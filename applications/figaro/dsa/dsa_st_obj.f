@@ -1,5 +1,5 @@
 C+
-C                     D S A _ S E T _ O B J E C T 
+C                     D S A _ S E T _ O B J E C T
 C
 C  Routine name:
 C     DSA_SET_OBJECT
@@ -28,7 +28,7 @@ C                      to be associated with the structure.
 C     (!) STATUS       (Integer,ref) Status code.  If bad status is
 C                      passed, this routine returns immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
@@ -100,7 +100,7 @@ C
       CHARACTER NAME*80                     ! DTA_ name for object name
       INTEGER   NCH                         ! Characters in object name
       INTEGER   NDIM                        ! # of dimensions in object string
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*80                ! Full structure name
 C
 C     Return immediately on bad status
@@ -122,7 +122,7 @@ C
       CALL DTA_SZVAR(NAME,1,NDIM,NCH,DTA_STATUS)
       IF (DTA_STATUS.EQ.0) THEN
 C
-C        It seems to exist.  See if it's large enough, and delete 
+C        It seems to exist.  See if it's large enough, and delete
 C        it if it isn't.
 C
          IF (NCH.LT.LENOBJ) THEN
@@ -147,11 +147,11 @@ C
       ELSE
 C
 C        If it didn't exist, it will have to be created
-C 
+C
          CREATE=.TRUE.
       END IF
 C
-C     If we're going to have to create it, do so.  
+C     If we're going to have to create it, do so.
 C
       IF (CREATE) THEN
          CALL DSA__CREATE_OBJECT(REF_SLOT,MAX(32,LENOBJ),DTA_STATUS)
@@ -172,7 +172,7 @@ C
          END IF
       END IF
 C
-C     At this point, we know it exists, and is big enough.  
+C     At this point, we know it exists, and is big enough.
 C     So write to it.
 C
       CALL DTA_WRVARC (NAME(:LENGTH),LENOBJ,OBJECT,DTA_STATUS)

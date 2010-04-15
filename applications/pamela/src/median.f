@@ -12,7 +12,7 @@ C   WDATA  =  R*4 Array containing the data.
 C   NPIX   =  I*4. Number of pixels in data array.
 C   IPEAK  =  Bin number of peak of line. Need only be within about 'FWHM'
 C             of true position.
-C   FWHM   =  Full-width half maximum of line to be fed in. 
+C   FWHM   =  Full-width half maximum of line to be fed in.
 C             If FWHM.LT.2. then a value of 2. is used.
 C   RBIN   =  R*4 Returns line position.
 C   SIGBIN =  R*4 Returns the ratio of the error of the line
@@ -37,7 +37,7 @@ C
       SAVE FWFAC, EPS
       DATA FWFAC/2.3548/
       DATA EPS/1.E-5/
-C     
+C
       CARE = 1.
       FSIG = MAX(2., FWHM)
       RSIG = FSIG/FWFAC
@@ -67,11 +67,11 @@ C
             ICHAMP= JPEAK+II-ISEARCH-1
          END IF
       END DO
-C     
+C
 C     If maximum occurs at end of search range, then have
 C     another go. If it gets to end of array give up, and if
 C     the loop has been traversed too many times, give up.
-C     
+C
       IF (ABS(ICHAMP-JPEAK).EQ.ISEARCH) THEN
          IF(ICHAMP.EQ.1 .OR. ICHAMP.EQ.NPIX .OR.
      &        ROUND.GT.10) THEN
@@ -84,11 +84,11 @@ C
 C
       JPEAK = ICHAMP
       RMU   = REAL(JPEAK)
-C     
+C
 C   Solve line-position equation by Newton's method.
 C
       IT  = 0
-      DEV = EPS + 1. 
+      DEV = EPS + 1.
       DO WHILE(ABS(DEV).GT.EPS .AND. IT.LT.100)
          IT = IT + 1
          IF(MOD(IT,10).EQ.0) CARE=0.95*CARE
@@ -115,7 +115,7 @@ C
 C
 C     Calculate error in bin position (assuming WDATA measured
 C     in counts)
-C     
+C
       RX1=0.D0
       RX2=0.D0
       DO I=IB1,IB2

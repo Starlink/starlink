@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COI_FKEYC( NAME, VALUE, CMTBGN, COMNT, COMCAR, HEADER, 
+*     CALL COI_FKEYC( NAME, VALUE, CMTBGN, COMNT, COMCAR, HEADER,
 *                     STATUS )
 
 *  Description:
@@ -91,7 +91,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -266,7 +266,7 @@
          CALL CHR_APPND( VAL( : VALN ), HEADER, CARDLN )
          CARDLN = ENDPOS + VALN
          CALL CHR_APPND( '''', HEADER, CARDLN )
-         
+
 *  If there is a comment string following keyword value, ...
          IF ( CMTBGN .NE. ' ' .AND. COMNT .NE. ' ' ) THEN
 
@@ -298,5 +298,5 @@
          HEADER( CARDLN:CARDLN ) = ' '
          CALL CHR_APPND( COMNT, HEADER, CARDLN )
       END IF
-      
+
       END

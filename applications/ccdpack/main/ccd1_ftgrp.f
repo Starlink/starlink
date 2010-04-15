@@ -48,7 +48,7 @@
 *        Two groups which on exit will contain the keyword and type of
 *        any FITS items whose values will be used in contructing
 *        extension item values.  The members of the first group will
-*        be normal (though possibly hierarchical) FITS keyword names, 
+*        be normal (though possibly hierarchical) FITS keyword names,
 *        except that they may contain one of the strings "<X1>", "<X2>",
 *        "<Y1>" or "<Y2>" to indicate indexing into a header value
 *        of the form [X1:X2,Y1:Y2].
@@ -117,7 +117,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -205,7 +205,7 @@
      :        NAME1( 1 : 5 ) .EQ. '_REAL'    .OR.
      :        NAME1( 1 : 7 ) .EQ. '_DOUBLE'  .OR.
      :        NAME1( 1 : 8 ) .EQ. '_LOGICAL' .OR.
-     :        NAME1( 1 : 5 ) .EQ. '_CHAR' ) THEN 
+     :        NAME1( 1 : 5 ) .EQ. '_CHAR' ) THEN
 
 *  Yes it is.  Check that the next word is a usable FITS keyword by
 *  making it TRANSFORM-friendly and then attempting a dummy substitution
@@ -223,7 +223,7 @@
                CALL MSG_SETC( 'LINNUM', NAME1 )
                CALL MSG_SETC( 'KEY', NAME2 )
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'CCD1_FTGRP_ERR', 
+               CALL ERR_REP( 'CCD1_FTGRP_ERR',
      :'  Invalid keyword name ^KEY at line ^LINNUM', STATUS )
                CALL ERR_RLSE
                GO TO 99
@@ -256,7 +256,7 @@
      :                   NAME2( 1 : 5 ) .EQ. '_REAL'    .OR.
      :                   NAME2( 1 : 7 ) .EQ. '_DOUBLE'  .OR.
      :                   NAME2( 1 : 8 ) .EQ. '_LOGICAL' .OR.
-     :                   NAME2( 1 : 5 ) .EQ. '_CHAR' ) ) THEN 
+     :                   NAME2( 1 : 5 ) .EQ. '_CHAR' ) ) THEN
 
 *  Not a FITS-keyword declaration and isn't a recognisable HDS-type.
 *  Look at the first element and see if is possible to convert this
@@ -266,14 +266,14 @@
                IF ( YES ) THEN
 
 *  Is known and has a type. Reorganize the input group to reflect this
-*  new state (last group may have trailing information so remember to 
+*  new state (last group may have trailing information so remember to
 *  append this.
                   CALL GRP_GET( WRDGRP( 3 ), I, 1, NAME3, STATUS )
                   CALL GRP_PUT( WRDGRP( 2 ), 1, NAME4, I, STATUS )
                   IAT = CHR_LEN( NAME2 ) + 1
                   CALL CHR_APPND( NAME3, NAME2, IAT )
                   CALL GRP_PUT( WRDGRP( 3 ), 1, NAME2, I, STATUS )
-               ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
+               ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Not recognised, hasn't been typed, isn't a FITS-keyword. Must be
 *  a mistake. Set status, issue an error message and abort.
@@ -307,10 +307,10 @@
             CALL GRP_GET( WRDGRP( 2 ), I, 1, NAME2, STATUS )
             CALL CCD1_KNEXT( NAME1, YES, NAME3, STATUS )
             IF ( YES ) THEN
-                     
+
 *  Ok item is known, is it typing correct?
 C               IF ( NAME2 .NE. NAME3 ) THEN
-                     
+
 *  No, better supersede this.
 C                  CALL MSG_SETC( 'ITEM', NAME1 )
 C                  CALL MSG_SETC( 'OLDTYPE', NAME2 )
@@ -318,13 +318,13 @@ C                  CALL MSG_SETC( 'NEWTYPE', NAME3 )
 C                  CALL CCD1_MSG( ' ', '  Warning - data type of'//
 C     :' extension item ^ITEM incorrect (^OLDTYPE) superseded by '//
 C     :'(^NEWTYPE)', STATUS )
-                     
+
 *  Overwrite the old type.
 C                  CALL GRP_PUT( WRDGRP( 2 ), 1, NAME3, I, STATUS )
 C                  NAME2 = NAME3
 C               END IF
-            ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
-                     
+            ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+
 *  Unrecognised extension item. Give up.
                CALL GRP_GET( LINGRP, I, 1, NAME3, STATUS )
                CALL MSG_SETC( 'LINNUM', NAME3 )
@@ -332,39 +332,39 @@ C               END IF
                STATUS = SAI__ERROR
                CALL ERR_REP( 'CCD1_FTGRP_ERR1', '  Unrecognisable'//
      :' statement or unknown extension item (^ITEM) - line ^LINNUM',
-     : STATUS )      
-            END IF   
+     : STATUS )
+            END IF
             IF ( STATUS .NE. SAI__OK ) GO TO 99
-                     
+
 *  Ok, now have a corroborated extension item, still havn't checked for
 *  any further FITS-keywords (which may be implicit). See if third item
 *  is singular and isn't numeric or logical, if this is so assume that
 *  it might be FITS-keyword. If it's _CHAR then treat separetely.
             CALL GRP_GET( WRDGRP( 3 ), I, 1, NAME3, STATUS )
             CALL CHR_DCWRD( NAME3, 1, NWRD, START, STOP, WORDS, LSTAT )
-            IF ( NAME2( 1 : 5 ) .NE. '_CHAR' ) THEN 
+            IF ( NAME2( 1 : 5 ) .NE. '_CHAR' ) THEN
                IF ( LSTAT .EQ. 0 ) THEN
-                     
+
 *  Single word. Is it a numeric or logical value?
                   CALL ERR_MARK
                   CALL CHR_CTOD( NAME3, DVAL, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
-                     
+
 *  Not numeric. Is it a possible logical?
                      CALL ERR_ANNUL( STATUS )
                      CALL CHR_CTOL( NAME3, LVAL, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
                         CALL ERR_ANNUL( STATUS )
-                        
+
 *  Not a numeric not a logical and is a single word. The only
 *  possibilities left are that this might already been declared or might
 *  be a single word which is a function of FITS-keywords already known.
-                        
+
 *  So check this name against those already in the group.
                         CALL GRP_INDEX( NAME3, FITGRP( 1 ), 1, INDEX,
      :                                  STATUS )
-                        IF ( INDEX .EQ. 0 ) THEN 
-                           
+                        IF ( INDEX .EQ. 0 ) THEN
+
 *  Isn't known, does it contain a reference to a known keyword? If so it
 *  is a straight function, if not don't know what it is (probably
 *  function of undeclared keyword).
@@ -376,20 +376,20 @@ C               END IF
                               CALL CCD1_KTIDY( .TRUE., NAME4, IX,
      :                                         STATUS )
                               NAME5 = NAME3
-                              CALL CCD1_KTIDY( .TRUE., NAME5, IX, 
+                              CALL CCD1_KTIDY( .TRUE., NAME5, IX,
      :                                         STATUS )
                               CALL TRN_STOK( NAME4, ' ', NAME5, NSUB,
      :                                       STATUS )
                               IF ( NSUB .NE. 0 ) THEN
-                           
+
 *  Known keyword substitutes into value, must be a function.
                                  LVAL = .TRUE.
-                                 GO TO 6    
+                                 GO TO 6
                               END IF
  5                         CONTINUE
  6                         CONTINUE
                            IF ( .NOT. LVAL ) THEN
-                           
+
 *  Almost certainly is a new FITS-keyword, one final check. Is it a
 *  valid token?  Test this by doing a dummy substitution.
                               WORDS( 1 ) = NAME3
@@ -399,9 +399,9 @@ C               END IF
                               CALL TRN_STOK( WORDS( 1 ), ' ', ' ', NSUB,
      :                                       STATUS )
                               IF ( STATUS .EQ. TRN__TOKIN ) THEN
-                           
+
 *  It's an invalid token. Cannot process this regardless. Time to give
-*  up on this.             
+*  up on this.
                                  CALL ERR_ANNUL( STATUS )
                                  CALL GRP_GET( LINGRP, I, 1, NAME1,
      :                                         STATUS )
@@ -417,7 +417,7 @@ C               END IF
                                  CALL ERR_RLSE
                                  GO TO 99
                               ELSE
-                           
+
 *  It's a FITS-keyword! Enter into group.
                                  CALL GRP_PUT( FITGRP( 1 ), 1, NAME3, 0,
      :                                         STATUS )
@@ -426,26 +426,26 @@ C               END IF
                               END IF
                               CALL ERR_RLSE
                            END IF
-                        END IF              
-                     END IF                 
-                  END IF                    
-                  CALL ERR_RLSE             
-               END IF                       
-            ELSE                            
-                                            
+                        END IF
+                     END IF
+                  END IF
+                  CALL ERR_RLSE
+               END IF
+            ELSE
+
 *  _CHAR data type. This need special processing, should always have a
 *  first word which is the name of a FITS-keyword. Just check if this
-*  exists, if not add it to the list.       
+*  exists, if not add it to the list.
                CALL GRP_GRPSZ( FITGRP( 1 ), NFITS, STATUS )
-               LVAL = .FALSE.               
-               DO 7 J = 1, NFITS            
+               LVAL = .FALSE.
+               DO 7 J = 1, NFITS
                   CALL GRP_GET( FITGRP( 1 ), J, 1, NAME4, STATUS )
                   CALL CCD1_KTIDY( .TRUE., NAME4, IX, STATUS )
                   NAME5 = NAME3( START( 1 ) : STOP( 1 ) )
                   CALL CCD1_KTIDY( .TRUE., NAME5, IX, STATUS )
                   CALL TRN_STOK( NAME4, ' ', NAME5, NSUB, STATUS )
                   IF ( NSUB .NE. 0 ) THEN
-                           
+
 *  Known keyword substitutes into value, must be a function.
                      LVAL = .TRUE.
                      GO TO 8
@@ -453,7 +453,7 @@ C               END IF
  7             CONTINUE
  8             CONTINUE
                IF ( .NOT. LVAL ) THEN
-                           
+
 *  Almost certainly is a new FITS-keyword, one final check. Is it a
 *  valid token?  Test this by doing a dummy substitution.
                   WORDS( 1 ) = NAME3( START( 1 ) : STOP( 1 ) )
@@ -461,9 +461,9 @@ C               END IF
                   CALL ERR_MARK
                   CALL TRN_STOK( WORDS( 1 ), ' ', ' ', NSUB, STATUS )
                   IF ( STATUS .EQ. TRN__TOKIN ) THEN
-                           
+
 *  It's an invalid token. Cannot process this regardless. Time to give
-*  up on this.             
+*  up on this.
                      CALL ERR_ANNUL( STATUS )
                      CALL GRP_GET( LINGRP, I, 1, NAME1, STATUS )
                      CALL MSG_SETC( 'LINNUM', NAME1 )
@@ -477,7 +477,7 @@ C               END IF
                      CALL ERR_RLSE
                      GO TO 99
                   ELSE
-                           
+
 *  It's a FITS-keyword! Enter into group.
                      CALL GRP_PUT( FITGRP( 1 ), 1,
      :                             NAME3( START( 1 ) : STOP ( 1 ) ),
@@ -487,7 +487,7 @@ C               END IF
                   CALL ERR_RLSE
                END IF
             END IF
-               
+
 *  Now record this extension-item together with its type and
 *  fits function.
             CALL GRP_PUT( DESGRP( 1 ), 1, NAME1, 0, STATUS )

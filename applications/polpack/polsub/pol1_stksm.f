@@ -36,7 +36,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

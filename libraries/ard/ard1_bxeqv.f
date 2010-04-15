@@ -35,7 +35,7 @@
 *     MSKSIZ = INTEGER (Given)
 *        The total number of elements in each array.
 *     A( MSKSIZ ) = INTEGER (Given)
-*        The first input array (in vector form). 
+*        The first input array (in vector form).
 *     LBOX( NDIM ) = INTEGER (Given)
 *        The lower pixel bounds of the box. A value of VAL__MAXI for
 *        element 1 is used to indicate an infinite box, and a value of
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -116,7 +116,7 @@
      :        LLBOX( ARD__MXDIM ),! Supplied box limited to mask area
      :        LUBOX( ARD__MXDIM ),! Supplied box limited to mask area
      :        MDIM,              ! A dimension size in supplied array
-     :        P,                 ! No. of pixels in (N-1)-Dim. object 
+     :        P,                 ! No. of pixels in (N-1)-Dim. object
      :        VA,                ! Vector address within supplied array
      :        VAINC( ARD__MXDIM) ! VA increment between N-D objects
 
@@ -147,12 +147,12 @@
 *  pixel is exterior.
             ELSE
                B( VA ) = 0
-      
+
             END IF
 
          END DO
 
-*  If the box is null, return without doing anything.                  
+*  If the box is null, return without doing anything.
       ELSE IF( LBOX( 1 ) .NE. VAL__MINI ) THEN
 
 *  Working in a variable number of dimensions introduces complications
@@ -227,7 +227,7 @@
 *  (system 2.) of the current pixel is BOXEL.
          DO BOXEL = 1, BOXSIZ
 
-*  Assign a value to the current pixel (as above). 
+*  Assign a value to the current pixel (as above).
             IF( B( VA ) .LE. 0 .AND.
      :          A( VA ) .LE. 0 ) THEN
                B( VA ) = 1
@@ -238,7 +238,7 @@
 
             ELSE
                B( VA ) = 0
-      
+
             END IF
 
 *  Increment the B array vector address of the next pixel to be
@@ -251,7 +251,7 @@
 *  If the index is now larger than the corresponding upper bound of the
 *  box...
             I = 1
-            DO WHILE( BINDEX( I ) .GT. LUBOX( I ) ) 
+            DO WHILE( BINDEX( I ) .GT. LUBOX( I ) )
 
 *  Reset the index to the corresponding lower bound.
                BINDEX( I ) = LLBOX( I )
@@ -268,11 +268,11 @@
 *  Increment the index for the next higher dimension.
                   I = I + 1
                   BINDEX( I ) = BINDEX( I ) + 1
-   
+
                END IF
-   
+
             END DO
-   
+
          END DO
 
       END IF

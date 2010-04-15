@@ -29,7 +29,7 @@ isa_ok($int, "Starlink::AST::Interval");
 my $ellipse = new Starlink::AST::Ellipse( $sky, 1, [0,0],[120*DAS2R,180*DAS2R],
 					  [0], undef, "" );
 isa_ok($ellipse, "Starlink::AST::Ellipse");
-my $polygon = new Starlink::AST::Polygon( $sky, 
+my $polygon = new Starlink::AST::Polygon( $sky,
 					  [-0.2, 0,0.2,0],
 					  [ 0, 0.2, 0, -0.2],
 					  undef, "");

@@ -24,7 +24,7 @@ C                  x data will simply be pixel number.
 C     ARCTYPE      The type of arc that was used - eg HELIUM,
 C                  NEON, etc. ARC will look for a file called
 C                  ARCTYPE.ARC which should hold the line list for
-C                  the arc.                              
+C                  the arc.
 C     INTERACTIVE  The number of orders to be fit interactively.
 C     ORDERS       The array of INTERACTIVE order numbers to be fit.
 C     ORDERFIT     The initial order of the polynomial fit.
@@ -50,7 +50,7 @@ C     WAVELEN      Wavelength specification.
 C     CHFACT
 C     SIGFACT
 C
-C     Command keywords -   
+C     Command keywords -
 C
 C     PREVIOUS     If specified, ARC will read in the line list from
 C                  the previous session as a starting point.
@@ -82,7 +82,7 @@ C     (>) HARD     (Char) The device/type for graphics hard plots.
 C
 C     Input -
 C
-C     As named     May use the lines from a previous run.  If so 
+C     As named     May use the lines from a previous run.  If so
 C     by ARFILE    these are read from the previous run's output
 C                  file.  See below.
 C
@@ -126,9 +126,9 @@ C        28th Nov 1984. KS/AAO. Test for only one line added before fit.
 C        10th Dec 1984. KS/AAO. Number of arc lines allowed increased.
 C        5th Sept 1985. KS/AAO. Dispersion plot facility added and menu
 C                       operation adopted for the fit,edit,refit sequence.
-C                       ARFILE parameter added.  Output file name now 
+C                       ARFILE parameter added.  Output file name now
 C                       output. Line number added to output file format.
-C                       RMS now output after 'C'.  Weights array now 
+C                       RMS now output after 'C'.  Weights array now
 C                       incorporated everywhere, but only really used in
 C                       ARFIT for the 'RMS without this line' figure.
 C                       Autofit added, together with class array.  Defaults
@@ -153,7 +153,7 @@ C        Modified for use with 2D input data, one order at a time. "ORDER"
 C        (of polynomial fit) renamed "NCOEFF" and all occurances of [real]
 C        ORDER+1 ---> ORDER [NCOEFF] changed to a consistant NCOEFF def'n.
 C
-C        Output file renamed "ARLINES.ECH" and format of file changed to 
+C        Output file renamed "ARLINES.ECH" and format of file changed to
 C        include order number for each line identified.  All subroutines
 C        affected by this revision renamed ECH_AR...
 C
@@ -209,7 +209,7 @@ C     18 Sep 1988  To avoid conflicts with routines in ARC (when linked
 C                  with Callable Figaro, for example) all subroutines
 C                  with names still common to both - anything still
 C                  beginning 'AR' instead of 'ECH_AR' have been given
-C                  an ARC_ prefix.  Sometime, these and those used by 
+C                  an ARC_ prefix.  Sometime, these and those used by
 C                  ARC should be combined into a single set of utilities.
 C                  KS/AAO.
 C     08 May 1989  Increase maximum number of interactively fitted orders
@@ -453,7 +453,7 @@ C
       IF (PAR_ABORT()) GO TO 500
 C
 C     Get workspace for the dispersion plots (two real arrays, each NX long)
-C     and for the X array and Z array (both real, NX long), and for a 
+C     and for the X array and Z array (both real, NX long), and for a
 C     double precision X array XDPTR (NX long).
 C
       CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',  WPTR, SLOT,STATUS)
@@ -467,7 +467,7 @@ C
       CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',XDPTR, SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
-C     Initialise the channel number and wavelength arrays, and 
+C     Initialise the channel number and wavelength arrays, and
 C     open output ARLINES.ECH file (UNIT=IOUT)
 C
       CALL PAR_RDKEY('PREVIOUS',.FALSE.,PREV)
@@ -482,7 +482,7 @@ C
       IF (ISTAT.NE.0) GO TO 500
 C
 C     Get the order numbers to be fit interactively ...
-C                                       
+C
       CALL PAR_RDVAL('INTERACTIVE',3.,FLOAT(INTMAX),3.,' ',VALUE)
       IF (PAR_ABORT()) GO TO 500
       NINTERACTIVE=VALUE
@@ -493,7 +493,7 @@ C
       CALL DYN_INCAD(IWTSPTR,'FLOAT',NINTERACTIVE,IMLDPTR,ISNEW,STATUS)
       CALL DYN_INCAD(IMLDPTR,'FLOAT',NINTERACTIVE,JORDPTR,ISNEW,STATUS)
       CALL DYN_INCAD(JORDPTR,'INT',NINTERACTIVE,FITSPTR,ISNEW,STATUS)
-      
+
       FORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),1)
       LORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),NORDERS)
       IF (FORDR.LE.LORDR) THEN
@@ -731,8 +731,8 @@ C
 C
       SVRMS=SVRMS/FLOAT(NINTERACTIVE)
 C
-C     Now we have NINTERACTIVE rows of %VAL(OPTR) filled with wavelengths; 
-C        below we fill in the rest with rather good guesses ... 
+C     Now we have NINTERACTIVE rows of %VAL(OPTR) filled with wavelengths;
+C        below we fill in the rest with rather good guesses ...
 C
       CALL ECH_ARFLAG(%VAL(CNF_PVAL(IORDPTR)),NINTERACTIVE,NORDERS,
      :                          FORDR,LORDR,%VAL(CNF_PVAL(FITSPTR)))

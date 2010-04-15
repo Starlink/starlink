@@ -150,7 +150,7 @@ sub adamtask_init {
   $adam_started = 1;
 
   return $ADAM_STATUS;
-  
+
 }
 
 
@@ -189,9 +189,9 @@ sub adamtask_message {
   return ($status, undef) if $command =~ /endmsg|setresponse|badstatus/;
 
   # If this is a control response then we should print the directory
-  # but only if we are sending a 'default' action. 'par_reset' returns nothing 
+  # but only if we are sending a 'default' action. 'par_reset' returns nothing
   $command eq "controlresponse" && do {
-    print $MSGHAND "$message[2] = $message[6]\n" 
+    print $MSGHAND "$message[2] = $message[6]\n"
       if ($message[2] eq "default" & !$msg_hide);
     return ($status, $message[6]);
   };
@@ -200,7 +200,7 @@ sub adamtask_message {
   # If this is a getresponse then return the parameter value
   $command eq "getresponse" && do {
     return ($status, $message[6]);
-    
+
   };
 
   # Just print inform messages
@@ -217,10 +217,10 @@ sub adamtask_message {
 
   # Need to ask for a parameter if we have a paramreq
   $command eq "paramreq" && do {
-    
+
     # Have to split the paramreq into parts
     # Split on the newline character (that was added by Starlink::ADAM)
-  
+
     my (@bits) = split(/\n/,$message[6]);
 
     my $value = &$PARAMREP_SUB(@bits);
@@ -260,7 +260,7 @@ Example:
 
 sub adamtask {
 
-  croak 'Usage: adamtask name, [file], [options]' 
+  croak 'Usage: adamtask name, [file], [options]'
     if (scalar(@_) < 1);
 
   # Arguments
@@ -285,7 +285,7 @@ sub adamtask {
   %options = %$opthash if defined $opthash;
 
   # Variables
-  my ($adam_task_type, $adam_task_type_set, $icl_task_name, 
+  my ($adam_task_type, $adam_task_type_set, $icl_task_name,
       $icl_task_name_set);
 
 #  print "Image is $image, Options $opthash\n";
@@ -345,7 +345,7 @@ sub adamtask {
     # Cant use a 'system' call since this does not return the PID
     # of the process. Use the Proc::Simple module instead.
 
-     # If I use this method for starting the tasks they 
+     # If I use this method for starting the tasks they
      # kill themselves when I shutdown.
 #    print "Starting $image...\n";
     my $pid = new Proc::Simple;
@@ -370,14 +370,14 @@ sub adamtask {
 
     }
 
-    
-    # Restore the environment    
+
+    # Restore the environment
     if ($adam_task_type_set) {
       $ENV{ADAM_TASK_TYPE} = $adam_task_type;
     } else {
       delete $ENV{ADAM_TASK_TYPE}
     }
-    
+
     if ($icl_task_name_set) {
       $ENV{ICL_TASK_NAME} = $icl_task_name;
     } else {
@@ -513,7 +513,7 @@ sub adamtask_sendw {
 
   # Return the parameter value if this is a 'getresponse'
   $response = " " unless (defined $response);
-  return ($ADAM_STATUS,$response) 
+  return ($ADAM_STATUS,$response)
     if $reply[0] =~ 'getresponse|controlresponse';
 
 
@@ -553,7 +553,7 @@ sub adamtask_set {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my $status = 
+  my $status =
     adamtask_sendw($task,$param,"SET",$val);
 
 }
@@ -616,7 +616,7 @@ sub adamtask_obey {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my $result = 
+  my $result =
     adamtask_send("adam_send(\"$task\",\"$command\",\"OBEY\",\"$params\")");
 
   return $result;
@@ -638,14 +638,14 @@ sub adamtask_paramreply {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my $status = 
+  my $status =
     adamtask_send("adam_reply($path,$messid,\"PARAMREP\",\"\",\"$reply\")");
 
   return $status;
 
 }
 
-# adamtask_syncreply 
+# adamtask_syncreply
 #
 #  Sends a reply to a sync message
 
@@ -666,7 +666,7 @@ sub adamtask_syncreply {
 
 =item adamtask_control()
 
-This routine can be used to send one of two CONTROL messages to 
+This routine can be used to send one of two CONTROL messages to
 an ADAM task and can take 3 forms.
 
 =over 4
@@ -708,7 +708,7 @@ sub adamtask_control {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my ($status, $result) = 
+  my ($status, $result) =
     adamtask_sendw($task,$command,"CONTROL",$params);
 
 #  return $result if $command eq 'default';
@@ -716,7 +716,7 @@ sub adamtask_control {
 
 }
 
-# adamtask_cancel 
+# adamtask_cancel
 #
 #  Implements the CANCEL command
 
@@ -906,7 +906,7 @@ module).
 =head2 B<Timeouts>
 
 The timeout period (in seconds) is controlled by the
-$Starlink::ADAMTASK::TIMEOUT variable. 
+$Starlink::ADAMTASK::TIMEOUT variable.
 
 
 =head2 B<Messages>
@@ -972,7 +972,7 @@ where <pid> is the process ID number.
    Starlink::ADAM) can be used to see whether the monolith is
    accepting messages.
 
- o get sometimes returns values that contain '@' symbols (eg 
+ o get sometimes returns values that contain '@' symbols (eg
    parameters for devices and NDFs). Make sure these are stripped before
    passing them to obeyw since perl will eval an '@' as an array.
 

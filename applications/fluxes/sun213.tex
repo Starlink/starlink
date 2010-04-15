@@ -2,7 +2,7 @@
 \usepackage{graphicx}
 
 \pagestyle{myheadings}
- 
+
 % -----------------------------------------------------------------------------
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
@@ -19,8 +19,8 @@
 FLUXES calculates accurate {\bf topocentric positions} of the planets and also
 {\bf integrated flux densities} of five of them at several wavelengths.
 These provide calibration information at the effective frequencies and
-beam-sizes employed by the UKT14 and SCUBA receivers on the 
-JCMT telescope based on Mauna Kea, Hawaii. 
+beam-sizes employed by the UKT14 and SCUBA receivers on the
+JCMT telescope based on Mauna Kea, Hawaii.
 
 A script, FLUXNOW, runs FLUXES for the current time and date.
 This allows you to obtain planetary positions and flux levels quickly.
@@ -85,7 +85,7 @@ This allows you to obtain planetary positions and flux levels quickly.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -240,12 +240,12 @@ This allows you to obtain planetary positions and flux levels quickly.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -287,8 +287,8 @@ This allows you to obtain planetary positions and flux levels quickly.
 
 FLUXES calculates accurate \textbf{topocentric positions} of the planets and
 also \textbf{integrated flux densities} of five of them at a number of
-wavelengths for the 
-\htmladdnormallink{JCMT telescope}{http://www.jach.hawaii.edu/JCMT/home.html} 
+wavelengths for the
+\htmladdnormallink{JCMT telescope}{http://www.jach.hawaii.edu/JCMT/home.html}
 on Mauna Kea, Hawaii.  These provide calibration information at the effective
 frequencies and beam-sizes employed by the UKT14 and SCUBA receivers on this
 telescope.
@@ -331,16 +331,16 @@ The differences mainly reflect changes in detector/telescope hardware.
 
 The program selects the appropriate {\tt{.dat}} file to use, based on the date
 you specify.
-The calculated temperature has an rms error of about 0.13K (negligible). 
+The calculated temperature has an rms error of about 0.13K (negligible).
 
 Bear in mind that Saturn can only be used for calibration when the
-rings are not open, and the Martian brightness temperatures are probably 
-only accurate to around $\pm5$\%. 
+rings are not open, and the Martian brightness temperatures are probably
+only accurate to around $\pm5$\%.
 
 \section{Using FLUXES}
 \xlabel{USING}
 \label{sec:using}
- 
+
 To run FLUXES or FLUXNOW, type its name (in lower case) after the prompt:
 
 \begin{myquote}
@@ -354,29 +354,29 @@ The program first asks you what output you want to generate:
 \begin{myquote}
 \begin{verbatim}
 JCMT FLUXES
- 
+
 POS - Do you require planetary data? (Y/N) /YES/ > Y
 FLU - Do you require flux data?      (Y/N) /YES/ > Y
-\end{verbatim} 
+\end{verbatim}
 \end{myquote}
 
-In the above example I opted to see both sets of output data. 
+In the above example I opted to see both sets of output data.
 If you were only interested in the planetary positions, reply ``{\tt{N}}''
 to the second prompt.
 (Prompts asking for a {\tt{Y/N}} answer can also be answered using
 {\tt{true/false}} or {\tt{t/f}} or {\tt{y/n}} --
 case is not significant.)
 
-Next, indicate where you want the information displayed or stored: 
+Next, indicate where you want the information displayed or stored:
 
 \begin{myquote}
 \begin{verbatim}
 SCREEN - Display output to terminal? (Y/N) /YES/ > Y
 OFL - Store output in a file?        (Y/N) /NO/ > Y
-OUTFILE - Name of output file /'fluxes.dat'/ > 
- 
+OUTFILE - Name of output file /'fluxes.dat'/ >
+
 Data will be written to file: /home/user1/gjp/flux/fluxes.dat
-\end{verbatim} 
+\end{verbatim}
 \end{myquote}
 
 If you reply ``{\tt{N}}'' to the OFL prompt, the next lines shown won't appear.
@@ -390,14 +390,14 @@ Otherwise, you must specify the time and date yourself, as appears below:
 \begin{myquote}
 \begin{verbatim}
 NOW - Use todays date/time? (Y/N) /YES/ > N
- 
+
 DATE - UT DATE (DD MM YY) /'12 09 96'/ > 16 09 96
 TIME - UT TIME (HH MM SS) /'12 00 00'/ > 08 45 00
 \end{verbatim}
 \end{myquote}
 
 Since you might only require flux and positional information for one planet,
-you are given the option of selecting it by specifying a value for the 
+you are given the option of selecting it by specifying a value for the
 parameter PLANET.
 When prompted, give the name of any planet, the Sun, the Moon,
 or `ALL' (meaning all the planets plus the Sun and Moon).
@@ -407,24 +407,24 @@ An example of the output generated is:
 
 \begin{myquote}
 \begin{verbatim}
-Planetary Submillimetre Fluxes for the JCMT                                     
- 
-UT:  11:25:55       UT Date:18-Sep-1996     HST: 1:25:55                        
- 
-LST:  0:53:52.8981  Julian:  2450344.976  Epoch: 1996.7145                      
- 
-Body         RA        TRIMRA         Dec       TRIMDEC        GD     AMASS     
-           (h m s)  (arcsec/sec)    (d m s)  (arcsec/sec)     (au)              
-SUN     11 44 39.7958  0.0379   + 1 39 35.6411  -0.0161    1.004696  13.375     
-MERCURY 11 33 12.7569 -0.0334   - 0 15 11.0814   0.0277    0.652113  13.375     
-VENUS    8 57 54.0821  0.0475   +16 20 20.0995  -0.0096    0.931408  13.375     
-MARS     8 32  2.5581  0.0268   +19 56 37.7140  -0.0057    2.022076  13.375     
-JUPITER 18 35 37.5441  0.0021   -23 23 38.9082   0.0001    4.866561  13.375     
-SATURN   0 21  4.1782 -0.0030   - 0 33 48.7199  -0.0013    8.508145   1.078     
-URANUS  20 12 44.5684 -0.0008   -20 33 32.2338  -0.0001   19.189787   5.468     
-NEPTUNE 19 47 41.0764 -0.0004   -20 39 32.1751  -0.0001   29.655347  10.395     
-PLUTO   16  4 56.5905  0.0008   - 7 52 56.4430  -0.0005   30.327917  13.375     
-MOON    15 54 32.2690  0.7373   -16 17 35.4393  -0.0368    0.002580  13.375     
+Planetary Submillimetre Fluxes for the JCMT
+
+UT:  11:25:55       UT Date:18-Sep-1996     HST: 1:25:55
+
+LST:  0:53:52.8981  Julian:  2450344.976  Epoch: 1996.7145
+
+Body         RA        TRIMRA         Dec       TRIMDEC        GD     AMASS
+           (h m s)  (arcsec/sec)    (d m s)  (arcsec/sec)     (au)
+SUN     11 44 39.7958  0.0379   + 1 39 35.6411  -0.0161    1.004696  13.375
+MERCURY 11 33 12.7569 -0.0334   - 0 15 11.0814   0.0277    0.652113  13.375
+VENUS    8 57 54.0821  0.0475   +16 20 20.0995  -0.0096    0.931408  13.375
+MARS     8 32  2.5581  0.0268   +19 56 37.7140  -0.0057    2.022076  13.375
+JUPITER 18 35 37.5441  0.0021   -23 23 38.9082   0.0001    4.866561  13.375
+SATURN   0 21  4.1782 -0.0030   - 0 33 48.7199  -0.0013    8.508145   1.078
+URANUS  20 12 44.5684 -0.0008   -20 33 32.2338  -0.0001   19.189787   5.468
+NEPTUNE 19 47 41.0764 -0.0004   -20 39 32.1751  -0.0001   29.655347  10.395
+PLUTO   16  4 56.5905  0.0008   - 7 52 56.4430  -0.0005   30.327917  13.375
+MOON    15 54 32.2690  0.7373   -16 17 35.4393  -0.0368    0.002580  13.375
 \end{verbatim}
 \end{myquote}
 
@@ -432,32 +432,32 @@ MOON    15 54 32.2690  0.7373   -16 17 35.4393  -0.0368    0.002580  13.375
 
 \begin{myquote}
 \begin{verbatim}
-Mars                                                                            
-South pole is Earth-facing; Inclination Angle =  73.30 degrees                  
-Semi-diameter =  2.31 arcsecs    Solid angle =  3.95E-10 sterads                
-Filter    Centre   Filter   Total   Flux in    Brightness          HPBW        
-Wavel.     Freq     Width    Flux    beam      Temperature       assumed       
-micron     (GHz)    (GHz)    (Jy)     (Jy)          (K)          (arcsecs)      
- 2000     146.0    39.0     52.15     51.81    205.1 +-  0.0       33.8         
- 1300     221.0    60.0    119.62    117.85    207.1 +-  0.0       22.3         
- 1100     264.0    60.0    170.56    167.00    208.0 +-  0.0       18.7         
-  850     350.0    30.0    298.80    287.78    209.3 +-  0.0       14.0         
-  750     407.0    30.0    402.83    383.11    210.0 +-  0.0       12.1         
-  600     483.0    51.0    564.65    526.27    210.9 +-  0.0       10.2         
-  450     677.0    30.0   1093.57    954.64    212.5 +-  0.0        7.3         
-  350     866.0    30.0   1761.21   1414.15    213.7 +-  0.0        5.7         
+Mars
+South pole is Earth-facing; Inclination Angle =  73.30 degrees
+Semi-diameter =  2.31 arcsecs    Solid angle =  3.95E-10 sterads
+Filter    Centre   Filter   Total   Flux in    Brightness          HPBW
+Wavel.     Freq     Width    Flux    beam      Temperature       assumed
+micron     (GHz)    (GHz)    (Jy)     (Jy)          (K)          (arcsecs)
+ 2000     146.0    39.0     52.15     51.81    205.1 +-  0.0       33.8
+ 1300     221.0    60.0    119.62    117.85    207.1 +-  0.0       22.3
+ 1100     264.0    60.0    170.56    167.00    208.0 +-  0.0       18.7
+  850     350.0    30.0    298.80    287.78    209.3 +-  0.0       14.0
+  750     407.0    30.0    402.83    383.11    210.0 +-  0.0       12.1
+  600     483.0    51.0    564.65    526.27    210.9 +-  0.0       10.2
+  450     677.0    30.0   1093.57    954.64    212.5 +-  0.0        7.3
+  350     866.0    30.0   1761.21   1414.15    213.7 +-  0.0        5.7
 \end{verbatim}
 \end{myquote}
 
 and so on....
-  
-If you encounter problems, please ask your system manager to consult 
+
+If you encounter problems, please ask your system manager to consult
 Appendix A.
 
 \section{Planetary brightness and flux density calculations}
 \xlabel{PLANET}
 \label{sec:planet}
-   
+
 The calibration of the temperature and flux density scales for the
 \htmladdnormallink{JCMT}{http://www.jach.hawaii.edu/JCMT/home.html} antenna
 ultimately rests on accurate knowledge of the brightness temperatures of the
@@ -468,11 +468,11 @@ Mars is used as the primary calibrator; that is, the brightness
 temperatures of all other planets are referred to the brightness temperature of
 Mars. Since Mars is a solid body, it is relatively secure to use a model of its
 brightness temperature as a function of date. This information can then be used
-to calibrate observations of the other planets. 
- 
-Once the brightness temperatures are known, it becomes possible to calculate 
-the flux density received at the Earth from a given planet, corrected for the 
-apparent size of the planet and the beam size of the 
+to calibrate observations of the other planets.
+
+Once the brightness temperatures are known, it becomes possible to calculate
+the flux density received at the Earth from a given planet, corrected for the
+apparent size of the planet and the beam size of the
 \htmladdnormallink{JCMT}{http://www.jach.hawaii.edu/JCMT/home.html}
 at the frequency being used.
 This is done by FLUXES and FLUXNOW.
@@ -484,13 +484,13 @@ visible to a 65mm aperture (the standard detector width) -- shown in the
 tables under the heading {\tt{Flux in beam}}.
 The latter is calculated from the beam width given in the final column -- if
 you have reason to believe that the beam width is different, or you have used a
-different aperture, you will have to re-do the calculation. 
+different aperture, you will have to re-do the calculation.
 
-The planetary brightness temperatures used are obtained from the measurements 
-of Griffin et al. (1986, {\tt{Icarus}}, 65, 244), Orton et al. 
+The planetary brightness temperatures used are obtained from the measurements
+of Griffin et al. (1986, {\tt{Icarus}}, 65, 244), Orton et al.
 (1986, {\tt{Icarus}}, 67, 289),
-and Griffin \& Orton (1993, {\tt{Icarus}}, 105, 537). The errors in brightness 
-temperatures are the rms internal errors of the observations. 
+and Griffin \& Orton (1993, {\tt{Icarus}}, 105, 537). The errors in brightness
+temperatures are the rms internal errors of the observations.
 
 From MJD 46040 until MJD 50000 ({\em{i.e.}}\ JD 2450000.5, corresponding to 1995
 October 10), FLUXES uses $\lambda350\mu$m Martian brightness temperatures
@@ -501,19 +501,19 @@ the Earth and the whole-disk brightness temperature at 40-day intervals. The
 model does not include the effects of dust storms and the Martian polar cap. At
 all other times, the model has a maximum uncertainty of within $\pm5$\% . Since
 the results for Mars are derived from models, no errors are quoted in the output
-of FLUXES. 
+of FLUXES.
 
-Before MJD 46040 and, more importantly, since MJD 50000, FLUXES uses a 
-modification of Wright's rotating cratered asteroid program (Wright, 
-E.L., 1995; private communication to H.E. Matthews). This reproduces 
+Before MJD 46040 and, more importantly, since MJD 50000, FLUXES uses a
+modification of Wright's rotating cratered asteroid program (Wright,
+E.L., 1995; private communication to H.E. Matthews). This reproduces
 82\%\ of the $T_b$ values in Table~6 of Wright (1976) exactly (where they are
-rounded to the nearest Kelvin), while the other 18\%\ differ by only $\pm1$~K. 
-A low-precision formula by Van Flandern and Pulkinnen, 
+rounded to the nearest Kelvin), while the other 18\%\ differ by only $\pm1$~K.
+A low-precision formula by Van Flandern and Pulkinnen,
 (1979, {\tt{Ap.J.Supp.}}, 41, 391)
 was used to compute the geometric factors (Mars-Sun
 distance $R$, Martian declinations of the Sun and the Earth $D_S$ and $D_E$,
 and the difference in Martian right ascensions between the Earth and the Sun
-$A_S - A_E$) far into the future. 
+$A_S - A_E$) far into the future.
 
 \begin{figure}
 \includegraphics[angle=-90,width=\textwidth]{sun213_fig1.eps}
@@ -521,23 +521,23 @@ $A_S - A_E$) far into the future.
 \caption{Martian brightness temperatures}
 \label{fig:mars}
 \end{figure}
- 
+
 The values of $T_b$ for Mars are calculated for the entire date range
 at intervals of 40 days. FLUXES interpolates between the nearest two
-values to obtain the value for the requested date and time. 
-Figure \ref{fig:mars} shows the variation of disk-averaged Martian $\lambda350$-$\mu$m 
-brightness temperatures over a period of 25.2 years, beginning in late 1975, 
-calculated using a rotating cratered asteroid model, and corrected for the 
-microwave background. The differences between this model and the full model 
-by Wright (1976) over the range for which data is available is shown 
+values to obtain the value for the requested date and time.
+Figure \ref{fig:mars} shows the variation of disk-averaged Martian $\lambda350$-$\mu$m
+brightness temperatures over a period of 25.2 years, beginning in late 1975,
+calculated using a rotating cratered asteroid model, and corrected for the
+microwave background. The differences between this model and the full model
+by Wright (1976) over the range for which data is available is shown
 dotted below, where the solid horizontal line is 0~K~T$_b$ difference.
 
 Over the interval for which
 both the original Wright model and the simplified model are valid, the
 differences in brightness temperatures have an rms error of 0.13~K
 ({\em i.e.}\ negligible) after removing a constant offset of -2.56~K, assumed
-due to the microwave background. 
- 
+due to the microwave background.
+
 \section{Using FLUXNOW}
 \xlabel{FLUXNOW}
 \label{sec:fluxnow}
@@ -567,7 +567,7 @@ FLUXES was originally developed as part of the
 package maintained by the \htmladdnormallink{JCMT Software Group}
 {http://www.jach.hawaii.edu/jcmt_sw/} at Hilo, Hawaii. It is
 loosely based on code originally developed by B.D. Yallop and C.Y. Hohenkerk
-of \htmladdnormallink{HM Nautical Almanac Office}{http://www.ast.cam.ac.uk/}. 
+of \htmladdnormallink{HM Nautical Almanac Office}{http://www.ast.cam.ac.uk/}.
 
 \clearpage
 
@@ -575,10 +575,10 @@ of \htmladdnormallink{HM Nautical Almanac Office}{http://www.ast.cam.ac.uk/}.
 \section{Installation}
 \xlabel{INSTALLATION}
 \label{sec:installation}
- 
-Most of what follows is likely to be of interest to site system managers only 
+
+Most of what follows is likely to be of interest to site system managers only
 and may be skipped by the rest of us.
- 
+
 The FLUXES/FLUXNOW code and associated files are supplied as a compressed
 tar file: {\tt{fluxes.tar.Z}}.  To install FLUXES/FLUXNOW the file must be
 uncompressed and the contents extracted to a suitable directory.  On
@@ -620,10 +620,10 @@ most Starlink system this will be directory {\tt{/star}}:
 \end{verbatim}
 \end{myquote}
 
-Once this is done you can make FLUXES and FLUXNOW available to you 
+Once this is done you can make FLUXES and FLUXNOW available to you
 by inserting:
 
-\begin{myquote} 
+\begin{myquote}
 \begin{verbatim}
 if ( -e /star/bin/fluxes/fluxes) then
    alias fluxes /star/bin/fluxes/fluxes.csh
@@ -634,7 +634,7 @@ else
 endif
 \end{verbatim}
 \end{myquote}
- 
+
 into your {\tt{/star/etc/cshrc}} file.  The example given assumes that
 you have chosen to have the FLUXES executable installed in directory
 {\tt{/star/bin/fluxes}}.  Obviously you will need to change this if you
@@ -667,7 +667,7 @@ in certain circumstances the flux values can be written to ADAM parameters
 and retrieved (this is somewhat easier than parsing the output text file).
 
 When FLUXES is run with a single planet name and filter the calculated
-flux values for that combination are written to the following 
+flux values for that combination are written to the following
 ADAM parameters:
 
 \begin{description}
@@ -679,10 +679,10 @@ ADAM parameters:
 \item[T\_BRIGHT:] the brightness temperature of the planet (K)
 \item[T\_ERROR:] the error in the brightness temperature (K)
 \item[SEMI\_DIAM:] Semi-diameter of the selected planet (arcsec).
-If `ALL' planets are selected then the parameter will retain the 
+If `ALL' planets are selected then the parameter will retain the
 value of the last planet processed (Neptune)
 \item[SOLID\_ANG:] Solid angle of the selected planet (steradians).
-If `ALL' planets are selected then the parameter will retain the 
+If `ALL' planets are selected then the parameter will retain the
 value of the last planet processed (Neptune)
 \end{description}
 
@@ -711,15 +711,15 @@ output was obtained even though fluxes was instructed to write
 to neither the screen or a file (and MSG\_FILTER=QUIET hides
 output even if SCREEN=yes).
 
- 
+
 It is possible to run FLUXES as a monolith but this requires
 that the fluxes monolith is run directly (not via the fluxes.csh
 shell script), that the JPL ephemeris is available as JPLEPH in the
 current working directory and that the envrionment variables
 FLUXES and FLUXPWD are set to the location of the fluxes binary
 and the current working directory respectively. If it is running
-as a monolith (specifically as an I-task) the parameter values can 
-then be retrieved from the monolith (e.g.\ by using 
+as a monolith (specifically as an I-task) the parameter values can
+then be retrieved from the monolith (e.g.\ by using
 \xref{STARTCL}{sun186}{adam_message_system_extension} ).
 
 \section{How does FLUXES work?}
@@ -856,13 +856,13 @@ where ${RA^\prime}_g$ and ${Dec^\prime}_g$ are the precessed geocentric coordina
 \alpha_{pole} = {Dec^\prime}_{Earth} + \frac{\pi}{2}
 \end{displaymath}
 
-or, if $Dec_{Earth} > 0$ so the South Pole is facing Earth, 
+or, if $Dec_{Earth} > 0$ so the South Pole is facing Earth,
 
 \begin{displaymath}
-\alpha_{pole} =  \frac{\pi}{2} - {Dec^\prime}_{Earth}. 
+\alpha_{pole} =  \frac{\pi}{2} - {Dec^\prime}_{Earth}.
 \end{displaymath}
 
-With this calculation performed the semi-major axis of the planet as seen from Earth, $R_{semi-major}$ is given as 
+With this calculation performed the semi-major axis of the planet as seen from Earth, $R_{semi-major}$ is given as
 
 \begin{displaymath}
 R_{semi-major} = \frac{R_{p} (1 - \epsilon_p)}{1 - \epsilon_p \cos \alpha_{pole}}
@@ -901,7 +901,7 @@ T_{b_{90}} = \frac{206.8}{\sqrt{1.524/d_{hel_{Mars}}}}
 where 1.524 AU is the mean heliocentric distance of Mars and $d_{hel_{Mars}}$ is the heliocentric distance of Mars for the given date, which can be calculated from the precessed geocentric positions and distances of the Sun (${RA^\prime}_{g_{sun}}$, ${Dec^\prime}_{g_{sun}}$, $d_{g_{sun}}$) and Mars (${RA^\prime}_{g_{Mars}}$, ${Dec^\prime}_{g_{Mars}}$, $d_{g_{Mars}}$) by defining the following quantity:
 
 \begin{displaymath}
-\cos E = \sin {Dec^\prime}_{g_{Mars}} \sin {Dec^\prime}_{g_{sun}} + \cos {Dec^\prime}_{g_{sun}} \cos {Dec^\prime}_{g_{sun}} \cos ({RA^\prime}_{g_{sun}} - {RA^\prime}_{g_{Mars}}) 
+\cos E = \sin {Dec^\prime}_{g_{Mars}} \sin {Dec^\prime}_{g_{sun}} + \cos {Dec^\prime}_{g_{sun}} \cos {Dec^\prime}_{g_{sun}} \cos ({RA^\prime}_{g_{sun}} - {RA^\prime}_{g_{Mars}})
 \end{displaymath}
 
 so that

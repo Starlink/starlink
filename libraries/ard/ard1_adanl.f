@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, 
+      SUBROUTINE ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR,
      :                       IPOPND, SZEXPR, SZOPND, INP, IWCS, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, 
+*     CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR,
 *                      IPOPND, SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Description:
@@ -33,8 +33,8 @@
 *        The number of pixel axes in the mask supplied to ARD_WORK.
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
-*        should have a Base Frame referring to pixel coords within the 
-*        pixel mask and another Frame with Domain ARDAPP referring to 
+*        should have a Base Frame referring to pixel coords within the
+*        pixel mask and another Frame with Domain ARDAPP referring to
 *        "Application co-ordinates" (i.e. default user coords).
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
@@ -61,18 +61,18 @@
 *        A pointer to a one dimensional _DOUBLE work array. On return, the
 *        array holds information about all the operands (i.e. keywords)
 *        used within the logical expression representing the ARD
-*        description. Each operand is defined by a variable length block 
-*        of values (see ARD1_LKR prologue for details). Checks are made on 
-*        the validity of the keyword argument lists.  The array is extended 
+*        description. Each operand is defined by a variable length block
+*        of values (see ARD1_LKR prologue for details). Checks are made on
+*        the validity of the keyword argument lists.  The array is extended
 *        if necessary.
 *     SZEXPR = INTEGER (Given and Returned)
 *        The size of the array pointed to by IPEXPR. The array is
 *        truncated on exit so that there is no un-used space at the
-*        end.  
+*        end.
 *     SZOPND = INTEGER (Given and Returned)
 *        The size of the array pointed to by IPOPND. The array is
 *        truncated on exit so that there is no un-used space at the
-*        end.  
+*        end.
 *     INP = INTEGER (Returned)
 *        Returned .TRUE if any INPUT keywords were found in the ARD
 *        description, and .FALSE. otherwise.
@@ -92,12 +92,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -124,7 +124,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,12 +171,12 @@
       CHARACTER
      : ELEM*(GRP__SZNAM )        ! Current GRP element
 
-      DOUBLE PRECISION           
+      DOUBLE PRECISION
      : WCSDAT( ARD__MXDIM*( ARD__MXDIM + 1 ) ) ! Extra WCS data
 
       INTEGER
      : CFRM,                     ! User coordinate Frame
-     : I,                        ! Index of next character 
+     : I,                        ! Index of next character
      : IELEM,                    ! Index of next GRP element
      : IEXPR,                    ! Next free entry in expression array
      : IOPND,                    ! Next free entry in operands array
@@ -188,8 +188,8 @@
      : PNARG,                    ! Index at which to store no. of arg.s
      : SIZE,                     ! No. of elements in group
      : TYPE,                     ! Identifier for operator or operand
-     : UWCS                      ! FrameSet supplied by user 
-      
+     : UWCS                      ! FrameSet supplied by user
+
       LOGICAL
      : KEYW,                     ! Is current field a keyword?
      : MORE,                     ! More GRP elements to be processed?
@@ -258,7 +258,7 @@
       CALL ARD1_COWCS( AWCS, AST__BAD, UWCS, STATUS )
 
 *  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
-      CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT, 
+      CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT,
      :                 STATUS )
 
 *  Get a pointer to the current Frame.
@@ -269,7 +269,7 @@
 
 *  Loop round until the entire ARD description has been processed.
       MORE = .TRUE.
-      DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  If all symbols have been read from the current GRP element, try to
 *  obtain a new GRP element.
@@ -292,17 +292,17 @@
 *  ARD1_KEYW twice; the first time initializes things, the second one
 *  completes things.
                      IF( KEYW ) THEN
-                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, 
-     :                                  WCSDAT, ELEM, L, CFRM, IPOPND, 
-     :                                  IOPND, PNARG, SZOPND, NARG, I, 
+                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS,
+     :                                  WCSDAT, ELEM, L, CFRM, IPOPND,
+     :                                  IOPND, PNARG, SZOPND, NARG, I,
      :                                  KEYW, STATUS )
-                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, 
-     :                                  WCSDAT, ELEM, L, CFRM, IPOPND, 
-     :                                  IOPND, PNARG, SZOPND, NARG, I, 
+                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS,
+     :                                  WCSDAT, ELEM, L, CFRM, IPOPND,
+     :                                  IOPND, PNARG, SZOPND, NARG, I,
      :                                  KEYW, STATUS )
                      END IF
 
-*  Report an error if the keyword or statement need an argument list and 
+*  Report an error if the keyword or statement need an argument list and
 *  no argument list has been started, or if it does not need an argument
 *  list and an argument list has been provided.
                   ELSE
@@ -314,13 +314,13 @@
      :                             STATUS )
                      GO TO 999
                   END IF
-      
+
                END IF
-            
+
 *  Otherwise, get the next element from the group containing the ARD
 *  description.
             ELSE
-               CALL ARD1_GET( IGRP, IELEM, 1, ELEM, STATUS )      
+               CALL ARD1_GET( IGRP, IELEM, 1, ELEM, STATUS )
 
 *  Increment the element index.
                IELEM = IELEM + 1
@@ -346,17 +346,17 @@
 *  keyword field, copy any remaining keyword arguments from the current
 *  GRP element into the returned operand array.
          ELSE IF( KEYW ) THEN
-            CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, 
-     :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
+            CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L,
+     :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I,
      :                      KEYW, STATUS )
 
-*  If we are in the middle of processing a statement field, obtain any 
+*  If we are in the middle of processing a statement field, obtain any
 *  remaining arguments from the GRP element. When the argument list
 *  is complete, make any modifications to the current transformations,
 *  etc, specified by the statement.
          ELSE IF( STAT ) THEN
-            CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, 
-     :                      DUBND, NEEDIM, NARG, I, UWCS, MAP, STAT, 
+            CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND,
+     :                      DUBND, NEEDIM, NARG, I, UWCS, MAP, STAT,
      :                      IWCS, WCSDAT, STATUS )
 
 *  Update the current Frame pointer.
@@ -410,7 +410,7 @@
 *  and set a flag to indicate that the ARD description contained at
 *  least one INPUT keyword.
                ELSE
-                  CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, 
+                  CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND,
      :                             STATUS )
                   INP = .TRUE.
                END IF
@@ -444,7 +444,7 @@
 
             END IF
 
-         END IF            
+         END IF
 
       END DO
 
@@ -456,11 +456,11 @@
          IWCS = AST_FRAMESET( AST_GETFRAME( AWCS, AST__BASE, STATUS ),
      :                        ' ', STATUS )
 
-*  Add the user co-ordinate Frame into the new FrameSet, using the 
+*  Add the user co-ordinate Frame into the new FrameSet, using the
 *  Mapping returned by ARD1_STAT to connect it to the existing base Frame.
          CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, CFRM, STATUS )
       END IF
-         
+
 *  Report an error and abort if a null ARD description was supplied.
       IF( IEXPR .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = ARD__BADDM
@@ -485,7 +485,7 @@
 *  Ensure the IWCS pointer is not annulled by the following call to
 *  AST_END.
       CALL AST_EXPORT( IWCS, STATUS )
-      
+
 *  End the AST context.
       CALL AST_END( STATUS )
 

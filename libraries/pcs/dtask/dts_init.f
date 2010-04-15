@@ -142,7 +142,7 @@
 *
 *   Put a dummy call to DTASK_GETPATH to force it to be loaded
 *   in case TASK_TRIGGER needs it
-*  
+*
       IF ( STATUS .NE. SAI__OK )
      :   CALL DTASK_GETPATH( NAME, PATH, MESSID, STATUS )
 

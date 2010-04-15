@@ -19,7 +19,7 @@
 *    INP=UNIV (Read)
 *          Object being copied from, structured or primitive.
 *    OUT=CHAR (Read)
-*          Object being copied to - takes shape and type of input. 
+*          Object being copied to - takes shape and type of input.
 
 * Description:
 *    Copies a data object from one place to another. The copy is
@@ -35,18 +35,18 @@
 * Examples:
 *    % hcopy file1 file2
 *       Copy complete container file.
-* 
+*
 *    % hcopy file.more.asterix.grafix.coltab tab1
 *       Extract an object into its own container file.
-* 
+*
 *    % hcopy file1.data_array file2.data_array
 *       Copy the component DATA_ARRAY in file1
 *       to DATA_ARRAY in file2. The DATA_ARRAY component of file2
 *       will be created, but file2 must already exist.
-* 
+*
 *    % hcopy '[1 2 3 4 5]' file.array
 *       Copy the explicit values given into a component ARRAY within file.
-* 
+*
 *    % hcopy '"Counts/sec"' 'file.axis(2).units'
 *       A more practical example of the above.
 *
@@ -145,7 +145,7 @@
       INTEGER CLENI                   ! CHAR length
       INTEGER IPTR, OPTR              ! Pointers to mapped data
       INTEGER NVAL                    ! Number of mapped values
-      
+
       LOGICAL INSLICE                 ! Input is slice or cell
       LOGICAL OUTSLICE                ! Output is slice or cell
       LOGICAL OUTTOP                  ! If output is top-level
@@ -162,13 +162,13 @@
 *    Initialise Locators
       OLOC = DAT__NOLOC
       FILOC = DAT__NOLOC
-      ILOC = DAT__NOLOC	
+      ILOC = DAT__NOLOC
       CLOC = DAT__NOLOC
 
 *    Set MSG environment
       CALL MSG_TUNE( 'ENVIRONMENT', 0, STATUS )
 
-*    Version id 
+*    Version id
       CALL MSG_OUTIF( MSG__NORM, ' ', VERSION, STATUS )
 
 *    Associate the input object file

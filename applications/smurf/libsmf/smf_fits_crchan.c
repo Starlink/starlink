@@ -18,7 +18,7 @@
 *  Arguments:
 *     nfits = int (Given)
 *        Number of FITS headers to extract. If a single buffer is used
-*        (see headrec) it can be set to 0 to be calculated explicitly. 
+*        (see headrec) it can be set to 0 to be calculated explicitly.
 *        If an explicit value is used for a single buffer, a check is made
 *        to ensure that nfits does not exceed the buffer. If a nul-embedded
 *        buffer is supplied and nfits is 0, it is explicitly set to 1.
@@ -95,9 +95,9 @@
 #include <string.h>
 #include "smf.h"
 
-void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits, 
+void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
 		      int *status ) {
-  
+
   /* Sc2store header records are each null terminated at the last non-whitespace
      character so we need to search for a null in the first 81 characters to
      distinguish this from the "read a block" approach. The quick way to do this

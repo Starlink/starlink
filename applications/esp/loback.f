@@ -12,14 +12,14 @@
 *  Invocation:
 *     CALL LOBACK( STATUS )
 *
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Description: 
+*  Description:
 *     Establishes the local mode values for parts of an image
-*     immediately surrounding a set of image co-ordinates supplied by 
-*     the user. 
+*     immediately surrounding a set of image co-ordinates supplied by
+*     the user.
 *
 *     The user may also supply some indication of the number of pixels
 *     that must be used to create the pixel value histogram.  This value
@@ -34,25 +34,25 @@
 *     The selection of the number of pixels to be used in constructing
 *     the histogram is defined by the user, subject to a lower limit of
 *     1024 pixels (32x32).
-* 
+*
 *  Usage:
 *     LOBACK IN INFILE SFACT THIRD OUT WIDTH
 *
 *  ADAM Parameters:
 *     IN = _NDF (Read)
-*        The name of the NDF data structure/file that is to be 
+*        The name of the NDF data structure/file that is to be
 *        examined.
 *
 *     INFILE = _CHAR (Read)
-*        The name of the ASCII text file containing the image 
-*        co-ordinates and number of pixels to be used at each location 
-*        or the number of contiguous pixels found there by FOCAS or 
+*        The name of the ASCII text file containing the image
+*        co-ordinates and number of pixels to be used at each location
+*        or the number of contiguous pixels found there by FOCAS or
 *        IMAGES.  Co-ordinates are in the Current co-ordinate system
 *        of IN.
 *
 *        If two columns are present then these are
-*        taken as representing the image co-ordinates required for the 
-*        regions of the image to be considered.  Co-ordinates are in 
+*        taken as representing the image co-ordinates required for the
+*        regions of the image to be considered.  Co-ordinates are in
 *        the Current coordinate system of the NDF.  If there is a third
 *        column, it represents the area, in pixels, of a square
 *        centred on the co-ordinates (but see the documentation for the
@@ -66,8 +66,8 @@
 *        - -1 to indicate that the application should automatically
 *          assign a filter radius to apply to the histogram.
 *        - 0 to indicate that the histogram should not be smoothed.
-*        - >0 to indicate the radius of the Gaussian filter to use. 
-*        Values greater than LOB__SFLIM (see include file) are not 
+*        - >0 to indicate the radius of the Gaussian filter to use.
+*        Values greater than LOB__SFLIM (see include file) are not
 *        allowed.
 *        The value returned is that employed. Units counts.
 *
@@ -92,7 +92,7 @@
 *        circumstances.  Units pixels.
 *
 *  Examples:
-*     loback in=p2 infile=coords.dat sfact=0 third=true 
+*     loback in=p2 infile=coords.dat sfact=0 third=true
 *            out=backs.dat width=64
 *
 *        Reads the data stored in text file COORDS (in co-ordinates
@@ -106,21 +106,21 @@
 *     loback in=p2 infile=coords.dat sfact=4 third=false
 *            out=output.dat width=35
 *
-*        Determines the background count value within a 35x35 pixel 
-*        area surrounding each of the locations identified in 
-*        COORDS.DAT. The histogram generated to do this will be 
-*        smoothed using a Gaussian 4 counts wide. The output will be 
-*        into text file OUTPUT.DAT. Since THIRD is false, the third 
-*        column represent the lower limit of pixels to be taken from 
+*        Determines the background count value within a 35x35 pixel
+*        area surrounding each of the locations identified in
+*        COORDS.DAT. The histogram generated to do this will be
+*        smoothed using a Gaussian 4 counts wide. The output will be
+*        into text file OUTPUT.DAT. Since THIRD is false, the third
+*        column represent the lower limit of pixels to be taken from
 *        the image to make up the histogram.
 *
 *  Notes:
-*     The current version will not accept a pixel value range greater 
-*     than the largest integer value possible. 
+*     The current version will not accept a pixel value range greater
+*     than the largest integer value possible.
 *
-*     The user may easily abolish the 32x32 pixel filter lower size 
-*     limit by modifying the WIDTH parameter entry in the LOBACK.IFL 
-*     file. This action is only recommended for use with very flat 
+*     The user may easily abolish the 32x32 pixel filter lower size
+*     limit by modifying the WIDTH parameter entry in the LOBACK.IFL
+*     file. This action is only recommended for use with very flat
 *     images.
 *
 *  Authors:
@@ -151,8 +151,8 @@
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system variables
       INCLUDE 'CNF_PAR'
-                     
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
@@ -162,7 +162,7 @@
       CHARACTER *(256) YSTR           ! Formatted Y co-ordinate
       LOGICAL EXCLAIM                 ! Was the file name used !?
       LOGICAL FILINP                  ! Was the input file name acceptable?
-      LOGICAL THIRD                   ! Is the third column the number of 
+      LOGICAL THIRD                   ! Is the third column the number of
                                       ! contiguous pixels?
       LOGICAL OPENF                   ! Was an output file opened?
       INTEGER ELEMS                   ! Number of pixels in the image
@@ -180,29 +180,29 @@
                                       ! input text file defining either the
                                       ! desired number of pixels to be used
                                       ! (if possible) in the histogram or the
-                                      ! number of contiguous pixels at that 
+                                      ! number of contiguous pixels at that
                                       ! location (see THIRD)
       INTEGER NUMP                    ! The size of the array in which the
-                                      ! pixel values for the image subset 
+                                      ! pixel values for the image subset
                                       ! will be stored
       INTEGER NUMPS                   ! The number of pixel values taken from
                                       ! the image to be used. Differs from NUMP
                                       ! for locations near the image edge
-      INTEGER NUMBER                  ! Number of points used in the 
+      INTEGER NUMBER                  ! Number of points used in the
                                       ! Calculation of mode
       INTEGER POINT0(10)              ! Pointer to NDF array to be used
       INTEGER POINT1(10)              ! Pointer to memory array to be used
-      INTEGER PRANGE(2)               ! Number of pixels in the image x 
-                                      ! and y axes 
+      INTEGER PRANGE(2)               ! Number of pixels in the image x
+                                      ! and y axes
       INTEGER SFACT                   ! Gaussian filter radius requested
       INTEGER UBND(7)                 ! Upper bounds for each image axis
-      INTEGER WIDTH                   ! Width of the area of image 
+      INTEGER WIDTH                   ! Width of the area of image
                                       ! to be examined
       INTEGER WIDE                    ! Minimum width of the box from
                                       ! which pixels will be taken
       INTEGER XLEN                    ! Length of formatted X co-ordinate
       INTEGER YLEN                    ! Length of formatted Y co-ordinate
-      DOUBLE PRECISION MODE(4)        ! Estimates of the image mode value 
+      DOUBLE PRECISION MODE(4)        ! Estimates of the image mode value
       DOUBLE PRECISION SDEV(2)        ! Estimate of the standard deviation
                                       ! of the modal value and its standard deviation
       REAL XC(LOB__NGALS)             ! X co-ordinate of galaxy/image location
@@ -210,29 +210,29 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Show the user that the program is running.
       CALL MSG_BLANK(STATUS)
       CALL MSG_OUT(' ','ESP LOBACK running.',STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Begin an NDF context.                               
+*   Begin an NDF context.
       CALL NDF_BEGIN
 
-*   Obtain an identifier for the NDF structure to be examined.       
+*   Obtain an identifier for the NDF structure to be examined.
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Display the name of the NDF.
-      CALL NDF_MSG('IN',NDF1)           
+      CALL NDF_MSG('IN',NDF1)
       CALL MSG_OUT(' ','Filename:   ^IN',STATUS)
 
 *   See if the title component is defined. If so, display its value.
       CALL NDF_CMSG('TITLE',NDF1,'Title',STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
       CALL MSG_OUT('TITLE','Title:      ^TITLE',STATUS)
-    
+
 *   Get the pixel-index bounds of an NDF and store in LBND and UBND.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -245,23 +245,23 @@
       CALL MSG_SETI('PR1',PRANGE(1))
       CALL MSG_SETI('PR2',PRANGE(2))
       CALL MSG_OUT(' ','Shape:      ^PR1 x ^PR2 pixels',STATUS)
-     
+
 *   Display the image x and y axis ranges (pixels).
       CALL MSG_SETI('L1',LBND(1))
       CALL MSG_SETI('L2',UBND(1))
       CALL MSG_SETI('L3',LBND(2))
       CALL MSG_SETI('L4',UBND(2))
       CALL MSG_OUT(' ','Bounds:     x= ^L1:^L2  y= ^L3:^L4'
-     :             ,STATUS)  
+     :             ,STATUS)
 
 *   Calculate the maximum number of pixels in the image.
       ELEMS=PRANGE(2)*PRANGE(1)
-       
+
 *   Display the image size.
       CALL MSG_SETI('ELEMS',ELEMS)
       CALL MSG_OUT(' ','Image size: ^ELEMS pixels',STATUS)
 
-*   Determine the input text file name. 
+*   Determine the input text file name.
       CALL FIO_ASSOC('INFILE','READ','LIST',80,FIOID,STATUS)
       IF (STATUS.EQ.SAI__OK) FILINP=.TRUE.
 
@@ -279,19 +279,19 @@
       END IF
 
 *   Determine what the third column of the ASCII text file is to be taken as
-*   describing. True = number of contiguous pixels in an object. 
+*   describing. True = number of contiguous pixels in an object.
 *   FALSE = the area of the image to be used.
       CALL PAR_GET0L('THIRD',THIRD,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999    
+      IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Minimum size for the width of the box to be used.
       CALL PAR_GET0I('WIDTH',WIDE,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999    
+      IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Map the source NDF data array as _REAL values for reading.
       CALL NDF_MAP(NDF1,'Data','_REAL','READ',POINT0(1),ELEMS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-                      
+
 *   Obtain the co-ordinates of the image locations/galaxies required.
       CALL LOB1_FILER(FIOID,NDF1,NGALS,XC,YC,NPIX,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -303,7 +303,7 @@
          EXCLAIM=.FALSE.
          CALL LOB1_TEXTO(1,NDF1,XC(1),YC(1),MODE,
      :                   SDEV,LBND,FIOD,OPENF,EXCLAIM,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999                         
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Tell the user what is going on.
          CALL MSG_BLANK(STATUS)
@@ -314,9 +314,9 @@
 
          DO 10 I=1,NGALS
 
-*         Calculate the width of the square part of the image about the 
+*         Calculate the width of the square part of the image about the
 *         the required location. Depends on the value of THIRD.
-            IF (THIRD) THEN 
+            IF (THIRD) THEN
 
 *            Number of contiguous pixels in the object mode.
 *            Image area used is 9 times that of the known object.
@@ -332,17 +332,17 @@
 *         Ensure that at least WIDExWIDE pixels are collected.
             IF (WIDTH.LT.WIDE) WIDTH=WIDE
 
-*         Setup the memory necessary to store all the pixel values from the 
+*         Setup the memory necessary to store all the pixel values from the
 *         image.
             NUMP=WIDTH*WIDTH
             CALL PSX_CALLOC(NUMP,'_REAL',POINT1(1),STATUS)
 
 *         Place the appropriate pixel values in the array from which the pixel
 *         count histogram will be constructed.
-         
+
             DO 1 J=1,4
                MODE(J)=0.0
- 1          CONTINUE     
+ 1          CONTINUE
             SDEV(1)=0.0
             SDEV(2)=0.0
             CALL LOB1_FILL(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
@@ -353,17 +353,17 @@
 *         Call the modified version of HISTPEAK/HSUB. If it returns with
 *         status set this is unset so that other data points can be
 *         processed.
-            CALL ERR_MARK    
+            CALL ERR_MARK
             CALL LOB1_HIS(POINT1,NUMPS,MODE,SDEV,NUMBER,SFACT,STATUS)
             CALL ERR_RLSE
             IF (STATUS.NE.SAI__OK) CALL ERR_ANNUL(STATUS)
-    
-*         Place in the opened file background results  for these 
+
+*         Place in the opened file background results  for these
 *         co-ordinates.
             IF (.NOT.EXCLAIM) THEN
                CALL LOB1_TEXTO(2,NDF1,XC(I),YC(I),MODE,
      :                         SDEV,LBND,FIOD,OPENF,EXCLAIM,STATUS)
-               IF (STATUS.NE.SAI__OK) GOTO 9999                         
+               IF (STATUS.NE.SAI__OK) GOTO 9999
             END IF
 
 *         Create an appropriately formatted output string.
@@ -372,7 +372,7 @@
             CALL ESP1_PR2S(NDF1,XC(I),YC(I),XSTR,YSTR,XLEN,YLEN,STATUS)
             FTEXT='A8'
             IF (LEN(XSTR).GT.8.OR.LEN(YSTR).GT.8) FTEXT='A14'
-            CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN)) 
+            CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN))
             CALL MSG_FMTC('Y',FTEXT,YSTR(1:YLEN))
 
 *         Mode values.
@@ -382,7 +382,7 @@
 
             FTEXT='F8.1'
             IF (ABS(MODE(2)).GT.9.9E8) FTEXT='E14.5'
-            CALL MSG_FMTD('BACK2',FTEXT,MODE(2)) 
+            CALL MSG_FMTD('BACK2',FTEXT,MODE(2))
 
             FTEXT='F8.1'
             IF (ABS(MODE(3)).GT.9.9E8) FTEXT='E14.5'
@@ -394,7 +394,7 @@
 
 *         Standard deviation values.
             FTEXT='F8.1'
-            IF (ABS(SDEV(1)).GT.9.9E6) FTEXT='E14.5' 
+            IF (ABS(SDEV(1)).GT.9.9E6) FTEXT='E14.5'
             CALL MSG_FMTD('SDEV1',FTEXT,SDEV(1))
 
             FTEXT='F8.1'
@@ -416,7 +416,7 @@
          IF (.NOT.EXCLAIM) THEN
             CALL LOB1_TEXTO(3,NDF1,XC(1),YC(1),MODE,
      :                      SDEV,LBND,FIOD,OPENF,EXCLAIM,STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 9999                         
+            IF (STATUS.NE.SAI__OK) GOTO 9999
          END IF
 
       END IF
@@ -428,14 +428,14 @@
 *   Close the file input ASCII files.
       CALL FIO_ANNUL(FIOID,STATUS)
 
-*   Un-map/annul the source NDF data array. 
+*   Un-map/annul the source NDF data array.
       CALL NDF_UNMAP(NDF1,'Data',STATUS)
-      CALL NDF_ANNUL(NDF1,STATUS)                          
+      CALL NDF_ANNUL(NDF1,STATUS)
 
 *   End the NDF context.
-      CALL NDF_END(STATUS)                              
+      CALL NDF_END(STATUS)
 
-      END 
+      END
 
 
       SUBROUTINE LOB1_XFILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)
@@ -447,20 +447,20 @@
 *     Looks at each line of the required file in turn.
 *     Ignores blank lines and those starting with # or ! since these
 *     are assumed to be comments. Others it examines for the presence
-*     of two numbers. 
+*     of two numbers.
 *
 *     These are taken as being x and y co-ordinates on an image and are
 *     checked to ensure that they lie within the bounds of the image.
 *     Co-ordinates are in the Current frame of INDF.
-*     If it is found that the a co-ordinate pair is not within the 
+*     If it is found that the a co-ordinate pair is not within the
 *     bounds of the image, the values are not retained, otherwise the
 *     counter is incremented and the values stored in arrays XC and YC.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL LOB1_FILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)    
+*      CALL LOB1_FILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)
 
 *  Description:
 *     Opens a user specified text file and reads from it a list of co-ordinates
@@ -470,7 +470,7 @@
 *     The co-ordinates obtained are returned in the arrays XC and YC. the
 *     number of co-ordinate pairs defined is assigned to NGALS.
 
-*  Arguments:               
+*  Arguments:
 *     FIOID = INTEGER (Given)
 *        FIO identifier for the input file.
 *     INDF = INTEGER (Given)
@@ -503,19 +503,19 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'FIO_ERR'               ! FIO error definitions
       INCLUDE 'LOB_PAR'               ! LOBACK constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER FIOID                   ! FIO identifier for the input file
       INTEGER INDF                    ! NDF identifier for image
 
 *  Arguments returned:
       INTEGER NGALS                   ! The number of galaxies to be profiled
-      INTEGER NPIX(LOB__NGALS)        ! The number of contiguous pixels at a 
+      INTEGER NPIX(LOB__NGALS)        ! The number of contiguous pixels at a
                                       ! given location or the number of pixels
                                       ! to be used
       REAL XC(LOB__NGALS)             ! X co-ordinates of the galaxy positions
@@ -523,7 +523,7 @@
       REAL YC(LOB__NGALS)             ! Y co-ordinates of the galaxy positions
                                       ! found from the file
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -543,12 +543,12 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Initialise the galaxy counter
       NGALS=0
 
-*   Start an error context.   
+*   Start an error context.
       CALL ERR_MARK
 
 *   Read from a file. Stop if the end of file is reached or if the maximum
@@ -557,7 +557,7 @@
       ABORT=.FALSE.
       LINE=0
       DO WHILE ((STATUS.NE.FIO__EOF).AND.(.NOT.ABORT))
-          
+
 *       Read a line from the steering file.
 
          CALL FIO_READ(FIOID,BUFFER,NCHAR,STATUS)
@@ -576,7 +576,7 @@
                FAILN=0
                INDEXE=-1
                VALUE(1)=-1E10
-               VALUE(2)=-1E10                             
+               VALUE(2)=-1E10
                VALUE(3)=1E0
 
                DO 10 I = 1,3
@@ -612,7 +612,7 @@
                   CALL ERR_RLSE
 
  10            CONTINUE
-               
+
 *            Stop looking at this line of text since two words are not
 *            present.
                IF (FAILN.GT.1) THEN
@@ -625,7 +625,7 @@
 
 *            Get coordinates.
 
-*            Start new error context. 
+*            Start new error context.
                FAIL=.FALSE.
                IF (STATUS.NE.SAI__OK) GO TO 666
                CALL ERR_MARK
@@ -693,7 +693,7 @@
  666     END IF
 
       END DO
-     
+
 *   Display the error message if necessary. Also, tidy up the error system.
       IF ((STATUS.NE.SAI__OK).AND.(STATUS.NE.FIO__EOF)) THEN
          CALL ERR_REP( ' ','Errors found when reading the data file.',
@@ -702,7 +702,7 @@
       ELSE
          CALL ERR_ANNUL( STATUS )
       END IF
-          
+
 *   End the error context.
       CALL ERR_RLSE
 
@@ -726,26 +726,26 @@
 
  9999 CONTINUE
 
-      END 
+      END
 
 
       SUBROUTINE LOB1_HIS(POINT1,ELEMS,MODE,SDEV,
      :                    NUMBER,SFACT,STATUS)
-*+                        
+*+
 *  Name:
 *     LOB1_HIS
 
 *  Purpose:
-*     Establish the mean, mode, median and other statistics 
-*     for NDF image files.  
+*     Establish the mean, mode, median and other statistics
+*     for NDF image files.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL LOB1_HIS(POINT1,ELEMS,MODE,SDEV,NUMBER,SFACT,STATUS)
-                    
-*  Arguments:   
+
+*  Arguments:
 *     POINT1(10) = INTEGER (Given)
 *        Pointer to the NDF data array.
 *     ELEMS = INTEGER (Given)
@@ -762,13 +762,13 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Description: 
-*     Allows the user to input the name of an NDF image file and 
+*  Description:
+*     Allows the user to input the name of an NDF image file and
 *     then constructs an image count value versus occurence histogram.
-*     This is used to allow count median, mode and standard 
-*     deviation values to be estimated. 
+*     This is used to allow count median, mode and standard
+*     deviation values to be estimated.
 *
-*     It is assumed that all ARD file manipulation has already been 
+*     It is assumed that all ARD file manipulation has already been
 *     carried out by the calling subroutine.
 *
 *     Bad valued points are excluded from the calculations.
@@ -776,27 +776,27 @@
 *     Four estimates of the modal value are generated:
 *     - unsmoothed mode.
 *     - smoothed mode.
-*     - projected mode. Calculated by extrapolating the lengths of a 
+*     - projected mode. Calculated by extrapolating the lengths of a
 *       series of chords through the peak to zero length and determining
 *       the count value at which this occurs.
-*     - interpolated mode. Calculated by assuming a Normal form 
+*     - interpolated mode. Calculated by assuming a Normal form
 *       for the histogram peak and 'fitting' a function to it.
 *       The function is then used to provide both a modal value and
-*       the distribution standard deviation.  
-*    
+*       the distribution standard deviation.
+*
 *     Two estimates of the standard deviation of pixel count values
 *     are generated:
 *     - simple standard deviation.
-*     - the standard deviation of the region of the histogram near 
+*     - the standard deviation of the region of the histogram near
 *       to the modal count value. This estimate reduces the influence of
 *       outlier points produced by brighter sources.
 *
 *     All values of MODE are returned to the calling subroutine.
-     
+
 
 *  Implementation Status:
-*     The current version will not accept a pixel value range greater 
-*     than the largest integer value possible. This will be corrected 
+*     The current version will not accept a pixel value range greater
+*     than the largest integer value possible. This will be corrected
 *     in a later version.
 
 *  Authors:
@@ -821,35 +821,35 @@
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system variables
       INCLUDE 'CNF_PAR'
-                     
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Arguments Given:   
+*  Arguments Given:
       INTEGER POINT1(10)              ! Pointer to the NDF data array.
       INTEGER ELEMS                   ! Total number of image pixels.
 
 *  Arguments Given and Returned:
-      INTEGER SFACT                   ! The radius of the Gaussian filter 
+      INTEGER SFACT                   ! The radius of the Gaussian filter
                                       ! requested and used.
-    
+
 *  Arguments Returned:
       INTEGER NUMBER                  ! Number of non-bad pixels used.
-      DOUBLE PRECISION MODE(4)        ! Modal count value estimates. 
-      DOUBLE PRECISION SDEV(2)        ! Standard deviation 
+      DOUBLE PRECISION MODE(4)        ! Modal count value estimates.
+      DOUBLE PRECISION SDEV(2)        ! Standard deviation
                                       ! and standard deviation values
 
-*  Local Variables:      
+*  Local Variables:
       INTEGER BARSIZ                  ! Size of the of the bin arrays
                                       ! used
-      INTEGER POINT2(10)              ! Pointer to the memory allocated 
+      INTEGER POINT2(10)              ! Pointer to the memory allocated
                                       ! for the unsmoothed histogram
       INTEGER POINT3(10)              ! Pointer to the memory allocated
                                       ! for the smoothed histogram
       INTEGER SFACTA                  ! The actual filter radius used
       INTEGER UNUPIX                  ! Number of unused pixels in the
                                       ! source NDF
-      DOUBLE PRECISION ADEV           ! Absolute deviation of the 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of the
                                       ! NDF pixels used
       REAL BINWID                     ! Bin width used when finding the
                                       ! median and mode values (not
@@ -863,35 +863,35 @@
       DOUBLE PRECISION MEDIAN         ! Median value of the NDF pixels
       DOUBLE PRECISION PEAKV(3)       ! Estimates of the histogram
                                       ! array peak height
-      DOUBLE PRECISION VARI           ! Variance of the NDF pixel values   
-                                                          
+      DOUBLE PRECISION VARI           ! Variance of the NDF pixel values
+
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
-*   Set default values for absolute deviation etc (see above). 
-      ADEV=0.0                      
+*   Set default values for absolute deviation etc (see above).
+      ADEV=0.0
       UNUPIX=0
-      HIGH=0.0                      
-      LOW=0.0                       
-      MEAN=0.0                      
-      MEDIAN=0.0                                 
-      NUMBER=0 
+      HIGH=0.0
+      LOW=0.0
+      MEAN=0.0
+      MEDIAN=0.0
+      NUMBER=0
       PEAKV(1)=0.0
       PEAKV(2)=0.0
       PEAKV(3)=0.0
       SFACTA=0
-      VARI=0.0                 
+      VARI=0.0
 
 *   Call routine to find the highest, lowest and mean
 *   value of those in the data array.
       CALL LOB1_HILOA(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
-     :                UNUPIX,HIGH,MEAN,LOW,NUMBER,STATUS)               
+     :                UNUPIX,HIGH,MEAN,LOW,NUMBER,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Determine the size of the array to be used for binning the image 
-*   pixel count values. The bin width is also set. The size of the 
+*   Determine the size of the array to be used for binning the image
+*   pixel count values. The bin width is also set. The size of the
 *   binning array is not allowed to exceed LOB__BINLI.
 
       IF (HIGH-LOW+1.GT.LOB__BINLI) THEN
@@ -908,7 +908,7 @@
 *   histogram arrays.
       CALL PSX_CALLOC(BARSIZ,'_DOUBLE',POINT2(1),STATUS)
       CALL PSX_CALLOC(BARSIZ,'_DOUBLE',POINT3(1),STATUS)
-      IF (STATUS.NE.SAI__OK) THEN  
+      IF (STATUS.NE.SAI__OK) THEN
          STATUS=SAI__ERROR
          CALL ERR_REP(' ','The dynamic arrays have not been allocated.'
      :                    ,STATUS)
@@ -918,7 +918,7 @@
 *   Call routine to find moments of deviation from the mean for
 *   the NDF data array.
       CALL LOB1_MOMDE(ELEMS,NUMBER,%VAL(CNF_PVAL(POINT1(1))),
-     :                MEAN,ADEV,VARI,SDEV,STATUS) 
+     :                MEAN,ADEV,VARI,SDEV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Call routine to find the median and mode of the values in
@@ -928,13 +928,13 @@
      :                NUMBER,SDEV,%VAL(CNF_PVAL(POINT2(1))),
      :                %VAL(CNF_PVAL(POINT3(1))),
      :                MEDIAN,PEAKV,SFACTA,MODE,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999  
-                                           
+      IF (STATUS.NE.SAI__OK) GOTO 9999
+
 *   Return to the calling routine..
  9999 CONTINUE
 
 *   Free the dynamic array space of the histogram arrays.
       CALL PSX_FREE(POINT2(1),STATUS)
-      CALL PSX_FREE(POINT3(1),STATUS)                           
+      CALL PSX_FREE(POINT3(1),STATUS)
 
       END

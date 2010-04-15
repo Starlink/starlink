@@ -20,7 +20,7 @@ C
       END DO
 C
 C     Locate each of the interactive orders IORDERS and set FIT=1
-C               
+C
       DO I=1,NI,1
          J=ABS(IORDERS(I)-F1)+1
          FIT(J)=1

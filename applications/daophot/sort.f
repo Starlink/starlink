@@ -1,4 +1,4 @@
-      SUBROUTINE  SORTER (WORK, MAXWRK, SORT, HIGH, LOW, INDEX, 
+      SUBROUTINE  SORTER (WORK, MAXWRK, SORT, HIGH, LOW, INDEX,
      .     MAXSTR, WATCH)
 C
 C=======================================================================
@@ -11,7 +11,7 @@ C              OFFICIAL DAO VERSION:  1991 April 18
 C
 C Argument
 C
-C  WATCH (INPUT) governs whether information relating to the progress 
+C  WATCH (INPUT) governs whether information relating to the progress
 C        of the reductions is to be typed on the terminal screen
 C        during execution.
 C
@@ -20,11 +20,11 @@ C
 C=======================================================================
 C
       IMPLICIT NONE
- 
+
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
@@ -38,7 +38,7 @@ C
 C MAXSTR is the maximum number of stars permitted in a data file.
 C        It is limited by the size of the WORK array in DAOPHOT:
 C        WORK must contain 282 bytes per star:  4 bytes each for SORT,
-C        INDEX, NLINE1, and, NLINE2, and 133 bytes each for LINE1 and 
+C        INDEX, NLINE1, and, NLINE2, and 133 bytes each for LINE1 and
 C        LINE2.
 C
 C MAXITM is the maximum number of output data per line of an output.
@@ -122,16 +122,16 @@ C
       END IF
 C
       NL=-1
-      CALL RDHEAD (2, NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1, 
+      CALL RDHEAD (2, NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, READNS, FRAD)
       IF (NL .LE. 0) GO TO 1010                     ! No header in input
       IF (NL .GT. 3) NL=1
 C
-C Copy input file header to output file.  
+C Copy input file header to output file.
 C
       ITEMS=6
       IF (FRAD .GT. 0.001) ITEMS=7
-      CALL WRHEAD (3, NL, NCOL, NROW, ITEMS, LOBAD, HIBAD, THRESH, 
+      CALL WRHEAD (3, NL, NCOL, NROW, ITEMS, LOBAD, HIBAD, THRESH,
      .     AP1, PHPADU, READNS, FRAD)
 C
  1010 CONTINUE
@@ -150,8 +150,8 @@ C
 C Read the input file in line by line, verbatim.  Pack the contents
 C of the line into the REAL array WORK, keeping track of the
 C lower and upper limits in the arrays LINELO and LINEHI.  At the
-C same time, extract the the particular datum 
-C according to which we wish to sort.  Sort these data.  Then write 
+C same time, extract the the particular datum
+C according to which we wish to sort.  Sort these data.  Then write
 C the file out again, line by line, verbatim, but in the new order.
 C
       I=0
@@ -166,7 +166,7 @@ C
       END IF
 C
       IF (N .LE. 1) GO TO 2000                 ! Blank line encountered
-      READ (TEXT(2:N), 901, IOSTAT=ISTAT) 
+      READ (TEXT(2:N), 901, IOSTAT=ISTAT)
      .     (DATUM(J), J=1,MIN0(15,MODE))
   901 FORMAT (F5.0, 14F9.0)
       IF (ISTAT .NE. 0) THEN
@@ -180,7 +180,7 @@ C
          WRITE (TEXT,77) I-1
    77    FORMAT (I10, ' stars is all I have room for.  Sorry!')
          CALL STUPID (TEXT(1:50))
-         WRITE (6,78) 
+         WRITE (6,78)
    78    FORMAT ('Increase the MS parameter and try again')
          CALL CLFILE (2)
          RETURN

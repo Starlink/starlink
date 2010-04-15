@@ -66,12 +66,12 @@
       INTEGER  STATUS             ! global status parameter
 
 *    Local constants :
- 
+
       REAL
      :    MINIMUM,                ! absolute value of smallest allowable
                                   ! divisor
      :    BADVAL                  ! 'bad pixel' value to be used when a
-                                  ! division by too small a number was 
+                                  ! division by too small a number was
                                   ! trapped
       PARAMETER( MINIMUM  =  1.0E-20 )  ! will do for now
       PARAMETER( BADVAL   =  0.0 )      ! ditto
@@ -79,7 +79,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J             ! counter variables 
+     :   I, J             ! counter variables
 
 *-
 *    check status on entry - return if not o.k.

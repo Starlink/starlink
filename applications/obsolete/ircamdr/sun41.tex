@@ -18,7 +18,7 @@
 \newcommand{\stardocauthors}   {Colin Aspin}
 \newcommand{\stardocdate}      {23rd May 1996}
 \newcommand{\stardoctitle}     {IRCAMDR \\[1ex] IRCAM3 Data Reduction Software}
-\newcommand{\stardocversion}   {Version 1.1} 
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {User's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -53,7 +53,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -121,7 +121,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -209,12 +209,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -232,7 +232,7 @@
 %   ==================
 
 The {\sc ircam3} data reduction and analysis software package, {\sc
-IrcamDR} (the old {\tt ircam\_clred} updated to work under Unix 
+IrcamDR} (the old {\tt ircam\_clred} updated to work under Unix
 and renamed) will analyse and display any 2D data image with a {\tt .sdf}
  file extension stored in the standard Starlink NDF data format.
 
@@ -265,10 +265,10 @@ filters stacks of images up to 256$\times$256 in size at present).
 The {\sc IrcamDR} software runs on Unix/VMS machines under the Starlink
 Infrastructure and utilizes the ICL command line environment.  {\sc ADAM}
 tasks perform most of the functions available in {\sc IrcamDR} and are
-controlled using ICL procedures.  
+controlled using ICL procedures.
 
 The {\sc ADAM} tasks (written in Fortran 77) used by {\sc IrcamDR} are
-called {\bf plt2d}, {\bf rapi2d}, {\bf obsrap} and {\bf polrap}.  
+called {\bf plt2d}, {\bf rapi2d}, {\bf obsrap} and {\bf polrap}.
 
 \begin{description}
 
@@ -279,7 +279,7 @@ procedures rather than by calling the {\bf plt2d} applications directly.
 
 \item [rapi2d] is the original a-task monolith and contains numerous
 applications to manipulate and process images; {\bf rapi2d} was the
-original kernel source for the Starlink KAPPA reduction task. 
+original kernel source for the Starlink KAPPA reduction task.
 
 \item [obsrap] is an additional reduction and analysis a-task monolith
 more specific to the processing of {\sc ircam1/2} and {\sc ircam3} data,
@@ -287,7 +287,7 @@ although many of the applications can be used on other datasets.
 
 \item [polrap] is an {\sc ADAM} a-task monolith with applications specific
 to the reduction and analysis of 2D imaging polarimetry data taken with
-{\sc ircam1/2/3} using the {\sc ukirt} {\sc irpol1/2} polarimeter module. 
+{\sc ircam1/2/3} using the {\sc ukirt} {\sc irpol1/2} polarimeter module.
 
 \end{description}
 
@@ -303,11 +303,11 @@ data.
 
 \section{\label{se:running_ircamdr}\xlabel{running_ircamdr}Running {\sc IrcamDR}}
 
-In the Starlink environment you can run {\sc IrcamDR} by typing the command 
+In the Starlink environment you can run {\sc IrcamDR} by typing the command
 name:
 
 \begin{verbatim}
-      % ircamdr 
+      % ircamdr
 \end{verbatim}
 
 where {\tt `\%'} is the shell prompt.  If this fails, check that you have
@@ -355,32 +355,32 @@ The following is an example of an {\sc IrcamDR} startup:
 \begin{small}
 \begin{verbatim}
       % ircamdr
- 
+
       Welcome to IRCAM_CLRED/Portable-IRCAMDR V1.0-0
- 
-      Working directory //home/frossie/data/cjs/ > 
- 
+
+      Working directory //home/frossie/data/cjs/ >
+
       ICL (UNIX) Version 3.1 14/09/95
- 
+
       Loading installed package definitions...
- 
+
         - Type HELP package_name for help on specific Starlink packages
         -   or HELP PACKAGES for a list of all Starlink packages
         - Type HELP [command] for help on ICL and its commands
- 
- 
+
+
          KAPPA commands are now available (Version 0.9-0).
- 
+
          Type `help kappa' or `kaphelp' for help on KAPPA commands.
- 
+
       Welcome to Unix IRCAM_CLRED/Portable-IRCAMDR !
- 
+
       Loading /ukirt_sw/IrcamDR/obsrap into obsrap29159 (attached)
       Loading Unix utilities
       Loading SUN Unix open plotting procedure...
       Select a plotting device from the list below ...
       Loading procedure file $LIRCAMDIR/popen_unix.icl
-      Plotting workstations currently supported : 
+      Plotting workstations currently supported :
       X-Windows base device                   =  1
       X-Windows 2 device                      =  2
       X-Windows 3 device                      =  3
@@ -391,10 +391,10 @@ The following is an example of an {\sc IrcamDR} startup:
       Encapsulated Postscript (P or L)        = 16 or 17
       Colour Postscript (P or L)              = 18 or 19
       Encapsulated Colour Postscript (P or L) = 20 or 21
-      Give workstation number for plotting ? 
+      Give workstation number for plotting ?
       Workstation Number (0=NONE AT THE MOMENT) \0\ : 1
       Loading /ukirt_sw/IrcamDR/plt2d into plt2d (attached)
-  
+
        Maximum number of colour cells available =   62
         Workstation centre coordinates are  390 ,256
         Workstation supports CURSORING ...
@@ -402,14 +402,14 @@ The following is an example of an {\sc IrcamDR} startup:
           Loading colour table  $LIRCAMDIR/col19  please wait
           Colour table loaded ...
       O.K. Plotting OPEN on workstation  X-WINDOWS
-      New (RO940422) or Old (IRCAM_22APR94_1C) data format : 
-      New or Old Format (N,O) \N\ ? 
+      New (RO940422) or Old (IRCAM_22APR94_1C) data format :
+      New or Old Format (N,O) \N\ ?
       Default UT date =  960226
-      UT date of files to work on (e.g. 940422) [RETURN=DEFAULT] : 
+      UT date of files to work on (e.g. 940422) [RETURN=DEFAULT] :
       UT Date \-1\ ? 960105
       Loading procedure file $LIRCAMDIR/setps.icl
       O.K. have set the PLATE SCALE to  0.286  arcsecs/pixel ...
-      IrcamDR > 
+      IrcamDR >
 \end{verbatim}
 \end{small}
 
@@ -434,10 +434,10 @@ commands by just entering the observation number alone.
 If you want to access processed images (any images for that
 matter, {\sc ircam1/2} or {\sc ircam3} processed images or other 2D
 images), you can enter 0 as the observation number.  You are then
-prompted for the full name of the image to be accessed.  
+prompted for the full name of the image to be accessed.
 
 In many ICL procedural commands (\emph{e.g.}, those ending with the word
-`{\bf lot}' or such commands as {\bf jitreg}, {\bf accoff}, {\bf coff}, 
+`{\bf lot}' or such commands as {\bf jitreg}, {\bf accoff}, {\bf coff},
 \emph{etc.},) you will need to access processed or semi-processed data.
 You can do so by entering a prefix, a range of observation numbers
 and a suffix which together will form the sequence of images to be
@@ -479,16 +479,16 @@ letter {\tt f} would be added to the name so that the output images
 would be called {\tt im\_50df}, {\tt im\_51df}, \ldots, {\tt im\_55df}.
 
 \section{\label{se:ircam3_data_analysis}\xlabel{se:ircam3_data_analysis}The reduction and analysis of {\sc ircam3} data}
- 
+
 The sequence used at {\sc ukirt} to reduce raw {\sc ircam3}
 images is as follows:
- 
+
 \subsection{\label{ss:standard_imaging}\xlabel{standard_imaging}Standard imaging observation using {\tt J}, {\tt H}, {\tt K}, {\tt nbL}, or 1-2um {\tt nb} filters.}
 
 \begin{enumerate}
 
 \item Dark subtraction using dark of same on-chip exposure time as
-object image(s), 
+object image(s),
 
 Commands to use are {\bf darklot} (for {\sc ircam1/2}
 images) or {\bf rodarklot} for {\sc ircam3} images,
@@ -497,19 +497,19 @@ images) or {\bf rodarklot} for {\sc ircam3} images,
 
 \begin{enumerate}
 
-\item a median-filtered set of object images, 
+\item a median-filtered set of object images,
 \item a median-filtered set of separate sky observations,
 \item a single dark subtracted sky observation (hopefully with no
 astronomical features present unless object images are point sources
 and they do not overlap with the features in the separate single sky
-image).  
+image).
 
 \end{enumerate}
 
 Commands to use are {\bf romed} or {\bf med3d} (called by {\bf
 romed}) for median-filtering objects.
 
-\item Flat-fielding of the dark subtracted object images. 
+\item Flat-fielding of the dark subtracted object images.
 
 Commands to
 use are {\bf flatlot} for flat-fielding a sequence of object images or
@@ -774,7 +774,7 @@ between mosaic tiles
 \htmlref{PLOT}{PLOT}} image display using a different {\it max},{\it
 min} scaling values
 
-\item [\htmlref{MORERANPLOT}{MORERANPLOT}]: replot the last {\bf 
+\item [\htmlref{MORERANPLOT}{MORERANPLOT}]: replot the last {\bf
 \htmlref{RANPLOT}{RANPLOT}} image display using a different range value
 
 \item [\htmlref{MOREVARGREY}{MOREVARGREY}]: replot the last {\bf
@@ -949,7 +949,7 @@ intensity in plot image
 \item [\htmlref{SETNUMORI}{SETNUMORI}]: define number orientation in
 {\bf \htmlref{SURROUND}{SURROUND}} axis annotation
 
-\item [\htmlref{SETNUMSCA}{SETNUMSCA}]: define number size in 
+\item [\htmlref{SETNUMSCA}{SETNUMSCA}]: define number size in
 {\bf \htmlref{SURROUND}{SURROUND}} axis annotation
 
 \item [\htmlref{SETPOLCOL}{SETPOLCOL}]: define polarization vector
@@ -960,7 +960,7 @@ colours for multi-colour vector plot
 \item [\htmlref{SETQUAD}{SETQUAD}]: define quadrant image display
 option (4 images together)
 
-\item [\htmlref{SETRADEC}{SETRADEC}]: defines RA and Dec for 
+\item [\htmlref{SETRADEC}{SETRADEC}]: defines RA and Dec for
 {\bf \htmlref{SURROUND}{SURROUND}} image axis annotation
 
 \item [\htmlref{SETSTD}{SETSTD}]: define the reduction/analysis setup
@@ -1005,10 +1005,10 @@ stellar images
 \item [\htmlref{SURROUND}{SURROUND}]: displays a border and tick
 marks/numbers around an image
 
-\item [\htmlref{TICKIO}{TICKIO}]: define tick mark position in 
+\item [\htmlref{TICKIO}{TICKIO}]: define tick mark position in
 {\bf \htmlref{SURROUND}{SURROUND}} axis annotation
 
-\item [\htmlref{TICKLEN}{TICKLEN}]: define tick mark length in 
+\item [\htmlref{TICKLEN}{TICKLEN}]: define tick mark length in
 {\bf \htmlref{SURROUND}{SURROUND}} image annotation
 
 \item [\htmlref{TOMAG}{TOMAG}]: convert images in intensity (DN/second)
@@ -1112,7 +1112,7 @@ constant value
 \item [\htmlref{COLCYCLE}{COLCYCLE}]: create a cyclic colour table
 (LUT)
 
-\item [\htmlref{COLMED}{COLMED}]: median filters down the columns of an image 
+\item [\htmlref{COLMED}{COLMED}]: median filters down the columns of an image
 
 \item [\htmlref{COMPADD}{COMPADD}]: increase S/N in an image by
 reducing spatial resolution
@@ -1239,7 +1239,7 @@ bad pixel list file
 \item [\htmlref{MANYCOL}{MANYCOL}]: combine colour tables (LUTs) in
 user-defined sequence
 
-\item [\htmlref{MED3D}{MED3D}]: median filter through a stack of images 
+\item [\htmlref{MED3D}{MED3D}]: median filter through a stack of images
 
 \item [\htmlref{MEDIAN}{MEDIAN}]: median filters (spatially) an image
 
@@ -1389,7 +1389,7 @@ manycol pencol penint writelut
 \item[Data Reduction :] abcom absep amcorr amcorrlot applymask applymasklot
 automos calcol chred colmed darklot defgrad deglot fcoadd flat2 flatlot
 flip histeq med3d medlot picklot rflot rodarklot romed rotlot scaledark
-scalelot splitlot stlot stred thresh thresh0 tslot wraplot 
+scalelot splitlot stlot stred thresh thresh0 tslot wraplot
 
 \item[Image Registration :] shift, shift2, shift3
 
@@ -1431,8 +1431,8 @@ vec vec\_title
 \item[Text Commands :] setcomori setfont wrccom wrcom
 
 \item[Miscellaneous :] array\_tests asciilist chpix calexp calmag
-calzer creframe getrast imcomb index io2ro 
-%  jsdclean 
+calzer creframe getrast imcomb index io2ro
+%  jsdclean
 laplace lincont
 linimag\_ndr look nomag obsext obslist oefix pclose popen radim roindex
 ropar rout rowmed see setfile setps setvar shadow stcoadd stepim tomag
@@ -1445,10 +1445,10 @@ trace trandat wrapcor x2mag x5mag
 
 \newpage
 \section{\label{se:command_descriptions}\xlabel{command_descriptions}Command Descriptions}
-%  
+%
 \subsection{\label{ss:icl_procedure_descriptions}\xlabel{icl_procedure_descriptions}ICL procedure descriptions}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ABLOCK}\xlabel{ABLOCK}ABLOCK}
 
 \begin{description}
@@ -1457,7 +1457,7 @@ trace trandat wrapcor x2mag x5mag
 workstation showing the translation of colour to intensity via annotation
 on colour block.  Plots colour block at user-specified coordinates in
 workstation raster units.  Block can be horizontal or vertical, have
-annotation or have no annotation and be of a user-defined size. 
+annotation or have no annotation and be of a user-defined size.
 
 \item[Usage :] To plot colour block and annotation on image.
 \item[Associated commands :] -
@@ -1480,7 +1480,7 @@ for colour block
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ACCOFF}\xlabel{ACCOFF}ACCOFF}
 
 \begin{description}
@@ -1505,11 +1505,11 @@ re-mosaicing large scale mosaics reduced using command stred.
 in a mosaic pattern (\emph{i.e.}, with large offsets to survey a large
 area of sky).  Use {\bf coff} for a sequence of images taken at supposedly the
 same spatial position. Use {\bf jitreg} for a sequence of images taken with a
-small jitter offset between them. 
+small jitter offset between them.
 
-\item[Associated commands :] {\tt \htmlref{setps}{SETPS}}, 
-{\tt \htmlref{histo}{HISTO}}, {\tt \htmlref{coff}{COFF}}, 
-{\tt \htmlref{jitreg}{JITREG}}, {\tt \htmlref{stred}{STRED}}, 
+\item[Associated commands :] {\tt \htmlref{setps}{SETPS}},
+{\tt \htmlref{histo}{HISTO}}, {\tt \htmlref{coff}{COFF}},
+{\tt \htmlref{jitreg}{JITREG}}, {\tt \htmlref{stred}{STRED}},
 {\tt \htmlref{remos}{REMOS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1526,15 +1526,15 @@ small jitter offset between them.
 \item[Description :] Re-displays the last image in the same manner as
 previously requested.
 
-\item[Usage :] Re-plot the last image displayed without changing anything. 
+\item[Usage :] Re-plot the last image displayed without changing anything.
 
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{ranplot}{RANPLOT}}, 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cnsigma}{CNSIGMA}}, 
-{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, \\ 
-{\tt \htmlref{cvargrey}{CVARGREY}}, {\tt \htmlref{moren}{MORENSIGMA}}, 
-{\tt \htmlref{morep}{MOREP}}, {\tt \htmlref{morer}{MORER}}, 
-{\tt \htmlref{morev}{MOREV}}, {\tt \htmlref{clear}{CLEAR}}, 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{ranplot}{RANPLOT}},
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cnsigma}{CNSIGMA}},
+{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, \\
+{\tt \htmlref{cvargrey}{CVARGREY}}, {\tt \htmlref{moren}{MORENSIGMA}},
+{\tt \htmlref{morep}{MOREP}}, {\tt \htmlref{morer}{MORER}},
+{\tt \htmlref{morev}{MOREV}}, {\tt \htmlref{clear}{CLEAR}},
 {\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{setcen}{SETCEN}}
 
 \item[Short version of command :] {\tt ag}
@@ -1544,7 +1544,7 @@ previously requested.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{AMCORRLOT}\xlabel{AMCORRLOT}AMCORRLOT}
 
 \begin{description}
@@ -1553,7 +1553,7 @@ previously requested.
 by a prefix, a range of numbers and a suffix, to represent the flux at
 unit airmass.  See above for the definition of the operation of the
 ``{\bf lot}'' family of images. Images must by in DN/sec.  Correction uses
-default extinction coefficients in ASCII file {\tt \$LIRCAMDIR/extinct.list}. 
+default extinction coefficients in ASCII file {\tt \$LIRCAMDIR/extinct.list}.
 
 \item[Usage :] When you have a lot of images (say forming a mosaic) to
 airmass correct.
@@ -1566,14 +1566,14 @@ airmass correct.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ANNCOL}\xlabel{ANNCOL}ANNCOL}
 
 \begin{description}
 
 \item[Description :] Defines the colour of the annotation created using
 command surround.  Defines colour to be used, use command surround to plot
-annotation itself in new colour. 
+annotation itself in new colour.
 
 \item[Usage :] Change colour of surround annotation for pretty pictures.
 \item[Associated commands :] -
@@ -1593,7 +1593,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{APPLYMASKLOT}\xlabel{APPLYMASKLOT}APPLYMASKLOT}
 
 \begin{description}
@@ -1602,10 +1602,10 @@ or \\
 names are defined by a prefix, a range of numbers and a suffix.  See above
 for the definition of the operation of the ``{\bf lot}'' family of images. Bad
 pixels in the mask are set to 1, good pixels set to 0.  A bad pixel in the
-output images is set to the magic number {\tt -1.0e-20}. 
+output images is set to the magic number {\tt -1.0e-20}.
 
 \item[Usage :] To mask out bad pixels in a series of images.
-\item[Associated commands:] {\tt \htmlref{applymask}{APPLYMASK}}, 
+\item[Associated commands:] {\tt \htmlref{applymask}{APPLYMASK}},
 {\tt \htmlref{makemask}{MAKEMASK}}, \ldots
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1614,7 +1614,7 @@ output images is set to the magic number {\tt -1.0e-20}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ARRAY_TESTS}\xlabel{ARRAY_TESTS}ARRAY\_TESTS}
 
 \begin{description}
@@ -1622,11 +1622,11 @@ output images is set to the magic number {\tt -1.0e-20}.
 \item[Description :] Calculates the STARE and ND\_STARE readout noises and
 the dark current from a series of engineering data taken with the EXEC
 named ARRAY\_TESTS\@.  Results are compared to the nominally expected
-values and the user is notified if the values obtained are within limits. 
-The results are also logged to an engineering file for archival use. 
+values and the user is notified if the values obtained are within limits.
+The results are also logged to an engineering file for archival use.
 
 \item[Usage :] To analyse data taken with ARRAY\_TESTS exec and
-determine current performance characteristics of {\sc ircam3} array. 
+determine current performance characteristics of {\sc ircam3} array.
 
 \item[Associated commands :] -
 \item[Short version of command :] -
@@ -1645,13 +1645,13 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{BORDER}\xlabel{BORDER}BORDER}
 
 \begin{description}
 
 \item[Description :] Plots a line around an image (a border) of
-user-defined width.  The line width is in pixels. 
+user-defined width.  The line width is in pixels.
 
 \item[Usage :] To plot a line around your image.
 \item[Associated commands :] {\tt \htmlref{surround}{SURROUND}}
@@ -1671,21 +1671,21 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{BOX}\xlabel{BOX}BOX}
 
 \begin{description}
 
-\item[Description :] Plots a box at a user-defined position in an image. 
+\item[Description :] Plots a box at a user-defined position in an image.
 The box is plotted wither centred or with its bottom-left corner on a
 user-selected pixel (selected by its X,Y pixel coordinates) in the image
 and is of a user-defined size (in arcseconds).  To set arcsecond/pixel
 scale in image use command setps.  The X,Y pixel coordinates are 1,1 for
 the bottom left corner (origin) of the image and 128,128 for the centre of
-the {\sc ircam3} 256$\times$256 array. 
+the {\sc ircam3} 256$\times$256 array.
 
 \item[Usage :] To, say, highlight a source or image feature.
-\item[Associated commands :] {\tt \htmlref{cbox}{CBOX}}, 
+\item[Associated commands :] {\tt \htmlref{cbox}{CBOX}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1704,7 +1704,7 @@ or \\
 \end{itemize}
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CABLOCK}\xlabel{CABLOCK}CABLOCK}
 
 \begin{description}
@@ -1713,9 +1713,9 @@ or \\
 workstation showing the translation of colour to intensity via annotation
 on colour block.  Plots colour block at user-specified position using
 cursor. Block can be horizontal or vertical, have annotation or have no
-annotation and be of a user-defined size. 
+annotation and be of a user-defined size.
 
-\item[Usage :] To put your colour index block somewhere special on your plot. 
+\item[Usage :] To put your colour index block somewhere special on your plot.
 
 \item[Associated commands :] -
 \item[Short version of command :] -
@@ -1733,7 +1733,7 @@ or \\
 \end{itemize}
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CALEXP}\xlabel{CALEXP}CALEXP}
 
 \begin{description}
@@ -1762,14 +1762,14 @@ or \\
 \begin{itemize}
 
 \item {\tt 42 } is the observation number for exposure calculation
-\item {\tt 5 } is the sigma level to be used for the {\bf nsigma} display of 
+\item {\tt 5 } is the sigma level to be used for the {\bf nsigma} display of
 image No.\ 42
 
 \end{itemize}
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CALMAG}\xlabel{CALMAG}CALMAG}
 
 \begin{description}
@@ -1801,7 +1801,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CALZER}\xlabel{CALZER}CALZER}
 
 \begin{description}
@@ -1830,7 +1830,7 @@ or \\
 \end{itemize}
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CBOX}\xlabel{CBOX}CBOX}
 
 \begin{description}
@@ -1842,7 +1842,7 @@ size (in arcseconds).  To set the arcsecond/pixel scale in the image
 use the command {\bf setps}.
 
 \item[Usage :] Put a box on your image.
-\item[Associated commands :] {\tt \htmlref{box}{BOX}}, 
+\item[Associated commands :] {\tt \htmlref{box}{BOX}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1862,18 +1862,18 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CCIRCLE}\xlabel{CCIRCLE}CCIRCLE}
 
 \begin{description}
 
-\item[Description :] Plots a circle at a user-defined position in an image. 
+\item[Description :] Plots a circle at a user-defined position in an image.
 The circle is plotted on a user-selected pixel (selected with the cursor) in
 the image and is of a user-defined diameter (in arcseconds).  To set the
 arcsecond/pixel scale in the image use the command {\bf setps}.
 
 \item[Usage :] Put a circle on your image.
-\item[Associated commands :] {\tt \htmlref{circle}{CIRCLE}}, 
+\item[Associated commands :] {\tt \htmlref{circle}{CIRCLE}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1891,7 +1891,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CCROSS}\xlabel{CCROSS}CCROSS}
 
 \begin{description}
@@ -1902,7 +1902,7 @@ cursor) in the image and is of a user-defined size (in arcseconds).  To
 set the arcsecond/pixel scale in the image use the command {\bf setps}.
 
 \item[Usage :] Put a cross on your image.
-\item[Associated commands :] {\tt \htmlref{cross}{CROSS}}, 
+\item[Associated commands :] {\tt \htmlref{cross}{CROSS}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1920,7 +1920,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CCUT}\xlabel{CCUT}CCUT}
 
 \begin{description}
@@ -1929,11 +1929,11 @@ or \\
 user-selected points in an image.  The points are selected using the
 cursor.  The user has several options to do with how the cut is
 displayed, these are set by the command setcut which has to be executed
-at least once before the {\bf ccut} can be performed.  
+at least once before the {\bf ccut} can be performed.
 
 \item[Usage :] View a cross-cut through the image currently displayed.
-\item[Associated commands :] {\tt \htmlref{setcut}{SETCUT}}, 
-{\tt \htmlref{cut}{CUT}}, {\tt \htmlref{setps}{SETPS}}, 
+\item[Associated commands :] {\tt \htmlref{setcut}{SETCUT}},
+{\tt \htmlref{cut}{CUT}}, {\tt \htmlref{setps}{SETPS}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setnum}{SETNUM}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1955,7 +1955,7 @@ extracted from and plotted.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CELLIPSE}\xlabel{CELLIPSE}CELLIPSE}
 
 \begin{description}
@@ -1967,7 +1967,7 @@ arcseconds) and eccentricity.  To set the arcsecond/pixel scale in the
 image use the command {\bf setps}.
 
 \item[Usage :] Plot an ellipse (IRAS error ellipse for example).
-\item[Associated commands :] {\tt \htmlref{ellipse}{ELLIPSE}}, 
+\item[Associated commands :] {\tt \htmlref{ellipse}{ELLIPSE}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -1987,7 +1987,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CENT1}\xlabel{CENT1}CENT1}
 
 \begin{description}
@@ -1998,7 +1998,7 @@ stellar position is calculated and returned to the user.  You can
 select multiple centroiding positions in {\bf cent1}.
 
 \item[Usage :] Determine the accurate position of sources in your image.
-\item[Associated commands :] {\tt \htmlref{cent2}{CENT2}}, 
+\item[Associated commands :] {\tt \htmlref{cent2}{CENT2}},
 {\tt \htmlref{cursor}{CURSOR}}, {\tt \htmlref{centroid}{CENTROID}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2017,7 +2017,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CENT2}\xlabel{CENT2}CENT2}
 
 \begin{description}
@@ -2028,9 +2028,9 @@ stellar positions are calculated and the RA,Dec offsets between them
 and together with the radial distance,position angle (east of north) is
 returned.
 
-\item[Usage :] Determine the accurate offsets between two sources in your image.  
-\item[Associated commands :] {\tt \htmlref{cent1}{CENT1}}, 
-{\tt \htmlref{cursor}{CURSOR}}, {\tt \htmlref{centroid}{CENTROID}} 
+\item[Usage :] Determine the accurate offsets between two sources in your image.
+\item[Associated commands :] {\tt \htmlref{cent1}{CENT1}},
+{\tt \htmlref{cursor}{CURSOR}}, {\tt \htmlref{centroid}{CENTROID}}
 
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2046,7 +2046,7 @@ returned.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CHDISP}\xlabel{CHDISP}CHDISP}
 
 \begin{description}
@@ -2076,7 +2076,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CHRED}\xlabel{CHRED}CHRED}
 
 \begin{description}
@@ -2113,7 +2113,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CIRCLE}\xlabel{CIRCLE}CIRCLE}
 
 \begin{description}
@@ -2125,7 +2125,7 @@ image) in the image and is of a user-defined diameter (in arcseconds).
 To set the arcsecond/pixel scale in the image use the command {\bf setps}.
 
 \item[Usage :] Plot a circle centred on a specific image pixel.
-\item[Associated commands :] {\tt \htmlref{ccircle}{CCIRCLE}}, 
+\item[Associated commands :] {\tt \htmlref{ccircle}{CCIRCLE}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2143,7 +2143,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CLEAR}\xlabel{CLEAR}CLEAR}
 
 \begin{description}
@@ -2160,7 +2160,7 @@ current graphics device to produce an empty/blank window.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CLEARIT}\xlabel{CLEARIT}CLEARIT}
 
 \begin{description}
@@ -2180,7 +2180,7 @@ background colour (generally black).
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CLINE}\xlabel{CLINE}CLINE}
 
 \begin{description}
@@ -2191,7 +2191,7 @@ the cursor in the current image.  The line width used is defined by the
 command {\bf line\_width}.
 
 \item[Usage :] Plot a line between two position in an image.
-\item[Associated commands :] {\tt \htmlref{line}{LINE}}, 
+\item[Associated commands :] {\tt \htmlref{line}{LINE}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setcurmark}{SETCURMARK}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2200,7 +2200,7 @@ command {\bf line\_width}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CNSIGMA}\xlabel{CNSIGMA}CNSIGMA}
 
 \begin{description}
@@ -2239,13 +2239,13 @@ than the size of the current graphics device can be displayed.
 
 \item[Usage :] To plot a image with nsigma scaling.
 
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{moren}{MORENSIGMA}}, {\tt \htmlref{clear}{CLEAR}}, 
-{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{cplot}{CPLOT}}, 
-{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, \\ 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}}, 
-{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{again}{AGAIN}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}}, 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{moren}{MORENSIGMA}}, {\tt \htmlref{clear}{CLEAR}},
+{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{cplot}{CPLOT}},
+{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, \\
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}},
+{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{again}{AGAIN}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}},
 {\tt \htmlref{setcen}{SETCEN}}, {\tt \htmlref{surround}{SURROUND}}
 
 \item[Short version of command :] {\tt cns}
@@ -2265,7 +2265,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COFF}\xlabel{COFF}COFF}
 
 \begin{description}
@@ -2281,7 +2281,7 @@ object taken at the same spatial position can be input and the spatial
 offsets (due to telescope oscillation or tracking errors) will be
 calculated relative to the first image in the sequence.  The offsets in
 the user-named output ASCII file are in arcseconds.  To set the pixel
-scale use the command {\bf setps}.  
+scale use the command {\bf setps}.
 
 \item[Hint :] Use {\bf coff} for a sequence of images taken at supposedly the
 same spatial position. Use {\tt jitreg} for a sequence of images taken with a
@@ -2291,8 +2291,8 @@ large offsets to survey a large area of sky).
 
 \item[Usage :] To work out offsets between subsequent images all of
 which are supposedly at same spatial position.
-\item[Associated commands :] {\tt \htmlref{setps}{SETPS}}, 
-{\tt \htmlref{centroid}{CENTROID}}, {\tt \htmlref{histo}{HISTO}}, 
+\item[Associated commands :] {\tt \htmlref{setps}{SETPS}},
+{\tt \htmlref{centroid}{CENTROID}}, {\tt \htmlref{histo}{HISTO}},
 {\tt \htmlref{accoff}{ACCOFF}}, {\tt \htmlref{jitreg}{JITREG}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2301,7 +2301,7 @@ which are supposedly at same spatial position.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COLINV}\xlabel{COLINV}COLINV}
 
 \begin{description}
@@ -2315,8 +2315,8 @@ signal) to black (high signal).  To re-establish the normal colour
 table display run command {\bf colinv} again.
 
 \item[Usage :] To invert colour table (b-w goes to w-b) and visa versa.
-\item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}}, 
-{\tt \htmlref{writelut}{WRITELUT}}, 
+\item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}},
+{\tt \htmlref{writelut}{WRITELUT}},
 {\tt grey}, {\tt col19}, {\tt heat}, {\tt col13}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2325,7 +2325,7 @@ table display run command {\bf colinv} again.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COLTAB}\xlabel{COLTAB}COLTAB}
 
 \begin{description}
@@ -2342,11 +2342,11 @@ in a 2D DATA\_ARRAY component of size 3$\times$256 with values between
 col1} through {\tt 49} plus {\tt grey} and {\tt heat}) can also be used
 with the FIGARO command {\bf colour}.
 
-\item[Usage :] Plot an {\sc IrcamDR} colour table of your own 
+\item[Usage :] Plot an {\sc IrcamDR} colour table of your own
 created with {\bf crecolt}.
-\item[Associated commands :] {\tt \htmlref{colinv}{COLINV}}, 
-{\tt \htmlref{ablock}{ABLOCK}}, {\tt \htmlref{cablock}{CABLOCK}}, 
-{\tt \htmlref{writelut}{WRITELUT}}, {\tt grey}, {\tt col19}, {\tt heat}, \\ 
+\item[Associated commands :] {\tt \htmlref{colinv}{COLINV}},
+{\tt \htmlref{ablock}{ABLOCK}}, {\tt \htmlref{cablock}{CABLOCK}},
+{\tt \htmlref{writelut}{WRITELUT}}, {\tt grey}, {\tt col19}, {\tt heat}, \\
 {\tt col13}, {\tt \htmlref{crecolt}{CRECOLT}}
 \item[Short version of command :] ct
 \item[Invocation :]
@@ -2364,7 +2364,7 @@ displayed
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CONT_TITLE}\xlabel{CONT_TITLE}CONT\_TITLE}
 
 \begin{description}
@@ -2375,7 +2375,7 @@ image on the current graphics device.
 
 \item[Usage :] To change title of a contour map without running through
 all of {\bf setcont}.
-\item[Associated commands :] {\tt \htmlref{contour}{CONTOUR}}, 
+\item[Associated commands :] {\tt \htmlref{contour}{CONTOUR}},
 {\tt \htmlref{setfont}{SETFONT}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2393,7 +2393,7 @@ under contour command
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CONTOFF}\xlabel{CONTOFF}CONTOFF}
 
 \begin{description}
@@ -2408,7 +2408,7 @@ contour map down (\emph{i.e.}, to decreasing Dec).
 \item[Usage :] Move a contour map slightly with respect to
 say, underlying image.
 
-\item[Associated commands :] {\tt \htmlref{setcont}{}SETCONT}, 
+\item[Associated commands :] {\tt \htmlref{setcont}{}SETCONT},
 {\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{line\_width}{LINE_WIDTH}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2426,7 +2426,7 @@ display and contour map display
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CONTOUR}\xlabel{CONTOUR}CONTOUR}
 
 \begin{description}
@@ -2437,7 +2437,7 @@ parameters a set by the command {\bf setcont}.  The width of the line
 used to plot the contours is set with the command {\bf line\_width}.
 
 \item[Usage :] To plot a contour map.
-\item[Associated commands :] {\tt \htmlref{setcont}{SETCONT}}, 
+\item[Associated commands :] {\tt \htmlref{setcont}{SETCONT}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{contoff}{CONTOFF}}
 \item[Short version of command :] {\tt cont}
 \item[Invocation :]
@@ -2456,7 +2456,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CPLOT}\xlabel{CPLOT}CPLOT}
 
 \begin{description}
@@ -2474,14 +2474,14 @@ displayed.
 
 \item[Usage :] To plot an image using plot {\it max},{\it min} scaling.
 
-\item[Associated commands :] {\tt \htmlref{plot}{PLOT}}, 
-{\tt \htmlref{morep}{MOREPLOT}}, {\tt \htmlref{clear}{CLEAR}}, 
-{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, \\ 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}}, 
-{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{setcen}{SETCEN}}, 
-{\tt \htmlref{setmm}{SETMM}}, {\tt \htmlref{again}{AGAIN}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}}, 
+\item[Associated commands :] {\tt \htmlref{plot}{PLOT}},
+{\tt \htmlref{morep}{MOREPLOT}}, {\tt \htmlref{clear}{CLEAR}},
+{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, \\
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}},
+{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{setcen}{SETCEN}},
+{\tt \htmlref{setmm}{SETMM}}, {\tt \htmlref{again}{AGAIN}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}},
 {\tt \htmlref{surround}{SURROUND}}
 
 \item[Short version of command :] {\tt cpl}
@@ -2490,7 +2490,7 @@ displayed.
 \begin{quote}{\tt  cplot }\\
 or \\
 {\tt cplot 42 }\\
-or\\ 
+or\\
 {\tt cplot 0 }
 \end{quote}
 
@@ -2502,7 +2502,7 @@ or\\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CRANPLOT}\xlabel{CRANPLOT}CRANPLOT}
 
 \begin{description}
@@ -2521,13 +2521,13 @@ current graphics device can be displayed.
 
 \item[Usage :] Plot an image using range scaling.
 
-\item[Associated commands :] {\tt \htmlref{ranplot}{RANPLOT}}, 
-{\tt \htmlref{morer}{MORERANPLOT}}, {\tt \htmlref{clear}{CLEAR}}, 
-{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{cplot}{CPLOT}}, \\ 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}}, 
-{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{setcen}{SETCEN}}, 
-{\tt \htmlref{again}{AGAIN}}, {\tt \htmlref{setps}{SETPS}}, 
+\item[Associated commands :] {\tt \htmlref{ranplot}{RANPLOT}},
+{\tt \htmlref{morer}{MORERANPLOT}}, {\tt \htmlref{clear}{CLEAR}},
+{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{cplot}{CPLOT}}, \\
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}},
+{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{setcen}{SETCEN}},
+{\tt \htmlref{again}{AGAIN}}, {\tt \htmlref{setps}{SETPS}},
 {\tt \htmlref{setnum}{SETNUM}}, {\tt \htmlref{surround}{SURROUND}}
 
 \item[Short version of command :] {\tt cran}
@@ -2545,12 +2545,12 @@ or \\
 \item {\tt 42} is the observation number of the image to be plotted
 \item {\tt 0} will prompt you for the full name of image to be plotted
 \end{itemize}
- 
+
 \end{description}
 
 \hrule
 \subsubsection*{\label{CROSS}\xlabel{CROSS}CROSS}
- 
+
 \begin{description}
 
 \item [Description :] Plots a cross at a user-defined position in an
@@ -2581,7 +2581,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CROSSCUT}\xlabel{CROSSCUT}CROSSCUT}
 
 \begin{description}
@@ -2613,7 +2613,7 @@ do clear current image display before plotting cross-cuts)
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CROSSCUT_PEAK}\xlabel{CROSSCUT_PEAK}CROSSCUT\_PEAK}
 
 \begin{description}
@@ -2646,7 +2646,7 @@ cross-cut through feature (full cross-cut is in this case
 near cursor selected position
 \end{itemize}\end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CSTATS}\xlabel{CSTATS}CSTATS}
 
 \begin{description}
@@ -2663,7 +2663,7 @@ user just invokes the command as {\tt cstats} then both the X and Y
 size of the sub-area are prompted for.
 
 \item[Usage :] Calculate statistics in sub-area of image currently displayed.
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{limag}{LIMAG}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2682,7 +2682,7 @@ calculated.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CURHOT}\xlabel{CURHOT}CURHOT}
 
 \begin{description}
@@ -2700,7 +2700,7 @@ hot pixel by the mean value in the bin or a bad pixel magic number.
 See {\bf hotshot} documentation for more details. The output is the
 image after bad/hot pixels have been removed.
 
-\item[Usage :] To remove hot/bad pixels from a sub-area of current image 
+\item[Usage :] To remove hot/bad pixels from a sub-area of current image
 displayed.
 \item[Associated commands :] {\tt \htmlref{hotshot}{HOTSHOT}}
 \item[Short version of command :] -
@@ -2710,7 +2710,7 @@ displayed.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CURSOR}\xlabel{CURSOR}CURSOR}
 
 \begin{description}
@@ -2733,7 +2733,7 @@ left mouse button.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CUT}\xlabel{CUT}CUT}
 
 \begin{description}
@@ -2748,9 +2748,9 @@ numerous setup options for the graph produced.  Use {\bf line\_width}
 to define the thickness of the line used to draw the graph.
 
 \item[Usage :] Plot cuts between specific pixels in an image.
-\item[Associated commands :] {\tt \htmlref{setcut}{SETCUT}}, 
+\item[Associated commands :] {\tt \htmlref{setcut}{SETCUT}},
 {\tt \htmlref{ccut}{CCUT}}
-\item[Short version of command :] - 
+\item[Short version of command :] -
 \item[Invocation :]
 
 \begin{quote}{\tt  cut }\\
@@ -2768,7 +2768,7 @@ be extracted and plotted
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CUT2FF}\xlabel{CUT2FF}CUT2FF}
 
 \begin{description}
@@ -2802,7 +2802,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CUT_TITLE}\xlabel{CUT_TITLE}CUT\_TITLE}
 
 \begin{description}
@@ -2812,7 +2812,7 @@ plot through an image.  This string can also be set in {\bf setcut}.
 
 \item[Usage :] Change {\bf cut} title rather than going through full
 {\bf setcut} options.
-\item[Associated commands :] {\tt \htmlref{cut}{CUT}}, 
+\item[Associated commands :] {\tt \htmlref{cut}{CUT}},
 {\tt \htmlref{ccut}{CCUT}}, {\tt \htmlref{setcut}{SETCUT}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2824,7 +2824,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CVARGREY}\xlabel{CVARGREY}CVARGREY}
 
 \begin{description}
@@ -2840,13 +2840,13 @@ command {\bf setvargrey}.
 
 \item[Usage :] Plot an image using {\bf vargrey} scaling.
 
-\item[Associated commands :] {\tt \htmlref{vargrey}{VARGREY}}, 
-{\tt \htmlref{morev}{MOREVARGREY}}, {\tt \htmlref{setvargrey}{SETVARGREY}}, 
-{\tt \htmlref{clear}{CLEAR}}, {\tt \htmlref{cnsigma}{CNSIGMA}}, 
-{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{plot}{PLOT}}, \\ 
-{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{setmag}{SETMAG}}, 
-{\tt \htmlref{setcen}{SETCEN}}, {\tt \htmlref{again}{AGAIN}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}}, 
+\item[Associated commands :] {\tt \htmlref{vargrey}{VARGREY}},
+{\tt \htmlref{morev}{MOREVARGREY}}, {\tt \htmlref{setvargrey}{SETVARGREY}},
+{\tt \htmlref{clear}{CLEAR}}, {\tt \htmlref{cnsigma}{CNSIGMA}},
+{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{plot}{PLOT}}, \\
+{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{setmag}{SETMAG}},
+{\tt \htmlref{setcen}{SETCEN}}, {\tt \htmlref{again}{AGAIN}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}},
 {\tt \htmlref{surround}{SURROUND}}
 
 \item[Short version of command :] {\tt cvg}
@@ -2855,7 +2855,7 @@ command {\bf setvargrey}.
 \begin{quote}{\tt  cvargrey }\\
 or \\
 {\tt cvargrey 42 }\\
-or \\ 
+or \\
 {\tt cvargrey 0 }
 \end{quote}
 
@@ -2866,7 +2866,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DAOCEN}\xlabel{DAOCEN}DAOCEN}
 
 \begin{description}
@@ -2878,7 +2878,7 @@ centroid of object at cursor position using {\bf rapi2d} application
 \item[Usage :] Attempting to identify DAO found objects (using find
 option) in your image.
 
-\item[Associated commands :] {\tt \htmlref{daofind}{DAOFIND}}, 
+\item[Associated commands :] {\tt \htmlref{daofind}{DAOFIND}},
 {\tt \htmlref{daogid}{DAOGID}}, {\tt \htmlref{daogid2}{DAOGID2}}
 
 \item[Short version of command :] -
@@ -2889,7 +2889,7 @@ option) in your image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DAOFIND}\xlabel{DAOFIND}DAOFIND}
 
 \begin{description}
@@ -2899,9 +2899,9 @@ find command (to auto-find stars in an image) and plots symbols
 (circles, crosses, boxes) or id number from DAOPHOT file on object
 identified.
 
-\item[Usage :] Identifying stars found by DAOPHOT find command on an image.  
+\item[Usage :] Identifying stars found by DAOPHOT find command on an image.
 
-\item[Associated commands :] {\tt \htmlref{daocen}{DAOCEN}}, 
+\item[Associated commands :] {\tt \htmlref{daocen}{DAOCEN}},
 {\tt \htmlref{daogid}{DAOGID}}, {\tt \htmlref{daogid2}{DAOGID2}}
 
 \item[Short version of command :] -
@@ -2912,7 +2912,7 @@ identified.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DAOGID}\xlabel{DAOGID}DAOGID}
 
 \begin{description}
@@ -2924,7 +2924,7 @@ DAOPHOT star is the one clicked on by user.
 
 \item[Usage :] Identifying stars found by the DAOPHOT find command on an image.
 
-\item[Associated commands :] {\tt \htmlref{daocen}{DAOCEN}}, 
+\item[Associated commands :] {\tt \htmlref{daocen}{DAOCEN}},
 {\tt \htmlref{daofind}{DAOFIND}}, {\tt \htmlref{daogid2}{DAOGID2}}
 
 \item[Short version of command :] -
@@ -2935,7 +2935,7 @@ DAOPHOT star is the one clicked on by user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DAOGID2}\xlabel{DAOGID2}DAOGID2}
 
 \begin{description}
@@ -2947,7 +2947,7 @@ one clicked on by user.  Useful to id stars that have been found using
 DAOPHOT find command in say, two filters (\emph{e.g.}, J and K).
 
 \item[Usage :] Identifying stars found by the DAOPHOT find command on an image.
-\item[Associated commands :] {\tt \htmlref{daocen}{DAOCEN}}, 
+\item[Associated commands :] {\tt \htmlref{daocen}{DAOCEN}},
 {\tt \htmlref{daofind}{DAOFIND}}, {\tt \htmlref{daogid}{DAOGID}}
 
 \item[Short version of command :] -
@@ -2958,7 +2958,7 @@ DAOPHOT find command in say, two filters (\emph{e.g.}, J and K).
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DARKLOT}\xlabel{DARKLOT}DARKLOT}
 
 \begin{description}
@@ -2983,9 +2983,9 @@ to {\tt im\_25d}.
 To dark subtract a series of {\sc ircam3} ({\sc ro}) images use the command
 {\bf rodarklot}.
 
-\item[Usage :] Dark subtract a series of {\sc ircam1/2} images from 
+\item[Usage :] Dark subtract a series of {\sc ircam1/2} images from
 container file.
-\item[Associated commands :] {\tt \htmlref{rodarklot}{RODARKLOT}}, 
+\item[Associated commands :] {\tt \htmlref{rodarklot}{RODARKLOT}},
 {\tt \htmlref{setfile}{SETFILE}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -2994,7 +2994,7 @@ container file.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DEGLOT}\xlabel{DEGLOT}DEGLOT}
 
 \begin{description}
@@ -3012,8 +3012,8 @@ adds a letter {\tt `g'} to the input filenames and writes the deglitched
 images to files of these names.
 
 \item[Usage :] De-glitching a series of images using a bad pixel mask.
-\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}}, 
-{\tt \htmlref{applymask}{APPLYMASK}}, 
+\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}},
+{\tt \htmlref{applymask}{APPLYMASK}},
 {\tt \htmlref{applymasklot}{APPLYMASKLOT}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3022,7 +3022,7 @@ images to files of these names.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DISP}\xlabel{DISP}DISP}
 
 \begin{description}
@@ -3043,9 +3043,9 @@ into the system using the command {\bf setvar}.
 
 \item[Usage :] Quick look display of object-sky images and simple
 aperture photometry on result.
-\item[Associated commands :] {\tt \htmlref{setvar}{SETVAR}}, 
-{\tt \htmlref{pho}{PHO}}, {\tt \htmlref{pho2}{PHO2}}, 
-{\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{stdred}{STDRED}}, 
+\item[Associated commands :] {\tt \htmlref{setvar}{SETVAR}},
+{\tt \htmlref{pho}{PHO}}, {\tt \htmlref{pho2}{PHO2}},
+{\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{stdred}{STDRED}},
 {\tt \htmlref{stred}{STRED}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3063,7 +3063,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DISPICK}\xlabel{DISPICK}DISPICK}
 
 \begin{description}
@@ -3098,7 +3098,7 @@ and have sub-area extracted from
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ELLIPSE}\xlabel{ELLIPSE}ELLIPSE}
 
 \begin{description}
@@ -3110,9 +3110,9 @@ the image and is of a user-defined major axis (in arcseconds) and
 eccentricity. To set the arcsecond/pixel scale in the image use the
 command {\bf setps}.
 
-\item[Usage :] To plot an ellipse centred on a pixel of an image 
+\item[Usage :] To plot an ellipse centred on a pixel of an image
 (\emph{e.g.}, an IRAS error ellipse).
-\item[Associated commands :] {\tt \htmlref{cellipse}{CELLIPSE}}, 
+\item[Associated commands :] {\tt \htmlref{cellipse}{CELLIPSE}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setps}{SETPS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3133,7 +3133,7 @@ is plotted
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{FLAT2}\xlabel{FLAT2}FLAT2}
 
 \begin{description}
@@ -3151,9 +3151,9 @@ normalization to unity for the image to be divided into the object
 image is determined by the {\bf rapi2d} application {\bf stats}.  The
 division is performed using the {\bf rapi2d} application {\bf div}.
 
-\item[Usage :] Flat-field two images A,B A with B and B with A.  
+\item[Usage :] Flat-field two images A,B A with B and B with A.
 A and B could be say, two images of a star with a spatial offset between them.
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{div}{DIV}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3173,7 +3173,7 @@ each other
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{FLATLOT}\xlabel{FLATLOT}FLATLOT}
 
 \begin{description}
@@ -3194,7 +3194,7 @@ flat-fielding is performed using the {\bf rapi2d} application {\bf div}.
 
 \item[Usage :] To flat-field a number of images with the same
 flat-field image.
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{div}{DIV}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3203,7 +3203,7 @@ flat-field image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GETCM}\xlabel{GETCM}GETCM}
 
 \begin{description}
@@ -3218,10 +3218,10 @@ command used to display an image \emph{e.g.}, {\bf nsigma}, {\bf plot},
 using say, nsigma display, and you want to know what the actual {\it
 max},{\it min} scaling values are for a specific sigma-level.
 
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{plot}{PLOT}}, 
-{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{ranplot}{RANPLOT}}, 
-{\tt \htmlref{cranplot}{CRANPLOT}}, {\tt \htmlref{vargrey}{VARGREY}}, \\ 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{plot}{PLOT}},
+{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{ranplot}{RANPLOT}},
+{\tt \htmlref{cranplot}{CRANPLOT}}, {\tt \htmlref{vargrey}{VARGREY}}, \\
 {\tt \htmlref{cvargrey}{CVARGREY}}
 
 \item[Short version of command :] -
@@ -3231,7 +3231,7 @@ max},{\it min} scaling values are for a specific sigma-level.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GETOFF}\xlabel{GETOFF}GETOFF}
 
 \begin{description}
@@ -3244,7 +3244,7 @@ re-mosaic a set of images) or {\bf jitreg} (to refine the offsets and correct
 for telescope drifting and pointing changes.
 
 \item[Usage :] Check spatial offsets of set of observations.
-\item[Associated commands :] {\tt \htmlref{remos}{REMOS}}, 
+\item[Associated commands :] {\tt \htmlref{remos}{REMOS}},
 {\tt \htmlref{jitreg}{JITREG}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3253,7 +3253,7 @@ for telescope drifting and pointing changes.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GETRAST}\xlabel{GETRAST}GETRAST}
 
 \begin{description}
@@ -3276,7 +3276,7 @@ are returned by {\bf getrast}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GLITCHMARK}\xlabel{GLITCHMARK}GLITCHMARK}
 
 \begin{description}
@@ -3307,7 +3307,7 @@ the median of the 8 surrounding pixels.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GRID}\xlabel{GRID}GRID}
 
 \begin{description}
@@ -3323,7 +3323,7 @@ in ra (1 sec of time) and 10" in dec say).  The width of the line used
 to draw the grid is defined by the command {\bf line\_width}.
 
 \item[Usage :] Put a grid of user-defined spacing on image displayed.
-\item[Associated commands :] {\tt \htmlref{setps}{SETPS}}, 
+\item[Associated commands :] {\tt \htmlref{setps}{SETPS}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3340,7 +3340,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{HARDCOPY}\xlabel{HARDCOPY}HARDCOPY}
 
 \begin{description}
@@ -3355,7 +3355,7 @@ on the hardcopy device and plots the output desired and then re-opens
 plotting to the previous graphics device.
 
 \item[Usage :] Produce a paper copy of current graphics.
-\item[Associated commands :] {\tt \htmlref{sethard}{SETHARD}}, 
+\item[Associated commands :] {\tt \htmlref{sethard}{SETHARD}},
 {\tt \htmlref{hardlot}{HARDLOT}}
 \item[Short version of command :] {\tt ha}
 \item[Invocation :]
@@ -3376,7 +3376,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{HARDLOT}\xlabel{HARDLOT}HARDLOT}
 
 \begin{description}
@@ -3390,7 +3390,7 @@ hardcopies are written to one output file but come out on separate
 pages of the hardcopy device.
 
 \item[Usage :] To produces paper copies of series of observations/images.
-\item[Associated commands :] {\tt \htmlref{hardcopy}{HARDCOPY}}, 
+\item[Associated commands :] {\tt \htmlref{hardcopy}{HARDCOPY}},
 {\tt \htmlref{sethard}{SETHARD}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3399,7 +3399,7 @@ pages of the hardcopy device.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{IO2RO}\xlabel{IO2RO}IO2RO}
 
 \begin{description}
@@ -3423,7 +3423,7 @@ observation files for reduction by {\sc IrcamDR}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{JITREG}\xlabel{JITREG}JITREG}
 
 \begin{description}
@@ -3454,9 +3454,9 @@ large area of sky).  Use {\bf coff} for a sequence of images taken at
 supposedly the same spatial position. Use {\bf jitreg} for a sequence
 of images taken with a small jitter offset between them.
 
-\item[Associated commands :] {\tt \htmlref{setps}{SETPS}}, 
-{\tt \htmlref{histo}{HISTO}}, {\tt \htmlref{coff}{COFF}}, 
-{\tt \htmlref{jitreg}{JITREG}}, {\tt \htmlref{stred}{STRED}}, 
+\item[Associated commands :] {\tt \htmlref{setps}{SETPS}},
+{\tt \htmlref{histo}{HISTO}}, {\tt \htmlref{coff}{COFF}},
+{\tt \htmlref{jitreg}{JITREG}}, {\tt \htmlref{stred}{STRED}},
 {\tt \htmlref{remos}{REMOS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3465,7 +3465,7 @@ of images taken with a small jitter offset between them.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LAGAIN}\xlabel{LAGAIN}LAGAIN}
 
 \begin{description}
@@ -3479,9 +3479,9 @@ clear the screen ({\bf clear}), change the parameters ({\bf setcut},
 {\bf setcont}, {\bf setvec}) and re-display the line plot using
 lagain.
 
-\item[Associated commands :] {\tt \htmlref{cut}{CUT}}, 
-{\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}}, 
-{\tt \htmlref{setcut}{SETCUT}}, {\tt \htmlref{setcont}{SETCONT}}, 
+\item[Associated commands :] {\tt \htmlref{cut}{CUT}},
+{\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}},
+{\tt \htmlref{setcut}{SETCUT}}, {\tt \htmlref{setcont}{SETCONT}},
 {\tt \htmlref{setvec}{SETVEC}}, {\tt \htmlref{clear}{CLEAR}}
 \item[Short version of command :] {\tt lag}
 \item[Invocation :]
@@ -3490,7 +3490,7 @@ lagain.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LIMAG}\xlabel{LIMAG}LIMAG}
 
 \begin{description}
@@ -3508,7 +3508,7 @@ calculates the 1-, 5-, 10- and 100- sigma limiting magnitudes per
 pixel, per sq arcsecond and per 3" aperture.
 
 \item[Usage :] To calculate limiting magnitude of image from sky noise.
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{cstats}{CSTATS}}, {\tt \htmlref{histo}{HISTO}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3525,7 +3525,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LINE}\xlabel{LINE}LINE}
 
 \begin{description}
@@ -3538,7 +3538,7 @@ ircam3} image).  The line width used is defined by the command {\bf
 line\_width}.
 
 \item[Usage :] Draws line on image displayed.
-\item[Associated commands :] {\tt \htmlref{cline}{CLINE}}, 
+\item[Associated commands :] {\tt \htmlref{cline}{CLINE}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3556,7 +3556,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LINE_WIDTH}\xlabel{LINE_WIDTH}LINE\_WIDTH}
 
 \begin{description}
@@ -3586,7 +3586,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LINECOL}\xlabel{LINECOL}LINECOL}
 
 \begin{description}
@@ -3596,9 +3596,9 @@ plotted on the current graphics device.  Colours are selected from the
 standard set referred to as (WRGBYPCS [W=white, R=red, G=blue, B=blue,
 Y=yellow, P=purple, C=cyan, S=pink and N=black]).  The setting of the
 line graphics colour is only temporary since any new line graphics will
-change the line colour to its own default colour.  
+change the line colour to its own default colour.
 
-\item[Usage :] To change line graphics colour when making a 
+\item[Usage :] To change line graphics colour when making a
 presentation slide/picture from the device screen.
 \item[Associated commands :] -
 \item[Short version of command :] -
@@ -3616,7 +3616,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MCURSOR}\xlabel{MCURSOR}MCURSOR}
 
 \begin{description}
@@ -3646,7 +3646,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MEDLOT}\xlabel{MEDLOT}MEDLOT}
 
 \begin{description}
@@ -3674,7 +3674,7 @@ a suffix {\tt dfzm}) then the output image would be {\tt im\_50dfzmm}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOFFLOT}\xlabel{MOFFLOT}MOFFLOT}
 
 \begin{description}
@@ -3690,7 +3690,7 @@ the command {\bf getoff} from the raw {\sc ro} files of a spatial
 mosaic.
 
 \item[Usage :] Calculating dc and spatial offsets between mosaic tiles.
-\item[Associated commands :] {\tt \htmlref{jitreg}{JITREG}}, 
+\item[Associated commands :] {\tt \htmlref{jitreg}{JITREG}},
 {\tt \htmlref{accoff}{ACCOFF}}, {\tt \htmlref{coff}{COFF}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3699,7 +3699,7 @@ mosaic.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MORENSIGMA}\xlabel{MORENSIGMA}MORENSIGMA}
 
 \begin{description}
@@ -3709,7 +3709,7 @@ different sigma level.  See command {\bf nsigma} for details of the nsigma
 image display method.
 
 \item[Usage :] Repeats last nsigma image display with new sigma-level.
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
 {\tt \htmlref{cnsigma}{CNSIGMA}}
 \item[Short version of command :] {\tt moren}, {\tt mn}
 \item[Invocation :]
@@ -3727,7 +3727,7 @@ image plotted
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOREPLOT}\xlabel{MOREPLOT}MOREPLOT}
 
 \begin{description}
@@ -3737,7 +3737,7 @@ different {\it max},{\it min} scaling values.  See command {\bf plot}
 for details of the plot image display method.
 
 \item[Usage :] To repeat last plot image display with new {\it max},{\it min}.
-\item[Associated commands :] {\tt \htmlref{plot}{PLOT}}, 
+\item[Associated commands :] {\tt \htmlref{plot}{PLOT}},
 {\tt \htmlref{cplot}{CPLOT}}
 \item[Short version of command :] {\tt morep}, {\tt mp}
 \item[Invocation :]
@@ -3754,7 +3754,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MORERANPLOT}\xlabel{MORERANPLOT}MORERANPLOT}
 
 \begin{description}
@@ -3764,7 +3764,7 @@ different range value.  See command {\bf ranplot} for details of the ranplot
 display method.
 
 \item[Usage :] To repeat last {\bf ranplot} image display with new range.
-\item[Associated commands :] {\tt \htmlref{ranplot}{RANPLOT}}, 
+\item[Associated commands :] {\tt \htmlref{ranplot}{RANPLOT}},
 {\tt \htmlref{cranplot}{CRANPLOT}}
 \item[Short version of command :] {\tt morer}
 \item[Invocation :]
@@ -3781,7 +3781,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOREVARGREY}\xlabel{MOREVARGREY}MOREVARGREY}
 
 \begin{description}
@@ -3791,7 +3791,7 @@ different pair of variable index scaling parameters.  See command
 {\bf vargrey} for details of the vargrey scaling method.
 
 \item[Usage :] To repeat last {\bf vargrey} image display with new parameters.
-\item[Associated commands :] {\tt \htmlref{vargrey}{VARGREY}}, 
+\item[Associated commands :] {\tt \htmlref{vargrey}{VARGREY}},
 {\tt \htmlref{cvargrey}{CVARGREY}}
 \item[Short version of command :] {\tt morev}
 \item[Invocation :]
@@ -3805,7 +3805,7 @@ or \\
 
 \item {\tt 60 } is the new percentage intensity cut value
 
-\item {\tt 20 } is the new colour index cut value 
+\item {\tt 20 } is the new colour index cut value
 (the bottom 60\% of the intensity range of the image  is
 mapped onto the bottom 20\% of the colour indices).
 
@@ -3813,7 +3813,7 @@ mapped onto the bottom 20\% of the colour indices).
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOS2}\xlabel{MOS2}MOS2}
 
 \begin{description}
@@ -3830,7 +3830,7 @@ device and saved with image name mos2.  The mosaicing part of mos2 is
 performed by the {\bf rapi2d} application {\bf mosaic2}.
 
 \item[Usage :] Test mosaic two overlapping images.
-\item[Associated commands :] {\tt \htmlref{mosaic2}{MOSAIC2}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic2}{MOSAIC2}},
 {\tt \htmlref{mosaic}{MOSAIC}}, {\tt \htmlref{quilt}{QUILT}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3848,17 +3848,17 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{NOMAG}\xlabel{NOMAG}NOMAG}
 
 \begin{description}
 
-\item[Description :] Command to tell the system that {\sc ircam3} does not 
-have an external magnifier attached to the cryostat.  This command therefore 
+\item[Description :] Command to tell the system that {\sc ircam3} does not
+have an external magnifier attached to the cryostat.  This command therefore
 sets the pixel scale (arcseconds/pixel) to 0.286"/pixel.
 
 \item[Usage :] To set pixel scale to 0.286".
-\item[Associated commands :] {\tt \htmlref{x2mag}{X2MAG}}, 
+\item[Associated commands :] {\tt \htmlref{x2mag}{X2MAG}},
 {\tt \htmlref{x5mag}{X5MAG}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -3867,7 +3867,7 @@ sets the pixel scale (arcseconds/pixel) to 0.286"/pixel.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{NSIGMA}\xlabel{NSIGMA}NSIGMA}
 
 \begin{description}
@@ -3903,13 +3903,13 @@ size of the current graphics device can be displayed.
 
 \item[Usage :] Plots an image with nsigma scaling.
 
-\item[Associated commands :] {\tt \htmlref{cnsigma}{CNSIGMA}}, 
-{\tt \htmlref{moren}{MORENSIGMA}}, {\tt \htmlref{clear}{CLEAR}}, 
-{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{cplot}{CPLOT}}, 
-{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}}, 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}}, 
-{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{again}{AGAIN}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}}, 
+\item[Associated commands :] {\tt \htmlref{cnsigma}{CNSIGMA}},
+{\tt \htmlref{moren}{MORENSIGMA}}, {\tt \htmlref{clear}{CLEAR}},
+{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{cplot}{CPLOT}},
+{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{cranplot}{CRANPLOT}},
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{cvargrey}{CVARGREY}},
+{\tt \htmlref{setmag}{SETMAG}}, {\tt \htmlref{again}{AGAIN}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}},
 {\tt \htmlref{setcen}{SETCEN}}, {\tt \htmlref{surround}{SURROUND}}
 
 \item[Short version of command :] {\tt ns}
@@ -3929,7 +3929,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OADD}\xlabel{OADD}OADD}
 
 \begin{description}
@@ -3941,9 +3941,9 @@ referred to by their observation number rather than their full name.
 
 \item[Usage :] Adds two observations together.
 
-\item[Associated commands :] {\tt \htmlref{osub}{OSUB}}, 
-{\tt \htmlref{odiv}{ODIV}}, {\tt \htmlref{omult}{OMULT}}, 
-{\tt \htmlref{add}{ADD}}, {\tt \htmlref{sub}{SUB}}, 
+\item[Associated commands :] {\tt \htmlref{osub}{OSUB}},
+{\tt \htmlref{odiv}{ODIV}}, {\tt \htmlref{omult}{OMULT}},
+{\tt \htmlref{add}{ADD}}, {\tt \htmlref{sub}{SUB}},
 {\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}}
 
 \item[Short version of command :] -
@@ -3962,7 +3962,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OCADD}\xlabel{OCADD}OCADD}
 
 \begin{description}
@@ -3974,9 +3974,9 @@ referred to by their observation number rather than their full name.
 
 \item[Usage :] Adds a constant to an observation.
 
-\item[Associated commands :] {\tt \htmlref{ocsub}{OCSUB}}, 
-{\tt \htmlref{ocdiv}{OCDIV}}, {\tt \htmlref{ocmult}{OCMULT}}, 
-{\tt \htmlref{cadd}{CADD}}, {\tt \htmlref{cdiv}{CDIV}}, 
+\item[Associated commands :] {\tt \htmlref{ocsub}{OCSUB}},
+{\tt \htmlref{ocdiv}{OCDIV}}, {\tt \htmlref{ocmult}{OCMULT}},
+{\tt \htmlref{cadd}{CADD}}, {\tt \htmlref{cdiv}{CDIV}},
 {\tt \htmlref{cmult}{CMULT}}
 
 \item[Short version of command :] -
@@ -3995,7 +3995,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OCDIV}\xlabel{OCDIV}OCDIV}
 
 \begin{description}
@@ -4007,8 +4007,8 @@ referred to by their observation number rather than their full name.
 
 \item[Usage :] Divides an observation by a constant.
 
-\item[Associated commands :] {\tt \htmlref{ocadd}{OCADD}}, 
-{\tt \htmlref{ocmult}{OCMULT}}, {\tt \htmlref{ocsub}{OCSUB}}, 
+\item[Associated commands :] {\tt \htmlref{ocadd}{OCADD}},
+{\tt \htmlref{ocmult}{OCMULT}}, {\tt \htmlref{ocsub}{OCSUB}},
 {\tt \htmlref{add}{ADD}}, {\tt \htmlref{mult}{MULT}}, {\tt \htmlref{sub}{SUB}}
 
 \item[Short version of command :] -
@@ -4027,7 +4027,7 @@ is being divided by constant.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OCMULT}\xlabel{OCMULT}OCMULT}
 
 \begin{description}
@@ -4040,8 +4040,8 @@ name.
 
 \item[Usage :] Multiples an observation by an constant.
 
-\item[Associated commands :] {\tt \htmlref{ocadd}{OCADD}}, 
-{\tt \htmlref{ocdiv}{OCDIV}}, {\tt \htmlref{ocsub}{OCSUB}}, 
+\item[Associated commands :] {\tt \htmlref{ocadd}{OCADD}},
+{\tt \htmlref{ocdiv}{OCDIV}}, {\tt \htmlref{ocsub}{OCSUB}},
 {\tt \htmlref{add}{ADD}}, {\tt \htmlref{div}{DIV}}, {\tt \htmlref{sub}{SUB}}
 
 \item[Short version of command :] -
@@ -4060,7 +4060,7 @@ is being multiplied by a constant.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OCSTATS}\xlabel{OCSTATS}OCSTATS}
 
 \begin{description}
@@ -4073,7 +4073,7 @@ ro}) images referred to by their observation number rather than their
 full name.
 
 \item[Usage :] Getting sub-area statistics from an observation.
-\item[Associated commands :] {\tt \htmlref{cstats}{CSTATS}}, 
+\item[Associated commands :] {\tt \htmlref{cstats}{CSTATS}},
 {\tt \htmlref{stats}{STATS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4091,7 +4091,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OCSUB}\xlabel{OCSUB}OCSUB}
 
 \begin{description}
@@ -4104,9 +4104,9 @@ name.
 
 \item[Usage :] Subtracting a constant from an observation.
 
-\item[Associated commands :] {\tt \htmlref{ocadd}{OCADD}}, 
-{\tt \htmlref{ocdiv}{OCDIV}}, {\tt \htmlref{ocmult}{OCMULT}}, 
-{\tt \htmlref{cadd}{CADD}}, {\tt \htmlref{cdiv}{CDIV}}, 
+\item[Associated commands :] {\tt \htmlref{ocadd}{OCADD}},
+{\tt \htmlref{ocdiv}{OCDIV}}, {\tt \htmlref{ocmult}{OCMULT}},
+{\tt \htmlref{cadd}{CADD}}, {\tt \htmlref{cdiv}{CDIV}},
 {\tt \htmlref{cmult}{CMULT}}
 
 \item[Short version of command :] -
@@ -4125,7 +4125,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ODIST}\xlabel{ODIST}ODIST}
 
 \begin{description}
@@ -4137,7 +4137,7 @@ second point from the values given for the first point by the command
 {\bf setnum} (RA Dec option).
 
 \item[Usage :] Calculating the distance between two pixels in am image.
-\item[Associated commands :] {\tt \htmlref{dist}{DIST}}, 
+\item[Associated commands :] {\tt \htmlref{dist}{DIST}},
 {\tt \htmlref{cent2}{CENT2}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4146,7 +4146,7 @@ second point from the values given for the first point by the command
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ODIV}\xlabel{ODIV}ODIV}
 
 \begin{description}
@@ -4159,9 +4159,9 @@ name.
 
 \item[Usage :] Dividing one observation by another.
 
-\item[Associated commands :] {\tt \htmlref{osub}{OSUB}}, 
-{\tt \htmlref{oadd}{OADD}}, {\tt \htmlref{omult}{OMULT}}, 
-{\tt \htmlref{add}{ADD}}, {\tt \htmlref{sub}{SUB}}, 
+\item[Associated commands :] {\tt \htmlref{osub}{OSUB}},
+{\tt \htmlref{oadd}{OADD}}, {\tt \htmlref{omult}{OMULT}},
+{\tt \htmlref{add}{ADD}}, {\tt \htmlref{sub}{SUB}},
 {\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}}
 
 \item[Short version of command :] -
@@ -4180,7 +4180,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OHISTO}\xlabel{OHISTO}OHISTO}
 
 \begin{description}
@@ -4192,7 +4192,7 @@ observation ({\sc ro}) images referred to by their observation number
 rather than their full name.
 
 \item[Usage :] To obtain sub-area statistics from observation.
-\item[Associated commands :] {\tt \htmlref{histo}{HISTO}}, 
+\item[Associated commands :] {\tt \htmlref{histo}{HISTO}},
 {\tt \htmlref{stats}{STATS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4210,7 +4210,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OLOOK}\xlabel{OLOOK}OLOOK}
 
 \begin{description}
@@ -4239,7 +4239,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OMULT}\xlabel{OMULT}OMULT}
 
 \begin{description}
@@ -4251,8 +4251,8 @@ referred to by their observation number rather than their full name.
 
 \item[Usage :] Multiplies two images together.
 
-\item[Associated commands :] {\tt \htmlref{oadd}{OADD}}, 
-{\tt \htmlref{odiv}{ODIV}}, {\tt \htmlref{osub}{OSUB}}, 
+\item[Associated commands :] {\tt \htmlref{oadd}{OADD}},
+{\tt \htmlref{odiv}{ODIV}}, {\tt \htmlref{osub}{OSUB}},
 {\tt \htmlref{add}{ADD}}, {\tt \htmlref{div}{DIV}}, {\tt \htmlref{sub}{SUB}}
 
 \item[Short version of command :] -
@@ -4271,7 +4271,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OSTATS}\xlabel{OSTATS}OSTATS}
 
 \begin{description}
@@ -4283,7 +4283,7 @@ observation ({\sc ro}) images referred to by their observation number
 rather than their full name.
 
 \item[Usage :] To obtain statistics on sub-area of observation.
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{cstats}{CSTATS}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4301,7 +4301,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OSUB}\xlabel{OSUB}OSUB}
 
 \begin{description}
@@ -4314,9 +4314,9 @@ name.
 
 \item[Usage :] Subtracts one observation image from another.
 
-\item[Associated commands :] {\tt \htmlref{oadd}{OADD}}, 
-{\tt \htmlref{odiv}{ODIV}}, {\tt \htmlref{omult}{OMULT}}, 
-{\tt \htmlref{add}{ADD}}, {\tt \htmlref{sub}{SUB}}, 
+\item[Associated commands :] {\tt \htmlref{oadd}{OADD}},
+{\tt \htmlref{odiv}{ODIV}}, {\tt \htmlref{omult}{OMULT}},
+{\tt \htmlref{add}{ADD}}, {\tt \htmlref{sub}{SUB}},
 {\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}}
 
 \item[Short version of command :] -
@@ -4335,7 +4335,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PCLOSE}\xlabel{PCLOSE}PCLOSE}
 
 \begin{description}
@@ -4353,7 +4353,7 @@ device.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PENCOL}\xlabel{PENCOL}PENCOL}
 
 \begin{description}
@@ -4382,7 +4382,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PENINT}\xlabel{PENINT}PENINT}
 
 \begin{description}
@@ -4414,7 +4414,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PHO}\xlabel{PHO}PHO}
 
 \begin{description}
@@ -4440,11 +4440,11 @@ On invocation, if the user gives {\bf pho} a command line parameter (any
 parameter actually) then {\bf pho} centres the star aperture on the peak pixel
 in the local neighbourhood of the cursor selected point (using the
 command {\bf histo} to get the location of the peak pixel).
- 
+
 \item [Usage :] Aperture photometry using single aperture object,sky.
 
-\item [Associated commands :] {\tt \htmlref{pho2}{PHO2}}, 
-{\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{disp}{DISP}}, 
+\item [Associated commands :] {\tt \htmlref{pho2}{PHO2}},
+{\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{disp}{DISP}},
 {\tt \htmlref{stdred}{STDRED}}
 
 \item [Short version of command :] -
@@ -4458,7 +4458,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PHO2}\xlabel{PHO2}PHO2}
 
 \begin{description}
@@ -4479,7 +4479,7 @@ for the 'star' aperture and 'sky' annulus using the cursor and it draws
 circles of the defined sizes at that location. The signal in the star
 aperture and sky annulus is used to calculate the signal from the
 object alone which is then converted to a magnitude using
-the zeropoint.  
+the zeropoint.
 
 On invocation, if the user gives {\bf pho2} a command line parameter
 (any parameter actually) then {\bf pho2} centres the star aperture on
@@ -4488,8 +4488,8 @@ the peak pixel in the local neighbourhood of the cursor selected point
 
 \item [Usage :] Aperture photometry using object aperture and concentric sky
 annulus.
-\item [Associated commands :] {\tt \htmlref{pho}{PHO}}, 
-{\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{disp}{DISP}}, 
+\item [Associated commands :] {\tt \htmlref{pho}{PHO}},
+{\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{disp}{DISP}},
 {\tt \htmlref{stdred}{STDRED}}
 \item [Short version of command :] -
 
@@ -4502,7 +4502,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PHO3}\xlabel{PHO3}PHO3}
 
 \begin{description}
@@ -4532,8 +4532,8 @@ the peak pixel).
 \item [Usage :] Aperture photometry using object aperture and
 concentric sky annulus separated from object aperture.
 
-\item [Associated commands :] {\tt \htmlref{pho}{PHO}}, 
-{\tt \htmlref{pho2}{PHO2}}, {\tt \htmlref{disp}{DISP}}, 
+\item [Associated commands :] {\tt \htmlref{pho}{PHO}},
+{\tt \htmlref{pho2}{PHO2}}, {\tt \htmlref{disp}{DISP}},
 {\tt \htmlref{stdred}{STDRED}}
 
 \item [Short version of command :] -
@@ -4547,7 +4547,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PICKLOT}\xlabel{PICKLOT}PICKLOT}
 
 \begin{description}
@@ -4577,7 +4577,7 @@ extracted.  If either of the above two parameters is N or undefined on
 the command line then that option is turned off.
 
 \item[Usage :] Extract an area of image to separate image.
-\item[Associated commands :] {\tt \htmlref{dispick}{DISPICK}}, 
+\item[Associated commands :] {\tt \htmlref{dispick}{DISPICK}},
 {\tt \htmlref{pickim}{PICKIM}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4596,7 +4596,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PLOT}\xlabel{PLOT}PLOT}
 
 \begin{description}
@@ -4615,9 +4615,9 @@ appropriate value above the sky.  This produces a plot where the sky is
 close to white on paper and gives good contrast (as opposed to
 hardcopying {\bf nsigma} plots) of features against background.
 
-\item[Associated commands :] {\tt \htmlref{cplot}{CPLOT}}, 
-{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{ranplot}{RANPLOT}}, 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{moreplot}{MOREPLOT}}, 
+\item[Associated commands :] {\tt \htmlref{cplot}{CPLOT}},
+{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{ranplot}{RANPLOT}},
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{moreplot}{MOREPLOT}},
 {\tt \htmlref{again}{AGAIN}}, {\tt \htmlref{setmm}{SETMM}}
 
 \item[Short version of command :] {\tt pl}
@@ -4639,7 +4639,7 @@ plotted
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PLOTGLITCH}\xlabel{PLOTGLITCH}PLOTGLITCH}
 
 \begin{description}
@@ -4655,7 +4655,7 @@ of the current image so that individual bad/hot pixels can be selected
 unambiguously with the cursor.
 
 \item[Usage :] Interactive bad/hot pixel removal on sequence of images.
-\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}}, 
+\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}},
 {\tt \htmlref{glitchmark}{GLITCHMARK}}, {\tt \htmlref{setarea}{SETAREA}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4664,7 +4664,7 @@ unambiguously with the cursor.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PLOTLOT}\xlabel{PLOTLOT}PLOTLOT}
 
 \begin{description}
@@ -4682,7 +4682,7 @@ quickly as possible.  This is useful for a pseudo-movie display to scan
 through a series of images.
 
 \item[Usage :] Plotting a lot of images using plot {\it max},{\it min} scaling.
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
 {\tt \htmlref{plot}{PLOT}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4701,7 +4701,7 @@ image displays.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POL2}\xlabel{POL2}POL2}
 
 \begin{description}
@@ -4749,7 +4749,7 @@ say, 5-8 arcsecond offsets) should be taken at each of the four waveplate
 position and each mosaic reduced with the command {\bf stred}.  The output from
 {\bf stred} can then be used in {\bf pol2}.
 
-\item[Associated commands :] {\tt \htmlref{setvar}{SETVAR}}, 
+\item[Associated commands :] {\tt \htmlref{setvar}{SETVAR}},
 {\tt \htmlref{stred}{STRED}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4768,7 +4768,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLREG}\xlabel{POLREG}POLREG}
 
 \begin{description}
@@ -4792,9 +4792,9 @@ added to the end, thus, if the input images were called {\tt pol0},
 images would be called {\tt pol0r}, {\tt pol45r}, {\tt pol22r and
 pol67r}.
 
-\item[Usage :] Registering spatially polarization images at 4 waveplate 
+\item[Usage :] Registering spatially polarization images at 4 waveplate
 positions.
-\item[Associated commands :] {\tt \htmlref{centroid}{CENTROID}}, 
+\item[Associated commands :] {\tt \htmlref{centroid}{CENTROID}},
 {\tt \htmlref{shift}{SHIFT}}, {\tt \htmlref{pickim}{PICKIM}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4803,7 +4803,7 @@ positions.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POPEN}\xlabel{POPEN}POPEN}
 
 \begin{description}
@@ -4823,8 +4823,8 @@ is needed when switching between output graphics devices.  The command
 device is defined by the command {\bf sethard}).
 
 \item[Usage :] Opening plotting to a new workstation/device.
-\item[Associated commands :] {\tt \htmlref{pclose}{PCLOSE}}, 
-{\tt \htmlref{sethard}{SETHARD}}, {\tt ixcs}, {\tt ixcm}, {\tt ixcl} 
+\item[Associated commands :] {\tt \htmlref{pclose}{PCLOSE}},
+{\tt \htmlref{sethard}{SETHARD}}, {\tt ixcs}, {\tt ixcm}, {\tt ixcl}
 (last three from Unix).
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4842,7 +4842,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{RANPLOT}\xlabel{RANPLOT}RANPLOT}
 
 \begin{description}
@@ -4861,12 +4861,12 @@ than the size of the current graphics device can be displayed.
 
 \item[Usage :] Plotting an image with range scaling on mean signal.
 
-\item[Associated commands :] {\tt \htmlref{cranplot}{CRANPLOT}}, 
-{\tt \htmlref{morer}{MORERANPLOT}}, {\tt \htmlref{clear}{CLEAR}}, 
-{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{plot}{PLOT}}, 
-{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{setmag}{SETMAG}}, 
-{\tt \htmlref{setcen}{SETCEN}}, {\tt \htmlref{again}{AGAIN}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}}, 
+\item[Associated commands :] {\tt \htmlref{cranplot}{CRANPLOT}},
+{\tt \htmlref{morer}{MORERANPLOT}}, {\tt \htmlref{clear}{CLEAR}},
+{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{plot}{PLOT}},
+{\tt \htmlref{vargrey}{VARGREY}}, {\tt \htmlref{setmag}{SETMAG}},
+{\tt \htmlref{setcen}{SETCEN}}, {\tt \htmlref{again}{AGAIN}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}},
 {\tt \htmlref{surround}{SURROUND}}
 
 \item[Short version of command :] {\tt ran}
@@ -4875,7 +4875,7 @@ than the size of the current graphics device can be displayed.
 \begin{quote}{\tt  ranplot }\\
 or \\
 {\tt ranplot 42 }\\
-or \\ 
+or \\
 {\tt ranplot 0 }
 \end{quote}
 
@@ -4886,7 +4886,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{REMOS}\xlabel{REMOS}REMOS}
 
 \begin{description}
@@ -4910,8 +4910,8 @@ mosaic using {\bf jitreg}, {\bf accoff} or {\bf coff} for example.  Use one
 of these and then use the output file created to re-mosaic the tiles
 using remos.
 
-\item[Associated commands :] {\tt \htmlref{stred}{STRED}}, 
-{\tt \htmlref{jitreg}{JITREG}}, {\tt \htmlref{accoff}{ACCOFF}}, 
+\item[Associated commands :] {\tt \htmlref{stred}{STRED}},
+{\tt \htmlref{jitreg}{JITREG}}, {\tt \htmlref{accoff}{ACCOFF}},
 {\tt \htmlref{coff}{COFF}}, {\tt \htmlref{quilt}{QUILT}}
 
 \item[Short version of command :] -
@@ -4921,7 +4921,7 @@ using remos.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{RFLOT}\xlabel{RFLOT}RFLOT}
 
 \begin{description}
@@ -4939,7 +4939,7 @@ thus {\tt im\_50dfzam} would be {\tt im\_50dfzmrf} after rotation and
 flipping.
 
 \item[Usage :] To change orientation of an image (say, North-East to top-left).
-\item[Associated commands :] {\tt \htmlref{rotate}{ROTATE}}, 
+\item[Associated commands :] {\tt \htmlref{rotate}{ROTATE}},
 {\tt \htmlref{flip}{FLIP}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -4948,7 +4948,7 @@ flipping.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROCENT}\xlabel{ROCENT}ROCENT}
 
 \begin{description}
@@ -4977,8 +4977,8 @@ mosaic together using {\bf remos} or {\bf quilt} or {\bf mosaic}
 into {\bf crequilt} which creates a quilt style ASCII file which can be
 fed into {\bf quilt} for mosaicing images together.
 
-\item[Associated commands :] {\tt \htmlref{centroid}{CENTROID}}, 
-{\tt \htmlref{remos}{REMOS}}, {\tt \htmlref{quilt}{QUILT}}, 
+\item[Associated commands :] {\tt \htmlref{centroid}{CENTROID}},
+{\tt \htmlref{remos}{REMOS}}, {\tt \htmlref{quilt}{QUILT}},
 {\tt \htmlref{crequilt}{CREQUILT}}
 
 \item[Short version of command :] -
@@ -4988,10 +4988,10 @@ fed into {\bf quilt} for mosaicing images together.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{RODARKLOT}\xlabel{RODARKLOT}RODARKLOT}
 
-\begin{description} 
+\begin{description}
 
 \item[Description :] Dark subtracts a series of raw {\sc ircam3} format
 individual images with names viz:  {\tt ro950412\_12}, {\tt
@@ -5014,7 +5014,7 @@ images with names {\tt im\_20d}, {\tt im\_21d},\ldots {\tt im\_25d}.
 images using a specified dark image.  To dark subtract a series of {\sc
 ircam1/2} container file images use the command {\bf darklot}.
 
-\item[Associated commands :] {\tt \htmlref{darklot}{DARKLOT}}, 
+\item[Associated commands :] {\tt \htmlref{darklot}{DARKLOT}},
 {\tt \htmlref{setfile}{SETFILE}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -5023,7 +5023,7 @@ ircam1/2} container file images use the command {\bf darklot}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROINDEX}\xlabel{ROINDEX}ROINDEX}
 
 \begin{description}
@@ -5037,11 +5037,11 @@ the ASCII file is typed to the screen.  The UT date of the {\sc ro}
 files used in {\bf roindex} (and in general) is set using the command
 {\bf setfile}.
 
-\item[Usage :] Producing a list of observational parameters from {\sc ro} image 
+\item[Usage :] Producing a list of observational parameters from {\sc ro} image
 range.
 
-\item[Associated commands :] {\tt \htmlref{ropar}{ROPAR}}, 
-{\tt \htmlref{rout}{ROUT}}, {\tt \htmlref{getoff}{GETOFF}}, 
+\item[Associated commands :] {\tt \htmlref{ropar}{ROPAR}},
+{\tt \htmlref{rout}{ROUT}}, {\tt \htmlref{getoff}{GETOFF}},
 {\tt \htmlref{setfile}{SETFILE}}
 
 \item[Short version of command :] -
@@ -5060,7 +5060,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROMED}\xlabel{ROMED}ROMED}
 
 \begin{description}
@@ -5079,8 +5079,8 @@ median filtered output image can be used in such commands as {\bf
 stred} instead of {\bf stred} median filtering the object images and
 using that as a flat-field.
 
-\item[Associated commands :] {\tt \htmlref{rodarklot}{RODARKLOT}}, 
-{\tt \htmlref{med3d}{MED3D}}, {\tt \htmlref{setfile}{SETFILE}}, 
+\item[Associated commands :] {\tt \htmlref{rodarklot}{RODARKLOT}},
+{\tt \htmlref{med3d}{MED3D}}, {\tt \htmlref{setfile}{SETFILE}},
 {\tt \htmlref{stred}{STRED}}
 
 \item[Short version of command :] -
@@ -5104,7 +5104,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROPAR}\xlabel{ROPAR}ROPAR}
 
 \begin{description}
@@ -5117,8 +5117,8 @@ with the command {\bf setfile}.
 
 \item[Usage :] To check the parameters used for a specific observation.
 
-\item[Associated commands :] {\tt \htmlref{roindex}{ROINDEX}}, 
-{\tt \htmlref{rout}{ROUT}}, {\tt \htmlref{getoff}{GETOFF}}, 
+\item[Associated commands :] {\tt \htmlref{roindex}{ROINDEX}},
+{\tt \htmlref{rout}{ROUT}}, {\tt \htmlref{getoff}{GETOFF}},
 {\tt \htmlref{setfile}{SETFILE}}
 
 \item[Short version of command :] -
@@ -5136,7 +5136,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROTLOT}\xlabel{ROTLOT}ROTLOT}
 
 \begin{description}
@@ -5151,7 +5151,7 @@ images but with the letter {\tt `r'} added to them.
 
 \item[Usage :] Rotating a sequence of images.
 
-\item[Associated commands :] {\tt \htmlref{rotate}{ROTATE}}, 
+\item[Associated commands :] {\tt \htmlref{rotate}{ROTATE}},
 {\tt \htmlref{rflot}{RFLOT}}
 
 \item[Short version of command :] -
@@ -5161,21 +5161,21 @@ images but with the letter {\tt `r'} added to them.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROUT}\xlabel{ROUT}ROUT}
 
 \begin{description}
 
 \item[Description :] Extracts the UT time information from a series of
 raw ({\sc ro}) {\sc ircam3} (or old format {\sc ircam1/2}) data images.
-The UT time is written to an ASCII file called {\tt rout.dat}.  The raw 
-images to be processed are defined by an observation number range and 
+The UT time is written to an ASCII file called {\tt rout.dat}.  The raw
+images to be processed are defined by an observation number range and
 the UT date defined by the command {\bf setfile}.
 
 \item[Usage :] Obtaining UT time on a sequence of {\sc ro} images.
 
-\item[Associated commands :] {\tt \htmlref{ropar}{ROPAR}}, 
-{\tt \htmlref{roindex}{ROINDEX}}, {\tt \htmlref{getoff}{GETOFF}}, 
+\item[Associated commands :] {\tt \htmlref{ropar}{ROPAR}},
+{\tt \htmlref{roindex}{ROINDEX}}, {\tt \htmlref{getoff}{GETOFF}},
 {\tt \htmlref{setfile}{SETFILE}}
 
 \item[Short version of command :] -
@@ -5194,7 +5194,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SCALEDARK}\xlabel{SCALEDARK}SCALEDARK}
 
 \begin{description}
@@ -5204,7 +5204,7 @@ style container files. {\bf scaledark} scales the exposure time from one
 value (the one used to take the dark) to another value (generally one
 close to the one used to take the dark).
 
-\item[Usage :] Useful if you forgot to take a dark of a specific exposure 
+\item[Usage :] Useful if you forgot to take a dark of a specific exposure
 time but you have one close to it in exposure length.
 \item[Associated commands :] -
 \item[Short version of command :] -
@@ -5214,7 +5214,7 @@ time but you have one close to it in exposure length.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SCALELOT}\xlabel{SCALELOT}SCALELOT}
 
 \begin{description}
@@ -5229,7 +5229,7 @@ application {\bf cdiv}.
 
 \item[Usage :] Scaling a sequence of images.
 
-\item[Associated commands :] {\tt \htmlref{scaledark}{SCALEDARK}}, 
+\item[Associated commands :] {\tt \htmlref{scaledark}{SCALEDARK}},
 {\tt \htmlref{cdiv}{CDIV}}
 
 \item[Short version of command :] -
@@ -5239,7 +5239,7 @@ application {\bf cdiv}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SEE}\xlabel{SEE}SEE}
 
 \begin{description}
@@ -5267,7 +5267,7 @@ window called {\tt GKS\_3800}.
 
 \item[Usage :] Calculating FWHM of stellar images in arcseconds.
 
-\item[Associated commands :] {\tt \xref{psf}{sun95}{PSF}}, 
+\item[Associated commands :] {\tt \xref{psf}{sun95}{PSF}},
 {\tt \htmlref{setps}{SETPS}}
 
 \item[Short version of command :] -
@@ -5276,7 +5276,7 @@ window called {\tt GKS\_3800}.
 \begin{quote}{\tt  see }\\
 or \\
 {\tt see 42 }\\
-or \\ 
+or \\
 {\tt see 0 }
 \end{quote}
 
@@ -5288,7 +5288,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETAREA}\xlabel{SETAREA}SETAREA}
 
 \begin{description}
@@ -5303,11 +5303,11 @@ sub-image is defined by an X,Y start pixel and a sub-area size (in
 pixels).  To switch off sub-area display the user must run {\bf
 setarea} again and select the full image option.
 
-\item[Usage :] Setting area of an image to be plotted with {\bf nsigma}, 
+\item[Usage :] Setting area of an image to be plotted with {\bf nsigma},
 {\bf plot}, {\bf ranplot}, {\bf vargrey} \emph{etc.}, image display commands.
 
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{ranplot}{RANPLOT}}, 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{ranplot}{RANPLOT}},
 {\tt \htmlref{vargrey}{VARGREY}}
 
 \item[Short version of command :] -
@@ -5317,7 +5317,7 @@ setarea} again and select the full image option.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCEN}\xlabel{SETCEN}SETCEN}
 
 \begin{description}
@@ -5340,9 +5340,9 @@ Users should use the command {\bf getrast} to determine the raster (pixel)
 size of the current graphics display device and then use {\bf setcen} (or
 {\bf setquad}) to define a new centre location for subsequent image display.
 
-\item[Associated commands :] {\tt \htmlref{setmag}{SETMAG}}, 
-{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{plot}{PLOT}}, 
-{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{vargrey}{VARGREY}}, 
+\item[Associated commands :] {\tt \htmlref{setmag}{SETMAG}},
+{\tt \htmlref{nsigma}{NSIGMA}}, {\tt \htmlref{plot}{PLOT}},
+{\tt \htmlref{ranplot}{RANPLOT}}, {\tt \htmlref{vargrey}{VARGREY}},
 {\tt \htmlref{setquad}{SETQUAD}}
 
 \item[Short version of command :] -
@@ -5361,7 +5361,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCOMORI}\xlabel{SETCOMORI}SETCOMORI}
 
 \begin{description}
@@ -5373,10 +5373,10 @@ text is written horizontally or vertically and starting at the bottom
 writing upwards downwards \emph{etc.} Horizontal-right is the default
 and produces normal direction and orientation text.
 
-\item[Usage :] Defining orientation of text written with {\bf wrcom} and 
+\item[Usage :] Defining orientation of text written with {\bf wrcom} and
 {\bf wrccom}.
 
-\item[Associated commands :] {\tt \htmlref{wrcom}{WRCOM}}, 
+\item[Associated commands :] {\tt \htmlref{wrcom}{WRCOM}},
 {\tt \htmlref{wrccom}{WRCCOM}}
 
 \item[Short version of command :] -
@@ -5397,7 +5397,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCONT}\xlabel{SETCONT}SETCONT}
 
 \begin{description}
@@ -5415,9 +5415,9 @@ contour map is defined by the command {\bf line\_width}.
 \item[Usage :] Setting contour levels to be plotted (amongst other
 things) using command {\bf contour}.
 
-\item[Associated commands :] {\tt \htmlref{contour}{CONTOUR}}, 
-{\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setnum}{SETNUM}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{cont\_title}{CONT_TITLE}}, 
+\item[Associated commands :] {\tt \htmlref{contour}{CONTOUR}},
+{\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{setnum}{SETNUM}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{cont\_title}{CONT_TITLE}},
 {\tt \htmlref{contoff}{CONTOFF}}
 
 \item[Short version of command :] -
@@ -5427,7 +5427,7 @@ things) using command {\bf contour}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCONTIC}\xlabel{SETCONTIC}SETCONTIC}
 
 \begin{description}
@@ -5442,8 +5442,8 @@ Tick marks are defined using the command {\bf setnum}.
 
 \item[Usage :] Defining contour axis tick mark length.
 
-\item[Associated commands :] {\tt \htmlref{setnum}{SETNUM}}, 
-{\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{contour}{CONTOUR}}, 
+\item[Associated commands :] {\tt \htmlref{setnum}{SETNUM}},
+{\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{contour}{CONTOUR}},
 {\tt \htmlref{surround}{SURROUND}}, {\tt \htmlref{ticklen}{TICKLEN}}
 
 \item[Short version of command :] -
@@ -5461,7 +5461,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCUR}\xlabel{SETCUR}SETCUR}
 
 \begin{description}
@@ -5483,7 +5483,7 @@ area with a small magnification \emph{i.e.}, not auto-scaling 0.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCURMARK}\xlabel{SETCURMARK}SETCURMARK}
 
 \begin{description}
@@ -5496,10 +5496,10 @@ the cursor position.
 
 \item[Usage :] Marking of cursor selected points in image.
 
-\item[Associated commands :] {\tt \htmlref{cursor}{CURSOR}}, 
-{\tt \htmlref{mcursor}{MCURSOR}}, {\tt \htmlref{glitchmark}{GLITCHMARK}}, 
-{\tt \htmlref{cbox}{CBOX}}, {\tt \htmlref{ccircle}{CCIRCLE}}, 
-{\tt \htmlref{ccross}{CCROSS}}, \\ {\tt \htmlref{cellipse}{CELLIPSE}}, 
+\item[Associated commands :] {\tt \htmlref{cursor}{CURSOR}},
+{\tt \htmlref{mcursor}{MCURSOR}}, {\tt \htmlref{glitchmark}{GLITCHMARK}},
+{\tt \htmlref{cbox}{CBOX}}, {\tt \htmlref{ccircle}{CCIRCLE}},
+{\tt \htmlref{ccross}{CCROSS}}, \\ {\tt \htmlref{cellipse}{CELLIPSE}},
 {\tt \htmlref{cline}{CLINE}}
 
 \item[Short version of command :] -
@@ -5518,7 +5518,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCUT}\xlabel{SETCUT}SETCUT}
 
 \begin{description}
@@ -5534,7 +5534,7 @@ can be produced.  The line thickness of the cut is set with the command
 
 \item[Usage :] Defining how a line cut through an image is plotted.
 
-\item[Associated commands :] {\tt \htmlref{cut}{CUT}}, 
+\item[Associated commands :] {\tt \htmlref{cut}{CUT}},
 {\tt \htmlref{ccut}{CCUT}}, {\tt \htmlref{line\_width}{LINE_WIDTH}}
 
 \item[Short version of command :] -
@@ -5544,7 +5544,7 @@ can be produced.  The line thickness of the cut is set with the command
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETCUTAXRAT}\xlabel{SETCUTAXRAT}SETCUTAXRAT}
 
 \begin{description}
@@ -5556,8 +5556,8 @@ longer X axis, values \verb+>1+  will give a longer Y axis.
 
 \item[Usage :] Defining cut axis ratio on current workstation/device.
 
-\item[Associated commands :] {\tt \htmlref{setcut}{SETCUT}}, 
-{\tt \htmlref{cut}{CUT}}, {\tt \htmlref{ccut}{CCUT}}, 
+\item[Associated commands :] {\tt \htmlref{setcut}{SETCUT}},
+{\tt \htmlref{cut}{CUT}}, {\tt \htmlref{ccut}{CCUT}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}
 
 \item[Short version of command :] -
@@ -5575,7 +5575,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETFILE}\xlabel{SETFILE}SETFILE}
 
 \begin{description}
@@ -5591,7 +5591,7 @@ images by their observation number alone \emph{e.g.}, {\tt setfile n
 950714} would allow you to plot observation number {\tt 42} in image
 {\tt ro950714\_42.sdf} by the command {\tt ns 42}.
 
-\item[Usage :] Selecting raw ({\sc ro}) image UT date or old container file 
+\item[Usage :] Selecting raw ({\sc ro}) image UT date or old container file
 prefix.
 \item[Associated commands :] -
 \item[Short version of command :] -
@@ -5611,7 +5611,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETFONT}\xlabel{SETFONT}SETFONT}
 
 \begin{description}
@@ -5625,7 +5625,7 @@ fancy font described above, the command is {\tt setfont -106}.
 
 \item[Usage :] Defining font for text on images.
 
-\item[Associated commands :] {\tt \htmlref{wrcom}{WRCOM}}, 
+\item[Associated commands :] {\tt \htmlref{wrcom}{WRCOM}},
 {\tt \htmlref{wrccom}{WRCCOM}}
 
 \item[Short version of command :] -
@@ -5635,7 +5635,7 @@ fancy font described above, the command is {\tt setfont -106}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETHARD}\xlabel{SETHARD}SETHARD}
 
 \begin{description}
@@ -5671,7 +5671,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETMAG}\xlabel{SETMAG}SETMAG}
 
 \begin{description}
@@ -5685,8 +5685,8 @@ is the default.
 
 \item[Usage :] Defining image magnification for image display.
 
-\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}}, 
-{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{ranplot}{RANPLOT}}, 
+\item[Associated commands :] {\tt \htmlref{nsigma}{NSIGMA}},
+{\tt \htmlref{plot}{PLOT}}, {\tt \htmlref{ranplot}{RANPLOT}},
 {\tt \htmlref{vargrey}{VARGREY}}
 
 \item[Short version of command :] -
@@ -5705,7 +5705,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETMAX}\xlabel{SETMAX}SETMAX}
 
 \begin{description}
@@ -5718,7 +5718,7 @@ together with the command {\bf setmm}.
 
 \item[Usage :] Defining maximum intensity in {\bf plot} image display.
 
-\item[Associated commands :] {\tt \htmlref{setmin}{SETMIN}}, 
+\item[Associated commands :] {\tt \htmlref{setmin}{SETMIN}},
 {\tt \htmlref{setmm}{SETMM}}, {\tt \htmlref{plot}{PLOT}}
 
 \item[Short version of command :] -
@@ -5737,7 +5737,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETMIN}\xlabel{SETMIN}SETMIN}
 
 \begin{description}
@@ -5750,7 +5750,7 @@ command {\bf setmm}.
 
 \item[Usage :] Defining minimum intensity in {\bf plot} image display.
 
-\item[Associated commands :] {\tt \htmlref{setmax}{SETMAX}}, 
+\item[Associated commands :] {\tt \htmlref{setmax}{SETMAX}},
 {\tt \htmlref{setmm}{SETMM}}, {\tt \htmlref{plot}{PLOT}}
 
 \item[Short version of command :] -
@@ -5769,7 +5769,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETMM}\xlabel{SETMM}SETMM}
 
 \begin{description}
@@ -5781,7 +5781,7 @@ under the command {\bf plot}.
 
 \item[Usage :] Running both {\bf setmax} and {\bf setmin}.
 
-\item[Associated commands :] {\tt \htmlref{setmin}{SETMIN}}, 
+\item[Associated commands :] {\tt \htmlref{setmin}{SETMIN}},
 {\tt \htmlref{setmax}{SETMAX}}, {\tt \htmlref{plot}{PLOT}}
 
 \item[Short version of command :] -
@@ -5802,7 +5802,7 @@ display device for the command {\bf plot}
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETNUM}\xlabel{SETNUM}SETNUM}
 
 \begin{description}
@@ -5829,7 +5829,7 @@ seconds of time/arcseconds can be produced.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETNUMORI}\xlabel{SETNUMORI}SETNUMORI}
 
 \begin{description}
@@ -5843,8 +5843,8 @@ axis comments/title strings are given.
 
 \item[Usage :] Defining number orientation in {\bf surround} axis annotation.
 
-\item[Associated commands :] {\tt \htmlref{surround}{SURROUND}}, 
-{\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}}, 
+\item[Associated commands :] {\tt \htmlref{surround}{SURROUND}},
+{\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}},
 {\tt \htmlref{setfont}{SETFONT}}, {\tt \htmlref{setnumsca}{SETNUMSCA}}
 
 \item[Short version of command :] -
@@ -5854,7 +5854,7 @@ axis comments/title strings are given.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETNUMSCA}\xlabel{SETNUMSCA}SETNUMSCA}
 
 \begin{description}
@@ -5867,8 +5867,8 @@ get larger number and if $>1$ you get smaller numbers.
 
 \item[Usage :] Defining number size in {\bf surround} axis annotation.
 
-\item[Associated commands :] {\tt \htmlref{surround}{SURROUND}}, 
-{\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}}, 
+\item[Associated commands :] {\tt \htmlref{surround}{SURROUND}},
+{\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}},
 {\tt \htmlref{setfont}{SETFONT}}, {\tt \htmlref{setnumori}{SETNUMORI}}
 
 \item[Short version of command :] -
@@ -5889,7 +5889,7 @@ larger than the default size.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETPOLCOL}\xlabel{SETPOLCOL}SETPOLCOL}
 
 \begin{description}
@@ -5906,7 +5906,7 @@ regions of similar polarization in vector maps.
 \item[Usage :] Defining polarization vector colours for multi-colour
 vector plot.
 
-\item[Associated commands :] {\tt \htmlref{vec}{VEC}}, 
+\item[Associated commands :] {\tt \htmlref{vec}{VEC}},
 {\tt \htmlref{setvec}{SETVEC}}
 
 \item[Short version of command :] -
@@ -5916,7 +5916,7 @@ vector plot.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETPS}\xlabel{SETPS}SETPS}
 
 \begin{description}
@@ -5948,7 +5948,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETQUAD}\xlabel{SETQUAD}SETQUAD}
 
 \begin{description}
@@ -5965,7 +5965,7 @@ the current graphics device.
 
 \item[Usage :] Selecting quadrant image display option.
 
-\item[Associated commands :] {\tt \htmlref{setmag}{SETMAG}}, 
+\item[Associated commands :] {\tt \htmlref{setmag}{SETMAG}},
 {\tt \htmlref{setcen}{SETCEN}}
 
 \item[Short version of command :] {\tt sq}
@@ -5984,7 +5984,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETRADEC}\xlabel{SETRADEC}SETRADEC}
 
 \begin{description}
@@ -5999,7 +5999,7 @@ define the origin and interval of the axes tick marks using the command
 
 \item[Usage :] Setting RA and Dec for {\bf surround} image axis annotation.
 
-\item[Associated commands :] {\tt \htmlref{setps}{SETPS}}, 
+\item[Associated commands :] {\tt \htmlref{setps}{SETPS}},
 {\tt \htmlref{setnum}{SETNUM}}, {\tt \htmlref{setcomori}{SETCOMORI}}
 
 \item[Short version of command :] -
@@ -6009,7 +6009,7 @@ define the origin and interval of the axes tick marks using the command
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETSTD}\xlabel{SETSTD}SETSTD}
 
 \begin{description}
@@ -6038,7 +6038,7 @@ reduced and analysed in {\bf stdred}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETVAR}\xlabel{SETVAR}SETVAR}
 
 \begin{description}
@@ -6052,8 +6052,8 @@ nbL, Lp, and nbM.
 
 \item[Usage :] Setting numerous variables for image analysis.
 
-\item[Associated commands :] {\tt \htmlref{disp}{DISP}}, 
-{\tt \htmlref{pho}{PHO}}, {\tt \htmlref{pho2}{PHO2}}, 
+\item[Associated commands :] {\tt \htmlref{disp}{DISP}},
+{\tt \htmlref{pho}{PHO}}, {\tt \htmlref{pho2}{PHO2}},
 {\tt \htmlref{pho3}{PHO3}}, {\tt \htmlref{setps}{SETPS}}
 
 \item[Short version of command :] -
@@ -6063,7 +6063,7 @@ nbL, Lp, and nbM.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETVARGREY}\xlabel{SETVARGREY}SETVARGREY}
 
 \begin{description}
@@ -6075,7 +6075,7 @@ colour indices Y.  See {\bf vargrey} description for more details.
 
 \item[Usage :] Setting {\bf vargrey} image scaling parameters.
 
-\item[Associated commands :] {\tt \htmlref{vargrey}{VARGREY}}, 
+\item[Associated commands :] {\tt \htmlref{vargrey}{VARGREY}},
 {\tt \htmlref{cvargrey}{CVARGREY}}
 
 \item[Short version of command :] {\tt setvg}
@@ -6095,7 +6095,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETVEC}\xlabel{SETVEC}SETVEC}
 
 \begin{description}
@@ -6116,7 +6116,7 @@ for more details).
 
 \item[Usage :] Defining how vector plots using command {\bf vec} are displayed.
 
-\item[Associated commands :] {\tt \htmlref{vec}{VEC}}, 
+\item[Associated commands :] {\tt \htmlref{vec}{VEC}},
 {\tt \htmlref{setpolcol}{SETPOLCOL}}, {\tt \htmlref{setps}{SETPS}}
 
 \item[Short version of command :] -
@@ -6126,7 +6126,7 @@ for more details).
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SHIFT2}\xlabel{SHIFT2}SHIFT2}
 
 \begin{description}
@@ -6143,7 +6143,7 @@ features.
 
 \item[Usage :] Registering two images to same spatial position.
 
-\item[Associated commands :] {\tt \htmlref{shift}{SHIFT}}, 
+\item[Associated commands :] {\tt \htmlref{shift}{SHIFT}},
 {\tt \htmlref{shift3}{SHIFT3}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -6160,7 +6160,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SHIFT3}\xlabel{SHIFT3}SHIFT3}
 
 \begin{description}
@@ -6177,7 +6177,7 @@ between the three features.
 
 \item[Usage :] Registering three images to same spatial position.
 
-\item[Associated commands :] {\tt \htmlref{shift}{SHIFT}}, 
+\item[Associated commands :] {\tt \htmlref{shift}{SHIFT}},
 {\tt \htmlref{shift2}{SHIFT2}}
 
 \item[Short version of command :] -
@@ -6195,7 +6195,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SKYSUB4}\xlabel{SKYSUB4}SKYSUB4}
 
 \begin{description}
@@ -6217,7 +6217,7 @@ with the letter 's' added to them.
 \item[Usage :] Subtracting sky from 4 images, usually images at four
 waveplate positions in polarimetry mode.
 
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{csub}{CSUB}}
 
 \item[Short version of command :] -
@@ -6227,7 +6227,7 @@ waveplate positions in polarimetry mode.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SPLITLOT}\xlabel{SPLITLOT}SPLITLOT}
 
 \begin{description}
@@ -6259,7 +6259,7 @@ manageable.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STDPROC}\xlabel{STDPROC}STDPROC}
 
 \begin{description}
@@ -6327,7 +6327,7 @@ mosaic data sets.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STDRED}\xlabel{STDRED}STDRED}
 
 \begin{description}
@@ -6343,7 +6343,7 @@ reducing image mosaics:
 
 \begin{enumerate}
 
-\item dark subtracts the images, 
+\item dark subtracts the images,
 
 \item creates a median filtered flat-field from the images
 (optional, user can use a separate sky flat-field -- option defined in
@@ -6367,7 +6367,7 @@ by good pixels from overlapping images,
 
 \item photometry is extracted from the images (either the
 individual tile images plus the final mosaiced image or just the final
-mosaiced image).  Photometry is setup in {\bf setstd}.  
+mosaiced image).  Photometry is setup in {\bf setstd}.
 
 Users can perform photometry on the stellar source located near the
 centre of the first image in the mosaic (and at the offset position in
@@ -6401,7 +6401,7 @@ already reduced images use the command {\bf setstd}.
 \item[Usage :] Reducing single star photometry mosaic image sets as
 defined by {\bf setstd}.
 
-\item[Associated commands :] {\tt \htmlref{stdproc}{STDPROC}}, 
+\item[Associated commands :] {\tt \htmlref{stdproc}{STDPROC}},
 {\tt \htmlref{setstd}{SETSTD}}
 
 \item[Short version of command :] -
@@ -6429,7 +6429,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STLOT}\xlabel{STLOT}STLOT}
 
 \begin{description}
@@ -6447,8 +6447,8 @@ letters {\tt `st'} added to their name.
 
 \item[Usage :] Sky subtracting and thresholding a series of images.
 
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
-{\tt \htmlref{histo}{HISTO}}, {\tt \htmlref{csub}{CSUB}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
+{\tt \htmlref{histo}{HISTO}}, {\tt \htmlref{csub}{CSUB}},
 {\tt \htmlref{thresh}{THRESH}}
 
 \item[Short version of command :] -
@@ -6458,18 +6458,18 @@ letters {\tt `st'} added to their name.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STRED}\xlabel{STRED}STRED}
 
 \begin{description}
 
 \item[Description :] Command to fully process/reduce a set of {\sc
 ircam3} images forming a mosaic. {\bf stred} takes the following steps in
-reducing image mosaics: 
+reducing image mosaics:
 
 \begin{enumerate}
 
-\item dark subtracts the images, 
+\item dark subtracts the images,
 
 \item creates a median filtered flat-field from the images (optionally,
 user can use a separate sky flat-field),
@@ -6485,17 +6485,17 @@ the obsrap application automos and applied to the images - corrections
 are dc subtractions only,
 
 \item the bad/hot pixels are masked out using a bad pixel magic number
-(the value used in {\sc IrcamDR} is {\tt -1.0e-20}), 
+(the value used in {\sc IrcamDR} is {\tt -1.0e-20}),
 
 \item the tiles are mosaiced together using the {\bf rapi2d}
-application {\bf quilt}.  
+application {\bf quilt}.
 
 Bad/hot pixels masked out in 5 above are replaced
 by good pixels from overlapping images.
 
 \end{enumerate}
 
-\item[Note :] The output images from {\bf stred} are scaled to unit 
+\item[Note :] The output images from {\bf stred} are scaled to unit
 exposure time.
 \item[Usage :] Reducing imaging mosaics completely.
 \item[Associated commands :] {\tt \htmlref{stdred}{STDRED}}
@@ -6506,7 +6506,7 @@ exposure time.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STREHL}\xlabel{STREHL}STREHL}
 
 \begin{description}
@@ -6524,7 +6524,7 @@ total signal in a stellar image comes.  A value is returned from {\bf
 strehl} (the Strehl ratio) and this is a fractional value referring to
 the observed to theoretical comparison.
 
-\item[Usage :] Determining strehl value of stellar imaging observation 
+\item[Usage :] Determining strehl value of stellar imaging observation
 generally using external magnifiers in shift-and-add mode.
 \item[Associated commands :] -
 \item[Short version of command :] -
@@ -6543,7 +6543,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SURROUND}\xlabel{SURROUND}SURROUND}
 
 \begin{description}
@@ -6556,10 +6556,10 @@ mark start position along the image axes and the interval between
 them.  The thickness of the image border and tick marks are defined by
 the command {\bf line\_width}.
 
-\item[Usage :] Plotting axis annotation around current image as defined by 
+\item[Usage :] Plotting axis annotation around current image as defined by
 {\bf setnum} command.
 
-\item[Associated commands :] {\tt \htmlref{setps}{SETPS}}, 
+\item[Associated commands :] {\tt \htmlref{setps}{SETPS}},
 {\tt \htmlref{setnum}{SETNUM}}, {\tt \htmlref{line\_width}{LINE_WIDTH}}
 
 \item[Short version of command :] {\tt sur}
@@ -6569,20 +6569,20 @@ the command {\bf line\_width}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{TICKIO}\xlabel{TICKIO}TICKIO}
 
 \begin{description}
 
-\item[Description :] Defines whether tick marks produced by the command 
-{\bf surround} or under contour or vector map plots (using commands 
-{\bf contour} and {\bf vec}) are plotted inside or outside the border 
+\item[Description :] Defines whether tick marks produced by the command
+{\bf surround} or under contour or vector map plots (using commands
+{\bf contour} and {\bf vec}) are plotted inside or outside the border
 around the image/plot.
 
 \item[Usage :] Setting tick mark position in {\bf surround} axis annotation.
 
-\item[Associated commands :] {\tt \htmlref{surround}{SURROUND}}, 
-{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}}, 
+\item[Associated commands :] {\tt \htmlref{surround}{SURROUND}},
+{\tt \htmlref{setps}{SETPS}}, {\tt \htmlref{setnum}{SETNUM}},
 {\tt \htmlref{contour}{CONTOUR}}, {\tt \htmlref{vec}{VEC}}
 
 \item[Short version of command :] -
@@ -6601,7 +6601,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{TICKLEN}\xlabel{TICKLEN}TICKLEN}
 
 \begin{description}
@@ -6616,8 +6616,8 @@ Tick marks are defined using the command {\bf setnum}.
 
 \item[Usage :] Setting tick mark length in {\bf surround} image annotation.
 
-\item[Associated commands :] {\tt \htmlref{setnum}{SETNUM}}, 
-{\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{contour}{CONTOUR}}, 
+\item[Associated commands :] {\tt \htmlref{setnum}{SETNUM}},
+{\tt \htmlref{line\_width}{LINE_WIDTH}}, {\tt \htmlref{contour}{CONTOUR}},
 {\tt \htmlref{surround}{SURROUND}}, {\tt \htmlref{ticklen}{TICKLEN}}
 
 \item[Short version of command :] -
@@ -6636,7 +6636,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{TOMAG}\xlabel{TOMAG}TOMAG}
 
 \begin{description}
@@ -6657,7 +6657,7 @@ thresholded ({\bf thresh}) before conversion to eliminate low, noisy levels.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{TSLOT}\xlabel{TSLOT}TSLOT}
 
 \begin{description}
@@ -6676,8 +6676,8 @@ the names.
 
 \item[Usage :] Thresholding and scaling a series of images.
 
-\item[Associated commands :] {\tt \htmlref{histo}{HISTO}}, 
-{\tt \htmlref{stats}{STATS}}, {\tt \htmlref{csub}{CSUB}}, 
+\item[Associated commands :] {\tt \htmlref{histo}{HISTO}},
+{\tt \htmlref{stats}{STATS}}, {\tt \htmlref{csub}{CSUB}},
 {\tt \htmlref{thresh}{THRESH}}, {\tt \htmlref{cdiv}{CDIV}}
 
 \item[Short version of command :] -
@@ -6687,7 +6687,7 @@ the names.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{VANS}\xlabel{VANS}VANS}
 
 \begin{description}
@@ -6719,7 +6719,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{VARGREY}\xlabel{VARGREY}VARGREY}
 
 \begin{description}
@@ -6739,9 +6739,9 @@ that the range of signal in your image is 100 to 1000 counts and the
 range of colour indices is 1 to 64 (\emph{i.e.}, the graphic display
 window was created with 64 colour indices).  The bottom 20\% of the
 intensity range in the image would be 100-280 counts (min+0.2*(max-min)).
-The bottom 80\% of the colour indices would be $\approx$1-51 pens.  
-Hence, in a {\bf vargrey} plot the range of colours covering pens 1 
-through 51 would represent the intensity range 100-280 while the range 
+The bottom 80\% of the colour indices would be $\approx$1-51 pens.
+Hence, in a {\bf vargrey} plot the range of colours covering pens 1
+through 51 would represent the intensity range 100-280 while the range
 of colours covering pens 52-64 would represent
 the intensity range 282-1000.  Clearly this will enhance the visibility
 of the low level features since more colours (pens) will be used to
@@ -6754,12 +6754,12 @@ using the command {\bf setvargrey}.
 
 \item[Usage :] Displaying an image using vargrey scaling.
 
-\item[Associated commands :] {\tt \htmlref{cvargrey}{VARGREY}}, 
-{\tt \htmlref{setvargrey}{SETVARGREY}}, 
-{\tt \htmlref{morevargrey}{MOREVARGREY}}, {\tt \htmlref{plot}{PLOT}}, 
-{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{nsigma}{NSIGMA}}, \\ 
-{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{ranplot}{RANPLOT}}, 
-{\tt \htmlref{cranplot}{CRANPLOT}}, {\tt \htmlref{setmag}{SETMAG}}, \ldots 
+\item[Associated commands :] {\tt \htmlref{cvargrey}{VARGREY}},
+{\tt \htmlref{setvargrey}{SETVARGREY}},
+{\tt \htmlref{morevargrey}{MOREVARGREY}}, {\tt \htmlref{plot}{PLOT}},
+{\tt \htmlref{cplot}{CPLOT}}, {\tt \htmlref{nsigma}{NSIGMA}}, \\
+{\tt \htmlref{cnsigma}{CNSIGMA}}, {\tt \htmlref{ranplot}{RANPLOT}},
+{\tt \htmlref{cranplot}{CRANPLOT}}, {\tt \htmlref{setmag}{SETMAG}}, \ldots
 
 \item[Short version of command :] {\tt vg}
 \item[Invocation :]
@@ -6777,7 +6777,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{VEC}\xlabel{VEC}VEC}
 
 \begin{description}
@@ -6792,7 +6792,7 @@ written).  The thickness of the lines plotted by vec are defined by the
 command {\bf line\_width}.
 
 \item[Usage :] Plotting a vector map of polarization data.
-\item[Associated commands :] {\tt \htmlref{setvec}{SETVEC}}, 
+\item[Associated commands :] {\tt \htmlref{setvec}{SETVEC}},
 {\tt \htmlref{line\_width}{LINE_WIDTH}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -6801,7 +6801,7 @@ command {\bf line\_width}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{VEC_TITLE}\xlabel{VEC_TITLE}VEC\_TITLE}
 
 \begin{description}
@@ -6811,7 +6811,7 @@ polarization vector map plot.  The title string can be any text sting
 and it can also be set in the command {\bf setvec}.
 
 \item[Usage :] Defining title for vector plot using command {\bf vec}.
-\item[Associated commands :] {\tt \htmlref{setvec}{SETVEC}}, 
+\item[Associated commands :] {\tt \htmlref{setvec}{SETVEC}},
 {\tt \htmlref{vec}{VEC}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -6823,7 +6823,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WRAPLOT}\xlabel{WRAPLOT}WRAPLOT}
 
 \begin{description}
@@ -6848,7 +6848,7 @@ corrected for 16-bit wrap-around.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WRCCOM}\xlabel{WRCCOM}WRCCOM}
 
 \begin{description}
@@ -6862,7 +6862,7 @@ used.
 
 Note that GKS font numbers under Unix are negative and start at {\tt -101}.
 
-\item[Usage :] Writing comments (text) on current workstation/device using 
+\item[Usage :] Writing comments (text) on current workstation/device using
 cursor selection of centre of string.
 \item[Associated commands :] {\tt \htmlref{wrcom}{WRCOM}}
 \item[Short version of command :] {\tt wrcc}
@@ -6872,7 +6872,7 @@ cursor selection of centre of string.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WRCOM}\xlabel{WRCOM}WRCOM}
 
 \begin{description}
@@ -6897,7 +6897,7 @@ using pixel coordinate selection of centre of string.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WRITELUT}\xlabel{WRITELUT}WRITELUT}
 
 \begin{description}
@@ -6912,7 +6912,7 @@ generally the most useful colour table in the {\sc IrcamDR} package).
 The associated command {\bf coltab} writes a named colour table (LUT)
 to the current graphics device.
 
-\item[Usage :] Writing one of {\tt col1} to {\tt col49} colour tables 
+\item[Usage :] Writing one of {\tt col1} to {\tt col49} colour tables
 (LUTs) to current workstation/device using number along (1-49).
 \item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}}
 \item[Short version of command :] -
@@ -6931,7 +6931,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{X2MAG}\xlabel{X2MAG}X2MAG}
 
 \begin{description}
@@ -6945,7 +6945,7 @@ selected using the command {\bf x5mag}.
 
 \item[Usage :] Defineing pixel scale when using 2$\times$ external magnifier
 (0.143"/pix).
-\item[Associated commands :] {\tt \htmlref{nomag}{NOMAG}}, 
+\item[Associated commands :] {\tt \htmlref{nomag}{NOMAG}},
 {\tt \htmlref{x5mag}{X5MAG}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -6954,7 +6954,7 @@ selected using the command {\bf x5mag}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{X5MAG}\xlabel{X5MAG}X5MAG}
 
 \begin{description}
@@ -6968,7 +6968,7 @@ scale is selected using the command {\bf x2mag}.
 
 \item[Usage :] Defining pixel scale when using 5$\times$ external magnifier
 (0.0571"/pix).
-\item[Associated commands :] {\tt \htmlref{nomag}{NOMAG}}, 
+\item[Associated commands :] {\tt \htmlref{nomag}{NOMAG}},
 {\tt \htmlref{x2mag}{X2MAG}}
 \item[Short version of command :] -
 \item[Invocation :]
@@ -6977,7 +6977,7 @@ scale is selected using the command {\bf x2mag}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ZAPLOT}\xlabel{ZAPLOT}ZAPLOT}
 
 \begin{description}
@@ -6988,7 +6988,7 @@ suffix (see above for the definition of the operation of the ``{\bf
 lot}'' family of images).  The bad columns and rows are defined by
 their column/row number and the number of consecutive columns/rows to
 be replaced.  The bad columns/rows are replaced by linear interpolation
-over then.  {\bf zaplot} uses the {\bf rapi2d} application {\bf zaplin} 
+over then.  {\bf zaplot} uses the {\bf rapi2d} application {\bf zaplin}
 to remove bad columns/rows.
 
 \item[Usage :] Removing bad columns/rows from a series of images.
@@ -7011,7 +7011,7 @@ polrap.ifl} for full command line parameter usage/specification of all
 a-task monolith applications.
 \end{quote}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ABCOM}\xlabel{ABCOM}ABCOM}
 \begin{description}
 
@@ -7030,13 +7030,13 @@ image using {\bf abcom}.
 \item[Associated commands :] {\tt \htmlref{absep}{ABSEP}}
 
 \item[Invocation :]
-\begin{quote}{\tt 
+\begin{quote}{\tt
 abcom}
 \end{quote}
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ABSEP}\xlabel{ABSEP}ABSEP}
 
 \begin{description}
@@ -7056,13 +7056,13 @@ image using {\bf abcom}.
 \item[Associated commands :] {\tt \htmlref{abcom}{ABCOM}}
 
 \item[Invocation :]
-\begin{quote}{\tt 
+\begin{quote}{\tt
 absep}
 \end{quote}
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ADD}\xlabel{ADD}ADD}
 
 \begin{description}
@@ -7072,13 +7072,13 @@ the result.
 
 \item[Usage :] To add to images together.
 
-\item[Associated commands :] {\tt \htmlref{sub}{SUB}}, 
+\item[Associated commands :] {\tt \htmlref{sub}{SUB}},
 {\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}}
 
 \item[Invocation :]
 
 \begin{quote}
-{\tt add} \\ 
+{\tt add} \\
 or \\
 {\tt  add im1 im2 im3}
 \end{quote}
@@ -7114,7 +7114,7 @@ magnitudes/airmass) for the filter used.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ANNSTATS}\xlabel{ANNSTATS}ANNSTATS}
 
 \begin{description}
@@ -7135,7 +7135,7 @@ information calculated in the annuli considered.
 \item[Usage :] For annular stats in extended objects \emph{e.g.},
 elliptical galaxies.
 
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{cstats}{CSTATS}}, {\tt \htmlref{aperadd}{APERADD}}
 
 \item[Invocation :]
@@ -7144,7 +7144,7 @@ elliptical galaxies.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{APERADD}\xlabel{APERADD}APERADD}
 
 \begin{description}
@@ -7164,11 +7164,11 @@ aperture.  The noise after binning is just the noise before binning
 (the standard deviation of all the pixels) divided by the root of the
 number of pixels in the aperture.
 
-\item[Usage :] For statistics within single circular aperture in 
+\item[Usage :] For statistics within single circular aperture in
 an image.
 
-\item[Associated commands :] {\tt \htmlref{aperphot}{APERPHOT}}, 
-{\tt \htmlref{annstats}{ANNSTATS}}, {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{aperphot}{APERPHOT}},
+{\tt \htmlref{annstats}{ANNSTATS}}, {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{cstats}{CSTATS}}
 
 \item[Invocation :]
@@ -7177,7 +7177,7 @@ an image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{APERPHOT}\xlabel{APERPHOT}APERPHOT}
 
 \begin{description}
@@ -7193,20 +7193,20 @@ the image.  {\bf aperphot} input prompts are as in the example below:
       INPIC - Image to be analysed /@JUNK/ > f39m40
       Title = DISP:OBJECT-SKY
       Image is 256 by 256 pixels
-      DATASOURCE - Source of input terminal=T or file=F /'T'/ > 
+      DATASOURCE - Source of input terminal=T or file=F /'T'/ >
       XCEN - X-centre of object aperture /128/ > 171
       YCEN - Y-centre of object aperture /128/ > 52
-      ECC - Eccentricity of object aperture/sky annulus /0/ > 
-      POSANG - Position angle of major axis wrt N (in degrees) /0/ > 
-      SKYANNUL - Subtract sky in concentric annulus (Y/N) ? /YES/ > 
+      ECC - Eccentricity of object aperture/sky annulus /0/ >
+      POSANG - Position angle of major axis wrt N (in degrees) /0/ >
+      SKYANNUL - Subtract sky in concentric annulus (Y/N) ? /YES/ >
       MAJAX1 - Major axis of object aperture (in arcsec) /10/ > 5
-      MAJAX2 - Major axis of inner diameter of concentric sky aperture 
-        (arcsec) /10/ > 
-      MAJAX3 - Major axis of outer diameter of concentric sky aperture 
-        (arcsec) /20/ > 
+      MAJAX2 - Major axis of inner diameter of concentric sky aperture
+        (arcsec) /10/ >
+      MAJAX3 - Major axis of outer diameter of concentric sky aperture
+        (arcsec) /20/ >
       SCALE - Pixel scale (arcsec/pixel) /1/ > .286
-      USEWHAT - Use MEDIAN or MEAN in sky calculation ? /'MEDIAN'/ > 
-      USEBAD - Use bad pixel value in calculation (Y/N) ? /YES/ > 
+      USEWHAT - Use MEDIAN or MEAN in sky calculation ? /'MEDIAN'/ >
+      USEBAD - Use bad pixel value in calculation (Y/N) ? /YES/ >
       BADVAL - Bad pixel value ? /-9.9999997E-2/ > -1.0e-20
 \end{verbatim}
 \end{small}
@@ -7222,7 +7222,7 @@ Output from {\bf aperphot} for terminal input mode (as above) is as follows:
       Mean intensity over aperture         = 102.8879
       Median intensity over aperture       = 51.99756
       Standard deviation in aperture       = 142.035
- 
+
       SKY ANNULUS
       ***********
       Number of GOOD/BAD pixels in annulus = 2868/0
@@ -7230,13 +7230,13 @@ Output from {\bf aperphot} for terminal input mode (as above) is as follows:
       Mean intensity over annulus          = 20.14412
       Median intensity over annulus        = 24.00037
       Standard deviation over annulus      = 46.72461
- 
+
       Sky in object aperture (MEDIAN)      = 5784.088
- 
+
       Object-Sky value                     = 19011.9
- 
+
       Magnitude from absolute value        = -10.69756
- 
+
       AGAIN - Another aperture in same image (Y/N) ? /YES/ > n:
 \end{verbatim}
 \end{small}
@@ -7255,7 +7255,7 @@ example of the format of the ASCII file is as below:
 \end{verbatim}
 \end{small}
 
-where, for the first numeric input line: 
+where, for the first numeric input line:
 
 \begin{itemize}
 
@@ -7288,33 +7288,33 @@ would mean consider all pixels regardless of value), and
 as below:
 
 \begin{small}
-\begin{verbatim} 
-      X  Y  E  POS  D1  D2  D3  N1  BN1  N2  BN2  TOT1  TOT2  TOT3 MAG 
-      * test file for aperphot file input 
-      * a starred line is a comment line anywhere in the file 
-      128.0 156.0 0.20 45.0 10.0 15.0 20.0 941 0 1656 0 25095 24991  104 -5.042 
-      * another comment line... 
-      197.0  51.0 0.11 37.0  5.0 12.0 18.0 241 0 1736 0  8803 10423 1620 -8.024 
-\end{verbatim} 
+\begin{verbatim}
+      X  Y  E  POS  D1  D2  D3  N1  BN1  N2  BN2  TOT1  TOT2  TOT3 MAG
+      * test file for aperphot file input
+      * a starred line is a comment line anywhere in the file
+      128.0 156.0 0.20 45.0 10.0 15.0 20.0 941 0 1656 0 25095 24991  104 -5.042
+      * another comment line...
+      197.0  51.0 0.11 37.0  5.0 12.0 18.0 241 0 1736 0  8803 10423 1620 -8.024
+\end{verbatim}
 \end{small}
 
 The output file from aperphot is named by adding a letter {\tt `a'} to the
 prefix of the input filename viz: if the input text file was called
 {\tt ngc2071.inp} then the output file would be called {\tt ngc2071a.inp}.
-The output file contains the same comment lines as the input file.  The 
+The output file contains the same comment lines as the input file.  The
 first line of the output file contains what the various output columns mean:
 
 \begin{itemize}
 
 \item {\tt X Y} are the input pixel coordinates of the centre of the
-aperture/annulus, 
+aperture/annulus,
 
 \item {\tt E POS} are the eccentricity and position angle of the
-aperture and annulus, 
+aperture and annulus,
 
-\item {\tt D1 D2 D3} are the three apertures defined (star+two sky), 
+\item {\tt D1 D2 D3} are the three apertures defined (star+two sky),
 
-\item {\tt N1} is the number of good pixels in the star aperture, 
+\item {\tt N1} is the number of good pixels in the star aperture,
 
 \item {\tt BN1} is the number of bad pixels in the sky aperture,
 
@@ -7322,9 +7322,9 @@ aperture and annulus,
 the sky annulus,
 
 \item {\tt TOT1} and {\tt TOT2} are total counts in
-the star aperture and sky annulus, 
+the star aperture and sky annulus,
 
-\item {\tt TOT3} is the star-sky contribution counts, and 
+\item {\tt TOT3} is the star-sky contribution counts, and
 
 \item {\tt MAG} is the instrumental magnitude ({\tt -2.5*log10(TOT3)}) of the
 source.
@@ -7340,7 +7340,7 @@ mode.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{APERPOL}\xlabel{APERPOL}APERPOL}
 
 \begin{description}
@@ -7392,8 +7392,8 @@ images averaged to make the final set of images.
 
 \item[Usage :] Aperture polarimetry on point-sources
 
-\item[Associated commands :] {\tt \htmlref{polly}{POLLY}}, 
-{\tt \htmlref{polly2}{POLLY2}}, {\tt \htmlref{polcal}{POLCAL}} 
+\item[Associated commands :] {\tt \htmlref{polly}{POLLY}},
+{\tt \htmlref{polly2}{POLLY2}}, {\tt \htmlref{polcal}{POLCAL}}
 {\tt polcal2}
 
 \item[Invocation :]
@@ -7402,7 +7402,7 @@ images averaged to make the final set of images.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{APPLYMASK}\xlabel{APPLYMASK}APPLYMASK}
 
 \begin{description}
@@ -7416,7 +7416,7 @@ an image with these bad pixels set to the magic number.
 \item[Usage :] Identifying bad/hot pixels in an image for subsequent mosaic
 removal by replacement.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
 {\tt \htmlref{quilt}{QUILT}}, {\tt \htmlref{makemask}{MAKEMASK}}
 
 \item[Invocation :]
@@ -7425,7 +7425,7 @@ removal by replacement.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ASCIILIST}\xlabel{ASCIILIST}ASCIILIST}
 
 \begin{description}
@@ -7448,7 +7448,7 @@ pixel value itself.  The output ASCII file is named by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{AUTOMOS}\xlabel{AUTOMOS}AUTOMOS}
 
 \begin{description}
@@ -7457,9 +7457,9 @@ pixel value itself.  The output ASCII file is named by the user.
 (sky changes) between a set of images in a mosaic.  {\bf automos} takes as
 input:
 
-\begin{enumerate} 
+\begin{enumerate}
 
-\item a list of images, one per line, in a text (ASCII) file, 
+\item a list of images, one per line, in a text (ASCII) file,
 
 \item a list of telescope spatial offsets (in arcseconds), again,
 one per line in a text (ASCII) file.
@@ -7490,7 +7490,7 @@ tiles.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{BINUP}\xlabel{BINUP}BINUP}
 
 \begin{description}
@@ -7507,8 +7507,8 @@ of values over an image.
 
 \item[Usage :] To increase S/N in image by degrading spatial resolution.
 
-\item[Associated commands :] {\tt \htmlref{compave}{COMPAVE}}, 
-{\tt \htmlref{compadd}{COMPADD}}, {\tt \htmlref{manic}{MANIC}}, 
+\item[Associated commands :] {\tt \htmlref{compave}{COMPAVE}},
+{\tt \htmlref{compadd}{COMPADD}}, {\tt \htmlref{manic}{MANIC}},
 {\tt \htmlref{sqorst}{SQORST}}
 
 \item[Invocation :]
@@ -7517,7 +7517,7 @@ of values over an image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{BLOCK}\xlabel{BLOCK}BLOCK}
 
 \begin{description}
@@ -7536,16 +7536,16 @@ smoothing.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CADD}\xlabel{CADD}CADD}
 
 \begin{description}
 
-\item[Description :] Adds a user-defined constant to every pixel in an image.  
+\item[Description :] Adds a user-defined constant to every pixel in an image.
 
 \item[Usage :] To correct dc level of image for sky subtraction
 
-\item[Associated commands :] {\tt \htmlref{cmult}{CMULT}}, 
+\item[Associated commands :] {\tt \htmlref{cmult}{CMULT}},
 {\tt \htmlref{cdiv}{CDIV}}, {\tt \htmlref{csub}{CSUB}}
 
 \item[Invocation :]
@@ -7554,7 +7554,7 @@ smoothing.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CALCOL}\xlabel{CALCOL}CALCOL}
 
 \begin{description}
@@ -7574,7 +7574,7 @@ IrcamDR} command {\bf shift2}) before running {\bf calcol}.
 
 \item[Usage :] Creating a colour image from two magnitude images.
 
-\item[Associated commands :] {\tt \htmlref{tomag}{TOMAG}}, 
+\item[Associated commands :] {\tt \htmlref{tomag}{TOMAG}},
 {\tt \htmlref{shift2}{SHIFT2}}
 
 \item[Invocation :]
@@ -7583,16 +7583,16 @@ IrcamDR} command {\bf shift2}) before running {\bf calcol}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CDIV}\xlabel{CDIV}CDIV}
 
 \begin{description}
 
-\item[Description :] Divides all pixels in an input image by a constant value. 
+\item[Description :] Divides all pixels in an input image by a constant value.
 
 \item[Usage :] Scaling an image by division.
 
-\item[Associated commands :] {\tt \htmlref{cadd}{CADD}}, 
+\item[Associated commands :] {\tt \htmlref{cadd}{CADD}},
 {\tt \htmlref{cmult}{CMULT}}, {\tt \htmlref{csub}{CSUB}}
 
 \item[Invocation :]
@@ -7601,7 +7601,7 @@ IrcamDR} command {\bf shift2}) before running {\bf calcol}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CENTROID}\xlabel{CENTROID}CENTROID}
 
 \begin{description}
@@ -7612,7 +7612,7 @@ takes as input a guess of the position of the object and then
 calculates the accurate position.
 
 \item[Usage :] Determining spatial offsets between images in a mosaic.
-\item[Associated commands :] {\tt \htmlref{cent1}{CENT1}}, 
+\item[Associated commands :] {\tt \htmlref{cent1}{CENT1}},
 {\tt \htmlref{cent2}{CENT2}}
 \item[Invocation :]
 
@@ -7620,7 +7620,7 @@ calculates the accurate position.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CHPIX}\xlabel{CHPIX}CHPIX}
 
 \begin{description}
@@ -7632,7 +7632,7 @@ The new value for the pixel is defined by the user also.
 
 \item[Usage :] Changing the counts in a bad/hot pixel.
 
-\item[Associated commands :] {\tt \htmlref{zaplin}{ZAPLIN}}, 
+\item[Associated commands :] {\tt \htmlref{zaplin}{ZAPLIN}},
 {\tt \htmlref{glitchmark}{GLITCHMARK}}, {\tt \htmlref{glitch}{GLITCH}}
 
 \item[Invocation :]
@@ -7641,16 +7641,16 @@ The new value for the pixel is defined by the user also.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CMULT}\xlabel{CMULT}CMULT}
 
 \begin{description}
 
-\item[Description :] Multiplies every pixel in an image by a constant value.  
+\item[Description :] Multiplies every pixel in an image by a constant value.
 
 \item[Usage :] Scaling images.
 
-\item[Associated commands :] {\tt \htmlref{cadd}{CADD}}, 
+\item[Associated commands :] {\tt \htmlref{cadd}{CADD}},
 {\tt \htmlref{cdiv}{CDIV}}, {\tt \htmlref{csub}{CSUB}}
 
 \item[Invocation :]
@@ -7659,7 +7659,7 @@ The new value for the pixel is defined by the user also.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COLCYCLE}\xlabel{COLCYCLE}COLCYCLE}
 
 \begin{description}
@@ -7679,7 +7679,7 @@ FIGARO LUTs and are interchangeable.
 \item[Usage :] Stretching display of an image by displaying multiple colour
 tables.
 
-\item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}}, 
+\item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}},
 {\tt \htmlref{writelut}{WRITELUT}}, {\tt \htmlref{crecolt}{CRECOLT}}
 
 \item[Invocation :]
@@ -7688,7 +7688,7 @@ tables.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COLMED}\xlabel{COLMED}COLMED}
 
 \begin{description}
@@ -7708,8 +7708,8 @@ where N and M are the original X and Y dimensions of the input image.
 The result can be subtracted from the original image using the command
 {\bf sub}.
 
-\item[Associated commands :] {\tt \htmlref{ygrow}{YGROW}}, 
-{\tt \htmlref{sub}{SUB}}, {\tt \htmlref{rowmed}{ROWMED}}, 
+\item[Associated commands :] {\tt \htmlref{ygrow}{YGROW}},
+{\tt \htmlref{sub}{SUB}}, {\tt \htmlref{rowmed}{ROWMED}},
 {\tt \htmlref{xgrow}{XGROW}}
 
 \item[Invocation :]
@@ -7731,7 +7731,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COMPADD}\xlabel{COMPADD}COMPADD}
 
 \begin{description}
@@ -7743,9 +7743,9 @@ Y.
 
 \item[Usage :] To increase S/N in an image by reducing spatial resolution.
 
-\item[Associated commands :] {\tt \htmlref{compave}{COMPAVE}}, 
-{\tt \htmlref{compick}{COMPICK}}, {\tt \htmlref{compress}{COMPRESS}}, 
-{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}}, 
+\item[Associated commands :] {\tt \htmlref{compave}{COMPAVE}},
+{\tt \htmlref{compick}{COMPICK}}, {\tt \htmlref{compress}{COMPRESS}},
+{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}},
 {\tt \htmlref{sqorst}{SQORST}}
 
 \item[Invocation :]
@@ -7754,7 +7754,7 @@ Y.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COMPAVE}\xlabel{COMPAVE}COMPAVE}
 
 \begin{description}
@@ -7766,9 +7766,9 @@ Y.
 
 \item[Usage :] To increase S/N in an image by reducing spatial resolution.
 
-\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}}, 
-{\tt \htmlref{compick}{COMPICK}}, {\tt \htmlref{compress}{COMPRESS}}, 
-{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}}, 
+\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}},
+{\tt \htmlref{compick}{COMPICK}}, {\tt \htmlref{compress}{COMPRESS}},
+{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}},
 {\tt \htmlref{sqorst}{SQORST}}
 
 \item[Invocation :]
@@ -7777,7 +7777,7 @@ Y.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COMPICK}\xlabel{COMPICK}COMPICK}
 
 \begin{description}
@@ -7791,9 +7791,9 @@ averaged.
 
 \item[Usage :] To decrease size of image but retain original S/N.
 
-\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}}, 
-{\tt \htmlref{compave}{COMPAVE}}, {\tt \htmlref{compress}{COMPRESS}}, 
-{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}}, 
+\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}},
+{\tt \htmlref{compave}{COMPAVE}}, {\tt \htmlref{compress}{COMPRESS}},
+{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}},
 {\tt \htmlref{sqorst}{SQORST}}
 
 \item[Invocation :]
@@ -7802,7 +7802,7 @@ averaged.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{COMPRESS}\xlabel{COMPRESS}COMPRESS}
 
 \begin{description}
@@ -7815,9 +7815,9 @@ Y.
 \item[Usage :] To decrease size of image and improve S/N by degrading
 spatial resolution.
 
-\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}}, 
-{\tt \htmlref{compave}{COMPAVE}}, {\tt \htmlref{compick}{COMPICK}}, 
-{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}}, 
+\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}},
+{\tt \htmlref{compave}{COMPAVE}}, {\tt \htmlref{compick}{COMPICK}},
+{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{manic}{MANIC}},
 {\tt \htmlref{sqorst}{SQORST}}
 
 \item[Invocation :]
@@ -7826,7 +7826,7 @@ spatial resolution.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CRECOLT}\xlabel{CRECOLT}CRECOLT}
 
 \begin{description}
@@ -7847,7 +7847,7 @@ crecolt} can also be used in the latest FIGARO (NDF) application called
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CREFRAME}\xlabel{CREFRAME}CREFRAME}
 
 \begin{description}
@@ -7867,7 +7867,7 @@ Useful to test software or simulate real data.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CREQUILT}\xlabel{CREQUILT}CREQUILT}
 
 \begin{description}
@@ -7893,7 +7893,7 @@ file and telescope offset list file
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CSFIT}\xlabel{CSFIT}CSFIT}
 
 \begin{description}
@@ -7922,7 +7922,7 @@ has values between 0 and 180 degrees.
 \item[Usage :] Statistically determining the source of the radiation in a
 polarization map.
 
-\item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}}, 
+\item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}},
 {\tt polcal2}, {\tt \htmlref{csgen}{CSGEN}}
 
 \item[Invocation :]
@@ -7931,7 +7931,7 @@ polarization map.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CSGEN}\xlabel{CSGEN}CSGEN}
 
 \begin{description}
@@ -7947,8 +7947,8 @@ has values between 0 and 180 degrees.
 
 \item[Usage :] To compare observations with theoretical results.
 
-\item[Associated commands :] {\tt \htmlref{csfit}{CSFIT}}, 
-{\tt \htmlref{polcal}{POLCAL}}, {\tt polcal2}, 
+\item[Associated commands :] {\tt \htmlref{csfit}{CSFIT}},
+{\tt \htmlref{polcal}{POLCAL}}, {\tt polcal2},
 {\tt \htmlref{thetafix}{THETAFIX}}
 
 \item[Invocation :]
@@ -7957,7 +7957,7 @@ has values between 0 and 180 degrees.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{CSUB}\xlabel{CSUB}CSUB}
 
 \begin{description}
@@ -7967,7 +7967,7 @@ The result of the subtraction is stored in the output image.
 
 \item[Usage :] Sky subtraction, dc-level correction \emph{etc.}
 
-\item[Associated commands :] {\tt \htmlref{cadd}{CADD}}, 
+\item[Associated commands :] {\tt \htmlref{cadd}{CADD}},
 {\tt \htmlref{cmult}{CMULT}}, {\tt \htmlref{cdiv}{CDIV}}
 
 \item[Invocation :]
@@ -7976,7 +7976,7 @@ The result of the subtraction is stored in the output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DEFGRAD}\xlabel{DEFGRAD}DEFGRAD}
 
 \begin{description}
@@ -7993,7 +7993,7 @@ the input image.
 
 \item[Usage :] Removing background gradients along columns or rows in an image.
 
-\item[Associated commands :] {\tt \htmlref{colmed}{COLMED}}, 
+\item[Associated commands :] {\tt \htmlref{colmed}{COLMED}},
 {\tt \htmlref{rowmed}{ROMED}}
 
 \item[Invocation :]
@@ -8002,7 +8002,7 @@ the input image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DEVFCS}\xlabel{DEVFCS}DEVFCS}
 
 \begin{description}
@@ -8020,7 +8020,7 @@ studied.
 \item[Usage :] Calculating deviation from centro-symmetry of pixels in a
 polarization map.
 
-\item[Associated commands :] {\tt \htmlref{csfit}{CSFIT}}, 
+\item[Associated commands :] {\tt \htmlref{csfit}{CSFIT}},
 {\tt \htmlref{csgen}{CSGEN}}
 
 \item[Invocation :]
@@ -8029,20 +8029,20 @@ polarization map.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DIST}\xlabel{DIST}DIST}
 
 \begin{description}
 
 \item[Description :] Given two pixels in an image and the pixel scale,
 dist calculates the offsets between in arcseconds and also the RA,Dec
-of the second position given the RA,Dec of the first.  
+of the second position given the RA,Dec of the first.
 
 \item[Note :] There is some doubt that {\bf dist} actually works correctly
 for all position angles of the two pixel positions in terms of RA,Dec
 (you need to check it yourself).
 
-\item[Usage :] Calculating offset and position (RA,Dec) of second point in 
+\item[Usage :] Calculating offset and position (RA,Dec) of second point in
 an image given the position (RA,Dec) of a first point
 \item[Associated commands :] {\tt \htmlref{cent2}{CENT2}}
 \item[Invocation :]
@@ -8051,7 +8051,7 @@ an image given the position (RA,Dec) of a first point
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{DIV}\xlabel{DIV}DIV}
 
 \begin{description}
@@ -8062,7 +8062,7 @@ the user.
 
 \item[Usage :] Manual flat-fielding for example.
 
-\item[Associated commands :] {\tt \htmlref{add}{ADD}}, 
+\item[Associated commands :] {\tt \htmlref{add}{ADD}},
 {\tt \htmlref{mult}{MULT}}, {\tt \htmlref{sub}{SUB}}
 
 \item[Invocation :]
@@ -8071,7 +8071,7 @@ the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{EXP10}\xlabel{EXP10}EXP10}
 
 \begin{description}
@@ -8082,7 +8082,7 @@ calculation.
 
 \item[Usage :] -
 
-\item[Associated commands :] {\tt \htmlref{expe}{EXPE}}, 
+\item[Associated commands :] {\tt \htmlref{expe}{EXPE}},
 {\tt \htmlref{expon}{EXPON}}
 
 \item[Invocation :]
@@ -8091,7 +8091,7 @@ calculation.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{EXPE}\xlabel{EXPE}EXPE}
 
 \begin{description}
@@ -8102,7 +8102,7 @@ calculation.
 
 \item[Usage :] -
 
-\item[Associated commands :] {\tt \htmlref{exp10}{EXP10}}, 
+\item[Associated commands :] {\tt \htmlref{exp10}{EXP10}},
 {\tt \htmlref{expon}{EXPON}}
 
 \item[Invocation :]
@@ -8111,7 +8111,7 @@ calculation.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{EXPON}\xlabel{EXPON}EXPON}
 
 \begin{description}
@@ -8122,7 +8122,7 @@ represents the result of the calculation.
 
 \item[Usage :] -
 
-\item[Associated commands :] {\tt \htmlref{exp10}{EXP10}}, 
+\item[Associated commands :] {\tt \htmlref{exp10}{EXP10}},
 {\tt \htmlref{expe}{EXPE}}
 
 \item[Invocation :]
@@ -8131,7 +8131,7 @@ represents the result of the calculation.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{FCOADD}\xlabel{FCOADD}FCOADD}
 
 \begin{description}
@@ -8152,7 +8152,7 @@ user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{FINDPEAK}\xlabel{FINDPEAK}FINDPEAK}
 
 \begin{description}
@@ -8172,7 +8172,7 @@ location of the peak value is returned to the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{FLIP}\xlabel{FLIP}FLIP}
 
 \begin{description}
@@ -8201,7 +8201,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GAUSS}\xlabel{GAUSS}GAUSS}
 
 \begin{description}
@@ -8230,7 +8230,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GAUSSTH}\xlabel{GAUSSTH}GAUSSTH}
 
 \begin{description}
@@ -8258,7 +8258,7 @@ or \\
 \item {\tt out1 } is the output smoothed image
 \end{itemize}\end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{GLITCH}\xlabel{GLITCH}GLITCH}
 
 \begin{description}
@@ -8279,7 +8279,7 @@ replacement of them by the median value of the {\tt 8} surrounding
 pixels.  The modified image is written to a user named output image.
 
 \item[Usage :] Removing bad/hot pixels or fudging data.
-\item[Associated commands :] {\tt \htmlref{glitchmark}{GLITCHMARK}}, 
+\item[Associated commands :] {\tt \htmlref{glitchmark}{GLITCHMARK}},
 {\tt \htmlref{applymask}{APPLYMASK}}
 \item[Invocation :]
 
@@ -8287,7 +8287,7 @@ pixels.  The modified image is written to a user named output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{HISTEQ}\xlabel{HISTEQ}HISTEQ}
 
 \begin{description}
@@ -8307,7 +8307,7 @@ intensity structure will be present.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{HISTGEN}\xlabel{HISTGEN}HISTGEN}
 
 \begin{description}
@@ -8327,7 +8327,7 @@ image can be converted to ASCII (text) using the command {\bf asciilist}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{HISTO}\xlabel{HISTO}HISTO}
 
 \begin{description}
@@ -8339,7 +8339,7 @@ the mean, median and mode of the pixels in the image.
 
 \item[Usage :] Statistics
 
-\item[Associated commands :] {\tt \htmlref{stats}{STATS}}, 
+\item[Associated commands :] {\tt \htmlref{stats}{STATS}},
 {\tt \htmlref{cstats}{CSTATS}}
 
 \item[Invocation :]
@@ -8356,7 +8356,7 @@ or \\
 \item {\tt 20 30 } are the X,Y size of the sub-area
 \end{itemize}\end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{HOTSHOT}\xlabel{HOTSHOT}HOTSHOT}
 
 \begin{description}
@@ -8388,7 +8388,7 @@ bad/hot pixels.  This iterative search stops when either:
 \begin{enumerate}
 
 \item the number of bad/hot pixels is less than 10\% of the original
-number of bad/hot pixels, 
+number of bad/hot pixels,
 
 \item when the number of bad pixels increases between iterations rather
 than decreases, or
@@ -8404,7 +8404,7 @@ removed.
 \item[Usage :] Removing isolated bad/hot pixels or cosmic ray events, for
 example.
 
-\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}}, 
+\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}},
 {\tt \htmlref{glitchmark}{GLITCHMARK}}
 
 \item[Invocation :]
@@ -8413,7 +8413,7 @@ example.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{IMCOMB}\xlabel{IMCOMB}IMCOMB}
 
 \begin{description}
@@ -8436,7 +8436,7 @@ implanted.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{INDEX}\xlabel{INDEX}INDEX}
 
 \begin{description}
@@ -8454,7 +8454,7 @@ observations.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{INSETB}\xlabel{INSETB}INSETB}
 
 \begin{description}
@@ -8467,7 +8467,7 @@ the value chosen by the user.
 
 \item[Usage :] Setting a region (box) of an image to a magic number
 
-\item[Associated commands :] {\tt \htmlref{insetc}{INSETC}}, 
+\item[Associated commands :] {\tt \htmlref{insetc}{INSETC}},
 {\tt \htmlref{outsetb}{OUTSETB}}, {\tt \htmlref{outsetc}{OUTSETC}}
 
 \item[Invocation :]
@@ -8476,7 +8476,7 @@ the value chosen by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{INSETC}\xlabel{INSETC}INSETC}
 
 \begin{description}
@@ -8489,7 +8489,7 @@ chosen by the user.
 
 \item[Usage :] Setting a region (circle) of an image to a magic number.
 
-\item[Associated commands :] {\tt \htmlref{insetb}{INSETB}}, 
+\item[Associated commands :] {\tt \htmlref{insetb}{INSETB}},
 {\tt \htmlref{outsetb}{OUTSETB}}, {\tt \htmlref{outsetc}{OUTSETC}}
 
 \item[Invocation :]
@@ -8498,7 +8498,7 @@ chosen by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{INTLK}\xlabel{INTLK}INTLK}
 
 \begin{description}
@@ -8514,15 +8514,15 @@ of any image to the terminal.  Useful to inspect regions of images.
 
 \end{description}
 
-% \hrule 
+% \hrule
 % \subsubsection*{\label{JSDCLEAN}\xlabel{JSDCLEAN}JSDCLEAN}
-% 
+%
 % \begin{description}
-% 
+%
 % \item[Description :] Under development.  Will eventually deconvolve PSF
 % from images using modified clean algorithm developed from James Dunlop
 % (JSD) of ROE.
-% 
+%
 % \item[Usage :] Removing of PSF from images for enhanced spatial resolution.
 %
 % \item[Associated commands :] -
@@ -8531,7 +8531,7 @@ of any image to the terminal.  Useful to inspect regions of images.
 %
 % \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LAPLACE}\xlabel{LAPLACE}LAPLACE}
 
 \begin{description}
@@ -8560,7 +8560,7 @@ Areas where the input image is flat come out as zero in the output.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LINCONT}\xlabel{LINCONT}LINCONT}
 
 \begin{description}
@@ -8582,7 +8582,7 @@ The ASCII files in the {\tt \$LIRCAMDIR} directory called:
 {\tt lincoeff\_\-fpa118\_postjul88.list}, \\
 {\tt lincoeff\_fpa118\_postjul88\_ndr.list}, \\
 {\tt lincoeff\_fpa175.\-list}, and \\
-{\tt lincoeff\_fpa175\_ndr.list} 
+{\tt lincoeff\_fpa175\_ndr.list}
 \end{quote}
 
 should be used depending on the time of observations, the array in use,
@@ -8593,12 +8593,12 @@ is:
 
 \begin{small}
 \begin{verbatim}
-      Title - IRCAM linearization coefficients - FPA175 - Post 01-Jun-1989 NDR 
-      -1.985e-6 
-      0.0 
-      0.0 
-      25000.0 
-      50000.0 
+      Title - IRCAM linearization coefficients - FPA175 - Post 01-Jun-1989 NDR
+      -1.985e-6
+      0.0
+      0.0
+      25000.0
+      50000.0
 \end{verbatim}
 \end{small}
 
@@ -8613,12 +8613,12 @@ file.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LINIMAG_NDR}\xlabel{LINIMAG_NDR}LINIMAG\_NDR}
 
 \begin{description}
 
-\item[Description :] Linearizes individual images from an old {\sc ircam1/2} 
+\item[Description :] Linearizes individual images from an old {\sc ircam1/2}
 style container file.  Linearization is as in lincont command above.
 
 \item[Usage :] Linearization of {\sc ircam1/2} data images.
@@ -8631,7 +8631,7 @@ style container file.  Linearization is as in lincont command above.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LOG10}\xlabel{LOG10}LOG10}
 
 \begin{description}
@@ -8640,7 +8640,7 @@ style container file.  Linearization is as in lincont command above.
 an image and writes the result to an output image named by the user.
 
 \item[Usage :] Intensity-magnitude conversion.
-\item[Associated commands :] {\tt \htmlref{loge}{LOGE}}, 
+\item[Associated commands :] {\tt \htmlref{loge}{LOGE}},
 {\tt \htmlref{logar}{LOGAR}}
 \item[Invocation :]
 
@@ -8648,7 +8648,7 @@ an image and writes the result to an output image named by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LOGAR}\xlabel{LOGAR}LOGAR}
 
 \begin{description}
@@ -8658,7 +8658,7 @@ pixels in an image and writes the result to an output image named by
 the user.
 
 \item[Usage :] -
-\item[Associated commands :] {\tt \htmlref{loge}{LOGE}}, 
+\item[Associated commands :] {\tt \htmlref{loge}{LOGE}},
 {\tt \htmlref{log10}{LOG10}}
 \item[Invocation :]
 
@@ -8666,7 +8666,7 @@ the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LOGE}\xlabel{LOGE}LOGE}
 
 \begin{description}
@@ -8675,7 +8675,7 @@ the user.
 an image and writes the result to an output image named by the user.
 
 \item[Usage :] -
-\item[Associated commands :] {\tt \htmlref{logar}{LOGAR}}, 
+\item[Associated commands :] {\tt \htmlref{logar}{LOGAR}},
 {\tt \htmlref{log10}{LOG10}}
 \item[Invocation :]
 
@@ -8683,7 +8683,7 @@ an image and writes the result to an output image named by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{LOOK}\xlabel{LOOK}LOOK}
 
 \begin{description}
@@ -8700,7 +8700,7 @@ X,Y start pixel and the X,Y sub-area size in pixels.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MAKEBAD}\xlabel{MAKEBAD}MAKEBAD}
 
 \begin{description}
@@ -8723,7 +8723,7 @@ list of X Y pixel coordinates for the bad/hot pixels identified.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MAKEGLITCH}\xlabel{MAKEGLITCH}MAKEGLITCH}
 
 \begin{description}
@@ -8736,7 +8736,7 @@ other way; good pixels have the value 0 and bad pixels have the value
 
 \item[Usage :] Converting a bad pixel mask to bad pixel list file.
 
-\item[Associated commands :] {\tt \htmlref{makemask}{MAKEMASK}}, 
+\item[Associated commands :] {\tt \htmlref{makemask}{MAKEMASK}},
 {\tt \htmlref{makebad}{MAKEBAD}}, {\tt \htmlref{glitch}{GLITCH}}
 
 \item[Invocation :]
@@ -8745,7 +8745,7 @@ other way; good pixels have the value 0 and bad pixels have the value
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MAKEMASK}\xlabel{MAKEMASK}MAKEMASK}
 
 \begin{description}
@@ -8764,7 +8764,7 @@ median of the surrounding pixels using {\bf glitch}.
 
 \item[Usage :] Creating bad pixel masks.
 
-\item[Associated commands :] {\tt \htmlref{makebad}{MAKEBAD}}, 
+\item[Associated commands :] {\tt \htmlref{makebad}{MAKEBAD}},
 {\tt \htmlref{makeglitch}{MAKEGLITCH}}, {\tt \htmlref{applymask}{APPLYMASK}}
 
 \item[Invocation :]
@@ -8773,7 +8773,7 @@ median of the surrounding pixels using {\bf glitch}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MANIC}\xlabel{MANIC}MANIC}
 
 \begin{description}
@@ -8790,8 +8790,8 @@ the routine.
 
 \item[Usage :] Re-sizing, dimensioning of images
 
-\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}}, 
-{\tt \htmlref{compave}{COMPAVE}}, {\tt \htmlref{compress}{COMPRESS}}, 
+\item[Associated commands :] {\tt \htmlref{compadd}{COMPADD}},
+{\tt \htmlref{compave}{COMPAVE}}, {\tt \htmlref{compress}{COMPRESS}},
 {\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{sqorst}{SQORST}}
 
 \item[Invocation :]
@@ -8800,7 +8800,7 @@ the routine.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MANYCOL}\xlabel{MANYCOL}MANYCOL}
 
 \begin{description}
@@ -8811,7 +8811,7 @@ an output colour table with suitable interpolation.  Allows the user to
 combine several colour tables.
 
 \item[Usage :] Colour table manipulation
-\item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}}, 
+\item[Associated commands :] {\tt \htmlref{coltab}{COLTAB}},
 {\tt \htmlref{crecolt}{CRECOLT}}, {\tt \htmlref{writelut}{WRITELUT}}
 \item[Invocation :]
 
@@ -8819,7 +8819,7 @@ combine several colour tables.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MED3D}\xlabel{MED3D}MED3D}
 
 \begin{description}
@@ -8842,7 +8842,7 @@ output median filtered image is named by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MEDIAN}\xlabel{MEDIAN}MEDIAN}
 
 \begin{description}
@@ -8883,7 +8883,7 @@ times before the filtered version is written to the output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOFF}\xlabel{MOFF}MOFF}
 
 \begin{description}
@@ -8896,8 +8896,8 @@ point on the sky in the two images.
 
 \item[Usage :] Mosaicing image tiles in a mosaic.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
-{\tt \htmlref{quilt}{QUILT}}, {\tt \htmlref{csub}{CSUB}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
+{\tt \htmlref{quilt}{QUILT}}, {\tt \htmlref{csub}{CSUB}},
 {\tt \htmlref{accoff}{ACCOFF}} \ldots
 
 \item[Invocation :]
@@ -8906,7 +8906,7 @@ point on the sky in the two images.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOSAIC}\xlabel{MOSAIC}MOSAIC}
 
 \begin{description}
@@ -8921,8 +8921,8 @@ size in mosaic.
 
 \item[Usage :] Mosaicing tiles from a mosaic
 
-\item[Associated commands :] {\tt \htmlref{quilt}{QUILT}}, 
-{\tt \htmlref{moff}{MOFF}}, {\tt \htmlref{accoff}{ACCOFF}} \ldots 
+\item[Associated commands :] {\tt \htmlref{quilt}{QUILT}},
+{\tt \htmlref{moff}{MOFF}}, {\tt \htmlref{accoff}{ACCOFF}} \ldots
 
 \item[Invocation :]
 
@@ -8930,7 +8930,7 @@ size in mosaic.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOSAIC2}\xlabel{MOSAIC2}MOSAIC2}
 
 \begin{description}
@@ -8940,7 +8940,7 @@ together.  The input images can be of different dimensions in {\bf mosaic2}.
 
 \item[Usage :] Mosaicing two images together.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
 {\tt \htmlref{quilt}{QUILT}}
 
 \item[Invocation :]
@@ -8949,7 +8949,7 @@ together.  The input images can be of different dimensions in {\bf mosaic2}.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MOSCOR}\xlabel{MOSCOR}MOSCOR}
 
 \begin{description}
@@ -8963,8 +8963,8 @@ correction calculated.
 
 \item[Usage :] Mosaicing tiles of a mosaic.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
-{\tt \htmlref{accoff}{ACCOFF}}, {\tt \htmlref{moff}{MOFF}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
+{\tt \htmlref{accoff}{ACCOFF}}, {\tt \htmlref{moff}{MOFF}},
 {\tt \htmlref{quilt}{QUILT}} \ldots
 
 \item[Invocation :]
@@ -8973,7 +8973,7 @@ correction calculated.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{MULT}\xlabel{MULT}MULT}
 
 \begin{description}
@@ -8983,7 +8983,7 @@ input image putting the result in the output image.
 
 \item[Usage :] Multiplying two images together.
 
-\item[Associated commands :] {\tt \htmlref{add}{ADD}}, 
+\item[Associated commands :] {\tt \htmlref{add}{ADD}},
 {\tt \htmlref{div}{DIV}}, {\tt \htmlref{sub}{SUB}}
 
 \item[Invocation :]
@@ -9001,7 +9001,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{NUMB}\xlabel{NUMB}NUMB}
 
 \begin{description}
@@ -9017,7 +9017,7 @@ values greater than an input value.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OBSEXT}\xlabel{OBSEXT}OBSEXT}
 
 \begin{description}
@@ -9036,7 +9036,7 @@ container file.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OBSLIST}\xlabel{OBSLIST}OBSLIST}
 
 \begin{description}
@@ -9053,7 +9053,7 @@ list if written to the terminal and optionally to an ASCII file.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OEFIX}\xlabel{OEFIX}OEFIX}
 
 \begin{description}
@@ -9074,7 +9074,7 @@ channel structure is re-assembled into the output file.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OUTSETB}\xlabel{OUTSETB}OUTSETB}
 
 \begin{description}
@@ -9088,7 +9088,7 @@ outside the sub-area set to the value chosen by the user.
 \item[Usage :] Setting pixels outside region (box) of an image to a
 magic number.
 
-\item[Associated commands :] {\tt \htmlref{outsetc}{OUTSETC}}, 
+\item[Associated commands :] {\tt \htmlref{outsetc}{OUTSETC}},
 {\tt \htmlref{insetb}{INSETB}}, {\tt \htmlref{insetc}{INSETC}}
 
 \item[Invocation :]
@@ -9097,7 +9097,7 @@ magic number.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{OUTSETC}\xlabel{OUTSETC}OUTSETC}
 
 \begin{description}
@@ -9111,7 +9111,7 @@ the circle set to the value chosen by the user.
 \item[Usage :] Setting pixels outside region (circle) of an image to a
 magic number.
 
-\item[Associated commands :] {\tt \htmlref{outsetb}{OUTSETB}}, 
+\item[Associated commands :] {\tt \htmlref{outsetb}{OUTSETB}},
 {\tt \htmlref{insetb}{INSETB}}, {\tt \htmlref{insetc}{INSETC}}
 
 \item[Invocation :]
@@ -9120,7 +9120,7 @@ magic number.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PICKIM}\xlabel{PICKIM}PICKIM}
 
 \begin{description}
@@ -9138,7 +9138,7 @@ and the X,Y sub-area size in pixels.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{PIXDUPE}\xlabel{PIXDUPE}PIXDUPE}
 
 \begin{description}
@@ -9157,7 +9157,7 @@ N times where N is input by the user.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLCAL}\xlabel{POLCAL}POLCAL}
 
 \begin{description}
@@ -9199,7 +9199,7 @@ images for {\sc irpol} plus polarizer (old format) combination
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLLY}\xlabel{POLLY}POLLY}
 
 \begin{description}
@@ -9217,7 +9217,7 @@ prism data set.
 
 \item[Usage :] Calculating polarization from input intensity values.
 
-\item[Associated commands :] {\tt \htmlref{polly2}{POLLY2}}, 
+\item[Associated commands :] {\tt \htmlref{polly2}{POLLY2}},
 {\tt \htmlref{polcal}{POLCAL}}, {\tt polcal2}
 
 \item[Invocation :]
@@ -9226,7 +9226,7 @@ prism data set.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLLY2}\xlabel{POLLY2}POLLY2}
 
 \begin{description}
@@ -9239,8 +9239,8 @@ the Wollaston prism.
 
 \item[Usage :] Calculating polarization parameters from input intensity values.
 
-\item[Associated commands :] {\tt \htmlref{polly}{POLLY}}, 
-{\tt polcal2}, {\tt \htmlref{polcal}{POLCAL}}, 
+\item[Associated commands :] {\tt \htmlref{polly}{POLLY}},
+{\tt polcal2}, {\tt \htmlref{polcal}{POLCAL}},
 {\tt \htmlref{polsep}{POLSEP}}, {\tt polthresh2}
 
 \item[Invocation :]
@@ -9249,7 +9249,7 @@ the Wollaston prism.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLSEP}\xlabel{POLSEP}POLSEP}
 
 \begin{description}
@@ -9277,7 +9277,7 @@ a new polarimetry observation.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLSHOT}\xlabel{POLSHOT}POLSHOT}
 
 \begin{description}
@@ -9301,7 +9301,7 @@ waveplate positions.
 \item[Usage :] Calculating shot-noise polarization on a waveplate plus
 polarizer observation.
 
-\item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}}, 
+\item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}},
 {\tt \htmlref{polthresh}{POLTHRESH}}
 
 \item[Invocation :]
@@ -9310,7 +9310,7 @@ polarizer observation.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POLTHRESH}\xlabel{POLTHRESH}POLTHRESH}
 
 \begin{description}
@@ -9329,7 +9329,7 @@ experiment with the threshold level (in the sky subtracted reduced
 polarization images) to see when the faint features of nebulosity say,
 become noisy.
 
-\item[Usage :] Thresholding a set of {\sc irpol} plus polarizer 
+\item[Usage :] Thresholding a set of {\sc irpol} plus polarizer
 polarization data.
 \item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}}
 \item[Invocation :]
@@ -9338,7 +9338,7 @@ polarization data.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{POW}\xlabel{POW}POW}
 
 \begin{description}
@@ -9355,7 +9355,7 @@ where {\it x} is the input exponent.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{QUILT}\xlabel{QUILT}QUILT}
 
 \begin{description}
@@ -9403,7 +9403,7 @@ creates the more complex {\bf quilt} mosaic ASCII file.
 
 \item[Usage :] Mosaicing image tiles from a mosaic together.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
 {\tt \htmlref{mosaic2}{MOSAIC2}}, {\tt \htmlref{accoff}{ACCOFF}} \emph{etc.}
 
 \item[Invocation :]
@@ -9412,7 +9412,7 @@ creates the more complex {\bf quilt} mosaic ASCII file.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{RADIM}\xlabel{RADIM}RADIM}
 
 \begin{description}
@@ -9435,7 +9435,7 @@ along each radius.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROOT}\xlabel{ROOT}ROOT}
 
 \begin{description}
@@ -9445,13 +9445,13 @@ stores the result in the output image.
 
 \item[Usage :] Decreasing dynamic range to aid data display.
 
-\item[Associated commands :] {\tt \htmlref{add}{ADD}}, 
-{\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}}, 
-{\tt \htmlref{sub}{SUB}}, {\tt \htmlref{pow}{POW}}, 
-{\tt \htmlref{cadd}{CADD}}, {\tt \htmlref{cdiv}{CDIV}}, 
-{\tt \htmlref{cmult}{CMULT}}, {\tt \htmlref{csub}{CSUB}}, 
-{\tt \htmlref{expe}{EXPE}}, {\tt \htmlref{exp10}{EXP10}}, 
-{\tt \htmlref{expon}{EXPON}}, {\tt \htmlref{log10}{LOG10}}, 
+\item[Associated commands :] {\tt \htmlref{add}{ADD}},
+{\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}},
+{\tt \htmlref{sub}{SUB}}, {\tt \htmlref{pow}{POW}},
+{\tt \htmlref{cadd}{CADD}}, {\tt \htmlref{cdiv}{CDIV}},
+{\tt \htmlref{cmult}{CMULT}}, {\tt \htmlref{csub}{CSUB}},
+{\tt \htmlref{expe}{EXPE}}, {\tt \htmlref{exp10}{EXP10}},
+{\tt \htmlref{expon}{EXPON}}, {\tt \htmlref{log10}{LOG10}},
 {\tt \htmlref{loge}{LOGE}}, {\tt \htmlref{logar}{LOGAR}}
 
 \item[Invocation :]
@@ -9460,7 +9460,7 @@ stores the result in the output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROTATE}\xlabel{ROTATE}ROTATE}
 
 \begin{description}
@@ -9480,7 +9480,7 @@ the input image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ROWMED}\xlabel{ROWMED}ROWMED}
 
 \begin{description}
@@ -9499,8 +9499,8 @@ to M$\times$N where M and N are the original X and Y dimensions of the
 input image.  The result can be subtracted from the original image
 using the command {\bf sub}.
 
-\item[Associated commands :] {\tt \htmlref{xgrow}{XGROW}}, 
-{\tt \htmlref{sub}{SUB}}, {\tt \htmlref{colmed}{COLMED}}, 
+\item[Associated commands :] {\tt \htmlref{xgrow}{XGROW}},
+{\tt \htmlref{sub}{SUB}}, {\tt \htmlref{colmed}{COLMED}},
 {\tt \htmlref{ygrow}{YGROW}}
 
 \item[Invocation :]
@@ -9522,7 +9522,7 @@ or \\
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SETVAL}\xlabel{SETVAL}SETVAL}
 
 \begin{description}
@@ -9539,7 +9539,7 @@ modified image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SHADOW}\xlabel{SHADOW}SHADOW}
 
 \begin{description}
@@ -9558,7 +9558,7 @@ in locating edges and fine detail in an image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SHIFT}\xlabel{SHIFT}SHIFT}
 
 \begin{description}
@@ -9572,7 +9572,7 @@ regions not occupied by the shifted input image.
 
 \item[Usage :] Aligning images of same spatial region but, say, in different
 filters.
-\item[Associated commands :] {\tt \htmlref{shift2}{SHIFT2}}, 
+\item[Associated commands :] {\tt \htmlref{shift2}{SHIFT2}},
 {\tt \htmlref{shift3}{SHIFT3}}
 \item[Invocation :]
 
@@ -9580,7 +9580,7 @@ filters.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SHSIZE}\xlabel{SHSIZE}SHSIZE}
 
 \begin{description}
@@ -9588,7 +9588,7 @@ filters.
 \item[Description :] Informs the user of the dimensions of the image
 given.  The dimensions are written to the terminal.
 
-\item[Usage :] Determining image size. 
+\item[Usage :] Determining image size.
 \item[Associated commands :] -
 \item[Invocation :]
 
@@ -9596,7 +9596,7 @@ given.  The dimensions are written to the terminal.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SQORST}\xlabel{SQORST}SQORST}
 
 \begin{description}
@@ -9607,9 +9607,9 @@ interpolation to change image sizes.
 
 \item[Usage :] Changing image sizes.
 
-\item[Associated commands :] {\tt \htmlref{compave}{COMPAVE}}, 
-{\tt \htmlref{compadd}{COMPADD}}, {\tt \htmlref{compress}{COMPRESS}}, 
-{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{compick}{COMPICK}}, 
+\item[Associated commands :] {\tt \htmlref{compave}{COMPAVE}},
+{\tt \htmlref{compadd}{COMPADD}}, {\tt \htmlref{compress}{COMPRESS}},
+{\tt \htmlref{binup}{BINUP}}, {\tt \htmlref{compick}{COMPICK}},
 {\tt \htmlref{manic}{MANIC}}
 
 \item[Invocation :]
@@ -9618,7 +9618,7 @@ interpolation to change image sizes.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STATS}\xlabel{STATS}STATS}
 
 \begin{description}
@@ -9628,7 +9628,7 @@ any image. The area is defined by its X,Y start pixel coordinate and
 X,Y sub-area size (in pixels).
 
 \item[Usage :] Statistical information on images.
-\item[Associated commands :] {\tt \htmlref{histo}{HISTO}}, 
+\item[Associated commands :] {\tt \htmlref{histo}{HISTO}},
 {\tt \htmlref{cstats}{CSTATS}}
 \item[Invocation :]
 
@@ -9636,7 +9636,7 @@ X,Y sub-area size (in pixels).
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STCOADD}\xlabel{STCOADD}STCOADD}
 
 \begin{description}
@@ -9656,7 +9656,7 @@ observation numbers (\emph{e.g.}, {\tt 10}, {\tt 12}, {\tt 14}, {\tt
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{STEPIM}\xlabel{STEPIM}STEPIM}
 
 \begin{description}
@@ -9682,7 +9682,7 @@ is input also.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{SUB}\xlabel{SUB}SUB}
 
 \begin{description}
@@ -9692,7 +9692,7 @@ to output image.
 
 \item[Usage :] Object-sky subtraction, say.
 
-\item[Associated commands :] {\tt \htmlref{add}{ADD}}, 
+\item[Associated commands :] {\tt \htmlref{add}{ADD}},
 {\tt \htmlref{div}{DIV}}, {\tt \htmlref{mult}{MULT}}
 
 \item[Invocation :]
@@ -9701,7 +9701,7 @@ to output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{THETAFIX}\xlabel{THETAFIX}THETAFIX}
 
 \begin{description}
@@ -9716,7 +9716,7 @@ angle image.
 
 \item[Usage :] Position angle range correction.
 
-\item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}}, 
+\item[Associated commands :] {\tt \htmlref{polcal}{POLCAL}},
 {\tt polcal2}, {\tt \htmlref{cadd}{CADD}}
 
 \item[Invocation :]
@@ -9725,7 +9725,7 @@ angle image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{THRESH}\xlabel{THRESH}THRESH}
 
 \begin{description}
@@ -9744,7 +9744,7 @@ user-defined value.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{THRESH0}\xlabel{THRESH0}THRESH0}
 
 \begin{description}
@@ -9761,7 +9761,7 @@ output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{TRANDAT}\xlabel{TRANDAT}TRANDAT}
 
 \begin{description}
@@ -9775,7 +9775,7 @@ data.  The input format required of the ASCII file is:
       -40.0   40.0   1121.9
         0.0   30.0     56.3
       100.0   20.0   2983.2
-      120.0   80.0    339.3     
+      120.0   80.0    339.3
      etc...
 \end{verbatim}
 \end{small}
@@ -9793,7 +9793,7 @@ in the image by 4 pixels and 1 pixel in X and Y, respectively.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{TRIG}\xlabel{TRIG}TRIG}
 
 \begin{description}
@@ -9805,10 +9805,10 @@ written to a new output image.
 
 \item[Usage :] -
 
-\item[Associated commands :] {\tt \htmlref{root}{ROOT}}, 
-{\tt \htmlref{pow}{POW}}, {\tt \htmlref{expe}{EXPE}}, 
-{\tt \htmlref{exp10}{EXP10}}, {\tt \htmlref{expon}{EXPON}}, 
-{\tt \htmlref{loge}{LOGE}}, {\tt \htmlref{log10}{LOG10}}, 
+\item[Associated commands :] {\tt \htmlref{root}{ROOT}},
+{\tt \htmlref{pow}{POW}}, {\tt \htmlref{expe}{EXPE}},
+{\tt \htmlref{exp10}{EXP10}}, {\tt \htmlref{expon}{EXPON}},
+{\tt \htmlref{loge}{LOGE}}, {\tt \htmlref{log10}{LOG10}},
 {\tt \htmlref{logar}{LOGAR}}
 
 \item[Invocation :]
@@ -9817,7 +9817,7 @@ written to a new output image.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WMOSAIC}\xlabel{WMOSAIC}WMOSAIC}
 
 \begin{description}
@@ -9832,7 +9832,7 @@ the formula:
 
 \item[Usage :] Weighted mosaicing of tile in mosaic.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
 {\tt \htmlref{quilt}{QUILT}}, {\tt \htmlref{wquilt}{WQUILT}}
 
 \item[Invocation :]
@@ -9841,7 +9841,7 @@ the formula:
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WQUILT}\xlabel{WQUILT}WQUILT}
 
 \begin{description}
@@ -9856,7 +9856,7 @@ formula:
 
 \item[Usage :] Weighted mosaicing of tile in mosaic from ASCII file.
 
-\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}}, 
+\item[Associated commands :] {\tt \htmlref{mosaic}{MOSAIC}},
 {\tt \htmlref{wmosaic}{WMOSAIC}}, {\tt \htmlref{wquilt}{WQUILT}}
 
 \item[Invocation :]
@@ -9865,7 +9865,7 @@ formula:
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{WRAPCOR}\xlabel{WRAPCOR}WRAPCOR}
 
 \begin{description}
@@ -9886,7 +9886,7 @@ to all values below 0.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{XGROW}\xlabel{XGROW}XGROW}
 
 \begin{description}
@@ -9897,8 +9897,8 @@ the new NDF image.  See {\bf rowmed} for more details.
 
 \item[Usage :] Growing a Y slice into an image for subtraction.
 
-\item[Associated commands :] {\tt \htmlref{ygrow}{YGROW}}, 
-{\tt \htmlref{rowmed}{ROWMED}}, {\tt \htmlref{colmed}{COLMED}}, 
+\item[Associated commands :] {\tt \htmlref{ygrow}{YGROW}},
+{\tt \htmlref{rowmed}{ROWMED}}, {\tt \htmlref{colmed}{COLMED}},
 {\tt \htmlref{yadd}{YADD}}
 
 \item[Invocation :]
@@ -9907,7 +9907,7 @@ the new NDF image.  See {\bf rowmed} for more details.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{YADD}\xlabel{YADD}YADD}
 
 \begin{description}
@@ -9919,8 +9919,8 @@ average of the rows.
 
 \item[Usage :] -
 
-\item[Associated commands :] {\tt \htmlref{xgrow}{XGROW}}, 
-{\tt \htmlref{rowmed}{ROWMED}}, {\tt \htmlref{colmed}{COLMED}}, 
+\item[Associated commands :] {\tt \htmlref{xgrow}{XGROW}},
+{\tt \htmlref{rowmed}{ROWMED}}, {\tt \htmlref{colmed}{COLMED}},
 {\tt \htmlref{ygrow}{YGROW}}
 
 \item[Invocation :]
@@ -9929,20 +9929,20 @@ average of the rows.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{YGROW}\xlabel{YGROW}YGROW}
 
 \begin{description}
 
-\item[Description :] Grows an N$\times$1 image created with {\bf colmed} 
+\item[Description :] Grows an N$\times$1 image created with {\bf colmed}
 into an N$\times$M image by pixel duplication.  The output
 image is written to a new NDF image.  See {\bf colmed} for more details of
 usage.
 
 \item[Usage :] Growing an X slice into an image for subtraction.
 
-\item[Associated commands :] {\tt \htmlref{xgrow}{XGROW}}, 
-{\tt \htmlref{colmed}{COLMED}}, {\tt \htmlref{rowmed}{ROWMED}}, 
+\item[Associated commands :] {\tt \htmlref{xgrow}{XGROW}},
+{\tt \htmlref{colmed}{COLMED}}, {\tt \htmlref{rowmed}{ROWMED}},
 {\tt \htmlref{yadd}{YADD}}
 
 \item[Invocation :]
@@ -9951,7 +9951,7 @@ usage.
 
 \end{description}
 
-\hrule 
+\hrule
 \subsubsection*{\label{ZAPLIN}\xlabel{ZAPLIN}ZAPLIN}
 
 \begin{description}
@@ -9965,7 +9965,7 @@ columns/rows entered are removed by linear interpolation.
 
 \item[Usage :] Removing bad columns/rows in images.
 
-\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}}, 
+\item[Associated commands :] {\tt \htmlref{glitch}{GLITCH}},
 {\tt \htmlref{glitchmark}{GLITCHMARK}}
 
 \item[Invocation :]
@@ -9974,7 +9974,7 @@ columns/rows entered are removed by linear interpolation.
 
 \end{description}
 
-% END 
+% END
 
 \end{document}
 

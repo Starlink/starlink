@@ -9,12 +9,12 @@ C
 C     Function:
 C        Reduce CCD spectropolarimetry data.
 C
-C     Description:                           
+C     Description:
 C        CCD2STOKES reduces data obtained with the AAO Pockels cell
 C        spectropolarimeter with the CCD as detector. The data for a
 C        single observation consists of two Figaro files containing the
-C        A and B state frames. Within each A and B frame there are four 
-C        spectra corresponding to the O and E rays for each of two 
+C        A and B state frames. Within each A and B frame there are four
+C        spectra corresponding to the O and E rays for each of two
 C        apertures (A and B). These spectra are combined
 C        to derive a Stokes parameter spectrum in TSP format.
 C        The CCD data are expected to be in raw CCD format which is
@@ -23,7 +23,7 @@ C        direction. Thus if the data is preprocessed using Figaro it will
 C        have to be rotated back.
 C
 C        Two different algorithms may be selected for the polarimetry
-C        reduction. The two algorithms differ in the method used to 
+C        reduction. The two algorithms differ in the method used to
 C        compensate for transparency variations between the observations
 C        at the two plate positions.
 C
@@ -57,7 +57,7 @@ C
 C-
 C
 C  History:
-C    27/4/1988   Original Version.   JAB/AAO 
+C    27/4/1988   Original Version.   JAB/AAO
 C    10/8/1990   Use DSA             JAB/AAO
 C    11/8/1990   Add Readout noise   JAB/AAO
 C    2/10/1991   Add algorithm selection   JAB/AAO
@@ -80,10 +80,10 @@ C
       INTEGER NELM
       INTEGER FSTATUS
       INTEGER NDIM, DIMS(7),DIMS2(7)
-      INTEGER LENNAME               
+      INTEGER LENNAME
 
-*  Extraction parameters             
-      INTEGER ASTART,BSTART,OESEP,WIDTH,SEP         
+*  Extraction parameters
+      INTEGER ASTART,BSTART,OESEP,WIDTH,SEP
 
 *  CCD parameters
       REAL BIAS,PHOTADU,RDN
@@ -104,7 +104,7 @@ C
       CALL PAR_GET0C('AFIGARO',FNAME,STATUS)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME,STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -117,7 +117,7 @@ C
      :          STATUS)
             GOTO 100
          ELSE
-            SEP = DIMS(1)                                 
+            SEP = DIMS(1)
 
 *  Map the data
 
@@ -158,7 +158,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -201,11 +201,11 @@ C
              CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
 
 *  Check them for validity
-             IF (ASTART+(WIDTH-1) .GT. SEP .OR. 
+             IF (ASTART+(WIDTH-1) .GT. SEP .OR.
      :           ASTART+(WIDTH-1)+OESEP .GT. SEP .OR.
      :           BSTART+(WIDTH-1) .GT. SEP .OR.
      :           BSTART+(WIDTH-1)+OESEP .GT. SEP) THEN
-                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)        
+                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)
                  GOTO 100
              ENDIF
 
@@ -223,10 +223,10 @@ C
 *  Get CCD parameters
 
 *  Bias level
-             CALL PAR_GET0R('BIAS',BIAS,STATUS) 
+             CALL PAR_GET0R('BIAS',BIAS,STATUS)
 
 *  Readout noise (electrons)
-             CALL PAR_GET0R('READNOISE',RDN,STATUS)              
+             CALL PAR_GET0R('READNOISE',RDN,STATUS)
 
 *  Photons per ADU
              CALL PAR_GET0R('PHOTADU',PHOTADU,STATUS)
@@ -256,7 +256,7 @@ C
                 ENDIF
              ENDDO
              RATIO = ALGORITHM .EQ. 'RATIO'
-      
+
 *  Create the output file
 
              CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -273,7 +273,7 @@ C
              CALL TSP_WLU_LAMBDA(OLOC,XLABEL,XUNITS,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,STOKESPAR,SLOC,STATUS)
 
 *  Map the Stokes data ...
@@ -281,13 +281,13 @@ C
 
 *  ... and its variance
              CALL TSP_MAP_VAR(SLOC,'WRITE',OEPTR,ELOC,STATUS)
-       
+
 *  Write the label and units (from the input file)
              CALL TSP_WLU(OLOC,LABEL,UNITS,STATUS)
 
 *  Map the intensity data
              CALL TSP_MAP_DATA(OLOC,'WRITE',OIPTR,ILOC,STATUS)
-             
+
 *  Copy the data
              IF (STATUS .EQ. SAI__OK) THEN
                 IF (RATIO) THEN
@@ -317,13 +317,13 @@ C
           ENDIF
 
 *  Unmap input arrays
- 
+
       ENDIF
 100   CONTINUE
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
 
 

@@ -22,7 +22,7 @@
 *     argument can be declared as a passed length character array in
 *     the normal way.
 *
-*     IRM_CPOIN should be called to un-do the effect of this routine 
+*     IRM_CPOIN should be called to un-do the effect of this routine
 *     before releasing the mapped memory.
 
 *  Arguments:
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

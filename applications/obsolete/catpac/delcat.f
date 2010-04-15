@@ -47,7 +47,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,17 +76,17 @@
 *   Make the call
 *
          call chp_delcat(incat, status)
-*  
+*
          if (status .eq. SAI__OK) then
 *
 *    Display the results
 *
            call msg_setc('catname',incat)
-           call msg_out('message 1','The catalogue ^catname has been 
+           call msg_out('message 1','The catalogue ^catname has been
      : deleted', status)
          elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)
-           call err_rep('message 2','The catalogue ^catname could not 
+           call err_rep('message 2','The catalogue ^catname could not
      : be found.', status)
          else
            call err_rep('message 3','An unidentified error ocurred in

@@ -19,7 +19,7 @@
 {  Description:
 {     The plotting device is set to postscript for inclusion in SUN/137.
 {     The size of the viewport is changed to the figure size within SUN/137.
-{     Each of the example diagrams are plotted separately using their 
+{     Each of the example diagrams are plotted separately using their
 {     respective ICL procedures.
 {     The GKS output files are renamed.
 
@@ -86,7 +86,7 @@ XCOLUMN Wave
 YCOLUMN Flux
 EXCOLUMN 0
 EYCOLUMN 0
-                              
+
 {  Read the data file.
 READF (PONGO_EXAMPLES&'')/swp3196.lap SELCOND="Flux > 0" NOALL
 
@@ -104,7 +104,7 @@ CHANGE COLOUR=1
 CHANGE LINEWID=2
 LABEL TITLE="SWP3196, LORES, LAP" COLUMNS
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 
@@ -162,7 +162,7 @@ XCOLUMN 1
 EXCOLUMN 2
 YCOLUMN 3
 EYCOLUMN 4
-                              
+
 {  Read the data file.
 READF DATA=(PONGO_EXAMPLES&'')/tutorial.dat ALL
 
@@ -196,7 +196,7 @@ FITLINE WEIGHT COLOUR=2
 LTYPE 4
 FITCURVE POLY NPOLY=2 WEIGHT COLOUR=4
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 
@@ -207,7 +207,7 @@ CHANGE CHEIGHT=1.0
 ENDPLOT
 { @(#)errors.icl	1.2     6/13/94     1
 
-!mv gks74.ps sun137_fig2.ps-tex 
+!mv gks74.ps sun137_fig2.ps-tex
 
 BEGPLOT epsfcol_p
 
@@ -256,7 +256,7 @@ PAPER 5.0 1
 CHANGE LINEWID=2
 
 {  Read the unbinned data into the XCOL data area, but only if their values
-{  are greater than zero. Note that the XCOL column has been specified by 
+{  are greater than zero. Note that the XCOL column has been specified by
 {  its label which is case-sensitive.
 READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat XCOL='Age' SELCOND='Age > 0' NOALL
 
@@ -267,7 +267,7 @@ XLOGARITHM
 LIMITS 2.0 11.0 0.0 100.0
 
 {  Draw a box, but don't draw the right-hand edge. Reset the X-axis options
-{  so that they do not contain an "L" option (which has been automatically 
+{  so that they do not contain an "L" option (which has been automatically
 {  added by XLOGARITHM).
 BOX BCNST BNST
 
@@ -299,9 +299,9 @@ HISTOGRAM 2.0 11.0 18 NOAUTOSCALE
 
 {  Write a label describing the second histogram.
 CHANGE LINESTY=1
-MTEXT R 2.5 0.5 0.5 'Number of new pulsars (dotted)' 
+MTEXT R 2.5 0.5 0.5 'Number of new pulsars (dotted)'
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 
@@ -404,7 +404,7 @@ CHANGE LINESTY=1 CHEIGHT=0.7
 PTEXT      -0.7082780     -18.0945511        0 0.0 '0655+64'
 PTEXT      -1.2338796     -17.0440712        0 0.0 '1913+16'
 
-{  Note the use of the command line continuation character "~", used 
+{  Note the use of the command line continuation character "~", used
 {  gratuitously here for for illustration.
 PTEXT      -0.2164239E+01  -0.1934648E+02    0 0.0 ~
    '1953+29'
@@ -418,7 +418,7 @@ PTEXT      -1.0945635     -20.1498394       37 0.0 'Death Line'
 PTEXT      -1.4808489     -16.7852573       19 0.0 'Spin-up Line'
 
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 
@@ -480,7 +480,7 @@ EXPAND 0.5
 {  Set the SCALE global parameter to scale the error ellipses.
 SETGLOBAL PONGO_ERSCALE 2.3
 
-{  Change the axis options global parameters to make the x=0 and y=0 
+{  Change the axis options global parameters to make the x=0 and y=0
 {  lines appear.
 SETGLOBAL PONGO_XOPT ABCNST
 SETGLOBAL PONGO_YOPT ABCNST
@@ -515,12 +515,12 @@ MTEXT T 1.0 0.5 0.5 'Defford only'
 {  Change the plotting pen.
 PEN 2
 
-{  Plot the points - note that because there is no command-line parameter, 
-{  and values have been read into the symbol column, these values are used 
+{  Plot the points - note that because there is no command-line parameter,
+{  and values have been read into the symbol column, these values are used
 {  to determine the symbol type.
 POINTS
 
-{  Change the pen again - note that the full form of the command is being 
+{  Change the pen again - note that the full form of the command is being
 {  used not its alias as above.
 CHANGE COLOUR=4
 
@@ -533,14 +533,14 @@ ELLIPSES NOAXES
 
 {  Find how many data points have been read (this was written out to the
 {  global parameter PONGO_NDATA by the read command.
-GETGLOBAL PONGO_NDATA (NDATA) 
+GETGLOBAL PONGO_NDATA (NDATA)
 
-{  Use the radiate command to draw lines from each of the data points to 
+{  Use the radiate command to draw lines from each of the data points to
 {  the origin.
 RADIATE 0.0 0.0 (NDATA)
 
 {  Draw the axis labels and the plot title.
-LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50 
+LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50
 
 {  Produce two more similar plots in different areas of the screen...
 VP_BR
@@ -548,14 +548,14 @@ READF SELCOND='3 = 12'
 WORLD DATA0
 WNAD
 BOXFRAME
-MTEXT T 1.0 0.5 0.5 'Knockin only' 
+MTEXT T 1.0 0.5 0.5 'Knockin only'
 CHANGE COLOUR=2
 POINTS
 CHANGE COLOUR=4
 ANNOTATE
 CHANGE COLOUR=1
 ELLIPSES NOAXES
-GETGLOBAL PONGO_NDATA (NDATA) 
+GETGLOBAL PONGO_NDATA (NDATA)
 RADIATE 0.0 0.0 (NDATA)
 
 {  Note that LABEL remembers the previous axis labels.
@@ -572,15 +572,15 @@ CHANGE COLOUR=4
 ANNOTATE
 CHANGE COLOUR=1
 ELLIPSES NOAXES
-GETGLOBAL PONGO_NDATA (NDATA) 
+GETGLOBAL PONGO_NDATA (NDATA)
 RADIATE 0.0 0.0 (NDATA)
-LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50 
+LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50
 
 {  Change the character height and viewport back to their default sizes.
 CHANGE CHEIGHT=1.0
 VSTAND
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 
@@ -650,8 +650,8 @@ YSCALE 1.7453292E-2
 {  Select a viewport in the top left-hand corner.
 VP_TL
 
-{  Get the limits from the data using the AITOFF projection, note that the 
-{  RA centre is specified in the form of hh:mm:ss.sss and that below is 
+{  Get the limits from the data using the AITOFF projection, note that the
+{  RA centre is specified in the form of hh:mm:ss.sss and that below is
 {  understood to mean 12 hours.
 DLIMITS PROJECTION=AITOFF RACENTRE=12 DECCENTRE=0
 
@@ -685,17 +685,17 @@ VP_BL
 LIMITS -4.0 4.0 -4.0 4.0 PROJECTION=TAN RACENTRE=0 DECCENTRE=30
 WNAD
 MTEXT T 1.0 0.5 0.5 'TAN centre \ga=0\uh\d \gd=30\(2729)'
-GRID 
+GRID
 PEN 6
 POINTS
 
 {  Plot the data in the bottom right-hand corner in an arc projection.
 PEN 1
 VP_BR
-LIMITS -3.1 3.1 -3.1 3.1 PROJECTION=ARC RACENTRE=12 
+LIMITS -3.1 3.1 -3.1 3.1 PROJECTION=ARC RACENTRE=12
 WNAD
 MTEXT T 1.0 0.5 0.5 'ARC centre \ga=12\uh\d \gd=30\(2729)'
-GRID 
+GRID
 PEN 6
 POINTS
 
@@ -777,7 +777,7 @@ LIMITS 5.5 4.5 -0.2 0.2
 {  Draw the box and plot the points.
 LWEIGHT 2
 CHANGE FONT=4
-BOXFRAME 
+BOXFRAME
 LWEIGHT 1
 CHANGE CHEIGHT=3
 POINTS
@@ -830,7 +830,7 @@ PAPER 5.0 1
 
 {-
 
-{  Read in the data, selecting objects with proper motions 
+{  Read in the data, selecting objects with proper motions
 {  greater than 0.5 arcseconds in RA per year.
 READF DATA=(PONGO_EXAMPLES&'')/highppm.dat XCOL=2 YCOL=3 ~
       EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
@@ -879,7 +879,7 @@ READF DATA=(PONGO_EXAMPLES&'')/gridlabels.dat XCOL=5 YCOL=6 ~
       LABCOL=4 EXCOL=0 EYCOL=0 TO=9 ALL
 DEGTOR X
 DEGTOR Y
-ANNOTATE PROJECTION=(PROJ) YOFF=0.02 XOFF=-0.01 JUSTIFICATION=1.0 
+ANNOTATE PROJECTION=(PROJ) YOFF=0.02 XOFF=-0.01 JUSTIFICATION=1.0
 
 {  Do normal vector plot for bottom half.
 READF DATA=(PONGO_EXAMPLES&'')/highppm.dat XCOL=2 YCOL=3 ~

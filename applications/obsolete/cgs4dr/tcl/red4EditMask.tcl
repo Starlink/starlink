@@ -1,6 +1,6 @@
 proc red4EditMask {taskname qval} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global cgs4drBitmaps
@@ -35,7 +35,7 @@ proc red4EditMask {taskname qval} {
     set Red4Widgets(EM_ENT01) [entry $top.e1 -width 60]
     pack $Red4Widgets(EM_LAB01) $Red4Widgets(EM_ENT01) -in $top -side left
     $Red4Widgets(EM_ENT01) insert end $Red4Widgets(MASK)
- 
+
     set Red4Widgets(EM_LAB02) [label $bot.l3 -text "Port"]
     set p0 [radiobutton $bot.p0 -bitmap @$cgs4drBitmaps/port0.xbm -variable Red4Widgets(EM_RDISP) -value 0]
     set p1 [radiobutton $bot.p1 -bitmap @$cgs4drBitmaps/port1.xbm -variable Red4Widgets(EM_RDISP) -value 1]
@@ -91,7 +91,7 @@ proc red4EditMask {taskname qval} {
       }
 
 #   Loop to do edits
-      set loop_status 0 
+      set loop_status 0
       while {$loop_status==0} {
 
 #     Issue a message
@@ -104,7 +104,7 @@ proc red4EditMask {taskname qval} {
 
 #     Get the returns (this will hang if task dies for any reason!)
         set cursor_status -1
-        $P4Task get cursor_status -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V" 
+        $P4Task get cursor_status -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V"
         tkwait variable cursor_status
         set mask_x -1
         $P4Task get mask_x -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V"

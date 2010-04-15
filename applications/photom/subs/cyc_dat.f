@@ -7,7 +7,7 @@
 *     CYC_DAT
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -16,11 +16,11 @@
 *     CALL CYC_DAT( CYCLE )
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -55,14 +55,14 @@
 	REAL CYCLE_DATA
 	COMMON / DATA_CYCLIC / CYCLIC_DATA, CYCLE_DATA
         CHARACTER TEXT * 72
-	
+
 	INTEGER STATUS
 
 	STATUS = SAI__OK
-	
+
 	IF( CYCLE .LE. 0.0 ) THEN
 	  TEXT = 'ERROR > CYC_DAT unacceptable periodicity'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 	  CYCLIC_DATA = .FALSE.
 	  CYCLE_DATA = 0.0
 	  CYC_DAT = -1

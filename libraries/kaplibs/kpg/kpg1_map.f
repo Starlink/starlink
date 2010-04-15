@@ -13,8 +13,8 @@
 *     CALL KPG1_MAP( INDF, COMP, TYPE, MMOD, PNTR, EL, STATUS )
 
 *  Description:
-*     This routine is a wrapper for NDF_MAP which obtains mapped access 
-*     to an array component of an NDF, returning a pointer to the mapped 
+*     This routine is a wrapper for NDF_MAP which obtains mapped access
+*     to an array component of an NDF, returning a pointer to the mapped
 *     values and a count of the number of elements mapped. At the moment
 *     this wrapper routine is a dummy which does nothing else.
 
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

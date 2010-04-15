@@ -1063,7 +1063,7 @@ to this file \\
 
 \subsection{\xlabel{sb_specifyingpositions}Specifying
   positions\label{sb:specifyingpositions}}
-  
+
 To work, \autoastrom\ requires some initial estimate of the centre of the CCD
 frame. You can provide this with a WCS component in the NDF, or with a FITS
 (NDF-) extension, or with approximate astrometry given on the command line.
@@ -1074,24 +1074,24 @@ FITS information, and get its initial astrometry from such pointing
 information.
 
   You control this process using the \texttt{--obsdata} option.
-  
+
   If you wish to insert an initial approximate WCS component in the NDF, you
   can best do this using \GAIA.
-  
+
   The initial calibration does not have to be particularly accurate; it need
   only be accurate enough that \autoastrom\ is able to make a query to a
   catalogue server that will return a set of catalogue objects that has a
   substantial overlap with the imaged area of sky.  The query covers the
   region of sky which maps to the four corners of the image, based on the
   initial astrometry, plus a small extra margin.
-  
+
   The default image scale is 1 arcsec per pixel.  You will need to specify the
   scale if the actual scale is significantly different from this, as errors in
   this scale result in substantial errors in the patch of sky requested from
   the server.  It is better to choose too small a scale than too large -- that
   way, the area which \autoastrom\ searches for will tend to lie within the
   observed area, rather than greatly overlap it.
-  
+
   \autoastrom\ assumes that north is along the \texttt{y}-axis.  The matching
   algorithms are generally insensitive to this angle.  However, the only case
   where you need to specify this is if the CCD is significantly longer than it
@@ -1227,7 +1227,7 @@ that produced as output by \SExtractor\ when \texttt{catalog\_type} is set to
 \end{quote}
 
 The \textit{colnum} numbers run from 1 to the number of columns; the
-\textit{colname} is one of a set of column named defined in the \SExtractor\ 
+\textit{colname} is one of a set of column named defined in the \SExtractor\
 documentation; and \textit{optional comment} is some (ignored) annotation.
 The data immediately follows, in rows with the given number of columns in
 them.  In each of these rows, any text following a \texttt{\#} is ignored, and
@@ -1303,7 +1303,7 @@ may need to mask the defects out by hand, using GAIA or similar.
 
 If you have any observations on the reliability, or indeed usefulness, of this
 option, the author would be interested to receive them.
-            
+
 This option is not always necessary when used with the default FINDOFF
 matching algorithm, but it is vital when used with the `match' matching
 algorithm (see Section~\ref{sb:options:match}), since that algorithm uses only
@@ -1462,12 +1462,12 @@ Type: switch; default: true
 Specifies a source for the observation data, including WCS information.  The
 keyword has the multiple role of specifying the source of WCS information,
 supplying approximate WCS information directly, and supplying the observation
-data (time, observatory, temperature andpressure, and colour) which \ASTROM\ 
+data (time, observatory, temperature andpressure, and colour) which \ASTROM\
 needs if it is to attempt one of its higher-order fits.  This information is
 only needed if it is missing from the NDF or any FITS extension it
 incorporates, and if you wish to attempt the slight increase in accuracy of
 the more elaborate fits.
-          
+
 Do not specify a keyword more than once with distinct values.
 
 The value of the \texttt{--obsdata} option can specify approximate astrometry
@@ -1480,7 +1480,7 @@ you might write
 This value indicates the centre of the CCD even when this is not the centre of
 distortion, which would be the case when, for example, the CCD represents an
 off-centre section of a Schmidt plate.
-          
+
 The program will take its astrometry from only one of the possible sources
 (see \texttt{source} below) -- so that it will not, for example, take a
 position from the \texttt{obsdata} option and a plate scale from the file's
@@ -1710,9 +1710,9 @@ of a number of shortcomings, including the following:
   aberrations in the camera optics -- are not allowed for, no magnitude or
   image shape terms are included in the model, and the refraction cannot be
   adjusted automatically.
-  
+
 \item The zonal distortions of the reference catalogues are neglected.
-  
+
 \item There is no provision for the simultaneous fitting of more than one
   plate.  This prevents an extended area being modelled via overlapping
   plates, and the determination of proper motion and parallax from plates
@@ -1734,7 +1734,7 @@ a problem if the initial astrometry is good enough.  It's not at present
 \textit{completely} clear exactly what `good enough' means.
 
 \begin{thebibliography}{}
-  
+
 \bibitem{sextractor-article} Bertin, E. Sextractor: Software for source
   extraction. \textit{Astron. Astrophys. Suppl. Ser.}, 117:393, 1996.
 
@@ -1745,15 +1745,15 @@ a problem if the initial astrometry is good enough.  It's not at present
 \bibitem{sextractor-web} Bertin, E. SExtractor program [online, cited 25 April
   2005] URL:
   \texttt{$<$http://terapix.iap.fr/rubrique.php?id\_rubrique=91/$>$}.
-  
+
 \bibitem{fitswcs2} Calabretta, M.R. \& Greisen, E.W. Representations of
   celestial coordinates in FITS (``Paper II''). \textit{Astronom. Astrophys.},
   395:1077-1122, 2002.
-  
+
 \bibitem{fitswcs1} Greisen, E.W. \& Calabretta, M.R.. Representations of world
   coordinates in FITS (``Paper I''). \textit{Astronom. Astrophys.},
   395:1061-1075, 2002.
-  
+
 \bibitem{fitswcs3} Greisen, E.W., Calabretta, M.R., Valdes, F.G., \& Allen,
   S.L. Representations of spectral coordinates in FITS (``Paper III'').
   \textit{Astronom. Astrophys.}, 446:747-771, 2006.
@@ -1762,10 +1762,10 @@ a problem if the initial astrometry is good enough.  It's not at present
   Schlesinger, B.M., Teuben, P.J., Thompson, R.W., \& Warnock, A. Definition
   of the flexible image transport system (FITS). \textit{Astron. Astrophys.},
   376:359-380, September 2001.
-  
+
 \bibitem{match-home} Richmond, M.W. Matching lists of stars [online, cited
   April 2005] URL:\texttt{$<$http://spiff.rit.edu/match/$>$}
-  
+
 \bibitem{valdes95} Valdes, F.G., Campusano, L.E., Velasquez, J.D., \& Stetson,
   P.B. FOCAS automatic catalog matching algorithms. \textit{Publications of
     the Astronomical Society of the Pacific}, 107:1119, November 1995.
@@ -1774,7 +1774,7 @@ a problem if the initial astrometry is good enough.  It's not at present
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
-%%% End: 
+%%% End:

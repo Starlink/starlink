@@ -114,7 +114,7 @@ F77_SUBROUTINE(sxg_gtdev)( INTEGER(entry), INTEGER(devno),
 * Name: SXG_GTPR
 *
 * Purpose:
-*    A Fortran-callable function to get the prompt for a device from the 
+*    A Fortran-callable function to get the prompt for a device from the
 *    SPECX devices structure.
 *
 * Language:
@@ -158,7 +158,7 @@ F77_SUBROUTINE(sxg_gtpr)( INTEGER(entry), CHARACTER(prompt), INTEGER(ierr)
 *       Table entry number
 *
 * Return value:
-*    SXG_INQDEVNO = INTEGER 
+*    SXG_INQDEVNO = INTEGER
 *       The device number of the ENTRY.
 *-
 */

@@ -13,19 +13,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELF1_ANGLES(X,Y,XC,YC,ANGLE,STATUS)    
+*     CALL ELF1_ANGLES(X,Y,XC,YC,ANGLE,STATUS)
 
 *  Description:
-*     Determines the angle between a point and the vertical axis of the 
+*     Determines the angle between a point and the vertical axis of the
 *     image (using a user provided origin). The ATAN function is used.
 *     To determine the quadrant knowledge of the x/y displacements from
 *     the given origin is employed. To avoid overflow errors, zero
 *     y displacements are handled carefully.
-     
+
 *  Arguments:
-*     X = REAL (Given) 
+*     X = REAL (Given)
 *        X co-ordinate of the pixel required
-*     Y = REAL (Given) 
+*     Y = REAL (Given)
 *        Y co=ordinate of the pixel required.
 *     XC = REAL (Given)
 *        X co-ordinate for the galaxy centre.
@@ -67,7 +67,7 @@
 *  Arguments Returned:
       REAL ANGLE                      ! The angle the point/origin
                                       ! line makes with the vertical
-                                     
+
 *  Arguments Given and Returned:
 
 *  Local variables:
@@ -87,33 +87,33 @@
 
 *   Deal with purely vertical displacements.
       IF (ABS(RX).LT.1E-20) THEN
-    
+
 *      Assign angle as 0 or 180 degrees.
          IF (RY.LT.0.0) THEN
             ANGLE=ELF__PIVAL
          ELSE
             ANGLE=0.0
          END IF
- 
+
       ELSE
 
 *      Deal with purely horizontal displacements.
          IF (RY.EQ.0) THEN
-   
+
 *         Assign angle as 90 or 270 degrees.
             IF (X-XC.LT.0.0) THEN
                ANGLE=1.5*ELF__PIVAL
             ELSE
                ANGLE=ELF__PIVAL/2.0
             END IF
-   
+
          ELSE
-     
+
 *         Deal with all other cases.
             VALUE=RX/RY
             ATNVAL=ATAN(VALUE)
-     
-*         Sort out the value depending on the quadrant. 
+
+*         Sort out the value depending on the quadrant.
             IF (VALUE.GT.0.0) THEN
                IF (RX.GT.0.0) THEN
                   ANGLE=ATNVAL
@@ -127,7 +127,7 @@
                   ANGLE=2.0*ELF__PIVAL+ATNVAL
                END IF
             END IF
-   
+
          END IF
 
       END IF
@@ -156,19 +156,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELP1_ANGLES(X,Y,XC,YC,ANGLE,STATUS)    
+*     CALL ELP1_ANGLES(X,Y,XC,YC,ANGLE,STATUS)
 
 *  Description:
-*     Determines the angle between a point and the vertical axis of the 
+*     Determines the angle between a point and the vertical axis of the
 *     image (using a user provided origin). The ATAN function is used.
 *     To determine the quadrant knowledge of the x/y displacements from
 *     the given origin is employed. To avoid overflow errors, zero
 *     y displacements are handled carefully.
-     
+
 *  Arguments:
-*     X = REAL (Given) 
+*     X = REAL (Given)
 *        X co-ordinate of the pixel required
-*     Y = REAL (Given) 
+*     Y = REAL (Given)
 *        Y co=ordinate of the pixel required.
 *     XC = REAL (Given)
 *        X co-ordinate for the galaxy centre.
@@ -210,7 +210,7 @@
 *  Arguments Returned:
       REAL ANGLE                      ! The angle the point/origin
                                       ! line makes with the vertical
-                                     
+
 *  Arguments Given and Returned:
 
 *  Local variables:
@@ -227,36 +227,36 @@
 *   Find the displacements from the origin in terms of x and y.
       RX=X-XC
       RY=Y-YC
-  
+
 *   Deal with purely vertical displacements.
       IF (ABS(RX).LT.1E-20) THEN
-    
+
 *      Assign angle as 0 or 180 degrees.
          IF (RY.LT.0.0) THEN
             ANGLE=ELP__PIVAL
          ELSE
             ANGLE=0.0
          END IF
- 
+
       ELSE
 
 *      Deal with purely horizontal displacements.
          IF (RY.EQ.0) THEN
-   
+
 *         Assign angle as 90 or 270 degrees.
             IF (X-XC.LT.0.0) THEN
                ANGLE=1.5*ELP__PIVAL
             ELSE
                ANGLE=ELP__PIVAL/2.0
             END IF
-   
+
          ELSE
-     
+
 *         Deal with all other cases.
             VALUE=RX/RY
             ATNVAL=ATAN(VALUE)
-     
-*         Sort out the value depending on the quadrant. 
+
+*         Sort out the value depending on the quadrant.
             IF (VALUE.GT.0.0) THEN
                IF (RX.GT.0.0) THEN
                   ANGLE=ATNVAL
@@ -270,7 +270,7 @@
                   ANGLE=2.0*ELP__PIVAL+ATNVAL
                END IF
             END IF
-   
+
          END IF
 
       END IF

@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ RUTHERFORD APPLETON LABORATORY\\
 \section{Introduction}
 
 The COLDMON package has been written to allow system managers to identify those
-items of software that are not used (or used infrequently) on their systems. It 
+items of software that are not used (or used infrequently) on their systems. It
 consists of a few command procedures and a Fortran program to analyze the
 results. It makes use of the AUDIT facility and security ACLs in VMS.
 
@@ -72,7 +72,7 @@ The package consists of the following files:
 \item [ANAL\_RESULTS.DAT]  -- Results file written by ANAL\_AUDIT.COM
 \item [ANAL\_SETUP.COM]  -- Setup script to set ACLs and enable Auditing
 \item [ANAL\_STATS.DAT]  -- Final statistics file written by $\ldots$
-\item [ANAL\_STATS.EXE]  -- Program to search the results file and produce 
+\item [ANAL\_STATS.EXE]  -- Program to search the results file and produce
 statistics.
 \item [ANAL\_STATS.FOR]  -- Source
 \end{description}
@@ -102,20 +102,20 @@ you would like to turn it on. An example of the output is given below:
 \begin{verbatim}
           You do not appear to have ACL auditing switched on.
           Do you want to turn it on now (Y/N) : y
-        
-        
+
+
           Setting up the ACLs on the files specified in ANAL_FILES.DAT
-        
+
           Please wait.....
-        
+
       DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST1.COM........acl done
       DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST2.COM........acl done
       DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST3.COM........acl done
-          Enabling ACL Auditing...                    
-        
+          Enabling ACL Auditing...
+
           Finished.
 \end{verbatim}
- 
+
 The date/time that analysis was started will be written to the file {\bf
 ANAL\_DATES.DAT}.
 
@@ -169,11 +169,11 @@ An example output is:
 \begin{verbatim}
       ANAL_STATS.DAT   Cold file access statistics
       --------------------------------------------
-      31-MAR-1992 09:53:42.32 -- Date/time analysis started       
-      31-MAR-1992 09:53:50.95 -- Date/time analysis stopped       
+      31-MAR-1992 09:53:42.32 -- Date/time analysis started
+      31-MAR-1992 09:53:50.95 -- Date/time analysis stopped
       TEST1.COM            Number of accesses=            3
       TEST2.COM            Number of accesses=            2
       TEST3.COM            Number of accesses=            1
 \end{verbatim}
-    
+
 \end{document}

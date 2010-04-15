@@ -9,7 +9,7 @@ Several aspects of the implementation need
 optimization and improvement.
 
 \item [Memory and Time Usage]
-Apart from possible bugs the translator 
+Apart from possible bugs the translator
 may place heavy demands on your resources.
 The memory that \latextohtml\ needs for translation ranges between
 8 - 10 Megabytes for simple documents and goes soon beyond
@@ -58,16 +58,16 @@ correctly.
 Commands which affect global parameters during the translation,
 and are sensitive to the order in which they are processed may
 not be handled correctly. In particular, counter manipulation
-(e.g. \texttt{newcounter, setcounter, stepcounter}, etc) 
+(e.g. \texttt{newcounter, setcounter, stepcounter}, etc)
 commands may cause problems.
 
 \item [Index\index{index}]
-The translator generates its own index by saving the arguments  of 
+The translator generates its own index by saving the arguments  of
 the \texttt{index} command. The contents of the \texttt{theindex}
 environment are ignored.
 
 \item[New Definitions\index{new definitions}]
-New definitions (\texttt{newcommand}, \texttt{newenvironment}, 
+New definitions (\texttt{newcommand}, \texttt{newenvironment},
 \texttt{newtheorem} and \texttt{def}),
 will not work as expected if they are defined more than once.
 Only the last definition will be used throughout the document.
@@ -98,7 +98,7 @@ Here are some curable symptoms:
 \begin{htmllist}
 \htmlitemmark{BlueBall}
 \item [Cannot run any of the Perl programs]
-If your Perl installation is such that Perl programs are not allowed 
+If your Perl installation is such that Perl programs are not allowed
 to run as shell scripts you may be unable to run  \fn{latex2html}, \fn{texexpand} \fn{pstogif}
 and  \fn{install-test}. In this case change the first line in each of these
 programs from
@@ -111,7 +111,7 @@ programs from
 \begin{verbatim}
 : # *-*-perl-*-*
     eval 'exec perl -S  $0 "$@"'
-    if $running_under_some_shell; 
+    if $running_under_some_shell;
 \end{verbatim}
 
 
@@ -222,7 +222,7 @@ Link the \fn{tcsh} to this place.
 files that you are using. It is likely that you are using
 a style file which contains raw TeX commands. In such a case
 start \latextohtml{} with the option \texttt{-dont\_include \Meta{style file
-name}}. Alternatively, add the name of the style to the variable 
+name}}. Alternatively, add the name of the style to the variable
 \texttt{DONT\_INCLUDE} in your
 \fn{HOME/.latex2html-init} file. If you don't have such a file then
 create one and add the lines:
@@ -232,8 +232,8 @@ $DONT_INCLUDE = "$DONT_INCLUDE" . ":<style file name>";
 \end{verbatim}
 
 Another reason why \latextohtml{} might stop is that the LaTeX source
-file itself contains raw TeX commands. In this case you may 
-put such commands inside a 
+file itself contains raw TeX commands. In this case you may
+put such commands inside a
 \hyperref{\texttt{latexonly}}{\texttt{latexonly (see Section }}{)}{sec:latexonly}
 environment.
 
@@ -252,9 +252,9 @@ Perl you are using by invoking Perl with the \texttt{-v} option.
 
 
 While you wait for your technical support people to upgrade Perl
-you could try invoking Perl from within \latextohtml{} with 
+you could try invoking Perl from within \latextohtml{} with
 the \texttt{-d} (debug) option. Then, when \latextohtml{} starts, it will
-immediately fall into the Perl debugger. To continue just press 
+immediately fall into the Perl debugger. To continue just press
 \texttt{c <CR>}.
 
 \item [\fn{dvips} complains about incorrect arguments \label{dvips}]
@@ -262,23 +262,23 @@ Please use a version which supports the command line options \texttt{-M -S,
 -o and -i}. ``Recent'' versions at least after 5.516 do
 support them.
 
-\item [It gives an \texttt{Out of memory} message and dies] 
-If you are using version \latextohtml{} 0.7 or later try splitting your 
-source file into more than one files using the \LaTeX\ 
-commands \texttt{input} or \texttt{include}. 
+\item [It gives an \texttt{Out of memory} message and dies]
+If you are using version \latextohtml{} 0.7 or later try splitting your
+source file into more than one files using the \LaTeX\
+commands \texttt{input} or \texttt{include}.
 Also, use the \texttt{-no\_images} option.
 
 As a last resort you may consider increasing the virtual memory
-(swap space) of your machine. As an indication 
+(swap space) of your machine. As an indication
 of what you might be able to do on your machine,
-a very long book (about 1000 printed pages) required about 
+a very long book (about 1000 printed pages) required about
 24MB of RAM and over 150MB of swap space to convert on a local Sun Sparc ELC
 running SunOS 4.1.3.
 
 \item [It gives ``dbm'' related error messages]
 \latextohtml{} 0.7 and later requires the
 Unix DataBase Management system (DBM or NDBM) in order to run.
-This is usually part of each Unix operating system but if you 
+This is usually part of each Unix operating system but if you
 don't have it then you may need to get it. \htmladdnormallinkfoot{Use Archie}
 {http://www.pvv.unit.no/archie/} to find one.
 
@@ -287,7 +287,7 @@ This is a nasty bug. Please use any characters other than quotes eg
 \texttt{verb+ABC+}
 
 \item [Cannot get the ``tilde'' (\~{}) to show]
-The trick here is to use the command \verb|\~{}|. 
+The trick here is to use the command \verb|\~{}|.
 
 Alternatively it is possible to use something like \\
 \begin{verbatim}
@@ -297,7 +297,7 @@ Alternatively it is possible to use something like \\
 
 or
 
-\verb|\htmladdnormallink{mylink}{http://host/\%7Eme/path/file.html}| 
+\verb|\htmladdnormallink{mylink}{http://host/\%7Eme/path/file.html}|
 
 \textbf{Warning:} Some browsers may not be able to interpret the \verb|%7E|
 as a ``tilde'' character.
@@ -307,9 +307,9 @@ As mentioned in other places plain TeX definitions cannot be
 converted.
 But you may also have problems even when using LaTeX definitions
 (with \texttt{newcommand} and \texttt{newenvironment}) if such definitions
-make use of {\it sectioning or verbatim} commands. These are 
+make use of {\it sectioning or verbatim} commands. These are
 handled in a special way by \latextohtml{} and cannot be used in
-macro definitions. 
+macro definitions.
 
 In general the macro handling mechanism is inefficient and very
 fragile. Avoid using macros if possible.
@@ -317,15 +317,15 @@ fragile. Avoid using macros if possible.
 \item [\texttt{input} commands]
 There is a bug in the expansion of \texttt{input} commands which causes a problem
 when more than one \texttt{input} command appear on the same line.
-There is no quick fix other than suggesting that you 
+There is no quick fix other than suggesting that you
 insert a newline after \texttt{input} commands in the source .tex files.
 
 \item [\texttt{input} commands in verbatim environments]
 These cause problems. There is no fix yet.
 
 \item [Optional arguments in description environments]
-If you have optional arguments for the \texttt{item} command in 
-a description environment containing nested ``]'' characters then 
+If you have optional arguments for the \texttt{item} command in
+a description environment containing nested ``]'' characters then
 these may not show up correctly. To avoid the problem enclose them
 in \{\}'s eg \verb+\item[{[nested [angle [brackets] are ok]]}]+
 
@@ -333,8 +333,8 @@ in \{\}'s eg \verb+\item[{[nested [angle [brackets] are ok]]}]+
 same file]
 
 If you notice any strange side-effects from previous runs of
-\latextohtml{} try using the option \texttt{-no\_reuse} and choose 
-\texttt{(d) } when prompted. This will 
+\latextohtml{} try using the option \texttt{-no\_reuse} and choose
+\texttt{(d) } when prompted. This will
 clear any intermediate files generated during previous runs.
 Note that this option will disable to image reuse mechanism.
 
@@ -350,33 +350,33 @@ be passed to LaTeX anyway e.g.
 \end{figure}
 \end{verbatim}
 
-Another reason why this might happen is that your shell 
-environment variable 
-\texttt{TEXINPUTS} is undefined. This is not always 
+Another reason why this might happen is that your shell
+environment variable
+\texttt{TEXINPUTS} is undefined. This is not always
 fatal but if you have problems you can use full
 pathnames for included postscript files (even when the postscript
 files are in the same directory as the LaTeX source file).
-Alternatively try setting TEXINPUTS to ".::". 
-With some TeX and LaTeX installations setting TEXINPUTS to 
+Alternatively try setting TEXINPUTS to ".::".
+With some TeX and LaTeX installations setting TEXINPUTS to
 ".::" may cause problems in the normal operation of LaTeX.
 If you get errors such as LaTeX complaining that it can no longer find
-any style files then you must set TEXINPUTS to 
+any style files then you must set TEXINPUTS to
 \verb|"<path to your LaTeX installation>:."|
 if you want to use both LaTeX and LaTeX2HTML.
 
 \item [Some of the inlined images are in the wrong places]
 This happens when any one of the inlined images is more than a page
 (paper page) long. This is sometimes the case with very large tables
-or large postscript images. In this case you can try specifying 
+or large postscript images. In this case you can try specifying
 a larger paper size (eg ``a3'', ``a2'' or even ``a0'') instead of
-the default (``a4'') using the LaTeX2HTML variable \fn{PAPERSIZE} 
+the default (``a4'') using the LaTeX2HTML variable \fn{PAPERSIZE}
 in the file \fn{latex2html.config}.
 
 Another reason why this may happen is that by default the \fn{dvips} program
 reverses the postscript pages it generates. If your \fn{dvips
 program}
 behaves in this way try changing the line
-\verb|$DVIPS = "dvips";| 
+\verb|$DVIPS = "dvips";|
 
 to
 
@@ -385,7 +385,7 @@ to
 in the file \fn{latex2html.config}.
 
 \item [\textbf{Unacceptable quality of converted images}]
-Try changing the size of the image 
+Try changing the size of the image
 (\hyperref{See image conversion}{See Section }{}{imgcon}).
 
 \item [The bibliographic references are missing]
@@ -395,11 +395,11 @@ in order to generate the references.
 
 \item [The labels of figures, tables or equations are wrong]
 This can happen if you have used any figures, tables, equations or
-any counters inside conditional text i.e. in a \texttt{latexonly} 
-or a \texttt{htmlonly} environment. 
+any counters inside conditional text i.e. in a \texttt{latexonly}
+or a \texttt{htmlonly} environment.
 
 \item [Problems after changing the configuration files]
-Please make sure that the last line in the configuration files 
+Please make sure that the last line in the configuration files
 (ie \fn{.latex2html-init} and \fn{latex2html.congif}) is:
 \begin{verbatim}
 1;      # This is the last line
@@ -407,19 +407,19 @@ Please make sure that the last line in the configuration files
 This is a Perl quirk...
 
 \item [Problems when producing the DVI version \label{htmlsty}]
-If you are using any of the new LaTeX commands which are defined in 
-the \fn{html.sty} file make sure that 
-\fn{html.sty} file is included e.g. as one of the optional arguments to the 
+If you are using any of the new LaTeX commands which are defined in
+the \fn{html.sty} file make sure that
+\fn{html.sty} file is included e.g. as one of the optional arguments to the
 \texttt{documentstyle} command.
 
 Of course you also have to make sure that LaTeX knows where the html.sty
 file is, either by putting it in the same place as the other style files on
 your system, or by changing your TEXINPUTS shell environment variable\footnote{
-If don't know how to do either of these things, copy (or link) html.sty 
+If don't know how to do either of these things, copy (or link) html.sty
 to the directory of your LaTeX document...}.
 
 \item [Some of the fonts are translated incorrectly]
-There is a fault in way the LaTeX scoping rules have been 
+There is a fault in way the LaTeX scoping rules have been
 interpreted in \latextohtml. Consider this:
 \begin{verbatim}
 \ttfamily fixed-width font.
@@ -434,7 +434,7 @@ by the beginning of the environment ``something'' so that ``default font'' will
 appear in the default font. But \latextohtml{} will not recognize
 ``something'' as a delimiter and ``default font'' will appear in the
 wrong
-font. 
+font.
 
 To avoid this problem until it is fixed you may delimit the scope of
 some
@@ -450,14 +450,14 @@ default font.
 \item [Using \fn{Ghostscript 3.X} you can no
 longer generate inlined images for equations]
 If you have a version of \latextohtml{} later than 0.6.1, go to the
-\latextohtml{} directory and run \fn{install-test} again. This should 
+\latextohtml{} directory and run \fn{install-test} again. This should
 fix it.
 
-With earlier versions of \latextohtml{} you can fix it by 
-replacing the file \fn{pstoppm.ps} in the 
-\latextohtml{} directory with a newer one that accompanies 
+With earlier versions of \latextohtml{} you can fix it by
+replacing the file \fn{pstoppm.ps} in the
+\latextohtml{} directory with a newer one that accompanies
 \fn{Ghostscript 3.X}. Alterhatively you can avoid using {\fn
-pstoppm.ps} 
+pstoppm.ps}
 by changing the way \texttt{GS} is invoked in the file \fn{pstogif},
 using something like \\
 \verb/open (GS, "|$GS -q -sDEVICE=ppmraw  -sOutputFile=$base.ppm $base.ps");/
@@ -474,10 +474,10 @@ Some text followed by \fbox{some more text in a box}.
 
 You should see something like:
 \begin{verbatim}
-This is LaTeX2HTML Version  (Wed Dec 1 1993) by Nikos Drakos, 
+This is LaTeX2HTML Version  (Wed Dec 1 1993) by Nikos Drakos,
 Computer Based Learning Unit, University of Leeds.
 
-OPENING /usr/cblelca/nikos/scripts/tex2html/tests/image-test.tex 
+OPENING /usr/cblelca/nikos/scripts/tex2html/tests/image-test.tex
 
 Reading ....
 Translating ...0/1.....1/1......
@@ -492,7 +492,7 @@ This is dvips 5.521 Copyright 1986, 1993 Radical Eye Software
 \end{verbatim}
 \begin{verbatim}
 ' TeX output 1993.12.03:1050' -> 12222_image
-(-> 12222_image001) <tex.pro>[1] 
+(-> 12222_image001) <tex.pro>[1]
 Initializing... done.
 Ghostscript 2.6.1 (5/28/93)
 Copyright (C) 1990-1993 Aladdin Enterprises, Menlo Park, CA.
@@ -535,14 +535,14 @@ cblelca% dvips -o image-test.ps image-test.dvi
 \begin{verbatim}
 This is dvips 5.519 Copyright 1986, 1993 Radical Eye Software
 ' TeX output 1993.11.12:1412' -> image-test.ps
-<tex.pro>. [1] 
+<tex.pro>. [1]
 cblelca% gs -dNODISPLAY pstoppm.ps
 Initializing... done.
 Ghostscript 2.6.1 (5/28/93)
 Copyright (C) 1990-1993 Aladdin Enterprises, Menlo Park, CA.
   All rights reserved.
 Ghostscript comes with NO WARRANTY: see the file COPYING for details.
-GS>(image-test) ppm1run 
+GS>(image-test) ppm1run
 Writing image-test.ppm
 GS>quit
 cblelca% pnmcrop image-test.ppm >image-test.crop.ppm
@@ -556,26 +556,26 @@ cblelca% ppmtogif image-test.crop.ppm >image-test.gif
 \item [STILL cannot get it to generate inlined images for equations
 etc.]
 If you have no problems with the \fn{image-test.tex} file but you
-still cannot convert the images in some of your files 
+still cannot convert the images in some of your files
 have a look in the directory of the generated
 HTML files for two files \fn{images.tex} and \fn{images.log}. Do you notice
-anything unusual in them? Copy \fn{images.tex} in the directory 
+anything unusual in them? Copy \fn{images.tex} in the directory
 of your original \LaTeX file and run \fn{latex} on \fn{images.tex}.
 Can you see any errors in \fn{images.log}? If yes can you fix
 \fn{images.tex} to get rid of the errors? After fixing {\fn
 images.tex}
 you can put it back in the directory of HTML files created by
-\latextohtml{} and run \latextohtml{} on the original document 
-using the option \texttt{-images\_only}. 
+\latextohtml{} and run \latextohtml{} on the original document
+using the option \texttt{-images\_only}.
 
 If you get into a mess try running \latextohtml{} with the options
 \texttt{-no\_reuse} and \texttt{-no\_images} eg
 \begin{verbatim}
 cblipca% latex2html -no_reuse -no_images test.tex
-This is LaTeX2HTML Version 95 (Tue Nov 29 1994) by Nikos Drakos, 
+This is LaTeX2HTML Version 95 (Tue Nov 29 1994) by Nikos Drakos,
 Computer Based Learning Unit, University of Leeds.
 
-OPENING /tmp_mnt/home/cblelca/nikos/tmp/test.tex 
+OPENING /tmp_mnt/home/cblelca/nikos/tmp/test.tex
 Cannot create directory /usr/cblelca/nikos/tmp/test: File exists
 (r) Reuse the images in the old directory OR
 (d) *** DELETE *** /usr/cblelca/nikos/tmp/test AND ITS CONTENTS OR
@@ -593,13 +593,13 @@ Doing section links .....
 *********** WARNINGS ***********
 
 If you are having problems displaying the correct images with Mosaic,
-try selecting "Flush Image Cache" from "Options" in the menu-bar 
+try selecting "Flush Image Cache" from "Options" in the menu-bar
 and then reload the HTML file.
 
 Done.
 \end{verbatim}
 
-Then try to have a look 
+Then try to have a look
 in the file  \fn{images.tex} (as described earlier) and perhaps fix it.
 Once you are happy that \fn{images.tex} is OK run \latextohtml{}
 again with the option \texttt{-images\_only}.
@@ -611,18 +611,18 @@ Some problems in displaying the correct inlined images,
 may be due to the image caching mechanisms of your browser.
 With some browsers a simple ``Reload Current Document'' will be enough
 to refresh the images but with others (eg Mosaic) you may need
-to request for the cache to be refreshed. With Mosaic try 
-selecting "Flush Image Cache" from "Options" in the menu-bar 
+to request for the cache to be refreshed. With Mosaic try
+selecting "Flush Image Cache" from "Options" in the menu-bar
 and then reload the HTML file.
 
 
-\item [It cannot do slides, memos, etc, ...] 
-If you use \texttt{slitex} you can go a long way just by replacing 
-the \texttt{slides} argument of the \texttt{documentstyle} command with 
+\item [It cannot do slides, memos, etc, ...]
+If you use \texttt{slitex} you can go a long way just by replacing
+the \texttt{slides} argument of the \texttt{documentstyle} command with
 something like \texttt{article} just before using \latextohtml.
-One problem may be that all your slides will end up in the  same HTML 
+One problem may be that all your slides will end up in the  same HTML
 file.
-If you use \fn{lslide.sty} you may get much better results 
+If you use \fn{lslide.sty} you may get much better results
 (\htmladdnormallinkfoot{use Archie}
 {http://www.pvv.unit.no/archie/} to find this or any other
 style files).
@@ -634,7 +634,7 @@ style files).
 \section{Support and More Information}
 
 A \htmladdnormallink{\latextohtml{} mailing list}{mailto:latex2html-request@mcs.anl.gov} has been set up at the
-Argonne National Labs (thanks to Ian Foster 
+Argonne National Labs (thanks to Ian Foster
 \Email{itf@mcs.anl.gov} and Bob Olson \Email{olson@mcs.anl.gov}). The
 \htmladdnormallinkfoot{\latextohtml{} mailing list
 archive}{http://cbl.leeds.ac.uk/nikos/tex2html/doc/mail/mail.html} is
@@ -652,11 +652,11 @@ with the contents \\
 
 \section{General License Agreement and Lack of Warranty}
 This software is distributed in the hope that it will be useful
-but \textbf{without any warranty}. The author(s) do not accept responsibility 
-to anyone for the consequences of using it or for whether it serves 
-any particular purpose or works at all. No warranty is made about 
-the software or its performance. 
- 
+but \textbf{without any warranty}. The author(s) do not accept responsibility
+to anyone for the consequences of using it or for whether it serves
+any particular purpose or works at all. No warranty is made about
+the software or its performance.
+
 Use and copying of this software and the preparation of derivative
 works based on this software are permitted, so long as the following
 conditions are met:
@@ -666,37 +666,37 @@ and prominently carried on all copies and supporting documentation.
 \item No fees or compensation are charged for use, copies, or
 access to this software. You may charge a nominal
 distribution fee for the physical act of transferring a
-copy, but you may not charge for the program itself. 
+copy, but you may not charge for the program itself.
 \item If you modify this software, you must cause the modified
 file(s) to carry prominent notices (a Change Log)
 describing the changes, who made the changes, and the date
 of those changes.
 \item  Any work distributed or published that in whole or in part
-contains or is a derivative of this software or any part 
-thereof is subject to the terms of this agreement. The 
+contains or is a derivative of this software or any part
+thereof is subject to the terms of this agreement. The
 aggregation of another unrelated program with this software
 or its derivative on a volume of storage or distribution
 medium does not bring the other program under the scope
 of these terms.
 \end{itemize}
- 
-This software is made available \textbf{as is}, and is distributed without 
+
+This software is made available \textbf{as is}, and is distributed without
 warranty of any kind, either expressed or implied.
 In no event will the author(s) or their institutions be liable to you
 for damages, including lost profits, lost monies, or other special,
 incidental or consequential damages arising out of or in connection
 with the use or inability to use (including but not limited to loss of
 data or data being rendered inaccurate or losses sustained by third
-parties or a failure of the program to operate as documented) the 
+parties or a failure of the program to operate as documented) the
 program, even if you have been advised of the possibility of such
 damages, or for any claim by any other party, whether in an action of
 contract, negligence, or other tortious action.
 
 \index{copyright}
-The \latextohtml{} translator is written by Nikos Drakos, 
+The \latextohtml{} translator is written by Nikos Drakos,
 Computer Based Learning Unit,  University of Leeds,  Leeds,  LS2 9JT.
 Copyright \copyright 1993, 1994, 1995. All rights reserved.
- 
+
 \section{Credits}
 Several people have contributed suggestions, ideas, solutions, support
 and encouragement. Some of these are Roderick Williams, Ana Maria
@@ -706,22 +706,22 @@ The idea of splitting \LaTeX\  files
 into more than one components linked with hyperlinks was first
 implemented in Perl by Toni Lantunen at CERN.
 Thanks to Robert Cailliau \Email{cailliau@cernnext.cern.ch}
-of the WorldWide Web Project also at CERN 
+of the WorldWide Web Project also at CERN
 for giving me access to the source code and documentation (although no
 part of the original design or the actual code has been used).
 
 Robert S. Thau \Email{rst@edu.mit.ai} has contributed the new version of
-\fn{texexpand}. Also, in order to translate the \emph{document 
+\fn{texexpand}. Also, in order to translate the \emph{document
 from hell} (!!!) he has extended the translator to handle \texttt{def}
 commands, nested math-mode commands, and has fixed several bugs.
 
-The \fn{pstogif} script 
+The \fn{pstogif} script
 uses the \fn{pstoppm.ps} postscript program originally written by
-Phillip Conrad (Perfect Byte, Inc.) and modified by L. Peter Deutsch 
+Phillip Conrad (Perfect Byte, Inc.) and modified by L. Peter Deutsch
 (Aladdin Enterprises).
 
 The idea of using existing symbolic labels to provide cross-references
-between documents was first conceived during discussions with 
+between documents was first conceived during discussions with
 Roderick Williams \Email{rodw@cbl.leeds.ac.uk}.
 Eric Carroll \Email{eric@ca.utoronto.utcc.enfm} suggested providing
 a command like \texttt{hyperref}. Franz Vojik
@@ -731,16 +731,16 @@ The \texttt{-auto\_navigation} option was based on an idea by
 Todd \texttt{<little@com.dec.enet.nuts2u>}.
 Axel Belinfante \texttt{<Axel.Belinfante@cs.utwente.nl>} provided the
 code in the \fn{makeidx.perl} file as well as numerous suggestions
-and bug reports. 
+and bug reports.
 
-Verena Umar \Email{verena@edu.vanderbilt.cas.compsci} 
+Verena Umar \Email{verena@edu.vanderbilt.cas.compsci}
 (\htmladdnormallink{Computer Science
 Education Project}{http://csep1.phy.ornl.gov/csep.html}) has been a very
 patient tester of some early versions of \latextohtml{}
-and many of the current features are a result of her 
-suggestions. 
+and many of the current features are a result of her
+suggestions.
 
-Thanks to (thanks to Ian Foster 
+Thanks to (thanks to Ian Foster
 \Email{itf@mcs.anl.gov} and Bob Olson \Email{olson@mcs.anl.gov}) at the
 Argonne National Labs for setting up the
 \htmladdnormallinkfoot{\latextohtml{} mailing list}{http://cbl.leeds.ac.uk/nikos/tex2html/doc/mail/mail.html}.
@@ -748,13 +748,13 @@ Argonne National Labs for setting up the
 \begin{changebar}
 Special credit is due Marcus Hennecke \Email{marcush@crc.ricoh.com}
 for his many extensive revisions, Mark Noworolski
-\Email{jmn@eecs.berkeley.edu} for coordinating V 95.3, 
+\Email{jmn@eecs.berkeley.edu} for coordinating V 95.3,
 Sidik Isani \Email{isani@cfht.hawaii.edu}, for his improvement
 in GIF quality, and to Herb Swan \Email{dprhws@edp.Arco.com} for
 coordinating V 96.1 of \latextohtml.
 \end{changebar}
 
-Many others, too many to mention, 
+Many others, too many to mention,
 have contributed bug reports, fixes, and other suggestions. Keep them coming!
 
 
@@ -763,7 +763,7 @@ The \htmladdnormallink{previous versions of the
 translator and some patches}{http://cbl.leeds.ac.uk/nikos/tex2html/previous-versions}
 are available. A \htmladdnormallink{detailed list of changes}
 {http://cbl.leeds.ac.uk/nikos/tex2html/doc/Changes.txt}
-which includes full credits to all who have contributed 
+which includes full credits to all who have contributed
 bug fixes or other code is also available with the
 \latextohtml{} distribution in the file \fn{Changes}.
 
@@ -785,7 +785,7 @@ more suitable to screen viewing.  Ideally, this should be done
 by setting the \texttt{mode} switch to \texttt{dvips}, but unfortunately
 not all version of \texttt{dvips} support this option.  For those
 that don't, a \fn{.dvipsrc} file is supplied with this distribution.
-Sidik Isani (\Email{isani@cfht.hawaii.edu}) provided this 
+Sidik Isani (\Email{isani@cfht.hawaii.edu}) provided this
 change.
 
 \item[Improved support for active image maps]
@@ -848,14 +848,14 @@ provided by Herb Swan:
 (It is the same as the \texttt{description} environment in the paper version.)
 
 \item[heqn] Redefines the \texttt{equation} environment so that
-equation numbers are handled in \texttt{HTML}.  This causes 
+equation numbers are handled in \texttt{HTML}.  This causes
 equations in this environment to be recyclable.  It also causes
 equation arrays to be recyclable if their equation numbers do not
 change from the previous run.
 \item[floatfig] Provides support for this environment by making it
 look like an ordinary figure in the electronic version.
 \item[wrapfig] (Same comment as for \texttt{floatfig}).
-\item[graphics] Defines elements of the standard \LaTeX 2e 
+\item[graphics] Defines elements of the standard \LaTeX 2e
 \texttt{graphics} package.
 \end{htmllist}
 
@@ -917,7 +917,7 @@ to the path of \LaTeX\ style files that \latextohtml{} should interpret.
 \item The default output file prefix.
 \end{enumerate}
 \item Fixed up comment removal code to remove all comments during preprocessing.
-\item Make \texttt{\$LATEX2HTMLSTYLES} a path list (and support `\~{}' as 
+\item Make \texttt{\$LATEX2HTMLSTYLES} a path list (and support `\~{}' as
 a way of specifying the home directory).
 \item Replace double dashes with a single dash.
 \item Removed extraneous spaces in comma separated citations.
@@ -953,14 +953,14 @@ style files to add new types of cross\-ref\-eren\-ces.
 \end{itemize}
 \end{htmllist}
 \end{changebar}
- 
+
 \subsection{Changes up to v95}
 \begin{htmllist}
 \htmlitemmark{RedBall}
 \item[\textbf{Much improved inlined equation baseline alignment!}]
 (Thanks to Mark Segal \Email{segal@spud.asd.sgi.com})
-Inlined equation bitmaps are now aligned correctly depending 
-on whether they contain subscripts, superscripts etc. 
+Inlined equation bitmaps are now aligned correctly depending
+on whether they contain subscripts, superscripts etc.
 \item[\textbf{Support for internationalization}]
 (Thanks to Martin Boyer \Email{gamin@ireq-robot.hydro.qc.ca})
 A global variable \texttt{LANGUAGE\_TITLES} can now be used to change the
@@ -975,14 +975,14 @@ process.
 This has been achieved by spawning off separate Unix processes to deal
 with each of the \texttt{input}'ed or \texttt{include}'d files. As each
 process
-terminates all the space that it used is reclaimed. 
-Asynchronous communication between processes takes place using 
-the Unix DataBase Management system (DBM or NDBM) 
+terminates all the space that it used is reclaimed.
+Asynchronous communication between processes takes place using
+the Unix DataBase Management system (DBM or NDBM)
 which should be present
 on your system.
 
-\textbf{To take advantage of these changes}, 
-it is necessary to split the source text 
+\textbf{To take advantage of these changes},
+it is necessary to split the source text
 into more than one files which can be assembled using the \LaTeX
 \texttt{input} or \texttt{include} commands.
 
@@ -990,9 +990,9 @@ into more than one files which can be assembled using the \LaTeX
 \item[\textbf{``Off-line'' Image Generation}]
 
 Two new options \texttt{-no\_images} and \texttt{ -images\_only} allow
-``off-line'' image conversion. The advantage of using these options is 
+``off-line'' image conversion. The advantage of using these options is
 that the translation can be allowed to finish even when there are
-problems with image conversion. In addition it may be possible to 
+problems with image conversion. In addition it may be possible to
 fix manually any image conversion problems and then run \latextohtml{}
 again just to integrate the new images without having to translate
 the rest of the text. More instructions on how to do this are
@@ -1001,10 +1001,10 @@ manual.
 
 Can now use either the \fn{pbmplus} or the \fn{netpbm} libary.
 If \fn{netpbm} is used then it is no longer necessary to get and
-install \fn{giftrans} in order to generate transparent inlined 
+install \fn{giftrans} in order to generate transparent inlined
 images.
 
-Also, a new option \texttt{map=\Meta{image map URL}} in the 
+Also, a new option \texttt{map=\Meta{image map URL}} in the
 command \texttt{htmlimage} can turn an included postscript image into an active
 image map.
 
@@ -1012,18 +1012,18 @@ image map.
 \begin{htmllist}
 \htmlitemmark{OrangeBall}
 \item [-no\_images]
-Do not attempt to produce any inlined images. 
+Do not attempt to produce any inlined images.
 The missing images can be generated "off-line" by restarting \latextohtml{}
 with the option \texttt{-images\_only}.
 \item [-images\_only]
 Try and convert any inlined images that were left over from previous
-runs of \latextohtml. 
+runs of \latextohtml.
 \item [-no\_reuse]
 Do \textbf{not} reuse images generated during previous translations.
 (This will enable the initial interactive session during which the user is
 asked whether to reuse the old directory, delete its contents or quit)
 \item [-no\_subdir]
-Place the generated HTML files  in the 
+Place the generated HTML files  in the
 current directory. The default behaviour is to create (or reuse)
 another file directory.
 \item [-ps\_images]
@@ -1040,11 +1040,11 @@ is now treated as a separate section.
 \item  Fixed to resolve figure and table numbers when captions contain
 accented characters.
 \item Added support for hierarchical indices with duplicate index keys
-\item Fixed problem with HTML encodings of ISO-LATIN1 characters   
+\item Fixed problem with HTML encodings of ISO-LATIN1 characters
 creeping into converted images of figures and tables.
 \item  Added new global variable \texttt{PAPERSIZE}
 to make it easier to change the default behavior when converting large images
-\item A new configuration variable (\texttt{TRANSPARENT\_IMAGES}) can be 
+\item A new configuration variable (\texttt{TRANSPARENT\_IMAGES}) can be
 used to stop any inlined images generated from "figure" environments
 from being transparent.
 \item Fixed problem which occurs when \fn{getcwd.pl} is not part of the
@@ -1076,29 +1076,29 @@ and pixel density.
 \item LaTeX \texttt{figure} and other environments are now processed
 in 24-bit color.
 \item Figure and table captions are now converted into HTML
-rather than becoming part of the inlined image. This means that 
+rather than becoming part of the inlined image. This means that
 any cross-references in the captions will become active.
 \item It is now possible to control for each generated image:
 \begin{itemize}
-\item its size 
+\item its size
 \item whether it should be inlined or left as an external image
 \item if left as an external image whether it should be accessible
 via a \htmlref{\textbf{generated thumbnail sketch}}{fig:example}
 or a textual hypertext link
 \end{itemize}
 These options are available from a new LaTeX command defined in {\fn
-html.sty} called \fn{htmlimage}. 
+html.sty} called \fn{htmlimage}.
 
 \item Equations and other inlined images are converted into
-transparent GIFs rather than XBMs. \textbf{This makes it possible 
+transparent GIFs rather than XBMs. \textbf{This makes it possible
 to reduced their storage requirements to about 1/6th of what was
 previously required!}
-\item The default size of equations and other small inlined 
+\item The default size of equations and other small inlined
 images can be changed
 by setting the variable \texttt{MATH\_SCALE\_FACTOR} in the
 configuration files.
 \item The default size of figures, tables, and other large
-inlined images can be changed by setting the variable 
+inlined images can be changed by setting the variable
 \texttt{FIGURE\_SCALE\_FACTOR} in the
 configuration files.
 
@@ -1112,7 +1112,7 @@ from invoking \texttt{METAFONT}.
 during conversion. \textbf{The impact of these changes can be very
 significant}.
 In particular, files
-containing large numbers of LaTeX commands (eg \fn{.aux} or \texttt{.bib}) 
+containing large numbers of LaTeX commands (eg \fn{.aux} or \texttt{.bib})
 files are handled much better.
 \end{itemize}
 
@@ -1121,10 +1121,10 @@ files are handled much better.
 \item The option \texttt{-allbitmaps} has been removed. This is no
 longer necessary as \latextohtml{} can now generate transparent
 GIF images.
-\item The definition of the command \texttt{htmladdnormallink} in the 
+\item The definition of the command \texttt{htmladdnormallink} in the
 file \fn{html.sty} has changed and the URL will no longer appear
 as a footnote in the paper (DVI) version. The translation of
-this command into HTML is \textbf{not} affected. 
+this command into HTML is \textbf{not} affected.
 
 The previous functionality can be obtained with a new command
 \texttt{htmladdnormallinkfoot} which will add the URL as a footnote
@@ -1138,12 +1138,12 @@ used.
 \begin{itemize}
 \item The \fn{install-test} script now recognizes version
 numbers correctly and gives better warnings. It also makes
-executable any scripts that need to be so. 
+executable any scripts that need to be so.
 \item Stopped using the \texttt{nslookup} program to try and guess
-e-mail addresses (they were used in signing each generated page). 
-This has been replaced with a simple call 
+e-mail addresses (they were used in signing each generated page).
+This has been replaced with a simple call
 to \texttt{finger}.
-\item Fixed problem which could cause ``Parameter overflow'' in 
+\item Fixed problem which could cause ``Parameter overflow'' in
 TeX during image conversion.
 \item The \fn{texexpand} script has been changed extensively.
 Some nasty looping problems are now avoided, and the tracking
@@ -1160,7 +1160,7 @@ is used (thanks to Brian  Toonen \Email{toonen@mcs.anl.gov}).
 caused the wrong ``hyperized'' text to appear in the final document.
 \item \texttt{item} optional arguments can now contain one level of
 nesting eg \texttt{item[[First Choice]]}.
-\item Fixed problems with the ``image caching and reuse'' mechanism 
+\item Fixed problems with the ``image caching and reuse'' mechanism
 which avoids converting images unnecessarily..
 \end{itemize}
 
@@ -1170,13 +1170,13 @@ which avoids converting images unnecessarily..
 by \htmladdnormallinkfoot{indexing scripts}
 {http://www.ai.mit.edu/tools/site-index.html}
  which generate information for the \htmladdnormallinkfoot{ALIWEB}
-{http://web.nexor.co.uk/aliweb/bin/aliwebsimple.pl} 
+{http://web.nexor.co.uk/aliweb/bin/aliwebsimple.pl}
 search and retrieval tool. The information in the \HTML{meta} tags
 contains
-the title of each separate HTML file. 
+the title of each separate HTML file.
 \item A new configuration variable \texttt{DEBUG} can be used to preserve
-intermediate files for debugging. 
-\item Some problems with respect to compatibility with the HTML2.0 
+intermediate files for debugging.
+\item Some problems with respect to compatibility with the HTML2.0
 standard have been addressed. No more ``unquoted attribute value literals''.
 \item All the navigation icons are now ``lynx friendly''; their
 \texttt{ALT} attribute now has a meaningful value.
@@ -1184,9 +1184,9 @@ standard have been addressed. No more ``unquoted attribute value literals''.
 to create hypertext links intended only for the HTML version of
 the document.
 \item \fn{DVIPSK} is now recognized by the installation script
-\item Added support for the \fn{changebar.sty} file by 
+\item Added support for the \fn{changebar.sty} file by
 David B. Johnson (dbj@titan.rice.edu).
-\item It is no longer necessary to add style file names into the 
+\item It is no longer necessary to add style file names into the
 \texttt{DONT\_INCLUDE} variable as \latextohtml{} now does not
 attempt to translate file included files ending in \texttt{.sty}.
 \item The small invisible bitmaps that used to mark anchors have been
@@ -1201,7 +1201,7 @@ other default configuration files.
 are named \fn{nodeN.html} where \fn{N} is an integer. Also, the file
 containing
 the footnotes is now called \fn{footnode.html}.
-\item A special extension to \latextohtml{} for those who use the 
+\item A special extension to \latextohtml{} for those who use the
 Harvard style for references can be obtained from
 \htmladdnormallink{http://www.arch.su.edu.au/\~{}peterw/latex/harvard/}{http://www.arch.su.edu.au/\~{}peterw/latex/harvard/}.
 \end{itemize}
@@ -1210,7 +1210,7 @@ Harvard style for references can be obtained from
 
 \subsection{Changes upto v0.5.3}
 \begin{itemize}
-\item The files \fn{LATEX2HTMLDIR/styles/german.perl} and 
+\item The files \fn{LATEX2HTMLDIR/styles/german.perl} and
 \fn{LATEX2HTMLDIR/styles/makeidx.perl} have been fixed
 so that they are consistent with changes in the main script.
 \item A problem with disappearing spaces after some equations
@@ -1244,21 +1244,21 @@ in \fn{german.sty} are translated to equivalent ISO-LATIN-1
 characters when that is possible (partly thanks to code supplied
 by Franz Vojik \Email{vojik@de.tu-muenchen.informatik}).
 \item[\textbf{Auto-loading of Style-Specific Code}]
-The translator now supports a 
+The translator now supports a
 \hyperref{mechanism for including Perl code extensions}{mechanism for
 including Perl code extensions (see Section }{)}{sec:sty}
-which are specific to particular style files. 
+which are specific to particular style files.
 
 
 This mechanism will help to keep the core script smaller as well as make
-it easier for others to contribute and share solutions on  
+it easier for others to contribute and share solutions on
 how to translate specific style files. The current distribution includes the files
 \fn{german.perl}, \fn{french.perl}, \fn{html.perl} and \fn{makeidx.perl}.
 \item[\textbf{Installation and Testing}]
 To make it easier to install the translator for more than one user
 there is now a configuration file ({\fn
-LATEX2HTMLDIR/latex2html.config}) which contains installation specific 
-information and default values for the various options. 
+LATEX2HTMLDIR/latex2html.config}) which contains installation specific
+information and default values for the various options.
 This makes it unnecessary to have a \fn{HOME/.latex2html-init} for
 each user.
 If a user does have a  \fn{HOME/.latex2html-init} then this will be
@@ -1278,12 +1278,12 @@ appears in each page
 \item a link to the next ``logical'' page (this allows reading each
 page in the same order as with a paper-based version - as opposed to
 structure navigation)
-\item a link to the previous ``logical'' page 
+\item a link to the previous ``logical'' page
 \item a link to the table of contents
-\item a link to the index 
+\item a link to the index
 \end{itemize}
 \item[\textbf{HTML Style File Extensions}]
-The HTML style file \fn{html.sty} now includes definitions of new 
+The HTML style file \fn{html.sty} now includes definitions of new
 environments for:
 \begin{htmllist}
 \htmlitemmark{OrangeBall}
@@ -1300,7 +1300,7 @@ document.
 \item[Conditional Text]
 The new environments \texttt{latexonly} and \texttt{htmlonly} allow their
 contents to appear only in final DVI or in the HTML version of a
-document respectively. 
+document respectively.
 
 A new command \texttt{hyperref} can be used to specify the way in
 which cross-references should be shown in the DVI version and the
@@ -1315,22 +1315,22 @@ set in the configuration file using the variable \texttt{LINE\_WIDTH}.
 All inlined images are now generated by calling \texttt{latex} and {\fn
 dvips} only once
 at the end of the conversion process (but each generated image still
-has to be filtered individually). Also, a warning is given if an 
+has to be filtered individually). Also, a warning is given if an
 image cannot be converted.
 \item[\textbf{Numeric Labels}]
 The original (LaTeX generated) numeric labels are used instead of
 the arrow navigation icon for cross-references where possible.
-To do this the translator uses the information in the 
+To do this the translator uses the information in the
 \fn{aux} file which is generated by \LaTeX. If the \fn{aux} file
 is out of date a warning is given.
 \item[\textbf{New Options}] \hfill
 \begin{htmllist}
 \htmlitemmark{RedBall}
 \item[\texttt{-auto\_navigation}]
-This puts a navigation panel 
+This puts a navigation panel
 at the top of each page as usual. But if the page exceeds a
-user-settable  
-number of words (the default is 450 words) 
+user-settable
+number of words (the default is 450 words)
 then a navigation panel is also placed at the end of
 the page. This option is active by default.
 \item[\texttt{-index\_in\_navigation}]
@@ -1346,21 +1346,21 @@ This puts a navigation panel at the bottom of each page.
 \item[\texttt{-top\_navigation}]
 This puts a navigation panel at the top of each page (the default).
 \item[\texttt{-show\_section\_numbers}]
-This allows each section (page) title to be numbered in the same 
-way that it would be numbered by \LaTeX. This requires 
-an up to date \fn{aux} file (generated by running \LaTeX) and that 
-each title is unique. If the \fn{aux} file is not up to date then a 
+This allows each section (page) title to be numbered in the same
+way that it would be numbered by \LaTeX. This requires
+an up to date \fn{aux} file (generated by running \LaTeX) and that
+each title is unique. If the \fn{aux} file is not up to date then a
 warning is given.
-Unfortunately if 
+Unfortunately if
 the title contains inlined images the numbering for that title will
-be lost. 
+be lost.
 \item[\texttt{-reuse}]
 This allows images generated during previous invocations of
-the translator to be ``reused'' without going through the initial 
+the translator to be ``reused'' without going through the initial
 interactive session. The same behavior is obtained by setting
 the variable \texttt{REUSE} to 1 (the default) in the configuration file.
 Note that images which may depend on contextual information (e.g. numerical
-labels) cannot be reused and are always re-generated. 
+labels) cannot be reused and are always re-generated.
 \end{htmllist}
 \item[\textbf{Bug Fixes and Minor Changes}] \hfill
 \begin{itemize}
@@ -1368,9 +1368,9 @@ labels) cannot be reused and are always re-generated.
 the option \texttt{-split 0}) is now working as expected.
 \item Newlines are translated to the \HTML{BR} tag.
 \item Fixed some problems in dealing with new command macros.
-\item \fn{texexpand} now respects commented \texttt{input} and 
+\item \fn{texexpand} now respects commented \texttt{input} and
 \texttt{include} commands. Also (thanks to Franz Vojik
-\Email{vojik@de.tu-muenchen.informatik}), it 
+\Email{vojik@de.tu-muenchen.informatik}), it
 now looks in subdirectories when expanding
 files.
 \item The ALIGN attribute of inlined images is now BOTTOM instead of
@@ -1381,7 +1381,7 @@ list environments.
 \end{itemize}
 \end{htmllist}
 
-More details on all the changes are available in the file 
+More details on all the changes are available in the file
 \fn{LATEX2HTMLDIR/Changes}.
 
 \subsection{Changes upto v0.3.1}
@@ -1390,11 +1390,11 @@ These changes are mostly due to patches contributed by Robert S. Thau
 \begin{itemize}
 \item Nested environments with the same name are now dealt with
 properly.
-\item Commands that are passed to LaTeX for processing which have 
-environments in their arguments (e.g. a \texttt{parbox} command which 
+\item Commands that are passed to LaTeX for processing which have
+environments in their arguments (e.g. a \texttt{parbox} command which
 an \texttt{itemize} environment as an argument) are now
-processed correctly. A general mechanism for users to 
-specify the syntax of commands that should be passed to LaTeX 
+processed correctly. A general mechanism for users to
+specify the syntax of commands that should be passed to LaTeX
 is described in Page \pageref{pass}.
 \item Fixed a problem with recognizing the \texttt{special} command.
 \item Fixed bug in the generation of the index.
@@ -1412,42 +1412,42 @@ This offers tremendous improvements in speed after an initial
 successful translation.
 
 \item [\textbf{Cross-References Between (Local or Remote) Documents}]
-Cross-references between 
+Cross-references between
 two or more documents (possibly on remote locations) can be
 established via symbolic labels
-which are independent of the physical realization of these documents. 
+which are independent of the physical realization of these documents.
 
 Such cross-references will be maintained with a simple
 re-translation\footnote{This is true for documents under the same
-server but for remote documents a little more is required (see 
+server but for remote documents a little more is required (see
 the \hyperref{example}{example in Section}{}{crossrefs})}
 even after one or more of the documents have been broken into
 different physical parts or moved.
 
-The mechanism is based on the 
+The mechanism is based on the
 \hyperref{new commands}{new commands (see Section }{ )}{external}
-\texttt{externallabels} and \texttt{externalref} which are an extension of the simple 
-\texttt{label-ref} pairs. 
+\texttt{externallabels} and \texttt{externalref} which are an extension of the simple
+\texttt{label-ref} pairs.
 
 \item [\textbf{New Options}] \hfill
 \begin{htmllist}
 \htmlitemmark{GreenBall}
 \item [\texttt{external\_images}] This provides hypertext links to where
 generated images (for equations, tables, figures etc) are stored
-externally. (The default is to ``inline'' generated images in the main body 
+externally. (The default is to ``inline'' generated images in the main body
 of the text.)
 \item [\texttt{ascii\_mode}] This switches all the navigation icons to their
-ascii equivalents. Also generated images are stored externally as with the 
+ascii equivalents. Also generated images are stored externally as with the
 \texttt{external\_images} option above. The \texttt{ascii\_mode} option
 makes documents more portable as it allows them to be
 viewed on browsers that do not support inlined images.
 \end{htmllist}
-\item [\textbf{Special Command Style File}] A style file \htmladdnormallink{\fn{html.sty}} 
+\item [\textbf{Special Command Style File}] A style file \htmladdnormallink{\fn{html.sty}}
 {http://cbl.leeds.ac.uk/nikos/tex2html/doc/html.sty.txt} is now included in the
-distribution. This contains the definitions (syntax) of some 
+distribution. This contains the definitions (syntax) of some
 special LaTeX commands mainly for providing external hypertext
 links.
-This should be included in LaTeX files that use the any 
+This should be included in LaTeX files that use the any
 \hyperref{hypermedia extensions}{hypermedia extensions (see Section}{ )}{special}.
 
 \item [\textbf{Minor Changes and Bug Fixes}] \hfill
@@ -1463,9 +1463,9 @@ headings.
   HTML tag (\HTML{HEAD}),
 \item The appearance of footnotes has been improved.
 \item Some inconsistencies in the \fn{pstoxbm} and \fn{pstogif}
- scripts have been fixed.  
+ scripts have been fixed.
 \item Parts of the documentation have been rewritten, restructured and
-some new sections have been added. 
+some new sections have been added.
 \end{itemize}
 \end{htmllist}
 
@@ -1475,20 +1475,20 @@ some new sections have been added.
 \begin{htmllist}
 \htmlitemmark{WhiteBall}
 \item [\textbf{New Texexpand}]
-This fixes problems with the standard version and 
-handles the inclusion of style files which need to processed by the 
-translator. Appropriate modifications to the main script were also 
-made to work with new version of \fn{texexpand}. 
+This fixes problems with the standard version and
+handles the inclusion of style files which need to processed by the
+translator. Appropriate modifications to the main script were also
+made to work with new version of \fn{texexpand}.
 
 \item [\textbf{Handling of Raw \TeX}]
-Added support for simple raw TeX commands such as  
+Added support for simple raw TeX commands such as
 \texttt{special} and simple instances of \texttt{def}\footnote{Where
-``simple'' is defined roughly 
-as ``they could have used \texttt{newcommand}, but didn't''.}. 
-For the messier cases, 
-the definition is scooped up and moved to the preamble.  This allows 
+``simple'' is defined roughly
+as ``they could have used \texttt{newcommand}, but didn't''.}.
+For the messier cases,
+the definition is scooped up and moved to the preamble.  This allows
 the translator to handle the simple, but nonstandard, postscript figure inclusion
-macros as well as an awful lot of other stuff done with gratuitous 
+macros as well as an awful lot of other stuff done with gratuitous
 \texttt{defs}.
 \item [\textbf{More Options}] \hfill
 \begin{htmllist}
@@ -1498,10 +1498,10 @@ This can be used  to specify style files that
 should not be included in the translation.
 \end{htmllist}
 \item [\textbf{Other Changes}] \hfill
-\begin{itemize} 
+\begin{itemize}
 \item Added support for nested math mode expressions and general
 list environments in order to handle \emph{the document from Hell!!!}.
-\item Fixed problems in the translation of 
+\item Fixed problems in the translation of
 bibitems, the substitution of macro definitions, and the processing of
 unrecognized commands in the preamble.
 \end{itemize}
@@ -1518,9 +1518,9 @@ in a page and the child links from that page.
 the same as that of the navigation icons.
 \item The arguments of \texttt{verbatim} environments are now translated
 into fixed width fonts.
-\item A warning is given if a \texttt{bbl} (bibliography) file is 
+\item A warning is given if a \texttt{bbl} (bibliography) file is
 needed but not found.
-\item The installation is now (mostly) done by setting variables in 
+\item The installation is now (mostly) done by setting variables in
 just one file.
 \item The \fn{pstoxbm} script now uses environment variables
 set in the initialization file.
@@ -1529,7 +1529,7 @@ set in the initialization file.
 \item Fixed bug in the handling of the \verb|$$|-form of the dislay
 math environment.
 \item Fixed bug in the handling of the *-forms of environments.
-\item Added sections on how to embed hyperlinks in a LaTeX document 
+\item Added sections on how to embed hyperlinks in a LaTeX document
 (see Page \pageref{sec:hyper}) and on how to extend the translator
 (see Page \pageref{sec:extend}) in the documentation.
 \end{itemize}
@@ -1542,6 +1542,6 @@ cannot tolerate them (e.g. \texttt{math}).
 from GIF to XBM. This looks better on grayscale and color monitors.
 \item Fixed problem with commands being passed on to LaTeX  after
 their
-arguments had been translated (this affects the commands 
+arguments had been translated (this affects the commands
 \texttt{psfig}, \texttt{fbox}, \texttt{framebox}, and \texttt{parbox}).
 \end{itemize}

@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -27,7 +27,7 @@
 Images observed using the Wide Field Camera instrument
 on the Isaac Newton Telescope contain nonlinear optical distortions.
 This note gives a quantitative description of these distortions.
-It also explains how they can be corrected for easily using 
+It also explains how they can be corrected for easily using
 the \xref{CCDPACK}{sun139}{} package.
 }
 % ? End of document identification
@@ -88,7 +88,7 @@ the \xref{CCDPACK}{sun139}{} package.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -266,12 +266,12 @@ the \xref{CCDPACK}{sun139}{} package.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -317,15 +317,15 @@ the \xref{CCDPACK}{sun139}{} package.
 
 \section{Astrometric calibration for INT Wide Field Camera images}
 
-The Wide Field Camera instrument on the Isaac Newton Telescope 
-contains four CCD chips of 2048 $\times$ 4096 pixels 
-positioned roughly, but not exactly, as shown in 
+The Wide Field Camera instrument on the Isaac Newton Telescope
+contains four CCD chips of 2048 $\times$ 4096 pixels
+positioned roughly, but not exactly, as shown in
 figure~\ref{fig:ideal}.
 
 \myfig{ideal.eps}{}{ideal.gif}{fig:ideal}{Idealised arrangement of WFC CCDs}
 
 In order to do accurate astrometry with data obtained
-from this instrument, it is necessary to correct for the 
+from this instrument, it is necessary to correct for the
 exact orientation and position of each CCD in relation to
 the others, as well as for nonlinear distortions
 away from the optical axis of the focal plane introduced by
@@ -338,37 +338,37 @@ transformation, which has the form
 
 The following transformations take account of both these effects
 to map the pixel coordinates $(x_i, y_i)$
-of CCD\#$i$ into a new pixel-like coordinate system 
+of CCD\#$i$ into a new pixel-like coordinate system
 $(x', y')$
 of uniform scale, which is the same for all four CCDs.
 The origin of this coordinate system is at pixel coordinates
 $(1778, 3029)$ of CCD\#4, which is taken to be on the optical axis.
 At this point, one unit of the new coordinate system is equivalent
-to one pixel of the CCD\#4 system, so that the new coordinates 
+to one pixel of the CCD\#4 system, so that the new coordinates
 are almost equivalent to CCD\#4 coordinates, although they diverge
 away from the origin thanks to the nonlinear distortion.
-Each unit of the new coordinates has the same size, 
+Each unit of the new coordinates has the same size,
 which is approximately 0.333 arcsec.
 
-The corrected coordinates $(x', y')$ are obtained from 
+The corrected coordinates $(x', y')$ are obtained from
 each set of pixel coordinates $(x_i, y_i)$
 by first translating so that the origin is on the optical
-axis, then rotating to the correct angle, 
+axis, then rotating to the correct angle,
 then correcting for the radial distortion effect:
 \begin{eqnarray*}
   x_i^{\rm shift} & = & x_i - X_i \\
   y_i^{\rm shift} & = & y_i - Y_i \\[1ex]
 %
-  x_i^{\rm rot}   & = & x_i^{\rm shift} \cos \theta_i 
+  x_i^{\rm rot}   & = & x_i^{\rm shift} \cos \theta_i
                       - y_i^{\rm shift} \sin \theta_i  \\
-  y_i^{\rm rot}   & = & x_i^{\rm shift} \sin \theta_i 
+  y_i^{\rm rot}   & = & x_i^{\rm shift} \sin \theta_i
                       + y_i^{\rm shift} \cos \theta_i  \\[1ex]
 %
-  x'              & = & x_i^{\rm rot} 
-                        \left( 1 + D \left[ \left. x_i^{\rm rot} \right.^2 
+  x'              & = & x_i^{\rm rot}
+                        \left( 1 + D \left[ \left. x_i^{\rm rot} \right.^2
                                           + \left. y_i^{\rm rot} \right.^2
                                      \right] \right)  \\
-  y'              & = & y_i^{\rm rot} 
+  y'              & = & y_i^{\rm rot}
                         \left( 1 + D \left[ \left. x_i^{\rm rot} \right.^2
                                           + \left. y_i^{\rm rot} \right.^2
                                      \right] \right)
@@ -381,9 +381,9 @@ and $D$ is the pincushion distortion coefficient.
 Values for these coefficients have been obtained by registering
 two exposures of the same region of sky, in which the instrument
 had been rotated by 180$^\circ$ between exposures.
-The value of $(X_4, Y_4)$ was taken from the value used 
-for the 
-\htmladdnormallink{Wide Field Survey}{http://www.ast.cam.ac.uk/~wfcsur/astrometry.html} 
+The value of $(X_4, Y_4)$ was taken from the value used
+for the
+\htmladdnormallink{Wide Field Survey}{http://www.ast.cam.ac.uk/~wfcsur/astrometry.html}
 data, and $\theta_4$ was chosen to be zero.
 The values of the coefficients in these equations are approximately:
 \begin{displaymath}
@@ -391,26 +391,26 @@ The values of the coefficients in these equations are approximately:
      X_1 & -336.74  &  Y_1 & 3039.14  &  \theta_1 &   0.01868^\circ  \\
      X_2 & 3180.68  &  Y_2 & 1729.67  &  \theta_2 & -90.62115^\circ  \\
      X_3 & 3876.73  &  Y_3 & 2996.30  &  \theta_3 &   0.11436^\circ  \\
-     X_4 & 1778.00  &  Y_4 & 3029.00  &  \theta_4 &   0.00000^\circ  
+     X_4 & 1778.00  &  Y_4 & 3029.00  &  \theta_4 &   0.00000^\circ
   \end{array}
 \end{displaymath}
 and
 \begin{displaymath}
      D = -5.30 \times 10^{-10} {\rm pixel}^{-2}
 \end{displaymath}
-This value of $D$ corresponds in units of radians to 
-\latexhtml{$-203\,{\rm rad}^{-2}$}{-203 rad$^{-2}$}, 
-compared to the value 
+This value of $D$ corresponds in units of radians to
+\latexhtml{$-203\,{\rm rad}^{-2}$}{-203 rad$^{-2}$},
+compared to the value
 \latexhtml{$-259.8\,{\rm rad}^{-2}$}{-259.8 rad$^{-2}$}
 quoted in the ING observer handbook.
 
 These values of the coefficients are thought to be correct to an
 accuracy of 1 or 2 pixels, which is around half an arcsecond.
 
-Figure~\ref{fig:exag} gives an exaggerated representation of the 
+Figure~\ref{fig:exag} gives an exaggerated representation of the
 shapes and positions of the CCDs as mapped on to the new coordinate system.
 
-\myfig{exag4.eps}{}{exag4.gif}{fig:exag}{Exagerrated view of the 
+\myfig{exag4.eps}{}{exag4.gif}{fig:exag}{Exagerrated view of the
 actual arrangement of the CCDs.  The dots in the corners mark the
 pixel origin for each CCD and the ``$\times$'' marks the origin of
 the unified coordinate system.}
@@ -420,33 +420,33 @@ the unified coordinate system.}
 
 For users of Starlink software,
 the calibrated coordinate information can be attached automatically
-to image files using the 
-\htmladdnormallink{ASTIMP}{http://capc23.ast.cam.ac.uk/star/local/docs/sun139.htx/node70.html#xref_ASTIMP} 
+to image files using the
+\htmladdnormallink{ASTIMP}{http://capc23.ast.cam.ac.uk/star/local/docs/sun139.htx/node70.html#xref_ASTIMP}
 command, and the file {\tt INT-WFC.ast}.
-This file is distributed in the CCDPACK package 
+This file is distributed in the CCDPACK package
 (in directory {\tt \$CCDPACK\_DIR}, or {\tt bin/ccdpack}).
 
 To use this facility,
-it is best if the files are first converted to Starlink \xref{NDF}{sun33}{} 
+it is best if the files are first converted to Starlink \xref{NDF}{sun33}{}
 format using the \xref{CONVERT}{sun55}{} package as follows:
 \begin{myquote}
 \begin{verbatim}
 % convert
 
    CONVERT commands are now available -- (Version 1.5-4)
- 
+
    Defaults for automatic NDF conversion are set.
- 
+
    Type conhelp for help on CONVERT commands.
    Type "showme sun55" to browse the hypertext documentation.
- 
+
 % fits2ndf in='r10628?.fits' out='*' container=true
 \end{verbatim}
 \end{myquote}
-which will convert the FITS file {\tt r106280.fits} 
+which will convert the FITS file {\tt r106280.fits}
 into the NDF {\tt r106280.sdf} and so on.
 The Starlink software will in fact work with FITS files,
-but because it converts them on the fly between FITS and NDF formats 
+but because it converts them on the fly between FITS and NDF formats
 before and after each command,
 this can be rather slow with files the size of WFC frames.
 
@@ -454,10 +454,10 @@ Once the file is in Starlink NDF format,
 from the Unix C shell do the following:
 \begin{myquote}
 \begin{verbatim}
-% ccdpack 
+% ccdpack
 
    CCDPACK commands are now available -- (Version 4.0-16)
-   
+
   For help use the commands ccdhelp or ccdwww
 
 % astimp in='r10628?' astfile=$CCDPACK_DIR/INT-WFC.ast reset accept
@@ -496,7 +496,7 @@ from the Unix C shell do the following:
     New frame in domain "INT-WFC" added
 \end{verbatim}
 \end{myquote}
-This command sets the Current coordinate frame of the specified 
+This command sets the Current coordinate frame of the specified
 NDF files to the new coordinate system $(x',y')$ described above.
 As well as applying the linear and nonlinear geometry terms whose
 coefficients were given,
@@ -504,17 +504,17 @@ it also rotates the coordinates according to the value of the
 ROTSKYPA FITS header card, which records the orientation of the
 turntable when the observation was made;
 in this case it was oriented at 180$^\circ$.
-In this way, applying the {\tt INT-WFC.ast} file to any set of 
-image NDF files will result in them sharing coordinates which 
-are related by a simple shift in X and Y coordinates, 
-since the nonlinear optical distortions, 
+In this way, applying the {\tt INT-WFC.ast} file to any set of
+image NDF files will result in them sharing coordinates which
+are related by a simple shift in X and Y coordinates,
+since the nonlinear optical distortions,
 the exact positioning of the CCDs on the turntable,
 and the orientation of the turntable itself will have been
-accounted for. 
+accounted for.
 
 Once the new coordinate system has been attached to the images,
 then most Starlink applications will make use of this as appropriate.
-If you display any of the images using 
+If you display any of the images using
 \xref{KAPPA}{sun95}{}'s
 \xref{DISPLAY}{sun95}{DISPLAY}
 application, the axes will show the coordinates in the new frame
@@ -522,9 +522,9 @@ as in figure~\ref{fig:display}:
 \begin{myquote}
 \begin{verbatim}
 % kappa
- 
+
    KAPPA commands are now available -- (Version 0.13-7)
- 
+
    Type kaphelp for help on KAPPA commands
    Type "showme sun95" to browse the hypertext documentation
 
@@ -534,18 +534,18 @@ as in figure~\ref{fig:display}:
 
 \myfig{r106282-s8-display.eps}{}{r106282-display.gif}{fig:display}{Display
 of a single CCD image with coordinates grafted onto it using {\tt ASTIMP}.
-Close inspection will show that the grid is not quite parallel to the 
-sides of the image, or straight, 
+Close inspection will show that the grid is not quite parallel to the
+sides of the image, or straight,
 because of the slight rotation from the vertical and nonlinear distortion.}
 
-If some of the frames overlap, the corresponding X and Y 
-offsets can then easily be determined 
+If some of the frames overlap, the corresponding X and Y
+offsets can then easily be determined
 using CCDPACK's object matching registration facilities.
 
 
 \section{Acknowledgements}
 
-This calibration was done on Starlink time with assistance from 
+This calibration was done on Starlink time with assistance from
 Peter Draper and David Gilbank in Durham.
 
 % ? End of main text

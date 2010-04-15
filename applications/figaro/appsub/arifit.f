@@ -13,13 +13,13 @@ C     (>) CHANS    (Real array CHANS(NLID)) The centers of the
 C                  identified lines, in pixel numbers.
 C     (>) WAVES    (Real array WAVES(NLID)) The wavelengths of the
 C                  identified lines.
-C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (>) NLID     (Integer) The number of identified lines.
-C     (>) ORDER    (Integer) The number of parameters used for the 
+C     (>) ORDER    (Integer) The number of parameters used for the
 C                  fit. (Note: this is the usual meaning of 'order'
 C                  plus 1)
-C     (<) COEFFS   (Double precision array COEFFS(NC)) The 
+C     (<) COEFFS   (Double precision array COEFFS(NC)) The
 C                  coefficients of the final fit.
 C     (<) RMS      (Real) The RMS error from the fit, in the wavelength
 C                  units being used.

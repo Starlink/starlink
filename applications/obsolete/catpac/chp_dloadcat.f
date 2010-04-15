@@ -17,7 +17,7 @@
 *     Down load the information in the common area for a given catalogue
 *     into the appropriate files. The catalogue may be a Join Extension,
 *     a Search Extension a Plain Extension or a Regular catalogue.
-*     The approach adopted in this routine is to consider extension 
+*     The approach adopted in this routine is to consider extension
 *     catalogues first (CPnumext greater than 0). For these consider all
 *     the columns selecting only those with origin 0 (EPorig eq 0)
 *     because these belong to the extension. Write these to the
@@ -27,9 +27,9 @@
 *
 *     ***NOTE*** In this implementation we have assumed that the
 *     catalogues that have been extended are read only.
-*   
+*
 *     If this is not an extension catalogue consider all the columns.
-*     For virtual columns full details will have to be written to the 
+*     For virtual columns full details will have to be written to the
 *     additional information file, for real columns details excluding
 *     format, units, comments, type will have to be written.
 *
@@ -56,7 +56,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,7 +105,7 @@
       CHARACTER * ( 10 ) CHARNUM10
       LOGICAL EXTNOTFND
 
-*- 
+*-
 *
 *.
 
@@ -121,7 +121,7 @@
         call err_annul(status)
       endif
 *
-      call chp_openaddf(CPname(cd), 'WRITE', 'LIST', CHP__SZDREC, 
+      call chp_openaddf(CPname(cd), 'WRITE', 'LIST', CHP__SZDREC,
      :                   fdd, status)
 *
 *    Abort if failed to open file okay
@@ -161,7 +161,7 @@
 *    Non standard format flag.
 *    Non standard format.
 *    Column array type
-*            
+*
             call chr_fill(' ',Dbuf)
             Dbuf(CHP_S_KEY:CHP_E_KEY) = 'A'
             Dbuf(CHP_S_CNAME:CHP_E_CNAME) = EPname(cd,cc)
@@ -278,7 +278,7 @@
 *    Expression part.
 *
 *
-            if (EPvcflag(cd,cc)) then 
+            if (EPvcflag(cd,cc)) then
               Dbuf(CHP_S_KEY:CHP_E_KEY) = 'D'
               Dbuf(CHP_S_CNAME:CHP_E_CNAME) = EPname(cd,cc)
               Dbuf(CHP_S_CEXPCON:CHP_E_CEXPCON) = '1'
@@ -286,7 +286,7 @@
               call fio_write(fdd, Dbuf, status)
               call chr_fill(' ',Dbuf)
 *
-*   The column is a virtual column, varable length character string or 
+*   The column is a virtual column, varable length character string or
 *   a variable length array .
 *   'E' is used to record this additional
 *   virtual column information
@@ -296,7 +296,7 @@
 *    Column Format
 *    Column Type
 *    Column Comment
-*           
+*
               Dbuf(CHP_S_KEY:CHP_E_KEY) = 'E'
               Dbuf(CHP_S_CNAME:CHP_E_CNAME) = EPname(cd,cc)
               Dbuf(CHP_S_CUNIT:CHP_E_CUNIT) = EPunits(cd,cc)
@@ -358,7 +358,7 @@
             call chr_itoc(PPpardes(cd,pc),
      :       Dbuf(CHP_S_PPARDES:CHP_E_PPARDES), nchar)
             call chr_itoc(PParrshp(cd,pc),
-     :       Dbuf(CHP_S_PARRSHP:CHP_E_PARRSHP), nchar) 
+     :       Dbuf(CHP_S_PARRSHP:CHP_E_PARRSHP), nchar)
             if (PPnsflag(cd,cc)) then
               Dbuf(CHP_S_PNSFLAG:CHP_E_PNSFLAG) = 'T'
             else
@@ -496,7 +496,7 @@
 *    Name of the first original catalogue if this is an extension.
 *    Name of the second original catalogue if this is an extension.
 *    Name of the third original catalogue if this is an extension.
-*            
+*
         Dbuf(CHP_S_KEY:CHP_E_KEY) = 'O'
         Dbuf(CHP_S_CATNAME:CHP_E_CATNAME) = CPname(cd)
         call chr_itoc(CPnumext(cd),
@@ -518,7 +518,7 @@
 *    Catalogue Delete Indicator.
 *    Catalogue Frequency Flag.
 *    Catalogue access Flag.
-*            
+*
         Dbuf(CHP_S_KEY:CHP_E_KEY) = 'P'
         Dbuf(CHP_S_CATNAME:CHP_E_CATNAME) = CPname(cd)
         if (CPdelind(cd)) then
@@ -559,7 +559,7 @@
 *    Non standard format flag.
 *    Non standard format.
 *    Column array type
-*            
+*
             call chr_fill(' ',Dbuf)
             Dbuf(CHP_S_KEY:CHP_E_KEY) = 'A'
             Dbuf(CHP_S_CNAME:CHP_E_CNAME) = EPname(cd,cc)
@@ -683,7 +683,7 @@
 *    Expression part.
 *
 *
-            if (EPvcflag(cd,cc)) then 
+            if (EPvcflag(cd,cc)) then
               Dbuf(CHP_S_KEY:CHP_E_KEY) = 'D'
               Dbuf(CHP_S_CNAME:CHP_E_CNAME) = EPname(cd,cc)
               Dbuf(CHP_S_CEXPCON:CHP_E_CEXPCON) = '1'
@@ -700,7 +700,7 @@
 *    Column Format
 *    Column Type
 *    Column Comment
-*           
+*
               Dbuf(CHP_S_KEY:CHP_E_KEY) = 'E'
               Dbuf(CHP_S_CNAME:CHP_E_CNAME) = EPname(cd,cc)
               Dbuf(CHP_S_CUNIT:CHP_E_CUNIT) = EPunits(cd,cc)
@@ -762,7 +762,7 @@
             call chr_itoc(PPpardes(cd,pc),
      :       Dbuf(CHP_S_PPARDES:CHP_E_PPARDES), nchar)
             call chr_itoc(PParrshp(cd,pc),
-     :       Dbuf(CHP_S_PARRSHP:CHP_E_PARRSHP), nchar) 
+     :       Dbuf(CHP_S_PARRSHP:CHP_E_PARRSHP), nchar)
             if (PPnsflag(cd,cc)) then
               Dbuf(CHP_S_PNSFLAG:CHP_E_PNSFLAG) = 'T'
             else
@@ -835,7 +835,7 @@
 *    'J' is not used
 *
 *
-*    'K' is not used 
+*    'K' is not used
 *
 *
 *   N-dimensional index information
@@ -899,7 +899,7 @@
 *    Catalogue Delete Indicator.
 *    Catalogue Frequency Flag.
 *    Catalogue access Flag.
-*            
+*
         Dbuf(CHP_S_KEY:CHP_E_KEY) = 'P'
         Dbuf(CHP_S_CATNAME:CHP_E_CATNAME) = CPname(cd)
         if (CPdelind(cd)) then

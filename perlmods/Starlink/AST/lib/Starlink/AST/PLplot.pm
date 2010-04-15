@@ -53,7 +53,7 @@ $Id$
 
 =item B<_GFlush>
 
-This function ensures that the display device is up-to-date, by flushing 
+This function ensures that the display device is up-to-date, by flushing
 any pending graphics to the output device.
 
    my $status = _GFlush();
@@ -116,17 +116,17 @@ sub _GMark {
 
 =item B<_GText>
 
-This function displays a character string $text at a given position using 
+This function displays a character string $text at a given position using
 a specified justification and up-vector.
 
    my $status = _GText( $text, $x, $y, $just, $upx, $upy );
 
-where $x is the reference x coordinate, $y is the reference y coordinate, 
+where $x is the reference x coordinate, $y is the reference y coordinate,
 and where $just is a character string which specifies the location within
 the text string which is to be placed at the reference position given by x
 and y. The first character may be 'T' for "top", 'C' for "centre", or 'B'
 for "bottom", and specifies the vertical location of the reference position.
-Note, "bottom" corresponds to the base-line of normal text. Some characters 
+Note, "bottom" corresponds to the base-line of normal text. Some characters
 (eg "y", "g", "p", etc) descend below the base-line. The second  character
 may be 'L' for "left", 'C' for "centre", or 'R'  for "right", and specifies
 the horizontal location of the  reference position. If the string has less
@@ -169,7 +169,7 @@ sub _GText {
       my $just2 = substr $just, 1, 1;
       if ( defined $just && length($just) == 2 ) {
 
-        # if we have a bogus justification string default it 
+        # if we have a bogus justification string default it
         unless( $just1 =~ /^[TBC]/ ) {
            warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
@@ -189,12 +189,12 @@ sub _GText {
       my ( $ret, $alpha, $beta ) = _GScales();
       return 0 if $ret == 0;
 
-      # If either axis is reversed, reverse the supplied up-vector 
+      # If either axis is reversed, reverse the supplied up-vector
       # components so that they refer to the world-coordinates axes.
       $upx = -$upx if $alpha < 0.0;
       $upy = -$upy if $beta < 0.0;
 
-      # Get the angle between the text base-line and horizontal. 
+      # Get the angle between the text base-line and horizontal.
       my $angle = atan2( -$upx*$alpha, $upy*$beta);
 
       # Get the fractional horizontal justification as needed by PGPLOT.
@@ -212,8 +212,8 @@ sub _GText {
       # PLplot assumes "Centre" justification.
       if( $just1 ne "C" ) {
 
-         # Get the bounding box of the string. Note, only the size of the box 
-         # is significant here, not its position. Also note, leading and 
+         # Get the bounding box of the string. Note, only the size of the box
+         # is significant here, not its position. Also note, leading and
          # trailing spaces are not included in the bounding box.
          my ( @xbox, @ybox );
 
@@ -226,7 +226,7 @@ sub _GText {
          #plptex ( $x, $y, $upy, $upx , $fjust, $text);
          # Normalise the up-vector in world coordinates.
          my $uplen = sqrt( $upx*$upx + $upy*$upy );
-         if( $uplen > 0.0 ){ 
+         if( $uplen > 0.0 ){
             $upx /= $uplen;
             $upy /= $uplen;
          } else {
@@ -248,7 +248,7 @@ sub _GText {
       #my $tbg;
       #pgqtbg( $tbg );
       #pgstbg( 0 );
-      #pgptxt( $x, $y, $angle, $fjust, $text ); 
+      #pgptxt( $x, $y, $angle, $fjust, $text );
       #pgstbg( $tbg );
       plcol0(15);
 
@@ -270,7 +270,7 @@ sub _GText {
 This function returns two values (one for each axis) which scale
 increments on the corresponding axis into a "normal" coordinate system in
 which: The axes have equal scale in terms of (for instance) millimetres
-per unit distance, X values increase from left to right and the Y values 
+per unit distance, X values increase from left to right and the Y values
 increase from bottom to top.
 
    my ( $status, $alpha, $beta ) = _GScales()
@@ -296,13 +296,13 @@ sub _GScales {
 
 =item B<_GTxExt>
 
-This function returns the corners of a box which would enclose the 
-supplied character string if it were displayed using astGText. The 
+This function returns the corners of a box which would enclose the
+supplied character string if it were displayed using astGText. The
 returned box INCLUDES any leading or trailing spaces.
 
    my ( $status, $xb, $yb ) = _GTxtExt( $text, $x, $y, $just, $upx, $upy);
 
-where $x is the reference x coordinate, $y is the reference y coordinate, 
+where $x is the reference x coordinate, $y is the reference y coordinate,
 and where $justification is a character string which specifies the
 location within the text string which is to be placed at the reference
 position given by x and y. The first character may be 'T' for "top", 'C'
@@ -310,9 +310,9 @@ for "centre", or 'B' for "bottom", and specifies the vertical location of
 the reference position. Note, "bottom" corresponds to the base-line of
 normal text. Some characters  (eg "y", "g", "p", etc) descend below the
 base-line. The second  character may be 'L' for "left", 'C' for "centre",
-or 'R'  for "right", and specifies the horizontal location of the 
+or 'R'  for "right", and specifies the horizontal location of the
 reference position. If the string has less than 2 characters then 'C' is
-used for the missing characters. 
+used for the missing characters.
 
 And $upx is the x component of the up-vector for the text, in graphics
 world coordinates. If necessary the supplied value should be negated to
@@ -515,7 +515,7 @@ sub _GTxExt {
 
   # Return
   _GFlush();
-  return (1, \@xb, \@yb );     
+  return (1, \@xb, \@yb );
 }
 
 =item B<_GQch>
@@ -555,7 +555,7 @@ value is converted to an integer value if necessary before use.
 
    my ( $status, $old_value ) = _GAttr( $attr, $value, $prim );
 
-Where $attr is an integer value identifying the required attribute. 
+Where $attr is an integer value identifying the required attribute.
 The following symbolic values are defined in the AST grf.h:
 
            GRF__STYLE  - Line style.
@@ -564,12 +564,12 @@ The following symbolic values are defined in the AST grf.h:
            GRF__FONT   - Character font.
            GRF__COLOUR - Colour index.
 
-$value is a new value to store for the attribute. If this is 
+$value is a new value to store for the attribute. If this is
 AST__BAD no value is stored, and $old_value is a scalar containing
-the old attribute value, if this is NULL no value is returned. 
+the old attribute value, if this is NULL no value is returned.
 
-Finally $prim is the sort of graphics primitive to be drawn with 
-the new attribute. Identified by the following values defined in 
+Finally $prim is the sort of graphics primitive to be drawn with
+the new attribute. Identified by the following values defined in
 AST's grf.h:
 
            GRF__LINE

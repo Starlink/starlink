@@ -26,7 +26,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     18 Dec 1995 (timj): 
+*     18 Dec 1995 (timj):
 *        Original version.
 *     21 Sep 2000 (ajc):
 *        Unused NFIL
@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -161,8 +161,8 @@ CD     PRINT *, 'File B has : ',NUMSCAN(2)
 
 
 * Now pass the pointers to subroutine
-      CALL MDATA_READ( MFILE, NUMSCAN, ALLSCANS, %VAL(TJOFFPTR), 
-     +     %VAL(TJIDXPTR), %VAL(TJNQUADPTR), %VAL(TJCHANNPTR), 
+      CALL MDATA_READ( MFILE, NUMSCAN, ALLSCANS, %VAL(TJOFFPTR),
+     +     %VAL(TJIDXPTR), %VAL(TJNQUADPTR), %VAL(TJCHANNPTR),
      +     %VAL(TJVLSRPTR), %VAL(TJFREQPTR), %VAL(TJFINCPTR),
      +     %VAL(TJRADECPTR), IFAIL, STATUS )
 
@@ -209,7 +209,7 @@ CD     PRINT *, 'File B has : ',NUMSCAN(2)
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL MDATA_READ( MFILE, NUMSCAN, N, OFFS, IDX, NQUAD, CHANN, LSR, 
+*     CALL MDATA_READ( MFILE, NUMSCAN, N, OFFS, IDX, NQUAD, CHANN, LSR,
 *                       FREQ, FINC, RADEC, IFAIL, STATUS )
 
 *  Description:
@@ -254,7 +254,7 @@ CD     PRINT *, 'File B has : ',NUMSCAN(2)
       INTEGER TJFREQ(N)          ! Centre frequency
       INTEGER TJFINC(N)          ! Frequency increment
       REAL    TJOFFS(2,N)        ! Offset array
-      REAL    TJVLSR(N)          ! VLSRs 
+      REAL    TJVLSR(N)          ! VLSRs
       DOUBLE PRECISION TJRADEC(2,N) ! RA DECS
 
 
@@ -282,7 +282,7 @@ CD     PRINT *, 'File B has : ',NUMSCAN(2)
 * Now need to read in the header info
 *  Check inherited global status.
       IF ( IFAIL .NE. 0 .OR. STATUS .NE. SAI__OK ) RETURN
- 
+
 *     Get the header information.
 
       START(1) = 1
@@ -325,7 +325,7 @@ CD     PRINT *, 'File B has : ',NUMSCAN(2)
                   PRINT *, 'Problem occurred in read, I = ',I, ' J = ',J
                   RETURN
                END IF
-               
+
 C     Transfer all header information to indexed arrays
                TJOFFS(1,FOUND) = DPOS(1)
                TJOFFS(2,FOUND) = DPOS(2)
@@ -350,8 +350,8 @@ C Could it be given a 2-D array of (x,y) to fool it (it uses DBL)? YES!!
 
 C Uncomment this to test sort output
 C      DO I = 1, FOUND
-C         PRINT *, INT(TJIDX(I)),TJOFFS(1,I) , TJOFFS(2,I), 
-C     +        TJRADEC(1,INT(TJIDX(I))), TJRADEC(2,INT(TJIDX(I))), 
+C         PRINT *, INT(TJIDX(I)),TJOFFS(1,I) , TJOFFS(2,I),
+C     +        TJRADEC(1,INT(TJIDX(I))), TJRADEC(2,INT(TJIDX(I))),
 C     +        TJCHANN(INT(TJIDX(I)))
 C      END DO
 
@@ -399,9 +399,9 @@ C Now loop through and compare to make sure data is consistent before merging
 
             IFAIL = 1
             RETURN
-         ELSE IF (ABS(TJRADEC(1,CNT)-TJRADEC(1,IMINONE)) 
+         ELSE IF (ABS(TJRADEC(1,CNT)-TJRADEC(1,IMINONE))
      +                .GT. (POSBOX*15.0/3600.0) .OR.
-     +            ABS(TJRADEC(2,CNT)-TJRADEC(2,IMINONE)) 
+     +            ABS(TJRADEC(2,CNT)-TJRADEC(2,IMINONE))
      +                .GT. (POSBOX/3600.0)) THEN
             PRINT *, 'Map centre is different, ',
      +           'it is unwise to proceed'
@@ -410,7 +410,7 @@ C Now loop through and compare to make sure data is consistent before merging
 
             IFAIL = 1
             RETURN
-            
+
          END IF
       END DO
       PRINT *, 'Data can be merged!'
@@ -447,11 +447,11 @@ C All of these checks except for offsets are no longer required
 C unless the consistency check above is switched off
 
          IF ( ABS(TJOFFS(1,I)-TJOFFS(1,I-1)) .LE. POSBOX .AND.
-     +        ABS(TJOFFS(2,I)-TJOFFS(2,I-1)) .LE. POSBOX .AND. 
+     +        ABS(TJOFFS(2,I)-TJOFFS(2,I-1)) .LE. POSBOX .AND.
      +        TJCHANN(CNT) .EQ. TJCHANN(IMINONE) .AND.
-     +        ABS(TJRADEC(1,CNT)-TJRADEC(1,IMINONE)) 
+     +        ABS(TJRADEC(1,CNT)-TJRADEC(1,IMINONE))
      +                          .LE. (POSBOX*15.0/3600.0) .AND.
-     +        ABS(TJRADEC(2,CNT)-TJRADEC(2,IMINONE)) 
+     +        ABS(TJRADEC(2,CNT)-TJRADEC(2,IMINONE))
      +                          .LE. (POSBOX/3600.0) .AND.
      +        ABS(TJVLSR(CNT)-TJVLSR(IMINONE)) .LE. VELBOX .AND.
      +        TJFREQ(CNT)  .EQ. TJFREQ(IMINONE)  .AND.
@@ -509,7 +509,7 @@ C and put next one on
                PRINT *, 'An error occurred during read ', I
                RETURN
             END IF
-            
+
          END IF
 C Set ifail back to 0
          IF (IFAIL .NE. 0 ) THEN
@@ -517,7 +517,7 @@ C Set ifail back to 0
             PRINT *, 'An error occurred somewhere. Aborted operation'
             RETURN
          END IF
-         
+
       END DO
 
 C Write final spectrum to file

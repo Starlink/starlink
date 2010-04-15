@@ -127,10 +127,10 @@ sub parse_lines {
 
   my @output;
   for my $line (@input) {
-    # push each line to the 
+    # push each line to the
     my ($printme, $prologue) = $self->push_line( $line );
 
-    # if we have a prologue it needs to be printed. It may 
+    # if we have a prologue it needs to be printed. It may
     # come with a line of text that should also be printed after
     # the prologue
     if (defined $prologue) {
@@ -283,7 +283,7 @@ sub flush {
 
   my $worker = $self->_worker;
   if (!defined $worker) {
-    # no active worker so either no prologue or it was 
+    # no active worker so either no prologue or it was
     # already complete.
     return;
   } else {

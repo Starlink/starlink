@@ -8,14 +8,14 @@
    preference to firefox and mozilla you should define the HTX_BROWSER
    variable.
 
-   Historic checks for a DISPLAY setting have been removed. 
+   Historic checks for a DISPLAY setting have been removed.
 
    Version 1.3-1 (August 2006)
    ---------------------------
 
    In this release the HTX system now uses a set of default browsers,
    rather than just one (formerly netscape). The current list (in priority
-   order) is: 
+   order) is:
 
       firefox mozilla netscape mosaic
 
@@ -30,11 +30,11 @@
    The default document server has been changed from star-www.rl.ac.uk
    to www.starlink.ac.uk.
 
-   V1.2-10 (SER) 
+   V1.2-10 (SER)
    -------------
    You can now use Netscape 7.1.
 
-   V1.2-9 (SER) 
+   V1.2-9 (SER)
    ------------
 
    Fixed bug when starting Netscape 4.x on some Solaris systems.
@@ -42,8 +42,8 @@
    V1.2-7 (SER)
    ------------
 
-   Added Mozilla browser which can be set with setenv HTX_BROWSER 
-   mozilla. This was done for RedHat 9.0. 
+   Added Mozilla browser which can be set with setenv HTX_BROWSER
+   mozilla. This was done for RedHat 9.0.
 
    V1.2-5 (January 2003)
    ---------------------
@@ -90,7 +90,7 @@
    ---------------
       For further details of these changes, see the final appendix of
       SUN/188, or use the command:
-   
+
          showme sun188 list_of_most_recent_changes
 
       to jump straight to the relevant page using your WWW browser.

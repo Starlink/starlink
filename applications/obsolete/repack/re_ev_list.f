@@ -11,7 +11,7 @@
 	integer i, system
 	character*80 unzip		! GUNZIP fits files.
 	character*80 dump		! Dump merge list to a file
-	
+
 
 	IF (STATUS .NE. 0) RETURN
 
@@ -30,9 +30,9 @@
 * List fits files to be merged into file re_ev.list
 	i = system(dump)
 	if (i .eq. 0) then
-	  write(*,*) 
+	  write(*,*)
 	  write(*,*)'   List of event files to be merged in re_ev.list'
-	  write(*,*) 
+	  write(*,*)
 	endif
 
 

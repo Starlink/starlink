@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE dq_PACK
 *
-*   Description: 
+*   Description:
 *      Pack data quality bits into integer.
 *
 *   Authors:
@@ -38,10 +38,10 @@
 *   Import:
       INTEGER NBIT           ! number of bits to be coded
       INTEGER BITS(NBIT)     ! array containing bit values
- 
+
 *   Export:
       INTEGER DQ             ! coded data quality value
- 
+
 *   Local variables:
       INTEGER BASE           ! binary mask
       INTEGER IBIT           ! bit index

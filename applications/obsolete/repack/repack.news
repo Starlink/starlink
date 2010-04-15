@@ -6,40 +6,40 @@
 
 
 This directory contains software that can be used to process images, and later
-raw event files, from the ROSAT Wide Field Camera taken during the survey 
-phase of the mission, 1990 Jul to 1991 Jan.  
+raw event files, from the ROSAT Wide Field Camera taken during the survey
+phase of the mission, 1990 Jul to 1991 Jan.
 
 
 The whole, or ~96% of it, EUV sky was imaged, in two colours, by the WFC and a
 source list, known as the 2RE catalogue (Pye et. al 1995), produced.  The
-survey images are available via the BROWSE database table ROSWFCSI. They were 
-sorted from original photon event files and screened for high background and 
-moon in WFC FOV.  (Sky exposure images, reskyexp_f1 and reskyexp_f2, account 
+survey images are available via the BROWSE database table ROSWFCSI. They were
+sorted from original photon event files and screened for high background and
+moon in WFC FOV.  (Sky exposure images, reskyexp_f1 and reskyexp_f2, account
 for this screening.)
 
 
-Images were named after the coordinates of the region of sky that they 
-covered, that is, they were given a six digit ecliptic grid reference 
-(longitude then latitude) and labelled depending on survey passband 
+Images were named after the coordinates of the region of sky that they
+covered, that is, they were given a six digit ecliptic grid reference
+(longitude then latitude) and labelled depending on survey passband
 eg. im012014_f1 and im012014_f2.  They are typically ~ 2x2 degrees in extent.
 
 
-As well as being available through BROWSE, images can be copied directly from 
-`/rosat/s3/images/yxx'. For ease of handling the images have been put into 
-sub-directories depending on ecliptic latitude map number.  There are 90 such 
-directories y01 to y90, containing a total of 13516 image pairs.  Currently 
-these images are available only in HDS format.  They will soon appear in FITS 
+As well as being available through BROWSE, images can be copied directly from
+`/rosat/s3/images/yxx'. For ease of handling the images have been put into
+sub-directories depending on ecliptic latitude map number.  There are 90 such
+directories y01 to y90, containing a total of 13516 image pairs.  Currently
+these images are available only in HDS format.  They will soon appear in FITS
 and GIF formats.  However, the programs related below will only process the
 HDS version.
 
 
-At the moment images can be source searched, via PSS, and exposure corrected.  
+At the moment images can be source searched, via PSS, and exposure corrected.
 It is also possible to find the exposure at any point in the sky for each
 survey passband.
 
 
-Later when the survey photon event files become available (in FITS format) it 
-will be possible to sort them into images and time series for any arbitrary 
+Later when the survey photon event files become available (in FITS format) it
+will be possible to sort them into images and time series for any arbitrary
 region in the sky.
 
 
@@ -50,7 +50,7 @@ region in the sky.
 
 
 1. Ancillary Files.
- 
+
 File	 	 Typ*	Comment
 ---------------- ---    --------------------------------------------------
 reskyexp_f1.sdf   b     Sky exposure map for survey passband F1.
@@ -106,30 +106,30 @@ re_science		Do it!
 1. re_evsrch
 
 Expects an RA, Dec, and radius in decimal degrees.  Program will return
-the names of the survey event files, held in /rosat/s3/images/yxx, that are 
-wholly or partially covered by the specified search cone.  This is useful if 
+the names of the survey event files, held in /rosat/s3/images/yxx, that are
+wholly or partially covered by the specified search cone.  This is useful if
 a user wishes too for example create their own image of a sky region and needs
 to know which event files are required in-order to do so.
 
-(Programs will soon be available to merge and sort event files.  These files 
+(Programs will soon be available to merge and sort event files.  These files
 will be accessible through a table in BROWSE.)
 
 2. re_imsrch
 
 Expects an RA and Dec in decimal degrees.  Program returns the survey image
 whose centre is closest to the specified RA & Dec.  Handy if a user wishes
-to look at an image containing their favourite source.  Images are in 
+to look at an image containing their favourite source.  Images are in
 /rosat/s3/images/yxx, and can also be accessed via the BROWSE table ROSWFCSI.
 
 
-3. re_expos		
+3. re_expos
 
 Using the survey sky exposure images, this program exposure corrects a source
-list output from PSS, or gives the exposure at RAs & Decs specified by the 
+list output from PSS, or gives the exposure at RAs & Decs specified by the
 user.  It has the following parameters:
 
 XIMAG:- Name of survey exposure sky map.  There is one map for each of the
-        two survey passbands. 
+        two survey passbands.
 
 SLIST:- Name of the PSS SSDS file.  A text file of decimal RAs and Decs, comma
         separated, can also be supplied.  If the input file has the name
@@ -142,10 +142,10 @@ CLIST:- If a SSDS file is being processed, then an output file containing the
 	newly corrected source counts can be specified.
 
 
-4. re_imexp		
+4. re_imexp
 
 Using the survey sky exposure and WFC configuration files this program exposure
-corrects a survey image.  It automatically figures out which passband the 
+corrects a survey image.  It automatically figures out which passband the
 image is in.  There are two parameters:
 
 INP:- Name of image to be corrected.
@@ -159,7 +159,7 @@ OUT:- Name of corrected image.
 			     The Script Files
 			     ----------------
 
-The script files were originally developed to process the entire set of survey 
+The script files were originally developed to process the entire set of survey
 images.  They actually work on image pairs.  Although they maybe of limited
 use in their present form, they serve as a good repository of default values if
 a user wishes to create background models, derive upper limits etc.  They
@@ -167,7 +167,7 @@ can be easily modified to suit a users own requirements.  The startup script
 sets up environment variables pointing to the location of all the other scripts
 and ancillary files.  The re_sci_par script contains environment variables that
 set default values for source searching etc.  The re_science script processes
-the images in the desired manner.  The other scripts invoke the background 
+the images in the desired manner.  The other scripts invoke the background
 modelling, source searching etc, programs.
 
 

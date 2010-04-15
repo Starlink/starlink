@@ -25,7 +25,7 @@
 *        Number of pixels per line in the input data.
 *     DATA( NPIX, NLIN ) = REAL (Given)
 *        The input data.
-*     SIGMA = REAL (Returned) 
+*     SIGMA = REAL (Returned)
 *        A rough estimate of the standard deviation of the noise in the
 *        data.
 *     STATUS = INTEGER (Given and Returned)
@@ -104,7 +104,7 @@
       NSUM2 = 0
       SUM2 = 0.0
 
-*  Loop round all the input pixels.  The first pixel in each row has no 
+*  Loop round all the input pixels.  The first pixel in each row has no
 *  `previous pixel', so set the previous pixel value to bad.
       DO LIN  = 1, NLIN
          LSTVAL = VAL__BADR
@@ -115,9 +115,9 @@
 *  If the data value is good, increment the statistics.
             IF ( DATVAL .NE. VAL__BADR .AND.
      :           LSTVAL .NE. VAL__BADR ) THEN
-               SUM2 = SUM2 + ( DATVAL - LSTVAL )**2            
+               SUM2 = SUM2 + ( DATVAL - LSTVAL )**2
                NSUM2 = NSUM2 + 1
-            ENDIF         
+            ENDIF
 
 *  Save the current pixel value for later use.
             LSTVAL = DATVAL

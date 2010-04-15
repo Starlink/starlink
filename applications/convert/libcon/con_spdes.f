@@ -20,12 +20,12 @@
 *     of which items have been set is made.
 *
 *     The keywords are:
-*        o  NAXIS, and NAXISn are derived from the dimensions of 
+*        o  NAXIS, and NAXISn are derived from the dimensions of
 *           the NDF data array.
 *        o  The TITLE, LABEL, and BUNITS descriptors are derived from
 *           the TITLE, LABEL, and UNITS NDF components.
 *        o  The CDELTn, CRVALn, CRTYPEn and CTYPEn descriptors are
-*           derived from a set of linear NDF AXIS structures. 
+*           derived from a set of linear NDF AXIS structures.
 *        o  The standard order of the FITS keywords is preserved.
 *           No FITS comments are written following the values of the
 *           above exceptions.
@@ -94,7 +94,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,7 +169,7 @@
       CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
 
 *  This is derived from the actual dimensionality of the NDF data array.
-      CALL CHR_ITOC( NDIM, CVALUE, NCHAR )      
+      CALL CHR_ITOC( NDIM, CVALUE, NCHAR )
       VALUE = ' '
       VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
       DESCR = 'NAXIS   '
@@ -191,7 +191,7 @@
 *  Now the actual size of each dimension of the NDF data array is
 *  written to the appropriate NAXISn descriptors.
       DO I = 1, NDIM
-         CALL CHR_ITOC( DIMS( I ), CVALUE, NCHAR )      
+         CALL CHR_ITOC( DIMS( I ), CVALUE, NCHAR )
          VALUE = ' '
          VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
          DESCR = ' '
@@ -212,15 +212,15 @@
 
 *  Handle axis descriptors.
 *  ========================
-*      
+*
 *  For any axis structure present, the routine checks to see if each
 *  axis data array is linear.  If it is, the start value and incremental
 *  value are written to the appropriate CRVALn and CDELTn descriptors,
 *  as are the label and units, if present, to CRTYPEn and CTYPEn
-*  respectively.  This is rather crude, as it deals with the axis 
-*  system as a whole, and that the flags to indicate presence of 
+*  respectively.  This is rather crude, as it deals with the axis
+*  system as a whole, and that the flags to indicate presence of
 *  components are for any of the axes.
-      DO I = 1, NDIM 
+      DO I = 1, NDIM
          CALL NDF_ASTAT( NDF, 'Centre', I, THERE, STATUS )
 
          IF ( THERE ) THEN
@@ -232,10 +232,10 @@
 *  type.  Use _REAL for all but double-precision centres.  See if the
 *  axis is linear.  Derive the increment between values.
             IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+               CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
      :                          DSTART, DEND, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
@@ -244,10 +244,10 @@
 
 *  Repeat for all other axis-centre data types mapped as real.
             ELSE
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+               CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
      :                          START, END, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
@@ -263,7 +263,7 @@
 
 *  Write the start value to descriptor CRVALn.
 *  ===========================================
-               CALL CHR_RTOC( START, CVALUE, NCHAR ) 
+               CALL CHR_RTOC( START, CVALUE, NCHAR )
                VALUE = ' '
                VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
                DESCR = ' '
@@ -285,7 +285,7 @@
 *  =================================================
 
 *  Form a descriptor string for the BDF.
-               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )      
+               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )
                VALUE = ' '
                VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
                DESCR = ' '
@@ -295,7 +295,7 @@
 *  Write this descriptor to the BDF.
                CALL WRDSCR( BDFNAM, DESCR, VALUE, 1, WRSTAT )
                IF ( WRSTAT .NE. 0 ) GO TO 999
-               
+
 *  Output the descriptor's name and value to the user if required.
                IF ( DESCRP ) THEN
                   CALL MSG_SETC( 'DESCR', DESCR )
@@ -323,7 +323,7 @@
 *  Write this descriptor to the BDF.
                   CALL WRDSCR( BDFNAM, DESCR, VALUE, 1, WRSTAT )
                   IF ( WRSTAT .NE. 0 ) GO TO 999
-               
+
 *  Output the descriptor's name and value to the user if required.
                   IF ( DESCRP ) THEN
                      CALL MSG_SETC( 'DESCR', DESCR )
@@ -352,7 +352,7 @@
 *  Write this descriptor to the BDF.
                   CALL WRDSCR( BDFNAM, DESCR, VALUE, 1, WRSTAT )
                   IF ( WRSTAT .NE. 0 ) GO TO 999
-               
+
 *  Output the descriptor's name and value to the user if required.
                   IF ( DESCRP ) THEN
                      CALL MSG_SETC( 'DESCR', DESCR )
@@ -367,7 +367,7 @@
 
 *  Process the title.
 *  ==================
-*   
+*
 *  If an NDF title is found, this is copied to the BDF title
 *  descriptor.
       CALL NDF_STATE( NDF, 'TITLE', THERE, STATUS )
@@ -391,7 +391,7 @@
 
 *  Process the label.
 *  ==================
-*   
+*
 *  If an NDF label is found, this is copied to the BDF label descriptor.
       CALL NDF_STATE( NDF, 'LABEL', THERE, STATUS )
       IF ( THERE ) THEN
@@ -414,7 +414,7 @@
 
 *  Process the units.
 *  ==================
-*   
+*
 *  If an NDF units component is found, this is copied to the BDF BUNITS
 *  descriptor.
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )

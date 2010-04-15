@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -85,15 +85,15 @@
  10   CONTINUE
 
 *  Calculate the Y positions.
-      CALL PDA_SPLEV( KNOTS, IKNOTS, SPLINE, NPOLY, X, Y, NPOINTS, 
+      CALL PDA_SPLEV( KNOTS, IKNOTS, SPLINE, NPOLY, X, Y, NPOINTS,
      :                IFAIL )
 
 *  Plot the data.
-      IF ( IFAIL .NE. 0 ) THEN 
+      IF ( IFAIL .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'PLOTSPLINE', 'Failed to plot spline, spline'//
      :        ' description must be invalid', STATUS )
-      ELSE 
+      ELSE
          CALL PGLINE( NPOINTS, X, Y )
       END IF
       END

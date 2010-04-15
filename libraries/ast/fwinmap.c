@@ -26,12 +26,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@ F77_INTEGER_FUNCTION(ast_winmap)( INTEGER(NAXES),
                                   DOUBLE(C1_IN),
                                   DOUBLE(C2_IN),
                                   DOUBLE(C1_OUT),
-                                  DOUBLE(C2_OUT), 
+                                  DOUBLE(C2_OUT),
                                   CHARACTER(OPTIONS),
                                   INTEGER(STATUS)
                                   TRAIL(OPTIONS) ) {
@@ -99,7 +99,7 @@ F77_INTEGER_FUNCTION(ast_winmap)( INTEGER(NAXES),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-      RESULT = astP2I( astWinMap( *NAXES, C1_IN, C2_IN, C1_OUT, C2_OUT, 
+      RESULT = astP2I( astWinMap( *NAXES, C1_IN, C2_IN, C1_OUT, C2_OUT,
                                   "%s", options ) );
       astFree( options );
    )

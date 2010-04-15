@@ -42,7 +42,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -185,12 +185,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -220,7 +220,7 @@
 source-code, especially mistakes that tend to be missed by compilers
 and linkers.
 
-Probably the most valuable feature is that it performs careful checks on 
+Probably the most valuable feature is that it performs careful checks on
 subprogram interfaces. {\tt FTNCHEK} examines the actual arguments in
 each {\tt CALL} statement (or function call) and compares them with the
 corresponding formal arguments of the {\tt SUBROUTINE} (or {\tt
@@ -229,7 +229,7 @@ or of incompatibilities in the data type or dimensions of each one. It
 also checks that where an argument is used before being set in the
 subprogram that it has a defined value on entry, and correspondingly
 that arguments are set on exit where the value is used later in the
-calling program. 
+calling program.
 
 Before using {\tt FTNCHEK} it is advisable to get the source-code to
 compile without errors. For the most comprehensive checking all the
@@ -240,9 +240,9 @@ this, if the source-code of the library is available, by producing a
 {\em project file} which stores the characteristics of each subprogram
 interface for subsequent use. After project files have been produced for
 each library, they can be used in later runs of {\tt FTNCHEK} to ensure
-that calls to library routines contain no obvious errors. 
+that calls to library routines contain no obvious errors.
 
-Depending on the options selected, {\tt FTNCHEK} will also flag 
+Depending on the options selected, {\tt FTNCHEK} will also flag
 variables that are never used, are not initialized, or which have no
 explicitly declared data type; it can also perform consistency checks on
 {\tt COMMON} blocks, and warn of the existence of non-standard or (not
@@ -267,7 +267,7 @@ NAMELIST} statements, and data-type specifications of {\tt LOGICAL*1},
 permits symbolic names that include underscores, and symbolic names up
 to 31 characters long. Case differences are ignored, and tabs are
 treated as if there were tab-stops every eight columns.  Most of these
-extensions will, however, be flagged if the {\tt -f77} switch is used. 
+extensions will, however, be flagged if the {\tt -f77} switch is used.
 
 {\tt FTNCHEK} does {\bf not}, however, understand the use of VMS
 intrinsic functions such as {\tt \%VAL}, {\tt \%LOC}, or {\tt \%REF}. In
@@ -276,7 +276,7 @@ which are identical to certain Fortran keywords (for example {\tt DATA}
 or {\tt READ}).  Details of these and other minor limitations are given
 in the author's own documentation (see section 5 below).  Sometimes a
 few unnecessary warnings appear, but this is usually acceptable given
-the comprehensive checking that is performed. 
+the comprehensive checking that is performed.
 
 \section{Running {\tt FTNCHEK}\xlabel{running_ftnchek}}
 
@@ -296,7 +296,7 @@ may precede an option and a space is unnecessary before a slash. Each
 option remains in effect from the point it is encountered until it is
 over-ridden by a later option; for example an output listing may be
 enabled for some source files and not for others. The options are
-outlined below; a summary can be obtained on-line by using the command: 
+outlined below; a summary can be obtained on-line by using the command:
 
 \begin{verbatim}
       $ ftnchek -help
@@ -307,9 +307,9 @@ looks for a project file with extension {\tt .prj}, otherwise it looks
 for a Fortran source file with the extension {\tt .f} (on Unix) or {\tt
 .for} (on VMS).  If more than one filename is specified the modules are
 treated as if they were on a single file. If no filename is given {\tt
-FTNCHEK} reads from the standard input. 
+FTNCHEK} reads from the standard input.
 
-The defaults for {\tt FTNCHEK} may be altered (on Unix) by setting 
+The defaults for {\tt FTNCHEK} may be altered (on Unix) by setting
 environment variables or (on VMS) by defining logical names.  For
 example, to enable the {\tt -list} option by default use the appropriate
 command below:
@@ -321,7 +321,7 @@ command below:
 
 \section{Options\xlabel{options}}
 
-{\em These options are {\bf off} by default, but may be switched 
+{\em These options are {\bf off} by default, but may be switched
 {\bf on} by using the appropriate switch:}
 
 \begin{quote}
@@ -330,18 +330,18 @@ command below:
 \item [--calltree] List the subprogram call hierarchy as a call-tree.
 
 \item [--division] Warn wherever division is done (except division by a
-constant). 
+constant).
 
-\item [--f77] Warn of violations of the Fortran 77 standard.  
+\item [--f77] Warn of violations of the Fortran 77 standard.
 
 \item [--library] Enter library mode: do not warn if subprograms in a file
-are defined but never used.  
+are defined but never used.
 
 \item [--list] List the source-code complete with line-numbers.
 
 \item [--project] Create a project file (see details in main manual).
 
-\item [--sixchar] Warn of names which are not unique in their 
+\item [--sixchar] Warn of names which are not unique in their
 first six characters.
 
 \item [--symtab] List the symbol table of each subprogram.
@@ -351,36 +351,36 @@ first six characters.
 
 {\em These options are {\bf on} by default, but may be switched {\bf
 off} by negating the switch (e.g. specifying on Unix {\tt -nodeclare} or
-on VMS {\tt /NODECLARE }):} 
+on VMS {\tt /NODECLARE }):}
 
 \begin{quote}
 \begin{description}
 
-\item [--declare] List all identifiers with no 
-explicitly declared data type (equivalent to using {\tt IMPLICIT NONE}). 
+\item [--declare] List all identifiers with no
+explicitly declared data type (equivalent to using {\tt IMPLICIT NONE}).
 
 \item [--extern] List all external subprograms that are never
-defined (this will flag use of library routines or non-standard 
-intrinsics). 
+defined (this will flag use of library routines or non-standard
+intrinsics).
 
-\item [--hollerith] Warn about Hollerith constants under the {\bf 
+\item [--hollerith] Warn about Hollerith constants under the {\bf
 --port} option.
 
-\item [--linebreak] Treat line-breaks in continued statements as space. 
+\item [--linebreak] Treat line-breaks in continued statements as space.
 
-\item [--portability] Warn of non-portable usage.  
+\item [--portability] Warn of non-portable usage.
 
-\item [--pretty] Warn of unusual layout, e.g. comments between continuation 
+\item [--pretty] Warn of unusual layout, e.g. comments between continuation
 lines.
 
 \item [--pure] Warn of functions which have side-effects.
 
-\item [--truncation] Warn if truncation may occur, e.g. in 
+\item [--truncation] Warn if truncation may occur, e.g. in
 converting real to integer.
 
 \item [--verbose] Output all messages; if switched off, omits some
 inessential messages, {\em e.g.} reporting the name of each
-{\tt INCLUDE} file. 
+{\tt INCLUDE} file.
 
 \end{description}
 \end{quote}
@@ -391,25 +391,25 @@ inessential messages, {\em e.g.} reporting the name of each
 \begin{description}
 
 \item [--arrays=n] Specify checks for array arguments, {\it n} range 0
-to 3, default 3. (0=none, 1=rank, 2=size, 3=all). 
+to 3, default 3. (0=none, 1=rank, 2=size, 3=all).
 
 \item [--columns=n] Set the maximum line length to {\it n} columns (text
-beyond this is ignored), range 0 to 132, default 72. 
+beyond this is ignored), range 0 to 132, default 72.
 
 \item [--common=n] Specify checks for {\tt COMMON} blocks, {\it n}
 range 0 to 3, default 3.  (0=none, 1=data-types, 2=array-storage,
-3=all). 
+3=all).
 
 \item [--include=path] Define a directory to search for include files; a
-cumulative option. 
+cumulative option.
 
 \item [--output=filename] Send output to the given file (the default
 file extension is {\tt .lis}). By default all output goes to {\tt
 stdout} (the screen) and on Unix may be redirected.
 
 \item [--usage=n] Specify checks for unused variables, {\it n} range
-0 to 3, default 3. (0=none, 1=used-before-set, 2=unused, 3=all). 
- 
+0 to 3, default 3. (0=none, 1=used-before-set, 2=unused, 3=all).
+
 \end{description}
 \end{quote}
 
@@ -418,7 +418,7 @@ stdout} (the screen) and on Unix may be redirected.
 This note just summarizes the facilities of {\tt FTNCHEK}. Its author,
 Dr Robert Moniot of Fordham University (USA), has provided a detailed
 manual which is available as an ASCII file {\tt ftnchek.doc} or in
-PostScript form as {\tt ftnchek.ps}. 
+PostScript form as {\tt ftnchek.ps}.
 
 \section{An Alternative\xlabel{an_alternative}}
 
@@ -427,6 +427,6 @@ which is licenced on the STADAT node.  This has rather similar
 functionality but both programs have their strengths and
 weaknesses. An obvious advantage of {\tt FTNCHEK} is that it is a
 public-domain product which can be used freely on any Unix, VMS, or
-MS-DOS system. 
+MS-DOS system.
 
 \end{document}

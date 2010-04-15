@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL SPD_FABER( MNDF, LINNAM, LABFRQ, CMPTYP, NPARA, PARTYP,
-*        COMP, STATUS ) 
+*        COMP, STATUS )
 
 *  Description:
 *     This routine finds a suitable component in the result structure of
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

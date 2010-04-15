@@ -16,7 +16,7 @@
 *     CALL FIND29( POUTDE, MENU, STATUS )
 
 *  Description:
-*  
+*
 *     The subroutine creates the output files which can be read by the
 *     Boresight Survey Data Extraction Program, EXCRDD.This subroutine
 *     creates a sorted list of scans for each plate record and calls the
@@ -38,7 +38,7 @@
 *     scan onward each identified scan in scan common contains a
 *     pointer to the next one in the time order, again the pointer is
 *     the position of this following scan in scan common.
-*     
+*
 *     -  The finish time of each scan in the linked list is compared
 *     with the start time of the next in the time order. If these times
 *     are found to overlap the scan overlap flag is set.
@@ -61,7 +61,7 @@
 *     -  For  each source in the plate common record.
 *
 *        If the source is required
-*        
+*
 *        -  For each scan in the source common record.
 *
 *           If the scan is required
@@ -69,7 +69,7 @@
 *           - Enter the scan into its correct position in the chain of
 *           pointers which form a list of scans ordered by their start
 *           UTCS time. This involves:-
-*           
+*
 *              If the scan is the first scan identified for this source
 *              put its scan common position identifier into the plate
 *              record's first scan position variable.
@@ -120,7 +120,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -139,14 +139,14 @@
       INCLUDE 'PSX_ERR'          ! PSX errors
 
 *  Global Variables:
-      INCLUDE 'FICOMN' ! Common blocks for FINDCRDD      
-                                       
+      INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
+
 *  Arguments Given:
       CHARACTER * ( * ) POUTDE
-      
+
 *  Arguments Given and Returned
       CHARACTER * ( 1 ) MENU
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -164,7 +164,7 @@
                                          ! created.
       CHARACTER * ( 19 ) DESNAM  ! Default name of file for description
                                  ! of plate files created.
-      INTEGER FD                 ! File descriptor obtained from FIO 
+      INTEGER FD                 ! File descriptor obtained from FIO
       LOGICAL FISCPL             ! First plate for this plate flag
       INTEGER IPLAT              ! Do loop variable for plates
       INTEGER ISCAN              ! Do loop variable for scans
@@ -205,12 +205,12 @@
 
 *  Use access mode write
       ACMODE = 'WRITE'
-      
+
 *  Generate a suitable dynamic default file name for the description of
 *  plate files created file
       DESNAM = 'FINDCRDD_PLATES_REQ'
 
-*  Determine the operating system being used 
+*  Determine the operating system being used
       CALL PSX_UNAME( SYSNAM, NODENM, RELEAS, VERSON, MACHIN, STATUS )
 
 *  If the system is not VMS change the name to lower case
@@ -220,7 +220,7 @@
 
 *  Enter the generated name as the default for the parameter
       CALL PAR_DEF0C( POUTDE, DESNAM, STATUS )
-      
+
 *  Open the description of plates created file
       CALL FIO_ASSOC( POUTDE, ACMODE, 'FORTRAN', RECSZ, FD, STATUS )
 
@@ -250,13 +250,13 @@
 
 *  Write the plate name on description of plates file
          BUFFER = '
-     :                               '      
+     :                               '
          WRITE ( BUFFER(2:11), '(A10)' ) OUTNAM
          CALL FIO_WRITE( FD, BUFFER, STATUS )
-      
+
 *  Set first scan for this plate flag to true
          FISCPL = .TRUE.
-      
+
 *  Initialise the count of scans for this plate to zero
          PLNOSC( IPLAT ) = 0
 
@@ -269,7 +269,7 @@
 *  Put the array index for the current source within the plate common
 *  into a more convienient variable
             SOPOS = PLSOI( IPLAT, ISOURC)
-      
+
 *  Check whether source is required
             IF ( .NOT. SOMADE( SOPOS ) ) THEN
 
@@ -285,7 +285,7 @@
                WRITE ( BUFFER(9:17), '(A8)' ) SONAME( SOPOS )
                WRITE ( BUFFER(23:25), '(I3)' ) SONOSC( SOPOS )
                CALL FIO_WRITE( FD, BUFFER, STATUS )
-      
+
 *  *********************************************************************
 *  For each scan associated with that source ( SONOSC is the number of
 *  scans assoicated with that source )
@@ -313,7 +313,7 @@
 
 *  Set the first scan to be considered flag off
                         FISCPL = .FALSE.
-      
+
                      ELSE
 
 *  If the current scan is not the first to be considered for this
@@ -333,12 +333,12 @@
 *  Set the pointer for the position of the next scan in the current scan
 *  record to be that of the scan compared
                            SCNSCP( SCPOS ) = CFSCAN
-      
+
                         ELSE
 *  Else follow the chain of next scan in start UTCS order pointers until
 *  a start UCTS time is found greater than the current scan start UTCS
 *  or an end of linked list value is found.
- 200                       CONTINUE                          
+ 200                       CONTINUE
 
 *  Check whether the pointer to the next scan in the comparison
 *  scan indicates the end of the linked list
@@ -350,16 +350,16 @@
 
 *  Store the compare scan value as the last compare scan
                               LACFSC = CFSCAN
-      
+
 *  Set a new value of the scan to be compared as the next scan pointer
 *  in the present scan to be compared
                               CFSCAN = SCNSCP( CFSCAN )
-      
+
 *  Check whether the current scan's UTCS start time is less than
 *  the start time of the scan to be compared
                               IF ( SCSTUT( SCPOS ) .LT.
      :                                     SCSTUT( CFSCAN ) ) THEN
-      
+
 *  Set the pointer in the last scan compared to the current scan
                                  SCNSCP( LACFSC ) = SCPOS
 
@@ -374,16 +374,16 @@
                            END IF
                         END IF
                      END IF
-      
+
 *  Add one to the count of scans for this plate
                      PLNOSC( IPLAT ) = PLNOSC( IPLAT ) + 1
-                        
+
 *  End of for if scan is required
                   END IF
-      
+
 *  End of for each scan marked as belonging to the current source
  300           CONTINUE
-                
+
 *  End if for if source is required
             END IF
 
@@ -412,16 +412,16 @@
                NSCPOS = SCNSCP( SCPOS )
 
 *  If the start time of the next scan is before the end time of the
-*  current scan 
+*  current scan
                IF ( SCENUT( SCPOS ) .GE. SCSTUT( NSCPOS ) ) THEN
 
 *  Set the current scan overlapped flag to .TRUE. ie overlapped
                   SCOVFL( SCPOS ) = .TRUE.
-      
+
                ELSE
 *  Set the current scan overlapped flag to .FALSE. ie  not overlapped
                   SCOVFL( SCPOS ) = .FALSE.
-                  
+
                END IF
 
 *  Set the current scan position to that of the next scan in the list
@@ -430,10 +430,10 @@
 
 *  Go to the top of the loop for processing each scan in linked list
                GO TO 500
-      
+
 *  If the scan pointed to by the current scan is the end list marker
             ELSE
-      
+
 *  Set the current scan overlapped flag to .FALSE. ie  not overlapped
                SCOVFL( SCPOS ) = .FALSE.
 
@@ -445,11 +445,11 @@
 * for EXCRDD for this plate record.
 * **********************************************************************
          CALL FIND23( IPLAT, FD, OUTNAM, STATUS )
-      
+
 *  End of for each plate record loop
  600  CONTINUE
 
 *  Set main menu variable to displaying the main menu
       MENU = 'M'
-      
+
       END

@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,12 +73,12 @@
       LOGICAL PARDBL             ! Character to double precision
 
 *  Local Variables:
-      CHARACTER * ( 2 ) STR( 2 ) ! Degrees/minutes or hours/minutes 
+      CHARACTER * ( 2 ) STR( 2 ) ! Degrees/minutes or hours/minutes
       CHARACTER * ( 12 ) DIGITS  ! Known digits
       DOUBLE PRECISION SECS      ! Number of seconds
       INTEGER IC                 ! Character counter
       INTEGER IAT                ! Current string position
-      INTEGER J                  ! Degrees(1) minutes(2) or seconds 
+      INTEGER J                  ! Degrees(1) minutes(2) or seconds
       INTEGER LP                 ! Length of input string
       LOGICAL OK                 ! Input string non-blank
       INTEGER I                  ! Loop variable
@@ -102,17 +102,17 @@
 *  Scan through par to locate the first non-space character.
       LP = CHR_LEN( PAR )
       OK = .FALSE.
-      DO 1 I = 1, LP 
+      DO 1 I = 1, LP
          IF ( PAR( I : I ) .NE. ' ' ) THEN
 
-*  First non-blank character. 
+*  First non-blank character.
             OK = . TRUE.
             GO TO 100
-         END IF         
+         END IF
          IAT = IAT + 1
  1    CONTINUE
  100  CONTINUE
-      IF ( OK ) THEN 
+      IF ( OK ) THEN
 
 *  Check if the first character is a sign.
          IF ( PAR( IAT : IAT ) .EQ. '-' ) THEN
@@ -124,14 +124,14 @@
          ELSE
             SGN=1.0
 
-*  Make an early exit if not a digit first      
+*  Make an early exit if not a digit first
             IF ( INDEX( DIGITS, PAR( IAT : IAT ) ) .EQ. 0 ) GO TO 99
          ENDIF
 
 *  Now scan through the remaining characters and load hm or dm into str.
          DO 3 K = IAT, LP
             IF ( INDEX( DIGITS, PAR( K : K ) ) .EQ. 0 ) THEN
-     
+
 *  Separator encountered, increment the dms counter.
                J = J + 1
                IF ( J .GT. 2 ) THEN

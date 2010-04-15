@@ -49,7 +49,7 @@ C
 C  External variables used:  None.
 C
 C  External subroutines / functions used:
-C     DSA_REF_SLOT, DSA_COERCE_ARRAY, DSA_VALIDATE_AXIS, 
+C     DSA_REF_SLOT, DSA_COERCE_ARRAY, DSA_VALIDATE_AXIS,
 C     DSA__CREATE_AXIS, DSA__AXIS_DATA_NAME
 C
 C  Prior requirements:
@@ -98,7 +98,7 @@ C
       CHARACTER DATA_NAME*80     ! DTA_ name for axis data array
       INTEGER   IGNORE           ! Dummy status value
       INTEGER   LENGTH           ! Length of OBJ_NAME
-      INTEGER   REF_SLOT         ! Reference name common slot 
+      INTEGER   REF_SLOT         ! Reference name common slot
 C
 C     DSA system common
 C
@@ -118,7 +118,7 @@ C
 C
 C     Look up the reference name in the tables and get the name
 C     of the axis data array.
-C          
+C
       CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500    ! Error exit
       CALL DSA__AXIS_DATA_NAME (REF_SLOT,AXIS,DATA_NAME,LENGTH)
@@ -128,7 +128,7 @@ C
       CALL DSA__CREATE_AXIS (REF_SLOT,AXIS,IGNORE)
 C
 C     Let DSA_COERCE_ARRAY do the work.
-C     
+C
       CALL DSA_COERCE_ARRAY (DATA_NAME(:LENGTH),TYPE,NDIM,DIMS,STATUS)
 C
 C     Exit

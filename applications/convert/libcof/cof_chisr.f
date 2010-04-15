@@ -91,7 +91,7 @@
 *        to fitsio routine.
 *     2009 June 26 (MJC):
 *        UPDATE_MODE may now have leading blanks that must be trimmed to
-*        avoid an error from NDF when NDF accesses this component. 
+*        avoid an error from NDF when NDF accesses this component.
 *     2009 June 30 (MJC):
 *        Indent paragraphs of text after the first line except for
 *        Software, Arguments, and Parameters headings for which a new
@@ -105,7 +105,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -314,7 +314,7 @@
 *  Obtain the current record.  Validate that it's an integer.
             CRCOL = INDEX( CARD, 'Current record:' )
 
-            IF ( STATUS .EQ. SAI__OK ) THEN 
+            IF ( STATUS .EQ. SAI__OK ) THEN
                CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'C', CARD )
@@ -427,13 +427,13 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  The width is the seventh word.
-               IF ( STATUS .EQ. SAI__OK ) THEN 
+               IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETC( 'C', CARD )
                      CALL MSG_SETC( 'F', WORDS( 7 ) )
                      CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer '//
-     :                             'field ''^F'' in FITS card ''^C''.', 
+     :                             'field ''^F'' in FITS card ''^C''.',
      :                             STATUS )
                   END IF
                END IF
@@ -487,7 +487,7 @@
 
 *  Set PARSKP if end of paragraph within a history record
                   PARSKP = KEYWRD .EQ. 'HISTORY' .AND.
-     :                     CARD( 9 + ALIGN: ) .EQ. ' ' 
+     :                     CARD( 9 + ALIGN: ) .EQ. ' '
                   IF ( KEYWRD .NE. 'HISTORY' .OR.
      :                 PARSKP ) THEN
 
@@ -497,7 +497,7 @@
 
 *  Is there any text to write?
                      IF ( PARCOL .GT. 0 ) THEN
- 
+
 *  Create the TEXT component and get a locator to it.  This should only
 *  be done for the first paragraph.
                         IF ( CRETEX ) THEN
@@ -529,7 +529,7 @@
 *  the first heading, so want to find the minimum positive offset.  If
 *  we add more headings make IARG, IGRP etc. an array.
                             CPHEAD = WIDTH
-                            IF ( IARG .GT. 0 ) 
+                            IF ( IARG .GT. 0 )
      :                        CPHEAD = MIN( CPHEAD, IARG )
                             IF ( IGRP .GT. 0 )
      :                        CPHEAD = MIN( CPHEAD, IGRP )
@@ -539,7 +539,7 @@
      :                        CPHEAD = MIN( CPHEAD, ISOF )
 
 *  If the heading is short there may be a later heading within the
-*  allowed width.  Only want to extract up to but not including the 
+*  allowed width.  Only want to extract up to but not including the
 *  second heading.  Note successive Group headings may appear.
                             CPHED2 = MAX( IARG, IGRP, IPAR, ISOF )
                             IGRP2 = CHR_INDEX( BUF( IGRP + 1: ),
@@ -564,23 +564,23 @@
 *  The heading is at the current paragraph position.  So treat it like
 *  the first line.
                               IF ( CPHEAD .EQ. 1 ) THEN
-                                 CALL CHR_PFORM( 1, PARAGR, .FALSE., 
+                                 CALL CHR_PFORM( 1, PARAGR, .FALSE.,
      :                                           TEXCOL,
      :                                           TEXT( :LWIDTH ) )
 
 *  It seems with Group that a leading space appears that prevents the
-*  Group heading from not being indented.  So shift the current index 
-*  within the paragraph pointer by one to skip over the space.  Then 
+*  Group heading from not being indented.  So shift the current index
+*  within the paragraph pointer by one to skip over the space.  Then
 *  index of the heading will be one and indented correctly.  It has
 *  no affect when it's a continuation (indented) line, as leading spaces
 *  are expected and removed.  Note we must not change TEXCOL, when
 *  CHR_PFORM returns it as zero, since this indicates that the
 *  paragraph has ended, and it is time to move on to the next HISTORY
 *  record.
-                                 IF ( TEXCOL .NE. 0 ) 
+                                 IF ( TEXCOL .NE. 0 )
      :                             TEXCOL = TEXCOL + 1
 
-*  Just transfer up to but excluding the heading, indenting the regulation 
+*  Just transfer up to but excluding the heading, indenting the regulation
 *  three characters.  Shift the position within paragraph to be at the
 *  heading.  There may still be leading blanks present in the paragraph,
 *  so remove those first to give consistent alignment.  Note we need to
@@ -654,11 +654,11 @@
                      END IF
 
 *  We can start a new paragraph.
-                     IF ( PARSKP ) PARCOL = 0 
-                  ELSE 
+                     IF ( PARSKP ) PARCOL = 0
+                  ELSE
 
 *  Append the current record to the paragraph buffer.
-                     CALL CHR_APPND( CARD( 9 + ALIGN: ), PARAGR, 
+                     CALL CHR_APPND( CARD( 9 + ALIGN: ), PARAGR,
      :                               PARCOL )
                      IF ( CARD( 80:80 ) .EQ. ' ' ) PARCOL = PARCOL + 1
                   END IF
@@ -709,12 +709,12 @@
      :                   /'HISTORY component.', STATUS )
       END IF
 
-*  If an error has occurred, issue a warning and flush the error, so that 
+*  If an error has occurred, issue a warning and flush the error, so that
 *  we can continue to build the rest of the NDF.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', NDF )
          CALL ERR_REP( 'COF_CHISR_ERR', 'The history information in '/
-     :                 /'the output NDF ''^NDF'' may be corrupt.', 
+     :                 /'the output NDF ''^NDF'' may be corrupt.',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
       END IF

@@ -12,7 +12,7 @@
 #include "dat_err.h"             /* DAT__ error code definitions            */
 #include "hds.h"
 
-int 
+int
 hdsWild(const char *fspec,
         const char *mode,
             int *iwld,

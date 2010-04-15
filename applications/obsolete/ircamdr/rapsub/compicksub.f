@@ -1,14 +1,14 @@
 
 *+  COMPICKSUB - compresses an image by selecting pixels at intervals
 
-      SUBROUTINE COMPICKSUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, ODIMS1, 
+      SUBROUTINE COMPICKSUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, ODIMS1,
      :                        ODIMS2, COMPRESS, STATUS )
 
 *    Description :
 *
 *     This routine compresses an input image by selecting evenly spaced
 *     pixels ( where the pixel spacing is defined by the compression
-*     factor ), and using those as the pixels for the smaller output 
+*     factor ), and using those as the pixels for the smaller output
 *     image. This routine is designed for 2-d arrays only.
 *
 *    Invocation :
@@ -69,12 +69,12 @@
      :    COMPRESS         ! the linear compression factor to be used
 
       REAL
-     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array 
+     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array
 
 *    Export :
 
       REAL
-     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array 
+     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array
 
 *    Status :
 
@@ -122,7 +122,7 @@
          END DO
       END DO
 
-         
+
 *    end and return
 
       END

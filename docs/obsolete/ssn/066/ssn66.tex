@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -92,20 +92,20 @@ becomes
 However, there is not an exact one--to--one correspondence between files on VMS
 and files on UNIX, and in any case file names may be different in
 order to conform to normal UNIX practice. For example, Fortran source files
-should have extension {\tt .f} instead of {\tt .for} and the object code 
+should have extension {\tt .f} instead of {\tt .for} and the object code
 library {\tt GNS.OLB} would be
 called {\tt libgns.a}. Furthermore, files which are normally referred to by a
 logical name will have a name that matches the logical name (converted to lower
 case) rather than the VMS file name. For example, the VMS file
 {\tt [STARLINK.LIB.GNS]GNS\_ERR.FOR} which has the logical name {\tt GNS\_ERR}
-becomes {\tt /star/starlink/lib/gns/gns\_err}. 
+becomes {\tt /star/starlink/lib/gns/gns\_err}.
 
 However, for files accessed by users, such as executable programs
 and Fortran include files, this is not acceptable because of the long and hard
 to remember path names involved and because of the disruption caused by any
 re-organisation of the directory structure. Therefore, these files will be
 either copied or moved to the following directories:
-          
+
 {\renewcommand{\arraystretch}{1.5}
 \[\begin{tabular}{ll}
 \tt/star/bin & Executable programs and shell scripts\\
@@ -118,22 +118,22 @@ either copied or moved to the following directories:
 
 
 There is also a directory {\tt /star/local} which contains similar
-subdirectories to those directories listed above 
+subdirectories to those directories listed above
 (e.g. {\tt /star/local/bin,
 /star/local/lib}, etc). This directory tree is provided as an empty
-tree structure into which sites can install local software. 
+tree structure into which sites can install local software.
 It will not be used by
-the Starlink Software Librarian. 
+the Starlink Software Librarian.
 
-On UNIX, programs and shell scripts can be run simply by typing the 
+On UNIX, programs and shell scripts can be run simply by typing the
 appropriate filename
 provided that the file can be found in a directory in
 the current path.  Most executables in
 the SSC will be moved to {\tt /star/bin} so that they are available to a user
 by simply adding {\tt /star/bin} to the current path. Some packages with a
 large number of commands may have their executable files in a subdirectory of
-{\tt/star/bin} along with a package initialization shell script. 
-This initialization script must be `sourced' to define aliases for 
+{\tt/star/bin} along with a package initialization shell script.
+This initialization script must be `sourced' to define aliases for
 individual packages via which programs can be run (see SUN/118 for more
 details).
 
@@ -142,7 +142,7 @@ if the number of files warrants this; for example, the 23 PGPLOT example program
 are found in {\tt/star/bin/examples/pgplot}. This avoids directories containing
 so many files that it becomes hard to locate files when you are unsure of the
 exact name. However, the number of subdirectories has to be kept under control
-in order to avoid the opposite problem where you know the name of the file 
+in order to avoid the opposite problem where you know the name of the file
 but are unable to find it because the directory structure is too complicated.
 
 Object module libraries will be moved to {\tt /star/lib} so that programs that
@@ -158,7 +158,7 @@ manager considerable freedom when deciding where to place files. However, some
 rules have to be followed so that software installations and updates will
 work.
 
-Since the root partition gets replaced by operating system upgrades 
+Since the root partition gets replaced by operating system upgrades
 {\tt /star} should be
 either the mount point of a disk partition or nfs file system, or a symbolic
 link to a directory somewhere else. Directories in {\tt /star} can be any of
@@ -168,12 +168,12 @@ can be easily restored from a tar file.
 
 On a server which serves several machines of different types, each machine type
 requires a different set of binary files. This is achieved by making {\tt
-/star/bin}, {\tt /star/lib}, {\tt /star/etc} and {\tt /star/bin/examples} 
-either symbolic links to or the mount points  of nfs file systems which 
+/star/bin}, {\tt /star/lib}, {\tt /star/etc} and {\tt /star/bin/examples}
+either symbolic links to or the mount points  of nfs file systems which
 contain the binary files for the appropriate machine architecture.
- 
+
 \section{Software Distribution}
-The actual distribution of files is done in much the same way as on VMS; {\tt 
+The actual distribution of files is done in much the same way as on VMS; {\tt
 tar} can do the job that {\tt backup} does on VMS. However, UNIX systems are
 not binary compatible in the way that VAXs are -- even when dealing with
 different models from the same manufacturer. Therefore the distribution
@@ -218,27 +218,27 @@ software (see SGP/11 for more details).
 The package level make file will often do no more than {\tt cd} to a series
 of sub-directories and execute make in each of them.
 Example make files for part of the {\tt /star/starlink} package
-directory is presented in appendix A with a commentary for those unfamiliar 
+directory is presented in appendix A with a commentary for those unfamiliar
 with make.
 
-In a few cases it may be necessary to distribute machine type specific 
-directories (for example, when we are not permitted to distribute source code). 
+In a few cases it may be necessary to distribute machine type specific
+directories (for example, when we are not permitted to distribute source code).
 Where this occurs, the directory names will incorporate the machine type so
 that the correct version can be selected by defining the environment variable
 {\tt SYSTEM} to be the machine type.
 For example the gks object libraries for the
 mips processor (DECstation) and the SUN SPARCSystem will be stored in:
-{\tt /star\-/starlink\-/lib\-/gks\-/mips} and {\tt 
-/star\-/starlink\-/lib\-/gks\-/sun4} respectively which can be referred to 
+{\tt /star\-/starlink\-/lib\-/gks\-/mips} and {\tt
+/star\-/starlink\-/lib\-/gks\-/sun4} respectively which can be referred to
 in make files as {\tt /star\-/starlink\-/lib\-/gks\-/\$(SYSTEM)}.
 
 \appendix
 \section{Example make files}
 
-The following example makefiles are cut--down versions of those currently 
+The following example makefiles are cut--down versions of those currently
 released. However, they do illustrate all of the basic requirements of
-their class of makefile. More complex examples can be found on--line in 
-the current release of the USSC. 
+their class of makefile. More complex examples can be found on--line in
+the current release of the USSC.
 
 
 \subsection{\tt /star/starlink/makefile}
@@ -247,7 +247,7 @@ the current release of the USSC.
 #
 #   Installation make file for the "core" starlink package.
 \end{verbatim}
-Lines beginning {\tt\#} are comments. 
+Lines beginning {\tt\#} are comments.
 \begin{verbatim}
 install:
         if test -d /star/bin; then echo; else mkdir /star/bin; fi
@@ -265,7 +265,7 @@ install:
         if test -d /star/local/include; \
                                 then echo; else mkdir /star/local/include; fi
         if test -d /star/local/man; then echo; else mkdir /star/local/man; fi
- 
+
         cp /star/starlink/login /star/etc/login
 
         cd lib; $(MAKE) install; cd ..
@@ -281,7 +281,7 @@ returns {\em true} if the specified file exists and is a directory and returns
 essentially a null command which is only there because the syntax of the {\tt
 if} command requires a command in the ``then'' clause.
 
-The {\tt install} target then just changes directory to {\tt lib} (the only 
+The {\tt install} target then just changes directory to {\tt lib} (the only
 one that exists at present) and executes {\tt make install}.
 
 \begin{verbatim}
@@ -290,7 +290,7 @@ deinstall:
         cd lib; $(MAKE) deinstall; cd ..
         cd utility; $(MAKE) deinstall; cd ..
         cd system; $(MAKE) deinstall; cd ..
- 
+
 clean:
         cd lib; $(MAKE) clean; cd ..
         cd utility; $(MAKE) clean; cd ..
@@ -310,7 +310,7 @@ install:
         cp sae_par /star/include
         cp sae_par.h /star/include
 \end{verbatim}
-The first step is to install the include files {\tt sae\_par} and 
+The first step is to install the include files {\tt sae\_par} and
 {\tt sae\_par.h} in {\tt/star/include}.
 \begin{verbatim}
         cd chr; $(MAKE) rebuild; $(MAKE) install; cd ..
@@ -332,7 +332,7 @@ The installation process is completed by changing directory to each of the
 sub-directories of {\tt /star\-/starlink\-/lib} in turn and using make to first
 build the binary files from the source code and then installing the necessary
 files in {/star/bin} etc. In this example, example programs are for pgplot and
-ncar only built if the environment variable SYSTEM is set to sun4, in order to 
+ncar only built if the environment variable SYSTEM is set to sun4, in order to
 save disk space.
 \begin{verbatim}
 clean:
@@ -347,7 +347,7 @@ clean:
         cd ncar/examples; $(MAKE) clean; cd ../..
 
 deinstall:
-        -rm /star/include/sae_par 
+        -rm /star/include/sae_par
         -rm /star/include/sae_par.h
         cd chr; $(MAKE) deinstall; cd ..
         cd ems; $(MAKE) deinstall; cd ..
@@ -360,11 +360,11 @@ deinstall:
         cd ncar/examples; $(MAKE) deinstall; cd ../..
 
  \end{verbatim}
-The {\tt clean} and {\tt deinstall} targets just execute  {\tt make clean} 
+The {\tt clean} and {\tt deinstall} targets just execute  {\tt make clean}
 and {\tt make deinstall} respectively in each of the sub
 directories.
 
-Again, there is no {\tt build} target because for example, the programs in 
+Again, there is no {\tt build} target because for example, the programs in
 the gns package have to be linked with the ems and chr libraries.
 \subsection{\tt /star/starlink/lib/chr/makefile}
 \begin{verbatim}
@@ -386,7 +386,7 @@ VERS = 1.1
 This sets the macro {\tt VERS} to the version number of the shareable
 library that will be built on systems that support shareable libraries.
 \begin{verbatim}
-#   Object files 
+#   Object files
 #
 OBJECT_FILES = chr_appnd.o chr_clean.o chr_copy.o chr_ctoc.o chr_ctod.o \
                chr_ctoi.o chr_ctol.o chr_ctor.o chr_dcwrd.o chr_delim.o \
@@ -441,17 +441,17 @@ install:
 The {\tt install} target installs the necessary files in the Starlink
 directories. The action taken depends on the type of system that the
 installation is being done on; on SUN 4 systems the shareable library ({\tt
-libchr.a.1.1}) is moved to {\tt /star/lib} as well as the 
+libchr.a.1.1}) is moved to {\tt /star/lib} as well as the
 object module library ({\tt
 libchr.a}). On other systems (such as a DECstation running ULTRIX
-which does not support sharable libraries) it is just the object module library 
+which does not support sharable libraries) it is just the object module library
 that is moved and the dummy shareable library is deleted.
 
 The libraries can be ``moved'' since they can always be rebuilt
 if required, but {\tt chr\_err} and {\tt chr\_link} must by copied so that {\tt
 /star/starlink/lib/gns} always contains the complete source of the package.
 
-The object module library must be ``randomized'' after it is copied otherwise 
+The object module library must be ``randomized'' after it is copied otherwise
 the library's symbol table will appear to the loader to be out of date.
 \begin{verbatim}
 #   target for de-installing from Starlink directories
@@ -490,7 +490,7 @@ libchr.a : $(OBJECT_FILES)
                   ranlib libchr.a;; \
         esac
 \end{verbatim}
-This rule states that on systems other than the SUN 4 the object library is 
+This rule states that on systems other than the SUN 4 the object library is
 created inserting the object files
 into the library and building the library index with {\tt ranlib}. \$? is a
 pre-defined macro that expands to the name of the source file that is newer

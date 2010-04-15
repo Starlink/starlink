@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -61,7 +61,7 @@ C# IL>=a, OL>=0
 *
       INTEGER    JUPLEX,  JLOLEX,  JUPRIX,  JLORIX,  JUPY,  JLOY
       PARAMETER (JUPLEX=1,JLOLEX=2,JUPRIX=3,JLORIX=4,JUPY=5,JLOY=6)
- 
+
 *     BCROSS  True if, prov' trap' base is the crossing the sides
 *     BXUPD   True if, X-ends of prov' trap' base need updating
 *     COLLIN  True if, edges are collinear
@@ -211,7 +211,7 @@ C# IL>=a, OL>=0
 *    If an edge is deleted any pointer to it external to this routine
 *    may still pick it up.
 *---------------------------------------------------------------------
- 
+
 *     Find peak from which to extract trapezoid
 *     (two edges containing the non-horizontal sides of trapezoid)
       CALL GKTZHP(NV,VX,VY,VXETT,IYETT,IETB,JETNXT,FOUND,JTZ)
@@ -276,14 +276,14 @@ C# IL>=a, OL>=0
          JLEFT = 2
       ENDIF
       JRIGHT = 3 - JLEFT
- 
+
 *     Set Upper Edge of trapezoid
       TZ(JUPLEX)  = VXTOP(JLEFT)
       TZ(JUPY)    = VYTOP
       TZ(JUPRIX)  = VXTOP(JRIGHT)
 *     and initialize Y-level of provisional trapezoid base
       TZ(JLOY)    = VYBOT(1)
- 
+
 *     Set lower Y value of provisional Trapezoid (may be raised)
 *     and the remove flags.
 *     Defer setting of of lower X values of provisional Trapezoid.
@@ -530,11 +530,11 @@ C# IL>=a, OL>=0
         FOUND = .FALSE.
         GOTO 999
   320 CONTINUE
- 
+
   500 CONTINUE
 *
 *     Here the base of the trapezoid is finalised
- 
+
 *     Set Lower Left and Right X-coords of Trapezoid, if necessary.
       IF(BXUPD)THEN
          TZ(JLOLEX) = TZ(JUPLEX)+(SLOPE(JLEFT))*(TZ(JUPY)-TZ(JLOY))
@@ -544,7 +544,7 @@ C# IL>=a, OL>=0
            TZ(JLORIX) = TZ(JUPRIX)+(SLOPE(JRIGHT))*(TZ(JUPY)-TZ(JLOY))
          ENDIF
       ENDIF
- 
+
 *     Remove Trapeziod from Edge Table
       IF((REMOVE(1) .AND. REMOVE(2)) .AND.
      :   (IETB(JTZ(1)) .EQ. IETB(JTZ(2))) )THEN
@@ -574,14 +574,14 @@ C# IL>=a, OL>=0
         FOUND = .FALSE.
         GOTO 999
       ENDIF
- 
+
 *     If necessary, ensure that the peak edges, implied by the edge
 *     table are valid.
       IF(PEAKCH)THEN
          CALL GKTZVP(NV,VX,VY,VXETT,IYETT,IETB,JETNXT)
          PEAKCH = .FALSE.
       ENDIF
- 
+
 *
 *     Count trapezoid as FOUND, only if
 *     at least one of the first four edges on the edge table
@@ -615,6 +615,6 @@ C# IL>=a, OL>=0
 *
 *     Also, Trapezoid should have top above base of clipping rectangle
       FOUND = FOUND .AND. (TZ(JUPY) .GT. YMIN)
- 
+
   999 CONTINUE
       END

@@ -13,10 +13,10 @@
 *     CALL CCD1_HCHAN( LOC, ACMODE, CHAN, STATUS )
 
 *  Description:
-*     This routine creates an AST channel for use within CCDPACK using 
-*     a given HDS locator.  It is a wrapper for AST_CHANNEL 
-*     whose purpose is to shield the calling routine from knowledge of 
-*     the source and sink routines and global variables required to 
+*     This routine creates an AST channel for use within CCDPACK using
+*     a given HDS locator.  It is a wrapper for AST_CHANNEL
+*     whose purpose is to shield the calling routine from knowledge of
+*     the source and sink routines and global variables required to
 *     make this work.  The routine maps the data and sets up the common
 *     block for later use by CCD1_CASRC and CCD1_CASNK.
 *
@@ -24,7 +24,7 @@
 *     a CHAR_ component of any (reasonable) length and any (reasonable)
 *     line length.  It should not be mapped on entry, but this routine
 *     will map it.  After data has been written to it using AST_WRITE
-*     (via CCD1_CASNK) the component will be mapped, and may have many 
+*     (via CCD1_CASNK) the component will be mapped, and may have many
 *     (up to half) blank, i.e.  space-filled, entries at the end of it,
 *     which the calling routine may wish to truncate.  After the is
 *     finished with, the locator should be annulled (which will unmap
@@ -34,7 +34,7 @@
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
 *        An HDS locator for the component to be read from/written to.
 *        It must be a 1-dimensional array of type _CHAR*N.  N and the
-*        extent of the array can both be any small integer larger 
+*        extent of the array can both be any small integer larger
 *        than 1; lines are broken into several array elements and
 *        the array extended if necessary.
 *     ACMODE = CHARACTER * ( * ) (Given)
@@ -47,8 +47,8 @@
 *        The global status.
 
 *  Restrictions:
-*     As currently implemented, only one AST channel created by this 
-*     routine may be in use at once.  No check is performed that the 
+*     As currently implemented, only one AST channel created by this
+*     routine may be in use at once.  No check is performed that the
 *     channel is not already in use.
 
 *  Copyright:
@@ -92,7 +92,7 @@
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'CCD1_PAR'         ! Local CCDPACK constants
-      
+
 *  Global Variables:
       INCLUDE 'CCD1_CACM'        ! CCD1_CALEN = INTEGER
                                  !    Length of elements in character array
@@ -108,20 +108,20 @@
 *  Arguments Given:
       CHARACTER * ( DAT__SZLOC ) LOC
       CHARACTER * ( * ) ACMODE
-      
+
 *  Arguments Returned:
       INTEGER CHAN
 
 *  Local variables:
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL CCD1_CASRC        ! Source routine for AST Channel
       EXTERNAL CCD1_CASNK        ! Sink routine for AST Channel
-      
+
 *.
 
 *  Check inherited global status.

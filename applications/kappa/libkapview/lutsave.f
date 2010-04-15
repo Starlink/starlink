@@ -38,9 +38,9 @@
 *        colour indices.  For colour tables produced by KAPPA this
 *        should be FALSE. [FALSE]
 *     LOGFILE = FILENAME (Write)
-*        The name of a text file to receive the formatted values in the 
+*        The name of a text file to receive the formatted values in the
 *        colour table. Each line i the file contains the red, green and
-*        blue intensities for a single pen, separated by spaces. A null 
+*        blue intensities for a single pen, separated by spaces. A null
 *        string (!) means that no file is created.  [!]
 *     LUT = NDF (Write)
 *        The output NDF into which the colour table is to be stored.
@@ -95,7 +95,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,7 +111,7 @@
 *  Local Constants:
       INTEGER NDIMS              ! Dimensionality of the LUT
       PARAMETER ( NDIMS = 2 )
-     
+
 *  Local Variables:
       INTEGER DIMS( NDIMS )      ! LUT dimensions
       INTEGER EL                 ! No. of mapped elements
@@ -177,13 +177,13 @@
 
 *  Allocate memory and store the LUT in the memory.
          CALL PSX_CALLOC( DIMS( 1 )*DIMS( 2 ), '_REAL', PNTR, STATUS )
-         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ), 
+         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ),
      :                    STATUS )
 
 *  Write it to a log file.
-         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ), 
+         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ),
      :                    %VAL( CNF_PVAL( PNTR ) ), 1, 1,
-     :                    DIMS( 1 ), DIMS( 2 ), .TRUE., FDI, 
+     :                    DIMS( 1 ), DIMS( 2 ), .TRUE., FDI,
      :                    'LOGFILE', STATUS )
 
 *  Free the memory.
@@ -196,13 +196,13 @@
          CALL NDF_MAP( NDF, 'DATA', '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Save the LUT to the NDF data component.
-         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ), 
+         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ),
      :                    STATUS )
 
 *  Also write it to a log file.
-         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ), 
+         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ),
      :                    %VAL( CNF_PVAL( PNTR ) ), 1, 1,
-     :                    DIMS( 1 ), DIMS( 2 ), .TRUE., FDI, 
+     :                    DIMS( 1 ), DIMS( 2 ), .TRUE., FDI,
      :                    'LOGFILE', STATUS )
 
 *  Set the title component of the NDF.

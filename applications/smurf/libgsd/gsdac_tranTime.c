@@ -4,7 +4,7 @@
 *     gsdac_tranTime.c
 
 *  Purpose:
-*     Translates datetime from YYYY-MM-DD HH:MM:SS to SPECX standard time 
+*     Translates datetime from YYYY-MM-DD HH:MM:SS to SPECX standard time
 *     format of DD-Mon-YY and hh:mm:ss
 
 *  Language:
@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_tranTime ( const char *dTime,char *iDate,  char *iTime, 
+*     gsdac_tranTime ( const char *dTime,char *iDate,  char *iTime,
 *                      int *status )
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *     iTime = char* (Given and Returned)
 *        Time as string in SPECX internal format (HH:MM:SS)
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *    C version of specx tran_time.f & tran_date.f for use with gsdac_getWCS
@@ -78,26 +78,26 @@
 
 #define FUNC_NAME "gsdac_tranTime.c"
 
-void gsdac_tranTime ( const char *dTime, char *iDate, char *iTime, 
+void gsdac_tranTime ( const char *dTime, char *iDate, char *iTime,
                       int *status )
 
 {
 
   /* Local variables */
-  
+
   int day;                    /* day */
   int hour;                   /* hour */
   int min;                    /* min */
   int month;                  /* month */
   const char *months[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",
-                           "AUG", "SEP", "OCT", "NOV", "DEC" };  
+                           "AUG", "SEP", "OCT", "NOV", "DEC" };
   int sec;                    /* second */
   int year;                   /* year */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  sscanf( dTime, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, 
+  sscanf( dTime, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day,
           &hour, &min, &sec );
 
   /* Write the date string. */

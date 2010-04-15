@@ -48,7 +48,7 @@
 *        been set by READF. However, if this facility is not required,
 *        it is perfectly acceptable to set ERSCALE when invoking
 *        ELLIPSES.
-*        
+*
 *        [The value of the global parameter PONGO_ERSCALE is used. If
 *        PONGO_ERSCALE is not defined, the default value 1.0 is used.]
 
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       LOGICAL DRAXES             ! Switch for drawing axes
 
@@ -104,7 +104,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that the device is open.
-      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
+      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
          CALL PAR_GET0L( 'AXES', DRAXES, STATUS )
          CALL PAR_GET0R( 'ERSCALE', SCALE, STATUS )
          CALL PON_ELLIPSES( DRAXES, XDATA, YDATA, ZDATA, ERRX, ERRY,

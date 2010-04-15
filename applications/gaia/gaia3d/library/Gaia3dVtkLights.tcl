@@ -354,7 +354,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
       set_maintain_luminance_
    }
 
-   #  Set various values and apply immediately. The name is the 
+   #  Set various values and apply immediately. The name is the
    #  LightKit property (see vtkLightKit documentation).
    public method set_prop {name value} {
       $lightkit_ Set${name} $value

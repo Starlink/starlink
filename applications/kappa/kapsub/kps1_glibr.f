@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_GLIBR( LBND1, LBND2, UBND1, UBND2, DIN, IPPIX, 
-     :                       NPOS, STATUS ) 
+      SUBROUTINE KPS1_GLIBR( LBND1, LBND2, UBND1, UBND2, DIN, IPPIX,
+     :                       NPOS, STATUS )
 *+
 *  Name:
 *     KPS1_GLIBR
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_GLIBR( LBND1, LBND2, UBND1, UBND2, DIN, IPPIX, NPOS, STATUS ) 
+*     CALL KPS1_GLIBR( LBND1, LBND2, UBND1, UBND2, DIN, IPPIX, NPOS, STATUS )
 
 *  Description:
 *     This routine returns an array holding the pixel co-ordinates at the
@@ -75,8 +75,8 @@
 *  Type Definitions:
       IMPLICIT NONE            ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'        ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE parameters
       INCLUDE 'PRM_PAR'        ! VAL__ constants
       INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
@@ -95,7 +95,7 @@
       INTEGER STATUS
 
 *  Local Variables:
-      INTEGER I,J      
+      INTEGER I,J
 *.
 
 *  Check inherited global status.
@@ -119,7 +119,7 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Store the pixel positions in the memory.
-            CALL KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN, 
+            CALL KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN,
      :                       NPOS, %VAL( CNF_PVAL( IPPIX ) ), STATUS )
 
          END IF

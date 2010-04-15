@@ -66,7 +66,7 @@ table[*entry].address = (void *)*address;
 *-
 */
 
-F77_SUBROUTINE(gen_inqsymnam)(INTEGER(entry), CHARACTER(name), INTEGER(ierr) 
+F77_SUBROUTINE(gen_inqsymnam)(INTEGER(entry), CHARACTER(name), INTEGER(ierr)
      TRAIL(name) ) {
 
      *ierr = 0;
@@ -98,7 +98,7 @@ F77_SUBROUTINE(gen_inqsymnam)(INTEGER(entry), CHARACTER(name), INTEGER(ierr)
 *-
 */
 
-F77_SUBROUTINE(gen_inqsymtyp)(INTEGER(entry), CHARACTER(type), INTEGER(ierr) 
+F77_SUBROUTINE(gen_inqsymtyp)(INTEGER(entry), CHARACTER(type), INTEGER(ierr)
      TRAIL(type) ) {
 
      *ierr = 0;

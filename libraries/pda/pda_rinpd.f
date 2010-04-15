@@ -13,8 +13,8 @@
 *     CALL PDA_RINPD( PERM, N, X, IFAIL )
 
 *  Description:
-*     This routine reorders an array (in place) using an permutation 
-*     vector. This is most likely the output from one of the sorting 
+*     This routine reorders an array (in place) using an permutation
+*     vector. This is most likely the output from one of the sorting
 *     routines PDA_QSI[A|D]D.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *        Status flag. Set 0 for success, otherwise the permutation isn't
 *        correct.
 
-*  Notes: 
+*  Notes:
 *     - Re-ordering is trivial if two arrays are available.
 *          DO I = 1, N
 *             XX( I ) = X( PERM( I ) )
@@ -65,11 +65,11 @@
 *  Arguments Given:
       INTEGER N
       INTEGER PERM( N )
-      
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION X( N )
       INTEGER IFAIL
-      
+
 *  Local Variables:
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Current index
@@ -90,10 +90,10 @@
          IF ( ( IAT .GE. 1 ) .AND. ( IAT .LE. N ) ) THEN
             IF( PERM( IAT ) .GT. 0 ) THEN
                PERM( IAT ) = -PERM( IAT )
-            ELSE 
+            ELSE
                IFAIL = 1
             END IF
-         ELSE 
+         ELSE
             IFAIL = 1
          END IF
          IF ( IFAIL .NE. 0 ) GO TO 99
@@ -107,7 +107,7 @@
 *  were we have been and terminate the inner loop when at the end of
 *  the cycle. We then test for another cycle etc.
       DO 2 I = 1, N
-         IF ( PERM( I ) .LT. 0 ) THEN 
+         IF ( PERM( I ) .LT. 0 ) THEN
 
 *  Remember this position keep a copy of its value.
             IAT = I
@@ -118,7 +118,7 @@
 *  values until we hit an index we've already done. This terminates the
 *  current sub-cycle.
  3          CONTINUE
-            IF ( PERM( IAT ) .LT. 0 ) THEN 
+            IF ( PERM( IAT ) .LT. 0 ) THEN
                X( IAT ) = X( -PERM( IAT ) )
                IAT0 = IAT
                PERM( IAT ) = -PERM( IAT )

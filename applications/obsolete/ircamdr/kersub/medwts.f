@@ -1,6 +1,6 @@
 *+  MEDWTS - performs 2-D weighted median filtering on a 2-D array
       SUBROUTINE MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, SAMSIZ, SAMINF,
-     :  IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, SAMPLE, SAMWT, 
+     :  IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, SAMPLE, SAMWT,
      :  STATUS )
 *    Description :
 *     The input array, ARRIN, is filtered using a weighted median filter to
@@ -175,7 +175,7 @@
 
                   IF( CURR .NE. TEST ) THEN
 
-*                   a smaller value than the test value was found so swap the 
+*                   a smaller value than the test value was found so swap the
 *                   values and weights round
                      SAMPLE( CURR ) = SAMPLE( TEST )
                      SAMPLE( TEST )  = CURVAL

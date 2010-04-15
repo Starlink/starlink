@@ -15,7 +15,7 @@
 *  Description:
 *     The character string is compared with each of the values
 *     given in the given set.
-*     The strings in the set can be any length and can differ 
+*     The strings in the set can be any length and can differ
 *     in length throughout the set. Each value is separated by a
 *     comma. Upper and lowercase are treated as being equivalent and
 *     trailing blanks are ignored.
@@ -23,15 +23,15 @@
 *  Arguments:
 *     SET = CHARACTER * ( * ) (Given)
 *        The set of character values. It takes the form
-*        'string1,string2,.......,stringN' where each of the 
-*        substring values from string1 to stringN can be of different 
+*        'string1,string2,.......,stringN' where each of the
+*        substring values from string1 to stringN can be of different
 *        lengths.
 *     STRING = CHARACTER * ( * ) (Given)
 *        The character string to be checked for membership of the set.
 
 *  Returned Value:
 *     CHR_INSET = LOGICAL
-*        Returns .TRUE. if the character string is a member of the 
+*        Returns .TRUE. if the character string is a member of the
 *        given set, returns .FALSE. otherwise.
 
 *  Algorithm:
@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     17-FEB-1984 (ASOC5):
 *        Documentation brought up to standard.
 *     11-DEC-1985 (MJM):
-*        Modified considerably to allow the various members of SET 
+*        Modified considerably to allow the various members of SET
 *        to be any and different lengths.
 *     17-SEP-1986 (MJM):
 *        Changed from INSET to CHR_INSET.
@@ -140,7 +140,7 @@
 *  Set up the end-of-set marker.
       END = .FALSE.
 
-*  Loop to search the given set - continue until end of set is reached, 
+*  Loop to search the given set - continue until end of set is reached,
 *  or the string is matched.
 *  DO WHILE loop.
  10   CONTINUE

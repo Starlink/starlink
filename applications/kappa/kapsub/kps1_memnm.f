@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MEMNM( DEF, NPIX, NLIN, FILE1, FILE20, FILE22, FILE2, 
+*     CALL KPS1_MEMNM( DEF, NPIX, NLIN, FILE1, FILE20, FILE22, FILE2,
 *                      OUT, STATUS )
 
 *  Description:
@@ -119,7 +119,7 @@
                                  ! allowed to change
       INTEGER	I                ! Index in image
       REAL	M                ! Model pixel value
-      INTEGER	NUSED            ! No. of good entropy values found 
+      INTEGER	NUSED            ! No. of good entropy values found
       REAL	S                ! Entropy pixel value
       REAL	SMAX             ! Maximum entropy per pixel
       REAL	SMEAN            ! Mean entropy per pixel
@@ -171,19 +171,19 @@
 
 *  Form the new model in file <2>.
          DO I = 1, C1_NPX * C1_NLN
-   
+
             F = FILE1( I )
             IF ( ME_KB( 20 ) .GT. 0 ) M = FILE20( I )
             S = FILE2( I )
-            FILE2( I ) = M + GAIN * ( F - M ) * S / SMAX 
-   
+            FILE2( I ) = M + GAIN * ( F - M ) * S / SMAX
+
          END DO
 
       END IF
 
 *  Copy the new model to the output NDF.
       IF ( ME_KB( 20 ) .EQ. 0 ) THEN
-         CALL KPS1_MEMOU( FILE2, FILE22, NPIX, NLIN, DEF, 1, 1, C1_XMG, 
+         CALL KPS1_MEMOU( FILE2, FILE22, NPIX, NLIN, DEF, 1, 1, C1_XMG,
      :                    C1_YMG, OUT, BAD, STATUS )
 
       ELSE

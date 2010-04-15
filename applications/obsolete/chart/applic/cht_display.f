@@ -24,7 +24,7 @@
 *     all the CHART parameters.
 
 *  Usage:
-*     DSIPLAY 
+*     DSIPLAY
 
 *  ADAM Parameters:
 *     PAUSE = _CHAR (Read)
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -95,8 +95,8 @@
       LOGICAL FLAG               ! [local_variable_description]
       INTEGER NVAL               ! [local_variable_description]
       INTEGER NPOS               ! [local_variable_description]
-      INTEGER L                  ! 
-      INTEGER L1                 ! 
+      INTEGER L                  !
+      INTEGER L1                 !
       INTEGER I                  ! [local_variable_description]
 
 *.
@@ -193,7 +193,7 @@ C
          ELSE
             L=CHR_LEN(VALUE)
             TEXT = '        The field centres are stored in a file ' //
-     :         'called ' // VALUE( 1:L ) 
+     :         'called ' // VALUE( 1:L )
             CALL MSG_OUT( ' ', TEXT, STATUS )
             TEXT = '        The file may be examined in the normal way'
             CALL MSG_OUT( ' ', TEXT, STATUS )
@@ -332,7 +332,7 @@ C
          ELSE
             L=CHR_LEN(VALUE)
             TEXT = '        The file containing extra objects is ' //
-     :           VALUE( 1:L ) 
+     :           VALUE( 1:L )
             CALL MSG_OUT( ' ', TEXT, STATUS )
             TEXT = '        The file may be examined in the normal way'
             CALL MSG_OUT( ' ', TEXT, STATUS )

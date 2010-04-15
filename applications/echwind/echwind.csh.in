@@ -55,7 +55,7 @@ endif
 
 #  Define file that holds list of spectrographs.
 setenv ECHWIND_SPECTROGRAPHS ${ECHWIND_HOME}spectrographs.dat
- 
+
 # The following line looks good, but it is not used.
 # The default value for the system detectors file is
 # 'detsystem' in the file 'echwind.ifl'. -- 25 Sep 1996, ACC

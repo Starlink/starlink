@@ -5,7 +5,7 @@
 *     RIDIR:RIyymmdd_o_i.
 *
 *     The reduction consists of subtracting
-*     suitable BIAS (any) and DARK (same chip exposure time) observations 
+*     suitable BIAS (any) and DARK (same chip exposure time) observations
 *     from the raw integration.
 *
 *     Sector statistics are calculated if associated with the raw integration.
@@ -152,7 +152,7 @@
 *    Status :
       INTEGER STATUS
 *    Input :
-      CHARACTER*(*) INT_NAME             ! the basic name of the integration 
+      CHARACTER*(*) INT_NAME             ! the basic name of the integration
 *                                             file to be reduced, e.g. I890816_1_1
 *    External references :
       INTEGER DSA_TYPESIZE               ! DSA type size enquiry function
@@ -166,7 +166,7 @@
 *    Local Constants :
 *    Local variables :
       INTEGER FLOATSIZE                  ! Bytes per element of 'FLOAT' array
-      INTEGER NDIM                       ! the dimensions of the integration 
+      INTEGER NDIM                       ! the dimensions of the integration
 *                                        !    array
       INTEGER DIMS( MAXDIM )             !                "
       INTEGER N_EXPOSURES                ! the number of exposures that were
@@ -241,7 +241,7 @@
 *                                        !   (YES, NO or ASK)
       CHARACTER*4 SUBTRACT_DARK          ! Should a DARK frame be subtracted ?
 *                                        !   (YES, NO or ASK)
-      CHARACTER*4 NORMALISE_FF           ! Should the flat field be 
+      CHARACTER*4 NORMALISE_FF           ! Should the flat field be
 *                                        !   normalised ? (YES, NO or ASK).
       CHARACTER*20 NORM_METHOD           ! The flat field normalisation method
 *                                        !   required ('POLYFIT' or 'SMOOTH')
@@ -262,7 +262,7 @@
 *    The integration structure has already been opened as 'INT_IN'
 *    and the parent observation file as 'OBSERVATION' before this
 *    routine is called
-*    first try to check that we have all the information for 
+*    first try to check that we have all the information for
 *    the integration reduction proceed.
 *    Get the INT_TYPE (i.e. the observation mode; CHOP, STARE etc...)
       DSA_STATUS = SAI__OK
@@ -310,7 +310,7 @@
 
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_REDUCE_FLAT_INT: '/
-     :        /'This FLAT integration was taken with '/ 
+     :        /'This FLAT integration was taken with '/
      :        /'oversampling, which is not sensible. '/
      :        /'There must have been a mistake!', STATUS )
          END IF
@@ -329,7 +329,7 @@
 
          IF (N_EXPOSURES .LT. 1) THEN
 
-            STATUS = SAI__ERROR   
+            STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_REDUCE_FLAT_INT: '/
      :        /'No exposures were made during the '/
      :        /'integration', STATUS )
@@ -342,7 +342,7 @@
       ENDIF
 
 *    get the exposure time in this integration EXPOSURE_TIME
-      CALL DSA_GET_FITS_F( 'OBSERVATION', 'DEXPTIME', 0, EXPOSURE_TIME, 
+      CALL DSA_GET_FITS_F( 'OBSERVATION', 'DEXPTIME', 0, EXPOSURE_TIME,
      :  COMMENT, DSA_STATUS )
 
       IF (DSA_STATUS .EQ. SAI__OK) THEN
@@ -425,8 +425,8 @@
      :      'No DARK subtraction will be performed', STATUS )
       END IF
 
-*    Determine if the flat-field is to be normalised, and the 
-*    normalisation method to be used. 
+*    Determine if the flat-field is to be normalised, and the
+*    normalisation method to be used.
       CALL PAR_GET0C( 'NORMALISE_FF', NORMALISE_FF, STATUS )
 
       IF ( NORMALISE_FF .EQ. 'YES' ) THEN
@@ -447,7 +447,7 @@
      :      'No FLAT field normalisation will be performed', STATUS )
       END IF
 
-*   If the flat field is going to be normalised, obtain the 
+*   If the flat field is going to be normalised, obtain the
 *   normalisation method required.
       IF ( PROCEED_NORM ) THEN
 
@@ -466,21 +466,21 @@
 *    Find the size of the input data array
       DSA_STATUS = STATUS
       CALL DSA_DATA_SIZE ('INT_IN', MAXDIM, NDIM, DIMS, NELM,
-     :  DSA_STATUS) 
+     :  DSA_STATUS)
 
 *    and the number of elements in a single plane of that array
       NPLANE = DIMS(1) * DIMS(2)
 
 *    Map in the array
       CALL DSA_MAP_DATA ('INT_IN', 'READ', 'FLOAT', IN_DATA, IN_SLOT,
-     :  DSA_STATUS) 
+     :  DSA_STATUS)
 
 *    Obtain the number of bytes per element in a data array of
 *    type 'FLOAT' from DSA
       FLOATSIZE = DSA_TYPESIZE( 'FLOAT', DSA_STATUS )
 
 *    Find the name of the observation file responsible for this
-*    integration, from it construct the name of the the observation 
+*    integration, from it construct the name of the the observation
 *    index file which should have a name of the form CGS4_yymmdd.INDEX
 *    Index files are found in the directory whose logical name is
 *    CGS4_INDEX.
@@ -497,7 +497,7 @@
 
 *    If non-destructive reads are not being used, then we need a ready
 *    reduced BIAS observation for this reduction.
-*    RED4_GET_OBSERVATION will either look for a suitable one in the 
+*    RED4_GET_OBSERVATION will either look for a suitable one in the
 *    index file or use one which has been explicitly specified.
 *    The data, errors and quality for this observation will be held in
 *    virtual memory, with the relevant pointers stored in /RED4_COMMON/.
@@ -524,7 +524,7 @@
       ENDIF
 
 *    We may also need a ready reduced DARK observation for this reduction.
-*    RED4_GET_OBSERVATION will either look for a suitable one in the 
+*    RED4_GET_OBSERVATION will either look for a suitable one in the
 *    index file or use one which has been explicitly specified.
 *    The data, errors and quality for this observation will be held in
 *    virtual memory, with the relevant pointers stored in /RED4_COMMON/.
@@ -575,8 +575,8 @@
          DSA_STATUS = STATUS
          CALL DSA_NAMED_INPUT ('MASK', MASK, DSA_STATUS)
 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS ) 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS ) 
+         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS )
+         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS )
 
          CALL DSA_MAP_DATA ('MASK', 'READ', 'BYTE', MASK_DATA,
      :     MASK_SLOT, DSA_STATUS)
@@ -585,7 +585,7 @@
 *    Now we're as sure as can be that everything's gonna be jus' fine,
 *    so open the output file according to the reduced integration template
 *    and with the correct filename e.g. RI890801_1_1 from I890801_1_1
-      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE', 
+      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE',
      :   INTRED_TEMPLATE, DSA_STATUS)
 
       IF ( DSA_STATUS .NE. SAI__OK ) THEN
@@ -599,25 +599,25 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL MSG_SETC( 'INT_RED', INT_RED )
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :     'Reducing FLAT integration into ^INT_RED', STATUS )
       ENDIF
 
       DSA_STATUS = STATUS
-      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE', 
+      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE',
      :   0, 0, DSA_STATUS)
 
 *    Copy the contents of the FITS structure from the raw integration file
 *    over to the reduced integration file (deleting the old structure first,
 *    if present)
-      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE, 
+      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE,
      :   'INT_RED.'//FITS_STRUCTURE, STATUS )
 
 *    Map in the data array of the reduced integration file, and the
-*    variance and quality arrays 
+*    variance and quality arrays
       DSA_STATUS = STATUS
       CALL DSA_USE_QUALITY ('INT_RED', DSA_STATUS)
-      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA, 
+      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA,
      :   DATA_SLOT, DSA_STATUS)
       CALL DSA_MAP_QUALITY ('INT_RED', 'WRITE', 'BYTE', RED_QUAL,
      :   QUAL_SLOT, DSA_STATUS)
@@ -643,7 +643,7 @@
 *    data quality array. Otherwise initialise this to zero.
       IF (DSA_STATUS .EQ. SAI__OK) THEN
 
-         CALL GEN_MOVE (FLOATSIZE*NPLANE, %val(IN_DATA), 
+         CALL GEN_MOVE (FLOATSIZE*NPLANE, %val(IN_DATA),
      :      %val(RED_DATA))
 
          IF ( INDEX( MASK, '#' ) .EQ. 0 ) THEN
@@ -674,7 +674,7 @@
 *       work out the sector statistics if enabled
          IF (INDEX(INT_TYPE,'SECTORS') .NE. 0) THEN
 
-*          the plane of the integration array holding the statistical 
+*          the plane of the integration array holding the statistical
 *             information
              IN_DATA = IN_DATA + FLOATSIZE * NPLANE
 
@@ -688,7 +688,7 @@
      :           N_EXPOSURES, %val(RED_VAR), STATUS )
             ELSE
 
-               CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA), 
+               CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA),
      :           NPLANE, N_EXPOSURES, %val(RED_VAR), STATUS)
             END IF
          ENDIF
@@ -720,10 +720,10 @@
                CALL MSG_SETC( 'LINCOEFFS', LINCOEFFS )
                CALL MSG_OUT( ' ', 'Linearising using '/
      :           /'^NCOEFFS^NTH order polynomial in ^LINCOEFFS',
-     :           STATUS ) 
+     :           STATUS )
             END IF
 
-            CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, 
+            CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE,
      :         %val(RED_DATA), %val(RED_VAR), %val(RED_QUAL),
      :         STATUS )
          END IF
@@ -747,13 +747,13 @@
 
 *         Obtain the workspace required by the normalisation routine.
             DSA_STATUS = STATUS
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', SPECTRUM_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', SPECTRUM_PTR,
      :        SPECTRUM_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'INT', SUM_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'INT', SUM_PTR,
      :        SUM_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', X_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', X_PTR,
      :        X_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', Y_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', Y_PTR,
      :        Y_SLOT, DSA_STATUS )
 
             IF ( DSA_STATUS .NE. SAI__OK ) THEN
@@ -781,17 +781,17 @@
          ELSE IF ( NORM_METHOD .EQ. 'SMOOTH' ) THEN
 
 *         Obtain the workspace required by the smoothing normalisation
-*         routine. 
+*         routine.
             DSA_STATUS = STATUS
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', SPECTRUM_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', SPECTRUM_PTR,
      :        SPECTRUM_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'INT', SUM_SLOT, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'INT', SUM_SLOT,
      :        SUM_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'BYTE', SQ_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'BYTE', SQ_PTR,
      :        SQ_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', SM_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', SM_PTR,
      :        SM_SLOT, DSA_STATUS )
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'BYTE', SMQ_PTR, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'BYTE', SMQ_PTR,
      :        SMQ_SLOT, DSA_STATUS )
 
             IF ( DSA_STATUS .NE. SAI__OK ) THEN
@@ -810,7 +810,7 @@
 *         are not mapped).
             IF ( STATUS .EQ. SAI__OK ) THEN
 
-               CALL RED4_NORMALISE_SMOOTH( DIMS(1), DIMS(2), 
+               CALL RED4_NORMALISE_SMOOTH( DIMS(1), DIMS(2),
      :           BOXSIZE, %val(RED_DATA), %val(RED_VAR), %val(RED_QUAL),
      :           %val(SPECTRUM_PTR), %val(SUM_PTR), %VAL(SQ_PTR),
      :           %val(SM_PTR), %val(SMQ_PTR), STATUS )
@@ -834,7 +834,7 @@
 
 *    Set the data label and units
 *    If the flat-field has been normalised, its units will just
-*    be arbitrary numbers. Otherwise they will be A/D numbers per 
+*    be arbitrary numbers. Otherwise they will be A/D numbers per
 *    exposure.
       IF ( PROCEED_NORM ) THEN
 
@@ -861,12 +861,12 @@
       CALL DSA_SET_DATA_INFO ('INT_RED', 2, CHAR_ARRAY, 0, 0.0D0,
      :  DSA_STATUS)
 
-*    Obtain the name of the object and write it to the reduced 
+*    Obtain the name of the object and write it to the reduced
 *    integration structure in the standard Figaro way.
       CALL DSA_GET_FITS_C( 'OBSERVATION', 'OBJECT', 0, OBJECT_NAME,
      :  COMMENT, DSA_STATUS )
       CALL DSA_SET_OBJECT( 'INT_RED', OBJECT_NAME, DSA_STATUS )
-   
+
 *    End of reduction
 *    record how the reduction went in the CGS4_INTRED extension
 *    Date & time

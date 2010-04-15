@@ -80,7 +80,7 @@
 *  Global variables:
 
 *  Local constants:
-      INTEGER      MAX_SUBS            ! the number of SCUBA sub-instruments 
+      INTEGER      MAX_SUBS            ! the number of SCUBA sub-instruments
       PARAMETER (MAX_SUBS = 5)
 
 *  Local variables:
@@ -98,7 +98,7 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*  find the wavelength of the filter in front of each sub-instrument 
+*  find the wavelength of the filter in front of each sub-instrument
 
       N_SUBS = MAX_SUBS
       SUB_INSTRMNT (1) = 'SHORT'
@@ -110,7 +110,7 @@
       CALL SCULIB_DECODE_FILTER (FILTER, N_SUBS, SUB_INSTRMNT,
      :  SUB_FILTER, SUB_WAVELENGTH, STATUS)
 
-*  construct BOLOMETERS string to measure only those sub-instruments that  
+*  construct BOLOMETERS string to measure only those sub-instruments that
 *  have a filter of the correct wavelength
 
       BOLOMETERS = ' '
@@ -120,7 +120,7 @@
       END IF
       IF ((SUB_FILTER(2) .EQ. '600')  .OR.
      :    (SUB_FILTER(2) .EQ. '750')  .OR.
-     :    (SUB_FILTER(2) .EQ. '850')) THEN    
+     :    (SUB_FILTER(2) .EQ. '850')) THEN
          BOLOMETERS (CHR_LEN(BOLOMETERS)+1:) = 'LONG_DC,'
       END IF
       IF (SUB_FILTER(3) .EQ. '1100') THEN
@@ -132,7 +132,7 @@
       IF (SUB_FILTER(5) .EQ. '2000') THEN
          BOLOMETERS (CHR_LEN(BOLOMETERS)+1:) = 'P2000_DC,'
       END IF
-      
+
       IF (CHR_LEN(BOLOMETERS) .GT. 0) THEN
          BOLOMETERS = BOLOMETERS (:CHR_LEN(BOLOMETERS)-1)
       END IF

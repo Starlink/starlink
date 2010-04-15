@@ -58,26 +58,26 @@
      :  I1,      ! index to first dimension of array
      :  I2       ! index to second dimension of array
 *-
- 
+
 *   check for error on entry
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *      scan the 2-D array in its second dimension
          DO I2 = 1,DIMS(2)
- 
+
 *         initialise the corresponding element of the 1-D array
             ARR1D( I2 ) = 0
- 
+
 *         sum all the values in the first dimension of the 2-D array
 *         into this element of the 1-D array
             DO I1 = 1,DIMS(1)
- 
+
                ARR1D( I2 ) = ARR1D( I2 ) + ARR2D( I1, I2 )
- 
+
             ENDDO
- 
+
          ENDDO
- 
+
       ENDIF
- 
+
       END

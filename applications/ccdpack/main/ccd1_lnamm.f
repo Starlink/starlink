@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_LNAMM( PARAM, INDXHI, INDXLO, TITLE, GRPID, VALID, 
+*     CALL CCD1_LNAMM( PARAM, INDXHI, INDXLO, TITLE, GRPID, VALID,
 *                      COMMEN, STATUS )
 
 *  Description:
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
       INTEGER INDXHI
       CHARACTER * ( * ) TITLE
       INTEGER GRPID
-      INTEGER VALID( * ) 
+      INTEGER VALID( * )
       LOGICAL COMMEN
 
 *  Status:
@@ -135,7 +135,7 @@
 *  Loop over the required index extracting the names and then writting
 *  them into the file.
       DO 1 I = INDXLO, INDXHI
-         IF ( VALID( I ) .NE. 0 ) THEN 
+         IF ( VALID( I ) .NE. 0 ) THEN
             NAME = ' '
             CALL GRP_GET( GRPID, I, 1, NAME, STATUS )
 
@@ -144,7 +144,7 @@
          END IF
  1    CONTINUE
 
-      IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Write a comment about the name of the list.
          CALL FIO_FNAME( FD, FNAME, STATUS )

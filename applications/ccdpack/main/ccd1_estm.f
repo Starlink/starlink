@@ -123,52 +123,52 @@
 *  Extract the sections and perform the statistics for each data type.
 
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_BEXTB( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTB( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMNB( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMNB( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                    EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_BEXTUB( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTUB( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                     IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMNUB( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMNUB( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                     EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_BEXTW( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTW( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMNW( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMNW( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                    EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_BEXTUW( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTUW( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                     IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMNUW( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMNUW( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                     EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_BEXTI( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTI( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMNI( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMNI( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                    EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_BEXTR( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTR( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMNR( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMNR( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                    EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_BEXTD( DIRECT, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_BEXTD( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2, BOUNDS,
      :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
-         CALL CCG1_STMND( .TRUE., %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_STMND( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                    EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
       ELSE

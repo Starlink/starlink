@@ -18,9 +18,9 @@
 *  Description:
 *     This routine creates a SURFACEFIT extension in a supplied NDF.
 *     Within in that in makes a FIT structure of type POLYNOMIAL,
-*     variant BSPLINE, for storing the fit coefficients; plus RMS, 
+*     variant BSPLINE, for storing the fit coefficients; plus RMS,
 *     RESIDMAX, and COSYS objects for the rms difference of the fit,
-*     the maximum residual, and the co-ordinate system respectively.  
+*     the maximum residual, and the co-ordinate system respectively.
 
 *  Arguments:
 *     NDFI = INTEGER (Given)
@@ -99,7 +99,7 @@
       INTEGER NDFI
       INTEGER NXKNOT
       INTEGER NYKNOT
-      REAL XKNOT( NXKNOT + 8 ) 
+      REAL XKNOT( NXKNOT + 8 )
       REAL YKNOT( NYKNOT + 8 )
       INTEGER NCOEF
       REAL COEFF( NCOEF )
@@ -122,9 +122,9 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Write the results to an extension named SURFACEFIT.  The 
+*  Write the results to an extension named SURFACEFIT.  The
 *  coefficients will be stored in a structure within this called FIT.
-*  FIT has type POLYNOMIAL (see SGP/38 for a description of the 
+*  FIT has type POLYNOMIAL (see SGP/38 for a description of the
 *  contents of a POLYNOMIAL structure).
       CALL NDF_XNEW( NDFI, 'SURFACEFIT', 'EXT', 0, 0, XLOC, STATUS )
 

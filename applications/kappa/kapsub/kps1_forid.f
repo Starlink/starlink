@@ -87,21 +87,21 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
- 
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION A( M, N )
       DOUBLE PRECISION B( M, N )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       DOUBLE PRECISION IM                 ! Imaginary part of complex vector
       INTEGER J                  ! Pixel count
@@ -109,26 +109,26 @@
       DOUBLE PRECISION MODUL              ! Modulus of complex vector
       DOUBLE PRECISION PHASE              ! Phase value
       DOUBLE PRECISION RL                 ! Real part of complex vector
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Just do it a pixel at a time.
       DO K = 1, N
          DO J = 1, M
- 
+
             MODUL = A( J, K )
             PHASE = B( J, K )
- 
+
             RL = MODUL * COS( PHASE )
             IM = MODUL * SIN( PHASE )
- 
+
             A( J, K ) = RL
             B( J, K ) = IM
- 
+
          END DO
       END DO
- 
+
       END

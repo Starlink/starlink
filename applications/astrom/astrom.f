@@ -38,7 +38,7 @@
 *
 *  Norman Gray, Starlink, 2001--2003: Interface expanded to match extra
 *  arguments to astrml().
-*    
+*
 *-
 
       IMPLICIT NONE
@@ -214,14 +214,14 @@
       ELSE
          WRITE(*,'("ASTROM BUG -- impossible action (",i3,")!")') action
       ENDIF
-      
+
       GO TO 9999
 
 *  Errors
  9010 CONTINUE
       WRITE (*,'(''Please run ASTROM from the correct script!'')')
       GO TO 9999
-      
+
  9015 CONTINUE
       I=1
       DO WHILE (I.LE.NFILE.AND.ARG(I:I).NE.' ')
@@ -251,4 +251,4 @@
 
       END
 
-      
+

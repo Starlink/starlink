@@ -7,13 +7,13 @@
       IMPLICIT NONE
 
       CHARACTER STRING*(*)
-      REAL   RVALUE       
+      REAL   RVALUE
       LOGICAL OK
-      INTEGER SLEN          
+      INTEGER SLEN
 
 *    Local variables :
-      CHARACTER FORMAT*8,   COUNT*3         
-      INTEGER NCHAR, CODE            
+      CHARACTER FORMAT*8,   COUNT*3
+      INTEGER NCHAR, CODE
 
       NCHAR = SLEN(STRING)
       WRITE (COUNT, '(I3)', IOSTAT=CODE) NCHAR
@@ -23,8 +23,8 @@
          FORMAT = '(G'//COUNT//'.0)'
          READ (STRING(1:NCHAR),FORMAT, IOSTAT=CODE) RVALUE
          IF (CODE .NE. 0) THEN
-            OK=.FALSE.   
+            OK=.FALSE.
          END IF
       END IF
-   
+
       END

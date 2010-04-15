@@ -57,7 +57,7 @@ C-
       CALL INITNPNEW (NPTSNEW)
 
       DO NQ = NQ1, NQ2
-        IF (DOQUAD(NQ))   THEN 
+        IF (DOQUAD(NQ))   THEN
 
           IF (NPTS(NQ).LE.1) THEN
             IFAIL = 18
@@ -65,7 +65,7 @@ C-
             RETURN
           END IF
 
-          NST   = NTOT (NQ-1) 
+          NST   = NTOT (NQ-1)
           NLEFT = NPTS (NQ)/2
 
           IF ( MOD (NPTS(NQ), 2) .EQ. 0 ) THEN    ! # of channels even
@@ -81,7 +81,7 @@ C-
               NSTART = MOD (NLEFT-NBIN/2, NBIN) + 1
               NBPTS1 = 2*MLEFT + 1
             END IF
-          END IF 
+          END IF
 
           DO J = 1, NBPTS1
 
@@ -106,7 +106,7 @@ C-
           OLDCEN    = 0.5*(NPTS(NQ)+1)
           CEN       = 0.5*(NBPTS1*NBIN+1)+NSTART-1
           ACHAN     = CEN - OLDCEN
-    
+
           CALL LSRCOR (LSRFLG, VSL, VES, VTE, VLSR,
      &                 IDATE, ITIME, IUTFLG, RA, DEC,
      &                 JFREST(NQ),  JFCEN(NQ),  LOFREQ(NQ),

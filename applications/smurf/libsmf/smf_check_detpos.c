@@ -35,7 +35,7 @@
 *     consistent. It converts the detector positions in the first time
 *     slice into sky positions using the RECEPPOS values, and then does
 *     the same again using the FPLANEX/Y values. It then finds the
-*     maximum discrepancy on the sky between the converted detector 
+*     maximum discrepancy on the sky between the converted detector
 *     positions. If this discrepancy is more than 1 arc-second, a warning
 *     message is issued (if "report" is non-zero), and a zero value is
 *     returned as the function value. If the detector positions in the
@@ -127,7 +127,7 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 /* Begin an AST context. */
       astBegin;
 
-/* Allocate work arrays to hold the GRID coords of all the detectors in the 
+/* Allocate work arrays to hold the GRID coords of all the detectors in the
    supplied data structure. */
       xin = astMalloc( (data->dims)[ 1 ]*sizeof( *xin ) );
       yin = astMalloc( (data->dims)[ 1 ]*sizeof( *yin ) );
@@ -151,40 +151,40 @@ int smf_check_detpos( smfData *data, int report, int *status ){
       xout_r = astMalloc( (data->dims)[ 1 ]*sizeof( *xout_r ) );
       yout_r = astMalloc( (data->dims)[ 1 ]*sizeof( *yout_r ) );
 
-/* Loop round all the time slices in the input data structure until we 
+/* Loop round all the time slices in the input data structure until we
    have found one that can be checked. */
       done = 0;
       for( itime = 0; !done && itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
-/* We first create a WCS FrameSet for the time slice, based on the RECEPPOS 
-   values. The smf_tslice_ast function uses the value of the hdr->detpos 
-   pointer (which points to an array holding the RECEPPOS values) to 
-   determine how the returned FrameSet should be created. If hdr->detpos is 
-   not NULL, the RECEPPOS values are used - otherwise the FPLANEX/Y values 
-   are used. The returned FrameSet describes the spatial coordinate systems 
-   associated with the current time slice. The base frame in the FrameSet 
-   will be a 2D Frame in which axis 1 is detector number and axis 2 is 
-   unused. The current Frame will be a SkyFrame (the SkyFrame System may be 
-   any of the JCMT supported systems). The Epoch will be set to the epoch of 
+/* We first create a WCS FrameSet for the time slice, based on the RECEPPOS
+   values. The smf_tslice_ast function uses the value of the hdr->detpos
+   pointer (which points to an array holding the RECEPPOS values) to
+   determine how the returned FrameSet should be created. If hdr->detpos is
+   not NULL, the RECEPPOS values are used - otherwise the FPLANEX/Y values
+   are used. The returned FrameSet describes the spatial coordinate systems
+   associated with the current time slice. The base frame in the FrameSet
+   will be a 2D Frame in which axis 1 is detector number and axis 2 is
+   unused. The current Frame will be a SkyFrame (the SkyFrame System may be
+   any of the JCMT supported systems). The Epoch will be set to the epoch of
    the time slice. */
          smf_tslice_ast( data, itime, 1, status );
 
 /* Use the FrameSet to transform the input receptor GRID positions into
    SKY coords. */
          if( hdr->wcs ) {
-            astTran2( hdr->wcs, (data->dims)[ 1 ], xin, yin, 1, xout_r, 
+            astTran2( hdr->wcs, (data->dims)[ 1 ], xin, yin, 1, xout_r,
                                                                 yout_r );
 
 /* Note the current (sky) Frame. */
             frm = astGetFrame( hdr->wcs, AST__CURRENT );
 
-/* Temporarily nullify the detpos array pointer in the smfHead structure. 
-   This will cause the next invocation of smf_tslice_ast to use the 
+/* Temporarily nullify the detpos array pointer in the smfHead structure.
+   This will cause the next invocation of smf_tslice_ast to use the
    FPLANEX/Y values. */
             old_detpos = hdr->detpos;
             hdr->detpos = NULL;
 
-/* We now create a second WCS FrameSet for the time slice based on the 
+/* We now create a second WCS FrameSet for the time slice based on the
    FPLANEX/Y values. */
             smf_tslice_ast( data, itime, 1, status );
 
@@ -201,7 +201,7 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 /* Use the above FrameSet to transform the input receptor GRID positions into
    the required SKY coords. */
                if( fs ) {
-                  astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout_f, 
+                  astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout_f,
                                                                    yout_f );
 
 /* Loop round each detector, finding the maximum distance on the sky
@@ -244,7 +244,7 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 /* Re-instate the detpos pointer in the header. */
             hdr->detpos = old_detpos;
          }
-      }   
+      }
 
 /* Free memory. */
       xin = astFree( xin );

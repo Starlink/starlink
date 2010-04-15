@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,7 +143,7 @@
 
 *  Loop for each object spectrum.
       DO J = 1, NSPEC
-         
+
 *  Find the strength of the emission line in the object spectrum.
 *  ==============================================================
 

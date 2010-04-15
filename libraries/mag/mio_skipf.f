@@ -1,21 +1,21 @@
- 
+
       SUBROUTINE MIO_SKIPF(TD, NFILE, STATUS)
 *+
 *  Name:
 *     MIO_SKIPF
- 
+
 *  Purpose:
 *     Skip file marks.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MIO_SKIPF(TD, NFILE, STATUS)
- 
+
 *  Description:
 *     Skip the specified number of file marks
- 
+
 *  Arguments:
 *     TD=INTEGER (Given)
 *        A variable containing the tape descriptor.
@@ -29,7 +29,7 @@
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
 *        N.B. This routine does not report its own errors.
- 
+
 *  Algorithm:
 *     Check for a valid tape descriptor and that the tape is open, if so, the
 *     tape descriptor is used to get a device channel number and the ioc_skipf
@@ -38,7 +38,7 @@
 *     between the two tape marks; that is, the skipping request has not
 *     completed.
 *     An EOV condition can only be cleared by the MIO_SKIPV routine.
- 
+
 *  Copyright:
 *     Copyright (C) 1980, 1983, 1986, 1991, 1992, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     Sid Wright (UCL::SLW)
 *     Jack Giddings (UCL::JRG)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     14-APR-1980:  Original.  (UCL::SLW)
 *     01-FEB-1983:  Fortran 77 Version. (UCL::JRG)
@@ -77,38 +77,38 @@
 *     22-Jan-1993:  Change include file names
 *           Convert code to uppercase using SPAG (RAL::BKM)
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     This is the Unix version.
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MIO_SYS'         ! MIO Internal Constants
       INCLUDE 'MIO_ERR'         ! MIO Errors
- 
+
 *  Arguments Given:
       INTEGER TD                ! tape descriptor
       INTEGER NFILE             ! number of files to skip
- 
+
 *  Status:
       INTEGER STATUS            ! status return
- 
+
 *  Local Variables:
       INTEGER MAGCN             ! channel number
       INTEGER NLEFT             ! number of tape marks to be skipped
       INTEGER DIR               ! direction of skip
- 
+
 *.
- 
- 
+
+
 C      print *,'mio_skipf:status,td,nfile',status,td,nfile
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
@@ -129,7 +129,7 @@ C      print *,'mio_skipf:status,td,nfile',status,td,nfile
             END DO
          END IF
       END IF
- 
+
 C      print *,'mio_skipf:status',status
 
       END

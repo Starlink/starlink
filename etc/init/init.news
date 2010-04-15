@@ -1,11 +1,11 @@
 
- INIT is the bundle that contains the Starlink initialisation 
+ INIT is the bundle that contains the Starlink initialisation
  files required by users in order to use the USSC.
 
  History:
     v1.1-27 1-OCT-2007 (PWD):
        Always define STARLINK_DIR to point at the root of the installation.
-       STARLINK_DIR can be pre-defined to relocate the installation 
+       STARLINK_DIR can be pre-defined to relocate the installation
        (work in progress).
 
     v1.1-26 6-JUL-2004 (TIMJ)
@@ -25,9 +25,9 @@
 
     v1.1-24 27-MAY-2003
        Added command definitions for AUTOASTROM.
-       JCMTDR now for linux in adam_packages.shl. 
+       JCMTDR now for linux in adam_packages.shl.
        SPLAT, moved to StarJava, added other StarJava
-       commands. 
+       commands.
        Chenged Perl config.
 
     v1.1-21 04-DEC-2002
@@ -113,30 +113,30 @@
     v1.0-15 08-AUG-1997
        Added definitions for SURF to cshrc, login and icl_login_sys.icl.
        Added help text for SURF to adam_packages.hlp.
- 
+
     v1.0-14 09-JUN-1997
        Modified default alias for commands not available to be of the form
- 
+
              alias fred 'cat /star/etc/not_installed; :  >& /dev/null'
- 
+
           so that any command line arguments (files etc) do not get directed
           to stdout.
- 
+
     v1.0-12 23-MAY-1997
        Added TCL_LIBRARY and TK_LIBRARY environment variables to login.
- 
+
     v1.0-11 09-MAY-1997
        Added aliases for FLUXES to cshrc.
- 
+
     v1.0-10 07-MAY-1997
        Added environment variable PHOTOM_HELP to login.
 
     v1.0-8 06-MAR-1997
        Added environment variable and aliases for GAIA.
- 
+
     v1.0-7 03-MAR-1997
        Removed CATAPP aliases.
- 
+
     v1.0-2 13-MAY-1996
        Modified ESP startup to search on esp.csh instead of espstart.
 

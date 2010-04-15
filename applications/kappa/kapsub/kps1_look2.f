@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LOOK2( MXLO, MXHI, MYLO, MYHI, MASK, NOVAL, XLO, 
+      SUBROUTINE KPS1_LOOK2( MXLO, MXHI, MYLO, MYHI, MASK, NOVAL, XLO,
      :                       XHI, YLO, YHI, IN, OUT, STATUS )
 *+
 *  Name:
@@ -11,12 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LOOK2( MXLO, MXHI, MYLO, MYHI, MASK, NOVAL, XLO, XHI, YLO, 
+*     CALL KPS1_LOOK2( MXLO, MXHI, MYLO, MYHI, MASK, NOVAL, XLO, XHI, YLO,
 *                      YHI, IN, OUT, STATUS )
 
 *  Description:
 *     This routine copies the input array to the output array,
-*     substituting the value NOVAL for each pixel which has a zero 
+*     substituting the value NOVAL for each pixel which has a zero
 *     value in the supplied mask array.
 
 *  Arguments:
@@ -80,7 +80,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -127,27 +127,27 @@
          DO I = XLO, XHI
             OUT( I, J ) = NOVAL
          END DO
-      END DO   
+      END DO
 
       DO J = JHI, YHI
          DO I = XLO, XHI
             OUT( I, J ) = NOVAL
          END DO
-      END DO   
+      END DO
 
       DO J = YLO, YHI
          DO I = XLO, ILO
             OUT( I, J ) = NOVAL
          END DO
-      END DO   
+      END DO
 
       DO J = YLO, YHI
          DO I = IHI, XHI
             OUT( I, J ) = NOVAL
          END DO
-      END DO   
+      END DO
 
-*  Now copy the overlap area from the input to the output, replacing masked 
+*  Now copy the overlap area from the input to the output, replacing masked
 *  pixels by NOVAL.
       DO J = JLO, JHI
          DO I = ILO, IHI

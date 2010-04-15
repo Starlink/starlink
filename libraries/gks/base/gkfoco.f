@@ -167,7 +167,7 @@
             RETURN
          ENDIF
 
-*     Send buffer immediately (don't bother if there's no useful data) 
+*     Send buffer immediately (don't bother if there's no useful data)
 
       ELSE IF (IFUNC.EQ.KIOSN.AND.KB(KWKIX).GT.KBB(KWKIX)) THEN
 *        Include the end buffer if one is defined

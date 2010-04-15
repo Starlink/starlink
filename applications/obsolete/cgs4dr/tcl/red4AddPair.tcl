@@ -1,6 +1,6 @@
 proc red4AddPair {taskname pair} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -27,8 +27,8 @@ proc red4AddPair {taskname pair} {
     set Red4Widgets(AP_LAB01) [label $top.l1 -text "Filename" -width 15]
     set Red4Widgets(AP_ENTRY) [entry $top.e1 -width 40]
     pack $Red4Widgets(AP_LAB01) $Red4Widgets(AP_ENTRY) -in $top -side left
-    $Red4Widgets(AP_ENTRY) insert end $Red4Widgets(OB) 
-    
+    $Red4Widgets(AP_ENTRY) insert end $Red4Widgets(OB)
+
     set Red4Widgets(AP_LAB02) [label $bot.l1 -text "Sky Weighting Factor"]
     set Red4Widgets(AP_SKYWT) [entry $bot.sk]
     set Red4Widgets(AP_CHECK) [checkbutton $bot.l2 -text "Variance Weight" -variable Red4Widgets(AP_VARWT)]

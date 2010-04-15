@@ -1,5 +1,5 @@
 *+  P4_SCALE_REAL - get data from data file and scale for screen
-      SUBROUTINE P4_SCALE_REAL ( DIM1, DIM2, DATA, 
+      SUBROUTINE P4_SCALE_REAL ( DIM1, DIM2, DATA,
      :                LOW, HIGH, CMIN, CMAX, IDATA, STATUS )
 *    Authors :
 *      K. Krisciunas (JACH::KEVIN)
@@ -43,7 +43,7 @@
              IDATA(I,J) = ITEMP
           ENDIF
         ENDDO
-      ENDDO     
+      ENDDO
 
 *    Exit subroutine
       END

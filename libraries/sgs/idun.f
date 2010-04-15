@@ -130,7 +130,7 @@
       END IF
       XNDW=(VIEWP(2)-VIEWP(1))/(WINDO(2)-WINDO(1))
       YNDW=(VIEWP(4)-VIEWP(3))/(WINDO(4)-WINDO(3))
-                                                                    
+
 *  Express plotting units in NDC
       XN=XPD/XDND
       YN=YPD/YDND

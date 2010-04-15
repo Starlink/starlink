@@ -38,7 +38,7 @@ typedef enum	{
 
     /* Simple commands (no parameters)
      */
-    SELN_REQ_COMMIT_PENDING_DELETE	
+    SELN_REQ_COMMIT_PENDING_DELETE
 				= SELN_ATTR(ATTR_NO_VALUE,	        65),
     SELN_REQ_DELETE		= SELN_ATTR(ATTR_NO_VALUE,	        66),
     SELN_REQ_RESTORE		= SELN_ATTR(ATTR_NO_VALUE,	        67),
@@ -74,7 +74,7 @@ typedef enum	{
      */
     SELN_REQ_UNKNOWN		= SELN_ATTR(ATTR_INT,		       254),
     SELN_REQ_FAILED		= SELN_ATTR(ATTR_INT,		       255)
-    
+
 }	Seln_attribute;
 
 /* Meta-levels available for use with SELN_REQ_FAKE/SET_LEVEL.

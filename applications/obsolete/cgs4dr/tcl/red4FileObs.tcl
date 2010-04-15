@@ -1,6 +1,6 @@
 proc red4FileObs {taskname type} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -20,7 +20,7 @@ proc red4FileObs {taskname type} {
     set Red4Widgets(FO_LABEL) [label $frame.lb -text "Filename"]
     set Red4Widgets(FO_ENTRY) [entry $frame.en -width 40]
     pack $Red4Widgets(FO_LABEL) $Red4Widgets(FO_ENTRY) -in $frame -side left
-    $Red4Widgets(FO_ENTRY) insert end $Red4Widgets(OB) 
+    $Red4Widgets(FO_ENTRY) insert end $Red4Widgets(OB)
 
 # Bind the defaults
     bind $Red4Widgets(FO_LABEL) <Button-2> "red4Update red4FileObs FO_ENTRY"

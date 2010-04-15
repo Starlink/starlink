@@ -1,7 +1,7 @@
 IRAFSTAR 1.2-1
 --------------
 
-Fixes a bug whereby the conversion process was deemed to have failed if 
+Fixes a bug whereby the conversion process was deemed to have failed if
 NDF2IRAF or NDF2FITS produced any messages.
 
 

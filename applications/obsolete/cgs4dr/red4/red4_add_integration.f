@@ -9,7 +9,7 @@
 *     record that the integration has been added and of how it had been
 *     reduced. All integrations are added with equal weight, any error
 *     array associated with the integration (from ADP statistics) is ignored.
-*     The error array of the reduce observation is calculated from the 
+*     The error array of the reduce observation is calculated from the
 *     dispersion of its component integrations about the mean.
 *     If there is a record of the integration already having been coadded
 *     then a warning message is output and no more done.
@@ -37,15 +37,15 @@
 *     The logic of this routine contains the following deficiencies :-
 *
 *     1. It is assumed that equal numbers of integrations will be added
-*        at each of the detector positions. (The COADDS array could be 
+*        at each of the detector positions. (The COADDS array could be
 *        checked to ensure this is true).
 *     2. It is assumed that integrations at other detector positions have
 *        the same integration time as the ones at detector position 1.
 *        (The total observation time is determined only from the latter).
-*     3. The MASKUSED, BIASUSED, DARKUSED, FLATUSED, LINEARIS and 
+*     3. The MASKUSED, BIASUSED, DARKUSED, FLATUSED, LINEARIS and
 *        NORMALIS parameters written to the FITS structure of the reduced
-*        observation file refer only to the most recent integration 
-*        added. They will refer to the observation as a whole only if 
+*        observation file refer only to the most recent integration
+*        added. They will refer to the observation as a whole only if
 *        every integration has used the same BIAS/DARK/FLAT etc...
 *        (Usually this is true).
 *
@@ -53,7 +53,7 @@
 *     It converts the name of the integration into the name of the
 *     reduced observation. It then converts this to the name of the
 *     observation, passes this to RED4_MAKE_OBSREDFILE, which then
-*     promptly converts this back into the name of the reduced 
+*     promptly converts this back into the name of the reduced
 *     observation!
 *
 *     The routine will not reject an integration which has not been
@@ -194,10 +194,10 @@
 *                                            !    the integration was taken at
       INTEGER LDAY, LDATE, LHOUR             ! lengths of date strings
       INTEGER DTA_STATUS                     !
-      INTEGER NELM_IND                       ! 
-      INTEGER NELM_INT                       ! 
-      INTEGER NELM_OBS                       ! 
-      INTEGER NDIM                           ! 
+      INTEGER NELM_IND                       !
+      INTEGER NELM_INT                       !
+      INTEGER NELM_OBS                       !
+      INTEGER NDIM                           !
       INTEGER N                              !
       INTEGER I                              ! Loop counter
       INTEGER CLEN                           ! Non-blank length of character string
@@ -238,7 +238,7 @@
 *                                            !    DARK, FLAT etc...)
       CHARACTER*40 OBJECT_NAME               ! The name of the object.
       CHARACTER*32 INT_INFO(2)               ! units and title of integration data
-      CHARACTER*40 TIME                      ! String holding date of last 
+      CHARACTER*40 TIME                      ! String holding date of last
 *                                            !    addition
       CHARACTER*80 BUFFER                    ! Buffer used for copying the name
 *                                            !    of the mask, BIAS, DARK or
@@ -303,7 +303,7 @@
          DSA_STATUS = STATUS
          CALL DSA_OPEN ( DSA_STATUS )
       ENDIF
-         
+
 *    Open reduced observation and integration files
       CALL RED4_CHECK_INPUT( OBSREDFILE, STATUS )
       CALL DSA_NAMED_INPUT ('OBSRED', OBSREDFILE, DSA_STATUS)
@@ -334,11 +334,11 @@
       CALL DSA_NAMED_INPUT ('COADDS', OBSREDFILE(:ICH_LEN(OBSREDFILE))//
      :   '.MORE.CGS4_COADDS', DSA_STATUS)
 
-      CALL DSA_MAP_DATA ('COADDS', 'UPDATE', 'SHORT', ADDRESS, 
+      CALL DSA_MAP_DATA ('COADDS', 'UPDATE', 'SHORT', ADDRESS,
      :   COADDS_SLOT, DSA_STATUS)
       COADDS_PTR = ADDRESS
 
-      CALL DSA_SPECIFIC_STRUCTURE ('COADDS', 'COADDED_INTS', 
+      CALL DSA_SPECIFIC_STRUCTURE ('COADDS', 'COADDED_INTS',
      :   'UPDATE', COADDED_INTS, DSA_STATUS)
 
 *    Search this structure for an occurence of the integration being added
@@ -354,7 +354,7 @@
          N = 1
          DTA_STATUS = DTA__OK
 
-*      Convert the integration name into its corresponding coadd 
+*      Convert the integration name into its corresponding coadd
 *      structure name
          CALL RED4_INTTOCOADD( INTFILE, COADD_TEST, STATUS )
 
@@ -384,7 +384,7 @@
 
 *    Get the detector position index of this particular integration
       DSA_STATUS = STATUS
-      CALL DSA_GET_FITS_I( 'INTRED', 'DINDEX', 0, DET_INDEX, COMMENT, 
+      CALL DSA_GET_FITS_I( 'INTRED', 'DINDEX', 0, DET_INDEX, COMMENT,
      :  DSA_STATUS )
 
 *    If the detector index is 1, read in the INTEGRATION_TIMe of the
@@ -424,7 +424,7 @@
 *    check that the index array can handle this index position (always
 *    should do but the program will crash*?! if it doesn't)
       CALL DSA_DATA_SIZE ('INDEX', MAXINDDIM, NDIM, INDEX_DIMS,
-     :  NELM_IND, DSA_STATUS) 
+     :  NELM_IND, DSA_STATUS)
 
       IF (DSA_STATUS .EQ. ADAM__OK) THEN
 
@@ -452,7 +452,7 @@
      :   OBSDATA_SLOT, DSA_STATUS)
       OBSDATA_PTR = ADDRESS
 
-      CALL DSA_MAP_VARIANCE ('OBSRED', 'UPDATE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_VARIANCE ('OBSRED', 'UPDATE', 'FLOAT', ADDRESS,
      :   OBSVAR_SLOT, DSA_STATUS)
       OBSVAR_PTR = ADDRESS
 
@@ -464,14 +464,14 @@
          VARIANCE_MAP = .FALSE.
       END IF
 
-      CALL DSA_MAP_QUALITY ('OBSRED', 'UPDATE', 'BYTE', ADDRESS, 
+      CALL DSA_MAP_QUALITY ('OBSRED', 'UPDATE', 'BYTE', ADDRESS,
      :   OBSQUAL_SLOT, DSA_STATUS)
       OBSQUAL_PTR = ADDRESS
 
       CALL DSA_DATA_SIZE ('OBSRED', MAXOBSDIM, NDIM, OBSDIMS, NELM_OBS,
-     :  DSA_STATUS) 
+     :  DSA_STATUS)
 
-*    and for the reduced integration (errors derived from CIRACS coadding 
+*    and for the reduced integration (errors derived from CIRACS coadding
 *    statistics are ignored)
       CALL DSA_USE_QUALITY ('INTRED', DSA_STATUS)
 
@@ -479,12 +479,12 @@
      :   INTDATA_SLOT, DSA_STATUS)
       INTDATA_PTR = ADDRESS
 
-      CALL DSA_MAP_QUALITY ('INTRED', 'READ', 'BYTE', ADDRESS, 
+      CALL DSA_MAP_QUALITY ('INTRED', 'READ', 'BYTE', ADDRESS,
      :   INTQUAL_SLOT, DSA_STATUS)
       INTQUAL_PTR = ADDRESS
 
-      CALL DSA_DATA_SIZE ('INTRED', MAXINTDIM, NDIM, INTDIMS, NELM_INT, 
-     :  DSA_STATUS) 
+      CALL DSA_DATA_SIZE ('INTRED', MAXINTDIM, NDIM, INTDIMS, NELM_INT,
+     :  DSA_STATUS)
 
 *    Call the routine that does the processing, the check for STATUS stops
 *    and adjustable array error if the routine is entered with some arrays
@@ -497,17 +497,17 @@
 
       IF (STATUS .EQ. ADAM__OK) THEN
 
-         CALL RED4_DO_COADD (%val(INTDATA_PTR), 
+         CALL RED4_DO_COADD (%val(INTDATA_PTR),
      :                       %val(INTQUAL_PTR),
      :                       INTDIMS(1),
      :                       INTDIMS(2),
-     :                       %val(INDEX_PTR), 
+     :                       %val(INDEX_PTR),
      :                       INDEX_DIMS(1),
      :                       INDEX_DIMS(2),
      :                       DET_INDEX,
      :                       %val(OBSDATA_PTR),
-     :                       %val(OBSVAR_PTR), 
-     :                       %val(OBSQUAL_PTR), 
+     :                       %val(OBSVAR_PTR),
+     :                       %val(OBSQUAL_PTR),
      :                       %val(COADDS_PTR),
      :                       OBSDIMS(1),
      :                       OBSDIMS(2),
@@ -519,13 +519,13 @@
 *    is bad at this point).
       IF ( VARIANCE_MAP .AND. (NELM_OBS .GT. 0) ) THEN
 
-         CALL GEN_CLIPF (%val(OBSVAR_PTR), 
+         CALL GEN_CLIPF (%val(OBSVAR_PTR),
      :      NELM_OBS, 0.0, 1.7E38, IGNORE, IGNORE,
      :      %val(OBSVAR_PTR))
       ENDIF
 
 *    Set the data title and information in the output structure to be the
-*    same as those in the input 
+*    same as those in the input
       DSA_STATUS = STATUS
       CALL DSA_GET_DATA_INFO ('INTRED', 2, INT_INFO, 0, DIGNORE,
      :  DSA_STATUS)
@@ -537,13 +537,13 @@
       CALL DSA_OBJECT_NAME( 'INTRED', OBJECT_NAME, DSA_STATUS )
       CALL DSA_SET_OBJECT( 'OBSRED', OBJECT_NAME, DSA_STATUS )
 
-*    If all OK, copy the contents of the .FITS structure in the 
+*    If all OK, copy the contents of the .FITS structure in the
 *    integration file into a COADD structure corresponding to the integration
       CALL RED4_COPY_STRUCTURE( 'INTRED.'//FITS_STRUCTURE,
      :  COADDED_INTS(:ICH_LEN(COADDED_INTS))//'.'//COADD_TEST,
      :  STATUS )
 
-*    If all OK and the detector index of the added integration is 1, then add 
+*    If all OK and the detector index of the added integration is 1, then add
 *    the integration's integration time to that of the observation, and
 *    update the value in the observation reduction file (both FITS and
 *    OBS structures).
@@ -555,7 +555,7 @@
          CALL DSA_PUT_FITS_F( 'OBSRED', 'EXPOSED', OBSERVATION_TIM, ' ',
      :     DSA_STATUS )
 
-         CALL DSA_SET_EXPOSURE( 'OBSRED', OBSERVATION_TIM, DSA_STATUS ) 
+         CALL DSA_SET_EXPOSURE( 'OBSRED', OBSERVATION_TIM, DSA_STATUS )
       ENDIF
 
 *   If all is ok, update RUTSTART and RUTEND to be the minimum and maximum
@@ -598,54 +598,54 @@
       END IF
 
 *    Copy the names of the bad pixel mask, and the BIAS, DARK and FLAT
-*    frames used, to the .FITS structure of the reduced observation 
+*    frames used, to the .FITS structure of the reduced observation
 *    file, provided these items exist in the reduced integration file.
 *    (Note that these will overwrite any existing items in the reduced
 *    observation file. If several integrations are added, the parameters
 *    of the last integration added will remain. This will not matter if
 *    all the integrations have been reduced in the same way).
-      CALL DSA_SEEK_FITS( 'INTRED', 'MASKUSED', FITS_EXIST, ACCESS, 
+      CALL DSA_SEEK_FITS( 'INTRED', 'MASKUSED', FITS_EXIST, ACCESS,
      :  ELEMENTS, STRLEN, DSA_STATUS )
 
       IF ( FITS_EXIST ) THEN
 
-         CALL DSA_GET_FITS_C( 'INTRED', 'MASKUSED', 0, BUFFER, COMMENT, 
+         CALL DSA_GET_FITS_C( 'INTRED', 'MASKUSED', 0, BUFFER, COMMENT,
      :     DSA_STATUS )
          CLEN = MAX( 1, ICH_LEN( BUFFER ) )
          CALL DSA_PUT_FITS_C( 'OBSRED', 'MASKUSED', BUFFER(1:CLEN), ' ',
      :     DSA_STATUS )
       END IF
 
-      CALL DSA_SEEK_FITS( 'INTRED', 'BIASUSED', FITS_EXIST, ACCESS, 
+      CALL DSA_SEEK_FITS( 'INTRED', 'BIASUSED', FITS_EXIST, ACCESS,
      :  ELEMENTS, STRLEN, DSA_STATUS )
 
       IF ( FITS_EXIST ) THEN
 
-         CALL DSA_GET_FITS_C( 'INTRED', 'BIASUSED', 0, BUFFER, COMMENT, 
+         CALL DSA_GET_FITS_C( 'INTRED', 'BIASUSED', 0, BUFFER, COMMENT,
      :     DSA_STATUS )
          CLEN = MAX( 1, ICH_LEN( BUFFER ) )
          CALL DSA_PUT_FITS_C( 'OBSRED', 'BIASUSED', BUFFER(1:CLEN), ' ',
      :     DSA_STATUS )
       END IF
 
-      CALL DSA_SEEK_FITS( 'INTRED', 'DARKUSED', FITS_EXIST, ACCESS, 
+      CALL DSA_SEEK_FITS( 'INTRED', 'DARKUSED', FITS_EXIST, ACCESS,
      :  ELEMENTS, STRLEN, DSA_STATUS )
 
       IF ( FITS_EXIST ) THEN
 
-         CALL DSA_GET_FITS_C( 'INTRED', 'DARKUSED', 0, BUFFER, COMMENT, 
+         CALL DSA_GET_FITS_C( 'INTRED', 'DARKUSED', 0, BUFFER, COMMENT,
      :     DSA_STATUS )
          CLEN = MAX( 1, ICH_LEN( BUFFER ) )
          CALL DSA_PUT_FITS_C( 'OBSRED', 'DARKUSED', BUFFER(1:CLEN), ' ',
      :     DSA_STATUS )
       END IF
 
-      CALL DSA_SEEK_FITS( 'INTRED', 'FLATUSED', FITS_EXIST, ACCESS, 
+      CALL DSA_SEEK_FITS( 'INTRED', 'FLATUSED', FITS_EXIST, ACCESS,
      :  ELEMENTS, STRLEN, DSA_STATUS )
 
       IF ( FITS_EXIST ) THEN
 
-         CALL DSA_GET_FITS_C( 'INTRED', 'FLATUSED', 0, BUFFER, COMMENT, 
+         CALL DSA_GET_FITS_C( 'INTRED', 'FLATUSED', 0, BUFFER, COMMENT,
      :     DSA_STATUS )
          CLEN = MAX( 1, ICH_LEN( BUFFER ) )
          CALL DSA_PUT_FITS_C( 'OBSRED', 'FLATUSED', BUFFER(1:CLEN), ' ',
@@ -655,7 +655,7 @@
 *    Copy the LINEARIS flag from the reduced integration file to
 *    the .FITS structure of the reduced observation file, if this item
 *    exists in the reduced integration file.
-      CALL DSA_SEEK_FITS( 'INTRED', 'LINEARIS', FITS_EXIST, ACCESS, 
+      CALL DSA_SEEK_FITS( 'INTRED', 'LINEARIS', FITS_EXIST, ACCESS,
      :  ELEMENTS, STRLEN, DSA_STATUS )
 
       IF ( FITS_EXIST ) THEN
@@ -676,9 +676,9 @@
 
          DO WHILE ( (DSA_STATUS .EQ. ADAM__OK) .AND. (FITS_EXIST) )
 
-            CALL DSA_GET_FITS_D( 'INTRED', ITEM(1:CPOS), 0, COEFF, 
+            CALL DSA_GET_FITS_D( 'INTRED', ITEM(1:CPOS), 0, COEFF,
      :        COMMENT, DSA_STATUS )
-            CALL DSA_PUT_FITS_D( 'OBSRED', ITEM(1:CPOS), COEFF, ' ', 
+            CALL DSA_PUT_FITS_D( 'OBSRED', ITEM(1:CPOS), COEFF, ' ',
      :        DSA_STATUS )
 
             I = I + 1
@@ -692,11 +692,11 @@
       END IF
 
 *    If no errors have occurred, and the observation being reduced is
-*    a FLAT, update the NORMALIS flag in the .FITS structure of the 
+*    a FLAT, update the NORMALIS flag in the .FITS structure of the
 *    reduced observation file, together with the normalisation method
 *    used.
       IF ( (DSA_STATUS .EQ. ADAM__OK) .AND.
-     :     (OBS_TYPE .EQ. 'FLAT') ) THEN 
+     :     (OBS_TYPE .EQ. 'FLAT') ) THEN
 
          CALL DSA_GET_FITS_C( 'INTRED', 'NORMALIS', 0, NORMALIS,
      :     COMMENT, DSA_STATUS )
@@ -736,7 +736,7 @@
          CALL DSA_PUT_FITS_C( 'OBSRED', 'STREDUCE', TIME(1:CLEN),
      :     ' ', DSA_STATUS )
       ENDIF
-         
+
  500  CONTINUE
 
 *   Close down DSA and tidy up.

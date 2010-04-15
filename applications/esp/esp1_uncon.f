@@ -1,7 +1,7 @@
 
 
 
-      SUBROUTINE GRA1_UNCON(RADISP,LOWR,HIGHR,STATUS)         
+      SUBROUTINE GRA1_UNCON(RADISP,LOWR,HIGHR,STATUS)
 *+
 *  Name:
 *     GRA1_UNCON
@@ -9,24 +9,24 @@
 *  Purpose:
 *     Takes the value returned by the cursor for the radius required and
 *     converts it to linear radius.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRA1_UNCON(RADISP,LOWR,HIGHR,STATUS)         
+*     CALL GRA1_UNCON(RADISP,LOWR,HIGHR,STATUS)
 
 *  Description:
 *     Take the values chosen by the user (using a cursor) from the graph
 *     plot of raw data and converts it from the transform value i.e. log,
 *     squared or quarter power to linear values.
-*     
+*
 *     The value is modified to ignore values for radius beyond the left hand
 *     edge of the plot.
 
-*  Arguments:                                
+*  Arguments:
 *     RADISP = CHAR (Given)
-*        Character variable denoting the format used for transforming 
+*        Character variable denoting the format used for transforming
 *        the radius value on the plotted graph.
 *        R=Linear Q=Quarter power, L=Logarithmic and S=Squared.
 *     LOWR = REAL (Given and Returned)
@@ -52,11 +52,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       CHARACTER RADISP *(256)         ! Defines the type of transformation
                                       ! to be applied to the radius value
 
@@ -66,13 +66,13 @@
       REAL HIGHR                      ! High transformed radius value to
                                       ! be untransformed
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Transformation not required.
       IF (RADISP.EQ.'R') THEN
@@ -107,7 +107,7 @@
       END
 
 
-      SUBROUTINE SEC1_UNCON(RADISP,LOWR,HIGHR,STATUS)         
+      SUBROUTINE SEC1_UNCON(RADISP,LOWR,HIGHR,STATUS)
 *+
 *  Name:
 *     SEC1_UNCON
@@ -115,24 +115,24 @@
 *  Purpose:
 *     Takes the value returned by the cursor for the radius required and
 *     converts it to linear radius.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SEC1_UNCON(RADISP,LOWR,HIGHR,STATUS)         
+*     CALL SEC1_UNCON(RADISP,LOWR,HIGHR,STATUS)
 
 *  Description:
 *     Take the values chosen by the user (using a cursor) from the graph
 *     plot of raw data and converts it from the transform value i.e. log,
 *     squared or quarter power to linear values.
-*     
+*
 *     The value is modified to ignore values for radius beyond the left hand
 *     edge of the plot.
 
-*  Arguments:                                
+*  Arguments:
 *     RADISP = CHAR (Given)
-*        Character variable denoting the format used for transforming 
+*        Character variable denoting the format used for transforming
 *        the radius value on the plotted graph.
 *        R=Linear Q=Quarter power, L=Logarithmic and S=Squared.
 *     LOWR = REAL (Given and Returned)
@@ -158,11 +158,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       CHARACTER RADISP *(256)         ! Defines the type of transformation
                                       ! to be applied to the radius value
 
@@ -172,13 +172,13 @@
       REAL HIGHR                      ! High transformed radius value to
                                       ! be untransformed
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Transformation not required.
       IF (RADISP.EQ.'R') THEN

@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine fills an array with values starting at START and
-*     incremented between each element by STEP. It's really just 
+*     incremented between each element by STEP. It's really just
 *     a convience for setting dynamically allocated arrays.
 *
 *     The result is:
@@ -73,22 +73,22 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 *  Arguments Given:
       REAL START
       REAL STEP
       INTEGER SIZE
-      
+
 *  Arguments Returned:
       REAL ARRAY( SIZE )
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
       INTEGER I                 ! Loop variable
       REAL CURVAL               ! Current array value
-      
+
 *.
 
 *  Check inherited global status.

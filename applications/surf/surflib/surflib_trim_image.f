@@ -32,7 +32,7 @@
 *     NY = INTEGER (Given)
 *       Number of Y pixels in image
 *     BITNUM = INTEGER (Given)
-*       Bit number to set to bad if within TRIM distance of a 
+*       Bit number to set to bad if within TRIM distance of a
 *       pixel that has bit 0 set. Start counting at 0.
 *     IN_QUAL(NX,NY) = UBYTE (Given)
 *       Input image.
@@ -67,10 +67,10 @@
 
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 *  Arguments Given:
       REAL    TRIM
       INTEGER NX
@@ -114,7 +114,7 @@
 *     Square of distance
       TRIMSQ = TRIM**2
 
-*     Need to loop over input, copying to output and if it 
+*     Need to loop over input, copying to output and if it
 *     is near a 'bad' pixel we set the required bit to 1.
 
       DO XPIX = 1, NX

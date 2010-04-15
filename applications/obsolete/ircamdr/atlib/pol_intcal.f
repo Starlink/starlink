@@ -6,11 +6,11 @@
 
 *      Define local variables
 
-	REAL INT_1,	! The intensity at 0 degrees 
+	REAL INT_1,	! The intensity at 0 degrees
      :	     INT_2,	! The intensity at 22.5 degrees
      :	     INT_3,	! The intensity at 45 degrees
      :	     INT_4,	! The intensity at 67.5 degrees
-     :	     TOTAL	! The total intensity 
+     :	     TOTAL	! The total intensity
 
 *      Calculate the sum of all the intensities to form the total
 

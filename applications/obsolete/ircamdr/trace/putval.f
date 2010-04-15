@@ -54,19 +54,19 @@
 *-
 
 *    append values for all the supported types
-      IF( CHR_SIMLR( TYPE, '_DOUBLE' ) ) THEN 
+      IF( CHR_SIMLR( TYPE, '_DOUBLE' ) ) THEN
 
 *       double precision
          CALL LSPUTD( OBJLOC, NDIM, DIMS, SIZE, LINE, LENG )
-      ELSEIF( CHR_SIMLR( TYPE, '_REAL' ) ) THEN 
+      ELSEIF( CHR_SIMLR( TYPE, '_REAL' ) ) THEN
 
 *       real
          CALL LSPUTR( OBJLOC, NDIM, DIMS, SIZE, LINE, LENG )
-      ELSEIF( CHR_SIMLR( TYPE, '_INTEGER' ) .OR. 
-     :  CHR_SIMLR( TYPE,  '_WORD' ) .OR. 
+      ELSEIF( CHR_SIMLR( TYPE, '_INTEGER' ) .OR.
+     :  CHR_SIMLR( TYPE,  '_WORD' ) .OR.
      :  CHR_SIMLR( TYPE, '_UWORD' ) .OR.
-     :  CHR_SIMLR( TYPE,  '_BYTE' ) .OR. 
-     :  CHR_SIMLR( TYPE, '_UBYTE' ) ) THEN 
+     :  CHR_SIMLR( TYPE,  '_BYTE' ) .OR.
+     :  CHR_SIMLR( TYPE, '_UBYTE' ) ) THEN
 
 *      all the various "integer" types
         CALL LSPUTI( OBJLOC, NDIM, DIMS, SIZE, LINE, LENG )

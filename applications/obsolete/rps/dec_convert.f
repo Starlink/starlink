@@ -3,13 +3,13 @@
 
 *  Type Declaration
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       CHARACTER*(*) CVALDEC
       DOUBLE PRECISION DEC
       LOGICAL LSTATUS
       INTEGER FIND_FIRST
- 
+
 ********************************************************************************
 *  Method
 *     Reads input as text.  A valid separator indicates not degrees.
@@ -28,7 +28,7 @@
 
 *  Common Parameters
       INCLUDE 'zpidata.inc'
- 
+
 *   Local variables:
 
       CHARACTER*1 SEP(4)/':', '/', ',', ' '/
@@ -60,9 +60,9 @@
             IF (ISTAT.NE.0) GOTO 20
             DEC = DEGREES * DDTOR
             REFORMAT = .TRUE.
- 
+
          ELSE				! Its degree / minute / second in some form
- 
+
             IF (CVALDEC(START:START) .EQ. '-' ) THEN
                NEGATIVE = .TRUE.
                START = START + 1
@@ -83,15 +83,15 @@ c            END IF
             START = INDEX+1
 	    INDEX2 = FIND_FIRST(CVALDEC(START:),CHARSEP,SUBINDEX)
             IF (INDEX2.EQ.0) GOTO 20
- 
+
             N2 = START + INDEX2 - 2
- 
-	    READ(CVALDEC(START:N2),*)MINUTE 
+
+	    READ(CVALDEC(START:N2),*)MINUTE
 
             N3 = N2 + 2
             IF (N3.GT.NCHAR) THEN
                SECOND = 0.0
-            ELSE 
+            ELSE
                READ(CVALDEC(N3:NCHAR), * , IOSTAT = STATUS) SECOND
                IF ( STATUS .NE. 0) GOTO 20
             END IF

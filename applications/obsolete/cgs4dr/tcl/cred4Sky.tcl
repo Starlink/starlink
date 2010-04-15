@@ -20,8 +20,8 @@ proc cred4Sky {taskname} {
     set l2 [label $midtop.l2 -text " "]
     set fi [radiobutton $midtop.fi -text "Errors from Int" -variable Cred4Widgets(ERRORS) -value "FROM_INT" -width 15]
     set fo [radiobutton $midtop.fo -text "Errors from Obs" -variable Cred4Widgets(ERRORS) -value "FROM_OBS" -width 15]
-    pack $l1 $l2 -in $midtop -side left 
-    pack $fo $fi -in $midtop -side right 
+    pack $l1 $l2 -in $midtop -side left
+    pack $fo $fi -in $midtop -side right
     bind $l1 <Button-2> "cred4Update cred4Sky ADD_IN_PAIRS"
     bind $l1 <Button-3> "cred4HelpDialog .helpDialog $cgs4drHtml/cred4SkyBox1.html"
     bind $l2 <Button-2> "cred4Update cred4Sky ALL"
@@ -38,8 +38,8 @@ proc cred4Sky {taskname} {
     set Cred4Widgets(SKYWT) [entry $bottop.sk -width 15]
     set vw [checkbutton $bottop.l2 -text "Variance Weight" -variable Cred4Widgets(VARWT)]
     set l4 [label $bottop.l4 -text " "]
-    pack $vw $l4 -in $bottop -side left 
-    pack $Cred4Widgets(SKYWT) $l3 -in $bottop -side right 
+    pack $vw $l4 -in $bottop -side left
+    pack $Cred4Widgets(SKYWT) $l3 -in $bottop -side right
     bind $l3 <Button-2> "cred4Update cred4Sky ALL"
     bind $l3 <Button-3> "cred4HelpDialog .helpDialog $cgs4drHtml/cred4SkyBox1.html"
     bind $l4 <Button-2> "cred4Update cred4Sky ALL"

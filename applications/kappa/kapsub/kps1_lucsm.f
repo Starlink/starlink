@@ -51,7 +51,7 @@
 *     IN( N ) = REAL (Given and Returned)
 *        The array to be smoothed.
 *     MASK( N ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     WORK( N ) = REAL (Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -98,7 +98,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       INTEGER N
       INTEGER NPIX
@@ -106,7 +106,7 @@
       REAL    WLIM
       LOGICAL TRANS
       REAL    PSF( N )
-      
+
 *  Arguments Given and Returned:
       REAL    IN( N )
 
@@ -120,7 +120,7 @@
 *  Local Variables:
       LOGICAL BAD                ! Are there any bad values in the data?
       INTEGER I                  ! Element count
-      
+
 *.
 
 *  Check the inherited global status.
@@ -160,7 +160,7 @@
             CALL KPS1_OP2( NPIX, NLIN, PSF, MASK, WORK, STATUS )
          END IF
 
-*  Normalise the smoothed input array by dividing it by the smoothed 
+*  Normalise the smoothed input array by dividing it by the smoothed
 *  mask array.  If the smoothed mask value is too low, set the output
 *  value bad.  The output values are returned in IN.
          DO I = 1, N

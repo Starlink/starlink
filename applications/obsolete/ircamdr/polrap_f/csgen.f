@@ -29,7 +29,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -43,8 +43,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -62,7 +62,7 @@
      :  ODIMS( NDIMS ),       ! dimensions of output DATA_ARRAYs
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  XCENTRE, 
+     :  XCENTRE,
      :  YCENTRE
 
 
@@ -96,7 +96,7 @@
 	    CALL PAR_GET0I( 'YCENTRE', YCENTRE, STATUS)
 
 *          pass everything to the work routine
-	    CALL CSGENSUB( ODIMS( 1), ODIMS( 2), %VAL( PNTRO), 
+	    CALL CSGENSUB( ODIMS( 1), ODIMS( 2), %VAL( PNTRO),
      :	                   XCENTRE, YCENTRE, STATUS)
 
 	  END IF

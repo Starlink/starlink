@@ -46,7 +46,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,17 +119,17 @@
            call msg_setc('paramname',pname)
            call msg_setc('paramreq',preq)
            call msg_setc('paraminfo',info)
-           call msg_out('message 1','The information in the ^paramreq of 
+           call msg_out('message 1','The information in the ^paramreq of
      : the parameter ^paramname in catalogue ^catname is ^paraminfo .'
      : , status)
          elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)
-           call err_rep('message 2','The catalogue ^catname could not 
+           call err_rep('message 2','The catalogue ^catname could not
      : be found.', status)
          elseif (status .eq. CHP__PARNOTFND) then
            call msg_setc('paramname',pname)
            call msg_setc('catname',incat)
-           call err_rep('message 3','The parameter ^paramname was not found in 
+           call err_rep('message 3','The parameter ^paramname was not found in
      : the catalogue ^catname.', status)
          elseif (status .eq. CHP__IVLDPREQ) then
            call msg_setc('paramireq',preq)

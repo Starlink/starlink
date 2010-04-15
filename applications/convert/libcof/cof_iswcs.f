@@ -59,7 +59,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,10 +77,10 @@
 *  Local Variables:
       CHARACTER CARD*85          ! FITS header card
       CHARACTER CLOC*(DAT__SZLOC)! Locator for FITS header card
-      CHARACTER ENC*30           ! Current FitsChan encoding 
+      CHARACTER ENC*30           ! Current FitsChan encoding
       CHARACTER LOC*(DAT__SZLOC) ! Locator for FITS extension
-      INTEGER FC                 ! AST FitsChan identifier 
-      INTEGER ICARD              ! Index of curent header cards 
+      INTEGER FC                 ! AST FitsChan identifier
+      INTEGER ICARD              ! Index of curent header cards
       INTEGER NCARD              ! No. of header cards in the FITS extension
       INTEGER OBJ                ! AST Object read from the FITS extension
       LOGICAL MORE               ! Read another Object?
@@ -107,32 +107,32 @@
 
 *  Find the FITS extension, and get its size.
          CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
-         CALL DAT_SIZE( LOC, NCARD, STATUS ) 
+         CALL DAT_SIZE( LOC, NCARD, STATUS )
 
 *  Loop round putting each card into the FitsChan.
          DO ICARD = 1, NCARD
-            CALL DAT_CELL( LOC, 1, ICARD, CLOC, STATUS ) 
-            CALL DAT_GET0C( CLOC, CARD, STATUS )             
+            CALL DAT_CELL( LOC, 1, ICARD, CLOC, STATUS )
+            CALL DAT_GET0C( CLOC, CARD, STATUS )
             CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS )
-            CALL DAT_ANNUL( CLOC, STATUS ) 
+            CALL DAT_ANNUL( CLOC, STATUS )
          END DO
 
-*  Annul the locator to the FITS extensuion array. 
+*  Annul the locator to the FITS extensuion array.
          CALL DAT_ANNUL( LOC, STATUS )
 
 *  Loop, attempting to read a FrameSet from the FitsChan, until a foregn
 *  encoding with more than 1 Frame is read.
          MORE = .TRUE.
-         DO WHILE( MORE ) 
+         DO WHILE( MORE )
             ENC = AST_GETC( FC, 'ENCODING', STATUS )
             CALL AST_CLEAR( FC, 'CARD', STATUS )
             OBJ = AST_READ( FC, STATUS )
 
-*  Leave the loop if no more objects can be read. 
+*  Leave the loop if no more objects can be read.
             IF( OBJ .EQ. AST__NULL ) THEN
                MORE = .FALSE.
 
-*  If an non-NATIVE object was read, see if it is a FrameSet containing more 
+*  If an non-NATIVE object was read, see if it is a FrameSet containing more
 *  than 1 Frame.
             ELSE IF( ENC .NE. 'NATIVE' ) THEN
                IF( AST_ISAFRAMESET( OBJ, STATUS ) ) THEN
@@ -147,5 +147,5 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
-    
+
       END

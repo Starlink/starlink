@@ -74,7 +74,7 @@
 *     25/1/89         TNW status set to 0, had been missed off
 *                     conversion to DSA
 *     13/10/89        TNW/CAVAD PHO_FOTOR made independent of FIGARO
-*      5/1/99         AJH change sda_map 'r' to 'READ' 
+*      5/1/99         AJH change sda_map 'r' to 'READ'
 *-
       implicit none
 

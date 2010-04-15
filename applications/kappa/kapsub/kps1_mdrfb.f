@@ -146,13 +146,13 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit types
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAE standard constants
- 
+
 *  Arguments Given:
       INTEGER STEP
       INTEGER IDIM1
@@ -160,13 +160,13 @@
       BYTE ARRIN( IDIM1, IDIM2 )
       INTEGER ODIM1
       INTEGER ODIM2
- 
+
 *  Arguments Returned:
       BYTE ARROUT( ODIM1, ODIM2 )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER FIRST              ! Position in output array of first
                                  ! line/column of input array
@@ -182,64 +182,64 @@
       INTEGER YIN                ! Y index to input array elements
       INTEGER YREF               ! Y index to array elements for
                                  ! 'reflection'
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  FIRST is position in output array of line or column corresponding to
 *  the first line or column of the input array.
       FIRST = STEP + 1
- 
+
 *  LASTX is position of column in output array corresponding to last
 *  column of the input array which may be accommodated.
       LASTX = MIN( STEP + IDIM1, ODIM1 - STEP )
- 
+
 *  LASTY, position in output array of line corresponding to last line
 *  of the input array which may be accommodated.
       LASTY = MIN( STEP + IDIM2, ODIM2 - STEP )
- 
+
 *  Copy the input frame into the central section of the output frame.
       DO Y = FIRST, LASTY
          YIN = Y - STEP
- 
+
          DO X = FIRST, LASTX
             XIN = X - STEP
             ARROUT( X, Y ) = ARRIN( XIN, YIN )
          END DO
       END DO
- 
+
 *  Pad bottom STEP lines of output array by a reflection about the line
 *  corresponding to the first line of the input array.
       DO Y = 1, STEP
          YREF = ( 2 * ( FIRST ) ) - Y
- 
+
          DO  X = FIRST, LASTX
             ARROUT( X, Y ) = ARROUT( X, YREF )
          END DO
       END DO
- 
+
 *  Pad top STEP lines of output array by a reflection about the line
 *  corresponding to the last line of the input array.
       DO Y = LASTY + 1, ODIM2
          YREF = ( 2 * LASTY ) - Y
- 
+
          DO X = FIRST, LASTX
             ARROUT( X, Y ) = ARROUT( X, YREF )
          END DO
       END DO
- 
+
 *  Pad out ends of all lines of the output image.
       DO Y = 1, ODIM2
- 
+
 *  Pad first STEP points of output array line by a reflection about the
 *  point corresponding to first point of the input image line.
          DO X = 1, STEP
             XREF = ( 2 * FIRST ) - X
             ARROUT( X, Y ) = ARROUT( XREF, Y )
          END DO
- 
+
 *  Pad last STEP points of output array line by a reflection about
 *  point corresponding to the last point of the input image line.
          DO X = LASTX + 1, ODIM1
@@ -247,5 +247,5 @@
             ARROUT( X, Y ) = ARROUT( XREF, Y )
          END DO
       END DO
- 
+
       END

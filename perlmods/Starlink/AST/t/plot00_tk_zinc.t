@@ -40,22 +40,22 @@ my $e = [ $c, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, $attrs ];
 Starlink::AST::Tk::_init_canvas_attrs( $c, $attrs);
 
 # _GAttr
-my ( $status, $old_value ) = 
-  Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__COLOUR(), 3, 
+my ( $status, $old_value ) =
+  Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__COLOUR(), 3,
                              Starlink::AST::Grf::GRF__MARK() );
 
 is( $status, 1, "Calling _GAttr()" );
 is($old_value, Starlink::AST::AST__BAD(),"Checking default GRF__COLOUR value");
 
 # check value we just sent
-( $status, $old_value ) = 
+( $status, $old_value ) =
   Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__COLOUR(),
 			     Starlink::AST::AST__BAD(),
                              Starlink::AST::Grf::GRF__MARK() );
 is($old_value, 3, "Checking previous GRF__COLOUR for GRF__MARK");
 
 # set a coloured line
-( $status, $old_value ) = 
+( $status, $old_value ) =
   Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__COLOUR(),
 			     5,
                              Starlink::AST::Grf::GRF__LINE() );
@@ -67,14 +67,14 @@ is( Starlink::AST::Tk::_GFlush( $e ), 1, "Calling _GFlush()" );
 is( Starlink::AST::Tk::_GLine( $e, \@x, \@y ), 1, "Calling _GLine()" );
 
 # _GMark( \@x, \@y, $type );
-( $status, $old_value ) = 
+( $status, $old_value ) =
   Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__SIZE(),
 			     1.5,
                              Starlink::AST::Grf::GRF__MARK() );
 is( Starlink::AST::Tk::_GMark( $e, \@x, \@y, 17 ), 1, "Calling _GMark()" );
 
 _text_and_box( $e, "Testing", 0.2, 0.4, "CL", 0, 1);
-( $status, $old_value ) = 
+( $status, $old_value ) =
   Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__COLOUR(),
 			     6,
                              Starlink::AST::Grf::GRF__TEXT() );
@@ -102,14 +102,14 @@ sub create_window {
    my $MW = MainWindow->new();
    $MW->positionfrom("user");
    $MW->geometry("+40+100");
-   $MW->title("Starlink::AST::Tk");   
+   $MW->title("Starlink::AST::Tk");
    $MW->iconname("Starlink::AST::Tk");
    $MW->configure( -cursor => "tcross" );
    $MW->after( 1000, sub { exit; } );
 
    # create the canvas widget
-   my $canvas = $MW->Zinc( -width       => 640, 
-			   -height      => 480, 
+   my $canvas = $MW->Zinc( -width       => 640,
+			   -height      => 480,
 			   -backcolor   => 'darkgrey',
 			   -borderwidth => 3 );
    $canvas->pack();
@@ -126,7 +126,7 @@ sub create_window {
                                 -borderwidth      => 3,
                                 -command => sub { exit; } );
    $button->pack( -side => 'right' );
-   
+
    return $canvas;
 }
 

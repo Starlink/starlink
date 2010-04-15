@@ -1,5 +1,5 @@
-	SUBROUTINE CONTOUR_TICKS( TICK_XINTERVAL, TICK_YINTERVAL, 
-     :                            CONTOUR_MAGNIF, 
+	SUBROUTINE CONTOUR_TICKS( TICK_XINTERVAL, TICK_YINTERVAL,
+     :                            CONTOUR_MAGNIF,
      :	                          CONTOUR_AXRAT, STATUS)
 
 * Description : Plots tick marks on the axes formed by an image border
@@ -105,7 +105,7 @@
 
 * plot bottom X axis tick marks
 
-	  X1 = IM_XST + 
+	  X1 = IM_XST +
      :          ( X_ZERO + TICK_XINTERVAL*(J-1))*CONTOUR_MAGNIF
 	  Y1 = IM_YST
 
@@ -165,7 +165,7 @@
 	  END IF
 
 	  Y1 = IM_YST +
-     :	       ( Y_ZERO + 
+     :	       ( Y_ZERO +
      :           TICK_YINTERVAL*(J-1))*CONTOUR_MAGNIF*CONTOUR_AXRAT
 
 	  CALL SGS_LINE( X1, Y1, X2, Y1)
@@ -203,7 +203,7 @@
 
 * plot bottom X axis tick marks
 
-	    X1 = IM_XST + 
+	    X1 = IM_XST +
      :           ( X_ZERO - TICK_XINTERVAL*(J-1))*CONTOUR_MAGNIF
 	    Y1 = IM_YST
 
@@ -273,7 +273,7 @@
 	    END IF
 
 	    Y1 = IM_YST +
-     :	         ( Y_ZERO - 
+     :	         ( Y_ZERO -
      :           TICK_YINTERVAL*(J-1))*CONTOUR_MAGNIF*CONTOUR_AXRAT
 
 	    CALL SGS_LINE( X1, Y1, X2, Y1)

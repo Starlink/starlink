@@ -41,7 +41,7 @@
 
 *  Function Value:
 *     KPG1_SHORT = LOGICAL
-*        Returned .TRUE. if and only if the supplied test string matches the 
+*        Returned .TRUE. if and only if the supplied test string matches the
 *        template.
 
 *  Copyright:
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,8 +129,8 @@
 *  Initialise the index of the next test character to be checked.
       K = 1
 
-*  We check each character in the template (excluding trailing blanks). If a 
-*  mismatch is found leave the loop. 
+*  We check each character in the template (excluding trailing blanks). If a
+*  mismatch is found leave the loop.
       DO I = 1, TMPLEN
 
 *  See if the remaining characters in the template start with the mark
@@ -146,21 +146,21 @@
          IF( MARKER ) THEN
             ENDOK = .TRUE.
 
-*  Otherwise, if we have reached the end of the supplied text, leave the loop. 
+*  Otherwise, if we have reached the end of the supplied text, leave the loop.
 *  We have a match if it is OK for the text to end here.
          ELSE IF( K .GT. TSTLEN ) THEN
             KPG1_SHORT = ENDOK
             GO TO 10
 
 *  Otherwise, if the characters are different, we do not have a match.
-         ELSE 
+         ELSE
             IF( CASE ) THEN
                IF( TEMPLT( I : I ) .NE. TEST( K : K ) ) THEN
                   KPG1_SHORT = .FALSE.
                   GO TO 10
                END IF
             ELSE
-               IF( CHR_UPPER( TEMPLT( I : I ) ) .NE. 
+               IF( CHR_UPPER( TEMPLT( I : I ) ) .NE.
      :             CHR_UPPER( TEST( K : K ) ) ) THEN
                   KPG1_SHORT = .FALSE.
                   GO TO 10
@@ -181,4 +181,4 @@
  10   CONTINUE
 
       END
- 
+

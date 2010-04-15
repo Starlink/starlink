@@ -67,7 +67,7 @@
 
          CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL, STATUS)
 
-         RED4_ACTIVE = .FALSE. 
+         RED4_ACTIVE = .FALSE.
 
          IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
             IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -103,7 +103,7 @@
 
 *    Tell the RED4 A-task to archive this observation
       INVAL = 'OBSERVATION="' // OBSERVATION // '"'
-      CALL TASK_OBEY( RED4_ALIAS, 'ARCHIVE_OBS', INVAL, OUTVAL, 
+      CALL TASK_OBEY( RED4_ALIAS, 'ARCHIVE_OBS', INVAL, OUTVAL,
      :   RED4_PATH, RED4_MESSID, STATUS )
 
 *    check that the action started OK, if not report an error
@@ -124,10 +124,10 @@
 *       if necessary, wait for action to finish, check completion
          IF ( WAIT ) THEN
 
-            CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID, OUTVAL, 
+            CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID, OUTVAL,
      :         STATUS )
 
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                IF (STATUS .EQ. DTASK__ACTINFORM) THEN

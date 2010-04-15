@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -75,10 +75,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  At the moment, AGI sometimes uses cached information stored in 
+*  At the moment, AGI sometimes uses cached information stored in
 *  internal storage, rather than reading it from the database file.
 *  This causes problems when two monoliths try to use the same
-*  database file. What happens is that one monolith updates the 
+*  database file. What happens is that one monolith updates the
 *  database, but the second monolith doesn't see the new state of
 *  the database until the database file is read again for any reason.
 *  The following call to AGI_IPOBS forces the IRAS90 monolith to update

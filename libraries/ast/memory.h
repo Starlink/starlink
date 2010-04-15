@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -120,7 +120,7 @@
 /* C header files. */
 /* --------------- */
 #include <stddef.h>
-#include "error.h"    
+#include "error.h"
 
 /* Macros. */
 /* ======= */
@@ -135,7 +135,7 @@
 /* Type definitions */
 /* ================ */
 
-#if defined(astCLASS) 
+#if defined(astCLASS)
 
 /* Header for allocated memory. */
 /* ---------------------------- */
@@ -164,7 +164,7 @@ typedef struct Memory {
 #endif
 
 
-#if defined(THREAD_SAFE) && defined(astCLASS) 
+#if defined(THREAD_SAFE) && defined(astCLASS)
 
 /* Define a structure holding all data items that are global within the
    memory.c file. */
@@ -288,15 +288,15 @@ void astEndPM_( int * );
 #define astMemoryId(ptr) astERROR_INVOKE(astMemoryId_(ptr,STATUS_PTR))
 #else
 
-#define astActiveMemory(label) 
+#define astActiveMemory(label)
 #define astMemoryTune(name,value)
 #define astWatchMemory(id)
-#define astFlushMemory(leak) 
-#define astBeginPM 
+#define astFlushMemory(leak)
+#define astBeginPM
 #define astEndPM
 #define astMemoryPtr(id) NULL
 #define astMemoryAlarm(text)
-#define astMemoryUse(ptr,text) 
+#define astMemoryUse(ptr,text)
 #define astMemoryId(ptr)
 
 #endif

@@ -128,7 +128,7 @@ C
                   GO TO 320           ! Break symbol search loop
                END IF
             END IF
-         END DO         
+         END DO
   320    CONTINUE                     ! End of symbol search loop
          IF (.NOT.TRANS) IST=POSN+1
       END DO

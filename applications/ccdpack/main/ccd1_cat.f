@@ -63,26 +63,26 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MSG_PAR'         ! Message system constants
       INCLUDE 'FIO_ERR'         ! FIO errors codes
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) FILE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER * ( MSG__SZMSG) LINE ! Line buffer for reads
       INTEGER FD                ! File descriptor
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 
 *  Now open the file.
       CALL FIO_OPEN( FILE, 'READ', 'LIST', 0, FD, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Write out its name.
          CALL MSG_SETC( 'FILE', FILE )
@@ -91,12 +91,12 @@
 
 *  Now loop until file is all read.
  1       CONTINUE
-         IF ( STATUS .EQ. SAI__OK ) THEN 
+         IF ( STATUS .EQ. SAI__OK ) THEN
             CALL FIO_READF( FD, LINE, STATUS )
             CALL MSG_OUT( ' ', LINE, STATUS )
             GO TO 1
          END IF
-         IF ( STATUS .EQ. FIO__EOF ) THEN 
+         IF ( STATUS .EQ. FIO__EOF ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF
          CALL FIO_CLOSE( FD, STATUS )

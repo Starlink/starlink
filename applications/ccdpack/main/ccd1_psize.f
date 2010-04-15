@@ -31,7 +31,7 @@
 *     IWCS = INTEGER (Given)
 *        An AST pointer to the WCS frameset of an NDF.
 *     JFRM = INTEGER (Given)
-*        The frame index of the frame in the IWCS frameset in which 
+*        The frame index of the frame in the IWCS frameset in which
 *        the size is to be returned.  The symbolic values AST__CURRENT
 *        and AST__BASE may be used.
 *     PSIZE = DOUBLE PRECISION (Returned)
@@ -78,14 +78,14 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Arguments Given:
       INTEGER IWCS
       INTEGER JFRM
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION PSIZE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -96,11 +96,11 @@
       DOUBLE PRECISION XQ( 2 )   ! X coordinates in JFRM frame
       DOUBLE PRECISION YP( 2 )   ! Y coordinates in GRID frame
       DOUBLE PRECISION YQ( 2 )   ! Y coordinates in JFRM frame
-      
+
 *  Local Data:
       DATA XP / 0D0, 1D0 /
       DATA YP / 0D0, 1D0 /
-      
+
 *.
 
 *  Check inherited global status.
@@ -117,7 +117,7 @@
 
 *  Get the pixel size.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         PSIZE = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2 
+         PSIZE = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2
      :               + ( YQ( 2 ) - YQ( 1 ) ) ** 2 )
      :         / SQRT( 2D0 )
       END IF

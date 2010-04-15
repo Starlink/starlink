@@ -1,5 +1,5 @@
 /*
-    This program is a filter that converts VMS Fortran into UNIX Fortran 
+    This program is a filter that converts VMS Fortran into UNIX Fortran
 
     The convertion of INCLUDE statment file names is controlled by a subsitution
     file; each record contains a VMS file (or library module) specification and
@@ -141,7 +141,7 @@ int *sae_par;
 	    if ( strcmp( newname, "/star/include/sae_par" ) == 0 )
 	    {
 		*sae_par = TRUE;
-		if ( make ) 
+		if ( make )
 		{
 		    if ( hds_fixup ) fprintf(make_file, "%s : %s\n", module,
 				    "/star/include/dat_par");
@@ -301,7 +301,7 @@ char *argv[];
 			}
 		    }
 		}
-		if (gotone) (void)incl(make_file, module, in_line, prefix, 
+		if (gotone) (void)incl(make_file, module, in_line, prefix,
 				&sae_par);
 
 /*
@@ -320,7 +320,7 @@ char *argv[];
 **  long
 */
 			if ((j > i) && (j > 73)) fprintf(stderr,
-"%% *** line containing backslashes may be more than 72 characters long\n"); 
+"%% *** line containing backslashes may be more than 72 characters long\n");
 
 			out_line[j++] = '\0';
 		}
@@ -345,14 +345,14 @@ char *argv[];
 		    {
 		    	fprintf( output_file,
 			     "      INCLUDE '/star/include/dat_par'\n" );
-		    	if (!quiet) 
+		    	if (!quiet)
 			fprintf(stderr,"%% Added '/star/include/dat_par'\n");
 		    }
 		    if (par_fixup)
 		    {
 		    	fprintf( output_file,
 			     "      INCLUDE '/star/include/par_par'\n" );
-		    	if (!quiet) 
+		    	if (!quiet)
 			fprintf(stderr,"%% Added '/star/include/par_par'\n");
 		    }
                     sae_par = FALSE;

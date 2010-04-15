@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,7 +101,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Remove spaces, and convert to upper case.
-      CALL CHR_RMBLK( TEXT ) 
+      CALL CHR_RMBLK( TEXT )
       CALL CHR_UCASE( TEXT )
 
 *  Store the used length of the string.
@@ -119,8 +119,8 @@
       IF( MARK .EQ. 0 ) THEN
          MARK = TLEN + 1
       ELSE
-         MARK = MARK + I - 1 
-      END IF     
+         MARK = MARK + I - 1
+      END IF
 
 *  If the major version number field is null, report an error.
       IF( MARK .LE. I ) THEN
@@ -146,7 +146,7 @@
          CALL ERR_REP( 'KPG1_PVERS_ERR3', 'Invalid major version '//
      :                 'number.', STATUS )
          GO TO 999
-      END IF     
+      END IF
 
 *  Move on to look at the first character following the dot.
       I = MARK + 1
@@ -160,8 +160,8 @@
          IF( MARK .EQ. 0 ) THEN
             MARK = TLEN + 1
          ELSE
-            MARK = MARK + I - 1 
-         END IF     
+            MARK = MARK + I - 1
+         END IF
 
 *  If the minor version number field is null, report an error.
          IF( MARK .LE. I ) THEN
@@ -187,7 +187,7 @@
             CALL ERR_REP( 'KPG1_PVERS_ERR6', 'Invalid minor version '//
      :                    'number.', STATUS )
             GO TO 999
-         END IF     
+         END IF
 
 *  Move on to look at the first character following the "-".
          I = MARK + 1
@@ -204,7 +204,7 @@
                CALL ERR_REP( 'KPG1_PVERS_ERR7', 'Invalid revision '//
      :                       'number.', STATUS )
                GO TO 999
-            END IF     
+            END IF
 
          END IF
 

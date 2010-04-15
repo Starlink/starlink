@@ -3,16 +3,16 @@
 *+
 *  Name:
 *     SUBPAR_GETNL
- 
+
 *  Purpose:
 *     Read parameter values.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_GETNL ( NAMECODE, NDIM, MAXD, VALUES, ACTD, STATUS )
- 
+
 *  Description:
 *     Read the values from an n-dimensional object associated with a
 *     parameter.
@@ -21,16 +21,16 @@
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
 *     There is a routine for each access type, LOGICAL:
- 
+
 *        SUBPAR_GETND    DOUBLE PRECISION
 *        SUBPAR_GETNR    REAL
 *        SUBPAR_GETNI    INTEGER
 *        SUBPAR_GETNL    LOGICAL
 *        SUBPAR_GETNC    CHARACTER[*n]
- 
+
 *     If the object data type differs from the access type, LOGICAL, then
 *     conversion is performed (if allowed).
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER
 *        pointer to the parameter
@@ -45,7 +45,7 @@
 *     ACTD(NDIM)=INTEGER
 *        Array to receive the actual object dimensions.
 *     STATUS=INTEGER
- 
+
 *  Algorithm:
 *     The HDS locator associated with the parameter is obtained.
 *     If this is successful, the shape of the associated object is found
@@ -57,7 +57,7 @@
 *     If an error is detected after an object is associated, error messages
 *     are flushed and another value obtained if possible by prompting up to
 *     a set number of times.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1986, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     06.11.1984 (BDK):
 *        Original version
@@ -110,43 +110,43 @@
 *     29-SEP-1994 (AJC):
 *        Use EMS_FACER not DAT_ERMSG to report errors
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! SAI Constants
       INCLUDE 'DAT_PAR'                 ! DAT Constants
       INCLUDE 'SUBPAR_PAR'              ! SUBPAR Constants
       INCLUDE 'SUBPAR_ERR'              ! SUBPAR errors
       INCLUDE 'SUBPAR_PARERR'           ! SUBPAR PAR errors
- 
+
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter number
       INTEGER NDIM			! Number of dimensions
       INTEGER MAXD(*)			! Array dimensions
- 
+
 *  Arguments Returned:
       LOGICAL VALUES(*)			! Array to receive values
       INTEGER ACTD(*)			! Object dimensions
- 
+
 *    Status return :
       INTEGER STATUS			! Status Return
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *  Local Constants:
       INTEGER MAXDIM                    ! Maximum number of dimensions
       PARAMETER ( MAXDIM = 7 )
       INTEGER MAXTRY                    ! Maximum attempts to get good value
       PARAMETER ( MAXTRY = 5 )
- 
+
 *  Local Variables:
       INTEGER DIMS(MAXDIM)                     ! dimensions of HDS object
       INTEGER ACTDIM                           ! dimensionality of HDS object
@@ -155,16 +155,16 @@
       CHARACTER*(DAT__SZLOC) BOTLOC            ! HDS locator
       LOGICAL ACCEPTED                         ! If no re-prompt required
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
- 
+
 *   Protect higher level tokens
       CALL EMS_MARK
- 
+
 *   Loop until ACCEPTED
       ACCEPTED = .FALSE.
       TRIES = 0
- 
+
       DOWHILE ( .NOT. ACCEPTED )
 *
 *      Get an HDS locator to the data for the parameter.
@@ -174,19 +174,19 @@
          ELSE
             CALL SUBPAR_ASSOC ( NAMECODE, 'READ', BOTLOC, STATUS )
          ENDIF
- 
+
          IF (STATUS .EQ. SAI__OK) THEN
 *        Get the object dimensions
             CALL DAT_SHAPE ( BOTLOC, MAXDIM, DIMS, ACTDIM, STATUS )
- 
+
 *        Now check size and shape.
 *        If actual dimensionality less than given, set higher dimensions
 *        to 1
             IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *           Ensure DIMS set correct for a scalar object
                IF ( ACTDIM .EQ. 0 ) DIMS(1) = 0
- 
+
                IF (ACTDIM .LE. NDIM) THEN
                   DO J = 1, NDIM
                      IF ( J .GT. ACTDIM ) ACTD(J) = 1
@@ -200,12 +200,12 @@
      :                  'of parameter ^NAME', STATUS )
                      ENDIF
                   ENDDO
- 
+
 *              If OK, get the data values and size
                   IF ( STATUS .EQ. SAI__OK )
      :               CALL DAT_GETNL( BOTLOC, ACTDIM, MAXD,
      :                 VALUES, ACTD, STATUS )
- 
+
                ELSE
                   STATUS = SUBPAR__ARRDIM
                   CALL EMS_SETI( 'DIMS', NDIM )
@@ -213,19 +213,19 @@
                   CALL EMS_REP ( 'SUP_GETN2',
      :            'SUBPAR: Maximum ^DIMS dimensions exceeded '//
      :            'for parameter ^NAME', STATUS )
- 
+
                ENDIF
- 
+
             ENDIF
- 
- 
+
+
 *        Annul the locator
             CALL DAT_ANNUL( BOTLOC, STATUS )
- 
+
 *        If OK, break the loop
             IF ( STATUS .EQ. SAI__OK ) THEN
                ACCEPTED = .TRUE.
- 
+
 *        Otherwise cancel the parameter - forcing reprompt,
 *        flush error messages and loop
             ELSE
@@ -236,7 +236,7 @@
                CALL SUBPAR_CANCL ( NAMECODE, STATUS )
 *           Flush error and reset status
                CALL SUBPAR_EFLSH( STATUS )
- 
+
 *           Check for try limit
                TRIES = TRIES + 1
                IF ( TRIES .EQ. MAXTRY ) THEN
@@ -249,19 +249,19 @@
      :            '^TRIES prompts failed to get a good value for '//
      :            'parameter ^NAME - NULL assumed', STATUS )
                ENDIF
- 
+
             ENDIF
- 
- 
+
+
 *     Else if ASSOC failed - stop loop
          ELSE
             ACCEPTED = .TRUE.
- 
+
          ENDIF
- 
+
       ENDDO
- 
+
 *  Release the error context
       CALL EMS_RLSE
- 
+
       END

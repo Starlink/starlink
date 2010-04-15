@@ -25,7 +25,7 @@
 
       INCLUDE 'PGP_ERR'
 
-      
+
       INTEGER ICON, IWKTYP, IERR
       INTEGER NLCD, NSKD, NVLD, NCHD, NPCD, NSTD
 
@@ -39,7 +39,7 @@
          CALL GQWKC(GRWKID(GRCIDE),IERR,ICON,IWKTYP)
          IF (IERR.NE.0) THEN
             CALL GRQREP('GRQTYP', 'GQWKC', IERR)
-         ELSE    
+         ELSE
             WRITE(TEMP,'(I10)') IWKTYP
             TYPE = TEMP
 

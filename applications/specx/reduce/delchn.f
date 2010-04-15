@@ -4,7 +4,7 @@ C-----------------------------------------------------------------------
 
 C   Routine to drop unequal numbers of points from the ends of each
 C   quadrant of data. Useful if excess noise in correlator data e.g.
-   
+
 C   History:
 C      6-JUN-2000 (AJC):
 C        Replace 'TYPE *' with 'PRINT *'
@@ -54,7 +54,7 @@ C        Replace 'TYPE *' with 'PRINT *'
           ELSE
             NPTSNEW(N)  = NPTS(N)-IDC1-IDC2
             ACHAN       = FLOAT(IDC1-IDC2)/2.
-    
+
             CALL LSRCOR (LSRFLG, VSL, VES, VTE, VLSR,
      &                   IDATE, ITIME, IUTFLG, RA, DEC,
      &                   JFREST(N),  JFCEN(N),  LOFREQ(N),

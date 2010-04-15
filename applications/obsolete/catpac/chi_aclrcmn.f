@@ -33,7 +33,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
 *      character*(CHI__SZEXP) Xname  ! Name of expression
 *      character*(CHI__SZFUNIT) Xunit  ! Units of the expression
 *      character*(CHI__SZFCMT) Xcomnt ! Comment on the expression
-*      
+*
 *
 *      integer Wlist(CHI__MXITM)         ! work stack
 *      integer Wqual(CHI__MXITM)         ! qualifiers
@@ -103,7 +103,7 @@
 *      character*(CHI__SZFNVAL) functcons(CHI__MXFUN) ! Constraint
 *      logical                functflag(CHI__MXFUN) ! Flag for SLA functions
 *      double precision       functsave(CHI__MXFUN) ! Saved returned argument
-*      character*(CHI__SZFCMT) funccomnt(CHI__MXFUN) ! Name of the result 
+*      character*(CHI__SZFCMT) funccomnt(CHI__MXFUN) ! Name of the result
 *      character*(CHI__SZFUNIT) funcunits(CHI__MXFUN) ! units of result
 *      integer                funcdtres(CHI__MXFUN) ! Data type of result
 *      integer Mxelem                    ! DELETE and RECOMPILE ENTIRE LIBRARY

@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -62,14 +62,14 @@ int HtmlMapControls(HtmlWidget *htmlPtr){
   h = Tk_Height(htmlPtr->clipwin);
   for(p=htmlPtr->firstInput; p; p=p->input.pNext){
     if( p->input.tkwin==0 ) continue;
-    if( p->input.y < y+h 
+    if( p->input.y < y+h
      && p->input.y + p->input.h > y
      && p->input.x < x+w
      && p->input.x + p->input.w > x
     ){
       /* The control should be visible.  Make is so if it isn't already */
-      Tk_MoveResizeWindow(p->input.tkwin, 
-          p->input.x - x, p->input.y - y, 
+      Tk_MoveResizeWindow(p->input.tkwin,
+          p->input.x - x, p->input.y - y,
           p->input.w, p->input.h);
       if( !Tk_IsMapped(p->input.tkwin) ){
         Tk_MapWindow(p->input.tkwin);
@@ -90,12 +90,12 @@ int HtmlMapControls(HtmlWidget *htmlPtr){
 ** is cleared.
 **
 ** When the TCL "exit" command is invoked, the order of operations
-** here is very touchy.  
+** here is very touchy.
 */
 void HtmlDeleteControls(HtmlWidget *htmlPtr){
   HtmlElement *p;        /* For looping over all controls */
   Tcl_Interp *interp;    /* The interpreter */
-  
+
   interp = htmlPtr->interp;
   p = htmlPtr->firstInput;
   htmlPtr->firstInput = 0;
@@ -104,7 +104,7 @@ void HtmlDeleteControls(HtmlWidget *htmlPtr){
   if( p==0 || htmlPtr->tkwin==0 ) return;
   HtmlLock(htmlPtr);
   for(; p; p=p->input.pNext){
-    if( p->input.pForm && p->input.pForm->form.id>0 
+    if( p->input.pForm && p->input.pForm->form.id>0
          && htmlPtr->zFormCommand && htmlPtr->zFormCommand[0]
          && !Tcl_InterpDeleted(interp) && htmlPtr->clipwin ){
       Tcl_DString cmd;
@@ -237,7 +237,7 @@ static void HtmlInputRequestProc(ClientData clientData, Tk_Window tkwin){
   pElem->input.h = Tk_ReqHeight(tkwin);
   if( pElem->input.htmlPtr && pElem->input.htmlPtr->tkwin!=0 ){
     pElem->input.htmlPtr->flags |= RELAYOUT;
-    HtmlScheduleRedraw(pElem->input.htmlPtr); 
+    HtmlScheduleRedraw(pElem->input.htmlPtr);
   }
 }
 
@@ -252,7 +252,7 @@ static void HtmlInputLostSlaveProc(ClientData clientData, Tk_Window tkwin){
   EmptyInput(pElem);
   if( pElem->input.htmlPtr && pElem->input.htmlPtr->tkwin!=0 ){
     pElem->input.htmlPtr->flags |= RELAYOUT;
-    HtmlScheduleRedraw(pElem->input.htmlPtr); 
+    HtmlScheduleRedraw(pElem->input.htmlPtr);
   }
 }
 
@@ -267,7 +267,7 @@ static void HtmlInputEventProc(ClientData clientData, XEvent *eventPtr){
     EmptyInput(pElem);
     if( pElem->input.htmlPtr && pElem->input.htmlPtr->tkwin!=0 ){
       pElem->input.htmlPtr->flags |= RELAYOUT;
-      HtmlScheduleRedraw(pElem->input.htmlPtr); 
+      HtmlScheduleRedraw(pElem->input.htmlPtr);
     }
   }
 }
@@ -386,7 +386,7 @@ static void AddSelectOptions(
       Tcl_DStringAppendElement(str, zValue);
       Tcl_DStringStartSublist(str);
       p = p->pNext;
-      while( p && p!=pEnd && p->base.type!=Html_EndOPTION 
+      while( p && p!=pEnd && p->base.type!=Html_EndOPTION
         && p->base.type!=Html_OPTION && p->base.type!=Html_EndSELECT ){
         if( p->base.type==Html_Text ){
           Tcl_DStringAppend(str, p->text.zText, -1);
@@ -419,7 +419,7 @@ int HtmlControlSize(HtmlWidget *htmlPtr, HtmlElement *pElem){
   char *zWin;            /* Name of child widget that implements this input */
   int incomplete = 0;    /* True if data is incomplete */
   Tcl_DString cmd;       /* The complete -formcommand callback */
- 
+
   if( pElem->input.sized ) return 0;
   pElem->input.type = InputType(pElem);
   switch( pElem->input.type ){
@@ -435,7 +435,7 @@ int HtmlControlSize(HtmlWidget *htmlPtr, HtmlElement *pElem){
       int result;
       char zToken[50];
 
-      if( pElem->input.pForm==0 || htmlPtr->zFormCommand==0 
+      if( pElem->input.pForm==0 || htmlPtr->zFormCommand==0
            || htmlPtr->zFormCommand[0]==0 ){
         EmptyInput(pElem);
         break;
@@ -463,7 +463,7 @@ int HtmlControlSize(HtmlWidget *htmlPtr, HtmlElement *pElem){
       int result;
       char zToken[50];
 
-      if( pElem->input.pForm==0 || htmlPtr->zFormCommand==0 
+      if( pElem->input.pForm==0 || htmlPtr->zFormCommand==0
            || htmlPtr->zFormCommand[0]==0 ){
         EmptyInput(pElem);
         break;
@@ -494,7 +494,7 @@ int HtmlControlSize(HtmlWidget *htmlPtr, HtmlElement *pElem){
       int result;
       char zToken[50];
 
-      if( pElem->input.pForm==0 || htmlPtr->zFormCommand==0 
+      if( pElem->input.pForm==0 || htmlPtr->zFormCommand==0
            || htmlPtr->zFormCommand[0]==0 ){
         EmptyInput(pElem);
         break;

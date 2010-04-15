@@ -1,5 +1,5 @@
       SUBROUTINE FIND02( CONREQ, ILEVEL, MAXLEN, NEWSO, PCONAD, PSCOR1,
-     : PSCOR2, PSCOSY, PSNAME, PSTITL, SCS, SOPOS, STATUS ) 
+     : PSCOR2, PSCOSY, PSNAME, PSTITL, SCS, SOPOS, STATUS )
 *+
 *  Name:
 *     FIND02
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL FIND02( CONREQ, ILEVEL, MAXLEN, NEWSO, PCONAD, PSCOR1,
-*     : PSCOR2, PSCOSY, PSNAME, PSTITL, SCS, SOPOS, STATUS ) 
+*     : PSCOR2, PSCOSY, PSNAME, PSTITL, SCS, SOPOS, STATUS )
 
 *  Description:
 *     To add details of a single new source or to edit a single
@@ -82,7 +82,7 @@
 *        entered
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*        
+*
 *  External Routines Used:
 *     FINDCRDD:
 *        FIND39
@@ -96,7 +96,7 @@
 *        MSG_FMTC, MSG_OUT
 *     PAR:
 *        PAR_CANCL, PAR_DEF0C, PAR_GET0C, PAR_GET0L, PAR_PROMT
-*     
+*
 *  Authors:
 *     DCP: Diana Parsons (IPMAF/RAL)
 *     {enter_new_authors_here}
@@ -110,7 +110,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
       INCLUDE 'PAR_ERR'          ! Parameter errors
 
 *  Global Variables:
-      INCLUDE 'FICOMN' ! Common blocks for FINDCRDD      
+      INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
 
 *  Arguments Given:
       LOGICAL CONREQ
@@ -196,7 +196,7 @@
 * **********************************************************************
 
       IF ( .NOT. NEWSO ) THEN
-      
+
          TSONAM = SONAME(SOPOS)
          TSOTIT = SOTITL(SOPOS)
          TSOCO1 = SOCO1(SOPOS)
@@ -217,7 +217,7 @@
 * **********************************************************************
 
       IF ( .NOT. NEWSO ) THEN
-      
+
 
 *  Start of loop which checks that the users source name is a valid file
 *  name, ( or ! or !! )
@@ -227,11 +227,11 @@
 *  this source to be unchanged.
          CALL PAR_PROMT( PSNAME, 'Updated source name (! for do not
      :   edit this source) ', STATUS )
-      
+
 *  The previous source name is used as dynamic default for the source
 *  name.
          CALL PAR_DEF0C( PSNAME, SONAME(SOPOS), STATUS  )
-      
+
 *  Ask user for new source name
          CALL PAR_GET0C( PSNAME, SONAME(SOPOS), STATUS )
 
@@ -248,14 +248,14 @@
 
 *  Set the source name default value to an empty string for next time
          CALL PAR_DEF0C( PSNAME, ' ', STATUS )
-      
+
 *  If a null ! parameter was entered go to the section which restores
 *  the original data or zeroises new entry
-         IF ( STATUS .EQ. PAR__NULL ) GO TO 300       
+         IF ( STATUS .EQ. PAR__NULL ) GO TO 300
 
 *  If there is any other form of error abort
          IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Check that the source name is a valid file name and give warning
 *  and re input if not
          IF ( .NOT. CHR_ISNAM( SONAME( SOPOS ) ) ) THEN
@@ -291,11 +291,11 @@
 *  If the source is a new one the source name is used as default for
 *  the title.
          CALL PAR_DEF0C( PSTITL, SONAME( SOPOS), STATUS )
-         
+
       END IF
 
 *  Get title for current source
-      CALL PAR_GET0C( PSTITL, SOTITL( SOPOS), STATUS ) 
+      CALL PAR_GET0C( PSTITL, SOTITL( SOPOS), STATUS )
 
 *  Cancel the parameter so that a new value is obtained next time
 *  through this section
@@ -304,16 +304,16 @@
 *  If a null ! parameter was entered, or if the filename was entered
 *  with a missing quote, the user is reprompted for the title
       IF ( STATUS .EQ. PAR__NULL ) GO TO 300
-      
+
 *  If there is any other form of error abort
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 * **********************************************************************
 *  Prepare defaults for new source coordinates.
 *  If the source is being edited the program checks whether the current
 *  sky coordinate system corresponds to that in which the source was
 *  originally entered. If they are different the user is allowed to
-*  choose a temporary coordinate system. 
+*  choose a temporary coordinate system.
 * **********************************************************************
 
 *  Set the logical DIFSCS, which indicates that an existing source does
@@ -332,7 +332,7 @@
 *  the source positions
             CALL IRA_CTOD( SOCO1( SOPOS ),SOCO2( SOPOS ), SCS,
      :      SCORD1, SCORD2, STATUS )
-      
+
          ELSE
 *  If the current sky coordinate system is not the same as that in
 *  which the source values were entered.
@@ -353,7 +353,7 @@
 *  We have to use an internal write to set it up in the format variable
             WRITE ( FMAT, 9999 ) IRA__SZSCS
  9999       FORMAT ( 'A', I2 )
-      
+
             CALL MSG_FMTC( 'C1', FMAT, SOCOSY( SOPOS ) )
             CALL MSG_OUT( ' ', ' The source was entered in ^C1',
      :      STATUS )
@@ -378,7 +378,7 @@
             CALL MSG_FMTC( 'C1', FMAT, SCS )
             CALL MSG_OUT( ' ', 'Temporary coordinate system is ^C1',
      :      STATUS )
-      
+
 *  If the temporary coordinate system matches the one in which the
 *  source was entered
             IF ( SCS .EQ. SOCOSY( SOPOS ) ) THEN
@@ -387,7 +387,7 @@
 *  defaults for the source positions
                CALL IRA_CTOD( SOCO1( SOPOS ),SOCO2( SOPOS ), SCS,
      :         SCORD1, SCORD2, STATUS )
-      
+
             ELSE
 
 *  Otherwise the default source positions are set to zero values
@@ -396,7 +396,7 @@
 
             END IF
 
-*  End of 
+*  End of
          END IF
 
       ELSE
@@ -438,12 +438,12 @@
 
 *  Normalise the coordinate system values
       CALL IRA_NORM( SDRA, SDDEC, STATUS)
-      
+
 *  Store the converted double precision coordinates as real in the
 *  source common
       SORA( SOPOS )   = REAL (SDRA)
       SODEC( SOPOS )  = REAL (SDDEC)
-      
+
 *  Store the current coordinate system
       SOCOSY( SOPOS ) = SCS
 
@@ -482,7 +482,7 @@
 * **********************************************************************
 *  Set the source_is_to_be_deleted to FALSE
 * **********************************************************************
-  
+
       SOMADE( SOPOS) = .FALSE.
 
 * **********************************************************************
@@ -496,10 +496,10 @@
 *  If the confirm parameter is entered as null ! the program returns
 *  here for a retry
  200     CONTINUE
-      
+
 *  Display one line source details
          CALL FIND39( .TRUE., 1, 1, MAXLEN, SOPOS, .FALSE., STATUS)
-      
+
 *  Ask user to confirm that source details are correct
          CALL PAR_GET0L( PCONAD, CONADD, STATUS )
 
@@ -512,10 +512,10 @@
             CALL ERR_ANNUL( STATUS )
             GO TO 200
          END IF
-      
+
 *  If there is any other form of error abort
          IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       END IF
 
 * **********************************************************************
@@ -527,18 +527,18 @@
 *  If any parameters are entered as null ! then they skip further
 *  processing and are brought here to restore original values
  300  CONTINUE
-      
+
       IF ( (CONREQ ) .AND. ( .NOT. CONADD )
      :      .OR. ( STATUS .EQ. PAR__NULL) ) THEN
          IF ( .NOT. NEWSO ) THEN
 
 *  If the source is being edited restore previous values
-            SONAME(SOPOS) = TSONAM 
+            SONAME(SOPOS) = TSONAM
             SOTITL(SOPOS) = TSOTIT
-            SOCO1(SOPOS)  = TSOCO1 
+            SOCO1(SOPOS)  = TSOCO1
             SOCO2(SOPOS)  = TSOCO2
-            SOCOSY(SOPOS) = TSOCOS 
-            SORA(SOPOS)   = TSORA  
+            SOCOSY(SOPOS) = TSOCOS
+            SORA(SOPOS)   = TSORA
             SODEC(SOPOS)  = TSODEC
 
 *  Display message to confirm source was not edited.
@@ -548,11 +548,11 @@
 *  Check whether a different coordinate system may have set up
 *  temporarily and if so restore the previous system
             IF ( DIFSCS ) SCS = SCSTMP
-      
+
          ELSE
 
 *  If the source is a new or additional source set the values back to
-*  their empty state 
+*  their empty state
             SONAME(SOPOS) = ' '
             SOTITL(SOPOS) = ' '
             SOCO1(SOPOS)  = ' '
@@ -566,13 +566,13 @@
          END IF
 
 *  If the removal of the source was caused by entering a ! parameter
-*  aqnnul the error message, which sets the status to SAI__OK. 
+*  aqnnul the error message, which sets the status to SAI__OK.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF
-      
+
       END IF
-      
+
 * **********************************************************************
 *  Display all or part of the current list of sources
 * **********************************************************************
@@ -591,41 +591,41 @@
 *  If this gives a short page because SOPOS is less than MAXLEN - 5
 *  from the top reset SOBOT
             IF ( SOPOS .LT. (MAXLEN - 5) ) THEN
-               SOBOT = MAXLEN 
+               SOBOT = MAXLEN
             END IF
-      
+
 *  If there aren't 5 sources below the edited source, set SOBOT to the
 *  last source.
             IF ( SOBOT. GT. NOFSO ) THEN
                SOBOT = NOFSO
             END IF
-      
+
 * Display the list
             CALL FIND39( .TRUE., 1, MAXLEN, MAXLEN, SOBOT, .FALSE.,
      :      STATUS )
-      
+
          ELSE
 
 *  If the subroutine is entering new or additional sources
 *  update the number of sources input
             NOFSO = SOPOS
-           
-*  List the last sources input 
+
+*  List the last sources input
             CALL FIND39( .TRUE., 1, MAXLEN, MAXLEN, NOFSO, .FALSE.,
      :      STATUS )
-      
+
          END IF
 
       END IF
-      
+
 * **********************************************************************
 *  If the subroutine is entering new or additional sources
-*  update the number of sources input  
+*  update the number of sources input
 * **********************************************************************
-       IF ( NEWSO ) THEN 
+       IF ( NEWSO ) THEN
           NOFSO = SOPOS
        END IF
-      
+
       END
-           
+
 

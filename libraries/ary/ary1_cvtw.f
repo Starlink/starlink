@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     ARY1_CVTW
- 
+
 *  Purpose:
 *     Convert a vectorised array to WORD.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL ARY1_CVTW( BAD, N, TYPE, PNTR, RESULT, DCE, STATUS )
- 
+
 *  Description:
 *     The routine converts a vectorised array of any primitive numeric
 *     type to a data type of WORD, checking for the presence of bad
 *     pixels if required. The input array is passed by pointer; the
 *     output array is passed directly.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether to check for bad pixel values.
@@ -38,7 +38,7 @@
 *        happens).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Algorithm:
 *     -  Initialise and mark the error stack.
 *     -  Test the input data type specification against each valid value
@@ -49,7 +49,7 @@
 *     -  Release the error stack.
 *     -  If the input data type specification was not valid, then report
 *     an error.
- 
+
 *  Copyright:
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     13-JUN-1989 (RFWS):
 *        Original version.
@@ -81,90 +81,90 @@
 *        Changed to use message token to prevent '$' affecting error
 *        messages.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! For CNV_PVAL function
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'ARY_ERR'          ! ARY_ error codes
- 
+
 *  Arguments Given:
       LOGICAL BAD
       INTEGER N
       CHARACTER * ( * ) TYPE
       INTEGER PNTR
- 
+
 *  Arguments Returned:
       INTEGER*2 RESULT
       LOGICAL DCE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       INTEGER IERR               ! Position of first conversion error
       INTEGER NERR               ! Number of conversion errors
       LOGICAL TYPOK              ! Whether the TYPE argument is valid
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Initialise and mark the error stack.
       TYPOK = .TRUE.
       NERR = 0
       CALL ERR_MARK
- 
+
 *  Test for each valid input data type in turn and call the appropriate
 *  conversion routine.
       IF ( TYPE .EQ. '_BYTE' ) THEN
          CALL VEC_BTOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                  NERR, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
          CALL VEC_UBTOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                   NERR, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL VEC_DTOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                  NERR, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL VEC_ITOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                  NERR, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL VEC_RTOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                  NERR, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
          CALL VEC_WTOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                  NERR, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          CALL VEC_UWTOW( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
      :                   NERR, STATUS )
- 
+
 *  Note if the input data type specified is not valid.
       ELSE
          TYPOK = .FALSE.
       END IF
- 
+
 *  If a data conversion error occurred, then annul any error reports it
 *  might have produced.
       DCE = NERR .NE. 0
       IF ( DCE ) CALL ERR_ANNUL( STATUS )
       CALL ERR_RLSE
- 
+
 *  Report an error if the input data type specified was not valid.
       IF ( STATUS .EQ. SAI__OK ) THEN
          IF( .NOT. TYPOK ) THEN
@@ -177,9 +177,9 @@
      :      STATUS )
          END IF
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_CVTW',
      :STATUS )
- 
+
       END

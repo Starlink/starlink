@@ -1,4 +1,4 @@
-*+  ADDARR2D - add two 2-d arrays 
+*+  ADDARR2D - add two 2-d arrays
 
       SUBROUTINE ADDARR2D ( INARRAY1, INARRAY2, OUTARRAY, DIMS1, DIMS2,
      :                      STATUS )
@@ -63,7 +63,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J             ! counter variables 
+     :   I, J             ! counter variables
 
 *-
 *    check status on entry - return if not o.k.

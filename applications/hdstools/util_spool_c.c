@@ -16,7 +16,7 @@
 *     Spool a file to the printer using a command defined by the ASTERIX
 *     environment variable AST_<TYPE>_SPOOL. Errors by the spooling process
 *     are reported and flushed to the environment. The value of TYPE can
-*     be anything as long as the appropriate environment variables set. 
+*     be anything as long as the appropriate environment variables set.
 *     Examples might be FORTRAN, PS or TEXT.
 *     {routine_description}
 
@@ -92,7 +92,7 @@
 
 *-
 */
-      
+
 /*
  *  Include files
  */
@@ -115,7 +115,7 @@
 /*
  *  Body of code
  */
-F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del), 
+F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del),
                             INTEGER(status) TRAIL(file) TRAIL(type) )
   {
   GENPTR_CHARACTER(file)
@@ -141,12 +141,12 @@ F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del),
    esym = (char *) malloc(type_length+1+10);
 
 /* Construct environment variable name */
-   strncpy( esym, "AST_", 4 );           
+   strncpy( esym, "AST_", 4 );
    strncpy( esym+4, type, type_length );
    strcpy( esym+4+type_length, "_SPOOL" );
 
 /* Get spool command */
-   spcmd = getenv( esym );		
+   spcmd = getenv( esym );
    free( esym );
 
 /* Import filename to C string */
@@ -160,12 +160,12 @@ F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del),
    strcpy( cstr + splen + 1, fname );
 
 /* Deletion required? */
-   if ( F77_ISTRUE(*del) )		
+   if ( F77_ISTRUE(*del) )
 
 /* Simple print command? */
       if ( strncmp(cstr,"PRINT",5) == 0 ) {
 /* Tack on a delete qualifier */
-         strcpy( cstr + splen + 		
+         strcpy( cstr + splen +
          strlen(fname) + 1 , "/DELETE" );
       }
 
@@ -205,7 +205,7 @@ F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del),
       } else {
 /* Parent, successful child creation */
 /* Wait for child to finish */
-         wstatus = wait( &cstatus );	
+         wstatus = wait( &cstatus );
 
 /* Delete the file? */
          if ( F77_ISTRUE(*del) ) {
@@ -215,7 +215,7 @@ F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del),
 
                *status = SAI__ERROR;
                emsSetc( "FILE", fname );
-               emsRep( " ", 
+               emsRep( " ",
                  "Unable to delete ^FILE after spooling", status );
             }
          }
@@ -223,7 +223,7 @@ F77_SUBROUTINE(util_spool)( CHARACTER(file), CHARACTER(type), LOGICAL(del),
 #endif
 
 /* Free space */
-      cnfFree( fname );			
+      cnfFree( fname );
    } else {
       *status = SAI__ERROR;
       emsSetc( "FILE", fname );

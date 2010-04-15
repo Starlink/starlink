@@ -1,10 +1,10 @@
 /*
  *  Name:
  *     centroidCmd
- 
+
  *  Purpose:
  *     Interface from RTD to CENTROID routine.
- 
+
  *  Description:
  *     This routine is designed to be called from RTD, the Real Time
  *     Display tool, as a foreign method. It accepts an info structure
@@ -29,12 +29,12 @@
  *      -maxshift the maximum shift in position.
  *      -toler the tolerence in centroid for convergence.
  *      -maxit the maximum number of iterations used in centroid estimation.
- 
+
  *  Notes:
  *     -  The -coords parameter should be paired doubles, these are
  *        read until the end of the string or until a new argument
  *        string is started.
- 
+
  *  Arguments:
  *     StarImageInfo = struct * (Given)
  *        Pointer to an ImageInfo structure.
@@ -43,12 +43,12 @@
  *     errStr = char ** (Returned)
  *        Pointer to pointer to a string that contains an error
  *        message if appropriate. Only set if return is 0.
- 
+
  *  Copyright:
  *     Copyright (C) 1998 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -68,7 +68,7 @@
  *
  *  Authors:
  *     PWD: Peter W. Draper (STARLINK - Durham University)
- 
+
  *  History:
  *     12-DEC-1997 (PWD):
  *        Original version.
@@ -102,9 +102,9 @@ extern F77_SUBROUTINE(rtd_cent)( CHARACTER(type), POINTER(image),
                                  DOUBLE_ARRAY(yin),
 				 INTEGER(nin), INTEGER(isize),
 				 DOUBLE(maxshf), INTEGER(maxit),
-				 DOUBLE(toler), 
+				 DOUBLE(toler),
                                  DOUBLE_ARRAY(xout),
-				 DOUBLE_ARRAY(yout), 
+				 DOUBLE_ARRAY(yout),
                                  INTEGER(nout),
 				 INTEGER(status) TRAIL(type));
 
@@ -294,7 +294,7 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
                        INTEGER_ARG(&maxit), DOUBLE_ARG(&toler),
                        DOUBLE_ARRAY_ARG(fxout), DOUBLE_ARRAY_ARG(fyout),
                        INTEGER_ARG(&nout), INTEGER_ARG(&status)
-                       TRAIL_ARG(type)); 
+                       TRAIL_ARG(type));
 
    if ( status == SAI__OK ) {
       /*  Need to encode the return values as a list of x,y coordinate
@@ -320,7 +320,7 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
       Tcl_SetResult( info->interp, opPtr, TCL_DYNAMIC );
       result = 1;
 
-   } 
+   }
    else {
       /*  Centroid routine exited in error, so get the error from EMS
           and return it as errStr. */

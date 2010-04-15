@@ -22,13 +22,13 @@
 *        The position angle of the analysed intensity. This is the angle
 *        from north in the spatial coordinate system of the output, to
 *        the analyser axis. Posotive rotation is in the same sense as
-*        rotation from the first spatial pixel axis to the second spatial 
+*        rotation from the first spatial pixel axis to the second spatial
 *        pixel axis (as required by POLPACK).
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
 *  Description:
-*     This function creates a POLPACK extension in the supplied NDF. 
+*     This function creates a POLPACK extension in the supplied NDF.
 *     Values are put in the extension that tell POLPACK that the NDF holds
 *     linearly analysed intensity, at the specified angle. These are the
 *     values needed by the POLPACK:POLCAL task.
@@ -99,11 +99,11 @@ void smf_polext( int ondf, double angle, int *status ){
    astBegin;
 
 /* Get a pointer to the WCS FrameSet in the output NDF. */
-   ndfGtwcs( ondf, &wcs, status ); 
+   ndfGtwcs( ondf, &wcs, status );
 
-/* POLPACK uses the first axis of the WCS Frame with Domain POLANAL as the 
+/* POLPACK uses the first axis of the WCS Frame with Domain POLANAL as the
    reference direction, so we need to add such a Frame to the WCS FrameSet.
-   The "angle" value supplied by the caller is with respect to north in the 
+   The "angle" value supplied by the caller is with respect to north in the
    WCS current Frame, so first get a pointer to the current WCS Frame. */
    curfrm = astGetFrame( wcs, AST__CURRENT );
 
@@ -149,12 +149,12 @@ void smf_polext( int ondf, double angle, int *status ){
       ndfPtwcs( wcs, ondf, status );
 
 /* Create the empty POLPACK extension. */
-      ndfXnew( ondf, "POLPACK", "POLPACK", 0, &dummy, &loc, status ); 
+      ndfXnew( ondf, "POLPACK", "POLPACK", 0, &dummy, &loc, status );
 
 /* Store the angle from the reference direction (north) to the effective
    analyser axis, measured positive in the same sense as rotation from the
    first to the second pixel axis. */
-      ndfXpt0r( angle*AST__DR2D, ondf, "POLPACK", "ANLANG", status ); 
+      ndfXpt0r( angle*AST__DR2D, ondf, "POLPACK", "ANLANG", status );
 
 /* Annul the extension locator.  */
       (void) datAnnul( &loc, status );

@@ -65,14 +65,14 @@
 *        necessary to avoid losing the NDF access after PAR_CANCL.
 *     15 Feb 1999 (tdca):
 *        Specified value for MODE parameter can now be more than two
-*        characters. 
+*        characters.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

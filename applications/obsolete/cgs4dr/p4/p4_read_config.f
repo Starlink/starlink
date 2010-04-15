@@ -49,7 +49,7 @@
      :  PORTNUM                        ! Port number
       REAL
      :  RVALUE                         ! Decoded real value
-      LOGICAL 
+      LOGICAL
      :  DECODED_OK,                    ! T if string decoded OK
      :  LVALUE                         ! Decoded logical value
 *-
@@ -86,7 +86,7 @@
 *   Open the configuration file
       CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'READ', 'LIST', 0, LUN, STATUS )
 
-*    Recursively read the contents of the file 
+*    Recursively read the contents of the file
       EOF = .FALSE.
       DO WHILE ( ( .NOT. EOF ) .AND. ( STATUS .EQ. SAI__OK ) )
 
@@ -218,43 +218,43 @@
                 ELSE IF ( ITEM.EQ.'DEVICE_XOPT' ) THEN
                   CALL CHR_FILL( ' ', DEVICE_XOPT(PORTNUM) )
                   DEVICE_XOPT(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'DEVICE_YOPT' ) THEN 
+                ELSE IF ( ITEM.EQ.'DEVICE_YOPT' ) THEN
                   CALL CHR_FILL( ' ', DEVICE_YOPT(PORTNUM) )
                   DEVICE_YOPT(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'DEVICE_LUT' ) THEN 
+                ELSE IF ( ITEM.EQ.'DEVICE_LUT' ) THEN
                   CALL CHR_FILL( ' ', DEVICE_LUT(PORTNUM) )
                   DEVICE_LUT(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'DISPLAY_DATA' ) THEN 
+                ELSE IF ( ITEM.EQ.'DISPLAY_DATA' ) THEN
                   CALL CHR_FILL( ' ', DISPLAY_DATA(PORTNUM) )
                   DISPLAY_DATA(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'TITLE' ) THEN 
+                ELSE IF ( ITEM.EQ.'TITLE' ) THEN
                   CALL CHR_FILL( ' ', TITLE(PORTNUM) )
                   TITLE(PORTNUM) = TMPSTR(1:CHR_LEN(TMPSTR))
-                ELSE IF ( ITEM.EQ.'DISPLAY_TYPE' ) THEN 
+                ELSE IF ( ITEM.EQ.'DISPLAY_TYPE' ) THEN
                   CALL CHR_FILL( ' ', DISPLAY_TYPE(PORTNUM) )
                   DISPLAY_TYPE(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'DISPLAY_PLANE' ) THEN 
+                ELSE IF ( ITEM.EQ.'DISPLAY_PLANE' ) THEN
                   CALL CHR_FILL( ' ', DISPLAY_PLANE(PORTNUM) )
                   DISPLAY_PLANE(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'CONTOUR_TYPE' ) THEN 
+                ELSE IF ( ITEM.EQ.'CONTOUR_TYPE' ) THEN
                   CALL CHR_FILL( ' ', CONTOUR_TYPE(PORTNUM) )
                   CONTOUR_TYPE(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'OVERCOLOUR' ) THEN 
+                ELSE IF ( ITEM.EQ.'OVERCOLOUR' ) THEN
                   CALL CHR_FILL( ' ', OVERCOLOUR(PORTNUM) )
                   OVERCOLOUR(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'COLOUR_STYLE' ) THEN 
+                ELSE IF ( ITEM.EQ.'COLOUR_STYLE' ) THEN
                   CALL CHR_FILL( ' ', COLOUR_STYLE(PORTNUM) )
                   COLOUR_STYLE(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'FG_COLOUR' ) THEN 
+                ELSE IF ( ITEM.EQ.'FG_COLOUR' ) THEN
                   CALL CHR_FILL( ' ', FG_COLOUR(PORTNUM) )
                   FG_COLOUR(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'BG_COLOUR' ) THEN 
+                ELSE IF ( ITEM.EQ.'BG_COLOUR' ) THEN
                   CALL CHR_FILL( ' ', BG_COLOUR(PORTNUM) )
                   BG_COLOUR(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'CUT_DIRECTION' ) THEN 
+                ELSE IF ( ITEM.EQ.'CUT_DIRECTION' ) THEN
                   CALL CHR_FILL( ' ', CUT_DIRECTION(PORTNUM) )
                   CUT_DIRECTION(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
-                ELSE IF ( ITEM.EQ.'LAST_TYPE' ) THEN 
+                ELSE IF ( ITEM.EQ.'LAST_TYPE' ) THEN
                   CALL CHR_FILL( ' ', LAST_TYPE(PORTNUM) )
                   LAST_TYPE(PORTNUM) = CTYPE(1:CHR_LEN(CTYPE))
                 ELSE

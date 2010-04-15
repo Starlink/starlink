@@ -37,7 +37,7 @@
 *                  DYN_INCREMENT) would not allow this. Code
 *                  modified to use %val() instead.               (SMB)
 *     23-Jul-1990: Character handling improved, and modified
-*                  to accept 4 digit observation numbers.     
+*                  to accept 4 digit observation numbers.
 *                  Also code spaced out.                         (SMB)
 *     29-Aug-1990: The 15 character limit on the length of
 *                  the name of the DSA COADDS structures was
@@ -106,10 +106,10 @@
 *                                            !    the integration was taken at
       INTEGER LDAY, LDATE, LHOUR             ! lengths of date strings
       INTEGER DTA_STATUS                     !
-      INTEGER NELM_IND                       ! 
-      INTEGER NELM_INT                       ! 
-      INTEGER NELM_OBS                       ! 
-      INTEGER NDIM                           ! 
+      INTEGER NELM_IND                       !
+      INTEGER NELM_INT                       !
+      INTEGER NELM_OBS                       !
+      INTEGER NDIM                           !
       INTEGER N                              !
       INTEGER IGNORE                         ! unimportant parameter
       INTEGER CLEN                           ! Non-blank length of character string
@@ -134,7 +134,7 @@
 
       CHARACTER*80 OBS_TYPE                  ! The observation type (BIAS,
 *                                            !    DARK, FLAT etc...)
-      CHARACTER*80 TIME                      ! String holding date of last 
+      CHARACTER*80 TIME                      ! String holding date of last
 *                                            !    addition
       CHARACTER*20 DAY, DATE, HOUR           ! Components of date
       CHARACTER*4 COMMENT                    ! Dummy comment
@@ -181,14 +181,14 @@
       CALL DSA_NAMED_INPUT ('COADDS', OBSREDFILE(:ICH_LEN(OBSREDFILE))//
      :   '.MORE.CGS4_COADDS', STATUS)
 
-      CALL DSA_MAP_DATA ('COADDS', 'UPDATE', 'SHORT', ADDRESS, 
+      CALL DSA_MAP_DATA ('COADDS', 'UPDATE', 'SHORT', ADDRESS,
      :   COADDS_SLOT, STATUS)
       COADDS_PTR = ADDRESS
 
-      CALL DSA_SPECIFIC_STRUCTURE ('COADDS', 'COADDED_INTS', 
+      CALL DSA_SPECIFIC_STRUCTURE ('COADDS', 'COADDED_INTS',
      :   'UPDATE', COADDED_INTS, STATUS)
 
-*    Search this structure for an occurence of the integration being 
+*    Search this structure for an occurence of the integration being
 *    removed. If not present, the user is warned and the routine aborted.
       FOUND = .FALSE.
 
@@ -197,7 +197,7 @@
          N = 1
          DTA_STATUS = DTA__OK
 
-*      Convert the integration name into its corresponding coadd 
+*      Convert the integration name into its corresponding coadd
 *      structure name
          CALL RED4_INTTOCOADD( INTFILE, COADD_TEST, STATUS )
 
@@ -224,7 +224,7 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
 
-            CALL MSG_OUT( ' ', 
+            CALL MSG_OUT( ' ',
      :        'This integration is not in the coadd', STATUS )
             GOTO 500
          ENDIF
@@ -233,7 +233,7 @@
 *    OK, both integration and observation files exist and the integration
 *    has been coadded -
 *    Get the detector position index of this particular integration
-      CALL DSA_GET_FITS_I( 'INTRED', 'DINDEX', 0, DET_INDEX, COMMENT, 
+      CALL DSA_GET_FITS_I( 'INTRED', 'DINDEX', 0, DET_INDEX, COMMENT,
      :  STATUS )
 
 *   Abort if an error has occurred at this point. (This is done for
@@ -280,7 +280,7 @@
 *    check that the index array can handle this index position (always
 *    should do but the program will crash*?! if it doesn't)
       CALL DSA_DATA_SIZE ('INDEX', MAXINDDIM, NDIM, INDEX_DIMS,
-     :  NELM_IND, STATUS) 
+     :  NELM_IND, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -300,7 +300,7 @@
       CALL DSA_MAP_DATA ('OBSRED', 'UPDATE', 'FLOAT', ADDRESS,
      :   OBSDATA_SLOT, STATUS)
       OBSDATA_PTR = ADDRESS
-      CALL DSA_MAP_VARIANCE ('OBSRED', 'UPDATE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_VARIANCE ('OBSRED', 'UPDATE', 'FLOAT', ADDRESS,
      :   OBSVAR_SLOT, STATUS)
       OBSVAR_PTR = ADDRESS
 
@@ -312,40 +312,40 @@
          VARIANCE_MAP = .FALSE.
       END IF
 
-      CALL DSA_MAP_QUALITY ('OBSRED', 'UPDATE', 'BYTE', ADDRESS, 
+      CALL DSA_MAP_QUALITY ('OBSRED', 'UPDATE', 'BYTE', ADDRESS,
      :   OBSQUAL_SLOT, STATUS)
       OBSQUAL_PTR = ADDRESS
       CALL DSA_DATA_SIZE ('OBSRED', MAXOBSDIM, NDIM, OBSDIMS, NELM_OBS,
-     :  STATUS) 
+     :  STATUS)
 
-*    and for the reduced integration (errors derived from CIRACS coadding 
+*    and for the reduced integration (errors derived from CIRACS coadding
 *    statistics are ignored)
       CALL DSA_USE_QUALITY ('INTRED', STATUS)
       CALL DSA_MAP_DATA ('INTRED', 'READ', 'FLOAT', ADDRESS,
      :   INTDATA_SLOT, STATUS)
       INTDATA_PTR = ADDRESS
-      CALL DSA_MAP_QUALITY ('INTRED', 'READ', 'BYTE', ADDRESS, 
+      CALL DSA_MAP_QUALITY ('INTRED', 'READ', 'BYTE', ADDRESS,
      :   INTQUAL_SLOT, STATUS)
       INTQUAL_PTR = ADDRESS
       CALL DSA_DATA_SIZE ('INTRED', MAXINTDIM, NDIM, INTDIMS, NELM_INT,
-     :  STATUS) 
+     :  STATUS)
 
 *    Call the routine that does the processing, the check for STATUS stops
 *    and adjustable array error if the routine is entered with some arrays
 *    not successfully mapped
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL RED4_DO_REMOVE (%val(INTDATA_PTR), 
+         CALL RED4_DO_REMOVE (%val(INTDATA_PTR),
      :                        %val(INTQUAL_PTR),
      :                        INTDIMS(1),
      :                        INTDIMS(2),
-     :                        %val(INDEX_PTR), 
+     :                        %val(INDEX_PTR),
      :                        INDEX_DIMS(1),
      :                        INDEX_DIMS(2),
      :                        DET_INDEX,
      :                        %val(OBSDATA_PTR),
-     :                        %val(OBSVAR_PTR), 
-     :                        %val(OBSQUAL_PTR), 
+     :                        %val(OBSVAR_PTR),
+     :                        %val(OBSQUAL_PTR),
      :                        %val(COADDS_PTR),
      :                        OBSDIMS(1),
      :                        OBSDIMS(2),
@@ -356,7 +356,7 @@
 *    if they are. (The check is performed even if the status is bad).
       IF ( VARIANCE_MAP .AND. (NELM_OBS .GT. 0) ) THEN
 
-         CALL GEN_CLIPF (%val(OBSVAR_PTR), 
+         CALL GEN_CLIPF (%val(OBSVAR_PTR),
      :      NELM_OBS, 0.0, VAL__MAXR, IGNORE, IGNORE,
      :      %val(OBSVAR_PTR))
       ENDIF
@@ -367,8 +367,8 @@
      :      COADDED_INTS(:ICH_LEN(COADDED_INTS))//'.'//COADD_TEST,
      :      STATUS )
 
-*    If all OK and the detector index of the added integration is 1, then 
-*    subtract the integration's integration time from that of the observation, 
+*    If all OK and the detector index of the added integration is 1, then
+*    subtract the integration's integration time from that of the observation,
 *    and update the value in the observation reduction file
       IF ((STATUS .EQ. SAI__OK) .AND. (DET_INDEX .EQ. 1)) THEN
 
@@ -390,7 +390,7 @@
          CALL DSA_PUT_FITS_C( 'OBSRED', 'STREDUCE', TIME(1:CLEN),
      :     ' ', STATUS )
       ENDIF
-         
+
  500  CONTINUE
 
       CALL DSA_CLOSE (STATUS)

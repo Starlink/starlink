@@ -24,7 +24,7 @@
 *        USEPEAK = LOGICAL (Given)
 *        (include file opt_cmn)
 * Variables
-*        CONTEXT = INTEGER 
+*        CONTEXT = INTEGER
 *          From find_file
 * Subroutines/functions referenced:
 *
@@ -38,13 +38,13 @@
 * History:
 *   TNW: 4-OCT-1990 Original version
 *   TNW: 26-JAN-2-FEB-1994 Add bits for FITS keywords etc.
-*   AJH: 15-DEC-1997 Fixed call to find_file - how it worked 
+*   AJH: 15-DEC-1997 Fixed call to find_file - how it worked
 *        before I do not know. Included CONTEXT variable and
 *        initialising before use to zero
 *   AJH: 18-DEC-1997 Revert to using .dst
-*   AJH: 10-MAR-1998 Remove dta_rdvarc, replace with HDS 
+*   AJH: 10-MAR-1998 Remove dta_rdvarc, replace with HDS
 *        lib call
-*   TDCA:25-JUN-1999 Changed enviroment variable in 
+*   TDCA:25-JUN-1999 Changed enviroment variable in
 *        PSX_GETENV call to FIG_DIR
 *   ACD: Fixed call to DAT_GET1C to prevent passing a scalar argument
 *        where a vector was required and also fixed accessing a DO LOOP
@@ -80,10 +80,10 @@ C      integer find_file
       context = 0
 
       CALL PSX_GETENV( 'FIG_DIR', BINPATH, STATUS)
-      
+
       i=1
- 
-      do while(binpath(i:i).NE.' ') 
+
+      do while(binpath(i:i).NE.' ')
        i=i+1
       enddo
 
@@ -94,10 +94,10 @@ C      integer find_file
       newpath = binpath(1:spacepos)//'/twodspec_defaults'
 
 
-*     Returns 1 if o.k.            
+*     Returns 1 if o.k.
 *      status = find_file(newpath,name,context)
 *      i=1
-*      do while(name(i:i).NE.' ') 
+*      do while(name(i:i).NE.' ')
 *       i=i+1
 *      enddo
 *      spacepos=i-1-4
@@ -154,7 +154,7 @@ C      integer find_file
 
          if(status.eq.SAI__OK) then
             dims(2) = min(dims(2),NFITSVAR)
-            
+
 *     call chr_fill(' ',name)
 *     len1 = 0
 *     call chr_putc('defaults.',name,len1)
@@ -164,12 +164,12 @@ C      integer find_file
 *     call chr_putc(']',name,len1)
 *     call dta_rdvarc(name,8,fits_unames(j,i),status)
 *     enddo
-            
+
             call dta_loc('defaults.more.figaro.'//
      :           fits_twodnames(i),nloc,status)
 
 
-            
+
 *            call dat_get0c(nloc,readvar,status)
             call dat_get1c(nloc,NFITSVAR,readvar,elem,status)
             call dta_annul(nloc,status)

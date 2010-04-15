@@ -6,8 +6,8 @@ C
 C     Convolves an image with a 3x3 symmetric convolution kernel.
 C     This allows a variety of spatial filters to be applied to
 C     an image.  The 3 by 3 array convolved with the image is defined
-C     by two values, the central value and the single value used 
-C     for the eight edge elements.  That is, if C is the central and 
+C     by two values, the central value and the single value used
+C     for the eight edge elements.  That is, if C is the central and
 C     E the edge value, the kernel array looks like
 C
 C                       E  E  E
@@ -29,7 +29,7 @@ C              copy of the input.
 C
 C                                      KS / AAO 30th Oct 1987
 C     Modified:
-C    
+C
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     25th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
@@ -101,7 +101,7 @@ C
      :                   STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Get workspace for GEN_FILT3 (if data is 1D we can use a 
+C     Get workspace for GEN_FILT3 (if data is 1D we can use a
 C     dummy workspace - GEN_FILT3 will ignore it)
 C
       IF ((NX.GT.1).AND.(NY.GT.1)) THEN

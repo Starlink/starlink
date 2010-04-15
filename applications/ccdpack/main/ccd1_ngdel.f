@@ -23,7 +23,7 @@
 *     first, and also whether it represents a whole NDF or just a slice.
 *     If it is a whole native NDF, then it opens it and calls NDF_DELET.
 *     If not, then opening it would have a high overhead and would also
-*     be useless, since it would be creating a new temporary NDF on disk 
+*     be useless, since it would be creating a new temporary NDF on disk
 *     only to delete it; in this case no action is taken.
 
 *  Arguments:
@@ -79,11 +79,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
-      
+
 *  Arguments Given:
       INTEGER GRP
       INTEGER INDEX
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -91,17 +91,17 @@
       CHARACTER * ( GRP__SZNAM) FIELDS( 6 ) ! NDG supplementary information
       INTEGER INDF               ! NDF identifier
       LOGICAL VERB               ! Log message about deleted files?
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get the NDG supplementary data for this NDF.
       CALL NDG_GTSUP( GRP, INDEX, FIELDS, STATUS )
 
 *  Check whether it is in native format.
-      IF ( FIELDS( 3 ) .EQ. '.sdf' ) THEN 
+      IF ( FIELDS( 3 ) .EQ. '.sdf' ) THEN
 
 *  Check whether it just represents a slice of NDF.
          IF ( FIELDS( 1 ) .EQ. ' ' ) THEN

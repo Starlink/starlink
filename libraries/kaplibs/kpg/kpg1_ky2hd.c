@@ -5,7 +5,7 @@
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS) 
+F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
                             TRAIL(LOC) ) {
 /*
 *+
@@ -22,7 +22,7 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
 *     CALL KPG1_KY2HD( KEYMAP, LOC, STATUS )
 
 *  Description:
-*     This routine copies the contents of an AST KeyMap into a supplied 
+*     This routine copies the contents of an AST KeyMap into a supplied
 *     HDS structure.
 
 *  Arguments:
@@ -43,12 +43,12 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

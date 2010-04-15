@@ -4,30 +4,30 @@
 *****************************************************************
       SUBROUTINE LTX_ABSTRACT(LUN_OUT,STATUS)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       INTEGER LUN_OUT		!	Unit to write tex stuff
       INTEGER STATUS		! Out	0 = OK, else -1
- 
+
 *  Global Variables
       INCLUDE 'com_form_latex.inc'
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_mtext.inc'
- 
+
 *  Functions
       INTEGER MDH_ENDWORD
- 
+
 *  Local Variables
       INTEGER IOSTATUS, NCHAR, LUN, LEN1, NCHABS, NLEFT
       CHARACTER*16 NOFILE/'No Abstract File'/
       CHARACTER*128 LINE
-      CHARACTER*800 ABSTRACT 
- 
+      CHARACTER*800 ABSTRACT
+
 *  Open File
       CALL GETLUN(LUN)
       NCHAR = MDH_ENDWORD(FORM_FILE)
       OPEN(LUN,FILE=FORM_FILE(:NCHAR)//'.ABSTRACT',STATUS='OLD',IOSTAT=IOSTATUS)
- 
+
       WRITE(LUN_OUT,'(A)') BSLASH//'put(30,55) {'//BSLASH//'parbox[t] {150mm}{'
       IF (IOSTATUS.NE.0) THEN
          WRITE(LUN_OUT,'(A)') NOFILE
@@ -61,13 +61,13 @@ c            IF(NCHAR.GT.0) WRITE(LUN_OUT,'(A)') LINE(:NCHAR)
 c         END DO
 10       CONTINUE
       END IF
- 
+
       WRITE(LUN_OUT,'(A)') '} }'
       CLOSE(LUN)
       CALL FRELUN(LUN)
-  
+
       STATUS = 0
- 
+
 20    CONTINUE
- 
+
       END

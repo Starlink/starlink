@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE gen_REV
 *
-*   Description: 
+*   Description:
 *      Reverse bytes in arbitrary word (1, 2, 4 only).
 *
 *   Authors:
@@ -30,7 +30,7 @@
 *   Import:
       INTEGER NBYTE                ! number of bytes per word
       INTEGER NWORD                ! number of words
- 
+
 *   Import-Export:
       BYTE WORDS(NBYTE, NWORD)     ! multi-byte words
       BYTE temp

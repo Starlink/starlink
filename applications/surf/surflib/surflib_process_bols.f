@@ -1,7 +1,7 @@
-      SUBROUTINE SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAMS, 
-     :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES, 
-     :     N_INTEGRATIONS, 
-     :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
+      SUBROUTINE SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAMS,
+     :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES,
+     :     N_INTEGRATIONS,
+     :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT,
      :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
      :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
      :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
@@ -9,8 +9,8 @@
      :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
      :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
      :     LOCAL_COORDS, MAP_X, MAP_Y,
-     :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
-     :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
+     :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+     :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4,
      :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
      :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, USE_LST, LST_DATA,
      :     WAVEPLATE_ANG, BOL_IP_DATA,
@@ -26,9 +26,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAMS, 
-*    :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
-*    :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
+*     CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAMS,
+*    :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
+*    :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT,
 *    :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
 *    :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
 *    :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
@@ -36,8 +36,8 @@
 *    :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
 *    :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
 *    :     LOCAL_COORDS, MAP_X, MAP_Y,
-*    :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
-*    :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
+*    :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+*    :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4,
 *    :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
 *    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, USE_LST, LST_DATA,
 *    :     WAVEPLATE_ANG, BOL_IP_DATA,
@@ -50,7 +50,7 @@
 *     In addition, if this is called from EXTINCTION (ie EXTINCTION=.TRUE.)
 *     the data is corrected for extinction using the calculated elevation
 *     of the bolometers. If EXTINCTION is .FALSE. all the bolometers positions
-*     are converted to apparent RA-Dec at the reference modified Julian 
+*     are converted to apparent RA-Dec at the reference modified Julian
 *     date (given by MJD_STANDARD).
 *
 *     There is some complication for moving sources (use PL output coords):
@@ -78,7 +78,7 @@
 *        EXTINCTION - corrects the input data for extinction
 *        REMIP   - Corrects the input data for instrumental polarisation
 *        All other values for this parameter assume that the bolometer
-*        positions are to be calculated and returned (converted to 
+*        positions are to be calculated and returned (converted to
 *        a standard MJD)
 *     N_BEAMS = _INTEGER (Given)
 *        Number of beams in the input data. Only used if EXTINCTION=.TRUE.
@@ -236,7 +236,7 @@
 
 *  Notes:
 *     MAP_X and MAP_Y are only used for JIGGLE modes.
-*     The SCAN/MAP offsets are wrapped into the RA1,DEC1,RA2,DEC2 
+*     The SCAN/MAP offsets are wrapped into the RA1,DEC1,RA2,DEC2
 *     numbers by the on-line system.
 *     The offsets are added to the map centre every time round the
 *     loop. This is because it is possible to have AZ offsets for
@@ -265,7 +265,7 @@
 *     updated as the sky rotated. This fix is only important for SCUBA2MEM
 *     where the positions of the off-beams are returned.
 
-*     For data taken on 19970405 and later the data headers are 
+*     For data taken on 19970405 and later the data headers are
 *     checked for internal consistency to determine possible clock
 *     errors on the acquisition computer. If the error is greater than
 *     20 seconds all LST's and the MJD are corrected accordingly.
@@ -352,12 +352,12 @@
 *
 
 *  Bugs:
-*     - Does not deal with chop beam positions for 2 bolometer phot 
+*     - Does not deal with chop beam positions for 2 bolometer phot
 *     observations.
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -380,10 +380,10 @@
       REAL             BOL_DU4 (NUM_CHAN, NUM_ADC)
       REAL             DEC1(N_SWITCHES, N_EXPOSURES,
      :                      N_INTEGRATIONS, N_MEASUREMENTS)
-      REAL             DEC2(N_SWITCHES, N_EXPOSURES, 
+      REAL             DEC2(N_SWITCHES, N_EXPOSURES,
      :                      N_INTEGRATIONS, N_MEASUREMENTS)
       DOUBLE PRECISION DEC_CEN
-      INTEGER          DEM_PNTR(N_EXPOSURES, N_INTEGRATIONS, 
+      INTEGER          DEM_PNTR(N_EXPOSURES, N_INTEGRATIONS,
      :                          N_MEASUREMENTS)
       INTEGER          END_EXP
       INTEGER          END_INT
@@ -443,7 +443,7 @@
       REAL             NVARIANCE(N_BOL, N_POS, N_BEAMS)
       INTEGER          N_POS_BEAMS
 
-*  Arguments Returned:      
+*  Arguments Returned:
       DOUBLE PRECISION BOL_DEC(N_BOL, N_POS, N_POS_BEAMS)
       DOUBLE PRECISION BOL_RA(N_BOL, N_POS, N_POS_BEAMS)
       DOUBLE PRECISION LST_DATA ( N_POS )
@@ -477,9 +477,9 @@
       CHARACTER*(1)    BEAMS(5)         ! Beam names
       INTEGER          BOL_COORDS_OFFSET! Offset used in CALC_BOL_COORDS
       CHARACTER*(10)   CENTRE_COORDS    ! Centre coords of observation centre
-      REAL             CENTRE_DU3       ! dU3 Nasmyth coordinate of point on 
+      REAL             CENTRE_DU3       ! dU3 Nasmyth coordinate of point on
                                         ! focal plane that defines tel axis
-      REAL             CENTRE_DU4       ! dU3 Nasmyth coordinate of point on 
+      REAL             CENTRE_DU4       ! dU3 Nasmyth coordinate of point on
                                         ! focal plane that defines tel axis
       CHARACTER*(5)    CHOP_CRD         ! Chop coordinate system
       CHARACTER*(20)   CHOP_FUN         ! Chop function
@@ -488,7 +488,7 @@
       DOUBLE PRECISION CLOCK_ERR        ! Clock error in radians
       DOUBLE PRECISION CURR_MJD         ! MJD for current sample
       INTEGER          DATA_OFFSET      ! Offset in BOL_RA and BOL_DEC
-      REAL             DEC_START        ! declination at start of SCAN 
+      REAL             DEC_START        ! declination at start of SCAN
       REAL             DEC_END          ! declination at end of SCAN
       DOUBLE PRECISION DTEMP            ! Scratch double
       DOUBLE PRECISION ELAPSED          ! Elapsed time since start of obsn
@@ -499,12 +499,12 @@
       DOUBLE PRECISION EXP_LST          ! LST of exposure
       REAL             EXP_TIME         ! Exposure time per measurement
       INTEGER          EXP_START        ! Position of start of exposure
-      LOGICAL          EXTINCTION       ! Extinction correcting? 
+      LOGICAL          EXTINCTION       ! Extinction correcting?
       LOGICAL          FLIP             ! Multiply data by -1
       INTEGER          I                ! Loop counter
       INTEGER          INTEGRATION      ! Loop counter for N_INTEGRATIONS
       INTEGER          ITEMP            ! Temp int
-      INTEGER          JIGGLE           ! 
+      INTEGER          JIGGLE           !
       DOUBLE PRECISION LAT_OBS          ! Latitude of observatory (radians)
       DOUBLE PRECISION LST              ! LST of switch
       DOUBLE PRECISION MAP_DEC_CEN      ! Dec of Map centre
@@ -529,7 +529,7 @@
       LOGICAL          REMIP            ! Correcting for Instrumental Pol?
       REAL             RTEMP            ! Temp real
       REAL             SCUCD_VERSION    ! Version of SCUCD file
-      LOGICAL          SCUOVER          ! Running SCUOVER?  
+      LOGICAL          SCUOVER          ! Running SCUOVER?
       LOGICAL          SET_STATUS       ! True is status has been set by sub
       LOGICAL          SOME_DATA        ! True if data was found
       INTEGER          STORED_OFFSET    ! Data offset at start of exposure
@@ -628,7 +628,7 @@
       CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS,
      :     'CNTR_DU4', CENTRE_DU4, STATUS)
 
-*     Cheat a little bit here and read CENTRE_COORDS from the 
+*     Cheat a little bit here and read CENTRE_COORDS from the
 *     FITS header rather than passing it in as an argument.
 
       CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
@@ -639,16 +639,16 @@
      :     'VERSION', SCUCD_VERSION, STATUS)
 
 *     Need some information on the CHOP
-      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS,
      :     'CHOP_THR', CHOP_THROW, STATUS)
       CHOP_THROW = CHOP_THROW * REAL(ARCSEC2RAD)
-      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :     'CHOP_CRD', CHOP_CRD, STATUS)
-      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS,
      :     'CHOP_PA', CHOP_PA, STATUS)
       CHOP_PA = CHOP_PA * REAL(PI) / 180.0
 
-      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :     'CHOP_FUN', CHOP_FUN, STATUS)
 
 *     Check for an inconsistency in the times stored in the
@@ -696,20 +696,20 @@
 *     Now get the clock error - ignore this if centre coords
 *     is AZ since we are then not tracking and we can therfore
 *     not determine the error from the headers
-*     Alternative to this is to make SCULIB_CALC_CLOCKERR 
+*     Alternative to this is to make SCULIB_CALC_CLOCKERR
 *     ignore AZ or check status and flush
             IF (CENTRE_COORDS .EQ. 'AZ') THEN
                CALL MSG_OUTIF(MSG__NORM, ' ', 'PROCESS_BOLS: '//
      :              'Clock error can not be determined when '//
      :              'centre coords is set to AZ', STATUS)
             ELSE
-               CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN, 
+               CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN,
      :              LST_STRT, CLOCK_ERR, DTEMP, STATUS )
             END IF
 
          END DO
 
-*     If the correction is greater than 20 seconds and less than 
+*     If the correction is greater than 20 seconds and less than
 *     about 1000 secs we apply the correction. Else we either do not
 *     want to bother (the accuaracy of the calculation means that a
 *     20 seconds error is not known well enough to make a difference) or
@@ -718,7 +718,7 @@
          RTEMP = CLOCK_ERR * DR2S ! Convert to seconds
          IF (RTEMP .GT. 1000.0) THEN
 
-            CALL MSG_SETR( 'ERR', RTEMP) 
+            CALL MSG_SETR( 'ERR', RTEMP)
             CALL MSG_OUTIF(MSG__QUIET, ' ','PROCESS_BOLS: Clock error'//
      :           ' calculated to be ^ERR seconds. Too large so '//
      :           'ignoring.', STATUS)
@@ -737,7 +737,7 @@
                DO INTEGRATION = 1, N_INTEGRATIONS
                   DO EXPOSURE = 1, N_EXPOSURES
                      DO I = 1, N_SWITCHES
-                        
+
 *     Add clock error (do not want to correct range to 0..2PI
 *     since that will not distinguish between today and tomorrow)
                         LST_STRT(I,EXPOSURE,INTEGRATION,MEASUREMENT) =
@@ -747,7 +747,7 @@
                   END DO
                END DO
             END DO
-            
+
          END IF
 
       END IF
@@ -769,7 +769,7 @@
      :        0, 0, 0.0D0, 0.0, 0.0, 0, 0, 0, 0, 0, 0.0, 0.0,
      :        0.0, 0.0, 0.0D0, 0.0D0, ELEVATION, PAR_ANGLE, STATUS)
 
-*     The PAR_ANGLE as returned can now be treated as the new 
+*     The PAR_ANGLE as returned can now be treated as the new
 *     CHOP_PA in a AZ coordinate frame
          CHOP_PA = SNGL(PAR_ANGLE) - CHOP_PA
          CHOP_CRD = 'AZ'
@@ -846,7 +846,7 @@
 *     This assumes the first scan is the reference
       FLIP = .FALSE.
 
-*     Store the map centre 
+*     Store the map centre
       MAP_RA_CEN = RA_CEN
       MAP_DEC_CEN = DEC_CEN
 
@@ -916,7 +916,7 @@
                   EXP_LST = EXP_LST / DBLE (N_SWITCHES)
 
 *     get the scan parameters for a raster map
-                  
+
                   IF (SAMPLE_MODE .EQ. 'RASTER') THEN
                      RA_START = RA1(N_SWITCHES, EXPOSURE, INTEGRATION,
      :                    MEASUREMENT)
@@ -939,8 +939,8 @@
 *     If we are at version 1.0 of SCUCD we need to correct these
 *     header values so long as this  is not a moving source
 *     or we have an RD centre. RD centre should work anyway.
-*     Only appears to be a problem with RJ data (at least 
-*     we can only correct RJ data and the problem was never 
+*     Only appears to be a problem with RJ data (at least
+*     we can only correct RJ data and the problem was never
 *     noticed with RB scan data)
 
                      IF (SCUCD_VERSION .EQ. 1.0
@@ -950,8 +950,8 @@
 
                         CALL SCULIB_FIX_SCAN_V10(CENTRE_COORDS,
      :                       LAT_OBS, RA_CEN, DEC_CEN, IN_UT1,
-     :                       DBLE(RA_START), DBLE(DEC_START), 
-     :                       DBLE(RA_END), DBLE(DEC_END), 
+     :                       DBLE(RA_START), DBLE(DEC_START),
+     :                       DBLE(RA_END), DBLE(DEC_END),
      :                       NEW_RA_START, NEW_DEC_START,
      :                       NEW_RA_END, NEW_DEC_END,
      :                       STATUS)
@@ -989,12 +989,12 @@
 *     bother because it's averaged over the switches anyway)
 
                      LST = EXP_LST + DBLE(I - EXP_START) *
-     :                    DBLE(EXP_TIME) * 1.0027379D0 * 
+     :                    DBLE(EXP_TIME) * 1.0027379D0 *
      :                    2.0D0 * PI / (3600.0D0 * 24.0D0)
 
 
 *     Store the LST
-                     
+
                      IF (USE_LST) LST_DATA(I) = LST
 
 
@@ -1007,7 +1007,7 @@
 *     First calculate the elapsed time since the start of the observation
 *     Note that we have to be careful about LST wrapping round to zero
 *     part way through an observation.
-*     In this case if LST is less than the start LST I assume that we 
+*     In this case if LST is less than the start LST I assume that we
 *     have been observing long enough that LST has wrapped round.
 *     Hopefully this will be okay unless we take an obvservation lasting
 *     for 24 hours!
@@ -1034,21 +1034,21 @@
                            MAP_DEC_CEN = LAT1
                         ELSE
 
-                           MAP_RA_CEN =  LONG1 + (LONG2 - LONG1) * 
+                           MAP_RA_CEN =  LONG1 + (LONG2 - LONG1) *
      :                          (CURR_MJD - MJD1)/ (MJD2 - MJD1)
-                           MAP_DEC_CEN = LAT1 + (LAT2 - LAT1) * 
+                           MAP_DEC_CEN = LAT1 + (LAT2 - LAT1) *
      :                          (CURR_MJD - MJD1) / (MJD2 - MJD1)
                         END IF
                      END IF
 
 *     work out the offset at which the measurement was made in arcsec
-                     
+
                      IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
                         ARRAY_RA_CENTRE = MAP_RA_CEN
                         ARRAY_DEC_CENTRE = MAP_DEC_CEN
 
 *     add on the offsets if needed
-                        IF ((MAP_X .NE. 0.0D0) .OR. 
+                        IF ((MAP_X .NE. 0.0D0) .OR.
      :                       (MAP_Y .NE. 0.0D0)) THEN
 
 *     convert to position in local_coords frame
@@ -1058,19 +1058,19 @@
 *     Planets should be done in RD local coords
                            CALL SCULIB_APPARENT_2_MP(MAP_RA_CEN,
      :                          MAP_DEC_CEN, LOCAL_COORDS,
-     :                          LST, IN_UT1, LAT_OBS, MYLONG, MYLAT, 
+     :                          LST, IN_UT1, LAT_OBS, MYLONG, MYLAT,
      :                          STATUS)
 
 *     now add on the tangent plane offset in this frame and convert
 *     back to apparent RA,Dec
-                           CALL SCULIB_CALC_APPARENT(LAT_OBS, MYLONG, 
+                           CALL SCULIB_CALC_APPARENT(LAT_OBS, MYLONG,
      :                          MYLAT, 0.0D0, 0.0D0, MAP_X, MAP_Y,
      :                          LOCAL_COORDS, LST, IN_UT1, 0.0D0, 0.0D0,
      :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
      :                          DTEMP, STATUS)
 
                         END IF
-                        
+
                         IF (JIGGLE_REPEAT .EQ. 1) THEN
                            JIGGLE = (EXPOSURE-1) *
      :                          JIGGLE_P_SWITCH +
@@ -1086,7 +1086,7 @@
                            OFFSET_X = JIGGLE_X (JIGGLE)
                            OFFSET_Y = JIGGLE_Y (JIGGLE)
                         ELSE
-                           IF (STATUS .EQ. SAI__OK) THEN 
+                           IF (STATUS .EQ. SAI__OK) THEN
                               STATUS = SAI__ERROR
                               CALL MSG_SETI('JIG', JIGGLE)
                               CALL MSG_SETI('COUNT',JIGGLE_COUNT)
@@ -1099,7 +1099,7 @@
                               CALL MSG_SETI ('M', MEASUREMENT)
                               CALL ERR_REP(' ',
      :                             'SURFLIB_PROCESS_BOLS: '//
-     :                             '- for exp ^E in int ^I, meas ^M', 
+     :                             '- for exp ^E in int ^I, meas ^M',
      :                             STATUS)
 
                            END IF
@@ -1131,20 +1131,20 @@
 *     start and end of the scans depending on the CENTRE_COORDS
 *     so we need to convert the map centres to Apparent RA/Dec
 *     before proceeding.
-*     If CENTRE_COORDS is 'PLANET' then we do nothing since it is 
+*     If CENTRE_COORDS is 'PLANET' then we do nothing since it is
 *     already in apparent RA/Dec.
 *     In fact the modification is really small.
 *     After December 1997 the on-line system really does store apparent
 *     RA/Dec correctly so this is not required (version 1.0 of the
 *     SCUCD file).
 
-                        CALL SCULIB_SCAN_2_RD(SCUCD_VERSION, 
+                        CALL SCULIB_SCAN_2_RD(SCUCD_VERSION,
      :                       CENTRE_COORDS, MAP_RA_CEN, MAP_DEC_CEN,
      :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
      :                       LST, IN_UT1, LAT_OBS,
      :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
      :                       STATUS)
-                        
+
                         OFFSET_X = 0.0
                         OFFSET_Y = 0.0
 
@@ -1165,12 +1165,12 @@
 *     These offsets are actually the offsets from the new map centre
 *     (and not from the RA_CEN,DEC_CEN!) This is what we think the
 *     on-line system is giving us.
-*     Now need to convert these tangent plane offsets from moving map centre 
+*     Now need to convert these tangent plane offsets from moving map centre
 *     to apparent RA/Dec.
 
                            CALL SLA_DTP2S (XI, ETA, MAP_RA_CEN,
-     :                          MAP_DEC_CEN, ARRAY_RA_CENTRE, 
-     :                          ARRAY_DEC_CENTRE) 
+     :                          MAP_DEC_CEN, ARRAY_RA_CENTRE,
+     :                          ARRAY_DEC_CENTRE)
 
                         END IF
 
@@ -1196,11 +1196,11 @@
 
                            CALL SCULIB_ADD_CHOP(
      :                          BEAMS(BM), RA_CEN, DEC_CEN,
-     :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, 
-     :                          CHOP_CRD, CHOP_PA, CHOP_FUN, CHOP_THROW, 
+     :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
+     :                          CHOP_CRD, CHOP_PA, CHOP_FUN, CHOP_THROW,
      :                          LST, IN_UT1, LAT_OBS,
      :                          RA_START, RA_END, DEC_START, DEC_END,
-     :                          NEW_ARRAY_RA, NEW_ARRAY_DEC, 
+     :                          NEW_ARRAY_RA, NEW_ARRAY_DEC,
      :                          STATUS)
 
                         ELSE
@@ -1224,17 +1224,17 @@
 
                         CALL SCULIB_CALC_BOL_COORDS (OUTCRDS,
      :                       FOCAL_STATION,
-     :                       NEW_ARRAY_RA, NEW_ARRAY_DEC, LST, 
-     :                       LAT_OBS, OFFSET_COORDS, OFFSET_X, 
+     :                       NEW_ARRAY_RA, NEW_ARRAY_DEC, LST,
+     :                       LAT_OBS, OFFSET_COORDS, OFFSET_X,
      :                       OFFSET_Y, IN_ROTATION, N_POINT,
      :                       N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :                       NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN,
      :                       BOL_ADC, BOL_DU3, BOL_DU4,
      :                       CENTRE_DU3, CENTRE_DU4,
-     :                       BOL_RA(1, BOL_COORDS_OFFSET, BM), 
+     :                       BOL_RA(1, BOL_COORDS_OFFSET, BM),
      :                       BOL_DEC(1, BOL_COORDS_OFFSET, BM),
      :                       ELEVATION, PAR_ANGLE, STATUS)
-                        
+
                         IF (EXTINCTION) THEN
 *     work out the zenith sky opacity at this LST
 
@@ -1247,19 +1247,19 @@
      :                             * (LST - FIRST_LST) /
      :                             (SECOND_LST - FIRST_LST)
                            END IF
-                           
+
 *     correct the bolometer data for the sky opacity
 *     Check for status here since the bounds can be exceeded
 *     before we enter the subroutine (DATA_OFFSET can be too large)
 
                            IF (STATUS .EQ. SAI__OK) THEN
-                           
+
                               DO BEAM = 1, N_BEAMS
 
-                                 
+
                                  CALL SCULIB_CORRECT_EXTINCTION (
      :                                NUM_ADC * NUM_CHAN, N_BOL,
-     :                                NDATA(1, DATA_OFFSET, BEAM), 
+     :                                NDATA(1, DATA_OFFSET, BEAM),
      :                                NVARIANCE(1, DATA_OFFSET, BEAM),
      :                                BOL_RA,BOL_DEC,LST, LAT_OBS, TAUZ,
      :                                STATUS)
@@ -1274,8 +1274,8 @@
 
                            DO BEAM = 1, N_BEAMS
 
-                              CALL SURFLIB_REMOVE_IP(ELEVATION, 
-     :                             NUM_CHAN, NUM_ADC, N_BOL, 
+                              CALL SURFLIB_REMOVE_IP(ELEVATION,
+     :                             NUM_CHAN, NUM_ADC, N_BOL,
      :                             WAVEPLATE_ANG(DATA_OFFSET), BOL_CHAN,
      :                             BOL_ADC, BOL_IP_DATA,
      :                             NDATA(1, DATA_OFFSET, BEAM),
@@ -1285,7 +1285,7 @@
 *     At this point we could correct the WAVEPLATE angle
 *     for parallactic angle and elevation. This will be needed
 *     during the regrid phase
-*     At this point we replace the waveplate angle with the 
+*     At this point we replace the waveplate angle with the
 *     sky rotation angle (over-writing any reference to the waveplate
 *     angle). We overwrite to save space since at this stage the rotation
 *     angle is more important for the polarimetry than the waveplate
@@ -1293,7 +1293,7 @@
 *     routine). Convert the angle to degrees for storage
 
                               WAVEPLATE_ANG(DATA_OFFSET) =
-     :                             SNGL ((PAR_ANGLE - ELEVATION) * 
+     :                             SNGL ((PAR_ANGLE - ELEVATION) *
      :                             180.0D0 / PI )
 
 *                              print *,DATA_OFFSET,
@@ -1303,7 +1303,7 @@
                            END DO
 
                         ELSE
-                           
+
 *     Convert the apparent RA/Decs to tangent plane offsets
 *     from the moving centre if we are using the 'PL' output system
 *     or want to calculate Az and NA
@@ -1312,7 +1312,7 @@
 
                               IF (STATUS .EQ. SAI__OK) THEN
                                  CALL SCULIB_APPARENT_2_TP (N_BOL,
-     :                                BOL_RA(1,DATA_OFFSET, BM), 
+     :                                BOL_RA(1,DATA_OFFSET, BM),
      :                                BOL_DEC(1,DATA_OFFSET, BM),
      :                                MAP_RA_CEN, MAP_DEC_CEN, 0.0D0,
      :                                0.0D0, 0.0D0, STATUS)
@@ -1328,9 +1328,9 @@
                                  IF (STATUS .EQ. SAI__OK) THEN
                                     CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(
      :                                   OUT_COORDS,1, N_BOL, ELEVATION,
-     :                                   PAR_ANGLE, 
+     :                                   PAR_ANGLE,
      :                                   BOL_RA(1, DATA_OFFSET, BM),
-     :                                   BOL_DEC(1,DATA_OFFSET, BM), 
+     :                                   BOL_DEC(1,DATA_OFFSET, BM),
      :                                   STATUS)
 
                                  END IF
@@ -1340,11 +1340,11 @@
                            ELSE
 *     convert the coordinates to apparent RA,Dec on MJD_STANDARD
                               IF (OUTCRDS .EQ. 'RA') THEN
-                                 IF (N_MAP .NE. 1 .AND. 
+                                 IF (N_MAP .NE. 1 .AND.
      :                                STATUS .EQ. SAI__OK) THEN
                                     CALL SCULIB_STANDARD_APPARENT (
-     :                                   N_BOL, 
-     :                                   BOL_RA(1,DATA_OFFSET, BM), 
+     :                                   N_BOL,
+     :                                   BOL_RA(1,DATA_OFFSET, BM),
      :                                   BOL_DEC(1, DATA_OFFSET, BM),
      :                                   IN_UT1, MJD_STANDARD, STATUS)
                                  END IF
@@ -1367,8 +1367,8 @@
                            ITEMP = N_BOL * (EXP_END - EXP_START + 1)
                            RTEMP = -1.0
 
-                           CALL SCULIB_MULCAR(ITEMP, 
-     :                          NDATA(1,STORED_OFFSET,1), RTEMP, 
+                           CALL SCULIB_MULCAR(ITEMP,
+     :                          NDATA(1,STORED_OFFSET,1), RTEMP,
      :                          NDATA(1, STORED_OFFSET,1))
                         END IF
                         FLIP = .FALSE.

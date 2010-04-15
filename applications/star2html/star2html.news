@@ -13,7 +13,7 @@
  also be handled in the HTML version of a document.
 
  Star2HTML, the Starlink internal document hypertext support package,
- has been updated so that the default copyright is now assigned to 
+ has been updated so that the default copyright is now assigned to
  the Science and Technology Facilities Council. A new option -obsolete
  has also been introduced to display an background image with the word
  OBSOLETE displayed.

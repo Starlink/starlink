@@ -14,7 +14,7 @@
 *     CALL ATL_PXDUP( IWCS, POS, STATUS )
 
 *  Description:
-*     This routine ensures that the number of axes in the current Frame 
+*     This routine ensures that the number of axes in the current Frame
 *     (WCS Frame) of a FrameSet is at least equal to the number of axes
 *     in the base Frame (PIXEL or GRID Frame). If the initial number of
 *     current Frame axes is too small, extra axes are added to the
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,8 +90,8 @@
       INTEGER ICUR
       INTEGER IDUP
       INTEGER INAX( ATL__MXDIM )
-      INTEGER INPRM( 2*ATL__MXDIM )      
-      INTEGER JAX 
+      INTEGER INPRM( 2*ATL__MXDIM )
+      INTEGER JAX
       INTEGER JDUP
       INTEGER JUNK
       INTEGER MAP
@@ -103,7 +103,7 @@
       INTEGER NPIX
       INTEGER NWCS
       INTEGER OUTAX( ATL__MXDIM )
-      INTEGER OUTPRM( 2*ATL__MXDIM )      
+      INTEGER OUTPRM( 2*ATL__MXDIM )
       INTEGER PM1
       INTEGER PM2
       LOGICAL ISDUP
@@ -170,7 +170,7 @@
 *  Check each pixel axis
          DO IAX = 1, NPIX
 
-*  If we do not yet have enough pixel axes available for duplication, see if 
+*  If we do not yet have enough pixel axes available for duplication, see if
 *  this pixel axis is independent of the existing WCS axes. If it is, we
 *  can add it to the list of pixel axes to be duplicated.
             IF( IDUP .LT. NDUP ) THEN
@@ -180,13 +180,13 @@
                ISDUP = .FALSE.
                DO JDUP = 1, IDUP
                   IF( DUPAX( JDUP ) .EQ. IAX ) ISDUP = .TRUE.
-               END DO                                    
+               END DO
 
                IF( .NOT. ISDUP ) THEN
 
-*  Get the rate of change of each WCS axis with respect to the current pixel 
+*  Get the rate of change of each WCS axis with respect to the current pixel
 *  axis, at the supplied pixel position. Note the maximum rate of change
-*  with respect to any WCS axis. 
+*  with respect to any WCS axis.
                   MXRATE = 0.0
                   DO JAX = 1, NWCS
                      RATE = AST_RATE( MAP, POS, JAX, IAX, STATUS )
@@ -215,7 +215,7 @@
                ISDUP = .FALSE.
                DO JDUP = 1, IDUP
                   IF( DUPAX( JDUP ) .EQ. IAX ) ISDUP = .TRUE.
-               END DO                                    
+               END DO
                IF( .NOT. ISDUP ) THEN
                   IDUP = IDUP + 1
                   DUPAX( IDUP ) = IAX
@@ -250,11 +250,11 @@
 
 *  Now create the parallel CmpMap containing the original Mapping and a
 *  UnitMap.
-        CM1 = AST_CMPMAP( MAP, AST_UNITMAP( NDUP, ' ', STATUS ), 
+        CM1 = AST_CMPMAP( MAP, AST_UNITMAP( NDUP, ' ', STATUS ),
      :                    .FALSE., ' ', STATUS )
 
 *  Now create the final PermMap.
-         DO IAX = 1, NPIX 
+         DO IAX = 1, NPIX
             OUTPRM( IAX ) = 0
          END DO
 
@@ -266,7 +266,7 @@
          JAX = 1
          DO IAX = 1, NWCS
 
-            DO WHILE( OUTPRM( JAX ) .NE. 0 ) 
+            DO WHILE( OUTPRM( JAX ) .NE. 0 )
                JAX = JAX + 1
             END DO
 
@@ -274,25 +274,25 @@
             OUTPRM( JAX ) = IAX
          END DO
 
-         PM2 = AST_PERMMAP( NPIX, INPRM, NPIX, OUTPRM, 0.0D0, ' ', 
+         PM2 = AST_PERMMAP( NPIX, INPRM, NPIX, OUTPRM, 0.0D0, ' ',
      :                      STATUS )
 
 *  Combine all 3 into a single Mapping, and simplify it.
-         NEWMAP = AST_SIMPLIFY( AST_CMPMAP( PM1, AST_CMPMAP( CM1, PM2, 
+         NEWMAP = AST_SIMPLIFY( AST_CMPMAP( PM1, AST_CMPMAP( CM1, PM2,
      :                                                      .TRUE., ' ',
      :                                                      STATUS ),
-     :                                      .TRUE., ' ', STATUS ), 
+     :                                      .TRUE., ' ', STATUS ),
      :                          STATUS )
 
 *  Now we construct the new current Frame. First pick the duplicated pixel
 *  axes from the base Frame, then combine the rsulting Fram ewith the
 *  original current Frame.
-         NEWFRM = AST_CMPFRAME( AST_GETFRAME( IWCS, AST__CURRENT, 
+         NEWFRM = AST_CMPFRAME( AST_GETFRAME( IWCS, AST__CURRENT,
      :                                        STATUS ),
-     :                          AST_PICKAXES( AST_GETFRAME( IWCS, 
-     :                                                      AST__BASE, 
+     :                          AST_PICKAXES( AST_GETFRAME( IWCS,
+     :                                                      AST__BASE,
      :                                                      STATUS ),
-     :                                        NDUP, DUPAX, JUNK, 
+     :                                        NDUP, DUPAX, JUNK,
      :                                        STATUS ),
      :                          ' ', STATUS )
 

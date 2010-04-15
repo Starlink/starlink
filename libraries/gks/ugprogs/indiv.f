@@ -1,24 +1,24 @@
       PROGRAM INDIV
 *                      GKS Example Program 8.3
- 
- 
+
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
       CALL SHIPWD
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing
@@ -30,8 +30,8 @@
       CALL GCLKS
       END
 
- 
- 
+
+
       SUBROUTINE SHIPWD
 *                      Draw a ship using individual
 *                      attributes.
@@ -39,7 +39,7 @@
 *                      included file
 *                      GINDIV, GLSOLI
       INCLUDE 'GKS_PAR'
- 
+
 *                      Set up parameters with names for the AFSs
       INTEGER GALN, GALWSC, GAPLCI
       PARAMETER (GALN=1, GALWSC=2, GAPLCI=3)

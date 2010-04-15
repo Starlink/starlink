@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     This routine decodes the value of a single component in a SCUBA
-*     data-spec. 
+*     data-spec.
 
 *  Language:
 *     Starlink Fortran 77
@@ -24,21 +24,21 @@
 *     -[4]   "<index1>:<index2>"     select all data in the range <index1> to
 *                               <index2>
 *
-*     or any combination of 2, 3 and 4 separated by commas. Example 
+*     or any combination of 2, 3 and 4 separated by commas. Example
 *     component values are:-
 *
 *      - "*"                     select all data
 *      - "1,5"                   select data at indices 1 and 5
-*      - "5:10,16"               select data at indices 5 through 10 and 16 
-*     
+*      - "5:10,16"               select data at indices 5 through 10 and 16
+*
 *     Errors will occur if:-
-*      
+*
 *       - You mix the * format with selection by index.
 *       - Any index selected lies outside the range 1 to N.
 *       - In a selection range <index2> is less than <index1>.
 *       - The component does not conform to the design syntax.
 *
-*     Output from the routine is in the form of a mask array SELECT. 
+*     Output from the routine is in the form of a mask array SELECT.
 *     Data indices selected will be marked as 1 in SELECT, while indices
 *     not selected will be zeroes.
 
@@ -80,7 +80,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                        ! No implicit typing
 
@@ -95,7 +95,7 @@
       INTEGER       SELECT (N)
 
 *  Status:
-      INTEGER STATUS  
+      INTEGER STATUS
 
 *  External routines:
       INTEGER CHR_LEN                      ! CHR used-string-length
@@ -136,7 +136,7 @@
          CALL ERR_REP (' ', 'SCULIB_DECODE_COMPONENT: zero length '//
      :     'component value', STATUS)
       END IF
-      
+
 *  check first for all items selected
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -211,7 +211,7 @@
                            CALL MSG_SETI ('I', I)
                            CALL MSG_SETI ('N', N)
                            CALL MSG_SETC ('C', COMPONENT)
-                           CALL ERR_REP (' ', 
+                           CALL ERR_REP (' ',
      :                       'SCULIB_DECODE_COMPONENT: number ^I '//
      :                       'in component ^C is outside allowed '//
      :                       'range 1-^N', STATUS)
@@ -243,7 +243,7 @@
                         STATUS = SAI__ERROR
                         CALL MSG_SETC ('A', PROTON)
                         CALL MSG_SETC ('C', COMPONENT)
-                        CALL ERR_REP (' ', 
+                        CALL ERR_REP (' ',
      :                    'SCULIB_DECODE_COMPONENT: '//
      :                    'error decoding ^A in component ^C',
      :                    STATUS)
@@ -259,7 +259,7 @@
      :                       'error decoding ^A in component ^C',
      :                        STATUS)
                         ELSE
-                    
+
 *  if the numbers are within range, set the SELECT array
 
                            IF ((I1.LT.1) .OR. (I1.GT.N)) THEN
@@ -268,7 +268,7 @@
                               CALL MSG_SETI ('I', I1)
                               CALL MSG_SETI ('N', N)
                               CALL MSG_SETC ('C', COMPONENT)
-                              CALL ERR_REP (' ', 
+                              CALL ERR_REP (' ',
      :                          'SCULIB_DECODE_COMPONENT: number '//
      :                          '^I in component ^C is outside '//
      :                          'allowed range 1 to ^N', STATUS)
@@ -278,7 +278,7 @@
                               CALL MSG_SETI ('I', I2)
                               CALL MSG_SETI ('N', N)
                               CALL MSG_SETC ('C', COMPONENT)
-                              CALL ERR_REP (' ', 
+                              CALL ERR_REP (' ',
      :                          'SCULIB_DECODE_COMPONENT: number '//
      :                          '^I in component ^C is outside '//
      :                          'allowed range 1-^N', STATUS)
@@ -286,7 +286,7 @@
                               LOOPING = .FALSE.
                               STATUS = SAI__ERROR
                               CALL MSG_SETC ('C', COMPONENT)
-                              CALL ERR_REP (' ', 
+                              CALL ERR_REP (' ',
      :                          'SCULIB_DECODE_COMPONENT: range '//
      :                          'reversed in component ^C', STATUS)
                            ELSE

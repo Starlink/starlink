@@ -159,7 +159,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
     smf_getfitsd( hdr, "UEL", &uel, status );
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
-    if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
+    if (*status == SMF__NOKWRD || ( *status == SAI__OK &&
                                     ( steptime == VAL__BADD ||
                                       steptime < VAL__SMLD ||
                                       (uel != VAL__BADD && steptime == uel ) ) ) ) {

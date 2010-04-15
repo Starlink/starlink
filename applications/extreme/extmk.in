@@ -12,11 +12,11 @@
 #
 #  Description:
 #     This is a simple filter which takes a Starlink mk file as input and
-#     writes as output a file which should provide the additional 
-#     functionality required for EXTREME use, i.e. it adds new 
-#     SYSTEM types of alpha_OSF1_64 and sun4_Solaris_64, provides 
+#     writes as output a file which should provide the additional
+#     functionality required for EXTREME use, i.e. it adds new
+#     SYSTEM types of alpha_OSF1_64 and sun4_Solaris_64, provides
 #     for use of the INTEGER8 macro to preprocess Fortran source code
-#     before compilation, and modifies the C compilation flags for 
+#     before compilation, and modifies the C compilation flags for
 #     use with the INT_BIG macro.
 #
 #     The changes it attempts to make are as follows:
@@ -25,21 +25,21 @@
 #        - Add a comment describing the INTEGER8 environment variable
 #        - Export the INTEGER8 environment variable
 #        - Modify SYSTEM-specific settings for existing SYSTEMs
-#        - Add support for the two new SYSTEMs 
+#        - Add support for the two new SYSTEMs
 #
 #     If it is unable to make any of the modifications it would like to,
 #     it will print an explanatory message saying what it could not do.
 #
 #     The only change which might be required which this script does not
 #     make is to set values for the SOURCE_VARIANT variable.  Depending
-#     on how the system-specific compilation is going to be done, it 
-#     may be desirable to add SOURCE_VARIANT='alpha_OSF1' in the new 
-#     alpha_OSF1_64 stanza, and SOURCE_VARIANT='sun4_Solaris' in the 
+#     on how the system-specific compilation is going to be done, it
+#     may be desirable to add SOURCE_VARIANT='alpha_OSF1' in the new
+#     alpha_OSF1_64 stanza, and SOURCE_VARIANT='sun4_Solaris' in the
 #     new sun4_Solaris_64 stanza.  If required, this must be done by hand.
 #
 #     This script is not extremely intelligent - unless the mk file
 #     follows the usual pattern quite closely, the output may be in
-#     error, or complete rubbish.  It is intended as a convenience, 
+#     error, or complete rubbish.  It is intended as a convenience,
 #     and if it does not work, then it will be necessary to make the
 #     modifications by hand; this is not too arduous.
 #
@@ -61,7 +61,7 @@
       }
       if ( @ARGV ) {
          my( $infile ) = shift( @ARGV );
-         open( IN, $infile ) 
+         open( IN, $infile )
             or die( "Failed to open $infile for reading.\n" );
       }
       else {
@@ -69,7 +69,7 @@
       }
       if ( @ARGV ) {
          my( $outfile ) = shift( @ARGV );
-         open( OUT, ">$outfile" ) 
+         open( OUT, ">$outfile" )
             or die( "Failed to open $outfile for writing.\n" );
          select( OUT );
       }
@@ -83,7 +83,7 @@
 
 #  Perform some rudimentary checks on the input.
       if ( $mk =~ /alpha_OSF1_64|sun4_Solaris_64/i ) {
-         print( STDERR 
+         print( STDERR
                 "Warning: mk file already contains 64-bit adaptations.\n",
                 "         Proceeding anyway.\n" );
       }
@@ -128,7 +128,7 @@
 #  Change the comment block describing macro defaults; modify the entry
 #  for CFLAGS and insert a new entry for INTEGER8.
       $done{ "Comment block entry for new CFLAGS default" } =
-      $mk =~ s{ 
+      $mk =~ s{
                 (   ^\#  \ +  CFLAGS \ *  \(  [^)]*  \)  \ * \n )
              }{
                 my( $a ) = $1;
@@ -170,11 +170,11 @@
                 $ax =~ s/LINK/INTEGER8/;
                 $a . $ax;
              }mxe;
-                
-#  We have now dealt with everything apart from the case stanzas 
+
+#  We have now dealt with everything apart from the case stanzas
 #  dealing with each SYSTEM in turn.  Output the initial part of the
 #  text and forget about it.
-      $mk =~ s{ 
+      $mk =~ s{
                 (   .*                                   \n
                       \ + case [^\n] \$ SYSTEM  [^\n]*   \n )
              }{
@@ -184,16 +184,16 @@
 
 
 #  Now identify each 'case "$SYSTEM"' stanza and modify it.
-#  In general these just get INTEGER8 and CFLAGS modified to reflect the 
+#  In general these just get INTEGER8 and CFLAGS modified to reflect the
 #  new defaults, but for SYSTEM values of alpha_OSF1 and sun4_Solaris,
 #  a new stanza is written for the corresponding 64-bit system.
       my( $sys );
-      foreach $sys ( qw/alpha_OSF1 alpha_OSF1_64 
+      foreach $sys ( qw/alpha_OSF1 alpha_OSF1_64
                         sun4_Solaris sun4_Solaris_64
                         ix86_Linux/ ) {
          $done{ "Variable settings for system $sys" } = 0;
       }
-                        
+
       $mk =~ s{
                 ( ^\# .*                                  \n )
                 ( ^\# \ *  -----*    \ *                  \n )
@@ -227,7 +227,7 @@
                 }
                 $block . $blockx;
              }mxeg;
-                
+
 #  Output the remainder of the modified text.
       print $mk;
 
@@ -238,7 +238,7 @@
          push( @undone, $task ) unless ( $success );
       }
       if ( @undone ) {
-         print( STDERR join( "\n      ", 
+         print( STDERR join( "\n      ",
                              "The following edits could not be made:",
                              @undone ),
                        "\n" );

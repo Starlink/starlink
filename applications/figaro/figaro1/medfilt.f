@@ -4,12 +4,12 @@ C
 C     M E D F I L T   /    M E D F I L T R
 C
 C     Figaro routines to median filter an image.  The result of
-C     this operation is an image in which the value of each pixel 
+C     this operation is an image in which the value of each pixel
 C     is the median value of a rectangular box of pixels centered on the
 C     corresponding pixel in the original array. MEDFILTR allows the
 C     box to be specified with different X and Y dimensions, while the
-C     original MEDFILT only supported a square box. MEDFILTR is 
-C     therefore a full superset of MEDFILT, but the older application 
+C     original MEDFILT only supported a square box. MEDFILTR is
+C     therefore a full superset of MEDFILT, but the older application
 C     has to be retained for compatability reasons.
 C
 C     Command parameters for MEDFILT -
@@ -17,7 +17,7 @@ C
 C     IMAGE    The name of the structure containing the image.
 C
 C     BOX      (Numeric) The size of the box (in pixels) to be
-C              used in calculating the medians.  Should be odd; 
+C              used in calculating the medians.  Should be odd;
 C              if even, BOX-1 will be used.
 C
 C     OUTPUT   The name of the result of the operation.  This can
@@ -30,11 +30,11 @@ C
 C     IMAGE    The name of the structure containing the image.
 C
 C     XBOX     (Numeric) The X-dimension of the box (in pixels) to be
-C              used in calculating the medians.  Should be odd; 
+C              used in calculating the medians.  Should be odd;
 C              if even, XBOX-1 will be used.
 C
 C     YBOX     (Numeric) The Y-dimension of the box (in pixels) to be
-C              used in calculating the medians.  Should be odd; 
+C              used in calculating the medians.  Should be odd;
 C              if even, YBOX-1 will be used.
 C
 C     OUTPUT   The name of the result of the operation.  This can

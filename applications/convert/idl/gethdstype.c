@@ -16,7 +16,7 @@
 *       The IDL type
 
 * Returned Value:
-*    hdstype = char * 
+*    hdstype = char *
 *       A pointer to a string containing the HDS type.
 
 * Description:

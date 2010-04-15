@@ -62,7 +62,7 @@ int main(int argc, char** argv)
         nerrs++;                                                        \
     }
 
-    /* 
+    /*
      * Compare values in prm_par.h against the values in the struct
      * NDR, as initialised by dat1_init_ndr.c.  Excerpts:
      *
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     testval_prm(i, NUM, MIN, min, I);
     testval_prm(f, NUM, MIN, min, R);
     testval_prm(d, NUM, MIN, min, D);
-    
+
     /* Number of basic machine units (bytes) used by a value. */
     testval(i, VAL, NB, length, UB);
     testval(i, VAL, NB, length, B);
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
     testval(i, VAL, NB, length, I);
     testval(i, VAL, NB, length, R);
     testval(i, VAL, NB, length, D);
-    
+
     /* Number of characters required to format value as decimal string. */
     testval(i, VAL, SZ, txtsize, UB);
     testval(i, VAL, SZ, txtsize, B);

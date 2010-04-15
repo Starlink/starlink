@@ -14,7 +14,7 @@ C     peak close to where it was found in the previous fit.  If a line
 C     does not show up in one cross-section, the previous position will
 C     be used, but if it fails to show up in the next cross-section, it
 C     will be dropped from the search list.  In many cases, there may be
-C     strong lines which were not indentified; these cannot be used to 
+C     strong lines which were not indentified; these cannot be used to
 C     improve the fit, but they can be used to 'lock' it down in the
 C     regions where there are few or no identified lines.
 C
@@ -22,7 +22,7 @@ C     Command parameters -
 C
 C     IMAGE     (Character) The name of the image containing the 2D arc.
 C     RSTART    (Numeric) The starting cross-section to be used.
-C     RWIDTH    (Numeric) The number of cross-sections to be added 
+C     RWIDTH    (Numeric) The number of cross-sections to be added
 C               together for each fit - if the arc is weak, this will
 C               need to be increased.
 C     RSIGMA    (Numeric) Normally, the sigma value from the arc line
@@ -36,10 +36,10 @@ C     SIGMIN    (Numeric) The minimum acceptable value for the sigma of
 C               an arc line found in the locking process.  Sigma here is
 C               the height of the line relative to the square root of
 C               the continuum.  Only used if LOCK specified.
-C     
-C     Command keywords -  
 C
-C     LOCK      Indicates that a search is to be made for lines to 
+C     Command keywords -
+C
+C     LOCK      Indicates that a search is to be made for lines to
 C               'lock' the fit.
 C     SPREAD    Indicates that IARC looks for lines first with an
 C               increased sigma, then with the specified sigma in order
@@ -47,15 +47,15 @@ C               to refine the fit.  If NOSPREAD is specified, the search
 C               is just with the specified sigma value.
 C     DETAIL    Indicates that full details of the fits are to be output
 C               (This is mainly a diagnostic tool.)
-C     XCORR     If specified, IARC will attempt to determine a linear 
-C               shift between successive spectra using 
-C               cross-correlation. This is particularly applicable to 
+C     XCORR     If specified, IARC will attempt to determine a linear
+C               shift between successive spectra using
+C               cross-correlation. This is particularly applicable to
 C               fibre data, where such linear shifts may occur. It is
-C               probably not useful for cases such as image-tube 
-C               distortion, where the spectra should change in a 
+C               probably not useful for cases such as image-tube
+C               distortion, where the spectra should change in a
 C               constant manner.
 C     WEIGHT    Indicates whether the least-squares fit is to be
-C               weighted using the peak intensity of each line (so that 
+C               weighted using the peak intensity of each line (so that
 C               more weight is given to strong lines).
 C     CHANSHIFT A constant shift which is added to all the input channel
 C               positions read from the arlines.lis file.  Shifts in the
@@ -63,19 +63,19 @@ C               range -1000.0 to 1000.0 are permitted.  If no value is
 C               specified no shift is made.  The value is supplied in
 C               `units' of pixels.
 C
-C     User variables used -  
+C     User variables used -
 C
-C     (<) IARC_WMAX   (Numeric) Maximum wavelength for any of the 
+C     (<) IARC_WMAX   (Numeric) Maximum wavelength for any of the
 C                     spectra.
 C     (<) IARC_WMIN   (Numeric) Minimum     "       "   "  "   "    "
-C     (<) NOFITS      (Numeric) The number of rows that could not be 
+C     (<) NOFITS      (Numeric) The number of rows that could not be
 C                     fitted.
 C     (<) ORDER       (Numeric) The order of the original fit.
 C     (<) RMSMAX      (Numeric) Maximum RMS error from the fits.
 C
 C     Input files -
 C
-C     ARLINES.LIS   Contains the details of the starting fit.  For 
+C     ARLINES.LIS   Contains the details of the starting fit.  For
 C                   format details see comments for subroutine ARGETL,
 C                   or the ARC command.
 C
@@ -97,25 +97,25 @@ C
 C     4th  Feb 1985  KS / AAO.  IARC_WMAX and IARC_WMIN now set.
 C     15th Mar 1985  KS / AAO.  DETAIL and RSIGMA added.
 C     1st  May 1985  KS / AAO. GAP added.
-C     29th Aug 1985  KS / AAO. SPREAD added. Excessive line-deleted 
-C                    messages bug fixed.  SPR on V4.2 Fortran compiler 
+C     29th Aug 1985  KS / AAO. SPREAD added. Excessive line-deleted
+C                    messages bug fixed.  SPR on V4.2 Fortran compiler
 C                    submitted, and VOLATILE IR1 included to bypass it.
 C                    Output format for linear fits is now correct.
 C     24th Sep 1985  KS / AAO. GAP may now be set to zero.
 C     30th Dec 1985  KS / AAO.  Fortran 4.3 compiler now available, so
 C                    the VOLATILE IR1 statement has been removed.
-C     24th Jun 1987  KS / AAO.  Now will accept 3 lines in a 
+C     24th Jun 1987  KS / AAO.  Now will accept 3 lines in a
 C                    cross-section instead of insisting on at least 4.
-C     26th Aug 1987  DJA / AAO. Revised DSA_ routines - some specs 
-C                    changed. Now uses DYN routines for dynamic-memory 
+C     26th Aug 1987  DJA / AAO. Revised DSA_ routines - some specs
+C                    changed. Now uses DYN routines for dynamic-memory
 C                    handling.
 C     26th Mar 1991  KS / AAO.  XCORR keyword added, controlling
-C                    automatic shift analysis of successive spectra. 
+C                    automatic shift analysis of successive spectra.
 C                    PAR_ABORT tests added.
 C     21st Jul 1992  HME / UoE, Starlink.  Make file name string 64
 C                    characters.
 C     22nd Sep 1992  HME / UoE, Starlink.  TABs removed, INCLUDE
-C                    changed. Lowercase file name. Lowercase extension 
+C                    changed. Lowercase file name. Lowercase extension
 C                    .iar.  Changed FIGX_SHIFT to FIG_SHIFT, LINES to
 C                    JTY_LINES, XYFIT to FIG_XYFIT.
 C     21st Jul 1993  HME / UoE, Starlink.  Use dsa_*_lu.
@@ -167,7 +167,7 @@ C
       CHARACTER CHNBUF*75        ! Message buffer for channel shift.
       INTEGER   CHNPOS           ! Length of CHNBUF (excl. trail.
                                  ! blanks)
-      REAL      CHNSFT           ! Optional shift added to channel 
+      REAL      CHNSFT           ! Optional shift added to channel
                                  ! positions
       INTEGER   CPTR             ! Dynamic-memory pointer to workspace
       LOGICAL   DETAIL           ! See above
@@ -325,7 +325,7 @@ C
       END IF
 C
 C     Are we to look for LOCK lines - if so get SIGMIN
-C     
+C
       CALL PAR_RDKEY('LOCK',.FALSE.,LOCK)
       IF (LOCK) CALL PAR_RDVAL('SIGMIN',0.,10000.,10.,' ',SIGMIN)
 C
@@ -352,7 +352,7 @@ C
 C     Get the necessary workspace - one array to hold the arc
 C     spectra, and one scratch array for IRLOCK, and one array to
 C     hold the previous spectrum (used for cross-correlation), all
-C     three NX long), and one array for the polynomial fits, NY*11 
+C     three NX long), and one array for the polynomial fits, NY*11
 C     long, in double precision.
 C
       CALL DSA_GET_WORK_ARRAY (11*NY,'DOUBLE',CPTR,WSLOT,STATUS)
@@ -390,7 +390,7 @@ C
          IF (FIRST) THEN
 C
 C           First time through, look for extra lines to use to lock the fit
-C           if required, and copy search line list (CHANS) into work line 
+C           if required, and copy search line list (CHANS) into work line
 C           list (CHANSO).
 C
             IF (LOCK) THEN
@@ -556,7 +556,7 @@ C                   Then one record for each line, giving channel
 C                   number, wavelength, calculated wavelength and
 C                   wavelength discrepancy.  (4F13.4)
 C                   Then one blank record, then a record giving the RMS
-C                   error and the value of SIGMA used 
+C                   error and the value of SIGMA used
 C                   (12X,F10.2,19X,F5.2).
 C                   Then one blank record, then one record giving the
 C                   order of fit (ie 1 less than number of coefficients)
@@ -593,7 +593,7 @@ C
             NLID=NLMAX
          END IF
          DO NFILE=1,NLID
-            READ (IN,'(2F13.4)',IOSTAT=STATUS) 
+            READ (IN,'(2F13.4)',IOSTAT=STATUS)
      :                                CHANS(NFILE),WAVES(NFILE)
             IF (STATUS.NE.0) GO TO 400
          END DO
@@ -621,12 +621,12 @@ C+
 C
 C     I R E F I T
 C
-C     IARC utility.  Refits a spectrum, given a table of expected 
+C     IARC utility.  Refits a spectrum, given a table of expected
 C     arc line channel numbers, to produce a new table of
 C     channel numbers for each line.  The program looks for a centroid
 C     in the data for each line in the table, and uses the new center
 C     if it finds one.  The search is performed twice, once with a
-C     larger sigma - in order to stand more chance of catching the 
+C     larger sigma - in order to stand more chance of catching the
 C     lines - then with the original sigma - to refine the centering.
 C     This feature can be disabled.
 C
@@ -655,7 +655,7 @@ C     GEN_CENTROID (GEN_package) Finds peak center by convolution with
 C                                derivitave of a gaussian.
 C
 C                                                KS / CIT 18th June 1984
-C     Modified:  
+C     Modified:
 C
 C     29th Aug 1985  KS / AAO.  SPREAD parameter introduced.
 C     23rd May 2002  ACD / UoE. CHANPK parameter array introduced.
@@ -716,7 +716,7 @@ C     creates the X and Y arrays ready for the polynomial fit.  If a
 C     line is not found in a search, the old value is used.  However, if
 C     a line is not found a given number of times in succession (the
 C     GAP value), it is dropped from the lists.
-C     
+C
 C     Parameters -  (">" input, "<" output, "!" modified)
 C
 C     (>) NLID     (Integer) The original number of lines identified -
@@ -748,7 +748,7 @@ C                  fit.
 C
 C     Common variables used - None
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     ICH_ENCODE   (ICH_ package) Encode number into character string
 C     GEN_NTH      (GEN_   "    ) Get abbreviation (st,nd,rd,th) for #
@@ -1023,7 +1023,7 @@ C     (>) FILE   (Character) The name of the result file.
 C     (>) IMAGE  (Character) The name of the image used for the fit
 C     (>) NX     (Integer) The number of pixels in each row of the image
 C     (>) NY     (Integer) The number of rows in the image
-C     (>) CARRAY (Double precision CARRAY(11,NY)) The coefficients for 
+C     (>) CARRAY (Double precision CARRAY(11,NY)) The coefficients for
 C                the fits for each row.
 C     (>) NLID   (Integer) The number of lines in the original fit
 C     (>) ORDER  (Integer) The order for the original fit
@@ -1034,7 +1034,7 @@ C                error writing to the IARC.LIS file.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used -  
+C     Subroutines / functions used -
 C
 C     ICH_LEN      (ICH_ package) Position of last non-blank char.
 C     DSA_GET_LU   (VMS standard) Get logical unit number from pool
@@ -1064,7 +1064,7 @@ C     Functions
 C
       INTEGER ICH_LEN
 C
-C     Local variables 
+C     Local variables
 C
       LOGICAL FOPEN
       INTEGER I, IGNORE, IY, NSTAT, OUTPUT
@@ -1092,7 +1092,7 @@ C
       CALL PAR_WRUSER('Summary of Image Arc Fit Results - ',NSTAT)
       CALL PAR_WRUSER('-----------------------------------',NSTAT)
       CALL PAR_WRUSER(' ',NSTAT)
-      WRITE (OUTPUT,'(2A)',IOSTAT=STATUS) 
+      WRITE (OUTPUT,'(2A)',IOSTAT=STATUS)
      :                 '2D fit to data in image ',IMAGE
       WRITE (STRING,'(A,I5,A,I5)',IOSTAT=IGNORE)
      :                     'Image dimensions ',NX,' by ',NY
@@ -1271,7 +1271,7 @@ C
 C     I R S H I F T
 C
 C     Compares a spectrum with the previous spectrum to determine
-C     a relative shift between them and apply this to the channel 
+C     a relative shift between them and apply this to the channel
 C     numbers of the lines identified so far.
 C
 C     Parameters -   (">" input, "!" modified, "W" workspace)
@@ -1326,4 +1326,4 @@ C
          END DO
       END IF
 C
-      END 
+      END

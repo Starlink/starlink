@@ -1,6 +1,6 @@
 proc red4Int {taskname action} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -24,7 +24,7 @@ proc red4Int {taskname action} {
     set Red4Widgets(AI_LABEL) [label $frame.lb -text "Filename"]
     set Red4Widgets(AI_ENTRY) [entry $frame.en -width 40]
     pack $Red4Widgets(AI_LABEL) $Red4Widgets(AI_ENTRY) -in $frame -side left
-    $Red4Widgets(AI_ENTRY) insert end $Red4Widgets(IN) 
+    $Red4Widgets(AI_ENTRY) insert end $Red4Widgets(IN)
 
 #  Bind defaults key as help has already been done
     bind $Red4Widgets(AI_LABEL) <Button-2> "red4Update red4Int ALL"

@@ -21,7 +21,7 @@
 *    Authors :
 *     Alan Wood (STADAT::ARW) Esther Gershuny (RLVAD::EJG)
 *    History :
-*     4-Feb-1992: Original 
+*     4-Feb-1992: Original
 *    Type definitions :
       implicit none
 *    Global constants :
@@ -39,7 +39,7 @@
 *    Status :
       integer status
 *    Global variables :
-      include 'chiwrk_cmn'    
+      include 'chiwrk_cmn'
 *    External:
       integer chr_len
 *    Local variables :
@@ -94,7 +94,7 @@
       l2 = chr_len(ctest)
       Wcval(1) = ctest(:l2)
       l2 = chr_len(Wcval(1))
-* 
+*
 *
 3000  continue
       return

@@ -1,22 +1,22 @@
       SUBROUTINE SSTRIP(STRING)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  S S T R I P
 C
 C
 C Author: Ian Howath
 C
-C Parameters: 
+C Parameters:
 C
 C STRING (><)
 C
-C History: 
-C  
-C 
+C History:
 C
-C  
+C
+C
+C
 C
 C Subroutine to strip leading spaces from a character string
 C

@@ -80,16 +80,16 @@
 *        so cannot be propagated.
 *        -  HISTORY is not propagated.
 *        -  UNITS is written to descriptor BUNITS.
-*        -  The number of dimensions of the data array is written 
-*        to the BDF descriptor NAXIS, and the actual dimensions to 
+*        -  The number of dimensions of the data array is written
+*        to the BDF descriptor NAXIS, and the actual dimensions to
 *        NAXIS1, NAXIS2 etc. as appropriate.
 *        -  If the NDF contains any linear axis structures the
 *        information necessary to generate these structures is written
 *        to the BDF descriptors (except when there is a non-zero value
 *        of CROTAn in the FITS extension).  For example, if a linear
-*        AXIS(1) structure exists in the input NDF the value of the 
+*        AXIS(1) structure exists in the input NDF the value of the
 *        first data point is stored in the BDF descriptor CRVAL1,
-*        and the incremental value between successive axis data is 
+*        and the incremental value between successive axis data is
 *        stored in CDELT1. If there is an axis label it is written to
 *        descriptor CRTYPE1, and axis unit is written to CTYPE1.
 *        (Similarly for AXIS(2) structures etc.) FITS does not have a
@@ -97,13 +97,13 @@
 *        NDF components will not be propagated.  Non-linear axis data
 *        arrays cannot be represented by CRVALn and CDELTn, and must be
 *        ignored.
-*        -  If the input NDF contains TITLE and LABEL components these 
+*        -  If the input NDF contains TITLE and LABEL components these
 *        are stored in the BDF descriptors TITLE and LABEL.
-*        -  If the input NDF contains a FITS extension, the FITS items 
-*        may be written to the BDF descriptors, with the following 
+*        -  If the input NDF contains a FITS extension, the FITS items
+*        may be written to the BDF descriptors, with the following
 *        exceptions:
-*           o  NAXIS, and NAXISn are derived from the dimensions of 
-*           the NDF data array as described above, so these items 
+*           o  NAXIS, and NAXISn are derived from the dimensions of
+*           the NDF data array as described above, so these items
 *           are not copied from the NDF FITS extension.
 *           o  The TITLE, LABEL, and BUNITS descriptors are only copied
 *           if no TITLE, LABEL, and UNITS NDF components have already
@@ -135,7 +135,7 @@
 *     -  Create and map the required data into VM using the old-style
 *     routine WRDATA.
 *     -  Copy the data from old-style to new-style VM.
-*     -  Establish the values for the FITS-like descriptors NAXIS, 
+*     -  Establish the values for the FITS-like descriptors NAXIS,
 *     NAXISn, CDELTn, CRVALn, CRTYPEn, CTYPEn, BUNITS, TITLE and LABEL
 *     from the NDF standard items if possible. These are copied into
 *     the appropriate BDF FITS descriptors.
@@ -229,7 +229,7 @@
       INCLUDE 'FIO_PAR'              ! FIO_ constants
       INCLUDE 'CNF_PAR'              ! For CNF_PVAL function
 
-*  Status:                  
+*  Status:
       INTEGER STATUS                 ! Global status
 
 *  External References:
@@ -261,7 +261,7 @@
       CHARACTER CMDFIL*(FIO__SZFNM) ! Command filename
       LOGICAL   CMPFND( NFLAGS )    ! True if certain special NDF
                                     ! components are present
-      CHARACTER COMAND*(80)         ! RUNSTAR-type command line 
+      CHARACTER COMAND*(80)         ! RUNSTAR-type command line
       CHARACTER CONECT*(FIO__SZFNM) ! Connection filename
       CHARACTER CRPIX*(SZDESC)      ! Descriptor name of CRPIXn
       CHARACTER CRVAL*(SZDESC)      ! Descriptor name of CRVALn
@@ -270,13 +270,13 @@
       CHARACTER DEFFMT*(2)          ! Default Interim data format
       LOGICAL   DESCRP              ! True if descriptors output to user
       INTEGER   DIMS(DAT__MXDIM)    ! IMAGE dimensions (axis length)
-      INTEGER   FD                  ! File descriptor 
+      INTEGER   FD                  ! File descriptor
       LOGICAL   FITSPR              ! True if FITS extension is present
       CHARACTER FITSTR*(SZFITS)     ! FITS string
       CHARACTER FORMAT*(2)          ! Interim data format required
       CHARACTER FTLOC*(DAT__SZLOC)  ! Locator to NDF FITS extension
       CHARACTER FTLOCI*(DAT__SZLOC) ! Locator to NDF FITS extension
-      CHARACTER HDSTYP*(DAT__SZTYP) ! HDS type data type 
+      CHARACTER HDSTYP*(DAT__SZTYP) ! HDS type data type
       INTEGER   I                   ! Loop variable
       INTEGER   IMAGEP              ! Pointer to BDF data
       REAL      INCREM              ! Incremental value for axis array
@@ -347,7 +347,7 @@
 
 *   Map the input data-array component in the format required for
 *   the output BDF.
-      CALL NDF_MAP( NDF, 'Data', HDSTYP, 'READ', POINTR, NITEM, 
+      CALL NDF_MAP( NDF, 'Data', HDSTYP, 'READ', POINTR, NITEM,
      :              STATUS )
 
 *   Create Interim-like files and point logicals to them.
@@ -399,7 +399,7 @@
 *   Get the name of the BDF file.
       CALL PAR_GET0C ('OUT', BDFILE, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 996
-            
+
 *   Construct RUNSTAR-like command line.
       COMAND = 'NDF2BDF/IMAGE='
       NCHAR = CHR_LEN (COMAND)
@@ -410,7 +410,7 @@
 *   Get name of the command file to hold this command line.
       CALL PAR_GET0C ('COMMAND', CMDFIL, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 996
-    
+
 *   Create the temporary command file.
       CALL FIO_OPEN (CMDFIL, 'WRITE', 'LIST', 80, FD, STATUS)
       IF (STATUS .NE. SAI__OK) THEN
@@ -435,7 +435,7 @@
      :                STATUS)
          IF (STATUS .EQ. SAI__OK) STATUS = ISTAT
       END IF
-      
+
       IF (STATUS.NE.SAI__OK) GO TO 996
 
 *   Create a logical name to point to Interim command file.
@@ -462,7 +462,7 @@
 
 
 *   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-*   
+*
 *   Now the various descriptors are written to the BDF.
 *   ===================================================
 
@@ -495,7 +495,7 @@
 
 *   Deal with the FITS extension if it is present.
 *   ==============================================
-*   
+*
       ELSE
 
 *      Each item is copied to a BDF descriptor except:
@@ -620,7 +620,7 @@
 *      Check that the mandatory headers have been written.  They might
 *      not have been created because the FITS extension only includes
 *      standard FITS keywords, such as the mandatory descriptors.
-         IF ( .NOT. STDDSR ) 
+         IF ( .NOT. STDDSR )
      :     CALL CON_SPDES( NDF, 'IMAGE', DESCRP, NFLAGS, CMPFND,
      :     STATUS )
 
@@ -661,9 +661,9 @@
                   END IF
                END DO
             END IF
-         END DO      
+         END DO
       END IF
-           
+
 *   Closedown.
 *   ==========
 
@@ -672,7 +672,7 @@
       IF (WRSTAT .NE. 0) THEN
          CALL MSG_SETC('DESCR', DESCR)
          STATUS = WRSTAT
-         CALL ERR_REP('NDF2BDF_WRERR', 
+         CALL ERR_REP('NDF2BDF_WRERR',
      :                'Error copying descriptor ^DESCR', STATUS)
       END IF
 

@@ -61,7 +61,7 @@ proc gwm_printDialog {w gwm c} {
     radiobutton $w.top.l.inkjet -text "HP Inkjet" -relief flat \
 	-variable gwm_priv($w,print_format) -value HPinkjet -anchor w -width 20
     pack $w.top.l.label $w.top.l.ps $w.top.l.colour_ps $w.top.l.eps \
-	$w.top.l.colour_eps $w.top.l.inkjet -side top 
+	$w.top.l.colour_eps $w.top.l.inkjet -side top
 
 # Create a label, radio buttons for selecting the back ground colour and
 # an entry widget for entering a colour name.
@@ -71,23 +71,23 @@ proc gwm_printDialog {w gwm c} {
       radiobutton $w.top.r.bcol -text "Colour:" -relief flat \
 	-variable gwm_priv($w,background_opt) -value colour -anchor w
       entry $w.top.r.bname -relief sunken -bd 2 -width 15
-    pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname -side top 
+    pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname -side top
 
 # Initialise the entry widget.
     $w.top.r.bname insert 0 $gwm_priv($w,print_background)
 
 # Pack a label and an entry widget for entering a file name into the middle frame.
     pack [frame $w.file.t] [frame $w.file.m] [frame $w.file.b]
-    label $w.file.t.wlab -fg blue -text "Output Options:" 
+    label $w.file.t.wlab -fg blue -text "Output Options:"
     pack $w.file.t.wlab
 
-    radiobutton $w.file.m.pbut -text "Printer" -width 15 -relief flat -variable cgs4drXopts(PrintOption) -value printer 
-    label $w.file.m.plab -text "Command:" -width 15  
+    radiobutton $w.file.m.pbut -text "Printer" -width 15 -relief flat -variable cgs4drXopts(PrintOption) -value printer
+    label $w.file.m.plab -text "Command:" -width 15
     entry $w.file.m.pname -width 30 -relief sunken -bd 2 -textvariable cgs4drXopts(PrintCommand)
     pack $w.file.m.pbut $w.file.m.plab $w.file.m.pname -side left -anchor w
 
-    radiobutton $w.file.b.fbut -text "File" -width 15 -relief flat -variable cgs4drXopts(PrintOption) -value file 
-    label $w.file.b.flab -text "Filename:" -width 15  
+    radiobutton $w.file.b.fbut -text "File" -width 15 -relief flat -variable cgs4drXopts(PrintOption) -value file
+    label $w.file.b.flab -text "Filename:" -width 15
     entry $w.file.b.fname -width 30 -relief sunken -bd 2 -textvariable cgs4drXopts(PrintFile)
     pack $w.file.b.fbut $w.file.b.flab $w.file.b.fname -side left -anchor w
 
@@ -193,7 +193,7 @@ proc gwm_printComplete {c name elem op} {
 # elem -    ditto
 # op -      ditto
   global $name
-  
+
 # Delete ourself.
   trace vdelete $name $op "gwm_printComplete $c"
 
@@ -202,7 +202,7 @@ proc gwm_printComplete {c name elem op} {
   if {[string tolower $cgs4drXopts(PrintOption)] == "printer"} {
     catch {eval exec $cgs4drXopts(PrintCommand) $cgs4drXopts(PrintFile)} err
     tk_dialog .info "Print Status" "$err" info 0 Dismiss
-  } 
+  }
 
 # Enable the widget.
   $c configure -state normal

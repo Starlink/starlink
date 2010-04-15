@@ -37,7 +37,7 @@
 *            (the default), verbose and debug levels respectively.
 *
 *        'SZOUT' Specifies a maximum line length to be used in the line wrapping
-*            process. By default the message output by MSG is split into chunks 
+*            process. By default the message output by MSG is split into chunks
 *            of no more than the maximum line length, and each chunk is written
 *            on a new line. The split is made at word boundaries if possible.
 *            The default maximum line length is 79 characters.
@@ -45,15 +45,15 @@
 *            If VALUE is set to 0, no wrapping will occur. If it is set greater
 *            than 0, it specifies the maximum output line length.
 *
-*        'STREAM' Specifies whether or not MSG should treat its output 
+*        'STREAM' Specifies whether or not MSG should treat its output
 *            unintelligently as a stream of characters.
 *            If VALUE is set to 0 (the default) all non-printing characters are
-*            replaced by blanks, and line wrapping occurs (subject to SZOUT). 
+*            replaced by blanks, and line wrapping occurs (subject to SZOUT).
 *            If VALUE is set to 1, no cleaning or line wrapping occurs.
 *
 *        'ENVIRONMENT' This is not a true tuning parameter name but causes
-*            the environment variables associated with all the true tuning 
-*            parameters to be used if set. If the environment variable is 
+*            the environment variables associated with all the true tuning
+*            parameters to be used if set. If the environment variable is
 *            not set, the tuning parameter is not altered. The VALUE argument
 *            is not used.
 *
@@ -76,12 +76,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

@@ -14,7 +14,7 @@
 *
 *  Description:
 *     This routine takes two real values giving X and Y coordinates
-*     in an NDF's Base coordinate frame and returns strings 
+*     in an NDF's Base coordinate frame and returns strings
 *     representing them transformed into the Current frame.
 *
 *  Arguments:
@@ -40,9 +40,9 @@
 *     keeps things tidy, but it means that the extraction of the WCS
 *     component from the NDF and of the mapping from the WCS component
 *     may have to be done multiple times, while if it were done in
-*     the calling routine it need only be done once.  However, the 
+*     the calling routine it need only be done once.  However, the
 *     time taken as a proportion of the overall running time for any
-*     current ESP application is always(?) going to be negligable, 
+*     current ESP application is always(?) going to be negligable,
 *     so this trade-off was judged worthwhile.
 *
 *  Authors:
@@ -99,7 +99,7 @@
 
 *   Get the mapping between the Current frame and the Base frame.
 *   The Base frame of a WCS component is the one in the GRID domain,
-*   which has values of unity in the centre of the first pixel 
+*   which has values of unity in the centre of the first pixel
 *   stored.
       CMAP=AST_GETMAPPING(IWCS,AST__CURRENT,AST__BASE,STATUS)
 

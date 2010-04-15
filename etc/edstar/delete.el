@@ -62,7 +62,7 @@ Notes:
 	 (insert " ")))
 
 ;;; Copy the character before point to the "c" register.
-   (copy-to-register ?c (- (point) 1) (point) t)     
+   (copy-to-register ?c (- (point) 1) (point) t)
 
 ;;; Record that the character was deleted in the reverse direction.
    (setq edstar-char-was-deleted-forward nil)))

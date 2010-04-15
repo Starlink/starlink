@@ -20,9 +20,9 @@
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters
 *     tausrc = smf_tausrc* (Returned)
-*        Source of optical depth data 
+*        Source of optical depth data
 *     extmeth = smf_extmeth* (Returned)
-*        Method to use for airmass calculation 
+*        Method to use for airmass calculation
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -34,7 +34,7 @@
 *      further descriptions of tausrc and extmeth see documentation
 *      for the EXTINCTION task. If a key cannot be located, the relevant
 *      NULL values are returned for the two enumerated types.
-*     
+*
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -107,7 +107,7 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
 
   if( tausrc ) {
     if( astMapGet0C( keymap, "TAUSRC", &tempstr ) ) {
-      
+
       switch( toupper(tempstr[0]) ) {
       case 'A':
         *tausrc = SMF__TAUSRC_AUTO;
@@ -143,9 +143,9 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
         break;
       default:
         *extmeth = SMF__EXTMETH_NONE;
-      } 
+      }
     } else {
       *extmeth = SMF__EXTMETH_NONE;
     }
-  }  
+  }
 }

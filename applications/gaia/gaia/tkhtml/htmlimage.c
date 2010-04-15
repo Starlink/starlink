@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -165,7 +165,7 @@ HtmlImage *HtmlGetImage(HtmlWidget *htmlPtr, HtmlElement *p){
   zWidth = HtmlMarkupArg(p, "width", "");
   zHeight = HtmlMarkupArg(p, "height", "");
   for(pImage=htmlPtr->imageList; pImage; pImage=pImage->pNext){
-    if( strcmp(pImage->zUrl,zSrc)==0 
+    if( strcmp(pImage->zUrl,zSrc)==0
     &&  strcmp(pImage->zWidth, zWidth)==0
     &&  strcmp(pImage->zHeight, zHeight)==0 ){
       HtmlFree(zSrc);

@@ -23,9 +23,9 @@
 *     This application allows you to select a new current picture in
 *     the graphics database using the cursor. Each time a position is
 *     selected (usually by pressing a button on the mouse), details of
-*     the topmost picture in the AGI database which encompasses that 
+*     the topmost picture in the AGI database which encompasses that
 *     position are displayed, together with the cursor position (in
-*     millimetres from the bottom left corner of the graphics device). 
+*     millimetres from the bottom left corner of the graphics device).
 *     On exit the last picture selected becomes the current picture.
 
 *  Usage:
@@ -36,29 +36,29 @@
 *        The graphics workstation. [The current graphics device]
 *     NAME = LITERAL (Read)
 *        Only pictures of this name are to be selected.  For instance, if
-*        you want to select a DATA picture which is covered by a 
+*        you want to select a DATA picture which is covered by a
 *        transparent FRAME picture, then you could specify NAME=DATA.
-*        A null (!) or blank string means that pictures of all names may 
+*        A null (!) or blank string means that pictures of all names may
 *        be selected. [!]
 *     SINGLE = _LOGICAL (Read)
 *        If TRUE then the user can supply only one position using the
 *        cursor, where-upon the application immediately exits, leaving
-*        the selected picture as the current picture. If FALSE is supplied, 
+*        the selected picture as the current picture. If FALSE is supplied,
 *        then the user can supply multiple positions. Once all positions
 *        have been supplied, a button is pressed to indicate that no more
 *        positions are required. [FALSE]
 
 *  Examples:
 *     piccur
-*        This selects a picture on the current graphics device by use of 
-*        the cursor.  The picture containing the last-selected point becomes 
+*        This selects a picture on the current graphics device by use of
+*        the cursor.  The picture containing the last-selected point becomes
 *        the current picture.
 *     piccur name=data
 *        This is like the previous example, but only DATA pictures can be
-*        selected. 
+*        selected.
 
 *  Notes:
-*     -  Nothing is displayed on the screen when the message filter 
+*     -  Nothing is displayed on the screen when the message filter
 *     environment variable MSG_FILTER is set to QUIET.
 
 *  Related Applications:
@@ -68,7 +68,7 @@
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -142,8 +142,8 @@
       INTEGER IPIC2              ! AGI id for new picture
       INTEGER IPICB              ! BASE picture identifier
       INTEGER IPLOTB             ! Plot for BASE picture
-      INTEGER NACT               ! No. of cursor actions 
-      INTEGER NPNT               ! No. of cursor positions supplied 
+      INTEGER NACT               ! No. of cursor actions
+      INTEGER NPNT               ! No. of cursor positions supplied
       LOGICAL INFO               ! Display mouse instructions?
       LOGICAL LOOP               ! Continue to get a new cursor position?
       LOGICAL QUIET              ! Run quietly?
@@ -170,7 +170,7 @@
       QUIET = .NOT. MSG_FLEVOK( MSG__NORM, STATUS )
 
 *  Get the NAME parameter.  A null value is made equivalent to a blank
-*  string, i.e. all pictures of any name may be selected.  
+*  string, i.e. all pictures of any name may be selected.
       CALL PAR_GET0C( 'NAME', NAME, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -181,17 +181,17 @@
 *  identifier for the current AGI picture.
       CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC0, STATUS )
 
-*  Get the the AGI identifier and AST Plot associated with the BASE picture. 
+*  Get the the AGI identifier and AST Plot associated with the BASE picture.
 *  The Base Frame in this Plot is GRAPHICS co-ordinates (millimetres from
 *  the bottom left corner of the view surface), and the Current Frame is
-*  AGI world co-ordinates in the BASE picture. The PGPLOT viewport is set 
+*  AGI world co-ordinates in the BASE picture. The PGPLOT viewport is set
 *  to match the BASE picture and PGPLOT world co-ordinates within the
 *  viewport are GRAPHICS co-ordinates. The BASE picture becomes the
 *  current picture in KPG1_GDGET.
       CALL AGI_IBASE( IPICB, STATUS )
       CALL KPG1_GDGET( IPICB, AST__NULL, .FALSE., IPLOTB, STATUS )
 
-*  Get the Mapping from GRAPHICS co-ordinates to AGI world co-ordinates in 
+*  Get the Mapping from GRAPHICS co-ordinates to AGI world co-ordinates in
 *  the BASE picture.
       BMAP = AST_GETMAPPING( IPLOTB, AST__BASE, AST__CURRENT, STATUS )
 
@@ -202,8 +202,8 @@
       YC = 0.5*( Y1 + Y2 )
 
 *  Store the instructions for the allowed actions. Also store the keys
-*  which must be pressed to activate the corresponding action. 
-      IF( SINGLE ) THEN 
+*  which must be pressed to activate the corresponding action.
+      IF( SINGLE ) THEN
          NACT = 1
          KEYS = ' '
          AMES( 1 ) = 'select a picture,'
@@ -225,20 +225,20 @@
       INFO = ( .NOT. QUIET )
       DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
-*  Get a position using the cursor, in PGPLOT world co-ordinates. This 
-*  corresponds to the GRAPHICS Frame of the current Plot (i.e. millimetres 
-*  from the bottom left corner of the view surface). The positions which 
-*  may be selected are unrestricted and may be given anywhere on the 
+*  Get a position using the cursor, in PGPLOT world co-ordinates. This
+*  corresponds to the GRAPHICS Frame of the current Plot (i.e. millimetres
+*  from the bottom left corner of the view surface). The positions which
+*  may be selected are unrestricted and may be given anywhere on the
 *  view surface.
-         CALL KPG1_PGCUR( INFO, PURP, NACT, AMES, KEYS( : NACT ), 0.0, 
+         CALL KPG1_PGCUR( INFO, PURP, NACT, AMES, KEYS( : NACT ), 0.0,
      :                    0.0, 0.0, 0.0, EXACT, XC, YC, 1, 0, 0,
      :                    0, -32, AST__NULL, XC, YC, ACT, NPNT, STATUS )
 
-*  Indicate that instructions on the use of the mouse should not be 
+*  Indicate that instructions on the use of the mouse should not be
 *  displayed again.
          INFO = .FALSE.
 
-*  If the third action ("quit retaining new picture") was performed, 
+*  If the third action ("quit retaining new picture") was performed,
 *  just leave the loop.
          IF( NPNT .EQ. 0 ) THEN
             LOOP = .FALSE.
@@ -272,8 +272,8 @@
 
 *  Transform the cursor position from GRAPHICS co-ordinates into the AGI
 *  world co-ordinate system of the BASE picture.
-            CALL AST_TRAN2( BMAP, 1, DBLE( XC ), DBLE( YC ), .TRUE., 
-     :                      XB, YB, STATUS ) 
+            CALL AST_TRAN2( BMAP, 1, DBLE( XC ), DBLE( YC ), .TRUE.,
+     :                      XB, YB, STATUS )
 
 *  Ensure the Base picture is the current picture.
             CALL AGI_SELP( IPICB, STATUS )
@@ -321,12 +321,12 @@
 *  Display this line.
                CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
 
-            END IF   
+            END IF
 
 *  If we are in singkle mode, leave the loop.
             IF( SINGLE ) LOOP = .FALSE.
 
-*  If the second action ("quit retaining original picture") was performed, 
+*  If the second action ("quit retaining original picture") was performed,
 *  re-instate the original picture.
          ELSE IF( ACT .EQ. 2 ) THEN
             CALL AGI_SELP( IPIC0, STATUS )

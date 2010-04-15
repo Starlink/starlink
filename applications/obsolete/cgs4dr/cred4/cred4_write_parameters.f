@@ -3,7 +3,7 @@
 *    Description :
 *     This routine writes the information stored in variables in the
 *     common block to the CRED4 parameters.
-*     It may be used to update the values of those parameters, but 
+*     It may be used to update the values of those parameters, but
 *     should not be used while data reduction is in progress.
 *    Invocation :
 *     CALL CRED4_WRITE_PARAMETERS( STATUS )
@@ -33,7 +33,7 @@
 *      2-Feb-1991: ADD_IN_PAIRS and ERRORS parameters added,
 *                  so that OBJECT and SKY observations can be
 *                  added together in pairs. It has been discovered
-*                  that the only way to sky-subtract reliably 
+*                  that the only way to sky-subtract reliably
 *                  is to add pairs in this way.                 (UKIRT::SMB)
 *     27-Jun-1991: Add point_source_options                     (UKIRT::PND)
 *     31-Jul-1991: BOXSIZE parameter added.                     (SMB)
@@ -46,7 +46,7 @@
 *     11-Feb-1993: Conform to error strategy                    (PND)
 *     22-Mar-1994: Add extract spc                              (PND,KLK)
 *     24-May-1994: Add bright and faint source algorithm        (PND)
-*     30-Aug-1994: Ported to Unix                               (PND) 
+*     30-Aug-1994: Ported to Unix                               (PND)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE

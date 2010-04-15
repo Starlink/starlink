@@ -1,6 +1,6 @@
-      SUBROUTINE JCMT_BEAM2RADEC (CENTRE_CRD, EPOCH, RACEN, 
-     :   DECCEN, LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY, 
-     :   XOFF, YOFF, LST, CHOP_CRD, CHOP_X, CHOP_Y, RA, DEC, 
+      SUBROUTINE JCMT_BEAM2RADEC (CENTRE_CRD, EPOCH, RACEN,
+     :   DECCEN, LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY,
+     :   XOFF, YOFF, LST, CHOP_CRD, CHOP_X, CHOP_Y, RA, DEC,
      :   COORD_SYSTEM, STATUS)
 *+
 *  Name:
@@ -14,9 +14,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_BEAM2RADEC (CENTRE_CRD, EPOCH, RACEN, 
-*    :   DECCEN, LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY, 
-*    :   XOFF, YOFF, LST, CHOP_CRD, CHOP_X, CHOP_Y, RA, DEC, 
+*     CALL JCMT_BEAM2RADEC (CENTRE_CRD, EPOCH, RACEN,
+*    :   DECCEN, LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY,
+*    :   XOFF, YOFF, LST, CHOP_CRD, CHOP_X, CHOP_Y, RA, DEC,
 *    :   COORD_SYSTEM, STATUS)
 
 *  Description:
@@ -31,24 +31,24 @@
 *   values:-
 *     In each case the offset of the pixel is transformed to be relative to
 *     axes parallel to the `local' axes, but with the the x-axis in all
-*     cases increasing to the left of the map. The offsets are converted to 
+*     cases increasing to the left of the map. The offsets are converted to
 *     radians.
 *
 *     For RA/Dec local systems:-
 *       If the chopper coordinate system is the same as the local, then
 *       the beam offset is added to the pixel offset and the RA, dec of the
-*       beam calculated by the SLA_DTP2S routine which converts tangent plane 
-*       offsets to RA, Dec. The RA, dec is precessed to the epoch of the 
+*       beam calculated by the SLA_DTP2S routine which converts tangent plane
+*       offsets to RA, Dec. The RA, dec is precessed to the epoch of the
 *       observation.
 *       If the chopper coord system is in AZ then the RA, dec of the pixel
 *       offset are calculated and precessed to the epoch of the observation.
 *       The az,alt of the pixel are calculated and the az,alt of the beam
-*       position calculated by another call to SLA_DTP2S. Finally the 
+*       position calculated by another call to SLA_DTP2S. Finally the
 *       az,alt of the beam are transformed back to RA, dec.
 *
 *     For alt-az local systems:-
-*       The alt,az of the map centre at this LST is calculated and SLA_DTP2S 
-*       used to calculate the alt,az of the beam. This is then converted back 
+*       The alt,az of the map centre at this LST is calculated and SLA_DTP2S
+*       used to calculate the alt,az of the beam. This is then converted back
 *       into an RA,Dec.
 *
 *  Arguments:
@@ -115,7 +115,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -197,8 +197,8 @@
       MJDTEMP = SLA_EPB2D (BEPOCH)
       JEPOCH = SLA_EPJ (MJDTEMP)
 
-*  The map centre coords are always B1950. Convert them to the same system 
-*  as the local offsets. If the local offsets are in AZ then just precess 
+*  The map centre coords are always B1950. Convert them to the same system
+*  as the local offsets. If the local offsets are in AZ then just precess
 *  the coordinates to the current epoch.
 
       IF (LOCAL_CRD .EQ. 'RB') THEN
@@ -216,7 +216,7 @@
 
          CALL SLA_PRECES ('FK4', BEPOCH, 1950.0D0, RACEN_LOC,
      :      DECCEN_LOC)
-         CALL SLA_FK45Z (RACEN_LOC, DECCEN_LOC, 1950.0D0, 
+         CALL SLA_FK45Z (RACEN_LOC, DECCEN_LOC, 1950.0D0,
      :      RACEN_LOC, DECCEN_LOC)
 
       ELSE IF (LOCAL_CRD .EQ. 'RD') THEN
@@ -239,7 +239,7 @@
 
       END IF
 
-  
+
 *  loop over the map pixels
 
       DO IY = 1, NY
@@ -274,17 +274,17 @@
 
                   X = X - CHOP_X * DAS2R
                   Y = Y + CHOP_Y * DAS2R
-                  CALL SLA_DTP2S (X, Y, RACEN_LOC, 
+                  CALL SLA_DTP2S (X, Y, RACEN_LOC,
      :               DECCEN_LOC, RA(IX,IY), DEC(IX,IY))
 
 *  precess to current epoch
 
-                  CALL SLA_PRECES ('FK4', 1950.0D0, BCURRENT, 
+                  CALL SLA_PRECES ('FK4', 1950.0D0, BCURRENT,
      :               RA(IX,IY), DEC(IX,IY))
 
                ELSE IF (CHOP_CRD .EQ. 'AZ') THEN
 
-*  calculate RA, Dec of telescope position and precess it to the observation 
+*  calculate RA, Dec of telescope position and precess it to the observation
 *  epoch
 
                   CALL SLA_DTP2S (X, Y, RACEN_LOC, DECCEN_LOC,
@@ -311,7 +311,7 @@
 
 *  now calculate the apparent az, el of the beam
 
-                  CALL SLA_DTP2S (-CHOP_X*DAS2R, CHOP_Y*DAS2R, 
+                  CALL SLA_DTP2S (-CHOP_X*DAS2R, CHOP_Y*DAS2R,
      :               AZ, ALT, AZ_BEAM, ALT_BEAM)
 
 *  convert this back to RA, dec
@@ -339,9 +339,9 @@
 
                   X = X - CHOP_X * DAS2R
                   Y = Y + CHOP_Y * DAS2R
-                  CALL SLA_DTP2S (X, Y, RACEN_LOC, 
+                  CALL SLA_DTP2S (X, Y, RACEN_LOC,
      :               DECCEN_LOC, RA(IX,IY), DEC(IX,IY))
-                  CALL SLA_PRECES ('FK5', 2000.0D0, JCURRENT, 
+                  CALL SLA_PRECES ('FK5', 2000.0D0, JCURRENT,
      :               RA(IX,IY), DEC(IX,IY))
 
                ELSE IF (CHOP_CRD .EQ. 'AZ') THEN
@@ -369,7 +369,7 @@
 
 *  now calculate the apparent az, el of the beam
 
-                  CALL SLA_DTP2S (-CHOP_X*DAS2R, CHOP_Y*DAS2R, 
+                  CALL SLA_DTP2S (-CHOP_X*DAS2R, CHOP_Y*DAS2R,
      :               AZ, ALT, AZ_BEAM, ALT_BEAM)
 
 *  convert this back to RA, dec
@@ -397,10 +397,10 @@
                ELSE
                   COORD_SYSTEM = 'FK5'
                END IF
-   
+
 *  calculate az, el of map centre at this LST, az measured from N to W so
 *  that it increases to left of map, like RA, as expected by SLA_DTP2S
-  
+
                HA = LST (IX,IY) - RACEN_LOC
                COSZ = SIN(DECCEN_LOC) * SIN(LAT) +
      :            COS(DECCEN_LOC) * COS (LAT) * COS (HA)

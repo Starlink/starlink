@@ -99,7 +99,7 @@ proc mos2 im1 im2
     send plt2d set magnification 0
   end if
   obeyw plt2d clear
-  obeyw plt2d nsigma mos2 
+  obeyw plt2d nsigma mos2
   obeyw plt2d comment 'Mosaiced Image' (workxcen) (possy) 15
 end proc
 

@@ -74,12 +74,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -210,7 +210,7 @@
      :       'Error obtaining the current zone when trying to define '/
      :       /'the frame zone.', STATUS )
          END IF
-      
+
 *    Test the values of the input parameters.
 
       ELSE IF ( ASP .LT. VAL__SMLR .OR. ( KEY .AND.
@@ -304,10 +304,10 @@
 
 *          Now for the oblate-picture case.
 
-               ELSE 
+               ELSE
 
 *                Define the frame to the bottom left, first creating a
-*                temporary zone allowing space for the key.  
+*                temporary zone allowing space for the key.
 
                   CALL SGS_ZSHAP( ASPPIC - ASPKEY, 'BL', ZONET, STATUS )
                   CALL SGS_ZSHAP( ASP, 'BL', ZONEF, STATUS )
@@ -331,7 +331,7 @@
          END IF
 
 *       Re-instate the current zone.
-      
+
          CALL SGS_SELZ( ZONEC, STATUS )
 
 *       Inquire whether GKS/SGS has reported an error.

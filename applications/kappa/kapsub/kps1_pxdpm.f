@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine stores bad values in the supplied array, except for the
-*     pixel with indices given by IMASK, which is set to 1. 
+*     pixel with indices given by IMASK, which is set to 1.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -64,8 +64,8 @@
 *  Type Definitions:
       IMPLICIT NONE            ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'        ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE parameters
       INCLUDE 'PRM_PAR'        ! VAL__ constants
 
 *  Arguments Given:
@@ -92,7 +92,7 @@
       DO I = 1, EL
          MASK( I ) = VAL__BADR
       END DO
-      
+
 *  Find the vector index of the pixel with indices given by IMASK.
       IV = IMASK( NDIM ) - 1
       DO I = NDIM - 1, 1, -1

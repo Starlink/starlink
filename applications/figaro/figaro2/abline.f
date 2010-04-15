@@ -5,7 +5,7 @@ C
 C     This routine does interactive analysis of absorption lines in
 C     spectra.
 C
-C     The user designates a segment of the input spectrum to 
+C     The user designates a segment of the input spectrum to
 C     be analysed in each pass.  First a continuum is fitted to this
 C     region, using only wavelength subsegments selected graphically
 C     by the user (ie. ignoring the absorption line in question and any
@@ -20,12 +20,12 @@ C     containing the line itself: the median wavelength and equivalent
 C     width of the absorption line are calculated.
 C
 C     The routine finishes up each segment with a hard copy plot showing
-C     the data, continuum and wavelength limits of the line, with a 
+C     the data, continuum and wavelength limits of the line, with a
 C     printout of results.
 C
 C     Command line parameters -
 C
-C     SPECTRUM    Name of the file containing the spectrum with 
+C     SPECTRUM    Name of the file containing the spectrum with
 C                 lines to be fitted
 C     CONTIN      File containing precomputed continuum, if one is
 C                 to be used.
@@ -44,7 +44,7 @@ C     Command keywords -
 C
 C     OLDCONT     Set if a precomputed continuum is to be used.
 C     LIMIT       LIMIT is set if the limits of a line are to be
-C                 taken as the limits indicated with the cursor.  
+C                 taken as the limits indicated with the cursor.
 C                 Otherwise, the program will look for the points
 C                 within the indicated limits where the data drops
 C                 below the continuum.
@@ -56,7 +56,7 @@ C     User variables -  (">" input, "<" output)
 C
 C     (>) SOFT    (Character) Device/type for soft plots
 C     (>) HARD    (Character)   "     "    "  hard  "
-C     (<) TVXST   (Numeric)  ) 
+C     (<) TVXST   (Numeric)  )
 C     (<) TVXEN   (Numeric)  ) Used to set the soft plot
 C     (<) TVHIGH  (Numeric)  ) parameters so that
 C     (<) TVLOW   (Numeric)  ) routines such as CCUR
@@ -64,8 +64,8 @@ C     (<) XSTART  (Numeric)  ) know what the display
 C     (<) XEND    (Numeric)  ) limits for the currently
 C     (<) HIGH    (Numeric)  ) displayed plot have
 C     (<) LOW     (Numeric)  ) been set to.
-C     (<) TVFILE  (Character)) 
-C     (<) TVCOLOR (Numeric)  ) 
+C     (<) TVFILE  (Character))
+C     (<) TVCOLOR (Numeric)  )
 C                                                    JGR   Jan 1985
 C     Modified:
 C
@@ -121,7 +121,7 @@ C
      :SUM,XMED,WLAM,XRANGL(2),XRANGH(2),YRANGE(2),ACH,ABS,
      :SPLITSUM,XSIGU,XSIGL,WIDTH,SIGN,ASYM,VALUE,Q
 C
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :   DUMMY,
      :   EPS,
      :   XFIT(2048),
@@ -151,7 +151,7 @@ C
      :   TPTR,
      :   WSLOT
 C
-      CHARACTER*64 
+      CHARACTER*64
      :   SPEC,
      :   CONT,
      :   LABEL(2),
@@ -179,13 +179,13 @@ C     Initial values
 C
       PLTOPN=.FALSE.             ! True if soft copy plot open
       FAULT=.FALSE.              ! True if error occurs
-      CONTOPN=.FALSE.            ! True when continuum spectrum file 
+      CONTOPN=.FALSE.            ! True when continuum spectrum file
                                  ! opened
       PLTTED=.FALSE.             ! True if a soft plot has been made
       OUOPEN=.FALSE.             ! True when output continuum file open
       SELECT=.FALSE.             ! True if subsegments selected.
-      LIMIT=.FALSE.              ! .TRUE. : cutoff equiv width sum at 
-                                 ! designated limits.  .FALSE. : cutoff 
+      LIMIT=.FALSE.              ! .TRUE. : cutoff equiv width sum at
+                                 ! designated limits.  .FALSE. : cutoff
                                  ! at first channel exceeding continuum
       CONTWR=.FALSE.             ! True when a continuum file to be written.
 C
@@ -272,13 +272,13 @@ C
          NPOL=1
       ELSE
 C
-C        No existing continuum file to be used, so set continuum to 
+C        No existing continuum file to be used, so set continuum to
 C        zero.
 C
          CALL GEN_FILL(DSA_TYPESIZE('FLOAT',STATUS)*NCHAN,
      :                  0,%VAL(CNF_PVAL(IPTRC)))
 C
-C        Get the other continuum fitting parameters 
+C        Get the other continuum fitting parameters
 C
          CONT=' '
          CALL PAR_RDVAL('SIG',0.,100.,2.25,' ',Q)
@@ -415,7 +415,7 @@ C
 C
 C        Check if segment specified by CENLAM, DELTLAM is entirely
 C        within range.  If not, move centre so that it is.  Illegal to
-C        have DELTLAM more than entire wavelength (X) range of 
+C        have DELTLAM more than entire wavelength (X) range of
 C        input spectrum.
 C
     9    IF(CHDELP.LE.NCHAN)GO TO 10
@@ -435,7 +435,7 @@ C
             GO TO 5
          END IF
 C
-C           Load X (wavelength) and data values of the selected segment 
+C           Load X (wavelength) and data values of the selected segment
 C           into arrays for analysis.
 C           NSEG = number of channels in the segment.
 C
@@ -626,8 +626,8 @@ C
             END IF
          END DO
 C
-C       Pack X and Y values for selected continuum subsegments into 
-C       arrays XFIT and YFIT.  Subsegments butted up to each other, 
+C       Pack X and Y values for selected continuum subsegments into
+C       arrays XFIT and YFIT.  Subsegments butted up to each other,
 C       ie. no gaps.  Total number of channels included = NFIT
 C       (This mess necessary because NAG routine cannot be instructed
 C       to ignore any of its input data points.)
@@ -636,7 +636,7 @@ C
          I=1                  ! Loop over number of subsegments
          J=NCST(1)            ! Preset for loop through channels of each
    18    NFIT=NFIT+1          ! Top of       "     "       "
-         XFIT(NFIT)=XVALS(J)  
+         XFIT(NFIT)=XVALS(J)
          YFIT(NFIT)=YVALS(J)
          J=J+1
          IF(J.LE.NCEND(I))GO TO 18
@@ -811,7 +811,7 @@ C          End of fit continuum section ('CONT' command)
 C
       END IF
 C
-C     Analyse a line.  This is the 'FIT' option. Get cursor 
+C     Analyse a line.  This is the 'FIT' option. Get cursor
 C     indication of range defining absorption line itself, and
 C     calculate wavelength and equivalent width.
 C     XL,XH = X values of low and high side of the range.
@@ -848,7 +848,7 @@ C
          CALL PGCURSE(XCUR,YCUR,CURC)
          XH=XCUR
 C
-C        Convert line range limits to nearest integer NL and NH 
+C        Convert line range limits to nearest integer NL and NH
 C        (channel no. scale of XVALS, YVALS) and test for obvious faults
 C
          NL=NINT((NSEG*XL-XL-NSEG*XVALS(1)+XVALS(NSEG))/(XVALS(NSEG)-
@@ -861,7 +861,7 @@ C
             GO TO 32
          END IF
 C
-C        If LIMIT = .FALSE. revise NL and/or NH as required so that they 
+C        If LIMIT = .FALSE. revise NL and/or NH as required so that they
 C        give channel nearest to line centre for which data exceeds
 C        continuum, unless this channel is outside original NL - NH
 C        range, in which case leave limit at NL (NH) specified by cursor.
@@ -953,8 +953,8 @@ C
          CALL PAR_WRUSER(STRING(:NEXT),STATUS)
 C
 C        Finish up soft plot by drawing vertical lines showing line range
-C        limits, then sign off soft plot. Adjust X values of vertical 
-C        lines so they are at edges of bins, not centre, to better show 
+C        limits, then sign off soft plot. Adjust X values of vertical
+C        lines so they are at edges of bins, not centre, to better show
 C        full range/area included.
 C
          XRANGL(1)=XVALS(NL)-0.5*ACH
@@ -1107,7 +1107,7 @@ C
 C
 C     Tidy up
 C
-  500 CONTINUE                      
+  500 CONTINUE
 C
 C       If a plot was made at all, set the user variables describing
 C       it, so routines such as XCUR and CCUR will work on it.

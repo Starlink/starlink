@@ -7,7 +7,7 @@
 *      This routine allows the user to remove bad columns or rows from
 *    an image by specifying the rows or columns, at the moment from
 *    the interface, but eventually from interactive placing of a cursor
-*    over the image on a display screen. 
+*    over the image on a display screen.
 *
 *    Parameters :
 *
@@ -78,7 +78,7 @@
 *
 *    History :
 *
-*     01-07-1985 : First implementation, using row/column coordinates 
+*     01-07-1985 : First implementation, using row/column coordinates
 *                : read from the user directly, rather than by use of
 *                : an interactive cursor on a display screen.
 *                : (REVA::MJM)
@@ -97,8 +97,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'          ! global SSE parameters
-      INCLUDE 'NDF_PAR'          
-      INCLUDE 'NDF_ERR'          
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -111,7 +111,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    IDIMS( NDIMS ),        ! dimensions of input DATA_ARRAY
      :    NDIM,                  ! number dimensions from NDF_DIM
      :    NELEMENTS,             ! number of elements mapped
@@ -139,16 +139,16 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    check for error here
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS )
-      
+
 *       check for error here
          IF( STATUS .EQ. SAI__OK ) THEN
 
@@ -158,8 +158,8 @@
             CALL MSG_OUT( 'INPUT_DIMS',
      :         'Image is ^XDIM by ^YDIM pixels', STATUS )
 
-*          now create output image type data structure 
-            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, 
+*          now create output image type data structure
+            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS,
      :                    LOCO, STATUS )
 
 *          check for error here
@@ -170,13 +170,13 @@
      :                        PNTRO, NELEMENTS, STATUS )
 
 *             copy the input array into the output array
-               CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
+               CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
      :                      %VAL( PNTRO ), STATUS )
 
 *             find out whether or not Poisson noise is to be added
                CALL PAR_GET0L( 'NOISE', NOISE, STATUS )
 
-*             initialise AGAIN and VALRC logicals 
+*             initialise AGAIN and VALRC logicals
                AGAIN   =  .TRUE.
                VALRC   =  .TRUE.
 
@@ -202,7 +202,7 @@
 
 *                   get start and finish row numbers - default finish to
 *                   be same as start i.e. only one row zapped
-                     CALL AIF_GET0I( 'STARTROW', 1, 1, IDIMS( 2 ), 
+                     CALL AIF_GET0I( 'STARTROW', 1, 1, IDIMS( 2 ),
      :                          START, STATUS )
                      CALL AIF_GET0I( 'FINISHROW', START, 1, IDIMS( 2 ),
      :                          FINISH, STATUS )
@@ -232,12 +232,12 @@
 
 *                   end of if-input-rows-cover-whole-array check
                      END IF
-  
+
                   ELSE
 
 *                   must be columns - get start and finish numbers - default
 *                   finish to be same as start i.e. only one column zapped
-                     CALL AIF_GET0I( 'STARTCOL', 1, 1, IDIMS( 1 ), 
+                     CALL AIF_GET0I( 'STARTCOL', 1, 1, IDIMS( 1 ),
      :                          START, STATUS )
                      CALL AIF_GET0I( 'FINISHCOL', START, 1, IDIMS( 1 ),
      :                          FINISH, STATUS )
@@ -275,7 +275,7 @@
 *                if a valid row/column, then call ZAPLINSUB to do work
                   IF ( VALRC .AND. STATUS .EQ. SAI__OK ) THEN
 
-                     CALL ZAPLINSUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ), 
+                     CALL ZAPLINSUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ),
      :                         START, FINISH, ROW, NOISE, STATUS )
 
                   ENDIF

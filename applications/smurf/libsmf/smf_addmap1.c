@@ -13,15 +13,15 @@
 *     C function
 
 *  Invocation:
-*     smf_addmap1( double *map1, double *mapweight1, 
-*                  int *hitsmap1, double *mapvar1, 
-*                  double *map2, double *mapweight2, 
-*                  int *hitsmap2, double *mapvar2, dim_t msize, 
+*     smf_addmap1( double *map1, double *mapweight1,
+*                  int *hitsmap1, double *mapvar1,
+*                  double *map2, double *mapweight2,
+*                  int *hitsmap2, double *mapvar2, dim_t msize,
 *                  int *status ) {
 
 *  Arguments:
 *     map1 = double* (Given and Returned)
-*        The first map 
+*        The first map
 *     mapweight1 = double* (Given and Returned)
 *        Relative weighting for each pixel in map1
 *     hitsmap1 = int* (Given and Returned)
@@ -29,7 +29,7 @@
 *     mapvar1 = double* (Given and Returned)
 *        Variance of each pixel in map1
 *     map2 = double* (Given)
-*        The second map 
+*        The second map
 *     mapweight2 = double* (Given)
 *        Relative weighting for each pixel in map2
 *     hitsmap2 = int* (Given)
@@ -43,8 +43,8 @@
 
 *  Description:
 *     This routine adds all of the pixels from map2 to map1 using inverse
-*     variance weighting. 
-*     
+*     variance weighting.
+*
 *  Authors:
 *     Edward Chapin (UBC)
 *     {enter_new_authors_here}
@@ -100,24 +100,24 @@
 
 #define FUNC_NAME "smf_addmap1"
 
-void smf_addmap1( double *map1, double *mapweight1, 
-                  int *hitsmap1, double *mapvar1, 
-                  double *map2, double *mapweight2, 
-                  int *hitsmap2, double *mapvar2, dim_t msize, 
+void smf_addmap1( double *map1, double *mapweight1,
+                  int *hitsmap1, double *mapvar1,
+                  double *map2, double *mapweight2,
+                  int *hitsmap2, double *mapvar2, dim_t msize,
                   int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */
-  
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
   /* Check for NULL inputs */
   if( (map1==NULL) || (mapweight1==NULL) || (hitsmap1==NULL) ||
-      (mapvar1==NULL) || (map2==NULL) || (mapweight2==NULL) || 
+      (mapvar1==NULL) || (map2==NULL) || (mapweight2==NULL) ||
       (hitsmap2==NULL) || (mapvar2==NULL) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Addmap failed due to NULL inputs.", status);      
+      errRep(FUNC_NAME, "Addmap failed due to NULL inputs.", status);
       return;
   }
 
@@ -128,8 +128,8 @@ void smf_addmap1( double *map1, double *mapweight1,
     if( (map1[i] == VAL__BADD) || (mapvar1[i] == VAL__BADD) ) {
       /* If bad pixel in map1 just copy map2 */
       map1[i] = map2[i];
-      mapweight1[i] = mapweight2[i]; 
-      hitsmap1[i] = hitsmap2[i]; 
+      mapweight1[i] = mapweight2[i];
+      hitsmap1[i] = hitsmap2[i];
       mapvar1[i] = mapvar2[i];
     } else if( (map2[i] != VAL__BADD) && (mapvar2[i] != VAL__BADD) ) {
       /* Add together if both maps have good pixels */
@@ -139,7 +139,7 @@ void smf_addmap1( double *map1, double *mapweight1,
 
       if( !mapweight1[i] ) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Addmap failed due to divide-by-zero", status);      
+	errRep(FUNC_NAME, "Addmap failed due to divide-by-zero", status);
 	return;
       } else {
 	map1[i] /= mapweight1[i];
@@ -147,8 +147,8 @@ void smf_addmap1( double *map1, double *mapweight1,
 
       /* Variance should be consistent with weight */
       mapvar1[i] = 1/mapweight1[i];
-      
+
     }
   }
-  
+
 }

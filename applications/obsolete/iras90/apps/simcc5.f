@@ -222,7 +222,7 @@
      :    RHI .GT. PWGSZY .OR. RLO .LT. 1) THEN
 
 *  Return the new sizes (including a "safety margin" of 2 pixels on each
-*  edge). 
+*  edge).
          PWGSZX = PHI - PLO + 5
          PWGSZY = RHI - RLO + 5
 

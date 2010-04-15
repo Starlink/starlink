@@ -22,12 +22,12 @@
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
 *     bolvar = double * (Given)
-*        If supplied, an array of externally supplied estimates of bolo 
+*        If supplied, an array of externally supplied estimates of bolo
 *        variance. Can be NULL in which case the variance is measured.
 *     quality = unsigned char * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
-*        will have bit SMF__Q_SPIKE set. 
+*        will have bit SMF__Q_SPIKE set.
 *     mask = unsigned char (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
@@ -36,11 +36,11 @@
 *     niter = size_t (Given)
 *        Number of iterations. If set to 0 iterate until the list of
 *        flagged sources doesn't change (converges). If a value greather
-*        than 10000 is supplied, then smf_flag_spikes2 will be invoked to 
-*        flag the spikes, with the box size being set to "niter - 10000". 
+*        than 10000 is supplied, then smf_flag_spikes2 will be invoked to
+*        flag the spikes, with the box size being set to "niter - 10000".
 *        See smf_flag_spikes2 for further details.
 *     maxiter = size_t (Given)
-*        If niter=0 maxiter is a maximum number of iterations. 
+*        If niter=0 maxiter is a maximum number of iterations.
 *     aiter = size_t * (Returned)
 *        The actual number of iterations executed. May be NULL.
 *     nflagged = size_t * (Returned)
@@ -50,16 +50,16 @@
 
 *  Description:
 *     Flags spikes using one of teo different algorithms, as specified by
-*     the "niter" argument. 
+*     the "niter" argument.
 *
-*     If niter is not equal to 10000, measures the rms and mean of each 
-*     bolometer, excluding data that has been flagged with bits specified 
-*     in mask. Samples that lie a factor of thresh * rms away from the mean 
-*     are flagged SMF__Q_SPIKE. This process can be run a fixed number of 
+*     If niter is not equal to 10000, measures the rms and mean of each
+*     bolometer, excluding data that has been flagged with bits specified
+*     in mask. Samples that lie a factor of thresh * rms away from the mean
+*     are flagged SMF__Q_SPIKE. This process can be run a fixed number of
 *     times, or until the list of flagged samples converges (niter=0).
 *
-*     If niter is greater than 10000, smf_flag_spikes2 is called to flag 
-*     the spikes, using the value of "niter-10000" as the box size. See 
+*     If niter is greater than 10000, smf_flag_spikes2 is called to flag
+*     the spikes, using the value of "niter-10000" as the box size. See
 *     smf_flag_spikes2 for details of the algorithm.
 
 *  Notes:
@@ -131,8 +131,8 @@
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
-                      unsigned char mask, double thresh, size_t niter, 
+void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
+                      unsigned char mask, double thresh, size_t niter,
                       size_t maxiter, size_t *aiter, size_t *nflagged,
                       int *status ) {
 
@@ -157,7 +157,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
   /* If requested, use the alternative spike flagger. */
   if( niter > 10000 ) {
-     smf_flag_spikes2( data, quality, mask, thresh, niter-10000, nflagged, 
+     smf_flag_spikes2( data, quality, mask, thresh, niter-10000, nflagged,
                        status );
      /* Set aiter to something since smf_flag_spikes2 doesn't */
      if( aiter ) {
@@ -194,7 +194,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
   if( *status == SAI__OK ) {
     /* obtain data dimensions */
-    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, 
+    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL,
                   status );
 
     /* Valid threshold check */
@@ -216,7 +216,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
     /* Loop over bolometer */
     for( i=0; i<nbolo; i++ ) if( !(qua[i*ntslice] & SMF__Q_BADB) ) {
-      
+
       base = i*ntslice;
 
       if( bolovar ) {
@@ -252,10 +252,10 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
       if( (*status == SAI__OK) && (sig > 0) ) {
 	/* Size of excursion for significant event */
 	dist = thresh*sig;
-	
+
 	/* Loop over all samples and flag outliers */
 	for( j=0; j<ntslice; j++ ) if( !(qua[base+j] & mask) ) {
-	  
+
 	  /* Significant excursion */
 	  if( fabs(dat[base+j]-mean) > dist ) {
 
@@ -267,14 +267,14 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
 	    /* Flag the data point */
 	    qua[base+j] |= SMF__Q_SPIKE;
-	    
+
 	  }
 	}
       }
     }
 
     /* Check that the exit condition has been met */
-    if( (niter && (iter >= niter)) || (maxiter && (iter > maxiter)) || 
+    if( (niter && (iter >= niter)) || (maxiter && (iter > maxiter)) ||
                                        (*status != SAI__OK) ) {
       done = 1;
     }

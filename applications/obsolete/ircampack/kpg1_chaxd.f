@@ -4,7 +4,7 @@
 *     KPG1_CHAXD
 
 *  Purpose:
-*     Check for usable AXIS structures 
+*     Check for usable AXIS structures
 
 *  Language:
 *     Starlink Fortran 77
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
      :        DALBND( NDF__MXDIM ),! AXIS lower bounds
      :        DAUBND( NDF__MXDIM ) ! AXIS upper bounds
 
-      INTEGER 
+      INTEGER
      :        AEL,               ! No. of elements in mapped axis array
      :        APNTR,             ! Pointer to mapped axis array
      :        AXIS,              ! Index of current dimension
@@ -101,7 +101,7 @@
      :        NDIM,              ! No. of dimensions in NDF
      :        UBND( NDF__MXDIM ) ! Upper bounds of the NDF
 
-      LOGICAL 
+      LOGICAL
      :        MONOTO             ! Is the current axis monotonic?
 
 *.
@@ -146,7 +146,7 @@
                   CALL MSG_OUT( 'KPG1_CHAXD_NOTMONO', 'Axis ^AX of '//
      :                          '^NDF is not monotonic and therefore '//
      :                          'cannot be used for annotation or '//
-     :                          'stored in the graphics database.', 
+     :                          'stored in the graphics database.',
      :                          STATUS )
 
 *  Flag that the axis coordinates cannot be used.
@@ -155,7 +155,7 @@
                END IF
 
             END IF
-      
+
 *  Unmap the axis centre array.
             CALL NDF_AUNMP( INDF, 'Centre', AXIS, STATUS )
 
@@ -168,7 +168,7 @@
 *  of world coordinates is returned if both axes are linear. Warning
 *  messages are issued for each non-linear axis.
       IF( DATAVL ) THEN
-         CALL KPG1_DCLID( 2, INDF, DALBND, DAUBND, SCALE, OFFSET, 
+         CALL KPG1_DCLID( 2, INDF, DALBND, DAUBND, SCALE, OFFSET,
      :                    DATAVL, STATUS )
 
 *  Force the axes to be considered linear. The returned values of SCALE

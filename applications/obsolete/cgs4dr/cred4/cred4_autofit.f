@@ -23,7 +23,7 @@
 *    Import :
       LOGICAL ASK                   ! T if should ask user before proceeding
       LOGICAL WAIT                  ! T if should wait for reduction action
-      CHARACTER*(*) OBSERVATION     ! The name of the observation 
+      CHARACTER*(*) OBSERVATION     ! The name of the observation
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -95,7 +95,7 @@
 
       IF ( PROCEED ) THEN
 
-*       Set the RED4_BUSY flag  
+*       Set the RED4_BUSY flag
          CALL NBS_PUT_VALUE( RED4_BUSY_ID, 0, VAL__NBI, .TRUE., STATUS )
 
 *       If the RED4_ACTIVE flag is true, wait for another action to finish
@@ -103,7 +103,7 @@
 
             CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID, OUTVAL, STATUS )
 
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF ( STATUS .NE. DTASK__ACTCOMPLETE ) THEN
                   IF ( STATUS .EQ. DTASK__ACTINFORM ) THEN
@@ -155,15 +155,15 @@
          CALL CHR_RMBLK( SPECTRUM )
          YS = MAX( 1, AFIT_ROW1 - (AFIT_NROWS / 2) )
          YE = MIN( DROWS, AFIT_ROW1 + (AFIT_NROWS / 2) )
-         CALL MSG_SETI( 'YS', YS )         
-         CALL MSG_SETI( 'YE', YE )         
+         CALL MSG_SETI( 'YS', YS )
+         CALL MSG_SETI( 'YE', YE )
          CALL MSG_SETC( 'SP', SPECTRUM )
          CALL MSG_OUT( ' ', 'Extracting rows ^YS to ^YE from reduced observation into ^SP', STATUS )
          CPOS = 0
          CALL CHR_PUTC( 'IMAGE="', INVAL, CPOS )
          CALL CHR_PUTC( ROBSERVATION(1:CHR_LEN(ROBSERVATION)), INVAL, CPOS )
          CALL CHR_PUTC( '" SPECTRUM="', INVAL, CPOS )
-         CALL CHR_PUTC( SPECTRUM(1:CHR_LEN(SPECTRUM)), INVAL, CPOS ) 
+         CALL CHR_PUTC( SPECTRUM(1:CHR_LEN(SPECTRUM)), INVAL, CPOS )
          CALL CHR_PUTC( '" YSTART=', INVAL, CPOS )
          CALL CHR_PUTI( YS, INVAL, CPOS )
          CALL CHR_PUTC( ' YEND=', INVAL, CPOS )
@@ -222,7 +222,7 @@
          CALL CHR_RMBLK( SPECTRUM )
          YS = MAX( 1, AFIT_ROW2 - (AFIT_NROWS / 2) )
          YE = MIN( DROWS, AFIT_ROW2 + (AFIT_NROWS / 2) )
-         CALL MSG_SETI( 'YS', YS )         
+         CALL MSG_SETI( 'YS', YS )
          CALL MSG_SETI( 'YE', YE )
          CALL MSG_SETC( 'SP', SPECTRUM )
          CALL MSG_OUT( ' ', 'Extracting rows ^YS to ^YE from observation into ^SP', STATUS )
@@ -242,7 +242,7 @@
          CALL MSG_OUT( ' ', 'Searching for lines in second spectrum', STATUS )
          CPOS = 0
          CALL CHR_PUTC( 'SP="', INVAL, CPOS )
-         CALL CHR_PUTC( SPECTRUM(1:CHR_LEN(SPECTRUM)), INVAL, CPOS ) 
+         CALL CHR_PUTC( SPECTRUM(1:CHR_LEN(SPECTRUM)), INVAL, CPOS )
          CALL CHR_PUTC( '" LI=0', INVAL, CPOS )
          CALL CHR_PUTC( ' XS=', INVAL, CPOS )
          CALL CHR_PUTR( AFIT_XSTART, INVAL, CPOS )
@@ -319,14 +319,14 @@
 
 *      Tell the RED4 task to write an engineering type 1 record.
          CALL MSG_OUT( ' ', 'Writing engineering type 1 record', STATUS )
-         CALL CRED4_OBEYW( RED4_ALIAS(1:CHR_LEN(RED4_ALIAS)), 'LOG_TYPE1', ' ', STATUS ) 
+         CALL CRED4_OBEYW( RED4_ALIAS(1:CHR_LEN(RED4_ALIAS)), 'LOG_TYPE1', ' ', STATUS )
          IF ( STATUS .NE. SAI__OK ) REDUCTION_OK = .FALSE.
 
 *      Reset the RED4_BUSY flag
          CALL ERR_ANNUL( STATUS )
          CALL NBS_PUT_VALUE( RED4_BUSY_ID, 0, VAL__NBI, .FALSE., STATUS )
 
-*      Delete the old $CGS4_ENG/emlt.lis files and spectrum%.* files 
+*      Delete the old $CGS4_ENG/emlt.lis files and spectrum%.* files
          CALL MSG_OUT( ' ', 'Tidying up old $CGS4_ENG/emlt.lis, $CGS4_DATA/spectrum%.* files', STATUS )
          CALL CRED4_TIDY_FILES( STATUS )
       ENDIF

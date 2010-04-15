@@ -1,31 +1,31 @@
-      SUBROUTINE  FIND (D, H, JCYLN, G, SKIP, MAX, MAXBOX, MAXCOL, 
+      SUBROUTINE  FIND (D, H, JCYLN, G, SKIP, MAX, MAXBOX, MAXCOL,
      .     MAXSKY, OPT, NOPT)
       IMPLICIT NONE
 C
 C=======================================================================
 C
-C This subroutine is supposed to find small, positive brightness 
-C perturbations in a two-dimensional image.  
+C This subroutine is supposed to find small, positive brightness
+C perturbations in a two-dimensional image.
 C
 C                OFFICIAL DAO VERSION:  1991 April 18
 C
-C First, FIND reads in several rows' worth of image data.  For each 
+C First, FIND reads in several rows' worth of image data.  For each
 C pixel it computes a least-squares fit of an analytic Gaussian function
-C to a roughly circular array of pixels surrounding the pixel in 
-C question.  The overall bias level (sky brightness in that vicinity) 
-C is removed by the calculation and, since the function is 
-C symmetric about the central pixel, a smooth gradient in the sky 
-C brightness cancels out exactly.  This means that the user does 
-C not have to specify an absolute brightness threshold for star 
-C detection, and if the mean background brightness varies over the 
+C to a roughly circular array of pixels surrounding the pixel in
+C question.  The overall bias level (sky brightness in that vicinity)
+C is removed by the calculation and, since the function is
+C symmetric about the central pixel, a smooth gradient in the sky
+C brightness cancels out exactly.  This means that the user does
+C not have to specify an absolute brightness threshold for star
+C detection, and if the mean background brightness varies over the
 C frame, to the extent that the variations are smooth and large-scale,
 C to first order they will have no effect on the detection limit.
-C    The derived peak heights of the Gaussian functions are stored in a 
-C scratch disk image file.  Later they will be read back in, and local 
-C maxima in the peak values will be sought.  After undergoing a few 
-C tests designed to select against bad pixels and bad columns, these 
-C local maxima will be considered to be astronomical objects, better 
-C image centroids will be computed, and the objects will be assigned 
+C    The derived peak heights of the Gaussian functions are stored in a
+C scratch disk image file.  Later they will be read back in, and local
+C maxima in the peak values will be sought.  After undergoing a few
+C tests designed to select against bad pixels and bad columns, these
+C local maxima will be considered to be astronomical objects, better
+C image centroids will be computed, and the objects will be assigned
 C sequential ID numbers and will be written to a disk data file.
 C    The user is asked to specify a "lowest good data-value"-- any pixel
 C whose value is found to fall below this level or above the HIBAD
@@ -37,26 +37,26 @@ C as well.
 C
 C Arguments
 C
-C     FWHM (INPUT) is the estimated full width at half-maximum of the 
+C     FWHM (INPUT) is the estimated full width at half-maximum of the
 C          objects for which the algorithm is to be optimized.  It will
-C          be used (a) to determine the size of the roughly circular 
-C          array which will be used to compute the brightness 
-C          enhancements and to define local maxima, and (b) to define 
-C          the coefficient assigned to each pixel in the computation 
+C          be used (a) to determine the size of the roughly circular
+C          array which will be used to compute the brightness
+C          enhancements and to define local maxima, and (b) to define
+C          the coefficient assigned to each pixel in the computation
 C          of the brightness enhancements.
 C
-C    WATCH (INPUT) governs whether information relating to the progress 
+C    WATCH (INPUT) governs whether information relating to the progress
 C          of the star-finding is to be typed on the terminal screen
 C          during execution.
 C
-C SHRPLO, SHRPHI (INPUT) are numerical cutoffs on the image-sharpness 
-C          statistic, designed to eliminate brightness maxima which 
-C          appear to be due to bad pixels, rather than to astronomical 
+C SHRPLO, SHRPHI (INPUT) are numerical cutoffs on the image-sharpness
+C          statistic, designed to eliminate brightness maxima which
+C          appear to be due to bad pixels, rather than to astronomical
 C          objects.
 C
-C RNDLO, RNDHI (INPUT) are numerical cutoffs on the image-roundness 
-C          statistic, designed to eliminate brightness maxima which 
-C          appear to be due to bad rows or columns, rather than to 
+C RNDLO, RNDHI (INPUT) are numerical cutoffs on the image-roundness
+C          statistic, designed to eliminate brightness maxima which
+C          appear to be due to bad rows or columns, rather than to
 C          astronomical objects.
 C
 C HIBAD  is the highest valid data-value-- the level above which the
@@ -76,7 +76,7 @@ C
 C MAXBOX is the length of the side of the largest subarray that you plan
 C        to need for computing the brightness enhancement in each pixel.
 C
-C MAX/MAXBOX is the length in the x-direction of the largest picture 
+C MAX/MAXBOX is the length in the x-direction of the largest picture
 C        you can try to reduce.
 C
 C-----------------------------------------------------------------------
@@ -84,7 +84,7 @@ C-----------------------------------------------------------------------
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
@@ -96,7 +96,7 @@ C Arrays
 C
       REAL D(MAXCOL,MAXBOX), H(MAXCOL,MAXBOX), DATA(2), OPT(NOPT)
       REAL G(MAXBOX,MAXBOX), AMAX1
-      INTEGER JCYLN(MAX) 
+      INTEGER JCYLN(MAX)
       LOGICAL SKIP(MAXBOX,MAXBOX)
 C
 C Variables
@@ -135,7 +135,7 @@ C Setup the necessary variables and arrays, particularly the constants
 C to be used in the convolutions.
 C
 C The brightness enhancement will be computed on the basis only of those
-C pixels within 1.5 sigma = 0.637*FWHM of the central pixel.  However, 
+C pixels within 1.5 sigma = 0.637*FWHM of the central pixel.  However,
 C in the limit of infinitely small FWHM the brightness enhancement will
 C be based on no fewer than the following subarray of pixels:
 C
@@ -151,20 +151,20 @@ C                          -  -  +  -  -
 C                                .
 C                                .
 C                                .
-C 
+C
 C This represents a 5 x 5 subarray taken out of the original picture.
-C The X represents the pixel for which the brightness enhancement is 
-C currently being computed and the +'s represent other pixels included 
+C The X represents the pixel for which the brightness enhancement is
+C currently being computed and the +'s represent other pixels included
 C in the calculation; the -'s and all pixels lying outside this 5 x 5
 C subarray will not be used in computing the brightness enhancement in
 C the central pixel.  In the limit of infinitely large FWHM, only those
 C pixels lying within a MAXBOX x MAXBOX square subarray centered on the
-C pixel in question will be used in computing its brightness 
+C pixel in question will be used in computing its brightness
 C enhancement.
 C
 C Compute the size of the subarray needed.  The radius of the circular
-C area desired is MAX (2.0, 0.637*FWHM), so the distance from the 
-C central pixel to the center of an edge pixel is the integer smaller 
+C area desired is MAX (2.0, 0.637*FWHM), so the distance from the
+C central pixel to the center of an edge pixel is the integer smaller
 C than this.
 C
       RADIUS=AMAX1(2.001, 0.637*FWHM)
@@ -172,16 +172,16 @@ C
       NBOX=2*NHALF+1                ! Length of the side of the subarray
       MIDDLE=NHALF+1
 C
-C Just for future reference-- 
+C Just for future reference--
 C
 C MIDDLE is the index of the central pixel of the box in both x and y,
 C        where the corner of the box is considered to be at (1,1).
 C
-C  NHALF is the number of pixels between the central pixel (exclusive) 
+C  NHALF is the number of pixels between the central pixel (exclusive)
 C        and the edge of the box (inclusive).  For example, if NBOX = 7,
 C        MIDDLE = 4 and NHALF = 3.  Note that all the way around the
-C        picture being reduced there will be a border NHALF pixels wide 
-C        where define brightness enhancements can't be defined, because 
+C        picture being reduced there will be a border NHALF pixels wide
+C        where define brightness enhancements can't be defined, because
 C        the box would extend beyond the boundaries of the frame.  We
 C        will thus be able to compute brightness enhancements only for
 C        MIDDLE <= x <= LASTCL,   MIDDLE <= y <= LASTRO, where...
@@ -193,7 +193,7 @@ C-----------------------------------------------------------------------
 C
 C Compute the values of a bivariate circular Gaussian function with
 C unit height and the specified value of the FWHM.
-C 
+C
       SIGSQ=(FWHM/2.35482)**2
       RADIUS=RADIUS**2
 C
@@ -204,41 +204,41 @@ C
 C EXPLANATION:
 C
 C The approach taken by this star-finding algorithm is defined by this
-C question:  "Assuming for the moment that there is a star with a 
-C Gaussian light distribution centered in the central pixel of this 
-C subarray, then how bright is it?"  Having answered that question for 
-C every pixel MIDDLE <= x <= LASTCL, MIDDLE <= y <= LASTRO, we will 
-C then go through the picture looking for places where the numerical 
-C answer to the question achieves local maxima.  For the region around 
+C question:  "Assuming for the moment that there is a star with a
+C Gaussian light distribution centered in the central pixel of this
+C subarray, then how bright is it?"  Having answered that question for
+C every pixel MIDDLE <= x <= LASTCL, MIDDLE <= y <= LASTRO, we will
+C then go through the picture looking for places where the numerical
+C answer to the question achieves local maxima.  For the region around
 C each pixel, then, we want to solve this equation via least squares:
 C
 C                     D(i,j) = h * G(i,j) + s
-C 
+C
 C where D is the observed brightness in some pixel of the subarray, G
-C is the value of the Gaussian function of unit central height in the 
+C is the value of the Gaussian function of unit central height in the
 C in that pixel
 C
 C G(i,j) = exp{[(i-MIDDLE)**2 + (j-MIDDLE)**2]/(2 * sigma**2)}, for
 C
 C                      (i-MIDDLE)**2 + (j-MIDDLE)**2 < (1.5 * sigma)**2
-C 
+C
 C (the center of the subarray has relative coordinates i = j = MIDDLE).
 C
 C      The parameters  h  (= central brightness of the hypothetical
 C star centered in the central pixel of the subarray), and s (= the
-C local sky background) are unknowns.  The least-squares solution 
+C local sky background) are unknowns.  The least-squares solution
 C for this system of equations is given by
 C
-C         [G*D] - [G] [D]/n               
+C         [G*D] - [G] [D]/n
 C    h =  ----------------- ,         s = {[D] - h [G]}/n
-C         [G**2] - [G]**2/n               
+C         [G**2] - [G]**2/n
 C
 C where the square brackets denote summation (Gauss's notation).
 C
-C For use in solving for the many values of  h, we will save the 
-C array G(i,j) (= G(I,J)) and the constants [G] (= SUMG, meaning 
-C "sum of the Gaussian"), [G**2] (= SUMGSQ), n (= PIXELS); also the 
-C denominator of the fraction for  h (= DENOM), and [G]/n (= SGOP).  
+C For use in solving for the many values of  h, we will save the
+C array G(i,j) (= G(I,J)) and the constants [G] (= SUMG, meaning
+C "sum of the Gaussian"), [G**2] (= SUMGSQ), n (= PIXELS); also the
+C denominator of the fraction for  h (= DENOM), and [G]/n (= SGOP).
 C [G*D] and [D] will have to be computed each time.
 C
 C It is possible to show that each of these least-squares problems can
@@ -277,8 +277,8 @@ C
       DENOM=SUMGSQ-(SUMG**2)/PIXELS
       SGOP=SUMG/PIXELS
 C
-C At this point the two-dimensional array G(I,J) contains the values of 
-C a unit Gaussian function, with the input value of FWHM, at each point 
+C At this point the two-dimensional array G(I,J) contains the values of
+C a unit Gaussian function, with the input value of FWHM, at each point
 C in the SQUARE subarray.
 C
 C SUMG   contains the sum of the values of the Gaussian function over
@@ -294,9 +294,9 @@ C
 C DENOM  contains the denominator of the fraction defining  h.
 C
 C SGOP   contains [G]/n
-C 
-C Using our knowledge of least squares, we can compute the standard 
-C error of the coefficient  h  in terms of the standard error of the 
+C
+C Using our knowledge of least squares, we can compute the standard
+C error of the coefficient  h  in terms of the standard error of the
 C brightness in a single pixel:
 C
 C      sigma**2(h) = sigma**2(1 pixel) / ([G**2] - [G]**2/n)
@@ -308,7 +308,7 @@ C
       CALL DAO_ALLOC( '_REAL', MAXSKY, IP2 )
       CALL DAO_ALLOC( '_INTEGER', MAXSKY, IP3 )
 
-      CALL SKY (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+      CALL SKY (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)),
      .          %VAL(CNF_PVAL(IP3)), MAXSKY, HIBAD, READNS,
      .          PHPADU, SKYMOD, IX)
 
@@ -319,7 +319,7 @@ C
       WRITE (6,610) RELERR
   610 FORMAT(23X, 'Relative error =', F5.2/)
 C
-C Now ask the user for a star-detection threshold and a bad pixel 
+C Now ask the user for a star-detection threshold and a bad pixel
 C ceiling.
 C
       CALL GETDAT ('Number of frames averaged, summed:', DATA, 2)
@@ -331,15 +331,15 @@ C
       HMIN = 0.01*NINT(100.*OPT(6)*RELERR*HMIN)
       READNS = SQRT(READNS)
 C
-C Later on, the threshold HMIN will be the minimum value of the local 
-C brightness enhancement that will be considered when searching for 
+C Later on, the threshold HMIN will be the minimum value of the local
+C brightness enhancement that will be considered when searching for
 C local maxima, and any pixel whose brightness value is less than LOBAD
 C or greater than HIBAD will be ignored in the computations.
 C
 C Open the input and scratch disk files.
 C
  2950 CALL GETNAM ('File for the positions:', COOFIL)
-      IF ((COOFIL .EQ. 'END OF FILE') .OR. 
+      IF ((COOFIL .EQ. 'END OF FILE') .OR.
      .     (COOFIL .EQ. 'GIVE UP')) THEN
          COOFIL = ' '
          RETURN
@@ -368,16 +368,16 @@ C
 C SECTION 2
 C
 C Read the raw image data in, holding only a few rows' worth of data in
-C memory at any one time.  Convolve the data with the appropriate 
-C Gaussian function, and write the resulting numbers into the scratch 
+C memory at any one time.  Convolve the data with the appropriate
+C Gaussian function, and write the resulting numbers into the scratch
 C disk picture.
 C
-C Only NBOX rows' worth of image data will be in memory at any one 
+C Only NBOX rows' worth of image data will be in memory at any one
 C time.  The row numbered MIDDLE of the rows in memory is the one in
-C which we will be looking for objects.  As we step through the image 
-C row by row, the data for the row MIDDLE-1 ( = NHALF) steps ahead of 
-C the new MIDDLE row will overwrite the data for the row MIDDLE 
-C ( = NHALF+1) steps behind.  This means that there is no practical 
+C which we will be looking for objects.  As we step through the image
+C row by row, the data for the row MIDDLE-1 ( = NHALF) steps ahead of
+C the new MIDDLE row will overwrite the data for the row MIDDLE
+C ( = NHALF+1) steps behind.  This means that there is no practical
 C upper limit to the size of the picture which can be run through
 C this routine.
 C
@@ -396,7 +396,7 @@ C
       LX = 1
       LY = 1
       NROWS = NHALF
-      CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL, 
+      CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL,
      .     D(1,MIDDLE), ISTAT)
       IF (ISTAT .NE. 0) THEN
          CALL STUPID ('Error reading image data from disk file.')
@@ -409,30 +409,30 @@ C first NHALF rows of the picture.  We will soon create the file
 C containing the derived values of  h  (see above) one row at a time.
 C
 C Now we will step through the picture row by row. JY remembers which
-C row in the big picture we are working on.  For each row JY, the 
-C convolved data will be accumulated in the vector H(i,2), and then 
+C row in the big picture we are working on.  For each row JY, the
+C convolved data will be accumulated in the vector H(i,2), and then
 C written into the JY-th row of the scratch picture.
 C
       JY=0
  2020 JY=JY+1                              ! Increment image-row pointer
       IF (JY .GT. NROW) GO TO 2100         ! Have we reached the bottom?
 C
-C Note that at any given time we have only NBOX rows of the original 
-C image in memory, contained in the cylinder buffer D(i,j), 
-C j = 1, ..., NBOX, but not necessarily in that order.  For instance, 
+C Note that at any given time we have only NBOX rows of the original
+C image in memory, contained in the cylinder buffer D(i,j),
+C j = 1, ..., NBOX, but not necessarily in that order.  For instance,
 C if NBOX = 5, when JY = 1,
-C 
+C
 C      row:     1    2    3    4    5     of G is to be fitted to
 C
 C      row:     *    *    1    2    3     of the original picture which
 C                                         is contained in
 C      row:     1    2    3    4    5     of D.
-C 
-C When row 1 of the picture is done, JY is set to 2, and row 4 
+C
+C When row 1 of the picture is done, JY is set to 2, and row 4
 C of the original picture is read into row 1 of the cylinder buffer,
 C D, overwriting the null values which we put there before.
 C Hence, when JY = 2,
-C 
+C
 C      row:     1    2    3    4    5     of G is to be fitted to
 C
 C      row:     *    1    2    3    4     of the original picture which
@@ -452,7 +452,7 @@ C
 C      row:     1    2    3    4    5     variable J
 C
 C      row:     5    6    7    8    9     variable JY
-C                                         
+C
 C      row:     2    3    4    5    1     vector JCYLN(J)
 C
 C The cylinder buffer, D, just rolls down through the picture like a
@@ -460,18 +460,18 @@ C caterpillar tread, dropping off rows of data when they are no longer
 C necessary and picking up new ones in their place.  The data are
 C handled in this way (a) to minimize the amount of memory required,
 C by storing only those rows that are immediately wanted, consistent
-C with (b) minimizing the number of data transfers.  Now, for the 
-C CURRENT value of JY, which row of the cylinder buffer is to be fitted 
-C to each row of G?  The answers will be contained in the vector 
+C with (b) minimizing the number of data transfers.  Now, for the
+C CURRENT value of JY, which row of the cylinder buffer is to be fitted
+C to each row of G?  The answers will be contained in the vector
 C JCYLN.
 C
-C JCYLN(MIDDLE) is the row in the cylinder buffer where we will find 
+C JCYLN(MIDDLE) is the row in the cylinder buffer where we will find
 C the data for row JY of the big picture, which is to be fitted to row
-C MIDDLE of G.  Similarly, JCYLN returns the position in the cylinder 
-C buffer of the row to be fitted to the J-th row of G 
-C (J = 1, ..., NBOX). 
+C MIDDLE of G.  Similarly, JCYLN returns the position in the cylinder
+C buffer of the row to be fitted to the J-th row of G
+C (J = 1, ..., NBOX).
 C
-C Now that this is all straight, read in the data for row JY+NHALF 
+C Now that this is all straight, read in the data for row JY+NHALF
 C (overwriting the data for row JY-NHALF-1, which is no longer needed).
 C
       DO J=1,NBOX
@@ -496,7 +496,7 @@ C
 C
       LY = JY+NHALF
       IF (LY .LE. NROW) THEN
-         CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL, 
+         CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL,
      .        D(1,JCYLN(NBOX)), ISTAT)
       ELSE
          K = JCYLN(NBOX)
@@ -512,11 +512,11 @@ C
 C
 C Compute the local brightness enhancement for each pixel in the row,
 C The enhancement is computed from a circular region contained
-C within an NBOX x NBOX array centered on the current pixel, using the 
-C array, G(I,J), and the constants SUMG, SUMGSQ, and PIXELS computed 
-C above.  (These constants will need to be modified if the circular 
-C region used in the calculation contains any bad pixels; we will use 
-C the variables SG, SGSQ, and P for temporary storage of these 
+C within an NBOX x NBOX array centered on the current pixel, using the
+C array, G(I,J), and the constants SUMG, SUMGSQ, and PIXELS computed
+C above.  (These constants will need to be modified if the circular
+C region used in the calculation contains any bad pixels; we will use
+C the variables SG, SGSQ, and P for temporary storage of these
 C constants, and SGD and SD for the accumulation of [G*D] and [D] which
 C are also needed.)
 C
@@ -583,10 +583,10 @@ C
       CALL OVRWRT (' ', 4)
 C
 C Later on, when we try to decide whether a local maximum represents
-C a stellar profile or a delta function ( = bright bad pixel), we will 
-C compare the brightness of the central pixel to the average of the 
-C surrounding pixels.  To be ready for that, we here modify SKIP to 
-C skip over the central pixel, and set PIXELS equal to the number of 
+C a stellar profile or a delta function ( = bright bad pixel), we will
+C compare the brightness of the central pixel to the average of the
+C surrounding pixels.  To be ready for that, we here modify SKIP to
+C skip over the central pixel, and set PIXELS equal to the number of
 C pixels in the circular area not counting the central pixel.
 C
       SKIP(MIDDLE,MIDDLE) = .TRUE.
@@ -597,23 +597,23 @@ C
 C SECTION 3
 C
 C Read in both the convolved data from the scratch disk file and the raw
-C data from the original picture.  Search for local maxima in the 
+C data from the original picture.  Search for local maxima in the
 C convolved brightness data.  When these are found, compute image-shape
 C statistics from the raw data to eliminate non-stellar brightness
-C enhancements (as well as possible) and estimate the position of the 
+C enhancements (as well as possible) and estimate the position of the
 C centroid of the brightness enhancement.
 C
  3000 CONTINUE
 C
 C Now the star search may begin.  The original image data will be read
-C into the cylinder buffer D again, just as before.  At the same time, 
-C the brightness enhancements will be read from the scratch disk file 
-C into another cylinder buffer, H.  The brightness enhancements will 
-C then be searched for local maxima.  When these are found, functions 
-C of the original image data will be used to derive shape parameters 
+C into the cylinder buffer D again, just as before.  At the same time,
+C the brightness enhancements will be read from the scratch disk file
+C into another cylinder buffer, H.  The brightness enhancements will
+C then be searched for local maxima.  When these are found, functions
+C of the original image data will be used to derive shape parameters
 C designed to identify bad pixels and bad columns or rows.
 C
-      CALL WRHEAD (3, 1, NCOL, NROW, 6, LOBAD, HIBAD, HMIN, 
+      CALL WRHEAD (3, 1, NCOL, NROW, 6, LOBAD, HIBAD, HMIN,
      .     0., PHPADU, READNS, 0.)
       IF (WATCH .GT. 0.5) THEN
          CALL OVRWRT (' ', 4)
@@ -636,14 +636,14 @@ C
       LX = 1
       LY = 1
       NROWS = NHALF
-      CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL, 
+      CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL,
      .     D(1,MIDDLE), ISTAT)
       IF (ISTAT .NE. 0) THEN
          CALL STUPID ('Error reading image data from disk file.')
          CALL CLPIC ('COPY')
          RETURN
       END IF
-      CALL RDARAY ('COPY', LX, LY, NCOL, NROWS, MAXCOL, 
+      CALL RDARAY ('COPY', LX, LY, NCOL, NROWS, MAXCOL,
      .     H(1,MIDDLE), ISTAT)
       IF (ISTAT .NE. 0) THEN
          CALL STUPID ('Error reading image data from scratch file.')
@@ -652,19 +652,19 @@ C
       END IF
       NROWS = 1
 C
-C Now step through the picture row by row.  Again JY is the image-row 
+C Now step through the picture row by row.  Again JY is the image-row
 C counter.
 C
       NSTAR = 0
       JY = 0
  3020 JY = JY+1
 C
-C Have we just finished reducing the last row? If not, work on the 
+C Have we just finished reducing the last row? If not, work on the
 C next row.  If so, go on to Section 4.
 C
       IF (JY .GT. NROW) GO TO 4000
 C
-C Determine the position in the cylinder buffers of all the rows 
+C Determine the position in the cylinder buffers of all the rows
 C contained in the box.
 C
       DO J=1,NBOX
@@ -676,14 +676,14 @@ C Read in the data for row JY+NHALF.
 C
       LY = JY+NHALF
       IF (LY .LE. NROW) THEN
-         CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL, 
+         CALL RDARAY ('DATA', LX, LY, NCOL, NROWS, MAXCOL,
      .        D(1,JCYLN(NBOX)), ISTAT)
          IF (ISTAT .NE. 0) THEN
             CALL STUPID ('Error reading image data from disk file.')
             CALL CLPIC ('COPY')
             RETURN
          END IF
-         CALL RDARAY ('COPY', LX, LY, NCOL, NROWS, MAXCOL, 
+         CALL RDARAY ('COPY', LX, LY, NCOL, NROWS, MAXCOL,
      .        H(1,JCYLN(NBOX)), ISTAT)
          IF (ISTAT .NE. 0) THEN
             CALL STUPID ('Error reading image data from scratch file.')
@@ -703,10 +703,10 @@ C
       JX = 1
  3040 HEIGHT = H(JX,JCYLN(MIDDLE))
 C
-C Sieve to locate a local maximum in the brightness enhancement.  To 
+C Sieve to locate a local maximum in the brightness enhancement.  To
 C be a local maximum, the brightness enhancement in a given pixel must
-C be above the threshold, and it must also be greater than the 
-C brightness enhancement of any pixel within a radius equal to 
+C be above the threshold, and it must also be greater than the
+C brightness enhancement of any pixel within a radius equal to
 C 1.5 sigma.
 C
       IF (HEIGHT .LT. HMIN) GO TO 3300
@@ -721,7 +721,7 @@ C
  3051 CONTINUE
 C
 C The brightness enhancement of this pixel is now confirmed to be above
-C the threshold, and to be larger than in any other pixel within a 
+C the threshold, and to be larger than in any other pixel within a
 C radius of 1.5 sigma.
 C
 C Now we derive the shape indices.  First, is the object much more
@@ -738,14 +738,14 @@ C
 C
 CD     TYPE *, JX, JY
 CD     DO 1666 J=1,NBOX
-CD1666 TYPE 6661, (JNINT(D(I,JCYLN(J))), 
+CD1666 TYPE 6661, (JNINT(D(I,JCYLN(J))),
 CD    .     I=MAX0(1,JX-NHALF),MIN0(NCOL,IX+NHALF)),
 CD    .     (JNINT(H(I,JCYLN(J))), I=IX-NHALF,IX+NHALF)
 CD6661 FORMAT(1X, <NBOX>I6, 1X, <NBOX>I6)
 C
-C As one final nuance, for this and subsequent calculations I propose 
-C to subtract off the modal sky level.  Otherwise, for faint stars on 
-C bright backgrounds in large boxes, it is barely possible that 
+C As one final nuance, for this and subsequent calculations I propose
+C to subtract off the modal sky level.  Otherwise, for faint stars on
+C bright backgrounds in large boxes, it is barely possible that
 C truncation error could affect the numerical results of the analysis.
 C
       SHARP=0.
@@ -776,36 +776,36 @@ C
 C Now check to see whether the object is strongly elongated either
 C along the row or along the column.  Compute the height of a Gaussian
 C function of x and a Gaussian function of y by least-squares fits to
-C the marginal distributions of the image data.  That is, fit the 
-C sum over y of the actual brightness values to the sum over y of the 
-C values of the array G, as functions of x.  If a bad pixel is found 
-C omit both the picture datum and the value of G for that pixel from 
-C their respective sums.  If the computed height of either the 
-C x-marginal or the y-marginal is non-positive, or if the central 
-c heights of the two marginals differ by more than their average 
-C (assuming that RNDLO and RNDHI have their default values 
-C of -1.0 and 1.0; otherwise, etc.), reject the star.  
+C the marginal distributions of the image data.  That is, fit the
+C sum over y of the actual brightness values to the sum over y of the
+C values of the array G, as functions of x.  If a bad pixel is found
+C omit both the picture datum and the value of G for that pixel from
+C their respective sums.  If the computed height of either the
+C x-marginal or the y-marginal is non-positive, or if the central
+c heights of the two marginals differ by more than their average
+C (assuming that RNDLO and RNDHI have their default values
+C of -1.0 and 1.0; otherwise, etc.), reject the star.
 C
-C We will now compute the height of the one-dimensional Gaussian 
+C We will now compute the height of the one-dimensional Gaussian
 C distribution which best fits the x-marginal distribution of the
 C brightness.  The equation which will be used will be the same as
 C in the comments above ( h = ...) except that the symbol D in the
-C equation now represents stands for the brightness data in the NBOX by 
-C NBOX square array summed over the y spatial direction, and the 
-C symbol G now stands for a one-dimensional Gaussian function (= the 
-C two-dimensional function G(i,j) also summed over the y spatial 
-C direction.  This sum is actually carried out numerically, rather 
-C than being done analytically, in order to permit the omission of 
-C "bad" pixels.)  At the same time, we will set up the necessary sums 
-C to permit the computation of a first-order correction to the centroid 
+C equation now represents stands for the brightness data in the NBOX by
+C NBOX square array summed over the y spatial direction, and the
+C symbol G now stands for a one-dimensional Gaussian function (= the
+C two-dimensional function G(i,j) also summed over the y spatial
+C direction.  This sum is actually carried out numerically, rather
+C than being done analytically, in order to permit the omission of
+C "bad" pixels.)  At the same time, we will set up the necessary sums
+C to permit the computation of a first-order correction to the centroid
 C of the Gaussian profile in x:
 C
 C                -[G'*(D-G)]          [G*G']-[D*G']
 C Delta x = -------------------- = -------------------,
 C            [G'**2] - [G']**2/n   [G'**2] - [G']**2/n
 C
-C where G is the one-dimensional Gaussian profile, G' = (dG/dx), and 
-C D = the summed actual image data.  (There would normally be a 
+C where G is the one-dimensional Gaussian profile, G' = (dG/dx), and
+C D = the summed actual image data.  (There would normally be a
 C [G']*[(D-G)]/n term in the numerator, but because G is already the
 C "best fitting" Gaussian, [(D-G)] = 0.)  We will use
 C
@@ -822,8 +822,8 @@ C SDGDXS  for [G'**2]           ("sum of {d(Gaussian)/dx}**2")
 C SDDGDX  for [D*G']            ("sum of data times d(Gaussian)/dx")
 C SGDGDX  for [G*G']            ("sum of Gaussian times d(Gaussian)/dx")
 C
-C In addition, for these calculations, pixels will arbitrarily be 
-C assigned weights ranging from unity at the corners of the box to 
+C In addition, for these calculations, pixels will arbitrarily be
+C assigned weights ranging from unity at the corners of the box to
 C MIDDLE**2 at the center (e.g. if NBOX = 5 or 7, the weights will be
 C
 C                                 1   2   3   4   3   2   1
@@ -834,11 +834,11 @@ C      2   4   6   4   2          3   6   9  12   9   6   3
 C      1   2   3   2   1          2   4   6   8   6   4   2
 C                                 1   2   3   4   3   2   1
 C
-C respectively).  This is done to desensitize the derived parameters to 
+C respectively).  This is done to desensitize the derived parameters to
 C possible neighboring, brighter stars.
 C
-C The temporary variable P will be used to accumulate the sum of the 
-C weights, and N will count the number of points in the marginal 
+C The temporary variable P will be used to accumulate the sum of the
+C weights, and N will count the number of points in the marginal
 C distribution that actually get used.
 C
 C SKIP ALL THIS IF THE STAR IS TOO NEAR THE EDGE OF THE FRAME!
@@ -904,7 +904,7 @@ C
       IF (HX .LE. 0.) GO TO 3200
 C
 C Compute the first-order correction to the x-centroid of the star.
-C Note that a factor of HX/SIGSQ is missing from SDGDX, SDDGDX, and 
+C Note that a factor of HX/SIGSQ is missing from SDGDX, SDDGDX, and
 C SGDGDX, and a factor of (HX/SIGSQ)**2 is missing from SDGDXS.
 C
       SKYLVL=(SUMD-HX*SUMG)/P
@@ -976,7 +976,7 @@ C ID number.
 C
  3190 NSTAR=NSTAR+1
       HEIGHT=-2.5*ALOG10(HEIGHT/HMIN)
-      IF (WATCH .GT. 0.5) WRITE (6,631) NSTAR, XCEN, YCEN, HEIGHT, 
+      IF (WATCH .GT. 0.5) WRITE (6,631) NSTAR, XCEN, YCEN, HEIGHT,
      .     SHARP, ROUND
   631 FORMAT(12X, I5, 2F7.1, F9.1, 2F9.2)
       WRITE (3,330) NSTAR, XCEN, YCEN, HEIGHT, SHARP, ROUND
@@ -992,7 +992,7 @@ C
       JX = JX+NHALF
  3300 JX = JX+1
 C
-C Have we passed the last pixel in the row?  If not, work on this 
+C Have we passed the last pixel in the row?  If not, work on this
 C pixel.  If so, go to next row.
 C
       IF (JX .LE. NCOL) GO TO 3040
@@ -1018,7 +1018,7 @@ C
       CALL GETDAT ('New threshold (in sigmas):', OPT(6), 1)
       IF (HMIN .LT. VAL__MINR) GO TO 9000              ! CTRL-Z was entered
  4030 CALL GETNAM ('Output file name:', COOFIL)
-      IF ((COOFIL .EQ. 'END OF FILE') .OR. 
+      IF ((COOFIL .EQ. 'END OF FILE') .OR.
      .     (COOFIL .EQ. 'GIVE UP')) THEN
          COOFIL = ' '
          GO TO 9000

@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,32 +134,32 @@
 
 *  Branch calling version of CCD1_MKHI appropriate to the input data
 *  type.
-      IF ( ITYPE .EQ. '_BYTE' ) THEN 
-        CALL CCG1_MKHIB( %VAL( CNF_PVAL( ARRAY ) ), 
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+        CALL CCG1_MKHIB( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
-      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN 
-        CALL CCG1_MKHIUB( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+        CALL CCG1_MKHIUB( %VAL( CNF_PVAL( ARRAY ) ),
      :                    NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
-      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN 
-        CALL CCG1_MKHIW( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+        CALL CCG1_MKHIW( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
-      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN 
-        CALL CCG1_MKHIUW( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+        CALL CCG1_MKHIUW( %VAL( CNF_PVAL( ARRAY ) ),
      :                    NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN 
-        CALL CCG1_MKHII( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+        CALL CCG1_MKHII( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN 
-        CALL CCG1_MKHIR( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+        CALL CCG1_MKHIR( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN 
-        CALL CCG1_MKHID( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+        CALL CCG1_MKHID( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE
@@ -169,7 +169,7 @@
          CALL MSG_SETC( 'TYPE', ITYPE )
          CALL ERR_REP( 'CCD1_MKHIST',
      :   '  CCD1_MKHIS: Unsupported data type (^TYPE).', STATUS )
-      
+
       END IF
 
 *  Extract the peak value.

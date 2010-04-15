@@ -18,7 +18,7 @@ int GWM_DestroyWindow( Display *display, char name[])
 *
 *  Purpose:
 *     Destroy a window.
-*     
+*
 *  Language:
 *     C
 *
@@ -26,7 +26,7 @@ int GWM_DestroyWindow( Display *display, char name[])
 *     status = GWM_DestroyWindow( display, name);
 *
 *  Description:
-*     The X display is searched for the named window and if found, the 
+*     The X display is searched for the named window and if found, the
 *     window name property is removed from the root window and the window
 *     and its associated pixmap destroyed.
 *
@@ -45,12 +45,12 @@ int GWM_DestroyWindow( Display *display, char name[])
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,17 +74,17 @@ int GWM_DestroyWindow( Display *display, char name[])
     Window *win_id;
     char *prop_name, *real_name;
     Atom atom, actual_type;
-    int actual_format; 
+    int actual_format;
     unsigned long nitems, bytes_after;
 
 
-/*	  
+/*
 **  Convert the window name to a property atom and get its value from the
 **  root window
-*/	  
+*/
     prop_name = malloc( strlen((char*)name) + 5 );
     if ( !prop_name ) return GWM_MEM_ALLOC;
-    
+
     (void)strcpy( prop_name, "GWM_");
     (void)strcat( prop_name, (char*)name );
     atom = XInternAtom( display, prop_name, True );
@@ -96,7 +96,7 @@ int GWM_DestroyWindow( Display *display, char name[])
     if ( status ) return GWM_WIN_NOEXIST;
     if ( nitems == 0 ) return GWM_WIN_NOEXIST;
 
-/*    
+/*
 **  Check that the window is an GWM window
 */
     atom = XInternAtom(display, "GWM_name", False );
@@ -106,15 +106,15 @@ int GWM_DestroyWindow( Display *display, char name[])
     if ( status ) return GWM_NOT_GWMWIN;
     status = strcmp( real_name, (char*)name );
     XFree( real_name );
-    if ( status ) 
+    if ( status )
     {
         XFree(win_id);
 	return GWM_WRONG_NAME;
     }
 
- /*	  
+ /*
  ** Delete the window
- */	  
+ */
     XDestroyWindow( display, *win_id);
     XFlush( display );
 

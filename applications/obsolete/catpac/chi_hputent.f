@@ -1,7 +1,7 @@
       SUBROUTINE
      : CHI_HPUTENT( CATNO, FNAMES, NUMFLDS, CHECK,
-     :                  CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS, 
-     :                  FLDTYPES, NULLFLAGS, STATUS) 
+     :                  CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
+     :                  FLDTYPES, NULLFLAGS, STATUS)
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -39,7 +39,7 @@
       LOGICAL COLFOUND
       CHARACTER*(DAT__SZTYP)   HTYPE
 *.
-      
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -76,17 +76,17 @@
                  CALL DAT_ANNUL( CHIH_SLICELOC( I, CATNO), STATUS)
 
                  CALL DAT_ALTER( CHIH_COLDLOC(  I, CATNO), 1, NEWSIZE,
-     :                                          STATUS)         
+     :                                          STATUS)
                  CHIH_MAPSEC(1, CATNO) = LINENO
-                 CHIH_MAPSEC(2, CATNO) = 
-     :                              MIN( LINENO + CHIH_MAXMAPSIZE, 
+                 CHIH_MAPSEC(2, CATNO) =
+     :                              MIN( LINENO + CHIH_MAXMAPSIZE,
      :                                   CHIH_TOTSIZE(1, CATNO))
                  CALL DAT_SLICE( CHIH_COLDLOC( I, CATNO), 1,
      :                    CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO),
      :                    CHIH_SLICELOC( I, CATNO), STATUS)
                  CALL DAT_MAP( CHIH_SLICELOC( I, CATNO), HTYPE,
      :                    CHIH_CHNAM( CHIH_MODE( 1, CATNO) ), 1,
-     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, 
+     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1,
      :                    CHIH_COLPT( I, CATNO), STATUS)
 
 * repeat for NULLFLAGS
@@ -102,7 +102,7 @@
      :                    CHIH_SLICENLOC( I, CATNO), STATUS)
                  CALL DAT_MAP( CHIH_SLICENLOC( I, CATNO), HTYPE,
      :                    CHIH_CHNAM( CHIH_MODE( 1, CATNO) ), 1,
-     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, 
+     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1,
      :                    CHIH_NULLPT( I, CATNO), STATUS)
 
              ENDIF
@@ -118,17 +118,17 @@
                  CALL DAT_TYPE( CHIH_COLDLOC( I, CATNO), HTYPE, STATUS)
                  CALL DAT_UNMAP( CHIH_SLICELOC( I, CATNO), STATUS)
                  CALL DAT_ANNUL( CHIH_SLICELOC( I, CATNO), STATUS)
-                 CHIH_MAPSEC(1, CATNO) = 
+                 CHIH_MAPSEC(1, CATNO) =
      :                    MAX( LINENO - CHIH_MAXMAPSIZE/2, 1)
-                 CHIH_MAPSEC(2, CATNO) = 
-     :                              MIN( LINENO + CHIH_MAXMAPSIZE/2, 
+                 CHIH_MAPSEC(2, CATNO) =
+     :                              MIN( LINENO + CHIH_MAXMAPSIZE/2,
      :                                   CHIH_TOTSIZE(1, CATNO))
                  CALL DAT_SLICE( CHIH_COLDLOC( I, CATNO), 1,
      :                    CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO),
      :                    CHIH_SLICELOC( I, CATNO), STATUS)
                  CALL DAT_MAP( CHIH_SLICELOC( I, CATNO), HTYPE,
      :                    CHIH_CHNAM( CHIH_MODE( 1, CATNO) ), 1,
-     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, 
+     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1,
      :                    CHIH_COLPT( I, CATNO), STATUS)
 
 * repeat for NULLFLAGS
@@ -141,7 +141,7 @@
      :                    CHIH_SLICENLOC( I, CATNO), STATUS)
                  CALL DAT_MAP( CHIH_SLICENLOC( I, CATNO), HTYPE,
      :                    CHIH_CHNAM( CHIH_MODE( 1, CATNO) ), 1,
-     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, 
+     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1,
      :                    CHIH_NULLPT( I, CATNO), STATUS)
 
              ENDIF
@@ -156,7 +156,7 @@
           DO I = 1, NUMFLDS
 * If the column is not found then explicitly map it, and fill the
 *   common block
-              CALL CHI_HGETCOL( CATNO, FNAMES(I), 
+              CALL CHI_HGETCOL( CATNO, FNAMES(I),
      :                    CHIH_SELCOL(I, CATNO), FLDTYPES(I), STATUS )
 
           ENDDO
@@ -182,10 +182,10 @@
      :                    CHIH_CHARSIZE(CHIH_SELCOL(I, CATNO), CATNO))
               ENDIF
               PT = CHIH_NULLPT( CHIH_SELCOL(I, CATNO), CATNO)
-              CALL  TBL_PUTCVL( NULLFLAGS(I), OFFSET, 1, %val(PT))    
+              CALL  TBL_PUTCVL( NULLFLAGS(I), OFFSET, 1, %val(PT))
           ENDIF
       ENDDO
-          
+
 9999  RETURN
 
       END

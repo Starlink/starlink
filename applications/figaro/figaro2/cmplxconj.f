@@ -41,14 +41,14 @@ C     Local variables
 C
       INTEGER   DIMS(10)         ! Image dimensions
       LOGICAL   FAULT            ! Input is not valid complex data?
-      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary 
+      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary
                                  ! data
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image
       INTEGER   RPTR             ! Dynamic-memory pointer for real data
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   STATUS           ! Running status for DSA routines
-C     
+C
 C     Initial values
 C
       STATUS=0

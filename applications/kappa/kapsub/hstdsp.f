@@ -101,7 +101,7 @@
      :    RANGE                 ! The difference between the maximum
                                 ! and the minimum values
 
-      INTEGER 
+      INTEGER
      :    K                     ! loop counter
 
       CHARACTER*50 TEXT         ! summary of the histogram

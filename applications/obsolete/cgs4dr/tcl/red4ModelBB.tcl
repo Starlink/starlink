@@ -1,6 +1,6 @@
 proc red4ModelBB {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -23,8 +23,8 @@ proc red4ModelBB {taskname} {
     set Red4Widgets(BB_LAB01) [label $top.l1 -text "Filename"]
     set Red4Widgets(BB_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(BB_LAB01) $Red4Widgets(BB_ENT01) -in $top -side left
-    $Red4Widgets(BB_ENT01) insert end $Red4Widgets(RO) 
-    
+    $Red4Widgets(BB_ENT01) insert end $Red4Widgets(RO)
+
     set Red4Widgets(BB_LAB02) [label $bot.l2 -text "Temperature"]
     set Red4Widgets(BB_ENT02) [entry $bot.e2]
     set Red4Widgets(BB_LAB03) [label $bot.l3 -text "Wavelength"]
@@ -68,7 +68,7 @@ proc red4ModelBB {taskname} {
         set out $Red4Widgets(RO)_bb
         set message "Generating model black body from $Red4Widgets(RO) output to $out"
         cgs4drInform $taskname $message
-        set param "template=$Red4Widgets(RO) bb_temp=$Red4Widgets(BB_DT) refwave=$Red4Widgets(BB_DW)" 
+        set param "template=$Red4Widgets(RO) bb_temp=$Red4Widgets(BB_DT) refwave=$Red4Widgets(BB_DW)"
         set param "$param refflux=$Red4Widgets(BB_DF) output=$out"
         $taskname obey black_body "$param" -inform "cgs4drInform $taskname %V"
       }

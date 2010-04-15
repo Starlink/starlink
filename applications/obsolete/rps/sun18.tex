@@ -42,7 +42,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -110,7 +110,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -194,12 +194,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -240,13 +240,13 @@ available from the Leicester Database and Archive Service WWW page:
 \newpage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
- 
+
 \section{\label{se:introduction}\xlabel{introduction}Introduction}
 
 \subsection{Overview}
 
 The RPS package provides all the tools necessary for the generation and
-electronic submission of observing proposals for the UK ROSAT Pointed 
+electronic submission of observing proposals for the UK ROSAT Pointed
 Observation Programme. Briefly RPS allows the user to do the following:
 
 \begin{enumerate}
@@ -275,7 +275,7 @@ Before starting to use RPS, the user ought to be familar with the
 requirements of the UK ROSAT Pointed Observation Programme as laid out
 in the Announcement of Opportunity (AO) cover letter and the Technical
 Description. Copies of these documents are available from the UKDC at
-RAL. 
+RAL.
 
 The RPS package is designed to enable guest observers to fulfil the
 most important requirements of the UK Programme, namely to submit a
@@ -317,7 +317,7 @@ technical details of the proposed observation(s) of each target.
 be applied to an observation are explained in Chapter 9 of the
 Technical Description.
 
-\item If there are any remarks, these are printed on one or more separate 
+\item If there are any remarks, these are printed on one or more separate
 {\bf Remarks Summary} sheets.
 
 \end{enumerate}
@@ -336,16 +336,16 @@ RPS uses various files to store and output the RPF, as follows, where
 
 \item[{\tt propname} \hfill]  holds the cover and general form
 data, where {\tt propname} is the name entered by the user when
-first creating the RPF. 
+first creating the RPF.
 
 {\bf NB.} \emph{These are binary files in {\tt FACTS}
 format, as used within the SCAR package, and are {\bf not} transferable
 between different platforms.}
 
-\item[{\tt propname\_target} \hfill] holds the target data. 
+\item[{\tt propname\_target} \hfill] holds the target data.
 
 \item[{\tt propname.abstract} \hfill] may be created within RPS.
-This must be a simple ASCII text file ({\em i.e.}, without \LaTeX\ 
+This must be a simple ASCII text file ({\em i.e.}, without \LaTeX\
 commands).  Without an abstract file the RPF can be printed, but not
 submitted by electronic mail.
 
@@ -363,7 +363,7 @@ printed.
 \end{list}
 
 \section{\label{se:getting_started}\xlabel{getting_started}Getting Started}
- 
+
 There is just one environment variable, {\tt RPS\_AUX}, which prefixes
 the file names.  At Starlink sites, if RPS is installed, this is set by
 {\tt /star/etc/login}.
@@ -447,7 +447,7 @@ The options are:
 of Targets, this is not displayed with the other fields as it is
 automatically adjusted whenever records are added or deleted.
 
-\item [Edit General Page] 
+\item [Edit General Page]
 
 \item [Edit Target Data] --- The Constraints form is accessed after the
 main Target form if selected.
@@ -625,7 +625,7 @@ The table below shows the fields for each section:
 	&TARGET.DEC         &C*11     	&TOTAL.OBS.TIME     &R*4      \\
 	&NUMBER.OBS         &I*1      	&TIME.CRITICAL      &L*1      \\
 	&HRI.CODE           &I*1      	&WFC.CODE           &I*1      \\
-	&WFC.ZOOM.ON        &L*1      	&WFC.FILT.CODE(8)   &C*3      \\	
+	&WFC.ZOOM.ON        &L*1      	&WFC.FILT.CODE(8)   &C*3      \\
 	&WFC.FILT.PCNT(8)   &I*1      	&WFC.FILT.MINT(8)   &R*4      \\
 	&REMARKS(4)        &C*50     	&			&	\\[1mm]
 {\bf Constraints}&COORD.OBSERVATION  &L*1 	&START.YEAR        &I*2      \\

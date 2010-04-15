@@ -39,7 +39,7 @@ V0.4}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -182,14 +182,14 @@ V0.4}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-% HTML document table of contents (if used). 
+% HTML document table of contents (if used).
 % ==========================================
-% Add table of contents header and a navigation button to return 
+% Add table of contents header and a navigation button to return
 % to this point in the document (this should always go before the
 % abstract \section). This places the table of contents on the title
 % page. Do not use this if you want the normal behaviour.
 %   \label{stardoccontents}
-%   \begin{rawhtml} 
+%   \begin{rawhtml}
 %     <HR>
 %     <H2>Contents</H2>
 %   \end{rawhtml}
@@ -221,23 +221,23 @@ V0.4}
 \section{Introduction}
 
 This document follows on from \xref{SSN/26}{ssn26}{} which provides an
-introduction to performance and tuning issues on SPARC/Solaris systems. 
-Here we describe a package of tools designed to help monitor performance 
-on your system, implement some of the advice given in SSN/26 and provide 
+introduction to performance and tuning issues on SPARC/Solaris systems.
+Here we describe a package of tools designed to help monitor performance
+on your system, implement some of the advice given in SSN/26 and provide
 tuning tips.
 
 In order to monitor performance and perform tuning operations, the Solaris
-system manager traditionally has to rely on tools such as {\tt{vmstat}}, 
+system manager traditionally has to rely on tools such as {\tt{vmstat}},
 {\tt{iostat}}, {\tt{sar}} and the like which are somewhat limited in their
 scope and usefulness. Repeatedly running tools such as these and maybe
 using perl or awk scripts to parse the results can lead to unacceptable
 overheads and even adversely affect the performance data being recorded.
 
 Using an interpreted language called SymbEL (Symbol Engine Language),
-developed by Richard Pettit at Sun Microsystems, it is now possible to 
+developed by Richard Pettit at Sun Microsystems, it is now possible to
 retrieve information directly from the SPARC kernel and to construct
-home-made tools simply by writing a script. This places information 
-resources that were only previously available to the system C programmer 
+home-made tools simply by writing a script. This places information
+resources that were only previously available to the system C programmer
 at the disposal of every system manager. A good number of tools have already
 been written\footnote{The tools currently available are those distributed
 with the SymbEL package and have been written by Richard Pettit and Adrian
@@ -254,13 +254,13 @@ can be incorporated into the package.
 {\bf{Note that this package is only relevant to SPARC systems running Solaris
 2.x}}. It will not work on systems running SunOS 4.x (Solaris 1). In addition,
 some tools require the Motif library which was only included with Solaris at
-version 2.4. 
+version 2.4.
 
 A detailed guide to the interpretation of results from the various tools
 in this package is beyond the scope of this brief document -- there are
 simply too many options to cover. The package is provided as a toolkit
 to enable system managers to develop the performance monitoring utilities
-that will be of most use to them. 
+that will be of most use to them.
 
 The following sections describe the package installation, its use, and
 a little about how it works. The document is intended only as an
@@ -329,7 +329,7 @@ started with the command:
 
 or by defining an alias to this command. The GUI, and most of the tools
 can be run from a regular user account although a few need to be run as
-root to function properly. Details are given under the Help menu when you 
+root to function properly. Details are given under the Help menu when you
 run up the GUI.
 
 \subsection{Removal}
@@ -351,7 +351,7 @@ running tools or monitors.
 
 Although the tools in this package can be invoked independently, they
 are more conveniently accessed from the SysTune GUI which groups them
-loosely under two headings: 
+loosely under two headings:
 
 \begin{enumerate}
 
@@ -418,31 +418,31 @@ in bold type require root privileges to function properly.}
 \hline \hline
 \multicolumn{1}{|c|}{\bf Monitor}& \multicolumn{1}{c|}{\bf Description} \\
 \hline
-quick tune     & not really a monitor -- performs a quick system tuning 
+quick tune     & not really a monitor -- performs a quick system tuning
                   diagnostic to identify possible problems \\
-ruletool       & probably the most useful tool at the moment -- a GUI based  
+ruletool       & probably the most useful tool at the moment -- a GUI based
                  monitor that interactively checks a
-                 system at specified intervals for a wide range of        
+                 system at specified intervals for a wide range of
                  performance problems \\
 virtual adrian & a command line version of {\em ruletool} -- can be started
                  at boot time and can log results to a file \\
 calendar monitor & a monitor which logs its results as calendar appointments
-                   using the OpenWindows calendar manager. Useful for  
+                   using the OpenWindows calendar manager. Useful for
                    collecting results from multiple machines \\
 syslog monitor & a monitor which logs its results {\em via} the syslogd \\
-io monitor      & a monitor version of {\tt iostat} -- monitors for slow 
+io monitor      & a monitor version of {\tt iostat} -- monitors for slow
                  disks \\
 net monitor    & a monitor version of {\tt netstatx} -- monitors for a slow
                  network \\
 {\bf nfs monitor}   &  a monitor version of {\tt nfsstat-m} -- monitors for slow
                  NFS client mount points \\
-vm monitor    & a monitor version of {\tt vmstat} -- monitors for low RAM,  
+vm monitor    & a monitor version of {\tt vmstat} -- monitors for low RAM,
                 swap and CPU overloads \\
 {\bf percollator} & Performance collator: Runs the performance rules, including
-WWW server performance, and writes concise output to a log file or stdout. \\ 
+WWW server performance, and writes concise output to a log file or stdout. \\
 \hline
 \end{tabular}
-\caption{A summary of the tools in the monitors grouping. Tools in bold type 
+\caption{A summary of the tools in the monitors grouping. Tools in bold type
 require root privileges to function properly.}
 \label{table2}
 \end{table}
@@ -450,7 +450,7 @@ require root privileges to function properly.}
 \newpage
 \subsection{Statistics Tools}
 
-The statistics tools retrieve information from the kernel and currently 
+The statistics tools retrieve information from the kernel and currently
 display it in one of three ways:
 
 \begin{enumerate}
@@ -464,7 +464,7 @@ After the tool has started, the SysTune window can be used again.
 SysTune text window. Whilst these tools are running, the SysTune window
 is frozen until they complete their function.
 
-\item Other tools, such as {\tt{iostat}} and {\tt{vmstat}}, run in the 
+\item Other tools, such as {\tt{iostat}} and {\tt{vmstat}}, run in the
 background and send their output to stdout. These tools loop until explicitly
 terminated using the {\tt{stop}} button on the SysTune GUI. Whilst these
 tools are executing other tools cannot be launched.
@@ -473,7 +473,7 @@ tools are executing other tools cannot be launched.
 
 \subsection{\label{montools}\xlabel{montools}Monitor Tools}
 
-The monitor tools run continuously in the background and only output 
+The monitor tools run continuously in the background and only output
 information when they detect a problem. They periodically retrieve
 information from the kernel (such as disk access times and CPU loads) and
 feed it into a series of rules which define acceptable ranges of
@@ -490,13 +490,13 @@ default, 50ms. This could be increased to 70ms if required:
    > setenv DISK_SVC_T_PROBLEM 70
 \end{verbatim}
 
-Obviously, the default tuning rules should not be changed without good 
+Obviously, the default tuning rules should not be changed without good
 reason and probably only after considerable experimentation. For the changes
-to have effect, any running monitors would have to be restarted. In the 
+to have effect, any running monitors would have to be restarted. In the
 current implementation, the SysTune GUI needs to be restarted as well.
 
 The monitor tools use the colour coding scheme described in Appendix A of
-{\em{Sun Performance and Tuning}} to categorise the nature and severity of 
+{\em{Sun Performance and Tuning}} to categorise the nature and severity of
 a problem. This is summarised in Table~\ref{table3}. For a graphic
 illustration of this colour coding scheme in action, start up the RuleTool
 monitor on a fairly busy system.
@@ -522,7 +522,7 @@ defined in Appendix A of {\em{Sun Performance and Tuning}}.}
 \label{table3}
 \end{center}
 \end{table}
- 
+
 \subsubsection{Interactive Monitoring}
 
 Most of the monitors use the same rules definitions but output their results
@@ -530,18 +530,18 @@ in different ways. The {\bf{RuleTool}} monitor is probably the most useful
 interactive system monitor available. This is a GUI based tool which uses
 the above mentioned colour-coding scheme to indicate performance problems.
 By clicking on the coloured bars, the data relating to the notified problem
-can be obtained. 
+can be obtained.
 
 \subsubsection{Non-interactive Monitoring}
 
 It may be more convenient to have a monitor run in the background and
 log its results to a file. The virtual\_adrian, syslog monitor, and calendar
-monitors all provide variations on this theme. 
+monitors all provide variations on this theme.
 
 The calendar monitor ({\tt{mon\_cm}}) checks the system over a 15 minute
 period and if any rule gives an amber state or worse, the rule state is
 entered as an appointment for that time period. The calendar to use can be
-supplied as a command line option so that output from monitors on 
+supplied as a command line option so that output from monitors on
 different hosts can be sent to a calendar manager on a central host.
 
 In order to send output from these monitors to a file or supply other
@@ -549,25 +549,25 @@ options (such as the calendar for {\tt{mon\_cm}} to use) the monitors must be
 started from the command line using the full path, since in the current
 implementation these options cannot be provided if the monitors are
 launched from the SysTune GUI. This is a limitation of the GUI library
-used to implement the SysTune GUI. 
+used to implement the SysTune GUI.
 
 As an example, here is a command to start the {\tt{mon\_cm}} monitor on node
 {\tt{client1}} with a monitoring interval of 30 minutes (1800 seconds) and
-send the output to the calendar manager belonging to user {\tt{star}} on node 
-{\tt{server1}}. A calendar file must already have been created for user 
+send the output to the calendar manager belonging to user {\tt{star}} on node
+{\tt{server1}}. A calendar file must already have been created for user
 {\tt{star}} on {\tt{server1}} using {\tt{cm}} and you must have permission to
-write to it. 
+write to it.
 
 \begin{verbatim}
    client1> /opt/RICHPse/examples/mon_cm.se 1800 star@server1 &
 \end{verbatim}
 
-For further information on available command line options, see the 
+For further information on available command line options, see the
 information on {\bf{Tools}} available through the SysTune HELP menu.
 
 The percollator.se monitor is new to SE2.5. It applies the performance
 rules, including new rules for WWW server performance, and logs its
-results in a concise format. It is intended to be a long-term monitor 
+results in a concise format. It is intended to be a long-term monitor
 allowing usage/performance trends to be analysed. Graphing tools which
 will use the concise output are currently being developed.
 
@@ -591,7 +591,7 @@ boot time was chosen during the installation. The scripts are:
 
 For example, to start up the calendar monitor at boot time you would first
 edit {\tt{/etc/init.d/\-mon\_cm}} to remove commented out lines (if any) and
-then create a link to it in {\tt{/etc/rc2.d}} 
+then create a link to it in {\tt{/etc/rc2.d}}
 
 \begin{quote}
 {\tt{ln -s /etc/init.d/mon\_cm /etc/rc2.d/S90mon\_cm}}
@@ -600,9 +600,9 @@ then create a link to it in {\tt{/etc/rc2.d}}
 \section{\label{symbel_lang}\xlabel{symbel_lang}The SymbEL Language}
 
 This section describes in a little more detail the SymbEL language used
-to implement the tools in this package. 
+to implement the tools in this package.
 
-SymbEL is an interpreted language ({\em{i.e.}}, it doesn't need to be 
+SymbEL is an interpreted language ({\em{i.e.}}, it doesn't need to be
 compiled) that has a syntax very similar to that of C. The beauty of SymbEL
 is that it allows the user to extract information from the running SPARC
 kernel simply by writing a script, in the same way that you could extract
@@ -621,7 +621,7 @@ active property of a variable, that is, that it will receive information
 from the  kernel. This property is signified in a SymbEL script by
 preceeding the variable by the language class followed by a dollar ({\tt{\$}})
 sign. There are currently four language classes; the ones that provide
-access to the kstat and kvm data being the kstat and kvm language classes. 
+access to the kstat and kvm data being the kstat and kvm language classes.
 
 This is probably best illustrated by an example. The following script
 will report the number of processes currently running on the system. If
@@ -648,7 +648,7 @@ system, then this script could be typed in and executed.
 \item The initial line flags that this script should be processed using
 the SymbEL interpreter {\tt{se}}.
 
-\item The {\tt{stdio.se}} and {\tt{kstat.se}} header files (located in 
+\item The {\tt{stdio.se}} and {\tt{kstat.se}} header files (located in
 {\tt{/opt/RICHPse/include}}) are included to provide definitions for the
 {\tt{printf}} function and for the kstat variable types.
 
@@ -660,7 +660,7 @@ language class.
 
 \item The print statement prints out the number of processes on the system
 simply by referencing the appropriate structure member. This automatically
-causes the structure to be updated with information from the kernel. 
+causes the structure to be updated with information from the kernel.
 
 \end{enumerate}
 
@@ -672,7 +672,7 @@ manual:
 \end{verbatim}
 
 or access it through the HELP button on the SysTune GUI.
- 
+
 \section{\label{gui}\xlabel{gui}The GUI extension}
 
 The SymbEL language has an {\tt{attach}} statement which allows it to be
@@ -696,7 +696,7 @@ library.
 \section{\label{more_info}\xlabel{more_info}Further Information}
 
 For a general overview of tuning issues on SPARC/Solaris systems, see
-\xref{{\em{Configuring, monitoring and tuning SPARC/Solaris 
+\xref{{\em{Configuring, monitoring and tuning SPARC/Solaris
 systems}, SSN/26}}{ssn26}{}.
 
 Both this brief note and the above SSN refer to the more detailed treatment
@@ -715,7 +715,7 @@ Configuration Page}{http://www.starlink.ac.uk/\~{}cac/sunspot/sun\_perf.html}
 \appendix
 \section{\label{changes}\xlabel{changes}Changes since V0.3}
 
-This is a maintenance release for Solaris 2.5 platforms. 
+This is a maintenance release for Solaris 2.5 platforms.
 
 \begin{enumerate}
 \item Systune V0.4 includes the SE2.5 package which works correctly on

@@ -157,7 +157,7 @@ proc GetScatterOver selectionList {
      .getscatterover.opt.symbolColour.value  configure  -state disabled
 
      pack  .getscatterover.opt.symbolColour -side top -pady 2m
- 
+
 #
 #   Pack this frame into the window.
 
@@ -182,7 +182,7 @@ proc GetScatterOver selectionList {
       -command {HelpText GetScatterOver_help}
 
 #
-#  Pack the buttons into their frame with a default border around 
+#  Pack the buttons into their frame with a default border around
 #  the OK button.
 
     frame .getscatterover.buttonFrame.default -relief sunken -bd 1
@@ -197,7 +197,7 @@ proc GetScatterOver selectionList {
       -padx 3m -pady 2m -ipadx 1m
     pack .getscatterover.buttonFrame.help -side top -expand 1 \
       -padx 3m -pady 2m -ipadx 1m
- 
+
 #
 #  Pack this frame into the window.
 
@@ -520,7 +520,7 @@ proc GetScatterOver selectionList {
        }
     }
 
-#    
+#
 #  Withdraw the window, then update all the geometry information
 #  so we know how big it wants to be, then centre the window in
 #  parent and de-iconify it.

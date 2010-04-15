@@ -40,7 +40,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBEXTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        exterior points in B. 
+*        exterior points in B.
 *     LBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The lower pixel bounds of the smallest box which contains all
 *        interior points in B. A value of VAL__MAXI for element 1 is
@@ -48,7 +48,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
 *  Loop round every element in the supplied array.
       DO I = 1, MSKSIZ
 
-*  Invert the current pixel. 
+*  Invert the current pixel.
          IF( B( I ) .EQ. 0 ) THEN
             B( I ) = 1
          ELSE
@@ -133,14 +133,14 @@
 
 *  Now swap the interior and exterior bounding boxes.
       DO I = 1, NDIM
-         TEMP = LBINTB( I ) 
+         TEMP = LBINTB( I )
          LBINTB( I ) = LBEXTB( I )
          LBEXTB( I ) = TEMP
 
-         TEMP = UBINTB( I ) 
+         TEMP = UBINTB( I )
          UBINTB( I ) = UBEXTB( I )
          UBEXTB( I ) = TEMP
 
-      END DO         
+      END DO
 
       END

@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     VEC_NEGW
- 
+
 *  Purpose:
 *     Vectorised WORD negation function.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL VEC_NEGW( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
- 
+
 *  Description:
 *     The routine evaluates the negation function for a vectorised
 *     array ARGV of WORD values.  If numerical errors occur, the
 *     value VAL__BADW is returned in appropriate elements of the
 *     result array RESV and a STATUS value is set.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether the argument values (ARGV) may be "bad".
@@ -46,7 +46,7 @@
 *        This should be set to SAI__OK on entry, otherwise the routine
 *        returns without action.  A STATUS value will be set by this
 *        routine if any numerical errors occur.
- 
+
 *  Copyright:
 *     Copyright (C) 1988, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,7 +71,7 @@
 *  Authors:
 *     R.F. Warren-Smith (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-AUG-1988 (RFWS):
 *        Original version.
@@ -82,15 +82,15 @@
 *     27-SEP-1995 (BKM):
 *        Changed LIB$ESTABLISH and LIB$REVERT calls to NUM_HANDL and NUM_REVRT
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
@@ -100,31 +100,31 @@
 
       INCLUDE 'PRM_ERR'          ! PRM_ error codes
 
- 
+
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
       INTEGER N                  ! Number of argument values to process
       INTEGER*2 ARGV( * )           ! Function argument array
- 
+
 *  Arguments Returned:
       INTEGER*2 RESV( * )           ! Function result array
       INTEGER IERR               ! Numerical error pointer
       INTEGER NERR               ! Numerical error count
- 
+
 *  Status:
       INTEGER STATUS             ! Error status
- 
+
 *  External References:
       EXTERNAL NUM_TRAP          ! Error handling routine
- 
+
 *  Global Variables:
       INCLUDE 'NUM_CMN'          ! Define NUM_ERROR flag
 
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
       INTEGER*2 ARG                 ! Temporary argument variable
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
 
@@ -134,54 +134,54 @@
 
       INCLUDE 'NUM_DEF_W'      ! Define NUM_ arithmetic functions
 
- 
+
 *.
- 
+
 *  Check status.
       IF( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  If required, establish the error handler and initialise the common
 *  block error flag.
       IF( .FALSE. ) THEN
          CALL NUM_HANDL( NUM_TRAP )
          NUM_ERROR = SAI__OK
       ENDIF
- 
+
 *  Initialise the numerical error pointer and the error count.
       IERR = 0
       NERR = 0
- 
+
 *  If the bad data flag is set:
 *  ---------------------------
 *  Loop to process each element of the input argument array in turn.
       IF( BAD ) THEN
          DO 1 I = 1, N
             ARG = ARGV( I )
- 
+
 *  Check if the argument value is bad.  If it is, then put a value of
 *  VAL__BADW in the corresponding element of the result array.
             IF( ARG .EQ. VAL__BADW ) THEN
                RESV( I ) = VAL__BADW
- 
+
 *  Check if the argument value is acceptable.  If not, then put a value
 *  of VAL__BADW in the corresponding element of the result array and
 *  increment the numerical error count.
             ELSE IF( .NOT. ( BAD .OR. NUM_NEW( ARG, NUM__MINW ) ) ) THEN
                RESV( I ) = VAL__BADW
                NERR = NERR + 1
- 
+
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = PRM__INTOF
                   IERR = I
                ENDIF
- 
+
 *  If the argument value is acceptable, then evaluate the negation
 *  function.
             ELSE
                RESV( I ) = NUM_NEGW( ARG )
- 
+
 *  If an error handler is established, check if the numerical error
 *  flag is set.  If so, put a value of VAL__BADW in the corresponding
 *  element of the result array and increment the error count.
@@ -189,47 +189,47 @@
                   IF( NUM_ERROR .NE. SAI__OK ) THEN
                      RESV( I ) = VAL__BADW
                      NERR = NERR + 1
- 
+
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                      IF( STATUS .EQ. SAI__OK ) THEN
                         STATUS = NUM_ERROR
                         IERR = I
                      ENDIF
- 
+
 *  Clear the error flag.
                      NUM_ERROR = SAI__OK
                   ENDIF
                ENDIF
             ENDIF
  1       CONTINUE
- 
+
 *  If the bad data flag is not set:
 *  -------------------------------
 *  Loop to process each element of the input argument array in turn.
       ELSE
          DO 2 I = 1, N
             ARG = ARGV( I )
- 
+
 *  Check if the argument value is acceptable.  If not, then put a value
 *  of VAL__BADW in the corresponding element of the result array and
 *  increment the error count.
             IF( .NOT. ( BAD .OR. NUM_NEW( ARG, NUM__MINW ) ) ) THEN
                RESV( I ) = VAL__BADW
                NERR = NERR + 1
- 
+
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = PRM__INTOF
                   IERR = I
                ENDIF
- 
+
 *  If the argument value is acceptable, then evaluate the negation
 *  function.
             ELSE
                RESV( I ) = NUM_NEGW( ARG )
- 
+
 *  If an error handler is established, check if the numerical error
 *  flag is set.  If so, put a value of VAL__BADW in the corresponding
 *  element of the result array and increment the error count.
@@ -237,14 +237,14 @@
                   IF( NUM_ERROR .NE. SAI__OK ) THEN
                      RESV( I ) = VAL__BADW
                      NERR = NERR + 1
- 
+
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                      IF( STATUS .EQ. SAI__OK ) THEN
                         STATUS = NUM_ERROR
                         IERR = I
                      ENDIF
- 
+
 *  Clear the error flag.
                      NUM_ERROR = SAI__OK
                   ENDIF
@@ -252,11 +252,11 @@
             ENDIF
  2       CONTINUE
       ENDIF
- 
+
 *  If required, remove the error handler.
       IF( .FALSE. ) THEN
          CALL NUM_REVRT
       ENDIF
- 
+
 *  Exit routine.
       END

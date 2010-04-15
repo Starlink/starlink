@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE str_MOVE
 *
-*   Description: 
+*   Description:
 *      Copy a string.
 *
 *   Authors:
@@ -34,7 +34,7 @@
 *   Import:
       BYTE STR1(ARB)       ! input string
       INTEGER SIZE2        ! maximum size of output string
- 
+
 *   Export:
       BYTE STR2(SIZE2)     ! receptor string
 

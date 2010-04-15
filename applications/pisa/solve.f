@@ -65,7 +65,7 @@ c     *** back substitution for solution
       DO 70 I = 1,M
          IR = M + 1 - I
          IF (A(IR,IR).EQ.0.0) THEN
-            
+
             B(IR) = 0.0
          ELSE
             TEMP = B(IR)
@@ -79,7 +79,7 @@ c     *** back substitution for solution
          ENDIF
  70   CONTINUE
       RETURN
-      
+
  30   DO 90 IB = 1,M
          B(IB) = 0.0
  90   CONTINUE

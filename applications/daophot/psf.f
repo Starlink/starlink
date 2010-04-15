@@ -1,12 +1,12 @@
-      SUBROUTINE  GETPSF (PIC, NCOL, NROW, PAR, PSF, XCEN, YCEN, 
+      SUBROUTINE  GETPSF (PIC, NCOL, NROW, PAR, PSF, XCEN, YCEN,
      .                    APMAG, SKY, ID, MAXSTR, OPT, NOPT)
       IMPLICIT NONE
 
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers, very small numbers and very
-*     large numbers with their PRM_PAR replacements. 
- 
+*     large numbers with their PRM_PAR replacements.
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
@@ -18,16 +18,16 @@ C average of several stars.
 C
 C                OFFICIAL DAO VERSION:  1991 May 10
 C
-C The subroutine reads in a subarray around the first desired 
-C point-spread function star, fits a gaussian profile to the core of 
-C the image, and generates a look-up table of the residuals of the 
+C The subroutine reads in a subarray around the first desired
+C point-spread function star, fits a gaussian profile to the core of
+C the image, and generates a look-up table of the residuals of the
 C actual image data from the gaussian fit.  If desired, it will then
-C fit this PSF to another star to determine its precise centroid, 
-C scale the same Gaussian to the new star's core, and add the 
+C fit this PSF to another star to determine its precise centroid,
+C scale the same Gaussian to the new star's core, and add the
 C differences between the actual data and the scaled Gaussian to the
 C look-up table.  This can go on star after star after star.
-C The parameters of the Gaussian approximation and the table of 
-C corrections from the approximation to the true PSF are stored in 
+C The parameters of the Gaussian approximation and the table of
+C corrections from the approximation to the true PSF are stored in
 C a disk file.
 C
 C Arguments
@@ -39,7 +39,7 @@ C        generate and store a look-up table occupying a larger area.
 C        The look-up table will be square, even though the corners will
 C        be unused.
 C
-C FITRAD (INPUT) is the fitting radius, which will be used in defining 
+C FITRAD (INPUT) is the fitting radius, which will be used in defining
 C        what is meant by a "neighbor" of the PSF star.
 C
 C Both of these arguments are user-definable parameters, whose values
@@ -70,8 +70,8 @@ C
 C
       INTEGER MAXBOX, MAXPSF, MAXSTR, MAXN, MAXPAR, MAXEXP, NCOL, NROW
       INTEGER NOPT
-      PARAMETER  (MAXPAR=6, MAXPSF=145, MAXEXP=6, 
-     .     MAXBOX=69, MAXN=200) 
+      PARAMETER  (MAXPAR=6, MAXPSF=145, MAXEXP=6,
+     .     MAXBOX=69, MAXN=200)
 C
 C Parameters
 C
@@ -86,8 +86,8 @@ C        raw picture data for the program stars, PSF will have to
 C        operate on a square array which is larger by 7 pixels in X
 C        and Y than MAXBOX.  Hence, the dimensions below are all
 C        MAXBOX + 7.
-C        
-C MAXPSF is the dimension of the largest lookup table that will ever 
+C
+C MAXPSF is the dimension of the largest lookup table that will ever
 C        need to be generated.  Recall that the corrections from the
 C        Gaussian approximation of the PSF to the true PSF will be
 C        stored in a table with a half-pixel grid size.
@@ -99,7 +99,7 @@ C MAXSTR is the largest number of stars permitted in a data file.
 C
 C MAXN is the maximum permitted number of PSF stars.
 C
-C MAXPAR is the maximum number of parameters which may be used to 
+C MAXPAR is the maximum number of parameters which may be used to
 C        describe the analytic part of the PSF, *** IN ADDITION TO
 C        the central intensity, and the x and y centroids.
 C
@@ -123,12 +123,12 @@ C
 C
       DOUBLE PRECISION SUM, VOL
       REAL LOBAD, HIBAD, THRESH, AP1, PHPADU, READNS, RONOIS,
-     .     FWHM, WATCH, FITRAD, RADSQ, PSFRAD, PSFRSQ, PSFMAG, FMAX, 
-     .     DFDX, DFDY, SIG, DX, DY, RDX, RDY, XMID, YMID, DP, OLD, W, 
+     .     FWHM, WATCH, FITRAD, RADSQ, PSFRAD, PSFRSQ, PSFMAG, FMAX,
+     .     DFDX, DFDY, SIG, DX, DY, RDX, RDY, XMID, YMID, DP, OLD, W,
      .     WT, RADIUS, SCALE, SUMSQ, SUMN, DATUM, RSQ
       REAL ERRMAG, CHI, SHARP, PERR, PKERR
       INTEGER I, J, K, L, N, NIN, LX, LY, MX, MY, NTOT, NSTAR, ISTAR, NL
-      INTEGER IEXPAND, IFRAC, IPSTYP, NPSF, NPAR, ISTAT, EDGESQ, 
+      INTEGER IEXPAND, IFRAC, IPSTYP, NPSF, NPAR, ISTAT, EDGESQ,
      .     NEXP, MIDDLE, MIDSQ, IDX, JDY, JDYSQ, IX, JY, ITER, NPASS
       LOGICAL STAROK, SATUR8, REDO
 C
@@ -156,7 +156,7 @@ C
 C
 C If in the final analysis we want to be able to determine a value for
 C the point-spread function anywhere within a radius of R pixels, and
-C we want the lookup table to have a one-half pixel grid spacing in 
+C we want the lookup table to have a one-half pixel grid spacing in
 C each coordinate.  To go from 0 to R with half-pixel steps, we
 C need 2*R points, not including the central ("0") one.  Outside this
 C we will need an additional pixel, just to make sure we will be able to
@@ -166,7 +166,7 @@ C
       NPSF = 2*(NINT(2.*PSFRAD)+1)+1
       PSFRAD = (REAL(NPSF-1)/2. - 1.)/2.
 C
-C Ascertain the name of the input (aperture, usually) photometry file, 
+C Ascertain the name of the input (aperture, usually) photometry file,
 C and read in the relevant data for all stars.
 C
       CALL TBLANK
@@ -295,8 +295,8 @@ C
          END IF
       END IF
 C
-C Define the subarray containing the star and search it for "bad" 
-C pixels.  This will include a two-pixel border around the PSF box 
+C Define the subarray containing the star and search it for "bad"
+C pixels.  This will include a two-pixel border around the PSF box
 C itself, to guarantee valid interpolations to within the PSF box.
 C
       LX = MAX0( 1, INT(XCEN(ISTAR)-PSFRAD)-1 )
@@ -364,11 +364,11 @@ C
                  IF (WATCH .GT. -0.5) THEN
                    CALL TBLANK
                    WRITE (6,628) ID(ISTAR), DATUM, CHAR(7), I, J
- 628               FORMAT (1X, I5, ' has a bad pixel:',  F9.1, 
+ 628               FORMAT (1X, I5, ' has a bad pixel:',  F9.1,
      .                  ' at position', A1, 2I5)
                  END IF
                ELSE
-                 IF (WATCH .GT. -0.5) 
+                 IF (WATCH .GT. -0.5)
      .                WRITE (6,628) ID(ISTAR), DATUM, CHAR(0), I, J
                END IF
 C
@@ -429,7 +429,7 @@ C
       END IF
 C
       IF (WATCH .GT. 0.5) THEN
-         CALL SHOW (PIC(LX,LY), FMAX, SKY(ISTAR), 
+         CALL SHOW (PIC(LX,LY), FMAX, SKY(ISTAR),
      .        MX-LX+1, MY-LY+1, NCOL)
          WRITE (6,622) ID(ISTAR), XCEN(ISTAR), YCEN(ISTAR),
      .        APMAG(ISTAR), NINT(FMAX)
@@ -470,7 +470,7 @@ C
          RETURN
       END IF
 C
-C If the first star is saturated, exchange it for the first 
+C If the first star is saturated, exchange it for the first
 C unsaturated one.
 C
       IF (SATR8D(1)) THEN
@@ -506,7 +506,7 @@ C
          END DO
 C
          N = NPARAM(I, FWHM, LABEL, PAR, MAXPAR)
-         CALL  FITANA  (PIC, NCOL, NROW, HJNK, XJNK, YJNK, SKY, 
+         CALL  FITANA  (PIC, NCOL, NROW, HJNK, XJNK, YJNK, SKY,
      .       SATR8D, NSTAR, FITRAD, WATCH, I, PAR, N, SIG)
 C
 C SIG is the root-mean-square scatter about the best-fitting analytic
@@ -535,7 +535,7 @@ C
       NPAR = NPARAM(IPSTYP, FWHM, LABEL, PAR, MAXPAR)
       READ (LINE,*) (PAR(L), L=1,NPAR)
 C
-C This last bit ensures that the subsequent computations will be 
+C This last bit ensures that the subsequent computations will be
 C performed with the parameters rounded off exactly the same as they
 C appear in the output .PSF file.
 C
@@ -628,7 +628,7 @@ C
                WRITE (LINE(J:J+15),68) ID(ISTAR)
    68          FORMAT (1X, I5, ' saturated')
             ELSE
-               WRITE (LINE(J:J+15),69) ID(ISTAR), 
+               WRITE (LINE(J:J+15),69) ID(ISTAR),
      .              PSF(ISTAR,1,1), FLAG(ISTAR)
    69          FORMAT (1X, I5, F7.3, 1X, A1, 1X)
             END IF
@@ -743,7 +743,7 @@ C
 C
 C The 4x4 box is given by  I-1 <= x <= I+2, J-1 <= y <= J+2.
 C
-               IF ((I .LT. 2) .OR. (J .LT. 2) .OR. 
+               IF ((I .LT. 2) .OR. (J .LT. 2) .OR.
      .              (I+2 .GT. NCOL) .OR.
      .              (J+2 .GT. NROW)) GO TO 4900           ! Next star
 C
@@ -790,7 +790,7 @@ C
 C
                   IF (ITER .LE. MAX0(3,NPASS/2)) THEN
                      W = HPSF(ISTAR)/(1. + (ABS(DP - OLD)/SIG))
-                  ELSE 
+                  ELSE
                      W = HPSF(ISTAR)/(1. + ((DP - OLD)/SIG)**2)
                   END IF
                ELSE
@@ -820,7 +820,7 @@ C
       IF (NEXP .LT. 2) GO TO 2800
 C
 C At this point, we must be sure that any higher order terms
-C in the PSF [i.e. those that go as powers of (XCEN-XMID) and 
+C in the PSF [i.e. those that go as powers of (XCEN-XMID) and
 C (YCEN-YMID)] contain zero volume, so that the total volume
 C of the PSF is independent of position.  This will be done
 C by looking at the total flux contained in the look-up
@@ -828,12 +828,12 @@ C tables of index 2 and higher.  The analytic function
 C will be scaled to the same total flux and subtracted from
 C each of the higher lookup tables and added into the
 C lookup table of index 1.  I scale the analytic function
-C instead of simply transferring the net flux from the 
+C instead of simply transferring the net flux from the
 C higher tables to table 1, because it is poor fits of
 C the analytic profile to the image data which has caused
 C the net flux in the lookup tables to depend upon position.
 C
-C Compute the brightness weighted average value of each of 
+C Compute the brightness weighted average value of each of
 C the terms in the polynomial expansion.
 C
       DO K=1,NEXP
@@ -875,7 +875,7 @@ C to the mean value of the polynomial term --- to keep the PSF for the
 C mean polynomial unchanged.  That way, if there is on average some
 C systematic error in sky estimate, at least it will be constant over
 C the area of the frame.  (This, of course, is potentially dangerous for
-C a globular cluster or similar object centered within the frame.  I 
+C a globular cluster or similar object centered within the frame.  I
 C have to think about this some more.)
 C
 CD     CALL COPPIC (CASE('stuff'), ISTAT)
@@ -896,7 +896,7 @@ CD        LX = LX*NPSF + LX + 1
 CD        LY = 1
 CD        MX = NPSF
 CD        MY = NPSF
-CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF,
 CD    .        PSF(1,1,K), ISTAT)
 CD     END DO
 C
@@ -959,7 +959,7 @@ CD        LX = LX*NPSF + LX + 1
 CD        LY = NPSF + 2
 CD        MX = NPSF
 CD        MY = NPSF
-CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF,
 CD    .        PSF(1,1,K), ISTAT)
 CD     END DO
 C
@@ -1012,7 +1012,7 @@ CD     END DO
 C
 CD     WRITE (6,*) 'VOL =', SNGL(VOL)
 C
-C Now determine the net volume of each of the higher-order PSF 
+C Now determine the net volume of each of the higher-order PSF
 C tables, and force it to zero by subtracting a scaled copy of
 C the constant PSF.  Scale the part that has been subtracted off
 C by the mean polynomial term and add it in to the constant
@@ -1051,7 +1051,7 @@ CD        LX = LX*NPSF + LX + 1
 CD        LY = 2*NPSF + 3
 CD        MX = NPSF
 CD        MY = NPSF
-CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF,
 CD    .        PSF(1,1,K), ISTAT)
 CD     END DO
 C
@@ -1083,16 +1083,16 @@ C
                HPSF(ISTAR) = 3.*HPSF(1)            ! Lousy starting guess
                XCEN(ISTAR) = XCEN(ISTAR)-LX+1.
                YCEN(ISTAR) = YCEN(ISTAR)-LY+1.
-               CALL PKFIT (PIC(LX,LY), K, L, NCOL, XCEN(ISTAR), 
+               CALL PKFIT (PIC(LX,LY), K, L, NCOL, XCEN(ISTAR),
      .              YCEN(ISTAR), HPSF(ISTAR), SKY(ISTAR), 0.5*PSFRAD,
      .              LOBAD, HIBAD, SCALE, IPSTYP, PAR, MAXPAR, NPAR,
      .              PSF, MAXPSF, MAXEXP, NPSF, NEXP, IFRAC, DX,
      .              DY, ERRMAG, CHI, SHARP, N)
                XCEN(ISTAR) = XCEN(ISTAR)+LX-1.
                YCEN(ISTAR) = YCEN(ISTAR)+LY-1.
-               WRITE (6,666) ID(ISTAR), XCEN(ISTAR), YCEN(ISTAR), 
-     .              PSFMAG-2.5*ALOG10(HPSF(ISTAR)), 
-     .              AMIN1(2.0, 1.086*ERRMAG/HPSF(ISTAR)), 
+               WRITE (6,666) ID(ISTAR), XCEN(ISTAR), YCEN(ISTAR),
+     .              PSFMAG-2.5*ALOG10(HPSF(ISTAR)),
+     .              AMIN1(2.0, 1.086*ERRMAG/HPSF(ISTAR)),
      .              REAL(N), CHI, SHARP
   666               FORMAT (1X, I5, 4F9.3, F9.0, F9.2, F9.3)
                LX = MAX0( 1, INT(XCEN(ISTAR)-PSFRAD)-1 )
@@ -1106,8 +1106,8 @@ C
                   DO I=LX,MX
                      IF (PIC(I,J) .LE. HIBAD) THEN
                         DX = REAL(I) - XCEN(ISTAR)
-                        PIC(I,J) = 
-     .                       PIC(I,J) - RDX * PROFIL(IPSTYP, 
+                        PIC(I,J) =
+     .                       PIC(I,J) - RDX * PROFIL(IPSTYP,
      .                       DX, DY, PAR, DFDX, DFDY, TERM, 0)
                      END IF
                   END DO
@@ -1165,14 +1165,14 @@ C
 C
 C First, write out the PSF stars.
 C
-      CALL WRHEAD (3, 3, NCOL, NROW, 7, LOBAD, HIBAD, THRESH, AP1, 
+      CALL WRHEAD (3, 3, NCOL, NROW, 7, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, READNS, RADIUS)
       DO I=1,NSTAR
          WRITE (3,280) ID(I), XCEN(I), YCEN(I), APMAG(I), SKY(I)
  280     FORMAT (1X, I5, 4F9.3)
       END DO
 C
-C Now look for all stars within a radius equal to 
+C Now look for all stars within a radius equal to
 C 1.5*PSFRAD+2.*FITRAD+1 of any of the PSF stars.
 C
       RSQ = (1.5*PSFRAD+2.*FITRAD+1.)**2
@@ -1195,7 +1195,7 @@ C
 C
 C Now all stars in the stack between positions NSTAR+1 and L-1,
 C inclusive, lie within the specified radius of the PSF stars and have
-C been written out.  Finally, look for any stars within a radius 
+C been written out.  Finally, look for any stars within a radius
 C equal to 2*FITRAD+1 of any of THESE stars, and of each other.
 C
       RSQ = (2.*FITRAD+1)**2
@@ -1219,8 +1219,8 @@ C
 C
 C#######################################################################
 C
-      SUBROUTINE  FITANA  (PIC, NCOL, NROW, H, XCEN, YCEN, SKY, 
-     .     SATR8D, NSTAR, 
+      SUBROUTINE  FITANA  (PIC, NCOL, NROW, H, XCEN, YCEN, SKY,
+     .     SATR8D, NSTAR,
      .    FITRAD, WATCH, IPSTYP, PAR, NPAR, CHI)
 C
 C This subroutine fits the ANALYTIC profile to the selected stars.
@@ -1233,7 +1233,7 @@ C
       CHARACTER*80 LINE
       REAL PIC(NCOL,NROW)
       REAL H(*), XCEN(*), YCEN(*), SKY(*), CLAMP(MAXPAR), OLD(MAXPAR)
-      REAL C(MAXPAR,MAXPAR), V(MAXPAR), PAR(MAXPAR), T(MAXPAR), 
+      REAL C(MAXPAR,MAXPAR), V(MAXPAR), PAR(MAXPAR), T(MAXPAR),
      .     Z(MAXPAR)
       REAL XCLAMP(MAXN), YCLAMP(MAXN), XOLD(MAXN), YOLD(MAXN)
       REAL ABS, PROFIL, SQRT
@@ -1271,13 +1271,13 @@ C-----------------------------------------------------------------------
 C
 C SECTION 1
 C
-C Now we will fit an integrated analytic function to the central part 
-C of the stellar profile.  For each star we will solve for three 
-C parameters: (1) H, the central height of the model profile (above 
-C sky); (2) XCEN, C the centroid of the star in x; and (3) YCEN, 
+C Now we will fit an integrated analytic function to the central part
+C of the stellar profile.  For each star we will solve for three
+C parameters: (1) H, the central height of the model profile (above
+C sky); (2) XCEN, C the centroid of the star in x; and (3) YCEN,
 C likewise for y.  In addition, from ALL STARS CONSIDERED TOGETHER
-C we will determine any other parameters, PAR(i), required to describe 
-C the profile.  We will use a circle of radius FITRAD centered on the 
+C we will determine any other parameters, PAR(i), required to describe
+C the profile.  We will use a circle of radius FITRAD centered on the
 C position of each PSF star. NOTE THAT we do not fit the data to an
 C actual analytic profile, but rather the function is numerically
 C integrated over the area of each pixel, and the observed data are fit

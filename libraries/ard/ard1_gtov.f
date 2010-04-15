@@ -18,7 +18,7 @@
 *     array). If any of the pixel coords are outside the range
 *     specified by UBND and LBND, then VA is returned as zero.
 *
-*     pixel cordinates are like pixel coordinates except that 
+*     pixel cordinates are like pixel coordinates except that
 *     pixel I extends from I-0.5 to I+0.5.
 
 *  Arguments:
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,14 +106,14 @@
       VA = 1
 
 *  Initialise the size of the current object (pixel, row, plane, cube,
-*  etc). 
+*  etc).
       P = 1
 
 *  Loop round each dimension.
-      DO I = 1, NDIM      
+      DO I = 1, NDIM
 
 *  Check the value for this axis is OK.
-         IF( GR( I ) .EQ. AST__BAD ) THEN 
+         IF( GR( I ) .EQ. AST__BAD ) THEN
             VA = 0
             GO TO 999
          ELSE
@@ -130,11 +130,11 @@
             ELSE
                VA = 0
                GO TO 999
- 
+
             END IF
 
          END IF
-  
+
       END DO
 
 *  Jump to here if an index is out of bounds or bad.

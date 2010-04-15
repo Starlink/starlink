@@ -22,35 +22,35 @@
 *  Description:
 *     This application modifies the WCS information in an NDF so that
 *     the WCS position of a given pixel is moved by specified amount
-*     along each WCS axis. The shifts to use are specified either by 
-*     an absolute offset vector given by the ABS parameter or by the 
-*     difference between a fiducial point and a standard object given 
-*     by the FID and OBJ parameters respectively. In each case the 
-*     co-ordinates are specified in the NDF's current WCS co-ordinate 
+*     along each WCS axis. The shifts to use are specified either by
+*     an absolute offset vector given by the ABS parameter or by the
+*     difference between a fiducial point and a standard object given
+*     by the FID and OBJ parameters respectively. In each case the
+*     co-ordinates are specified in the NDF's current WCS co-ordinate
 *     Frame.
 
 *  Usage:
-*     wcsslide ndf abs 
+*     wcsslide ndf abs
 
 *  ADAM Parameters:
 *     ABS( ) = _DOUBLE (Read)
-*        Absolute shift for each WCS axis.  The number of values 
-*        supplied must match the number of WCS axes in the NDF.  It is 
+*        Absolute shift for each WCS axis.  The number of values
+*        supplied must match the number of WCS axes in the NDF.  It is
 *        only used if STYPE="Absolute".  Offsets for celestial longitude
-*        and latitude axes should be specified in arcseconds.  Offsets 
-*        for all other types of axes should be given directly in the 
+*        and latitude axes should be specified in arcseconds.  Offsets
+*        for all other types of axes should be given directly in the
 *        units of the axis.
 *     FID = LITERAL (Read)
-*        A comma-separated list of formatted axis values giving the 
+*        A comma-separated list of formatted axis values giving the
 *        position of the fiducial point in WCS co-ordinates.  The number
-*        of values supplied must match the number of WCS axes in the 
+*        of values supplied must match the number of WCS axes in the
 *        NDF.  It is only used if STYPE="Relative".
 *     NDF = NDF (Update)
 *        The NDF to be translated.
 *     OBJ = LITERAL (Read)
-*        A comma-separated list of formatted axis values giving the 
-*        position of the standard object in WCS co-ordinates.  The 
-*        number of values supplied must match the number of WCS axes in 
+*        A comma-separated list of formatted axis values giving the
+*        position of the standard object in WCS co-ordinates.  The
+*        number of values supplied must match the number of WCS axes in
 *        the NDF.  It is only used if STYPE="Relative".
 *     STYPE = LITERAL (Read)
 *        The sort of shift to be used.  The choice is "Relative" or
@@ -58,23 +58,23 @@
 
 *  Examples:
 *     wcsslide m31 [32,23]
-*        The (RA,Dec) axes in the NDF m31 are shifted by 32 arcseconds 
+*        The (RA,Dec) axes in the NDF m31 are shifted by 32 arcseconds
 *        in right ascension and 23 arcseconds in declination.
 *     wcsslide speca stype=rel fid=211.2 obj=211.7
 *        The spectral axis in the NDF speca (which measures frequency in
-*        GHz), is shifted by 0.5 GHz (i.e. 211.7--211.2). 
+*        GHz), is shifted by 0.5 GHz (i.e. 211.7--211.2).
 *     wcsslide speca stype=abs abs=0.5
 *        This does just the same as the previous example.
 
 *  Notes:
 *     -  The correction is affected by translating pixel co-ordinates by
 *     a constant amount before projection them into WCS co-ordinates.
-*     Therefore, whilst the translation will be constant across the 
-*     array in pixel co-ordinates, it may vary in WCS co-ordinates 
-*     depending on the nature of the pixel->WCS transformation.  The 
-*     size of the translation in pixel co-ordinates is chosen in order 
-*     to produce the required shift in WCS co-ordinates at the OBJ 
-*     position (if STYPE is "Relative"), or at the array centre (if 
+*     Therefore, whilst the translation will be constant across the
+*     array in pixel co-ordinates, it may vary in WCS co-ordinates
+*     depending on the nature of the pixel->WCS transformation.  The
+*     size of the translation in pixel co-ordinates is chosen in order
+*     to produce the required shift in WCS co-ordinates at the OBJ
+*     position (if STYPE is "Relative"), or at the array centre (if
 *     STYPE is "Absolute").
 
 *  Related Applications:
@@ -115,7 +115,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       DOUBLE PRECISION OBJ( NDF__MXDIM ) ! WCS coords of standard object
       DOUBLE PRECISION P1( NDF__MXDIM )! Start of geodesic offset
       DOUBLE PRECISION P2( NDF__MXDIM )! Target for geodesic offset
-      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector      
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions in pixels
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Used length of string
@@ -145,8 +145,8 @@
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER J                  ! Loop variable
       INTEGER MAP0               ! Mapping that shifts pixel coords
-      INTEGER MAP1               ! Original GRID->WCS Mapping 
-      INTEGER MAP2               ! New GRID->WCS Mapping 
+      INTEGER MAP1               ! Original GRID->WCS Mapping
+      INTEGER MAP2               ! New GRID->WCS Mapping
       INTEGER NDIM               ! Number of dimensions in NDF
       INTEGER NPIX               ! Number of pixel axes in NDF
       INTEGER NWCS               ! Number of WCS axes in NDF
@@ -178,10 +178,10 @@
 
 *  Get the absolute shift directly as the value of the ABS parameter.
       IF ( STYPE .EQ. 'ABSOLUTE' ) THEN
-         CALL PAR_EXACD( 'ABS', NWCS, SHIFT, STATUS ) 
+         CALL PAR_EXACD( 'ABS', NWCS, SHIFT, STATUS )
 
 *  If any of the current Frame axes are SKY axes, then the supplied
-*  offset values are interpreted as arc-seconds. Convert them to 
+*  offset values are interpreted as arc-seconds. Convert them to
 *  radians.
          DO I = 1, NWCS
             ATTR = 'Domain('
@@ -202,24 +202,24 @@
          DO I = 1, NPIX
             GFID( I ) = 0.5*( DIM( I ) + 1 )
          END DO
-         CALL AST_TRANN( IWCS, 1, NPIX, 1, GFID, .TRUE., NWCS, 1, FID, 
+         CALL AST_TRANN( IWCS, 1, NPIX, 1, GFID, .TRUE., NWCS, 1, FID,
      :                   STATUS )
 
 *  P1 is the start of the geodesic and P2 is the end of the geodesic.
 *  Initialise them both to the FID point obtained above.
          DO I = 1, NWCS
-            P1( I ) = FID( I ) 
-            P2( I ) = FID( I ) 
-         END DO            
+            P1( I ) = FID( I )
+            P2( I ) = FID( I )
+         END DO
 
 *  Offset away from this WCS position by the required amount on each
-*  axis. 
+*  axis.
          DO I = 1, NWCS
 
 *  Move the geodesic end-point along the I'th axis by a small amount.
-            P2( I ) = 1.001*P1( I ) 
+            P2( I ) = 1.001*P1( I )
             IF( P2( I ) .EQ. P1( I ) ) P2( I ) = 1.0
-      
+
 *  Move away from P1 towards P2, by the distance given by SHIFT(I). The
 *  resulting position is stored in OBJ.
             CALL AST_OFFSET( IWCS, P1, P2, SHIFT( I ), OBJ, STATUS )
@@ -230,13 +230,13 @@
                P2( J ) = OBJ( J )
             END DO
 
-         END DO            
+         END DO
 
 *  Convert the final OBJ position into GRID coords.
-         CALL AST_TRANN( IWCS, 1, NWCS, 1, OBJ, .FALSE., NPIX, 1, GOBJ, 
+         CALL AST_TRANN( IWCS, 1, NWCS, 1, OBJ, .FALSE., NPIX, 1, GOBJ,
      :                   STATUS )
 
-*  Alternatively, get the shift as the difference between the FID and 
+*  Alternatively, get the shift as the difference between the FID and
 *  OBJ parameters.
       ELSE
 
@@ -258,7 +258,7 @@
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Unable to calculate the pixel '//
-     :                    'co-ordinates of the specified points.', 
+     :                    'co-ordinates of the specified points.',
      :                    status )
          END IF
       END DO
@@ -277,7 +277,7 @@
       CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Add it back in again, using the new Mapping to connect it to the base
-*  (GRID) Frame. 
+*  (GRID) Frame.
       CALL AST_ADDFRAME( IWCS, AST__BASE, MAP2, WCSFRM, STATUS )
 
 *  Store the modified FrameSet in the NDF.

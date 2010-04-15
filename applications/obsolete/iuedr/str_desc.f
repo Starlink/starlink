@@ -1,5 +1,5 @@
       SUBROUTINE str_DESC(FORMAT, RIGHT, FIELD, SUPR, JUMPLN, EDIT)
- 
+
 *+
 *
 *   Name:
@@ -37,21 +37,21 @@
 
 *   Import:
       BYTE FORMAT(256)      ! edit format
- 
+
 *   Export:
       LOGICAL JUMPLN        ! jump over line end
       LOGICAL RIGHT         ! whether need to right justify in field
       LOGICAL SUPR          ! assignment suppression
- 
+
       BYTE EDIT             ! edit type character
 
       INTEGER FIELD         ! minimum field size
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
       INTEGER str_LEN       ! string length
       INTEGER str_TYPE      ! character lexical type
- 
+
 *   Local variables:
       INTEGER DIGIT         ! decoded digit
       INTEGER FIRST         ! first character position
@@ -61,14 +61,14 @@
 *   String length
       FIRST = 1
       LAST = str_LEN(FORMAT)
- 
+
 *   Default values
       RIGHT = .TRUE.
       FIELD = 0
       SUPR = .FALSE.
       JUMPLN = .TRUE.
       EDIT = 32
- 
+
 *   Work through format end on the <edit> character
  100  CONTINUE
 

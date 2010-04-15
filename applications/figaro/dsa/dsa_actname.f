@@ -25,7 +25,7 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) FILENAME       (Fixed string,descr) The full file specification
 C                        for the file containing the structure.
-C     (>) STRUCT         (Fixed string,descr) The structure part of the 
+C     (>) STRUCT         (Fixed string,descr) The structure part of the
 C                        name, starting with a '.'
 C     (<) ACTUAL_NAME    (Fixed string,descr) The actual name for the
 C                        structure.
@@ -42,7 +42,7 @@ C  Support: Keith Shortridge, AAO
 C
 C  Version date: 29th August 1992
 C
-C  Note:  
+C  Note:
 C     This is an DSA_ system internal routine and should not be
 C     called directly from outside the DSA_ package.
 C-
@@ -91,7 +91,7 @@ C
             GO TO 340          ! Break out of loop
          END IF
       END DO
-  340 CONTINUE      
+  340 CONTINUE
 C
 C     We expect the filename to be valid, but make sure we return
 C     something even if it isn't.

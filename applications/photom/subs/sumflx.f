@@ -2,7 +2,7 @@
       SUBROUTINE SUMFLX(IMAGE, CLIP, SKY, SIGMA, VSKY, APAR,
      :                  PADU, SATURE, NX, NY, ERROR, BESTN, STAR,
      :                  CODE, STATUS)
-      
+
 *+
 *  Name :
 *     SUMFLX
@@ -80,7 +80,7 @@
 *     07-SEP-2004
 *        Changed to use CNF pointers
 *     10-JAN-2008 (PWD):
-*        Keep the MIN1, MIN2, MAX1 and MAX2 limits within the 
+*        Keep the MIN1, MIN2, MAX1 and MAX2 limits within the
 *        bounds of the IMAGE array.
 *     {enter_changes_here}
 *
@@ -93,52 +93,52 @@
 
 *  Global Constants :
 
-      INCLUDE 'SAE_PAR' 
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
       INCLUDE 'CNF_PAR'
 
-*  Arguments Given : 
+*  Arguments Given :
 
       INTEGER NX, NY
 
       REAL IMAGE(NX, NY)
       REAL CLIP, PADU, SATURE
-      REAL SKY, SIGMA, VSKY 
-            
+      REAL SKY, SIGMA, VSKY
+
 *  Arguments Given and Returned :
 
       REAL APAR(6)
- 
+
 *  Arguments Returned :
 
       REAL STAR, ERROR, BESTN
       CHARACTER * ( 2 ) CODE
-      
-*  Local Variables :  
 
-      INTEGER STATUS 
-      
+*  Local Variables :
+
+      INTEGER STATUS
+
       INTEGER I, J
-      
-      INTEGER MIN1, MIN2, MAX1, MAX2 
-      
+
+      INTEGER MIN1, MIN2, MAX1, MAX2
+
 *   HDS temporary object variables
 
       INTEGER DIM(2)
       INTEGER X, Y
-      
+
       CHARACTER * ( DAT__SZLOC ) VLOC
       CHARACTER * ( DAT__SZLOC ) RLOC
       CHARACTER * ( DAT__SZLOC ) MLOC
       CHARACTER * ( DAT__SZLOC ) DLOC
       INTEGER VVAR, RVAR, MASK, DATA
-      
+
 *.
 
 *   Check status on entry - return if not o.k.
-      IF ( STATUS .NE. SAI__OK ) RETURN      
-      
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
 *   Simulate the functionality of the F90 floor() and
 *   ceiling() intrinsic functions. This entire hack
 *   is four lines of F90, somebody shoot me!
@@ -162,7 +162,7 @@
             MAX2 = INT(APAR(6)+CLIP+0.5)+1
       ELSE
             MAX2 = INT(APAR(6)+CLIP+0.5)
-      ENDIF    
+      ENDIF
 
 *   Clip to array bounds, 1->NX & 1->NY.
       MIN1 = MAX( MIN1, 1 )
@@ -182,49 +182,49 @@
       CALL DAT_TEMP("_REAL", 2, DIM, MLOC, STATUS)
       CALL DAT_MAPR(MLOC, 'WRITE', 2, DIM, MASK, STATUS)
       CALL DAT_TEMP("_REAL", 2, DIM, DLOC, STATUS)
-      CALL DAT_MAPR(DLOC, 'WRITE', 2, DIM, DATA, STATUS) 
-          
+      CALL DAT_MAPR(DLOC, 'WRITE', 2, DIM, DATA, STATUS)
+
 *   Pass the workspace to DOSUM which carries out the summation
 *   loop for the optimal extraction algorithim
 
       X = DIM(1)
       Y = DIM(2)
-   
+
 *   This is a temporary hack while I figure out  a linear version
 *   of the algorithim, should work fine, if somewhat more slowly
 
       CALL DOSUM(IMAGE, NX, NY, %VAL(CNF_PVAL(VVAR)),
      :           %VAL(CNF_PVAL(RVAR)), %VAL(CNF_PVAL(MASK)),
-     :           %VAL(CNF_PVAL(DATA)), X, Y, SKY, SIGMA, VSKY, APAR, 
-     :           PADU, SATURE, CLIP, ERROR, BESTN, STAR, 
-     :           MIN1, MAX1, MIN2, MAX2, CODE, STATUS)     
-     
-      
+     :           %VAL(CNF_PVAL(DATA)), X, Y, SKY, SIGMA, VSKY, APAR,
+     :           PADU, SATURE, CLIP, ERROR, BESTN, STAR,
+     :           MIN1, MAX1, MIN2, MAX2, CODE, STATUS)
+
+
       CALL DAT_UNMAP( VLOC, STATUS )
-      CALL DAT_ANNUL( VLOC, STATUS )  
-      
+      CALL DAT_ANNUL( VLOC, STATUS )
+
       CALL DAT_UNMAP( RLOC, STATUS )
-      CALL DAT_ANNUL( RLOC, STATUS )  
-            
+      CALL DAT_ANNUL( RLOC, STATUS )
+
       CALL DAT_UNMAP( MLOC, STATUS )
-      CALL DAT_ANNUL( MLOC, STATUS )  
+      CALL DAT_ANNUL( MLOC, STATUS )
 
       CALL DAT_UNMAP( DLOC, STATUS )
-      CALL DAT_ANNUL( DLOC, STATUS )  
+      CALL DAT_ANNUL( DLOC, STATUS )
 
-                    
+
 *   End of routine
 
   99  CONTINUE
 
-      END       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-         
+      END
+
+
+
+
+
+
+
+
+
+

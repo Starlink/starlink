@@ -4,7 +4,7 @@
 *
 *   Name:
 *      SUBROUTINE PHOTM
-* 
+*
 *   Description:
 *      Read PHOT image from VICAR tape file into memory.
 *
@@ -28,12 +28,12 @@
 
 *   Import:
       INTEGER TP                    ! tape descriptor
- 
+
 *   Export:
       INTEGER*2 APHOT(MAXS, MAXL)   ! photometric image array
- 
+
       BYTE AQUAL(MAXS, MAXL)        ! data quality array
- 
+
       INTEGER STATUS                ! status return
 
 *   Read VICAR image

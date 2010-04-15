@@ -49,7 +49,7 @@
 *        2*SMF__MXSMF
 *     2007-07-10 (EC):
 *        smfArray.sdata is now static array with SMF__MXSMF entries, and
-*        smfArray.ndat is initialized to 0 (incremented with each 
+*        smfArray.ndat is initialized to 0 (incremented with each
 *        smf_addto_smfArray call)
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
@@ -101,7 +101,7 @@
 
 smfArray *smf_create_smfArray( int * status ) {
 
-  /* Need to make sure that any memory we malloc will be freed on error 
+  /* Need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
   smfArray *ary = NULL;    /* Main struct */
   dim_t i;
@@ -136,8 +136,8 @@ smfArray *smf_create_smfArray( int * status ) {
   return ary;
 
  CLEANUP:
-  if ( ary ) 
+  if ( ary )
     ary = smf_free( ary, status );
-  
+
   return NULL;
 }

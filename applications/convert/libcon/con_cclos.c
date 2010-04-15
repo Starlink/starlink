@@ -10,7 +10,7 @@ F77_INTEGER_FUNCTION(con_cclos)( void  ){
 /*
  *  Name:
  *    con_cclose
- 
+
  *  Purpose:
  *    Provides access to the C "fclose" function from Fortran.
 
@@ -22,7 +22,7 @@ F77_INTEGER_FUNCTION(con_cclos)( void  ){
  *       Status: 0 = failure, 1 = success
 
 
- */   
+ */
 
       if( fclose( fd ) ){
          return( 0 );
@@ -32,4 +32,4 @@ F77_INTEGER_FUNCTION(con_cclos)( void  ){
 
       }
 
-} 
+}

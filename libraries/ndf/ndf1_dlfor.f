@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
          CALL ERR_REP( 'NDF1_DLFOR_FXS',
      :      'Routine ^ROUTINE called with an invalid FILE argument ' //
      :      'of ^FILE; this value should not include any foreign '//
-     :      'extension specifier (internal programming error).', 
+     :      'extension specifier (internal programming error).',
      :      STATUS )
       END IF
 
@@ -340,7 +340,7 @@
      :                              ACCESS = 'DIRECT' )
                               IF ( IERR .EQ. 0 ) GO TO 3
                            END IF
- 3                         CONTINUE                       
+ 3                         CONTINUE
 
 *  If the file is not yet open (possibly because none of the above were
 *  executed), then try one last time using the OPEN statement defaults.
@@ -387,7 +387,7 @@
             END IF
          END IF
       END IF
- 
+
 *  Call error tracing routine if appropriate.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_DLFOR', STATUS )
 

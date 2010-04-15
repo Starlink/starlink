@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmcombn(int qfoo,int qbar,int qbaz[],int*Q0){int 
+void sbmcombn(int qfoo,int qbar,int qbaz[],int*Q0){int
 qfobar,q1,q2,qfoobar;if(qfoo<1||qbar<1||qfoo>qbar){*Q0=-1;
 return;}else{*Q0=0;}if(qbaz[0]<1){for(qfobar=0;qfobar<qfoo;
 qfobar++){qbaz[qfobar]=qfobar+1;}}else{qfobar=0;q1=1;while(

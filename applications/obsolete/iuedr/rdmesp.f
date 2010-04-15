@@ -5,7 +5,7 @@
 
 *  Description:
 *     Read IUE MELO or MEHI data array, and extract information.
-*     Read the actual data array from VICAR file, then extract the 
+*     Read the actual data array from VICAR file, then extract the
 *     spectral information needed for storage in IUEDR.
 
 *  History:
@@ -35,10 +35,10 @@
       INTEGER NREC                     ! number of records
 
       INTEGER*2 DATA( RECLEN, NREC )   ! data array
- 
+
 *  Export:
       INTEGER STATUS! status return
- 
+
 *  External references:
       LOGICAL STR_SIMLR                ! caseless string equality
 
@@ -58,11 +58,11 @@
 *  Read data array.
       CALL VIC_RDAT( TP, 2, RECLEN, NREC, DATA, STATUS )
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Translate the Record Zero Contents.
       CALL VIC_MEZR( RECLEN, DATA, STATUS )
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Branch on type of data found.
       IF ( STR_SIMLR( RESOL, 'LORES\\') .AND. NORDER.EQ.1 ) THEN
          CALL VIC_MEOR( 1, RECLEN, NREC, DATA, STATUS )
@@ -72,7 +72,7 @@
          END IF
 
       ELSE IF ( STR_SIMLR( RESOL, 'HIRES\\' ) ) THEN
- 
+
 *     Process each echelle order.
          DO IORDER = 1, NORDER
             CALL VIC_MEOR( IORDER, RECLEN, NREC, DATA, STATUS )

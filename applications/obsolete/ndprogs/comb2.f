@@ -9,19 +9,19 @@ C   Description
 C   -----------
 C   This routine services the following commands:
 C
-C     ARITH2 - Arithmetic operations between two images. The operations 
+C     ARITH2 - Arithmetic operations between two images. The operations
 C              supported are: +, -, *, /, **.
 C
 C     LOGIC2 - Bitwise logical operations between two images. The operations
 C              supported are: AND, OR, XOR, NAND, NOR, NXOR.
 C
-C     MASK2  - Masking operations between two images. The operations 
-C              supported are: MAX, MIN, replace where IMAGE is non-magic, 
-C              replace where IMAGE1 is non-magic, replace where IMAGE and 
+C     MASK2  - Masking operations between two images. The operations
+C              supported are: MAX, MIN, replace where IMAGE is non-magic,
+C              replace where IMAGE1 is non-magic, replace where IMAGE and
 C              IMAGE1 are both non-magic, replace where IMAGE is magic.
 C              (Read bad quality for magic if quality data is present)
 C
-C   If the input images have different dimensionalities, the one with the 
+C   If the input images have different dimensionalities, the one with the
 C   larger number of dimensions must be given first, as IMAGE. In such a
 C   case the combination may be performed repeatedly, starting and ending at
 C   given coordinates in the higher dimensions of IMAGE. For example a 2-D
@@ -30,9 +30,9 @@ C
 C   The axes of IMAGE1 are aligned with the corresponding axes of IMAGE,
 C   i.e. a 1-D IMAGE1 is always combined with the X rows of IMAGE. This is
 C   the most efficient way to operate on arrays, producing the lowest number
-C   of page faults. If it is required to combine a 1-D IMAGE1 with the Z 
-C   rows of a 3-D IMAGE, the XYZ to ZXY transposition of IMAGE may be 
-C   achieved by prior use of TRANSPOSE. 
+C   of page faults. If it is required to combine a 1-D IMAGE1 with the Z
+C   rows of a 3-D IMAGE, the XYZ to ZXY transposition of IMAGE may be
+C   achieved by prior use of TRANSPOSE.
 C
 C   The output structure will be a copy of the FIRST input structure.
 C
@@ -52,14 +52,14 @@ C   Environment
 C   -----------
 C   FIGARO
 C
-C                                               
+C
 C   Parameters (read or written)
 C   ----------------------------
 C   IMAGE    Name of the structure containing the first image. (character)
 C            (prompted for).
 C
 C   IMAGE1   Name of the structure containing the second image. (character)
-C            (prompted for).  
+C            (prompted for).
 C
 C   START    Coordinate in each dimension of IMAGE at which the operation is
 C            to start. (real, array)(prompted for).
@@ -69,8 +69,8 @@ C            to end. (real, array)(prompted for).
 C
 C   OPER     Operation to be performed. (character)(prompted for).
 C
-C   OUTPUT   Name of the structure containing the output image. May be the 
-C            same as IMAGE. (character)(prompted for).     
+C   OUTPUT   Name of the structure containing the output image. May be the
+C            same as IMAGE. (character)(prompted for).
 C
 C
 C   Keywords
@@ -88,18 +88,18 @@ C
 C
 C   Method
 C   ------
-C   - The IMAGE and IMAGE1 structures are tested for the bad data flag. If 
+C   - The IMAGE and IMAGE1 structures are tested for the bad data flag. If
 C     either is found and non-zero, magic values are assumed to be present
 C     and are left in the data.
-C   - A subset of IMAGE is optionally selected by specifying the start and 
-C     end coordinates in each dimension. If IMAGE has more dimensions than 
-C     IMAGE1, the required start and end coordinates in each of the higher 
-C     dimensions are also prompted for. For example, if it is required to 
+C   - A subset of IMAGE is optionally selected by specifying the start and
+C     end coordinates in each dimension. If IMAGE has more dimensions than
+C     IMAGE1, the required start and end coordinates in each of the higher
+C     dimensions are also prompted for. For example, if it is required to
 C     combine a 2-D IMAGE1 with a 3-D IMAGE, the start and end pixels in the
 C     third dimension of IMAGE control which XY planes of IMAGE are combined
-C     with IMAGE1.         
-C   - The structure IMAGE is copied to OUTPUT. If the data array of either 
-C     IMAGE or IMAGE1 is of type FLOAT, then both IMAGE and IMAGE1 are 
+C     with IMAGE1.
+C   - The structure IMAGE is copied to OUTPUT. If the data array of either
+C     IMAGE or IMAGE1 is of type FLOAT, then both IMAGE and IMAGE1 are
 C     mapped as FLOAT.
 C   - Error and quality arrays are mapped as appropriate.
 C   - A subroutine appropriate to the required operation, the data type, and
@@ -117,7 +117,7 @@ C      DSA_INPUT
 C      DSA_MAP_DATA
 C      DSA_MAP_ERRORS
 C      DSA_MAP_QUALITY
-C      DSA_OPEN          
+C      DSA_OPEN
 C      DSA_OUTPUT
 C      DSA_USE_FLAGGED_VALUES
 C      DSA_WRUSER
@@ -153,7 +153,7 @@ C   COMB2_B_W
 C   COMB2_B_WQ
 C   REPLACE_ERRORS_R2
 C   REPLACE_ERRORS_W2
-C      
+C
 C
 C   INCLUDE statements
 C   ------------------
@@ -170,7 +170,7 @@ C
 C
 C   Possible future upgrades
 C   ------------------------
-C   - Allow a fractional offset between images before combination, with 
+C   - Allow a fractional offset between images before combination, with
 C     linear interpolation of pixel values.
 C   - Purging of the error array when void values are present. At present,
 C     this would require use of DSA common block data and routines in the
@@ -185,11 +185,11 @@ C
 C   History
 C   -------
 C   01-FEB-1989   - Original program
-C   29-AUG-1990   - Bug which sometimes caused the output file to be mapped 
+C   29-AUG-1990   - Bug which sometimes caused the output file to be mapped
 C                   as the wrong type was fixed.  A few typos were also
 C                   corrected.  (JRL)
 C   10-AUG-1991   - Quality and error handling implemented (GOLDJIL)
-C   16-SEP-1991   - Bug which led to erroneous output if IMAGE 
+C   16-SEP-1991   - Bug which led to erroneous output if IMAGE
 C                   contained SHORT data and IMAGE1 FLOAT data fixed.
 C                   (GOLDJIL)
 C   30-NOV-1992   - Unix version (GOLDJIL).
@@ -281,7 +281,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get command name.
-C   
+C
       CALL PAR_COMMAND(COMMAND)
 C
 C   Open file for IMAGE.
@@ -290,7 +290,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Display information on IMAGE.
-C                               
+C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.TRUE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
@@ -319,7 +319,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Display information on IMAGE1.
-C                               
+C
       CALL NDP_GET_IMAGE_INFO
      &  ('IMAGE1',.TRUE.,.TRUE.,TYPE1,BADPIX1,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -339,16 +339,16 @@ C
       CALL DSA_DATA_SIZE('IMAGE1',6,NDIM1,DIMS1,NELM1,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
-C   Set single BADPIX flag. 
+C   Set single BADPIX flag.
 C
       BADPIX=BADPIX.OR.BADPIX1
 C
 C   Check that IMAGE has the higher dimensionality.
 C
       IF(NDIM1.GT.NDIM)THEN
-        CALL DSA_WRUSER('IMAGE must have the higher dimensionality.\\N')       
+        CALL DSA_WRUSER('IMAGE must have the higher dimensionality.\\N')
         GO TO 500
-      END IF     
+      END IF
 C
 C   Check that any error information is compatible in IMAGE & IMAGE1
 C
@@ -381,7 +381,7 @@ C
       END IF
 C
 C   Get IMAGE axis range.
-C                              
+C
       CALL NDP_AXIS_RANGE
      &  ('IMAGE',DIMS,NDIM,START,END,STAPIX,ENDPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -399,7 +399,7 @@ C
           ENDPIX(I)=DIMS1(I)
         END IF
       END DO
-C       
+C
 C   Get operation name.
 C
    10 CONTINUE
@@ -440,9 +440,9 @@ C
           CALL DSA_WRUSER('Unrecognized option.\\N')
           GO TO 10
         END IF
-      END IF                                         
+      END IF
 C
-C   Open file for OUTPUT.                                  
+C   Open file for OUTPUT.
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -458,7 +458,7 @@ C
       END IF
 C
 C   Map OUTPUT data array. If IMAGE1 is FLOAT, OUTPUT must be mapped as FLOAT.
-C   Otherwise, map OUTPUT as SHORT or FLOAT depending on IMAGE's type. (As 
+C   Otherwise, map OUTPUT as SHORT or FLOAT depending on IMAGE's type. (As
 C   OUTPUT is simply a copy of IMAGE). (Ditto error array)
 C
       IF (PURGE_ERR) THEN
@@ -561,10 +561,10 @@ C
 C   Arithmetical and comparison operations.
 C   - for INTEGER*2 data.
 C
-      ELSE 
+      ELSE
         IF(MAP_TYPE.EQ.'SHORT')THEN
 C
-C     - with magic values absent (the magic value is supplied in case a 
+C     - with magic values absent (the magic value is supplied in case a
 C       forbidden operation is attempted).
 C
           IF(.NOT.BADPIX)THEN
@@ -586,7 +586,7 @@ C   - for REAL data.
 C
         ELSE
 C
-C     - with magic values absent (the magic value is supplied in case a 
+C     - with magic values absent (the magic value is supplied in case a
 C       forbidden operation is attempted).
 C
           IF(.NOT.BADPIX)THEN
@@ -628,14 +628,14 @@ C
             CALL REPLACE_ERRORS_R2(DYNAMIC_MEM(OEPTR),NELM,
      &                            DUMREAL)
           END IF
-        ELSE 
+        ELSE
           CALL DSA_WRUSER('\\n ** The error array may now')
           CALL DSA_WRUSER(' contain void values.\\n')
         END IF
       END IF
 C
 C   Tidy up and exit.
-C                  
+C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
 C
@@ -654,7 +654,7 @@ C
       IMPLICIT NONE
 C
 C     Parameters
-C                                                       
+C
       CHARACTER*(*) OPER
       INTEGER       DIMS(10),NDIM,NELM,DIMS1(10),NDIM1,NELM1,
      &              STAPIX(6),ENDPIX(6)
@@ -663,7 +663,7 @@ C
       LOGICAL       QUAL
 C
 C     Local variables
-C                     
+C
       INTEGER   I            ! Loop counter
       INTEGER   II           ! Loop counter
       INTEGER   INC(6)       ! 1-D increments for dimensions of OARRAY
@@ -695,7 +695,7 @@ C
         DO II=1,I-1
           INC(I)=INC(I)*DIMS(II)
         END DO
-      END DO   
+      END DO
 C
 C     Compute offset in ARRAY1 needed to increment each dimension
 C
@@ -704,10 +704,10 @@ C
         DO II=1,I-1
           INC1(I)=INC1(I)*DIMS1(II)
         END DO
-      END DO   
+      END DO
 C
 C     Bitwise AND
-C     
+C
       IF(OPER.EQ.'AND')THEN
         DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
           OOFF6=(IND6-1)*INC(6)
@@ -742,7 +742,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -761,7 +761,7 @@ C
                         ELSE
                           IF (OQARRAY(OOFF).EQ.0) OQARRAY(OOFF) = 1
                         END IF
-                      ELSE  
+                      ELSE
                         OARRAY(OOFF)=OARRAY(OOFF).AND.ARRAY1(I1OFF)
                       END IF
 C
@@ -774,7 +774,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise OR
 C
@@ -812,7 +812,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -831,7 +831,7 @@ C
                         ELSE
                           IF (OQARRAY(OOFF).EQ.0) OQARRAY(OOFF) = 1
                         END IF
-                      ELSE  
+                      ELSE
                         OARRAY(OOFF)=OARRAY(OOFF).OR.ARRAY1(I1OFF)
                       END IF
 C
@@ -844,7 +844,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise XOR
 C
@@ -882,7 +882,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -901,7 +901,7 @@ C
                         ELSE
                           IF (OQARRAY(OOFF).EQ.0) OQARRAY(OOFF) = 1
                         END IF
-                      ELSE  
+                      ELSE
                         OARRAY(OOFF)=OARRAY(OOFF).XOR.ARRAY1(I1OFF)
                       END IF
 
@@ -914,7 +914,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NAND
 C
@@ -952,7 +952,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -972,7 +972,7 @@ C
                         ELSE
                           IF (OQARRAY(OOFF).EQ.0) OQARRAY(OOFF) = 1
                         END IF
-                      ELSE  
+                      ELSE
                         OARRAY(OOFF)=(.NOT.OARRAY(OOFF))
      &                                                .AND.ARRAY1(I1OFF)
                       END IF
@@ -986,7 +986,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NOR
 C
@@ -1024,7 +1024,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1044,7 +1044,7 @@ C
                         ELSE
                           IF (OQARRAY(OOFF).EQ.0) OQARRAY(OOFF) = 1
                         END IF
-                      ELSE  
+                      ELSE
                         OARRAY(OOFF)=(.NOT.OARRAY(OOFF))
      &                                             .OR.ARRAY1(I1OFF)
                       END IF
@@ -1058,7 +1058,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NXOR
 C
@@ -1096,7 +1096,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1118,7 +1118,7 @@ C
                         ELSE
                           IF (OQARRAY(OOFF).EQ.0) OQARRAY(OOFF) = 1
                         END IF
-                      ELSE  
+                      ELSE
                         OARRAY(OOFF)=(.NOT.OARRAY(OOFF))
      &                                             .XOR.ARRAY1(I1OFF)
                       END IF
@@ -1132,9 +1132,9 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
       END IF
-C         
+C
       END
 
 
@@ -1149,14 +1149,14 @@ C
       IMPLICIT NONE
 C
 C     Parameters
-C                                                       
+C
       CHARACTER*(*) OPER
       INTEGER       DIMS(10),NDIM,NELM,DIMS1(10),NDIM1,NELM1,
      &              STAPIX(6),ENDPIX(6)
       INTEGER*2     OARRAY(NELM),ARRAY1(NELM1),MAGICVAL
 C
 C     Local variables
-C                     
+C
       INTEGER   I            ! Loop counter
       INTEGER   II           ! Loop counter
       INTEGER   INC(6)       ! 1-D increments for dimensions of OARRAY
@@ -1188,7 +1188,7 @@ C
         DO II=1,I-1
           INC(I)=INC(I)*DIMS(II)
         END DO
-      END DO   
+      END DO
 C
 C     Compute offset in ARRAY1 needed to increment each dimension
 C
@@ -1197,7 +1197,7 @@ C
         DO II=1,I-1
           INC1(I)=INC1(I)*DIMS1(II)
         END DO
-      END DO   
+      END DO
 C
 C     Bitwise AND
 C
@@ -1235,7 +1235,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1247,7 +1247,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-                    IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+                    IF(OARRAY(OOFF).GT.MAGICVAL .AND.
      &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=OARRAY(OOFF).AND.ARRAY1(I1OFF)
                     ELSE
@@ -1263,7 +1263,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise OR
 C
@@ -1301,7 +1301,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1313,7 +1313,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-                    IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+                    IF(OARRAY(OOFF).GT.MAGICVAL .AND.
      &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=OARRAY(OOFF).OR.ARRAY1(I1OFF)
                     ELSE
@@ -1329,7 +1329,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise XOR
 C
@@ -1367,7 +1367,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1379,7 +1379,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-                    IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+                    IF(OARRAY(OOFF).GT.MAGICVAL .AND.
      &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=OARRAY(OOFF).XOR.ARRAY1(I1OFF)
                     ELSE
@@ -1395,7 +1395,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NAND
 C
@@ -1433,7 +1433,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1445,7 +1445,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-                    IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+                    IF(OARRAY(OOFF).GT.MAGICVAL .AND.
      &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.ARRAY1(I1OFF)
                     ELSE
@@ -1461,7 +1461,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NOR
 C
@@ -1499,7 +1499,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1511,7 +1511,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-                    IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+                    IF(OARRAY(OOFF).GT.MAGICVAL .AND.
      &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).OR.ARRAY1(I1OFF)
                     ELSE
@@ -1527,7 +1527,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NXOR
 C
@@ -1565,7 +1565,7 @@ C
                 END IF
 C
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   IF(NDIM1.EQ.1)THEN
                     I1OFF2=0
                   ELSE
@@ -1577,7 +1577,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-                    IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+                    IF(OARRAY(OOFF).GT.MAGICVAL .AND.
      &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.ARRAY1(I1OFF)
                     ELSE
@@ -1593,9 +1593,9 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
       END IF
-C         
+C
       END
 
 

@@ -9,7 +9,7 @@ C     Maps the quality data array in a structure.
 C
 C  Description:
 C     This routine maps the quality data array in a structure, returning
-C     the address of the mapped array.  The whole array is mapped.  If 
+C     the address of the mapped array.  The whole array is mapped.  If
 C     there is in fact no quality data array, then one will be created
 C     if the mapping specified 'WRITE' or 'UPDATE' and filled with zeros.
 C     If the main data array contains flagged values, and the application
@@ -24,7 +24,7 @@ C     that if the file contains flagged data, both map routines - DATA
 C     and QUALITY - must be called even if the application only intends to
 C     use the quality array).  Note that in all cases this routine
 C     does return an address that may be used as the start of a quality
-C     array.  
+C     array.
 C
 C  Language:
 C     FORTRAN
@@ -35,14 +35,14 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
 C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
 C     (<) ADDRESS      (Integer,ref) The address of the mapped array.
 C     (<) SLOT         (Integer,ref) A handle value associated with this
@@ -52,7 +52,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
@@ -86,7 +86,7 @@ C     11th Dec  1989.   Now sets QUAL_UPDATE flag on a write or update
 C                       mapping.  KS/AAO.
 C     21st Feb  1990.   Uses DSA__QUAL_NAME to remove assumptions about
 C                       file format details.  KS/AAO.
-C     22nd Apr  1991.   Now uses DSA__CREATE_QUAL_ENV to create the 
+C     22nd Apr  1991.   Now uses DSA__CREATE_QUAL_ENV to create the
 C                       environment for the quality array - allows support
 C                       of structured arrays including BADBITS values. KS/AAO.
 C     1st  May  1991.   Now gets BADBITS value and tests to see if this
@@ -124,7 +124,7 @@ C
 C     Local variables
 C
       INTEGER   IGNORE                      ! Dummy status argument
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Name of structure
 C
 C     Return immediately on bad status
@@ -133,7 +133,7 @@ C
 C
 C     All that this routine needs to do is set the USE_QUALITY flag
 C     in the tables and to call DSA_ACT_MAP_QUALITY. For this it
-C     needs the reference slot number - this is a shame, since 
+C     needs the reference slot number - this is a shame, since
 C     DSA_ACT_MAP_QUALITY looks this up too - we could avoid this
 C     by giving DSA_ACT_MAP_QUALITY the reference slot as an additional
 C     argument to be used only if non-zero. One day, maybe.
@@ -141,7 +141,7 @@ C
 C     We also check that the sequence used by this program is
 C     correct, given the sometimes awkward way applications can call
 C     the various USE and MAP routines.
-C          
+C
       CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
 C
       IF ((DATA_SLOT(REF_SLOT).NE.0).AND.

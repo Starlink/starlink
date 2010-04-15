@@ -40,7 +40,7 @@
 *     SUMSQ = _DOUBLE (Returned)
 *        Sum of squares
 *     STDEV = _DOUBLE (Returned)
-*        Standard deviation 
+*        Standard deviation
 *     QSORT = _REAL (Returned)
 *        Sorted data set
 *     STATUS = INTEGER (Given and Returned)
@@ -53,7 +53,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -66,7 +66,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -173,7 +173,7 @@
                IF ( ( NKEPT .EQ. 1 ) .OR.
      :              ( STDEV .LT. 0.0D0 ) ) THEN
                   STDEV = 0.0D0
- 
+
 *     Otherwise, calculate the standard deviation normally.
                ELSE
                   STDEV = SQRT( STDEV / DBLE( NKEPT - 1 ) )
@@ -197,7 +197,7 @@
                   END DO
 *     Stop clipping if didnt remove any points
                   IF (NREM.EQ.0) CLIPPING = .FALSE.
-               
+
                ELSE
                   CLIPPING = .FALSE.
                END IF

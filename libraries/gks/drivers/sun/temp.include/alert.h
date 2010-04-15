@@ -41,7 +41,7 @@ ALERT_OPTIONAL		= ALERT_ATTR(ATTR_BOOLEAN,			55)
 /* ------------------------useful constants ------------------------- */
 /* ------------------------------------------------------------------ */
 
-/* the following constant, ALERT_FAILED is returned if alert_prompt() 
+/* the following constant, ALERT_FAILED is returned if alert_prompt()
    failed for an unspecified reason.
 */
 

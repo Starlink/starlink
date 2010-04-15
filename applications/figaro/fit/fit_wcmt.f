@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ W C M T
 C
-C     Writes a comment into a FITS header.  Assumes 
+C     Writes a comment into a FITS header.  Assumes
 C     FIT_INIT has been called to initialise the header routines.
 C     The FITS standard allows comments to be given the keywords
 C     COMMENT, or HISTORY, or blank.  NAME should be passed as one

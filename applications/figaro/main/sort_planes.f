@@ -47,7 +47,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     3-AUG-1993 (TNW): 
+*     3-AUG-1993 (TNW):
 *        Original version.
 *     22-NOV-1993 (TNW):
 *        Allow to sort in ascending or descending order

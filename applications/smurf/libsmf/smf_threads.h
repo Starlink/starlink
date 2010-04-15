@@ -46,7 +46,7 @@
 
 /* Describes the error status upon completion of a job by a worker. */
 typedef struct smfJobStatus {
-   int ems_status;             
+   int ems_status;
    int nmessage;
    char **messages;
 } smfJobStatus;

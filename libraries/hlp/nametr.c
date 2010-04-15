@@ -85,7 +85,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
    ** kmd=0: Translate library name to filename
    ** -----------------------------------------
    */
- 
+
    /* Translate the string (if enough room in output string). */
       if ( ( lp + (int) strlen ( strin ) + ls ) >= lstrout )
          return hlp_STRING_OVERFLOW;
@@ -119,7 +119,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
    /* Determine and validate length of suffix. */
       if ( ( ls = (int) strlen ( strin ) ) >= LSMAX)
          return hlp_STRING_OVERFLOW;
- 
+
    /* Store the suffix. */
       strcpy ( suffix, strin );
       return OK;
@@ -130,7 +130,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
    ** kmd=3: Enquire prefix
    ** ---------------------
    */
- 
+
    /* Copy the prefix and report if truncated. */
       strncpy ( strout, prefix, lstrout );
       return ( ( lp <= lstrout ) ? OK : hlp_STRING_OVERFLOW );
@@ -141,7 +141,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
    ** kmd=4: Enquire suffix
    ** ---------------------
    */
- 
+
    /* Copy the suffix and report if truncated. */
       strncpy ( strout, suffix, lstrout );
       return ( ( ls <= lstrout ) ? OK : hlp_STRING_OVERFLOW );

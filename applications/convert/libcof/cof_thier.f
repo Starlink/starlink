@@ -78,7 +78,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,7 +141,7 @@
 
 *  An invocation of the basic algorithm starts here.  Check the
 *  inherited status.
-   1     CONTINUE     
+   1     CONTINUE
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Vectorise the structure, and determine how many elements it has.
@@ -154,7 +154,7 @@
 *  Loop to process each array element.
             IEL( STK ) = 0
 
-*  2 is the start of a "DO WHILE" loop.     
+*  2 is the start of a "DO WHILE" loop.
    2        CONTINUE
             IF ( ( IEL( STK ) .LT. EL( STK ) ) .AND.
      :           ( STATUS .EQ. SAI__OK ) ) THEN

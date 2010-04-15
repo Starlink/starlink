@@ -13,16 +13,16 @@
 *     CALL CCD1_KTIDY( TOTRN, TEXT, INDXY, STATUS )
 
 *  Description:
-*     This routine turns text containing FITS-header-like strings of 
-*     the form which may be found in the translation tables used 
-*     by the IMPORT utility into a string suitable for use as a token 
+*     This routine turns text containing FITS-header-like strings of
+*     the form which may be found in the translation tables used
+*     by the IMPORT utility into a string suitable for use as a token
 *     in TRANSFORM routines.
 *
 *     In fact it makes two related sets of substitutions: if it finds
-*     either a character which is legal in a FITS header but not a 
-*     TRANSFORM token ('.'), or one of the special strings 
-*     '<X1>', '<X2>', '<Y1>' or '<Y2>', then it replaces them by 
-*     something identifiable but palatable to TRANSFORM.  
+*     either a character which is legal in a FITS header but not a
+*     TRANSFORM token ('.'), or one of the special strings
+*     '<X1>', '<X2>', '<Y1>' or '<Y2>', then it replaces them by
+*     something identifiable but palatable to TRANSFORM.
 *     Additionally, if exactly one substitution of the X1,X2,Y1,Y2 type
 *     has been made, the returned INDXY argument will indicate which
 *     it was.
@@ -34,7 +34,7 @@
 *     The routine is designed to be used with TOTRN = TRUE to generate
 *     a token for use in TRANSFORM expressions, and with TOTRN = FALSE
 *     to generate a genuine FITS header.  In either case, the INDXY
-*     argument can be examined to determine whether an X1-type 
+*     argument can be examined to determine whether an X1-type
 *     string was present.
 
 *  Arguments:
@@ -42,11 +42,11 @@
 *        If TRUE, then the strings '<X1>', '<X2>', '<Y1>' and '<Y2>'
 *        will be turned into something identifiable and the returned
 *        string will be legal as a TRANSFORM token.  If FALSE, then
-*        the strings '<X1>', '<X2>', '<Y1>' and '<Y2>' will be 
+*        the strings '<X1>', '<X2>', '<Y1>' and '<Y2>' will be
 *        removed, and the returned string will be legal as a FITS
 *        header keyword.
 *     TEXT = CHARACTER * ( * ) (Given and Returned)
-*        On entry a FITS header-like keyword, which may contain 
+*        On entry a FITS header-like keyword, which may contain
 *        substrings of the form "<X1>" etc.  On exit, such strings
 *        will be removed or converted as described above.  The string
 *        must be long enough to accommodate such substitutions.
@@ -54,14 +54,14 @@
 *        Indicates which of '<X1>', '<X2>', '<Y1>' or '<Y2>' has
 *        been found in TEXT.  If exactly one of these has been found,
 *        INDXY will be 1, 2, 3 or 4 respectively.  If more than one
-*        was found it will be -1, and if none has been found it 
+*        was found it will be -1, and if none has been found it
 *        will be 0.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     The form of the substituted phrases could be harmlessly altered to
-*     something else, with the following constraints: they should be 
+*     something else, with the following constraints: they should be
 *     at least eight characters long, so that a FITS header with these
 *     appended cannot be mistaken for a normal FITS header, and they
 *     are alphanumeric so that they can be used as part of a TRN token.
@@ -113,10 +113,10 @@
 
 *  Arguments Given and Returned:
       CHARACTER * ( * ) TEXT
-      
+
 *  Arguments Returned:
       INTEGER INDXY
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -125,11 +125,11 @@
       INTEGER CHR_LEN            ! Length of string excluding trailing blanks
       EXTERNAL CHR_ISALF
       LOGICAL CHR_ISALF          ! Whether character is alphabetic
-      
+
 *  Local Constants:
       INTEGER NTOK
       PARAMETER ( NTOK = 4 )     ! Number of possible token substitutions
-      
+
 *  Local Variables:
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position in input string
@@ -144,12 +144,12 @@
       CHARACTER * 8 REPLC( NTOK ) ! Replacements for tokens
       CHARACTER * 4 TOKEN( NTOK ) ! Tokens to substitute for
       CHARACTER * ( GRP__SZNAM ) WORK ! Output string
-      
+
 *  Local Data:
       DATA TOKEN / '<X1>', '<X2>', '<Y1>', '<Y2>' /
       DATA REPLC / '___X1___', '___X2___', '___Y1___', '___Y2___' /
       DATA DOTREP / '___DT___' /
-      
+
 *.
 
 *  Check inherited global status.
@@ -232,7 +232,7 @@
       ELSE IF ( TOTREP .GT. 1 ) THEN
          INDXY = -1
       END IF
-         
+
 *  Finally write the output string back to the input one for return.
       TEXT = WORK
 

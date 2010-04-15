@@ -1,4 +1,4 @@
-      SUBROUTINE GTCTCL( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, CI, 
+      SUBROUTINE GTCTCL( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, CI,
      :                   GI, CNAME, STATUS )
 
 *+
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GTCTCL( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, CI, 
+*     CALL GTCTCL( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, CI,
 *                  GI, CNAME, STATUS )
 
 *  Description:
-*     This routine obtains the name of a catalogue component, selected from 
-*     those available in the supplied catalogue. A CAT identifier (see 
+*     This routine obtains the name of a catalogue component, selected from
+*     those available in the supplied catalogue. A CAT identifier (see
 *     SUN/181) for the selected component is returned.
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *        A string containing the supplied command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
 *        supplied default value will be used if no value has
@@ -40,7 +40,7 @@
 *     CI = INTEGER (Given)
 *        The CAT catalogue identifier.
 *     GI = INTEGER (Returned)
-*        The returned CAT column identifier. Returned equal to CAT__NOID 
+*        The returned CAT column identifier. Returned equal to CAT__NOID
 *        if an error occurs.
 *     CNAME = CHARACTER * ( * ) (Returned)
 *        The column name. Returned blank if an error occurrs.
@@ -49,7 +49,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -63,15 +63,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CAT_PAR'          ! CAT constants 
-      INCLUDE 'CAT_ERR'          ! CAT error constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CAT_PAR'          ! CAT constants
+      INCLUDE 'CAT_ERR'          ! CAT error constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
@@ -99,7 +99,7 @@
       GI = CAT__NOID
       CNAME = ' '
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Defer the reporting of errors.
@@ -113,17 +113,17 @@
      :            STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999      
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Jump to here if a new column name has been obtained.
  10   CONTINUE
-      
+
 *  Attempt to get an identifier for the named column.
       CALL CAT_TIDNT( CI, CNAME, GI, STATUS )
 
 *  If it exists, check that the component is a column. Report an error
 *  otherwise.
-      IF( STATUS .EQ. SAI__OK ) THEN         
+      IF( STATUS .EQ. SAI__OK ) THEN
          CALL CAT_TIDTP( GI, IDTYP, STATUS )
 
          IF( IDTYP .NE. CAT__FITYP .AND. STATUS .EQ. SAI__OK ) THEN
@@ -133,7 +133,7 @@
      :                    STATUS )
          END IF
 
-*  If the component was not found, annul the verbose CAT message, and 
+*  If the component was not found, annul the verbose CAT message, and
 *  re-report with a more concise message.
       ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -144,14 +144,14 @@
      :                  'was found in catalogue ''^CATNAM''.', STATUS )
       END IF
 
-*  If an error has occurred, flush the error, display a list of valid 
+*  If an error has occurred, flush the error, display a list of valid
 *  component names, and get a new value.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_FLUSH( STATUS )
 
          CALL CAT_TNDNT( CI, CAT__FITYP, 1, GI, STATUS )
          N = 1
-         DO WHILE( GI .NE. CAT__NOID ) 
+         DO WHILE( GI .NE. CAT__NOID )
             CALL CAT_TIQAC( GI, 'NAME', CNAME, STATUS )
             CALL MSG_SETC( 'NAMES', ' ' )
             CALL MSG_SETC( 'NAMES', CNAME )
@@ -166,7 +166,7 @@
          CALL RDSTR( COMM, PROMPT, DEFVAL, CNAME, STATUS )
 
 *  If a new name was supplied, go round to try to open the catalogue.
-         IF( STATUS .EQ. SAI__OK ) GO TO 10         
+         IF( STATUS .EQ. SAI__OK ) GO TO 10
 
       END IF
 
@@ -192,6 +192,6 @@
       END IF
 
 *  Release the error stack.
-      CALL ERR_RLSE      
+      CALL ERR_RLSE
 
       END

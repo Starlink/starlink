@@ -32,9 +32,9 @@ C    (4) BINS       (Integer)  The number of bins for the resulting spectrum.
 C    (5) OUTPUT     (TSP, nD)  The Output rebinned spectrum.
 C        LOG        (Logical)  Bin into logarithmic wavelength bins.
 C        MEAN       (Logical)  Conserve mean data level rather than flux.
-C        QUAD       (Logical)  Use quadratic (rather than linear) 
+C        QUAD       (Logical)  Use quadratic (rather than linear)
 C                               interpolation.
-C        
+C
 C
 C     Support: Jeremy Bailey, AAO
 C
@@ -43,7 +43,7 @@ C
 C-
 C
 C  History:
-C    10/8/1988   Original Version.   JAB/AAO 
+C    10/8/1988   Original Version.   JAB/AAO
 C
 
       IMPLICIT NONE
@@ -52,7 +52,7 @@ C
       INCLUDE 'USER_ERR'
 
 *  Status argument
-      INTEGER STATUS        
+      INTEGER STATUS
 
 *  Speed of light
       REAL C
@@ -68,10 +68,10 @@ C
       CHARACTER*(DAT__SZLOC) OLOC,ILOC,XLOC,RXLOC,SILOC,SOLOC
       CHARACTER*64 LABEL,UNITS
       LOGICAL OK,LOGWR,INCREM
-      INTEGER SIZE,NBINR,NUM,NY                
+      INTEGER SIZE,NBINR,NUM,NY
       REAL WSTART,WEND,DELTA
       LOGICAL Q,U,V,FLUX,QUAD,MEAN
-                         
+
 *  Get the Input data
 
       CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
@@ -89,7 +89,7 @@ C
 *  Get Label and Units for the wavelength axis
 
          CALL TSP_RLU_LAMBDA(ILOC,LABEL,UNITS,STATUS)
-                        
+
 *  Get LOG parameter
          CALL PAR_GET0L('LOG',LOGWR,STATUS)
 
@@ -98,12 +98,12 @@ C
          CALL PAR_DEF0R('WEND',%VAL(XPTR+4*(SIZE-1)),STATUS)
          CALL PAR_GET0R('WSTART',WSTART,STATUS)
          CALL PAR_GET0R('WEND',WEND,STATUS)
-         CALL PAR_DEF0I('BINS',SIZE,STATUS) 
-         CALL PAR_GET0I('BINS',NBINR,STATUS)           
+         CALL PAR_DEF0I('BINS',SIZE,STATUS)
+         CALL PAR_GET0I('BINS',NBINR,STATUS)
 
 *  If WEND is less than WSTART it is actually the wavelength increment
          INCREM = WSTART .GT. WEND
-                        
+
 *  In this case calculate what the end wavelength really is
          IF (INCREM) THEN
             DELTA=WEND
@@ -112,7 +112,7 @@ C
             ELSE
                WEND=EXP(LOG(WSTART)+(NBINR-1)*LOG(DELTA/C+1))
             END IF
-         END IF  
+         END IF
 
 *  Get MEAN parameter
          CALL PAR_GET0L('MEAN',MEAN,STATUS)
@@ -124,23 +124,23 @@ C
 *  Create output file
          CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
          CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
-             
+
 *  Copy input to output and resize to new number of bins
          IF (NDIM .EQ. 1) THEN
              CALL TSP_COPY(ILOC,OLOC,STATUS)
              CALL TSP_RESIZE(OLOC,1,NBINR,STATUS)
          ELSE
-             CALL TSP_COPY(ILOC,OLOC,STATUS)    
+             CALL TSP_COPY(ILOC,OLOC,STATUS)
              DIMS(1)=NBINR
              CALL TSP_RESIZE(OLOC,2,DIMS,STATUS)
-         ENDIF                                          
+         ENDIF
 
-*  Map the wavelength axis of the output data    
+*  Map the wavelength axis of the output data
          CALL TSP_MAP_LAMBDA(OLOC,'WRITE',RXPTR,RXLOC,STATUS)
 
 *  Fill the output wavelength axis with new values
          CALL FIG_WFILL(WSTART,WEND,LOGWR,NBINR,%VAL(RXPTR))
-                                 
+
          IF (NDIM .EQ. 2) THEN
             NY = DIMS(2)
          ELSE
@@ -148,10 +148,10 @@ C
          ENDIF
 
 *  Scrunch Intensity array
-                                             
+
          IF (STATUS .EQ. SAI__OK) THEN
             CALL TSP_SCRUNCH(ILOC,OLOC,%VAL(XPTR),%VAL(RXPTR),SIZE,
-     :             NBINR,NY,QUAD,LOGWR,FLUX,STATUS)         
+     :             NBINR,NY,QUAD,LOGWR,FLUX,STATUS)
 
 *  Scrunch the Stokes arrays
 
@@ -169,7 +169,7 @@ C
 *  Annul locators
                CALL DAT_ANNUL(SILOC,STATUS)
                CALL DAT_ANNUL(SOLOC,STATUS)
-            ENDIF         
+            ENDIF
             IF (U) THEN
 
 *  U stokes parameter
@@ -183,7 +183,7 @@ C
 *  Annul locators
                CALL DAT_ANNUL(SILOC,STATUS)
                CALL DAT_ANNUL(SOLOC,STATUS)
-            ENDIF         
+            ENDIF
             IF (V) THEN
 
 *  V stokes parameter
@@ -197,7 +197,7 @@ C
 *  Annul locators
                CALL DAT_ANNUL(SILOC,STATUS)
                CALL DAT_ANNUL(SOLOC,STATUS)
-            ENDIF                         
+            ENDIF
          ENDIF
 
 *  Unmap output arrays and annul locators
@@ -205,12 +205,12 @@ C
          CALL TSP_UNMAP(XLOC,STATUS)
          CALL TSP_UNMAP(RXLOC,STATUS)
          CALL DAT_ANNUL(OLOC,STATUS)
-         CALL DAT_ANNUL(ILOC,STATUS)         
+         CALL DAT_ANNUL(ILOC,STATUS)
 
       ENDIF
       END
 
-      
+
       SUBROUTINE TSP_SCRUNCH(LOC1,LOC2,X1,X2,NX1,NX2,NY,
      :                        QUAD,LOG,FLUX,STATUS)
 *+
@@ -244,19 +244,19 @@ C
       INCLUDE 'DAT_PAR'
 
 *  Parameters
-      CHARACTER*(DAT__SZLOC) LOC1,LOC2                       
+      CHARACTER*(DAT__SZLOC) LOC1,LOC2
       INTEGER NX1,NX2,NY
       REAL X1(NX1),X2(NX2)
       LOGICAL QUAD,LOG,FLUX
-      INTEGER STATUS  
-      
+      INTEGER STATUS
+
 *  Local variables
       INTEGER IPTR,OPTR,VIPTR,VOPTR
       CHARACTER*(DAT__SZLOC) ILOC,OLOC,VILOC,VOLOC
       INTEGER IMODE,IQUAD,NADD,VSTAT,I
       LOGICAL VARIANCE
       REAL SSKEW
- 
+
 *  Map the input data
       CALL TSP_MAP_DATA(LOC1,'READ',IPTR,ILOC,STATUS)
 
@@ -279,13 +279,13 @@ C
       IQUAD=0
       IF (QUAD) IQUAD=1
       NADD=1
-      SSKEW=0.  
+      SSKEW=0.
 
 *  Loop over Y values
       DO I=1,NY
 
 *  Do the rebinning
-         CALL TSP_REBIN(IMODE,IQUAD,%VAL(IPTR),NX1,%VAL(OPTR),NX2,        
+         CALL TSP_REBIN(IMODE,IQUAD,%VAL(IPTR),NX1,%VAL(OPTR),NX2,
      :         NADD,SSKEW,FLUX,X1,X2,.FALSE.,LOG,.FALSE.)
          OPTR = OPTR+NX2*4
          IPTR = IPTR+NX1*4
@@ -307,8 +307,8 @@ C
          CALL TSP_UNMAP(VOLOC,STATUS)
       ENDIF
       END
- 
-                                            
+
+
 
 C
       SUBROUTINE TSP_REBIN(IMODE,IQUAD,WDATA,NPIX,RBIN,NRBIN,NADD,
@@ -326,7 +326,7 @@ C used. The program can be used in two modes: if IMODE equals zero then
 C the output bins will be shifted by SSKEW relative to the input bins,
 C and each output bin will consis of the sum of NRBIN input bins; otherwise
 C the rebinnning will be done from the wavelength scale WAVES to the scale
-C WAVESR with NRBIN now meaning the number of output bins. 
+C WAVESR with NRBIN now meaning the number of output bins.
 C
 C
 C      HISTORY OF DEVELOPMENT
@@ -342,15 +342,15 @@ C values and Lolita uses arrays of polynomial wavelength coefficients.
 C This current version is based on Ashley's REBIN version 1.4, dated
 C 8th July 1983.  The subroutine REBIN_TFORM has been totally replaced,
 C and the initialisation sequence has changed to comply with the new
-C version.  The error messages have been removed. The calling sequence 
-C has had to be changed.  However, the main body of the program is 
+C version.  The error messages have been removed. The calling sequence
+C has had to be changed.  However, the main body of the program is
 C unchanged.  The CFLUX argument is new.  For compatibility with other
 C Figaro programs, the convention regarding the sign of SSKEW has been
 C reversed.
 C
 C First Fig_Rebin working version  -  20th July 1983
 C
-C Modifications 
+C Modifications
 C     3rd Oct 1983   KS/CIT Minor modification. Sense of SSKEW reversed to
 C                    conform to normal Figaro conventions.
 C
@@ -361,7 +361,7 @@ C                    had to reference data at wavelengths outside the range
 C                    of the input data array, it would use either the first
 C                    or last input array value.  The modified version will
 C                    use a zero value under these circumstances.
-C          
+C
 C     10th Aug 1988  JAB/AAO. Add Variance argument. Rename to TSP_REBIN
 C
 C DESCRIPTION OF ARGUMENTS
@@ -412,7 +412,7 @@ C                        increase logarithmically.
 C
 C   LOGWR   - LOGICAL    Mode 1 only - true if the wavelengths given in WAVESR
 C                        increase logarithmically.
-C             
+C
 C   VARIANCE- LOGICAL    True if the variance of the data is being processed
 C                        divide by an extra factor of the size of the output
 C                        bin in terms of the input bin.
@@ -456,7 +456,7 @@ C from integrating this parabola from <n-0.5> to <n+0.5>. When a fraction
 C of an input bin is required, the equation of the parabola which fits this
 C bin and the neighbouring bins is found, and then integrated appropriately.
 C
-C      If the program is called with CFLUX=.FALSE. after the number of 
+C      If the program is called with CFLUX=.FALSE. after the number of
 C counts in each output bin has been found, these are divided by the width of
 C each output bin in terms of input bins. This ensures that the mean level
 C of the data doess not change. Hence, after rebinning it is not necessarily
@@ -604,7 +604,7 @@ C
       END DO
 C
       END
-C                                      
+C
 
 
 C+
@@ -612,7 +612,7 @@ C+
 C
 C     F I G _ T F O R M
 C
-C     Rebin utility routine.  Given an x-value (RX) in the 
+C     Rebin utility routine.  Given an x-value (RX) in the
 C     rebinned data, calculates the corresponding wavelength
 C     and returns (X) the corresponding x-value in the original
 C     data.
@@ -637,7 +637,7 @@ C                Returned as the number of one of the bins used in
 C                the interpolation for X, and so probably a good
 C                starting place for the next call.
 C     (<) X      (Real) The x-value in the original data corresponding
-C                to the wavelength at bin RX in the rebinned data.  
+C                to the wavelength at bin RX in the rebinned data.
 C                This is also a bin number.
 C
 C     Common variables used -
@@ -653,13 +653,13 @@ C                - ie the dimension of WAVES
 C     (>) NBINR  (Integer) The number of bins in the rebinned array
 C                - ie the dimension of WAVESR
 C
-C     All common variables in 
+C     All common variables in
 C
 C     COMMON /REBIN_INFO/ UP,LOGS,LOGSR,NBIN,NBINR
 C+
 C     Method -
 C
-C     The wavelength corresponding to RX is found by linear 
+C     The wavelength corresponding to RX is found by linear
 C     interpolation between the closest array elements in WAVESR.
 C     A search through WAVES, starting from IX, finds the nearest
 C     two values to that wavelength and X is then calculated by

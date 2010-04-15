@@ -1,5 +1,5 @@
-      SUBROUTINE NDF1_PSNDF( STR, LBND, UBND, AXIS, IWCS, WCSSEC, 
-     :                       VALUE1, VALUE2, FRAME1, FRAME2, ISBND, 
+      SUBROUTINE NDF1_PSNDF( STR, LBND, UBND, AXIS, IWCS, WCSSEC,
+     :                       VALUE1, VALUE2, FRAME1, FRAME2, ISBND,
      :                       ISDEF1, ISDEF2, STATUS )
 *+
 *  Name:
@@ -12,16 +12,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_PSNDF( STR, LBND, UBND, AXIS, IWCS, WCSSEC, VALUE1, 
-*                      VALUE2, FRAME1, FRAME2, ISBND, ISDEF1, ISDEF2, 
+*     CALL NDF1_PSNDF( STR, LBND, UBND, AXIS, IWCS, WCSSEC, VALUE1,
+*                      VALUE2, FRAME1, FRAME2, ISBND, ISDEF1, ISDEF2,
 *                      STATUS )
 
 *  Description:
 *     The routine parses a dimension bound field for an NDF to
 *     determine two values which specify the bounds for a dimension
 *     when selecting an NDF section. The lower and upper bounds may be
-*     separated in the normal way by a colon or semi-colon (e.g. '10:20'), 
-*     or by '~' (e.g. '31~10'). The latter indicates that the bounds should 
+*     separated in the normal way by a colon or semi-colon (e.g. '10:20'),
+*     or by '~' (e.g. '31~10'). The latter indicates that the bounds should
 *     be centred on the first value and have a dimension size equal to the
 *     second value. Suitable default values are returned if either or
 *     both halves of the field are omitted (e.g. '100:', ':100', ':',
@@ -29,56 +29,56 @@
 *     upper bound is set to equal the lower bound (unless the string is
 *     blank, which is equivalent to ':'). If the values of bounds are
 *     supplied using integer format, then they are interpreted as pixel
-*     indices. Otherwise, they are interpreted as value in the current 
-*     Frame of the supplied WCS FrameSet. 
+*     indices. Otherwise, they are interpreted as value in the current
+*     Frame of the supplied WCS FrameSet.
 
 *  Arguments:
 *     STR = CHARACTER * ( * ) (Given)
 *        The string to be parsed.
 *     LBND = DOUBLE PRECISION (Given)
-*        Default lower axis bound. This should be a WCS axis value if WCSSEC 
+*        Default lower axis bound. This should be a WCS axis value if WCSSEC
 *        is .TRUE., and a pixel coordinate otherwise.
 *     UBND = DOUBLE PRECISION (Given)
-*        Default upper axis bound. This should be a WCS axis value if WCSSEC 
+*        Default upper axis bound. This should be a WCS axis value if WCSSEC
 *        is .TRUE., and a pixel coordinate otherwise.
 *     AXIS = INTEGER (Given)
 *        The index of the axis number to which STR relates. If WCSSEC
 *        is .FALSE., then the AXIS value is the index of a pixel axis.
 *        Otherwise, it is the index of a WCS axis.
 *     IWCS = INTEGER (Given)
-*        An AST pointer to the NDF's WCS FrameSet. 
+*        An AST pointer to the NDF's WCS FrameSet.
 *     WCSSEC = LOGICAL (Given)
-*        If .TRUE., then the section specifier uses "WCS syntax". Otherwise, 
+*        If .TRUE., then the section specifier uses "WCS syntax". Otherwise,
 *        it uses the old pixel/axis syntax. In WCS syntax, the supplied
 *        STR string should contain a specification for the bounds on each
 *        WCS axis, supplied in the order of the WCS axes. Each bound
 *        specification must be given using WCS axis values. The number of
-*        bounds specifications must equal the number of WCS axes. If WCSSEC 
-*        is .FALSE., the supplied STR string should contain a specification 
-*        for the bounds on each pixel axis, supplied in the order of the 
-*        pixel axes. Each bound specification must be given using either 
-*        pixel indices (integers), or WCS values (non-integers). 
+*        bounds specifications must equal the number of WCS axes. If WCSSEC
+*        is .FALSE., the supplied STR string should contain a specification
+*        for the bounds on each pixel axis, supplied in the order of the
+*        pixel axes. Each bound specification must be given using either
+*        pixel indices (integers), or WCS values (non-integers).
 *     VALUE1 = DOUBLE PRECISION (Returned)
 *        First value specifying the dimension bounds.
 *     VALUE2 = DOUBLE PRECISION (Returned)
 *        Second value specifying the dimension bounds.
 *     FRAME1 = INTEGER (Returned)
-*        0 ==> VALUE1 is to be interpreted as a WCS or axis coordinate 
+*        0 ==> VALUE1 is to be interpreted as a WCS or axis coordinate
 *        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     FRAME2 = INTEGER (Returned)
-*        0 ==> VALUE2 is to be interpreted as a WCS or axis coordinate 
+*        0 ==> VALUE2 is to be interpreted as a WCS or axis coordinate
 *        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     ISBND = LOGICAL (Returned)
 *        Whether VALUE1 and VALUE2 specify the lower and upper bounds
 *        directly (i.e. .TRUE. ==> a ':' separator was given or
 *        implied, whereas .FALSE. ==> a '~' separator was given).
 *     ISDEF1 = LOGICAL (Returned)
-*        .TRUE. ==> the VALUE1 value is a default value and was not 
-*        specified in the supplied string. .FALSE. ==> VALUE1 was 
+*        .TRUE. ==> the VALUE1 value is a default value and was not
+*        specified in the supplied string. .FALSE. ==> VALUE1 was
 *        specified explicitly in the supplied string.
 *     ISDEF2 = LOGICAL (Returned)
-*        .TRUE. ==> the VALUE1 value is a default value and was not 
-*        specified in the supplied string. .FALSE. ==> VALUE1 was 
+*        .TRUE. ==> the VALUE1 value is a default value and was not
+*        specified in the supplied string. .FALSE. ==> VALUE1 was
 *        specified explicitly in the supplied string.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -98,12 +98,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -134,7 +134,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -186,7 +186,7 @@
          VALUE1 = LBND
          VALUE2 = UBND
 
-         IF( WCSSEC ) THEN 
+         IF( WCSSEC ) THEN
             FRAME1 = 0
             FRAME2 = 0
          ELSE
@@ -199,7 +199,7 @@
          ISDEF2 = .TRUE.
 
 *  Otherwise, locate the separator between the two values. We use ";" as
-*  an alternative to ":" because ":" is used as a separator within formatted 
+*  an alternative to ":" because ":" is used as a separator within formatted
 *  angle and time values.
       ELSE
          ISEP = INDEX( STR, '~' )
@@ -211,7 +211,7 @@
          ISBND = .TRUE.
          IF ( ISEP .NE. 0 ) THEN
             ISBND = ( STR( ISEP : ISEP ) .EQ. ':' ) .OR.
-     :              ( STR( ISEP : ISEP ) .EQ. ';' ) 
+     :              ( STR( ISEP : ISEP ) .EQ. ';' )
          ELSE
             ISEP = LEN( STR ) + 1
          END IF
@@ -226,8 +226,8 @@
             DEF1 = ( LBND + UBND ) / 2.0D0
             DEF2 = UBND - LBND + 1.0D0
 
-         ELSE 
-            DEF2 = 0.5D0*AST_AXDISTANCE( IWCS, AXIS, LBND, UBND, 
+         ELSE
+            DEF2 = 0.5D0*AST_AXDISTANCE( IWCS, AXIS, LBND, UBND,
      :                                   STATUS )
             DEF1 = AST_AXOFFSET( IWCS, AXIS, LBND, DEF2, STATUS )
          END IF
@@ -237,7 +237,7 @@
          IF ( ISEP .LE. F ) THEN
             VALUE1 = DEF1
 
-            IF( WCSSEC ) THEN 
+            IF( WCSSEC ) THEN
                FRAME1 = 0
             ELSE
                FRAME1 = 1
@@ -248,7 +248,7 @@
 *  Otherwise, parse the string in front of the separator to obtain the
 *  first bound, supplying the appropriate default.
          ELSE
-            CALL NDF1_PSNDB( STR( F : ISEP - 1 ), DEF1, AXIS, IWCS, 
+            CALL NDF1_PSNDB( STR( F : ISEP - 1 ), DEF1, AXIS, IWCS,
      :                       WCSSEC, VALUE1, FRAME1, ISDEF1, STATUS )
          END IF
 
@@ -264,7 +264,7 @@
          ELSE IF ( ISEP .EQ. L ) THEN
             VALUE2 = DEF2
 
-            IF( WCSSEC ) THEN 
+            IF( WCSSEC ) THEN
                FRAME2 = 0
             ELSE
                FRAME2 = 1
@@ -275,7 +275,7 @@
 *  Otherwise, parse the string which follows the separator to determine
 *  the second value.
          ELSE
-            CALL NDF1_PSNDB( STR( ISEP + 1 : L ), DEF2, AXIS, IWCS, 
+            CALL NDF1_PSNDB( STR( ISEP + 1 : L ), DEF2, AXIS, IWCS,
      :                       WCSSEC, VALUE2, FRAME2, ISDEF2, STATUS )
          END IF
       END IF
@@ -286,7 +286,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
          IF ( .NOT. ISBND ) THEN
 
-*  If the extent is in pixels, then the nearest integer value must be 
+*  If the extent is in pixels, then the nearest integer value must be
 *  positive.
             IF ( FRAME2 .EQ. 1 .AND. NINT( VALUE2 ) .LE. 0 ) THEN
                STATUS = NDF__BNDIN
@@ -303,7 +303,7 @@
                IAT = 6
                CALL CHR_PUTI( AXIS, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               CALL MSG_SETC( 'L', AST_GETC( IWCS, ATTR( : IAT ), 
+               CALL MSG_SETC( 'L', AST_GETC( IWCS, ATTR( : IAT ),
      :                                       STATUS ) )
 
                STATUS = NDF__BNDIN

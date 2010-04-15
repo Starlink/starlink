@@ -94,35 +94,35 @@ void smf_get_spread ( char *pabuf, int *spread, int *nparam, int *status ) {
   } else if( !strcmp( pabuf, "LINEAR" ) ) {
     *spread = AST__LINEAR;
     *nparam = 0;
-   
-  } else if( !strcmp( pabuf, "SINC" ) ) {      
+
+  } else if( !strcmp( pabuf, "SINC" ) ) {
     *spread = AST__SINC;
     *nparam = 1;
-   
-  } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
+
+  } else if( !strcmp( pabuf, "SINCSINC" ) ) {
     *spread = AST__SINCSINC;
     *nparam = 2;
-   
-  } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
+
+  } else if( !strcmp( pabuf, "SINCCOS" ) ) {
     *spread = AST__SINCCOS;
     *nparam = 2;
-   
-  } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
+
+  } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {
     *spread = AST__SINCGAUSS;
     *nparam = 2;
-   
-  } else if( !strcmp( pabuf, "SOMB" ) ) {      
+
+  } else if( !strcmp( pabuf, "SOMB" ) ) {
     *spread = AST__SOMB;
     *nparam = 1;
-   
-  } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
+
+  } else if( !strcmp( pabuf, "SOMBCOS" ) ) {
     *spread = AST__SOMBCOS;
     *nparam = 2;
-   
-  } else if( !strcmp( pabuf, "GAUSS" ) ) {      
+
+  } else if( !strcmp( pabuf, "GAUSS" ) ) {
     *spread = AST__GAUSS;
     *nparam = 2;
-   
+
   } else if( *status == SAI__OK ) {
     *nparam = 0;
     *status = SAI__ERROR;

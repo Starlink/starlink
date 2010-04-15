@@ -116,7 +116,7 @@ typedef struct{
 }dirinfo;
 #define NNULL (struct direct *)0
 /*
- * 
+ *
  */
 #define STRUCTMALLOC(x)	(x *)gk0xclrmalloc(sizeof(x))
 #define ARRAYMALLOC(length,type)	(type *)malloc((unsigned)(length)*sizeof(type))

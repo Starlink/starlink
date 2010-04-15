@@ -11,7 +11,7 @@ C     spectrum.
 C
 C     Command parameters -
 C
-C     STANDARD    (Character) The interpolated continuum spectrum of 
+C     STANDARD    (Character) The interpolated continuum spectrum of
 C                 the standard star.  Note: This should not be in
 C                 magnitude units, and should probably not contain a
 C                 .TABLE.BANDWIDTH data object, since this would
@@ -23,7 +23,7 @@ C
 C     SPECTRUM    (Character) The observed continuum spectrum of the
 C                 standard star.  Note that both STANDARD and SPECTRUM
 C                 should be on the same wavelength scale (given by
-C                 a .X.DATA array) and ideally this will be a linear 
+C                 a .X.DATA array) and ideally this will be a linear
 C                 scale.
 C
 C     OUTPUT      (Character) The resulting calibration spectrum.
@@ -35,12 +35,12 @@ C
 C                                        KS / CIT 28th May 1984
 C     Modified:
 C
-C     24th Aug 1987  DJA/AAO. Revised DSA_ routines - some specs 
+C     24th Aug 1987  DJA/AAO. Revised DSA_ routines - some specs
 C                    changed. Now uses DYN_ routines for dynamic-memory
 C                    handling.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
 C                    in mapping calls.
-C     5th  Oct 1992  HME / UoE, Starlink. Changed INCLUDE. TABs 
+C     5th  Oct 1992  HME / UoE, Starlink. Changed INCLUDE. TABs
 C                    removed.
 C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -69,7 +69,7 @@ C
       INTEGER      SPDPTR        ! Pointer to spectrum data
       INTEGER      SPDSLOT       ! Map slot number for spectrum data
       INTEGER      SPXPTR        ! Pointer to spectrum x-axis data
-      INTEGER      SPXSLOT       ! Map slot number for spectrum x-axis 
+      INTEGER      SPXSLOT       ! Map slot number for spectrum x-axis
                                  ! data
       INTEGER      STATUS        ! Running status for DSA_ routines
       CHARACTER    STRING*64     ! Output message text
@@ -179,7 +179,7 @@ C
 C     F I G _ C A L D I V
 C
 C     Calculates the instrumental response of a detector, given
-C     an observed continuum standard spectrum - ie a continuum 
+C     an observed continuum standard spectrum - ie a continuum
 C     fitted to an observed standard - and a spectrum that gives
 C     the actual flux density over the same wavelength range for
 C     that standard star.  The result is a spectrum where all the

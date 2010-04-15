@@ -49,7 +49,7 @@
              A(I) = 0.0
           ENDDO
        ENDIF
-!       
+!
 ! Initialisation of EXISTS
 !
        DO 1 I=1,N
@@ -173,7 +173,7 @@
              WRITE (*,
      :       '(''   ISINP:  no clouds in model'')')
           ELSE
-             MODEL = .TRUE.  
+             MODEL = .TRUE.
           ENDIF
           GOTO 500
        ELSEIF (STRING(1:1).EQ.'Q') THEN

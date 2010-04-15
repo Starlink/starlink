@@ -17,7 +17,7 @@
 *      file.
 
 
-*-  
+*-
       CHARACTER*(*) STRING
       INTEGER LENGTH
 
@@ -28,4 +28,4 @@
 100   CONTINUE
       LENG=K
       END
- 
+

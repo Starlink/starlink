@@ -34,7 +34,7 @@
 *     of each of the NDFs (GRP group GID) and the filter type (if
 *     appropriate). The filter types (FILT) is only used when the TYPE
 *     is FLAT. This extracts only the flatfields with the correct filter
-*     type. If the IRFLAT parameter is TRUE then suitable TARGET frames 
+*     type. If the IRFLAT parameter is TRUE then suitable TARGET frames
 *     will be used if no FLATs are located.
 *
 *     GID is a GRP group identifier (for all the FTYPES entries), the
@@ -81,7 +81,7 @@
 *        GRP group identifier. This group contains the names of the
 *        NDFs.
 *     IRFLAT = LOGICAL (Given)
-*        Whether or not TARGET frames may be used to flatfield.  This 
+*        Whether or not TARGET frames may be used to flatfield.  This
 *        is an IR option and will only be used if no flatfields of an
 *        appropriate colour exist.
 *     NNDF = INTEGER (Given)
@@ -97,8 +97,8 @@
 *        flag is in operation.
 *     PTEMP( NNDF ) = INTEGER (Given and Returned)
 *        Pointers to the frames selected.
-*     TEMP = CHARACTER * ( * ) (Returned) 
-*        The name of the temporary file that is used to contain the 
+*     TEMP = CHARACTER * ( * ) (Returned)
+*        The name of the temporary file that is used to contain the
 *        NDF names. You should arrange to delete this.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -146,7 +146,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -216,7 +216,7 @@
      :                    FILT, PTEMP, NFRMS, STATUS )
 
 *  If asked check for TARGETS that could be used.
-         IF ( NFRMS .EQ. 0 .AND. IRFLAT ) THEN 
+         IF ( NFRMS .EQ. 0 .AND. IRFLAT ) THEN
             CALL CCD1_LOCS3( FTYPES, 2, NNDF, 1, 2, VALID, 'TARGET',
      :                       FILT, PTEMP, NFRMS, STATUS )
             IRUSED = .TRUE.

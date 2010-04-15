@@ -13,8 +13,8 @@
 *     CALL CAT_GCOLD( CI, GI, FROW, NROW, VALS, STATUS )
 
 *  Description:
-*     This routine reads multiple values for a single column from a 
-*     catalogue. 
+*     This routine reads multiple values for a single column from a
+*     catalogue.
 
 *  Arguments:
 *     CI = INTEGER (Given)
@@ -32,18 +32,18 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,13 +62,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
       INCLUDE 'CAT_PAR'          ! CAT public constants
       INCLUDE 'CAT1_PAR'         ! CAT internal constants
@@ -101,7 +101,7 @@
       LOGICAL NULL               ! Is this a null element?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First find the index of the slot within the CAT common blocks which
@@ -111,7 +111,7 @@
 *  First deal with the special case of FITS format.
       IF( BKTYP__CAT1( SLOT ) .EQ. CAT1__BKFIT ) THEN
 
-*  Get the Fortran IO unit attached to the FITS file. 
+*  Get the Fortran IO unit attached to the FITS file.
          FUNIT = FUNT__CAT3( SLOT )
 
 *  Get the column number associated with CAT column identifier GI.
@@ -126,7 +126,7 @@
      :                BAD, FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.  
+*  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
             CALL MSG_SETI( 'I', ICOL )
             CALL CAT1_FIOER( FSTAT, 'CAT_GCOLD_ERR1', 'FTGCVE',
@@ -142,7 +142,7 @@
          DO I = 1, NROW
 
 *  Get the column value.
-            CALL CAT_FGT0D( CI, I + FROW - 1, GI, VALS( I ), NULL, 
+            CALL CAT_FGT0D( CI, I + FROW - 1, GI, VALS( I ), NULL,
      :                      STATUS )
 
 *  If this value is null, store a bad value.

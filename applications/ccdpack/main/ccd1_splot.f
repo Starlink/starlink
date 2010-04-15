@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine writes a .MORE.AST_PLOT component into a picture
-*     in the AGI database from the PLOT argument, in the same form 
+*     in the AGI database from the PLOT argument, in the same form
 *     as is used by KAPPA applications, so that subsequent applications
-*     can pick up all the WCS information which was available to the 
+*     can pick up all the WCS information which was available to the
 *     calling application.
 *
 *     Note that unlike KAPPA applications it does not write a
@@ -81,11 +81,11 @@
 *  Local Constants:
       INTEGER CLEN               ! Length of strings in character array
       PARAMETER ( CLEN = 32 )
-      
+
 *  Arguments Given:
       INTEGER PICID
       INTEGER PLOT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -105,7 +105,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Open a new or existing .MORE component.
       CALL AGI_IMORE( PICID, THERE, STATUS )
       IF ( THERE ) THEN
@@ -153,7 +153,7 @@
       NEL = NEL + 1
  1    CONTINUE
       NEL = NEL - 1
-      CALL CCD1_CA2C( %VAL( CNF_PVAL( IPWCS ) ), NEL, LINE, STATUS, 
+      CALL CCD1_CA2C( %VAL( CNF_PVAL( IPWCS ) ), NEL, LINE, STATUS,
      :                %VAL( CNF_CVAL( CLEN ) ) )
       IF ( LINE .EQ. ' ' .AND. NEL .GT. 1 ) GO TO 1
 

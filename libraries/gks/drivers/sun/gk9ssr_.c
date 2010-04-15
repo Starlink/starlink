@@ -21,7 +21,7 @@
  * Errors:
  *
  * Comments:
- *   Called at end of polyline entry point to reset the width to 1 and the 
+ *   Called at end of polyline entry point to reset the width to 1 and the
  *   style to be NULL.
  */
 extern Pr_texture      *style;

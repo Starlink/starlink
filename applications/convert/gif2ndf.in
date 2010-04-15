@@ -3,13 +3,13 @@
 #+
 #  Name:
 #     gif2ndf
- 
+
 #  Purpose:
-#     Converts a GIF-format file into an NDF 
- 
+#     Converts a GIF-format file into an NDF
+
 #  Type of Module:
 #     Bourne shell script
-  
+
 #  Description:
 #     This Bourne-shell script converts a Graphics Interchange Format
 #     (GIF) file into an unsigned-byte (256 grey-level) NDF format file.
@@ -29,7 +29,7 @@
 #        The name of the NDF to be generated (without the .sdf extension).
 #        If the OUT parameter is omitted, the value of the IN parameter
 #        is used.
- 
+
 #  Examples:
 #     gif2ndf old new
 #        This converts the GIF file old.gif into an NDF called new
@@ -47,15 +47,15 @@
 #
 #     Input image filenames must have the extension .gif.
 #
-#     The Netpbm utilities giftopnm, ppmtopgm, pnmflip and pnmtofits 
+#     The Netpbm utilities giftopnm, ppmtopgm, pnmflip and pnmtofits
 #     must be available on your PATH.
- 
+
 #  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
 #     GJP: G.J.Privett (Starlink - UWCC)
 #     AJC: A.J.Chipperfield (Starlink - RAL)
 #     {enter_new_authors_here}
- 
+
 #  History:
 #     28-NOV-1995 (AJC):
 #        Original version, based on work by MJC and GJP.
@@ -68,14 +68,14 @@
 #     1998 November 19 (AJC):
 #        Use Netpbm - common for all platforms
 #          Use giftopnm not giftoppm
-#          Use pnmtofits not pgmtofits 
+#          Use pnmtofits not pgmtofits
 #     1999 March 11 (AJC):
 #        Correct removal of .gif from name
 #     {note_further_changes_here}
 
 #  Bugs:
 #     {note_any_bugs_here}
- 
+
 #-
 
 # Check that a file name was given.
@@ -111,9 +111,9 @@ out=${2:-$name}
     exit 1
   }
   rm -f convert_err?_$name.lis
- 
+
 # Convert the image to an NDF of data type _UBYTE.  Make the error look
-# as if it came from MSG, so as this is a secondary error report, 
+# as if it came from MSG, so as this is a secondary error report,
 # replace the !! prefix with !.
 $CONVERT_DIR/fits2ndf in=convert_temp_$name.fit out=$out fmtcnv=t \
   </dev/null  2>&1 | \

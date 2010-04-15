@@ -46,31 +46,31 @@ typedef enum {
     PANEL_VALUE_X		= PANEL_ATTR(ATTR_X, 35),
     PANEL_SLIDER_WIDTH		= PANEL_ATTR(ATTR_X, 36),
     PANEL_WIDTH			= PANEL_ATTR(ATTR_X, 37),
-    
+
     /* indexed x-coordinates */
     PANEL_CHOICE_X		= PANEL_ATTR(ATTR_INDEX_X, 38),
     PANEL_MARK_X		= PANEL_ATTR(ATTR_INDEX_X, 39),
-    
+
     /* lists of x-coordinates */
     PANEL_CHOICE_XS	= PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_X), 40),
     PANEL_MARK_XS	= PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_X), 41),
-   
+
    /* y-coordinates */
     PANEL_ITEM_Y		= PANEL_ATTR(ATTR_Y, 42),
     PANEL_ITEM_Y_GAP		= PANEL_ATTR(ATTR_Y, 43),
     PANEL_LABEL_Y		= PANEL_ATTR(ATTR_Y, 44),
     PANEL_VALUE_Y		= PANEL_ATTR(ATTR_Y, 45),
     PANEL_HEIGHT		= PANEL_ATTR(ATTR_Y, 46),
-    
+
     /* indexed y-coordinates */
     PANEL_CHOICE_Y		= PANEL_ATTR(ATTR_INDEX_Y, 47),
     PANEL_MARK_Y		= PANEL_ATTR(ATTR_INDEX_Y, 48),
-    
+
     /* lists of y-coordinates */
     PANEL_CHOICE_YS	= PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_Y), 49),
     PANEL_MARK_YS	= PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_Y), 50),
 
-    /* integers */    
+    /* integers */
     PANEL_VALUE			= PANEL_ATTR(ATTR_INT,  51),
     PANEL_LABEL_DISPLAY_LENGTH	= PANEL_ATTR(ATTR_INT,  52),
     PANEL_VALUE_DISPLAY_LENGTH	= PANEL_ATTR(ATTR_INT,  53),
@@ -80,9 +80,9 @@ typedef enum {
     PANEL_CHOICE_OFFSET		= PANEL_ATTR(ATTR_INT,  57),
     PANEL_TIMER_SECS		= PANEL_ATTR(ATTR_INT, 58),
     PANEL_TIMER_USECS		= PANEL_ATTR(ATTR_INT, 59),
-    
+
     /* lists of integers */
-    PANEL_MENU_CHOICE_VALUES	= 
+    PANEL_MENU_CHOICE_VALUES	=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_INT), 60),
 
     /* booleans */
@@ -103,7 +103,7 @@ typedef enum {
     PANEL_READ_ONLY             = PANEL_ATTR(ATTR_BOOLEAN, 124),
     PANEL_BOXED                 = PANEL_ATTR(ATTR_BOOLEAN, 125),
 
-    
+
     /* indexed booleans */
     PANEL_TOGGLE_VALUE		= PANEL_ATTR(PANEL_INDEX_BOOLEAN, 120),
 
@@ -114,7 +114,7 @@ typedef enum {
     PANEL_FEEDBACK		= PANEL_ATTR(ATTR_ENUM, 77),
     PANEL_PAINT			= PANEL_ATTR(ATTR_ENUM, 78),
     PANEL_MOUSE_STATE		= PANEL_ATTR(ATTR_ENUM, 79),
-   
+
     /* characters */
     PANEL_MASK_CHAR		= PANEL_ATTR(ATTR_CHAR, 80),
 
@@ -124,11 +124,11 @@ typedef enum {
     PANEL_NOTIFY_STRING		= PANEL_ATTR(ATTR_STRING, 83),
     PANEL_MENU_TITLE_STRING	= PANEL_ATTR(ATTR_STRING, 84),
     PANEL_NAME			= PANEL_ATTR(ATTR_STRING, 85),
-   
+
     /* lists of strings */
     PANEL_CHOICE_STRINGS	=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_STRING), 86),
-    PANEL_MENU_CHOICE_STRINGS	= 
+    PANEL_MENU_CHOICE_STRINGS	=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_STRING), 87),
 
     /* indexed strings */
@@ -136,51 +136,51 @@ typedef enum {
 
     /* indexed font */
     PANEL_CHOICE_FONT		= PANEL_ATTR(PANEL_INDEX_FONT, 123),
-    
+
     /* pixrect pointers */
     PANEL_LABEL_IMAGE		= PANEL_ATTR(ATTR_PIXRECT_PTR, 89),
     PANEL_MENU_TITLE_IMAGE	= PANEL_ATTR(ATTR_PIXRECT_PTR, 90),
     PANEL_MENU_MARK_IMAGE	= PANEL_ATTR(ATTR_PIXRECT_PTR, 91),
     PANEL_MENU_NOMARK_IMAGE	= PANEL_ATTR(ATTR_PIXRECT_PTR, 92),
     PANEL_TYPE_IMAGE		= PANEL_ATTR(ATTR_PIXRECT_PTR, 93),
- 
-    /* lists of pixrect pointers */   
-    PANEL_CHOICE_IMAGES		= 
+
+    /* lists of pixrect pointers */
+    PANEL_CHOICE_IMAGES		=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_PIXRECT_PTR), 94),
-    PANEL_MENU_CHOICE_IMAGES	=        
+    PANEL_MENU_CHOICE_IMAGES	=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_PIXRECT_PTR), 95),
-    PANEL_MARK_IMAGES		= 
+    PANEL_MARK_IMAGES		=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_PIXRECT_PTR), 96),
     PANEL_NOMARK_IMAGES		=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_PIXRECT_PTR), 97),
 
-    /* indexed pixrect pointers */   
+    /* indexed pixrect pointers */
     PANEL_CHOICE_IMAGE		= PANEL_ATTR(PANEL_INDEX_PIXRECT_PTR, 98),
     PANEL_MARK_IMAGE		= PANEL_ATTR(PANEL_INDEX_PIXRECT_PTR, 99),
     PANEL_NOMARK_IMAGE		= PANEL_ATTR(PANEL_INDEX_PIXRECT_PTR, 100),
 
-    /* pixfont pointers */   
+    /* pixfont pointers */
     PANEL_LABEL_FONT		= PANEL_ATTR(ATTR_PIXFONT_PTR, 101),
     PANEL_VALUE_FONT		= PANEL_ATTR(ATTR_PIXFONT_PTR, 102),
     PANEL_MENU_TITLE_FONT	= PANEL_ATTR(ATTR_PIXFONT_PTR, 103),
     PANEL_FONT			= PANEL_ATTR(ATTR_PIXFONT_PTR, 104),
 
-    /* lists of fonts */    
+    /* lists of fonts */
     PANEL_CHOICE_FONTS		=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_PIXFONT_PTR), 105),
-    PANEL_MENU_CHOICE_FONTS	= 
+    PANEL_MENU_CHOICE_FONTS	=
         PANEL_ATTR(ATTR_LIST_INLINE(ATTR_NULL, ATTR_PIXFONT_PTR), 106),
 
-    /* function pointers */    
+    /* function pointers */
     PANEL_NOTIFY_PROC		= PANEL_ATTR(ATTR_FUNCTION_PTR, 107),
     PANEL_TIMER_PROC		= PANEL_ATTR(ATTR_FUNCTION_PTR, 108),
     PANEL_EVENT_PROC		= PANEL_ATTR(ATTR_FUNCTION_PTR, 109),
     PANEL_BACKGROUND_PROC	= PANEL_ATTR(ATTR_FUNCTION_PTR, 122),
-    
+
     /* rect pointers */
     PANEL_ITEM_RECT		= PANEL_ATTR(ATTR_RECT_PTR, 110),
-    
-    /* pixwin pointers */  
+
+    /* pixwin pointers */
     PANEL_PIXWIN		= PANEL_ATTR(ATTR_PIXWIN_PTR, 111),
 #ifdef ecd.color
     /* color panel item attributes */
@@ -198,7 +198,7 @@ typedef enum {
     PANEL_NEXT_ITEM		= PANEL_ATTR(ATTR_OPAQUE, 118),
     PANEL_PARENT_PANEL		= PANEL_ATTR(ATTR_OPAQUE, 119),
 
-    
+
 } Panel_attribute;
 
 /********* values for LEVEL attrs  *********************************/
@@ -317,7 +317,7 @@ extern Panel_item	panel_line();
     			PANEL_NOMARK_IMAGES,        0,              \
     			PANEL_FEEDBACK,             PANEL_MARKED,   \
     			PANEL_DISPLAY_LEVEL,        PANEL_CURRENT
- 
+
 
 
 /***********************************************************************/
@@ -344,7 +344,7 @@ extern Panel_item	panel_line();
 extern struct toolsw	*panel_create();
 extern caddr_t          *panel_make_list();
 
-/* PANEL_CU() is provided for backward 
+/* PANEL_CU() is provided for backward
  * compatability.
  */
 #define	PANEL_CU(n)		(ATTR_COL(n))

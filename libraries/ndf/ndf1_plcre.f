@@ -111,7 +111,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -258,7 +258,7 @@
          CALL DAT_PRMRY( .TRUE., LOCPL, .TRUE., STATUS )
          CALL HDS_LINK( LOCPL, 'NDF_PCB', STATUS )
       END IF
-       
+
 *  An error occurred, then annul the returned locator.
       IF ( STATUS .NE. SAI__OK ) CALL DAT_ANNUL( LOCPL, STATUS )
 

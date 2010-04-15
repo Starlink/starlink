@@ -81,7 +81,7 @@ Notes:
                     (insert "\n"))))))))
 
 ;;; Move point on to the placeholder.
-    (if start 
+    (if start
         (progn
           (goto-char start)
           (indent-according-to-mode)))))

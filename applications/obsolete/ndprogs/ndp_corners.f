@@ -27,7 +27,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -72,7 +72,7 @@ C
       END DO
 C
 C   Compute coordinates of all corner pixels in the image.
-C      
+C
       DO N=1,2
         DO M=1,2
           DO L=1,2
@@ -91,6 +91,6 @@ C
             END DO
           END DO
         END DO
-      END DO                     
+      END DO
 C
       END

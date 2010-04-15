@@ -1,5 +1,5 @@
 C+
-C                D S A Z _ I N Q _ N A M E 
+C                D S A Z _ I N Q _ N A M E
 C
 C  Routine name:
 C     DSAZ_INQ_NAME
@@ -131,10 +131,10 @@ C     Unfortunately, it seems that in some implementations the INQUIRE
 C     statement will return a string that is just the same as the string
 C     used to open the file (the SUN does this). In this cases, you can
 C     get filenames as perverse as '../other_dir/../this_dir/file.ext'.
-C     If we have a resulting string that contains '..' characters in it, 
-C     we need to remove each instance, together with the preceding 
-C     directory name. We start again each time through, just in case of 
-C     constructs such as '/home/aaossg/ks/dsa/../../user/dir/file.ext' 
+C     If we have a resulting string that contains '..' characters in it,
+C     we need to remove each instance, together with the preceding
+C     directory name. We start again each time through, just in case of
+C     constructs such as '/home/aaossg/ks/dsa/../../user/dir/file.ext'
 C     and the like.
 C
       IDOT=INDEX(TEMP_NAME,'../')
@@ -146,7 +146,7 @@ C
                ISLASH=LSLASH
                LSLASH=I
             END IF
-         END DO 
+         END DO
          IF (ISLASH.GT.0) TEMP_NAME(ISLASH:)=TEMP_NAME(IDOT+2:)
          IDOT=INDEX(TEMP_NAME,'../')
       END DO

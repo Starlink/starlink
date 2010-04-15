@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
 *           Pointers to the mapped NAMES array of each group.
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
-*           The number of values stored in the mapped NAMES array 
+*           The number of values stored in the mapped NAMES array
 *           for each group (this may be less than the total size of the
 *           array).
 *        CMN_UPPER( GRP__MAXG ) = LOGICAL (Read)
@@ -134,7 +134,7 @@
 *  required by UNIX. There is no corresponding dummy argument in the
 *  code for GRP1_FIND.
       CALL GRP1_FIND( CMN_UPPER( SLOT ), CMN_GSIZE( SLOT ), START,
-     :                %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
+     :                %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
      :                NAME, INDEX, STATUS,
      :                %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 

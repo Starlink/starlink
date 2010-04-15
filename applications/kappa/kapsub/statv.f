@@ -271,7 +271,7 @@
             MXPSCL = VAL__BADI
             MNPSCL = VAL__BADI
 
-*          Define the bounds for a value to be included in the 
+*          Define the bounds for a value to be included in the
 *          statistics.
 
             LOWER = TMEAN - CLIP( J ) * TSTDEV
@@ -316,7 +316,7 @@
 
 *       Now form returned quantities.  The standard deviation (sigma)
 *       is formed from the equation for the variance (sigma squared) :
-*                                               _ 
+*                                               _
 *        variance  =   Sum over n pixels ( x   -   x )**2
 *                                           i
 *                      ----------------------------------
@@ -324,11 +324,11 @@
 *                                  ( n - 1 )
 *
 *       This can be algebraically manipulated to the following :
-*                                          _ 
+*                                          _
 *        variance  =   Sum(( x )**2)  -  n.x**2
-*                             i                
+*                             i
 *                      ------------------------
-*                  
+*
 *                              ( n - 1 )
 *
 *       and then standard deviation equals sqrt( variance ).
@@ -354,7 +354,7 @@
 *          rounding errors.
 
             IF ( DIM .EQ. 1 .OR. DMAXIM .EQ. DMINIM .OR.
-     :           VARNCE .LT. 0.0D0 ) THEN      
+     :           VARNCE .LT. 0.0D0 ) THEN
                VARNCE  =  0.0D0
             ELSE
               VARNCE  =  VARNCE / ( DNMPIX - 1.0D0 )
@@ -371,7 +371,7 @@
             TMAX  =  REAL( DMAXIM )
             TMIN  =  REAL( DMINIM )
             TSTDEV  =  REAL( DSTDDV )
- 
+
          ELSE
 
 *          Statistics are undefined.

@@ -34,7 +34,7 @@ C
         IF (.NOT.OK) RETURN
       ELSE
         NPT = NP
-        DO 5, I=1,NPT 
+        DO 5, I=1,NPT
           XI(I) = X(I)
           YI(I) = Y(I)
     5   CONTINUE
@@ -50,7 +50,7 @@ C
       ENDIF
       ICYCLE = -(INT(CYCLES) + 1)
       SHIFT = DBLE(ICYCLE)*PERIOD
-*     WRITE(*,*) '   FOURIER: Shifting x-axis by ',SHIFT 
+*     WRITE(*,*) '   FOURIER: Shifting x-axis by ',SHIFT
       NEG = 0
       HOLD = NPT
       DO 10,J=1,NPT
@@ -66,7 +66,7 @@ C either end (PROP) is significantly greater than zero.
 C
       IF (PROP.GT.1.0D-06) THEN
         CALL ENDMSK (XI,YI,NPT,PROP,ENDM)
-      ENDIF 
+      ENDIF
 C
 C  Fourier transform the interpolated, endmasked data.
 C

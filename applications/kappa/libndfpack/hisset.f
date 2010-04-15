@@ -120,13 +120,13 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'MSG_PAR'          ! MSG_ public constants
 
 *  Status:
@@ -192,7 +192,7 @@
          ELSE
             IF ( .NOT. THERE ) THEN
                CALL NDF_HCRE( INDF, STATUS )
-            
+
 *  If it already exists, then obtain the existing update mode.
             ELSE
                CALL NDF_HINFO( INDF, 'MODE', 0, OLD, STATUS )

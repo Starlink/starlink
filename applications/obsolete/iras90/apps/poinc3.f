@@ -16,8 +16,8 @@
 *     This subroutine fits three known points with a parabola:
 *              Y = A * X^2 + B * X + C
 *     and find the max. value and position of this parabola with in the
-*     range of these three know points. It assumes that the known point 
-*     YP, Y and YL have X coordinates -1, 0 and 1, respectively. The 
+*     range of these three know points. It assumes that the known point
+*     YP, Y and YL have X coordinates -1, 0 and 1, respectively. The
 *     position of the max. value is returned in this coordinate.
 
 *  Arguments:
@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,7 +77,7 @@
       A = 0.5 * ( YP + YL ) - C
       B = 0.5 * ( YL - YP )
 
-*  If A is negative, there is a max. find its position. 
+*  If A is negative, there is a max. find its position.
       FOUND = .FALSE.
       IF ( A .LT. -VAL__SMLR ) THEN
          MAXPOS = -B / ( 2.0 * A )
@@ -88,8 +88,8 @@
             FOUND = .TRUE.
          END IF
       END IF
-      
-*  If no max. is found within the range of the known points, 
+
+*  If no max. is found within the range of the known points,
 *  the max is attanded at one end of the section.
       IF ( .NOT. FOUND ) THEN
          IF ( YL .GT. YP ) THEN

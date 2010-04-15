@@ -48,8 +48,8 @@ C                                     KS / CIT  26th Oct 1982
 C     Modified:
 C
 C     13th March 1986.  KS / AAO. Modified to use HDS routines.
-C     10th Jan   1992.  KS / AAO.  Syntax of include statements changed to 
-C                       remove VMS logical names and to use lower case, to 
+C     10th Jan   1992.  KS / AAO.  Syntax of include statements changed to
+C                       remove VMS logical names and to use lower case, to
 C                       enable compilation on a SUN.
 C     24th  Jan  1992.  KS / AAO. Calls to EMS added to control error reporting.
 C     12th  Mar  1993.  HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
@@ -86,7 +86,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert NAME to upper case and analyse it
 C
@@ -117,7 +117,7 @@ C
       CALL DTA_DTATYP(HDSTYPE,TYPE,NCHAR,STATUS)
       IF (STATUS.NE.0) GO TO 600
 C
-C     If the object is a character string, we use the length as the 
+C     If the object is a character string, we use the length as the
 C     first dimension, and move the other dimensions up accordingly.
 C     Otherwise, just copy the dimension information over.
 C

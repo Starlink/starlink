@@ -89,7 +89,7 @@
 *                 Mark the chosen point with a green cross
 *                 Switch off first-point repeat
 *              Else
-*                 Display next functions of the choice device and 
+*                 Display next functions of the choice device and
 *                   locator in frame zone
 *                 Mark the provisional point with a white cross
 *              Endif
@@ -287,8 +287,8 @@
 
 *                   Check whether they lie within the array.
 
-                     IF ( ( XCUR01 .GE. XLOW .AND. XCUR01 .LE. XHIGH ) 
-     :                    .AND. ( YCUR01 .GE. YLOW .AND. 
+                     IF ( ( XCUR01 .GE. XLOW .AND. XCUR01 .LE. XHIGH )
+     :                    .AND. ( YCUR01 .GE. YLOW .AND.
      :                            YCUR01 .LE. YHIGH ) ) THEN
 
                         AGAIN = .FALSE.
@@ -356,7 +356,7 @@
      :                           STATUS )
 
                      CALL SGS_SELZ( ZONEO, STATUS )
-                     CALL SGS_SPEN( 1 ) 
+                     CALL SGS_SPEN( 1 )
                      CALL KPG1_CROSS( XCUR01, YCUR01, 5., STATUS )
 
 *                End of which-button-pressed check
@@ -451,7 +451,7 @@
 
 *                   Check that the points are distinct.
 
-                     IF ( ( XCUR01 .NE. XCUR02 ) .OR. 
+                     IF ( ( XCUR01 .NE. XCUR02 ) .OR.
      :                    ( YCUR01 .NE. YCUR02 ) ) THEN
 
 *                      Draw the region in green after erasing

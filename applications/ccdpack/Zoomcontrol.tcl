@@ -19,11 +19,11 @@
 #  Public Methods:
 #     zoominc factor inc
 #        This method is provided for doing arithmetic on zoomfactors;
-#        the factor argument is a possible contents of the "value" 
-#        public variable, a zoom factor, and the inc argument is an 
+#        the factor argument is a possible contents of the "value"
+#        public variable, a zoom factor, and the inc argument is an
 #        integer indicating how to change it; +1 means zoom in one level,
 #        -1 means zoom out one level, etc.  Exactly what a level means
-#        is not defined by this interface, but the result returned by 
+#        is not defined by this interface, but the result returned by
 #        this method will give another possible value of the "value"
 #        public variable.  This method respects the max and min limits.
 
@@ -169,9 +169,9 @@
       public variable value { 1 } {
 #-----------------------------------------------------------------------
          if { $value < $min } {
-            configure -value $min 
+            configure -value $min
          } elseif { $value > $max } {
-            configure -value $max 
+            configure -value $max
          }
          set level [ factor2level $value ]
          $omenu select [ expr $level + $minlevel ]
@@ -193,8 +193,8 @@
       private proc factor2level { factor } {
 #-----------------------------------------------------------------------
          catch {
-            if { $factor > $max } { 
-               set factor $max 
+            if { $factor > $max } {
+               set factor $max
             } elseif { $factor < $min } {
                set factor $min
             }
@@ -274,7 +274,7 @@
 #  Private variables.
 ########################################################################
 
-      private variable maxlevel [ expr [ llength $factorreps ] - 1 ]     
+      private variable maxlevel [ expr [ llength $factorreps ] - 1 ]
                                        # Maximum zoom level
       private variable omenu          ;# Path name of the optionmenu widget
       private variable minlevel 0     ;# Minimum zoom level

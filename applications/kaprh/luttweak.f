@@ -41,7 +41,7 @@
 
 *  Usage:
 *     luttweak [device] [plane] [view]
-   
+
 *  ADAM Parameters:
 *     DEVICE = DEVICE (Read)
 *        The name of the image-display device whose lookup table is to
@@ -131,7 +131,7 @@
 
 *  Related Applications:
 *     KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTROT.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -143,7 +143,7 @@
 *        Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
 *        than n.
 *     1991 November 15 (MJC):
-*        Made exit trigger number 2.  Inceased maximum number of 
+*        Made exit trigger number 2.  Inceased maximum number of
 *        triggers to 64.
 *     1992 February 10 (MJC):
 *        Normalised the rotation displacement by the effective number
@@ -170,7 +170,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -222,7 +222,7 @@
      :  MEMIDS( NMEMAX ),        ! Available memories
      :  MEMTYP,                  ! Memory type
      :  MODCON,                  ! Configuration mode
-     :  NCHAR,                   ! Number of characters in IDI 
+     :  NCHAR,                   ! Number of characters in IDI
                                  ! interaction instruction message
      :  NCHAR1,                  ! Number of characters in interaction
                                  ! message
@@ -233,7 +233,7 @@
      :  NLOC( 1 )                ! Number of locators
 
       INTEGER
-     :  NLUTE,                   ! Number of entries in the VLUT less 
+     :  NLUTE,                   ! Number of entries in the VLUT less
                                  ! the reserved pens.
      :  NMEM,                    ! Number of image memories
      :  NRESP,                   ! Number of reserved pens
@@ -494,7 +494,7 @@
 
 *    Read the current LUT, only storing what is possible.  The buffer
 *    is generous as most devices have no more than 256 levels.
-      NLUTE = MIN( NINTS( 1 ) - NRESP, CTM__MXPEN ) 
+      NLUTE = MIN( NINTS( 1 ) - NRESP, CTM__MXPEN )
       CALL IILRLT( DID, MEMID, NRESP, NLUTE, VLUT, IDSTAT )
 
 *    Abort if an error has occurred.  Note IDI does not use
@@ -547,8 +547,8 @@
 *
 *       Note that IDI only works in device pixels and does not resample
 *       arbitrarily sized arrays to match the transfer window.
-       
-*       Find the number of pixels visible. 
+
+*       Find the number of pixels visible.
          NXD = DSIZE( 1 ) / ( ZOOM + 1 )
          NYD = DSIZE( 2 ) / ( ZOOM + 1 )
 
@@ -684,7 +684,7 @@
             TRIGS( 1 ) = 0
             TRIGS( 2 ) = 0
             TRIGS( 3 ) = 0
-      
+
 *          Execute the interactions.
             CALL IIIEIW( DID, TRIGS, IDSTAT )
 
@@ -757,7 +757,7 @@
 *       Define the origins of the transfer window.
          OX = MIN( MAX( BORDER, XP - NLUTE / 2 ),
      :                  DSIZE( 1 ) + 1 - BORDER - NLUTE )
-         OY = MIN( MAX( BORDER, YP - WIDTH / 2 ), 
+         OY = MIN( MAX( BORDER, YP - WIDTH / 2 ),
      :                  DSIZE( 2 ) + 1 - BORDER - WIDTH )
 
          DEPTH = 8
@@ -786,7 +786,7 @@
 
 *       This may not be implemented so watch out for this particular
 *       error message.  If it is not implemented there is already a
-*       one-to-one correspondence. Abort if an error has occurred. 
+*       one-to-one correspondence. Abort if an error has occurred.
 *       Note IDI does not use inherited status.
          IF ( IDSTAT .NE. IDI__OK .AND. IDSTAT .NE. IDI__NOTIM ) THEN
 
@@ -823,7 +823,7 @@
      :        /'the colour table.', STATUS )
             GOTO 960
          END IF
-      
+
 *       Fill the array with element numbers less one to give colour
 *       indices.  Omit the reserved pens.
          CALL ELNMBI( NRESP, NINTS( 1 ) - 1, NLUTE, %VAL( CTPTR ),
@@ -1060,7 +1060,7 @@
 *          so toggle the flag for the tweaking routine.
             IF ( TRIGS( 2 ) .NE. 0 ) WHITE = .NOT. WHITE
 
-*          Tweak the LUT. 
+*          Tweak the LUT.
 *          ==============
 
 *          Only tweak when the locator has moved or the padding toggle
@@ -1073,7 +1073,7 @@
                CALL KPS1_LUTWK( NLUTE, VLUT, PENDIS,
      :                          SOSDIS, WHITE, TLUT, STATUS )
 
-*             Write the tweaked VLUT. 
+*             Write the tweaked VLUT.
 *             =======================
 
 *             Only write to the unreserved portion of the VLUT.
@@ -1092,7 +1092,7 @@
 *       Completed the loop so can next cycle can no longer be the first
 *       pass.
          FIRST = .FALSE.
-      
+
       END DO
 
 *    Restore the display to its former state, i.e. removing the colour-
@@ -1105,7 +1105,7 @@
 *       ===========================
 
 *       Redefine the origin of the transfer window.
-         OY = OY - WIDTH + 1 
+         OY = OY - WIDTH + 1
          CALL IIMSTW( DID, MEMID, 0, NLUTE, WIDTH, DEPTH, OX, OY,
      :                IDSTAT )
 
@@ -1118,7 +1118,7 @@
             GOTO 980
          END IF
 
-*       Write the captured portion of the memory to the screen starting 
+*       Write the captured portion of the memory to the screen starting
 *       at position OX, OY in the transfer window.  The data are taken
 *       from the lowest byte of each integer word in the data array
 *       (defined by PACK = 1, DEPTH = 8 ).
@@ -1164,7 +1164,7 @@
  999  CONTINUE
 
       IF ( DEVCAN ) THEN
-      
+
 *       Close down IDI using the parameter system.
          CALL IDI_CANCL( 'DEVICE', STATUS )
       ELSE

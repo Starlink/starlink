@@ -14,7 +14,7 @@
 *     CALL CHP_OPENADDFR( FILE, ACMODE, FORM, RECSZ, FD, SYSCAT, STATUS )
 *
 *  Description:
-*     Open a CHP additional information file. Currently assumes that the 
+*     Open a CHP additional information file. Currently assumes that the
 *     file is in the current directory. Later to include a search path.
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        'UPDATE' - Open a file to write. The file must exist.
 *        'APPEND' - Open a file to append. The file must exist.
 *     FORM = CHARACTER * ( * ) (Given)
-*        Expression giving the required formatting of the file. 
+*        Expression giving the required formatting of the file.
 *        Valid formats are:
 *        'FORTRAN' - Formatted file, normal fortran interpretation of the first
 *                    character of each record.
@@ -60,13 +60,13 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
 *      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
- 
+
 *  Local Variables:
       CHARACTER * ( 32 ) FILENAME ! Full filename
       CHARACTER * ( 28 ) FILENAME1 ! Full filename

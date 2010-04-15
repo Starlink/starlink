@@ -14,7 +14,7 @@
 *
 *   Method:
 *      CORRECTS IN AN APPROXIMATE FASHION FOR THE 25% ERROR IN TH 20%
-*      FLAT FIELD AND THE 4% AND 2.5% ERRORS IN THE 10% AND 20% FLAT 
+*      FLAT FIELD AND THE 4% AND 2.5% ERRORS IN THE 10% AND 20% FLAT
 *      FIELDS.
 *      Code adapted from Toon Snijders SWPLORES.FOR program.
 *
@@ -25,7 +25,7 @@
 
 *    Import:
       REAL*8 WAVE        ! wavelength
- 
+
       REAL*8 F0          ! pixel FN = (TN-2000)
 
 *   Export:
@@ -83,7 +83,7 @@
       W = MAX(WDELTA(JD), MIN(WDELTA(JU), WAVE))
       DCDW = (DELTA(JU) - DELTA(JD))/(WDELTA(JU) - WDELTA(JD))
       COR = (W - WDELTA(JD))*DCDW + DELTA(JD)
- 
+
 *   Use interpolated value of "COR" to correct F0 and store in FN
       X = F0
 
@@ -92,14 +92,14 @@
          FN = X*E10
 
       ELSE IF (X.LE.X20) THEN
- 
+
 *   CORRECT FOR 2.5% AND 4% ERRORS IN 20% AND 40% ITF ENTRIES,
 *   CORB=(0.0394-0.0252)/D21,D21=X20-X10,DI21=1.0/D21
          FN = X - (X - X10)*DI21*COR
          FN = FN*(E20 - (X20 - X)*CORB)
 
       ELSE IF (X.LE.X40) THEN
- 
+
 *   CORRECT 2.5% EXPOSURE LEVEL ERROR IN 20% FLAT FIELD,
 *   IGNORE ERRORS IN HIGHER ENTRIES,CORA=0.0252/D42,D42=X40-X20,
 *   DI42=1/D42

@@ -40,7 +40,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,11 +68,11 @@
 *  Check inherited global status.
 *
       IF ( STATUS .NE. SAI__OK ) RETURN
-* 
+*
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Call GNENTS on the appropriate low level system
 *
       if (dbname .eq. 'HDS') then

@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine calculates the scale factors needed to convert CRDD
-*     data in UNITS1 to that in UNITS2. Systems of units should be 
+*     data in UNITS1 to that in UNITS2. Systems of units should be
 *     specified using the symbolic constants listed below, rather than
 *     by the corresponding character strings. These constants are made
 *     available by including the IRC_PAR file. Presently, this routine
@@ -79,7 +79,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Starlink Primitive constants
-      INCLUDE 'I90_DAT'          ! IRAS Satellite and mission data 
+      INCLUDE 'I90_DAT'          ! IRAS Satellite and mission data
       INCLUDE 'IRC_PAR'          ! IRC_ package constants
 
 *  Arguments Given:
@@ -101,7 +101,7 @@
 *  Local Constants:
       INTEGER BAND               ! Current waveband index.
       INTEGER DETNO              ! Current detector number.
-      LOGICAL DIVSOL             ! True if the scale should be divided 
+      LOGICAL DIVSOL             ! True if the scale should be divided
 				 ! by the solid angle.
       INTEGER I                  ! Do loop index
       LOGICAL MULSOL             ! True if the scale should be multiplied
@@ -139,7 +139,7 @@
          ELSE IF( CHR_SIMLR( UNITS1, UNITS2 ) ) THEN
             SCALE( I ) = 1.0
 
-*  Otherwise, find the scaling factor  (excluding solid angle factor) 
+*  Otherwise, find the scaling factor  (excluding solid angle factor)
 *  for converting input CRDD values to units of Jy. Also determine if
 *  the solid angle factor needs to be included.
          ELSE
@@ -187,14 +187,14 @@
             ELSE IF( CHR_SIMLR( UNITS2, IRC__J ) ) THEN
                DIVSOL = .FALSE.
 
-            ELSE IF( CHR_SIMLR( UNITS2, IRC__JPS ) ) THEN 
+            ELSE IF( CHR_SIMLR( UNITS2, IRC__JPS ) ) THEN
                DIVSOL = .TRUE.
 
-            ELSE IF( CHR_SIMLR( UNITS2, IRC__MJPS ) ) THEN 
+            ELSE IF( CHR_SIMLR( UNITS2, IRC__MJPS ) ) THEN
                SCALE( I ) = SCALE( I )*1.0E-6
                DIVSOL = .TRUE.
 
-            ELSE 
+            ELSE
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'U', UNITS2 )
                CALL ERR_REP( 'IRM_UNTCV_ERR3',

@@ -27,13 +27,13 @@
 *        should be initialised to 0 on the first call to this routine,
 *        the value will be incremented on subsequent calls.
 *     EOF = LOGICAL (Returned)
-*        If true then there is no control table line to return. 
+*        If true then there is no control table line to return.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berru (STARLINK)
 *     {enter_new_authors_here}
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,10 +73,10 @@
 
 *  Local Constants:
       INTEGER NLINE              ! No. of lines in default control table
-      PARAMETER ( NLINE = 10 ) 
+      PARAMETER ( NLINE = 10 )
 
       INTEGER MXLIN              ! Max. length of a table line
-      PARAMETER ( MXLIN = 20 ) 
+      PARAMETER ( MXLIN = 20 )
 
 *  Local Variables:
       CHARACTER TABLE( NLINE )*(MXLIN) ! The table
@@ -105,7 +105,7 @@
       ELSE
          EOF = .TRUE.
          BUFLEN = 1
-         BUFFER = ' ' 
+         BUFFER = ' '
       END IF
 
       END

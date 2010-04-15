@@ -22,7 +22,7 @@ C+
       IMPLICIT NONE
 C
 C     Parameters
-C     
+C
       INTEGER NLID
       REAL CHANS(NLID),WAVES(NLID),CENT,VALUE
 C

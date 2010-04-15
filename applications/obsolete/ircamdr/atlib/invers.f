@@ -8,7 +8,7 @@ C
 C   Given      (arguments)
 C   N           size of square submatrix
 C   A           containing matrix
-C	
+C
 C   Returned   (arguments)
 C   A           matrix containing inverted submatrix
 C

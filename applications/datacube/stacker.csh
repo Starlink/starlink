@@ -10,12 +10,12 @@
 #     C-shell script.
 #
 #  Usage:
-#     stacker [-i filename] [-n number] [-o number] [-z/+z] 
+#     stacker [-i filename] [-n number] [-o number] [-z/+z]
 #
 #  Description:
-#     This shell script reads a three-dimensional IFU NDF datacube and 
-#     presents you with a white-light image of the cube.  You can then 
-#     select a number of X-Y position using the cursor.  The script 
+#     This shell script reads a three-dimensional IFU NDF datacube and
+#     presents you with a white-light image of the cube.  You can then
+#     select a number of X-Y position using the cursor.  The script
 #     will then extract and display these spectra in a `stack' with each
 #     spectrum plotted offset vertically from the previous one in the stack.
 #
@@ -28,10 +28,10 @@
 #       Number of spectra to extract.
 #     -o number
 #       Offset between the spectra in the stack.
-#     -z 
+#     -z
 #       The script will automatically prompt the user to select a region to
 #       zoom before prompting for the region of interest.  [TRUE]
-#     +z 
+#     +z
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
 #
@@ -65,13 +65,13 @@
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
-#       an NDF section are supplied; this is via the new checkndf script 
+#       Corrected the NDF name extraction when both the file extension and
+#       an NDF section are supplied; this is via the new checkndf script
 #       that also checks for a degenerate third axis.
 #     2006 March 10 (MJC):
-#       Find upper limit of the plots' ordinate so as to include all 
-#       spectra fully regardless of the offsets.  Also allow a 2-percent 
-#       margin at the top and bottom of the plot to separate the spectra 
+#       Find upper limit of the plots' ordinate so as to include all
+#       spectra fully regardless of the offsets.  Also allow a 2-percent
+#       margin at the top and bottom of the plot to separate the spectra
 #       from the axes.
 #     {enter_further_changes_here}
 #
@@ -116,29 +116,29 @@ while ( $#args > 0 )
       set gotnum = "TRUE"
       set numspec = $args[1]
       shift args
-      breaksw    
+      breaksw
    case -o:    # offset for each spectra
       shift args
       set gotoff = "TRUE"
       set offset = $args[1]
       shift args
-      breaksw     
+      breaksw
     case -p:    # postscript output?
       set gotpost = "TRUE"
       shift args
-      breaksw             
+      breaksw
    case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
-      breaksw                            
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw  
+   endsw
 end
 
 # Do the package setup.
@@ -160,8 +160,8 @@ if ( $status == 1 ) exit
 # Collapse white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-echo "xollapse in=${infile}${ndf_section} out=${colfile} axis=3" 
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+echo "xollapse in=${infile}${ndf_section} out=${colfile} axis=3"
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Setup the plot device.
 set plotdev = "xwin"
@@ -170,7 +170,7 @@ set plotdev = "xwin"
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null
 
 # Form spectral stack.
 # ====================
@@ -235,9 +235,9 @@ set counter = 1
 set ytop = $ybot
 while ( $counter <= $numspec )
 
-   set specfile = "${tmpdir}/${user}/stak_${counter}.sdf" 
-   set outfile = "${tmpdir}/${user}/stak_${counter}_off.sdf" 
-   
+   set specfile = "${tmpdir}/${user}/stak_${counter}.sdf"
+   set outfile = "${tmpdir}/${user}/stak_${counter}_off.sdf"
+
 # Do the addition.
    set specoff = `calc exp="'${offset}*(${counter}-1)'" prec=_double`
 
@@ -249,7 +249,7 @@ while ( $counter <= $numspec )
 # last spectrum even though it has the largest offset.
    stats "${outfile}" >& /dev/null
    set outmax = `parget maximum stats`
-   set ytop = `calc exp="'max(${outmax},${ytop})'"` 
+   set ytop = `calc exp="'max(${outmax},${ytop})'"`
 
 # Increment the spectrum counter.
    @ counter = $counter + 1
@@ -257,8 +257,8 @@ end
 
 # Give a litte breathing room to separate the curves from the
 # axes.
-set ytop = `calc exp="'${ytop}+0.02*((${ytop})-(${ybot}))'"` 
-set ybot = `calc exp="'${ybot}-0.02*((${ytop})-(${ybot}))'"` 
+set ytop = `calc exp="'${ytop}+0.02*((${ytop})-(${ybot}))'"`
+set ybot = `calc exp="'${ybot}-0.02*((${ytop})-(${ybot}))'"`
 
 # Create the multi-spectrum plot.
 # ===============================
@@ -271,8 +271,8 @@ echo "      Plotting:"
 # Plot each spectrum in turn in the same graphic.
 set counter = $numspec
 while ( $counter > 0 )
-   
-   set outfile = "${tmpdir}/${user}/stak_${counter}_off.sdf" 
+
+   set outfile = "${tmpdir}/${user}/stak_${counter}_off.sdf"
 
    echo "        Spectrum: ${counter} "
 
@@ -323,8 +323,8 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
    set counter = $numspec
    while ( $counter > 0 )
-   
-      set outfile = "${tmpdir}/${user}/stak_${counter}_off" 
+
+      set outfile = "${tmpdir}/${user}/stak_${counter}_off"
 
       echo "        Spectrum: ${counter} "
 
@@ -341,8 +341,8 @@ endif
 # =========
 cleanup:
 
-rm -f ${tmpdir}/${user}/stak_?.sdf >& /dev/null     
-rm -f ${tmpdir}/${user}/stak_?_off.sdf >& /dev/null   
-rm -f ${tmpdir}/${user}/stak_col.sdf >& /dev/null    
-rm -f ${tmpdir}/${user}/stak_cursor.tmp >& /dev/null 
+rm -f ${tmpdir}/${user}/stak_?.sdf >& /dev/null
+rm -f ${tmpdir}/${user}/stak_?_off.sdf >& /dev/null
+rm -f ${tmpdir}/${user}/stak_col.sdf >& /dev/null
+rm -f ${tmpdir}/${user}/stak_cursor.tmp >& /dev/null
 rmdir ${tmpdir}/${user}  >& /dev/null

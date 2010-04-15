@@ -17,7 +17,7 @@
 #     user) that should be executed when the checkbutton state is
 #     toggled. The initial state and text of the checkbutton are given
 #     by the option -option_state and -option_text. The command is
-#     -option_cmd. 
+#     -option_cmd.
 
 #  Invocations:
 #
@@ -81,7 +81,7 @@
 itk::usual OptionDialog {}
 
 itcl::class gaia::OptionDialog {
-   
+
    #  Inheritances:
    #  -------------
    inherit util::DialogWidget
@@ -89,7 +89,7 @@ itcl::class gaia::OptionDialog {
    #  Constructor:
    #  ------------
    constructor {args} {
-      
+
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
@@ -114,7 +114,7 @@ itcl::class gaia::OptionDialog {
 
    #  Methods:
    #  --------
-   
+
    #  Execute the option_cmd option if defined.
    protected method do_option_cmd_ {} {
       if { $itk_option(-option_cmd) != {} } {
@@ -125,7 +125,7 @@ itcl::class gaia::OptionDialog {
 
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  Initial state of checkbutton (0 or 1).
    itk_option define -option_state option_state Option_state 0
 

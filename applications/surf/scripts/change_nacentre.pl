@@ -21,11 +21,11 @@ $result = GetOptions("help"    => \$h,
                      );
 
 $h = 1 unless $result == 1;  # Print help info if unknown option
- 
- 
+
+
 # Print a help message
- 
- 
+
+
 ($h) && do {
   print qq/
 Usage:

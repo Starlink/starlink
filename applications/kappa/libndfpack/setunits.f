@@ -27,7 +27,7 @@
 *     UNITS parameter, then the NDF's UNITS component will be erased.
 *
 *     There is also an option to modify the pixel values within the NDF
-*     to reflect the change in units (see parameter MODIFY). 
+*     to reflect the change in units (see parameter MODIFY).
 
 *  Usage:
 *     setunits ndf units
@@ -37,16 +37,16 @@
 *        The NDF data structure whose UNITS component is to be
 *        modified.
 *     MODIFY = _LOGICAL (Read)
-*        If a TRUE value is supplied, then the pixel values in the DATA and 
+*        If a TRUE value is supplied, then the pixel values in the DATA and
 *        VARIANCE components of the NDF will be modified to reflect the
 *        change in units. For this to be possible, both the original
-*        Units value in the NDF and the new Units value must both correspond 
-*        to the format for units strings described in the FITS WCS standard 
+*        Units value in the NDF and the new Units value must both correspond
+*        to the format for units strings described in the FITS WCS standard
 *        (see "Representations of world coordinates in FITS", Greisen &
 *        Calabretta, 2002, A&A - available at http://www.aoc.nrao.edu/~egreisen/wcs_AA.ps.gz)
-*        If either of the two units strings are not of this form, or if it is 
-*        not possible to find a transformation between them (for instance, 
-*        because they represent different quantities), an error is 
+*        If either of the two units strings are not of this form, or if it is
+*        not possible to find a transformation between them (for instance,
+*        because they represent different quantities), an error is
 *        reported. [FALSE]
 *     UNITS = LITERAL (Read)
 *        The value to be assigned to the NDF's UNITS component (e.g.
@@ -71,7 +71,7 @@
 *        the value "MJy". If possible, the pixel values are changed from
 *        their old units to the new units. For instance, if the UNITS
 *        component of the NDF was original "J/(m**2*s*GHz)", the DATA
-*        values will be multiplied by 1.0E11, and the variance values by 
+*        values will be multiplied by 1.0E11, and the variance values by
 *        1.0E22.  However, if the original units component was (say) "K"
 *        (Kelvin) then an error would be reported since there is no
 *        direct conversion from Kelvin to MegaJansky.
@@ -120,7 +120,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -180,9 +180,9 @@
       CALL PAR_GET0L( 'MODIFY', MODIFY, STATUS )
       IF( MODIFY ) THEN
 
-*  If so, attempt to get an AST Mapping from the old Units to the 
+*  If so, attempt to get an AST Mapping from the old Units to the
 *  new Units. We do this by creating a pair of 1D Frames with the
-*  appropriate units and then attempting to find a conversion between 
+*  appropriate units and then attempting to find a conversion between
 *  them. We set the ActiveUnit flag for both Frames so that the Units
 *  will be taken into accoutn when deriving the inter-Frame Mapping.
          OLDFRM = AST_FRAME( 1, ' ', STATUS )
@@ -193,11 +193,11 @@
          CALL AST_SETC( NEWFRM, 'Unit(1)', NEWUN, STATUS )
          CALL AST_SETACTIVEUNIT( NEWFRM, .TRUE., STATUS )
 
-         FSET = AST_CONVERT( OLDFRM, NEWFRM, ' ', STATUS ) 
+         FSET = AST_CONVERT( OLDFRM, NEWFRM, ' ', STATUS )
 
-*  Re-instate the original Unit, and report an error if no conversion was 
-*  possible. 
-         IF( FSET .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN         
+*  Re-instate the original Unit, and report an error if no conversion was
+*  possible.
+         IF( FSET .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
             CALL NDF_CPUT( OLDUN, INDF, 'UNIT', STATUS )
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF )
@@ -211,14 +211,14 @@
 *  If a conversion was possible...
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Map the DATA array for update. We are constrained to use _DOUBLE since 
+*  Map the DATA array for update. We are constrained to use _DOUBLE since
 *  AST_TRAN1 only handles double precision values.
             CALL NDF_MAP( INDF, 'Data', '_DOUBLE', 'UPDATE', IPDAT, EL,
-     :                    STATUS ) 
+     :                    STATUS )
 
 *  Make a copy of it.
             CALL PSX_CALLOC( EL, '_DOUBLE', IPW1, STATUS )
-            CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IPDAT ) ), 
+            CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IPDAT ) ),
      :                     %VAL( CNF_PVAL( IPW1 ) ),
      :                     IERR, NERR, STATUS )
 
@@ -227,47 +227,47 @@
      :                      %VAL( CNF_PVAL( IPDAT ) ), STATUS )
 
 *  If the VARIANCE array is defined, we need to transform it. We do this
-*  by perturbing each data value by an amount equal to the corresponding 
+*  by perturbing each data value by an amount equal to the corresponding
 *  error estimate.
             CALL NDF_STATE( INDF, 'Variance', VAR, STATUS )
             IF( VAR ) THEN
 
-*  Map the VARIANCE array for update. 
-               CALL NDF_MAP( INDF, 'Variance', '_DOUBLE', 'UPDATE', 
-     :                       IPVAR, EL, STATUS ) 
+*  Map the VARIANCE array for update.
+               CALL NDF_MAP( INDF, 'Variance', '_DOUBLE', 'UPDATE',
+     :                       IPVAR, EL, STATUS )
 
 *  Find the square root of the Variance values (i.e. error estimates),
 *  putting them in new work space.
                CALL PSX_CALLOC( EL, '_DOUBLE', IPW2, STATUS )
-               CALL VEC_SQRTD( .TRUE., EL, %VAL( CNF_PVAL( IPVAR ) ), 
+               CALL VEC_SQRTD( .TRUE., EL, %VAL( CNF_PVAL( IPVAR ) ),
      :                         %VAL( CNF_PVAL( IPW2 ) ),
      :                         IERR, NERR, STATUS )
 
 *  Perturb the original DATA values by an amount equal to the error
 *  estimate. Put the result back in the IPW1 workspace.
-               CALL VEC_ADDD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
+               CALL VEC_ADDD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ),
      :                        %VAL( CNF_PVAL( IPW2 ) ),
-     :                        %VAL( CNF_PVAL( IPW1 ) ), 
+     :                        %VAL( CNF_PVAL( IPW1 ) ),
      :                        IERR, NERR, STATUS )
 
 *  Transform these perturbed data values using the inter-unit Mapping,
 *  putting the result back in the IPW2 array.
-               CALL AST_TRAN1( FSET, EL, %VAL( CNF_PVAL( IPW1 ) ), 
+               CALL AST_TRAN1( FSET, EL, %VAL( CNF_PVAL( IPW1 ) ),
      :                         .TRUE.,
      :                         %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Find the difference between the tranformed original and transformed
 *  perturbed data values, putting the result in IPW1.
-               CALL VEC_SUBD( .TRUE., EL, %VAL( CNF_PVAL( IPDAT ) ), 
+               CALL VEC_SUBD( .TRUE., EL, %VAL( CNF_PVAL( IPDAT ) ),
      :                        %VAL( CNF_PVAL( IPW2 ) ),
-     :                        %VAL( CNF_PVAL( IPW1 ) ), 
+     :                        %VAL( CNF_PVAL( IPW1 ) ),
      :                        IERR, NERR, STATUS )
 
 *  Square these differences, putting the result in the output variance
 *  array.
-               CALL VEC_MULD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
+               CALL VEC_MULD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ),
      :                        %VAL( CNF_PVAL( IPW1 ) ),
-     :                        %VAL( CNF_PVAL( IPVAR ) ), 
+     :                        %VAL( CNF_PVAL( IPVAR ) ),
      :                        IERR, NERR, STATUS )
 
 *  Release work space.

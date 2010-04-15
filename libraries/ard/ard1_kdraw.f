@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_KDRAW( RINDEX, NDIM, LBND, UBND, MSKSIZ, TYPE, 
-     :                       IWCS, NPAR, PAR, IPB, LBEXTB, UBEXTB, 
+      SUBROUTINE ARD1_KDRAW( RINDEX, NDIM, LBND, UBND, MSKSIZ, TYPE,
+     :                       IWCS, NPAR, PAR, IPB, LBEXTB, UBEXTB,
      :                       LBINTB, UBINTB, STATUS )
 *+
 *  Name:
@@ -7,14 +7,14 @@
 
 *  Purpose:
 *     Initialise an array to hold an interior value at all pixels
-*     through which a specified curve passes, and the exterior value 
+*     through which a specified curve passes, and the exterior value
 *     at all other points.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_KDRAW( RINDEX, NDIM, LBND, UBND, MSKSIZ, TYPE, IWCS, NPAR, 
+*     CALL ARD1_KDRAW( RINDEX, NDIM, LBND, UBND, MSKSIZ, TYPE, IWCS, NPAR,
 *                      PAR, IPB, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -40,8 +40,8 @@
 *     TYPE = INTEGER (Given)
 *        The symbolic value representing the region type.
 *     IWCS = INTEGER (Given)
-*        An identifer for an AST FrameSet. The Base Frame should be 
-*        PIXEL coordinates within the B array. The Current Frame should 
+*        An identifer for an AST FrameSet. The Base Frame should be
+*        PIXEL coordinates within the B array. The Current Frame should
 *        be user coordinates.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
@@ -57,7 +57,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBEXTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        exterior points in B. 
+*        exterior points in B.
 *     LBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The lower pixel bounds of the smallest box which contains all
 *        interior points in B. A value of VAL__MAXI for element 1 is
@@ -65,7 +65,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -78,12 +78,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,10 +123,10 @@
 *        CMN_IPBC = INTEGER (Write)
 *           Pointer to the B array passed to the ARD "drawing" routines.
 *        CMN_LBNDC( 2 ) = INTEGER (Write)
-*           The lower bounds of the B array passed to the ARD "drawing" 
+*           The lower bounds of the B array passed to the ARD "drawing"
 *           routines.
 *        CMN_UBNDC( 2 ) = INTEGER (Write)
-*           The upper bounds of the B array passed to the ARD "drawing" 
+*           The upper bounds of the B array passed to the ARD "drawing"
 *           routines.
 *        CMN_LBIBC( 2 ) = INTEGER (Write)
 *           The lower bounds of the interior bounding box passed to the
@@ -165,18 +165,18 @@
       PARAMETER ( NLP = 500 )
 
 *  Local Variables:
-      DOUBLE PRECISION 
-     :        BBOX( 4 ),         ! The PIXEL bounds of B 
+      DOUBLE PRECISION
+     :        BBOX( 4 ),         ! The PIXEL bounds of B
      :        START( 2 )         ! Start position for row/col
 
       INTEGER
      :        I,                 ! Loop count
      :        IPLOT,             ! AST Plot identifier
      :        NWCS,              ! No. of user coord axes
-     :        IPW1               ! Pointer to work space 
+     :        IPW1               ! Pointer to work space
 
       REAL
-     :        GBOX( 4 )          ! The PIXEL bounds of B 
+     :        GBOX( 4 )          ! The PIXEL bounds of B
 
 *.
 
@@ -186,11 +186,11 @@
 *  Store the number of WCS axes.
       NWCS = AST_GETI( IWCS, 'Naxes', STATUS )
 
-*  POINT/PIXEL keywords are easy. Just transform them from user to pixel and 
+*  POINT/PIXEL keywords are easy. Just transform them from user to pixel and
 *  mark the pixel in which they fall.
       IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX ) THEN
          CALL ARD1_POI2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                   IWCS, %VAL( CNF_PVAL( IPB ) ), 
+     :                   IWCS, %VAL( CNF_PVAL( IPB ) ),
      :                   LBEXTB, UBEXTB, LBINTB,
      :                   UBINTB, STATUS )
 
@@ -198,24 +198,24 @@
 *  just transform a set of evenly spaced points from user coords to pixel
 *  coords and join them up with straight lines. Not nice, but probably no
 *  one uses 3D lines anyway.
-      ELSE IF( TYPE .EQ. ARD__LIN .AND. ( NDIM .NE. 2 .OR. 
+      ELSE IF( TYPE .EQ. ARD__LIN .AND. ( NDIM .NE. 2 .OR.
      :                                    NWCS .NE. 2 ) ) THEN
          CALL PSX_CALLOC( NDIM*NLP, '_DOUBLE', IPW1, STATUS )
          CALL ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ, NPAR,
-     :                   PAR, NLP, IWCS, %VAL( CNF_PVAL( IPB ) ), 
+     :                   PAR, NLP, IWCS, %VAL( CNF_PVAL( IPB ) ),
      :                   LBEXTB, UBEXTB, LBINTB,
      :                   UBINTB, %VAL( CNF_PVAL( IPW1 ) ), STATUS )
          CALL PSX_FREE( IPW1, STATUS )
 
 *  All other cases are handled by the graphics facilities of the AST Plot
-*  class (they are all 2D cases). We use special "graphics" functions which 
-*  "draw" into the B array by assigning RINDEX to the pixels through which 
-*  the drawn curve passes. Doing it this way means we pick up all the 
-*  sophisticated adaptive facilities of the Plot class for handling 
+*  class (they are all 2D cases). We use special "graphics" functions which
+*  "draw" into the B array by assigning RINDEX to the pixels through which
+*  the drawn curve passes. Doing it this way means we pick up all the
+*  sophisticated adaptive facilities of the Plot class for handling
 *  non-linearities and discontinuities in the user->pixel transformation.
       ELSE IF( NDIM .EQ. 2 .AND. NWCS .EQ. 2 ) THEN
 
-*  Initialize the interior bounding box passed in common to the "drawing" 
+*  Initialize the interior bounding box passed in common to the "drawing"
 *  routines.
          DO I = 1, 2
             CMN_LBIBC( I ) = VAL__MAXI
@@ -231,7 +231,7 @@
             CMN_UBNDC( I ) = UBND( I )
          END DO
 
-*  A straight line in user coords could conceivably correspond to a curve 
+*  A straight line in user coords could conceivably correspond to a curve
 *  in pixel coords, potentially with discontinuities. The AST Plot class
 *  has facilities for transforming curves from one Frame to another,
 *  taking account of any non-linearities and discontinuities. We create
@@ -242,21 +242,21 @@
 
          GBOX( 1 ) = REAL( LBND( 1 ) ) - 1.0
          GBOX( 2 ) = REAL( LBND( 2 ) ) - 1.0
-         GBOX( 3 ) = REAL( UBND( 1 ) ) 
-         GBOX( 4 ) = REAL( UBND( 2 ) ) 
-   
-         BBOX( 1 ) = DBLE( GBOX( 1 ) ) 
-         BBOX( 2 ) = DBLE( GBOX( 2 ) ) 
-         BBOX( 3 ) = DBLE( GBOX( 3 ) ) 
-         BBOX( 4 ) = DBLE( GBOX( 4 ) ) 
+         GBOX( 3 ) = REAL( UBND( 1 ) )
+         GBOX( 4 ) = REAL( UBND( 2 ) )
+
+         BBOX( 1 ) = DBLE( GBOX( 1 ) )
+         BBOX( 2 ) = DBLE( GBOX( 2 ) )
+         BBOX( 3 ) = DBLE( GBOX( 3 ) )
+         BBOX( 4 ) = DBLE( GBOX( 4 ) )
 
 *  Create the plot. indicating that graphics are to "drawn" using routines
 *  registered by AST_GRFSET.
          IPLOT = AST_PLOT( IWCS, GBOX, BBOX, 'GRF=1', STATUS )
 
-*  Indicate that curves should be drawn to an accuracy of about 0.2 of 
+*  Indicate that curves should be drawn to an accuracy of about 0.2 of
 *  a pixel.
-         CALL AST_SETD( IPLOT, 'TOL', 0.2D0/DBLE( 
+         CALL AST_SETD( IPLOT, 'TOL', 0.2D0/DBLE(
      :    MIN( UBND( 1 ) - LBND( 1 ) + 1, UBND( 2 ) - LBND( 2 ) + 1 ) ),
      :                  STATUS )
 
@@ -299,14 +299,14 @@
             END IF
 
 *  Loop round each row/col.
-            DO I = 1, NPAR 
+            DO I = 1, NPAR
 
 *  Indicate where the row/col is to be drawn.
                IF( TYPE .EQ. ARD__ROW ) THEN
                   CALL AST_SETD( IPLOT, 'LABELAT(1)', PAR(I), STATUS )
                ELSE
                   CALL AST_SETD( IPLOT, 'LABELAT(2)', PAR(I), STATUS )
-               END IF            
+               END IF
 
 *  Draw it.
                CALL AST_GRID( IPLOT, STATUS )

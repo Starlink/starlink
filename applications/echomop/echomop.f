@@ -495,7 +495,7 @@
           END IF
           IF ( SOME_AUTO .AND. ( ACTION .EQ. 'ECHMENU' .OR.
      :         ACTION .EQ. 'ECHOMOP' ) ) THEN
-             REPORT_STRING = ' Auto-running: Option ' // 
+             REPORT_STRING = ' Auto-running: Option ' //
      :             CVALUE( :CHR_LEN( CVALUE ) ) // '.'
              CALL ECH_REPORT( 0, REPORT_STRING )
           END IF
@@ -532,40 +532,40 @@
 *          rather more of the above ad-hoc parsing into a routine such
 *          as this, but this is probably complicated enough as it is)
              call ech_parse_option (cvalue, cvalueclass, i1, i2)
-             
+
              if (cvalueclass .eq. 'y') then ! default
                 option = default_option
-                
+
              else if (cvalueclass .eq. '1') then ! single option
                 option = i1
-                
+
              else if (cvalueclass .eq. '2') then ! option plus suboption
                 option = i1
                 suboption = i2
-                
+
              else if (cvalueclass .eq. 'h') then ! help
                 option = 0
-                
+
              else if (cvalueclass .eq. 'Y') then ! hyper
                 option = 0
                 hyper = .true.
-                
+
              else if (cvalueclass .eq. 'q') then ! quit/exit
                 option = options_in_use
-                
+
              else if (cvalueclass .eq. 'm') then ! menu
                 full_menu = .true.
                 option = menu_option
-                
+
              else if (cvalueclass .eq. 'a') then ! adjust
                 option = adjust_option
-                
+
              else if (cvalueclass .eq. 'p') then ! plot
                 option = plot_option
-                
+
              else if (cvalueclass .eq. 'd') then ! disable
                 option = disable_option
-                
+
              else               ! errors
                 option = 0
                 suboption = 0
@@ -617,9 +617,9 @@
              option = next_1d_option ( option )
           END IF
         END IF
-       
+
 *        write (report_string, '("DBG:1:option=",i2," suboption=",i3,
-*     :       " subopt_module=",a," option_module()=",a)') 
+*     :       " subopt_module=",a," option_module()=",a)')
 *     :       option, suboption, subopt_module, option_module(option)
 *        call ech_report (0, report_string)
 

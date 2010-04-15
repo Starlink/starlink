@@ -2,23 +2,23 @@
 *+
 *  Name:
 *     VEC_WTOI
- 
+
 *  Purpose:
 *     Convert vectorised WORD values to INTEGER.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL VEC_WTOI( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
- 
+
 *  Description:
 *     The routine performs type conversion on a vectorised array ARGV
 *     of WORD values, converting them to the equivalent INTEGER
 *     values.  If numerical errors occur, the value VAL__BADI is
 *     returned in appropriate elements of the result array RESV and a
 *     STATUS value is set.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether the argument values (ARGV) may be "bad".
@@ -42,7 +42,7 @@
 *        This should be set to SAI__OK on entry, otherwise the routine
 *        returns without action.  A STATUS value will be set by this
 *        routine if any numerical errors occur.
- 
+
 *  Copyright:
 *     Copyright (C) 1988, 1991, 1992 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 *  Authors:
 *     R.F. Warren-Smith (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-AUG-1988 (RFWS):
 *        Original version.
@@ -79,15 +79,15 @@
 *        Temporarily removed adjustments to data limits to account for
 *        rounding.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
@@ -95,20 +95,20 @@
 
       INCLUDE 'PRM_ERR'          ! PRM_ error codes
 
- 
+
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
       INTEGER N                  ! Number of elements to process
       INTEGER*2 ARGV( * )           ! Array of input values
- 
+
 *  Arguments Returned:
       INTEGER RESV( * )          ! Array of result values
       INTEGER IERR               ! Numerical error pointer
       INTEGER NERR               ! Numerical error count
- 
+
 *  Status:
       INTEGER STATUS             ! Error status
- 
+
 *  Local Variables:
       INTEGER*2 HI                  ! Upper bound on argument
       INTEGER*2 LO                  ! Lower bound on argument
@@ -116,11 +116,11 @@
       DOUBLE PRECISION DLO       ! Lower bound on data
       INTEGER I                  ! Loop counter
       LOGICAL FIRST              ! First invocation?
- 
+
       SAVE FIRST
       SAVE HI
       SAVE LO
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
 
@@ -130,20 +130,20 @@
 
       INCLUDE 'NUM_DEF_W'      ! Define NUM_ arithmetic functions
 
- 
+
 *  Local Data:
       DATA FIRST / .TRUE. /      ! First invocation
- 
+
 *.
- 
+
 *  Check status.
       IF( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  If the conversion can potentially fail, then on the first invocation
 *  set up the lower and upper bounds on the argument values.
       IF ( .FALSE. ) THEN
          IF ( FIRST ) THEN
- 
+
 *  Find the intersection of the ranges of allowed values between the
 *  input and output data types. Perform this calculation in double
 *  precision.
@@ -151,7 +151,7 @@
      :                 NUM_ITOD( NUM__MINI ) )
             DHI = MIN( NUM_WTOD( NUM__MAXW ),
      :                 NUM_ITOD( NUM__MAXI ) )
- 
+
 *  Adjust the resulting limits to allow for rounding of both the input
 *  and output data types.
 C            IF ( DLO .GT. 0.0D0 ) THEN
@@ -174,78 +174,78 @@ C
             FIRST = .FALSE.
          END IF
       END IF
- 
+
 *  Initialise the numerical error pointer and the error count.
       IERR = 0
       NERR = 0
- 
+
 *  If the bad data flag is set:
 *  ---------------------------
 *  Loop to process each element of the input array in turn.
       IF( BAD ) THEN
          DO 1 I = 1, N
- 
+
 *  Check if the input value is bad.  If it is, then put a value of
 *  VAL__BADI in the corresponding element of the result array.
             IF( ARGV( I ) .EQ. VAL__BADW ) THEN
                RESV( I ) = VAL__BADI
- 
+
 *  If the conversion can potentially fail, then test if the argument
 *  value lies within its allowed bounds.
             ELSE IF( ( .FALSE. ) .AND.
      :               ( NUM_LTW( ARGV( I ), LO ) .OR.
      :                 NUM_GTW( ARGV( I ), HI ) ) ) THEN
- 
+
 *  If not, then put a value of VAL__BADI in the corresponding
 *  element of the result array, and increment the numerical error
 *  count.
                RESV( I ) = VAL__BADI
                NERR = NERR + 1
- 
+
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__OK
                   IERR = I
                END IF
- 
+
 *  If the input value is OK, perform type conversion.
             ELSE
                RESV( I ) = NUM_WTOI( ARGV( I ) )
             END IF
  1       CONTINUE
- 
+
 *  If the bad data flag is not set:
 *  -------------------------------
 *  Loop to process each element of the input array in turn.
       ELSE
          DO 2 I = 1, N
- 
+
 *  If the conversion can potentially fail, then test if the argument
 *  value lies within its allowed bounds.
             IF( ( .FALSE. ) .AND.
      :          ( NUM_LTW( ARGV( I ), LO ) .OR.
      :            NUM_GTW( ARGV( I ), HI ) ) ) THEN
- 
+
 *  If not, then put a value of VAL__BADI in the corresponding
 *  element of the result array, and increment the numerical error
 *  count.
                RESV( I ) = VAL__BADI
                NERR = NERR + 1
- 
+
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__OK
                   IERR = I
                END IF
- 
+
 *  If the input argument is OK, then perform type conversion.
             ELSE
                RESV( I ) = NUM_WTOI( ARGV( I ) )
             END IF
  2       CONTINUE
       END IF
- 
+
 *  Exit routine.
       END

@@ -4,7 +4,7 @@
 *     msg1Print
 
 *  Purpose:
-*     Deliver the text of a message to the user. 
+*     Deliver the text of a message to the user.
 
 *  Language:
 *    Starlink ANSI C
@@ -13,10 +13,10 @@
 *     msg1Print( const char * text, int * status );
 
 *  Description:
-*     This uses the parameter system to deliver the message text to the 
-*     user. Trailing blanks are removed. If the delivery fails, the 
-*     message is given as an error report and a subsequent explanatory 
-*     error report made. This should ensure that the message is seen by 
+*     This uses the parameter system to deliver the message text to the
+*     user. Trailing blanks are removed. If the delivery fails, the
+*     message is given as an error report and a subsequent explanatory
+*     error report made. This should ensure that the message is seen by
 *     the user.
 
 *  Arguments:
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *     26-FEB-2001 (AJC):
 *        Use MSG1_RFORM nor EMS1_RFORM
 *     1-JUL-2004 (DSB):
-*        Use MSG1_GT... functions to get the values from the MSG_CMN 
+*        Use MSG1_GT... functions to get the values from the MSG_CMN
 *        common blocks rather than directly accessing the common blocks
 *        (which are initialised in a different shared library).
 *     25-JUL-2008 (TIMJ):
@@ -153,7 +153,7 @@ void msg1Print( const char * text, const char * prefix, int * status ) {
   /*  Create a new error context */
   emsMark();
 
-  /*  Find the filled length of the message text string and write it 
+  /*  Find the filled length of the message text string and write it
    *  to the standard output stream. */
   leng = strlen( text );
 

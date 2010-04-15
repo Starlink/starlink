@@ -13,8 +13,8 @@
 *     CALL IRC_TRACE( IDC, ROUTNE, STATUS )
 
 *  Description:
-*     This routine displays information about a CRDD file, using the 
-*     supplied routine to display each line of text. The particular 
+*     This routine displays information about a CRDD file, using the
+*     supplied routine to display each line of text. The particular
 *     information displayed will depend on the type of CRDD file.
 
 *  Arguments:
@@ -22,8 +22,8 @@
 *        The IRC identifier for the astrometry structure.
 *     ROUTNE = EXTERNAL (Given)
 *        A routine to which is passed each line of text for display.
-*        It should have the same argument list as MSG__OUTIF (see 
-*        SUN/104), and should be declared EXTERNAL in the calling 
+*        It should have the same argument list as MSG__OUTIF (see
+*        SUN/104), and should be declared EXTERNAL in the calling
 *        routine. This routine is called with a priority of MSG__NORM
 *        for the more commonly needed information, and MSG__VERB for the
 *        less commonly needed information.
@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -127,29 +127,29 @@
       CALL MSG_SETI( 'B', I90__WAVEL( CCM_BAND( IDC ) ) )
       CALL MSG_LOAD( 'IRC_TRACE_MSG1', 'Waveband          : ^B um', BUF,
      :               BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG1', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG1', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display the SOP number.
       CALL MSG_SETI( 'S', CCM_SOP( IDC ) )
-      CALL MSG_LOAD( 'IRC_TRACE_MSG2', 'SOP               : ^S', BUF, 
+      CALL MSG_LOAD( 'IRC_TRACE_MSG2', 'SOP               : ^S', BUF,
      :               BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG2', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG2', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display the OBS number.
       CALL MSG_SETI( 'O', CCM_OBS( IDC ) )
-      CALL MSG_LOAD( 'IRC_TRACE_MSG3', 'Observation       : ^O', BUF, 
+      CALL MSG_LOAD( 'IRC_TRACE_MSG3', 'Observation       : ^O', BUF,
      :               BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG3', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG3', BUF( : BUFLEN ),
      :             STATUS )
-      
+
 *  Display the nominal scan speed number.
       CALL MSG_FMTR( 'S', 'F5.2', REAL( CCM_NOMSP( IDC )*IRA__R2AM ) )
       CALL MSG_LOAD( 'IRC_TRACE_MSG4',
      :               'Nominal scan speed: ^S arc-mins per second', BUF,
      :               BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG4', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG4', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display information about the reference position.
@@ -168,17 +168,17 @@
      :                 STATUS )
 
       CALL MSG_SETC( 'AD', ADESCR )
-      CALL MSG_SETC( 'A', ATEXT )      
-      CALL MSG_LOAD( 'IRC_TRACE_MSG6', '   ^AD ^A', BUF, BUFLEN, 
+      CALL MSG_SETC( 'A', ATEXT )
+      CALL MSG_LOAD( 'IRC_TRACE_MSG6', '   ^AD ^A', BUF, BUFLEN,
      :               STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG6', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG6', BUF( : BUFLEN ),
      :             STATUS )
 
       CALL MSG_SETC( 'BD', BDESCR )
-      CALL MSG_SETC( 'B', BTEXT )      
-      CALL MSG_LOAD( 'IRC_TRACE_MSG7', '   ^BD ^B', BUF, BUFLEN, 
+      CALL MSG_SETC( 'B', BTEXT )
+      CALL MSG_LOAD( 'IRC_TRACE_MSG7', '   ^BD ^B', BUF, BUFLEN,
      :               STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG7', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG7', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display information about the detector numbers.
@@ -186,17 +186,17 @@
       CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG8',
      :               'Detector numbers', STATUS )
 
-      DO DIND = CCM_DLOW( IDC ), CCM_DHIGH( IDC ) 
+      DO DIND = CCM_DLOW( IDC ), CCM_DHIGH( IDC )
          CALL MSG_FMTI( 'IN', 'I3', DIND )
          CALL MSG_SETI( 'NO', CCM_DETNO( DIND +
      :                                   CCM_DETOR( IDC ), IDC ) )
          CALL MSG_LOAD( 'IRC_TRACE_MSG9', '   NDF row ^IN: #^NO',
      :                  BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG9', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRC_TRACE_MSG9', BUF( : BUFLEN ),
      :                STATUS )
       END DO
 
-*  Call a lower level routine to trace DETAILS.      
+*  Call a lower level routine to trace DETAILS.
       CALL IRC1_TRACI( IDC, ROUTNE, STATUS )
 
 *  If an error has occurred, give a context message.

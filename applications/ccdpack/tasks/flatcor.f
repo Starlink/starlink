@@ -31,12 +31,12 @@
 *  ADAM Parameters:
 *     FLAT = LITERAL (Read)
 *        Name of the image which contains the normalised (mean of one)
-*        flatfield data. This should have been produced by a program 
-*        such as MAKEFLAT. The data should have a floating point HDS 
+*        flatfield data. This should have been produced by a program
+*        such as MAKEFLAT. The data should have a floating point HDS
 *        data type (_REAL or _DOUBLE).  If USESET is true, FLAT should
 *        be a group expression referring to one flatfield data file
-*        matching each of the Set Index attributes represented in the 
-*        IN list; again the name of the file produced by MAKEFLAT will 
+*        matching each of the Set Index attributes represented in the
+*        IN list; again the name of the file produced by MAKEFLAT will
 *        normally be suitable.  The name of this file may be specified
 *        using indirection through a file.
 *        [Global flatfield]
@@ -104,8 +104,8 @@
 *        this replaces the string debias with flattened in any of the
 *        output names tmp_*.
 *     SATURATION = _DOUBLE (Read)
-*        The value at which the input data has been saturated. This 
-*        is only required if the saturation has been flagged using a 
+*        The value at which the input data has been saturated. This
+*        is only required if the saturation has been flagged using a
 *        non-BAD value.
 *        [1.0D6]
 *     SETSAT = _LOGICAL (Read)
@@ -136,16 +136,16 @@
 *        [Output from FLATCOR]
 *     USESET = _LOGICAL (Read)
 *        Whether to use Set header information or not.  If USESET is
-*        false then any Set header information will be ignored. 
-*        If USESET is true, then the FLAT parameter is taken to 
+*        false then any Set header information will be ignored.
+*        If USESET is true, then the FLAT parameter is taken to
 *        refer to a group of files, and each IN file will be processed
 *        using a flatfield dataset with a Set Index attribute which
 *        matches its own.  An IN file with no Set header is considered
 *        to match a FLAT file with no Set header, so USESET can safely
-*        be set true (the default) when the input files contain no 
+*        be set true (the default) when the input files contain no
 *        Set header information.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 
@@ -160,13 +160,13 @@
 *
 *     flatcor n4151r1 n4151r1f flatfield setsat=true saturation=32767
 *        In this example the data have had a saturation value applied
-*        which has not been recorded within CCDPACK and the required 
+*        which has not been recorded within CCDPACK and the required
 *        information has been supplied.
 *
 *     flatcor in='*' out='*_flattened' flat=master_flatr
 *        In this example all the images in the current directory are
 *        processed. The resultant data are written to files with the
-*        same name as the corresponding input images, but with the 
+*        same name as the corresponding input images, but with the
 *        characters "_flattened" appended to the filename.
 
 *  Implementation Status:
@@ -179,8 +179,8 @@
 *       this information if the values are to be propagated properly. If
 *       more than one saturation value has been used then the input
 *       frames will need to be processed singly. This is because FLATCOR
-*       only uses one saturation value per input group. If the 
-*       saturation values have been set within CCDPACK (by DEBIAS) 
+*       only uses one saturation value per input group. If the
+*       saturation values have been set within CCDPACK (by DEBIAS)
 *       these will be processed correctly and may be different.
 
 *  Behaviour of Parameters:
@@ -243,7 +243,7 @@
 *        Updated for CCDPACK 2.0.
 *     12-AUG-1996 (PDRAPER):
 *        Fixed incorrect assignment of EXTSAT to SATVAL (linux port
-*        bug). 
+*        bug).
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator controls (foreign data access upgrade).
 *     23-FEB-1999 (MBT):
@@ -279,7 +279,7 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
-      CHARACTER * ( CCD1__NMLEN ) DFILT ! Filter type of data 
+      CHARACTER * ( CCD1__NMLEN ) DFILT ! Filter type of data
       CHARACTER * ( CCD1__NMLEN ) FILTER ! Filter type of flatfield
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Input data type.
       CHARACTER * ( NDF__SZTYP ) FTYPE ! Flatfield data type.
@@ -472,7 +472,7 @@
 
 *  Look for a filter type. Compare this with the type of the master
 *  calibration frame.
-            IF ( FCHECK ) THEN 
+            IF ( FCHECK ) THEN
                CALL CCG1_FCH0C( IDIN, 'FILTER', DFILT, OK, STATUS )
                IF ( .NOT. OK ) THEN
 
@@ -607,7 +607,7 @@
             CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
      :                    STATUS )
             IPVOUT = 0
-            IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE, 
+            IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE,
      :                                 'WRITE', IPVOUT, EL, STATUS )
 
 *  Look at the CCDPACK extension and see if a saturation _value_ has

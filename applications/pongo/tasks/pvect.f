@@ -144,7 +144,7 @@
             ELSE
                ZFACT = SCALE
             END IF
-            
+
             RAT = XDATA( IDAT )
             DECT = YDATA( IDAT )
             CALL SLA_DCS2C( RAT, DECT, POS )
@@ -153,7 +153,7 @@
             PM( 2 ) = DBLE( ERRX( IDAT ) ) * COS( RAT )
      :           -DBLE( ERRY( IDAT ) ) * SIN( RAT ) * SIN( DECT )
             PM( 3 ) = -DBLE( ERRY( IDAT ) ) * COS( DECT )
-            
+
             DO 10 I = 1, 3
                POS( I ) = POS( I ) + PM( I ) * DBLE( ZFACT )
  10         CONTINUE
@@ -162,20 +162,20 @@
             RAT = SLA_DRANRM( RAT )
             LSTAT = SAI__OK
             CALL PON_GT_CIRCLE( PROJECTION-1, RA0, DEC0, XDATA( IDAT ),
-     :                          YDATA( IDAT ), RAT, DECT, .TRUE., 
+     :                          YDATA( IDAT ), RAT, DECT, .TRUE.,
      :                          LSTAT )
-            IF ( LSTAT .NE. SAI__OK ) THEN 
+            IF ( LSTAT .NE. SAI__OK ) THEN
                NERR = NERR + 1
             END IF
  20      CONTINUE
-         IF ( NERR .NE. 0 ) THEN 
+         IF ( NERR .NE. 0 ) THEN
             STATUS = SAI__ERROR
-            IF ( NERR .EQ. NDAT ) THEN 
-               CALL ERR_REP( 'PVECTPROB', 
+            IF ( NERR .EQ. NDAT ) THEN
+               CALL ERR_REP( 'PVECTPROB',
      :              'Failed to plot any proper motion vectors', STATUS )
             ELSE
                CALL MSG_SETI( 'NERR', NERR )
-               CALL ERR_REP( 'PVECTPROB', 
+               CALL ERR_REP( 'PVECTPROB',
      :              'Failed to plot ^NERR vectors.', STATUS )
             END IF
          END IF

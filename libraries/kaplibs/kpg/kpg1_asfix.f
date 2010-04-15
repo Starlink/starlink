@@ -4,7 +4,7 @@
 *     KPG1_ASFIX
 
 *  Purpose:
-*     Modify the WCS FrameSet of an NDF to take account of 
+*     Modify the WCS FrameSet of an NDF to take account of
 *     re-gridding the pixel array.
 
 *  Language:
@@ -15,20 +15,20 @@
 
 *  Description:
 *     This routine copies the WCS FrameSet from NDF1 to NDF2, re-mapping
-*     the PIXEL Frame using the specified Mapping in the process. It should 
-*     be used to set up the WCS FrameSet of a newly created output NDF 
-*     which has been formed by applying a geometric transformation to an 
-*     input NDF. 
+*     the PIXEL Frame using the specified Mapping in the process. It should
+*     be used to set up the WCS FrameSet of a newly created output NDF
+*     which has been formed by applying a geometric transformation to an
+*     input NDF.
 
 *  Arguments:
 *     MAP = INTEGER (Given)
-*        An AST Mapping from pixel co-ordinates in the INDF1 to pixel 
+*        An AST Mapping from pixel co-ordinates in the INDF1 to pixel
 *        co-ordinates in INDF2.
 *     INDF1 = INTEGER (Given)
 *        The input NDF.
 *     INDF2 = INTEGER (Given)
 *        The output NDF. Any existing WCS FrameSet is discarded and
-*        replaced by a re-mapped copy of the WCS FrameSet from the input 
+*        replaced by a re-mapped copy of the WCS FrameSet from the input
 *        NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,18 +93,18 @@
       CALL AST_BEGIN( STATUS )
 
 *  The required output WCS is a copy of the input WCS in which the GRID
-*  Frame has been re-mapped, using AST_REMAPFRAME. This requires the 
-*  Mapping from the input GRID Frame to the output GRID Frame. First get 
-*  the Mapping from the input GRID Frame to the input PIXEL Frame. To do 
-*  this, get the WCS FrameSet from the input NDF, find the PIXEL Frame, 
+*  Frame has been re-mapped, using AST_REMAPFRAME. This requires the
+*  Mapping from the input GRID Frame to the output GRID Frame. First get
+*  the Mapping from the input GRID Frame to the input PIXEL Frame. To do
+*  this, get the WCS FrameSet from the input NDF, find the PIXEL Frame,
 *  and get the Mapping.
       CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
       CALL KPG1_ASFFR( IWCS1, 'PIXEL', IPIX1, STATUS )
       MAP1 = AST_GETMAPPING( IWCS1, AST__BASE, IPIX1, STATUS )
 
-*  Also get the PIXEL->GRID Mapping from the output NDF. We use NDF_GTWCS 
-*  here instead of KPG1_GTWCS since we are only interested in the GRID and 
-*  PIXEL Frames and so do not need the facility for importing WCS from FITS 
+*  Also get the PIXEL->GRID Mapping from the output NDF. We use NDF_GTWCS
+*  here instead of KPG1_GTWCS since we are only interested in the GRID and
+*  PIXEL Frames and so do not need the facility for importing WCS from FITS
 *  extensions, etc, which KPG1_GTWCS provides.
       CALL NDF_GTWCS( INDF2, IWCS2, STATUS )
       CALL KPG1_ASFFR( IWCS2, 'PIXEL', IPIX2, STATUS )
@@ -112,7 +112,7 @@
 
 *  Combine all three Mappings to get the required Mapping from input GRID
 *  Frame to output GRID Frame. Simplify it.
-      MAP3 = AST_SIMPLIFY( AST_CMPMAP( AST_CMPMAP( MAP1, MAP, .TRUE., 
+      MAP3 = AST_SIMPLIFY( AST_CMPMAP( AST_CMPMAP( MAP1, MAP, .TRUE.,
      :                                             ' ', STATUS ),
      :                                 MAP2, .TRUE., ' ', STATUS ),
      :                     STATUS )
@@ -121,7 +121,7 @@
       CALL AST_REMAPFRAME( IWCS1, AST__BASE, MAP3, STATUS )
 
 *  Store this modified WCS FrameSet in the output NDF.
-      CALL NDF_PTWCS( IWCS1, INDF2, STATUS ) 
+      CALL NDF_PTWCS( IWCS1, INDF2, STATUS )
 
 *  Exit the AST context.
       CALL AST_END( STATUS )

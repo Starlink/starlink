@@ -89,7 +89,7 @@ Font_info ;
  *		       <X . . . . X .
  *		       <X . . . . X .<---- SunView baseline
  *		       <X . . . . X .<---- GKS baseline
- *			. . . . . . .> 
+ *			. . . . . . .>
  *			. . . . . . .> base_to_bottom (3)
  *			. . . . . . .>
  *			V V V V V V V

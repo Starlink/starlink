@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 \markright{SSN/52.1}
 \setlength{\textwidth}{160mm}
@@ -87,7 +87,7 @@ provide secondary page and swap files later, this space will be needed.
 Even if it is intended to use smaller primary files later, the space to have
 both the old and new primary files on the system disc together may be required.
 
-Next consider carefully what size of PAGE and SWAP files are required for 
+Next consider carefully what size of PAGE and SWAP files are required for
 the satellite.
 The UAF file is {\em common} and so a single user with a pagefile quota of even
 18000 could completely fill a 20000 block pagefile.
@@ -109,7 +109,7 @@ This file is normally created by AUTOGEN when the satellite first boots.
 It is slightly larger than the memory size so for a 6 Mbyte machine it uses
 12000 blocks.
 As a temporary (or even a permanent) measure its creation can be prevented
-by modifying the SYS\$SYSDEVICE:[SYSn.SYSEXE]MODPARAMS.DAT file that 
+by modifying the SYS\$SYSDEVICE:[SYSn.SYSEXE]MODPARAMS.DAT file that
 SATELLITE\_CONFIG creates before the AUTOGEN run of the satellite's first boot.
 (If using {\em local} page and swap files it can be edited
 using another terminal before telling SATELLITE\_CONFIG which disc to use.)
@@ -155,7 +155,7 @@ like:
     $ RENAME /CONFIRM SYS$COMMON:[SYSMGR]ACCOUNTNG.DAT;*  SYS$SPECIFIC:
 \end{verbatim}
 The lists in Appendix A are divided up into COMMON and SPECIFIC and show file
-placements {\em after} satellites have been added. 
+placements {\em after} satellites have been added.
 
 The list below identifies some of the more important the files that should be
 moved  to the boot node specific directories {\em before} adding any satellites.
@@ -232,7 +232,7 @@ NETUSR will in future only be used for the Coloured Books Software.
 
 \begin{sloppypar}
 The other major function is to run AUTOGEN with option REBOOT.
-When the satellite reboots it will use the standard startup procedures --- 
+When the satellite reboots it will use the standard startup procedures ---
 SYS\$SYSTEM:STARTUP.COM call\-ing SYS\$MANAGER:SYSTARTUP.COM.
 \end{sloppypar}
 
@@ -421,7 +421,7 @@ One of the most important and confusing things about managing a cluster is that
 when logged in under usernames like SYSTEM there is a logical name search list
 in operation when logical names like SYS\$MANAGER and SYS\$SYSTEM are used ---
 SYS\$MANAGER is the default directory when logged in as SYSTEM.
-The actual logical name search list in use is SYS\$SYSROOT translating to 
+The actual logical name search list in use is SYS\$SYSROOT translating to
 SYS\$SPECIFIC: followed by SYS\$COMMON: where the SYS\$SPECIFIC refers to
 the login node.
 Apart from the dangers of accessing both sets of files with commands like PURGE
@@ -438,7 +438,7 @@ manipulate files in these directories.
 Several points about clusters and the network.
 
 \begin {itemize}
-\item {\bf Alias} 
+\item {\bf Alias}
 ~~~Ensure that all nodes are set up to have the correct DECnet node
 name as the alias.
 
@@ -475,7 +475,7 @@ connections from DECservers can have some load sharing effects.
 shared.
 This means that a command like MC NCP PURGE KNOWN NODE ALL on {\em any} machine
 in the cluster will purge all knowledge of any other nodes other than the
-local node on {\em all machines in the cluster}. 
+local node on {\em all machines in the cluster}.
 In this particular case it would mean that the satellites would not boot again
 once the volatile database on the boot node is cleared.
 This could take quite a long time to discover and be very puzzling!
@@ -488,7 +488,7 @@ If this is not done, the new definitions will not take effect until each of
 the nodes has rebooted.
 
 Finally it is perfectly safe to use files like STARLINK\_NODES.COM to update
-the databases even when they contain the definitions of the local nodes 
+the databases even when they contain the definitions of the local nodes
 (as long as these are correct of course!).
 
 \end {itemize}
@@ -560,7 +560,7 @@ The /ABORT will close any current remote access to the disc.
 
 \item The command to dismount discs remote to a node is thought to be:
 \begin{verbatim}
-    $ DISMOUNT/ABORT node$device 
+    $ DISMOUNT/ABORT node$device
 \end{verbatim}
 \item These commands could be placed in the SYS\$MANAGER:SYSHUTDWN.COM
 with perhaps both COMMON and SPECIFIC versions.
@@ -588,7 +588,7 @@ If three or four nodes are shutting down, this leads to a flood of messages,
 especially in the later stages of shutdown, again stopping users doing anything
 useful.
 
-For nodes that do not serve local discs to the cluster, it may well be 
+For nodes that do not serve local discs to the cluster, it may well be
 appropriate to alter the shutdown so that only local users are informed.
 This can be achieved by defining the logical name SHUTDOWN\$INFORM\_NODES
 to be just the name of the local node.
@@ -616,7 +616,7 @@ When this is severe and happens soon after the system has booted take remedial
 action as soon as possible.
 If it occurs only after a few days then a more considered approach is possible.
 
-In both cases it is important to run AUTOGEN at the correct time --- i.e. 
+In both cases it is important to run AUTOGEN at the correct time --- i.e.
 when the whole cluster is running and all devices and page and swap files
 are available.
 It can be run during normal operations as long as the REBOOT option is not used.
@@ -777,7 +777,7 @@ execute:
 The reasons for these operations are as follows.
 Firstly it is best to start the windows software in a node specific manner
 because it will probably be necessary to modify the parameters of windows
-system. 
+system.
 This is done by defining logical names {\em before} executing STARTVWS.
 It also stops all other nodes from trying to start the software every time
 they boot. The attempt does no harm but is just a waste of time.
@@ -846,7 +846,7 @@ installed
 \item [DUVAD\_SHUTDOWN.COM : ] Example of local variation of shutdown procedure
 \item [LOADNET.COM : ] Part of cluster common network startup
 \item [LOAD\_PSI.COM : ] Part of cluster common network startup
-\item [LOGIN.COM : ] Possible system manager LOGIN file 
+\item [LOGIN.COM : ] Possible system manager LOGIN file
 \item [MAIL.DIR : ] Possible system manager MAIL directory
 \item [MAKEROOT.COM : ] CI cluster version of BOOT\_CONFIG
 \item [NETCONFIG.COM : ] Network configuration procedure
@@ -864,7 +864,7 @@ should be in COMMON area.
 \item [VAXVMSSYS.EVC : ] Used by SATELLITE\_CONFIG to obtain an initial set of
 satellite parameters. Not essential.
 \item [VMSIMAGES.COM : ] Part of system startup
-\item [VMSIMAGES.DAT : ] Initial version of file. Copied to SPECIFIC by 
+\item [VMSIMAGES.DAT : ] Initial version of file. Copied to SPECIFIC by
 SATELLITE\_CONFIG
 \end{description}
 The following files would be seen if the Workstation software has been
@@ -909,9 +909,9 @@ page/swap)
 \end{description}
 The following files would be seen on a node running PSI
 \begin{description}
-\item [NETX25.DAT : ] Network X25 data 
-\item [NETX29.DAT : ] Network X29 data 
-\item [PSI\$041.DAT : ] Flag saying running PSI041 
+\item [NETX25.DAT : ] Network X25 data
+\item [NETX29.DAT : ] Network X29 data
+\item [PSI\$041.DAT : ] Flag saying running PSI041
 \end{description}
 The following files would be seen on a running VaxStation with VWS
 \begin{description}

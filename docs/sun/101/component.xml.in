@@ -9,7 +9,7 @@
   <abstract><p>
      This document is a tutorial in the art of ADAM programming.  ADAM
      is the Starlink Software Environment.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

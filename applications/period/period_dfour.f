@@ -1,8 +1,8 @@
- 
+
 C===========================================================================
- 
+
       FUNCTION PERIOD_DFOUR(N, TIME, DATA, FREQ)
- 
+
 C===========================================================================
 C Returns the Fourier transform of the time series specified by TIME(1:N)
 C and DATA(1:N), evaluated at the frequency FREQ. The FT is normalized to
@@ -17,7 +17,7 @@ C===========================================================================
 
       INCLUDE "PIVARS"
 
-      INTEGER N,K 
+      INTEGER N,K
       DOUBLE PRECISION FREQ, DATA(N), TIME(N)
       DOUBLE PRECISION PHASE
       DOUBLE COMPLEX PERIOD_DFOUR
@@ -26,19 +26,19 @@ C===========================================================================
 C---------------------------------------------------------------------------
 C Evaluate FT at FREQ.
 C---------------------------------------------------------------------------
- 
+
       FT = (0.0D0, 0.0D0)
- 
+
       DO 100 K = 1, N
          PHASE = -TWOPI*FREQ*TIME(K)
          FT = FT + DATA(K)*DCMPLX(DCOS(PHASE), DSIN(PHASE))
  100  CONTINUE
- 
+
 C---------------------------------------------------------------------------
 C Return with FT properly normalized.
 C---------------------------------------------------------------------------
- 
+
       PERIOD_DFOUR = FT/DFLOAT(N)
- 
+
       RETURN
       END

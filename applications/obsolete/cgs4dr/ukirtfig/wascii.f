@@ -15,7 +15,7 @@ C
 C     Command keywords -  None
 C
 C                                               KS / AAO 10th Oct 1986
-C     Modified:  
+C     Modified:
 C
 C     24th Oct 1986.  KS / AAO.  Format code 2 data now written one pair
 C                     of values to a line.
@@ -36,7 +36,7 @@ C
 C
 C     Local variables
 C
-      CHARACTER    ACCESS*1     ! Access mode 
+      CHARACTER    ACCESS*1     ! Access mode
       LOGICAL      EXISTS       ! T if fits item exists
       INTEGER      ELEMENTS     ! Number of elements in fits item
       INTEGER      STRLEN       ! Length of string for returned fits item
@@ -136,16 +136,16 @@ C
 C     Get the object name
 C
       EXISTS = .FALSE.
-      CALL DSA_SEEK_FITS('SPECT', 'OBJECT', EXISTS, ACCESS, 
+      CALL DSA_SEEK_FITS('SPECT', 'OBJECT', EXISTS, ACCESS,
      :   ELEMENTS, STRLEN, STATUS )
       IF ( EXISTS ) THEN
-         CALL DSA_GET_FITS_C( 'SPECT', 'OBJECT', 1, OBJECT_NAME, 
+         CALL DSA_GET_FITS_C( 'SPECT', 'OBJECT', 1, OBJECT_NAME,
      :      COMMENT, STATUS )
       ELSE
          OBJECT_NAME = 'Object not specified'
       ENDIF
 C
-C     Check that there is an X array.  
+C     Check that there is an X array.
 C
       CALL DSA_SEEK_AXIS('SPECT',1,XEXIST,STATUS)
       CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
@@ -256,13 +256,13 @@ C     (>) QEXIST (Logical) flag = .true. if data quality array was found.
 C     (>) ZQUAL  (BYTE array ZQUAL(NX)) The flux data quality array.
 C     (<) STATUS (Integer) Status code.  0 => OK, non-zero values are
 C                Fortran I/O error codes.
-C   
+C
 C     Common variables used - None
 C
 C     Subroutines / functions used - None
 C
 C                                        KS / AAO 10th Oct 1986
-C     Modified:  
+C     Modified:
 C
 C     24th Oct 1986.  KS / AAO.  Format code 2 data now written one pair
 C                     of values to a line.
@@ -289,7 +289,7 @@ C
 
       WRITE ( LU, 93, IOSTAT=STATUS ) OBJECT_NAME
 93    FORMAT ( ' * ', A )
- 
+
       WRITE ( LU, 103, IOSTAT=STATUS )  ZLABEL
 103   FORMAT ( ' ', '* Wavelength        ',A,'  Errors       Quality' )
 

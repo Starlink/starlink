@@ -39,7 +39,7 @@ dau_match_types(struct PDD *obj, struct PDD *app)
    return hds_gl_status;
 }
 
-int 
+int
 dat1_cvt( int bad,
           int nval,
           struct PDD *imp,

@@ -98,12 +98,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -225,7 +225,7 @@
 
 *  Create an integer array component called MASKS, within the
 *  QEXP structure.
-      CALL DAT_NEW( QCM_LOCQ( IDQ ), 'MASKS', '_INTEGER', 1, 
+      CALL DAT_NEW( QCM_LOCQ( IDQ ), 'MASKS', '_INTEGER', 1,
      :              MAX( 1, NMASKS ), STATUS )
 
 *  Get a locator to it, and store it in common.
@@ -237,7 +237,7 @@
      :               QCM_MSPNT( IDQ ), NEL, STATUS )
 
 *  Store the supplied masks in the MASKS array.
-      CALL VEC_ITOI( .FALSE., NEL, MASKS, 
+      CALL VEC_ITOI( .FALSE., NEL, MASKS,
      :               %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ),
      :                IERR, NERR, STATUS )
 
@@ -249,7 +249,7 @@
      :               STATUS )
       CALL DAT_MAPV( QCM_LOCOP( IDQ ), '_INTEGER', 'WRITE',
      :               QCM_OPPNT( IDQ ), NEL, STATUS )
-      CALL VEC_ITOI( .FALSE., NEL, OPCODE, 
+      CALL VEC_ITOI( .FALSE., NEL, OPCODE,
      :               %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ),
      :                IERR, NERR, STATUS )
 

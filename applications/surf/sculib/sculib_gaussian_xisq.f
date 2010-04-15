@@ -7,11 +7,11 @@
 *     calculate chi-squared of Gaussian fit
 
 *  Description:
-*     If entered with good status this routine calculates the chi-squared 
-*     between a dataset and a Gaussian function. Data points with bad quality 
-*     will be ignored, as will points with zero variance. A warning will be 
-*     issued if any data points with zero variance are encountered. If no 
-*     valid data points are found then an error will be reported and bad 
+*     If entered with good status this routine calculates the chi-squared
+*     between a dataset and a Gaussian function. Data points with bad quality
+*     will be ignored, as will points with zero variance. A warning will be
+*     issued if any data points with zero variance are encountered. If no
+*     valid data points are found then an error will be reported and bad
 *     status returned. The data are passed in via common.
 
 *  Invocation:
@@ -23,14 +23,14 @@
 *     N                      = INTEGER (Given)
 *           the number of parameters being fit, should be 6
 *     FIT(N)                 = DOUBLE PRECISION (Given)
-*           the fit parameters:- 
+*           the fit parameters:-
 *              - FIT(1) = peak height
 *              - FIT(2) = length of the `a' axis of the sigma ellipse
 *              - FIT(3) = length of the `b' axis of the sigma ellipse
-*              - FIT(4) = the angle between the `a' axis and 
+*              - FIT(4) = the angle between the `a' axis and
 *                         the x axis (+ve anticlockwise, radians)
-*              - FIT(5) = the x coord of the centre 
-*              - FIT(6) = the y coord of the centre 
+*              - FIT(5) = the x coord of the centre
+*              - FIT(6) = the y coord of the centre
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
@@ -85,7 +85,7 @@
       REAL    DATA_FIT (MAX_FIT_DATA)     ! value of measurements
       REAL    VARIANCE_FIT (MAX_FIT_DATA) ! variance on measurements
       INTEGER QUALITY_FIT (MAX_FIT_DATA)  ! quality on measurements
-      COMMON /SCULIB_GAUSSIAN_FIT_DATA/ NDATA_FIT, X_FIT, 
+      COMMON /SCULIB_GAUSSIAN_FIT_DATA/ NDATA_FIT, X_FIT,
      :  Y_FIT, DATA_FIT, VARIANCE_FIT, QUALITY_FIT
 
 *  Local Constants:
@@ -93,11 +93,11 @@
 *  Local variables:
       DOUBLE PRECISION A              ! = FIT(2)
       DOUBLE PRECISION ALPHA          ! angle between a line from the data
-                                      ! point to the ellipse centre and the x 
+                                      ! point to the ellipse centre and the x
                                       ! axis
       DOUBLE PRECISION B              ! = FIT(3)
       DOUBLE PRECISION BETA           ! angle between a line from the data point
-                                      ! to the ellipse centre and the `a' axis 
+                                      ! to the ellipse centre and the `a' axis
                                       ! of the ellipse (beta = alpha - theta)
       DOUBLE PRECISION F              ! = FIT(1)
       DOUBLE PRECISION G              ! the value of the fitted Gaussian at
@@ -108,7 +108,7 @@
       DOUBLE PRECISION THETA          ! = FIT(4)
       DOUBLE PRECISION XCENTRE        ! = FIT(5)
       DOUBLE PRECISION YCENTRE        ! = FIT(6)
-      LOGICAL ZERO_VARS               ! .TRUE. if any data with zero variance 
+      LOGICAL ZERO_VARS               ! .TRUE. if any data with zero variance
                                       ! are encountered
 
 *  Internal References:
@@ -137,15 +137,15 @@
       DO I = 1, NDATA_FIT
          IF (QUALITY_FIT(I) .EQ. 0) THEN
             IF (VARIANCE_FIT(I) .GT. 0.0) THEN
-               ALPHA = ATAN2 (DBLE(Y_FIT(I))-YCENTRE, 
+               ALPHA = ATAN2 (DBLE(Y_FIT(I))-YCENTRE,
      :           DBLE(X_FIT(I))-XCENTRE)
                BETA = ALPHA - THETA
 
                SIGMA2 = (A * COS(BETA))**2 + (B * SIN(BETA))**2
-               G = F * EXP ((-(DBLE(X_FIT(I))-XCENTRE)**2 - 
+               G = F * EXP ((-(DBLE(X_FIT(I))-XCENTRE)**2 -
      :           (DBLE(Y_FIT(I))-YCENTRE)**2) / SIGMA2)
 
-               XISQ = XISQ + (DBLE(DATA_FIT(I))-G)**2 / 
+               XISQ = XISQ + (DBLE(DATA_FIT(I))-G)**2 /
      :           DBLE(VARIANCE_FIT(I))
                N_ADDED = N_ADDED + 1
             ELSE

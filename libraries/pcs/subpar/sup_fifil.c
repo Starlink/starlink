@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,7 +92,7 @@
 
 *-
 */
-      
+
 /* Include Statements: */
 #include "sae_par.h"
 #include "cnf.h"
@@ -121,7 +121,7 @@ GENPTR_CHARACTER(ext)
 GENPTR_CHARACTER(acc)
 GENPTR_CHARACTER(file)
 
-/* Local Variables: 
+/* Local Variables:
 */
 char *path_c;
 char *name_c;
@@ -143,22 +143,22 @@ struct stat statb;
 /* .
 */
 
-/* Exit if bad given status 
+/* Exit if bad given status
 */
    if ( *status != SAI__OK ) return;
-     
+
 /* Initialise to file not found
 */
    notfound = 1;
 
-/* Convert given strings to C strings 
+/* Convert given strings to C strings
 */
    path_c = cnfCreim( path, path_length );
    name_c = cnfCreim( name, name_length );
    ext_c = cnfCreim( ext, ext_length );
    tmpext = malloc( strlen(ext_c) + 1 );
    acc_c = cnfCreim( acc, acc_length );
-   
+
    if ( ( path_c != NULL )
      && ( name_c != NULL )
      && ( ext_c != NULL )
@@ -166,7 +166,7 @@ struct stat statb;
      && ( tmpext != NULL ) ) {
 
 /* Get an array of pointers to the extensions into the exts array
-   Leaves nexts = number of possible extensions 
+   Leaves nexts = number of possible extensions
 */
       strcpy( tmpext, ext_c );
 
@@ -185,11 +185,11 @@ struct stat statb;
             if ( strspn( exts[*ind], " " ) == strlen( exts[*ind] ) )
                 exts[*ind] = NULL;
 
-/* Get size of filename 
+/* Get size of filename
 */
       namlen = strlen( name_c );
 
-/* Convert the access mode 
+/* Convert the access mode
 */
       switch (acc_c[0])
          {
@@ -206,13 +206,13 @@ struct stat statb;
             accno = F_OK;
          }
 
-/* Get the path - if there is no translation, get a null string 
+/* Get the path - if there is no translation, get a null string
 */
       if ( ( tpath = getenv(path_c) ) != NULL )
          {
          tmppath = malloc( strlen(tpath) + 1 );
 
-/* If a string has been allocated for the path, search it 
+/* If a string has been allocated for the path, search it
 */
          if ( tmppath )
             {
@@ -221,7 +221,7 @@ struct stat statb;
 /* For each directory on the path -
 */
             for ( dir=strtok(tmppath,":");
-                  ( *status == SAI__OK ) && notfound && ( dir != NULL ); 
+                  ( *status == SAI__OK ) && notfound && ( dir != NULL );
                   dir=strtok(NULL,":") )
                {
 
@@ -249,12 +249,12 @@ struct stat statb;
                if ( tmpdir )
                   {
                   for ( *ind=0;
-                        ( *status == SAI__OK ) && notfound && 
+                        ( *status == SAI__OK ) && notfound &&
                           ( !ind || (*ind<nexts) );
                         (*ind)++ )
                      {
                      if ( tmpname=malloc
-                        ( strlen(tmpdir) + namlen 
+                        ( strlen(tmpdir) + namlen
                           + ( ( exts[*ind] != NULL ) ? strlen(exts[*ind]) : 0 )
                           + 2 ) )
                         {
@@ -332,15 +332,15 @@ struct stat statb;
       emsRep("SUP_FIFIL6",
       " SUBPAR: Failed to find file ^NAME^EXT on path ^PATH", status );
       }
-      
+
 /* Free the imported C strings etc. - works OK even if they weren't allocated
 */
-   cnfFree( path_c );  
-   cnfFree( name_c );   
-   cnfFree( ext_c ); 
-   free( tmpext ); 
+   cnfFree( path_c );
+   cnfFree( name_c );
+   cnfFree( ext_c );
+   free( tmpext );
    cnfFree( acc_c );
- 
+
    return;
    }
 

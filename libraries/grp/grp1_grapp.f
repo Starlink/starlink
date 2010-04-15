@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,7 +118,7 @@
       INTEGER BSIZE              ! Size of basis group
       INTEGER EDEP               ! Indirection depth of the element
       INTEGER EIFILE             ! Index of the indirection file name
-      INTEGER EMODGP             ! Identifier for basis group 
+      INTEGER EMODGP             ! Identifier for basis group
       INTEGER EMODIN             ! Index into the group given by EMODGP
       INTEGER F                  ! First character checked.
       INTEGER FIRST              ! Index of 1st element just added
@@ -154,7 +154,7 @@
       FIRST = SIZE0 + 1
       INDEX = FIRST
 
-*  Store the size of the basis group on entry. This is done in case 
+*  Store the size of the basis group on entry. This is done in case
 *  SLOT1 and SLOT2 both point to the same group, in which case the size
 *  of the group will vary as the group expression is expanded. Saving
 *  the initial size ensures that only those names which were in the
@@ -183,7 +183,7 @@
 *  suffix.
       IF( SLOT1 .NE. 0 ) CALL GRP1_KWILD( SLOT2, GRPEXP, STATUS )
 
-*  Set a flag to indicate that no elements have yet been found which 
+*  Set a flag to indicate that no elements have yet been found which
 *  need expanding again.
       AGAIN = .FALSE.
 
@@ -191,23 +191,23 @@
 *  expression.
       START = 1
       NEXT = 1
-      DO WHILE( NEXT .GT. 0 .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( NEXT .GT. 0 .AND. STATUS .EQ. SAI__OK )
 
 *  Locate the end of the next element within the group expression
 *  (commencing at the character pointed to by START), and find the
 *  start and end of the inner-most kernel within it.
-         CALL GRP1_FKERN( SLOT2, START, GRPEXP, NEXT, P1, P2, 
+         CALL GRP1_FKERN( SLOT2, START, GRPEXP, NEXT, P1, P2,
      :                    K1, K2, S1, S2, T1, T2, F, L, STATUS )
 
 *  Expand the kernel into a list of elements, storing the list at the
 *  end of the group. The number of names added to the end of the group
 *  is returned in NADDED.
-         CALL GRP1_EXPAN( GRPEXP, K1, K2, BSIZE, SLOT1, SLOT2, 
-     :                    INDEX, 0, 0, GRP__NOID, 0, NADDED, NAME, 
+         CALL GRP1_EXPAN( GRPEXP, K1, K2, BSIZE, SLOT1, SLOT2,
+     :                    INDEX, 0, 0, GRP__NOID, 0, NADDED, NAME,
      :                    TFLAG, STATUS )
 
-*  If this is the last element in the group expression, and if no 
-*  flag character has already been found, indicate that the group 
+*  If this is the last element in the group expression, and if no
+*  flag character has already been found, indicate that the group
 *  expression is flaged if a flag character was found by GRP1_EXPAN.
          IF( NEXT .EQ. 0 .AND. .NOT. FLAG ) FLAG = TFLAG
 
@@ -217,15 +217,15 @@
 
 *  Modify each of the elements in the expanded list to include the
 *  characters which specify any editing to be done on the name.
-         CALL GRP1_INCED( SLOT2, INDEX, INDEX + NADDED - 1, 
+         CALL GRP1_INCED( SLOT2, INDEX, INDEX + NADDED - 1,
      :                    GRPEXP, START, K1, K2, NEXT, STATUS )
 
-*  Update the index of the next available slot in the group.   
+*  Update the index of the next available slot in the group.
          INDEX = INDEX + NADDED
 
 *  Store the starting position of the next element within the group
 *  expression. This will be one if no further elements remain.
-         START = NEXT + 1         
+         START = NEXT + 1
 
       END DO
 
@@ -263,8 +263,8 @@
      :                       EDEP, EIFILE, EMODGP, EMODIN, NADDED,
      :                       NAME, TFLAG, STATUS )
 
-*  If this is the last element in the group expression, and if no 
-*  flag character has already been found, indicate that the group 
+*  If this is the last element in the group expression, and if no
+*  flag character has already been found, indicate that the group
 *  expression is flaged if a flag character was found by GRP1_EXPAN.
             IF( II .EQ. LAST .AND. .NOT. FLAG ) FLAG = TFLAG
 
@@ -277,7 +277,7 @@
             CALL GRP1_INCED( SLOT2, INDEX, INDEX + NADDED - 1, ELEM,
      :                       1, K1, K2, NEXT, STATUS )
 
-*  Update the index of the next available slot in the group.   
+*  Update the index of the next available slot in the group.
             INDEX = INDEX + NADDED
 
          END DO
@@ -302,10 +302,10 @@
 *  names which were already in the group on entry).
          CALL GRP1_PTELM( SLOT2, SIZE0 + II - FIRST + 1, NEWEL,
      :                    EDEP, EIFILE, EMODGP, EMODIN, STATUS )
-*     
+*
 *  Abort if an error has occured.
          IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
       END DO
 
 *  Now remove any escape characters from the returned names.

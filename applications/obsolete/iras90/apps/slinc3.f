@@ -15,7 +15,7 @@
 *     SLINC3( PNLON, PNLAT, MODE, IRA, SCS, LBND, UBND,
 *             MXNSCT, MXVTCE, NPOLY, NVTCE, PLYLON, PLYLAT, PSCTLN,
 *             STATUS )
-      
+
 *  Description:
 *     This subroutine is used to draw a polyline interactively. The user
 *     will be continuously prompted for the next vertice of the polyline
@@ -23,7 +23,7 @@
 *     given by the user. The lines connecting the vertices are in fact
 *     the sections of great circles connecting these position.
 *     The spcifications of the polyline are appended to the ones on
-*     entry and returned.  
+*     entry and returned.
 
 *  Arguments:
 *     PNLON = CHARACTER*( * ) (Given)
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,7 +79,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
-                                                
+
 *  Arguments Given:
       CHARACTER*( * ) PNLON
       CHARACTER*( * ) PNLAT
@@ -89,7 +89,7 @@
       REAL LBND( 2 ), UBND( 2 )
       INTEGER MXNSCT
       INTEGER MXVTCE
-      
+
 *  Arguments Given and Returned:
       INTEGER NPOLY
       INTEGER NVTCE( MXNSCT )
@@ -101,8 +101,8 @@
 
 *  External References:
       DOUBLE PRECISION SLA_DBEAR ! Bearing angle of a position see from
-                                 ! other position 
-                                
+                                 ! other position
+
 *  Local Variables:
       DOUBLE PRECISION ANG       ! Position of a great circle
       DOUBLE PRECISION DIST      ! Distance between two vertices
@@ -147,7 +147,7 @@
             IF ( STATUS .EQ. PAR__NULL ) THEN
                EXIT = .TRUE.
                CALL ERR_ANNUL( STATUS )
-            END IF      
+            END IF
          ELSE
 
             CALL MSG_BLANKIF( MSG__NORM, STATUS )
@@ -198,7 +198,7 @@
 *  If the great circle section is drawn successfully, flush out the
 *  drawing and record the specification of this section of the polyline.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL SGS_FLUSH      
+               CALL SGS_FLUSH
                PLYLON( NPOLY, NVTCE( NPOLY ) ) = LON
                PLYLAT( NPOLY, NVTCE( NPOLY ) ) = LAT
             END IF
@@ -212,5 +212,5 @@
       END DO
 
  999  CONTINUE
-      
+
       END

@@ -30,7 +30,7 @@
 *
 *     If the first detector name starts with a minus sign, the minus sign
 *     is removed, and the supplied group is modified to hold all available
-*     detector names except for those that were initially in the supplied 
+*     detector names except for those that were initially in the supplied
 *     group.
 
 *  Authors:
@@ -93,7 +93,7 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
 /* Check inherited status. Also check a group was supplied. */
    if( *status != SAI__OK || !detgrp ) return;
 
-/* Check the first element in the supplied group. If it starts with a 
+/* Check the first element in the supplied group. If it starts with a
    minus sign, remove it and set a flag indicating that the supplied
    detectors are to be excluded rather than included. */
    buf = detname;
@@ -116,7 +116,7 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
       lab += strlen( lab ) + 1;
    }
 
-/* Check that each entry in "detgrp" is also in "alldets". Issue a 
+/* Check that each entry in "detgrp" is also in "alldets". Issue a
    warning if any of the detector names specified in "detgrp"
    were not found in the data. */
    baddets = NULL;
@@ -141,7 +141,7 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
    }
 
 /* If the supplied detectors are to be excluded, modify the group holding
-   all detector names by replacing each detector name that is to be excluded 
+   all detector names by replacing each detector name that is to be excluded
    with the string "REMOVE". */
    if( exclude ) {
       for( irec = 1; irec <= (data->dims)[ 1 ]; irec++ ) {
@@ -164,5 +164,5 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
 
 /* Free resources */
    grpDelet( &alldets, status );
-} 
+}
 

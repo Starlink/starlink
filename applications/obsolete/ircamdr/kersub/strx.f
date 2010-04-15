@@ -1,5 +1,5 @@
 *+  STRX - stretches the input array into the output array in the X-direction
-      SUBROUTINE STRX( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+      SUBROUTINE STRX( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :                 XPIX, XWT, STATUS )
 *    Description :
 *     The input array, ARRIN, is stretched in the X ( first dimension )

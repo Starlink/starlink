@@ -93,7 +93,7 @@
  *    01 Aug 1995 (rpt):
  *       Support for DATADIR variable and upper/lower case file suffix
  *    26 Jul 1996 (sec):
- *       Support for the actual given filename. 
+ *       Support for the actual given filename.
  *-
  */
 
@@ -130,22 +130,22 @@ int gsdOpenRead( char *file, float *version, char *label, int *nitem,
  */
    datadir = getenv( "DATADIR" );
 
-/* Open the GSD file for read access. Check first the actual filename, 
+/* Open the GSD file for read access. Check first the actual filename,
  * then upper and lower case suffix and DATADIR
  */
    sprintf( dfile, "%s", file );
    *fptr = fopen( dfile, "r" );
-   if ( !*fptr ) { 
+   if ( !*fptr ) {
      sprintf( dfile, "%s.dat", file );
      *fptr = fopen( dfile, "r" );
-     if ( !*fptr ) { 
+     if ( !*fptr ) {
        sprintf( dfile, "%s.DAT", file );
        *fptr = fopen( dfile, "r" );
-       if ( !*fptr ) { 
+       if ( !*fptr ) {
          if ( datadir != NULL ) {
   	   sprintf( dfile, "%s/%s.dat", datadir, file );
   	   *fptr = fopen( dfile, "r" );
-  	   if ( !*fptr ) { 
+  	   if ( !*fptr ) {
   	     sprintf( dfile, "%s/%s.DAT", datadir, file );
   	     *fptr = fopen( dfile, "r" );
   	   }

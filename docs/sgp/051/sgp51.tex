@@ -66,7 +66,7 @@ procedures, which evolve with operational demands.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -209,12 +209,12 @@ procedures, which evolve with operational demands.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -254,9 +254,9 @@ procedures, which evolve with operational demands.
 \section{\label{introduction}\xlabel{introduction}Introduction}
 
 The Starlink Software Collection is a large and complex set of packages.
-It is maintained through the efforts of various support programmers and 
+It is maintained through the efforts of various support programmers and
 the Starlink Software Librarian.  There are a large number of diverse
-packages, each with its own requirements which have to be dealt with 
+packages, each with its own requirements which have to be dealt with
 when put through a change cycle.
 
 To avoid having to remember several different ways of building and
@@ -328,12 +328,12 @@ package file.
 \item[Find and fix the problem/bug]: Programmer.
 
 The fix for a bug is up to the programmer, who must
-find and solve the problem.  
+find and solve the problem.
 
 \item[Update the software to add new functionality]: Programmer.
 
 In some cases a more detailed change is to be made and instead of a fix
-to an individual problem, a series of fixes and possibly additional functions 
+to an individual problem, a series of fixes and possibly additional functions
 are required.  Updates are usually assigned by the Head
 of Software as part of the annual Software Plan (for details see
 \xref{SGP/48}{sgp48}{}), though some requests for enhancements or
@@ -397,11 +397,11 @@ package.  The revision number is the number after the period in the
 may only be incremented, never decremented.
 
 The document revision number is not changed if the only change since
-the last release is to correct spelling and format errors. 
+the last release is to correct spelling and format errors.
 
 \end{enumerate}
 
-\item [All Documents]: Programmer and Document Librarian.  
+\item [All Documents]: Programmer and Document Librarian.
 
 \begin{enumerate}
 
@@ -447,7 +447,7 @@ Librarian of the location.
 \item The Document Librarian should check that the submitted
 document conforms where practicable to the Starlink House Style, and
 that the document revision number and date have been updated
-appropriately.  
+appropriately.
 
 \item The Document Librarian must clear the document for release.
 
@@ -459,7 +459,7 @@ In some cases the Document Librarian may at his discretion make
 modifications to the document before returning it to the programmer.  The
 modified document source should be returned by email.
 
-If modifications are made, a new hypertext version of the document should  
+If modifications are made, a new hypertext version of the document should
 be created (by the programmer).
 
 If the Document Librarian does not clear the document for release, the
@@ -501,12 +501,12 @@ numbers returned to zero.
 
 \item If a beta-test is to be carried out, the letter {\tt{b}} should
 be added to the {\tt{release}} number.  The {\tt{b}} will be removed
-for final release after the beta-test period.  
+for final release after the beta-test period.
 
 \end{enumerate}
 
 For libraries, a Library Version number is defined, similar to the
-Package Version number, but without the {\tt{release}} number.  
+Package Version number, but without the {\tt{release}} number.
 
 \begin{enumerate}
 
@@ -517,14 +517,14 @@ bug fixes and {\it{minor}} updates.
 dynamic linked program linked with the new library would not run with
 the older versions of the library, {\em{e.g.}}, if new subroutines had
 been added to the library.  The {\tt{minor}} version number should be
-returned to zero.  
+returned to zero.
 
 \end{enumerate}
 
 \item[Testing procedures]: Programmer
 
 It is the responsibility of the programer to verify that a fix or update
-for a piece of software works, and does not adversely affect the existing 
+for a piece of software works, and does not adversely affect the existing
 functionality of the software.
 
 It is also the responsibility of the programmer to provide information
@@ -542,13 +542,13 @@ combinations:
 
 \begin{enumerate}
 
-\item The fix and/or update must verifiably have been included in the 
+\item The fix and/or update must verifiably have been included in the
 the new source set for the package.
 
 \item The {\tt{./mk test}} for the package should be passed on all platforms.
 
 The {\tt{./mk test}} (the {\tt{test}} target in the {\tt{makefile}}) should,
-after package installation, check that all appropriate binaries will run, 
+after package installation, check that all appropriate binaries will run,
 and that all required files are installed correctly.  It is not intended that
 the {\tt{./mk test}} should do an exhaustive test of all functionality in a
 package.
@@ -571,7 +571,7 @@ software.
 It is the responsibility of the programmer to maintain in fixed or
 updated software any existing compatibility with other software, where
 reasonably practicable.  Any instance where this is not possible should
-be discussed with the Software Librarian.  
+be discussed with the Software Librarian.
 
 The requirement for maintaining existing capability does not preclude
 the possibility of changes in functionality breaking existing
@@ -597,10 +597,10 @@ completed satisfactorily.
 \item[Risk assessment]: Programmer and Software Librarian.
 
 An assessment of the risk involved in the fix or update must be made, in
-order to determine whether a beta-test of the package is required.  
+order to determine whether a beta-test of the package is required.
 
 There is a risk to other packages in the Software Collection from any
-release -- changes in functionality in the package may break existing 
+release -- changes in functionality in the package may break existing
 software, and major updates may introduce new bugs to the package that
 may not show up in testing before release.
 
@@ -614,7 +614,7 @@ The programmer should provide factual information to the Software
 Librarian about the scope and impact of the fix or update.  This
 information will be used by the Software Librarian in determining
 whether a beta-test is needed, though if a programmer thinks fit, he
-may recommend a beta-test be carried out.   
+may recommend a beta-test be carried out.
 
 The Software Librarian will normally consult the Head of Software when
 determining whether a beta-test is to be made, but it is the
@@ -653,7 +653,7 @@ the {\tt{makefile}}:
 \end{verbatim}
 \end{quote}
 
-This creates a {\tt{package.tar.Z}} archive.   
+This creates a {\tt{package.tar.Z}} archive.
 
 \item[Upload to RAL or local {\tt{ftp}} system]: Programmer.
 
@@ -666,8 +666,8 @@ systems.
 
 \item[Notify Software Librarian of submission]: Programmer.
 
-The programmer should notify the Software Librarian of a submission 
-by sending an email message to {\tt{ussc@star.rl.ac.uk}}.  
+The programmer should notify the Software Librarian of a submission
+by sending an email message to {\tt{ussc@star.rl.ac.uk}}.
 
 The message should contain:
 
@@ -675,7 +675,7 @@ The message should contain:
 
 \item the location of the {\tt{package.tar.Z}} archive,
 
-\item any special instructions for installation, and details of 
+\item any special instructions for installation, and details of
 any new command aliases and environment variables required.
 
 \item a statement of priority, and any specific scheduling requirements.
@@ -691,7 +691,7 @@ needed for testing, it should also be made available with (but not in)
 the {\tt{package.tar.Z}} archive.
 
 \item a copy of the {\tt{package.news}} file `attached' (using
-{\tt{Pine}}) for reference. 
+{\tt{Pine}}) for reference.
 
 \end{enumerate}
 
@@ -707,17 +707,17 @@ system.
 
 The Software Librarian will initiate a check of the submitted software,
 which will be carried out either by the Software Librarian or by a
-designated checker.  
+designated checker.
 
 The check will normally be carried out over a period of a few days,
 and the programmer will be notified beforehand that the check is about
 to occur, so that any last minute changes may be incorporated and
-notified to the Software Librarian before the check starts.  
+notified to the Software Librarian before the check starts.
 
 Any major last minute changes will cause the submission to be handed
 back to the programmer for proper resubmission.
 
-The person assigned to check the submission is responsible for ensuring that 
+The person assigned to check the submission is responsible for ensuring that
 the submission is checked according to the procedure below.
 
 \begin{description}
@@ -734,7 +734,7 @@ appropriate to make sure they conform to the Starlink standards.
 
 \item[Documentation standard]\mbox{}
 
-The Document Librarian should be consulted to see that the document 
+The Document Librarian should be consulted to see that the document
 has been cleared for release.  If the document has not been cleared,
 the submission should be rejected.
 
@@ -757,12 +757,12 @@ extended verification that the package runs.
 
 The package {\tt{export}} and {\tt{export\_run}} distribution archives
 should be created and tested to ensure that they can be installed
-correctly.  
+correctly.
 
 The package deinstallation procedure should be tested to
 ensure that the deinstallation occurs without failing.
 
-The package {\tt{clean}} and {\tt{unbuild}} procedures should be tested to 
+The package {\tt{clean}} and {\tt{unbuild}} procedures should be tested to
 ensure that no extraneous files remain after their operation.
 
 \item[Clearing for release]\mbox{}
@@ -794,7 +794,7 @@ source directory renamed from {\tt{package}} to {\tt{old.package}}.
 
 \item {\bf{Create a new directory}}
 
-A new {\tt{package}} source directory should be created, and the 
+A new {\tt{package}} source directory should be created, and the
 distribution {\tt{package.tar.Z}} archive should be unpacked into it.
 
 \item {\bf{Build the package}}
@@ -876,8 +876,8 @@ will detail:
 
 \item[Upload the beta-test distribution sets]: Software Librarian.
 
-The beta-test distribution sets will be made available in the 
-Starlink anonymous {\tt{ftp}} system beta-test directory, 
+The beta-test distribution sets will be made available in the
+Starlink anonymous {\tt{ftp}} system beta-test directory,
 with the beta-test release note.
 
 \item[Issue beta-test note]: Software Librarian.
@@ -930,7 +930,7 @@ reports should be fed back to the Programmer responsible.
 The Software Librarian is responsible for the tasks in this section.
 
 When one or more packages are cleared for release, a release bundle
-should be made.  The precise method of release depends upon the inventory 
+should be made.  The precise method of release depends upon the inventory
 of packages to be released, but all releases follow the same basic pattern.
 
 \begin{enumerate}
@@ -950,11 +950,11 @@ specific distribution staging directories.
 
 \item{\bf{Create document masters}}
 
-Where documents have been updated, create new paper masters, and pass them 
+Where documents have been updated, create new paper masters, and pass them
 to the Documentation Librarian for bulk copying.  Where possible,
 paper masters should be printed double-sided.
 
-The Software Librarian should use discretion when deciding whether 
+The Software Librarian should use discretion when deciding whether
 new paper masters are needed.  Minor spelling corrections would normally
 not require a complete new copy run, but it would be appropriate to
 generate a new paper master so that future copies are made from the
@@ -965,11 +965,11 @@ latest master.
 Each package should have a news item to announce a bug fix or update.
 
 The news item should contain a short description of the package, and
-details of the update in simple terms.  More complicated details of the 
+details of the update in simple terms.  More complicated details of the
 release may also be included, but should be restricted to subtopics of
 the news item.
 
-The Software Librarian should generate a suitable news item for each 
+The Software Librarian should generate a suitable news item for each
 package to be issued, based on the submitted {\tt{package.news}} file.
 Distribution news items should be called {\tt{news\_package.txt}}.  The
 news item should be placed in the permanent staging directory.
@@ -1086,7 +1086,7 @@ the release note.
 \item{\bf{Distribute the Release}}
 
 Distribute the release note to sites using the {\tt{ussc\_mailer}}
-script and the {\tt{ussc\_sites}} distribution list.  
+script and the {\tt{ussc\_sites}} distribution list.
 
 \item{\bf{Issue the release note to Usenet}}
 
@@ -1116,7 +1116,7 @@ using the {\tt{ussc\_arc}} script.
 
 After a release, the Software Librarian should tidy up the development
 system used to build the release by removing old copies of software,
-purging test directories and staging areas, and filing all email and 
+purging test directories and staging areas, and filing all email and
 notes in the software package file.
 
 \begin{enumerate}
@@ -1128,7 +1128,7 @@ and on-line archiving should be deleted once the emailing has been completed.
 
 \item{\bf{Remove old versions of software}}
 
-The procedure for building software prior to release requires that a 
+The procedure for building software prior to release requires that a
 `deinstalled' copy of the software be kept on-line in an {\tt{old.package}}
 directory at the same level in the directory hierarchy as the {\tt{package}}
 directory.  The {\tt{old.package}} directory should be deleted.
@@ -1160,7 +1160,7 @@ This ends the release cycle.
 Porting Starlink Software to a new hardware and software combination is
 not something to be undertaken lightly.  That said, following the
 simple guidelines and procedures detailed here should result in a
-successful port. 
+successful port.
 
 A successful port is defined as the complete conversion of a package
 onto a new hardware and software combination, and the reintegration of
@@ -1173,7 +1173,7 @@ until it has passed all its tests.
 
 A port of a package is either easy, in that you only have to port the
 package itself, or hard, in that you have to port all the necessary
-infrastructure as well.  
+infrastructure as well.
 
 \subsection{\label{who_does_the_port}\xlabel{who_does_the_port}Who does the port}
 
@@ -1196,9 +1196,9 @@ make the package run on the new system.
 
 \subsubsection{Port procedure}
 
-The procedure for porting (in terms of the Software Cycle) is to treat 
+The procedure for porting (in terms of the Software Cycle) is to treat
 the port exercise as a development update to the package, and use Steps
-1 and 2 of the Software Cycle.  
+1 and 2 of the Software Cycle.
 
 If the porter is not the support programmer for the package, he should
 note all the modifications necessary to the package to complete the
@@ -1213,14 +1213,14 @@ the package is sufficiently tested to pass Step 2 of the Software Cycle.
 
 A complete port of the whole system to a new hardware and software
 combination is best left to the Starlink Project, and is usually
-assigned to one programmer.  
+assigned to one programmer.
 
 \subsubsection{Port procedure}
 
 The method is to start at the lowest level of the infrastructure and
 work up the dependencies till the whole infrastructure is ported.
 This must be done using Steps 1 and 2 of the Software Cycle applied
-to each separate package in the infrastructure.  
+to each separate package in the infrastructure.
 
 Notes must be kept of modifications require to each package, and these
 should be fed back to the package support programmers so that they may
@@ -1286,7 +1286,7 @@ written or ported.
 
 There is a document detailing the use of the {\sc{CD-rom}} which
 contains some details of the software inventory, and the layout of the
-{\sc{CD-rom}}.  For the Linux distribution, this document is 
+{\sc{CD-rom}}.  For the Linux distribution, this document is
 \xref{SUN/212}{sun212}{}. The document must be updated to reflect the
 new {\sc{CD-rom}} to be produced.
 
@@ -1321,7 +1321,7 @@ fixed, and a final release date set.
 \subsection{\label{cdrom_inserts}\xlabel{cdrom_inserts}{\sc{CD-rom}} inserts}
 
 A new {\sc{CD-rom}} version should be provided with a new jewel case insert
-detailing the version number and date of the release.  This should also 
+detailing the version number and date of the release.  This should also
 have brief details of how to use the {\sc{CD-rom}}.
 
 \subsection{\label{cdrom_production}\xlabel{cdrom_production}{\sc{CD-rom}} production}

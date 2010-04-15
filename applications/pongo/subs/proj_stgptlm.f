@@ -17,13 +17,13 @@
 *     extending a line through the North celestial pole through the
 *     sphere at the point of interest and onto the tangent plane of the
 *     reference point
-*     
+*
 *     L is assumed to be positive to the east
 *     M is assumed to be positive to the north
 *
 *     Based on the AIPS implementation of these geometries - see
 *     AIPS memos 27 & 46 - Eric Greisen.
-*     
+*
 
 *  Arguments:
 *     PHI0 = DOUBLE PRECISION (Given)
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

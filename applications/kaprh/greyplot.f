@@ -46,7 +46,7 @@
 
 *  ADAM Parameters:
 *     ABSLAB  =  LITERAL (Read)
-*        Label for the plot abscissa, in which NCAR fancy founts 
+*        Label for the plot abscissa, in which NCAR fancy founts
 *        may be embedded when FONT = "NCAR".  This parameter is only
 *        used when the axes option is selected.  If axis information is
 *        present the suggested default is the NDF's axis label followed
@@ -79,7 +79,7 @@
 *        greyscale provided BADCOL is an integer between 0 and 15, or
 *        a named colour.  The bad pixels will remain unaltered if the
 *        lookup table is manipulated.  The suggested default is the
-*        current value. [The current value, but equals "MIN" if there 
+*        current value. [The current value, but equals "MIN" if there
 *        is no current value.]
 *     BLACK = _DOUBLE (Read)
 *        The array value that scales to the black in the greyscale
@@ -143,9 +143,9 @@
 *
 *        If FULL = FALSE, only non-reserved intensities will form the
 *        greyscale.  If a null (!) value is supplied, the value used is
-*        TRUE when the non-reserved pens is less than 32, and FALSE 
-*        otherwise.  (This figure was chosen because it is roughly the 
-*        number of grey levels at which the eye will clearly detect the 
+*        TRUE when the non-reserved pens is less than 32, and FALSE
+*        otherwise.  (This figure was chosen because it is roughly the
+*        number of grey levels at which the eye will clearly detect the
 *        quantisation in a complex scene.) [!]
 *     IN = NDF (Read)
 *        Input NDF data structure containing the image to be displayed.
@@ -170,7 +170,7 @@
 *                          standard deviation to the mean plus seven
 *                          standard deviations.  The scaling values are
 *                          reported so that the faster Scale mode may be
-*                          utilised later. 
+*                          utilised later.
 *          "Flash"       - The image is flashed onto the screen without
 *                          any scaling at all.  This is the fastest
 *                          option.  Since there is no longer a
@@ -180,23 +180,23 @@
 *          "Percentiles" - The image is scaled between the values
 *                          corresponding to two percentiles.  The
 *                          scaling values are reported so that the
-*                          faster Scale mode may be utilised later. 
+*                          faster Scale mode may be utilised later.
 *          "Range"       - The image is scaled between the minimum and
 *                          maximum data values.
 *          "Scale"       - You define the upper and lower limits
 *                          between which the image is to be scaled.  The
 *                          application reports the maximum and the
-*                          minimum values for reference and makes these 
+*                          minimum values for reference and makes these
 *                          defaults respectively.
 *          "Sigmas"      - The image is scaled between two standard-
 *                          deviation limits.  The scaling values used
 *                          are reported so that the faster Scale mode
-*                          may be utilised later. 
+*                          may be utilised later.
 *     NUMBIN  =  _INTEGER (Read)
 *        The number of histogram bins used to compute percentiles for
 *        scaling. (Percentiles mode) [2048]
 *     ORDLAB  =  LITERAL (Read)
-*        Label for the plot ordinate, in which NCAR fancy founts 
+*        Label for the plot ordinate, in which NCAR fancy founts
 *        may be embedded when FONT = "NCAR".   This parameter is only
 *        used when the axes option is selected.  If axis information is
 *        present the suggested default is the NDF's axis label followed
@@ -281,7 +281,7 @@
 
 *  Examples:
 *     greyplot sdor key mode=sc black=1 white=5.2
-*        Makes a greyscale display of the data component of the NDF 
+*        Makes a greyscale display of the data component of the NDF
 *        called sdor on the current image-display device, scaling
 *        between 1 and 5.2.  Values up to 1.0 in the data array will
 *        appear black in the plot, and values larger than 5.2 will be
@@ -307,7 +307,7 @@
 *     greyplot cgs4k v key mode=ra device=canon_l
 *        Makes a greyscale display of the variance component of NDF
 *        cgs4k on the Canon_l device, scaling between the minimum and
-*        maximum variance values. 
+*        maximum variance values.
 
 *  Notes:
 *     -  The application stores a number of pictures in the graphics
@@ -322,7 +322,7 @@
 *     associated with the plot is stored by reference with the DATA
 *     picture.  On exit the current database picture for the chosen
 *     device reverts to the input picture.
-*     -  When axes are requested the axis annotations are defined by 
+*     -  When axes are requested the axis annotations are defined by
 *     their lower and upper bounds, i.e. a regular array is assumed.
 *     The bounds are in pixel or data co-ordinates.
 *     -  The data type of the output NDF depends on the number of colour
@@ -356,7 +356,7 @@
 *     -  Create and map a scratch area for array scaling.  Scale via
 *     the requested method and data type, performing any necessary
 *     preliminary calculations, e.g. histogram for percentiles.  Reset
-*     the bad-pixel flag if it has been determined that none exist 
+*     the bad-pixel flag if it has been determined that none exist
 *     during the preliminaries to save processing.
 *     -  Plot the scaled cell array.
 *     -  Write the scaling limits.
@@ -402,7 +402,7 @@
 *        Added the input and output of NDFs containing scaled data.
 *     1991 May 14 (MJC):
 *        Added direct processing of _BYTE and _WORD data.
-*     1991 July 22 (MJC): 
+*     1991 July 22 (MJC):
 *        Added user-controlled appearance of bad pixels.
 *     1991 August 20 (MJC):
 *        Added FONT parameter.
@@ -446,7 +446,7 @@
       INCLUDE 'NDF_PAR'        ! NDF definitions
       INCLUDE 'NDF_ERR'        ! NDF_ error constants
       INCLUDE 'CTM_PAR'        ! Colour-table management constants
-      INCLUDE 'GNS_PAR'        ! GNS constants 
+      INCLUDE 'GNS_PAR'        ! GNS constants
 
 *  Status:
       INTEGER STATUS
@@ -509,7 +509,7 @@
      :  KEY,                   ! A key of the grey values versus pixel
                                ! is to be produced
      :  MONOTO,                ! Axis is monotonic
-     :  OUTTIC,                ! Axis tick marks are to be placed 
+     :  OUTTIC,                ! Axis tick marks are to be placed
                                ! outside the box instead of inside
      :  POSTIV,                ! The scaling of the array is to be
                                ! positive
@@ -584,7 +584,7 @@
      :  AXPNTR( NDF__MXDIM ),  ! Pointers to the mapped axes
      :  BPCI,                  ! Bad-pixel colour index
      :  DIMS( NDIM ),          ! Dimensions of input array
-     :  EL,                    ! Number of elements in the input and 
+     :  EL,                    ! Number of elements in the input and
                                ! cell arrays
      :  HIST( MAXBIN ),        ! Histogram
      :  I, J,                  ! Counters
@@ -785,7 +785,7 @@
       DIMS( 1 ) = SUBND( 1 ) - SLBND( 1 ) + 1
       DIMS( 2 ) = SUBND( 2 ) - SLBND( 2 ) + 1
 
-*    Check whether or not bad pixels may be present.      
+*    Check whether or not bad pixels may be present.
 
       CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
 
@@ -1151,7 +1151,7 @@
 
 *       When axes are present room must be made for them, and so the
 *       default magnification is reduced.  Make a new "initial" image
-*       zone, but with an allowance for the axes.  
+*       zone, but with an allowance for the axes.
 
          CALL KPS1_IMZBO( ANCLIP, ZONEI, STATUS )
 
@@ -1207,7 +1207,7 @@
          CALL PAR_GDR1R( 'MAJTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
      :                   MAJTIC, STATUS )
 
-*       Are the tick marks on the outside of the axes?  Default is 
+*       Are the tick marks on the outside of the axes?  Default is
 *       outside so that they do not hide any of the image.
 
          CALL PAR_GTD0L( 'OUTTIC', .TRUE., .TRUE., OUTTIC, STATUS )
@@ -2164,14 +2164,14 @@
 
             CALL SNX_AGWV
 
-*          Store the current NCAR grid values. 
+*          Store the current NCAR grid values.
 
             CALL AGGETF( 'GRID/LEFT.', GRID( 1 ) )
             CALL AGGETF( 'GRID/RIGHT.', GRID( 2 ) )
             CALL AGGETF( 'GRID/BOTTOM.', GRID( 3 ) )
             CALL AGGETF( 'GRID/TOP.', GRID( 4 ) )
 
-*          Store the current NCAR grid values. 
+*          Store the current NCAR grid values.
 
             CALL AGSETF( 'GRID/LEFT.', ANCLIP( 1 ) )
             CALL AGSETF( 'GRID/RIGHT.', ANCLIP( 2 ) )
@@ -2189,7 +2189,7 @@
      :                   AXUBND( 2 ), PLTITL, ABSLAB, ORDLAB, MINTIC,
      :                   MAJTIC, OUTTIC, THICK, .FALSE., STATUS )
 
-*          Restore the input NCAR grid values. 
+*          Restore the input NCAR grid values.
 
             CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
             CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
@@ -2286,7 +2286,7 @@
       END IF
 
       IF ( SCALE ) THEN
-      
+
 *       Create the output NDF.
 *       ======================
 

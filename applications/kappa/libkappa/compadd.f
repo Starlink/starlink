@@ -25,7 +25,7 @@
 *     is achieved by adding the values of the input NDF within
 *     non-overlapping `rectangular' boxes whose dimensions are the
 *     compression factors.  The additions may be normalised to correct
-*     for any bad values present in the input NDF. The exact placement of 
+*     for any bad values present in the input NDF. The exact placement of
 *     the boxes can be controlled using parameter ALIGN.
 
 *  Usage:
@@ -34,13 +34,13 @@
 *  ADAM Parameters:
 *     ALIGN = LITERAL (Read)
 *        This parameter controls the placement of the compression boxes
-*        within the input NDF (also see parameter TRIM). It can take any 
+*        within the input NDF (also see parameter TRIM). It can take any
 *        of the following values:
 *
 *        - "ORIGIN" --- The compression boxes are placed so that the
-*        origin of the pixel co-ordinate Frame (i.e. pixel coords (0,0)) in 
-*        the input NDF corresponds to a corner of a compression box. This 
-*        results in the pixel origin being retained in the output NDF. For 
+*        origin of the pixel co-ordinate Frame (i.e. pixel coords (0,0)) in
+*        the input NDF corresponds to a corner of a compression box. This
+*        results in the pixel origin being retained in the output NDF. For
 *        instance, if a pair of 2-dimensional images which have previously
 *        been aligned in pixel co-ordinates are compressed, then using this
 *        option ensures that the compressed images will also be aligned
@@ -60,7 +60,7 @@
 *        - "LAST" --- The compression boxes are placed so that the
 *        last pixel in the input NDF (for instance, the top right
 *        pixel in a 2-dimensional image) corresponds to the last pixel
-*        in a compression box. See the "FIRST" option above for further 
+*        in a compression box. See the "FIRST" option above for further
 *        comments.
 *                                                             ["ORIGIN"]
 *     AXWEIGHT = _LOGICAL (Read)
@@ -75,7 +75,7 @@
 *        fewer are supplied the last value in the list of compression
 *        factors is given to the remaining dimensions.  Thus if a
 *        uniform compression is required in all dimensions, just one
-*        value need be entered. The suggested default is the current value. 
+*        value need be entered. The suggested default is the current value.
 *     IN  = NDF (Read)
 *        The NDF structure to be reduced in size.
 *     NORMAL = _LOGICAL (Read)
@@ -103,13 +103,13 @@
 *        propagates the title from the input NDF to the output NDF. [!]
 *     TRIM = _LOGICAL (Read)
 *        If parameter TRIM is set TRUE, the output NDF only contains data
-*        for compression boxes which are entirely contained within the 
-*        input NDF. Any pixels around the edge of the input NDF which are 
-*        not contained within a compression box are ignored. If TRIM is set 
-*        FALSE, the output NDF contains data for all compression boxes which 
+*        for compression boxes which are entirely contained within the
+*        input NDF. Any pixels around the edge of the input NDF which are
+*        not contained within a compression box are ignored. If TRIM is set
+*        FALSE, the output NDF contains data for all compression boxes which
 *        have any overlap with the input NDF.  All pixels outside the
-*        bounds of the NDF are assumed to be bad. That is, any boxes which 
-*        extend beyond the bounds of the input NDF are padded with bad 
+*        bounds of the NDF are assumed to be bad. That is, any boxes which
+*        extend beyond the bounds of the input NDF are padded with bad
 *        pixels. See also parameter ALIGN. [current value]
 *     WLIM = _REAL (Read)
 *        If the input NDF contains bad pixels, then this parameter
@@ -137,13 +137,13 @@
 *        would result in a sixteen-fold reduction in the array
 *        components.
 *     compadd cosmos profile [10000,1] wlim=0 align=first trim=no
-*        This compresses the 2-dimensional NDF called cosmos to produce a 
+*        This compresses the 2-dimensional NDF called cosmos to produce a
 *        1-dimensional NDF called profile. This is done using a
 *        compression box which is 1 pixel high, but which is wider than
-*        the whole input image. Each pixel in the output NDF thus 
+*        the whole input image. Each pixel in the output NDF thus
 *        corresponds to the sum of the corresponding row in the
 *        input image. WLIM is set to zero to ensure that bad pixels
-*        are ignored. ALIGN is set to FIRST so that each compression box 
+*        are ignored. ALIGN is set to FIRST so that each compression box
 *        is flush with the left edge of the input image. TRIM is set to
 *        NO so that compression boxes which extend outside the bounds of
 *        the input image (which will be all of them if the input image is
@@ -230,7 +230,7 @@
 *        Type of local variable AXWT corrected from INTEGER to LOGICAL.
 *     10-JUN-1998 (DSB):
 *        Propagate WCS component. Ensure each output dimension is at least
-*        one pixel long. 
+*        one pixel long.
 *     12-OCT-1998 (DSB):
 *        Changed the way in which the bounds of the output image are
 *        determined so that pixel origin information is retained.
@@ -436,16 +436,16 @@
 *  ====================================
 
 *  See how the placement of the compression boxes is to be chosen. "ORIGIN"
-*  results in boxes being placed so that the origin of pixel co-ordinates 
-*  in the input NDF is co-incident with the bottom left corner of a 
-*  compression box. "First" results in the first pixel (i.e. the bottom 
-*  left pixel in a 2D array) being the first pixel in the first compression 
-*  box. "Last" results in the last pixel (i.e. the top right pixel in a 2D 
-*  array) being the last pixel in the last compression box. 
-      CALL PAR_CHOIC( 'ALIGN', 'Origin', 'Origin,First,Last', .TRUE., 
+*  results in boxes being placed so that the origin of pixel co-ordinates
+*  in the input NDF is co-incident with the bottom left corner of a
+*  compression box. "First" results in the first pixel (i.e. the bottom
+*  left pixel in a 2D array) being the first pixel in the first compression
+*  box. "Last" results in the last pixel (i.e. the top right pixel in a 2D
+*  array) being the last pixel in the last compression box.
+      CALL PAR_CHOIC( 'ALIGN', 'Origin', 'Origin,First,Last', .TRUE.,
      :                ALIGN, STATUS )
 
-*  Store the input pixel co-ordinates of the bottom left corner of a 
+*  Store the input pixel co-ordinates of the bottom left corner of a
 *  compression box.
       IF( ALIGN .EQ. 'ORIGIN' ) THEN
          DO I = 1, NDIM
@@ -456,21 +456,21 @@
          DO I = 1, NDIM
             REF( I ) = LBND( I ) - 1
          END DO
-      
+
       ELSE IF( ALIGN .EQ. 'LAST' ) THEN
          DO I = 1, NDIM
             REF( I ) = UBND( I )
          END DO
-      
+
       END IF
 
 *  See if the input image is to padded or trimmed in order to make it a
 *  whole number of compression boxes.
       CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
 
-*  Work out the bounds for the output array and the size of the output 
-*  array from the input array dimensions, compression factor and alignment.  
-*  Also modify the input bounds so that they correspond to the section of 
+*  Work out the bounds for the output array and the size of the output
+*  array from the input array dimensions, compression factor and alignment.
+*  Also modify the input bounds so that they correspond to the section of
 *  the input image which is actually used. Trim or pad the input image to
 *  make it a whole number of compression boxes, as required by parameter
 *  TRIM.
@@ -480,19 +480,19 @@
          IF( TRIM ) THEN
             LBNDO( I ) = KPG1_CEIL( REAL( LBND( I ) - 1 - REF( I ) )
      :                              / REAL( COMPRS( I ) ) ) - D + 1
-            UBNDO( I ) = MAX( LBNDO( I ), 
+            UBNDO( I ) = MAX( LBNDO( I ),
      :                        KPG1_FLOOR( REAL( UBND( I ) - REF( I ) )
      :                                    / REAL( COMPRS( I ) ) ) - D )
          ELSE
             LBNDO( I ) = KPG1_FLOOR( REAL( LBND( I ) - 1 - REF( I ) )
      :                              / REAL( COMPRS( I ) ) ) - D + 1
-            UBNDO( I ) = MAX( LBNDO( I ), 
+            UBNDO( I ) = MAX( LBNDO( I ),
      :                        KPG1_CEIL( REAL( UBND( I ) - REF( I ) )
      :                                    / REAL( COMPRS( I ) ) ) - D )
          END IF
 
          ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
-         
+
          LBND( I ) = 1 + REF( I ) + COMPRS( I )*( LBNDO( I ) - 1 + D )
          UBND( I ) = REF( I ) + COMPRS( I )*( UBNDO( I ) + D )
          IDIMS( I ) = UBND( I ) - LBND( I ) + 1
@@ -588,40 +588,40 @@
 *  whether there is variance or not, and the implementation type.
       IF ( VAR ) THEN
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMVDR( NDIM, IDIMS, 
+            CALL KPG1_CMVDR( NDIM, IDIMS,
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                       COMPRS, NLIM,
      :                       NORMAL, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTR1 ) ),
      :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMVDD( NDIM, IDIMS, 
+            CALL KPG1_CMVDD( NDIM, IDIMS,
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                       COMPRS, NLIM,
      :                       NORMAL, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTR1 ) ),
      :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF
       ELSE
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMADR( NDIM, IDIMS, 
+            CALL KPG1_CMADR( NDIM, IDIMS,
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       COMPRS, NLIM, NORMAL, 
+     :                       COMPRS, NLIM, NORMAL,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
      :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMADD( NDIM, IDIMS, 
+            CALL KPG1_CMADD( NDIM, IDIMS,
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       COMPRS, NLIM, NORMAL, 
+     :                       COMPRS, NLIM, NORMAL,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
      :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF
       END IF
@@ -715,43 +715,43 @@
 *  NDF_AMTYP is written then this will have to change.
             IF ( AVAR ) THEN
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMVVR( 2, ADIMS, 
+                  CALL KPG1_CMVVR( 2, ADIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                             %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                             ACOMPR,
-     :                             NLIM, AXWT, 
+     :                             NLIM, AXWT,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                             %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMVVD( 2, ADIMS, 
+                  CALL KPG1_CMVVD( 2, ADIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                             %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                             ACOMPR,
-     :                             NLIM, AXWT, 
+     :                             NLIM, AXWT,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                             %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                END IF
             ELSE
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMAVR( 2, ADIMS, 
+                  CALL KPG1_CMAVR( 2, ADIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                             ACOMPR, NLIM, 
+     :                             ACOMPR, NLIM,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMAVD( 2, ADIMS, 
+                  CALL KPG1_CMAVD( 2, ADIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                             ACOMPR, NLIM, 
+     :                             ACOMPR, NLIM,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                END IF
@@ -811,18 +811,18 @@
 *  NDF_AMTYP is written then this will have to change.  The widths are
 *  normalised in case there are undefined widths present.
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMADR( 2, ADIMS, 
+                  CALL KPG1_CMADR( 2, ADIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ACOMPR, NLIM, .TRUE.,
-     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMADD( 2, ADIMS, 
+                  CALL KPG1_CMADD( 2, ADIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ACOMPR, NLIM, .TRUE.,
-     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                END IF
@@ -839,7 +839,7 @@
 
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel coordinates. This mapping is described by a matrix and an offset
-*  vector. Set these up. 
+*  vector. Set these up.
       DO I = 1, NDIMI * NDIMI
          MATRIX( I ) = 0.0D0
       END DO

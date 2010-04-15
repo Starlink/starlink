@@ -35,7 +35,7 @@
 
       CHARACTER*(*) GRID
       LOGICAL DIRECT
- 
+
       DOUBLE PRECISION NERA,NEDEC,NWRA,NWDEC,SERA,SEDEC,SWRA,SWDEC
      : ,CENRA,CENDEC,RA,DECMAX,DECMIN,DEC,AO,DO,MMRD
       REAL NSCALE,XLEAST,XMOST,YLEAST,YMOST,XRANGE,YRANGE
@@ -50,7 +50,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       HW=SIZEMM/2.0
       MMRD = 1.0/(RDSA*SCALE)
 *
@@ -232,15 +232,15 @@ C        END IF
          DECSEC = DECSEC + DECINT
          IF (DECSEC*RDSA.LE.DECMAX) GOTO 370
          RAMAX = RAMAX - 0.5 * RAINC
- 
+
       END IF
- 
+
       CALL SGS_SELZ (IZAREA,ISTAT)
 *
 *   If ARGS then Reset Pen Colour
 *
       IF (COLOUR) CALL SGS_SPEN (1)
- 
+
 *
 *   Get Scale of E,W Sides (ESCALE)
 *   and N,S,Sides (NSCALE,SSCALE)
@@ -373,7 +373,7 @@ C        END IF
 650   CONTINUE
       RA = RASEC * RDST
       X = REAL( SIZE - ((RA - NWRA)/NSCALE) )
-      IF (.NOT.DIRECT) X=-X 
+      IF (.NOT.DIRECT) X=-X
       IF (.NOT.ALTERNATE) NEXT=.TRUE.
       IF (NEXT) THEN
          CALL RAMK(X,SIZE+SIZEMM/100.0,RA, STATUS )
@@ -438,5 +438,5 @@ C        END IF
       IF (RASEC*RDST.LT.SERA) GOTO 800
 870   CONTINUE
       CALL SGS_SELZ (IZCHART,ISTAT)
- 
+
       END

@@ -25,7 +25,7 @@
 *     NSMP = INTEGER (Given)
 *        Number of samples in the data series.
 *     INDAT( NSMP ) = REAL (Given)
-*        Input data series. 
+*        Input data series.
 *     OUTDAT( NSMP ) = REAL(Returned)
 *        Filtered output series.
 *     STATUS = INTEGER (Given and Returned)
@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,25 +76,25 @@
      :               /' does not have enough samples', STATUS )
          GOTO 999
       END IF
-      
+
 *  Get the first filtered data sample.
       OUTDAT( 1 ) = - INDAT( 1 ) - INDAT( 2 )
-     :              + INDAT( 3 ) + INDAT( 4 ) + INDAT( 5 ) + INDAT( 6 )       
+     :              + INDAT( 3 ) + INDAT( 4 ) + INDAT( 5 ) + INDAT( 6 )
      :              - INDAT( 7 ) - INDAT( 8 )
 
 *  Calculate the following filtered data sample recursively.
       DO I = 1, NSMP - 8
-         OUTDAT( I + 1 ) = OUTDAT( I ) + INDAT( I ) - 
-     :                     2.0 * INDAT( I + 2 ) + 2.0 * INDAT( I + 6 ) -        
+         OUTDAT( I + 1 ) = OUTDAT( I ) + INDAT( I ) -
+     :                     2.0 * INDAT( I + 2 ) + 2.0 * INDAT( I + 6 ) -
      :                     INDAT( I + 8 )
       END DO
 
-*  The final 7 samples are non-filterable, assign them the last 
+*  The final 7 samples are non-filterable, assign them the last
 *  filtered sample value.
       DO I = NSMP - 6, NSMP
          OUTDAT( I ) = OUTDAT( I - 1 )
       END DO
- 
+
  999  CONTINUE
 
       END

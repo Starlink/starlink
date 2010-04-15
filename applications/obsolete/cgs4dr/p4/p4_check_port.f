@@ -13,18 +13,18 @@
       INCLUDE 'SAE_PAR'
 *    Status :
       INTEGER STATUS           ! Global status
-*    External references : 
+*    External references :
       INTEGER PGBEGIN          ! PGPLOT open device routine
       INTEGER CHR_LEN          ! Finds used length of string
       LOGICAL CHR_SIMLR        ! T if two strings are similar
 *    Global variables :
       INCLUDE 'P4COM.INC'      ! P4 common block
 *    Local variables :
-      CHARACTER*( NBS_FLEN ) 
+      CHARACTER*( NBS_FLEN )
      :  TMPSTR,                ! A temporary string
      :  PG_STATE               ! Return from PGQINF call
-      INTEGER 
-     :  PORT,                  ! Port number 
+      INTEGER
+     :  PORT,                  ! Port number
      :  CLEN,                  ! Length of string
      :  IGNORE,                ! Ignorable return
      :  ERR_STAT               ! An error status
@@ -52,7 +52,7 @@
           IF ( VERBOSE ) THEN
             CALL MSG_SETC( 'DEV', DEVICE_NAME( PORT ) )
             CALL MSG_SETI( 'PORT', PORT )
-            CALL MSG_OUT( ' ', 
+            CALL MSG_OUT( ' ',
      :        'Device ^DEV is already open on port ^PORT', STATUS )
           ENDIF
         ELSE
@@ -65,7 +65,7 @@
             IF ( VERBOSE ) THEN
               CALL MSG_SETC( 'DEV', DEVICE_NAME( PORT ) )
               CALL MSG_SETI( 'PORT', PORT )
-              CALL MSG_OUT( ' ', 
+              CALL MSG_OUT( ' ',
      :          'Closing device ^DEV on port ^PORT', STATUS )
             ENDIF
             CALL PGEND

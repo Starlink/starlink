@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A, 
+      SUBROUTINE SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A,
      :  LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
 *+
 *  Name:
@@ -11,13 +11,13 @@
 *     This routine fits a general function to a data-set by searching the
 *     chi-squared plane. Chi-squared at each test fit position will be
 *     evaluated by the external routine XISQ_ROUTINE. The data to be fit
-*     are passed to the external routine through common; see 
-*     SCULIB_GAUSSIAN_XISQ for an example. Each call to the routine will 
-*     generate one iteration of the search. On exit the fit should have an 
-*     improved chi-squared that should be checked for convergence (i.e. has 
-*     chi-squared changed by less than CHICUT between 2 iterations) before 
-*     the routine is called again to perform the next iteration. It is 
-*     recommended that the routine be entered for the first iteration with 
+*     are passed to the external routine through common; see
+*     SCULIB_GAUSSIAN_XISQ for an example. Each call to the routine will
+*     generate one iteration of the search. On exit the fit should have an
+*     improved chi-squared that should be checked for convergence (i.e. has
+*     chi-squared changed by less than CHICUT between 2 iterations) before
+*     the routine is called again to perform the next iteration. It is
+*     recommended that the routine be entered for the first iteration with
 *     LAMBDA set to 0.001. Thereafter, the routine will return the value
 *     of LAMBDA to be used in the next iteration.
 *
@@ -32,7 +32,7 @@
 
 
 *  Invocation:
-*     CALL SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A, 
+*     CALL SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A,
 *    :  LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
 
 *  Arguments:
@@ -77,12 +77,12 @@
 *       -   SCULIB_INVERT_MATRIX is called to invert the modified `alpha'
 *          matrix
 *       -   If LAMBDA = 0 this is all that's required because this input
-*          is given if the routine is required to calculate the `error' 
+*          is given if the routine is required to calculate the `error'
 *          matrix
 *       -   Otherwise, SCULIB_FIT_MULT is called to multiply the inverted
 *          `alpha' matrix by the `beta' to give the next iteration of the
 *          fit for this LAMBDA
-*       -   Chi-squared is calculated for the new fit and compared with 
+*       -   Chi-squared is calculated for the new fit and compared with
 *          that for the previous fit. If the chi-squared is greater than
 *          the previous value plus CHICUT then things have got worse.
 *          In this case the routine will increase LAMBDA by a factor of
@@ -174,7 +174,7 @@
          END DO
 
 *  invert the matrix
- 
+
          CALL SCULIB_INVERT_MATRIX (N, ALPHA, DET, IK, JK, STATUS)
 
 *  only calculate next iteration if lambda > 0, otherwise this routine
@@ -197,7 +197,7 @@
 
             CALL XISQ_ROUTINE (XISQR, N, A, STATUS)
             IF (XISQR .GT. XISQ1 + CHICUT) THEN
- 
+
 *  oops, worse than before so return to previous solution, increase lambda
 *  and try again
 
@@ -208,7 +208,7 @@
                CALL XISQ_ROUTINE (XISQR, N, A, STATUS)
                LAMBDA = 10.0D0 * LAMBDA
 
-*  cutoff in case lambda is getting too big 
+*  cutoff in case lambda is getting too big
 
                IF (LAMBDA .GT. 1000.0D0) THEN
                   STATUS = SAI__ERROR
@@ -217,7 +217,7 @@
      :              STATUS)
                END IF
             ELSE
-           
+
 *  an improvement so decrease lambda for the next iteration and exit the loop
 
                LAMBDA = 0.1D0 * LAMBDA
@@ -231,6 +231,6 @@
             LOOPING = .FALSE.
          END IF
 
-      END DO   
+      END DO
 
       END

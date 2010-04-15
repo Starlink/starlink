@@ -20,7 +20,7 @@ C     with both types of data quality information, calls both USE routines,
 C     but - having assumed that since only one type of information was
 C     allowed in the file - assumes that only one will have been called
 C     and so tries to handle the data using ONLY the flagged values or
-C     ONLY the quality information. This routine checks for just that 
+C     ONLY the quality information. This routine checks for just that
 C     sequence, and puts out a warning if it detects it. A program that
 C     does really intend to use both flagged values and quality data
 C     simultaneously - which is rather awkward to do, and not really
@@ -62,7 +62,7 @@ C
 C  Common variable details:
 C     (>) QF_HANDLING   (Integer array) Flags that record the use the program
 C                       is making of the quality and flag information.
-C     (>) QF_PROBLEM    (Integer parameter) The value of QF_HANDLING 
+C     (>) QF_PROBLEM    (Integer parameter) The value of QF_HANDLING
 C                       that may represent a possible problem (program
 C                       is using both flagged values and data quality
 C                       at the same time without having indicated that
@@ -89,7 +89,7 @@ C     Functions used
 C
       INTEGER ICH_LEN
 C
-C     DSA_ common definition 
+C     DSA_ common definition
 C
       INCLUDE 'DSA_COMMON'
 C
@@ -101,7 +101,7 @@ C
 C
 C        Check for the problem sequence. A program that calls
 C        DSA_SEEK_QUALITY and gets a positive response will set the
-C        QF_QUAL_SET flag in QF_HANDLING. One that calls 
+C        QF_QUAL_SET flag in QF_HANDLING. One that calls
 C        DSA_SEEK_FLAGGED_VALUES and gets a positive response will set the
 C        QF_FLAG_SET flag. One that calls DSA_USE_QUALITY will set the
 C        QF_USE_QUALITY flag. One that calls DSA_USE_FLAGGED_VALUES will

@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -173,7 +173,7 @@
                   CALL ERR_RLSE
                END IF
             END IF
-                         
+
 *  Test for _BYTE.  Exit the loop if there is a match.
          ELSE IF ( CHR_ABBRV( HDSTYP, '_BYTE', 2 ) ) THEN
             HDSTYP = '_BYTE'
@@ -240,6 +240,6 @@
          CALL ERR_REP( 'KPG1_GETYP_GIVEUP',
      :     'Repeated attempts to obtain an HDS primitive data type '/
      :     /'has failed after ^N attempts.', STATUS )
-      END IF 
+      END IF
 
       END

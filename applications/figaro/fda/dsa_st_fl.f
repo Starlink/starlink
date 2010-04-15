@@ -14,7 +14,7 @@
 
 *  Description:
 *     If an application needs to explicitly indicate either that a newly
-*     created data array contains flagged data values, or needs to 
+*     created data array contains flagged data values, or needs to
 *     indicate to the system that a data array that did contain flagged
 *     values no longer does so, it can call this routine to set the
 *     appropriate flags in the NDF.
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

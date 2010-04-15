@@ -1,5 +1,5 @@
       SUBROUTINE SURFLIB_FILL_WPLATE(N_WPLATE, SCUCD_WPLATE,
-     :     N_POS, N_EXP, N_INT, N_MEAS, DEM_PNTR, WPLATE_OUT, 
+     :     N_POS, N_EXP, N_INT, N_MEAS, DEM_PNTR, WPLATE_OUT,
      :     WPLATE_ANG, STATUS)
 *+
 *  Name:
@@ -10,7 +10,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_FILL_WPLATE(USE_WP, N_WPLATE, SCUCD_WPLATE, N_POS, N_EXP,
 *    :     N_INT, N_MEAS, DEM_PNTR, WPLATE_OUT, WPLATE_ANG, STATUS)
@@ -21,7 +21,7 @@
 *     array is present (N_WPLATE>0), then this array contains the waveplate
 *     position for each measurement. If this array is not present
 *     the Waveplate angle is assumed to start at 0 degrees and increment
-*     by 22.5 degrees for each integration. If the number of 
+*     by 22.5 degrees for each integration. If the number of
 *     measurements exceeds the number of positions in the SCUCD_WPLATE
 *     array the sequence wraps round to the first value.
 *     The final output array will contain a single number (waveplate
@@ -29,7 +29,7 @@
 *     in degrees.
 *
 *     Since integrations and measurements are stored sequentially
-*     in a data file (in DEM_PNTR) there is no need to use 
+*     in a data file (in DEM_PNTR) there is no need to use
 *     SCULIB_FIND_SWITCH to determine the start and end points
 *     in the data array - use SCULIB_FIND_INT.
 *
@@ -96,7 +96,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! Status
       INCLUDE 'PRM_PAR'         ! Bad values
@@ -150,7 +150,7 @@
          LAST_END = -1
 
          DO MEASUREMENT = 1, N_MEAS
-            
+
 *     Find where the measurement starts
 *     This should all be done in SCULIB_FIND_MEAS (if it existed)
 *     [This should really just start at 1 and from then on be
@@ -163,7 +163,7 @@
             IF (MSTART .LE. 0) THEN
 
                CALL MSG_SETI ('M', MEASUREMENT)
-               CALL MSG_OUTIF (MSG__NORM, ' ', 
+               CALL MSG_OUTIF (MSG__NORM, ' ',
      :              'SURFLIB_FILL_WPLATE: no data '//
      :              'for meas ^M', STATUS)
 
@@ -226,7 +226,7 @@
                IF (MSTART .LE. 0) THEN
                   CALL MSG_SETI ('I', INTEGRATION)
                   CALL MSG_SETI ('M', MEASUREMENT)
-                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+                  CALL MSG_OUTIF (MSG__NORM, ' ',
      :                 'SURFLIB_FILL_WPLATE: no data '//
      :                 'for int ^I, meas ^M', STATUS)
 
@@ -241,7 +241,7 @@
                      END DO
                   END IF
 
-               ELSE 
+               ELSE
 
 
                   IF (MEND .LT. 0) THEN

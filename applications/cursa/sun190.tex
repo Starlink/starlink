@@ -43,7 +43,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -129,7 +129,7 @@ intended readership is users and potential users of CURSA.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -543,12 +543,12 @@ intended readership is users and potential users of CURSA.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -587,9 +587,9 @@ To set up for using CURSA type: ~~ {\tt cursa}
 
 \begin{tabular}{ll}
 
-{\tt xcatview}     & browse and generate selections from a catalogue 
+{\tt xcatview}     & browse and generate selections from a catalogue
                      (X-windows, easy-to-use), \\
-{\tt catview}      & browse and generate selections from a catalogue 
+{\tt catview}      & browse and generate selections from a catalogue
                      (command line), \\
 {\tt catselect}    & select a subset from a catalogue, \\
 {\tt catcoord}     & convert between celestial coordinate systems, \\
@@ -651,21 +651,21 @@ To set up for using CURSA type: ~~ {\tt cursa}
    .LT. == /= >= > <= <}  \\
 {\bf logical (boolean) operators:} {\tt .AND. .OR. .NOT. \& $|$ \# }  \\
 {\bf brackets:} use brackets, `{\tt (}', `{\tt )}', as appropriate,  \\
-{\bf sexagesimal values:} use a colon (`:') to separate 
+{\bf sexagesimal values:} use a colon (`:') to separate
    hours/degrees, minutes and seconds. Unsigned values are interpreted
    as hours; values in degrees must always have a sign (`{\tt +}' or
    `{\tt -}'). Sexagesimal values are converted to radians prior to
    evaluating the expression.  \\
-{\bf great circle distance:} 
+{\bf great circle distance:}
    {\tt GREAT(}$\alpha_{1},\delta_{1}$,$\alpha_{2},\delta_{2}${\tt )} \\
-{\bf  position angle} of point $(\alpha_{2},\delta_{2})$ from point 
+{\bf  position angle} of point $(\alpha_{2},\delta_{2})$ from point
   $(\alpha_{1},\delta_{1})$:
   {\tt PANGLE(}$\alpha_{1},\delta_{1}$,$\alpha_{2},\delta_{2}${\tt )}
 \newpage
 
 \begin{htmlonly}
 \section*{Preliminaries}
-\end{htmlonly} 
+\end{htmlonly}
 
 \subsection*{CURSA home page and on-line documentation}
 \label{HOMEPAGE}
@@ -709,7 +709,7 @@ Librarian, as follows.
 
 Postal address: \\
 \begin{tabular}{l}
-The Software Librarian. Starlink Project, Rutherford Appleton Laboratory, 
+The Software Librarian. Starlink Project, Rutherford Appleton Laboratory,
   Chilton, \\
 DIDCOT, Oxfordshire, OX11 0QX, United Kingdom.                \\
 \end{tabular}
@@ -734,7 +734,7 @@ Suggestions for enhancements and improvements to CURSA are also
 welcome.  Details of how to contact me are given below.
 \begin{flushright}
 Clive Davenhall \\
-\end{flushright} 
+\end{flushright}
 
 \vspace{3mm}
 
@@ -760,10 +760,10 @@ from overseas:                  & +44-131-668-8416 \\
 \newpage
 \subsection*{Acknowledgments}
 
-CURSA is far from being all my own work. Clive~Page, Rodney~Warren-Smith 
+CURSA is far from being all my own work. Clive~Page, Rodney~Warren-Smith
 and Alan~Wood have all been involved in aspects of its development.
 Indeed, Clive~Page wrote the expression parser which CURSA uses, and
-Appendix~\ref{EXPR} is based on documentation which he supplied. 
+Appendix~\ref{EXPR} is based on documentation which he supplied.
 Malcolm~Currie and Anne Sansom tested an early version of {\tt xcatview}
 and suggested several significant improvements. Numerous other people have
 made useful contributions.
@@ -771,10 +771,10 @@ made useful contributions.
 I am grateful to everyone who has contributed time and expertise.
 \begin{flushright}
 Clive Davenhall \\
-\raggedright {\it Department of Physics and Astronomy, University of 
+\raggedright {\it Department of Physics and Astronomy, University of
 Leicester \\
 Saint Indract's Day 1995}
-\end{flushright} 
+\end{flushright}
 
 Various items of external software have been introduced into version 3.1
 of CURSA which it is a pleasure to acknowledge.  {\tt catremote} accesses
@@ -791,7 +791,7 @@ suggested improvements to, CURSA.
 Clive Davenhall \\
 \raggedright {\it Institute for Astronomy, University of Edinburgh \\
 Saint M\'{e}dard's Day 1997}
-\end{flushright} 
+\end{flushright}
 
 I am grateful to John Lucey for useful discussions about photometric
 calibration and for kindly providing the data used in the example
@@ -803,7 +803,7 @@ photometric calibration.
 Clive Davenhall \\
 \raggedright {\it Institute for Astronomy, University of Edinburgh \\
 Saint Aed's Day 1997}
-\end{flushright} 
+\end{flushright}
 
 \newpage
 \subsection*{Revision history}
@@ -903,7 +903,7 @@ Saint Aed's Day 1997}
    {\Large\bf \stardoctitle \\ [2.5ex]
               \stardocversion} \\ [2ex]
    \rule{80mm}{0.5mm}
-   \end{center}   
+   \end{center}
    \vspace{20mm}
 
    \setlength{\parskip}{0mm}
@@ -959,7 +959,7 @@ selecting subsets from catalogues, sorting catalogues, copying catalogues,
 pairing two catalogues, converting catalogue coordinates between some
 celestial coordinate systems, plotting finding charts and photometric
 calibration.  Also, subsets can be extracted from a catalogue in a format
-suitable for plotting using other Starlink packages, such as PONGO. 
+suitable for plotting using other Starlink packages, such as PONGO.
 
 CURSA can access catalogues held in either the popular FITS table format,
 the Tab-Separated Table (TST) format or the Small Text List (STL) format.
@@ -995,9 +995,9 @@ in this format.  Some of the more generally useful ones are:
 
   \item {\it Selected Astronomical Catalogs volumes I, II, III and IV},
    produced by the US Astronomical Data Center (ADC) at the NASA Goddard
-   Space Flight Center, 
+   Space Flight Center,
 
-  \item {\it HST Guide Star Catalog}, produced by the NASA Space Telescope 
+  \item {\it HST Guide Star Catalog}, produced by the NASA Space Telescope
    Science Institute (see Section~\ref{GSCIN}, below),
 
   \item several of the {\it Einstein Observatory}\, CD-ROMs.
@@ -1048,7 +1048,7 @@ CURSA's facilities for manipulating and displaying angles (see
 Section~\ref{CELCOORD} and Appendix~\ref{ANGLE}).
 
 Further details of the CD-ROMs and the data centres may be found in the
-CURSA 
+CURSA
 `\htmladdnormallink{home page}{http://www.starlink.ac.uk/cursa/}'
 (see page~\pageref{HOMEPAGE} for the URL) and in SUN/162\cite{SUN162},
 though the latter is now somewhat out of date.
@@ -1078,7 +1078,7 @@ save it as a CURSA Tab-Separated Table (TST) format catalogue which can
 then be input to the other CURSA applications. This facility is available
 as part of {\tt xcatview} (see Section~\ref{XVIEW}) and as application {\tt
 catremote} (see Section~\ref{REMACCSS}).
- 
+
 In the past Starlink provided the SCAR (Starlink Catalogue Access and
 Reporting) system for manipulating astronomical catalogues on its
 VAX/VMS service. SCAR had its own unique format for storing catalogues.
@@ -1091,7 +1091,7 @@ page~\pageref{HOMEPAGE} for details).
 
 \section{\xlabel{START}Getting started}
 
-CURSA is an optional Starlink software item. Before proceeding you should 
+CURSA is an optional Starlink software item. Before proceeding you should
 check with your local site manager whether it is installed at your site,
 and if not attempt to persuade him to install it.  If CURSA is installed at
 your site the following directory should exist:
@@ -1116,8 +1116,8 @@ The following message should appear:
 If it does not, then the probable cause is that CURSA is not installed
 correctly at your site; check with your local site manager.
 
-You do not need any special quotas or privileges to use CURSA. However, 
-obviously, you need enough disk space to accommodate any catalogues 
+You do not need any special quotas or privileges to use CURSA. However,
+obviously, you need enough disk space to accommodate any catalogues
 that you might use and any output files that you might create.
 
 
@@ -1125,10 +1125,10 @@ that you might use and any output files that you might create.
 
 An astronomical {\bf catalogue} is basically a {\bf table} of values,
 consisting of the measurements of the same property for a set of
-objects, together with the auxiliary information necessary to describe 
-this table. There are several different terminologies for describing 
-the elements of such tables. For simplicity, in CURSA a terminology which 
-corresponds loosely to that used intuitively for the paper versions of 
+objects, together with the auxiliary information necessary to describe
+this table. There are several different terminologies for describing
+the elements of such tables. For simplicity, in CURSA a terminology which
+corresponds loosely to that used intuitively for the paper versions of
 astronomical catalogues is used:
 
 \begin{description}
@@ -1144,7 +1144,7 @@ astronomical catalogues is used:
 
 \end{description}
 
-Some of the other terminologies are shown for comparison in 
+Some of the other terminologies are shown for comparison in
 Table~\ref{TABLE_NOT}\footnote{This table is adapted from {\it
 Database Systems in Science and Engineering}\, by J.R.~Rumble and
 F.J.~Smith\cite{RUMBLE}, p158.}.
@@ -1175,9 +1175,9 @@ introducing any ambiguity. However, where it is necessary to
 differentiate between the two sorts of entities, {\bf table} is used
 to denote the simple matrix of rows and columns and {\bf catalogue} is
 used to denote the combination of a table and its associated auxiliary
-information. (Note, however, that this usage implies nothing about the 
+information. (Note, however, that this usage implies nothing about the
 contents of the catalogue; it may contain a published astronomical catalogue,
-a set of private astronomical results or, indeed, data which are entirely 
+a set of private astronomical results or, indeed, data which are entirely
 non-astronomical.)
 
 A CURSA catalogue which contains celestial coordinates in a restricted
@@ -1198,9 +1198,9 @@ in Section~\ref{COLS}, below.
 Catalogues can also contain auxiliary information which applies to the
 entire catalogue. CURSA recognises two types of auxiliary information:
 {\bf parameters} and {\bf textual information}. A {\bf parameter} is
-a single datum, such as the epoch or equinox of celestial coordinates stored 
+a single datum, such as the epoch or equinox of celestial coordinates stored
 in a catalogue. CURSA parameters are similar to FITS keywords (in
-fact, CURSA interprets named keywords in a FITS table as parameters). 
+fact, CURSA interprets named keywords in a FITS table as parameters).
 Parameters have attributes similar to columns.
 
 {\bf Textual information} is information, usually descriptive,
@@ -1248,16 +1248,16 @@ The name of the column. The rules for column names are as follows.
 
 \begin{itemize}
 
-  \item The name must be unique within the totality of parameters and 
-   columns for the catalogue. This condition is necessary in order that 
-   a component (parameter or column) may be identified unambiguously 
+  \item The name must be unique within the totality of parameters and
+   columns for the catalogue. This condition is necessary in order that
+   a component (parameter or column) may be identified unambiguously
    when its name is used in an expression (see Appendix~\ref{EXPR}).
 
-  \item A name may comprise up to fifteen characters. This value is chosen 
+  \item A name may comprise up to fifteen characters. This value is chosen
    for consistency with HDS and is adequate for FITS tables.
 
-  \item The name can contain only: upper or lower case alphabetic 
-   characters (a-z, A-Z), numeric characters (0-9) and the underscore 
+  \item The name can contain only: upper or lower case alphabetic
+   characters (a-z, A-Z), numeric characters (0-9) and the underscore
    character (`\_'). Note that lower case alphabetic characters must
    be allowed in order to access existing FITS tables. {\it However,
    corresponding upper and lower case characters are considered to be
@@ -1265,7 +1265,7 @@ The name of the column. The rules for column names are as follows.
    HD\_Number} and {\tt hd\_number} would all refer to the same column.
 
   \item The first character must be a letter.
-  
+
 \end{itemize}
 
 \paragraph{DTYPE}
@@ -1276,21 +1276,21 @@ and also signed one and two byte INTEGERs.
 \paragraph{DIMS}
 The dimensionality of the column: scalar or a vector.
 
-\paragraph{SIZE} 
-If the column is a vector this attribute contains the number of 
+\paragraph{SIZE}
+If the column is a vector this attribute contains the number of
 elements in the vector. If the column is a scalar it is set to one.
 
 \paragraph{UNITS}
 The units in which values stored in the column are expressed. The UNITS
 attribute is used to identify, and control the appearance of, columns
 of angles (see Appendix~\ref{ANGLE}). Apart from this exception the units
-are treated purely as comments and no attempts are made to automatically 
-propagate and convert units in calculations and selections. 
+are treated purely as comments and no attempts are made to automatically
+propagate and convert units in calculations and selections.
 
-\paragraph{EXFMT} 
-The format used to represent a field extracted from a column for 
-external display by {\tt xcatview} (see section~\ref{XVIEW}) or {\tt 
-catview} (see section~\ref{VIEW}). The external format specifier should be 
+\paragraph{EXFMT}
+The format used to represent a field extracted from a column for
+external display by {\tt xcatview} (see section~\ref{XVIEW}) or {\tt
+catview} (see section~\ref{VIEW}). The external format specifier should be
 a valid Fortran 77 format specifier for the data type of the column.
 
 \paragraph{COMM}
@@ -1299,25 +1299,25 @@ Explanatory comments describing the column.
 
 \section{\xlabel{NULLS}\label{NULLS}Null values}
 
-CURSA supports null values in catalogues. Null values are used to represent 
+CURSA supports null values in catalogues. Null values are used to represent
 a field for which no actual value is available. Null values can arise in
 several ways. They may be present in a catalogue when it is read by
-CURSA. An example might be a catalogue of multi-colour photometry for a 
-set of stars where measures for some colours were missing for some of the 
+CURSA. An example might be a catalogue of multi-colour photometry for a
+set of stars where measures for some colours were missing for some of the
 stars. Null values would be used to represent the missing values.
 Alternatively, they might arise where an expression is being used to
 compute a new column and evaluation of the expression for the current
 row results in a `$\div$ by zero' error. No valid value will be
 available for the expression, so a null value will be substituted.
 
-Throughout CURSA null values have the single, simple meaning that `no value 
-is available for this datum'. It is possible to invent schemes where a set 
-of null values are supported, each with a subtly different gradation of 
+Throughout CURSA null values have the single, simple meaning that `no value
+is available for this datum'. It is possible to invent schemes where a set
+of null values are supported, each with a subtly different gradation of
 meaning. However, CURSA does not support such schemes.
 
 \subsection{Processing null values}
 
-You do not need to know all the details of how CURSA manipulates null 
+You do not need to know all the details of how CURSA manipulates null
 values internally. However, the following points may be useful.
 
 \begin{itemize}
@@ -1354,22 +1354,22 @@ represented by the single character `{\tt ?}'.
 
 \section{\xlabel{CELCOORD}\label{CELCOORD}Celestial coordinates}
 
-Most astronomical catalogues contain columns of celestial 
-coordinates of some sort: usually Right Ascension and 
-Declination for some equinox and epoch, or perhaps Galactic or 
-ecliptic coordinates. The storage, manipulation and presentation 
-for display of celestial coordinates in the computer-readable 
-version of astronomical catalogues is something of a vexed topic 
-which has caused a deal of confusion and difficulty, much of it, 
+Most astronomical catalogues contain columns of celestial
+coordinates of some sort: usually Right Ascension and
+Declination for some equinox and epoch, or perhaps Galactic or
+ecliptic coordinates. The storage, manipulation and presentation
+for display of celestial coordinates in the computer-readable
+version of astronomical catalogues is something of a vexed topic
+which has caused a deal of confusion and difficulty, much of it,
 in principle, unnecessary.
 
 For preexisting catalogues, such as those described in
-Section~\ref{OBTAIN}, the format of the celestial 
+Section~\ref{OBTAIN}, the format of the celestial
 coordinates will already be fixed and CURSA will simply display the
-columns in whatever way is possible. For example, many catalogues 
-contain the hours, or degrees, minutes and seconds which 
-comprise a coordinate as separate columns; a form which is 
-singularly inconvenient for further processing. However, CURSA has 
+columns in whatever way is possible. For example, many catalogues
+contain the hours, or degrees, minutes and seconds which
+comprise a coordinate as separate columns; a form which is
+singularly inconvenient for further processing. However, CURSA has
 some special facilities for processing and displaying coordinates, and
 catalogues that have been specifically prepared for CURSA can take
 advantage of these.
@@ -1378,7 +1378,7 @@ CURSA can store columns of coordinates as radians but automatically
 present them as sexagesimal hours or degrees when they are listed by the
 browsing applications {\tt xcatview} (see Section~\ref{XVIEW}) or {\tt
 catview} (see Section~\ref{VIEW}). The advantages of this approach are
-that internally within CURSA the coordinates remain in radians, which is 
+that internally within CURSA the coordinates remain in radians, which is
 the most convenient form for computations, but they are presented to the
 user, and he interacts with them, as sexagesimal hours or degrees, which
 is the way that he naturally thinks about them.
@@ -1386,11 +1386,11 @@ is the way that he naturally thinks about them.
 Also, it is possible within {\tt xcatview} or {\tt catview} to
 interactively alter the precise way that a coordinate is formatted for
 display. These facilities are described in detail in
-Appendix~\ref{ANGLE}. Similarly, while displaying coordinates in units of 
-hours or degrees formatted as sexagesimal values is usually the required 
-behaviour, occasionally you may want to display angles as simple decimal 
+Appendix~\ref{ANGLE}. Similarly, while displaying coordinates in units of
+hours or degrees formatted as sexagesimal values is usually the required
+behaviour, occasionally you may want to display angles as simple decimal
 numbers expressed in radians (as they are represented internally). Both
-{\tt xcatview} and {\tt catview} provide this facility. 
+{\tt xcatview} and {\tt catview} provide this facility.
 
 CURSA application {\tt catgscin} (see Section~\ref{GSCIN}) reformats
 coordinates in regions of the HST {\it Guide Star Catalog}\, to a
@@ -1399,7 +1399,7 @@ format which is fully compatible with CURSA.  Similarly, {\tt catremote}
 from remote on-line catalogues, returns coordinates which are fully
 compatible.  Also, {\tt catcdsin} (see Section~\ref{CDSIN}) will
 usually reformat the text versions of CDS catalogues into STL format
-catalogues containing CURSA-compatible coordinates.  Finally, the CURSA 
+catalogues containing CURSA-compatible coordinates.  Finally, the CURSA
 `\htmladdnormallink{home page}{http://www.starlink.ac.uk/cursa/}'
 (see page~\pageref{HOMEPAGE} for the URL) contains a list of catalogues
 which have been converted to have coordinates which are fully compatible
@@ -1549,8 +1549,8 @@ catalogue formats are:
 
 The {\tt .GSC} and {\tt .gsc} file types for FITS tables are provided in
 order to allow regions of the HST {\it Guide Star Catalog}\, to be accessed
-easily. Other FITS tables obtained from an external source, such as those 
-mentioned in Section~\ref{OBTAIN}, may have a different file type. They 
+easily. Other FITS tables obtained from an external source, such as those
+mentioned in Section~\ref{OBTAIN}, may have a different file type. They
 must be renamed (with the Unix command {\tt mv}) to have a recognised file
 type before they can be accessed with CURSA.
 
@@ -1572,7 +1572,7 @@ so.}.
 Usually the table component of a FITS file occurs in the first FITS
 extension to the file. When reading an existing FITS file CURSA will look
 for a table in the first extension. In cases where the table is located
-in an extension other than the first you can specify the required 
+in an extension other than the first you can specify the required
 extension by giving its number inside curly brackets after the name
 of the file. For example, if the table occurred in the third extension
 of a FITS file called {\tt perseus.FIT} you would specify:
@@ -1632,7 +1632,7 @@ the following special replies may also be entered:
 
   \item[ {\tt !!} ] abort the application\footnote{Of course the
    application may also be aborted by typing `{\tt <Control-C>}'.
-   Typing `{\tt <Control-C>}' is less likely to tidy up properly any files 
+   Typing `{\tt <Control-C>}' is less likely to tidy up properly any files
    which are open, though this is unlikely to be important in
    practice.}.
 
@@ -1812,7 +1812,7 @@ manipulating catalogues and tables.  Using CAT it is straightforward to
 write your own programs to perform specialised tasks not covered by the
 more general CURSA applications. Programs written with CAT are fully
 inter-operable with the standard CURSA applications (in fact the CURSA
-applications themselves use CAT). CAT is comprehensively documented in 
+applications themselves use CAT). CAT is comprehensively documented in
 \xref{SUN/181}{sun181}{}\cite{SUN181}.  A set of simple example programs
 are included with the CAT library.
 
@@ -1839,7 +1839,7 @@ and will not attempt to interpret the celestial coordinates.
 There is a `home page' for FTOOLS at the GSFC.  The URL is:
 
 \begin{quote}
-\htmladdnormallink{{\tt 
+\htmladdnormallink{{\tt
 http://heasarc.gsfc.nasa.gov/docs/software/ftools/ftools\_menu.html}}
 {http://heasarc.gsfc.nasa.gov/docs/software/ftools/ftools_menu.html}
 \end{quote}
@@ -1849,7 +1849,7 @@ the Department of Physics and Astronomy, University of Leicester.  The
 URL is:
 
 \begin{quote}
-\htmladdnormallink{{\tt 
+\htmladdnormallink{{\tt
 http://ledas-www.star.le.ac.uk/ftools/ftools\_menu.html}}
 {http://ledas-www.star.le.ac.uk/ftools/ftools_menu.html}
 \end{quote}
@@ -1879,7 +1879,7 @@ Further information about Starbase is available from its `home page'
 at URL:
 
 \begin{quote}
-\htmladdnormallink{{\tt 
+\htmladdnormallink{{\tt
 http://cfa-www.harvard.edu/\~{}john/starbase/starbase.html}}
 {http://cfa-www.harvard.edu/\~{}john/starbase/starbase.html}
 \end{quote}
@@ -1942,7 +1942,7 @@ a normal Starlink node).
   \item creation of subsets defined by algebraic criteria. For example,
    if the catalogue again contained columns {\tt V} and {\tt B\_V} then
    to find the stars in the catalogue fainter than twelfth magnitude
-   and with a $B-V$\, of greater than 0.5 the criteria would be `{\tt 
+   and with a $B-V$\, of greater than 0.5 the criteria would be `{\tt
    V > 12.0 .AND. B\_V > 0.5}'. Again see Appendix~\ref{EXPR} for the
    syntax of expressions,
 
@@ -1987,7 +1987,7 @@ displayed for columns of any data type, though for CHARACTER and LOGICAL
 columns the only quantity which can be determined is the number of
 non-null rows.
 
-For each chosen column its name, data type and the number of non-null rows 
+For each chosen column its name, data type and the number of non-null rows
 (that is, the number of rows used in the calculation) are displayed and the
 statistics listed in Table~\ref{STATT} are computed.  Though all these
 quantities are standard statistics there is a remarkable amount of muddle
@@ -2043,7 +2043,7 @@ follows.
    corresponds exactly to a given quartile.  In this case the value is
    computed by averaging the two nearest elements.
 
-   The interquartile range is simply the positive difference between 
+   The interquartile range is simply the positive difference between
    $Q_{1}$and $Q_{3}$.
 
   \item The median is simply the second quartile ($j = 2$).  The mean has
@@ -2125,8 +2125,8 @@ running the same application in both cases. However, as a user you will
 not normally be concerned with these details.}, but is much less easy to
 use. Indeed it is not really intended for casual, interactive usage. If at
 all possible I recommend that you use {\tt xcatview} for casual, interactive
-browsing of a catalogue. However, if you do not have an X display available 
-then you will have to use {\tt catview}. It is also useful for running 
+browsing of a catalogue. However, if you do not have an X display available
+then you will have to use {\tt catview}. It is also useful for running
 prepared scripts which perform routine, standard, `batch' type operations.
 
 In order to run {\tt catview} type:
@@ -2142,7 +2142,7 @@ and the following prompt should appear:
 \end{verse}
 
 Using {\tt catview} you can create an arbitrary number of selections from
-the catalogue, each defined by its own criteria. {\tt catview} has the 
+the catalogue, each defined by its own criteria. {\tt catview} has the
 notion of the `current selection', which is the selection that it is
 working on currently.  Columns chosen for display to the screen or a
 text file, are listed from the current selection and statistics are
@@ -2195,7 +2195,7 @@ follows.
    name} and {\tt expression} are mandatory, but {\tt units} is
    optional. See Appendix~\ref{EXPR} for the syntax of expressions.
 
-   As an example, to list catalogue columns {\tt V}, {\tt B\_V} and a 
+   As an example, to list catalogue columns {\tt V}, {\tt B\_V} and a
    computed column {\tt B} defined by `{\tt V + B\_V}' you would enter:
 
   \begin{verse}
@@ -2206,7 +2206,7 @@ follows.
    which is longer than a single line.  Such long lists can be entered
    using a continuation line mechanism.  This mechanism is described in
    Section~\ref{LONGLINE}.
-  
+
   \item[ {\tt SHOWSEL} ] List details of all the selections which
    currently exist.
 
@@ -2234,7 +2234,7 @@ follows.
    maximum values can optionally be entered as sexagesimal values in
    hours or degrees.  The usual rules for interpreting sexagesimal
    values in expressions are followed.  For example any of the following
-   three values could be entered and all correspond to the same 
+   three values could be entered and all correspond to the same
    coordinate:
 
   \begin{center}
@@ -2371,8 +2371,8 @@ follows.
 
     \end{description}
 
-    \item[ {\tt TFLAG} ] Specify whether or not to copy the textual 
-     information associated with the original catalogue to the new 
+    \item[ {\tt TFLAG} ] Specify whether or not to copy the textual
+     information associated with the original catalogue to the new
      catalogue. The possible replies are:
 
     \begin{description}
@@ -2449,7 +2449,7 @@ follows.
 
   \item[ {\tt SETFILE} ] Set a number of configuration options for the
    output text file. Most of these options define the items which will
-   be included in the text file.   You will be prompted to supply the 
+   be included in the text file.   You will be prompted to supply the
    following options.
 
   \begin{description}
@@ -2508,7 +2508,7 @@ follows.
 
     \end{description}
 
-    \item[ {\tt FTABL} ] Specify whether a table of values is to be 
+    \item[ {\tt FTABL} ] Specify whether a table of values is to be
      included. The options are:
 
     \begin{description}
@@ -2545,7 +2545,7 @@ They should be typed exactly as you would enter them interactively.
 Figure~\ref{CATVIEW_SCRIPT} shows an example of a script for {\tt
 catview}. It selects quasars with redshift greater than three and
 brighter than nineteenth magnitude from a catalogue\footnote{The
-catalogue used in this example is the {\it Catalogue of Quasars and Active 
+catalogue used in this example is the {\it Catalogue of Quasars and Active
 Galactic Nuclei}\, by M.-P. Veron-Cetty and P. Veron\cite{VERON89}.}
 and writes selected columns from the subset to a file in a format suitable
 for passing to subsequent applications (that is, without any annotation).
@@ -2561,7 +2561,7 @@ The individual commands are:
   \item[ {\tt SETCMP} ] Specify the columns to be listed: {\tt ra},
    {\tt dec}, {\tt redshift}, {\tt v}.
 
-  \item[ {\tt SETFILE} ] Set the configuration options for the 
+  \item[ {\tt SETFILE} ] Set the configuration options for the
    information to be included in the text file.  The options given
    correspond to including only the specified columns, without any
    annotation.
@@ -3085,7 +3085,7 @@ Table~\ref{SELTYPT}.
    maximum values can optionally be entered as sexagesimal values in
    hours or degrees.  The usual rules for interpreting sexagesimal
    values in expressions are followed.  For example any of the following
-   three values could be entered and all correspond to the same 
+   three values could be entered and all correspond to the same
    coordinate:
 
   \begin{center}
@@ -3135,7 +3135,7 @@ Table~\ref{SELTYPT}.
    colon).  A decimal point and fractional seconds of arc can be entered
    if required.  For example, twenty-three and a half seconds of arc
    would be entered as `{\tt 0:23.5}'.
- 
+
   \item[Polygonal area] ({\tt SELTYP} option {\tt P}). \\
    This option selects all the rows which lie inside a polygon which you
    specify.  The polygon can be of an arbitrary shape and have an
@@ -3319,16 +3319,16 @@ All the other columns and parameters in the catalogue are simply copied.
   \item[ {\tt CATOUT} ] Enter the name of the output catalogue to
    contain the new coordinates.
 
-  \item[ {\tt EPOCHI} ] Specify the epoch of the input catalogue, 
+  \item[ {\tt EPOCHI} ] Specify the epoch of the input catalogue,
    for example, `{\tt J2000}' or `{\tt B1950}'.
 
-  \item[ {\tt EQUINI} ] Specify the equinox of the input catalogue, 
+  \item[ {\tt EQUINI} ] Specify the equinox of the input catalogue,
    for example, `{\tt J2000}' or `{\tt B1950}'.
 
   \item[ {\tt RAIN} ] Enter the name of the column containing Right
    Ascension in the input catalogue.
 
-  \item[ {\tt DECIN} ] Enter the name of the column containing 
+  \item[ {\tt DECIN} ] Enter the name of the column containing
    Declination in the input catalogue.
 
   \item[ {\tt PMRA} ] Enter the name of the column containing the
@@ -3347,10 +3347,10 @@ All the other columns and parameters in the catalogue are simply copied.
    radial velocity in the input catalogue.  Enter `{\tt NONE}' if no
    column is available.
 
-  \item[ {\tt EPOCHO} ] Specify the epoch of the output catalogue, 
+  \item[ {\tt EPOCHO} ] Specify the epoch of the output catalogue,
    for example, `{\tt J2000}' or `{\tt B1950}'.
 
-  \item[ {\tt EQUINO} ] Specify the equinox of the output catalogue, 
+  \item[ {\tt EQUINO} ] Specify the equinox of the output catalogue,
    for example, `{\tt J2000}' or `{\tt B1950}'.
 
   \item[ {\tt RAOUT} ] Enter the name of the column containing the
@@ -3661,7 +3661,7 @@ Section~\ref{COPYTEXT}.  You should then answer the following prompts.
 
 Example graphics translation files are available for most of the catalogues
 in the default list of remote on-line catalogues supplied with CURSA.
-The files available are listed in Table~\ref{EXAMPLEGRT}.  The 
+The files available are listed in Table~\ref{EXAMPLEGRT}.  The
 SuperCOSMOS graphics translation files both plot all the objects in
 the finding chart as ellipses.  In {\tt scosmosbw.grt} all the objects are
 plotted using the default colour (usually black objects on a white
@@ -3801,7 +3801,7 @@ ELSE IF VMAG >= 7.5  AND  VMAG < 9.0
   SYMBOL = filledcircle   ! filled circle,
   COLOUR = red            ! coloured red.
 
-ELSE 
+ELSE
   SYMBOL = opencircle     ! open circle,
   COLOUR = red            ! coloured red.
 
@@ -3824,7 +3824,7 @@ SIZE1  = scale(VMAG, 7.5D0, 1.0D1, 5.0D-2, 1.0D-2)
 
 Both the examples given here have shown the symbol size being scaled
 with magnitude.  However, it is important to realise that the
-expressions defining both {\tt SIZE1} and the {\tt IF \ldots ELSE \ldots 
+expressions defining both {\tt SIZE1} and the {\tt IF \ldots ELSE \ldots
 END IF} conditions can be any valid CURSA expressions (see
 Appendix~\ref{EXPR}) involving any columns in the target list.  Graphics
 translation files are provided for most of the catalogues in the default
@@ -3994,7 +3994,7 @@ and need to be scaled to produce a symbol size.
 
 \begin{description}
 
-  \item[{\tt scale(column, colmin, colmax, smin, smax)}] ~ 
+  \item[{\tt scale(column, colmin, colmax, smin, smax)}] ~
   \\ Performs a simple linear scaling.  {\tt column} is the name of
    the column to be scaled.  {\tt colmin} and {\tt colmax} are the
    minimum and maximum values in the column to be scaled.  If a
@@ -4210,7 +4210,7 @@ shows how to configure {\tt catview} to produce such an output file.
 Several plotting packages are available on Starlink. One such is PONGO,
 which is documented in \xref{SUN/137}{sun137}{}\cite{SUN137}.
 Figures~\ref{PONGO_SCATTER} and \ref{PONGO_AITOFF} show two example PONGO
-scripts for producing plots. Figure~\ref{PONGO_SCATTER} produces a 
+scripts for producing plots. Figure~\ref{PONGO_SCATTER} produces a
 scatter-plot of redshift against $V$\, magnitude from a table where the
 $V$\, magnitude is read from the fifth column and the redshift from the
 fourth.  Figure~\ref{PONGO_AITOFF} produces an all-sky plot using a PONGO
@@ -4303,14 +4303,14 @@ are fully documented in \xref{SUN/137}{sun137}{}.
 {\tt catpair} is provided to identify `corresponding' objects
 in two catalogues; objects are considered to correspond if they have
 similar positions. An output catalogue is generated from the list of
-corresponding objects. 
+corresponding objects.
 
-In astronomical catalogues the `corresponding' rows in two catalogues 
-are usually rows which contain data for the same astronomical object. 
-Traditionally in relational database systems corresponding rows are 
-identified by having identical values for some field, such as a name. 
-For example, two rows might be considered to correspond if a name field 
-in both catalogues adopted the value `NGC~1305' for both rows. This 
+In astronomical catalogues the `corresponding' rows in two catalogues
+are usually rows which contain data for the same astronomical object.
+Traditionally in relational database systems corresponding rows are
+identified by having identical values for some field, such as a name.
+For example, two rows might be considered to correspond if a name field
+in both catalogues adopted the value `NGC~1305' for both rows. This
 operation is usually called {\bf joining} the two catalogues.
 
 \begin{figure}[htbp]
@@ -4359,7 +4359,7 @@ process. In practice the positions used are almost always some type of
 two-dimensional coordinates; usually celestial coordinates such as Right
 Ascension and Declination, or possibly Cartesian coordinates of some
 sort. In principle one, three or higher dimensional coordinates could be
-used though they are not important in practice. {\tt catpair} only supports 
+used though they are not important in practice. {\tt catpair} only supports
 joining based on two-dimensional coordinates, though the coordinates
 may be either Cartesian or spherical-polar.
 
@@ -4368,12 +4368,12 @@ two-dimensional coordinates is called {\bf pairing}. Thus, in this
 usage, pairing is a special case of joining catalogues, albeit one which
 is important in astronomical practice.
 
-{\tt catpair} operates on two input catalogues, known as the {\bf primary} 
-and {\bf secondary} catalogues. To fix ideas, think of the primary as being 
-a small list of target objects which you have compiled, and the secondary 
-as being a standard catalogue, such as the SAO star catalogue, one of the 
-{\it Durchmusterungen}\, or Dreyer's {\it New General Catalogue}\, of 
-non-stellar objects. The final result of the pairing is a new catalogue 
+{\tt catpair} operates on two input catalogues, known as the {\bf primary}
+and {\bf secondary} catalogues. To fix ideas, think of the primary as being
+a small list of target objects which you have compiled, and the secondary
+as being a standard catalogue, such as the SAO star catalogue, one of the
+{\it Durchmusterungen}\, or Dreyer's {\it New General Catalogue}\, of
+non-stellar objects. The final result of the pairing is a new catalogue
 containing the paired objects; the {\bf output} catalogue.
 
 If you wish to pair several catalogues to create a single output
@@ -4382,11 +4382,11 @@ intermediate paired catalogues as appropriate.
 
 Pairing is a relatively complicated process and you must answer several
 prompts to fully specify the operations to be performed. The following
-two sections, `Requirements' and `Running {\tt catpair}' respectively 
-describe the requirements for {\tt catpair} and how to run it. You should 
-read at least these two sections. Subsequent sections describe various 
-aspects of the pairing process in greater detail. While it is not strictly 
-necessary to read these latter sections, they may help you to understand 
+two sections, `Requirements' and `Running {\tt catpair}' respectively
+describe the requirements for {\tt catpair} and how to run it. You should
+read at least these two sections. Subsequent sections describe various
+aspects of the pairing process in greater detail. While it is not strictly
+necessary to read these latter sections, they may help you to understand
 what {\tt catpair} is doing and hence to use it more effectively.
 
 
@@ -4395,8 +4395,8 @@ what {\tt catpair} is doing and hence to use it more effectively.
 Obviously before running {\tt catpair} you must have a primary and a
 secondary catalogue. The secondary catalogue {\it must}\, be sorted on
 the second column that is to be used for the pairing (usually this will
-be the $y$ or Declination coordinate). If your secondary is not sorted 
-in this way then use {\tt catsort} (see Section~\ref{SORT}, above) to 
+be the $y$ or Declination coordinate). If your secondary is not sorted
+in this way then use {\tt catsort} (see Section~\ref{SORT}, above) to
 create a suitably sorted secondary catalogue.
 
 You need to know the names of the columns in both catalogues which
@@ -4407,7 +4407,7 @@ Section~\ref{HEAD}, above) to obtain the details. If the coordinates
 are Cartesian then the coordinates in both input catalogues must be in
 the same system, with the same units,\footnote{{\tt catpair} does not
 actually check that the units attribute is the same for the various
-columns holding the coordinates because in CURSA units are treated 
+columns holding the coordinates because in CURSA units are treated
 purely as comments.} zero point and orientation. That is, a given value
 for the coordinates (say 23.5, 105.7) should correspond to the same
 position in both catalogues. If the coordinates are spherical-polar
@@ -4421,7 +4421,7 @@ whether two objects, one in each catalogue, are considered pairs or not.
 If the actual separation of the two objects is less than or equal to
 this distance then they are considered pairs; if it is greater then they
 are not. In {\tt catpair} this critical distance may be either a
-constant, a column in the primary (so it varies for different objects in 
+constant, a column in the primary (so it varies for different objects in
 the primary) or an expression based on columns in the primary. In
 practice the value adopted for the critical distance is often derived
 from the errors associated with the positions in the catalogues. If
@@ -4477,7 +4477,7 @@ of the prompt line.
    column to be used in the pairing (usually the $y$ or Declination
    coordinate).
 
-  \item[ {\tt OUTPUT} ] Enter the name of the output catalogue to 
+  \item[ {\tt OUTPUT} ] Enter the name of the output catalogue to
    contain the set of paired objects. A catalogue with this name must {\it
    not}\, already exist. {\tt catpair} will automatically create the output
    catalogue {\it in toto}.
@@ -4648,8 +4648,8 @@ multiple matches.
 If you choose to retain in the output catalogue only some of the columns
 in the two input catalogues you will be prompted to supply the names of
 the columns required and hence you must be prepared with this information.
-If you are not familiar with the details of the columns in your input 
-catalogues you can use {\tt catheader} (see Section~\ref{HEAD}, above) to 
+If you are not familiar with the details of the columns in your input
+catalogues you can use {\tt catheader} (see Section~\ref{HEAD}, above) to
 obtain the necessary information.
 
 Once you have indicated that you are to retain only specified columns (by
@@ -4721,7 +4721,7 @@ using a text editor. Then type:
 \end{verse}
 
 where {\it script\_file}\, is the name of the file you have created.
-Figure~\ref{PAIR_SCRIPT_EXAM} shows an annotated example {\tt catpair} 
+Figure~\ref{PAIR_SCRIPT_EXAM} shows an annotated example {\tt catpair}
 script for pairing with Cartesian coordinates.  This script is available
 as file:
 
@@ -4773,7 +4773,7 @@ developing your own scripts.
 
 \begin{quote}
 The column on the left (in a {\tt courier} font) shows the entries in a
-{\tt catpair} script file. The column on the right (in a roman font) briefly 
+{\tt catpair} script file. The column on the right (in a roman font) briefly
 describes the corresponding entry.
 \end{quote}
 
@@ -4788,7 +4788,7 @@ describes the corresponding entry.
 This section discusses the criteria used to determine whether two
 objects, one from each of the two input catalogues, `correspond' or
 pair. The two objects pair if the difference in their two-dimensional
-coordinates is smaller than some specified critical distance, $D$. The 
+coordinates is smaller than some specified critical distance, $D$. The
 formul\ae\ differ for Cartesian and celestial coordinates.
 
 \subsubsection{Cartesian coordinates}
@@ -4819,7 +4819,7 @@ simply derived by applying spherical trigonometry to the two
 coordinates. In practice it has the disadvantage that because of
 numerical errors it is inaccurate when the great circle distance is a
 small angle. There are algebraically equivalent formulations which
-retain numerical accuracy for small angles. In {\tt catpair} the great 
+retain numerical accuracy for small angles. In {\tt catpair} the great
 circle distance is calculated using the appropriate SLA routine\footnote{See
 \xref{SUN/67}{sun67}{}\cite{SUN67}. The actual routine used is {\tt
 SLA\_DSEP}.}, which uses such a formulation in order to ensure accuracy for
@@ -4837,9 +4837,9 @@ $D$, are supported by {\tt catpair}.
    twenty-three minutes of arc or less.  Of the various cases this is
    the simplest.
 
-  \item It adopts the value of a column in the primary. Typically such a 
-   column would be an error associated with the position; objects with a 
-   small error would only pair with a nearby object, but objects with a 
+  \item It adopts the value of a column in the primary. Typically such a
+   column would be an error associated with the position; objects with a
+   small error would only pair with a nearby object, but objects with a
    large error would pair with objects further away.
 
   \item It adopts a value computed from an expression involving columns
@@ -4849,11 +4849,11 @@ $D$, are supported by {\tt catpair}.
 
 A fourth case in which the critical distance is computed from an
 expression involving columns in {\it both}\, catalogues is {\it not}\,
-supported in {\tt catpair}. A special instance of this case which sometimes 
-arises is where both input catalogues have errors in their coordinates which 
-vary with the objects in the catalogues and thus are stored as columns, one 
-in each catalogue. Objects are considered to pair when their error circles 
-overlap. Here the expression for the critical distance, $D$, would involve 
+supported in {\tt catpair}. A special instance of this case which sometimes
+arises is where both input catalogues have errors in their coordinates which
+vary with the objects in the catalogues and thus are stored as columns, one
+in each catalogue. Objects are considered to pair when their error circles
+overlap. Here the expression for the critical distance, $D$, would involve
 columns (containing the errors) from both catalogues and hence this case is
 {\it not}\, supported.
 
@@ -4888,8 +4888,8 @@ columns (containing the errors) from both catalogues and hence this case is
 
 \end{figure}
 
-Figure~\ref{PAIR_JOINED_CAT} illustrates the result of pairing two catalogues, 
-with a set of corresponding rows in the catalogues identified. There are a 
+Figure~\ref{PAIR_JOINED_CAT} illustrates the result of pairing two catalogues,
+with a set of corresponding rows in the catalogues identified. There are a
 number of options for the set of rows to be included in an output catalogue
 generated from such a pairing. The various alternatives available in
 {\tt catpair} are described below.
@@ -4907,7 +4907,7 @@ generated from such a pairing. The various alternatives available in
    actual values, for unpaired objects they will contain null values.
    The corresponding case of retaining all the rows in the secondary
    can be realised by regarding the primary as the secondary and vice
-   versa. This option might also be used when pairing a list of target 
+   versa. This option might also be used when pairing a list of target
    stars with a standard catalogue.
 
   \item[MOSAIC] The output catalogue contains a row for every paired row
@@ -4916,12 +4916,12 @@ generated from such a pairing. The various alternatives available in
    larger area of sky from several slightly overlapping catalogues.
 
   \item[PRIMREJ] Only the unpaired objects in the primary catalogue are
-   retained.    The corresponding case of retaining all the unpaired rows in 
-   the secondary can be realised by regarding the primary as the secondary 
+   retained.    The corresponding case of retaining all the unpaired rows in
+   the secondary can be realised by regarding the primary as the secondary
    and vice versa. This option might be used in proper motion studies.
 
   \item[ALLREJ] The output catalogue contains a row for all the unpaired
-   objects in either catalogue. This option might also be used in proper 
+   objects in either catalogue. This option might also be used in proper
    motion studies.
 
 \end{description}
@@ -4930,9 +4930,9 @@ generated from such a pairing. The various alternatives available in
 \subsection{\label{PAIR_MULTIPLE}Multiple matches}
 
 This section describes how multiple matches are handled by {\tt
-catpair}. Multiple matches can arise because the pairing techniques are 
+catpair}. Multiple matches can arise because the pairing techniques are
 matching objects with similar rather than identical positions and
-an object in one catalogue can pair with several in the other catalogue. 
+an object in one catalogue can pair with several in the other catalogue.
 The terminology used in this section is:
 
 \begin{description}
@@ -4946,7 +4946,7 @@ The terminology used in this section is:
 \end{description}
 
 That is, any match is potentially a pair and the pairing algorithm must
-prescribe which matches are considered pairs. There are three cases for 
+prescribe which matches are considered pairs. There are three cases for
 multiple matches:
 
 \begin{enumerate}
@@ -4964,7 +4964,7 @@ multiple matches:
 \end{enumerate}
 
 {\tt catpair} is unsuitable for handling the third case, and should {\it
-not}\, be used with catalogues where it is likely to be important. There are, 
+not}\, be used with catalogues where it is likely to be important. There are,
 however, several options for handling the first two cases:
 
 \begin{enumerate}
@@ -4979,8 +4979,8 @@ however, several options for handling the first two cases:
 \end{enumerate}
 
 The third option is not practical in a general purpose program such as
-{\tt catpair} because it relies on astronomical knowledge about the 
-catalogues being paired. Either of the first two options may be 
+{\tt catpair} because it relies on astronomical knowledge about the
+catalogues being paired. Either of the first two options may be
 appropriate, depending on the details of the pairing being performed.
 {\tt catpair} provides both options separately for multiple matches in
 the primary and secondary, and you should choose the alternatives
@@ -5077,15 +5077,15 @@ following two cases.
 
 \begin{itemize}
 
-  \item If a target object in the primary had coordinates \hm{11}{19}{5}, 
-   \dm{+13}{20} with an error circle of 30\arcmin then all three galaxies 
-   would be matches. This case is an example of multiple matches in the 
-   secondary. 
+  \item If a target object in the primary had coordinates \hm{11}{19}{5},
+   \dm{+13}{20} with an error circle of 30\arcmin then all three galaxies
+   would be matches. This case is an example of multiple matches in the
+   secondary.
 
-  \item Conversely, if there were two target objects with coordinates of 
-   \hm{11}{18}{8}, \dm{+13}{01} and \hm{11}{18}{9}, \dm{+13}{07} and both 
-   with an error circle of 10\arcmin then they would both match NGC~3623 and 
-   neither would match the other members of the triplet. This case is an 
+  \item Conversely, if there were two target objects with coordinates of
+   \hm{11}{18}{8}, \dm{+13}{01} and \hm{11}{18}{9}, \dm{+13}{07} and both
+   with an error circle of 10\arcmin then they would both match NGC~3623 and
+   neither would match the other members of the triplet. This case is an
    example of multiple matches in the primary.
 
 \end{itemize}
@@ -5138,10 +5138,10 @@ NGC & \multicolumn{2}{c}{$\alpha$} & \multicolumn{2}{c}{$\delta$} \\ \hline
 This section describes the pairing algorithm used by {\tt catpair}.
 Strictly speaking you should not need to know the details of the
 algorithm in order to use {\tt catpair}, but the information is
-provided for reference and completeness. {\tt catpair} uses an index join 
+provided for reference and completeness. {\tt catpair} uses an index join
 technique which is illustrated in Figure~\ref{PAIR_INDEX_JOIN}. The
 secondary catalogue is sorted on the second coordinate to be used in
-the pairing.\footnote{Spherical-polar coordinates must be sorted on 
+the pairing.\footnote{Spherical-polar coordinates must be sorted on
 Declination or latitude in order to avoid problems with the zero --
 twenty-four hour boundary.} The algorithm is then as follows. Every
 entry in the primary catalogue is examined sequentially and for each
@@ -5154,11 +5154,11 @@ pair. All of these rows are then examined individually to check if
 they do pair.
 
 The advantages of this technique are that it is relatively straightforward
-and it does not require the primary catalogue to be sorted (though the 
-secondary must). The main disadvantage is that the ranges in the secondary 
-corresponding to subsequent rows in the primary may overlap, thus leading 
-to multiple reads of rows in the secondary. The technique is most 
-appropriate where a small primary is being paired with a large secondary; 
+and it does not require the primary catalogue to be sorted (though the
+secondary must). The main disadvantage is that the ranges in the secondary
+corresponding to subsequent rows in the primary may overlap, thus leading
+to multiple reads of rows in the secondary. The technique is most
+appropriate where a small primary is being paired with a large secondary;
 perhaps a small personal list of target objects is being paired with a
 large standard catalogue. However, it will certainly work if
 the primary and secondary are of similar size; it will merely take
@@ -5525,7 +5525,7 @@ The usual sequence of using these applications is:
 
   \item run {\tt catphotomtrn} to apply the transformation coefficients
    to the programme objects and determine calibrated magnitudes for
-   them. 
+   them.
 
 \end{enumerate}
 
@@ -5719,7 +5719,7 @@ For completeness, and to avoid any possible ambiguity, the formula used
 to compute the standard deviation, $s$, is:
 
 \begin{equation}
-s = \sqrt{ \frac{1}{(n - 1)} 
+s = \sqrt{ \frac{1}{(n - 1)}
     \sum_{i=1}^{n} (m(i)_{\rm catalogue} - m(i)_{\rm calculated})^2 }
 \end{equation}
 
@@ -5823,7 +5823,7 @@ is adequate for all normal needs as it is accurate to better than 0.1\%
 up to $X = 6.8$ and better than 1\% up to $X = 10$.  Bemporad's tabulated
 values are unlikely to be trustworthy to such accuracy because of
 variations in density, pressure and other conditions in the atmosphere
-from those that he assumed.  At zenith distances greater than about 
+from those that he assumed.  At zenith distances greater than about
 $87^{\circ}$ the air mass is held constant to avoid arithmetic overflows.
 
 
@@ -6024,8 +6024,8 @@ Such occurrences seem to be rare.
 The Hubble Space Telescope {\it Guide Star Catalog}\, (GSC, see
 Section~\ref{OBTAIN}, above) is divided into some 9537 regions and
 each region is held as a separate FITS table file. These FITS tables can
-be read directly by CURSA. However, there is a CURSA utility to convert 
-them to a more convenient format. I recommend that you use it to 
+be read directly by CURSA. However, there is a CURSA utility to convert
+them to a more convenient format. I recommend that you use it to
 convert a region before accessing the region with other CURSA applications.
 The utility generates a new version of the region with the following
 changes:
@@ -6049,7 +6049,7 @@ In order to convert a GSC region simply type:
 
 The amount of textual
 information written to the output catalogue is controlled using the
-command line mechanism described in Section~\ref{COPYTEXT}.  
+command line mechanism described in Section~\ref{COPYTEXT}.
 You then answer the following prompt.
 
 \begin{description}
@@ -6081,7 +6081,7 @@ catremote} or the catalogue browser {\tt xcatview}\footnote{Technically
 {\tt catremote} to access the remote catalogue, though as a user you
 will not normally be concerned with these details.  Note, however,
 that the command line catalogue browser, {\tt catview}, cannot access
-remote catalogues.} (see Section~\ref{XVIEW}).  {\tt catremote} and 
+remote catalogues.} (see Section~\ref{XVIEW}).  {\tt catremote} and
 {\tt xcatview} provide the same functionality for accessing remote
 catalogues, though {\tt xcatview} is slightly more convenient to use.
 Currently the only sort of selection which is permitted on remote
@@ -6359,7 +6359,7 @@ resolver.  The details of individual arguments are as follows.
 
   \item[{\it name-resolver}\/] The name of the name resolver which is to
    be queried.  In the above examples the SIMBAD name resolver provided by
-   ESO using the SIMBAD integrated database maintained by the 
+   ESO using the SIMBAD integrated database maintained by the
    \htmladdnormallink{Centre de Donn\'{e}es astronomiques de Strasbourg}
    {http://cdsweb.u-strasbg.fr/CDS.html} (CDS) is being used.  This name
    resolver is included in the default list of remote on-line catalogues
@@ -6472,10 +6472,10 @@ communicate.  This protocol is a subset of a proposed general format
 for exchanging information between remote astronomical information services
 which is being developed at the Centre de Donn\'{e}es astronomiques de
 Strasbourg (CDS) and elsewhere.  The proposal is described in the
-working document {\it Astronomical Server URL}\, by M.~Albrecht {\it et 
-al.}\cite{SERVERURL}.  It is important to realise that this protocol 
+working document {\it Astronomical Server URL}\, by M.~Albrecht {\it et
+al.}\cite{SERVERURL}.  It is important to realise that this protocol
 is general, and allows not just {\tt catremote}, but also various other
-clients, such as \xref{GAIA}{sun214}{}\cite{SUN214} and 
+clients, such as \xref{GAIA}{sun214}{}\cite{SUN214} and
 \htmladdnormallinkfoot{{\it SkyCat}\/}{http://archive.eso.org/skycat/},
 to communicate with various different servers for differing purposes.
 Thus, it is not optimised for {\tt catremote}, resulting in some
@@ -6586,10 +6586,10 @@ described here.
 
 \subsection{Creating a new column}
 
-Expressions for creating a new column have an algebraic format, and comprise: 
-columns, vector column elements, parameters and constants linked by 
-arithmetic operators and mathematical functions. For example, suppose that 
-a catalogue contained scalar columns called {\tt x}, {\tt y} and {\tt z} 
+Expressions for creating a new column have an algebraic format, and comprise:
+columns, vector column elements, parameters and constants linked by
+arithmetic operators and mathematical functions. For example, suppose that
+a catalogue contained scalar columns called {\tt x}, {\tt y} and {\tt z}
 and parameters called {\tt p} and {\tt q}.  Some valid expressions are:
 
 \begin{equation}
@@ -6612,10 +6612,10 @@ equivalent:
 {\tt hd\_number}
 \end{verse}
 
-Vector column elements occur in expressions with their usual syntax: 
-the name of the base column followed by the element number enclosed 
-in square brackets. The first element in a vector is numbered one. For 
-example, an expression to add two to the fourth element of vector 
+Vector column elements occur in expressions with their usual syntax:
+the name of the base column followed by the element number enclosed
+in square brackets. The first element in a vector is numbered one. For
+example, an expression to add two to the fourth element of vector
 {\tt FLUX} would be `{\tt FLUX[4] + 2.0}'.
 
 \subsection{Defining a new selection}
@@ -6660,14 +6660,14 @@ brackets (`{\tt (}' and `{\tt )}') may be used as required.
 
 \subsection{Mathematical functions provided}
 
-Table~\ref{FUNCS} lists the mathematical functions which are provided. 
-The letters denote data types permitted, coded as follows: B = BYTE, 
-H = half INTEGER, I = INTEGER, R = REAL, D = DOUBLE PRECISION, C = 
-CHARACTER, L = LOGICAL. The appearance of N as an argument means that 
-any numeric type (BHIRD) is permitted, as a result it means that the 
-type is the widest type of any of the arguments.  R/D means that the 
-result is REAL unless one or more arguments is of DOUBLE PRECISION 
-type in which case D is the result. 
+Table~\ref{FUNCS} lists the mathematical functions which are provided.
+The letters denote data types permitted, coded as follows: B = BYTE,
+H = half INTEGER, I = INTEGER, R = REAL, D = DOUBLE PRECISION, C =
+CHARACTER, L = LOGICAL. The appearance of N as an argument means that
+any numeric type (BHIRD) is permitted, as a result it means that the
+type is the widest type of any of the arguments.  R/D means that the
+result is REAL unless one or more arguments is of DOUBLE PRECISION
+type in which case D is the result.
 
 \begin{table}[htbp]
 
@@ -6714,7 +6714,7 @@ D = GREAT(N,N,N,N)  & great circle distance between two spherical \\
                     & coordinates. All the input arguments and the \\
                     & return argument are in radians. The input arguments \\
       & are in the order: $(\alpha_{1},\delta_{1}$,$\alpha_{2},\delta_{2})$ \\
-D = PANGLE(N,N,N,N) & position angle of point $(\alpha_{2},\delta_{2})$ 
+D = PANGLE(N,N,N,N) & position angle of point $(\alpha_{2},\delta_{2})$
       from point \\
       & $(\alpha_{1},\delta_{1})$.  All the input arguments and the return \\
       & argument are in radians. The input arguments are in \\
@@ -6731,64 +6731,64 @@ D = PANGLE(N,N,N,N) & position angle of point $(\alpha_{2},\delta_{2})$
 \subsection{Rules for expressions}
 
 The expression string can contain constants, column and parameter names,
-operators, functions, and parentheses.  In general the usual rules of 
+operators, functions, and parentheses.  In general the usual rules of
 algebra and Fortran should be followed, with some minor exceptions
 as noted below.
 
 \begin{enumerate}
 
-  \item Spaces are permitted between items, except that a function-name 
+  \item Spaces are permitted between items, except that a function-name
    must be followed immediately by a left parenthesis.  Spaces are not
    permitted within items such as names and numerical constants, but can be
-   used within character strings and date/time values in curly braces. 
+   used within character strings and date/time values in curly braces.
 
-  \item Lower-case letters are treated everywhere as identical to the 
+  \item Lower-case letters are treated everywhere as identical to the
    corresponding upper-case letter.
 
   \item Column and parameter names can be up to fifteen characters long, and
    may consist of letters, digits, and underscores, except that the first
    character must not be a digit.
 
-  \item Vector elements are supported but with a restricted syntax: 
-   they may consist of a name followed by an unsigned integer constant 
-   subscript enclosed in square brackets, for example {\tt FLUX[4]} or 
+  \item Vector elements are supported but with a restricted syntax:
+   they may consist of a name followed by an unsigned integer constant
+   subscript enclosed in square brackets, for example {\tt FLUX[4]} or
    {\tt MAGNITUDE[13]}. The first element of the vector is numbered one.
 
-  \item CHARACTER constants may be enclosed in a pair of single or 
-   double quotes; embedded quotes of the same type may be denoted by 
-   doubling up on the quote character within the string, for example 
+  \item CHARACTER constants may be enclosed in a pair of single or
+   double quotes; embedded quotes of the same type may be denoted by
+   doubling up on the quote character within the string, for example
    \verb+'DON''T'+ or \verb+"DON""T"+.
 
-  \item LOGICAL constants may be {\tt .TRUE.} or {\tt .FALSE.} but 
+  \item LOGICAL constants may be {\tt .TRUE.} or {\tt .FALSE.} but
    abbreviations of these words are allowed down to {\tt .T.} and
    {\tt .F.}
 
-  \item Numerical constants may appear in any valid form for Fortran 77 
-   (except that embedded spaces are not allowed).  Some additional forms 
+  \item Numerical constants may appear in any valid form for Fortran 77
+   (except that embedded spaces are not allowed).  Some additional forms
    are also permitted, as shown below.
 
   \item \%Xstring \%Ostring \%Bstring for hexadecimal, octal and binary
    INTEGER constants respectively.
 
-  \item Angles in sexagesimal notation: colons must be used to separate 
+  \item Angles in sexagesimal notation: colons must be used to separate
    items, for example hours:minutes:seconds (or degrees:minutes:seconds).
    If there is a leading sign then the value will be taken as
    degrees:minutes:seconds, otherwise hours:minutes:seconds.  In either
    case the value is converted to RADIANS.
 
-  \item A date/time value may be given as a string enclosed in curly 
+  \item A date/time value may be given as a string enclosed in curly
    braces; a range of common formats are permitted, with order
    year-month-day or day-month-year, and the month as a number or
    three-character abbreviation.  The time may follow with colons separating
-   hours:minutes:seconds.  Examples of some valid dates: 
+   hours:minutes:seconds.  Examples of some valid dates:
   \begin{verse}
    {\tt 1992-JUL-26 12:34:56}  \\
    {\tt 92.7.26}  \\
    {\tt 26/7/92T3:45}
   \end{verse}
 
-  \item Relational operators are supported in both Fortran 77 form 
-   (for example {\tt .GE. .NE.}) as well as in the Fortran 90 forms (for 
+  \item Relational operators are supported in both Fortran 77 form
+   (for example {\tt .GE. .NE.}) as well as in the Fortran 90 forms (for
    example, ${\tt >=}$ ${\tt /=}$ ).
 
   \item Single-symbol forms for {\tt .AND. .OR. and .NOT.} are provided as
@@ -6798,9 +6798,9 @@ as noted below.
    operators and the logical operators {\tt .AND.} and {\tt .OR.} where
    spaces or parentheses separate them from names or constants, but the
    logical constants and the {\tt .NOT.} operator need the enclosing dots
-   to distinguish them from other lexical items in all cases. 
+   to distinguish them from other lexical items in all cases.
 
-  \item INTEGER division does not result in truncation (as in Fortran) 
+  \item INTEGER division does not result in truncation (as in Fortran)
    but produces a floating-point result.  The {\tt NINT} or {\tt INT}
    function should be used (as appropriate) if an INTEGER result is
    required.
@@ -6808,7 +6808,7 @@ as noted below.
   \item The functions {\tt MAX} and {\tt MIN} must have exactly two
    arguments.
 
-  \item All arithmetic is carried out internally in DOUBLE PRECISION 
+  \item All arithmetic is carried out internally in DOUBLE PRECISION
    (but the compiler works out the effective data type of the result using
    the normal expression rules).
 
@@ -6820,8 +6820,8 @@ as noted below.
 
 \subsection{Operator precedence}
 
-The operator precedence rules are show in Table~\ref{PREC}. The rules 
-of Fortran 90 are used as far as possible; in this table the larger 
+The operator precedence rules are show in Table~\ref{PREC}. The rules
+of Fortran 90 are used as far as possible; in this table the larger
 numbers denote higher precedence (tighter binding).
 
 \begin{table}[htbp]
@@ -6857,7 +6857,7 @@ Note that all operators except {\tt **} associate from left to right, but
 
 \section{\xlabel{ANGLE}\label{ANGLE}Storing and representing columns of angles}
 
-CURSA provides special facilities for representing columns which 
+CURSA provides special facilities for representing columns which
 contain angles. Usually angular columns are used to store celestial
 coordinates such as Right Ascension and Declination, position angles
 or small angles such as the great circle distance between neighbouring
@@ -6873,16 +6873,16 @@ combination of the DTYPE (data type) and UNITS attributes.
 
 \begin{itemize}
 
-  \item The data type must be DOUBLE PRECISION or 
+  \item The data type must be DOUBLE PRECISION or
    REAL,\footnote{DOUBLE PRECISION is more common in practice because
    REAL numbers are insufficiently accurate to represent an angle to
    a precision of a second of arc or better.}
 
-  \item The units attribute of the column should be set to 
-   `{\tt RADIANS}' followed by an angular format specifier 
-   enclosed in curly brackets (`\{\}'). The simplest forms of this 
-   angular format specifier are simply `{\tt HOURS}' and `{\tt 
-   DEGREES}' for hours and degrees respectively. Thus, examples of 
+  \item The units attribute of the column should be set to
+   `{\tt RADIANS}' followed by an angular format specifier
+   enclosed in curly brackets (`\{\}'). The simplest forms of this
+   angular format specifier are simply `{\tt HOURS}' and `{\tt
+   DEGREES}' for hours and degrees respectively. Thus, examples of
    the UNITS attribute are:
 
   \begin{description}
@@ -6899,7 +6899,7 @@ combination of the DTYPE (data type) and UNITS attributes.
 \end{itemize}
 
 Incidentally, the external display format attribute of the column, EXFMT,
-must be set to a valid Fortran 77 format specifier corresponding to the 
+must be set to a valid Fortran 77 format specifier corresponding to the
 data type of the column, because of the way that CURSA represents
 catalogues as FITS tables.
 
@@ -6925,24 +6925,24 @@ form:
 {\tt RADIANS\{angular format specifier\} }
 \end{center}
 
-The simplest angular format specifiers are `{\tt HOURS}' and 
+The simplest angular format specifiers are `{\tt HOURS}' and
 `{\tt DEGREES}'.
 
 \begin{description}
 
-  \item[{\tt HOURS}] will cause the angle to be displayed as 
-   hours, minutes and seconds, with the seconds displayed to one 
+  \item[{\tt HOURS}] will cause the angle to be displayed as
+   hours, minutes and seconds, with the seconds displayed to one
    place of decimals,
 
-  \item[{\tt DEGREES}] will cause the angle to be displayed as 
-   degrees, minutes and seconds, with the seconds displayed as a 
+  \item[{\tt DEGREES}] will cause the angle to be displayed as
+   degrees, minutes and seconds, with the seconds displayed as a
    whole number.
 
 \end{description}
 
-If the angular format specifier is omitted altogether and 
-the UNITS attribute simply set to `{\tt RADIANS}' or `{\tt 
-RADIANS\{\}}' then the angle will be interpreted exactly as 
+If the angular format specifier is omitted altogether and
+the UNITS attribute simply set to `{\tt RADIANS}' or `{\tt
+RADIANS\{\}}' then the angle will be interpreted exactly as
 though the angular format specifier had been `{\tt DEGREES}'.
 There are additional simple angular format specifiers for displaying
 angles as minutes or seconds of arc or time to a specified number of
@@ -6966,12 +6966,12 @@ omitted then the value will be displayed as an integer number.  Though
 these angular specifiers can be used to display any angle, obviously
 they are most likely to be useful for small angles.
 
-These simple angular format specifiers will usually be 
-adequate for representing columns of celestial coordinates. 
-However, sometimes you might wish to specify a different 
+These simple angular format specifiers will usually be
+adequate for representing columns of celestial coordinates.
+However, sometimes you might wish to specify a different
 representation for an angle. CURSA accepts angular
-format specifiers which permit angles to be represented in a 
-number of different formats. These specifiers are constructed 
+format specifiers which permit angles to be represented in a
+number of different formats. These specifiers are constructed
 from a selection from amongst the following elements:
 
 \begin{center}
@@ -6982,19 +6982,19 @@ The meaning of each of the individual elements is as follows.
 
 \begin{description}
 
-  \item[{\tt I}] Use the ISO standard separator for expressing 
-   times, a colon (`:'), to separate hours or degrees, minutes and 
+  \item[{\tt I}] Use the ISO standard separator for expressing
+   times, a colon (`:'), to separate hours or degrees, minutes and
    seconds.
 
-  \item[{\tt B}] Use a single blank space to separate hours or 
+  \item[{\tt B}] Use a single blank space to separate hours or
    degrees, minutes and seconds.
 
-  \item[{\tt L}] Use a letter ({\tt h}, {\tt d}, {\tt m}, or 
-   {\tt s}, as appropriate) to separate hours or degrees, minutes 
-   and seconds. 
+  \item[{\tt L}] Use a letter ({\tt h}, {\tt d}, {\tt m}, or
+   {\tt s}, as appropriate) to separate hours or degrees, minutes
+   and seconds.
 
-  \item[{\tt +}] Insert a plus sign (`$+$') before positive angles 
-   (a minus sign is, of course, always inserted before negative 
+  \item[{\tt +}] Insert a plus sign (`$+$') before positive angles
+   (a minus sign is, of course, always inserted before negative
    angles).
 
   \item[{\tt Z}] Insert leading zeros before the hours, degrees, minutes
@@ -7024,21 +7024,21 @@ The meaning of each of the individual elements is as follows.
    omitted in this case then the units are minutes or seconds of arc.
    If either {\tt H} or {\tt D} is present then {\tt T} is ignored.
 
-  \item[{\it .n}] Display the least significant unit (seconds, 
-   minutes, degrees or hours, as appropriate) to {\it n}\, decimal 
+  \item[{\it .n}] Display the least significant unit (seconds,
+   minutes, degrees or hours, as appropriate) to {\it n}\, decimal
    places.
 
 \end{description}
 
-Any of the items may be omitted, down to and including a 
+Any of the items may be omitted, down to and including a
 completely blank specifier.
 
-The items can occur in any order, except that {\it .n}\, must 
-occur last. However, for human readability I recommend that the 
+The items can occur in any order, except that {\it .n}\, must
+occur last. However, for human readability I recommend that the
 items occur in the order:
 
 \begin{center}
-(any of: {\tt I}, {\tt B}, {\tt L}, {\tt +} or {\tt Z}) ({\tt H} 
+(any of: {\tt I}, {\tt B}, {\tt L}, {\tt +} or {\tt Z}) ({\tt H}
 or {\tt D}) {\tt M S T} .{\it n}
 \end{center}
 
@@ -7046,10 +7046,10 @@ If items are omitted the following defaults apply.
 
 \begin{itemize}
 
-  \item If neither {\tt I}, {\tt B} nor {\tt L} is specified 
+  \item If neither {\tt I}, {\tt B} nor {\tt L} is specified
    then {\tt I} is assumed.
 
-  \item If {\tt +} is omitted then positive angles are not 
+  \item If {\tt +} is omitted then positive angles are not
    preceded by a `$+$' sign.
 
   \item If {\tt Z} is omitted then leading zeros are omitted in the
@@ -7069,20 +7069,20 @@ If items are omitted the following defaults apply.
    {\tt M} is absent then {\tt S} is ignored (this case is technically
    illegal).
 
-  \item If {\it .n}\, is omitted then the least significant unit 
-   (seconds, minutes, degrees or hours, as appropriate) is 
+  \item If {\it .n}\, is omitted then the least significant unit
+   (seconds, minutes, degrees or hours, as appropriate) is
    displayed as a whole number, without any places of decimals.
 
 \end{itemize}
 
 Table~\ref{SEXAG_EXAM} lists a number of examples of angular format
 specifiers which might be used to represent `large' angles, such as
-celestial coordinates, together with examples of how they would 
+celestial coordinates, together with examples of how they would
 represent an angle.  Table~\ref{SMALL_EXAM} lists a number of examples of
 angular format specifiers which might be used to represent small angles,
 such as the great circle distance between two neighbouring objects or the
 angular size of an extended object, together with examples of how they
-would represent an angle.  
+would represent an angle.
 
 \begin{table}[htbp]
 
@@ -7097,7 +7097,7 @@ Specifier     & Example            & Notes          \\ \hline
 {\tt DMS.2}   & {\tt 62:51:34.65} & Degrees, minutes and seconds to two places of decimals \\
               &                    & \\
 {\tt H}       & {\tt 4}            & Integer hours \\
-{\tt H.2}     & {\tt 4.19}         & Hours to two places of decimals \\ 
+{\tt H.2}     & {\tt 4.19}         & Hours to two places of decimals \\
 {\tt HM}      & {\tt 4:11}         & Hours and integer minutes \\
 {\tt HM.2}    & {\tt 4:11.44}      & Hours and minutes to two places of decimals \\
 {\tt HMS}     & {\tt 4:11:26}      & Hours, minutes and integer seconds \\
@@ -7167,8 +7167,8 @@ small angles}
 
 The simple angular format specifiers, `{\tt HOURS}', `{\tt DEGREES}',
 `{\tt ARCMIN}', `{\tt ARCSEC}', `{\tt TIMEMIN}' and `{\tt TIMESEC}'
-are just synonyms for particular cases of the 
-general specifiers. They are listed, together with the 
+are just synonyms for particular cases of the
+general specifiers. They are listed, together with the
 equivalent full specification in Table~\ref{SEXAG_SIMPLE}.
 
 \begin{table}[htbp]
@@ -7245,7 +7245,7 @@ CURSA can read both binary and formatted FITS tables. It can write only
 binary FITS tables. It should be able to handle most components of
 FITS tables, with the exception of variable length array columns. If
 a variable length array column is encountered a warning message will
-be reported and the column will be ignored. 
+be reported and the column will be ignored.
 
 If a column containing no data is encountered a warning message will be
 generated and the column will be ignored.
@@ -7262,10 +7262,10 @@ COMPLEX columns in a FITS table it represents them as follows:
   \item a COMPLEX REAL vector column of $n$ elements is represented as
    a REAL vector column of $2n$ elements,
 
-  \item a COMPLEX DOUBLE PRECISION scalar column is represented as a 
+  \item a COMPLEX DOUBLE PRECISION scalar column is represented as a
    DOUBLE PRECISION vector column of two elements,
 
-  \item a COMPLEX DOUBLE PRECISION vector column of $n$ elements is 
+  \item a COMPLEX DOUBLE PRECISION vector column of $n$ elements is
    represented as a DOUBLE PRECISION vector column of $2n$ elements.
 
 \end{itemize}
@@ -7273,7 +7273,7 @@ COMPLEX columns in a FITS table it represents them as follows:
 Usually the table component of a FITS file occurs in the first FITS
 extension to the file. When reading an existing FITS file CURSA will look
 for a table in the first extension. In cases where the table is located
-in an extension other than the first you may specify the required 
+in an extension other than the first you may specify the required
 extension by giving its number inside curly brackets after the name
 of the file. For example, if the table occurred in the third extension
 of a FITS file called {\tt perseus.FIT} you would specify:
@@ -7517,7 +7517,7 @@ readability of a description file as required.
 Throughout this manual keywords and directives are shown in upper
 case for clarity.  However, they are actually case-insensitive.
 
-The example in Figure~\ref{DESCR_SIMPLE} contains five columns: 
+The example in Figure~\ref{DESCR_SIMPLE} contains five columns:
 {\tt RA}, {\tt DEC}, {\tt V}, {\tt B\_V} and {\tt U\_B}.  Each column
 must be defined on a separate line (if necessary the definition of a
 column can be continued onto another line, though in the example none
@@ -7627,7 +7627,7 @@ D POSITION=CHARACTER      ! Table is fixed-format.
    column (the third item of information given for each column) is
    {\it not}\, a simple sequence number, but rather is the position
    of the first character associated with the column in each record of the
-   table (starting counting at one).  
+   table (starting counting at one).
 %   This arrangement is necessary to
 %   locate columns in a direct access file.  Optionally positions can
 %   be specified in this fashion for small lists, if desired (see
@@ -7744,7 +7744,7 @@ Columns and parameters have the following general format:
 {\tt C} or {\tt P} ~~~ mandatory items ~~~ optional items
 \end{quote}
 
-All items must be separated by one or more spaces.  The 
+All items must be separated by one or more spaces.  The
 mandatory items must be supplied.  They occur in a fixed order and
 only the value is given.  The optional items usually
 correspond to attributes of the column or parameter.  They may be
@@ -7935,7 +7935,7 @@ field is computed by applying a scale factor and zero point to the value
 stored in the table, according to the formula:
 
 \begin{equation}
-{\rm actual~value} = 
+{\rm actual~value} =
                 ( {\tt SCALEF} \times {\rm stored~value} ) + {\tt ZEROP}
 \end{equation}
 
@@ -7951,7 +7951,7 @@ of a scaled column from the scaled value stored. See above for the
 formula used.
 
 \paragraph{{\tt TBLFMT}} This item is not an attribute of the column,
-rather it is the format to be used to read the column from the table 
+rather it is the format to be used to read the column from the table
 in small text lists.  It will usually be a Fortran 77 format specifier
 valid for the data type of the column, though some special forms are
 provided for reading sexagesimal angles.  These special forms are
@@ -7960,7 +7960,7 @@ omitted then it defaults to the value of {\tt EXFMT} for the column.
 
 \subsubsection{\label{TBLFMT_ANG}Storing sexagesimal angles}
 
-Columns of angles may be stored formatted as sexagesimal hours or degrees 
+Columns of angles may be stored formatted as sexagesimal hours or degrees
 or as minutes or seconds of arc or time in an STL catalogue.  These
 options both make the catalogues much easier to read by eye and allow
 STL descriptions to be prepared for many existing catalogues which are
@@ -8044,7 +8044,7 @@ obey the following constraints:
    be subdivided into either seconds (with a colon as a separator) or
    decimal minutes,
 
-  \item small angles expressed in seconds of arc or time may be 
+  \item small angles expressed in seconds of arc or time may be
    represented either with or without a decimal fraction.
 
 \end{itemize}
@@ -8154,7 +8154,7 @@ Figure~\ref{STLCOMPANG} shows an example of an STL format catalogue
 containing several columns of complex sexagesimal angles.  This
 catalogue is available as file:
 
-\begin{verse} 
+\begin{verse}
 {\tt /star/share/cursa/angles.TXT}
 \end{verse}
 
@@ -8222,7 +8222,7 @@ The interpretation of the {\tt TBLFMT} items for these angles is quite
 straightforward.  For example, column {\tt ANGLE1} starts in the third
 character of each record and has units of degrees.  It has a separate
 sign as its first character.  The quotient degrees, minutes and
-seconds are all two-character INTEGER values and are separated by 
+seconds are all two-character INTEGER values and are separated by
 one space (or rather by any single character).
 
 \subsection{Parameters \label{PAR}}
@@ -8357,7 +8357,7 @@ the table are specified in a small text list.  The options are:
    sequence number of the first character (starting at one)
    corresponding to it in each line, record or row of the table.  This
    option is suitable for
-%   both 
+%   both
    fixed format small text files.
 %   and direct access binary catalogues.
    Characters in the input lines are counted starting at one.
@@ -8420,7 +8420,7 @@ because the result looks rather untidy.
 
 By default CURSA writes standard STLs.  It can be made to write a KAPPA
 format STL by appending `{\tt KAPPA}' inside curly brackets after the
-name of the file\footnote{This convention is just the usual CURSA 
+name of the file\footnote{This convention is just the usual CURSA
 syntax for specifying extra information about a catalogue; {\it cf}\/
 reading FITS tables.}.  For example, to write a KAPPA format STL called
 {\tt perseus.TXT} you would specify:
@@ -8442,7 +8442,7 @@ KAPPA format STL is available in file:
 Catalogues written in the KAPPA variant STL format permit a limited
 degree of inter-operability between CURSA and KAPPA.  Currently the
 KAPPA applications which access tables read them as ASCII text files.
-Typically these files can contain header comments beginning with a 
+Typically these files can contain header comments beginning with a
 `{\tt \#}' character.  This format is consistent with the KAPPA variant
 STL, but KAPPA does not `know' that it is reading STL format files.
 
@@ -11323,8 +11323,8 @@ This appendix gives detailed descriptions of all the CURSA applications.
 \addcontentsline{toc}{section}{References}
 \begin{thebibliography}{99}
 
-  \bibitem{SERVERURL} M.~Albrecht, M.~Barylak, D.~Durand, P.~Fernique, 
-   A.~Micol, F.~Ochsenbein, F.~Pasian, B.~Pirenne, D.~Ponz and 
+  \bibitem{SERVERURL} M.~Albrecht, M.~Barylak, D.~Durand, P.~Fernique,
+   A.~Micol, F.~Ochsenbein, F.~Pasian, B.~Pirenne, D.~Ponz and
    M.~Wenger, 19 September 1996, {\it Astronomical Server URL}\,
    (Version 1.0).  See URL: {\tt http://vizier.u-strasbg.fr/doc/asu.html}
 
@@ -11348,7 +11348,7 @@ This appendix gives detailed descriptions of all the CURSA applications.
    and A.C.~Davenhall, 21 September 2000, \xref{SUN/55.14}{sun55}{}: {\it
    CONVERT --- A Format-conversion Package}, Starlink.
 
-  \bibitem{SUN162} A.C.~Davenhall, 18 March 1993, \xref{SUN/162.1}{sun162}{}: 
+  \bibitem{SUN162} A.C.~Davenhall, 18 March 1993, \xref{SUN/162.1}{sun162}{}:
    {\it A Guide to Astronomical Catalogues, Databases and Archives available
    through Starlink}, Starlink.
 
@@ -11401,9 +11401,9 @@ This appendix gives detailed descriptions of all the CURSA applications.
 
   \bibitem{PMM} D.~Monet, A.~Bird, B.~Canzian, H.~Harris, N.~Reid,
    A.~Rhodes, S.~Sell, H.~Ables, C.~Dahn, H.~Guetter, A.~Henden,
-   S.~Leggett, H.~Levison, C.~Luginbuhl, J.~Martini, A.~Monet, J.~Pier, 
+   S.~Leggett, H.~Levison, C.~Luginbuhl, J.~Martini, A.~Monet, J.~Pier,
    B.~Riepe, R.~Stone, F.~Vrba and R.~Walker,
-   1996, {\it USNO-SA1.0}, (U.S. Naval Observatory: Washington DC). 
+   1996, {\it USNO-SA1.0}, (U.S. Naval Observatory: Washington DC).
    See also URL: \htmladdnormallink{
    {\tt http://www.nofs.navy.mil/}}{http://www.nofs.navy.mil/}
 
@@ -11434,7 +11434,7 @@ This appendix gives detailed descriptions of all the CURSA applications.
    University Press: Cambridge and Sky Publishing Corporation: Cambridge,
    Massachusetts).
 
-  \bibitem{SUN57} D.L.~Terrett and N.~Eaton, 12 July 1995, 
+  \bibitem{SUN57} D.L.~Terrett and N.~Eaton, 12 July 1995,
    \xref{SUN/57.8}{sun57}{}: {\it GNS -- Graphics Workstation Name Service},
    Starlink.
 

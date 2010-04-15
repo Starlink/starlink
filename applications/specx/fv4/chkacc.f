@@ -11,7 +11,7 @@ C-----------------------------------------------------------------------
       CHARACTER IACCES*1
 
       CHKACC=.FALSE.
-      IF (ACCESS(IFILE)(1:1).EQ.IACCES .OR. 
+      IF (ACCESS(IFILE)(1:1).EQ.IACCES .OR.
      &    ACCESS(IFILE)(2:2).EQ.IACCES)     CHKACC = .TRUE.
 
       RETURN

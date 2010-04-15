@@ -13,24 +13,24 @@
 *     CALL MSG_FLUSHERR( STATUS )
 
 *  Description:
-*     Ensure that all pending error messages in the current error 
-*     context have been output to the user. On successful completion, the 
+*     Ensure that all pending error messages in the current error
+*     context have been output to the user. On successful completion, the
 *     error context is annulled and the status argument reset to SAI__OK;
-*     if an error occurs during output of the error messages, the 
-*     error context is not anulled and the status argument is returned 
+*     if an error occurs during output of the error messages, the
+*     error context is not anulled and the status argument is returned
 *     set to ERR__OPTER. The messages are output in the same way as using
 *     MSG_OUTIF in QUIET mode except that error messages are prepended with
 *     "#" similarly to normal error messages (instead of "!").
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The global status: it is set to SAI__OK on return if the 
-*        error message output is successful; if not, it is set to 
+*        The global status: it is set to SAI__OK on return if the
+*        error message output is successful; if not, it is set to
 *        ERR__OPTER.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 1983, 1984, 1989-1991, 1994 Science & Engineering 
+*     Copyright (C) 1983, 1984, 1989-1991, 1994 Science & Engineering
 *     Research Council. Copyright (C) 1997, 1999, 2001 Central Laboratory
 *     of the Research Councils. All Rights Reserved.
 
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

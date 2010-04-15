@@ -412,7 +412,7 @@ itcl::class gaia::GaiaAstSystem {
 	 if { $system_(epoch) != "default" } {
 	    append options ",epoch=$system_(epoch)"
          } else {
-            if { $system_(system) == "default" && 
+            if { $system_(system) == "default" &&
                  $system_defaults_(default,epoch) != "" } {
                append options ",epoch=$system_defaults_(default,epoch)"
             } elseif { $system_defaults_($system,epoch) != "" } {

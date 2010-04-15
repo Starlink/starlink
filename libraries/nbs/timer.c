@@ -75,7 +75,7 @@ struct tms
 #  define TIMEUNIT	60.0		/* time unit is 1/60 second */
 #endif
 
-#if HAVE_SYS_TIMES_H 
+#if HAVE_SYS_TIMES_H
 #include <sys/times.h>
 #endif
 
@@ -92,7 +92,7 @@ timer_start()
 int timer_time ()
 {
    long buffer;
-  
+
    time (&buffer);
    return 1000000 * (buffer-tstart);
 }
@@ -100,7 +100,7 @@ int timer_time ()
 int timer_utime ()
 {
    struct tms buffer;
-  
+
    times (&buffer);
    return (int) (1000000.0 / TIMEUNIT) * (buffer.tms_utime-start.tms_utime);
 }
@@ -108,15 +108,15 @@ int timer_utime ()
 int timer_stime ()
 {
    struct tms buffer;
-  
-   times (&buffer); 
+
+   times (&buffer);
    return (int) (1000000.0 / TIMEUNIT) * (buffer.tms_stime-start.tms_stime);
 }
 
 int timer_cutime ()
 {
    struct tms buffer;
-  
+
    times (&buffer);
    return (int) (1000000.0 / TIMEUNIT) * (buffer.tms_cutime-start.tms_cutime);
 }
@@ -124,7 +124,7 @@ int timer_cutime ()
 int timer_cstime ()
 {
    struct tms buffer;
-  
+
    times (&buffer);
    return (int) (1000000.0 / TIMEUNIT) * (buffer.tms_cstime-start.tms_cstime);
-} 
+}

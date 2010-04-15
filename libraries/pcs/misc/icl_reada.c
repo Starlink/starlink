@@ -164,15 +164,15 @@ struct termios init_tty,
                init_ttout,
 	       linemode_tty;
 /*
- * tty input is first read into a dynamic memory buffer 'readbuff' and is 
- * the processed into a cyclical buffer 'inbuff'. This provides type-ahead 
- * and allows some pre-processing of certain characters even when not in 
+ * tty input is first read into a dynamic memory buffer 'readbuff' and is
+ * the processed into a cyclical buffer 'inbuff'. This provides type-ahead
+ * and allows some pre-processing of certain characters even when not in
  * explicit input mode.
  *
  * Eventually the line to be passed to ICL is assembled from 'inbuff' into
  * 'inputline' allowin for line editing operations.
  */
-char 
+char
     inbuff   [INPUTBUFFERLENGTH], /* Cyclic input buffer for characters read */
     inputline[INPUTLINELENGTH+1], /* Constructed input line for ICL */
     saveinput[INPUTLINELENGTH+1], /* Save input when recalling lines */
@@ -204,7 +204,7 @@ int
     notkilled         = TRUE,
     expectinginput    = FALSE,
     gotline           = FALSE;
-    
+
 
 /* state for longjump */
 sigjmp_buf	goback;
@@ -242,7 +242,7 @@ int recall_p;			/* processing position in recall buffer */
  *
  ******************************************************************************
  */
-void 
+void
 initrecall(void)
 {
     int i;
@@ -261,7 +261,7 @@ initrecall(void)
  *
  ******************************************************************************
  */
-void 
+void
 addtorecall(char *line)
 {
     char *txt;
@@ -371,7 +371,7 @@ nextline(void)
 
 #define NUMKEYS 26
 
-const char *keyseq[NUMKEYS+4] = 
+const char *keyseq[NUMKEYS+4] =
 {"\033[A",    /* up-history */
  "\033[B",    /* down-history */
  "\033[C",    /* forward-char */
@@ -436,11 +436,11 @@ int controlcodes[26] =
      Kunknown /* CNTL V */,	Kunknown  /* CNTL W */,	Kunknown  /* CNTL X */,
      Kunknown /* CNTL Y */,	Kunknown /* CNTL Z */
     };
-   
+
 /* codespecialkey() returns one of the integers defined above or one
  * of the codes below (must be negative)
  */
-            
+
 #define SUBSTRING (-1)		/* Input so far is a partial match */
 #define NOMATCH   (-2)		/* No match on special characters  */
 
@@ -452,12 +452,12 @@ int controlcodes[26] =
  * matching a special operation defined above. Also processes control keys
  * and DELETE .
  *
- * Can also return SUBSTRING (partial match - await more characters arriving) 
+ * Can also return SUBSTRING (partial match - await more characters arriving)
  * or NOMATCH.
  *
  ******************************************************************************
  */
-int 
+int
 codespecialkey(void)
 {
     const char *w;
@@ -513,7 +513,7 @@ codespecialkey(void)
  *
  ******************************************************************************
  */
-int 
+int
 noisechar(char ch)
 {
     if ( isalnum( ch ) || (strchr("_.-=*[]?~",ch) != NULL) )
@@ -530,7 +530,7 @@ noisechar(char ch)
  *
  ******************************************************************************
  */
-int 
+int
 spacechar(char ch)
 {
     if (ch == ' ' || ch == '\t')
@@ -544,7 +544,7 @@ spacechar(char ch)
  *
  ******************************************************************************
  */
-int 
+int
 normalcharacter(char ch)
 {
     if ((ch >= 'a' && ch <= 'z') ||
@@ -562,7 +562,7 @@ normalcharacter(char ch)
  *
  ******************************************************************************
  */
-void 
+void
 ringbell(void)
 {
 /*    if (flash_screen != CHARNIL)
@@ -589,7 +589,7 @@ ringbell(void)
  * we position at the start of the current display line.
  *
  ******************************************************************************
-*/ 
+*/
 void
 posbol( int del, int prlen, int cpos, int epos )
 {
@@ -604,7 +604,7 @@ int nlines,cline;
    if ( del ) {
       if (delete_line != CHARNIL) {
          for (;nlines--;)putp(delete_line);
-        
+
       } else {
          putchar('\r');
          if (clr_eos != CHARNIL)
@@ -621,7 +621,7 @@ int nlines,cline;
  *  R E D O L I N E ( int complete, int prlen, int cpos, int epos, int forwd )
  *
  * Re-display a line leaving the cursor in position cpos.
- * We assume that the static variables prompt and inputline are set up 
+ * We assume that the static variables prompt and inputline are set up
  * correctly and the cursor is at the start of the line. (This is the complete
  * prompt and reply display on most terminals but only the current display
  * line on dumb terminals ie where we cannot move the cursor up.)
@@ -647,7 +647,7 @@ int cline,  /* line number which cursor is on (start at 0) */
 
 /* Calculate line numbers and remainders */
    cline =  ( prlen + cpos ) / COLS;
-   ll_len = (prlen + epos) % COLS; 
+   ll_len = (prlen + epos) % COLS;
    cl_len = (prlen + cpos) % COLS;
 
 /* For dumb terminals (ie where cursor cannot be moved up) we have to work with
@@ -696,7 +696,7 @@ int cline,  /* line number which cursor is on (start at 0) */
  * is at end of line. */
    if ( !(complete && (cpos==epos)) ) {
    /* Re-position at start if we have just displayed the complete line */
-      if ( complete ) 
+      if ( complete )
          posbol(0, prlen, epos, epos);
 
    /* If first line, start with prompt */
@@ -714,10 +714,10 @@ int cline,  /* line number which cursor is on (start at 0) */
             putchar('\n');
          } else
             if ( forwd ) putchar('\n');
-            
-   /* and, for dumb terminals, if there is more on the line, print it, 
+
+   /* and, for dumb terminals, if there is more on the line, print it,
     *    restoring cursor to SOL */
-         if ( cursor_up == CHARNIL ) 
+         if ( cursor_up == CHARNIL )
             if ( epos > cpos ) printf( "%s\r", inputline+cpos );
       }
    }
@@ -767,7 +767,7 @@ void filename_complete(void) {
 /*   Get expanded if necessary filename into tbuff */
          if ( strpbrk(tbuff,"~$") != NULL ) {
             sprintf(combuff, "echo %s", tbuff);
-            result = shell_command( combuff );      
+            result = shell_command( combuff );
 /*   If there was no expansion, tbuff remains as original */
             if (result != NULL) {
                if (strcmp(result, "")) {
@@ -799,7 +799,7 @@ void filename_complete(void) {
                            nfiles++; /* stops the while */
                            ringbell();
                         }
-            
+
                      } else {
 /*         combuff is exact match for 1st name
  *         so all future matches will be same */
@@ -833,7 +833,7 @@ void filename_complete(void) {
                   i = 0;
                   while( (extns[i] != NULL) ) {
                      lenext = (int)strlen( extns[i] );
-                     if ( 
+                     if (
                        !strcmp( *filelist.gl_pathv+nmatch-lenext, extns[i] ) ) {
                         *(*filelist.gl_pathv + nmatch - lenext ) = '\0';
                         if ( nmatch - lenext < expanded_len ) {
@@ -851,13 +851,13 @@ void filename_complete(void) {
 /*   Restore any environment variables */
 /*   and copy to inputline */
                strcpy( combuff, &inputline[inpl_cpos] );
-               strcpy( &inputline[inpl_cpos-trunc], 
+               strcpy( &inputline[inpl_cpos-trunc],
                        *filelist.gl_pathv+expanded_len );
                if ( nfiles == 1 )
                   strcat(inputline," ");
                inpl_cpos = strlen( inputline );
                strcat( inputline, combuff );
-               inpl_epos = strlen(inputline);          
+               inpl_epos = strlen(inputline);
 
             } else {
 /*   No matches */
@@ -866,7 +866,7 @@ void filename_complete(void) {
                ringbell();
             }
 
-         } else {  
+         } else {
 /*               Failed getting filenames */
 #ifdef GLOB_NOMATCH
             if ( status == GLOB_NOMATCH ) printf("\nNo match.\n");
@@ -875,11 +875,11 @@ void filename_complete(void) {
                good status even when match count is zero. This
                branch then only hits if no matches and status is good.
              */
-            if ( status == 0 && filelist.gl_pathc == 0) 
+            if ( status == 0 && filelist.gl_pathc == 0)
                   printf("\nNo match.\n");
 #endif
             ringbell();
-         } 
+         }
          globfree( &filelist );
 
       } else {
@@ -903,7 +903,7 @@ void filename_complete(void) {
  *
  ******************************************************************************
  */
-void 
+void
 keyboard_input(void)
 {
     int readret, inputavailable, worker, worker1;
@@ -915,7 +915,7 @@ keyboard_input(void)
     int i;
     int save_cpos, save_epos;
 /*
- * Source WAS stdin 
+ * Source WAS stdin
  */
     time.tv_sec  = 0;
     time.tv_usec = 0;
@@ -925,15 +925,15 @@ keyboard_input(void)
         if(!select(2, &infds, NULL, NULL, &time))       /* non-blocking */
             break;
         if(FD_ISSET(fileno(stdin), &infds)) {
-            
+
             if (inbuf_rpos >= inbuf_cpos) {
-                readret = 
+                readret =
                     read( fileno(stdin),
                           readbuff,
                           INPUTBUFFERLENGTH - (inbuf_rpos - inbuf_cpos) );
             }
             else {
-                readret = 
+                readret =
                     read( fileno(stdin),
                           readbuff,
                           inbuf_cpos - inbuf_rpos - 2 );
@@ -1064,8 +1064,8 @@ keyboard_input(void)
                        inpl_cpos++;
                        redoline( 1, prompt_len, inpl_cpos, inpl_epos, 1 );
                     }
-                 
-		 } else 
+
+		 } else
                     ringbell();
 
 		break;
@@ -1094,7 +1094,7 @@ keyboard_input(void)
                        strcpy(inputline,saveinput);
                        saveinput_p = CHARNIL;
                     } else
-                       ringbell();                       
+                       ringbell();
 		} else {
 		    strcpy(inputline, w);
 		}
@@ -1168,7 +1168,7 @@ keyboard_input(void)
 	      case Ktosol:
                 posbol( cursor_up==CHARNIL, prompt_len, inpl_cpos, inpl_epos );
 		inpl_cpos = 0;
-                redoline( cursor_up==CHARNIL, prompt_len, inpl_cpos, inpl_epos, 
+                redoline( cursor_up==CHARNIL, prompt_len, inpl_cpos, inpl_epos,
                 1 );
 		break;
 
@@ -1204,7 +1204,7 @@ keyboard_input(void)
                        worker--;
                  if ( spacechar(inputline[worker]) ) worker++;
 
-                 sprintf(combuff, 
+                 sprintf(combuff,
                     "ls -Cd %.*s*",inpl_cpos-worker, &inputline[worker]);
                  result = shell_command( combuff );
                  printf("\n%s", result );
@@ -1289,7 +1289,7 @@ keyboard_input(void)
 			break;
 		     else
 			worker1--;
-                   
+
                    if ( !noisechar(inputline[worker1]) ) {
 /* Find beginning of word (or line) */
                       while (!noisechar(inputline[worker1]))
@@ -1381,14 +1381,14 @@ keyboard_input(void)
     } /* of while inputavailable */
 
     return;
-} 
+}
 
 /******************************************************************************
  *
  *	R E S I Z E _ H A N D L E R ( int signo )
  *
  * This function is called when we get a window resize event (n.b. only on
- * local windows and remotely connected ones using rlogin - NOT telnet!) and 
+ * local windows and remotely connected ones using rlogin - NOT telnet!) and
  * resets the variables 'COLS' and 'LINES' (declared in curses.h) accordingly.
  *
  ******************************************************************************
@@ -1402,8 +1402,8 @@ resize_handler(int signo)
     posbol( 1, prompt_len, inpl_cpos, inpl_epos );
     COLS  = size.ws_col;
     LINES = size.ws_row;
-    redoline(1, prompt_len, inpl_cpos, inpl_epos, 1 ); 
-    return;     
+    redoline(1, prompt_len, inpl_cpos, inpl_epos, 1 );
+    return;
 }
 
 /******************************************************************************
@@ -1436,7 +1436,7 @@ cntlc_handler(int signo)
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT);
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    siglongjmp(goback, 0); 
+    siglongjmp(goback, 0);
 }
 
 /******************************************************************************
@@ -1504,7 +1504,7 @@ sig_handler( int signo )
  *
  ******************************************************************************
  */
-void 
+void
 initscreen(int nolines)
 {
     char ch;
@@ -1622,7 +1622,7 @@ initscreen(int nolines)
 char
 *shell_command( char *command )
 {
-    int pid, fd[2], fde[2], status; 
+    int pid, fd[2], fde[2], status;
     size_t resultsize, resp;
     ssize_t nchars;
     char *result;
@@ -1659,7 +1659,7 @@ char
                          resultsize+=INPUTLINELENGTH;
                          result = (char *)realloc((void *)result,resultsize);
                       }
-                      if ( (nchars = 
+                      if ( (nchars =
                          read(fd[0], (void *)(result+resp), resultsize-resp-1))
                          < 0 )
                          perror("shell_command()");
@@ -1674,7 +1674,7 @@ char
                 close(fde[0]);
 		waitpid(pid, &status, 0);
 	    }
-	}		
+	}
     if (status == 0)
 	return result; /* TRUE */
     else
@@ -1693,7 +1693,7 @@ F77_SUBROUTINE(icl_reada)( CHARACTER(fpr1), INTEGER(len1),
                            CHARACTER(fval), INTEGER(vallen),
                            CHARACTER(fdflt), INTEGER(deflen)
                            TRAIL(fpr1) TRAIL(fpr2) TRAIL(fval) ) {
- 
+
     fd_set infds;
     /* sleep(20); * Debug! */
 
@@ -1730,7 +1730,7 @@ F77_SUBROUTINE(icl_reada)( CHARACTER(fpr1), INTEGER(len1),
         return;
     }
 /* End of non-tty stdio handling - remaining code deals with tty input */
- 
+
 /*
  * Initialize command recall system
  */
@@ -1742,7 +1742,7 @@ F77_SUBROUTINE(icl_reada)( CHARACTER(fpr1), INTEGER(len1),
        for (inpl_cpos = 0; inpl_cpos < INPUTLINELENGTH; ++inpl_cpos)
       	  blankline[inpl_cpos] = ' ';
        blankline[inpl_cpos] = '\0';
-       
+
 /* Set exit handler to restore terminal state */
 #if HAVE_ATEXIT
 	atexit(exit_handler);		       /* ANSI C/POSIX */
@@ -1778,7 +1778,7 @@ F77_SUBROUTINE(icl_reada)( CHARACTER(fpr1), INTEGER(len1),
 
 /* Process any type-ahead */
     gotline = FALSE;
-    if (inbuf_cpos != inbuf_rpos) 
+    if (inbuf_cpos != inbuf_rpos)
        keyboard_input();
 
 /* If not complete line type-ahead, loop getting more */

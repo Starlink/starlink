@@ -142,7 +142,7 @@ itcl::class gaia::TabbedGaia {
       #  Options menu.
       set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
-      
+
       #  Toggle control of child windows.
       $Options add checkbutton \
          -label {Control popup windows} \
@@ -229,7 +229,7 @@ itcl::class gaia::TabbedGaia {
 
       #  Need to update so that GAIA instances are available?
       update
-      
+
       #  Doesn't work without these before update either (block
       #  happens anyway?).
       rename ::tkwait ::tabbedgaia_tkwait
@@ -239,15 +239,15 @@ itcl::class gaia::TabbedGaia {
       after idle [code $this show_tab_ $index]
       $names_($tabcount_) configure \
          -on_close_cmd [code $this tab_closed_]
-   
+
       #  Tab has GAIA clone label.
       $itk_component(tabbedpane) pageconfigure $index \
          -label [$names_($tabcount_) cget -number]
-      
+
       #  Return GAIA instance.
       return $names_($tabcount_)
    }
-   
+
    #  Get a tab by number and return the GAIA instance displayed.
    #  If index is greater than the current tabcount_ limit then new
    #  instances up to that limit are created.
@@ -318,8 +318,8 @@ itcl::class gaia::TabbedGaia {
 
       #  Withdraw toplevel windows that are children of the window we
       #  have just deselected. This should be "lasttab_"
-      if { $itk_option(-control_popups) && 
-           $lasttab_ != -1 && 
+      if { $itk_option(-control_popups) &&
+           $lasttab_ != -1 &&
            $lasttab_ < $tabcount_ } {
 
          set lastgaia $names_([expr $lasttab_+1])
@@ -444,7 +444,7 @@ itcl::class gaia::TabbedGaia {
       incr index
       $basegaia open $filename
       update
-      
+
       set image [[$basegaia get_image] get_image]
       set isfits [$image isfits]
       set hdu_list [$image hdu list]

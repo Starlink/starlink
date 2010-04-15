@@ -1,5 +1,5 @@
 { Procedure STDPROC : auto scans RO lis file and creates batch file
-proc stdproc 
+proc stdproc
   get plt2d name_prefix (ropref)
   print "Using RO prefix " (ropref)
   utd = substr(ropref,3,6)
@@ -14,7 +14,7 @@ proc stdproc
   copfile (rbfile) crestd.tmp
   delfile crestd.icl
   delfile header.txt
-  ! $LIRCAMDIR/crestd 
+  ! $LIRCAMDIR/crestd
   delfile crestd.tmp
   typfile crestd.icl
   asklog (yn) "Execute the above batch file (Yes or No) \N\ ? "

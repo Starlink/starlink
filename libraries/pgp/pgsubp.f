@@ -5,7 +5,7 @@ C+
       INTEGER NXSUB, NYSUB
 C
 C PGPLOT divides the physical surface of the plotting device (screen,
-C window, or sheet of paper) into NXSUB x NYSUB `panels'. When the 
+C window, or sheet of paper) into NXSUB x NYSUB `panels'. When the
 C view surface is sub-divided in this way, PGPAGE moves to the next
 C panel, not the next physical page. The initial subdivision of the
 C view surface is set in the call to PGBEG. When PGSUBP is called,
@@ -14,11 +14,11 @@ C subdivided in the manner indicated. No plotting should be done
 C between a call of PGSUBP and a call of PGPAGE (or PGENV, which calls
 C PGPAGE).
 C
-C If NXSUB > 0, PGPLOT uses the panels in row order; if <0, 
+C If NXSUB > 0, PGPLOT uses the panels in row order; if <0,
 C PGPLOT uses them in column order, e.g.,
-C      
-C  NXSUB=3, NYSUB=2            NXSUB=-3, NYSUB=2   
-C                                                
+C
+C  NXSUB=3, NYSUB=2            NXSUB=-3, NYSUB=2
+C
 C +-----+-----+-----+         +-----+-----+-----+
 C |  1  |  2  |  3  |         |  1  |  3  |  5  |
 C +-----+-----+-----+         +-----+-----+-----+
@@ -29,7 +29,7 @@ C PGPLOT advances from one panels to the next when PGPAGE is called,
 C clearing the screen or starting a new page when the last panel has
 C been used. It is also possible to jump from one panel to another
 C in random order by calling PGPANL.
-C 
+C
 C Arguments:
 C  NXSUB  (input)  : the number of subdivisions of the view surface in
 C                    X (>0 or <0).

@@ -36,7 +36,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,7 +110,7 @@
             IF ( STATUS .EQ. FIO__EOF ) THEN
                CALL ERR_ANNUL( STATUS )
             ENDIF
-            GO TO 2         
+            GO TO 2
          END IF
 
 *  Read in the next line.

@@ -97,7 +97,7 @@ itcl::class gaia::MultiGraphPrint {
    #  descriptor
    public method print {fd} {
       global ::$w_.color ::$w_.rotate ::$w_.colormap ::$w_.fit_to_page
-      if { [set $w_.fit_to_page] } { 
+      if { [set $w_.fit_to_page] } {
          set fit yes
       } else {
          set fit no
@@ -120,7 +120,7 @@ itcl::class gaia::MultiGraphPrint {
             -center 1 \
             -decorations 0 \
             -maxpect $fit
-         
+
          set cmd [list $graph postscript output]
          puts $fd [eval $cmd]
       }

@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine stores a value for a FITS keyword in a FitsChan. If
-*     the keyword already has a value in the FitsChan, the existing value 
+*     the keyword already has a value in the FitsChan, the existing value
 *     is replaced with the new value. Otherwise, the new keyword is
-*     added to the end of the FitsChan. On exit, the current Card in 
+*     added to the end of the FitsChan. On exit, the current Card in
 *     the FitsChan is the card following the new keyword value (or
 *     end-of-file if the new card is the last one in the FitsChan).
 
@@ -24,15 +24,15 @@
 *     THIS = INTEGER (Given)
 *        Pointer to the FitsChan to use.
 *     NAME = CHARACTER * ( * ) (Given)
-*        The FITS keyword name. This may be a complete FITS header card, 
-*        in which case the keyword to use is extracted from it. No more 
+*        The FITS keyword name. This may be a complete FITS header card,
+*        in which case the keyword to use is extracted from it. No more
 *        than 80 characters are read from this string.
 *     VALUE = REAL (Given)
-*        The new keyword value. If this is VAL__BADR, then an undefined 
+*        The new keyword value. If this is VAL__BADR, then an undefined
 *        value will be stored in the FitsChan.
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A new comment for the keyword. If this is blank, any comment in
-*        the NAME string is used. If the NAME string contains no comment, 
+*        the NAME string is used. If the NAME string contains no comment,
 *        any existing comment for the keyword in the FitsChan is retained.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *        Original version.
 *     16-JUL-2007 (DSB):
 *        Modified to check that the stored keyword value can be
-*        formatted. A warning message is issued if not, and the 
+*        formatted. A warning message is issued if not, and the
 *        card is deleted.
 *     5-DEC-2008 (DSB):
 *        Avoid use of AST__UNDEF constants.
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,7 +108,7 @@
 
 *  Rewind the FitsChan so that fhe following search starts from the first
 *  card.
-      CALL AST_CLEAR( THIS, 'CARD', STATUS ) 
+      CALL AST_CLEAR( THIS, 'CARD', STATUS )
 
 *  Search the FitsChan for a card referring to the given keyword. If
 *  found, it becomes the current Card. If not found, the FitsChan is left
@@ -118,14 +118,14 @@
 *  Store the new keyword value, over-writing the current card (or
 *  appending to the end of the FitsChan if the FitsChan is at end-of-file.)
       IF( VALUE .NE. VAL__BADR ) THEN
-         CALL AST_SETFITSF( THIS, NAME, DBLE( VALUE ), COMMNT, .TRUE., 
+         CALL AST_SETFITSF( THIS, NAME, DBLE( VALUE ), COMMNT, .TRUE.,
      :                      STATUS )
       ELSE
          CALL AST_SETFITSU( THIS, NAME, COMMNT, .TRUE., STATUS )
       END IF
 
 *  Format the new keyword value. If this fails, annul the error, issue a
-*  warning, and delete the card from the FitsChan. 
+*  warning, and delete the card from the FitsChan.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL AST_CLEAR( THIS, 'Card', STATUS )
          FOUND = AST_FINDFITS( THIS, NAME, CARD, .FALSE., STATUS )

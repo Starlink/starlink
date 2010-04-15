@@ -1,7 +1,7 @@
 C+
       SUBROUTINE MSPLOT
 C
-C     M S P L O T  
+C     M S P L O T
 C
 C     Produces a plot of a spectrum, splitting it up into a number of
 C     sections, each plotted separately in a series down the plotting
@@ -21,14 +21,14 @@ C     XSTART      The x-value at which plotting is to start.
 C     XEND        The x-value at which plotting is to end.
 C                 (XSTART and XEND are not required if the
 C                 WHOLE keyword is specified.)
-C     LABEL       A label for the plot.  
+C     LABEL       A label for the plot.
 C     COLOUR      The colour for the plot, assuming the display device
 C                 supports it.  The axes are always white.
 C     THICKNESS   The width of the lines used for the plot.  This is
-C                 only used for 'hard' & 'build' plots, and should 
+C                 only used for 'hard' & 'build' plots, and should
 C                 really be 1 for anything other than a high-resolution
 C                 device like a Versatec or a laser printer.
-C    
+C
 C     Command keywords -
 C
 C     SAMESCALE   The program is to use a the same scale for all the
@@ -125,7 +125,7 @@ C
       INTEGER   STATUS           ! Status return from DSA_ routines
       CHARACTER STRINGS(2)*64    ! Receives data and axis information
       INTEGER   THICK            ! Line thickness for plot
-      REAL      VALUE            ! Temporary real 
+      REAL      VALUE            ! Temporary real
       REAL      VMAX             ! Maximum value in data array
       REAL      VMIN             ! Minimum value in data array
       LOGICAL   WHOLE            ! True if WHOLE specified
@@ -218,7 +218,7 @@ C
       DUNITS=STRINGS(1)
       DLABEL=STRINGS(2)
 C
-C     Get the label for the plot - 
+C     Get the label for the plot -
 C
       CALL PAR_RDCHAR('LABEL',' ',PLAB)
 C
@@ -243,7 +243,7 @@ C
          CKEY=1
       END IF
 C
-C     Check for 'HARD' 
+C     Check for 'HARD'
 C
       CALL PAR_RDKEY('HARDCOPY',.FALSE.,HARD)
       IF (PAR_ABORT()) GO TO 500   ! User requested abort
@@ -299,7 +299,7 @@ C
 C
 C     See if the data should be plotted in reverse
 C
-      REVPLOT=(MAGNITUDE.NE.0.0) 
+      REVPLOT=(MAGNITUDE.NE.0.0)
 C
 C     Finally, perform the plot - there should be an error version
 C     as well for the ELSE clause, but there isn't yet.
@@ -352,7 +352,7 @@ C     (>) DEVICE   (Character) The device/type to be used for the
 C                  plot - see PGPLOT documentation for details.
 C                  If BUILD is true, DEVICE is the filename to be
 C                  used for the 'build' file.
-C     (>) THICK    (Integer) The line thickness for the plot.  
+C     (>) THICK    (Integer) The line thickness for the plot.
 C     (>) CKEY     (Integer) The GRPCKG code (0..7) for the colour
 C                  of the plot.
 C     (>) REVPLOT  (Logical) True if the vertical scale is to be reversed.
@@ -390,7 +390,7 @@ C
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL SAMESCALE, SHOWZERO, HARD, REVPLOT
       INTEGER IXST,IXEN,NX,STATUS,THICK,NSPECT,CKEY
@@ -415,7 +415,7 @@ C
       CHARACTER TYPE*16
 C
 C     If same scale is to be used for all, then work out the values now.
-C     
+C
       IF (SAMESCALE) THEN
          CALL GEN_RANGEF(ZVALS,IXST,IXEN,HIGH,LOW)
          IF (SHOWZERO) THEN

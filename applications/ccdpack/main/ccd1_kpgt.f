@@ -18,8 +18,8 @@
 *     This routine queries the ADAM global parameter database to find
 *     the values of global variables.  It not only gets the normal
 *     global variable values, but any keyed values (as written using
-*     CCD1_KPSV) as well.  The values are returned as HDS primary 
-*     locators to the parameter structures (as got by HDSPAR) and 
+*     CCD1_KPSV) as well.  The values are returned as HDS primary
+*     locators to the parameter structures (as got by HDSPAR) and
 *     should be annulled in due course by the calling routine.
 
 *  Arguments:
@@ -27,19 +27,19 @@
 *        The name of the basic parameter to which the global (and
 *        possibly keyed) parameter corresponds.
 *     MAXKEY = INTEGER (Given)
-*        The maximum number of keyed values that can be returned 
+*        The maximum number of keyed values that can be returned
 *        (size of arrays KEYS and KVALS).  If MAXKEY is zero, no
 *        attempt will be made to return the keyed values.
 *     QUNKEY = LOGICAL (Returned)
-*        True if a non-empty value was found for the unkeyed global 
+*        True if a non-empty value was found for the unkeyed global
 *        variable.
 *     ULOC = CHARACTER * ( * ) (Returned)
-*        HDS locator of the unkeyed global variable (nothing returned 
+*        HDS locator of the unkeyed global variable (nothing returned
 *        if QUNKEY is false).
 *     NK = INTEGER (Returned)
-*        The number of keyed values returned in KEYS and KVALS.  
-*        If more than MAXKEY keyed values are available, only the 
-*        first MAXKEY will be returned in KEYS and KLOCS and NK 
+*        The number of keyed values returned in KEYS and KVALS.
+*        If more than MAXKEY keyed values are available, only the
+*        first MAXKEY will be returned in KEYS and KLOCS and NK
 *        will be returned equal to MAXKEY.
 *     KEYS( * ) = INTEGER (Returned)
 *        The keys for which values were found.
@@ -91,18 +91,18 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS system constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER MAXKEY
-      
+
 *  Arguments Returned:
       LOGICAL QUNKEY
       CHARACTER * ( * ) ULOC
       INTEGER NK
       INTEGER KEYS( * )
       CHARACTER * ( * ) KLOCS( * )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -116,7 +116,7 @@
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER K                  ! Loop variable
-      INTEGER KEY                ! Key integer 
+      INTEGER KEY                ! Key integer
       INTEGER NCOMP              ! Number of components in structure
       LOGICAL THERE              ! Is component present?
 
@@ -124,7 +124,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Initialise the number of keyed parameters found.
       NK = 0
       QUNKEY = .FALSE.
@@ -142,7 +142,7 @@
 
 *  Try to get a locator for the unkeyed value.
          CALL DAT_THERE( GLOC, GPARAM, THERE, STATUS )
-         IF ( THERE ) THEN 
+         IF ( THERE ) THEN
             CALL DAT_FIND( GLOC, GPARAM, ULOC, STATUS )
 
 *  If there was any error, annul it and continue.
@@ -171,7 +171,7 @@
 *  In case of an error so far annul it and take no further action.
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
-               ELSE 
+               ELSE
 
 *  Loop over each component in the structure.
                   DO I = 1, NCOMP
@@ -191,8 +191,8 @@
                            CALL CHR_CTOI( STNAME( 5: ), KEY, STATUS )
 
 *  We have a key integer and a locator representing the keyed value.
-*  Insert the pair into corresponding positions in the arrays KEYS 
-*  and KLOCS, which are sorted into ascending order of KEYS, as 
+*  Insert the pair into corresponding positions in the arrays KEYS
+*  and KLOCS, which are sorted into ascending order of KEYS, as
 *  long as the key value is not already represented there.
 *  This is not the most sophisticated insertion algorithm in the
 *  world, but we are most unlikely to be dealing with large lists
@@ -229,7 +229,7 @@
                                     IF ( KEY .GT. KEYS( K - 1 ) .AND.
      :                                   KEY .LT. KEYS( K ) ) THEN
 
-*  It's between these two entries.  Shift up the higher ones, insert 
+*  It's between these two entries.  Shift up the higher ones, insert
 *  it here, and exit the search loop.
                                        NK = NK + 1
                                        DO J = NK, K + 1, -1
@@ -242,7 +242,7 @@
                                     END IF
                                  END DO
 
-*  If we got here, it must be because it was equal to one of the 
+*  If we got here, it must be because it was equal to one of the
 *  existing entries.  It will not be entered in the list.  Annul the
 *  locator.
                                  CALL DAT_ANNUL( KLOC, STATUS )

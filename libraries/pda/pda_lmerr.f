@@ -1,12 +1,12 @@
        SUBROUTINE PDA_LMERR( FCN, M, N, X, RESID, MXITER, DRESID, JACOB,
-     :                       ALPHA, PIVOT, WORK, SIGMA, CORREL, COVAR, 
+     :                       ALPHA, PIVOT, WORK, SIGMA, CORREL, COVAR,
      :                       FLAG, STATUS )
 
 *  Name:
 *     PDA_LMERR
 *
 *  Purpose:
-*     Estimates the errors of least-squares fits to non-linear 
+*     Estimates the errors of least-squares fits to non-linear
 *     functions
 
 *  Language:
@@ -22,7 +22,7 @@
 *     non-linear functions, by determining the errors in the fitted
 *     parameters.  It assumes normally distributed errors.
 
-*     This routine uses the same fitting function defined for 
+*     This routine uses the same fitting function defined for
 *     PDA_LMFUN1 with known best-fit values and residuals to
 *     return the uncertainties in the best-fit values and
 *     the correlations between the variables.
@@ -39,14 +39,14 @@
 *     N = INTEGER (Given)
 *        The number of free parameters of the fit.
 *     X( N ) = DOUBLE PRECISION (Given)
-*         The best-fit parameters. 
+*         The best-fit parameters.
 *     RESID( M ) = DOUBLE PRECISION (Given)
 *        The residuals for the best fit.
 *     MXITER = INTEGER (Given)
 *        The maximum number of loops in error evaluation.  It is
 *        constrained to be from one to ten.
 *     DRESID( M ) = DOUBLE PRECISION (Returned)
-*        Work array for the displaced-fit residuals.  On output, this 
+*        Work array for the displaced-fit residuals.  On output, this
 *        is equal to argument RESID.
 *     JACOB( M, N ) = DOUBLE PRECISION (Returned)
 *        Work array for the Jacobian derived by finite differences.
@@ -62,7 +62,7 @@
 *        The two-variable correlations
 *     COVAR( N, N )  = DOUBLE PRECISION (Returned)
 *        The covariance matrix.
-*     FLAG( N ) = LOGICAL (Returned)   
+*     FLAG( N ) = LOGICAL (Returned)
 *        An element is set .TRUE. if the corresponding parameter
 *        likely caused the failure of the inversion of the
 *        curvature matrix.
@@ -73,12 +73,12 @@
 *   Notes:
 *     The errors are derived as follows.  First create the M * N
 *     Jacobian matrix by differencing the residuals of the best-fit
-*     and those derived from a small increment of each parameter 
+*     and those derived from a small increment of each parameter
 *     around the best-fit parameters, and normalised by the parameter
-*     increment.  
+*     increment.
 
-*     Next form the N-by-N curvature matrix (one half times the 
-*     Hessian matrix of second derivatives), by summing over the 
+*     Next form the N-by-N curvature matrix (one half times the
+*     Hessian matrix of second derivatives), by summing over the
 *     elements of the product of the transposed Jacobian matrix and
 *     the Jacobian itself for all functions.
 *
@@ -90,7 +90,7 @@
 *     "Numerical Recipes" (Cambridge University Press).
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
+*     Copyright (C) 2007 Particle Physics and Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -181,7 +181,7 @@
        INTEGER MITER             ! Constrained number of iterations
        DOUBLE PRECISION PS       ! Parameter shift
        DOUBLE PRECISION SUM      ! Sum of Jacobian products
-       DOUBLE PRECISION SUMRES   ! Sum of the residuals squared 
+       DOUBLE PRECISION SUMRES   ! Sum of the residuals squared
        DOUBLE PRECISION XCOPY    ! Copy of current best-fit parameter
 
 *.
@@ -242,7 +242,7 @@
 *  Assign the first differential matrix aka the Jacobian.  It uses the
 *  best-possible guess for the relative error for the current parameter.
             DO IFUN = 1, M
-               JACOB( IFUN, J ) = ( RESID( IFUN ) - DRESID( IFUN ) ) / 
+               JACOB( IFUN, J ) = ( RESID( IFUN ) - DRESID( IFUN ) ) /
      :                            DELTAX
             END DO
 
@@ -281,8 +281,8 @@
          END DO
          CHISQ = SUMRES / DBLE( M - N )
 
-*  In case the curvature matrix cannot be inverted, flag those 
-*  parameters with small diagonal components of curvature; these are 
+*  In case the curvature matrix cannot be inverted, flag those
+*  parameters with small diagonal components of curvature; these are
 *  the likely null variables that caused the matrix inversion to fail.
          DO J = 1, N
             FLAG( J ) = ABS( ALPHA( J, J ) ) .LE. MINPS
@@ -316,7 +316,7 @@
 
 *  Extract the parameter errors from the covariance matrix.
           DO J = 1, N
-             SIGMA( J ) = MAX( MINPS, 
+             SIGMA( J ) = MAX( MINPS,
      :                         SQRT( ABS( COVAR( J, J ) * CHISQ )  ) )
 
 *  Now normalise to form the symmetric correlation matrix.

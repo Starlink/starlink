@@ -225,10 +225,10 @@ itcl::class gaia::GaiaPhotomObject {
       redraw_object
    }
 
-   #  Set all values in one go after object is created (more efficient 
+   #  Set all values in one go after object is created (more efficient
    #  than repeated configures). The values set are:
    #
-   #     index xpos ypos mag magerr sky signal code major eccen angle 
+   #     index xpos ypos mag magerr sky signal code major eccen angle
    #     positions shape fwhm1 fwhm2 seeing
    #
    #  All fields must be supplied, just set unnecesary ones to {}.
@@ -239,13 +239,13 @@ itcl::class gaia::GaiaPhotomObject {
 
       #  Pretend this object has been measured (for now).
       set measured_ 1
-      
+
       #  Convert image positions into canvas positions for X and Y.
       lassign [canvas_coord $xpos $ypos] xpos ypos
-      
+
       #  Convert major axis into a canvas scale.
       set major [canvas_dist $major]
-      
+
       #  Modify minor and eccen if shape is circular, otherwise set
       #  minor axis to correct value.
       if { $shape == "circle" } {
@@ -254,10 +254,10 @@ itcl::class gaia::GaiaPhotomObject {
       } else {
          set minor [expr $major*sqrt(1.0-$eccen*$eccen)]
       }
-      
+
       #  Convert the angle into a canvas one.
       set angle [canvas_angle $angle]
-      
+
       #  Now redraw the object with these parameters.
       redraw_object
    }
@@ -310,7 +310,7 @@ itcl::class gaia::GaiaPhotomObject {
       configure -positions $newpositions
    }
 
-   #  Set details of a sky region that will be used when creating 
+   #  Set details of a sky region that will be used when creating
    #  without allowing resizing.
    public method setskydefaults {major ecc angle shape} {
        set sky_defaults_(angle) [canvas_angle $angle]
@@ -319,7 +319,7 @@ itcl::class gaia::GaiaPhotomObject {
        set sky_defaults_(shape) $shape
    }
 
-   #  Synchronise the configuration options to reflect the drawn 
+   #  Synchronise the configuration options to reflect the drawn
    #  objects. Calling this method is necessary to follow any changes
    #  in the image zoom, which is never seen.
    public method sync {} {
@@ -330,7 +330,7 @@ itcl::class gaia::GaiaPhotomObject {
          update_ellipse $canvas_id_ resize
       }
    }
-   
+
    #  Return the values of all options. If mode is "all" then for
    #  apertures the extended form is used, otherwise only basic PHOTOM
    #  values are returned. If object isn't measured then this will
@@ -378,7 +378,7 @@ itcl::class gaia::GaiaPhotomObject {
       set description \
          "[format {%10d %10f %10f %10f %10f %10f %10s %10f %10f %10s} \
              $index $x $y $fwhm1 $fwhm2 $ang $code $maj $seeing $positions]"
-      if { $mode == "all" } { 
+      if { $mode == "all" } {
          append description "\n[list_sky_]"
       }
       return $description
@@ -390,7 +390,7 @@ itcl::class gaia::GaiaPhotomObject {
       set description \
          "[format {%10d %10f %10f %10f %10f %10f %10f %10s %10s} \
              $index $x $y $mag $magerr $sky $signal $code $positions]"
-      if { $mode == "all" } { 
+      if { $mode == "all" } {
          append description "\n[list_sky_]"
       }
       return $description
@@ -454,7 +454,7 @@ itcl::class gaia::GaiaPhotomObject {
          }
       }
    }
-   
+
    #  Return aperture details.
    protected method getapdets_ {} {
       lassign [image_coord $xpos $ypos] x y
@@ -472,7 +472,7 @@ itcl::class gaia::GaiaPhotomObject {
       set maj [image_dist $major]
       return "$index $x $y $mag $magerr $sky $signal $code \
               $positions $innerscale $outerscale $maj"
-   }   
+   }
 
    #  Return PSF details.
    protected method getpsfdets_ {} {
@@ -482,7 +482,7 @@ itcl::class gaia::GaiaPhotomObject {
       configure -index 0
       return "$index $x $y $fwhm1 $fwhm2 $angle $code $maj $seeing \
               $positions $innerscale $outerscale"
-   }   
+   }
 
    #  Status of object.
    public method status {} {
@@ -582,7 +582,7 @@ itcl::class gaia::GaiaPhotomObject {
             -semimajor $major -semiminor $minor -angle $angle
          update_circle $canvas_id_ move
 
-         #  Update display and deselect object (immediate resize isn't 
+         #  Update display and deselect object (immediate resize isn't
          #  desirable).
          update idletasks
          $canvasdraw deselect_object $canvas_id_
@@ -673,7 +673,7 @@ itcl::class gaia::GaiaPhotomObject {
 	   set default_binding_ [bind $canvas <1>]
 	   set default_cursor_ [$canvas cget -cursor]
 	   $canvas configure -cursor circle
-	   
+
 	   #  Get the position of the circle and create it.
 	   set interactive_ 0
 	   bind $canvas <1> [code eval $this placed_sky_circle_ $canvasX_ $canvasY_]
@@ -747,7 +747,7 @@ itcl::class gaia::GaiaPhotomObject {
        set sky_details_($sky_regions,id) $id
        $canvasdraw add_notify_cmd $id [code $this update_sky_circle $id] 0
        add_bindings_ $id
-       
+
        #  Inform sub-classes that a new aperture has been created.
        if { $create_cmd_ != {} } {
 	   eval $create_cmd_ $id
@@ -803,7 +803,7 @@ itcl::class gaia::GaiaPhotomObject {
             -semimajor $major -semiminor $minor -angle $angle
          update_ellipse $canvas_id_ move
 
-         #  Update display and deselect object (immediate resize isn't 
+         #  Update display and deselect object (immediate resize isn't
          #  desirable).
          update idletasks
          $canvasdraw deselect_object $canvas_id_
@@ -1486,7 +1486,7 @@ itcl::class gaia::GaiaPhotomObject {
 
    #  Sky region details.
    protected variable sky_details_
-   
+
    #  Defaults for sky regions created non-interactively
    protected variable sky_defaults_
 

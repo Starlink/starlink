@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,8 +87,8 @@
       LOGICAL DONE               ! Has seed been set before?
       REAL SEED                  ! The returned seed
 
-*  Ensure DONE is set false on the first call to this routine for 
-*  each process. Ensure the flag and seed values are retained for 
+*  Ensure DONE is set false on the first call to this routine for
+*  each process. Ensure the flag and seed values are retained for
 *  future invocations.
       DATA DONE /.FALSE./
       SAVE DONE, SEED
@@ -97,7 +97,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If the seed has already been set, just update the previous seed by a 
+*  If the seed has already been set, just update the previous seed by a
 *  random amount.
       IF( DONE ) THEN
          SEED = 2*SEED*SLA_RANDOM( SEED )
@@ -111,13 +111,13 @@
 *  Obtain the process id as an integer.
          CALL PSX_GETPID( PID, STATUS )
 
-*  Generate the seed as an odd number.  The process id is included 
-*  because the ticks are in seconds.  On modern machines the 
-*  application may be called several times each second, and so the same 
+*  Generate the seed as an odd number.  The process id is included
+*  because the ticks are in seconds.  On modern machines the
+*  application may be called several times each second, and so the same
 *  seed would be used if it depended on NTICKS alone.  Including the PID
-*  causes different seeds to be used each time because the PIDs will be 
+*  causes different seeds to be used each time because the PIDs will be
 *  different.  If the application is run repeatedly in the same process
-*  (e.g. ICL), then the seed will be set in the above (DONE=.TRUE.) 
+*  (e.g. ICL), then the seed will be set in the above (DONE=.TRUE.)
 *  block.
          SEED = REAL( ( MOD( NTICKS, NORM ) + 100*PID )* 2 + 1 )
 

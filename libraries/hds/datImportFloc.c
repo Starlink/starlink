@@ -29,10 +29,10 @@
  *    datImportFloc( const char flocator[DAT__SZLOC], int loc_length, HDSLoc **clocator, int * status);
 
  *  Description:
- *    This function should be used to convert a Fortran HDS locator 
+ *    This function should be used to convert a Fortran HDS locator
  *    (implemented as a string buffer) to a C locator struct. The C locator
  *    is malloced by this routine. The memory will be freed when datAnnul
- *    is called. This function is also available via the 
+ *    is called. This function is also available via the
  *    HDS_IMPORT_FLOCATOR macro defined in hds_fortran.h.
 
  *  Arguments
@@ -134,7 +134,7 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
 
   /* Now import the Fortran locator - this will work even if status
      is bad on entry but it is possible for this routine to set status
-     as well. We need to be able to determine whether the status was 
+     as well. We need to be able to determine whether the status was
      set bad by this routine, since that will result in garbage in the
      HDS locator. */
   emsMark();

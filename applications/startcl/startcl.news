@@ -3,8 +3,8 @@
 
  STARTCL v1.5-4 is now available.
 
- This release of the Starlink Tcl/Tk extensions upgrades them to Tcl/Tk 
+ This release of the Starlink Tcl/Tk extensions upgrades them to Tcl/Tk
  Version 8.2.3 and adds dynamic loading of the Gwm and Adam message
- system extensions on Linux.  Dynamic loading of these extensions was 
+ system extensions on Linux.  Dynamic loading of these extensions was
  already available on Tru64 Unix and Solaris.
 

@@ -71,16 +71,16 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
-      
+
 *  Arguments Given:
       INTEGER GID
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       LOGICAL VALID              ! Does GID represent a valid group?
-      
+
 *.
 
 *  Check inherited global status.
@@ -100,6 +100,6 @@
       ELSE
          GID = GRP__NOID
       END IF
-      
+
       END
 * $Id$

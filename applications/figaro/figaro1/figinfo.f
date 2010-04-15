@@ -9,14 +9,14 @@ C     find there, particularly in the case of awkward things like the
 C     flag that indicates whether or not the file's main data array may
 C     contain flagged data values (which doesn't necessarily mean that
 C     it does, just that it might). This particular flag can be a
-C     problem for Figaro files, partly because the default rules - how 
-C     you interpret its absence - is different in the two data formats, 
+C     problem for Figaro files, partly because the default rules - how
+C     you interpret its absence - is different in the two data formats,
 C     NDF and .DST.  If it is set when the file does not in fact contain
 C     flagged values then  processing the file can be inefficient,
-C     particularly for large files. If the file does contain flagged 
+C     particularly for large files. If the file does contain flagged
 C     data values but the flag is not set, then very odd results can be
-C     obtained when the file is processed. FIGINFO uses the same file 
-C     access routines as a normal Figaro program to interpret the file 
+C     obtained when the file is processed. FIGINFO uses the same file
+C     access routines as a normal Figaro program to interpret the file
 C     contents. It also provides a couple of options for manipulating
 C     the 'may contain flagged data values' flag, should it be mis-set.
 C
@@ -26,19 +26,19 @@ C     INPUT     (Character) Is the name of the file to be checked.
 C
 C  Keywords:
 C
-C     CHECK_FLAGS   If set, FIGINFO reads the data in the main data 
+C     CHECK_FLAGS   If set, FIGINFO reads the data in the main data
 C                   array to see if it does in fact contain flagged data
-C                   values. If it does not, the 'may contain flagged 
-C                   data values' flag is cleared. (This option is only 
+C                   values. If it does not, the 'may contain flagged
+C                   data values' flag is cleared. (This option is only
 C                   offered if the flag was initially set.)
-C     CLEAR_FLAG    A DANGEROUS option that clears the 'may contain 
+C     CLEAR_FLAG    A DANGEROUS option that clears the 'may contain
 C                   flagged data values' flag without testing the
-C                   actual data. (This option is only offered if the 
-C                   flag was initially set and CHECK_FLAGS was not 
+C                   actual data. (This option is only offered if the
+C                   flag was initially set and CHECK_FLAGS was not
 C                   specified.)
 C     SET_FLAG      A relatively safe option that sets the 'may contain
 C                   flagged data values' flag. The actual data is not
-C                   tested. (This option is only offered if the flag was 
+C                   tested. (This option is only offered if the flag was
 C                   not initially set.)
 C-
 C  History:
@@ -96,7 +96,7 @@ C
       LOGICAL   VARIANCE         ! True if variance array exists
       DOUBLE PRECISION WIDTH     ! Fixed axis width value - ignored
 C
-C     Open input file. 
+C     Open input file.
 C
       STATUS=0
       CALL DSA_OPEN (STATUS)
@@ -281,7 +281,7 @@ C
             ELSE
                NUMBER=ICH_CI(NFLAGGED)
                CALL PAR_WRUSER ('Data array contained '//
-     :             NUMBER(:ICH_LEN(NUMBER))//' flagged data value(s)', 
+     :             NUMBER(:ICH_LEN(NUMBER))//' flagged data value(s)',
      :                                                        IGNORE)
             END IF
 C
@@ -290,7 +290,7 @@ C
 C           If the CHECK option was not taken, we can still offer to
 C           clear the 'may have flagged data' flag. This should be
 C           regarded as a dangerous thing to do, and is only justified in
-C           cases where the data array is so huge that we can justify 
+C           cases where the data array is so huge that we can justify
 C           avoiding the overhead of checking it. (This should be a
 C           hidden parameter!)
 C
@@ -324,7 +324,7 @@ C
             IF (STATUS.NE.0) GO TO 500
             CALL PAR_WRUSER ('Flagged data flag has been set',IGNORE)
          END IF
-         
+
       END IF
 C
 C     Exit
@@ -362,7 +362,7 @@ C
       SUBROUTINE FIGINFO_CHECK_D (ARRAY,NELM,FLAG,NFLAGGED)
 C
 C     Utility routine for FIGINFO. This routine counts the number
-C     of the NELM elements in the double precision array ARRAY actually 
+C     of the NELM elements in the double precision array ARRAY actually
 C     contain the flag value FLAG. This number is returned in NFLAGGED.
 C
       IMPLICIT NONE

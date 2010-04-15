@@ -85,7 +85,7 @@ char *gaiaUtilsErrMessage()
 
     /* Recover error status from EMS */
     emsStat( &status_copy );
-    
+
     /* Check for programming errors and protect against them */
     if ( status_copy == SAI__OK ) {
         return strdup( "No EMS error status (possible programming error)" );
@@ -554,7 +554,7 @@ int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
                 *error_mess = strdup( ptr );
             }
             else {
-                *error_mess = 
+                *error_mess =
                     strdup( "Unknown error dealing with channel map plots" );
             }
         }
@@ -707,7 +707,7 @@ int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
 
     c[0] = VAL__BADR;
     grp = NULL;
-    
+
     /* If necessary pass in description in pieces as ardGrpex cannot accept
      * more than 255 characters per expression. This is indicated when the
      * string is too long and the breaks happen at embedded newlines. */
@@ -735,12 +735,12 @@ int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
 
     /*  Create the mask. */
     index = 2;
-    ardWork( grp, 2, inlbnd, inubnd, c, 0, &index, maskPtr, lbnd, ubnd, 
-             lbnde, ubnde, &status ); 
+    ardWork( grp, 2, inlbnd, inubnd, c, 0, &index, maskPtr, lbnd, ubnd,
+             lbnde, ubnde, &status );
 
     /* If either of the lower bounds are greater than the upper, then there
      * are no pixels in the mask (says the ARD docs). Return all bounds 0 in
-     * that case. */ 
+     * that case. */
     if ( lbnd[0] > ubnd[0] || lbnd[1] > ubnd[1] ) {
         lbnd[0] = ubnd[0] = lbnd[1] = ubnd[1] = 0;
     }

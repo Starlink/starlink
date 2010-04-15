@@ -5,7 +5,7 @@ C     AJH - switched A and C above
 C     TAY2CHEB
 C
 C     Converts polynomial coefficients held in Taylor series
-C     form into Chebyshev polynomial coefficients.  
+C     form into Chebyshev polynomial coefficients.
 C
 C     Parameters -  (">" input, "<" output)
 C
@@ -29,7 +29,7 @@ C
 C     Subroutines / functions used - None
 C
 C     GEN_CHEB2NO
-C     Original program by John Lucey, AAO. 
+C     Original program by John Lucey, AAO.
 C     Re-packaged by KS / AAO, 4th April 1985
 C     Say in prologue that A() is messed about with. HME / UoE,
 C        Starlink, 28th April 1995
@@ -53,9 +53,9 @@ C+
      $         9*0.D0,256.D0,0.D0,
      $         10*0.D0,512.D0/
 
-      DATA COM/11*1.D0, 
+      DATA COM/11*1.D0,
      $   0.D0,1.D0,2.D0,3.D0,4.D0,5.D0,6.D0,7.D0,8.D0,9.D0,10.D0,
-     $   2*0.D0,1.D0,3.D0,6.D0,10.D0,15.D0,21.D0,28.D0,36.D0,45.D0,   
+     $   2*0.D0,1.D0,3.D0,6.D0,10.D0,15.D0,21.D0,28.D0,36.D0,45.D0,
      $   3*0.D0,1.D0,4.D0,10.D0,20.D0,35.D0,56.D0,84.D0,120.D0,
      $   4*0.D0,1.D0,5.D0,15.D0,35.D0,70.D0,126.D0,210.D0,
      $   5*0.D0,1.D0,6.D0,21.D0,56.D0,126.D0,252.D0,
@@ -63,9 +63,9 @@ C+
      $   7*0.D0,1.D0,8.D0,36.D0,120.D0,
      $   8*0.D0,1.D0,9.D0,45.D0,
      $   9*0.D0,1.D0,10.D0,
-     $   10*0,1.D0/ 
-  
-    
+     $   10*0,1.D0/
+
+
       XRANGE=XMAX-XMIN
       AA=2.0D0/XRANGE
       BB=-(XMAX+XMIN)/XRANGE
@@ -75,7 +75,7 @@ C+
 
       A(NORDER)=C(NORDER)/((AA**NORDER)*COM(NORDER,NORDER)*
      :     CHB(NORDER,NORDER))
-      
+
       IF (NORDER.GT.1) THEN
          DO K=NORDER-1,0,-1
             SUM=0.D0
@@ -84,8 +84,8 @@ C+
             ENDDO
             P(K)=SUM
          ENDDO
-         
-         
+
+
          DO K=NORDER-1,0,-1
             SUM=0.D0
             DO I=K,NORDER
@@ -94,7 +94,7 @@ C+
             A(K)=(C(K)/(SUM*(AA**K)))-P(K)
          ENDDO
       ENDIF
-      
+
       A(0)=A(0)*2.D0
 
-      END        
+      END

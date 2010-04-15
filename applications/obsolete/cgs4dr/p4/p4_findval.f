@@ -1,10 +1,10 @@
-*+  P4_FINDVAL - routine to find the data value at a particular x, y position 
+*+  P4_FINDVAL - routine to find the data value at a particular x, y position
       SUBROUTINE P4_FINDVAL (X, Y, AXIS1, AXIS2, DATA, ERRORS, QUALITY,
      :   NDIM, DIM1, DIM2, IF_ERRORS, IF_QUALITY, DATAVAL, DATAERR,
      :   DATAQUAL, ACT_X, ACT_Y, IPOS, JPOS, STATUS)
 *    Description :
 *    Invocation :
-*     CALL P4_FINDVAL (X, Y, AXIS1, AXIS2, DATA, ERRORS, QUALITY, NDIM, 
+*     CALL P4_FINDVAL (X, Y, AXIS1, AXIS2, DATA, ERRORS, QUALITY, NDIM,
 *    :   DIM1, DIM2, IF_ERRORS, IF_QUALITY, DATAVAL, DATAERR, DATAQUAL,
 *    :   ACT_X, ACT_Y, IPOS, JPOS, STATUS)
 *    Parameters :
@@ -40,7 +40,7 @@
       INTEGER DATAQUAL                    ! 0 if there was a data value at
 *                                         !  x, y
       INTEGER IPOS, JPOS                  ! co-ords of datum in array
-      REAL ACT_X, ACT_Y                   ! actual position of x,y point 
+      REAL ACT_X, ACT_Y                   ! actual position of x,y point
 *    Status :
       INTEGER STATUS
 *    External references :

@@ -4,7 +4,7 @@
 
 	IMPLICIT NONE
 
-	INTEGER 
+	INTEGER
      :	  NUMCOEFFS             ! number of coefficients
 
 	REAL
@@ -15,10 +15,10 @@
 
 *      caluclate correction factor for this pixel
 
-	FACTOR = 1.0 + 
-     :	         COEFFS( 1)*VALMBIAS + 
+	FACTOR = 1.0 +
+     :	         COEFFS( 1)*VALMBIAS +
      :	         COEFFS( 2)*VALMBIAS**2 +
-     :           COEFFS( 3)*VALMBIAS**3 + 
+     :           COEFFS( 3)*VALMBIAS**3 +
      :	         COEFFS( 4)*VALMBIAS**4 +
      :           COEFFS( 5)*VALMBIAS**5
 

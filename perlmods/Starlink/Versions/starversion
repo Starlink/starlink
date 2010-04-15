@@ -168,7 +168,7 @@ If a version number can not be determined, it is returned as C<unknown>
  KAPPA: V0.15-5
  BLAH:  UNKNOWN
 
-Additionally, the program can be used to compare the version of 
+Additionally, the program can be used to compare the version of
 an installed package with a supplied version number via the
 C<-compare> flag.
 

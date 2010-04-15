@@ -12,7 +12,7 @@ BEGIN {
    exit;
  } else {
    plan tests => 2;
- }  
+ }
 };
 
 

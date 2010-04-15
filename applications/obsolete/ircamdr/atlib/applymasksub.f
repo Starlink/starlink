@@ -5,15 +5,15 @@
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
      :	  STATUS,
      :	  J,
      :	  K,
      :	  NUMPIX
 
-	REAL 
+	REAL
      :	  ARRIN( DIMSX, DIMSY),
      :	  ARRIN2( DIMSX, DIMSY),
      :	  ARROUT( DIMSX, DIMSY),
@@ -22,7 +22,7 @@
 *      initialize the number of bad pixels found
 	NUMPIX = 0
 
-*      scan image 
+*      scan image
 	DO J = 1, DIMSY
 	  DO K = 1, DIMSX
 	    IF( ARRIN2( K, J) .GT. 0.999 .AND.

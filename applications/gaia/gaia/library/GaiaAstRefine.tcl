@@ -198,7 +198,7 @@ itcl::class gaia::GaiaAstRefine {
             -variable [scope values_($this,maxshift)] \
             -command [code $this configure -maxshift $i]
       }
-      
+
       #  Markers menu
       set Marker [add_menubutton Markers]
 
@@ -218,7 +218,7 @@ itcl::class gaia::GaiaAstRefine {
       }
       add_short_help $itk_component(table) \
 	      {Reference positions and their ideal X,Y places}
-      
+
       #  Add a switch for controlling if the graphics markers move
       #  one-by-one or all together.
       itk_component add coupled {
@@ -545,7 +545,7 @@ itcl::class gaia::GaiaAstRefine {
    #  transformation as it exists is assigned directly to the image.
    public method assign {} {
       set nrows [$itk_component(table) total_rows]
-      if { $nrows > 0 } { 
+      if { $nrows > 0 } {
 
         #  Just use a refine with fittype of 6.
          set fittype $itk_option(-fittype)
@@ -586,7 +586,7 @@ itcl::class gaia::GaiaAstRefine {
          set tr3(4) $yoff
          set tr3(5) 0.0
          set tr3(6) 1.0
-         
+
          trconcat_ tr1 tr2 tr4
          trconcat_ tr4 tr3 tr5
 
@@ -605,9 +605,9 @@ itcl::class gaia::GaiaAstRefine {
 
    #  Methods for performing globals reorientations of the displayed
    #  positions. Note that we use displacements, scales and rotations
-   #  relative to the position used last time (this ensures that we 
+   #  relative to the position used last time (this ensures that we
    #  get back to where we started when returning to the initial
-   #  values). 
+   #  values).
    protected method xoffset_ {dx} {
       set reldx [expr $dx-$last_(xoffset)]
       $itk_component(table) offset $reldx 0.0
@@ -645,13 +645,13 @@ itcl::class gaia::GaiaAstRefine {
 	       set last_($control) $default_($control)
 	   }
        }
-       if { $ignore != "xcentre" } { 
+       if { $ignore != "xcentre" } {
 	   set_xcentre_ $default_(xcentre)
        }
-       if { $ignore != "ycentre" } { 
+       if { $ignore != "ycentre" } {
 	   set_ycentre_ $default_(ycentre)
        }
-       if { $ignore != "coupled" } { 
+       if { $ignore != "coupled" } {
 	   set values_($this,coupled) $default_(coupled)
 	   set_coupled_
        }
@@ -757,17 +757,17 @@ itcl::class gaia::GaiaAstRefine {
    itk_option define -isize isize Isize 9 {
       set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
       set values_($this,isize) $itk_option(-isize)
-      if { [info exists itk_component(table) ] } { 
+      if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -isize $itk_option(-isize)
       }
    }
-   
+
    #  Need to be 3.5->21.5, steps of 1.
    itk_option define -maxshift maxshift Maxshift 5.5 {
       set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
       set itk_option(-maxshift) [expr int($maxshift)+0.5]
       set values_($this,maxshift) $itk_option(-maxshift)
-      if { [info exists itk_component(table) ] } { 
+      if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
    }

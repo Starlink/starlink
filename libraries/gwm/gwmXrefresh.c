@@ -60,7 +60,7 @@ int MAIN (int argc, char *argv[])
 *     Either an error message or the name of the display is written to
 *     to the standard error channel. This provides the parent process
 *     with enough information to connect to the window.
-*     
+*
 *  Arguments:
 *     See xmake
 *
@@ -73,12 +73,12 @@ int MAIN (int argc, char *argv[])
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -145,31 +145,31 @@ int MAIN (int argc, char *argv[])
     static XtResource resources[] = {
 	{"geometry", "Geometry", XtRString, sizeof(String),
 		XtOffset(ApDataPtr,geom), XtRString, "780x512"},
-	{XtNforeground, XtCForeground, XtRString, sizeof(String), 
+	{XtNforeground, XtCForeground, XtRString, sizeof(String),
 		XtOffset(ApDataPtr,fg), XtRString, "White"},
-	{XtNbackground, XtCBackground, XtRString, sizeof(String), 
+	{XtNbackground, XtCBackground, XtRString, sizeof(String),
 		XtOffset(ApDataPtr,bg), XtRString, "Black"},
 	{"title", "Title", XtRString, sizeof(String),
 		XtOffset(ApDataPtr,title), XtRString, NULL},
 	{"overlayColour", "OverlayColour", XtRString, sizeof(String),
 		XtOffset(ApDataPtr,ovcol), XtRString, ""},
-	{"colours", "Colours", XtRInt, sizeof(int), 
+	{"colours", "Colours", XtRInt, sizeof(int),
 		XtOffset(ApDataPtr,ncols), XtRImmediate, (caddr_t)0},
-	{XtNborderWidth, XtCBorderWidth, XtRInt, sizeof(int), 
+	{XtNborderWidth, XtCBorderWidth, XtRInt, sizeof(int),
 		XtOffset(ApDataPtr,border), XtRImmediate, (caddr_t)10},
 	{"overlay", "Overlay", XtRBoolean, sizeof(Boolean),
 		XtOffset(ApDataPtr,overlay), XtRString, "False"},
-	{"interactive", "Interactive", XtRBoolean, sizeof(Boolean), 
+	{"interactive", "Interactive", XtRBoolean, sizeof(Boolean),
 		XtOffset(ApDataPtr,inter), XtRString, "False"},
-	{"iconic", "Iconic", XtRBoolean, sizeof(Boolean), 
+	{"iconic", "Iconic", XtRBoolean, sizeof(Boolean),
 		XtOffset(ApDataPtr,iconic), XtRString, "False"},
 	};
 
-/*	  
+/*
 **  Use XtInitialize to parse the command arguments using the standard Xt
 **  options.
-*/	  
-    top = XtInitialize("gwm", "Gwm", optable, XtNumber(optable), 
+*/
+    top = XtInitialize("gwm", "Gwm", optable, XtNumber(optable),
 	&argc, argv);
 
 /*
@@ -182,16 +182,16 @@ int MAIN (int argc, char *argv[])
 	goto error_exit;
     }
 
-/*	  
+/*
 **  There should be only one argument left (in addition to the program
 **  name in argv[0]) which is the window name
-*/	  
+*/
     if ( argc <= 1 )
     {
 	GWM_Error( GWM_NO_WIN_NAME );
 	goto error_exit;
     }
-    else 
+    else
     {
 	if ( argc > 2 )
         {
@@ -209,14 +209,14 @@ int MAIN (int argc, char *argv[])
 	    	goto error_exit;
 	    }
 	}
-		
+
     }
 
 /*
 **  Fetch the values of the window size parameters from the resource
 **  database
 */
-    XtGetSubresources(top, &data, argv[1], argv[1], resources, 
+    XtGetSubresources(top, &data, argv[1], argv[1], resources,
 	XtNumber(resources), NULL, 0);
 
 /*
@@ -236,11 +236,11 @@ int MAIN (int argc, char *argv[])
 */
     if (data.overlay && (data.ovcol[0] == '\0')) data.ovcol = data.fg;
 
-/*	  
+/*
 **  Make the window
 */
-    status = GWM_MakeWindow (display, argv[1], data.title, data.ncols, 
-	data.inter, data.iconic, data.border, data.fg, data.bg, data.overlay, 
+    status = GWM_MakeWindow (display, argv[1], data.title, data.ncols,
+	data.inter, data.iconic, data.border, data.fg, data.bg, data.overlay,
 	data.ovcol, size_x, size_y, pos_x, pos_y, &win_id );
 
     if ( status != GWM_SUCCESS)
@@ -249,9 +249,9 @@ int MAIN (int argc, char *argv[])
 	goto error_exit;
     }
 
-/*	  
+/*
 **  Set up the structure that GWM_ProcessEvent uses to process the events
-*/	  
+*/
     status = GWM_GetWinInfo( display, win_id, &info);
 
     if ( status != GWM_SUCCESS)
@@ -276,25 +276,25 @@ int MAIN (int argc, char *argv[])
 #if defined(VMS)
     (void)lib$establish( handler );
 #endif
-/*	  
+/*
 **  Create a graphics context for copying the pixmap to the window.
-*/	  
+*/
    info->gc = XCreateGC( display, win_id, 0, &gcvalues);
 
-/*	  
+/*
 **  Select the events to process
-*/	  
+*/
     XSelectInput( display, win_id, ExposureMask | PropertyChangeMask |
 	    StructureNotifyMask | StructureNotifyMask);
 
-/*	  
+/*
 **  Loop waiting for events
-*/	  
+*/
     for (;;)
     {
 	XNextEvent( display, &event);
 
-	if ( event.type == Expose || event.type == ConfigureNotify || 
+	if ( event.type == Expose || event.type == ConfigureNotify ||
 	    event.type == DestroyNotify || event.type == ClientMessage
 	    || event.type == PropertyNotify)
 	{
@@ -306,7 +306,7 @@ int MAIN (int argc, char *argv[])
 	    }
 	}
 
-/*	  
+/*
 **  If it was a window destroy event then exit
 */
 	if ( event.type == DestroyNotify) break;
@@ -314,7 +314,7 @@ int MAIN (int argc, char *argv[])
 
 #if defined(VMS)
 error_exit:
-    return 1;    
+    return 1;
 #else
     return 0;
 error_exit:
@@ -328,9 +328,9 @@ int main()
     char *argv[255], *newline;
     int argc;
 
-/*	  
+/*
 **  Read arguments the standard input until EOF is seen
-*/	  
+*/
     for ( argc = 0 ; argc < 255; argc++)
     {
 	argv[argc] = malloc(255);
@@ -340,9 +340,9 @@ int main()
 	argv[argc] = realloc(argv[argc], strlen(argv[argc])+1);
     }
     argv[argc] = '\0';
-/*	  
+/*
 **  Call the "real" main program
-*/	  
+*/
     return VMS_main(argc, argv);
 }
 #endif

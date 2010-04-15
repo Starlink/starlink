@@ -32,7 +32,7 @@
 *     the arrows (see parameter BLANK).
 
 *  Usage:
-*     drawnorth [device] [length] [origin] 
+*     drawnorth [device] [length] [origin]
 
 *  ADAM Parameters:
 *     ARROW = _REAL (Read)
@@ -48,7 +48,7 @@
 *        device.  The size of the blanked area can be controlled using
 *        parameter BLANKSIZE.  [FALSE]
 *     BLANKSIZE = _REAL (Read)
-*        Specifies the size of the blanked area (see parameter BLANK). 
+*        Specifies the size of the blanked area (see parameter BLANK).
 *        A value of 1.0 results in the blanked area being just large
 *        enough to contain the drawn arrows and labels.  Values larger
 *        than 1.0 introduce a blank margin around the drawn arrows and
@@ -74,7 +74,7 @@
 *
 *        An error will be reported if a co-ordinate Frame is requested
 *        which is not available in the previously displayed picture.  If
-*        the selected Frame has more than two axes, the parameter 
+*        the selected Frame has more than two axes, the parameter
 *        USEAXIS will determine the two axes which are to be used.  [!]
 *     LENGTH( 2 ) = _REAL (Read)
 *        The lengths of the arrows, expressed as fractions of the
@@ -87,7 +87,7 @@
 *        arrows will be supplied (see parameter ORIGIN).  The following
 *        Frames will always be available.
 *
-*        - "GRAPHICS" -- gives positions in millimetres from the 
+*        - "GRAPHICS" -- gives positions in millimetres from the
 *        bottom-left corner of the plotting surface.
 *
 *        - "BASEPIC" -- gives positions in a normalised system in which
@@ -100,8 +100,8 @@
 *        and the shortest dimension of the picture has length 1.0.  The
 *        scales on the two axes are equal.
 *
-*        - "NDC" -- gives positions in a normalised system in which the 
-*        bottom-left corner of the plotting surface is (0,0) and the 
+*        - "NDC" -- gives positions in a normalised system in which the
+*        bottom-left corner of the plotting surface is (0,0) and the
 *        top-right corner is (1,1).
 *
 *        - "CURNDC" -- gives positions in a normalised system in which
@@ -119,14 +119,14 @@
 *     ORIGIN = LITERAL (Read)
 *        The co-ordinates at which to place the origin of the arrows,
 *        in the Frame specified by parameter OFRAME.  If a null (!)
-*        value is supplied, OFRAME is ignored and the arrows are 
+*        value is supplied, OFRAME is ignored and the arrows are
 *        situated at a default position near one of the corners, or at
 *        the centre.  The supplied position can be anywhere within the
 *        current picture.  An error is reported if the arrows and
 *        labels cannot be drawn at any of these positions.  [!]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the vectors and annotated axes. 
+*        use for the vectors and annotated axes.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -147,11 +147,11 @@
 *        defaulted if a null value (!) is supplied. See section
 *        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported). 
+*        (no error is reported).
 *
 *        The appearance of the arrows is controlled by the attributes
 *        Colour(Axes), Width(Axes), etc. (the synonym Arrows may be
-*        used in place of Axes). 
+*        used in place of Axes).
 *
 *        The text of the label to draw against each arrow is specified
 *        by the Symbol(1) and Symbol(2) attributes.  These default to
@@ -168,23 +168,23 @@
 *        the two drawn arrows should refer.  Each axis can be specified
 *        using one of the following options.
 *
-*        - An integer index of an axis within the current Frame of the 
+*        - An integer index of an axis within the current Frame of the
 *        input NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *
 *        - An axis symbol string such as "RA" or "VRAD".
 *
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
-*        sky longitude and latitude axes respectively.  Only those axis 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
 *        A list of acceptable values is displayed if an illegal value
-*        is supplied.  If a null (!) value is supplied, the first two 
+*        is supplied.  If a null (!) value is supplied, the first two
 *        axes of the Frame are used.  [!]
 
 *  Examples:
-*     drawnorth 
+*     drawnorth
 *        Draws a pair of arrows indicating the directions of the axes of
 *        the previously displayed image, contour map, etc. The arrows
 *        are drawn at the top left of the picture. The current values
@@ -194,8 +194,8 @@
 *        and positions them in the middle of the underlying DATA
 *        picture. In addition, the text labels are drawn with a clear
 *        background so that the underlying image can seen around the
-*        text. 
-*     drawnorth blank blanksize=1.2 oframe=pixel origin="150,250" 
+*        text.
+*     drawnorth blank blanksize=1.2 oframe=pixel origin="150,250"
 *        As above, but positions the arrows at pixel co-ordinates
 *        (150,250), and blanks out a larger area around the arrows.
 *     drawnorth blank oframe=! origin="10:12:34,-12:23:37"
@@ -271,7 +271,7 @@
 
 *  Local Variables:
       CHARACTER DOM*30           ! Domain name
-      DOUBLE PRECISION BBOX( 4 ) ! Box bounds 
+      DOUBLE PRECISION BBOX( 4 ) ! Box bounds
       DOUBLE PRECISION CC0( 2 )  ! Current Frame position of origin
       DOUBLE PRECISION GC0( 2 )  ! GRAPHICS Frame position of origin
       DOUBLE PRECISION GC1( 2 )  ! GRAPHICS Frame position of new origin
@@ -299,7 +299,7 @@
       REAL DX2                   ! Upper GRAPHICS X value of DATA picture
       REAL DY1                   ! Lower GRAPHICS Y value of DATA picture
       REAL DY2                   ! Upper GRAPHICS Y value of DATA picture
-      REAL GBOX( 4 )             ! Box bounds 
+      REAL GBOX( 4 )             ! Box bounds
       REAL LENS( 2 )             ! Size of arrows
       REAL MARGIN                ! Amount to extend area by at each edge
       REAL MNSIZE                ! Size (in mm) of smallest picture dimension
@@ -323,9 +323,9 @@
       CALL AST_BEGIN( STATUS )
 
 *  Open the grahics device and see if there is an axisting DATA picture
-*  with which we can attempt to align the new one. If such a picture is 
+*  with which we can attempt to align the new one. If such a picture is
 *  found, a Plot is returned for it. Otherwise, an error is reported.
-      CALL KPG1_PLOTA( AST__NULL, 'OLD', ' ', IPIC0, IPICD0, IPLOT, 
+      CALL KPG1_PLOTA( AST__NULL, 'OLD', ' ', IPIC0, IPICD0, IPLOT,
      :                 STATUS )
 
 * Save the bounds of this picture.
@@ -333,7 +333,7 @@
 
 *  In order to allow the arrows to be drawn anywhere within the original
 *  current picture (as opposed to merely anywhere within the DATA picture),
-*  we get the Plot fro the current picture and into it the Frames from the 
+*  we get the Plot fro the current picture and into it the Frames from the
 *  DATA picture Plot, aligning the FrameSets in the BASEPIC Frame....
 
 *  Get the Plot for the original current picture.
@@ -341,13 +341,13 @@
 
 *  Remove all Frames except the GRAPHICS Frame and the BASEPIC Frame.
       I = 1
-      DO WHILE( I .LE. AST_GETI( IPLOTC, 'NFRAME', STATUS ) ) 
+      DO WHILE( I .LE. AST_GETI( IPLOTC, 'NFRAME', STATUS ) )
          FRM = AST_GETFRAME( IPLOTC, I, STATUS )
          DOM = AST_GETC( FRM, 'DOMAIN', STATUS )
          IF( DOM .NE. 'BASEPIC' .AND. DOM .NE. 'GRAPHICS' ) THEN
             CALL AST_REMOVEFRAME( IPLOTC, I, STATUS )
             I = I - 1
-         END IF            
+         END IF
          CALL AST_ANNUL( FRM, STATUS )
          I = I + 1
       END DO
@@ -367,17 +367,17 @@
       CALL KPG1_ASMRG( IPLOTC, IPLOT, ' ', .TRUE., 0, STATUS )
 
 *  Reinstate the original current Frame (set to BASPIC by the above call).
-      FS = AST_FINDFRAME( IPLOTC, CURFRM, ' ', STATUS ) 
+      FS = AST_FINDFRAME( IPLOTC, CURFRM, ' ', STATUS )
 
 *  Select the Frame for which arrows are required. The selected Frame
 *  becomes the current FRAME.
       CALL MSG_SETC( 'PIC', 'picture' )
       CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IPLOTC, ' ', ' ', .TRUE.,
      :                 '^PIC', STATUS )
-      
+
 *  If the selected Frame has more than 2 axes, get the user to indicate
 *  which two axes are to be used.
-      NAX = AST_GETI( IPLOTC, 'NAXES', STATUS ) 
+      NAX = AST_GETI( IPLOTC, 'NAXES', STATUS )
       IF( NAX .LT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NAX', NAX )
@@ -395,13 +395,13 @@
          CALL KPG1_GTAXI( 'USEAXIS', IPLOTC, 2, IAXIS, STATUS )
 
 *  Create a new Frame by picking the selected axes from the original
-*  Current Frame. This also returns a PermMap which goes from the 
+*  Current Frame. This also returns a PermMap which goes from the
 *  original Frame to the new one, using AST__BAD values for the
 *  un-selected axes.
          NEWCUR = AST_PICKAXES( IPLOTC, 2, IAXIS, PMAP, STATUS )
 
 *  Add this new Frame into the FrameSet. It becomes the Current Frame.
-         CALL AST_ADDFRAME( IPLOTC, AST__CURRENT, PMAP, NEWCUR, 
+         CALL AST_ADDFRAME( IPLOTC, AST__CURRENT, PMAP, NEWCUR,
      :                      STATUS )
 
       END IF
@@ -409,13 +409,13 @@
 *  Note the index of the current Frame in the Plot.
       ICURR = AST_GETI( IPLOTC, 'CURRENT', STATUS )
 
-*  Allow the user to specify the Frame in which ORIGIN is to be given. 
-*  Any Frame in the Plot can be chosen. The selected Frame becomes the 
+*  Allow the user to specify the Frame in which ORIGIN is to be given.
+*  Any Frame in the Plot can be chosen. The selected Frame becomes the
 *  Current Frame in the Plot.
       CALL MSG_SETC( 'PIC', 'picture' )
       CALL KPG1_ASFRM( 'OFRAME', 'EPOCH', IPLOTC, ' ', ' ', .TRUE.,
      :                 '^PIC', STATUS )
-      
+
 *  Get the position of the arrow origin. Check first that no error has
 *  occurred.
       IF( STATUS .NE. SAI__OK ) GOTO 999
@@ -437,7 +437,7 @@
 
 *  Get the other parameters defining the arrows.
       CALL PAR_GET0R( 'ARROW', ARROW, STATUS )
-      CALL PAR_GET1R( 'LENGTH', 2, LENS, NLENS, STATUS ) 
+      CALL PAR_GET1R( 'LENGTH', 2, LENS, NLENS, STATUS )
       IF( NLENS .LT. 2 ) LENS( 2 ) = LENS( 1 )
 
 * COnvert relative sizes to absolute sizes.
@@ -453,7 +453,7 @@
 *  Create a new Plot from the existing one. All the Plot attributes of
 *  the new Plot are initialised to the "unset" defaults (i.e. any Plot
 *  attributes which have been set in the existing Plot are forgotten). This
-*  is done so that the set attributes of the existing Plot are not given 
+*  is done so that the set attributes of the existing Plot are not given
 *  priority over the attribute settings in kappa_drawnorth_style.def.
       GBOX( 1 ) = X1
       GBOX( 2 ) = Y1
@@ -473,21 +473,21 @@
       CALL KPG1_ASPSY( '(ARROW1)', '(AXIS1)', STATUS )
       CALL KPG1_ASPSY( '(ARROW2)', '(AXIS2)', STATUS )
 
-*  Set the attributes of the Plot to give the required plotting style.     
+*  Set the attributes of the Plot to give the required plotting style.
       CALL KPG1_ASSET( 'KAPPA_DRAWNORTH', 'STYLE', IPLOTC, STATUS )
 
 *  If we are to find a default origin, first try a position near the top
-*  left corner of the underlying DATA picture. This first guess will 
+*  left corner of the underlying DATA picture. This first guess will
 *  result in the arrows being within the DATA picture, but the labels may
 *  not be.
-      IF( GUESS ) THEN 
+      IF( GUESS ) THEN
          R = 1.3*MAX( LENS( 1 ), LENS( 2 ) )
          GC0( 1 ) = DX1 + R
          GC0( 2 ) = DY2 - R
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
 *  origin. The bouding box of the plotted items is returned.
-         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0, 
+         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0,
      :                    MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Check they were plotted.
@@ -500,8 +500,8 @@
             GC1( 2 ) = GC0( 2 ) - YY2 + DY2 - 3.0
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
-*  modified origin. 
-            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1, 
+*  modified origin.
+            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1,
      :                       MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Use this modified origin if the arrows and labels were succesfully
@@ -515,14 +515,14 @@
       END IF
 
 *  If we still need to find a default origin, try a position near the
-*  bottom left corner of the underlying DATA picture. 
-      IF( GUESS ) THEN 
+*  bottom left corner of the underlying DATA picture.
+      IF( GUESS ) THEN
          GC0( 1 ) = DX1 + R
          GC0( 2 ) = DY1 + R
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
 *  origin. The bouding box of the plotted items is returned.
-         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0, 
+         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0,
      :                    MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Check they were plotted.
@@ -535,8 +535,8 @@
             GC1( 2 ) = GC0( 2 ) - YY1 + DY1 + 3.0
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
-*  modified origin. 
-            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1, 
+*  modified origin.
+            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1,
      :                       MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Use this modified origin if the arrows and labels were succesfully
@@ -550,8 +550,8 @@
       END IF
 
 *  If we still need to find a default origin, try a position near the
-*  top right corner of the underlying DATA picture. 
-      IF( GUESS ) THEN 
+*  top right corner of the underlying DATA picture.
+      IF( GUESS ) THEN
          GC0( 1 ) = DX2 - R
          GC0( 2 ) = DY2 - R
 
@@ -570,8 +570,8 @@
             GC1( 2 ) = GC0( 2 ) - YY2 + DY2 - 3.0
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
-*  modified origin. 
-            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1, 
+*  modified origin.
+            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1,
      :                       MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Use this modified origin if the arrows and labels were succesfully
@@ -585,14 +585,14 @@
       END IF
 
 *  If we still need to find a default origin, try a position near the
-*  bottom right corner of the underlying DATA picture. 
-      IF( GUESS ) THEN 
+*  bottom right corner of the underlying DATA picture.
+      IF( GUESS ) THEN
          GC0( 1 ) = DX2 - R
          GC0( 2 ) = DY1 + R
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
 *  origin. The bouding box of the plotted items is returned.
-         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0, 
+         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0,
      :                    MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Check they were plotted.
@@ -605,8 +605,8 @@
             GC1( 2 ) = GC0( 2 ) + DY1 - YY1 + 3.0
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
-*  modified origin. 
-            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1, 
+*  modified origin.
+            CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC1,
      :                       MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Use this modified origin if the arrows and labels were succesfully
@@ -619,15 +619,15 @@
          END IF
       END IF
 
-*  If we still need to find a default origin, try the centre of the 
-*  underlying DATA picture. 
-      IF( GUESS ) THEN 
+*  If we still need to find a default origin, try the centre of the
+*  underlying DATA picture.
+      IF( GUESS ) THEN
          GC0( 1 ) = 0.5*( DX1 + DX2 )
          GC0( 2 ) = 0.5*( DY1 + DY2 )
 
 *  Attempt to draw the arrows and labels in invisible ink, using this
 *  origin. The bouding box of the plotted items is returned.
-         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0, 
+         CALL KPS1_DNRTH( .FALSE., IPLOT, LENS, ARROW, GC0,
      :                    MNSIZE, XX1, XX2, YY1, YY2, STATUS )
 
 *  Check they were plotted.
@@ -636,10 +636,10 @@
       END IF
 
 *  If we still need to find a default origin, report an error.
-      IF( GUESS .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF( GUESS .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'DRAWNORTH_ERR2', 'Cannot find a usable '//
-     :                 'default value for the ORIGIN parameter.', 
+     :                 'default value for the ORIGIN parameter.',
      :                 STATUS )
          GO TO 999
       END IF
@@ -650,8 +650,8 @@
      :                 XX1, XX2, YY1, YY2, STATUS )
 
 *  Report an error if the supplied origin cannot be used.
-      IF( ( XX2 .LT. XX1 .OR. YY2 .LT. YY1 ) .AND. 
-     :    STATUS .EQ. SAI__OK ) THEN 
+      IF( ( XX2 .LT. XX1 .OR. YY2 .LT. YY1 ) .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'DRAWNORTH_ERR3', 'Cannot determine the axis '//
      :                 'directions at the specified origin.', STATUS )
@@ -660,8 +660,8 @@
 
 *  Find the relative size for the new picture, as a fraction of the box just
 *  enclosing the arrows and labels.
-      CALL PAR_GDR0R( 'BLANKSIZE', 1.05, 1.0, 10000.0, .FALSE., BLSIZE, 
-     :                STATUS ) 
+      CALL PAR_GDR0R( 'BLANKSIZE', 1.05, 1.0, 10000.0, .FALSE., BLSIZE,
+     :                STATUS )
 
 *  Find the GRAPHICS bounds for the new picture.
       MARGIN = 0.5*( BLSIZE - 1.0 )*( XX2 - XX1 )
@@ -685,12 +685,12 @@
       IF( BLANK ) CALL KPG1_PGCLR( STATUS )
 
 *  Draw the required arrows and labels.
-      CALL KPS1_DNRTH( .TRUE., IPLOTC, LENS, ARROW, GC0, MNSIZE, 
+      CALL KPS1_DNRTH( .TRUE., IPLOTC, LENS, ARROW, GC0, MNSIZE,
      :                 XX1, XX2, YY1, YY2, STATUS )
 
 *  Report an error if the supplied origin cannot be used.
-      IF( ( XX2 .LT. XX1 .OR. YY2 .LT. YY1 ) .AND. 
-     :    STATUS .EQ. SAI__OK ) THEN 
+      IF( ( XX2 .LT. XX1 .OR. YY2 .LT. YY1 ) .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'DRAWNORTH_ERR5', 'Cannot determine the axis '//
      :                 'directions at the specified origin.', STATUS )

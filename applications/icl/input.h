@@ -24,10 +24,10 @@ extern int   terminal_output (void);
 extern int   sense_vms (FILE *fp);
 extern int   icl_input(void);
 extern void  icl_unput(int i);
-extern value icl_gets  (int interruptable, char *whofor, char *buffer, 
+extern value icl_gets  (int interruptable, char *whofor, char *buffer,
 			int buffersize, char *prompt, char *dflt);
 extern value clearupafterinput(char *whofor);
-extern value icl_fgets (char *filename, char *buffer, int buffersize, 
+extern value icl_fgets (char *filename, char *buffer, int buffersize,
 			value vfp);
 extern value clearupafterread(value file, char *whofor, char *filename);
 extern value iclopenfile(char *whofor, char *filename, char *openmode);

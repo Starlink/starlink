@@ -1,6 +1,6 @@
 
 
-*+  GENHIS - calculates the histogram of an array of data 
+*+  GENHIS - calculates the histogram of an array of data
 
       SUBROUTINE GENHIS ( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH,
      :                    YFINISH, VALMAX, VALMIN, NUMBIN, HIST,
@@ -8,7 +8,7 @@
 
 *    Description :
 *
-*     This routine calculates the truncated intensity histogram 
+*     This routine calculates the truncated intensity histogram
 *     of a rectangular array of data.
 *
 *    Invocation :
@@ -65,7 +65,7 @@
 *     30-07-1985 : First SSE/ADAM implementation, with algorithm taken
 *                : from Dennis Kelly's GENHIS from Starlink (UKTH::MARK)
 *     14-04-1986 : Tidied up (REVA::MJM)
-*     12-AUG-1994  Changed DIM arguments so that routine will compile(SKL@JACH) 
+*     12-AUG-1994  Changed DIM arguments so that routine will compile(SKL@JACH)
 *
 *    Type Definitions :
 

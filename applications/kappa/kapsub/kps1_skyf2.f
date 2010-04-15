@@ -124,15 +124,15 @@
       CHARACTER * ( * ) SCS
       INTEGER NP
       INTEGER NPOS
-      DOUBLE PRECISION P( NP )      
+      DOUBLE PRECISION P( NP )
 
 *  Arguments Given and Returned:
-      DOUBLE PRECISION PC( NP )      
-      DOUBLE PRECISION AA( NPOS )      
-      DOUBLE PRECISION BB( NPOS )      
-      DOUBLE PRECISION XX( NPOS )      
-      DOUBLE PRECISION YY( NPOS )      
-      
+      DOUBLE PRECISION PC( NP )
+      DOUBLE PRECISION AA( NPOS )
+      DOUBLE PRECISION BB( NPOS )
+      DOUBLE PRECISION XX( NPOS )
+      DOUBLE PRECISION YY( NPOS )
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -145,8 +145,8 @@
       DOUBLE PRECISION PD        ! Pixel distance between two positions
       INTEGER          POS       ! Current position index
       CHARACTER * ( GRP__SZNAM ) TEXT( 4 ) ! Text defining current
-                                 ! position 
-      
+                                 ! position
+
 *.
 
 *  Check the inherited global status.
@@ -160,7 +160,7 @@
          CALL CHR_CTOD( TEXT( 3 ), XX( POS ), STATUS )
          CALL CHR_CTOD( TEXT( 4 ), YY( POS ), STATUS )
       END DO
-      
+
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -182,17 +182,17 @@
          PC( 3 ) = P( 3 )
          PC( 4 ) = P( 4 )
       END IF
-      
+
 *  If pixel sizes were supplied by the user, they are used.  Otherwise,
 *  the pixel size is guessed by dividing the arc-distance between the
 *  first two positions by the distance in pixels.  An error is reported
 *  if the first two positions are co-incident.
       IF ( .NOT. PSIZE ) THEN
-         
+
          PD = SQRT( MAX( 0.0D0, ( XX( 1 ) - XX( 2 ) )**2 +
      :        ( YY( 1 ) - YY( 2 ) )**2 ) )
          AD = SLA_DSEP( AA( 1 ), BB( 1 ), AA( 2 ), BB( 2 ) )
-         
+
          IF ( ( ABS( AD ) .LT. VAL__SMLD .OR. ABS( PD ) .LT. VAL__SMLD )
      :          .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -200,26 +200,26 @@
      :                    /'positions given.', STATUS )
             GO TO 999
          END IF
-         
+
          PC( 5 ) = AD/PD
          PC( 6 ) = AD/PD
-         
+
       ELSE
          PC( 5 ) = P( 5 )
          PC( 6 ) = P( 6 )
       END IF
-      
+
 *  If the image orientation was supplied by the user, it is
 *  used. Otherwise, the image orientation is guessed by finding the
 *  difference between the bearing of the second position from the first
 *  in sky co-ordinates and image co-ordinates.  An error is reported
 *  if the first two positions are co-incident.
       IF ( .NOT. ORIENT ) THEN
-         
+
          PD = SQRT( MAX( 0.0D0, ( XX( 1 ) - XX( 2 ) )**2 +
      :        ( YY( 1 ) - YY( 2 ) )**2 ) )
          AD = SLA_DSEP( AA( 1 ), BB( 1 ), AA( 2 ), BB( 2 ) )
-         
+
          IF ( ( ABS( AD ) .LT. VAL__SMLD .OR. ABS( PD ) .LT. VAL__SMLD )
      :          .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -227,14 +227,14 @@
      :                    /'positions given.', STATUS )
             GO TO 999
          END IF
-         
+
          PC( 7 ) = SLA_DBEAR( AA( 1 ), BB( 1 ), AA( 2 ), BB( 2 ) ) -
      :             ATAN2( XX( 1 ) - XX( 2 ), YY( 2 ) - YY( 1 ) )
       ELSE
          PC( 7 ) = P( 7 )
 
       END IF
-      
+
 *  If the tilt of the celestial sphere was supplied by the user, it is
 *  used, otherwise it is guessed as zero.
       IF ( .NOT. TILT ) THEN
@@ -244,7 +244,7 @@
       END IF
 
 *  Shift the sky co-ordinates of the reference positions slightly (by a
-*  tenth of a pixel) so that it is unlikely to correspond to any of the 
+*  tenth of a pixel) so that it is unlikely to correspond to any of the
 *  supplied positions.  This needs to be done because some projections
 *  (e.g. AITOFF) have a singularity at the reference position.
       PC( 1 ) = AA( 1 ) + 0.1*PC( 5 )
@@ -252,5 +252,5 @@
 
 *  Jump to here if an error has occurred.
  999  CONTINUE
-         
+
       END

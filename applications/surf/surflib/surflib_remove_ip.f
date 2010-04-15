@@ -10,7 +10,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_REMOVE_IP( ELEVATION, NUM_CHAN, NUM_ADC,
 *    :     N_BOLS, WPLATE_ANG, BOL_CHAN, BOL_ADC,
@@ -27,11 +27,11 @@
 *     where fractional polarisation and IP angle vary linearly with
 *     elevation.
 *
-*     This is an approximation of 
+*     This is an approximation of
 *
 *       Actual flux = measured flux - mean flux * frac IP
 *
-*     where 
+*     where
 *
 *        IP = P * (1 + cos (4 WP - 2 THETA ) ),
 *
@@ -42,11 +42,11 @@
 *     bolometers are jiggling on and off the source.
 *
 *     This routine corrects the data point for each bolometer
-*     by looking up the IP data in the supplied array. Only one 
-*     set of bolometers can be processed at any one time (since the 
-*     elevation of the array changes during the observation). The 
+*     by looking up the IP data in the supplied array. Only one
+*     set of bolometers can be processed at any one time (since the
+*     elevation of the array changes during the observation). The
 *     routine should be called repeatedly for each time/elevation.
-*     
+*
 
 
 *  Arguments:
@@ -117,11 +117,11 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
- 
+
 *  Arguments Given:
       DOUBLE PRECISION ELEVATION
       INTEGER NUM_CHAN
@@ -175,7 +175,7 @@
 *     Precalculate degrees to radians conversion
       SD2R = SNGL(PI) / 180.0
 
-*     Convert the elevation to degrees since the IP_DATA 
+*     Convert the elevation to degrees since the IP_DATA
 *     specifies the slope in X/degrees
 
       EL = SNGL(ELEVATION)
@@ -246,11 +246,11 @@
 *     Assume that the variances are good if the data IP values
 *     were good
 
-               P_IP_VAR = (PZERO_VAR + (EL ** 2.0) * PSLOPE_VAR ) / 
+               P_IP_VAR = (PZERO_VAR + (EL ** 2.0) * PSLOPE_VAR ) /
      :              (100 ** 2)
                THETA_IP_VAR = THETA_VAR + (EL ** 2.0) * THETASLOPE_VAR
 
-*     Now calculate the IP correction 
+*     Now calculate the IP correction
 
                ANG_BIT = COS((4.0*WPANG) - (2.0*THETA_IP))
                IP = P_IP * ( 1 + ANG_BIT )
@@ -261,12 +261,12 @@
 
                ANG_VAR = ((2.0 * SIN((4.0*WPANG)-(2.0*THETA_IP)))
      :              ** 2.0) * THETA_IP_VAR
-               
+
 *     check for division by zero problems
                IF (P_IP .EQ. 0.0 .OR. ANG_BIT .EQ. 0) THEN
                   IP_VAR = VAL__BADR
                ELSE
-                  IP_VAR = (IP**2)*( (P_IP_VAR/(P_IP**2)) + 
+                  IP_VAR = (IP**2)*( (P_IP_VAR/(P_IP**2)) +
      :                 (ANG_VAR/(ANG_BIT**2)) )
                END IF
 

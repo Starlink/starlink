@@ -53,15 +53,15 @@ C-----------------------------------------------------------------------
       CALL PGPAGE
       CALL PGVSTD
       CALL PGWNAD(-A, A*(N+1), -1.1, 1.1)
-      
+
       DO 200 T=0,NT
         CALL PGBBUF
         CALL PGERAS
         CALL PGSCI(1)
         CALL PGBOX('bcnst', 0.0, 0, 'bcnst', 0.0, 0)
         DO 100 I=0,N
-          X(I) = I*A 
-          Y(I) = SIN(I*A-T*B)  
+          X(I) = I*A
+          Y(I) = SIN(I*A-T*B)
   100   CONTINUE
         CALL PGSCI(3)
         CALL PGLINE(N+1,X,Y)
@@ -79,19 +79,19 @@ C-----------------------------------------------------------------------
       CALL PGSCI(1)
       CALL PGBOX('bcnst', 0.0, 0, 'bcnst', 0.0, 0)
       DO 300 I=0,N
-         X(I) = I*A 
-         Y(I) = SIN(I*A)  
+         X(I) = I*A
+         Y(I) = SIN(I*A)
  300  CONTINUE
       CALL PGEBUF
-   
+
       DO 500 T=0,NT
         CALL PGBBUF
         CALL PGSCI(0)
         CALL PGLINE(N+1,X,Y)
         CALL PGSCI(3)
         DO 400 I=0,N
-          X(I) = I*A 
-          Y(I) = SIN(I*A-T*B)  
+          X(I) = I*A
+          Y(I) = SIN(I*A-T*B)
   400   CONTINUE
         CALL PGLINE(N+1,X,Y)
         CALL PGEBUF

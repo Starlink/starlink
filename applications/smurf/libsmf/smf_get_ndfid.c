@@ -13,10 +13,10 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     ndfid = int smf_get_ndfid ( const HDSLoc *loc, const char *name, 
-*                   const char *accmode, 
-*		    const char *state, const char *dattype, const int ndims, 
-*		    const int *lbnd, const int *ubnd, int *status ) 
+*     ndfid = int smf_get_ndfid ( const HDSLoc *loc, const char *name,
+*                   const char *accmode,
+*		    const char *state, const char *dattype, const int ndims,
+*		    const int *lbnd, const int *ubnd, int *status )
 
 *  Arguments:
 *     loc = HDSLoc* (Given)
@@ -116,8 +116,8 @@
 
 #define FUNC_NAME "smf_get_ndfid"
 
-int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode, 
-		    const char *state, const char *dattype, const int ndims, 
+int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
+		    const char *state, const char *dattype, const int ndims,
 		    const int *lbnd, const int *ubnd, int *status ) {
 
   /* Local variables */
@@ -136,7 +136,7 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
   }
 
   /* Note: write access clears the contents of the NDF */
-  if ( strncmp( accmode, "WRITE", 5 ) == 0  
+  if ( strncmp( accmode, "WRITE", 5 ) == 0
        || strncmp( accmode, "UPDATE", 6 ) == 0 ) {
     /* Does the NDF already exist? If so tell the user that it's going
        to be overwritten. */
@@ -152,8 +152,8 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
   }
   ndfOpen( loc, name, accmode, state, &ndfid, &place, status );
   if ( *status != SAI__OK ) {
-    errRep( FUNC_NAME, 
-	    "Call to ndfOpen failed: unable to obtain an NDF identifier", 
+    errRep( FUNC_NAME,
+	    "Call to ndfOpen failed: unable to obtain an NDF identifier",
 	    status );
     return NDF__NOID;
   }

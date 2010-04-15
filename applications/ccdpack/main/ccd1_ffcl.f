@@ -144,21 +144,21 @@
 
 *  Call the appropriate version of CCG1_FFREJ
       IF ( PTYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_FFRJR( BAD, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_FFRJR( BAD, %VAL( CNF_PVAL( IPIN ) ),
      :                    NX, NY, NITER, GAMMA,
-     :                    IX, IY, SIGMA, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    IX, IY, SIGMA, %VAL( CNF_PVAL( IPOUT ) ),
      :                    NGOOD,
-     :                    %VAL( CNF_PVAL( IPWRK )), 
+     :                    %VAL( CNF_PVAL( IPWRK )),
      :                    %VAL( CNF_PVAL( IPILIN ) ),
      :                    %VAL( CNF_PVAL( IPNLIN ) ),
      :                    STATUS )
 
       ELSE IF( PTYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_FFRJD( BAD, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_FFRJD( BAD, %VAL( CNF_PVAL( IPIN ) ),
      :                    NX, NY, NITER, GAMMA,
-     :                    IX, IY, SIGMA, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    IX, IY, SIGMA, %VAL( CNF_PVAL( IPOUT ) ),
      :                    NGOOD,
-     :                    %VAL( CNF_PVAL( IPWRK )), 
+     :                    %VAL( CNF_PVAL( IPWRK )),
      :                    %VAL( CNF_PVAL( IPILIN ) ),
      :                    %VAL( CNF_PVAL( IPNLIN ) ),
      :                    STATUS )

@@ -33,23 +33,23 @@ qbar,int*qbaz,long*Q0,int*qfobar)
 int Q11;double q12;QQUUX=(int)strlen(qbar);Q5=*qbaz-1;q12=
 0.0;Q11=0;qdog=qcat;while(qdog!=Q10){switch(qdog){case qcat:
 switch(qfoo(QQUUX,qbar,&Q5,&QFRED)){case q1:qdog=Q6;break;
-case q2:qdog=qcat;break;case qfoobar:qdog=QgASp;break;case 
+case q2:qdog=qcat;break;case qfoobar:qdog=QgASp;break;case
 Q3:qdog=QFISH;break;case qfOBAz:qdog=QBUGGY;break;case q4:
-case qfoobaz:qdog=QMUM;break;default:qdog=q9;}break;case 
+case qfoobaz:qdog=QMUM;break;default:qdog=q9;}break;case
 QFISH:Q11=-1;case QgASp:switch(qfoo(QQUUX,qbar,&Q5,&QFRED)){
 case q1:qdog=Q6;break;case q2:qdog=QgASp;break;case qfoobar:
 case Q3:case q4:case qfOBAz:qdog=qDAd;break;case qfoobaz:
 default:qdog=q9;}break;case Q6:q12=q12*1e1+QFRED;qdog=(q12>=
-(double)LONG_MIN&&q12<=(double)LONG_MAX)?q7:qDAd;break;case 
+(double)LONG_MIN&&q12<=(double)LONG_MAX)?q7:qDAd;break;case
 q7:switch(qfoo(QQUUX,qbar,&Q5,&QFRED)){case q1:qdog=Q6;break
-;case q2:qdog=QBAD;break;case qfoobar:case Q3:case q4:case 
+;case q2:qdog=QBAD;break;case qfoobar:case Q3:case q4:case
 qfOBAz:qdog=q8;break;case qfoobaz:qdog=QBAD;break;default:
 qdog=q9;}break;case q8:Q5--;case QBAD:if(Q11)q12=-q12;*Q0=(
 long)(dnint(q12));case qBuG:switch(qfoo(QQUUX,qbar,&Q5,&
 QFRED)){case q2:qdog=qBuG;break;case q1:case qfoobar:case Q3
 :case qfOBAz:qdog=qsilly;break;case q4:case qfoobaz:qdog=Q10
 ;break;default:qdog=q9;}break;case qsilly:Q5--;qdog=Q10;
-break;case QBUGGY:Q5--;case QMUM:Q11=1;qdog=Q10;break;case 
+break;case QBUGGY:Q5--;case QMUM:Q11=1;qdog=Q10;break;case
 qDAd:Q5--;case q9:Q11=2;qdog=Q10;break;default:qdog=q9;}}*
 qbaz=Q5+1;*qfobar=Q11;}static int qfoo(int QQUUX,char*qbar,
 int*Q5,double*QFRED){int Q13,Q14;char qdisk;

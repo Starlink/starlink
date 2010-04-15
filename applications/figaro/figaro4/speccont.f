@@ -92,21 +92,21 @@
 *        The PGPLOT colour index to be used for the plot. This can be
 *        formally between 0 and 255, but not all devices support all
 *        colours. The default colour representation is:
-*        -  0: Background,       
+*        -  0: Background,
 *        -  1: Foreground (default),
-*        -  2: Red,              
+*        -  2: Red,
 *        -  3: Green,
-*        -  4: Blue,             
+*        -  4: Blue,
 *        -  5: Cyan,
-*        -  6: Magenta,          
+*        -  6: Magenta,
 *        -  7: Yellow,
-*        -  8: Orange,           
+*        -  8: Orange,
 *        -  9: Green/Yellow,
-*        -  10: Green/Cyan,       
+*        -  10: Green/Cyan,
 *        -  11: Blue/Cyan,
-*        -  12: Blue/Magenta,     
+*        -  12: Blue/Magenta,
 *        -  13: Red/Magenta,
-*        -  14: Dark grey,        
+*        -  14: Dark grey,
 *        -  15: Light grey.
 *     THICK = _INTEGER (Read)
 *        The PGPLOT line thickness. Can be between 1 and 21. [1]
@@ -248,7 +248,7 @@
 
 *  Examples:
 *     speccont cube(,5,) start=2 step=2 end=10 accept
-*        This takes the fifth xz-cut from the input cube. It draws 
+*        This takes the fifth xz-cut from the input cube. It draws
 *        contours at values 2, 4, 6, 8, and 10.
 
 *  Notes:
@@ -277,7 +277,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

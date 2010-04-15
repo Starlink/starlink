@@ -11,7 +11,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL SURFLIB_HISTOGRAM_GRID (N_PTS, NX, NY, USEDATA,
 *     :     IN_DATA, IN_QUALITY, BADBIT, IJ, GRID, IMAX, JMAX, NMAX,
@@ -61,7 +61,7 @@
 *     John Lightfoot (jfl@roe.ac.uk)
 
 *  Notes:
-*     - If USEDATA is TRUE the data and quality array are used so that bad 
+*     - If USEDATA is TRUE the data and quality array are used so that bad
 *       pixels can be identified and not included into the histogram of
 *       positions.
 *     - GRID is not initialised by this routine
@@ -100,7 +100,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -133,7 +133,7 @@
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
- 
+
 *.
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -142,7 +142,7 @@
 
 
 *     Loop through all points in the input data
-*     adding into the histogram. 
+*     adding into the histogram.
 *     Should make sure that the I,Js are valid
 
 *     Implement one loop that checks for data and one that just uses IJ
@@ -156,7 +156,7 @@
 *     a bad value
             IF ((IN_DATA(I) .NE. VAL__BADR) .AND.
      :           (NDF_QMASK(IN_QUALITY(I), BADBIT)) .AND.
-     :           IJ(1,I) .NE. VAL__BADI .AND. 
+     :           IJ(1,I) .NE. VAL__BADI .AND.
      :           IJ(2,I) .NE. VAL__BADI ) THEN
 
 *     Check bounds
@@ -167,7 +167,7 @@
                   GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
 
                ELSE
-                  
+
                   WARNING = .TRUE.
 
                END IF
@@ -181,7 +181,7 @@
          DO I = 1, N_PTS
 
 *     Ignore bad pixels
-            IF (IJ(1,I) .NE. VAL__BADI .AND. 
+            IF (IJ(1,I) .NE. VAL__BADI .AND.
      :           IJ(2,I) .NE. VAL__BADI) THEN
 
 *     Check bounds
@@ -194,7 +194,7 @@
                ELSE
 
                   WARNING = .TRUE.
-               
+
                END IF
 
             END IF

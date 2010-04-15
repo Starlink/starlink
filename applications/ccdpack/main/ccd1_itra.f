@@ -81,7 +81,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
  1    CONTINUE
 
 *  Append X,Y values if asked.
-      IF ( INSXY ) THEN 
+      IF ( INSXY ) THEN
          DO 3 I = 1, NRECS
                ARRAY( I, NPAR - 1 ) = X( I )
                ARRAY( I, NPAR ) = Y( I )

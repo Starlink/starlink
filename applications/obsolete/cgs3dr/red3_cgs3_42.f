@@ -64,11 +64,11 @@ C
 
       CALL DSA_OPEN(STATUS)
 
-C    Get the name of the input file 
+C    Get the name of the input file
       CALL PAR_GET0C ('INPUT', INPUT, STATUS)
       CALL DSA_NAMED_INPUT ('INPUT',INPUT,STATUS)
 
-C    Determine dimensions of input. 
+C    Determine dimensions of input.
       CALL DSA_DATA_SIZE ('INPUT', 4, NDIM, DIMS, ELEMENTS,
      : STATUS)
       IF ((NDIM .NE. 4) .OR. (DIMS(3) .GT. 2)) THEN
@@ -195,7 +195,7 @@ C       Coerce the axis 2 data
 C    Reduce the input data into the output file
       IF (STATUS .EQ. SAI__OK) THEN
          IF (NPOL .EQ. 1) THEN
-            CALL CGS3_1 (NWAVE, NBEAMS, NCYC, %val(IPTR), 
+            CALL CGS3_1 (NWAVE, NBEAMS, NCYC, %val(IPTR),
      :       %val(AIPTR), %val(OPTR), %val(AOPTR), %val(A2OPTR))
          ELSE
 
@@ -277,10 +277,10 @@ C    And while we're at it, reverse the data, as CGS3 delivers it backwards.
                   SUMSQ (NWAVE-I+1,K) = SUMSQ (NWAVE-I+1,K) +
      :             ((IN_DATA(K,I,1,J) - IN_DATA(K,I,2,J))/2.0)**2
                ELSE
-                  SUM (NWAVE-I+1,K) = SUM (NWAVE-I+1,K) + 
+                  SUM (NWAVE-I+1,K) = SUM (NWAVE-I+1,K) +
      :             IN_DATA(K,I,1,J)
                   SCANMN(J,K) = SCANMN(J,K) + IN_DATA(K,I,1,J)
-                  SUMSQ (NWAVE-I+1,K) = SUMSQ (NWAVE-I+1,K) + 
+                  SUMSQ (NWAVE-I+1,K) = SUMSQ (NWAVE-I+1,K) +
      :             IN_DATA(K,I,1,J)
                END IF
             END DO
@@ -300,7 +300,7 @@ C    Calculate the average and variance for each point
       DO I = 1, NWAVE
          DO J = 1, NPOL
             OUT_DATA(I,J) = SUM(I,J) / NCYCLES
-            IF (NCYCLES .GT. 1) OUT_VARIANCE (I,J) = 
+            IF (NCYCLES .GT. 1) OUT_VARIANCE (I,J) =
      :       (SUMSQ(I,J) - (SUM(I,J)**2)/NCYCLES)/(NCYCLES*(NCYCLES-1))
             IF (OUT_VARIANCE(I,J) .LT. 0.0) THEN
                OUT_VARIANCE (I,J) = 0.0
@@ -348,9 +348,9 @@ C    also recalculating the new variances.
                      SUMSQ (NWAVE-I+1,K) = SUMSQ (NWAVE-I+1,K) +
      :                ((IN_DATA(K,I,1,J) - IN_DATA(K,I,2,J))/2.0)**2
                   ELSE
-                     SUM (NWAVE-I+1,K) = SUM (NWAVE-I+1,K) + 
+                     SUM (NWAVE-I+1,K) = SUM (NWAVE-I+1,K) +
      :                IN_DATA(K,I,1,J)
-                     SUMSQ (NWAVE-I+1,K) = SUMSQ (NWAVE-I+1,K) + 
+                     SUMSQ (NWAVE-I+1,K) = SUMSQ (NWAVE-I+1,K) +
      :                IN_DATA(K,I,1,J)
                   END IF
                END DO
@@ -367,7 +367,7 @@ C       Calculate the average and variance for each point
          IF (N_CYC .GT. 0) THEN
             DO I = 1, NWAVE
                OUT_DATA(I,K) = SUM(I,K) / NCYCLES
-               IF (NCYCLES .GT. 1) OUT_VARIANCE (I,K) = 
+               IF (NCYCLES .GT. 1) OUT_VARIANCE (I,K) =
      :          (SUMSQ(I,K) - (SUM(I,K)**2)/NCYCLES)/
      :          (NCYCLES*(NCYCLES-1))
                IF (OUT_VARIANCE(I,K) .LT. 0.0) THEN
@@ -384,7 +384,7 @@ C       Calculate the average and variance for each point
 
       END
 
-      SUBROUTINE CGS3_1 (NWAVE, NBEAMS, NCYC, IN_DATA, 
+      SUBROUTINE CGS3_1 (NWAVE, NBEAMS, NCYC, IN_DATA,
      :   IN_AXIS, OUT_DATA, OUT_AXIS, OUT_AXIS2)
 C
 C     Author:
@@ -422,7 +422,7 @@ C
       DO J = 1, NCYC
          DO I = 1, NWAVE
             IF (NBEAMS .EQ. 2 ) THEN
-               OUT_DATA(NWAVE-I+1,J) = 
+               OUT_DATA(NWAVE-I+1,J) =
      :            (IN_DATA(1,I,1,J)-IN_DATA(1,I,2,J))/2.0
             ELSE
                OUT_DATA(NWAVE-I+1,J) = IN_DATA(1,I,1,J)

@@ -1,27 +1,27 @@
       PROGRAM CIRCLE
 *                      GKS Example Program 2.3
- 
+
 *                      XA and YA arrays hold the POLYLINE coordinates
       REAL XA(0:360), YA(0:360)
 *                      RADFAC is factor that converts degrees to radians
       REAL RADFAC
       PARAMETER (RADFAC = 3.14159 / 180.0)
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Loop over bundles, changing radius
       DO 20 KPLI=1,4
       RADIUS = FLOAT (KPLI) * 0.1
@@ -37,7 +37,7 @@
 *                      Draw the circle
          CALL GPL   (361 , XA , YA)
    20 CONTINUE
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

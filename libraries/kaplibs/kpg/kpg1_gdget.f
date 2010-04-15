@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine makes the specified AGI picture current, creates a
-*     corresponding PGPLOT viewport and window, and returns a Plot 
-*     associated with the picture. 
+*     corresponding PGPLOT viewport and window, and returns a Plot
+*     associated with the picture.
 *
 *     On exit, the PGPLOT viewport corresponds to the area encompassed by
 *     the specified picture. The world co-ordinate bounds within this
@@ -23,20 +23,20 @@
 *     millimetres from the bottom left corner of the view surface. This
 *     corresponds to the Base (GRAPHICS) Frame in the returned Plot.
 *
-*     The returned Plot will normally be obtained from the MORE structure 
+*     The returned Plot will normally be obtained from the MORE structure
 *     in the graphics database (where it was stored by a previous AST-based
-*     application). The Base Frame will be a GRAPHICS Frame, giving 
-*     millimetres from the bottom left corner of the view surface. 
+*     application). The Base Frame will be a GRAPHICS Frame, giving
+*     millimetres from the bottom left corner of the view surface.
 *
-*     If no Plot is available in the database, then an initial PLOT is 
-*     created containing a Base Frame with Domain GRAPHICS (giving 
-*     millimetres from the bottom left corner of the view surface), and 
+*     If no Plot is available in the database, then an initial PLOT is
+*     created containing a Base Frame with Domain GRAPHICS (giving
+*     millimetres from the bottom left corner of the view surface), and
 *     a Current Frame corresponding to AGI world co-ordinates. The Frame
-*     to represent AGI world co-ordinates in the Plot may be supplied by 
-*     the calling application (for instance, an application may supply a 
-*     PIXEL Frame on the assumption that AGI world co-ordinates are pixel 
-*     co-ordinates). If no such Frame is supplied then a simple Frame is 
-*     used, with Domain set to AGI_WORLD. 
+*     to represent AGI world co-ordinates in the Plot may be supplied by
+*     the calling application (for instance, an application may supply a
+*     PIXEL Frame on the assumption that AGI world co-ordinates are pixel
+*     co-ordinates). If no such Frame is supplied then a simple Frame is
+*     used, with Domain set to AGI_WORLD.
 *
 *     A third Frame may optionally be added to the Plot representing AGI
 *     DATA co-ordinates. This Frame will have Domain AGI_DATA, and the
@@ -45,19 +45,19 @@
 *     present, it will be the Current Frame in the Plot on exit. See
 *     "Usage" below for warnings about using this option.
 *
-*     Finally, some other Frames are added to the Plot representing 
+*     Finally, some other Frames are added to the Plot representing
 *     various normalised co-ordinates:
 *
 *     BASEPIC: The co-ordinates of the bottom left corner of the BASE
-*     picture are (0,0). The shorter dimension of the BASE picture has 
-*     length 1.0, and the other axis has a length greater than 1.0. 
+*     picture are (0,0). The shorter dimension of the BASE picture has
+*     length 1.0, and the other axis has a length greater than 1.0.
 *
 *     NDC: Normalized device coordinates. The bottom left corner of the
 *     screen is (0,0) and the top-right corner is (1,1).
 *
 *     CURPIC: The co-ordinates of the bottom left corner of the current
-*     picture are (0,0). The shorter dimension of the current picture has 
-*     length 1.0, and the other axis has a length greater than 1.0. 
+*     picture are (0,0). The shorter dimension of the current picture has
+*     length 1.0, and the other axis has a length greater than 1.0.
 *
 *     CURNDC: The co-ordinates of the bottom left corner of the current
 *     picture are (0,0), and the top right corner is (1,1).
@@ -66,26 +66,26 @@
 *     Frames then they are retained and no new Frame is added.
 
 *  Usage:
-*     -  To create a new AGI picture, an AST-based application should 
-*     call routine AGP_SVIEW to store the bounds of the current PGPLOT 
+*     -  To create a new AGI picture, an AST-based application should
+*     call routine AGP_SVIEW to store the bounds of the current PGPLOT
 *     viewport as a new picture in the AGI database. The bounds of the
 *     viewport in PGPLOT world co-ordinates will be saved as AGI world
 *     co-ordinates in the AGI database. Non-AST applications will use this
 *     information and so PGPLOT world co-ordinates should be set
 *     appropriately before calling AGP_SVIEW (for instance, DISPLAY sets
 *     them to pixel co-ordinates in the displayed NDF). Note, AST-based
-*     applications do not use the world co-ordinate information stored in 
+*     applications do not use the world co-ordinate information stored in
 *     AGI database (see below).
-*     -  After calling AGP_SVIEW, this routine (KPG1_GDGET) should be 
+*     -  After calling AGP_SVIEW, this routine (KPG1_GDGET) should be
 *     called to obtain an AST Plot for the new picture. Since the picture
-*     has just been created, it will not as yet have a Plot stored with it 
+*     has just been created, it will not as yet have a Plot stored with it
 *     in the database. An initial Plot is created in which the Base Frame
 *     is a GRAPHICS Frame (giving millimetres from the bottom left corner
 *     of the view surface), and the Current Frame gives AGI world
-*     co-ordinates (as stored with the picture by AGP_SVIEW). The Frame 
+*     co-ordinates (as stored with the picture by AGP_SVIEW). The Frame
 *     specified by argument WCFRM is used for this purpose (a default
 *     Frame with Domain AGI_WORLD is used if no Frame is supplied). For
-*     instance, DISPLAY supplies a PIXEL Frame for WCFRM to identify AGI 
+*     instance, DISPLAY supplies a PIXEL Frame for WCFRM to identify AGI
 *     world co-ordinates as pixel co-ordinates. As well as creating a Plot,
 *     this routine also sets PGPLOT world co-ordinates so that they
 *     correspond to GRAPHICS co-ordinates (millimetres from bottom left
@@ -106,18 +106,18 @@
 *     Frame and a world co-ordinate Frame as described above. A DATA
 *     co-ordinate Frame can optionally be included in the initial Plot
 *     (see below).
-*     -  If an AST-based application accesses an existing picture which has 
-*     an associated TRANSFORM structure, then the Plot created by this 
-*     routine can optionally include a Frame with Domain AGI_DATA. This 
-*     Frame will be connected to the world co-ordinate Frame using an AST 
-*     IntraMap which encapsulates the mapping implemented by the TRANSFORM 
-*     structure in the AGI database. If this option is selected, there are 
-*     some restrictions on what can and cannot be done with the returned Plot, 
-*     because of the potential presence of the IntraMap: 
-*        1) The Plot must not be combined with another Plot if the other 
+*     -  If an AST-based application accesses an existing picture which has
+*     an associated TRANSFORM structure, then the Plot created by this
+*     routine can optionally include a Frame with Domain AGI_DATA. This
+*     Frame will be connected to the world co-ordinate Frame using an AST
+*     IntraMap which encapsulates the mapping implemented by the TRANSFORM
+*     structure in the AGI database. If this option is selected, there are
+*     some restrictions on what can and cannot be done with the returned Plot,
+*     because of the potential presence of the IntraMap:
+*        1) The Plot must not be combined with another Plot if the other
 *        Plot may also contain an AGI_DATA Frame.
 *        2) Before using the Plot (or a derived Mapping) to transform
-*        positions (eg using AST_TRAN2), it should be ensured that the 
+*        positions (eg using AST_TRAN2), it should be ensured that the
 *        picture from which the Plot was created is the current AGI
 *        picture.
 *     Because of these restrictions, the option to create an AGI_DATA
@@ -125,27 +125,27 @@
 
 *  Arguments:
 *     IPIC = INTEGER (Given)
-*        The AGI identifier for the picture. If a value of -1 is supplied, 
+*        The AGI identifier for the picture. If a value of -1 is supplied,
 *        the identifier for the current picture is used.
 *     WCFRM = INTEGER (Given)
 *        A pointer to an AST Frame which will be used to describe AGI
 *        world co-ordinates if the picture has no associated Plot. This
-*        argument is ignored if the picture already has a Plot stored with 
-*        it in the database. If a null pointer (AST__NULL) is supplied, then 
+*        argument is ignored if the picture already has a Plot stored with
+*        it in the database. If a null pointer (AST__NULL) is supplied, then
 *        a default Frame is used with Domain set to AGI_WORLD.
 *     MKDATA = LOGICAL (Given)
 *        Should a Frame with Domain AGI_DATA be included in the returned
 *        Plot to represent AGI DATA co-ordinates? This is ignored if the
 *        picture has a Plot already stored with it in the database.
 *     IPLOT = INTEGER (Returned)
-*        An AST pointer to the Plot. Returned equal to AST__NULL if an 
+*        An AST pointer to the Plot. Returned equal to AST__NULL if an
 *        error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  The PGPLOT interface to the AGI library should be opened before
-*     calling this routine.  
+*     calling this routine.
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2000, 2001, 2002 Central Laboratory of the Research Councils.
@@ -156,12 +156,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -191,7 +191,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -243,7 +243,7 @@
 *  Initialise returned values.
       IPLOT = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -265,21 +265,21 @@
 *  Get the name of the selected picture.
       CALL AGI_INAME( NAME, STATUS )
 
-*  Create a PGPLOT viewport from the picture. The viewport covers the 
+*  Create a PGPLOT viewport from the picture. The viewport covers the
 *  entire picture (no border is left), and has world co-ordinates defined
 *  by the AGI database.
       CALL AGP_NVIEW( .FALSE., STATUS )
 
 *  See if there is a MORE structure associated with the picture.
-      CALL AGI_IMORE( IPICL, MORE, STATUS ) 
+      CALL AGI_IMORE( IPICL, MORE, STATUS )
 
 *  If so we see if the MORE structure contains an AST Plot.
       IF( MORE ) THEN
 
 *  Get an HDS locator to the MORE structure.
-         CALL AGI_MORE( IPICL, 'READ', MORLOC, STATUS ) 
+         CALL AGI_MORE( IPICL, 'READ', MORLOC, STATUS )
 
-*  Attempt to read an AST Object from the AST_PLOT component of the HDS 
+*  Attempt to read an AST Object from the AST_PLOT component of the HDS
 *  structure. No error is reported if there is no AST_PLOT component.
          CALL KPG1_WREAD( MORLOC, 'AST_PLOT', IPLOT, STATUS )
 
@@ -318,7 +318,7 @@
          CALL PGSWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
 
 *  If no Plot was obtained, return a Plot containing the GRAPHICS Frame,
-*  an AGI world co-ordinates Frame and (optionally) an AGI Data 
+*  an AGI world co-ordinates Frame and (optionally) an AGI Data
 *  co-ordinates Frame.
       ELSE
 
@@ -342,7 +342,7 @@
      :                    'symbol(1)=X,symbol(2)=Y', STATUS )
          END IF
 
-*  If required, add an AGI_DATA Frame into the returned Plot. 
+*  If required, add an AGI_DATA Frame into the returned Plot.
          IF( MKDATA ) THEN
 
 *  Get the Frame index of the AGI world co-ordinate Frame.
@@ -351,13 +351,13 @@
 *  Create an "ASAGD" IntraMap to encapsulate the TRANSFORM structure stored in
 *  the AGI database. It maps AGI WORLD co-ords into AGI data co-ords
 *  using the TRANSFORM structure for the current AGI picture.
-            MAP = AST_INTRAMAP( 'ASAGD', 2, 2, ' ', STATUS ) 
+            MAP = AST_INTRAMAP( 'ASAGD', 2, 2, ' ', STATUS )
 
-*  Create the Frame and add it into the Plot, using the above IntraMap to 
-*  connect it to the world co-ordinate Frame. The new Frame becomes the 
+*  Create the Frame and add it into the Plot, using the above IntraMap to
+*  connect it to the world co-ordinate Frame. The new Frame becomes the
 *  Current Frame.
-            CALL AST_ADDFRAME( IPLOT, IWOCO, MAP, 
-     :                         AST_FRAME( 2, ' ', STATUS ), STATUS ) 
+            CALL AST_ADDFRAME( IPLOT, IWOCO, MAP,
+     :                         AST_FRAME( 2, ' ', STATUS ), STATUS )
 
 *  Set its Domain to AGI_DATA, and set its Title and axis Symbols.
             CALL AST_SETC( IPLOT, 'Domain', 'AGI_DATA', STATUS )
@@ -390,18 +390,18 @@
 
 *  We now find the bounds of the view surface in BASEPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT.
      :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) /
      :                        ABS( BX( 4 ) - BX( 2 ) ) )
             OUTB( 2 ) = 1.0D0
          ELSE
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
             OUTB( 1 ) = 1.0D0
-            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) /
      :                        ABS( BX( 3 ) - BX( 1 ) ) )
          END IF
 
@@ -420,10 +420,10 @@
 *  Save the original current Frame index.
          ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Add the BASEPIC Frame into the Plot.      
+*  Add the BASEPIC Frame into the Plot.
          CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, BPIC, STATUS )
 
-*  If the picture is a DATA picture, re-instate the original current Frame 
+*  If the picture is a DATA picture, re-instate the original current Frame
 *  index. Otherwise, leave the BASEPIC Frame as the current Frame.
          IF( NAME .EQ. 'DATA' ) THEN
             CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
@@ -431,7 +431,7 @@
 
       END IF
 
-*  Add a Frame representing normalized device co-ordinates. This picture 
+*  Add a Frame representing normalized device co-ordinates. This picture
 *  has (in general) un-equals scales on each axis. The bottom left corner
 *  is (0,0) and the top right is (1,1). This Frame is given the Domain NDC.
 *  ====================================================================
@@ -472,10 +472,10 @@
 *  Save the original current Frame index.
          ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Add the NDC Frame into the Plot.      
+*  Add the NDC Frame into the Plot.
          CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, NPIC, STATUS )
 
-*  Re-instate the original current Frame index. 
+*  Re-instate the original current Frame index.
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
@@ -502,18 +502,18 @@
 
 *  We now find the bounds of the current window in CURPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT.
      :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) /
      :                        ABS( BX( 4 ) - BX( 2 ) ) )
             OUTB( 2 ) = 1.0D0
          ELSE
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
             OUTB( 1 ) = 1.0D0
-            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) /
      :                        ABS( BX( 3 ) - BX( 1 ) ) )
          END IF
 
@@ -532,17 +532,17 @@
 *  Save the original current Frame index.
          ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Add the CURPIC Frame into the Plot.      
+*  Add the CURPIC Frame into the Plot.
          CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, CPIC, STATUS )
 
-*  Re-instate the original current Frame index. 
+*  Re-instate the original current Frame index.
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
 
-*  Add a Frame representing another normalised co-ordinate system in the 
+*  Add a Frame representing another normalised co-ordinate system in the
 *  current picture. This Frame has (0,0) at the bottom left corner of the
-*  current picture, and (1,1) at the top right corner. This Frame is given 
+*  current picture, and (1,1) at the top right corner. This Frame is given
 *  the Domain CURNDC.
 *  ====================================================================
 
@@ -584,15 +584,15 @@
 *  Save the original current Frame index.
          ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Add the CURPIC Frame into the Plot.      
+*  Add the CURPIC Frame into the Plot.
          CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, CNDC, STATUS )
 
-*  Re-instate the original current Frame index. 
+*  Re-instate the original current Frame index.
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
 
-*  Export the Plot pointer from the current AST context. This will 
+*  Export the Plot pointer from the current AST context. This will
 *  prevent it being annulled by the following call to AST_END. If
 *  an error has occurred, then the Plot will not be exported by this
 *  call and so will be annulled by AST_END.

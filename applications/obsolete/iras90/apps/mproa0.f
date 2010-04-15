@@ -1,4 +1,4 @@
-      SUBROUTINE MPROA0( N1, N2, DATIN, AX1IN, AX2IN, DATOUT, AX1OUT, 
+      SUBROUTINE MPROA0( N1, N2, DATIN, AX1IN, AX2IN, DATOUT, AX1OUT,
      :                   AX2OUT, STATUS )
 *+
 *  Name:
@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,7 +82,7 @@
 
 *  Copy the first axis data.
       DO I = 1, N1
-         AX1OUT( I ) = AX1IN( I ) 
+         AX1OUT( I ) = AX1IN( I )
       END DO
 
 *  Copy the rest of the data.

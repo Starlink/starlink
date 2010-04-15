@@ -16,7 +16,7 @@ C     no longer assume from the fact that DSA_MAP_QUALITY had been called
 C     that the application wanted to handle quality. Splitting the
 C     routines in this way allows us to make this assumption.
 C     This routine maps the quality data array in a structure, returning
-C     the address of the mapped array.  The whole array is mapped.  If 
+C     the address of the mapped array.  The whole array is mapped.  If
 C     there is in fact no quality data array, then one will be created
 C     if the mapping specified 'WRITE' or 'UPDATE' and filled with zeros.
 C     If the main data array contains flagged values, and the application
@@ -34,14 +34,14 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
 C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
 C     (<) ADDRESS      (Integer,ref) The address of the mapped array.
 C     (<) SLOT         (Integer,ref) A handle value associated with this
@@ -51,11 +51,11 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     CNF_PVAL, ICH_FOLD, DSA_REF_SLOT, DSA_SEEK_QUALITY, 
+C     CNF_PVAL, ICH_FOLD, DSA_REF_SLOT, DSA_SEEK_QUALITY,
 C     DSA_DATA_SIZE, DSA_MAP_ARRAY, DSA_MAP_DUMMY, DSA_NFILL_ARRAY
 C     DSA_GET_ACTUAL_NAME, DSA_SEEK_FLAGGED_VALUES, DSA__QUAL_NAME
 C     DSA__CREATE_QUAL_ENV, DSA_CREATE_ARRAY, DSA__GET_BADBITS,
@@ -105,7 +105,7 @@ C     11th Dec  1989.   Now sets QUAL_UPDATE flag on a write or update
 C                       mapping.  KS/AAO.
 C     21st Feb  1990.   Uses DSA__QUAL_NAME to remove assumptions about
 C                       file format details.  KS/AAO.
-C     22nd Apr  1991.   Now uses DSA__CREATE_QUAL_ENV to create the 
+C     22nd Apr  1991.   Now uses DSA__CREATE_QUAL_ENV to create the
 C                       environment for the quality array - allows support
 C                       of structured arrays including BADBITS values. KS/AAO.
 C     1st  May  1991.   Now gets BADBITS value and tests to see if this
@@ -183,7 +183,7 @@ C
 C
 C     Look up the reference name in the tables and get the name
 C     of the quality array.
-C          
+C
       CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
       CALL DSA__QUAL_NAME (REF_SLOT,OBJ_NAME,LENGTH)
 C
@@ -211,7 +211,7 @@ C     a real array in the final structure and this should be respected,
 C     even if the actual data is flagged. However, this routine may be
 C     called from DSA_PRE_PROCESS_FLAGGED, in which case we really do
 C     want to create a dummy array if one does not exist. We can tell the
-C     difference by looking at the 'use quality' flag, which will be set 
+C     difference by looking at the 'use quality' flag, which will be set
 C     if we are being called from DSA_MAP_QUALITY.
 C
       IF ((.NOT.USE_QUALITY(REF_SLOT)).AND.(.NOT.EXIST)) THEN
@@ -247,13 +247,13 @@ C           array rather than use the actual one in the file. This is where
 C           the quality array exists, but the data is flagged and the
 C           application will not use the flagged values, intending to use
 C           the quality array instead. If all of this is the case, the
-C           quality array will be modified to reflect the flagged data - 
+C           quality array will be modified to reflect the flagged data -
 C           but if the quality array is being mapped readonly, then we need
 C           a copy of it! So this is an odd combination of circumstances,
 C           but one that has to be allowed for.
 C
             COPY = (EXIST.AND.(CHR.EQ.'R').AND.FLAGGED.AND.
-     :            USE_QUALITY(REF_SLOT).AND..NOT.USE_FLAGS(REF_SLOT)) 
+     :            USE_QUALITY(REF_SLOT).AND..NOT.USE_FLAGS(REF_SLOT))
 C
 C           Map the quality array.
 C
@@ -285,8 +285,8 @@ C
 C     Now, after all that, we will either have mapped an array in the
 C     structure starting at address ADDRESS (which we may have had to
 C     create) or we may have CREATE_DUMMY set.  Either way, we may
-C     also have ZERO_FILL set.  
-C 
+C     also have ZERO_FILL set.
+C
       IF (CREATE_DUMMY) THEN
          CALL DSA_GET_ACTUAL_NAME(REF_NAME,STRUCTURE,STATUS)
          NAME = 'quality array in '//STRUCTURE
@@ -306,7 +306,7 @@ C
       QUALITY_SLOT(REF_SLOT) = SLOT
 C
 C     If the data array has already been mapped, then now is the time to
-C     call the quality pre-processing routine.  Note that we can't assume 
+C     call the quality pre-processing routine.  Note that we can't assume
 C     from the obvious fact that DSA_ACT_MAP_QUALITY has being called that
 C     the application wants to handle quality data.  This is because
 C     DSA_PRE_PROCESS_FLAGGED_VALUES may call DSA_MAP_QUALITY if a

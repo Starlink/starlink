@@ -40,7 +40,7 @@ C     Local variables:
       REAL      SUM
       REAL      TWID
       REAL      WEIGHT
- 
+
 C     Functions
 
       REAL      XTRANS
@@ -86,7 +86,7 @@ C       finishes at N+0.5 points.
 
         PL = XSNART (XSCALE, BL, NDAT, IERR1)
         PR = XSNART (XSCALE, BR, NDAT, IERR2)
-        
+
 C       Don't do any more if bin does not lie within original spectrum...
 
         IF (      PL.GT.0.5 .AND. PL.LT.FLOAT(NDAT)+0.5
@@ -103,7 +103,7 @@ C         Check that both edges of the bin lie within the current spectrum;
 C         if so integrate over affected input channels to find new values,
 C         otherwise ignore this bin. Average so that new spectrum will also
 C         be correct on temperature scale (not integrated intensity).
-C         Width of *input* bin is taken as difference of x-values at 
+C         Width of *input* bin is taken as difference of x-values at
 C         plus or minus half a channel from nominal channel number.
 C         Don't need to test errors, since result is guaranteed by earlier
 C         doing reverse operation successfully.
@@ -134,7 +134,7 @@ C         Write new value into current output point.
         END IF
 
       END DO
-  
+
 C     Regridded array is complete: copy data back from work area
 C     into original data array
 

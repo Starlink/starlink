@@ -57,7 +57,7 @@
 *        Original version.
 *     13 Feb 1990 (ks):
 *        Modified to support different data formats, through use of
-*        DSA__ routines. 
+*        DSA__ routines.
 *     21 Aug 1992 (ks):
 *        Automatic portability modifications ("INCLUDE" syntax etc)
 *        made.
@@ -75,7 +75,7 @@
 *-
 
       SUBROUTINE DSA_PUT_FITS_C( DSAREF, KEY, VALUE, COMENT, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,7 +171,7 @@
 
 
       SUBROUTINE DSA_PUT_FITS_D( DSAREF, KEY, VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -229,7 +229,7 @@
 
 
       SUBROUTINE DSA_PUT_FITS_F( DSAREF, KEY, VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -284,7 +284,7 @@
 
 
       SUBROUTINE DSA_PUT_FITS_I( DSAREF, KEY, VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -335,7 +335,7 @@
 
 
       SUBROUTINE DSA_PUT_FITS_L( DSAREF, KEY, VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -489,7 +489,7 @@
      :                  STRING, ISTR, STATUS, %VAL(CNF_CVAL(80)) )
       CALL DSA1_ITMPUT( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
-     :                  ENDSTR, DSA__REFFNE(SLOT), STATUS, 
+     :                  ENDSTR, DSA__REFFNE(SLOT), STATUS,
      :                  %VAL(CNF_CVAL(80)) )
 
 *  Return.

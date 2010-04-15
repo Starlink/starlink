@@ -23,7 +23,7 @@
 *
 *     Based on the AIPS implementation of these geometries - see
 *     AIPS memos 27 & 46 - Eric Greisen.
-*     
+*
 
 *  Arguments:
 *     PHI0 = DOUBLE PRECISION (Given)
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,6 +96,6 @@
          M=SINT*COS0-COST*SIN0*COS(DPHI)
          STATUS=SAI__OK
       ENDIF
-      
+
       END
 * $Id$

@@ -102,7 +102,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *       map input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :      PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIM, IDIMS, NDIMS, STATUS)
@@ -129,7 +129,7 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 *          set up dimensions of the workspace arrays
@@ -142,31 +142,31 @@
 
 *          create and map the workspace arrays
             CALL NDF_TEMP( PLACE1, STATUS )
-            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS1, PLACE1, WLOC1, 
+            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS1, PLACE1, WLOC1,
      :                    STATUS )
             CALL NDF_MAP( WLOC1, 'DATA', '_REAL', 'WRITE', WPNTR1,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE2, STATUS )
-            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS2, PLACE2, WLOC2, 
+            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS2, PLACE2, WLOC2,
      :                    STATUS )
             CALL NDF_MAP( WLOC2, 'DATA', '_REAL', 'WRITE', WPNTR2,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE3, STATUS )
-            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS3, PLACE3, WLOC3, 
+            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS3, PLACE3, WLOC3,
      :                    STATUS )
             CALL NDF_MAP( WLOC3, 'DATA', '_REAL', 'WRITE', WPNTR3,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE4, STATUS )
-            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS2, PLACE4, WLOC4, 
+            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS2, PLACE4, WLOC4,
      :                    STATUS )
             CALL NDF_MAP( WLOC4, 'DATA', '_REAL', 'WRITE', WPNTR4,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE5, STATUS )
-            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS3, PLACE5, WLOC5, 
+            CALL NDF_NEW( '_REAL', NDIM, LBND, WDIMS3, PLACE5, WLOC5,
      :                    STATUS )
             CALL NDF_MAP( WLOC5, 'DATA', '_REAL', 'WRITE', WPNTR5,
      :                    NELEMENTS, STATUS )
@@ -178,14 +178,14 @@
                IF( ODIMS( 1 ) .GT. IDIMS( 1 ) ) THEN
 
 *                stretch input array in X direction storing result in workspace
-                  CALL STRX( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
-     :              WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ), 
+                  CALL STRX( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
+     :              WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ),
      :              %VAL( WPNTR4 ), %VAL( WPNTR2 ), STATUS )
                ELSE
 
 *                squash input array in X direction storing result in workspace
-                  CALL SQSHX( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
-     :              WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ), 
+                  CALL SQSHX( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
+     :              WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ),
      :              %VAL( WPNTR4 ), %VAL( WPNTR2 ), STATUS )
                ENDIF
 
@@ -193,14 +193,14 @@
 
 *                stretch workspace in Y direction storing result in output
 *                array
-                  CALL STRY( WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ), 
-     :              ODIMS(1), ODIMS(2), %VAL( PNTRO ), 
+                  CALL STRY( WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ),
+     :              ODIMS(1), ODIMS(2), %VAL( PNTRO ),
      :              %VAL( WPNTR5 ), %VAL( WPNTR3 ), STATUS )
                ELSE
 
 *                squash workspace in Y direction storing result in output array
-                  CALL SQSHY( WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ), 
-     :              ODIMS(1), ODIMS(2), %VAL( PNTRO ), 
+                  CALL SQSHY( WDIMS1(1), WDIMS1(2), %VAL( WPNTR1 ),
+     :              ODIMS(1), ODIMS(2), %VAL( PNTRO ),
      :              %VAL( WPNTR5 ), %VAL( WPNTR3 ), STATUS )
                ENDIF
             ENDIF

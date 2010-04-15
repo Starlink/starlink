@@ -54,7 +54,7 @@
 *     29 Aug 1992 (ks):
 *        "INCLUDE" filenames now upper case.
 *     17 Dec 1992. (ks):
-*        Added initialisation of temporary name variables. 
+*        Added initialisation of temporary name variables.
 *        Also added SYS_STATUS.
 *     17 Feb 1995 (ks):
 *        Added QF_BOTH_OK.
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

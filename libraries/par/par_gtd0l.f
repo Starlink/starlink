@@ -29,7 +29,7 @@
 *        returns with STATUS=PAR__NULL.  If NULL is .TRUE., the
 *        returned VALUE takes the value of DEFAUL and, if the MSG filtering
 *        level (see SUN/104) is 'verbose', a message informs the user of the
-*        value used for the parameter. The routine then returns with 
+*        value used for the parameter. The routine then returns with
 *        STATUS=SAI__OK.  This feature is intended for
 *        convenient handling of null values.  NULL should only be set
 *        to .TRUE. when the value of DEFAUL will always give a
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

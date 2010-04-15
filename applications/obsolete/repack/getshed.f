@@ -12,11 +12,11 @@
 *-
 * Local
 	integer		hdu		! Header Data unit.
-	integer		hdutyp		
+	integer		hdutyp
 	integer		idum
 	character*80	cdum
 
- 
+
 	IF (STATUS .NE. 0) RETURN
 
 * Read some keywords from the primary header.
@@ -26,7 +26,7 @@
 	  WRITE(*,*) '   Error in GETSHED.'
 	  write(*,*) '   Not reading primary header.'
           status = 1
-	  return	  
+	  return
 	endif
 
 	call ftgkys(imap, 'DATE', head.cre_date, cdum, status)
@@ -47,7 +47,7 @@
 	  WRITE(*,*) '   Error in GETSHED.'
 	  write(*,*) '   Not reading bintable header.'
           status = 1
-	  return	  
+	  return
 	endif
 	call ftgkyj(imap, 'NAXIS2', head.nevent, cdum, status)
 	call ftgkyj(imap, 'DETNAM', head.detector, cdum, status)
@@ -62,9 +62,9 @@
 	head.mode     = 'S'
 	head.observer = 'ROS-UKSC'
 	head.ref_date = s2_ref_date
-	
+
 999	IF (STATUS .NE. 0) THEN
 	  WRITE(*,*) '   Error in GETSHED.'
 	ENDIF
- 
+
 	END

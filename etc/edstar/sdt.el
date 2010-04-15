@@ -87,7 +87,7 @@ Arguments:
 			      (save-excursion
 				(set-buffer oldbuf)
 
-;;; Remember the editing position in this buffer. 
+;;; Remember the editing position in this buffer.
 				(setq posn (point))
 
 ;;; If it is read-only, then kill it (otherwise it will simply be over-written
@@ -123,7 +123,7 @@ Arguments:
 			  (save-excursion
 			    (set-buffer oldbuf)
 
-;;; Remember the editing position in this buffer. 
+;;; Remember the editing position in this buffer.
 			    (setq posn (point))
 
 ;;; If it is read-only, then kill it (otherwise it will simply be over-written

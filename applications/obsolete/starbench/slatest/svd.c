@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-double qfoo(double qbar,double qbaz);void sbmsvd(int Q0,int 
+double qfoo(double qbar,double qbaz);void sbmsvd(int Q0,int
 qfobar,int q1,int q2,double*qbar,double*qfoobar,double*Q3,
 double*q4,int*qfOBAz)
 #define qfoobaz 30

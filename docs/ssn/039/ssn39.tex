@@ -70,9 +70,9 @@ This directory has not been modified by Starlink.
 
 \item {\tt [GKS.DRIVERS]} :
 Source code (in {\tt GKS72.TLB}) and WDT files for all the device handlers
-provided by or modified by Starlink. 
+provided by or modified by Starlink.
 
-\end{itemize} 
+\end{itemize}
 
 Once the following logical names have been defined (by {\tt
 [STARLINK]STARTUP.COM} on Starlink systems):
@@ -89,11 +89,11 @@ Once the following logical names have been defined (by {\tt
       "GKS_WDT"            = "GKS_DIR:GKSWDT.DAM"
       "GKS_WS_IMAGE"       = "GKS_DIR:GKS_WS_IMAGE.EXE"
       "GKSSHARE"           = "GKS_DIR:GKS_WS_IMAGE.EXE"
-\end{verbatim} 
+\end{verbatim}
 
 the system is ready to use provided that the workstation handlers used at RAL
 are appropriate. The last ({\tt GKSSHARE}) is required in order to support older
-applications. 
+applications.
 
 On non-Starlink systems the root of directory tree ({\tt [.GKS]}) can be
 any directory you chose provided that the logical names are modified
@@ -125,7 +125,7 @@ STAR\_LINK\_ADAM.COM} in {\tt STARDISK:[STARLINK.LIB]}.
 
 The template file {\tt [.GKS]WORKSTATIONS\-.TEMPLATE} may be used as a template
 for your own {\tt [.GKS]\-WORKSTATIONS.DAT}. The supplied version of {\tt
-[.GKS]\-WORKSTATIONS.DAT} is that for use on the Starlink Project VAXCluster 
+[.GKS]\-WORKSTATIONS.DAT} is that for use on the Starlink Project VAXCluster
 at RAL.
 
 
@@ -157,7 +157,7 @@ The prompts from the procedure and your responses would be:
 Where is your existing version of GKSLIB.OLB?\\
 {\tt [.GKS]}
 
-Where are the GKS development files to be found? 
+Where are the GKS development files to be found?
 If they are not all in the same directory you can enter a search list\\
 {\tt [.GKS],[.GKS.CCD]}
 
@@ -182,7 +182,7 @@ want in your configuration\\
 {\tt [.GKS]WORKSTATIONS.DAT}
 \end{quote}
 
-The new versions of {\tt GKSLIB.OLB}, {\tt GKS\_WS\_IMAGE.EXE} and {\tt 
+The new versions of {\tt GKSLIB.OLB}, {\tt GKS\_WS\_IMAGE.EXE} and {\tt
 GKSWDT.DAM} will be created in your current default directory. The answers to
 the prompts can be supplied as parameters to the command procedure; an example
 of this can be found in {\tt [.GKS]GKS\_REBUILD.COM}.
@@ -203,7 +203,7 @@ following changes to the code:
 
 \begin{itemize}
 
-\item Change INCLUDE statement from 
+\item Change INCLUDE statement from
 \begin{verbatim}
       'INCLUDE "GINCLUDE:filename"'
 \end{verbatim}
@@ -284,7 +284,7 @@ shareable image specifying {\tt [.GKS.CCD]} only as the location of the
 0702	! Calcomp 81 plotter, A4 roll feed
 0703	! Calcomp 81 plotter, A3 roll feed
 0704	! Calcomp 81 plotter, roll feed to workstation viewport
-! 
+!
 ! Starlink supported workstations
 !
 0160	! Sigmex ARGS 7000
@@ -328,7 +328,7 @@ shareable image specifying {\tt [.GKS.CCD]} only as the location of the
 !
 3200    ! Digisolve Ikon 1024 x 780
 3201    ! Digisolve Ikon 1024 x 780 overlay
-3202    ! Digisolve Ikon 1024 x 780 + VT terminal 
+3202    ! Digisolve Ikon 1024 x 780 + VT terminal
 3203    ! Digisolve Ikon 1024 x 780 overlay + VT terminal
 !
 3800	! X Windows
@@ -356,7 +356,7 @@ shareable image specifying {\tt [.GKS.CCD]} only as the location of the
 !1100	! Versatec 1200A fan fold
 !1101	! Versatec 1200A square workstation
 !
-!  Unsupported Workstations 
+!  Unsupported Workstations
 !
 !0410	! HP 7221B sheet A4 plotter
 !0411	! HP 7221B sheet A3 plotter

@@ -19,16 +19,16 @@ C    (1) INPUT      (TSP, 1D)  The input spectrum to be multiplied.
 C    (2) FACTOR     (Real)     Factor to multiply by
 C    (3) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C          20/11/1990
 C
 C-
 C
 C  History:
-C    4/12/1988   Original Version.   JAB/AAO 
+C    4/12/1988   Original Version.   JAB/AAO
 C    20/11/1990  Handle bad values.  JAB/AAO
 C
 
@@ -43,17 +43,17 @@ C
 *  HDS locators
       CHARACTER*(DAT__SZLOC) OLOC,ILOC,DLOC,SLOC
       LOGICAL OK,QZ,UZ,VZ
-      INTEGER SIZE,NUM,STAT                                        
+      INTEGER SIZE,NUM,STAT
       REAL FACTOR
-                         
+
 *  Get the Input data
 
          CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
 
 *  Get the scale factor
-   
+
          CALL PAR_GET0R('FACTOR',FACTOR,STATUS)
- 
+
 *  Get the output file
 
          CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -70,14 +70,14 @@ C
 
 *  Map intensity data
 
-         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)
 
 *  Scale Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
          ENDIF
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Scale the variance (twice) if present
 
@@ -103,7 +103,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -128,7 +128,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Map the variance and scale it (if present)
@@ -153,7 +153,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Map the variance and scale it  (if present)
@@ -175,7 +175,7 @@ C
 
       END
 
-      
+
 
       SUBROUTINE TSP_CMULT (FACTOR,NX,DATA)
 *+

@@ -13,7 +13,7 @@
 *     An error will be reported and bad status returned if the name of the
 *     FITS item is blank or more than 8 characters long. An error will also
 *     occur if the FITS character array is full.
-*     The FITS array must contain a final entry of simply 'END' unless 
+*     The FITS array must contain a final entry of simply 'END' unless
 *     N_FITS is 0. The END entry is automatically moved to the last field
 *     as entries are added to the FITS array.
 
@@ -159,7 +159,7 @@
       ELSE
 
 *     If we have no entries, make sure we are using the first one
-         IF (N_FITS .EQ. 0) THEN 
+         IF (N_FITS .EQ. 0) THEN
             N_FITS = 1
          ELSE IF (FITS(N_FITS) .NE. 'END') THEN
 *     Else warn if we have a FITS array that does not end in END

@@ -75,7 +75,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -229,7 +229,7 @@
                   END DO
                   NDIM = NDIM - 1
                END IF
-               
+
 *  Dealing with a scalar.
             ELSE
                NDIM = 0
@@ -287,25 +287,25 @@
             ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                CALL FTGCVI( FUNIT, COLNUM, 1, 1, NV, VAL__BADW,
      :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
             ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NV, VAL__BADI,
      :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
             ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                CALL FTGCVE( FUNIT, COLNUM, 1, 1, NV, VAL__BADR,
      :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
             ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                CALL FTGCVD( FUNIT, COLNUM, 1, 1, NV, VAL__BADD,
      :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
             ELSE IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
                CALL FTGCVS( FUNIT, COLNUM, 1, 1, NV, ' ',
      :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT,
-     :                      %VAL( CNF_CVAL( 1 ) ), 
+     :                      %VAL( CNF_CVAL( 1 ) ),
      :                      %VAL( CNF_CVAL( WIDTH ) ) )
-      
+
             END IF
 
 *  Tidy the locator to the DATA component.

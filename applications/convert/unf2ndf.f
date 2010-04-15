@@ -74,7 +74,7 @@
 *        unambiguous abbreviation may be given.  TYPE is ignored when
 *        COMP = "Quality" since the QUALITY component must comprise
 *        unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
-*        NDF. The suggested default is the current value.  TYPE is 
+*        NDF. The suggested default is the current value.  TYPE is
 *        also only accessed when FITS is FALSE. ["_REAL"]
 
 *  Examples:
@@ -384,7 +384,7 @@
 *   Check that the mandatory descriptors are present.  Want to start
 *   the searchs in the last (NHEADS) header.  When there are two
 *   headers, the first will be a dummy header.
-         CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ),
      :                   BITPIX, NDIM, DIMS, DARRAY, NONSDA, EL,
      :                   STATUS, %VAL( CNF_CVAL( 80 ) ) )
@@ -412,9 +412,9 @@
 
 *  Obtain the scale and zero, the blank value.
          CALL CON_FTYPE( BITPIX, HSTART( NHEADS ), NCARD,
-     :                   %VAL( CNF_PVAL( HPNTR ) ), 
+     :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   BSCALE, BZERO, BLANK,
-     :                   BADPIX, UNSIGN, STATUS, 
+     :                   BADPIX, UNSIGN, STATUS,
      :                   %VAL( CNF_CVAL( 80 ) ) )
 
 *  Determine the HDS data type of the data array.  Note that the QUALITY
@@ -501,37 +501,37 @@
 *  Call a routine to read the data from the unformatted Fortran file.
 *  The selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_IFUFB( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFB( FD, EL, NUMPRE, SKIP,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IFUFD( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFD( FD, EL, NUMPRE, SKIP,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IFUFI( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFI( FD, EL, NUMPRE, SKIP,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_IFUFR( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFR( FD, EL, NUMPRE, SKIP,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_IFUFUB( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFUB( FD, EL, NUMPRE, SKIP,
      :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_IFUFUW( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFUW( FD, EL, NUMPRE, SKIP,
      :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_IFUFW( FD, EL, NUMPRE, SKIP, 
+         CALL CON_IFUFW( FD, EL, NUMPRE, SKIP,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
@@ -542,7 +542,7 @@
 *  The first argument is the number of header cards from the start of
 *  the headers up to the end of the current header.
       IF ( HEADER ) THEN
-         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, 
+         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD,
      :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS,
      :                   %VAL( CNF_CVAL( 80 ) ) )

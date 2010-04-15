@@ -8,7 +8,7 @@
   <description>AVS as a GUI for ADAM</description>
   <abstract><p>
     This describes an experiment to test the feasiblity of using AVS networks
-    in the ADAM context, based upon the conversion of an ADAM application into 
+    in the ADAM context, based upon the conversion of an ADAM application into
     an AVS module.  After an outline of AVS and its data types, this
     paper reports various steps in the conversion of the KAPPA ADD task.
     </p></abstract>

@@ -193,7 +193,7 @@ itcl::class gaia::GaiaSpecCoords {
             #  If this isn't set then no specframe (or timeframe), so at
             #  default already and nothing to do.
             if { [info exists default_system_($axis)] } {
-               
+
                #  If time_ is set then we're using offset time. Undo that.
                undo_time_offset_
 

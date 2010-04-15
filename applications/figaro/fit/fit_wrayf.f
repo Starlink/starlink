@@ -53,7 +53,7 @@ C     GEN_BSWAP    (GEN_ package) Swap order of bytes in words
 C     GEN_WBSWAP   ( "      "   ) Swap order of bytes in longwords
 C     FIT_MWRIT    (FIT_    "   ) Write FBUFF buffer to tape
 C
-C     Note: This routine assumes that the values for BSCALE and 
+C     Note: This routine assumes that the values for BSCALE and
 C     BZERO will not generate data outside the integer range
 C     used.  If this is not true, arithmetic faults will occur.
 C
@@ -113,7 +113,7 @@ C
             FBUFFS(FPTRS)=(DATA(I)-BZERO)*SCALE+0.5
             FPTRS=FPTRS+1
             IF (FPTRS.GT.1440) THEN
-               IF (.NOT.NOSWAP) 
+               IF (.NOT.NOSWAP)
      :               CALL GEN_BSWAP(FBUFFS(FPTRO),FPTRS-FPTRO)
                CALL FIT_MWRIT(STATUS)
                FPTR=1
@@ -122,7 +122,7 @@ C
                IF (STATUS.NE.0) GO TO 600
             END IF
          END DO
-         IF ((.NOT.NOSWAP).AND.FPTRS.GT.1) 
+         IF ((.NOT.NOSWAP).AND.FPTRS.GT.1)
      :                 CALL GEN_BSWAP(FBUFFS(FPTRO),FPTRS-FPTRO)
          FPTR=(FPTRS-1)*2+1
 C
@@ -137,7 +137,7 @@ C
             FBUFFI(FPTRI)=(DATA(I)-BZERO)*SCALE+0.5
             FPTRI=FPTRI+1
             IF (FPTRI.GT.720) THEN
-               IF (.NOT.NOSWAP) 
+               IF (.NOT.NOSWAP)
      :                CALL GEN_WBSWAP(FBUFFI(FPTRO),FPTRI-FPTRO)
                CALL FIT_MWRIT(STATUS)
                FPTR=1
@@ -146,7 +146,7 @@ C
                IF (STATUS.NE.0)  GO TO 600
             END IF
          END DO
-         IF ((.NOT.NOSWAP).AND.FPTRI.GT.1) 
+         IF ((.NOT.NOSWAP).AND.FPTRI.GT.1)
      :                   CALL GEN_WBSWAP(FBUFFI(FPTRO),FPTRI-FPTRO)
          FPTR=(FPTRI-1)*4+1
       END IF

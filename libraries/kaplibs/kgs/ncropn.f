@@ -16,7 +16,7 @@
 *                  PIC1, ZONE1, STATUS )
 
 *  Description:
-*     This routine gets the name of an SGS workstation from the user 
+*     This routine gets the name of an SGS workstation from the user
 *     and opens it, using AGI to create a zone corresponding to the
 *     current AGI picture.   If a null status is returned when accessing
 *     the device, it is handled transparent, and a flag is returned to
@@ -30,8 +30,8 @@
 *     returning to ensure that AUTOGRAPH uses the full zone for
 *     plotting.
 *
-*     Before returning, the AGI picture which was current on entry to 
-*     this routine is reinstated as the current AGI picture. 
+*     Before returning, the AGI picture which was current on entry to
+*     this routine is reinstated as the current AGI picture.
 
 *  Arguments:
 *     PNAME1 = CHARACTER * ( * ) (Given)
@@ -41,10 +41,10 @@
 *        The name of an ADAM parameter which will be associated with
 *        the graphics workstation.
 *     PNAME3 = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to get the 
+*        The name of an ADAM parameter which will be used to get the
 *        required X extent of the FRAME picture in metres.
 *     PNAME4 = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to get the 
+*        The name of an ADAM parameter which will be used to get the
 *        required Y extent of the FRAME picture in metres.
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A comment to store in the AGI database with the FRAME picture.
@@ -76,12 +76,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,7 +112,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -211,6 +211,6 @@
 
       CALL ERR_RLSE
 
-  999 CONTINUE    
+  999 CONTINUE
 
       END

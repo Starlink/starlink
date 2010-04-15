@@ -28,7 +28,7 @@
       INCLUDE 'GKS_PAR'
       INCLUDE 'PGP_ERR'
 
-      
+
       IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRSLW - No PGPLOT device open',
      :   GRNODO)

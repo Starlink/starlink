@@ -106,12 +106,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -158,7 +158,7 @@
 *     10-JUL-2006 (DSB):
 *        Ensure that the result of copying a scaled array is a simple
 *        array. This is because scaled arrays are read-only, so we need
-*        to be able to create a simple array from a scaled array if we are 
+*        to be able to create a simple array from a scaled array if we are
 *        ever going to be able to change the values in the array.
 *     17-JUL-2006 (DSB):
 *        Add value for DEFER when calling ARY1_DCRE(P).
@@ -168,7 +168,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -251,10 +251,10 @@
          SCALED = .FALSE.
       END IF
 
-*  If the input array is a base array, but is not a scaled array, then check 
-*  to see that there is no conflicting mapped access for write or update in 
+*  If the input array is a base array, but is not a scaled array, then check
+*  to see that there is no conflicting mapped access for write or update in
 *  effect. Report an error if there is. We exclude scaled arrays since
-*  these need to be converted to simple form, in the same way that an array 
+*  these need to be converted to simple form, in the same way that an array
 *  section is copied.
       IF ( .NOT. ACB_CUT( IACB1 ) .AND. .NOT. SCALED ) THEN
          IF ( DCB_NWRIT( IDCB1 ) .NE. 0 ) THEN
@@ -320,7 +320,7 @@
                   IF ( DCB_STA( IDCB1 ) ) THEN
                      CALL ARY1_CLN( IACB1, IACBC, STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *  Map the input array for reading through the cloned ACB entry and the
 *  output array for writing.
                         CALL ARY1_MAPS( IACBC, DCB_TYP( IDCB1 ),
@@ -411,13 +411,13 @@
 
 *  Get the required data type for the new array.
                IF( SCALED ) THEN
-                  CALL CMP_TYPE( DCB_SCLOC( IDCB1 ), 'SCALE', NEWTYP, 
+                  CALL CMP_TYPE( DCB_SCLOC( IDCB1 ), 'SCALE', NEWTYP,
      :                           STATUS )
-               ELSE 
+               ELSE
                   NEWTYP = DCB_TYP( IDCB1 )
                END IF
 
-*  Create a new simple data object (with an entry in the DCB) with the 
+*  Create a new simple data object (with an entry in the DCB) with the
 *  correct type and bounds to accommodate the copied data.
                CALL ARY1_DCRE( .FALSE., NEWTYP, DCB_CPX( IDCB1 ),
      :                         ACB_NDIM( IACB1 ), ACB_LBND( 1, IACB1 ),
@@ -439,14 +439,14 @@
                   IF ( DCB_STA( IDCB1 ) ) THEN
                      CALL ARY1_CLN( IACB1, IACBC, STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *  Map the input array for reading through the cloned ACB entry and the
 *  output array for writing.
-                        CALL ARY1_MAPS( IACBC, NEWTYP, DCB_CPX( IDCB1 ), 
-     :                                  'READ', PNTR1( 1 ), PNTR1( 2 ), 
+                        CALL ARY1_MAPS( IACBC, NEWTYP, DCB_CPX( IDCB1 ),
+     :                                  'READ', PNTR1( 1 ), PNTR1( 2 ),
      :                                  STATUS )
-                        CALL ARY1_MAPS( IACB2, NEWTYP, DCB_CPX( IDCB1 ), 
-     :                                  'WRITE', PNTR2( 1 ), PNTR2( 2 ), 
+                        CALL ARY1_MAPS( IACB2, NEWTYP, DCB_CPX( IDCB1 ),
+     :                                  'WRITE', PNTR2( 1 ), PNTR2( 2 ),
      :                                  STATUS )
 
 *  Find the number of data components to be copied and the number of
@@ -554,7 +554,7 @@
          CALL ARY1_ANL( IACB2, STATUS )
          IACB2 = 0
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_CPY', STATUS )
 

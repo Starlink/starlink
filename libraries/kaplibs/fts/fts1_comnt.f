@@ -17,9 +17,9 @@
 *  Description:
 *     This routine searches a buffer containing the header card images
 *     from a FITS file for the next card with keyword COMMENT.  The
-*     search begins at a defined card image; and ends when the next end 
+*     search begins at a defined card image; and ends when the next end
 *     of a header block, marked by the END keyword, is encountered or
-*     the buffer is exhausted.  The routine returns the comment string, 
+*     the buffer is exhausted.  The routine returns the comment string,
 *     and the number of the card image within the buffer array that
 *     contains the comment.  If the keyword is is present %THERE is
 *     true, otherwise it is false.
@@ -70,12 +70,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA

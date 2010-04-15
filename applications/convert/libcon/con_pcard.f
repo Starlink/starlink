@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_PCARD( CARD, LINENO, EL, CARDAR, STATUS ) 
+*     CALL CON_PCARD( CARD, LINENO, EL, CARDAR, STATUS )
 
 *  Description:
 *     This copies an 80-character `card image' into an array of card
@@ -65,7 +65,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
       INTEGER LINENO
       CHARACTER * 80 CARD
       INTEGER EL
-      
+
 *  Arguments Given and Returned:
       CHARACTER * 80 CARDAR( EL )
 
@@ -104,5 +104,5 @@
      :    'The chosen record (^L) lies outside the bounds (1 to ^EL) '/
      :    /'of the card-image array.', STATUS )
       END IF
-      
+
       END

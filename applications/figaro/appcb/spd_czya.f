@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -314,7 +314,7 @@
 *  We pass 7 pointers, assuming that NDF__MXDIM=7.
       CALL SPD_WZYB( DCENTR, USEVAL, WIDTH.NE.0, VARUSE,
      :               SPAXIS, NELM, DIM, FILENO, FORM, BADVAL,
-     :               %VAL( CNF_PVAL( CEN(1) ) ), 
+     :               %VAL( CNF_PVAL( CEN(1) ) ),
      :               %VAL( CNF_PVAL( CEN(2) ) ),
      :               %VAL( CNF_PVAL( CEN(3) ) ),
      :               %VAL( CNF_PVAL( CEN(4) ) ),

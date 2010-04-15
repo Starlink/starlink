@@ -44,7 +44,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -59,7 +59,7 @@
       INTEGER CENTYR             ! Number of centuries entered in year
       INTEGER JDPCEN             ! Julian days per century
       INTEGER JUDAY              ! The number of days since the start of
-                                 ! the year 
+                                 ! the year
       INTEGER JUYEAR             ! The number of Julian days up to the
                                  ! begining of the year
       INTEGER LEAP4              ! Is 0 if the year is a multiple of 4
@@ -80,7 +80,7 @@
 *  leap year correction
       JUDAY = MTHDAY( IMONTH ) + IDAY
 
-*  Calculate whether the year is a multiple of 4 
+*  Calculate whether the year is a multiple of 4
       LEAP4 = MOD( IYEAR, 4)
 
 *  Calculate whether the year is a multiple of 100

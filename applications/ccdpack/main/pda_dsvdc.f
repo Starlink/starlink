@@ -1,4 +1,4 @@
-      SUBROUTINE PDA_DSVDC (X, LDX, N, P, S, E, U, LDU, V, LDV, WORK, 
+      SUBROUTINE PDA_DSVDC (X, LDX, N, P, S, E, U, LDU, V, LDV, WORK,
      :                      JOB, INFO)
 C***BEGIN PROLOGUE  DSVDC
 C***PURPOSE  Perform the singular value decomposition of a rectangular

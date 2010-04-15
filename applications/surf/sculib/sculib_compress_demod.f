@@ -1,5 +1,5 @@
-      SUBROUTINE SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS, 
-     :  IN_DATA, ADC_INDEX, CHAN_INDEX, INT_INDEX, ADC, CHAN, 
+      SUBROUTINE SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS,
+     :  IN_DATA, ADC_INDEX, CHAN_INDEX, INT_INDEX, ADC, CHAN,
      :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
 *+
 *  Name:
@@ -15,12 +15,12 @@
 *     to give an average for that integration. Data with bad quality are
 *     ignored. The variance on the average will also be derived; set equal
 *     to the variance on the input data if only one jiggle contributes to the
-*     average, otherwise calculated from the spread of the input points about 
+*     average, otherwise calculated from the spread of the input points about
 *     the mean.
 
 *  Invocation:
-*     CALL SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS, 
-*    :  IN_DATA, ADC_INDEX, CHAN_INDEX, INT_INDEX, ADC, CHAN, 
+*     CALL SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS,
+*    :  IN_DATA, ADC_INDEX, CHAN_INDEX, INT_INDEX, ADC, CHAN,
 *    :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
 
 *  Arguments:
@@ -115,7 +115,7 @@
 *  Local variables:
       INTEGER BOL                        ! index of bolometer data in array
       INTEGER I                          ! DO loop index
-      INTEGER INT                        ! integration number 
+      INTEGER INT                        ! integration number
       INTEGER JIG                        ! jiggle index
       INTEGER JIG_INDEX                  ! index of JIG in integration INT
 
@@ -130,7 +130,7 @@
 *  find the index of the desired bolometer
 
       BOL = VAL__BADI
-           
+
       IF (N_BOLS .GT. 0) THEN
          DO I = 1, N_BOLS
             IF ((CHAN .EQ. CHAN_INDEX(I)) .AND.
@@ -159,7 +159,7 @@
             OUT_QUALITY (INT) = 0
 
 *  add up sum and sum of squares of jiggle measurements
-         
+
             DO JIG = 1, N_JIGS
                JIG_INDEX = INT_INDEX(INT) + JIG - 1
 

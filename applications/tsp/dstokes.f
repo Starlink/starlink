@@ -25,7 +25,7 @@ C
 C-
 C
 C  History:
-C    8/3/1992   Original Version.   JAB/AAO 
+C    8/3/1992   Original Version.   JAB/AAO
 C
 
       IMPLICIT NONE
@@ -60,7 +60,7 @@ C
       CALL TSP_COPY(LOC,OLOC,STATUS)
 
 *  Find the Stokes parameters
-          
+
       CALL TSP_STOKES(OLOC,NUM,QZ,UZ,VZ,STATUS)
 
       IF (STOKESPAR .EQ. 'Q' .OR. STOKESPAR .EQ. 'q') THEN
@@ -86,7 +86,7 @@ C
           ENDIF
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL DAT_ANNUL(OLOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)

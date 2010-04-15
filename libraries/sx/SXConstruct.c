@@ -31,7 +31,7 @@ Error m_SXConstruct( Object *in, Object*out){
 *     If "deltas" is supplied, it defines the distances between adjacent
 *     positions on each axis. It should be a vector with the same number
 *     of dimensions as "upper" and "lower", or a single value (in which
-*     case the supplied value is used for all axes). The upper and lower 
+*     case the supplied value is used for all axes). The upper and lower
 *     bounds are expanded if necessary until they span an integer number
 *     of deltas.
 *
@@ -62,7 +62,7 @@ Error m_SXConstruct( Object *in, Object*out){
 *     This example imports a scattered data set from "C02.general",
 *     extracts a single frame, uses SXConstruct to make a grid covering the
 *     bounds of the frame, with increments of 10.0 along each axis, and
-*     then uses SXBIN to find the mean data value in each of the square 
+*     then uses SXBIN to find the mean data value in each of the square
 *     connections of this new grid. the resulting field is displayed.
 *
 *     data = Import("/usr/lpp/dx/samples/data/CO2.general");
@@ -89,12 +89,12 @@ Error m_SXConstruct( Object *in, Object*out){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -142,7 +142,7 @@ Error m_SXConstruct( Object *in, Object*out){
       int      rank;         /* Array rank */
       float    tmp;          /* Swapping space */
       Type     type;         /* Array numeric type */
-  
+
 
 /*  If OBJECT was supplied, check it is a field. */
 
@@ -178,29 +178,29 @@ Error m_SXConstruct( Object *in, Object*out){
 /*  Get a pointer to the bounding box array and the number of items in
  *  the array, etc. */
 
-         box_ptr = (float *) DXGetArrayData( array ); 
-         DXGetArrayInfo( array, &ncorn, &type, &cat, &rank, &ndim );      
+         box_ptr = (float *) DXGetArrayData( array );
+         DXGetArrayInfo( array, &ncorn, &type, &cat, &rank, &ndim );
 
          if( type != TYPE_FLOAT ){
             DXSetError( ERROR_BAD_TYPE, "input object positions are not TYPE_FLOAT");
-            goto error; 
+            goto error;
          }
 
          if( cat != CATEGORY_REAL ){
             DXSetError( ERROR_BAD_TYPE, "input object positions are not REAL");
-            goto error; 
+            goto error;
          }
 
          if( rank > 1 ){
             DXSetError( ERROR_BAD_TYPE, "input object positions have rank larger than 1");
-            goto error; 
+            goto error;
          }
 
          if( rank == 0 ) ndim = 1;
 
          if( ndim > 3 ){
             DXSetError( ERROR_BAD_TYPE, "input object positions have more than 3 dimensions");
-            goto error; 
+            goto error;
          }
 
 
@@ -217,7 +217,7 @@ Error m_SXConstruct( Object *in, Object*out){
                if( bnd < lbnd[j] ) lbnd[j]=bnd;
                if( bnd > ubnd[j] ) ubnd[j]=bnd;
             }
-         }            
+         }
 
 
 /*  Delete the copy of the input object */
@@ -241,7 +241,7 @@ Error m_SXConstruct( Object *in, Object*out){
 
             if( ndim > 3 ){
                DXSetError( ERROR_BAD_TYPE, "lower bounds have more than 3 dimensions");
-               goto error; 
+               goto error;
             }
 
          }
@@ -256,7 +256,7 @@ Error m_SXConstruct( Object *in, Object*out){
 
             if( ndim2 != ndim ){
                DXSetError( ERROR_BAD_TYPE, "number of upper and lower bounds does not match");
-               goto error; 
+               goto error;
             }
 
          }
@@ -293,7 +293,7 @@ Error m_SXConstruct( Object *in, Object*out){
          } else {
             if( ndim2 != ndim ){
                DXSetError( ERROR_BAD_TYPE, "incorrect number of deltas given");
-               goto error; 
+               goto error;
             } else {
                for( j=0; j<ndim; j++){
                   del[j] = deltas[j];
@@ -310,7 +310,7 @@ Error m_SXConstruct( Object *in, Object*out){
                lbnd[j] = 0.5*( ubnd[j] + lbnd[j] - ( cnt[j] - 1 )*del[j] );
             } else {
                DXSetError( ERROR_BAD_TYPE, "negative or zero delta given");
-               goto error; 
+               goto error;
             }
          }
 
@@ -328,7 +328,7 @@ Error m_SXConstruct( Object *in, Object*out){
          } else {
             if( ndim2 != ndim ){
                DXSetError( ERROR_BAD_TYPE, "incorrect number of counts given");
-               goto error; 
+               goto error;
             } else {
                for( j=0; j<ndim; j++){
                   cnt[j] = counts[j];
@@ -358,7 +358,7 @@ Error m_SXConstruct( Object *in, Object*out){
 
       } else {
          DXSetError( ERROR_MISSING_DATA, "no deltas or counts given");
-         goto error; 
+         goto error;
       }
 
 
@@ -392,7 +392,7 @@ Error m_SXConstruct( Object *in, Object*out){
 
 /*  Finish the field */
 
-      if( !DXEndField( (Field) o ) ) goto error; 
+      if( !DXEndField( (Field) o ) ) goto error;
 
 
 /*  Return the output field. */

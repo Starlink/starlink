@@ -69,9 +69,9 @@ C***********************************************************************
 C
 C
 ************************************************************************
- 
+
       SUBROUTINE ATTACH(NAFILE,OPEN)
- 
+
 *+
 *  Name :
 *     ATTACH
@@ -133,12 +133,12 @@ C
 *-
 *  Type Definitions :
       IMPLICIT NONE
- 
+
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
- 
+
 *  Global variables :
 *    ...Daophot file names:
       CHARACTER*(30) COOFILE
@@ -147,39 +147,39 @@ C
       CHARACTER*(30) PROFILE
       CHARACTER*(30) GRPFILE
       COMMON /FILENAM/ COOFILE , MAGFILE , PSFFILE , PROFILE , GRPFILE
- 
+
 *    ...Daophot picture size:
       INTEGER NCOL
       INTEGER NROW
       COMMON /SIZE  / NCOL , NROW
- 
+
 *    Common block for NDF information
       INCLUDE 'ndf_cmn'
- 
+
 *  Arguments Given :
       CHARACTER*(*) NAFILE
- 
+
 *  Arguments Given and Returned
       LOGICAL*1 OPEN
- 
+
 *  External references :
       CHARACTER*(30) SWITCH
- 
+
 *  Local variables :
       LOGICAL BAD               ! Bad pixel flag
       INTEGER STATUS            ! HDS error status
       INTEGER DIM(2)            ! Size of DATA_ARRAY component
       INTEGER NDIM              ! Number of DATA_ARRAY dimensions
       CHARACTER*(72) TITLE      ! NDF title string, from its TITLE component
- 
+
 *  Local data :
 
 *.
- 
+
 *   Initialise the HDS status variable.
       STATUS = SAI__OK
- 
-*   If there is already a data file open, close it.  Issue a warning 
+
+*   If there is already a data file open, close it.  Issue a warning
 *   if an error occurs, but carry on.
       IF ( OPEN ) THEN
          CALL NDF_ANNUL(NDF_IDATA,STATUS)
@@ -191,7 +191,7 @@ C
          END IF
          OPEN = .FALSE.
       END IF
- 
+
 *   If NAFILE wasn't defined in the ATTACH command line, ask for it
 *   here.  Quit if "end of file" (ctrl-Z) was entered.
       IF ( NAFILE.EQ.' ' ) THEN
@@ -199,13 +199,13 @@ C
          CALL ASKFILE('Enter file name:',NAFILE)
          IF ( NAFILE.EQ.'END OF FILE' ) RETURN
       END IF
- 
+
 *   Try to open the file.  Check for errors and report them.
       CALL NDF_FIND(DAT__ROOT,NAFILE,NDF_IDATA,STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL TBLANK
          CALL ERR_REP(' ','ATTACH - error opening file',STATUS)
- 
+
 *   If there is no error, set the OPEN flag and assign initial default
 *   sequential filenames for use later.
       ELSE
@@ -215,23 +215,23 @@ C
          PSFFILE = SWITCH(NAFILE,'.PSF')
          PROFILE = SWITCH(NAFILE,'.NST')
          GRPFILE = SWITCH(NAFILE,'.GRP')
- 
+
 *   Output a message if there are bad pixels present
          CALL NDF_BAD(NDF_IDATA,'Data',.TRUE.,BAD,STATUS)
          IF ( BAD ) CALL MSG_OUT(' ',
      :                    'NOTE - Bad pixels are present in the data'
      :                    ,STATUS)
- 
+
 *   Try to read the TITLE component
          TITLE = ' '
          CALL NDF_CGET(NDF_IDATA,'Title',TITLE,STATUS)
- 
+
 *   If successful, display the title
          IF ( TITLE.NE.' ' ) THEN
             CALL TBLANK
             CALL MSG_OUT(' ','Title: ' // TITLE,STATUS)
          END IF
- 
+
 *   Find the shape of the DATA_ARRAY component
          CALL NDF_DIM(NDF_IDATA,2,DIM,NDIM,STATUS)
          IF ( STATUS.EQ.SAI__OK .AND. NDIM.NE.2 ) THEN
@@ -250,15 +250,15 @@ C
             CALL TBLANK
             CALL MSG_SETC('FILE',NAFILE)
             CALL MSG_OUT(' ','Failed to attach ^FILE',STATUS)
- 
+
 *   If the DATA_ARRAY is OK, save its dimensions.
          ELSE
             NCOL = DIM(1)
             NROW = DIM(2)
          END IF
- 
+
 *   End of "no error finding the NDF" condition.
       END IF
- 
+
 *   Exit routine.
       END

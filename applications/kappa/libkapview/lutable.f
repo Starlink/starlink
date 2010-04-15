@@ -145,9 +145,9 @@
 
 *  Notes:
 *     - The effects of this command will only be immediately apparent
-*     when run on X windows which have 256 colours (or other similar 
+*     when run on X windows which have 256 colours (or other similar
 *     pseudocolour devices). On other devices (for instance, X windows
-*     with more than 256 colours) the effects will only become apparent 
+*     with more than 256 colours) the effects will only become apparent
 *     when subsequent graphics applications are run.
 
 *  Related Applications:
@@ -265,13 +265,13 @@
       CALL PSX_CALLOC( NINTS, '_INTEGER', IPW2, STATUS )
 
 *  Everything else is done in a lower level subroutine so that the
-*  above work space can be used. This avoids the need for static 
+*  above work space can be used. This avoids the need for static
 *  arrays with an associated fixed limit on the number of colours.
-      CALL KPS1_LTABA( NINTS, FULL, %VAL( CNF_PVAL( IPW1 ) ), 
+      CALL KPS1_LTABA( NINTS, FULL, %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 STATUS )
 
-*  Free workspace. 
+*  Free workspace.
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPW2, STATUS )
 

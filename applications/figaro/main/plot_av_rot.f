@@ -51,7 +51,7 @@
 *    E_VPOS1(LINE_COUNT,MGAUSS) = REAL ARRAY (Workspace)
 *        Errors on VPOS1
 * In ARC_DIMS = CHARACTERommon (Workspace)
-*       
+*
 *    MGAUSS = INTEGER (Workspace)
 *        Maximum number of Gaussians
 *

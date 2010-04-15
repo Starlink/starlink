@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -165,7 +165,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_DOCVT = ( IVAL .NE. 0 )
          END IF
-         
+
 *  Keep NDF objects flag.
 *  =====================
 *  Read the keep NDF objects flag value from its environment variable
@@ -174,16 +174,16 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_KEEP = ( IVAL .EQ. 1 )
          END IF
-         
+
 *  Create History components automatically.
 *  ========================================
-*  Read the "create History components automatically" flag from its 
+*  Read the "create History components automatically" flag from its
 *  environment variable (if present) and set the TCB flag accordingly.
          CALL NDF1_RDTUN( 'NDF_AUTO_HISTORY', 0, IVAL, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_AUTOHISTORY = ( IVAL .NE. 0 )
          END IF
-         
+
 *  Show data conversions flag.
 *  ==========================
 *  Read the show data conversions flag value from its environment
@@ -192,7 +192,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_SHCVT = ( IVAL .EQ. 1 )
          END IF
-         
+
 *  Warning message flag.
 *  ====================
 *  Read the warning message flag value from its environment variable
@@ -201,13 +201,13 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_WARN = ( IVAL .EQ. 1 )
          END IF
-         
-*  Propagation of extensions 
+
+*  Propagation of extensions
 *  =========================
-*  This is a pointer to an AST KeyMap in which each entry has a key that 
-*  is the name of an NDF extension, and an integer value that is non-zero 
+*  This is a pointer to an AST KeyMap in which each entry has a key that
+*  is the name of an NDF extension, and an integer value that is non-zero
 *  if the extension is to be propagated by default (by NDF_PROP), or zero
-*  if the extension is not to be propagated by default. Any extension that 
+*  if the extension is not to be propagated by default. Any extension that
 *  is not specified within this KeyMap is propagated by default. Note,
 *  these tuning parameter cannot be set from an environment variable.
          TCB_PXT = AST__NULL

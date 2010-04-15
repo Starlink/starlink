@@ -25,10 +25,10 @@
 *     and the WAVE values. An error is also reported if the NDF is not
 *     1-dimensional.
 *
-*     Only the DATA component of the output NDF is set by this routine. 
+*     Only the DATA component of the output NDF is set by this routine.
 *     The shape of the NDF and all other components (AXIS, TITLE, all
 *     extensions, etc) are inherited from the model NDF.
-      
+
 *  Arguments:
 *     NDFNAM = CHARACTER * ( * ) (Given)
 *        The name of the NDF structure.
@@ -60,11 +60,11 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) NDFNAM
       INTEGER INDFM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -83,11 +83,11 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get the bounds of the model NDF. An error will be reported if it is
 *  not 1 dimensional.
       CALL NDF_BOUND( INDFM, 1, LBND, UBND, NDIM, STATUS )
-         
+
 *  Start an NDF context.
       CALL NDF_BEGIN
 
@@ -111,7 +111,7 @@
 *  FLUX value is only assigned to a DATA element if the corresponding
 *  WAVE and AXIS CENTRE values are the same. DATA values which do not
 *  have a corresponding element in the FLUX array are set bad.
-      CALL AXMAT( EL, %VAL( CNF_PVAL( IPAXIS ) ), 
+      CALL AXMAT( EL, %VAL( CNF_PVAL( IPAXIS ) ),
      :            %VAL( CNF_PVAL( IPDATA ) ), NGOOD, STATUS )
 
 *  Report an error if there was no overlap between the AXIS CENTRE
@@ -121,11 +121,11 @@
          CALL ERR_REP( 'WRPROP_ERR2', 'None of the pixels in the ' //
      :        'model NDF have the same axis position as any of the '//
      :        'stored flux values.', STATUS )
-      END IF      
+      END IF
 
 *  Delete the output NDF if an error has occured.
       IF( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF1, STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

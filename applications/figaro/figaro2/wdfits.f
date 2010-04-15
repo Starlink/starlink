@@ -10,17 +10,17 @@ C
 C  Description:
 C     Writes a Figaro image out to disk in FITS format.  Since the
 C     Figaro format is a superset of FITS, not all the information
-C     held in the Figaro file can be written to tape, so this 
+C     held in the Figaro file can be written to tape, so this
 C     routine concentrates on the main data array.  This means that
 C     it is really only suitable for images with no associated
 C     calibration data.  If the file has axis structures that
 C     contain linear data arrays, these will be converted into the
 C     appropriate CDELTn, CRPIXn and CRVALn keywords.  Non-linear axis
 C     data will be ignored. The only other information written into
-C     the FITS header will be taken from the FITS-specific data 
-C     structure, should the structure contain one.  Any entries in this 
-C     structure that can reasonably be output as header quantities 
-C     (arrays of data cannot) will be.  
+C     the FITS header will be taken from the FITS-specific data
+C     structure, should the structure contain one.  Any entries in this
+C     structure that can reasonably be output as header quantities
+C     (arrays of data cannot) will be.
 C
 C     If the end of the tape is reached while the data is being written,
 C     the tape is backspaced to the start of the image data and an
@@ -30,7 +30,7 @@ C     'standard' FITS recipie for handling end of tape - which allows
 C     images to span tapes - is not followed.  In batch mode the user
 C     is not given this option.
 C
-C     This program serves for the command WDFITS, which writes 
+C     This program serves for the command WDFITS, which writes
 C     an image out in the AAO de facto 'Disk Fits' format - ie to a
 C     disk file whose 2880 byte records are exactly the same as the
 C     records on a FITS tape would be, except that the data is not
@@ -39,7 +39,7 @@ C
 C  Parameters:
 C     IMAGE     (Character) The file containing the Figaro data
 C               structure to be written to disk.
-C     FILE      (Character) The name of the 
+C     FILE      (Character) The name of the
 C               disk file to which the data is to be written.
 C
 C  Keywords:
@@ -65,7 +65,7 @@ C                    in all type tests.  WIFITS can never have worked
 C                    on double precision data!
 C     17th June 1986 KS / AAO. WDFITS added.  LIB$GET_LUN used to get
 C                    disk logical unit number.
-C     9th Oct 1987   KS / AAO. Now allows .FITS.x to be a structure 
+C     9th Oct 1987   KS / AAO. Now allows .FITS.x to be a structure
 C                    with .DATA and .DESCRIPTION elements. Length of
 C                    filenames increased.
 C     5th Nov 1987   KS / AAO. Will now retry with a new tape if end
@@ -74,19 +74,19 @@ C     30th Jan 1990  KS / AAO. Substantially reworked to use DSA
 C                    routines.
 C                    BSCALE, BZERO now calculated in double precision in
 C                    all cases. Blocked output now supported, through
-C                    the new `BLOCKED' parameter.  Support for 'USHORT' 
-C                    data added.  Actions when end-of-tape hit revised 
-C                    slightly, and termination after last image made 
-C                    optional. FITS 'COMMENT', 'HISTORY' and blank 
+C                    the new `BLOCKED' parameter.  Support for 'USHORT'
+C                    data added.  Actions when end-of-tape hit revised
+C                    slightly, and termination after last image made
+C                    optional. FITS 'COMMENT', 'HISTORY' and blank
 C                    items  treated as comments instead of character
 C                    strings (no quotation marks in header).  Axis
-C                    keywords now written before keywords taken from 
-C                    the FITS substructure and so take priority in case 
+C                    keywords now written before keywords taken from
+C                    the FITS substructure and so take priority in case
 C                    they have different values in the FITS
 C                    substructure.  Fault signalled if tape reaches
 C                    end and 'continue on new tape' option not taken -
 C                    so a procedure can abort cleanly.
-C      5th Mar 1993  KS/AAO. Added NOTERM keyword. 
+C      5th Mar 1993  KS/AAO. Added NOTERM keyword.
 C     26th Apr 1993  KS/AAO. Introduced use of FIT_DFOPEN to get around
 C                    system-dependent OPEN keywords.
 C     20th Jul 1993  HME/UoE, Starlink.  Reduce code to WDFITS (and
@@ -174,7 +174,7 @@ C
       INTEGER   NELM             ! Number of elements in data array
       LOGICAL   NOTERM           ! Value of 'NOTERM' keyword
       INTEGER   NKEY             ! Counter through keyword check tables
-      INTEGER   OBJPTR           ! Counter through FITS items in 
+      INTEGER   OBJPTR           ! Counter through FITS items in
                                  ! structure
       INTEGER   OBELM            ! Number of elements in a FITS item
       DOUBLE PRECISION SCALED(3) ! Calculated BSCALE values for BITPIXes
@@ -183,7 +183,7 @@ C
       INTEGER   STRLEN           ! Length of FITS character item -
                                  ! ignored
       LOGICAL   STRUCT           ! Indicates data array is structured
-      LOGICAL   SWAP             ! Indicates output is to be 
+      LOGICAL   SWAP             ! Indicates output is to be
                                  ! byte-swapped
       INTEGER   STATUS           ! General non-DSA status variable
       LOGICAL   TOPEN            ! Indicated tape was opened
@@ -252,9 +252,9 @@ C
       IF (TOTAPE) THEN
 *        REWIND=.FALSE.
 *        CURRENT=.FALSE.
-*        IF (PAR_GIVEN('REWIND')) 
+*        IF (PAR_GIVEN('REWIND'))
 *    :                       CALL PAR_RDKEY('REWIND',.FALSE.,REWIND)
-*        IF (PAR_GIVEN('CURRENT')) 
+*        IF (PAR_GIVEN('CURRENT'))
 *    :                       CALL PAR_RDKEY('CURRENT',.FALSE.,CURRENT)
 *        IF ((.NOT.REWIND).AND.(.NOT.CURRENT)) THEN
 *           CALL PAR_RDKEY('POSITION',.TRUE.,POSIT)
@@ -331,7 +331,7 @@ C
       CALL DSA_DATA_SIZE ('IMAGE',10,NDIM,DIMS,NELM,DSA_STATUS)
       IF (DSA_STATUS.NE.0) GO TO 500
 C
-C     Map the data, using the appropriate data type.  
+C     Map the data, using the appropriate data type.
 C
       IF ((TYPE.EQ.'BIT').OR.(TYPE.EQ.'BYTE')) THEN
          TYPE='BYTE'
@@ -406,7 +406,7 @@ C     loop on FINISHED.
 C
       FINISHED=.FALSE.
       DO WHILE (.NOT.FINISHED)
-C   
+C
 C        Start to write the FITS header with the standard quantities.
 C        Also put them into the check arrays so that we can trap any
 C        disparate values that might be in the FITS substructure.
@@ -439,14 +439,14 @@ C
      :                    STATUS)
             IF (STATUS.NE.0) GO TO 450
          END IF
-C   
+C
 C        Now look at the axis data, checking for linear data.  For any
 C        axis that has linear data, generate the CDELTn, CRPIXn, and CRVALn
-C        keywords.  Use the label for that axis as a comment for CRVALn, 
+C        keywords.  Use the label for that axis as a comment for CRVALn,
 C        and use any units to generate a CTYPEn keyword.  Note that the
 C        restriction to 9 axes is an artificial one that happens to make
 C        the formatting easier (only needs one digit).
-C   
+C
          IF (NDIM.GT.9) THEN
             CALL PAR_WRUSER('Cannot handle calibration data properly '//
      :                      'for more than 9 dimensions',STATUS)
@@ -526,11 +526,11 @@ C
                CALL DSA_UNMAP (SLOT,DSA_STATUS)
             END IF
          END DO
-C   
+C
 C        Now, work through all the elements in any FITS-specific
 C        substructure that the data might have, and write any
 C        objects it contains into the FITS header.
-C   
+C
          OBJPTR=0
          EXIST=.TRUE.
          DO WHILE (EXIST)
@@ -540,12 +540,12 @@ C
             IF (STATUS.NE.0) GO TO 500
             IF (EXIST.AND.(ACCESS.NE.' ').AND.
      :          (NAME(1:8).NE.'END     ')) THEN
-C   
+C
 C              Given a new object name that we can handle, what happens
 C              next depends on the type (and hence on ACCESS).
-C   
+C
 C              An integer
-C   
+C
                IF ((ACCESS.EQ.'I').OR.(ACCESS.EQ.'S')) THEN
                   IF (OBELM.EQ.1) THEN
                      CALL DSA_GET_FITS_I ('IMAGE',NAME,1,N,COMMENT,
@@ -561,9 +561,9 @@ C
                      END IF
                   END IF
                END IF
-C   
+C
 C              A real number
-C   
+C
                IF (OBELM.EQ.1) THEN
                   IF (ACCESS.EQ.'F') THEN
                      CALL DSA_GET_FITS_F ('IMAGE',NAME,1,VALUE,COMMENT,
@@ -608,9 +608,9 @@ C
                      END IF
                   END IF
                END IF
-C   
+C
 C              A character string - which may have multiple values
-C   
+C
                IF (ACCESS.EQ.'C') THEN
                   DO I=1,OBELM
                      STRING=' '
@@ -633,16 +633,16 @@ C
                END IF
             END IF
          END DO
-C   
+C
 C        Terminate the header
-C   
+C
          CALL FIT_WEND(STATUS)
          IF (STATUS.NE.0)  GO TO 450
-C   
+C
 C        Write out the image data in the appropriate type.  Note that
 C        BITPIX=16 normally means that the input was 2 byte integer, but
 C        in WJT it is also used for FLOAT data.
-C   
+C
          IF (BITPIX.EQ.8) THEN
             CALL FIT_WRAYB(%VAL(CNF_PVAL(IPTR)),NELM,STATUS)
          ELSE IF (BITPIX.EQ.16) THEN
@@ -671,21 +671,21 @@ C
          IF (NOTERM) CALL FIT_NOTERM
          CALL FIT_CLOSE(STATUS)
          IF (STATUS.NE.0) GO TO 450
-C   
+C
 C        If we get here, the I/O was all OK, so we've finished.
-C   
+C
          IF (STATUS.EQ.0)  FINISHED=.TRUE.
-C   
+C
 C        Program breaks to here if there was an I/O error from
 C        the FIT_ routines.  So if FINISHED is not set, it must be
 C        because of an I/O error, indicated by a bad STATUS value.
-C   
+C
   450    CONTINUE
          IF (.NOT.FINISHED) THEN
 C
 C           The only error we can handle is if we ran out of tape.
 C           If so, give the user (if not in batch mode) the option
-C           of mounting a new tape and repeating.  We also make 
+C           of mounting a new tape and repeating.  We also make
 C           attempting to terminate the tape an option, since this
 C           has given problems on some drives (mainly those at the
 C           AAT), although it is believed that the operation is
@@ -764,9 +764,9 @@ C
             END IF
          END IF
       END DO
-C   
+C
 C     Close everything down
-C   
+C
   500 CONTINUE
 *     IF (TOPEN) THEN
 *        CALL FIT_END(STATUS)
@@ -851,7 +851,7 @@ C
       END IF
       DO KEY=1,NKEY
          IF (NAMECK(KEY).EQ.KNAME) THEN
-            FIG_KEYCHK=.FALSE.      
+            FIG_KEYCHK=.FALSE.
             IF (ABS(CHECK(KEY)-VALUE)/VALUE.GT.0.000001) THEN
                CALL DSA_WRUSER(
      :           'Warning: the FITS-specific structure of the file ')

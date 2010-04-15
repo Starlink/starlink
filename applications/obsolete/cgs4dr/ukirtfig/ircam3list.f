@@ -17,7 +17,7 @@ C
 C     LISTING   The name of the text file in which the information
 C               will be listed
 C
-C     Command Keywords - 
+C     Command Keywords -
 C
 C
 C     FULL      By default 80 character listing records are produced.
@@ -29,7 +29,7 @@ C+
 C
 C     Dynamic memory include file - defines DYNAMIC_MEM
 C
-      INCLUDE 'DYNAMIC_MEMORY'      
+      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Local variables
 C
@@ -153,7 +153,7 @@ C
 
                          HEAD1 = '  Obs Object      Obstype  UT start'//
      :                  '     Exp.    Nexp       Mode   Filter'//
-     :                  '   Armss' 
+     :                  '   Armss'
                      IF (FULL) THEN
                         HEADER = HEAD1//' Cols Rows  Mag Psize'//
      :	                  '    R.A.          Dec     Eqnx'
@@ -279,5 +279,5 @@ C
       CALL DSA_CLOSE(STATUS)
 C
       END
-          
+
 

@@ -5,10 +5,10 @@ C     S D I S T
 C
 C     Determines the s-distortion parameters for a star spectrum.
 C     This program requires as input an image containing at least one
-C     stellar spectrum.  For each spectrum it is to examine, it 
+C     stellar spectrum.  For each spectrum it is to examine, it
 C     assumes that a point has been indicated somewhere in the center
 C     of the spectrum.  Starting at that point, it attempts to follow
-C     the spectrum and so map out the distortion.  
+C     the spectrum and so map out the distortion.
 C
 C     Command parameters -
 C
@@ -17,17 +17,17 @@ C     COLUMNS    (Numeric) The number of columns to be added
 C                together when tracing the spectra.
 C     TRACE      (Character) Controls the algorithm used to follow
 C                the spectra.  Only the first character is significant.
-C                'E' (Edges) Indicates that the data profile is a 
-C                'top-hat'shape - as you might get from a continuum 
-C                source through a dekker.  If EDGES is specified, an 
+C                'E' (Edges) Indicates that the data profile is a
+C                'top-hat'shape - as you might get from a continuum
+C                source through a dekker.  If EDGES is specified, an
 C                edge-locating algorithm is used, and the width of the
 C                top hat is assumed to be approximately WIDTH*2.
 C                'C' is the same as 'E', except that the center is
 C                taken as the center of gravity of the data within the
 C                edges, while 'E' takes it as the average of the edges.
-C                'G' (Gaussian) Indicates that the profile is roughly 
-C                gaussian, of half width WIDTH.  
-C     WIDTH      (Numeric) The expected half-width of the spectra in 
+C                'G' (Gaussian) Indicates that the profile is roughly
+C                gaussian, of half width WIDTH.
+C     WIDTH      (Numeric) The expected half-width of the spectra in
 C                pixels.
 C     MAXDEG     (Numeric) The maximum degree polynomial to be
 C                fitted.
@@ -57,11 +57,11 @@ C               3 header lines, all beginning with '*'
 C               One line giving the number of spectra traced, and the
 C               dimensions of the image used, in the format
 C               20X,I5,15X,I8,4X,I8.
-C               Then, for each spectrum traced, one record giving 
+C               Then, for each spectrum traced, one record giving
 C               the spectrum number, and the leftmost and rightmost
-C               pixels covered by the trace, in format 
+C               pixels covered by the trace, in format
 C               11X,I5,17X,I5,4X,I5, then 1 record giving the average
-C               Y value in the spectrum, and the width of the 
+C               Y value in the spectrum, and the width of the
 C               spectrum, in format 16X,F13.7,10X,F9.2,
 C               which is followed by 3 records giving the 11
 C               polynomial coefficients for the fit, in 3D23.16.
@@ -75,19 +75,19 @@ C      2nd Apr 1985  KS/ AAO. Revised to use NAG version of FIG_DXYFIT.
 C                    Workspace used, and call to FIG_GETDIS changed.
 C      7th Aug 1987  DJA/AAO.  Rewritten to use DSA_ routines.
 C                    Now uses DYN_ routines for dynamic memory handling
-C     22nd Mar 1988  KS / AAO. Modified for GKS version of PGPLOT.  
-C                    Workspace usage corrected, use of STATUS made 
+C     22nd Mar 1988  KS / AAO. Modified for GKS version of PGPLOT.
+C                    Workspace usage corrected, use of STATUS made
 C                    uniform.
 C     26th May 1988  KS/AAO. Maximum number of spectra increased to 50.
-C                    TRACE parameter added.  
+C                    TRACE parameter added.
 C     31st May 1988  KS/AAO. DIAG keyword added. Image dimensions and
 C                    spectrum width added to output format.
 C     16th Aug 1988  KS/AAO. WIDTH limit increased.  Number of records
 C                    for coefficients (4) corrected in comments.
-C     31st Oct 1992  HME / UoE, Starlink.  Lower case file name 
-C                    sdist.dat. INCLUDE changed, TABs removed. DISPLAY 
-C                    always false, no TVP calls. SOFT parameter becomes 
-C                    SOFTD. 
+C     31st Oct 1992  HME / UoE, Starlink.  Lower case file name
+C                    sdist.dat. INCLUDE changed, TABs removed. DISPLAY
+C                    always false, no TVP calls. SOFT parameter becomes
+C                    SOFTD.
 C     27th Jul 1993  HME / UoE, Starlink.  Disuse PAR_Q*, use
 C                    PAR_ABORT. Added parameter NEXT.
 C     16th Feb 1995  HME / UoE, Starlink. In the big workspace move
@@ -102,10 +102,10 @@ C                    separate calls and use DSA_GET_WORK_ARRAY.
 C     26th Jul 1995  HME / UoE, Starlink.  Implement the changes
 C                    contained in AAO's version 4.2:
 C                    KS/AAO. Increased tolerance to allow for larger
-C                    detectors (now varies with WIDTH, was just 2 
+C                    detectors (now varies with WIDTH, was just 2
 C                    pixels).  Introduced the 'BALANCE' algorithm.
-C                    KS/AAO. Changes as determined by SJM for the 
-C                    portable Figaro version made to this newer version 
+C                    KS/AAO. Changes as determined by SJM for the
+C                    portable Figaro version made to this newer version
 C                    of SDIST.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
@@ -118,7 +118,7 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions used 
+C     Functions used
 C
       LOGICAL PAR_ABORT
       INTEGER ICH_FOLD, ICH_LEN
@@ -154,7 +154,7 @@ C
       INTEGER   NDIM             ! Number of dimensions in data
       INTEGER   NELM             ! Total number of elements in data
       INTEGER   NX               ! Size of 1st dimension
-      INTEGER   NY               ! Size of 2nd dimension 
+      INTEGER   NY               ! Size of 2nd dimension
       INTEGER   NXYS             !
       CHARACTER SOFT*32          ! The name of the current soft device
       INTEGER   SPTR             ! Dynamic-memory pointer to workspace
@@ -309,9 +309,9 @@ C
       IF (PAR_ABORT()) GO TO 500
 C
 C     Get workspace for the polynomial fits (this is used as 2 double
-C     precision arrays by the routine FIG_DXYFIT) and to collect the 
+C     precision arrays by the routine FIG_DXYFIT) and to collect the
 C     X and Y values to be fitted.  Soft plots also require extra space
-C     (under pointer SPTR). See FIG_GETDIS for details. 
+C     (under pointer SPTR). See FIG_GETDIS for details.
 C
       CALL DSA_GET_WORK_ARRAY(5*NX+3*(MAXD+1),
      :                            'DOUBLE',WPTR,WSLOT,STATUS)
@@ -342,17 +342,17 @@ C
          GO TO 500
       END IF
       FOPEN=.TRUE.
-      WRITE (FILE,'(A/2A/A)',IOSTAT=FSTATUS) 
+      WRITE (FILE,'(A/2A/A)',IOSTAT=FSTATUS)
      :                   '*','*  SDIST results for ',IMAGE, '*'
       IF (FSTATUS.NE.0) GO TO 450
-      WRITE (FILE,'(A,I5,A,I8,A,I8)',IOSTAT=FSTATUS) 
+      WRITE (FILE,'(A,I5,A,I8,A,I8)',IOSTAT=FSTATUS)
      :      'Number of spectra = ',NXYS,'     Data array',NX,' by ',NY
       IF (FSTATUS.NE.0) GO TO 450
       DO I=1,NXYS
          WRITE (FILE,'(3(A,I5))',IOSTAT=FSTATUS) 'Spectrum # ',I,
      :                      ' X coverage from ',IX1(I),' to ',IX2(I)
          IF (FSTATUS.NE.0) GO TO 450
-         WRITE (FILE,'(A,F13.7,A,F9.2)',IOSTAT=FSTATUS) 
+         WRITE (FILE,'(A,F13.7,A,F9.2)',IOSTAT=FSTATUS)
      :            'Average Y value ',YAVS(I),'     Width',WIDTHS(I)
          IF (FSTATUS.NE.0) GO TO 450
          WRITE (FILE,'(3D23.16)',IOSTAT=FSTATUS) (COEFFS(J,I),J=1,11)
@@ -427,7 +427,7 @@ C     (>) ARRAY   (Real array ARRAY(10)) Contains the display parameters
 C                 for the current image.  See IMAGE for details.
 C     (>) DIAG    (Logical) True if detailed diagnostics required.
 C     (W) IWORK   (Integer array IWORK(NX)) Workspace.
-C     (W) WORK    (Double precision array WORK(5*NX+3*(MAXD+1))) 
+C     (W) WORK    (Double precision array WORK(5*NX+3*(MAXD+1)))
 C                  Workspace.
 C     (W) XWORK   (Double precision array XWORK(NX)) Workspace.
 C     (W) YWORK   (Double precision array YWORK(NX)) Workspace.
@@ -450,9 +450,9 @@ C     Modified:
 C
 C     31st Jan 1985.  KS / AAO.  Test added to prevent crash when
 C                     no points could be found in a spectrum.
-C     2nd April 1985. KS / AAO. Modified to use NAG version of 
+C     2nd April 1985. KS / AAO. Modified to use NAG version of
 C                     FIG_DXYFIT.  Calling sequence for this routine
-C                     and FIG_DXYFIT changed.  
+C                     and FIG_DXYFIT changed.
 C     26th May 1988.  KS/AAO. TRACE parameter added.
 C     31st May 1988.  KS/AAO. Set initial limit values properly.
 C                     DIAG parameter added.  WIDTHS parameter added.
@@ -504,7 +504,7 @@ C
       LSOFT=SOFT.NE.' '
 C
 C     Trace mode
-C  
+C
       BAL=.FALSE.
       EDGES=.FALSE.
       COG=.FALSE.
@@ -845,7 +845,7 @@ C     (>) IXLEFT  (Integer) The leftmost extent of the traced spectrum
 C     (>) IXRIGHT (Integer) The rightmost extent of the traced spectrum
 C     (>) SOFT    (Character) The device/type for the plots, as required
 C                 by PGBEGIN.
-C     (>) RCOEFF  (Double precision array COEFFS(DEGREE+1)) The 
+C     (>) RCOEFF  (Double precision array COEFFS(DEGREE+1)) The
 C                 polynomial coefficients for the fitted spectrum.
 C                 The constant term should be LAST.
 C     (>) DEGREE  (Integer) The polynomial degree used.
@@ -869,7 +869,7 @@ C
       DOUBLE PRECISION RCOEFF(DEGREE+1)
       CHARACTER*(*) SOFT
 C
-C     Functions 
+C     Functions
 C
       INTEGER PGBEGIN
       DOUBLE PRECISION GEN_EPOLYD
@@ -944,7 +944,7 @@ C     derivative either side of the center in the range within
 C     the first minima in the actual data either side of the
 C     center.  The positions of the edges are more precisely
 C     calculated by looking at the derivative of that absolute
-C     first derivative - this should cross zero at the edge of 
+C     first derivative - this should cross zero at the edge of
 C     the peak.  The two points where this 2nd derivative crosses
 C     zero are returned as the left and right edges of the data.
 C     The function value is the position of the center of the data
@@ -952,7 +952,7 @@ C     calculated as the center of gravity of the data within
 C     the left and right edges.
 C
 C     Call-
-C     
+C
 C     CENTER = FIG_EDGES(ARRAY,NELM,CENT,LEFT,RIGHT)
 C
 C     Parameters-
@@ -964,7 +964,7 @@ C     (>) NELM       (Integer,ref) The number of data elements
 C     (>) CENT       (Real,ref) An estimate of the profile center
 C     (<) LEFT       (Real,ref) The left edge of the data
 C     (<) RIGHT      (Real,ref) The right edge of the data
-C     
+C
 C     Returns -
 C
 C     (<) CENTER     (Real,function value) The calculated center
@@ -1091,14 +1091,14 @@ C     'balance' because the COG actually means something much more
 C     sophisticated to do with edge following in the SDIST context.)
 C
 C     Call-
-C     
+C
 C     CENTER = FIG_BALANCE(ARRAY,NELM)
 C
 C     Parameters-
 C
 C     (!) ARRAY      (Real array,ref) The data for the profile.
 C     (>) NELM       (Integer,ref) The number of data elements
-C     
+C
 C     Returns -
 C
 C     (<) CENTER     (Real,function value) The calculated center

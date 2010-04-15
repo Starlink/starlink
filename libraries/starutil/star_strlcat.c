@@ -43,7 +43,7 @@
 *        Initial version.
 
 *  Notes:
-*     - This is for use from C only. 
+*     - This is for use from C only.
 *     - If available the system strlcat routine will be used. The entire
 *       purpose of this routine is to provide a version of strlcat if
 *       the operating system does not provide one (e.g. on Linux)

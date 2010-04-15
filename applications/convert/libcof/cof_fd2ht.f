@@ -68,7 +68,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
 *  HDS primitive data type.
       IF ( DATCOD .EQ. 1 .OR. DATCOD .EQ. 11 ) THEN
          TYPE = '_UBYTE'
-         
+
       ELSE IF ( DATCOD .EQ. 21 ) THEN
          TYPE = '_WORD'
 

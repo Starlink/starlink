@@ -2,25 +2,25 @@
      &STOKES_U,STOKES_UV,N,IAR,Q,QV,U,UV,WA)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   R E A D _ I T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPTS (>), LAMBDA (>), STOKES_I (>), STOKES_Q (>), STOKES_QV (>),
 C STOKES_U (>), STOKES_UV (>), N (<), IAR (<), Q (<), QV (<), U (<)
 C UV (<), WA (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C

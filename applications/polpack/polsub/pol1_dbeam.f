@@ -14,13 +14,13 @@
 
 *  Description:
 *     This routine returns DBEAM = .TRUE. if all the NDFs supplied in
-*     the given group contain dual-beam data (indicated by a leagl RAY item 
+*     the given group contain dual-beam data (indicated by a leagl RAY item
 *     in their POLPACK extensions). If any do not, then .FALSE. is
 *     returned.
 
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
-*        A GRP identifier for the group containing the input NDF names. 
+*        A GRP identifier for the group containing the input NDF names.
 *     DBEAM = LOGICAL (Returned)
 *        Do all NDFs contain dual-beam data?
 *     STATUS = INTEGER (Given and Returned)
@@ -28,7 +28,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,13 +101,13 @@
          IF( .NOT. THERE ) THEN
             DBEAM = .FALSE.
             GO TO 999
-         END IF           
+         END IF
 
 *  Annul the locator to the POLPACK extension.
          CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Annul the current NDF identifier.
-         CALL NDF_ANNUL( INDF, STATUS ) 
+         CALL NDF_ANNUL( INDF, STATUS )
 
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999

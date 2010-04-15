@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,8 +143,8 @@
 
       REAL
      :     DATVAL,               ! Input data value (minus background)
-     :     SUM1,                 ! Sum of data values 
-     :     SUM2,                 ! Sum of squared data values 
+     :     SUM1,                 ! Sum of data values
+     :     SUM2,                 ! Sum of squared data values
      :     XHI,                  ! Upper X limit for current row
      :     XLO                   ! Lower X limit for current row
 *.
@@ -160,7 +160,7 @@
       CALL IRA_DTOC( A, B, SCS, 0, ATEXT, BTEXT, STATUS )
 
 *  Display the sky coordinates.
-      TEXT = '    Centre                 : '      
+      TEXT = '    Centre                 : '
       IAT = 29
       CALL CHR_APPND( ATEXT, TEXT, IAT )
       CALL CHR_APPND( ', '//BTEXT, TEXT, IAT )
@@ -196,12 +196,12 @@
                            DATVAL = DATVAL - BACK
 
 *  Increment the statistics.
-                           SUM1 = SUM1 + DATVAL            
+                           SUM1 = SUM1 + DATVAL
                            SUM2 = SUM2 + DATVAL*DATVAL
                            NGOOD = NGOOD + 1
 
                         END IF
-      
+
                      END IF
                   END DO
 
@@ -218,7 +218,7 @@
 *  Calculate the upper and lower limits on column number.
                   XHI = ( XSIZE/YSIZE )*SQRT( MAX( 0.0, YSIZE**2 -
      :                  ( REAL( J ) - 0.5 - Y )**2 ) ) + X
-                  XLO = 2.0*X - XHI 
+                  XLO = 2.0*X - XHI
 
 *  Loop round all columns in the aperture which fall within the image
 *  area.
@@ -233,12 +233,12 @@
                            DATVAL = DATVAL - BACK
 
 *  Increment the statistics.
-                           SUM1 = SUM1 + DATVAL            
+                           SUM1 = SUM1 + DATVAL
                            SUM2 = SUM2 + DATVAL*DATVAL
                            NGOOD = NGOOD + 1
 
                         END IF
-      
+
                      END IF
                   END DO
 
@@ -272,7 +272,7 @@
             CALL CHR_APPND( ' Jy', TEXT, IAT )
             CALL MSG_OUTIF( MSG__NORM, ' ', TEXT( : IAT ), STATUS )
             IF( LOGING ) CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-      
+
             TEXT = '    Mean surface brightness: '
             IAT = 29
             CALL CHR_PUTR( MEAN, TEXT, IAT )

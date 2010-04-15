@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -237,7 +237,7 @@
 *  Check that this is the required occurrence.
                NF = NF + 1
                IF ( NF .GE. NOCCUR ) THEN
-                  
+
 *  The keyword is present.
                   THERE = .TRUE.
 
@@ -247,7 +247,7 @@
 *  over it, otherwise just set character position to be one after the
 *  end of the keyword, except when special, this means that the '=' may
 *  only be in column 9, so check for this.
-                  IF ( .NOT. SPEC ) THEN 
+                  IF ( .NOT. SPEC ) THEN
                      EQUALS = INDEX( BUFFER( CARD ), '=' ) + 1
                      IF ( EQUALS .EQ. 1 ) EQUALS = CHR_LEN( CRDKEY ) + 1
                   ELSE
@@ -268,7 +268,7 @@
 *  of the string, the final position is the presumed location of the
 *  start of the comment (or the end of the string). Except for the
 *  special keywords which are returned unchanged.
-                  IF ( .NOT. SPEC ) THEN 
+                  IF ( .NOT. SPEC ) THEN
                      CALL CHR_FANDL( BUFFER( CARD ) ( EQUALS: ), LQCOL,
      :                               TQCOL )
                      LQCOL = LQCOL + EQUALS - 1
@@ -295,7 +295,7 @@
                      IF ( TQCOL .EQ. 0 ) THEN
                         TQCOL = INDEX( BUFFER( CARD )( LQCOL: ), '/' )
                         IF ( TQCOL .EQ. 0 ) THEN
-                           
+
 *  No comment. Set the end of string to its length.
                            TQCOL = LEN( BUFFER( CARD ) )
                         ELSE

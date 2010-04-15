@@ -32,12 +32,12 @@
 
 #  Configuration options:
 #
-#        corners 
+#        corners
 #
 #     List of the coordinates of the box corners.
 
 #  Methods:
-#  
+#
 #        getard {update 1}
 #
 #     Returns the ARD description of this object. The current
@@ -60,12 +60,12 @@
 #     Creates a window for viewing and editing the properties of an
 #     object. This is usually invoked by double clicking on the object.
 #
-#        update_properties 
+#        update_properties
 #
 #     Modifies the properties of the object to mirror the
 #     current configuration options.
 #
-#        update_from_table 
+#        update_from_table
 #
 #     Modifies the current configuration to reflect the values entered
 #     into the show_properties window by the user.
@@ -114,21 +114,21 @@
 #.
 
 itcl::class gaia::StarArdRect {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
-      #  Set the type of canvas object. 
+      #  Set the type of canvas object.
       eval configure $args
       configure -mode rectangle
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
@@ -148,14 +148,14 @@ itcl::class gaia::StarArdRect {
       set corners "$xlower $ylower $xupper $yupper"
       return "RECT($xlower,$ylower,$xupper,$yupper)"
    }
-   
+
    #  Set the properties of the object to those of an ARD description
    #  of an object of this type.
    public method setard {desc} {
-      if {$desc != "" } { 
-         set failed 1 
-         if { [check_description rectangle $desc] } { 
-            if { [llength $qualifiers_] == 4 } { 
+      if {$desc != "" } {
+         set failed 1
+         if { [check_description rectangle $desc] } {
+            if { [llength $qualifiers_] == 4 } {
                lassign $qualifiers_ xlower ylower xupper yupper
                set corners "$xlower $ylower $xupper $yupper"
                lassign [canvas_coord $xlower $ylower] x0 y0
@@ -169,7 +169,7 @@ itcl::class gaia::StarArdRect {
          }
       }
    }
-   
+
    #  Create a new rectangle using an ARD description.
    public method createard {desc {cmd ""}} {
       setard "$desc"
@@ -178,7 +178,7 @@ itcl::class gaia::StarArdRect {
 
    #  Set new corners to appropriate variables in correct coordinate
    #  systems.
-   private method process_corners_ {imagecoords} { 
+   private method process_corners_ {imagecoords} {
       set corners $imagecoords
       lassign $corners x0 y0 x1 y1
       lassign [canvas_coord $x0 $y0] x0 y0
@@ -188,7 +188,7 @@ itcl::class gaia::StarArdRect {
 
    #  Process coordinates and assign the result to the public
    #  variables, corners and coords in the correct system.
-   private method process_coords_ {canvcoords} { 
+   private method process_coords_ {canvcoords} {
       set coords $canvcoords
       lassign $coords x0 y0 x1 y1
       lassign [image_coord $x0 $y0] x0 y0
@@ -202,7 +202,7 @@ itcl::class gaia::StarArdRect {
       if { $name == {} } {
          set name ".poly$canvas_id_"
       }
-      if { ! [create_properties_window $name] } { 
+      if { ! [create_properties_window $name] } {
 
          #  Now add the entry  for the description.
          set Corners_ [ETable $Frame_.table -columns 2 -rows 2 \
@@ -211,7 +211,7 @@ itcl::class gaia::StarArdRect {
          $Corners_ setlabel 0 X
          $Corners_ setlabel 1 Y
          pack $Corners_ -side top -fill both -expand true
-      } 
+      }
 
       #  Update the information to be current.
       update_properties
@@ -225,7 +225,7 @@ itcl::class gaia::StarArdRect {
       process_coords_ $coords
 
       #  Update the properties box if it exists.
-      if { [winfo exists $Corners_] } { 
+      if { [winfo exists $Corners_] } {
          lassign $corners x0 y0 x1 y1
          $Corners_ insert 0 $x0 $y0
          $Corners_ insert 1 $x1 $y1
@@ -234,7 +234,7 @@ itcl::class gaia::StarArdRect {
 
    #  Update coords from the table.
    public method update_from_table {} {
-      if { [winfo exists $Corners_] } { 
+      if { [winfo exists $Corners_] } {
          process_corners_  "[$Corners_ get 0] [$Corners_ get 1]"
          redraw
       }

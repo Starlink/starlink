@@ -68,7 +68,7 @@
 *        There are four cases for the variances, because variances may
 *        exist in IN or OUT, or not, or both. If they exist in OUT they
 *        must be updated (grown or set bad), if they don't exist in OUT
-*        they may have to be created. If neither has variance, there is 
+*        they may have to be created. If neither has variance, there is
 *        nothing to do.
 *     -  Grow covariance row sums.
 *        These are grown only if they exist in source and target. If
@@ -139,7 +139,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -776,7 +776,7 @@
      :                        PNTR3, NDF(4), NELM3, STATUS )
                ONE(SPAXJ) = NELM1
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ), 
+                  CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
      :                            %VAL( CNF_PVAL( PNTR3 ) ),
      :                            STAPIX, ENDPIX, NDF__MXDIM, ONE,
      :                            DIM3, NELM1, NELM3, STATUS )

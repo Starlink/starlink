@@ -99,7 +99,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
-/* Begin an AST Object context so that we do not need to annul explicitly 
+/* Begin an AST Object context so that we do not need to annul explicitly
    the AST Objects created in this function. */
    astBegin;
 
@@ -109,7 +109,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 /* Get the required FITS header. Return without further action if either
    is not present in the supplied FitsChan, or if the NDF is not
    2-dimensional. */
-   if( astGetFitsF( fc, "WAVELEN", &wavelen ) && 
+   if( astGetFitsF( fc, "WAVELEN", &wavelen ) &&
        astGetFitsF( fc, "BANDWID", &bandwid ) && ndim == 2 ) {
 
 /* Get the current WCS FrameSet from the supplied NDF, and get a pointer
@@ -120,7 +120,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 /* Return without action if this is not a SkyFrame. */
       if( astIsASkyFrame( cfrm ) ) {
 
-/* Construct a topocentric wavelength SpecFrame to describe the new spectral 
+/* Construct a topocentric wavelength SpecFrame to describe the new spectral
    WCS axis. */
          specfrm = astSpecFrame( "System=wavelen,StdOfRest=topo,Unit=m" );
 
@@ -148,7 +148,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 
 #undef OVERLAY
 
-/* Create a WinMap that gives wavelength as a function of spectral GRID 
+/* Create a WinMap that gives wavelength as a function of spectral GRID
    position. Assume the pixel centre maps onto WAVELEN and the pixel
    width is BANDWID. */
          grid_lo= 0.5;
@@ -159,10 +159,10 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 
 /* Modify the WCS FrameSet so that the base and current Frames are
    3-dimensional. The current Frame is expanded by adding in the
-   SpecFrame, and the base Frame is expanded by adding in a 3rd GRID 
+   SpecFrame, and the base Frame is expanded by adding in a 3rd GRID
    axis. Other Frames are left unchanged. The SpecFrame and the new GRID
    axis are connected using the WinMap created above. */
-         atlAddWcsAxis( wcs, (AstMapping *) specmap, (AstFrame *) specfrm, 
+         atlAddWcsAxis( wcs, (AstMapping *) specmap, (AstFrame *) specfrm,
                         NULL, NULL, status );
 
 /* Change the NDF bounds to include a 3rd axis with pixel bounds "1:1". */
@@ -175,7 +175,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
       }
    }
 
-/* End the AST Object context. This will annull annull the AST Objects 
+/* End the AST Object context. This will annull annull the AST Objects
    created in this function. */
    astEnd;
 }

@@ -62,7 +62,7 @@
 #include <pthread.h>
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX pthread_mutex_lock( &mutex );
-#define UNLOCK_MUTEX pthread_mutex_unlock( &mutex ); 
+#define UNLOCK_MUTEX pthread_mutex_unlock( &mutex );
 
 #else
 

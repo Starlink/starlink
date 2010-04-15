@@ -1,5 +1,5 @@
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C CHI -- This program finds chi values for rejection from MEASURES output 
+C CHI -- This program finds chi values for rejection from MEASURES output
 C
 C             For a decription of this program, see CHI.HLP
 C
@@ -27,7 +27,7 @@ C   Contains:-
 C T_CHI         Look at MEASURE output to flag 'bad' stars
 C CHI_GCL       Get CL input
 C CHI_LOADDAT   Load star mags, chi. Get no of good stars
-C CHI_GETDAT    Extract wanted data from the input file 
+C CHI_GETDAT    Extract wanted data from the input file
 C CHI_DLIM      Get distance limits
 C CHI_NUMITS    Get iteration number limits
 C CHI_CHILAW    Calc a curve under the Chi - Mag distribution of points
@@ -78,7 +78,7 @@ Cbegin
       endif
 
       call chi_chilaw  ( %val(ipa) )					!Remove Chi-Mag growth effect
- 
+
       if ( MODE.eq.'auto' ) then					!Get CHI limits with magn
           call chi_autoc ( %val(ipa) )
       else
@@ -120,7 +120,7 @@ Cbegin
       if ( istat.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
       if ( TBVX.lt.13 ) then
-         call printo ( 
+         call printo (
      +        'ERROR: File not good Chi input -less than 8 columns' )
          ST_FAILED = .true.
          return
@@ -234,7 +234,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C CHI_GETDAT -- Extract wanted data from the input file 
+C CHI_GETDAT -- Extract wanted data from the input file
 C
 C  a j penny                     dao               1988-05-17
 
@@ -364,7 +364,7 @@ Cbegin
 
       rv = real(km+1)/4.0
       call get1r ( 'OFFCEN', DLIM, rv, 0.0, 1.0e10 )
-    
+
       kout = 0
       kgood = 0
       do k = 1, TBY
@@ -379,7 +379,7 @@ Cbegin
                kgood = kgood + 1
             endif
          endif
-      enddo  
+      enddo
       call printo ( ' ' )
       call pargi ( kout )
       call printd ( 'No of stars too far from input posn = %d ' )
@@ -411,7 +411,7 @@ Cbegin
 
 
       if ( ST_FAILED ) return
-      
+
       call printo ( ' ' )
       call printo ( 'Limits allowed for number of iterations?' )
       call printo ( ' ' )
@@ -459,7 +459,7 @@ Cbegin
       do k = 1, TBY
          if ( data(k,7).lt.0.5 ) then
          endif
-      enddo  
+      enddo
       kout = 0
       kgood = 0
       do k = 1, TBY
@@ -471,7 +471,7 @@ Cbegin
                kgood = kgood + 1
             endif
          endif
-      enddo  
+      enddo
       call printo ( ' ' )
       call pargi ( kout )
       call printd ( 'No of stars with too many iterations = %d ' )
@@ -528,7 +528,7 @@ Cbegin
       call chi_alimr ( data, 1, TBY, xmin, xmax )
       call chi_alimr ( data, 2, TBY, ymin, ymax )
 
-      call amovkr ( 1.0e10, ybox, 25 )					!Find Y min in each X box, 
+      call amovkr ( 1.0e10, ybox, 25 )					!Find Y min in each X box,
       call azeror ( xbox, 25 )						! and the X of that Y
       do k = 1, TBY
          if ( data(k,7).lt.0.5 ) then
@@ -572,7 +572,7 @@ Cbegin
                xx(j) = 10.0**((xd-xbox(j))/2.5)
             enddo
             call linfit ( xx, ybox, nk, sl, ze, ta, tb, tc, chi, rms )
-            if ( first .or. chi.le.chimin ) then 
+            if ( first .or. chi.le.chimin ) then
                first = .false.
                chimin = chi
                slmin = sl
@@ -596,7 +596,7 @@ Cbegin
          call printo ( 'is too near zero for this algorithm' )
          call printo ( ' - so the raw Chi values are used.' )
          call printo ( ' ' )
-      else								!Scale Chi values and load 
+      else								!Scale Chi values and load
          SLOPE = sl							! SLOPE and ZERO
          ZERO = ze
          ZMAG = xdmin
@@ -661,7 +661,7 @@ C   a j penny                 dao           1988-04-25
 C--
       real av, sd, xmin, xmax, tav, tsd, ya, am, f,
      +     rav(100), rsd(100)
-      integer k, ka, kxmin, kxmax, knum(100), num, ipw, ipr, ipb, 
+      integer k, ka, kxmin, kxmax, knum(100), num, ipw, ipr, ipb,
      +        ierr
       character text*72
       real trunc
@@ -679,7 +679,7 @@ Cbegin
          return
       endif
 
-      call chi_alimr ( data, 1, TBY, xmin, xmax )			!Get display ranges of chi, 
+      call chi_alimr ( data, 1, TBY, xmin, xmax )			!Get display ranges of chi,
       kxmin = int(xmin) - 1
       kxmax = int(xmax) + 1
 
@@ -690,7 +690,7 @@ Cbegin
          call chi_cmmean ( data, k, %val(ipr), %val(ipw), %val(ipb),
      +                     num )
          knum(k) = num
-         call meanstdr ( %val(ipr), %val(ipw), %val(ipb), num, 
+         call meanstdr ( %val(ipr), %val(ipw), %val(ipb), num,
      +                   .true., 3.0, .false., 0.0, av, sd )
          rav(k) = av
          rsd(k) = sd
@@ -808,7 +808,7 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call chi_alimr ( data, 1, TBY, xmin, xmax )					!Get display ranges of chi, 
+      call chi_alimr ( data, 1, TBY, xmin, xmax )					!Get display ranges of chi,
       call chi_alimr ( data, 2, TBY, ymin, ymax )					!  mags and if to number points
 
       xmin = aint(xmin-0.05*(xmax-xmin))
@@ -954,11 +954,11 @@ Cbegin
       if ( ST_FAILED ) return
 
       call printo ( ' ' )
-      if ( REDUCE ) then						!Type out information 
+      if ( REDUCE ) then						!Type out information
          call printo ( '  Plot of reduced Chi vs Mag' )
          call pargr ( slope )
          call pargr ( zmag )
-         call printd ( 
+         call printd (
      +   '  Chi reduced by S.10**((Z-mag)/2.5):  S = %f ; Z = %f ' )
          call printo ( '  Cursor returns actual Chi ' )
       else
@@ -1041,7 +1041,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( NUMCUR.eq.0 ) then
-         do k = 1, 100							
+         do k = 1, 100
             ODATA(1,k) = real(k)
             ODATA(2,k) = 1.0e7
          enddo
@@ -1056,7 +1056,7 @@ Cbegin
          xn(k) = xmaxa - 0.2*(real(k-1))
          xhere = xn(k)
 
-         more = .true.							!Find mag just fainter 
+         more = .true.							!Find mag just fainter
          j = NUMCUR							!and brighter than here
          do while ( more )
             j = j - 1
@@ -1130,7 +1130,7 @@ Cbegin
                kgood = kgood + 1
             endif
          endif
-      enddo  
+      enddo
       call printo ( ' ' )
       call pargi ( kout )
       call printd ( 'No of stars with Chi-Sq too high = %d ' )
@@ -1170,11 +1170,11 @@ Cbegin
       call get1c ( 'TITLE', TITLE, TITLE, .true. )
       if ( ST_FAILED ) return
       call ptdesc ( 'OUT', 'TITLE', TITLE )
-	
+
       call ident ( %val(ipo), 7, 100 )					!Load names
 
       call coprr ( ODATA, 2, 100, 1, 2, 1, 100, %val(ipo), 7, 100, 6,1)	!load data
-     
+
 
       end
 

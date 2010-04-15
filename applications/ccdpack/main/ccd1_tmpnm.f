@@ -14,7 +14,7 @@
 
 *  Description:
 *     The routine appends a incremented number to the string PREFIX,
-*     creating a unique name on each call. The name is PREFIXn.tmp, 
+*     creating a unique name on each call. The name is PREFIXn.tmp,
 *     where n is the new number.
 
 *  Arguments:
@@ -96,7 +96,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If NCOUNT is 0 then this is the first call. Generate a random number 
+*  If NCOUNT is 0 then this is the first call. Generate a random number
 *  to look more temporary (use the process PID).
       IF ( NCOUNT .EQ. 0 ) CALL PSX_GETPID( NCOUNT, STATUS )
 

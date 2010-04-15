@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -34,7 +34,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** A parsed URI is held in an instance of the following structure.
 ** Each component is recorded in memory obtained from HtmlAlloc().
 **
-** The examples are from the URI 
+** The examples are from the URI
 **
 **    http://192.168.1.1:8080/cgi-bin/printenv?name=xyzzy&addr=none#frag
 */
@@ -220,11 +220,11 @@ static char *Trim(char *z){
 /*
 ** The input azSeries[] is a sequence of URIs.  This command must
 ** resolve them all and put the result in the interp->result field
-** of the interpreter associated with the HTML widget.  Return 
+** of the interpreter associated with the HTML widget.  Return
 ** TCL_OK on success and TCL_ERROR if there is a failure.
 **
 ** This function can cause the HTML widget to be deleted or changed
-** arbitrarily. 
+** arbitrarily.
 */
 int HtmlCallResolver(
   HtmlWidget *htmlPtr,      /* The widget that is doing the resolving. */

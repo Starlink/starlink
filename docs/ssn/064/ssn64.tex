@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink System Note}
 \newcommand{\stardocinitials}  {SSN}
 \newcommand{\stardocsource}    {ssn\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2002 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -22,7 +22,7 @@
 \newcommand{\stardocdate}      {3 September 2002}
 \newcommand{\stardoctitle}     {ADAM --- Organization of Application Packages}
 \newcommand{\stardocabstract}  {
-This document explains the standard way in which 
+This document explains the standard way in which
 \xref{ADAM}{sg4}{} applications packages
 are set up to run on Starlink machines. It covers the systems permitting
 use of the applications direct from the shell and from the Interactive Command
@@ -88,7 +88,7 @@ Librarian and Site Managers.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -237,12 +237,12 @@ Librarian and Site Managers.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -289,16 +289,16 @@ Librarian and Site Managers.
 
 % ? Main text
 \section{\xlabel{introduction}Introduction}
-This document explains the standard way in which 
+This document explains the standard way in which
 \xref{ADAM}{sg4}{} applications packages
 are set up to run on Starlink machines. It covers the systems permitting
-use of the applications direct from the Unix shell and from the 
-\xref{Interactive Command Language (ICL)}{sg5}{}. 
+use of the applications direct from the Unix shell and from the
+\xref{Interactive Command Language (ICL)}{sg5}{}.
 
 Changes in this version of the document are listed in Section \ref{changes}.
 
 When a new package is being developed, the way in which it will fit into the
-scheme should be discussed with the Starlink Software Librarian and the Head 
+scheme should be discussed with the Starlink Software Librarian and the Head
 of Applications.
 \xref{KAPPA}{sun95}{}
 provides a good example of how things are done and may be used as a template.
@@ -311,32 +311,32 @@ In this document  \textit{package} means
 \section{\xlabel{packages}Packages}
 \subsection{\xlabel{general}General}
 \label{pack_gen}
-The term `package' in this document may be taken to mean a related group of 
+The term `package' in this document may be taken to mean a related group of
 ADAM applications. Packages are described as \textit{standard} if they are
 installed at every Starlink site or \textit{option} if the are only installed
 when requested by users.
 Allowance is also
-made for \textit{local}\/ packages which are non-Starlink packages set up for 
+made for \textit{local}\/ packages which are non-Starlink packages set up for
 general use at particular sites.
 It is assumed that packages may be run directly from the shell or from ICL;
 where this is not the case, the inappropriate files are omitted from the
 installation.
 
-In most cases applications in the package will all be linked into a single 
-monolith (see 
+In most cases applications in the package will all be linked into a single
+monolith (see
 \xref{SUN/144}{sun144}{monoliths}) for efficient running from ICL and to save
 disk space.
-Packages could however be defined to consist of any mixture of task types 
+Packages could however be defined to consist of any mixture of task types
 and procedures \dash\ they could, in fact, include elements from other packages.
 Because a package may well consist of applications written by a number of
 different authors, the term \textit{Package Administrator} is used for the
 person with overall responsibility for the package.
 
-Executable files, shell scripts, ICL command files and compiled 
-\xref{interface files}{sun115}{} 
+Executable files, shell scripts, ICL command files and compiled
+\xref{interface files}{sun115}{}
 associated with a package will usually be installed in a directory referred to
 by environment variable \textit{package}\_DIR.
-For most applications packages this directory is 
+For most applications packages this directory is
 \texttt{/star/bin/\textit{package}}.
 If the package can be run direct from the shell, \textit{package}\_DIR should
 also contain links with the name of each application in a monolith pointing
@@ -344,12 +344,12 @@ to that monolith.
 
 \textit{e.g.}\ \texttt{ \% ln \$KAPPA\_DIR/kappa\_pm \$KAPPA\_DIR/add }
 
-Individual interface files will also be required in addition to the monolithic 
+Individual interface files will also be required in addition to the monolithic
 interface file in this case.
 
 \subsection{\xlabel{package_help_libraries}Package Help Libraries}
 Each package should provide a \textit{Package Help Library}.
-This is a Starlink HELP library (see 
+This is a Starlink HELP library (see
 \xref{SUN/124}{sun124}{}).
 The structure of the HELP library is at the Package Administrator's discretion
 but at the very least it should contain an overall description of the package
@@ -358,35 +358,35 @@ with subtopics for each application.
 The usual format is described below:
 \begin{description}
 \item[Level 0] A general description of the package.
-\item[Level 1] A description of individual applications and other general 
+\item[Level 1] A description of individual applications and other general
 topics such as `Getting Started'.
-\item[Level 2] As required. Each application will normally have a 
-subtopic `parameters' which has subtopics describing each parameter. 
+\item[Level 2] As required. Each application will normally have a
+subtopic `parameters' which has subtopics describing each parameter.
 These parameter subtopics may be referred to in parameter help
-specifications in task interface files (see 
+specifications in task interface files (see
 \xref{SUN/115}{sun115}{}).
 \end{description}
-Package Help Libraries will usually be installed in directory 
+Package Help Libraries will usually be installed in directory
 \texttt{/star/help/\textit{package}} and named \texttt{\textit{package}.shl}.
-Environment variable \textit{package}\_HELP should be defined to point to the 
+Environment variable \textit{package}\_HELP should be defined to point to the
 Package Help Library and this used in the relevant commands.
 
 \subsection{\xlabel{shell_package_startup_scripts}Shell Package Startup Scripts}
-Generally, to start up a package for use direct from the shell, the 
+Generally, to start up a package for use direct from the shell, the
 user will type:
 \begin{quote}
 \texttt{\% \textit{package}}
 \end{quote}
-The Starlink login procedures will have defined command, \textit{package}, which, 
-when issued by the user, will cause commands in the \textit{Package Startup 
-Script} to be obeyed. 
+The Starlink login procedures will have defined command, \textit{package}, which,
+when issued by the user, will cause commands in the \textit{Package Startup
+Script} to be obeyed.
 
-The Package Startup Script will define commands for 
-running the individual applications and for obtaining help. 
+The Package Startup Script will define commands for
+running the individual applications and for obtaining help.
 It should also issue a `Welcome' message stating the package name and version.
 Typically it will contain mainly alias commands of the form:
 \begin{quote}
-\texttt{\% alias 
+\texttt{\% alias
 \textit{application} \$\textit{package}\_DIR/\textit{application}}
 
 \textit{e.g.}:
@@ -401,13 +401,13 @@ be installed in \textit{package}\_DIR.
 
 
 \subsection{\xlabel{icl_package_definition_files}ICL Package Definition Files}
-Generally, to start up a package under 
+Generally, to start up a package under
 \xref{ICL}{sg5}{}, the user will type:
 \begin{quote}
 \texttt{ICL> \textit{package}}
 \end{quote}
 This will cause ICL commands in the \textit{Package Definition Command File} to be
-obeyed. All but the simplest packages will contain a Package Definition 
+obeyed. All but the simplest packages will contain a Package Definition
 Command File which is a file containing ICL commands to:
 \begin{enumerate}
 \item Define the commands which the user will use to run the package.
@@ -449,8 +449,8 @@ directly by the overall system startup procedures.
 \section{\xlabel{the_overall_system}The Overall System}
 \subsection{\xlabel{the_adam_packages_help_library}The ADAM\_PACKAGES Help Library}
 \label{adamhelp}
-A Starlink HELP library giving general descriptions of all Starlink packages 
-will be maintained in \texttt{/star/help/adam\_package.shl} by the Starlink 
+A Starlink HELP library giving general descriptions of all Starlink packages
+will be maintained in \texttt{/star/help/adam\_package.shl} by the Starlink
 Software Librarian.
 The top-level topic  will give a list, with a single line
 description, of all the \textit{standard} and \textit{option} packages and will be
@@ -462,7 +462,7 @@ The second level will be subtopics for the individual packages.
 Each subtopic will give a brief description of the package and describe how
 to start using it. Before any packages have been started up by the user, the
 command:
-\begin{quote} 
+\begin{quote}
 \texttt{ICL> HELP \textit{package}}
 \end{quote}
 will display the appropriate subtopic.
@@ -471,8 +471,8 @@ Environment variable ADAM\_PACKAGES points to this help file.
 
 \subsection{\xlabel{icl_startup_command_files}ICL Startup Command
 Files\label{icl_startup_command_files}}
-ICL uses environment variables to identify files containing 
-commands which it will obey automatically before taking input from any file 
+ICL uses environment variables to identify files containing
+commands which it will obey automatically before taking input from any file
 specified as a parameter of the ICL command, or prompting for input.
 The environment variables, in the order they are accessed, are:
 
@@ -489,19 +489,19 @@ Starlink Software Librarian which contains ICL commands which:
 help system, the relevant entry in the ADAM\-\_PACKAGES help library.
 \item For each \textit{standard}\/ package, define an
 \textit{ICL Package Startup Command} which, if issued by the user, will
-start up the package for use with ICL (usually by 
+start up the package for use with ICL (usually by
 \xref{LOAD}{sg5}{LOAD}ing the Package Definition
 Command File).
 \item For each \textit{option}\/ package, check whether the package is installed
 at the site by checking for the existence of an appropriate file (usually the
 Package Definition Command File).
 If the package is installed, an ICL Package Startup Command is defined as for
-\textit{standard} packages; if not, an ICL Package Startup Command is defined 
-which, if issued, will inform the user politely that the package is not 
-available at the site\footnote{As a temporary measure, this is also done for 
+\textit{standard} packages; if not, an ICL Package Startup Command is defined
+which, if issued, will inform the user politely that the package is not
+available at the site\footnote{As a temporary measure, this is also done for
 \textit{standard} packages which have not yet been set up to run from ICL.}.
 \item Check if environment variable LADAM\-\_PACKAGES defines a file which
-exists and, if it does, 
+exists and, if it does,
 \xref{LOAD}{sg5}{LOAD} the file (see  Section \ref{ladampacks}).
 \item Print a brief introductory message.
 \end{enumerate}
@@ -520,7 +520,7 @@ For CCDPACK (an \textit{option} package), it contains:
 \begin{verbatim}
 {  CCDPACK  }
 DEFHELP CCDPACK $ADAM_PACKAGES CCDPACK
-IF FILE_EXISTS("$CCDPACK_DIR/ccdpack.icl") 
+IF FILE_EXISTS("$CCDPACK_DIR/ccdpack.icl")
   DEFSTRING CCDPACK LOAD $CCDPACK_DIR/ccdpack
 ELSE
   DEFSTRING CCDPACK NOTINSTALLED CCDPACK
@@ -537,12 +537,12 @@ it to define the required Package Startup Command.
 \subsection{\xlabel{ladam_packages}LADAM\_PACKAGES}
 \label{ladampacks}
 This is an environment variable pointing to an ICL command file which,
-if it exists, will be 
+if it exists, will be
 \xref{LOAD}{sg5}{LOAD}ed during the ICL\_LOGIN\_SYS sequence.
-The file is intended to define both the Package Startup Command and the source 
+The file is intended to define both the Package Startup Command and the source
 of introductory help for \textit{local} packages.
 
-LADAM\-\_PACKAGES will be controlled by the local Site Manager and 
+LADAM\-\_PACKAGES will be controlled by the local Site Manager and
 may also contain any other site-specific login commands.
 
 \subsection{\xlabel{starlink_login_actions}Starlink Login Actions}
@@ -569,11 +569,11 @@ be defined.
 \subsubsection{/star/etc/cshrc}
 \textit{Shell Package Startup Commands} are defined in \texttt{/star/etc/cshrc}
 which must be `source'ed in order to use any Starlink software.
-For \textit{standard} packages a command is defined which will `source' 
+For \textit{standard} packages a command is defined which will `source'
 the Package Startup Script to start up the package for use from the shell.
 For \textit{option} packages, the existence of an appropriate file within the
 package is checked to determine whether or not the package is installed.
-If it is, a Startup Command is defined as for \textit{standard} 
+If it is, a Startup Command is defined as for \textit{standard}
 packages;
 if not, a command is defined which will politely tell the user that
 the package has not been installed.
@@ -594,79 +594,79 @@ ICL (UNIX) Version 3.0  04/08/94
   -   or HELP PACKAGES for a list of all Starlink packages
   - Type HELP [command] for help on ICL and its commands
 
-ICL> HELP PACKAGES 
-  
-PACKAGES 
-  
-   The following ADAM applications packages are available from Starlink: 
-  
-   Standard Packages: 
-    CATAPP    -  Catalogue applications
-    CONVERT   -  Data format conversion. 
-    FIGARO    -  General data-reduction. 
-    KAPPA     -  Image processing. 
-    SST       -  Simple Software Tools 
-    UTILITIES -  Miscellaneous useful tools
-  
-   Option Packages: 
-    ASTERIX   -  X-ray data analysis. 
-    CCDPACK   -  CCD data reduction 
-    DAOPHOT   -  Stellar photometry. 
+ICL> HELP PACKAGES
 
-    ... etc...  
-  
-  Additional information available: 
-  
-  ASTERIX    CATAPP     CCDPACK    CONVERT    DAOPHOT    FIGARO     KAPPA 
+PACKAGES
+
+   The following ADAM applications packages are available from Starlink:
+
+   Standard Packages:
+    CATAPP    -  Catalogue applications
+    CONVERT   -  Data format conversion.
+    FIGARO    -  General data-reduction.
+    KAPPA     -  Image processing.
+    SST       -  Simple Software Tools
+    UTILITIES -  Miscellaneous useful tools
+
+   Option Packages:
+    ASTERIX   -  X-ray data analysis.
+    CCDPACK   -  CCD data reduction
+    DAOPHOT   -  Stellar photometry.
 
     ... etc...
 
-Topic? KAPPA 
-  
-KAPPA  
+  Additional information available:
+
+  ASTERIX    CATAPP     CCDPACK    CONVERT    DAOPHOT    FIGARO     KAPPA
+
+    ... etc...
+
+Topic? KAPPA
+
+KAPPA
 
   KAPPA---the Kernel APplication PAckage---currently comprises applications for
-  general image processing, many of which will function with data of 
-  dimensionality other than two; data visualisation, with flexible control of 
-  the location and size of pictures; and the manipulation of NDF components. 
+  general image processing, many of which will function with data of
+  dimensionality other than two; data visualisation, with flexible control of
+  the location and size of pictures; and the manipulation of NDF components.
 
      ... etc...
 
-  To make the commands of KAPPA available, type: 
-  
-      ICL> KAPPA 
-  
-Topic? 
-ICL> HELP KAPPA 
-  
-KAPPA  
+  To make the commands of KAPPA available, type:
+
+      ICL> KAPPA
+
+Topic?
+ICL> HELP KAPPA
+
+KAPPA
 
   KAPPA---the Kernel APplication PAckage---currently comprises applications for
-  general image processing, many of which will function with data of 
-  dimensionality other than two; data visualisation, with flexible control of 
-  the location and size of pictures; and the manipulation of NDF components. 
+  general image processing, many of which will function with data of
+  dimensionality other than two; data visualisation, with flexible control of
+  the location and size of pictures; and the manipulation of NDF components.
 
      ... etc...
 
-  To make the commands of KAPPA available, type: 
-  
-      ICL> KAPPA 
-  
-Topic? 
-ICL> KAPPA 
- 
- --      Initialised for KAPPA      -- 
- --   Version 0.8-SU, 1993 January  -- 
- 
- Type HELP KAPPA or KAPHELP for KAPPA help 
-  
-ICL> HELP KAPPA 
-  
+  To make the commands of KAPPA available, type:
+
+      ICL> KAPPA
+
+Topic?
+ICL> KAPPA
+
+ --      Initialised for KAPPA      --
+ --   Version 0.8-SU, 1993 January  --
+
+ Type HELP KAPPA or KAPHELP for KAPPA help
+
+ICL> HELP KAPPA
+
 Help
 
    Welcome to the KAPPA online help system.  Here you can display
    details about a specific KAPPA command or more-general information
-   such as what KAPPA can do and how to use it.  
+   such as what KAPPA can do and how to use it.
 
    ... etc...
 
@@ -676,58 +676,58 @@ Help
   Changes_to_KAPPA      CHPIX      Classified_commands   CLEANER    CMULT
 
    ... etc...
- 
-Topic? ADD 
- 
-ADD 
-  
-  Adds two NDF data structures. 
-  
+
+Topic? ADD
+
+ADD
+
+  Adds two NDF data structures.
+
   Usage:
 
      ADD IN1 IN2 OUT
 
-  Description: 
-  
-     The routine adds two NDF data structures pixel-by-pixel to produce 
-     a new NDF. 
-  
-  Additional information available: 
-  
-  Parameters Examples    Notes      Authors    History 
-  
+  Description:
+
+     The routine adds two NDF data structures pixel-by-pixel to produce
+     a new NDF.
+
+  Additional information available:
+
+  Parameters Examples    Notes      Authors    History
+
 ADD Subtopic? PARAMETERS
-  
-ADD 
-  
-  Parameters 
-  
-    For information on individual parameters, select from the list below: 
-  
-    Additional information available: 
-  
-    IN1        IN2        OUT        TITLE 
-  
-ADD Parameters Subtopic? IN1 
-  
-ADD 
-  
-  Parameters 
-  
-    IN1 
-  
-      IN1 = NDF (Read) 
-         First NDF to be added. 
-  
-ADD Parameters Subtopic? 
-ADD Subtopic? 
-Topic? 
+
+ADD
+
+  Parameters
+
+    For information on individual parameters, select from the list below:
+
+    Additional information available:
+
+    IN1        IN2        OUT        TITLE
+
+ADD Parameters Subtopic? IN1
+
+ADD
+
+  Parameters
+
+    IN1
+
+      IN1 = NDF (Read)
+         First NDF to be added.
+
+ADD Parameters Subtopic?
+ADD Subtopic?
+Topic?
 ICL> ASTERIX
 
       ASTERIX  is not installed at this site.
    If you really want it, contact your Site Manager.
 
-ICL> EXIT 
+ICL> EXIT
 %
 \end{verbatim}
 \end{quote}
@@ -738,11 +738,11 @@ The Starlink Software Librarian maintains:
 \begin{description}
 \item[/star/etc/login] which defines environment variables required by
 \textit{standard} and installed \textit{option} packages.
-\item[/star/etc/cshrc] which defines Shell Package Startup Commands for 
+\item[/star/etc/cshrc] which defines Shell Package Startup Commands for
 \textit{standard} and installed \textit{option} packages to be run from the shell.
 \item[ICL\_LOGIN\_SYS] an ICL command file, automatically LOADed at ICL startup,
-which defines ICL Package Startup Commands and basic help for all Starlink 
-packages. (In the case of non-installed \textit{option} packages, the Startup 
+which defines ICL Package Startup Commands and basic help for all Starlink
+packages. (In the case of non-installed \textit{option} packages, the Startup
 Command will inform the user than the package is not available.)
 \item[ADAM\_PACKAGES] which is a Starlink HELP file giving basic information
 about all available packages.
@@ -753,11 +753,11 @@ If required, Site Managers provide and maintain:
 \end{description}
 Package Administrators provide and maintain:
 \begin{description}
-\item[Package Startup Script] a shell script defining commands to be used when 
+\item[Package Startup Script] a shell script defining commands to be used when
 running the package directly from the shell.
 \item[Package Definition Command File] an ICL command file defining commands
 and help topics to be used when running the package from ICL.
-\item[Package Help File] a Starlink HELP file providing detailed help 
+\item[Package Help File] a Starlink HELP file providing detailed help
 information about the package.
 \end{description}
 

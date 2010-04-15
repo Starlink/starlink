@@ -38,7 +38,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -211,12 +211,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -1168,7 +1168,7 @@ Example:
 \end{verbatim}
 \end{footnotesize}
 \end{quote}
-Note, however, that much of the freedom implied by the above recommendations 
+Note, however, that much of the freedom implied by the above recommendations
 may not be available to programs which conform to the documentation standards of
 a particular `software environment', especially if automatic documentation
 facilities are involved.
@@ -1489,7 +1489,7 @@ Starlink may, of course, differ from those laid down by Starlink.
 It is {\bf essential} that variables are initialized.
 Even the VAX's initialization to 0 cannot be relied upon as the task may or
 may not be reloaded between invocations.
-DATA statements must only be used to initialize data which will not change. 
+DATA statements must only be used to initialize data which will not change.
 (Emphasizes rule~36.)
 
 \srule{Use the ADAM standard prologue !!}
@@ -1515,14 +1515,14 @@ avoid using them.
 
 \srule{Report errors via the ERR\_ routines !!!}
 Error reporting must be done using the ADAM error system ERR\_ subroutines
-and the ADAM error strategy should be employed. 
+and the ADAM error strategy should be employed.
 The ADAM error system is described in SUN/104.   A stand-alone
 version of the ERR\_ package exists.
 (Reinforces rule~43.)
 
 \srule{Set STATUS on failure !!!}
 All applications which fail must return to the
-environment with an error status value set. 
+environment with an error status value set.
 This is to enable the environment to detect the failure so that users can
 write procedures which take appropriate action.
 (Supplements rule~43.)
@@ -1541,7 +1541,7 @@ Where it is necessary to call these, rule~1 note~2 must be relaxed.
 
 \srule{Get parameters with the PAR\_ routines etc.\ !!!}
 All program parameters must be obtained using the parameter system PAR\_
-or pkg\_ASSOC subroutines. 
+or pkg\_ASSOC subroutines.
 (Reinforces and supplements rule~18.)
 
 \srule{Use symbols when testing for bad pixels !!!}
@@ -1557,12 +1557,12 @@ Use the environment facility packages MAG, FIO etc.\ wherever possible.
 (Reinforces rule~18.)
 
 If it is necessary to use Fortran I/O, obtain and release logical unit numbers
-using FIO\_GUNIT and FIO\_PUNIT. 
+using FIO\_GUNIT and FIO\_PUNIT.
 (Supplements rule~19.)
 
 \srule{Use symbolic names !!!}
 Status values and package constants are given symbolic names such as
-PAR\_\_NULL and DAT\_\_SZLOC by INCLUDE files for each package. 
+PAR\_\_NULL and DAT\_\_SZLOC by INCLUDE files for each package.
 These symbolic names should be used on every occasion that the constant is
 required.  Follow these conventions when developing your own
 INCLUDE files, and use file names in the INCLUDE statements
@@ -1577,7 +1577,7 @@ The RETURN statement is allowed in the form:
 \begin{verbatim}
     IF (STATUS.NE.SAI__OK) RETURN
 \end{verbatim}
-as the first executable statement in a subroutine. 
+as the first executable statement in a subroutine.
 This avoids an extra, unhelpful IF clause and indentation.
 Alternatively, use a GO~TO n, where line n is a CONTINUE statement immediately
 preceeding the END statement.
@@ -1627,7 +1627,7 @@ degree of portability is appropriate, taking into account:
 \item its life expectancy;
 \item who will support it long-term; and
 \item the extent to which the programmer is prepared to rely on
-infrastructure software provided by others.  
+infrastructure software provided by others.
 \end{itemize}
 To put the recommendations of the Starlink Standard in context,
 consider four degrees of portability, called here

@@ -1,4 +1,4 @@
-*+  P4_CLOSE_NB - Close the P4 noticeboard 
+*+  P4_CLOSE_NB - Close the P4 noticeboard
       SUBROUTINE P4_CLOSE_NB( STATUS )
 *    Description :
 *     This routine closes the P4 noticeboard

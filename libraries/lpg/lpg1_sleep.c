@@ -59,7 +59,7 @@ F77_SUBROUTINE(lpg1_sleep)( REAL(DELAY), INTEGER(STATUS) ){
 
 /* The setitimer call raises a SIGALRM signal when the timer goes off.
    The default action on SIGALRM is to terminate the process. To avoid
-   this, save the old SIGALRM handler, and use the myhand handler which 
+   this, save the old SIGALRM handler, and use the myhand handler which
    does nothing. */
          oldhand = signal( SIGALRM, myhand );
 
@@ -78,7 +78,7 @@ F77_SUBROUTINE(lpg1_sleep)( REAL(DELAY), INTEGER(STATUS) ){
             pause();
 
 /* Re-instate the original interval timer. */
-            setitimer( ITIMER_REAL, oldval, NULL ); 
+            setitimer( ITIMER_REAL, oldval, NULL );
          }
 
 /* The alarm has gone off. Re-instate the original SIGALRM handler. */

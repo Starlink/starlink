@@ -71,7 +71,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -146,8 +146,8 @@
                ELSE
                   FILE20( C1_XMG + PIX, C1_YMG + LIN ) = MODVAL
                   NGOOD = NGOOD + 1
-               
-               ENDIF         
+
+               ENDIF
 
             END IF
 

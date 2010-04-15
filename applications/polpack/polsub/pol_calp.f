@@ -1,7 +1,7 @@
       SUBROUTINE POL_CALP( NEL, NSET, NPOS, NPAIR, IPDCOR, IPVCOR,
      :                     NSTATE, VAR, IEST, VIEST, QEST, VQEST, UEST,
      :                     VUEST, WEIGHT, OUT, VOUT, ROT, STATUS )
-*+ 
+*+
 *  Name:
 *     POL_CALP
 
@@ -86,7 +86,7 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -107,8 +107,8 @@
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
 *     13-JUL-2009 (DSB):
-*        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs 
-*        CCG_MD3R and CCG_MD1R instead of CCDPACK CCG1_MDR3R and 
+*        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs
+*        CCG_MD3R and CCG_MD1R instead of CCDPACK CCG1_MDR3R and
 *        CCG1_MDR1R.
 *     {enter_changes_here}
 
@@ -124,7 +124,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER NEL
       INTEGER NSET
@@ -135,7 +135,7 @@
       INTEGER NSTATE( NPOS )
       LOGICAL VAR
       REAL ROT
-      
+
 *  Arguments Given and Returned:
       REAL IEST( NEL, NPAIR )
       REAL VIEST( NEL, NPAIR )
@@ -148,7 +148,7 @@
 *  Arguments Returned:
       REAL OUT( NEL, * )
       REAL VOUT( NEL, * )
-      
+
 * Status:
       INTEGER STATUS             ! Global status
 
@@ -162,7 +162,7 @@
                                  ! workspace pointers
       INTEGER NBAD               ! Number of bad pixels
       LOGICAL BAD                ! bad pixel flag
-      
+
       REAL Q, U                  ! Stokes parameters
       REAL VQ, VU                ! Variances on Stokes parameters
       REAL K1, K2                ! Constants
@@ -173,10 +173,10 @@
 
 * Assume that bad pixels are present.
       BAD = .TRUE.
-      
+
 * Loop through the polarisation datasets. Note that these images should
 * have been corrected with the polarisation and time dependent
-* efficiency factors by this stage. 
+* efficiency factors by this stage.
       NI = 0
       NQ = 0
       NU = 0
@@ -186,26 +186,26 @@
 * Estimates of I and Q can be obtained from the first waveplate
 * position. If variance information is required then add the variance
 * arrays. If we are operating in circular polarimetry mode (only two
-* waveplate positions present) then Q will actually by V. 
+* waveplate positions present) then Q will actually by V.
          IF ( NSTATE( 1 ) .GE. ISET ) THEN
             NI = NI + 1
             NQ = NQ + 1
 
-            CALL VEC_SUBR( BAD, NEL, 
+            CALL VEC_SUBR( BAD, NEL,
      :           %VAL( CNF_PVAL( IPDCOR( 1, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 2, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 2, ISET ) ) ),
      :           QEST( 1, NQ ), IERR, NERR,
      :           STATUS )
-            CALL VEC_ADDR( BAD, NEL, 
+            CALL VEC_ADDR( BAD, NEL,
      :           %VAL( CNF_PVAL( IPDCOR( 1, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 2, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 2, ISET ) ) ),
      :           IEST( 1, NI ), IERR, NERR,
      :           STATUS )
 
             IF ( VAR ) THEN
-               CALL VEC_ADDR( BAD, NEL, 
+               CALL VEC_ADDR( BAD, NEL,
      :              %VAL( CNF_PVAL( IPVCOR( 1, ISET ) ) ),
-     :              %VAL( CNF_PVAL( IPVCOR( 2, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPVCOR( 2, ISET ) ) ),
      :              VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ), VQEST( 1, NQ ),
@@ -222,21 +222,21 @@
          IF ( NSTATE( 2 ) .GE. ISET ) THEN
             NI = NI + 1
             NQ = NQ + 1
-            CALL VEC_SUBR( BAD, NEL, 
+            CALL VEC_SUBR( BAD, NEL,
      :           %VAL( CNF_PVAL( IPDCOR( 4, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 3, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 3, ISET ) ) ),
      :           QEST( 1, NQ ), IERR, NERR,
      :           STATUS )
-            CALL VEC_ADDR( BAD, NEL, 
+            CALL VEC_ADDR( BAD, NEL,
      :                     %VAL( CNF_PVAL( IPDCOR( 4, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 3, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 3, ISET ) ) ),
      :           IEST( 1, NI ), IERR, NERR,
      :           STATUS )
 
             IF ( VAR ) THEN
-               CALL VEC_ADDR( BAD, NEL, 
+               CALL VEC_ADDR( BAD, NEL,
      :              %VAL( CNF_PVAL( IPVCOR( 4, ISET ) ) ),
-     :              %VAL( CNF_PVAL( IPVCOR( 3, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPVCOR( 3, ISET ) ) ),
      :              VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ), VQEST( 1, NQ ),
@@ -253,21 +253,21 @@
          IF ( NSTATE( 3 ) .GE. ISET ) THEN
             NI = NI + 1
             NU = NU + 1
-            CALL VEC_SUBR( BAD, NEL, 
+            CALL VEC_SUBR( BAD, NEL,
      :           %VAL( CNF_PVAL( IPDCOR( 5, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 6, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 6, ISET ) ) ),
      :           UEST( 1, NU ), IERR,
      :           NERR, STATUS )
-            CALL VEC_ADDR( BAD, NEL, 
+            CALL VEC_ADDR( BAD, NEL,
      :                     %VAL( CNF_PVAL( IPDCOR( 5, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 6, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 6, ISET ) ) ),
      :           IEST( 1, NI ), IERR,
      :           NERR, STATUS )
 
             IF ( VAR ) THEN
-               CALL VEC_ADDR( BAD, NEL, 
+               CALL VEC_ADDR( BAD, NEL,
      :              %VAL( CNF_PVAL( IPVCOR( 5, ISET ) ) ),
-     :              %VAL( CNF_PVAL( IPVCOR( 6, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPVCOR( 6, ISET ) ) ),
      :              VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ),
@@ -283,20 +283,20 @@
          IF ( NSTATE( 4 ) .GE. ISET ) THEN
             NI = NI + 1
             NU = NU + 1
-            CALL VEC_SUBR( BAD, NEL, 
+            CALL VEC_SUBR( BAD, NEL,
      :           %VAL( CNF_PVAL( IPDCOR( 8, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 7, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 7, ISET ) ) ),
      :           UEST( 1, NU ), IERR,
      :           NERR, STATUS )
-            CALL VEC_ADDR( BAD, NEL, 
+            CALL VEC_ADDR( BAD, NEL,
      :           %VAL( CNF_PVAL( IPDCOR( 8, ISET ) ) ),
-     :           %VAL( CNF_PVAL( IPDCOR( 7, ISET ) ) ), 
+     :           %VAL( CNF_PVAL( IPDCOR( 7, ISET ) ) ),
      :           IEST( 1, NI ), IERR,
      :           NERR, STATUS )
             IF ( VAR ) THEN
-               CALL VEC_ADDR( BAD, NEL, 
+               CALL VEC_ADDR( BAD, NEL,
      :              %VAL( CNF_PVAL( IPVCOR( 7, ISET ) ) ),
-     :              %VAL( CNF_PVAL( IPVCOR( 8, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPVCOR( 8, ISET ) ) ),
      :              VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ),
@@ -329,16 +329,16 @@
 
 * Initialise the variances and covariances of the order statistics
 * from NI to 1, assuming an initially normal distribution.
-         CALL CCD1_ORVAR( NI, NMAT, %VAL( CNF_PVAL( IPWRK3 ) ), 
+         CALL CCD1_ORVAR( NI, NMAT, %VAL( CNF_PVAL( IPWRK3 ) ),
      :                    %VAL( CNF_PVAL( IPCOV ) ),
      :                    STATUS )
 
 *  Get the median total intensity data, and variances.
-         CALL CCG_MD1R( .TRUE., NEL, NI, IEST, VIEST, 1, 
+         CALL CCG_MD1R( .TRUE., NEL, NI, IEST, VIEST, 1,
      :        NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 1 ),
-     :        VOUT( 1, 1 ), %VAL( CNF_PVAL( IPWRK1 ) ), 
-     :        %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ), 
-     :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :        VOUT( 1, 1 ), %VAL( CNF_PVAL( IPWRK1 ) ),
+     :        %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ),
+     :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ),
      :        NBAD, STATUS )
 
 *  Now do Q.
@@ -347,16 +347,16 @@
 * Initialise the variances and covariances of the order statistics
 * from NQ to 1, assuming an initially normal distribution.
             NMAT = NQ * ( NQ + 1 ) / 2
-            CALL CCD1_ORVAR( NQ, NMAT, %VAL( CNF_PVAL( IPWRK3 ) ), 
+            CALL CCD1_ORVAR( NQ, NMAT, %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPCOV ) ),
      :                       STATUS )
 
 *  Get the median Q data, and variances.
-            CALL CCG_MD1R( .TRUE., NEL, NQ, QEST, VQEST, 1, 
-     :           NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 2 ), 
+            CALL CCG_MD1R( .TRUE., NEL, NQ, QEST, VQEST, 1,
+     :           NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 2 ),
      :           VOUT( 1, 2 ), %VAL( CNF_PVAL( IPWRK1 ) ),
      :           %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ),
-     :           %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :           %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ),
      :           NBAD, STATUS )
 
          ENDIF
@@ -367,16 +367,16 @@
 * Initialise the variances and covariances of the order statistics
 * from NU to 1, assuming an initially normal distribution.
             NMAT = NU * ( NU + 1 ) / 2
-            CALL CCD1_ORVAR( NU, NMAT, %VAL( CNF_PVAL( IPWRK3 ) ), 
+            CALL CCD1_ORVAR( NU, NMAT, %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPCOV ) ),
      :                       STATUS )
 
 *  Get the median U data, and variances.
-            CALL CCG_MD1R( .TRUE., NEL, NU, UEST, VUEST, 1, 
-     :           NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 3 ), 
+            CALL CCG_MD1R( .TRUE., NEL, NU, UEST, VUEST, 1,
+     :           NMAT, %VAL( CNF_PVAL( IPCOV ) ), OUT( 1, 3 ),
      :           VOUT( 1, 3 ), %VAL( CNF_PVAL( IPWRK1 ) ),
      :           %VAL( CNF_PVAL( IPWRK2 ) ), %VAL( CNF_PVAL( IPWRK4 ) ),
-     :           %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :           %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK3 ) ),
      :           NBAD, STATUS )
          ENDIF
 
@@ -387,24 +387,24 @@
             WEIGHT( I ) = 1.0
          ENDDO
          CALL CCG_MD3R( NEL, NI, IEST, WEIGHT, 1, OUT( 1, 1 ),
-     :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ), 
+     :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ),
+     :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ),
      :           %VAL( CNF_PVAL( IPWRK3 ) ), NBAD, STATUS )
          IF ( NQ .GT. 0 ) THEN
             CALL CCG_MD3R( NEL, NQ, QEST, WEIGHT, 1, OUT( 1, 2 ),
-     :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ), 
+     :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ),
+     :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ),
      :           %VAL( CNF_PVAL( IPWRK3 ) ), NBAD, STATUS )
          ENDIF
          IF ( NU .GT. 0 ) THEN
             CALL CCG_MD3R( NEL, NU, UEST, WEIGHT, 1, OUT( 1, 3 ),
-     :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ), 
+     :           %VAL( CNF_PVAL( IPWRK1 ) ), %VAL( CNF_PVAL( IPWRK2 ) ),
+     :           %VAL( CNF_PVAL( IPWRK4 ) ), %VAL( CNF_PVAL( IPWRK5 ) ),
      :           %VAL( CNF_PVAL( IPWRK3 ) ), NBAD, STATUS )
          ENDIF
       ENDIF
 
-* Now rotate the reference direction if required, and if we are operating 
+* Now rotate the reference direction if required, and if we are operating
 * in linear (not circular) mode (this is indicated by the presence of 1 or
 * more U images).
       IF( ROT .NE. 0.0 .AND. NU .GT. 0 ) THEN
@@ -418,7 +418,7 @@
 
             IF( Q .NE. VAL__BADR .AND. U .NE. VAL__BADR ) THEN
                OUT( I, 2 ) = Q*K1 + U*K2
-               OUT( I, 3 ) = U*K1 - Q*K2 
+               OUT( I, 3 ) = U*K1 - Q*K2
 
             ELSE
                OUT( I, 2 ) = VAL__BADR
@@ -435,16 +435,16 @@
             DO I = 1, NEL
                VQ = VOUT( I, 2 )
                VU = VOUT( I, 3 )
-   
+
                IF( VQ .NE. VAL__BADR .AND. VU .NE. VAL__BADR ) THEN
                   VOUT( I, 2 ) = VQ*K1 + VU*K2
                   VOUT( I, 3 ) = VQ*K2 + VU*K1
-   
+
                ELSE
                   VOUT( I, 2 ) = VAL__BADR
                   VOUT( I, 3 ) = VAL__BADR
                END IF
-   
+
             END DO
 
          END IF
@@ -458,7 +458,7 @@
       CALL PSX_FREE( IPWRK3, STATUS )
       CALL PSX_FREE( IPWRK4, STATUS )
       CALL PSX_FREE( IPWRK5, STATUS )
-      
+
 *  Exit routine.
  99   CONTINUE
       END

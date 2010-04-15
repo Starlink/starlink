@@ -86,7 +86,7 @@
 
 /* Decrement the BCP reference count.                                       */
       bcp->count--;
-               
+
 /* Return the global status value.                                          */
       return hds_gl_status;
    }

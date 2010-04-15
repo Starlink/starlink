@@ -27,7 +27,7 @@
 *     application.
 
 *  Usage:
-*     MAPCRDD IN PIXSIZE CENTRE_LON CENTRE_LAT BOXSIZE OUT 
+*     MAPCRDD IN PIXSIZE CENTRE_LON CENTRE_LAT BOXSIZE OUT
 
 *  ADAM Parameters:
 *     BOXSIZE = _REAL (Read)
@@ -69,7 +69,7 @@
 *        help on "Specifying_detectors" for more information on
 *        specifying groups of detector numbers. The parameter INCLUDE
 *        can alternatively be used to specify the detectors to use. The
-*        default value of SMALL causes all the small detectors to be 
+*        default value of SMALL causes all the small detectors to be
 *        excluded.                                               [SMALL]
 *     FWHM = _REAL (Read)
 *        Two values specifying the full widths at half maximum of the
@@ -398,7 +398,7 @@
       INTEGER DETNO              ! Detector number.
       INTEGER DLIST( I90__MAXDT )! Detectors available in current wave
                                  ! band.
-      INTEGER EXCLUD( I90__MAXDT + I90__NDEAD )! Detectors to exclude 
+      INTEGER EXCLUD( I90__MAXDT + I90__NDEAD )! Detectors to exclude
                                  ! from the map.
       INTEGER I                  ! Loop count.
       INTEGER IAT                ! Position of last non-blank character.
@@ -713,7 +713,7 @@
 
 *  Find the image bounds which produce an image with the requested
 *  width and height.
-      CALL IRA_XYLIM( IDA, AC, BC, DBLE( BOXSIZ( 1 ) ), 
+      CALL IRA_XYLIM( IDA, AC, BC, DBLE( BOXSIZ( 1 ) ),
      :                DBLE( BOXSIZ( 2 ) ), LPCBND, UPCBND, STATUS )
 
 *  Convert the pixel coordinate image bounds to pixel indices.

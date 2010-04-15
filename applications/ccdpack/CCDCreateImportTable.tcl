@@ -311,7 +311,7 @@
 #  Widget configuration.
 #--------------------------------------------------------------------------
 #  Menubar.
-#  Add command to close and exit the window (equivalent to OK, Cancel 
+#  Add command to close and exit the window (equivalent to OK, Cancel
 #  and exit interface).
       $Menu addcommand File {Close Window} "$Choice invoke Cancel"
       $Menu addcommand File {Accept Window} "$Choice invoke OK"
@@ -394,7 +394,7 @@
 #  listbox with the names of the possible FITS items.
       $Refndf bind entry <Return> "$Fitsextract invoke {Extract FITS items}"
 
-#  Add a button to extract the FITS extension information 
+#  Add a button to extract the FITS extension information
       $Fitsextract addbutton {Extract FITS items} \
          "CCDExtractFitsFromNDF $Top $Refndf $Fitsbox"
 
@@ -622,7 +622,7 @@
 #  And wait for this window to be destroyed, which indicates completion
 #  of the task.
       CCDWindowWait $Topwin
-      return 
+      return
 
 #  End of procedure.
   }

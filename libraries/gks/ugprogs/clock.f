@@ -1,6 +1,6 @@
       PROGRAM CLOCK
 *                      GKS Example Program 2.9
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GSTRKP, GACENT, GATOP, GAHALF, GAVNOR, GABOTT, GACAP
@@ -12,22 +12,22 @@
       DATA NUM/'I II III IIII V VI VII VIII IX X XI XII'/
       DATA NUMLEN /1,2,3,4,1,2,3,4,2,1,2,3/
       DATA JASF /13*GINDIV/
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Set ASPECT SOURCE FLAGS to INDIVIDUAL
       CALL GSASF (JASF)
 *                      Set font
@@ -62,7 +62,7 @@
       CALL GSTXAL (GACAP,GAHALF)
       CALL GSCHXP (1.0)
       CALL GTX(0.5,0.5,'*')
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
       CALL GUWK(1, 1)

@@ -13,7 +13,7 @@
 *     CALL ARD1_OFWCS( AWCS, PAR, UWCS, STATUS )
 
 *  Description:
-*     This routine creates a new user FrameSet (UWCS) from the 
+*     This routine creates a new user FrameSet (UWCS) from the
 *     supplied parameters.
 
 *  Arguments:
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,15 +60,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
-      INCLUDE 'ARD_CONST'        ! ARD private constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'ARD_CONST'        ! ARD private constants
 
 *  Arguments Given:
       INTEGER AWCS
@@ -96,7 +96,7 @@
 
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the Curent Frame in the application FrameSet has domain ARDAPP.
@@ -117,7 +117,7 @@
       IFRM = AST__NOFRAME
       DO I = 1, AST_GETI( UWCS, 'NFRAME', STATUS )
          FR = AST_GETFRAME( UWCS, I, STATUS )
-         DOM = AST_GETC( FR, 'DOMAIN', STATUS ) 
+         DOM = AST_GETC( FR, 'DOMAIN', STATUS )
          CALL AST_ANNUL( FR, STATUS )
          IF( DOM .EQ. 'ARDAPP' ) THEN
             IFRM = I
@@ -133,7 +133,7 @@
          CALL AST_ANNUL( UWCS, STATUS )
          CALL ARD1_COWCS( AWCS, AST__BAD, UWCS, STATUS )
          IFRM = AST_GETI( UWCS, 'BASE', STATUS )
-      END IF 
+      END IF
 
 *  Create a WinMap from old ARDAPP coords to new ARDAPP coords.
       DO I = 1, NDIM
@@ -145,7 +145,7 @@
          OUTB( I ) = OFFV - SIDE
       END DO
 
-      M1 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+      M1 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Remap the ARDAPP Frame.
       CALL AST_REMAPFRAME( UWCS, IFRM, M1, STATUS )

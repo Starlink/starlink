@@ -1,5 +1,5 @@
       SUBROUTINE TILTX(X,Y,R, STATUS )
- 
+
 *+
 *  This routine plots an exploded cross of half width R, rotated by an
 *  angle of 45 degrees, at a point (X,Y).
@@ -17,7 +17,7 @@
 *   History:
 *     4-MAR-1993 (AJJB):
 *       STATUS argument added.
-*       
+*
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -27,7 +27,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
         RAY=(R*4.0)/5.0
         GAP=R/3.5
         TILT=SIN(45.0)

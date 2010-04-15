@@ -2,11 +2,11 @@
 
 #+
 #  Description:
-#     Displays a vector plot on the current graphics device showing the 
+#     Displays a vector plot on the current graphics device showing the
 #     distortion at each point in the quadrant of the focal plane containing
-#     subarrays s8d and s4a, and over-plots the outline of each sub-array. 
-#     The distortion to use can be specified on the command line or selected 
-#     by setting the environment variable SMURF_DISTORTION before running 
+#     subarrays s8d and s4a, and over-plots the outline of each sub-array.
+#     The distortion to use can be specified on the command line or selected
+#     by setting the environment variable SMURF_DISTORTION before running
 #     this script.
 
 #  Usage:
@@ -14,12 +14,12 @@
 
 #  Arguments:
 #     distortion
-#        A distortion code. If no value is supplied, the current value of 
+#        A distortion code. If no value is supplied, the current value of
 #        the SMURF_DISTORTION envieonment variable will be used.
 #     fxoff fyoff
-#        The focal plane coordinates (in mm) of a reference point. The 
-#        distortion vector at this reference point will be subtracted from 
-#        all displayed vectors. If not supplied, no reference vector will 
+#        The focal plane coordinates (in mm) of a reference point. The
+#        distortion vector at this reference point will be subtracted from
+#        all displayed vectors. If not supplied, no reference vector will
 #        be subtracted.
 
 #-
@@ -34,16 +34,16 @@ endif
 set none = 0
 if( $?SMURF_DISTORTION ) then
    set dist = "$SMURF_DISTORTION"
-   echo "   Using distortion polynomial '$SMURF_DISTORTION'" 
+   echo "   Using distortion polynomial '$SMURF_DISTORTION'"
    if( "$SMURF_DISTORTION" == "NONE" ) then
       set none = 1;
-   endif    
+   endif
 else
    set dist = "OLD"
-   echo "   Using original distortion polynomial" 
+   echo "   Using original distortion polynomial"
 endif
 
-#  Note the focal plane position of the vector to use as the reference (if 
+#  Note the focal plane position of the vector to use as the reference (if
 #  any). This vector will be subtracted from all other displayed vectors.
 if( $# > 1 ) then
    set fxoff = $2
@@ -63,8 +63,8 @@ $SMURF_DIR/dsutils outmag=mag outang=ang in=! fxlo=-50 fxhi=0 fylo=0 fyh=50 \
                    fxoff=$fxoff fyoff=$fyoff
 $KAPPA_DIR/settitle mag "'$dist distortion map'"
 
-#  Clear the graphics device, display a faint greyscale image of the vector 
-#  magnitude, and then draw the vectors (so long as SMURF_DISTORTION is 
+#  Clear the graphics device, display a faint greyscale image of the vector
+#  magnitude, and then draw the vectors (so long as SMURF_DISTORTION is
 #  not NONE, VECPLOT objects to drawing nothing but zero length vectors).
 $KAPPA_DIR/gdclear current
 if( $none == 0 ) then
@@ -72,7 +72,7 @@ if( $none == 0 ) then
    $KAPPA_DIR/vecplot mag ang arrow=0.003 clear=no quiet
 else
    echo "   There are no vectors draw because SMURF_DISTORTION is set to NONE"
-   $KAPPA_DIR/display mag mode=scale low=0 high=1 
+   $KAPPA_DIR/display mag mode=scale low=0 high=1
 endif
 
 #  Display s8d outline in red

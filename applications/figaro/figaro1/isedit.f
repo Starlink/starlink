@@ -3,7 +3,7 @@ C+
 C
 C     I S E D I T
 C
-C     Interactively edit a 1D or 2D spectrum allowing points or 
+C     Interactively edit a 1D or 2D spectrum allowing points or
 C     complete spectra to be removed
 C
 C     Command parameters -
@@ -25,19 +25,19 @@ C     Modified:
 C
 C     4th Feb 1991   JMS / AAO. Added PAR_ABORT and STATUS checks to
 C                    support user requested aborts. Made minor
-C                    modification to initialisation of NY variable. 
-C                    Added another interpolation option, "J", to 
+C                    modification to initialisation of NY variable.
+C                    Added another interpolation option, "J", to
 C                    interpolate between chosen points.
-C     15th Mar 1991  JMS / AAO. Write an error array only if there was 
+C     15th Mar 1991  JMS / AAO. Write an error array only if there was
 C                    one in the input (taken from HME's modification of
-C                    20/2/91). 
+C                    20/2/91).
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     26th Apr 1991  JMS / AAO. Removed the statements IXS=1 and IXE=NX.
 C                    FIG_ISEDIT_RANGE now uses only the selected part of
 C                    the spectrum to calculate the high, low and mean
 C                    levels.
-C     6th Nov 1991.  HME / UoE, Starlink. Take care of HIGH=LOW. 
+C     6th Nov 1991.  HME / UoE, Starlink. Take care of HIGH=LOW.
 C                    Increase plot range by 5% on either side.
 C     4th  Sep 1992  HME / UoE, Starlink. Change INCLUDE.
 C                    PGASK is banned from ADAM, commented out.
@@ -58,9 +58,9 @@ C     Functions
 C
       LOGICAL   PAR_ABORT
       INTEGER   DSA_TYPESIZE
-      INTEGER   PGBEGIN      
+      INTEGER   PGBEGIN
       CHARACTER ICH_CI*13,ICH_CF*13
- 
+
 C
       CHARACTER DEVICE*32        ! PGPLOT device specification
       INTEGER   DIMS(2)          ! Image dimensions
@@ -112,7 +112,7 @@ C
                                  ! data
       REAL      XST              ! Initial X-value
       CHARACTER XUNITS*32        ! Structure X-axis units
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -166,7 +166,7 @@ C
       IF (EXIST) THEN
          CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',EPTR1,SLOT2,
      :                       STATUS)
-      ELSE 
+      ELSE
          CALL DSA_GET_WORK_ARRAY(NELM,'FLOAT',EPTR1,SLOT2,STATUS)
          CALL GEN_FILL(NELM*DSA_TYPESIZE('FLOAT',STATUS),0,
      :                 %VAL(CNF_PVAL(EPTR1)))
@@ -201,7 +201,7 @@ C
           STATUS=0
       END IF
       CALL PGASK(.FALSE.)
-C 
+C
 C     Initialize GKD package
 C
 C
@@ -219,12 +219,12 @@ C
          IF (PISNO) CALL CNF_UNREGP(OPTR)
          OPTR = TPTR
          PISNO = ISNEWO
-         
+
          CALL DYN_INCAD(EPTR1,'FLOAT',(SCAN-1)*NX,TPTR,ISNEWE,STATUS)
          IF (PISNE) CALL CNF_UNREGP(EPTR)
          EPTR = TPTR
          PISNE = ISNEWE
-          
+
          CALL DYN_INCAD(QPTR1,'BYTE',(SCAN-1)*NX,TPTR,ISNEWQ,STATUS)
          IF (PISNQ) CALL CNF_UNREGP(QPTR)
          QPTR = TPTR
@@ -291,8 +291,8 @@ C
 C     F I G _ I S E D I T _ P L O T
 C
 C     Plots an array (ZVALS) against another array (XVALS), with errors
-C     as specified by an error array (ERRORS). It is assumed that these 
-C     map element for element, and that the XVALS values represent the 
+C     as specified by an error array (ERRORS). It is assumed that these
+C     map element for element, and that the XVALS values represent the
 C     coordinates at the center of each 'bin', and are in ascending order.
 C
 C     Parameters -   (">" input, "<" output)
@@ -313,7 +313,7 @@ C     (>) PLAB     (Character) The label for the plot as a whole.
 C     (>) AXES     (Logical) True if axes are to be plotted.
 C     (>) ERRUSE   (Logical) True if ERRORS values are to be used.  If
 C                  false, errors should be taken as zero.
-C     (>) THICK    (Integer) The line thickness for the plot.  
+C     (>) THICK    (Integer) The line thickness for the plot.
 C     (>) CKEY     (Integer) The GRPCKG code (0..7) for the colour
 C                  of the plot.
 C     (>) XVST     (Real) The actual x-start value for the plot.
@@ -343,7 +343,7 @@ C     11th Dec 1990    Based on FIG_XZEPLOT     JAB / JAC
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL AXES,ERRUSE
       INTEGER IXST,IXEN,NX,STATUS,THICK,CKEY
@@ -362,26 +362,26 @@ C
 C
 C       Setup plot environment, and plot data.
 C
-        CALL PGPAGE                                    
-        CALL PGSCI(WHITE)                                 
-        CALL PGSLW(THICK)                                 
-        CALL PGVSTAND                                     
-        CALL PGWINDOW(XVST,XVEN,LOW,HIGH)                 
-        IF (AXES) THEN                                    
-           CALL PGBOX('ABCNST',0.,0,'ABCNST',0.,0)        
-           CALL PGLABEL(XLAB,ZLAB,PLAB)                   
-        ELSE                                              
-           CALL PGLABEL(' ',' ',PLAB)                     
-        END IF                                            
-        CALL PGSCI(CKEY)                                  
-        DO I=IXST,IXEN                                    
+        CALL PGPAGE
+        CALL PGSCI(WHITE)
+        CALL PGSLW(THICK)
+        CALL PGVSTAND
+        CALL PGWINDOW(XVST,XVEN,LOW,HIGH)
+        IF (AXES) THEN
+           CALL PGBOX('ABCNST',0.,0,'ABCNST',0.,0)
+           CALL PGLABEL(XLAB,ZLAB,PLAB)
+        ELSE
+           CALL PGLABEL(' ',' ',PLAB)
+        END IF
+        CALL PGSCI(CKEY)
+        DO I=IXST,IXEN
            IF (QUALITY(I) .EQ. 0) THEN
               CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,IXST,
      :                IXEN,I,ERRUSE)
            END IF
-        END DO                     
-        CALL PGSCI(WHITE)          
-        CALL PGSLW(1)              
+        END DO
+        CALL PGSCI(WHITE)
+        CALL PGSLW(1)
 C
 C      Close down plot
 C
@@ -409,7 +409,7 @@ C     (>) ERRUSE   (Logical) True if ERRORS values are to be used.  If
 C                  false, errors should be taken as zero.
 
       INTEGER IXST,IXEN,IX
-      REAL XVALS(NX),ZVALS(NX),ERRORS(NX) 
+      REAL XVALS(NX),ZVALS(NX),ERRORS(NX)
       LOGICAL ERRUSE
 
       REAL XVAL1,XVAL2,YVAL1,YVAL2,WIDTH
@@ -419,16 +419,16 @@ C                  false, errors should be taken as zero.
       ELSE
           WIDTH=XVALS(IXEN)-XVALS(IXST)
       END IF
-      XVAL1=XVALS(IX)-WIDTH*0.5                   
-      XVAL2=XVALS(IX)+WIDTH*0.5                   
-      CALL PGERRX(1,XVAL1,XVAL2,ZVALS(IX),0.0)              
-      IF (ERRUSE) THEN                                     
-         YVAL1=ZVALS(IX)-ERRORS(IX)                          
-         YVAL2=ZVALS(IX)+ERRORS(IX)                          
-         CALL PGERRY(1,XVALS(IX),YVAL1,YVAL2,0.0)           
-      END IF                      
+      XVAL1=XVALS(IX)-WIDTH*0.5
+      XVAL2=XVALS(IX)+WIDTH*0.5
+      CALL PGERRX(1,XVAL1,XVAL2,ZVALS(IX),0.0)
+      IF (ERRUSE) THEN
+         YVAL1=ZVALS(IX)-ERRORS(IX)
+         YVAL2=ZVALS(IX)+ERRORS(IX)
+         CALL PGERRY(1,XVALS(IX),YVAL1,YVAL2,0.0)
+      END IF
 
-      END                         
+      END
 
 
 
@@ -456,7 +456,7 @@ C                  false, errors should be taken as zero.
           MEAN=MEAN/NUM
       END IF
       END
-     
+
       SUBROUTINE FIG_ISEDIT_CURS(XVALS,ZVALS,QUALITY,ERRORS,NX,NY,
      :     IXST,IXEN,HIGH,LOW,XST,XEN,FINISHED,SCAN,STATUS)
 C
@@ -485,8 +485,8 @@ C     (!) STATUS   (Integer) Status value.
 C
 C     Modified:
 C
-C     5th Feb. 1991.   JMS / AAO. Added another interpolation option "J" - Now 
-C                      interpolates between chosen X and Y points and Draws 
+C     5th Feb. 1991.   JMS / AAO. Added another interpolation option "J" - Now
+C                      interpolates between chosen X and Y points and Draws
 C                      green crosses at chosen points.
 C
 C+
@@ -527,7 +527,7 @@ C
               CALL PAR_RDVAL('YVALUE',1.,FLOAT(NY),
      :           FLOAT(MIN(SCAN+1,NY)),' ',YVAL)
               IF (PAR_ABORT()) RETURN
-              SCAN=NINT(YVAL) 
+              SCAN=NINT(YVAL)
           ELSE IF (CH .EQ. 'R' .OR. CH .EQ. 'r') THEN
               REPEAT = .FALSE.
           ELSE IF (CH .EQ. 'S' .OR. CH .EQ. 's') THEN
@@ -538,7 +538,7 @@ C
      :              ICH_CI(SCAN))
               DO IX=1,NX
                   QUALITY(IX)=1
-              END DO            
+              END DO
               CALL PGQCOL(CI1,CI2)
               IF (CI2 .GE. 3) THEN
                   CALL PGSCI(3)
@@ -623,7 +623,7 @@ C
                     CALL GKD_WRITE_LINE('This point is already deleted')
                  ELSE
 C
-C         Draw green cross at selected point 
+C         Draw green cross at selected point
 C
                     CALL PGQCOL(CI1,CI2)
                     IF (CI2 .GE. 3) THEN
@@ -632,7 +632,7 @@ C
                        CALL PGSCI(1)
                     END IF
 C
-                    IF (IX2 .LT. IX1) THEN 
+                    IF (IX2 .LT. IX1) THEN
                        IX=IX1
                        IX1=IX2
                        IX2=IX
@@ -672,7 +672,7 @@ C
                   QUALITY(IX)= 1
 C
 C         Mark deleted point on plot by setting colour to green
-C         or by a dashed line 
+C         or by a dashed line
 C
                   CALL PGQCOL(CI1,CI2)
                   IF (CI2 .GE. 3) THEN
@@ -728,7 +728,7 @@ C
 C
 C         Output help information
 C
-              CALL FIG_ISEDIT_HELP 
+              CALL FIG_ISEDIT_HELP
           END IF
       END DO
       END

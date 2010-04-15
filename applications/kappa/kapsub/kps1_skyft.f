@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_SKYFT( LOG, LOGFD, IGRP, NPOS, SCS, EPOCH, PROJ, 
-     :                       TILT, ORIENT, PSIZE, REFIMG, REFSKY, NP, 
+      SUBROUTINE KPS1_SKYFT( LOG, LOGFD, IGRP, NPOS, SCS, EPOCH, PROJ,
+     :                       TILT, ORIENT, PSIZE, REFIMG, REFSKY, NP,
      :                       PROJEC, P, RMS, STATUS )
 *+
 *  Name:
@@ -119,7 +119,7 @@
 *        Implemented DSB's 1997 Jan 27 changes made to the NAG version.
 *        These improved the security of error checking and reporting.
 *     3-DEC-1998 (DSB):
-*        Change tolerance used in PDA routine from 1.0D-8 to 1.0D-3 (the 
+*        Change tolerance used in PDA routine from 1.0D-8 to 1.0D-3 (the
 *        smaller value usually prevented the PDA routine from finding a
 *        solution).
 *     2004 September 3 (TIMJ):
@@ -178,7 +178,7 @@
 *        TILTC = LOGICAL (Write)
 *           Was the tilt of the celestial sphere prior to projection
 *           fixed by the user?
-      
+
 *  Arguments Given:
       LOGICAL LOG
       INTEGER LOGFD
@@ -193,11 +193,11 @@
       LOGICAL REFIMG
       LOGICAL REFSKY
       INTEGER NP
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) PROJEC
       DOUBLE PRECISION P( NP )
-      
+
 *  Arguments Returned:
       REAL RMS
 
@@ -208,7 +208,7 @@
       INTEGER CHR_LEN            ! Returns used length of a string
       EXTERNAL KPS1_SKYFN        ! Subroutine for evaluating the
                                  ! residuals
-      
+
 *  Local Variables:
       INTEGER END                ! Index of last char in projection name
       DOUBLE PRECISION FS        ! Sum of squared residuals
@@ -243,7 +243,7 @@
       CALL PSX_CALLOC( NPOS, '_DOUBLE', IPWYO, STATUS )
 
 *  Initialise other values in the common block.
-      NPOSC = NPOS      
+      NPOSC = NPOS
       SCSC = SCS
       EPOCHC = EPOCH
       TILTC = TILT
@@ -251,8 +251,8 @@
       PSIZEC = PSIZE
       REFIMC = REFIMG
       REFSKC = REFSKY
-      
-*  See how many parameters are to be included in the optimisation. 
+
+*  See how many parameters are to be included in the optimisation.
       N = 0
       IF ( .NOT. REFIMG ) N = N + 2
       IF ( .NOT. REFSKY ) N = N + 2
@@ -262,7 +262,7 @@
 
 *  Report an error if insufficient positions have been supplied.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      IF ( 2 * NPOS .LT. N ) THEN      
+      IF ( 2 * NPOS .LT. N ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'N', ( N + 1 )/2 )
          CALL ERR_REP( 'KPS1_SKYFT_ERR1', 'Too few positions '/
@@ -276,20 +276,20 @@
       CALL PSX_CALLOC( LW, '_DOUBLE', IPWNA2, STATUS )
       CALL PSX_CALLOC( N, '_INTEGER', IPWNA1, STATUS )
       CALL PSX_CALLOC( 2 * NPOS, '_DOUBLE', IPWFV, STATUS )
-      
+
 *  Read the co-ordinate data from the GRP group into the work arrays
 *  and get an initial guess at the projection parameters (returned in
 *  P).
       CALL KPS1_SKYF2( IGRP, ORIENT, PSIZE, TILT, REFIMG, REFSKY, SCS,
-     :                 NP, NPOS, P, PC, %VAL( CNF_PVAL( IPWA ) ), 
+     :                 NP, NPOS, P, PC, %VAL( CNF_PVAL( IPWA ) ),
      :                 %VAL( CNF_PVAL( IPWB ) ),
-     :                 %VAL( CNF_PVAL( IPWX ) ), 
+     :                 %VAL( CNF_PVAL( IPWX ) ),
      :                 %VAL( CNF_PVAL( IPWY ) ), STATUS )
 
 *  Get a list of the supported projections, and find the indices of the
 *  first and last character in the first one in the list.  Each pair of
 *  entries in the list are separated by a comma.
-      CALL IRA_IPROJ( PRJLST, STATUS )      
+      CALL IRA_IPROJ( PRJLST, STATUS )
       START = 1
       END = INDEX( PRJLST, ',' ) - 1
 
@@ -334,39 +334,39 @@
                   N = N + 2
                   XC( N - 1 ) = PC( 1 )
                   XC( N ) = PC( 2 )
-               END IF            
+               END IF
 
                IF ( .NOT. REFIMG ) THEN
                   N = N + 2
                   XC( N - 1 ) = PC( 3 )
                   XC( N ) = PC( 4 )
-               END IF            
+               END IF
 
                IF ( .NOT. PSIZE ) THEN
                   N = N + 2
                   XC( N - 1 ) = PC( 5 )
                   XC( N ) = PC( 6 )
                END IF
-               
+
                IF ( .NOT. ORIENT ) THEN
                   N = N + 1
                   XC( N ) = PC( 7 )
                END IF
-               
+
                IF ( .NOT. TILT ) THEN
                   N = N + 1
                   XC( N ) = PC( 8 )
                END IF
-               
+
 *  Initialise the status flag used by the PDA service routine
 *  KPS1_SKYFN.
                ISTAT = SAI__OK
 
 *  Do the search.  The tolerance value is fairly arbitrary.
                CALL PDA_LMDIF1( KPS1_SKYFN, 2 * NPOS, N, XC,
-     :                          %VAL( CNF_PVAL( IPWFV ) ), 
+     :                          %VAL( CNF_PVAL( IPWFV ) ),
      :                          1.0D-3, IFAIL,
-     :                          %VAL( CNF_PVAL( IPWNA1 ) ), 
+     :                          %VAL( CNF_PVAL( IPWNA1 ) ),
      :                          %VAL( CNF_PVAL( IPWNA2 ) ), LW )
 
 *  If an error occurred in the PDA service routine (KPS1_SKYFN), add a
@@ -386,7 +386,7 @@
                   END IF
 
                ELSE
-                  
+
 *  Report an error if the PDA routine could not find an answer.
                   IF ( IFAIL .EQ. 0 .OR. IFAIL .GE. 4 ) THEN
                      STATUS = SAI__ERROR
@@ -399,7 +399,7 @@
 *  Compute the sum of the squared residuals.  Since the array of
 *  residuals is dynamic it is obtained as workspace therefore a
 *  subroutine must be called to evaluate its sum.
-                  CALL KPG1_SQSUD( 2 * NPOS, %VAL( CNF_PVAL( IPWFV ) ), 
+                  CALL KPG1_SQSUD( 2 * NPOS, %VAL( CNF_PVAL( IPWFV ) ),
      :                             FS, STATUS )
 
 *  If the sum of the squared residuals for this projection is better
@@ -407,7 +407,7 @@
 *  values, and the sum of the squared residuals.
                   IF ( FS .LT. FSMIN ) THEN
                      PRJ = PRJECC
-                     
+
                      N = 0
 
                      IF ( .NOT. REFSKY ) THEN
@@ -417,8 +417,8 @@
                      ELSE
                         P0( 1 ) = PC( 1 )
                         P0( 2 ) = PC( 2 )
-                     END IF            
-                     
+                     END IF
+
                      IF ( .NOT. REFIMG ) THEN
                         N = N + 2
                         P0( 3 ) = XC( N - 1 )
@@ -426,7 +426,7 @@
                      ELSE
                         P0( 3 ) = PC( 3 )
                         P0( 4 ) = PC( 4 )
-                     END IF            
+                     END IF
 
                      IF ( .NOT. PSIZE ) THEN
                         N = N + 2
@@ -436,42 +436,42 @@
                         P0( 5 ) = PC( 5 )
                         P0( 6 ) = PC( 6 )
                      END IF
-                     
+
                      IF ( .NOT. ORIENT ) THEN
                         N = N + 1
-                        P0( 7 ) = XC( N ) 
+                        P0( 7 ) = XC( N )
                      ELSE
                         P0( 7 ) = PC( 7 )
                      END IF
-                     
+
                      IF ( .NOT. TILT ) THEN
                         N = N + 1
-                        P0( 8 ) = XC( N ) 
+                        P0( 8 ) = XC( N )
                      ELSE
                         P0( 8 ) = PC( 8 )
                      END IF
-                     
+
                      FSMIN = FS
 
                   END IF
-               
+
                END IF
 
             END IF
 
-         END IF         
+         END IF
 
 *  Find the start and end of the next projection name in the list.
-         START = END + 2         
+         START = END + 2
          IF ( START .LE. LEND ) THEN
-            END = INDEX( PRJLST( START: ), ',' ) 
+            END = INDEX( PRJLST( START: ), ',' )
             IF ( END .GT. 0 ) THEN
                END = END + START - 2
             ELSE
                END = LEND
             END IF
          END IF
-         
+
       END DO
 
 *  If no solution was found, report an error.
@@ -495,14 +495,14 @@
 
 *  Log the results and residuals if required.
       IF ( LOG )
-     :  CALL KPS1_SKYF4( PROJEC, NP, P, SCS, EPOCH, NPOS, 
+     :  CALL KPS1_SKYF4( PROJEC, NP, P, SCS, EPOCH, NPOS,
      :                   %VAL( CNF_PVAL( IPWA ) ),
-     :                   %VAL( CNF_PVAL( IPWB ) ), 
-     :                   %VAL( CNF_PVAL( IPWX ) ), 
+     :                   %VAL( CNF_PVAL( IPWB ) ),
+     :                   %VAL( CNF_PVAL( IPWX ) ),
      :                   %VAL( CNF_PVAL( IPWY ) ), RMS,
-     :                   LOGFD, %VAL( CNF_PVAL( IPWXO ) ), 
+     :                   LOGFD, %VAL( CNF_PVAL( IPWXO ) ),
      :                   %VAL( CNF_PVAL( IPWYO ) ), STATUS )
-      
+
 *  Jump to here if an error occurs.
  999  CONTINUE
 

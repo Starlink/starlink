@@ -116,7 +116,7 @@ C     added here to count the number of items already in use for this
 C     ref slot does assume that the array is compacted - ie by the time
 C     we find the free space, we've passed through all the slots used by
 C     this ref slot)
-C     
+C
       ITEM=0
       AVAIL=0
       FOUND=.FALSE.

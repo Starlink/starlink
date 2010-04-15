@@ -16,19 +16,19 @@
 *
 * Arguments:
 *    FITPAR(N) = REAL ARRAY (Given)
-*       
+*
 *    N = INTEGER (Given)
-*       
+*
 *    M = INTEGER (Given)
-*       
+*
 *    SDATA(M) = REAL ARRAY (Given)
-*       
+*
 *    LINE_NUMBER = INTEGER (Given)
-*       
+*
 *    FUNCT(x, fitpar) = REAL ARRAY (Given)
 *        Function to evaluate fit
 *    FIT_VALUES(M,LINE_NUMBER) = REAL ARRAY (Returned)
-*       
+*
 *-
       implicit none
       integer m,n

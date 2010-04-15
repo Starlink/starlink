@@ -89,15 +89,15 @@
 
 *          Append values for primitive types
             if (prim) then
-               if (chr_simlr(type, '_DOUBLE')) then 
+               if (chr_simlr(type, '_DOUBLE')) then
                   call lsputd(loc, ndim, dims, size, line, leng)
-               elseif (chr_simlr(type, '_REAL')) then 
+               elseif (chr_simlr(type, '_REAL')) then
                   call lsputr(loc, ndim, dims, size, line, leng)
-               elseif (chr_simlr(type, '_INTEGER') .or. 
-     :           chr_simlr(type, '_WORD') .or. 
+               elseif (chr_simlr(type, '_INTEGER') .or.
+     :           chr_simlr(type, '_WORD') .or.
      :           chr_simlr(type, '_UWORD') .or.
-     :           chr_simlr(type, '_BYTE')  .or. 
-     :           chr_simlr(type, '_UBYTE')) then 
+     :           chr_simlr(type, '_BYTE')  .or.
+     :           chr_simlr(type, '_UBYTE')) then
                   call lsputi(loc, ndim, dims, size, line, leng)
                elseif (chr_simlr(type, '_LOGICAL')) then
                   call lsputl(loc, ndim, dims, size, line, leng)

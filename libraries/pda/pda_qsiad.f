@@ -4,7 +4,7 @@
 *     PDA_QSIAD
 
 *  Purpose:
-*     Sort an array of pointers to access a DOUBLE PRECISION  array 
+*     Sort an array of pointers to access a DOUBLE PRECISION  array
 *     in ascending order.
 
 *  Language:
@@ -59,7 +59,7 @@
 *     6-AUG-1992 (RFWS):
 *        Rationalised the inner loop to improve performance.
 *     8-NOV-1995 (PDRAPER):
-*        Renamed to PDA_QSIA (Quick Sort Indexed Ascending) for 
+*        Renamed to PDA_QSIA (Quick Sort Indexed Ascending) for
 *        the PDA library. Now returns the index of the first 1..N
 *        elements of X.
 *     {enter_further_changes_here}
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
                                 ! base 2 of the maximum number of
                                 ! elements to be sorted)
       PARAMETER ( MXSTK = 64 )
-      
+
 *  Local Variables:
       DOUBLE PRECISION XPART    ! Partition value
       INTEGER I                 ! Index to pointer array
@@ -98,7 +98,7 @@
       INTEGER R                 ! Right pointer element in sub-file
       INTEGER RR( MXSTK )       ! Stack for right sub-file limits
       INTEGER STK               ! Recursion stack pointer
-      
+
 *.
 
 *  Initialise.
@@ -145,7 +145,7 @@
                I2 = I3
                I3 = ITMP
             END IF
-            
+
 *  Store the partition value.
             XPART = X( IP( I2 ) )
 
@@ -162,13 +162,13 @@
             IF ( X( IP( I ) ) .LT. XPART ) THEN
                I = I + 1
                GO TO 3
-            END IF           
+            END IF
 
  4          CONTINUE             ! Start of 'DO WHILE' loop
             IF ( X( IP( J ) ) .GT. XPART ) THEN
                J = J - 1
                GO TO 4
-            END IF           
+            END IF
 
 *  Exchange pairs of values when necessary by interchanging their
 *  pointers.

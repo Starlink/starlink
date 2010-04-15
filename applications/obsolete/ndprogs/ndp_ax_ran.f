@@ -8,8 +8,8 @@ C   ---------------------------
 C
 C   Description
 C   -----------
-C   Prompts for a range of axis values and pixel numbers for each axis in 
-C   an image structure. The values obtained can then be used to set the 
+C   Prompts for a range of axis values and pixel numbers for each axis in
+C   an image structure. The values obtained can then be used to set the
 C   limits of an array operation.
 C
 C
@@ -27,7 +27,7 @@ C
 C
 C   Prompts
 C   -------
-C   WHOLE  If specified, the whole range of each axis is taken, otherwise 
+C   WHOLE  If specified, the whole range of each axis is taken, otherwise
 C          a range of values may be selected. (keyword).
 C   START  Start coordinate on each axis. (real, array).
 C   END    End coordinate on each axis. (real, array).
@@ -55,7 +55,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -90,7 +90,7 @@ C
 C
 C     Local variables
 C
-      INTEGER       ADDRESS           ! Address of dynamic memory element   
+      INTEGER       ADDRESS           ! Address of dynamic memory element
       INTEGER       AXELM(6)          ! Dynamic memory pointers to axes
       INTEGER       AXSLOT(6)         ! Map slot numbers for axes
       REAL          EMIN(6)           ! Minimum end coordinates
@@ -166,4 +166,4 @@ C
 C
   500 CONTINUE
       END
-    
+

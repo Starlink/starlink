@@ -2,53 +2,53 @@
       SUBROUTINE PERIOD_OGIP(YPTR, MXCOL, MXSLOT,
      :                       NPTSARRAY, INFILEARRAY,
      :                       YERRORARRAY, DETRENDARRAY)
- 
+
 *+
 *  Name:
 *     PERIOD_OGIP
- 
+
 *  Purpose:
 *     Routine to read OGIP FITS table data into a PERIOD data slot.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PERIOD_OGIP(YPTR, MXCOL, MXSLOT,
-*                      NPTSARRAY, JUNK1, JUNK2, 
+*                      NPTSARRAY, JUNK1, JUNK2,
 *                      INFILEARRAY, YERRORARRAY, DETRENDARRAY)
 
-*  Description: 
-*     The user enters the name of the file to be considered. The code  
+*  Description:
+*     The user enters the name of the file to be considered. The code
 *     then opens the file and looks at the first line to check the
-*     file is of a simple FITS format. 
+*     file is of a simple FITS format.
 *
-*     An attempt is then made to read the values for FITS keywords 
+*     An attempt is then made to read the values for FITS keywords
 *     DETNAM, INSTRUMENT, TELESCOPE and OBJECT. These are displayed
 *     for the user.
 *
-*     The program then looks through the file to find all the extensions. 
-*     It displays the details (number of points 
-*     EXTNAME value etc) of the extensions found and asks the users to 
-*     select one to be read. The headings for each of the rows present is 
+*     The program then looks through the file to find all the extensions.
+*     It displays the details (number of points
+*     EXTNAME value etc) of the extensions found and asks the users to
+*     select one to be read. The headings for each of the rows present is
 *     then displayed and the user can then select which slot the data shall
 *     go in and the which column will represent X, Y and Y errors.
- 
+
 *  Notes:
 *     No attempt has been made to adopt the Starlink parameter system.
 *
 *     Several parts of this code were 'borrowed' from PERIOD_INPUT.F
-*     which use several techniques that are frowned on in the Starlink 
-*     Programmers Standard. This usage has been retained to keep the 
-*     program style consistent with that found in the rest of PERIOD. 
-*     Hopefully, this will mean that the program will be of a style 
+*     which use several techniques that are frowned on in the Starlink
+*     Programmers Standard. This usage has been retained to keep the
+*     program style consistent with that found in the rest of PERIOD.
+*     Hopefully, this will mean that the program will be of a style
 *     familiar to PERIOD's author (Vik Dhillon), thereby making it easier
 *     for him to adjust the code if he so desires.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     29-SEP-1994 (GJP)
 *     (Original version)
@@ -57,19 +57,19 @@
 C     Converted to Double Precision (KPD), August 2001
 C     Modified to incorporate dynamic memory allocation for major
 C      data/work array(s) and/or use of such arrays (KPD), October 2001
- 
+
 *-
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'
- 
+
 *   PLT declarations.
       INTEGER MXCOL, MXSLOT
       INTEGER YPTR(MXSLOT), NPTSARRAY(MXSLOT)
- 
-*   PERIOD_INPUT declarations. 
+
+*   PERIOD_INPUT declarations.
 *   Similar to those used in other PERIOD packages.
       INTEGER JUNK1PTR, JUNK2PTR
       INTEGER NUMROWS
@@ -77,10 +77,10 @@ C      data/work array(s) and/or use of such arrays (KPD), October 2001
       INTEGER KEYPTR, PERIOD_GET1DINT
       INTEGER YSLOT1, THISROW, IFAIL
       INTEGER OKCUREXT, XICUREXT, YICUREXT
-      CHARACTER*72 INFILEARRAY(MXSLOT) 
+      CHARACTER*72 INFILEARRAY(MXSLOT)
       LOGICAL YERRORARRAY(MXSLOT), YERROR, DETRENDARRAY(MXSLOT)
- 
-*   Local variables.     
+
+*   Local variables.
       CHARACTER*80 AGAINS           ! Loop again user input
       CHARACTER*80 COMMENT          ! Unused string returned by FITSIO
       CHARACTER*40 DETN             ! Contents of DETNAM keyword
@@ -117,15 +117,15 @@ C     CHARACTER*40 HDC2(26)         ! Contents of HDUCLAS2 keyword
       INTEGER COLNY                 ! Column representing Y
       INTEGER COLNZ                 ! Column representing Y errors
       INTEGER CUREXT                ! Chosen extension number
-      INTEGER EXTENS                ! Number of extensions 
-C     INTEGER HDT(26)               ! Type of table present 
+      INTEGER EXTENS                ! Number of extensions
+C     INTEGER HDT(26)               ! Type of table present
       INTEGER HDTPTR                ! Pntr to type of table present
                                     ! ie binary or ASCII
       INTEGER HDUTYPE               ! Extension table type
       INTEGER I                     ! Loop variable
       INTEGER NFOUND                ! Number of keywords found
       INTEGER NKEYS                 ! Number of keywords found
-      INTEGER NSPACE                ! Not used  
+      INTEGER NSPACE                ! Not used
 C     INTEGER OKAY(26)              ! Identifies usable extensions
       INTEGER OKAYPTR               ! Pntr to info on usable extensions
       INTEGER READWRITE             ! Read/write IO mode
@@ -136,7 +136,7 @@ C     INTEGER OKAY(26)              ! Identifies usable extensions
       INTEGER STATUS2               ! FITSIO status flag
       INTEGER STATUS3               ! FITSIO status flag
       INTEGER UNIT                  ! IO unit number
-C     INTEGER XI(26)                ! Number of rows in an extension 
+C     INTEGER XI(26)                ! Number of rows in an extension
       INTEGER XIPTR                 ! Pntr to no. of rows in an extension
 C     INTEGER YI(26)                ! Number of columns in an extension
       INTEGER YIPTR                 ! Pntr to no. of columns in an extension
@@ -152,11 +152,11 @@ C     INTEGER YI(26)                ! Number of columns in an extension
 
 * Attempt to read the file.
 
- 10   CONTINUE 
+ 10   CONTINUE
 
 *   Get the file name.
       WRITE(*,*) ' '
-      WRITE(*,'(X,A,$)') 
+      WRITE(*,'(X,A,$)')
      : 'Enter name of OGIP FITS file (<CR> to quit) : '
       READ (*,'(A)',ERR=10) TEMPS
 
@@ -176,24 +176,24 @@ C     INTEGER YI(26)                ! Number of columns in an extension
 *      Open the OGIP FITS file requested.
          READWRITE=0
          CALL FTOPEN(UNIT,FILENAME,READWRITE,BLOCKSIZE,STATUS)
-         IF(STATUS.NE.0) THEN 
+         IF(STATUS.NE.0) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) '** ERROR: Could not open/read the file.'
             WRITE(*,*) ' '
             GOTO 10
-         END IF    
+         END IF
 
 *      Find the number of keywords in the first HDU.
          CALL FTGHSP(UNIT,NKEYS,NSPACE,STATUS)
-         IF((STATUS.NE.0).OR.(NKEYS.EQ.0)) THEN 
+         IF((STATUS.NE.0).OR.(NKEYS.EQ.0)) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
-            WRITE(*,*) 
+            WRITE(*,*)
      :         '** ERROR: Could not find any keywords in the HDU.'
             WRITE(*,*) ' '
             GOTO 10
-         END IF    
+         END IF
 
 *      Initialise the values for INSTRUMENT etc.
          REC1=' '
@@ -206,14 +206,14 @@ C     INTEGER YI(26)                ! Number of columns in an extension
          STATUS=0
          CALL FTGREC(UNIT,1,REC1,STATUS)
          CALL PERIOD_CASE(REC1, .TRUE.)
-         IF((REC1(1:6).NE.'SIMPLE').OR.(REC1(30:30).NE.'T')) THEN 
+         IF((REC1(1:6).NE.'SIMPLE').OR.(REC1(30:30).NE.'T')) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
-            WRITE(*,*) 
+            WRITE(*,*)
      :         '** ERROR: File is not simple FITS.'
             WRITE(*,*) ' '
             GOTO 10
-         END IF    
+         END IF
 
 *      Try to read the telescope details.
 
@@ -228,7 +228,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
 *      Instrument.
          STATUS=0
          CALL FTGKEY(UNIT,'INSTRUME',STRING,COMMENT,STATUS)
-         IF(STATUS.EQ.0) THEN 
+         IF(STATUS.EQ.0) THEN
             CALL PERIOD_STRIP(STRING,STRING2)
             INST=STRING2
          END IF
@@ -236,7 +236,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
 *      Object.
          STATUS=0
          CALL FTGKEY(UNIT,'OBJECT',STRING,COMMENT,STATUS)
-         IF(STATUS.EQ.0) THEN 
+         IF(STATUS.EQ.0) THEN
             CALL PERIOD_STRIP(STRING,STRING2)
             OBJE=STRING2
          END IF
@@ -244,7 +244,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
 *      Detector name.
          STATUS=0
          CALL FTGKEY(UNIT,'DETNAM',STRING,COMMENT,STATUS)
-         IF(STATUS.EQ.0) THEN 
+         IF(STATUS.EQ.0) THEN
             CALL PERIOD_STRIP(STRING,STRING2)
             DETN=STRING2
          END IF
@@ -272,11 +272,11 @@ C      Determine number of extensions, prior to dynamic array allocation
 *         Increment the extension counter.
              EXTENS=EXTENS+1
 
-         END DO 
+         END DO
 
          EXTENS=EXTENS-1
 
-*      Close down the file.      
+*      Close down the file.
          CALL FTCLOS(UNIT,STATUS)
 
 *      Abort due to lack of suitable extensions.
@@ -302,17 +302,17 @@ C      Dynamically allocate memory.
          STATUS=0
          READWRITE=0
          CALL FTOPEN(UNIT,FILENAME,READWRITE,BLOCKSIZE,STATUS)
-         CALL PERIOD_OGIPEXTNS(%VAL(CNF_PVAL(XIPTR)), 
+         CALL PERIOD_OGIPEXTNS(%VAL(CNF_PVAL(XIPTR)),
      :                         %VAL(CNF_PVAL(YIPTR)),
-     :                         %VAL(CNF_PVAL(HDTPTR)), 
+     :                         %VAL(CNF_PVAL(HDTPTR)),
      :                         %VAL(CNF_PVAL(OKAYPTR)),
-     :                         %VAL(CNF_PVAL(HDCPTR)), 
+     :                         %VAL(CNF_PVAL(HDCPTR)),
      :                         %VAL(CNF_PVAL(HDCCPTR)),
-     :                         %VAL(CNF_PVAL(HDC2PTR)), 
+     :                         %VAL(CNF_PVAL(HDC2PTR)),
      :                         %VAL(CNF_PVAL(EXTNPTR)),
      :                         HEAD1, EXTENS, UNIT)
 
-*      Close down the file.      
+*      Close down the file.
          CALL FTCLOS(UNIT,STATUS)
          CALL PERIOD_DEALL(HDTPTR)
          CALL PERIOD_DEALL(HDC2PTR)
@@ -323,9 +323,9 @@ C      Dynamically allocate memory.
 *      Let the user select the extension to be used.
  150     CONTINUE
          CUREXT=0
-         WRITE(*,'(X,A,$)') 'Enter the extension number ' // 
+         WRITE(*,'(X,A,$)') 'Enter the extension number ' //
      :                      'to be considered (0 to quit) : '
-         READ (*,*,ERR=150) CUREXT 
+         READ (*,*,ERR=150) CUREXT
 
          IF(CUREXT.EQ.0) THEN
             CALL PERIOD_DEALL(OKAYPTR)
@@ -337,7 +337,7 @@ C      Dynamically allocate memory.
          IF((CUREXT.LT.0).OR.(CUREXT.GT.EXTENS)) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
-            WRITE(*,*) 
+            WRITE(*,*)
      :       '** ERROR: No extension of that number!'
             WRITE(*,*) ' '
             GOTO 150
@@ -349,15 +349,15 @@ C      Dynamically allocate memory.
          IF(OKCUREXT.EQ.1) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
-            WRITE(*,*) 
+            WRITE(*,*)
      :       '** ERROR: That extension is unusable!'
             WRITE(*,*) ' '
             GOTO 150
          END IF
 
-         XICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(XIPTR)), 
+         XICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(XIPTR)),
      :                              EXTENS)
-         YICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(YIPTR)), 
+         YICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(YIPTR)),
      :                              EXTENS)
 
          CALL PERIOD_DEALL(OKAYPTR)
@@ -368,7 +368,7 @@ C      Dynamically allocate memory.
          STATUS=0
          READWRITE=0
          CALL FTOPEN(UNIT,FILENAME,READWRITE,BLOCKSIZE,STATUS)
-      
+
 *      Go to the desired extension.
          STATUS=0
          CALL FTMAHD(UNIT,CUREXT,HDUTYPE,STATUS)
@@ -378,7 +378,7 @@ C      Dynamically allocate memory.
          SOFAR=0
          DO 200 I=1,XICUREXT
 
-*         Obtain the column header title.     
+*         Obtain the column header title.
             TTYPE=' '
             CALL FTGKNS(UNIT,'TTYPE',I,1,TTYPE,NFOUND,STATUS)
             WRITE(*,*) I,'             ',TTYPE
@@ -386,7 +386,7 @@ C      Dynamically allocate memory.
 *         Avoid a fast screen scroll.
             SOFAR=SOFAR+1
             IF(SOFAR.EQ.20) THEN
-               WRITE(*,'(X,A,$)') 'Press enter to continue '  
+               WRITE(*,'(X,A,$)') 'Press enter to continue '
                READ (*,'(A)') JUNK
                SOFAR=0
             END IF
@@ -396,7 +396,7 @@ C      Dynamically allocate memory.
 *      Let the user select the column to be used.
  250     CONTINUE
          COLNX=0
-         WRITE(*,'(X,A,$)') 'Enter the TTYPE column number ' // 
+         WRITE(*,'(X,A,$)') 'Enter the TTYPE column number ' //
      :                      'to be read as X (0 to quit) : '
          READ (*,*,ERR=250) COLNX
          IF(COLNX.EQ.0) GOTO 900
@@ -404,7 +404,7 @@ C      Dynamically allocate memory.
          IF((COLNX.LT.0).OR.(COLNX.GT.XICUREXT)) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
-            WRITE(*,*) 
+            WRITE(*,*)
      :       '** ERROR: No column of that number!'
             WRITE(*,*) ' '
             GOTO 250
@@ -413,7 +413,7 @@ C      Dynamically allocate memory.
 *      Let the user select the column to be used.
  300     CONTINUE
          COLNY=0
-         WRITE(*,'(X,A,$)') 'Enter the TTYPE column number ' // 
+         WRITE(*,'(X,A,$)') 'Enter the TTYPE column number ' //
      :                      'to be read as Y (0 to quit) : '
          READ (*,*,ERR=300) COLNY
          IF(COLNY.EQ.0) GOTO 900
@@ -421,7 +421,7 @@ C      Dynamically allocate memory.
          IF((COLNY.LT.0).OR.(COLNY.GT.XICUREXT)) THEN
             CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
-            WRITE(*,*) 
+            WRITE(*,*)
      :       '** ERROR: No column of that number!'
             WRITE(*,*) ' '
             GOTO 300
@@ -433,18 +433,18 @@ C      Dynamically allocate memory.
 *      Let the user select the column to be used.
  350        CONTINUE
             COLNZ=0
-            WRITE(*,'(X,A,$)') 'Enter the TTYPE column number ' // 
+            WRITE(*,'(X,A,$)') 'Enter the TTYPE column number ' //
      :                   'to be read as Y errors (0 to ignore) : '
             READ (*,*,ERR=350) COLNZ
 
 *      Only continue if the user wants this option.
             YERROR=.FALSE.
-            IF(COLNZ.NE.0) THEN      
+            IF(COLNZ.NE.0) THEN
                YERROR=.TRUE.
                IF((COLNZ.LT.0).OR.(COLNZ.GT.XICUREXT)) THEN
                   CALL PERIOD_WRITEBELL()
                   WRITE(*,*) ' '
-                  WRITE(*,*) 
+                  WRITE(*,*)
      :             '** ERROR: No column of that number!'
                   WRITE(*,*) ' '
                   GOTO 350
@@ -452,16 +452,16 @@ C      Dynamically allocate memory.
 
             END IF
 
-         END IF      
+         END IF
          WRITE(*,*) ' '
 
 *      Let the user select the data slot to be used.
  400     CONTINUE
          SLOT=0
-         WRITE(*,'(X,A,$)') 'Enter the slot number into which' // 
+         WRITE(*,'(X,A,$)') 'Enter the slot number into which' //
      :                      ' the data should be read (0 to quit) : '
          READ (*,*,ERR=400) SLOT
-         IF(SLOT.EQ.0) GOTO 900      
+         IF(SLOT.EQ.0) GOTO 900
          IF((SLOT.LT.0).OR.(SLOT.GT.MXSLOT)) THEN
              CALL PERIOD_WRITEBELL()
              WRITE(*,*) ' '
@@ -474,7 +474,7 @@ C      Determine number of data values, prior to dynamic array allocation
 
 *      Tell the user what is going on.
          WRITE(*,*)
-         WRITE(*,*) 'Estimating data quantities for Slot=',SLOT 
+         WRITE(*,*) 'Estimating data quantities for Slot=',SLOT
          WRITE(*,*) ' '
 
 *      Read all the columns.
@@ -514,7 +514,7 @@ C      Determine number of data values, prior to dynamic array allocation
 *         Check the status values. Reject the line if any are bad.
             IF((STATUS1.EQ.0).AND.(STATUS2.EQ.0)
      :                       .AND.(STATUS3.EQ.0)) THEN
-       
+
 *         Check the undefined values. Reject the line if any are found.
                IF((.NOT.TEST1).AND.(.NOT.TEST2)
      :                       .AND.(.NOT.TEST3)) THEN
@@ -560,7 +560,7 @@ C      Dynamically allocate memory.
 
 *      Tell the user what is going on.
          WRITE(*,*)
-         WRITE(*,*) 'Reading data into Slot=',SLOT 
+         WRITE(*,*) 'Reading data into Slot=',SLOT
          WRITE(*,*) ' '
 
 *      Read all the columns.
@@ -601,7 +601,7 @@ C      Dynamically allocate memory.
 *         Check the status values. Reject the line if any are bad.
             IF((STATUS1.EQ.0).AND.(STATUS2.EQ.0)
      :                       .AND.(STATUS3.EQ.0)) THEN
-       
+
 *         Check the undefined values. Reject the line if any are found.
                IF((.NOT.TEST1).AND.(.NOT.TEST2)
      :                       .AND.(.NOT.TEST3)) THEN
@@ -609,7 +609,7 @@ C      Dynamically allocate memory.
 
 *               Store the values.
                   CALL PERIOD_OGIPSTORE(DVAL1, DVAL2, DVAL3,
-     :                                  THISROW, 
+     :                                  THISROW,
      :                                  %VAL(CNF_PVAL(JUNK2PTR)),
      :                                  NUMROWS, MXCOL)
                END IF
@@ -623,9 +623,9 @@ C      Dynamically allocate memory.
 
          IFAIL = 0
 
-         CALL PERIOD_OGIPSORTCYCLE(%VAL(CNF_PVAL(YSLOT1)), 
+         CALL PERIOD_OGIPSORTCYCLE(%VAL(CNF_PVAL(YSLOT1)),
      :                             NUMROWS, MXCOL,
-     :                             %VAL(CNF_PVAL(JUNK2PTR)), 
+     :                             %VAL(CNF_PVAL(JUNK2PTR)),
      :                             %VAL(CNF_PVAL(JUNK1PTR)),
      :                             %VAL(CNF_PVAL(KEYPTR)), IFAIL)
 
@@ -647,7 +647,7 @@ C      Dynamically allocate memory.
          WRITE(*,*) '** OK: Filled Slot=', SLOT
          WRITE(*,*) ' '
          INFILEARRAY(SLOT)='OGIP FITS File=' // TEMPS
-        
+
          YERRORARRAY(SLOT)=YERROR
          DETRENDARRAY(SLOT)=.FALSE.
          NPTSARRAY(SLOT)=NUMROWS
@@ -656,9 +656,9 @@ C      Dynamically allocate memory.
          CALL PERIOD_DEALL(KEYPTR)
          CALL PERIOD_DEALL(JUNK1PTR)
          CALL PERIOD_DEALL(JUNK2PTR)
- 
+
  650     CONTINUE
-         WRITE(*, '(X,A,$)') 'Would you like to read the ' // 
+         WRITE(*, '(X,A,$)') 'Would you like to read the ' //
      :                       'file again ? [N]  : '
          READ (*, '(A)', ERR=650) AGAINS
          CALL PERIOD_CASE(AGAINS, .TRUE.)
@@ -669,7 +669,7 @@ C      Dynamically allocate memory.
       END DO
 
  900  CONTINUE
-     
+
 
       RETURN
       END

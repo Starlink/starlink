@@ -106,12 +106,12 @@
 *     2006 August 1 (MJC):
 *        Modified some units strings to conform to the FITS standard.
 *     2006 September 10 (MNB):
-*        Added WLEN column and additional keyword WLNSUSD for standard 
+*        Added WLEN column and additional keyword WLNSUSD for standard
 *        FIBRE table.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -193,7 +193,7 @@
       CHARACTER * ( 13 ) TTYIFU( MXCIFU ) ! IFU table field names
       CHARACTER * ( 13 ) TUNIT( MXCSTD ) ! Binary-table field units
       CHARACTER * ( 13 ) TUNIFU( MXCIFU ) ! IFU table field units
-      
+
 
 *  Local Data:
       DATA TDESC / 'Object name', 'J2000 mean Right Ascension',
@@ -215,7 +215,7 @@
      :             'COMMENT', 'RETRACTOR', 'SWITCHFIELD',
      :             'SWITCHPARTNER', 'WLEN' /
 
-      DATA TUNIT / ' ', 'rad', 'rad', 'um', 'um', 'um', 'um', 'rad', 
+      DATA TUNIT / ' ', 'rad', 'rad', 'um', 'um', 'um', 'um', 'rad',
      :             ' ', ' ', 'mag', ' ', ' ', ' ', ' ', 'bin', 'A' /
 
       DATA TDEIFU / 'Spectrum Identifier',
@@ -228,18 +228,18 @@
      :              'Pivot number',
      :              'ID from fibres_ifu.txt',
      :              'X pos. within the spiral grid',
-     :              'Y pos. within the spiral grid', 
+     :              'Y pos. within the spiral grid',
      :              'Type code either U, D, P or S',
      :              'Name' /
 
       DATA TFOIFU / '1J', '1J', '1J', '1J', '1J', '1D', '1D', '1J',
      :              '16A', '1J', '1J', '1A', '8A' /
 
-      DATA TTYIFU / 'SPEC_ID', 'SELECTED', 'NSPAX', 'SPEC_LEN', 
+      DATA TTYIFU / 'SPEC_ID', 'SELECTED', 'NSPAX', 'SPEC_LEN',
      :              'SPEC_STA', 'XPOS', 'YPOS', 'GROUP_N',
      :              'SPAX_ID', 'XGPOS', 'YGPOS', 'TYPE' , 'NAME' /
 
-      DATA TUNIFU / ' ', ' ', ' ', ' ', ' ', 'arcsec', 
+      DATA TUNIFU / ' ', ' ', ' ', ' ', ' ', 'arcsec',
      :              'arcsec', ' ', ' ', ' ', ' ', ' ', ' ' /
 
 *.
@@ -265,7 +265,7 @@
       ELSE
           MXCOMP = MXCSTD
       ENDIF
-      
+
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
       FSTAT = FITSOK
@@ -319,7 +319,7 @@
          CRDNAM = 'TFORM'
          CALL CHR_APPND( CN, CRDNAM, NC )
 
-*  FITSIO does not permit cards to be placed after a named card; 
+*  FITSIO does not permit cards to be placed after a named card;
 *  it requires that we read that named card first.
          CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
 
@@ -335,12 +335,12 @@
 *  by NaNs and don't have TNULLn cards.  Null character values are
 *  recognised by the presence of the ASCII null as the first character.
          IF ( TFORM( I ) .EQ. '1J ') THEN
-            
+
 *  Insert the TNULLn card.
             CALL FTIKYJ( FUNIT, CRDNAM, VAL__BADI, 'Null value', FSTAT )
 
          ELSE IF ( TFORM( I ) .EQ. '1I' ) THEN
-              
+
 *  Insert the TNULLn card.  There is no FTIKYI routine so equate the
 *  word bad value to an integer and create an integer-valued card.
             IVALUE = VAL__BADW
@@ -361,13 +361,13 @@
 *  Write the TDISPn cards for table viewers.
 *  =========================================
 
-*  In most cases default display formats are likely to be fine.  Only 
+*  In most cases default display formats are likely to be fine.  Only
 *  the following certainly look wrong using CURSA.
-         IF ( TTYPE( I ) .EQ. 'X' .OR. 
-     :        TTYPE( I ) .EQ. 'Y' .OR. 
-     :        TTYPE( I ) .EQ. 'MAGNITUDE' .OR. 
+         IF ( TTYPE( I ) .EQ. 'X' .OR.
+     :        TTYPE( I ) .EQ. 'Y' .OR.
+     :        TTYPE( I ) .EQ. 'MAGNITUDE' .OR.
      :        TTYPE( I ) .EQ. 'PID' ) THEN
- 
+
 *  Form the name of the keyword which will immediately precede the
 *  inserted TNULLn card.
             NC = 5
@@ -426,7 +426,7 @@
 *  The scalar primitive components of this structure are to be made
 *  into FITS headers located in the binary table, using their names as
 *  keywords, where that is possible.
-*  
+*
 *  Get a locator to the FIELD structure.
       CALL DAT_FIND( LOC, 'FIELD', FLOC, STATUS )
 
@@ -512,55 +512,55 @@
 *  UNALLOCOBJ
          ELSE IF ( KEYWRD .EQ. 'UNAL-OBJ' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Number of unallocated objects', FSTAT )
 
 *  UNALLOCGUI
          ELSE IF ( KEYWRD .EQ. 'UNAL-GUI' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Number of unallocated guide stars', FSTAT )
 
 *  UNALLOCSKY
          ELSE IF ( KEYWRD .EQ. 'UNAL-SKY' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Number of unallocated skies', FSTAT )
 
 *  ALLOCOBJ
          ELSE IF ( KEYWRD .EQ. 'ALLOCOBJ' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Number of allocated objects', FSTAT )
 
 *  ALLOCGUI
          ELSE IF ( KEYWRD .EQ. 'ALLOCGUI' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Number of allocated guide stars', FSTAT )
 
 *  ALLOCSKY
          ELSE IF ( KEYWRD .EQ. 'ALLOCSKY' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Number of unallocated skies', FSTAT )
 
 *  XSWITCHOFFSET
          ELSE IF ( KEYWRD .EQ. 'XSWTCHOF' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Beam switch offset X (um)', FSTAT )
 
 *  YSWITCHOFFSET
          ELSE IF ( KEYWRD .EQ. 'YSWTCHOF' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :                   'Beam switch offset Y (um)', FSTAT )
 
 *  WLNSUSD
          ELSE IF ( KEYWRD .EQ. 'WLNSUSD' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
-            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE,
      :         'No of Fibres using the specific wavelength', FSTAT )
 
 * -------------------------------
@@ -572,12 +572,12 @@
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Atmospheric pressure (millibars)', FSTAT )
-     
+
 *  ATMHRUM
          ELSE IF ( KEYWRD .EQ. 'ATMHRUM' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Atmospheric relative humidity (percent)', 
+     :                   'Atmospheric relative humidity (percent)',
      :                   FSTAT )
 
 *  ATMTEMP
@@ -585,25 +585,25 @@
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Atmospheric temperature (K)', FSTAT )
-     
+
 *  WLEN
          ELSE IF ( KEYWRD .EQ. 'WLEN' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Refraction wavelength (nm)', FSTAT )
-     
+
 *  TELMA
          ELSE IF ( KEYWRD .EQ. 'TELMA' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'AAT CCS MA value', FSTAT )
-     
+
 *  TELME
          ELSE IF ( KEYWRD .EQ. 'TELME' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'AAT CCS ME value', FSTAT )
-     
+
 *  TELNP
          ELSE IF ( KEYWRD .EQ. 'TELNP' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
@@ -615,89 +615,89 @@
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'AAT CCS CH value', FSTAT )
-     
+
 *  TELHF
          ELSE IF ( KEYWRD .EQ. 'TELHF' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'AAT CCS HF value', FSTAT )
-     
+
 *  PA
          ELSE IF ( KEYWRD .EQ. 'PA' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Rotator Position Angle (deg)', FSTAT )
-     
+
 *  INST_ROT
          ELSE IF ( KEYWRD .EQ. 'INST_ROT' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Instrument mount rotation (deg)', FSTAT )
-     
+
 *  INSTOFFX
          ELSE IF ( KEYWRD .EQ. 'INSTOFFX' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Offset of instrument centre in X (um)', 
+     :                   'Offset of instrument centre in X (um)',
      :                   FSTAT )
-     
+
 *  INSTOFFY
          ELSE IF ( KEYWRD .EQ. 'INSTOFFY' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Offset of instrument centre in Y (um)',
      :                   FSTAT )
-     
+
 *  TCRVL6
          ELSE IF ( KEYWRD .EQ. 'TCRVL6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Reference pixel J2000 Right Ascension (deg)', 
+     :                   'Reference pixel J2000 Right Ascension (deg)',
      :                   FSTAT )
-     
+
 *  TCRVL7
          ELSE IF ( KEYWRD .EQ. 'TCRVL7' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Reference pixel J2000 Declination (deg)',
      :                   FSTAT )
-     
+
 *  TCRPX6
          ELSE IF ( KEYWRD .EQ. 'TCRPX6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Reference pixel x', FSTAT )
-     
+
 *  TCRPX7
          ELSE IF ( KEYWRD .EQ. 'TCRPX7' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Reference pixel y', FSTAT )
-     
+
 *  TC6_6
          ELSE IF ( KEYWRD .EQ. 'TC6_6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Pixel transformation', FSTAT )
-     
+
 *  TC6_7
          ELSE IF ( KEYWRD .EQ. 'TC6_7' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Pixel transformation', FSTAT )
-     
+
 *  TC7_6
          ELSE IF ( KEYWRD .EQ. 'TC7_6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Pixel transformation ', FSTAT )
-     
+
 *  TC7_7
          ELSE IF ( KEYWRD .EQ. 'TC7_7' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Pixel transformation', FSTAT )
-     
+
 *  TCDLT6
          ELSE IF ( KEYWRD .EQ. 'TCDLT6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
@@ -709,19 +709,19 @@
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Co-ordinate increment', FSTAT )
-     
+
 *  TP66
          ELSE IF ( KEYWRD .EQ. 'TP66' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Transformation matrix', FSTAT )
-     
+
 *  TP67
          ELSE IF ( KEYWRD .EQ. 'TP67' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Transformation matrix', FSTAT )
-     
+
 *  TP76
          ELSE IF ( KEYWRD .EQ. 'TP76' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
@@ -733,31 +733,31 @@
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Transformation matrix', FSTAT )
-     
+
 *  TCRD6
          ELSE IF ( KEYWRD .EQ. 'TCRD6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Random error in X', FSTAT )
-     
+
 *  TCRD7
          ELSE IF ( KEYWRD .EQ. 'TCRD7' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Random error in Y', FSTAT )
-     
+
 *  TCSY6
          ELSE IF ( KEYWRD .EQ. 'TCSY6' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Systematic error in X', FSTAT )
-     
+
 *  TCSY7
          ELSE IF ( KEYWRD .EQ. 'TCSY7' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
      :                   'Systematic error in Y', FSTAT )
-     
+
 
 
 *  The 2dF software seems to put in ASCII null characters perhaps due to
@@ -823,7 +823,7 @@
             NC = CHR_LEN( CVALUE( :64 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
      :                   'Unit Type', FSTAT )
-	    
+
 *  TCTYP7
          ELSE IF ( KEYWRD .EQ. 'TCTYP7' ) THEN
             CALL DAT_GET0C( CLOC, CVALUE, STATUS )
@@ -831,21 +831,21 @@
             NC = CHR_LEN( CVALUE( :64 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
      :                   'Unit Type', FSTAT )
-	    
+
 *  TCUNI6
          ELSE IF ( KEYWRD .EQ. 'TCUNI6' ) THEN
             CALL DAT_GET0C( CLOC, CVALUE, STATUS )
             CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
             NC = CHR_LEN( CVALUE( :64 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), 'Unit', FSTAT )
-	    
+
 *  TCUNI7
          ELSE IF ( KEYWRD .EQ. 'TCUNI7' ) THEN
             CALL DAT_GET0C( CLOC, CVALUE, STATUS )
             CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
             NC = CHR_LEN( CVALUE( :64 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), 'Unit', FSTAT )
-	    
+
 *  TWCS6
          ELSE IF ( KEYWRD .EQ. 'TWCS6' ) THEN
             CALL DAT_GET0C( CLOC, CVALUE, STATUS )
@@ -853,7 +853,7 @@
             NC = CHR_LEN( CVALUE( :64 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
      :                   'Co-ordinate name', FSTAT )
-	    
+
 
 *  TWCS7
          ELSE IF ( KEYWRD .EQ. 'TWCS7' ) THEN
@@ -862,7 +862,7 @@
             NC = CHR_LEN( CVALUE( :64 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
      :                   'Co-ordinate name', FSTAT )
-	    
+
          END IF
 
 *  Tidy the locator to the object.
@@ -896,7 +896,7 @@
          IF ( TFORM( I ) .EQ. '80A'  .OR. TFORM( I ) .EQ. '16A' .OR.
      :        TFORM( I ) .EQ. '10A'  .OR. TFORM( I ) .EQ. '8A' .OR.
      :        TFORM( I ) .EQ. '1A' ) THEN
- 
+
             IF ( THERE ) THEN
 
 *  Obtain the length in characters of the component and map its values.
@@ -906,7 +906,7 @@
 *     :                          STATUS, %VAL( STRLEN ) )
 
 *  Transfer the values to the binary-table column.
-                CALL FTPCLS( FUNIT, I, 1, 1, EL, 
+                CALL FTPCLS( FUNIT, I, 1, 1, EL,
      :                       %VAL( CNF_PVAL( OPNTR ) ),
      :                       FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
 
@@ -937,7 +937,7 @@
 
 *  Transfer the values to the binary-table column.  Replace Starlink bad
 *  values with NaNs.
-                CALL FTPCND( FUNIT, I, 1, 1, EL, 
+                CALL FTPCND( FUNIT, I, 1, 1, EL,
      :                       %VAL( CNF_PVAL( OPNTR ) ),
      :                       VAL__BADD, FSTAT )
 
@@ -945,15 +945,15 @@
                 CALL DAT_UNMAP( CLOC, STATUS )
 
 *  Need to create a column of null values.  First fill a work array with
-*  bad values.  
+*  bad values.
              ELSE
                 CALL PSX_CALLOC( EL, '_DOUBLE', OPNTR, STATUS )
-                CALL CON_CONSD( VAL__BADD, EL, 
+                CALL CON_CONSD( VAL__BADD, EL,
      :                          %VAL( CNF_PVAL( OPNTR ) ), STATUS )
 
 *  Transfer the bad values to the binary-table column.  Replace
 *  Starlink bad values with NaNs.
-                CALL FTPCND( FUNIT, I, 1, 1, EL, 
+                CALL FTPCND( FUNIT, I, 1, 1, EL,
      :                       %VAL( CNF_PVAL( OPNTR ) ),
      :                       VAL__BADD, FSTAT )
 
@@ -973,7 +973,7 @@
      :                         STATUS )
 
 *  Transfer the values to the binary-table column.
-                CALL FTPCLJ( FUNIT, I, 1, 1, EL, 
+                CALL FTPCLJ( FUNIT, I, 1, 1, EL,
      :                       %VAL( CNF_PVAL( OPNTR ) ), FSTAT )
 
 *  Unmap the component.
@@ -999,7 +999,7 @@
      :                         STATUS )
 
 *  Transfer the values to the binary-table column.
-                CALL FTPCLI( FUNIT, I, 1, 1, EL, 
+                CALL FTPCLI( FUNIT, I, 1, 1, EL,
      :                       %VAL( CNF_PVAL( OPNTR ) ), FSTAT )
 
 *  Unmap the component.

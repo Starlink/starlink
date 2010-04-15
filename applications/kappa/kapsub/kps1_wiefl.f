@@ -27,7 +27,7 @@
 *         |H|   +  ----
 *                   Pg
 *
-*            *                                                   2 
+*            *                                                   2
 *     where H  is the complex conjugate of the FT of the PSF, |H|  is
 *     the square of the modulus of the FT of the PSF, Pn is the mean
 *     noise power per pixel in the input image, and Pg is the mean power
@@ -56,12 +56,12 @@
 *     FILE_6( EL ) = REAL (Given and Returned)
 *        The 2-d power spectrum for the model image.  If QUIET is
 *        .FALSE., this will be returned with the noise power given by
-*        PN subtracted from every pixel. 
+*        PN subtracted from every pixel.
 *     FILE_3( EL ) = REAL (Given and Returned)
 *        On input it is the Fourier transform of the PSF.  Upon return
 *        it is the Fourier transform of the Wiener filter function.
 *     FILE_2( EL ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -104,21 +104,21 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER EL
       INTEGER M
       INTEGER N
       REAL PN
       LOGICAL QUIET
-      
+
 *  Arguments Given and Returned:
       REAL FILE_6( EL )
       REAL FILE_3( EL )
 
 *  Arguments Returned:
       REAL FILE_2( EL )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -176,5 +176,5 @@
 *  Multiply the reciprocal of the filter denominator by the complex
 *  conjugate of the FT of the PSF.  The result is the final filter.
       CALL KPG1_HMLTR( M, N, FILE_3, FILE_2, FILE_3, STATUS )
-      
+
       END

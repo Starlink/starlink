@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,7 +132,7 @@
 *           The NDF's access mode.
 *        DCB_PATH( NDF__MXDCB ) = CHARACTER * ( NDF__SZPTH ) (Write)
 *           Data object HDS path name.
-      
+
       INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
 *        TCB_SHCVT = LOGICAL (Read)
 *           Whether to display information about format conversion
@@ -199,7 +199,7 @@
          SAVE = ( .NOT. DISPOS ) .OR.
      :          ( ( DCB_DSP( IDCB ) .EQ. 'KEEP' ) .AND.
      :            ( ( IFMT .EQ. 0 ) .OR. DCB_FORKP( IDCB ) ) )
-      
+
 *  Determine which foreign format code should be used when deleting
 *  foreign files. If the file did not exist prior to being accessed by
 *  the NDF_ library, then only a dummy (empty) placeholder file will
@@ -257,8 +257,8 @@
          IF ( CVT ) THEN
 
 *  Check that a conversion command is available. An error is reported if not.
-            CALL NDF1_CVCMD( DCB_FORFL( IDCB ), IFMT, DCB_LOC( IDCB ), 
-     :                       ' ', .FALSE., .TRUE., DEF, CMD, LCMD, 
+            CALL NDF1_CVCMD( DCB_FORFL( IDCB ), IFMT, DCB_LOC( IDCB ),
+     :                       ' ', .FALSE., .TRUE., DEF, CMD, LCMD,
      :                       STATUS )
 
 *  If conversion to a foreign file format is required, and a conversion
@@ -268,15 +268,15 @@
 
 *  Convert the NDF to the foreign file format.
                CALL ERR_BEGIN( STATUS )
-               CALL NDF1_CVFOR( DCB_FORFL( IDCB ), IFMT, 
-     :                          DCB_LOC( IDCB ), ' ', .FALSE., 
+               CALL NDF1_CVFOR( DCB_FORFL( IDCB ), IFMT,
+     :                          DCB_LOC( IDCB ), ' ', .FALSE.,
      :                          STATUS )
 
 *  If this appears to have succeeded, then check that the foreign file
 *  now exists. If not, then something has gone wrong with the
 *  conversion process, so report an error.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL NDF1_FILEX( DCB_FORFL( IDCB ), ' ', .FALSE., 
+                  CALL NDF1_FILEX( DCB_FORFL( IDCB ), ' ', .FALSE.,
      :                             THERE, STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      IF ( .NOT. THERE ) THEN

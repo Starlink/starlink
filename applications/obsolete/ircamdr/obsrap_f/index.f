@@ -38,7 +38,7 @@
 *     22-07-1986 : First implementation (REVA::CAA)
 *     24-11-1986 : added time file creation (HILO::CAA)
 *     04-03-1987 : added list filename input (HILO::CAA)
-*     23-Jun-1994  Changed LIB$ and STR$ to FIO_, CHR_, 
+*     23-Jun-1994  Changed LIB$ and STR$ to FIO_, CHR_,
 *                  TYPE to ERR_REP     (SKL@JACH)
 *
 * Type definitions :
@@ -81,7 +81,7 @@
 	REAL PIXELPITCH			! pitch of pixel in array
 	REAL PLATESCALE			! plate scale of observations
 
-	CHARACTER*20 ARRAYTYPE		! array type 
+	CHARACTER*20 ARRAYTYPE		! array type
 	CHARACTER*20 CONFIGURATION	! configuration parameter
 	CHARACTER*80 CONTNAME		! name of container file specified
 	CHARACTER*132 DASHING		! dashed line string
@@ -148,7 +148,7 @@
 
 	CALL SUBPAR_PUTNAME ( IMCODE, CONTNAME( 1:LEN), STATUS)
 
-*      associate container file 
+*      associate container file
 
 	CALL DAT_ASSOC( 'CONTAINER', 'READ', LOCTOP, STATUS )
 
@@ -214,7 +214,7 @@
 
 	CALL DAT_FIND( LOCGEN, 'INSTRUMENT', LOCINST, STATUS)
 	if( status .ne. sai__ok) then
-          CALL ERR_REP('ERR', 'Error after find INSTRUMENT ...', 
+          CALL ERR_REP('ERR', 'Error after find INSTRUMENT ...',
      :                         STATUS )
 	  return
 	end if
@@ -245,7 +245,7 @@
 	  CALL DAT_ANNUL( LOCTOP, STAT)
 
           CALL ERR_REP('ERR', 'Ho hum ... bit of a problem guys ...',
-     :                 STATUS ) 
+     :                 STATUS )
 
 	  RETURN
 
@@ -355,7 +355,7 @@
 	  CALL DAT_ANNUL( LOCGEN, STAT)
 	  CALL DAT_ANNUL( LOCTOP, STAT)
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                 'Bombed out after GENERAL info section ...',
      :                 STATUS )
 
@@ -412,7 +412,7 @@
 
 *        form the instrument string and write it
 
-	  CALL CHR_UCASE( INSTRUMENT) 
+	  CALL CHR_UCASE( INSTRUMENT)
           CALL CHR_CLEAN(  INSTRUMENT)
           LEN1 = 0
 	  CALL CHR_APPND( INSTRUMENT,INSTRUMENT, LEN1)
@@ -428,7 +428,7 @@
           CALL CHR_CLEAN( STRING )
           STRLEN = 0
 	  CALL CHR_APPND( STRING, STRING, STRLEN)
-	  CALL CHR_UCASE( SOFTWARE) 
+	  CALL CHR_UCASE( SOFTWARE)
           CALL CHR_CLEAN( SOFTWARE)
           LEN1 = 0
 	  CALL CHR_APPND( SOFTWARE, SOFTWARE, LEN1)
@@ -468,7 +468,7 @@
 
 	  WRITE( LUN, '(A)') ' '
 
-*        form the array type string 
+*        form the array type string
 
 	  CALL CHR_UCASE( ARRAYTYPE )
           CALL CHR_CLEAN( ARRAYTYPE )
@@ -481,10 +481,10 @@
 
 *        form the array size string and write it
 
-          CALL CHR_ITOC( NUMCOLS, STRVAL1, LEN1 ) 
-          CALL CHR_ITOC( NUMROWS, STRVAL2, LEN2 ) 
+          CALL CHR_ITOC( NUMCOLS, STRVAL1, LEN1 )
+          CALL CHR_ITOC( NUMROWS, STRVAL2, LEN2 )
 
-	  STRING = STRING( 1:STRLEN) // '     :     Array size is ' // 
+	  STRING = STRING( 1:STRLEN) // '     :     Array size is ' //
      :             STRVAL1( 1:LEN1) // ' by ' // STRVAL2( 1:LEN2) //
      :             ' pixels'
           CALL CHR_CLEAN( STRING )
@@ -497,7 +497,7 @@
 *        form the pixel pitch and plate scale strings and write them out
 
           CALL CHR_RTOC( PIXELPITCH, STRVAL1, LEN1)
-          CALL CHR_RTOC( PLATESCALE, STRVAL2, LEN2) 
+          CALL CHR_RTOC( PLATESCALE, STRVAL2, LEN2)
 
 	  STRING = 'Plate Scale = ' // STRVAL2( 1:LEN2) // ' "/pixel' //
      :	           '     :     Pixel Pitch = ' // STRVAL1( 1:LEN1) //
@@ -522,7 +522,7 @@
 
 *        form the origin string and write it
 
-	  CALL CHR_UCASE( ORIGIN ) 
+	  CALL CHR_UCASE( ORIGIN )
           CALL CHR_CLEAN( ORIGIN )
           LEN1 = 0
 	  CALL CHR_APPND( ORIGIN, ORIGIN, LEN1)
@@ -558,7 +558,7 @@
 
 	  WRITE( LUN, '(A)') ' '
 
-	  STRING = 'OBSERVATION listing requested from element number ' // 
+	  STRING = 'OBSERVATION listing requested from element number ' //
      :	           STRVAL1( 1:LEN1) // ' to ' // STRVAL2( 1:LEN2)
           CALL CHR_CLEAN( STRING )
           STRLEN = 0
@@ -812,7 +812,7 @@
 	  CALL CHR_APPND( STRING, STRING, STRLEN)
 	  CALL MSG_OUT ( 'BLANK', ' ', STATUS)
 
-*        form the array type string 
+*        form the array type string
 
           CALL CHR_CLEAN( ARRAYTYPE )
           LEN1 = 0
@@ -827,7 +827,7 @@
           CALL CHR_ITOC( NUMCOLS,  STRVAL1, LEN1)
           CALL CHR_ITOC( NUMROWS,  STRVAL2, LEN2)
 
-	  STRING = STRING( 1:STRLEN) // '     :     Array size is ' // 
+	  STRING = STRING( 1:STRLEN) // '     :     Array size is ' //
      :             STRVAL1( 1:LEN1) // ' by ' // STRVAL2( 1:LEN2) //
      :             ' pixels'
           CALL CHR_CLEAN( STRING )
@@ -899,7 +899,7 @@
 
 	  CALL MSG_OUT ( 'BLANK', ' ', STATUS)
 
-	  STRING = 'OBSERVATION listing requested from element number ' // 
+	  STRING = 'OBSERVATION listing requested from element number ' //
      :	           STRVAL1( 1:LEN1) // ' to ' // STRVAL2( 1:LEN2)
           CALL CHR_CLEAN( STRING )
           STRLEN = 0
@@ -1021,7 +1021,7 @@
 	    STRING = STRING( 1:CHARUP2) // STRVAL1( 1:10) // ' '
 
 	    CHARUP2 = 121
-  
+
             CALL CHR_CLEAN( STRING )
             STRLEN = 0
             CALL CHR_APPND( STRING, STRING, STRLEN)
@@ -1050,7 +1050,7 @@
 
 	  IF( TIMEFILE .EQ. 'YES' .OR. TIMEFILE .EQ. 'Y') THEN
 
-	    CLOSE( LUN_T)               
+	    CLOSE( LUN_T)
 
             CALL FIO_PUNIT( LUN_T, STATUS )
 

@@ -4,7 +4,7 @@
 *     ZAPLIN
 
 *  Purpose:
-*     Replaces regions in a two-dimensional NDF by bad values or by 
+*     Replaces regions in a two-dimensional NDF by bad values or by
 *     linear interpolation.
 
 *  Language:
@@ -22,18 +22,18 @@
 
 *  Description:
 *     This routine replaces selected areas within a two-dimensional
-*     input NDF (specified by parameter IN), either by filling the 
-*     areas with bad values, or by linear interpolation between 
+*     input NDF (specified by parameter IN), either by filling the
+*     areas with bad values, or by linear interpolation between
 *     neighbouring data values (see parameter ZAPTYPE).  Each area to be
-*     replaced can be either a range of pixel columns extending the 
-*     full height of the image, a range of pixel lines extending the 
-*     full width of the image, or a rectangular region with edges 
+*     replaced can be either a range of pixel columns extending the
+*     full height of the image, a range of pixel lines extending the
+*     full width of the image, or a rectangular region with edges
 *     parallel to the pixel axes (see parameter LINCOL).
 *
-*     The bounds of the area to be replaced can be specified either by 
-*     using a graphics cursor, or directly in response to parameter 
+*     The bounds of the area to be replaced can be specified either by
+*     using a graphics cursor, or directly in response to parameter
 *     prompts, or by supplying a text file containing the bounds (see
-*     parameter MODE).  In the first two modes the application loops 
+*     parameter MODE).  In the first two modes the application loops
 *     asking for new areas to zap, until told to quit or an error is
 *     encountered.  In the last mode processing stops when the end of
 *     file is found.  An output text file may be produced containing a
@@ -42,7 +42,7 @@
 *     subsequent invocation of ZAPLIN.
 
 *  Usage:
-*     zaplin in out [title] { lincol=? 
+*     zaplin in out [title] { lincol=?
 *                           { columns=? lines=?
 *                           { colin=?
 *                           mode
@@ -51,20 +51,20 @@
 *     COLIN = FILENAME (Read)
 *        The name of a text file containing the bounds of the areas to
 *        be replaced.  This parameter is only accessed if parameter MODE
-*        is set to "File".  Each record in the file must be either a 
+*        is set to "File".  Each record in the file must be either a
 *        blank line, a comment (indicated by a "!" or "#" in column 1 ),
 *        or a definition of an area to be replaced, consisting of three
 *        or four space-separated fields.  If a range of columns is to be
 *        replaced, each of the first two fields should be a formatted
-*        value for the first axis of the current co-ordinate Frame of 
-*        the input NDF, and the third field should be the single 
+*        value for the first axis of the current co-ordinate Frame of
+*        the input NDF, and the third field should be the single
 *        character "C".  If a range of lines is to be replaced, each of
 *        the first two fields should be a formatted value for the second
-*        axis of the current co-ordinate Frame, and the third field 
+*        axis of the current co-ordinate Frame, and the third field
 *        should be the single character "L".  If a rectangular region is
 *        to be replaced, the first two fields should give the formatted
 *        values on axes 1 and 2 at one corner of the box, and the second
-*        two fields should give the formatted values on axes 1 and 2 at 
+*        two fields should give the formatted values on axes 1 and 2 at
 *        the opposite corner of the box.
 *     COLOUT = FILENAME (Read)
 *        The name of an output text file in which to store descriptions
@@ -72,37 +72,37 @@
 *        application.  It has the same format as the input file accessed
 *        using parameter COLIN, and so may be used as input on a
 *        subsequent invocation.  This parameter is not accessed if
-*        parameter MODE is set to "File".  If COLOUT is null (!), no 
+*        parameter MODE is set to "File".  If COLOUT is null (!), no
 *        file will be created.  [!]
 *     COLUMNS = LITERAL (Read)
 *        A pair of X values indicating the range of columns to be
-*        replaced.  All columns between the supplied values will be 
-*        replaced.  This parameter is only accessed if parameter LINCOL 
+*        replaced.  All columns between the supplied values will be
+*        replaced.  This parameter is only accessed if parameter LINCOL
 *        is set to "Columns" or "Region", and parameter MODE is set to
 *        "Interface".  Each X value should be given as a formatted value
-*        for axis 1 of the current co-ordinate Frame of the input NDF. 
+*        for axis 1 of the current co-ordinate Frame of the input NDF.
 *        The two values should be separated by a comma, or by one or
 *        more spaces.
 *     DEVICE = DEVICE (Read)
-*        The graphics device to use if parameter MODE is set to 
+*        The graphics device to use if parameter MODE is set to
 *        "Cursor".  [Current graphics device]
 *     IN = NDF (Read)
 *        The input image.
 *     LINCOL = LITERAL (Read)
-*        The type of area is to be replaced.  This parameter is only 
+*        The type of area is to be replaced.  This parameter is only
 *        accessed if parameter MODE is set to "Cursor" or "Interface".
 *        The options are as follows.
 *
-*        - "Lines" -- Replaces lines of pixels between the Y values 
+*        - "Lines" -- Replaces lines of pixels between the Y values
 *        specified by parameter LINES.  Each replaced line extends the
 *        full width of the image.
 *
-*        - "Columns" -- Replaces columns of pixels between the X values 
-*        specified by parameter COLUMNS.  Each replaced column extends 
+*        - "Columns" -- Replaces columns of pixels between the X values
+*        specified by parameter COLUMNS.  Each replaced column extends
 *        the full height of the image.
 *
 *        - "Region" -- Replaces the rectangular region of pixels within
-*        the X and Y bounds specified by parameters COLUMNS and LINES. 
+*        the X and Y bounds specified by parameters COLUMNS and LINES.
 *        The edges of the box are parallel to the pixel axes.
 *
 *        If this parameter is specified on the command line, and
@@ -110,7 +110,7 @@
 *        replaced; otherwise a series of areas will be replaced until a
 *        null (!) value is supplied for this parameter.
 *     LINES = LITERAL (Read)
-*        A pair of Y values indicating the range of lines to be 
+*        A pair of Y values indicating the range of lines to be
 *        replaced.  All lines between the supplied values will be
 *        replaced.  This parameter is only accessed if parameter LINCOL
 *        is set to "Lines" or "Region", and parameter MODE is set to
@@ -122,9 +122,9 @@
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Mark".  It specifies the type of marker with which each
 *        cursor position should be marked, and should be given as an
-*        integer PGPLOT marker type.  For instance, 0 gives a box, 1 
-*        gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a 
-*        triangle.  The value must be larger than or equal to -31.  
+*        integer PGPLOT marker type.  For instance, 0 gives a box, 1
+*        gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
+*        triangle.  The value must be larger than or equal to -31.
 *        [current value]
 *     MODE = LITERAL (Read)
 *        The method used to obtain the bounds of the areas to be
@@ -133,9 +133,9 @@
 *
 *        - "Interface" -- bounds are obtained using parameters COLUMNS,
 *        and LINES.  The type of area to be replaced is specified using
-*        parameter LINCOL.  
+*        parameter LINCOL.
 *
-*        - "Cursor" -- bounds are obtained using the graphics cursor of 
+*        - "Cursor" -- bounds are obtained using the graphics cursor of
 *        the device specified by parameter DEVICE.  The type of area to
 *        be replaced is specified using parameter LINCOL.  The WCS
 *        information stored with the picture in the graphics database is
@@ -145,7 +145,7 @@
 *        output NDF were aligned.  Graphics may be drawn over the image
 *        indicating the region to be replaced (see parameter PLOT).
 *
-*        - "File" -- the bounds and type of each area to be replaced 
+*        - "File" -- the bounds and type of each area to be replaced
 *        are supplied in the text file specified by parameter COLIN.
 *
 *        [current value]
@@ -162,8 +162,8 @@
 *        The output image.
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark each cursor position.
-*        The appearance of these graphics (colour, size, etc ) is 
-*        controlled by the STYLE parameter.  PLOT can take any of the 
+*        The appearance of these graphics (colour, size, etc ) is
+*        controlled by the STYLE parameter.  PLOT can take any of the
 *        following values.
 *
 *        - "Adapt" -- Causes "Box" to be used if a region is being
@@ -192,9 +192,9 @@
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
-*        file preceded by an up-arrow character "^".  Such text files 
+*        file preceded by an up-arrow character "^".  Such text files
 *        should contain further comma-separated lists which will be read
-*        and interpreted in the same manner.  Attribute settings are 
+*        and interpreted in the same manner.  Attribute settings are
 *        applied in the order in which they occur within the list, with
 *        later settings overriding any earlier settings given for the
 *        same attribute.
@@ -209,32 +209,32 @@
 *        defaulted if a null value (!) is supplied.  See section
 *        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).  
+*        (no error is reported).
 *
-*        The appearance of vertical and horizontal lines is controlled 
+*        The appearance of vertical and horizontal lines is controlled
 *        by the attributes Colour(Curves), Width(Curves), etc. (the
 *        synonym Lines may be used in place of Curves).  The appearance
-*        of boxes is controlled by the attributes Colour(Border), 
+*        of boxes is controlled by the attributes Colour(Border),
 *        Size(Border), etc. (the synonym Box may be used in place of
-*        Border).  The appearance of markers is controlled by 
-*        attributes Colour(Markers), Size(Markers), etc.  
+*        Border).  The appearance of markers is controlled by
+*        attributes Colour(Markers), Size(Markers), etc.
 *        [current value]
 *     TITLE = LITERAL (Read)
-*        Title for the output image.  A null value (!) propagates the 
+*        Title for the output image.  A null value (!) propagates the
 *        title from the input image to the output image.  [!]
 *     USEAXIS = GROUP (Read)
-*        USEAXIS is only accessed if the current co-ordinate Frame of 
+*        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the input NDF has more than two axes.  A group of two strings
-*        should be supplied specifying the two axes spanning the plane 
-*        containing the areas to be replaced.  Each axis can be 
+*        should be supplied specifying the two axes spanning the plane
+*        containing the areas to be replaced.  Each axis can be
 *        specified using one of the following options.
 *
-*        - Its integer index within the current Frame of the output 
-*        NDF (in the range 1 to the number of axes in the current 
+*        - Its integer index within the current Frame of the output
+*        NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *        - Its symbol string such as "RA" or "VRAD".
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
 *        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
@@ -243,7 +243,7 @@
 *        same indices as the first two significant NDF pixel axes are
 *        used.  [!]
 *     ZAPTYPE = LITERAL (Read)
-*        The method used to choose the replacement pixel values.  It 
+*        The method used to choose the replacement pixel values.  It
 *        should be one of the options below.
 *
 *        - "Bad" -- Replace the selected pixels by bad values.
@@ -251,11 +251,11 @@
 *        - "Linear" -- Replace the selected pixels using linear
 *        interpolation.  If a range of lines is replaced, then the
 *        interpolation is performed vertically between the first
-*        non-bad pixels above and below the selected lines.  If a 
-*        range of columns is replaced, then the interpolation is 
+*        non-bad pixels above and below the selected lines.  If a
+*        range of columns is replaced, then the interpolation is
 *        performed horizontally between the first non-bad pixels to
 *        the left and right of the selected columns.  If a rectangular
-*        region is replaced, then the interpolation is bi-linear 
+*        region is replaced, then the interpolation is bi-linear
 *        between the nearest non-bad pixels on all four edges of
 *        the selected region.  If interpolation is not possible (for
 *        instance, if the selected pixels are at the edge of the array)
@@ -263,27 +263,27 @@
 
 *  Examples:
 *     zaplin out=cleaned colout=fudge.dat
-*        Assuming the current value of parameter MODE is "Cursor", this 
-*        will copy the NDF associated with the last DATA picture to an 
-*        NDF called "cleaned", interactively replacing areas using the 
-*        current graphics device.  Linear interpolation is used to 
+*        Assuming the current value of parameter MODE is "Cursor", this
+*        will copy the NDF associated with the last DATA picture to an
+*        NDF called "cleaned", interactively replacing areas using the
+*        current graphics device.  Linear interpolation is used to
 *        obtain the replacement values.  A record of the areas replaced
 *        will be stored in a text file named "fudge.dat".
 *     zaplin grubby cleaned i lincol=r columns="188,190" lines="15,16"
-*        This replaces a region from pixel (188,15) to (190,16) within 
+*        This replaces a region from pixel (188,15) to (190,16) within
 *        the NDF called "grubby" and stores the result in the NDF called
-*        "cleaned".  The current co-ordinate Frame in the input NDF 
+*        "cleaned".  The current co-ordinate Frame in the input NDF
 *        should be set to PIXEL first (using WCSFRAME).  The replacement
 *        is performed using linear interpolation.
 *     zaplin grubby(6,,) cleaned i lincol=r columns="188,190"
 *        This replaces columns 188 to 190 in the 6th y-z plane region
 *        within the NDF called "grubby" and stores the result in the NDF
-*        called "cleaned".  The current co-ordinate Frame in the input 
-*        NDF should be set to PIXEL first (using WCSFRAME).  The 
+*        called "cleaned".  The current co-ordinate Frame in the input
+*        NDF should be set to PIXEL first (using WCSFRAME).  The
 *        replacement is performed using linear interpolation.
 *     zaplin m42 m42c f colin=aaoccd1.dat zaptype=b
-*        This flags with bad values the regions in the NDF called "m42" 
-*        defined in the text file called "aaoccd1.dat", and stores the 
+*        This flags with bad values the regions in the NDF called "m42"
+*        defined in the text file called "aaoccd1.dat", and stores the
 *        result in an NDF called "m42c".
 *     zaplin m42 m42c f colin=aaoccd1.dat noise
 *        As above except that linear interpolation plus cosmetic noise
@@ -410,7 +410,7 @@
 *        co-ordinates in the current Frame of the NDF.  Reformatted code
 *        layout.
 *     15-APR-2004 (DSB):
-*        Correct use of LINCOL to suppress looping if supplied on 
+*        Correct use of LINCOL to suppress looping if supplied on
 *        command line.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
@@ -424,13 +424,13 @@
 *  Type Definitions:
       IMPLICIT NONE              ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'          ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Global SSE parameters
       INCLUDE 'NDF_PAR'          ! NDF definitions
       INCLUDE 'SUBPAR_PAR'       ! SUBPAR constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'FIO_ERR'          ! FIO error definitions
-      INCLUDE 'AST_PAR'          ! AST constants and function 
+      INCLUDE 'AST_PAR'          ! AST constants and function
                                  ! declarations
       INCLUDE 'PRM_PAR'          ! VAL__ contants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -451,16 +451,16 @@
       CHARACTER LINCOL*7         ! Type of area to zap
       CHARACTER LINDEF*7         ! Suggested default area to zap
       CHARACTER MESS*120         ! Cursor purpose message
-      CHARACTER MODE*10          ! Mode in which line/column 
+      CHARACTER MODE*10          ! Mode in which line/column
                                  ! co-ordinates are to be obtained
       CHARACTER OBJECT*30        ! Description of area being zapped
       CHARACTER PLOT*5           ! Nature of required graphics
       CHARACTER REFNAM*256       ! Reference name
       CHARACTER ZAP*10           ! Method of zapping
-      DOUBLE PRECISION CLBND( 2 ) ! Double precision current Frame 
+      DOUBLE PRECISION CLBND( 2 ) ! Double precision current Frame
                                  ! bounds
       DOUBLE PRECISION COLVAL( 2 ) ! Range of values on axis 1 to zap
-      DOUBLE PRECISION CUBND( 2 ) ! Double precision current Frame 
+      DOUBLE PRECISION CUBND( 2 ) ! Double precision current Frame
                                  ! bounds
       DOUBLE PRECISION DLBND( 2 ) ! Double precision GRID bounds
       DOUBLE PRECISION DP( 2, 2 ) ! A pair of double precision 2-d
@@ -480,16 +480,16 @@
       INTEGER FDO                ! File description of output text file
       INTEGER I                  ! Loop counter
       INTEGER IAT                ! Number  of characters in a string
-      INTEGER IERR               ! Position of first exception during 
+      INTEGER IERR               ! Position of first exception during
                                  ! variance generation
-      INTEGER IMARK              ! Index of PGPLOT marker symbol for 
+      INTEGER IMARK              ! Index of PGPLOT marker symbol for
                                  ! this region
       INTEGER INDF1              ! Input-NDF identifier
       INTEGER INDF2              ! Output-NDF identifier
       INTEGER IPIC               ! AGI identifier for DATA picture
       INTEGER IPIC0              ! AGI identifier for current picture
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
-      INTEGER IPLOT              ! Plot associated with current DATA 
+      INTEGER IPLOT              ! Plot associated with current DATA
                                  ! picture
       INTEGER IPOUT( 2 )         ! Pointer to output DATA_ARRAY
                                  ! component
@@ -500,12 +500,12 @@
                                  ! Frame
       INTEGER NAX                ! Number  of axes in CFRM
       INTEGER NC                 ! Character column counter
-      INTEGER NCHAR              ! Number of characters in buffer read 
+      INTEGER NCHAR              ! Number of characters in buffer read
                                  ! from the co-ordinate file
-      INTEGER NERR               ! Number of exceptions in variance 
+      INTEGER NERR               ! Number of exceptions in variance
                                  ! generation
       INTEGER NFRM               ! Number of Frames in original Plot
-      INTEGER NP                 ! Number of points obtained by the 
+      INTEGER NP                 ! Number of points obtained by the
                                  ! cursor
       INTEGER NVAL               ! Number of values supplied
       INTEGER RBMODE             ! PGPLOT rubber-band mode
@@ -524,17 +524,17 @@
       LOGICAL GOOD               ! Usable positions supplied?
       LOGICAL GOTNAM             ! Reference name obtained for the NDF?
       LOGICAL INTERF             ! Environment option was selected?
-      LOGICAL LCDEF              ! Parameter LINCOL defined on the 
+      LOGICAL LCDEF              ! Parameter LINCOL defined on the
                                  ! command line?
       LOGICAL LINE               ! Lines to be removed? (else columns)
       LOGICAL NOISE              ! Poissonian noise to be added?
       LOGICAL REGION             ! A region is to be zapped?
       LOGICAL VARNCE             ! Variance is present in the NDF?
       LOGICAL VWORK              ! Workspace obtained for variance?
-      LOGICAL XYOK               ! Positions read successfully from 
+      LOGICAL XYOK               ! Positions read successfully from
                                  ! file?
       LOGICAL ZBAD               ! Fill zapped areas with bad values?
-      REAL X1, X2, Y1, Y2        ! World co-ordinates bounds of PGPLOT 
+      REAL X1, X2, Y1, Y2        ! World co-ordinates bounds of PGPLOT
                                  ! window
       REAL XIN, YIN              ! Initial cursor position
       REAL XP( 2 )               ! X co-ordinates of the supplied points
@@ -615,17 +615,17 @@
 *  Find the most recent DATA picture.
          CALL KPG1_AGFND( 'DATA', IPIC, STATUS )
 
-*  Report the name, comment, and label, if one exists, for the current 
+*  Report the name, comment, and label, if one exists, for the current
 *  picture.
          CALL KPG1_AGATC( STATUS )
 
 *  Obtain a reference to the NDF.
          CALL KPG1_AGREF( IPIC, 'READ', GOTNAM, REFNAM, STATUS )
 
-*  Set the PGPLOT viewport and AST Plot for this DATA picture.  The 
-*  PGPLOT viewport is set equal to the selected picture, with world 
+*  Set the PGPLOT viewport and AST Plot for this DATA picture.  The
+*  PGPLOT viewport is set equal to the selected picture, with world
 *  co-ordinates giving millimetres from the bottom-left corner of the
-*  view surface. 
+*  view surface.
          CALL KPG1_GDGET( IPIC, AST__NULL, .FALSE., IPLOT, STATUS )
 
 *  Save the bounds of the DATA picture.
@@ -680,7 +680,7 @@
 
 *  Now get the WCS FrameSet from the NDF, ensuring we have exactly
 *  two axes in the Base and Current Frames.
-      CALL KPG1_ASGET( INDF1, 2, .TRUE., .TRUE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDF1, 2, .TRUE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Compute the dimensions.
@@ -736,7 +736,7 @@
       END IF
 
 *  In graphics mode, merge the WCS FrameSet read from the NDF with the
-*  Plot read from the graphics database, aligning them in some suitable 
+*  Plot read from the graphics database, aligning them in some suitable
 *  Frame.
       IF ( CURSOR ) THEN
 
@@ -744,15 +744,15 @@
          NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
 
 *  Nwo merge the FrameSet into the Plot, aligning them in some suitable
-*  Frame.  The current Frame in the resulting Plot will be the PIXEL 
-*  Frame from the original WCS FrameSet.  The Base Frame will be the 
+*  Frame.  The current Frame in the resulting Plot will be the PIXEL
+*  Frame from the original WCS FrameSet.  The Base Frame will be the
 *  GRAPHICS Frame.
          CALL KPG1_ASMRG( IPLOT, IWCS, DOM, .FALSE., 0, STATUS )
 
 *  Find the index of the NDFs PIXEL Frame in the merged Plot.
          IPIX = IPIX + NFRM
 
-*  Get the simplified Mapping from the GRAPHICS Frame to the PIXEL 
+*  Get the simplified Mapping from the GRAPHICS Frame to the PIXEL
 *  Frame of the NDF.
          MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, IPIX,
      :                                       STATUS ), STATUS )
@@ -763,7 +763,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'ZAPLIN_ERR3', 'The transformation from '//
      :                    'the GRAPHICS co-ordinate Frame to the '//
-     :                    'PIXEL co-ordinate Frame is undefined.', 
+     :                    'PIXEL co-ordinate Frame is undefined.',
      :                    STATUS )
             GO TO 999
          END IF
@@ -784,14 +784,14 @@
             CALL NDF_MSG( 'N', INDF1 )
             CALL ERR_REP( 'ZAPLIN_ERR3', 'The transformation from '//
      :                    'the current co-ordinate Frame in ^N to the'//
-     :                    ' PIXEL co-ordinate Frame is undefined.', 
+     :                    ' PIXEL co-ordinate Frame is undefined.',
      :                    STATUS )
             GO TO 999
          END IF
 
-*  In these modes, the user can supply upper and lower ranges on a 
+*  In these modes, the user can supply upper and lower ranges on a
 *  single specific axis.  To transform these into pixel co-ordinates,
-*  we need to specify some value for the "other" axis as well.  We use 
+*  we need to specify some value for the "other" axis as well.  We use
 *  the extreme values covered by the whole image.
          DLBND( 1 ) = DBLE( SLBND( 1 ) ) - 1.0D0
          DLBND( 2 ) = DBLE( SLBND( 2 ) ) - 1.0D0
@@ -799,20 +799,20 @@
          DUBND( 2 ) = DBLE( SUBND( 2 ) )
 
          CALL AST_MAPBOX( CMAP, DLBND, DUBND, .TRUE., 1, CLBND( 1 ),
-     :                    CUBND( 1 ), XL, XU, STATUS ) 
+     :                    CUBND( 1 ), XL, XU, STATUS )
          CALL AST_MAPBOX( CMAP, DLBND, DUBND, .TRUE., 2, CLBND( 2 ),
-     :                    CUBND( 2 ), XL, XU, STATUS ) 
+     :                    CUBND( 2 ), XL, XU, STATUS )
 
       END IF
 
-*  Create the output NDF. This is initially a copy of the input NDF, 
+*  Create the output NDF. This is initially a copy of the input NDF,
 *  which will then be altered.
       CALL LPG_PROP( INDF1, 'WCS,Data,Variance,Quality,Axis,Units',
      :               'OUT', INDF2, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
-      
+
 *  Check whether or not bad pixels may be present.
       CALL NDF_BAD( INDF2, 'Data', .FALSE., BAD( 1 ), STATUS )
 
@@ -827,17 +827,17 @@
       END IF
 
 *  This application supports all the non-complex numeric types directly.
-*  Therefore for the given type of the image find in which type it 
+*  Therefore for the given type of the image find in which type it
 *  should be processed.
       CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
      :                '_DOUBLE', INDF2, INDF2, 'Data', ITYPE, DTYPE,
      :                STATUS )
 
-*  Map the output data array and variance.  Check whether or not bad 
+*  Map the output data array and variance.  Check whether or not bad
 *  pixels  may be present in the variance.
       CALL NDF_MAP( INDF2, COMP, ITYPE, 'UPDATE', IPOUT, EL, STATUS )
 
-      IF ( VARNCE ) CALL NDF_BAD( INDF2, 'Variance', .FALSE., BAD( 2 ), 
+      IF ( VARNCE ) CALL NDF_BAD( INDF2, 'Variance', .FALSE., BAD( 2 ),
      :                            STATUS )
 
 *  Create workspace for variance when none exists in the NDF.
@@ -845,7 +845,7 @@
 
 *  Unbelievably, PSX_CALLOC seems only to be able to handle a subset of
 *  the defined HDS data types.  Since the data type at this point could
-*  be anything, we need to use PSX_MALLOC, first finding the total 
+*  be anything, we need to use PSX_MALLOC, first finding the total
 *  number of bytes required.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             BYTES = EL*VAL__NBR
@@ -879,39 +879,39 @@
 *  Variance is taken to be the absolute data value.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL VEC_ABSR( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL VEC_ABSB( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL VEC_ABSD( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ABSI( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL VEC_ABSUB( BAD( 1 ), EL, 
+            CALL VEC_ABSUB( BAD( 1 ), EL,
      :                      %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                      IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL VEC_ABSUW( BAD( 1 ), EL, 
+            CALL VEC_ABSUW( BAD( 1 ), EL,
      :                      %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                      %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                      IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL VEC_ABSW( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                     IERR, NERR, STATUS )
 
          END IF
@@ -926,11 +926,11 @@
       DO WHILE( AGAIN .AND. STATUS .EQ. SAI__OK )
          NP = 0
 
-*  Obtain the type of area to zap.  In FILE mode, this is specified by 
+*  Obtain the type of area to zap.  In FILE mode, this is specified by
 *  the contents of the supplied file.  In other modes, ask the user.
          IF ( .NOT. FILE ) THEN
 
-*  Find out whether a range of lines or columns, or a region is to be 
+*  Find out whether a range of lines or columns, or a region is to be
 *  cleaned.
             CALL MSG_OUT( 'BLANK', ' ', STATUS )
             CALL PAR_CHOIC( 'LINCOL', LINDEF, 'Lines,Columns,Region,'/
@@ -949,7 +949,7 @@
             CALL PAR_CANCL( 'LINCOL', STATUS )
 
 *  Set the LINE logical accordingly.  Also store a description of the
-*  object which is to be zapped, and indicate the PGPLOT rubber-band 
+*  object which is to be zapped, and indicate the PGPLOT rubber-band
 *  mode to be used when getting the points with a cursor.
             REGION = .FALSE.
             IF ( LINCOL( 1:1 ) .EQ. 'R' ) THEN
@@ -964,7 +964,7 @@
                LINE  =  .FALSE.
                OBJECT = 'range of columns'
                RBMODE = 0
-            ELSE 
+            ELSE
                AGAIN = .FALSE.
             END IF
 
@@ -995,15 +995,15 @@
 *  First set up the text indicating the purpose for using the cursor.
             MESS = ' '
             NC = 0
-            CALL CHR_APPND( 'give 2 points bounding the required', 
+            CALL CHR_APPND( 'give 2 points bounding the required',
      :                      MESS, NC )
             NC = NC + 1
             CALL CHR_APPND( OBJECT, MESS, NC )
 
 *  Now get the two required points.
-            CALL KPG1_PGCUR( .TRUE., MESS( : NC ), 2, ACTDES, 'AX', 
-     :                       X1, X2, Y1, Y2, 0, XIN, YIN, 2, RBMODE, 
-     :                       LINES, BOX, IMARK, IPLOT, XP, YP, ACT, NP, 
+            CALL KPG1_PGCUR( .TRUE., MESS( : NC ), 2, ACTDES, 'AX',
+     :                       X1, X2, Y1, Y2, 0, XIN, YIN, 2, RBMODE,
+     :                       LINES, BOX, IMARK, IPLOT, XP, YP, ACT, NP,
      :                       STATUS )
 
 *  Copy the GRAPHICS positions into double precision.
@@ -1054,23 +1054,23 @@
 
 *  If Zapping a region, get a ranges on both axes.
             IF ( REGION ) THEN
-               CALL KPG1_GTAXV( 'COLUMNS', 2, .TRUE., CFRM, 1, COLVAL, 
+               CALL KPG1_GTAXV( 'COLUMNS', 2, .TRUE., CFRM, 1, COLVAL,
      :                          NVAL, STATUS )
-               CALL KPG1_GTAXV( 'LINES', 2, .TRUE., CFRM, 2, LINVAL, 
+               CALL KPG1_GTAXV( 'LINES', 2, .TRUE., CFRM, 2, LINVAL,
      :                          NVAL, STATUS )
 
 *  If zapping a range of lines, just get the range on axis 2, and use
 *  the full range covered by the image for the other axis.
             ELSE IF ( LINE ) THEN
-               CALL KPG1_GTAXV( 'LINES', 2, .TRUE., CFRM, 2, LINVAL, 
+               CALL KPG1_GTAXV( 'LINES', 2, .TRUE., CFRM, 2, LINVAL,
      :                          NVAL, STATUS )
                COLVAL( 1 ) = CLBND( 1 )
                COLVAL( 2 ) = CUBND( 1 )
 
 *  If zapping a range of columns, just get the range on axis 1, and use
 *  the full range covered by the image for the other axis.
-            ELSE 
-               CALL KPG1_GTAXV( 'COLUMNS', 2, .TRUE., CFRM, 1, COLVAL, 
+            ELSE
+               CALL KPG1_GTAXV( 'COLUMNS', 2, .TRUE., CFRM, 1, COLVAL,
      :                          NVAL, STATUS )
                LINVAL( 1 ) = CLBND( 2 )
                LINVAL( 2 ) = CUBND( 2 )
@@ -1079,7 +1079,7 @@
 
 *  If a null value was supplied, annul the error.  Otherwise store the
 *  supplied position and increment the number of supplied positions.
-            IF ( STATUS .EQ. PAR__NULL ) THEN           
+            IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
 
             ELSE IF ( STATUS .EQ. SAI__OK ) THEN
@@ -1120,19 +1120,19 @@
             CALL AST_TRANN( MAP, 2, 2, 2, DP, .TRUE., 2, 2, DP, STATUS )
 
 *  Check the pixel co-ordinates are good.
-            IF ( DP( 1, 1 ) .EQ. AST__BAD .OR. 
+            IF ( DP( 1, 1 ) .EQ. AST__BAD .OR.
      :          DP( 1, 2 ) .EQ. AST__BAD ) THEN
                CALL MSG_OUT( 'ZAPLIN_MSG1', 'The first supplied '//
      :                       'position does not correspond to a '//
-     :                       'valid position in pixel co-ordinates.', 
+     :                       'valid position in pixel co-ordinates.',
      :                       STATUS )
                GOOD = .FALSE.
 
-            ELSE IF ( DP( 2, 1 ) .EQ. AST__BAD .OR. 
+            ELSE IF ( DP( 2, 1 ) .EQ. AST__BAD .OR.
      :                DP( 2, 2 ) .EQ. AST__BAD ) THEN
                CALL MSG_OUT( 'ZAPLIN_MSG1', 'The second supplied '//
      :                       'position does not correspond to a '//
-     :                       'valid position in pixel co-ordinates.', 
+     :                       'valid position in pixel co-ordinates.',
      :                       STATUS )
                GOOD = .FALSE.
 
@@ -1161,7 +1161,7 @@
                CALL MSG_OUT( 'ZAPLIN_MSG1', 'The two supplied '//
      :                       'positions have the same pixel '//
      :                       'co-ordinates.', STATUS )
-               GOOD = .FALSE.            
+               GOOD = .FALSE.
             END IF
 
          END IF
@@ -1200,7 +1200,7 @@
                END IF
 
 *  Or check that the columns have some overlap with the NDF.
-            ELSE 
+            ELSE
                IF ( ZUBND( 1 ) .LT. ZLBND( 1 ) ) THEN
                   CALL NDF_MSG( 'N', INDF1 )
                   CALL MSG_OUT( 'ZAPLIN_MSG1', 'The columns to be '//
@@ -1242,7 +1242,7 @@
             ZLBND( 2 ) = ZLBND( 2 ) - SLBND( 2 ) + 1
             ZUBND( 2 ) = ZUBND( 2 ) - SLBND( 2 ) + 1
 
-*  Call appropriate routines depending on the implementation type. The 
+*  Call appropriate routines depending on the implementation type. The
 *  routines are strictly two-dimensional for the time being.
             IF ( ITYPE .EQ. '_REAL' ) THEN
 
@@ -1253,11 +1253,11 @@
 
 *  Or, linearly or bi-linearly interpolate across the pixels to be
 *  zapped.
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGR( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, 
+     :                             NOISE,
      :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                             STATUS )
                END IF
 
@@ -1266,11 +1266,11 @@
                IF ( ZBAD ) THEN
                   CALL BAD2DB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, 
+     :                             NOISE,
      :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                             STATUS )
                END IF
 
@@ -1278,11 +1278,11 @@
                IF ( ZBAD ) THEN
                   CALL BAD2DD( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGD( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, 
+     :                             NOISE,
      :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                             STATUS )
                END IF
 
@@ -1290,11 +1290,11 @@
                IF ( ZBAD ) THEN
                   CALL BAD2DI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, 
+     :                             NOISE,
      :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                             STATUS )
                END IF
 
@@ -1302,11 +1302,11 @@
                IF ( ZBAD ) THEN
                   CALL BAD2DUB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGUB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                              NOISE, 
+     :                              NOISE,
      :                              %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                              %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                              STATUS )
                END IF
 
@@ -1314,11 +1314,11 @@
                IF ( ZBAD ) THEN
                   CALL BAD2DUW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGUW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                              NOISE, 
+     :                              NOISE,
      :                              %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                              %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                              STATUS )
                END IF
 
@@ -1326,11 +1326,11 @@
                IF ( ZBAD ) THEN
                   CALL BAD2DW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
-               ELSE 
+               ELSE
                   CALL KPS1_ZPRGW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, 
+     :                             NOISE,
      :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                             STATUS )
                END IF
 
@@ -1346,11 +1346,11 @@
                DP( 2, 2 ) = DBLE( ZUBND( 2 ) )
 
 *  Map these pixel co-ordinates into the current Frame of the NDF.
-               CALL AST_TRANN( CMAP, 2, 2, 2, DP, .TRUE., 2, 2, DP, 
-     :                         STATUS ) 
+               CALL AST_TRANN( CMAP, 2, 2, 2, DP, .TRUE., 2, 2, DP,
+     :                         STATUS )
 
 *  Check the current Frame co-ordinates are good.
-               IF ( DP( 1, 1 ) .EQ. AST__BAD .OR. 
+               IF ( DP( 1, 1 ) .EQ. AST__BAD .OR.
      :              DP( 1, 2 ) .EQ. AST__BAD ) THEN
                   CALL NDF_MSG( 'N', INDF1 )
                   CALL MSG_OUT( 'ZAPLIN_MSG1', 'The first supplied '//
@@ -1359,7 +1359,7 @@
      :                          'co-ordinate Frame of ''^N'' and so '//
      :                          'cannot be logged.', STATUS )
 
-               ELSE IF ( DP( 2, 1 ) .EQ. AST__BAD .OR. 
+               ELSE IF ( DP( 2, 1 ) .EQ. AST__BAD .OR.
      :                   DP( 2, 2 ) .EQ. AST__BAD ) THEN
                   CALL NDF_MSG( 'N', INDF1 )
                   CALL MSG_OUT( 'ZAPLIN_MSG1', 'The first supplied '//
@@ -1416,18 +1416,18 @@
 
 *  Add a context message if the supplied positions could not be used.
          IF ( AGAIN .AND. .NOT. GOOD ) THEN
-             
+
             IF ( FILE ) THEN
                CALL MSG_SETC( 'FN', FNAME )
                CALL MSG_SETC( 'B', BUFFER )
                CALL MSG_OUT( 'ZAPLIN_MSG1', 'The following record '//
-     :                       'in file ''^FN'' will ignored: ^B', 
+     :                       'in file ''^FN'' will ignored: ^B',
      :                       STATUS )
 
             ELSE
                IF ( NP .EQ. 1 ) THEN
                   CALL MSG_SETC( 'W', 'position' )
-               ELSE 
+               ELSE
                   CALL MSG_SETC( 'W', 'positions' )
                END IF
 

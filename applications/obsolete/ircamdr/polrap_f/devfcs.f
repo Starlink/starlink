@@ -20,8 +20,8 @@
 *    Global constants :
 
 	INCLUDE 'SAE_PAR'
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -41,10 +41,10 @@
      :    ACTDIM,       ! actual dimensions from NDF_DIM
      :    NELEMENTS,    ! number of elements mapped by NDF_MAP
      :    PNTRI,        ! pointer to : input DATA_ARRAY
-     :	  XCEN,         ! 
-     :	  YCEN,         ! 
-     :	  XPOS,         ! 
-     :	  YPOS          ! 
+     :	  XCEN,         !
+     :	  YCEN,         !
+     :	  XPOS,         !
+     :	  YPOS          !
 
 	REAL
      :	  ACTTHETA,     !
@@ -82,7 +82,7 @@
 	  CALL PAR_GET0I( 'XCEN', XCEN, STATUS)
 	  CALL PAR_GET0I( 'YCEN', YCEN, STATUS)
 
-*        loop to get another vector position 
+*        loop to get another vector position
 
 	  MORE = .TRUE.
 
@@ -98,8 +98,8 @@
 
 *          call subroutine to do work
 
-	    CALL DEVFCSSUB( DIMS(1), DIMS(2), %VAL( PNTRI), XCEN, 
-     :	                    YCEN, XPOS, YPOS, ACTTHETA, CALTHETA, 
+	    CALL DEVFCSSUB( DIMS(1), DIMS(2), %VAL( PNTRI), XCEN,
+     :	                    YCEN, XPOS, YPOS, ACTTHETA, CALTHETA,
      :                      DEVTHETA, STATUS)
 
 *          tell user the bad news
@@ -132,7 +132,7 @@
 
 	  END DO
 
-*      tidy up structure 
+*      tidy up structure
 
 	CALL NDF_ANNUL(  LOCI, STATUS )
 

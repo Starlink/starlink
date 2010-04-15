@@ -18,7 +18,7 @@ final class GSDHelper {
     /**
      * Pads (or truncates) a string so that it is forced to be the
      * specified length. Space padded.
-     * 
+     *
      * @param input String to be truncated.
      * @param outputLength Length of the return string.
      * @return
@@ -28,7 +28,7 @@ final class GSDHelper {
         String outstr;
         if (input.length() == outputLength) return input;
         if (input.length() > outputLength ) {
-           outstr = input.substring(0,outputLength);         
+           outstr = input.substring(0,outputLength);
         } else {
             // Append the correct number of spaces. There must be
             // a better way. At the very least should be using

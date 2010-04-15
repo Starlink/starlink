@@ -124,7 +124,7 @@ proc CCDReduce { Topwin } {
    CCDCcdWidget Top top Ccd::toplevel $Topwin -title "Perform Reduction"
 
 #  Menubar.
-   CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar 
+   CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 #  Radioarray for getting the debiassing type.
    CCDCcdWidget Debiastype debiastype \
@@ -138,7 +138,7 @@ proc CCDReduce { Topwin } {
       Ccd::radioarray $Top.interp \
                   -label "Interpolation method:" \
                   -variable CCDglobalpars(INTERPTYPE)
-   
+
 #  Radioarray for deciding the type of disk space savings we want.
    CCDCcdWidget Spacesave spacesave \
       Ccd::radioarray $Top.spacesave \
@@ -191,13 +191,13 @@ proc CCDReduce { Topwin } {
          "$Interp state all disabled"
       if { $dbtype == 0 } { set dbtype 4 }
    }
-   
+
 #  If no default type exists set one and make sure if it does exist
 #  that it is sensible.
    if { ![info exists CCDglobalpars(DEBIASTYPE)] } {
       set CCDglobalpars(DEBIASTYPE) $dbtype
    } else {
-      if { [regexp {[1-4]} $CCDglobalpars(DEBIASTYPE)] } { 
+      if { [regexp {[1-4]} $CCDglobalpars(DEBIASTYPE)] } {
          if { !$BIAS(debias,$CCDglobalpars(DEBIASTYPE)) } {
             set CCDglobalpars(DEBIASTYPE) $dbtype
          }
@@ -225,7 +225,7 @@ proc CCDReduce { Topwin } {
       $Interp addbutton {plane across frame} {4}
       if { $haveinterp == 0 } { set haveinterp 4 }
    }
-   
+
 #  If no default type exists set one and make sure if it does exist
 #  that it is sensible.
    if { ! [info exists CCDglobalpars(INTERPTYPE)] && $haveinterp != 0 } {
@@ -233,7 +233,7 @@ proc CCDReduce { Topwin } {
       set haveinterp 1
    } else  {
       if { $haveinterp != 0 } {
-         if { [regexp {[1-4]} $CCDglobalpars(INTERPTYPE)] } { 
+         if { [regexp {[1-4]} $CCDglobalpars(INTERPTYPE)] } {
             if { !$BIAS(interp,$CCDglobalpars(INTERPTYPE)) } {
                set CCDglobalpars(INTERPTYPE) $haveinterp
             }
@@ -243,7 +243,7 @@ proc CCDReduce { Topwin } {
          }
       }
    }
-   
+
 #  Initialise the state of the window.
    if { $CCDglobalpars(DEBIASTYPE) != "3" } {
       $Interp state all disabled
@@ -254,7 +254,7 @@ proc CCDReduce { Topwin } {
    $Spacesave addbutton {none} {NONE}
    $Spacesave addbutton {some} {SOME}
    $Spacesave addbutton {lots} {LOTS}
-   
+
 #  Choice.
 #  Ok creates the schedule and runs it (run the SCHEDULE application),
 #  then exits.
@@ -282,7 +282,7 @@ proc CCDReduce { Topwin } {
    pack $debiastype -fill x
    if { $haveinterp } { pack $interp -fill x }
    pack $spacesave -fill x
-   
+
 #  Wait for interaction in this window to end.
       CCDWindowWait $Top
 

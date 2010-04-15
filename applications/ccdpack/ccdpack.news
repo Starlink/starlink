@@ -34,9 +34,9 @@
 
   Changes since v4.0-18
   ---------------------
- 
+
   - A new parameter GENVAR has been added to the DRIZZLE task.
- 
+
   - DRIZZLE now propagates extensions from the first input NDF to the
     output.
 

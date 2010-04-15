@@ -21,7 +21,7 @@ proc buildP4Widgets1 w {
     set label [label $frame.label -text Data -width 8]
     pack $label -side left
     set P4Widgets(DATA) [entry $frame.entry -relief sunken -bd 2]
-    pack $P4Widgets(DATA) -side left -expand yes -fill x 
+    pack $P4Widgets(DATA) -side left -expand yes -fill x
     bind $label <Button-2> "p4Update buildP4Widgets1 ALL"
     bind $label <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4DataBox1.html"
     bind $P4Widgets(DATA) <Button-2> {$P4Widgets(DATA) delete 0 end; $P4Widgets(DATA) insert end \$RODIR/ro$env(CGS4_DATE)_oooo}
@@ -72,7 +72,7 @@ proc buildP4Widgets1 w {
     set data    [radiobutton $frame.data    -text "Data"    -value DATA    -variable P4Widgets(DISPLAY_PLANE) -width 8]
     set errors  [radiobutton $frame.errors  -text "Error"   -value ERRORS  -variable P4Widgets(DISPLAY_PLANE) -width 8]
     set quality [radiobutton $frame.quality -text "Quality" -value QUALITY -variable P4Widgets(DISPLAY_PLANE) -width 8]
-    pack $data $errors $quality -side left 
+    pack $data $errors $quality -side left
     bind $label <Button-2> "p4Update buildP4Widgets ALL"
     bind $data <Button-2> "set P4Widgets(DISPLAY_PLANE) DATA"
     bind $errors <Button-2> "set P4Widgets(DISPLAY_PLANE) DATA"
@@ -91,7 +91,7 @@ proc buildP4Widgets1 w {
     bind $as <Button-2> "set P4Widgets(AUTOSCALE) 1"
     bind $as <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4AutoscaleBox1.html"
 
-# Panel for flipout 
+# Panel for flipout
     set flipFrame1 [frame $mainFrame.flipFrame1 -bd 2 -relief sunken]
     pack $flipFrame1 -fill x -expand yes
     bind $flipFrame1 <Button-2> "p4Update buildP4Widgets1 ALL"
@@ -211,7 +211,7 @@ proc buildP4Widgets1 w {
     bind $P4Widgets(CURSOR) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4CursorBox1.html"
     bind $P4Widgets(SET) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4SetBox1.html"
     bind $P4Widgets(CONFIGS) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4ConfigsBox1.html"
- 
+
 # Histogram attributes
     set histogramFlipOut [frame $flipFrame2.hflip]
     set xlabel [label $histogramFlipOut.xlab -text "X step"]
@@ -365,7 +365,7 @@ proc NewFlipOut {master slave} {
     pack forget $master
     if {$slave != ""} {
       pack $master -fill x -expand yes -after [winfo parent ${master}].st
-      pack $slave -side left 
+      pack $slave -side left
     }
 }
 
@@ -388,7 +388,7 @@ proc SetFlipOut {master name el op} {
   } elseif {$plot_whole==0 && $autoscale==1} {
     pack $master -fill x -expand yes -after [winfo parent ${master}].plf
     pack ${master}.wh -side right -fill x
-  } 
+  }
 }
 
 #proc SetFlipOut {w c name el op} {
@@ -413,6 +413,6 @@ proc SetFlipOut {master name el op} {
 #  } else {
 #    pack forget $c
 #    pack forget $w
-#  } 
+#  }
 #}
 

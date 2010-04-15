@@ -21,31 +21,31 @@
 
 *  Description:
 *     This application creates a new CmpFrame and optionally initialises
-*     its attributes. A CmpFrame is a compound Frame which allows two 
-*     component Frames (of any class) to be merged together to form a 
-*     more complex Frame. The axes of the two component Frames then 
-*     appear together in the resulting CmpFrame (those of the first Frame, 
-*     followed by those of the second Frame). 
+*     its attributes. A CmpFrame is a compound Frame which allows two
+*     component Frames (of any class) to be merged together to form a
+*     more complex Frame. The axes of the two component Frames then
+*     appear together in the resulting CmpFrame (those of the first Frame,
+*     followed by those of the second Frame).
 *
 *     Since a CmpFrame is itself a Frame, it can be used as a component in
-*     forming further CmpFrames. Frames of arbitrary complexity may be 
-*     built from simple individual Frames in this way. 
+*     forming further CmpFrames. Frames of arbitrary complexity may be
+*     built from simple individual Frames in this way.
 
 *  Usage:
 *     cmpframe frame1 frame2 options result
 
 *  ADAM Parameters:
-*     FRAME1 = LITERAL (Read) 
-*        An NDF or text file holding the first component Frame. If an NDF 
+*     FRAME1 = LITERAL (Read)
+*        An NDF or text file holding the first component Frame. If an NDF
 *        is supplied, the current Frame in its WCS FrameSet will be used.
-*     FRAME2 = LITERAL (Read) 
-*        An NDF or text file holding the second component Frame. If an NDF 
+*     FRAME2 = LITERAL (Read)
+*        An NDF or text file holding the second component Frame. If an NDF
 *        is supplied, the current Frame in its WCS FrameSet will be used.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new CmpFrame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new CmpFrame.
 *     RESULT = LITERAL (Read)
-*        A text file to receive the new CmpFrame. 
+*        A text file to receive the new CmpFrame.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
@@ -99,7 +99,7 @@
       INTEGER FRAME2
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

@@ -42,7 +42,7 @@ dau_gather_data( int bad, struct LCP_DATA *data, int *nbad )
    struct PDD    app;
    struct PDD    obj;
    HDS_PTYPE     *axis;
-   HDS_PTYPE     (*dbt)[2];                      
+   HDS_PTYPE     (*dbt)[2];
    struct ODL    odl;
    HDS_PTYPE     stride[DAT__MXSLICE];
    HDS_PTYPE     mult[DAT__MXSLICE];
@@ -235,7 +235,7 @@ dau_scatter_data( int bad, struct LCP_DATA *data, int *nbad )
    struct PDD    app;
    struct PDD    obj;
    HDS_PTYPE     *axis;
-   HDS_PTYPE     (*dbt)[2];                      
+   HDS_PTYPE     (*dbt)[2];
    struct ODL    odl;
    HDS_PTYPE     stride[DAT__MXSLICE];
    HDS_PTYPE     mult[DAT__MXSLICE];

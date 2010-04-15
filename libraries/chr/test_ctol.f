@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1989, 1993, 1994 Science & Engineering Research Council.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -51,10 +51,10 @@
 *     17-AUG-1989 (RLVAD::AJC):
 *        Original version.
 *     14-SEP-1993 (ACC)
-*        Modularised version: broken into one routine for each of 5 main 
+*        Modularised version: broken into one routine for each of 5 main
 *        categories of tests.
 *     01-MAR-1994 (ACC)
-*        Second modularised version: broken further into one routine for 
+*        Second modularised version: broken further into one routine for
 *        each of subroutine tested.  This subroutine created.
 *     27-JAN-1997 (AJC):
 *        Use EQV/NEQV not EQ/NEQ for logicals
@@ -63,7 +63,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:   
+*  Subprograms called:
 *     CHR_CTOL
 
 *-
@@ -110,7 +110,7 @@
       CALL CHR_CTOL ('f', L2(2), ISTAT)
       CALL CHR_CTOL ('nO', L2(3), ISTAT)
       CALL CHR_CTOL ('n', L2(4), ISTAT)
-      IF ((ISTAT .EQ. SAI__OK) .AND. 
+      IF ((ISTAT .EQ. SAI__OK) .AND.
      :    ((L1(1).AND.L1(2).AND.L1(3).AND.L1(4)) .EQV. .TRUE.) .AND.
      :    .NOT.(L2(1).OR.L2(2).OR.L2(3).OR.L2(4) .EQV. .TRUE.)) THEN
          PRINT *, 'CHR_CTOL OK'

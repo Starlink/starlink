@@ -30,7 +30,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -44,8 +44,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -67,13 +67,13 @@
      :  ODIMS( NDIMS ),       ! dimensions of output DATA_ARRAYs
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
-     :  PNTRI,                !    "     " input      " 
-     :  PNTRI2,               !    "     " input      " 
-     :  PNTRO,                !    "     " output     " 
+     :  PNTRI,                !    "     " input      "
+     :  PNTRI2,               !    "     " input      "
+     :  PNTRO,                !    "     " output     "
      :	NUMPIX
 
       REAL
-     :	MAGICNO                 ! magic number 
+     :	MAGICNO                 ! magic number
 
 *-
 *      check for error on entry - return if not o.k.
@@ -115,7 +115,7 @@
 	  RETURN
 	END IF
 
-	IF( ( DIMS( 1) .NE. DIMS2( 1)) .OR. 
+	IF( ( DIMS( 1) .NE. DIMS2( 1)) .OR.
      :	    ( DIMS( 2) .NE. DIMS2( 2))) THEN
 	  CALL MSG_OUT( 'ERR', 'ERROR, image and mask not same size',
      :	                STATUS)
@@ -151,14 +151,14 @@
 	CALL PAR_GET0R( 'MAGICNO', MAGICNO, STATUS)
 
 *      pass everything to the work routine
-	CALL APPLYMASKSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :                     %VAL( PNTRI2), %VAL( PNTRO), MAGICNO, 
+	CALL APPLYMASKSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :                     %VAL( PNTRI2), %VAL( PNTRO), MAGICNO,
      :                     NUMPIX, STATUS)
 
 *      tell user the bad news...
 	CALL MSG_SETR( 'MAG', MAGICNO)
 	CALL MSG_SETI( 'NP', NUMPIX)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Number of pixels masked to ^MAG in image = ^NP', STATUS)
 
 *      annul locators and unmap

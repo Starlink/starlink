@@ -1,4 +1,4 @@
-*+  AMCORR - corrects intensity image to zero airmass 
+*+  AMCORR - corrects intensity image to zero airmass
 
       SUBROUTINE AMCORR ( STATUS )
 
@@ -13,11 +13,11 @@
 *    Method :
 *
 *     Check for error on entry - return if not o.k.
-*     Get extinction file to be used as correction 
+*     Get extinction file to be used as correction
 *     If no error then get extinction/airmass for different passbands
 *     Get input image data structure
 *     If no error so far then
-*        Get airmass to be used as correction 
+*        Get airmass to be used as correction
 *        Map the input DATA_ARRAY component
 *        Create output image data structure
 *        If no error so far then
@@ -33,7 +33,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -48,8 +48,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'CHR_ERR'
       INCLUDE 'FIO_PAR'
 
@@ -70,7 +70,7 @@
      :  DIMS( NDIMS ),        ! dimensions of input DATA_ARRAYs
      :  ODIMS( NDIMS ),       ! dimensions of output DATA_ARRAYs
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_DIM
      :	LUN,
@@ -103,12 +103,12 @@
 
 *    get magic number for bad pixels from interface
       CALL PAR_GET0R( 'MAGICNO', MAGICNO, STATUS)
-   
+
 *    get the file containing the extinction values/airmass
       CALL PAR_GET0C( 'EXTFILE', EXTFILE, STATUS)
       CALL AB_TRANSLATE_ENV( EXTFILE, TRANSLATION, STATUS)
       EXTFILE = TRANSLATION
- 
+
 *    tell user the name of the extinction file being used
       CALL MSG_OUT( 'BLANK', ' ', STATUS)
       CALL MSG_SETC( 'EF', EXTFILE)
@@ -131,11 +131,11 @@
 *      increment the number of data lines read
 	COUNTER = COUNTER + 1
 
-*      find the position of the = sign since this delineates the 
-*      filter from the extinction value 
+*      find the position of the = sign since this delineates the
+*      filter from the extinction value
 	POSEQ = INDEX( LINE, '=')
 
-*      if an = sign was found, read the filter name and the 
+*      if an = sign was found, read the filter name and the
 *      extinction value from the data line
 	IF( POSEQ .GT. 0) THEN
 	  READ( LINE( 1:POSEQ-1), '(A)') FILTERS( COUNTER)
@@ -145,7 +145,7 @@
 *        tell the user the extinction values read in ...
 	  CALL MSG_SETC( 'FN', FILTERS( COUNTER))
 	  CALL MSG_SETR( 'EX', EXTVALS( COUNTER))
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :	  'Filter = ^FN,		Extinction/am = ^EX', STATUS)
 	END IF
       END DO
@@ -193,7 +193,7 @@
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                    PNTRO, NELEMENTS, STATUS )
 
-*          check for error before getting other values region and accessing 
+*          check for error before getting other values region and accessing
 *          pointers
             IF( STATUS .EQ. SAI__OK ) THEN
 
@@ -210,7 +210,7 @@
 	          MORE = .FALSE.
 	          EXTVAL = EXTVALS( COUNTER)
                   CALL MSG_SETR( 'EXT', EXTVAL)
-	          CALL MSG_OUT( 'MESS', 
+	          CALL MSG_OUT( 'MESS',
      :	           'Extinction value used = ^EXT', STATUS)
 	        END IF
                 COUNTER = COUNTER + 1
@@ -220,11 +220,11 @@
 *            if no extinction value found for filter selected get one
 	      IF( EXTVAL .LT. 0.0) THEN
 	        CALL MSG_SETC( 'FI', FILTER)
-	        CALL MSG_OUT( 'MESS', 
+	        CALL MSG_OUT( 'MESS',
      :	      'Error, NO extinction coefficient found for filter ^FI',
      :	          STATUS)
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
-	        CALL MSG_OUT( 'MESS', 
+	        CALL MSG_OUT( 'MESS',
      :	          'Please input one now!', STATUS)
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	        CALL PAR_GET0R( 'EXTVAL', EXTVAL, STATUS)
@@ -235,9 +235,9 @@
 	      CALL PAR_GET0R( 'AIRMASS', AIRMASS, STATUS)
 
 *            pass everything to the airmass correction routine
-              CALL AMCORRSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :	                      ODIMS( 1), ODIMS( 2), %VAL( PNTRO), 
-     :	                      EXTVAL, AIRMASS, MAGICNO, FACTOR, 
+              CALL AMCORRSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :	                      ODIMS( 1), ODIMS( 2), %VAL( PNTRO),
+     :	                      EXTVAL, AIRMASS, MAGICNO, FACTOR,
      :                        STATUS)
             END IF
 
@@ -245,7 +245,7 @@
 	    CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	    CALL MSG_SETR( 'FAC', FACTOR)
 	    CALL MSG_SETR( 'AIR', AIRMASS)
-	    CALL MSG_OUT( 'MESS', 
+	    CALL MSG_OUT( 'MESS',
      :	      'Multiplicative correction factor for airmass ^AIR = ^FAC',
      :	      STATUS)
 	    CALL MSG_OUT( 'BLANK', ' ', STATUS)

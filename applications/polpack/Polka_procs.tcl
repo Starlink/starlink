@@ -7,7 +7,7 @@
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #
@@ -128,9 +128,9 @@ proc AllMappings {} {
 #     IMAGES (Read)
 #        A list of the input images (without any section specifiers).
 #     IMMAP (Read)
-#        An array of lists (one for each image), each giving the mapping 
+#        An array of lists (one for each image), each giving the mapping
 #        from the supplied image to the reference (first) image. Each
-#        mapping is a list of 6 values representing a general linear 
+#        mapping is a list of 6 values representing a general linear
 #        transformation.
 #-
    global DBEAM
@@ -154,7 +154,7 @@ proc AllMappings {} {
 
 # If no image mapping could be created for this image, add the image name
 # onto a list of such image names. The reference image is always
-# considered to be registered (with itself) but no mapping structure is 
+# considered to be registered (with itself) but no mapping structure is
 # actually created for it.
       if { ![info exists IMMAP($image)] && $image != $im0 } {
          lappend missing $image
@@ -167,7 +167,7 @@ proc AllMappings {} {
    if { $missing != "" } {
       append mess "The following images cannot yet be registered with image \"$im0\":\n"
       foreach image $missing {
-         append mess "   $image\n"     
+         append mess "   $image\n"
       }
    }
 
@@ -243,7 +243,7 @@ proc B1MotionBind {x y} {
 #           2 - The user completes a started mask polygon.
 #           3 - The user selects a label by clicking on an existing feature.
 #     MOVE (Read)
-#        Was the shift key pressed when the button was clicked? If so, the 
+#        Was the shift key pressed when the button was clicked? If so, the
 #        whole polygon is dragged instead of a single vertex.
 #     ROOTI (Read)
 #        The position index of the vertex being pointed at, or the position
@@ -255,14 +255,14 @@ proc B1MotionBind {x y} {
 #        The canvas Y coordinate at which the button was pressed.
 #     SELECTED_AREA (Read and Write)
 #        The bounds of the selected area in the order xmin, xmax, ymin,
-#        ymax. 
+#        ymax.
 #     VID0 (Read)
 #        The canvas item id for the vertex being pointed at (if any).
 #     VID1 (Read)
-#        The canvas item id for the vector ending at the vertex being 
+#        The canvas item id for the vector ending at the vertex being
 #        pointed at (if any).
 #     VID2 (Read)
-#        The canvas item id for the vector starting at the vertex being 
+#        The canvas item id for the vector starting at the vertex being
 #        pointed at (if any).
 #-
    global CAN
@@ -295,7 +295,7 @@ proc B1MotionBind {x y} {
    set py [lindex $pxy 1]
    set POINTER_PXY [format "( %.1f, %.1f )" $px $py ]
 
-# The global variable MODE determines how events over the canvas are 
+# The global variable MODE determines how events over the canvas are
 # processed. Pointer motion with button 1 pressed usually results in
 # an area being selected. The only exception to this is if we are in mode
 # 1 ("edit an existing polygon") AND we are pointing at a polygon vertex,
@@ -306,7 +306,7 @@ proc B1MotionBind {x y} {
    } elseif { $MODE != 1 || $ROOTI == "" } {
 
 # Find the min and max values on each axis of the selected area. The
-# position at which the button was pressed (ROOTx,ROOTY) gives one 
+# position at which the button was pressed (ROOTx,ROOTY) gives one
 # corner of the box, and the current cursor position gives the other.
       if { $cx < $ROOTX } {
          set xmin $cx
@@ -348,7 +348,7 @@ proc B1MotionBind {x y} {
 
 # Move the start of the vector which starts at the vertex.
       set coords [$CAN coords $VID2]
-      $CAN coords $VID2 $cx $cy [lindex $coords 2] [lindex $coords 3] 
+      $CAN coords $VID2 $cx $cy [lindex $coords 2] [lindex $coords 3]
 
 # If the shift key was pressed, drag the whole polygon.
    } {
@@ -384,7 +384,7 @@ proc BeginUF {} {
 #     IFILE (Read)
 #        Temporary file names created by UniqueFile are stored in Polka's
 #        temporary POLKA_SCRATCH directory so that they are deleted when
-#        Polka terminates. They have a name of the form polka<i> where 
+#        Polka terminates. They have a name of the form polka<i> where
 #        <i> is an integer, which is different for each file and
 #        increases monotonically throughout the execution of Polka. IFILE
 #        records the value of i used in the previous call to UniqueFile.
@@ -421,7 +421,7 @@ proc Blink {w option value1 value2 interval} {
 #
 #  Globals:
 #    STOP_BLINK (Read and Write)
-#       If this is not null on entry then the blinking is stopped, and  
+#       If this is not null on entry then the blinking is stopped, and
 #       the option value is set to the value of STOP_BLINK (which is then
 #       reset to null).
 #-
@@ -431,7 +431,7 @@ proc Blink {w option value1 value2 interval} {
       if { $STOP_BLINK == "" } {
          $w configure $option $value1
          after $interval [list Blink $w $option $value2 $value1 $interval]
-      } { 
+      } {
          $w configure $option $STOP_BLINK
          set STOP_BLINK ""
       }
@@ -468,35 +468,35 @@ proc BoundBox {px py map inv} {
 
 # If required map the supplied pixel coordinates.
    if { $map != "" } {
-      set ok [TranList $map $inv $px $py mpx mpy] 
+      set ok [TranList $map $inv $px $py mpx mpy]
    } {
-      set mpx $px 
+      set mpx $px
       set mpy $py
       set ok 1
    }
 
-# If the mapping was succesful, find the upper and lower limit of the 
+# If the mapping was succesful, find the upper and lower limit of the
 # mapped x axis values.
    if { $ok } {
       set xlo [lindex $mpx 0]
-      set xhi $xlo 
+      set xhi $xlo
       foreach px $mpx {
-         if { $px > $xhi } { 
-            set xhi $px 
-         } elseif { $px < $xlo } { 
-            set xlo $px 
-         }               
+         if { $px > $xhi } {
+            set xhi $px
+         } elseif { $px < $xlo } {
+            set xlo $px
+         }
       }
 
 # Do the same for the Y axis.
       set ylo [lindex $mpy 0]
-      set yhi $ylo 
+      set yhi $ylo
       foreach py $mpy {
-         if { $py > $yhi } { 
-            set yhi $py 
-         } elseif { $py < $ylo } { 
-            set ylo $py 
-         }               
+         if { $py > $yhi } {
+            set yhi $py
+         } elseif { $py < $ylo } {
+            set ylo $py
+         }
       }
 
 # Create an NDF section string, describing these limits. Convert the
@@ -540,11 +540,11 @@ proc Cancel {args} {
 #           3 - The user selects a label by clicking on an existing feature.
 #     SELECTED_AREA (Read and Write)
 #        The bounds of the selected area in the order xmin, xmax, ymin,
-#        ymax. 
+#        ymax.
 #     V0 (Read)
 #        The index of the first vertex of the incomplete polygon.
 #  Notes:
-#    - 
+#    -
 #-
    global CANCEL
    global MODE
@@ -567,7 +567,7 @@ proc Cancel {args} {
          CancelArea
 
 # If no area was cancelled, cancel any incomplete mask polygon. This
-# involves deleting the positions making up the polygon, and setting the 
+# involves deleting the positions making up the polygon, and setting the
 # interaction mode back to 1 (i.e. "start or edit a polygon" mode).
       } elseif { $MODE == 2 } {
          DelPosn $V0 1
@@ -602,7 +602,7 @@ proc CancelArea {} {
 #        ymax. Set to a null string on exit.
 #     ZOOM (Read)
 #        Path to the "Zoom" button.
-#     
+#
 #
 #  Notes:
 #    - The Zoom and Delete buttons are disabled, and the Cancel button
@@ -657,7 +657,7 @@ proc CanDelete {id} {
    global CURITEM
 
 # If the item being deleted has set the canvas cursor (see proc CursorBind)
-# we need to reset the cursor before deleting the item. 
+# we need to reset the cursor before deleting the item.
    if { [info exists CURITEM] && $CURITEM == $id } {
 
 # Check each tag associated with the item.
@@ -712,10 +712,10 @@ proc CanToNDF {cx cy} {
    global CX
    global CY
    global MX
-   global MY             
+   global MY
 
-# Get the pixel coordinates in the displayed image. 
-   set px [expr $CX + $MX * $cx ] 
+# Get the pixel coordinates in the displayed image.
+   set px [expr $CX + $MX * $cx ]
    set py [expr $CY + $MY * $cy ]
 
 # Return the coordinates.
@@ -763,7 +763,7 @@ proc CheckMsg {action val} {
 # add it to the list (on a new line), and indicate an error has occurred.
    if { [regexp {^!+(.*)} $val match mess] } {
       if { [info exists ADAM_ERRORS] } {
-         if { [string length $mess] > 30 } { 
+         if { [string length $mess] > 30 } {
             set ADAM_ERRORS "$ADAM_ERRORS\n$mess"
          } {
             set ADAM_ERRORS "$ADAM_ERRORS $mess"
@@ -774,7 +774,7 @@ proc CheckMsg {action val} {
 
 # If the message is not an error message, append it as a new element to
 # the list stored in ATASK_OUTPUT.
-   } { 
+   } {
       lappend ATASK_OUTPUT $val
    }
 }
@@ -820,7 +820,7 @@ proc CheckRef {} {
    global REFOBJ_DISP
    global RRB_DISABLED
 
-# If the reference and current images are the same, then the reference 
+# If the reference and current images are the same, then the reference
 # objects cannot be of the same type as the current objects.
    if { $REFIM_DISP == $IMAGE_DISP } {
 
@@ -829,8 +829,8 @@ proc CheckRef {} {
       if { $RRB_DISABLED != $RB_REF($CUROBJ_DISP) } {
 
 # ... re-enable any disabled button...
-         if { $RRB_DISABLED != "" } { 
-            $RRB_DISABLED configure -state normal 
+         if { $RRB_DISABLED != "" } {
+            $RRB_DISABLED configure -state normal
          }
 
 # ... and disable the "correct" button.
@@ -845,7 +845,7 @@ proc CheckRef {} {
 # If the reference and displayed image are different, there is no need to
 # disable any button. Enable any previously disabled button.
    } {
-      if { $RRB_DISABLED != "" } { 
+      if { $RRB_DISABLED != "" } {
          $RRB_DISABLED configure -state normal
          set RRB_DISABLED ""
       }
@@ -854,7 +854,7 @@ proc CheckRef {} {
 # Also set the state of the "Accept" button, which can only be used if
 # both current and reference objects are image features (i.e. not masks).
    if { ( $REFOBJ_DISP == $O_RAY_FEATURES ||
-          $REFOBJ_DISP == $E_RAY_FEATURES ) && 
+          $REFOBJ_DISP == $E_RAY_FEATURES ) &&
         ( $CUROBJ_DISP == $O_RAY_FEATURES ||
           $CUROBJ_DISP == $E_RAY_FEATURES ) } {
       $ACCEPT configure -state normal
@@ -871,14 +871,14 @@ proc CheckRF {task} {
 #  Purpose:
 #     Check that the AMS rendevous file for a task still exists. If it
 #     does not (for some reason it seems to be occasionally deleted by
-#     the StarTcl system, turning the process into a zombie), then the 
+#     the StarTcl system, turning the process into a zombie), then the
 #     task is killed and re-loaded.
 #
 #  Arguments:
 #     The task to be checked (previously loaded using LoadTask).
 #
 #  Returned Value:
-#     Returns 1 if the rendevous file still exists, and zero if it 
+#     Returns 1 if the rendevous file still exists, and zero if it
 #     did not exist (in which case the task will have been re-loaded).
 #
 #  Globals:
@@ -901,7 +901,7 @@ proc CheckRF {task} {
       set ret 1
    }
 
-   return $ret   
+   return $ret
 
 }
 
@@ -911,8 +911,8 @@ proc CheckSky {image object} {
 #    CheckSky
 #
 #  Purpose:
-#    Checks that the supplied mask or sky object overlaps the supplied image. 
-#    At least one vertex must be more than 2 pixels away from the nearest 
+#    Checks that the supplied mask or sky object overlaps the supplied image.
+#    At least one vertex must be more than 2 pixels away from the nearest
 #    image edge for the area to be usable.
 #
 #  Arguments:
@@ -933,10 +933,10 @@ proc CheckSky {image object} {
 #        An integer representing the "O-ray sky" object type.
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     SECTIONS (Read)
 #        An array, indexed by image name, holding the pixel bounds of
 #        the image as a standard NDF section specifier (eg "(100:230,-10:20)").
@@ -948,7 +948,7 @@ proc CheckSky {image object} {
 #-
    global E_RAY_MASK
    global E_RAY_SKY
-   global O_RAY_MASK 
+   global O_RAY_MASK
    global O_RAY_SKY
    global SECTIONS
    global PNTPX
@@ -961,9 +961,9 @@ proc CheckSky {image object} {
    set sec [SecList $SECTIONS($image)]
    if { $sec != "" } {
       set lx [expr [lindex $sec 0] - 1]
-      set ux [lindex $sec 1] 
+      set ux [lindex $sec 1]
       set ly [expr [lindex $sec 2] - 1]
-      set uy [lindex $sec 3] 
+      set uy [lindex $sec 3]
 
 # Loop round each vertex in the mask or sky area.
       set size [llength $PNTPX($image,$object)]
@@ -994,7 +994,7 @@ proc CheckVal {value pause max min} {
 #  Purpose:
 #    Check that a text string entered in a "widget" created using procedure
 #    "Value" is a valid numerical value. If it is invalid, it is
-#    over-written with the previous value (which should be available in 
+#    over-written with the previous value (which should be available in
 #    global variable OLD_VAL). If it is valid, the image is re-drawn with
 #    the new scalings (optionally after a short pause to allow the other
 #    scaling to be set as well).
@@ -1037,7 +1037,7 @@ proc CheckVal {value pause max min} {
       set val $max
    }
 
-# If the value has changed, or a previous redisplay was cancelled, 
+# If the value has changed, or a previous redisplay was cancelled,
 # schedule a redisplay of the image.
    if { $val != $OLD_VAL || $REDISPLAY_CANCELLED } {
       set REDISPLAY_CANCELLED 0
@@ -1091,11 +1091,11 @@ proc Clear {image obj} {
 #     O_RAY_MASK (Read)
 #        An integer representing the "O-ray mask" object type.
 #-
-   global E_RAY_FEATURES 
+   global E_RAY_FEATURES
    global E_RAY_MASK
    global IMAGES
-   global O_RAY_FEATURES 
-   global O_RAY_MASK 
+   global O_RAY_FEATURES
+   global O_RAY_MASK
    global O_RAY_SKY
    global E_RAY_SKY
    global REDRAW
@@ -1127,7 +1127,7 @@ proc Clear {image obj} {
 
    if { $image == "" && $obj == "" } {
       set redisp 1
-   } { 
+   } {
       set redisp 0
    }
 
@@ -1197,7 +1197,7 @@ proc ClearRef {} {
 #        The image from which the currently displayed reference objects
 #        are derived.
 #     REFOBJ_DISP (Read and Write)
-#        The type of reference objects currently displayed. 
+#        The type of reference objects currently displayed.
 #        Set to NONE on exit.
 #-
    global REFOBJ_DISP
@@ -1232,7 +1232,7 @@ proc ClearCur {} {
 
 # Only clear the current objects if some are currently displayed.
    if { $CUROBJ_DISP != $NONE } {
-      ClearPosns 
+      ClearPosns
       set CUROBJ_DISP $NONE
    }
 }
@@ -1247,7 +1247,7 @@ proc ClearPosns {args} {
 #
 #  Arguments:
 #     args
-#        An optional list argument holding the image from which the 
+#        An optional list argument holding the image from which the
 #        positions are derived, and the type of objects to be cleared.
 #        If these are not supplied, they default to $IMAGE_DISP and
 #        $CUROBJ_DISP.
@@ -1265,7 +1265,7 @@ proc ClearPosns {args} {
 #     PNTVID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        vectors between positions in the list. A value of -1 indicates that 
+#        vectors between positions in the list. A value of -1 indicates that
 #        no line is currently drawn for the position. A blank string
 #        indicates that no vector is defined.
 #-
@@ -1279,9 +1279,9 @@ proc ClearPosns {args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_DISP
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Do nothing if the list is empty.
@@ -1290,7 +1290,7 @@ proc ClearPosns {args} {
       if { $size > 0 } {
 
 # Delete any canvas items marking the positions in the list. The item
-# indices stored in the list are set to -1 if the marker is not currently 
+# indices stored in the list are set to -1 if the marker is not currently
 # drawn. Do both the position markers and the vectors joining adjacent
 # vertices in a polygon.
          for {set i 0} {$i < $size} {incr i} {
@@ -1327,7 +1327,7 @@ proc ClearGwm {args} {
 #
 #  Globals:
 #     IMSEC_DISP (Write)
-#        The currently didsplayed image (as supplied by the user). Set to a 
+#        The currently didsplayed image (as supplied by the user). Set to a
 #        null string on exit (unless "args" is supplied).
 #-
    global DEVICE
@@ -1337,9 +1337,9 @@ proc ClearGwm {args} {
 # if an error occurs.
    Obey kapview gdclear "device=$DEVICE" 1
 
-# Set the globals IMSEC_DISP blank to indicate that no image 
+# Set the globals IMSEC_DISP blank to indicate that no image
 # is currently displayed (unless the same image is about to be re-displayed).
-   if { $args == "" } { 
+   if { $args == "" } {
       set IMSEC_DISP ""
    }
 }
@@ -1358,7 +1358,7 @@ proc ColMenu {menu label var} {
 #     label
 #        The label to use for the new item (eg "Current Objects").
 #     var
-#        The name of the global variable to assign the colour string 
+#        The name of the global variable to assign the colour string
 #        to (eg "CURCOL").
 #
 #  Notes:
@@ -1396,12 +1396,12 @@ proc ConcMap {map1 inv1 map2 inv2} {
 #
 #  Arguments:
 #     map1
-#        The mapping to be applied first. In the form of 
+#        The mapping to be applied first. In the form of
 #        a list of 6 parameter values.
-#     inv1 
+#     inv1
 #        Should the inverse mapping from map1 be used?
 #     map2
-#        The mapping to be applied second. In the form of 
+#        The mapping to be applied second. In the form of
 #        a list of 6 parameter values.
 #     inv2
 #        Should the inverse mapping from map2 be used?
@@ -1481,7 +1481,7 @@ proc Confirm {message} {
 #
 #  Arguments:
 #    message
-#       The message to display. 
+#       The message to display.
 #
 #  Returned Value:
 #   Zero is returned if the operation should be cancelled, one is
@@ -1520,7 +1520,7 @@ proc ConvMap {gotc type} {
 #        shift, rotation and magnification values. Otherwise, the opposite
 #        is done.
 #     type
-#        The current mapping type (1-5). If "gotc" is non-zero, then this 
+#        The current mapping type (1-5). If "gotc" is non-zero, then this
 #        determines the default rotations and magnifications returned if
 #        any of the C coefficients are not supplied. If "gotc" is zero,
 #        then any restrictions on the mapping implied by the map type are
@@ -1544,12 +1544,12 @@ proc ConvMap {gotc type} {
 #     MAP_MY (Read and Write)
 #       The magnification of the rotated Y axis.
 #     MAP_C (Read and Write)
-#       An array of 6 coefficient values. 
+#       An array of 6 coefficient values.
 #     RTOD (Read)
 #       The conversion factor from radians to degrees.
 #-
-   global MAP_SX 
-   global MAP_SY 
+   global MAP_SX
+   global MAP_SY
    global MAP_RX
    global MAP_MX
    global MAP_RY
@@ -1584,7 +1584,7 @@ proc ConvMap {gotc type} {
          set MAP_RY 0.0
          set MAP_MX ""
          set MAP_MY ""
- 
+
       } {
          set MAP_RX ""
          set MAP_RY ""
@@ -1593,7 +1593,7 @@ proc ConvMap {gotc type} {
       }
 
 # If a mapping was supplied, do the conversions.
-      if { $MAP_C(1) != "" && $MAP_C(2) != "" && $MAP_C(3) != "" && 
+      if { $MAP_C(1) != "" && $MAP_C(2) != "" && $MAP_C(3) != "" &&
            $MAP_C(4) != "" && $MAP_C(5) != "" && $MAP_C(6) != "" } {
          set c1  $MAP_C(1)
          set c2  $MAP_C(2)
@@ -1695,7 +1695,7 @@ proc Copy {} {
    global PNTVID
    global PNTTAG
    global MODE
- 
+
 # Do nothing if there is no selected area, or we are not in MODE 1
 # ("Create or edit a polygon").
    if { $SELECTED_AREA != "" && $MODE == 1 } {
@@ -1704,17 +1704,17 @@ proc Copy {} {
       if { $PASTE } {
          set PASTE 0
          $EDITMENU entryconfigure Paste -state disabled
-         unset PNTCY(copy,copy) 
-         unset PNTCX(copy,copy) 
-         unset PNTID(copy,copy) 
-         unset PNTLBL(copy,copy) 
-         unset PNTNXT(copy,copy) 
-         unset PNTPY(copy,copy) 
-         unset PNTPX(copy,copy) 
-         unset PNTVID(copy,copy) 
-         unset PNTTAG(copy,copy) 
+         unset PNTCY(copy,copy)
+         unset PNTCX(copy,copy)
+         unset PNTID(copy,copy)
+         unset PNTLBL(copy,copy)
+         unset PNTNXT(copy,copy)
+         unset PNTPY(copy,copy)
+         unset PNTPX(copy,copy)
+         unset PNTVID(copy,copy)
+         unset PNTTAG(copy,copy)
       }
- 
+
 # Store the number of current position.
       set size [NumPosn ""]
 
@@ -1732,21 +1732,21 @@ proc Copy {} {
          set cy [GetPosn $i CY]
          set nxt [GetPosn $i NXT]
 
-# Loop round adjacent vertices, checking that they are within the selected 
+# Loop round adjacent vertices, checking that they are within the selected
 # area. Leave the loop if the position is not a vertex, if we arrive
-# back at the original vertex. 
+# back at the original vertex.
          set ok 0
-         while { $cx >= $xmin && $cx <= $xmax && 
-                 $cy >= $ymin && $cy <= $ymax && 
+         while { $cx >= $xmin && $cx <= $xmax &&
+                 $cy >= $ymin && $cy <= $ymax &&
                  $nxt != -1 && $nxt != "" } {
 
 # If the next vertex is the original vertex, we have been round the entire
 # polygon without going outside the selected area. Set a flag to indicate
-# that the current position can be copied, ane leave the loop. 
+# that the current position can be copied, ane leave the loop.
             if { $nxt == $i } {
-               set ok 1 
+               set ok 1
                break
-            }  
+            }
 
 # Get the value for this position.
             set cx [GetPosn $nxt CX]
@@ -1789,13 +1789,13 @@ proc CreateMask {image object} {
 #
 #  Purpose:
 #    This procedure creates a default mask for the supplied image and
-#    ray if it does not already have a mask. A search is made for an 
-#    image for which the required mask is defined. If found, the first 
+#    ray if it does not already have a mask. A search is made for an
+#    image for which the required mask is defined. If found, the first
 #    such mask is returned. If no such mask is found, all images are
-#    checked (starting with the specified image) to see if any has both 
-#    an OE mapping and a defined "other" mask. The first such image 
-#    found is used to create the required mask by mapping its "other" 
-#    mask using its OE mapping. 
+#    checked (starting with the specified image) to see if any has both
+#    an OE mapping and a defined "other" mask. The first such image
+#    found is used to create the required mask by mapping its "other"
+#    mask using its OE mapping.
 #
 #  Arguments:
 #    image
@@ -1816,7 +1816,7 @@ proc CreateMask {image object} {
 #        An integer representing the "O-ray mask" object type.
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #-
    global E_RAY_MASK
    global IMAGES
@@ -1839,10 +1839,10 @@ proc CreateMask {image object} {
 # Get the name of the other ray's mask. Decide whether to use the forward
 # or inverse OE mapping (forward goes from E to O) to create the required
 # mask from the other mask (if possible).
-      if { $object == $O_RAY_MASK } {      
+      if { $object == $O_RAY_MASK } {
          set other $E_RAY_MASK
          set inv 0
-      } { 
+      } {
          set other $O_RAY_MASK
          set inv 1
       }
@@ -1854,7 +1854,7 @@ proc CreateMask {image object} {
             TranPXY "ref" 0 $im $object $image $object
             set ok 1
             break
-         } 
+         }
       }
 
 # If no usable mask was found...
@@ -1866,17 +1866,17 @@ proc CreateMask {image object} {
          if { $map != "" && [llength $PNTPX($image,$other)] > 0 } {
             TranPXY $map $inv $image $other $image $object
             set ok 1
-         } 
+         }
       }
 
 # If no usable mask was found...
       if { !$ok } {
 
-# Search for an image with a mask of the other type AND an OE mapping. Map 
+# Search for an image with a mask of the other type AND an OE mapping. Map
 # the first such mask found. Do not include the specified image first since
 # this was checked earlier.
          foreach im $IMAGES {
-            if { $im != $image } { 
+            if { $im != $image } {
                set map [OEMapping $im]
                if { $map != "" && [llength $PNTPX($im,$other)] > 0 } {
                   TranPXY $map $inv $im $other $image $object
@@ -1902,15 +1902,15 @@ proc CreateSky {image object} {
 #
 #  Purpose:
 #    This procedure creates a default sky area for the supplied image and
-#    ray if it does not already have one. 
+#    ray if it does not already have one.
 #
-#    If the image has one sky area but not the other, and also has an OE 
-#    mapping, then the OE mapping is used to create the missing sky area, 
+#    If the image has one sky area but not the other, and also has an OE
+#    mapping, then the OE mapping is used to create the missing sky area,
 #    based on the existing sky area. Otherwise,
 #    if the image has an image mapping (i.e. from the image to the
 #    reference image), and the reference image has a mask, then the image
 #    mapping is used to create the missing mask based on the reference
-#    images's mask. 
+#    images's mask.
 #
 #  Arguments:
 #    image
@@ -1927,7 +1927,7 @@ proc CreateSky {image object} {
 #        A list of the available images (without section strings).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #-
    global E_RAY_SKY
    global IMAGES
@@ -1956,7 +1956,7 @@ proc CreateSky {image object} {
 # Get the name of the other ray's sky area. Decide whether to use the forward
 # or inverse OE mapping (forward goes from E to O) to create the required
 # sky area from the other sky area (if possible).
-      if { $object == $O_RAY_SKY } {      
+      if { $object == $O_RAY_SKY } {
          set other $E_RAY_SKY
          set inv 0
       } {
@@ -1994,12 +1994,12 @@ proc CreateSky {image object} {
          }
       }
 
-# If the sky area has not yet been created, and if the current image has an 
+# If the sky area has not yet been created, and if the current image has an
 # image mapping...
       set map0 [ImageMapping $image]
       if { !$ok && $map0 != "" } {
 
-# ... search for an image which has the required sky area, and an image 
+# ... search for an image which has the required sky area, and an image
 # mapping. The previously displayed image is checked first.
          foreach im $imlist {
             set map1 [ImageMapping $im]
@@ -2086,17 +2086,17 @@ proc CursorBind {tags cursors} {
 #     CursorBind
 #
 #  Purpose:
-#     Set up binding for canvas items with specified tags so that specified 
+#     Set up binding for canvas items with specified tags so that specified
 #     cursors are displayed when the pointer is placed over the items.
 #
 #  Arguments:
 #     tags
 #        A list of canvas tags.
 #     cursors
-#        A list of cursor specifications, which should be in one-to-one 
+#        A list of cursor specifications, which should be in one-to-one
 #        correspondance with the elements in "tags". The specified cursor
 #        is displayed whenever the pointer is placed over a canvas item
-#        with the corresponding tag. If a null value is supplied, then 
+#        with the corresponding tag. If a null value is supplied, then
 #        the bindings are removed items with the corresponding tag.
 #
 #-
@@ -2138,7 +2138,7 @@ proc DecVal {value max min} {
 #    DecVal
 #
 #  Purpose:
-#    Called to decrement the numerical value associated with a "widget" 
+#    Called to decrement the numerical value associated with a "widget"
 #    created by the procedure "Value".
 #
 #  Arguments:
@@ -2194,14 +2194,14 @@ proc Delete {} {
 #  Globals:
 #     SELECTED_AREA (Read)
 #        The bounds of the selected area in the order xmin, xmax, ymin,
-#        ymax. 
+#        ymax.
 #-
    global SELECTED_AREA
 
 # Issue a warning and return if there is no selected area.
-   if { $SELECTED_AREA == "" } { 
+   if { $SELECTED_AREA == "" } {
       Message "Select an area by clicking and dragging over the image before using the \"Delete\" command."
-      return 
+      return
    }
 
 # Store the number of current position.
@@ -2220,7 +2220,7 @@ proc Delete {} {
       set cx [GetPosn $i CX]
       set cy [GetPosn $i CY]
 
-# If it is within the selected area, delete it, and then point to the 
+# If it is within the selected area, delete it, and then point to the
 # previous position and reduce the size of the list by one.
       if { $cx >= $xmin && $cx <= $xmax && $cy >= $ymin && $cy <= $ymax } {
          DelPosn $i 0
@@ -2239,16 +2239,16 @@ proc DelPosn {i all args} {
 #    DelPosn
 #
 #  Purpose:
-#    Deletes an image position. 
+#    Deletes an image position.
 #
 #  Arguments:
 #    i
-#       The index of the position, starting at zero. 
+#       The index of the position, starting at zero.
 #    all
 #       If 1, then all positions connected by vectors to the supplied
 #       position will also be deleted.
 #    args
-#       An optional list argument holding the image from which the 
+#       An optional list argument holding the image from which the
 #       positions are derived, and the type of objects to be drawn.
 #       If these are not supplied, they default to $IMAGE_DISP and
 #       $CUROBJ_DISP.
@@ -2262,10 +2262,10 @@ proc DelPosn {i all args} {
 #        The displayed image (without section).
 #     PNTCX (Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas X coordinates. 
+#        is a list of canvas X coordinates.
 #     PNTCY (Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas Y coordinates. 
+#        is a list of canvas Y coordinates.
 #     PNTID (Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -2273,21 +2273,21 @@ proc DelPosn {i all args} {
 #        currently drawn for the position.
 #     PNTLBL (Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of labels associated with the positions in the list. 
+#        is a list of labels associated with the positions in the list.
 #     RECALC_OEMAP (Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the image's E to O mapping was last found.
 #     RECALC_IMMAP (Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the mapping from the image to the first
 #        (reference) image was last found. The flag is set for all
 #        images if the image features for the first (reference) image
 #        are changed.
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -2297,17 +2297,17 @@ proc DelPosn {i all args} {
 #        closed).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PNTTAG (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas tags (one for each position).
 #     PNTVID (Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        vectors between positions in the list. A value of -1 indicates that 
+#        vectors between positions in the list. A value of -1 indicates that
 #        no line is currently drawn for the position. A blank string
 #        indicates that no vector is defined.
 #     V0 (Read and Write)
@@ -2317,10 +2317,10 @@ proc DelPosn {i all args} {
 #        The index of the position corresponding to the last vertex in
 #        an incomplete (i.e. open) polygon.
 #     VCX0 (Write)
-#        The canvas X coordinates at the first vertex in an incomplete 
+#        The canvas X coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VCY0 (Write)
-#        The canvas Y coordinates at the first vertex in an incomplete 
+#        The canvas Y coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VID2 (Write)
 #        The canvas item id of the vector joining the last vertex in an
@@ -2346,7 +2346,7 @@ proc DelPosn {i all args} {
    global RECALC_OEMAP
    global RESAVE
    global V0
-   global V1     
+   global V1
    global VCX0
    global VCY0
    global VID2
@@ -2355,9 +2355,9 @@ proc DelPosn {i all args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_DISP
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Note the next vertex in the polygon (if any).
@@ -2472,7 +2472,7 @@ proc DelPosn {i all args} {
 # Indicate that we will need to re-save the output images.
       set RESAVE 1
 
-# Indicate that the mappings based on this position list will need to be 
+# Indicate that the mappings based on this position list will need to be
 # re-calculated (but not if we are modifying a mask - the mappings are
 # based on feature positions, not mask positions).
       if { $object == $O_RAY_FEATURES || $object == $E_RAY_FEATURES } {
@@ -2485,7 +2485,7 @@ proc DelPosn {i all args} {
          if { $image != [lindex $IMAGES 0] } {
             foreach im $IMAGES {
                set RECALC_IMMAP($im) 1
-            }         
+            }
          }
       }
 
@@ -2512,7 +2512,7 @@ proc DelPosn {i all args} {
 
       } {
 
-# If the deleted position was part of a polygon with less than 4 vertices, 
+# If the deleted position was part of a polygon with less than 4 vertices,
 # delete the entire polygon. If there was only a single vertex in the
 # polygon, then it will already have been deleted.
          if { $next != "" } {
@@ -2565,15 +2565,15 @@ proc DescMap {map} {
    set MAP_C(6) ""
    set ret ""
 
-# If the supplied mapping refers to the reference image, return 
+# If the supplied mapping refers to the reference image, return
 # a unit mapping.
    if { $map == "ref" } {
-      set MAP_C(1) 0.0      
-      set MAP_C(2) 1.0      
-      set MAP_C(3) 0.0      
-      set MAP_C(4) 0.0      
-      set MAP_C(5) 0.0      
-      set MAP_C(6) 1.0      
+      set MAP_C(1) 0.0
+      set MAP_C(2) 1.0
+      set MAP_C(3) 0.0
+      set MAP_C(4) 0.0
+      set MAP_C(5) 0.0
+      set MAP_C(6) 1.0
 
       set ret "ref"
       set ok 1
@@ -2703,28 +2703,28 @@ proc DoubleClick {name args} {
 #
 #  Purpose:
 #    Coordinates execution of commands bound to double and single clicks
-#    of a button in a widget. It can be used to prevent execution of a 
+#    of a button in a widget. It can be used to prevent execution of a
 #    single click command if a double click command has also been activated
 #    by the same click. The single click command should call this
-#    procedure with "args" not supplied, and should only proceed if it 
+#    procedure with "args" not supplied, and should only proceed if it
 #    returns a zero value. The double click command should call this
-#    procedure immediately on entry, specifying any arbitrary value for 
+#    procedure immediately on entry, specifying any arbitrary value for
 #    "args" (the returned value should be ignored).
 #
 #  Arguments:
 #     name
-#        The name of a global variable by which the single and double click 
+#        The name of a global variable by which the single and double click
 #        commands want to communicate.
 #     args
-#        If any extra arguments are supplied, then the global variable with 
+#        If any extra arguments are supplied, then the global variable with
 #        name supplied in "name" is set to 1, and the procedure returns
-#        immediately. Otherwise, the global variable is set to zero, the 
+#        immediately. Otherwise, the global variable is set to zero, the
 #        procedure pauses for 250 milliseconds, and then returns the value of
 #        the global variable (which should have been set to 1 during the pause
 #        if the corresponding double click command started up).
 #
 #  Returned Value:
-#     A boolean flag indicating if the double click command has been 
+#     A boolean flag indicating if the double click command has been
 #     activated.
 #-
    upvar #0 $name trigger
@@ -2738,7 +2738,7 @@ proc DoubleClick {name args} {
    }
 
    return $trigger
-}   
+}
 
 proc DrawGwm {} {
 #+
@@ -2765,14 +2765,14 @@ proc DrawGwm {} {
 #       to ensure that the data values are positive. An array with a value
 #       for each image.
 #    IMAGE_DISP (Write)
-#       The name of the displayed unscaled base image (with no section 
+#       The name of the displayed unscaled base image (with no section
 #       specifier).
 #    IMSEC_DISP (Write)
 #       The displayed unscaled base image section (as supplied,
 #       potentially with a section specifier).
 #    IMSEC_REQ (Read)
 #       The unscaled base image section to be displayed. The string
-#       includes an NDF section specifier expressed in standard form (i.e. 
+#       includes an NDF section specifier expressed in standard form (i.e.
 #       as two ranges of pixel indices).
 #    MX (Write)
 #       The X scale factor for converting from canvas
@@ -2799,7 +2799,7 @@ proc DrawGwm {} {
 #       image is selected:
 #
 #       If VIEW=UNZOOMED then the whole image is displayed when a new
-#       image is selected. 
+#       image is selected.
 #
 #       If VIEW=ZOOMED then only the current section from the new image
 #       is displayed.
@@ -2848,27 +2848,27 @@ proc DrawGwm {} {
       GetSec $IMSEC_REQ IMAGE_DISP section0
       set section0 [ScreenSec $section0]
 
-# Transform this section to take account of any effects currently applied to 
+# Transform this section to take account of any effects currently applied to
 # the selected image.
       set map [TotalMap $IMAGE_DISP]
       if { $map != "ref" && $map != "" } {
          set section0 [TranSec $section0 $map 0]
       }
 
-# If we are viewing the unzoomed images, or if this is the first image 
-# to be displayed, display the whole image as supplied (i.e unzoomed), 
-# and clear the section stack. 
+# If we are viewing the unzoomed images, or if this is the first image
+# to be displayed, display the whole image as supplied (i.e unzoomed),
+# and clear the section stack.
       if { $VIEW == "Unzoomed" || $IMAGE_PREV == "" } {
-         set SECTION_REQ $section0 
+         set SECTION_REQ $section0
          set SECTION_STACK ""
 
 # Otherwise, the new image is drawn at the same zoom factor as the old
 # image, and inherits the old section stack.
       } {
 
-# Replace the bottom entry on the section stack with a section which 
-# will result in the whole image being displayed if the UnZoom button 
-# is pressed repeatedly. 
+# Replace the bottom entry on the section stack with a section which
+# will result in the whole image being displayed if the UnZoom button
+# is pressed repeatedly.
          if { $section0 != $SECTION_REQ } {
             if { [llength $SECTION_STACK] > 0 } {
                set SECTION_STACK [lreplace $SECTION_STACK end end $section0]
@@ -2887,7 +2887,7 @@ proc DrawGwm {} {
          set newstack ""
          for {set i 0} {$i < [llength $SECTION_STACK]} {incr i} {
             lappend newstack [ScreenSec [lindex $SECTION_STACK $i] ]
-         }         
+         }
          set SECTION_STACK $newstack
 
       }
@@ -2902,7 +2902,7 @@ proc DrawGwm {} {
 
 # Set the text to display in the status area describing the sky subtraction
 # method.
-      SkyOff      
+      SkyOff
 
    }
 
@@ -2922,7 +2922,7 @@ proc DrawGwm {} {
       set cx [lindex $centre 0]
       set cy [lindex $centre 1]
       set centre "$cx,$cy"
-   
+
 # Decide on the scaling to use. Check for the user having locked the
 # scaling. If the data range being very low, use "flash" mode (otherwise
 # DISPLAY will report an error), otherwise use the specified percentiles.
@@ -2931,10 +2931,10 @@ proc DrawGwm {} {
 
       } {
          if { [Obey kappa stats "ndf=$data"] } {
-            set maxm [GetParamED kappa stats:maximum] 
+            set maxm [GetParamED kappa stats:maximum]
             set minm [GetParamED kappa stats:minimum]
 
-            if { abs( $maxm/2.0 - $minm/2.0 ) < 
+            if { abs( $maxm/2.0 - $minm/2.0 ) <
                  2.0E-4 * ( abs($maxm)/2.0 + abs($minm)/2.0 ) } {
                set pars "mode=flash"
                set scalow $minm
@@ -2945,7 +2945,7 @@ proc DrawGwm {} {
          }
       }
 
-# Display the image section centred correctly. 
+# Display the image section centred correctly.
       if { [Obey kapview display "in=\"$data\" $pars badcol=0 device=$DEVICE \
                                   axes=no centre=\"$centre\"" ] } {
 
@@ -2961,7 +2961,7 @@ proc DrawGwm {} {
          set SCALOW [format "%.5g" $scalow]
          set SCAHIGH [format "%.5g" $scahigh]
 
-# Use picin to get the bounds of the DATA picture just created in 
+# Use picin to get the bounds of the DATA picture just created in
 # normalised device coordinates and NDF pixels. These NDC values extend
 # from 0 to 1 on both axes (and in general are therefore not square).
          Obey kapview picin "device=$DEVICE current=yes name=DATA frame=ndc" 1
@@ -2975,7 +2975,7 @@ proc DrawGwm {} {
          set wcx2 [GetParamED kapview picin:x2]
          set wcy1 [GetParamED kapview picin:y1]
          set wcy2 [GetParamED kapview picin:y2]
-      
+
 # Calculate the offsets and scaling factors for converting from canvas
 # coordinates to NDF pixels.
          set cx1 [expr $ncx1 * ( $SIZE - 1 )]
@@ -3025,13 +3025,13 @@ proc DrawPosns {ref reg args} {
 #
 #  Arguments:
 #     ref
-#        If non-zero, then the objects are drawn as reference objects, 
+#        If non-zero, then the objects are drawn as reference objects,
 #        otherwise they are drawn as current objects.
 #     reg
 #        Should the positions be mapped into the frame of the current
 #        objects? This is only used if "ref" is non-zero.
 #     args
-#        An optional list argument holding the image from which the 
+#        An optional list argument holding the image from which the
 #        positions are derived, and the type of objects to be drawn.
 #        If these are not supplied, they default to $IMAGE_DISP and
 #        $CUROBJ_REQ.
@@ -3045,10 +3045,10 @@ proc DrawPosns {ref reg args} {
 #        The displayed image (without section).
 #     PNTCX (Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas X coordinates. 
+#        is a list of canvas X coordinates.
 #     PNTCY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas Y coordinates. 
+#        is a list of canvas Y coordinates.
 #     PNTID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -3056,10 +3056,10 @@ proc DrawPosns {ref reg args} {
 #        currently drawn for the position.
 #     PNTLBL (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of labels associated with the positions in the list. 
+#        is a list of labels associated with the positions in the list.
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -3069,17 +3069,17 @@ proc DrawPosns {ref reg args} {
 #        closed).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PNTTAG (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas tags (one for each position).
 #     PNTVID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        vectors between positions in the list. A value of -1 indicates that 
+#        vectors between positions in the list. A value of -1 indicates that
 #        no line is currently drawn for the position. A blank string
 #        indicates that no vector is defined.
 #     V0 (Write)
@@ -3089,10 +3089,10 @@ proc DrawPosns {ref reg args} {
 #        The index of the position corresponding to the last vertex in
 #        an incomplete (i.e. open) polygon.
 #     VCX0 (Write)
-#        The canvas X coordinates at the first vertex in an incomplete 
+#        The canvas X coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VCY0 (Write)
-#        The canvas Y coordinates at the first vertex in an incomplete 
+#        The canvas Y coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VID2 (Write)
 #        The canvas item id of the vector joining the last vertex in an
@@ -3117,7 +3117,7 @@ proc DrawPosns {ref reg args} {
    global PNTVID
    global REFCOL
    global V0
-   global V1     
+   global V1
    global VCX0
    global VCY0
    global VID2
@@ -3126,9 +3126,9 @@ proc DrawPosns {ref reg args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_REQ
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Do nothing if the list is empty.
@@ -3140,7 +3140,7 @@ proc DrawPosns {ref reg args} {
 # Reference positions may be mapped into the frame of the current objects
 # (if the user has selcted the relevant option), but current objects are
 # always displayed at their specified pixel coordinates (i.e. without
-# mapping). 
+# mapping).
          if { $ref } {
             set vtag "rvectors"
             set colour $REFCOL
@@ -3165,7 +3165,7 @@ proc DrawPosns {ref reg args} {
             set px [lindex $pxlist $i]
             set py [lindex $pylist $i]
             set cxy [NDFToCan $px $py]
-            if { $cxy == "" } { return } 
+            if { $cxy == "" } { return }
             lappend PNTCX($image,$object) [lindex $cxy 0]
             lappend PNTCY($image,$object) [lindex $cxy 1]
          }
@@ -3180,7 +3180,7 @@ proc DrawPosns {ref reg args} {
 # If this value is not null, there is a vector.
             if { $next != "" } {
 
-# If there is a vector to be drawn, get the canvas coordinates at the 
+# If there is a vector to be drawn, get the canvas coordinates at the
 # current (starting) position.
                set cx [lindex $PNTCX($image,$object) $i]
                set cy [lindex $PNTCY($image,$object) $i]
@@ -3193,26 +3193,26 @@ proc DrawPosns {ref reg args} {
 # to the pointer).
                   if { !$ref } {
 
-# Find the index (V0) of the position at the start of the incomplete polygon. 
+# Find the index (V0) of the position at the start of the incomplete polygon.
 # This is a positions which does not have any other position pointing to
 # it.
                      set j $i
                      while { $j < $size } {
-   
+
                         set V0 $j
                         set j 0
-                     
+
                         while { $j < $size && [lindex $PNTNXT($image,$object) $j] != $V0 } {
                            incr j
                         }
-   
+
                      }
 
 # Store the canvas coordinates at this position.
                      set VCX0 [lindex $PNTCX($image,$object) $V0]
                      set VCY0 [lindex $PNTCY($image,$object) $V0]
 
-# Initially make the vector zero length. 
+# Initially make the vector zero length.
                      set cxn $cx
                      set cyn $cy
 
@@ -3239,9 +3239,9 @@ proc DrawPosns {ref reg args} {
 # If a canvas item already exists, configure it to have the correct
 # properties.
                } {
-                  $CAN coords $vid $cx $cy $cxn $cyn 
+                  $CAN coords $vid $cx $cy $cxn $cyn
                   $CAN itemconfigure $vid -fill $colour -tags [list $vtag $tag]
-               }                   
+               }
 
 # If this is the "loose" end of an incomplete mask polygon, store the
 # list index of the position, and the canvas item id of the vector in
@@ -3261,8 +3261,8 @@ proc DrawPosns {ref reg args} {
             set cx [lindex $PNTCX($image,$object) $i]
             set cy [lindex $PNTCY($image,$object) $i]
 
-# Isolated positions (indicated by a null NXT value) are taken to be image 
-# "features". Positions which are connected to other positions are taken to 
+# Isolated positions (indicated by a null NXT value) are taken to be image
+# "features". Positions which are connected to other positions are taken to
 # be mask "vertices". Draw the appropriate marker.
             set next [lindex $PNTNXT($image,$object) $i]
             if { $next == "" } {
@@ -3325,14 +3325,14 @@ proc DrawCur {} {
 # If the image was updated while waiting for a label for a candidate
 # feature, redraw the circle which marks the candidate feature.
    if { $TEST_ID != "" } {
-      TestFea 
+      TestFea
    }
 
 # Indicate that the requested values are now displayed.
    set CUROBJ_DISP $CUROBJ_REQ
 
 # Re-configure the reference objects to use the new mapping.
-   DrawRef 
+   DrawRef
 }
 
 proc DrawRef {} {
@@ -3380,13 +3380,13 @@ proc DrawRef {} {
       $REFALIGN configure -state normal
 
 # If ref. objects are being drawn aligned, enable the Redraw button.
-      if { $REFALN } { 
+      if { $REFALN } {
          $REDRAW configure -state normal
       } {
          $REDRAW configure -state disabled
       }
 
-# If a reference mask (O, E or sky) has been requested, endeavour to ensure 
+# If a reference mask (O, E or sky) has been requested, endeavour to ensure
 # that the mask exists. If a mask does not already exist, then an attempt is
 # made to create one from the other defined masks and mappings, on there
 # assumption that all masks should be roughly the same.
@@ -3399,9 +3399,9 @@ proc DrawRef {} {
       }
 
 # Draw the markers.
-      DrawPosns 1 $REFALN $REFIM_REQ $REFOBJ_REQ 
+      DrawPosns 1 $REFALN $REFIM_REQ $REFOBJ_REQ
 
-# If no reference objects are being drawn, disabled the "Draw Aligned" 
+# If no reference objects are being drawn, disabled the "Draw Aligned"
 # and "Re-draW" buttons.
    } {
       $REFALIGN configure -state disabled
@@ -3420,11 +3420,11 @@ proc Dump {file} {
 #     Dump
 #
 #  Purpose:
-#     Dump the current positions lists, masks, and options to a text file 
+#     Dump the current positions lists, masks, and options to a text file
 #     which can be restored later (using procedure Restore).
 #
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the dump is written to the specified
 #        file (any existing file with the same name is over-written).
 #        Otherwise, the user is asked to supply a file name.
@@ -3434,11 +3434,11 @@ proc Dump {file} {
 #     1 if a succesful dump was performed, zero otherwise.
 #
 #-
-   global E_RAY_FEATURES 
+   global E_RAY_FEATURES
    global E_RAY_MASK
    global IMAGES
-   global O_RAY_FEATURES 
-   global O_RAY_MASK 
+   global O_RAY_FEATURES
+   global O_RAY_MASK
    global O_RAY_SKY
    global E_RAY_SKY
    global IMMAP
@@ -3464,7 +3464,7 @@ proc Dump {file} {
 
    } {
       set ok [OpenFile "w" "Dump output file" \
-                           "Give name of dump file to create:" file fd] 
+                           "Give name of dump file to create:" file fd]
    }
 
 # Only proceed if a file was opened.
@@ -3497,13 +3497,13 @@ proc Dump {file} {
          } {
             puts $fd ""
          }
-         
+
          if { [info exists PROT_IMMAP($image)] } {
             puts $fd $PROT_IMMAP($image)
          } {
             puts $fd ""
          }
-         
+
 
 # Loop round each object type...
          foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
@@ -3521,7 +3521,7 @@ proc Dump {file} {
          }
       }
 
-# Save the names and values of the global variables holding the current 
+# Save the names and values of the global variables holding the current
 # option settings...
       puts $fd "Options:"
       foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL PSF_SIZE INTERP FITTYPE OEFITTYPE SKYPAR VIEW XHAIR SKYOFF HAREA SAREA" {
@@ -3549,11 +3549,11 @@ proc DumpImage {file} {
 #     DumpImage
 #
 #  Purpose:
-#     Dump the current positions list and masks for the displayed image to a 
+#     Dump the current positions list and masks for the displayed image to a
 #     text file which can be restored later (using procedure Restore).
 #
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the dump is written to the specified
 #        file (any existing file with the same name is over-written).
 #        Otherwise, the user is asked to supply a file name.
@@ -3563,11 +3563,11 @@ proc DumpImage {file} {
 #     1 if a succesful dump was performed, zero otherwise.
 #
 #-
-   global E_RAY_FEATURES 
+   global E_RAY_FEATURES
    global E_RAY_MASK
    global IMAGE_DISP
-   global O_RAY_FEATURES 
-   global O_RAY_MASK 
+   global O_RAY_FEATURES
+   global O_RAY_MASK
    global O_RAY_SKY
    global E_RAY_SKY
    global PNTPX
@@ -3589,7 +3589,7 @@ proc DumpImage {file} {
 
    } {
       set ok [OpenFile "w" "Dump output file" \
-                           "Give name of dump file to create:" file fd] 
+                           "Give name of dump file to create:" file fd]
    }
 
 # Only proceed if a file was opened.
@@ -3640,11 +3640,11 @@ proc DumpMask {file} {
 #     DumpMask
 #
 #  Purpose:
-#     Dump the current O and E ray masks from the first (reference) image, to 
+#     Dump the current O and E ray masks from the first (reference) image, to
 #     a text file which can be restored later (using procedure RestoreMask).
 #
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the dump is written to the specified
 #        file (any existing file with the same name is over-written).
 #        Otherwise, the user is asked to supply a file name.
@@ -3656,8 +3656,8 @@ proc DumpMask {file} {
 #-
    global DBEAM
    global IMAGES
-   global E_RAY_MASK 
-   global O_RAY_MASK 
+   global E_RAY_MASK
+   global O_RAY_MASK
    global PNTPX
    global PNTPY
    global PNTNXT
@@ -3689,7 +3689,7 @@ proc DumpMask {file} {
       if { ![CreateMask $im0 $O_RAY_MASK] } {
          Message "The mask defining the O-ray areas in $im0 has not yet been supplied."
 
-# If we are in dual-beam mode, check that the E-ray mask is available for the 
+# If we are in dual-beam mode, check that the E-ray mask is available for the
 # reference image
       } elseif { ![CreateMask $im0 $E_RAY_MASK] && $DBEAM } {
          Message "The mask defining the E-ray areas in $im0 has not yet been supplied."
@@ -3697,7 +3697,7 @@ proc DumpMask {file} {
 # If these checks were passed, open a file specified by the user.
       } {
          set ok [OpenFile "w" "Dump output file" \
-                              "Give name of dump file to create:" file fd] 
+                              "Give name of dump file to create:" file fd]
       }
    }
 
@@ -3745,11 +3745,11 @@ proc EditMapping {image mapping} {
 #
 #  Purpose:
 #     Allows the user to examine and edit the coefficients describing
-#     a mapping. 
+#     a mapping.
 #
 #  Arguments:
 #     image
-#       The image with which the mapping is associated. 
+#       The image with which the mapping is associated.
 #     mapping
 #       If "im" then the image mapping associated with image "$image is
 #       displayed. Otherwise, the OE mapping associated with the image is
@@ -3758,7 +3758,7 @@ proc EditMapping {image mapping} {
 #  Globals:
 #     B_FONT (Read)
 #        The default font used for buttons.
-#     CB_COL (Read) 
+#     CB_COL (Read)
 #        The colour to use for the check buttons in the dialog box.
 #     EDMAP_EXIT (Write)
 #        Used to communicate with the buttons in the dialog box. It holds
@@ -3768,9 +3768,9 @@ proc EditMapping {image mapping} {
 #     IMAGES (Read)
 #        A list of the input images (without any section specifiers).
 #     IMMAP (Read and Write)
-#        An array of lists (one for each image), each giving the mapping 
+#        An array of lists (one for each image), each giving the mapping
 #        from the supplied image to the reference (first) image. Each
-#        mapping is a list of 6 values representing a general linear 
+#        mapping is a list of 6 values representing a general linear
 #        transformation.
 #     INV (Write)
 #        Is the inverse mapping displayed?
@@ -3785,10 +3785,10 @@ proc EditMapping {image mapping} {
 #        The magnification of the rotated Y axis implied by the values of
 #        MAP_C.
 #     MAP_RX (Write)
-#        The anti-clockwise rotation of the original X axis implied by the 
+#        The anti-clockwise rotation of the original X axis implied by the
 #        values of MAP_C (in degrees).
 #     MAP_RY (Write)
-#        The anti-clockwise rotation of the original X axis implied by the 
+#        The anti-clockwise rotation of the original X axis implied by the
 #        values of MAP_C (in degrees).
 #     MAP_SX  (Write)
 #        The shift of the magnified X axis implied by the values of MAP_C.
@@ -3802,31 +3802,31 @@ proc EditMapping {image mapping} {
 #     OEFITTYPE (Read)
 #        A textual description of the mapping to be used for the OE mapping.
 #     OEMAP (Read and Write)
-#        An array of mappings (one for each image), each being a list of 
+#        An array of mappings (one for each image), each being a list of
 #        6 parameter values giving the linear mapping from E to O ray.
 #     PROT_IMMAP (Read and Write)
 #        A 1-d array indexed by image. Each element is either "normal" or
 #        "disabled", and specified whether the image mapping associated
 #        with the image may be changed. A value of "normal" means that the
-#        image mapping may be changed; a value of "disabled" means that it 
+#        image mapping may be changed; a value of "disabled" means that it
 #        may not be changed.
 #     PROT_OEMAP (Read and Write)
 #        A 1-d array indexed by image. Each element is either "normal" or
 #        "disabled", and specified whether the OE mapping associated
 #        with the image may be changed. A value of "normal" means that the
-#        mapping may be changed; a value of "disabled" means that it 
+#        mapping may be changed; a value of "disabled" means that it
 #        may not be changed.
-#     RB_COL (Read) 
+#     RB_COL (Read)
 #        The colour to use for the radiobuttons in the dialog box.
 #     RB_FONT (Read)
 #        The default font used for radiobuttons.
 #     RECALC_IMMAP (Read and Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the image mapping was last found.
 #     RECALC_OEMAP (Read and Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the image's E to O mapping was last found.
 #     tcl_precision (Read)
 #        The number of significant digits used by tcl when formatting a
@@ -3839,15 +3839,15 @@ proc EditMapping {image mapping} {
    global EDMAP_EXIT
    global FITTYPE
    global IMAGES
-   global IMMAP   
+   global IMMAP
    global INV
    global MAP_C
    global MAP_MX
    global MAP_MY
    global MAP_RX
    global MAP_RY
-   global MAP_SX 
-   global MAP_SY 
+   global MAP_SX
+   global MAP_SY
    global MAPTYPE
    global MENUBACK
    global OEFITTYPE
@@ -3902,7 +3902,7 @@ proc EditMapping {image mapping} {
 
    }
 
-# Get the coefficient values in the full 6 parameter fit from the mapping. 
+# Get the coefficient values in the full 6 parameter fit from the mapping.
 # Create a warning message if the mapping is not defined.
    if { [DescMap $map] == "" } {
       append header_text "\n\n(Currently undefined)"
@@ -3977,17 +3977,17 @@ proc EditMapping {image mapping} {
    set top .edmaps
    set topf [MakeDialog $top "Edit a mapping" 1]
 
-# Create a message describing the mapping. The width of the message cannot 
+# Create a message describing the mapping. The width of the message cannot
 # be specified in characters, so we use the default width initially.
    set fr2a [frame $topf.fr2a -relief ridge -bd 4 ]
-   pack $fr2a -side top -pady 4m -ipadx 4m -ipady 4m 
+   pack $fr2a -side top -pady 4m -ipadx 4m -ipady 4m
    set header [message $fr2a.header -text $header_text -justify center ]
 
-# Find the pixel size of the font used by the Message. Use 10 if the 
+# Find the pixel size of the font used by the Message. Use 10 if the
 # font string cannot be parsed.
    set font [$header cget -font]
    if { ![regexp {^-[^-]*-[^-]*-[^-]*-[^-]*-[^-]*-[^-]*-([^-]+)} $font \
-                  match pixsize] } { set pixsize 10 } 
+                  match pixsize] } { set pixsize 10 }
 
 # Find the width (in pixels) of 40 characters, assuming an aspect ratio
 # of 1.5 (it would be nice to use the character width from the font
@@ -4002,21 +4002,21 @@ proc EditMapping {image mapping} {
 # Set the width for the data entry boxes.
    set wid [expr $tcl_precision + 6]
 
-# Create a frame holding a table of shifts, rotations, and magnifications 
+# Create a frame holding a table of shifts, rotations, and magnifications
 # on the X and Y axes.
    set fr2 [frame $topf.fr2 -bd 2 -relief raised -background $MENUBACK]
-   pack $fr2 -padx 2m -pady 4m -ipadx 2m -ipady 2m -fill x -expand 1 
+   pack $fr2 -padx 2m -pady 4m -ipadx 2m -ipady 2m -fill x -expand 1
 
    set fa [frame $fr2.fa -background $MENUBACK]
-   pack $fa -side left -fill y 
+   pack $fa -side left -fill y
    pack [label $fa.l1 -text " " -width 7 -font $B_FONT -background $MENUBACK] -side top
    pack [label $fa.l2 -text "X" -width 7 -font $B_FONT -background $MENUBACK] \
         [label $fa.l3 -text "Y" -width 7 -font $B_FONT -background $MENUBACK] -side top -fill y -expand 1
 
    set fc [frame $fr2.fc -background $MENUBACK]
    pack $fc -side left -expand 1
-   set fcv1 [RealValue $fc.v1 $wid MAP_RX "ConvMap 0 $fittype" -font $B_FONT -state $rv(RX)] 
-   set fcv2 [RealValue $fc.v2 $wid MAP_RY "ConvMap 0 $fittype" -font $B_FONT -state $rv(RY)] 
+   set fcv1 [RealValue $fc.v1 $wid MAP_RX "ConvMap 0 $fittype" -font $B_FONT -state $rv(RX)]
+   set fcv2 [RealValue $fc.v2 $wid MAP_RY "ConvMap 0 $fittype" -font $B_FONT -state $rv(RY)]
    pack [label $fc.l1 -text "Rotation" -width 14 -background $MENUBACK] \
         $fcv1 $fcv2 -side top -fill x -expand 1
    SetHelp $fcv1 ".  The clockwise rotation (in degres) of the X axis produced by the mapping."
@@ -4024,20 +4024,20 @@ proc EditMapping {image mapping} {
 
    set fd [frame $fr2.fd -background $MENUBACK]
    pack $fd -side left -expand 1
-   set fdv1 [RealValue $fd.v1 $wid MAP_MX "ConvMap 0 $fittype" -font $B_FONT -state $rv(MX)] 
-   set fdv2 [RealValue $fd.v2 $wid MAP_MY "ConvMap 0 $fittype" -font $B_FONT -state $rv(MY)] 
+   set fdv1 [RealValue $fd.v1 $wid MAP_MX "ConvMap 0 $fittype" -font $B_FONT -state $rv(MX)]
+   set fdv2 [RealValue $fd.v2 $wid MAP_MY "ConvMap 0 $fittype" -font $B_FONT -state $rv(MY)]
    pack [label $fd.l1 -text "Magnification" -width 14 -background $MENUBACK] $fdv1 $fdv2 -side top -fill x -expand 1
    SetHelp $fdv1 ".  The magnification of the X axis produced by the mapping."
    SetHelp $fdv2 ".  The magnification of the Y axis produced by the mapping."
 
    set fb [frame $fr2.fb -background $MENUBACK]
    pack $fb -side left -expand 1
-   set fbv1 [RealValue $fb.v1 $wid MAP_SX "ConvMap 0 $fittype" -font $B_FONT -state $rv(SX)] 
-   set fbv2 [RealValue $fb.v2 $wid MAP_SY "ConvMap 0 $fittype" -font $B_FONT -state $rv(SY)] 
+   set fbv1 [RealValue $fb.v1 $wid MAP_SX "ConvMap 0 $fittype" -font $B_FONT -state $rv(SX)]
+   set fbv2 [RealValue $fb.v2 $wid MAP_SY "ConvMap 0 $fittype" -font $B_FONT -state $rv(SY)]
    pack [label $fb.l1 -text "Shift" -width 14 -background $MENUBACK] $fbv1 $fbv2 -side top -fill x -expand 1
    SetHelp $fbv1 ".  The shift of origin (in pixels) along the X axis produced by the mapping."
    SetHelp $fbv2 ".  The shift of origin (in pixels) along the Y axis produced by the mapping."
-   
+
 # Create a frame holding a table of C1 to C6.
    set fr3 [frame $topf.fr3 -bd 2 -relief raised -background $MENUBACK]
    pack $fr3 -padx 2m -pady 4m -ipadx 2m -ipady 2m -fill x -expand 1 -side top
@@ -4111,7 +4111,7 @@ proc EditMapping {image mapping} {
 
    set b6 [button $butfrm.oemap -text "OEmap" -command "set EDMAP_EXIT oemap" -state $state]
    SetHelp $b6 $help
-   
+
 # Create a frame holding the write protection button, and pack them.
    set fr1b [frame $topf.fr1b -relief groove -bd 2]
    pack $fr1b -padx 2m -pady 3m -fill x -expand 1 -side top -anchor w
@@ -4119,8 +4119,8 @@ proc EditMapping {image mapping} {
    set cb1 [checkbutton $fr1b.cb1 -text "Protect Mapping" -variable $pvar \
             -state $pstate -offvalue normal -onvalue disabled \
             -selectcolor $CB_COL -command \
-            "$b2 configure -state \$$pvar 
-             $b4 configure -state \$$pvar 
+            "$b2 configure -state \$$pvar
+             $b4 configure -state \$$pvar
              $fbv1 configure -state \$$pvar
              $fbv2 configure -state \$$pvar
              $fcv1 configure -state \$$pvar
@@ -4135,7 +4135,7 @@ proc EditMapping {image mapping} {
              $c6 configure -state \$$pvar"]
    pack $cb1 -padx 2m -pady 1m -anchor w
 
-# Now pack the OK, Clear, Cancel, Restore, Help and (if required) OEMap 
+# Now pack the OK, Clear, Cancel, Restore, Help and (if required) OEMap
 # buttons so that they appear at the bottom of the dialog box.
    pack $butfrm -fill x -expand 1
    pack $b1 $b2 $b3 $b4 $b5 -side left -expand 1
@@ -4161,9 +4161,9 @@ proc EditMapping {image mapping} {
       } elseif { $EDMAP_EXIT == "ok" } {
 
 # Get the forward mapping.
-         if { $INV } { 
+         if { $INV } {
             set INV 0
-            InvMapC $fittype 
+            InvMapC $fittype
          }
 
 # If the forward mapping is not defined, delete any existing mapping.
@@ -4172,7 +4172,7 @@ proc EditMapping {image mapping} {
                unset $map_var
             }
 
-# Otherwise, see if the the mapping was changed. 
+# Otherwise, see if the the mapping was changed.
          } {
             set changed 0
             for {set i 1} {$i < 7} {incr i} {
@@ -4182,10 +4182,10 @@ proc EditMapping {image mapping} {
                }
             }
 
-# If it has, save it, and indicate that we will need to re-save the 
+# If it has, save it, and indicate that we will need to re-save the
 # output images.
             if { $changed } {
-               if { $MAP_C(1) == 0.0 && $MAP_C(2) == 1.0 && $MAP_C(3) == 0.0 && 
+               if { $MAP_C(1) == 0.0 && $MAP_C(2) == 1.0 && $MAP_C(3) == 0.0 &&
                     $MAP_C(4) == 0.0 && $MAP_C(5) == 0.0 && $MAP_C(6) == 1.0 } {
                   set $map_var "ref"
                } {
@@ -4197,7 +4197,7 @@ proc EditMapping {image mapping} {
          }
 
 # Re-configure the reference objects to use the new mapping.
-         DrawRef 
+         DrawRef
 
 # Indicate that the dialog box should be closed.
          set exit 1
@@ -4209,7 +4209,7 @@ proc EditMapping {image mapping} {
          }
          ConvMap 1 $fittype
 
-# If the Restore button was pressed, restore the original values describing 
+# If the Restore button was pressed, restore the original values describing
 # the forward mapping.
       } elseif { $EDMAP_EXIT == "restore" } {
          for {set i 1} {$i < 7} {incr i} {
@@ -4217,10 +4217,10 @@ proc EditMapping {image mapping} {
          }
          ConvMap 1 $fittype
          set INV 0
-   
+
 # If the Help button was pressed, give more help.
       } elseif { $EDMAP_EXIT == "help" } {
-         ShowHelp "POLKA_EDIT_MAPPING_DIALOG" 
+         ShowHelp "POLKA_EDIT_MAPPING_DIALOG"
 
 # If the OEMap button was pressed, exit the loop.
       } elseif { $EDMAP_EXIT == "oemap" } {
@@ -4249,7 +4249,7 @@ proc Effects {im effect nodisp} {
 #  Arguments:
 #     im
 #        The image to which the effect is to be applied.
-#     effect 
+#     effect
 #        The label of the entry from the Effects menu which was pressed.
 #     nodisp
 #        If this is non-zero then the results of the effect are not
@@ -4257,20 +4257,20 @@ proc Effects {im effect nodisp} {
 #
 #  Globals:
 #     EFFECTS_MAPPINGS (Read and Write)
-#        A 1-d array, indexed by image name. Each element is a list 
+#        A 1-d array, indexed by image name. Each element is a list
 #        in which each entry gives the mapping introduced by the
 #        corresponding effect. This mapping goes from pixel coords in
 #        the previous top entry in the effects stack to the new top entry.
 #        There is no entry for the supplied image (i.e. the number of
-#        entries in this stack is the same as EFFECTS_STACK, i.e. one less 
-#        than in IMAGE_STACK). Each mapping is described by a list of 6 
+#        entries in this stack is the same as EFFECTS_STACK, i.e. one less
+#        than in IMAGE_STACK). Each mapping is described by a list of 6
 #        values giving the parameters of a full 2-D linear fit.
 #     EFFECTS_STACK (Read and Write)
-#        A 1-d array, indexed by image name. Each element is a list 
+#        A 1-d array, indexed by image name. Each element is a list
 #        containing textual descriptions of the effects applied to the
-#        image. These descriptions correspond to the images in the 
+#        image. These descriptions correspond to the images in the
 #        correspsonding element of the IMAGE_STACK list (except that the
-#        original image - stored at the bottom of the IMAGE_STACK - does not 
+#        original image - stored at the bottom of the IMAGE_STACK - does not
 #        have a description).
 #     FILLCON (Read and Write)
 #        Set to "Variable value" if the Fill effect should fill bad pixels
@@ -4284,10 +4284,10 @@ proc Effects {im effect nodisp} {
 #        A 1-d array index by image name. Each element is a list of file
 #        names holding the result of each effect. Each effect operates on
 #        images on the top of this stack, and results in a new image being
-#        pushed onto the stack. The name of the supplied image section is 
-#        pre-loaded onto the stack, and is never removed (the Undo and Undo 
-#        All effects are disabled if the only image left on the stack is the 
-#        original image). 
+#        pushed onto the stack. The name of the supplied image section is
+#        pre-loaded onto the stack, and is never removed (the Undo and Undo
+#        All effects are disabled if the only image left on the stack is the
+#        original image).
 #     MEXP (Read and Write)
 #        The expression used by the Maths effect.
 #     PSF_SIZE (Read)
@@ -4314,7 +4314,7 @@ proc Effects {im effect nodisp} {
    global EFFECTS_MAPPINGS
    global EFFECTS_STACK
    global FILLCON
-   global FILLVAL 
+   global FILLVAL
    global FSIZE
    global IMAGE_STACK
    global IMAGES
@@ -4331,8 +4331,8 @@ proc Effects {im effect nodisp} {
    global SKYPAR
    global SSIZE
    global THRBAD
-   global THRHI 
-   global THRLO 
+   global THRHI
+   global THRLO
    global UNZOOM
 
 # Begin a temporary file context.
@@ -4355,8 +4355,8 @@ proc Effects {im effect nodisp} {
       set file ""
       set desc ""
 
-# The parameters of the linear mapping from any new image to the original 
-# supplied image (i.e. the image at the bottom of the image stack) are 
+# The parameters of the linear mapping from any new image to the original
+# supplied image (i.e. the image at the bottom of the image stack) are
 # stored in the "c" list. Indicate that as yet no mapping has been
 # produced.
       set c ""
@@ -4366,15 +4366,15 @@ proc Effects {im effect nodisp} {
 
 #---------------------------------------------------------------
 # Align - Resamples the displayed image to align it with another
-# specified image using the current mappings. This can only be done 
-# if the required mappings are available. 
+# specified image using the current mappings. This can only be done
+# if the required mappings are available.
       if { $effect == "Align" } {
 
 # Assume we do not need to update the display.
          set update 0
 
-# This effect may not be applied to the first image because the 
-# first image defines the output cooridnate frame, and the rest of 
+# This effect may not be applied to the first image because the
+# first image defines the output cooridnate frame, and the rest of
 # Polka assumes it has a unit image mapping.
          if { $im == $im0 } {
             Message "The \"Align\" effect cannot be used on image \"$im0\"."
@@ -4386,12 +4386,12 @@ proc Effects {im effect nodisp} {
             set labels(ALIMG) "Align \"$im\" with image: "
             set limits(ALIMG) $IMAGES
 
-# Set a default value for the target image name (the first image in the 
+# Set a default value for the target image name (the first image in the
 # supplied list).
             if { ![info exists ALIMG] } {
                set ALIMG [lindex $IMAGES 0]
             }
-   
+
 # Get a value from the user for the target image name.
             if { [GetPars ALIMG types labels limits "Enter Align Parameters" \
                           "POLKA_ALIGN_EFFECT" \
@@ -4417,7 +4417,7 @@ proc Effects {im effect nodisp} {
                if { $m2 != "" } {
 
 # Combine them to get a mapping from the current image to the target image.
-# This is the mapping which must be applied to the image on the top of the 
+# This is the mapping which must be applied to the image on the top of the
 # effects stack to produce the required alignment.
                   if { $im != $ALIMG } {
                      set m21 [ConcMap $m2 0 $m1 1]
@@ -4426,7 +4426,7 @@ proc Effects {im effect nodisp} {
                   }
 
 # Get the transformed image.
-                  if { $m21 != "" } {               
+                  if { $m21 != "" } {
                      if { $m21 == "ref" } {
                         Message "The displayed image is already aligned with image \"$ALIMG\"."
                      } {
@@ -4464,29 +4464,29 @@ proc Effects {im effect nodisp} {
          if { ![info exists FSIZE] } {
             set FSIZE [expr 3.0*$PSF_SIZE]
          }
-   
+
 # Describe the filter size parameter.
          set types(FSIZE) "_REAL"
          set labels(FSIZE) "Filter size (in pixels): "
          set limits(FSIZE) [list  1.0 10000.0]
 
-# Get a value from the user for the filter size.   
+# Get a value from the user for the filter size.
          if { [GetPars FSIZE types labels limits "Enter Filter Parameters" \
                        "POLKA_FILTER_EFFECT" \
                        ". Enter the parameters needed to perform the selected effect."] } {
-   
+
 # First smooth the input image. The output file name is stored in
 # variable "a1".
             set a1 [UniqueFile]
             set ok [Obey kappa gausmooth "in=$image fwhm=$FSIZE out=$a1"]
 
 # If OK, take the difference between the smoothed image and the original.
-# This will contain just the high frequencies, but bright features will 
+# This will contain just the high frequencies, but bright features will
 # have deep rings around them.
             if { $ok } {
                set a2 [UniqueFile]
                set ok [Obey kappa maths "exp=ia-ib ia=$image ib=$a1 out=$a2"]
-            }         
+            }
 
 # To reduce the depth of these dark rings, we try smoothing the input
 # image again, but this time excluding the bright features. First, remove
@@ -4494,14 +4494,14 @@ proc Effects {im effect nodisp} {
             if { $ok } {
                set a3 [UniqueFile]
                set ok [Obey kappa ffclean "in=$a2 out=$a3 box=$FSIZE clip=\[1,1,1,1\]"]
-            }         
+            }
 
 # Next, transfer the bad pixel mask from this cleaned image to the
 # original image.
             if { $ok } {
                set a4 [UniqueFile]
                set ok [Obey kappa maths "exp=ia*(1-0*ib) ia=$image ib=$a3 out=$a4"]
-            }         
+            }
 
 # Next, smooth this new image (a copy of the original but with small, bright
 # features removed). We allow the smoothing to fill in the holes left by
@@ -4509,7 +4509,7 @@ proc Effects {im effect nodisp} {
             if { $ok } {
                set a5 [UniqueFile]
                set ok [Obey kappa gausmooth "in=$a4 wlim=1E-6 fwhm=$FSIZE out=$a5"]
-            }         
+            }
 
 # See if there are any bad pixels left in the smoothed image.
             if { $ok } {
@@ -4542,13 +4542,13 @@ proc Effects {im effect nodisp} {
                   set desc ""
                   set update 0
                }
-            }         
+            }
 
 # If the user cancelled the effect, do not update the display.
          } {
             set update 0
          }
-   
+
 #---------------------------------------------------------------
 # Maths - Applies an arbitrary algebraic expression to the other images
 # on the stack, using KAPPA:MATHS. Image token IA refers to the image
@@ -4558,18 +4558,18 @@ proc Effects {im effect nodisp} {
 
 # Get the maths expression to use.
          if { ![info exists MEXP] } { set MEXP "" }
-   
+
          set types(MEXP) "_CHAR*50"
          set labels(MEXP) "Maths expression: "
          set limits(MEXP) ""
-   
+
          if { [GetPars MEXP types labels limits "Enter Maths Parameters" \
                        "POLKA_MATHS_EFFECT" \
                        ". Enter the parameters needed to perform the selected effect."] } {
 
 # Remove any spaces from the expression.
             regsub -all { } $MEXP "" MEXP
-   
+
 # Extract the image tokens (IA, etc) from the expression, and store them
 # in list "ims".
             set exp $MEXP
@@ -4578,30 +4578,30 @@ proc Effects {im effect nodisp} {
                lappend ims [string range $exp [lindex $imt 0] [lindex $imt 1]]
                set exp "[string range $exp 0 [lindex $s 1]][string range $exp [lindex $e 0] end]"
             }
-   
+
 # Warn the user if there are no image tokens in the expresion. Do not
-# update the display.   
+# update the display.
             if { $ims == "" } {
                Message "There are no image tokens (such as \"IA\") in the Maths expression."
                set update 0
-   
+
 # Warn the user if there are any parameter tokens in the expresion. Do not
-# update the display.   
+# update the display.
             } elseif { [regexp -nocase {(^|[^A-Z])(P[A-Z])([^A-Z]|$)} $MEXP match s pa e] } {
                Message "Parameter tokens such as \"$pa\" are not allowed in the Maths expression."
                set update 0
-   
+
 # Warn the user if there are any sub-expression tokens in the expresion. Do not
-# update the display.   
+# update the display.
             } elseif { [regexp -nocase {(^|[^A-Z])(F[A-Z])([^A-Z]|$)} $MEXP match s fa e] } {
                Message "Sub-expression tokens such as \"$fa\" are not allowed in the Maths expression."
                set update 0
-   
+
 # If the expression is ok, sort the image tokens into alphabetical order.
             } {
                set ims [lsort $ims]
 
-# Purge any repeated image tokens from the list.         
+# Purge any repeated image tokens from the list.
                set i 0
                set j 1
                while { $j < [llength $ims] } {
@@ -4612,12 +4612,12 @@ proc Effects {im effect nodisp} {
                      incr j
                   }
                }
-   
+
 # Find the indices within the image stack corresponding to each image
-# token. IA is the top-of-stack, IB is the one below the top, etc. Get 
-# the corresponding file name and construct a list (impar) of the ATASK 
-# parameter assignments required for each image token. If there are more 
-# image tokens than there are images on the stack, then warn the user, 
+# token. IA is the top-of-stack, IB is the one below the top, etc. Get
+# the corresponding file name and construct a list (impar) of the ATASK
+# parameter assignments required for each image token. If there are more
+# image tokens than there are images on the stack, then warn the user,
 # and do not update the display.
                set nstack [llength $IMAGE_STACK($im)]
                scan a %c a
@@ -4627,7 +4627,7 @@ proc Effects {im effect nodisp} {
                      set letter [string tolower $letter]
                      scan $letter %c letter
                      set index [expr $letter - $a]
-   
+
                      if { $index < $nstack } {
                         append impar " $imt=[lindex $IMAGE_STACK($im) $index] "
                      } {
@@ -4642,7 +4642,7 @@ proc Effects {im effect nodisp} {
                   set file [UniqueFile]
                   set desc "Maths (exp=$MEXP)"
 
-# Invoke KAPPA:MATHS to do the work. 
+# Invoke KAPPA:MATHS to do the work.
                   if { ![Obey kappa maths "exp=$MEXP $impar out=$file"] } {
                      set ok 0
                      set file ""
@@ -4656,7 +4656,7 @@ proc Effects {im effect nodisp} {
          } {
             set update 0
          }
-   
+
 #---------------------------------------------------------------
 # Negate - Reverse the sign of every pixel value.
       } elseif { $effect == "Negate" } {
@@ -4668,10 +4668,10 @@ proc Effects {im effect nodisp} {
             set desc ""
             set update 0
          }
-   
+
 #---------------------------------------------------------------
-# Fit Sky - Estimate the sky background in the displayed image based on 
-# the current sky areas or supplied sky frames, and optionally subtract 
+# Fit Sky - Estimate the sky background in the displayed image based on
+# the current sky areas or supplied sky frames, and optionally subtract
 # it from the displayed image.
       } elseif { $effect == "Fit Sky" } {
 
@@ -4692,7 +4692,7 @@ proc Effects {im effect nodisp} {
             if { ![info exists SKYOP] } {
                set SKYOP "Fitted sky"
             }
-   
+
 # Get a value from the user for the image type.
             if { [GetPars SKYOP types labels limits "Enter Fit Sky Parameters" \
                           "POLKA_FITSKY_EFFECT" \
@@ -4711,7 +4711,7 @@ proc Effects {im effect nodisp} {
                   append desc " - sky corrected data returned)"
                   set sub 1
                }
-   
+
                set file [SkySub $image $im $sub]
                if { $file == "" } {
                   set update 0
@@ -4729,15 +4729,15 @@ proc Effects {im effect nodisp} {
          if { ![info exists SSIZE] } {
             set SSIZE [expr 3.0*$PSF_SIZE]
          }
-   
+
          set types(SSIZE) "_REAL"
          set labels(SSIZE) "Gaussian FWHM (in pixels): "
          set limits(SSIZE) [list  1.0E-6  10000.0]
-   
+
          if { [GetPars SSIZE types labels limits "Enter Smoothing Parameters" \
                        "POLKA_SMOOTH_EFFECT" \
                        ". Enter the parameters needed to perform the selected effect."] } {
-   
+
 # Get the output image name.
             set file [UniqueFile]
             set desc "Smooth (Fwhm = $SSIZE)"
@@ -4754,7 +4754,7 @@ proc Effects {im effect nodisp} {
          } {
             set update 0
          }
-   
+
 #---------------------------------------------------------------
 # Stats - Display statistics of the data within the selected area of the
 # currenrly displayed image.
@@ -4764,22 +4764,22 @@ proc Effects {im effect nodisp} {
          set update 0
 
 # Issue a warning and return if there is no selected area.
-         if { $SELECTED_AREA == "" } { 
+         if { $SELECTED_AREA == "" } {
             Message "Select an area by clicking and dragging over the image before using the \"Stats\" effect."
 
 #  Otherwise...
          } {
 
 # Get the bounds in canvas coordinates of the selected area.
-            set cxlo [lindex $SELECTED_AREA 0]      
-            set cylo [lindex $SELECTED_AREA 1]      
-            set cxhi [lindex $SELECTED_AREA 2]      
-            set cyhi [lindex $SELECTED_AREA 3]      
+            set cxlo [lindex $SELECTED_AREA 0]
+            set cylo [lindex $SELECTED_AREA 1]
+            set cxhi [lindex $SELECTED_AREA 2]
+            set cyhi [lindex $SELECTED_AREA 3]
 
 # Convert these to pixel coordinates. Note, the Y axis is reversed since the
 # TK origin is at the UPPER left corner.
             set pxyl [CanToNDF $cxlo $cyhi]
-            if { $pxyl == "" } { return } 
+            if { $pxyl == "" } { return }
             set pxlo [lindex $pxyl 0]
             set pylo [lindex $pxyl 1]
             set pxyl [CanToNDF $cxhi $cylo]
@@ -4824,13 +4824,13 @@ proc Effects {im effect nodisp} {
             set FILLCON "Variable value"
             set FILLVAL 0.0
          }
-   
+
          set vars [list FILLCON FILLVAL]
 
          set types(FILLCON) "_CHOICE"
          set labels(FILLCON) "Fill with: "
          set limits(FILLCON) [list "Variable value" "Constant value"]
-   
+
          set types(FILLVAL) "_REAL"
          set labels(FILLVAL) "Constant fill value: "
          set limits(FILLVAL) ""
@@ -4838,7 +4838,7 @@ proc Effects {im effect nodisp} {
          if { [GetPars $vars types labels limits "Enter Filling Parameters" \
                        "POLKA_FILL_EFFECT" \
                        ". Enter the parameters needed to perform the selected effect."] } {
-            
+
 # Get the output image name.
             set file [UniqueFile]
 
@@ -4879,7 +4879,7 @@ proc Effects {im effect nodisp} {
             set THRLO $SCALOW
             set THRHI $SCAHIGH
          }
-   
+
          set vars [list THRLO THRHI THRBAD]
 
          set types(THRLO) "_REAL"
@@ -4889,11 +4889,11 @@ proc Effects {im effect nodisp} {
          set types(THRHI) "_REAL"
          set labels(THRHI) "Upper threshold value: "
          set limits(THRHI) ""
-   
+
          set types(THRBAD) "_LOGICAL"
          set labels(THRBAD) "Remove out-of-bounds pixels?"
          set limits(THRBAD) ""
-   
+
          if { [GetPars $vars types labels limits "Enter Thresholding Parameters" \
                        "POLKA_THRESHOLD_EFFECT" \
                        ". Enter the parameters needed to perform the selected effect."] } {
@@ -4911,7 +4911,7 @@ proc Effects {im effect nodisp} {
             } {
                set news "newlo=$THRLO newhi=$THRHI"
             }
-   
+
 # Decide on the output image name.
             set file [UniqueFile]
             set desc "Threshold (limits = \[ $THRLO, $THRHI \] )"
@@ -4928,7 +4928,7 @@ proc Effects {im effect nodisp} {
          } {
             set update 0
          }
-   
+
 #---------------------------------------------------------------
 # Log - Takes the log of the difference between each pixel value and the
 # minimum pixel value in the image.
@@ -4952,13 +4952,13 @@ proc Effects {im effect nodisp} {
                set update 0
             }
          }
-   
+
 
 #---------------------------------------------------------------
 # Undo - Undo the most recently applied effect. This is done by poping
 # the top entry of the image stack.
 #
-# Undo All - Undo all the applied effects. This is done by removing 
+# Undo All - Undo all the applied effects. This is done by removing
 # all but the bottom entry (the original image) from the image stack.
       } elseif { $effect == "Undo" || $effect == "Undo All" } {
 
@@ -4972,9 +4972,9 @@ proc Effects {im effect nodisp} {
 # Undo this many effects.
          for {set i 0} {$i < $n} {incr i} {
 
-# If the mapping caused any changes to the positions lists (etc), undo them. 
-# This will be the case unless the mapping is a unit mapping (indicated by 
-# the string "ref"). If this fails, leave the effect in place, and give a 
+# If the mapping caused any changes to the positions lists (etc), undo them.
+# This will be the case unless the mapping is a unit mapping (indicated by
+# the string "ref"). If this fails, leave the effect in place, and give a
 # warning.
             set m21 [Top EFFECTS_MAPPINGS($im)]
             if { $m21 != "ref" } {
@@ -4985,12 +4985,12 @@ proc Effects {im effect nodisp} {
                }
             }
 
-# We arrive here only if the above went OK. Pop the top entries from the 
+# We arrive here only if the above went OK. Pop the top entries from the
 # stacks.
             Pop IMAGE_STACK($im)
             Pop EFFECTS_STACK($im)
             Pop EFFECTS_MAPPINGS($im)
-         }       
+         }
 
 #---------------------------------------------------------------
 # Show Effects - All other effects names result in a dialog box being created
@@ -5028,8 +5028,8 @@ proc Effects {im effect nodisp} {
 
 # If a new image was created, containing the results of applying the
 # selected effect, then push it onto the image stack. Also store a
-# description of the effect on the effects stack, and the mapping 
-# from the new image to the previous image. If the effect just applied 
+# description of the effect on the effects stack, and the mapping
+# from the new image to the previous image. If the effect just applied
 # produced no geometric change, then the new image is assigned a unit
 # mapping.
       if { $file != "" } {
@@ -5044,13 +5044,13 @@ proc Effects {im effect nodisp} {
 # Cancel the informative text set earlier in this procedure.
       if { $told } { SetInfo "" 0 }
 
-# If required, display the new image. 
-      if { $update && !$nodisp} { 
-         UpdateDisplay gwm 
+# If required, display the new image.
+      if { $update && !$nodisp} {
+         UpdateDisplay gwm
       }
    }
 
-# Delete all the temporary files created in this procedure, except for the 
+# Delete all the temporary files created in this procedure, except for the
 # one which was pushed on the image stack.
    EndUF $tfc $file
 
@@ -5067,7 +5067,7 @@ proc MappingMod {image map undo} {
 #     the specified map.
 #
 #  Arguments:
-#     image 
+#     image
 #        The image to be used. If this is null, then the currently
 #        displayed image is used.
 #     map
@@ -5076,7 +5076,7 @@ proc MappingMod {image map undo} {
 #     undo
 #        If this is non-zero, then the modifications caused by the
 #        supplied mapping are removed instead of being applied. Note, in
-#        this case the current effects stacks MUST STILL include the 
+#        this case the current effects stacks MUST STILL include the
 #        effect which is being undone.
 #
 #  Returned Value:
@@ -5093,12 +5093,12 @@ proc MappingMod {image map undo} {
 #     IMAGE_DISP (Read)
 #        The displayed image (without section).
 #     IMMAP (Read and Write)
-#        An array of lists (one for each image), each giving the mapping 
+#        An array of lists (one for each image), each giving the mapping
 #        from the supplied image to the reference (first) image. Each
-#        mapping is a list of 6 values representing a general linear 
+#        mapping is a list of 6 values representing a general linear
 #        transformation.
 #     OEMAP (Read and Write)
-#        An array of mappings (one for each image), each being a list of 
+#        An array of mappings (one for each image), each being a list of
 #        6 parameter values giving the linear mapping from E to O ray.
 #     O_RAY_FEATURES (Read)
 #        An integer representing the "O-ray features" object type.
@@ -5106,10 +5106,10 @@ proc MappingMod {image map undo} {
 #        An integer representing the "O-ray mask" object type.
 #     PNTPX (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #-
    global DEF_OEMAP
    global E_RAY_FEATURES
@@ -5147,24 +5147,24 @@ proc MappingMod {image map undo} {
 # is done so that it can be re-instated if anything goes wrong while
 # calculating new values.
    foreach obj "$O_RAY_SKY $E_RAY_SKY $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
-      set old_px($obj) $PNTPX($image,$obj) 
-      set old_py($obj) $PNTPY($image,$obj) 
-   }                     
+      set old_px($obj) $PNTPX($image,$obj)
+      set old_py($obj) $PNTPY($image,$obj)
+   }
 
    set old_immap [ImageMapping $image]
    set old_oemap [OEMapping $image]
-   set old_defoemap $DEF_OEMAP 
+   set old_defoemap $DEF_OEMAP
    set old_sec_stack $SECTION_STACK
    set old_sec_req $SECTION_REQ
 
 # If the image being used is the displayed image, insert a new section at
-# the bottom of the section stack which causes the entire mapped image to be 
+# the bottom of the section stack which causes the entire mapped image to be
 # displayed so that it fills the screen. The bottom entry on the stack
 # always refers to the entire image. If there are no entries on the stack
 # then the currently displayed section will be for the entire image, and
 # so can be used instead.
    if { $image == $IMAGE_DISP } {
-      if { $map != "ref" } { 
+      if { $map != "ref" } {
          if { [llength $SECTION_STACK] > 0 } {
             set sec0 [lindex $SECTION_STACK end]
          } {
@@ -5175,19 +5175,19 @@ proc MappingMod {image map undo} {
       }
    }
 
-# Get the transformed positions lists. 
+# Get the transformed positions lists.
    foreach obj "$O_RAY_SKY $E_RAY_SKY $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
       if { ![TranList $map $for $old_px($obj) $old_py($obj) \
                       PNTPX($image,$obj) \
                       PNTPY($image,$obj)] } {
          set ok 0
-         break 
+         break
       }
-   }                           
+   }
 
 # Modify the image and OE mappings for the displayed image by
 # concatenating them with the supplied mapping.
-   if { $ok } {                     
+   if { $ok } {
       if { $old_immap != "" } {
          set IMMAP($image) [ConcMap $map $back $old_immap 0]
          if { $IMMAP($image) == "" } {
@@ -5196,7 +5196,7 @@ proc MappingMod {image map undo} {
       }
    }
 
-   if { $ok } {                     
+   if { $ok } {
       if { $old_oemap != "" } {
          set OEMAP($image) [ConcMap [ConcMap $map $back $old_oemap 0] \
                                     0 $map $for]
@@ -5217,16 +5217,16 @@ proc MappingMod {image map undo} {
    if { !$ok } {
 
       foreach obj "$O_RAY_SKY $E_RAY_SKY $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
-         set PNTPX($image,$obj) $old_px($obj) 
+         set PNTPX($image,$obj) $old_px($obj)
          set PNTPY($image,$obj) $old_py($obj)
-      }                     
-   
+      }
+
       if { old_immap != "" } {
          set IMMAP($image) $old_immap
       } elseif { [info exists IMMAP($image)] } {
          unset IMMAP($image)
       }
-               
+
       if { old_oemap != "" } {
          set OEMAP($image) $old_oemap
       } elseif { [info exists OEMAP($image)] } {
@@ -5255,7 +5255,7 @@ proc MakeTrn {map} {
 #        A set of 6 linear mapping parameters, or "ref" for a unit mapping.
 #
 #  Returned Value:
-#     The path to the text file holding the Mapping, or a null string if the 
+#     The path to the text file holding the Mapping, or a null string if the
 #     supplied mapping was undefined, or if KAPPA:WCSADD failed.
 #-
 
@@ -5270,8 +5270,8 @@ proc MakeTrn {map} {
          set maptype "unit"
          set coeffs ""
 
-# Otherwise, we will create a compound WinMap/MatrixMap. Construct a string 
-# holding all 6 coefficients, in a form suitable for passing to an A-task as 
+# Otherwise, we will create a compound WinMap/MatrixMap. Construct a string
+# holding all 6 coefficients, in a form suitable for passing to an A-task as
 # the value for a vector parameter.
       } {
          set maptype "linear"
@@ -5305,11 +5305,11 @@ proc Message {message} {
 #
 #  Arguments:
 #    message
-#       The message to display. 
+#       The message to display.
 #
 #  Globals:
 #    F_OWNER (Read and Write)
-#        The name of the Polka widget which "owns" the focus. It is 
+#        The name of the Polka widget which "owns" the focus. It is
 #        temporarily changed to be the toplevel containing the dialogue
 #        box. It is reset to its original value when the label has been
 #        obtained.
@@ -5320,8 +5320,8 @@ proc Message {message} {
    global TOP
    global env
 
-# If the top level window has not yet been created, message to standard 
-# output 
+# If the top level window has not yet been created, message to standard
+# output
    if { ![info exists TOP] } {
       puts $message
 
@@ -5349,11 +5349,11 @@ proc Erase {image object} {
 #
 #  Purpose:
 #     Erase an object. This includes clearing the associated markers on
-#     the canvas, and clearing the global arrays holding information 
+#     the canvas, and clearing the global arrays holding information
 #     describing the object.
 #
 #  Arguments:
-#     image 
+#     image
 #        The image with which the object is associated.
 #     obj_out
 #        The object type ($E_RAY_MASK, $O_RAY_MASK, etc)
@@ -5400,21 +5400,21 @@ proc EndUF {context leave} {
 #     for any files included in the argument "leave".
 #
 #  Arguments:
-#     context 
+#     context
 #        A context identifier returned by BeginUF. All contexts contained
 #        with the specified context are also ended.
 #     leave
 #        A list of files which are to be escaped into the next higher
-#        context. 
+#        context.
 #
 #  Globals:
-#     POLKA_SCRATCH 
-#       The path to the temporary directory used to store temporary images 
+#     POLKA_SCRATCH
+#       The path to the temporary directory used to store temporary images
 #       created by Polka.
 #     IFILE (Read)
 #        Temporary file names created by UniqueFile are stored in Polka's
 #        temporary POLKA_SCRATCH directory which is deleted when
-#        Polka terminates. They have a name of the form polka<i> where 
+#        Polka terminates. They have a name of the form polka<i> where
 #        <i> is an integer, which is different for each file and
 #        increases monotonically throughout the execution of Polka. IFILE
 #        records the value of i used in the previous call to UniqueFile.
@@ -5609,8 +5609,8 @@ proc Extension {ndf comp type value old} {
 #
 #  Globals:
 #     ATASK_OUTPUT (Read and Write)
-#        A list containing any non-error messages produced by the most 
-#        recently run A-task. Each message is stored as a new element in 
+#        A list containing any non-error messages produced by the most
+#        recently run A-task. Each message is stored as a new element in
 #        the list.
 #
 #  Notes:
@@ -5642,7 +5642,7 @@ proc Extension {ndf comp type value old} {
       if { $old_value != "" } {
          if { ![Obey ndfpack setext "cname=$comp ndf=$ndf loop=no option=erase xname=POLPACK xtype=POLPACK"] } {
             set ok 0
-         } 
+         }
       }
 
 # And add the new item.
@@ -5652,7 +5652,7 @@ proc Extension {ndf comp type value old} {
    }
 
 # Return the old value if a variable has been supplied for it.
-   if { $old != "" } { 
+   if { $old != "" } {
       upvar $old old_val
       set old_val $old_value
    }
@@ -5683,11 +5683,11 @@ proc FindHelp {x y} {
 #       A 1-D array index by widget name. Each element is an htx
 #       cross-reference label to be displayed if the widget is selected
 #       using "Help on pointer".
-#     
+#
 #-
    global HELP_LABELS
 
-# Find the lowest level window at the given root coordinates.    
+# Find the lowest level window at the given root coordinates.
    set w [winfo containing $x $y]
 
 # Assume there is no label associated with this position.
@@ -5732,12 +5732,12 @@ proc FindPosn {names values tol args} {
 #           ID - The canvas item id of the marker for the position (-1
 #                if no marker is currently drawn).
 #           VID - The canvas item id of the line joining the position to
-#                the position given by parameter NXT (-1 if no line is 
+#                the position given by parameter NXT (-1 if no line is
 #                currently drawn, and null ("") if NXT is undefined).
-#           NXT - The index of the position corresponding to the next 
+#           NXT - The index of the position corresponding to the next
 #                vertex in a polygonal mask (-1 if there is no "next
-#                vertex" (i.e. if the polygon is open) and null ("") if this 
-#                position is not part of a polygon). 
+#                vertex" (i.e. if the polygon is open) and null ("") if this
+#                position is not part of a polygon).
 #           LBL - The textual label associated with a position.
 #           TAG - A canvas tag associated with the position.
 #     values
@@ -5746,7 +5746,7 @@ proc FindPosn {names values tol args} {
 #     tol
 #        The tolerance to use for CX, CY, PX and PY equality.
 #     args
-#        An optional list argument holding the image from which the 
+#        An optional list argument holding the image from which the
 #        positions are derived, and the type of objects to be searched.
 #        If these are not supplied, they default to $IMAGE_DISP and
 #        $CUROBJ_DISP.
@@ -5763,10 +5763,10 @@ proc FindPosn {names values tol args} {
 #        The displayed image (without section).
 #     PNTCX (Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas X coordinates. 
+#        is a list of canvas X coordinates.
 #     PNTCY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas Y coordinates. 
+#        is a list of canvas Y coordinates.
 #     PNTID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -5774,7 +5774,7 @@ proc FindPosn {names values tol args} {
 #        currently drawn for the position.
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -5784,17 +5784,17 @@ proc FindPosn {names values tol args} {
 #        closed).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PNTTAG (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas tags (one for each position).
 #     PNTVID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        vectors between positions in the list. A value of -1 indicates that 
+#        vectors between positions in the list. A value of -1 indicates that
 #        no line is currently drawn for the position. A blank string
 #        indicates that no vector is defined.
 #
@@ -5818,9 +5818,9 @@ proc FindPosn {names values tol args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_DISP
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Do nothing if the list is empty.
@@ -5834,7 +5834,7 @@ proc FindPosn {names values tol args} {
 
 # Check each supplied parameter value
             set j 0
-            foreach name $names {  
+            foreach name $names {
                set supval [lindex $values $j]
                incr j
 
@@ -5842,9 +5842,9 @@ proc FindPosn {names values tol args} {
                upvar #0 PNT$name array
                set curval [lindex $array($image,$object) $i]
 
-# If it is different to the supplied position, set ret null and break out of 
+# If it is different to the supplied position, set ret null and break out of
 # the loop. Pixel and canvas coordinates are given a tolerance.
-               if { $name == "PX" || $name == "PY" || 
+               if { $name == "PX" || $name == "PY" ||
                     $name == "CX" || $name == "CY" } {
                   if { $curval > [expr $supval + $tol] || $curval < [expr $supval - $tol] } {
                      set ret ""
@@ -5888,7 +5888,7 @@ proc Finish {save} {
 #     RESAVE (Read)
 #        Set to zero if the the mappings and masks have not changed since
 #        the last time the output images were saved. Set to a non-zero
-#        value if the output images are out-of-date with respect to the 
+#        value if the output images are out-of-date with respect to the
 #        mappings and/or masks.
 #-
    global RESAVE
@@ -5900,9 +5900,9 @@ proc Finish {save} {
 # Construct a suitable confirmation question, depending on whether or not
 # the output images have been saved.
    if { $RESAVE && $GOTOUT } {
-      set quest "The output images have not yet been saved!\n\nQuit Polka?"   
+      set quest "The output images have not yet been saved!\n\nQuit Polka?"
    } {
-      set quest "Exit Polka?"   
+      set quest "Exit Polka?"
    }
 
 # See if the user confirms the intention to exit. If so, exit.
@@ -5916,7 +5916,7 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
 #     Fit
 #
 #  Purpose:
-#     Estimates a linear mapping which maps the (gx,gy) positions onto 
+#     Estimates a linear mapping which maps the (gx,gy) positions onto
 #     the (gu,gv) positions, imposing the restrictions implied by the
 #     supplied fit type.
 #
@@ -5937,15 +5937,15 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
 #        The numerical fittype to use (see CCDPACK:REGISTER).
 #
 #  Returned Value:
-#     A list of 6 parameter values. A blank string is returned if the 
+#     A list of 6 parameter values. A blank string is returned if the
 #     mapping cannot be determined, and "ref" is returned for a unit mapping.
 #-
 
 # Assume failure.
    set ret ""
 
-# Unless the fit type is a full 6 parameter fit (fittype 5) use a local 
-# procedure instead of CCDPACK:REGISTER, which constrains the magnification 
+# Unless the fit type is a full 6 parameter fit (fittype 5) use a local
+# procedure instead of CCDPACK:REGISTER, which constrains the magnification
 # to be the same on both axes and is fast.
    if { $fittype != 5 } {
       set ret [Fit1234 $labxy $gx $gy $labuv $gu $gv $fittype]
@@ -5953,8 +5953,8 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
 # Otherwise, use CCDPACK:REGISTER...
    } {
 
-# The pixel coordinates for the input and mapped positions are written to 
-# separate text files in the format of a CCDPACK position list. Create a 
+# The pixel coordinates for the input and mapped positions are written to
+# separate text files in the format of a CCDPACK position list. Create a
 # file to hold the names of these two position list files and open it.
       set infiles [UniqueFile]
       set infilesid [open $infiles w]
@@ -5977,9 +5977,9 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
          puts $infilesid $infile
          set infileid [open $infile w]
 
-# Write the labels and pixel coordinates to the file opened earlier. Only 
-# use positions with non-blank labels. Count the number of positions written 
-# to the text file. 
+# Write the labels and pixel coordinates to the file opened earlier. Only
+# use positions with non-blank labels. Count the number of positions written
+# to the text file.
          set nused 0
          set size [llength $pxlist]
          for {set i 0} {$i < $size} {incr i} {
@@ -6003,7 +6003,7 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
 # Close the file holding the names of the position list files.
       close $infilesid
 
-# If the lists were produced OK, we can now find the mapping which 
+# If the lists were produced OK, we can now find the mapping which
 # registers them.
       if { $nused > 0 } {
 
@@ -6034,7 +6034,7 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
 #  Purpose:
 #     Calculate a linear mapping from the (gx,gy) positions to the
 #     (gu,gv) positions. Various constraints can be put on the fit by
-#     specifying a suitable fittype. These are like the fit types 1 to 4 
+#     specifying a suitable fittype. These are like the fit types 1 to 4
 #     used by CCDPACK:REGISTER except that magnification is constrained
 #     to be the same on both axes. it type 5 is not handled by this
 #     procedure.
@@ -6107,13 +6107,13 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
          set su 0.0
          set sxx 0.0
          set syy 0.0
-   
+
          for {set i 0} {$i < $n} {incr i} {
             set x [lindex $lx $i]
             set y [lindex $ly $i]
             set u [lindex $lu $i]
             set v [lindex $lv $i]
-   
+
             set suy [expr $suy + $u * $y]
             set svx [expr $svx + $v * $x]
             set svy [expr $svy + $v * $y]
@@ -6146,7 +6146,7 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
 
 # Otherwise, find the magnification, and rotation.
             } {
-   
+
                if { $fittype == 2 } {
                   set a [expr ($n * ( $svy + $sux ) - $sv * $sy - $su * $sx)]
                   set b [expr ($n * ( $suy - $svx ) - $su * $sy + $sv * $sx)]
@@ -6158,19 +6158,19 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
                      set c2 1.0
                      set c3 0.0
                   }
-   
+
                } elseif { $fittype == 3 } {
                   set a [expr ($n * ( $svy + $sux ) - $sv * $sy - $su * $sx)]
                   set c2 [expr $a / $den ]
                   set c3 0.0
-   
+
                } elseif { $fittype == 4 } {
                   set a [expr ($n * ( $svy + $sux ) - $sv * $sy - $su * $sx)]
                   set c2 [expr $a / $den ]
                   set c3 [expr ($n * ( $suy - $svx ) - $su * $sy + $sv * $sx) / $den]
-   
+
                }
-            }            
+            }
 
 # Find the offsets.
             set c1 [expr ( $su - $sx * $c2 - $c3 * $sy) / $n]
@@ -6178,7 +6178,7 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
          }
 
 # Transform the xy positions using the mapping, and find the rms
-# deviation between the xy and uv positions. Also make a list of all the 
+# deviation between the xy and uv positions. Also make a list of all the
 # residuals.
          set res2_list ""
          set sum2 0.0
@@ -6189,7 +6189,7 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
             set v [lindex $lv $i]
             set du [expr $c1 + $c2 * $x + $c3 * $y - $u]
             set dv [expr $c4 - $c3 * $x + $c2 * $y - $v]
-            set res2 [expr $du * $du + $dv * $dv]         
+            set res2 [expr $du * $du + $dv * $dv]
 
             lappend res2_list $res2
 
@@ -6217,7 +6217,7 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
                   lappend new_lu [lindex $lu $i]
                   lappend new_lv [lindex $lv $i]
                   incr new_n
-               } 
+               }
             }
 
 # Leave the loop if no points were rejected.
@@ -6260,10 +6260,10 @@ proc GetFeature {cx cy rlabel} {
 #        A list of canvas coordinates of the initial guesses at the feature
 #        positions.
 #     rlabel
-#        If this is not null, then it is a list of labels to be used as the 
+#        If this is not null, then it is a list of labels to be used as the
 #        labels for the new features (and the user is not prompted for new
-#        labels). Also, this suppresses the warning messages which are 
-#        otherwise displayed if a position already exists at the supplied 
+#        labels). Also, this suppresses the warning messages which are
+#        otherwise displayed if a position already exists at the supplied
 #        position, or if a position cannot be centroided.
 #
 #  Returned Value:
@@ -6317,14 +6317,14 @@ proc GetFeature {cx cy rlabel} {
 # If the positions are to be centroided...
    if { $PSF_SIZE > 0 } {
 
-#  Write out the initiali pixel coordinates to a text file to be passed 
+#  Write out the initiali pixel coordinates to a text file to be passed
 #  to POLCENT.
       set tfile [UniqueFile]
       set tfile_id [open $tfile w]
 
       for {set i 0} {$i < $np} {incr i} {
          puts $tfile_id "[lindex $px $i] [lindex $py $i]"
-      }            
+      }
 
       close $tfile_id
 
@@ -6335,12 +6335,12 @@ proc GetFeature {cx cy rlabel} {
       set isize [expr 2 * $PSF_SIZE]
       set maxsh [expr 4 * $PSF_SIZE]
 
-# Attempt to centroid them. 
+# Attempt to centroid them.
       set imsec "[Top IMAGE_STACK($IMAGE_DISP)]$SECTION_DISP"
       if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize infile=$tfile outfile=$tofile"] } {
 
 # If succesful, read the accurate feature coordinates from the output
-# file. Create a Tcl list containing the X and Y values, replacing "D" 
+# file. Create a Tcl list containing the X and Y values, replacing "D"
 # exponents by "E".
          set qx ""
          set qy ""
@@ -6413,9 +6413,9 @@ proc GetFeature {cx cy rlabel} {
          if { $rlb == "" } {
             Message "An image feature already exists at the specified position."
          }
-               
-# If there is no existing feature at this position, create a circle on the 
-# canvas at the accurate position. This is a temporary marker used to 
+
+# If there is no existing feature at this position, create a circle on the
+# canvas at the accurate position. This is a temporary marker used to
 # indicate that we have a "candidate feature". TestFea returns a list
 # holding the X and Y canvas coordinates at the feature.
       } {
@@ -6437,7 +6437,7 @@ proc GetFeature {cx cy rlabel} {
 # If a label was given, create a new position and marker.
          if { $lab != "" } {
             set cxy [NDFToCan $ppx $ppy]
-            if { $cxy == "" } { return } 
+            if { $cxy == "" } { return }
             set cx [lindex $cxy 0]
             set cy [lindex $cxy 1]
             set newi [SetPosn -1 "PX PY CX CY LBL" [list $ppx $ppy $cx $cy $lab] ]
@@ -6445,7 +6445,7 @@ proc GetFeature {cx cy rlabel} {
             SetPosn $newi ID $id
          }
       }
-   }   
+   }
 
    return $nbad
 }
@@ -6462,7 +6462,7 @@ proc GetItems {} {
 #     None.
 #
 #  Globals:
-#     CB_COL (Read) 
+#     CB_COL (Read)
 #        The colour to use for the check buttons in the dialog box.
 #     GETITEMS_EXIT (Read and Write)
 #        Used to communicate with the widgets.
@@ -6479,15 +6479,15 @@ proc GetItems {} {
 #        A list containing flags indicating if each of the status items
 #        is displayed or not.
 #     SI_VARS (Read)
-#        A list containing the global variable name for each status item, 
+#        A list containing the global variable name for each status item,
 #        in the order they were defined.
-#     
+#
 #  Notes:
-#    - 
+#    -
 #-
    global CB_COL
    global GETITEMS_EXIT
-   global SAREA 
+   global SAREA
    global SI_LABELS
    global SI_LIST
    global SI_ON
@@ -6499,14 +6499,14 @@ proc GetItems {} {
 
 # Save the list of status item identifiers for the items curently
 # displayed.
-   set si_list_old $SI_LIST 
+   set si_list_old $SI_LIST
 
 # Find the length of the longest label.
    set maxl 0
    foreach label $SI_LABELS {
       set l [string length $label]
       if { $l > $maxl } { set maxl $l }
-   }   
+   }
 
 # Create a frame to put the checkbuttons in.
    set fr0 [frame $topf.fr0]
@@ -6520,7 +6520,7 @@ proc GetItems {} {
 
 # Create a check button for each status item, place them alternately in
 # the left and right of the two frames just created.
-   set f $fr1   
+   set f $fr1
    for {set i 0} {$i < [llength $SI_VARS]} {incr i} {
 
       if { [lsearch -exact $SI_LIST  $i] > -1 } {
@@ -6540,8 +6540,8 @@ proc GetItems {} {
                set SI_LIST \[lreplace \$SI_LIST \$j \$j]
             }
          }"]
-        
-      pack $cb($i) -side top -pady 1m -anchor nw 
+
+      pack $cb($i) -side top -pady 1m -anchor nw
 
       if { $f == $fr1 } {
          set f $fr2
@@ -6588,28 +6588,28 @@ proc GetItems {} {
 # and exit.
       if { $GETITEMS_EXIT == "cancel" } {
          if { $SI_LIST != $si_list_old } {
-            set SI_LIST $si_list_old 
+            set SI_LIST $si_list_old
             if { $SAREA } {
                StatusArea 0
-               StatusArea 1              
+               StatusArea 1
             }
          }
          set exit 1
 
-# If the Apply button was pressed, re-draw the status area if it is currently 
+# If the Apply button was pressed, re-draw the status area if it is currently
 # displayed, but do not exit.
       } elseif { $GETITEMS_EXIT == "apply" } {
          if { $SAREA } {
             StatusArea 0
-            StatusArea 1              
+            StatusArea 1
          }
 
-# If the OK button was pressed, re-draw the status area if it is currently 
+# If the OK button was pressed, re-draw the status area if it is currently
 # displayed, and exit.
       } elseif { $GETITEMS_EXIT == "ok" } {
          if { $SAREA } {
             StatusArea 0
-            StatusArea 1              
+            StatusArea 1
          }
          set exit 1
 
@@ -6627,7 +6627,7 @@ proc GetItems {} {
 
 # If the Help button was pressed, display help.
       } elseif { $GETITEMS_EXIT == "help" } {
-         ShowHelp "POLKA_STATUS_ITEMS_DIALOG" 
+         ShowHelp "POLKA_STATUS_ITEMS_DIALOG"
       }
    }
 
@@ -6642,8 +6642,8 @@ proc GetLabel {} {
 #    GetLabel
 #
 #  Purpose:
-#    Obtain a string with which to label an image feature. Labels are 
-#    integers. A dialogue box is displayed 
+#    Obtain a string with which to label an image feature. Labels are
+#    integers. A dialogue box is displayed
 #    containing a list of all the known feature labels. The
 #    user may select one by clicking on an entry in the list, or may choose
 #    to use a new feature label (created automatically). Clicking on
@@ -6661,7 +6661,7 @@ proc GetLabel {} {
 #        Is this the first image to be assigned feature labels? If so, the
 #        labels are created automatically without any user intervention.
 #     LABBUT (Write)
-#        Used to communicate with widget commands. 
+#        Used to communicate with widget commands.
 #     LAST_LABEL (Read and Write)
 #        The label from the last image feature to be pointed at.
 #     LABELS (Read and Write)
@@ -6686,7 +6686,7 @@ proc GetLabel {} {
    global LABELS
    global LABEL_OFF
    global LAST_LABEL
-   global LB     
+   global LB
    global LB_B3
    global NLAB
    global OBJTYPE
@@ -6704,17 +6704,17 @@ proc GetLabel {} {
       foreach w $LABEL_OFF {
          lappend states [$w cget -state]
          $w configure -state disabled
-      }      
+      }
 
-# Indicate that clicks in the GWM display are now being used to select 
+# Indicate that clicks in the GWM display are now being used to select
 # feature labels.
       SetMode 3
 
 # Create the top level window for the dialogue box, and set its title.
-      set top .feature 
+      set top .feature
       set topf [MakeDialog $top "Select feature label" 0]
 
-# Create and pack a frame for the "OK", "NEW", "CANCEL" and "HELP" buttons at 
+# Create and pack a frame for the "OK", "NEW", "CANCEL" and "HELP" buttons at
 # the left hand side.
       set f3 [frame $topf.f3]
       pack $f3 -side left -fill y -padx 2m -expand 1
@@ -6797,7 +6797,7 @@ proc GetLabel {} {
 # If the cancel button was pressed, leave the loop.
          if { $LABBUT != "" && $LABBUT != " " } {
 
-# See if the label has already been used. If so, display an error 
+# See if the label has already been used. If so, display an error
 # message.
             if { [FindPosn LBL $LABBUT 0] != "" } {
                Message "This image already has an \"$OBJTYPE($CUROBJ_DISP)\"  position labelled \"$LABBUT\". Please select a new label."
@@ -6818,7 +6818,7 @@ proc GetLabel {} {
       foreach w $LABEL_OFF {
          $w configure -state [lindex $states $i]
          incr i
-      }      
+      }
 
 # Enter interaction mode 1 ("Enter image features").
       SetMode 0
@@ -6839,7 +6839,7 @@ proc GetParam {task param} {
 #    task
 #       The name of the task (eg "kapview").
 #    param
-#       The name of the parameter in the form "action:param" 
+#       The name of the parameter in the form "action:param"
 #       (eg "datapic:ncx1").
 #
 #  Returned Value:
@@ -6877,16 +6877,16 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #  Purpose:
 #     Obtain a set of values of various data types from the user.
 #     A dialog box is displayed, containing a set of labeled entry
-#     widgets, check buttons and radio buttons. Checks are made that 
+#     widgets, check buttons and radio buttons. Checks are made that
 #     the supplied values are acceptable.
 #
 #  Arguments:
 #     vars
 #        A list of the names of the global variable which are to recieve
-#        the entered values. The initial values of these variables are 
+#        the entered values. The initial values of these variables are
 #        displayed in the entry boxes. NB, these variables must be GLOBAL.
 #     ntypes
-#        The name of a 1-D array indexed by variable name, holding the data 
+#        The name of a 1-D array indexed by variable name, holding the data
 #        type for the the variable. This must be one of:
 #        _REAL - A floating point value.
 #        _INTEGER - An integer value.
@@ -6896,20 +6896,20 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #        _CHOICE - A choice from the strings supplied in the variable's
 #                  entry in the "limits" array.
 #     nlabels
-#        The name of a 1-D array indexed by variable name, holding the labels 
+#        The name of a 1-D array indexed by variable name, holding the labels
 #        to display next to each entry box. These may be blank if no label is required.
 #     nlimits
-#        The name of a 1-D array indexed by variable name. Each element is a 
+#        The name of a 1-D array indexed by variable name. Each element is a
 #        list holding values which restrict the values which can be taken by
-#        the corresponding variable. For _REAL and _INEGER, the first item 
-#        in the list is the minimum allowed value, and the second is the 
+#        the corresponding variable. For _REAL and _INEGER, the first item
+#        in the list is the minimum allowed value, and the second is the
 #        maximum allowed value. If not supplied, no limits are imposed. For
 #        _CHOICE, the items in the list are the allowed string values for the
 #        variable.
 #     title
 #        A title for the dialog box window.
 #     help
-#        An htx cross-reference label into the hypertext documentation to be 
+#        An htx cross-reference label into the hypertext documentation to be
 #        followed if the Help button is pressed. If this is blank then no Help
 #        button is created.
 #     dhelp
@@ -7008,9 +7008,9 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
          set wid [expr $tcl_precision + 6]
 
 # Extract the min and max values from the limits list.
-         if { $nlims > 0 } { 
+         if { $nlims > 0 } {
             set min [lindex $lims 0]
-            if { $nlims > 1 } { 
+            if { $nlims > 1 } {
                set max [lindex $lims 1]
             } {
                set max {\"\"}
@@ -7022,22 +7022,22 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # Create the data entry box, limiting the value to the supplied max and
 # min (if any).
-         set com "if { $max != \\\"\\\" && \\\$$varname > $max } { 
+         set com "if { $max != \\\"\\\" && \\\$$varname > $max } {
                      set $varname $max
-                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } { 
+                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } {
                      set $varname $min
                   }"
          set vl [RealValue $f1.vl $wid $varname $com]
-         pack $vl -side left 
+         pack $vl -side left
 
 # _INTEGER...
       } elseif { $type == "_INTEGER" } {
          incr nent
 
 # Extract the min and max values from the limits list.
-         if { $nlims > 0 } { 
+         if { $nlims > 0 } {
             set min [lindex $lims 0]
-            if { $nlims > 1 } { 
+            if { $nlims > 1 } {
                set max [lindex $lims 1]
             } {
                set max {\"\"}
@@ -7050,22 +7050,22 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
          if { $min != {\"\"} } { set min [expr round( $min )] }
          if { $max != {\"\"} } { set max [expr round( $max )] }
 
-# Create the data entry box, limiting the value to integer values between the 
+# Create the data entry box, limiting the value to integer values between the
 # supplied max and min (if any).
          set com "set $varname \\\[expr round( \\\$$varname ) \\\]
-                  if { $max != \\\"\\\" && \\\$$varname > $max } { 
+                  if { $max != \\\"\\\" && \\\$$varname > $max } {
                      set $varname $max
-                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } { 
+                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } {
                      set $varname $min
                   }"
          set vl [RealValue $f1.vl 12 $varname $com]
-         pack $vl -side left 
+         pack $vl -side left
 
 # _LOGICAL
       } elseif { $type == "_LOGICAL" } {
          set cb [checkbutton $f1.cb -text $label -variable $varname \
                              -selectcolor $CB_COL -font $B_FONT]
-         pack $cb -side left 
+         pack $cb -side left
 
 # _CHAR
       } elseif { [regexp {^_CHAR} $type] } {
@@ -7079,21 +7079,21 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # Create the string entry box.
          set vl [StringValue $f1.vl $wid $varname "" -font $B_FONT]
-         pack $vl -side left 
+         pack $vl -side left
 
 # _CHOICE
       } elseif { $type == "_CHOICE" } {
 
 # Create a frame to hold the radio-buttons.
          set rbf [frame $f1.rbf]
-         pack $rbf -side left 
+         pack $rbf -side left
 
 # Create a radiobutton for each option.
          set ii 0
          foreach string $lims {
             set rb [radiobutton $rbf.$ii -text $string -value $string \
                                 -variable $varname -selectcolor $RB_COL]
-            pack $rb -side top -anchor w 
+            pack $rb -side top -anchor w
             incr ii
          }
 
@@ -7113,7 +7113,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
    SetHelp $b2 ".  Press to close the dialog box, cancelling the operation."
    SetHelp $b3 ".  Press to restore the original values."
 
-   pack $b1 $b2 $b3 -side left -expand 1 -padx 2m   
+   pack $b1 $b2 $b3 -side left -expand 1 -padx 2m
 
    if { $help != "" } {
       set b4 [button $butfrm.help -text "Help" -command "set INPUTS_BUTTON help"]
@@ -7121,8 +7121,8 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
       pack $b4 -side left -expand 1 -padx 2m
    }
 
-# If there is only one variable being obtained through an entry, then create a 
-# binding so that pressing the <Return> key behaves like clicking the OK 
+# If there is only one variable being obtained through an entry, then create a
+# binding so that pressing the <Return> key behaves like clicking the OK
 # button.
    if { $nent == 1 } { bind $top <Return> "set INPUTS_BUTTON ok" }
 
@@ -7162,7 +7162,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # If the Help button was pressed, display help.
       } elseif { $INPUTS_BUTTON == "help" } {
-         ShowHelp $help 
+         ShowHelp $help
       }
    }
 
@@ -7195,23 +7195,23 @@ proc GetPosn {i name args} {
 #           ID - The canvas item id of the marker for the position (-1
 #                if no marker is currently drawn).
 #           VID - The canvas item id of the line joining the position to
-#                the position given by parameter NXT (-1 if no line is 
+#                the position given by parameter NXT (-1 if no line is
 #                currently drawn, and null ("") if NXT is undefined).
-#           NXT - The index of the position corresponding to the next 
+#           NXT - The index of the position corresponding to the next
 #                vertex in a polygonal mask (-1 if there is no "next
-#                vertex" (i.e. if the polygon is open) and null ("") if this 
-#                position is not part of a polygon). 
+#                vertex" (i.e. if the polygon is open) and null ("") if this
+#                position is not part of a polygon).
 #           LBL - The textual label associated with a position.
 #           TAG - A canvas tag associated with the position.
 #     args
-#        An optional list argument holding the image from which the 
+#        An optional list argument holding the image from which the
 #        positions are derived, and the type of objects to be used.
 #        If these are not supplied, they default to $IMAGE_DISP and
 #        $CUROBJ_DISP.
 #
 #  Returned Value:
 #     The parameter value.
-#     
+#
 #  Globals:
 #     CUROBJ_DISP (Read)
 #        The type of the current objects displayed.
@@ -7219,10 +7219,10 @@ proc GetPosn {i name args} {
 #        The displayed image (without section).
 #     PNTCX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas X coordinates. 
+#        is a list of canvas X coordinates.
 #     PNTCY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas Y coordinates. 
+#        is a list of canvas Y coordinates.
 #     PNTID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -7230,7 +7230,7 @@ proc GetPosn {i name args} {
 #        currently drawn for the position.
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -7240,17 +7240,17 @@ proc GetPosn {i name args} {
 #        closed).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PNTTAG (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas tags (one for each position).
 #     PNTVID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        vectors between positions in the list. A value of -1 indicates that 
+#        vectors between positions in the list. A value of -1 indicates that
 #        no line is currently drawn for the position. A blank string
 #        indicates that no vector is defined.
 #
@@ -7274,9 +7274,9 @@ proc GetPosn {i name args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_DISP
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Do nothing if the list is empty, or an invalid index has been supplied.
@@ -7388,7 +7388,7 @@ proc HelpArea {} {
 # Find the pixels in 6 characters.
          if { [scan $pixsize %d pxsiz] == 0 } {
             set pxsiz 14
-         }         
+         }
          set height [expr 6 * $pxsiz]
 
 # The width is the requested width of the whole window.
@@ -7403,13 +7403,13 @@ proc HelpArea {} {
 # Create a dummy frame with height but no width to act as a vertical strut.
 # Geometry propagation is turn off for this frame so that its requested
 # size will be retained even though nothing is put in the frame. This
-# strut is used to keep the help area the same size even if the message text 
+# strut is used to keep the help area the same size even if the message text
 # within it requires a narrower area.
          set HSTRUT [frame $F4.strut -width 0 -height $height]
          pack propagate $HSTRUT 0
          pack $HSTRUT -side left
 
-# Create a message widget to display dynamic help information about 
+# Create a message widget to display dynamic help information about
 # the widget underneath the pointer.
          set HLAB [message $F4.lab -justify left -textvariable HELP \
                             -anchor w -font $HLP_FONT -width $width]
@@ -7434,14 +7434,14 @@ proc Helper {} {
 #     Helper
 #
 #  Purpose:
-#     Selects the text to display in the help area. 
+#     Selects the text to display in the help area.
 #
 #  Arguments:
 #     None.
 #
 #  Globals:
 #     HELPS (Read)
-#        An array holding the help messages for all widgets, indexed by 
+#        An array holding the help messages for all widgets, indexed by
 #        widget name.
 #     HELP (Write)
 #        The text to be displayed in the help area.
@@ -7472,7 +7472,7 @@ proc Helper {} {
    after 10
 
 # Find the lowest level widget under the pointer.
-   set x [winfo pointerx .] 
+   set x [winfo pointerx .]
    set y [winfo pointery .]
    set w [winfo containing $x $y]
 
@@ -7498,7 +7498,7 @@ proc IncVal {value max min} {
 #    IncVal
 #
 #  Purpose:
-#    Called to increment the numerical value associated with a "widget" 
+#    Called to increment the numerical value associated with a "widget"
 #    created by the procedure "Value".
 #
 #  Arguments:
@@ -7577,7 +7577,7 @@ proc InvMap {map} {
       set c6 [lindex $map 5]
 
 # Check that all the required coefficients are available.
-      if { $c1 != "" && $c2 != "" && $c3 != "" && 
+      if { $c1 != "" && $c2 != "" && $c3 != "" &&
            $c4 != "" && $c5 != "" && $c6 != "" } {
 
 # Check that the mapping is not singular.
@@ -7616,7 +7616,7 @@ proc InvMapC {fittype} {
 #
 #  Globals:
 #     INV (Read and Write)
-#        If non-zero, then the MAP_C array on exit should hold the 
+#        If non-zero, then the MAP_C array on exit should hold the
 #        inverse mapping. Otherwise, it should hold the forward mapping.
 #     MAP_C (Read and Write)
 #        An array of 6 coefficients describing the linear mapping as:
@@ -7628,7 +7628,7 @@ proc InvMapC {fittype} {
 
 # See if the supplied mapping is undefined. If it is return an undefined
 # mapping.
-   if { $MAP_C(1) == "" || $MAP_C(2) == "" || $MAP_C(3) == "" || 
+   if { $MAP_C(1) == "" || $MAP_C(2) == "" || $MAP_C(3) == "" ||
         $MAP_C(4) == "" || $MAP_C(5) == "" || $MAP_C(6) == "" } {
       set MAP_C(1) ""
       set MAP_C(2) ""
@@ -7689,7 +7689,7 @@ proc ImageMapping {image} {
 #     Return the mapping which transforms the pixel coordinates of a
 #     certain position on the sky in the supplied image, into the pixel
 #     coordinates of the same sky position in the first (reference)
-#     image. If an up-to-date mapping is already available, then it is 
+#     image. If an up-to-date mapping is already available, then it is
 #     returned. Otherwise, an attempt is made to determine a new mapping.
 #     If no mapping can be created for the specified image (for
 #     instance, if the required image features have not yet been given by
@@ -7710,7 +7710,7 @@ proc ImageMapping {image} {
 #     E_RAY_FEATURES (Read)
 #        An integer representing the "E-ray features" object type.
 #     MAPTYPE (Read)
-#        A list containing the textual descriptions of the available 
+#        A list containing the textual descriptions of the available
 #        mapping types.
 #     FITTYPE (Read)
 #        A textual description of the mapping to be used for the image mapping.
@@ -7722,22 +7722,22 @@ proc ImageMapping {image} {
 #        An integer representing the "O-ray features" object type.
 #     PNTLBL (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of labels associated with the positions in the list. 
+#        is a list of labels associated with the positions in the list.
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PROT_IMMAP (Read and Write)
 #        A 1-d array indexed by image. Each element is either "normal" or
 #        "disabled", and specified whether the image mapping associated
 #        with the image may be changed. A value of "normal" means that the
-#        image mapping may be changed; a value of "disabled" means that it 
+#        image mapping may be changed; a value of "disabled" means that it
 #        may not be changed.
 #     RECALC_IMMAP (Read and Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the image mapping was last found.
 #-
    global E_RAY_FEATURES
@@ -7748,7 +7748,7 @@ proc ImageMapping {image} {
    global O_RAY_FEATURES
    global PNTLBL
    global PNTPX
-   global PNTPY     
+   global PNTPY
    global PROT_IMMAP
    global RECALC_IMMAP
    global OEMAP
@@ -7760,12 +7760,12 @@ proc ImageMapping {image} {
    set im0 [lindex $IMAGES 0]
 
 # The first (reference) image does not have an explicit mapping stored for it.
-# Instead, a unit mapping is implicitly assumed to exist. So do nothing if 
+# Instead, a unit mapping is implicitly assumed to exist. So do nothing if
 # the supplied image is the first (reference) image.
    if { $image != $im0 } {
 
 # First decide whether we need to calculate the mapping. We don't need
-# to if the existing mapping is up-to-date with respect to the positions 
+# to if the existing mapping is up-to-date with respect to the positions
 # lists for the supplied image, and the first (reference) image.
 # If an existing mapping is protected, we leave it unchanged.
       set calc 0
@@ -7776,7 +7776,7 @@ proc ImageMapping {image} {
          if { $RECALC_IMMAP($image) && $PROT_IMMAP($image) == "normal" } {
             set calc 1
          }
-      }           
+      }
 
 # Find a new mapping if necessary.
       if { $calc } {
@@ -7807,7 +7807,7 @@ proc ImageMapping {image} {
                   set oemap [OEMapping $im 1]
                   if { $oemap != "" } {
 
-# Map the E-ray features to get the O-ray features.                  
+# Map the E-ray features to get the O-ray features.
                      set ok [TranList $oemap 0 $PNTPX($im,$obj) \
                                       $PNTPY($im,$obj) pxlist($im) pylist($im)]
                   }
@@ -7818,13 +7818,13 @@ proc ImageMapping {image} {
             if { !$ok } { break }
          }
 
-# If the lists were produced OK, we can now find the mapping which 
+# If the lists were produced OK, we can now find the mapping which
 # registers them.
          if { $ok } {
 
 # Get the numerical index of the fit type to use.
             foreach fittype [array names MAPTYPE] {
-               if { $MAPTYPE($fittype) == $FITTYPE } { break } 
+               if { $MAPTYPE($fittype) == $FITTYPE } { break }
             }
 
 # Do the fit.
@@ -7882,7 +7882,7 @@ proc Labels {label add} {
 #    label
 #      The label to be added or removed.
 #    add
-#      If add is non-zero, then the usage count of the supplied label is 
+#      If add is non-zero, then the usage count of the supplied label is
 #      incremented (it is also added to LABELS if it is a new label).
 #      If add is zero, then the usage count of the label is decremented.
 #      If this results in zero usage, it is removed from LABELS. The
@@ -7904,7 +7904,7 @@ proc Labels {label add} {
 #    NEXT_LABEL (Write)
 #      The index of the next automatically generated label.
 #    NLAB (Read and Write)
-#      An array (indexed by label) giving the number of positions with 
+#      An array (indexed by label) giving the number of positions with
 #      each label.
 #    O_RAY_FEATURES (Read)
 #      An integer representing the "O-ray features" object type.
@@ -7962,7 +7962,7 @@ proc Labels {label add} {
 
 # We now see if we can generate labels automatically. This is the case if
 # the current image/object type combination is the only one to have any
-# features with non-blank labels. Initially assume we can generate auto 
+# features with non-blank labels. Initially assume we can generate auto
 # labels.
    set AUTO_LABEL 1
 
@@ -7978,7 +7978,7 @@ proc Labels {label add} {
 # If this image and object have any feature labels...
             if { [info exists PNTLBL($image,$object)] } {
 
-# If any of the labels are not blank, set the AUTO_LABEL flag false and 
+# If any of the labels are not blank, set the AUTO_LABEL flag false and
 # leave the loop.
                foreach lab $PNTLBL($image,$object) {
                   if { $lab != "" } {
@@ -7997,7 +7997,7 @@ proc Labels {label add} {
 
 # If there are currently no defined labels, reset the next auto label
 # index.
-   if { [llength $LABELS] == 0 } { set NEXT_LABEL 0 } 
+   if { [llength $LABELS] == 0 } { set NEXT_LABEL 0 }
 
 }
 
@@ -8062,11 +8062,11 @@ proc LoadOptions {} {
    global ATASK_XHAIR
    global ATASK_XHRCOL
    global ATASK_SKYPAR
-   global BADCOL      
+   global BADCOL
    global CHAR_LIST
    global CHAR_STOP
    global CURCOL
-   global DBEAM           
+   global DBEAM
    global FITTYPE
    global HAREA
    global INTERP
@@ -8082,7 +8082,7 @@ proc LoadOptions {} {
    global SELCOL
    global SI_LIST
    global SI_VARS
-   global SKYOFF               
+   global SKYOFF
    global SKYPAR
    global STOKES
    global VIEW
@@ -8248,7 +8248,7 @@ proc LoadOptions {} {
          set LOGFILE_ID [open $ATASK_LOGFILE w]
       }
       set ATASK 1
-   } { 
+   } {
       set LOGFILE_ID ""
    }
 
@@ -8284,7 +8284,7 @@ proc LoadOptions {} {
 # a long time). Any new items are displayed.
       scan [string range $ATASK_SI $i end] "%d" n
 
-   } {   
+   } {
       set n 0
    }
 
@@ -8305,14 +8305,14 @@ proc LoadTask {task file} {
 #
 #  Arguments:
 #    task
-#      The name by which the task is to be known 
+#      The name by which the task is to be known
 #      (eg "kapview").
 #    file
-#      The file containing the executable image 
+#      The file containing the executable image
 #      (eg "/star/bin/kappa/kapview_mon").
 #
 #  Notes:
-#    -  This procedure shuts down the whole application if the task 
+#    -  This procedure shuts down the whole application if the task
 #    cannot be loaded.
 #
 #  Globals:
@@ -8339,8 +8339,8 @@ proc LoadTask {task file} {
       after 100
       incr count
       if {$count > 100} {
-         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
-         Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
+         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..."
+         Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..."
          $task kill
          exit 1
       }
@@ -8388,7 +8388,7 @@ proc MakeDialog {w title grab} {
 #
 #  Globals:
 #     F_OWNER (Read and Write)
-#        The name of the Polka widget which "owns" the focus. It is 
+#        The name of the Polka widget which "owns" the focus. It is
 #        temporarily changed to be the toplevel containing the dialogue
 #        box. It is reset to its original value when the label has been
 #        obtained.
@@ -8428,7 +8428,7 @@ proc MakeDialog {w title grab} {
    pack $topf
    pack $topf0 -padx 2m -pady 2m -ipadx 2m -ipady 2m
 
-# Create a binding so that when the dialog box is destroyed, 
+# Create a binding so that when the dialog box is destroyed,
 # the focus is handed back to the original window.
    bind $top <Destroy> "set F_OWNER $old_f_owner
                         focus $old_f_owner"
@@ -8444,7 +8444,7 @@ proc Mappings {image} {
 #
 #  Purpose:
 #     Ensure that the image and OE mappings for the supplied image are
-#     up-to-date. New mappings are only created if the relevant positions 
+#     up-to-date. New mappings are only created if the relevant positions
 #     lists have changed since the current mappings were created.
 #
 #  Arguments:
@@ -8452,7 +8452,7 @@ proc Mappings {image} {
 #        The image for which mappings are required.
 #
 #  Returned Value:
-#     1 is returned if both mappings are usable on exit. Otherwise, 
+#     1 is returned if both mappings are usable on exit. Otherwise,
 #     zero is returned.
 #
 #  Globals:
@@ -8461,7 +8461,7 @@ proc Mappings {image} {
 #-
    global DBEAM
 
-# If we are in dual-beam mode, attempt to create the mapping from E to O 
+# If we are in dual-beam mode, attempt to create the mapping from E to O
 # ray for the supplied image.
    if { $DBEAM } {
       set oe_ok [OEMapping $image]
@@ -8473,7 +8473,7 @@ proc Mappings {image} {
 # (reference) image.
    set im_ok [ImageMapping $image]
 
-# If both mappings were created OK, return 1 (success). Otherwise, return 
+# If both mappings were created OK, return 1 (success). Otherwise, return
 # zero (failure).
    if { $im_ok != "" && $oe_ok != "" } {
       set ret 1
@@ -8490,10 +8490,10 @@ proc MapRefs {px_name py_name} {
 #     MapRefs
 #
 #  Purpose:
-#     Returns pixel coordinates for the reference objects, mapped into 
+#     Returns pixel coordinates for the reference objects, mapped into
 #     the frame of the current objects (if possible). If this
 #     cannot be done (due to the required mappings not yet being known),
-#     then an error message is displayed and the returned coordinates refer 
+#     then an error message is displayed and the returned coordinates refer
 #     to the original frame of the reference objects.
 #
 #  Arguments:
@@ -8515,10 +8515,10 @@ proc MapRefs {px_name py_name} {
 #        An integer representing the "O-ray mask" object type.
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     REFIM_REQ (Read)
 #        The requested image from which the displayed reference objects
 #        should be derived.
@@ -8532,7 +8532,7 @@ proc MapRefs {px_name py_name} {
    global O_RAY_MASK
    global O_RAY_SKY
    global PNTPX
-   global PNTPY          
+   global PNTPY
    global REDRAW
    global REFALN
    global REFIM_REQ
@@ -8545,7 +8545,7 @@ proc MapRefs {px_name py_name} {
    set told [SetInfo "Mapping reference objects. Please wait... " 0]
 
 # See if the current objects refer to the O or E ray.
-   if { $CUROBJ_REQ == $O_RAY_FEATURES || 
+   if { $CUROBJ_REQ == $O_RAY_FEATURES ||
         $CUROBJ_REQ == $O_RAY_MASK ||
         $CUROBJ_REQ == $O_RAY_SKY } {
       set cur_ray "O"
@@ -8554,7 +8554,7 @@ proc MapRefs {px_name py_name} {
    }
 
 # See if the reference objects refer to the O or E ray.
-   if { $REFOBJ_REQ == $O_RAY_FEATURES || 
+   if { $REFOBJ_REQ == $O_RAY_FEATURES ||
         $REFOBJ_REQ == $O_RAY_MASK ||
         $REFOBJ_REQ == $O_RAY_SKY } {
       set ref_ray "O"
@@ -8570,7 +8570,7 @@ proc MapRefs {px_name py_name} {
       set ref_mask 0
    }
 
-# If the reference objects are E-ray objects, the first mapping maps them 
+# If the reference objects are E-ray objects, the first mapping maps them
 # into the O-ray frame.
    if { $ref_ray == "E" } {
       set m1 [OEMapping $REFIM_REQ]
@@ -8590,11 +8590,11 @@ proc MapRefs {px_name py_name} {
       set m2 [ImageMapping $REFIM_REQ]
    }
 
-# Combine it with the first mapping. This gives the mapping from the 
+# Combine it with the first mapping. This gives the mapping from the
 # reference frame (E or O) to the O-ray frame of the first image.
    set m21 [ConcMap $m1 0 $m2 0]
 
-# Get the mapping from the current image to the first image. If the 
+# Get the mapping from the current image to the first image. If the
 # current and reference images are the same, pretend the first image is
 # the reference image.
    if { $ref_mask || $REFIM_REQ == $IMAGE_DISP } {
@@ -8603,7 +8603,7 @@ proc MapRefs {px_name py_name} {
       set m3 [ImageMapping $IMAGE_DISP]
    }
 
-# Combine this with the total mapping so far, to get the mapping from the 
+# Combine this with the total mapping so far, to get the mapping from the
 # reference frame to the O-ray frame in the current image.
    set m321 [ConcMap $m21 0 $m3 1]
 
@@ -8626,10 +8626,10 @@ proc MapRefs {px_name py_name} {
       set REFALN 0
       $REDRAW configure -state disabled
 
-# Otherwise, if the mapping is a unit mapping, leave the supplied positions 
-# unchanged. 
-   } elseif { $map != "ref" } { 
-      TranList $map 0 $lpx $lpy lpx lpy 
+# Otherwise, if the mapping is a unit mapping, leave the supplied positions
+# unchanged.
+   } elseif { $map != "ref" } {
+      TranList $map 0 $lpx $lpy lpx lpy
    }
 
 # Cancel the informative text set earlier in this procedure.
@@ -8656,7 +8656,7 @@ proc MarkBind {i image object} {
 
 # Get the canvas item identifier for the marker. Only proceed if a marker
 # is currently displayed.
-   set id [GetPosn $i ID $image $object]   
+   set id [GetPosn $i ID $image $object]
    if { $id != -1 } {
 
 # Get the label and pixel coordinates desribing the position.
@@ -8682,7 +8682,7 @@ proc MarkBind {i image object} {
 
 # Set LABEL and PXY blank when the pointer leaves the position.
       $CAN bind $id <Leave> \
-         "set LABEL {} 
+         "set LABEL {}
           set PXY {}"
    }
 }
@@ -8699,7 +8699,7 @@ proc MarkPosn {i ref vertex tags} {
 #     i
 #        The index of the position to be marked.
 #     ref
-#        If non-zero, then a reference marker is drawn, otherwise a current 
+#        If non-zero, then a reference marker is drawn, otherwise a current
 #        objects marker is drawn.
 #     vertex
 #        If non-zero, then the position is marked as a vertex, otherwise
@@ -8723,10 +8723,10 @@ proc MarkPosn {i ref vertex tags} {
 #        The reference image (without section).
 #     PNTCX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas X coordinates. 
+#        is a list of canvas X coordinates.
 #     PNTCY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas Y coordinates. 
+#        is a list of canvas Y coordinates.
 #     PNTID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -8751,7 +8751,7 @@ proc MarkPosn {i ref vertex tags} {
       set colour $REFCOL
       set image $REFIM_REQ
       set object $REFOBJ_REQ
-   } { 
+   } {
       set colour $CURCOL
       set image $IMAGE_DISP
       set object $CUROBJ_REQ
@@ -8796,7 +8796,7 @@ proc MarkPosn {i ref vertex tags} {
    } {
       $CAN coords $id $cx $cy
       $CAN itemconfigure $id -bitmap @$bitmap -foreground $colour -tags $tags
-   }                   
+   }
 
 # Set up bindings which assign the position's label to the global LABEL
 # when the pointer enters the marker, and sets LABEL blank when the
@@ -8866,7 +8866,7 @@ proc MenuMotionBind {win y} {
    global MENUHELPS
 
 # Ignore separators and tearoffs
-   set mty [$win type @$y] 
+   set mty [$win type @$y]
    if { $mty != "separator" && $mty != "tearoff" } {
 
 # Get the label from the menu entry under the pointer.
@@ -8938,24 +8938,24 @@ proc MotionBind {x y} {
 
 # Store the pixel coordinates of the pointer in POINTER_PXY.
    set pxy [CanToNDF $cx $cy]
-   if { $pxy == "" } { return } 
+   if { $pxy == "" } { return }
 
    set px [lindex $pxy 0]
    set py [lindex $pxy 1]
    set POINTER_PXY [format "( %.1f, %.1f )" $px $py ]
 
-# The global variable MODE determines how events over the canvas are 
-# processed. If we are in mode 2 ("enter a new polygon"), the "loose" end 
+# The global variable MODE determines how events over the canvas are
+# processed. If we are in mode 2 ("enter a new polygon"), the "loose" end
 # of the most recent vector is bound to the pointer.
    if { $MODE == 2 } {
 
 # Move the "loose" end of the vector which starts at the previous vertex,
 # so that it follows the pointer.
       set coords [$CAN coords $VID2]
-      $CAN coords $VID2 [lindex $coords 0] [lindex $coords 1]  $cx $cy 
+      $CAN coords $VID2 [lindex $coords 0] [lindex $coords 1]  $cx $cy
 
 # If we are in mode 3 ("waiting for a feature label"), select the label
-# of the feature under the pointer (if any) in the list box in the 
+# of the feature under the pointer (if any) in the list box in the
 # "Select feature label" dialog box.
    } elseif { $MODE == 3 } {
 
@@ -8966,13 +8966,13 @@ proc MotionBind {x y} {
       if { $LABEL != "<unknown>" } {
          set j [lsearch -exact $labs $LABEL]
       } {
-         set j -1 
+         set j -1
       }
 
 # If found, select the corresponding entry in the list box.
       if { $j != -1 } {
          $LB selection clear 0 end
-         $LB selection set $j                         
+         $LB selection set $j
          $LB see $j
       }
    }
@@ -8984,7 +8984,7 @@ proc GetParamED {task param} {
 #     GetParamED
 #
 #  Purpose:
-#     Returns the value of an ATASK parameter substituing "E" exponents for 
+#     Returns the value of an ATASK parameter substituing "E" exponents for
 #     "D" exponents. Also removes delimiting quotes.
 #
 #  Arguments:
@@ -9001,7 +9001,7 @@ proc GetParamED {task param} {
    regexp {^\'(.*)\'$} $res match res
    return $res
 }
-    
+
 proc NDFToCan { px py } {
 #+
 #  Name:
@@ -9043,8 +9043,8 @@ proc NDFToCan { px py } {
    global MX
    global MY
 
-# Get the canvas coordinates. 
-   if { $px != "" && $py != "" } { 
+# Get the canvas coordinates.
+   if { $px != "" && $py != "" } {
       set cxy [list [ expr ( $px - $CX ) / $MX] [ expr ( $py - $CY ) / $MY] ]
    } {
       set cxy ""
@@ -9069,8 +9069,8 @@ proc NumPosn {v0 args} {
 #        index $v0. Otherwise, the number of positions of any description
 #        is returned.
 #     args
-#        An optional list argument holding the image from which the 
-#        positions are derived, and the type of objects. If these are 
+#        An optional list argument holding the image from which the
+#        positions are derived, and the type of objects. If these are
 #        not supplied, they default to $IMAGE_DISP and $CUROBJ_DISP.
 #
 #  Returned Value:
@@ -9084,10 +9084,10 @@ proc NumPosn {v0 args} {
 #     PNTID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        positions in the list. 
+#        positions in the list.
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -9106,9 +9106,9 @@ proc NumPosn {v0 args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_DISP
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Return zero if the specified positions list does not exist.
@@ -9132,7 +9132,7 @@ proc NumPosn {v0 args} {
          set nxt [lindex $PNTNXT($image,$object) $v0]
          if { $nxt != "" } {
             set size 1
-            while { $nxt != $v0 && $nxt != -1 } { 
+            while { $nxt != $v0 && $nxt != -1 } {
                incr size
                set nxt [lindex $PNTNXT($image,$object) $nxt]
             }
@@ -9152,7 +9152,7 @@ proc Obey {task action params args} {
 #    Obey
 #
 #  Purpose:
-#    Executes an ADAM application. 
+#    Executes an ADAM application.
 #
 #  Arguments:
 #    task
@@ -9160,16 +9160,16 @@ proc Obey {task action params args} {
 #    action
 #       The name of the application (eg "display").
 #    params
-#       Any command line parameter assignments to pass to the 
-#       application. A blank string must be supplied if no 
+#       Any command line parameter assignments to pass to the
+#       application. A blank string must be supplied if no
 #       command line parameter assignments are needed.
 #    args
 #       o  If the optional string "noreport" is supplied, then any error
-#       messages generated by the action are not displayed. 
-#       o  If the name of a currently defined global variable is supplied, 
+#       messages generated by the action are not displayed.
+#       o  If the name of a currently defined global variable is supplied,
 #       then the variable is assumed to be a 1-D array, indexed by A-task
-#       parameter name. The associated values are the values to supply for 
-#       the A-task's parameters if they are prompted for. 
+#       parameter name. The associated values are the values to supply for
+#       the A-task's parameters if they are prompted for.
 #       o  The presence of any other non-blank value after "params" causes
 #       the whole TCL application to abort if the specified action
 #       does not complete succesfully.
@@ -9184,7 +9184,7 @@ proc Obey {task action params args} {
 #    ADAM_ERRORS (Write)
 #      The messages from the most recent ADAM application to fail.
 #    ATASK_OUTPUT (Write)
-#       Any non-error messages generated by the action are appended to 
+#       Any non-error messages generated by the action are appended to
 #       this list. Each message is stored as a new element in the list.
 #    STATUS (Write)
 #      The status string returned by the action.
@@ -9232,8 +9232,8 @@ proc Obey {task action params args} {
       } elseif { $args == "noreport" } {
          set report 0
 
-# Otherwise, abort on an error.         
-      } elseif { [lindex $args 0] != "" } { 
+# Otherwise, abort on an error.
+      } elseif { [lindex $args 0] != "" } {
          set abort 1
       }
    }
@@ -9256,7 +9256,7 @@ proc Obey {task action params args} {
 # messages are thrown away. Parameter requests are responded to by
 # sending a null (!) value. The variable STATUS is set when the
 # action completes.
-   set STATUS ""   
+   set STATUS ""
    $task obey $action $params -inform "CheckMsg $action %V" \
                       -endmsg {set STATUS "%S"} \
                       -paramreq $param_req
@@ -9274,7 +9274,7 @@ proc Obey {task action params args} {
          puts $LOGFILE_ID "\n$task $action $params..."
       }
 
-      set STATUS ""   
+      set STATUS ""
       $task obey $action $params -inform "CheckMsg $action %V" \
                          -endmsg {set STATUS "%S"} \
                          -paramreq $param_req
@@ -9319,14 +9319,14 @@ proc OEMapping {image} {
 #  Purpose:
 #     Return the mapping which transforms the pixel coordinates of a
 #     given sky position in the E ray area, into the pixel coordinates
-#     of the same sky positions within the O ray area of the specified image. 
+#     of the same sky positions within the O ray area of the specified image.
 #     If an up-to-date mapping is already available, then it is returned.
 #     Otherwise, an attempt is made to determine a new OE mapping.
 #     If no OE mapping can be created for the specified image (for
 #     instance, if the required image features have not yet been given by
-#     the user), then a default mapping is returned if possible. This is 
+#     the user), then a default mapping is returned if possible. This is
 #     the most recent OE mapping to be determined (this is done on
-#     the assumption that OE mappings will be more or less the same for 
+#     the assumption that OE mappings will be more or less the same for
 #     all images). No errors are reported if the mapping cannot be created
 #     due to lack of image features.
 #
@@ -9343,7 +9343,7 @@ proc OEMapping {image} {
 #     E_RAY_FEATURES (Read)
 #        An integer representing the "E-ray features" object type.
 #     MAPTYPE (Read)
-#        A list containing the textual descriptions of the available 
+#        A list containing the textual descriptions of the available
 #        mapping types.
 #     OEFITTYPE (Read)
 #        A textual description of the mapping to be used for the OE mapping.
@@ -9354,22 +9354,22 @@ proc OEMapping {image} {
 #        An integer representing the "O-ray features" object type.
 #     PNTLBL (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of labels associated with the positions in the list. 
+#        is a list of labels associated with the positions in the list.
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PROT_OEMAP (Read and Write)
 #        A 1-d array indexed by image. Each element is either "normal" or
 #        "disabled", and specified whether the OE mapping associated
 #        with the image may be changed. A value of "normal" means that the
-#        mapping may be changed; a value of "disabled" means that it 
+#        mapping may be changed; a value of "disabled" means that it
 #        may not be changed.
 #     RECALC_OEMAP (Read and Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the image's E to O mapping was last found.
 #-
    global DEF_OEMAP
@@ -9381,7 +9381,7 @@ proc OEMapping {image} {
    global O_RAY_FEATURES
    global PNTLBL
    global PNTPX
-   global PNTPY    
+   global PNTPY
    global PROT_OEMAP
    global RECALC_OEMAP
 
@@ -9391,9 +9391,9 @@ proc OEMapping {image} {
       set OEMAP($image) ""
       set PROT_OEMAP($image) normal
 
-# Otherwise, if the stored OE mapping is out-of-date (i.e. if the image 
-# features have changed since the stored mapping was calculated) then we 
-# cannot use the stored mapping, so clear it. We only do this if the 
+# Otherwise, if the stored OE mapping is out-of-date (i.e. if the image
+# features have changed since the stored mapping was calculated) then we
+# cannot use the stored mapping, so clear it. We only do this if the
 # stored mapping is not protected.
    } {
       if { $RECALC_OEMAP($image) && $PROT_OEMAP($image) == "normal" } {
@@ -9409,7 +9409,7 @@ proc OEMapping {image} {
 
 # Get the numerical index of the fit type to use.
       foreach fittype [array names MAPTYPE] {
-         if { $MAPTYPE($fittype) == $OEFITTYPE } { break } 
+         if { $MAPTYPE($fittype) == $OEFITTYPE } { break }
       }
 
 # Attempt to do the fit. This will return a null string if there are
@@ -9430,7 +9430,7 @@ proc OEMapping {image} {
 
 # If the fit could not be performed, use the current default OE mapping.
       } {
-         set OEMAP($image) $DEF_OEMAP         
+         set OEMAP($image) $DEF_OEMAP
       }
 
 # Indicate the mapping is now up-to-date.
@@ -9490,9 +9490,9 @@ proc OpenFile {mode title text lfile lfd} {
       pack [label $topf.lab -text $text] -expand 1 -fill x -side top -pady 2m
    }
 
-# Create and pack an entry widget 
+# Create and pack an entry widget
    set ent [entry $topf.ent -width 40]
-   pack $ent -side top -expand 1 -fill x -pady 4m 
+   pack $ent -side top -expand 1 -fill x -pady 4m
 
 # Pre-load the current value of the file name (if not blank).
    if { [info exists file] && $file != "" } { $ent insert 0 $file }
@@ -9550,7 +9550,7 @@ proc OpenFile {mode title text lfile lfd} {
 # Now deal with cases where the file is to be written.
          } {
 
-# If the file already exists, get the user to confirm that it is 
+# If the file already exists, get the user to confirm that it is
 # OK to over-write it. If so, attempt to opne it for writing. Report any
 # error.
             if { ![file exists $file] || [Confirm "Over-write existing file \"$file\"?"] } {
@@ -9562,7 +9562,7 @@ proc OpenFile {mode title text lfile lfd} {
             }
          }
 
-# If the file was opened succesfully, indicate that the dialog box should be 
+# If the file was opened succesfully, indicate that the dialog box should be
 # closed.
          if { $ret } { set exit 1 }
 
@@ -9594,7 +9594,7 @@ proc Paste {} {
 # ("Create or edit a polygon").
    if { $PASTE && $MODE == 1 } {
 
-# Get a unique string to attach to the canvas tags associated with the 
+# Get a unique string to attach to the canvas tags associated with the
 # copy positions.
       append stag "C"
       append stag $NPOLY
@@ -9605,7 +9605,7 @@ proc Paste {} {
       set dx ""
       for {set i 0} {$i < $size} {incr i} {
 
-# Move this vertex slightly so that the pasted polygons do not coincide 
+# Move this vertex slightly so that the pasted polygons do not coincide
 # with the original polygons. The first vertex is moved until it does not
 # fall on an existing feature. Subsequent vertices are moved by the same
 # amount. Also append a unique string to the position tags.
@@ -9621,7 +9621,7 @@ proc Paste {} {
                set ccx [expr $cx + $dx]
                set ccy [expr $cy + $dx]
             }
-         } 
+         }
 
          set cx [expr $cx + $dx]
          set cy [expr $cy + $dx]
@@ -9670,8 +9670,8 @@ proc PixIndSection {imsec} {
    Obey ndfpack ndftrace "ndf=\"$imsec\" quiet" 1
 
 # Get the lower and upper bounds.
-   set lbound [GetParamED ndfpack ndftrace:lbound] 
-   set ubound [GetParamED ndfpack ndftrace:ubound] 
+   set lbound [GetParamED ndfpack ndftrace:lbound]
+   set ubound [GetParamED ndfpack ndftrace:ubound]
 
 # Extract the individual bounds.
    set ok 0
@@ -9689,10 +9689,10 @@ proc PixIndSection {imsec} {
       set ylo 1
       set xhi 512
       set yhi 512
-   } 
+   }
 
 # Return the section string.
-   return "($xlo:$xhi,$ylo:$yhi)"    
+   return "($xlo:$xhi,$ylo:$yhi)"
 }
 
 proc Pop {stack args} {
@@ -9705,17 +9705,17 @@ proc Pop {stack args} {
 #
 #  Arguments:
 #    stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       On exit, the list holds one less element than on entry.
 #    args
 #        An optional argument giving the number of levels to pop off the
-#        stack. It defaults to 1. If it is supplied as -1, then the 
+#        stack. It defaults to 1. If it is supplied as -1, then the
 #        the first (bottom) entry is returned and the stack is emptied. If it
-#        is supplied as 0, then the top entry on the stack is returned, but 
+#        is supplied as 0, then the top entry on the stack is returned, but
 #        it is not removed from the stack.
 #
 #  Returned Value:
-#    The required stack element, or an empty string if the supplied stack 
+#    The required stack element, or an empty string if the supplied stack
 #    was empty.
 #-
 
@@ -9723,7 +9723,7 @@ proc Pop {stack args} {
 
    if { $args == "" } {
       set levels 1
-   } { 
+   } {
       set levels $args
    }
 
@@ -9737,7 +9737,7 @@ proc Pop {stack args} {
    } {
       set ret [lindex $stk [expr $levels - 1] ]
       set stk [lrange $stk $levels end]
-   } 
+   }
 
    return $ret
 }
@@ -9752,7 +9752,7 @@ proc Push {stack value} {
 #
 #  Arguments:
 #    stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       On exit, the list holds one more element than on entry.
 #    value
 #       The value to be pushed onto stack.
@@ -9775,7 +9775,7 @@ proc RealValue {name width value command args} {
 #    RealValue
 #
 #  Purpose:
-#    Create a simple numerical value entry "widget". 
+#    Create a simple numerical value entry "widget".
 #
 #  Arguments:
 #    name
@@ -9783,12 +9783,12 @@ proc RealValue {name width value command args} {
 #    width
 #      The number of characters in the text entry widget.
 #    value
-#      The name (NOT the value) of the global variable to receive the 
+#      The name (NOT the value) of the global variable to receive the
 #      numerical value. Note, this must be a *global* variable.
 #    command
 #      A command to execute after a valid value has been assigned to the
 #      variable.
-#    args 
+#    args
 #      Any further options to pass to the command which creates the
 #      "entry" widget (optional).
 #
@@ -9833,13 +9833,13 @@ proc RealValue {name width value command args} {
           set OLD_VAL \$$value
        }"
 
-# When <Return> is pressed or the focus leaves the current entry, check that 
-# the current text represents a valid value (if not, the old value will be 
-# re-instated). 
+# When <Return> is pressed or the focus leaves the current entry, check that
+# the current text represents a valid value (if not, the old value will be
+# re-instated).
    set check "if { \[$name cget -state\] == \"normal\" } {
                 set $value \[string trim \$$value\]
-                if { \[scan \$$value \"%%g\" $value\] < 1 } { 
-                   set $value \$OLD_VAL 
+                if { \[scan \$$value \"%%g\" $value\] < 1 } {
+                   set $value \$OLD_VAL
                 } elseif { \$OLD_VAL != \$$value } {
                    eval \"$command\"
                 }
@@ -9847,17 +9847,17 @@ proc RealValue {name width value command args} {
    bind $name <Return> $check
    bind $name <FocusOut> $check
 
-# Store a command to process termination of data entry. Clear the current 
-# selection, pass the focus back to the window which had it before, and 
-# check that the current text represents a valid value (if not, the old 
+# Store a command to process termination of data entry. Clear the current
+# selection, pass the focus back to the window which had it before, and
+# check that the current text represents a valid value (if not, the old
 # value will be re-instated).
    set done "if { \[$name cget -state\] == \"normal\" } {
                 $name select clear
                 set F_OWNER \$OLD_F_OWNER
                 focus \$OLD_F_OWNER
                 set $value \[string trim \$$value\]
-                if { \[scan \$$value \"%%g\" $value\] < 1 } { 
-                   set $value \$OLD_VAL 
+                if { \[scan \$$value \"%%g\" $value\] < 1 } {
+                   set $value \$OLD_VAL
                 } elseif { \$OLD_VAL != \$$value } {
                    eval \"$command\"
                 }
@@ -9897,7 +9897,7 @@ proc ReCentre {cx cy} {
 
 # Convert the canvas coords to NDF pixel coords.
    set pxy [CanToNDF $cx $cy]
-   if { $pxy == "" } { return } 
+   if { $pxy == "" } { return }
    set px [lindex $pxy 0]
    set py [lindex $pxy 1]
 
@@ -9945,7 +9945,7 @@ proc ReleaseBind {x y} {
 #    ReleaseBind
 #
 #  Purpose:
-#    Process button-1 releases over the image. 
+#    Process button-1 releases over the image.
 #
 #  Arguments:
 #    x
@@ -9961,7 +9961,7 @@ proc ReleaseBind {x y} {
 #     DELETE (Read)
 #        Path to the "Delete" button.
 #     F_OWNER (Write)
-#        The name of the Polka widget which "owns" the focus. 
+#        The name of the Polka widget which "owns" the focus.
 #     LB_B3 (Read)
 #        The name of the "OK" button in the "Select Feature Label" dialog
 #        box.
@@ -9995,10 +9995,10 @@ proc ReleaseBind {x y} {
 #        The index of the position corresponding to the last vertex in
 #        an incomplete (i.e. open) polygon.
 #     VCX0 (Read and Write)
-#        The canvas X coordinates at the first vertex in an incomplete 
+#        The canvas X coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VCY0 (Read and Write)
-#        The canvas Y coordinates at the first vertex in an incomplete 
+#        The canvas Y coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VID0 (Read)
 #        The canvas item id for the vertex being pointed at (if any).
@@ -10019,7 +10019,7 @@ proc ReleaseBind {x y} {
    global EDITMENU
    global F_OWNER
    global LB_B3
-   global LABEL    
+   global LABEL
    global NPOLY
    global MODE
    global MOVE
@@ -10038,7 +10038,7 @@ proc ReleaseBind {x y} {
    global ZOOM
 
 # If there is a selected area, check that it is of significant size. If
-# it isn't, cancel it. 
+# it isn't, cancel it.
    if { $SELECTED_AREA != "" } {
       set dx [expr [lindex $SELECTED_AREA 2] - [lindex $SELECTED_AREA 0] ]
       set dy [expr [lindex $SELECTED_AREA 3] - [lindex $SELECTED_AREA 1] ]
@@ -10053,7 +10053,7 @@ proc ReleaseBind {x y} {
       $DELETE configure -state normal
       $CANCEL configure -state normal
       $EDITMENU entryconfigure Delete -state normal
-      if { $MODE == 1 } { 
+      if { $MODE == 1 } {
          $EDITMENU entryconfigure Copy -state normal
       }
 
@@ -10083,7 +10083,7 @@ proc ReleaseBind {x y} {
             if { $MOVE } {
                set nxt [GetPosn $ROOTI NXT]
                while {$nxt != $ROOTI && $nxt != -1 && $nxt != "" } {
-                  set id [GetPosn $nxt ID]   
+                  set id [GetPosn $nxt ID]
                   set cxy [$CAN coords $id]
                   set cx [lindex $cxy 0]
                   set cy [lindex $cxy 1]
@@ -10112,11 +10112,11 @@ proc ReleaseBind {x y} {
 # Create a vector attached to the new position. It initially has zero
 # length. Store the canvas item id for this vector.
             set vid [$CAN create line $ROOTX $ROOTY $ROOTX $ROOTY -fill $CURCOL -tags [list vectors $tag]]
-            SetPosn $newi VID $vid 
+            SetPosn $newi VID $vid
 
 # Create the marker for the new positon, and store its canvas id.
-            set id [MarkPosn $newi 0 1 vroot] 
-            SetPosn $newi ID $id 
+            set id [MarkPosn $newi 0 1 vroot]
+            SetPosn $newi ID $id
             set ROOTID $id
 
 # Store the global values needed to construct the new polygon.
@@ -10128,7 +10128,7 @@ proc ReleaseBind {x y} {
             set VTAG $tag
 
 # Enter mode 2.
-            SetMode 2    
+            SetMode 2
          }
 
 # Mode 2 - "Enter a new mask polygon"
@@ -10153,7 +10153,7 @@ proc ReleaseBind {x y} {
             SetPosn $newi "VID" $vid
 
 # Create the marker for the new positon, and store its canvas id.
-            set id [MarkPosn $newi 0 1 ""] 
+            set id [MarkPosn $newi 0 1 ""]
             SetPosn $newi ID $id
 
 # Raise the marker of the first (root) vertex to the top of the display list.
@@ -10175,11 +10175,11 @@ proc ReleaseBind {x y} {
 # 3, delete the entire polygon.
             if { [NumPosn $V0] < 3 } {
                Message "Polygon has less than 3 vertices and will be deleted."
-               DelPosn $V0 1 
+               DelPosn $V0 1
 
 # Otherwise...
             } {
- 
+
 # Raise the marker for the first vertex so that it is on top of the vector
 # which ends there. This ensures that the marker is picked up in
 # preference to the vector (for instance when pointing at it with the
@@ -10191,7 +10191,7 @@ proc ReleaseBind {x y} {
                SetPosn $V1 NXT $V0
                SetMode 1
 
-# Add the tag "vertices" to the root vertex, and activate the commands which 
+# Add the tag "vertices" to the root vertex, and activate the commands which
 # would occur if the pointer was moved into it.
                $CAN addtag vertices withtag $ROOTID
                eval [$CAN bind vertices <Enter>]
@@ -10231,11 +10231,11 @@ proc Restore {file} {
 #     Restore
 #
 #  Purpose:
-#     Restore positions lists, masks, and options from a text file 
+#     Restore positions lists, masks, and options from a text file
 #     previously created using procedure Dump.
 #
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the dump is read from the specified
 #        file. Otherwise, the user is asked to supply a file name.
 #
@@ -10243,11 +10243,11 @@ proc Restore {file} {
 #  Returned Value:
 #     1 if a succesful dump was performed, zero otherwise.
 #-
-   global E_RAY_FEATURES 
+   global E_RAY_FEATURES
    global E_RAY_MASK
    global IMAGES
-   global O_RAY_FEATURES 
-   global O_RAY_MASK 
+   global O_RAY_FEATURES
+   global O_RAY_MASK
    global O_RAY_SKY
    global E_RAY_SKY
    global IMMAP
@@ -10294,7 +10294,7 @@ proc Restore {file} {
 # Set a flag indicating that the supplied file is a valid dump file.
       set bad 0
 
-# If the user supplied the dump file, dump the current positions, masks, etc, 
+# If the user supplied the dump file, dump the current positions, masks, etc,
 # so that they can be restored if anything goes wrong. Abort if the dump fails.
       if { !$backup } {
          set safefile [UniqueFile]
@@ -10314,14 +10314,14 @@ proc Restore {file} {
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
+         }
          if { ![regexp {^Image } $line] } { break }
 
 # Restore the the OE Mapping.
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
+         }
 
          if { $line != "" } {
             if { [llength $line] == 6 } {
@@ -10330,7 +10330,7 @@ proc Restore {file} {
             } {
                set bad 1
                break
-            } 
+            }
          } {
             catch { unset OEMAP($image) }
          }
@@ -10339,7 +10339,7 @@ proc Restore {file} {
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
+         }
 
          if { $line != "" } {
             if { [llength $line] == 6 } {
@@ -10347,7 +10347,7 @@ proc Restore {file} {
             } {
                set bad 1
                break
-            } 
+            }
          } {
             catch { unset IMMAP($image) }
          }
@@ -10356,18 +10356,18 @@ proc Restore {file} {
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
+         }
 
          if { $line != "" } {
             set PROT_OEMAP($image) $line
          } {
             catch { unset PROT_OEMAP($image) }
          }
-         
+
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
+         }
 
          if { $line != "" } {
             set PROT_IMMAP($image) $line
@@ -10387,16 +10387,16 @@ proc Restore {file} {
 # Get the number of positions in this list ($npnt).
             if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
                set bad 1
-            } 
+            }
 
 # Read the arrays holding information describing the list.
             foreach item "PX PY NXT LBL TAG" {
                set aryname "PNT${item}"
-               upvar #0 $aryname ary 
+               upvar #0 $aryname ary
 
                if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
                   set bad 1
-               } 
+               }
 
 # Store the new array values.
                if { !$bad } {
@@ -10429,7 +10429,7 @@ proc Restore {file} {
                   } {
                      lappend PNTVID($image,$object) -1
                   }
-               }            
+               }
             }
          }
       }
@@ -10439,8 +10439,8 @@ proc Restore {file} {
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
-      }      
+         }
+      }
 
 # Only proceed if the file is good so far.
       if { !$bad } {
@@ -10449,7 +10449,7 @@ proc Restore {file} {
          foreach var "XHAIR SKYOFF HAREA SAREA SKYPAR" {
             upvar #0 $var gvar
             set old_$var $gvar
-         }            
+         }
 
 # Restore the values of the global variables holding the option settings...
          foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL PSF_SIZE INTERP FITTYPE OEFITTYPE SKYPAR VIEW XHAIR SKYOFF HAREA SAREA" {
@@ -10458,7 +10458,7 @@ proc Restore {file} {
             if { [gets $fd line] == -1 || [llength $line] != 2 || [lindex $line 0] != $var } {
                set bad 1
                break
-            } 
+            }
             set gvar [lindex $line 1]
          }
 
@@ -10477,7 +10477,7 @@ proc Restore {file} {
 
             if { $old_HAREA != $HAREA } {
                set HAREA $old_HAREA
-               $OPTSMENU invoke "Display Help Area" 
+               $OPTSMENU invoke "Display Help Area"
             }
 
             if { $old_SAREA != $SAREA } {
@@ -10507,7 +10507,7 @@ proc Restore {file} {
 #  If the specified file was bad, try restoring the dump saved at the start
 #  of this procedure. Do not do this if we are already restoring a saved
 #  "backup" dump.
-      if { $bad && !$backup } { 
+      if { $bad && !$backup } {
          Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
          Restore $safefile
       }
@@ -10528,7 +10528,7 @@ proc RestoreImage {file} {
 #     Restore positions lists and masks for the currently displayed image.
 #
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the dump is read from the specified
 #        file. Otherwise, the user is asked to supply a file name.
 #
@@ -10536,11 +10536,11 @@ proc RestoreImage {file} {
 #  Returned Value:
 #     1 if a succesful dump was performed, zero otherwise.
 #-
-   global E_RAY_FEATURES 
+   global E_RAY_FEATURES
    global E_RAY_MASK
    global IMAGE_DISP
-   global O_RAY_FEATURES 
-   global O_RAY_MASK 
+   global O_RAY_FEATURES
+   global O_RAY_MASK
    global O_RAY_SKY
    global E_RAY_SKY
    global PNTCY
@@ -10586,7 +10586,7 @@ proc RestoreImage {file} {
 # Set a flag indicating that the supplied file is a valid dump file.
       set bad 0
 
-# If the user supplied the dump file, dump the current positions, masks, etc, 
+# If the user supplied the dump file, dump the current positions, masks, etc,
 # so that they can be restored if anything goes wrong. Abort if the dump fails.
       if { !$backup } {
          set safefile [UniqueFile]
@@ -10598,7 +10598,7 @@ proc RestoreImage {file} {
 
 # Check that no error has occured and sve the name of the currently
 # displayed image.
-      if { !$bad } { 
+      if { !$bad } {
          set image $IMAGE_DISP
 
 # Loop round each object type...
@@ -10613,16 +10613,16 @@ proc RestoreImage {file} {
 # Get the number of positions in this list ($npnt).
             if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
                set bad 1
-            } 
+            }
 
 # Read the arrays holding information describing the list.
             foreach item "PX PY NXT LBL TAG" {
                set aryname "PNT${item}"
-               upvar #0 $aryname ary 
+               upvar #0 $aryname ary
 
                if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
                   set bad 1
-               } 
+               }
 
 # Store the new array values.
                if { !$bad } {
@@ -10655,7 +10655,7 @@ proc RestoreImage {file} {
                   } {
                      lappend PNTVID($image,$object) -1
                   }
-               }            
+               }
             }
          }
       }
@@ -10669,7 +10669,7 @@ proc RestoreImage {file} {
 #  If the specified file was bad, try restoring the dump saved at the start
 #  of this procedure. Do not do this if we are already restoring a saved
 #  "backup" dump.
-      if { $bad && !$backup } { 
+      if { $bad && !$backup } {
          Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
          RestoreImage $safefile
       }
@@ -10687,11 +10687,11 @@ proc RestoreMask {file} {
 #     RestoreMask
 #
 #  Purpose:
-#     Restore O and E ray masks from a dump file created by DumpMask. 
+#     Restore O and E ray masks from a dump file created by DumpMask.
 #     Current masks are first cleared.
 #
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the dump is read from the specified
 #        file. Otherwise, the user is asked to supply a file name.
 #
@@ -10701,7 +10701,7 @@ proc RestoreMask {file} {
    global E_RAY_MASK
    global DBEAM
    global IMAGES
-   global O_RAY_MASK 
+   global O_RAY_MASK
    global PNTCY
    global PNTCX
    global PNTID
@@ -10735,7 +10735,7 @@ proc RestoreMask {file} {
 # Set a flag indicating that the supplied file is a valid dump file.
       set bad 0
 
-# If the user supplied the dump file, dump the current mask so that it 
+# If the user supplied the dump file, dump the current mask so that it
 # can be restored if anything goes wrong. If the dump fails (for instance
 # because the mask has not yet been set up), then continue anyway.
       if { !$backup } {
@@ -10758,7 +10758,7 @@ proc RestoreMask {file} {
 
       }
 
-# Save the name of the first (reference) image. Use a foreach loop so that we 
+# Save the name of the first (reference) image. Use a foreach loop so that we
 # can use a break command to jump to the end.
       foreach image [lindex $IMAGES 0] {
 
@@ -10766,9 +10766,9 @@ proc RestoreMask {file} {
          if { [gets $fd line] == -1 } {
             set bad 1
             break
-         } 
-  
-         if { ![regexp {^Masks only} $line] } { 
+         }
+
+         if { ![regexp {^Masks only} $line] } {
             set bad 1
             break
          }
@@ -10779,16 +10779,16 @@ proc RestoreMask {file} {
 # Get the number of positions in the supplied mask ($npnt).
             if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
                set bad 1
-            } 
+            }
 
 # Read the arrays from the text file holding information describing the list.
             foreach item "PX PY NXT LBL TAG" {
                set aryname "PNT${item}"
-               upvar #0 $aryname ary 
-   
+               upvar #0 $aryname ary
+
                if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
                   set bad 1
-               } 
+               }
 
 # Store the new array values.
                if { !$bad } {
@@ -10812,7 +10812,7 @@ proc RestoreMask {file} {
                catch { unset PNTCX($image,$object) }
                catch { unset PNTCY($image,$object) }
                catch { unset PNTVID($image,$object) }
-   
+
                foreach nxt $PNTNXT($image,$object) {
                   lappend PNTID($image,$object) -1
                   lappend PNTCX($image,$object) ""
@@ -10822,7 +10822,7 @@ proc RestoreMask {file} {
                   } {
                      lappend PNTVID($image,$object) -1
                   }
-               }            
+               }
             }
          }
       }
@@ -10836,7 +10836,7 @@ proc RestoreMask {file} {
 # If the specified file was bad, try restoring the dump saved at the start
 # of this procedure. Do not do this if we are already restoring a saved
 # "backup" dump.
-      if { $bad && !$backup } { 
+      if { $bad && !$backup } {
          Message "Syntax error encountered restoring masks from \"$file\". Last line read was:\n\n\"$line\""
          if { $safefile != "" } { RestoreMask $safefile }
       }
@@ -10874,7 +10874,7 @@ proc Save {} {
 #     IMSECS (Read)
 #        A list of the input image sections as supplied by the user.
 #     INTERP (Read)
-#        The interpolation method to use when resampling the input images. 
+#        The interpolation method to use when resampling the input images.
 #     MAP_RX (Write)
 #        The anti-clockwise rotation from the input image's X axis to the
 #        output image's X axis (in degrees).
@@ -10893,7 +10893,7 @@ proc Save {} {
 #        An integer representing the "O-ray mask" object type.
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -10903,10 +10903,10 @@ proc Save {} {
 #        closed).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     POLMODE (Read)
 #        'Linear' or 'Circular'; indicates the type of polarisation for
 #        which Stokes parameters should be created.
@@ -10918,7 +10918,7 @@ proc Save {} {
 #     RESAVE (Read and Write)
 #        Set to zero if the the mappings and masks have not changed since
 #        the last time the output images were saved. Set to a non-zero
-#        value if the output images are out-of-date with respect to the 
+#        value if the output images are out-of-date with respect to the
 #        mappings and/or masks.
 #     SKYOFF (Read)
 #        Should sky subtraction be performed? If not, then the input image
@@ -10926,7 +10926,7 @@ proc Save {} {
 #     SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
-#        surfaces to areas within the supplied object frames (i.e. the 
+#        surfaces to areas within the supplied object frames (i.e. the
 #        O and E sky areas).
 #     SKY_METHOD (Read)
 #        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. Any
@@ -10956,9 +10956,9 @@ proc Save {} {
    global OS
    global OUTIMS
    global O_RAY_MASK
-   global O_RAY_SKY   
+   global O_RAY_SKY
    global PNTNXT
-   global PNTPX 
+   global PNTPX
    global PNTPY
    global POLMODE
    global POLPACK_DIR
@@ -10977,9 +10977,9 @@ proc Save {} {
    global WCSDOMAIN
 
 # If no output files are required, tell the user.
-   if { !$GOTOUT } { 
+   if { !$GOTOUT } {
       Message "No output data files were specified when Polka was run.\n\n(The Dump command in the File menu can still be used to dump the current feature positions, masks, etc.)"
-      return 1 
+      return 1
    }
 
 # Display a warning and return if the images have already been saved.
@@ -10991,9 +10991,9 @@ proc Save {} {
       set w1 "are"
    }
 
-   if { !$RESAVE } { 
+   if { !$RESAVE } {
       Message "The output $out $w1 already up-to-date with respect to the current mappings and masks."
-      return 1 
+      return 1
    }
 
 # Begin a temporary file context.
@@ -11019,13 +11019,13 @@ proc Save {} {
 # action if any are missing.
    if { [AllMappings] } {
 
-# If we are in dual-beam mode,  ensure that the reference image has an O-ray 
-# mask. Since we already know that all mappings are available, all other 
+# If we are in dual-beam mode,  ensure that the reference image has an O-ray
+# mask. Since we already know that all mappings are available, all other
 # masks can be created from this mask if necessary.
       if { $DBEAM && ![CreateMask $im0 $O_RAY_MASK] } {
          Message "Masks defining the O and E ray areas have not yet been supplied."
 
-# If the sky to be subtracted is defined within the object frames, 
+# If the sky to be subtracted is defined within the object frames,
 # ensure that sky areas have been defined.
       } elseif { $SKYOFF && $SKY_METHOD == $SKY_AREA && ![CreateSky $im0 $O_RAY_SKY] } {
          Message "The areas containing sky have not yet been supplied."
@@ -11064,7 +11064,7 @@ proc Save {} {
          }
 
          foreach image $IMAGES {
-            
+
 # Ignore the first image if it used purely as a reference "pasteboard"
 # and is not to be included in the output data sets.
             if { $REFONLY && $image == $im0 } continue
@@ -11077,7 +11077,7 @@ proc Save {} {
             set lb($image) [label $fr.lb -text "$image:" -anchor w \
                             -background $back]
             pack $lb($image) -side left -padx 2m -fill x
-            
+
             set tick($image) [label $fr.tick -foreground $back \
                               -background $back -bitmap @$POLPACK_DIR/tick.bit]
             pack $tick($image) -side right
@@ -11086,14 +11086,14 @@ proc Save {} {
 
          set image ""
          set fr1 [frame $pfrm.fr1]
-         pack $fr1 -side top -anchor nw -fill x 
+         pack $fr1 -side top -anchor nw -fill x
          set l1 [label $fr1.l1 -text "Doing image: " -font $S_FONT]
          set l2 [label $fr1.l2 -textvariable SIMAGE]
-         pack $l1 $l2 -side left -padx 6m 
+         pack $l1 $l2 -side left -padx 6m
 
          set fr234 [frame $pfrm.fr234 -background $back -bd 2 -relief raised]
          pack $fr234 -side left -padx 5m -pady 3m -fill x -expand 1
-         pack [label $fr234.lb -text "Processing stages" -font $S_FONT -background $back] -side top 
+         pack [label $fr234.lb -text "Processing stages" -font $S_FONT -background $back] -side top
 
          set fr2 [frame $fr234.fr2 -background $back]
          set fr3 [frame $fr234.fr3 -background $back]
@@ -11116,7 +11116,7 @@ proc Save {} {
             pack $selab     -side top -anchor w -fill y -expand 1
             pack $setick(O) -side top -anchor w -fill y -expand 1
             pack $setick(E) -side top -anchor w -fill y -expand 1
-   
+
             set sslab [label $fr2.r1 -text "Sky subtraction:" -background $back]
             set sstick(O) [label $fr3.r1 -foreground $back \
                             -background $back -bitmap @$POLPACK_DIR/tick.bit]
@@ -11133,7 +11133,7 @@ proc Save {} {
             set sstick(O) "no.such.widget"
             set sstick(E) "no.such.widget"
          }
-         
+
          set melab [label $fr2.r2 -text "Mask extraction:" -background $back]
          set metick(O) [label $fr3.r2 -foreground $back \
                          -background $back -bitmap @$POLPACK_DIR/tick.bit]
@@ -11185,7 +11185,7 @@ proc Save {} {
 # Open a text file to receive the name of all the aligned intensity images
 # create below.
          set intfiles [UniqueFile]
-         set intfiles_id [open $intfiles w]            
+         set intfiles_id [open $intfiles w]
 
 # Process each of the input images in turn.
          set ok 1
@@ -11259,13 +11259,13 @@ proc Save {} {
                Wop $melab configure -foreground red
 
 # If in dual-beam mode, ensure that the mask is available.
-               set got_mask [CreateMask $image $obj] 
-               if { $DBEAM && !$got_mask } { 
+               set got_mask [CreateMask $image $obj]
+               if { $DBEAM && !$got_mask } {
                   set ok 0
-                  break 
+                  break
                }
 
-# If we have a mask, find the upper and lower limits of the pixel coordinates 
+# If we have a mask, find the upper and lower limits of the pixel coordinates
 # for the mask and create a standard section specifier from them.
                if { $got_mask } {
                   set sect [BoundBox $PNTPX($image,$obj) $PNTPY($image,$obj) "" 0]
@@ -11287,12 +11287,12 @@ proc Save {} {
                   }
                }
 
-# Make the "mask extraction" label (and associated tick mark) in the 
-# progress dialog box revert to black, and highlight the "image alignment" 
+# Make the "mask extraction" label (and associated tick mark) in the
+# progress dialog box revert to black, and highlight the "image alignment"
 # label in red.
                Wop $melab configure -foreground black
                Wop $metick($ray) configure -foreground black
-               Wop $ialab configure -foreground red 
+               Wop $ialab configure -foreground red
 
 # Get the name of a temporary file to hold the output image in NDF format.
                set outndf [UniqueFile]
@@ -11308,7 +11308,7 @@ proc Save {} {
                   set map1 "ref"
                   set map2 [ImageMapping $image]
 
-# For E-ray masks the genuine OE mapping (from E to 0) is used with 
+# For E-ray masks the genuine OE mapping (from E to 0) is used with
 # the image mapping.
                } {
                   set map1 [OEMapping $image]
@@ -11330,12 +11330,12 @@ proc Save {} {
                      if { $sect == "" } {
                         set ok 0
                         break
-                     } 
+                     }
                   } {
                      set sect ""
-                  }         
+                  }
 
-# Transform the mask area using the mapping (if defined). 
+# Transform the mask area using the mapping (if defined).
                   if { ![TranImage $maskarea $map $outndf $sect] } {
                      set ok 0
                      break
@@ -11346,8 +11346,8 @@ proc Save {} {
                      set ok 0
                      break
                   }
-                  
-# Make the "image alignment" label (and associated tick mark) in the 
+
+# Make the "image alignment" label (and associated tick mark) in the
 # progress dialog box revert to black, and highlight the "header information"
 # label in red.
                   Wop $ialab configure -foreground black
@@ -11378,18 +11378,18 @@ proc Save {} {
                      }
                   }
 
-# The image identifier. This is only assigned a value if the IMGID component 
+# The image identifier. This is only assigned a value if the IMGID component
 # does not already exist. In this case, the name of the input image is
 # used.
-                  if { ![Extension $outndf IMGID _CHAR "" old_plate] } { 
-                     set ok 0 
+                  if { ![Extension $outndf IMGID _CHAR "" old_plate] } {
+                     set ok 0
                      break
                   }
 
                   if { ![string length $old_plate] } {
                      set plate [file tail $image]
-                     if { ![Extension $outndf IMGID _CHAR $plate ""] } { 
-                        set ok 0 
+                     if { ![Extension $outndf IMGID _CHAR $plate ""] } {
+                        set ok 0
                         break
                      }
                   }
@@ -11400,7 +11400,7 @@ proc Save {} {
                      break
                   }
 
-# Make the "header information" label (and associated tick mark) in the 
+# Make the "header information" label (and associated tick mark) in the
 # progress dialog box revert to black.
                   Wop $hilab configure -foreground black
                   Wop $hitick($ray) configure -foreground black
@@ -11409,11 +11409,11 @@ proc Save {} {
 # Null mappings should not happen.
                } {
                   set ok 0
-                  break            
+                  break
                }
 
-#  Write the name of the NDF version of the output image just created to the 
-#  text file opened earlier. 
+#  Write the name of the NDF version of the output image just created to the
+#  text file opened earlier.
                puts $intfiles_id $outndf
 
 # Add the name of the NDF to a list of files to be escaped to the next
@@ -11467,11 +11467,11 @@ proc Save {} {
                set ok 0
             }
 
-# Make the "Producing Stokes parameters" label (and associated tick mark) in 
+# Make the "Producing Stokes parameters" label (and associated tick mark) in
 # the progress dialog box revert to black.
             Wop $stoklb configure -foreground black
             Wop $stoktick configure -foreground black
-          
+
          }
 
 # Ensure X events are ignored while ADAM tasks are being executed.
@@ -11479,17 +11479,17 @@ proc Save {} {
          update idletasks
 
 # Destroy the progress dialog box.
-         if { [winfo exists $top] } { 
+         if { [winfo exists $top] } {
             after 1000
-            destroy $top 
+            destroy $top
          }
       }
    }
 
-# If an error occurred, give a contextual message, and delete any output 
+# If an error occurred, give a contextual message, and delete any output
 # images which were created.
-   if { !$ok } { 
-      Message "The registered images could not be saved." 
+   if { !$ok } {
+      Message "The registered images could not be saved."
       set CANCEL_OP 0
       foreach image $IMAGES {
 
@@ -11563,7 +11563,7 @@ proc SaveOptions {} {
    global ATASK_OEFIT
    global ATASK_PHI
    global ATASK_PLO
-   global ATASK_POLMODE 
+   global ATASK_POLMODE
    global ATASK_PSF
    global ATASK_REFCOL
    global ATASK_SAREA
@@ -11573,7 +11573,7 @@ proc SaveOptions {} {
    global ATASK_SKYPAR
    global ATASK_VIEW
    global ATASK_XHAIR
-   global ATASK_XHRCOL          
+   global ATASK_XHRCOL
    global BADCOL
    global CHAR_LIST
    global CHAR_STOP
@@ -11585,14 +11585,14 @@ proc SaveOptions {} {
    global OEFITTYPE
    global PHI_REQ
    global PLO_REQ
-   global POLMODE         
+   global POLMODE
    global PSF_SIZE
    global REFCOL
    global SAREA
-   global SELCOL            
+   global SELCOL
    global SI_LIST
    global SI_VARS
-   global SKYOFF           
+   global SKYOFF
    global SKYPAR
    global STOKES
    global VIEW
@@ -11621,12 +11621,12 @@ proc SaveOptions {} {
      if { $STOKES } { set ATASK_POLMODE $POLMODE }
 
      foreach fittype [array names MAPTYPE] {
-        if { $MAPTYPE($fittype) == $FITTYPE } { break } 
+        if { $MAPTYPE($fittype) == $FITTYPE } { break }
      }
      set ATASK_FIT $fittype
 
      foreach fittype [array names MAPTYPE] {
-        if { $MAPTYPE($fittype) == $OEFITTYPE } { break } 
+        if { $MAPTYPE($fittype) == $OEFITTYPE } { break }
      }
      set ATASK_OEFIT $fittype
 
@@ -11649,7 +11649,7 @@ proc ScreenSec {section} {
 #     ScreenSec
 #
 #  Purpose:
-#     Expand the supplied section in one direction so that it is 
+#     Expand the supplied section in one direction so that it is
 #     square (and will thus fill the GWM display area).
 #
 #  Arguments:
@@ -11665,7 +11665,7 @@ proc ScreenSec {section} {
    set newsec $section
 
 # Get a list containing the x and y bounds extracted from the supplied
-# string. 
+# string.
    set sec [SecList $section]
 
 # Find the pixel indices at the centre of the supplied section.
@@ -11684,8 +11684,8 @@ proc ScreenSec {section} {
       set yc [lindex $cc 1]
 
 # Find the width and height of the section.
-      set width [expr $xu - $xl + 1 ]      
-      set height [expr $yu - $yl + 1 ]      
+      set width [expr $xu - $xl + 1 ]
+      set height [expr $yu - $yl + 1 ]
 
 # If the width is smaller than the height, adjust the x bounds to make
 # the section square.
@@ -11693,7 +11693,7 @@ proc ScreenSec {section} {
          set xl [expr int( floor( $xc - 0.5 * $height ) ) ]
          set xu [expr int( floor( $xl + $height - 1 ) ) ]
 
-# Otherwise, if the width is greater than the height, adjust the y bounds 
+# Otherwise, if the width is greater than the height, adjust the y bounds
 # to make the section square.
       } elseif { $width > $height } {
          set yl [expr int( floor( $yc - 0.5 * $width ) ) ]
@@ -11701,8 +11701,8 @@ proc ScreenSec {section} {
       }
 
 # Construct a new section string.
-      set newsec "($xl:$xu,$yl:$yu)"    
-   } 
+      set newsec "($xl:$xu,$yl:$yu)"
+   }
 
    return $newsec
 }
@@ -11726,8 +11726,8 @@ proc SearchHelp {} {
    set type(EXSRCH) "_LOGICAL"
    set labs(WSRCH) "Search for:"
    set labs(EXSRCH) "Exact search?"
-   set limit(WSRCH) ""   
-   set limit(EXSRCH) ""   
+   set limit(WSRCH) ""
+   set limit(EXSRCH) ""
 
 #  Set up initial default valus.
    if { ![info exists WSRCH] || ![info exists EXSRCH] } {
@@ -11749,16 +11749,16 @@ proc SearchHelp {} {
       . config -cursor watch
       update idletasks
 
-# Run findme to display the results of the search. Use the -h and -l switches 
-# to make it search the page headings and lines. Use the -s switch to make it 
-# arrange the results in order of significance. If an exact search is required 
-# use the -w and -c switches to ensure only whole words are matched, and case 
+# Run findme to display the results of the search. Use the -h and -l switches
+# to make it search the page headings and lines. Use the -s switch to make it
+# arrange the results in order of significance. If an exact search is required
+# use the -w and -c switches to ensure only whole words are matched, and case
 # is significant. Use -q to suppress output to standard output.
       if { $EXSRCH } {
-         set err [catch {exec findme -q -h -l -s -w -c  $WSRCH $POLPACK_HELP/polka} mess] 
+         set err [catch {exec findme -q -h -l -s -w -c  $WSRCH $POLPACK_HELP/polka} mess]
       } {
-         set err [catch {exec findme -q -h -l -s $WSRCH $POLPACK_HELP/polka} mess] 
-      }      
+         set err [catch {exec findme -q -h -l -s $WSRCH $POLPACK_HELP/polka} mess]
+      }
 
 #  Re-instate the original cursor.
       . config -cursor $old_cursor
@@ -11789,7 +11789,7 @@ proc SecCen {section} {
 #      A section string (eg "(30:40,50:60)").
 #
 #  Returned Value:
-#      A list of two values; the x and y pixel indices (integers) at the 
+#      A list of two values; the x and y pixel indices (integers) at the
 #      centre of the section.
 #-
    set sec [SecList $section]
@@ -11855,7 +11855,7 @@ proc Segment {indata outdata image obj} {
 #        The name of the supplied image which is associated with the mask
 #        which defines the polygonal areas to be copied.
 #     obj
-#        The name of the mask object which defines the polygonal areas to 
+#        The name of the mask object which defines the polygonal areas to
 #        be copied (eg $O_RAY_MASK, $E_RAY_SKY, etc).
 #
 #  Returned Value:
@@ -11864,7 +11864,7 @@ proc Segment {indata outdata image obj} {
 #  Globals:
 #     PNTNXT (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -11874,16 +11874,16 @@ proc Segment {indata outdata image obj} {
 #        closed).
 #     PNTPX (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #-
    global PNTNXT
    global PNTPX
    global PNTPY
 
-# Write the pixel coordinates of the mask to a set of text files in a format 
+# Write the pixel coordinates of the mask to a set of text files in a format
 # which can be used by KAPPA:SEGMENT. Each file holds a single polygon.
    set pntnxt $PNTNXT($image,$obj)
    set file [UniqueFile]
@@ -11917,7 +11917,7 @@ proc Segment {indata outdata image obj} {
             }
          }
 
-         if { $i != "" } { 
+         if { $i != "" } {
             set i0 $i
             set file [UniqueFile]
             set fileid [open $file w]
@@ -11934,7 +11934,7 @@ proc Segment {indata outdata image obj} {
 # area.
    set maskarea [UniqueFile]
 
-# Run SEGMENT to extract the mask area into a temporary image.  
+# Run SEGMENT to extract the mask area into a temporary image.
    if { $outdata == "" } { set outdata "!" }
    if { ![Obey kappa segment "in1=$indata in2=$outdata mode=file out=$maskarea $polys"] } {
       set maskarea ""
@@ -11959,13 +11959,13 @@ proc SelectFont {font} {
 #     A specific font matching the the supplied pattern. The first
 #     matching font returned by xlsfonts is used, with the proviso that
 #     font families are searched in the following order:
-#        helvetica 
-#        lucida 
-#        fixed 
-#        clean 
-#        courier 
-#        times 
-#        charter 
+#        helvetica
+#        lucida
+#        fixed
+#        clean
+#        courier
+#        times
+#        charter
 #        new century schoolbook
 #
 #     A null string is returned if no matching font can be found belonging
@@ -11984,7 +11984,7 @@ proc SelectFont {font} {
 # Find the index of the first matching font in the current family. If
 # found, get the full font name and leave the loop.
          set i 0
-         while { $i > -1 } { 
+         while { $i > -1 } {
             set i [lsearch -regexp $fonts "^-\[^-\]+-$n" ]
             set rfont [lindex $fonts $i]
             if { ![catch "button .test -font $rfont"] } {
@@ -11999,7 +11999,7 @@ proc SelectFont {font} {
       }
 
 # If the xlsfonts command failed display the message.
-   } { 
+   } {
       Message "An error occurred using xlsfonts to list fonts...\n $fonts"
    }
 
@@ -12015,7 +12015,7 @@ proc SendBack {} {
 #  Purpose:
 #     Writes the names and values of the global variables holding the
 #     a-task options values to a text file. This procedure should be
-#     called prior to exiting the Polka Tcl script. The a-task will 
+#     called prior to exiting the Polka Tcl script. The a-task will
 #     read the values in the file and store them in its HDS parameter
 #     file.
 #
@@ -12025,7 +12025,7 @@ proc SendBack {} {
 #  Globals:
 #    COMFILE (Read)
 #       The name of the text file in which to store the values of the global
-#       variables to be passed back to the a-task. 
+#       variables to be passed back to the a-task.
 #
 #-
    global COMFILE
@@ -12033,24 +12033,24 @@ proc SendBack {} {
    global ATASK_XHAIR
    global ATASK_HAREA
    global ATASK_SAREA
-   global ATASK_PSF  
+   global ATASK_PSF
    global ATASK_SKYPAR
-   global ATASK_SI   
-   global ATASK_VIEW 
+   global ATASK_SI
+   global ATASK_VIEW
    global ATASK_BADCOL
    global ATASK_CURCOL
    global ATASK_REFCOL
    global ATASK_SELCOL
    global ATASK_XHRCOL
-   global ATASK_FIT  
+   global ATASK_FIT
    global ATASK_OEFIT
-   global ATASK_PLO  
-   global ATASK_PHI  
+   global ATASK_PLO
+   global ATASK_PHI
    global ATASK_POLMODE
 
-   if { $COMFILE != "" } { 
+   if { $COMFILE != "" } {
 
-      catch {exec rm -f $comfile} 
+      catch {exec rm -f $comfile}
 
       set fd [open $COMFILE "w"]
 
@@ -12072,7 +12072,7 @@ proc SendBack {} {
       if { [info exists ATASK_PLO] }     { puts $fd "ATASK_PLO $ATASK_PLO"}
       if { [info exists ATASK_PHI] }     { puts $fd "ATASK_PHI $ATASK_PHI"}
       if { [info exists ATASK_POLMODE] } { puts $fd "ATASK_POLMODE $ATASK_POLMODE"}
-      
+
       close $fd
 
    }
@@ -12090,7 +12090,7 @@ proc Seq {com delay id count} {
 #    com
 #       The command to execute in the timed sequence.
 #    delay
-#       The number of milliseconds between executions of the 
+#       The number of milliseconds between executions of the
 #       command given by "com".
 #    id
 #       A string which can be used to identify the sequence.
@@ -12189,7 +12189,7 @@ proc SetColours {var} {
    global XHAIR_IDV
    global XHRCOL
 
-# Reconfigure the current objects if their colour has changed. Also set the 
+# Reconfigure the current objects if their colour has changed. Also set the
 # colour used by the "Current:" radio buttons.
    if { $var == "CURCOL" } {
       DrawCur
@@ -12198,11 +12198,11 @@ proc SetColours {var} {
          $RB_CUR($i) configure -selectcolor $CURCOL
       }
 
-# Reconfigure the reference objects if their colour has changed. Also set the 
+# Reconfigure the reference objects if their colour has changed. Also set the
 # colour used by the "Reference:" radio buttons.
    } elseif { $var == "REFCOL" } {
-      DrawRef 
-      
+      DrawRef
+
       foreach i "$NONE $O_RAY_SKY $O_RAY_FEATURES $O_RAY_MASK $E_RAY_SKY $E_RAY_FEATURES $E_RAY_MASK" {
          $RB_REF($i) configure -selectcolor $REFCOL
       }
@@ -12239,7 +12239,7 @@ proc SetHelp {widget help args} {
 #    widget
 #       The name of the widget (eg ".fr1.button").
 #    help
-#       The text to display. 
+#       The text to display.
 #    args
 #       An optional htx cross-reference label to be associated with the
 #       widget.
@@ -12264,9 +12264,9 @@ proc SetHelp {widget help args} {
       set HELP_LABELS($widget) $args
    }
 
-# Ensure that the displayed help text is up-to-date. 
-   Helper 
-   
+# Ensure that the displayed help text is up-to-date.
+   Helper
+
 }
 
 proc SetInfo {text def} {
@@ -12281,8 +12281,8 @@ proc SetInfo {text def} {
 #     text
 #        A text string which can be displayed above the GWM image.
 #     def
-#        If non-zero, the the supplied text string is low priority and 
-#        should be displayed only when there is no other more important 
+#        If non-zero, the the supplied text string is low priority and
+#        should be displayed only when there is no other more important
 #        text to be displayed. If zero, then the text is high priority
 #        and is displayed immediately, so long as no other high priority
 #        text is currently being displayed.
@@ -12310,7 +12310,7 @@ proc SetInfo {text def} {
 
 # If the supplied text is to be displayed whenever there is no current
 # text, then save it in DEFAULT_INFO for later use.
-   if { $def } { 
+   if { $def } {
       set DEFAULT_INFO $text
       set told 1
 
@@ -12331,7 +12331,7 @@ proc SetInfo {text def} {
       set INFO_TEXT $CURRENT_INFO
    } {
       set INFO_TEXT $DEFAULT_INFO
-   }   
+   }
 
 # Ensure the text is displayed.
    update idletasks
@@ -12349,7 +12349,7 @@ proc SetMode {mode} {
 #
 #  Arguments:
 #     mode
-#        The required interaction mode. This determines how to process button 
+#        The required interaction mode. This determines how to process button
 #        clicks and motion in the GWM canvas item. Modes are:
 #           0 - The user specifies image features by clicking on them.
 #           1 - The user starts a new mask polygon, or edits an existing one.
@@ -12366,7 +12366,7 @@ proc SetMode {mode} {
 #     MODE (Write)
 #        The new interaction mode.
 #-
-   global CAN   
+   global CAN
    global CANCEL
    global EDITMENU
    global MODE
@@ -12377,13 +12377,13 @@ proc SetMode {mode} {
    global PRE_MODE4
    global SELECTED_AREA
    global V0
-   global V1     
+   global V1
    global VCX0
    global VCY0
    global VID2
    global XHAIR
 
-# Disable the Copy and Paste entries in the Edit menu. 
+# Disable the Copy and Paste entries in the Edit menu.
    $EDITMENU entryconfigure Copy -state disabled
    $EDITMENU entryconfigure Paste -state disabled
 
@@ -12418,7 +12418,7 @@ proc SetMode {mode} {
       }
       if { $PASTE } {
          $EDITMENU entryconfigure Paste -state normal
-      }    
+      }
 
    } elseif { $mode == 2 } {
       CursorBind [list vertices vectors vroot] [list "" "" X_cursor]
@@ -12460,7 +12460,7 @@ proc SetMode {mode} {
 # now constructing a polygon (note we may go back to finish the polygon
 # if we have gone into mode 4). These values are set in mode 1.
    if { $mode == 0 || $mode == 1 || $mode == 3 || ( $mode == 4 && $old_mode != 1 && $old_mode != 2 ) } {
-      set V0 "" 
+      set V0 ""
       set V1 ""
       set VCX0 ""
       set VCY0 ""
@@ -12481,7 +12481,7 @@ proc SetPosn {i names values args} {
 #  Arguments:
 #     i
 #        The index (zero-based) of the position for which information
-#        is to be set. If this is supplied as -1, then a new position is 
+#        is to be set. If this is supplied as -1, then a new position is
 #        appended to the end of the list.
 #     names
 #        A list of the names of the parameters to be set. These should be
@@ -12493,18 +12493,18 @@ proc SetPosn {i names values args} {
 #           ID - The canvas item id of the marker for the position (-1
 #                if no marker is currently drawn).
 #           VID - The canvas item id of the line joining the position to
-#                the position given by parameter NXT (-1 if no line is 
+#                the position given by parameter NXT (-1 if no line is
 #                currently drawn, and null ("") if NXT is undefined).
-#           NXT - The index of the position corresponding to the next 
+#           NXT - The index of the position corresponding to the next
 #                vertex in a polygonal mask (-1 if there is no "next
-#                vertex" (i.e. if the polygon is open) and null ("") if this 
-#                position is not part of a polygon). 
+#                vertex" (i.e. if the polygon is open) and null ("") if this
+#                position is not part of a polygon).
 #           LBL - The textual label associated with a position.
 #           TAG - A canvas tag associated with the position.
 #     values
 #        A list of parameter values corresponding to the names in "names".
 #     args
-#        An optional list argument holding the image from which the 
+#        An optional list argument holding the image from which the
 #        positions are derived, and the type of objects to be used.
 #        If these are not supplied, they default to $IMAGE_DISP and
 #        $CUROBJ_DISP.
@@ -12512,7 +12512,7 @@ proc SetPosn {i names values args} {
 #  Returned Value:
 #     The index of the set position. A null string is returned if the
 #     supplied index is out of bounds.
-#     
+#
 #  Globals:
 #     CAN (Read)
 #        Path to the canvas containing the GWM image display.
@@ -12522,29 +12522,29 @@ proc SetPosn {i names values args} {
 #        The displayed image (without section).
 #     PNTCX (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas X coordinates. 
+#        is a list of canvas X coordinates.
 #     PNTCY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of canvas Y coordinates. 
+#        is a list of canvas Y coordinates.
 #     PNTID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
 #        positions in the list. A value of -1 indicates that no marker is
 #        currently drawn for the position.
 #     RECALC_OEMAP (Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the image's E to O mapping was last found.
 #     RECALC_IMMAP (Write)
-#        A 1-d array indexed by image. Each element is a logical flag 
-#        indicating if the image features for the corresponding image 
+#        A 1-d array indexed by image. Each element is a logical flag
+#        indicating if the image features for the corresponding image
 #        have changed since the mapping from the image to the first
 #        (reference) image was last found. The flag is set for all
 #        images if the image features for the first (reference) image
 #        are changed.
 #     PNTNXT (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of integers representing indices within the lists 
+#        is a list of integers representing indices within the lists
 #        given by PNTxxx. Each integer gives the index of the next position
 #        along the edge of a polygon. The vector starting at position
 #        index i, ends at position index given by the i'th element of
@@ -12554,17 +12554,17 @@ proc SetPosn {i names values args} {
 #        closed).
 #     PNTPX (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PNTTAG (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas tags (one for each position).
 #     PNTVID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
-#        vectors between positions in the list. A value of -1 indicates that 
+#        vectors between positions in the list. A value of -1 indicates that
 #        no line is currently drawn for the position. A blank string
 #        indicates that no vector is defined.
 #     V0 (Read)
@@ -12574,10 +12574,10 @@ proc SetPosn {i names values args} {
 #        The index of the position corresponding to the last vertex in
 #        an incomplete (i.e. open) polygon.
 #     VCX0 (Write)
-#        The canvas X coordinates at the first vertex in an incomplete 
+#        The canvas X coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VCY0 (Write)
-#        The canvas Y coordinates at the first vertex in an incomplete 
+#        The canvas Y coordinates at the first vertex in an incomplete
 #        (i.e. open) polygon.
 #     VID2 (Write)
 #        The canvas item id of the vector joining the last vertex in an
@@ -12611,9 +12611,9 @@ proc SetPosn {i names values args} {
    if { $args == "" } {
       set image $IMAGE_DISP
       set object $CUROBJ_DISP
-   } { 
-      set image [lindex $args 0]      
-      set object [lindex $args 1]      
+   } {
+      set image [lindex $args 0]
+      set object [lindex $args 1]
    }
 
 # Get the size of the list.
@@ -12624,7 +12624,7 @@ proc SetPosn {i names values args} {
    }
 
 # If a new position is being appended to the list, append a dummy
-# position containing default values now which will be filled with the 
+# position containing default values now which will be filled with the
 # supplied values later.
    if { $i == -1 } {
       set ret $size
@@ -12653,7 +12653,7 @@ proc SetPosn {i names values args} {
       set vidmod 0
       set lblmod 0
 
-# Loop round each supplied value.  
+# Loop round each supplied value.
       for {set j 0} {$j < [llength $names]} {incr j} {
          set val [lindex $values $j]
          set name [lindex $names $j]
@@ -12673,10 +12673,10 @@ proc SetPosn {i names values args} {
             set lblmod 1
             set new_label $val
             set old_label [lindex $PNTLBL($image,$object) $ret]
-         }         
+         }
 
-# Set the value, and indicate that the mappings based on this position list 
-# will need to be re-calculated (unless this is a mask). 
+# Set the value, and indicate that the mappings based on this position list
+# will need to be re-calculated (unless this is a mask).
          upvar #0 PNT$name array
          if { [info exists array($image,$object)] } {
             set array($image,$object) [lreplace $array($image,$object) $ret $ret $val]
@@ -12691,7 +12691,7 @@ proc SetPosn {i names values args} {
                if { $image != [lindex $IMAGES 0] } {
                   foreach im $IMAGES {
                      set RECALC_IMMAP($im) 1
-                  }         
+                  }
                }
             }
 
@@ -12706,7 +12706,7 @@ proc SetPosn {i names values args} {
          set cx [lindex $PNTCX($image,$object) $ret]
          set cy [lindex $PNTCY($image,$object) $ret]
          set pxy [CanToNDF $cx $cy]
-         if { $pxy == "" } { return "" } 
+         if { $pxy == "" } { return "" }
          set px [lindex $pxy 0]
          set py [lindex $pxy 1]
          set PNTPX($image,$object) [lreplace $PNTPX($image,$object) $ret $ret $px]
@@ -12718,7 +12718,7 @@ proc SetPosn {i names values args} {
          set px [lindex $PNTPX($image,$object) $ret]
          set py [lindex $PNTPY($image,$object) $ret]
          set cxy [NDFToCan $px $py]
-         if { $cxy == "" } { return "" } 
+         if { $cxy == "" } { return "" }
          set cx [lindex $cxy 0]
          set cy [lindex $cxy 1]
          set PNTCX($image,$object) [lreplace $PNTCX($image,$object) $ret $ret $cx]
@@ -12755,7 +12755,7 @@ proc SetPosn {i names values args} {
                   set coords [$CAN coords $vid]
                   set cx0 [lindex $coords 0]
                   set cy0 [lindex $coords 1]
-                  $CAN coords $vid $cx0 $cy0 $cx $cy 
+                  $CAN coords $vid $cx0 $cy0 $cx $cy
                }
             }
             incr j
@@ -12783,7 +12783,7 @@ proc SetPosn {i names values args} {
          }
       }
 
-# If the first vertex in a polygon have been changed, store the new values. 
+# If the first vertex in a polygon have been changed, store the new values.
       if { $ret == $V0 } {
          if { $pxymod || $cxymod } {
             set VCX0 $cx
@@ -12791,7 +12791,7 @@ proc SetPosn {i names values args} {
          }
       }
 
-# If the last vertex in a polygon have been changed, store the new values. 
+# If the last vertex in a polygon have been changed, store the new values.
       if { $ret == $V1 } {
          if { $vidmod } {
             set VID2 [lindex $PNTVID($image,$object) $ret]
@@ -12805,12 +12805,12 @@ proc SetPosn {i names values args} {
          Labels $old_label 0
       }
 
-# Update the bindings to be activated when the pointer enters or 
+# Update the bindings to be activated when the pointer enters or
 # leaves the marker.
       MarkBind $ret $image $object
 
 # If the index is out of bounds, return a null value.
-   } { 
+   } {
       set ret ""
    }
 
@@ -12829,10 +12829,10 @@ proc ShowHelp {label} {
 #     display the specified section of the Polka documentation.
 #
 #  Arguments:
-#     label 
+#     label
 #        An htx cross-reference label into the polka document. If this
 #        is "pointer", then the pointer is used to identify the object about
-#        which help is required. The cursor becomes a question mark and 
+#        which help is required. The cursor becomes a question mark and
 #        the window under the pointer when it is next clicked is the one
 #        about which help is displayed. If a blank string is supplied,
 #        then the procedure issues a warning message that no help is
@@ -12841,7 +12841,7 @@ proc ShowHelp {label} {
 #  Globals:
 #     SAFE (Read)
 #        The path to a window which can receive notification of all events
-#        while we are waiting. This should be a window which ignores all 
+#        while we are waiting. This should be a window which ignores all
 #        events (except those set up here).
 #     HELP_LABEL (Read and Write)
 #        The htx label identified using the pointer.
@@ -12864,7 +12864,7 @@ proc ShowHelp {label} {
       . config -cursor question_arrow
 
 # Set up a binding so that when any button is clicked, the htx label
-# associated with the widget under the pointer is returned. If the 
+# associated with the widget under the pointer is returned. If the
 # lowest level widget doesn't have a label, work up through the family
 # tree until an ancestor is found which does have a help label.
       bind $SAFE <Button> {set HELP_LABEL [FindHelp %X %Y]}
@@ -12881,7 +12881,7 @@ proc ShowHelp {label} {
       bind $SAFE <Button> ""
 
 # Release the grab.
-      grab release $SAFE 
+      grab release $SAFE
    }
 
 # If no label is available, report an error.
@@ -12891,7 +12891,7 @@ proc ShowHelp {label} {
 # Otherwise, translate the special label POLKA_CONTENTS into a blank
 # string so that it goes to the top of the Polka help document.
    } {
-      if { $label == "POLKA_CONTENTS" } {      
+      if { $label == "POLKA_CONTENTS" } {
          set label ""
       }
 
@@ -12899,8 +12899,8 @@ proc ShowHelp {label} {
       set old_cursor [. cget -cursor]
       . config -cursor watch
 
-# Run showme to get the full url of a local file to be displayed. Warn 
-# the user if an error occurs. 
+# Run showme to get the full url of a local file to be displayed. Warn
+# the user if an error occurs.
       if { [catch {exec showme -l -n $POLPACK_HELP/polka $label} url] } {
          . config -cursor $old_cursor
          Message "Showme failed to find the help documentation - $url"
@@ -12908,7 +12908,7 @@ proc ShowHelp {label} {
 # If OK, use CCDShowHelp to display the required information in a WWW
 # browser. The browser to use is determined by the HTX_BROWSER
 # environment variable (netscape is used if HTX_BROWSER is not defined).
-      } { 
+      } {
          CCDShowHelp $url
          . config -cursor $old_cursor
       }
@@ -12921,7 +12921,7 @@ proc SingleBind {x y shift} {
 #    SingleBind
 #
 #  Purpose:
-#    Process single clicks of button 1 over the image. 
+#    Process single clicks of button 1 over the image.
 #
 #  Arguments:
 #    x
@@ -12952,10 +12952,10 @@ proc SingleBind {x y shift} {
 #     VID0 ( Write)
 #        The canvas item id for the vertex being pointed at (if any).
 #     VID1 ( Write)
-#        The canvas item id for the vector ending at the vertex being 
+#        The canvas item id for the vector ending at the vertex being
 #        pointed at (if any).
 #     VID2 ( Write)
-#        The canvas item id for the vector starting at the vertex being 
+#        The canvas item id for the vector starting at the vertex being
 #        pointed at (if any).
 
 #-
@@ -12984,7 +12984,7 @@ proc SingleBind {x y shift} {
    set ROOTX [$CAN canvasx $x]
    set ROOTY [$CAN canvasy $y]
 
-# The global variable MODE determines how events over the canvas are 
+# The global variable MODE determines how events over the canvas are
 # processed. The only case which needs any special treatment is if
 # the user is editing an existing polygon (mode 1).
    if { $MODE == 1 } {
@@ -13029,9 +13029,9 @@ proc SingleBind {x y shift} {
             set VID0 $id
             set VID2 $vid
             set VID1 [GetPosn $ROOTI VID]
-            set ROOTI $newi               
+            set ROOTI $newi
             update idletasks
-            eval [$CAN bind vertices <Enter>] 
+            eval [$CAN bind vertices <Enter>]
 
          }
       }
@@ -13074,8 +13074,8 @@ proc SkyOff {} {
 #    O_RAY_SKY (Read)
 #        An integer representing the "O-ray sky" object type.
 #    SKYIMS (Read)
-#        A list of images containing sky data to be subtracted from the 
-#        supplied object frames. 
+#        A list of images containing sky data to be subtracted from the
+#        supplied object frames.
 #    SKYOFF (Read)
 #        Should a sky background be subtracted?
 #    SKYPAR (Read)
@@ -13090,14 +13090,14 @@ proc SkyOff {} {
 #    SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
-#        surfaces to areas within the supplied object frames (i.e. the 
+#        surfaces to areas within the supplied object frames (i.e. the
 #        O and E sky areas).
 #    SKY_FRAME (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by subtracting
 #        the sky frame specified in SKYIMS.
 #    SKY_METHOD (Read)
-#        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. 
+#        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME.
 #-
    global CUROBJ_REQ
    global DBEAM
@@ -13109,8 +13109,8 @@ proc SkyOff {} {
    global RB_CUR
    global RB_REF
    global REFOBJ_REQ
-   global SKYIMS    
-   global SKYOFF   
+   global SKYIMS
+   global SKYOFF
    global SKYPAR
    global SKYTEXT
    global SKYTEXT2
@@ -13185,7 +13185,7 @@ proc SkySub {data image sub args} {
 #     image
 #        The name of the user supplied image from which the supplied data
 #        is derived.
-#     sub 
+#     sub
 #        If non-zero then the returned image is the difference between
 #        the supplied data and the estimated sky background. Otherwise,
 #        the returned data is the estimated sky background.
@@ -13212,7 +13212,7 @@ proc SkySub {data image sub args} {
 #     PSF_SIZE (Read)
 #        The feature size specified by the user.
 #     SKYIMS (Read)
-#        A list of images containing sky data to be subtracted from the 
+#        A list of images containing sky data to be subtracted from the
 #        supplied object frames. This variable is ignored unless $SKY_METHOD
 #        is $SKY_FRAME.
 #     SKYOFF (Read)
@@ -13224,7 +13224,7 @@ proc SkySub {data image sub args} {
 #     SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
-#        surfaces to areas within the supplied object frames (i.e. the 
+#        surfaces to areas within the supplied object frames (i.e. the
 #        O and E sky areas).
 #     SKY_FRAME (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
@@ -13271,12 +13271,12 @@ proc SkySub {data image sub args} {
 # If the sky background has been supplied in a separate image, subtract
 # it from the object frame.
    if { $SKY_METHOD == $SKY_FRAME && $SKYOFF } {
-   
-# Indicate that the sky areas have been extracted, and highlight the 
+
+# Indicate that the sky areas have been extracted, and highlight the
 # "sky subraction" label to indicate that the sky is being subtracted.
       Wop $setick(O) configure -foreground black
       if { $DBEAM } { Wop $setick(E) configure -foreground black }
-      Wop $sslab configure -foreground red 
+      Wop $sslab configure -foreground red
 
 # Do the subtraction, then ensure that he bounds are the same as the
 # supplied data (padding with bad pixels if necessary).
@@ -13347,7 +13347,7 @@ proc SkySub {data image sub args} {
             break
          }
 
-# Fit a surface to the data within the sky areas. 
+# Fit a surface to the data within the sky areas.
          set fit($ray) [UniqueFile]
 
          if { ![Obey kappa surfit "in=$sky out=$fit($ray) evaluate=all fittype=poly order=$SKYPAR"] } {
@@ -13362,7 +13362,7 @@ proc SkySub {data image sub args} {
       }
 
 # If a progress report is required, make the "sky subtraction" label red.
-      Wop $sslab configure -foreground red 
+      Wop $sslab configure -foreground red
 
 # If the fits to the sky areas for the required rays were obtained ok,
 # combine them into a single sky image.
@@ -13371,24 +13371,24 @@ proc SkySub {data image sub args} {
 # First deal with dual-beam cases...
          if { $DBEAM } {
 
-# Extract the O-ray mask area from the O-ray sky fit image. 
+# Extract the O-ray mask area from the O-ray sky fit image.
             set osky [Segment $fit(O) "" $image $O_RAY_MASK]
-            if { $osky == "" } { 
-               set ok 0 
+            if { $osky == "" } {
+               set ok 0
 
-# If OK, insert into this image the E-ray mask area from the E-ray sky 
+# If OK, insert into this image the E-ray mask area from the E-ray sky
 # fit image.
             } {
                set oesky [Segment $fit(E) $osky $image $E_RAY_MASK]
-               if { $oesky == "" } { 
-                  set ok 0 
+               if { $oesky == "" } {
+                  set ok 0
                } {
                   set sky $oesky
                }
             }
 
 # For single-beam cases. just use the whole O-ray fit.
-         } { 
+         } {
             set sky $fit(O)
          }
       }
@@ -13416,12 +13416,12 @@ proc SkySub {data image sub args} {
 # If anything went wrong, return a null string.
       if { !$ok } { set ssimage "" }
 
-# Do no sky subtraction for any other type. 
+# Do no sky subtraction for any other type.
    } {
       set ssimage $image
    }
 
-# Delete all the temporary files created in this procedure, except for the 
+# Delete all the temporary files created in this procedure, except for the
 # one being returned (if any).
    EndUF $tfc $ssimage
 
@@ -13487,7 +13487,7 @@ proc StatusArea {on} {
 #        displayed. These integers are indices into the SI_LABELS, SI_HELPS
 #        and SI_VARS lists.
 #     SI_VARS (Read)
-#        A list containing the global variable name for each status item, 
+#        A list containing the global variable name for each status item,
 #        in the order they were defined.
 #     SI_WIDTHS (Read)
 #        A list of widths for the status items, in the order they were
@@ -13508,7 +13508,7 @@ proc StatusArea {on} {
    global F3
    global OPTSMENU
    global SI_HELPS
-   global SI_LABELS 
+   global SI_LABELS
    global SI_LIST
    global SI_VARS
    global SI_WIDTHS
@@ -13553,7 +13553,7 @@ proc StatusArea {on} {
             set label [lindex $SI_LABELS $id]
             set expwid [lindex $SI_WIDTHS $id]
 
-# The total width of the item is the sum of the two.        
+# The total width of the item is the sum of the two.
             set totwid [expr [string length $label] + $expwid ]
 
 # Update the longest item in this column.
@@ -13566,11 +13566,11 @@ proc StatusArea {on} {
                set icol 0
             } {
                set icol 1
-            }            
+            }
          }
 
 # Reduce the required widths since the average character width used seems
-# to be overly generous, resulting in more space being used by the labels 
+# to be overly generous, resulting in more space being used by the labels
 # than is needed.
          set maxwid(0) [expr int( 0.9 * $maxwid(0) )]
          set maxwid(1) [expr int( 0.9 * $maxwid(1) )]
@@ -13596,7 +13596,7 @@ proc StatusArea {on} {
 # Store the name of the column's frame in which this item is to be put.
             set c $col($icol)
 
-# Create the status item. Each item has its own frame which contains two 
+# Create the status item. Each item has its own frame which contains two
 # label widgets. The left hand label contains the fixed label text, the
 # right hand label contains the variable text. The length of the second
 # label is set so that the total length of the two labels is always
@@ -13609,7 +13609,7 @@ proc StatusArea {on} {
             set frl1 [label $fr.l1 -text $label -font $S_FONT -anchor w]
             set frl2 [label $fr.l2 -textvariable $var -anchor w \
                                    -font $S_BFONT -width $remaining]
-            pack $frl1 -side left 
+            pack $frl1 -side left
             pack $frl2 -side left -expand 1 -fill x
 
 # Set the help text to display when the pointer is over the item's frame.
@@ -13620,7 +13620,7 @@ proc StatusArea {on} {
                set icol 0
             } {
                set icol 1
-            }            
+            }
          }
       }
 
@@ -13687,7 +13687,7 @@ proc StringValue {name width value command args} {
 #    StringValue
 #
 #  Purpose:
-#    Create a simple text entry "widget". 
+#    Create a simple text entry "widget".
 #
 #  Arguments:
 #    name
@@ -13695,12 +13695,12 @@ proc StringValue {name width value command args} {
 #    width
 #      The number of characters in the text entry widget.
 #    value
-#      The name (NOT the value) of the global variable to receive the 
+#      The name (NOT the value) of the global variable to receive the
 #      numerical value. Note, this must be a *global* variable.
 #    command
 #      A command to execute after a valid value has been assigned to the
 #      variable.
-#    args 
+#    args
 #      Any further options to pass to the command which creates the
 #      "entry" widget (optional).
 #
@@ -13794,24 +13794,24 @@ proc TestFea {} {
 
 # Convert the supplied pixel coordinates to canvas coordinates.
    set cxy [NDFToCan $TEST_PX $TEST_PY]
-   if { $cxy == "" } { return "" } 
+   if { $cxy == "" } { return "" }
    set cx [lindex $cxy 0]
    set cy [lindex $cxy 1]
 
-# Find the coordinates defining the required marker.    
+# Find the coordinates defining the required marker.
    set xl [expr $cx - 3]
    set yl [expr $cy - 3]
    set xu [expr $cx + 3]
    set yu [expr $cy + 3]
 
-# If there is currently no candidate feature, create a circle on the canvas 
-# at the supplied position. 
+# If there is currently no candidate feature, create a circle on the canvas
+# at the supplied position.
    if { $TEST_ID == "" } {
       set TEST_ID [$CAN create oval $xl $yl $xu $yu -outline $CURCOL -tags features]
 
 # If there is already a candidate feature, configure its marker.
-   } {   
-      $CAN coords $TEST_ID $xl $yl $xu $yu 
+   } {
+      $CAN coords $TEST_ID $xl $yl $xu $yu
       $CAN raise $TEST_ID
    }
 
@@ -13829,7 +13829,7 @@ proc Top {stack} {
 #
 #  Arguments:
 #    stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       The list is unchanged on exit.
 #
 #  Returned Value:
@@ -13858,13 +13858,13 @@ proc TotalMap {image} {
 #
 #  Globals:
 #     EFFECTS_MAPPINGS (Read)
-#        A 1-d array, indexed by image name. Each element is a list 
+#        A 1-d array, indexed by image name. Each element is a list
 #        in which each entry gives the mapping introduced by the
 #        corresponding effect. This mapping goes from pixel coords in
 #        the previous top entry in the effects stack to the new top entry.
 #        There is no entry for the supplied image (i.e. the number of
-#        entries in this stack is the same as EFFECTS_STACK, i.e. one less 
-#        than in IMAGE_STACK). Each mapping is described by a list of 6 
+#        entries in this stack is the same as EFFECTS_STACK, i.e. one less
+#        than in IMAGE_STACK). Each mapping is described by a list of 6
 #        values giving the parameters of a full 2-D linear fit.
 #-
    global EFFECTS_MAPPINGS
@@ -13880,7 +13880,7 @@ proc TotalMap {image} {
 # the list end), concatenating all the mappings.
    for {set i $bot} {$i >= 0} {incr i -1} {
       set tot_map [ConcMap $tot_map 0 [lindex $EFFECTS_MAPPINGS($image) $i] 0]
-   }           
+   }
 
    return $tot_map
 }
@@ -13902,7 +13902,7 @@ proc TranImage {data map trandata section} {
 #        The name of the output image to create.
 #     section
 #        The required section of the output image. If this is a null
-#        string, then the output image is just big enough to contain the 
+#        string, then the output image is just big enough to contain the
 #        entire input image.
 #
 #  Returned Value:
@@ -13934,7 +13934,7 @@ proc TranImage {data map trandata section} {
 # If only part of the output image is required, set up the relevant
 # REGRID parameters.
          set shape "lbound=\! ubound=\!"
-      
+
          if { $section != "" } {
             set sec [SecList $section]
             if { $sec != "" } {
@@ -13943,7 +13943,7 @@ proc TranImage {data map trandata section} {
                set ylo [lindex $sec 2]
                set yhi [lindex $sec 3]
                set shape "lbound=\[$xlo,$ylo\] ubound=\[$xhi,$yhi\]"
-            }      
+            }
          }
 
 # Get the interpolation method in a form which KAPPA:REGRID can use.
@@ -13953,7 +13953,7 @@ proc TranImage {data map trandata section} {
             set method NEAREST
          }
 
-         set ok [Obey kappa regrid "method=$method out=$trandata in=$data $shape mapping=$trn"] 
+         set ok [Obey kappa regrid "method=$method out=$trandata in=$data $shape mapping=$trn"]
 
 # Delete the Mapping file.
          catch "exec rm -f $trn"
@@ -13977,15 +13977,15 @@ proc TranList {map inv px_i py_i px_out py_out} {
 #        If non-zero then the inverse mapping is used. Otherwise the
 #        forward mapping is used.
 #     px_i
-#        The list of x pixel coordinates to be transformed. 
+#        The list of x pixel coordinates to be transformed.
 #     py_i
-#        The list of y pixel coordinates to be transformed. 
+#        The list of y pixel coordinates to be transformed.
 #     px_out
-#        The name of the variable in the calling procedure in which to place 
-#        the list of transformed x pixel coordinates. 
+#        The name of the variable in the calling procedure in which to place
+#        the list of transformed x pixel coordinates.
 #     py_out
-#        The name of the variable in the calling procedure in which to place 
-#        the list of transformed y pixel coordinates. 
+#        The name of the variable in the calling procedure in which to place
+#        the list of transformed y pixel coordinates.
 #
 #  Returned Value:
 #     1 for success, 0 for failure.
@@ -14001,8 +14001,8 @@ proc TranList {map inv px_i py_i px_out py_out} {
 
 # For a unit mapping, just copy input to output.
    if { $map == "ref" } {
-      set px_o $px_i      
-      set py_o $py_i      
+      set px_o $px_i
+      set py_o $py_i
       set ok 1
 
 # For any other defined mapping, transform each point in turn.
@@ -14049,12 +14049,12 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
 #
 #  Arguments:
 #     map
-#        Specifies a mapping to apply to the pixel coordinates. It should be 
-#        the name of an HDS container file (without the .sdf) containing a 
-#        transform structure. 
+#        Specifies a mapping to apply to the pixel coordinates. It should be
+#        the name of an HDS container file (without the .sdf) containing a
+#        transform structure.
 #     inv
 #        If non-zero, then the inverse of the mapping specified by "map" is
-#        used. Otherwise the forward mapping is used. 
+#        used. Otherwise the forward mapping is used.
 #     im_in
 #        The image assocaited with the positions to be mapped.
 #     obj_in
@@ -14067,10 +14067,10 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
 #  Globals:
 #     PNTPX (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel X coordinates. 
+#        is a list of pixel X coordinates.
 #     PNTPY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
-#        is a list of pixel Y coordinates. 
+#        is a list of pixel Y coordinates.
 #     PNTTAG (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas tags (one for each position).
@@ -14078,7 +14078,7 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
 #  Notes:
 #     - The output list is not displayed on the screen by this procedure.
 #     - The canvas coordinates in the output list are just a copy of the
-#     input canvas coordinates and do not take into account the supplied 
+#     input canvas coordinates and do not take into account the supplied
 #     mapping.
 #-
    global CAN
@@ -14114,32 +14114,32 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
       if { $im_out != [lindex $IMAGES 0] } {
          foreach im $IMAGES {
             set RECALC_IMMAP($im) 1
-         }         
+         }
       }
 
       set stag ""
 
 # If we are creating masks, get a suffix for the canvas tags associated
-# with each position. 
+# with each position.
    } {
       set stag "C"
       append stag $NPOLY
       incr NPOLY
-   } 
+   }
 
 # If the input list is not empty.
    if { [info exists PNTPX($im_in,$obj_in)] } {
       set size [llength $PNTPX($im_in,$obj_in)]
       if { $size > 0 } {
-      
+
 # Copy the input lists to the output lists, indicating that markers and
 # vectors currently are not drawn (by setting their canvas identifiers to
 # -1). Do not copy the canvas coordinates since they may not take effects
 # mappings into account.
-         set PNTPX($im_out,$obj_out) $PNTPX($im_in,$obj_in) 
-         set PNTPY($im_out,$obj_out) $PNTPY($im_in,$obj_in) 
-         set PNTLBL($im_out,$obj_out) $PNTLBL($im_in,$obj_in) 
-         set PNTNXT($im_out,$obj_out) $PNTNXT($im_in,$obj_in) 
+         set PNTPX($im_out,$obj_out) $PNTPX($im_in,$obj_in)
+         set PNTPY($im_out,$obj_out) $PNTPY($im_in,$obj_in)
+         set PNTLBL($im_out,$obj_out) $PNTLBL($im_in,$obj_in)
+         set PNTNXT($im_out,$obj_out) $PNTNXT($im_in,$obj_in)
 
          for {set i 0} {$i < $size} {incr i} {
             lappend PNTID($im_out,$obj_out) -1
@@ -14229,7 +14229,7 @@ proc UniqueFile {} {
 #     POLKA_SCRATCH (Read)
 #        The path to the POLKA_SCRATCH directory.
 #     IFILE (Read and Write)
-#        File names have a name of the form polka<i> where <i> is an 
+#        File names have a name of the form polka<i> where <i> is an
 #        integer, which is different for each file. IFILE
 #        records the value of i used in the previous call to this
 #        function. The first value of i considered is one greater than
@@ -14280,7 +14280,7 @@ proc UnZoom1 {} {
    if { ![DoubleClick UNZOOM_CLICK] } {
 
 # If the section stack is not empty...
-      while { [llength $SECTION_STACK] > 0 } { 
+      while { [llength $SECTION_STACK] > 0 } {
 
 # Pop the top section off the section stack.
          set SECTION_REQ [Pop SECTION_STACK]
@@ -14328,7 +14328,7 @@ proc UnZoom2 {} {
 # Indicate that this is part of a double click sequence.
    DoubleClick UNZOOM_CLICK 1
 
-# If there is anything on the stack, get the bottom section off 
+# If there is anything on the stack, get the bottom section off
 # the section stack.
    if { [llength $SECTION_STACK] > 0 } {
       set SECTION_REQ [Pop SECTION_STACK -1]
@@ -14367,7 +14367,7 @@ proc UpdateDisplay {args} {
 #          potetially including a section string).
 #      IMSEC_REQ (Read)
 #          The unscaled base image section to be displayed. The string
-#          includes an NDF section specifier expressed in standard form (i.e. 
+#          includes an NDF section specifier expressed in standard form (i.e.
 #          as two ranges of pixel indices).
 #      PHI_DISP (Read)
 #          The current upper percentile for the displayed image scaling.
@@ -14420,7 +14420,7 @@ proc UpdateDisplay {args} {
    CancelArea
 
 # If a new image is being displayed, set the reference objects to "None",
-# set the Current objects to "O-ray features", and turn off the 
+# set the Current objects to "O-ray features", and turn off the
 # "Draw-alinged" button.
    if { $IMSEC_REQ != $IMSEC_DISP } {
       $RB_REF($NONE) select
@@ -14429,8 +14429,8 @@ proc UpdateDisplay {args} {
    }
 
 # The display is layered. At the bottom is the GWM image. Next comes the
-# markers (canvas items) for the reference objects. The markers for the 
-# current objects are at the top. When lower layers are re-drawn they 
+# markers (canvas items) for the reference objects. The markers for the
+# current objects are at the top. When lower layers are re-drawn they
 # wipe out the higher layers, and so the higher layers also need to be
 # re-drawn even if they have not changed...
 
@@ -14446,8 +14446,8 @@ proc UpdateDisplay {args} {
       set drawcur 1
 
 # If the image section is unchanged, but the reference objects have changed
-# then we need not re-draw the image section. 
-   } elseif { $REFOBJ_REQ != $REFOBJ_DISP || 
+# then we need not re-draw the image section.
+   } elseif { $REFOBJ_REQ != $REFOBJ_DISP ||
               $REFIM_REQ != $REFIM_DISP ||
               $args == "ref" } {
       set drawgwm 0
@@ -14477,11 +14477,11 @@ proc UpdateDisplay {args} {
 # Set the interaction mode depending on the type of object being entered.
 # Do not change the mode if we are in the process of identifying an image
 # feature.
-   if { $MODE != 3 } { 
+   if { $MODE != 3 } {
       if { $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK ||
            $CUROBJ_REQ == $O_RAY_SKY || $CUROBJ_REQ == $E_RAY_SKY } {
          SetMode 1
-      } { 
+      } {
          SetMode 0
       }
    }
@@ -14496,7 +14496,7 @@ proc UpdateDisplay {args} {
 # identical.
    CheckRef
 
-# Set a flag indicating if features labels can be generated automatically. 
+# Set a flag indicating if features labels can be generated automatically.
 # This is the case if no labels yet exist.
    Labels "" 1
 
@@ -14519,7 +14519,7 @@ proc Value {name label width value max min checker} {
 #    width
 #      The number of characters in the text entry widget.
 #    value
-#      The name (NOT the value) of the global variable to receive the 
+#      The name (NOT the value) of the global variable to receive the
 #      numerical value. Note, this must be a *global* variable.
 #    max
 #      The maximum allowed numerical value.
@@ -14527,7 +14527,7 @@ proc Value {name label width value max min checker} {
 #      The minimum allowed numerical value.
 #    checker
 #      The name of a procedure which can be called to check a supplied
-#      numerical value. See "CheckVal" as an example. 
+#      numerical value. See "CheckVal" as an example.
 #
 #  Returned Value:
 #    The name of the frame containing the other widgets.
@@ -14552,7 +14552,7 @@ proc Value {name label width value max min checker} {
 #    REDISPLAY_REQUESTED (Read and Write)
 #      Was a redisplay of the image requested?
 #    SEQ_STOP (Write)
-#      The identifier of the sequence of timed commands which is to be 
+#      The identifier of the sequence of timed commands which is to be
 #      terminated.
 #-
 
@@ -14582,7 +14582,7 @@ proc Value {name label width value max min checker} {
       "if { \$REDISPLAY_REQUESTED } {
           set REDISPLAY_REQUESTED 0
           set REDISPLAY_CANCELLED 1
-       } 
+       }
        $name.ent select from 0
        $name.ent select to end
 
@@ -14616,7 +14616,7 @@ proc Value {name label width value max min checker} {
    $name.left configure -activeforeground [lindex [$name.left configure -foreground] end]
 
 # When mouse button 1 is pressed, reset the number of decrements
-# performed so far to zero, and call "Seq" to initiate a sequence of 
+# performed so far to zero, and call "Seq" to initiate a sequence of
 # calls to "DecVal", separated by 100 milliseconds.
    bind $name.left <ButtonPress-1> \
       "global REDISPLAY_REQUESTED
@@ -14624,14 +14624,14 @@ proc Value {name label width value max min checker} {
        if { \$REDISPLAY_REQUESTED } {
           set REDISPLAY_REQUESTED 0
           set REDISPLAY_CANCELLED 1
-       } 
+       }
        set DECS 0
        set OLD_VAL \$$value
        Seq \"DecVal $value $max $min\" 100 $name-2 DECS"
 
 # When mouse button 1 is released, set the value of the global SEQ_STOP
 # variable to the ID associated with the DecVal procedure (i.e. $name-2).
-# This causes the sequence of timed calls to DecVal to terminate. 
+# This causes the sequence of timed calls to DecVal to terminate.
    bind $name.left <ButtonRelease-1> \
       "set SEQ_STOP $name-2
        $checker $value 1 $max $min"
@@ -14646,7 +14646,7 @@ proc Value {name label width value max min checker} {
        if { \$REDISPLAY_REQUESTED } {
           set REDISPLAY_REQUESTED 0
           set REDISPLAY_CANCELLED 1
-       } 
+       }
        set OLD_VAL \$$value
        set INCS 0
        Seq \"IncVal $value $max $min\" 100 $name-1 INCS"
@@ -14670,7 +14670,7 @@ proc WaitFor {name args} {
 #  Purpose:
 #     Pause the caller until a named global variable changes its value.
 #     Meanwhile, events are directed to a nominated "safe" window. This
-#     "freezes" the display so that further actions cannot be initiated by 
+#     "freezes" the display so that further actions cannot be initiated by
 #     the user
 #
 #  Arguments:
@@ -14678,8 +14678,8 @@ proc WaitFor {name args} {
 #        The name (NOT the value) of the global variable to be watched.
 #     args
 #        An optional list argument. If supplied, the first element should
-#        be a command and the second element should be a time in milliseconds. 
-#        The supplied command will be executed after each period of the 
+#        be a command and the second element should be a time in milliseconds.
+#        The supplied command will be executed after each period of the
 #        specified time, until the variable is changed. If the delay time
 #        is not supplied it defaults to 100 milliseconds. If the suppleid
 #        command returns a zero value, then the loop is aborted prematurely.
@@ -14692,7 +14692,7 @@ proc WaitFor {name args} {
 #  Globals:
 #     SAFE (Read)
 #        The path to a window which can receive notifivcation of all events
-#        while we are waiting. This should be a window which ignores all 
+#        while we are waiting. This should be a window which ignores all
 #        events.
 #
 #  Notes:
@@ -14787,7 +14787,7 @@ proc Wop {w args} {
 #     Wop
 #
 #  Purpose:
-#     Execute a widget command, gaurding against the possibility of the 
+#     Execute a widget command, gaurding against the possibility of the
 #     widget no longer existing.
 #
 #  Arguments:
@@ -14802,7 +14802,7 @@ proc Wop {w args} {
 #-
    if { [winfo exists $w] } {
       set ret [eval $w $args]
-   } { 
+   } {
       set ret ""
    }
    return $ret
@@ -14850,7 +14850,7 @@ proc Xhair {cx cy} {
    global SIZE
    global XHAIR
    global XHAIR_IDV
-   global XHAIR_IDH 
+   global XHAIR_IDH
    global XHRCOL
 
 # If we require a cross-hair...
@@ -14909,7 +14909,7 @@ proc Zoom {} {
 #  Globals:
 #     SELECTED_AREA (Read)
 #        The bounds of the selected area in the order xmin, xmax, ymin,
-#        ymax. 
+#        ymax.
 #
 #-
    global SELECTED_AREA
@@ -14922,15 +14922,15 @@ proc Zoom {} {
    if { $SELECTED_AREA != "" } {
 
 # Get the bounds in canvas coordinates of the selected area.
-      set cxlo [lindex $SELECTED_AREA 0]      
-      set cylo [lindex $SELECTED_AREA 1]      
-      set cxhi [lindex $SELECTED_AREA 2]      
-      set cyhi [lindex $SELECTED_AREA 3]      
+      set cxlo [lindex $SELECTED_AREA 0]
+      set cylo [lindex $SELECTED_AREA 1]
+      set cxhi [lindex $SELECTED_AREA 2]
+      set cyhi [lindex $SELECTED_AREA 3]
 
 # Convert these to pixel coordinates. Note, the Y axis is reversed since the
 # TK origin is at the UPPER left corner.
       set pxyl [CanToNDF $cxlo $cyhi]
-      if { $pxyl == "" } { return } 
+      if { $pxyl == "" } { return }
       set pxlo [lindex $pxyl 0]
       set pylo [lindex $pxyl 1]
       set pxyl [CanToNDF $cxhi $cylo]
@@ -14954,7 +14954,7 @@ proc Zoom {} {
          Push SECTION_STACK $SECTION_DISP
          $UNZOOM configure -state normal
 
-# Display the modified section. 
+# Display the modified section.
          set SECTION_REQ "($ipxlo:$ipxhi,$ipylo:$ipyhi)"
          UpdateDisplay
        } {
@@ -14994,14 +14994,14 @@ proc Transfer {} {
 #     Transfer
 #
 #  Purpose:
-#     Transfer the current features from the currently selected image to 
+#     Transfer the current features from the currently selected image to
 #     a group of other images.
 #
 #  Arguments:
 #     None.
 #
 #  Globals:
-#     CB_COL (Read) 
+#     CB_COL (Read)
 #        The colour to use for the check buttons in the dialog box.
 #     GETITEMS_EXIT (Read and Write)
 #        Used to communicate with the widgets.
@@ -15018,11 +15018,11 @@ proc Transfer {} {
 #        A list containing flags indicating if each of the status items
 #        is displayed or not.
 #     SI_VARS (Read)
-#        A list containing the global variable name for each status item, 
+#        A list containing the global variable name for each status item,
 #        in the order they were defined.
-#     
+#
 #  Notes:
-#    - 
+#    -
 #-
    global BACKCOL
    global CB_COL
@@ -15042,7 +15042,7 @@ proc Transfer {} {
    foreach image $IMAGES {
       set l [string length $image]
       if { $l > $maxl } { set maxl $l }
-   }   
+   }
 
 # Create a frame to put the checkbuttons in.
    set fr0 [frame $topf.fr0]
@@ -15061,12 +15061,12 @@ proc Transfer {} {
 
 # Create a check button for each image name, place them alternately in
 # the frames just created.
-   set f $fr1   
+   set f $fr1
    for {set i 0} {$i < [llength $IMAGES]} {incr i} {
       set IM_TRAN($i) 0
       set im [lindex $IMAGES $i]
 
-# Each line in the Frame consists of a checkbutton, with a label at the 
+# Each line in the Frame consists of a checkbutton, with a label at the
 # end of it, consisting of a tick mark. Create the frame for this line.
       set lfrm [frame $f.f_$i]
 
@@ -15074,7 +15074,7 @@ proc Transfer {} {
 # button.
       if { $im == $IMAGE_DISP } {
          set state "disabled"
-      } { 
+      } {
          set state normal
       }
 
@@ -15090,8 +15090,8 @@ proc Transfer {} {
                set TRAN_LIST \[lreplace \$TRAN_LIST \$j \$j]
             }
          }"]
-        
-         pack $cb($i) -side left 
+
+         pack $cb($i) -side left
 
 # Pack a label containing a tick mark to the right of the checkbutton. If
 # image has features make the tick visible by setting its foreground
@@ -15107,7 +15107,7 @@ proc Transfer {} {
       pack $tick($im) -side left
 
 # Pack the line frame.
-      pack $lfrm -side top -pady 1m -anchor nw 
+      pack $lfrm -side top -pady 1m -anchor nw
 
 # Swap frames.
       if { $f == $fr1 } {
@@ -15165,9 +15165,9 @@ proc Transfer {} {
 
 # Transfer the positions.
          for {set i 0} {$i < [llength $IMAGES]} {incr i} {
-            if { $IM_TRAN($i) } { 
+            if { $IM_TRAN($i) } {
                set im [lindex $IMAGES $i]
-               TransFea $IMAGE_DISP $im 
+               TransFea $IMAGE_DISP $im
                $tick($im) configure -foreground red
                update idletasks
             }
@@ -15191,7 +15191,7 @@ proc Transfer {} {
 
 # If the Help button was pressed, display help.
       } elseif { $TRANSFER_EXIT == "help" } {
-         ShowHelp "POLKA_TRANSFER_DIALOG" 
+         ShowHelp "POLKA_TRANSFER_DIALOG"
       }
    }
 
@@ -15207,7 +15207,7 @@ proc HasFea {image} {
 #     HasFea
 #
 #  Purpose:
-#     Returns 0 or 1 indicating if there are currently any features 
+#     Returns 0 or 1 indicating if there are currently any features
 #     associated with the supplied image.
 #
 #  Arguments:
@@ -15220,8 +15220,8 @@ proc HasFea {image} {
 #     O_RAY_FEATURES (Read)
 #        An integer representing the "O-ray features" object type.
 #-
-   global E_RAY_FEATURES 
-   global O_RAY_FEATURES 
+   global E_RAY_FEATURES
+   global O_RAY_FEATURES
 
 # Initialise the returned value to indicate that the image has no
 # features.
@@ -15249,7 +15249,7 @@ proc TransFea {in out} {
 #     Transfer all features from image $in to image $out.
 #
 #  Arguments:
-#     in 
+#     in
 #        The name of the source image.
 #     out
 #        The name of the destination image.
@@ -15260,8 +15260,8 @@ proc TransFea {in out} {
 #     O_RAY_FEATURES (Read)
 #        An integer representing the "O-ray features" object type.
 #-
-   global E_RAY_FEATURES 
-   global O_RAY_FEATURES 
+   global E_RAY_FEATURES
+   global O_RAY_FEATURES
    global E_RAY_MASK
    global O_RAY_MASK
    global E_RAY_SKY
@@ -15330,7 +15330,7 @@ proc GetCents {px py rlabel image object} {
 #  Purpose:
 #     Check if supplied pixel positions can be used as features,
 #     and if so, adds the features to the list of current features.
-#     No markers are displayed or used. The image should not be the 
+#     No markers are displayed or used. The image should not be the
 #     currently displayed image.
 #
 #  Arguments:
@@ -15368,14 +15368,14 @@ proc GetCents {px py rlabel image object} {
 # pixel coordinates with accurate coordinates.
    if { $PSF_SIZE > 0 } {
 
-# Write out the initial pixel coordinates to a text file to be passed 
+# Write out the initial pixel coordinates to a text file to be passed
 # to POLCENT.
       set tfile [UniqueFile]
       set tfile_id [open $tfile w]
 
       for {set i 0} {$i < $np} {incr i} {
          puts $tfile_id "[lindex $px $i] [lindex $py $i]"
-      }            
+      }
 
       close $tfile_id
 
@@ -15392,7 +15392,7 @@ proc GetCents {px py rlabel image object} {
       if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize infile=$tfile outfile=$tofile"] } {
 
 # If succesful, read the accurate feature coordinates from the output
-# file. Create a Tcl list containing the X and Y values, replacing "D" 
+# file. Create a Tcl list containing the X and Y values, replacing "D"
 # exponents by "E".
          set qx ""
          set qy ""
@@ -15462,7 +15462,7 @@ proc GetCents {px py rlabel image object} {
 # Create a new position.
          set newi [SetPosn -1 "PX PY LBL" [list $ppx $ppy $lab] $image $object ]
       }
-   }   
+   }
 
    return $nbad
 }

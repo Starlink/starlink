@@ -1,4 +1,4 @@
-      SUBROUTINE FIND44( MAXLEN, PAUNAM, PBANDS, PCROSS, PINSCA, MENU, 
+      SUBROUTINE FIND44( MAXLEN, PAUNAM, PBANDS, PCROSS, PINSCA, MENU,
      : STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIND44( MAXLEN, PAUNAM, PBANDS, PCROSS, PINSCA, MENU, 
+*     CALL FIND44( MAXLEN, PAUNAM, PBANDS, PCROSS, PINSCA, MENU,
 *     : STATUS )
 
 *  Description:
@@ -59,7 +59,7 @@
 *     CHR:
 *        CHR_ISNAM, CHR_UCASE
 *     ERR:
-*        ERR_ANNUL   
+*        ERR_ANNUL
 *     MSG:
 *        MSG_FMTC, MSG_OUT
 *     PAR:
@@ -77,7 +77,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,7 +94,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-      
+
 *  Arguments Given:
       INTEGER MAXLEN
       CHARACTER * ( * )  PAUNAM
@@ -155,7 +155,7 @@
 *  Program returns here if the name of the source to be augmented is
 *  not a valid filename
  200  CONTINUE
-      
+
 *  *********************************************************************
 *  Ask user for name of source to augment with region size and wavebands
 *  *********************************************************************
@@ -216,7 +216,7 @@
 *  Set the previous cross scan size as dynamic default for the cross
 *  scan size.
                CALL PAR_DEF0R( PCROSS, DECROS, STATUS )
-      
+
 *  Obtain the cross scan size in arc minutes from the user
                CALL PAR_GET0R( PCROSS, ICROS, STATUS )
 
@@ -227,7 +227,7 @@
 *  Set the previous in scan size as dynamic default for the in scan
 *  size.
                CALL PAR_DEF0R( PINSCA, DEINSC, STATUS )
-      
+
 *  Obtain the in scan size in arc minutes from the user
                CALL PAR_GET0R( PINSCA, IINSC, STATUS )
 
@@ -242,19 +242,19 @@
                SOWAB( 2 ) = SOWAB2( SOPOS )
                SOWAB( 3 ) = SOWAB3( SOPOS )
                SOWAB( 4 ) = SOWAB4( SOPOS )
-      
+
 *  Call FIND22 to ask the user for bands required and translate them
 *  into logicals (including using source wavebands required as a
 *  default)
                CALL FIND22( PBANDS, .TRUE., SOWAB, WAFOUN, STATUS )
-      
+
 *  Check whether any parameter was abort !!
                IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
 *  Check whether any parameter was ! indicating that the user does not
 *  want to augment this particularsource with matching name
                IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *  Store the new waveband requirements in the source waveband logicals
                   SOWAB1( SOPOS ) = SOWAB ( 1 )
                   SOWAB2( SOPOS ) = SOWAB ( 2 )
@@ -262,7 +262,7 @@
                   SOWAB4( SOPOS ) = SOWAB ( 4 )
 
 *  Change the in scan value to radians and store in SOINSZ
-                  SOINSZ( SOPOS ) = IINSC * AMTOR 
+                  SOINSZ( SOPOS ) = IINSC * AMTOR
 *  Change the cross scan value to radians and store in SOCRSZ
                   SOCRSZ( SOPOS ) = ICROS * AMTOR
 
@@ -274,10 +274,10 @@
 
 *  If any of the parameters was entered as !, indicating do not augment
 *  this source with the augment sourc name, annul any error message,
-*  which sets the status to SAI__OK. 
+*  which sets the status to SAI__OK.
                   CALL ERR_ANNUL( STATUS )
-      
-               END IF      
+
+               END IF
             END IF
  300     CONTINUE
 
@@ -290,9 +290,9 @@
                CALL MSG_OUT( ' ',
      :         'WARNING - source to edited, ^c1, was not found',
      :         STATUS )
-            
+
             END IF
-      
+
 *  Go to the begining of the next source to be edited loop
             GO TO 100
 

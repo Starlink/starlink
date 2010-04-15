@@ -23,7 +23,7 @@ c
 *		px	array for midy profile sums - for up to 41
 *			substeps per increment, and up to 21 increments
 *			total width
-*	
+*
 *	COMMON:	/coext/ (determined in routine SPROF, i.e. here.)
 *		xav	shift of dataset relative to the MIDY
 *		nsuby	number of seeing profile substeps
@@ -150,7 +150,7 @@ c
 
 	  do i=ldlo,ldhi
 
-*           Normalise X about the reference position, to prevent 
+*           Normalise X about the reference position, to prevent
 *           rounding errors.
 
 	    xn=i-nxref
@@ -234,7 +234,7 @@ c
 
             CALL MSG_SETI( 'J', J )
             CALL MSG_SETI( 'LVAL', LVAL )
-	    CALL MSG_OUT( ' ', ' Edge of range. J=^J LVAL=^LVAL', 
+	    CALL MSG_OUT( ' ', ' Edge of range. J=^J LVAL=^LVAL',
      :        STATUS )
 
 	    xval(j)=-999.

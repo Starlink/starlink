@@ -1,4 +1,4 @@
-      SUBROUTINE PSA1_NDFIN4( IPOINT, NX, NY, ORIGX, ORIGY, BAD, 
+      SUBROUTINE PSA1_NDFIN4( IPOINT, NX, NY, ORIGX, ORIGY, BAD,
      :                        STATUS )
 *+
 *  Name:
@@ -96,7 +96,7 @@
          CALL MSG_SETC( 'NTYPE', NTYPE )
          CALL MSG_OUT( ' ',
      :' Input NDF is of type ^NTYPE - this application can only'//
-     :' process using INTEGER values; significance may be lost', 
+     :' process using INTEGER values; significance may be lost',
      :  STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -189,8 +189,8 @@
 *  Check for BAD pixels - need to remove these at some point.
       CALL NDF_BAD( IDINS, 'Data', .TRUE., BAD, STATUS )
       IF ( BAD ) THEN
-         CALL MSG_OUT( 'HAS_BAD_PIX ', 
-     :                 ' Warning: input data contain "bad" pixels.', 
+         CALL MSG_OUT( 'HAS_BAD_PIX ',
+     :                 ' Warning: input data contain "bad" pixels.',
      :                 STATUS )
       END IF
 

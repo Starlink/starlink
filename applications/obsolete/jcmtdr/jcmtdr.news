@@ -4,7 +4,7 @@
  This is release V1.2-3 of JCMTDR. This is the first release for
  Linux and the first without reliance on the NAG library.
 
- JCMTDR is a collection of applications for use in reducing JCMT 
+ JCMTDR is a collection of applications for use in reducing JCMT
  mapping data taken using the IFD in conjunction with UKT14 or the
  single-pixel heterodyne frontends. It is intended as a replacement
  for NOD2. This programme is intended for reduction of archive data
@@ -26,7 +26,7 @@
      as no replacement PDA routine is available.
 
   o  Include SC/1 and SUN/132 in the distribution. Update SUN/132 to current
-     standard although references to VMS and old Figaro support are still 
+     standard although references to VMS and old Figaro support are still
      present and should be removed.
 
   o  GSD inspection routines have been removed. They are now distributed as

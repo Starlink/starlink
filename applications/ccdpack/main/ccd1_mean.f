@@ -95,31 +95,31 @@
 
 *  Pass the data to the appropriate routine.
       IF ( PTYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_MEANB( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEANB( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                    SIZE, AVEACC, VALPIX,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_MEANUB( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEANUB( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                     SIZE, AVEACC, VALPIX,
      :                     STATUS )
       ELSE IF ( PTYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_MEANW( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEANW( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                    SIZE, AVEACC, VALPIX,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_MEANUW( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEANUW( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                     SIZE, AVEACC, VALPIX,
      :                     STATUS )
       ELSE IF ( PTYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_MEANI( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEANI( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                    SIZE, AVEACC, VALPIX,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_MEANR( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEANR( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                    SIZE, AVEACC, VALPIX,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_MEAND( BAD, %VAL( CNF_PVAL( IPVEC ) ), 
+         CALL CCG1_MEAND( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                    SIZE, AVEACC, VALPIX,
      :                    STATUS )
       ELSE

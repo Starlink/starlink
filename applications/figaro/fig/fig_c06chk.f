@@ -4,7 +4,7 @@ C
 C     F I G _ C 0 6 C H K
 C
 C     Given a number N, checks it against the factorisation criteria
-C     used by the NAG C06xxx routines, viz that it must have no more 
+C     used by the NAG C06xxx routines, viz that it must have no more
 C     than 20 prime factors, none of which may be greater than 19.  If N
 C     fails the test, return the closest larger and smaller numbers that
 C     pass it.
@@ -19,9 +19,9 @@ C     Common variables used - None
 C
 C     Subroutines / functions used -
 C
-C     FIG_C06TST   (FIG_ routine) Applies the C06 criteria to one value 
+C     FIG_C06TST   (FIG_ routine) Applies the C06 criteria to one value
 C
-C                                        4th Sept 1986  KS / AAO.  
+C                                        4th Sept 1986  KS / AAO.
 C
 C     This routine is a modification of one originally written by
 C     JOS / AAO.  It now returns PREV as well as NEXT and includes

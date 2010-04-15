@@ -63,7 +63,7 @@ PUBLIC cursor *gk0xcudecode(pattern,style) char *pattern; int style;{
 		cp->c_xhot = val[0];
 		cp->c_yhot = val[1];
 		cp->c_xoffset = val[2];
-		cp->c_yoffset = val[3];		
+		cp->c_yoffset = val[3];
 	}else gk0xwwpanic("unknown style to gk0xcudecode");
 	cp->c_bm = gk0xbmdecode(pattern,style);
 	if(cp->c_bm==0){

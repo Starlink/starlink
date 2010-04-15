@@ -20,7 +20,7 @@ C     (>) ORDER     (Integer Array ORDER(NLMAX))  The order number of
 C                   each of the identified arc lines.
 C     (>) CHANS     (Real Array CHANS(NLMAX))  The x-centroids of each
 C                   of the identified lines.
-C     (>) WAVES     (Real Array WAVES(NLMAX))  The arc wavelengths 
+C     (>) WAVES     (Real Array WAVES(NLMAX))  The arc wavelengths
 C                   assigned to each of the identified lines.
 C     (>) WEIGHTS   (Real Array WEIGHTS(NLMAX))  The weights of each
 C                   line to be fit.

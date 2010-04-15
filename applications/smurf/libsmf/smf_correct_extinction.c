@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_correct_extinction(smfData *data, smf_tausrc tausrc,
-*                            smf_extmeth method, double tau, double *allextcorr, 
+*                            smf_extmeth method, double tau, double *allextcorr,
 *                            int *status) {
 
 *  Arguments:
@@ -252,8 +252,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   /* If no opacity monitor specified generate bad status */
   if( tausrc==SMF__TAUSRC_NULL ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": No extinction monitor specified", 
-            status ); 
+    errRep( "", FUNC_NAME ": No extinction monitor specified",
+            status );
     return;
   }
 
@@ -261,8 +261,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     /* If caller not requesting allextcorr fail here */
     if( !allextcorr ) {
       msgSetc("F", FUNC_NAME);
-      msgOutif(MSG__VERB," ", 
-               "^F has already been run on these data, returning to caller", 
+      msgOutif(MSG__VERB," ",
+               "^F has already been run on these data, returning to caller",
                status);
       return;
     }
@@ -292,7 +292,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   }
 
   /* Tell user we're correcting for extinction */
-  msgOutif(MSG__VERB," ", 
+  msgOutif(MSG__VERB," ",
            "Correcting for extinction.", status);
 
   /* Should check data type for double if not allextcorr case */
@@ -430,7 +430,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* Assign pointer to input data array if status is good */
   if ( *status == SAI__OK ) {
-    indata = (data->pntr)[0]; 
+    indata = (data->pntr)[0];
     vardata = (data->pntr)[1];
   }
   /* It is more efficient to call astTranGrid than astTran2
@@ -503,7 +503,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         if ( tau == VAL__BADD ) {
           if ( *status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep("", "Error calculating tau from WVM temperatures", 
+            errRep("", "Error calculating tau from WVM temperatures",
                    status);
           }
         }
@@ -575,7 +575,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         quick = 1;
         extcorr = exp(airmass*tau);
       }
-    } 
+    }
     /* Loop over data in time slice. Start counting at 1 since this is
        the GRID coordinate frame */
     base = npts * k;  /* Offset into 3d data array (time-ordered) */
@@ -595,7 +595,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         airmass = slaAirmas( zd );
         extcorr = exp(airmass*tau);
       }
-	
+
       if( allextcorr ) {
         /* Store extinction correction factor */
         allextcorr[index] = extcorr;
@@ -617,7 +617,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       }
 
     }
-    
+
     /* Note that we do not need to free "wcs" or revert its SYSTEM
        since smf_tslice_ast will replace the object immediately. */
   } /* End loop over timeslice */
@@ -642,7 +642,7 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
   double delta;      /* difference between airmass1 and airmass2 times the tau  */
   const double footprint = 10.0 * DD2R / 60.0;  /* 10 arcmin */
   const double corrthresh = 0.01; /* threshold to switch from quick to slow as fraction */
-  
+
   if (*status != SAI__OK) return 0;
 
   /* short circuit if tau is extremely small */

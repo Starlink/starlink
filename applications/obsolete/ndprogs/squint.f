@@ -2,12 +2,12 @@
 C+
 C
 C   -----------
-C   S Q U I N T 
+C   S Q U I N T
 C   -----------
 C
 C   Description
 C   -----------
-C   Displays pixel values of a 2-D image or image subset as single 
+C   Displays pixel values of a 2-D image or image subset as single
 C   characters, giving a very crude grey scale.
 C
 C
@@ -50,15 +50,15 @@ C
 C
 C   Method
 C   ------
-C   - The IMAGE structure is tested for the bad pixel flag. If it is found 
-C     and non-zero, magic values are assumed to be present and are left in 
+C   - The IMAGE structure is tested for the bad pixel flag. If it is found
+C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
-C   - The minimum and maximum values in the selected image subset are 
+C   - The minimum and maximum values in the selected image subset are
 C     obtained by calling the appropriate NDP_STATS routine. These are used
 C     to determine an eight level scale.
-C   - A subroutine appropriate to the data type is called to display 
+C   - A subroutine appropriate to the data type is called to display
 C     symbols corresponding to the data values. Dimension 2 of the array is
-C     accessed in reverse so that the display appears with the correct 
+C     accessed in reverse so that the display appears with the correct
 C     orientation.
 C
 C
@@ -78,7 +78,7 @@ C      DSA_WRUSER
 C
 C   Library DYN:
 C      DYN_ELEMENT
-C              
+C
 C   Library ICH:
 C      ICH_ENCODE
 C      ICH_LEN
@@ -116,7 +116,7 @@ C
 C   Extensions to FORTRAN 77
 C   ------------------------
 C   DO WHILE / END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
-C                       
+C
 C
 C   Possible future upgrades
 C   ------------------------
@@ -198,7 +198,7 @@ C
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
-C   Get information about IMAGE             
+C   Get information about IMAGE
 C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -237,7 +237,7 @@ C
         CALL DSA_MAP_QUALITY('IMAGE','READ','BYTE',ADDRESS,QSLOT,STATUS)
         QPTR=DYN_ELEMENT(ADDRESS)
       END IF
-      IF (STATUS.NE.0) GO TO 500  
+      IF (STATUS.NE.0) GO TO 500
 C
 C   Perform loop for each subset
 C

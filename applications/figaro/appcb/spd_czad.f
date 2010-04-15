@@ -1,5 +1,5 @@
       SUBROUTINE SPD_CZAD( REASON, PICID, OVER, NDF, TEXT, LABGVN,
-     :                     BOTTOM, LEFT, TOP, RIGHT, FILL, WLDGVN, 
+     :                     BOTTOM, LEFT, TOP, RIGHT, FILL, WLDGVN,
      :                     WORLD, LABSPC, ROMAN, CHIGHT, COLOUR, THICK,
      :                     AXES, TICK, NUML, MAJOR, MINOR, DASH,
      :                     START, STEP, NMAJOR, STATUS )
@@ -464,7 +464,7 @@
 *        x should be linear, result y should be constant.
 *        For data x we can use the mapped axis centres. But we need a
 *        corresponding array of y values identical to 1 (not 0).
-            CALL AGI_TDTOW( PICID, DIM(AXIS(1)), 
+            CALL AGI_TDTOW( PICID, DIM(AXIS(1)),
      :                      %VAL( CNF_PVAL( ADAT(1) ) ),
      :                      %VAL( CNF_PVAL( WPTR(1) ) ),
      :                      %VAL( CNF_PVAL( WPTR(2) ) ),
@@ -702,7 +702,7 @@
      :                   %VAL( CNF_PVAL( IPATH ) ), STATUS )
 
 *     Plot the contours.
-         CALL PGCONB( %VAL( CNF_PVAL( DATA ) ), DIM(AXIS(1)), 
+         CALL PGCONB( %VAL( CNF_PVAL( DATA ) ), DIM(AXIS(1)),
      :                DIM(AXIS(2)), 1, DIM(AXIS(1)), 1, DIM(AXIS(2)),
      :                %VAL( CNF_PVAL( IPATH ) ), NMAJOR, TR, VAL__BADR )
 

@@ -15,10 +15,10 @@
 *  Description:
 *     A scaling factor is returned which converts data values from the
 *     specified NDF into values in the specified units. An error may be
-*     reported if the NDF contains CPC data, depending on the specific 
+*     reported if the NDF contains CPC data, depending on the specific
 *     conversion required (some can be performed for CPC data, and some
 *     cannot). An error is also reported if the input data is in colour
-*     corrected flux density based system, and the requested units are 
+*     corrected flux density based system, and the requested units are
 *     a flux based system.
 
 *  Arguments:
@@ -30,7 +30,7 @@
 *        The scale factor for converting the NDF data values to the
 *        required units.
 *     BAND = INTEGER (Returned)
-*        The survey waveband index. Negative values are returned for 
+*        The survey waveband index. Negative values are returned for
 *        CPC waveband indices (eg -1 or -2 ).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       CALL DAT_ANNUL( LOC, STATUS )
 
 *  Add a contextual report if anything went wrong.
-      IF( STATUS .NE. SAI__OK ) THEN      
+      IF( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'N', INDF )
          CALL MSG_SETC( 'U', UNITS )
          CALL ERR_REP( 'IRM_UNTIM_ERR3',

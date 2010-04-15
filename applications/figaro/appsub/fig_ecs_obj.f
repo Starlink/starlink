@@ -12,7 +12,7 @@ C     Given the order selection array produced during ECHSELECT, this
 C     routine collapses the image orders into single cross-sections of
 C     the output collapsed echellogram.  It can do this either for the
 C     sky orders or the object orders.  It just sums the object x-sects
-C     for each order, but when it collects sky x-sects, it scales each 
+C     for each order, but when it collects sky x-sects, it scales each
 C     to match the number of object x-sects for the corresponding order.
 C
 C  Language:
@@ -71,7 +71,7 @@ C
       INTEGER   IORD          ! Index through x-sects of CDATA
       INTEGER   IX            ! Index through x-section elements
       INTEGER   IY            ! Index through x-sects of IMAGE
-      INTEGER   ORDER         ! Order number for current x-sect 
+      INTEGER   ORDER         ! Order number for current x-sect
       INTEGER   TOTOBJ        ! Total number of object x-sects for order
       INTEGER   TOTSKY        ! Total number of sky x-sects for order
       LOGICAL   USE           ! Indicates this x-sect is to be used
@@ -80,7 +80,7 @@ C     Loop through all the x-sects in the collapsed echellogram
 C
       DO IORD=1,NORD
 C
-C        For each x-sect, work out which order number applies, 
+C        For each x-sect, work out which order number applies,
 C        clear the sky and object totals, and zero out the x-sect.
 C
          TOTSKY=0
@@ -110,7 +110,7 @@ C
                   USE=(ORDERS(IY).GT.0)
                ELSE
 C
-C                 If we are collecting sky data, we want this if it is 
+C                 If we are collecting sky data, we want this if it is
 C                 a sky cross-sect, but we also need to know the total
 C                 sky and object x-sects for this order.
 C

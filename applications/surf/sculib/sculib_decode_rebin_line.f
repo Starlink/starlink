@@ -46,7 +46,7 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -59,7 +59,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -138,14 +138,14 @@
 *     There are no longer any comments left so
 *     split the string into words
 
-      CALL CHR_DCWRD(NEW_LINE, MXWORD, N_FOUND, START, PSTOP, WORDS, 
+      CALL CHR_DCWRD(NEW_LINE, MXWORD, N_FOUND, START, PSTOP, WORDS,
      :     CSTATUS)
 
 *     Check output
-      
+
 *     Check that we got the expected values and types
 
-      IF (N_FOUND .GE. 1) THEN 
+      IF (N_FOUND .GE. 1) THEN
          NAME = WORDS(1)
          CALL CHR_LDBLK(NAME) ! justify
       END IF
@@ -169,7 +169,7 @@
             CALL ERR_REP(' ','SCULIB_DECODE_REBIN_LINE: Error '//
      :           'converting the WEIGHT (^WT) to a REAL', STATUS)
          END IF
-            
+
       END IF
 
 *     Now SHIFT_DX
@@ -202,5 +202,5 @@
 
       END IF
 
-      END 
+      END
 

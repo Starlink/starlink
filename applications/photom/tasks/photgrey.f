@@ -196,7 +196,7 @@
 * Scale the data array into the workspace array
       call MSG_OUT( ' ', 'Scaling image', status )
       call GREY( idims( 1 ), idims( 2 ), %val( CNF_PVAL( datpin ) ),
-     :           xstart, xend, ystart, yend, dx, dy, 
+     :           xstart, xend, ystart, yend, dx, dy,
      :           %val( CNF_PVAL( worpin ) ),
      :           npens, vmax, vmin )
 
@@ -236,7 +236,7 @@
           CALL ERR_REP( 'PHOTGREY_ERR',
      :        'PHOTGREY: Error displaying image.', STATUS )
       END IF
-      
+
       END
 
 *-----------------------------------------------------------------------
@@ -334,7 +334,7 @@
 *    History :
 *
 *     14-04-1986 : First implementation (REVA::MJM)
-*     1986 Aug 12: Completed prologue and nearly conformed to 
+*     1986 Aug 12: Completed prologue and nearly conformed to
 *                  Starlink standards (RAL::CUR).
 *     1986 Sep  2: Renamed parameters -> arguments section in prologue,
 *                  added bad-pixel handling and tidied (RAL::CUR).
@@ -395,7 +395,7 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*    check the sub-array co-ordinates for validity 
+*    check the sub-array co-ordinates for validity
 
       IF ( XSTART .LT. 1 .OR. XSTART .GT. DIM1 .OR.
      :     YSTART .LT. 1 .OR. YSTART .GT. DIM2 .OR.
@@ -444,7 +444,7 @@
       NUMPIX  =  ( XFINSH - XSTART + 1 ) * ( YFINSH - YSTART + 1 )
 
 *    initialise max and min variables to be equal to the value of
-*    the lower left corner of the specified subarray, and the 
+*    the lower left corner of the specified subarray, and the
 *    positions of each to be there
 
       MINMUM      =  ABS( VAL__BADR )

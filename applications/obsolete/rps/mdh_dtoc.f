@@ -49,7 +49,7 @@
 
 	  IF (I3.GE.1) THEN
 
-            MDH_DTOC = SIGN// DUMMY( START:I3+START-1) // '.' 
+            MDH_DTOC = SIGN// DUMMY( START:I3+START-1) // '.'
      &         // DUMMY(I3+START:I1+1 )
 	  ELSE
 

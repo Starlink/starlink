@@ -1,18 +1,18 @@
 *+FORM_EDIT        Does Form editing, deleting, etc.
       SUBROUTINE FORM_EDIT(STATUS)
- 
+
 *  Type Declaration
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       INTEGER STATUS			! Exit status, 0 = OK
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_points.inc'
       INCLUDE 'com_form_qual.inc'
       INCLUDE 'com_form_mtext.inc'
- 
+
 *******************************************************************************
 *  History
 *     1988 December	M Ricketts	1st Version
@@ -26,7 +26,7 @@
       CHARACTER*128 FORM_GETC
       INTEGER POP_MENU
       INTEGER DBS_GETI
- 
+
 *  Local Variables
       INTEGER NTARGET, KTARGET, IERR, EDTYPE, ISTART
       CHARACTER*6 TEXT, ETHEAD*27
@@ -37,9 +37,9 @@
      &     'Edit general page', 'Edit target data', 'Add target',
      &     'Review targets'/
       CHARACTER*26 EHEADING /'RPS - Edit Forms,   target'/
- 
+
 * ___________________________ Executable Code __________________________________
- 
+
       STATUS = 0
 
       CALL FORM_OPEN('W',STATUS)					! Open file if necessary, find how many targets
@@ -61,18 +61,18 @@
       EDTYPE = POP_MENU(OPTIONS,NOPT,ETHEAD,-MENU_CURS,MTEXT)		! '-' puts 'return' instead of 'exit'
       MENU_CURS = NOPT + 1
       IF (EDTYPE.GT.NOPT) GOTO 99
- 
+
       IF (EDTYPE.EQ.1) THEN			! Edit cover page
- 
+
          CALL FORM_REFILL('COVER',0,STATUS)
          IF (STATUS.NE.0) GOTO 99
          RECN = 1
          CALL FORM_WRITE(REF_FORM,RECN,IERR)
          MTEXT(LOC_MSTATUS:) = ' Cover edited                     '
          IF (IERR.EQ.0) GOTO 10
- 
+
       ELSE IF (EDTYPE.EQ.2) THEN		! Edit General Page
- 
+
          CALL FORM_REFILL('GEN',0,STATUS)
          IF (STATUS.NE.0) GOTO 99
          RECN = 1
@@ -81,7 +81,7 @@
          IF (IERR.EQ.0) GOTO 10
 
       ELSE IF (EDTYPE.EQ.3) THEN		! Edit Target
- 
+
          IF (NTARGET.GT.1) THEN
             KTARGET = NTARGET + 1
             DO WHILE (KTARGET.LE.0 .OR. KTARGET .GT. NTARGET)
@@ -95,7 +95,7 @@
          ELSE IF (NTARGET.EQ.0) THEN
 	    TEXT = FORM_GETC('No Targets - Must add target first, <ret> to continue',
      c		' ')
-	    GOTO 10     
+	    GOTO 10
          ELSE
             KTARGET = 1
          END IF
@@ -105,9 +105,9 @@
          CALL FORM_WRITE( REF_TARGET, KTARGET, IERR)
          WRITE( MTEXT(LOC_MSTATUS:) ,'(A,I2,A)' ) 'Target ',KTARGET, ' edited         '
          IF (IERR.EQ.0) GOTO 10
- 
+
       ELSE IF (EDTYPE.EQ.4) THEN		! Add Target
- 
+
          KTARGET = NTARGET + 1
          QTARGET = KTARGET
          CALL FORM_REFILL('TARGET',-KTARGET,STATUS)
@@ -118,21 +118,21 @@
          RECN = 1
          CALL FORM_WRITE(REF_FORM,RECN,IERR)
          IF (IERR .NE.0) GOTO 99
- 
+
          CALL FORM_WRITE(REF_TARGET,KTARGET,IERR)
          WRITE( MTEXT(LOC_MSTATUS:) ,'(A,I2,A)' ) 'Target ',KTARGET, ' added          '
          IF (IERR.EQ.0) GOTO 10
- 
+
       ELSE IF (EDTYPE.EQ.5) THEN		! Review Target List
- 
+
          CALL TARG_REVIEW
          MTEXT(LOC_MSTATUS:) = '                                                            '
          NTARGET = DBS_GETI(REF_FORM,FLD_NTARGETS)
          GOTO 10
- 
+
       END IF
- 
+
 99    CONTINUE
       IF (IERR.NE.0) MTEXT(LOC_MSTATUS:) = 'Error editing                                  '
- 
+
       END

@@ -3,7 +3,7 @@
 *    Description :
 *     This routine completes the processing of a group of observations
 *     when it is known that all the observations have been taken.
-*     If necessary, the group is polynomial fitted to enhance sky removal, 
+*     If necessary, the group is polynomial fitted to enhance sky removal,
 *     to produce a file called <group_name>_PF.DST.
 *     If necessary, the group is divided by a STANDARD, to produce a
 *     file called <group_name>_DBS.DST.
@@ -32,7 +32,7 @@
 *                  temporary file to be displayed, as in
 *                  CRED4_SHOW_GRP.                                (UKIRT::SMB)
 *     30-May-1991: Above modification reversed. Divide by the
-*                  STANDARD, and create a file called 
+*                  STANDARD, and create a file called
 *                  <group_name>_DIVBYSTD.DST.                     (SMB)
 *     01-Jul-1991: Shedule a POLYFIT if appropriate               (PND)
 *     16-Aug-1991: Minor cosmetic change to PF_POLYFIT            (PND)
@@ -41,7 +41,7 @@
 *     16-Jun-1992: Change file extension _DIVBYSTD to _DBS        (PND)
 *      9-Jul-1992: Comment out some VERBOSE debugging code        (PND)
 *     24-Jul-1992: General tidy of code                           (PND)
-*     11-Feb-1993: Conform to error strategy                      (PND) 
+*     11-Feb-1993: Conform to error strategy                      (PND)
 *     24-Mar-1994: Add automatic extraction of spectra            (PND,KLK)
 *      1-Aug-1994: Update for Unix port                           (PND)
 *    endhistory
@@ -88,9 +88,9 @@
 *   Copy the name of the original group into a local variable
       ORIGINAL_GROUP = GROUP
 
-*   Check that the group is composed of a sensible mixture of 
-*   OBJECT and SKY observations. 
-      CALL CRED4_CHECK_GRP( GROUP, NOBJ, NSKY, EXPOSED, SKYEXP, OK, STATUS ) 
+*   Check that the group is composed of a sensible mixture of
+*   OBJECT and SKY observations.
+      CALL CRED4_CHECK_GRP( GROUP, NOBJ, NSKY, EXPOSED, SKYEXP, OK, STATUS )
 
 *   Check this has worked.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -178,13 +178,13 @@
             IF ( DISPLAY_GRP(I).EQ.'ASK' .OR. DISPLAY_GRP(I).EQ.'ask' ) THEN
                ASK = .TRUE.
                CALL CHR_ITOC( I, CPORT, CPOS )
-               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                CALL CRED4_DISPLAY( INVAL, 'GROUP', ASK, WAIT, STATUS )
 
             ELSE IF ( DISPLAY_GRP(I).EQ.'YES' .OR. DISPLAY_GRP(I).EQ.'yes' ) THEN
                ASK = .FALSE.
                CALL CHR_ITOC( I, CPORT, CPOS )
-               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                CALL CRED4_DISPLAY( INVAL, 'GROUP', ASK, WAIT, STATUS )
 
             ELSE IF ( DISPLAY_GRP(I).EQ.'NO' .OR. DISPLAY_GRP(I).EQ.'no' ) THEN
@@ -211,7 +211,7 @@
          IF ( EXTRACT_SPC .NE. 'NO' ) THEN
             OUTPUT = GROUP(1:CHR_LEN(GROUP)) // '_spc'
             OUTPUT2 = GROUP(1:CHR_LEN(GROUP)) // '_imspc'
-            CALL CRED4_EXTRACT_SPC( GROUP, OUTPUT, OUTPUT2, ASK, 
+            CALL CRED4_EXTRACT_SPC( GROUP, OUTPUT, OUTPUT2, ASK,
      :        WAIT, EXTRACTED, STATUS )
             IF ( STATUS .NE. SAI__OK ) REDUCTION_OK = .FALSE.
          ELSE
@@ -237,13 +237,13 @@
             IF ( DISPLAY_SPC(I).EQ.'ASK' .OR. DISPLAY_SPC(I).EQ.'ask' ) THEN
                ASK = .TRUE.
                CALL CHR_ITOC( I, CPORT, CPOS )
-               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                CALL CRED4_DISPLAY( INVAL, 'SPECTRUM', ASK, WAIT, STATUS )
 
             ELSE IF ( DISPLAY_SPC(I).EQ.'YES' .OR. DISPLAY_SPC(I).EQ.'yes' ) THEN
                ASK = .FALSE.
                CALL CHR_ITOC( I, CPORT, CPOS )
-               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+               INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                CALL CRED4_DISPLAY( INVAL, 'SPECTRUM', ASK, WAIT, STATUS )
 
             ELSE IF ( DISPLAY_SPC(I).EQ.'NO' .OR. DISPLAY_SPC(I).EQ.'no' ) THEN
@@ -269,7 +269,7 @@
             IF ( EXTRACTED ) GROUP = ORIGINAL_GROUP
             CALL MSG_SETC( 'GROUP', GROUP )
             CALL MSG_OUT( ' ', 'Group ^GROUP completed - '/
-     :        /'Use divide_by_std to divide it by a standard', 
+     :        /'Use divide_by_std to divide it by a standard',
      :        STATUS )
          ENDIF
       ELSE

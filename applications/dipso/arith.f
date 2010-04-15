@@ -9,14 +9,14 @@
        INTEGER NPOINT, NBREAK, STKNPT
        INTEGER ISHIFT, I, J, I1, I2
        TSTVAL = -16.1054
- 
+
        SW1 = MAX(WAVE(1),WAVE(NPOINT))
        SW2 = MIN(WAVE(1),WAVE(NPOINT))
        CW1 = MAX(XSTACK(1),XSTACK(STKNPT))
        CW2 = MIN(XSTACK(1),XSTACK(STKNPT))
        GW1 = MAX(SW2,CW2)
        GW2 = MIN(SW1,CW1)
- 
+
        CALL REMAP(WAVE,FLUX,NPOINT,XSTACK,WORK,STKNPT,0)
        NPOINT = STKNPT
        IF (FN.EQ.'/') THEN
@@ -48,15 +48,15 @@
              FLUX(I) = MIN(YSTACK(I),WORK(I))
   300     CONTINUE
        ENDIF
- 
+
        DO 400 JJ = 1, NBREAK - 1
           X1 = WAVE(BREAK(JJ))
           X2 = WAVE(BREAK(JJ)+1)
           TMP = MIN(X1,X2)
           X2 = MAX(X1,X2)
           X1 = TMP
- 
- 
+
+
           DO 350 II = 1, NPOINT
              WV = XSTACK(II)
              IF (WV.GT.X1 .AND. WV.LT.X2) THEN
@@ -70,13 +70,13 @@
              FLUX(I) = TSTVAL
           ENDIF
   500  CONTINUE
- 
- 
+
+
        DO 600 I = 1, NBSTCK
           BREAK(I) = BSTACK(I)
   600  CONTINUE
        NBREAK = NBSTCK
- 
+
        OK = .TRUE.
        IF (GW2.LT.GW1) THEN
           NPOINT = 0
@@ -86,14 +86,14 @@
           FLUX(1) = 0.0
           GOTO 700
        ENDIF
- 
+
        CALL SRTBRK
      : (ASIZE1,WAVE,FLUX,NPOINT,MAXBRK,BREAK,NBREAK,TSTVAL, OK)
- 
+
        IF (.NOT.OK) THEN
           WRITE (*,'(''      WARNING:  error resorting breaks!'')')
        ENDIF
- 
+
   700  CONTINUE
 
        END

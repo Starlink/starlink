@@ -28,7 +28,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
-*  Import: 
+*  Import:
       INTEGER  NEL               ! Number of elements
       CHARACTER*80 FITSAR(NEL)   ! FITS array
       CHARACTER*(*) ITEM         ! Name of ITEM
@@ -61,7 +61,7 @@
 *    If an error occurred, then report a message.
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_REP( ' ', 'Could not find FITS item', STATUS)
-      END IF     
+      END IF
 
 
       END

@@ -44,12 +44,12 @@
 
 *    Find last occurrence of file separator (0 or N)
       SEPPOS = CHR_LEN( ROFILE )
-      CALL CHR_FIND( ROFILE, SEPARATOR, .FALSE., SEPPOS ) 
+      CALL CHR_FIND( ROFILE, SEPARATOR, .FALSE., SEPPOS )
 
 *    Find last occurrence of underscore
       USCPOS = CHR_LEN( ROFILE )
       CALL CHR_FIND( ROFILE, '_', .FALSE., USCPOS )
- 
+
 *    Set the output file
       CALL CHR_FILL( ' ', RGFILE )
       RGFILE = PREFIX // 'RGDIR' // SEPARATOR // 'rg' // ROFILE(SEPPOS+3:USCPOS)

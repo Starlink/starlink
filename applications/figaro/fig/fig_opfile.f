@@ -38,7 +38,7 @@ C     4th Sept 1992  Re-written as simple version of DSA_OPEN_TEXT_FILE.
 C                    HME/UoE, Starlink.
 C
 C     Note:  Ideally, this routine would use DSA_OPEN_TEXT_FILE, but
-C     it cannot because it is passed the logicl unit to use.  New 
+C     it cannot because it is passed the logicl unit to use.  New
 C     programs should use DSA_OPEN_TEXT_FILE in preference to this
 C     routine, and should let it supply the logical unit.
 C+
@@ -68,7 +68,7 @@ C     Reset status.
 C
       STATUS = 0
 C
-C     The file should exist, we have to look for it.  We try the 
+C     The file should exist, we have to look for it.  We try the
 C     various directories one by one.  If we actually fail to
 C     open an existing file, we exit the loop.
 C

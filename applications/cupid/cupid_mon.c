@@ -1,5 +1,5 @@
 #include "sae_par.h"
-#include "f77.h"                 
+#include "f77.h"
 #include "mers.h"
 #include "ndf.h"
 #include "star/task_adam.h"
@@ -40,7 +40,7 @@ void cupid_mon( int *status ) {
 *     valid task name.  If there is no match, an error report is made.
 
 *  Parameters:
-*     status 
+*     status
 *        Pointer to the global status variable used by the ADAM fixed part.
 
 *  Synopsis:
@@ -81,7 +81,7 @@ void cupid_mon( int *status ) {
 *     31-JUL-2009 (DSB):
 *        Use ndgBegpv/Endpv to provide automatic provenance propagation.
 *     16-OCT-2009 (DSB):
-*        Use ndgBeggh/ndgEndgh to record contents of group parameters in 
+*        Use ndgBeggh/ndgEndgh to record contents of group parameters in
 *        the history component of output NDFs.
 *     {enter_further_changes_here}
 
@@ -117,8 +117,8 @@ void cupid_mon( int *status ) {
 
 /* Begin a provenance block. This causes event handlers to be registered
    with the NDF library so that a handler routine in NDG is called every
-   time an NDF is opened. This handler routine keeps a record of all 
-   NDFs that are opened for input or output, until the block is closed 
+   time an NDF is opened. This handler routine keeps a record of all
+   NDFs that are opened for input or output, until the block is closed
    by calling ndgEndpv. */
    ndgBegpv( status );
 
@@ -168,7 +168,7 @@ void cupid_mon( int *status ) {
    that the application accessed in order to create the output NDF. Any
    output NDF that already contains a provenance extension is left
    unchanged (so individual application can override this automatic
-   provenance handling by adding a provenance extension to the output 
+   provenance handling by adding a provenance extension to the output
    NDF itself). */
    sprintf( buff, "CUPID:%s", name );
    ndgEndpv( buff, status );

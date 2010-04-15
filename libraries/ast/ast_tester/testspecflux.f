@@ -51,7 +51,7 @@
 
       if( ast_getc( ff2, 'unit', status ) .ne. 'W/m^2/Angstrom' )
      :    call stopit( status, 'Error 6B' )
-      if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' ) 
+      if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' )
      :    call stopit( status, 'error 6C' )
 
       sff2 = ast_specfluxframe( sf, ff2, ' ', status )
@@ -66,8 +66,8 @@
       yin = 1.0D0
       xin = 2.0D0
       call ast_tran2( fs, 1, xin, yin, .true., xout, yout, status )
-      
-      if( abs(yout - 1.33425638D-26) .gt. 1.0D-32 ) 
+
+      if( abs(yout - 1.33425638D-26) .gt. 1.0D-32 )
      :    call stopit( status, 'error 9' )
 
       if( xout .ne. 2.0D0 ) call stopit( status, 'error 10' )
@@ -80,7 +80,7 @@
       if( fs .eq. ast__null ) call stopit( status, 'error 11' )
       call ast_tran2( fs, 1, xin, yin, .true., xout, yout, status )
 
-      if( abs(xout - 1.33425638D-26) .gt. 1.0D-32 ) 
+      if( abs(xout - 1.33425638D-26) .gt. 1.0D-32 )
      :    call stopit( status, 'error 12' )
 
       if( yout .ne. 2.0D0 ) call stopit( status, 'error 13' )
@@ -96,16 +96,16 @@
       xin = 1.0D0
       call ast_tran2( fs, 1, xin, yin, .true., xout, yout, status )
 
-      if( abs(xout - 1.33425638D-26) .gt. 1.0D-32 ) 
+      if( abs(xout - 1.33425638D-26) .gt. 1.0D-32 )
      :    call stopit( status, 'error 15' )
 
       if( yout .ne. 2.0D0 ) call stopit( status, 'error 16' )
 
 
 
-      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m2/nm)', 
+      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m2/nm)',
      :                     status )
-      if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' ) 
+      if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' )
      :    call stopit( status, 'error 17' )
       sff2 = ast_specfluxframe( sf, ff2, ' ', status )
 
@@ -126,7 +126,7 @@
 
       call ast_tran2( fs, 1, xout, yout, .false., xin, yin, status )
 
-      if( abs( xin - 2.0D0 ) .gt. 1.0D-9 ) call stopit( status, 
+      if( abs( xin - 2.0D0 ) .gt. 1.0D-9 ) call stopit( status,
      :                                                  'error 21' )
       if( abs( yin - 1.0D0 ) .gt. 1.0D-9 ) call stopit( status,
      :                                                  'error 22' )
@@ -135,15 +135,15 @@
 
 
 
-      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m2/nm/sr)', 
+      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m2/nm/sr)',
      :                     status )
-      if( ast_getc( ff2, 'system', status ) .ne. 'SFCBRW' ) 
+      if( ast_getc( ff2, 'system', status ) .ne. 'SFCBRW' )
      :    call stopit( status, 'error 23' )
       sff2 = ast_specfluxframe( sf, ff2, ' ', status )
 
       sf = ast_specframe( 'system=freq,unit=GHz', status )
       ff = ast_Fluxframe( 123.0D0, sf, 'Unit=Jy/deg**2', status )
-      if( ast_getc( ff, 'system', status ) .ne. 'SFCBR' ) 
+      if( ast_getc( ff, 'system', status ) .ne. 'SFCBR' )
      :    call stopit( status, 'error 24' )
       sff = ast_specfluxframe( sf, ff, ' ', status )
 
@@ -154,13 +154,13 @@
       xin = 2.0D0
       call ast_tran2( fs, 1, xin, yin, .true., xout, yout, status )
 
-      if( abs(yout + 21.3585154D0 ) .gt. 0.000001 ) 
+      if( abs(yout + 21.3585154D0 ) .gt. 0.000001 )
      :    call stopit( status, 'error 26' )
 
       if( xout .ne. 2.0D0 ) call stopit( status, 'error 27' )
 
       call ast_tran2( fs, 1, xout, yout, .false., xin, yin, status )
-      if( abs( xin - 2.0D0 ) .gt. 1.0D-9 ) call stopit( status, 
+      if( abs( xin - 2.0D0 ) .gt. 1.0D-9 ) call stopit( status,
      :                                                  'error 28' )
       if( abs( yin - 1.0D0 ) .gt. 1.0D-9 ) call stopit( status,
      :                                                  'error 29' )
@@ -211,7 +211,7 @@
       external mysource, mysink
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -233,7 +233,7 @@
          write(*,*) text
          call stopit( status, 'Cannot read object from channel' )
       end if
-     
+
 
 
       if( ast_getd( obj, 'specval', status ) .ne.
@@ -244,7 +244,7 @@
          call stopit( status, 'Object has changed' )
       end if
 
-      end  
+      end
 
       subroutine sink1( status )
       implicit none
@@ -263,7 +263,7 @@
       if( index( line( : l ),'Unc =' ) .GT. 0 ) then
          done = .true.
 
-      else if( .not. done .and. 
+      else if( .not. done .and.
      :         index( line( : l ),'FrameSet' ) .GT. 0 ) then
          fsfound= .true.
       end if
@@ -277,7 +277,7 @@
       integer status, next, end, ll
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -300,7 +300,7 @@
       character buf*25000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -319,7 +319,7 @@
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif

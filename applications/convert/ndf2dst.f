@@ -62,9 +62,9 @@
 *                                 any flagged values actually in the
 *                                 input main data array.  .Z.FLAGGED is
 *                                 set accordingly.
-*          Title               -> .OBS.OBJECT 
+*          Title               -> .OBS.OBJECT
 *
-*          AXIS(1) structure   -> .X 
+*          AXIS(1) structure   -> .X
 *             AXIS(1) Data     -> .X.DATA  (unless there is a DATA_ARRAY
 *                                 component of AXIS(1).MORE.FIGARO to
 *                                 allow for a non-1-dimensional array)
@@ -79,7 +79,7 @@
 *             AXIS(1) Label    -> .X.LABEL
 *             AXIS(1).MORE.FIGARO.xxx -> .X.xxx
 *          (Similarly for AXIS(2), ..., AXIS(6) which are renamed to
-*          .Y .T .U .V or .W) 
+*          .Y .T .U .V or .W)
 *
 *          FIGARO extension:
 *          .MORE.FIGARO.MAGFLAG -> .Z.MAGFLAG
@@ -89,7 +89,7 @@
 *          .MORE.FIGARO.xxx    -> .xxx   (recursively)
 *
 *          FITS extension:
-*          .MORE.FITS 
+*          .MORE.FITS
 *                   Items      -> .FITS.xxx
 *                   Comments   -> .COMMENTS.xxx
 *
@@ -226,7 +226,7 @@
       LOGICAL                AXVAR  ! True if axis-variance array exists
       LOGICAL                AXWIDT ! True if axis-width array exists
       LOGICAL                BAD    ! True if bad values recognised
-      INTEGER                BADBIT ! Value sof the NDF bad-bits 
+      INTEGER                BADBIT ! Value sof the NDF bad-bits
       LOGICAL                BADPIX ! True if bad values may be present
                                     ! in the main data array
       INTEGER                CLEN   ! String length
@@ -245,9 +245,9 @@
       LOGICAL                FIGOBS ! True if Figaro .OBS created
       INTEGER                FIPTR  ! Pointer to Figaro imaginary array      LOGICAL                FLPRES ! Value of the .Z.FLAGGED component
                                     ! in the DST
-      CHARACTER*48           FITCOM ! FITS comment         
+      CHARACTER*48           FITCOM ! FITS comment
       CHARACTER*70           FITDAT ! FITS value
-      CHARACTER*8            FITNAM ! FITS keyword          
+      CHARACTER*8            FITNAM ! FITS keyword
       LOGICAL                FLPRES ! Value of the .Z.FLAGGED component
                                     ! in the DST
       CHARACTER*(NDF__SZFTP) FTYPE  ! Full data type
@@ -290,7 +290,7 @@
       LOGICAL                LVAL   ! Value of a logical FITS item
       CHARACTER*20           MFNAM  ! Name of item in Figaro extension
       INTEGER                NAXELM ! No elements in axis data structure
-      INTEGER                NCOMP  ! Number of components 
+      INTEGER                NCOMP  ! Number of components
       INTEGER                NCC    ! Column of FITS comment delimiter
       INTEGER                NCCOM  ! Number of characters in FITS
                                     ! COMMENT or HISTORY card
@@ -351,7 +351,7 @@
 
 *   Create the Figaro file.
 *   =======================
-*   
+*
 *   Obtain the name of the output Figaro file, and append the standard
 *   file extension.
       CALL PAR_GET0C ('OUT', FIGFIL, STATUS )
@@ -364,7 +364,7 @@
 
 *   Deal with the Figaro extension (if any).
 *   ========================================
-*   
+*
 *   NDF.MORE.FIGARO.xxx -> OUTPUT.xxx
       CALL NDF_XSTAT( NDF, 'FIGARO', EXIST, STATUS )
       IF ( EXIST ) THEN
@@ -413,7 +413,7 @@
 *            There are some special cases.  First the magnitude flag and
 *            the range, which go to the .Z structure.
                IF ( MFNAM .EQ. 'MAGFLAG' .OR. MFNAM .EQ. 'RANGE' ) THEN
-      
+
 *               Create .Z structure in the Figaro file, if it does not
 *               exist, and get a locator to it.
                   CALL DAT_THERE( LF, 'Z', EXIST, STATUS )
@@ -428,7 +428,7 @@
 *            Next special cases are the airmass and time, which go to
 *            the .OBS structure.
                ELSE IF ( MFNAM .EQ. 'SECZ' .OR. MFNAM .EQ. 'TIME' ) THEN
-      
+
 *               Create .OBS structure in the Figaro file, if it does not
 *               exist, and get a locator to it.
                   CALL DAT_THERE( LF, 'OBS', EXIST, STATUS )
@@ -472,14 +472,14 @@
 *   defined destination.
 
       NEXT = 0
-      FIGMOR = .FALSE.   
+      FIGMOR = .FALSE.
       DO WHILE ( XNAME .NE. ' ' .AND. STATUS .EQ. SAI__OK )
          NEXT = NEXT + 1
 
 *       Search through the NDF's extensions.  Only process non-standard
 *       extensions.
          CALL NDF_XNAME( NDF, NEXT, XNAME, STATUS )
-         IF (XNAME(1:6) .NE. 'FIGARO' .AND. XNAME .NE. ' ' .AND. 
+         IF (XNAME(1:6) .NE. 'FIGARO' .AND. XNAME .NE. ' ' .AND.
      :       XNAME(1:4) .NE. 'FITS') THEN
 
 *         Obtain a locator to the current extension.
@@ -544,7 +544,7 @@
       CALL DAT_THERE( LF, 'Z', EXIST, STATUS )
       IF ( .NOT. EXIST ) THEN
          CALL DAT_NEW( LF, 'Z', 'IMAGE', 0, 0, STATUS )
-      END IF   
+      END IF
       CALL DAT_FIND( LF, 'Z', LFZ, STATUS )
 
 *   Create .Z.DATA in the Figaro file and get a locator to it.
@@ -602,7 +602,7 @@
 
 *   Copy the character components.
 *   ==============================
-*   
+*
 *   Copy UNITS TO .Z.UNITS
       CALL NDF_STATE( NDF, 'UNITS', EXIST, STATUS )
       IF ( EXIST ) THEN
@@ -652,7 +652,7 @@
          CALL DAT_THERE( LF, 'OBS', EXIST, STATUS )
          IF ( .NOT. EXIST ) THEN
             CALL DAT_NEW( LF, 'OBS', 'OBS', 0, 0,  STATUS )
-         END IF   
+         END IF
          CALL DAT_FIND( LF, 'OBS', LFO, STATUS )
 
 *      Create the OBJECT component in the Figaro OBS structure, obtain
@@ -677,7 +677,7 @@
 
 *      Map the NDF data array with the appropriate type.
          CALL NDF_TYPE( NDF, 'VARIANCE', TYPE, STATUS )
-         CALL NDF_MAP( NDF, 'VARIANCE', TYPE, 'READ', NVPTR, NELM, 
+         CALL NDF_MAP( NDF, 'VARIANCE', TYPE, 'READ', NVPTR, NELM,
      :                 STATUS )
 
 *      Create .Z.ERRORS in the Figaro file and get a locator to it.
@@ -691,35 +691,35 @@
 *      Take the square root of the variance to make the error array.
 *      Call a routine appropriate to the variance type.
          IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL VEC_SQRTR( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTR( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE') THEN
-            CALL VEC_SQRTD( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTD( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_INTEGER') THEN
-            CALL VEC_SQRTI( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTI( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_BYTE') THEN
-            CALL VEC_SQRTB( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTB( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_WORD') THEN
-            CALL VEC_SQRTW( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTW( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_UBYTE') THEN
-            CALL VEC_SQRTUB( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTUB( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                       %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_UWORD') THEN
-            CALL VEC_SQRTUW( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+            CALL VEC_SQRTUW( BAD, NELM, %VAL(CNF_PVAL(NVPTR)),
      :                       %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          END IF
-         
+
 *      Unmap .Z.ERRORS and the variance.
          CALL DAT_ANNUL( LFZE, STATUS )
          CALL NDF_UNMAP( NDF, 'Variance', STATUS )
@@ -829,7 +829,7 @@
                CALL NDF_ATYPE( NDF, 'Centre', IAXIS, TYPE, STATUS )
                CALL NDF_AMAP( NDF, 'Centre', IAXIS, TYPE, 'READ',
      :                        AXPTR, NAXELM, STATUS )
-              
+
 *            Create the axis.DATA structure.
                CALL DAT_NEW( LFAX, 'DATA', TYPE, 1, DIM( IAXIS ),
      :                       STATUS )
@@ -850,7 +850,7 @@
                CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )
             END IF
 
-*         Copy the (1-dimensional) variance array if there is not a 
+*         Copy the (1-dimensional) variance array if there is not a
 *         variance array already.
             IF ( .NOT. AXVAR ) THEN
 
@@ -863,7 +863,7 @@
                   CALL NDF_ATYPE( NDF, 'Variance', IAXIS, TYPE, STATUS )
                   CALL NDF_AMAP( NDF, 'Variance', IAXIS, TYPE, 'READ',
      :                           AXPTR, NAXELM, STATUS )
-              
+
 *               Create the axis.VARIANCE structure.
                   CALL DAT_NEW( LFAX, 'VARIANCE', TYPE, 1, DIM( IAXIS ),
      :                          STATUS )
@@ -908,7 +908,7 @@
 
 *         Copy the (1-dimensional) width array if there is not a width
 *         array already.
-            ELSE 
+            ELSE
 
 *            Look to see if there is an axis-width array.
                CALL NDF_ASTAT( NDF, 'Width', IAXIS, EXIST, STATUS )
@@ -919,7 +919,7 @@
                   CALL NDF_ATYPE( NDF, 'Width', IAXIS, TYPE, STATUS )
                   CALL NDF_AMAP( NDF, 'Width', IAXIS, TYPE, 'READ',
      :                           AXPTR, NAXELM, STATUS )
-              
+
 *               Create the axis.WIDTH structure.
                   CALL DAT_NEW( LFAX, 'WIDTH', TYPE, 1, DIM( IAXIS ),
      :                          STATUS )
@@ -990,7 +990,7 @@
 
       IF ( EXIST ) THEN
 
-*      Get a locator to the FITS extension and find the number of 
+*      Get a locator to the FITS extension and find the number of
 *      FITS items.
          CALL NDF_XLOC( NDF, 'FITS', 'READ', NXFIT, STATUS )
          CALL DAT_SHAPE( NXFIT, 10, DIM, NDIM, STATUS )
@@ -1001,9 +1001,9 @@
 
 *      Create FIGARO .COMMENTS structure.
          CALL DAT_NEW( LF, 'COMMENTS', 'COMMENTS', 0, 0, STATUS )
-         CALL DAT_FIND( LF, 'COMMENTS', LFCOM, STATUS ) 
+         CALL DAT_FIND( LF, 'COMMENTS', LFCOM, STATUS )
 
-*      Get the FITS items one by one, test the type and create an 
+*      Get the FITS items one by one, test the type and create an
 *      item of appropriate type in the Figaro FITS structure.
 *      If an item has an associated comment, this is written to the
 *      Figaro COMMENTS structure.
@@ -1276,7 +1276,7 @@
             END IF
             CALL DAT_ANNUL( LFMFI, STATUS )
          END DO
- 
+
 *      Erase Figaro .COMMENTS structure if this is empty.  Note that the
 *      locator to the comments structure must be annul before the
 *      structure is deleted.
@@ -1298,7 +1298,7 @@
 
 *   Annul locators to other objects.
       CALL DAT_ANNUL( LFZ, STATUS )
- 
+
 999   CONTINUE
       CALL NDF_END( STATUS )
       CALL HDS_CLOSE( LF, STATUS )

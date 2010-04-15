@@ -1,7 +1,7 @@
       SUBROUTINE PGINTR( V1, V2, NULL, ID0, ID1, ID2, STATUS )
 *+
 *  Name:
-*     PGINTR  
+*     PGINTR
 
 *  Purpose:
 *     Accesses a device, starts up AGI, activates PGPLOT and set the
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  Have request to use no device set flag and reset status
          NULL = .TRUE.
          STATUS = SAI__OK
-      END IF 
+      END IF
       IF ( STATUS .EQ. SAI__OK .AND. .NOT. NULL ) THEN
 
 *  Begin an AGI scope
@@ -114,7 +114,7 @@
 *  Test status to see if picture exists, if not annul status and
 *  create new picture.
          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )    
+            CALL ERR_ANNUL( STATUS )
 
 *  Get the world coordinates of the base viewport
             CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS )
@@ -138,14 +138,14 @@
 *  Test status to see if picture exists, if not annul status and
 *  create new picture.
             IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_ANNUL( STATUS )    
+               CALL ERR_ANNUL( STATUS )
 
 *  Scale the world coordinates to leave a border around the picture
                WWX1 = WX1 + ( WX2 - WX1 ) * V2(1)
                WWX2 = WX1 + ( WX2 - WX1 ) * V2(2)
                WWY1 = WY1 + ( WY2 - WY1 ) * V2(3)
                WWY2 = WY1 + ( WY2 - WY1 ) * V2(4)
-      
+
 *  Create the second picture in the top partition.
                CALL AGI_NUPIC( WWX1, WWX2, WWY1, WWY2, 'PISA_RESPLOT',
      :                         'RESIDS', WWX1, WWX2, WWY1, WWY2, ID2,
@@ -158,7 +158,7 @@
          CALL AGP_ACTIV( STATUS )
          CALL AGP_NVIEW( .FALSE., STATUS )
 
-*  Get the line width 
+*  Get the line width
          CALL PAR_GET0I( 'LINEW', ILW, STATUS )
 
 *  Set it up

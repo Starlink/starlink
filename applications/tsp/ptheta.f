@@ -10,7 +10,7 @@ C     Function:
 C        Output the P and Theta values for a polarization spectrum
 C
 C     Description:
-C        The polarization and position angle corresponding to a 
+C        The polarization and position angle corresponding to a
 C        specified wavelength range of a polarization spectrum are
 C        calculated and output.
 C
@@ -28,7 +28,7 @@ C
 C-
 C
 C  History:
-C    15/6/1988   Original Version.   JAB/AAO 
+C    15/6/1988   Original Version.   JAB/AAO
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -39,10 +39,10 @@ C    15/6/1988   Original Version.   JAB/AAO
       CHARACTER*(DAT__SZLOC) QLOC,ULOC,T1LOC,T2LOC,LLOC
       REAL LSTART,LEND
 
-      INTEGER ICH_LEN                            
+      INTEGER ICH_LEN
 
 *  Get the data
-                                       
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
       CALL TSP_SIZE(LOC,3,DIMS,ACTDIM,STATUS)
       SIZE = DIMS(1)
@@ -70,14 +70,14 @@ C    15/6/1988   Original Version.   JAB/AAO
       CALL PAR_GET0R('LEND',LEND,STATUS)
 
 *  Calculate the results
-                    
+
       IF (STATUS .EQ. SAI__OK) THEN
         CALL TSP_PTHETA(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(QEPTR),
      :   %VAL(UPTR),%VAL(UEPTR),LSTART,LEND,%VAL(LPTR),STATUS)
       ENDIF
 
-*  Tidy up      
-                                
+*  Tidy up
+
       CALL TSP_UNMAP(IDLOC,STATUS)
       CALL TSP_UNMAP(QDLOC,STATUS)
       CALL TSP_UNMAP(UDLOC,STATUS)
@@ -85,11 +85,11 @@ C    15/6/1988   Original Version.   JAB/AAO
       CALL TSP_UNMAP(UELOC,STATUS)
       CALL TSP_UNMAP(LLOC,STATUS)
       CALL DAT_ANNUL(QLOC,STATUS)
-      CALL DAT_ANNUL(ULOC,STATUS) 
+      CALL DAT_ANNUL(ULOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
       SUBROUTINE TSP_PTHETA(SIZE,I,Q,QE,U,UE,LSTART,LEND,L,STATUS)
 *
 *  Subroutine to calculate the polarization and position angle
@@ -100,10 +100,10 @@ C    15/6/1988   Original Version.   JAB/AAO
       REAL LSTART, LEND
       REAL II,QQ,UU,QQE,UUE,P,PE,THETA,TE,X
       INTEGER NP
-      INTEGER STATUS  
+      INTEGER STATUS
       INTEGER CHAN
-          
-      NP = 0 
+
+      NP = 0
       II = 0.0
       QQ = 0.0
       UU = 0.0
@@ -115,7 +115,7 @@ C    15/6/1988   Original Version.   JAB/AAO
               QQ = QQ + Q(CHAN)
               QQE = QQE + QE(CHAN)
               UU = UU + U(CHAN)
-              UUE = UUE + UE(CHAN)  
+              UUE = UUE + UE(CHAN)
               II = II + I(CHAN)
           ENDIF
       ENDDO
@@ -126,10 +126,10 @@ C    15/6/1988   Original Version.   JAB/AAO
          UUE = 100.0*SQRT(UUE)/II
          P = SQRT(QQ*QQ+UU*UU)
          THETA = ATAN2(UU,QQ) * 90.0/3.1415926
-         IF (THETA .LT. 0.0) THETA = THETA + 180.0  
+         IF (THETA .LT. 0.0) THETA = THETA + 180.0
          IF (P .GT. 0.0) THEN
              X = QQE*QQE*QQ*QQ + UUE*UUE*UU*UU
-             PE = SQRT(X)/P  
+             PE = SQRT(X)/P
              X = QQ*QQ*UUE*UUE + UU*UU*QQE*QQE
              X = 0.5*SQRT(X)
              X = X/(P*P)
@@ -151,8 +151,8 @@ C    15/6/1988   Original Version.   JAB/AAO
       ELSE
          CALL MSG_OUT(' ','No Data in Specified Wavelength Range',
      :       STATUS)
-      ENDIF   
+      ENDIF
       END
-         
-                   
-          
+
+
+

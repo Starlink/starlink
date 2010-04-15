@@ -13,21 +13,21 @@
 *     CALL KPG1_ASFFR( TARGET, DOMAIN, IFRM, STATUS )
 
 *  Description:
-*     This routine finds the last Frame with a given Domain within a 
-*     FrameSet, and returns its index. The Current Frame in the FrameSet 
+*     This routine finds the last Frame with a given Domain within a
+*     FrameSet, and returns its index. The Current Frame in the FrameSet
 *     is not changed.
 *
-*     The first and last component Frames within CmpFrames are included 
-*     in the search (component Frames in the middle of a CmpFrame cannot 
-*     be found as yet). If a matching Frame is found within a CmpFrame, 
-*     then a copy of the matching Frame is appended to the FrameSet. The 
-*     returned Frame index refers to this extracted component Frame, rather 
+*     The first and last component Frames within CmpFrames are included
+*     in the search (component Frames in the middle of a CmpFrame cannot
+*     be found as yet). If a matching Frame is found within a CmpFrame,
+*     then a copy of the matching Frame is appended to the FrameSet. The
+*     returned Frame index refers to this extracted component Frame, rather
 *     than the CmpFrame from which it was extracted.
 
 *  Arguments:
 *     TARGET = INTEGER (Given)
 *        An AST pointer for a FrameSet containing the Frames to be
-*        searched. 
+*        searched.
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        The Domain name to be searched for.
 *     IFRM = INTEGER (Returned)
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,13 +73,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -110,7 +110,7 @@
 *  Initialise returned values.
       IFRM = AST__NOFRAME
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start an AST context.
@@ -131,7 +131,7 @@
          IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. DOMAIN ) THEN
             IFRM = I
             GO TO 999
-         END IF         
+         END IF
 
 *  Annul the Frame pointer.
          CALL AST_ANNUL( FRM, STATUS )
@@ -156,15 +156,15 @@
 
 *  Indicate we have found no axes for the required Domain yet.
                NOUT = 0
-    
+
 *  Check each axis of the CmpFrame.
                DO J = 1, NAX
 
 *  Pick this axis from the CmpFrame. This creates a 1-D Frame.
-                  AXFRM = AST_PICKAXES( FRM, 1, J, MAP, STATUS ) 
+                  AXFRM = AST_PICKAXES( FRM, 1, J, MAP, STATUS )
 
 *  Does this axis belong to the required Domain?
-                  IF( AST_GETC( AXFRM, 'DOMAIN', STATUS ) .EQ. 
+                  IF( AST_GETC( AXFRM, 'DOMAIN', STATUS ) .EQ.
      :                DOMAIN ) THEN
 
 *  If so, add it to the list of axes to be copied.
@@ -174,7 +174,7 @@
 
 *  Otherwise, indicate that a PermMap would assign the first constant value
 *  (which will be 0.0) to the axis.
-                  ELSE 
+                  ELSE
                      INPRM( J ) = -1
                   END IF
 
@@ -183,7 +183,7 @@
 *  If some axes belonging to the required Domain were found, extract them
 *  into a Frame.
                IF( NOUT .GT. 0 ) THEN
-                  FMATCH = AST_PICKAXES( FRM, NOUT, OUTPRM, MAP, 
+                  FMATCH = AST_PICKAXES( FRM, NOUT, OUTPRM, MAP,
      :                                   STATUS )
 
 *  Create a PermMap which will map values in the CmpFrame into the sub-Frame
@@ -192,7 +192,7 @@
 *  user supplied the values to use for these un-used axes. Anyway,
 *  assigning zero is better than assigning AST__BAD since this would result
 *  in the inverse mapping producing unusable positions.
-                  MAP = AST_PERMMAP( NAX, INPRM, NOUT, OUTPRM, 0.0D0, 
+                  MAP = AST_PERMMAP( NAX, INPRM, NOUT, OUTPRM, 0.0D0,
      :                               ' ', STATUS )
 
 *  Save the index of the Current Frame in the target FrameSet.
@@ -212,7 +212,7 @@
 
                END IF
 
-            END IF         
+            END IF
 
 *  Annul the Frame pointer.
             CALL AST_ANNUL( FRM, STATUS )
@@ -229,4 +229,4 @@
 *  End the AST context.
       CALL AST_END( STATUS )
 
-      END 
+      END

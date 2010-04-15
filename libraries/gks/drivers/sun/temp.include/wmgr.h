@@ -12,7 +12,7 @@
  * A menu interface to these functions is also provided.
  * Typically, a tool window is responsible for window management.
  */
- 
+
 /*
  * The following menu is initialized and available to a user program once
  * wmgr_setupmenu is called.  It can be stacked with over menus and
@@ -81,7 +81,7 @@ int		wmgr_set_placeholders(/* orect, irect */);
  * Figure_xxx_rect establishes a new rect for one tool, without
  *	requiring the tool's windowfd;  this implies the window should
  *	not yet be in the display tree when these routines are called.
- * Acquire_xxx_rect does the same job, but takes care of removing / 
+ * Acquire_xxx_rect does the same job, but takes care of removing /
  *	reinserting the window in the display tree.
  * Inquire_xxx_rect returns the same information Aquire would,
  *	without advancing the global positioning information.

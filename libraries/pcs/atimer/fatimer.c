@@ -13,7 +13,7 @@
 *     Provides a Fortran callable interface to ATIMER_SETTIMR
 *     and ATIMER_CANTIM which set and cancel millisecond timers.
 *     A C routine has to be written as the handler routine, specified
-*     in the SSETTIMR call, which is called directly by the ATIMER system. 
+*     in the SSETTIMR call, which is called directly by the ATIMER system.
 *     The C handler may be written as follws to call a handler written
 *     in Fortran:
 *
@@ -63,7 +63,7 @@
 
 *-
 */
-      
+
 /* Include Statements: */
 #include "sae_par.h"
 #include "f77.h"
@@ -85,7 +85,7 @@
 
 *  Description:
 *     Cancels the ATIMER timer with the specified id.
-*     The value of the id is obtained and specified in a call to 
+*     The value of the id is obtained and specified in a call to
 *     atimer_settimr.
 
 *  Arguments:
@@ -134,7 +134,7 @@
 /* Function Definition: */
 F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
 {
-/* Exit if bad given status 
+/* Exit if bad given status
 */
    if ( *status != SAI__OK ) return;
 
@@ -159,7 +159,7 @@ F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
 
 *  Description:
 *     Cancels the ATIMER timer with the specified id.
-*     The value of the id is obtained and specified in a call to 
+*     The value of the id is obtained and specified in a call to
 *     atimer_settimr.
 
 *  Arguments:
@@ -207,13 +207,13 @@ F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
 
 *-
 */
-      
+
 /* Function Definition: */
-F77_SUBROUTINE(fatimer_settimr)( INTEGER(delay), INTEGER(id), 
+F77_SUBROUTINE(fatimer_settimr)( INTEGER(delay), INTEGER(id),
                                  void (*handler)(), INTEGER(status) )
 {
 
-/* Exit if bad given status 
+/* Exit if bad given status
 */
    if ( *status != SAI__OK ) return;
 

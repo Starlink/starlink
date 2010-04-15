@@ -1,5 +1,5 @@
-	SUBROUTINE LINCONT_LIN( DIMS_BIAS_1, DIMS_BIAS_2, BIAS_ARRAY, 
-     :                          NCBIAS, DIMS_IMAGE_1, DIMS_IMAGE_2, 
+	SUBROUTINE LINCONT_LIN( DIMS_BIAS_1, DIMS_BIAS_2, BIAS_ARRAY,
+     :                          NCBIAS, DIMS_IMAGE_1, DIMS_IMAGE_2,
      :	                        IMAGE_ARRAY, NCIMAGE, NUMCOEFFS, COEFFS)
 
 * Description : Subtracts scaled bias from image and applies linearization
@@ -31,7 +31,7 @@
      :	  IMAGE_ARRAY( DIMS_IMAGE_1, DIMS_IMAGE_2), ! data image
      :	  COEFFS( NUMCOEFFS),                           ! coefficients
      :	  VALMBIAS,                                     ! data-bias
-     :	  VALLIN                                        ! corrected data 
+     :	  VALLIN                                        ! corrected data
 
 *       Initialize adam status
 
@@ -48,7 +48,7 @@
 
 	    IF( NCIMAGE .GT. 0 .AND. NCBIAS .GT. 0) THEN
 
-	      VALMBIAS = ( IMAGE_ARRAY( K, J)/REAL( NCIMAGE) - 
+	      VALMBIAS = ( IMAGE_ARRAY( K, J)/REAL( NCIMAGE) -
      :	                   BIAS_ARRAY( K, J)/REAL( NCBIAS))
 
 	    ELSE
@@ -70,7 +70,7 @@
 *          put linearized pixel back into data pixel after scaling up by the
 *          number of coadds in raw data image and adding scaled bias back in
 
-	    IMAGE_ARRAY( K, J) = ( VALLIN + 
+	    IMAGE_ARRAY( K, J) = ( VALLIN +
      :	               BIAS_ARRAY( K, J)/REAL( NCBIAS))*NCIMAGE
 
 	  END DO

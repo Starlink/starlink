@@ -49,9 +49,9 @@
 
       IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRSETS - No PGPLOT device open',
-     :   GRNODO) 
+     :   GRNODO)
       ELSE IF (.NOT.GRWSOP(GRCIDE)) THEN
-         CALL ERR_REP('GRNOPG', 
+         CALL ERR_REP('GRNOPG',
      :   'GRSETS - workstation was not opened by PGPLOT', GRNOPG)
       ELSE
 
@@ -103,7 +103,7 @@
          GRWIN2(2,GRCIDE) = XDC*REAL(LX-1)/XM
          GRWIN2(3,GRCIDE) = 0.0
          GRWIN2(4,GRCIDE) = YDC*REAL(LY-1)/YM
-        
+
 *   Save workstation size
         GRXMAX(GRCIDE) = XDC*REAL(LX-1)/XM
         GRYMAX(GRCIDE) = YDC*REAL(LY-1)/YM

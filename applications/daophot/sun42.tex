@@ -9,17 +9,17 @@
 \newcommand{\stardocnumber}    {42.5}
 \newcommand{\stardocauthors}   {Nicholas Eaton and Grant Privett}
 \newcommand{\stardocdate}      {6 December 1996}
-\newcommand{\stardoctitle}     {DAOPHOT 
+\newcommand{\stardoctitle}     {DAOPHOT
 
 Stellar Photometry Package}
 \newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {Introduction}
 \newcommand{\stardocabstract}  {
-DAOPHOT is a stellar photometry package designed by Peter Stetson at DAO to deal 
+DAOPHOT is a stellar photometry package designed by Peter Stetson at DAO to deal
 with crowded fields. The package performs various tasks including
 finding objects, aperture photometry, obtaining the point-spread function, and
 profile-fitting photometry. Profile fitting in crowded regions is performed
-iteratively, which improves the accuracy of the photometry. 
+iteratively, which improves the accuracy of the photometry.
 }
 % ? End of document identification
 
@@ -52,7 +52,7 @@ iteratively, which improves the accuracy of the photometry.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -121,7 +121,7 @@ iteratively, which improves the accuracy of the photometry.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -206,12 +206,12 @@ iteratively, which improves the accuracy of the photometry.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -249,18 +249,18 @@ iteratively, which improves the accuracy of the photometry.
 \section{\xlabel{INTRODUCTION}Introduction}
 \label{sec:intro}
 
-DAOPHOT is a stellar photometry package designed by Peter Stetson at DAO to deal 
+DAOPHOT is a stellar photometry package designed by Peter Stetson at DAO to deal
 with crowded fields. The package performs various tasks including
 finding objects, aperture photometry, obtaining the point-spread function, and
 profile-fitting photometry. Profile fitting in crowded regions is performed
-iteratively, which improves the accuracy of the photometry. 
+iteratively, which improves the accuracy of the photometry.
 
 This document is an introduction to DAOPHOT II: The Next Generation. It replaces
 the previous version which is known as DAOPHOT Classic. The main changes concern
 the choice of the point-spread fitting function and the handling of under-sampled
 data. This version uses image data written in NDF, the Starlink N-Dimensional
 Data Format \xref{(SUN/33)}{sun33}{}, that contain a DATA\_ARRAY component
-and have an extension {\tt .sdf}. 
+and have an extension {\tt .sdf}.
 
 A document written by Peter Stetson (DAOPHOT: A computer program for crowded-field
 stellar photometry, Publ.astr.Soc.Pacific, {\bf 99}, 191-222, 1987)
@@ -270,7 +270,7 @@ is also available through Starlink.
 DAOPHOT does not directly use an image display, which is one of the reasons why the
 package has been successfully ported round the world. Three additional routines
 have therefore been supplied which allow results obtained with DAOPHOT to be
-displayed on an image device. 
+displayed on an image device.
 
 The routine DAOGREY (see \S{\ref{sec:daogrey}})
 will display a grey scale image of the data on a suitable
@@ -281,10 +281,10 @@ will put up a cursor on the display to allow positions to
 be measured from the screen. Although KAPPA (\xref{SUN/95}{sun95}{}) routines could
 be used for the image display and cursor interaction, DAOPHOT does not comply with
 the Starlink coordinate system convention (\xref{SUN/33}{sun33}{}) and thus any
-coordinates would be half a pixel out. 
+coordinates would be half a pixel out.
 
 DAOPHOT is copyright of Peter Stetson at the Dominion Astrophysical Observatory.
-The algorithms should not be changed without permission. 
+The algorithms should not be changed without permission.
 
 
 \section{\xlabel{RUNNING}Running DAOPHOT}
@@ -297,14 +297,14 @@ DAOPHOT is invoked by the simple command:
         % daophot
 \end{verbatim}
 
-this should generate a response similar to: 
+this should generate a response similar to:
 
 \begin{verbatim}
         DAOPHOT applications are now available -- (Version 1.2)
 \end{verbatim}
 
 Subsequent use of {\tt daophot} will place you inside the DAOPHOT executable image,
-which you can leave with the command: 
+which you can leave with the command:
 
 \begin{verbatim}
         Command: EXIT
@@ -318,7 +318,7 @@ using the command:
 \end{verbatim}
 
 The file has to be in the NDF format of the Starlink Standard Data Structures
-\xref{(SUN/33)}{sun33}{}. The default file extension is {\tt .sdf}. 
+\xref{(SUN/33)}{sun33}{}. The default file extension is {\tt .sdf}.
 
 At present DAOPHOT can only handle NDF files that have the DATA\_ARRAY structure at
 the top level. If the program fails to find the data structure in the container
@@ -330,7 +330,7 @@ file, then the message:
 
 will be displayed. If you do not expect this message, then this is the moment to
 seek help from your system manager. If you do not get this message, then you can
-carry on with DAOPHOT. 
+carry on with DAOPHOT.
 
 The complete set of DAOPHOT commands can be found in the user's manual (MUD/9).
 
@@ -354,10 +354,10 @@ various stages of processing and the user guide keeps stressing that it is highl
 advisable to have the most accurate values as possible for these parameters.
 Although the program will execute with guesstimates for these, the results should
 be treated with caution. The sections on the {\bf PEAK} and {\bf NSTAR} commands in
-the user guide suggest a method of checking the validity of the values given. 
+the user guide suggest a method of checking the validity of the values given.
 
 The file {\tt photo.opt} contains the list of aperture radii used by DAOPHOT when
-performing aperture photometry. 
+performing aperture photometry.
 
 An alternative to the iterative profile fitting routine NSTAR in DAOPHOT has been
 written by Peter Stetson and is called ALLSTAR. It is described in the user manual
@@ -375,10 +375,10 @@ The file {\tt allstar.opt} contains parameters for this program.
 DAOPHOT does not directly use an image display, instead it produces image files of
 intermediate results which can be displayed on any available display system. It is
 often desirable to indicate the positions of stars on top of the displayed image.
-To achieve this some special routines have been created. 
+To achieve this some special routines have been created.
 
 DAOGREY is the first of these routines and this will display the image data on a
-suitable device. 
+suitable device.
 It is executed by typing:
 
 \begin{verbatim}
@@ -390,25 +390,25 @@ The following parameters are requested:
 \begin{description}
 \item[\mbox{}]\mbox{}
 \begin{description}
-\item[IN -- NDF containing input image] 
+\item[IN -- NDF containing input image]
 The name of the file containing the image data.
 \item[XSTART -- first index of subarray]
-\item[XEND  -- second index of subarray] 
+\item[XEND  -- second index of subarray]
 \item[YSTART -- first index of subarray]
-\item[YEND  -- second index of subarray] 
+\item[YEND  -- second index of subarray]
 
 These specify the limits in pixel coordinates of the area of the data array to
 be plotted.
 
 The choice of values allows subsections of the data to be viewed.
 
-\item[LOW -- lowest data value to plot] 
-\item[HIGH -- highest data value to plot] 
+\item[LOW -- lowest data value to plot]
+\item[HIGH -- highest data value to plot]
 
 These specify the data values corresponding to black and white on the display.
 The grey levels in between are set automatically.
 
-\item[DEVICE -- Display device] 
+\item[DEVICE -- Display device]
 
 The name of the display device to be used.
 The image is plotted in the centre of the display, best filling the display
@@ -425,7 +425,7 @@ in the file on top of the grey image produced by DAOGREY. The positions are
 indicated by a green cross. The file can be any of the types {\tt .coo}, {\tt .ap},
 {\tt .grp} or {\tt .nst} produced by DAOPHOT. If the file is not suitable then
 error messages will be given and the routine will end. If the filename was entered
-wrongly, then just run the task again. 
+wrongly, then just run the task again.
 
 To run DAOPLOT simply type:
 
@@ -451,7 +451,7 @@ DAOCURS will display a cursor over the grey image produced by DAOGREY so that
 positions can be read off the screen. The cursor is positioned with the mouse and
 the position recorded by pressing any of the keys, except the break key on the
 mouse. The break key ends the cursor session. Positions are written to the terminal
-as well as a file. 
+as well as a file.
 
 To run DAOCURS type:
 \begin{verbatim}
@@ -463,7 +463,7 @@ The following parameter is requested:
 \begin{description}
 \item[\mbox{}]\mbox{}
 \begin{description}
-\item[RFILE -- File for results]  
+\item[RFILE -- File for results]
 The name of the file to receive the positions selected by the cursor operation.
 \end{description}
 \end{description}
@@ -476,7 +476,7 @@ and DAOCURS will not at present work on an image displayed with any routine othe
 than DAOGREY. DAOGREY uses the AGI database system (\xref{SUN/48}{sun48}{}) to
 record the position of the image on the screen. DAOPLOT and DAOCURS use the
 database file to set up the screen coordinates. When an entire session has been
-completed the database file can be deleted. 
+completed the database file can be deleted.
 
 \end{document}
 

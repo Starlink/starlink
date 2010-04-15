@@ -1,6 +1,6 @@
 ************************************************************************
       REAL FUNCTION TGAUSS(I, J, APAR, INTER)
-      
+
 *+
 *  Name :
 *     TGAUSS
@@ -60,39 +60,39 @@
 
 *  Global Constants :
 
-      INCLUDE 'SAE_PAR' 
+      INCLUDE 'SAE_PAR'
 
-*  Arguments Given : 
+*  Arguments Given :
 
       INTEGER I, J
       INTEGER INTER
 
       REAL APAR(6)
-            
+
 *  Arguments Given and Returned :
- 
+
 *  Arguments Returned :
 
-*  Local Variables :  
+*  Local Variables :
 
-      
+
       REAL X, Y, WORK, R, THETA
-      
+
 *.
-      
+
       X = REAL(I) - APAR(5)
       Y = REAL(J) - APAR(6)
-      
+
 *   Convert to R,THETA co-odinate system
 
       R = SQRT(X*X + Y*Y)
-      
+
 *   If R is zero then the function will come out OK whatever theta is,
 *   otherwise find theta, getting the quadrant right
 
       IF(ABS(R) .GT. 0.0) THEN
-      
-*   Replace the functionality of the F90 SIGN() call    
+
+*   Replace the functionality of the F90 SIGN() call
             IF ( Y .GT. 0.0 ) THEN
 	          THETA = -1.0*ACOS(X/R)
             ELSE
@@ -100,25 +100,25 @@
             ENDIF
       ELSE
             THETA = 0.0
-      ENDIF 
-      
-      WORK = R*R*( (COS(THETA+APAR(3))/APAR(1))**2.0 
+      ENDIF
+
+      WORK = R*R*( (COS(THETA+APAR(3))/APAR(1))**2.0
      :       + (SIN(THETA+APAR(3))/APAR(2))**2.0 )
       TGAUSS = APAR(4)*EXP(-1.0*WORK)
 
-           
+
 *   End of routine
 
   99  CONTINUE
 
-      END       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-         
+      END
+
+
+
+
+
+
+
+
+
+

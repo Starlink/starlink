@@ -13,7 +13,7 @@ c     M  is an integer 0.lt.M.le.13, set by user.
 c     S is a vector S(j) = sin(2*pi*j/np ), j = 1,2,....,np/4-1,
 c     computed by program.
 c     IFS is a parameter to be set by user as follows-
-c     IFS = 1 to set n = np = 2**m, set up sin table (if required), 
+c     IFS = 1 to set n = np = 2**m, set up sin table (if required),
 c     and do a fourier transform, replacing the vector a by
 c
 c     x(j) = sum over k = 0,n-1 of A(k)*exp(2*pi*i/n)**(j*k),

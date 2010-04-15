@@ -15,7 +15,7 @@
 *  Description:
 *     The LOGICAL value is encoded into 'T' or 'F' which is then
 *     copied into the given string beginning at position IPOSN+1.
-*     IPOSN is is returned updated to indicate the end position 
+*     IPOSN is is returned updated to indicate the end position
 *     of the encoded logical value within STRING.
 
 *  Arguments:
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

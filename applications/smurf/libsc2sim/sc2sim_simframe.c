@@ -283,7 +283,7 @@ void sc2sim_simframe
 
   /* Sample astronomical sky image */
   if( *status == SAI__OK ) {
-    sc2sim_getast_wcs( inx.colsize, inx.rowsize, xbolo, ybolo, bolo2map, astsim, astnaxes, 
+    sc2sim_getast_wcs( inx.colsize, inx.rowsize, xbolo, ybolo, bolo2map, astsim, astnaxes,
                        sinx.interp, sinx.params, dbuf, status);
   }
 

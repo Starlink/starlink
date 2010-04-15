@@ -19,7 +19,7 @@
  *
  *     This version is the generic form for the float, double, int,
  *     short, unsigned short, char and unsigned char versions. Just
- *     include this in the appropriate stub after setting the 
+ *     include this in the appropriate stub after setting the
  *     values of the macros:
  *
  *        IMG_F77_TYPE   = (r|d|l|i|w|uw|b|ub)
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
  *        Original version
  *     24-May-1996 (PDRAPER):
  *        Added code to handle pointer arrays correctly. Made into
- *        generic include file. 
+ *        generic include file.
  *     10-JUN-1996 (PDRAPER):
  *        Converted to use more C-like names.
  *     21-APR-1999 (PDRAPER):
@@ -95,12 +95,12 @@ IMGOUT( IMG_SHORT_C_TYPE ) ( char *param1,
                              char *param2,
                              IMG_FULL_C_TYPE **ip,
                              int *status ) {
-  
+
    DECLARE_CHARACTER_DYN( fparam1 );
    DECLARE_CHARACTER_DYN( fparam2 );
    DECLARE_POINTER_ARRAY_DYN( fip );
    int nparam;
-  
+
    /*  Count the number of output parameters and create enough space for
        the corresponding Fortran pointers */
    nparam = img1CountParams( param2, status );

@@ -62,7 +62,7 @@ C  Zero the existing data
       CALL INITHD
       CALL INIT_ARRAY (LSTK-128, DATA, 0.0)
 
-C  Open the GSD file 
+C  Open the GSD file
 
       CALL SPECX_GSD_OPEN   (GSD_SCAN, IERR)
       IF (IERR.NE.0) GO TO 99
@@ -78,7 +78,7 @@ C  Read file header according to version
          CALL SPECX_GSD_V4_HEADER (IERR)
          IF (IERR .NE. 0) GOTO 98
 
-      ELSE 
+      ELSE
 
          CALL SPECX_GSD_V5_HEADER (IERR)
          IF (IERR .NE. 0) GOTO 98
@@ -145,7 +145,7 @@ C Now really do the check to see if INDEX is too large
 
       END IF
 
-      WRITE (ITITLE(:9),'(I4.4,''.'',I4.4)',IOSTAT=ISTAT) 
+      WRITE (ITITLE(:9),'(I4.4,''.'',I4.4)',IOSTAT=ISTAT)
      &       GSD_SCAN,INDEX
 
 C  Read data according to GSD version
@@ -215,7 +215,7 @@ C  Local variables
      &          // ''',/,'
       END DO
 
-      PROMPT = PROMPT(:GEN_ILEN(PROMPT)) 
+      PROMPT = PROMPT(:GEN_ILEN(PROMPT))
      &           // '''$Which one do you want? ''"'
 
       RETURN

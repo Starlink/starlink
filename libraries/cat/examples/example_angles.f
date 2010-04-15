@@ -41,7 +41,7 @@
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CI,       ! Catalogue identifier.
      :  RAI,      ! Identifier for column of Right Ascension.
      :  DECI,     !     "       "    "    "  Declination.
@@ -114,7 +114,7 @@
 *       Report success or failure creating the catalogue, as appropriate.
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL MSG_OUT (' ', 'Catalogue created successfully.', 
+            CALL MSG_OUT (' ', 'Catalogue created successfully.',
      :        STATUS)
          ELSE
             CALL ERR_REP ('EXAMPLE_ANGLES_ERR', 'Failed to create '/

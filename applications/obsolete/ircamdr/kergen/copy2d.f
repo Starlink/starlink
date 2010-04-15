@@ -29,7 +29,7 @@
 *    History :
 *     01/12/1983 : Original version                     (ROE::ASOC5)
 *     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
-*     15-JULY-1994 Changed arguments to input DIMS separately 
+*     15-JULY-1994 Changed arguments to input DIMS separately
 *                  so that routine will still compile (SKL@JACH)
 *
 *    Type Definitions :

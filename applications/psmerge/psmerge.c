@@ -15,9 +15,9 @@
 *  Description:
 *     The command parameters are a list of EPS files each optionally
 *     preceeded by -s -t and -r to specify a scale factor, translation (in
-*     points) and rotation (in degrees anti-clockwise). The transformations 
+*     points) and rotation (in degrees anti-clockwise). The transformations
 *     are applied in the order given and are cumulative (ie. -r45 -r45 will
-*     rotation the picture by 90 degrees) but the transformation is  reset 
+*     rotation the picture by 90 degrees) but the transformation is  reset
 *     to the identity transformation after each EPS file.
 *
 *     The x and y values for -s and -t are separated by a single character
@@ -68,9 +68,9 @@
    comments the process would be relatively simple: The output file
    needs some preamble comments, some magic to get the coordinate origin
    to the bottom left corner of the printable area of the page (unless
-   we are writing an EPS file), then for each file to be merged, a 
+   we are writing an EPS file), then for each file to be merged, a
    BEGINEPSFILE command, an appropriate scale, translate or rotate
-   command as each qualifier is encountered, the contents of the file 
+   command as each qualifier is encountered, the contents of the file
    followed by an ENDEPSFFILE command, and finally a showpage command
    and some trailing comments.
 
@@ -148,7 +148,7 @@ int main( int argc, char *argv[] )
 /*
  *  handle the case of no arguments at all.
  */
-    if ( argc < 2 ) 
+    if ( argc < 2 )
     {
         fprintf( stderr, "psmerge: Error: no arguments\n" );
         exit( EXIT_FAILURE );
@@ -165,7 +165,7 @@ int main( int argc, char *argv[] )
     epsf = FALSE;
     for ( i = 1; i < argc; i++ )
     {
-        if ( strcmp( argv[i], "-e" ) == 0 ) 
+        if ( strcmp( argv[i], "-e" ) == 0 )
         {
             epsf = TRUE;
             break;
@@ -194,7 +194,7 @@ int main( int argc, char *argv[] )
     if ( !epsf ) printf( "clippath pathbbox pop pop translate" );
 
 /*
- *  Write definitions of BEGINEPSFILE and ENDEPSFILE. These are taken from 
+ *  Write definitions of BEGINEPSFILE and ENDEPSFILE. These are taken from
  *  the ENCAPSULATED Postscript FILES document V2.0 with the addition of
  *  the re-definition of defaultmatrix which the GKS postscript driver uses.
  *  (this may be a bug in GKS).
@@ -237,7 +237,7 @@ int main( int argc, char *argv[] )
             case 's':			/* scale */
                 xscale = yscale = 0.0;
                 str = argv[i] + 2;
-                pos = strcspn( str, "Xx" ); 
+                pos = strcspn( str, "Xx" );
                 xstr = malloc( strlen(str)+1 );
                 xstr = strncpy( xstr, str, pos );
                 nfields = sscanf( xstr, "%lf", &xscale );
@@ -302,7 +302,7 @@ int main( int argc, char *argv[] )
 		break;
 
             default:
-                fprintf( stderr, 
+                fprintf( stderr,
                     "psmerge: Warning: unrecognised qualifier %s ignored\n",
                     argv[i] );
                 break;
@@ -327,7 +327,7 @@ int main( int argc, char *argv[] )
             {
 
             /*
-             *  Write the BEGINEPSF command and the accumulated 
+             *  Write the BEGINEPSF command and the accumulated
              *  transformation
              */
                 printf( "BEGINEPSFILE\n" );
@@ -366,21 +366,21 @@ int main( int argc, char *argv[] )
                             totalbb.try = y;
                             totalbb.defined = TRUE;
                         }
-    
+
                         x = localbb.llx * t[0] + localbb.try * t[2] + t[4];
                         y = localbb.llx * t[1] + localbb.try * t[3] + t[5];
                         if ( x < totalbb.llx ) totalbb.llx = x;
                         if ( x > totalbb.trx ) totalbb.trx = x;
                         if ( y < totalbb.lly ) totalbb.lly = y;
                         if ( y > totalbb.try ) totalbb.try = y;
-    
+
                         x = localbb.trx * t[0] + localbb.try * t[2] + t[4];
                         y = localbb.trx * t[1] + localbb.try * t[3] + t[5];
                         if ( x < totalbb.llx ) totalbb.llx = x;
                         if ( x > totalbb.trx ) totalbb.trx = x;
                         if ( y < totalbb.lly ) totalbb.lly = y;
                         if ( y > totalbb.try ) totalbb.try = y;
-    
+
                         x = localbb.trx * t[0] + localbb.lly * t[2] + t[4];
                         y = localbb.trx * t[1] + localbb.lly * t[3] + t[5];
                         if ( x < totalbb.llx ) totalbb.llx = x;
@@ -393,7 +393,7 @@ int main( int argc, char *argv[] )
 		     *  warn the user that there was no bounding box
 		     */
 		    {
-                        fprintf( stderr, 
+                        fprintf( stderr,
 			    "psmerge: Error: %s has no bounding box\n",
                 	    argv[i] );
 		    }
@@ -414,7 +414,7 @@ int main( int argc, char *argv[] )
     printf( "showpage\n" );
     printf( "%%%%Trailer\n");
     if ( epsf & totalbb.defined )
-        printf( "%%%%BoundingBox: %d %d %d %d\n", (int)totalbb.llx, 
+        printf( "%%%%BoundingBox: %d %d %d %d\n", (int)totalbb.llx,
 	    (int) totalbb.lly, (int)totalbb.trx, (int)totalbb.try );
 
     exit( EXIT_SUCCESS );
@@ -423,7 +423,7 @@ int main( int argc, char *argv[] )
 void ProcessFile( FILE *file, struct bb_tag *bb )
 {
 /*
- *  Copy from file to the standard output looking for "structured" comments 
+ *  Copy from file to the standard output looking for "structured" comments
  *  (a line starting with %% as we go.
  */
     char comment[257];
@@ -467,7 +467,7 @@ void ProcessFile( FILE *file, struct bb_tag *bb )
                     {
                         /* Pages and Page comments are thrown away */
                     }
-                    else if ( strncmp( "BoundingBox:", comment, 
+                    else if ( strncmp( "BoundingBox:", comment,
                         12 ) == 0 )
                     {
                         if ( epsf && ( atend || (!bb->defined) ) )
@@ -479,21 +479,21 @@ void ProcessFile( FILE *file, struct bb_tag *bb )
                             else
                             {
                                 if ( sscanf( &comment[12], "%lf %lf %lf %lf",
-                                    &(bb->llx), &(bb->lly), &(bb->trx), 
-                                    &(bb->try) ) == 4 ) 
+                                    &(bb->llx), &(bb->lly), &(bb->trx),
+                                    &(bb->try) ) == 4 )
                                 {
                                      bb->defined = TRUE;
                                 }
                                 else
                                 {
-                                    fprintf( stderr, 
+                                    fprintf( stderr,
                         "psmerge: Warning: invalid bounding box comment: %s\n",
                                        comment );
                                 }
                             }
 			}
                     }
-                    else if ( strncmp( "DocumentFonts:", comment, 
+                    else if ( strncmp( "DocumentFonts:", comment,
                         14 ) == 0 )
                     {
                     }

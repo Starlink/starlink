@@ -1,30 +1,30 @@
 
 
 
-      SUBROUTINE ELF1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
+      SUBROUTINE ELF1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)
 *+
 *  Name:
 *     ELF1_TRANS
 
 *  Purpose:
 *     Transfer data from the mapped NDF to a dynamic memory array.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL ELF1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
+*      CALL ELF1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)
 
 *  Description:
-*      Copies data from the currently mapped source NDF 'DATA' array and 
+*      Copies data from the currently mapped source NDF 'DATA' array and
 *      transfers it into the PSX dynamic memory allocated for temporary
 *      storage. All manipulation is then carried out on that. The routine
-*      allows it to be refreshed whenever a new profile is required. 
-*      
+*      allows it to be refreshed whenever a new profile is required.
+*
 
-*  Arguments:               
+*  Arguments:
 *     ELEMS = INTEGER (Given)
-*        Number of elements in the data NDF.                  
+*        Number of elements in the data NDF.
 *     ARRAY0(ELEMS) = REAL (Given)
 *        Array containing the mapped NDF data region.
 *     ARRAY1(ELEMS) = REAL (Returned)
@@ -46,27 +46,27 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the NDF array
       REAL ARRAY0(ELEMS)              ! The mapped NDF data array
 
 *  Arguments Returned:
-      REAL ARRAY1(ELEMS)              ! Dynamic array into which the 
-                                      ! mapped NDF data region is copied 
+      REAL ARRAY1(ELEMS)              ! Dynamic array into which the
+                                      ! mapped NDF data region is copied
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
       INTEGER I                       ! Temporary loop variable
 *.
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Transfer data from the mapped NDF array to the dynamic memory array.
       DO 10 I=1,ELEMS
@@ -80,30 +80,30 @@
 
 
 
-      SUBROUTINE ELP1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
+      SUBROUTINE ELP1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)
 *+
 *  Name:
 *     ELP1_TRANS
 *
 *  Purpose:
 *     Transfer data from the mapped NDF to a dynamic memory array.
-*     
+*
 *  Language:
 *     Starlink Fortran 77
 *
 *  Invocation:
-*      CALL ELP1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
+*      CALL ELP1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)
 *
 *  Description:
-*      Copies data from the currently mapped source NDF 'DATA' array and 
+*      Copies data from the currently mapped source NDF 'DATA' array and
 *      transfers it into the PSX dynamic memory allocated for temporary
 *      storage. All manipulation is then carried out on that. The routine
-*      allows it to be refreshed whenever a new profile is required. 
-*      
+*      allows it to be refreshed whenever a new profile is required.
 *
-*  Arguments:               
+*
+*  Arguments:
 *     ELEMS = INTEGER (Given)
-*        Number of elements in the data NDF.                  
+*        Number of elements in the data NDF.
 *     ARRAY0(ELEMS) = REAL (Given)
 *        Array containing the mapped NDF data region..
 *     ARRAY1(ELEMS) = REAL (Returned)
@@ -125,27 +125,27 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the NDF array
       REAL ARRAY0(ELEMS)              ! The mapped NDF data array
 
 *  Arguments Returned:
-      REAL ARRAY1(ELEMS)              ! Dynamic array into which the 
-                                      ! mapped NDF data region is copied 
+      REAL ARRAY1(ELEMS)              ! Dynamic array into which the
+                                      ! mapped NDF data region is copied
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
       INTEGER I                       ! Temporary loop variable
 *.
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Transfer data from the mapped NDF array to the dynamic memory array.
       DO 10 I=1,ELEMS
@@ -157,7 +157,7 @@
       END
 
 
-      SUBROUTINE GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,ARRAY1,    
+      SUBROUTINE GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,ARRAY1,
      :                      ARRAY2,XCO,YCO,RLIM,PRANGE,
      :                      UPIX,GUESS,STATUS)
 *+
@@ -166,37 +166,37 @@
 
 *  Purpose:
 *     Establish those parts of the image that will contribute.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,ARRAY1,ARRAY2,
-*                      XCO,YCO,RLIM,PRANGE,UPIX,GUESS,STATUS)    
+*                      XCO,YCO,RLIM,PRANGE,UPIX,GUESS,STATUS)
 
 *  Description:
 *      An image is constructed on which only the pixels which
 *      will contribute to the test summation are present
 *      as non-zero values.
 *
-*      This is done by setting the whole image to zero and then 
-*      making a pixel non-zero if one of the sources contribute 
+*      This is done by setting the whole image to zero and then
+*      making a pixel non-zero if one of the sources contribute
 *      to it.
-*      
+*
 *      The image is then scanned through and those pixels that
 *      found to contribute set to the value in the input image.
 
-*  Arguments:               
+*  Arguments:
 *     NSOUR = INTEGER (Given)
-*        Number of sources.       
+*        Number of sources.
 *     BACK = REAL (Given)
-*        The sky background count.          
+*        The sky background count.
 *     SIGMA = REAL (Given)
 *        Standard deviation of the background.
 *     NSIGMA = REAL (Given)
 *        Number of std dev above sky at which pixels are signicant
 *     ELEMS = INTEGER (Given)
-*        Number of elements in the data NDF. 
+*        Number of elements in the data NDF.
 *     ARRAY1(ELEMS) = REAL (Given)
 *        Array containing the mapped NDF data region..
 *     ARRAY2(ELEMS) = REAL (Given and Returned)
@@ -230,12 +230,12 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the NDF array
       INTEGER NSOUR                   ! Number of sources
       INTEGER PRANGE(2)               ! Width of the image
@@ -250,10 +250,10 @@
 *  Arguments Returned:
       INTEGER UPIX                    ! Number of pixels used
       REAL ARRAY2(ELEMS)              ! Dynamic array into which the
-                                      ! mapped NDF data region is copied 
+                                      ! mapped NDF data region is copied
       REAL GUESS(10,7)                ! Initial source parameters
-     
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -274,15 +274,15 @@
       REAL RMAX                       ! MAximum radius
       REAL R1                         ! Temporary radius
       REAL R2                         ! Temporary radius
-     
+
       REAL SQMAX                      ! Radius squared
       REAL THRESH                     ! Good/bad pixel threshold
       REAL TOTAL                      ! Summation
       REAL VALUE                      ! Pixel value
 *.
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Look around the centre of the object. Find the brightest non-bad pixel.
       DO 5 I=1,NSOUR
@@ -290,43 +290,43 @@
 *   Set the comparison pixel value to low.
          MXP=-1E+20
 
-*      Look around the current centre 
+*      Look around the current centre
          DO 7 Y=INT(YCO(I,1))-7,INT(YCO(I,1))+7
             DO 8 X=INT(XCO(I,1))-7,INT(XCO(I,1))+7
 
 *            Check that the pixel is within the image.
                IF ((X.GE.1).AND.(X.LE.PRANGE(1)).AND.(Y.GE.1)
      :            .AND.(Y.LE.PRANGE(2))) THEN
- 
+
 *               Get the pixel address.
-                  ADDR=(Y-1)*PRANGE(1)+X               
+                  ADDR=(Y-1)*PRANGE(1)+X
 
 *               Get the pixel value.
                   VALUE=ARRAY1(ADDR)
 
 *               Check that it was not a BAD pixel.
                   IF (VALUE.NE.VAL__BADR) THEN
-                     
+
 *                  Check to see if its brightest.
                      IF(VALUE.GT.MXP) MXP=VALUE
 
                  END IF
 
                END IF
-              
+
  8          CONTINUE
  7       CONTINUE
 
 *      Normalise the peak value.
          IF (MXP.GT.-1E+19) THEN
-            GUESS(I,4)=MXP-BACK   
+            GUESS(I,4)=MXP-BACK
          ELSE
             GUESS(I,4)=-1E20
          END IF
 
  5    CONTINUE
 
-*   Look at sources for which the radius has been defined as BAD and 
+*   Look at sources for which the radius has been defined as BAD and
 *   try to determine a sensible estimate for RLIM.
       DO 2 I=1,NSOUR
 
@@ -341,7 +341,7 @@
                R1=ABS(PRANGE(1)-XCO(I,1))
                R2=ABS(PRANGE(2)-YCO(I,1))
                RMAX=MAX(R1,R2)
-               
+
 *            Look outward from it until the first bad pixel or
 *            first pixels below .75 the brightness of the core are found.
                VALUE=GUESS(I,4)
@@ -360,7 +360,7 @@
      :                (Y.GE.1).AND.(Y.LE.PRANGE(2))) THEN
 
 *                  Calc the array offset.
-                     ADDR=(INT(Y)-1)*PRANGE(1)+INT(X) 
+                     ADDR=(INT(Y)-1)*PRANGE(1)+INT(X)
 
 *                  Get the pixel value.
                      VALUE=ARRAY1(ADDR)-BACK
@@ -372,14 +372,14 @@
 
 *               Increment the radius.
                   R=R+1.
-                  
+
                END DO
- 
-*            Look through the array and find the point at which the pixel 
+
+*            Look through the array and find the point at which the pixel
 *            value at a given radius started to increase again.
                IF (R.GT.2) THEN
 
-*               Look through the array from outside edge looking for 
+*               Look through the array from outside edge looking for
 *               the last time the outer pixel value was greater than
 *               the inner pixel value.
                   J=INT(R)+1
@@ -387,7 +387,7 @@
                      IF(PATR(K).GT.PATR(K-2)+SIGMA) J=K
  6                CONTINUE
                   R=REAL(J)
-                 
+
                END IF
 
 *            Increment the counter.
@@ -398,18 +398,18 @@
 
 *         Calculate the average radius.
             RLIM(I)=TOTAL/REAL(N)
-           
+
 *         Correct the radius of the sources if necessary
             IF (RLIM(I).LT.2.) RLIM(I)=2.
-      
+
 *         Display the value used.
             IF (I.EQ.1) CALL MSG_BLANK(STATUS)
             CALL MSG_FMTR('X','F6.1',XCO(I,1))
             CALL MSG_FMTR('Y','F6.1',YCO(I,1))
             CALL MSG_FMTR('R','F6.1',RLIM(I))
             CALL MSG_OUT(' ','Radius of source at ^X, ^Y '//
-     :                ' was set to ^R pixels.',STATUS) 
-         
+     :                ' was set to ^R pixels.',STATUS)
+
          END IF
 
  2    CONTINUE
@@ -418,7 +418,7 @@
       DO 10 I=1,ELEMS
          ARRAY2(I)=0.0
  10   CONTINUE
-      
+
 *   For each source in turn mark pixels that are near a source.
       DO 105 I=1,NSOUR
 
@@ -445,21 +445,21 @@
      :             (Y.GE.1).AND.(Y.LE.PRANGE(2))) THEN
 
 *               Find the distance from the source origin.
-                  RADIUS=(REAL(X)-XCO(I,1))**2 + 
+                  RADIUS=(REAL(X)-XCO(I,1))**2 +
      :                   (REAL(Y)-YCO(I,1))**2
-                
+
 *               Abort if radius too big.
                   IF (RADIUS.LT.SQMAX) THEN
-             
+
 *                  Calc the array offset.
-                     ADDR=(Y-1)*PRANGE(1)+X 
+                     ADDR=(Y-1)*PRANGE(1)+X
 
 *                  Get the pixel value.
                      VALUE=ARRAY1(ADDR)
 
 *                  Only allow pixels above the threshold.
                      IF(VALUE.GT.THRESH) ARRAY2(ADDR)=ARRAY2(ADDR)+1
-   
+
 
                   END IF
 
@@ -483,7 +483,7 @@
          ELSE
             ARRAY2(I)=VAL__BADR
          END IF
-      
+
  1000 CONTINUE
 
 *   Nreat spacing.
@@ -494,30 +494,30 @@
       END
 
 
-      SUBROUTINE SEC1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
+      SUBROUTINE SEC1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)
 *+
 *  Name:
 *     SEC1_TRANS
 
 *  Purpose:
 *     Transfer data from the mapped NDF to a dynamic memory array.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL SEC1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
+*      CALL SEC1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)
 
 *  Description:
-*      Copies data from the currently mapped source NDF 'DATA' array and 
+*      Copies data from the currently mapped source NDF 'DATA' array and
 *      transfers it into the PSX dynamic memory allocated for temporary
 *      storage. All manipulation is then carried out on that. The routine
-*      allows it to be refreshed whenever a new profile is required. 
-*      
+*      allows it to be refreshed whenever a new profile is required.
+*
 
-*  Arguments:               
+*  Arguments:
 *     ELEMS = INTEGER (Given)
-*        Number of elements in the data NDF.                  
+*        Number of elements in the data NDF.
 *     ARRAY0(ELEMS) = REAL (Given)
 *        Array containing the mapped NDF data region..
 *     ARRAY1(ELEMS) = REAL (Returned)
@@ -539,27 +539,27 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the NDF array
       REAL ARRAY0(ELEMS)              ! The mapped NDF data array
 
 *  Arguments Returned:
-      REAL ARRAY1(ELEMS)              ! Dynamic array into which the 
-                                      ! mapped NDF data region is copied 
+      REAL ARRAY1(ELEMS)              ! Dynamic array into which the
+                                      ! mapped NDF data region is copied
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
       INTEGER I                       ! Temporary loop variable
 *.
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Transfer data from the mapped NDF array to the dynamic memory array.
       DO 10 I=1,ELEMS

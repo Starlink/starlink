@@ -96,7 +96,7 @@ void smf_set_moving ( AstFrameSet* wcs, int *status ) {
     astsys = astGetC( wcs, "SYSTEM" );
     if ( astsys ) {
       if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-	msgOutif( MSG__DEBUG, "", 
+	msgOutif( MSG__DEBUG, "",
 		  "SMF_SET_MOVING: setting attributes for moving sources", status );
 	astSet( wcs, "SkyRefIs=Origin,AlignOffset=1" );
       }

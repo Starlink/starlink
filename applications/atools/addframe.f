@@ -21,40 +21,40 @@
 
 *  Description:
 *     This application adds a new Frame and an associated Mapping to a
-*     FrameSet so as to define a new coordinate system, derived from one 
-*     which already exists within the FrameSet. The new Frame then becomes 
+*     FrameSet so as to define a new coordinate system, derived from one
+*     which already exists within the FrameSet. The new Frame then becomes
 *     the FrameSet's current Frame.
 
 *  Usage:
 *     addframe this iframe map frame result
 
 *  ADAM Parameters:
-*     FRAME = LITERAL (Read) 
-*        An NDF or text file holding the Frame that describes the new 
-*        coordinate system. This application may also be used to merge 
-*        two FrameSets by supplying a second FrameSet for this argument 
-*        (see SUN/210 for details). If an NDF is supplied, its WCS 
+*     FRAME = LITERAL (Read)
+*        An NDF or text file holding the Frame that describes the new
+*        coordinate system. This application may also be used to merge
+*        two FrameSets by supplying a second FrameSet for this argument
+*        (see SUN/210 for details). If an NDF is supplied, its WCS
 *        FrameSet will be used.
 *     IFRAME = LITERAL (Read)
 *        The integer index or Domain name of the Frame within the
-*        FrameSet which describes the coordinate system upon which the 
-*        new one is to be based (the strings AST__BASE and AST__CURRENT 
+*        FrameSet which describes the coordinate system upon which the
+*        new one is to be based (the strings AST__BASE and AST__CURRENT
 *        may also be supplied).
-*     MAP = LITERAL (Read) 
-*        An NDF or text file holding the Mapping which describes how to 
+*     MAP = LITERAL (Read)
+*        An NDF or text file holding the Mapping which describes how to
 *        convert coordinates from the old coordinate system (described by the
 *        Frame with index IFRAME) into coordinates in the new system. The
-*        Mapping's forward transformation should perform this conversion, 
-*        and its inverse transformation should convert in the opposite 
+*        Mapping's forward transformation should perform this conversion,
+*        and its inverse transformation should convert in the opposite
 *        direction. If an NDF is supplied, the Mapping from the Base
 *        Frame to the Current Frame of its WCS FrameSet will be used.
 *     RESULT = LITERAL (Read)
 *        An NDF or text file to receive the modified FrameSet. If an NDF
-*        is supplied, the WCS FrameSet within the NDF will be replaced by 
+*        is supplied, the WCS FrameSet within the NDF will be replaced by
 *        the new FrameSet, if possible.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original FrameSet to which a 
-*        new Frame is to be added. If an NDF is supplied, the WCS 
+*        An NDF or text file holding the original FrameSet to which a
+*        new Frame is to be added. If an NDF is supplied, the WCS
 *        FrameSet will be used.
 
 *  Copyright:
@@ -112,29 +112,29 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a FrameSet.
-      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS, 
+      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS,
      :                 STATUS )
 
 *  Get the index of the basis Frame.
       CALL ATL1_GTFRM( 'IFRAME', THIS, IFRAME, STATUS )
 
 *  Get a Mapping.
-      CALL KPG1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, 
+      CALL KPG1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP,
      :                 STATUS )
 
 *  Get a Frame.
-      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME,
      :                 STATUS )
 
 *  Add the Frame into the FrameSet.
-      CALL AST_ADDFRAME( THIS, IFRAME, MAP, FRAME, STATUS ) 
+      CALL AST_ADDFRAME( THIS, IFRAME, MAP, FRAME, STATUS )
 
 *  Write the modified FrameSet out.
       CALL ATL1_PTOBJ( 'RESULT', 'THIS', THIS, STATUS )

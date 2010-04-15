@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MEMCS( DATA, VAR, NPIX, NLIN, USEVAR, ILEVEL, 
-     :                       XMARG, YMARG, FILE21, FILE22, SIGMA, MEAN, 
+      SUBROUTINE KPS1_MEMCS( DATA, VAR, NPIX, NLIN, USEVAR, ILEVEL,
+     :                       XMARG, YMARG, FILE21, FILE22, SIGMA, MEAN,
      :                       STATUS )
 *+
 *  Name:
@@ -91,7 +91,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 
 *  Type Definitions:
 
@@ -126,7 +126,7 @@
       INTEGER  ILEVEL
       INTEGER  XMARG
       INTEGER  YMARG
-      
+
 
 *  Arguments Returned:
 
@@ -175,7 +175,7 @@
             FILE22( PIX, LIN ) = 0.0
          END DO
       END DO
-      
+
 
 *  Iinitialise the sums used to find the statistics.
 
@@ -208,11 +208,11 @@
                NSUM1 = NSUM1 + 1
 
                IF( LSTVAL .NE. VAL__BADR ) THEN
-                  SUM2 = SUM2 + ( DATVAL - LSTVAL )**2            
+                  SUM2 = SUM2 + ( DATVAL - LSTVAL )**2
                   NSUM2 = NSUM2 + 1
                END IF
 
-            ENDIF         
+            ENDIF
 
             LSTVAL = DATVAL
 
@@ -244,7 +244,7 @@
 
          SUM2 = 0.0
          NSUM2 = 0
-      
+
          DO LIN  = 1, NLIN
             DO PIX = 1, NPIX
 
@@ -337,14 +337,14 @@
 
 *  If no variances were supplied with the data, set file 22 to hold
 *  the value of 1/sigma were there is valid data. Bad data values and
-*  the blank margin retain the initial accuracy value of zero. This 
+*  the blank margin retain the initial accuracy value of zero. This
 *  causes  MEMSYS3 to give them zero weight in the deconvolution.
 
       IF( .NOT. USEVAR ) THEN
 
          IF( SIGMA .GT. 0.0 ) THEN
             ACC = 1.0 / SIGMA
-   
+
             DO LIN = 1, NLIN
                DO PIX = 1, NPIX
                   IF( DATA( PIX, LIN ) .NE. VAL__BADR ) THEN
@@ -352,7 +352,7 @@
                   END IF
                END DO
             END DO
-   
+
          ELSE
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPS1_MEMCS_ERR3',
@@ -362,7 +362,7 @@
          END IF
 
       END IF
-      
+
 
 *  If required tell the user what the mean data value and noise estimate
 *  are.
@@ -371,7 +371,7 @@
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
 
          CALL MSG_SETR( 'MEAN', MEAN )
-         CALL MSG_OUT( 'REPORT', 
+         CALL MSG_OUT( 'REPORT',
      :                 '  Mean value in the input data is ^MEAN',
      :                  STATUS )
 

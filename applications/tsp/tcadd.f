@@ -9,10 +9,10 @@ C
 C     Function:
 C        Add Channels of a time series dataset
 C
-C     Description:   
+C     Description:
 C        TCADD adds a range of channels of a time series dataset
 C        to produce a 1-dimensional output array. The number of channels
-C        can be one so it can be used to extract a single channel.   
+C        can be one so it can be used to extract a single channel.
 C
 C     Parameters:
 C    (1) INPUT      (TSP, 2D)  The input time series dataset.
@@ -20,23 +20,23 @@ C        FIRST      (Integer)  First channel to extract.
 C        LAST       (Integer)  Last channel to extract.
 C        OUTPUT     (TSP, 1D)  The output binned dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         26/2/1988
 C
 C-
 C
 C  History:
-C    5/12/1993   Original Version.   JAB/AAO 
+C    5/12/1993   Original Version.   JAB/AAO
 C
 
 
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'                          
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'USER_ERR'  
+      INCLUDE 'USER_ERR'
 
 *  Status argument
       INTEGER STATUS
@@ -50,10 +50,10 @@ C
 
 *  Pointers
       INTEGER OPTR,DPTR
-      
-      
+
+
       LOGICAL QZ,UZ,VZ
-      INTEGER FIRST,LAST   
+      INTEGER FIRST,LAST
       INTEGER NUM
 
 *  Get Locators to the input and output datasets
@@ -85,10 +85,10 @@ C
 
       CALL PAR_GET0I('FIRST',FIRST,STATUS)
       CALL PAR_GET0I('LAST',LAST,STATUS)
-           
+
 *  Map intensity data
 
-         CALL TSP_MAP_DATA(ILOC,'READ',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(ILOC,'READ',DPTR,DLOC,STATUS)
          CALL TSP_MAP_DATA(OLOC,'UPDATE',OPTR,ODLOC,STATUS)
 
 *  Correct Intensity data
@@ -96,7 +96,7 @@ C
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,%VAL(OPTR))
          ENDIF
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
          CALL TSP_UNMAP(ODLOC,STATUS)
 
 *  Correct variance data
@@ -127,7 +127,7 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
      :              %VAL(OPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
 *  Get Q variance and correct it
@@ -156,7 +156,7 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
      :              %VAL(OPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
 *  Get U variance and correct it
@@ -186,7 +186,7 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
      :              %VAL(OPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
 *  Get U variance and correct it
@@ -205,7 +205,7 @@ C
              CALL DAT_ANNUL(OSLOC,STATUS)
 
          ENDIF
-                              
+
 
 500   CONTINUE
       CALL DAT_ANNUL(ILOC,STATUS)
@@ -219,7 +219,7 @@ C
 C+
 C
 C     T S P _ T C A D D
-C 
+C
 C     Add channels FIRST to LAST of a time series data set to produce
 C     a single channel output dataset.
 C
@@ -255,7 +255,7 @@ C
         DO IC=FIRST,LAST
           IF (DATA(IC,IX) .NE. VAL__BADR) THEN
              X = X + DATA(IC,IX)
-       
+
           ELSE
              X = VAL__BADR
           ENDIF

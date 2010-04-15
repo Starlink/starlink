@@ -13,7 +13,7 @@
 *     CALL NDF1_CHTIM( DATE, MJD, STATUS )
 
 *  Description:
-*     The routine attempts to convert the supplied date/time string 
+*     The routine attempts to convert the supplied date/time string
 *     into a Modified Julian Date. An error is reported if this fails.
 
 *  Arguments:
@@ -38,7 +38,7 @@
 *
 *     - Gregorian Date and Time: Any calendar date (as above) but with
 *     a fraction of a day expressed as hours, minutes and seconds
-*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be 
+*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be
 *     separated by a space or by a "T" (as used by ISO8601 format).
 *
 *     - Modified Julian Date: With or without decimal places
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,14 +93,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST functions and constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  External References:
       INTEGER CHR_LEN            ! Used string length
@@ -127,7 +127,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create an AST TimeFrame that uses MJD to describe moment sin time.
-      TFRM = AST_TIMEFRAME( 'System=MJD', STATUS )               
+      TFRM = AST_TIMEFRAME( 'System=MJD', STATUS )
 
 *  Use this TimeFrame to parse the supplied string, returning the
 *  corresponding MJD if succesful.
@@ -148,7 +148,7 @@
 
 *  Free the TimeFrame.
       CALL AST_ANNUL( TFRM, STATUS )
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_CHTIM', STATUS )
 

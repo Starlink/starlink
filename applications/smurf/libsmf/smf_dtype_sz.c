@@ -82,11 +82,11 @@
 #define FUNC_NAME "smf_dtype_sz"
 
 size_t smf_dtype_sz( const smf_dtype dtype, int *status ) {
-  
+
   size_t retval = 0;
 
   if (*status != SAI__OK) return retval;
-  
+
   /* now switch on data type */
   switch( dtype ) {
   case SMF__INTEGER:

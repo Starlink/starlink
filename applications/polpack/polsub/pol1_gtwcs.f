@@ -17,13 +17,13 @@
 *     This routine gets the FrameSet from the WCS component of the
 *     supplied NDF. The Base Frame of this FrameSet (describing GRID
 *     coordinates in the supplied NDF) is 3 (or 4) dimensional. A new 2D
-*     (or 3D) Frame is added to the FrameSet which represents GRID coordinates 
+*     (or 3D) Frame is added to the FrameSet which represents GRID coordinates
 *     in the binned 2D (or 3D) images created by polvec. This Frame is
 *     connected to the original GRID Frame by scaling and shifting
-*     axes 1 and 2 according to the values supplied in TR. Since all 
+*     axes 1 and 2 according to the values supplied in TR. Since all
 *     the planes in the input cube are presumed to be aligned, axes 3
-*     and 4 are ignored. A new 2D (or 3D) PIXEL Frame is added to the 
-*     FrameSet using the supplied pixel bounds. The original GRID and 
+*     and 4 are ignored. A new 2D (or 3D) PIXEL Frame is added to the
+*     FrameSet using the supplied pixel bounds. The original GRID and
 *     PIXEL Frames are removed.
 *
 *     If the Current Frame contains an axis with Symbol "STOKES", a new
@@ -53,7 +53,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
       NDIMO = NDIMG - 1
 
 *  Create a PermMap which will create a 2D (or 3D) Frame from the first 2
-*  (or 3) axes of the 3D (or 4D) GRID Frame included in the above FrameSet. 
+*  (or 3) axes of the 3D (or 4D) GRID Frame included in the above FrameSet.
 *  The constant value 1.0 is assigned to the final axis when doing an inverse
 *  transformation (i.e. from 2/3D Frame to 3/4D Frame).
       INPERM( 1 ) = 1
@@ -153,12 +153,12 @@
       OUTPERM( 1 ) = 1
       OUTPERM( 2 ) = 2
       OUTPERM( 3 ) = 3
-      
-      PERM = AST_PERMMAP( NDIMG, INPERM, NDIMO, OUTPERM, 1.0D0, ' ', 
+
+      PERM = AST_PERMMAP( NDIMG, INPERM, NDIMO, OUTPERM, 1.0D0, ' ',
      :                    STATUS )
 
-*  Now create a WinMap which scales and shifts the first two axes in the 
-*  2/3D Frame according to the values supplied in TR. 
+*  Now create a WinMap which scales and shifts the first two axes in the
+*  2/3D Frame according to the values supplied in TR.
       INA( 1 ) = 0.0D0
       INA( 2 ) = 0.0D0
       INA( 3 ) = 0.0D0
@@ -173,14 +173,14 @@
       OUTB( 2 ) = TR( 3 ) + TR( 4 )
       OUTB( 3 ) = 1.0D0
 
-      WIN = AST_WINMAP( NDIMO, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+      WIN = AST_WINMAP( NDIMO, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Concatenate and simplify these two mappings.
       CMP = AST_SIMPLIFY( AST_CMPMAP( PERM, WIN, .TRUE., ' ', STATUS ),
      :                    STATUS )
 
 *  Create the new 2/3D GRID Frame.
-      FRM = AST_FRAME( NDIMO, 'DOMAIN=GRID', STATUS ) 
+      FRM = AST_FRAME( NDIMO, 'DOMAIN=GRID', STATUS )
       CALL AST_SETC( FRM, 'Title', 'Data grid indices', STATUS )
       CALL AST_SETC( FRM, 'Label(1)', 'Data grid index 1', STATUS )
       CALL AST_SETC( FRM, 'Label(2)', 'Data grid index 2', STATUS )
@@ -200,20 +200,20 @@
 
 *  Add the new 2/3D GRID Frame into the FrameSet, connecting it to
 *  the base (i.e. GRID) Frame using the mapping created above.
-      CALL AST_ADDFRAME( IWCS, AST__BASE, CMP, FRM, STATUS ) 
+      CALL AST_ADDFRAME( IWCS, AST__BASE, CMP, FRM, STATUS )
 
-*  The above call will have changed the Current Frame to be the new Frame. 
+*  The above call will have changed the Current Frame to be the new Frame.
 *  Get its index.
       INEW = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Re-instate the original Current Frame, and make the new Frame the base
 *  Frame.
-      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )      
-      CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )      
+      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+      CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )
 
 *  Find the 3/4D PIXEL Frame within the WCS FrameSet. It becomes the
 *  Current Frame.
-      TEMP = AST_FINDFRAME( IWCS, AST_FRAME( NDIMG, ' ', STATUS ), 
+      TEMP = AST_FINDFRAME( IWCS, AST_FRAME( NDIMG, ' ', STATUS ),
      :                      'PIXEL', STATUS )
 
 *  Report an error if no PIXEL Frame was found. Otherwise, annul the
@@ -224,17 +224,17 @@
          CALL ERR_REP( 'POL1_GTWCS_1', 'No PIXEL Frame found in WCS '//
      :                'component of ^NDF (possible programming error).',
      :                STATUS )
-      ELSE 
+      ELSE
          CALL AST_ANNUL( TEMP, STATUS )
       END IF
 
 *  Get the index of the 3/4D PIXEL Frame, and re-instate the original
 *  Current Frame.
       IPIX = AST_GETI( IWCS, 'CURRENT', STATUS )
-      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )      
+      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
 *  Create a new 2/3D PIXEL Frame.
-      FRM = AST_FRAME( NDIMO, 'DOMAIN=PIXEL', STATUS ) 
+      FRM = AST_FRAME( NDIMO, 'DOMAIN=PIXEL', STATUS )
       CALL AST_SETC( FRM, 'Title', 'Pixel coordinates', STATUS )
       CALL AST_SETC( FRM, 'Label(1)', 'Pixel coordinate 1', STATUS )
       CALL AST_SETC( FRM, 'Label(2)', 'Pixel coordinate 2', STATUS )
@@ -264,19 +264,19 @@
       OUTB( 2 ) = OUTA( 2 ) + 1.0D0
       OUTB( 3 ) = OUTA( 3 ) + 1.0D0
 
-      WIN = AST_WINMAP( NDIMO, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+      WIN = AST_WINMAP( NDIMO, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Add the new 2/3D PIXEL Frame into the FrameSet, connecting it to
 *  the base (i.e. GRID) Frame using the mapping created above.
-      CALL AST_ADDFRAME( IWCS, AST__BASE, WIN, FRM, STATUS ) 
+      CALL AST_ADDFRAME( IWCS, AST__BASE, WIN, FRM, STATUS )
 
 *  If the original Current Frame was the 3/4D Grid Frame, make the 2/3D GRID
 *  Frame the Current Frame.
       IF( ICURR .EQ. IBASE ) THEN
          CALL AST_SETI( IWCS, 'CURRENT', INEW, STATUS )
 
-*  If the original Current Frame was the 3/4D PIXEL Frame, leave the 2/3D 
-*  PIXEL as the Current Frame. Otherwise, reinstate the original Current 
+*  If the original Current Frame was the 3/4D PIXEL Frame, leave the 2/3D
+*  PIXEL as the Current Frame. Otherwise, reinstate the original Current
 *  Frame.
       ELSE IF( ICURR .NE. IPIX ) THEN
          CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
@@ -307,7 +307,7 @@
             IAT = 7
             CALL CHR_PUTI( I, ATTR, IAT )
             CALL CHR_APPND( ')', ATTR, IAT )
-            IF( AST_GETC( FRM, ATTR( : IAT ), STATUS ) .NE. 
+            IF( AST_GETC( FRM, ATTR( : IAT ), STATUS ) .NE.
      :          'STOKES' ) THEN
                NAX = NAX + 1
                AXES( NAX ) = I
@@ -320,7 +320,7 @@
          IF( STAXIS .GT. 0 ) THEN
 
 *  Create a new Frame from the Current Frame excluding the Stokes axis.
-            NEWFRM = AST_PICKAXES( FRM, NAX, AXES, PERM, STATUS ) 
+            NEWFRM = AST_PICKAXES( FRM, NAX, AXES, PERM, STATUS )
 
 *  Modify its Domain to exclude the string "STOKES", potentially with
 *  hyphens before or after.

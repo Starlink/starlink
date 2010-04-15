@@ -1,6 +1,6 @@
 *PROFIT
 *
-* PROFIT  -- Implements the fitting method described in 
+* PROFIT  -- Implements the fitting method described in
 *            1989, PASP, 101, 1032 for fitting the fractions needed
 *            for optimal extraction when the spectrum is tilted or curved.
 *
@@ -12,7 +12,7 @@
 * linear equations become ill-conditioned. However I have yet to have it do
 * this and even on spectra tilted by less than a pixel it has been fine.
 * However you should keep an eye out if you are trying to apply it very
-* straight spectra. Use extopt if it does fail in such cases. 
+* straight spectra. Use extopt if it does fail in such cases.
 *
 *
 * Parameters are:
@@ -25,7 +25,7 @@
 *
 *  DARK    -- Dark frame representing counts unaffected by slit
 *             profile. This will be subtracted off data before applying
-*             the balance factors. 
+*             the balance factors.
 *
 *  REGION  -- Contains the sky/object region limits (only the object
 *             limits matter in this case).
@@ -102,12 +102,12 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE', 'READ', IMAGE, STATUS)
-C     
+C
 C     Open balance frame, identifier FLAT
-C     
+C
       CALL NDF_ASSOC('FLAT','READ',FLAT,STATUS)
 C
 C     Open dark frame
@@ -120,19 +120,19 @@ C
          CALL NDF_TEMP(PLACE, STATUS)
          CALL NDF_NEW('_REAL', NDIM, LBND, UBND, PLACE, DARK, STATUS)
       END IF
-C     
+C
 C     Get sky region input file, check its OK
-C     
+C
       CALL NDF_ASSOC('REGION','READ',REGION,STATUS)
-C     
-      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.LEFT',LEFT,STATUS)      
-      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.RIGHT',RIGHT,STATUS)    
+C
+      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.LEFT',LEFT,STATUS)
+      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.RIGHT',RIGHT,STATUS)
       IF(LEFT.GT.RIGHT .OR. LEFT.LE.0.) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP(' ','Bad object limits', STATUS)
       END IF
       CALL NDF_BOUND(REGION, 1, SLO, SHI, NDIM, STATUS)
-C     
+C
 C     Open sky file. Number of poly coefficients is used in
 C     uncertainty estimation.
 C
@@ -141,10 +141,10 @@ C
 C     Get track file
 C
       CALL GET_TRACK(YPOS, TOFF, STATUS)
-C     
+C
 C     There must be a reference X position in the sky region file
-C     
-      CALL NDF_XGT0D(REGION,'PAMELA','REGPIC.YREF',YREF,STATUS)    
+C
+      CALL NDF_XGT0D(REGION,'PAMELA','REGPIC.YREF',YREF,STATUS)
 C
 C     Open fraction file
 C
@@ -152,7 +152,7 @@ C
       CALL NDF_PROP(SMALL,' ','FRACT',FRACT,STATUS)
       CALL NDF_RESET(FRACT,'Title',STATUS)
       CALL NDF_CPUT('PROFIT output',FRACT,'Title',STATUS)
-C     
+C
 C     What region of frame
 C
       CALL NDF_ISBAS(IMAGE, IBASE, STATUS)
@@ -180,7 +180,7 @@ C
          YLO = LBND(2)
          YHI = UBND(2)
       END IF
-C 
+C
 C     compute minimal range in X to use
 C
       CALL XLIMS(.TRUE.,YREF,LEFT,RIGHT,YLO,YHI,XLO,XHI,STATUS)
@@ -188,7 +188,7 @@ C
       XHI = MIN(UBND(1), XHI)
 C
 C     Generate appropriate section NDFs
-C 
+C
       IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
      &     YLO.NE.LBND(2) .OR. YHI.NE.UBND(2)) THEN
          LBND(1) = XLO
@@ -217,7 +217,7 @@ C
       END IF
 C
 C     Section dimensions
-C     
+C
       NXS = UBND(1)-LBND(1)+1
       NYS = UBND(2)-LBND(2)+1
 C
@@ -230,16 +230,16 @@ C
          CALL NDF_CLONE(TEMP, REGION, STATUS)
          CALL NDF_ANNUL(TEMP, STATUS)
       END IF
-C     
+C
 C     Fiddle with fraction output file so that only relevant
 C     region is stored.
 C
       CALL NDF_RESET(FRACT,'Data',STATUS)
       CALL NDF_SBND(2,LBND,UBND,FRACT,STATUS)
       CALL NDF_STYPE('_REAL',FRACT,'Data',STATUS)
-C     
+C
 C     Parameters
-C     
+C
       CALL PAR_GDR0R('READOUT',1.E-2,0.,1.E10,.FALSE.,READOUT,STATUS)
       CALL PAR_GDR0R('PHOTON',1.,1.E-10,1.E10,.FALSE.,PHOTON,STATUS)
       CALL PAR_GDR0I('NPOLY',3,1,10,.FALSE.,NPOLYT,STATUS)
@@ -267,7 +267,7 @@ C
       CALL NDF_MAP(RWORK,'Data','_INTEGER','WRITE',RPTR,EL,STATUS)
 C
 C     Create 'pamela' extension if not already one present.
-C     
+C
       CALL NDF_XSTAT(FRACT, 'PAMELA', THERE, STATUS)
       IF(.NOT.THERE) THEN
          CALL NDF_XNEW(FRACT,'PAMELA', 'Ext', 0, 0, LOC, STATUS)
@@ -275,14 +275,14 @@ C
       ELSE
          CALL NDF_XLOC(FRACT,'PAMELA','UPDATE',LOC,STATUS)
          CALL DAT_THERE(LOC, 'PROFIT', THERE, STATUS)
-         IF(.NOT.THERE) 
+         IF(.NOT.THERE)
      &        CALL DAT_NEW(LOC, 'PROFIT', 'Struct', 0, 0, STATUS)
       END IF
 C
 C     Write values needed by 'RECOMP'
 C
-      CALL NDF_XPT0R(LEFT,FRACT,'PAMELA','PROFIT.LEFT',STATUS) 
-      CALL NDF_XPT0R(RIGHT,FRACT,'PAMELA','PROFIT.RIGHT',STATUS) 
+      CALL NDF_XPT0R(LEFT,FRACT,'PAMELA','PROFIT.LEFT',STATUS)
+      CALL NDF_XPT0R(RIGHT,FRACT,'PAMELA','PROFIT.RIGHT',STATUS)
 C
 C     Create NDF for the polys
 C
@@ -316,16 +316,16 @@ C
 C     Write final value need by RECOMP and also the YLO and YHI
 C     values which should not change
 C
-      CALL NDF_XPT0D(XREF,FRACT,'PAMELA','PROFIT.XREF',STATUS) 
-      CALL NDF_XPT0I(YLO,FRACT,'PAMELA','PROFIT.YLO',STATUS) 
-      CALL NDF_XPT0I(YHI,FRACT,'PAMELA','PROFIT.YHI',STATUS) 
+      CALL NDF_XPT0D(XREF,FRACT,'PAMELA','PROFIT.XREF',STATUS)
+      CALL NDF_XPT0I(YLO,FRACT,'PAMELA','PROFIT.YLO',STATUS)
+      CALL NDF_XPT0I(YHI,FRACT,'PAMELA','PROFIT.YHI',STATUS)
       CALL NDF_END(STATUS)
       RETURN
       END
-*	
+*
       SUBROUTINE FRACFIT(DATA,FLAT,DARK,SKY,NXS, NYS,XLO,YLO,
-     &     YREF, LEFT, RIGHT, NPOLS, NPOLY, READOUT, PHOTON, 
-     &     NBLOCK, THRESH, NSLOW, BADVAL, WORK, REJECT, PLOT, 
+     &     YREF, LEFT, RIGHT, NPOLS, NPOLY, READOUT, PHOTON,
+     &     NBLOCK, THRESH, NSLOW, BADVAL, WORK, REJECT, PLOT,
      &     FRACTION, PROFILE, XREF, DEVICE, NMED, STATUS)
 *
 * F R A C F I T 2
@@ -345,7 +345,7 @@ C
 * This routine uses the fact that we can trace the position of the spectrum
 * to reduce the number of polynomial terms needed. This routine assumes that
 * lines of constant wavelength are roughly parallel to the rows. If this is not
-* the case, it may still work, but it would be better to alter the initial 
+* the case, it may still work, but it would be better to alter the initial
 * estimate stage to cope with a tilted slit.
 *
 * Inputs:
@@ -364,7 +364,7 @@ C
 *                         That is all pixels from LEFT to RIGHT plus 2 at either
 *                         end, and taking the spectrum position into account.
 *                         The sky is assumed to have been flat fielded and had
-*                         the dark frame removed so that the sky subtracted 
+*                         the dark frame removed so that the sky subtracted
 *                         data = FLAT*(DATA-DARK)-SKY
 *
 * I*4 NXS, NYS        --  X, Y dimensions of frame section
@@ -373,9 +373,9 @@ C
 *
 * R*4 LEFT, RIGHT   -- Left and right extent of object extraction. The profile
 *                      is fitted over a slight larger region than this, but is
-*                      normalised to 1 only in this region. 
+*                      normalised to 1 only in this region.
 *
-* I*4 NPOLS         -- Number of polynomials to fit to profile. Should be 
+* I*4 NPOLS         -- Number of polynomials to fit to profile. Should be
 *                      greater than NINT(RIGHT-LEFT)+2. Each polynomial is
 *                      evaluated at a position which shifts with the spectrum.
 *
@@ -395,7 +395,7 @@ C
 *                      noise.
 *
 * I*4 NBLOCK        -- Number of rows per fit point. Only use greater than 1
-*                      if signal weak. Rows are then combined in groups of 
+*                      if signal weak. Rows are then combined in groups of
 *                      NBLOCK
 *
 * R*4 THRESH        -- Rejection threshold, sigma. Points further than THRESH
@@ -410,16 +410,16 @@ C
 * R*8 WORK(NPOLS*NPOLY*(NPOLS*NPOLY+3)) -- Work space array for the least
 *                      squares solution of the fit.
 *
-* L*4 REJECT(NX, NYS/NBLOCK) - Work space array. Used to store which 
+* L*4 REJECT(NX, NYS/NBLOCK) - Work space array. Used to store which
 *                      pixels have been rejected during the fit.
 *
-* L*4 PLOT          -- .TRUE. if you want to be able to plot the fit. The 
+* L*4 PLOT          -- .TRUE. if you want to be able to plot the fit. The
 *                      program then gives you the option of plotting the
 *                      estimated versus fitted fractions for each column.
 *
 * I*4 NMED         -- Median filter width to reduce effect of cosmic rats
 *                     on initial profile sums
-* 
+*
 * Outputs:
 *
 * R*4 FRACTION(NXS,NYS)  -- Contains the fit to the fraction of flux in every
@@ -446,10 +446,10 @@ C
       CHARACTER*(*) DEVICE
 C
 C     Local variables and arrays
-C     
+C
       INTEGER MAXCOFF
       PARAMETER (MAXCOFF=1000)
-      INTEGER INDX(MAXCOFF), PGOPEN      
+      INTEGER INDX(MAXCOFF), PGOPEN
       CHARACTER*10 REPLY
       DOUBLE PRECISION SUM1, SUM2, SUM3, CHISQ, D
       DOUBLE PRECISION OFFSET, HRANGE
@@ -544,8 +544,8 @@ C
          END DO
       END DO
 C
-C     First estimate of fractions based upon simple division of pixel value 
-C     by sum across profile. Cannot be used directly. Later fitting process 
+C     First estimate of fractions based upon simple division of pixel value
+C     by sum across profile. Cannot be used directly. Later fitting process
 C     will modify this array. Negative blocks are flagged as are blocks with
 C     any bad pixels.
 C
@@ -600,23 +600,23 @@ C     extraction region.
 C
 
             OK = FLAT(ITL,JJ).NE.VAL__BADR .AND.
-     &           DATA(ITL,JJ).NE.VAL__BADR .AND. 
-     &           DATA(ITL,JJ).LT.BADVAL    .AND. 
-     &           DARK(ITL,JJ).NE.VAL__BADR .AND. 
-     &           SKY(ITL,JJ).NE.VAL__BADR 
+     &           DATA(ITL,JJ).NE.VAL__BADR .AND.
+     &           DATA(ITL,JJ).LT.BADVAL    .AND.
+     &           DARK(ITL,JJ).NE.VAL__BADR .AND.
+     &           SKY(ITL,JJ).NE.VAL__BADR
             IF(OK) THEN
                OK = FLAT(ITH,JJ).NE.VAL__BADR .AND.
-     &              DATA(ITH,JJ).NE.VAL__BADR .AND. 
-     &              DATA(ITH,JJ).LT.BADVAL    .AND. 
-     &              DATA(ITH,JJ).NE.VAL__BADR .AND. 
-     &              SKY(ITH,JJ).NE.VAL__BADR 
+     &              DATA(ITH,JJ).NE.VAL__BADR .AND.
+     &              DATA(ITH,JJ).LT.BADVAL    .AND.
+     &              DATA(ITH,JJ).NE.VAL__BADR .AND.
+     &              SKY(ITH,JJ).NE.VAL__BADR
             END IF
             IF(OK .AND. ILO.LT.IX1) THEN
                OK = FLAT(ILO,JJ).NE.VAL__BADR .AND.
-     &              DATA(ILO,JJ).NE.VAL__BADR .AND. 
-     &              DATA(ILO,JJ).LT.BADVAL    .AND. 
-     &              DARK(ILO,JJ).NE.VAL__BADR .AND. 
-     &              SKY(ILO,JJ).NE.VAL__BADR 
+     &              DATA(ILO,JJ).NE.VAL__BADR .AND.
+     &              DATA(ILO,JJ).LT.BADVAL    .AND.
+     &              DARK(ILO,JJ).NE.VAL__BADR .AND.
+     &              SKY(ILO,JJ).NE.VAL__BADR
                IF(OK) THEN
                   ADD = FLAT(ILO,JJ)*(DATA(ILO,JJ)-DARK(ILO,JJ))
      &                 -SKY(ILO,JJ)
@@ -625,10 +625,10 @@ C
             END IF
             IF(OK) THEN
                OK = FLAT(IX1,JJ).NE.VAL__BADR .AND.
-     &              DATA(IX1,JJ).NE.VAL__BADR .AND. 
-     &              DATA(IX1,JJ).LT.BADVAL    .AND. 
-     &              DARK(IX1,JJ).NE.VAL__BADR .AND. 
-     &              SKY(IX1,JJ).NE.VAL__BADR 
+     &              DATA(IX1,JJ).NE.VAL__BADR .AND.
+     &              DATA(IX1,JJ).LT.BADVAL    .AND.
+     &              DARK(IX1,JJ).NE.VAL__BADR .AND.
+     &              SKY(IX1,JJ).NE.VAL__BADR
                IF(OK) THEN
                   ADD = FLAT(IX1,JJ)*(DATA(IX1,JJ)-DARK(IX1,JJ))
      &                 -SKY(IX1,JJ)
@@ -636,10 +636,10 @@ C
                   PART = REAL(IX1+XLO-1)+0.5-LEFT-XSHIFT
                   SUM1 = SUM1 + PART*ADD
                   OK = FLAT(IX2,JJ).NE.VAL__BADR .AND.
-     &                 DATA(IX2,JJ).NE.VAL__BADR .AND. 
-     &                 DATA(IX2,JJ).LT.BADVAL    .AND. 
-     &                 DARK(IX2,JJ).NE.VAL__BADR .AND. 
-     &                 SKY(IX2,JJ).NE.VAL__BADR 
+     &                 DATA(IX2,JJ).NE.VAL__BADR .AND.
+     &                 DATA(IX2,JJ).LT.BADVAL    .AND.
+     &                 DARK(IX2,JJ).NE.VAL__BADR .AND.
+     &                 SKY(IX2,JJ).NE.VAL__BADR
                   IF(OK) THEN
                      ADD = FLAT(IX2,JJ)*(DATA(IX2,JJ)-DARK(IX2,JJ))
      &                    -SKY(IX2,JJ)
@@ -648,10 +648,10 @@ C
                      SUM1 = SUM1 + PART*ADD
                      IF(IHI.GT.IX2) THEN
                         OK = FLAT(IHI,JJ).NE.VAL__BADR .AND.
-     &                       DATA(IHI,JJ).NE.VAL__BADR .AND. 
-     &                       DATA(IHI,JJ).LT.BADVAL    .AND. 
-     &                       DARK(IHI,JJ).NE.VAL__BADR .AND. 
-     &                       SKY(IHI,JJ).NE.VAL__BADR 
+     &                       DATA(IHI,JJ).NE.VAL__BADR .AND.
+     &                       DATA(IHI,JJ).LT.BADVAL    .AND.
+     &                       DARK(IHI,JJ).NE.VAL__BADR .AND.
+     &                       SKY(IHI,JJ).NE.VAL__BADR
                         IF(OK) THEN
                            ADD = FLAT(IHI,JJ)*(DATA(IHI,JJ)-
      &                          DARK(IHI,JJ))-SKY(IHI,JJ)
@@ -663,10 +663,10 @@ C
                         DO WHILE(OK .AND. IX.LT.IX2-1)
                            IX = IX + 1
                            OK = FLAT(IX,JJ).NE.VAL__BADR .AND.
-     &                          DATA(IX,JJ).NE.VAL__BADR .AND. 
-     &                          DATA(IX,JJ).LT.BADVAL    .AND. 
-     &                          DARK(IX,JJ).NE.VAL__BADR .AND. 
-     &                          SKY(IX,JJ).NE.VAL__BADR 
+     &                          DATA(IX,JJ).NE.VAL__BADR .AND.
+     &                          DATA(IX,JJ).LT.BADVAL    .AND.
+     &                          DARK(IX,JJ).NE.VAL__BADR .AND.
+     &                          SKY(IX,JJ).NE.VAL__BADR
                            IF(OK) THEN
                               ADD = FLAT(IX,JJ)*(DATA(IX,JJ)-
      &                             DARK(IX,JJ))-SKY(IX,JJ)
@@ -736,7 +736,7 @@ C
       NSIDE = NPOLS*NPOLY
       NADD  = NSIDE*NSIDE
 C
-C     Start fitting cycle. 
+C     Start fitting cycle.
 C
       ICYCLE = -1
       CHISQ = 1.
@@ -778,9 +778,9 @@ C
                   PROF(IX) = 0.
                   VARIANC(IX) = 0.
                END DO
-C     
+C
 C     Compute data point and variance for block.
-C     
+C
                SUM   = SPROF(IY)
                SNORM = SUM/REAL(IY2-IY1+1)
                DO JJ = IY1, IY2
@@ -790,7 +790,7 @@ C
                         FR  = FRACTION(IX,JJ)
                         BAL = FLAT(IX,JJ)
                         SK  = SKY(IX,JJ)+BAL*DARK(IX,JJ)
-                        VARIANC(IX) = VARIANC(IX) + 
+                        VARIANC(IX) = VARIANC(IX) +
      &                       BAL*(BAL*VAR0+PFAC*(FR*SNORM+SK))
                         PROF(IX) = PROF(IX)+BAL*DAT-SK
                      END IF
@@ -799,14 +799,14 @@ C
                SUM2 = 0.D0
                DO IX = IX1, IX2
                   IF(REJECT(IX,IY)) THEN
-C          
+C
 C     Evaluate QFAC, the contribution of polynomial number JL
 C     for the pixel IX1,JJ. Four cases are considered. The first
 C     two account for the triangular interpolation function partially
-C     overlapping a pixel, on one side only. The third is for the 
+C     overlapping a pixel, on one side only. The third is for the
 C     function wholly inside a pixel, and finally for the pixel wholly
 C     covered by the interpolation function.
-C     
+C
                      XZ = XJ-REAL(IX)
                      XT = ABS(XZ)
                      IF(XT.GE.SAVE1) THEN
@@ -846,13 +846,13 @@ C
       DO JL = 1, NPOLS
          XJL  = RLEFT + SPIX*(REAL(JL)-0.5)
          XJL1 = XJL - SPIX
-C     
+C
 C     Symmetric matrix; only evaluate half of it.
 C
          DO KL = 1, JL
             XKL  = RLEFT + SPIX*(REAL(KL)-0.5)
             XKL2 = XKL + SPIX
-C         
+C
 C     Contribution to matrix only evaluated if two polynomial
 C     terms can be affected by the same pixel.
 C
@@ -864,7 +864,7 @@ C
                      IY2 = NBLOCK*IY
                      IF(IY.EQ.NPOINT) IY2 = NYS
                      XSHIFT = XS(IY)
-C               
+C
 C     Compute left and right limits of polynomials JL and KL
 C     for this value of Y
 C
@@ -885,17 +885,17 @@ C
                                  FR  = FRACTION(IX,JJ)
                                  BAL = FLAT(IX,JJ)
                                  SK  = SKY(IX,JJ)+BAL*DARK(IX,JJ)
-                                 VARIANC(IX) = VARIANC(IX) + 
+                                 VARIANC(IX) = VARIANC(IX) +
      &                                BAL*(BAL*VAR0+PFAC*
      &                                (FR*SNORM+SK))
                               END IF
                            END DO
                         END DO
-C     
-C     Evaluate sum over row of QFAC(JL) times QFAC(KL) where 
-C     QFAC(I) is fraction of polynomial I which contributes to 
-C     to pixel IX,JJ. 
-C     
+C
+C     Evaluate sum over row of QFAC(JL) times QFAC(KL) where
+C     QFAC(I) is fraction of polynomial I which contributes to
+C     to pixel IX,JJ.
+C
                         SUM2 = 0.D0
                         DO IX = IX1, IX2
                            IF(REJECT(IX,IY)) THEN
@@ -956,7 +956,7 @@ C
                         INDEX2 = INDEX1 + NEXT
                         WORK(INDEX2) = SUM1
                      ELSE
-                        INDEX2 = INDEX1 
+                        INDEX2 = INDEX1
                      END IF
                      IF(KL.NE.JL) THEN
                         INDEX3 = INDEX2 + NTEM2*(KL-JL)
@@ -972,8 +972,8 @@ C
       END DO
 C
 C     Solve matrix equation AX = B for X. A is a real symmetric,
-C     positive definite matrix, dimension (NPOLY*NPOLS)**2. X is 
-C     the vector representing the coefficients fitted to the 
+C     positive definite matrix, dimension (NPOLY*NPOLS)**2. X is
+C     the vector representing the coefficients fitted to the
 C     normalised profile.
 C
       CALL LUDCMP(WORK,NSIDE,NSIDE,INDX,D,IFAIL)
@@ -996,7 +996,7 @@ C
 C     Evaluate fit individually rather than in blocks
 C     to give smooth change with Y. Evaluate over larger
 C     region but renormalise over requested region.
-C     
+C
       DO IY = 1, NYS
          YD = (DBLE(IY+YLO-1)-OFFSET)/HRANGE
          IF(ICYCLE.GT.0) THEN
@@ -1112,7 +1112,7 @@ C
 C
 C     NSLOW used here to prevent wholesale rejcetion
 C
-                  IF(ABS(RESID).GT.TFAC*THRESH .AND. 
+                  IF(ABS(RESID).GT.TFAC*THRESH .AND.
      &                 NSOFAR.GE.NSLOW) THEN
                      REJECT(IX,IY) = .FALSE.
                      RESID = RESID/SQRT(CHIOLD)
@@ -1130,9 +1130,9 @@ C
                   END IF
 
                ELSE IF(NSLOW.EQ.0 .AND. ICYCLE.EQ.4) THEN
-C     
+C
 C     One restore cycle for pathological cases
-C     
+C
                   RESID = (OBSERVE(IX)-PREDICT(IX))/SQRT(VARIANC(IX))
                   IF(ABS(RESID).LT.TFAC*THRESH) THEN
                      REJECT(IX,IY) = .TRUE.
@@ -1158,9 +1158,9 @@ C
       ELSE
          RMAX = REAL(RMAX/SQRT(CHIOLD))
       END IF
-C     
+C
 C     Rejection of points one by one
-C     
+C
       IF(ABS(RMAX).GT.THRESH) THEN
          NSOFAR = NSOFAR + 1
          NREJ = NREJ + 1
@@ -1171,7 +1171,7 @@ C
          CALL MSG_OUT(' ',
      &        '^SIG sigma reject at X: ^IX, Y block: ^IY',
      &                    STATUS)
-         WRITE(*,'(1X,F8.3,A,I4,A,I4)') 
+         WRITE(*,'(1X,F8.3,A,I4,A,I4)')
      &        RMAX,' sigma reject at X: ',IXMAX,', Y block: ',IYMAX
       END IF
       CALL MSG_SETR('CHISQ',REAL(CHISQ))
@@ -1179,24 +1179,24 @@ C
      &     'Reduced Chi-squared of fit = ^CHISQ',
      &     STATUS)
       NTOTAL = NTOTAL + NREJ
-C     
+C
 C     Try another fit?
 C
       IF(ICYCLE.LE.3 .OR. (NREJ.GT.0 .AND. ICYCLE.LE.MXCYCLE)) GOTO 200
-C     
+C
 C     Fit over
 C
       CALL MSG_BLANK(STATUS)
       CALL MSG_OUT(' ','Profile fit finished.',STATUS)
-      WRITE(*,'(A,I5,A,I5)') 
+      WRITE(*,'(A,I5,A,I5)')
      &     ' Total number of rejected points = ',NTOTAL,
      &     ' out of ',NSUM+NTOTAL
       CALL MSG_BLANK(STATUS)
 C
       IF(PLOT) THEN
-C     
+C
 C     Compute plot ranges
-C     
+C
          IXMIN = NXS
          IXMAX = 1
          DO IY = 1, NYS
@@ -1220,7 +1220,7 @@ C
          IF(ID.GT.0) THEN
             CALL PGENV(X1-10, X2+10, Y1, Y2, 0, 1)
             CALL PGLAB('Y position','Fraction',' ')
-            WRITE(*,'(A,I4,A,I4)') 
+            WRITE(*,'(A,I4,A,I4)')
      &           ' Plotting columns ',IXMIN+XLO-1,
      &           ' to ',IXMAX+XLO-1
             WRITE(*,*) ' '
@@ -1236,7 +1236,7 @@ C
                ELSE IF(REPLY.EQ.' ') THEN
 C
 C     Load up new plot
-C     
+C
                   NPLOT = 0
                   DO IY = 1, NPOINT
                      IF(POSIT(IY)) THEN
@@ -1251,7 +1251,7 @@ C
                            SUM2 = 0.D0
                            DO JJ = IY1, IY2
                               SUM1 = SUM1 + MAX(0., FRACTION(IX,JJ))
-                              SUM2 = SUM2 + 
+                              SUM2 = SUM2 +
      &                             FLAT(IX,JJ)*DATA(IX,JJ)-SKY(IX,JJ)
                            END DO
                            NPLOT = NPLOT + 1
@@ -1263,9 +1263,9 @@ C
                         END IF
                      END IF
                   END DO
-C     
+C
 C     Now plot
-C     
+C
                   IF(NPLOT.GT.1) THEN
                      N1 = 1
                      N2 = 1

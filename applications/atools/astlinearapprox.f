@@ -204,7 +204,7 @@
 *  Output the fit.
          CALL PAR_PUT1D( 'FIT', ( NIN + 1 ) * NOUT, FIT, STATUS )
       ELSE
-         IF ( STATUS .EQ. SAI__OK ) THEN 
+         IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
          END IF
       ENDIF
@@ -220,7 +220,7 @@
 
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ASTLINEARAPPROX_ERR', 'Error finding a'// 
+         CALL ERR_REP( 'ASTLINEARAPPROX_ERR', 'Error finding a'//
      :                 ' linear approximation to a mapping',
      :                 STATUS )
       END IF

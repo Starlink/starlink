@@ -146,7 +146,7 @@
 *  If this column is empty, set status to error, report end exit.
          IF ( MITMCL( I ) .EQ. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'IRM_TABLE_ERR1', 
+            CALL ERR_REP( 'IRM_TABLE_ERR1',
      :                   'IRM_TABLE: An empty column has been supplied',
      :                     STATUS )
             GOTO 999
@@ -163,7 +163,7 @@
       HI1 = WDTH / ASPCT
 
 *  Calculate the height of the text from the height of the table.
-      HI2 = ( Y2 - Y1 ) / ( 2.0*REAL( NROW ) + 1.0 ) 
+      HI2 = ( Y2 - Y1 ) / ( 2.0*REAL( NROW ) + 1.0 )
 
 *  Get the text height from above two possible height
       TXTHI = MIN( HI1, HI2 )

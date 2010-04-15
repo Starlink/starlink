@@ -4,7 +4,7 @@
 *     LPG1_TIDY
 
 *  Purpose:
-*     Release resources and reset common block entries used to store 
+*     Release resources and reset common block entries used to store
 *     lists of data file names.
 
 *  Language:
@@ -33,12 +33,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *        PNAME2( LPG__MXPAR ) = CHARACTER * ( DAT__SZNAM ) (Write)
 *           The names of other parameters used by the application.
 *        IGRP( LPG__MXPAR ) = INTEGER (Write)
-*           The identifier for the GRP groups holding the data file names 
+*           The identifier for the GRP groups holding the data file names
 *           supplied for each data file parameter.
 *        SIZE( LPG__MXPAR ) = INTEGER (Write)
 *           The number of data files supplied for each data file parameter.
@@ -90,7 +90,7 @@
 *        NRUN = INTEGER (Write)
 *           The number of times the application has been invoked so far.
 *        STATE2( LPG__MXPAR ) = INTEGER (Write)
-*           The original (i.e. before the first invocation was performed) 
+*           The original (i.e. before the first invocation was performed)
 *           PAR state of each parameter listed in array PNAME2.
 *        TMPLST = INTEGER (Read and Write)
 *           A GRP identifier for a group holding the full specification
@@ -100,12 +100,12 @@
 *           be open by the NDF system. In this case the temporary NDF
 *           is copied to the requested position once the application has
 *           finished.  The TMPLST group holds adjacent pairs of file
-*           specs; the first one in each pair is the spec of the temporary 
+*           specs; the first one in each pair is the spec of the temporary
 *           output NDF, the second is the spec of the requested output NDF.
 *        OPNLST = INTEGER (Read and Write)
 *           A GRP identifier for a group holding the full specification
 *           for any existing NDFs which have been opened for read-only
-*           input by this invocation of the application. 
+*           input by this invocation of the application.
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -130,7 +130,7 @@
          SIZE( I ) = 0
 
 *  Delete the GRP group, if it still exists.
-         IF( IGRP( I ) .NE. GRP__NOID ) CALL GRP_DELET( IGRP( I ), 
+         IF( IGRP( I ) .NE. GRP__NOID ) CALL GRP_DELET( IGRP( I ),
      :                                                  STATUS )
 
       END DO

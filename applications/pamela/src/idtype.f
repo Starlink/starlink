@@ -3,7 +3,7 @@
 *           for automated processing of data.
 *
 * IDTYPE collapses a frame in X and Y and then searches for peaks.
-* Depending upon what it finds it classifies the frame as an ARC, 
+* Depending upon what it finds it classifies the frame as an ARC,
 * FLAT or DATA. The dispersion should run along the Y direction and
 * the frame should have been debiassed. Thus if it finds no object
 * but some lines it will identify the type as ARC. If it finds an
@@ -30,10 +30,10 @@
 *
 *  XSTART, XEND, YSTART, YEND -- Region of frame to consider.
 *
-*  NXWIDTH   -- Width of median filter to apply in X direction; must be 
+*  NXWIDTH   -- Width of median filter to apply in X direction; must be
 *               odd = 1 will have no effect.
 *
-*  NYWIDTH   -- Width of median filter to apply in Y direction; must be 
+*  NYWIDTH   -- Width of median filter to apply in Y direction; must be
 *               odd = 1 will have no effect.
 *
 *  TOBJM -- For a peak to be detected in the spatial direction it
@@ -70,7 +70,7 @@
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE', 'READ',IMAGE, STATUS)
 C
@@ -110,7 +110,7 @@ C
      &        .FALSE.,YHI,STATUS)
 C
 C     Replace IMAGE and FLAT with section ndfs
-C 
+C
          IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
      &        YLO.NE.LBND(2) .OR. YHI.NE.UBND(2)) THEN
             LBND(1) = XLO
@@ -140,7 +140,7 @@ C
       CALL PAR_GDR0R('TLINA',50.,0.,1.E30,.FALSE.,TLINA,STATUS)
       CALL PAR_GDR0R('FLIM',10000.,0.,1.E30,.FALSE.,FLIM,STATUS)
 C
-C     Map data files 
+C     Map data files
 C
       IF(TRACE) THEN
          CALL NDF_TEMP(PLACE, STATUS)
@@ -151,10 +151,10 @@ C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
       CALL NDF_MAP( FLAT,'Data','_REAL','READ',FPTR,EL,STATUS)
 C
-      CALL RECOG(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)), 
-     &     %VAL(CNF_PVAL(WPTR)), NXS, NYS, XLO, YLO, NXWIDTH, 
-     &     NYWIDTH, TOBJM, TOBJA, TLINM, TLINA, FLIM, TRACE, 
-     &     TOTAL, NPIX, MEAN, NOBJ, SOBJ, IOBJ, SKY, 
+      CALL RECOG(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)),
+     &     %VAL(CNF_PVAL(WPTR)), NXS, NYS, XLO, YLO, NXWIDTH,
+     &     NYWIDTH, TOBJM, TOBJA, TLINM, TLINA, FLIM, TRACE,
+     &     TOTAL, NPIX, MEAN, NOBJ, SOBJ, IOBJ, SKY,
      &     NLINE, SLINE, ILINE, CONT, ID, STATUS)
 C
       IF(STATUS.EQ.SAI__OK) THEN
@@ -197,21 +197,21 @@ C
       CALL NDF_END(STATUS)
       RETURN
       END
-      
-      SUBROUTINE RECOG(DATA, BAL, WORK, NX, NY, XLO, YLO, 
-     &     NXWIDTH, NYWIDTH, TOBJM, TOBJA, TLINM, TLINA, 
+
+      SUBROUTINE RECOG(DATA, BAL, WORK, NX, NY, XLO, YLO,
+     &     NXWIDTH, NYWIDTH, TOBJM, TOBJA, TLINM, TLINA,
      &     FLIM, TRACE, TOTAL, NPIX, MEAN, NOBJ, SOBJ, IOBJ,
      &     SKY, NLINE, SLINE, ILINE, CONT, ID, STATUS)
 C
 C     Subroutine to compute and return useful information to
 C     help identify the type of a data frame (e.g. FLAT, DATA, ARC)
 C     and to return other numbers to describe quality thereof.
-C     
+C
 C     Data assumed to be dispersed in Y direction.
 C     Only frame from IXLO to IXHI, IYLO to IYHI will be treated.
 C     Crude at the moment. Will not cope with strong slopes in either
 C     spatial or spectral direction.
-C     
+C
 C     R*4 DATA(NX,NY) -- Data frame
 C     R*4 BAL(NX,NY)  -- Balance frame
 C     R*4 WORK(NX,NY) -- Workspace for distorted spectrum case
@@ -241,7 +241,7 @@ C     R*4 SLINE       -- Peak value of strongest line found (continuum removed)
 C     I*4 ILINE       -- Position of strongest line
 C     R*4 CONT        -- Median of collapse in X
 C     C*(*) ID        -- Tentative identification of frame type
-C 
+C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
@@ -291,17 +291,17 @@ C
          RETURN
       END IF
       MEAN = TOTAL/REAL(NPIX)
-C     
+C
 C     Compute average profile by collapsing in Y
-C     
+C
       IF(.NOT.TRACE) THEN
-C     
+C
 C     No distortion map case
-C     
+C
          DO IX = 1, NX
             NOK = 0
             DO IY = 1, NY
-               IF(BAL(IX,IY).NE.VAL__BADR .AND. 
+               IF(BAL(IX,IY).NE.VAL__BADR .AND.
      &              DATA(IX,IY).NE.VAL__BADR) THEN
                   NOK = NOK + 1
                   YDATA(NOK) = BAL(IX,IY)*DATA(IX,IY)
@@ -309,7 +309,7 @@ C
             END DO
             IF(NOK.GT.0) THEN
                CALL MEDFILT(YDATA,YFILT,NOK,NYWIDTH,IFAIL)
-               SUM = 0.D0    
+               SUM = 0.D0
                DO IY = 1, NOK
                   SUM = SUM + YFILT(IY)
                END DO
@@ -319,20 +319,20 @@ C
             END IF
          END DO
       ELSE
-C     
+C
 C     X values referred relative to values calculated at mid point
 C     The mid-point value is returned as it will be needed by any
 C     routines that use the sky regions chosen
-C     
+C
          CALL GET_TRACK(DBLE(2*YLO+NY-1)/2., XREF, STATUS)
-C     
+C
 C     Distortion coefficient case
-C     
+C
          DO IY = 1, NY
-C     
+C
 C     Compute shift, load into buffer, shift to the right and then
 C     add into profile
-C     
+C
             CALL GET_TRACK(DBLE(IY+YLO-1), XD, STATUS)
             XSHIFT = REAL(XD - XREF)
             DO IX = 1, NX
@@ -343,18 +343,18 @@ C
                   XDATA(IX)  = 0.
                END IF
             END DO
-            CALL REBIN(0, 0, XDATA, NX, XFILT, 1, XSHIFT, 
+            CALL REBIN(0, 0, XDATA, NX, XFILT, 1, XSHIFT,
      &           0, D1, 0, D2, R1, R2)
-C     
+C
 C     Mask pixels affected by bad data
-C     
+C
             DO IX = 1, NX
                I1 = INT(REAL(IX)-XSHIFT)
                I2 = I1+1
-               IF((I1.GE.1 .AND. I1.LE.NX .AND. 
+               IF((I1.GE.1 .AND. I1.LE.NX .AND.
      &              (BAL(I1,IY).EQ.VAL__BADR .OR.
      &              DATA(I1,IY).EQ.VAL__BADR)) .OR.
-     &              (I2.GE.1 .AND. I2.LE.NX .AND. 
+     &              (I2.GE.1 .AND. I2.LE.NX .AND.
      &              (BAL(I2,IY).EQ.VAL__BADR .OR.
      &              DATA(I2,IY).EQ.VAL__BADR))) THEN
                   WORK(IX,IY) = VAL__BADR
@@ -373,7 +373,7 @@ C
             END DO
             IF(NOK.GT.0) THEN
                CALL MEDFILT(YDATA,YFILT,NOK,NYWIDTH,IFAIL)
-               SUM = 0.    
+               SUM = 0.
                DO IY = 1, NOK
                   SUM = SUM + YFILT(IY)
                END DO
@@ -409,9 +409,9 @@ C
       END IF
 C
 C     Objects are identified as local maxima above TOBJM times AND
-C     TOBJA above SKY with SKY set to minimum of 1 for the 
+C     TOBJA above SKY with SKY set to minimum of 1 for the
 C     multiplicative part. Bad pixels are now set very negative.
-C     
+C
       THRESHM = TOBJM*MAX(1., SKY)
       THRESHA = SKY + TOBJA
       NOBJ = 0
@@ -422,7 +422,7 @@ C
       IOBJ = 0
       DO IX=2,NX-1
          IF(XPROF(IX).GE.XPROF(IX-1) .AND.
-     &        XPROF(IX).GT.XPROF(IX+1) .AND. 
+     &        XPROF(IX).GT.XPROF(IX+1) .AND.
      &        XPROF(IX).GT.THRESHM .AND. XPROF(IX).GT.THRESHA) THEN
             NOBJ = NOBJ + 1
             IF(XPROF(IX).GT.SOBJ) THEN
@@ -433,14 +433,14 @@ C
       END DO
       SOBJ = SOBJ - SKY
       IF(NOBJ.EQ.0) SOBJ = 0.
-C     
+C
 C     Compute average spectrum by collapsing in X
 C     (no distortion allowed for)
 C
       DO IY = 1, NY
          NOK = 0
          DO IX = 1, NX
-            IF(BAL(IX,IY).NE.VAL__BADR .AND. 
+            IF(BAL(IX,IY).NE.VAL__BADR .AND.
      &           DATA(IX,IY).NE.VAL__BADR) THEN
                NOK = NOK + 1
                XDATA(NOK) = BAL(IX,IY)*DATA(IX,IY)
@@ -448,7 +448,7 @@ C
          END DO
          IF(NOK.GT.0) THEN
             CALL MEDFILT(XDATA,XFILT,NOK,NXWIDTH,IFAIL)
-            SUM = 0.D0    
+            SUM = 0.D0
             DO IX = 1, NOK
                SUM = SUM + XFILT(IX)
             END DO
@@ -471,7 +471,7 @@ C
          CALL HEAPSORT(NOK,YFILT,IRANK)
 C
 C     Set 'CONT' equal to median value
-C     
+C
          CONT = YFILT(IRANK(NOK/2+1))
          IF(MOD(NOK,2).EQ.0) THEN
             CONT = (CONT+YFILT(IRANK(NOK/2)))/2.
@@ -484,7 +484,7 @@ C
 C
 C     Lines are identified as local maxima above TLINM times CONT
 C     with minimum of 1, AND TLINA above CONT
-C     
+C
       THRESHM = TLINM*MAX(1., CONT)
       THRESHA = CONT + TLINA
       NLINE = 0
@@ -495,7 +495,7 @@ C
       END DO
       DO IY=2,NY-1
          IF(YSPEC(IY).GE.YSPEC(IY-1) .AND.
-     &        YSPEC(IY).GT.YSPEC(IY+1) .AND. 
+     &        YSPEC(IY).GT.YSPEC(IY+1) .AND.
      &        YSPEC(IY).GT.THRESHM .AND. YSPEC(IY).GT.THRESHA) THEN
             NLINE = NLINE + 1
             IF(YSPEC(IY).GT.SLINE) THEN
@@ -506,9 +506,9 @@ C
       END DO
       SLINE = SLINE - CONT
       IF(NLINE.EQ.0) SLINE = 0.
-C     
+C
 C     Finally try to identify the data type.
-C     
+C
       IF(NOBJ.GT.0) THEN
          ID = 'DATA'
       ELSE IF(NLINE.GT.1) THEN

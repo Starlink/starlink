@@ -16,8 +16,8 @@
 * 1) CAA :  1stNov85 : Modified to work under PLT2D
 * 2) CAA : 14thNov85 : Added image slice option to data set
 * 3) CAA : 29thSep86 : Added auto contour level option
-*    SKL   17thFeb94   Changed DAT and CMP routines to NDF   
-*    SKL   26THJul94   Changed error reporting to use ERR_, removed VALUE 
+*    SKL   17thFeb94   Changed DAT and CMP routines to NDF
+*    SKL   26THJul94   Changed error reporting to use ERR_, removed VALUE
 *    SKL   26thOct94   Changed MAGNIF from INT to REAL
 *    SKL   04thNov94   Added option of auto scaling if magnif=0
 * Endhistory
@@ -120,7 +120,7 @@
         CALL PAR_GET0C( 'SUBIM_OPTION', SUBIM_OPTION, STATUS)
 
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                  'Error : CONTOUR_PLOT : after PAR_GETs',
      :                   STATUS )
           RETURN
@@ -131,7 +131,7 @@
         CALL NDF_ASSOC( 'CONTOUR_IMAGE', 'READ', LOC_IMAGE, STATUS)
 
         IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                  'Error : CONTOUR_PLOT : During NDF_ASSOC',
      :                   STATUS )
           RETURN
@@ -148,7 +148,7 @@
      :                  POINTER_IMAGE, NELEMENTS, STATUS)
 
           IF( STATUS. NE. SAI__OK)THEN
-            CALL ERR_REP( 'ERR', 
+            CALL ERR_REP( 'ERR',
      :                'Error : CONTOUR_PLOT : During NDF_MAP image',
      :                     STATUS )
             RETURN
@@ -177,11 +177,11 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
 * map data in 'DATA_ARRAY' to obtain memory pointer POINTER_IMAGE
 * and size of 2D image in NAXIS
 
-          CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ', 
+          CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ',
      :                   POINTER_IMAGE, NELEMENTS, STATUS)
 
           IF( STATUS. NE. SAI__OK)THEN
-            CALL ERR_REP( 'ERR', 
+            CALL ERR_REP( 'ERR',
      :            'Error : CONTOUR_PLOT : During NDF_MAP sub-image',
      :                     STATUS )
             RETURN
@@ -226,7 +226,7 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
 
 *        set magnification to 80% display area for annotation space
 
-          CONTOUR_MAGNIF = 0.80 * CONTOUR_MAGNIF   
+          CONTOUR_MAGNIF = 0.80 * CONTOUR_MAGNIF
 
 *        test for above maximum value for magnification
 
@@ -264,7 +264,7 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
           CALL NDF_ANNUL( LOC_IMAGE, STATUS)
 
           IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP( 'ERR', 
+            CALL ERR_REP( 'ERR',
      :            'Error : CONTOUR_PLOT : after NDF_ANNUL sub-image',
      :                     STATUS )
             RETURN
@@ -277,7 +277,7 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
           CALL NDF_ANNUL( LOC_IMAGE,   STATUS)
 
           IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP( 'ERR', 
+            CALL ERR_REP( 'ERR',
      :                    'Error : CONTOUR_PLOT : after NDF_ANNUL',
      :                     STATUS )
             RETURN

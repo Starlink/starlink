@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000-2003 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -88,7 +88,7 @@ understand.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -547,12 +547,12 @@ understand.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -632,7 +632,7 @@ familiarity with one of these is assumed, as is knowledge of
 the UNIX C-shell. If you want to use IMG from C then you should
 briefly study the earlier sections (which are Fortran specific, but
 nevertheless show the appropriate calling sequences and discuss more
-general issues) and then look at 
+general issues) and then look at
 \hyperref{this later section}{appendix }{}{IMGCinterface}.
 
 \section{ACCESSING IMAGE DATA \label{USINGIMG}}
@@ -1759,7 +1759,7 @@ NDF (our ``images'' are really the main NDF data array) such as its
 variance, quality or world coordinate system. It also allows you to
 access NDF extensions (our ``sources'' of header information) in more
 sophisticated ways.  As a very simple example the next program snippet
-shows how to write out the name of an image dataset 
+shows how to write out the name of an image dataset
 (also see \htmlref{IMG\_NAME}{IMG\_NAME}):
 \begin{code}
 \begin{verbatim}
@@ -1939,7 +1939,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
          via IMG subroutines are considered as potential matches.
 
          \sstitem Identifiers obtained using
-         \htmlref{IMG\_INDF}{IMG\_INDF} are not released by this routine. 
+         \htmlref{IMG\_INDF}{IMG\_INDF} are not released by this routine.
       }
    }
 }
@@ -2027,7 +2027,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
          via IMG subroutines are considered as potential matches.
 
          \sstitem Identifiers obtained using
-         \htmlref{IMG\_INDF}{IMG\_INDF} are not released by this routine. 
+         \htmlref{IMG\_INDF}{IMG\_INDF} are not released by this routine.
       }
    }
 }
@@ -2288,7 +2288,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
            has not already been made. Note that it will be opened for
            read-only access and you will not be able to write or delete any
            header items. If you need to be able to do this then access the
-           image first, either with one of the 
+           image first, either with one of the
            \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]} subroutines
            (if you intend to process the image data), or the
            \htmlref{HDR\_MOD}{HDR\_MOD} subroutine.
@@ -2530,7 +2530,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
          XNAME1 = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The name of the extension to be copied (\qs{FITS} or \qs{ }
-         for FITS). 
+         for FITS).
       }
       \sstsubsection{
          PARAM2 = CHARACTER $*$ ( $*$ ) (Given)
@@ -2541,7 +2541,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
       \sstsubsection{
          XNAME2 = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the destination header source (\qs{FITS} or 
+         The name of the destination header source (\qs{FITS} or
          \qs{ } for FITS, must be FITS if XNAME1 is FITS).
       }
       \sstsubsection{
@@ -2556,7 +2556,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 
          \sstitem
          Modified header items associated with the input source will copied
-         to the new image. 
+         to the new image.
 
          \sstitem
          This routine may be used to copy the same header source (from a
@@ -3046,35 +3046,35 @@ be passed as arrays also have a length argument.
 \begin{rawhtml}
 <PRE>
 <A NAME="xref_imgCancl"></A>
-  void <B>imgCancl</B>(char *param, int *status) 
-     Cancel an image/parameter association 
+  void <B>imgCancl</B>(char *param, int *status)
+     Cancel an image/parameter association
 <A NAME="xref_imgDelet"></a>
-  void <B>imgDelet</B>(char *param, int *status) 
-     Delete an image 
+  void <B>imgDelet</B>(char *param, int *status)
+     Delete an image
 <A NAME="xref_imgFree"></A>
-  void <B>imgFree</B>(char *param, int *status) 
-     Free an image 
+  void <B>imgFree</B>(char *param, int *status)
+     Free an image
 <A NAME="xref_imgIn[N][X]"></A>
-  void <B>imgIn[N][X]</B>(char *param, int *nx, [int *ny,] [int *nz,] TYPE **ip, int *status) 
-     Access an existing image for reading 
+  void <B>imgIn[N][X]</B>(char *param, int *nx, [int *ny,] [int *nz,] TYPE **ip, int *status)
+     Access an existing image for reading
 <A NAME="xref_imgIndf"></A>
-  void <B>imgIndf</B>(char *param, int *indf, int *status) 
-     Obtain an NDF identifier for an image 
+  void <B>imgIndf</B>(char *param, int *indf, int *status)
+     Obtain an NDF identifier for an image
 <A NAME="xref_imgMod[N][X]"></A>
-  void <B>imgMod[N][X]</B>(char *param, int *nx, [int *ny,] [int nz,] TYPE **ip, int *status) 
-     Access an image for modification 
+  void <B>imgMod[N][X]</B>(char *param, int *nx, [int *ny,] [int nz,] TYPE **ip, int *status)
+     Access an image for modification
 <A NAME="xref_imgNew[N][X]"></A>
-  void <B>imgNew[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status) 
-     Create a new image 
+  void <B>imgNew[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)
+     Create a new image
 <A NAME="xref_imgName"></A>
-  void <B>imgName</B>(char *param, char *value, int value_length, int *status) 
+  void <B>imgName</B>(char *param, char *value, int value_length, int *status)
      Return the image name
 <A NAME="xref_imgOut[X]"></A>
-  void <B>imgOut[X]</B>(char *param1, char *param2, TYPE **ip, int *status) 
-     Create an output image 
+  void <B>imgOut[X]</B>(char *param1, char *param2, TYPE **ip, int *status)
+     Create an output image
 <A NAME="xref_imgTmp[N][X]"></A>
-  void <B>imgTmp[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status) 
-     Create a temporary image 
+  void <B>imgTmp[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)
+     Create a temporary image
 </PRE>
 \end{rawhtml}
 
@@ -3096,7 +3096,7 @@ Number of dimensions \texttt{[N]}    &    \texttt{nx}, \texttt{ny} \& \texttt{nz
 \end{center}
 \end{small}
 The default number of dimensions are two (in which case do not replace
-\texttt{[N]} by anything). 
+\texttt{[N]} by anything).
 
 The ordering of array dimensions is different in C to Fortran, so for
 instance the Fortran array \myverb{ARRAY(NX,NY,NZ)} is equivalent to
@@ -3106,8 +3106,8 @@ hard code any array dimensions) and you're far more likely to use the
 data via a pointer to the first element. Since C arrays also always start
 at 0 (rather than 1 as is the default in Fortran) the index of an
 element say \texttt{[y][x]} is
-\texttt{nx}~$\times$~\texttt{y}~$+$~\texttt{x}. In 3-D this becomes 
-\texttt{[z][y][x]} --- 
+\texttt{nx}~$\times$~\texttt{y}~$+$~\texttt{x}. In 3-D this becomes
+\texttt{[z][y][x]} ---
 \texttt{nx}~$\times$~\texttt{ny}~$\times$~\texttt{z}~$+$~\texttt{nx}~$\times$~\texttt{y}~$+$~\texttt{x}.
 
 \label{IMGCdatatypes}
@@ -3184,39 +3184,39 @@ The default data type is \texttt{float} (in which case do not replace
 \begin{rawhtml}
 <PRE>
 <A NAME="xref_hdrDelet"></A>
-  void <B>hdrDelet</B>(char *param, char *xname, char *item, int comp, int *status) 
-     Delete a header item 
+  void <B>hdrDelet</B>(char *param, char *xname, char *item, int comp, int *status)
+     Delete a header item
 <A NAME="xref_hdrIn"></A>
-  void <B>hdrIn</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status) 
-     Read a character header item 
+  void <B>hdrIn</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status)
+     Read a character header item
 <A NAME="xref_hdrInc"></A>
-  void <B>hdrInC</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status) 
-     Read a character header item 
+  void <B>hdrInC</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status)
+     Read a character header item
 <A NAME="xref_hdrIn[X]"></A>
-  void <B>hdrIn[X]</B>(char *param, char *xname, char *item, int comp, TYPE *value, int *status) 
-     Read a header item 
+  void <B>hdrIn[X]</B>(char *param, char *xname, char *item, int comp, TYPE *value, int *status)
+     Read a header item
 <A NAME="xref_hdrMod"></A>
-  void <B>hdrMod</B>(char *param, int *status) 
-     Open an image allowing modification of any header items 
+  void <B>hdrMod</B>(char *param, int *status)
+     Open an image allowing modification of any header items
 <A NAME="xref_hdrName"></A>
-  void <B>hdrName</B>(char *param, char *xname, int n, char *item, int item_length, int *status) 
-     Return a header item name 
+  void <B>hdrName</B>(char *param, char *xname, int n, char *item, int item_length, int *status)
+     Return a header item name
 <A NAME="xref_hdrNumb"></A>
-  void <B>hdrNumb</B>(char *param, char *xname, char *item, int *n, int *status) 
-     Return a header item count 
+  void <B>hdrNumb</B>(char *param, char *xname, char *item, int *n, int *status)
+     Return a header item count
 <A NAME="xref_hdrOut"></A>
-  void <B>hdrOut</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status) 
-     Write a character header item 
+  void <B>hdrOut</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status)
+     Write a character header item
 <A NAME="xref_hdrOutC"></A>
-  void <B>hdrOutc</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status) 
-     Write a character header item 
+  void <B>hdrOutc</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status)
+     Write a character header item
 <A NAME="xref_hdrOut[X]"></A>
-  void <B>hdrOut[X]</B>(char *param, char *xname, char *item, char *commen, TYPE *value,   int *status) 
-     Write a header item 
+  void <B>hdrOut[X]</B>(char *param, char *xname, char *item, char *commen, TYPE *value,   int *status)
+     Write a header item
 </PRE>
 \end{rawhtml}
 \label{HDRCdatatypes}
-Where the \texttt{"[X]"} indicate the data type of the header items. 
+Where the \texttt{"[X]"} indicate the data type of the header items.
 The possible values of \texttt{[X]} are:
 \begin{small}
 \begin{center}
@@ -3518,7 +3518,7 @@ shows how to read the value of a header item.
 header item.
 % 2
 \item The size of the string is passed as an additional argument when
-calling \myverb{hdrIn} 
+calling \myverb{hdrIn}
 (this argument is not present in the Fortran version).
 \end{enumnotes}
 
@@ -3614,7 +3614,7 @@ at the same time.
 \begin{enumnotes}
 % 1
 \item The address to the first element of the \texttt{RA} and \texttt{DEC}
-arrays is passed. This could have been written as 
+arrays is passed. This could have been written as
 \texttt{\&RA[0][0]} and \texttt{\&DEC[0][0]}.
 \end{enumnotes}
 
@@ -3622,7 +3622,7 @@ This example shows how to write values to the same header item of two images.
 \begin{code}
 \begin{verbatim}
    char obstype[2][5] = {"BIAS","FLAT"};
-   hdrOut( "BIAS,FLAT", " ", "OBSTYPE", "Type of observation", 
+   hdrOut( "BIAS,FLAT", " ", "OBSTYPE", "Type of observation",
            (char *) obstype, 5, istat );
    imgFree( "*", istat );
 \end{verbatim}
@@ -3630,15 +3630,15 @@ This example shows how to write values to the same header item of two images.
 
 \subsection{Compiling and linking C programs}
 Compiling and linking a C program is very similar to the methods
-described 
+described
 (\hyperref{in the Fortran section}{in \S}{}{IMGCOMPILING}), except
-that you must compile the source code before the linking stage. 
+that you must compile the source code before the linking stage.
 
 If your program source file is named \myverb{prog.c}, and it only
 depends on IMG, then the commands:
 \begin{code}
 \begin{verbatim}
-% cc -c -I/star/include prog.c 
+% cc -c -I/star/include prog.c
 % alink prog.o -L/star/lib `img_link_adam`
 \end{verbatim}
 \end{code}
@@ -3662,10 +3662,10 @@ information etc.
 The documentation has been updated to reinforce the fact that NDF
 identifiers obtained using \htmlref{\myverb{IMG\_INDF}}{IMG\_INDF} are not
 released by any IMG calls (you must do this for yourself using
-\myverb{NDF\_ANNUL}). 
+\myverb{NDF\_ANNUL}).
 
 A new routine for copying sources of header information
-(\htmlref{\myverb{HDR\_COPY}}{HDR\_COPY}) has been added. 
+(\htmlref{\myverb{HDR\_COPY}}{HDR\_COPY}) has been added.
 
 A bug in the FITS header writer that added NULL characters after the
 END card has been corrected. This should have only affected output
@@ -3676,7 +3676,7 @@ FITS headers that contained some initially empty cards.
 A bug that returned all images as the same size, even from different
 calls to \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, has been fixed.
 
-FITS character strings may now be free-format (i.e.\ 
+FITS character strings may now be free-format (i.e.\
 the terminating quote may be before the 20th column of a header card).
 
 \end{document}

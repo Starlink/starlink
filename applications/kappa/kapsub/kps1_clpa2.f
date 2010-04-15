@@ -13,17 +13,17 @@
 *     CALL KPS1_CLPA2( INDF, STATUS )
 
 *  Description:
-*     This routine searches the current Frame in the WCS FrameSet of the 
+*     This routine searches the current Frame in the WCS FrameSet of the
 *     supplied NDF, looking for duplicated GRID axes (these may be added
 *     by KPS1_CLPA0). If any are found, a new Frame is created which is a
 *     copy of the original current Frame, except that the GRID axes are
 *     replaced by the correspsonding PIXEL axes. A Mapping is created
-*     which maps positions from the original current Frame to this new 
+*     which maps positions from the original current Frame to this new
 *     Frame (this Mapping is a UnitMap for the non-GRID axes in the
 *     current Frame, and a shift of origin for the GRID axes). The new
-*     Frame is added into the WCS FrameSet, using the above Mapping to 
+*     Frame is added into the WCS FrameSet, using the above Mapping to
 *     connect it to the original current Frame. This new Frame is left as
-*     the current WCS Frame, and the original current Frame is removed from 
+*     the current WCS Frame, and the original current Frame is removed from
 *     the FrameSet.
 
 *  Arguments:
@@ -66,14 +66,14 @@
 *        Check that there are some non-GRID axes in the current Frame
 *        before using the non-GRID axes.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER INDF
@@ -150,15 +150,15 @@
          IAT = 7
          CALL CHR_PUTI( I, ATTR, IAT )
          CALL CHR_APPND( ')', ATTR, IAT )
-         IF( AST_GETC( WFRM, ATTR( : IAT ), STATUS ) .EQ. 
+         IF( AST_GETC( WFRM, ATTR( : IAT ), STATUS ) .EQ.
      :       'GRID' ) THEN
 
 *  If it is, get the index of the associated base Frame axis. Set a flag
 *  if this is not possible.
             INAX = I
             CALL AST_MAPSPLIT( MAP, 1, INAX, OUTAX, TMAP, STATUS )
-            IF( TMAP .NE. AST__NULL ) THEN 
-               IF( AST_GETI( TMAP, 'Nout', STATUS ) .EQ. 1 ) THEN         
+            IF( TMAP .NE. AST__NULL ) THEN
+               IF( AST_GETI( TMAP, 'Nout', STATUS ) .EQ. 1 ) THEN
                   NG = NG + 1
                   GAXID( NG ) = I
                   AXG( NG ) = OUTAX( 1 )
@@ -195,16 +195,16 @@
 
 *  Create a Frame containing the PIXEL axes that correspond to the GRID
 *  axes found in the current Frame.
-         PFRM = AST_PICKAXES( AST_GETFRAME( IWCS, IPFRM, STATUS ), 
+         PFRM = AST_PICKAXES( AST_GETFRAME( IWCS, IPFRM, STATUS ),
      :                        NG, AXG, TMAP, STATUS )
 
 *  Combine these two Frames, and then permute the axes in the combined
 *  Frame to put them back into the order used by the original current Frame.
-         IF( NGFRM .NE. AST__NULL ) THEN 
+         IF( NGFRM .NE. AST__NULL ) THEN
             NEWFRM = AST_CMPFRAME( NGFRM, PFRM, ' ', STATUS )
          ELSE
             NEWFRM = AST_CLONE( PFRM, STATUS )
-         END IF   
+         END IF
 
          DO I = 1, NNONG
             PERM( NGAXID( I ) ) = I
@@ -215,9 +215,9 @@
          END DO
 
          CALL AST_PERMAXES( NEWFRM, PERM, STATUS )
-  
-*  Now create a Mapping form the original current Frame to this new Frame. 
-*  Values for non-GRID axes are just copied using a UnitMap. Values for 
+
+*  Now create a Mapping form the original current Frame to this new Frame.
+*  Values for non-GRID axes are just copied using a UnitMap. Values for
 *  GRID axes are converted into the corresponding PIXEL axis value using
 *  a ShiftMap. First get the pixel origin from the NDF.
          CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -227,8 +227,8 @@
          CALL AST_ANNUL( MAP, STATUS )
 
 *  Now loop round each current Frame axis.
-         DO I = 1, NWCS 
-         
+         DO I = 1, NWCS
+
 *  If this is a non-GRID axis, create a UnitMap.
             IF( AX( I ) .EQ. 0 ) THEN
                TMAP = AST_UNITMAP( 1, ' ', STATUS )
@@ -243,7 +243,7 @@
 *  Add the above Mapping into the running parallel CmpMap.
             IF( MAP .EQ. AST__NULL ) THEN
                MAP = TMAP
-            ELSE               
+            ELSE
                MAP = AST_CMPMAP( MAP, TMAP, .FALSE., ' ', STATUS )
             END IF
 

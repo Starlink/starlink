@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -61,22 +61,22 @@ package. Users of IRC\_ should not need to know about these specific details, as
 all access to CRDD information (except the DATA array) should be done
 using IRC\_. Following Starlink programming standards, all the subroutines are
 identified by names of up to five characters, together with the prefix
-``IRC\_''. 
+``IRC\_''.
 
 The routines within IRC\_ all apply to {\em reading } CRDD files. New CRDD files
 can be created using the NDF\_ system, based on previously existing input CRDD
 files. Such input CRDD files will exist for most applications {\em with the
-exception of the application which extracts CRDD from the tape archives}. 
+exception of the application which extracts CRDD from the tape archives}.
 
 Access to the sample values which form the bulk data in a CRDD file can be
-gained through the NDF\_ routines described in 
-SUN/33. The IRG\_ package (see ID/5 ) provides facilities for acquiring NDF 
-identifiers from a ``free format'' list of CRDD files, potentially including wild 
+gained through the NDF\_ routines described in
+SUN/33. The IRG\_ package (see ID/5 ) provides facilities for acquiring NDF
+identifiers from a ``free format'' list of CRDD files, potentially including wild
 cards, explicit multiple names, indirection through text file, etc.
 
-Throughout this document the term ``CRDD file'' is used to mean any file which 
-holds data in the form of time ordered data streams from separate detectors. 
-Technically, data is no longer true CRDD once any operation has been performed 
+Throughout this document the term ``CRDD file'' is used to mean any file which
+holds data in the form of time ordered data streams from separate detectors.
+Technically, data is no longer true CRDD once any operation has been performed
 on, since it is no longer in the original form distributed by IPAC.
 
 \section {CRDD Type Independency}
@@ -87,8 +87,8 @@ angles. This may not always be true. The CRDD for Pointed Observations
 (POs) may eventually be available in a form known as ``footprints'', in
 which the pointing information is stored explicitly for each data sample. Other
 forms of CRDD may become available in the future. It would obviously be a large
-overhead if a new set of CRDD handling applications need to be written each 
-time this happens. 
+overhead if a new set of CRDD handling applications need to be written each
+time this happens.
 
 For this reason, a major design goal for the IRC\_ package was ``CRDD type
 independency''. This means that applications need not know what type of CRDD is
@@ -102,7 +102,7 @@ should be modified). If this rule is strictly adhered to, then future new types
 of CRDD can be accommodated simply by modifying the IRC\_ routines. For this
 reason, the main part of this document describes CRDD in terms of concepts
 common to {\em all} CRDD types. All specific details of individual CRDD types
-are contained in the appendices. 
+are contained in the appendices.
 
 \section {CRDD Support Information}
 \label {SEC:SUPP}
@@ -117,8 +117,8 @@ provided by IRC for handling this information is the routine IRC\_SUPP which
 returns an HDS locator to a requested item of support information (if it
 exists). It is the responsibility of the calling application to ensure that this
 information is correctly interpreted. Access to this information should be kept
-to a minimum, as its use makes an application CRDD-type dependant. Applications 
-should always allow for the possibility that a required item of support 
+to a minimum, as its use makes an application CRDD-type dependant. Applications
+should always allow for the possibility that a required item of support
 information may not be present in the supplied CRDD file.
 
 \section {Terms Used to Describe CRDD Files}
@@ -142,12 +142,12 @@ were not necessarily taken at the same time). Thus the first dimension steps
 though sample numbers, and the second steps though detectors. Note, there is no
 need for the DATA array to have a row for {\em each} detector in the band, the
 number of rows can be less than the number of detectors in the band if some
-detectors are to be excluded. 
+detectors are to be excluded.
 
 Each element in the data array is called a ``sample'', not a pixel. The word
 ``pixel'' means a ``picture element'', so ``sample'' is used to emphasise that
-the data is {\em not} a picture, but a set of time order data streams. Each 
-sample can be characterised by the following general properties: 
+the data is {\em not} a picture, but a set of time order data streams. Each
+sample can be characterised by the following general properties:
 
 \begin{description}
 
@@ -159,7 +159,7 @@ surface brightness estimates rather than flux estimates. In fact applications
 could in principle perform {\em any} operation on the sample values.
 Applications should check UNITS if the nature of the sample values effects the
 algorithm. Standard values for UNITS are listed in appendix \ref {APP:UNITS}. No
-calibration corrections are applied by applications which use these values. 
+calibration corrections are applied by applications which use these values.
 
 \item [Sample number] - This is a value varying between the bounds of the
 first dimension of the data array. These bounds need not necessarily start at 1
@@ -167,16 +167,16 @@ first dimension of the data array. These bounds need not necessarily start at 1
 create an NDF {\em section} (see SUN/33) from a CRDD file, containing a subset
 of the entire DATA array. In this case the first sample in the section retains
 the sample number it had in the original {\em base} NDF, which in general will
-not be 1. However, applications should always create {\em new} CRDD files 
+not be 1. However, applications should always create {\em new} CRDD files
 with a lower bound of 1 (except if they are propagated from input CRDD file, in
-which case they should inherit the bounds of the input CRDD file). 
+which case they should inherit the bounds of the input CRDD file).
 
 In order to index the data array, an {\em integer} sample number must obviously
 be used. However, several IRC routines use {\em floating point} sample numbers
 which can have fractional values. This allows positions to be specified to a
 greater accuracy. Applications can choose whether to just use the nearest
 integer to index the data array, or whether to use some form of interpolation
-between the sample values on either side of the fractional sample number. 
+between the sample values on either side of the fractional sample number.
 
 Sample numbers may extend beyond the bounds of the first dimension of the NDF
 DATA array. Obviously in such situations, no actual {\em data values} are
@@ -186,7 +186,7 @@ some given position on the sky. The position of a sample which lies outside the
 DATA array is obtained by extrapolation from the samples within the DATA array.
 If an accurate extrapolated position cannot be obtained, IRC will return an
 error status, and generate an error report. The calling application must then
-decide how to handle this situation. 
+decide how to handle this situation.
 
 \item [Time] - For each sample, this is the difference in UTC between the moment
 each sample was taken and the moment sample number 1 was taken, in seconds.
@@ -194,27 +194,27 @@ The time of a given sample number can vary from detector to detector.
 
 \item [Detector index] - An integer varying between the bounds of the second
 dimension of the data array, and giving the row at which the detectors data
-is stored. Note, the detector {\em index } does not explicitly 
-identify a detector in terms of the detector {\em numbers } used in the 
+is stored. Note, the detector {\em index } does not explicitly
+identify a detector in terms of the detector {\em numbers } used in the
 Explanatory Supplement. The detector {\em index } locates the detector
-within the NDF data array (i.e the row number holding the detectors data 
+within the NDF data array (i.e the row number holding the detectors data
 stream), the detector {\em number} locates it within the IRAS focal plane.
 No assumptions are made about the order in which detectors are stored in the
 NDF.
 
-\item [Detector number] - Each of the 62 IRAS detectors was identified by a 
-``Detector number'', an integer varying from 1 to 62. These are shown in the 
+\item [Detector number] - Each of the 62 IRAS detectors was identified by a
+``Detector number'', an integer varying from 1 to 62. These are shown in the
 Explanatory Supplement figure II.C.6. The detector which gave rise to a
 particular sample can be identified by these numbers. A vector of
 detector numbers will be stored in the IRAS extension, giving an ``absolute''
-identity to each detector index value. Each detector can have a maximum of 
+identity to each detector index value. Each detector can have a maximum of
 one row of data in a CRDD file.
 
 \item [Position] - This is the position on the sky corresponding to the detector
 centre at the moment the sample was taken. All sky positions are given and
 returned as double precision Right Ascension and Declination values (FK4,
 B1950), in radians. If positions in other sky coordinate systems are required,
-the IRAS astrometry package (IRA\_, see ID/2) can be used to do the conversion. 
+the IRAS astrometry package (IRA\_, see ID/2) can be used to do the conversion.
 
 \item [Scan angle] - This is the orientation of the path being traced across the
 sky by a detector, and can vary from sample to sample. Near the poles, it can
@@ -224,7 +224,7 @@ of the positive focal plane Y axis. The angle is in radians and is measured
 positive in the same sense as rotation from north to east (this is the standard
 astronomical Position Angle (PA) of the positive Y axis). Scan angles are always
 double precision values. See appendix \ref {APP:FOCALP} for a description of the
-focal plane (Z,Y) coordinate system. 
+focal plane (Z,Y) coordinate system.
 
 \item [Scan speed] - This is the speed at which a source is moving across the
 focal plane, in radians per second. This is a signed value to indicate if the
@@ -232,12 +232,12 @@ motion is ``with-survey'' (i.e in the same sense as the all sky survey), or
 ``anti-survey'' (i.e. in the opposite direction). With-survey motion is positive
 and corresponds to sources moving across the focal plane in the positive Y
 direction. Anti-survey motion is negative and corresponds to sources moving
-across the focal plane in the negative Y direction (see appendix \ref 
+across the focal plane in the negative Y direction (see appendix \ref
 {APP:FOCALP}).
 \end{description}
 
 \section {Using the IRC\_ Routines}
-See appendix \ref {APP:EXAMS} for some code fragments showing typical examples 
+See appendix \ref {APP:EXAMS} for some code fragments showing typical examples
 of the use of IRC.
 
 \subsection {Assumptions to be Avoided when Using IRC}
@@ -256,22 +256,22 @@ may contain data in any of the units listed in appendix \ref {APP:UNITS}, and
 applications should check the UNITS component before deciding how to process the
 data. If the application cannot process data with the supplied units, then a
 suitable error should be reported. Applications which {\em write} CRDD files
-should always produce values in one of the supported units systems. 
+should always produce values in one of the supported units systems.
 
 \item {\em ``Taking the same sample number from each row results in a set of
 simultaneous samples''}. This may not be the case for all types of CRDD (eg PO
 footprint data). However, substantial CPU savings can sometimes be made by an
 application if each column of samples {\em are} in fact obtained simultaneously.
 For this reason routine IRC\_SIMUL is provided which will return a logical value
-indicating if the detector data samples are simultaneous or not. 
+indicating if the detector data samples are simultaneous or not.
 
-\item {\em ``Adjacent samples from a single detector are all equally spaced on 
+\item {\em ``Adjacent samples from a single detector are all equally spaced on
 the sky''}. Again, this may not be the case for all types of CRDD (eg PO
 footprint data). It {\em can} be assumed that adjacent samples are equally
-spaced in {\em time}, but not in {\em position}. 
+spaced in {\em time}, but not in {\em position}.
 
-\item {\em ``The first sample in the array is sample number 1''}. This need not 
-be true now that NDFs are being used to store the CRDD (see the description of 
+\item {\em ``The first sample in the array is sample number 1''}. This need not
+be true now that NDFs are being used to store the CRDD (see the description of
 `` Sample Numbers'' in section \ref {SEC:TERMS} ).
 
 \item {\em ``The detectors are stored in cross-scan order''}. This need not be
@@ -279,13 +279,13 @@ true, detectors can be stored in any order. The IRAS detectors numbers
 identifying the detectors from which the data in each row of the NDF was created
 are explicitly stored in CRDD file. The relationship between row numbers in the
 DATA array (or ``detector index'', see section \ref {SEC:TERMS}) and IRAS
-detector numbers can be obtained using IRC\_DETNO and IRC\_DETIN. 
+detector numbers can be obtained using IRC\_DETNO and IRC\_DETIN.
 
 \item {\em ``The scan angle is constant''}. This also is not true. Scan angle
 (see section \ref{SEC:TERMS}) can vary along the length of a scan. {\em It can
 also vary from detector to detector at a given point in the scan.} This latter
 effect is only significant near the poles, but applications should not be
-written which rely on the scan angle being the same for all detectors. 
+written which rely on the scan angle being the same for all detectors.
 
 \end {enumerate}
 
@@ -294,7 +294,7 @@ The IRC package has associated with it various symbolic constants defining such
 things as the required length of various character variables. These values
 consist of a name of up to 5 characters prefixed by ``IRC\_\_''  (note the {\em
 double} underscore), and can be made available to an application by including
-the following lines at the start of the routines which uses them: 
+the following lines at the start of the routines which uses them:
 
 
 \begin{verbatim}
@@ -304,7 +304,7 @@ the following lines at the start of the routines which uses them:
 
 The values thus defined are described in the following sections, and also in the
 subroutine specifications. Another set of symbolic constants is made available
-by the statement 
+by the statement
 
 \begin{verbatim}
       INCLUDE 'IRC_ERR'
@@ -314,25 +314,25 @@ These values have the same format of those contained in IRC\_PAR, put define
 various error conditions which can be generated within the IRC package.
 Applications can compare the $STATUS$ argument with these values to check for
 specific error conditions. These values are described in appendix \ref
-{APP:ERRORS}. 
+{APP:ERRORS}.
 
 \subsection {Initialising the IRC\_ System}
-A call to IRC\_INIT must be made before calling any other IRC\_ routines. This 
+A call to IRC\_INIT must be made before calling any other IRC\_ routines. This
 routine initializes various common blocks.
 
 \subsection {Obtaining  NDF Identifiers for Input CRDD Files}
-The next step that most applications will need to do is to obtain a set of NDF 
+The next step that most applications will need to do is to obtain a set of NDF
 identifiers for all the input CRDD files. These identifiers are given as input
-to many NDF\_ routines and to IRC\_IMPRT, to identify the CRDD file to be 
+to many NDF\_ routines and to IRC\_IMPRT, to identify the CRDD file to be
 operated on.
-There is a finite limit to the number of NDF identifiers which can be 
-defined simultaneously. Therefore it is a good idea to process CRDD files one 
-at a time, rather than all together, so that resources can be released and 
-re-used. Obviously this may not always be possible, in which case the possibility 
-of hitting the limit should be born in mind. The actual value of the limit is 
-hard to define as it depends on many things, but it will probably be of the 
-order of one or two hundred, if the users open file quota does not impose a 
-lower limit. If this presents a problem, the facilities provided by the IRG\_ 
+There is a finite limit to the number of NDF identifiers which can be
+defined simultaneously. Therefore it is a good idea to process CRDD files one
+at a time, rather than all together, so that resources can be released and
+re-used. Obviously this may not always be possible, in which case the possibility
+of hitting the limit should be born in mind. The actual value of the limit is
+hard to define as it depends on many things, but it will probably be of the
+order of one or two hundred, if the users open file quota does not impose a
+lower limit. If this presents a problem, the facilities provided by the IRG\_
 (ID/5) package may be of help.
 
 NDF identifiers for existing CRDD files can be obtained by calling routine
@@ -345,29 +345,29 @@ routine. This routine checks that the NDF is in fact a CRDD file, and reads data
 from the CRDD\_INFO extension (see below) into various internal common blocks.
 Note, it is possible to import an NDF {\em section} into IRC as well as a base
 NDF. Indeed, there is nothing to stop the user specifying a section when giving
-the NDF name in reponse to the parameter prompt from IRM\_CRDDF. However, if 
-an NDF section is specified which is a {\em super}-set in the second dimension 
-(i.e. if the bounds of the second dimension of the section extend beyond the 
-bounds of the second dimension of the base NDF), then there will be no 
-detector numbers corresponding to the extra rows used to pad the section out to 
-the required size. In this case IRC\_IMPRT will report an error. No such error 
-is reported if the section is a {\em sub}-set of the base NDF in the second 
+the NDF name in reponse to the parameter prompt from IRM\_CRDDF. However, if
+an NDF section is specified which is a {\em super}-set in the second dimension
+(i.e. if the bounds of the second dimension of the section extend beyond the
+bounds of the second dimension of the base NDF), then there will be no
+detector numbers corresponding to the extra rows used to pad the section out to
+the required size. In this case IRC\_IMPRT will report an error. No such error
+is reported if the section is a {\em sub}-set of the base NDF in the second
 dimension.
 
 \subsection{IRC identifiers}
-Routine IRC\_IMPRT returns an ``IRC identifier'' for the CRDD information 
-associated with the given NDF. This identifier is passed to other IRC\_ routines 
-to identify the CRDD file. IRC\_ANNUL should be called to annul the IRC 
+Routine IRC\_IMPRT returns an ``IRC identifier'' for the CRDD information
+associated with the given NDF. This identifier is passed to other IRC\_ routines
+to identify the CRDD file. IRC\_ANNUL should be called to annul the IRC
 identifier when access to the CRDD information is no longer needed.
 
 \subsection {Accessing Sample Values}
-The CRDD sample values are stored in the standard DATA component of the NDF, and 
-can be accessed using the usual NDF\_ routines such as NDF\_MAP. Before 
-processing the CRDD, applications should first get the value of the UNITS 
-component using NDF\_CGET, and check that the data represents a physical 
+The CRDD sample values are stored in the standard DATA component of the NDF, and
+can be accessed using the usual NDF\_ routines such as NDF\_MAP. Before
+processing the CRDD, applications should first get the value of the UNITS
+component using NDF\_CGET, and check that the data represents a physical
 quantity which the application knows how to handle. The legality of both the
 UNITS and LABEL component values are checked by IRC\_IMPRT. If the stored values
-are not recognised then an error report is made (see appendices 
+are not recognised then an error report is made (see appendices
 \ref {APP:UNITS} and \ref {APP:LABEL} for lists of legal values).
 
 \subsection {Obtaining Pointing Information}
@@ -379,8 +379,8 @@ impose the restriction that each column of the DATA array must contain
 simultaneously obtained detector samples. For this reason IRC\_BPOS requires a
 detector index as a given argument to establish the relationship between sample
 number and boresight position.) IRC\_POSMP returns three arrays of the same size
-and shape as the main data array, holding the two sky coordinates and scan 
-angle at every detector sample. 
+and shape as the main data array, holding the two sky coordinates and scan
+angle at every detector sample.
 
 Positions of samples which lie outside the bounds of the data array can be
 estimated using IRC\_BPOS and IRC\_DPOS (but {\em not} IRC\_POSMP). These
@@ -390,7 +390,7 @@ constant cone angle and constant rate of change of clock angle. See the
 Explanatory Supplement, chapter III). If an accurate extrapolated position is
 not available, the subroutines inherited STATUS value is set to the symbolic
 value IRC\_\_BADEX (see appendix \ref {APP:ERRORS} ) and an error report is
-generated. The calling application can then decide how to handle this error. 
+generated. The calling application can then decide how to handle this error.
 
 Routine IRC\_IMCO combines the above routines with various IRA (see ID/2)
 routines, to provide the coefficients of a linear transformation which maps
@@ -400,12 +400,12 @@ defines the mapping between sky coordinates and image coordinates, and is
 usually obtained by calling one of the IRA routines IRA\_CREAT or IRA\_IMPRT.
 The returned coefficients can either be used directly to transform focal plane
 coordinates to image coordinates, or can be used to derive values such as the
-position angle of the focal plane Y axis, the pixel dimensions, etc. 
+position angle of the focal plane Y axis, the pixel dimensions, etc.
 
 If all that is required is a rough estimate of where abouts on the sky the data
 is, the routine IRC\_INFO can be called which returns (amongst other things) the
 position of the CRDD file ``reference point'', which is usually the
-field centre requested when the data was extracted from the tape archives. 
+field centre requested when the data was extracted from the tape archives.
 
 \subsection {Transforming Between Focal Plane and Sky Coordinates}
 At the moment a given detector sample is taken, there exists a transformation
@@ -416,7 +416,7 @@ sky coordinates to focal plane coordinates using full spherical geometry,
 accurate for {\em any} point on the sky. The inverse transformation can be
 performed by IRC\_SKCO1 and IRC\_SKCO2. These routines can be used to find the
 in-scan or cross-scan distance (Y or Z focal plane values) from the boresight to
-any point on the sky. 
+any point on the sky.
 
 \subsection {Moving Between Detector Samples}
 Routine IRC\_DIST will find the in-scan distance joining two specified detector
@@ -426,7 +426,7 @@ corresponds to the closest approach of a given detector track to a specified sky
 position. IRC\_BCLAP will do the same for the boresight track.(Note, IRC\_BCLAP
 requires a detector index as a given argument to establish the relationship
 between sample number and boresight position, which can vary from detector to
-detector.) 
+detector.)
 
 \subsection {Accessing Detector Numbers and Detector Indices}
 The detector number corresponding to a given row in the DATA array can be found
@@ -437,7 +437,7 @@ If the requested detector number is not included in the CRDD file then the
 Starlink ``BAD'' value (VAL\_\_BADI) is returned. In addition, the routine
 IRC\_DINDS will convert a list of detector numbers to the corresponding detector
 indices, ignoring any detector numbers for which there is no data in the CRDD
-file. 
+file.
 
 \subsection {Accessing Other Information}
 Other information is available by calling IRC\_INFO. This includes:
@@ -458,7 +458,7 @@ Other information is available by calling IRC\_INFO. This includes:
 
 These, and other values, are defined in section \ref {SEC:CRDD_INFO}. A locator
 to an item of ``support information'' (see section \ref{SEC:SUPP}) may be
-obtained using routine IRC\_SUPP. 
+obtained using routine IRC\_SUPP.
 
 \subsection {Other Functions}
 More routines are being added to IRC\_ to perform other functions. See
@@ -466,7 +466,7 @@ the routine specifications contained in appendix \ref {APP:ROUTS} for
 a complete list.
 
 \section {Data Structures}
-A CRDD file makes use of some of the standard NDF components, but 
+A CRDD file makes use of some of the standard NDF components, but
 needs extra information held in the IRAS extension.
 
 \subsection {NDF Components}
@@ -479,31 +479,31 @@ The following meanings are attached to the standard NDF components.
 \item [UNITS] - A character string describing the sample values held in the data
 array. See appendix \ref {APP:UNITS} for a list of legal values and their
 meanings. Applications need to check the UNITS value before deciding how to use
-the sample values. A check is made by IRC\_IMPRT that the value held in UNITS 
+the sample values. A check is made by IRC\_IMPRT that the value held in UNITS
 corresponds to one of the legal values.
 
-\item [TITLE] - A string which usually names the object observed (eg "M51", 
+\item [TITLE] - A string which usually names the object observed (eg "M51",
 "NGC 5128" etc).
 
 \item [LABEL] - A string describing the type of data; ``Pointed Observation
 CRDD'' or ``Survey CRDD''. Legal values are listed in appendix \ref{APP:LABEL}.
 A check is made by IRC\_IMPRT that the value held in LABEL corresponds to one of
-the legal values. 
+the legal values.
 
 \item [VARIANCE] - This is optional, but could be used to store the variance of
-each CRDD sample. General purpose Starlink software assume that these variance 
-values represent independent, Gaussian noise samples. The limitations imposed 
-by these assumptions are recognised, but this component can still be useful, 
+each CRDD sample. General purpose Starlink software assume that these variance
+values represent independent, Gaussian noise samples. The limitations imposed
+by these assumptions are recognised, but this component can still be useful,
 especially within the IRAS package, where the limitations will be understood.
 
-\item [QUALITY] - This is optional, but can be used to distinguish between 
+\item [QUALITY] - This is optional, but can be used to distinguish between
 different samples. For instance, quality could be used to identify samples
-which are to be used when calculating destriping parameters. The IRQ\_ package 
+which are to be used when calculating destriping parameters. The IRQ\_ package
 (see ID/6) provides facilities for handling quality values in IRAS90.
 
-\item [HISTORY] - This component is used to record any significant processes 
-performed on the CRDD, and any important numerical values used (eg solid angles, 
-bandwidths, etc). What goes into HISTORY is left to the discretion of each 
+\item [HISTORY] - This component is used to record any significant processes
+performed on the CRDD, and any important numerical values used (eg solid angles,
+bandwidths, etc). What goes into HISTORY is left to the discretion of each
 application.
 
 \item [AXIS] - This component is left undefined within a CRDD file.
@@ -515,10 +515,10 @@ application.
 NDFs which contain CRDD have an extension with a {\em name} IRAS and
 an HDS {\em type} of IRAS. This is an HDS structure used to store IRAS specific
 information. It can potentially contain several components or sub-structures.
-The IRC\_ package is associated with a particular sub-structure {\em named} 
+The IRC\_ package is associated with a particular sub-structure {\em named}
 ``CRDD\_INFO''. CRDD\_INFO is an HDS object and has a {\em type} of
 ``CRDD\_INFO''. This object stores all the information required by the IRC\_
-package. It contains the following components: 
+package. It contains the following components:
 
 \begin {description}
 
@@ -527,40 +527,40 @@ must be equal to the size of the second dimension of the {\em base} NDF. Each
 element will hold the detector number of the corresponding row in the DATA
 array. Thus if the bounds of the second dimension of the base NDF were [-5,3]
 then DET\_NUMBERS(1) would hold the detector number corresponding to row -5,
-DET\_NUMBERS(2) would hold the detector number corresponding to row -4, etc. 
+DET\_NUMBERS(2) would hold the detector number corresponding to row -4, etc.
 
-\item [DET\_ORIGIN] - An \_INTEGER scalar giving the index within the 
-DET\_NUMBERS array corresponding to the origin of the second dimension of the 
+\item [DET\_ORIGIN] - An \_INTEGER scalar giving the index within the
+DET\_NUMBERS array corresponding to the origin of the second dimension of the
 NDF. Thus if the bounds of the second dimension of the base NDF were [-5,3]
 so that DET\_NUMBERS(1) holds the detector number corresponding to row -5, then
 DET\_NUMBERS(6) would hold the detector number corresponding to row zero, and
 so DET\_ORIGIN should have the value 6.
 
-\item [BAND] - An \_INTEGER scalar in the range 1 to 4, giving the IRAS band 
+\item [BAND] - An \_INTEGER scalar in the range 1 to 4, giving the IRAS band
 number. Storing the band {\em number} (rather than wavelength) allows the
-value of BAND to be used directly as an index into arrays holding band-specific 
+value of BAND to be used directly as an index into arrays holding band-specific
 information. On the other hand, applications should always use wavelengths
 (12, 25, 60, 100 $\mu$m) rather than band numbers when communicating with the user.
 
 \item [REF\_RA] - A \_DOUBLE scalar giving the Right Ascension (equinox B1950.0)
 of a reference position in the vicinity of the sky region covered by the CRDD
 file, given in units of radians. The reference position will usually be the
-source position requested by the user when the CRDD file was created. 
+source position requested by the user when the CRDD file was created.
 
-\item [REF\_DEC] - A \_DOUBLE scalar giving the Declination (equinox B1950.0) 
+\item [REF\_DEC] - A \_DOUBLE scalar giving the Declination (equinox B1950.0)
 of the reference position in radians.
 
-\item [SOP] - An \_INTEGER scalar giving the Satellite Observation Plan number 
+\item [SOP] - An \_INTEGER scalar giving the Satellite Observation Plan number
 from which the data is derived.
 
 \item [OBS] - An \_INTEGER scalar giving the Observation number within the
 SOP from which the data is derived.
 
-\item [NOM\_SPEED] - A real value giving the scan speed on the sky at the 
+\item [NOM\_SPEED] - A real value giving the scan speed on the sky at the
 centre of the scan (see section \ref {SEC:TERMS}). This value will usually
 be the equivalent of 3.85 arc-minutes per second for survey data, but may be
 different for PO data. Also, the exact scan speed may vary with sample number
-in a PO scan. 
+in a PO scan.
 
 \item [DETAILS] - All the above components are meaningful for any type of CRDD.
 However, there will be information which is only meaningful in the context of
@@ -570,7 +570,7 @@ structures will be defined to hold such information. They have differing HDS
 ``PO\_FOOTPRINT'', etc). The component named DETAILS within the CRDD\_INFO
 structure contains one (and only one) of these structures. The names and
 contents of each of these structure types are described in the relevant
-appendix. Any available support information is stored in a component of the 
+appendix. Any available support information is stored in a component of the
 DETAILS structure named SUPPORT\_INFO.
 
 \end {description}
@@ -626,25 +626,25 @@ The structure of a typical CRDD file is as follows:
 \end{picture}
 \setlength{\textwidth}{160mm}
 
-The IRC\_ routines access the components of the fifth and sixth rows, and 
+The IRC\_ routines access the components of the fifth and sixth rows, and
 NDF\_ routines access components of the second and third rows.
 
-The {\bf DESTRIPE} and {\bf MEMCRDD} components are shown as examples of 
-components of the IRAS structure which may be created by CRDD handling 
-applications to store supplementary information about the CRDD file. Such 
-structures will be defined in the documentation of the relevant application and 
-{\em do not } form part of the standard structure of a CRDD file, as defined by this 
-document. Routines to access such structures will form part of the individual 
+The {\bf DESTRIPE} and {\bf MEMCRDD} components are shown as examples of
+components of the IRAS structure which may be created by CRDD handling
+applications to store supplementary information about the CRDD file. Such
+structures will be defined in the documentation of the relevant application and
+{\em do not } form part of the standard structure of a CRDD file, as defined by this
+document. Routines to access such structures will form part of the individual
 application.
 
 \section {Compiling and Linking with IRC}
 \label{SEC:LINK}
 This section describes how to compile and link applications which use IRC
 subroutines, on both VMS and UNIX systems. It is assumed that the IRAS90 package
-is installed as part of the Starlink Software Collection. 
+is installed as part of the Starlink Software Collection.
 
 \subsection{VMS}
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use the IRC package should start by issuing the commands:
 
 \begin{verbatim}
@@ -655,12 +655,12 @@ $ IRAS90_DEV
 \end{verbatim}
 
 These commands set up logical names related to all the IRAS90
-subsystems, including IRC. 
+subsystems, including IRC.
 
 To link a VMS ADAM application with the IRC package, the linker options file
 IRAS90\_LINK\_ADAM should be used. For example, to compile and link an ADAM
 application called PROG with the IRC library, the following commands should be
-used: 
+used:
 
 \begin{verbatim}
 $ ADAMSTART
@@ -668,28 +668,28 @@ $ ADAMDEV
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ ALINK PROG, IRAS90_LINK_ADAM/OPT 
+$ ALINK PROG, IRAS90_LINK_ADAM/OPT
 \end{verbatim}
 
 Stand-alone (i.e. non-ADAM) applications can be linked with the ``standalone''
 version of IRC. To do this the link options file IRAS90\_LINK should be used
 instead of IRAS90\_LINK\_ADAM. Thus to compile and link a stand-alone
-application with the IRC package, the following commands should be given: 
+application with the IRC package, the following commands should be given:
 
 \begin{verbatim}
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ LINK PROG, IRAS90_LINK/OPT 
+$ LINK PROG, IRAS90_LINK/OPT
 \end{verbatim}
 
 \subsection{UNIX}
 
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use any IRAS90 sub-package should do the following:
 
 \begin{enumerate}
-\item Execute the {\bf iras90} command. This sets up an alias for the 
+\item Execute the {\bf iras90} command. This sets up an alias for the
 {\bf iras90\_dev} command.
 
 \item Execute the {\bf iras90\_dev} command.  This creates soft links
@@ -697,26 +697,26 @@ within the current directory to
 all the iras90 include files, defines an environment variable IRAS90\_SRC
 pointing to the IRAS90 source directory, adds the {\bf bin}
 sub-directory of IRAS90\_SRC on to the end of the current value for the
-environment variable PATH, and adds the {\bf lib} sub-directory of 
-IRAS90\_SRC on to the end of the current value for the environment 
+environment variable PATH, and adds the {\bf lib} sub-directory of
+IRAS90\_SRC on to the end of the current value for the environment
 variable LD\_LIBRARY\_PATH. The command {\bf iras90\_dev star} will do
 the same but will also create soft links to all starlink include files
 (i.e. all files in the directory /star/include).
 
 \item If a UNIX application accesses any include files (such as
-IRC\_PAR) then they should be specified (within the source file) in upper case 
+IRC\_PAR) then they should be specified (within the source file) in upper case
 without any directory
 path. The I90\_PAR file (for instance) can be included using the statement
 
 \verb+      INCLUDE 'I90_PAR'+\\
 
-\item Soft links can be deleted (using the {\bf rm} command) when no longer 
+\item Soft links can be deleted (using the {\bf rm} command) when no longer
 needed.
 The command {\bf iras90\_dev remove} will remove all IRAS90 soft links from
 the current directory. The command {\bf iras90\_dev remove star} will
 remove all IRAS90 and Starlink soft links from the current directory.
-Note, soft links are only accessable in the directory from which the {bf ln} 
-or {\bf iras90\_dev} command was issued. 
+Note, soft links are only accessable in the directory from which the {bf ln}
+or {\bf iras90\_dev} command was issued.
 \item For ADAM applications the following {\bf alink} command should be used:
 
 \verb+% alink prog.f -L$IRAS90_SRC/lib `irc_link_adam`+\\
@@ -746,11 +746,11 @@ sample number} and a {detector index} (see section \ref{SEC:TERMS}).
 \noteroutine{IRC\_ANNUL( IDC, STATUS )}
    {Release a CRDD file from the IRC\_ system.}
 \noteroutine{IRC\_BCLAP( IDC, DETIND, RA, DEC, CLSAMP, CLZFP, STATUS )}
-   {Find the sample number corresponding to the closest approach of the 
+   {Find the sample number corresponding to the closest approach of the
     boresight to a given sky position.}
-\noteroutine{IRC\_BPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE, SPEED, 
+\noteroutine{IRC\_BPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE, SPEED,
                         STATUS )}
-   {Returns the position, speed and scan angle of the boresight at a set of 
+   {Returns the position, speed and scan angle of the boresight at a set of
     samples.}
 \noteroutine{IRC\_CLOSE( STATUS )}
    {Close down the IRC\_ system.}
@@ -765,14 +765,14 @@ sample number} and a {detector index} (see section \ref{SEC:TERMS}).
    {Converts a list of detector numbers to the corresponding detector indices.}
 \noteroutine{IRC\_DIST( IDC, SAMP1, DETIN1, SAMP2, DETIN2, DIST, STATUS )}
    {Return the in-scan distance between two samples within a scan.}
-\noteroutine{IRC\_DPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE, SPEED, 
+\noteroutine{IRC\_DPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE, SPEED,
                         STATUS )}
-   {Returns the position, speed and scan angle of a given detector at a set 
+   {Returns the position, speed and scan angle of a given detector at a set
     of sample numbers.}
 \noteroutine{IRC\_FPCO1( IDC, SAMPLE, DETIND, NVAL, RA, DEC, ZFP, YFP, STATUS )}
-   {Return the focal plane coordinates of many sky positions at the time 
+   {Return the focal plane coordinates of many sky positions at the time
     determined by a given sample.}
-\noteroutine{IRC\_FPCO2( IDC, NVAL, SAMPLE, DETIND, RA, DEC, W1, W2, W3, 
+\noteroutine{IRC\_FPCO2( IDC, NVAL, SAMPLE, DETIND, RA, DEC, W1, W2, W3,
                          W4, ZFP, YFP, STATUS )}
     {Return the focal plane coordinates of a single sky position at a set of
      times determined by the given set of samples.}
@@ -796,18 +796,18 @@ sample number} and a {detector index} (see section \ref{SEC:TERMS}).
    {Produce a mapped array holding the position and orientation of each sample.}
 \noteroutine{IRC\_SATCO( IDC, NVAL, SAMPLE, DETIND, PSI, THETA, SOLONG, UTCS,
                         STATUS )}
-   {Returns the satellite coordinates, solar longitude and UTCS values at a 
+   {Returns the satellite coordinates, solar longitude and UTCS values at a
     set of samples.}
 \noteroutine{IRC\_SIMUL( IDC, SIMUL, STATUS )}
    {See if the CRDD file contains simultaneous detector samples or not.}
 \noteroutine{IRC\_SKCO1( IDC, SAMPLE, DETIND, NVAL, ZFP, YFP, RA, DEC, STATUS )}
-   {Find sky coordinates for a set of focal plane positions at a time specified 
+   {Find sky coordinates for a set of focal plane positions at a time specified
     by the given sample.}
 \noteroutine{IRC\_SKCO2( IDC, NVAL, SAMPLE, DETIND, ZFP, YFP, RA, DEC, STATUS )}
    {Find sky coordinates for a single focal plane position at a set of times
     specified by a given set of samples.}
 \noteroutine{IRC\_SUPP( IDC, NAME, THERE, LOC, STATUS )}
-   {See if an item of support information exists, and if so, return an HDS 
+   {See if an item of support information exists, and if so, return an HDS
     locator to it.}
 \noteroutine{IRC\_TRACE( IDC, ROUTNE, STATUS )}
    {Display the contents of the CRDD\_INFO structure.}
@@ -827,7 +827,7 @@ sample number} and a {detector index} (see section \ref{SEC:TERMS}).
    \newline
    \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
    \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstbannerlength}{0.5em}
    \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
    \addtolength{\sstcaptionlength}{-4.45pt}
    \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
@@ -1933,7 +1933,7 @@ sample number} and a {detector index} (see section \ref{SEC:TERMS}).
 
       IRC\_\_F      - Flux values in units of Pico-Watts (i.e. 1.0E-12 of
                       a Watt) per square metre.
- 
+
       IRC\_\_J      - Flux density values in Janskys.
 
       IRC\_\_JPS    - Surface brightness in Janskys per steradian.
@@ -2623,24 +2623,24 @@ The STARLSE package (see SUN/105) provides facilities for initialising the VAX
 Language Sensitive Editor (LSE) to simplify the generation of Fortran
 code conforming to the Starlink programming standard (see SGP/16). One of the
 facilities provided by LSE is the automatic production of argument lists for
-subroutine calls. Templates for all the subroutines in the IRC package can be 
+subroutine calls. Templates for all the subroutines in the IRC package can be
 made available within LSE by performing the following steps (within LSE):
 \begin{enumerate}
 \item Issue the LSE command GOTO FILE/READ IRC\_DIR:IRC.LSE
 \item Issue the LSE command DO
 \item Issue the LSE command DELETE BUFFER.
 \item Move to a buffer holding a .FOR of a .GEN file in the usual way.
-\item IRC subroutine templates are then available by typing in the name of an 
+\item IRC subroutine templates are then available by typing in the name of an
 IRC subroutine (or an abbreviation) and expanding it (CTRL-E).
 \item Help on the subroutine and its arguments can be obtained by placing the
-cursor at a point in the buffer at which the subroutine name has been entered 
+cursor at a point in the buffer at which the subroutine name has been entered
 and pressing GOLD-PF2.
 \end{enumerate}
 
 \section {Examples of Using IRC}
 \label{APP:EXAMS}
 \subsection {Accessing a Single CRDD File}
-This example shows the main code of a VMS program to display the coordinates of 
+This example shows the main code of a VMS program to display the coordinates of
 the reference point of a CRDD file.
 
 \begin{quote}
@@ -2701,9 +2701,9 @@ Programming notes:
 
 \item The symbolic constant IRA\_\_SZFSC is used to define the length of the
 character variables RATXT and DECTXT which hold the formatted sky coordinates of
-the reference point. This constant is defined in the included file `IRA\_PAR'. 
+the reference point. This constant is defined in the included file `IRA\_PAR'.
 
-\item The ADAM parameter system is used to obtain an NDF. The user may give the 
+\item The ADAM parameter system is used to obtain an NDF. The user may give the
 name of the CRDD file in response to the prompt for parameter `IN'. At this
 point the CRDD file is known only to the NDF system, and is identified by its
 ``NDF identifier'', INDF.
@@ -2714,7 +2714,7 @@ returned which is used to identify the CRDD file to other IRC routines.
 
 \item IRC\_INFO is called to get the coordinate for the CRDD file reference
 point (in 1950 equatorial coordinates). The IRC identifier tells IRC\_INFO which
-CRDD file is to be used. 
+CRDD file is to be used.
 
 \item The call to IRC\_ANNUL is not strictly needed since IRC\_CLOSE will
 ensure that all IRC identifiers are annuled.
@@ -2723,12 +2723,12 @@ ensure that all IRC identifiers are annuled.
 
 \subsection {Plotting Detector Data Streams}
 This example shows how plots of data value against in-scan distance may
-be produced for each detector in a CRDD file, with each plot aligned so that 
+be produced for each detector in a CRDD file, with each plot aligned so that
 an in-scan distance of zero refers to the closest approach to the CRDD file
-reference point. 
+reference point.
 
 \begin{quote}
-\begin{tabbing} 
+\begin{tabbing}
 
 \verb#*  Get the bounds and size of the NDF.                 #\\
 \verb#      CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM,       #\numcir{1}\\
@@ -2782,38 +2782,38 @@ Programming notes:
 \begin{enumerate}
 
 \item INDF is the NDF identifier for the CRDD file obtained previously. This
-call is made since neither axis is constrained to have a lower bound of 1. 
+call is made since neither axis is constrained to have a lower bound of 1.
 
 \item IRC\_DCLAP is called to enable the different plots to be aligned with
-each other. The returned value FSTSMP gives the fractional sample number within 
-the first detector data stream at which the closest approach to the reference 
-point occurs. This sample number is defined as having an in-scan distance of 
-zero in all the plots. The choice of the first detector is arbitrary, any 
+each other. The returned value FSTSMP gives the fractional sample number within
+the first detector data stream at which the closest approach to the reference
+point occurs. This sample number is defined as having an in-scan distance of
+zero in all the plots. The choice of the first detector is arbitrary, any
 detector would do.
 
-\item The {\em detector index} value gives the row number within the NDF, not 
-the IRAS detector {\em number}. Thus detector index values vary between the 
+\item The {\em detector index} value gives the row number within the NDF, not
+the IRAS detector {\em number}. Thus detector index values vary between the
 lower and upper bounds of the second dimension of the NDF.
 
 \item IRC\_DIST gives a positive or negative in-scan distance depending on
-which side of FSTSMP the current sample is located. Note, SAMPLE is an 
-{\em integer} sample number, but IRC\_DIST requires {\em fractional} values, 
+which side of FSTSMP the current sample is located. Note, SAMPLE is an
+{\em integer} sample number, but IRC\_DIST requires {\em fractional} values,
 therefore the REAL function must be used.
 
 \item XDAT is a REAL array which should have upper and lower bounds equal to the
 those of the first dimension of the NDF. IRC\_DIST returns INSCAN in radians,
 and is converted to degrees by multiplying it by the symbolic constant
 IRA\_\_RTOD (Radians TO Degrees) defined in the file IRA\_PAR. The factor of
-60.0 then converts the degrees value to arc-minutes. 
+60.0 then converts the degrees value to arc-minutes.
 
 \item IRC\_DETNO should be declared as an integer in the calling routine.
 
 \item The routine PLOT plots the detector data on some graphics device. More
 arguments would probably be needed for this routine in practice. The simple
-routine used here would have the following declarations: 
+routine used here would have the following declarations:
 
 \begin{quote}
-\begin{tabbing} 
+\begin{tabbing}
 
 \verb#      SUBROUTINE PLOT( SIZE, YDATA, XDATA, DETNO,      #\\
 \verb#     :                 STATUS )                        #\\
@@ -2826,27 +2826,27 @@ routine used here would have the following declarations:
 
 Note, the YDATA and XDATA arrays now have a lower bound of 1 to make plotting
 easier. Y values which contained the Starlink ``BAD'' value should be excluded
-from the plot in some way. 
+from the plot in some way.
 
 \end{enumerate}
 \section {Legal Values for NDF Component UNITS}
 \label{APP:UNITS}
-The UNITS component of the NDF holds a character string which is used to 
-determine the physical quantity which the sample values represent. Applications 
-should always check the UNITS component by comparing its value with the 
-IRC symbolic constants (defined in IRC\_PAR) listed below. Using symbolic 
-constants rather than literal values reduces the chances of bugs being into 
+The UNITS component of the NDF holds a character string which is used to
+determine the physical quantity which the sample values represent. Applications
+should always check the UNITS component by comparing its value with the
+IRC symbolic constants (defined in IRC\_PAR) listed below. Using symbolic
+constants rather than literal values reduces the chances of bugs being into
 introduced into software due to errors in the spelling of literal units values.
 
 The following units systems are currently recognised:
 \begin{description}
-\item [IRC\_\_F] - Flux values in units of Pico-Watts ( i.e. $10^{-12}$ of a 
+\item [IRC\_\_F] - Flux values in units of Pico-Watts ( i.e. $10^{-12}$ of a
 Watt ) per square metre.
-\item [IRC\_\_J] - Flux density values in Janskys. 
-\item [IRC\_\_JPS] - Surface brightness values in Janskys per steradian. 
-\item [IRC\_\_MJPS] - Surface brightness values in Mega-Janskys per steradian. 
+\item [IRC\_\_J] - Flux density values in Janskys.
+\item [IRC\_\_JPS] - Surface brightness values in Janskys per steradian.
+\item [IRC\_\_MJPS] - Surface brightness values in Mega-Janskys per steradian.
 \item [IRC\_\_FPS] - Surface brightness values in Pico-Watts per square metre,
-per steradian. 
+per steradian.
 \end{description}
 
 \section {Legal Values for NDF Component LABEL}
@@ -2854,27 +2854,27 @@ per steradian.
 Legal values for the LABEL component of the NDF are:
 \begin{description}
 \item [Pointed Observation CRDD] - The DATA array holds CRDD derived
-from a Pointed Observation (PO), using the main survey array (as opposed to the 
+from a Pointed Observation (PO), using the main survey array (as opposed to the
 CPC).
 \item [Survey CRDD] - The DATA array holds CRDD derived from the all sky survey.
 \end{description}
 
 \section {The IRAS focal plane coordinate system}
 \label{APP:FOCALP}
-Positions within the focal plane are described in the IRAS Catalogs and Atlases 
+Positions within the focal plane are described in the IRAS Catalogs and Atlases
 Explanatory Supplement by a Cartesian coordinate system in which the two axes
-are labelled $Z$ and $Y$ ($X$ is normal to the focal plane in the direction of 
+are labelled $Z$ and $Y$ ($X$ is normal to the focal plane in the direction of
 the boresight). The origin of the $ZY$ system is at the focal plane position
-corresponding to boresight of the telescope. The Y axis is parallel to the scan 
+corresponding to boresight of the telescope. The Y axis is parallel to the scan
 direction. As a point on the sky passes over the focal plane is moves in the
-positive Y direction. This is the opposite direction to that in which the 
-boresight moves as it passes over the sky. The difference can be thought in 
-terms of where a fictitious observer is placed. An observer ``sat on the focal 
+positive Y direction. This is the opposite direction to that in which the
+boresight moves as it passes over the sky. The difference can be thought in
+terms of where a fictitious observer is placed. An observer ``sat on the focal
 plane'' would see the stars moving in the positive Y direction. An observer
 ``fixed to the sky'' would see the telescope boresight moving in the negative
 Y direction. IRC often uses the positive Y direction as a reference direction.
 
-The Z axis is in the cross-scan direction. Rotation from the positive Y 
+The Z axis is in the cross-scan direction. Rotation from the positive Y
 direction to the positive Z direction is in the same sense as rotation from
 east to north. In fact, the Z axis always points towards the Sun.
 
@@ -2883,7 +2883,7 @@ The Explanatory Supplement contains a schematic diagram of the focal plane (fig.
 positive downwards. Table II.C.3 (pages II-12 and II-13) list the focal plane
 coordinates of the detector centres. These values, together with many other IRAS
 specific constants, are made available by including the file I90\_DAT.FOR, and
-should always be accessed by means of the symbolic values defined by that file. 
+should always be accessed by means of the symbolic values defined by that file.
 
 \section {Survey Data with Boresight Pointing Information}
 
@@ -2896,7 +2896,7 @@ simultaneously obtained} detector samples. A ``scan'' in this context consists
 of a set of detector samples equally spaced in time (any detector samples for
 which no valid data is available are given the Starlink ``BAD'' value
 (VAL\_BADR), taken from a single observation within a given SOP. The scan length
-is thus restricted to being less than the total scan length of the observation, 
+is thus restricted to being less than the total scan length of the observation,
 but is otherwise arbitrary.
 
 \subsection{ The DETAILS structure}
@@ -2906,31 +2906,31 @@ The DETAILS structure contains the following components:
 \item [BASE\_UTCS] - (A \_DOUBLE scalar) The UTCS of detector sample number 1.
 Note, this is not necessarily the {\em first} sample in the DATA array. For
 instance, if sample numbers start at -100 then sample 1 is actually the 102'nd
-sample. Zero UTCS is taken as 00.00 1-JAN-1981. 
+sample. Zero UTCS is taken as 00.00 1-JAN-1981.
 
-\item [BASE\_MJD] - (A \_DOUBLE scalar) The Modified Julian Date 
-corresponding to BASE\_UTCS. 
+\item [BASE\_MJD] - (A \_DOUBLE scalar) The Modified Julian Date
+corresponding to BASE\_UTCS.
 
-\item [BORE\_POSNS] - (An \_INTEGER scalar) The number of boresight positions 
-stored in the following arrays. 
+\item [BORE\_POSNS] - (An \_INTEGER scalar) The number of boresight positions
+stored in the following arrays.
 
-\item [UTCS\_OFFSET(BORE\_POSNS)] -  (A \_REAL array) The difference in UTCS 
-between the associated boresight position and detector sample number 1. Note, 
+\item [UTCS\_OFFSET(BORE\_POSNS)] -  (A \_REAL array) The difference in UTCS
+between the associated boresight position and detector sample number 1. Note,
 single precision is sufficient since only UTCS {\em differences} are stored.
 By contrast, storing {\em absolute} UTCS values require double precision.
 
 \item [PSI(BORE\_POSNS)] -  (A \_REAL array) The clock angle $\psi$, of the
 associated boresight position, in radians. See the IRAS Catalogs and Atlases
 Explanatory Supplement (Exp. Supp.) Fig. III.B.7,  for a description of the
-``satellite'' coordinate system, ${\psi,\theta}$. 
+``satellite'' coordinate system, ${\psi,\theta}$.
 
-\item [THETA(BORE\_POSNS)] -  (A \_REAL array) The cone angle $\theta$, of the 
+\item [THETA(BORE\_POSNS)] -  (A \_REAL array) The cone angle $\theta$, of the
 associated boresight position, in radians (see Exp. Supp. Fig. III.B.7).
 
 \item [LAMBDA\_SUN(BORE\_POSNS)] -  (A \_REAL array) The ecliptic longitude
-(1950) of the sun at the time of the associated boresight position, in radians. 
+(1950) of the sun at the time of the associated boresight position, in radians.
 
-\item [SUPPORT\_INFO] - (A structure with type SUPPORT\_INFO) Holds items of 
+\item [SUPPORT\_INFO] - (A structure with type SUPPORT\_INFO) Holds items of
 support information (see section \ref {SEC:SUPP}) as listed below.
 
 \end{description}
@@ -2939,24 +2939,24 @@ The SUPPORT\_INFO structure is used to store information contained in the
 Boresight Pointing History Files (BPHF) distributed by IPAC. These files are
 described in the IRAS SDAS Software Interface Specification, data set IR.BPHP.D
 (PR51) which should be consulted for more information. The following components
-are included in SUPPORT\_INFO: 
+are included in SUPPORT\_INFO:
 
 \begin{description}
 
 \item [UNC\_PSI(BORE\_POSNS)] - (A \_REAL array) The uncertainty in $\psi$ at
-the associated boresight position, in radians, given as ``SIGPSI'' in the BPHF. 
+the associated boresight position, in radians, given as ``SIGPSI'' in the BPHF.
 
 \item [UNC\_THETA(BORE\_POSNS)] - (A \_REAL array) The uncertainty in $\theta$
-at the associated boresight position, in radians, given as ``SIGNU'' in the 
-BPHF. SIGNU is actually the uncertainty in $\nu$, not $\theta$. But since 
+at the associated boresight position, in radians, given as ``SIGNU'' in the
+BPHF. SIGNU is actually the uncertainty in $\nu$, not $\theta$. But since
 $\theta = \nu + \pi/2$ the uncertainty in $\theta$ will equal that in $\nu$.
 
-\item [GEOG\_LAT(BORE\_POSNS)] -  (A \_REAL array) The geographic latitude of 
-of the boresight at the associated boresight position, in radians, given as 
+\item [GEOG\_LAT(BORE\_POSNS)] -  (A \_REAL array) The geographic latitude of
+of the boresight at the associated boresight position, in radians, given as
 ``BETG'' in the BPHF.
 
-\item [GEOG\_LONG(BORE\_POSNS)] -  (A \_REAL array) The geographic longitude of 
-of the boresight at the associated boresight position, in radians, given as 
+\item [GEOG\_LONG(BORE\_POSNS)] -  (A \_REAL array) The geographic longitude of
+of the boresight at the associated boresight position, in radians, given as
 ``LAMG'' in the BPHF.
 
 \end {description}
@@ -2976,65 +2976,65 @@ necessary to interpolate between boresight positions to get the position of the
 boresight at detector samples between the stored positions. It is sometimes also
 necessary to extrapolate beyond the UTCS range stored in the components of
 DETAILS. Both interpolation and extrapolation are easier to perform in
-satellite coordinates than ecliptic coordinates. 
+satellite coordinates than ecliptic coordinates.
 
 Detector sample positions are reconstructed as follows:
 \begin{itemize}
-\item The solar longitude is precessed from mean 1950 to mean of date. 
+\item The solar longitude is precessed from mean 1950 to mean of date.
 \item Least squares linear fits are made to the clock angle $\psi$, the cone
-angle $\theta$ and the solar longitude (mean of date). The independent variable 
+angle $\theta$ and the solar longitude (mean of date). The independent variable
 is the offset in UTCS since detector sample number 1.
 \item For each detector sample, the UTCS offset since detector sample number 1 is
-calculated assuming that all samples are equally spaced in time. 
-\item The clock and cone angles, and the solar longitude (mean of date) at the 
-moment the detector sample was taken are estimated using the linear fits 
+calculated assuming that all samples are equally spaced in time.
+\item The clock and cone angles, and the solar longitude (mean of date) at the
+moment the detector sample was taken are estimated using the linear fits
 established earlier.
 \item The ecliptic coordinates $(\lambda,\beta)$ (mean of date) of the boresight
 are calculated from the clock and cone angles ($\psi$ and $\theta$), and solar
-longitude ($\lambda_{sun}$) using the following equations: 
+longitude ($\lambda_{sun}$) using the following equations:
 \begin{eqnarray*}
 \beta & = & \arcsin( \sin \theta. \cos \psi )\\
-\lambda & = & \lambda_{sun} + \arctan \left(\frac{-\sin \theta.\sin \psi}{\cos 
+\lambda & = & \lambda_{sun} + \arctan \left(\frac{-\sin \theta.\sin \psi}{\cos
 \theta} \right)
 \end{eqnarray*}
-\item These ecliptic coordinates are then converted to equatorial coordinates 
+\item These ecliptic coordinates are then converted to equatorial coordinates
 (B1950).
 \end{itemize}
 
 \section {Adding Support for New CRDD File Formats}
-IRC has been designed to enable the package to be modified to include support 
+IRC has been designed to enable the package to be modified to include support
 for any future variations in CRDD file formats (see section \ref {SEC:INDEP}).
-This appendix describes the general outline of how such a modification can be 
-made. It should be noted that IRC does not {\em create} CRDD files from 
+This appendix describes the general outline of how such a modification can be
+made. It should be noted that IRC does not {\em create} CRDD files from
 scratch. An application must exist which will create the CRDD files (usually
-by reading a magnetic tape archive). This application must decide how to 
+by reading a magnetic tape archive). This application must decide how to
 assign values  to the components of the CRDD\_INFO structure (see section
-\ref{SEC:CRDD_INFO}. It must also decide on the HDS {\em type} of the DETAILS 
-structure (see SUN/92 for restrictions on HDS types), and on what information 
+\ref{SEC:CRDD_INFO}. It must also decide on the HDS {\em type} of the DETAILS
+structure (see SUN/92 for restrictions on HDS types), and on what information
 is stored in that structure (and how). The
 information in DETAILS must be sufficient to allow sample positions, scan
 angles, and scan speeds to be determined (see section \ref{SEC:TERMS}).
 
-Once the structure and type of DETAILS has been defined, various IRC routines 
-need to be modified. IRC\_IMPRT reads the HDS type of the DETAILS structure 
-from the given CRDD file, checks it is a recognized type, and if so, stores it 
+Once the structure and type of DETAILS has been defined, various IRC routines
+need to be modified. IRC\_IMPRT reads the HDS type of the DETAILS structure
+from the given CRDD file, checks it is a recognized type, and if so, stores it
 in common (in array CCM\_TYPE). Other routines then check CCM\_TYPE to decide
-which lower level subroutine should be called to perform the required task. 
+which lower level subroutine should be called to perform the required task.
 Such lower level routines should exist for each CRDD type. The steps to
 including a new CRDD type (once the DETAILS structure is defined) are thus:
 
 \begin {enumerate}
-\item Modify IRC\_IMPRT to include the HDS type of the new DETAILS structure in 
+\item Modify IRC\_IMPRT to include the HDS type of the new DETAILS structure in
 the list of recognised types.
 \item Modify the following subroutines to include the new type: IRC1\_BCLPI,
 IRC1\_BPOSI, IRC1\_CLPNT, IRC1\_DCLPI, IRC1\_DISTI, IRC1\_DPOSI, IRC1\_OFFSI,
 IRC\_SATSI, IRC\_TRACI, IRC\_POSMP, IRC\_SIMUL. Most of these routines just
 perform a check on the value of CCM\_TYPE and call a relevant lower level
-subroutine. 
-\item Write the new subroutines to perform the tasks required by the routines 
-modified in the previous step. The routines which process type SURVEY\_BSIGHT 
+subroutine.
+\item Write the new subroutines to perform the tasks required by the routines
+modified in the previous step. The routines which process type SURVEY\_BSIGHT
 can be examined as examples of such subroutines.
-\item Write applications to check that IRC functions correctly with the new CRDD 
+\item Write applications to check that IRC functions correctly with the new CRDD
 type.
 \item Modify ID1.TEX to incorporate the new CRDD type. This should include an
 appendix which describes the new CRDD format, and the related DETAILS structure.
@@ -3056,42 +3056,42 @@ IRC\_ makes calls to the following packages:
 \item [SLA\_] - The SLA package; see SUN/67.
 \end{description}
 
-Access to these packages, together with packages called from within these 
-packages, is necessary to use IRC. 
+Access to these packages, together with packages called from within these
+packages, is necessary to use IRC.
 
 \section {IRC Error Codes}
 \label {APP:ERRORS}
-IRC routines can return any $STATUS$ value generated by the subroutine packages 
+IRC routines can return any $STATUS$ value generated by the subroutine packages
 which it calls. In addition it can return the following IRC-specific values:
 
 \begin{description}
 
 \item {\bf IRC\_\_BADBN     }\\
-An illegal IRAS band number was specified (outside the range 1 to 4). 
+An illegal IRAS band number was specified (outside the range 1 to 4).
 
 \item {\bf IRC\_\_BADDB     }\\
-The CRDD file contained data from a detector which is not included in the band 
+The CRDD file contained data from a detector which is not included in the band
 specified by the BAND component of the CRDD\_INFO structure.
 
 \item {\bf IRC\_\_BADDI     }\\
-A detector index is out of bounds. Detector indices must lie within the bounds 
+A detector index is out of bounds. Detector indices must lie within the bounds
 of the second dimension of the NDF.
 
 \item {\bf IRC\_\_BADEX     }\\
-Unable to evaluate an accurate position for a detector sample lying outside the 
+Unable to evaluate an accurate position for a detector sample lying outside the
 bounds of the first dimension of the DATA array.
 
 \item {\bf IRC\_\_BADNC     }\\
 An illegal coordinate index was given. Coordinates have indices of 1 or 2 (eg
-in an equatorial sky coordinate system, Right Ascension has index 1 and 
+in an equatorial sky coordinate system, Right Ascension has index 1 and
 Declination has index 2).
 
 \item {\bf IRC\_\_BADDN     }\\
-A detector number is out of bounds. Detector numbers must lie in the range 
+A detector number is out of bounds. Detector numbers must lie in the range
 1 to 62.
 
 \item {\bf IRC\_\_BADDT     }\\
-The DET\_NUMBERS component of CRDD\_INFO has the wrong size. It should have the 
+The DET\_NUMBERS component of CRDD\_INFO has the wrong size. It should have the
 same size as the second dimension of the NDF.
 
 \item {\bf IRC\_\_BADLA     }\\
@@ -3104,7 +3104,7 @@ The DETAILS component of CRDD\_INFO has an unrecognised HDS type.
 An illegal value was found for the UNITS component of the NDF.
 
 \item {\bf IRC\_\_D2BIG     }\\
-The second dimension of the NDF is too big. The second dimension is restricted 
+The second dimension of the NDF is too big. The second dimension is restricted
 to 16 rows or less.
 
 \item {\bf IRC\_\_INVID     }\\
@@ -3142,7 +3142,7 @@ A blank value was found for the UNITS component of the NDF.
 An illegal number of values has been supplied.
 
 \item {\bf IRC\_\_ZEROS     }\\
-CRDD samples have been found which claim to have the same in-scan position 
+CRDD samples have been found which claim to have the same in-scan position
 (i.e. zero scan speed). This will be caused by a programming error.
 
 \end{description}
@@ -3162,13 +3162,13 @@ Changes introduced in version 13 of ID1:
 IRC\_ERR.
 \item The names of symbolic constants (including STATUS values) which previously
 were longer than five characters (excluding the IRC\_\_ prefix) have been
-truncated to five characters. The actual {\em values} associated with each name 
+truncated to five characters. The actual {\em values} associated with each name
 have not changed.
-\item The VMS version of IRC is now released in the form of a sharable image 
-rather than an object library. Applications linked with the sharable image have 
-the advantage that they will not need to be {\em re}-linked when IRC is upgraded 
+\item The VMS version of IRC is now released in the form of a sharable image
+rather than an object library. Applications linked with the sharable image have
+the advantage that they will not need to be {\em re}-linked when IRC is upgraded
 in future. Note, the object library has been removed from the IRC system.
-\item The linking and development procedures have been modified to bring them 
+\item The linking and development procedures have been modified to bring them
 into line with Starlink standards (see SSN/8).
 \item IRC subroutine templates and help can now be made available in the STARLSE
 editing environment.

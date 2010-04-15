@@ -2,7 +2,7 @@
       CHARACTER*(*) FUNCTION MDH_GETCN( QUERY )
 
 *  -----------
-*  DESCRIPTION                                                 
+*  DESCRIPTION
 *  -----------
 
 *  Asks a question and returns a character input from the terminal.
@@ -11,7 +11,7 @@
 *  VARIABLES
 *  ---------
 
-*INPUT: 
+*INPUT:
 
       CHARACTER*(*) QUERY	! Question.
 
@@ -45,7 +45,7 @@
 
         WRITE( * , '( X,A,$ )' ) QUERY( :LEN )//': '
         READ ( * , '( A )' , IOSTAT = IERR ) MDH_GETCN
- 
+
       END DO
 
       DO I = 1 , NBLANKS

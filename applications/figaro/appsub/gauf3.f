@@ -3,9 +3,9 @@ C
 C
 C     G A U F 3
 C
-C     Determines the positon of the peak of the next profile 
-C     to fit by subtracting the previous sum of Gaussians 
-C     ( GAUSUM ). The position of the peak ( GPOS ) and height 
+C     Determines the positon of the peak of the next profile
+C     to fit by subtracting the previous sum of Gaussians
+C     ( GAUSUM ). The position of the peak ( GPOS ) and height
 C     ( GPK ) above continuum are returned
 C
 C     Parameters -  (">" input, "<" output )
@@ -21,8 +21,8 @@ C                                             JRW / AAO  February 1987
 C
 C     Modified:
 C       Original
-C 
-      IMPLICIT NONE 
+C
+      IMPLICIT NONE
 C
 C     Parameters
 C
@@ -37,7 +37,7 @@ C
       DO I=1,GX
         DIF(I)=GZVALS(I)-GAUSUM(I)
       END DO
- 
+
       MFF=-1.E36
 
       DO I=1,GX
@@ -46,7 +46,7 @@ C
           NI=I
         END IF
       END DO
-    
+
       GPOS=GXVALS(NI)
       GPK=DIF(NI)
 

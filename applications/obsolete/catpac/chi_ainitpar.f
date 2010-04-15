@@ -15,7 +15,7 @@
 
 *  Description:
 *     Initialize common variables for a parse.
-* 
+*
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -37,7 +37,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,7 +73,7 @@
 *
 *   Get all the information about the fields.
 *
-      CALL CHI_GALLCD(INPUT, NUMFLDS, FNAMES, FFORMATS, FTYPES, 
+      CALL CHI_GALLCD(INPUT, NUMFLDS, FNAMES, FFORMATS, FTYPES,
      :  FXUNITS, FCOMMENTS, FMDATAACC, FDATAACC, STATUS)
 *
 *   Copy the information into the common variables.
@@ -95,7 +95,7 @@
         EUNIT(I) = FXUNITS(I)
 *        ENULL(I) = FNULLS(I)
         ECOMNT(I) = FCOMMENTS(I)
-       
+
       ENDDO
       DO I = 1, NUMFLDS
       ENDDO

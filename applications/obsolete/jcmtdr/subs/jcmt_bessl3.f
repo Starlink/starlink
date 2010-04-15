@@ -1,5 +1,5 @@
-      SUBROUTINE JCMT_BESSEL_REGRID_3 (FBAD, PIXSPACE, NI, NJ, 
-     :   ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN, CONV_SUM, 
+      SUBROUTINE JCMT_BESSEL_REGRID_3 (FBAD, PIXSPACE, NI, NJ,
+     :   ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN, CONV_SUM,
      :   CONV_WEIGHT, STATUS)
 *+
 *  Name:
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_BESSEL_REGRID_3 (FBAD, PIXSPACE, NI, NJ, 
-*    :   ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN, CONV_SUM, 
+*     CALL JCMT_BESSEL_REGRID_3 (FBAD, PIXSPACE, NI, NJ,
+*    :   ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN, CONV_SUM,
 *    :   CONV_WEIGHT, STATUS)
 
 *  Description:
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -83,10 +83,10 @@
       DOUBLE PRECISION PDA_DBESJ1                ! NAG Bessel function
 
 *  Local Constants:
-      INTEGER WTRESOL                            ! number of subpixel 
+      INTEGER WTRESOL                            ! number of subpixel
       PARAMETER (WTRESOL = 200)                  ! interpolations of the
                                                  ! weighting function
-      INTEGER WTPIXMAX                           ! maximum number of pixels 
+      INTEGER WTPIXMAX                           ! maximum number of pixels
       PARAMETER (WTPIXMAX = 7)                   ! that the weighting function
                                                  ! extends to
 
@@ -99,7 +99,7 @@
       DOUBLE PRECISION XINC                      ! x-axis pixel increment
       DOUBLE PRECISION YINC                      ! y-axis pixel increment
       DOUBLE PRECISION WTFN (WTPIXMAX * WTRESOL) ! weighting function
-      DOUBLE PRECISION WT                        ! value of weighting function 
+      DOUBLE PRECISION WT                        ! value of weighting function
                                                  ! at output pixel
       DOUBLE PRECISION XPIX, YPIX                ! position of output pixel
       DOUBLE PRECISION XCONV, YCONV              ! position of convolution
@@ -110,7 +110,7 @@
                                                  ! function array corresponding
                                                  ! to RPIX
       DOUBLE PRECISION XX                        ! argument of PDA_DBESJ1
-      
+
 *   local data
 *.
 
@@ -125,11 +125,11 @@
 
 *  Weighting function used is the function (I/I0 = 2*J1(x)/x), with
 *  a cosine apodization to zero over the last third of its extent.
-*  It is tabulated up to WTPIXMAX pixels out at a resolution of 1/WTRESOL 
+*  It is tabulated up to WTPIXMAX pixels out at a resolution of 1/WTRESOL
 *  of a pixel. The FWHM of the function is such that it would have
 *  been fully sampled by a rectangular mesh with sample points separated
-*  by the input pixel spacing. The width, WTPIXMAX and WTRESOL are all 
-*  measured in units of input pixels. 
+*  by the input pixel spacing. The width, WTPIXMAX and WTRESOL are all
+*  measured in units of input pixels.
 
 *  ..basic function
 
@@ -158,20 +158,20 @@
 *  OK, good map point, loop through other map points in convolution
 *  function range ...
 
-               YPIX = (JOUT-JCEN) * YINC + YCEN     
+               YPIX = (JOUT-JCEN) * YINC + YCEN
                XPIX = (IOUT-ICEN) * XINC + XCEN
 
                DO JCONV = MAX(1,JOUT-WTPIXMAX), MIN(NJ,JOUT+WTPIXMAX)
                   DO ICONV = MAX(1,IOUT-WTPIXMAX), MIN(NI,IOUT+WTPIXMAX)
 
-*  and if they have zero weight, add them into the convolution function as 
+*  and if they have zero weight, add them into the convolution function as
 *  if they were measured to be zero
 
                      IF (TOT_WEIGHT_IN(ICONV,JCONV) .EQ. 0.0) THEN
-                        YCONV = (JCONV-JCEN) * YINC + YCEN     
+                        YCONV = (JCONV-JCEN) * YINC + YCEN
                         XCONV = (ICONV-ICEN) * XINC + XCEN
                         RPIX = SQRT ((YPIX-YCONV)**2 + (XPIX-XCONV)**2)
-                        RPIX = RPIX / PIXSPACE         
+                        RPIX = RPIX / PIXSPACE
                         ICPIX = NINT (RPIX * WTRESOL) + 1
                         IF ((ICPIX.GE.1).AND.
      :                      (ICPIX.LE.WTPIXMAX*WTRESOL)) THEN
@@ -179,7 +179,7 @@
                         ELSE
                            WT = 0.0D0
                         END IF
-                        CONV_WEIGHT(IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) 
+                        CONV_WEIGHT(IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT)
      :                     + WT
                      END IF
 

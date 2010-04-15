@@ -1,4 +1,4 @@
-      SUBROUTINE CDCRA1( PADD, PNAME, PLON, PLAT, 
+      SUBROUTINE CDCRA1( PADD, PNAME, PLON, PLAT,
      :                   SCS, MXSRCE, NSRCE, NAME,
      :                   RA, DEC, LON, LAT, STATUS )
 *+
@@ -12,15 +12,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CDCRA1( PADD, PNAME, PLON, PLAT, 
-*                  SCS, MXSRCE, NSRCE, NAME, 
+*     CALL CDCRA1( PADD, PNAME, PLON, PLAT,
+*                  SCS, MXSRCE, NSRCE, NAME,
 *                  RA, DEC, LON, LAT, STATUS )
 
 *  Description:
 *     This subroutine is used to get additional expected source
 *     positions from the user. It will keep prompting the user for the
 *     next source after successfully getting a source until a null, '!',
-*     value is supplied. 
+*     value is supplied.
 
 *  Arguments:
 *     PADD = CHARACTER (Given)
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,7 +106,7 @@
 
 *  If there is any exist sources, ...
       IF ( NSRCE .GT. 0 ) THEN
-      
+
 *  Convert the input RA and DEC to the coordinates under specified sky
 *  coordinate system.
          CALL IRA_CONVT( NSRCE, RA, DEC, 'EQUATORIAL(1950.0)', SCS,

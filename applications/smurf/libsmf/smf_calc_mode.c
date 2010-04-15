@@ -90,7 +90,7 @@
 static smf_obstype smf__parse_obstype ( char obs_type[], int *status );
 
 void smf_calc_mode ( smfHead * hdr, int * status ) {
-  
+
   char sam_mode[SZFITSCARD+1];   /* Value of SAM_MODE header */
   char obs_type[SZFITSCARD+1];   /* value of OBS_TYPE header */
   char sw_mode[SZFITSCARD+1];    /* value of SW_MODE header */

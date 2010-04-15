@@ -3,7 +3,7 @@
      :  OBSERVERS, OBS_TYPE_CODE, OBJECT_NAME, OBJECT_CLASS, OBJECT_RA,
      :  OBJECT_DEC, EQUINOX, INSTRUMENT, GRATING_NAME,
      :  GRATING_WAVELENGTH, GRATING_ORDER, FILTERS, DWELL_TIME, RED_OBS,
-     :  LOG_FILE, REFERENCE, WPLATE_ANGLE, START_AIRMASS, STATUS ) 
+     :  LOG_FILE, REFERENCE, WPLATE_ANGLE, START_AIRMASS, STATUS )
 *    Description :
 *     This subroutine writes the information given to it into a
 *     record appended to the specified observation catalogue.
@@ -13,7 +13,7 @@
 *     The observation catalogue is only opened briefly so that at other
 *     times it may be interrogated while data reduction is in progress.
 *    Invocation :
-*      CALL RED4_WRITE_ARCHIVE( CATFILE, START_DATE, 
+*      CALL RED4_WRITE_ARCHIVE( CATFILE, START_DATE,
 *     :  START_TIME, OBSERVERS, OBS_TYPE_CODE, OBJECT_NAME,
 *     :  OBJECT_CLASS, OBJECT_RA, OBJECT_DEC, EQUINOX,
 *     :  INSTRUMENT, GRATING_NAME, GRATING_WAVELENGTH,
@@ -79,7 +79,7 @@
 *    External references:
 *    Local Constants :
       INTEGER
-     :  FOR__OK                        
+     :  FOR__OK
       PARAMETER( FOR__OK = 0 )         ! Fortran I/O success status
 *    Local variables :
       CHARACTER*80
@@ -158,7 +158,7 @@
      :         INSTRUMENT(1:6), GRATING_NAME(1:6),
      :         GRATING_WAVELENGTH, GRATING_ORDER, FILTERS(1:6),
      :         DWELL_TIME, RED_OBS(1:15), LOG_FILE(1:15),
-     :         REFERENCE(1:8), WPLATE_ANGLE, START_AIRMASS 
+     :         REFERENCE(1:8), WPLATE_ANGLE, START_AIRMASS
 
  2010       FORMAT( I8.8, 1X, F8.5, 1X,  ! Date & Time
      :              A12, 1X,             ! Observers' name(s)
@@ -201,7 +201,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'CATFILE', CATFILE )
             CALL ERR_REP( ' ', 'RED4_WRITE_ARCHIVE: '/
-     :        /'Error opening observation '/ 
+     :        /'Error opening observation '/
      :        /'catalogue ^CATFILE (reason follows)', STATUS )
             CALL GEN_FORTERR( IOS, .TRUE., ERRMSG )
             CALL MSG_SETC( 'ERRMSG', ERRMSG )
@@ -213,7 +213,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'STATUS', STATUS )
          CALL ERR_REP( ' ', 'RED4_WRITE_ARCHIVE: '/
-     :     /'Error obtaining free logical '/ 
+     :     /'Error obtaining free logical '/
      :     /'unit number, Status = ^STATUS', STATUS )
       END IF
 

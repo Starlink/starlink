@@ -1,19 +1,19 @@
 
 *+  WMFOPEN - does opening and initial reading from file for mosaic routine
 
-      SUBROUTINE WMFOPEN ( FNAME, PARAM, LUN, LOC, NUMBER, MAXI, 
+      SUBROUTINE WMFOPEN ( FNAME, PARAM, LUN, LOC, NUMBER, MAXI,
      :                    MINI, WT, STATUS )
 
 *    Description :
 *
 *     This routine opens a file that contains information required to
 *     build up a mosaic image, i.e. the names and offsets of images
-*     from a central one. 
+*     from a central one.
 *     The routine takes a filename and a parameter, opens the file,
 *     associates the parameter and a locator with the given central
 *     image, returning the locator. Also returned are the opened file
-*     unit number, the number of subsequent images to be read in, and 
-*     the read-in maximum and minimum x,y offsets that any of the images 
+*     unit number, the number of subsequent images to be read in, and
+*     the read-in maximum and minimum x,y offsets that any of the images
 *     has from the central one.
 *     The mosaic file should have the format :
 *
@@ -101,8 +101,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'       
-      INCLUDE  'NDF_ERR'       
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
       INCLUDE  'FIO_PAR'
 
 *    Import :
@@ -175,8 +175,8 @@
       CALL NDF_EXIST( 'INPICI', 'READ', LOC, STATUS )
 
 *    check status on return and jump out if there is an error
-      IF ( (LOC .EQ. NDF__NOID) .OR. 
-     :      (STATUS .NE. SAI__OK) ) GOTO 999 
+      IF ( (LOC .EQ. NDF__NOID) .OR.
+     :      (STATUS .NE. SAI__OK) ) GOTO 999
 
 *    read the weight for this image
       READ( LUN, *, END=999, ERR=999 ) WT
@@ -184,11 +184,11 @@
 *    read the total number of frames to be mosaiced
       READ( LUN, *, END=999, ERR=999 ) NUMBER
 
-*    read the max x,y offsets that any following image has from the 
+*    read the max x,y offsets that any following image has from the
 *    central one
       READ( LUN, *, END=999, ERR=999 ) MAXI( 1 ), MAXI( 2 )
 
-*    read the min x,y offsets that any following image has from the 
+*    read the min x,y offsets that any following image has from the
 *    central one
       READ( LUN, *, END=999, ERR=999 ) MINI( 1 ), MINI( 2 )
 

@@ -43,7 +43,7 @@ C     DTA_WRVARI        Write an integer to a data object.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -76,7 +76,7 @@ C     Actually, this routine is a bit odd, because it was in fact the
 C     first DSA__ routine written.  Done now, it probably wouldn't be
 C     used at all - the calling routine would call DSA__RANGE_STRUCT_NAME
 C     and make up the name from there.
-C     
+C
       IF (NDF_FORMAT(REF_SLOT)) THEN
          CALL DTA_WRVARI (OBJ_NAMES(REF_SLOT)(:OBJ_LEN(REF_SLOT))//
      :                    '.MORE.FIGARO.RANGE.VALID',1,0,DTA_STATUS)

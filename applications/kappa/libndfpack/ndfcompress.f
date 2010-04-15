@@ -25,10 +25,10 @@
 *     subsequent application, since all applications will automatically
 *     uncompress the data.
 
-*     Currently the only compression method available is to scale the 
-*     data values using a linear transformation so that they fit into a 
-*     smaller data type.  A description of the scaling uses is stored 
-*     with the output NDF so that later application can reconstruct the 
+*     Currently the only compression method available is to scale the
+*     data values using a linear transformation so that they fit into a
+*     smaller data type.  A description of the scaling uses is stored
+*     with the output NDF so that later application can reconstruct the
 *     original unscaled values.
 
 *  Usage:
@@ -36,17 +36,17 @@
 
 *  ADAM Parameters:
 *     DSCALE = _DOUBLE (Read)
-*        The scale factor to use for the DATA component, when 
+*        The scale factor to use for the DATA component, when
 *        compressing with METHOD set to "SCALE".  If a null (!) value is
-*        supplied for DSCALE or DZERO, default values will be used for 
-*        both that cause the scaled data values to occupy 96% of the 
-*        available range of the data type selected using parameter 
+*        supplied for DSCALE or DZERO, default values will be used for
+*        both that cause the scaled data values to occupy 96% of the
+*        available range of the data type selected using parameter
 *        SCALETYPE.  [!]
 *     DZERO = _DOUBLE (Read)
 *        The zero offset to use for the DATA component, when compressing
 *        with METHOD set to SCALE.  If a null (!) value is supplied for
-*        DSCALE or DZERO, default values will be used for both that 
-*        cause the scaled data values to occupy 96% of the available 
+*        DSCALE or DZERO, default values will be used for both that
+*        cause the scaled data values to occupy 96% of the available
 *        range of the data type selected using parameter SCALETYPE.  [!]
 *     IN = NDF (Read)
 *        The input NDF.
@@ -56,42 +56,42 @@
 *     OUT = NDF (Write)
 *        The output NDF.
 *     SCALETYPE = LITERAL (Read)
-*        The data type to use for the scaled data values.  It is only 
+*        The data type to use for the scaled data values.  It is only
 *        used if METHOD is "SCALED".  It can be one of the following
 *        options.
 *
-*        - "_INTEGER" -- 4 byte signed integers 
+*        - "_INTEGER" -- 4 byte signed integers
 *
-*        - "_WORD" -- 2 byte signed integers 
+*        - "_WORD" -- 2 byte signed integers
 *
-*        - "_UWORD" -- 2 byte unsigned integers 
+*        - "_UWORD" -- 2 byte unsigned integers
 *
-*        - "_BYTE" -- 1 byte signed integers 
+*        - "_BYTE" -- 1 byte signed integers
 *
-*        - "_UBYTE" -- 1 byte unsigned integers 
+*        - "_UBYTE" -- 1 byte unsigned integers
 *
 *        The same data type is used for both DATA and (if required)
-*        VARIANCE components of the output NDF.  The initial default 
+*        VARIANCE components of the output NDF.  The initial default
 *        value is "_WORD".   [current value]
 *     VSCALE = _DOUBLE (Read)
 *        The scale factor to use for the VARIANCE component, when
 *        compressing with METHOD set to SCALE. If a null (!) value is
-*        supplied for VSCALE or VZERO, default values will be used for 
-*        both that cause the scaled variance values to occupy 96% of 
-*        the available range of the data type selected using parameter 
+*        supplied for VSCALE or VZERO, default values will be used for
+*        both that cause the scaled variance values to occupy 96% of
+*        the available range of the data type selected using parameter
 *        SCALETYPE.  [!]
 *     VZERO = _DOUBLE (Read)
 *        The zero factor to use for the VARIANCE component, when
 *        compressing with METHOD set to SCALE.  If a null (!) value is
-*        supplied for VSCALE or VZERO, default values will be used for 
-*        both that cause the scaled variance values to occupy 96% of 
-*        the available range of the data type selected using parameter 
+*        supplied for VSCALE or VZERO, default values will be used for
+*        both that cause the scaled variance values to occupy 96% of
+*        the available range of the data type selected using parameter
 *        SCALETYPE.  [!]
 
 *  Examples:
 *     ndfcompress infile outfile scale scaletype=_uword
 *        Copies the contents of the NDF structure infile to the new
-*        structure outfile, scaling the values so that they fit into 
+*        structure outfile, scaling the values so that they fit into
 *        unsigned 2-byte integers. The scale and zero values used are
 *        chosen automatically.
 
@@ -99,12 +99,12 @@
 *     KAPPA: NDFCOPY.
 
 *  Implementation Status:
-*     The TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY, AXIS, WCS, and 
-*     HISTORY components are copied by this routine, together with all 
-*     extensions.  
+*     The TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY, AXIS, WCS, and
+*     HISTORY components are copied by this routine, together with all
+*     extensions.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,7 +133,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'DAT_PAR'          ! DAT constants
-      INCLUDE 'PRM_PAR'          ! VAL constants 
+      INCLUDE 'PRM_PAR'          ! VAL constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -160,8 +160,8 @@
       CHARACTER COMP(2)*8        ! NDF array component names
       CHARACTER METHOD*5         ! Compression method
       CHARACTER SCLPAR(2)*6      ! Parameters for getting scale values
-      CHARACTER STYPE*(DAT__SZTYP)! Numerical type of scaled array 
-      CHARACTER TYPE*(DAT__SZTYP)! Numerical type of input array 
+      CHARACTER STYPE*(DAT__SZTYP)! Numerical type of scaled array
+      CHARACTER TYPE*(DAT__SZTYP)! Numerical type of input array
       CHARACTER ZERPAR(2)*6      ! Parameters for getting zero values
       DOUBLE PRECISION MAXVAL    ! Max value in array
       DOUBLE PRECISION MINVAL    ! Min value in array
@@ -197,8 +197,8 @@
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
-*  Obtain the compression method. 
-      CALL PAR_CHOIC( 'METHOD', METHOD, 'SCALE', .TRUE., METHOD, 
+*  Obtain the compression method.
+      CALL PAR_CHOIC( 'METHOD', METHOD, 'SCALE', .TRUE., METHOD,
      :                STATUS )
 
 *  First deal with SCALE compression.
@@ -221,7 +221,7 @@
          DO I = 1, 2
 
 *  Pass on if the component is not defined in the input NDF.
-            CALL NDF_STATE( INDF1, COMP( I ), THERE, STATUS ) 
+            CALL NDF_STATE( INDF1, COMP( I ), THERE, STATUS )
             IF( THERE ) THEN
 
 *  Get the data type of the input NDF array component.
@@ -229,12 +229,12 @@
 
 *  Map the input array, and see if there may be any bad values in the
 *  mapped array.
-               CALL NDF_MAP( INDF1, COMP( I ), TYPE, 'READ', IP1, EL, 
-     :                       STATUS ) 
-               CALL NDF_BAD( INDF1, COMP( I ), .FALSE., BAD, STATUS ) 
+               CALL NDF_MAP( INDF1, COMP( I ), TYPE, 'READ', IP1, EL,
+     :                       STATUS )
+               CALL NDF_BAD( INDF1, COMP( I ), .FALSE., BAD, STATUS )
 
-*  Check that no error has occurred.  This is so that we can be sure 
-*  that  any PAR__NULL error following the next two PAR_GET0D calls was 
+*  Check that no error has occurred.  This is so that we can be sure
+*  that  any PAR__NULL error following the next two PAR_GET0D calls was
 *  generated  by one of the two PAR calls.
                IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -242,13 +242,13 @@
                CALL PAR_GET0D( SCLPAR( I ), SCALE, STATUS )
                CALL PAR_GET0D( ZERPAR( I ), ZERO, STATUS )
 
-*  If a null value was supplied for either, annul the error and 
+*  If a null value was supplied for either, annul the error and
 *  calculate default values.
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
 
 *  Get the max and min data values in the input array.
-                  CALL KPG1_MXMNX( TYPE, BAD, EL, IP1, NINVAL, MAXVAL, 
+                  CALL KPG1_MXMNX( TYPE, BAD, EL, IP1, NINVAL, MAXVAL,
      :                             MINVAL, MAXPOS, MINPOS, STATUS )
 
 *  Get the maximum and minimum data values representable by the selected
@@ -272,9 +272,9 @@
                   ELSE IF( STYPE .EQ. '_UBYTE' ) THEN
                      VMX = VAL_UBTOD( .FALSE., VAL__MAXUB, STATUS )
                      VMN = VAL_UBTOD( .FALSE., VAL__MINUB, STATUS )
- 
+
                   ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR 
+                     STATUS = SAI__ERROR
                      CALL MSG_SETC( 'T', TYPE )
                      CALL ERR_REP( 'NDFCOMP_ERR1', 'NDFCOMPRESS: '//
      :                             'Unsupported data type ''^T'' '//
@@ -285,7 +285,7 @@
 *  cover 96% of the available scaled data range.
                   IF( MAXVAL .NE. MINVAL ) THEN
                      SCALE = ( MAXVAL - MINVAL )/( 0.96*( VMX - VMN ) )
-                  ELSE                     
+                  ELSE
                      SCALE = 1.0D0
                   END IF
 
@@ -305,7 +305,7 @@
                   CALL MSG_SETR( 'S', REAL( SCALE ) )
                   CALL MSG_SETR( 'Z', REAL( ZERO ) )
 
-               ELSE 
+               ELSE
                   SCALE = NINT( SCALE )
                   ZERO = NINT( ZERO )
                   CALL MSG_SETI( 'S', NINT( SCALE ) )
@@ -318,15 +318,15 @@
      :                          'using Scale=^S   Zero=^z', STATUS )
 
 *  Map the output array into which will be put the scaled values.
-               CALL NDF_MAP( INDF2, COMP( I ), STYPE, 'WRITE', IP2, EL, 
-     :                       STATUS ) 
+               CALL NDF_MAP( INDF2, COMP( I ), STYPE, 'WRITE', IP2, EL,
+     :                       STATUS )
 
 *  Copy the input array to the output array, scaling them in the
 *  process.
-               CALL KPG1_SCALX( SCALE, ZERO, BAD, EL, TYPE, IP1, 
+               CALL KPG1_SCALX( SCALE, ZERO, BAD, EL, TYPE, IP1,
      :                          STYPE, IP2, BADOUT, NBAD, STATUS )
 
-*  Unmap the output array, since the scale and zero values cannot be 
+*  Unmap the output array, since the scale and zero values cannot be
 *  set if the array is mapped.
                CALL NDF_UNMAP( INDF2, COMP( I ), STATUS )
 
@@ -337,23 +337,23 @@
 *  data range.
                IF( NBAD .EQ. 1 ) THEN
                   CALL MSG_OUT( 'NDFCOMP_MSG2', '  One pixel did not '//
-     :                          'fit into the scaled data range.', 
+     :                          'fit into the scaled data range.',
      :                          STATUS )
                   CALL MSG_BLANK( STATUS )
 
                ELSE IF( NBAD .GT. 1 ) THEN
                   CALL MSG_SETI( 'N', NBAD )
                   CALL MSG_OUT( 'NDFCOMP_MSG3', '  ^N pixels did not '//
-     :                          'fit into the scaled data range.', 
+     :                          'fit into the scaled data range.',
      :                          STATUS )
                   CALL MSG_BLANK( STATUS )
                END IF
 
 *  Store the scale and zero terms in the output NDF. This will convert
 *  its storage form from simple to scaled, and change the data type of
-*  the NDF to the data type of the scale and zero terms. 
+*  the NDF to the data type of the scale and zero terms.
                IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL NDF_PTSZD( SCALE, ZERO, INDF2, COMP( I ), 
+                  CALL NDF_PTSZD( SCALE, ZERO, INDF2, COMP( I ),
      :                            STATUS )
 
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
@@ -361,7 +361,7 @@
      :                           VAL_DTOR( .FALSE., ZERO, STATUS ),
      :                           INDF2, COMP( I ), STATUS )
 
-               ELSE 
+               ELSE
                   CALL NDF_PTSZI( VAL_DTOI( .FALSE., SCALE, STATUS ),
      :                           VAL_DTOI( .FALSE., ZERO, STATUS ),
      :                           INDF2, COMP( I ), STATUS )

@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,11 +65,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'KPG_PAR'          ! KPG constants
 
 *  Status:
@@ -87,8 +87,8 @@
 
 *  "Log10" - Log base 10
       PURPOSE = 'Take log. (base 10) of each coordinate value'
-      CALL AST_INTRAREG( 'Log10', AST__ANY, AST__ANY, KPG1_ASLOG, 
-     :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 44 ), 
+      CALL AST_INTRAREG( 'Log10', AST__ANY, AST__ANY, KPG1_ASLOG,
+     :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 44 ),
      :                   KPG_AUTHOR, KPG_CONTACT, STATUS )
 
       END

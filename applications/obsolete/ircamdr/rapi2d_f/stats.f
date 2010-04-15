@@ -48,7 +48,7 @@
 *        Enddo
 *     Endif
 *     End
-* 
+*
 *    Bugs :
 *
 *     None known.
@@ -63,7 +63,7 @@
 *     26-11-1986 : added par_put's for means,stds (UKIRT::CAA)
 *     22-08-1988 : added additional statistics (JACH::CAA)
 *     12_Apr-1994  changed DAT and CMP calls to NDF (SKL@JACH)
-*    Endhistory 
+*    Endhistory
 
 *    Type definitions :
 
@@ -72,8 +72,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR' 
-      INCLUDE  'NDF_ERR' 
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -86,7 +86,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  LOCI,           ! input data structure
      :  DIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
      :  NELEMENTS,       ! number of elements mapped by NDF_MAP
@@ -100,7 +100,7 @@
      :  XSIZEMAX,       ! maximum permissible sub-array in x
      :  YSIZEMAX        !    "         "       "    "   in y
 
-      REAL 
+      REAL
      :  TOTAL,          ! total of pixels in sub-array
      :  MEAN,           ! mean of pixels in sub-array
      :  STDDEV,         ! standard deviation of pixels in sub-array
@@ -152,9 +152,9 @@
             XSIZEMAX  =  10000
             YSIZEMAX  =  10000
 
-            CALL AIF_GET0I( 'XSIZE', XSIZEMAX, 1, XSIZEMAX, XSIZE, 
+            CALL AIF_GET0I( 'XSIZE', XSIZEMAX, 1, XSIZEMAX, XSIZE,
      :                       STATUS )
-            CALL AIF_GET0I( 'YSIZE', YSIZEMAX, 1, YSIZEMAX, YSIZE, 
+            CALL AIF_GET0I( 'YSIZE', YSIZEMAX, 1, YSIZEMAX, YSIZE,
      :                       STATUS )
 
 *          check that sub-array limits are within image and set to max
@@ -172,13 +172,13 @@
 
 *             now call the subroutine to do the work
 
-               CALL STATSSUB( %VAL( PNTRI ), DIMS( 1), DIMS( 2), 
-     :	                      XSTART, YSTART, XSIZE, YSIZE, NUMPIX, 
-     :                        MAXIMUM, MINIMUM, TOTAL, MEAN, 
+               CALL STATSSUB( %VAL( PNTRI ), DIMS( 1), DIMS( 2),
+     :	                      XSTART, YSTART, XSIZE, YSIZE, NUMPIX,
+     :                        MAXIMUM, MINIMUM, TOTAL, MEAN,
      :                        STDDEV, STATUS )
 
-               CALL STATSSUB2( %VAL( PNTRI), DIMS( 1), DIMS( 2), 
-     :	                       XSTART, YSTART, XSIZE, YSIZE, MEDIAN, 
+               CALL STATSSUB2( %VAL( PNTRI), DIMS( 1), DIMS( 2),
+     :	                       XSTART, YSTART, XSIZE, YSIZE, MEDIAN,
      :                         MODE)
 
 *             on return, display the results
@@ -187,7 +187,7 @@
 
                CALL MSG_SETI( 'NUMPIX', NUMPIX )
                CALL MSG_OUT( 'STATS_NUMPIX',
-     :       'Number of pixels in calculation      =  ^NUMPIX', 
+     :       'Number of pixels in calculation      =  ^NUMPIX',
      :        STATUS )
 	       CALL PAR_PUT0I( 'NUMPIX', NUMPIX, STATUS)
 
@@ -240,7 +240,7 @@
 *          ask whether user wants another sub-array
             CALL PAR_GET0L( 'AGAIN', AGAIN, STATUS )
 
-*          annul parameter values before looping 
+*          annul parameter values before looping
             CALL PAR_CANCL( 'XSTART', STATUS )
             CALL PAR_CANCL( 'YSTART', STATUS )
             CALL PAR_CANCL( 'XSIZE', STATUS )

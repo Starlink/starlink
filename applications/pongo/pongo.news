@@ -9,8 +9,8 @@
  Recent Changes (Release 2.0-2)
  --------------
 
- PONGO now uses native PGPLOT for plotting rather than the deprecated 
- Starlink GKS PGPLOT. This should fix plotting and interoperability  
+ PONGO now uses native PGPLOT for plotting rather than the deprecated
+ Starlink GKS PGPLOT. This should fix plotting and interoperability
  problems with recent versions of KAPPA.
 
  Alasdair Allan (aa@astro.ex.ac.uk), 22nd April 2004.
@@ -19,14 +19,14 @@
  -------------
 
  PONGO has been considerably extended to now work from the IRAF/CL
- command language. To use this load the pongo package. The 
+ command language. To use this load the pongo package. The
  commands that are available are the same as when running from ICL.
- 
+
  Other changes of note are:
 
    o The READF command has been changed so that `@' is no
-     longer needed when using an ICL variable to store the file name. 
-     This is INCOMPATIBLE with previous behaviour and any scripts 
+     longer needed when using an ICL variable to store the file name.
+     This is INCOMPATIBLE with previous behaviour and any scripts
      using the `@' form will need changing, i.e. lines with statements
      like:
 
@@ -49,13 +49,13 @@
 
    o A description of how to close the edges of grids has been added to
      the GRID command section. This command now also attempts to
-     complete latitude lines to their end points (this reduces 
+     complete latitude lines to their end points (this reduces
      the ragged appearance at the ends of latitude lines).
 
    o The YLINEAR command now works.
 
    o The VP_xx commands have been modified to accept an argument which
-     indicates that space around the viewport should be reserved for 
+     indicates that space around the viewport should be reserved for
      any labels.
 
    o FITCURVE now uses the XMIN and XMAX parameters as described
@@ -72,7 +72,7 @@
      the fill-style attributes (for polygons and histograms).
 
    o A new command DRAWPOLY has been introduced. This draws polygons
-     that can be filled. 
+     that can be filled.
 
    o A new command SETPROJ has been introduced. This sets the
      projection geometry related global variables (under CL this sets
@@ -84,7 +84,7 @@
      circles. The GT\_CIRCLE command already supplies this ability.
 
    o The commands XSCALE, YSCALE, YOFFSET and XOFFSET now allow
-     negative factors. 
+     negative factors.
 
   Peter Draper (P.W.Draper@durham.ac.uk), 12th November 1997.
 

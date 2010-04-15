@@ -39,7 +39,7 @@ C     Formal parameters
 
       IFAIL = 0
       IF (ICHECK(1,IFAIL).NE.1)   RETURN
-      
+
       CALL INITNPNEW (NPTSNEW)
       CALL QLIM      (NQ, NQ1, NQ2)
       DO NQ = NQ1, NQ2
@@ -55,7 +55,7 @@ C           Average two polarizations.
             NPTSNEW(NQ) = NP1/2
             NST         = NTOT(NQ-1)
             DO J = 1,NPTSNEW(NQ)
-              IF (DATA(NST+J).EQ.BADPIX_VAL .AND. 
+              IF (DATA(NST+J).EQ.BADPIX_VAL .AND.
      &            DATA(NST+NPTSNEW(NQ)).EQ.BADPIX_VAL) THEN
                 DATA(NST+J) = BADPIX_VAL
               ELSE IF (DATA(NST+J).EQ.BADPIX_VAL) THEN

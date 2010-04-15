@@ -64,7 +64,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J                     ! counter variables 
+     :   I, J                     ! counter variables
 
 *-
 *    check status on entry - return if not o.k.

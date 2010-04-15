@@ -43,20 +43,20 @@
 
 *   Import:
       BYTE CNTRL(MAXTOK)    ! control string
- 
+
       REAL*8 FVALUE           ! float value
- 
+
       INTEGER MAXC          ! size of value
- 
+
 *   Import/Export:
       BYTE LINE(MAXC)       ! line to be modified
- 
+
       INTEGER POS           ! current character position in line
- 
+
 *   External references:
       INTEGER str_INDEX     ! character index in string
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL FIXED         ! whether fixed point
       LOGICAL RIGHT         ! whether right justified
@@ -64,13 +64,13 @@
       BYTE EDIT             ! edit character
       BYTE FORMAT(MAXTOK)   ! format from CNTRL
       BYTE VALUE(MAXTOK)    ! value coded into string
- 
+
       INTEGER FIELD         ! field size
       INTEGER FIRST         ! first position in CNTRL
       INTEGER LAST          ! last position in CNTRL
       INTEGER PREC          ! precision
       INTEGER TYPE          ! format type index
- 
+
       FIRST = 1
       LAST = str_LEN(CNTRL)
 

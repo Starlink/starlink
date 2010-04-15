@@ -20,9 +20,9 @@
 *        The global status.
 
 *  Description:
-*     This application returns a Mapping that will convert coordinates 
-*     between the coordinate systems represented by two Frames in a 
-*     FrameSet. 
+*     This application returns a Mapping that will convert coordinates
+*     between the coordinate systems represented by two Frames in a
+*     FrameSet.
 
 *  Usage:
 *     getmapping this frame1 frame2 result
@@ -31,17 +31,17 @@
 *     IFRAME1 = LITERAL (Read)
 *        The integer index or Domain name of the first Frame within the
 *        FrameSet (the strings AST__BASE and AST__CURRENT may also be
-*        supplied). This Frame describes the coordinate system for the 
-*        "input" end of the Mapping. 
+*        supplied). This Frame describes the coordinate system for the
+*        "input" end of the Mapping.
 *     IFRAME2 = LITERAL (Read)
 *        The integer index or Domain name of the second Frame within the
 *        FrameSet (the strings AST__BASE and AST__CURRENT may also be
-*        supplied). This Frame describes the coordinate system for the 
-*        "output" end of the Mapping. 
+*        supplied). This Frame describes the coordinate system for the
+*        "output" end of the Mapping.
 *     RESULT = LITERAL (Read)
 *        An text file to receive the Mapping.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the FrameSet. If an NDF is supplied, 
+*        An NDF or text file holding the FrameSet. If an NDF is supplied,
 *        the WCS FrameSet will be used.
 
 *  Copyright:
@@ -97,14 +97,14 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get an AST Object.
-      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, IAST, 
+      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, IAST,
      :                 STATUS )
 
 *  Get the index of the first Frame.

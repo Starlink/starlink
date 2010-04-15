@@ -1,7 +1,7 @@
 C+
 C                          G E N _ T I M E
 C
-C  Routine name: 
+C  Routine name:
 C     GEN_TIME
 C
 C  Function:
@@ -9,7 +9,7 @@ C     Formats current day and time in a friendly way.
 C
 C  Description:
 C     Returns the current day and time formatted in a friendly
-C     way - ie as 'Wednesday 25th December 1985 11:25 am' rather 
+C     way - ie as 'Wednesday 25th December 1985 11:25 am' rather
 C     than as '25-DEC-85 11:25:00'.
 C
 C  Language:
@@ -20,30 +20,30 @@ C     CALL GEN_TIME(STYLE,DAY,LDAY,DATE,LDATE,HOUR,LHOUR)
 C
 C  Parameters -    (">" input, "<" output)
 C     (>) STYLE    (Integer, ref) The low bits of STYLE control the
-C                  format of the result.  
+C                  format of the result.
 C                  Bit 0 (the least significant bit) should be
 C                  set if the seconds are to be included in the
 C                  time.
 C                  Bit 1 should be set if the time of day is to
-C                  be given as 'am' or 'pm' rather than in 24 
+C                  be given as 'am' or 'pm' rather than in 24
 C                  hour format.
 C                  Bit 2 should be set if the month is to precede
 C                  the day, ie 'December 25th, 1985', rather than
 C                  '25th December 1985'.
-C     (<) DAY      (Fixed string, descr) Returned with the string 
+C     (<) DAY      (Fixed string, descr) Returned with the string
 C                  giving the day of the week. Should be at least 9
 C                  characters.
 C     (<) LDAY     (Integer, ref) Returned with the number of characters
 C                  used for DAY.
-C     (<) DATE     (Fixed string, descr) Returned with the string 
+C     (<) DATE     (Fixed string, descr) Returned with the string
 C                  giving the date.  Should be at least 20 characters.
 C     (<) LDATE    (Integer, ref) Returned with the number of characters
 C                  used for DATE.
-C     (<) HOUR     (Fixed string, descr) Returned with the string giving 
+C     (<) HOUR     (Fixed string, descr) Returned with the string giving
 C                  the time of day.  Should be at least 12 characters.
 C     (<) LHOUR    (Integer, ref) Returned with the number of characters
 C                  used for the time.
-C                  
+C
 C  Authors: Keith Shortridge, AAO
 C           Horst Meyerdierks, UoE, Starlink
 C           Clive Davenhall, UoE, Starlink
@@ -111,7 +111,7 @@ C
      :   IDAY, MONTH, YEAR, NDAY, PSXYDY, PSXDST, TSTRCT, STATUS )
       EMS_STATUS=0
       CALL EMS_ANNUL(EMS_STATUS)
-      CALL EMS_END(EMS_STATUS) 
+      CALL EMS_END(EMS_STATUS)
       NDAY = NDAY + 1
       MONTH = MONTH + 1
 C
@@ -144,7 +144,7 @@ C
       DAYSTR(IPTR:IPTR)=CHAR(UNITS+ICHAR('0'))
       IF ((UNITS.GE.4).OR.(UNITS.EQ.0).OR.(TENS.EQ.1)) THEN
          ABBR='th'
-      ELSE 
+      ELSE
          ABBR=ABBRS(UNITS)
       END IF
       DAYSTR(IPTR+1:IPTR+2)=ABBR
@@ -190,7 +190,7 @@ C
          IPTR=1
       END IF
       TIMSTR(IPTR:IPTR)=CHAR(UNITS+ICHAR('0'))
-      IPTR=IPTR+1            
+      IPTR=IPTR+1
       WRITE(TIMSTR(IPTR:IPTR+2),'(A,I2.2)',IOSTAT=IGNORE) ':',IM
       IPTR=IPTR+3
       IF (SECS) THEN

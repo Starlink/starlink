@@ -3,7 +3,7 @@ C+
      :                       NLID,NCOEFF,SIGMA)
 C
 C     E C H _ A R L I S T
-C        
+C
 C     ECHARC utility.  Writes out the lines and wavelengths to a
 C     disk file in a simple format suitable for a program (either
 C     ARC itself or some automatic fitter) to read later.  The

@@ -278,7 +278,7 @@
 *        ISMOO behaviour now correct. Detection always used smoothed
 *        data previous to this.
 *     30-NOV-1998 (PDRAPER):
-*        Added test to stop the number of pixels in ILIST from 
+*        Added test to stop the number of pixels in ILIST from
 *        being exceeded.
 *     07-SEP-2004 (PDRAPER):
 *        Changed to use CNF_PAR
@@ -612,9 +612,9 @@ c *** negative objects pass 1, positive objects pass 2
       IF ( IPASS .EQ. 3 ) GOTO 900
 
 *   Load 1st and 2nd lines into the buffers
-      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUFO, NYOUT, 0, 
+      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUFO, NYOUT, 0,
      :                STATUS )
-      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUF, NYOUT, NYOUT, 
+      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUF, NYOUT, NYOUT,
      :                STATUS )
 
 *   Reset some variables
@@ -634,7 +634,7 @@ c *** negative objects pass 1, positive objects pass 2
 
 *   Load next line into buffer
       KK = KK + NYOUT
-      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUFN, NYOUT, KK, 
+      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUFN, NYOUT, KK,
      :                STATUS )
       iw=irec+1
       iww=ijc+jjc
@@ -990,7 +990,7 @@ c  *** check if image is overlapped
          endif
 c  *** get profile intensities
          if(isoph.eq.2)then
-            call phopt( %VAL( CNF_PVAL( MAP ) ), parm, nbit, rec, 
+            call phopt( %VAL( CNF_PVAL( MAP ) ), parm, nbit, rec,
      :                  xpeak, r, sigsq )
          endif
          ib=0
@@ -1105,11 +1105,11 @@ c  *** end of pixel loop
       if(irec.lt.istop-1) then
 C  PWD: more lines for this object???. Stop if not enough data left to
 C  process another line.
-         IF( IJC .LT. IMLIM - NRANGE - 1 ) THEN 
+         IF( IJC .LT. IMLIM - NRANGE - 1 ) THEN
             GOTO 250
          ELSE
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 
+            CALL ERR_REP( ' ',
      :'Internal storage space exhausted -- objects too large', STATUS )
             GO TO 900
          END IF

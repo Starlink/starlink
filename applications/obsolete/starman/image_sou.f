@@ -1,6 +1,6 @@
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCALC -- (Program) Create an image by calculations on other images
-C    
+C
 C  alan penny                       ral                       1992 Dec
 
       subroutine imcalc ( ierradam )
@@ -54,7 +54,7 @@ C--
 Cbegin
 
       call starman_start
-                    
+
       call t_imcut
 
       call starman_end ( ierradam )
@@ -104,7 +104,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFLASH -- (Program) Flash up an image on the display 
+C IMFLASH -- (Program) Flash up an image on the display
 C
 C    alan penny             ral               1990 Jan
 
@@ -209,7 +209,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMSMOOTH -- (Program) 
+C IMSMOOTH -- (Program)
 C
 C         A.J.Penny                RAL                  1991 May
 
@@ -264,7 +264,7 @@ C--
 Cbegin
 
       call starman_start
-                    
+
       call t_imtype
 
       call starman_end ( ierradam )
@@ -340,12 +340,12 @@ Cbegin
          if ( ANYIN ) then						!Load input images into stack
             do kk = 1, NZ
                if ( IMTY(kk).eq.'SHORT' ) then
-                  call imca_loads ( %val(IP(kk)), NX(kk), NY(kk), 
-     +                              BS(kk), BZ(kk), INVALI(kk), k, kk, 
+                  call imca_loads ( %val(IP(kk)), NX(kk), NY(kk),
+     +                              BS(kk), BZ(kk), INVALI(kk), k, kk,
      +                              %val(IPSTK), NXO, NZ )
                else
-                  call imca_loadr ( %val(IP(kk)), NX(kk), NY(kk), 
-     +                              BS(kk), BZ(kk), RINVALI(kk), k, kk, 
+                  call imca_loadr ( %val(IP(kk)), NX(kk), NY(kk),
+     +                              BS(kk), BZ(kk), RINVALI(kk), k, kk,
      +                              %val(IPSTK), NXO, NZ )
                endif
             enddo
@@ -370,13 +370,13 @@ Cbegin
 
 
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCA_SDEF -- Set up defaults
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine imca_sdef ( )
 
       implicit none
@@ -410,15 +410,15 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCA_GCL -- Get input and output info from the command line
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine imca_gcl ( )
 
       implicit none
       include 'imcalc.inc'
       include 'STARMAN_INC'
 C--
-      integer k, ierr 
-      character title*50, texta*132, inim*3 
+      integer k, ierr
+      character title*50, texta*132, inim*3
 Cbegin
 
 
@@ -436,7 +436,7 @@ Cbegin
 
       call imca_polish ( EXPRS, OPCODE, NOPCODE, IMID, NIM,		!Translate it into reverse polish notation
      +                   IMP, VARID, NVAR, IMPV, CON, NCON, ierr )
-      if ( ierr.ne.0 ) then						
+      if ( ierr.ne.0 ) then
          ST_FAILED = .true.
          return
       endif
@@ -450,13 +450,13 @@ Cbegin
       else
          do k = 1, NZ
             inim = 'IN'//IMTOT(k)(2:2)
-            call opimzr ( inim, IP(k), NX(k), NY(k), IMTY(k), .false., 
+            call opimzr ( inim, IP(k), NX(k), NY(k), IMTY(k), .false.,
      +                    ierr )
             if ( ierr.ne.0 ) then
                ST_FAILED = .true.
                return
             endif
-            call gtimzd ( inim, IMTY(k), BS(k), BZ(k), INVALI(k), 
+            call gtimzd ( inim, IMTY(k), BS(k), BZ(k), INVALI(k),
      +                    RINVALI(k), texta, ierr)
             if ( ierr.ne.0 ) then
                ST_FAILED = .true.
@@ -476,7 +476,7 @@ Cbegin
       call imca_vardiff							!How many diff variables?
 
       if ( NVARTOT.gt.0 ) then						!Get input variables
-         do k = 1, NVARTOT		
+         do k = 1, NVARTOT
             call get1r ( VARTOT(k), VAR(k), 0.0, -1.0e37, +1.0e37 )
          enddo
       endif
@@ -485,7 +485,7 @@ Cbegin
       call uppcase ( EXPRS, texta )
       if ( index(texta,'RAN').ne.0 .or. index(texta,'GAUSS').ne.0 )
      +   then
-         call get1i ( 'SEED', KSEED, 1234567891, 1200000001, 
+         call get1i ( 'SEED', KSEED, 1234567891, 1200000001,
      +                        1400000001 )
          call ajseed ( KSEED )
       endif
@@ -552,7 +552,7 @@ Cbegin
 
 
       if ( ST_FAILED ) return
-   
+
       if ( ANYIN ) then
          kins = 0
          kinr = 0
@@ -695,8 +695,8 @@ C IMCA_POLISH -- Decode equation and sort into reverse Polish
 C
 C  alan penny                RAL                1991 Dec
 
-      subroutine imca_polish ( exprs, opcode, noper, imid, 
-     +                         nim, imp, varid, nvar, impv, con, 
+      subroutine imca_polish ( exprs, opcode, noper, imid,
+     +                         nim, imp, varid, nvar, impv, con,
      +                         ncon, ierr)
 
       implicit none
@@ -715,7 +715,7 @@ C  alan penny                RAL                1991 Dec
       integer          ierr		!o: Error flag (0=ok;bad 2=;3=;4=)
 C--
 
-      character in*133, numchr*132, test*7, testa*7, 
+      character in*133, numchr*132, test*7, testa*7,
      +          output*7, fin*2, fina*3
       integer j, k, tos, stk(0:132), symb(132), ll, ncin, nnum,
      +        nsymb, iok, isymb, ndiff, istat, jj
@@ -732,9 +732,9 @@ C--
       character*1 endoper(numendoper)
 
       character*7 oper(-3:maxsym), opsymb(-3:maxsym)
-      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym), 
+      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym),
      +        prl(-3:maxsym), prr(-3:maxsym)
- 
+
       data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),		!Set up image of operators,
      +        prr(j),j=-3,10 ) /					! symbols and their priorities
      +  '       ', 'LDCON  ', 1, 0, 0, 10, 10,
@@ -791,20 +791,20 @@ C--
 
       data endoper / '+', '-', '/', '*', ')', '=', ' ' /
 Cbegin
- 
+
 
       ierr = 0
       ncin = 0
- 
+
       do k = 1, len(exprs)						!Remove embedded blanks
          if ( exprs(k:k).ne.' ' .and. ncin.lt.132  ) then		!Count no of characters
             ncin = ncin + 1
             in(ncin:ncin) = exprs(k:k)
          endif
       enddo
- 
+
       exprs = in(1:ncin)						!Return the expression with blanks removed
- 
+
       ncin = ncin + 1							!Append an '= ' operator to terminate the expression
       in(ncin:ncin) = '='
 
@@ -815,15 +815,15 @@ Cbegin
       j = 0
 
       opnext = .false.							!Indicates if an operator is expected next
-									! first entity must not look like an operator 
+									! first entity must not look like an operator
 
       lmore = .true.							!Loop thru OPLs until '='found
       do while ( lmore )
-         found = .false.						!Search through the list of symbols to 
+         found = .false.						!Search through the list of symbols to
          nsymb = -1							! identify which comes next
          do while ( nsymb.lt.maxsym .and. .not.found )
             nsymb = nsymb + 1
-            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like 
+            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like
                test = in(k:min(k+l(nsymb)-1,81))			! an operator or operand from the left, as appropriate
                call uppcase ( test, testa )
                if ( testa.eq.oper(nsymb) ) found = .true.
@@ -831,22 +831,22 @@ Cbegin
          enddo
 
          isfile = .false.
-         if ( .not.found ) then						!If symbol was not found: - 
+         if ( .not.found ) then						!If symbol was not found: -
 
             if ( opnext ) then						!Error if an operator expected
                ierr = 3
                call printo ( ' ' )
                call printo ( 'ERROR: Cant understand Equation - ' )
                call pargi ( k )
-               call printd ( 
+               call printd (
      +              'ERROR:   An Operator missing, at character: %d' )
-               call printo ( 
+               call printo (
      +              'ERROR:   - that is a plus, or a minus, etc')
                call imca_eqnerr ( exprs, k )
                return
             elseif ( in(k:k).eq.'!' ) then				!Is it marked as filename?
 
-               nnum = 0			
+               nnum = 0
                numchr = ' '						!extract contiguous characters
 
                ll = index(in(k+1:),'!')					!File name would end with an !
@@ -855,9 +855,9 @@ Cbegin
                   call printo ( ' ' )
                   call printo ( 'ERROR: Cant understand Equation - ' )
                   call pargi ( k )
-                  call printd ( 
+                  call printd (
      +              'ERROR:   An ! at character: %d marks start of' )
-                  call printo ( 
+                  call printo (
      +              'ERROR:   filename - but there is no end !')
                   call imca_eqnerr ( exprs, k )
                   return
@@ -866,20 +866,20 @@ Cbegin
                   call printo ( ' ' )
                   call printo ( 'ERROR: Cant understand Equation - ' )
                   call pargi ( k )
-                  call printd ( 
+                  call printd (
      +              'ERROR:   An ! at character: %d marks start of' )
-                  call printo ( 
+                  call printo (
      +              'ERROR:   filename - but only another ! follows')
                   call imca_eqnerr ( exprs, k )
                   return
                endif
                nnum = ll + 1
                numchr = in(k+1:k+ll-1)
- 
+
                call file_is ( numchr(:nnum-2), isfile )			!Try to read this as a file
                if ( isfile ) then
                   thisok = .true.
-                  nsymb = -1						
+                  nsymb = -1
                   nim = nim + 1						!If it is a image, add name to image stack
                   fin(1:1) = 'I'
                   fin(2:2) = char(64+nim)
@@ -889,7 +889,7 @@ Cbegin
                   call file_par ( numchr(:nnum-2), fina, istat )
                endif
 
-            else if ( (in(k:k).eq.'I' .or. in(k:k).eq.'i')		!If an operand was expected, it may be 
+            else if ( (in(k:k).eq.'I' .or. in(k:k).eq.'i')		!If an operand was expected, it may be
      +                 .and. ischar(in(k+1:k+1)) ) then
                nsymb = -1						! a image, variable or const.
                nim = nim + 1						!If it is a image, add name to image stack
@@ -905,7 +905,7 @@ Cbegin
                nnum = 0							!Otherwise it may be a constant...
                numchr = ' '						! extract contiguous numerical characters
 
-               atend = .false.						!Character may be part of a numerical constant 
+               atend = .false.						!Character may be part of a numerical constant
                ll = k - 1						! if it is 0..9 or '.'
                do while ( ll.lt.ncin .and. .not.atend )			! or if it is an 'e' following one of the above
                   ll = ll + 1						! or if it is a sign following an 'e'
@@ -920,8 +920,8 @@ Cbegin
                      atend = .true.					!End of number as soon as one of the above tests fails
                   endif
                enddo
-               call chartor ( numchr(:nnum), const, iok )       
- 
+               call chartor ( numchr(:nnum), const, iok )
+
                if ( iok.eq.0 .and. nnum.ne.0 ) then			!If successful, add constant to stack
                   thisok = .true.
                   ncon = ncon + 1
@@ -936,7 +936,7 @@ Cbegin
                   numchr = ' '						! extract contiguous characters
 
                   atend = .false.					!File name would end with an operator
-                  ll = k - 1						
+                  ll = k - 1
                   do while ( ll.lt.ncin .and. .not.atend )
                      ll = ll + 1
                      do jj = 1, numendoper
@@ -947,7 +947,7 @@ Cbegin
                         numchr(nnum:nnum) = in(ll:ll)
                      endif
                   enddo
- 
+
                   call file_is ( numchr(:nnum), isfile )			!Try to read this as a file
                   if ( isfile .and. nnum.ne.0 ) then
                      thisok = .true.
@@ -962,33 +962,33 @@ Cbegin
                   endif
 
                endif
-               
+
                if ( .not.thisok ) then
                   ierr = 2						!Otherwise there is a bad operand error
                   call printo ( ' ' )
                   call printo ( 'ERROR: Cant understand Equation -' )
                   call pargi ( k )
-                  call printd ( 
+                  call printd (
      +            'ERROR:   Operand missing or bad, at character: %d' )
                   call printo ( 'ERROR:   - that is a file, '//
      +                      'a parameter, a constant, or a variable' )
-                  call printo ( 
+                  call printo (
      +            'ERROR:   - If file name, the file may not exist' )
                   call imca_eqnerr ( exprs, k )
                   return
                endif
-  
+
             endif
          endif
- 
-         j = j + 1							!Put the identified symbol into the output 
-         symb(j) = nsymb						! array and move the input pointer to the 
+
+         j = j + 1							!Put the identified symbol into the output
+         symb(j) = nsymb						! array and move the input pointer to the
          if ( isfile ) then
             k = k + nnum
          else
             k = k + l(nsymb)						! next symbol
          endif
- 
+
          opnext = opr(nsymb).ne.1					!Decide whether an operator or operand follows
          if ( opsymb(nsymb).eq.'=' ) lmore = .false.
       enddo
@@ -1001,11 +1001,11 @@ Cbegin
       lmore = .true.
       do while ( lmore )
          lmore = .false.
- 
-         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have 
+
+         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have
      +        oper(symb(isymb)).eq.')' ) then				! matching parentheses, cancel them
- 
-            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the 
+
+            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the
  									! opening parenthesis then send it to the output stream
 
                output = opsymb(stk(tos))				!Remove the enclosed '(' from functions first
@@ -1018,8 +1018,8 @@ Cbegin
                lmore = .true.
              endif
 
-         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has 
-            output = opsymb(stk(tos))					! a high enough priority, transfer it to 
+         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has
+            output = opsymb(stk(tos))					! a high enough priority, transfer it to
             tos = tos - 1						! the output stream
          else
             tos = tos + 1						!Otherwise, transfer the next symbol to the stack
@@ -1027,11 +1027,11 @@ Cbegin
             isymb = isymb + 1
             lmore = .true. 						!Return for next test
          endif
- 
+
          if ( .not.lmore ) then
 
-            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output, 
-               ierr = 4							! it results from unpaired parentheses 
+            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output,
+               ierr = 4							! it results from unpaired parentheses
                call printo ( ' ' )
                call printo ( 'ERROR: ) missing from Equation -' )	! in the input expression...quit qith error
                call printo ( 'ERROR: '//exprs(1:70) )
@@ -1044,27 +1044,27 @@ Cbegin
                return
             endif
 
-            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it 
+            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it
                noper = noper + 1					! if it is unary + or a comma
                opcode(noper) = output
             endif
- 
+
             if ( output.ne.'=' ) lmore = .true.				!Return for next symbol if not the end
 
          endif
 
       enddo
- 
-      if ( nim.ge.1 ) then						!If images or variables are referenced, sort 
-         call imca_sort ( imid, nim, imp, ndiff, symb )			! their names into alphabetical order and obtain 
-         nim = ndiff							! pointers to allow them to be accessed in their 
+
+      if ( nim.ge.1 ) then						!If images or variables are referenced, sort
+         call imca_sort ( imid, nim, imp, ndiff, symb )			! their names into alphabetical order and obtain
+         nim = ndiff							! pointers to allow them to be accessed in their
       endif								! original order
       if ( nvar.ge.1 ) then
          call imca_sort ( varid, nvar, impv, ndiff, symb )
          nvar = ndiff
       endif
- 
- 
+
+
       end
 
 
@@ -1105,12 +1105,12 @@ C IMCA_DOIT -- Combine the lines from the stack of images into one line
 C
 C  alan penny                     RAL            1991 Dec
 
-      subroutine imca_doit ( riml, nx, nz, ky, opcode, nopcode, imp, 
+      subroutine imca_doit ( riml, nx, nz, ky, opcode, nopcode, imp,
      +                       impv, var, con, rimo, kseed, ierr )
 
       implicit none
       include 'ST_LIMITS_INC'
- 
+
       integer      nx			!i: X size of input lines
       integer      nz			!i: Z size of input lines
       real         riml(nx,nz)		!i: Input lines
@@ -1137,13 +1137,13 @@ C--
       character opsymb(nsymb)*6						!Recognised operations
       data opsymb /
      + 'LDCON ', 'LDVAR ', 'LDIM  ', '=     ',
-     + '-     ', '+     ', '**    ', '*     ', '/     ', 'NEG   ', 
-     + 'SQRT  ', 'EXP   ', 'LOG10 ', 'LOG   ', 'SIN   ', 'COS   ', 
-     + 'TAN   ', 'ASIN  ', 'ACOS  ', 'ATAN  ', 'ATAN2 ', 'SINH  ', 
-     + 'COSH  ', 'TANH  ', 'ABS   ', 'AINT  ', 'ANINT ', 'MOD   ', 
-     + 'SIGN  ', 'DIM   ', 'MIN   ', 'MAX   ', 'XX    ', 'YY    ', 
+     + '-     ', '+     ', '**    ', '*     ', '/     ', 'NEG   ',
+     + 'SQRT  ', 'EXP   ', 'LOG10 ', 'LOG   ', 'SIN   ', 'COS   ',
+     + 'TAN   ', 'ASIN  ', 'ACOS  ', 'ATAN  ', 'ATAN2 ', 'SINH  ',
+     + 'COSH  ', 'TANH  ', 'ABS   ', 'AINT  ', 'ANINT ', 'MOD   ',
+     + 'SIGN  ', 'DIM   ', 'MIN   ', 'MAX   ', 'XX    ', 'YY    ',
      + 'CLIP  ', 'GAUSS ', 'RAN   ' /
-Cbegin 
+Cbegin
 
 
       ierr = 0								!Failure flag
@@ -1160,33 +1160,33 @@ Cbegin
                opwhich(k) = j
                found = .true.
             endif
-         enddo 
+         enddo
          if ( .not.found ) then
             ierr = 1
             return
          endif
       enddo
-      
+
       do j = 1, nx							!Do for all pixels in line
 
          tos = 0							!Initialise the arith, image,
          numiim = 0							! variable, constant stack pointers
          nvar = 0
-         ncon = 0 
- 
+         ncon = 0
+
          nop = 0							!Do the operations
          more = .true.
          bad = .false.
 
          do while ( nop.lt.nopcode .and. more )
-            nop = nop + 1 
+            nop = nop + 1
 
             go to ( 101,102,103,104,105,106,107,108,109,110,111,112,
      +              113,114,115,116,117,118,119,120,121,122,123,124,
      +              125,126,127,128,129,130,131,132,133,134,135,136,
      +              137 ),
      +            opwhich(nop)
-           
+
  101        continue
                tos = tos + 1						!Load constant on to stack
                ncon = ncon + 1
@@ -1383,11 +1383,11 @@ Cbegin
                tos = tos - 1
             go to 100
  133        continue
-               tos = tos + 1						!XX : X position in output image 
+               tos = tos + 1						!XX : X position in output image
                s(tos) = j
             go to 100
  134        continue
-               tos = tos + 1						!YY : Y position in output image 
+               tos = tos + 1						!YY : Y position in output image
                s(tos) = ky
             go to 100
  135        continue
@@ -1415,20 +1415,20 @@ Cbegin
                rimo(j) = INT_INVALR
                more = .false.
             endif
- 
+
          enddo
- 
+
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCA_IMDIFF -- Get number of diff input images and point to stack
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine imca_imdiff ( )
 
       implicit none
@@ -1440,7 +1440,7 @@ C--
 Cbegin
 
 
-      NZ = 0 
+      NZ = 0
 
       if ( NIM.ne.0 ) then
          do j = 1, NIM
@@ -1485,7 +1485,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCA_VARDIFF -- Get number of diff input variables and point to stack
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine imca_vardiff ( )
 
       implicit none
@@ -1497,7 +1497,7 @@ C--
 Cbegin
 
 
-      NVARTOT = 0 
+      NVARTOT = 0
 
       if ( NVAR.ne.0 ) then
          do j = 1, NVAR
@@ -1536,9 +1536,9 @@ C IMCA_LOADR -- Copy real image into a 3-D stack
 C
 C  alan penny                 ral                     1991 Dec
 
-      subroutine imca_loadr ( im, nx, ny, bs, bz, rinvali, jn, jzn, 
+      subroutine imca_loadr ( im, nx, ny, bs, bz, rinvali, jn, jzn,
      +                        rim, nxo, nz )
- 
+
       implicit none
       include 'ST_LIMITS_INC'
 
@@ -1557,7 +1557,7 @@ C--
       integer k
       real    rv
 Cbegin
- 
+
 
       do k = 1, nxo
          rv = im(k,jn)
@@ -1567,19 +1567,19 @@ Cbegin
             rim(k,jzn) = bs*rv + bz
          endif
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCA_LOADS -- Copy int*2 image into a 3-D stack
 C
 C  alan penny                 ral                     1991 Dec
 
-      subroutine imca_loads ( im, nx, ny, bs, bz, invali, jn, jzn, 
+      subroutine imca_loads ( im, nx, ny, bs, bz, invali, jn, jzn,
      +                        rim, nxo, nz )
- 
+
       implicit none
       include 'ST_LIMITS_INC'
 
@@ -1597,7 +1597,7 @@ C  alan penny                 ral                     1991 Dec
 C--
       integer k, kv
 Cbegin
- 
+
 
       do k = 1, nxo
          kv = im(k,jn)
@@ -1607,10 +1607,10 @@ Cbegin
             rim(k,jzn) = bs*real(kv) + bz
          endif
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMCA_OUTLR -- Load a line to the real output image
@@ -1685,7 +1685,7 @@ Cbegin
          else
             rv = (rv-bz)/bs
             if ( rv.lt.INT_MINSR .or. rv.gt.INT_MAXSR ) then
-               imo(j,kl) = inval 
+               imo(j,kl) = inval
             else
                imo(j,kl) = rv
             endif
@@ -1704,7 +1704,7 @@ C  alan penny            ral                     1991 Dec
       subroutine imca_sort ( c, nc, imp, ndiff, iw )
 
       implicit none
- 
+
       integer        nc		!i: Number of identifiers
       character*(*)  c(nc)	!i/o: Identiers
       integer        imp(nc)	!o: pointer to identifier place in stack
@@ -1715,7 +1715,7 @@ C--
       character*132 text
       logical repeat
 Cbegin
- 
+
 
       ndiff = 1								!Only 1?
       iw(1) = 1
@@ -1723,12 +1723,12 @@ Cbegin
       if ( nc.le.1 ) return
 
       nn = min(132,len(c(1)))						!Length of input strings
- 
+
       do k = 1, nc							!Initiallise pointers in workspace
          iw(k) = k
       enddo
 
-      repeat = .true.							!Perform a bubble sort to put 
+      repeat = .true.							!Perform a bubble sort to put
       do while ( repeat ) 						! character strings into alphabetical order
          repeat = .false.
          do k = 1, nc-1
@@ -1741,23 +1741,23 @@ Cbegin
                iw(k+1) = iw(k)
                iw(k) = it
             endif
-         enddo 
+         enddo
       enddo
- 
-      ndiff = 1								!Pointers now point to original positions. scan list to 
+
+      ndiff = 1								!Pointers now point to original positions. scan list to
       imp(iw(1)) = 1							! remove repeated entries and reverse the pointing direction
       do k = 2, nc
-         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and 
+         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and
             ndiff = ndiff + 1						! put it in the correct place in the list
             c(ndiff) = c(k)
          endif
          imp(iw(k)) = ndiff						!Set the appropriate output pointer to its new location
       enddo
- 
- 
+
+
       end
-  
- 
+
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C  T_IMCUBE.F
 C
@@ -1808,7 +1808,7 @@ C--
 
       character*6 tplane1(3), tplane2(6), tplane3(6)
       data tplane1, tplane2, tplane3 / 'ZPLANE', 'YPLANE', 'XPLANE',
-     +   'ZPLANE', 'YPLANE', 'YPLANE', 'XPLANE', 'XPLANE', 'XPLANE', 
+     +   'ZPLANE', 'YPLANE', 'YPLANE', 'XPLANE', 'XPLANE', 'XPLANE',
      +   'TPLANE', 'TPLANE', 'ZPLANE', 'TPLANE', 'ZPLANE', 'YPLANE' /
       integer nd1(3), nd2(6), nd3(6)
       data nd1, nd2, nd3 / 3, 2, 1, 3, 2, 2, 1, 1, 1,
@@ -1869,11 +1869,11 @@ Cbegin
       if ( NDIM.le.2 ) then
          call printo ( 'As input image is 2D, 2D output image is same')
       elseif ( NDIM.eq.3 ) then
-         call printo ( 'Planes to choose from are: xy:xz:yz' ) 
+         call printo ( 'Planes to choose from are: xy:xz:yz' )
          call get_job ( 'PLANE3', 'xy:xz:yz', NPLANE, 1, th2, nth2 )
       elseif ( NDIM.eq.4 ) then
-         call printo ( 'Planes to choose from are: xy:xz:xt:yz:yt:zt') 
-         call get_job ( 'PLANE4', 'xy:xz:xt:yz:yt:zt', NPLANE, 1, th3, 
+         call printo ( 'Planes to choose from are: xy:xz:xt:yz:yt:zt')
+         call get_job ( 'PLANE4', 'xy:xz:xt:yz:yt:zt', NPLANE, 1, th3,
      +                  nth3 )
       endif
 
@@ -1886,12 +1886,12 @@ Cbegin
       NPP(1) = 1
       NPP(2) = NT
       if ( NDIM.eq.3 ) then
-         call get2i ( tplane1(NPLANE), NP(1), NP(2), 
+         call get2i ( tplane1(NPLANE), NP(1), NP(2),
      +                .true., 1, nd(nd1(NPLANE)) )
       elseif ( NDIM.eq.4 ) then
-         call get2i ( tplane2(NPLANE), NP(1), NP(2), 
+         call get2i ( tplane2(NPLANE), NP(1), NP(2),
      +                .true., 1, nd(nd2(NPLANE)) )
-         call get2i ( tplane3(NPLANE), NPP(1), NPP(2), 
+         call get2i ( tplane3(NPLANE), NPP(1), NPP(2),
      +                .true., 1, nd(nd3(NPLANE)) )
       endif
 
@@ -1909,11 +1909,11 @@ Cbegin
       if ( NPLANE.eq.6 ) NYO = NT
 
       if ( IMTYPE.eq.'REAL' )  call opimrw ( 'OUT', IPO, NXO, NYO, 	!Get output image
-     +                                       .false.,i)	
+     +                                       .false.,i)
       if ( IMTYPE.eq.'INT' )   call opimiw ( 'OUT', IPO, NXO, NYO,
-     +                                       .false.,i)	
+     +                                       .false.,i)
       if ( IMTYPE.eq.'SHORT' ) call opimsw ( 'OUT', IPO, NXO, NYO,
-     +                                       .false.,i)	
+     +                                       .false.,i)
       if ( i.ne.0 ) then
          ST_FAILED = .true.
          return
@@ -2002,7 +2002,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(j,k,kk)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
          elseif ( NPLANE.eq.2 ) then
@@ -2017,7 +2017,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(j,kk,k)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
          else
@@ -2032,7 +2032,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(kk,j,k)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
          endif
@@ -2053,7 +2053,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
         elseif ( NPLANE.eq.2 ) then
@@ -2070,7 +2070,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
         elseif ( NPLANE.eq.3 ) then
@@ -2087,7 +2087,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
         elseif ( NPLANE.eq.4 ) then
@@ -2104,7 +2104,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
         elseif ( NPLANE.eq.5 ) then
@@ -2121,7 +2121,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
         else
@@ -2138,19 +2138,19 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = RINVAL 
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
                enddo
             enddo
         endif
 
       endif
-     
+
 
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMCB_DOITI -- Copy data from input to output - integer 
+C IMCB_DOITI -- Copy data from input to output - integer
 C
 C alan penny          ral                   1991 April
 
@@ -2191,7 +2191,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(j,k,kk)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
          elseif ( NPLANE.eq.2 ) then
@@ -2206,7 +2206,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(j,kk,k)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
          else
@@ -2221,7 +2221,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(kk,j,k)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
          endif
@@ -2242,7 +2242,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.2 ) then
@@ -2259,7 +2259,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.3 ) then
@@ -2276,7 +2276,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.4 ) then
@@ -2293,7 +2293,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.5 ) then
@@ -2310,7 +2310,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         else
@@ -2327,13 +2327,13 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         endif
 
       endif
-     
+
 
       end
 
@@ -2356,7 +2356,7 @@ C alan penny          ral                   1991 April
 C--
       integer j, k, kk, kka, kkb, kf
 Cbegin
-     
+
 
       if ( NDIM.eq.2 ) then
 
@@ -2380,7 +2380,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(j,k,kk)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
          elseif ( NPLANE.eq.2 ) then
@@ -2395,7 +2395,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(j,kk,k)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
          else
@@ -2410,7 +2410,7 @@ Cbegin
                         out(j,k) = out(j,k) + in3(kk,j,k)
                      endif
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
          endif
@@ -2431,7 +2431,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.2 ) then
@@ -2448,7 +2448,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.3 ) then
@@ -2465,7 +2465,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.4 ) then
@@ -2482,7 +2482,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         elseif ( NPLANE.eq.5 ) then
@@ -2499,7 +2499,7 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         else
@@ -2516,13 +2516,13 @@ Cbegin
                         endif
                      enddo
                   enddo
-                  if ( kf.eq.1 ) out(j,k) = INVAL 
+                  if ( kf.eq.1 ) out(j,k) = INVAL
                enddo
             enddo
         endif
 
       endif
-     
+
 
       end
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -2562,7 +2562,7 @@ C--
      + 'Average  Take average of all pixels',
      + 'Highest  Take highest pixel',
      + 'Sample   Take value of bottom left hand pixel in box'/
-    
+
 Cbegin
 
 
@@ -2573,7 +2573,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       NXS = 1
-      NXE = NX 
+      NXE = NX
       call get2i ( 'XRANGE', NXS, NXE, .true., 1, NX )
       if ( ST_FAILED ) return
       XREV = .false.
@@ -2588,7 +2588,7 @@ Cbegin
       if ( NYS.gt.NYE ) YREV = .true.
       call cswopi ( NYS, NYE )
 
-      NXST = 1   
+      NXST = 1
       NYST = 1
       lim = max(NX,NY)
       call get2i ( 'BIN', NXST, NYST, .true., 1, lim )
@@ -2609,7 +2609,7 @@ Cbegin
 
       SAMPLE = 'sample '
       if ( NXST.ne.1 .or. NYST.ne.1 ) then
-         call get_job ( 'SAMPLE', 'sample:highest:average', k, 2, th, 
+         call get_job ( 'SAMPLE', 'sample:highest:average', k, 2, th,
      +                  nth )
          if ( ST_FAILED ) return
          SAMPLE = 'sample '
@@ -2639,7 +2639,7 @@ Cbegin
       call icopdes ( 'IN', 'OUT', ierr )
       call ptdesc ( 'OUT', 'TITLE', title )
 
-     
+
       end
 
 
@@ -2665,10 +2665,10 @@ C--
 Cbegin
 
 
-      if ( NXST.eq.1 .and. NYST.eq.1 .and. .not.XREV .and. 
+      if ( NXST.eq.1 .and. NYST.eq.1 .and. .not.XREV .and.
      +     .not.YREV ) then
-         
-         if ( NXS.eq.1 .and. NXE.eq.NX .and. 
+
+         if ( NXS.eq.1 .and. NXE.eq.NX .and.
      +        NYS.eq.1 .and. NYE.eq.NY ) then
             call amovr ( in, out, NX*NY )
          else
@@ -2804,10 +2804,10 @@ C--
 Cbegin
 
 
-      if ( NXST.eq.1 .and. NYST.eq.1 .and. .not.XREV .and. 
+      if ( NXST.eq.1 .and. NYST.eq.1 .and. .not.XREV .and.
      +     .not.YREV ) then
-         
-         if ( NXS.eq.1 .and. NXE.eq.NX .and. 
+
+         if ( NXS.eq.1 .and. NXE.eq.NX .and.
      +        NYS.eq.1 .and. NYE.eq.NY ) then
             call amovs ( in, out, NX*NY )
          else
@@ -2926,8 +2926,8 @@ C    Contains:-
 C
 C T_IMDES      List, write, delete descriptors of an image
 C IMD_LIST     List descriptors
-C IMD_SINGLE   Put out wanted descriptors 
-C IMD_ALL      Put out all descriptors 
+C IMD_SINGLE   Put out wanted descriptors
+C IMD_ALL      Put out all descriptors
 C IMD_WRITE    Write descriptors to image
 C IMD_DELETE   Delete descriptors from an image
 C IMD_COPY     Copy descriptors from one image to another
@@ -2961,7 +2961,7 @@ C--
      + 'Write     Write descriptors to image' /
 Cbegin
 
-    
+
       call get_job ( 'OPTION', topt, kout, 1, th, nth )
       if ( ST_FAILED ) return
 
@@ -2978,7 +2978,7 @@ Cbegin
                        if ( ka.eq.1 ) then
                           call imd_alist
                        else
-                          call imd_slist 
+                          call imd_slist
                        endif
                        endif
 
@@ -2993,7 +2993,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMD_SLIST -- Put out wanted descriptors 
+C IMD_SLIST -- Put out wanted descriptors
 C
 C  alan penny                 ral                1990-06-15
 
@@ -3076,7 +3076,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMD_ALIST -- Put out all descriptors 
+C IMD_ALIST -- Put out all descriptors
 C
 C  alan penny                 ral                1990-06-15
 
@@ -3172,7 +3172,7 @@ C  p morris      leeds                   Jun 1992
 C--
       integer ierr, iv, ka
       real rv
-      character desnam*20, val*72 
+      character desnam*20, val*72
       logical loop, first
 Cbegin
 
@@ -3250,7 +3250,7 @@ Cbegin
 
       if ( ka.eq.1 ) then
 
-         more = .true.		
+         more = .true.
          ncount = 0
          nval = 1
          do while ( more )
@@ -3285,7 +3285,7 @@ Cbegin
             if ( descr.eq.' ' ) then
                loop = .false.
             else
-               call dldes ( 'IN', descr, ierr ) 
+               call dldes ( 'IN', descr, ierr )
             endif
             if ( ierr.ne.0 ) then
                ST_FAILED = .true.
@@ -3317,7 +3317,7 @@ C   alan penny                ral      1990 jan
 C--
       character*60 atext(10000)
       character*8  adescr(10000)
-      integer numdes(10000), ierr, j, k, ip2, nx2, ny2, nval, 
+      integer numdes(10000), ierr, j, k, ip2, nx2, ny2, nval,
      +        ntot, ncount
       character*6 imt2
       logical over, dele
@@ -3443,7 +3443,7 @@ C T_IMFITS_DR           Convert Fits disk file into an NDF File
 C IMFI_GETFITS          Read a disk FITS file header
 C IMFI_FITSHEAD         Read information from FITS header.
 C IMFI_PUTH             Store header in output array
-C IMFI_PUT(IRS)(RS)     Move image data values from input file to output 
+C IMFI_PUT(IRS)(RS)     Move image data values from input file to output
 C IMFI_NUMGET(IRS)(RS)  Gets data from FITS block into array
 C IMFI_BSWOP            Swop bytes in character array
 C IMFI_CHECK            Check FITS Header start is OK
@@ -3555,8 +3555,8 @@ Cbegin
          N_EXP    = M_N_EXP
          N_TIME   = M_N_TIME
          N_DATE   = M_N_DATE
-      endif            
-                                     
+      endif
+
       call imfi_getfits ( infile, header, nbl, intype, line, ierr )	!Read in header
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( NX.lt.1 .or. NY.lt.1 ) then
@@ -3629,11 +3629,11 @@ Cbegin
 
       nbl = 0								!Read header block(s)
       endfound = .false.
-      do while ( .not.endfound .and. nbl.lt.20 )	
+      do while ( .not.endfound .and. nbl.lt.20 )
 
          nbl = nbl + 1
          read ( 1, rec=nbl, err=998 ) tblock(1:2880)
- 
+
          goto 995
   998       call printo ( ' ' )
             call pargi ( nbl )
@@ -3673,7 +3673,7 @@ Cbegin
       endif
 
       kl = 10
-      idot = index(infile(1:kl),'.') 
+      idot = index(infile(1:kl),'.')
       if ( idot.ne.0 ) kl = idot - 1
 
       if ( DO_INFO ) then
@@ -3683,7 +3683,7 @@ Cbegin
          line(81:80+kl) = infile(1:kl)
       endif
 
-      write ( line(161:240), 
+      write ( line(161:240),
      +   '('' Dimension: '',i6,'' x'',i6,''  : Number of blocks'',
      +    '' in header '',i2)' ) NX, NY, nbl
 
@@ -3735,7 +3735,7 @@ Cbegin
          ison = .true.
          found = .false.
          kf = 80
-         do kk = 10, 80 
+         do kk = 10, 80
             if ( ahead(kk:kk).eq.char(39) ) ison = .not.ison
             if ( .not.found .and. ison ) then
                if ( ahead(kk:kk).eq.'/' ) then
@@ -3747,12 +3747,12 @@ Cbegin
          bhead = ahead(10:kf-1)
 
          call endstrip ( bhead, ja, jb )
-         
+
          if ( name.eq.'END') more = .false.
          if ( name.eq.'TITLE' ) g_title = .true.
 
       enddo
-       
+
       g_bscale = .false.
       g_bzero  = .false.
       g_inval  = .false.
@@ -3770,7 +3770,7 @@ Cbegin
          ison = .true.
          found = .false.
          kf = 80
-         do kk = 10, 80 
+         do kk = 10, 80
             if ( ahead(kk:kk).eq.char(39) ) ison = .not.ison
             if ( .not.found .and. ison ) then
                if ( ahead(kk:kk).eq.'/' ) then
@@ -3781,7 +3781,7 @@ Cbegin
          enddo
          bhead = ahead (10:kf-1)
          call endstrip ( bhead, ja, jb )
-         
+
          if ( name.ne.'END') call ptdesc ( 'OUT', name, bhead(ja:jb) )
 
          if ( name.eq.N_OBJECT ) then
@@ -3795,22 +3795,22 @@ Cbegin
             endif
          elseif ( name.eq.'BSCALE' ) then
             g_bscale = .true.
-            call chartor ( bhead(ja:jb), BS, ierr ) 
-            if ( ierr.ne.0 ) call printo ( 
+            call chartor ( bhead(ja:jb), BS, ierr )
+            if ( ierr.ne.0 ) call printo (
      +         '  WARNING: BSCALE descriptor not a proper number' )
          elseif ( name.eq.'BZERO' )  then
             g_bzero  = .true.
-            call chartor ( bhead(ja:jb), BZ, ierr ) 
-            if ( ierr.ne.0 ) call printo ( 
+            call chartor ( bhead(ja:jb), BZ, ierr )
+            if ( ierr.ne.0 ) call printo (
      +         '  WARNING: BZERO descriptor not a proper number' )
          elseif ( name.eq.'INVAL' )  then
             g_inval  = .true.
-            call chartor ( bhead(ja:jb), rv, ierr ) 
-            if ( ierr.ne.0 ) call printo ( 
+            call chartor ( bhead(ja:jb), rv, ierr )
+            if ( ierr.ne.0 ) call printo (
      +         '  WARNING: INVAL descriptor not a proper number' )
             if ( outtype.eq.'REAL' ) then
                RINVAL = rv
-            else 
+            else
                i_inval = nint(rv)
                INVAL = max(-32768,min(32767,nint(rv)))
             endif
@@ -3836,11 +3836,11 @@ Cbegin
       if ( g_inval ) then
          if ( intype.eq.'REAL' ) then
             call pargr ( RINVAL )
-            call printd ( 
+            call printd (
      +' Type %c : Bscale %f : Bzero %f : Inval flag %f' )
          else
             call pargi ( i_inval )
-            call printd ( 
+            call printd (
      +'   Type  %c  :   Bscale  %f  :  Bzero  %f  :  Inval flag  %d' )
          endif
       else
@@ -3860,7 +3860,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFI_PUTSS -- Move image data values from input file to output 
+C IMFI_PUTSS -- Move image data values from input file to output
 C
 C   alan penny                    ral            1994 Nov
 
@@ -3872,7 +3872,7 @@ C   alan penny                    ral            1994 Nov
       include 'ST_LIMITS_INC'
       include 'ST_IMAGE_INC'
 
-      integer*2    im(NX,NY)	!o: Output image 
+      integer*2    im(NX,NY)	!o: Output image
       integer      nbl		!i: No of FITS blocks in header
       integer      ierr		!o: Error flag (0=ok;1=bad)
 C--
@@ -3928,7 +3928,7 @@ Cbegin
             call pargi ( jx )
             call pargi ( jy )
             call printd ( '           Data   end at X = %d ; Y = %d ' )
-            call printo ( 
+            call printo (
      +    '           Setting disk contents of that block to INVALID' )
             call printo ( ' ' )
          endif
@@ -3940,7 +3940,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFI_PUTSR -- Move image data values from input file to output 
+C IMFI_PUTSR -- Move image data values from input file to output
 C
 C   alan penny                    ral            1994 Nov
 
@@ -4022,7 +4022,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFI_PUTIR -- Move image data values from input file to output 
+C IMFI_PUTIR -- Move image data values from input file to output
 C
 C   alan penny                    ral            1994 Nov
 
@@ -4104,7 +4104,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFI_PUTIS -- Move image data values from input file to output 
+C IMFI_PUTIS -- Move image data values from input file to output
 C
 C   alan penny                    ral            1994 Nov
 
@@ -4186,7 +4186,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFI_PUTRR -- Move image data values from input file to output 
+C IMFI_PUTRR -- Move image data values from input file to output
 C
 C   alan penny                    ral            1994 Nov
 
@@ -4268,7 +4268,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMFI_PUTRS -- Move image data values from input file to output 
+C IMFI_PUTRS -- Move image data values from input file to output
 C
 C   alan penny                    ral            1994 Nov
 
@@ -4383,7 +4383,7 @@ Cbegin
       ierr = 0
 
       qot = char(39)							!The ' character
-      
+
       aline = ' '
 
       endfound = .false.
@@ -4400,7 +4400,7 @@ Cbegin
          ison = .true.
          found = .false.
          kf = 80
-         do kk = 10, 80 
+         do kk = 10, 80
             if ( block(i+kk:i+kk).eq.char(39) ) ison = .not.ison
             if ( .not.found .and. ison ) then
                if ( block(i+kk:i+kk).eq.'/' ) then
@@ -4713,7 +4713,7 @@ Cbegin
 
       enddo
 
- 
+
       end
 
 
@@ -4755,7 +4755,7 @@ Cbegin
 
       enddo
 
- 
+
       end
 
 
@@ -4973,14 +4973,14 @@ Cbegin
       DSNXE = NX
       DSNYS = 1
       DSNYE = NY
-      call ds_init ( IMTITLE, 1, ierr )					!Open display 
+      call ds_init ( IMTITLE, 1, ierr )					!Open display
       if ( ierr.ne.0 ) then
          call printo ( 'ERROR: Can not open that display device' )
          ST_FAILED = .true.
          return
       endif
 
-      call ds_gtcomf ( 0 )						!Get image display size 
+      call ds_gtcomf ( 0 )						!Get image display size
 
       call ds_imgscl ( %val(IPIM), NX, NY, IMTYPE, 1, NX, 1, NY )	!Get display scale
 
@@ -5026,7 +5026,7 @@ C IMJ_WORK1(RS) Add image in, in nearest mode
 C IMJ_WORK2(RS) Add image in, in linear mode
 C IMJ_WORK3(RS) Add image in, in uniform mode
 C IMJ_TYPE2     Add two reference images
-C IMJ_XXDOIT    Do work of adding two reference images 
+C IMJ_XXDOIT    Do work of adding two reference images
 
 
 
@@ -5154,7 +5154,7 @@ Cbegin
 
       call get1b ( 'ZERO', DOZERO, .true. ) 				!Get if subtract median
 
-      call get_job ( 'METHOD', 'nearest:linear:uniform', KMETH, 2,	!Get transform coeffs 
+      call get_job ( 'METHOD', 'nearest:linear:uniform', KMETH, 2,	!Get transform coeffs
      +                         thelp, nthelp )
 
       call get_job ( 'SHIFT', 'full:xyshift', KSHIFT, 2, thelp1, 	!Get full transform or just XY shift
@@ -5195,12 +5195,12 @@ Cbegin
 
          if ( k.lt.10 ) then						!Input image
             write ( texta, '(''IN'',i1)' ) k
-            call opimzr ( texta, IPI(k), NXI(k), NYI(k), IMTY(k), 
-     +                    .true., istat )	
+            call opimzr ( texta, IPI(k), NXI(k), NYI(k), IMTY(k),
+     +                    .true., istat )
          else
             write ( textb, '(''IN'',i2)' ) k
-            call opimzr ( textb, IPI(k), NXI(k), NYI(k), IMTY(k), 
-     +                    .true., istat )	
+            call opimzr ( textb, IPI(k), NXI(k), NYI(k), IMTY(k),
+     +                    .true., istat )
          endif
 
          if ( istat.eq.1 .or. istat.eq.3 ) then				!Check input image
@@ -5226,27 +5226,27 @@ Cbegin
          if ( KSHIFT.eq.1 ) then
             if ( k.lt.10 ) then
                write ( textc, '(''XCOEFF'',i1)' ) k
-               call get3r ( textc, btrc(1), btrc(2), btrc(3), .true., 
+               call get3r ( textc, btrc(1), btrc(2), btrc(3), .true.,
      +                      -1.0e8, 1.0e8 )
                write ( textc, '(''YCOEFF'',i1)' ) k
-               call get3r ( textc, btrc(4), btrc(5), btrc(6), .true., 
+               call get3r ( textc, btrc(4), btrc(5), btrc(6), .true.,
      +                      -1.0e8, 1.0e8 )
             else
                write ( textd, '(''XCOEFF'',i2)' ) k
-               call get3r ( textd, btrc(1), btrc(2), btrc(3), .true., 
+               call get3r ( textd, btrc(1), btrc(2), btrc(3), .true.,
      +                      -1.0e8, 1.0e8 )
                write ( textd, '(''YCOEFF'',i2)' ) k
-               call get3r ( textd, btrc(4), btrc(5), btrc(6), .true., 
+               call get3r ( textd, btrc(4), btrc(5), btrc(6), .true.,
      +                      -1.0e8, 1.0e8 )
             endif
          else
             if ( k.lt.10 ) then
                write ( textc, '(''XYSHFT'',i1)' ) k
-               call get2r ( textc, btrc(1), btrc(4), .true., -1.0e8, 
+               call get2r ( textc, btrc(1), btrc(4), .true., -1.0e8,
      +                      1.0e8 )
             else
                write ( textd, '(''XYSHFT'',i2)' ) k
-               call get2r ( textd, btrc(1), btrc(4), .true., -1.0e8, 
+               call get2r ( textd, btrc(1), btrc(4), .true., -1.0e8,
      +                      1.0e8 )
             endif
          endif
@@ -5307,7 +5307,7 @@ Cbegin
             write ( textf, '(''SCALE'',i2)' ) k
             call get1r ( textf, SCALE(k), 1.0, 0.0, 1.0e8 )
          endif
-       
+
          if ( k.eq.MAXN ) then
             more = .false.
             call pargi ( MAXN )
@@ -5353,11 +5353,11 @@ Cbegin
          call imj_getsize
          call get2i ( 'SIZE', NXR, NYR, .true., 1, 100000 )
          NOREF = .true.
-      else 
+      else
          NOREF = .false.
          call gtimrd ( 'INREF', rva, rvb, INVALREF, titler, istat )
       endif
-  
+
       if ( .not.NOREF ) then						!Reference load image
          call opimrr ( 'INLOAD', IPL, iv, ivb, .false., istat )
          if ( istat.ne.0 ) then
@@ -5366,7 +5366,7 @@ Cbegin
             return
          endif
          if ( iv.ne.NXR .or. ivb.ne.NYR ) then
-            call printo ( 
+            call printo (
      +         'ERROR: Load image different size to reference image' )
             ST_FAILED = .true.
             return
@@ -5381,16 +5381,16 @@ Cbegin
       if ( .not.DOUTREF ) IPOR = 1
       IPOL = 1
       if ( DOUTREF ) then
-         if ( NOREF ) titler = ' ' 					!Add title 
-         call get1c (  'TITLER', otitler, titler, .true. )	
+         if ( NOREF ) titler = ' ' 					!Add title
+         call get1c (  'TITLER', otitler, titler, .true. )
          call opimrw ( 'OUTLOAD', IPOL, NXR, NYR, .true., istat )	!Open output load image
-         if ( NOREF ) titlel = ' '					!Add title 
-         call get1c (  'TITLEL', otitlel, titlel, .true. )			
+         if ( NOREF ) titlel = ' '					!Add title
+         call get1c (  'TITLEL', otitlel, titlel, .true. )
          if ( NOREF ) then						!Load descriptors
             call ptdesr ( 'OUTREF',   'INVAL',   INT_INVALR )
             call ptdesr ( 'OUTLOAD',  'INVAL',   INT_INVALR )
          else
-            call icopdes ( 'INREF',  'OUTREF', istat )				
+            call icopdes ( 'INREF',  'OUTREF', istat )
             call icopdes ( 'INLOAD', 'OUTLOAD', istat )
          endif
          call ptdesc ( 'OUTREF',  'TITLE', otitler )
@@ -5449,7 +5449,7 @@ Cbegin
       if ( .not.DOUTIM ) IPO = 1
       if ( DOUTIM ) then
          call get1c (  'TITLE', title, IMTITLE, .true. )
-         call icopdes ( 'IN1',  'OUT', istat )				
+         call icopdes ( 'IN1',  'OUT', istat )
          call ptdesc ( 'OUT',  'TITLE', title )
          call ptdesr ( 'OUT', 'BZERO', BZO )
          call ptdesr ( 'OUT', 'BSCALE', BSO )
@@ -5477,7 +5477,7 @@ C--
       integer k, kx, ky
       real xa, xb, xc, xd, x, ya, yb, yc, yd, y
 Cbegin
- 
+
 
       NXR = 100
       NYR = 100
@@ -5511,7 +5511,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMJ_DOIT -- Add images in
-C  1) resample the input images over the entire area covered by the 
+C  1) resample the input images over the entire area covered by the
 C     output image
 C  2) Scan the selected area of the output image (location x,y) and
 C     calculate the transformed position (xdash,ydash) in the input
@@ -5531,7 +5531,7 @@ C--
       real std, v1, v2, v3, v4
       character texta*3, textb*4, cv*1
 Cbegin
- 
+
 
       if ( ST_FAILED ) return						!Failed or no more images
 
@@ -5552,7 +5552,7 @@ Cbegin
          call amovkr ( INT_INVALR, %val(IPWR), NXR*NYR )		!Zero them
          call azeror ( %val(IPWL), NXR*NYR )
       else
-         call amovr ( %val(IPR), %val(IPWR), NXR*NYR )			!Load input reference 
+         call amovr ( %val(IPR), %val(IPWR), NXR*NYR )			!Load input reference
          call achvalr ( %val(IPWR), INVALREF, INT_INVALR, NXR*NYR )
          call amovr ( %val(IPL), %val(IPWL), NXR*NYR )
          if ( .not.NOREF ) call canpar  ( 'INREF' )
@@ -5562,7 +5562,7 @@ Cbegin
       do k = 1, NTOT
          if ( k.lt.10 ) then
             write ( texta, '(''IN'',i1)' ) k
-            call gtimzd ( texta, IMTY(k), BS, BZ, INVALIS, INVALIR, 
+            call gtimzd ( texta, IMTY(k), BS, BZ, INVALIS, INVALIR,
      +                    cv, istat )
          else
             write ( textb, '(''IN'',i2)' ) k
@@ -5600,30 +5600,30 @@ Cbegin
 
          if ( KMETH.eq.1 ) then						!Add image in
             if ( IMTY(k).eq.'SHORT' ) then
-               call imj_work1s ( %val(IPI(k)), NXI(k), NYI(k), 
+               call imj_work1s ( %val(IPI(k)), NXI(k), NYI(k),
      +                           %val(IPWR), %val(IPWL), k )
             else
-               call imj_work1r ( %val(IPI(k)), NXI(k), NYI(k), 
+               call imj_work1r ( %val(IPI(k)), NXI(k), NYI(k),
      +                           %val(IPWR), %val(IPWL), k )
             endif
          elseif ( KMETH.eq.2 ) then
             if ( IMTY(k).eq.'SHORT' ) then
-               call imj_work2s ( %val(IPI(k)), NXI(k), NYI(k), 
+               call imj_work2s ( %val(IPI(k)), NXI(k), NYI(k),
      +                           %val(IPWR), %val(IPWL), k )
             else
-               call imj_work2r ( %val(IPI(k)), NXI(k), NYI(k), 
+               call imj_work2r ( %val(IPI(k)), NXI(k), NYI(k),
      +                           %val(IPWR), %val(IPWL), k )
             endif
          elseif ( KMETH.eq.3 ) then
             if ( IMTY(k).eq.'SHORT' ) then
-               call imj_work3s ( %val(IPI(k)), NXI(k), NYI(k), 
+               call imj_work3s ( %val(IPI(k)), NXI(k), NYI(k),
      +                           %val(IPWR), %val(IPWL), k )
             else
-               call imj_work3r ( %val(IPI(k)), NXI(k), NYI(k), 
+               call imj_work3r ( %val(IPI(k)), NXI(k), NYI(k),
      +                           %val(IPWR), %val(IPWL), k )
             endif
          endif
-  
+
          if ( k.lt.10 ) then						!Free data access to image
             call canpar ( texta )
          else
@@ -5662,7 +5662,7 @@ Cbegin
       if ( DOUTREF ) then
          call printo ( ' ' )
          call printd ( ' Loading output reference and load images' )
-         call amovr ( %val(IPWR), %val(IPOR), NXR*NYR )	
+         call amovr ( %val(IPWR), %val(IPOR), NXR*NYR )
          call amovr ( %val(IPWL), %val(IPOL), NXR*NYR )
          call printd ( ' Loaded output reference and load images' )
       endif
@@ -5671,10 +5671,10 @@ Cbegin
          call printo ( ' ' )
          call printd ( ' Loading output image' )
          if ( OUTTYPE.eq.'SHORT' ) then
-            call imj_loadso ( %val(IPWR), %val(IPWL), %val(IPO), 
+            call imj_loadso ( %val(IPWR), %val(IPWL), %val(IPO),
      +                       NXR*NYR, INT_INVALR, BSO, BZO, INVALO )
          else
-            call imj_loadro ( %val(IPWR), %val(IPWL), %val(IPO), 
+            call imj_loadro ( %val(IPWR), %val(IPWL), %val(IPO),
      +                  NXR*NYR, INT_INVALR, BSO, BZO, INT_INVALR )
          endif
          call printd ( ' Loaded output image' )
@@ -5789,10 +5789,10 @@ Cbegin
          do ix = KELIM(1,1,kk), KELIM(2,1,kk)
 
             ajx = TRC(1,kk) + TRC(2,kk)*ix + TRC(3,kk)*iy		!Find nearest pixel location
-            ajy = TRC(4,kk) + TRC(5,kk)*ix + TRC(6,kk)*iy 
+            ajy = TRC(4,kk) + TRC(5,kk)*ix + TRC(6,kk)*iy
             jx = nint(min(anumh,max(anuml,ajx)))
             jy = nint(min(anumh,max(anuml,ajy)))
- 
+
             if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
                valr = INT_INVALR					!Input invalid?
                if ( im(jx,jy).ne.INVALIR ) valr = BS*im(jx,jy) +BZ-ZERO
@@ -5801,7 +5801,7 @@ Cbegin
      +              ( wref(ix,iy).eq.INT_INVALR .or.
      +                wload(ix,iy).eq.0.0 ) ) then
 
-                  wref(ix,iy) = INT_INVALR				!If so load bad 
+                  wref(ix,iy) = INT_INVALR				!If so load bad
                   wload(ix,iy) = wload(ix,iy) + SCALE(kk)
 
                else							!Good value
@@ -5819,7 +5819,7 @@ Cbegin
                      refim = wref(ix,iy)
                      rloadim = wload(ix,iy)
                   endif
-  
+
                   ovalr = refi*rloadi + refim*rloadim			!Add
                   ovall = rloadi + rloadim
                   if ( ovall.ne.0.0 ) then
@@ -5832,8 +5832,8 @@ Cbegin
                endif
 
             endif
- 
-         enddo 
+
+         enddo
       enddo
 
 
@@ -5872,10 +5872,10 @@ Cbegin
          do ix = KELIM(1,1,kk), KELIM(2,1,kk)
 
             ajx = TRC(1,kk) + TRC(2,kk)*ix + TRC(3,kk)*iy		!Find nearest pixel location
-            ajy = TRC(4,kk) + TRC(5,kk)*ix + TRC(6,kk)*iy 
+            ajy = TRC(4,kk) + TRC(5,kk)*ix + TRC(6,kk)*iy
             jx = nint(min(anumh,max(anuml,ajx)))
             jy = nint(min(anumh,max(anuml,ajy)))
- 
+
             if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
                valr = INT_INVALR					!Input invalid?
                if ( im(jx,jy).ne.INVALIS ) valr = BS*im(jx,jy) +BZ-ZERO
@@ -5884,7 +5884,7 @@ Cbegin
      +              ( wref(ix,iy).eq.INT_INVALR .or.
      +                wload(ix,iy).eq.0.0 ) ) then
 
-                  wref(ix,iy) = INT_INVALR				!If so load bad 
+                  wref(ix,iy) = INT_INVALR				!If so load bad
                   wload(ix,iy) = wload(ix,iy) + SCALE(kk)
 
                else							!Good value
@@ -5902,7 +5902,7 @@ Cbegin
                      refim = wref(ix,iy)
                      rloadim = wload(ix,iy)
                   endif
-  
+
                   ovalr = refi*rloadi + refim*rloadim			!Add
                   ovall = rloadi + rloadim
                   if ( ovall.ne.0.0 ) then
@@ -5915,8 +5915,8 @@ Cbegin
                endif
 
             endif
- 
-         enddo 
+
+         enddo
       enddo
 
 
@@ -5958,10 +5958,10 @@ Cbegin
             yref = TRC(4,kk) + TRC(6,kk)*iy
             xdash = xref + TRC(2,kk)*ix
             ydash = yref + TRC(5,kk)*ix
- 
+
             jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
             jy = nint(min(anumh,max(anuml,ydash)))
- 
+
             if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
 
                i = xdash						!Find shift from next lowest pixel,line location
@@ -5972,11 +5972,11 @@ Cbegin
                sum = 0.0						!Initiallise sums for forming weighted mean
                wtsum = 0.0
 
-               if ( j.ge.1 .and. j.le.nyc ) then			!Form weighted mean of adjacent 4 pixels, 
+               if ( j.ge.1 .and. j.le.nyc ) then			!Form weighted mean of adjacent 4 pixels,
 
                   if ( i.ge.1 .and. i.le.nxc ) then			! checking that each lies
                     if ( im(i,j).ne.INVALIR ) then			! within the input image and is not invalid
-                        wt = (1.0-dx)*(1.0-dy)				!Weight is calculated from the x,y 
+                        wt = (1.0-dx)*(1.0-dy)				!Weight is calculated from the x,y
                         sum = sum + im(i,j)*wt				!shift from integer pixel locations
                         wtsum = wtsum + wt
                      endif
@@ -5991,7 +5991,7 @@ Cbegin
                   endif
 
                endif
-  
+
                if ( j+1.ge.1 .and. j+1.le.nyc ) then
 
                   if ( i.ge.1 .and. i.le.nxc ) then
@@ -6001,7 +6001,7 @@ Cbegin
                         wtsum = wtsum + wt
                      endif
                   endif
- 
+
                   if ( i+1.ge.1 .and. i+1.le.nxc ) then
                      if ( im(i+1,j+1).ne.INVALIR ) then
                         wt = dx*dy
@@ -6019,10 +6019,10 @@ Cbegin
                endif
 
                if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
-     +              ( wref(ix,iy).eq.INT_INVALR .or. 
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
      +                wload(ix,iy).eq.0.0 ) ) then
 
-                  wref(ix,iy) = INT_INVALR				!If so load bad 
+                  wref(ix,iy) = INT_INVALR				!If so load bad
                   wload(ix,iy) = wload(ix,iy) + SCALE(kk)
 
                else							!Good value
@@ -6040,7 +6040,7 @@ Cbegin
                      refim = wref(ix,iy)
                      rloadim = wload(ix,iy)
                   endif
-  
+
                   ovalr = refi*rloadi + refim*rloadim			!Add
                   ovall = rloadi + rloadim
                   if ( ovall.ne.0.0 ) then
@@ -6054,7 +6054,7 @@ Cbegin
 
             endif
 
-         enddo 
+         enddo
       enddo
 
 
@@ -6096,10 +6096,10 @@ Cbegin
             yref = TRC(4,kk) + TRC(6,kk)*iy
             xdash = xref + TRC(2,kk)*ix
             ydash = yref + TRC(5,kk)*ix
- 
+
             jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
             jy = nint(min(anumh,max(anuml,ydash)))
- 
+
             if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
 
                i = xdash						!Find shift from next lowest pixel,line location
@@ -6110,11 +6110,11 @@ Cbegin
                sum = 0.0						!Initiallise sums for forming weighted mean
                wtsum = 0.0
 
-               if ( j.ge.1 .and. j.le.nyc ) then			!Form weighted mean of adjacent 4 pixels, 
+               if ( j.ge.1 .and. j.le.nyc ) then			!Form weighted mean of adjacent 4 pixels,
 
                   if ( i.ge.1 .and. i.le.nxc ) then			! checking that each lies
                     if ( im(i,j).ne.INVALIS ) then			! within the input image and is not invalid
-                        wt = (1.0-dx)*(1.0-dy)				!Weight is calculated from the x,y 
+                        wt = (1.0-dx)*(1.0-dy)				!Weight is calculated from the x,y
                         sum = sum + im(i,j)*wt				!shift from integer pixel locations
                         wtsum = wtsum + wt
                      endif
@@ -6129,7 +6129,7 @@ Cbegin
                   endif
 
                endif
-  
+
                if ( j+1.ge.1 .and. j+1.le.nyc ) then
 
                   if ( i.ge.1 .and. i.le.nxc ) then
@@ -6139,7 +6139,7 @@ Cbegin
                         wtsum = wtsum + wt
                      endif
                   endif
- 
+
                   if ( i+1.ge.1 .and. i+1.le.nxc ) then
                      if ( im(i+1,j+1).ne.INVALIS ) then
                         wt = dx*dy
@@ -6157,10 +6157,10 @@ Cbegin
                endif
 
                if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
-     +              ( wref(ix,iy).eq.INT_INVALR .or. 
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
      +                wload(ix,iy).eq.0.0 ) ) then
 
-                  wref(ix,iy) = INT_INVALR				!If so load bad 
+                  wref(ix,iy) = INT_INVALR				!If so load bad
                   wload(ix,iy) = wload(ix,iy) + SCALE(kk)
 
                else							!Good value
@@ -6178,7 +6178,7 @@ Cbegin
                      refim = wref(ix,iy)
                      rloadim = wload(ix,iy)
                   endif
-  
+
                   ovalr = refi*rloadi + refim*rloadim			!Add
                   ovall = rloadi + rloadim
                   if ( ovall.ne.0.0 ) then
@@ -6192,7 +6192,7 @@ Cbegin
 
             endif
 
-         enddo 
+         enddo
       enddo
 
 
@@ -6237,25 +6237,25 @@ Cbegin
             yref = TRC(4,kk) + TRC(6,kk)*iy
             xdash = xref + TRC(2,kk)*ix
             ydash = yref + TRC(5,kk)*ix
- 
+
             jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
             jy = nint(min(anumh,max(anuml,ydash)))
- 
+
             if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
 
                dx = xdash - jx						!Shift from the nearest pixel
                dy = ydash - jy
- 
+
                r1 = dx*dx + 0.25					!X and Y weight arrays (dependent on the phase dx,dy)
                r2 = dy*dy + 0.25
                wx(-1) = r1 - dx
                wx(1)  = r1 + dx
                wy(-1) = r2 - dy
                wy(1)  = r2 + dy
- 
+
                sum = 0.0						!scan the 9 nearest pixels, forming
                wtsum = 0.0						! a weighted sum of all the valid ones
- 
+
                do jshift = -1, 1
                   jj = jy + jshift
                   if ( jj.ge.1 .and. jj.le.nyc ) then			!Still in the image?
@@ -6277,12 +6277,12 @@ Cbegin
                   valr = sum/wtsum
                   valr = BS*valr + BZ - ZERO
                endif
-      
+
                if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
-     +              ( wref(ix,iy).eq.INT_INVALR .or. 
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
      +                wload(ix,iy).eq.0.0 ) ) then
 
-                  wref(ix,iy) = INT_INVALR				!If so load bad 
+                  wref(ix,iy) = INT_INVALR				!If so load bad
                   wload(ix,iy) = wload(ix,iy) + SCALE(kk)
 
                else							!Good value
@@ -6300,7 +6300,7 @@ Cbegin
                      refim = wref(ix,iy)
                      rloadim = wload(ix,iy)
                   endif
-  
+
                   ovalr = refi*rloadi + refim*rloadim			!Add
                   ovall = rloadi + rloadim
                   if ( ovall.ne.0.0 ) then
@@ -6311,9 +6311,9 @@ Cbegin
                   wload(ix,iy) = ovall
 
                endif
- 
+
             endif
-         enddo 
+         enddo
       enddo
 
 
@@ -6358,25 +6358,25 @@ Cbegin
             yref = TRC(4,kk) + TRC(6,kk)*iy
             xdash = xref + TRC(2,kk)*ix
             ydash = yref + TRC(5,kk)*ix
- 
+
             jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
             jy = nint(min(anumh,max(anuml,ydash)))
- 
+
             if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
 
                dx = xdash - jx						!Shift from the nearest pixel
                dy = ydash - jy
- 
+
                r1 = dx*dx + 0.25					!X and Y weight arrays (dependent on the phase dx,dy)
                r2 = dy*dy + 0.25
                wx(-1) = r1 - dx
                wx(1)  = r1 + dx
                wy(-1) = r2 - dy
                wy(1)  = r2 + dy
- 
+
                sum = 0.0						!scan the 9 nearest pixels, forming
                wtsum = 0.0						! a weighted sum of all the valid ones
- 
+
                do jshift = -1, 1
                   jj = jy + jshift
                   if ( jj.ge.1 .and. jj.le.nyc ) then			!Still in the image?
@@ -6398,12 +6398,12 @@ Cbegin
                   valr = sum/wtsum
                   valr = BS*valr + BZ - ZERO
                endif
-      
+
                if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
-     +              ( wref(ix,iy).eq.INT_INVALR .or. 
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
      +                wload(ix,iy).eq.0.0 ) ) then
 
-                  wref(ix,iy) = INT_INVALR				!If so load bad 
+                  wref(ix,iy) = INT_INVALR				!If so load bad
                   wload(ix,iy) = wload(ix,iy) + SCALE(kk)
 
                else							!Good value
@@ -6421,7 +6421,7 @@ Cbegin
                      refim = wref(ix,iy)
                      rloadim = wload(ix,iy)
                   endif
-  
+
                   ovalr = refi*rloadi + refim*rloadim			!Add
                   ovall = rloadi + rloadim
                   if ( ovall.ne.0.0 ) then
@@ -6432,9 +6432,9 @@ Cbegin
                   wload(ix,iy) = ovall
 
                endif
- 
+
             endif
-         enddo 
+         enddo
       enddo
 
 
@@ -6467,7 +6467,7 @@ Cbegin
          return
       endif
       call gtimrd ( 'INREF1', bs1, bz1, rinval1, titler, istat )
-  
+
       call opimrr ( 'INLOAD1', ipl1, iv, ivb, .false., istat )
       if ( istat.ne.0 ) then
          call printo ( 'ERROR: Error is in first input Load image' )
@@ -6475,7 +6475,7 @@ Cbegin
          return
       endif
       if ( iv.ne.NXR .or. ivb.ne.NYR ) then
-         call printo ( 
+         call printo (
      +    'ERROR: First Load image different size to reference image' )
          ST_FAILED = .true.
          return
@@ -6495,7 +6495,7 @@ Cbegin
          return
       endif
       call gtimrd ( 'INREF2', bs2, bz2, rinval2, titler, istat )
-  
+
       call opimrr ( 'INLOAD2', ipl2, iv, ivb, .false., istat )
       if ( istat.ne.0 ) then
          call printo ( 'ERROR: Error is in second input Load image' )
@@ -6503,7 +6503,7 @@ Cbegin
          return
       endif
       if ( iv.ne.NXR .or. ivb.ne.NYR ) then
-         call printo ( 
+         call printo (
      +   'ERROR: Second Load image different size to reference image' )
          ST_FAILED = .true.
          return
@@ -6521,12 +6521,12 @@ Cbegin
       endif
 
       if ( DOUTIM ) then
-         if ( OUTTYPE.eq.'SHORT' ) call gtwrkr ( 'WORKO', NXR*NYR, 
+         if ( OUTTYPE.eq.'SHORT' ) call gtwrkr ( 'WORKO', NXR*NYR,
      +                                            ipoa, istat )
          BSO = bs1
-         BZO = bz1 
+         BZO = bz1
          call get2r ( 'OUTSCALE', BSO, BZO, .true., -1.0e20, 1.0e20 )
-         call get1c (  'TITLE', otitle, titler, .true. )		
+         call get1c (  'TITLE', otitle, titler, .true. )
          call icopdes ( 'INREF1',  'OUT', istat )
          call ptdesc ( 'OUT',  'TITLE',  otitle )
          call ptdesr ( 'OUT',  'BZERO',  BZO    )
@@ -6544,10 +6544,10 @@ Cbegin
       if ( .not.DOUTREF ) IPOR = 1
       IPOL = 1
       if ( DOUTREF ) then
-         call get1c (  'TITLER', otitler, titler, .true. )		
+         call get1c (  'TITLER', otitler, titler, .true. )
          call opimrw ( 'OUTLOAD', IPOL, NXR, NYR, .true., istat )	!Open output load image
-         call get1c (  'TITLEL', otitlel, titlel, .true. )			
-         call icopdes ( 'INREF1',  'OUTREF', istat )				
+         call get1c (  'TITLEL', otitlel, titlel, .true. )
+         call icopdes ( 'INREF1',  'OUTREF', istat )
          call icopdes ( 'INLOAD1', 'OUTLOAD', istat )
          call ptdesc ( 'OUTREF',  'TITLE', otitler )
          call ptdesc ( 'OUTLOAD', 'TITLE', otitlel )
@@ -6559,10 +6559,10 @@ Cbegin
          RINVALO = INT_INVALR
       endif
       call imj_xxdoit ( %val(ipr1), %val(ipl1), %val(ipr2),	 	!Load ouput images
-     +                  %val(ipl2), %val(IPOR), %val(IPOL), %val(ipoa), 
-     +                  NXR, NYR, bs1, bz1, rinval1, bs2, bz2, 
+     +                  %val(ipl2), %val(IPOR), %val(IPOL), %val(ipoa),
+     +                  NXR, NYR, bs1, bz1, rinval1, bs2, bz2,
      +                  rinval2, DOUTREF, DOUTIM, BSO, BZO, RINVALO )
-      if ( DOUTIM .and. OUTTYPE.eq.'SHORT' ) call azchtrs ( %val(ipoa), 
+      if ( DOUTIM .and. OUTTYPE.eq.'SHORT' ) call azchtrs ( %val(ipoa),
      +   INT_INVALR, INT_MINSR, INT_MAXSR, %val(IPO), INVALO, NXR*NYR )
 
 
@@ -6570,13 +6570,13 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMJ_XXDOIT -- Do work of adding two reference images 
+C IMJ_XXDOIT -- Do work of adding two reference images
 C
 C alan penny                    ral            1991 March
 
-      subroutine imj_xxdoit ( rim1, lim1, rim2, lim2, orim, olim, out, 
-     +                        nx, ny, bs1, bz1, rinval1, bs2, bz2, 
-     +                        rinval2, doutref, doutim, bso, bzo, 
+      subroutine imj_xxdoit ( rim1, lim1, rim2, lim2, orim, olim, out,
+     +                        nx, ny, bs1, bz1, rinval1, bs2, bz2,
+     +                        rinval2, doutref, doutim, bso, bzo,
      +                        rinvalo )
 
       implicit none
@@ -6621,7 +6621,7 @@ Cbegin
                vl1 = 0.0
                fl1 = .true.
             else
-               fl1 = .false.	
+               fl1 = .false.
                vr1 = vr1*bs1 + bz1
             endif
 
@@ -6695,7 +6695,7 @@ Cbegin
       call imke_gcl							!Get input/output info
       if ( ST_FAILED ) return
 
-      if ( IMTYPE.eq.'REAL' ) then 
+      if ( IMTYPE.eq.'REAL' ) then
          call gtwrkr ( 'WORKA', NX*NY, IPIMA, istat )
       else
          call gtwrks ( 'WORKA', NX*NY, IPIMA, istat )
@@ -6718,14 +6718,14 @@ Cbegin
 
 
       end
- 
+
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IMKE_GCL -- Get input and output info from the command line
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine imke_gcl ( )
 
       implicit none
@@ -6734,7 +6734,7 @@ C  alan penny                         RAL                1991 Dec
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C--
-      integer ierr 
+      integer ierr
       character title*50
 
       integer kopt
@@ -6745,7 +6745,7 @@ C--
      + 'Is the output image ? :- ',
      + 'Option   Choice',
      + '------   --------',
-     + 'Real     Real 32-bit ', 
+     + 'Real     Real 32-bit ',
      + 'Short    Signed 16-bit integer '/
 
 Cbegin
@@ -6780,7 +6780,7 @@ Cbegin
      +                    ' important, or to store big numbers' )
             BS = 1.0
             BZ = 0.0
-            call get2r ( 'OUTSCALE', BS, BZ, .true., 1.0, 
+            call get2r ( 'OUTSCALE', BS, BZ, .true., 1.0,
      +                   -1.0e20, 1.0e20 )
             if ( ST_FAILED ) return
          else
@@ -6812,7 +6812,7 @@ Cbegin
       call opimzw ( 'OUT', IMTYPE, IPO, NX, NY, .true., ierr )       !Get output image
       if ( ierr.eq.1 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
-   
+
       call get1c  ( 'TITLE', title, IMTITLE, .true. )
       if ( ST_FAILED ) return
 
@@ -6890,9 +6890,9 @@ C--
       integer kx, ky, iv, nmax
       real rv, rva
       logical loop
-Cbegin 
+Cbegin
 
-  
+
       nmax = max(nxa,nya)
       kx = 1
       ky = 1
@@ -6929,7 +6929,7 @@ Cbegin
             rva = (rva-BZ)/BS
             iv = min(32767.0,max(-32768.0,rva))
             in(kx,ky) = iv
-         endif 
+         endif
 
        enddo
 
@@ -6956,9 +6956,9 @@ C--
       integer kx, ky, nmax
       real rv, rva
       logical loop
-Cbegin 
+Cbegin
 
-  
+
       nmax = max(nxa,nya)
       kx = 1
       ky = 1
@@ -7432,7 +7432,7 @@ Cbegin
       endif
 
       call ptdesc ( 'OUT', 'TITLE', title )
-     
+
       end
 
 
@@ -7618,7 +7618,7 @@ Cbegin
          call get2i ( 'BOX', nxb, nyb, .true., 1, iv )
          if ( ST_FAILED ) return
       endif
-  
+
       call opimzw ( 'OUT', IMTYPE, ipo, NX, NY, .false., ierr )
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
@@ -7636,14 +7636,14 @@ Cbegin
             call gtwrks ( 'WA', nxa*nya, ipwa, ierr )
             call gtwrks ( 'WC', nx*ny, ipwc, ierr )
             call imsm_gausss ( %val(IPIM), NX, NY, INVAL, rad,
-     +                         %val(ipwa), nxa, nya, 
+     +                         %val(ipwa), nxa, nya,
      +                         %val(ipwc), %val(ipwb), nxb, nyb )
             call amovs ( %val(ipwc), %val(ipo), NX*NY )
          else
             call gtwrkr ( 'WA', nxa*nya, ipwa, ierr )
             call gtwrkr ( 'WC', nx*ny, ipwc, ierr )
             call imsm_gaussr ( %val(IPIM), NX, NY, RINVAL, rad,
-     +                         %val(ipwa), nxa, nya, 
+     +                         %val(ipwa), nxa, nya,
      +                         %val(ipwc), %val(ipwb), nxb, nyb )
             call amovr ( %val(ipwc), %val(ipo), NX*NY )
          endif
@@ -7659,14 +7659,14 @@ Cbegin
             call gtwrks ( 'WA', NX*NY, ipwa, ierr )
             call amovs ( %val(IPIM), %val(ipwa), NX*NY )
             call smoothbs ( %val(ipwa), NX, NY, INVAL, nxb, nyb,
-     +                      1, %val(ipwb), %val(ipwc), %val(ipwd), 
+     +                      1, %val(ipwb), %val(ipwc), %val(ipwd),
      +                      %val(ipwe) )
             call amovs ( %val(ipwa), %val(ipo), NX*NY )
          else
             call gtwrkr ( 'WA', NX*NY, ipwa, ierr )
             call amovr ( %val(IPIM), %val(ipwa), NX*NY )
             call smoothbr ( %val(ipwa), NX, NY, RINVAL, nxb, nyb,
-     +                     1, %val(ipwb), %val(ipwc), %val(ipwd), 
+     +                     1, %val(ipwb), %val(ipwc), %val(ipwd),
      +                     %val(ipwe) )
             call amovr ( %val(ipwa), %val(ipo), NX*NY )
          endif
@@ -7676,13 +7676,13 @@ Cbegin
          if ( IMTYPE.eq.'SHORT' ) then
             call gtwrks ( 'WB', NX*NY, ipwb, ierr )
             call gtwrki ( 'WC', nxb*nyb, ipwc, ierr )
-            call imsm_medians ( %val(IPIM), %val(ipwb), %val(ipwc), 
+            call imsm_medians ( %val(IPIM), %val(ipwb), %val(ipwc),
      +                          nxb, nyb )
             call amovs ( %val(ipwb), %val(ipo), NX*NY )
          else
             call gtwrkr ( 'WB', NX*NY, ipwb, ierr )
             call gtwrkr ( 'WC', nxb*nyb, ipwc, ierr )
-            call imsm_medianr ( %val(IPIM), %val(ipwb), %val(ipwc), 
+            call imsm_medianr ( %val(IPIM), %val(ipwb), %val(ipwc),
      +                          nxb, nyb )
             call amovr ( %val(ipwb), %val(ipo), NX*NY )
          endif
@@ -7692,7 +7692,7 @@ Cbegin
       call icopdes ( 'IN', 'OUT', ierr )
       call ptdesc ( 'OUT', 'TITLE', title )
 
-      
+
       end
 
 
@@ -7704,7 +7704,7 @@ C  Take account of invalid pixels.
 C
 C  alan penny                  ral                  1994-05-26
 
-      subroutine imsm_gausss ( in, nx, ny, inval, rad, 
+      subroutine imsm_gausss ( in, nx, ny, inval, rad,
      +                         ia, nxa, nya, io, ee, nxb, nyb )
 
       implicit none
@@ -7797,7 +7797,7 @@ Cbegin
                   kdy = ka - kb
                   do ja = 1, nxb
                      jx = j - jb + ja - jb
-                     if ( jx.ge.1 .and. jx.le.nx ) io(jx,jy) = 
+                     if ( jx.ge.1 .and. jx.le.nx ) io(jx,jy) =
      +                                    io(jx,jy) + iv*ee(ja,ka)
                   enddo
                endif
@@ -7808,7 +7808,7 @@ Cbegin
 
       do k = 1, ny
          do j = 1, nx
-            if ( ia(j,k).eq.inval ) io(j,k) = inval 
+            if ( ia(j,k).eq.inval ) io(j,k) = inval
          enddo
       enddo
 
@@ -7824,7 +7824,7 @@ C  Take account of invalid pixels.
 C
 C  alan penny                  ral                  1994-05-26
 
-      subroutine imsm_gaussr ( rin, nx, ny, rinval, rad, 
+      subroutine imsm_gaussr ( rin, nx, ny, rinval, rad,
      +                         ria, nxa, nya, rio, ee, nxb, nyb )
 
       implicit none
@@ -7917,7 +7917,7 @@ Cbegin
                   kdy = ka - kb
                   do ja = 1, nxb
                      jx = j - jb + ja - jb
-                     if ( jx.ge.1 .and. jx.le.nx ) rio(jx,jy) = 
+                     if ( jx.ge.1 .and. jx.le.nx ) rio(jx,jy) =
      +                                    rio(jx,jy) + rv*ee(ja,ka)
                   enddo
                endif
@@ -7928,7 +7928,7 @@ Cbegin
 
       do k = 1, ny
          do j = 1, nx
-            if ( ria(j,k).eq.rinval ) rio(j,k) = rinval 
+            if ( ria(j,k).eq.rinval ) rio(j,k) = rinval
          enddo
       enddo
 
@@ -7981,9 +7981,9 @@ Cbegin
                         nsum = nsum + 1
                      endif
                   endif
-               enddo         
+               enddo
             endif
-         enddo         
+         enddo
 
          if ( .not.some ) then
             iv = 0
@@ -7991,7 +7991,7 @@ Cbegin
             iv = sum/real(nsum)
          endif
 
-      enddo         
+      enddo
 
 
       end
@@ -8042,9 +8042,9 @@ Cbegin
                         nsum = nsum + 1
                      endif
                   endif
-               enddo         
+               enddo
             endif
-         enddo         
+         enddo
 
          if ( .not.some ) then
             rv = 0.0
@@ -8052,7 +8052,7 @@ Cbegin
             rv = sum/real(nsum)
          endif
 
-      enddo         
+      enddo
 
 
       end
@@ -8182,11 +8182,11 @@ Cbegin
          return
       endif
       if ( ST_FAILED ) return
-      
+
       call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr )
 
       nxs = 1
-      nxe = NX 
+      nxe = NX
       call get2i ( 'XRANGE', nxs, nxe, .true., 1, NX )
       if ( ST_FAILED ) return
       call cswopi ( nxs, nxe )
@@ -8247,7 +8247,7 @@ Cbegin
       if ( IMTYPE.eq.'SHORT' ) then
          call ims_minmaxs ( %val(IPIM), NX, NY, INVAL, nxs, nxe,
      +                      nys, nye, amin, amax, kp, ngood, nbad )
-      else 
+      else
          call ims_minmaxr ( %val(IPIM), NX, NY, RINVAL, nxs, nxe,
      +                      nys, nye, amin, amax, kp, ngood, nbad )
       endif
@@ -8389,7 +8389,7 @@ C IMS_MINMAXS -- Get max and min of flagged area of short array
 C
 C  alan penny                ral                      1990-06-15
 
-      subroutine ims_minmaxs ( im, nx, ny, inval, nxs, nxe, 
+      subroutine ims_minmaxs ( im, nx, ny, inval, nxs, nxe,
      +                         nys, nye, amin, amax, kp, ngood, nbad )
 
       implicit none
@@ -8472,7 +8472,7 @@ C IMS_MINMAXR -- Get max and min of flagged area of real array
 C
 C  alan penny                ral                      1990-06-15
 
-      subroutine ims_minmaxr ( im, nx, ny, rinval, nxs, nxe, 
+      subroutine ims_minmaxr ( im, nx, ny, rinval, nxs, nxe,
      +                         nys, nye, amin, amax, kp, ngood, nbad )
 
       implicit none
@@ -8604,7 +8604,7 @@ Cbegin
       if ( istat.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
 
-      if ( IMTYPE.eq.'REAL' ) then				
+      if ( IMTYPE.eq.'REAL' ) then
          call printo ( 'Image Type is: REAL' )
          call gtimrd ( 'IN', BS, BZ, RINVAL, IMTITLE, istat )
       elseif ( IMTYPE.eq.'INT' ) then
@@ -8614,7 +8614,7 @@ Cbegin
          call printo ( 'Image Type is: INTEGER*2' )
          call gtimsd ( 'IN', BS, BZ, INVAL, IMTITLE, istat )
       else
-         call printo ( 
+         call printo (
      +   'ERROR: Can only deal with: REAL;INTEGER;SHORT type images' )
          ST_FAILED = .true.
          return
@@ -8626,13 +8626,13 @@ Cbegin
 
       call imt_gcl
 
-      if ( RANGE ) call imt_range 
+      if ( RANGE ) call imt_range
 
       BSO = BS
       BZO = BZ
       if ( AUTO ) call imt_auto
 
-      if ( (IMTYPE.eq.'REAL' .and. OUTTYPE.ne.'REAL') .or. 
+      if ( (IMTYPE.eq.'REAL' .and. OUTTYPE.ne.'REAL') .or.
      +     (IMTYPE.eq.'INT' .and. OUTTYPE.eq.'SHORT') ) then
          call printo ( '  ' )
          call printo ( '  The Output image may need to have a '//
@@ -8741,7 +8741,7 @@ Cbegin
 
       AUTO = .false.							!Use auto scaling?
       if ( (IMTYPE.eq.'REAL' .and. (OUTTYPE.eq.'INT'.or.
-     +                              OUTTYPE.eq.'SHORT')) .or. 
+     +                              OUTTYPE.eq.'SHORT')) .or.
      +     (IMTYPE.eq.'INT' .and. OUTTYPE.eq.'SHORT') ) then
          call get1b ( 'AUTO', AUTO, .false. )
          if ( ST_FAILED ) return
@@ -8773,9 +8773,9 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( ALLBAD ) then
-         if ( OUTTYPE.eq.'REAL' )  call amovkr ( INVALOR, %val(IPIM), 
+         if ( OUTTYPE.eq.'REAL' )  call amovkr ( INVALOR, %val(IPIM),
      +                                           NX*NY )
-         if ( OUTTYPE.eq.'INT' )   call amovki ( INVALOI, %val(IPIM), 
+         if ( OUTTYPE.eq.'INT' )   call amovki ( INVALOI, %val(IPIM),
      +                                           NX*NY )
          if ( OUTTYPE.eq.'SHORT' ) call amovks ( INVALOS, %val(IPIM),
      +                                           NX*NY )
@@ -8845,7 +8845,7 @@ Cbegin
                rv(j) = rva
             endif
          enddo
-         call azchtrs ( rv, RINVAL, INT_MINSR, INT_MAXSR, 
+         call azchtrs ( rv, RINVAL, INT_MINSR, INT_MAXSR,
      +                  out(1,k), INVALOS, NX )
       enddo
 
@@ -8853,7 +8853,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IMT_COPRI -- Copy data from real input to integer output 
+C IMT_COPRI -- Copy data from real input to integer output
 C
 C alan penny          ral                   1991 April
 
@@ -8883,7 +8883,7 @@ Cbegin
                rv(j) = rva
             endif
          enddo
-         call azchtri ( rv, RINVAL, INT_MINIR, INT_MAXIR, 
+         call azchtri ( rv, RINVAL, INT_MINIR, INT_MAXIR,
      +                  out(1,k), INVALOI, NX )
       enddo
 
@@ -8921,7 +8921,7 @@ Cbegin
                rv(j) = (rva-BZO)/BSO
             endif
          enddo
-         call azchtrs ( rv, INT_INVALR, INT_MINSR, INT_MAXSR, 
+         call azchtrs ( rv, INT_INVALR, INT_MINSR, INT_MAXSR,
      +                  out(1,k), INVALOS, NX )
       enddo
 
@@ -9101,7 +9101,7 @@ Cbegin
       endif
 
       call ptdesc ( 'OUT', 'TITLE', title )
-     
+
 
       end
 
@@ -9151,14 +9151,14 @@ Cbegin
          rv = -32768.0*BS + BZ
          if ( top.lt.rv ) then
             call pargr ( rv )
-            call printo ( 
+            call printo (
      +      'WARNING: Upper limit below minimum possible value for' )
             call printd ('         this 16-bit integer image of - %f')
             call printo ( '         No pixels will need weeding' )
          endif
          rv = 32767.0*BS + BZ
          if ( bot.gt.rv ) then
-            call printo ( 
+            call printo (
      +      'WARNING: Lower limit above maximum possible value for' )
             call printd ('         this 16-bit integer image of - %f')
             call printo ('         No pixels will need weeding' )

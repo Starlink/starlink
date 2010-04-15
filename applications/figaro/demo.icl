@@ -1,28 +1,28 @@
 {+
 {  Name:
 {     demo
-{ 
+{
 {  Purpose:
 {     Test a cross-section of ICL Figaro applications.
-{ 
+{
 {  Language:
 {     ICL
-{ 
+{
 {  Type of Module:
 {     ICL procedure with some Unix commands.
-{ 
+{
 {  Description:
 {     Start this procedure with:
 {
 {     ICL> load $FIG_DIR/demo
-{ 
+{
 {  Parameters:
 {     none.
-{ 
+{
 {  Authors:
 {     hme: Horst Meyerdierks (UoE, Starlink)
 {     acd: Clive Davenhall (UoE, Starlink)
-{ 
+{
 {  History:
 {     17 Jan 1992 (hme):
 {        Original version.
@@ -51,7 +51,7 @@
 {
 {  Start-up.
       figaro
-{ 
+{
 {  First, let's create a 1-D data array for testing.
       print 'This is the Figaro demo.'
       print 'Creating a 1D test file ...'
@@ -68,18 +68,18 @@
       copobj test1d.axis(1).data_array test1d.data_array
       print 'Setting the axis data (linear) ...'
       lxset image=test1d output=test1d  wstart=1 wend=100   log=false
-{ 
+{
 {  See what we got there.
       print 'Examining the file ...'
       hdstrace test1d full
       istat test1d  min max min max
-{ 
+{
 {  Plot it on the soft device.
       print 'Opening the devices for graphics and imaging ...'
       soft xw
       idev xw
       splot test1d hardcopy=f whole autoscale label="Figaro demo"
-{ 
+{
 {  Assemble a 2-D data set.
       print 'Growing the 1D test file into a 2D test file ...'
       growx spectrum=test1d image=test2d ystart=1 yend=50 new ysize=50
@@ -94,7 +94,7 @@
       lxset image=test1d output=test1d  wstart=1 wend=100 log=f
       print 'Growing the 1D test file into part of the 2D test file ...'
       growx spectrum=test1d image=test2d ystart=24 yend=26 new=f
-{ 
+{
 {  Have a look at this image.
       print 'Examining the file ...'
       hdstrace test2d full
@@ -136,7 +136,7 @@
       sdist test_sdist columns=3 trace=Gauss width=3 maxdeg=10 softd=f accept
       cdist test_sdist ystart=min yend=max output=test_sdist2 maxdegy=10 accept
       image test_sdist2 erase=f accept
-{ 
+{
 {  Now try a GKS calling application.
       print 'Finding and extracting fibres in the image ...'
       print ' '
@@ -214,7 +214,7 @@
       idiv    test_cmplx8 test_cmplx1 test_cmplx9
       image test_cmplx9 min max min max erase=f optimize=0.25 ~
          autoscale=t xplaces=1 yplaces=1 aspect=f accept
-{ 
+{
 {  Delete the files created.
       print 'Deleting all test files ...'
 !     rm -f test1d.* test2d.* test_pfile.* test_fits.* test_sdist*.* sdist.dat test_stand*.* test_cmplx*.* hd84937.tab g158m100.tab spiketrum.def standard_lut.sdf

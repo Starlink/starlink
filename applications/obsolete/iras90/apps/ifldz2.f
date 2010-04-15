@@ -30,10 +30,10 @@
 *  Notes:
 *     This routine uses the sla_lib routine SLA_DTP2S to translate from the
 *     box size which is on the tangent plane at the specified RA and Dec, to
-*     the spherical equivalent. If one were to give the SLA_DTP2S routine a 
-*     box size of 1 degree it would take this as if it were at the equator, 
+*     the spherical equivalent. If one were to give the SLA_DTP2S routine a
+*     box size of 1 degree it would take this as if it were at the equator,
 *     it would give spherical coordinate extremities of 4deg RA x 1deg Dec at
-*     a Dec of 75deg (nb. cos(75)=.25). Though this is technically correct 
+*     a Dec of 75deg (nb. cos(75)=.25). Though this is technically correct
 *     we felt that users were likely to want a box of approx 1deg square at
 *     75deg Dec and therefore the RA size is multiplied by cos(dec) in each
 *     case.
@@ -124,7 +124,7 @@ c  Procedures used
            I2 = ( (I * SIZE) - (SIZE / 2.0) ) * COS( DEC )
            J2 = (J * SIZE) - (SIZE / 2.0)
 
-*  Use SLA_DTP2S to transform the tangent plane coordinates to spherical 
+*  Use SLA_DTP2S to transform the tangent plane coordinates to spherical
 *  coordinates
            CALL SLA_DTP2S( I2, J2, RA, DEC, RATMP, DECTMP )
 

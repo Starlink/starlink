@@ -11,7 +11,7 @@ C     The DSA system maintains an overall status value that is cleared
 C     by a call to DSA_OPEN and will normally be set (if any error has
 C     occurred) during the final call to DSA_CLOSE. This routine returns
 C     the value of that status variable, and so indicates if any error
-C     occurred between the last call to DSA_OPEN and the corresponding 
+C     occurred between the last call to DSA_OPEN and the corresponding
 C     call to DSA_CLOSE. It is intended for use by master programs that
 C     invoke applications code that uses the DSA library but which do not
 C     themselves return any indication of success or failure, and allows

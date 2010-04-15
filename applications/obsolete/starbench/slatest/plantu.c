@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmplantu(double qfoo,double qbar,double phi,double 
+void sbmplantu(double qfoo,double qbar,double phi,double
 qbaz[],double*Q0,double*qfobar,double*q1,int*q2)
 #define qfoobar 499.004782
 {int Q3;double q4[3],qfOBAz[3],qfoobaz[6],QQUUX[6],Q5[6],

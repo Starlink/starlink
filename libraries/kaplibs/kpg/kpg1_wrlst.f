@@ -11,17 +11,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_WRLST( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE, 
+*     CALL KPG1_WRLST( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE,
 *                      ID0, IDENTS, NULL, STATUS )
 
 *  Description:
 *     This routine saves a set of positions in a text file as a CAT
-*     catalogue (see SUN/181). Information describing associated co-ordinate 
-*     Frames can also be stored in the file as textual information, allowing 
-*     subsequent applications to interpret the positions. Files written with 
+*     catalogue (see SUN/181). Information describing associated co-ordinate
+*     Frames can also be stored in the file as textual information, allowing
+*     subsequent applications to interpret the positions. Files written with
 *     this routine can be read using KPG1_RDLST (and also XCATVIEW etc).
 *
-*     The positions are stored in the file in a Frame selected by the 
+*     The positions are stored in the file in a Frame selected by the
 *     user using hardwired parameters CATFRAME and CATEPOCH. This Frame
 *     defaults to a SKY Frame if present, otherwise a PIXEL Frame if present,
 *     otherwise the original Base Frame within the supplied FrameSet. The
@@ -29,7 +29,7 @@
 *     and will be Mapped into the required Frame if necessary.
 *
 *     If the ID atttribute of the FrameSet is set to "FIXED_BASE", then
-*     the user is not allowed to change the base Frame using parameters 
+*     the user is not allowed to change the base Frame using parameters
 *     CATFRAME and CATEPOCH.
 *
 *     See also KPG1_WRTAB, which is like this routine but allows a
@@ -39,7 +39,7 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use.
 *     ARRDIM = INTEGER (Given)
-*        The size of the first dimension of the positions array. This must 
+*        The size of the first dimension of the positions array. This must
 *        be larger than or equal to NPOS.
 *     NPOS = INTEGER (Given)
 *        The number of positions to store in the file.
@@ -47,12 +47,12 @@
 *        The number of axes in the Frame specified by IFRM.
 *     POS( ARRDIM, NAX ) = DOUBLE PRECISION (Given)
 *        The positions to store in the file. POS( I, J ) should give the
-*        axis J value for position I. 
+*        axis J value for position I.
 *     IFRM = INTEGER (Given)
 *        The index of the Frame within IWCS to which the supplied
 *        positions relate. Can be AST__BASE or AST__CURRENT.
 *     IWCS = INTEGER (Given)
-*        A pointer to an AST FrameSet to store with the positions. 
+*        A pointer to an AST FrameSet to store with the positions.
 *     TITLE = CHARACTER * ( * ) (Given)
 *        A title to store at the top of the text file. Ignored if blank.
 *     ID0 = INTEGER (Given)
@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -125,13 +125,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)

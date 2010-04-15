@@ -383,7 +383,7 @@ void smurf_sc2threadtest( int *status ) {
   /* Annul the bad status that we set in smfParallelTime */
   if( *status == SMF__INSMP ) {
     errAnnul( status );
-    msgOut( "", " *** Annulled SMF__INSMP set in smfParallelTime *** ", 
+    msgOut( "", " *** Annulled SMF__INSMP set in smfParallelTime *** ",
             status );
   } else {
     msgOut( "", " *** Flushing good status *** ", status );

@@ -66,24 +66,24 @@
       INTEGER N
       INTEGER M
       REAL A( NDEC, M )
-      
+
 *  Arguments Given and Returned:
       INTEGER LINK( NDEC )
-      
+
 *  Arguments Returned:
       INTEGER IP( NDEC )
       INTEGER IFAIL
-      
+
 *  Local Variables:
       INTEGER I
       INTEGER J
       INTEGER K
-      
+
 *.
 
 *  Check that NDEC is at least 2 bigger than N.
       IFAIL = 0
-      IF ( NDEC .LT. N + 2 ) THEN 
+      IF ( NDEC .LT. N + 2 ) THEN
          IFAIL = 1
       ELSE IF ( N .EQ. 1 ) THEN
 

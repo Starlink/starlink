@@ -132,15 +132,15 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
- 
+
 *  Arguments Given:
       INTEGER NPIX
       INTEGER NLINES
@@ -148,10 +148,10 @@
       LOGICAL VAR
       REAL INVAR( NPIX, NLINES )
       INTEGER NITER
- 
+
 *  Arguments Given and Returned:
       REAL SIZE
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION CNGMAX
       DOUBLE PRECISION CNGRMS
@@ -162,10 +162,10 @@
       REAL WTSUM( NPIX, NLINES )
       REAL DLAST( NPIX )
       REAL WTLAST( NPIX )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       REAL DEC                ! Weighting decrement factor
       DOUBLE PRECISION DIFF      ! Absolute change in new value
@@ -184,18 +184,18 @@
                                  ! rms change
       CHARACTER * ( 80 ) PRBUF   ! Message buffer
       DOUBLE PRECISION RMS       ! RMS
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       NBAD=0
- 
+
 *  Copy the input to the output data array and count the bad values.
       DO J = 1, NLINES
          DO I = 1, NPIX
@@ -203,7 +203,7 @@
             IF ( INARR( I, J ) .EQ. VAL__BADR ) NBAD = NBAD + 1
          END DO
       END DO
- 
+
 *  If the progress of the iterations is to be printed (verbose message
 *  reporting), print some headings.
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
@@ -211,20 +211,20 @@
      :  /'smoothing length    max. change    rms change', STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'HEADING2', '      ---------    '/
      :  /'----------------    -----------    ----------', STATUS )
- 
+
 *  There are two processing paths depending whether or not variance is
 *  present.
       IF ( .NOT. VAR ) THEN
- 
+
 *  Perform the required number of relaxation iterations.
          LASTMX = 0.0D0
          CNGMAX = 0.0D0
- 
+
          DO ITER = 1, NITER
- 
+
 *  Set the maximum absolute change so far.
             LASTMX = MAX( LASTMX, CNGMAX, 0.0D0 )
- 
+
 *  If the max change last iteration was less than 0.25 of the maximum
 *  change so far, reduce the scale size by a factor 2 and reset the
 *  maximum change so far.
@@ -232,16 +232,16 @@
                SIZE = SIZE * 0.5
                LASTMX = CNGMAX
             END IF
- 
+
 *  Initialise the maximum absolute change and number of values used to
 *  compute the rms change for this iteration.
             CNGMAX = 0.0D0
             NRMS = 0
- 
+
 *  Calculate the logarithmic decrement for the weights in going from one
 *  pixel to the next.
             DEC = EXP( -1.0E0 / NUM_RTOR( SIZE ) )
- 
+
 *  Initialise the storage for forming the weighted means.
             DO J = 1, NLINES
                DO  I = 1, NPIX
@@ -249,12 +249,12 @@
                   WTSUM( I, J ) = 0.0E0
                END DO
             END DO
- 
+
 *  First work through the image lines, scanning each line in both
 *  directions.
             DO J = 1, NLINES
                DO IDIRN = -1, 1, 2
- 
+
                   IF ( IDIRN .GE. 0 ) THEN
                      IFIRST = 1
                      ILAST = NPIX
@@ -262,31 +262,31 @@
                      IFIRST = NPIX
                      ILAST = 1
                   END IF
- 
+
 *  Initialise the stores.  DLAST is the weighted sum of previous data
 *  values; WTLAST is the sum of previous weights.
                   DLAST( 1 ) = 0.0E0
                   WTLAST( 1 ) = 0.0E0
- 
+
 *  Process a line.
                   DO I = IFIRST, ILAST, IDIRN
- 
+
 *  If the input pixel is valid, reset the weighted sums.
                      IF ( INARR( I, J ) .NE. VAL__BADR ) THEN
                         DLAST( 1 ) = OUTARR( I, J )
                         WTLAST( 1 ) = 1.0E0
- 
+
 *  For invalid locations, form the sums for the weighted mean.
                      ELSE
- 
+
 *  Decrement the previous weight.
                         WTLAST( 1 ) = WTLAST( 1 ) * DEC
                         DLAST( 1 ) = DLAST( 1 ) * DEC
- 
+
 *  Form sums for the replacement value.
                         DSUM( I, J ) = DSUM( I, J ) + DLAST( 1 )
                         WTSUM( I, J ) = WTSUM( I, J ) + WTLAST( 1 )
- 
+
 *  If this pixel has been replaced before, add it into the current
 *  weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BADR ) THEN
@@ -294,15 +294,15 @@
                            DLAST( 1 ) = DLAST( 1 ) + OUTARR( I, J )
                         END IF
                      END IF
- 
+
                   END DO
                END DO
             END DO
- 
+
 *  Now perform the same process down the image columns, but processing
 *  a whole line of data at once.
             DO JDIRN = -1, 1, 2
- 
+
                IF ( JDIRN .GE. 0 ) THEN
                   JFIRST = 1
                   JLAST = NLINES
@@ -310,97 +310,97 @@
                   JFIRST = NLINES
                   JLAST = 1
                END IF
- 
+
 *  Initialise the stores for a whole line.
                DO I = 1, NPIX
                   DLAST( I ) = 0.0E0
                   WTLAST( I ) = 0.0E0
                END DO
- 
+
 *  Process columns, as above, but using a whole line of data.
                DO J = JFIRST, JLAST, JDIRN
                   DO I  = 1, NPIX
- 
+
 *  If the input pixel is valid, reset the weighted sums.
                      IF ( INARR( I, J ) .NE. VAL__BADR ) THEN
                         DLAST( I ) = OUTARR( I, J )
                         WTLAST( I ) = 1.0E0
- 
+
                      ELSE
- 
+
 *  Decrement the previous weight.
                         WTLAST( I ) = WTLAST( I ) * DEC
                         DLAST( I ) = DLAST( I ) * DEC
- 
+
 *  Form sums for the replacement value.
                         DSUM( I, J ) = DSUM( I, J ) + DLAST( I )
                         WTSUM( I, J ) = WTSUM( I, J ) + WTLAST( I )
- 
+
 *  If this pixel has been replaced before, add it into the current
 *  weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BADR ) THEN
                            WTLAST( I ) = WTLAST( I ) + 1.0E0
                            DLAST( I ) = DLAST( I ) + OUTARR( I, J )
                         END IF
- 
+
                      END IF
                   END DO
                END DO
             END DO
- 
+
 *  Scan the invalid pixels, replacing those for which a new weighted
 *  mean can be formed.
             RMS = 0.0D0
- 
+
             DO J = 1, NLINES
                DO I = 1, NPIX
- 
+
 *  If the input pixel was invalid, and a replacement value can be
 *  found, calculate the replacement value.
                   IF ( INARR( I, J ) .EQ. VAL__BADR .AND.
      :                 WTSUM( I, J ) .GT. 0.0E0 ) THEN
                      NEWVAL = DSUM( I, J ) / WTSUM( I, J )
- 
+
 *  Cannot compute differences when the output value is still bad.
                      IF ( OUTARR( I, J ) .NE. VAL__BADR ) THEN
- 
+
 *  Find the maximum absolute change this iteration.
                         DIFF = ABS( NUM_RTOD( NEWVAL -
      :                         OUTARR( I, J ) ) )
                         CNGMAX = MAX( CNGMAX, DIFF )
- 
+
 *  Form the sums for the rms change.
                         RMS = RMS + DIFF * DIFF
                         NRMS = NRMS + 1
                      END IF
- 
+
 *  Assign the new output value.
                      OUTARR( I, J ) = NEWVAL
                   END IF
                END DO
             END DO
- 
+
 *  Print the progress of each iteration, if required.  Calculate the
 *  rms and maximum change this iteration.  The first iteration change
 *  values are undefined because the difference is with respect to an
 *  undefined value.
             IF ( ITER .GT. 1 ) THEN
                CNGRMS = SQRT( RMS / DBLE( MAX( 1, NRMS ) ) )
- 
+
                WRITE( PRBUF, '(6X,I6,9X,G13.6,4X,G13.6,2X,G13.6)' )
      :           ITER, SIZE, CNGMAX, CNGRMS
- 
+
             ELSE
                WRITE( PRBUF, '(6X,I6,9X,G13.6,4X)' ) ITER, SIZE
- 
+
             END IF
             CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
- 
+
          END DO
- 
+
 *  Variance weighting and processing.
       ELSE
- 
+
 *  Copy the input to the output variance array.  Add to the number of
 *  bad values if the data was good, but the variance was bad.
          DO J = 1, NLINES
@@ -410,16 +410,16 @@
      :              INVAR( I, J ) .EQ. VAL__BADR ) NBAD = NBAD + 1
             END DO
          END DO
- 
+
 *  Perform the required number of relaxation iterations.
          LASTMX = 0.0D0
          CNGMAX = 0.0D0
- 
+
          DO ITER = 1, NITER
- 
+
 *  Set the maximum absolute change so far.
             LASTMX = MAX( LASTMX, CNGMAX, 0.0D0 )
- 
+
 *  If the max change last iteration was less than 0.25 of the maximum
 *  change so far, reduce the scale size by a factor 2 and reset the
 *  maximum change so far.
@@ -427,16 +427,16 @@
                SIZE = SIZE * 0.5
                LASTMX = CNGMAX
             END IF
- 
+
 *  Initialise the maximum absolute change and number of values used to
 *  compute the rms change for this iteration.
             CNGMAX = 0.0D0
             NRMS = 0
- 
+
 *  Calculate the logarithmic decrement for the weights in going from one
 *  pixel to the next.
             DEC = EXP( -1.0E0 / NUM_RTOR( SIZE ) )
- 
+
 *  Initialise the storage for forming the weighted means.
             DO J = 1, NLINES
                DO  I = 1, NPIX
@@ -444,12 +444,12 @@
                   WTSUM( I, J ) = 0.0E0
                END DO
             END DO
- 
+
 *  First work through the image lines, scanning each line in both
 *  directions.
             DO J = 1, NLINES
                DO IDIRN = -1, 1, 2
- 
+
                   IF ( IDIRN .GE. 0 ) THEN
                      IFIRST = 1
                      ILAST = NPIX
@@ -457,33 +457,33 @@
                      IFIRST = NPIX
                      ILAST = 1
                   END IF
- 
+
 *  Initialise the stores.  DLAST is the weighted sum of previous data
 *  values; WTLAST is the sum of previous weights.
                   DLAST( 1 ) = 0.0E0
                   WTLAST( 1 ) = 0.0E0
- 
+
 *  Process a line.
                   DO I = IFIRST, ILAST, IDIRN
- 
+
 *  If the input pixel and variance are valid, reset the weighted sums.
                      IF ( INARR( I, J ) .NE. VAL__BADR .AND.
      :                    INVAR( I, J ) .NE. VAL__BADR .AND.
      :                    OUTVAR( I, J ) .GT. 0.0 ) THEN
                         DLAST( 1 ) = OUTARR( I, J ) / OUTVAR( I, J )
                         WTLAST( 1 ) = 1.0E0 / OUTVAR( I, J )
- 
+
 *  For invalid locations, form the sums for the weighted mean.
                      ELSE
- 
+
 *  Decrement the weight given by the variance.
                         WTLAST( 1 ) = WTLAST( 1 ) * DEC
                         DLAST( 1 ) = DLAST( 1 ) * DEC
- 
+
 *  Form sums for the replacement value.
                         DSUM( I, J ) = DSUM( I, J ) + DLAST( 1 )
                         WTSUM( I, J ) = WTSUM( I, J ) + WTLAST( 1 )
- 
+
 *  If this pixel or variance has been replaced before, add it into the
 *  current weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BADR .AND.
@@ -495,15 +495,15 @@
      :                                  OUTARR( I, J ) / OUTVAR( I, J )
                         END IF
                      END IF
- 
+
                   END DO
                END DO
             END DO
- 
+
 *  Now perform the same process down the image columns, but processing
 *  a whole line of data at once.
             DO JDIRN = -1, 1, 2
- 
+
                IF ( JDIRN .GE. 0 ) THEN
                   JFIRST = 1
                   JLAST = NLINES
@@ -511,34 +511,34 @@
                   JFIRST = NLINES
                   JLAST = 1
                END IF
- 
+
 *  Initialise the stores for a whole line.
                DO I = 1, NPIX
                   DLAST( I ) = 0.0E0
                   WTLAST( I ) = 0.0E0
                END DO
- 
+
 *  Process columns, as above, but using a whole line of data.
                DO J = JFIRST, JLAST, JDIRN
                   DO I  = 1, NPIX
- 
+
 *  If the input pixel and variance are valid, reset the weighted sums.
                      IF ( OUTARR( I, J ) .NE. VAL__BADR .AND.
      :                    OUTVAR( I, J ) .NE. VAL__BADR .AND.
      :                    OUTVAR( I, J ) .GT. 0.0 ) THEN
                         DLAST( I ) = OUTARR( I, J ) / OUTVAR( I, J )
                         WTLAST( I ) = 1.0E0 / OUTVAR( I, J )
- 
+
                      ELSE
- 
+
 *  Decrement the previous weight.
                         WTLAST( I ) = WTLAST( I ) * DEC
                         DLAST( I ) = DLAST( I ) * DEC
- 
+
 *  Form sums for the replacement value.
                         DSUM( I, J ) = DSUM( I, J ) + DLAST( I )
                         WTSUM( I, J ) = WTSUM( I, J ) + WTLAST( I )
- 
+
 *  If this pixel or variance has been replaced before, add it into the
 *  current weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BADR .AND.
@@ -549,39 +549,39 @@
                            DLAST( I ) = DLAST( I ) +
      :                                  OUTARR( I, J ) / OUTVAR( I, J )
                         END IF
- 
+
                      END IF
                   END DO
                END DO
             END DO
- 
+
 *  Scan the invalid pixels, replacing those for which a new weighted
 *  mean can be formed.
             RMS = 0.0D0
- 
+
             DO J = 1, NLINES
                DO I = 1, NPIX
- 
+
 *  If the input pixel or variance was invalid, and a replacement value
 *  can be found, calculate the replacement value.
                   IF ( ( INARR( I, J ) .EQ. VAL__BADR .OR.
      :                   INVAR( I, J ) .EQ. VAL__BADR ) .AND.
      :                 WTSUM( I, J ) .GT. 0.0E0 ) THEN
                      NEWVAL = DSUM( I, J ) / WTSUM( I, J )
- 
+
 *  Cannot compute differences when the output value is still bad.
                      IF ( OUTARR( I, J ) .NE. VAL__BADR ) THEN
- 
+
 *  Find the maximum absolute change this iteration.
                         DIFF = ABS( NUM_RTOD( NEWVAL -
      :                         OUTARR( I, J ) ) )
                         CNGMAX = MAX( CNGMAX, DIFF )
- 
+
 *  Form the sums for the rms change.
                         RMS = RMS + DIFF * DIFF
                         NRMS = NRMS + 1
                      END IF
- 
+
 *  Assign the new output values.  Only assign a new output value when
 *  the input was bad, but change the variance if it was bad or there
 *  is a new value.
@@ -591,27 +591,27 @@
                   END IF
                END DO
             END DO
- 
+
 *  Print the progress of each iteration, if required.  Calculate the
 *  rms and maximum change this iteration.  The first iteration change
 *  values are undefined because the difference is with respect to an
 *  undefined value.
             IF ( ITER .GT. 1 ) THEN
                CNGRMS = SQRT( RMS / DBLE( MAX( 1, NRMS ) ) )
- 
+
                WRITE( PRBUF, '(6X,I6,9X,G13.6,4X,G13.6,2X,G13.6)' )
      :           ITER, SIZE, CNGMAX, CNGRMS
- 
+
             ELSE
                WRITE( PRBUF, '(6X,I6,9X,G13.6,4X)' ) ITER, SIZE
- 
+
             END IF
             CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
- 
+
          END DO
- 
+
       END IF
- 
+
   999 CONTINUE
- 
+
       END

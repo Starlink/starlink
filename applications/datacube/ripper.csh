@@ -13,7 +13,7 @@
 #     ripper [-i filename] [-o filename] [-p]
 #
 #  Description:
-#     This shell script reads a three-dimensional IFU NDF datacube as input, 
+#     This shell script reads a three-dimensional IFU NDF datacube as input,
 #     presents you with a white-light image of the cube and allows you to
 #     select an X-Y position using the cursor.  It then extracts (and
 #     optionally displays) the spectrum for that X-Y position.
@@ -24,11 +24,11 @@
 #       be a three-dimensional NDF.  By default the script will prompt for the
 #       input file.
 #     -o filename
-#       The filename for the output spectrum.  By default the script will 
+#       The filename for the output spectrum.  By default the script will
 #       prompt for the name of the output file.
 #     -p
-#       The script will plot the extracted spectrum to the current display 
-#       as well as saving it to an NDF file. [FALSE] 
+#       The script will plot the extracted spectrum to the current display
+#       as well as saving it to an NDF file. [FALSE]
 #
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA package.
@@ -63,7 +63,7 @@
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
 #     {enter_further_changes_here}
@@ -117,7 +117,7 @@ while ( $#args > 0 )
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw   
+   endsw
 end
 
 # Do the package setup.
@@ -178,7 +178,7 @@ endif
 # Extract and plot the selected spectrum.
 # =======================================
 
-echo " "	 
+echo " "
 echo "      Extracting:"
 echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 echo " "

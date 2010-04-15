@@ -6,10 +6,10 @@
 /*+
  * Name:
  *    HDRLIST
- 
+
  *  Purpose:
  *     List all the header items in a named source.
- 
+
  *  Description:
  *     This routine is part of the IMG example suite. It accesses an
  *     existing image with a known header information source (such as
@@ -21,12 +21,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -44,7 +44,7 @@
  *         Original Version
 
  *  Notes:
- *     As this handles the special FITS header items "COMMENT", "HISTORY" 
+ *     As this handles the special FITS header items "COMMENT", "HISTORY"
  *     and " ", it is a little more complex than the documentation in
  *     SUN/160 suggests.
 
@@ -70,7 +70,7 @@ F77_SUBROUTINE(hdrlist)(INTEGER(istat))
 
   /*  See how many items are present (this also accesses the image). */
   hdrNumb( "IN", source, "*", &n, istat );
-  if ( n > 0 ) { 
+  if ( n > 0 ) {
 
     /*  Get the names of the items one-by-one. Then read the value
      *  of the item. This will fail for FITS multiple items unless
@@ -103,16 +103,16 @@ F77_SUBROUTINE(hdrlist)(INTEGER(istat))
         if ( type == HISTORY && !donehistory ) {
           list = 1;
           donehistory = 1;
-        } else if ( type == COMMENT && !donecomment ) { 
+        } else if ( type == COMMENT && !donecomment ) {
           list = 1;
           donecomment = 1;
         } else if ( type == BLANK && !doneblank ) {
           list = 1;
           doneblank = 1;
         }
-        if ( list ) { 
+        if ( list ) {
           hdrNumb( "IN", source, item, &ncomp, istat );
-          for( j=1; j <= ncomp; j++ ) { 
+          for( j=1; j <= ncomp; j++ ) {
             hdrInC( "IN", source, item, j, value, 80, istat );
             printf( "%s = %s \n", item, value );
           }

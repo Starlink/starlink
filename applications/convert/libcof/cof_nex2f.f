@@ -1,6 +1,6 @@
-      SUBROUTINE COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR, 
-     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
-     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE, 
+      SUBROUTINE COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR,
+     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
+     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
      :                      STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR, ARRNAM, 
+*     CALL COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR, ARRNAM,
 *                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROHIS,
 *                     SUMS, ENCOD, NATIVE, STATUS )
 
@@ -37,18 +37,18 @@
 *     NOARR = INTEGER (Given)
 *        The number of NDF arrays to copy.
 *     ARRNAM( NOARR ) = CHARACTER * ( * ) (Given)
-*        The names (in uppercase) of the NDF array components to write 
-*        to the FITS file.  These should be in the order to be written. 
+*        The names (in uppercase) of the NDF array components to write
+*        to the FITS file.  These should be in the order to be written.
 *        If the DATA component is present it should be first.
 *     BITPIX = INTEGER (Given)
 *        The number of bits per pixel (FITS BITPIX) required for the
 *        output FITS file.  In addition there are three special values.
-*        A value of 0 means use the BITPIX of the input array.  A value 
-*        of -1 means use the value of the BITPIX keyword in the NDF's 
-*        FITS extension; if the extension or BITPIX card is absent, the 
-*        BITPIX of the input array is used.  BITPIX=1 requests that any 
-*        scaled arrays in the NDF be copied to the scaled data type.  
-*        In the absence of a scaled array, behaviour reverts to 
+*        A value of 0 means use the BITPIX of the input array.  A value
+*        of -1 means use the value of the BITPIX keyword in the NDF's
+*        FITS extension; if the extension or BITPIX card is absent, the
+*        BITPIX of the input array is used.  BITPIX=1 requests that any
+*        scaled arrays in the NDF be copied to the scaled data type.
+*        In the absence of a scaled array, behaviour reverts to
 *        BITPIX=-1, which may in turn be effectively BITPIX=0.
 *     BLOCKF = INTEGER (Given)
 *        The blocking factor for the output file.  It must be a positive
@@ -66,8 +66,8 @@
 *        COF_WHEAD for details.
 *     DUPLEX = LOGICAL (Give)
 *        This qualifies the effect of PROFIT=.TRUE.  A .FALSE. value
-*        means that the airlocks headers only appear with the primary 
-*        array.  Supplying .TRUE., propagates the FITS airlock headers 
+*        means that the airlocks headers only appear with the primary
+*        array.  Supplying .TRUE., propagates the FITS airlock headers
 *        for other array components of the NDF.
 *     PROHIS = LOGICAL (Given)
 *        If .TRUE., any NDF history records are written to the primary
@@ -77,9 +77,9 @@
 *        If .TRUE., DATASUM and CHECKSUM headers are written to each
 *        HDU.
 *     ENCOD = CHARACTER * ( * ) (Given)
-*        The encoding to use. If this is blank, then a default encoding 
+*        The encoding to use. If this is blank, then a default encoding
 *        is chosen based on the contents of the FITS extension. The
-*        supplied string should be a recognised AST encoding such as 
+*        supplied string should be a recognised AST encoding such as
 *        'DSS', 'FITS-WCS', 'NATIVE', etc (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Should a NATIVE encoding of the WCS info be included in the
@@ -101,7 +101,7 @@
 *     not support these data types).
 *     -  The FITS keyword BLANK records the bad values for integer
 *     output types.  Bad values in floating-point output arrays are
-*     denoted by IEEE not-a-number values. 
+*     denoted by IEEE not-a-number values.
 *     -  The NDF's quality and variance arrays appear in individual
 *     FITS IMAGE extensions immediately following the primary header
 *     and data unit, unless that component already appears as the
@@ -117,8 +117,8 @@
 *          is transferred when argument BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
-*          structures are present, the values in the NDF's FITS 
-*          extension are copied (when argument PROFIT is .TRUE.).  If 
+*          structures are present, the values in the NDF's FITS
+*          extension are copied (when argument PROFIT is .TRUE.).  If
 *          any axes are non-linear, all FITS axis information is lost.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
@@ -131,8 +131,8 @@
 *          a blank string.
 *        EXTNAME --- is the is the path of the extension within the
 *          NDF.  If the path is too long to fit within the header
-*          (68 characters), EXTNAME is set to  '@EXTNAMEF'.  The full 
-*          path is then stored in keyword EXTNAMEF using the HEASARC 
+*          (68 characters), EXTNAME is set to  '@EXTNAMEF'.  The full
+*          path is then stored in keyword EXTNAMEF using the HEASARC
 *          Long-string CONTINUE convention
 *          (http://fits.gsfc.nasa.gov/registry/continue_keyword.html).
 *        EXTVER --- is only set when EXTNAME (q.v.) cannot accommodate
@@ -204,7 +204,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -293,7 +293,7 @@
       REAL NUL_32                ! Null value for BITPIX=-32
       DOUBLE PRECISION NUL_64    ! Null value for BITPIX=-64
       LOGICAL OPEN               ! FITS file exists?
-      LOGICAL PROPEX             ! Propagate FITS extension for the 
+      LOGICAL PROPEX             ! Propagate FITS extension for the
                                  ! current header?
       INTEGER SBYTES             ! No. of bytes per scaled array value
       LOGICAL SCALE              ! The array is to be scaled?
@@ -302,7 +302,7 @@
       LOGICAL THERE              ! BITPIX FITS header card ! is present?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
       LOGICAL VALID              ! The NDF identifier is valid?
-      
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
@@ -355,12 +355,12 @@
          NSCALE = .FALSE.
          IF ( BITPIX .EQ. 1 ) THEN
             CALL NDF_FORM( NDF, 'Data', FORM, STATUS )
-            NSCALE = FORM .EQ. 'SCALED' .AND.   
+            NSCALE = FORM .EQ. 'SCALED' .AND.
      :               ARRNAM( ICOMP ) .NE. 'QUALITY'
 
             IF ( NSCALE ) THEN
                CALL NDF_SCTYP( NDF, ARRNAM( ICOMP ), SCTYPE, STATUS )
-               CALL NDF_GTSZD( NDF, ARRNAM( ICOMP ), BSCALE, BZERO, 
+               CALL NDF_GTSZD( NDF, ARRNAM( ICOMP ), BSCALE, BZERO,
      :                         STATUS )
 
 *  Try to obtain the native type from the FITS airlock as there's no
@@ -464,7 +464,7 @@
 
 *  First write the standard headers, and merge in the FITS extension
 *  when requested to do so.
-         CALL COF_WHEAD( NDF, NDFP, ARRNAM( ICOMP ), FUNIT, BPOUT, 
+         CALL COF_WHEAD( NDF, NDFP, ARRNAM( ICOMP ), FUNIT, BPOUT,
      :                   PROPEX, ORIGIN, ENCOD, NATIVE, .FALSE., SNAME,
      :                   STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -511,7 +511,7 @@
 *  ------------------------------
 *
 *  Scaling is required when the requested BITPIX has lower precision
-*  than the array type and BITPIX is an integer type.  Also scaling 
+*  than the array type and BITPIX is an integer type.  Also scaling
 *  or the application of an offset is needed when the input data type
 *  does not match the FITS data types, namely _BYTE and _UWORD.  Deal
 *  with these special cases first...
@@ -665,7 +665,7 @@
             END IF
 
 *  Abort if an error has occurred.  We do this check so that we can be
-*  confident that any error which is detected after the next block of 
+*  confident that any error which is detected after the next block of
 *  calls to COF_ESCOx) was produiced by COF_ESCOx.
             IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -675,26 +675,26 @@
 *  need a shift of BZERO.  The scaling itself is done by FITSIO (FTPSCL
 *  sets the scale and offset).
             IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL COF_ESCOW( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL COF_ESCOW( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                         MINV, MAXV, BSCALE, BZERO, STATUS )
 
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL COF_ESCOI( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL COF_ESCOI( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                         MINV, MAXV, BSCALE, BZERO, STATUS )
 
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL COF_ESCOR( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL COF_ESCOR( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                         MINV, MAXV, BSCALE, BZERO, STATUS )
 
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL COF_ESCOD( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL COF_ESCOD( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                         MINV, MAXV, BSCALE, BZERO, STATUS )
 
             END IF
 
 *  An error (SAI__ERROR) will have been reported if all the pixel values
 *  were bad.  In this case, we annul the error and use default BSCALE
-*  and BZERO values (the resulting NDF will be filled with BLANK 
+*  and BZERO values (the resulting NDF will be filled with BLANK
 *  values).
             IF ( STATUS .EQ. SAI__ERROR .AND. BAD ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -788,23 +788,23 @@
 *  determine whether or not scaling was required).  The arrays may have
 *  bad pixels.
             IF ( BPIN .EQ. 8 ) THEN
-               CALL FTPPNB( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL FTPPNB( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                      NULL8, FSTAT )
 
             ELSE IF ( BPIN .EQ. 16 ) THEN
-               CALL FTPPNI( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL FTPPNI( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                      NULL16, FSTAT )
 
             ELSE IF ( BPIN .EQ. 32 ) THEN
-               CALL FTPPNJ( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL FTPPNJ( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                      NULL32, FSTAT )
 
             ELSE IF ( BPIN .EQ. -32 ) THEN
-               CALL FTPPNE( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL FTPPNE( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                      NUL_32, FSTAT )
 
             ELSE IF ( BPIN .EQ. -64 ) THEN
-               CALL FTPPND( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL FTPPND( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                      NUL_64, FSTAT )
             END IF
 
@@ -815,7 +815,7 @@
                BUFFER = 'Error writing '//ARRNAM( ICOMP )( :NC )/
      :                  /' array component to FITS file '/
      :                  /FILNAM( :NCF )//'.'
-               CALL COF_FIOER( FSTAT, 'COF_NEX2F_WRDATAERR', 
+               CALL COF_FIOER( FSTAT, 'COF_NEX2F_WRDATAERR',
      :                         'FTPPNx', BUFFER, STATUS )
                GOTO 999
             END IF
@@ -833,7 +833,7 @@
      :                      %VAL( CNF_PVAL( IPNTR ) ), FSTAT )
 
             ELSE IF ( BPIN .EQ. 16 ) THEN
-               CALL FTPPRI( FUNIT, 0, 1, EL, 
+               CALL FTPPRI( FUNIT, 0, 1, EL,
      :                      %VAL( CNF_PVAL( IPNTR ) ), FSTAT )
 
             ELSE IF ( BPIN .EQ. 32 ) THEN
@@ -875,6 +875,6 @@
 
       END DO
 
-  999 CONTINUE      
+  999 CONTINUE
 
       END

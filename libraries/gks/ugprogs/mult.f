@@ -1,6 +1,6 @@
       PROGRAM MULT
 *                      GKS Example Program 3.3
- 
+
 *                      (XC2,YC2) is the centre and EXT2 the extent of the
 *                      portion of the ship that is seen in view 2. (XC3,YC3
 *                      and EXT3 have the same role in view 3.
@@ -15,22 +15,22 @@
      :           32.0,32.0,26.0,26.0,20.0,20.0,14.0,12.0,12.0/
       DATA XC2,YC2, EXT2/60.0,36.0,28.0/
       DATA XC3,YC3, EXT3/15.0,16.0,14.0/
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Set up view 1
       CALL GSWN(1, 0.0,100.0, 10.0,35.0)
       CALL GSVP(1, 0.0,1.0,    0.7,0.95)

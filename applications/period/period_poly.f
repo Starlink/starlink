@@ -1,6 +1,6 @@
- 
+
       FUNCTION PERIOD_POLY(COEFF, NPOLY, X)
- 
+
 C============================================================================
 C             NPOLY
 C Evaluates   SUM COEFF(I) * X**(I-1).
@@ -16,13 +16,13 @@ C     Modified power raising to use INTEGER powers not DOUBLE PRECISION.
 C     which caused core dumps on Digital unix (and is clearly insane anyway).
 C
 C============================================================================
- 
+
       IMPLICIT NONE
- 
+
       INTEGER NPOLY
       DOUBLE PRECISION PERIOD_POLY, COEFF(NPOLY), X
       DOUBLE PRECISION X0, X1, X2, X3, X4, X5, X6, X7, X8, X9
- 
+
       X0 = COEFF(1)
       X1 = COEFF(2)*(X)
       X2 = COEFF(3)*(X**2)
@@ -33,7 +33,7 @@ C============================================================================
       X7 = COEFF(8)*(X**7)
       X8 = COEFF(9)*(X**8)
       X9 = COEFF(10)*(X**9)
- 
+
       IF ( NPOLY.EQ.1 ) THEN
          PERIOD_POLY = X0
       ELSE IF ( NPOLY.EQ.2 ) THEN
@@ -55,6 +55,6 @@ C============================================================================
       ELSE IF ( NPOLY.EQ.10 ) THEN
          PERIOD_POLY = X0 + X1 + X2 + X3 + X4 + X5 + X6 + X7 + X8 + X9
       END IF
- 
+
       RETURN
       END

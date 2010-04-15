@@ -12,8 +12,8 @@ This is a maintenance release of gwm. The only significant change is to
 correct a problem with gwm windows which have allocated a private colour
 map which could cause graphics applications to generate X errors.
 
-This release of GWM adds support for windows created with visual types other 
-than the default visual type of the display. The simple display manager 
+This release of GWM adds support for windows created with visual types other
+than the default visual type of the display. The simple display manager
 distributed with the gwm library cannot create windows with alternative
 visual types but they can be created with the tcl/tk based manager that
 is distributed as part of startcl.

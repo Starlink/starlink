@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
 
 *  Increment loop count, flush error and issue informative message
 *  if still failing.
-            IF ( LOOPAG ) THEN 
+            IF ( LOOPAG ) THEN
                LOOP = LOOP + 1
                IF ( LOOP .LE. MXLOOP ) THEN
                   CALL ERR_REP( 'PHO1_ASFIO1',
@@ -184,7 +184,7 @@
 
 *  Return for another go if required.
          GO TO 1
-      END IF     
+      END IF
 
 *  If status set on exit then affirm action.
       IF ( STATUS .NE. SAI__OK .AND. LOOP .EQ. MXLOOP ) THEN

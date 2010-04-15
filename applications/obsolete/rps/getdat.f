@@ -14,7 +14,7 @@
 	call psx_localtime(nticks, secs, mins, hours, day, month,
      *		year, wday, yday, isdst, tstrct, status)
 
-	write(xstring,'(i3,a1,i2.2,a1,i2.2,a1,i2,a1,i2.2,a1,i2)') 
+	write(xstring,'(i3,a1,i2.2,a1,i2.2,a1,i2,a1,i2.2,a1,i2)')
      &  hours, ':', mins, ':', secs, ' ', day, '/', month+1,'/',year
 
 	tstring = xstring

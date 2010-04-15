@@ -34,8 +34,8 @@
 *        an error status to be returned, but is treated as being
 *        equivalent to the user specifying the band given by DEFAUL.
 *     BAND = INTEGER (Returned)
-*        The waveband index. Returned equal to DEFAUL if an error 
-*        occurs (unless DEFAUL is an invalid waveband index, in which 
+*        The waveband index. Returned equal to DEFAUL if an error
+*        occurs (unless DEFAUL is an invalid waveband index, in which
 *        case 1 is returned).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,7 +169,7 @@
 
       END DO
 
-*  If an error has occurred, give a context message and return a safe 
+*  If an error has occurred, give a context message and return a safe
 *  band number.
       IF( STATUS .NE. SAI__OK ) THEN
          BAND = ERRBND

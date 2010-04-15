@@ -62,7 +62,7 @@ PRIVATE void gk0xdomap(bm,b,map,flags)bitmap *bm;box b;unsigned char *map;int fl
 			line = l.l_base+
 				(y % HEIGHT(bm->bm_box) + l.l_yoffset)*l.l_bytestride;
 			end = line + ((l.l_width-1+l.l_xoffset)>>3);	/* last byte in scanline */
-			next = line + ((x+l.l_xoffset)>>3);	
+			next = line + ((x+l.l_xoffset)>>3);
 			getreg = GETBYTE(next);
 			gl = 8-shift;	/* valid bits in getreg ending least sig bit */
 			if(gl>l.l_width-x){	/* bits to end of scanline */

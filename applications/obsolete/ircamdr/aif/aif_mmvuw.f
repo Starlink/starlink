@@ -58,20 +58,20 @@
       INTEGER
      :  X             ! index to array elements
 *-
- 
+
 *    check for error on entry
       IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       initialise minimum and maximum values
          RANGE( 1 ) = ARRAY( 1 )
          RANGE( 2 ) = ARRAY( 1 )
- 
+
 *       search all the remaining values of ARRAY for the min and max values
          DO X = 2, NPTS
- 
+
             RANGE( 1 ) = MIN( RANGE( 1 ), ARRAY( X ) )
             RANGE( 2 ) = MAX( RANGE( 2 ), ARRAY( X ) )
          ENDDO
       ENDIF
- 
+
       END

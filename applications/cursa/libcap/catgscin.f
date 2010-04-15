@@ -108,7 +108,7 @@ C     epoch of the coordinates.
 *  External References:
       INTEGER CHR_LEN
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  ROWS,       ! No. of rows in the input catalogue.
@@ -155,7 +155,7 @@ C     epoch of the coordinates.
          CALL CHR_PUTC ('gsc', CATOUT, LCATOU)
          CALL CHR_PUTC (CATIN(1 : LCATIN), CATOUT, LCATOU)
          CALL CHR_PUTC ('.FIT', CATOUT, LCATOU)
- 
+
          CALL CAT_TOPEN (CATOUT(1 : LCATOU), 'NEW', 'WRITE', CIOUT,
      :     STATUS)
 
@@ -186,7 +186,7 @@ C     epoch of the coordinates.
 
 *
 *       Generate an index on the Declination column.  Note that the
-*       values in the column will be in degrees when the index is 
+*       values in the column will be in degrees when the index is
 *       generated, but the values will be written in radians.  However,
 *       the order is the same in both cases.
 
@@ -230,7 +230,7 @@ C    :     /'Ascension and Declination.', STATUS)
          CALL CAP_GSCTB (CIIN, II, CIOUT, NUMCOL, FIOUT, STATUS)
 
 *
-*       If required, copy any header text from the input catalogue to the 
+*       If required, copy any header text from the input catalogue to the
 *       output catalogue.
 
          IF (TEXT(1 : 1) .NE. 'N') THEN

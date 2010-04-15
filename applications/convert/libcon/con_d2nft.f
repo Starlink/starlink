@@ -84,7 +84,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Length of a character string ignoring
-                                 ! trailing blanks  
+                                 ! trailing blanks
 *  Local Constants:
       INTEGER FITKEY             ! Length of a FITS keyword
       PARAMETER ( FITKEY = 8 )
@@ -127,7 +127,7 @@
       INTEGER FDIMS( 2 )         ! Dimensions of FITS extension
       CHARACTER * ( 90 ) FITNAM  ! Name of FITS-structure item
       CHARACTER * ( FITLEN ) FITSTR ! Contains FITS string
-      CHARACTER * ( VALLEN ) FITVAL ! Contains FITS value 
+      CHARACTER * ( VALLEN ) FITVAL ! Contains FITS value
       INTEGER IARRAY( 100 )      ! Used to read in INTEGER type data
                                  ! items
       INTEGER MINLEN             ! Minimum length of input FITS string
@@ -208,32 +208,32 @@
 *  20 characters.  Character values may be longer, and are left
 *  justified.
       NDATA = 1
-      IF ( TYPE .EQ. 'BYTE' ) THEN    
+      IF ( TYPE .EQ. 'BYTE' ) THEN
          CALL DTA_RDVARB( PATH, NDATA, BARRAY, DSTAT )
          IF ( DSTAT .NE. 0 ) GOTO 450
          IARRAY( 1 ) = NUM_BTOI( BARRAY( 1 ) )
          CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
 
-      ELSE IF ( TYPE .EQ. 'CHAR' ) THEN    
+      ELSE IF ( TYPE .EQ. 'CHAR' ) THEN
          CALL DTA_RDVARC( PATH, FDIMS( 1 ), FITVAL, DSTAT )
          IF ( DSTAT .NE. 0 ) GOTO 450
 
-      ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN    
+      ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
          CALL DTA_RDVARD( PATH, NDATA, DARRAY, DSTAT )
          IF ( DSTAT .NE. 0 ) GOTO 450
          CALL CHR_DTOC( DARRAY( 1 ), FITVAL( :20 ), NC )
 
-      ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN    
+      ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN
          CALL DTA_RDVARF( PATH, NDATA, FARRAY, DSTAT )
          IF ( DSTAT .NE. 0 ) GOTO 450
          CALL CHR_RTOC( FARRAY( 1 ), FITVAL( :20 ), NC )
 
-      ELSE IF ( TYPE .EQ. 'INT' ) THEN    
+      ELSE IF ( TYPE .EQ. 'INT' ) THEN
          CALL DTA_RDVARI( PATH, NDATA, IARRAY, DSTAT )
          IF ( DSTAT .NE. 0 ) GOTO 450
          CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
 
-      ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
+      ELSE IF ( TYPE .EQ. 'SHORT' ) THEN
          CALL DTA_RDVARS( PATH, NDATA, SARRAY, DSTAT )
          IF ( DSTAT .NE. 0 ) GOTO 450
          IARRAY( 1 ) = NUM_WTOI( SARRAY( 1 ) )

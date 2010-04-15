@@ -10,14 +10,14 @@ C     the data array elements were bad, then those elements of the
 C     main data array are set to the 'flagged' or 'magic' value. Note
 C     that this replaces the previous value in the data array, which is
 C     therefore left - so this process can remove information from the
-C     file, which is why Figaro tends to prefer the use of quality 
+C     file, which is why Figaro tends to prefer the use of quality
 C     arrays rather than flagged data arrays.
 C
 C  Command parameters:
 C
 C     INPUT  (Character) The name of the structure containing the data.
 C
-C     OUTPUT (Character) The name of the result of the operation.  This 
+C     OUTPUT (Character) The name of the result of the operation.  This
 C            can be the same as for INPUT.  If not, a new structure
 C            is created, with everything but the data a direct
 C            copy of the input.
@@ -152,7 +152,7 @@ C
          CALL PAR_WRUSER('Data array now has '//
      :       NUMBER(:ICH_LEN(NUMBER))//' data elements flagged',IGNORE)
          CALL DSA_SET_FLAGGED_VALUES ('OUTPUT',.TRUE.,STATUS)
-      ELSE 
+      ELSE
          CALL DSA_SET_FLAGGED_VALUES ('OUTPUT',.FALSE.,STATUS)
       END IF
 C
@@ -163,7 +163,7 @@ C
       CALL DSA_UNMAP(QSLOT,STATUS)
       CALL DSA_DELETE_QUALITY('OUTPUT',STATUS)
 C
-C     Close down everything 
+C     Close down everything
 C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)

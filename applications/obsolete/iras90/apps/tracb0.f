@@ -1,8 +1,8 @@
-      SUBROUTINE TRACB0( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT, 
+      SUBROUTINE TRACB0( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT,
      :                   SCNDIR, NDISP, OFFSET, DET, DTINDX, SCALE,
-     :                   XLMT, YLMT, BAND, IDC, PDET, PPOSN, 
-     :                   PSTRTH, PPRF, PODET, POSCN, POSKY, POSTR, 
-     :                   COORDS, UNITS, COLOUR, CURSOR, CLRBLK, 
+     :                   XLMT, YLMT, BAND, IDC, PDET, PPOSN,
+     :                   PSTRTH, PPRF, PODET, POSCN, POSKY, POSTR,
+     :                   COORDS, UNITS, COLOUR, CURSOR, CLRBLK,
      :                   FID, LOG, STATUS )
 *+
 *  Name:
@@ -15,10 +15,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACB0( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT, 
+*     CALL TRACB0( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT,
 *                  SCNDIR, NDISP, OFFSET, DET, DTINDX, SCALE,
-*                  XLMT, YLMT, BAND, IDC, PDET, PPOSN, PSTRTH, 
-*                  PPRF, PODET, POSCN, POSKY, POSTR, COORDS, 
+*                  XLMT, YLMT, BAND, IDC, PDET, PPOSN, PSTRTH,
+*                  PPRF, PODET, POSCN, POSKY, POSTR, COORDS,
 *                  UNITS, FID, COLOUR, CURSOR, CLRBLK, LOG, STATUS )
 
 *  Description:
@@ -34,16 +34,16 @@
 *     the log file.
 *
 *     The point source template is got from a NDF file associated with
-*     parameter PPRF. The NDF file should have a size of 1 for its 
-*     second dimension ( one profile for all four wave bands ) or 4 
-*     ( one profile for each wave band ).  All profiles in the NDF 
+*     parameter PPRF. The NDF file should have a size of 1 for its
+*     second dimension ( one profile for all four wave bands ) or 4
+*     ( one profile for each wave band ).  All profiles in the NDF
 *     file have a normalised amplitude.
 *
 *     Before calling this routine, the NCAR (AUTOGRAPH) grid window
 *     should be made to match the current SGS zone world coordinates,
 *     that is the grid window should have the bounds (0.0, 1.0,
 *     0.0, 1.0).
-*     
+*
 
 *  Arguments:
 *     BSMP = INTEGER (Given)
@@ -116,7 +116,7 @@
 *        The units of the displayed data trace.
 *     COLOUR = LOGICAL (Given)
 *        If true, colour is available on the graphic device. Otherwise
-*        colour is not available.         
+*        colour is not available.
 *     CURSOR = LOGICAL (Given)
 *        If true, cursor is available on the graphic device.
 *     CLRBLK = LOGICAL (Given)
@@ -143,7 +143,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,7 +152,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants.
-            
+
 *  Arguments Given:
       INTEGER BSMP
       INTEGER ESMP
@@ -204,7 +204,7 @@
       PARAMETER ( NDIMX = 2 )
       REAL TEXTHT                ! Character height of a string
       PARAMETER ( TEXTHT = 0.02 )
-      
+
 *  Local Variables:
       CHARACTER A1UNIT*11        ! Units of first axis centre values.
       CHARACTER DTST*4           ! String holding detector number
@@ -222,7 +222,7 @@
       CHARACTER YSKY*( IRA__SZFSC ) ! String holding second sky coord.
 
 
-      DOUBLE PRECISION ANGLE     ! Scan angle at cloest sample 
+      DOUBLE PRECISION ANGLE     ! Scan angle at cloest sample
       DOUBLE PRECISION SKY( 2 )  ! Sky coordinates of the cloest sample
       DOUBLE PRECISION SMPDEC    ! DEC of the closet sample
       DOUBLE PRECISION SMPRA     ! RA of the closet sample
@@ -264,7 +264,7 @@
       INTEGER PEN                ! Pen number used to draw point source
       INTEGER SAMPLN             ! Used length of SAMPST
       INTEGER SPSTLN             ! Used length of SPST
-      INTEGER SSTRLN             ! Used length of SSTR 
+      INTEGER SSTRLN             ! Used length of SSTR
       INTEGER UNTLN              ! Used length of the UNITS
       INTEGER VLSTLN             ! Used length of the VLST
       INTEGER XSKYLN             ! Used length of XSKY
@@ -334,7 +334,7 @@
      :   'TRACB0: NDF containing point source profiles has no AXIS '//
      :   'CENTRE values for dimension 1.', STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  Check that AXIS UNITS exists for the first dimension.
       CALL NDF_ASTAT( INDF, 'UNITS', 1, THERE, STATUS )
@@ -344,11 +344,11 @@
      :   'TRACB0: NDF containing point source profiles has no AXIS '//
      :   'UNITS value for dimension 1.', STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  Check that AXIS CENTRE values are in arc-minutes.
       CALL NDF_ACGET( INDF, 'UNITS', 1, A1UNIT, STATUS )
-      IF( .NOT. CHR_SIMLR( A1UNIT( : 7 ), 'ARC-MIN') .AND. 
+      IF( .NOT. CHR_SIMLR( A1UNIT( : 7 ), 'ARC-MIN') .AND.
      :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'U', A1UNIT )
@@ -356,7 +356,7 @@
      :      'TRACB0: Units of first dimension axis coordinates ("^U")'//
      :      ' are wrong (should be arc-minutes).', STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  Map the data array and CENTRE array of the first axis of the NDF
 *  file for reading.
@@ -369,11 +369,11 @@
          LINNO = 1
 
 *  If the file contains four profiles, use one for each wave band.
-      ELSE 
+      ELSE
          LINNO = BAND
       END IF
 
-*  Find the indices of the first and last non-zero values in the 
+*  Find the indices of the first and last non-zero values in the
 *   profile.
       CALL TRACB4( DIM( 1 ), DIM( 2 ), %VAL( DPNTR ), LINNO, BG, ED,
      :            STATUS )
@@ -386,7 +386,7 @@
      :   'profile', STATUS )
          GO TO 999
       END IF
-      
+
 *  Set SGS attributes.
       CALL SGS_SHTX( TEXTHT )
       CALL SGS_SARTX( ASPCT )
@@ -428,24 +428,24 @@
 *  Flush out the messages.
       CALL SGS_FLUSH
 
-*  Use pen 2 to draw point source profile 
+*  Use pen 2 to draw point source profile
       PEN = 2
 
 *  If colour is available on the graphic device, the pen 2 will have the
 *  different colour with other pen, set the line type as solid.
       IF ( COLOUR ) CALL IRM_SOLIN( STATUS )
-            
+
 *  Get the used length of UNITS and COORDS for writing logging file.
       UNTLN = CHR_LEN( UNITS )
       CODSLN = CHR_LEN( COORDS )
 
 *  Enter a loop to draw point source template repeatly, until cursor is
 *  outside the grid window, or after overlaying a point source template
-*  via keyboard. 
+*  via keyboard.
       EXIT = .FALSE.
       DO WHILE( .NOT.EXIT .AND. STATUS .EQ. SAI__OK )
 
-*  If cursor is not available or the device can not be cleared partly, 
+*  If cursor is not available or the device can not be cleared partly,
 *  use keyboard.
          IF ( .NOT. CURSOR ) THEN
 
@@ -453,14 +453,14 @@
             GOT = .FALSE.
             DO WHILE( .NOT.GOT .AND. STATUS .EQ. SAI__OK )
 
-*  Get a detector number from the environment, and cancel its value 
+*  Get a detector number from the environment, and cancel its value
 *  afterward.
                CALL PAR_GET0I( PDET, DETNO, STATUS )
                CALL PAR_CANCL( PDET, STATUS )
 
 *  Check whether the detector given is among those in display, if so
 *  note down the trace index of the detector.
-               DO I = 1, NDISP      
+               DO I = 1, NDISP
                   IF ( DETNO .EQ. DET( I ) ) THEN
                      GOT = .TRUE.
                      NERTRC = I
@@ -478,7 +478,7 @@
 *  Flush the error.
                   CALL ERR_FLUSH( STATUS )
 
-               END IF   
+               END IF
 
 *  Go back to get a new value if no valid detector is got.
             END DO
@@ -501,7 +501,7 @@
 *  Get the sample index of the specified position.
                INDEX1 = DTINDX( NERTRC )
                INDEX2 = DTINDX( NERTRC )
-               CALL IRC_OFFST( IDC, REAL( BSMP ), INDEX1, INDEX2, 
+               CALL IRC_OFFST( IDC, REAL( BSMP ), INDEX1, INDEX2,
      :                         DIST, SMPR, STATUS )
                NERSMP = NINT( SMPR )
 
@@ -523,15 +523,15 @@
 
 *  Get the peak value of the point source, and cancel the parameter
 *  value afterward.
-            CALL PAR_GDR0R( PSTRTH, VAL__BADR, 0.0, 
-     :                      YLMT( 2 ) - YLMT( 1 ), .FALSE., STRTH, 
+            CALL PAR_GDR0R( PSTRTH, VAL__BADR, 0.0,
+     :                      YLMT( 2 ) - YLMT( 1 ), .FALSE., STRTH,
      :                      STATUS )
-            CALL PAR_CANCL( PSTRTH, STATUS )     
+            CALL PAR_CANCL( PSTRTH, STATUS )
 
 *  Now all parameters have been got correctly.
             FOUND = .TRUE.
 
-*  If the cursor is available, using cursor to specified a position 
+*  If the cursor is available, using cursor to specified a position
 *  in the display.
          ELSE
 
@@ -539,7 +539,7 @@
             CALL SNX_CURS( UX, UY, NKEY )
 
 *  If cursor is inside the grid window, find the trace index and sample
-*  index which is closest to the cursor. 
+*  index which is closest to the cursor.
             IF ( UX .GE. XLMT( 1 ) .AND. UX .LE. XLMT( 2 ) .AND.
      :           UY .GE. YLMT( 1 ) .AND. UY .LE. YLMT( 2 ) ) THEN
 
@@ -553,7 +553,7 @@
             END IF
          END IF
 
-*  If not exit and a nearest trace is found, going on to draw the point 
+*  If not exit and a nearest trace is found, going on to draw the point
 *  source template.
          IF ( .NOT.EXIT .AND. FOUND ) THEN
             DETNO = DET( NERTRC )
@@ -565,17 +565,17 @@
      :                   %VAL( APNTR ), SLOPE, CONST, STATUS )
 
 *  Calculate the Peak value of the point source.
-            IF ( CURSOR ) STRTH = UY - CONST - OFFSET( NERTRC ) 
-               
+            IF ( CURSOR ) STRTH = UY - CONST - OFFSET( NERTRC )
+
 *  If calculated Peak value is less than 0, set it as 0.
             IF ( STRTH .LT. 0.0 ) STRTH = 0.0
-  
+
 *  Draw the point source template.
             CALL TRACB6( DIM( 1 ), DIM( 2 ), %VAL( APNTR ),
-     :                   %VAL( DPNTR ), LINNO, BG, ED, XLMT, YLMT, 
-     :                   UX, OFFSET( NERTRC ), CONST, SLOPE, STRTH, 
+     :                   %VAL( DPNTR ), LINNO, BG, ED, XLMT, YLMT,
+     :                   UX, OFFSET( NERTRC ), CONST, SLOPE, STRTH,
      :                   SCNDIR, PEN, STATUS )
-      
+
 *  Encoding detector number and point source Peak value into character
 *  strings.
             CALL CHR_ITOC( DETNO, DTST( 2 : ), DTSTLN )
@@ -583,7 +583,7 @@
             DTST( 1 : 1 ) = '#'
             DTSTLN = DTSTLN + 1
 
-*  Encode the sample number and NDF row number into character 
+*  Encode the sample number and NDF row number into character
 *  strings.
             CALL CHR_ITOC( NERSMP, SAMPST, SAMPLN )
             CALL CHR_ITOC( DTINDX( NERTRC ), NDFRST, NDFRLN )
@@ -598,7 +598,7 @@
             CALL CHR_RTOC( SCAN( 2 ), XST, XSTLN )
 
 *  Get the sky coordinate ( B1950 FK4 ) of the sample.
-            CALL IRC_DPOS( IDC, 1, REAL( NERSMP ), DTINDX( NERTRC ), 
+            CALL IRC_DPOS( IDC, 1, REAL( NERSMP ), DTINDX( NERTRC ),
      :                     SMPRA, SMPDEC, ANGLE, SPEED, STATUS )
 
 *  Convert the specified sky coordinate to the specified sky coordinate
@@ -621,7 +621,7 @@
 *  Clear the region on the graphic device to write the new obtained
 *  data.
             IF ( CLRBLK ) THEN
-               CALL SGS_CLRBL( -0.23, 0.1, YDET + TEXTHT, 
+               CALL SGS_CLRBL( -0.23, 0.1, YDET + TEXTHT,
      :                            YSCO - 4.0 * TEXTHT )
                CALL SGS_CLRBL( -0.23, -0.1, YSAMP + TEXTHT,
      :                            YROW - TEXTHT )
@@ -674,11 +674,11 @@
 *  Set the flag to show something have been logged in the log file.
                LOG = 1
             END IF
-      
+
 *  If no cursor available or graphic surface can not be cleared partly,
 *  exit the do loop after first drawing.
             IF ( .NOT.CURSOR .OR. .NOT.CLRBLK ) EXIT = .TRUE.
-      
+
          END IF
 
 *  Go back to draw another point source template if not exit.

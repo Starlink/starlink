@@ -1,4 +1,4 @@
-      SUBROUTINE GET_LIM(REPLY, X1, X2, XLO, XHI, Y1, Y2, 
+      SUBROUTINE GET_LIM(REPLY, X1, X2, XLO, XHI, Y1, Y2,
      &YLO, YHI, IFAIL)
 *
 * Gets X,Y-limits of a region X1 to X2
@@ -6,7 +6,7 @@
 * The values of X1, X2 must lie betweem XLO to XHI
 * similarly for Y1, Y2
 *
-* CHARACTER*2 REPLY --- First character = 'C' cursor is used, 
+* CHARACTER*2 REPLY --- First character = 'C' cursor is used,
 *                       = 'T' terminal is used. Second character
 *                       ='X' only X range promted, ='Y' only
 *                       Y range prompted, ='B' for both.
@@ -15,7 +15,7 @@
 *                       in X.
 *
 * REAL X1, X2    -- X limits of points
-* REAL XLO, XHI  -- Range of allowed X 
+* REAL XLO, XHI  -- Range of allowed X
 * REAL Y1, Y2    -- Y limits of points
 * REAL YLO, YHI  -- Range of allowed Y
 *
@@ -39,7 +39,7 @@
         ELSE
           WRITE(*,*) 'First ',RANGE,' limit'
         END IF
-*        
+*
         CH = 'S'
         DO WHILE(.NOT.SAMECI(CH,'C') .AND. .NOT.SAMECI(CH,'Q'))
           CALL PGCURSE(X, Y, CH)
@@ -71,10 +71,10 @@
         IFAIL = 1
         DO WHILE(IFAIL.NE.0)
           IF(SAMECI(RANGE,'X')) THEN
-            WRITE(*,'(A,F8.2,A,F8.2,A,$)') 
+            WRITE(*,'(A,F8.2,A,F8.2,A,$)')
      &      'Enter X limits (between ',XLO,' and ',XHI,') or Q to quit:'
           ELSE IF(SAMECI(RANGE,'Y')) THEN
-            WRITE(*,'(A,F8.2,A,F8.2,A,$)') 
+            WRITE(*,'(A,F8.2,A,F8.2,A,$)')
      &      'Enter Y limits (between ',YLO,' and ',YHI,') or Q to quit:'
           ELSE IF(SAMECI(RANGE,'B')) THEN
             WRITE(*,'(A,F8.2,A,F8.2,A,F8.2,A,F8.2,A,$)')
@@ -94,9 +94,9 @@
           ELSE IF(SAMECI(RANGE,'B')) THEN
             READ(STRING, *, IOSTAT=IFAIL) X1, Y1, X2, Y2
             IF(X1.LT.XLO .OR. X1.GT.XHI .OR. X2.LT.XLO
-     &      .OR.X2.GT.XHI .OR. Y1.LT.YLO .OR. Y1.GT.YHI 
+     &      .OR.X2.GT.XHI .OR. Y1.LT.YLO .OR. Y1.GT.YHI
      &      .OR. Y2.LT.YLO .OR.Y2.GT.YHI) IFAIL = 1
-          END IF 
+          END IF
         END DO
       END IF
       IF(.NOT.SAMECI(RANGE,'Y')) THEN

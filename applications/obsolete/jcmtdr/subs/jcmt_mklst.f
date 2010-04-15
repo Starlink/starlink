@@ -5,27 +5,27 @@
 *     JCMT_MKLSTXY
 
 *  Purpose:
-*     Extracts and expands pixel LST and x, y from the SCAN table for 
-*     'on the fly' observation. 
+*     Extracts and expands pixel LST and x, y from the SCAN table for
+*     'on the fly' observation.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_MKLSTXY (SCAN_TABLE_1, C3NO_SCAN_VARS1, C3NIS, C3NSAMPLE, 
+*     CALL JCMT_MKLSTXY (SCAN_TABLE_1, C3NO_SCAN_VARS1, C3NIS, C3NSAMPLE,
 *    :   C6SD, C3SRT, LST, X, Y, C3MXP, STATUS)
 
 *  Description:
 *     takes the SCAN_TABLE_1 specification of the LST, X, Y, and DIRECTION
 *     of the start of each `on the fly' ROW action and, with the value
 *     of C3SRT input calculates the LST and x, y co-ordinates of the pixels
-*     measured along the scan. It is assumed that x, y are the ideal 
+*     measured along the scan. It is assumed that x, y are the ideal
 *     positions measured, in cell units. C6SD is also input and specifies
 *     whether the scans are VERTICAL (in altitude) or HORIZONTAL (in azimuth).
 *
 *     The assumed order of the items in the scan table is hardwired.
-*     An error is returned if C6SD is not one of the allowed values, or if 
-*     the length of a scan as specified in the scan table differs from C6MXP, 
+*     An error is returned if C6SD is not one of the allowed values, or if
+*     the length of a scan as specified in the scan table differs from C6MXP,
 *     the number of points in each scan phase.
 *
 *     Only the first C3NSAMPLE scans are read.
@@ -38,7 +38,7 @@
 *     C3NO_SCAN_VARS1 = INTEGER (Given)
 *        the number of items stored in the scan table per scan
 *     C3NIS = INTEGER (Given)
-*        the total number of scans intended for the observation 
+*        the total number of scans intended for the observation
 *     C3NSAMPLE = INTEGER (Given)
 *        the number of valid scans
 *     C6SD = CHARACTER*(*) (Given)
@@ -48,7 +48,7 @@
 *     LST (C3MXP, C3NIS) = DOUBLE PRECISION (Returned)
 *        the LST of each pixel in HOURS
 *     X (C3MXP, C3NIS) = REAL (Returned)
-*        the x offset of each pixel 
+*        the x offset of each pixel
 *     Y (C3MXP, C3NIS) = (Returned)
 *        the y offset of each pixel
 *     C3MXP = INTEGER (Given)
@@ -66,7 +66,7 @@
 
 *  History:
 *     16-MAY-1991: (REVAD::JFL) : Original version.
-*     11-NOV-1991: (REVAD::JFL) : Modified to read C3NSAMPLE points from 
+*     11-NOV-1991: (REVAD::JFL) : Modified to read C3NSAMPLE points from
 *                                 scan table to cater for aborted observations.
 *     10-FEB-1993: (REVAD::JFL) : calculation of map extent removed.
 *     {enter_changes_here}
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-            
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -139,19 +139,19 @@
 
             PIXTIME = REAL(C3SRT) / LENGTH/ 3660.0 * DUT2ST
 
-*  loop along scan, working out LST and x,y 
+*  loop along scan, working out LST and x,y
 
             DO PIXEL = 1, C3MXP
 
                LST(PIXEL,I) = LSTSTART + ABS(PIXEL-1) * PIXTIME
                IF (C6SD .EQ. 'HORIZONTAL') THEN
                   X(PIXEL,I) = XSTART + DIRECTION * (PIXEL-1)
-                  Y(PIXEL,I) = YSTART 
+                  Y(PIXEL,I) = YSTART
                ELSE
                   X(PIXEL,I) = XSTART
                   Y(PIXEL,I) = YSTART + DIRECTION * (PIXEL-1)
                END IF
-              
+
             END DO
 
          END DO
@@ -161,7 +161,7 @@
          CALL PAR_WRUSER ('JCMT_MKLSTXY - Bad scan direction C6SD',
      :      STATUS)
          STATUS = SAI__ERROR
-      
+
       END IF
 
       END

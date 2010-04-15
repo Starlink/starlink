@@ -66,7 +66,7 @@
 *     22-JAN-1998 (DSB):
 *        Supplied message is now expanded before being assigned to an MSG
 *        token. This allows the supplied message to contain references to
-*        other (pre-defined) message tokens. 
+*        other (pre-defined) message tokens.
 *     1-FEB-2000 (DSB):
 *        Enclose MSG_LOAD call in a new error reporting environment.
 *     11-SEP-2000 (DSB):
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,7 +103,7 @@
 
 *  Do not check the inherited global status.
 
-*  Get the expanded message first so that substitutions occur for any 
+*  Get the expanded message first so that substitutions occur for any
 *  embedded message tokens.
       CALL MSG_LOAD( ' ', MESSGE, OPSTR, OPLEN, STATUS )
 
@@ -172,6 +172,6 @@
          END IF
 
       END IF
-      
+
   999 CONTINUE
       END

@@ -88,11 +88,11 @@
 *     24-FEB-1997 (PDRAPER):
 *        Removed unnecessary EXP1 and EXP2 estimates
 *     28-JAN-1998 (PDRAPER):
-*        Added check for normal scores with a population of 2. 
+*        Added check for normal scores with a population of 2.
 *        The second score isn't calculated as it is the negative
 *        of the first score.
 *     1-NOV-2002 (DSB):
-*        Add MATRIX workspace argument in order to remove limit that EL 
+*        Add MATRIX workspace argument in order to remove limit that EL
 *        be no bigger than CCG1__MXNDF.
 *     2009 July 5 (MJC):
 *        Rebadged to be part of the more-public CCG library.
@@ -102,7 +102,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-      
+
 *     Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'
@@ -165,7 +165,7 @@
 
 *  Get the covariance matrix for I*I.
             V11 = PDA_V11( I, IFAIL )
-            CALL PDA_COVMAT( MATRIX, I, EL, V11, PP( 1 ), 
+            CALL PDA_COVMAT( MATRIX, I, EL, V11, PP( 1 ),
      :                       PP( 2 ), SUMSQ, IFAIL )
 
 *  Now pack this into the output matrix in the form recognised by other

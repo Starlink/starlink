@@ -9,7 +9,7 @@ C     Gets a specified amount of dynamic memory.
 C
 C  Description:
 C     This routine obtains an amount of dynamic memory, and returns
-C     its address. It also returns a slot number which should be used 
+C     its address. It also returns a slot number which should be used
 C     to refer to the memory in order to release it later.
 C
 C  Language:
@@ -30,9 +30,9 @@ C     (!) STATUS       (Integer,ref) Status value.  If bad status is
 C                      passed it, this routine returns immediately.
 C
 C  External subroutines / functions used:
-C     EMS_ANNUL, EMS_BEGIN, EMS_END, ICH_CI, ICH_LEN, PSX_MALLOC 
+C     EMS_ANNUL, EMS_BEGIN, EMS_END, ICH_CI, ICH_LEN, PSX_MALLOC
 C
-C  Prior requirements:  
+C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the DSA_ system.
 C
 C  Support: Keith Shortridge, AAO
@@ -71,7 +71,7 @@ C     Functions used
 C
       CHARACTER ICH_CI*16
       INTEGER ICH_LEN
-C 
+C
 C     DSA_ system common
 C
       INCLUDE 'DSA_COMMON'

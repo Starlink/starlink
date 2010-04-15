@@ -129,7 +129,7 @@
 *     exist, we have to create and locate it with
 *     DAT_NEW( DPAREN, FDCOMP, HDSTYP, 0, 0, STATUS )
 *     DAT_FIND( DPAREN, FDCOMP, DSTLOC, STATUS )
-      
+
 *  Authors:
 *     KS: Keith Shortridge (AAO)
 *     HME: Horst Meyerdierks (UoE, Starlink)
@@ -172,7 +172,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

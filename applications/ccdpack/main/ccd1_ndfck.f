@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL CCD1_NDFCK( SIMPLE, MENTRY, MODIFY, NNDF, GID, FTYPES, FILT,
-*                      DARK, FLASH, ADDDRK, ADDFLS, ONEFIL, ONEDRK, 
+*                      DARK, FLASH, ADDDRK, ADDFLS, ONEFIL, ONEDRK,
 *                      ONEFLS, STATUS )
 
 *  Description:
@@ -145,7 +145,7 @@
 *     15-NOV-1995 (PDRAPER):
 *        Added ONEDRK and ONEFLS to support IR scripts.
 *     3-MAR-1997 (PDRAPER):
-*        Removed LOC argument from IRG_NDFEX call. Added call to 
+*        Removed LOC argument from IRG_NDFEX call. Added call to
 *        release dangling LOCTMP.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
@@ -194,11 +194,11 @@
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN           ! Used length of string
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER IBIAS, ITARG, IDARK, IFLASH, IFLAT,
      :     IMBIAS, IMFLAT, IMDARK, IMFLAS ! Possible FRAME TYPES
-      PARAMETER ( IBIAS = 1, ITARG = 2, IDARK = 3 , IFLASH = 4 , 
-     :            IFLAT = 5, IMBIAS = 6, IMFLAT = 7, IMDARK = 8, 
+      PARAMETER ( IBIAS = 1, ITARG = 2, IDARK = 3 , IFLASH = 4 ,
+     :            IFLAT = 5, IMBIAS = 6, IMFLAT = 7, IMDARK = 8,
      :            IMFLAS =9 )
 
 *  Local Variables:
@@ -428,8 +428,8 @@
 *=======================================================================
 *  This value just needs to be present for flatfield, target and
 *  master flatfield data any old string will do.
-               IF ( FTYPE .EQ. FLIST( IFLAT ) .OR. 
-     :              FTYPE .EQ. FLIST( ITARG ) .OR. 
+               IF ( FTYPE .EQ. FLIST( IFLAT ) .OR.
+     :              FTYPE .EQ. FLIST( ITARG ) .OR.
      :              FTYPE .EQ. FLIST( IMFLAT ) ) THEN
 
 *  Need a filter type.
@@ -501,7 +501,7 @@
 *  required by all except biases,flash frames and any masters.
                IF ( FTYPE .EQ. FLIST( ITARG ) .OR.
      :              FTYPE .EQ. FLIST( IFLAT ) .OR.
-     :              FTYPE .EQ. FLIST( IDARK ) ) THEN 
+     :              FTYPE .EQ. FLIST( IDARK ) ) THEN
                   IF ( ADDDRK ) THEN
 
 *  Check that a value hasn't already been given.
@@ -559,7 +559,7 @@
                IF ( FTYPE .EQ. FLIST( ITARG ) .OR.
      :              FTYPE .EQ. FLIST( IFLASH ) .OR.
      :              FTYPE .EQ. FLIST( IFLAT ) .OR.
-     :              FTYPE .EQ. FLIST( IDARK ) ) THEN 
+     :              FTYPE .EQ. FLIST( IDARK ) ) THEN
                   IF ( ADDFLS ) THEN
 
 *  Check that a value hasn't already been given.
@@ -625,7 +625,7 @@
 
 *  Only requirement for masters is a check whether the master bias
 *  is zeroed or not.
-                  IF ( FTYPE .EQ. FLIST( IMBIAS ) ) THEN 
+                  IF ( FTYPE .EQ. FLIST( IMBIAS ) ) THEN
 
                      IF ( SIMPLE .AND. MENTRY ) THEN
 
@@ -638,7 +638,7 @@
 
 *  Have a value and can modify the extension, so do so.
                               CALL CHR_CTOL( BUFFER, LVAL, STATUS )
-                              CALL CMP_MOD( LOCEXT, 'ZEROED', 
+                              CALL CMP_MOD( LOCEXT, 'ZEROED',
      :                                      '_LOGICAL', 0, 0, STATUS )
                               CALL CMP_PUT0L( LOCEXT, 'ZEROED', LVAL,
      :                                        STATUS )
@@ -661,13 +661,13 @@
 *  Get value from user if required, or just check etc.
                         CALL DAT_THERE( LOCEXT, 'ZEROED', OK, STATUS )
                         IF ( OK ) THEN
-                           CALL CMP_GET0L( LOCEXT, 'ZEROED', LVAL, 
+                           CALL CMP_GET0L( LOCEXT, 'ZEROED', LVAL,
      :                                     STATUS )
                            FRMEXT = .TRUE.
                         END IF
                         IF ( MODIFY ) THEN
                            CALL PAR_GET0L( 'ZEROED', LVAL, STATUS )
-                           CALL CMP_MOD( LOCEXT, 'ZEROED', 
+                           CALL CMP_MOD( LOCEXT, 'ZEROED',
      :                                   '_LOGICAL', 0, 0, STATUS )
                            CALL CMP_PUT0L( LOCEXT, 'ZEROED', LVAL,
      :                                     STATUS )
@@ -675,26 +675,26 @@
                         END IF
                      END IF
                      IF ( OK ) THEN
-                        IF ( LVAL ) THEN 
+                        IF ( LVAL ) THEN
                            IF ( FRMEXT ) THEN
-                              CALL CCD1_MSG( ' ', 
+                              CALL CCD1_MSG( ' ',
      :                     '    ZEROED                 TRUE*', STATUS )
                            ELSE
-                              CALL CCD1_MSG( ' ', 
+                              CALL CCD1_MSG( ' ',
      :                     '    ZEROED                 TRUE', STATUS )
                            END IF
                         ELSE
-                           IF ( FRMEXT ) THEN 
-                              CALL CCD1_MSG( ' ', 
+                           IF ( FRMEXT ) THEN
+                              CALL CCD1_MSG( ' ',
      :                     '    ZEROED                 FALSE*', STATUS)
                            ELSE
-                              CALL CCD1_MSG( ' ', 
+                              CALL CCD1_MSG( ' ',
      :                     '    ZEROED                 FALSE', STATUS )
                            END IF
                         END IF
                      END IF
                   END IF
-               ELSE 
+               ELSE
 
 *=======================================================================
 *  Check the CCD parameters.
@@ -738,7 +738,7 @@
                         END IF
                         CALL CMP_MODC( LOCEXT, 'DIRECTION', 1, 0, 0,
      :                                 STATUS )
-                        CALL CMP_PUT0C( LOCEXT, 'DIRECTION', BUFF, 
+                        CALL CMP_PUT0C( LOCEXT, 'DIRECTION', BUFF,
      :                                  STATUS )
                         NEED = .FALSE.
                      END IF
@@ -773,13 +773,13 @@
 *  direction is known, otherwise the user must be trusted.
                      IF ( BUFF .EQ. 'X' ) THEN
                         DUMMY = UBND( 1 ) - LBND( 1 ) + 1
-                        CALL CCD1_GTBDS( .FALSE., NDFID, DUMMY, 
-     :                                   LBND( 1 ), 4, BOUNDS, NBOUND, 
+                        CALL CCD1_GTBDS( .FALSE., NDFID, DUMMY,
+     :                                   LBND( 1 ), 4, BOUNDS, NBOUND,
      :                                   OK, STATUS )
                      ELSE IF ( BUFF .EQ. 'Y' ) THEN
                         DUMMY = UBND( 2 ) - LBND( 2 ) + 1
-                        CALL CCD1_GTBDS( .FALSE., NDFID, DUMMY, 
-     :                                   LBND( 2 ), 4, BOUNDS, NBOUND, 
+                        CALL CCD1_GTBDS( .FALSE., NDFID, DUMMY,
+     :                                   LBND( 2 ), 4, BOUNDS, NBOUND,
      :                                   OK, STATUS )
                      ELSE
                         CALL CCD1_GTBDS( .FALSE., NDFID, -1, ORIG, 4,
@@ -806,8 +806,8 @@
                      CALL DAT_FIND( LOCEXT, 'BOUNDS', LOCTMP, STATUS )
                      CALL DAT_NCOMP( LOCTMP, NBOUND, STATUS )
                      IF ( NBOUND .EQ. 2 ) THEN
-                        CALL CCG1_FCH1I( NDFID, 'BOUNDS', 
-     :                                   'START1,END1,', 2, BOUNDS, 
+                        CALL CCG1_FCH1I( NDFID, 'BOUNDS',
+     :                                   'START1,END1,', 2, BOUNDS,
      :                                   OK, STATUS )
                      ELSE
                         CALL CCG1_FCH1I( NDFID, 'BOUNDS',
@@ -903,7 +903,7 @@
                         BOUNDS( 2 ) = UBND2( 1 )
                         BOUNDS( 3 ) = LBND2( 2 )
                         BOUNDS( 4 ) = UBND2( 2 )
-                        CALL CCG1_STO1I( NDFID, 'EXTENT', 
+                        CALL CCG1_STO1I( NDFID, 'EXTENT',
      :                                   'CCDPACK_XITEM',
      :                                   'MINX,MAXX,MINY,MAXY,', 4,
      :                                   BOUNDS, STATUS )
@@ -983,8 +983,8 @@
 *=======================================================================
 *  Get the deferred charge value.
 *=======================================================================
-                  CALL CCD1_XADD( 'DEFERRED', LOCEXT, 'DEFERRED', 
-     :                            MODIFY, .FALSE., DVAL, OK, FRMEXT, 
+                  CALL CCD1_XADD( 'DEFERRED', LOCEXT, 'DEFERRED',
+     :                            MODIFY, .FALSE., DVAL, OK, FRMEXT,
      :                            STATUS )
                   IF ( OK ) THEN
                      MESS = ' '
@@ -1019,7 +1019,7 @@
                      CALL NDF_MSG( 'NDFNAM', NDFID )
                      CALL MSG_LOAD( ' ', '^NDFNAM', NDFNAM, NAMLEN,
      :                              STATUS )
-                     CALL DAT_NEW0C( LOCEXT, 'ORIGINAL', NAMLEN, 
+                     CALL DAT_NEW0C( LOCEXT, 'ORIGINAL', NAMLEN,
      :                               STATUS )
                      CALL CMP_PUT0C( LOCEXT, 'ORIGINAL',
      :                               NDFNAM( :NAMLEN ), STATUS )

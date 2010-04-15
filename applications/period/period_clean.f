@@ -1,8 +1,8 @@
-       
-      SUBROUTINE PERIOD_CLEAN(XDATA, YDATA, NDATA, MAXPTS, FMIN, FMAX, 
-     :                        FINT, NCL, GAIN, FREQUENCY, POWER, NOUT, 
+
+      SUBROUTINE PERIOD_CLEAN(XDATA, YDATA, NDATA, MAXPTS, FMIN, FMAX,
+     :                        FINT, NCL, GAIN, FREQUENCY, POWER, NOUT,
      :                        INFO)
- 
+
 C===========================================================================
 C Calculates the CLEANed power spectrum of a dataset of length NDATA stored
 C in the arrays XDATA and YDATA. The spectrum will be calculated between the
@@ -33,8 +33,8 @@ C                        (JLEHAR@MAIL.AST.CAM.AC.UK).)
 C
 C GJP March 1997
 C
-C Modified ONES array dimensions since it was 0-MAXPNTS-1 and 
-C 1-MAXPNTS were actually being used. Modified calls to 
+C Modified ONES array dimensions since it was 0-MAXPNTS-1 and
+C 1-MAXPNTS were actually being used. Modified calls to
 C PERIOD_DFOUR to use FREQ rather than array (say) DFREQ(I) value.
 C
 C Converted to Double Precision (KPD), August 2001
@@ -42,7 +42,7 @@ C Power-raising modified to use INTEGER power (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'
@@ -50,7 +50,7 @@ C===========================================================================
 C-----------------------------------------------------------------------------
 C PERIOD_CLEAN declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER NDATA, MAXPTS, NCL, NOUT, INFO
       DOUBLE PRECISION XDATA(NDATA),YDATA(NDATA)
       DOUBLE PRECISION POWER(MAXPTS),FREQUENCY(MAXPTS)
@@ -60,7 +60,7 @@ C-----------------------------------------------------------------------------
       INTEGER BPTR, CPTR, SPTR
       DOUBLE PRECISION FMIN, FMAX, FINT
 
- 
+
       CALL PERIOD_ALLOC('_DOUBLE', MAXPTS, ONESPTR)
       CALL PERIOD_ALLOC('_DOUBLE', 2*MAXPTS, WFREQPTR)
       CALL PERIOD_ALLOC('_DOUBLE', MAXPTS, DFREQPTR)
@@ -79,18 +79,18 @@ C    "down the line" doesn't allow for a COMPLEX attribute.
 C----------------------------------------------------------------------------
 C Calculate CLEANed power spectrum
 C----------------------------------------------------------------------------
- 
+
       CALL PERIOD_PERFORMCLEAN(XDATA, YDATA, NDATA, MAXPTS, FMIN,
      :                         FMAX, FINT, NCL, GAIN, FREQUENCY,
-     :                         POWER, NOUT, INFO, 
+     :                         POWER, NOUT, INFO,
      :                         %VAL(CNF_PVAL(ONESPTR)),
-     :                         %VAL(CNF_PVAL(WFREQPTR)), 
+     :                         %VAL(CNF_PVAL(WFREQPTR)),
      :                         %VAL(CNF_PVAL(DFREQPTR)),
-     :                         %VAL(CNF_PVAL(DPTR)), 
-     :                         %VAL(CNF_PVAL(WPTR)), 
+     :                         %VAL(CNF_PVAL(DPTR)),
+     :                         %VAL(CNF_PVAL(WPTR)),
      :                         %VAL(CNF_PVAL(RPTR)),
-     :                         %VAL(CNF_PVAL(BPTR)), 
-     :                         %VAL(CNF_PVAL(CPTR)), 
+     :                         %VAL(CNF_PVAL(BPTR)),
+     :                         %VAL(CNF_PVAL(CPTR)),
      :                         %VAL(CNF_PVAL(SPTR)))
 
       CALL PERIOD_DEALL(SPTR)

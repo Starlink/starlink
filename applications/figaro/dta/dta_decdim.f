@@ -17,14 +17,14 @@ C                  terminating the string.
 C     (>) IST      (Integer) the start of the dimension specification
 C                  in the string - ie STRING(IST:IST) is the "[" that
 C                  begins the specification.
-C     (>) MAXDIM   (Integer) The maximum number of dimensions 
+C     (>) MAXDIM   (Integer) The maximum number of dimensions
 C                  expected - ie the dimension of the array DIMS.
 C     (<) IEND     (Integer) the end of the dimension specification
 C                  in the string - ie STRING(IEND:IEND) is the "]" that
 C                  ends the specification.
-C     (<) NDIM     (Integer) Returns the number of dimensions 
+C     (<) NDIM     (Integer) Returns the number of dimensions
 C                  specified.
-C     (<) DIMS     (Integer DIMS(MAXDIM)) Returns the values of 
+C     (<) DIMS     (Integer DIMS(MAXDIM)) Returns the values of
 C                  the dimension specifiers in NAME.
 C     (<) STATUS   (Integer) Returns a status code.
 C                  0 => OK, possible error codes are
@@ -41,8 +41,8 @@ C                                       KS / AAO 30th May 1988
 C     Modified:
 C
 C     1st Sept 1988  Test disalowing leading zeros removed.  KS/AAO.
-C     8th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     8th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN. Unused variable I deleted.
 C+
       IMPLICIT NONE
@@ -63,7 +63,7 @@ C
       CHARACTER CHR
 C
 C     Start to decode the dimension information.  Must end with a ],
-C     and dimensions are delimited by commas.  Each dimension value in 
+C     and dimensions are delimited by commas.  Each dimension value in
 C     turn is summed up in N.
 C
 C     First setup the initial pointers etc
@@ -75,7 +75,7 @@ C
          NDIM=1
          N=0
          J=IST+1
-         ENDED=.FALSE.      
+         ENDED=.FALSE.
       END IF
 C
 C     This loop continues until 'ended' is signalled, either by the

@@ -18,7 +18,7 @@
 *    Global variables :
       INCLUDE 'QMAN_GLOBAL.PAR'       ! QMAN common block
       INCLUDE 'QMAN_COMMON.BLK'       ! QMAN global parameter constants
-*    Local variables : 
+*    Local variables :
       INTEGER NTICKS                  ! PoSiX time ticks
       INTEGER SECONDS                 ! Number of seconds pas the minute
       INTEGER MINUTES                 ! Number of minutes past the hour
@@ -49,7 +49,7 @@
       CALL SLA_CALDJ( YEAR, MONTHS, DAYS, TIMESTAMP, STATUS )
 
 *   Set the timestamp
-      TIMESTAMP = TIMESTAMP + DBLE(HOURS)/HPD + DBLE(MINUTES)/MPD + 
+      TIMESTAMP = TIMESTAMP + DBLE(HOURS)/HPD + DBLE(MINUTES)/MPD +
      :  DBLE(SECONDS)/SPD + DBLE(FRACTION)/FPD
 
 *   Exit subroutine

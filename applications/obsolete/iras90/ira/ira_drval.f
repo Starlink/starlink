@@ -17,7 +17,7 @@
 *  Description:
 *     This routine plots a text string holding a formatted version of a
 *     longitude or latitude value, at a user specified location.
-*     Plotting is performed with the current SGS zone. 
+*     Plotting is performed with the current SGS zone.
 *
 *     A facility is available to suppress the display of leading fields
 *     which have not changed since the last value was displayed (see
@@ -41,10 +41,10 @@
 *        The world coordinate Y value at which to put the text.
 *     STYLE = INTEGER (Given)
 *        The style number for the text. The styles available are
-*        described in IRA_DTOC. Note, styles 1 and 3 are not available 
-*        and style 5 has a superscript unit symbol added at the end of 
-*        the string. Superscripts (h, m, s, o, ' or " ) are used to 
-*        indicate units rather than the normal text characters h, m, s 
+*        described in IRA_DTOC. Note, styles 1 and 3 are not available
+*        and style 5 has a superscript unit symbol added at the end of
+*        the string. Superscripts (h, m, s, o, ' or " ) are used to
+*        indicate units rather than the normal text characters h, m, s
 *        and d.
 *     ACC = DOUBLE PRECISION (Given)
 *        Specifies the accuracy to which the value should be displayed,

@@ -50,7 +50,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,24 +123,24 @@
           RETORDER = .TRUE.
           CALL CHP_CREDUP(INPUT, REJECTS, 500, STATUS)
 *
-*  Loop through the input catalogue placing the entries in the output or 
+*  Loop through the input catalogue placing the entries in the output or
 *  rejects catalogue.
 *
           RECSAMP = 0
           DO RECCOUNT = 1, NUMRECS
-            CALL CHP_GDNAC(INPUT, NFIELDS, FNAMES, FIELDTYPES, 
+            CALL CHP_GDNAC(INPUT, NFIELDS, FNAMES, FIELDTYPES,
      :  COLDES, CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
      :  PTRVALS, NULLS, STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
               RECSAMP = RECSAMP + 1
                IF (RECSAMP .EQ. FREQ) THEN
                 CALL CHP_PUTENT(OUTPUT,1, NFIELDS, FNAMES, FIELDTYPES,
-     :  CHARVALS, 
+     :  CHARVALS,
      :  DOUBVALS, INTVALS, LOGVALS, REALVALS, PTRVALS, NULLS, STATUS)
                 RECSAMP = 0
                ELSE
                 CALL CHP_PUTENT(OUTPUT,1, NFIELDS, FNAMES, FIELDTYPES,
-     :  CHARVALS, 
+     :  CHARVALS,
      :  DOUBVALS, INTVALS, LOGVALS, REALVALS, PTRVALS, NULLS, STATUS)
                ENDIF
              ENDIF
@@ -149,22 +149,22 @@
 *
 *   The rejects catalogue is not required.
 *
-*  Find the next Nth row position. Read the entry and 
+*  Find the next Nth row position. Read the entry and
 *  write it to the output catalogue.
 *
           RECSAMP = FREQ
           DO RECCOUNT = 1, NUMRECS
-            CALL CHP_GDNAC(INPUT, NFIELDS, FNAMES, FIELDTYPES, 
+            CALL CHP_GDNAC(INPUT, NFIELDS, FNAMES, FIELDTYPES,
      :  COLDES, CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
      :  PTRVALS, NULLS, STATUS)
             IF (STATUS .EQ. SAI__OK .AND. RECCOUNT .EQ. RECSAMP ) THEN
                 CALL CHP_PUTENT(OUTPUT,1, NFIELDS, FNAMES, FIELDTYPES,
-     :  CHARVALS, 
+     :  CHARVALS,
      :  DOUBVALS, INTVALS, LOGVALS, REALVALS, PTRVALS, NULLS, STATUS)
              RECSAMP = RECSAMP + FREQ
             ENDIF
           ENDDO
         ENDIF
-      ENDIF 
+      ENDIF
 *
       END

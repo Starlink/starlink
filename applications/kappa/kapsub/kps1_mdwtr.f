@@ -2,7 +2,7 @@
      :                         SAMSIZ, SAMINF, IDIM1, IDIM2, ARRIN,
      :                         ODIM1, ODIM2, SAMPLE, SAMWT, ARROUT,
      :                         CHANGE, STATUS )
- 
+
 *+
 *  Name:
 *     KPS1_MDWTx
@@ -183,14 +183,14 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
- 
+
 *  Arguments Given:
       DOUBLE PRECISION DIFF
       INTEGER STEP
@@ -205,16 +205,16 @@
       REAL ARRIN( IDIM1, IDIM2 )
       INTEGER ODIM1
       INTEGER ODIM2
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION SAMPLE( SAMSIZ )
       INTEGER SAMWT( SAMSIZ )
       REAL ARROUT( ODIM1, ODIM2 )
       LOGICAL CHANGE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER ACTMED             ! Actual median position in sorted sample
       INTEGER ACTSAM             ! Actual number of values in SAMPLE for
@@ -243,92 +243,92 @@
       INTEGER Y                  ! Y position of output image elements
       INTEGER YPOS               ! Y position of image element being
                                  ! processed
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Initialise the CHANGE flag.  It will be set .TRUE. later if any data
 *  values are changed by the filter.
       CHANGE = .FALSE.
- 
+
 *  Apply the 2-dimensional weighted median filter for all lines of the
 *  output image.
       DO Y = 1, ODIM2
- 
+
 *  Calculate position of corresponding input image line.
          OFSETY = Y + STEP
- 
+
 *  For all points in the output image line.
          DO X = 1, ODIM1
- 
+
 *  Calculate the position of the corresponding input image point.
             OFSETX = X + STEP
- 
+
 *  Initialise running totals for sum of values of valid pixels and the
 *  sum of their corresponding weights.
             ACTSAM = 0
             WEIGHT = 0
- 
+
 *  Fill the SAMPLE array with values for sorting.
             DO SINDEX = 1, NUMSAM
- 
+
 *  Get offset position of sample element.
                XPOS = OFSETX + SAMINF( SINDEX, 1 )
                YPOS = OFSETY + SAMINF( SINDEX, 2 )
- 
+
 *  If the pixel is valid then increment number-of-values counter.
                IF ( ARRIN( XPOS, YPOS ) .NE. VAL__BADR ) THEN
                   ACTSAM = ACTSAM + 1
- 
+
 *  Put input image element into the sample array and then put
 *  corresponding weight into sample weighting array.
                   SAMPLE( ACTSAM ) = NUM_RTOD( ARRIN( XPOS, YPOS ) )
                   SAMWT( ACTSAM ) = SAMINF( SINDEX, 3 )
- 
+
 *  Keep running total of the weights.
                   WEIGHT = WEIGHT + SAMWT( ACTSAM )
                END IF
             END DO
- 
+
 *  Compute the median position.
             ACTMED = WEIGHT / 2 + 1
- 
+
 *  Only allow median to be computed if sufficient pixels and weights
 *  were used to form sample.
             IF ( ACTSAM .LT. 3 .OR.
      :           ACTMED .LT. INT( MEDTHR * MEDPOS ) ) THEN
- 
+
 *  Pass input value to the output pixel.
                ARROUT( X, Y ) = ARRIN( OFSETX, OFSETY )
             ELSE
- 
+
 *  Sort SAMPLE array keeping track of the weights.  Initialise the
 *  index to SAMPLE element for comparison.
                TEST = 1
                SUMWT = 0
- 
+
 *  Can terminate sort once accumulated weight (position in expanded
 *  list) includes median position.
                DO WHILE( SUMWT .LT. ACTMED )
- 
+
 *  Initialise the index to the current elements, current value, and
 *  weight.
                   CURR   = TEST
                   CURVAL = SAMPLE( TEST )
                   CURWT  = SAMWT( TEST )
- 
+
 *  Compare all SAMPLE elements after test element against the
 *  current value.
                   DO SINDEX = TEST + 1, ACTSAM
- 
+
                      IF ( SAMPLE( SINDEX ) .LT. CURVAL ) THEN
- 
+
 *  We have found a value in list which is less than current smallest
 *  value; this element becomes new current element.
                         CURR   = SINDEX
@@ -336,9 +336,9 @@
                         CURWT  = SAMWT( SINDEX )
                      END IF
                   END DO
- 
+
                   IF ( CURR .NE. TEST ) THEN
- 
+
 *  A smaller value than the test value was found so swap the values and
 *  weights.
                      SAMPLE( CURR ) = SAMPLE( TEST )
@@ -346,42 +346,42 @@
                      SAMWT( CURR )  = SAMWT( TEST )
                      SAMWT( TEST )   = CURWT
                   END IF
- 
+
                   SUMWT = SUMWT + SAMWT( TEST )
- 
+
 *  Increment index to test the element.
                   TEST = TEST + 1
                END DO
- 
+
 *  Set up the median value.
                MEDIAN = SAMPLE( TEST - 1 )
- 
+
 *  Test for replacement.
                DELTA = MEDIAN - NUM_RTOD( ARRIN( OFSETX, OFSETY ) )
- 
+
                IF ( ABS( DELTA ) .GT. DIFF ) THEN
- 
+
 *  The value should be replaced.  Record the fact that at least one
 *  data value has changed.
                   CHANGE = .TRUE.
- 
+
 *  Reduce the size of the change if damping is required.
                   IF ( DAMP ) DELTA = DELTA / 2.0
- 
+
 *  Replace the value.
                   ARROUT( X, Y ) = ARRIN( OFSETX, OFSETY ) +
      :                             NUM_DTOR( DELTA )
                ELSE
- 
+
 *  No change, so just copy from the input array.
                   ARROUT( X, Y ) = ARRIN( OFSETX, OFSETY )
                END IF
- 
+
 *  End of condition for the number in the sample and median position.
             END IF
- 
+
 *  End of loops for all pixels.
          END DO
       END DO
- 
+
       END

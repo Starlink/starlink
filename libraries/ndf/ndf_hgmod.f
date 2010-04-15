@@ -13,14 +13,14 @@
 *     CALL NDF_HGMOD( INDF, HMODE, STATUS )
 
 *  Description:
-*     The routine returns the current history component update mode of 
+*     The routine returns the current history component update mode of
 *     an NDF. See NDF_HSMOD.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        NDF identifier.
 *     HMODE = CHARACTER * ( * ) (Returned)
-*        The history update mode: 'DISABLED', 'QUIET', 'NORMAL' or 'VERBOSE'. 
+*        The history update mode: 'DISABLED', 'QUIET', 'NORMAL' or 'VERBOSE'.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,22 +64,22 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
 *        DCB_HLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator for NDF history component.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
@@ -124,11 +124,11 @@
 
 *  Otherwise, if the UPDATE_MODE component exists, get its value. If not,
 *  use a default value of NORMAL.
-            ELSE 
+            ELSE
                CALL DAT_THERE( DCB_HLOC( IDCB ), 'UPDATE_MODE', THERE,
      :                         STATUS )
                IF( THERE ) THEN
-                  CALL CMP_GET0C( DCB_HLOC( IDCB ), 'UPDATE_MODE', 
+                  CALL CMP_GET0C( DCB_HLOC( IDCB ), 'UPDATE_MODE',
      :                            HMODE, STATUS )
                   CALL CHR_RMBLK( HMODE )
                ELSE

@@ -66,8 +66,8 @@
 *    History :
 *
 *     26-06-1986 : First implementation (REVA::MJM)
-*     12-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)  
-*     12-AUG-1994  Changed input DIM arguments for SUBARR2D (SKL@JACH) 
+*     12-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
+*     12-AUG-1994  Changed input DIM arguments for SUBARR2D (SKL@JACH)
 *
 *    Type definitions :
 
@@ -76,8 +76,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -117,7 +117,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the first structure
-         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ',
      :                  PNTRI1, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI1, NDIMS, DIMS1, NDIM, STATUS)
@@ -132,7 +132,7 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *             map the data array component of the second structure
-               CALL NDF_MAP( LOCI2, 'DATA', '_REAL', 'READ', 
+               CALL NDF_MAP( LOCI2, 'DATA', '_REAL', 'READ',
      :                       PNTRI2, NELEMENTS, STATUS )
 
                CALL NDF_DIM( LOCI2, NDIMS, DIMS2, NDIM, STATUS)
@@ -151,7 +151,7 @@
 
 *                   if no error then continue
                      IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                      map a data array component
                         CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )

@@ -18,7 +18,7 @@
 *     point source profile associated with the given waveband at the
 *     same rate as the IRAS data scans. The non-zero segment of the
 *     result is put into a temporary working array and the pointer to
-*     its first element is returned.  
+*     its first element is returned.
 
 *  Arguments:
 *     NPSMP = INTEGER (Given)
@@ -28,7 +28,7 @@
 *        Number of profile in the input ideal point source profile data
 *        array.
 *     DATA( NPSMP, NPROF ) = REAL (Given)
-*        The input ideal point source profile data array. 
+*        The input ideal point source profile data array.
 *     AXIS( NPSMP ) = REAL (Given)
 *        The in-scan axis of the point source profile, in arc-min from
 *        its centre.
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,7 +79,7 @@
 *  Arguments Returned:
       INTEGER PRFWID
       INTEGER PPROF
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -108,13 +108,13 @@
 
 *  Find the non-zero segment of the profile to be resampled.
       CALL POIND0( NPSMP, NPROF, DATA, LINNO, BG, ED, STATUS )
-      
+
 *  Find the time duration of the point souce profile when scanned by
 *  IRAS.
       TMDR = ( AXIS( ED ) - AXIS( BG ) ) / I90__SPEED
 
 *  It will have the number of samples if sampled at the same rate as
-*  IRAS scans. To simplify the later calculation, oddise the number. 
+*  IRAS scans. To simplify the later calculation, oddise the number.
       PRFWID = 2 * NINT( 0.5 * REAL( I90__SRATE( BAND ) ) * TMDR ) + 1
 
 *  If it contains too few samples after resampling, set status, report
@@ -126,16 +126,16 @@
      :                /'in-scan distance.', STATUS )
          GOTO 999
       END IF
-      
+
 *  Create a temporary working array to contain the resampled non-zero
 *  segment.
       CALL PSX_CALLOC( PRFWID, '_REAL', PPROF, STATUS )
 
 *  Re-sample the non-zero segment of the profile and put the result into
 *  the temporary working array.
-      CALL POIND1( NPSMP, NPROF, DATA, AXIS, BAND, PRFWID, 
-     :             %VAL( PPROF ), STATUS ) 
+      CALL POIND1( NPSMP, NPROF, DATA, AXIS, BAND, PRFWID,
+     :             %VAL( PPROF ), STATUS )
 
  999  CONTINUE
-      
+
       END

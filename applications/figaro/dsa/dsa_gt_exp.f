@@ -10,7 +10,7 @@ C
 C  Description:
 C     Many Figaro data structures opened, for example, by DSA_INPUT
 C     will have an exposure time associated with them.  This routine
-C     returns that time (in seconds), if it exists, or a supplied 
+C     returns that time (in seconds), if it exists, or a supplied
 C     default if it does not.
 C
 C  Language:
@@ -31,7 +31,7 @@ C                      treated as invalid.  Usually, this will be zero, since
 C                      it is usually easy for uninitialised values to look
 C                      as if they are zero, and negative times are generally
 C                      invalid.
-C     (<) TIME         (Float,ref) The exposure time, in seconds, associated 
+C     (<) TIME         (Float,ref) The exposure time, in seconds, associated
 C                      with the structure.
 C     (!) STATUS       (Integer,ref) Status code.  If bad status is
 C                      passed, this routine returns immediately.
@@ -92,7 +92,7 @@ C
       INTEGER   LENGTH                      ! Length of structure name
       CHARACTER NAME*80                     ! DTA_ name for exposure time
       CHARACTER NUMBER*16                   ! Used to format times
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*80                ! Full name of structure
       LOGICAL   USE_DEF                     ! Indicates default must be used
 C

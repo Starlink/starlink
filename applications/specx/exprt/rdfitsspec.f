@@ -58,14 +58,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Variables:
       INCLUDE 'STAKPAR'
       INCLUDE 'FLAGCOMM'
-      INCLUDE 'STACKCOMM' 
+      INCLUDE 'STACKCOMM'
       INCLUDE 'SPECX_FITS'
 
 *  Status:
@@ -219,7 +219,7 @@
          IFAIL = 18
          GO TO 500
       ELSE IF ( NNE1 .GT. 1 ) THEN
-         PRINT *, ' FITS file contains >1 dimensional data -- aborting' 
+         PRINT *, ' FITS file contains >1 dimensional data -- aborting'
          IFAIL = 18
          GO TO 500
       END IF
@@ -278,7 +278,7 @@
             LSCAN = NINT( RTEMP )
             WRITE( ITITLE(1:5), '(I5)', ERR = 901 ) LSCAN
             ITITLE(6:6) = ' '
- 901        CONTINUE 
+ 901        CONTINUE
          ELSE IF ( KEYWRD .EQ. 'CRVAL2'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) DTEMP
             IF ( STATUS .NE. 0 ) THEN
@@ -534,7 +534,7 @@
 *  CRPIX1          a reference channel (number)
 *
 *
-*  Given these, one obtains the freq. of the m-th channel by the 
+*  Given these, one obtains the freq. of the m-th channel by the
 *  linear relation
 *
 *          freq(m) = RESTFREQ + CRVAL1 + (m-CRPIX1)*CDELT1
@@ -543,14 +543,14 @@
 *  frequency in CRVAL1, hence the above conversion should be done
 *  while using 0.0 instead of RESTFREQ.
 *
-*  Meanwhile, SPECX defines its freq scale by 
+*  Meanwhile, SPECX defines its freq scale by
 *     (1)  JFINC(1) is the channel spacing in Hz (INTEGER*4)
 *     (2)  JFREST(1) is the rest freq in kHz     (INTEGER*4)
 *     (3)  JFCEN(1) is the centre freq in kHz     (INTEGER*4)
 *   NOTE: (3) JFCEN means the frequency of the channel #(n+1)/2
 *
 *  THUS.....
-*        the conversion is straightforward, with 
+*        the conversion is straightforward, with
 *
 *         JFCEN = JFREST + CRVAL1 + CDELT1( 0.5 +N/2)-CRPIX1)
 *

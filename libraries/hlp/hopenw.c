@@ -80,32 +80,32 @@ int hlpHopenw ( int ( * nametr ) ( int, char*, int, char* ), long nchars )
 
 /* Full filename (with prefix and suffix). */
    char file[200];
- 
- 
+
+
 /* Abort if the system isn't in the right state. */
    if ( jhelp != -1 ) return hlp_ILLEGAL_STATE;
- 
+
 /* Translate the HELP library name and open the file. */
    if ( ( j = ( * nametr) ( 0, hlnext, 200, file ) ) ) return j;
    if ( ( fphl = fopen ( file, "w" ) ) == NULL ) return hlp_OPEN_ERROR;
 
 /* Note its name. */
    strcpy ( hlopen, hlnext );
- 
+
 /* Fill the file with nulls */
    for ( i = 0l; i < nchars; i++ )
       if ( fputc ( '\0', fphl ) == EOF ) return hlp_WRITE_ERROR;
- 
+
 /* Initialize addresses for next sequential access. */
    nextx = 0l;
    nextd = 0l;
- 
+
 /* Set HELP state. */
    jhelp = 1;
- 
+
 /* Store the file size. */
    nchh = nchars;
- 
+
 /* Normal exit. */
    return 0;
 }

@@ -46,16 +46,16 @@
       REAL RAT,E1,E2,O1,O2
       INTEGER JX,JY
       REAL RX,RY,T,U
-                                                        
-*  Copy X axis to output           
+
+*  Copy X axis to output
       DO I=1,WIDTH
          OX(I)=IX(I+X1-1)
       ENDDO
-                   
+
 *  Copy Y axis to output
       DO J=1,HEIGHT
          OY(J)=IY(J+Y1-1)
-      ENDDO 
+      ENDDO
 
 
       DO I=1,WIDTH
@@ -67,14 +67,14 @@
           JX = INT(RX)
           JY = INT(RY)
           T = RX - REAL(JX)
-          U = RY - REAL(JY)        
+          U = RY - REAL(JY)
           O1 = (1.0-T)*(1.0-U)*I1(JX,JY) +
      :          T*(1.0-U)*I1(JX+1,JY) + T*U*I1(JX+1,JY+1)
-     :           + (1.0-T)*U*I1(JX,JY+1)  
+     :           + (1.0-T)*U*I1(JX,JY+1)
           O2 = (1.0-T)*(1.0-U)*I2(JX,JY) +
      :          T*(1.0-U)*I2(JX+1,JY) + T*U*I2(JX+1,JY+1)
-     :           + (1.0-T)*U*I2(JX,JY+1)  
-*  Determine ratio of E and O data                                              
+     :           + (1.0-T)*U*I2(JX,JY+1)
+*  Determine ratio of E and O data
           IF ((O1+O2) .NE. 0.0) THEN
              RAT = (E1+E2)/(O1+O2)
           ELSE
@@ -86,7 +86,7 @@
           O2 = O2*RAT
 
 
-*  Output intensity 
+*  Output intensity
           INTEN(I,J) = O1+O2+E1+E2
 
 *  Determine Stokes parameter
@@ -126,7 +126,7 @@
 *   Modified:
 *+
 
-      
+
 *+
 
       IMPLICIT NONE
@@ -148,7 +148,7 @@
       INTEGER STATUS
 
       STATUS=0
-  
+
 *  Copy X axis to output
       DO I=1,WIDTH
          OX(I)=IX(I+X1-1)
@@ -157,8 +157,8 @@
 *  Copy Y axis to output
       DO J=1,HEIGHT
          OY(J)=IY(J+Y1-1)
-      ENDDO 
-                  
+      ENDDO
+
       DO I=1,WIDTH
         DO J=1,HEIGHT
           E1 = I1(X1+I-1,Y1+J-1)
@@ -168,13 +168,13 @@
           JX = INT(RX)
           JY = INT(RY)
           T = RX - REAL(JX)
-          U = RY - REAL(JY)        
+          U = RY - REAL(JY)
           O1 = (1.0-T)*(1.0-U)*I1(JX,JY) +
      :          T*(1.0-U)*I1(JX+1,JY) + T*U*I1(JX+1,JY+1)
-     :           + (1.0-T)*U*I1(JX,JY+1)  
+     :           + (1.0-T)*U*I1(JX,JY+1)
           O2 = (1.0-T)*(1.0-U)*I2(JX,JY) +
      :          T*(1.0-U)*I2(JX+1,JY) + T*U*I2(JX+1,JY+1)
-     :           + (1.0-T)*U*I2(JX,JY+1)  
+     :           + (1.0-T)*U*I2(JX,JY+1)
 *   Output intensity
           INTEN(I,J) = E1+E2+O1+O2
 

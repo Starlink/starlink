@@ -21,10 +21,10 @@ C     USHORT.
 C
 C     Parameters -    (">" input, "<" output)
 C
-C     (>) NAME     (Character) The name of the object 
+C     (>) NAME     (Character) The name of the object
 C                  which is to be mapped. This should be in the
 C                  standard data system format, ie name
-C                  components separated by dots followed by 
+C                  components separated by dots followed by
 C                  optional dimensional information enclosed
 C                  in square brackets.  Ideally the name should
 C                  have been created by a call to DTA_CRVAR.
@@ -54,8 +54,8 @@ C
 C                                      KS / AAO 9th Nov 1988
 C     Modified:
 C
-C     27th Aug  1992.  HME/UoE.   Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     27th Aug  1992.  HME/UoE.   Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C+
       IMPLICIT NONE

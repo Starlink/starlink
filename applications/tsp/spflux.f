@@ -24,16 +24,16 @@ C    (3) TIME       (Real)     Integration time in seconds for the
 C                               spectrum to be calibrated.
 C    (4) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         17/03/2000
 C
 C-
 C
 C  History:
-C    16/8/1988   Original Version.   JAB/AAO 
+C    16/8/1988   Original Version.   JAB/AAO
 C    16/8/1990   Use DSA.            JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
 C
@@ -67,14 +67,14 @@ C
 
 *  Stokes parameters in data
       LOGICAL QZ,UZ,VZ
-      INTEGER SIZE,NUM,STAT                                        
+      INTEGER SIZE,NUM,STAT
       INTEGER ELEMENTS,DUMMY,CSLOT
       CHARACTER*64 STRINGS(2)
       REAL TIME
 
 *  ICH functions
       INTEGER CHR_LEN
-                         
+
 *  Get the Input data
 
       CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
@@ -91,7 +91,7 @@ C
          STATUS = USER__001
          GOTO 100
       ENDIF
-      
+
 *  Get the data size
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -108,7 +108,7 @@ C
             LABEL = ' '
             UNITS = ' '
          ENDIF
-            
+
 *  Map data array
 
          CALL DSA_MAP_DATA('INPUT','READ','FLOAT',CPTR,CSLOT,STATUS)
@@ -116,12 +116,12 @@ C
              CALL MSG_OUT(' ','Error Mapping calibration data',STATUS)
              STATUS = USER__001
              GOTO 100
-         ENDIF        
+         ENDIF
 
 *  Get the integration time
-   
+
          CALL PAR_GET0R('TIME',TIME,STATUS)
- 
+
 *  Get the output file
 
          CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -146,7 +146,7 @@ C
 *  Map axis array and data
 
          CALL TSP_MAP_LAMBDA(OLOC,'WRITE',XPTR,XLOC,STATUS)
-         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)
 
 *  Calibrate Intensity data
 
@@ -154,7 +154,7 @@ C
              CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
      :                  %VAL(DPTR))
          ENDIF
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Calibrate variance if present
 
@@ -178,7 +178,7 @@ C
 *  Write label and units for clibrated data
 
          CALL TSP_WLU(OLOC,LABEL,UNITS,STATUS)
-                                        
+
 *  Calibrate the Stokes parameters, and variances if present
 
          CALL TSP_STOKES(OLOC,NUM,QZ,UZ,VZ,STATUS)
@@ -194,7 +194,7 @@ C
 *  Calibrate the Q stokes data
                  CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
      :                     %VAL(DPTR))
-             ENDIF           
+             ENDIF
 
 *  Unmap the array
              CALL TSP_UNMAP(DLOC,STATUS)
@@ -225,7 +225,7 @@ C
 *  Calibrate the U stokes data
                  CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
      :                     %VAL(DPTR))
-             ENDIF           
+             ENDIF
 
 *  Unmap the array
              CALL TSP_UNMAP(DLOC,STATUS)
@@ -258,7 +258,7 @@ C
 *  Calibrate the V stokes data
                  CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
      :                     %VAL(DPTR))
-             ENDIF           
+             ENDIF
 
 *  Unmap the array
              CALL TSP_UNMAP(DLOC,STATUS)
@@ -295,7 +295,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
       SUBROUTINE TSP_SPFLUX (TIME,NX,XDATA,CDATA,DATA)
 C+
@@ -362,7 +362,7 @@ C
 C     T S P _ W A V E S T
 C
 C     Figaro holds wavelength data in an X-array where each element
-C     holds the value corresponding to the CENTER of the element. 
+C     holds the value corresponding to the CENTER of the element.
 C     This routine calculates - by interpolation - the value that
 C     corresponds to the START of the element.  It will also calculate
 C     values that lie outside the actual range of the data, so can be
@@ -403,4 +403,4 @@ C
       END IF
 C
       END
-                                                               
+

@@ -9,11 +9,11 @@ C
 C     Function:
 C        Reduce IR Polarization images
 C
-C     Description:                           
+C     Description:
 C        IMPOL derives a polarization image from a set of four observations
 C        made with a rotating half-wave plate polarimeter at angles of
 C        0, 22.5, 45 and 67.5 degrees. It is used to reduce polarization
-C        imaging data obtained with the IRIS IR camera and half-wave plate 
+C        imaging data obtained with the IRIS IR camera and half-wave plate
 C        polarimeter at the AAT or the IRPOL/IRCAM polarimeter at UKIRT.
 C        It should also be useable with other similar instruments (not
 C        necessarily in the IR).
@@ -60,7 +60,7 @@ C
 *  Access the First frame
 
       CALL NDF_ASSOC('POS1','READ',ID1,STATUS)
-      
+
 *  Get the data size
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -77,7 +77,7 @@ C
 *  Access the Second frame
 
              CALL NDF_ASSOC('POS2','READ',ID2,STATUS)
-      
+
 *  Get the data size
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -97,7 +97,7 @@ C
 *  Access the third frame
 
              CALL NDF_ASSOC('POS3','READ',ID3,STATUS)
-      
+
 *  Get the data size
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -117,7 +117,7 @@ C
 *  Access the Fourth frame
 
              CALL NDF_ASSOC('POS4','READ',ID4,STATUS)
-      
+
 *  Get the data size
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -147,7 +147,7 @@ C
              CALL TSP_MAP_DATA(OLOC,'WRITE',OPTR,OLOC2,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
 
 *  Map the Q Stokes data
@@ -162,14 +162,14 @@ C
              CALL DAT_ANNUL(SLOC,STATUS)
 
 *  Map the input files
-    
+
              CALL NDF_MAP(ID1,'Data','_REAL','READ',I1PTR,NELM,STATUS)
              CALL NDF_MAP(ID2,'Data','_REAL','READ',I2PTR,NELM,STATUS)
              CALL NDF_MAP(ID3,'Data','_REAL','READ',I3PTR,NELM,STATUS)
              CALL NDF_MAP(ID4,'Data','_REAL','READ',I4PTR,NELM,STATUS)
 
-*  Reduce the data 
-      
+*  Reduce the data
+
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_IMPOL(NELM,%VAL(I1PTR),%VAL(I2PTR),%VAL(I3PTR),
      :                  %VAL(I4PTR),%VAL(OPTR),%VAL(QPTR),%VAL(UPTR))
@@ -188,12 +188,12 @@ C
           ENDIF
 
 *  Unmap input arrays
- 
+
       ENDIF
 100   CONTINUE
       END
 
-      
+
 
 
       SUBROUTINE TSP_IMPOL(SIZE,I1,I2,I3,I4,I,Q,U)
@@ -201,10 +201,10 @@ C
 *    IMPOL command
 *
 *    Subroutine to do the reduction
-*       
+*
 *    Sum the intensities for the four datasets to derive the output
 *    intensity, calculate the fractional Stokes parameters from:
-*    
+*
 *       U/I = (I1-I2)/(I1+I2)    Q/I = (I3-I4)/(I3+I4)
 *
 *    and then scale up to intensity stokes parameters by multiplying
@@ -248,7 +248,7 @@ C
              QF = (I3(IX)-I4(IX))/(I3(IX)+I4(IX))
              U(IX) = UF*I(IX)
              Q(IX) = QF*I(IX)
-         ELSE 
+         ELSE
              I(IX) = VAL__BADR
              U(IX) = VAL__BADR
              Q(IX) = VAL__BADR

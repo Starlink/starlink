@@ -4,7 +4,7 @@ C
 C     D T A _ B L O C K
 C
 C     Block data initialisation routine for the DTA_ system.
-C     
+C
 C     Common variables used -
 C
 C     (<) CACHEI    (Logical) Cache initialisation flag, set false.

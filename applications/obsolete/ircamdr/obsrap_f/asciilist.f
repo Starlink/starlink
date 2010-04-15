@@ -21,8 +21,8 @@
 *    Global constants :
 
 	INCLUDE 'SAE_PAR'
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
         INCLUDE 'FIO_PAR'
 
 *    Status :
@@ -37,7 +37,7 @@
 
 *    Local variables :
 
-	CHARACTER*80 
+	CHARACTER*80
      :	  FILEN                ! name of output filename
 
 	INTEGER
@@ -79,10 +79,10 @@
 *        get output format specifier
 
 	  CALL MSG_OUT( 'BLANK', ' ', STATUS)
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :	    'Output format =1, dimensions line then Intensities',
      :	    STATUS)
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :	    'Output format =2, X, Y,Intensity',
      :	    STATUS)
 	  CALL MSG_OUT( 'BLANK', ' ', STATUS)

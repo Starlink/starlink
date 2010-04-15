@@ -21,8 +21,8 @@
  *		char *string;		      * TYPE_STRING, TYPE_EXCEPTION
  *		struct _symtab *symbols;      * TYPE_SYMTAB
  *		struct _value (*function)();  * TYPE_FUNCTION
- *		double (*dfunction)();	      * TYPE_FUNCTION 
- *		int (*ifunction)();	      * TYPE_FUNCTION 
+ *		double (*dfunction)();	      * TYPE_FUNCTION
+ *		int (*ifunction)();	      * TYPE_FUNCTION
  *		PORTPTR fp;		      * TYPE_FILE
  *	} u;
  * } value;
@@ -76,7 +76,7 @@ value noval, trueval, falseval, intzeroval, realzeroval, nullstringval;
  *
  ******************************************************************************
  */
-void 
+void
 init_values(void)
 {
     trueval     =   value_logical(1);
@@ -117,7 +117,7 @@ maptypetostring(value v)
  *
  ******************************************************************************
  */
-int 
+int
 value_print(value v)
 {
     extern int outfpstring(char *message);	/* output.c */
@@ -170,7 +170,7 @@ value_print(value v)
  *
  ******************************************************************************
  */
-int 
+int
 isexception(value val)
 {
     return (val.type == TYPE_EXCEPTION);
@@ -193,7 +193,7 @@ isexception(value val)
  *
  ******************************************************************************
  */
-value 
+value
 value_real(double f)
 {
     value new;
@@ -209,7 +209,7 @@ value_real(double f)
  *
  ******************************************************************************
  */
-value 
+value
 value_integer(int i)
 {
     value new;
@@ -225,7 +225,7 @@ value_integer(int i)
  *
  ******************************************************************************
  */
-value 
+value
 value_logical(int i)
 {
     value new;
@@ -241,7 +241,7 @@ value_logical(int i)
  *
  ******************************************************************************
  */
-value 
+value
 value_string(char *s)
 {
     value new;
@@ -262,7 +262,7 @@ value_string(char *s)
  *
  ******************************************************************************
  */
-value 
+value
 value_function(value(*fn) ())
 {
     value new;
@@ -278,7 +278,7 @@ value_function(value(*fn) ())
  *
  ******************************************************************************
  */
-value 
+value
 value_real_function(double (*fn) ())
 {
     value new;
@@ -294,7 +294,7 @@ value_real_function(double (*fn) ())
  *
  ******************************************************************************
  */
-value 
+value
 value_integer_function(int (*fn) ())
 {
     value new;
@@ -321,7 +321,7 @@ value_integer_function(int (*fn) ())
  *
  ******************************************************************************
  */
-value 
+value
 exception(char *name)
 {
     value new;
@@ -340,7 +340,7 @@ exception(char *name)
  *
  ******************************************************************************
  */
-value 
+value
 exception1(char *format, char *qual)
 {
     value new;
@@ -362,7 +362,7 @@ exception1(char *format, char *qual)
  *
  ******************************************************************************
  */
-value 
+value
 exception2(char *format, char *qual, char *qual1)
 {
     value new;
@@ -404,7 +404,7 @@ adam_exception(char *exname, int status)
  *
  ******************************************************************************
  */
-value 
+value
 value_symtab(struct _symtab *sym)
 {
     value new;
@@ -420,7 +420,7 @@ value_symtab(struct _symtab *sym)
  *
  ******************************************************************************
  */
-value 
+value
 value_file(PORTPTR fp)
 {
     value new;
@@ -436,7 +436,7 @@ value_file(PORTPTR fp)
  *
  ******************************************************************************
  */
-void 
+void
 reset_integer_part(value *val, int i)
 {
     (*val).u.integer = i;
@@ -458,7 +458,7 @@ reset_integer_part(value *val, int i)
  *
  ******************************************************************************
  */
-double 
+double
 real_part(value val)
 {
     return val.u.real;
@@ -470,7 +470,7 @@ real_part(value val)
  *
  ******************************************************************************
  */
-int 
+int
 integer_part(value val)
 {
     return val.u.integer;
@@ -482,7 +482,7 @@ integer_part(value val)
  *
  ******************************************************************************
  */
-int 
+int
 logical_part(value val)
 {
     return val.u.integer;
@@ -506,7 +506,7 @@ string_part(value val)
  *
  ******************************************************************************
  */
-PORTPTR 
+PORTPTR
 file_part(value val)
 {
     return val.u.fp;
@@ -553,7 +553,7 @@ ifunction_part(value val))) ())
  *	S Y M B O L T A B L E _ P A R T (value val)
  *
  * symboltable_part() is exported by value.c but should only be used in
- * symtab.c as it returns a pointer to a symboltable and this module is the 
+ * symtab.c as it returns a pointer to a symboltable and this module is the
  * only one that knows about such things!
  *
  ******************************************************************************
@@ -588,7 +588,7 @@ symboltable_part(value val)
  *
  ******************************************************************************
  */
-value 
+value
 real_val(value aval)
 {
     value val;
@@ -625,7 +625,7 @@ real_val(value aval)
  *
  ******************************************************************************
  */
-value 
+value
 integer_val(value aval)
 {
     value val;
@@ -662,7 +662,7 @@ integer_val(value aval)
  *
  ******************************************************************************
  */
-value 
+value
 string_val(value val)
 {
     extern int precision;					/* procs.c */
@@ -705,7 +705,7 @@ string_val(value val)
  *
  ******************************************************************************
  */
-value 
+value
 sstring_val(value val)
 {
     static char buffer[20];
@@ -742,7 +742,7 @@ sstring_val(value val)
  *
  ******************************************************************************
  */
-value 
+value
 as_nonstring(value val)
 {
     extern node *parse_expression(char *s, int lenofs);	/* parse.y */
@@ -772,7 +772,7 @@ as_nonstring(value val)
  *
  ******************************************************************************
  */
-int 
+int
 as_logical(value val)
 {
     if (isexc(val))
@@ -798,7 +798,7 @@ as_logical(value val)
  *
  ******************************************************************************
  */
-value 
+value
 numeric_as_real(value val)
 {
     switch (val.type) {

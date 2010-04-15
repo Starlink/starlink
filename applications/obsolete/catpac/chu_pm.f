@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHU_PM( INPUT, OUTPUT, RAEP0, DECEP0, RAPM, DECPM, PARLX, 
+     : CHU_PM( INPUT, OUTPUT, RAEP0, DECEP0, RAPM, DECPM, PARLX,
      : RADVEL, EP0, EP1, RAEP1, DECEP1, STATUS )
 *+
 *  Name:
@@ -19,7 +19,7 @@
 *     Create a catalogue containing new fields for the new Right Ascension and
 *     Declination after the correction has been made for proper motion.
 *     Calculated using SLA_PM. See SUN 67.
-* 
+*
 *     Proper motions should be given in radians per year of epoch.
 *     Parallax should be given in arcseconds.
 *     Radial velocity should be given in km/sec (+ve if receeding)
@@ -66,7 +66,7 @@
 
 *  Bugs:
 *     {note_new_bugs_here}
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
       CHARACTER * ( * ) RAEP1
       CHARACTER * ( * ) DECEP1
       REAL EP0
-      REAL EP1      
+      REAL EP1
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -203,7 +203,7 @@
 *  ARC SECONDS to RADIANS
       REAL*8 DAS2R
       PARAMETER (DAS2R=0.4848136811095359949D-05)
-*- 
+*-
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -226,8 +226,8 @@
         RAPMFLG = .FALSE.
         DECPMFLG = .FALSE.
         PFLG = .FALSE.
-        VFLG = .FALSE.  
-    
+        VFLG = .FALSE.
+
         DO FLDCOUNT = 1, NUMFLDS
           IF (NAMES(FLDCOUNT) .EQ. RAEP0) THEN
             RAFLG = .TRUE.
@@ -252,9 +252,9 @@
 *
 *   Continue only if the fields are in the catalogue.
 *
-        IF (RAFLG .AND. DECFLG .AND. RAPMFLG .AND. DECPMFLG .AND. 
+        IF (RAFLG .AND. DECFLG .AND. RAPMFLG .AND. DECPMFLG .AND.
      :      PFLG .AND. VFLG) THEN
-* 
+*
 *   Add the new fields and create an empty catalogue.
 *
           NUMFLDS = NUMFLDS + 1
@@ -289,7 +289,7 @@
           FIRSTPASS = .TRUE.
           CALL CHP_GNENTS(INPUT, NUMENTS, STATUS)
           DO ENTCOUNT = 1, NUMENTS
-            CALL CHP_GDNAC(INPUT, INPUTNFLDS, OLDFNAMES, FTYPES, 
+            CALL CHP_GDNAC(INPUT, INPUTNFLDS, OLDFNAMES, FTYPES,
      :  COLDES, CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
      :  PTRVALS, NULLS, STATUS)
 *
@@ -317,17 +317,17 @@
 *  Check for nulls in all the fields to be used in the calculation
 *
            IF (NULLS(R1POS) .OR.
-     :         NULLS(D1POS) .OR. 
-     :         NULLS(DR1POS) .OR. 
-     :         NULLS(DD1POS) .OR. 
-     :         NULLS(P1POS) .OR. 
+     :         NULLS(D1POS) .OR.
+     :         NULLS(DR1POS) .OR.
+     :         NULLS(DD1POS) .OR.
+     :         NULLS(P1POS) .OR.
      :         NULLS(V1POS) ) THEN
 *
               NULLS(R2POS) = .TRUE.
               NULLS(D2POS) = .TRUE.
 *
            ELSE
-* 
+*
 *    For all passes calculate new fields
 *
               NULLS(R2POS) = .FALSE.
@@ -335,22 +335,22 @@
              CALL CHP_CONNDS(CHARVALS(R1POS), RAFMT, DBR1, STATUS)
              CALL CHP_CONNDS(CHARVALS(D1POS), DECFMT, DBD1, STATUS)
 
-             IF (FTYPES(DR1POS) .EQ. 'D') THEN 
+             IF (FTYPES(DR1POS) .EQ. 'D') THEN
                DBDR1 = DOUBVALS(DR1POS)
              ELSE
                DBDR1 = REALVALS(DR1POS)
              ENDIF
-             IF (FTYPES(DD1POS) .EQ. 'D') THEN 
+             IF (FTYPES(DD1POS) .EQ. 'D') THEN
                DBDD1 = DOUBVALS(DD1POS)
              ELSE
                DBDD1 = REALVALS(DD1POS)
              ENDIF
-             IF (FTYPES(P1POS) .EQ. 'D') THEN 
+             IF (FTYPES(P1POS) .EQ. 'D') THEN
                DBP1 = DOUBVALS(P1POS)
              ELSE
                DBP1 = REALVALS(P1POS)
              ENDIF
-             IF (FTYPES(V1POS) .EQ. 'D') THEN 
+             IF (FTYPES(V1POS) .EQ. 'D') THEN
                DBV1 = DOUBVALS(V1POS)
              ELSE
                DBV1 = REALVALS(V1POS)
@@ -368,8 +368,8 @@
 *
 *    Put the complete row into the table
 *
-          call chp_putent(output,1, numflds,names,ftypes, charvals, 
-     :  doubvals, intvals, logvals, realvals, ptrvals, nulls, 
+          call chp_putent(output,1, numflds,names,ftypes, charvals,
+     :  doubvals, intvals, logvals, realvals, ptrvals, nulls,
      :  status)
           ENDDO
 *

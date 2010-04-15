@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Byte swap a double precision data value (assumes wrong endianness
-*     of data). 
+*     of data).
 
 *  Language:
 *     Starlink Fortran 77

@@ -15,8 +15,8 @@
 *  Description:
 *     This routine decodes an expression like "KEYWRD[0-9]" into a range
 *     0 to 9 and also returns the position of first occurrence of "[".
-*     It is used to decode such an expression into a possible range 
-*     of values and where to replace the range part of the string 
+*     It is used to decode such an expression into a possible range
+*     of values and where to replace the range part of the string
 *     from when encoding and decoding long strings into FITS headers.
 
 *  Arguments:
@@ -69,18 +69,18 @@
 
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
-      
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Starlink constants
-      
+
 *  Arguments Given:
-      CHARACTER * ( * ) KEYWRD 
-      
+      CHARACTER * ( * ) KEYWRD
+
 *  Arguments Returned:
       INTEGER FIRST
       INTEGER LAST
       INTEGER INSERT
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
@@ -89,7 +89,7 @@
       INTEGER CHR_LEN           ! Used length of a string
       EXTERNAL CHR_ISDIG
       LOGICAL CHR_ISDIG         ! Is character a digit
-      
+
 *  Local Variables:
       INTEGER I1, I2, I3, I4    ! String points
       INTEGER I                 ! Loop variable
@@ -101,9 +101,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 
-*  Locate the first character of the range. 
+*  Locate the first character of the range.
       I1 = INDEX( KEYWRD, '[' )
-      IF ( I1 .EQ. 0 ) THEN 
+      IF ( I1 .EQ. 0 ) THEN
 
 *  No range. Look for numeric end of string.
          I1 = CHR_LEN( KEYWRD )
@@ -111,7 +111,7 @@
          DO 1 I = I1, 1, -1
             IF ( .NOT. CHR_ISDIG( KEYWRD( I: I ) ) ) THEN
                I2 = I + 1
-               IF ( I2 .LE. I1 ) THEN 
+               IF ( I2 .LE. I1 ) THEN
                   CALL CHR_CTOI( KEYWRD( I2: I1 ), FIRST, STATUS )
                   LAST = FIRST
                   INSERT = I2
@@ -131,25 +131,25 @@
 *  Locate "-" and decode first value.
          FAILED = .FALSE.
          I2 = INDEX( KEYWRD, '-' )
-         IF ( I2 .NE. 0 ) THEN 
+         IF ( I2 .NE. 0 ) THEN
             CALL CHR_CTOI( KEYWRD( I1 + 1: I2 - 1 ), FIRST, STATUS )
 
 *  Now look for closing "]".
-            I3 = INDEX( KEYWRD, ']' ) 
-            IF ( I3 .NE. 0 ) THEN 
+            I3 = INDEX( KEYWRD, ']' )
+            IF ( I3 .NE. 0 ) THEN
                CALL CHR_CTOI( KEYWRD( I2 + 1: I3 - 1 ), LAST, STATUS )
                INSERT = I1
             ELSE
                FAILED = .TRUE.
             END IF
-         ELSE 
+         ELSE
             FAILED = .TRUE.
          END IF
-         IF ( FAILED ) THEN 
+         IF ( FAILED ) THEN
             IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
             CALL MSG_SETC( 'KEY', KEYWRD )
             CALL ERR_REP( 'CCD1_HDRRN', '  CCD1_HDRRN: Failed to' //
-     :      ' decode keyword expression - ^KEY - into a valid range', 
+     :      ' decode keyword expression - ^KEY - into a valid range',
      :                   STATUS )
          END IF
       END IF

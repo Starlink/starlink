@@ -1,9 +1,9 @@
 C+
-      SUBROUTINE DTA_CHRPTR 
+      SUBROUTINE DTA_CHRPTR
 C
-C     D T A _ C H R P T R       
+C     D T A _ C H R P T R
 C
-C     On a VAX, this is a routine that, given a string, returns a pointer 
+C     On a VAX, this is a routine that, given a string, returns a pointer
 C     to the start of the actual characters in the string.  This UNIX version
 C     is a dummy, since the function it performs is not needed. For more
 C     details, see the listing for DTA_MVAR, which is the only routine that

@@ -23,14 +23,14 @@
 *     Create a new catalogue by joining two catalogues. The effect of the join
 *     is as follows. Consider a large catalogue that contains all the fields
 *     from the INPUT1 catalogue and all the fields from the INPUT2 catalogue.
-*     Into this catalogue put an entry for each combination of entries in 
-*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M 
+*     Into this catalogue put an entry for each combination of entries in
+*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M
 *     entries where N is the number of entries in the INPUT1 catalogue and
 *     M the number in the INPUT2 catalogue. Now search this catalogue for
 *     those entries that satisfy the given expression.
 *
 *     Another way of looking at join is to say. Take every entry in turn
-*     from catalogue INPUT1. Match this entry against every entry in 
+*     from catalogue INPUT1. Match this entry against every entry in
 *     catalogue INPUT2 and if the EXPRESSion is satisfied combine both entries
 *     to write to a new catalogue.
 *
@@ -70,7 +70,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

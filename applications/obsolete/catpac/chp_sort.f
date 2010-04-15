@@ -15,14 +15,14 @@
 *
 *  Description:
 *     Sort a catalogue on given columns.
-*     The order of column names in the SORTCOLS array is significant. 
+*     The order of column names in the SORTCOLS array is significant.
 *     SORTCOLS(1) must contain the primary column.
 *     SORTCOL(2) and SORTCOLS(3) contain the secondary and tertiary columns.
-*     Spaces in either the secondary or tertiary position simply indicates 
+*     Spaces in either the secondary or tertiary position simply indicates
 *     that there should be no secondary or tertiary ordering.
 *     The direction of the sort for each column in given in the corresponding
 *     element of the SORTDIR array. TRUE for ascending.
- 
+
 *  Arguments:
 *     INPUT = CHARACTER * ( CHP__SZNAME ) (Given)
 *        Catalogue name.
@@ -34,9 +34,9 @@
 *        Global status.
 
 *  Notes:
-*     If a column name does not exist in the catalogue a column not found 
+*     If a column name does not exist in the catalogue a column not found
 *     error will be reported.
-*   
+*
 *     It is possible to sort a catalogue on a virtual column but not on array
 *     elements.
 *
@@ -66,7 +66,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

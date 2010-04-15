@@ -19,7 +19,7 @@
 *     data = const smfData* (Given)
 *        Data struct to obtain file identifier from.
 *     appl = const char * (Given)
-*        Name of "application" to store in file. If NULL, the 
+*        Name of "application" to store in file. If NULL, the
 *        default application name will be used.
 *     status = int* (Given and Returned)
 *        Pointer to global status. Will be bad on return if this smfData

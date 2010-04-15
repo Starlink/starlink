@@ -127,16 +127,16 @@
 *     NAMELIST = LITERAL (Read)
 *        Only used if NDFNAMES is FALSE. If this is the case then this
 *        specifies the name of a file to contain a listing of the names
-*        of the output lists. This file may then be used to pass the 
+*        of the output lists. This file may then be used to pass the
 *        names onto another CCDPACK application using indirection.
 *        [FINDCENT.LIS]
 *     NDFNAMES = _LOGICAL (Read)
 *        If TRUE then the routine will assume that the names of the
 *        input position lists are stored in the CCDPACK extension item
-*        "CURRENT_LIST" of the input NDFs. The names will be present 
+*        "CURRENT_LIST" of the input NDFs. The names will be present
 *        in the extension if the positions were located using a CCDPACK
 *        application (such as IDICURS). Using this facility allows the
-*        transparent propagation of position lists through processing 
+*        transparent propagation of position lists through processing
 *        chains.
 *
 *        If a global value for this parameter has been set using
@@ -163,9 +163,9 @@
 *        centroid. On each iteration the box of data from which the
 *        centroid is estimated is updated. If the new centroid does not
 *        differ from the previous value by more than this amount (in X
-*        and Y) then iteration stops. Failure to meet this level of 
-*        accuracy does not result in the centroid being rejected, the 
-*        centroiding process just stops after the permitted number of 
+*        and Y) then iteration stops. Failure to meet this level of
+*        accuracy does not result in the centroid being rejected, the
+*        centroiding process just stops after the permitted number of
 *        iterations (MAXITER).
 *        [0.05]
 
@@ -179,7 +179,7 @@
 *        On exit the new lists are named *.cent and are associated with
 *        the NDFs (instead of the original "input" lists).
 *
-*     findcent ndfnames=false in='"ndf1,ndf2,ndf3"' 
+*     findcent ndfnames=false in='"ndf1,ndf2,ndf3"'
 *              inlist='"ndf1.pos,ndf2.pos,ndf3.pos"' outlist='*.acc'
 *              namelist=new_position_lists
 *        In this example the position list names are not previously
@@ -202,7 +202,7 @@
 *     - No use is made of variance information.
 
 *  Notes:
-*     - Position list formats. 
+*     - Position list formats.
 *
 *       CCDPACK supports data in two formats.
 *
@@ -235,12 +235,12 @@
 *       In all cases, the coordinates in position lists are pixel
 *       coordinates.
 *
-*     - NDF extension items. 
+*     - NDF extension items.
 *
-*       If NDFNAMES is TRUE then the item "CURRENT_LIST" of the 
-*       .MORE.CCDPACK structure of the input NDFs will be located 
-*       and assumed to contain the names of the lists whose positions 
-*       are to be centroided. On exit this item will be updated to 
+*       If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
+*       .MORE.CCDPACK structure of the input NDFs will be located
+*       and assumed to contain the names of the lists whose positions
+*       are to be centroided. On exit this item will be updated to
 *       reference the name of the centroided list of positions.
 
 *  Behaviour of Parameters:
@@ -308,7 +308,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -328,7 +328,7 @@
 *  Local Constants:
       DOUBLE PRECISION AUTOSZ
       PARAMETER ( AUTOSZ = 1024.0D0 ) ! Typical size of image
-      
+
 *  Local Variables:
       CHARACTER * ( 6 ) ACCESS  ! NDF access mode.
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer used to read in data
@@ -374,7 +374,7 @@
       LOGICAL AUTOSC            ! Whether to scale centroid parameters by image size
       LOGICAL NDFS              ! True if position lists are named in NDF extensions
       LOGICAL SIGN              ! If true features are positive
-      
+
 *.
 
 *  Check inherited global status.
@@ -406,7 +406,7 @@
 
 *  NDF names will also supply the position list names.
          CALL CCD1_GTLIG( .TRUE., 'CURRENT_LIST', 'IN', 1, CCD1__MXNDF,
-     :                    .FALSE., NNDF, FIOGR, NDFGR, NNOLIS, NLGR, 
+     :                    .FALSE., NNDF, FIOGR, NDFGR, NNOLIS, NLGR,
      :                    STATUS )
          CALL CCD1_GRDEL( NLGR, STATUS )
 
@@ -453,7 +453,7 @@
 *=======================================================================
 
 *  See if autoscaling of the parameters is required. This attempts to
-*  adapt to the size of the image, since larger images will tend to have 
+*  adapt to the size of the image, since larger images will tend to have
 *  less accurate initial positions (since they are displayed at lower
 *  resolution). The scaling works assuming that an image AUTOSZ square
 *  does not need any scaling, otherwise the search box and maximum
@@ -497,7 +497,7 @@
 *  Maximum number of iterations.
       CALL MSG_SETI( 'MAXIT', MAXIT )
       CALL CCD1_MSG( ' ',
-     : '  Maximum number of iterations: ^MAXIT', STATUS) 
+     : '  Maximum number of iterations: ^MAXIT', STATUS)
 
 *  Tolerence in centroids.
       CALL MSG_SETD( 'TOLER', TOLER )
@@ -508,7 +508,7 @@
          CALL CCD1_MSG( ' ', '  Locating positive features', STATUS )
       ELSE
          CALL CCD1_MSG( ' ', '  Locating negative features', STATUS )
-      END IF      
+      END IF
 
 *  Note if autoscaling centroid parameters.
       IF ( AUTOSC ) THEN
@@ -516,15 +516,15 @@
          CALL CCD1_MSG( ' ',
      : '  * tuning parameters to image size: ^AUTOSZ x ^AUTOSZ',STATUS )
       END IF
-      
+
 *=======================================================================
 * Main loop - process pairs of NDFs and list names.
 *=======================================================================
       DO 2 I = 1, NNDF
 
 *  Access the NDF associated with this position list.
-         CALL NDG_NDFAS( NDFGR, I, ACCESS, IDIN, STATUS ) 
-      
+         CALL NDG_NDFAS( NDFGR, I, ACCESS, IDIN, STATUS )
+
 *  Write informational message about it.
          CALL CCD1_MSG( ' ',  ' ', STATUS )
          CALL NDF_MSG( 'CURRENT_NDF', IDIN )
@@ -562,7 +562,7 @@
 *  Now map them in. If the number of fields in the file is 2 then
 *  the values are interpreted as X and Y, otherwise the standard file
 *  format is assumed.
-            IF ( NVAL .EQ. 2 ) THEN 
+            IF ( NVAL .EQ. 2 ) THEN
 
 *  Map in X and Y positions.
                CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC,
@@ -570,7 +570,7 @@
 
 *  Generate some identifiers to go with these positions
                CALL CCD1_MALL( NREC, '_INTEGER', IPDIN, STATUS )
-               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( CNF_PVAL( IPDIN ) ),
      :                          STATUS )
             ELSE
 
@@ -585,10 +585,10 @@
             IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Extract the values from the mapped positions data array.
-            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NREC, NVAL, 1, 
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NREC, NVAL, 1,
      :                      %VAL( CNF_PVAL( IPXIN ) ),
      :                      STATUS )
-            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NREC, NVAL, 2, 
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NREC, NVAL, 2,
      :                      %VAL( CNF_PVAL( IPYIN ) ),
      :                      STATUS )
 
@@ -612,12 +612,12 @@
 
 *  Perform the centroiding.
             IF ( STATUS .NE. SAI__OK ) GO TO 99
-            CALL CCD1_CENT( TYPE, IPIN, NCOL, NLINE, LBND, 
-     :                      %VAL( CNF_PVAL( IPDIN ) ), 
-     :                      %VAL( CNF_PVAL( IPXIN ) ), 
+            CALL CCD1_CENT( TYPE, IPIN, NCOL, NLINE, LBND,
+     :                      %VAL( CNF_PVAL( IPDIN ) ),
+     :                      %VAL( CNF_PVAL( IPXIN ) ),
      :                      %VAL( CNF_PVAL( IPYIN ) ),
      :                      NREC, ISIZES, SIGN, MAXSHS, MAXIT, TOLERS,
-     :                      %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                      %VAL( CNF_PVAL( IPDOUT ) ),
      :                      %VAL( CNF_PVAL( IPXOUT ) ),
      :                      %VAL( CNF_PVAL( IPYOUT ) ), NOUT, STATUS )
 
@@ -626,7 +626,7 @@
             NREC = 0
             NOUT = 0
          END IF
-         IF ( STATUS .NE. SAI__OK ) THEN 
+         IF ( STATUS .NE. SAI__OK ) THEN
 
 *  An severe error has occured accompany the message with the file name.
             CALL NDF_MSG( 'NDF', IDIN)
@@ -645,11 +645,11 @@
 *  Write the output results.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CCD1_FIOHD( FDOUT, 'Output from FINDCENT', STATUS )
-         CALL CCD1_WRIXY( FDOUT, %VAL( CNF_PVAL( IPDOUT ) ), 
+         CALL CCD1_WRIXY( FDOUT, %VAL( CNF_PVAL( IPDOUT ) ),
      :                    %VAL( CNF_PVAL( IPXOUT ) ),
-     :                    %VAL( CNF_PVAL( IPYOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPYOUT ) ),
      :                    NOUT, LINE, CCD1__BLEN,
-     :                    STATUS ) 
+     :                    STATUS )
 
 *  Close the file.
          CALL FIO_CLOSE( FDOUT, STATUS )
@@ -657,37 +657,37 @@
 *  Write the report about this loop. The input positions.
          CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FDIN', FNAME )
-         CALL CCD1_MSG( ' ',       
+         CALL CCD1_MSG( ' ',
      : '  Associated positions list: ^FDIN', STATUS )
-                                    
+
 *  Number of records read from input list.
          CALL MSG_SETI( 'NREC', NREC )
-         CALL CCD1_MSG( ' ',        
+         CALL CCD1_MSG( ' ',
      : '  Number of input positions: ^NREC', STATUS )
 
 *  Output parameters: Name of output position list.
          CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FDOUT', FNAME )
          CALL CCD1_MSG( ' ', '  Output positions list: ^FDOUT', STATUS )
-                                     
-*  Number of entries.                
+
+*  Number of entries.
          CALL MSG_SETI( 'NOUT', NOUT )
          CALL CCD1_MSG( ' ', '  Number of output positions: ^NOUT',
      :                  STATUS )
-                               
+
 *  Number of positions not centroided.
-         IF ( NREC - NOUT .GT. 0 ) THEN 
+         IF ( NREC - NOUT .GT. 0 ) THEN
             CALL MSG_SETI( 'NFAIL', NREC - NOUT )
             CALL CCD1_MSG( ' ',
      :'  Number of positions NOT centroided: ^NFAIL', STATUS )
-         END IF                
+         END IF
 
 *  If the position list names were accessed using the NDF extension item
 *  'CURRENT_LIST' then update the NDF extension.
-         IF ( NDFS ) THEN      
+         IF ( NDFS ) THEN
             CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
-         END IF                
-                               
+         END IF
+
 *  Close files and release resources used on this loop.
          CALL NDF_ANNUL( IDIN, STATUS )
          CALL FIO_CLOSE( FDIN, STATUS )
@@ -701,29 +701,29 @@
 
 *  Write terminator for Processing NDF: message.
          CALL CCD1_MSG( ' ', '  ---', STATUS )
-                               
+
 *=======================================================================
 *  End of main processing loop.
 *=======================================================================
- 2    CONTINUE                 
-                               
+ 2    CONTINUE
+
 *  If the filenames were supplied directly then write an output list of
 *  the names for other applications to use.
-      IF ( .NOT. NDFS ) THEN   
-                               
+      IF ( .NOT. NDFS ) THEN
+
 *  Write the names of the output files to a file which may be used for
 *  indirection into other applications.
-         IF ( STATUS .EQ. SAI__OK ) THEN 
+         IF ( STATUS .EQ. SAI__OK ) THEN
             CALL CCD1_LNAM( 'NAMELIST', 1, NNDF,
      :   '# FINDCENT - output position lists', FIOGRO, GRP__NOID,
      :                      .TRUE., STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN 
+            IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                CALL CCD1_MSG( ' ', '  No namelist written', STATUS )
             END IF
          END IF
-      END IF                   
-                               
+      END IF
+
 *  Abort label, cleanup after this.
  99   CONTINUE
 

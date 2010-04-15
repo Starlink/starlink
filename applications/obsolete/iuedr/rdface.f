@@ -1,5 +1,5 @@
       SUBROUTINE RDFACE(FD, STATUS)
- 
+
 *+
 *
 *   Name:
@@ -30,7 +30,7 @@
 
 *   Import:
       INTEGER FD                  ! file descriptor
- 
+
 *   Export:
       INTEGER STATUS              ! status return
 

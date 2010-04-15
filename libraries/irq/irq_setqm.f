@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -171,7 +171,7 @@
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
      :                 FIXBIT, SLOT, STATUS )
 
-*  If all pixels already have the quality, assign a value to SET and 
+*  If all pixels already have the quality, assign a value to SET and
 *  return without further action.
       IF( FIXED .AND. VALUE ) THEN
          CALL NDF_SIZE( INDF, SET, STATUS )
@@ -196,7 +196,7 @@
          CALL NDF_SIZE( INDF, SET, STATUS )
 
 *  If the quality name has a fixed bit number, we still need to modify
-*  the QUALITY component. 
+*  the QUALITY component.
          QMOD = FIXBIT
 
 *  Otherwise, some but not all of the mask pixels are selected. So indicate
@@ -237,12 +237,12 @@
          END IF
 
 *  Set the appropriate bit in the QUALITY array.
-         CALL IRQ1_QMSK( BIT, BAD, .TRUE., SIZE, MASK, 
+         CALL IRQ1_QMSK( BIT, BAD, .TRUE., SIZE, MASK,
      :                   %VAL( CNF_PVAL( PNT ) ),
      :                   STATUS )
 
 *  Count the number of pixels which do and do not have the quality.
-         CALL IRQ1_QCNT( BIT, SIZE, %VAL( CNF_PVAL( PNT ) ), 
+         CALL IRQ1_QCNT( BIT, SIZE, %VAL( CNF_PVAL( PNT ) ),
      :                   SET, CLEAR, STATUS )
 
 *  Unmap the QUALITY array.
@@ -265,7 +265,7 @@
       END IF
 
 *  Update the quality information.
-      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, FIXBIT, 
+      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, FIXBIT,
      :               STATUS )
 
 *  If an error occur, give context information.

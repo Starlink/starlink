@@ -10,8 +10,8 @@
 #     information.
 
 #  Description:
-#     This class 
-    
+#     This class
+
 #  Invocations:
 #
 #        GaiaPolUSpec object_name [configuration options]
@@ -78,7 +78,7 @@ itcl::class gaia::GaiaPolUSpec {
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -87,7 +87,7 @@ itcl::class gaia::GaiaPolUSpec {
       set created_ 0
 
 #  Set defaults.
-      reset  
+      reset
 
    }
 
@@ -96,7 +96,7 @@ itcl::class gaia::GaiaPolUSpec {
    destructor {
 
 #  Annul any reference to the displayed GaiaPolCat.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          catch {set cat_ [$cat_ annull]}
       }
 
@@ -130,9 +130,9 @@ itcl::class gaia::GaiaPolUSpec {
 #  Ensure the controls have been created.
       create
 
-#  Save a reference to the supplied GaiaPolCat, annulling any 
+#  Save a reference to the supplied GaiaPolCat, annulling any
 #  reference to a previous GaiaPolCat first.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          $cat_ annull
       }
       set cat_ [$cat clone]
@@ -163,22 +163,22 @@ itcl::class gaia::GaiaPolUSpec {
          if { [llength $z] == 2 } {
             setZvals $z
 
-#  Otherwise, attempt to find the Z column value corresponding to the 
-#  current Z axis control value, and use this as the new Z column value. 
+#  Otherwise, attempt to find the Z column value corresponding to the
+#  current Z axis control value, and use this as the new Z column value.
 #  Use the lowest Z column value if this is not possible.
          } else {
             set zax $values_($this,zaval)
             if { $zax != "" && $zax != "***" } {
                lassign [$cat zConv $zax "zaval" ] zcnew zanew
                if { $zcnew == "" || $zcnew == "***" } {
-                  set zcnew [$cat getZlo] 
-               } 
+                  set zcnew [$cat getZlo]
+               }
             } else {
-               set zcnew [$cat getZlo] 
+               set zcnew [$cat getZlo]
             }
 
 #  Store this new Z column value.
-            newZval $zcnew "zcval" 
+            newZval $zcnew "zcval"
          }
 
 #  If the catalogue has only a single spectral channel, disable the
@@ -213,7 +213,7 @@ itcl::class gaia::GaiaPolUSpec {
             set otheritem "zcval"
          }
 
-         set zzz [$cat_ zConv $z $item] 
+         set zzz [$cat_ zConv $z $item]
          lassign $zzz values_($this,zcval) values_($this,zaval)
 
       }
@@ -276,7 +276,7 @@ itcl::class gaia::GaiaPolUSpec {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
 #     (none at the moment)
 
@@ -338,7 +338,7 @@ itcl::class gaia::GaiaPolUSpec {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -378,7 +378,7 @@ itcl::class gaia::GaiaPolUSpec {
 #  Next row.
          incr r
 
-#  Create a frame containing a LabelEntry to set the spectral channel as a Z 
+#  Create a frame containing a LabelEntry to set the spectral channel as a Z
 #  column value, and a label to indicate the required units.
          itk_component add zc {
             frame $w_.zc
@@ -394,12 +394,12 @@ itcl::class gaia::GaiaPolUSpec {
          label $itk_component(zc).unit -text "" \
                                        -anchor w \
                                        -justify left
-         pack $itk_component(zc).val $itk_component(zc).unit -side left 
+         pack $itk_component(zc).val $itk_component(zc).unit -side left
 
          grid $itk_component(zc) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(zc) {Z column value defining the spectral channel to display (only enabled for spectropolarimetry data).}
 
-#  Create a frame containing a LabelEntry to set the spectral channel as a Z 
+#  Create a frame containing a LabelEntry to set the spectral channel as a Z
 #  axis value, and a label to indicate the required units.
          itk_component add za {
             frame $w_.za
@@ -416,13 +416,13 @@ itcl::class gaia::GaiaPolUSpec {
                                        -anchor w \
                                        -justify left
 
-         pack $itk_component(za).val $itk_component(za).unit -side left 
+         pack $itk_component(za).val $itk_component(za).unit -side left
 
          grid $itk_component(za) -row $r -column 2 -sticky nw -padx $px
          add_short_help $itk_component(za) {Z axis value defining the spectral channel to display (only enabled for spectropolarimetry data).}
 
 #  Vertical space
-         grid [frame $w_.space1 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -434,7 +434,7 @@ itcl::class gaia::GaiaPolUSpec {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
 
 #  Create a new font for the units labels.
@@ -494,7 +494,7 @@ itcl::class gaia::GaiaPolUSpec {
 #  Thw window containing the progress bar
    itk_option define -pbar pbar PBar {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -512,13 +512,13 @@ itcl::class gaia::GaiaPolUSpec {
        variable attr_
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

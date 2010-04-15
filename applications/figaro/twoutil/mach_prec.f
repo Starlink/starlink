@@ -21,16 +21,16 @@
 * History:
 *-
       IMPLICIT NONE
-      
-      INTEGER PDA_I1MACH      
+
+      INTEGER PDA_I1MACH
       REAL B,T
 
 *
-      
+
       B = PDA_I1MACH(10)
       T = PDA_I1MACH(14)
       MACH_PREC = 0.5*B**(1-T)
-      
+
       END
 
 

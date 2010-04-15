@@ -35,7 +35,7 @@
 *  Implementation Deficiencies:
 *     -  This routine uses VMS specific Fortran OPEN options.
 *        Replace these with calls to FIO.
-      
+
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,7 +131,7 @@
       OUT=7
 
 * This call is equivalent to the statement :
-* 
+*
 * OPEN( UNIT=OUT, FILE='astrom.dat', STATUS='UNKNOWN',
 * RECL=80, CARRIAGECONTROL='LIST')
 * (see History)

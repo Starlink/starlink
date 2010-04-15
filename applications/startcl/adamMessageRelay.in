@@ -8,15 +8,15 @@ fi
 # Which sees it as an extended comment.
 
 #
-# This script acts as a "go-between" between a tk application and adam 
+# This script acts as a "go-between" between a tk application and adam
 # tasks. The tk application cannot communicate directly with an adam
-# task because adam_receive blocks waiting for messages and so if it 
+# task because adam_receive blocks waiting for messages and so if it
 # was called within the tk application, the user interface would "hang".
 #
-# The go-between waits for adam messages; if a message is received from 
+# The go-between waits for adam messages; if a message is received from
 # the tk application, the message value is executed as a tcl command and
-# the result sent to the tk application in an Adam inform message. If a 
-# message is received from an adam task its contents are written to 
+# the result sent to the tk application in an Adam inform message. If a
+# message is received from an adam task its contents are written to
 # standard output (for the tk application to read).
 
 # Initialise the adam message system using comand line argument as our

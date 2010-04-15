@@ -4,33 +4,33 @@
 *     AGP1_TRANS
 
 *  Purpose:
-*     Translate a user-supplied device specification to a PGPLOT 
+*     Translate a user-supplied device specification to a PGPLOT
 *     device specification and an AGI workstation name.
 
 *  Invocation:
 *     CALL AGP1_TRANS( PARAM, USPEC, PSPEC, AGINAM, STATUS )
 
 *  Description:
-*     This routine converts a user-supplied graphics device specification 
+*     This routine converts a user-supplied graphics device specification
 *     into a native PGPLOT equivalent, and an AGI worksation name.
 *
-*     The user supplied specification can either use the GNS or 
+*     The user supplied specification can either use the GNS or
 *     native PGPLOT syntax:
 *
 *        GNS: The specification takes the form "gtype[;gfile]", where
 *        gtype is a GNS device type and gfile is the GNS name of an output
 *        file or specific device.
 *
-*        Native PGPLOT: The specification takes the form "[pfile]/ptype", 
-*        where ptype is a PGPLOT device type and pfile is the PGPLOT name 
+*        Native PGPLOT: The specification takes the form "[pfile]/ptype",
+*        where ptype is a PGPLOT device type and pfile is the PGPLOT name
 *        of an output file or specific device.
 *
 *     In both case the device type or file name may be an environment
 *     variable, in which case the translation will be used.
-* 
+*
 *     The returned PGPLOT specification will always be of the "native
 *     PGPLOT" form described above.
-*     
+*
 *     The AGI workstation name is of the form "AGI_xxx_y" where xxx and y
 *     are integers. These are chosen to be the same as the values used by
 *     the GNS GKS interface, so that PGPLOT applications can find and use
@@ -38,7 +38,7 @@
 *
 *     The conversions are driven by a static device description table
 *     which is defined in the text file "pgnames.txt". Fortran source
-*     files are generated from this file at build-time, using the 
+*     files are generated from this file at build-time, using the
 *     make_agp_files script.
 
 *  Arguments:
@@ -47,7 +47,7 @@
 *        blank. Only used in error reports.
 *     USPEC = CHARACTER * ( * ) (Given)
 *        The user-supplied device specification. If a question mark is
-*        given, a list of available devices is given, and an error is 
+*        given, a list of available devices is given, and an error is
 *        reported.
 *     PSPEC = CHARACTER * ( * ) (Returned)
 *        The equivalent native PGPLOT device specification.
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@
 *     31-OCT-2001 (DSB):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -126,27 +126,27 @@
 *.
 
 *  Initialize.
-      PSPEC = ' '     
-      AGINAM = ' '     
+      PSPEC = ' '
+      AGINAM = ' '
 
 *  Check the inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Take a local copy of the supplied device specification, removing any
 *  white space.
-      IF( USPEC .NE. ' ' ) THEN 
+      IF( USPEC .NE. ' ' ) THEN
          CALL CHR_FANDL( USPEC, F, L )
          LSPEC = USPEC( F : L )
          CALL CHR_RMBLK( LSPEC )
       ELSE
          STATUS = SAI__ERROR
-         IF( PARAM .NE. ' ' ) THEN 
+         IF( PARAM .NE. ' ' ) THEN
             CALL MSG_SETC( 'P', PARAM )
             CALL ERR_REP( 'AGP1_TRANS_ERR1', 'Blank graphics device '//
-     :                    'specified for parameter ^P.', STATUS )         
+     :                    'specified for parameter ^P.', STATUS )
          ELSE
             CALL ERR_REP( 'AGP1_TRANS_ERR2', 'Blank graphics device '//
-     :                    'specified.', STATUS )         
+     :                    'specified.', STATUS )
          END IF
          GO TO 999
       END IF
@@ -179,7 +179,7 @@
 *  If the supplied device spec contains neither a ";" or a "/" try
 *  translating it as a logical name.
       IF( .NOT.( PGP .OR. GNS ) ) THEN
-         CALL AGP1_ENVGT( LSPEC, TRANS, OK, STATUS ) 
+         CALL AGP1_ENVGT( LSPEC, TRANS, OK, STATUS )
 
 *  If the environment variable exists, replace the supplied spec with the
 *  translation, and look for "/" and ";" characters again.
@@ -206,14 +206,14 @@
          IF( PTYPE .EQ. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'U', USPEC )
-            IF( PARAM .NE. ' ' ) THEN 
+            IF( PARAM .NE. ' ' ) THEN
                CALL MSG_SETC( 'P', PARAM )
                CALL ERR_REP( 'AGP1_TRANS_ERR4', 'Blank graphics type '//
-     :                       'specified for parameter ^P (''^U'').', 
-     :                       STATUS )         
+     :                       'specified for parameter ^P (''^U'').',
+     :                       STATUS )
             ELSE
                CALL ERR_REP( 'AGP1_TRANS_ERR5', 'Blank graphics type '//
-     :                       'specified by ''^U''.', STATUS )         
+     :                       'specified by ''^U''.', STATUS )
             END IF
             GO TO 999
          END IF
@@ -225,9 +225,9 @@
          END IF
 
 *  Attempt to translate them as environment variables.
-         CALL AGP1_ENVGT( PTYPE, TRANS, OK, STATUS ) 
+         CALL AGP1_ENVGT( PTYPE, TRANS, OK, STATUS )
          IF( OK ) PTYPE = TRANS
-         CALL AGP1_ENVGT( PFILE, TRANS, OK, STATUS ) 
+         CALL AGP1_ENVGT( PFILE, TRANS, OK, STATUS )
          IF( OK ) PFILE = TRANS
 
 *  Find the index of the PGPLOT device type in the common arrays.
@@ -245,41 +245,41 @@
             IF( PFILE .EQ. ' ' ) PFILE = AGP_PFN( ITYPE )
          END IF
 
-*  If the device spec did not included a "/", we assume a GNS name has been 
+*  If the device spec did not included a "/", we assume a GNS name has been
 *  supplied...
       ELSE
 
-*  Extract the GNS device type, and file name. 
+*  Extract the GNS device type, and file name.
          IF( GNS ) THEN
             IF( ISEP .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'U', USPEC )
-               IF( PARAM .NE. ' ' ) THEN 
+               IF( PARAM .NE. ' ' ) THEN
                   CALL MSG_SETC( 'P', PARAM )
                   CALL ERR_REP( 'AGP1_TRANS_ERR6', 'Blank graphics '//
      :                          'type specified for parameter ^P '//
-     :                          '(''^U'').', STATUS )         
+     :                          '(''^U'').', STATUS )
                ELSE
                   CALL ERR_REP( 'AGP1_TRANS_ERR7', 'Blank graphics '//
-     :                          'type specified by ''^U''.', STATUS )         
+     :                          'type specified by ''^U''.', STATUS )
                END IF
                GO TO 999
             END IF
 
-            GTYPE = LSPEC( : ISEP - 1 ) 
+            GTYPE = LSPEC( : ISEP - 1 )
             GFILE = LSPEC( ISEP + 1 : )
 
 *  If no ";" character was included, assume the supplied string is the
 *  device type, and use a blank file name.
          ELSE
             GTYPE = LSPEC
-            GFILE = ' '            
+            GFILE = ' '
          END IF
 
 *  Attempt to translate them as environment variables.
-         CALL AGP1_ENVGT( GTYPE, TRANS, OK, STATUS ) 
+         CALL AGP1_ENVGT( GTYPE, TRANS, OK, STATUS )
          IF( OK ) GTYPE = TRANS
-         CALL AGP1_ENVGT( GFILE, TRANS, OK, STATUS ) 
+         CALL AGP1_ENVGT( GFILE, TRANS, OK, STATUS )
          IF( OK ) GFILE = TRANS
 
 *  Find the index of the GNS device type in the common arrays.
@@ -300,7 +300,7 @@
       END IF
 
 *  Return the total PGPLOT spec.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          IAT = 0
          PSPEC = ' '
          CALL CHR_APPND( PFILE, PSPEC, IAT )

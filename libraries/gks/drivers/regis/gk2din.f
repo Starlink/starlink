@@ -65,11 +65,11 @@
       KWKDAT(ICY,KWKIX)=-99
       CALL GK2DDR(0,0,0)
 *
-      IF(TYPE.EQ.1720) THEN	
-        KWKDAT(MODE,KWKIX)=0			
-      ELSE			
-        KWKDAT(MODE,KWKIX)=1			
-      ENDIF			
+      IF(TYPE.EQ.1720) THEN
+        KWKDAT(MODE,KWKIX)=0
+      ELSE
+        KWKDAT(MODE,KWKIX)=1
+      ENDIF
 *
       KWKDAT(CHARHI,KWKIX)=20
       KWKDAT(CHARWI,KWKIX)=9

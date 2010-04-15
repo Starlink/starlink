@@ -122,8 +122,8 @@
 
 #define FUNC_NAME "smf_update_quality"
 
-void smf_update_quality( smfData *data, unsigned char *target, int syncbad, 
-			 const int *badmask, double badfrac, 
+void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
+			 const int *badmask, double badfrac,
 			 int *status ) {
 
   dim_t i;                      /* loop counter */
@@ -146,7 +146,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
       qual = (unsigned char *) data->pntr[2]; /* QUALITY given by smfData */
     } else {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "smfData does not contain a QUALITY component", 
+      errRep( FUNC_NAME, "smfData does not contain a QUALITY component",
               status);
       return;
     }
@@ -162,12 +162,12 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   /* Check for valid badfrac */
   if( (badfrac < 0) || (badfrac > 1) ) {
     msgSeti( "BADFRAC", badfrac );
-    errRep(FUNC_NAME, 
+    errRep(FUNC_NAME,
            "Invalid badfrac: ^BADFRAC. Must be in range (0 -- 1).", status);
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, 
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride,
                 &tstride, status );
 
   if( *status == SAI__OK ) {
@@ -181,7 +181,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
       smf_select_pntr( data->pntr, data->dtype, &ddata, NULL,
                        &idata, NULL, status);
     }
-    
+
     /* Synchronize SMF__Q_BADDA quality and VAL__BADD in data array */
     if( syncbad ) {
       if (data->dtype == SMF__DOUBLE) {
@@ -204,7 +204,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
         return;
       }
     }
-    
+
     /* Apply badmask if available */
     if( badmask || badfrac ) {
 

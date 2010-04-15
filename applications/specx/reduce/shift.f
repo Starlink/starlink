@@ -44,7 +44,7 @@ C     Ok, go...
 
       IFAIL = 0
 
-C     Set the X-scale 
+C     Set the X-scale
 
       CALL SETXNEW (XSCALE, IFAIL)
 

@@ -44,7 +44,7 @@
 ;;; Key definitions.
   (define-key starc-mode-map "\t" 'indent-according-to-mode)
   (define-key starc-mode-map "#"  'edstar-self-insert)
-  
+
 ;;;EXPERIMENTAL BIT
 (let (new-ast-routine)
 
@@ -353,11 +353,11 @@
   (new-token "#INCLUDE"
              "\\#include \"<{header_file}>.h\" /* <[comment]> */"
              '((desc . "Include \".h\" header file")))
-  
+
   (new-token "#SYSINCLUDE"
              "\\#include <<{header_file}>.h> /* <[comment]> */"
              '((desc . "Include system header file")))
-  
+
   (new-token "#UNDEF"
              "\\#undef <{macro_name}>"
              '((desc . "Undefine a macro")))
@@ -447,7 +447,7 @@
                                      (substring time 20 24)))
                   (if (= (aref date 0) ? ) (setq date (substring date 1)))
                   date)))
-  
+
   (new-place "DECLARATION_SPECIFIER"
              nil
              '((desc . "A declaration specifier.")))
@@ -526,7 +526,7 @@
 *     <{enter_further_changes_here}>"
              '((desc . "Note of when later changes were made.")
                (head . "*")))
-  
+
   (new-place "ENTER_FURTHER_CHANGES_HERE"
              "<{date}> (<{author_identifier}>):
 *        <{changes}>
@@ -545,11 +545,11 @@
              '((help . "A C expression.")
                (head . "")
                (tail . "")))
-  
+
   (new-token "EXPRESSION_STATEMENT"
              "<[expression]>"
              '((help . "An expression statement.")))
-  
+
 ;;; NB special code is used for expanding bracketed expressions so that
 ;;; any following ";" statement terminator may be removed.
   (new-token "FOR"
@@ -662,7 +662,7 @@
 		  (insert-char ?  indent)
 		  t))
              '((desc . "if (...) {...} else if (...) {...} else {...}")))
-  
+
   (new-place "INIT"
              nil
              '((help . "Initial value for the variable.")
@@ -853,7 +853,7 @@ provides.")
 		t)
              '((desc . "Return statement")
 	       (tail . ";")))
-  
+
   (new-place "RTL_HEADER_FILES"
              "/* C run-time library header files. */
 <{RTL_header}>...

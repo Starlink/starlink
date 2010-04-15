@@ -13,7 +13,7 @@
 *     RESULT = AST_STRIPESCAPES( THIS, ATTRIB )
 
 *  Description:
-*     This function is a wrap-up of the C ast_stripescapes_a function. It 
+*     This function is a wrap-up of the C ast_stripescapes_a function. It
 *     will rarely need to be used, but is provided for use on platforms
 *     where the normal mechanism for returning character strings as
 *     function results from C to Fortran (as defined in the f77.h
@@ -21,9 +21,9 @@
 *
 *     If this problem is encountered, the C macro NO_CHAR_FUNCTION
 *     should be defined (in CFLAGS) during C compilation. This will
-*     cause the function ast_stripescapes_a to be built (instead of 
-*     ast_stripescapes) and this returns its the result via an additional 
-*     initial argument. This Fortran function is then used simply to 
+*     cause the function ast_stripescapes_a to be built (instead of
+*     ast_stripescapes) and this returns its the result via an additional
+*     initial argument. This Fortran function is then used simply to
 *     transfer the argument value to the function result.
 
 *  Arguments:

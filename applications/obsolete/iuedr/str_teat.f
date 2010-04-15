@@ -49,15 +49,15 @@
 
 *   Import:
       BYTE CNTRL(256)       ! control string
- 
+
       INTEGER LAST          ! last character position
- 
+
 *   Import/Export:
       INTEGER FIRST         ! first character in CNTRL
- 
+
 *   Export:
       BYTE TOKEN(MAXTOK)    ! token string
- 
+
 *   Local variables:
       INTEGER CPOS        ! character position in TOKEN
 

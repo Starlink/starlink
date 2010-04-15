@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -119,7 +119,7 @@ int HtmlHrefCmd(
   int x, y;
   char *z;
 
-  if( Tcl_GetInt(interp, argv[2], &x) != TCL_OK 
+  if( Tcl_GetInt(interp, argv[2], &x) != TCL_OK
    || Tcl_GetInt(interp, argv[3], &y) != TCL_OK
   ){
     TestPoint(0);
@@ -371,7 +371,7 @@ int HtmlTokenHandlerCmd(
 }
 
 /*
-** WIDGET index INDEX	
+** WIDGET index INDEX
 */
 int HtmlIndexCmd(
   HtmlWidget *htmlPtr,   /* The HTML widget */
@@ -517,7 +517,7 @@ void HtmlUpdateSelection(HtmlWidget *htmlPtr, int forceUpdate){
   }else{
     TestPoint(0);
   }
-  if( htmlPtr->pSelStartBlock 
+  if( htmlPtr->pSelStartBlock
   && htmlPtr->pSelStartBlock==htmlPtr->pSelEndBlock
   && htmlPtr->selStartIndex > htmlPtr->selEndIndex
   ){
@@ -594,7 +594,7 @@ int HtmlSelectionClearCmd(
 ** position in htmlPtr->ins.
 */
 void HtmlUpdateInsert(HtmlWidget *htmlPtr){
-  HtmlIndexToBlockIndex(htmlPtr, htmlPtr->ins, 
+  HtmlIndexToBlockIndex(htmlPtr, htmlPtr->ins,
                         &htmlPtr->pInsBlock, &htmlPtr->insIndex);
   HtmlRedrawBlock(htmlPtr, htmlPtr->pInsBlock);
   if( htmlPtr->insTimer==0 ){

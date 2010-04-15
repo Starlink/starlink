@@ -16,21 +16,21 @@
 Figure 12.39 Get Fits Dialogue Box</CENTER><P>
 <!-- START
 <dir>
- <dt><strong>Title: </strong> 
+ <dt><strong>Title: </strong>
   <dd> get_statistics_on_data
- <dt><strong>Description: </strong> 
+ <dt><strong>Description: </strong>
   <dd> Returns mean, mode, median, high and low of an image
- <dt><strong>Script(s): </strong> 
+ <dt><strong>Script(s): </strong>
   <dd> red4Fits
- <dt><strong>Dialogue Box Parameter(s): </strong> 
+ <dt><strong>Dialogue Box Parameter(s): </strong>
    <dd> Filename - file to be analyzed input via entry widget
    <dd> FITS Item - fits item to be read input via entry widget
- <dt><strong>Mouse Button(s): </strong> 
+ <dt><strong>Mouse Button(s): </strong>
   <dd> MB1 - Invokes dialogue box on double-click
   <dd> MB2 - Sets the following defaults <dir>
    <dd> Filename = $RODIR/royymmdd_oooo for given UT-date
    <dd> Fits Item = OBJECT </dir>
-  <dd> MB3 - Invokes help window on single-click for the high-lighted text 
+  <dd> MB3 - Invokes help window on single-click for the high-lighted text
 </dir>
 <!-- END
 <P><HR><P>

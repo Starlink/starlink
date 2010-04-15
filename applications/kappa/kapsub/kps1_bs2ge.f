@@ -13,30 +13,30 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BS2GE( LOC, MXPAR, NXKNOT, NYKNOT, XKNOT, YKNOT, SCALE, 
+*     CALL KPS1_BS2GE( LOC, MXPAR, NXKNOT, NYKNOT, XKNOT, YKNOT, SCALE,
 *                      COEFF, WORK, STATUS )
 
 *  Description:
 *     This routine reads information describing a two-dimensional
-*     bi-cubic B-spline polynomial surface from a standard Starlink 
-*     POLYNOMIAL structure, as defined in SGP/38 and extended to 
+*     bi-cubic B-spline polynomial surface from a standard Starlink
+*     POLYNOMIAL structure, as defined in SGP/38 and extended to
 *     B-splines.  All floating-point information within the structure is
 *     returned as single precision.
 *
 *     It is assumed the calling programme needs a one-dimensional array
 *     of coefficients, where COEFF( ( IX - 1 ) * ( NYKNOT + 4 ) + IY )
 *     contains the coefficient for the (IX,IY)th term (with NYKNOT + 4
-*     being the total number of Y terms).  Such a one-dimensional array 
+*     being the total number of Y terms).  Such a one-dimensional array
 *     is used by the PDA_SURFIT and PDA_BISPEV routines and defined in
 *     the NAG manual (see Chapter E02 on "Curve and Surface fitting").
 *
 *     This routine will convert the two-dimensional coefficient array
 *     from the POLYNOMIAL structure (in the format described in SGP/38
-*     and extended to B-splines in KPS1_PL2PU), and load a flipped 
+*     and extended to B-splines in KPS1_PL2PU), and load a flipped
 *     version of this into the required one-dimensional array.
 *
 *     The routine will also read the knot positions in _INTEGER type
-*     array KNOTS (or XKNOTS and YKNOTS for older data), and a 
+*     array KNOTS (or XKNOTS and YKNOTS for older data), and a
 *     data-scaling factor in SCALE of type _REAL.
 
 *  Arguments:
@@ -59,10 +59,10 @@
 *        The scale factor applied to the data values before calculating
 *        the spline.
 *     COEFF( MXPAR * MXPAR ) = DOUBLE PRECISION (Returned)
-*        Array of B-spline polynomial coefficients, in the format used 
+*        Array of B-spline polynomial coefficients, in the format used
 *        by NAG and PDA routines (see KPS1_SUSF).
 *     WORK( MXPAR, MXPAR ) = REAL (Returned)
-*        Work array containing the two-dimensional array of 
+*        Work array containing the two-dimensional array of
 *        coefficients as read from the POLYNOMIAL structure.
 *     STATUS =  INTEGER (Given and Returned)
 *        Global status value.
@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -98,7 +98,7 @@
 *     2007 July 4 (MJC):
 *        Original version derived from KPG1_PL2GE.
 *     2009 December 17 (MJC):
-*        Use a single generic concatenated KNOTS vector as now 
+*        Use a single generic concatenated KNOTS vector as now
 *        documented in SGP/38, but for compatibility with older data
 *        test for XKNOTS and YKNOTS components if KNOTS is absent.
 *     2009 December 19 (MJC):
@@ -143,7 +143,7 @@
 *  Local variables:
       INTEGER DIM( MAXDIM )      ! Actual dimensions of coefficients
                                  ! array
-      INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients 
+      INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients
                                  ! array
       INTEGER ELX                ! Number of X knots read from structure
       INTEGER ELY                ! Number of Y knots read from structure
@@ -171,10 +171,10 @@
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'V',  VARNT )
          CALL ERR_REP( 'KPS1_BS2GE_VARIANT', 'The POLYNOMIAL '/
-     :                 /'structure has type ^V, expecting BSPLINE.', 
+     :                 /'structure has type ^V, expecting BSPLINE.',
      :                 STATUS )
        ELSE
-       
+
 *  Find out the size of the DATA_ARRAY of coefficients, and ensure it
 *  is smaller than the maximum permitted.
          CALL CMP_SHAPE( LOC, 'DATA_ARRAY', MAXDIM, DIM, NDIM, STATUS )
@@ -183,7 +183,7 @@
          NYKNOT = DIM( 2 ) - 4
 
          IF ( ( STATUS .EQ. SAI__OK ) .AND.
-     :        ( DIM( 1 ) .LE. MXPAR ) .AND. 
+     :        ( DIM( 1 ) .LE. MXPAR ) .AND.
      :        ( DIM( 2 ) .LE. MXPAR ) ) THEN
 
 *  Read the coefficients into the work array.
@@ -230,20 +230,20 @@
 *  Copy the X-axis set of knots from the work vector into returned
 *  array.
                CALL KPG1_CPNDR( 1, 1, NKNOTS,
-     :                          %VAL( CNF_PVAL( KPNTR ) ), 1, 
+     :                          %VAL( CNF_PVAL( KPNTR ) ), 1,
      :                          NXKNOT + 8, XKNOT, ELX, STATUS )
 
 *  Copy the Y-axis set of knots from the work vector into returned
 *  array, offset by the number XKNOTS.
                CALL KPG1_CPNDR( 1, 1, NKNOTS,
-     :                          %VAL( CNF_PVAL( KPNTR ) ), NXKNOT + 9, 
+     :                          %VAL( CNF_PVAL( KPNTR ) ), NXKNOT + 9,
      :                          NKNOTS, YKNOT, ELX, STATUS )
 
                CALL PSX_FREE( KPNTR, STATUS )
 
             ELSE
 
-*  Copy the knots to the XKNOTS and YKNOTS arrays within the 
+*  Copy the knots to the XKNOTS and YKNOTS arrays within the
 *  POLYNOMIAL structure.
                CALL CMP_GET1R( LOC, 'XKNOTS', NXKNOT + 8, XKNOT, ELX,
      :                         STATUS )
@@ -265,7 +265,7 @@
      :                          /'(^NX,^NY).', STATUS )
                   GO TO 999
                END IF
-            END IF 
+            END IF
 
 *  Read the data scaling factor.
             CALL CMP_GET0R( LOC, 'SCALE', SCALE, STATUS )

@@ -115,7 +115,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -224,5 +224,5 @@
      :                 'Lower bound (^LBND) exceeds upper bound ' //
      :                 '(^UBND).', STATUS )
       END IF
-       
+
       END

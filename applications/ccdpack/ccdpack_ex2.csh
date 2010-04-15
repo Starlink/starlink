@@ -10,7 +10,7 @@ ccdclear reset accept
 #
 #   Restore the general and CCD configuration.
 #
-ccdsetup restore=true restorefile=CCDPACK_SETUP.DAT reset accept 
+ccdsetup restore=true restorefile=CCDPACK_SETUP.DAT reset accept
 #
 #   Present the data to CCDPACK.
 #

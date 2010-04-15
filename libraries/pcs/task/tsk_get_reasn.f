@@ -16,7 +16,7 @@
 *     CALL TASK_GET_REASON ( REASON, STATUS )
 
 *  Description:
-*     Return an integer whose value signifies the reason for the current 
+*     Return an integer whose value signifies the reason for the current
 *     reschedule. Their possible values are:
 *       MESSYS__EXTINT
 *       MESSYS__RESCHED

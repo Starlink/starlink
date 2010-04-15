@@ -1,6 +1,6 @@
 *+  RAPGAUTH - performs a rapid 2-D gaussian smooth on a 2-D array
 
-      SUBROUTINE RAPGAUTH( SIGMA, NPIX, THRESH, DIMX, DIMY, ARRAY, ROLL, 
+      SUBROUTINE RAPGAUTH( SIGMA, NPIX, THRESH, DIMX, DIMY, ARRAY, ROLL,
      :	                   RBUF, WEIGHT, RMARGE, STATUS )
 *    Description :
 *     Replaces each pixel of the 2-D array, ARRAY, by the weighted mean of
@@ -8,7 +8,7 @@
 *     function is a gaussian of standard deviation SIGMA pixels.
 *     An immediate return will occur if STATUS has an error value on entry.
 *    Invocation :
-*      CALL RAPGAUTH( SIGMA, NPIX, DIMX, DIMY, ARRAY, ROLL, RBUF, WEIGHT, 
+*      CALL RAPGAUTH( SIGMA, NPIX, DIMX, DIMY, ARRAY, ROLL, RBUF, WEIGHT,
 *     :               RMARGE, STATUS )
 *    Parameters :
 *     SIGMA = REAL( READ )
@@ -105,7 +105,7 @@
 
 *    check for error on entry
       IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       calculate half smoothing box size rounded down and up
          HNPIX = NPIX / 2
          HNPIX1 = ( NPIX + 1 ) / 2
@@ -144,7 +144,7 @@
                ROLL( X, Y ) = ARRAY( X, 1 )
             ENDDO
          ENDDO
- 
+
 *       for remaining rows of 2-D buffer copy in 2nd to HNPIXth rows of image
          DO Y = FIRST+1, NPIX
             DO X = 1, DIMX
@@ -278,5 +278,5 @@
          ENDDO
 
       ENDIF
- 
+
       END

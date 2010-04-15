@@ -26,5 +26,5 @@
          CHOUT = CHIN(M:N)
          NCHARS = N - M + 1
       END IF
-      
+
       END

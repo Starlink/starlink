@@ -33,7 +33,7 @@
 *     be controlled using parameter TOLERANCE. Greater accuracy is
 *     bought at the cost of greater run-time, so in general only use
 *     high accuracy if it is really necessary.
- 
+
 *  Usage:
 *     SKYGRID DEVICE IN
 
@@ -41,7 +41,7 @@
 *     CLEAR = _LOGICAL (Read)
 *        True if the area of the graphics device over which the
 *        coordinate grid is to be drawn should be cleared before
-*        creating the grid.                                        [NO] 
+*        creating the grid.                                        [NO]
 *     COORDS = LITERAL (Read)
 *        Specifies the sky coordinate system to use. Valid values
 *        include ECLIPTIC, EQUATORIAL, GALACTIC. See help on
@@ -124,18 +124,18 @@
 *        fraction of the maximum dimension of the plotting zone. A
 *        negative or zero value suppresses text labels.           [0.02]
 *     TOLERANCE = _INTEGER (Read)
-*        The tolerance allowed when plotting the curves which make up 
-*        the grid. The value should be between zero and ten. Values 
-*        outside this range are take as being equal to the nearest end 
+*        The tolerance allowed when plotting the curves which make up
+*        the grid. The value should be between zero and ten. Values
+*        outside this range are take as being equal to the nearest end
 *        point of the range.  A value of zero gives minimum tolerance
-*        (i.e. maximum accuracy), at the cost of increased plotting 
+*        (i.e. maximum accuracy), at the cost of increased plotting
 *        time. A value of ten gives poorer accuracy but is faster.   [6]
-   
+
 *  Examples:
 *     SKYGRID XWINDOWS
-*        Overlay a coordinate grid on top of the most recent DATA 
-*        picture on the XWINDOWS image display. The AGI database will 
-*        usually contain the information needed to define the 
+*        Overlay a coordinate grid on top of the most recent DATA
+*        picture on the XWINDOWS image display. The AGI database will
+*        usually contain the information needed to define the
 *        coordinate grid. If it does not, then the user will be prompted
 *        for parameter IN, and the name of the displayed NDF should be
 *        given in response.
@@ -156,10 +156,10 @@
 *        o  If all else fails, the value of the IN parameter is
 *        cancelled, and the user is prompted for the NDF containing
 *        relevant astrometry information.
-*      
+*
 *     -  This routine can only be used to display coordinate grids
 *     for NDFs which contain astrometry information in the form used by
-*     the IRAS90 package. 
+*     the IRAS90 package.
 
 *  Authors:
 *     WG: Wei Gong (IPMAF)
@@ -181,7 +181,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -193,10 +193,10 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'AGI_ERR'          ! AGI_ error constants
-                                
+
 *  Status:
       INTEGER STATUS             ! Global status
-                                
+
 **** The next lines were removed for Release1.0 bugfix 9 ****
 *  Local Constants:
 *      REAL MARGIN                ! Width of margin for annotations, as a
@@ -206,9 +206,9 @@
 
 *  Local Variables:
       REAL BX1, BX2, BY1, BY2    ! Extension of base zone
-      REAL BXM, BYM              ! Size of base zone 
+      REAL BXM, BYM              ! Size of base zone
       LOGICAL CLEAR              ! True if grid zone is to be cleared
-      LOGICAL COLOUR             ! Graphic device colour flag 
+      LOGICAL COLOUR             ! Graphic device colour flag
       REAL COORSZ                ! Coordinate label size.
 **** next variable inserted for release 1.0 bugfix 9
       REAL DIMMAX                ! Maximum dimension of plotting area
@@ -229,7 +229,7 @@
                                  ! Bound of specified NDF section
       LOGICAL LINES              ! Grid line flag
       INTEGER LPXL( 2 ), UPXL( 2 )
-                                 ! Data picture ext. in pixels indices  
+                                 ! Data picture ext. in pixels indices
       INTEGER NEWPIC             ! AGI picture number for the created
                                  ! picture.
       INTEGER PENA               ! SGS pen number
@@ -255,7 +255,7 @@
 **** next variable inserted for release 1.0 bugfix 9
       REAL XMAR, YMAR            ! Width of margins
       INTEGER ZONE1              ! SGS zone ID on entry
-      INTEGER ZONEB              ! SGS zone ID for base zone 
+      INTEGER ZONEB              ! SGS zone ID for base zone
       INTEGER ZONEG              ! ID of SGS grid zone, include annotation
       INTEGER ZONEGS             ! ID of SGS grid section zone
       INTEGER ZONEP              ! SGS zone ID for the DATA picture
@@ -270,8 +270,8 @@
       CALL MSG_IFGET( STATUS )
 
 *  Open the graphic database and start up SGS on the requested graphics
-*  device. Do not clear the display. 
-      CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID1, ZONE1, 
+*  device. Do not clear the display.
+      CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID1, ZONE1,
      :                STATUS )
 
 *  Attempt to find a DATA picture.
@@ -288,7 +288,7 @@
       CALL IRM_GDTYP( 'SGS', GDTYPE, STATUS )
 
 *  Set the dynamic default value for CLEAR according to graphic device
-*  type. If the device is an image_overlay, clear the picture zone by 
+*  type. If the device is an image_overlay, clear the picture zone by
 *  default.
       IF ( GDTYPE( : 13 ) .EQ. 'IMAGE_OVERLAY' ) THEN
          CALL PAR_DEF0L( 'CLEAR', .TRUE., STATUS )
@@ -312,18 +312,18 @@
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_SETC( 'LAB', PICLAB )
          CALL MSG_OUTIF( MSG__NORM, 'SKYGRID_MSG1',
-     :                   '  DATA picture ^LAB ("^COM") being used', 
+     :                   '  DATA picture ^LAB ("^COM") being used',
      :                      STATUS )
       ELSE
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_OUTIF( MSG__NORM, 'SKYGRID_MSG2',
      :                   '  DATA picture "^COM" being used', STATUS )
-      END IF   
+      END IF
 
 *  Get an SGS zone id for the DATA picture.
       CALL AGS_NZONE( ZONEP, STATUS )
 
-*  Enquire the zone size of the DATA picture. 
+*  Enquire the zone size of the DATA picture.
       CALL SGS_IZONE( X1, X2, Y1, Y2, XM, YM )
 
 *  Enquire if GKS/SGS has reported an error.
@@ -355,7 +355,7 @@
 
 *  Find the world coordinate extent of the temporary zone.
       CALL SGS_IZONE( TX1, TX2, TY1, TY2, TXM, TYM )
-      
+
 *  Enquire if GKS/SGS has reported an error.
       CALL GKS_GSTAT( STATUS )
 
@@ -368,7 +368,7 @@
 
 *  Set the world coordinate system of the temporary zone to be
 *  continuous with that of the picture zone.
-      IF( STATUS .EQ. SAI__OK ) CALL SGS_SW( PTX1, PTX2, PTY1, PTY2, 
+      IF( STATUS .EQ. SAI__OK ) CALL SGS_SW( PTX1, PTX2, PTY1, PTY2,
      :                                       STATUS )
 
 *  Abort if an error has occurred.
@@ -422,14 +422,14 @@
 
 *  See which sky coordinate system the user wants to use.
       CALL IRA_GTSCS( 'COORDS', .TRUE., SCS, STATUS )
-       
+
 *  Get values for the parameters describing the graphics required. First
 *  see if the plot is to be annotated.
       CALL PAR_GET0L( 'LABEL', LABEL, STATUS )
 
 *  If so, get the text height and coordinate value height, and limit to
 *  unity.
-      IF( LABEL ) THEN      
+      IF( LABEL ) THEN
          CALL PAR_GET0R( 'TEXTSIZE', TEXTSZ, STATUS )
          CALL PAR_GET0R( 'COORDSIZE', COORSZ, STATUS )
          TEXTSZ = MIN( 0.99999, TEXTSZ )
@@ -447,7 +447,7 @@
 
 *  See if the grid should be the lines across the picture or just tick
 *  marks around the bounds of the picture.
-      CALL PAR_GET0L( 'LINES', LINES, STATUS )      
+      CALL PAR_GET0L( 'LINES', LINES, STATUS )
 
 *  Get the longitude and latitude gaps of the grid lines.
       CALL IRA_GETCO( 'LONINT', 'LATINT',
@@ -481,7 +481,7 @@
       ELSE
          CALL IRA_DROPT( 'LINES', -1.0D0, STATUS )
       END IF
-      
+
       CALL IRA_DROPT( 'LONG_GAP', LONINT, STATUS )
       CALL IRA_DROPT( 'LAT_GAP', LATINT, STATUS )
       CALL IRA_DROPT( 'LONG_ACC', LONACC, STATUS )
@@ -497,17 +497,17 @@
 *  If annotation is required, a zone larger than the picture is needed
 *  to contain the annotations.
       IF ( LABEL ) THEN
-                        
+
 *  Find the boundary of a zone which is larger than the overlying
 *  section to contain the annotation.
 
 ***** The next section removed for Release 1.0 bugfix 9
-*         GX1 = MAX( PTX1, GLPXL( 1 ) - 
-*     :                    MARGIN * ( GUPXL( 1 ) - GLPXL( 1 ) ) ) 
-*         GX2 = MIN( PTX2, GUPXL( 1 ) + 
-*     :                    MARGIN * ( GUPXL( 1 ) - GLPXL( 1 ) ) ) 
+*         GX1 = MAX( PTX1, GLPXL( 1 ) -
+*     :                    MARGIN * ( GUPXL( 1 ) - GLPXL( 1 ) ) )
+*         GX2 = MIN( PTX2, GUPXL( 1 ) +
+*     :                    MARGIN * ( GUPXL( 1 ) - GLPXL( 1 ) ) )
 *         GY1 = MAX( PTY1, GLPXL( 2 ) -
-*     :                    MARGIN * ( GUPXL( 2 ) - GLPXL( 2 ) ) ) 
+*     :                    MARGIN * ( GUPXL( 2 ) - GLPXL( 2 ) ) )
 *         GY2 = MIN( PTY2, GUPXL( 2 ) +
 *     :                    MARGIN * ( GUPXL( 2 ) - GLPXL( 2 ) ) )
 *****
@@ -526,18 +526,18 @@
 *  Create a zone to contain the sky grid and labels. And set the
 *  coordinate of the grid zone as that of the picture zone.
          CALL SGS_ZONE( GX1, GX2, GY1, GY2, ZONEG, STATUS )
-         CALL SGS_SW( GX1, GX2, GY1, GY2, STATUS )  
+         CALL SGS_SW( GX1, GX2, GY1, GY2, STATUS )
 
 *  If labels are not required, ...
       ELSE
 
 *  Create an SGS zone to contain only the sky grid, and set the
 *  coordinate of the zone as that of the picture zone.
-         CALL SGS_ZONE( GLPXL( 1 ), GUPXL( 1 ), GLPXL( 2 ), GUPXL( 2 ), 
+         CALL SGS_ZONE( GLPXL( 1 ), GUPXL( 1 ), GLPXL( 2 ), GUPXL( 2 ),
      :                  ZONEG, STATUS )
-         CALL SGS_SW( GLPXL( 1 ), GUPXL( 1 ), GLPXL( 2 ), GUPXL( 2 ), 
+         CALL SGS_SW( GLPXL( 1 ), GUPXL( 1 ), GLPXL( 2 ), GUPXL( 2 ),
      :                STATUS )
-    
+
       END IF
 
 *  Release the base zone and temporary zone.
@@ -546,7 +546,7 @@
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  If the clear zone  is requested, clear the zone.
       IF ( CLEAR ) CALL SGS_CLRZ
 
@@ -564,7 +564,7 @@
 *  Save the zone in which the grid will be drawn in the AGI database, as
 *  a FRAME picture.
       CALL AGS_SZONE( 'FRAME', 'IRAS90_SKYGRID', NEWPIC, STATUS )
-      
+
 *  Save the astrometry information associated with the new picture.
       CALL IRM_PTAST( NEWPIC, IDA, STATUS )
 

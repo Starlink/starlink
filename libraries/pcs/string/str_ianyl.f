@@ -13,11 +13,11 @@
 *     POSITION = STRING_IANYL ( STRING, CHOICE )
 
 *  Description:
-*     Finds the position of the first character in STRING which matches 
+*     Finds the position of the first character in STRING which matches
 *     any of the characters in CHOICE.
 
 *  Algorithm:
-*     Each character of STRING is compared with the characters in CHOICE 
+*     Each character of STRING is compared with the characters in CHOICE
 *     until a match is found, or STRING is exhausted.
 
 *  Copyright:
@@ -54,7 +54,7 @@
 
 *  Result:
 *     POSITION = INTEGER
-*           The value returned is the position in STRING at which the 
+*           The value returned is the position in STRING at which the
 *           first character match occurs.
 *           If no match found, then POSITION is set to zero.
 

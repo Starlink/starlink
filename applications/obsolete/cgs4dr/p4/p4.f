@@ -1,19 +1,19 @@
 *+ P4.FOR - Top level routine for P4 plotting task
-      SUBROUTINE P4( STATUS ) 
+      SUBROUTINE P4( STATUS )
 *    Authors :
 *     P N Daly (JACH::PND)
 *    History :
 *      4-Aug-1994: Original Unix version (PND)
 *    endhistory
-*    Type Definitions : 
-      IMPLICIT NONE 
-*    Global constants : 
-      INCLUDE 'SAE_PAR' 
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
       INCLUDE 'ADAMDEFNS'
-      INCLUDE 'ACT_ERR' 
-      INCLUDE 'PAR_PAR' 
-*    Status : 
-      INTEGER STATUS 
+      INCLUDE 'ACT_ERR'
+      INCLUDE 'PAR_PAR'
+*    Status :
+      INTEGER STATUS
 *    Global variables :
       INCLUDE 'P4COM.INC'
 *    Local variables :
@@ -22,7 +22,7 @@
 *-
 
 *    Return if status on entry is bad
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Check the context, which should be OBEY or CANCEL.
       CALL TASK_GET_CONTEXT( CONTEXT, STATUS )
@@ -40,7 +40,7 @@
            CALL P4_CLEAR( STATUS )
 
 *     Close the noticeboard.
-        ELSE IF ( NAME .EQ. 'CLOSE_NB' ) THEN 
+        ELSE IF ( NAME .EQ. 'CLOSE_NB' ) THEN
            CALL P4_CLOSE_NB( STATUS )
 
 *     Close the viewport
@@ -56,23 +56,23 @@
            CALL P4_CURSORVAL( STATUS )
 
 *     Display the data in some way
-        ELSE IF ( NAME .EQ. 'DISPLAY' ) THEN 
+        ELSE IF ( NAME .EQ. 'DISPLAY' ) THEN
            CALL P4_DISPLAY( STATUS )
 
-*     Identify the plot with username, date 
-        ELSE IF ( NAME .EQ. 'IDENTIFY' ) THEN 
+*     Identify the plot with username, date
+        ELSE IF ( NAME .EQ. 'IDENTIFY' ) THEN
            CALL P4_IDENTIFY( STATUS )
 
-*     List the common block values 
-        ELSE IF ( NAME .EQ. 'LIST_CB' ) THEN 
+*     List the common block values
+        ELSE IF ( NAME .EQ. 'LIST_CB' ) THEN
            CALL P4_LIST_CB( STATUS )
 
-*     List the noticeboard to screen 
-        ELSE IF ( NAME .EQ. 'LIST_NB' ) THEN 
+*     List the noticeboard to screen
+        ELSE IF ( NAME .EQ. 'LIST_NB' ) THEN
            CALL P4_LIST_NB( STATUS )
 
-*     Load a colour table 
-        ELSE IF ( NAME .EQ. 'LUT' ) THEN 
+*     Load a colour table
+        ELSE IF ( NAME .EQ. 'LUT' ) THEN
            CALL P4_LUT( STATUS )
 
 *     Plot an overgraph
@@ -103,19 +103,19 @@
 *     Verbose on
         ELSE IF ( NAME .EQ. 'VERBOSE' ) THEN
            VERBOSE = .TRUE.
-           CALL MSG_OUT( ' ', 'P4: Verbose messages enabled in task', STATUS ) 
+           CALL MSG_OUT( ' ', 'P4: Verbose messages enabled in task', STATUS )
 
 *     Verbose off
         ELSE IF ( NAME .EQ. 'NOVERBOSE' ) THEN
            VERBOSE = .FALSE.
-           CALL MSG_OUT( ' ', 'P4: Verbose messages disabled in task', STATUS ) 
+           CALL MSG_OUT( ' ', 'P4: Verbose messages disabled in task', STATUS )
 
 *     The action name is not recognised.
         ELSE
            STATUS = SAI__ERROR
            CALL MSG_SETC( 'NAME', NAME )
            CALL ERR_REP( ' ', 'P4: Invalid P4 action, ^NAME', STATUS )
-        ENDIF      
+        ENDIF
 
 *   Cancel the action
       ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
@@ -125,6 +125,6 @@
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'P4: Invalid P4 context', STATUS )
-      ENDIF 
+      ENDIF
 
-      END 
+      END

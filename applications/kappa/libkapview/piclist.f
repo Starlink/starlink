@@ -81,7 +81,7 @@
 
 *  Notes:
 *     -  The list is not reported to the user when PICNUM is specified
-*     on the command line.  This feature is useful where a procedure 
+*     on the command line.  This feature is useful where a procedure
 *     just wants to select a new current picture (hiding the details
 *     from the user).  A new current picture cannot be selected with
 *     text-file output, and so the presence of PICNUM on the command
@@ -146,7 +146,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -451,7 +451,7 @@
 *  Select the base picture so there is a current picture that
 *  encompasses all pictures.
                      CALL AGI_SELP( PICIDB, STATUS )
-      
+
 *  Avoid exhausting the available picture identifiers by annulling each
 *  one as we are finished with it, but do not annul the base picture or
 *  the current picture when the application began.
@@ -477,7 +477,7 @@
       CALL AGI_END( PICIDE, STATUS )
 
 *  Close the database.
-      CALL AGI_ANNUL( PICIDC, STATUS )     
+      CALL AGI_ANNUL( PICIDC, STATUS )
 
 *  Close the text file.
       IF ( LOGF ) CALL FIO_ANNUL( FD, STATUS )

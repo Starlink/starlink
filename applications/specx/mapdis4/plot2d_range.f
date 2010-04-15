@@ -1,6 +1,6 @@
 *  History:
 *     20 July 2000 (ajc):
-*        Change TYPE to PRINT 
+*        Change TYPE to PRINT
 *        Missing commas in format
 *-----------------------------------------------------------------------
 

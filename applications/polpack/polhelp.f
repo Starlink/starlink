@@ -41,17 +41,17 @@
 *        Subsubsubtopic for which help is to be given. [" "]
 
 *  Navigating the Help Tree:
-*     The text for each topic is displayed in screen-fulls. A prompt is issued 
+*     The text for each topic is displayed in screen-fulls. A prompt is issued
 *     at the end of each topic at which you may:
 *
-*        -  enter a topic and/or subtopic name(s) to display the help for 
+*        -  enter a topic and/or subtopic name(s) to display the help for
 *           that topic or subtopic, so for example, "polka parameters dpi"
 *           gives help on DPI, which is a subtopic of Parameters, which
 *           in turn is a subtopic of POLKA;
-*        -  press the RETURN key to see more text at a "Press RETURN to 
+*        -  press the RETURN key to see more text at a "Press RETURN to
 *           continue ..." request;
-*        -  press the RETURN key at topic and subtopic prompts to move up 
-*           one level in the hierarchy, and if you are at the top level it 
+*        -  press the RETURN key at topic and subtopic prompts to move up
+*           one level in the hierarchy, and if you are at the top level it
 *           will terminate the help session;
 *        -  enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
 *           response to any prompt will terminate the help session;
@@ -84,7 +84,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)

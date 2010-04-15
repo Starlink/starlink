@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SPOSA0( PARAM, IGRP, COORDS, GOTSKY, SIZE, FILE, LFILE, 
+*     CALL SPOSA0( PARAM, IGRP, COORDS, GOTSKY, SIZE, FILE, LFILE,
 *                  STATUS )
 
 *  Description:
@@ -21,12 +21,12 @@
 *     a group expression. If an error occurs trying to read the file,
 *     the user is re-prompted for a new file. Once a file has been read
 *     into a group, the first element of the group is examined. If it is
-*     the name of a valid IRA sky coordinate system, then this value is 
+*     the name of a valid IRA sky coordinate system, then this value is
 *     returned in COORDS and GOTSKY is returned true (in this case the
-*     first element is excluded from the returned group). If it is a 
-*     numerical value, the value "IMAGE COORDINATES" is returned in 
+*     first element is excluded from the returned group). If it is a
+*     numerical value, the value "IMAGE COORDINATES" is returned in
 *     COORDS and GOTSKY is returned false. If neither of these cases
-*     holds, an error is reported. 
+*     holds, an error is reported.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,10 +158,10 @@
       CALL IRA_GETEQ( COORDS, EQU, BJ, NAME, STATUS )
 
 *  If it is not a valid sky coordinate system, annul the error and see
-*  if the first element is a valid numerical value. If it is not, 
+*  if the first element is a valid numerical value. If it is not,
 *  report a more informative error. If it is, assume image coordinates.
       IF( STATUS .EQ. IRA__BADSC ) THEN
-         CALL ERR_ANNUL( STATUS )      
+         CALL ERR_ANNUL( STATUS )
 
          CALL CHR_CTOR( COORDS, TEST, STATUS )
 
@@ -179,7 +179,7 @@
          END IF
 
 *  If the file specifies a valid sky coordinate system, indicate that
-*  we have sky coordinates rather than image coordinates. Also create 
+*  we have sky coordinates rather than image coordinates. Also create
 *  a new group excluding the first element.
       ELSE
 

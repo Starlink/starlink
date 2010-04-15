@@ -37,20 +37,20 @@ void hlpHchkl ( char *record, int *level, char *name )
 
 /* Locate the first field in record */
    hlpSplit ( record, 0, &ips, &ipf );
- 
+
 /* Does it start at the beginning of the line? */
    if ( ips == 0) {
- 
+
    /* Yes: attempt to decode a decimal integer. */
       l = (int) hlpDec ( record, &ips );
- 
+
    /* Was it entirely decimal digits? */
       i = ipf + 1;
       if ( ips == i ) {
- 
+
       /* Yes: return the logical level number. */
          *level = l + levoff;
- 
+
       /* Obtain the level name if any. */
          hlpSplit ( record, i, &ips, &ipf );
          if ( ips > 0 ) {

@@ -39,7 +39,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
             CALL CHR_LDBLK( LAB )
             LABLN = CHR_LEN( LAB )
 
-*  If this NDF has different type from that of the first, set status 
+*  If this NDF has different type from that of the first, set status
 *  and exit.
             IF ( LAB( : LABLN ) .NE. LAB1( : LAB1LN ) ) THEN
                STATUS = SAI__ERROR
@@ -104,7 +104,7 @@
 *  If the routine finishes sucessfully, return the type of CRDD files
       IF ( STATUS .EQ. SAI__OK ) THEN
          TYPE = LAB1
-      
+
 *  Otherwise, return a blank string.
       ELSE
          TYPE = ' '

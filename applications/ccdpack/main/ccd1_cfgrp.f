@@ -36,7 +36,7 @@
 *        comments allowed, commas striped out, leading blanks removed
 *        -- see CCD1_RDLIN).
 *     NWORDS = INTEGER (Given)
-*        The number of words to be extracted from each line. 
+*        The number of words to be extracted from each line.
 *     MINWRD = INTEGER (Given)
 *        The minimum number of words which must exist in each line.
 *        If this number are not encountered then an error is issued
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
       INTEGER IAT                ! Position in string
       INTEGER LAST               ! Position of last character in word
       INTEGER LINNUM             ! Current line number
-      INTEGER NCHAR              ! Number of characters 
+      INTEGER NCHAR              ! Number of characters
       INTEGER NTYPE              ! Number of characters
       LOGICAL EOF                ! At end of file
       LOGICAL NOTFND             ! Next word in string not found
@@ -192,7 +192,7 @@
 *  Now extract last word. If MINWRD = NWORDS then check that this isn't
 *  blank.
                NCHAR = CHR_LEN( BUFFER ( IAT : ) )
-               IF ( NCHAR .EQ. 0 ) THEN 
+               IF ( NCHAR .EQ. 0 ) THEN
                   IF ( MINWRD .GE. NWORDS .AND. STATUS .EQ. SAI__OK )
      :            THEN
 
@@ -219,7 +219,7 @@
             END IF
          END IF
          GO TO 2
-      END IF     
+      END IF
 
  99   CONTINUE
       END

@@ -106,7 +106,7 @@ C
       INTEGER   CODE                   ! Indicates type of data structure
       CHARACTER KEYWORD*16             ! Keyword (for folding to upper case)
       CHARACTER NAME*80                ! DTA name of value data object
-      INTEGER   STRING                 ! Number of string to use 
+      INTEGER   STRING                 ! Number of string to use
 C
 C     Return immediately on bad status
 C
@@ -137,7 +137,7 @@ C
       INTEGER   CODE                   ! Indicates type of data structure
       CHARACTER KEYWORD*16             ! Keyword (for folding to upper case)
       CHARACTER NAME*80                ! DTA name of value data object
-      INTEGER   STRING                 ! Number of string to use 
+      INTEGER   STRING                 ! Number of string to use
 C
 C     Return immediately on bad status
 C
@@ -167,7 +167,7 @@ C
       INTEGER   CODE                   ! Indicates type of data structure
       CHARACTER KEYWORD*16             ! Keyword (for folding to upper case)
       CHARACTER NAME*80                ! DTA name of value data object
-      INTEGER   STRING                 ! Number of string to use 
+      INTEGER   STRING                 ! Number of string to use
 C
 C     Return immediately on bad status
 C
@@ -198,7 +198,7 @@ C
       INTEGER   CODE                   ! Indicates type of data structure
       CHARACTER KEYWORD*16             ! Keyword (for folding to upper case)
       CHARACTER NAME*80                ! DTA name of value data object
-      INTEGER   STRING                 ! Number of string to use 
+      INTEGER   STRING                 ! Number of string to use
 C
 C     Return immediately on bad status
 C
@@ -228,7 +228,7 @@ C
       INTEGER   CODE                   ! Indicates type of data structure
       CHARACTER KEYWORD*16             ! Keyword (for folding to upper case)
       CHARACTER NAME*80                ! DTA name of value data object
-      INTEGER   STRING                 ! Number of string to use 
+      INTEGER   STRING                 ! Number of string to use
 C
 C     Return immediately on bad status
 C
@@ -258,7 +258,7 @@ C
       INTEGER   CODE                   ! Indicates type of data structure
       CHARACTER KEYWORD*16             ! Keyword (for folding to upper case)
       CHARACTER NAME*80                ! DTA name of value data object
-      INTEGER   STRING                 ! Number of string to use 
+      INTEGER   STRING                 ! Number of string to use
 C
 C     Return immediately on bad status
 C

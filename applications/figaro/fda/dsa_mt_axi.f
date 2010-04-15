@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
 
 
       SUBROUTINE DSA1_MATAX( SLO1, AXIS1, SLO2, AXIS2, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -232,7 +232,7 @@
          GO TO 500
       END IF
 
-*  See if the axis data arrays exist. 
+*  See if the axis data arrays exist.
       CALL DSA1_SKAX( SLO1, AXIS1, EXST1, STATUS )
       CALL DSA1_SKAX( SLO2, AXIS2, EXST2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
@@ -251,7 +251,7 @@
      :   NDIM2, DIM2, NELM2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
-*  Compare them. First, the number of dimensions.  
+*  Compare them. First, the number of dimensions.
       IF ( NDIM2 .NE. NDIM1 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'FDA_T001', DSA__REFNAM(SLO1) )

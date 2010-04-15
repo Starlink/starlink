@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_ELMAP( SWAP, FRM, XIN, YIN, AXRIN, SIGIN, ANGIN,
-     :                       MAP, XOUT, YOUT, AXROUT, SIGOUT, ANGOUT, 
+     :                       MAP, XOUT, YOUT, AXROUT, SIGOUT, ANGOUT,
      :                       STATUS )
 *+
 *  Name:
@@ -12,13 +12,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_ELMAP( SWAP, FRM, XIN, YIN, AXRIN, SIGIN, ANGIN, MAP, 
+*     CALL KPS1_ELMAP( SWAP, FRM, XIN, YIN, AXRIN, SIGIN, ANGIN, MAP,
 *                      XOUT, YOUT, AXROUT, SIGOUT, ANGOUT, STATUS )
 
 *  Description:
 *     The parameters of an ellipse are provided (centre, axis ratio,
 *     minor axis length and major axis inclination), and the corresponding
-*     properties of the ellipse are found after transformation using the 
+*     properties of the ellipse are found after transformation using the
 *     supplied Mapping. It is assumed that the Mapping is linear, and has
 *     2 input axes and 2 output axes.
 
@@ -51,7 +51,7 @@
 *     ANGOUT = REAL (Returned)
 *        The orientation of the ellipse. For SkyFrames, this will be the
 *        position angle of the major axis. For other Frames it is the
-*        inclination of the major axis to the X axis in radians (x 
+*        inclination of the major axis to the X axis in radians (x
 *        through y positive). Returned in the range 0 - PI.
 *     STATUS = INTEGER (Returned)
 *        The global status.
@@ -86,13 +86,13 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -151,29 +151,29 @@
          MAJAXS = 0.0D0
       END IF
 
-*  Store SIN and COS of the input major axis angle.         
+*  Store SIN and COS of the input major axis angle.
       SININ = SIN( DBLE( ANGIN ) )
       COSIN = COS( DBLE( ANGIN ) )
 
 *  Store three input positions; 1) the centre, 2) one end of the minor
 *  axis, 3) one end of the major axis.
-      INPOS( 1, 1 ) = XIN 
-      INPOS( 1, 2 ) = YIN 
+      INPOS( 1, 1 ) = XIN
+      INPOS( 1, 2 ) = YIN
       INPOS( 2, 1 ) = XIN - SININ*DBLE( SIGIN )
       INPOS( 2, 2 ) = YIN + COSIN*DBLE( SIGIN )
       INPOS( 3, 1 ) = XIN + COSIN*MAJAXS
       INPOS( 3, 2 ) = YIN + SININ*MAJAXS
 
 *  Transform these using the supplied Mapping.
-      CALL AST_TRANN( MAP, 3, 2, 3, INPOS, .TRUE., 2, 3, OUTPOS, 
-     :                STATUS ) 
+      CALL AST_TRANN( MAP, 3, 2, 3, INPOS, .TRUE., 2, 3, OUTPOS,
+     :                STATUS )
 
 *  Check all the mapped values are good. If any are bad, return bad values.
-      IF( OUTPOS( 1, 1 ) .EQ. AST__BAD .OR. 
-     :    OUTPOS( 1, 2 ) .EQ. AST__BAD .OR. 
-     :    OUTPOS( 2, 1 ) .EQ. AST__BAD .OR. 
-     :    OUTPOS( 2, 2 ) .EQ. AST__BAD .OR. 
-     :    OUTPOS( 3, 1 ) .EQ. AST__BAD .OR. 
+      IF( OUTPOS( 1, 1 ) .EQ. AST__BAD .OR.
+     :    OUTPOS( 1, 2 ) .EQ. AST__BAD .OR.
+     :    OUTPOS( 2, 1 ) .EQ. AST__BAD .OR.
+     :    OUTPOS( 2, 2 ) .EQ. AST__BAD .OR.
+     :    OUTPOS( 3, 1 ) .EQ. AST__BAD .OR.
      :    OUTPOS( 3, 2 ) .EQ. AST__BAD ) THEN
          XOUT = AST__BAD
          YOUT = AST__BAD
@@ -184,20 +184,20 @@
       ELSE
 
 *  Return the mapped centre.
-         XOUT = OUTPOS( 1, 1 )      
-         YOUT = OUTPOS( 1, 2 )      
+         XOUT = OUTPOS( 1, 1 )
+         YOUT = OUTPOS( 1, 2 )
 
 *  Find the arc-length of the mapped minor axis.
          P1( 1 ) = XOUT
          P1( 2 ) = YOUT
          P2( 1 ) = OUTPOS( 2, 1 )
          P2( 2 ) = OUTPOS( 2, 2 )
-         SIGOUT = AST_DISTANCE( FRM, P1, P2, STATUS ) 
+         SIGOUT = AST_DISTANCE( FRM, P1, P2, STATUS )
 
 *  Find the arc-length of the mapped major axis.
          P2( 1 ) = OUTPOS( 3, 1 )
          P2( 2 ) = OUTPOS( 3, 2 )
-         MAJAXS = AST_DISTANCE( FRM, P1, P2, STATUS ) 
+         MAJAXS = AST_DISTANCE( FRM, P1, P2, STATUS )
 
 *  The Mapping may have resulted in the mapped "minor" axis being longer
 *  than the mapped "major" axis. In this case we swap the roles of the
@@ -211,7 +211,7 @@
             OUTPOS( 3, 2 ) = OUTPOS( 2, 2 )
             OUTPOS( 2, 1 ) = P2( 1 )
             OUTPOS( 2, 2 ) = P2( 2 )
-         END IF            
+         END IF
 
 *  Find the axis ratio.
          IF( SIGOUT .NE. 0.0 ) THEN
@@ -221,9 +221,9 @@
          END IF
 
 *  To find the bearing of the major axis, we should really have an AST
-*  function "AST_BEAR", similar to SLALIB function SLA_BEAR, which 
+*  function "AST_BEAR", similar to SLALIB function SLA_BEAR, which
 *  takes account of the geometry of the Frame. Until then we use
-*  techniques for the two common cases of simple Eucleidean and 
+*  techniques for the two common cases of simple Eucleidean and
 *  spherical geometry. First deal wil spherical geometry.
          IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
 
@@ -232,7 +232,7 @@
             IF( .NOT. SWAP ) THEN
                A = 1
                B = 2
-            ELSE 
+            ELSE
                A = 2
                B = 1
             END IF
@@ -245,7 +245,7 @@
 *  If this is not a skyframe, just use euclidean geometry.
          ELSE
             DY = OUTPOS( 3, 2 ) - YOUT
-            DX = OUTPOS( 3, 1 ) - XOUT 
+            DX = OUTPOS( 3, 1 ) - XOUT
             IF( DX .NE. 0.0 .OR. DY .NE. 0.0 ) THEN
                ANGOUT = REAL( ATAN2( DY, DX ) )
             ELSE
@@ -263,5 +263,5 @@
          END IF
 
       END IF
-         
+
       END

@@ -16,7 +16,7 @@
 *  Description:
 C      Formerly PROGRAM PRINT
 C
-C      This program reads the intermediate data file and creates a 
+C      This program reads the intermediate data file and creates a
 C      formatted file for output to a printer.
 C
 C      Most of the hardwork is done by the existing PRINT subroutine
@@ -25,7 +25,7 @@ C
 
 *  Arguments:
 *     IPARI = INTEGER (Given and Returned)
-*        
+*
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -50,7 +50,7 @@ C
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -58,7 +58,7 @@ C
       INCLUDE 'MAIN'             ! CHART control common blocks
 
 *  Globals used from MAIN.FOR:
-*  
+*
 *        AO = DOUBLE PRECISION (Read and Write)
 *           FIELD CENTRE RA AT EQUINOX 'EQUOUT'
 *        [descriptions_of_global_variables_referenced]...

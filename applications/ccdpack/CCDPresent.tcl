@@ -214,7 +214,7 @@
 		  set plural flashes
 	       }
 	       if {$CCDhaveframe($plural) && [info exists CCDndfs($plural)]} {
-                  set i 0 
+                  set i 0
 		  foreach ndf $CCDndfs($plural) {
 
 #  Initialise line intended for writing to file with the name of the NDF.

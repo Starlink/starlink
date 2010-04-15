@@ -17,6 +17,6 @@ C   is equal to zero returns 1 and NQUAD, else NQ and NQ.
       END IF
 
       RETURN
-      END 
+      END
 
 

@@ -2,16 +2,16 @@
 *+
 *  Name:
 *     PAR_MAXx
- 
+
 *  Purpose:
 *     Sets a maximum value for a parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_MAXx( PARAM, VALUE, STATUS )
- 
+
 *  Description:
 *     This routine sets a maximum value for the specified parameter.
 *     The value will be used as an upper limit for any value
@@ -27,7 +27,7 @@
 *        any RANGE specified for the parameter in the interface file.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types character,
 *     integer, real, and double precision: replace "x" in the routine
@@ -48,7 +48,7 @@
 *
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
- 
+
 *  Copyright:
 *     Copyright (C) 1990, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     AJC: A J Chipperfield (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     28-SEP-1990 (AJC):
 *        Original version.
@@ -83,38 +83,38 @@
 *        Added note concerning the minimum being greater than the
 *        maximum.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       DOUBLE PRECISION VALUE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER NAMCOD             ! Parameter index
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Find the parameter-system pointer to the internal parameter space
 *  associated with the parameter.
       CALL SUBPAR_FINDPAR( PARAM, NAMCOD, STATUS )
- 
+
 *  Set the maximum value for the parameter.
       CALL SUBPAR_MAXD( NAMCOD, VALUE, STATUS )
- 
+
       END

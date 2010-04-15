@@ -45,7 +45,7 @@
 *    Return if status on entry is not ADAM__OK
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Now set the gun levels according to the pen index 
+*    Now set the gun levels according to the pen index
       IF ( CVAL .EQ. 1 ) THEN
 
          COLOUR = 'DARK'

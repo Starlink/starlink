@@ -90,7 +90,7 @@ FORTINTER wftpri_(b,m,flags,mlen)int *b,*flags,mlen; char *m;{
 #ifdef OLDFORTRAN
 FORTINTER wftprt_(b,m,flags,length)int *b,*flags,length;char *m;{
  	char *copy = malloc((unsigned)length + 1);
-	
+
  	strncpy(copy,m,length);
  	copy[length] = '\0';
 	ftprint(to_box(b),copy,*flags);
@@ -237,7 +237,7 @@ PRIVATE void gk0xOverstrike(b,str,len,topbit)box b;unsigned char *str;{
 		gk0xbmbox(b,BMNOT);
 		/* carry on from this blank */
 	}
-}	
+}
 #ifdef FORTINTER
 FORTINTER int wftloa_(file,len)char *file; int len;{	/* char *file; */
 	return(int)gk0xftload(file);
@@ -245,7 +245,7 @@ FORTINTER int wftloa_(file,len)char *file; int len;{	/* char *file; */
 #ifdef OLDFORTRAN
 FORTINTER int wftlod_(file,length)char *file;int length;{
  	char *malloc(),*name = malloc((unsigned)length+1);
- 	
+
  	strncpy(name,file,length);
  	name[length] = '\0';
 	return(int)gk0xftload(name);

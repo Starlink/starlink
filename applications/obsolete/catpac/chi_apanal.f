@@ -213,8 +213,8 @@
           endif
         endif
       enddo
-*  
-*  take each item of Xlist in turn and check that a conversion from the 
+*
+*  take each item of Xlist in turn and check that a conversion from the
 *  input type to the output type is possible.
 *
       j = 0

@@ -22,14 +22,14 @@ C     Modified:
 C
 C     22nd Feb 1985  KS / AAO.  Modified to handle 2D data as well
 C                    as single spectra.
-C     30th Apr 1985  KS / AAO.  Check for observation time given 
+C     30th Apr 1985  KS / AAO.  Check for observation time given
 C                    but invalid added.
-C     26th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs 
+C     26th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
 C                    changed. Now uses DYN_ routines for dynamic-memory
 C                    handling.
 C     20th Dec 1990  JMS / AAO. Now handles 2D Calibration Spectrum
 C                    Data.
-C     23rd Sep 1992  HME / UoE, Starlink.  TABs removed. INCLUDE 
+C     23rd Sep 1992  HME / UoE, Starlink.  TABs removed. INCLUDE
 C                    changed.
 C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -38,7 +38,7 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions used 
+C     Functions used
 C
       LOGICAL FIG_SCRCHK
 C
@@ -101,11 +101,11 @@ C
       NX=DIMS(1)
       NY=NELM/NX
 C
-C     Get number of dimensions of Spectrum x-axis 
+C     Get number of dimensions of Spectrum x-axis
 C
       CALL DSA_AXIS_SIZE('SPECT',1,2,SXDIM,DIMS,NELM,STATUS)
       SX2=DIMS(2)
-C      
+C
 C     Get value of CALSPECT and open file
 C
       CALL DSA_INPUT('CALIB','CALSPECT',STATUS)
@@ -204,7 +204,7 @@ C
       IF (PISNS) CALL CNF_UNREGP(SXPTR)
 
 C
-C     The units of the calibrated spectrum are now the units of the 
+C     The units of the calibrated spectrum are now the units of the
 C     calibrating spectrum (since CSPIKE doesn't worry about the
 C     technicality of modifying that to include the 'per counts per
 C     second per angstrom' that it should tag on the end.  Copy that

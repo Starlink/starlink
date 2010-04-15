@@ -10,7 +10,7 @@ C     sections of constant AXIS(2), and GROWY copying into cross-
 C     sections of constant AXIS(1).  The operation performed by GROWX
 C     is the inverse of that performed by EXTRACT, and similarly
 C     for GROWY and YSTRACT.
-C     
+C
 C     Command parameters:
 C
 C     SPECTRUM    (Character) The name of the input spectrum file.
@@ -21,7 +21,7 @@ C                 not exist, or if the 'NEW' keyword is specified,
 C                 a new file is created with all other data elements
 C                 set to zero.
 C
-C     XSTART      (Numeric) The number of the first cross-section 
+C     XSTART      (Numeric) The number of the first cross-section
 C       or        into which the spectrum is to be copied.  XSTART
 C     YSTART      is used by GROWY, YSTART by GROWX.
 C
@@ -113,7 +113,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -158,7 +158,7 @@ C
       IF (VEXIST) THEN
          CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',SVPTR,SLOT,
      :                         STATUS)
-      END IF      
+      END IF
 C
 C     See if output is new or old image. A new image is opened with
 C     DSA_OUTPUT, an old image with DSA_INPUT_UPDATE.
@@ -198,12 +198,12 @@ C
          ELSE
             CALL DSA_MATCH_DIMENSION('SPECT',1,'IMAGE',2,STATUS)
          END IF
-    
+
       END IF
       IF(STATUS.NE.0)GOTO 500
 C
-C     Get the AXIS(1) or AXIS(2) start and end parameters.  
-C     If we don't have an image yet, we set ludicrous maximum 
+C     Get the AXIS(1) or AXIS(2) start and end parameters.
+C     If we don't have an image yet, we set ludicrous maximum
 C     values for the size limits.
 C
       IF (NEW) THEN
@@ -242,7 +242,7 @@ C
          NY=DIMS(2)
          CALL DSA_RESHAPE_DATA('IMAGE','SPECT',2,DIMS,STATUS)
 C
-C        Copy SPECTRUM AXIS(1) structure (if any) to appropriate 
+C        Copy SPECTRUM AXIS(1) structure (if any) to appropriate
 C        structure in IMAGE.
 C
          CALL DSA_SEEK_AXIS('SPECT',1,EXIST,STATUS)
@@ -255,7 +255,7 @@ C
                CALL DSA_RESHAPE_AXIS('IMAGE',2,'SPECT',1,NDIM,DIMS,
      :                                STATUS)
             END IF
-         END IF       
+         END IF
 
       END IF
 C

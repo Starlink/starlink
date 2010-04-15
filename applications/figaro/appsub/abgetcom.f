@@ -26,7 +26,7 @@ C         HELP          output help text
 C         RECONT        repeat fit without reselecting (R)
 C         XXXX          new centre wavelength: begin line analysis
 C                       This command is given just by specifying a
-C                       wavelength value.  COMMAND will be returned 
+C                       wavelength value.  COMMAND will be returned
 C                       as 'XXXX'. (R)
 C
 C         (R) indicates this causes the routine to return.
@@ -42,7 +42,7 @@ C     (!) NQ       (Integer) Number of iterations for continuum fit
 C     (!) DELTLAM  (Real) Wavelength range displayed.
 C     (!) LIMIT      (Logical) True if cut is to be at designated points
 C     (!) CENLAM   (Real) central displayed wavelength
-C     
+C
 C                                           KS / AAO 4th Oct 1985
 C     Modified:
 C
@@ -74,7 +74,7 @@ C
 C     Reply parameters - values are determined by the order in the
 C     ICH_KEY call.
 C
-      INTEGER SIG, DEG, ITN, LIM, NOLIM, WIDTH, CONT, FIT, 
+      INTEGER SIG, DEG, ITN, LIM, NOLIM, WIDTH, CONT, FIT,
      :        QUIT, HELP, QUEST, RECONT
       PARAMETER (SIG=1, DEG=2, ITN=3, LIM=4, NOLIM=5, WIDTH=6,
      :        CONT=7, FIT=8, QUIT=9, HELP=10, QUEST=11, RECONT=12)
@@ -118,7 +118,7 @@ C
      :              'Unrecognised command.  Use "?" or "HELP" for help',
      :                                                           STATUS)
                END IF
-            ELSE 
+            ELSE
 C
 C              If it is a recognised command, see if it is followed
 C              by a number.  (Not all commands need them, but we look
@@ -256,7 +256,7 @@ C
 C
             ELSE IF ((KEY.EQ.HELP).OR.(KEY.EQ.QUEST)) THEN
 C
-C              'HELP' 
+C              'HELP'
 C
                CALL FIG_HELP('abline',STATUS)
                IF (STATUS.NE.0) THEN

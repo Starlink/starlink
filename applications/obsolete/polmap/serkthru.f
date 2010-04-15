@@ -2,25 +2,25 @@
      &                   STOKES_U,STOKES_UV,LAMBDA,TITLE,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
-C 
+C Subroutine:
+C
 C   S E R K T H R U
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), STOKES_I (<), STOKES_Q (><), STOKES_QV (><),
 C STOKES_U (><), STOKES_UV (><), LAMBDA (<), TITLE (><), NPTS (<),
 C OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Writes a Serkowski curve onto the current xgrid
 C

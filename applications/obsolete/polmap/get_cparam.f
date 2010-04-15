@@ -1,23 +1,23 @@
       SUBROUTINE GET_CPARAM(ST,CPARAM,OK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C      G E T _  C P A R A M
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C ST (<), CPARAM (>), OK (>), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Prompts for and inputs a character string parameter.
 C

@@ -21,10 +21,10 @@
 
 *  Description:
 *     This routine displays a list of all the quality names currently
-*     defined within a supplied NDF (see task SETQUAL). The descriptive 
-*     comments which were stored with the quality names when they were 
-*     originally defined are also displayed. An option exists for also 
-*     displaying the number of pixels which hold each quality. 
+*     defined within a supplied NDF (see task SETQUAL). The descriptive
+*     comments which were stored with the quality names when they were
+*     originally defined are also displayed. An option exists for also
+*     displaying the number of pixels which hold each quality.
 
 *  Usage:
 *     showqual in [count]
@@ -80,7 +80,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -161,7 +161,7 @@
          CALL IRQ_NUMQN( LOCS, NAMES, STATUS )
          QI = .TRUE.
 
-*  If no quality names information was found, annul the error and set 
+*  If no quality names information was found, annul the error and set
 *  the number of defined names to zero.
       ELSE IF( STATUS .EQ. IRQ__NOQNI ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -190,7 +190,7 @@
          CONTXT = 0
          CALL IRQ_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
      :                   COMMNT, DONE, STATUS )
-      
+
 *  Loop round displaying each quality name in turn.
          DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
@@ -222,9 +222,9 @@
 *  Display the quality name, comment, and count.
                CALL MSG_SETI( 'CNT', QCOUNT )
                CALL MSG_SETC( 'COM', COMMNT )
-               
-               IF( .NOT. FIXED ) THEN 
-                  CALL MSG_SETI( 'B', BIT )   
+
+               IF( .NOT. FIXED ) THEN
+                  CALL MSG_SETI( 'B', BIT )
                   CALL MSG_OUT( 'SHOWQUAL_MSG2', '  '//QNAME//
      :                          ' (bit ^B) - "^COM" (^CNT)', STATUS )
                ELSE
@@ -235,8 +235,8 @@
 *  If no count is required, just display the quality name and comment.
             ELSE
                CALL MSG_SETC( 'COM', COMMNT )
-               IF( .NOT. FIXED ) THEN 
-                  CALL MSG_SETI( 'B', BIT )   
+               IF( .NOT. FIXED ) THEN
+                  CALL MSG_SETI( 'B', BIT )
                   CALL MSG_OUT( 'SHOWQUAL_MSG4', '  '//QNAME//
      :                          ' (bit ^B) - "^COM"', STATUS )
                ELSE

@@ -1,6 +1,6 @@
 
 * no plus (not a real prologue)
- 
+
 *  Name:
 *     SCULIB_BITS
 

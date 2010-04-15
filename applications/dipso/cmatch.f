@@ -34,8 +34,8 @@
 *        A string specifying the classes required for matching commands.
 *     MATCH = LOGICAL (Returned)
 *        Returned .TRUE. if the current command matches the required
-*        classification. Returned .FALSE. otherwise.      
-      
+*        classification. Returned .FALSE. otherwise.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -56,7 +56,7 @@
 *  Arguments Given:
       CHARACTER CLIST*(*)
       CHARACTER RLIST*(*)
-      
+
 *  Arguments Returned:
       LOGICAL MATCH
 
@@ -74,13 +74,13 @@
 
 *  Copy the list of required classes to a local variable.
       LRLIST = RLIST
-      
+
 *  Remove leading blanks from the record.
       CALL CHR_LDBLK( LRLIST )
 
 *  Initialise the return flag to indicate that no match has been found.
       MATCH = .FALSE.
-      
+
 *  Loop until all the class combinations have been checked, or a
 *  match has been found.
       DO WHILE( LRLIST .NE. ' ' .AND. .NOT. MATCH )
@@ -90,14 +90,14 @@
          END = 1
          CALL CHR_FIWE( LRLIST, END, STATUS )
 
-*  Store the word, and remove it from the buffer. 
+*  Store the word, and remove it from the buffer.
          COMB = LRLIST( : END )
          LRLIST( : END ) = ' '
          CALL CHR_LDBLK( LRLIST )
 
 *  Assume a match will be found.
          MATCH = .TRUE.
-         
+
 *  Check each class in the current combination.
          DO I = 1, END
             C = COMB( I : I )
@@ -115,7 +115,7 @@
                      MATCH = .FALSE.
                      GO TO 10
                   END IF
-               
+
 *  If this is a non-negated class, get the upper case equivalent.
                ELSE
                   CALL CHR_UCASE( C )
@@ -127,11 +127,11 @@
                      MATCH = .FALSE.
                      GO TO 10
                   END IF
-             
+
                END IF
 
             END IF
-            
+
          END DO
 
  10      CONTINUE

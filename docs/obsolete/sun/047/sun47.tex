@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ The contents of a magnetic tape are copied to disk by:
     $ DISMOUNT <tape>
 \end{verbatim}
 where {\tt <tape>} is the name of a magnetic tape device (eg., {\tt MTA1:,
-MUA0:}) and {\tt <diskfile>} is any valid disk file specification (which can 
+MUA0:}) and {\tt <diskfile>} is any valid disk file specification (which can
 contain a DECnet node specification).
 
 A new tape can then be created by:
@@ -216,7 +216,7 @@ When copying part of an ANSI or BACKUP tape the volume label is only written to
 the disk container file if {\tt/FILE=(START:1)}. An ANSI tape must have a
 volume label so the container file must  be appended to an already labelled
 tape (using {\tt/APPEND} and {\tt/ANSI} or {\tt/BACKUP}) if a valid ANSI format
-tape is to be created. 
+tape is to be created.
 
 If the tape being appended to contains no files (ie. it has just been
 initialised) then {\tt/ANSI} must be used so that the dummy file is

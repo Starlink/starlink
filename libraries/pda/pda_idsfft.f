@@ -1,12 +1,12 @@
- 
- 
-      SUBROUTINE PDA_IDSFFT(md,ncp,ndp,xd,yd,zd,nxi,nyi,xi,yi,zi, 
+
+
+      SUBROUTINE PDA_IDSFFT(md,ncp,ndp,xd,yd,zd,nxi,nyi,xi,yi,zi,
      :                      iwk,wk,istat,status)
- 
+
 c this subroutine performs smooth surface fitting when the pro-
 c jections of the data points in the x-y plane are irregularly
 c distributed in the plane.
- 
+
 c the input parameters are
 c     md  = mode of computation (must be 1, 2, or 3),
 c         = 1 for new ncp and/or new xd-yd,
@@ -30,21 +30,21 @@ c     xi  = array of dimension nxi containing the x
 c           coordinates of the output grid points,
 c     yi  = array of dimension nyi containing the y
 c           coordinates of the output grid points.
- 
+
 c the output parameter is
 c     zi  = doubly-dimensioned array of dimension (nxi,nyi),
 c           where the interpolated z values at the output
 c           grid points are to be stored.
 c     istat = error message.
 c     status= Starlink error status
- 
+
 c the other parameters are
 c     iwk = integer array of dimension
 c              max0(31,27+ncp)*ndp+nxi*nyi
 c           used internally as a work area,
 c     wk  = array of dimension 5*ndp used internally as a
 c           work area.
- 
+
 c the very first call to this subroutine and the call with a new
 c ncp value, a new ndp value, and/or new contents of the xd and
 c yd arrays must be made with md=1.  the call with md=2 must be
@@ -59,19 +59,19 @@ c mended unless there are evidences that dictate otherwise.
 
 c this subroutine calls the idcldp, idgrid, idpdrv, idptip, and
 c idtang subroutines.
- 
-c  Starlink Status.     
+
+c  Starlink Status.
       INTEGER STATUS                  ! Global status
-   
+
 c declaration statements
-      dimension xd(100), yd(100), zd(100), xi(101), yi(101), zi(10201), 
+      dimension xd(100), yd(100), zd(100), xi(101), yi(101), zi(10201),
      :          iwk(13301), wk(500)
       common /idpi  / itpv
       integer istat
 
 *  these variables seem to require caching between calls - TIMJ
       save nl, nt
- 
+
 c   check the inherited error status.
       if (STATUS.NE.0) return
 
@@ -82,7 +82,7 @@ c (for md=1,2,3)
       ndp0 = ndp
       nxi0 = nxi
       nyi0 = nyi
- 
+
 c error check.  (for md=1,2,3)
       if ( md0.ge.1 .and. md0.le.3 ) then
          if ( ncp0.ge.2 .and. ncp0.lt.ndp0 ) then
@@ -106,7 +106,7 @@ c error check.  (for md=1,2,3)
                      iwk(3) = nxi0
                      iwk(4) = nyi0
                   end if
- 
+
 c allocation of storage areas in the iwk array.  (for md=1,2,3)
                   jwipt = 16
                   jwiwl = 6*ndp0 + 1
@@ -115,10 +115,10 @@ c allocation of storage areas in the iwk array.  (for md=1,2,3)
                   jwiwp = 30*ndp0 + 1
                   jwipc = 27*ndp0 + 1
                   jwigp0 = max0(31, 27+ncp0)*ndp0
- 
+
 c triangulates the x-y plane.  (for md=1)
                   if ( md0.le.1 ) then
-                     call PDA_IDTANG(ndp0,xd,yd,nt,iwk(jwipt),nl, 
+                     call PDA_IDTANG(ndp0,xd,yd,nt,iwk(jwipt),nl,
      :                               iwk(jwipl),iwk(jwiwl),
      :                               iwk(jwiwp),wk,istat)
                      iwk(5) = nt
@@ -128,7 +128,7 @@ c triangulates the x-y plane.  (for md=1)
                         return
                      end if
                   end if
- 
+
 c determines ncp points closest to each data point.  (for md=1)
                   if ( md0.le.1 ) then
                      call PDA_IDCLDP(ndp0,xd,yd,ncp0,iwk(jwipc),istat)
@@ -137,12 +137,12 @@ c determines ncp points closest to each data point.  (for md=1)
                         return
                      end if
                   end if
- 
+
 c sorts output grid points in ascending order of the triangle
 c number and the border line segment number.  (for md=1,2)
                   if ( md0.ne.3 ) then
-                     call PDA_IDGRID(xd,yd,nt,iwk(jwipt), 
-     :                               nl,iwk(jwipl),nxi0,nyi0,xi,yi, 
+                     call PDA_IDGRID(xd,yd,nt,iwk(jwipt),
+     :                               nl,iwk(jwipl),nxi0,nyi0,xi,yi,
      :                               iwk(jwngp0+1),iwk(jwigp0+1),
      :                               istat)
                   end if
@@ -151,7 +151,7 @@ c estimates partial derivatives at all data points.
 c (for md=1,2,3)
                   call PDA_IDPDRV(ndp0,xd,yd,zd,ncp0,iwk(jwipc),
      :                            wk,istat)
- 
+
 c interpolates the zi values.  (for md=1,2,3)
                   itpv = 0
                   jig0mx = 0
@@ -175,8 +175,8 @@ c interpolates the zi values.  (for md=1,2,3)
                            izi = iwk(jwigp)
                            iyi = (izi-1)/nxi0 + 1
                            ixi = izi - nxi0*(iyi-1)
-                           call PDA_IDPTIP(xd,yd,zd,nt,iwk(jwipt),nl, 
-     :                                     iwk(jwipl),wk,iti,xi(ixi), 
+                           call PDA_IDPTIP(xd,yd,zd,nt,iwk(jwipt),nl,
+     :                                     iwk(jwipl),wk,iti,xi(ixi),
      :                                     yi(iyi),zi(izi),istat)
  2                      continue
                      end if
@@ -190,8 +190,8 @@ c interpolates the zi values.  (for md=1,2,3)
                            izi = iwk(jwigp)
                            iyi = (izi-1)/nxi0 + 1
                            ixi = izi - nxi0*(iyi-1)
-                           call PDA_IDPTIP(xd,yd,zd,nt,iwk(jwipt),nl, 
-     :                                     iwk(jwipl),wk,iti,xi(ixi), 
+                           call PDA_IDPTIP(xd,yd,zd,nt,iwk(jwipt),nl,
+     :                                     iwk(jwipl),wk,iti,xi(ixi),
      :                                     yi(iyi),zi(izi),istat)
  4                      continue
                      end if
@@ -202,11 +202,11 @@ c interpolates the zi values.  (for md=1,2,3)
             end if
          end if
       end if
- 
+
 c error exit
- 
+
  100  continue
       istat = 4
       status=1
- 
+
       end

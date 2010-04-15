@@ -201,7 +201,7 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 			              "unset noglob\n"
 			              "echo $r\n" );
          }
-	 
+
 /* sh shell:								    */
 /* ========								    */
 /* Include the "no shell" case, as the "sh" shell is still used in this	    */

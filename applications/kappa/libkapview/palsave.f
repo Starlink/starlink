@@ -93,7 +93,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
          END DO
       END IF
 
-*  Save the reserved colours in an NDF. First specify the dimensions of the 
+*  Save the reserved colours in an NDF. First specify the dimensions of the
 *  new NDF.
       DIMS( 1 ) = NPRICL
       DIMS( 2 ) = CTM__RSVPN

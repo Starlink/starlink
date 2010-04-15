@@ -40,7 +40,7 @@
 *     a graphics cursor (see help on "Quality_in_IRAS90" for more
 *     information about the use of quality in IRAS90).
 *
-*     Some of these features may be controlled using a primative 
+*     Some of these features may be controlled using a primative
 *     "Graphical User Interface".
 
 *  Usage:
@@ -59,7 +59,7 @@
 *                                        [current sky coordinate system]
 *     CURSOR = _LOGICAL (Read)
 *        If a true value is supplied, then the "Graphical User
-*        Interface" will be used (if possible). Otherwise, a parameter 
+*        Interface" will be used (if possible). Otherwise, a parameter
 *        interface will be used.                                 [FALSE]
 *     DATA = _REAL (Write)
 *        This is an output parameter to which is written the last data
@@ -180,7 +180,7 @@
 *        "Change Parameters" option is selected using parameter NEXT.
 *        It can take the following values (or any un-ambiguous
 *        abbreviation):
-*        
+*
 *           REDRAW DISPLAY - Redraw the display using the new parameter
 *           values.
 *
@@ -219,7 +219,7 @@
 *           giving a maximum cross scan distance. This also causes new
 *           Y limits and trace offsets to be calculated and used. New
 *           detectors may also be selected using the DET# option.
-*           
+*
 *        If the "Graphical User Interface" is being used (see parameter
 *        CURSOR), then the parameter PARAM is not used, but these
 *        options can be selected from a menu using the graphics cursor.
@@ -260,17 +260,17 @@
 *        then a definition of the name is added to the NDF. The user is
 *        warned if the quality name is already defined within the NDF.
 *     SCNPSN = _REAL (Write)
-*        This is an output parameter consisting of an array of two 
-*        values. The first is the last in-scan position and the second 
-*        is the last cross-scan position displayed using the "Get Data 
+*        This is an output parameter consisting of an array of two
+*        values. The first is the last in-scan position and the second
+*        is the last cross-scan position displayed using the "Get Data
 *        Value" or "Draw Point Source" options (selected using parameter
 *        NEXT or through the "Graphical User Interface").
 *     SKYPSN = _DOUBLE (Write)
-*        This is an output parameter consisting of an array of two 
-*        values. The first is the last sky longitude and the second 
-*        is the last sky latitude displayed using the "Get Data 
+*        This is an output parameter consisting of an array of two
+*        values. The first is the last sky longitude and the second
+*        is the last sky latitude displayed using the "Get Data
 *        Value" or "Draw Point Source" options (selected using parameter
-*        NEXT or through the "Graphical User Interface"). Both values 
+*        NEXT or through the "Graphical User Interface"). Both values
 *        are in radians.
 *     SPACE = LITERAL (Read)
 *        Specifies the method by which the vertical offset for each
@@ -329,13 +329,13 @@
 *        is to give the extension a type identical to its name.       []
 *     YLIMIT = _REAL (Read)
 *        The upper and lower limits of the Y axis, in the units
-*        specified by parameter UNITS. 
+*        specified by parameter UNITS.
 
 *  The Display:
 *     The contents of the display can be controlled using the parameter
 *     OMIT. This allows various parts of the display to be optionally
 *     omitted.
-*     
+*
 *     The main item in the display is the rectangular area containing
 *     the actual data traces (the "data area"). The bottom edge of this
 *     rectangle has a scale indicating distance along the scan in
@@ -388,10 +388,10 @@
 *     subtract the offset for the detector listed in the offset table.
 *     In fact it is much easier to use the "Get Data Value" option to do
 *     this! (see parameter NEXT). The table also lists the "cross scan
-*     distance" of each trace. This is the offset (in arc-minutes) from 
+*     distance" of each trace. This is the offset (in arc-minutes) from
 *     the CRDD file reference position to the detector track (positive
 *     in the same sense as the focal plane Z coordinate).
-*     
+*
 *     All graphics are produced within the sub-region of the current
 *     AGI picture, specified by parameters PXSIZE and PYSIZE (by default
 *     the entire picture is used). Two new pictures are created within
@@ -506,7 +506,7 @@
 *     option.
 
 *  Examples:
-*     TRACECRDD CENA_B1S3 
+*     TRACECRDD CENA_B1S3
 *        This command would display traces from the CRDD file CENA_B1S3.
 *        The user is prompted for parameters DETS, XLIMIT and YLIMIT
 *        before the traces are drawn. After the traces have been drawn
@@ -528,7 +528,7 @@
 *        obtaining values for the parameters NEXT and PARAM, rather than
 *        the keyboard. In addition, only those samples which have both
 *        the qualities FRED and TOM are displayed.
-*        
+*
 
 *  Authors:
 *     WG: Wei Gong (IPMAF)
@@ -538,7 +538,7 @@
 *  History:
 *     5-APR-1991 (WG):
 *        Original version.
-*        (Based on the INTERIM version CRDDTRACE by DSB ) 
+*        (Based on the INTERIM version CRDDTRACE by DSB )
 *     18-NOV-1992 (DSB):
 *        Modified for inclusion in the IRAS90 release (quality
 *        assignment, OMIT parameter, re-write of prologue, etc).
@@ -548,7 +548,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -562,7 +562,7 @@
       INCLUDE 'IRC_PAR'          ! IRC constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error values.
-                                
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -574,7 +574,7 @@
       INTEGER CHR_LEN            ! Used length of a character string
       INTEGER IRC_DETIN          ! The index of a detector
 
-*  Local Variables:     
+*  Local Variables:
       CHARACTER COORDS*( IRA__SZSCS ) ! User specified sky coordinates
                                       ! system
       CHARACTER CRDUNT*( IRC__SZULS ) ! Units of data in CRDD NDF file
@@ -583,7 +583,7 @@
       CHARACTER FILNAM*( GRP__SZFNM )! File name of logging file
       CHARACTER MENU*128         ! Option list of next action
       CHARACTER NAME*( GRP__SZFNM ) ! The full name of the input NDF.
-      CHARACTER PTITLE*( GRP__SZFNM ) ! The title of the display    
+      CHARACTER PTITLE*( GRP__SZFNM ) ! The title of the display
       CHARACTER QEXP*(IRQ__SZQEX)! Current value of parameter QEXP.
       CHARACTER SELITM*20        ! Selected item
       CHARACTER UNITS*( IRC__SZUNI )  ! User specified display units
@@ -609,11 +609,11 @@
       INTEGER EDET               ! End detector index of data array of
                                  ! CRDD NDF file
       INTEGER ESMP               ! End sample index of data array of
-                                 ! CRDD NDF file 
+                                 ! CRDD NDF file
       INTEGER FID                ! The identifier of logging file
       INTEGER FLNMLN             ! Used length of FILNAM string
       INTEGER I                  ! Do loop index
-      INTEGER IDC                ! IRC identifier for CRDD NDF file    
+      INTEGER IDC                ! IRC identifier for CRDD NDF file
       INTEGER IGRP               ! GRP identifier for group containing
                                  ! the input NDF name.
       INTEGER INDF               ! Identifier for CRDD NDF file
@@ -650,7 +650,7 @@
       LOGICAL COLOUR             ! Colour available flag
       LOGICAL CURSOR             ! Cursor available flag
       LOGICAL EXIT               ! Flag of exiting do loop 2
-      LOGICAL FLAGS(8)           ! Flags indicating which parts of the 
+      LOGICAL FLAGS(8)           ! Flags indicating which parts of the
                                  ! display are required.
       LOGICAL LOGING             ! Logging flag
       LOGICAL LOOP               ! True if looping is selected.
@@ -662,7 +662,7 @@
 
       REAL AVERAG( I90__MAXDT )  ! Average of each data trace
       REAL COFST( 2 )            ! Coordinate offset
-      REAL COSCL( 2 )            ! Coordinate scale 
+      REAL COSCL( 2 )            ! Coordinate scale
       REAL SCALE( I90__MAXDT )   ! Scale factor to convert data from
                                  ! original units to user specified one
       REAL SGMA( I90__MAXDT )    ! Sigma of each data trace
@@ -689,7 +689,7 @@
 *  Get the input CRDD file. This is obtained as a group expression even
 *  though only 1 NDF is required so that the user can use wild-cards to
 *  complete long file names (for instance).
-      CALL IRM_RDNDF( 'NDF',  1, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'NDF',  1, 1, '  Give more NDF names...',
      :                IGRP, NIN, STATUS )
       CALL NDG_NDFAS( IGRP, 1, 'UPDATE', INDF, STATUS )
 
@@ -741,7 +741,7 @@
          CALL FIO_WRITE( FID, ' ', STATUS )
          CALL FIO_WRITE( FID, ' Contains a log of all the values '//
      :                  'displayed with the "GET DATA VALUE" ', STATUS )
-         CALL FIO_WRITE( FID, ' and "DRAW POINT SOURCE" options.', 
+         CALL FIO_WRITE( FID, ' and "DRAW POINT SOURCE" options.',
      :                   STATUS )
          CALL FIO_WRITE( FID, ' ', STATUS )
          CALL FIO_WRITE( FID, ' Input CRDD file:   '//
@@ -753,14 +753,14 @@
 *  If logging is not required, set the flag to indicate this.
       ELSE
          LOG = 0
-      
+
       END IF
 
 *  Inquire the bound of the data array of the input NDF.
       CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
 
 *  Store the indices of beggining and end samples, and beggining and end
-*  detectors. 
+*  detectors.
       BSMP = LBND( 1 )
       ESMP = UBND( 1 )
       BDET = LBND( 2 )
@@ -775,11 +775,11 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 998
 
-*  Get the global properties, the in-scan distance and x-scan distance 
-*  of the input CRDD file. 
-      CALL TRACA1( IDC, BSMP, ESMP, BDET, EDET, %VAL( IPDATA ), BAND, 
-     :             REFRA, REFDEC, ADET, SCNDIR, %VAL( IPNTR ), XSCN, 
-     :             YMX, YMN, AVERAG, SGMA, NVAL, NAVAIL, STATUS )    
+*  Get the global properties, the in-scan distance and x-scan distance
+*  of the input CRDD file.
+      CALL TRACA1( IDC, BSMP, ESMP, BDET, EDET, %VAL( IPDATA ), BAND,
+     :             REFRA, REFDEC, ADET, SCNDIR, %VAL( IPNTR ), XSCN,
+     :             YMX, YMN, AVERAG, SGMA, NVAL, NAVAIL, STATUS )
 
 *  If there are no detectors available for selection, set status, report
 *  the error and exit.
@@ -794,7 +794,7 @@
 *  not satisfying the quality expression supplied by parameter QEXP are
 *  set bad.
       CALL PSX_CALLOC( EL, '_REAL', DPNTR, STATUS )
-  
+
 *  Copy the required samples from the input DATA array to the temporary
 *  array pointed to by DPNTR.
       CALL TRACC5( 'QEXP', INDF, EL, %VAL( IPDATA ), %VAL( DPNTR ),
@@ -803,7 +803,7 @@
 *  Get the cross-scan range which defines the list of default detectors.
       CALL PAR_GET1R( 'XSCAN', 2, XSCAN, ACTVAL, STATUS )
 
-* If only one value was supplied, use equal and opposite limits.      
+* If only one value was supplied, use equal and opposite limits.
       IF( ACTVAL .EQ. 1 ) THEN
          XSCAN( 1 ) = -ABS( XSCAN( 1 ) )
          XSCAN( 2 ) = -XSCAN( 1 )
@@ -823,7 +823,7 @@
 *  available in the input NDF.
       CALL TRACA2( IDC, NAVAIL, BDET, EDET, ADET, XSCN, XSCAN, DET,
      :             NDISP, DETLIS, DETLN, STATUS )
-      
+
 *  Establish the list as the default for parameter DETS.
       CALL PAR_DEF0C( 'DETS', DETLIS( : DETLN ), STATUS )
 
@@ -869,11 +869,11 @@
      :             'XLIMIT', XLMT, STATUS )
 
 *  Get vertical display limits.
-      CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, %VAL( IPNTR ), 
-     :             %VAL( DPNTR ), NDISP, DTINDX, SCALE, XLMT, 
+      CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, %VAL( IPNTR ),
+     :             %VAL( DPNTR ), NDISP, DTINDX, SCALE, XLMT,
      :             YMX, YMN, 'YLIMIT', YLMT, STATUS )
 
-*  See which parts of the display are to be omitted. Use a dynamic 
+*  See which parts of the display are to be omitted. Use a dynamic
 *  default of "NOTHING".
       CALL PAR_DEF0C( 'OMIT', 'NOTHING', STATUS )
       CALL TRACC2( 'OMIT', FLAGS, STATUS )
@@ -882,11 +882,11 @@
       CALL AGI_BEGIN
 
 *  Open a SGS workstation.
-      CALL IRM_GROPN( 'DEVICE', 'PXSIZE', 'PYSIZE', .TRUE., 
-     :             'IRAS90_TRACECRDD', PIC0, PIC1, ZONE, COLOUR, 
+      CALL IRM_GROPN( 'DEVICE', 'PXSIZE', 'PYSIZE', .TRUE.,
+     :             'IRAS90_TRACECRDD', PIC0, PIC1, ZONE, COLOUR,
      :              CURSOR, CLRBLK, STATUS )
 
-*  If cursor is available on the graphic device and the device can be 
+*  If cursor is available on the graphic device and the device can be
 *  partly cleared, see if user wants to use the cursor.
       IF ( CURSOR .AND. CLRBLK ) THEN
          CALL PAR_GET0L( 'CURSOR', USECUR, STATUS )
@@ -917,7 +917,7 @@
          CALL TRACA7( BSMP, ESMP, BDET, EDET, %VAL( IPNTR ), XSCN,
      :               %VAL( DPNTR ), UNITS, REFRA, REFDEC, COORDS,
      :               NDISP, DET, DTINDX, SCALE, XLMT, YLMT, PTITLE,
-     :               SCNDIR, COLOUR, AVERAG, OFFMTD, FLAGS, OFFSET, 
+     :               SCNDIR, COLOUR, AVERAG, OFFMTD, FLAGS, OFFSET,
      :               STATUS )
 
 *  If looping is selected, enter do loop 2 for further action.
@@ -925,7 +925,7 @@
             EXIT = .FALSE.
             DO WHILE( .NOT.EXIT .AND. STATUS .EQ. SAI__OK )
 
-*  If using cursor is specified, clear a block on the current SGS zone 
+*  If using cursor is specified, clear a block on the current SGS zone
 *  and display a menu for user to select an item
                ITEMNO = 0
                SELITM = ' '
@@ -934,7 +934,7 @@
                   CALL IRM_HMENU( 6, MENU, NROW, 2, -0.2, 1.2, -0.3,
      :                            -0.22, 'Select an item by '/
      :                          /'positioning cursor and pressing '/
-     :                          /'any key.', COLOUR, 1, 0.02, .TRUE., 
+     :                          /'any key.', COLOUR, 1, 0.02, .TRUE.,
      :                           ITEMNO, STATUS )
 
                   SELITM = ' '
@@ -942,7 +942,7 @@
 *  Otherwise, select an item from the keyboard.
                ELSE
                   CALL PAR_CHOIC( 'NEXT', 'Redraw display', MENU,
-     :                            .FALSE., SELITM, STATUS ) 
+     :                            .FALSE., SELITM, STATUS )
                   CALL PAR_CANCL( 'NEXT', STATUS )
 
                END IF
@@ -951,9 +951,9 @@
                IF ( ITEMNO .EQ. 3 .OR. SELITM( : 17 ) .EQ.
      :                                      'CHANGE PARAMETERS' ) THEN
                   CALL TRACA8( 'PARAM', 'DETS', 'DEVICE', 'PXSIZE',
-     :                         'PYSIZE', 'XLIMIT', 'YLIMIT', 'PTITLE', 
+     :                         'PYSIZE', 'XLIMIT', 'YLIMIT', 'PTITLE',
      :                         'UNITS', 'SPACE', 'OFFSET', 'OMIT',
-     :                         'QEXP', 'XSCAN', INDF, IDC, BSMP, ESMP, 
+     :                         'QEXP', 'XSCAN', INDF, IDC, BSMP, ESMP,
      :                         BDET, EDET, %VAL( IPNTR ), XSCN,
      :                         %VAL( IPDATA), %VAL( DPNTR ), CRDUNT,
      :                         YMX, YMN, NAVAIL, ADET, QEXP, DET,
@@ -968,7 +968,7 @@
 *  Exit do loop 2 to redraw the display with new parameters.
                   EXIT = .TRUE.
 
-*  If 'Redraw display' is specified. 
+*  If 'Redraw display' is specified.
                ELSE IF ( ITEMNO .EQ. 2 .OR. SELITM( : 14 ) .EQ.
      :                                      'REDRAW DISPLAY' ) THEN
 
@@ -976,7 +976,7 @@
                   IF ( STATUS .EQ. SAI__OK ) CALL SGS_CLRZ
 
 *  Exit do loop 2.
-                  EXIT = .TRUE.      
+                  EXIT = .TRUE.
 
 *  If 'Quit' is specified, exit do loop 2 and quit do loop 1.
                ELSE IF ( ITEMNO .EQ. 1 .OR. SELITM( : 4 ) .EQ.
@@ -998,7 +998,7 @@
                      QUIT = .TRUE.
 
 *  Otherwise, clear the field used to display data values.
-                  ELSE 
+                  ELSE
                      CALL SGS_CLRBL( -0.55, -0.1, -0.15, -0.05 )
                      CALL SGS_CLRBL( -0.55, 1.2, -0.5, -0.13 )
                      CALL SGS_FLUSH
@@ -1008,10 +1008,10 @@
                ELSE IF ( ITEMNO .EQ. 5 .OR. SELITM( : 17 ) .EQ.
      :                                      'DRAW POINT SOURCE' ) THEN
                   CALL TRACB0( BSMP, ESMP, BDET, EDET, %VAL( IPNTR ),
-     :                         XSCN, %VAL( IPDATA ), SCNDIR,  NDISP, 
-     :                         OFFSET, DET, DTINDX, SCALE, XLMT, YLMT, 
+     :                         XSCN, %VAL( IPDATA ), SCNDIR,  NDISP,
+     :                         OFFSET, DET, DTINDX, SCALE, XLMT, YLMT,
      :                         BAND, IDC, 'SRCDET', 'SRCPSN', 'SRCPEAK',
-     :                        'PROFILES', 'DATDET', 'SCNPSN', 'SKYPSN', 
+     :                        'PROFILES', 'DATDET', 'SCNPSN', 'SKYPSN',
      :                        'PEAK', COORDS, UNITS, COLOUR, CURSOR,
      :                         CLRBLK, FID, LOG, STATUS )
 
@@ -1020,13 +1020,13 @@
                      QUIT = .TRUE.
 
 *  Otherwise, clear the field used to display data values.
-                  ELSE 
+                  ELSE
                      CALL SGS_CLRBL( -0.55, -0.1, -0.15, -0.05 )
                      CALL SGS_CLRBL( -0.55, 1.2, -0.5, -0.13 )
                      CALL SGS_FLUSH
                   END IF
 
-*  If 'Assign quality' is specified... 
+*  If 'Assign quality' is specified...
                ELSE IF ( ITEMNO .EQ. 6 .OR. SELITM( : 14 ) .EQ.
      :                                      'ASSIGN QUALITY' ) THEN
 
@@ -1042,7 +1042,7 @@
                      QUIT = .TRUE.
 
 *  Otherwise, clear the field used to display instructions.
-                  ELSE 
+                  ELSE
                      CALL SGS_CLRBL( -0.55, 1.2, -0.5, -0.13 )
                   END IF
 
@@ -1064,8 +1064,8 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO  997
 
-*  Now save the data picture in the AGI data base. Select the 'FRAME' 
-*  picture as current picture. 
+*  Now save the data picture in the AGI data base. Select the 'FRAME'
+*  picture as current picture.
       CALL AGI_SELP( PIC1, STATUS )
 
 *  Set up a zone which covers the area used for the data curves.
@@ -1075,8 +1075,8 @@
 *  data values. The X axis is left unchanged. This is because the
 *  displayed units (in arc-mins) may decrease from left to right, and
 *  AGI can only cope with coordinates which increase from left to right.
-      CALL SGS_SW( 0.0, 1.0, YLMT( 1 ), YLMT( 2 ), STATUS ) 
- 
+      CALL SGS_SW( 0.0, 1.0, YLMT( 1 ), YLMT( 2 ), STATUS )
+
 *  Save the current SGS zone in the database.
       CALL AGS_SZONE( 'DATA', 'IRAS90_TRACECRDD', PIC2, STATUS )
 
@@ -1107,17 +1107,17 @@
       CALL AGI_END( PIC0, STATUS )
       CALL AGI_CANCL( 'DEVICE', STATUS )
 
-*  If log file was opened, and some logging has been done, close the 
+*  If log file was opened, and some logging has been done, close the
 *  file and cancel the parameter.
  998  CONTINUE
 
-      IF( LOGING ) THEN 
+      IF( LOGING ) THEN
          IF ( LOG .GE. 0 ) THEN
             CALL FIO_CANCL( 'LOGFILE', STATUS )
 
 *  Or if log file was opened, but no logging has been done, cancel the
 *  parameter and then delete the file.
-         ELSE 
+         ELSE
             CALL FIO_FNAME( FID, FILNAM, STATUS )
             CALL FIO_CANCL( 'LOGFILE', STATUS )
             FLNMLN = CHR_LEN( FILNAM )

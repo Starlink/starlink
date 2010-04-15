@@ -53,30 +53,30 @@
 *  Local Variables:
       DOUBLE PRECISION ANGLE     ! Position angle of detector track at
                                  ! point of closest approach of
-                                 ! detector with index 1 to the 
+                                 ! detector with index 1 to the
                                  ! reference point.
       INTEGER BAND               ! IRAS band no. of data in CRDD file.
-      REAL CLZFP                 ! Focal plane Z at point of closest 
-                                 ! approach of detector with index 1 
+      REAL CLZFP                 ! Focal plane Z at point of closest
+                                 ! approach of detector with index 1
                                  ! to the reference point.
-      REAL CLSAMP                ! Sample no. at point of closest 
-                                 ! approach of detector with index 1 
+      REAL CLSAMP                ! Sample no. at point of closest
+                                 ! approach of detector with index 1
                                  ! to the reference point.
       DOUBLE PRECISION DEC       ! DEC of point of closest approach of
-                                 ! detector with index 1 to the 
+                                 ! detector with index 1 to the
                                  ! reference point.
       INTEGER IDC                ! IRC identifier for CRDD file.
       INTEGER INDF               ! NDF identifier for CRDD file.
       REAL NOMSPD                ! Nominal scan speed of CRDD file.
       INTEGER OBS                ! OBS of data in CRDD file.
       DOUBLE PRECISION RA        ! RA of point of closest approach of
-                                 ! detector with index 1 to the 
+                                 ! detector with index 1 to the
                                  ! reference point.
       DOUBLE PRECISION REFDEC    ! DEC of CRDD reference point.
       DOUBLE PRECISION REFRA     ! RA of CRDD reference point.
       INTEGER SOP                ! SOP of data in CRDD file.
-      REAL SPEED                 ! Scan speed at point of closest 
-                                 ! approach of detector with index 1 
+      REAL SPEED                 ! Scan speed at point of closest
+                                 ! approach of detector with index 1
                                  ! to the reference point.
 
 *.
@@ -94,10 +94,10 @@
       CALL IRC_IMPRT( INDF, IDC, STATUS )
 
 *  Get the global information from the CRDD file.
-      CALL IRC_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD, SOP, OBS, 
+      CALL IRC_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD, SOP, OBS,
      :               STATUS )
 
-*  Check band number, SOP and OBS. If any item is not correct, report 
+*  Check band number, SOP and OBS. If any item is not correct, report
 *  an error.
       IF( BAND .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -120,7 +120,7 @@
      : 'IRC_TEST: Band no. is ^OBS, should be 0', STATUS )
       END IF
 
-*  Find the closest approach of the detector with index 1 to the 
+*  Find the closest approach of the detector with index 1 to the
 *  reference point.
       CALL IRC_DCLAP( IDC, 1, REFRA, REFDEC, CLSAMP, CLZFP, STATUS )
 
@@ -128,7 +128,7 @@
       CALL IRC_DPOS( IDC, 1, CLSAMP, 1, RA, DEC, ANGLE, SPEED, STATUS )
 
 *  If either the RA or the DEC is wrong, report an error.
-      IF( ABS( RA - 3.4932870310024 ) .GT. 7.0D-6 .AND. 
+      IF( ABS( RA - 3.4932870310024 ) .GT. 7.0D-6 .AND.
      :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETD( 'RA', RA )

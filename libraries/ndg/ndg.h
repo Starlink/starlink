@@ -9,12 +9,12 @@
 
 *  Description:
 *     This module defines the C interface to the functions of the ADAM NDG
-*     library. The file ndg_adam.c contains C wrappers for the Fortran 
+*     library. The file ndg_adam.c contains C wrappers for the Fortran
 *     GRP routines.
 
 *  Notes:
 *     - Given the size of the NDg library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use NDG from C extend this file (and
 *     ndg_adam.c) to include any functions which they need but which are
 *     not already included.

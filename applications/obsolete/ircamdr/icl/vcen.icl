@@ -20,9 +20,9 @@ proc vcen
   create afile "vcen.dat"
   loop for jj = j1 to j2
     im = "c"&jj
-    print "Centroiding images " (im) 
+    print "Centroiding images " (im)
     send plt2d set cursor_image (im)
-    obeyw plt2d nsigma (im) 
+    obeyw plt2d nsigma (im)
     obeyw plt2d line_width 2
     if iflag = 0
       iflag = 1

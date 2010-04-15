@@ -3,7 +3,7 @@ C+
 C
 C     F I G _ T F O R M D
 C
-C     Rebin utility routine.  Given an x-value (RX) in the 
+C     Rebin utility routine.  Given an x-value (RX) in the
 C     rebinned data, calculates the corresponding wavelength
 C     and returns (X) the corresponding x-value in the original
 C     data.
@@ -15,22 +15,22 @@ C     instead of wavelength coefficients.  This makes the routine
 C     quite different, and perhaps a little cruder.  This routine
 C     This is a double precision version of the routine FIG_TFORM,
 C     intended for use by FIG_REBIND.
-C                            
+C
 C     Parameters -    (">" input, "!" modified, "<" output)
 C
-C     (>) RX     (Double precision) The x-value in the rebinned data.  
+C     (>) RX     (Double precision) The x-value in the rebinned data.
 C                This is a bin number.
-C     (>) WAVES  (Double precision  array) The wavelength values for 
+C     (>) WAVES  (Double precision  array) The wavelength values for
 C                the centers of the bins of the original data.
-C     (>) WAVESR (Double precision array) The wavelength values for 
+C     (>) WAVESR (Double precision array) The wavelength values for
 C                the centers of the bins of the rebinned data.
 C     (!) IX     (Integer) Passed as an initial bin number at which to
 C                start searching for X, so must be a valid bin number.
 C                Returned as the number of one of the bins used in
 C                the interpolation for X, and so probably a good
 C                starting place for the next call.
-C     (<) X      (Double precision) The x-value in the original data 
-C                corresponding to the wavelength at bin RX in the 
+C     (<) X      (Double precision) The x-value in the original data
+C                corresponding to the wavelength at bin RX in the
 C                rebinned data.  This is also a bin number.
 C
 C     Common variables used -
@@ -46,13 +46,13 @@ C                - ie the dimension of WAVES
 C     (>) NBINR  (Integer) The number of bins in the rebinned array
 C                - ie the dimension of WAVESR
 C
-C     All common variables in 
+C     All common variables in
 C
 C     COMMON /REBIN_INFO/ UP,LOGS,LOGSR,NBIN,NBINR
 C
 C     Method -
 C
-C     The wavelength corresponding to RX is found by linear 
+C     The wavelength corresponding to RX is found by linear
 C     interpolation between the closest array elements in WAVESR.
 C     A search through WAVES, starting from IX, finds the nearest
 C     two values to that wavelength and X is then calculated by

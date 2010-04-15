@@ -1,7 +1,7 @@
 ************************************************************************
-      SUBROUTINE FPEAK(IMAGE, CLIP, SKY, SIGMA, VSKY, 
+      SUBROUTINE FPEAK(IMAGE, CLIP, SKY, SIGMA, VSKY,
      :                 APAR, PADU, NX, NY, CODE, STATUS)
-     
+
 *+
 *  Name :
 *     FPEAK
@@ -73,42 +73,42 @@
 
 *  Global Constants :
 
-      INCLUDE 'SAE_PAR' 
+      INCLUDE 'SAE_PAR'
 
-*  Arguments Given : 
+*  Arguments Given :
 
       INTEGER NX, NY
 
       REAL IMAGE(NX, NY)
       REAL CLIP, SEE
       REAL PADU
-      REAL SKY, SIGMA, VSKY           
-      
+      REAL SKY, SIGMA, VSKY
+
 *  Arguments Given and Returned :
 
       REAL APAR(6)
- 
+
 *  Arguments Returned :
-      
+
       CHARACTER * ( 2 ) CODE
 
-*  Local Variables :  
+*  Local Variables :
 
-      INTEGER STATUS  
-      
+      INTEGER STATUS
+
       INTEGER IPOS1, IPOS2, I, J
       REAL XPOS, YPOS
       REAL STAR, SAFE
 
-*  Unused arguments from SUMFLX      
+*  Unused arguments from SUMFLX
       REAL ERROR, BESTN
-      
+
 *.
 
 *   Check status on entry - return if not o.k.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN      
-      
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
 *   Define the loop counters
 
       IPOS1=NINT(APAR(5))
@@ -116,17 +116,17 @@
 
 *   Start looking
 
-      DO I=IPOS1-1, IPOS1+1 
+      DO I=IPOS1-1, IPOS1+1
             DO J=IPOS2-1, IPOS2+1
 	          APAR(5)=REAL(I)
 		  APAR(6)=REAL(J)
-		  
+
 *   Call SUMFLX with dummy SATURE argument, 1E+06, we don't
 *   want it falling over in a heap on saturated stars at this
 *   point, save that for later
-	  
-		  CALL SUMFLX(IMAGE, CLIP, SKY, SIGMA, VSKY, 
-     :                        APAR, PADU, 1.0E+24, NX, NY, ERROR, 
+
+		  CALL SUMFLX(IMAGE, CLIP, SKY, SIGMA, VSKY,
+     :                        APAR, PADU, 1.0E+24, NX, NY, ERROR,
      :                        BESTN, STAR, CODE, STATUS)
                   IF((I.EQ.IPOS1-1) .AND. (J.EQ.IPOS2-1)) THEN
 		         SAFE = STAR
@@ -139,24 +139,24 @@
 			       YPOS = REAL(J)
 			 END IF
 	          ENDIF
-            END DO	    
+            END DO
       END DO
-      
+
       APAR(5) = XPOS
-      APAR(6) = YPOS       
-      
+      APAR(6) = YPOS
+
 *   End of routine
 
   99  CONTINUE
 
-      END       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-         
+      END
+
+
+
+
+
+
+
+
+
+

@@ -3,9 +3,9 @@ proc GetCat { } {
 #+ GetCat
 #
 #  Get the details to specify a catalogue.  The details are the name of
-#  the catalogue, any comments to be added to it and the various options for 
+#  the catalogue, any comments to be added to it and the various options for
 #  the items to be included in the catalogue.
-#  
+#
 #  Given
 #    none.
 #
@@ -55,7 +55,7 @@ proc GetCat { } {
      global saveCatComm
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -195,7 +195,7 @@ proc GetCat { } {
           .getcat.button.opt.text.value  delete 0 end
           .getcat.button.opt.text.value  insert 0 "No"
           .getcat.button.opt.text.value  configure  -state disabled
- 
+
           global localCatText
           set    localCatText "F"
          }
@@ -239,7 +239,7 @@ proc GetCat { } {
        -command {HelpText GetCat_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getcat.button.ctrl.default -relief sunken -bd 1

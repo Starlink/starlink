@@ -13,7 +13,7 @@
 *     CALL KPG1_FFTBD( M, N, IN, WORK, OUT, STATUS )
 
 *  Description:
-*     The input array should hold a Fourier transform of a purely real 
+*     The input array should hold a Fourier transform of a purely real
 *     image, in Hermitian format as produced by KPG1_FFTFD, or
 *     KPG1_HMLTD.  The inverse FFT of this image is taken and returned
 *     in OUT.
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     1995 September 7 (MJC):
 *        Used PDA_ prefix for FFTPACK routines.
 *     13-DEC-2003 (DSB):
-*        Use KPG1_DNAG2R in stead of PDA_DNAG2R.  KPG1_DNAG2R uses 
+*        Use KPG1_DNAG2R in stead of PDA_DNAG2R.  KPG1_DNAG2R uses
 *        workspace to achieve greater speed.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL.
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,7 +105,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Column counter
       INTEGER IPW                ! Pointer to work space
@@ -138,7 +138,7 @@
 *  Transform each column of the current output array.
       DO I = 1, M
 
-*  Copy this column to the end of the work array, beyond the part used 
+*  Copy this column to the end of the work array, beyond the part used
 *  to store trig. functions.
          DO  J = 1, N
             WORK( IW + J ) = OUT( I, J )
@@ -151,7 +151,7 @@
 
 *  Copy the transformed column back to the output array.
          DO  J = 1, N
-            OUT( I, J ) = WORK( IW + J ) 
+            OUT( I, J ) = WORK( IW + J )
          END DO
 
       END DO
@@ -160,13 +160,13 @@
 *  FFT of the input image rows.
       CALL PDA_DRFFTI( M, WORK )
 
-*  Transform each row of the output array. 
+*  Transform each row of the output array.
       DO J = 1, N
          CALL KPG1_DNAG2R( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) ) )
          CALL PDA_DRFFTB( M, OUT( 1, J ), WORK )
       END DO
 
-*  Free work space 
+*  Free work space
       CALL PSX_FREE( IPW, STATUS )
 
       END

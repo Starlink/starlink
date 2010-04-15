@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -54,29 +54,29 @@ into a finite number of pixels. Let these pixel values be $f_{j}$ where $j$ goes
 from 1 to $M$, the number of pixels in the image. Let the mean surface
 brightness of the {\em sky} averaged over the area covered by pixel $j$ be
 $g_{j}$. The finite resolution of the image will cause $f_{j}$ and $g_{j}$ to be
-different. 
+different.
 
-If the image is made up from $N$ CRDD samples with values $D_{k}$ (where $k$ is 
+If the image is made up from $N$ CRDD samples with values $D_{k}$ (where $k$ is
 in the range 1 to $N$), then each sample value can be represented (ignoring
 noise) by the equation:
 
 \begin {equation}
-D_{k}=\Omega_{k}.\sum_{j=1}^{M} P_{jk}.g_{j} 
+D_{k}=\Omega_{k}.\sum_{j=1}^{M} P_{jk}.g_{j}
 \end {equation}
 
 where $\Omega_{k}$ is the effective solid angle of the detector in steradians,
 and $P_{jk}$ is the response of sample $k$ to sky pixel $j$. The $P_{jk}$ values
-are normalised so that 
+are normalised so that
 
 \begin {equation}
-\sum_{j=1}^{M} P_{jk} = 1.0 
+\sum_{j=1}^{M} P_{jk} = 1.0
 \end {equation}
 
 Each CRDD sample is a measure of flux (or flux density), but can be converted to
 a measure of surface brightness by dividing the sample value by it's effective
 solid angle. The resulting surface brightness value is a measure of the typical
 sky brightness over the sky area to which the sample was sensitive (i.e the sky
-pixels for which $P_{jk}$ is greater than zero). 
+pixels for which $P_{jk}$ is greater than zero).
 
 If the detector centre position for each CRDD sample is mapped into the frame of
 the output image from MAPCRDD, they will be unevenly distributed across the
@@ -84,8 +84,8 @@ image. To estimate the surface brightness of a single pixel in the map
 ($f_{j}$), one should look at the nearby CRDD samples. Each sample will give a
 different estimate for the mean sky surface brightness in that area. Obviously,
 greater importance should be put on the sample values which are closest to the
-pixel, and possibly on sample values which are more accurate. MAPCRDD forms each 
-output pixel value as the weighted mean of all nearby input data samples. 
+pixel, and possibly on sample values which are more accurate. MAPCRDD forms each
+output pixel value as the weighted mean of all nearby input data samples.
 
 \begin{equation}
 f_{j}=\frac{\sum_{k=1}^{N}W_{kj}.(\frac{D_{k}}{\Omega_{k}})}
@@ -93,9 +93,9 @@ f_{j}=\frac{\sum_{k=1}^{N}W_{kj}.(\frac{D_{k}}{\Omega_{k}})}
 \label {EQ:FJ}
 \end{equation}
 
-where $f_{j}$ is the $j$th pixel value in units of $Jy/Sr$, $D_{k}$ is the value 
-of the $k$th input data sample in units of Janskys, $\Omega_{k}$ is the solid 
-angle of the $k$th input data sample in units of steradians, $W_{kj}$ is the 
+where $f_{j}$ is the $j$th pixel value in units of $Jy/Sr$, $D_{k}$ is the value
+of the $k$th input data sample in units of Janskys, $\Omega_{k}$ is the solid
+angle of the $k$th input data sample in units of steradians, $W_{kj}$ is the
 weight of the $k$th input data sample at the $j$th output pixel, $N$ is the
 number of input data samples.
 
@@ -107,7 +107,7 @@ other pixels are given a weight of zero. In this case, a pixel is only affected
 by those CRDD samples for which the corresponding mask area includes the pixel
 in question. Pixels which lie {\em partially} inside the detector mask are given
 a weight in proportion to the fraction of the pixel area which lies within the
-detector mask. 
+detector mask.
 \item A sample is given a weight which is a Gaussian function of the
 displacement from the pixel to the detector centre. Thus samples which are
 further away from the pixel get a lower weight than those closer to the pixel.
@@ -117,12 +117,12 @@ product of the in-scan and cross-scan Gaussian functions. This scheme is further
 modified by clipping the Gaussian functions to zero at the edges of the
 geometric mask of the detector. Again, the weight assigned to pixels which lie
 {\em partially} inside the detector mask is reduced in proportion to the
-fraction of the pixel area which lies outside the detector mask. 
+fraction of the pixel area which lies outside the detector mask.
 
 \end{enumerate}
 
 In either case, the weights are initially normalize so that the total weight of
-each sample is unity (but see section \ref {SEC:ACC}), that is: 
+each sample is unity (but see section \ref {SEC:ACC}), that is:
 
 \begin{equation}
 \sum_{j=1}^{M}W_{kj}=1.0
@@ -132,12 +132,12 @@ for all $k$.
 
 The ``ideal'' weighting scheme (in the least squares sense) is one in which the
 weight of each sample value is equal to the response of the detector to a sky
-pixel at the same position as the image pixel. This scheme is not supported by 
+pixel at the same position as the image pixel. This scheme is not supported by
 MAPCRDD.
 
 In practice, the first step to mapping a CRDD sample into an image is to find
-the detector centre and orientation within the image frame. The geometric 
-boundary of the detector mask can then be ``traced'' over the pixel array, as 
+the detector centre and orientation within the image frame. The geometric
+boundary of the detector mask can then be ``traced'' over the pixel array, as
 illustrated in the following diagram:
 
 \setlength{\textwidth}{190mm}
@@ -169,15 +169,15 @@ illustrated in the following diagram:
 \end{picture}
 \setlength{\textwidth}{160mm}
 
-The above diagram shows an array of image pixels with the outline of a detector 
+The above diagram shows an array of image pixels with the outline of a detector
 mask superimposed, centred on the symbol ``\verb+x+''.
 
 
-Having positioned the sample within the image frame, the next task is to 
+Having positioned the sample within the image frame, the next task is to
 evaluate the weights $W_{kj}$ to be assigned to each pixel. To do this
 the mask area is divided up into rectangular ``sectors'' which ideally
 are much smaller than a pixel. These sectors have edges which are parallel to
-the mask edges, rather than the image edges, as shown in the diagram below. 
+the mask edges, rather than the image edges, as shown in the diagram below.
 
 \setlength{\textwidth}{190mm}
 \setlength{\unitlength}{0.5mm}
@@ -230,13 +230,13 @@ as a 2-dimensional Gaussian function), and are normalised so that they have a
 sum of unity. A temporary pixel grid is created to hold the pixel weights, and
 the pixel values are set to zero. The sector weights are then binned into the
 pixel grid (i.e. each sector weight is summed into the total weight of the
-closest pixel). 
+closest pixel).
 
-Ideally, a new set of pixel weights should be calculated for each sample, 
-because of the fact that the alignment of the sector and pixel grids will have 
-changed. In the previous diagram, the centre of the sector grid (marked by the 
-\verb+x+ symbol) was positioned at the centre of a pixel, in the following 
-diagram it is positioned towards a corner of a pixel, and the weights will be 
+Ideally, a new set of pixel weights should be calculated for each sample,
+because of the fact that the alignment of the sector and pixel grids will have
+changed. In the previous diagram, the centre of the sector grid (marked by the
+\verb+x+ symbol) was positioned at the centre of a pixel, in the following
+diagram it is positioned towards a corner of a pixel, and the weights will be
 different in each pixel as a result:
 
 \setlength{\textwidth}{190mm}
@@ -286,20 +286,20 @@ Calculating these weights for every sample is time consuming, and the need to do
 this can be avoided by storing sets of pre-computed pixel weights for several
 different offsets between pixel and sector grids. When mapping a sample value,
 the set of pixel weights used is that for which the offset is closest to the
-offset between the sample centre and the centre of the closest pixel. 
+offset between the sample centre and the centre of the closest pixel.
 
 These sets of pixel weights assume some particular orientation and image scale.
-Both these values can change slightly over the course of a long scan (of 
+Both these values can change slightly over the course of a long scan (of
 several degrees), thus invalidating the pixel weights. For this reason, a check
-is made for each sample that the orientation and image scale have not changed 
-significantly since the last sets of pixel weights were calculated. If some 
+is made for each sample that the orientation and image scale have not changed
+significantly since the last sets of pixel weights were calculated. If some
 significant change {\em is} found, then new pixel weights are calculated.
 
 Having found the sample weight $W_{kj}$ associated with each pixel, the weight
-is multiplied by the sample's surface brightness value $(D_{k}/\Omega_{k})$ and 
-summed into a pixel grid holding the running sum of these values. The weight 
-itself is summed into another pixel grid holding the the running sum of the 
-weights. After all samples have been mapped, the first pixel grid is divided by 
+is multiplied by the sample's surface brightness value $(D_{k}/\Omega_{k})$ and
+summed into a pixel grid holding the running sum of these values. The weight
+itself is summed into another pixel grid holding the the running sum of the
+weights. After all samples have been mapped, the first pixel grid is divided by
 the second to get the properly normalised surface brightness image.
 
 \subsection{Small Detectors}
@@ -310,7 +310,7 @@ divided between fewer pixels). Pixels which had contributions from both small
 and full size detectors would thus be unduly influenced by the small detector
 values. To get round this, the total weight assigned to a detector (i.e. the sum
 of the pixel weights) is reduced in proportion to the detector size, thus giving
-the same weight per pixel to both small and full size detectors. 
+the same weight per pixel to both small and full size detectors.
 
 \subsection{Weighing the more Accurate CRDD Samples}
 \label {SEC:ACC}
@@ -318,7 +318,7 @@ CRDD files may contain variance values $V_{k}$ associated with each CRDD sample
 $D_{k}$. In this case, the variance of the surface brightness estimate
 $(D_{k}/\Omega_{k})$ is $V_{k}.\Omega_{k}^{-2}$. In order to give greater weight
 to the more accurate samples, the weights $W_{kj}$ in equations \ref{EQ:FJ} and
-\ref{EQ:WS} should be replaced by $W^{\prime}_{kj}$  where 
+\ref{EQ:WS} should be replaced by $W^{\prime}_{kj}$  where
 
 \begin{equation}
 W^{\prime}_{kj}=\frac{W_{kj}}{V_{k}.\Omega_{k}^{-2}}
@@ -327,7 +327,7 @@ W^{\prime}_{kj}=\frac{W_{kj}}{V_{k}.\Omega_{k}^{-2}}
 
 \section{Estimating the Variance of each Output Pixel Value}
 \label {SEC:VAR}
-There are two ways of producing a variance estimate $\sigma^{2}_{j}$ for each 
+There are two ways of producing a variance estimate $\sigma^{2}_{j}$ for each
 output pixel value $f_{j}$:
 
 \begin{enumerate}
@@ -349,23 +349,23 @@ extent. Also, samples from different scans can have different zero levels (due
 to changes in the detectors, electronics, etc, or to changes in zodiacal
 background), which do not effect the stored variance values. Thus, this method
 will usually underestimate the uncertainty in the output surface brightness
-estimates. 
+estimates.
 
 \item
 
 The second approach to estimating the uncertainty in each output pixel value
-is to base it on the spread of the CRDD samples that contributed to the pixel. 
-This method can be used if there are no variance values available for the input 
+is to base it on the spread of the CRDD samples that contributed to the pixel.
+This method can be used if there are no variance values available for the input
 CRDD.
 Using this method, each contributing CRDD sample is (after division by the
 effective solid angle) considered to be an estimate of the surface brightness at
 the required pixel, and variation in these CRDD samples is considered to be due
 to noise. Of course, in practice such variation will also be partly due to
-spatial structure in the surface brightness image. 
+spatial structure in the surface brightness image.
 
-The variance of the surface brightness at the pixel is then just the mean of 
+The variance of the surface brightness at the pixel is then just the mean of
 the squared residuals between the input CRDD sample values and the output pixel
-surface brightness. 
+surface brightness.
 
 \begin{equation}
 \sigma^{2}_{j}=\frac{\sum_{k=1}^{N}W\prime_{kj}.(\frac{D_{k}}{\Omega_{k}}-f_{j})^{2}}
@@ -383,23 +383,23 @@ or equivalently
 This method of calculating output variances has the advantage that differences
 in zero level between different data streams are reflected in higher output
 variances. However, it also has the disadvantage that the resulting variances
-will artificially increase in regions of high spatial structure. 
+will artificially increase in regions of high spatial structure.
 
 \end{enumerate}
 
 \section{Pseudo-code}
 The following is high-level pseudo-code describing the algorithm used by MAPCRDD
-if no output variances are required: 
+if no output variances are required:
 
 \begin{verbatim}
-      Create a 2D array representing the array of sectors covering a 
+      Create a 2D array representing the array of sectors covering a
       full-size detector.
 
       Store the sector weights in the array just created.
 
       Normalise the sector weights to have a total sum of unity.
 
-      Create two 2D grids the same size as the output map. Grid 1 will hold the 
+      Create two 2D grids the same size as the output map. Grid 1 will hold the
       sum of the weighted CRDD samples at each pixel, and grid 2 will hold the
       sum of the weights at each pixel.
 
@@ -409,9 +409,9 @@ if no output variances are required:
 
          For each detector...
 
-            Find the linear transformation coefficients which transform sector 
-            indices to focal plane coordinate offsets from the detector centre. 
-            This transformation will effectively shrink the sector array to the 
+            Find the linear transformation coefficients which transform sector
+            indices to focal plane coordinate offsets from the detector centre.
+            This transformation will effectively shrink the sector array to the
             size of the detector.
 
             Reduce each sector weight in proportion to the detector size.
@@ -419,24 +419,24 @@ if no output variances are required:
             Set the "saved" scan angle, and X and Y image scales to bad values.
 
             For each sample...
-      
-               Find the linear transformation coefficients which transform 
-               focal plane coordinate offsets from the detector centre to 
-               pixel coordinates. This transformation locates the sample 
+
+               Find the linear transformation coefficients which transform
+               focal plane coordinate offsets from the detector centre to
+               pixel coordinates. This transformation locates the sample
                within the two pixel grids.
 
                Calculate the current scan angle, and the X and Y image scales.
 
-               If any of these are significantly different to the "saved" 
+               If any of these are significantly different to the "saved"
                values, then...
-                  
+
                   Calculate a new set of pixel weight grids.
 
                   "Save" the current scan angle, and X and Y image scale.
 
                End if
 
-               Find the fractional pixel X and Y offset between the centre of 
+               Find the fractional pixel X and Y offset between the centre of
                the detector and the centre of the closest pixel.
 
                Find the pixel weight grid which corresponds to these offsets.
@@ -446,11 +446,11 @@ if no output variances are required:
                   Modify the pixel weight by dividing it by the variance of
                   the current CRDD sample (converted to a surface brightness).
 
-                  Increment the corresponding pixel value in grid 1 by the 
+                  Increment the corresponding pixel value in grid 1 by the
                   product of the modified pixel weight and the sample
                   value (converted to a surface brightness).
 
-                  Increment the corresponding pixel value in grid 2 by the 
+                  Increment the corresponding pixel value in grid 2 by the
                   modified pixel weight.
 
                Next pixel.
@@ -466,27 +466,27 @@ if no output variances are required:
 
 \end{verbatim}
 
-If not all input CRDD files have associated variance values, then the above 
-pseudo-code must be changed slightly by removing the line which modifies the 
+If not all input CRDD files have associated variance values, then the above
+pseudo-code must be changed slightly by removing the line which modifies the
 pixel weights, and then using the original (un-modified) pixel weights when
 incrementing the two pixel grids.
 
-If all input CRDD files have associated variance values, and these variance 
-values are to be used to generate output variances using the first method 
-described in section \ref {SEC:VAR}, then the following pseudo-code 
+If all input CRDD files have associated variance values, and these variance
+values are to be used to generate output variances using the first method
+described in section \ref {SEC:VAR}, then the following pseudo-code
 is used:
 
 \begin{verbatim}
-      Create a 2D array representing the array of sectors covering a 
+      Create a 2D array representing the array of sectors covering a
       full-size detector.
 
       Store the sector weights in the array just created.
 
       Normalise the sector weights to have a total sum of unity.
 
-      Create three 2D grids the same size as the output map. Grid 1 will hold 
-      the sum of the weighted CRDD samples at each pixel, grid 2 will hold 
-      the sum of the weights at each pixel, and grid 3 will hold the sum of the 
+      Create three 2D grids the same size as the output map. Grid 1 will hold
+      the sum of the weighted CRDD samples at each pixel, grid 2 will hold
+      the sum of the weights at each pixel, and grid 3 will hold the sum of the
       weighted input variances.
 
       Store zeros in every element of the three pixel grids.
@@ -495,9 +495,9 @@ is used:
 
          For each detector...
 
-            Find the linear transformation coefficients which transform sector 
-            indices to focal plane coordinate offsets from the detector centre. 
-            This transformation will effectively shrink the sector array to the 
+            Find the linear transformation coefficients which transform sector
+            indices to focal plane coordinate offsets from the detector centre.
+            This transformation will effectively shrink the sector array to the
             size of the detector.
 
             Reduce each sector weight in proportion to the detector size.
@@ -505,24 +505,24 @@ is used:
             Set the "saved" scan angle, and X and Y image scales to bad values.
 
             For each sample...
-      
-               Find the linear transformation coefficients which transform 
-               focal plane coordinate offsets from the detector centre to 
-               pixel coordinates. This transformation locates the sample 
+
+               Find the linear transformation coefficients which transform
+               focal plane coordinate offsets from the detector centre to
+               pixel coordinates. This transformation locates the sample
                within the two pixel grids.
 
                Calculate the current scan angle, and the X and Y image scales.
 
-               If any of these are significantly different to the "saved" 
+               If any of these are significantly different to the "saved"
                values, then...
-                  
+
                   Calculate a new set of pixel weight grids.
 
                   "Save" the current scan angle, and X and Y image scale.
 
                End if
 
-               Find the fractional pixel X and Y offset between the centre of 
+               Find the fractional pixel X and Y offset between the centre of
                the detector and the centre of the closest pixel.
 
                Find the pixel weight grid which corresponds to these offsets.
@@ -532,16 +532,16 @@ is used:
                   Modify the pixel weight by dividing it by the variance of
                   the current CRDD sample (converted to a surface brightness).
 
-                  Increment the corresponding pixel value in grid 1 by the 
+                  Increment the corresponding pixel value in grid 1 by the
                   product of the modified pixel weight and the sample
                   value (converted to a surface brightness).
 
-                  Increment the corresponding pixel value in grid 2 by the 
+                  Increment the corresponding pixel value in grid 2 by the
                   modified pixel weight.
 
                   Increment the corresponding pixel value in grid 3 by the
                   product of the square of the modified pixel weight and the
-                  variance of the current CRDD sample (converted to a surface 
+                  variance of the current CRDD sample (converted to a surface
                   brightness).
 
                Next pixel.
@@ -555,28 +555,28 @@ is used:
       Divide pixel grid 1 by pixel grid 2 to get the output surface brightness
       values.
 
-      Divide pixel grid 3 by the square of pixel grid 2 to get the output 
+      Divide pixel grid 3 by the square of pixel grid 2 to get the output
       variance values.
 
 \end{verbatim}
 
-If output variances are required but no input variances are available, then the 
-output variances must be based on the spread of input CRDD values as 
-described in the second method in section \ref {SEC:VAR}. In this case, the 
+If output variances are required but no input variances are available, then the
+output variances must be based on the spread of input CRDD values as
+described in the second method in section \ref {SEC:VAR}. In this case, the
 following pseudo-code is used:
 
 \begin{verbatim}
 
-      Create a 2D array representing the array of sectors used to map a 
+      Create a 2D array representing the array of sectors used to map a
       full-size detector.
 
       Store the sector weights in the array just created.
 
       Normalise the sector weights to have a total sum of unity.
 
-      Create three 2D grids the same size as the output map. Grid 1 will hold 
-      the sum of the weighted CRDD samples at each pixel, grid 2 will hold 
-      the sum of the weights at each pixel, and grid 3 will hold the sum of the 
+      Create three 2D grids the same size as the output map. Grid 1 will hold
+      the sum of the weighted CRDD samples at each pixel, grid 2 will hold
+      the sum of the weights at each pixel, and grid 3 will hold the sum of the
       weighted squared CRDD samples at each pixel.
 
       Store zeros in every element of the three pixel grids.
@@ -585,9 +585,9 @@ following pseudo-code is used:
 
          For each detector...
 
-            Find the linear transformation coefficients which transform sector 
-            indices to focal plane coordinate offsets from the detector centre. 
-            This transformation will effectively shrink the sector array to the 
+            Find the linear transformation coefficients which transform sector
+            indices to focal plane coordinate offsets from the detector centre.
+            This transformation will effectively shrink the sector array to the
             size of the detector.
 
             Reduce each sector weight in proportion to the detector size.
@@ -595,24 +595,24 @@ following pseudo-code is used:
             Set the "saved" scan angle, and X and Y image scales to bad values.
 
             For each sample...
-      
-               Find the linear transformation coefficients which transform 
-               focal plane coordinate offsets from the detector centre to 
-               pixel coordinates. This transformation locates the sample 
+
+               Find the linear transformation coefficients which transform
+               focal plane coordinate offsets from the detector centre to
+               pixel coordinates. This transformation locates the sample
                within the two pixel grids.
 
                Calculate the current scan angle, and the X and Y image scales.
 
-               If any of these are significantly different to the "saved" 
+               If any of these are significantly different to the "saved"
                values, then...
-                  
+
                   Calculate a new set of pixel weight grids.
 
                   "Save" the current scan angle, and X and Y image scale.
 
                End if
 
-               Find the fractional pixel X and Y offset between the centre of 
+               Find the fractional pixel X and Y offset between the centre of
                the detector and the centre of the closest pixel.
 
                Find the pixel weight grid which corresponds to these offsets.
@@ -622,15 +622,15 @@ following pseudo-code is used:
                   Modify the pixel weight by dividing it by the variance of
                   the current CRDD sample (converted to a surface brightness).
 
-                  Increment the value of the corresponding pixel in grid 1 by 
-                  the product of the modified pixel weight and the current 
+                  Increment the value of the corresponding pixel in grid 1 by
+                  the product of the modified pixel weight and the current
                   CRDD sample value (converted to a surface brightness).
 
-                  Increment the value of the corresponding pixel in grid 2 by 
+                  Increment the value of the corresponding pixel in grid 2 by
                   the modified pixel weight.
 
-                  Increment the value of the corresponding pixel in grid 3 by 
-                  the product of the modified sector weight and the square of 
+                  Increment the value of the corresponding pixel in grid 3 by
+                  the product of the modified sector weight and the square of
                   the current CRDD sample (converted to a surface brightness).
 
                Next pixel.
@@ -646,8 +646,8 @@ following pseudo-code is used:
 
       Divide pixel grid 3 by pixel grid 2.
 
-      Subtract the square of the normalised pixel grid 1 from the normalised 
-      pixel grid 3, and limit to be positive or zero, to get the output 
+      Subtract the square of the normalised pixel grid 1 from the normalised
+      pixel grid 3, and limit to be positive or zero, to get the output
       variances.
 
 \end{verbatim}

@@ -3,7 +3,7 @@ C+
 C
 C     S O F T  /  H A R D / I D E V
 C
-C     SOFT is used to set the user variable (SOFT) that controls 
+C     SOFT is used to set the user variable (SOFT) that controls
 C     the soft copy graphics output of Figaro programs.  HARD is
 C     used to set the user variable (HARD) that controls the
 C     hardcopy graphics output. IDEV is used to set the user variable
@@ -11,9 +11,9 @@ C     (IDEV) that controls the image display.
 C
 C     Command parameters -
 C
-C     HARDDEV  (Character string) A device name recognised by 
+C     HARDDEV  (Character string) A device name recognised by
 C       or     the GKS version of PGPLOT.  Normally, what should
-C     SOFTDEV  be used is one of the device names recognised by 
+C     SOFTDEV  be used is one of the device names recognised by
 C       or     GNS.  HARDDEV and SOFTDEV are used by HARD and SOFT
 C     IMAGDEV  respectively.
 C
@@ -27,7 +27,7 @@ C              if it does not match one of the acceptable SGS names.
 C
 C     DRAW     Draws a test diagram on the screen.  (DRAW is the
 C              default for SOFT and IDEV, NODRAW is the default for HARD)
-C     
+C
 C                                     KS / AAO 16th March 1988
 C     History -
 C

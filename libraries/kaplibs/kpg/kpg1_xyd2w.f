@@ -21,10 +21,10 @@
 *  Arguments:
 *     SCALE( 2 ) = DOUBLE PRECISION (Given)
 *        The scale factors in the linear relationships between axis
-*        co-ordinates and pixel co-ordinates. 
+*        co-ordinates and pixel co-ordinates.
 *     OFFSET( 2 ) = DOUBLE PRECISION (Given)
 *        The offsets in the linear relationships between axis
-*        co-ordinates and pixel co-ordinates. 
+*        co-ordinates and pixel co-ordinates.
 *     NPOINT = INTEGER (Given)
 *        The number of points specified.
 *     XP( NPOINT ) = REAL (Given and Returned)
@@ -41,7 +41,7 @@
 *
 *     where PIXEL is a pixel co-ordinate for the I'th dimension, and
 *     DATA is the corresponding axis co-ordinate.
-  
+
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error if either of the scale factors are zero.
-      IF ( ABS( SCALE( 1 ) ) .LE. VAL__SMLD .OR. 
+      IF ( ABS( SCALE( 1 ) ) .LE. VAL__SMLD .OR.
      :     ABS( SCALE( 2 ) ) .LE. VAL__SMLD ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_XYD2W_ERR1', 'Pixels have zero size '/

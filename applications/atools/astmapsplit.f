@@ -20,42 +20,42 @@
 *        The global status.
 
 *  Description:
-*     This application returns a Mapping that will convert coordinates 
-*     between the coordinate systems represented by two Frames in a 
-*     FrameSet. 
+*     This application returns a Mapping that will convert coordinates
+*     between the coordinate systems represented by two Frames in a
+*     FrameSet.
 *
-*     This application creates a new Mapping which connects specified inputs 
+*     This application creates a new Mapping which connects specified inputs
 *     within a supplied Mapping to the corresponding outputs of the supplied
-*     Mapping.  This is only possible if the specified inputs correspond to 
-*     some subset of the Mapping outputs. That is, there must exist a subset 
+*     Mapping.  This is only possible if the specified inputs correspond to
+*     some subset of the Mapping outputs. That is, there must exist a subset
 *     of the Mapping outputs for which each output depends only on the
-*     selected Mapping inputs, and not on any of the inputs which have not 
-*     been  selected. If this condition is not met by the supplied Mapping, 
+*     selected Mapping inputs, and not on any of the inputs which have not
+*     been  selected. If this condition is not met by the supplied Mapping,
 *     then an error is reported.
 
 *  Usage:
 *     astmapsplit this in out map
 
 *  ADAM Parameters:
-*     IN() = _INTEGER (Read) 
-*        A vector of integers which are the indices within the supplied 
+*     IN() = _INTEGER (Read)
+*        A vector of integers which are the indices within the supplied
 *        Mapping (THIS) of the inputs which are to be picked from the Mapping
-*        (the first Mapping input has index 1).  
+*        (the first Mapping input has index 1).
 *     MAP = LITERAL (Read)
 *        An text file to receive the output Mapping. The number of inputs
 *        to this Mapping will be the same as the number of values
 *        supplied for the IN parameter (the number of outputs may be
 *        different).
-*     OUT() = _INTEGER (Write) 
-*        An output parameter to which is written a vector of integers which 
-*        are the indices of the outputs of the supplied Mapping fed by the 
-*        picked inputs. A value of one is used to refer to the first Mapping 
-*        output. The number of values stored in the array on exit will equal 
-*        the number of outputs in the returned Mapping. The i'th element in 
-*        the returned array holds the index within the supplied Mapping which 
+*     OUT() = _INTEGER (Write)
+*        An output parameter to which is written a vector of integers which
+*        are the indices of the outputs of the supplied Mapping fed by the
+*        picked inputs. A value of one is used to refer to the first Mapping
+*        output. The number of values stored in the array on exit will equal
+*        the number of outputs in the returned Mapping. The i'th element in
+*        the returned array holds the index within the supplied Mapping which
 *        corresponds to the i'th output of the returned Mapping.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the input Mapping. If an NDF is supplied, 
+*        An NDF or text file holding the input Mapping. If an NDF is supplied,
 *        the base to current Mapping within the WCS FrameSet will be used.
 
 *  Copyright:
@@ -97,7 +97,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  External References:
       EXTERNAL AST_ISAMAPPING
@@ -115,7 +115,7 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -126,19 +126,19 @@
      :                 STATUS )
 
 *  Get the indices of the inputs to select.
-      CALL PAR_GET1I( 'IN', NDF__MXDIM, IN, NIN, STATUS ) 
+      CALL PAR_GET1I( 'IN', NDF__MXDIM, IN, NIN, STATUS )
 
 *  Split the supplied Mapping.
       CALL AST_MAPSPLIT( THIS, NIN, IN, OUT, MAP, STATUS )
 
-*  Report an error if the Mapping could not be split. 
+*  Report an error if the Mapping could not be split.
       IF( MAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'ASTMAPSPLIT_ERR1', 'There is no subset of '//
      :                 'Mapping outputs which depend only on the '//
      :                 'specified Mapping inputs.', STATUS )
 
-*  Otherwise, display the indices of the output axes. 
+*  Otherwise, display the indices of the output axes.
       ELSE
          CALL MSG_BLANK( STATUS )
          NOUT = AST_GETI( map, 'Nout', STATUS )
@@ -150,9 +150,9 @@
          DO I = 1, NIN
             CALL MSG_SETI( 'IN', IN( I ) )
             IF( I .NE. NIN ) CALL MSG_SETC( 'IN', ' ,' )
-         END DO   
+         END DO
          CALL MSG_OUT( 'ASTMAPSPLIT_MSG2', '   ^IN', STATUS )
-         
+
          CALL MSG_SETI( 'NOUT', NOUT )
          CALL MSG_OUT( 'ASTMAPSPLIT_MSG3', 'feed the following '//
      :                 '^NOUT outputs:', status )
@@ -160,11 +160,11 @@
          DO I = 1, NOUT
             CALL MSG_SETI( 'OUT', OUT( I ) )
             IF( I .NE. NOUT ) CALL MSG_SETC( 'OUT', ' ,' )
-         END DO   
+         END DO
 
          CALL MSG_OUT( 'ASTMAPSPLIT_MSG4', '   ^OUT', STATUS )
          CALL MSG_BLANK( STATUS )
-         
+
          CALL PAR_PUT1I( 'OUT', NOUT, OUT, STATUS )
 
 *  Write the Mapping out to a text file.

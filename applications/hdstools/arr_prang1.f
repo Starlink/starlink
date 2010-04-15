@@ -1,4 +1,4 @@
-      SUBROUTINE ARR_PRANG1R( N, ARRAY, PMIN, RMIN, PMAX, 
+      SUBROUTINE ARR_PRANG1R( N, ARRAY, PMIN, RMIN, PMAX,
      :                          RMAX, STATUS )
 *+
 *  Name:
@@ -15,7 +15,7 @@
 
 *  Description:
 *     Obtains the minimum and maximum values in a REAL array, and the
-*     pixel numbers at which the first occurrence of the minimum and 
+*     pixel numbers at which the first occurrence of the minimum and
 *     maximum occur. All values are consider good.
 
 *  Arguments:
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
 *  Arguments Given:
       INTEGER			N			! Number of values
       REAL			ARRAY(*)		! Values
- 
+
 *  Arguments Returned:
       INTEGER			PMIN			! Pixel no. of minimum
       REAL			RMIN			! Minimum value

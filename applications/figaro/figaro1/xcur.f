@@ -43,7 +43,7 @@ C
       INTEGER      STATUS       ! Running status for DSA_ routines
       REAL         X1           ! The first X position of the cursor
       REAL         X2           ! The second X position of the cursor
-      REAL         XEN          ! The value of the right edge of the display 
+      REAL         XEN          ! The value of the right edge of the display
       REAL         XST          ! The value of the left edge of the display
       REAL         Y            ! The current Y position of the cursor
 C

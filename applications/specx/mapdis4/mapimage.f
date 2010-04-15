@@ -35,7 +35,7 @@
       ISTAT = IGETLUN (UNIT, 'contour_map4', .FALSE.)
       IF (ISTAT.ne.0) RETURN
 
-      OPEN (UNIT, 
+      OPEN (UNIT,
      &      FILE   = FILENAME,
      &      STATUS = 'OLD',
      &      FORM   = 'UNFORMATTED',
@@ -70,7 +70,7 @@ CD      PRINT *, '    virtual memory got (bytes)  = ', NBYTES
 
 *     Read the data into the image array
 
-      CALL VREAD (UNIT, NMAPS*IMX*IMY, %VAL(IPTR), ISTAT) 
+      CALL VREAD (UNIT, NMAPS*IMX*IMY, %VAL(IPTR), ISTAT)
 
 *     Close the file and release the logical unit
 

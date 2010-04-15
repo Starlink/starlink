@@ -5,7 +5,7 @@
 *   Name:
 *      INTEGER FUNCTION str_TYPE
 *
-*   Description: 
+*   Description:
 *      Determine type of SWT character.
 *
 *   Authors:
@@ -36,7 +36,7 @@
 
 *   Import:
       BYTE C                ! character to be typed
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
 

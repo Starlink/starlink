@@ -18,7 +18,7 @@
 *  Description:
 *     The image coordinates of two opposite corners of the box are
 *     obtained using the cursor or parameter interface, depending on
-*     the value of parameter CURSOR. 
+*     the value of parameter CURSOR.
 
 *  Arguments:
 *     PLON1 = CHARACTER * ( * ) (Given)

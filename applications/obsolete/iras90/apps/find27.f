@@ -4,7 +4,7 @@
 *     FIND27
 
 *  Purpose:
-*     To print a list of sources surrounding a deleted position 
+*     To print a list of sources surrounding a deleted position
 
 *  Language:
 *     Starlink Fortran 77
@@ -53,7 +53,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -71,7 +71,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
- 
+
 *  Arguments Given:
       INTEGER MAXLEN
       INTEGER SOPOS
@@ -105,7 +105,7 @@
 *  First the program counts backwards until either the first source to
 *  be displayed is the first source in the list or the number of sources
 *  to be displayed is the half page length
- 100  CONTINUE     
+ 100  CONTINUE
       IF ( ( SOTOP .NE. 1) .AND. ( NSODIS .NE. HALFML ) )THEN
 
 *  Move back to look at the preceeding source
@@ -132,7 +132,7 @@
 *  Now the program goes forward through the sources checking to see
 *  that it is not either a full page of MAXLEN lines, or the source
 *  being considered is not the last (NOFSO)
- 200  CONTINUE     
+ 200  CONTINUE
       IF ( ( SOBOT .NE. NOFSO) .AND. ( NSODIS .NE. MAXLEN) ) THEN
 
 *  Move forwards to look at the next source

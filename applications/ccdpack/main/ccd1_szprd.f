@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -162,7 +162,7 @@
             Y( I ) = Y( I ) + CCD1_WT1( I ) *
      :                        ( X( CCD1_IPAIR( 2, I ) ) -
      :                          X( CCD1_IPAIR( 1, I ) ) )
- 1       CONTINUE        
+ 1       CONTINUE
 
 *  Add constraints on the mean correction. These constraints can always
 *  be met exactly, so weight them so that they are "large" compared
@@ -180,7 +180,7 @@
      :                                   CCD1_WT1( I ) * Y( I )
             X( CCD1_IPAIR( 1, I ) ) = X( CCD1_IPAIR( 1, I ) ) -
      :                                   CCD1_WT1( I ) * Y( I )
- 3       CONTINUE        
+ 3       CONTINUE
 
 *  Add constraints on the mean correction. These constraints can always
 *  be met exactly, so weight them so that they are "large" compared

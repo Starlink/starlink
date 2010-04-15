@@ -16,33 +16,33 @@
 *
 * Arguments:
 *    M = INTEGER (Given)
-*       
+*
 *    N = INTEGER (Given)
-*       
+*
 *    XC(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    RC(M) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    AJC(LJC,N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    LJC = INTEGER (Given)
-*       
+*
 *    SING(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    IGRADE = INTEGER (Given)
-*       
+*
 *    NCALL = INTEGER (Given)
-*       
+*
 *    NF = INTEGER (Given)
-*       
+*
 *    MIW(LIW) = INTEGER ARRAY (Given)
-*       
+*
 *    LIW = INTEGER (Given)
-*       
+*
 *    WN(NIW) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    NIW = INTEGER (Given)
-*       
+*
 *
       implicit none
 * global:

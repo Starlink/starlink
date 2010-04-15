@@ -28,7 +28,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-*  
+*
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwdt.cmn'
       INCLUDE '../../include/gkwca.cmn'
@@ -55,7 +55,7 @@
 *
 *
 * --------------------------------------------------------------------
- 
+
       RHT=FLOAT(KWKDAT(CHARHI,KWKIX))
       RMAXWD=FLOAT(KWKDAT(CHARWI,KWKIX))
       RBOT=0.0

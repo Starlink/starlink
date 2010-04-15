@@ -23,7 +23,7 @@
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the supplied group.
 *     IWCS = INTEGER (Returned)
-*        An AST pointer to the returned Object. AST__NULL is returned if 
+*        An AST pointer to the returned Object. AST__NULL is returned if
 *        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,15 +61,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
-      INCLUDE 'ARD_CONST'        ! ARD provate constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'ARD_CONST'        ! ARD provate constants
 
 *  Arguments Given:
       INTEGER NWCS
@@ -83,7 +83,7 @@
 
 *  External References:
       EXTERNAL ARD1_SRCTA
-      INTEGER CHR_LEN          
+      INTEGER CHR_LEN
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks.
@@ -101,14 +101,14 @@
 *  Initialise returned pointer.
       IWCS = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Create an AST Channel through which the text stored in the group can be 
-*  read, and converted into an AST Object. The subroutine ARD1_SRCTA 
-*  extracts the text from the group, concatenates continuation lines, and 
-*  supplies the total line to the AST library. Textual information not 
-*  related to AST is skipped over without reporting errors. 
+*  Create an AST Channel through which the text stored in the group can be
+*  read, and converted into an AST Object. The subroutine ARD1_SRCTA
+*  extracts the text from the group, concatenates continuation lines, and
+*  supplies the total line to the AST library. Textual information not
+*  related to AST is skipped over without reporting errors.
       CHAN = AST_CHANNEL( ARD1_SRCTA, AST_NULL, 'SKIP=1', STATUS )
 
 *  Store the group identifier.
@@ -121,15 +121,15 @@
       IWCS = AST_READ( CHAN, STATUS )
 
 *  Annul the Channel.
-      CALL AST_ANNUL( CHAN, STATUS )      
+      CALL AST_ANNUL( CHAN, STATUS )
 
 *  Report an error if no object was read.
       IF( STATUS .EQ. SAI__OK ) THEN
          IF( IWCS .EQ. AST__NULL ) THEN
             STATUS = ARD__BADAR
             CALL ERR_REP( 'ARD1_RDWCS_ERR1', 'The WCS argument list '//
-     :                    'does not describe a valid AST Object.', 
-     :                    STATUS )      
+     :                    'does not describe a valid AST Object.',
+     :                    STATUS )
 
 *  Report an error if a non-FrameSet was read.
          ELSE IF( .NOT. AST_ISAFRAMESET( IWCS, STATUS ) ) THEN
@@ -138,7 +138,7 @@
             CALL MSG_SETC( 'CL', AST_GETC( IWCS, 'CLASS', STATUS ) )
             CALL ERR_REP( 'ARD1_RDWCS_ERR2', 'An AST ^CL was read '//
      :                    'from the WCS argument list but a FrameSet '//
-     :                    'is required.', STATUS )      
+     :                    'is required.', STATUS )
 
 *  Report an error if the Current Frame has the wrong number of axes.
          ELSE IF( AST_GETI( IWCS, 'NAXES', STATUS ) .NE. NWCS ) THEN

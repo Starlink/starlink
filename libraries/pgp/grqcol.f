@@ -11,7 +11,7 @@
 *   a GKS workstation so we guess that if a workstation can change its
 *   colour table dynamically then it can change the background too.
 *
-*   
+*
 *   Given
 *      ICLOW    i     Lowest available colour index
 *      ICHIGH   i     Highest available colour index
@@ -22,7 +22,7 @@
 *      GRTYP    i()   Workstation type
 *
 *   Constants from GKS_PAR
-*   
+*
 *   D.L.Terrett  Starlink  Jun 1989
 *+
       IMPLICIT NONE
@@ -49,9 +49,9 @@
             GO TO 9999
          END IF
          ICHIGH = ICHIGH - 1
-      
+
 *     Low limit is 0 if the colour table is dynamic, otherwise it is 1.
-         CALL GQDWKA(GRTYP(GRCIDE), IERR, PLBUN, PMBUN, TXBUN, FABUN, 
+         CALL GQDWKA(GRTYP(GRCIDE), IERR, PLBUN, PMBUN, TXBUN, FABUN,
      :               PAREP, COLREP, WKTR)
          IF (IERR.NE.0) THEN
             CALL GRQREP('GRQCOL', 'GQDWKA', IERR)

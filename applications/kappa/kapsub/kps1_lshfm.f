@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2, 
+      SUBROUTINE KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2,
      :                       STATUS )
 
 *+
@@ -15,7 +15,7 @@
 *     CALL KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2, STATUS )
 
 *  Description:
-*     This routine formats the supplied positions, identifiers and labels, 
+*     This routine formats the supplied positions, identifiers and labels,
 *     and stores the resulting strings in the supplied GRP group.
 
 *  Arguments:
@@ -69,7 +69,7 @@
 *     7-AUG-2003 (DSB):
 *        Normalise the supplied positions.
 *     11-NOV-2005 (DSB):
-*        Allow up to 50 axes (this allows tables such as those produced by 
+*        Allow up to 50 axes (this allows tables such as those produced by
 *        CUPID:CLUMPS which have more than NDF__MXDIM columns to be
 *        displayed).
 *     21-NOV-2006 (DSB):
@@ -79,7 +79,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -106,10 +106,10 @@
 
 *  Local Constants:
       INTEGER NSP                  ! No. of spaces between fields
-      PARAMETER( NSP = 3 ) 
+      PARAMETER( NSP = 3 )
 
       INTEGER MXDIM                ! Max number of axes
-      PARAMETER( MXDIM = 50 ) 
+      PARAMETER( MXDIM = 50 )
 
 *  Local Variables:
       CHARACTER ATTRIB*15          ! AST attribute name
@@ -143,7 +143,7 @@
          DO I = 1, NAX
             C( I ) = POS( K, I )
          END DO
-         CALL AST_NORM( FRM, C, STATUS )         
+         CALL AST_NORM( FRM, C, STATUS )
          DO I = 1, NAX
             POS( K, I ) = C( I )
          END DO
@@ -152,7 +152,7 @@
          DO I = 1, NAX
 
 *  Find the used length of the formatted axis value.
-           MXWID( I ) = MAX( MXWID( I ), CHR_LEN( 
+           MXWID( I ) = MAX( MXWID( I ), CHR_LEN(
      :                     AST_FORMAT( FRM, I, POS( K, I ), STATUS ) ) )
 
          END DO
@@ -173,7 +173,7 @@
          IAT = 5
          CALL CHR_PUTI( I, ATTRIB, IAT )
          CALL CHR_APPND( ')', ATTRIB, IAT )
-         TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS ) 
+         TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS )
          CALL KPG1_PGESC( TEXT, STATUS )
          MXWID( I ) = MAX( MXWID( I ), CHR_LEN( TEXT ) )
 
@@ -182,7 +182,7 @@
          CALL CHR_PUTI( I, ATTRIB, IAT )
          CALL CHR_APPND( ')', ATTRIB, IAT )
 
-         TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS ) 
+         TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS )
          CALL KPG1_PGESC( TEXT, STATUS )
          MXWID( I ) = MAX( MXWID( I ), CHR_LEN( TEXT ) )
 
@@ -208,12 +208,12 @@
 *  spaces).
       BLEN = TAB( NAX + 1 ) - NSP
 
-*  Create the header, putting each word in the middle of the corresponding 
+*  Create the header, putting each word in the middle of the corresponding
 *  field...
 *  =======================================================================
 
 *  First line: "Position", "Label" (if needed) and axis symbols
-      LINE = ' ' 
+      LINE = ' '
       IF( IGRP1. NE. GRP__NOID ) THEN
          IAT = ( TAB( 0 ) + TAB( -1 ) - NSP - 8 )/2
       ELSE
@@ -238,10 +238,10 @@
          LINE( IAT : ) = TEXT
       END DO
 
-      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
 
 *  Second line: "identifier" and axis units (if any).
-      LINE = ' ' 
+      LINE = ' '
 
       IF( IGRP1. NE. GRP__NOID ) THEN
          IAT = ( TAB( 0 ) + TAB( -1 ) - NSP - 10 )/2
@@ -262,14 +262,14 @@
          LINE( IAT : ) = TEXT
       END DO
 
-      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
 
 *  Separator lines.
       DO I = 1, BLEN
          LINE( I : I ) = '-'
       END DO
-      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
-      CALL GRP_PUT( IGRP2, 1, ' ', 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
+      CALL GRP_PUT( IGRP2, 1, ' ', 0, STATUS )
 
 *  Format the identifiers, labels and positions in columns
 *  =======================================================
@@ -282,7 +282,7 @@
          IAT = TAB( -1 ) + 2
          LINE( IAT : ) = '#'
          CALL CHR_PUTI( ID( K ), LINE, IAT )
-   
+
 *  Put any label into the buffer.
          IF( IGRP1 .NE. GRP__NOID ) THEN
             CALL GRP_GET( IGRP1, K, 1, LABEL, STATUS )
@@ -291,14 +291,14 @@
          END IF
 
 *  Format the results on each axis. Start each axis value at the tab
-*  positions found above. 
+*  positions found above.
          DO I = 1, NAX
-            LINE( TAB( I ) : ) = AST_FORMAT( FRM, I, POS( K, I ), 
+            LINE( TAB( I ) : ) = AST_FORMAT( FRM, I, POS( K, I ),
      :                                       STATUS )
          END DO
 
 *  Store the buffer in the group.
-         CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
+         CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
 
       END DO
 

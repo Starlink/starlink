@@ -36,17 +36,17 @@
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF, FITS file or text file holding the Frame. If an NDF is 
-*        supplied, the current Frame of the WCS FrameSet will be used. If a 
-*        FITS file is supplied, the Frame corresponding to the primary axis 
+*        An NDF, FITS file or text file holding the Frame. If an NDF is
+*        supplied, the current Frame of the WCS FrameSet will be used. If a
+*        FITS file is supplied, the Frame corresponding to the primary axis
 *        descriptions will be used.
 *     AXIS = INTEGER (Read)
 *         The number of the Frame axis for which unformatting is to be
 *         performed (axis numbering starts at 1 for the first axis).
 *     VALUE = GROUP (Read)
-*        A comma-separated list of formatted axis values to be read. 
-*        A text file may be specified by preceeding the name of the file 
-*        with an up arrow character "^". If the supplied value ends with a 
+*        A comma-separated list of formatted axis values to be read.
+*        A text file may be specified by preceeding the name of the file
+*        with an up arrow character "^". If the supplied value ends with a
 *        minus sign, the user is re-prompted for additional values.
 *     RESULT = LITERAL (Read)
 *        The name of a text file in which to put the unformatted axis
@@ -93,8 +93,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  External References:
       EXTERNAL AST_ISAFRAME
@@ -111,7 +111,7 @@
       LOGICAL LOG
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -122,8 +122,8 @@
      :                 STATUS )
 
 *  Get the axis index.
-      CALL PAR_GDR0I( 'AXIS', 1, 1, AST_GETI( THIS, 'NAXES', STATUS ), 
-     :                .FALSE., AXIS, STATUS ) 
+      CALL PAR_GDR0I( 'AXIS', 1, 1, AST_GETI( THIS, 'NAXES', STATUS ),
+     :                .FALSE., AXIS, STATUS )
 
 *  Get a group holding the input formatted axis values.
       IGRP = GRP__NOID
@@ -136,7 +136,7 @@
          CALL ERR_ANNUL( STATUS )
       ELSE
 
-*  We delete any pre-existing file first. 
+*  We delete any pre-existing file first.
          CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
@@ -149,17 +149,17 @@
       DO I = 1, NP
 
 *  Get this element.
-         CALL GRP_GET( IGRP, I, 1, BUF, STATUS ) 
+         CALL GRP_GET( IGRP, I, 1, BUF, STATUS )
 
 *  Unformat the value.
-         NC = AST_UNFORMAT( THIS, AXIS, BUF( : CHR_LEN( BUF ) ), VALUE, 
+         NC = AST_UNFORMAT( THIS, AXIS, BUF( : CHR_LEN( BUF ) ), VALUE,
      :                      STATUS )
 
 *  Display it to the screen.
          CALL MSG_SETC( 'STRING', BUF )
          CALL MSG_SETD( 'VALUE', VALUE )
          CALL MSG_SETI( 'NC', NC )
-         CALL MSG_OUT( ' ', '  ^STRING -> ^VALUE (^NC characters read)', 
+         CALL MSG_OUT( ' ', '  ^STRING -> ^VALUE (^NC characters read)',
      :                 STATUS )
 
 *  Write it to the text file if necessary.

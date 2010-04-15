@@ -785,7 +785,7 @@ itcl::class gaia::GaiaContour {
 
    #  Get the GaiaCube instance associated with a given rtdimage. Return {} if
    #  not a cube, rtdimage is the local one or we're not stepping through
-   #  slices. 
+   #  slices.
    protected method get_gaiacube_ {rtdimage} {
       if { $rtdimage != {} && $cube_step_ && $rtdimage != $itk_option(-rtdimage) } {
 
@@ -839,7 +839,7 @@ itcl::class gaia::GaiaContour {
             set gaiaanimation [$gaiacube component animation]
             set delay_ [$gaiaanimation cget -delay]
          }
-         
+
          #  Clear existing contours.
          if { $all } {
             remove_contours
@@ -848,18 +848,18 @@ itcl::class gaia::GaiaContour {
             remove_contour_ $index
             update
          }
-         
+
          #  If requested just display over the visible canvas +/- a little.
          if { ! $whole_ } {
             set bounds [calc_bounds_]
          } else {
             set bounds ""
          }
-         
+
          #  Draw the contours. Do this one at a time so that we can
          #  update the interface.
          if { $all } {
-            
+
             #  If this is a cube loop over the planes, drawing all the
             #  contours for each plane before moving to the next.
             if { $gaiacube != {} } {
@@ -874,10 +874,10 @@ itcl::class gaia::GaiaContour {
             for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
                set drawn_($i) 0
             }
-            
+
             #  Cube loop.
             for {set j $ll} {$j <= $ul} {incr j $step} {
-               
+
                if { $halt_ } {
                   break
                }
@@ -886,7 +886,7 @@ itcl::class gaia::GaiaContour {
                   #  Move cube to new plane.
                   $gaiacube set_display_plane $j 0
                }
-               
+
                #  Level loop.
                for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
                   set att [get_ast_att_ $i]
@@ -899,7 +899,7 @@ itcl::class gaia::GaiaContour {
                   #  Stop or wait for a while if asked.
                   if { $pause_ } {
                      puts "Contouring paused..."
-                     
+
                      #  Complete some graphics when pausing cubes.
                      if { $gaiacube != {} } {
                         draw_key_
@@ -915,11 +915,11 @@ itcl::class gaia::GaiaContour {
                      puts "Contouring halted."
                      break
                   }
-                  
+
                   #  Set the tag used to control clear etc.
                   $itk_option(-rtdimage) configure -ast_tag \
                      "$itk_option(-ast_tag) $leveltags_($i) $linetags_($i)"
-                  
+
                   #  Draw the contour (return value is number of points).
                   incr drawn_($i) \
                      [$itk_option(-rtdimage) contour \
@@ -927,7 +927,7 @@ itcl::class gaia::GaiaContour {
                          $att $bounds [expr {$i == 0}]]
                   update
                }
-               
+
                #  Update coordinate and clear contours, if requested.
                if { $gaiacube != {} } {
                   draw_key_
@@ -939,16 +939,16 @@ itcl::class gaia::GaiaContour {
                   }
                }
             }
-            
+
          } else {
-            
+
             set atts [get_ast_att_ $index]
             set level [$itk_component(value$index) get]
-            
+
             #  Set the tag used to control clear etc.
             $itk_option(-rtdimage) configure -ast_tag \
                "$itk_option(-ast_tag) $leveltags_($index) $linetags_($index)"
-            
+
             #  Draw the contour.
             #  If this is a cube loop over the planes, drawing this level.
             if { $gaiacube != {} } {
@@ -975,7 +975,7 @@ itcl::class gaia::GaiaContour {
                      [$itk_option(-rtdimage) contour \
                          $level $rtdimage $careful_ $smooth_ \
                          $atts $bounds 1]
-                  
+
                   #  Update coordinate and clear contours, if requested.
                   if { $gaiacube != {} } {
                      draw_key_
@@ -994,7 +994,7 @@ itcl::class gaia::GaiaContour {
                       $atts $bounds 1]
             }
          }
-         
+
          #  Add/update the key.
          draw_key_
          update idletasks
@@ -1016,7 +1016,7 @@ itcl::class gaia::GaiaContour {
          if { $gaiacube != {} } {
             set coordinate [$gaiacube get_plane_coord 1 1 1]
             if { $coordinate != {} } {
-               
+
                #  Get a position.
                set w [winfo width $itk_option(-canvas)]
                set h [winfo height $itk_option(-canvas)]

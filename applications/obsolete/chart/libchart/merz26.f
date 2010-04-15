@@ -1,5 +1,5 @@
       SUBROUTINE MERZ26(X,Y, STATUS )
-      
+
 *+
 *   Calculates and prints the co-ordinates for the
 *   Merz guide telescope on the RGO 26-inch refractor.

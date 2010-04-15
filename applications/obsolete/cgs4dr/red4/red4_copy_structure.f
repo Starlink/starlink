@@ -9,7 +9,7 @@
 *     been produced to simplify the high-level code by removing the
 *     frequently used low level DTA calls and checks.
 *    Invocation :
-*      CALL RED4_COPY_STRUCTURE( SOURCE, DESTINATION, STATUS ) 
+*      CALL RED4_COPY_STRUCTURE( SOURCE, DESTINATION, STATUS )
 *    Parameters :
 *     SOURCE        = CHARACTER*(*)( READ )
 *        The DTA address of the structure to be copied.
@@ -61,7 +61,7 @@
 *   Check for error on entry
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
-*   Attempt to delete the destination structure, to ensure it does 
+*   Attempt to delete the destination structure, to ensure it does
 *   not exist. Ignore the status returned.
       DTA_STATUS = DTA__OK
       CALL DTA_DLVAR( DESTINATION, DTA_STATUS )
@@ -71,7 +71,7 @@
       IF ( VERBOSE ) THEN
          CALL MSG_SETC( 'SOURCE', SOURCE )
          CALL MSG_SETC( 'DESTINATION', DESTINATION )
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :     'Attempting to copy ^SOURCE to ^DESTINATION OK', STATUS )
       END IF
       CALL DTA_CYVAR( SOURCE, DESTINATION, DTA_STATUS )
@@ -97,7 +97,7 @@
         IF ( VERBOSE ) THEN
            CALL MSG_SETC( 'SOURCE', SOURCE )
            CALL MSG_SETC( 'DESTINATION', DESTINATION )
-           CALL MSG_OUT( ' ', 
+           CALL MSG_OUT( ' ',
      :       'Copied ^SOURCE to ^DESTINATION OK', STATUS )
         END IF
       END IF

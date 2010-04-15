@@ -73,7 +73,7 @@
 *        done to increase the portability of the routine.
 *
 *     -  The allowed values of TYPE are _INTEGER, _REAL, _DOUBLE,
-*        _LOGICAL, _CHAR, _BYTE, _UBYTE, _WORD and _UWORD. 
+*        _LOGICAL, _CHAR, _BYTE, _UBYTE, _WORD and _UWORD.
 *        The number of bytes allocated for each is as defined in the
 *        f77.h header file.
 
@@ -83,7 +83,7 @@
 *  References:
 *     -  POSIX standard (1988), section 8.1
 *     -  ANSI C standard (1989), section 4.10.3.1
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -92,12 +92,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -148,7 +148,7 @@
 /* Global Constants:		.					    */
 
 #if STDC_HEADERS
-#  include <ctype.h>		 /* Character handling			    */ 
+#  include <ctype.h>		 /* Character handling			    */
 #  include <stdlib.h>		 /* Standard C library			    */
 #  include <stdio.h>		 /* Standard C I/O library		    */
 #  include <string.h>
@@ -186,7 +186,7 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
 
 /* Variable initialisation */
    size = 0;
-   
+
 /* Check inherited global status.					    */
 
    if( *status != SAI__OK ) return;
@@ -227,7 +227,7 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
          psx1_rep_c( "PSX_CALLOC_INTYP",
            "Invalid type in call to PSX_CALLOC", status );
       }
-		  
+
 /* Check the status and allocate the space if all is well.		    */
 
    if( *status == SAI__OK )
@@ -257,7 +257,7 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
          *pntr = (F77_POINTER_TYPE)0;
          *status = PSX__NOALL;
 	 total = (unsigned long)(*nmemb * size);
-         sprintf( errbuf, 
+         sprintf( errbuf,
             "Failed to allocate space with calloc. %d elements of size %d bytes (%lu bytes total) requested",
 		  (int)*nmemb, (int)size, (unsigned long)total );
          psx1_rep_c( "PSX_CALLOC_NOALL", errbuf, status );

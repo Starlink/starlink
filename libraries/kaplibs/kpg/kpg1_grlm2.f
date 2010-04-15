@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GRLM2( PARAM, N, D1, D2, USEBAR, BAR, LIM1, 
+      SUBROUTINE KPG1_GRLM2( PARAM, N, D1, D2, USEBAR, BAR, LIM1,
      :                       LIM2, STATUS )
 *+
 *  Name:
@@ -14,47 +14,47 @@
 *     CALL KPG1_GRLM2( PARAM, N, D1, D2, USEBAR, BAR, LIM1, LIM2, STATUS )
 
 *  Description:
-*     This routine returns the default limits for a graph axis. The 
+*     This routine returns the default limits for a graph axis. The
 *     way in which the limits are chosen is specified by the user through
-*     the parameter specified by PARAM. This parameter can take the 
+*     the parameter specified by PARAM. This parameter can take the
 *     following values:
 *
 *        - "Range" -- LIM1 and LIM2 are returned equal to the lowest and
 *        highest supplied data values (including error bars).
 *
 *        - "Extended" -- LIM1 and LIM2 are returned equal to the lowest and
-*        highest supplied data values (including error bars), extended to 
+*        highest supplied data values (including error bars), extended to
 *        give a margin of 2.5% of the total data range at each end.
 *
-*        - "Extended,10,5" -- Like "Extended", except the margins at the 
-*        two ends are specified as a pair of numerical value in the second 
-*        and third elements of the array. These values are percentages of 
+*        - "Extended,10,5" -- Like "Extended", except the margins at the
+*        two ends are specified as a pair of numerical value in the second
+*        and third elements of the array. These values are percentages of
 *        the total data range. So, "Extended,10,5" includes a margin of 10%
-*        of the total data range in LIM1, and 5% in LIM2. If only one 
-*        numerical value is given, the same value is used for both limits. If 
-*        no value is given, both limits default to 2.5. "Range" is equivalent 
+*        of the total data range in LIM1, and 5% in LIM2. If only one
+*        numerical value is given, the same value is used for both limits. If
+*        no value is given, both limits default to 2.5. "Range" is equivalent
 *        to "Extended,0,0".
 *
-*        - "Percentiles,5,95" -- The second and third elements of the array 
-*        are interpreted as percentiles. For instance, "Perc,5,95" causes 5% 
-*        of the data points (ignoring error bars) to be below LIM1, and 10% 
-*        to be above the LIM2. If only 1 value (p1) is supplied, the other 
-*        one, p2, defaults to (100 - p1). If no values are supplied, p1 and 
+*        - "Percentiles,5,95" -- The second and third elements of the array
+*        are interpreted as percentiles. For instance, "Perc,5,95" causes 5%
+*        of the data points (ignoring error bars) to be below LIM1, and 10%
+*        to be above the LIM2. If only 1 value (p1) is supplied, the other
+*        one, p2, defaults to (100 - p1). If no values are supplied, p1 and
 *        p2 default to 5 and 95.
-*        
-*        - "Sigma,2,3" -- The second and third elements of the array are 
-*        interpreted as multiples of the standard deviation of the data 
-*        values (ignoring error bars). For instance, "S,2,3" causes the 
+*
+*        - "Sigma,2,3" -- The second and third elements of the array are
+*        interpreted as multiples of the standard deviation of the data
+*        values (ignoring error bars). For instance, "S,2,3" causes the
 *        LIM1 to be the mean of the data values, minus two sigma, and LIM2
-*        to be the mean plus three sigma. If only 1 value is supplied, the 
-*        same value is used for both limits. If no values are supplied, both 
+*        to be the mean plus three sigma. If only 1 value is supplied, the
+*        same value is used for both limits. If no values are supplied, both
 *        values default to 3.0.
-*              
-*     The above strings can be abbreviated to one character. 
+*
+*     The above strings can be abbreviated to one character.
 *
 *     If the parameter name is supplied as blank, then "Extended" is
-*     assumed (i.e. LIM1 and LIM2 are chosen so that the axis encompasses 
-*     the entire data range including error bars, with 2.5% margin at each 
+*     assumed (i.e. LIM1 and LIM2 are chosen so that the axis encompasses
+*     the entire data range including error bars, with 2.5% margin at each
 *     end).
 *
 *     If only 1 limit is required (i.e. if LIM1 or LIM2 are supplied not
@@ -70,10 +70,10 @@
 *     D1( N ) = DOUBLE PRECISION (Given)
 *        The central data value at each point.
 *     D2( N ) = DOUBLE PRECISION (Given)
-*        An associated mask array. D1( I ) is only used if both D1( I ) and 
+*        An associated mask array. D1( I ) is only used if both D1( I ) and
 *        D2( I ) are not equal to VAL__BADD.
 *     USEBAR = LOGICAL (Given)
-*        Should BAR be used? 
+*        Should BAR be used?
 *     BAR( N,2 ) = DOUBLE PRECISION (Given)
 *        The upper and lower ends of each error bar. Assumed equal to D1
 *        if USEBAR is .FALSE. (i.e. no error bars).
@@ -96,12 +96,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -126,7 +126,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -188,7 +188,7 @@
       IF( LIM2 .EQ. VAL__BADD ) NLIM = NLIM + 1
 
 *  Do nothing if both limits are already defined.
-      IF( NLIM .GT. 0 ) THEN 
+      IF( NLIM .GT. 0 ) THEN
 
 *  If no parameter has been geven, pretend we get the value "Extended"
 *  from the user.
@@ -200,12 +200,12 @@
          ELSE
             CALL KPG1_MIXVR( PARAM, NLIM + 1, VAL__MINR, VAL__MAXR,
      :                      'Extended,Percentiles,Sigmas,Range', PVALS,
-     :                      NVAL, STATUS ) 
+     :                      NVAL, STATUS )
 
 *  Abort if an error has occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         END IF      
+         END IF
 
 *  Convert "Range" to "Extended,0".
          IF( PVALS( 1 ) .EQ. 'RANGE' ) THEN
@@ -224,12 +224,12 @@
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'P', PARAM )
                CALL MSG_SETC( 'V', PVALS( 2 ) )
-   
+
                DO I = 2, NVAL
                   CALL MSG_SETC( 'V', ',' )
                   CALL MSG_SETC( 'V', PVALS( I ) )
                END DO
-   
+
                CALL ERR_REP( 'KPG1_GRLM2_ERR2', 'Extra values (^V) '//
      :                       'supplied after ''RANGE'' for parameter '//
      :                       '%^P.', STATUS )
@@ -239,7 +239,7 @@
 *  Replace the supplied parameter value.
             PVALS( 1 ) = 'EXTENDED'
             PVALS( 2 ) = '0.0'
-            NVAL = 2 
+            NVAL = 2
 
          END IF
 
@@ -247,32 +247,32 @@
 *  if either the second or third values are not numerical.
          V1 = VAL__BADD
          V2 = VAL__BADD
-   
+
          IF( NVAL .GE. 2 .AND. STATUS .EQ. SAI__OK ) THEN
             CALL CHR_CTOD( PVALS( 2 ), V1, STATUS )
-   
+
             IF( STATUS .NE. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'P', PARAM )
                CALL MSG_SETC( 'V', PVALS( 1 ) )
                CALL MSG_SETC( 'V1', PVALS( 2 ) )
-   
+
                CALL ERR_REP( 'KPG1_GRLM2_ERR3', 'Non-numeric value '//
      :                       '(^V1) supplied after ''^V'' for '//
      :                       'parameter %^P.', STATUS )
                GO TO 999
             END IF
          END IF
-   
+
          IF( NVAL .GE. 3 .AND. STATUS .EQ. SAI__OK ) THEN
             CALL CHR_CTOD( PVALS( 3 ), V2, STATUS )
-   
+
             IF( STATUS .NE. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'P', PARAM )
                CALL MSG_SETC( 'V', PVALS( 1 ) )
                CALL MSG_SETC( 'V2', PVALS( 3 ) )
-   
+
                CALL ERR_REP( 'KPG1_GRLM2_ERR4', 'Non-numeric value '//
      :                       '(^V2) supplied after ''^V'' for '//
      :                       'parameter %^P.', STATUS )
@@ -290,11 +290,11 @@
             CALL PSX_CALLOC( N, '_DOUBLE', IPW1, STATUS )
 
 *  Copy the data values to the work array, applying the bad value mask
-*  supplied in D2 at the same time.      
-            CALL KPG1_CPBDD( N, D1, D2, %VAL( CNF_PVAL( IPW1 ) ), 
+*  supplied in D2 at the same time.
+            CALL KPG1_CPBDD( N, D1, D2, %VAL( CNF_PVAL( IPW1 ) ),
      :                       STATUS )
 
-*  Implement defaults for any missing numerical parameter values. 
+*  Implement defaults for any missing numerical parameter values.
             IF( V1 .EQ. VAL__BADD ) V1 = 5.0
             IF( V2 .EQ. VAL__BADD ) V2 = 100.0 - V1
 
@@ -302,21 +302,21 @@
             FRAC( 1 ) = REAL( V1 )*0.01
             FRAC( 2 ) = REAL( V2 )*0.01
 
-*  Obtain the maximum and minimum values to define the bounds of the 
+*  Obtain the maximum and minimum values to define the bounds of the
 *  histogram.
-            CALL KPG1_MXMND( .TRUE., N, %VAL( CNF_PVAL( IPW1 ) ), 
+            CALL KPG1_MXMND( .TRUE., N, %VAL( CNF_PVAL( IPW1 ) ),
      :                       NINVAL, DMAX,
      :                       DMIN, MAXPOS, MINPOS, STATUS )
 
-*  Generate the histogram between those bounds. The number of bad pixels 
+*  Generate the histogram between those bounds. The number of bad pixels
 *  has been counted so it might be possible to save future processing.
-            CALL KPG1_GHSTD( ( NINVAL .EQ. 0 ), N, 
+            CALL KPG1_GHSTD( ( NINVAL .EQ. 0 ), N,
      :                       %VAL( CNF_PVAL( IPW1 ) ), HISTSZ,
      :                       .FALSE., DMAX, DMIN, HIST, STATUS )
 
 *  Estimate the values at the percentiles. On exit, the values in FRAC
 *  are re-arranged into ascending order.
-            CALL KPG1_HSTFD( HISTSZ, HIST, DMAX, DMIN, 2, FRAC, PERVAL, 
+            CALL KPG1_HSTFD( HISTSZ, HIST, DMAX, DMIN, 2, FRAC, PERVAL,
      :                       STATUS )
 
 *  Swap the percentiles back if they were flipped.
@@ -331,7 +331,7 @@
 *  the upper limit is required to be found by this routine).
             IF( NLIM .EQ. 1 ) THEN
 
-*  If the user supplied a percentile value, use it (i.e. PERVAL( 1 )). 
+*  If the user supplied a percentile value, use it (i.e. PERVAL( 1 )).
                IF( NVAL .EQ. 2 ) THEN
                   IF( LIM1 .EQ. VAL__BADD ) THEN
                      LIM1 = PERVAL( 1 )
@@ -340,7 +340,7 @@
                   END IF
 
 *  Otherwise (i.e. if the defaults of 5,95 have been used), use the default
-*  appropriate to the required limit ( PERVAL( 1 ) for low limits, 
+*  appropriate to the required limit ( PERVAL( 1 ) for low limits,
 *  PERVAL( 2 ) for high limits).
                ELSE
                   IF( LIM1 .EQ. VAL__BADD ) THEN
@@ -363,7 +363,7 @@
 *  ====================================================================
          ELSE IF( PVALS( 1 ) .EQ. 'SIGMAS' ) THEN
 
-*  Implement defaults for any missing numerical parameter values. 
+*  Implement defaults for any missing numerical parameter values.
             IF( V1 .EQ. VAL__BADD ) V1 = 3.0
             IF( V2 .EQ. VAL__BADD ) V2 = V1
 
@@ -375,7 +375,7 @@
 *  Find the required sums so that we can calculate the mean and standard
 *  deviation of the data.
             DO I = 1, N
-               IF( D1( I ) .NE. VAL__BADD .AND. 
+               IF( D1( I ) .NE. VAL__BADD .AND.
      :          D2( I ) .NE. VAL__BADD ) THEN
                   S1 = S1 + D1( I )
                   S2 = S2 + D1( I )**2
@@ -385,7 +385,7 @@
 
 *  Report an error if if no good data was found.
             IF( S3 .LE. 1.0 ) THEN
-   
+
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'KPG1_GRLM2_ERR5', 'No good data to '//
@@ -396,18 +396,18 @@
 
 *  Find the required limits.
             ELSE
-               MEAN = S1/S3            
+               MEAN = S1/S3
                SIG = SQRT( MAX( 0.0D0, S2/S3 - MEAN**2 ) )
-   
+
 *  Return the required values.
                IF( LIM1 .EQ. VAL__BADD ) LIM1 = MEAN - V1*SIG
                IF( LIM2 .EQ. VAL__BADD ) LIM2 = MEAN + V2*SIG
-   
+
             END IF
 
 *  Limits given as an extended data range.
 *  =======================================
-         ELSE 
+         ELSE
 
 *  Initialise the extreme data values.
             DMIN = VAL__MAXD
@@ -415,9 +415,9 @@
 
 *  Find the data limits, including error bars if supplied.
             IF( USEBAR ) THEN
-   
+
                DO I = 1, N
-                  IF( D1( I ) .NE. VAL__BADD .AND. 
+                  IF( D1( I ) .NE. VAL__BADD .AND.
      :                D2( I ) .NE. VAL__BADD .AND.
      :                BAR( I, 1 ) .NE. VAL__BADD .AND.
      :                BAR( I, 2 ) .NE. VAL__BADD ) THEN
@@ -437,15 +437,15 @@
                END DO
 
             ELSE
-  
+
                DO I = 1, N
-                  IF( D1( I ) .NE. VAL__BADD .AND. 
+                  IF( D1( I ) .NE. VAL__BADD .AND.
      :                D2( I ) .NE. VAL__BADD ) THEN
                      DMIN = MIN( DMIN, D1( I ) )
                      DMAX = MAX( DMAX, D1( I ) )
                   END IF
                END DO
- 
+
             END IF
 
 *  Report an error if if no good data was found.
@@ -461,9 +461,9 @@
 
 *  Find the data range.
             ELSE
-               RANGE = DMAX - DMIN 
+               RANGE = DMAX - DMIN
 
-*  Implement defaults for any missing numerical values. 
+*  Implement defaults for any missing numerical values.
                IF( V1 .EQ. VAL__BADD ) V1 = 2.5
                IF( V2 .EQ. VAL__BADD ) V2 = V1
 

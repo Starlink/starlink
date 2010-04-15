@@ -21,7 +21,7 @@ C  Parameters:     (">" input, "<" output)
 C     (>) NAME     (Fixed string, descr) The name of the parameter
 C     (>) DEFAULT  (Fixed string, descr) The string to be used as the
 C                  default value of the parameter.
-C     (<) STATUS   (Integer, ref) Indicates the result of the 
+C     (<) STATUS   (Integer, ref) Indicates the result of the
 C                  operation.  0 => OK.  A non-zero value
 C                  indicates failure.
 C
@@ -59,7 +59,7 @@ C
 C
       IF ( ABORT ) RETURN
 C
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
       CALL PAR_DEF0C( NAME, DEFAULT, STATUS )
       IF ( STATUS .NE. SAI__OK ) ABORT = .TRUE.
 C

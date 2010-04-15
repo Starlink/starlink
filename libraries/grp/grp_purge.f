@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -165,17 +165,17 @@
 *  and are required by UNIX. There are no corresponding dummy arguments
 *  in the code for GRP1_IPURG.
       CALL GRP1_IPURG( CMN_UPPER( SLOT1 ), CMN_SIZE( SLOT1 ),
-     :           %VAL( CNF_PVAL( CMN_NMPNT( SLOT1 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_NMPNT( SLOT1 ) ) ),
      :           %VAL( CNF_PVAL( CMN_MGPNT( SLOT1 ) ) ),
-     :           %VAL( CNF_PVAL( CMN_MIPNT( SLOT1 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_MIPNT( SLOT1 ) ) ),
      :           %VAL( CNF_PVAL( CMN_LVPNT( SLOT1 ) ) ),
-     :           %VAL( CNF_PVAL( CMN_INPNT( SLOT1 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_INPNT( SLOT1 ) ) ),
      :           CMN_GSIZE( SLOT1 ),
-     :           CMN_SIZE( SLOT2 ), 
+     :           CMN_SIZE( SLOT2 ),
      :           %VAL( CNF_PVAL( CMN_NMPNT( SLOT2 ) ) ),
-     :           %VAL( CNF_PVAL( CMN_MGPNT( SLOT2 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_MGPNT( SLOT2 ) ) ),
      :           %VAL( CNF_PVAL( CMN_MIPNT( SLOT2 ) ) ),
-     :           %VAL( CNF_PVAL( CMN_LVPNT( SLOT2 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_LVPNT( SLOT2 ) ) ),
      :           %VAL( CNF_PVAL( CMN_INPNT( SLOT2 ) ) ),
      :           CMN_GSIZE( SLOT2 ), STATUS ,
      :           %VAL( CNF_CVAL( GRP__SZNAM ) ),

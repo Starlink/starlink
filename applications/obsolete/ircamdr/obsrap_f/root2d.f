@@ -1,11 +1,11 @@
-*+  ROOT2D - takes the square root of 2-d array pixel by pixel 
+*+  ROOT2D - takes the square root of 2-d array pixel by pixel
 
       SUBROUTINE ROOT2D ( INARRAY, DIMS1, DIMS2, OUTARRAY, STATUS )
 
 *    Description :
 *
 *     This routine fills the output array pixels with the results
-*     of taking the square root of the input array 
+*     of taking the square root of the input array
 *     specified, i.e. New value = Old value ** 0.5
 *
 *    Invocation :
@@ -29,13 +29,13 @@
 *     If input power is negative then
 *        Very small pixel values may cause us to overflow - work out
 *         minimum limit and set large checking flag false
-*     Else input power is greater than zero 
+*     Else input power is greater than zero
 *        Large positive pixels may cause us to overflow - work out
 *         maximum limit and set large checking flag true
 *     Endif
 *     If large checking then
 *        For all pixels of the output array
-*           If Inarray pixel is negative or has value greater 
+*           If Inarray pixel is negative or has value greater
 *            than specified maximum then
 *              Outarray pixel = Bad value
 *           Else
@@ -44,7 +44,7 @@
 *        Endfor
 *     Else small checking required
 *        For all pixels of the output array
-*           If Inarray pixel is negative or has value less than 
+*           If Inarray pixel is negative or has value less than
 *            specified minimum then
 *              Outarray pixel = Bad value
 *           Else
@@ -93,12 +93,12 @@
       INTEGER  STATUS             ! global status parameter
 
 *    Local constants :
- 
+
 *    Local variables :
 
       INTEGER
-     :    I, J                    ! counter variables 
-   
+     :    I, J                    ! counter variables
+
 *-
 *    check status on entry - return if not o.k.
 

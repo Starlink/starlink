@@ -47,7 +47,7 @@
 
 * Old dta
 *      call dta_wrvarc(refnam//'.fits.'//item,chr_len(val),val,status)
-*      call cmp_put0c(NLOC,refnam//'.fits.'//item, val, status) 
+*      call cmp_put0c(NLOC,refnam//'.fits.'//item, val, status)
 
            call dta_loc(refnam//'.fits.'//item,nloc,status)
            call dat_put0c(nloc,val,status)
@@ -61,8 +61,8 @@
 
 * Old dta
 *        call dta_wrvarc(refnam//'.comments.'//item,ilen,comment,status)
-*      call cmp_put0c(PLOC,refnam//'.comments.'//item, comment, status)  
- 
+*      call cmp_put0c(PLOC,refnam//'.comments.'//item, comment, status)
+
            call dta_loc(refnam//'.comments.'//item,ploc,status)
            call dat_put0c(ploc,comment,status)
 

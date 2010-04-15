@@ -28,12 +28,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -120,7 +120,7 @@ typedef struct AstSpecFrame {
    AstSystemType sourcesys;      /* Code identifying source vel. system */
    int nuunits;                  /* Size of usedunits array */
    char **usedunits;             /* Last used units for each system */
-   double specorigin;            /* Origin for sectral values */ 
+   double specorigin;            /* Origin for sectral values */
    int alignspecoffset;          /* Align SpecFrame in offset coords? */
 } AstSpecFrame;
 
@@ -195,7 +195,7 @@ typedef struct AstSpecFrameVtab {
 } AstSpecFrameVtab;
 
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -229,7 +229,7 @@ AstSpecFrame *astSpecFrameId_( const char *, ... );
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstSpecFrame *astInitSpecFrame_( void *, size_t, int, 
+AstSpecFrame *astInitSpecFrame_( void *, size_t, int,
                                          AstSpecFrameVtab *,
                                          const char *, int * );
 
@@ -237,12 +237,12 @@ AstSpecFrame *astInitSpecFrame_( void *, size_t, int,
 void astInitSpecFrameVtab_( AstSpecFrameVtab *, const char *, int * );
 
 /* Loader. */
-AstSpecFrame *astLoadSpecFrame_( void *, size_t, 
+AstSpecFrame *astLoadSpecFrame_( void *, size_t,
                                          AstSpecFrameVtab *,
                                          const char *, AstChannel *channel, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitSpecFrameGlobals_( AstSpecFrameGlobals * );
 #endif
 

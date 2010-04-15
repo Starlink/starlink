@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command WRITE.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  Get an identifier to the model NDF.
       CALL GETNDF( PARAMS, 2, .TRUE., COMM, 'Model NDF', '!', 'READ',
      :             ' ', INDFM, STATUS )
@@ -158,8 +158,8 @@
          CALL NDF_ANNUL( INDFM, STATUS )
 
       END IF
-         
-*  Jump to here if an error occurs. 
+
+*  Jump to here if an error occurs.
  999  CONTINUE
 
 *  If an error has occurred, re-report it with less information unlerss

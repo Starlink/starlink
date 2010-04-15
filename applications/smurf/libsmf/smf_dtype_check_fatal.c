@@ -100,7 +100,7 @@ int smf_dtype_check_fatal(const smfData* data, const char * type,
 
   /* Set a default value */
   int retval = 0;
-  
+
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 

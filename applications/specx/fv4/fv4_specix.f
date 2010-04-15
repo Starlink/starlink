@@ -1,4 +1,4 @@
-      SUBROUTINE FV4_SPECIX( XLOC, ISEQ, RPOS, LENGTH, ILOUT, IFAIL, 
+      SUBROUTINE FV4_SPECIX( XLOC, ISEQ, RPOS, LENGTH, ILOUT, IFAIL,
      :                       STATUS )
 *+
 *  Name:
@@ -52,7 +52,7 @@
 *  History:
 *     07 Dec 1993 (hme):
 *        Original version.
-*     10 May 1995 (rpt): 
+*     10 May 1995 (rpt):
 *        Added support for ISEQ
 *     21 Sep 2000 (ajc):
 *        Unused IMODE
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
       CHARACTER * ( DAT__SZLOC ) TLOC ! An HDS locator
 
 *.
-   
+
 *  Check inherited global status.
       IF ( IFAIL .NE. 0 .OR. STATUS .NE. SAI__OK ) RETURN
 
@@ -139,11 +139,11 @@
 *     If header read OK.
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-            IF ( DPOS(1) .GE. RPOS(1)-0.01 .AND. 
+            IF ( DPOS(1) .GE. RPOS(1)-0.01 .AND.
      :           DPOS(1) .LE. RPOS(2)+0.01 .AND.
      :           DPOS(2) .GE. RPOS(3)-0.01 .AND.
      :           DPOS(2) .LE. RPOS(4)+0.01 ) THEN
-               
+
 *           If long format.
                IF ( LENGTH .EQ. 2 ) THEN
 

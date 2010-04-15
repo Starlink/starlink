@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Give size in bytes for TYPE.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -39,14 +39,14 @@
 
 *   Import:
       BYTE TYPE(MAXTYPE)    ! data type (Fortran only)
- 
+
 *   Export:
       INTEGER BYTES         ! bytes per primitive element
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       LOGICAL str_SIMLR     ! caseless string equality
- 
+
 *   Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 

@@ -8,7 +8,7 @@ C
 C     ARC utility.  Displays on the graphics device a section of an
 C     arc spectrum, autoscaled, with space at the top for interactive
 C     line finding. Also displays any points already identified in this
-C     range.  Uses PGPLOT routines, and assumes that PGBEGIN has 
+C     range.  Uses PGPLOT routines, and assumes that PGBEGIN has
 C     already been called.  Does not call PGEND.
 C
 C     Parameters -    (">" input, "<" output)
@@ -21,13 +21,13 @@ C     (>) IXEN      (Integer) The last element to be displayed.
 C     (>) XLAB      (Character) The x-label for the plot.
 C     (>) ZLAB      (Character) The z-label for the plot.
 C     (>) COEFFS    (Double precision array COEFFS(ORDER)) The
-C                   current wavelength coefficients. 
+C                   current wavelength coefficients.
 C     (>) ORDER     (Integer) The number of coefficients used.
 C     (>) XS        (Logical) True if identified lines are to be
 C                   indicated only by an X instead of by wavelength.
-C     (>) CHANS     (Real array CHANS(NP)) The channels of the 
+C     (>) CHANS     (Real array CHANS(NP)) The channels of the
 C                   identified lines so far.
-C     (>) WAVES     (Real array WAVES(NP)) The wavelengths of the 
+C     (>) WAVES     (Real array WAVES(NP)) The wavelengths of the
 C                   identified lines so far.
 C     (>) CLASS     (Integer array CLASS(NP)) The class codes for
 C                   the identified lines.

@@ -3,7 +3,7 @@
  *
  * hatches.h:  Contains line segment end point data for RAL GKS hatch styles
  *             -1 to -10.
- *             The data is held as a set of 10 static arrays of XSegments, 
+ *             The data is held as a set of 10 static arrays of XSegments,
  *             called hatch_1,  hatch_2,  etc.
  *
  * Author:  TAW

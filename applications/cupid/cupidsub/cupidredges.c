@@ -22,20 +22,20 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidREdges( int nel, double *dval, int *dpos, int *mask, 
+*     void cupidREdges( int nel, double *dval, int *dpos, int *mask,
 *                       int minpix, double thresh, double noise, double rms,
 *                       double flatslope, int *status )
 
 *  Description:
-*     This function finds the highest data value in the supplied 1D line 
-*     of data. It then works outwards on both sides of this peak position 
+*     This function finds the highest data value in the supplied 1D line
+*     of data. It then works outwards on both sides of this peak position
 *     looking for the edges of the peak. When found, the pixels
 *     corresponding to the edge are flagged as edge pixels in the
 *     supplied 3D mask array so long as they encompass more than a given
 *     number of pixels, and the peak position is flagged as a peak in the
-*     mask. The 1D line of data is then rescanned looking for the next 
-*     highest peak, and the edges of this peak are also flagged in the mask. 
-*     This procedure is repeated until all peaks above the given threshhold 
+*     mask. The 1D line of data is then rescanned looking for the next
+*     highest peak, and the edges of this peak are also flagged in the mask.
+*     This procedure is repeated until all peaks above the given threshhold
 *     value have been found.
 
 *  Parameters:
@@ -45,20 +45,20 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 *        Pointer to an array holding the data values at each point in the
 *        1D line of data.
 *     dpos
-*        Pointer to an array holding the 1D vector index within the "mask" 
+*        Pointer to an array holding the 1D vector index within the "mask"
 *        array corresponding to each data value in the 1D line of data.
 *        On exit, all pixels contained within any peak are set to -1.
 *     mask
 *        Pointer to the mask array. Edge pixels are set to 1 on exit.
 *     minpix
-*        The minimum number of pixels (including the edge pixels) which must 
-*        be spanned by a peak in order for its edges to be marked in the 
-*        returned mask. 
+*        The minimum number of pixels (including the edge pixels) which must
+*        be spanned by a peak in order for its edges to be marked in the
+*        returned mask.
 *     thresh
-*        The smallest significant peak height. The edges of peaks which are 
+*        The smallest significant peak height. The edges of peaks which are
 *        below this limit are not included in the returned mask.
 *     noise
-*        Defines the data value below which pixels are considered to be in 
+*        Defines the data value below which pixels are considered to be in
 *        the noise. A peak is considered to end when the peak value dips
 *        below the "noise" value.
 *     rms
@@ -151,7 +151,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
                maxpos = i;
             }
          }
-      }      
+      }
 
 /* We have finished if there are no good pixels left or if the highest
    pixel value is below the noise level. */
@@ -167,7 +167,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
       vlast = VAL__MIND;
       vlim = VAL__MAXD;
 
-/* Loop round extending the peak to larger radii until the first significant 
+/* Loop round extending the peak to larger radii until the first significant
    minimum is found in the line of data. "i" is left holding the index of
    the first pixel which is not included in the current peak. */
       up_ok = 0;
@@ -187,13 +187,13 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 /* Ignore bad pixels */
          if( v != VAL__BADD ) {
 
-/* If both this pixel value and the previous pixel value are below the 
+/* If both this pixel value and the previous pixel value are below the
    noise threshold, assume we have reached the noise background. */
             if( v < noise && vlast < noise ) {
                up_ok = 1;
                break;
-              
-/* Otherwise, if this value is lower by a significant amount than the 
+
+/* Otherwise, if this value is lower by a significant amount than the
    previous lowest value, remember it. */
             } else if( v < minval ) {
                hslok = hslok || ( minval + deltav - v )/( i - minpos ) > flatslope;
@@ -201,17 +201,17 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
                minpos = i;
                vlim = v + 2*rms;
 
-/* Otherwise, if this value is more than 2*RMS noise higher than the 
-   lowest value found so far, we assume that the lowest value found so far 
+/* Otherwise, if this value is more than 2*RMS noise higher than the
+   lowest value found so far, we assume that the lowest value found so far
    is the minimum point in the profile. */
             } else if( v > vlim ){
                i = minpos + 1;
                up_ok = 1;
                break;
 
-/* Otherwise, if the lowest pixel has not changed for the past GRADSTEP 
+/* Otherwise, if the lowest pixel has not changed for the past GRADSTEP
    pixels, assume we have reached the flat bit of the profile, so long as
-   we have also had a steep bit (i.e. distinguish between the flat bit at 
+   we have also had a steep bit (i.e. distinguish between the flat bit at
    the top of a peak and the flat background surrounding the peak). */
             } else if( i - minpos > GRADSTEP && hslok ) {
                i = minpos + 1;
@@ -236,14 +236,14 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    slope greater than flatslope. */
       lslok = 0;
 
-/* We now search for the lower edge pixel. Initialise the lowest value found 
+/* We now search for the lower edge pixel. Initialise the lowest value found
    so far in the peaks profile. */
       minval = maxval - deltav;
       minpos = maxpos;
       vlast = VAL__MIND;
       vlim = VAL__MAXD;
 
-/* Loop round extending the peak to smaller radii until the first significant 
+/* Loop round extending the peak to smaller radii until the first significant
    minimum is found in the line of data. "i" is left holding the index of
    the first pixel which is not included in the current peak. */
       lo_ok = 0;
@@ -259,17 +259,17 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 
 /* Get the pixel value. */
          v = dval[ i ];
-         
+
 /* Ignore bad pixels */
          if( v != VAL__BADD ) {
 
-/* If both this pixel value and the previous pixel value are below the 
+/* If both this pixel value and the previous pixel value are below the
    noise threshold, assume we have reached the noise background. */
             if( v < noise && vlast < noise ) {
                lo_ok = 1;
                break;
-              
-/* Otherwise, if this value is lower by a significant amount than the previous 
+
+/* Otherwise, if this value is lower by a significant amount than the previous
    lowest value, remember it. */
             } else if( v < minval ) {
                lslok = lslok || ( minval + deltav - v )/( minpos - i ) > flatslope;
@@ -277,8 +277,8 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
                minpos = i;
                vlim = v + 2*rms;
 
-/* Otherwise, if this value is more than the 2*RMS noise higher than the 
-   lowest value found so far, we assume that the lowest value found so far 
+/* Otherwise, if this value is more than the 2*RMS noise higher than the
+   lowest value found so far, we assume that the lowest value found so far
    is the minimum point in the profile. */
             } else if( v > vlim ){
                i = minpos - 1;
@@ -320,7 +320,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
              maxval >= thresh ) {
             mask[ dpos[ maxpos ] ] += CUPID__KPEAK;
 
-         } 
+         }
       }
 
 /* Indicate that the intervening pixels have been allocated to a peak. */

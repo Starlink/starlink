@@ -81,9 +81,9 @@
 *     max_dispersion = REAL (Given)
 *        Maximum allowed dispersion (pixels per A)
 *     start_wave_index = INTEGER (Given)
-*        Index corresponding to lowest wavelength 
+*        Index corresponding to lowest wavelength
 *     end_wave_index = INTEGER (Given)
-*        Index corresponding to highest wavelength 
+*        Index corresponding to highest wavelength
 *     differ_thresh = REAL (Given)
 *        Maximum difference in ratios (percentage)
 *     num_actv_ftrs = INTEGER (Given)
@@ -229,8 +229,8 @@
       INTEGER db_index
       CHARACTER * ( 80 ) REPORT_STRING
       INTEGER IGNORE             ! MSG status
-      DATA ratidx   / 1 , 2 , 3 , 4 , 
-     :                2 , 1 , 3 , 4 , 
+      DATA ratidx   / 1 , 2 , 3 , 4 ,
+     :                2 , 1 , 3 , 4 ,
      :                3 , 1 , 2 , 4 ,
      :                4 , 1 , 2 , 3   /
 
@@ -269,7 +269,7 @@
          cand_count = 0
 
 *%       Loop through all calculated ratios to be matched with
-         rindex = 1 
+         rindex = 1
 * 3 >>>>>
          DO WHILE ( rindex .NE. next_index ( rindex , iftr ) )
 
@@ -280,7 +280,7 @@
 *%         Calculate limiting slots of the feature database we need to search
            low_end = ratios ( rindex,1,iftr )  /
      :                              ( 1.0 + differ_thresh )
-           high_end = ratios ( rindex,1,iftr ) * 
+           high_end = ratios ( rindex,1,iftr ) *
      :                              ( 1.0 + differ_thresh )
 
 *%         Loop through quick index entries (into feature db)
@@ -293,7 +293,7 @@
 
 *%             Loop through all values in this slot (of feature db)
 * 4 >>>>>>>>>>>
-               DO iindex =  ftr_db_quick_index ( iqindex ) , 
+               DO iindex =  ftr_db_quick_index ( iqindex ) ,
      :                    ftr_db_quick_index ( iqindex+1 ) - 1
 
 *%              If feature wavelength for this db entry is within range then
@@ -307,12 +307,12 @@
                    ccnt(1) = ccnt(1) + 1
 
 *%                 Calculate difference between database ratio and observed ratio
-                   difference1 = ABS ( 1.0 - 
+                   difference1 = ABS ( 1.0 -
      :                         ABS ( ratios ( rindex , 1,iftr ) /
      :                                     ftr_db ( pos_l1 , pos_r1 ,
-     :                                               db_index ) 
-     :                                    )   
-     :                                ) 
+     :                                               db_index )
+     :                                    )
+     :                                )
 
 *%                 If ratios are close to each other then
                    IF ( difference1 .LT. differ_thresh ) THEN
@@ -323,12 +323,12 @@
 
 *%                    Calculate difference between database ratio and observed ratio
                       ccnt(2) = ccnt(2) + 1
-                      difference2 = ABS ( 1.0 - 
+                      difference2 = ABS ( 1.0 -
      :                         ABS ( ratios ( rindex , 2,iftr ) /
      :                                   ftr_db ( pos_l1 ,
-     :                                            pos_r2 , db_index ) 
-     :                                    )   
-     :                                  )  
+     :                                            pos_r2 , db_index )
+     :                                    )
+     :                                  )
 
 *%                    If ratios are close to each other then
                       IF ( difference2 .LT. differ_thresh ) THEN
@@ -339,24 +339,24 @@
 
 *%                      Calculate difference between database ratio and observed ratio
                         ccnt(3) = ccnt(3) + 1
-                        difference3 = ABS ( 1.0 - 
+                        difference3 = ABS ( 1.0 -
      :                         ABS ( ratios ( rindex , 3,iftr ) /
      :                                   ftr_db ( pos_l2 ,
-     :                                            pos_r1 , db_index ) 
-     :                                    )   
-     :                                   ) 
+     :                                            pos_r1 , db_index )
+     :                                    )
+     :                                   )
 
 *%                      If ratios are close to each other then
                         IF ( difference3 .LT. differ_thresh ) THEN
 
 *%                          Calculate difference between database ratio and observed ratio
                             ccnt(4) = ccnt(4) + 1
-                            difference4 = ABS ( 1.0 - 
+                            difference4 = ABS ( 1.0 -
      :                       ABS ( ratios ( rindex , 4,iftr ) /
      :                                   ftr_db ( pos_l2 ,
-     :                                            pos_r2 , db_index ) 
-     :                                      )   
-     :                                    )  
+     :                                            pos_r2 , db_index )
+     :                                      )
+     :                                    )
 
 *%                          If ratios are close to each other then
                             IF ( difference4 .LT. differ_thresh ) THEN
@@ -393,7 +393,7 @@
 
 *%                  End loop
 * 5 <<<<<<<<<<<<<<<<
-                    END DO 
+                    END DO
 
 *%                 Endif
                    ENDIF
@@ -419,7 +419,7 @@
          END DO
 
 *%       Select top 'max_candidates' candidates for eventual consistency search
-         CALL SPD_WZKF( 
+         CALL SPD_WZKF(
      :      bpos_dispersion, bpos_ftr, bpos_distances, bpos_posindex,
      :      bpos_prev_ftr, bpos_prev_ftr2, bpos_next_ftr,
      :      bpos_next_ftr2, best_dispersion(1,iftr), best_ftr(1,iftr),

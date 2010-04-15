@@ -1,9 +1,9 @@
- 
-      SUBROUTINE PERIOD_SCARGLE(X, Y, N, WK1, WK2, NDIM, NOUT, IFAIL, 
+
+      SUBROUTINE PERIOD_SCARGLE(X, Y, N, WK1, WK2, NDIM, NOUT, IFAIL,
      :                          FMIN, FMAX, FINT, INFO,
      :                          AVE, VAR, XMIN, XDIF,
      :                          OFAC, HIFAC, NFREQ)
- 
+
 C==============================================================================
 C Subroutine for fast evaluation of the Lomb-Scargle statistic using the method
 C described by Press, W. H. & Rybicki, G. B., 1989, Astrophysical Journal, 338,
@@ -22,14 +22,14 @@ C Converted to Double Precision (KPD), August 2001
 C==============================================================================
 
       IMPLICIT NONE
- 
+
 C------------------------------------------------------------------------------
 C Number of interpolation points per 1/4 cycle of highest frequency.
 C------------------------------------------------------------------------------
 
-      INTEGER MACC 
+      INTEGER MACC
       PARAMETER (MACC=4)
- 
+
 C------------------------------------------------------------------------------
 C PERIOD_SCARGLE declarations.
 C------------------------------------------------------------------------------
@@ -37,32 +37,32 @@ C------------------------------------------------------------------------------
       INTEGER     NOUT, N, IFAIL, INFO, K, IEL, LOOP
       INTEGER     ISTEP, NDIM, J, NFREQ, NFREQT
       DOUBLE PRECISION FMIN, FMAX, FINT
-      DOUBLE PRECISION AVE, VAR 
+      DOUBLE PRECISION AVE, VAR
       DOUBLE PRECISION X(N), Y(N), WK1(NDIM), WK2(NDIM)
       DOUBLE PRECISION XMIN, XDIF
       DOUBLE PRECISION FNDIM, OFAC, HIFAC, FAC, CK, CKK, DEN, DF
-      DOUBLE PRECISION CTERM, STERM, HYPO, HC2WT, HS2WT, CWT, SWT 
+      DOUBLE PRECISION CTERM, STERM, HYPO, HC2WT, HS2WT, CWT, SWT
       DATA ISTEP/50/
- 
+
       NOUT = IDINT(0.5D0*OFAC*HIFAC*DFLOAT(N))
- 
+
 C------------------------------------------------------------------------------
 C Zero the workspaces.
 C------------------------------------------------------------------------------
-      
+
       DO 300 J = 1, NDIM
          WK1(J) = 0.0D0
          WK2(J) = 0.0D0
  300  CONTINUE
       FAC = DFLOAT(NDIM)/(XDIF*OFAC)
       FNDIM = DFLOAT(NDIM)
- 
+
 C------------------------------------------------------------------------------
 C Extirpolate the data into the workspaces.
 C------------------------------------------------------------------------------
 
       IFAIL = 0
-      
+
       DO 400 J = 1, N
          CK = 1.0D0 + DMOD((X(J)-XMIN)*FAC, FNDIM)
          CKK = 1.0D0 + DMOD(2.0D0*(CK-1.0D0), FNDIM)
@@ -74,23 +74,23 @@ C------------------------------------------------------------------------------
          IF ( IFAIL.EQ.1 ) GO TO 600
 
  400  CONTINUE
- 
+
 C------------------------------------------------------------------------------
 C Take the Fast Fourier Transforms.
 C------------------------------------------------------------------------------
-      
+
       CALL PERIOD_REALFT(WK1, NFREQ, 1)
 
       CALL PERIOD_REALFT(WK2, NFREQ, 1)
 
       DF = 1.0D0/(XDIF*OFAC)
       K = 3
- 
+
 C------------------------------------------------------------------------------
 C Compute the Lomb-Scargle value for each frequency between FMIN, FMAX
 C with step size FINT.
 C------------------------------------------------------------------------------
-      
+
       IEL = 0
       LOOP = 1
       DO 500 J = 1, NOUT
@@ -111,7 +111,7 @@ C------------------------------------------------------------------------------
             IF ( INFO.EQ.1 ) THEN
                IF ( IEL.EQ.(LOOP*ISTEP) ) THEN
                   WRITE (*, 99001) WK1(IEL), WK2(IEL)
-99001             FORMAT ('+Frequency =', D12.6, 
+99001             FORMAT ('+Frequency =', D12.6,
      :                    ',  Lomb-Scargle Statistic =', D12.6)
                   LOOP = LOOP + 1
                END IF
@@ -120,7 +120,7 @@ C------------------------------------------------------------------------------
          END IF
  500  CONTINUE
       NOUT = IEL
- 
+
  600  CONTINUE
       RETURN
       END

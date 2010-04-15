@@ -17,7 +17,7 @@
 *     plotting surface through which the graph is seen.
 
 *  Usage:
-*     viewport action 
+*     viewport action
 *        {[xvpmin] [xvpmax] [yvpmin] [yvpmax]
 *        action
 
@@ -36,9 +36,9 @@
 *           the X and Y directions in terms of normalised device
 *           coordinates (i.e. coordinates that run from 0 to 1 along
 *           the horizontal and vertical directions).
-*           - "INCHES" -- The viewport is set by specifying its extent 
+*           - "INCHES" -- The viewport is set by specifying its extent
 *           in the X and Y directions in terms of inches.
-*           
+*
 *        [The value is prompted for.]
 *     XVPMIN = _REAL (Read and Write)
 *        The left hand side of the viewport.
@@ -62,22 +62,22 @@
 *        value is used. The current value is initially set to 1.0.
 *     XMIN = _REAL (Read)
 *        The left hand edge of the world coordinate system.
-*        
+*
 *        [The value of the global parameter PONGO_XMIN is used. If
 *        PONGO_XMIN is not defined, the default value 0.0 is used.]
 *     XMAX = _REAL (Read)
 *        The right hand edge of the world coordinate system.
-*        
+*
 *        [The value of the global parameter PONGO_XMAX is used. If
 *        PONGO_XMAX is not defined, the default value 1.0 is used.]
 *     YMIN = _REAL (Read)
 *        The lower edge of the world coordinate system.
-*        
+*
 *        [The value of the global parameter PONGO_YMIN is used. If
 *        PONGO_YMIN is not defined, the default value 0.0 is used.]
 *     YMAX = _REAL (Read)
 *        The upper edge of the world coordinate system.
-*        
+*
 *        [The value of the global parameter PONGO_YMAX is used. If
 *        PONGO_YMIN is not defined, the default value 1.0 is used.]
 
@@ -104,7 +104,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,7 +121,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       CHARACTER * ( 20 ) ACTION  ! Action to be taken
 
@@ -131,7 +131,7 @@
       REAL XMAXP                 ! Upper X world coordinate
       REAL YMINP                 ! Lower Y world coordinate
       REAL YMAXP                 ! Upper Y world coordinate
-      
+
 *  Internal References:
       INTEGER CHR_LEN
 
@@ -141,8 +141,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the plotting device is open.
-      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
-      
+      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
+
 *  Get ACTION.
          CALL PAR_GET0C( 'ACTION', ACTION, STATUS )
 
@@ -163,7 +163,7 @@
             CALL PAR_GET0R( 'XVPMAX', XMAXP, STATUS )
             CALL PAR_GET0R( 'YVPMIN', YMINP, STATUS )
             CALL PAR_GET0R( 'YVPMAX', YMAXP, STATUS )
-            
+
             IF ( ACTION .EQ. 'NDC' ) THEN
                CALL PGVPORT( XMINP, XMAXP, YMINP, YMAXP )
             ELSE
@@ -171,7 +171,7 @@
             END IF
          END IF
       END IF
-         
+
 *  Check the returned status and report a contextual error message if
 *  necessary.
       IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'VIEWPORT_END',

@@ -108,8 +108,8 @@
           LL1 = INDEX (LINE, '!')
           LL2 = INDEX (LINE, '#')
           IF (LL1.NE.0) LL = LL1
-          IF (LL2.NE.0) LL = MIN (LL, LL2)          
-          
+          IF (LL2.NE.0) LL = MIN (LL, LL2)
+
           ID    = ID + 1
           ICHAR = 1
 
@@ -262,7 +262,7 @@ CD          PRINT *, 'Output file = ', FFILE(:IFIN-IST+1)
         GO TO 99
       END IF
 
-      PROMPT =   '"''Terminals available: ''/'  
+      PROMPT =   '"''Terminals available: ''/'
      &         // PROMPT(:IP-1)  // ''''
      &         // '//'' Terminal type? ['  // TERMDEV(:LT) // '] ''"'
 
@@ -539,7 +539,7 @@ CD          PRINT *, 'Output file = ', FFILE(:IFIN-IST+1)
           END IF
         END IF
 
-*       Error in PGBEGIN? 
+*       Error in PGBEGIN?
 
         IF (IPG .EQ. 1) THEN
           DEVINIT = .TRUE.
@@ -552,7 +552,7 @@ CD          PRINT *, 'Output file = ', FFILE(:IFIN-IST+1)
 
 *         Find size of screen in mm.
 *         PGQVP returns the size of the default viewport which is the
-*         display surface less a margin 4 default character heights wide. 
+*         display surface less a margin 4 default character heights wide.
 
           CALL PGQVP (2, X1, X2, Y1, Y2)
           XSIZED = X2 + X1
@@ -576,7 +576,7 @@ C     Initialize virtual co-ordinates to mm
 
       CALL PGWINDOW (0.0, XSIZED, 0.0, YSIZED)
 
-      print *, '-- sxgdevice -- ', devname,' ', 
+      print *, '-- sxgdevice -- ', devname,' ',
      :         outfile(:gen_ilen(outfile))
 CD     print *, '   idev     = ', idev
 CD     print *, '   iterm    = ', iterm
@@ -591,7 +591,7 @@ CD     print *, '   outfile  = ', outfile(:gen_ilen(outfile))
 
 *-----------------------------------------------------------------------
 
-      SUBROUTINE SXGDEVEND 
+      SUBROUTINE SXGDEVEND
 
 *  Routine to close off the current plot device, flush buffer etc,
 *  and send hardcopy file to the appropriate device.
@@ -732,7 +732,7 @@ CD     print *, '   outfile  = ', outfile(:gen_ilen(outfile))
 
       SUBROUTINE SXGCURSOR (XPOS, YPOS, KEY)
 
-C  Routine to read back the current graphics cursor position using 
+C  Routine to read back the current graphics cursor position using
 C  Tektronix 4010/4014 GIN emulation, and convert position to millimetres.
 
       IMPLICIT  NONE
@@ -783,7 +783,7 @@ C  OK, go...
 C     Transform key to integer
 
       KEY = ICHAR (CKEY)
-      
+
 C     Convert cursor positions to millimetres
 
       XPOS = XLL + (U-ULL) * (XHH-XLL)/(UHH-ULL)
@@ -840,7 +840,7 @@ C     Convert cursor positions to millimetres
       REAL XHI
       REAL YLO
       REAL YHI
-      
+
 *     Include files
 
       INCLUDE 'SXGPGPLOT.INC'
@@ -853,7 +853,7 @@ C     Convert cursor positions to millimetres
       UHH = XHI
       VLL = YLO
       VHH = YHI
- 
+
       RETURN
       END
 
@@ -993,7 +993,7 @@ C     Convert cursor positions to millimetres
       IF (IFONT.EQ.2) JFONT = 1
       IF (IFONT.EQ.3) JFONT = 1
       IF (IFONT.EQ.4) JFONT = 1
-      
+
       CALL PGSCF (JFONT)
 
       RETURN
@@ -1028,7 +1028,7 @@ C     Convert cursor positions to millimetres
       SUBROUTINE SXGLABEL (X, Y, STRING)
 
 *  Routine to write a label STRING of NCHARS at the current cursor
-*  location. 
+*  location.
 
       IMPLICIT  NONE
 
@@ -1373,7 +1373,7 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
       IF (XSEX) THEN
         XOPT   = 'ZYH'//XOPT
         XTICKD = 0.0
-        NXSUB  = 0        
+        NXSUB  = 0
       END IF
 
       IF (LABELY .EQ. 0) THEN
@@ -1394,7 +1394,7 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
       IF (YSEX) THEN
         YOPT   = 'ZYD'//YOPT
         YTICKD = 0.0
-        NYSUB  = 0        
+        NYSUB  = 0
       END IF
 
       CALL PGTBOX   (XOPT, XTICKD, NXSUB, YOPT, YTICKD, NYSUB)
@@ -1672,7 +1672,7 @@ C     CALL PGLABEL (LABEL, ' ', ' ')
       TSTRING = STRING1
       TSTRING(L1+2:) = STRING2(:L2)
       TSTRING(L1+L2+3:) = CTIME
-      
+
       CALL PGMTEXT ('t', +0.2, 1.0, 1.0, TSTRING(:L1+L2+2+24) )
       CALL PGSCH   (EXPAND)
 

@@ -63,7 +63,7 @@
 #define DAT__W 8		 /* _WORD                                   */
 
 #define DAT__MXPRM 9		 /* Number of primitive data types	    */
-                        
+
 /* Primitive data storage order:					    */
 /* =============================					    */
 /* Note these values should not be changed, as they are encoded in data	    */
@@ -390,7 +390,7 @@ if (!_ok(*status))\
                          HDS_PTYPE  *subs );
 
       int dat1_import_floc ( const char flocator[DAT__SZLOC],
-			      int loc_length, HDSLoc *clocator, 
+			      int loc_length, HDSLoc *clocator,
 			      int * status);
 
 #endif

@@ -16,7 +16,7 @@
 *  Description:
 *     This routine is a server for ZAPLIN.  It reports the pixel indices
 *     of the bounds of the region to be be zapped.  It also validates
-*     the bounds for a line or column region by checking that they do 
+*     the bounds for a line or column region by checking that they do
 *     not include the whole array.
 *
 *     If a region has been zapped the format of the report is:
@@ -99,7 +99,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

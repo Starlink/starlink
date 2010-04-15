@@ -45,7 +45,7 @@
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
  *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
  *  Authors:
  *     PWD: Peter W. Draper (Starlink - Durham University)
  *     {enter_new_authors_here}

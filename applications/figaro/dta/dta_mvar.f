@@ -18,7 +18,7 @@ C     Parameters -   (">" input, "<" output )
 C
 C     (>) NAME     (Character) The object name, in the standard
 C                  data structure format.  Should end with a
-C                  blank or the string end, and is case 
+C                  blank or the string end, and is case
 C                  insignificant.
 C     (>) NITEM    (Integer) The number of elements to be
 C                  read from the data structure.
@@ -50,7 +50,7 @@ C
 C     all in blocks MUINFO and MUCHAR
 C
 C     Subroutines / functions used -
-C 
+C
 C     DTA_PRETR    (DTA_ package) Preliminary set up for data transfer
 C     DTA_HDSERC   ( "      "   ) Convert HDS error code to DTA code
 C     DTA_TYTIDY   ( "      "   ) Generate acceptable HDS type name
@@ -71,15 +71,15 @@ C     DTA_ routines, combining the functions of DTA_MUVAR and DTA_MRVAR.
 C
 C     Modified:
 C
-C     8th  May 1986  KS / AAO.  GNAME added to trap otherwise invalid 
+C     8th  May 1986  KS / AAO.  GNAME added to trap otherwise invalid
 C                    HDS group names.
 C     22nd Oct 1986  KS / AAO.  Bug fixed in character mapping.  ITYPE
 C                    was being tested against TYP_CHAR instead of TYP_DSCHAR.
-C     20th Jan 1992  KS / AAO.  Syntax of include statements changed to 
-C                    remove VMS logical names and to use lower case, to 
+C     20th Jan 1992  KS / AAO.  Syntax of include statements changed to
+C                    remove VMS logical names and to use lower case, to
 C                    enable compilation on a SUN.  DUMMY now explicitly set
 C                    to zero before being used as an inherited status value,
-C                    and comments added as to the way DTA_CHRPTR works 
+C                    and comments added as to the way DTA_CHRPTR works
 C                    on a UNIX system. Unused variables SIZE and TMODE removed.
 C     24th Jan 1992  KS / AAO. Calls to EMS added to control error reporting.
 C     12th Feb 1992  KS / AAO. DTA_CHRPTR changed to DTAZ_CHRPTR to emphasise
@@ -90,7 +90,7 @@ C                    name.
 C                    Append 'G' to top level name to construct HDS group
 C                    name.
 C     12th Mar 1993  HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
-C     2005 May 31    MJC/Starlink Use CNF_PVAL for pointers to mapped 
+C     2005 May 31    MJC/Starlink Use CNF_PVAL for pointers to mapped
 C                    data.
 C+
       IMPLICIT NONE
@@ -130,7 +130,7 @@ C     Local variables
 C
       LOGICAL TEMPLOC, UNDEF, VALID
       INTEGER DUMMY, EMSTAT, I, IBLANK, IDOT
-      INTEGER LDIMS(DST_MAXDIM), NLDIM, OBJ 
+      INTEGER LDIMS(DST_MAXDIM), NLDIM, OBJ
       CHARACTER FNAME*80, GNAME*17, HDSTYPE*16
       CHARACTER LOC*(DAT__SZLOC), TLOC*(DAT__SZLOC)
 C
@@ -141,7 +141,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Make sure name is in upper case for comparison with
 C     the names in the common block.
@@ -197,7 +197,7 @@ C
 C     Map the data.  Note that we always make sure that we use
 C     a temporary locator, so the mapping of the data won't get
 C     in the way of access via any original locator, and nor
-C     will any annulling of that locator (as it gets uncached, for 
+C     will any annulling of that locator (as it gets uncached, for
 C     example) interfere with the mapping.
 C     Now the group name is constructed from the top level name by
 C     appending 'G'. If we use the top level name, that is usually a DSA
@@ -243,7 +243,7 @@ C     the actual data, even for character data. This is handled by having
 C     two versions of DTA_CHRPTR - on the VAX it does the necessary processing,
 C     while under UNIX it is a null routine.
 C
-      IF (ITYPE.EQ.TYP_DSCHAR) 
+      IF (ITYPE.EQ.TYP_DSCHAR)
      :  CALL DTA_CHRPTR(%VAL( CNF_PVAL(POINTER) ), POINTER)
 C
 C     Update the common blocks.

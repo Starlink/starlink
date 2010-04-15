@@ -39,8 +39,8 @@
 *     which are further than a specified limit from the linear fit. The
 *     limit is specified as a multiple of the RMS deviation of the cross
 *     scan data array from the linear fit. The multiple is given by
-*     argument NSIGMA. This process is repeated until the RMS residual 
-*     reduces by less than 0.1% between iterations. The requested 
+*     argument NSIGMA. This process is repeated until the RMS residual
+*     reduces by less than 0.1% between iterations. The requested
 *     output surface brightness after background subtraction
 *     is subtracted from the fit. This final fit is then either
 *     subtracted from the input data, or stored directly in the output
@@ -103,7 +103,7 @@
 *        The gradient of the background, in units of Mega-Janskys per
 *        steradian, per radian.
 *     OFFSET = REAL (Returned)
-*        The background, in units of Mega-Janskys per steradian, at 
+*        The background, in units of Mega-Janskys per steradian, at
 *        sample SLOW from detector with index DLOW.
 *     DNLOW = INTEGER (Returned)
 *        The detector number corresponding to index DLOW.
@@ -142,7 +142,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -170,7 +170,7 @@
       LOGICAL OK
       CHARACTER QNAME*(*)
       CHARACTER LOCS(5)*(*)
-      
+
 *  Arguments Returned:
       REAL DATOUT( SLOW:SHIGH, DLOW:DHIGH )
       LOGICAL BAD
@@ -187,14 +187,14 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER IRC_DETNO          ! Detector number corresponding to a 
+      INTEGER IRC_DETNO          ! Detector number corresponding to a
                                  ! given detector index.
 
 *  Local Constants:
       INTEGER MAXIT              ! Max. no. of iterations.
       PARAMETER( MAXIT = 20 )
 
-      REAL TARGET                ! Fractional change in RMS between 
+      REAL TARGET                ! Fractional change in RMS between
       PARAMETER( TARGET = 0.001 )! iterations for convergence.
 
 *  Local Variables:
@@ -226,7 +226,7 @@
                                  ! sample SAMP from detector DLOW.
       REAL GRAD2                 ! The gradient of the background in the
                                  ! input units, per radian.
-      REAL LRMS                  ! The value of RMS on the previous 
+      REAL LRMS                  ! The value of RMS on the previous
                                  ! iterations.
       REAL OFF2                  ! The background at the start of the
                                  ! scan in the input units.
@@ -245,7 +245,7 @@
       DO DET = DLOW, DHIGH
          DN = IRC_DETNO( IDC, DET, STATUS )
          CALL IRM_UNTCV( UNITS, IRC__MJPS, 1, DN, WORK2( DET ), STATUS )
-      END DO      
+      END DO
 
 *  Store the number of detectors represented in the CRDD file.
       NDET = DHIGH - DLOW + 1
@@ -287,7 +287,7 @@
                ELSE
                   WORK3( DET ) = VAL__BADR
                END IF
-      
+
             ELSE
                WORK3( DET ) = VAL__BADR
             END IF
@@ -328,15 +328,15 @@
 *  Display the original RMS residual.
       CALL MSG_SETR( 'RMS', RMS )
       CALL MSG_OUTIF( MSG__VERB, 'BACKA1_MSG1',
-     :                '    Iteration 0: RMS residual is ^RMS', 
+     :                '    Iteration 0: RMS residual is ^RMS',
      :                STATUS )
 
-*  Loop round rejecting outlying samples from the straight line fit, 
+*  Loop round rejecting outlying samples from the straight line fit,
 *  until the RMS changes by less than 0.1% between succesive iterations.
       LRMS = 0.0
       ITER = 0
 
-      DO WHILE( ABS( ( RMS - LRMS )/( RMS + LRMS ) ) .GT. 0.5*TARGET 
+      DO WHILE( ABS( ( RMS - LRMS )/( RMS + LRMS ) ) .GT. 0.5*TARGET
      :         .AND. ITER .LE. MAXIT .AND. STATUS .EQ. SAI__OK )
          ITER = ITER + 1
 
@@ -347,11 +347,11 @@
          NGOOD4 = 0
          THRESH = NSIGMA*RMS
          DO SAMP = SLOW, SHIGH
-          
-            DATVAL = WORK1( SAMP ) 
+
+            DATVAL = WORK1( SAMP )
             IF( DATVAL. NE. VAL__BADR ) THEN
                FITVAL = GRAD*WORK5( SAMP ) + OFFSET
-  
+
                IF( ABS( DATVAL - FITVAL ) .LT. THRESH ) THEN
                   WORK4( SAMP ) = DATVAL
                   NGOOD4 = NGOOD4 + 1
@@ -386,7 +386,7 @@
          CALL MSG_SETI( 'REJ', NGOOD1 - NGOOD4 )
          CALL MSG_SETR( 'RMS', RMS )
          CALL MSG_OUTIF( MSG__VERB, 'BACKA1_MSG2',
-     : '    Iteration ^I: RMS residual is ^RMS (^REJ values rejected)', 
+     : '    Iteration ^I: RMS residual is ^RMS (^REJ values rejected)',
      :                   STATUS )
 
       END DO
@@ -395,10 +395,10 @@
       DNLOW = IRC_DETNO( IDC, DLOW, STATUS )
 
 *  Store the background at the start and end of the scan.
-      BLOW = GRAD*WORK5( SLOW ) + OFFSET 
-      BHIGH = GRAD*WORK5( SHIGH ) + OFFSET 
+      BLOW = GRAD*WORK5( SLOW ) + OFFSET
+      BHIGH = GRAD*WORK5( SHIGH ) + OFFSET
 
-*  Display the background at the start of the scan, and the amount by 
+*  Display the background at the start of the scan, and the amount by
 *  which it changes along the length of the scan.
       CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
@@ -417,7 +417,7 @@
      :    '    Background increases by ^B ^U along the length of the '//
      :    'scan (^L arc-mins).', STATUS )
 
-      ELSE 
+      ELSE
          CALL MSG_SETR( 'B', BLOW - BHIGH )
          CALL MSG_SETC( 'U', IRC__MJPS )
          CALL MSG_SETR( 'L', REAL( ABS( WORK5( SHIGH ) - WORK5( SLOW ) )
@@ -432,7 +432,7 @@
 *  satisfy the supplied quality expression set bad. In addition, set bad
 *  those samples which correspond to bad values in the cross scan data
 *  array. Loop round each index in the cross scan data array.
-      IF( OK ) THEN 
+      IF( OK ) THEN
          DO SAMP = SLOW, SHIGH
 
 *  If this cross scan data value is BAD, identify the samples from each
@@ -480,12 +480,12 @@
       OFFSET = OFFSET - OUTBAC
 
 *  Initalise the flag used to indicate if there are any bad values in
-*  the output array.      
+*  the output array.
       BAD = .FALSE.
 
 *  If required, subtract the background from every input value and
 *  store in the output array.
-      IF( OUTTYP .EQ. 'DATA' ) THEN      
+      IF( OUTTYP .EQ. 'DATA' ) THEN
 
 *  Do every detector in turn.
          DO DET = DLOW, DHIGH
@@ -494,7 +494,7 @@
 *  input CRDD file.
             GRAD2 = GRAD/WORK2( DET )
             OFF2 = OFFSET/WORK2( DET )
-   
+
 *  Loop round every good sample from this detector.
             DO SAMP = SLOW, SHIGH
                DATVAL = DATIN( SAMP, DET )
@@ -513,10 +513,10 @@
                   DATOUT( SAMP, DET ) = VAL__BADR
                   BAD = .TRUE.
                END IF
-   
+
             END DO
-   
-         END DO      
+
+         END DO
 
 *  Otherwise, fill the output array with the background value (excluding
 *  samples which are bad in the input).
@@ -524,7 +524,7 @@
          DO DET = DLOW, DHIGH
             GRAD2 = GRAD/WORK2( DET )
             OFF2 = OFFSET/WORK2( DET )
-   
+
             DO SAMP = SLOW, SHIGH
                DATVAL = DATIN( SAMP, DET )
                IF( DATVAL .NE. VAL__BADR ) THEN
@@ -537,10 +537,10 @@
                   DATOUT( SAMP, DET ) = VAL__BADR
                   BAD = .TRUE.
                END IF
-   
+
             END DO
-   
-         END DO      
+
+         END DO
 
       END IF
 

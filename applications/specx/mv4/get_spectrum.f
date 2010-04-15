@@ -91,7 +91,7 @@ CD      PRINT *, '    XOFF, YOFF =', XOFF, YOFF
         FRAC  = SIGN (1.0,XOFF) * MOD(MSTEP+1,2)
         IFRAC = NINT (FRAC)
         XOFF2 = 2 * NINT (XOFF+FRAC*0.5) - IFRAC
-      
+
         N     = NINT (0.5 * FLOAT (NSTEP+1) - YOFF)
         FRAC  = SIGN (1.0,YOFF) * MOD(NSTEP+1,2)
         IFRAC = NINT (FRAC)

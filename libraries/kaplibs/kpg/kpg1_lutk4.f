@@ -31,18 +31,18 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
 *  Local Variables:
       INTEGER CMAP1              ! Pointer to a CmpMap
       INTEGER CMAP2              ! Pointer to a CmpMap
-      INTEGER I                  ! Loop count   
+      INTEGER I                  ! Loop count
       INTEGER NPEN               ! Number of pens
       INTEGER PERM( 3 )          ! Pointer to output permutation array
       INTEGER PMAP               ! Pointer to a PermMap
@@ -97,7 +97,7 @@
 *  Save the number of pens in use.
       NPEN = UP - LP + 1
 
-*  Copy the RGB intensities (0-1) into the work array. 
+*  Copy the RGB intensities (0-1) into the work array.
       DO I = LP, UP
          CALL PGQCR( I, R, G, B )
          WORK( I, 1 ) = DBLE( R )
@@ -108,12 +108,12 @@
 *  Create three LutMaps describing the Mapping from Pen Number to each of
 *  the three primary colours.
       DO I = 1, 3
-         RGBMAP( I ) = AST_LUTMAP( NPEN, WORK( LP, I ), DBLE( LP ), 
-     :                             1.0D0, ' ', STATUS ) 
+         RGBMAP( I ) = AST_LUTMAP( NPEN, WORK( LP, I ), DBLE( LP ),
+     :                             1.0D0, ' ', STATUS )
       END DO
 
 *  Combine these LutMaps in parallel,
-      CMAP1 = AST_CMPMAP( RGBMAP( 1 ), RGBMAP( 2 ), .FALSE., ' ', 
+      CMAP1 = AST_CMPMAP( RGBMAP( 1 ), RGBMAP( 2 ), .FALSE., ' ',
      :                    STATUS )
       CMAP2 = AST_CMPMAP( CMAP1, RGBMAP( 3 ), .FALSE., ' ', STATUS )
 

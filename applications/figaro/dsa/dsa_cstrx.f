@@ -23,7 +23,7 @@ C     CALL DSA_CSTRx (ELEMENTS,BSCALE,BZERO,BASE,ARRAY,ERRORS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) ELEMENTS      (Integer,ref) The number of elements in the 
+C     (>) ELEMENTS      (Integer,ref) The number of elements in the
 C                       array.
 C     (<) BSCALE        (Double precision,ref) The scaling factor to
 C                       be applied.
@@ -259,13 +259,13 @@ C     This is the only one of these routines that needs explanation, and
 C     is odd only because Fortran doesn't support unsigned integer types.
 C     If the data in the array is all in the range 0..32767 then the
 C     signed and unsigned representations are the same and we leave it alone.
-C     If there are values such as 'FFFF'X (=65535 unsigned, =-1 signed), 
+C     If there are values such as 'FFFF'X (=65535 unsigned, =-1 signed),
 C     then we set BZERO to 32768.0 and flip the sign bit of each word.
 C
 C     Hex pattern (in ARRAY):               0000    7FFF    8000    FFFF
-C     As an unsigned value      
+C     As an unsigned value
 C        (ie the value we want):               0   32767   32768   65535
-C     The value we want -32768 
+C     The value we want -32768
 C       (ie the offsetted value we need): -32768      -1       0   32767
 C     This offsetted value in hex
 C       (ie what we want in BASE)           8000    FFFF    0000    7FFF

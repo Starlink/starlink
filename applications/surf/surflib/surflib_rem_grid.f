@@ -9,7 +9,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_REM_GRID( N_POS, N_BOLS, NX, NY,
 *    :     IJ, GRID, IN_DATA, STATUS)
@@ -62,10 +62,10 @@
 *
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! For VAL__BAD
@@ -110,7 +110,7 @@
 
                IF (IN_DATA(I) .NE. VAL__BADR) THEN
 
-*     If grid value is bad (should not happen in the case this routine 
+*     If grid value is bad (should not happen in the case this routine
 *     was written for but check for it anyway) then data value is set to bad
 
 *               if (in_data(I) .gt.0.015) then
@@ -129,7 +129,7 @@
                   ELSE
                      IN_DATA ( I ) = IN_DATA ( I ) - GRID (IPOS, JPOS)
                   END IF
-               
+
                END IF
 
             END IF
@@ -138,5 +138,5 @@
 
       END DO
 
-      END 
+      END
 

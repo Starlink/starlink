@@ -10,7 +10,7 @@
  * Copyright (C) SERC 1987
  *
  * Maintenance Log:
- *  
+ *
  *     ??/??/87  TAW   Created.
  *     06/05/87  PJWR  Corrected to use GKS drawing area of bitmap rather than
  *                     the entire bitmap.
@@ -62,12 +62,12 @@
 
 typedef struct
 {
-  int		 jf_links;	
-  int		 jf_flags;	
+  int		 jf_links;
+  int		 jf_flags;
   struct pixfont *jf_font;		/* Need this for SunView routines */
-  int		 jf_offset;		
+  int		 jf_offset;
   unsigned char	 jf_first,
-		 jf_last;	
+		 jf_last;
 }
 jfontinfo;
 
@@ -96,7 +96,7 @@ f77_integer gk9sxc_(ifid, itxpr, nchars, ichstr, x, y)
 
   extern int
     pf_ttext();			/* Pixrect transparent text routine */
-  
+
   struct pr_prpos
     where;			/* Output pixrect/coordinate pair */
 
@@ -124,7 +124,7 @@ f77_integer gk9sxc_(ifid, itxpr, nchars, ichstr, x, y)
     b_top,			/* Changed display area top bound */
     b_bottom;			/* Changed display area bottom bound */
 
-  f77_real					
+  f77_real
     x_offset =			/* Offset of left edge from character centre */
       (gkywkd_.qwkdat[ws][ICHWD] / 2.0),
     y_offset =			/* From character centre to SunView baseline */
@@ -145,7 +145,7 @@ f77_integer gk9sxc_(ifid, itxpr, nchars, ichstr, x, y)
     for(i = 0; i < *nchars; i++)
       str[i] = (char)ichstr[i];
     str[*nchars] = '\0';
-    
+
     /*
      * Get the ww bitmaps pixrect and pixfont for use by SunView.
      */
@@ -201,7 +201,7 @@ f77_integer gk9sxc_(ifid, itxpr, nchars, ichstr, x, y)
       /* Modify right bound of changed area for character width */
 
       b_right += (int)gkywkd_.qwkdat[ws][ICHWD] - 1;
-    } 
+    }
     else				/* String precision */
     {
       /* Calculate SunView output coordinates of the first character */

@@ -9,7 +9,7 @@ C
 C     Function:
 C        Bin a time series
 C
-C     Description:        
+C     Description:
 C        TBIN creates a new time series by binning an input time series
 C        into bins of a specified size. All the points falling within
 C        one bin are averaged, and their time value is averaged to create
@@ -25,19 +25,19 @@ C    (C) XSTART     (Double)   First time value (MJD) to use.
 C    (C) XEND       (Double)   Last time value (MJD) to use.
 C        OUTPUT     (TSP, 2D)  The output binned dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         26/2/1988
 C
 C-
 C
 C  History:
-C    Aug/1987   Original Version.   JAB/AAO 
+C    Aug/1987   Original Version.   JAB/AAO
 C    26/2/1988   TSP Monolith version.  JAB/AAO
 C
-     
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -45,13 +45,13 @@ C
 
 *  Status argument
       INTEGER STATUS
-      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays   
+      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays
       INTEGER XPTR                         ! Pointer to X (time) array
       INTEGER WPTR                         ! Pointer to wavelength axis
       INTEGER STRT,FIN                     ! Start and finish channels
       INTEGER SIZE                         ! Original size of data in X
       INTEGER FSIZE                        ! Size after X limits selection
-      INTEGER NEWSIZE                      ! Size of binned data   
+      INTEGER NEWSIZE                      ! Size of binned data
       INTEGER ACTSIZE                      ! Size after removing points
                                            ! with no data
       CHARACTER*(DAT__SZLOC) LOC           ! Top level locator
@@ -64,7 +64,7 @@ C
 
 *   Temporary array pointers and locators
 
-      CHARACTER*(DAT__SZLOC) YRLOC,YELOC,ALOC,OLOC,OILOC,OIVLOC       
+      CHARACTER*(DAT__SZLOC) YRLOC,YELOC,ALOC,OLOC,OILOC,OIVLOC
       CHARACTER*(DAT__SZLOC) XXLOC,XDLOC,TILOC,TDLOC,QLOC,QILOC,QIVLOC
       CHARACTER*(DAT__SZLOC) ULOC,UILOC,UIVLOC,VLOC,VILOC,VIVLOC
       CHARACTER*(DAT__SZLOC) XLOC,WLOC
@@ -72,13 +72,13 @@ C
       INTEGER YRPTR,YEPTR,QIPTR,QIVPTR,UIPTR,UIVPTR,VIPTR,VIVPTR
 
 *  Get the data
-                                             
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN                           
+      IF (STATUS .EQ. SAI__OK) THEN
 
 *  Get X Axis data
-     
+
 
 *  Find size of array
         CALL TSP_SIZE(LOC,3,DIMS,ACTDIM,STATUS)
@@ -113,9 +113,9 @@ C
         CALL TSP_TEMP(SIZE,'_DOUBLE',TDPTR,TDLOC,STATUS)
         CALL TSP_TEMP(SIZE,'_DOUBLE',XXPTR,XXLOC,STATUS)
         CALL TSP_TEMP(SIZE,'_DOUBLE',XDPTR,XDLOC,STATUS)
-                                                    
+
 *   Find X limits
-                     
+
         CALL TSP_PHSXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
         SIZE = FIN-STRT+1
         FSIZE = SIZE
@@ -138,14 +138,14 @@ C
 *  Bin data
 
           CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
-     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)    
+     :             %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
+     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
 
 *  Create the output file
 
           IF (CHAN .EQ. 1) THEN
               CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
-              CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS) 
+              CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
 
 *  Get new size
 
@@ -153,7 +153,7 @@ C
 
 *  Build the string describing the Stokes parameters needed in the
 *  output dataset
-                                          
+
               IF (QPTR .NE. 0 .AND. UPTR.NE.0 .AND. VPTR.NE.0) THEN
                   STOKES = 'QUV'
               ELSE IF (QPTR.NE.0 .AND. UPTR.NE.0) THEN
@@ -171,8 +171,8 @@ C
               ELSE
                   STOKES = ' '
               ENDIF
-                 
-*  Create the output dataset                    
+
+*  Create the output dataset
               IF (ACTDIM .EQ. 2) THEN
                   CALL TSP_CREATE_2D(OLOC,NCHANS,ACTSIZE,STOKES,.TRUE.,
      :               .TRUE.,STATUS)
@@ -205,7 +205,7 @@ C
 
               CALL TSP_MAP_TIME(OLOC,'WRITE',APTR,ALOC,STATUS)
               CALL TSP_GEN_MOVE(2*ACTSIZE,%VAL(XXPTR),%VAL(APTR))
-              CALL TSP_UNMAP(ALOC,STATUS)  
+              CALL TSP_UNMAP(ALOC,STATUS)
 
 *  Copy label and units of time axis
               CALL TSP_RLU_TIME(LOC,LABEL,UNITS,STATUS)
@@ -220,7 +220,7 @@ C
 
 *  ... and the output variance
               CALL TSP_MAP_VAR(OLOC,'WRITE',OIVPTR,OIVLOC,STATUS)
-              
+
               IF (QPTR .NE. 0) THEN
 
 *  Q Stokes parameter
@@ -232,7 +232,7 @@ C
 *  Map the Q Stokes variance
                 CALL TSP_MAP_VAR(QLOC,'WRITE',QIVPTR,QIVLOC,STATUS)
                 CALL DAT_ANNUL(QLOC,STATUS)
-              ENDIF                
+              ENDIF
 
               IF (UPTR .NE. 0) THEN
 
@@ -245,7 +245,7 @@ C
 *  Map the U Stokes variance
                 CALL TSP_MAP_VAR(ULOC,'WRITE',UIVPTR,UIVLOC,STATUS)
                 CALL DAT_ANNUL(ULOC,STATUS)
-              ENDIF                
+              ENDIF
 
               IF (VPTR .NE. 0) THEN
 
@@ -258,7 +258,7 @@ C
 *  Map the V Stokes variance
                 CALL TSP_MAP_VAR(VLOC,'WRITE',VIVPTR,VIVLOC,STATUS)
                 CALL DAT_ANNUL(VLOC,STATUS)
-              ENDIF                
+              ENDIF
           ENDIF
 
 *  Copy the points containing good data to the output array
@@ -271,20 +271,20 @@ C
 
 *  Bin the Q Stokes parameter
               CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(QPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
-     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)        
+     :             %VAL(QPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
+     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the points containing good data to the output array
                 CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,%VAL(YRPTR),
      :            %VAL(YEPTR),%VAL(QIPTR),%VAL(QIVPTR),%VAL(XDPTR))
-             ENDIF                                     
+             ENDIF
           ENDIF
           IF (UPTR .NE. 0) THEN
 
 *  Bin the U Stokes parameter
               CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(UPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
+     :             %VAL(UPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
      :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
               IF (STATUS .EQ. SAI__OK) THEN
 
@@ -297,14 +297,14 @@ C
 
 *  Bin the V Stokes parameter
               CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(VPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
+     :             %VAL(VPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
      :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the points containing good data to the output
                  CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,%VAL(YRPTR),
      :             %VAL(YEPTR),%VAL(VIPTR),%VAL(VIVPTR),%VAL(XDPTR))
-              ENDIF                             
+              ENDIF
           ENDIF
 
 
@@ -312,10 +312,10 @@ C
           CALL TSP_PHSUNMAPITEM(LOC,STATUS)
           CHAN = CHAN+1
         ENDDO
-      ENDIF        
+      ENDIF
 
-*  Tidy up      
-                                  
+*  Tidy up
+
       CALL TSP_UNMAP(WLOC,STATUS)
       CALL TSP_UNMAP(XLOC,STATUS)
 
@@ -327,15 +327,15 @@ C
       IF (QPTR .NE. 0) THEN
           CALL TSP_UNMAP(QILOC,STATUS)
           CALL TSP_UNMAP(QIVLOC,STATUS)
-      ENDIF    
+      ENDIF
       IF (UPTR .NE. 0) THEN
           CALL TSP_UNMAP(UILOC,STATUS)
           CALL TSP_UNMAP(UIVLOC,STATUS)
-      ENDIF    
+      ENDIF
       IF (VPTR .NE. 0) THEN
           CALL TSP_UNMAP(VILOC,STATUS)
           CALL TSP_UNMAP(VIVLOC,STATUS)
-      ENDIF    
+      ENDIF
 
 
 *  Unmap the temporary arrays
@@ -345,12 +345,12 @@ C
       CALL TSP_UNMAP(XDLOC,STATUS)
       CALL TSP_UNMAP(TILOC,STATUS)
       CALL TSP_UNMAP(TDLOC,STATUS)
-      CALL DAT_ANNUL(LOC,STATUS)                                
+      CALL DAT_ANNUL(LOC,STATUS)
       CALL DAT_ANNUL(OLOC,STATUS)
       END
-              
 
-                                 
+
+
       SUBROUTINE TSP_TBCPY(SIZE,ACTSIZE,CHAN,NCHANS,X,XE,Y,YE,XD)
 *+
 *
@@ -390,8 +390,8 @@ C
       DOUBLE PRECISION XD(SIZE)
 
 *  Local variables
-      INTEGER I,J  
-                 
+      INTEGER I,J
+
 *  Loop over points
       J=1
       DO I=1,SIZE
@@ -404,7 +404,7 @@ C
           ENDIF
       ENDDO
       END
-                                                          
+
 
       SUBROUTINE TSP_TBSIZE(SIZE,X,ACTSIZE,XD)
 *+
@@ -413,7 +413,7 @@ C
 *
 *  TBIN command
 *
-*  Count the number of good points in the dataset, and return a 
+*  Count the number of good points in the dataset, and return a
 *  new X array containing just the good points
 *
 *  Parameters:
@@ -440,20 +440,20 @@ C
       INTEGER I,J
 
 *  Loop over data points
-      I=1        
+      I=1
       DO J=1,SIZE
          IF (X(J) .NE. VAL__BADD) THEN
              XD(I)=X(J)
              I=I+1
          ENDIF
-      ENDDO          
+      ENDDO
 
 *  Return actual number of good points
       ACTSIZE = I-1
       END
-             
- 
-                                                           
+
+
+
 
 
 
@@ -482,7 +482,7 @@ C
 *  (W)  DS       (Double)    Workspace Double precision array
 *  (<)  NEWSIZE  (Integer)   Number of data points after binning
 *  (!)  STATUS   (Integer)   Status value
-*    
+*
 *  Jeremy Bailey    26/2/1988
 *
 *  Modified:
@@ -496,23 +496,23 @@ C
       INCLUDE 'USER_ERR'
 
 *  Parameters
-      INTEGER SIZE,NEWSIZE                    
+      INTEGER SIZE,NEWSIZE
       REAL Y(SIZE), YB(SIZE), YE(SIZE)
       INTEGER STATUS
-      INTEGER I                    
+      INTEGER I
       DOUBLE PRECISION BINSIZE
       DOUBLE PRECISION X(*),XB(*)
-      INTEGER NP(*)                    
+      INTEGER NP(*)
       DOUBLE PRECISION DS(*)
-      
+
 *  Local variables
       DOUBLE PRECISION D
-      INTEGER BIN    
+      INTEGER BIN
       REAL YX
-     
-               
+
+
       IF (STATUS .EQ. SAI__OK) THEN
-                                      
+
 *  determine size of binned array and check that it is not too large
 
          IF (BINSIZE .GT. 0.0) THEN
@@ -522,7 +522,7 @@ C
 *  If the binsize is negative we leave the data unchanged
 
              NEWSIZE = SIZE
-         ENDIF             
+         ENDIF
          IF (NEWSIZE .GT. SIZE) THEN
              CALL MSG_OUT('MSG','Too Many Bins',STATUS)
              STATUS = USER__001
@@ -533,33 +533,33 @@ C
 
          DO I=1,NEWSIZE
              YB(I) = 0.0
-             DS(I) = 0.0            
-             NP(I) = 0  
+             DS(I) = 0.0
+             NP(I) = 0
              XB(I) = 0.0
          ENDDO
-                                                                    
+
 *  Loop over points of unbinned data, adding into appropriate bin
 
-         DO I=1,SIZE                                
+         DO I=1,SIZE
 
 *  Determine bin which this point lies in
-  
-             IF (BINSIZE .GT. 0.0) THEN               
-                 BIN = (X(I)-X(1))/BINSIZE + 1        
-             ELSE                                     
-                 BIN = I                              
-             ENDIF                       
+
+             IF (BINSIZE .GT. 0.0) THEN
+                 BIN = (X(I)-X(1))/BINSIZE + 1
+             ELSE
+                 BIN = I
+             ENDIF
 
 *  Add data into bin
-             
+
              IF (Y(I) .NE. VAL__BADR) THEN
-                 YB(BIN) = YB(BIN) + Y(I)                 
-                 DS(BIN) = DS(BIN) + Y(I)*Y(I)            
-                 NP(BIN) = NP(BIN) + 1                    
+                 YB(BIN) = YB(BIN) + Y(I)
+                 DS(BIN) = DS(BIN) + Y(I)*Y(I)
+                 NP(BIN) = NP(BIN) + 1
                  XB(BIN) = XB(BIN) + X(I)
-             ENDIF                 
-         ENDDO                                        
-                                                                  
+             ENDIF
+         ENDDO
+
 *  Calculate X,Y and errors for bin
 
          DO I=1,NEWSIZE
@@ -575,14 +575,14 @@ C
 
 *  Calculate mean and standard error for bin
                  YB(I) = YB(I)/NP(I)
-                 XB(I) = XB(I)/NP(I)    
+                 XB(I) = XB(I)/NP(I)
                  D = YB(I)
                  YE(I) = REAL((DS(I)-D*D*NP(I))/
      :                      (NP(I)*(NP(I)-1)))
              ENDIF
-         ENDDO              
-         
-      ENDIF                              
+         ENDDO
+
+      ENDIF
       END
-                                   
+
 

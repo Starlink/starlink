@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
 
       INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
 *        ACB_IDCB( ARY__MXACB ) = INTEGER (Read)
-*           Index to data object entry in the DCB 
+*           Index to data object entry in the DCB
 *        ACB_IMCB( ARY__MXACB ) = INTEGER (Read)
 *           Index to mapping entry in MCB
 
@@ -228,7 +228,7 @@
          END IF
       END IF
 9999  CONTINUE
-             
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_CHCMA', STATUS )
 

@@ -11,7 +11,7 @@
 *                   blanks as necessary.
 *      L        i   receives the number of characters in STRING, excluding
 *                   trailing blanks.
-*      
+*
 *   D.L.Terrett  Starlink  Apr 1991
 *+
       IMPLICIT NONE

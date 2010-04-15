@@ -30,8 +30,8 @@
 *     machine.  Conversion is performed by modifying the data in situ.
 *     No separate output file is produced.
 *
-*     This application can also be used to replace any IEEE floating point 
-*     NaN or Inf values in an HDS object with the appropriate Starlink 
+*     This application can also be used to replace any IEEE floating point
+*     NaN or Inf values in an HDS object with the appropriate Starlink
 *     bad value. This conversion is performed even if the data values
 *     within the object are already represented using the appropriate
 *     native data representation for the machine in use.
@@ -99,7 +99,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

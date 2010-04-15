@@ -46,9 +46,9 @@ struct wininfo
 /*
 **  Functions
 */
-int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols, 
-			Boolean inter, Boolean iconic, unsigned int border, 
-			char *fg, char *bg, Boolean overlay, char *ovcol, 
+int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
+			Boolean inter, Boolean iconic, unsigned int border,
+			char *fg, char *bg, Boolean overlay, char *ovcol,
 			int size_x, int size_y, int pos_x, int pos_y,
 			Window *win_id);
 

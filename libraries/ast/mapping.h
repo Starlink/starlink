@@ -252,12 +252,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -472,7 +472,7 @@ typedef struct AstMappingVtab {
 } AstMappingVtab;
 
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -514,7 +514,7 @@ AstMapping *astLoadMapping_( void *, size_t, AstMappingVtab *,
                              const char *, AstChannel *channel, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitMappingGlobals_( AstMappingGlobals * );
 #endif
 #endif
@@ -639,9 +639,9 @@ astINVOKE(V,astRebinSeqLD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this),STATUS_PTR))
 #define astLinearApprox(this,lbnd,ubnd,tol,fit) \
-astINVOKE(V,astLinearApprox_(astCheckMapping(this),lbnd,ubnd,tol,fit,STATUS_PTR)) 
+astINVOKE(V,astLinearApprox_(astCheckMapping(this),lbnd,ubnd,tol,fit,STATUS_PTR))
 #define astQuadApprox(this,lbnd,ubnd,nx,ny,fit,rms) \
-astINVOKE(V,astQuadApprox_(astCheckMapping(this),lbnd,ubnd,nx,ny,fit,rms,STATUS_PTR)) 
+astINVOKE(V,astQuadApprox_(astCheckMapping(this),lbnd,ubnd,nx,ny,fit,rms,STATUS_PTR))
 #define astRebinD(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astRebinD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astRebinF(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \

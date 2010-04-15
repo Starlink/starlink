@@ -58,7 +58,7 @@
 
 *  Usage:
 *     VECPLOT NDF1 NDF2 [COMP] [STEP] [VSCALE] [VTYPE] [JUST] [KEY]
-*             [DEVICE] 
+*             [DEVICE]
 
 *  ADAM Parameters:
 *     ABSLAB  =  LITERAL (Read)
@@ -164,7 +164,7 @@
 *     STEP = _INTEGER (Read)
 *        The number of pixels between adjacent displayed vectors (along
 *        both axes). Increasing this value reduces the number of
-*        displayed vectors. The default value gives about 30 vectors 
+*        displayed vectors. The default value gives about 30 vectors
 *        along the longest axis of the plot. []
 *     THICK = _REAL (Read)
 *        The thickness of the axes and annotations in the plot, where
@@ -173,18 +173,18 @@
 *        [1.0]
 *     VECCOL = LITERAL (Read)
 *        The colour for the vectors. The options are:
-*          "MAX"          - The maximum colour index in the image 
+*          "MAX"          - The maximum colour index in the image
 *                           display colour lookup table.
-*          "MIN"          - The minimum (non-reserved) colour index in 
+*          "MIN"          - The minimum (non-reserved) colour index in
 *                           the image display colour lookup table.
 *          An integer     - The actual colour index. It is constrained
 *                           between 0 and the maximum colour index
-*                           available on the device. 
+*                           available on the device.
 *          A named colour - Uses the named colour from the palette, and
 *                           if it is not present, the nearest colour
 *                           from the palette is selected.
 *        The suggested default is the current value. [The current value,
-*        but equals "MIN" if there is no current value.] 
+*        but equals "MIN" if there is no current value.]
 *     VSCALE = _REAL (Given)
 *        The scale to be used for the vectors. The supplied value
 *        should give the data value corresponding to a vector length of
@@ -202,7 +202,7 @@
 *        taken from POLANG.  All other settings are defaulted, so
 *        for example about 20 vectors are displayed along the longest
 *        axis, and a key is plotted.
-*     VECPLOT POLINT POLANG ANGROT=23.4 
+*     VECPLOT POLINT POLANG ANGROT=23.4
 *        Produces a vector map in which the primary axis of the vectors
 *        (as defined by the value zero in the NDF "POLANG") is at the
 *        position angle 23.4 degrees (measured anti-clockwise from the
@@ -237,12 +237,12 @@
 *        Original version.
 *     21-SEP-1993 (DSB):
 *        Modified to overlay the vector plot on any existing DATA plot
-*        contained within the current picture. 
+*        contained within the current picture.
 *     1-MAY-1995 (DSB):
-*        ANGFAC set to DTOR if no UNITS component found in NDF2 (i.e. 
+*        ANGFAC set to DTOR if no UNITS component found in NDF2 (i.e.
 *        assume angles are in degrees if units are unspecified). This
 *        is what the docs says has always happened, but in fact it was
-*        previously assumed that angles were in radians if units were 
+*        previously assumed that angles were in radians if units were
 *        unspecified (i.e. ANGFAC was incorrrectly set to 1.0).
 *     {enter_further_changes_here}
 
@@ -272,7 +272,7 @@
      :           ANCLP1,       ! Fraction of the frame zone in which the
      :           ANCLP2,       ! image will appear when there are axes
      :           ANCLP3,
-     :           ANCLP4,         
+     :           ANCLP4,
      :           ASPKEY,       ! Fractional aspect ratio for the key
      :           DTOR,         ! Degrees to radians conversion factor
      :           NVEC0         ! Default no. of vectors along short axis
@@ -310,7 +310,7 @@
      :        OFFSET( NDIM ),  ! Offsets in world-to-data mapping
      :        SCALE( NDIM )    ! Scale factors in world-to-data mapping
 
-      LOGICAL 
+      LOGICAL
      :        AXES,            ! Annotated axes to be drawn?
      :        BORDER,          ! Border to be drawn round the plot?
      :        CLEAR,           ! Graphics device to be cleared?
@@ -358,7 +358,7 @@
      :        IERR,            ! GKS error code.
      :        INDF1,           ! Identifier for first NDF
      :        INDF2,           ! Identifier for second NDF
-     :        IPIXX,           ! Max. no. of pixel columns   
+     :        IPIXX,           ! Max. no. of pixel columns
      :        IPIXY,           ! Max. no. of pixel lines
      :        IWKID            ! Current GKS workstation identifier
 
@@ -429,7 +429,7 @@
 *  returned in SDIM1.
       CALL KPG1_SGDIM( INDF1, NDIM, SDIM1, STATUS )
 
-*  Obtain the bounds of the first NDF.  
+*  Obtain the bounds of the first NDF.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIMS1, STATUS )
 
 *  Abort if an error has occurred.
@@ -530,8 +530,8 @@
 *  annotated axes (if required), and stored in the graphics database
 *  with the newly created data picture. Axis coordinates must be
 *  monotonic to be usable. The coefficients of the linear transformation
-*  from world to data coordinates are returned. If no usable data 
-*  coordinates are available, then a unit transformation is returned. 
+*  from world to data coordinates are returned. If no usable data
+*  coordinates are available, then a unit transformation is returned.
 *  If the axes are non-linear a warning message is issued and a linear
 *  approximation to the axis coordinates is returned.
       CALL KPG1_CHAXD( INDF1, SDIM1, DATAVL, SCALE, OFFSET, STATUS )
@@ -557,7 +557,7 @@
      :                   STATUS )
       END IF
 
-*  Ensure that plotted lines will be solid. 
+*  Ensure that plotted lines will be solid.
       CALL KPG1_SOLIN( STATUS )
 
 *  Abort if an error has occurred.
@@ -583,7 +583,7 @@
 *  DATA coordinates...
          IF( COSYS .EQ. 'DATA' ) THEN
 
-*  Get the abscissa and ordinate labels, suggesting the value in the 
+*  Get the abscissa and ordinate labels, suggesting the value in the
 *  axis structure of INDF1, if present, as the default. Otherwise, use
 *  "X" and "Y" as defaults.
             CALL KPG1_GAXLB( INDF1, SDIM1( 1 ), 'ABSLAB', 'X', ABSLAB,
@@ -689,12 +689,12 @@
          END IF
 
 *  Draw annotated axes in the graph window with the grid positioned as
-*  defined above. 
+*  defined above.
          CALL NCRAXS( ALBND( 1 ), ALBND( 2 ), AUBND( 1 ), AUBND( 2 ),
      :                PLTITL, ABSLAB, ORDLAB, MINTIC, MAJTIC, OUTTIC,
      :                THICK, .FALSE., STATUS )
 
-*  Restore the original bounds of the AUTOGRAPH grid window. 
+*  Restore the original bounds of the AUTOGRAPH grid window.
          CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
          CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
          CALL AGSETF( 'GRID/BOTTOM.', GRID( 3 ) )
@@ -766,7 +766,7 @@
 
 *  Obtain the maximum number of colour indices.
       CALL KPG1_QIDAT( 'DEVICE', 'SGS', NINTS, IPIXX, IPIXY, STATUS )
-      
+
 *  See what pen is to be used to draw the vectors.
       CALL KPG1_MACOL( 'VECCOL', CTM__RSVPN, NINTS - 1, VCI, STATUS )
 
@@ -830,7 +830,7 @@
 
 *  Arrive here if an error occurs.
  999  CONTINUE
-      
+
 *  Shut down the graphics database.
       CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
 

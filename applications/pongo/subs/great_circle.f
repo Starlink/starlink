@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,7 +82,7 @@
       PARAMETER (D2PI=6.283185307179586476925287D0)
       DOUBLE PRECISION INCR, DECR ! increment and decrement factors when
                                  ! adjusting stepsize
-      PARAMETER (INCR=2.001D0, DECR= 0.501D0)      
+      PARAMETER (INCR=2.001D0, DECR= 0.501D0)
 
 *  Local Variables:
       DOUBLE PRECISION L, M      ! coordinates in projection plane
@@ -108,7 +108,7 @@
       REAL XMINP,XMAXP,YMINP,YMAXP ! plotter limits
                                  ! viewing surface
       INTEGER LSTAT              ! Local status value
-      
+
 *  External References:
       EXTERNAL SLA_DVDV
       DOUBLE PRECISION SLA_DVDV
@@ -123,14 +123,14 @@
       STEPMAX=((XMAXP-XMINP)+(YMAXP-YMINP))/2/5
       STPAMAX = DBLE( STEPMAX / 10 )
       STPAMIN = STPAMAX / 5
-      
+
 *  get cartesian vectors
       CALL SLA_DCS2C(RA1, DEC1, V1)
       CALL SLA_DCS2C(RA2, DEC2, V2)
 
 *  calculate the separation (think about rejection)
       SEP=ACOS(SLA_DVDV(V1, V2))
-      
+
 *  calculate z axis
       CALL SLA_DVXV(V1, V2, VT)
 
@@ -166,7 +166,7 @@
          SEP=D2PI-SEP
       ENDIF
       THESTEP=SEP/100
-        
+
       ONCEMR = .FALSE.
       DO WHILE ( THETA-THEMAX .LT. 1.0D-5 .OR. ONCEMR )
 
@@ -179,21 +179,21 @@
 
 *  retrieve normal spherical coordinates
          CALL SLA_DCC2S(POS,RAT,DECT)
-         LSTAT = SAI__OK 
+         LSTAT = SAI__OK
          CALL PROJ_CONVPTLM(PROJECTION, RA0, DEC0, RAT, DECT, L, M,
      :                      LSTAT )
          IF ( LSTAT .EQ. SAI__OK ) THEN
 
 *  calculate the step size
-              LOS=MAX(ABS(L-LLAST),1D-15)     
+              LOS=MAX(ABS(L-LLAST),1D-15)
               MOS=MAX(ABS(M-MLAST),1D-15)
               LMDIST=SQRT(MOS*MOS+LOS*LOS)
-              IF(.NOT.DRAW 
-     :          .OR.  (SIGN(1D0,L)*SIGN(1D0,LLAST).LT.0 
+              IF(.NOT.DRAW
+     :          .OR.  (SIGN(1D0,L)*SIGN(1D0,LLAST).LT.0
      :                           .AND. LOS.GT.STEPMAX/2)
-     :          .OR.(SIGN(1D0,M)*SIGN(1D0,MLAST).LT.0 
+     :          .OR.(SIGN(1D0,M)*SIGN(1D0,MLAST).LT.0
      :                           .AND. MOS.GT.STEPMAX/2)
-     :          ) THEN 
+     :          ) THEN
 
 *  if step to large just move, 'wrap around' projection case
                  CALL PGMOVE(REAL(L), REAL(M))
@@ -223,7 +223,7 @@
                     ELSE
 *   just draw to this point
                        CALL PGDRAW(REAL(L), REAL(M))
-                       LLAST=L             
+                       LLAST=L
                        MLAST=M
                     ENDIF
                  ENDIF
@@ -235,9 +235,9 @@
 *   If this is the last step then make it reach THEMAX.
          THETA=THETA+THESTEP
          IF ( THETA-THEMAX .GT. 1.0D-5 .AND. .NOT. ONCEMR ) THEN
-            ONCEMR = .TRUE. 
+            ONCEMR = .TRUE.
             THETA = THEMAX
-         ELSE 
+         ELSE
             ONCEMR = .FALSE.
          END IF
       END DO

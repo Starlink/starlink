@@ -9,12 +9,12 @@ C
 C     Function:
 C        Reduce CCD spectropolarimetry data.
 C
-C     Description:                           
+C     Description:
 C        CCD2POL reduces data obtained with the AAO Half-wave plate
 C        spectropolarimeter with the CCD as detector. The data for a
 C        single observation consists of four Figaro files containing the
 C        frames for plate position 0, 45, 22.5 and 67.5 degrees. Within each
-C        frame there are four spectra corresponding to the O and E rays for 
+C        frame there are four spectra corresponding to the O and E rays for
 C        each of two apertures (A and B). These spectra are combined
 C        to derive a polarization spectrum in TSP format.
 C        The CCD data are expected to be in raw CCD format which is
@@ -23,7 +23,7 @@ C        direction. Thus if the data is preprocessed using Figaro it will
 C        have to be rotated back.
 C
 C        Two different algorithms may be selected for the polarimetry
-C        reduction. The two algorithms differ in the method used to 
+C        reduction. The two algorithms differ in the method used to
 C        compensate for transparency variations between the observations
 C        at the two plate positions.
 C
@@ -63,7 +63,7 @@ C
 C-
 C
 C  History:
-C    27/4/1988   Original Version (CCD2STOKES).   JAB/AAO 
+C    27/4/1988   Original Version (CCD2STOKES).   JAB/AAO
 C    10/8/1990   Use DSA             JAB/AAO
 C    11/8/1990   Add Readout noise   JAB/AAO
 C    11/8/1990   Adapted from CCD2STOKES.  JAB/AAO
@@ -88,10 +88,10 @@ C
 *  Number of elements in data arrays
       INTEGER NELM
       INTEGER NDIM, DIMS(7),DIMS2(7)
-      INTEGER LENNAME                            
+      INTEGER LENNAME
 
 *  Extraction parameters
-      INTEGER ASTART,BSTART,OESEP,WIDTH,SEP         
+      INTEGER ASTART,BSTART,OESEP,WIDTH,SEP
 
 *  CCD parameters
       REAL BIAS,PHOTADU,RDN
@@ -115,7 +115,7 @@ C
       CALL PAR_GET0C('POS1',FNAME,STATUS)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME,STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -128,7 +128,7 @@ C
      :          STATUS)
             GOTO 100
          ELSE
-            SEP = DIMS(1)                                 
+            SEP = DIMS(1)
 
 *  Map the data
 
@@ -168,7 +168,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -201,9 +201,9 @@ C
              CALL DSA_NAMED_INPUT('INPUT3',FNAME,STATUS)
              IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
-               GOTO 100 
+               GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -238,7 +238,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                STATUS = USER__001
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -282,11 +282,11 @@ C
 
 *  Check them for validity
 
-             IF (ASTART+(WIDTH-1) .GT. SEP .OR. 
+             IF (ASTART+(WIDTH-1) .GT. SEP .OR.
      :           ASTART+(WIDTH-1)+OESEP .GT. SEP .OR.
      :           BSTART+(WIDTH-1) .GT. SEP .OR.
      :           BSTART+(WIDTH-1)+OESEP .GT. SEP) THEN
-                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)        
+                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)
                  GOTO 100
              ENDIF
 
@@ -305,10 +305,10 @@ C
 *  Get the CCD parameters
 
 *  Bias level
-             CALL PAR_GET0R('BIAS',BIAS,STATUS) 
+             CALL PAR_GET0R('BIAS',BIAS,STATUS)
 
 *  Readout noise (electrons)
-             CALL PAR_GET0R('READNOISE',RDN,STATUS)              
+             CALL PAR_GET0R('READNOISE',RDN,STATUS)
 
 *  Photons per ADU
              CALL PAR_GET0R('PHOTADU',PHOTADU,STATUS)
@@ -325,7 +325,7 @@ C
                 ENDIF
              ENDDO
              RATIO = ALGORITHM .EQ. 'RATIO'
-      
+
 *  Create the output file
 
              CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -345,7 +345,7 @@ C
              CALL TSP_WLU_LAMBDA(OLOC,XLABEL,XUNITS,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
 
 *  Map the Q Stokes data and its variance
@@ -373,10 +373,10 @@ C
 
              CALL TSP_TEMP(DIMS(2),'_REAL',T1PTR,T1LOC,STATUS)
              CALL TSP_TEMP(DIMS(2),'_REAL',T2PTR,T2LOC,STATUS)
-             
+
 *  Reduce the data (This is equivalent to doing CCD2STOKES on each
 *  pair and then QUMERGE).
-      
+
              IF (STATUS .EQ. SAI__OK) THEN
                 IF (RATIO) THEN
 
@@ -435,13 +435,13 @@ C
           ENDIF
 
 *  Unmap input arrays
- 
+
       ENDIF
 100   CONTINUE
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
 
 

@@ -16,12 +16,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,11 +64,11 @@
 
       INTEGER CAT__OK
       PARAMETER (CAT__OK = 0)
-      
+
 *
 *    Maximum numbers of various entities.
 
-      INTEGER CAT__MXCAT   ! Maximum permitted number of open 
+      INTEGER CAT__MXCAT   ! Maximum permitted number of open
       PARAMETER (CAT__MXCAT = 5)  ! catalogues.
 
       INTEGER CAT__MXCOL   ! Maximum permitted number of columns.
@@ -95,7 +95,7 @@
       INTEGER CAT__SZCNM   ! Maximum size of catalogue name.
       PARAMETER (CAT__SZCNM = 80)
 
-      INTEGER CAT__SZCNF   ! Maximum size of full catalogue name, that 
+      INTEGER CAT__SZCNF   ! Maximum size of full catalogue name, that
       PARAMETER (CAT__SZCNF = 256) ! is, including a directory spec.
 
 *
@@ -104,7 +104,7 @@
       INTEGER CAT__SZANM   ! Maximum size of an attribute name.
       PARAMETER (CAT__SZANM = 15)
 
-      INTEGER CAT__SZCMP   ! Maximum size of a component (column, 
+      INTEGER CAT__SZCMP   ! Maximum size of a component (column,
       PARAMETER (CAT__SZCMP = 15) ! parameter or index) name.
 
       INTEGER CAT__SZTYP   ! Size of the type attribute for a column or
@@ -119,7 +119,7 @@
       INTEGER CAT__SZCOM   ! Size of the comments attribute for a column
       PARAMETER (CAT__SZCOM = 80)  ! or parameter.
 
-      INTEGER CAT__SZVAL   ! Maximum size of value attribute for a 
+      INTEGER CAT__SZVAL   ! Maximum size of value attribute for a
       PARAMETER (CAT__SZVAL = 500)  ! parameter.
 
       INTEGER CAT__SZEXP   ! Maximum size of character string to hold an

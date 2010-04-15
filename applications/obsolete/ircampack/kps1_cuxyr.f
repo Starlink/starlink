@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,15 +103,15 @@
                                  ! cursor
       LOGICAL CURCHO             ! Cursor is available with suitable
                                  ! choices?
-      REAL DELTA                 ! Width of markers 
+      REAL DELTA                 ! Width of markers
       LOGICAL IMGDIS             ! Device is nominally an image display
       INTEGER IPXX               ! Pointer to workspace
       INTEGER IPYY               ! Pointer to workspace
-      LOGICAL MARK               ! Crosses required at cursor positions 
+      LOGICAL MARK               ! Crosses required at cursor positions
       LOGICAL POLY               ! Lines required joining cursor
                                  ! positions?
-      REAL X1, Y1                ! World co-ords of lower-left corner 
-      REAL X2, Y2                ! World co-ords of upper-right corner 
+      REAL X1, Y1                ! World co-ords of lower-left corner
+      REAL X2, Y2                ! World co-ords of upper-right corner
       REAL XIN, YIN              ! co-ords of the centre of the picture
       REAL XM, YM                ! Size of the image zone in metres
 
@@ -176,7 +176,7 @@
      :             VAL__MAXR, XIN, YIN, NVERT, %VAL( IPX ), %VAL( IPY ),
      :             STATUS )
 
-*  If the vertices have been joined by straight lines, complete the 
+*  If the vertices have been joined by straight lines, complete the
 *  polygon by joining the first vertex to the last vertex.  The
 *  co-ordinates are extracted from the work arrays.
       IF ( POLY .AND. NVERT .GT. 2 ) THEN

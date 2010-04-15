@@ -54,7 +54,7 @@ CD    Print *, '-- gen_decode --'
 
 *     Either get the value directly (numeric string) or translate symbol.
 *     If result not delayed then value is returned into workspace array
-*     at next available location. Otherwise - if for example we need to 
+*     at next available location. Otherwise - if for example we need to
 *     evaluate the array index for the symbol first - enter symbol on the
 *     stack, and the "evaluate array index" operator (@) on the operator stack.
 
@@ -74,7 +74,7 @@ CD        Print *,'     integer value read'
         ELSE IF (gen_floating (instring, idig, fdig)) THEN
           type   = 'R4'
           form   = 'F'
-          WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1, 
+          WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (instring, type, form, rvalue)
 CD        Print *,'     real*4 value read'

@@ -148,7 +148,7 @@ void datMsg( const char * token, const HDSLoc * loc ) {
 #endif
 
     /* Find the filename length */
-    ncf = strlen( file );    
+    ncf = strlen( file );
 
     /*  See if the file is "odd". Check to see if it has the default file
      *  extension of '.SDF' with at least one character preceding it. */

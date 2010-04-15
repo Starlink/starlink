@@ -70,7 +70,7 @@
       CHARACTER*10 MODE               ! Observation mode
       CHARACTER*3  POL                ! Was polarizer in or out?
       CHARACTER*2  TMPSTR             ! temporary string
-      CHARACTER*4  TMPSTRCY           ! temporary string '_single CYcle number' 
+      CHARACTER*4  TMPSTRCY           ! temporary string '_single CYcle number'
       CHARACTER*74 STRINGS(6)         ! Strings to use for messages
       CHARACTER*440 INVAL, OUTVAL     ! ADAM Message strings
       INTEGER      SKYNUM             ! Sky run number to reduce
@@ -99,7 +99,7 @@
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT ('RUN_FILE', RUNFIL, STATUS)
 
-*    Determine dimensions of input. 
+*    Determine dimensions of input.
       CALL DSA_DATA_SIZE ('RUN_FILE', 4, NDIM, DIMS, ELEMENTS,
      : STATUS)
 
@@ -201,7 +201,7 @@
          CALL CGS3DR_GENRAWNAME (SKYNUM, SKYFIL, STATUS)
 
          IF (VERBOSE) THEN
-*          Determine dimensions of input sky. 
+*          Determine dimensions of input sky.
             CALL DSA_NAMED_INPUT ('SKY_FILE', SKYFIL, STATUS)
             CALL DSA_DATA_SIZE ('SKY_FILE', 4, NDIM, DIMS, ELEMENTS,
      :       STATUS)
@@ -506,7 +506,7 @@
                CALL CHR_FILL( ' ', INVAL )
                CALL CHR_FILL( ' ', OUTVAL )
                CALL TASK_CNCAT (6, STRINGS, INVAL, STATUS)
-               IF (VERBOSE) CALL MSG_OUT (' ', 
+               IF (VERBOSE) CALL MSG_OUT (' ',
      :          'Plotting object spectrum', STATUS)
                CALL CGS3DR_OBEYW (FIGARO_TASK, 'ESPLOT', INVAL, OUTVAL,
      :          120000, STATUS)
@@ -535,7 +535,7 @@
                CALL CHR_FILL( ' ', INVAL )
                CALL CHR_FILL( ' ', OUTVAL )
                CALL TASK_CNCAT (4, STRINGS, INVAL, STATUS)
-               IF (VERBOSE) CALL MSG_OUT (' ', 
+               IF (VERBOSE) CALL MSG_OUT (' ',
      :          'Plotting polarization spectrum', STATUS)
 
               CALL CGS3DR_OBEYW (TSP_TASK, 'EPLOT', INVAL, OUTVAL,

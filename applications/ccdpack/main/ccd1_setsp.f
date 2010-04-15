@@ -17,7 +17,7 @@
 *     This routine takes an NDG group of NDFs and divides it into an
 *     array of subgroups according to Set membership characteristics.
 *     Two types of splitting are possible, according to the value
-*     of the KEY argument: if KEY='NAME' they are split so that all 
+*     of the KEY argument: if KEY='NAME' they are split so that all
 *     members of each output group have the same value of the
 *     .CCDPACK.MORE.SET.NAME extension item, and if KEY='INDEX'
 *     then all members of each output group have the same value
@@ -31,7 +31,7 @@
 
 *  Arguments:
 *     IGNDF = INTEGER (Given)
-*        The NDG identifier of a group of NDFs to be split into 
+*        The NDG identifier of a group of NDFs to be split into
 *        subgroups.
 *     KEY = CHARACTER * ( * ) (Given)
 *        The name of the Set characteristic on which the groups should
@@ -42,17 +42,17 @@
 *        this in the members of IGNDF an error will result.
 *     OGNDF( MAXOG ) = INTEGER (Returned)
 *        The first NOGRP returned elements of this array will be NDG
-*        identifiers of groups of NDFs grouped according to the 
+*        identifiers of groups of NDFs grouped according to the
 *        specified key.
 *     NOGRP = INTEGER (Returned)
 *        The number of output groups into which the input group was split
 *        (and hence the number of elements returned in OGNDF).  If
 *        KEY='NONE' this will be 1.
 *     OGKEY = INTEGER (Returned)
-*        A group whose I'th element contains the the key value 
+*        A group whose I'th element contains the the key value
 *        (Set NAME or INDEX characteristic) common to the NDFs returned
 *        in the group in the I'th element of OGNDF.  If KEY='INDEX'
-*        the index is converted to a string in the normal way to 
+*        the index is converted to a string in the normal way to
 *        for the name.  If KEY='NONE' the first element will be an
 *        empty string.
 *     STATUS = INTEGER (Given and Returned)
@@ -98,17 +98,17 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
-      
+
 *  Arguments Given:
       INTEGER IGNDF
       CHARACTER * ( * ) KEY
       INTEGER MAXOG
-      
+
 *  Arguments Returned:
       INTEGER OGNDF( MAXOG )
       INTEGER NOGRP
       INTEGER OGKEY
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -163,7 +163,7 @@
 
 *  Treat the case in which grouping is by Set Index or Set Name.
       ELSE IF ( KEY .EQ. 'INDEX' .OR. KEY .EQ. 'NAME' ) THEN
-      
+
 *  Loop over all items in the input group.
          DO I = 1, NIGRP
 
@@ -187,7 +187,7 @@
                CALL CHR_ITOC( SINDEX, KEYVAL, NCHAR )
             ELSE
                STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 
+               CALL ERR_REP( ' ',
      :'CCD1_SETSP: Invalid KEY value (programming error)', STATUS )
             END IF
 
@@ -201,7 +201,7 @@
 
 *  If we have not encountered this key before, initialise a new group
 *  and copy this NDF into it.  Doing it this way rather than creating
-*  a new group with GRP_NEW ensures that the new group inherits 
+*  a new group with GRP_NEW ensures that the new group inherits
 *  control characters etc of the old group.
             IF ( GOTKEY .EQ. 0 ) THEN
                NOGRP = NOGRP + 1
@@ -232,7 +232,7 @@
                CALL GRP_PUT( OGNDF( GOTKEY ), 1, NDFNAM, IOUT, STATUS )
             END IF
 
-*  Copy supplementary information from the input NDG item to the 
+*  Copy supplementary information from the input NDG item to the
 *  output one.
             CALL NDG_GTSUP( IGNDF, I, FIELDS, STATUS )
             CALL NDG_PTSUP( OGNDF( GOTKEY ), IOUT, FIELDS, STATUS )
@@ -242,7 +242,7 @@
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'KEY', KEY )
-         CALL ERR_REP( 'CCD1_SETSP_BADKEY', 
+         CALL ERR_REP( 'CCD1_SETSP_BADKEY',
      :                 'CCD1_SETSP: Bad group key ^KEY', STATUS )
       END IF
 

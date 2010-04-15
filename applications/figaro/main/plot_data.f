@@ -16,14 +16,14 @@
 *     The plots are Labeled according to the user suppled Labels
 *   The main purpose of this routine is to Kid PGPLOT into designing
 *   the correct Y axis for us . For the weighted fits we want to
-*   suppress the points which are given low weights. We do this simply 
+*   suppress the points which are given low weights. We do this simply
 *   by taking the product of the Y and W arrays.
 *   NOte that this works fine for the data normally encountered by
 *   the routine , which will tend to be in COUNTS or ADU with values
 *   >= 1e-6 which is the value used to omitt points in the fits.
 *   The fudge will however fail for data with extreme values.
 *
-* Arguments:      
+* Arguments:
 *    X(NPTS) = DOUBLE PRECISION ARRAY (Given)
 *        Input X axis data
 *    Y(NPTS) = DOUBLE PRECISION ARRAY (Given)
@@ -97,8 +97,8 @@
       if(status.ne.SAI__OK) return
 
 * fill in data arrays
-* For FIT mode, tO design the graph we set up an array 
-* DYNAMIC_MEM(YWPTR) which has the product of the weights and the 
+* For FIT mode, tO design the graph we set up an array
+* DYNAMIC_MEM(YWPTR) which has the product of the weights and the
 * actual data. Since the weights for excluded points are normally
 * 1E-6 this means that we reduce such points to values vary close to
 * ZERO for most reasonable data sets.

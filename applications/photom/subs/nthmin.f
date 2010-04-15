@@ -58,7 +58,7 @@
 *     14-01-1986 :  First implementation - more or less a straight
 *                   copy of routine of same name written by Rodney
 *                   Warren-Smith for Starlink package EDRS. (REVA::MJM)
-*     1986 Aug 12:  Completed prologue and nearly conformed to 
+*     1986 Aug 12:  Completed prologue and nearly conformed to
 *                   Starlink standards (RL.STAR::CUR).
 *     1986 Sep 2 :  Renamed parameters -> arguments section in prologue
 *                   and added bad-pixel handling (RL.CUR::STAR).

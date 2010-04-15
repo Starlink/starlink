@@ -8,19 +8,19 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_RESTORE( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
-*     This routine removes the chopped beam response from SCAN/MAP 
+*     This routine removes the chopped beam response from SCAN/MAP
 *     observations.
 
 *  Usage:
@@ -42,7 +42,7 @@
 *     restore input output \
 *        Restore input.sdf to output.sdf using the default chop throw.
 *     restore resw restore 40.2
-*        Restore resw.sdf to restore.sdf using a chop throw of 40.2 
+*        Restore resw.sdf to restore.sdf using a chop throw of 40.2
 *        arcseconds.
 
 *  Notes:
@@ -63,7 +63,7 @@
 *     $Id$
 *     21-SEP-1995: original version.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -98,7 +98,7 @@
       REAL         CHOP_THROW           ! chopper throw (arcsec)
       INTEGER      DIM (MAXDIM)         ! the dimensions of an array
       LOGICAL      RESTORE              ! .TRUE. if the RESTORE application
-                                        ! has already been run on the 
+                                        ! has already been run on the
                                         ! input file
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
@@ -126,7 +126,7 @@
       INTEGER      LAST_MEAS            ! measurement where abort occurred
       INTEGER      NDIM                 ! the number of dimensions in an array
       INTEGER      NREC                 ! number of history records in file
-      INTEGER      N_BOL                ! number of bolometers measured 
+      INTEGER      N_BOL                ! number of bolometers measured
       INTEGER      N_EXPOSURES          ! number of exposures per integration
       INTEGER      N_FITS               ! number of FITS lines read from file
       INTEGER      N_INTEGRATIONS       ! number of integrations per measurement
@@ -137,7 +137,7 @@
       CHARACTER*132 OUTFILE             ! Default name for output file
       INTEGER      OUTNDF               ! NDF identifier of output file
       INTEGER      OUT_DATA_PTR         ! pointer to data array in output
-      INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output 
+      INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output
       INTEGER      OUT_VARIANCE_PTR     ! pointer to variance array in output
       LOGICAL      REDUCE_SWITCH        ! .TRUE. if REDUCE_SWITCH has been run
       INTEGER      RUN_NUMBER           ! run number of observation
@@ -191,14 +191,14 @@
      :  STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
      :  OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :  'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -229,7 +229,7 @@
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a MAP observation '//
      :     'of object ^OBJECT', STATUS)
 
@@ -302,7 +302,7 @@
          ABORTED = .TRUE.
       END IF
 
-*  map the various components of the data array and check the data dimensions 
+*  map the various components of the data array and check the data dimensions
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
       CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
@@ -332,7 +332,7 @@
 *  map the DEM_PNTR array and check its dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
       CALL MSG_SETI ('N_E', N_EXPOSURES)
@@ -341,7 +341,7 @@
       CALL MSG_SETC ('PKG', PACKAGE)
 
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integration(s) in '//
      :        '^N_M measurement(s)', STATUS)
@@ -357,18 +357,18 @@
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
      :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM,' ', 
+         CALL MSG_OUTIF (MSG__NORM,' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
-      END IF         
+      END IF
 
 *     Generate a default name for the output file
       CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
@@ -385,7 +385,7 @@
 
       CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE',
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
@@ -404,22 +404,22 @@
      :        (CHOP_FUN .EQ. 'SCUBAWAVE')  .OR.
      :        (CHOP_FUN .EQ. 'RAMPWAVE')) THEN
             CALL SCULIB_2POS_DECONV (N_EXPOSURES,
-     :           N_INTEGRATIONS, N_MEASUREMENTS, 
+     :           N_INTEGRATIONS, N_MEASUREMENTS,
      :           %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
-     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)),
      :           %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(IN_QUALITY_PTR)), SAMPLE_DX, CHOP_THROW,
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADBIT, STATUS)
          ELSE IF (CHOP_FUN .EQ. 'TRIPOS') THEN
             CALL SCULIB_3POS_DECONV (N_EXPOSURES,
      :           N_INTEGRATIONS, N_MEASUREMENTS,
      :           %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
-     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)),
      :           %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(IN_QUALITY_PTR)), SAMPLE_DX, CHOP_THROW,
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADBIT, STATUS)
          END IF

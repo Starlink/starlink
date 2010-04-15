@@ -1,5 +1,5 @@
 *+  CAR_CHOIC - Obtain response from a set of choices.
-      SUBROUTINE CAR_CHOIC (PARAM, CASE, PROMPT, NUMRSP, DESCR, RESPS, 
+      SUBROUTINE CAR_CHOIC (PARAM, CASE, PROMPT, NUMRSP, DESCR, RESPS,
      :  REPLY, STATUS)
 *    Description :
 *     Subroutine to prompt the user for one choice between a list of
@@ -14,7 +14,7 @@
 *     3.   The response for each choice must be no more than 10
 *          characters.
 *     4.   The (arbitary) maximum number of possible responses is 100.
-*     5.   Prompting continues until a valid response is given. The 
+*     5.   Prompting continues until a valid response is given. The
 *          default response is the first option given.
 *     6.   At the programmer's discretion abbreviations for the input
 *          responses are allowed. These are indicated by placing a
@@ -41,7 +41,7 @@
 *           Name of the environment parameter from which the response
 *           is to be obtained.
 *     CASE  =  LOGICAL (READ)
-*           A flag indicating whether the responses are to be forced 
+*           A flag indicating whether the responses are to be forced
 *           into upper case, coded as follows:
 *           .TRUE.  -  force into upper case,
 *           .FALSE. -  do not force into upper case (that is, allow

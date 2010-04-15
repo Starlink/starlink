@@ -15,12 +15,12 @@
 *
 *  Description:
 *     Opens the CHI system and performs house keeping tasks.
-*     CHI_OPEN sould be the first CHI call in your application 
+*     CHI_OPEN sould be the first CHI call in your application
 *     and CHI_CLOSE the last.
 
 *  Arguments:
 *     STATUS = INTEGER * ( CHI__SZNAME ) (Given and Returned)
-*        
+*
 *  Anticipated Errors:
 *     None
 
@@ -37,7 +37,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -62,7 +62,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-* 
+*
         do icount = 1, chi__mxass
           opcatnames(icount) = '9999'
           numopencats = 0

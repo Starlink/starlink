@@ -23,8 +23,8 @@
 *        Global status.
 
 *  Notes:
-*     A CHI_RESET is not needed the first time data is retrieved from the 
-*     catalogue. 
+*     A CHI_RESET is not needed the first time data is retrieved from the
+*     catalogue.
 
 *  Anticipated Errors:
 *     CHI__CATNOTFND
@@ -42,7 +42,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,5 +91,5 @@
 *        call chi_getcd(dbname, catname, .FALSE. ,cd ,status)
 *        call chi_rreset(cd, status)
       endif
-*    
+*
       END

@@ -62,7 +62,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
 
 *  Loop for each position.
       DO I = 1, EL
- 
+
 *  Create some tokens for the co-ordinates.  Write them into a buffer.
          CALL MSG_SETR( 'X', XP( I ) )
          CALL MSG_SETR( 'Y', YP( I ) )

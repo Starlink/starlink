@@ -28,13 +28,13 @@ C     (<) ARRAY    (Real array ARRAY(NX,NY)) The output data.
 C
 C     Subroutines / functions used - None
 C
-C     Note: 1) Edge effects.  This routine operates as though 
+C     Note: 1) Edge effects.  This routine operates as though
 C              there were extra pixels outside the actual array,
 C              all containing zero.  So some of the data in the
 C              edge pixels can be thought of as being transferred
 C              into these non-existent pixels and so is effectively
 C              lost.
-C           2) This routine is based on code taken from the routine 
+C           2) This routine is based on code taken from the routine
 C              GEN_ASMOTH.
 C
 C                                       KS / AAO 30th Oct 1987
@@ -79,7 +79,7 @@ C
      :             +(ARRAY(IX-1,1)+ARRAY(IX,2)+ARRAY(IX+1,1)
      :               +ARRAY(IX-1,2)+ARRAY(IX+1,2))*EVAL
          END DO
-         ROW(NX)=ARRAY(NX,1)*CVAL 
+         ROW(NX)=ARRAY(NX,1)*CVAL
      :          +(ARRAY(NX-1,1)+ARRAY(NX,2)+ARRAY(NX-1,2))*EVAL
 C
 C        Then the intermediate rows.  Note that ROW is split into two

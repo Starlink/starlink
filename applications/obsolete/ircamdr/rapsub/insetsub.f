@@ -1,8 +1,8 @@
 
 *+  INSETSUB - replaces all pixels inside circle with specified value
 
-      SUBROUTINE INSETSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, 
-     :                      XCENTRE, YCENTRE, DIAMETER, NEWVAL, 
+      SUBROUTINE INSETSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2,
+     :                      XCENTRE, YCENTRE, DIAMETER, NEWVAL,
      :                      STATUS )
 
 *    Description :
@@ -13,7 +13,7 @@
 *
 *    Invocation :
 *
-*     CALL INSETSUB( INARRAY, OUTARRAY, DIMS, XCENTRE, YCENTRE, 
+*     CALL INSETSUB( INARRAY, OUTARRAY, DIMS, XCENTRE, YCENTRE,
 *                    DIAMETER, NEWVAL, STATUS )
 *
 *    Method :
@@ -107,7 +107,7 @@
 
             DISTANCE  =  SQRT(REAL((I-XCENTRE)**2+(J-YCENTRE)**2))
 
-*          check this against given radius value 
+*          check this against given radius value
 
             IF( DISTANCE .LE. RADIUS ) THEN
 

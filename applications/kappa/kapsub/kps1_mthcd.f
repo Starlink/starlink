@@ -69,47 +69,47 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER AEL
       DOUBLE PRECISION AXIS( AEL )
       INTEGER STRIDE
       INTEGER EL
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION ARRAY( AEL )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Index to ARRAY element
       INTEGER J                  ! Loop counter through the stride
       INTEGER K                  ! Loop counter through the axis
                                  ! elements                                 ! stride
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Loop for each element of the array in strides.
       DO K = 1, EL / STRIDE
          DO J = 1, STRIDE
- 
+
 *  Generate the index to array element.
             I = ( K - 1 ) * STRIDE + J
- 
+
 *  Fill the array with axis values.  Mod of the axis element is needed
 *  for the first axis, as the STRIDE will be 1.
             ARRAY( I ) = AXIS( MOD( K - 1, AEL ) + 1 )
          END DO
       END DO
- 
+
       END

@@ -2,23 +2,23 @@
      &STK_NPTS,OUT_LU,IN_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   R E T I T L E
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), CPARAM (<), PARAMS (<), STK_TITLE (><),
 C STK_NPTS (<), OUT_LU (<), IN_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Retitles a stack polarization spectrum.
 C

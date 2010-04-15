@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHI_XREPOCD( INPUT, CNAME, CFORMAT, 
+*     CALL CHI_XREPOCD( INPUT, CNAME, CFORMAT,
 *     CUNIT, CCOMMENT, STATUS )
 *
 *  Description:
@@ -49,7 +49,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,7 +111,7 @@
 *
 *   Get all the information about the columns.
 *
-      call chi_gallcd(input, catnumcols, catcnames, catcformats, 
+      call chi_gallcd(input, catnumcols, catcnames, catcformats,
      :  catctypes, catcunits, catccomments, catcmdataacc,
      :  catcdataacc, status)
 *
@@ -131,7 +131,7 @@
       call chi_crecat(output, catnuments, catnumcols, catcnames,
      :  catcformats, catcunits, catccomments, status)
 *
-*    Loop through the input catalogue until the end reading the data and 
+*    Loop through the input catalogue until the end reading the data and
 *    copying the data.
 *
       do entscount = 1, catnuments

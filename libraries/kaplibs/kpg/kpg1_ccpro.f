@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -68,8 +68,8 @@
 *     1994 September 27 (MJC):
 *        Original version.
 *     9-JAN-2001 (DSB):
-*        Changed behaviour so that the component is left undefined in 
-*        the output NDF (rather than being set blank) if a null 
+*        Changed behaviour so that the component is left undefined in
+*        the output NDF (rather than being set blank) if a null
 *        parameter value is supplied, and no component exists in the
 *        input NDF.
 *     2008 June 17 (MJC):
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

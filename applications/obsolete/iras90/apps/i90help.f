@@ -42,8 +42,8 @@
 *           of four levels.
 *
 *     Once in the help library, it can be navigated in the same way
-*     as VMS help libraries.  CTRL/Z (in VMS) or CTRL/D (in UNIX) to 
-*     exit from any level, and <RET> to move up a level in the 
+*     as VMS help libraries.  CTRL/Z (in VMS) or CTRL/D (in UNIX) to
+*     exit from any level, and <RET> to move up a level in the
 *     hierarchy.
 
 *  Usage:
@@ -66,7 +66,7 @@
 
 *  History:
 *     14-SEP-1992 (DSB):
-*        Original version, modified from KAPPA equivalent written by 
+*        Original version, modified from KAPPA equivalent written by
 *        MJC.
 *      8-AUG-2004 (TIMJ):
 *        Use SHL

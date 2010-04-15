@@ -55,7 +55,7 @@ C                        the value of STATUS.
 C
 C  External variables used:  None.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DSA_WRUSER, DSA_GET_ACTUAL_NAME, ICH_LEN
 C
 C  Prior requirements:

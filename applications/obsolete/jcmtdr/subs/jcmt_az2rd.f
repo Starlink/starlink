@@ -1,5 +1,5 @@
-      SUBROUTINE JCMT_ALTAZ2RADEC (RA2000, DEC2000, MJDSTART, 
-     :   DUT, LONG, LAT, HT, XP, YP, TDK, PMB, RH, TLR, OBFREQ, 
+      SUBROUTINE JCMT_ALTAZ2RADEC (RA2000, DEC2000, MJDSTART,
+     :   DUT, LONG, LAT, HT, XP, YP, TDK, PMB, RH, TLR, OBFREQ,
      :   PROJ, NX, NY, XOFF, YOFF, LST, RAOUT, DECOUT, STATUS)
 
 *+
@@ -36,18 +36,18 @@
 *     co-ordinates to the mean equator and equinox of a standard epoch.
 *
 *     The routine uses SLA routines to:-
-*       Calculate the geocentric apparent RA, Dec of the mean observation 
+*       Calculate the geocentric apparent RA, Dec of the mean observation
 *       centre at the date and time of the observation.
 *       For each pixel:-
 *         Calculate the observed az,el corresponding to the geocentric
-*         apparent observation centre at the LST at which the pixel was 
+*         apparent observation centre at the LST at which the pixel was
 *         observed.
 *         Calculate the observed az,el of the pixel.
 *         Calculate the geocentric apparent RA,Dec of the current pixel.
 *         Calculate the mean RA,Dec of the current pixel.
 *
 *      This process of working back from RA2000, DEC2000 to the actual
-*      RA, Dec observed by the telescope assumes that the JCMT telescope 
+*      RA, Dec observed by the telescope assumes that the JCMT telescope
 *      task used the same method in reverse to work out RA2000 and DEC2000
 *      from observed RA, Dec. This assumption may be invalid, particularly
 *      regarding the atmospheric refraction parameters used.
@@ -119,7 +119,7 @@
 *     13-MAY-1991 (REVAD::JFL): Changed parameter list of JCMT_RADREFR
 *     23-SEP-1991 (REVAD::JFL): Removed calculation of max and min of RAs
 *                               and Decs.
-*     11-NOV-1991 (REVAD::JFL): Fixed MAJOR bug whereby azimuths where 
+*     11-NOV-1991 (REVAD::JFL): Fixed MAJOR bug whereby azimuths where
 *                               calculated without cos(altitude) effect taken
 *                               into account.
 *     {enter_changes_here}
@@ -128,7 +128,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,7 +171,7 @@
       INTEGER IX                    ! current pixel x index
       INTEGER IY                    ! current pixel y index
       DOUBLE PRECISION AMPRMS(21)   ! parameter array for SLA_MAPPA
-      DOUBLE PRECISION AOPRMS(14)   ! parameter array for SLA_AOP  
+      DOUBLE PRECISION AOPRMS(14)   ! parameter array for SLA_AOP
       DOUBLE PRECISION WL           !  wavelength
       DOUBLE PRECISION HAOB, DECOB, RAOB
 
@@ -183,13 +183,13 @@
 *  routines, first calculating the observing wavelength in microns
 
       WL = C * 1.0d6 / OBFREQ
-      CALL SLA_AOPPA (MJDSTART, DUT, LONG, LAT, HT, XP, YP, TDK, 
+      CALL SLA_AOPPA (MJDSTART, DUT, LONG, LAT, HT, XP, YP, TDK,
      :   PMB, RH, WL, TLR, AOPRMS)
 
-*  correct the refraction constants here to something appropriate to mm 
-*  range 
+*  correct the refraction constants here to something appropriate to mm
+*  range
 
-      CALL JCMT_RADREFR (HT, TDK, PMB, RH, WL, LAT, AOPRMS(11), 
+      CALL JCMT_RADREFR (HT, TDK, PMB, RH, WL, LAT, AOPRMS(11),
      :   AOPRMS(12))
 
 *  precompute the parameters needed by SLA mean to apparent routines
@@ -210,7 +210,7 @@
 
             AOPRMS(14) = LST(IX,IY)
 
-*  find the observed az,zen of the centre of the observation at the LST 
+*  find the observed az,zen of the centre of the observation at the LST
 *  that this pixel was observed
 
             CALL SLA_AOPQK (RA, DEC, AOPRMS, AZC, ZENC, HAOB, DECOB,
@@ -221,7 +221,7 @@
 
             ZENP = ZENC - YOFF(IY) * DAS2R
             AZP = AZC + XOFF(IX) * DAS2R / SIN (ZENP)
-  
+
 *  find geocentric apparent ra, dec of current pixel
 
             CALL SLA_OAPQK ('A', AZP, ZENP, AOPRMS, RAOUT(IX,IY),

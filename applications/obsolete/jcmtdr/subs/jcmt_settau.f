@@ -51,7 +51,7 @@
 *        takes account of bad values in input data and ignores LST's associated
 *        with them which may be invalid
 *     11-NOV-1991 (REVAD::JFL):
-*        Modified to set TAU to FBAD if associated map data point is 
+*        Modified to set TAU to FBAD if associated map data point is
 *        invalid
 *     {enter_changes_here}
 
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      REAL TAU, ENDTAU           ! zenith opacity at beginning and end of 
+      REAL TAU, ENDTAU           ! zenith opacity at beginning and end of
                                  ! observation
       LOGICAL TAUINTERP          ! T if want to interpolate between TAU and
                                  ! ENDTAU

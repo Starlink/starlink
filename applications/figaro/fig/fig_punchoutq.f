@@ -16,7 +16,7 @@ C     (>) IX1     (Integer) The first X value for the zapped area
 C     (>) IY1     (Integer) The   "   Y   "    "   "    "     "
 C     (>) IX2     (Integer) The last  X   "    "   "    "     "
 C     (>) IY2     (Integer) The   "   Y   "    "   "    "     "
-C     (>) BITNUM  (Integer) Bit number to be set 
+C     (>) BITNUM  (Integer) Bit number to be set
 C     (>) BITVAL  (Logical) Value bit is to be set to
 C
 C     Common variables used - None

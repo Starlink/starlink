@@ -145,7 +145,7 @@
 
 * convert number to string for length test
 
-            CALL CHR_ITOC( INT(X_NUMBER), STRING, NUMB_CHAR ) 
+            CALL CHR_ITOC( INT(X_NUMBER), STRING, NUMB_CHAR )
 
 * plot bottom X axis number
 

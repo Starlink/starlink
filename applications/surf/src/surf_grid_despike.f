@@ -1,5 +1,5 @@
       SUBROUTINE SURF_GRID_DESPIKE( N_FILES, N_PTS, N_POS, N_BOLS,
-     :     BITNUM, NYQUIST, BOL_RA_PTR, BOL_DEC_PTR, 
+     :     BITNUM, NYQUIST, BOL_RA_PTR, BOL_DEC_PTR,
      :     DATA_PTR, QUALITY_PTR, NX, NY, ICEN, JCEN, NSPIKES,
      :     BADBIT, STATUS )
 *+
@@ -11,34 +11,34 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURF_GRID_DESPIKE ( N_FILES, N_PTS, N_POS, N_BOLS, NYQUIST,
 *    :     BOL_RA_PTR, BOL_DEC_PTR, DATA_PTR, QUALITY_PTR,
 *    :     NX, NY, ICEN, JCEN, NSPIKES,
-*    :     BADBIT, STATUS ) 
+*    :     BADBIT, STATUS )
 
 *  Description:
-*     For each data point this routine places it into a bin in the 
+*     For each data point this routine places it into a bin in the
 *     output grid depending on the position of the data point on the sky.
 *     The position in the input data array is stored.
 *     This is done in two stages:
 *
 *     - Find the size of the output grid from the maximum extent of
 *        the input data.
-*     - Loop through data. Find I,J coordinate of each point in the 
+*     - Loop through data. Find I,J coordinate of each point in the
 *        output grid.
 *     - Find out maximum number of points for an I,J position.
-*     - Put data onto grid in array (I,J,N) [REALS]. 
+*     - Put data onto grid in array (I,J,N) [REALS].
 *        We also need to store positions of these data.
 *        We can either do it by storing the file number, bolometer and
 *        position (time) index OR we can just store some index in a merged
-*        data array that goes from 1..TOT_PTS. 
-*         First method is easy but memory hungry. Second method is 
+*        data array that goes from 1..TOT_PTS.
+*         First method is easy but memory hungry. Second method is
 *         more efficient but does need some reconstruction to work
 *         out where the point was in the original data.
 *       Use the second method.
-*   
+*
 *     Once the data is gridded, it is first displayed and then
 *     despiked. Currently despiking is done on a simple sigma clipping
 *     basis for each bin.
@@ -59,7 +59,7 @@
 *       Nyquist sampling (radians)
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (X coords)
-*       Note that each data set has positions for N_POS * N_BOLS 
+*       Note that each data set has positions for N_POS * N_BOLS
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (Y coords)
 *     DATA_PTR( N_FILES ) = INTEGER (Given)
@@ -157,7 +157,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -165,7 +165,7 @@
       INCLUDE 'MSG_PAR'                          ! MSG__NORM
       INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
       INCLUDE 'AST_PAR'                          ! AST constants
- 
+
 *  Arguments Given:
       INTEGER N_FILES
       INTEGER BITNUM
@@ -182,7 +182,7 @@
       INTEGER NY
       INTEGER ICEN
       INTEGER JCEN
-      
+
 *  Arguments Returned:
       INTEGER NSPIKES ( N_FILES )
 
@@ -190,7 +190,7 @@
       INTEGER STATUS                        ! Global status
 
 *  Local Constants:
- 
+
 *  Local Variables:
       LOGICAL ALIGN                         ! DATA pic. aligned with a previous picture?
       INTEGER BIN_PTR                       ! Binned data
@@ -241,7 +241,7 @@
 
 *  Local data
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Initialise pointers
@@ -318,7 +318,7 @@
 *     Fill the array with data. (1 file at a time)
 
          CALL SURFLIB_CALC_IJPOS(N_PTS(I), DBLE(OUT_PIXEL), ICEN, JCEN,
-     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBR)),
      :        STATUS)
@@ -334,7 +334,7 @@
 *     should) but I am just trying to do it properly...
 
          CALL SURFLIB_HISTOGRAM_GRID( N_PTS(I), NX, NY, .TRUE.,
-     :        %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(DATA_PTR(I))),
      :        %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
      :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
      :        %VAL(CNF_PVAL(GRID_PTR)), IMAX, JMAX, NMAX, STATUS)
@@ -373,24 +373,24 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
-         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, 
+         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR,
      :                      %VAL(CNF_PVAL(BIN_PTR)))
-         CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI, 
+         CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI,
      :        %VAL(CNF_PVAL(BIN_POS_PTR)))
       END IF
 
 *     Now we need to copy the data into BIN_PTR and the positions
-*     into BIN_POS_PTR. 
+*     into BIN_POS_PTR.
 
       OFFSET = 0
 
       DO I = 1, N_FILES
 
          CALL SURFLIB_FILL_GRID(N_PTS(I), NX, NY, NMAX, OFFSET,
-     :        %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(DATA_PTR(I))),
      :        %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
      :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
-     :        %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :        %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)),
      :        %VAL(CNF_PVAL(BIN_POS_PTR)),
      :        STATUS)
 
@@ -408,13 +408,13 @@
       CALL SCULIB_FREE ('IJPOS_PTR', IJPOS_PTR, IJPOS_END, STATUS)
 
 *     Some scratch space for storing the numbers (size nmax)
-*     in each bin. This scratch space is used in 
+*     in each bin. This scratch space is used in
 *     SURFLIB_PLOT_GRID as well as SURFLIB_STATS_GRID
 *     We use DOUBLE as that is required by AST in PLOT_GRID and is
 *     fine for scratch space in STATS_GRID
 
       CALL SCULIB_MALLOC(NMAX * VAL__NBD, PNT_PTR, PNT_END, STATUS)
-      CALL SCULIB_MALLOC(NMAX * VAL__NBD, SCRATCH_PTR, SCRATCH_END, 
+      CALL SCULIB_MALLOC(NMAX * VAL__NBD, SCRATCH_PTR, SCRATCH_END,
      :     STATUS)
 
 
@@ -422,12 +422,12 @@
 
       CALL PAR_GET0R('NSIGMA', NSIGMA, STATUS)
 
-*     Ask for the smoothing mode. Ask for it here since 
+*     Ask for the smoothing mode. Ask for it here since
 *       1. We need to know it anyway
 *       2. We only need to know DMODE if SMODE is not equal to NONE
 *          or if we are plotting.
 
-      CALL PAR_CHOIC('SMODE', 'NONE', 'NONE,HANN', 
+      CALL PAR_CHOIC('SMODE', 'NONE', 'NONE,HANN',
      :        .TRUE., SMODE, STATUS)
 
 
@@ -474,7 +474,7 @@
       END IF
 
 *     Since we are plotting then we can ask about the display mode
-     
+
 *     At this point we also need to find out the type of unwrapping
 *     to use.
 
@@ -483,7 +483,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((SMODE .NE. 'NONE') .OR. PLOT) THEN
 
-            CALL PAR_CHOIC('DMODE', 'SPIRAL', 
+            CALL PAR_CHOIC('DMODE', 'SPIRAL',
      :           'SPIRAL,XLINEAR,YLINEAR,DIAG1,DIAG2',
      :           .TRUE., UMODE, STATUS)
 
@@ -505,7 +505,7 @@
      :     STATUS)
       CALL SCULIB_MALLOC(NX * NY * VAL__NBI, JPOS_PTR, JPOS_END,
      :     STATUS)
-      
+
 *     ...and calculate the new grid look up table
 
       CALL SURFLIB_CALC_GRIDIJ(UMODE, NX, NY, ICEN, JCEN,
@@ -515,7 +515,7 @@
 *     Calculate the statistics of each bin and store in an array.
 *     Since this is generally useful for the plotting and the
 *     despiking itself.
-*     Have three measurements: 
+*     Have three measurements:
 *         Median and The mean + nsigma and the mean - nsigma
 *     Note that SURFLIB_PLOT_GRID still needs to work out the
 *     positions itself since it can not deal with bad pixels.
@@ -526,14 +526,14 @@
 
       STATS_PTR = 0
       STATS_END = 0
-      CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR, STATS_END, 
+      CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR, STATS_END,
      :     STATUS)
 
 *     Calculate stats using the specified smoothing mode
 
-      CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA, 
+      CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA,
      :     %VAL(CNF_PVAL(IPOS_PTR)),
-     :     %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :     %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)),
      :     %VAL(CNF_PVAL(PNT_PTR)),
      :     %VAL(CNF_PVAL(STATS_PTR)), STATUS)
 
@@ -547,11 +547,11 @@
 *
 *         IF (STATUS .NE. PAR__NULL) THEN
 *
-*            CALL NDF_MAP(GRNDF, 'DATA', '_REAL', 'WRITE', GRPNTR, 
+*            CALL NDF_MAP(GRNDF, 'DATA', '_REAL', 'WRITE', GRPNTR,
 *     :           ITEMP, STATUS)
-*            CALL VEC_RTOR(.FALSE., NX * NY, %VAL(STATS_PTR), 
+*            CALL VEC_RTOR(.FALSE., NX * NY, %VAL(STATS_PTR),
 *     :           %VAL(GRPNTR), IERR, NERR, STATUS)
-*            
+*
 *            CALL NDF_UNMAP(GRNDF, '*', STATUS)
 *            CALL NDF_ANNUL(GRNDF, STATUS)
 *         ELSE
@@ -569,13 +569,13 @@
       IF (PLOT) THEN
 
 *     Plot the data
-         CALL SURFLIB_PLOT_GRID(UNIT, NX, NY, NMAX, NSIGMA, 
-     :        %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)), 
+         CALL SURFLIB_PLOT_GRID(UNIT, NX, NY, NMAX, NSIGMA,
+     :        %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)),
      :        %VAL(CNF_PVAL(BIN_PTR)),
-     :        %VAL(CNF_PVAL(STATS_PTR)), %VAL(CNF_PVAL(PNT_PTR)), 
+     :        %VAL(CNF_PVAL(STATS_PTR)), %VAL(CNF_PVAL(PNT_PTR)),
      :        %VAL(CNF_PVAL(SCRATCH_PTR)),
      :        STATUS)
-         
+
 *     Finish the plotting excursion
 
       END IF
@@ -588,12 +588,12 @@
 *     difficult to relate back to actual quality.
 
       CALL SURFLIB_CLIP_GRID(N_FILES, N_PTS, NX, NY, NMAX,
-     :     N_BOLS, BITNUM, DATA_PTR, QUALITY_PTR, 
+     :     N_BOLS, BITNUM, DATA_PTR, QUALITY_PTR,
      :     %VAL(CNF_PVAL(BIN_PTR)),
-     :     %VAL(CNF_PVAL(BIN_POS_PTR)), %VAL(CNF_PVAL(STATS_PTR)), 
+     :     %VAL(CNF_PVAL(BIN_POS_PTR)), %VAL(CNF_PVAL(STATS_PTR)),
      :     %VAL(CNF_PVAL(IPOS_PTR)),
      :     %VAL(CNF_PVAL(JPOS_PTR)), NSPIKES, STATUS)
-         
+
 *     Free memory
       CALL SCULIB_FREE('PNT_PTR', PNT_PTR, PNT_END, STATUS)
       CALL SCULIB_FREE('SCRATCH', SCRATCH_PTR, SCRATCH_END, STATUS)
@@ -603,7 +603,7 @@
       CALL SCULIB_FREE('JPOS_PTR', JPOS_PTR, JPOS_END, STATUS)
 
 
-*     Free BIN_PTR 
+*     Free BIN_PTR
       CALL SCULIB_FREE('BIN_PTR', BIN_PTR, BIN_PTR_END, STATUS)
       CALL SCULIB_FREE('BIN_POS', BIN_POS_PTR, BIN_POS_END, STATUS)
 

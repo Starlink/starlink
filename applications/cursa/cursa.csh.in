@@ -13,11 +13,11 @@
 #     source cursa.csh
 #
 #  Description:
-#     This procedure defining the links needed to execute 
+#     This procedure defining the links needed to execute
 #     each application from the current directory.
 #
 #  Notes:
-#     The installation target is set outside of this script. 
+#     The installation target is set outside of this script.
 #     A test is made to see if the environment variable INSTALL
 #     has been set.
 #
@@ -134,7 +134,7 @@ alias cursa_catgrid   '$CURSA_DIR/catphotomlst'
 #  Perl scripts, use the Starlink Perl.
 if ( -e @STARPERL@ ) then
    set starperl=@STARPERL@
-else 
+else
    if ( -e $STARLINK_DIR/bin/starperl ) then
       set starperl=$STARLINK_DIR/bin/starperl
    else
@@ -160,7 +160,7 @@ alias cursa_xcatview  '$CURSA_DIR/xcatview'
 #
 #  Define the utility program to be used to submit the query.  The options
 #  are:
-#    "/star/bin/cursa/geturl" -- geturl utility, 
+#    "/star/bin/cursa/geturl" -- geturl utility,
 #    "lynx -source"           -- lynx command line browser,
 #    "java  UrlReader"        -- Java utility.
 #    "wget -q -O -"           -- wget utility (probably RedHat Linux only).

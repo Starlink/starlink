@@ -2,16 +2,16 @@
 *+
 *  Name:
 *     INQUIRE
- 
+
 *  Purpose:
 *     Display PONGO status information.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Description:
 *     Display information about the status of PONGO and the data which
 *     have been read in. The options are:
@@ -32,7 +32,7 @@
 
 *  Usage:
 *     inquire
- 
+
 *  ADAM Parameters:
 *     PGPLOT = _LOGICAL (Read)
 *        Display the current PGPLOT plotting attributes.
@@ -70,17 +70,17 @@
 *        If no value is specified on the command line, the current
 *        value is used. The current value is initially set to 0
 *        (implying the end of the list).
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     PDRAPER: P.W. Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     6-APR-1990 (JBVAD::PAH):
 *        Original version.
@@ -91,33 +91,33 @@
 *     30-MAY-1996 (PDRAPER):
 *        Extended fill styles to 4 and added hatch style output.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
       INCLUDE 'GNS_PAR'          ! GNS_ public global constants
- 
+
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! PONGO global variables
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
       EXTERNAL GNS_FILTG
       LOGICAL GNS_FILTG          ! Filter function for GNS
       EXTERNAL PON_SHODATA       ! Deliver a line of data
       EXTERNAL PON_DEVOP         ! PGPLOT device is open
-      LOGICAL PON_DEVOP 
-      
+      LOGICAL PON_DEVOP
+
 *  Local Variables:
       CHARACTER * ( 7 ) FONTS( 4 ) ! Font styles
       CHARACTER * ( 13 ) LINESTYLE( 5 ) ! Line styles
@@ -144,21 +144,21 @@
       REAL XWMIN                 ! Current world coordinate
       REAL YWMAX                 ! Current world coordinate
       REAL YWMIN                 ! Current world coordinate
-      REAL ANGLE                 ! Hatching angle 
+      REAL ANGLE                 ! Hatching angle
       REAL SEPN                  ! Hatching spacing
       REAL PHASE                 ! Hatching phase
 
-*  Local Data: 
+*  Local Data:
       DATA FONTS / 'Normal', 'Roman', 'Italic', 'Script' /
       DATA LINESTYLE / 'Solid', 'Dashed', 'Dot-dash-dot-dash', 'Dotted',
      :                 'Dash-dot-dot-dot' /
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS.NE.SAI__OK ) RETURN
 
-*  Initialise DONE. 
+*  Initialise DONE.
       DONE = .FALSE.
       PGOPEN = PON_DEVOP( .FALSE., STATUS )
 
@@ -167,7 +167,7 @@
       CALL PAR_GET0I( 'PAGE', PAGE, STATUS )
       CALL PAR_GET0I( 'FROM', FROM, STATUS )
       CALL PAR_GET0I( 'TO', TO, STATUS )
- 
+
 *  PGPLOT parameter.
       CALL PAR_GET0L( 'PGPLOT', SHOW, STATUS )
 
@@ -175,12 +175,12 @@
          DONE = .TRUE.
          IF ( PGOPEN ) THEN
             CALL PGQINF( 'DEV/TYPE', OUTBUF, LENGTH ) ! Seem to need
-                                ! DEV/TYPE other ways of getting device 
+                                ! DEV/TYPE other ways of getting device
                                 ! name fail
             TO = INDEX( OUTBUF, '/')
-            IF ( TO .NE. 0 ) LENGTH = TO - 1 
+            IF ( TO .NE. 0 ) LENGTH = TO - 1
             CALL MSG_SETC( 'DEV', OUTBUF( : LENGTH ) )
-            CALL MSG_OUT( ' ', 'Current plotting device: ^DEV', 
+            CALL MSG_OUT( ' ', 'Current plotting device: ^DEV',
      :                    STATUS )
             CALL MSG_BLANK( STATUS )
             CALL PGQCF( IFONT )
@@ -216,7 +216,7 @@
                CALL MSG_SETC( 'FILSTY', ')' )
             END IF
             CALL MSG_OUT( ' ', '   Fill style: ^FILSTY', STATUS )
-            
+
             CALL MSG_SETR( 'ANGLE', ANGLE )
             CALL MSG_OUT( ' ', '   Hatch angle: ^ANGLE', STATUS )
             CALL MSG_SETR( 'SEPN', SEPN )
@@ -230,10 +230,10 @@
             CALL MSG_SETI( 'LINWID', ILW )
             CALL MSG_OUT( ' ', '   Line width: ^LINWID', STATUS )
 
-            IF ( TBCI .LT. 0 ) THEN 
-               CALL MSG_OUT( ' ', '   Text background: transparent', 
+            IF ( TBCI .LT. 0 ) THEN
+               CALL MSG_OUT( ' ', '   Text background: transparent',
      :                       STATUS )
-            ELSE 
+            ELSE
                CALL MSG_SETI( 'TBCI', TBCI )
                CALL MSG_OUT( ' ', '   Text background: ^TBCI', STATUS )
             END IF
@@ -244,9 +244,9 @@
          END IF
       END IF
 
-*  LIMITS parameter. 
+*  LIMITS parameter.
       CALL PAR_GET0L( 'LIMITS', SHOW, STATUS )
- 
+
       IF ( SHOW ) THEN
          DONE = .TRUE.
          CALL MSG_OUT( ' ', 'Actual data limits:', STATUS )
@@ -289,7 +289,7 @@
          END IF
       END IF
 
-*  COLUMNS parameter. 
+*  COLUMNS parameter.
       CALL PAR_GET0L( 'COLUMNS', SHOW, STATUS )
 
       IF ( SHOW ) THEN
@@ -301,7 +301,7 @@
             CALL MSG_BLANK( STATUS )
 
             DO 10 I = 1, NCOLS
- 
+
 *           Truncate the column labels if they are too long.
                CALL MSG_FMTI( 'COLUMN', 'I2', I )
                CALL MSG_SETC( 'LABEL', COLLAB( I ) )
@@ -314,7 +314,7 @@
          END IF
       END IF
 
-*  DEVICES parameter. 
+*  DEVICES parameter.
       CALL PAR_GET0L( 'DEVICES', SHOW, STATUS )
 
       IF ( SHOW ) THEN
@@ -325,28 +325,28 @@
          CALL MSG_BLANK( STATUS )
       END IF
 
-*  DATA parameter. 
+*  DATA parameter.
       CALL PAR_GET0L( 'DATA', SHOW, STATUS )
 
       IF ( SHOW ) THEN
          DONE = .TRUE.
- 
+
 *     Deliver the data to the user.
          CALL PON_SHOUSR( PON_SHODATA, 'PAGE', NDAT, FROM, TO, STATUS )
          CALL MSG_BLANK( STATUS )
       END IF
- 
+
       IF ( ( .NOT. DONE )
      :     .AND. ( STATUS .EQ. SAI__OK ) ) CALL MSG_OUT( ' ',
      :                                        'No action has been ' //
      :                                        'taken.', STATUS )
- 
-*  Check the returned status and report a contextual error message 
+
+*  Check the returned status and report a contextual error message
 *  if necessary.
       IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'INQUIRE_END',
      :                              'INQUIRE: Unable to display ' //
      :                              'PONGO status information.',
      :                              STATUS )
- 
+
       END
 * $Id$

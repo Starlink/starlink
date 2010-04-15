@@ -64,7 +64,7 @@
 *     been assigned the weight DELETE /DJA?
 *     Workspace passed from above, TNW/CAVAD 19/9/90
 *     Replaced NAG e02adf with PDA_DPOLFT  JWP March 97
-*     Fix PDA call, calculate all RMSs and convert 
+*     Fix PDA call, calculate all RMSs and convert
 *       Taylor series to Cheby AJH Oct 97
 *     Remove character strings continued across continuation lines: ACD,
 *       28/9/00
@@ -72,7 +72,7 @@
       implicit none
 *
 * import
-*     
+*
       integer max_kplus1
       integer npts
       double precision x(npts)
@@ -127,7 +127,7 @@
       integer status
 * --------------------------------------------------------------
 * Square weights
-      
+
       DO 1 I = 1, npts
          sqweight(I) = weight(I) * weight(I)
  1    CONTINUE
@@ -137,7 +137,7 @@
       xlim1=x(1)
       xlim2=x(1)
       DO 2 I= 2, npts
-         xlim1 = min(xlim1,x(I)) 
+         xlim1 = min(xlim1,x(I))
          xlim2 = max(xlim2,x(I))
  2    CONTINUE
 
@@ -170,7 +170,7 @@
 * Perform fits for all degrees from 0 to max_fit
       do 4 i = 1,max_fit
 
-      EPS = 0D0      
+      EPS = 0D0
 
       CALL PDA_DPOLFT(npts, x, y, sqweight, i-1, ndeg, eps, r, ierr,
      :     athree, ifail)
@@ -179,26 +179,26 @@
          CALL PAR_WRUSER(
      :     'Error during polynomial fit using PDA_DPOLFT', STATUS)
       ENDIF
-      
+
 *     Put rms error for fit order i-1 into rssq(i)
       RSSQ(i) = EPS
-      
+
 *     Convert co-effs for fit order i-1 to Taylor series values
       IFAIL = 0
 
 *     If new fit has max order not higher than before then skip
-      if (ndeg.ge.i-1) then 
+      if (ndeg.ge.i-1) then
 
          CALL PDA_DPCOEF(i-1, 0D0, conv, athree, IFAIL)
-         
+
          IF (IFAIL .NE. 0) THEN
             CALL PAR_WRUSER('Error during conversion of fit '/
      :        /'co-effs to Taylor series co-effs in fit_cpolb.f',
      :        STATUS)
          ENDIF
-         
+
 *     Convert returned Taylor co-effs to Chebyshev for degree i-1
-         
+
          CALL TAY2CHEB(i-1,xlim1,xlim2,conv,chbyi)
 
 
@@ -207,12 +207,12 @@
             COEFFS(i,j)=chbyi(j)
  3       CONTINUE
 
-*     End of if ndeg.lt.i-1 
+*     End of if ndeg.lt.i-1
       ENDIF
-      
+
  4    CONTINUE
-      
-      
+
+
 * return Status if FIT via routine NAme
 
       fit_cpolb = ifail

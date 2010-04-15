@@ -47,7 +47,7 @@ C
       LOGICAL FIG_SCRCHK
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
       CHARACTER ICH_CI*5         ! Only needs to be 5 as maximum length
-C                                ! of the output spectrum is 65536 
+C                                ! of the output spectrum is 65536
 C                                ! pixels
 C
       INTEGER  EOF

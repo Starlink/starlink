@@ -1,7 +1,7 @@
 *+  APERADDSUB - bins up pixels within a specified circle
 
-      SUBROUTINE APERADDSUB ( INARRAY, IDIMS1, IDIMS2, XCEN, YCEN, 
-     :                        PIXDIAM, NUMPIX, OLDNOISE, TOTAL, 
+      SUBROUTINE APERADDSUB ( INARRAY, IDIMS1, IDIMS2, XCEN, YCEN,
+     :                        PIXDIAM, NUMPIX, OLDNOISE, TOTAL,
      :                        MEAN, NEWNOISE, STATUS )
 
 *    Description :
@@ -126,8 +126,8 @@
 *    included in the box
       IRADIUS =  NINT( RADIUS + 1.0 )
       BLXPIX  =  XPIX - IRADIUS
-      BLYPIX  =  YPIX - IRADIUS 
-      TRXPIX  =  XPIX + IRADIUS 
+      BLYPIX  =  YPIX - IRADIUS
+      TRXPIX  =  XPIX + IRADIUS
       TRYPIX  =  YPIX + IRADIUS
 
 *    make sure that the box does not run off the array
@@ -157,18 +157,18 @@
             IF( DISTANCE .LE. RADIUS ) THEN
 
 *             include this point
-               NUMPIX   =  NUMPIX + 1 
+               NUMPIX   =  NUMPIX + 1
                TOTAL    =  TOTAL + INARRAY( I, J )
                TOTALSQ  =  TOTALSQ + ( INARRAY( I, J )**2 )
 
             END IF
 
          END DO
-      END DO               
+      END DO
 
 *    now form returned quantities - the standard deviation (sigma)
 *    is formed from the equation for the variance (sigma squared) :
-*                                               _ 
+*                                               _
 *     variance  =   Sum over n pixels ( x   -   x )**2
 *                                        i
 *                   ----------------------------------
@@ -180,7 +180,7 @@
 *     variance  =   Sum(( x )**2)  -  2.x.Sum( x )  +  n.x**2
 *                          i                    i
 *                   -----------------------------------------
-*                  
+*
 *                                  ( n - 1 )
 *
 *    and then standard deviation equals sqrt( variance )

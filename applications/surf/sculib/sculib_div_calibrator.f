@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE, 
+      SUBROUTINE SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE,
      :  CALIBRATOR, QUALITY,STATUS)
 *+
 *  Name:
@@ -9,11 +9,11 @@
 
 *  Description:
 *     This routine divides the calibrator signal into the chop signal and
-*     variance over an array of measurements. No division will occur if the 
+*     variance over an array of measurements. No division will occur if the
 *     measurement quality is bad or the square of the calibrator signal is zero.
 
 *  Invocation:
-*     CALL SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE, CALIBRATOR, 
+*     CALL SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE, CALIBRATOR,
 *    :  QUALITY)
 
 *  Arguments:

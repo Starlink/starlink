@@ -12,12 +12,12 @@
 # file also defines the following targets:
 #   buildsupport       - build each of the buildsupport tools
 #   clean-buildsupport - clean the buildsupport tools
-#   configure-deps     - build the set of components which 
+#   configure-deps     - build the set of components which
 #                        must be built before ./configure
 # It additionally defines the variable SUPPORTED_COMPONENTS,
 # containing the list of manifest files corresponding to
 # components marked `supported' in their component.xml file.
-# No other targets or variables defined here should be 
+# No other targets or variables defined here should be
 # regarded as persistent or otherwise relied upon.
 
 

@@ -1,5 +1,5 @@
       SUBROUTINE SPD_CZMD( ORDER, NFDB, NCOMP, NPIX, NROWS, FDB,
-     :   LOCATS, IDENTS, WEIGHT, RETVAL, A3, XVAL, RESULT, RESVAR, 
+     :   LOCATS, IDENTS, WEIGHT, RETVAL, A3, XVAL, RESULT, RESVAR,
      :   FINSHD, STATUS )
 *+
 *  Name:
@@ -134,7 +134,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -383,7 +383,7 @@
                      CALL PGMOVE( RESULT(2*I-1,ROWNUM), BOTTOM )
                      CALL PGDRAW( RESULT(2*I-1,ROWNUM), TOP )
                   ELSE
-                     CALL PGPT( 1, 
+                     CALL PGPT( 1,
      :                  RESULT(2*I-1,ROWNUM), RESULT(2*I,ROWNUM), 5 )
                   END IF
                END IF

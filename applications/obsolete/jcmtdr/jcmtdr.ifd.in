@@ -410,13 +410,13 @@ package jcmtdr {
    icl { defhelp   jcmtdr $JCMTDR_HELP 0 }
 
    display {
- 
+
       JCMTDR commands are now available -- (Version @VERSION@)
-  
+
               Type "jcmt_help jcmtdr" for help
            or "showme sc1" or "showme sun192" for
                       web documentation
-  
+
    }
 
 }

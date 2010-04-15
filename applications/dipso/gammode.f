@@ -2,7 +2,7 @@
        LOGICAL OK
        CHARACTER*1 BLEEP
        COMMON /BLEEP / BLEEP
- 
+
        IF ((X.LT.0.) .OR. (A.LE.0.)) THEN
           WRITE (*,
      :    '(''   MODE:  negative argument encountered in GAMMODE'',A)')
@@ -10,7 +10,7 @@
           OK = .FALSE.
           GOTO 100
        ENDIF
- 
+
        IF (X.LT.A+1.) THEN
           CALL GSERMODE(GAMSER,A,X,GLN,OK)
           IF (.NOT.OK) GOTO 100

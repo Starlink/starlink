@@ -1,7 +1,7 @@
       SUBROUTINE RVML (LUREP,LUINP,LUPRO,LUECH)
 *+
 *  - - - - -
-*   R V M L 
+*   R V M L
 *  - - - - -
 *
 *  Observer radial velocity utility - main routine.
@@ -58,7 +58,7 @@
 *
 *  The program terminates if, at any point, a record beginning
 *  'END' or an EOF is detected.
-*     
+*
 *  P.T.Wallace   Starlink   18 April 1994
 *-
 

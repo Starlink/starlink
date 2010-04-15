@@ -179,10 +179,10 @@
 *  Get units and name of column.
          CALL CAT_TIQAC( FI( I ), 'UNITS', UNITS, STATUS )
          CALL CAT_TIQAC( FI( I ), 'NAME', NAME, STATUS )
-         IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN 
-            
+         IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN
+
 *  Column with angle data. This is either an RA or DEC. If qualified by
-*  {HOURS} then assume RA, otherwise it is a DEC. Note we need both of 
+*  {HOURS} then assume RA, otherwise it is a DEC. Note we need both of
 *  these to have a valid match.
             IF ( UNITS( 8: ) .EQ. '{HOURS}' ) THEN
                IF ( RACOL .EQ. 0 ) RACOL = I
@@ -191,20 +191,20 @@
             END IF
 
 *  Check for SExtractor specific names.
-         ELSE IF ( NAME .EQ. 'X_WORLD' ) THEN 
+         ELSE IF ( NAME .EQ. 'X_WORLD' ) THEN
             RACOL = I
-         ELSE IF ( NAME .EQ. 'Y_WORLD' ) THEN 
+         ELSE IF ( NAME .EQ. 'Y_WORLD' ) THEN
             DECCOL = I
          ELSE IF ( NAME .EQ. 'X_IMAGE' ) THEN
             XCOL = I
-         ELSE IF ( NAME .EQ. 'Y_IMAGE' ) THEN 
-            YCOL = I 
+         ELSE IF ( NAME .EQ. 'Y_IMAGE' ) THEN
+            YCOL = I
          END IF
  2    CONTINUE
 
 *  OK, if we have located special columns then add these to the header
-*  section. 
-      IF ( RACOL .NE. 0 .AND. DECCOL .NE. 0 ) THEN 
+*  section.
+      IF ( RACOL .NE. 0 .AND. DECCOL .NE. 0 ) THEN
          IAT = IAT + 1
          CALL CHR_ITOC( RACOL - 1, VALUE, ICUR )
          TABLE( IAT ) = 'ra_col: '// VALUE( :ICUR )
@@ -212,7 +212,7 @@
          CALL CHR_ITOC( DECCOL - 1, VALUE, ICUR )
          TABLE( IAT ) = 'dec_col: '// VALUE( :ICUR )
       END IF
-      IF ( XCOL .NE. 0 .AND. YCOL .NE. 0 ) THEN 
+      IF ( XCOL .NE. 0 .AND. YCOL .NE. 0 ) THEN
          IAT = IAT + 1
          CALL CHR_ITOC( XCOL - 1, VALUE, ICUR )
          TABLE( IAT ) = 'x_col: '// VALUE( :ICUR )

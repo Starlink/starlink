@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_SKYF4( PROJEC, NP, P, SCS, EPOCH, NPOS, AA, BB, 
+      SUBROUTINE KPS1_SKYF4( PROJEC, NP, P, SCS, EPOCH, NPOS, AA, BB,
      :                       XX, YY, RMS, LOGFD, XO, YO, STATUS )
 *+
 *  Name:
@@ -28,7 +28,7 @@
 *     NP = INTEGER (Given)
 *        The size of array P.
 *     P( NP ) = DOUBLE PRECISION (Given)
-*        The projection parameters. 
+*        The projection parameters.
 *     SCS = CHARACTER * ( * ) (Given)
 *        The sky co-ordinate system.
 *     EPOCH = DOUBLE PRECISION (Given)
@@ -47,7 +47,7 @@
 *     RMS = REAL (Given)
 *        The RMS residual in pixels.
 *     LOGFD = INTEGER (Given)
-*        The FIO file descriptor for the log file. 
+*        The FIO file descriptor for the log file.
 *     XO( NPOS ) = DOUBLE PRECISION (Returned)
 *        The image X values formed by transforming AA and BB.
 *     YO( NPOS ) = DOUBLE PRECISION (Returned)
@@ -105,20 +105,20 @@
 *  Arguments Given:
       CHARACTER * ( * ) PROJEC
       INTEGER NP
-      DOUBLE PRECISION P( NP )      
+      DOUBLE PRECISION P( NP )
       CHARACTER * ( * ) SCS
       DOUBLE PRECISION EPOCH
       INTEGER NPOS
-      DOUBLE PRECISION AA( NPOS )      
-      DOUBLE PRECISION BB( NPOS )      
-      DOUBLE PRECISION XX( NPOS )      
-      DOUBLE PRECISION YY( NPOS )      
+      DOUBLE PRECISION AA( NPOS )
+      DOUBLE PRECISION BB( NPOS )
+      DOUBLE PRECISION XX( NPOS )
+      DOUBLE PRECISION YY( NPOS )
       REAL RMS
       INTEGER LOGFD
 
 *  Arguments Returned:
-      DOUBLE PRECISION XO( NPOS )      
-      DOUBLE PRECISION YO( NPOS )      
+      DOUBLE PRECISION XO( NPOS )
+      DOUBLE PRECISION YO( NPOS )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -162,7 +162,7 @@
      :               /'reference point  : ^A, ^B', BUF, LBUF, STATUS )
       CALL FIO_WRITE( LOGFD, BUF( : LBUF ), STATUS )
 
-      
+
       CALL MSG_SETR( 'X', REAL( P( 3 ) ) )
       CALL MSG_SETR( 'Y', REAL( P( 4 ) ) )
       CALL MSG_LOAD( 'KPS1_SKYF4_MSG4', '    Image co-ordinates of '/
@@ -224,10 +224,10 @@
       DO I = 1, NPOS
 
          IF ( XO( I ) .NE. VAL__BADD .AND. YO( I ) .NE. VAL__BADD ) THEN
-            RESID = SQRT( MAX( 0.0D0, ( XX( I ) - XO( I ) )**2 + 
+            RESID = SQRT( MAX( 0.0D0, ( XX( I ) - XO( I ) )**2 +
      :                                ( YY( I ) - YO( I ) )**2 ) )
 
-            CALL IRA_DTOC( AA( I ), BB( I ), SCS, 0, ATEXT, BTEXT, 
+            CALL IRA_DTOC( AA( I ), BB( I ), SCS, 0, ATEXT, BTEXT,
      :                     STATUS )
             CALL MSG_SETI( 'I', I )
             CALL MSG_SETC( 'A', ATEXT )

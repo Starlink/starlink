@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,11 +90,11 @@ int main(int argc, char *argv[])
 /*
 **  Check that the colour table entry is writable
 */
-    if ( DefaultVisual( display, DefaultScreen( display ) )->class 
+    if ( DefaultVisual( display, DefaultScreen( display ) )->class
 	== StaticColor ||
-         DefaultVisual( display, DefaultScreen( display ) )->class 
+         DefaultVisual( display, DefaultScreen( display ) )->class
 	== StaticGray ||
-         DefaultVisual( display, DefaultScreen( display ) )->class 
+         DefaultVisual( display, DefaultScreen( display ) )->class
         == TrueColor )
     {
 	fprintf( stderr, "Sorry - display has a fixed colour table\n");
@@ -104,11 +104,11 @@ int main(int argc, char *argv[])
 /*
 **  Convert the colour specification
 */
-    status = XParseColor( display, DefaultColormapOfScreen( 
+    status = XParseColor( display, DefaultColormapOfScreen(
 	DefaultScreenOfDisplay( display ) ), argv[2], &color);
     if (!status)
     {
-	fprintf( stderr, 
+	fprintf( stderr,
 	    "Sorry - can't understand colour specification \"%s\"\n", argv[2]);
 	return;
     }
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     for ( i = 0; i < size; i++ )
     {
     	color.pixel = table[i] | ~mask;
-    	XStoreColor( display, DefaultColormapOfScreen( DefaultScreenOfDisplay( 
+    	XStoreColor( display, DefaultColormapOfScreen( DefaultScreenOfDisplay(
 	    display ) ), &color);
     }
 

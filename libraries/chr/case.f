@@ -13,14 +13,14 @@
 *     CALL TEST_CASE(STATUS)
 
 *  Description:
-*     Test each of the case conversion routines listed in Appendix A.3 
+*     Test each of the case conversion routines listed in Appendix A.3
 *     of SUN/40.3.
 *     If any failure occurs, return STATUS = SAI__ERROR.
 *     Otherwise, STATUS is unchanged.
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1993, 1994 Science & Engineering Research Council.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -56,8 +56,8 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:    
-*     TEST_LCASE, TEST_LOWER, TEST_UCASE, TEST_UPPER  
+*  Subprograms called:
+*     TEST_LCASE, TEST_LOWER, TEST_UCASE, TEST_UPPER
 
 *-
 
@@ -118,7 +118,7 @@
 
 *    Write summary message
 
-      IF (STATUS .EQ. SAI__OK) THEN 
+      IF (STATUS .EQ. SAI__OK) THEN
          PRINT *,'*** All change case routines OK ***'
       ELSE
          PRINT *,'*** Error(s) in change case routines ***'

@@ -11,7 +11,7 @@
 #  Description:
 #     This class produces a dialog box containing a single column of
 #     checkbuttons containing supplied values and labels.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolOptionsDialog object_name [configuration options]
@@ -100,7 +100,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
 #  Public Methods:
 #  ===============
 
-#  Select a specified set of the displayed options. 
+#  Select a specified set of the displayed options.
 #  ------------------------------------------------
    public method setOptions {sel} {
       set i 0
@@ -114,7 +114,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
       }
    }
 
-#  Check all options. 
+#  Check all options.
 #  ------------------
    public method allOptions {} {
       set i 0
@@ -127,7 +127,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
 #  Protected Methods:
 #  =================
 
-#  Add the checkbutons. The -options option gives a list of strings used 
+#  Add the checkbutons. The -options option gives a list of strings used
 #  both as option labels and option values.
 #  --------------------------------------------------------------------
    protected method addButtons {} {
@@ -140,7 +140,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
 #  Create a new frame for the check buttons.
       itk_component add buts {
             frame $w_.buts -relief groove -bd 2
-      }      
+      }
       pack $itk_component(buts) -side top -anchor n -fill both \
                                 -expand 1 -padx 2m -pady 3m -ipady 2m
 
@@ -155,7 +155,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
                   set lwidth $len
                }
             }
-            incr lwidth 
+            incr lwidth
          } else {
             set lwidth 13
          }
@@ -170,10 +170,10 @@ itcl::class gaia::GaiaPolOptionsDialog {
                                   -onvalue 1 \
                                   -offvalue 0 \
                                   -labelwidth $lwidth \
-                                  -variable [scope values_($this,item$i)] 
+                                  -variable [scope values_($this,item$i)]
 
             }
-         pack $itk_component(item$i) -side top -fill both -anchor n -expand 1 -padx 3m 
+         pack $itk_component(item$i) -side top -fill both -anchor n -expand 1 -padx 3m
          incr i
       }
    }
@@ -185,15 +185,15 @@ itcl::class gaia::GaiaPolOptionsDialog {
       destroy $itk_component(top)
    }
 
-#  This method is redefined here to change the value that is returned 
+#  This method is redefined here to change the value that is returned
 #  from activate to be a two element list; the first element gives the
-#  index of the button that was pressed, and the second elemtn is a list of 
-#  the selected options. 
+#  index of the button that was pressed, and the second elemtn is a list of
+#  the selected options.
 #  ------------------------------------------------------------------
    protected method set_result {} {
       global ::$variable_
       set but [set $variable_]
- 
+
       set opts ""
       set i 0
       foreach item $itk_option(-options) {

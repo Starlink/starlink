@@ -23,12 +23,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -67,13 +67,13 @@
 #define IRQ__QITYP QUALITY_NAMES
 
 /* Maximum length of descriptive comments stored with each quality name. */
-#define IRQ__SZCOM 50 
+#define IRQ__SZCOM 50
 
 /* Maximum length of a quality expression. */
-#define IRQ__SZQEX 255 
+#define IRQ__SZQEX 255
 
 /* Maximum length of a quality name. */
-#define IRQ__SZQNM 15 
+#define IRQ__SZQNM 15
 
 
 

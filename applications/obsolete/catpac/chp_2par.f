@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHP_2PAR( CD1, INPUT1, CD2, INPUT2, EXPRESS, CNAMES, 
+     : CHP_2PAR( CD1, INPUT1, CD2, INPUT2, EXPRESS, CNAMES,
      : CTYPES, STATUS )
 *+
 *  Name:
@@ -12,17 +12,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHP_2PAR( CD1, INPUT1, CD2, INPUT2, EXPRESS, 
+*     CALL CHP_2PAR( CD1, INPUT1, CD2, INPUT2, EXPRESS,
 *     CNAMES, CTYPES, STATUS )
 
 *  Description:
 *     This routine will not normally be required because all common uses of
 *     the parser have been anticipated and included in other CHP routines.
-*     CHP_SEARCH and CHP_JOIN call the parser on you behalf. CHP_1PAR and 
-*     CHI_2PAR give 
-*     you direct access to the parser when 1 or 2 catalogues are involved. 
-*     This routine parses an expression which contains column names from  
-*     two catalogues. To apply this expression to a set of data see the 
+*     CHP_SEARCH and CHP_JOIN call the parser on you behalf. CHP_1PAR and
+*     CHI_2PAR give
+*     you direct access to the parser when 1 or 2 catalogues are involved.
+*     This routine parses an expression which contains column names from
+*     two catalogues. To apply this expression to a set of data see the
 *     CHI_APPLY routine. CHP_2PAR uses the arguments FNAMES and FTYPES to
 *     inform the user of how the data is to be supplied. See CHI_APPLY for
 *     more detail.
@@ -61,7 +61,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,11 +112,11 @@
 *
          call chi_aclrcmn( status )
 *
-*    CHI_AINITPAR loads the field information from the catalogues into the 
+*    CHI_AINITPAR loads the field information from the catalogues into the
 *    common area. Other routines can then search through this common area
 *    to find if the field is in the catalogue and the type of the field.
 *
-         call chp_ainit2par(cd1, input1, cd2, input2, cnames, 
+         call chp_ainit2par(cd1, input1, cd2, input2, cnames,
      :    ctypes, status)
 *
 *    CHI_APREPAR takes the expression and preparses it replacing and CONVERTs
@@ -124,13 +124,13 @@
 *
          call chi_aprepar(express, status)
 *
-*    CHI_ASPLIT takes the expression and splits it into items having first 
+*    CHI_ASPLIT takes the expression and splits it into items having first
 *    removed any redundant spaces and where possible converted to upper case.
-*    An item is recognised if it is an expected character (Eg. *,+) or a 
+*    An item is recognised if it is an expected character (Eg. *,+) or a
 *    string of expected characters (.LT.,SQRT). If a string is not recognised
 *    and the next item is found the the unidentified string is either a field
-*    name or constant. For a list recognised items see CHIPAR_PAR and for a 
-*    list of recognised functions see CHI_ABLOCK because each item is given an 
+*    name or constant. For a list recognised items see CHIPAR_PAR and for a
+*    list of recognised functions see CHI_ABLOCK because each item is given an
 *    item number that has to be unique the item number for a function is 100
 *    plus the function number.
 *
@@ -152,17 +152,17 @@
 *
           call chi_asplit( express, nitems, status)
 *           do i = 1,nitems
-*           print *,'worigin(i) = ',worigin(i) 
-*           print *,'wqual(i) = ',wqual(i) 
-*           print *,'wlist(i) = ',wlist(i) 
+*           print *,'worigin(i) = ',worigin(i)
+*           print *,'wqual(i) = ',wqual(i)
+*           print *,'wlist(i) = ',wlist(i)
 *           print *,'wstring = ',wstring
 *           enddo
 *
-*    CHI_ATRANS performs the reverse polish manipulation. Wlist and Wqual 
-*    remain unchanged but at the ent of CHI_ATRANS Worigin reflects the 
+*    CHI_ATRANS performs the reverse polish manipulation. Wlist and Wqual
+*    remain unchanged but at the ent of CHI_ATRANS Worigin reflects the
 *    reverse polish order of items
 *
-*    The integer array Xlist whose size is given by Xsize contains the item 
+*    The integer array Xlist whose size is given by Xsize contains the item
 *    numbers in reverse polish order corresponding to Worigin. So if Xlist(8)
 *    is a 7 indicating a comma the Wlist(8) point to that comma in Wstring.
 *
@@ -170,8 +170,8 @@
 *    is given as -its position in the common area (Ename(i)).
 *
 *    Constants are also dealt with at this stage. When a constant is recognised
-*    it is given a unique negative number that does not conflict with the 
-*    negative numbers allocated for fieldnames. The details of the constant 
+*    it is given a unique negative number that does not conflict with the
+*    negative numbers allocated for fieldnames. The details of the constant
 *    are stored in the common area at the position given by the absolute value
 *    of its negative number.
 *
@@ -183,13 +183,13 @@
 *           print *,'status = ',status
 *           do i = 1,nitems
 *           print *,'worigin(i) = ',worigin(i)
-*           print *,'wqual(i) = ',wqual(i) 
-*           print *,'wlist(i) = ',wlist(i) 
+*           print *,'wqual(i) = ',wqual(i)
+*           print *,'wlist(i) = ',wlist(i)
 *           enddo
 *           print *,'xsize = ',xsize
 *           do i = 1,nitems
-*           print *,'xqual(i) = ',xqual(i) 
-*           print *,'xlist(i) = ',xlist(i) 
+*           print *,'xqual(i) = ',xqual(i)
+*           print *,'xlist(i) = ',xlist(i)
 *           enddo
 *
 *           do i = 1,Enitems
@@ -197,7 +197,7 @@
 *           print *,'Ecomnt(i) = ',Ecomnt(i)
 *           enddo
 *
-*    CHI_APANAL works out the types. A dummy evaluation is done to establish 
+*    CHI_APANAL works out the types. A dummy evaluation is done to establish
 *    types. At the lowest level a constant or fieldname has a type. In the
 *    case of fieldnames 1,2,3,4,5 for logical, integer, real, double, character
 *    Constants -1,-2,-3,-4,-5
@@ -207,9 +207,9 @@
 *    the function SQRT requires that its argument is double precision. So the
 *    outtype of the argument has to be double precision.
 *
-*    Because a dummy evaluation is carried out the types for the items are 
+*    Because a dummy evaluation is carried out the types for the items are
 *    correctly identified as the the evaluation unwinds. The types of all the
-*    bottom level elements is checked for invalid conversions. Allowed 
+*    bottom level elements is checked for invalid conversions. Allowed
 *    automatic conversions are only those between numerics
 *
 *    CHI_APANAL also deals with the comments of the items.
@@ -230,7 +230,7 @@
 *    Xlist contains for a simple operator the operator identification number.
 *                   for a function the function number + 100
 *                   for a field name 0
-*                   and for a constant a negative number whose absolute value 
+*                   and for a constant a negative number whose absolute value
 *                   points to the value in the W<t>val arrays.
 *
 *    Xqual contains for a simple operator the output type.
@@ -239,7 +239,7 @@
 *                   for this field name*100
 *                   plus the integer value of the type of this field
 *                   1,2,3,4,5 for logical, integer, real, double, character
-*                   and for a constant the integer value of the type of this 
+*                   and for a constant the integer value of the type of this
 *                   constant plus if the constant is a character string
 *                   10*the string length
 *
@@ -256,13 +256,13 @@
 *           print *,'after CHI_APCONS'
 *           do i = 1,nitems
 *           print *,'worigin(i) = ',worigin(i)
-*           print *,'wqual(i) = ',wqual(i) 
-*           print *,'wlist(i) = ',wlist(i) 
+*           print *,'wqual(i) = ',wqual(i)
+*           print *,'wlist(i) = ',wlist(i)
 *           enddo
 *           print *,'xsize = ',xsize
 *           do i = 1,xsize
-*           print *,'xqual(i) = ',xqual(i) 
-*           print *,'xlist(i) = ',xlist(i) 
+*           print *,'xqual(i) = ',xqual(i)
+*           print *,'xlist(i) = ',xlist(i)
 *           enddo
 *           print *,'xstring = ',xstring
 *
@@ -275,7 +275,7 @@
 *    Xlist contains for a simple operator the operator identification number.
 *                   for a function the function number + 100
 *                   for a field name 0
-*                   and for a constant a negative number whose absolute value 
+*                   and for a constant a negative number whose absolute value
 *                   points to the value in the W<t>val arrays.
 *
 *    Xqual contains for a simple operator the output type.
@@ -289,12 +289,12 @@
 *           print *,'Xrdsize = ',Xrdsize
 *           do i = 1,Xrdsize
 *           print *,'i = ',i
-*           print *,'Rstart(i) = ',Rstart(i) 
-*           print *,'Rend(i) = ',Rend(i) 
-*           print *,'Rsplit(i) = ',Rsplit(i) 
-*           print *,'Rcons(i) = ',Rcons(i) 
-*           print *,'Rtype(i) = ',Rtype(i) 
-*           print *,'Rshape(i) = ',Rshape(i) 
+*           print *,'Rstart(i) = ',Rstart(i)
+*           print *,'Rend(i) = ',Rend(i)
+*           print *,'Rsplit(i) = ',Rsplit(i)
+*           print *,'Rcons(i) = ',Rcons(i)
+*           print *,'Rtype(i) = ',Rtype(i)
+*           print *,'Rshape(i) = ',Rshape(i)
 *           enddo
 *          print *,'neitems = ',enitems
 *          do i = 1, enitems
@@ -307,15 +307,15 @@
 *          enddo
 *           do i = 1,nitems
 *           print *,'worigin(i) = ',worigin(i)
-*           print *,'wqual(i) = ',wqual(i) 
-*           print *,'wlist(i) = ',wlist(i) 
+*           print *,'wqual(i) = ',wqual(i)
+*           print *,'wlist(i) = ',wlist(i)
 *           enddo
 *           print *,'xsize = ',xsize
 *           do i = 1,xsize
-*           print *,'xqual(i) = ',xqual(i) 
-*           print *,'xlist(i) = ',xlist(i) 
+*           print *,'xqual(i) = ',xqual(i)
+*           print *,'xlist(i) = ',xlist(i)
 *           enddo
-*           do i = 1, 5           
+*           do i = 1, 5
 *           print *,'xdval(i) = ',xdval(i)
 *           print *,'xival(i) = ',xival(i)
 *           print *,'xlval(i) = ',xlval(i)

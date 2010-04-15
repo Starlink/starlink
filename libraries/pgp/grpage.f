@@ -1,6 +1,6 @@
       SUBROUTINE GRPAGE
 *+
-*     - - - - - - - - 
+*     - - - - - - - -
 *       G R P A G E    (GKS emulation of GRPCKG)
 *     - - - - - - - -
 *

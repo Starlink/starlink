@@ -37,8 +37,8 @@ int main(){
 
    int i, j, k;
    int iv[60];
-   int ivec;              
-   int nf;                
+   int ivec;
+   int nf;
    double v[ lv ];
    double d[ n ];
    double x[ n ];
@@ -160,10 +160,10 @@ double model( int axis, int i, int j, int k, double *x, int *nf ){
       a = ( i + 1 ) - x[ 0 ];
       b = ( j + 1 )/x[ 1 ] - x[ 2 ];
       c = ( k + 1 )/x[ 3 ] - x[ 4 ];
-   
+
       if( axis == 0 ) {
          ret = a*b*c;
-  
+
       } else if( axis == 1 ) {
          ret = -b*c;
 

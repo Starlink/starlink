@@ -15,11 +15,11 @@ C     (>) CHANS    (Real array CHANS(NLID)) The centers of the
 C                  identified lines, in pixel numbers.
 C     (>) WAVES    (Real array WAVES(NLID)) The wavelengths of the
 C                  identified lines.
-C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (>) NLID     (Integer) The number of identified lines.
-C     (>) NCOEFF   (Integer) The number of parameters used for the 
-C                  fit.  
+C     (>) NCOEFF   (Integer) The number of parameters used for the
+C                  fit.
 C     (<) RMSX     (Real) The RMS error from the fit, in angstroms.
 C
 C                                      KS / AAO 5th Sept 1985

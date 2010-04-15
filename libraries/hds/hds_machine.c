@@ -75,7 +75,7 @@
 #include <stdlib.h>
 
 int main ( void ) {
-      
+
   /*  Local Variables: */
   int status = DAT__OK;
 

@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_SCUBA2MEM ( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine reads in SCUBA demodulated data and writes it
 *     out along with the positions of the bolometers on the sky
@@ -42,7 +42,7 @@
 *        is that of the map centre of the observation in the output
 *        coordinates.
 *     LONG = CHAR (Read)
-*        The longitude of the output map centre. The supplied default value 
+*        The longitude of the output map centre. The supplied default value
 *        is that of the map centre of the observation in the output
 *        coordinates.
 *     MSG_FILTER = CHAR (Read)
@@ -58,7 +58,7 @@
 *     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
-*        - AZ:  Azimuth/elevation offsets 
+*        - AZ:  Azimuth/elevation offsets
 *        - NA:  Nasmyth offsets
 *        - PL:  RA/Dec Offsets from moving centre (eg Planets)
 *        - RB:  RA/Dec (B1950)
@@ -67,7 +67,7 @@
 *        - GA:  Galactic coordinates (J2000)
 *     SHIFT = REAL( 2 ) (Read)
 *        The pointing shift [X,Y] to be applied that would bring the
-*        map into the correct position. 
+*        map into the correct position.
 *        This is a shift in the output coordinate frame. CHANGE_POINTING
 *        should be used to add Az/El pointing offsets.
 
@@ -81,7 +81,7 @@
 *  Notes:
 *     - Can be used on JIGGLE and SCAN data.
 *     - The coordinates of the selected output frame are written
-*       to the output FITS extension in keywords OUT_CRDS, OUTLONG and 
+*       to the output FITS extension in keywords OUT_CRDS, OUTLONG and
 *       OUTLAT. The full FITS header of the observation itself is still
 *       available.
 
@@ -106,7 +106,7 @@
 
 *  Authors:
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995-2002 Particle Physics and Astronomy
@@ -167,12 +167,12 @@
 *     Initial revision
 *
 *     {note_history_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 * Type Definitions:
       IMPLICIT NONE
 
@@ -200,12 +200,12 @@
 
 * Local variables:
       INTEGER ADDED             ! Number added to group this time
-      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2) 
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
                                        ! Angles (wplate,angrot) for each
-                                       ! integration (polarimetry) 
+                                       ! integration (polarimetry)
       REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
                                        ! Angles (wplate,angrot) for each
-                                       ! measurement (polarimetry) 
+                                       ! measurement (polarimetry)
       REAL    BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! Bolometer weights
       INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -269,7 +269,7 @@
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
                                         ! locator of FITS extension in output
                                         ! file
-      DOUBLE PRECISION OUT_LAT          ! longitude of output map centre 
+      DOUBLE PRECISION OUT_LAT          ! longitude of output map centre
                                         ! (radians)
       DOUBLE PRECISION OUT_LONG         ! longitude of output map centre
                                         ! (radians)
@@ -296,17 +296,17 @@
       REAL    WAVELENGTH                ! Wavelength of data (microns)
 
 * Local data:
- 
+
       DATA SUFFIX_STRINGS /'!_mem','m','_mem'/
 
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Init pointers
       LST_PTR(1) = 0
       LST_PTR(2) = 0
- 
+
 
 
 
@@ -319,7 +319,7 @@
 *     Turn off curly brackets so that SCUBA sections work okay
       CALL GRP_SETCC( IGRP, 'OPEN_KERNEL,CLOSE_KERNEL', '%%', STATUS )
 
-*     Read in the group members 
+*     Read in the group members
       CALL GRP_GROUP('IN', GRP__NOID, IGRP, NMEMBERS, ADDED,
      :     FLAG, STATUS)
 
@@ -330,36 +330,36 @@
       HOURS = .TRUE.
       IF (OUT_COORDS .EQ. 'RB') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are FK4 B1950.0', STATUS)
       ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are FK5 J2000.0', STATUS)
       ELSE IF (OUT_COORDS .EQ. 'GA') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :     '^PKG: output coordinates are galactic', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'RD') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are apparent RA,Dec '//
      :        '(no date as yet)', STATUS)
       ELSE IF (OUT_COORDS .EQ. 'NA') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are nasmyth', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are Az/El offsets', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'PL') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        '^PKG: output coordinates are offsets from moving centre', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
+     :        '^PKG: output coordinates are offsets from moving centre',
      :        STATUS)
          HOURS = .FALSE.
       ELSE
@@ -372,9 +372,9 @@
       END IF
 
 *     Read in the input data
-*     We will do automatic quality masking 
+*     We will do automatic quality masking
       QMF = .TRUE.
-      
+
 *     Set the file counter to 1 since we are not trying to convert
 *     all input files to a standard MJD. We are trying to convert
 *     each frame to the supplied RA/Dec grid
@@ -405,7 +405,7 @@
          CALL GRP_GET(IGRP, GRP, 1, INSTRING, STATUS)
 
 *     Parse the filename string - GRP must be configured not to use {}
-         CALL SCULIB_SPLIT_FILE_SPEC(INSTRING, SCUBA__MAX_SECT, FNAME, 
+         CALL SCULIB_SPLIT_FILE_SPEC(INSTRING, SCUBA__MAX_SECT, FNAME,
      :        NSPEC, DATA_SPEC, USE_SECTION, STATUS)
 
 *     If we are processing multiple input files, list each one
@@ -417,22 +417,22 @@
          END IF
 
 *     Open the input file
-         CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
+         CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS)
 
 *     We want the LST array
          USELST = .TRUE.
 
 *     Calculate the beam positions and read in the data.
 
-         CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
+         CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE,
      :        NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :        N_BOL, N_POS, N_INTS, N_MEAS, N_BEAM,
-     :        IN_UT1, IN_UT1, IN_RA_CEN, 
-     :        IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, SUB_INSTRUMENT, 
-     :        OBJECT, UTDATE, UTSTART, 
+     :        IN_UT1, IN_UT1, IN_RA_CEN,
+     :        IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, SUB_INSTRUMENT,
+     :        OBJECT, UTDATE, UTSTART,
      :        BOL_ADC, BOL_CHAN, BOL_RA_PTR,
      :        BOL_RA_END, BOL_DEC_PTR,
-     :        BOL_DEC_END, DATA_PTR, 
+     :        BOL_DEC_END, DATA_PTR,
      :        DATA_END, VARIANCE_PTR,
      :        VARIANCE_END, QMF, QUALITY_PTR,
      :        QUALITY_END, QBITS, USELST, LST_PTR,
@@ -458,7 +458,7 @@
 *     The NA, AZ and PL frames already have offsets so we dont need
 *     to do anything with them
 
-         IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
+         IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ'
      :        .AND. OUT_COORDS.NE.'PL')) THEN
 
 *     Inform the 'RD' regridder the date of regrid
@@ -467,7 +467,7 @@
                CALL MSG_SETC ('UTDATE', UTDATE)
                CALL MSG_SETC ('UTSTART', UTSTART)
                CALL MSG_SETC('PKG', PACKAGE)
-               CALL MSG_OUTIF(MSG__NORM, ' ', 
+               CALL MSG_OUTIF(MSG__NORM, ' ',
      :              '^PKG: Using output coordinates of '//
      :              'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
             END IF
@@ -479,19 +479,19 @@
 
 *     Request the new apparent ra/dec centre
             CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG', 'LAT',
-     :           OUT_COORDS, LAT_OBS, IN_RA_CEN, IN_DEC_CEN, IN_UT1, 
+     :           OUT_COORDS, LAT_OBS, IN_RA_CEN, IN_DEC_CEN, IN_UT1,
      :           HOURS, OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG,
      :           OUT_LAT, STATUS)
 
 *     Convert everything to tangent plane offsets from the selected
 *     map centre
 
-            CALL SCULIB_APPARENT_2_TP (N_PTS * N_BEAM, 
-     :           %VAL(CNF_PVAL(BOL_RA_PTR)), 
+            CALL SCULIB_APPARENT_2_TP (N_PTS * N_BEAM,
+     :           %VAL(CNF_PVAL(BOL_RA_PTR)),
      :           %VAL(CNF_PVAL(BOL_DEC_PTR)),
      :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :           DBLE(SHIFT(1)), DBLE(SHIFT(2)), STATUS)
-            
+
          ELSE
 
 *     NA, AZ or PL
@@ -509,7 +509,7 @@
                CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
      :              %VAL(CNF_PVAL(BOL_DEC_PTR)), DBLE(SHIFT(2)),
      :              %VAL(CNF_PVAL(BOL_DEC_PTR)))
-            
+
             END IF
 
          END IF
@@ -532,7 +532,7 @@
      :        SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
 
 *     Create the output file
-*     Would like to propogate the FITS header to the output 
+*     Would like to propogate the FITS header to the output
 *     plus the other extensions for information.
 *     Will update the FITS header later.
 *     This means that I may as well get a section from the input
@@ -580,13 +580,13 @@
          DO I = 1, N_BEAM
 
 *     Now the X positions
-            CALL VEC_DTOR(.TRUE., N_PTS, 
+            CALL VEC_DTOR(.TRUE., N_PTS,
      :   %VAL(CNF_PVAL(BOL_RA_PTR) + VAL__NBD * N_PTS * (I - 1)),
      :   %VAL(CNF_PVAL(OUT_DATA_PTR) + VAL__NBR * (2 * I - 1) * N_PTS),
      :           IERR, NERR, STATUS)
 
 *     Now Y
-            CALL VEC_DTOR(.TRUE., N_PTS, 
+            CALL VEC_DTOR(.TRUE., N_PTS,
      :   %VAL(CNF_PVAL(BOL_DEC_PTR) + VAL__NBD * N_PTS * (I - 1)),
      :   %VAL(CNF_PVAL(OUT_DATA_PTR) + VAL__NBR * (2 * I) * N_PTS),
      :           IERR, NERR, STATUS)
@@ -599,8 +599,8 @@
 *     Add some keywords to the FITS header to specify the
 *     output coordinate system
 
-         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :        'OUT_CRDS', OUT_COORDS, 
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'OUT_CRDS', OUT_COORDS,
      :        'coordinate system of tangent plane offsets', STATUS)
 
 *       No long and lat for NA/AZ/PL frames
@@ -608,12 +608,12 @@
      :      .AND. OUT_COORDS .NE.'PL') THEN
 
             CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'OUTLONG', OUT_LONG, 
-     :           'centre longitude of output offsets (radians)', 
+     :           'OUTLONG', OUT_LONG,
+     :           'centre longitude of output offsets (radians)',
      :           STATUS)
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'OUTLAT', OUT_LAT, 
-     :           'centre latitude of output offsets (radians)', 
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'OUTLAT', OUT_LAT,
+     :           'centre latitude of output offsets (radians)',
      :           STATUS)
 
          END IF
@@ -621,7 +621,7 @@
 *     write out the FITS extension (deleting the old one first)
 
       CALL NDF_XDEL(OUTNDF, 'FITS', STATUS)
-      CALL NDF_XNEW(OUTNDF, 'FITS', '_CHAR*80', 1, N_FITS, 
+      CALL NDF_XNEW(OUTNDF, 'FITS', '_CHAR*80', 1, N_FITS,
      :     OUT_FITSX_LOC, STATUS)
       CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
       CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
@@ -630,11 +630,11 @@
 *     Axis 1: Bolometer number
 *     Axis 2: LST
 *     Axis 3: Beam
-      
+
          CALL NDF_ACRE(OUTNDF, STATUS)
 
 *     Deal with BOLOMETER axis
- 
+
          CALL NDF_ASTYP('_INTEGER', OUTNDF, 'CENTRE', 1, STATUS)
 
          CALL NDF_AMAP(OUTNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
@@ -652,7 +652,7 @@
          CALL NDF_AMAP(OUTNDF, 'CENTRE', 2, '_DOUBLE', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
 
-         CALL VEC_DTOD(.TRUE., N_POS, 
+         CALL VEC_DTOD(.TRUE., N_POS,
      :        %VAL(CNF_PVAL(LST_PTR(1))), %VAL(CNF_PVAL(OUT_A_PTR)),
      :        IERR, NERR, STATUS)
 

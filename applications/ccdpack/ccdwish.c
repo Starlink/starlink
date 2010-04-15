@@ -17,12 +17,12 @@
 *     the startcl extensions and the ndf object manipulation extensions.
 *
 *     However, when invoked with the -pipes flag as the first command-
-*     line argument, and the subsequent two arguments giving file 
+*     line argument, and the subsequent two arguments giving file
 *     descriptors for input and output streams, it will run in pipes mode.
 *
 *     In this mode a Tcl interpreter is set up, and the executable goes
 *     into an infinite loop, reading commands from the incoming (downward)
-*     pipe, feeding them to the interpreter, and spitting the results 
+*     pipe, feeding them to the interpreter, and spitting the results
 *     back through the output (upward) pipe.
 *
 *     Each incoming command must be terminated by a '\0' character.
@@ -132,16 +132,16 @@ extern F77_SUBROUTINE(ccd1_linflt)();
         for (n=0; n<my_argc; n++) free (my_argv[n]);    \
         free (my_argv);                                 \
     }
-    
 
-/* Declare the maximum size of the string which will receive the string 
+
+/* Declare the maximum size of the string which will receive the string
    arguments.  1024 should be large enough, I hope. */
 #define MAX_ARG_LEN 1024
 
-/* FC_MAIN can be a macro expanding to the entry point used by the 
+/* FC_MAIN can be a macro expanding to the entry point used by the
  * Fortran RTL. When that is true assume all Fortran initialisations are
  * done, otherwise we need to take more care.
- */ 
+ */
 #if HAVE_FC_MAIN
    int FC_MAIN() {
 #else
@@ -221,13 +221,13 @@ extern F77_SUBROUTINE(ccd1_linflt)();
           F77_CALL(ccd1_getarg)(INTEGER_ARG(&k),
                                 CHARACTER_ARG(argstr) TRAIL_ARG(argstr));
           if (( my_argv[k] = (char*) malloc( MAX_ARG_LEN + 1 )) == NULL ) {
-              fprintf( stderr, "Can't allocate (%d bytes) for arg %d\n", 
+              fprintf( stderr, "Can't allocate (%d bytes) for arg %d\n",
                        MAX_ARG_LEN, k );
               return 1;
           }
           cnfImprt( argstr, MAX_ARG_LEN, my_argv[k] );
       }
-      my_argv[my_argc] = 0;     /* terminate argv list conventionally */  
+      my_argv[my_argc] = 0;     /* terminate argv list conventionally */
 
 
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
@@ -255,7 +255,7 @@ extern F77_SUBROUTINE(ccd1_linflt)();
          fprintf( stderr, "%s failed.\n", my_argv[ 0 ] );
 
          RELEASE_ARGV;
-         
+
          return 1;
       }
 
@@ -264,7 +264,7 @@ extern F77_SUBROUTINE(ccd1_linflt)();
       Tk_Main( my_argc, my_argv, Tcl_AppInit );
 
       RELEASE_ARGV;
-         
+
       return 0;
    }
 
@@ -379,12 +379,12 @@ extern F77_SUBROUTINE(ccd1_linflt)();
                           Tcl_GetStringResult( interp ) );
       }
 
-/* Make sure CCDPACK_DIR is on auto_path, so we can pick up scripts 
+/* Make sure CCDPACK_DIR is on auto_path, so we can pick up scripts
  * using autoloading, allow override of ccdpack_dir and use a baked
  * in version as fallback. */
     ccdDir = Tcl_GetVar( interp, "ccdpack_dir", TCL_GLOBAL_ONLY );
     if ( ccdDir == NULL ) {
-        ccdDir = Tcl_GetVar2( interp, "env", "CCDPACK_DIR", 
+        ccdDir = Tcl_GetVar2( interp, "env", "CCDPACK_DIR",
                               TCL_GLOBAL_ONLY );
     }
     if ( ccdDir == NULL ) {
@@ -476,7 +476,7 @@ extern F77_SUBROUTINE(ccd1_linflt)();
 *     name = char *
 *        Name of the environment variable to be set.  Need not be static.
 *     value = char *
-*        Value that the environment variable is to be set to.  Need not 
+*        Value that the environment variable is to be set to.  Need not
 *        be static.
 *     overwrite = int
 *        If the environment variable name already exists, then the value
@@ -532,7 +532,7 @@ extern F77_SUBROUTINE(ccd1_linflt)();
 
 
    int ccdEndinterp( ClientData clientData, Tcl_Interp *interp, int code ) {
-/*    
+/*
 *+
 *  Name:
 *     ccdEndinterp

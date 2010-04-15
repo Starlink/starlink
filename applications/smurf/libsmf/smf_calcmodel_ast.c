@@ -171,7 +171,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   map = dat->map;
   hitsmap = dat->hitsmap;
   mapvar = dat->mapvar;
-  mapweight = dat->mapweight; 
+  mapweight = dat->mapweight;
   model = allmodel[chunk];
   if(dat->noi) {
     noi = dat->noi[chunk];
@@ -183,7 +183,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
     if( astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits) ) {
       if( zero_lowhits < 0 ) {
         *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status ); 
+        errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
       }
     }
   }

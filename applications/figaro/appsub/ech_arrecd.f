@@ -14,7 +14,7 @@ C     (>) CHANS    (Real array CHANS(NLMAX)) The centers of the
 C                  identified lines, in pixel numbers.
 C     (>) WAVES    (Real array WAVES(NLMAX)) The wavelengths of the
 C                  identified lines.
-C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (>) CLASS    (Integer array CLASS(NLMAX)) The class codes for
 C                  the identified arc lines.
@@ -28,7 +28,7 @@ C     (>) M2       (Integer) The last order number involved.
 C     (>) NX       (Integer) The number of pixels in the arc data.
 C     (>) DRMS     (Logical) True if the "RMS if omitted" statistic
 C                  is to be output for each line.
-C     (>) NCOEFF   (Integer) The number of parameters to be used for 
+C     (>) NCOEFF   (Integer) The number of parameters to be used for
 C                  the fit to each order.
 C
 C     ***  Originally ARFIT (output to terminal)  KS / CIT 14th June 1983
@@ -51,7 +51,7 @@ C     WFL / AAO 31st May 1988. Attempt to avoid crashes with too few lines.
 C+
       IMPLICIT NONE
 C
-C     Parameters - 
+C     Parameters -
 C
       LOGICAL DRMS
       INTEGER IREC,NLMAX,NLID,M1,M2,NX,NCOEFF
@@ -92,7 +92,7 @@ C
 C
 C     Initial value for counter at the end of last order
 C
-      ILAST=0                           
+      ILAST=0
 C
 C     This is the main loop over all orders, selecting lines, fitting
 C     them and listing the results ...
@@ -116,10 +116,10 @@ C        Next we output some header information
 C
          WRITE(IREC,99) ' '
          CHARS=' '
-         WRITE(CHARS,'(13X,A,I3)') 
+         WRITE(CHARS,'(13X,A,I3)')
      :     'ECHARC Fit Record for Order Number = ',M
          WRITE(IREC,99) CHARS
-         WRITE(CHARS,'(12X,A)') 
+         WRITE(CHARS,'(12X,A)')
      :     '=========================================='
          WRITE(IREC,99) CHARS
          WRITE(IREC,99) ' '
@@ -202,7 +202,7 @@ C        Produce title for line-list table
 C
             WRITE(IREC,99) ' '
             IF (DRMS) THEN
-               WRITE(IREC,99) 
+               WRITE(IREC,99)
      1         '  Line     Channel   Wavelength  Calculated'//
      2         '  Discrepancy   RMS if'
                WRITE(IREC,99)
@@ -212,7 +212,7 @@ C
                WRITE(IREC,99)
      1         '  Line     Channel   Wavelength  Calculated'//
      2         '  Discrepancy'
-               WRITE(IREC,99) 
+               WRITE(IREC,99)
      1         '                                 Wavelength'
             END IF
             WRITE(IREC,99) ' '

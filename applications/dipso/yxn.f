@@ -10,12 +10,12 @@
        LOGICAL OK
        INTEGER BREAKS(MAXBRK)
        INTEGER I, NTEST
- 
+
        REAL X(ASIZE1), Y(ASIZE1), POWER, TSTVAL
- 
+
        CHARACTER*10 TEXT
        INTEGER SLEN
- 
+
        TSTVAL = -16.1054
        NTEST = 0
        DO 100 I = 1, NPOINT
@@ -32,7 +32,7 @@
              NTEST = NTEST + 1
           ENDIF
   100  CONTINUE
- 
+
        IF (NTEST.GT.0) THEN
           WRITE (TEXT,'(I5)',IOSTAT=IX) NTEST
           CALL SSTRIP(TEXT)
@@ -44,5 +44,5 @@
              NPOINT = 0
           ENDIF
        ENDIF
- 
+
        END

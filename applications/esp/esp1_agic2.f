@@ -11,32 +11,32 @@
 *     Turns on/off the AGI/SGS/PGPLOT interface allowing line drawing
 *     and a cursor using SGS, displaying graphs using PGPLOT and returning
 *     the NDF identifier as required.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELF1_AGIC2(GRADEV,ONOFF,NDFS,NAME,NDF1,DEVCAN,PICID,STATUS)    
+*     CALL ELF1_AGIC2(GRADEV,ONOFF,NDFS,NAME,NDF1,DEVCAN,PICID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *
-*     Sets up the AGI interface, obtaining the most recent 'DATA' or 
-*     'ELLFOU' picture. Activates SGS so that PGPLOT and normal SGS 
+*     Sets up the AGI interface, obtaining the most recent 'DATA' or
+*     'ELLFOU' picture. Activates SGS so that PGPLOT and normal SGS
 *     routines can be used. PGPLOT is turned on/off to set up its colour
 *     tables.
 *
 *     Also (if required) obtains the NDF identifier for the current picture
 *     (if available).
-*    
+*
 *     Closes down the above in an orderly fashion. (ONOFF=1).
 
-*  Arguments:                
+*  Arguments:
 *     GRADEV *(6) = CHARACTER (Given)
-*        The name of the graphics device being considered.                     
+*        The name of the graphics device being considered.
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     NDFS = INTEGER (Given)
 *        Defines whether the routines obtaining the NDF used to generate
 *        the current picture should be used. 0=No 1=Yes.
@@ -66,7 +66,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PAR_ERR'               ! Parameter-system errors
@@ -74,25 +74,25 @@
       INCLUDE 'DAT_PAR'               ! DAT constants
 
 *  Arguments Given:
-      CHARACTER *(6) GRADEV           ! Graphics device name                   
+      CHARACTER *(6) GRADEV           ! Graphics device name
       INTEGER NAME                    ! Defines whether pictures of name
                                       ! DATA or ELLFOU are to used
       INTEGER ONOFF                   ! Defines whether AGI/PGPLOT
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Returned.                                           
-      INTEGER NDFS                    ! Should the NDF identifier be 
+*  Arguments Returned.
+      INTEGER NDFS                    ! Should the NDF identifier be
                                       ! returned?
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       LOGICAL DEVCAN                  ! Defines whether the current
                                       ! picture is to be retained at
                                       ! database closedown
       INTEGER NDF1                    ! An NDF identifier
       INTEGER PICID                   ! An AGI picture identifier
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
@@ -107,7 +107,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set default value.
-      DEVCAN=.FALSE.   
+      DEVCAN=.FALSE.
 
 *   Setup the AGI/SGS/PGPLOT interface.
       IF (ONOFF.EQ.0) THEN
@@ -117,7 +117,7 @@
 
 *      Get the graphics device, and open SGS.
          CALL AGI_ASSOC(GRADEV,'UPDATE',PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -127,17 +127,17 @@
 
 *      If the graphics device was not available, report the error and
 *      leave the programme.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             IF (STATUS.NE.PAR__ABORT) DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
 
-*      Select the base picture as current so that the search for DATA 
+*      Select the base picture as current so that the search for DATA
 *      or ELLFOU later will look through all the pictures.
          CALL AGI_IBASE(PICID,STATUS)
          CALL AGI_SELP(PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -156,7 +156,7 @@
          END IF
 
 *      Abort if it was impossible to find a suitable entry in the AGI database.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
@@ -169,7 +169,7 @@
 
 *      Set up PGPLOT so that its colours are used.
          CALL AGP_ACTIV(STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -190,10 +190,10 @@
 *         DAT__SZLOC length format.
             CALL DAT_VALID(IDENT1(1:DAT__SZLOC),GOTLOC,STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9999
- 
+
 *         Use NDF_FIND in a manner suiatble for the type of
 *         identifier found.
-            IF (GOTLOC) THEN 
+            IF (GOTLOC) THEN
                IDENT=IDENT1(1:DAT__SZLOC)
                CALL NDF_FIND(IDENT,' ',NDF1,STATUS)
             ELSE
@@ -205,7 +205,7 @@
      :                      STATUS)
                GOTO 9999
             END IF
- 
+
 *         Display the name of the file in question.
             CALL NDF_MSG('IN2',NDF1)
             CALL MSG_BLANK(STATUS)
@@ -216,7 +216,7 @@
       END IF
 
  9999 CONTINUE
- 
+
 
 *   Closedown the AGI/SGS interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
@@ -253,32 +253,32 @@
 *     Turns on/off the AGI/SGS/PGPLOT interface allowing line drawing
 *     and a cursor using SGS, displaying graphs using PGPLOT and returning
 *     the NDF identifier as required.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELP1_AGIC2(GRADEV,ONOFF,NDFS,NAME,NDF1,DEVCAN,PICID,STATUS)    
+*     CALL ELP1_AGIC2(GRADEV,ONOFF,NDFS,NAME,NDF1,DEVCAN,PICID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *
-*     Sets up the AGI interface, obtaining the most recent 'DATA' or 
-*     'ELLPRO' picture. Activates SGS so that PGPLOT and normal SGS 
+*     Sets up the AGI interface, obtaining the most recent 'DATA' or
+*     'ELLPRO' picture. Activates SGS so that PGPLOT and normal SGS
 *     routines can be used. PGPLOT is turned on/off to set up its colour
 *     tables.
 *
 *     Also (if required) obtains the NDF identifier for the current picture
 *     (if available).
-*    
+*
 *     Closes down the above in an orderly fashion. (ONOFF=1).
 
-*  Arguments:                
-*     GRADEV *(6) = CHARACTER (Given) 
-*        The name of the graphics device being used.                    
+*  Arguments:
+*     GRADEV *(6) = CHARACTER (Given)
+*        The name of the graphics device being used.
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     NDFS = INTEGER (Given)
 *        Defines whether the routines obtaining the NDF used to generate
 *        the current picture should be used. 0=No 1=Yes.
@@ -308,7 +308,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PAR_ERR'               ! Parameter-system errors
@@ -316,30 +316,30 @@
       INCLUDE 'DAT_PAR'               ! DAT constants
 
 *  Arguments Given:
-      CHARACTER *(6) GRADEV           ! Graphics device name            
+      CHARACTER *(6) GRADEV           ! Graphics device name
       INTEGER NAME                    ! Defines whether pictures of name
                                       ! DATA or ELLPRO are to used
       INTEGER ONOFF                   ! Defines whether AGI/PGPLOT
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Returned.                                           
-      INTEGER NDFS                    ! Should the NDF identifier be 
+*  Arguments Returned.
+      INTEGER NDFS                    ! Should the NDF identifier be
                                       ! returned?
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       LOGICAL DEVCAN                  ! Defines whether the current
                                       ! picture is to be retained at
                                       ! database closedown
       INTEGER NDF1                    ! An NDF identifier
       INTEGER PICID                   ! An AGI picture identifier
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
       LOGICAL   GOTLOC                ! Was a locator found?
-      CHARACTER *255 IDENT1           ! HDS identifier for the image 
+      CHARACTER *255 IDENT1           ! HDS identifier for the image
       CHARACTER *(DAT__SZLOC) IDENT   ! HDS identifier for the image
       INTEGER ZONID                   ! SGS zone identifier of the initial
                                       ! picture
@@ -349,7 +349,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set default value.
-      DEVCAN=.FALSE.   
+      DEVCAN=.FALSE.
 
 *   Setup the AGI/SGS/PGPLOT interface.
       IF (ONOFF.EQ.0) THEN
@@ -359,7 +359,7 @@
 
 *      Get the graphics device, and open SGS.
          CALL AGI_ASSOC(GRADEV,'UPDATE',PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -369,17 +369,17 @@
 
 *      If the graphics device was not available, report the error and
 *      leave the programme.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             IF (STATUS.NE.PAR__ABORT) DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
 
-*      Select the base picture as current so that the search for DATA 
+*      Select the base picture as current so that the search for DATA
 *      or ELLPRO later will look through all the pictures.
          CALL AGI_IBASE(PICID,STATUS)
          CALL AGI_SELP(PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -398,7 +398,7 @@
          END IF
 
 *      Abort if it was impossible to find a suitable entry in the AGI database.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
@@ -411,7 +411,7 @@
 
 *      Set up PGPLOT so that its colours are used.
          CALL AGP_ACTIV(STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -433,10 +433,10 @@
 *         DAT__SZLOC length format.
             CALL DAT_VALID(IDENT1(1:DAT__SZLOC),GOTLOC,STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9999
- 
+
 *         Use NDF_FIND in a manner suiatble for the type of
 *         identifier found.
-            IF (GOTLOC) THEN 
+            IF (GOTLOC) THEN
                IDENT=IDENT1(1:DAT__SZLOC)
                CALL NDF_FIND(IDENT,' ',NDF1,STATUS)
             ELSE
@@ -448,7 +448,7 @@
      :                      STATUS)
                GOTO 9999
             END IF
- 
+
 *         Display the name of the file in question.
             CALL NDF_MSG('IN2',NDF1)
             CALL MSG_BLANK(STATUS)
@@ -459,7 +459,7 @@
       END IF
 
  9999 CONTINUE
- 
+
 
 *   Closedown the AGI/SGS interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
@@ -496,32 +496,32 @@
 *     Turns on/off the AGI/SGS/PGPLOT interface allowing line drawing
 *     and a cursor using SGS, displaying graphs using PGPLOT and returning
 *     the NDF identifier as required.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GAU1_AGIC2(GRADEV,ONOFF,NDFS,NDF1,DEVCAN,PICID,STATUS)    
+*     CALL GAU1_AGIC2(GRADEV,ONOFF,NDFS,NDF1,DEVCAN,PICID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *
-*     Sets up the AGI interface, obtaining the most recent 'DATA'. 
-*     Activates SGS so that PGPLOT and normal SGS routines can be used. 
+*     Sets up the AGI interface, obtaining the most recent 'DATA'.
+*     Activates SGS so that PGPLOT and normal SGS routines can be used.
 *     PGPLOT is turned on/off to set up its colour
 *     tables.
 *
 *     Also (if required) obtains the NDF identifier for the current picture
 *     (if available).
-*    
+*
 *     Closes down the above in an orderly fashion. (ONOFF=1).
 
-*  Arguments:                
-*     GRADEV *(6) = CHARACTER (Given) 
-*        The name of the graphics device being used.                    
+*  Arguments:
+*     GRADEV *(6) = CHARACTER (Given)
+*        The name of the graphics device being used.
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     NDFS = INTEGER (Given)
 *        Defines whether the routines obtaining the NDF used to generate
 *        the current picture should be used. 0=No 1=Yes.
@@ -548,7 +548,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PAR_ERR'               ! Parameter-system errors
@@ -557,23 +557,23 @@
       INCLUDE 'DAT_PAR'               ! DAT constants
 
 *  Arguments Given:
-      CHARACTER *(6) GRADEV           ! Graphics device name            
+      CHARACTER *(6) GRADEV           ! Graphics device name
       INTEGER ONOFF                   ! Defines whether AGI/PGPLOT
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Returned.                                           
-      INTEGER NDFS                    ! Should the NDF identifier be 
+*  Arguments Returned.
+      INTEGER NDFS                    ! Should the NDF identifier be
                                       ! returned?
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       LOGICAL DEVCAN                  ! Defines whether the current
                                       ! picture is to be retained at
                                       ! database closedown
       INTEGER NDF1                    ! An NDF identifier
       INTEGER PICID                   ! An AGI picture identifier
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
@@ -588,29 +588,29 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set default value.
-      DEVCAN=.FALSE.   
+      DEVCAN=.FALSE.
 
 *   Setup the AGI/SGS/PGPLOT interface.
       IF (ONOFF.EQ.0) THEN
 
 *      Start a new AGI context.
-         CALL AGI_BEGIN     
+         CALL AGI_BEGIN
 
 *      Get the graphics device, and open SGS.
          CALL AGI_ASSOC(GRADEV,'UPDATE',PICID,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-        
+
 *      Activate SGS.
          CALL AGS_ACTIV(STATUS)
 
 *      If the graphics device was not available, report the error and
 *      leave the programme.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             IF (STATUS.NE.PAR__ABORT) DEVCAN=.TRUE.
             GOTO 9999
          END IF
 
-*      Select the base picture as current so that the search for DATA 
+*      Select the base picture as current so that the search for DATA
 *      will look through all the pictures.
          CALL AGI_IBASE(PICID,STATUS)
          CALL AGI_SELP(PICID,STATUS)
@@ -619,12 +619,12 @@
      :         'AGI database search failed.',STATUS)
              GOTO 9999
          END IF
-        
+
 *      Create a new SGS_ZONE from most recent image.
             CALL AGI_RCL('DATA',PICID,STATUS)
 
 *      Abort if it was impossible to find a suitable entry in the AGI database.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             DEVCAN=.TRUE.
             GOTO 9999
          END IF
@@ -634,7 +634,7 @@
          CALL AGI_SELP(PICID,STATUS)
          CALL AGS_NZONE(ZONID,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-       
+
 *      Set up PGPLOT so that its colours are used.
          CALL AGP_ACTIV(STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -658,7 +658,7 @@
 
 *         Use NDF_FIND in a manner suiatble for the type of
 *         identifier found.
-            IF (GOTLOC) THEN 
+            IF (GOTLOC) THEN
                IDENT=IDENT1(1:DAT__SZLOC)
                CALL NDF_FIND(IDENT,' ',NDF1,STATUS)
             ELSE
@@ -681,7 +681,7 @@
       END IF
 
  9999 CONTINUE
- 
+
 
 *   Closedown the AGI/SGS interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
@@ -716,27 +716,27 @@
 *  Purpose:
 *     Turns on/off the AGI/SGS/PGPLOT interface allowing line drawing
 *     and a cursor using SGS and  displaying graphs using PGPLOT.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRA1_AGIC2(ONOFF,DEVCAN,PICID,STATUS)    
+*     CALL GRA1_AGIC2(ONOFF,DEVCAN,PICID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *
-*     Sets up the AGI interface, obtaining the most recent 'GRAPHS' 
-*     picture. Activates SGS so that PGPLOT and normal SGS 
+*     Sets up the AGI interface, obtaining the most recent 'GRAPHS'
+*     picture. Activates SGS so that PGPLOT and normal SGS
 *     routines can be used. PGPLOT is turned on/off to set up its colour
 *     tables.
 *
 *     Closes down the above in an orderly fashion. (ONOFF=1).
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     DEVCAN = LOGICAL (Given and Returned)
 *        The device parameter is to be annuled when ONOFF=1.
 *     PICID = INTEGER (Given and Returned)
@@ -758,25 +758,25 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PAR_ERR'               ! Parameter-system errors
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ONOFF                   ! Defines whether AGI/PGPLOT
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Returned.                                           
+*  Arguments Returned.
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       LOGICAL DEVCAN                  ! Defines whether the current
                                       ! picture is to be retained at
                                       ! database closedown
       INTEGER PICID                   ! An AGI picture identifier
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
@@ -788,7 +788,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set default value.
-      DEVCAN=.FALSE.   
+      DEVCAN=.FALSE.
 
 *   Setup the AGI/SGS/PGPLOT interface.
       IF (ONOFF.EQ.0) THEN
@@ -798,7 +798,7 @@
 
 *      Get the graphics device, and open SGS.
          CALL AGI_ASSOC('DEVICE','UPDATE',PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -808,17 +808,17 @@
 
 *      If the graphics device was not available, report the error and
 *      leave the programme.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             IF (STATUS.NE.PAR__ABORT) DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
 
-*      Select the base picture as current so that the search for GRAPHS 
+*      Select the base picture as current so that the search for GRAPHS
 *      later will look through all the pictures.
          CALL AGI_IBASE(PICID,STATUS)
          CALL AGI_SELP(PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -829,7 +829,7 @@
          CALL AGI_RCL('GRAPHS',PICID,STATUS)
 
 *      Abort if it was impossible to find a suitable entry in the AGI database.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
@@ -843,7 +843,7 @@
       END IF
 
  9999 CONTINUE
- 
+
 
 *   Closedown the AGI/SGS interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
@@ -877,32 +877,32 @@
 *     Turns on/off the AGI/SGS/PGPLOT interface allowing line drawing
 *     and a cursor using SGS, displaying graphs using PGPLOT and returning
 *     the NDF identifier as required.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SEC1_AGIC2(GRADEV,ONOFF,NDFS,NAME,NDF1,DEVCAN,PICID,STATUS)    
+*     CALL SEC1_AGIC2(GRADEV,ONOFF,NDFS,NAME,NDF1,DEVCAN,PICID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *
-*     Sets up the AGI interface, obtaining the most recent 'DATA' or 
-*     'SECTOR' picture. Activates SGS so that PGPLOT and normal SGS 
+*     Sets up the AGI interface, obtaining the most recent 'DATA' or
+*     'SECTOR' picture. Activates SGS so that PGPLOT and normal SGS
 *     routines can be used. PGPLOT is turned on/off to set up its colour
 *     tables.
 *
 *     Also (if required) obtains the NDF identifier for the current picture
 *     (if available).
-*    
+*
 *     Closes down the above in an orderly fashion. (ONOFF=1).
 
-*  Arguments:                
+*  Arguments:
 *     GRADEV *(6) = CHARACTER (Given)
-*        The name of the graphiccs device used.                     
+*        The name of the graphiccs device used.
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     NDFS = INTEGER (Given)
 *        Defines whether the routines obtaining the NDF used to generate
 *        the current picture should be used. 0=No 1=Yes.
@@ -932,33 +932,33 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PAR_ERR'               ! Parameter-system errors
       INCLUDE 'NDF_PAR'               ! NDF constants
       INCLUDE 'DAT_PAR'               ! DAT constants
 
-*  Arguments Given:                            
-      CHARACTER *(6) GRADEV           ! Graphics device name  
+*  Arguments Given:
+      CHARACTER *(6) GRADEV           ! Graphics device name
       INTEGER NAME                    ! Defines whether pictures of name
                                       ! DATA or SECTOR are to used
       INTEGER ONOFF                   ! Defines whether AGI/PGPLOT
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Returned.                                           
-      INTEGER NDFS                    ! Should the NDF identifier be 
+*  Arguments Returned.
+      INTEGER NDFS                    ! Should the NDF identifier be
                                       ! returned?
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       LOGICAL DEVCAN                  ! Defines whether the current
                                       ! picture is to be retained at
                                       ! database closedown
       INTEGER NDF1                    ! An NDF identifier
       INTEGER PICID                   ! An AGI picture identifier
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
@@ -971,9 +971,9 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-               
+
 *   Set default value.
-      DEVCAN=.FALSE.   
+      DEVCAN=.FALSE.
 
 *   Setup the AGI/SGS/PGPLOT interface.
       IF (ONOFF.EQ.0) THEN
@@ -983,7 +983,7 @@
 
 *      Get the graphics device, and open SGS.
          CALL AGI_ASSOC(GRADEV,'UPDATE',PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -993,17 +993,17 @@
 
 *      If the graphics device was not available, report the error and
 *      leave the programme.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             IF (STATUS.NE.PAR__ABORT) DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
 
-*      Select the base picture as current so that the search for DATA 
+*      Select the base picture as current so that the search for DATA
 *      or SECTOR later will look through all the pictures.
          CALL AGI_IBASE(PICID,STATUS)
          CALL AGI_SELP(PICID,STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -1018,7 +1018,7 @@
          END IF
 
 *      Abort if it was impossible to find a suitable entry in the AGI database.
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             DEVCAN=.TRUE.
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
@@ -1031,7 +1031,7 @@
 
 *      Set up PGPLOT so that its colours are used.
          CALL AGP_ACTIV(STATUS)
-         IF (STATUS.NE.SAI__OK) THEN 
+         IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_FLUSH(STATUS)
             GOTO 9999
          END IF
@@ -1052,10 +1052,10 @@
 *         DAT__SZLOC length format.
             CALL DAT_VALID(IDENT1(1:DAT__SZLOC),GOTLOC,STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9999
- 
+
 *         Use NDF_FIND in a manner suiatble for the type of
 *         identifier found.
-            IF (GOTLOC) THEN 
+            IF (GOTLOC) THEN
                IDENT=IDENT1(1:DAT__SZLOC)
                CALL NDF_FIND(IDENT,' ',NDF1,STATUS)
             ELSE
@@ -1067,7 +1067,7 @@
      :                      STATUS)
                GOTO 9999
             END IF
- 
+
 *         Display the name of the file in question.
             CALL NDF_MSG('IN2',NDF1)
             CALL MSG_OUT(' ','Using ^IN2 as the input NDF.',STATUS)
@@ -1077,7 +1077,7 @@
       END IF
 
  9999 CONTINUE
- 
+
 
 *   Closedown the AGI/SGS interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN

@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -63,15 +63,15 @@ To run Toolpack, the command
         $ TOOLPACK
 \end{verbatim}
 should be issued. This will run a command procedure which sets up the names
-of the Toolpack tools as DCL symbols. {\tt TOOLPACK} is a DCL symbol. It could 
+of the Toolpack tools as DCL symbols. {\tt TOOLPACK} is a DCL symbol. It could
 be added to the users {\tt LOGIN.COM} file.
 
 Users must also define the logical name TIE{\tt{\$}}PFS as follows:
 \begin{verbatim}
         $ DEFINE TIE$PFS "DISK:/dir[/dir[/dir]...]"
 \end{verbatim}
-where {\tt DISK} is the disk, and {\tt /dir[/dir[/dir...]} is the path of 
-directories to the location of the files to be worked on. 
+where {\tt DISK} is the disk, and {\tt /dir[/dir[/dir...]} is the path of
+directories to the location of the files to be worked on.
 
 For example, the directory
 structure:
@@ -80,7 +80,7 @@ structure:
 \end{verbatim}
 would be specified as:
 \begin{verbatim}
-        $ DEFINE TIE$PFS "DISK$USER:/STAR/FORTRAN/"    
+        $ DEFINE TIE$PFS "DISK$USER:/STAR/FORTRAN/"
 \end{verbatim}
 In addition to the standard tools, five command procedures are provided, which
 combine the use of several tools to achieve more advanced processing of code.

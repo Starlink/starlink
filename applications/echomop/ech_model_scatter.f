@@ -286,7 +286,7 @@
      :                balance=fitted_flat(ix+iix,iiy-ybase,iord)
                    xdata ( nyfit ) = arc(ix+iix,iiy)*balance
                  END DO
-                 CALL ECH_MEAN_MEDIAN( NYFIT, XDATA, .TRUE., .FALSE., 
+                 CALL ECH_MEAN_MEDIAN( NYFIT, XDATA, .TRUE., .FALSE.,
      :                MEDIAN, STATUS )
                  sum(iix) = 0.0
                  min = 1.0e20
@@ -336,7 +336,7 @@
      :                balance=fitted_flat(ix+iix,iiy-ybase,iord)
                    xdata ( nyfit ) = arc(ix+iix,iiy)*balance
                  END DO
-                 CALL ECH_MEAN_MEDIAN( NYFIT, XDATA, .TRUE., .FALSE., 
+                 CALL ECH_MEAN_MEDIAN( NYFIT, XDATA, .TRUE., .FALSE.,
      :                MEDIAN, STATUS )
                  sum(iix) = 0.0
                  min = 1.0e20

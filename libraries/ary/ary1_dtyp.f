@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,8 +145,8 @@
 
 *  Report an error if the creation of the data arrays has been deferred.
 *  The only situation in which creation is deferred is if ARY1_DCRE(P) i
-*  called with its DEFER parameter set TRUE. In this case, all the 
-*  required information should already be available because ARY1_DCRE(P) 
+*  called with its DEFER parameter set TRUE. In this case, all the
+*  required information should already be available because ARY1_DCRE(P)
 *  will have set it up.
          IF( ARY1_DEFR( IDCB, STATUS ) ) THEN
             STATUS = ARY__UNDEF
@@ -235,11 +235,11 @@
                         IF ( DCB_CPX( IDCB ) ) THEN
                            IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
                               STATUS = ARY__USFRM
-                              CALL ERR_REP( 'ARY1_DSTP_SCMX', 
+                              CALL ERR_REP( 'ARY1_DSTP_SCMX',
      :                                 'Complex scaled arrays are '//
      :                                 'currently unsupported by the '//
      :                                 'ARY library.', STATUS )
-                           END IF 
+                           END IF
 
 *  Otherwise, get a locator to it for the DCB and obtain its type.
                            CALL DAT_FIND( DCB_LOC( IDCB ),
@@ -294,7 +294,7 @@
             DCB_KTYP( IDCB ) = STATUS .EQ. SAI__OK
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DTYP', STATUS )
 

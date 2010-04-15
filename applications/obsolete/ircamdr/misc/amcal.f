@@ -97,7 +97,7 @@
 	  IF( CMO .EQ. 'NOV') MO = 11
 	  IF( CMO .EQ. 'DEC') MO = 12
           CALL CHR_CTOI( CYR, YR)
-          IF( DA .GT. 31 .OR. DA .LE. 0 .OR. 
+          IF( DA .GT. 31 .OR. DA .LE. 0 .OR.
      :	      MO .GT. 12 .OR. MO .LE. 0) THEN
 	    type *, 'da, mo = ', da, mo
 	    TYPE *, 'Illegal date!!!  aborting'
@@ -164,7 +164,7 @@
      :                COS( DEC*RADI)*COS( LAT*RADI)*COS( HA*RADI))
 
 * convert back to degrees
-		     
+
 	  ALT = ALT/RADI
 
 * convert to AIRMASS

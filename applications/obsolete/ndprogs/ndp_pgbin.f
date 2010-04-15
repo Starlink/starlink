@@ -8,7 +8,7 @@ C
 C   Description
 C   -----------
 C   Calls PGPLOT routine PGBIN to plot a histogram style graph of a 1-D
-C   array. If the bad data flag is set, the line string is broken at magic 
+C   array. If the bad data flag is set, the line string is broken at magic
 C   value pixels.
 C
 C
@@ -33,7 +33,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'MAGIC_VALUES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -70,7 +70,7 @@ c
       if(.not.badpix)then
         call pgbin(nelm,xvals,yvals,center)
       else
-        j=0        
+        j=0
         do i=1,nelm
           if(yvals(i).gt.magic_float)then
             j=j+1

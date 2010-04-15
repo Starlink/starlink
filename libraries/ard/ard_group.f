@@ -13,13 +13,13 @@
 *     CALL ARD_GROUP( PARAM, IGRP1, IGRP2, STATUS )
 
 *  Description:
-*     An ARD description is obtained from the environment using the 
-*     supplied parameter name and stored in a group identified by the 
+*     An ARD description is obtained from the environment using the
+*     supplied parameter name and stored in a group identified by the
 *     returned value of IGRP2. If the last character in the ARD
-*     description is a minus sign ("-") then the parameter value is 
-*     then cancelled and further ARD descriptions are obtained and 
+*     description is a minus sign ("-") then the parameter value is
+*     then cancelled and further ARD descriptions are obtained and
 *     appended to the returned group. This process continues until an
-*     ARD description is supplied which does not end with a minus 
+*     ARD description is supplied which does not end with a minus
 *     sign, or a null value is supplied.
 *
 *     If a GRP identifier for an existing group is supplied for IGRP1
@@ -33,7 +33,7 @@
 *        The parameter name.
 *     IGRP1 = INTEGER (Given)
 *        GRP identifier for a group to be used as a basis for
-*        modification elements. 
+*        modification elements.
 *     IGRP2 = INTEGER (Returned)
 *        GRP identifier for the created group.
 *     STATUS = INTEGER (Given and Returned)
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,7 +135,7 @@
       CALL GRP_SETCC( IGRP2, 'NUL,DEL,OPEN_N,CLOSE_N', '%;%%', STATUS )
 
 *  Initialise the current size of the group to zero. The size of the
-*  group is calculated locally rather than using the value returned by 
+*  group is calculated locally rather than using the value returned by
 *  GRP_GROUP because the value returned by GRP_GROUP is set to 1 if
 *  an error occurs (such as a null value being supplied at the first
 *  prompt) which causes the trap for null groups to fail in this module.
@@ -189,7 +189,7 @@
      :                    STATUS )
 
 *  For other errors, add context information.
-         ELSE 
+         ELSE
             CALL MSG_SETC( 'PARAM', PARAM )
             CALL ERR_REP( 'ARD_GROUP_ERR3', 'ARD_GROUP: Error '//
      :                    'associating an ARD description with the '//

@@ -131,7 +131,7 @@ dau_copy_object(int ncomp,
       if (!active)
          _invoke(rec_reset_record(&des1))
 
-/* Identify the new record in the appropriate field of the destination 
+/* Identify the new record in the appropriate field of the destination
    Component Record Vector. */
 
       rec_get_rid( &des1, &rid1 );
@@ -168,7 +168,7 @@ dau_copy_object(int ncomp,
                _invoke(rec_locate_data(&src2,rcl2.dlen,0,'R',&src_crv2))
                nelem1 = rcl2.dlen/SZCRV;
                dlen2  = rcl2.dlen;
-               
+
                SET_64BIT_MODE(des);
                rcl2.dlen = nelem1 * SZCRV;
                _invoke(rec_create_record(&des1,&rcl2,&des2))
@@ -182,7 +182,7 @@ dau_copy_object(int ncomp,
                   int szcrv1 = dlen2/nelem1;
                   unsigned char *p1, *p2;
                   int i;
-                  
+
                   memset( (void *) des_crv2, 0, rcl2.dlen);
                   for( p1 = src_crv2, p2 = des_crv2, i = 0; i <nelem1; i++ )
                   {
@@ -190,8 +190,8 @@ dau_copy_object(int ncomp,
                      p1 += szcrv1;
                      p2 += szcrv2;
                   }
-                } 
-                  
+                }
+
                if (!active)
                   _invoke(rec_reset_record(&des2))
 

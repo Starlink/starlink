@@ -128,7 +128,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 500
 
 *    Now the observation-specific input and processing*********************
-*    Simplest first, BIAS 
+*    Simplest first, BIAS
 
       IF ( OBS_TYPE .EQ. 'BIAS') THEN
 

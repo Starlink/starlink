@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,11 +76,11 @@
 
 *  Local Variables:
       DOUBLE PRECISION DENOM     ! Denominator
-      DOUBLE PRECISION SX        ! Sum of X values.      
-      DOUBLE PRECISION SXX       ! Sum of X squared values.      
-      DOUBLE PRECISION SXY       ! Sum of X*Y values.      
-      DOUBLE PRECISION SY        ! Sum of Y values.      
-      DOUBLE PRECISION SYY       ! Sum of Y squared values.      
+      DOUBLE PRECISION SX        ! Sum of X values.
+      DOUBLE PRECISION SXX       ! Sum of X squared values.
+      DOUBLE PRECISION SXY       ! Sum of X*Y values.
+      DOUBLE PRECISION SY        ! Sum of Y values.
+      DOUBLE PRECISION SYY       ! Sum of Y squared values.
 
       INTEGER I                  ! Loop count.
       INTEGER N                  ! No. of points in sums.

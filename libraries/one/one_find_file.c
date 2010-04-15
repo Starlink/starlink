@@ -74,12 +74,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -383,7 +383,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
                 /* SpecLength is the total length of FileSpec,
                    including trailing blanks */
                 /* Add -d to ls if we are not listing directory contents */
-	      
+
 	        (void) strcpy( Command, "ls " );
 		if ( F77_ISFALSE( *LisDir ) ) {
 		  strcat( Command, "-d " );
@@ -400,11 +400,11 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
                if (Fdptr[1] != STDOUT_FILENO) {
                    /* Close stdout (not generally necessary, but
                       required by Single Unix spec) */
-                   close(STDOUT_FILENO); 
+                   close(STDOUT_FILENO);
                    dup2(Fdptr[1], STDOUT_FILENO);
                    close(Fdptr[1]);  /* Pipe write fd no longer needed */
                }
-               
+
                /*  We're going to ignore any error messages from 'ls', so
                 *  we do the same trick for standard error, this time using
                 *  a file descriptor opened on the null device. This has the

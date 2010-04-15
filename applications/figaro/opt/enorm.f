@@ -97,7 +97,7 @@
           enorm = sqrt(s2*(one+(x3max/s2)*(x3max*s3)))
         else
           enorm = sqrt(x3max*((s2/x3max)+(x3max*s3)))
-        endif 
+        endif
       endif
   130 continue
 *

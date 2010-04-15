@@ -14,14 +14,14 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last, 
-*                    int *ptime, int badmask, int is2d, 
-*                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-*                    AstFrame *ospecfrm, AstMapping *ospecmap, 
-*                    Grp *detgrp, int moving, int usewgt, int spread, 
-*                    const double params[], int lbnd_out[ 3 ], 
-*                    int ubnd_out[ 3 ], int genvar, float *data_array, 
-*                    float *var_array, double *wgt_array, float *texp_array, 
+*     smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
+*                    int *ptime, int badmask, int is2d,
+*                    AstSkyFrame *abskyfrm, AstMapping *oskymap,
+*                    AstFrame *ospecfrm, AstMapping *ospecmap,
+*                    Grp *detgrp, int moving, int usewgt, int spread,
+*                    const double params[], int lbnd_out[ 3 ],
+*                    int ubnd_out[ 3 ], int genvar, float *data_array,
+*                    float *var_array, double *wgt_array, float *texp_array,
 *                    float *teff_array, double *fcon, int *nused,
 *                    int *nreject, int *naccept, int *status );
 
@@ -37,10 +37,10 @@
 *        Is this the last call to this routine for the current output
 *        cube?
 *     ptime = int * (Given)
-*        Pointer to an array of integers, each one being the index of a 
-*        time slice that is to be pasted into the output cube. If this is 
+*        Pointer to an array of integers, each one being the index of a
+*        time slice that is to be pasted into the output cube. If this is
 *        NULL, then all time slices are used. The values in the array
-*        should be monotonic increasing and should be terminated by a value 
+*        should be monotonic increasing and should be terminated by a value
 *        of VAL__MAXI.
 *     badmask = int (Given)
 *        Indicates how the bad pixel mask for each output spectrum is
@@ -48,60 +48,60 @@
 *        output spectrum to be identical to the bad pixel mask of the
 *        first input spectrum that contributes to the output spectrum.
 *        Any subsequent input spectra that contribute to the same output
-*        spectrum but have a different bad pixel mask are ignored. A 
-*        "badmask" value of 1 causes the bad pixel mask for each output 
+*        spectrum but have a different bad pixel mask are ignored. A
+*        "badmask" value of 1 causes the bad pixel mask for each output
 *        spectrum to be the union of the bad pixel masks of all input
 *        spectra that contribute to the output spectrum. That is, an
-*        output pixel will be bad if any of the input pixels that 
+*        output pixel will be bad if any of the input pixels that
 *        contribute to it are bad.
 *     is2d = int (Given)
 *        Should a 2D weights array be used? If so, the weight and
-*        variance within a single output spectrum is assumed to be the 
-*        same for all spectral channels, and so 2D instead of 3D arrays 
+*        variance within a single output spectrum is assumed to be the
+*        same for all spectral channels, and so 2D instead of 3D arrays
 *        can be used, saving lots of memory. A 2D array has a single
 *        element for each spectrum in the output NDF. A 3D array has an
 *        element for every element in the output NDF.
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the output cube. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
 *        spatial grid coordinates in the output cube.
 *     ospecfrm = AstFrame * (Given)
-*        Pointer to the SpecFrame within the current Frame of the output WCS 
+*        Pointer to the SpecFrame within the current Frame of the output WCS
 *        Frameset.
 *     ospecmap = AstMapping * (Given)
-*        Pointer to the Mapping from the SpecFrame to the third GRID axis 
+*        Pointer to the Mapping from the SpecFrame to the third GRID axis
 *        within the current Frame of the output WCS Frameset.
 *     detgrp = Grp * (Given)
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output cube.
 *     usewgt = int (Given)
 *        A flag indicating if the input data should be weighted according
 *        to the input variances determined from the input Tsys values.
 *     spread = int (Given)
-*        Specifies the scheme to be used for dividing each input data value 
+*        Specifies the scheme to be used for dividing each input data value
 *        up amongst the corresponding output pixels. See docs for astRebinSeq
 *        (SUN/211) for the allowed values.
 *     params = const double[] (Given)
 *        An optional pointer to an array of double which should contain any
-*        additional parameter values required by the pixel spreading scheme. 
-*        See docs for astRebinSeq (SUN/211) for further information. If no 
+*        additional parameter values required by the pixel spreading scheme.
+*        See docs for astRebinSeq (SUN/211) for further information. If no
 *        additional parameters are required, this array is not used and a
-*        NULL pointer may be given. 
+*        NULL pointer may be given.
 *     lbnd_out = dim_t [ 3 ] (Given)
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
 *        The upper pixel index bounds of the output cube.
 *     genvar = int (Given)
-*        Indicates how the output variances should be calculated: 
+*        Indicates how the output variances should be calculated:
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
@@ -110,28 +110,28 @@
 *        include the data from the supplied input NDF.
 *     var_array = float * (Given and Returned)
 *        An array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
-*        zero). The supplied array is update on exit to include the data from 
-*        the supplied input NDF. If "is2d" is non-zero, then this array 
-*        should be big enough to hold a single spatial plane from the output 
-*        cube (all planes will then have the same variance and so only one 
-*        plane need be calculated). If "is2d" is zero, the "var_array" 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is
+*        zero). The supplied array is update on exit to include the data from
+*        the supplied input NDF. If "is2d" is non-zero, then this array
+*        should be big enough to hold a single spatial plane from the output
+*        cube (all planes will then have the same variance and so only one
+*        plane need be calculated). If "is2d" is zero, the "var_array"
 *        array should be the same shape and size as the output data array.
 *     wgt_array = double * (Given and Returned)
-*        An array in which to store the relative weighting for each pixel in 
-*        the output cube. The supplied array is update on exit to include the 
-*        data from the supplied input NDF. If "genvar" is 2, this array should 
-*        be the same size as "var_array". If "genvar" is 1, this array should 
+*        An array in which to store the relative weighting for each pixel in
+*        the output cube. The supplied array is update on exit to include the
+*        data from the supplied input NDF. If "genvar" is 2, this array should
+*        be the same size as "var_array". If "genvar" is 1, this array should
 *        be twice the size of the "var_array" array.
 *     texp_array = float * (Given and Returned)
-*        A work array, which holds the total exposure time for each output 
-*        spectrum. It is updated on exit to include the supplied input NDF. 
-*        It should be big enough to hold a single spatial plane from the 
+*        A work array, which holds the total exposure time for each output
+*        spectrum. It is updated on exit to include the supplied input NDF.
+*        It should be big enough to hold a single spatial plane from the
 *        output cube.
 *     teff_array = float * (Given and Returned)
-*        A work array, which holds the effective integration time for each 
-*        output spectrum, scaled by a factor of 4. It is updated on exit to 
-*        include the supplied input NDF. It should be big enough to hold a 
+*        A work array, which holds the effective integration time for each
+*        output spectrum, scaled by a factor of 4. It is updated on exit to
+*        include the supplied input NDF. It should be big enough to hold a
 *        single spatial plane from the output cube.
 *     fcon = double * (Given and Returned)
 *        If "first" is supplied non-zero, then *fcon is returned holding
@@ -139,7 +139,7 @@
 *        channel width (this is the factor needed for calculating the
 *        variances from the Tsys value). This returned value should be
 *        left unchanged on subsequent invocations of this function. If
-*        "first" is zero on entry, the reurned value is VAL__BADD if the 
+*        "first" is zero on entry, the reurned value is VAL__BADD if the
 *        factor for the current file has a different value.
 *     nused = int * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
@@ -150,7 +150,7 @@
 *        because they have a different bad pixel mask to the output.
 *        Only used if "badmask==0" (it is left unchanged otherwise).
 *     naccept = int * (Given and Returned)
-*        The number of input spectra that have not been ignored. Only used 
+*        The number of input spectra that have not been ignored. Only used
 *        if "badmask==0" (it is left unchanged otherwise).
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
@@ -231,21 +231,21 @@
 
 #define FUNC_NAME "smf_rebincube"
 
-void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last, 
-                     int *ptime, int badmask, int is2d, 
-                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-                     AstFrame *ospecfrm, AstMapping *ospecmap, 
-                     Grp *detgrp, int moving, int usewgt, int lbnd_out[ 3 ], 
-                     int ubnd_out[ 3 ], int spread, 
-                     const double params[], int genvar, float *data_array, 
-                     float *var_array, double *wgt_array, float *texp_array, 
+void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
+                     int *ptime, int badmask, int is2d,
+                     AstSkyFrame *abskyfrm, AstMapping *oskymap,
+                     AstFrame *ospecfrm, AstMapping *ospecmap,
+                     Grp *detgrp, int moving, int usewgt, int lbnd_out[ 3 ],
+                     int ubnd_out[ 3 ], int spread,
+                     const double params[], int genvar, float *data_array,
+                     float *var_array, double *wgt_array, float *texp_array,
                      float *teff_array, double *fcon, int *nused,
                      int *nreject, int *naccept, int *status ){
 
 /* Local Variables */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
    AstFrame *specframe = NULL; /* SpecFrame in input WCS */
-   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
+   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
    dim_t ndet;                 /* No of detectors in the input */
    dim_t dim[ 3 ];             /* Output array dimensions */
@@ -304,7 +304,7 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
 
    } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
 
-/* fcon can be different by fraction of a percent and still be accurate enough 
+/* fcon can be different by fraction of a percent and still be accurate enough
    for our purposes */
       double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
       if ( percent > 1.0 ) {
@@ -319,21 +319,21 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
       }
    }
 
-/* Get a Mapping that converts values in the input spectral system to the 
+/* Get a Mapping that converts values in the input spectral system to the
    corresponding values in the output spectral system. */
    fs = astConvert( specframe, ospecfrm, "" );
 
-/* Concatenate these Mappings with the supplied spectral Mapping to get 
+/* Concatenate these Mappings with the supplied spectral Mapping to get
    a Mapping from the input spectral grid axis (pixel axis 1) to the
    output spectral grid axis (pixel axis 3). */
    ssmap = astCmpMap( astCmpMap( specmap, astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                 1, " " ), 
+                                 1, " " ),
                       ospecmap, 1, " " );
 
-/* In principle, the spectral coverage of the current input file and the 
-   output file may not be equal. The effect of this input file on the 
-   returned exposure time arrays should depend on how much spectral overlap 
+/* In principle, the spectral coverage of the current input file and the
+   output file may not be equal. The effect of this input file on the
+   returned exposure time arrays should depend on how much spectral overlap
    there is between the two. So find what fraction of the output spectral
    range is contributed to by the spectral range of the input. */
    gin[ 0 ] = 0.5;
@@ -349,23 +349,23 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
 /* If we are using nearest neighbour rebinning, we can use specialist
    code that is faster than AST. */
    if( spread == AST__NEAREST ) {
-      smf_rebincube_nn( wf, data, first, last, ptime, nchan, ndet, nslice, 
-                        nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap, 
-                        abskyfrm, oskymap, detgrp, moving, usewgt, genvar, 
-                        tfac, fcon2, data_array, var_array, wgt_array, 
+      smf_rebincube_nn( wf, data, first, last, ptime, nchan, ndet, nslice,
+                        nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap,
+                        abskyfrm, oskymap, detgrp, moving, usewgt, genvar,
+                        tfac, fcon2, data_array, var_array, wgt_array,
                         texp_array, teff_array, nused, nreject, naccept,
                         &good_tsys, status );
 
 /* For all other spreading schemes, we use AST. */
    } else {
-      smf_rebincube_ast( wf, data, first, last, ptime, nchan, ndet, nslice, 
-                         nel, nxy, nout, dim, (AstMapping *) ssmap, abskyfrm, 
-                         oskymap, detgrp, moving, usewgt, spread, params, 
+      smf_rebincube_ast( wf, data, first, last, ptime, nchan, ndet, nslice,
+                         nel, nxy, nout, dim, (AstMapping *) ssmap, abskyfrm,
+                         oskymap, detgrp, moving, usewgt, spread, params,
                          genvar, tfac, fcon2, data_array, var_array, wgt_array,
                          texp_array, teff_array, &good_tsys, nused, status );
    }
 
-/* If this is the final pass through this function, convert zero texp_array 
+/* If this is the final pass through this function, convert zero texp_array
    and texp_array values to bad values. */
    if( last ) {
       for( iv = 0; iv < nxy; iv++ ) {
@@ -377,9 +377,9 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
    }
 
 /* Issue a warning if Tsys values were being used to create output
-   variances or weight input data values but no good Tsys values were 
+   variances or weight input data values but no good Tsys values were
    found in the input NDF. */
-   if( ( usewgt || genvar == 2 ) && !good_tsys ) { 
+   if( ( usewgt || genvar == 2 ) && !good_tsys ) {
       msgBlank( status );
       smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>", status );
       msgOutif( MSG__NORM, " ", "WARNING: ^FILE contains no Tsys values "

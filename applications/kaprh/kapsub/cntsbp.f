@@ -71,7 +71,7 @@
 *       given the entrance cell
 *     Compute the fractional co-ordinates of the sub-cell pixels
 *     Linearly interpolate to compute the sub-array pixel values
-*     Determine which edges of the sub-cell are crossed by a contour, 
+*     Determine which edges of the sub-cell are crossed by a contour,
 *       excluding the entrance side
 *     If at least one cell edge is crossed then
 *        Initialise variables
@@ -126,7 +126,7 @@
 *    Import :
 
       REAL CELABL              ! Data value of bottom-left pixel in
-                               ! the current full-pixel cell 
+                               ! the current full-pixel cell
       REAL CELABR              ! Ditto, bottom-right pixel
       REAL CELATR              ! Ditto, top-right pixel
       REAL CELATL              ! Ditto, top-left pixel
@@ -176,7 +176,7 @@
       LOGICAL TESTTL           ! Ditto, top-left pixel
       LOGICAL CROSSB           ! Whether a contour at the current level
                                ! crosses the bottom edge of the
-                               ! current cell 
+                               ! current cell
       LOGICAL CROSSR           ! Ditto, right edge
       LOGICAL CROSST           ! Ditto, top edge
       LOGICAL CROSSL           ! Ditto, left edge
@@ -185,18 +185,18 @@
 
       INTEGER EXIT             ! Flag to indicate through which edge
                                ! of a cell a contour line makes its
-                               ! exit 
+                               ! exit
       INTEGER NCROSS           ! Number of contour lines leaving a cell
       INTEGER PREXIT
       INTEGER X                ! X (2-dimensional) index of the
-                               ! bottom-left pixel in a cell 
+                               ! bottom-left pixel in a cell
       INTEGER Y                ! Ditto, Y index
 
       REAL CENTRE              ! Average pixel value in the cell
       REAL FRACT               ! Fractional cell extent of contour
                                ! intersection point with a cell edge
       REAL PIXBL               ! Data value of bottom-left pixel in
-                               ! the current cell 
+                               ! the current cell
       REAL PIXBR               ! Ditto, bottom-right pixel
       REAL PIXTR               ! Ditto, top-right pixel
       REAL PIXTL               ! Ditto, top-left pixel
@@ -222,20 +222,20 @@
 *   Check status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Note the sub-pixel array is notional.   The centres of its corner 
+*   Note the sub-pixel array is notional.   The centres of its corner
 *   elements are also the centres of the full-sized pixels, so that
 *   contouring continues from the entrance position to the full-sized
 *   array.  To achieve this the dimensions of the sub-pixel array
 *   are each one more than the number spanning a full-pixel width (i.e.
-*   there is a half a sub-pixel border around the full-sized cell. 
+*   there is a half a sub-pixel border around the full-sized cell.
 *   Note this still lies within the original array. Hereafter "pixel"
 *   means "sub-pixel".
 
       RD1 = REAL( DIM1 )
       RD2 = REAL( DIM2 )
 
-*   Derive the cell position in which to start tracing the contour. 
-*   X, Y correspond to the bottom-left pixel in the cell.  
+*   Derive the cell position in which to start tracing the contour.
+*   X, Y correspond to the bottom-left pixel in the cell.
 
       IF ( ENTER .EQ. BOTTOM ) THEN
          X = MAX( 1, MIN( DIM1, INT( DIM1 * CELFRA + 1.0 ) ) )
@@ -304,7 +304,7 @@
 
 
 *   Check that at least one cell edge is crossed by the contour.
-      IF ( CROSSB .OR. CROSSR .OR. CROSST .OR. CROSSL ) THEN 
+      IF ( CROSSB .OR. CROSSR .OR. CROSST .OR. CROSSL ) THEN
 
 *   Initialise variables for following the contour line.
 
@@ -331,7 +331,7 @@
 
 *   If the contour crosses the bottom edge of the current cell, then
 *   increment the count of edge intersections and remember this edge as
-*   a potential contour exit point from the cell. 
+*   a potential contour exit point from the cell.
             IF ( CROSSB ) THEN
                NCROSS = NCROSS + 1
                EXIT = BOTTOM
@@ -382,13 +382,13 @@
 *   that the lines do not cross. There are three possible pairing
 *   combinations which leave the first coordinate (where the contour
 *   first entered the cell) unchanged.  The correct pairing is achieved
-*   by performing up to two coordinate interchanges. 
+*   by performing up to two coordinate interchanges.
             IF ( NCROSS .EQ. 4 )THEN
 
 *   ...if the contour initially entered the cell through the top edge
 *      (and therefore exited the previous cell through the bottom edge),
 *      then the two lines will cross; this is a consequence of the
-*      order in which the cell edges are considered.  If this has 
+*      order in which the cell edges are considered.  If this has
 *      happened, then swap the appropriate coordinates.
                IF ( PREXIT .EQ. BOTTOM ) THEN
                   SWAP = XCONT( 3 )
@@ -459,14 +459,14 @@
 *   indices allow this (i.e. we are not already at the boundary of the
 *   image region currently being contoured).  If we are, then
 *   contour-following must stop at this point, so exit the contouring
-*   loop. 
+*   loop.
             IF ( EXIT .EQ. BOTTOM ) THEN
                IF ( Y .LE. 1 ) GO TO 1
 
 
 *   Adjust the 2-dimensional image indices of the bottom-left pixel and
 *   the associated 1-dimensional (vectorised) ARRAY index to refer to
-*   the bottom-left pixel of the new cell. 
+*   the bottom-left pixel of the new cell.
                Y = Y - 1
 
 *   Copy the pixel values which are common to the old and new cells into
@@ -497,7 +497,7 @@
 
 
 *   Similarly, copy the old TEST values and derive new ones where
-*   needed. 
+*   needed.
                TESTTL = TESTBL
                TESTTR = TESTBR
                TESTBL = PIXBL .GE. CLEVEL
@@ -588,7 +588,7 @@
                IF ( X .LE. 1 ) GO TO 1
 
                X = X - 1
-  
+
                PIXTR = PIXTL
                PIXBR = PIXBL
 

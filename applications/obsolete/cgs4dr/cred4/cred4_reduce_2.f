@@ -74,14 +74,14 @@
 
 *      Do the DRCONFIG command
         ELSE IF ( WORDS(1) .EQ. 'DRCONFIG' ) THEN
-          IF ( INDEX( WORDS(2), SEPARATOR ) .EQ. 0 ) 
+          IF ( INDEX( WORDS(2), SEPARATOR ) .EQ. 0 )
      :      WORDS(2) = CGS4_CONFIG(1:CHR_LEN(CGS4_CONFIG)) // WORDS(2)(1:CHR_LEN(WORDS(2)))
           CALL CHR_RMBLK( WORDS(2) )
           CALL MSG_SETC( 'CONFIG_FILE', WORDS(2) )
           CALL MSG_OUT(' ', 'Changing data reduction config to ^CONFIG_FILE', STATUS )
           CALL PAR_PUT0C( 'CONFIG_FILE', WORDS(2), STATUS )
-          CALL CRED4_RESTORE_CONFIG( STATUS ) 
-          CALL CRED4_RESTORE_PCONFIG( STATUS ) 
+          CALL CRED4_RESTORE_CONFIG( STATUS )
+          CALL CRED4_RESTORE_PCONFIG( STATUS )
 
 *      Do the DRPAUSE command
         ELSE IF ( WORDS(1) .EQ. 'DRPAUSE' ) THEN
@@ -107,7 +107,7 @@
         ELSE IF ( WORDS(1) .EQ. 'DRMASK' ) THEN
           CALL CHR_FILL( ' ', CDUMMY )
           CALL NBS_PUT_CVALUE( MASK_ID, 0, CDUMMY(1:LEN(CDUMMY)), STATUS )
-          IF ( INDEX( WORDS(2), SEPARATOR ) .EQ. 0 ) 
+          IF ( INDEX( WORDS(2), SEPARATOR ) .EQ. 0 )
      :      WORDS(2) = PREFIX // 'CGS4_MASKS' // SEPARATOR // WORDS(2)(1:CHR_LEN(WORDS(2)))
           CALL CHR_RMBLK( WORDS(2) )
           CLEN = CHR_LEN( WORDS(2) )
@@ -157,7 +157,7 @@
           CALL CRED4_DO_END( WORDS(2), STATUS )
 
 *      Do the ENDGROUP command
-        ELSE IF ( WORDS(1) .EQ. 'ENDGROUP' ) THEN 
+        ELSE IF ( WORDS(1) .EQ. 'ENDGROUP' ) THEN
           CALL CRED4_CHECK_INPUT( WORDS(2), STATUS )
           CALL CRED4_DO_ENDGROUP( WORDS(2), STATUS )
 
@@ -193,7 +193,7 @@
         CALL NBS_PUT_VALUE( RED4_BUSY_ID, 0, VAL__NBI, .FALSE., STATUS )
         CALL NBS_PUT_VALUE( P4_BUSY_ID, 0, VAL__NBI, .FALSE., STATUS )
         PAUSE_REDUCTION = .TRUE.
-        CALL MSG_OUT( ' ', 'Data reduction sequence not set up!', STATUS )   
+        CALL MSG_OUT( ' ', 'Data reduction sequence not set up!', STATUS )
       ENDIF
 
       END

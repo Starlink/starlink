@@ -9,7 +9,7 @@ Documentation, including release notes, is in sun242.tar-htx
 Changes
 -------
 
-Since 0.5: 
+Since 0.5:
   * In 0.5-10: Fix packaging bug -- 0.5-9 wouldn't build properly on
     some machines.
   * In 0.5-9: Various stability improvements, and fixes to help
@@ -28,7 +28,7 @@ Since 0.5:
     of ASTROM, nor the decompose_transform routine in autoastrom.pm,
     both of which are Copyright 1995 Patrick Wallace.  See
     README.Licence.
-  * Uses bundled ASTROM 3.7, which emits FITS WCS headers which 
+  * Uses bundled ASTROM 3.7, which emits FITS WCS headers which
     extend the draft `Paper II' proposals.  See ASTROM docs for discussion.
 
 Notes

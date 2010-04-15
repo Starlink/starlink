@@ -20,9 +20,9 @@
 *        The global status.
 
 *  Description:
-*     This application returns the reference position (specified by 
-*     attributes RefRA and RefDec) converted to the celestial coordinate 
-*     system represented by a supplied SkyFrame. The formated celestial 
+*     This application returns the reference position (specified by
+*     attributes RefRA and RefDec) converted to the celestial coordinate
+*     system represented by a supplied SkyFrame. The formated celestial
 *     longitude and latitude values are displayed.
 
 *  Usage:
@@ -30,14 +30,14 @@
 
 *  ADAM Parameters:
 *     FRM = LITERAL (Read)
-*        An NDF or text file holding the SkyFrame that describes the 
-*        coordinate system in which the reference longitude and latitude 
-*        values should be displayed. If an NDF is supplied, the current 
-*        Frame of its WCS FrameSet will be used. If a null (!) value is 
-*        supplied, the reference position will be displayed as FK5 J2000 
+*        An NDF or text file holding the SkyFrame that describes the
+*        coordinate system in which the reference longitude and latitude
+*        values should be displayed. If an NDF is supplied, the current
+*        Frame of its WCS FrameSet will be used. If a null (!) value is
+*        supplied, the reference position will be displayed as FK5 J2000
 *        right ascension and declination.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the SpecFrame. If an NDF is supplied, 
+*        An NDF or text file holding the SpecFrame. If an NDF is supplied,
 *        the current Frame in the WCS FrameSet will be used.
 
 *  Copyright:
@@ -104,7 +104,7 @@
       INTEGER UFRM
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -114,13 +114,13 @@
       CALL KPG1_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
       IF( AST_ISAFRAMESET( THIS, STATUS ) ) THEN
          SFRM = AST_GETFRAME( THIS, AST__CURRENT, STATUS )
-      ELSE 
+      ELSE
          SFRM = AST_CLONE( THIS, STATUS )
       END IF
 
-      IF( .NOT. AST_ISASPECFRAME( SFRM, STATUS ) .AND. 
+      IF( .NOT. AST_ISASPECFRAME( SFRM, STATUS ) .AND.
      :    STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_SETC( 'CLASS', AST_GETC( SFRM, 'Class', STATUS ) )         
+         CALL MSG_SETC( 'CLASS', AST_GETC( SFRM, 'Class', STATUS ) )
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'An AST ^CLASS was provided for parameter'//
      :                 ' THIS, but a SpecFrame was needed.', STATUS )
@@ -135,19 +135,19 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          UFRM = AST_SKYFRAME( ' ', STATUS )
-      ELSE 
+      ELSE
          IF( AST_ISAFRAMESET( FRM, STATUS ) ) THEN
             UFRM = AST_GETFRAME( FRM, AST__CURRENT, STATUS )
-         ELSE 
+         ELSE
             UFRM = AST_CLONE( FRM, STATUS )
          END IF
-   
-         IF( .NOT. AST_ISASKYFRAME( UFRM, STATUS ) .AND. 
+
+         IF( .NOT. AST_ISASKYFRAME( UFRM, STATUS ) .AND.
      :        STATUS .EQ. SAI__OK ) THEN
-            CALL MSG_SETC( 'CLASS', AST_GETC( UFRM, 'Class', STATUS ) )       
+            CALL MSG_SETC( 'CLASS', AST_GETC( UFRM, 'Class', STATUS ) )
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'An AST ^CLASS was provided for '//
-     :                    'parameter FRM, but a SkyFrame was needed.', 
+     :                    'parameter FRM, but a SkyFrame was needed.',
      :                    STATUS )
             GO TO 999
          END IF

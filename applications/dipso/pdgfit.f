@@ -1,6 +1,6 @@
       SUBROUTINE PDGFIT (NPTS, X, Y, SD, ORDER, CHISQ, ES, C)
 C
-C  Program fits a power series polynomial of order ORDER to a set of 
+C  Program fits a power series polynomial of order ORDER to a set of
 C NPTS data points by the method of "Least Squares".
 C  The fit is weighted by the reciporical of the square of the standard
 C deviation on each ordinate (Y) value.
@@ -9,7 +9,7 @@ C
 C     The Polynomial is of the form
 C      y(x) = c1 + c2*x + c3*x^2 + c4*x^3 ... + c(order+1)*x^order
 C
-C  Additional program segments required:  SUBROUTINE SMATIN 
+C  Additional program segments required:  SUBROUTINE SMATIN
 C
       IMPLICIT NONE
 C  Imports:-
@@ -19,20 +19,20 @@ C  Imports:-
       INTEGER ORDER                       ! Order of polynomial to be fitted
 C  Import/export:-
       DOUBLE PRECISION Y(*)               ! Array of data ordinates =>
-C                             contains calculated best-fit ordinates on RETURN 
+C                             contains calculated best-fit ordinates on RETURN
 C  Exports:-
       DOUBLE PRECISION CHISQ              ! Chi-squared
-      DOUBLE PRECISION ES                 ! Scatter of data from best-fit curve 
+      DOUBLE PRECISION ES                 ! Scatter of data from best-fit curve
       DOUBLE PRECISION C(ORDER+1)         ! Array of best-fit curve coefficients
 C  Local:-
       DOUBLE PRECISION CALCY              ! Temporarily holds best-fit ordinates
       DOUBLE PRECISION A(20,20)           ! Matrix holding power-x sums
       DOUBLE PRECISION B(20)              ! y-times-power-x summation matrix
-      DOUBLE PRECISION DELTA              ! Determinants of A 
-      DOUBLE PRECISION DIFF               ! Holds difference between measured 
+      DOUBLE PRECISION DELTA              ! Determinants of A
+      DOUBLE PRECISION DIFF               ! Holds difference between measured
      +                         !     and calculated ordinates
       INTEGER I, J, K                     ! Do-loop increment variables
-C 
+C
 C  Check that no sds are zero, else fit is indeterminate.
 C
       DO I = 1,NPTS
@@ -51,7 +51,7 @@ C
         DO 10, J=1,20
           A(I,J) = 0.0D+00
    10   CONTINUE
-   20 CONTINUE 
+   20 CONTINUE
       DO 100, I=1,(ORDER+1)
         C(I) = 0.0D+00
   100 CONTINUE
@@ -104,10 +104,10 @@ C
         ES = ES + DIFF**2
         CHISQ = CHISQ + DIFF**2/SD(I)**2
         Y(I) = CALCY
-  750 CONTINUE       
+  750 CONTINUE
       IF ( (NPTS-ORDER) .GT. 1 ) THEN
         ES = SQRT( ES/REAL(NPTS-ORDER-1) )
       ELSE
       ENDIF
-      RETURN     
+      RETURN
       END

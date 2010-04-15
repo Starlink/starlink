@@ -20,10 +20,10 @@
 *     component names prefixed with 'NO' (to indicate that the
 *     specified component should not be propagated). By default the
 *     HISTORY, LABEL and TITLE components are propagated. All extensions
-*     are also propagated by default except for any that have had a zero 
-*     value assigned to the corresponding "PXT..." tuning parameter 
+*     are also propagated by default except for any that have had a zero
+*     value assigned to the corresponding "PXT..." tuning parameter
 *     using NDF_TUNE. Named extensions may be included or excluded
-*     (over-riding the defaults set by the "PXT..." tuning parameters) 
+*     (over-riding the defaults set by the "PXT..." tuning parameters)
 *     by specifying EXTENSION( ) or NOEXTENSION( ) as one of the list
 *     items with a list of the extensions to be affected contained
 *     within the parentheses. The same component name may appear more
@@ -41,12 +41,12 @@
 *        Maximum number of names to be returned in the EXTN array (i.e.
 *        the declared size of this array).
 *     EXTN( MXEXTN ) = CHARACTER * ( DAT__SZNAM ) (Given and Returned)
-*        On entry, a list of the names of all available NDF extensions. On 
+*        On entry, a list of the names of all available NDF extensions. On
 *        exit, a list of the names of NDF extensions which are not to be
 *        propagated.
 *     NEXTN = INTEGER (Given and Returned)
 *        On entry, the number of available extension names supplied in
-*        the EXTN array. On exit, the number of extension names returned 
+*        the EXTN array. On exit, the number of extension names returned
 *        in the EXTN array.
 *     CPF( NDF__MXCPF ) = LOGICAL (Returned)
 *        Array of component propagation flags. Symbolic constants are
@@ -83,12 +83,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,7 +116,7 @@
 *        Use the "PXT..." tuning parameters to determine whether or not
 *        to propagate named extsnions by default.
 *     22-FEB-2010 (DSB):
-*        Allow an asterisk (*) be used as a wild card to match all 
+*        Allow an asterisk (*) be used as a wild card to match all
 *        extension names.
 *     {enter_further_changes_here}
 
@@ -124,7 +124,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -181,17 +181,17 @@
 *  If the TCB contains an AST KeyMap holding default propagation flags
 *  for NDF extensions, then take a copy of it so we can modify it without
 *  making any permanatent changes. Otherwise, create a new empty KeyMap.
-*  Also, store the names of all available extensions in the KeyMap. Each 
-*  is given an associated value of one, indicating that the extension 
+*  Also, store the names of all available extensions in the KeyMap. Each
+*  is given an associated value of one, indicating that the extension
 *  should be copied. Any "NOEXTENSION" elements in the supplied expression
-*  may cause some of these values to be set to zero, indicating that the 
+*  may cause some of these values to be set to zero, indicating that the
 *  extension is not to be copied.
       IF( TCB_PXT .NE. AST__NULL ) THEN
          PXT = AST_COPY( TCB_PXT, STATUS )
 
          DO I = 1, NEXTN
             IF( .NOT. AST_MAPHASKEY( PXT, EXTN( I ), STATUS ) ) THEN
-               CALL AST_MAPPUT0I( PXT, EXTN( I ), 1, ' ', STATUS ) 
+               CALL AST_MAPPUT0I( PXT, EXTN( I ), 1, ' ', STATUS )
             END IF
          END DO
 
@@ -199,7 +199,7 @@
          PXT = AST_KEYMAP( ' ', STATUS )
 
          DO I = 1, NEXTN
-            CALL AST_MAPPUT0I( PXT, EXTN( I ), 1, ' ', STATUS ) 
+            CALL AST_MAPPUT0I( PXT, EXTN( I ), 1, ' ', STATUS )
          END DO
 
       END IF
@@ -217,7 +217,7 @@
       CPF( NDF__UCPF ) = .FALSE.
       CPF( NDF__VCPF ) = .FALSE.
       CPF( NDF__WCPF ) = .FALSE.
-      
+
 *  Initialise a pointer to the start of the "current" item in the
 *  component list.
       I1 = 1

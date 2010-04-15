@@ -39,65 +39,65 @@ long hlpDec ( char *string, int *iptr )
                   1 = accepting digits
                   2 = number terminated        */
    int istate;
- 
+
    int l, i, c;
    long n, idigit;
- 
+
 
 /* Length of string */
    l = (int) strlen ( string );
- 
+
 /* State = waiting for first digit. */
    istate = 0;
- 
+
 /* Default result. */
    n = -1l;
- 
+
 /* Initialize local copy of pointer. */
    i = *iptr;
 
 /* Loop until end-of-string or end-of-number. */
    while ( i >= 0 && i < l && istate < 2 ) {
- 
+
    /* Next character. */
       c = (int) string [ i++ ];
 
    /* Blank? */
       if ( isspace ( c ) ) {
- 
+
       /* Yes: if we have seen numbers, correct pointer and terminate. */
          if ( istate > 0 ) {
             i -= 1;
             istate = 2;
          }
- 
+
    /*  Digit? */
       } else if ( isdigit ( c ) ) {
- 
+
       /* Yes: convert to integer. */
          idigit = (long) ( c - '0' );
- 
+
       /* First digit to be seen? */
          if ( istate == 0 ) {
- 
+
          /* Yes: start the number and set the state. */
             n = idigit;
             istate = 1;
          } else {
- 
+
          /* Not the first: include it. */
             n = idigit + n * 10l;
          }
       } else {
- 
+
       /* Unrecognized character: correct pointer and terminate. */
          i -= 1;
          istate = 2;
       }
- 
+
    /* Next character. */
    }
- 
+
 /* Results. */
    *iptr = i;
    return n;

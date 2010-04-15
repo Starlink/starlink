@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,5 +101,5 @@
         CALL ERR_REP( ' ', '...from ^R', STATUS )
 
       END IF
- 
+
       END

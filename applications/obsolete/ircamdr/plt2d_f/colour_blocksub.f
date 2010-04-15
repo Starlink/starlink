@@ -1,5 +1,5 @@
 	SUBROUTINE COLOUR_BLOCKSUB( NAXIS1, NAXIS2, COLOUR_ARRAY, CORIENT,
-     :	                            XCENTRE, YCENTRE, CSCALE, 
+     :	                            XCENTRE, YCENTRE, CSCALE,
      :	                            BLOCK_ANNOT)
 
 * Description : Routine to plot a colour table block on workstation
@@ -18,7 +18,7 @@
 * History :
 * 26-MAY-86 : REVA::CAA : added box around colour block and annotate option
 * 29-Sept-94  SKL@JACH Changed GCA calls for UNIX GKS, changed arguments
-*             to list NAXIS(1) and (2) separately for compiler 
+*             to list NAXIS(1) and (2) separately for compiler
 * Endhistory
 
 * Type Definitions
@@ -147,7 +147,7 @@
 
 * call subroutine to plot ticks on the long axis of the block
 
-	  CALL BLOCK_TICKS( XSTC, YSTC, XENC, YENC, CSCALE, CORIENT, 
+	  CALL BLOCK_TICKS( XSTC, YSTC, XENC, YENC, CSCALE, CORIENT,
      :	                    NAXIS1, NAXIS2, STATUS)
 
 * call subroutine to plot number on long axis of block

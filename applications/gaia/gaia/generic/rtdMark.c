@@ -99,27 +99,27 @@ static Tk_CustomOption tagsOption = {
 };
 
 static Tk_ConfigSpec configSpecs[] = {
-    {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL, "e", 
+    {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL, "e",
                        Tk_Offset(MarkItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_BITMAP, "-stipple", (char *) NULL, (char *) NULL, (char *) NULL, 
+    {TK_CONFIG_BITMAP, "-stipple", (char *) NULL, (char *) NULL, (char *) NULL,
                        Tk_Offset(MarkItem, fillStipple), TK_CONFIG_NULL_OK},
-    {TK_CONFIG_BOOLEAN, "-fixscale", (char *) NULL, (char *) NULL, "0", 
+    {TK_CONFIG_BOOLEAN, "-fixscale", (char *) NULL, (char *) NULL, "0",
                         Tk_Offset(MarkItem, fixscale), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL, (char *) NULL, 
+    {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL, (char *) NULL,
                       Tk_Offset(MarkItem, fillColor), TK_CONFIG_NULL_OK},
-    {TK_CONFIG_DOUBLE, "-minscale", (char *) NULL, (char *) NULL, "-1", 
+    {TK_CONFIG_DOUBLE, "-minscale", (char *) NULL, (char *) NULL, "-1",
                        Tk_Offset(MarkItem, minscale), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_COLOR, "-outline", (char *) NULL, (char *) NULL, "black", 
+    {TK_CONFIG_COLOR, "-outline", (char *) NULL, (char *) NULL, "black",
                       Tk_Offset(MarkItem, outlineColor), 0},
-    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL, (char *) NULL, 
+    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL, (char *) NULL,
                        0, TK_CONFIG_NULL_OK, &tagsOption},
-    {TK_CONFIG_DOUBLE, "-scale", (char *) NULL, (char *) NULL, "1", 
+    {TK_CONFIG_DOUBLE, "-scale", (char *) NULL, (char *) NULL, "1",
                        Tk_Offset(MarkItem, scale), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_INT, "-size", (char *) NULL, (char *) NULL, "1", 
+    {TK_CONFIG_INT, "-size", (char *) NULL, (char *) NULL, "1",
                     Tk_Offset(MarkItem, size), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_INT, "-width", (char *) NULL, (char *) NULL, "1", 
+    {TK_CONFIG_INT, "-width", (char *) NULL, (char *) NULL, "1",
                     Tk_Offset(MarkItem, width), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_STRING, "-type", (char *) NULL, (char *) NULL, "circle", 
+    {TK_CONFIG_STRING, "-type", (char *) NULL, (char *) NULL, "circle",
                        Tk_Offset(MarkItem, type), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
                     (char *) NULL, 0, 0}
@@ -848,12 +848,12 @@ static void ScaleMark( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
     markPtr->y = originY + scaleY*(markPtr->y - originY);
     if ( ! markPtr->fixscale ) {
 
-        /*  realscale is the scale we would have without a minscale, 
+        /*  realscale is the scale we would have without a minscale,
          *  when it is less than minscale the scale used is minscale.
          *  This allows an absolute sense of what the scale is. */
         markPtr->realscale *= scaleX;
 
-        if ( markPtr->minscale > 0.0 && 
+        if ( markPtr->minscale > 0.0 &&
              markPtr->realscale < markPtr->minscale ) {
             markPtr->scale = markPtr->minscale;
         }
@@ -1156,7 +1156,7 @@ rlineto %.15g %.15g rlineto closepath\n",
             /*  Now the outline (using the same region command). */
             if (markPtr->outlineColor != NULL) {
                 Tcl_AppendResult(interp, buffer, (char *) NULL);
-                
+
                 /*  Set the outline width */
                 sprintf(string, "%d setlinewidth", MAX(1,markPtr->width/2));
                 Tcl_AppendResult(interp, string,
@@ -1170,7 +1170,7 @@ rlineto %.15g %.15g rlineto closepath\n",
         }
         break;
     }
-    
+
     return TCL_OK;
 }
 
@@ -1189,44 +1189,44 @@ static void MarkCorrectAnchor( MarkItem *markPtr, double *x, double *y )
 {
     double sby2;
     sby2 = (double)markPtr->size/2.0;
-    
+
     switch (markPtr->tkanchor) {
-        case TK_ANCHOR_NW: 
+        case TK_ANCHOR_NW:
             *x -= sby2;
             *y -= sby2;
         break;
-        
+
         case TK_ANCHOR_N:
             *y -= sby2;
         break;
-        
+
         case TK_ANCHOR_NE:
             *x += sby2;
             *y -= sby2;
         break;
-        
+
         case TK_ANCHOR_W:
             *x -= sby2;
         break;
-        
+
         case TK_ANCHOR_E:
             *x += sby2;
         break;
-        
+
         case TK_ANCHOR_SW:
             *x -= sby2;
             *y += sby2;
         break;
-        
+
         case TK_ANCHOR_S:
             *y += sby2;
         break;
-        
+
         case TK_ANCHOR_SE:
             *x += sby2;
             *y += sby2;
         break;
-        
+
         case TK_ANCHOR_CENTER:
         break;
     }

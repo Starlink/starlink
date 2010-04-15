@@ -169,7 +169,7 @@
                DEVIA( I ) = SQRT( ABS( DEVIA( I ) ) )
             END IF
          ELSE
-            
+
 *  No values in bin set all to zero.
             XPL( I ) =0.0
             DEVIA( I ) = 0.0D0
@@ -189,6 +189,6 @@
             RPL( I ) = RPL( I )/ REAL ( IPL( I ) )
          END IF
  5    CONTINUE
-      
+
       END
 * $Id$

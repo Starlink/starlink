@@ -1,9 +1,9 @@
 /*
 *     astTypemap.c
- 
+
 *  Purpose:
 *     Helper code for AST object typemap processing and object handling
- 
+
 *  Description:
 *     This file implements functions useful for converting AST C structs
 *     to Perl objects and Perl objects back to the corresponding C struct.
@@ -25,7 +25,7 @@
 *	}
 *	else
 *	    Perl_croak(aTHX_ \"$var is not of class %s\",ntypeToClass(\"${ntype}\"))
-* 
+*
 *     OUTPUT
 *     T_ASTOBJ
 *	$arg = createPerlObject(\"${ntype}\", (void*)$var);
@@ -33,10 +33,10 @@
 *  Copyright:
 *     Copyright (C) 2004-2005 Tim Jenness.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     TIMJ: Tim Jenness (JAC)
- 
+
 *  History:
 *     24-FEB-2004 (TIMJ):
 *        Original version
@@ -65,7 +65,7 @@ static char  pntrAttrib[9] = "_pointer";
 /* The root namespace we are dealing with */
 static char NAMESPACE[14] = "Starlink::AST";
 
-/* 
+/*
    Given the XS version of the class name (which is directly related
    to the struct name - AstObject * maps to AstObjectPtr), and a
    pointer to an ast object, return an a reference to a Perl hash
@@ -88,7 +88,7 @@ SV* createPerlObject( char * xsntype, AstObject * var ) {
 
   /* Now create a reference to the hash object
      Do not increment the reference count since at the end of this
-     we still only want a single reference to the hash to exist */ 
+     we still only want a single reference to the hash to exist */
   rv =  newRV_noinc( (SV*)hash_object );
 
   /* Bless the reference into a class. We translate the XS ntype
@@ -97,7 +97,7 @@ SV* createPerlObject( char * xsntype, AstObject * var ) {
 
   /* Store the pointer if we were given one */
   if (var != NULL) {
-    setPerlAstObject( myobject, var ); 
+    setPerlAstObject( myobject, var );
   }
 
   return myobject;
@@ -147,13 +147,13 @@ IV extractAstIntPointer( SV * arg ) {
     Perl_croak(aTHX_ "Error extracting _pointer attribute from object");
   }
 
-  /* extract the actual IV from the element */  
+  /* extract the actual IV from the element */
   return SvIV( *elem );
 }
 
 
 /* Convert an XS ntype value (eg AstFitsChanPtr) to an appropriate user
-   friendly perl namespace (eg Starlink::AST::FitsChan) 
+   friendly perl namespace (eg Starlink::AST::FitsChan)
 
    Note that "AstObjectPtr" is special-cased to "Starlink::AST"
 
@@ -211,7 +211,7 @@ SV* getPerlObjectAttr ( SV * myobject, char * attr ) {
   if (myobject == NULL || !SvOK(myobject) ) {
     return NULL;
   }
- 
+
   /* Make sure we have a reference to a hash */
   if (SvROK(myobject) && SvTYPE(SvRV(myobject))==SVt_PVHV)
     hash_object = (HV*)SvRV(myobject);
@@ -243,7 +243,7 @@ void setPerlObjectAttr ( SV * myobject, char * attr, SV * value ) {
   if (myobject == NULL || !SvOK(myobject) ) {
     Perl_croak(aTHX_ "Must supply a valid SV/object to setPerlObjectAttr");
   }
- 
+
   /* Make sure we have a reference to a hash */
   if (SvROK(myobject) && SvTYPE(SvRV(myobject))==SVt_PVHV)
     hash_object = (HV*)SvRV(myobject);
@@ -255,7 +255,7 @@ void setPerlObjectAttr ( SV * myobject, char * attr, SV * value ) {
   retval = hv_store( hash_object, attr, strlen(attr),
 		     value,0);
 
-  /* If the store fails, free up the SV created earlier and croak */  
+  /* If the store fails, free up the SV created earlier and croak */
   if (retval == NULL ) {
     SvREFCNT_dec( value );
     Perl_croak(aTHX_ "Error storing AstObject pointer into hash\n");

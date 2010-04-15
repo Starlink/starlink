@@ -7,7 +7,7 @@
 *
 *   Clip a polygon against a rectangle: Sutherland-Hodgman algorithm.
 *   this routine must be called four times to clip against each of the
-*   edges of the rectangle in turn.      
+*   edges of the rectangle in turn.
 *
 *   Given
 *      N        i       Number of vertices
@@ -20,11 +20,11 @@
 *                       3: clip against bottom edge, Y > YMIN=VAL
 *                       4: clip against top edge,    Y < YMIN=VAL
 *      VAL      r       coordinate value of current edge.
-*      MAXOUT   i       maximum number of vertices allowed in output 
+*      MAXOUT   i       maximum number of vertices allowed in output
 *                       polygon (dimension of QX, QY).
 *
 *   Returned
-*     PX        r(>=N)  X world coordinates of the N vertices of the 
+*     PX        r(>=N)  X world coordinates of the N vertices of the
 *                       input polygon.
 *     PY        r(>=N)  Y ditto
 *     NOUT      i       the number of vertices in the clipped polygon.

@@ -31,7 +31,7 @@ proc qmanEGroup {taskname} {
     } elseif {$bv == 1} {
       cgs4drCursor watch red white
       qmanCancelEndGroup $taskname
-    } 
+    }
 
 # Remove the dialog box
     cgs4drCursor arrow green black

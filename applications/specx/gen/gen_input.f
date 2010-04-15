@@ -13,17 +13,17 @@
 
 C   Routine to prompt with character string PROMPT and receive a
 C   character string from the terminal.
-C   If the return character string is null or carriage return 
+C   If the return character string is null or carriage return
 C   CHAX is left unchanged and JDEF is set to 1, if input is CTRL/Z JDEF is
 C   set to 2; else the string is returned in CHAX
 C   and JDEF is set to 0. In this last case ISTR returns the length
 C   of the variable CHAX.
 
 C   The routine by default reads from a (max 2048 character) command line
-C   held in CLILINE. If the command line is exhausted then a prompt is 
+C   held in CLILINE. If the command line is exhausted then a prompt is
 C   delivered to the terminal, and the resulting input 'tops up' the command
 C   line. Subsequent input is again taken from the command line until
-C   it is once more exhausted. 
+C   it is once more exhausted.
 
 C   Each call to GETCH retrieves the contents of one item of terminal input.
 
@@ -237,7 +237,7 @@ C  Otherwise STRING just read is the required item
 
 C  Before return jump back to top of stack
 
-  200 ISP = ISPMAX 
+  200 ISP = ISPMAX
       LUN = ICLI(3,ISP)
       CALL SET_LUN_IN (LUN)
 

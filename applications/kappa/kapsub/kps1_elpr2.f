@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_ELPR2( NX, NY, USEANN, PA, RATIO, RMIN, RMAX, XC,
-     :                       YC, NSTEP, PA1, WID, PASTEP, REGVAL, IGRP, 
+     :                       YC, NSTEP, PA1, WID, PASTEP, REGVAL, IGRP,
      :                       REGIND, REGCEN, REGWID, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_ELPR2( NX, NY, USEANN, PA, RATIO, RMIN, RMAX, XC, YC, 
-*                      NSTEP, PA1, WID, PASTEP, REGVAL, IGRP, REGIND, 
+*     CALL KPS1_ELPR2( NX, NY, USEANN, PA, RATIO, RMIN, RMAX, XC, YC,
+*                      NSTEP, PA1, WID, PASTEP, REGVAL, IGRP, REGIND,
 *                      REGCEN, REGWID, STATUS )
 
 *  Description:
@@ -66,7 +66,7 @@
 *        should be no smaller than WID.
 *     REGVAL = INTEGER (Given)
 *        The value which will be passed to subroutine ARD_WORK as the
-*        value to use to represent the first region included in the 
+*        value to use to represent the first region included in the
 *        ARD description.
 *     IGRP = INTEGER (Returned)
 *        A GRP identifier for a group containing the ARD description.
@@ -126,7 +126,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP__ constants
-      
+
 *  Arguments Given:
       INTEGER NX
       INTEGER NY
@@ -142,20 +142,20 @@
       REAL WID
       REAL PASTEP
       INTEGER REGVAL
-      
+
 *  Arguments Returned:
       INTEGER IGRP
       INTEGER REGIND( * )
       REAL REGCEN( NSTEP )
       REAL REGWID( NSTEP )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      REAL RTOD                  ! Factor to convert radians to degrees 
+      REAL RTOD                  ! Factor to convert radians to degrees
       PARAMETER ( RTOD = 57.29578 )
-      
+
 *  Local Variables:
       INTEGER CURVAL             ! ARD mask value for current region
       REAL HWID                  ! Half the annulus width
@@ -167,14 +167,14 @@
       CHARACTER * ( GRP__SZNAM ) POLY ! ARD description of first sector
       REAL R                     ! Radius of sector
       CHARACTER *( GRP__SZNAM ) TEXT ! Buffer for ARD keywords, etc
-      
+
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create the GRP group to store the ARD description in.
-      CALL GRP_NEW( 'ARD DESCRIPTION', IGRP, STATUS )      
+      CALL GRP_NEW( 'ARD DESCRIPTION', IGRP, STATUS )
 
 *  Initialise the value which will be used by ARD_WORK to represent
 *  the `current' region.
@@ -186,7 +186,7 @@
       WRITE( TEXT, * ) 'OFFSET(', XC, ',', YC, ')'
       CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
-*  If the ARD description is to describe the intersection of the 
+*  If the ARD description is to describe the intersection of the
 *  sectors with the annulus specified by RMIN and RMAX...
       IF ( USEANN ) THEN
 
@@ -204,7 +204,7 @@
             CURVAL = CURVAL + 1
             WRITE( TEXT, * ) '( ELLIPSE( 0.0, 0.0, ', OMAJ, ',', OMIN,
      :                       ',', RTOD * PA, ') '
-            CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )      
+            CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
 *  Now find the major and minor axes of the inner edge of the annulus.
             IMAJ = RMIN
@@ -216,7 +216,7 @@
                CURVAL = CURVAL + 1
                WRITE( TEXT, * ) '.AND. .NOT. ELLIPSE( 0.0, 0.0, ',
      :                          IMAJ, ',', IMIN, ',', RTOD * PA, ') '
-               CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )      
+               CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
             END IF
 
 *  Store an .AND. operator to connect the annulus ARD description to
@@ -237,18 +237,18 @@
 *  Create a text string holding the ARD description of the first sector
 *  polygon.
       HWID = WID / 2.0
-      WRITE( POLY, * ) 'POLY( 0.0, 0.0, ', 
-     :                 R * COS( PA1 ),          ',', 
+      WRITE( POLY, * ) 'POLY( 0.0, 0.0, ',
+     :                 R * COS( PA1 ),          ',',
      :                 R * SIN( PA1 ),          ',',
      :                 R * COS( PA1 + HWID ),   ',',
      :                 R * SIN( PA1 + HWID ),   ',',
-     :                 R * COS( PA1 + WID ),   ',', 
+     :                 R * COS( PA1 + WID ),   ',',
      :                 R * SIN( PA1 + WID ),   ')'
 
 *  Store this polygon in the group.
       CALL GRP_PUT( IGRP, 1, POLY, 0, STATUS )
 
-*  Store the azimuthal angle at the centre of the first sector, and the 
+*  Store the azimuthal angle at the centre of the first sector, and the
 *  sector width, in degress.
       REGCEN( 1 ) = ( PA1 + HWID ) * RTOD
       REGWID( 1 ) = WID * RTOD
@@ -262,7 +262,7 @@
 *  operators exist between adjacent keywords (the statements such as
 *  TWIST are skipped over by ARD when evaluating the logical
 *  expression).
-      DO I = 2, NSTEP      
+      DO I = 2, NSTEP
 
 *  Put the origin of the ARD user co-ordinate system back to the origin
 *  of the application co-ordinate system (in this case this is the same
@@ -275,7 +275,7 @@
          WRITE( TEXT, * ) 'TWIST(',RTOD * PASTEP,')'
          CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
-*  Set the origin of the ARD user co-ordinate system back to the centre of 
+*  Set the origin of the ARD user co-ordinate system back to the centre of
 *  the ellipse.
          WRITE( TEXT, * ) 'OFFSET(', XC, ',', YC, ')'
          CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )

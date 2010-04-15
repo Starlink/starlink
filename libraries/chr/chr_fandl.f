@@ -14,11 +14,11 @@
 
 *  Description:
 *     Find the indices of the first and last non-blank characters in
-*     the given string. If the string is all blank, the first index 
-*     is returned set to the end of the string and the last index is 
+*     the given string. If the string is all blank, the first index
+*     is returned set to the end of the string and the last index is
 *     returned set to zero, i.e. INDEX1 is greater than INDEX2.
-*     If the string has no length, i.e. it is a substring with the first 
-*     index greater than the second, both indices are returned set to 
+*     If the string has no length, i.e. it is a substring with the first
+*     index greater than the second, both indices are returned set to
 *     zero.
 
 *  Arguments:
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -105,7 +105,7 @@
          END IF
       ELSE
 
-*     The string contains non-blank characters. Find the position of 
+*     The string contains non-blank characters. Find the position of
 *     the first non-blank character.
          DO 10 INDEX1 = 1, INDEX2
             IF ( STRING( INDEX1 : INDEX1 ) .NE. ' ' ) GO TO 20

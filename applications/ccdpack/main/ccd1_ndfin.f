@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,8 +118,8 @@
          CALL NDG_ASSOC( NAME, .TRUE., GID, NNDF, TERM, STATUS )
          ADDED = NNDF - ONNDF
 
-*  Get out if a given a par_abort. Also quit after an unreasonble 
-*  number of attempts. 
+*  Get out if a given a par_abort. Also quit after an unreasonble
+*  number of attempts.
          IF ( STATUS .EQ. PAR__ABORT )THEN
             GO TO 99
          ELSE IF ( NTRY .GT. 10 ) THEN
@@ -133,13 +133,13 @@
 
 *  Check that the number of NDFs returned is in the permitted range. If
 *  the continuation character has been used then reprompt.
-         AGAIN = .FALSE. 
+         AGAIN = .FALSE.
          IF ( TERM ) THEN
 
 *  Continuation character has been issued reprompt, appending to the
 *  present group.
             CALL PAR_CANCL( NAME, STATUS )
-            AGAIN = .TRUE. 
+            AGAIN = .TRUE.
 
 *  Status may have been set by NDG for a good reason.. check for this
 *  and reprompt.
@@ -178,7 +178,7 @@
 
 *  If status is set to par__null then reset status, note that this is
 *  only tested if the checks for number of NDFs etc. have been passed.
-         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN 
+         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             AGAIN = .FALSE.
          END IF
@@ -187,7 +187,7 @@
 *  Write out the actual number of NDFs accessed.
       CALL MSG_SETC( 'PARNAME', NAME )
       CALL MSG_SETI( 'NDFAC_NNDF', NNDF )
-      IF ( NNDF .GT. 1 ) THEN 
+      IF ( NNDF .GT. 1 ) THEN
          CALL MSG_OUT( ' ',
      :   '  ^NDFAC_NNDF NDFs accessed using parameter %^PARNAME',
      :   STATUS )
@@ -197,5 +197,5 @@
      :   STATUS )
       END IF
 
-99    END 
+99    END
 * $Id$

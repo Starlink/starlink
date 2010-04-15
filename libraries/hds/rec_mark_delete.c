@@ -57,7 +57,7 @@
 
 /* Check the inherited global status.                                       */
       if ( !_ok( *status ) ) return;
-      
+
 /* Set the deletion flag in the file control vector.                        */
       rec_ga_fcv[ han->slot ].dele = 1;
 

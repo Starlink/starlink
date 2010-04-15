@@ -52,12 +52,12 @@ c      call ast_listissued( 'teststc' )
       call puteg( 'teststc_eg6', 1, status )
       call xmlread( 1, obj1, ' ', status )
       obj1 = ast_simplify( obj1, status )
-      call checkdump( obj1, 'checkdump 1', status ) 
+      call checkdump( obj1, 'checkdump 1', status )
 
       call puteg( 'teststc_eg7', 1, status )
       call xmlread( 1, obj2, ' ', status )
       obj2 = ast_simplify( obj2, status )
-      call checkdump( obj2, 'checkdump 2', status ) 
+      call checkdump( obj2, 'checkdump 2', status )
 
       overlap = ast_overlap( obj1, obj2, status )
       if( overlap .ne. 4 .and.status .eq. sai__ok ) then
@@ -68,7 +68,7 @@ c      call ast_listissued( 'teststc' )
       call puteg( 'teststc_eg8', 1, status )
       call xmlread( 1, obj2, ' ', status )
       obj2 = ast_simplify( obj2, status )
-      call checkdump( obj2, 'checkdump 3', status ) 
+      call checkdump( obj2, 'checkdump 3', status )
 
       overlap = ast_overlap( obj1, obj2, status )
       if( overlap .ne. 3 .and.status .eq. sai__ok ) then
@@ -142,7 +142,7 @@ c      call ast_listissued( 'teststc' )
       obj = ast_simplify( obj, status )
 
 *  Write out the object through a Channel and read it back.
-      call checkdump( obj, 'checkdump 1', status ) 
+      call checkdump( obj, 'checkdump 1', status )
 
 *  Test simplify by negating and simplifying twice.
       call ast_negate( obj, status )
@@ -151,7 +151,7 @@ c      call ast_listissued( 'teststc' )
       obj = ast_simplify( obj, status )
 
 *  Check it is a STCResourceProfile
-      if( .not. ast_isastcresourceprofile( obj, status ) ) 
+      if( .not. ast_isastcresourceprofile( obj, status ) )
      :                      call stopit( status, 'Error 1' )
 
 *  Check it contains an Interval.
@@ -160,20 +160,20 @@ c      call ast_listissued( 'teststc' )
      :                      call stopit( status, 'Error 1a' )
 
 *  Timescale should be tt. Try changing it to TAI.
-      if( ast_getc( obj, 'timescale', status ) .ne. 'TT' ) 
+      if( ast_getc( obj, 'timescale', status ) .ne. 'TT' )
      :    call stopit( status, 'Error 0a' )
 
-      if( abs( ast_getd(obj,'TimeOrigin',status)-51382.6666666D0 ) 
+      if( abs( ast_getd(obj,'TimeOrigin',status)-51382.6666666D0 )
      :   .gt. 1.0D-7 ) call stopit( status, 'Error 0b' )
 
       call ast_getregionbounds( obj, lbnd, ubnd, status )
       if( lbnd(3) .ne. 0.0 ) call stopit( status, 'Error 0c' )
-      
+
       call ast_set( obj, 'timescale=tai', status )
-      if( ast_getc( obj, 'timescale', status ) .ne. 'TAI' ) 
+      if( ast_getc( obj, 'timescale', status ) .ne. 'TAI' )
      :    call stopit( status, 'Error 0d' )
-      
-      if( abs( ast_getd(obj,'TimeOrigin',status)-51382.6662941667D0 ) 
+
+      if( abs( ast_getd(obj,'TimeOrigin',status)-51382.6662941667D0 )
      :   .gt. 1.0D-7 ) call stopit( status, 'Error 0e' )
 
       call ast_getregionbounds( obj, lbnd, ubnd, status )
@@ -185,32 +185,32 @@ c      call ast_listissued( 'teststc' )
 
       call ast_set( obj, 'timescale=tt', status )
       obj = ast_Simplify( obj, status )
-      if( ast_getc( obj, 'timescale', status ) .ne. 'TT' ) 
+      if( ast_getc( obj, 'timescale', status ) .ne. 'TT' )
      :    call stopit( status, 'Error 0g' )
 
-      if( abs( ast_getd(obj,'TimeOrigin',status)-51382.6666666D0 ) 
+      if( abs( ast_getd(obj,'TimeOrigin',status)-51382.6666666D0 )
      :   .gt. 1.0D-7 ) call stopit( status, 'Error 0h' )
 
       call ast_getregionbounds( obj, lbnd, ubnd, status )
-      if( abs( lbnd(3) ) .gt. 1.0D-6 ) 
+      if( abs( lbnd(3) ) .gt. 1.0D-6 )
      :       call stopit( status, 'Error 0i' )
 
-          
+
 
 * Other tests
-      if( ast_getd( obj, 'fillfactor', status ) .ne. 0.02D0 ) 
+      if( ast_getd( obj, 'fillfactor', status ) .ne. 0.02D0 )
      :    call stopit( status, 'Error 1b' )
 
-      if( ast_getc( obj, 'ident', status ) .ne. 'AllSky-CXO' ) 
+      if( ast_getc( obj, 'ident', status ) .ne. 'AllSky-CXO' )
      :    call stopit( status, 'Error 1c' )
 
-      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' ) 
+      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' )
      :    call stopit( status, 'Error 2' )
 
       if( ast_getc( obj, 'title(3)', status ) .ne. 'Time' )
      :    call stopit( status, 'Error 2a' )
 
-      if( ast_getc( obj, 'label(3)', status ) .ne. 
+      if( ast_getc( obj, 'label(3)', status ) .ne.
      :    'Modified Julian Date offset from 1999-07-23 16:00:00' ) THEN
          call stopit( status, 'Error 2b' )
       end if
@@ -227,13 +227,13 @@ c      call ast_listissued( 'teststc' )
       if( ast_getc( obj, 'label(2)', status ) .ne. 'Declination' )
      :    call stopit( status, 'Error 3c' )
 
-      if( ast_getc( obj, 'title(2)', status ) .ne. 'Space' ) 
+      if( ast_getc( obj, 'title(2)', status ) .ne. 'Space' )
      :    call stopit( status, 'Error 3d' )
 
       if( ast_getc( obj, 'domain(2)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 4' )
 
-      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' ) 
+      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' )
      :    call stopit( status, 'Error 5' )
 
       if( ast_getc( obj, 'system(4)', status ) .ne. 'ENER' )
@@ -242,13 +242,13 @@ c      call ast_listissued( 'teststc' )
       if( ast_getc( obj, 'stdofrest', status ) .ne. 'Topocentric' )
      :    call stopit( status, 'Error 5b' )
 
-      if( ast_getc( obj, 'title(4)', status ) .ne. 
+      if( ast_getc( obj, 'title(4)', status ) .ne.
      :    'Energy (Topocentric)' ) call stopit( status, 'Error 5c' )
 
       if( ast_getc( obj, 'unit(4)', status ) .ne. 'keV' )
      :    call stopit( status, 'Error 5d' )
 
-      if( ast_geti( obj, 'naxes', status ) .ne. 4 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 4 )
      :    call stopit( status, 'Error 6' )
 
       in(1,1) = 10.0
@@ -297,21 +297,21 @@ c      call ast_listissued( 'teststc' )
          if( i .eq. 3 .or. i .eq. 6 ) then
             do j = 1, 4
                if( out(i,j) .ne. in(i,j) ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 7' )
                   end if
                end if
-            end do           
+            end do
          else
             do j = 1, 4
                if( out(i,j) .ne. AST__BAD ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 8' )
                   end if
                end if
-            end do           
+            end do
          end if
       end do
 
@@ -331,11 +331,11 @@ c      call ast_listissued( 'teststc' )
          call stopit( status, 'Error 27' )
       else if( ast_geti( r, 'naxes', status ) .ne. 4 ) then
          call stopit( status, 'Error 28' )
-      else 
-         fs = ast_convert( obj, r, ' ', status )              
+      else
+         fs = ast_convert( obj, r, ' ', status )
          if( fs .eq. AST__NULL ) then
             call stopit( status, 'Error 29' )
-         else 
+         else
             m = ast_getMapping( fs, AST__BASE, AST__CURRENT, status )
             m = ast_simplify( m, status )
             if( .not. ast_isaunitmap( m, status ) ) then
@@ -346,40 +346,40 @@ c      call ast_listissued( 'teststc' )
 
          call ast_getregionbounds( r, lbnd, ubnd, status )
 
-         if( abs( lbnd(1)+2.42406841E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( lbnd(1)+2.42406841E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 31a' )
-         if( abs( ubnd(1)-2.42406841E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( ubnd(1)-2.42406841E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 31b' )
-         if( abs( lbnd(2)+2.42406841E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( lbnd(2)+2.42406841E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 31c' )
-         if( abs( ubnd(2)-2.42406841E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( ubnd(2)-2.42406841E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 31d' )
-         if( abs( 0.5*(ubnd(3)+lbnd(3)) ) .gt. 1.0E-10) 
+         if( abs( 0.5*(ubnd(3)+lbnd(3)) ) .gt. 1.0E-10)
      :       call stopit( status, 'Error 31e' )
-         if( abs( 0.5*(ubnd(3)-lbnd(3))-0.578703703718D-09 ) .gt. 
+         if( abs( 0.5*(ubnd(3)-lbnd(3))-0.578703703718D-09 ) .gt.
      :       1.0E-15 ) call stopit( status, 'Error 31e2' )
-         if( abs( lbnd(4)-5.01 ) .gt. 0.00001 ) 
+         if( abs( lbnd(4)-5.01 ) .gt. 0.00001 )
      :       call stopit( status, 'Error 31g' )
-         if( abs( ubnd(4)-5.11 ) .gt. 0.00001 ) 
+         if( abs( ubnd(4)-5.11 ) .gt. 0.00001 )
      :       call stopit( status, 'Error 31h' )
 
       end if
 
 
-      if( .not. ast_mapget1C( km, AST__STCNAME, 6, nval, cvals, 
+      if( .not. ast_mapget1C( km, AST__STCNAME, 6, nval, cvals,
      :                        status ) ) then
          call stopit( status, 'Error 32' )
 
       else if( nval .ne. 4 ) then
          call stopit( status, 'Error 33' )
       else
-         if( cvals(1) .ne. 'Position' ) 
+         if( cvals(1) .ne. 'Position' )
      :        call stopit( status, 'Error 34a' )
-         if( cvals(2) .ne. 'Position' ) 
+         if( cvals(2) .ne. 'Position' )
      :        call stopit( status, 'Error 34b' )
-         if( cvals(3) .ne. 'Time' ) 
+         if( cvals(3) .ne. 'Time' )
      :        call stopit( status, 'Error 34c' )
-         if( cvals(4) .ne. 'Energy' ) 
+         if( cvals(4) .ne. 'Energy' )
      :        call stopit( status, 'Error 34d' )
       end if
 
@@ -389,11 +389,11 @@ c      call ast_listissued( 'teststc' )
          call stopit( status, 'Error 36' )
       else if( ast_geti( r, 'naxes', status ) .ne. 4 ) then
          call stopit( status, 'Error 37' )
-      else 
-         fs = ast_convert( obj, r, ' ', status )              
+      else
+         fs = ast_convert( obj, r, ' ', status )
          if( fs .eq. AST__NULL ) then
             call stopit( status, 'Error 38' )
-         else 
+         else
             m = ast_getMapping( fs, AST__BASE, AST__CURRENT, status )
             m = ast_simplify( m, status )
             if( .not. ast_isaunitmap( m, status ) ) then
@@ -403,22 +403,22 @@ c      call ast_listissued( 'teststc' )
 
          call ast_getregionbounds( r, lbnd, ubnd, status )
 
-         if( abs( lbnd(1)+1.2120342E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( lbnd(1)+1.2120342E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 40a' )
-         if( abs( ubnd(1)-1.2120342E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( ubnd(1)-1.2120342E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 40b' )
-         if( abs( lbnd(2)+1.2120342E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( lbnd(2)+1.2120342E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 40c' )
-         if( abs( ubnd(2)-1.2120342E-06 ) .gt. 0.0001E-6 ) 
+         if( abs( ubnd(2)-1.2120342E-06 ) .gt. 0.0001E-6 )
      :       call stopit( status, 'Error 40d' )
 
-         if( abs( 86400.0D0*(ubnd(3)-lbnd(3))-1.6D-5 ) .gt. 1.0E-10 ) 
+         if( abs( 86400.0D0*(ubnd(3)-lbnd(3))-1.6D-5 ) .gt. 1.0E-10 )
      :       call stopit( status, 'Error 40e' )
-         if( abs( 0.5*(ubnd(3)+lbnd(3)) ) .gt. 1.0E-10 ) 
+         if( abs( 0.5*(ubnd(3)+lbnd(3)) ) .gt. 1.0E-10 )
      :       call stopit( status, 'Error 40f' )
-         if( abs( lbnd(4)-5.05 ) .gt. 0.00001 ) 
+         if( abs( lbnd(4)-5.05 ) .gt. 0.00001 )
      :       call stopit( status, 'Error 40g' )
-         if( abs( ubnd(4)-5.07 ) .gt. 0.00001 ) 
+         if( abs( ubnd(4)-5.07 ) .gt. 0.00001 )
      :       call stopit( status, 'Error 40h' )
 
       end if
@@ -429,11 +429,11 @@ c      call ast_listissued( 'teststc' )
          call stopit( status, 'Error 42' )
       else if( ast_geti( r, 'naxes', status ) .ne. 4 ) then
          call stopit( status, 'Error 43' )
-      else 
-         fs = ast_convert( obj, r, ' ', status )              
+      else
+         fs = ast_convert( obj, r, ' ', status )
          if( fs .eq. AST__NULL ) then
             call stopit( status, 'Error 44' )
-         else 
+         else
             m = ast_getMapping( fs, AST__BASE, AST__CURRENT, status )
             m = ast_simplify( m, status )
             if( .not. ast_isaunitmap( m, status ) ) then
@@ -443,21 +443,21 @@ c      call ast_listissued( 'teststc' )
 
          call ast_getregionbounds( r, lbnd, ubnd, status )
 
-         if( abs( lbnd(1)+0.00242406841 ) .gt. 0.01E-6 ) 
+         if( abs( lbnd(1)+0.00242406841 ) .gt. 0.01E-6 )
      :       call stopit( status, 'Error 46a' )
-         if( abs( ubnd(1)-0.00242406841 ) .gt. 0.01E-6 ) 
+         if( abs( ubnd(1)-0.00242406841 ) .gt. 0.01E-6 )
      :       call stopit( status, 'Error 46b' )
-         if( abs( lbnd(2)+0.00242406841 ) .gt. 0.01E-6 ) 
+         if( abs( lbnd(2)+0.00242406841 ) .gt. 0.01E-6 )
      :       call stopit( status, 'Error 46c' )
-         if( abs( ubnd(2)-0.00242406841 ) .gt. 0.01E-6 ) 
+         if( abs( ubnd(2)-0.00242406841 ) .gt. 0.01E-6 )
      :       call stopit( status, 'Error 46d' )
-         if( abs( 86400.0D0*(ubnd(3)-lbnd(3))- 1000.0 ) .gt. 1.0E-10 ) 
+         if( abs( 86400.0D0*(ubnd(3)-lbnd(3))- 1000.0 ) .gt. 1.0E-10 )
      :       call stopit( status, 'Error 46e' )
-         if( abs( 0.5*(ubnd(3)+lbnd(3)) ) .gt. 1.0E-10 ) 
+         if( abs( 0.5*(ubnd(3)+lbnd(3)) ) .gt. 1.0E-10 )
      :       call stopit( status, 'Error 46f' )
-         if( abs( lbnd(4)-4.06 ) .gt. 0.001 ) 
+         if( abs( lbnd(4)-4.06 ) .gt. 0.001 )
      :       call stopit( status, 'Error 46g' )
-         if( abs( ubnd(4)-6.06 ) .gt. 0.001 ) 
+         if( abs( ubnd(4)-6.06 ) .gt. 0.001 )
      :       call stopit( status, 'Error 46h' )
 
       end if
@@ -490,11 +490,11 @@ c      call ast_listissued( 'teststc' )
          call stopit( status, 'Error 27b' )
       else if( ast_geti( r, 'naxes', status ) .ne. 4 ) then
          call stopit( status, 'Error 28b' )
-      else 
-         fs = ast_convert( obj2, r, ' ', status )              
+      else
+         fs = ast_convert( obj2, r, ' ', status )
          if( fs .eq. AST__NULL ) then
             call stopit( status, 'Error 29b' )
-         else 
+         else
             m = ast_getMapping( fs, AST__BASE, AST__CURRENT, status )
             m = ast_simplify( m, status )
             if( .not. ast_isaunitmap( m, status ) ) then
@@ -504,27 +504,27 @@ c      call ast_listissued( 'teststc' )
 
          call ast_getregionbounds( r, lbnd, ubnd, status )
 
-         if( abs( lbnd(1)-1.68139639 ) .gt. 1.0E-7 ) 
+         if( abs( lbnd(1)-1.68139639 ) .gt. 1.0E-7 )
      :       call stopit( status, 'Error 31ab' )
-         if( abs( ubnd(1)-1.68140922 ) .gt. 1.0E-7 ) 
+         if( abs( ubnd(1)-1.68140922 ) .gt. 1.0E-7 )
      :       call stopit( status, 'Error 31bb' )
-         if( abs( lbnd(2)+1.05049161 ) .gt. 1.0E-7 ) 
+         if( abs( lbnd(2)+1.05049161 ) .gt. 1.0E-7 )
      :       call stopit( status, 'Error 31cb' )
-         if( abs( ubnd(2)+1.05048523 ) .gt. 1.0E-7 ) 
+         if( abs( ubnd(2)+1.05048523 ) .gt. 1.0E-7 )
      :       call stopit( status, 'Error 31db' )
-         if( abs( 0.5*86400.0D0*(ubnd(3)-lbnd(3))- 5.0D-5) .gt. 1.0E-10) 
+         if( abs( 0.5*86400.0D0*(ubnd(3)-lbnd(3))- 5.0D-5) .gt. 1.0E-10)
      :       call stopit( status, 'Error 31eb' )
-         if( abs( 0.5*86400.0D0*(ubnd(3)+lbnd(3))) .gt. 1.0E-10 ) 
+         if( abs( 0.5*86400.0D0*(ubnd(3)+lbnd(3))) .gt. 1.0E-10 )
      :       call stopit( status, 'Error 31fb' )
-         if( abs( lbnd(4)-5.01 ) .gt. 0.000001 ) 
+         if( abs( lbnd(4)-5.01 ) .gt. 0.000001 )
      :       call stopit( status, 'Error 31gb' )
-         if( abs( ubnd(4)-5.11 ) .gt. 0.000001 ) 
+         if( abs( ubnd(4)-5.11 ) .gt. 0.000001 )
      :       call stopit( status, 'Error 31hb' )
 
       end if
 
 
-      if( ast_mapget1C( km, AST__STCNAME, 6, nval, cvals, status )) 
+      if( ast_mapget1C( km, AST__STCNAME, 6, nval, cvals, status ))
      :    call stopit( status, 'Error 32b' )
 
 
@@ -533,28 +533,28 @@ c      call ast_listissued( 'teststc' )
       unc = ast_getunc( obj, .true., status )
 
       if( unc .eq. AST__NULL ) call stopit( status, 'Error 9' )
-      if( ast_getunc( unc, .false., status ) .ne. AST__NULL ) 
+      if( ast_getunc( unc, .false., status ) .ne. AST__NULL )
      :               call stopit( status, 'Error 9a' )
 
       call ast_getregionbounds( unc, lbnd, ubnd, status )
 
 
-      if( abs( lbnd(1) + 2.42406841E-06 ) .gt. 0.0000001E-06 ) 
+      if( abs( lbnd(1) + 2.42406841E-06 ) .gt. 0.0000001E-06 )
      :      call stopit( status, 'Error 10' )
 
-      if( abs( lbnd(2) + 2.42406841E-06 ) .gt. 0.0000001E-06 ) 
+      if( abs( lbnd(2) + 2.42406841E-06 ) .gt. 0.0000001E-06 )
      :      call stopit( status, 'Error 11' )
-      if( abs( 86400.0D0*lbnd(3) + 5.0D-5 ) .gt. 0.1E-10 ) 
+      if( abs( 86400.0D0*lbnd(3) + 5.0D-5 ) .gt. 0.1E-10 )
      :      call stopit( status, 'Error 12' )
-      if( abs( lbnd(4) - 0.07 ) .gt. 0.0001 ) 
+      if( abs( lbnd(4) - 0.07 ) .gt. 0.0001 )
      :      call stopit( status, 'Error 13' )
-      if( abs( ubnd(1) - 2.42406841E-06 ) .gt. 0.0000001E-06 ) 
+      if( abs( ubnd(1) - 2.42406841E-06 ) .gt. 0.0000001E-06 )
      :      call stopit( status, 'Error 14' )
-      if( abs( ubnd(2) - 2.42406841E-06 ) .gt. 0.0000001E-06 ) 
+      if( abs( ubnd(2) - 2.42406841E-06 ) .gt. 0.0000001E-06 )
      :      call stopit( status, 'Error 15' )
-      if( abs( 86400.0D0*ubnd(3) - 5.0D-5 ) .gt. 0.1E-10 ) 
+      if( abs( 86400.0D0*ubnd(3) - 5.0D-5 ) .gt. 0.1E-10 )
      :      call stopit( status, 'Error 16' )
-      if( abs( ubnd(4) - 0.17 ) .gt. 0.0001 ) 
+      if( abs( ubnd(4) - 0.17 ) .gt. 0.0001 )
      :      call stopit( status, 'Error 17' )
 
 
@@ -567,7 +567,7 @@ c         if( status .ne. AST__NOVAL ) then
 c            write(*,*) 'status is ',status,': should be ',AST__NOVAL
 c            if( status .ne. sai__ok ) call err_annul( status )
 c            call stopit( status, 'Error 18' )
-c         else 
+c         else
 c            call err_annul( status )
 c         end if
 c         call err_end( status )
@@ -582,7 +582,7 @@ c         if( status .ne. AST__NOVAL ) then
 c            write(*,*) 'status is ',status,': should be ',AST__NOVAL
 c            if( status .ne. sai__ok ) call err_annul( status )
 c            call stopit( status, 'Error 19' )
-c         else 
+c         else
 c            call err_annul( status )
 c         end if
 c         call err_end( status )
@@ -662,7 +662,7 @@ c      end if
       else if( ast_mapsize( warns, status ) .ne. 5 ) then
          call stopit( status, 'Error 3' )
 
-      else if( .not. ast_mapget0c( warns, 'Warning_1', value, l, 
+      else if( .not. ast_mapget0c( warns, 'Warning_1', value, l,
      :                             status ) ) then
          call stopit( status, 'Error 4' )
 
@@ -670,7 +670,7 @@ c      end if
      :         'reading a Position2D element: contains more than '//
      :         'one <Size> element. AST can only use the first' ) then
          call stopit( status, 'Error 5' )
-      end if 
+      end if
 
 
       call ast_end( status )
@@ -705,10 +705,10 @@ c      end if
       obj = ast_simplify( obj, status )
       call ast_negate( obj, status )
       obj = ast_simplify( obj, status )
-      call checkdump( obj, 'checkdump 1', status ) 
+      call checkdump( obj, 'checkdump 1', status )
 
 *  Check it is a StcCatalogEntryLocation
-      if( .not. ast_isastcCatalogEntryLocation( obj, status ) ) 
+      if( .not. ast_isastcCatalogEntryLocation( obj, status ) )
      :                      call stopit( status, 'Error 1' )
 
 *  Check it is an Interval.
@@ -721,23 +721,23 @@ c      end if
      :           call stopit( status, 'Error 1b' )
 
 * Other tests
-      if( ast_geti( obj, 'naxes', status ) .ne. 5 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 5 )
      :    call stopit( status, 'Error 1ab' )
 
-      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 ) 
+      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 )
      :    call stopit( status, 'Error 1b' )
 
-      if( ast_getc( obj, 'ident', status ) .ne. 'RA6-18hDec20-70deg' ) 
+      if( ast_getc( obj, 'ident', status ) .ne. 'RA6-18hDec20-70deg' )
      :    call stopit( status, 'Error 1c' )
 
-      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' ) 
+      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' )
      :    call stopit( status, 'Error 2' )
 
-      if( ast_getc( obj, 'title(3)', status ) .ne. 
-     :              'Julian Date [TT] offset from 1968-05-23 12:00:00' ) 
+      if( ast_getc( obj, 'title(3)', status ) .ne.
+     :              'Julian Date [TT] offset from 1968-05-23 12:00:00' )
      :    call stopit( status, 'Error 2a' )
 
-      if( ast_getc( obj, 'label(3)', status ) .ne. 
+      if( ast_getc( obj, 'label(3)', status ) .ne.
      :    'Julian Date offset from 1968-05-23 12:00:00' ) THEN
          call stopit( status, 'Error 2b' )
       endif
@@ -757,13 +757,13 @@ c      end if
       if( ast_getc( obj, 'title(2)', status ) .ne. 'PosEq' )
      :    call stopit( status, 'Error 3d' )
 
-      if( ast_getd( obj, 'Equinox', status ) .ne. 1950D0 ) 
+      if( ast_getd( obj, 'Equinox', status ) .ne. 1950D0 )
      :    call stopit( status, 'Error 3d' )
 
       if( ast_getc( obj, 'domain(2)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 4' )
 
-      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' ) 
+      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' )
      :    call stopit( status, 'Error 5' )
 
       if( ast_getc( obj, 'system(4)', status ) .ne. 'WAVE' )
@@ -772,13 +772,13 @@ c      end if
       if( ast_getc( obj, 'stdofrest', status ) .ne. 'Topocentric' )
      :    call stopit( status, 'Error 5b' )
 
-      if( ast_test( obj, 'title(4)', status ) ) 
+      if( ast_test( obj, 'title(4)', status ) )
      :    call stopit( status, 'Error 5c' )
 
-      if( ast_geti( obj, 'naxes', status ) .ne. 5 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 5 )
      :    call stopit( status, 'Error 6' )
 
-      if( ast_getc( obj, 'domain(5)', status ) .ne. 'REDSHIFT' ) 
+      if( ast_getc( obj, 'domain(5)', status ) .ne. 'REDSHIFT' )
      :    call stopit( status, 'Error 6a' )
 
       if( ast_getc( obj, 'system(5)', status ) .ne. 'VOPT' )
@@ -872,21 +872,21 @@ c      end if
          if( i .eq. 1 .or. i .eq. 7 .or. i .eq. 12 ) then     ! inside points
             do j = 1, 5
                if( out(i,j) .ne. in(i,j) ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 7' )
                   end if
                end if
-            end do           
+            end do
          else                                  ! outside points
             do j = 1, 5
                if( out(i,j) .ne. AST__BAD ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 8' )
                   end if
                end if
-            end do           
+            end do
          end if
       end do
 
@@ -957,10 +957,10 @@ c      end if
       obj = ast_simplify( obj, status )
       call ast_negate( obj, status )
       obj = ast_simplify( obj, status )
-      call checkdump( obj, 'checkdump 1', status ) 
+      call checkdump( obj, 'checkdump 1', status )
 
 *  Check it is a StcCatalogEntryLocation
-      if( .not. ast_isastcCatalogEntryLocation( obj, status ) ) 
+      if( .not. ast_isastcCatalogEntryLocation( obj, status ) )
      :                      call stopit( status, 'Error 1' )
 
 *  Check it is an Interval.
@@ -976,7 +976,7 @@ c      end if
      :           call stopit( status, 'Error 1b' )
 
 *  Check it has 5 axes.
-      if( ast_geti( obj, 'naxes', status ) .ne. 5 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 5 )
      :    call stopit( status, 'Error 1ab' )
 
 *  Check the rest frequency for axis 5 (redshift) is 5000 Angstrom
@@ -996,13 +996,13 @@ c      end if
      :    0.00001D0 ) call stopit( status, 'Error B5' )
 
 *  Other tests
-      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 ) 
+      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 )
      :    call stopit( status, 'Error 1b' )
 
-      if( ast_getc( obj, 'ident', status ) .ne. 'RA6-18hDec20-70deg' ) 
+      if( ast_getc( obj, 'ident', status ) .ne. 'RA6-18hDec20-70deg' )
      :    call stopit( status, 'Error 1c' )
 
-      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' ) 
+      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' )
      :    call stopit( status, 'Error 2' )
 
       if( ast_getc( obj, 'label(3)', status ) .ne.
@@ -1025,13 +1025,13 @@ c      end if
       if( ast_getc( obj, 'title(2)', status ) .ne. 'PosEq' )
      :    call stopit( status, 'Error 3d' )
 
-      if( ast_getd( obj, 'Equinox', status ) .ne. 1950D0 ) 
+      if( ast_getd( obj, 'Equinox', status ) .ne. 1950D0 )
      :    call stopit( status, 'Error 3d' )
 
       if( ast_getc( obj, 'domain(2)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 4' )
 
-      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' ) 
+      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' )
      :    call stopit( status, 'Error 5' )
 
       if( ast_getc( obj, 'system(4)', status ) .ne. 'WAVE' )
@@ -1040,13 +1040,13 @@ c      end if
       if( ast_getc( obj, 'stdofrest', status ) .ne. 'Topocentric' )
      :    call stopit( status, 'Error 5b' )
 
-      if( ast_test( obj, 'title(4)', status ) ) 
+      if( ast_test( obj, 'title(4)', status ) )
      :    call stopit( status, 'Error 5c' )
 
-      if( ast_geti( obj, 'naxes', status ) .ne. 5 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 5 )
      :    call stopit( status, 'Error 6' )
 
-      if( ast_getc( obj, 'domain(5)', status ) .ne. 'REDSHIFT' ) 
+      if( ast_getc( obj, 'domain(5)', status ) .ne. 'REDSHIFT' )
      :    call stopit( status, 'Error 6a' )
 
       if( ast_getc( obj, 'system(5)', status ) .ne. 'VOPT' )
@@ -1140,21 +1140,21 @@ c      end if
          if( i .eq. 1 .or. i .eq. 7 .or. i .eq. 12 ) then     ! inside points
             do j = 1, 5
                if( out(i,j) .ne. in(i,j) ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 7' )
                   end if
                end if
-            end do           
+            end do
          else                                  ! outside points
             do j = 1, 5
                if( out(i,j) .ne. AST__BAD ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 8' )
                   end if
                end if
-            end do           
+            end do
          end if
       end do
 
@@ -1225,11 +1225,11 @@ c      end if
       obj = ast_simplify( obj, status )
       call ast_negate( obj, status )
       obj = ast_simplify( obj, status )
-      call checkdump( obj, 'checkdump 1', status ) 
+      call checkdump( obj, 'checkdump 1', status )
 
 
 *  Check it is a STCSearchLocation
-      if( .not. ast_isastcsearchlocation( obj, status ) ) 
+      if( .not. ast_isastcsearchlocation( obj, status ) )
      :                      call stopit( status, 'Error 1' )
 
 *  Check it is a Prism.
@@ -1242,19 +1242,19 @@ c      end if
      :           call stopit( status, 'Error 1b' )
 
 * Other tests
-      if( ast_geti( obj, 'naxes', status ) .ne. 4 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 4 )
      :    call stopit( status, 'Error 1ab' )
 
-      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 ) 
+      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 )
      :    call stopit( status, 'Error 1b' )
 
-      if( ast_getc( obj, 'ident', status ) .ne. 'M81' ) 
+      if( ast_getc( obj, 'ident', status ) .ne. 'M81' )
      :    call stopit( status, 'Error 1c' )
 
-      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' ) 
+      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' )
      :    call stopit( status, 'Error 2' )
 
-      if( ast_getc( obj, 'label(3)', status ) .ne. 
+      if( ast_getc( obj, 'label(3)', status ) .ne.
      :    'Modified Julian Date offset from 1900-01-01' ) THEN
          call stopit( status, 'Error 2b' )
       end if
@@ -1274,13 +1274,13 @@ c      end if
       if( ast_getc( obj, 'title(2)', status ) .ne. 'Equatorial' )
      :    call stopit( status, 'Error 3d' )
 
-      if( ast_test( obj, 'Equinox', status ) ) 
+      if( ast_test( obj, 'Equinox', status ) )
      :    call stopit( status, 'Error 3d2' )
 
       if( ast_getc( obj, 'domain(2)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 4' )
 
-      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' ) 
+      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' )
      :    call stopit( status, 'Error 5' )
 
       if( ast_getc( obj, 'system(4)', status ) .ne. 'WAVE' )
@@ -1289,10 +1289,10 @@ c      end if
       if( ast_getc( obj, 'stdofrest', status ) .ne. 'Barycentric' )
      :    call stopit( status, 'Error 5b' )
 
-      if( ast_getc( obj, 'title(4)', status ) .ne. 'Wavelength' ) 
+      if( ast_getc( obj, 'title(4)', status ) .ne. 'Wavelength' )
      :    call stopit( status, 'Error 5c' )
 
-      if( ast_geti( obj, 'naxes', status ) .ne. 4 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 4 )
      :    call stopit( status, 'Error 6' )
 
       if( ast_getc( obj, 'unit(4)', status ) .ne. 'Angstrom' )
@@ -1301,7 +1301,7 @@ c      end if
       frm = ast_getregionframe( obj, status )
       if( ast_getc( frm, 'Ident', status ) .ne. 'ICRS-TT-BARY' )
      :    call stopit( status, 'Error 7' )
-            
+
 
 
 *  Tests on reference values
@@ -1408,7 +1408,7 @@ c      end if
          if( i .eq. 1 .or. i .eq. 7 ) then     ! inside points
             do j = 1, 4
                if( out(i,j) .ne. in(i,j) ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 13c' )
                   end if
@@ -1417,7 +1417,7 @@ c      end if
          else                                  ! outside points
             do j = 1, 4
                if( out(i,j) .ne. AST__BAD ) then
-                  if( status .eq. sai__ok ) then 
+                  if( status .eq. sai__ok ) then
                      write(*,*) i,j,out(i,j),in(i,j)
                      call stopit( status, 'Error 14c' )
                   end if
@@ -1455,7 +1455,7 @@ c      end if
 
 *  Use a new XmlChan to read an object from file 1,and simplify it.
       call xmlread( 1, obj, ' ', status )
-      call checkdump( obj, 'checkdump 2', status ) 
+      call checkdump( obj, 'checkdump 2', status )
       obj = ast_simplify( obj, status )
 
 *  Test simplify by negating and simplifying twice.
@@ -1463,10 +1463,10 @@ c      end if
       obj = ast_simplify( obj, status )
       call ast_negate( obj, status )
       obj = ast_simplify( obj, status )
-      call checkdump( obj, 'checkdump 1', status ) 
+      call checkdump( obj, 'checkdump 1', status )
 
 *  Check it is a STCObsDataLocation
-      if( .not. ast_isastcobsdatalocation( obj, status ) ) 
+      if( .not. ast_isastcobsdatalocation( obj, status ) )
      :                      call stopit( status, 'Error 1' )
 
 *  Check it contains a Prism.
@@ -1475,16 +1475,16 @@ c      end if
      :                      call stopit( status, 'Error 1a' )
 
 * Other tests
-      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 ) 
+      if( ast_getd( obj, 'fillfactor', status ) .ne. 1.0D0 )
      :    call stopit( status, 'Error 1b' )
 
-      if( ast_getc( obj, 'ident', status ) .ne. 'M81' ) 
+      if( ast_getc( obj, 'ident', status ) .ne. 'M81' )
      :    call stopit( status, 'Error 1c' )
 
-      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' ) 
+      if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' )
      :    call stopit( status, 'Error 2' )
 
-      if( ast_getc( obj, 'label(3)', status ) .ne. 
+      if( ast_getc( obj, 'label(3)', status ) .ne.
      :    'Modified Julian Date offset from 2004-07-15 08:23:56' ) then
          call stopit( status, 'Error 2b' )
       end if
@@ -1501,13 +1501,13 @@ c      end if
       if( ast_getc( obj, 'label(2)', status ) .ne. 'Declination' )
      :    call stopit( status, 'Error 3c' )
 
-      if( ast_getc( obj, 'title(2)', status ) .ne. 'Equatorial' ) 
+      if( ast_getc( obj, 'title(2)', status ) .ne. 'Equatorial' )
      :    call stopit( status, 'Error 3d' )
 
       if( ast_getc( obj, 'domain(2)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 4' )
 
-      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' ) 
+      if( ast_getc( obj, 'domain(4)', status ) .ne. 'SPECTRUM' )
      :    call stopit( status, 'Error 5' )
 
       if( ast_getc( obj, 'system(4)', status ) .ne. 'WAVE' )
@@ -1516,13 +1516,13 @@ c      end if
       if( ast_getc( obj, 'stdofrest', status ) .ne. 'Topocentric' )
      :    call stopit( status, 'Error 5b' )
 
-      if( ast_getc( obj, 'title(4)', status ) .ne. 
+      if( ast_getc( obj, 'title(4)', status ) .ne.
      :    'Wavelength' ) call stopit( status, 'Error 5c' )
 
       if( ast_getc( obj, 'unit(4)', status ) .ne. 'Angstrom' )
      :    call stopit( status, 'Error 5d' )
 
-      if( ast_geti( obj, 'naxes', status ) .ne. 4 ) 
+      if( ast_geti( obj, 'naxes', status ) .ne. 4 )
      :    call stopit( status, 'Error 6' )
 
       call ast_getregionbounds( obj, lbnd, ubnd, status )
@@ -1534,25 +1534,25 @@ c      end if
       lbnd(3) = 0.5*(lbnd(3) + ubnd(3))
       lbnd(4) = 0.5*(lbnd(4) + ubnd(4))
 
-      if( abs( lbnd(1) - 2.59858948190075 ) .gt. 1E-06 ) 
+      if( abs( lbnd(1) - 2.59858948190075 ) .gt. 1E-06 )
      :      call stopit( status, 'Error 10' )
-      if( abs( lbnd(2) - 1.20541670934471 ) .gt. 1E-06 ) 
+      if( abs( lbnd(2) - 1.20541670934471 ) .gt. 1E-06 )
      :      call stopit( status, 'Error 11' )
-      if( abs( lbnd(3) ) .gt. 1E-5 ) 
+      if( abs( lbnd(3) ) .gt. 1E-5 )
      :      call stopit( status, 'Error 12' )
-      if( abs( lbnd(4) - 4600 ) .gt. 0.0001 ) 
+      if( abs( lbnd(4) - 4600 ) .gt. 0.0001 )
      :      call stopit( status, 'Error 13' )
-      if( abs( ubnd(1) - 2.61080678666471 ) .gt. 1E-06 ) 
+      if( abs( ubnd(1) - 2.61080678666471 ) .gt. 1E-06 )
      :      call stopit( status, 'Error 14' )
-      if( abs( ubnd(2) - 1.2097800324747 ) .gt. 1E-06 ) 
+      if( abs( ubnd(2) - 1.2097800324747 ) .gt. 1E-06 )
      :      call stopit( status, 'Error 15' )
-      if( abs( ubnd(3) - 380.0D0 ) .gt. 1E-5 ) 
+      if( abs( ubnd(3) - 380.0D0 ) .gt. 1E-5 )
      :      call stopit( status, 'Error 16' )
-      if( abs( ubnd(4) - 4800 ) .gt. 0.0001 ) 
+      if( abs( ubnd(4) - 4800 ) .gt. 0.0001 )
      :      call stopit( status, 'Error 17' )
-      if( ast_getc( obj, 'ObsLon', status ) .ne. 'W111:35:39.84' ) 
+      if( ast_getc( obj, 'ObsLon', status ) .ne. 'W111:35:39.84' )
      :      call stopit( status, 'Error 18' )
-      if( ast_getc( obj, 'ObsLat', status ) .ne. 'N31:57:30.96' ) 
+      if( ast_getc( obj, 'ObsLat', status ) .ne. 'N31:57:30.96' )
      :      call stopit( status, 'Error 19' )
 
       unc = ast_getunc( obj, .true., status )
@@ -1565,22 +1565,22 @@ c      end if
       lbnd(3) = 0.5*(lbnd(3) + ubnd(3))
       lbnd(4) = 0.5*(lbnd(4) + ubnd(4))
 
-      if( abs( lbnd(1) - 2.59858948190075D0) .gt. 1E-05 ) 
+      if( abs( lbnd(1) - 2.59858948190075D0) .gt. 1E-05 )
      :      call stopit( status, 'Error 21' )
-      if( abs( lbnd(2) - 1.20541670934471D0) .gt. 1E-05 ) 
+      if( abs( lbnd(2) - 1.20541670934471D0) .gt. 1E-05 )
      :      call stopit( status, 'Error 22' )
-      if( abs( lbnd(3) ) .gt. 1.0D-05 ) 
+      if( abs( lbnd(3) ) .gt. 1.0D-05 )
      :      call stopit( status, 'Error 23' )
-      if( abs( lbnd(4) - 4600.0D0) .gt. 0.0001 ) 
+      if( abs( lbnd(4) - 4600.0D0) .gt. 0.0001 )
      :      call stopit( status, 'Error 24' )
-      if( abs( ubnd(1) - 2.59859209989462D0) .gt. 1E-05 ) 
+      if( abs( ubnd(1) - 2.59859209989462D0) .gt. 1E-05 )
      :      call stopit( status, 'Error 25' )
 
-      if( abs( ubnd(2) - 1.20541932733859D0) .gt. 1E-05 ) 
+      if( abs( ubnd(2) - 1.20541932733859D0) .gt. 1E-05 )
      :      call stopit( status, 'Error 26' )
-      if( abs( ubnd(3) - 0.3803143212621760D-03 ) .gt. 1E-05 ) 
+      if( abs( ubnd(3) - 0.3803143212621760D-03 ) .gt. 1E-05 )
      :      call stopit( status, 'Error 27' )
-      if( abs( ubnd(4) - 4600.0002D0) .gt. 0.000001 ) 
+      if( abs( ubnd(4) - 4600.0002D0) .gt. 0.000001 )
      :      call stopit( status, 'Error 28' )
 
       if( status .ne. sai__ok ) write(*,*) 'teststc: example 5 '//
@@ -1630,7 +1630,7 @@ c      end if
       integer obj, ifil, status, ch
       character opts*(*)
 
-      if( status .ne. sai__ok ) return 
+      if( status .ne. sai__ok ) return
 
       ifile = ifil
       iline = 1
@@ -1651,7 +1651,7 @@ c      end if
 
 
 *
-*  Reads line "iline" from internal file "ifile" and returns it to AST using 
+*  Reads line "iline" from internal file "ifile" and returns it to AST using
 *  the AST_PUTLINE routine. Then increments "iline" ready for next time.
 *
       subroutine xmlSource( status )
@@ -1669,7 +1669,7 @@ c      end if
          call ast_putline( ' ', -1, status )
       end if
 
-      end        
+      end
 
 *
 *  Append a line obtained using ast_getline function to the end of the
@@ -1683,7 +1683,7 @@ c      end if
       integer status, l
       character line*(linelen)
 
-      call ast_getline( line, l, status ) 
+      call ast_getline( line, l, status )
       if( l .gt. 0 ) then
 
          if( filelen( ifile ) .ge. mxline ) then
@@ -1701,7 +1701,7 @@ c      end if
 
       end if
 
-      end      
+      end
 
 
       subroutine puteg( flnam, ifl, status )
@@ -1712,15 +1712,15 @@ c      end if
       include 'teststc_com'
 
       integer status, ifl
-      character flnam*(*)      
+      character flnam*(*)
 
-      if( status .ne. sai__ok ) return 
+      if( status .ne. sai__ok ) return
 
       open( file=flnam, status='old', unit=10 )
 
       iline = 1
  10   continue
-      if( iline .gt. mxline ) call stopit( status, 
+      if( iline .gt. mxline ) call stopit( status,
      :                                     'mxline exceeded in puteg' )
       read( 10, '(A)', end=20 ) files( ifl, iline )
 
@@ -1729,7 +1729,7 @@ c      end if
       end if
 
       iline = iline + 1
-      go to 10  
+      go to 10
 
  20   continue
       close( 10 )
@@ -1751,7 +1751,7 @@ c      end if
       external mysource, mysink
       character buf*190000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -1776,14 +1776,14 @@ c      end if
          call stopit( status, 'Cannot read object from channel' )
       end if
 
-*  Check that it is a Region and its boundary is identical to the supplied 
+*  Check that it is a Region and its boundary is identical to the supplied
 *  Region.
       overlap = ast_overlap( obj, result, status )
       if( overlap .ne. 5 ) then
          write(*,*) 'obj result Overlap: ', overlap
          write(*,*) 'obj self-Overlap: ', ast_overlap( obj, obj,
      :                                                 status )
-         write(*,*) 'result self-Overlap: ', ast_overlap( result, 
+         write(*,*) 'result self-Overlap: ', ast_overlap( result,
      :                                                 result, status )
          call ast_Show( obj, status )
          call ast_Show( result, status )
@@ -1791,10 +1791,10 @@ c      end if
          call stopit( status, 'Object has changed' )
       end if
 
-*  Return the new Region pointer in place of the old. 
-      obj = result      
+*  Return the new Region pointer in place of the old.
+      obj = result
 
-      end  
+      end
 
       subroutine mysource( status )
       implicit none
@@ -1803,7 +1803,7 @@ c      end if
       integer status, next, end, ll
       character buf*190000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -1826,7 +1826,7 @@ c      end if
       character buf*190000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -1845,7 +1845,7 @@ c      end if
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l,' greater than ',ll
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif

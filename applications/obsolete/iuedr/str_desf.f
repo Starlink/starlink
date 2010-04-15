@@ -31,27 +31,27 @@
 
 *   Import:
       REAL*8 FVALUE         ! floating point number to be formatted
- 
+
 *   Export:
       INTEGER CSIGN       ! number of sign characters
       INTEGER SIGDEC      ! format decimal places
       INTEGER EXPON       ! base 10 exponent
- 
+
 *   Local variables:
       BYTE STR(256)       ! temporary string to hold number
- 
+
       INTEGER I           ! loop index
       INTEGER STATUS      ! status
 
       STATUS = 0
 *   Code value
       CALL gen_FTOE(FVALUE, 12, 5, 256, STR)
- 
+
 *   Extract exponent
       CALL gen_STOI(STR(10), EXPON, STATUS)
 
       IF (STATUS.NE.0) EXPON = 0
- 
+
 *   Remove trailing zeros from float part
       I = 8
 
@@ -67,7 +67,7 @@
 
  200  CONTINUE
       SIGDEC = I - 3
- 
+
 *   Sign character count
       IF (STR(1).EQ.43) THEN
 

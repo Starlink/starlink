@@ -31,7 +31,7 @@
 *     If NDFS is false then it is assumed that the names accessed
 *     through the ADAM parameters PARNAM using GRP are just the exact
 *     names of the files.  All files are then opened using FIO_OPEN to
-*     test for their existence. 
+*     test for their existence.
 
 *  Arguments:
 *     NDFS = LOGICAL (Given)
@@ -51,7 +51,7 @@
 *     SKIPMT = LOGICAL (Given)
 *        If true, then position list files which exist but contain no
 *        positions will be treated in the same way as non-existent
-*        position list files (added to the NLGR group).  If false, 
+*        position list files (added to the NLGR group).  If false,
 *        they will be treated the same as position list files which
 *        do contain positions.
 *     NOPEN = INTEGER (Returned)
@@ -63,9 +63,9 @@
 *        An NDG group identifier for the names of the NDFs from which
 *        the filenames were obtained.
 *     NNOLIS = INTEGER (Returned)
-*        The size of NLGR. 
+*        The size of NLGR.
 *     NLGR = INTEGER (Returned)
-*        An NDG group identifier for the names of lists/NDFs which were 
+*        An NDG group identifier for the names of lists/NDFs which were
 *        specified by the user, but have no position list file or,
 *        if SKIPMT is true, have empty lists.
 *     STATUS = INTEGER (Given and Returned)
@@ -73,7 +73,7 @@
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
-*     before exit. 
+*     before exit.
 *     -  The calling routine must annul the group identifiers before exit.
 
 *  Copyright:
@@ -132,7 +132,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -197,7 +197,7 @@
      :                    STATUS )
          CALL MSG_SETI( 'NOPEN', NRET )
          CALL MSG_SETC( 'PARNAM', PARNAM )
-         IF ( NRET .EQ. 1 ) THEN 
+         IF ( NRET .EQ. 1 ) THEN
             CALL CCD1_MSG( ' ',
      :'  ^NOPEN name accessed using parameter %^PARNAM', STATUS )
          ELSE
@@ -228,7 +228,7 @@
 
 *  Get the NDF name and file name.
             CALL GRP_GET( NDF1GR, I, 1, NNAME, STATUS )
-            CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )  
+            CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )
             IF ( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Cannot locate the named extension item.  Add this name to the group
@@ -346,7 +346,7 @@
          CALL CCD1_GRDEL( FIO1GR, STATUS )
       END IF
 
-*  Ensure that we have an acceptable number of lists.  We may have 
+*  Ensure that we have an acceptable number of lists.  We may have
 *  arrived here without that if an acceptable number of NDFs were
 *  supplied but they did not all have associated lists.
       IF ( NOPEN .LT. MINOPN ) THEN

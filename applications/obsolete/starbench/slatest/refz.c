@@ -7,7 +7,7 @@
 void sbmrefz(double qfoo,double refa,double refb,double*qbar
 ){double qbaz,Q0,qfobar,q1,q2,qfoobar,Q3,q4,qfOBAz,qfoobaz;
 const double QQUUX=0.55445,Q5=-0.01133,QFRED=0.00202,qdog=
-0.28385,qcat=0.02390;const double QFISH=93.0;const double 
+0.28385,qcat=0.02390;const double QFISH=93.0;const double
 QgASp=83.0/DR2D;const double Q6=(QQUUX+Q5*7.0+QFRED*49.0)/(
 1.0+qdog*7.0+qcat*49.0);qbaz=gmin(qfoo,QgASp);Q0=qbaz;qfobar
 =sin(Q0);q1=cos(Q0);q2=qfobar/q1;qfoobar=q2*q2;Q3=q2*qfoobar

@@ -122,7 +122,7 @@ Cbegin
          else
             write ( textb(2), '(a1)' ) COL(2)
          endif
-         call gd_dobox ( DXLIM(1), DXLIM(2), textb(1), 
+         call gd_dobox ( DXLIM(1), DXLIM(2), textb(1),
      +                   DYLIM(1), DYLIM(2), textb(2), ' ', 0 )
       endif
       DONEAXIS = .true.
@@ -184,7 +184,7 @@ Cbegin
       loop = .true.							!Get and type posns
       do while ( loop )
          k = pgcurse ( xa, ya, ch )
-         if ( xa.ge.min(DXLIM(1),DXLIM(2)) .and. 
+         if ( xa.ge.min(DXLIM(1),DXLIM(2)) .and.
      +        xa.le.max(DXLIM(1),DXLIM(2)) ) then
             write ( text, '(1x,f7.3,2x,f7.3)' ) ya, xa
             if ( kopt.eq.2 ) then
@@ -211,7 +211,7 @@ Cbegin
                   write ( text(27:), '(''    No valid stars'')' )
                else
                   rname = ANAME(KSTART,jmin)
-                  write ( text(20:), '(a20,2x,f7.3,2x,f7.3)' ) 
+                  write ( text(20:), '(a20,2x,f7.3,2x,f7.3)' )
      +                  rname, ymin, xmin
                endif
             endif
@@ -274,7 +274,7 @@ Cbegin
       do while ( more )
 
          call get_job ( 'TYLINE', 'cursor:table:keyboard:return', 	!Get sort of line
-     +                            kopt, kdef, thelp, nthelp ) 
+     +                            kopt, kdef, thelp, nthelp )
          if ( ST_FAILED ) return
          kdef = kopt
 
@@ -460,14 +460,14 @@ Cbegin
          if ( doexit ) return
          call di_option_setup ( ktopt, 1, .true. )
          if ( ST_FAILED ) return
-         call choice_panel_sw			
+         call choice_panel_sw
       else
-         call get_job ( 'TYPE', 'cmd:twocol', k, 1, thelp1, nthelp1 )	!Get if HR or Two-colour 
+         call get_job ( 'TYPE', 'cmd:twocol', k, 1, thelp1, nthelp1 )	!Get if HR or Two-colour
          if ( ST_FAILED ) return
          KSTART = 1							! diagram
          if ( k.eq.1 ) KSTART = 2
          call di_colcode						!Get colour codes
-         call type_hchoice	
+         call type_hchoice
          call di_option_setup ( ktopt, 1, .true. )
          if ( ST_FAILED ) return
       endif
@@ -498,7 +498,7 @@ Cbegin
          if ( ktopt.eq.'setnumber' ) then				!Change set number
                            call pargi ( NTOTSET )
                            call printd ( '%d sets open so far' )
-                           if ( NSET.ne.0 ) call get1i ( 'SET', NSET, 
+                           if ( NSET.ne.0 ) call get1i ( 'SET', NSET,
      +                                             NSET, 1, NTOTSET )
                            if ( ST_FAILED ) return
                            endif
@@ -526,7 +526,7 @@ Cbegin
 
          if ( ktopt.eq.'nearest' ) call di_gcur ( 2 )			!Type positions of cursor and nearest star
 
-         if ( ktopt.eq.'panel' ) call choice_panel_sw			!Change panel/keyboard input choice 
+         if ( ktopt.eq.'panel' ) call choice_panel_sw			!Change panel/keyboard input choice
 
          if ( ktopt.eq.'plot_limits' ) call di_plims 			!Change plot limits
 
@@ -559,7 +559,7 @@ C   alan penny                        ral              1990-01-31
       integer        set_num		!i: Number of option set
       logical        koutside		!i: Are we outside the option loop?
 C--
-      integer j,k 
+      integer j,k
 
       integer opt_num
       parameter ( opt_num=20 )
@@ -591,7 +591,7 @@ C--
      + 'output from printer (this file only becomes available when',
      + 'the device is -closed-). ',
      + '[All plot options open a device, if it is closed.]'/
-     
+
       data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
@@ -609,8 +609,8 @@ C--
      + 'line', 'Put line onto graph.',
      + 'A solid line is drawn on the graph. Method choice (repeated):-',
      + '    1) Reading in a table of XY positions.       (-table-)',
-     + '    2) Typing in a series of XY positions.      (-keyboard-)', 
-     + '    3) Cursor input a series of XY positions. (-cursor-)', 
+     + '    2) Typing in a series of XY positions.      (-keyboard-)',
+     + '    3) Cursor input a series of XY positions. (-cursor-)',
      + '    4) End of this option.                         (-return-)',
      + '[2) and 3) - end by inputting a posn to the left of the axis.]'/
 
@@ -618,18 +618,18 @@ C--
      + 'cursor', 'Get XY positions from graph ',
      + 'The cursor is placed in the plot, and a mouse button pressed.',
      + 'The location of that position is typed out, and the user can',
-     + 'repeat for another position.', 
-     + ' ', 
+     + 'repeat for another position.',
+     + ' ',
      + 'Exit from this option by selecting a position to the left of',
      + 'the plot (but still within the window).'/
 
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'colour_eqn', 'Change colour equation applied to input colours',
-     + 'Each input -colour- (i.e. a single waveband) has a', 
+     + 'Each input -colour- (i.e. a single waveband) has a',
      + 'colour equation applied to it before plotting or storage.',
      + 'This asks you for the colour constant (default zero) in the ',
-     + 'equation to be applied to each colour. The Equation is:- ', 
-     + ' Used Colour = Input colour + Const * (col(3-4)) + Zero point', 
+     + 'equation to be applied to each colour. The Equation is:- ',
+     + ' Used Colour = Input colour + Const * (col(3-4)) + Zero point',
      + '[col(3-4) is the (input) colour in the plot in X direction.]'/
 
       data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
@@ -637,13 +637,13 @@ C--
      + 'The data already loaded are plotted as points on the graph.',
      + '(A plot device is opened if not open.)',
      + ' ', ' ', ' ', ' ' /
- 
+
       data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'dotnumber', 'Set whether numbers are plotted with points',
-     + ' ', 
+     + ' ',
      + 'Toggle between two states of plotting the data. The first ',
-     + 'is just plotting the points. The second additionally adds ', 
-     + 'the number of each point in the input table. ', 
+     + 'is just plotting the points. The second additionally adds ',
+     + 'the number of each point in the input table. ',
      + ' ', ' '/
 
       data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
@@ -657,7 +657,7 @@ C--
 
       data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'numgood', 'Number of good measures for plotting a star ',
-     + ' ', 
+     + ' ',
      + 'This sets the number of good measures a star must have',
      + 'before it can be plotted. These ranges apply to the present',
      + 'data set. You can also set them to apply to all sets',
@@ -684,43 +684,43 @@ C--
 
       data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'setnumber', 'Data set these setups apply to ',
-     + ' ', 
+     + ' ',
      + 'As you can input a number of data sets, you can set a ',
-     + 'different a different set of the setup values (col eqn, zero', 
+     + 'different a different set of the setup values (col eqn, zero',
      + 'point, plot limits, etc) to each set. The default is the last',
-     + 'set of data entered. With this option you can set it to any of', 
+     + 'set of data entered. With this option you can set it to any of',
      + 'the previously entered sets. '/
 
       data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'symbol', 'Set the symbol plotted as points ',
      + 'You can set the type of the sybol plotted for each point.',
-     + 'The options are the integers of the PGPLOT codes 1 -128.', 
+     + 'The options are the integers of the PGPLOT codes 1 -128.',
      + 'This code is set for the present set. You also have the option',
-     + 'to set this symbol for all data sets.', 
-     + ' ', 
+     + 'to set this symbol for all data sets.',
+     + ' ',
      + 'The default is the present set code, at first 1 (a dot).'/
 
       data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'zero_point', 'Change zero points applied to input colours',
-     + 'Each input -colour- (i.e. a single waveband) has a', 
+     + 'Each input -colour- (i.e. a single waveband) has a',
      + 'zero point applied to it before plotting or storage. ',
      + 'This asks you for the zero point (default zero) in the ',
-     + 'equation to be applied to each colour. The Equation is:- ', 
-     + ' Used Colour = Input colour + Const * (col(3-4)) + Zero point', 
+     + 'equation to be applied to each colour. The Equation is:- ',
+     + ' Used Colour = Input colour + Const * (col(3-4)) + Zero point',
      + '[col(3-4) is the (input) colour in the plot in X direction.]'/
 
       data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'getdata', 'Get the tables with the magnitudes in them',
-     + ' ', 
+     + ' ',
      + 'Get the tables with the magnitudes in them. There can be',
-     + 'up to four input colours - but these may be in four separate', 
-     + 'tables or in less, with more than one colour in a single ', 
-     + 'table. Only enough tables are asked for to get the required ', 
+     + 'up to four input colours - but these may be in four separate',
+     + 'tables or in less, with more than one colour in a single ',
+     + 'table. Only enough tables are asked for to get the required ',
      + 'colours.'/
 
       data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'store', 'Store the present plotted data set as a table file ',
-     + ' ', 
+     + ' ',
      + 'The present data set is stored in a table. The XY positions',
      + 'may be stored. Then the cmd or two-colour diagram values are',
      + 'stored. Then the input magnitudes and the number of good',
@@ -731,8 +731,8 @@ C--
      + 'nearest', 'Get cursor XY positions and nearest star',
      + 'The cursor is placed in the plot, and a mouse button pressed.',
      + 'The location of that position is typed out, and the user can',
-     + 'repeat for another position. The position and name of the', 
-     + 'nearest star is the current set is put out.', 
+     + 'repeat for another position. The position and name of the',
+     + 'nearest star is the current set is put out.',
      + 'Exit from this option by selecting a position to the left of',
      + 'the plot (but still within the window).'/
 
@@ -749,7 +749,7 @@ C--
       integer sect_num
       parameter ( sect_num=6 )
       character*10 sect_head(sect_num)
-      data sect_head / 'ACTIONS', 'FILES', 'SETS', 'SETUPS', 
+      data sect_head / 'ACTIONS', 'FILES', 'SETS', 'SETUPS',
      +                 'GRAPH', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'plot:line:cursor:nearest' /
@@ -776,18 +776,18 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
 
 
       end
-  
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DI_COLCODE -- Get the colour codes for the wanted colours
@@ -795,12 +795,12 @@ C
 C   a j penny                     dao              1988-05-01
 
       subroutine di_colcode
-   
+
       implicit none
       include 'diagram.inc'
       include 'STARMAN_INC'
 C--
-      integer j, k 
+      integer j, k
       character*7 colcode
       character*1 cv(7), cva
       data cv / 'U', 'B', 'B', 'V', 'V', 'B', 'V' /
@@ -1015,16 +1015,16 @@ Cbegin
                if ( ok ) then
                   OPENED(ka) = .true.
                   if ( k.eq.KSTART ) then
-                     tby = tbya 
+                     tby = tbya
                      if ( istat.ne.3 ) then
-                        call gtdesc ( file, 'TITLE', ATITLE, 
+                        call gtdesc ( file, 'TITLE', ATITLE,
      +                                ' ', iv, i )
                      else
                         ATITLE = ' '
                      endif
                   else
                      if ( tbya.ne.tby ) then
-                        call printo ( 
+                        call printo (
      +                       'ERROR: File wrong length - try again' )
                         ok = .false.
                      endif
@@ -1032,7 +1032,7 @@ Cbegin
                endif
 
             enddo
-            
+
             jk = 3
             ja = 0
             call findhead ( file, (tbxv-5), 'magnitude', .false.,jj)
@@ -1053,13 +1053,13 @@ Cbegin
                call gthead ( file, jk, text, istat )
                call pargc ( text )
                call pargi ( jk )
-               call printd ( 
+               call printd (
      +              'Magnitude header - %c - found in column %d' )
             else
                call printo ( 'No Magnitude header found. It is '//
      +                       'commonly in column 3' )
             endif
- 
+
             write ( cva, '(i1)' ) k
             tcolumn = 'COLUMN'//cva
             call get1i ( tcolumn, KCOLUMN(k,NSET), jk, 1, (tbxv-5) )
@@ -1095,7 +1095,7 @@ Cbegin
             tncol = 'NCOL'//cva
             call get1i ( tncol, KNCOLUMN(k,NSET), jk, 0, (tbxv-5) )
             if ( ST_FAILED ) return
-            if ( KNCOLUMN(k,NSET).ne.0 .and. .not.ALLNUMG ) 
+            if ( KNCOLUMN(k,NSET).ne.0 .and. .not.ALLNUMG )
      +                                         NUMG(k,NSET) = 0
 
             IPF(k,NSET)   = ipt
@@ -1151,9 +1151,9 @@ Cbegin
 
       call get1b ( 'ALL_SETS', doall, .true. )
       if ( ST_FAILED ) return
-   
+
       kt = NSET
-      if ( doall ) kt = 1   
+      if ( doall ) kt = 1
       do k = KSTART, 4
          if ( KFILE(k).eq.k ) then
 
@@ -1216,9 +1216,9 @@ Cbegin
 
       call get1b ( 'ALL_SETS', ALLNUMG, .true. )
       if ( ST_FAILED ) return
-   
-      kt = NSET 
-      if ( ALLNUMG ) kt = 1   
+
+      kt = NSET
+      if ( ALLNUMG ) kt = 1
       do k = KSTART, 4
          if ( KFILE(k).eq.k ) then
 
@@ -1265,7 +1265,7 @@ Cbegin
       call get1i ( 'SYMBOL', iv, SYMB(NSET), 1, 128 )
       call get1b ( 'ALL_SETS', doall, .true. )
       if ( ST_FAILED ) return
-   
+
       SYMB(NSET) = iv
       if ( doall ) call amovki ( iv, SYMB, MAXSET )
 
@@ -1315,7 +1315,7 @@ Cbegin
 
       call get1b ( 'ALL_SETS', doall, .true. )
       if ( ST_FAILED ) return
-   
+
       if ( doall ) then
          call amovkr ( xva, XXMIN, MAXSET )
          call amovkr ( xvb, XXMAX, MAXSET )
@@ -1362,10 +1362,10 @@ Cbegin
             call pargc ( COL(3) )
             call pargc ( COL(4) )
             call pargc ( COL(k) )
-            call printd ( 
+            call printd (
      +         '   %c (used) = %c + K%c*(%c-%c) + ZP%c (input) ' )
             call pargc ( COL(k) )
-            call printd ( '   What value of ZP%c to use?' ) 
+            call printd ( '   What value of ZP%c to use?' )
             rv = ZEROP(k,NSET)
             call get1r ( 'ZEROP', rv, rv, -1.0e10, 1.0e10 )
             if ( ST_FAILED ) return
@@ -1419,10 +1419,10 @@ Cbegin
          j = KFILE(k)
          ja = KCOLUMN(j,NSET) + 5
          do jj = 1, TOTSTARS
-            call copr1 ( %val(IPF(j,NSET)), TBXVS(j,NSET), 
+            call copr1 ( %val(IPF(j,NSET)), TBXVS(j,NSET),
      +                   TBYS(NSET), ja, jj, rv )
             ADATA(k,jj) = rv
-            call namegt ( %val(IPF(j,NSET)), TBXVS(j,NSET), 
+            call namegt ( %val(IPF(j,NSET)), TBXVS(j,NSET),
      +                   TBYS(NSET), jj, rname )
             ANAME(k,jj) = rname
          enddo
@@ -1432,7 +1432,7 @@ Cbegin
          if ( KNCOLUMN(k,NSET).ne.0 ) then
             ja = KNCOLUMN(j,NSET) + 5
             do jj = 1, TOTSTARS
-              call copr1 ( %val(IPF(j,NSET)), TBXVS(j,NSET), 
+              call copr1 ( %val(IPF(j,NSET)), TBXVS(j,NSET),
      +                     TBYS(NSET), ja, jj, rv )
               FNUMFG(k,jj) = rv
             enddo
@@ -1477,8 +1477,8 @@ Cbegin
          if ( XX(k).gt.XXMAX(NSET) ) ZZ(k) = .false.
          if ( YY(k).lt.YYMIN(NSET) ) ZZ(k) = .false.
          if ( YY(k).gt.YYMAX(NSET) ) ZZ(k) = .false.
-            
-      
+
+
       enddo
 
       call azerob ( LOADED,   MAXSET )
@@ -1546,7 +1546,7 @@ Cbegin
          kp = kp + 1
          call pthead ( 'OUT', kp, 'Y', istat )
       endif
-    
+
       if ( KSTART.eq.1 ) then
          write ( hval(kp), '(a1,''-'',a1)' ) COL(1), COL(2)
       else
@@ -1573,8 +1573,8 @@ Cbegin
       kxy = 5
       if ( doxy ) kxy = 7
       do k = 1, TBYS(NSET)
-         call coprr ( %val(IPF(KSTART,NSET)), TBXVS(KSTART,NSET), 
-     +                TBYS(NSET), 1, kxy,  k, k, %val(ipo), tbxvout, 
+         call coprr ( %val(IPF(KSTART,NSET)), TBXVS(KSTART,NSET),
+     +                TBYS(NSET), 1, kxy,  k, k, %val(ipo), tbxvout,
      +                tbyout, 1, k )
          call cop1r ( YY(k), %val(ipo), tbxvout, tbyout, kxy+1, k )
          call cop1r ( XX(k), %val(ipo), tbxvout, tbyout, kxy+2, k )
@@ -1596,13 +1596,13 @@ Cbegin
       enddo
 
       call canpar ( 'OUT' )
-      
+
 
       end
 
-   
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DI_COLEQ -- Get colour eqn 
+C DI_COLEQ -- Get colour eqn
 C
 C   a j penny                      dao             1988-04-24
 
@@ -1637,10 +1637,10 @@ Cbegin
             call pargc ( COL(3) )
             call pargc ( COL(4) )
             call pargc ( COL(k) )
-            call printd ( 
+            call printd (
      +        '    %c (used) =  %c + K%c*(%c-%c) + ZP%c (input) ' )
             call pargc ( COL(k) )
-            call printd ( '    What value of -K%c- to use ?' ) 
+            call printd ( '    What value of -K%c- to use ?' )
             rva = COLCOR(k,NSET)
             call get1r ( 'COLCOR', rv, rva, -1.0e10, 1.0e10 )
             if ( ST_FAILED ) return
@@ -1704,13 +1704,13 @@ Cbegin
                call pargc ( COL(2) )
                call pargr ( amina )
                call pargr ( amaxa )
-               call printd ( 
+               call printd (
      +         ' %c - %c limits taken as:  Min = %f  ; Max = %f' )
             else
                call pargc ( COL(2) )
                call pargr ( amina )
                call pargr ( amaxa )
-               call printd ( 
+               call printd (
      +         ' %c limits taken as:  Min = %f  ; Max = %f' )
             endif
          else
@@ -1753,7 +1753,7 @@ Cbegin
          amina = 30000.0
          amaxa = -30000.0
          some = .false.
-         do k = 1, TOTSTARS 
+         do k = 1, TOTSTARS
             if ( ZZ(k) ) then
                some = .true.
                amaxa = max(amaxa,XX(k))

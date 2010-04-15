@@ -15,12 +15,12 @@
        LOGICAL LOGXY
 
        DATA XLARGENEG/ -35.0/
- 
+
        IF (LOGXY) THEN
           STFORM = .FALSE.
           GOTO 100
        ENDIF
- 
+
        AMIN = LIMITS(1)
        AMAX = LIMITS(2)
        ZEROMAX = .FALSE.
@@ -29,19 +29,19 @@
        IF (ABS(AMAX).LT.ZEROTOL) ZEROMAX = .TRUE.
        IF (ABS(AMIN).LT.ZEROTOL) ZEROMIN = .TRUE.
 *   If exponent too long change to standard fom
- 
+
        IF (ZEROMAX) THEN
           AMAXEXP = XLARGENEG
        ELSE
           AMAXEXP = LOG10(ABS(AMAX))
        ENDIF
- 
+
        IF (ZEROMIN) THEN
           AMINEXP = XLARGENEG
        ELSE
           AMINEXP = LOG10(ABS(AMIN))
        ENDIF
- 
+
        IF(ZEROMIN.AND.ZEROMAX)THEN
 *        Both max and min are zero
           STFORM = .FALSE.
@@ -75,8 +75,8 @@
        ELSE
           STFORM = .FALSE.
        ENDIF
- 
- 
+
+
   100  CONTINUE
        IF (STFORM) THEN
           CALL DECIMATE(IFONT,AUSE,APPEND,NAPPEND,IEXP)
@@ -97,5 +97,5 @@
           NEWLABELN = LABELN
           IEXP = 0
        ENDIF
- 
+
        END

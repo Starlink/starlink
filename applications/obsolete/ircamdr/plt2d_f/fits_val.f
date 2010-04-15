@@ -1,9 +1,9 @@
-	SUBROUTINE FITS_VAL( NELEMENTS, ARRAY, ELEMENT, 
+	SUBROUTINE FITS_VAL( NELEMENTS, ARRAY, ELEMENT,
      :                       STRING, STR_LENGTH, STATUS)
-* Description : 
+* Description :
 *  Gets character value of a FITS header element
 * Invocation :
-*     CALL FITS_VAL( NELEMENTS, ARRAY, ELEMENT, 
+*     CALL FITS_VAL( NELEMENTS, ARRAY, ELEMENT,
 *     :               STRING, STR_LENGTH, STATUS)
 *
 * Parameters :
@@ -16,7 +16,7 @@
 *     Sandy Leggett (SKL@JACH)
 *
 * History:
-*     23-Feb-94    
+*     23-Feb-94
 *
 * Type definitions :
 	IMPLICIT  NONE			! no default typing allowed
@@ -32,7 +32,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :     NELEMENTS,                   ! number of elements of array
      :     ELEMENT,                     ! Required element of array
      :     EQUALS,                      ! Location of '=' in array
@@ -41,9 +41,9 @@
      :     END,                         ! End value string
      :     STR_LENGTH,                  ! Length of value string
      :     PADST                        ! Pad string with blanks from here
-  
+
         CHARACTER*(*) ARRAY(NELEMENTS)
-	CHARACTER*(80)  STRING     
+	CHARACTER*(80)  STRING
 	CHARACTER*(1)  CHR
 
 *-
@@ -52,18 +52,18 @@
 
 *      check status on entry - return if not o.k.
 	IF ( STATUS .NE. SAI__OK ) THEN
-           STRING = ' '     
+           STRING = ' '
 	   RETURN
 	END IF
 
         STRING = ARRAY(ELEMENT)
 
-   
+
         EQUALS = INDEX( STRING(1:80), '=' )
         START = EQUALS + 1
         END = INDEX( STRING(1:80), '/' )
         END = END - 1
-        STR_LENGTH = END - START + 1 
+        STR_LENGTH = END - START + 1
 
 
 *      take away the single quotes from the character values
@@ -73,7 +73,7 @@
              START = QUOTE + 1
              QUOTE = INDEX( STRING(START:80), CHR )
              END = START + QUOTE - 2
-             STR_LENGTH = END - START + 1 
+             STR_LENGTH = END - START + 1
         END IF
 
 

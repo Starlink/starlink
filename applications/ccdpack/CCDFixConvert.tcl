@@ -15,15 +15,15 @@
 #     In CCDPACK this can happen when a C/Fortran A-task spawns a
 #     child process to run ccdwish.
 #
-#     When the first process accesses a foreign data file the NDF 
-#     library may create a temporary HDS container file to hold it 
-#     in native form.  If the second process accesses the same 
+#     When the first process accesses a foreign data file the NDF
+#     library may create a temporary HDS container file to hold it
+#     in native form.  If the second process accesses the same
 #     foreign file, NDF will overwrite the same HDS container
 #     file with the same converted data.  When the second process
 #     exits or releases the NDF, the temporary file will be deleted,
 #     so that the first process can no longer find it.
 #
-#     This routine tinkers with environment variables so that the 
+#     This routine tinkers with environment variables so that the
 #     created HDS container file is given a different name in each
 #     instance.  This means that the processes are working with
 #     different native versions of the foreign data.  It is still
@@ -37,7 +37,7 @@
 #  Arguments:
 #     prefix = string
 #        A string to prepend to the normal name for a temporary HDS
-#        container file to distinguish it from the one used prior 
+#        container file to distinguish it from the one used prior
 #        to calling this routine.
 
 #  Copyright:

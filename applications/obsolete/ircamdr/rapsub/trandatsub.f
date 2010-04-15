@@ -1,8 +1,8 @@
 
 *+  TRANDATSUB - converts an x,y,i array of data into an image array
 
-      SUBROUTINE TRANDATSUB ( OUTARRAY, ODIMS1, ODIMS2, INDATA, 
-     :         MAXREC, NPTS, XPOS, YPOS, INTENSPOS, PSCALE, XMIN, 
+      SUBROUTINE TRANDATSUB ( OUTARRAY, ODIMS1, ODIMS2, INDATA,
+     :         MAXREC, NPTS, XPOS, YPOS, INTENSPOS, PSCALE, XMIN,
      :         YMIN, STATUS )
 
 *    Description :
@@ -25,7 +25,7 @@
 *        Endfor
 *     Endfor
 *     For all input data points
-*        Work out position of pixel in output image to hold current data 
+*        Work out position of pixel in output image to hold current data
 *         point from x,y coordinates and pixel scale
 *     Endfor
 *     Return
@@ -109,7 +109,7 @@
 *    loop round all the points in INDATA, getting out the x,y,i
 *    values for each one
       DO  K  =  1, NPTS
-         
+
          CURRX  =  INDATA( XPOS, K )
          CURRY  =  INDATA( YPOS, K )
          CURRI  =  INDATA( INTENSPOS, K )

@@ -71,7 +71,7 @@
 #define BUFSIZE 64
 
 void
-dat1emsSetBigu( const char * token, UINT_BIG value ) 
+dat1emsSetBigu( const char * token, UINT_BIG value )
 {
   /* simplest approach is to format the number our selves and then
      store that using emsSetc */

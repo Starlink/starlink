@@ -41,7 +41,7 @@
 *   Free the virtual memory area used for the BIAS arrays.
       IF ( (CURRENT_BIAS .NE. ' ') .AND. (BIAS_NELM .GT. 0) ) THEN
 
-         IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+         IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :     'Releasing memory used to map BIAS data, '/
      :     /'variance and quality arrays', STATUS )
 
@@ -71,15 +71,15 @@
          ENDIF
       ELSE
 
-         IF ( VERBOSE ) 
-     :      CALL MSG_OUT( ' ', 
+         IF ( VERBOSE )
+     :      CALL MSG_OUT( ' ',
      :         'No current BIAS was mapped', STATUS )
       ENDIF
 
 *   Free the virtual memory area used for the DARK arrays.
       IF ( (CURRENT_DARK .NE. ' ') .AND. (DARK_NELM .GT. 0) ) THEN
 
-         IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+         IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :     'Releasing memory used to map DARK data, '/
      :     /'variance and quality arrays', STATUS )
 
@@ -109,15 +109,15 @@
          ENDIF
       ELSE
 
-         IF ( VERBOSE ) 
-     :      CALL MSG_OUT( ' ', 
+         IF ( VERBOSE )
+     :      CALL MSG_OUT( ' ',
      :         'No current DARK was mapped', STATUS )
       ENDIF
 
 *   Free the virtual memory area used for the FLAT arrays.
       IF ( (CURRENT_FLAT .NE. ' ') .AND. (FLAT_NELM .GT. 0) ) THEN
 
-         IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+         IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :     'Releasing memory used to map FLAT data, '/
      :     /'variance and quality arrays', STATUS )
 
@@ -147,16 +147,16 @@
          ENDIF
       ELSE
 
-         IF ( VERBOSE ) 
-     :      CALL MSG_OUT( ' ', 
+         IF ( VERBOSE )
+     :      CALL MSG_OUT( ' ',
      :         'No current FLAT was mapped', STATUS )
       ENDIF
 
 *   Free the virtual memory area used for the STANDARD arrays.
-      IF ( (CURRENT_STANDARD .NE. ' ') .AND. 
+      IF ( (CURRENT_STANDARD .NE. ' ') .AND.
      :     (STANDARD_NELM .GT. 0) ) THEN
 
-         IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+         IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :     'Releasing memory used to map STANDARD data, '/
      :     /'variance and quality arrays', STATUS )
 
@@ -187,8 +187,8 @@
          ENDIF
       ELSE
 
-         IF ( VERBOSE ) 
-     :      CALL MSG_OUT( ' ', 
+         IF ( VERBOSE )
+     :      CALL MSG_OUT( ' ',
      :        'No current STANDARD was mapped', STATUS )
       ENDIF
       END

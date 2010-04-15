@@ -1,10 +1,10 @@
 *+  RED4_POKE_FITS - Poke a specified FITS item with a given value.
       SUBROUTINE RED4_POKE_FITS( STATUS )
 *    Description :
-*     This routine read, writes or updates a given value to a specified 
-*     FITS item in a data structure. If the FITS item does not already 
+*     This routine read, writes or updates a given value to a specified
+*     FITS item in a data structure. If the FITS item does not already
 *     exist it is created.
-*     The routine is used for peeking and poking the contents of the FITS 
+*     The routine is used for peeking and poking the contents of the FITS
 *     structure so that the data reduction system may be tested.
 *    Invocation :
 *     CALL RED4_POKE_FITS( STATUS )
@@ -147,7 +147,7 @@
 *            Get its current value and obtain a new value, using
 *            the current one as a default. Then write the new value
 *            back to the FITS structure. This all depends on what
-*            type the FITS item is. 
+*            type the FITS item is.
                IF ( ACCESS(1:1) .EQ. 'C' ) THEN
 
 *               Character type.
@@ -163,17 +163,17 @@
                   ENDIF
 
 *               Write the value to GLOBAL.FITS_VALUE
-                  CALL PAR_DEF0C( 'FITS_VALUE', 
+                  CALL PAR_DEF0C( 'FITS_VALUE',
      :              CVALUE(1:CVALEN), STATUS )
-                  CALL PAR_PUT0C( 'FITS_VALUE', 
+                  CALL PAR_PUT0C( 'FITS_VALUE',
      :              CVALUE(1:CVALEN), STATUS )
 
                   IF ( METHOD(1:4) .NE. 'READ' ) THEN
 
                      CLEN = MAX( 1, CHR_LEN( CVALUE ) )
-                     CALL PAR_DEF0C( 'CVALUE', 
+                     CALL PAR_DEF0C( 'CVALUE',
      :                 CVALUE(1:CLEN), STATUS )
-                     CALL PAR_GET0C( 'CVALUE', 
+                     CALL PAR_GET0C( 'CVALUE',
      :                 CVALUE(1:CLEN), STATUS )
 
                      CLEN = MAX( 1, CHR_LEN( CVALUE ) )
@@ -190,7 +190,7 @@
 *               as integers).
                   CALL DSA_GET_FITS_I( 'DATA', ITEM, 0, IVALUE,
      :              COMMENT, DSA_STATUS )
- 
+
                   IF ( MODE(1:7) .EQ. 'VERBOSE' ) THEN
                     CALL MSG_SETI( 'IVALUE', IVALUE )
                     CALL MSG_OUT( ' ', 'RED4_POKE_FITS: '/
@@ -200,9 +200,9 @@
 *               Write the value to GLOBAL.FITS_VALUE
                   WRITE(CVALUE,*) IVALUE
                   CVALEN = CHR_LEN( CVALUE )
-                  CALL PAR_DEF0C( 'FITS_VALUE', 
+                  CALL PAR_DEF0C( 'FITS_VALUE',
      :              CVALUE(1:CVALEN), STATUS )
-                  CALL PAR_PUT0C( 'FITS_VALUE', 
+                  CALL PAR_PUT0C( 'FITS_VALUE',
      :              CVALUE(1:CVALEN), STATUS )
 
                   IF ( METHOD(1:4) .NE. 'READ' ) THEN
@@ -232,9 +232,9 @@
 *               Write the value to GLOBAL.FITS_VALUE
                   WRITE(CVALUE,*) RVALUE
                   CVALEN = CHR_LEN( CVALUE )
-                  CALL PAR_DEF0C( 'FITS_VALUE', 
+                  CALL PAR_DEF0C( 'FITS_VALUE',
      :              CVALUE(1:CVALEN), STATUS )
-                  CALL PAR_PUT0C( 'FITS_VALUE', 
+                  CALL PAR_PUT0C( 'FITS_VALUE',
      :              CVALUE(1:CVALEN), STATUS )
 
                   IF ( METHOD(1:4) .NE. 'READ' ) THEN
@@ -266,7 +266,7 @@
                ELSE
 
                   CALL MSG_SETC( 'ITEM', ITEM )
-                  CALL MSG_OUT( ' ', 
+                  CALL MSG_OUT( ' ',
      :               '^ITEM is a new item', STATUS )
 
 *            Obtain the type required.

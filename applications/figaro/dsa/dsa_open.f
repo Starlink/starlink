@@ -21,7 +21,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (!) STATUS       (Integer,ref) Status code.  If a bad status value
-C                      is passed, this routine returns immediately. 
+C                      is passed, this routine returns immediately.
 C
 C  External variables used:
 C     Common variables used only by the DSA_ package.
@@ -85,7 +85,7 @@ C     9th  Feb  1990.  NDF FITS items added.  KS/AAO.
 C     21st Aug 1992    Automatic portability modifications
 C                      ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992    "INCLUDE" filenames now upper case. KS/AAO
-C     17th Dec 1992.   Added initialisation of temporary name variables. 
+C     17th Dec 1992.   Added initialisation of temporary name variables.
 C                      Also added SYS_STATUS. KS/AAO.
 C     17th Feb 1995.   Added QF_BOTH_OK. KS/AAO.
 C     29th Nov 1995.   Added QF_LOGGED. KS/AAO.
@@ -124,7 +124,7 @@ C
          CALL DSA_WRUSER ('Attempt to open the Figaro routines ')
          CALL DSA_WRUSER
      :               ('(a call to DSA_OPEN) when the routines were ')
-         CALL DSA_WRUSER 
+         CALL DSA_WRUSER
      :              ('already open.  Probable programming error.')
          CALL DSA_WRFLUSH
          STATUS=DSA__ALROPEN

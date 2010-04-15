@@ -6,7 +6,7 @@ C+
 C
 C     G E N _ D I V A F V
 C
-C     Divides two floating point arrays, propagating VARIANCE.  
+C     Divides two floating point arrays, propagating VARIANCE.
 C     The arrays may have any dimensions; they are treated here as
 C     linear in order to generate more efficient code.
 C     If any divisor element is zero, the result is set to 0
@@ -78,7 +78,7 @@ C
       V2V  = 0D0                    ! Initial V2DATA as double precision VALUE
       V3V  = 0D0                    ! Initial V3DATA as double precision VALUE
 C
-C     Handle different quality methods separately.  
+C     Handle different quality methods separately.
 C
       IF ( QUAL ) THEN
 C

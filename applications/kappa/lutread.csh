@@ -39,7 +39,7 @@
 
 #  Notes:
 #     This is a procedure that calls LUTABLE.  Therefore, the
-#     parameters cannot be specified on the command line.  You will 
+#     parameters cannot be specified on the command line.  You will
 #     only be prompted for the parameters if the device is not suitable
 #     or not available, and/or the lookup table file could not be
 #     accessed.
@@ -88,7 +88,7 @@
 #   Check whether the LUT has been given.  If not inquire what it is
 #   mimicking the LUTABLE prompt for parameter LUT.
 #
-if ($lutread_pars == "") then 
+if ($lutread_pars == "") then
    echo -n "LUT - NDF containing input LUT > "
    set lutname = $<
 else

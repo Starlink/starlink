@@ -3,11 +3,11 @@
 *+ FITSWM - write images to tape in fits format with head information.
 *
 *    Description : Images are written to a tape in fits format using MT
-*                  commands. Takes input from either IRCAM observation HDS 
-*                  container files or stand-alone processed HDS images or 
-*                  both. Stand-alone image names read from free-format AscII 
-*                  file created with edit or DCL dir output. The image names 
-*                  should NOT contain the .SDF file extension as HDS does not 
+*                  commands. Takes input from either IRCAM observation HDS
+*                  container files or stand-alone processed HDS images or
+*                  both. Stand-alone image names read from free-format AscII
+*                  file created with edit or DCL dir output. The image names
+*                  should NOT contain the .SDF file extension as HDS does not
 *                  like that ...
 *
 *    Invocation : CALL FITSWM( STATUS)
@@ -24,7 +24,7 @@
 *
 *    History :
 *
-*     07-07-1987 : First implementation 
+*     07-07-1987 : First implementation
 *     24-JUN-1994  Changed LIB$ to FIO_, STR$ to CHR_,
 *                  MSG_OUT on error to ERR_REP (SKL@JACH)
 *     07-SEP-1994  Reduced continuation lines for UNIX compiler (SKL@JACH)
@@ -52,7 +52,7 @@
 
 *    Local variables :
 
-        INTEGER 
+        INTEGER
      :    CONTEND( 100),            ! end image in container file
      :    CONTSTART( 100),          ! start image in container file
      :    COUNTER,                  ! loop counter
@@ -155,7 +155,7 @@
      :    TITLE*80,                 ! title of observation
      :    TAPEORDISK*80             ! tape of disk write
 
-        LOGICAL 
+        LOGICAL
      :    MORE,                     ! another input variable
      :    SWAPBYTES                 ! swap bytes on tape
 *-
@@ -189,7 +189,7 @@
         CALL MSG_OUT( 'BLANK', ' ', STATUS)
         CALL PAR_GET0C( 'TAPEORDISK', TAPEORDISK, STATUS)
         CALL CHR_UCASE( TAPEORDISK )
-        IF( TAPEORDISK( 1:1) .NE. 'T' .AND. 
+        IF( TAPEORDISK( 1:1) .NE. 'T' .AND.
      :      TAPEORDISK( 1:1) .NE. 'D') TAPEORDISK( 1:1) = 'T'
 
 *      get the input source option from user
@@ -216,16 +216,16 @@
         CALL PAR_GET0C( 'SOURCE', SOURCE, STATUS)
         CALL CHR_UCASE( SOURCE )
 
-*      test the input source option 
+*      test the input source option
         IF( SOURCE( 1:1) .EQ. 'C' .OR. SOURCE( 1:1) .EQ. 'B' .OR.
      :      SOURCE( 1:1) .EQ. 'S') THEN
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
-          CALL MSG_OUT( 'MESSAGE', 
+          CALL MSG_OUT( 'MESSAGE',
      :                  'Container file input section ...',
      :                  STATUS)
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-*        get the number of container files to be written to tape 
+*        get the number of container files to be written to tape
           CALL PAR_GET0I( 'NUMCONT', NUMCONT, STATUS)
 
 *        loop to get all container filenames and start,end obs elements
@@ -249,7 +249,7 @@
      :                  STATUS)
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-*        get the name of the file containing the list of images 
+*        get the name of the file containing the list of images
   400     CONTINUE
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
           CALL PAR_GET0C( 'FILENAME', FFILE, STATUS)
@@ -300,16 +300,16 @@
             IF( STATUS .NE. SAI__OK) THEN
               STATUS = SAI__OK
               CALL MSG_SETC( 'CONT', CONTNAME( J))
-              CALL MSG_OUT( 'MESSAGE', 
+              CALL MSG_OUT( 'MESSAGE',
      :         'ERROR, IRCAM observation file ^CONT NOT FOUND ...',
      :         STATUS)
               GOTO 500
             END IF
             CALL DAT_FIND( LOCI, 'OBS', LOCOBS, STATUS)
-            CALL DAT_FIND( LOCI, 'GENERAL', LOCGEN, STATUS)             
-            CALL DAT_FIND( LOCGEN, 'INSTRUMENT', LOCINST, STATUS)               
-            CALL DAT_FIND( LOCGEN, 'ID', LOCID, STATUS)         
-            CALL DAT_FIND( LOCGEN, 'TELESCOPE', LOCTEL, STATUS)         
+            CALL DAT_FIND( LOCI, 'GENERAL', LOCGEN, STATUS)
+            CALL DAT_FIND( LOCGEN, 'INSTRUMENT', LOCINST, STATUS)
+            CALL DAT_FIND( LOCGEN, 'ID', LOCID, STATUS)
+            CALL DAT_FIND( LOCGEN, 'TELESCOPE', LOCTEL, STATUS)
 
 *          get size of OBS structure and setup number elements
             CALL DAT_SHAPE( LOCOBS, 2, DIMS, NDIMS, STATUS)
@@ -317,13 +317,13 @@
             ENDOBS = MIN( CONTEND( J), DIMS( 1))
             CALL MSG_SETI( 'ST', STARTOBS)
             CALL MSG_SETI( 'EN', ENDOBS)
-            CALL MSG_OUT( 'MESS', 
+            CALL MSG_OUT( 'MESS',
      :       'Start observation = ^ST, End observation = ^EN', STATUS)
 
 *          loop for all images from container file specified by user
             DO K = STARTOBS, ENDOBS
 
-*            get the parameters from the current container file observation 
+*            get the parameters from the current container file observation
 *            after getting locator to current obs cell elements
               NDIMS = 1
               DIMS( 1) = K
@@ -350,13 +350,13 @@
                 STATUS = SAI__OK
                 CALL MSG_SETI( 'NUMO', K)
                 CALL MSG_SETC( 'CON', CONTNAME( J))
-                CALL MSG_OUT( 'MESSAGE', 
+                CALL MSG_OUT( 'MESSAGE',
      :'IRCAM Container file ^CON, Obs number ^NUMO NOT FOUND ...',
      :           STATUS)
                 GOTO 200
               END IF
 
-*            set number of dimensions to zero for scalar primitives 
+*            set number of dimensions to zero for scalar primitives
               NDIMS = 0
 
 *            put the mode and configuration to upper case for testing
@@ -364,17 +364,17 @@
               CALL CHR_UCASE( CONF )
 
 *            test if the configuration is legal i.e. either STARE or CHOP and
-*            mode is legal i.e. KTC ON or KTC OFF. Set the flag for the buffers 
+*            mode is legal i.e. KTC ON or KTC OFF. Set the flag for the buffers
 *            filled
               IF( CONF .EQ. 'STARE' .AND. MODE .EQ. 'KTC OFF') THEN
                 DATA_FLAG = 1
-              ELSE IF( CONF .EQ. 'STARE' .AND. MODE .EQ. 'KTC ON') 
+              ELSE IF( CONF .EQ. 'STARE' .AND. MODE .EQ. 'KTC ON')
      :         THEN
                 DATA_FLAG = 2
-              ELSE IF( CONF .EQ. 'CHOP' .AND. MODE .EQ. 'KTC OFF') 
+              ELSE IF( CONF .EQ. 'CHOP' .AND. MODE .EQ. 'KTC OFF')
      :         THEN
                 DATA_FLAG = 3
-              ELSE IF( CONF .EQ. 'CHOP' .AND. MODE .EQ. 'KTC ON') 
+              ELSE IF( CONF .EQ. 'CHOP' .AND. MODE .EQ. 'KTC ON')
      :         THEN
                 DATA_FLAG = 4
               ELSE
@@ -382,17 +382,17 @@
               END IF
 
 *            write the correct data buffers to tape in fits format
-              IF( DATA_FLAG .EQ. 1 .OR. 
-     :            DATA_FLAG .EQ. 2 .OR. 
-     :            DATA_FLAG .EQ. 3 .OR. 
+              IF( DATA_FLAG .EQ. 1 .OR.
+     :            DATA_FLAG .EQ. 2 .OR.
+     :            DATA_FLAG .EQ. 3 .OR.
      :            DATA_FLAG .EQ. 4 ) THEN
 
 *              for any data flag other than 0 get buffer 1, PHASEA
-                CALL DAT_FIND( LOCCELL, 'PHASEA', LOCBUFF, STATUS)              
-                CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)            
+                CALL DAT_FIND( LOCCELL, 'PHASEA', LOCBUFF, STATUS)
+                CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)
                 CALL DAT_SHAPE( LOCDA, 2, DIMS, NDIMS, STATUS)
-        
-*              test the status to see if the find on the data_array etc 
+
+*              test the status to see if the find on the data_array etc
 *              was successful, if not then tell user and release this element
 
                 IF( STATUS .NE. SAI__OK) THEN
@@ -409,14 +409,14 @@
                 END IF
 
 *              map the data array component ...
-                CALL DAT_MAPR( LOCDA, 'READ', NDIMS, DIMS, PNTRI, 
+                CALL DAT_MAPR( LOCDA, 'READ', NDIMS, DIMS, PNTRI,
      :                         STATUS)
 
 *              increment counter for number of images written to tape
                 COUNTER = COUNTER + 1
 
 *              call subroutine to calculate max,min in data and BZERO, BSCALE
-                CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+                CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :                          MAXVAL, MINVAL, BZERO, BSCALE)
 
 *              tell user of the max,min and b values calculated
@@ -427,13 +427,13 @@
      :            STATUS)
                 CALL MSG_SETR( 'MAX', MAXVAL)
                 CALL MSG_SETR( 'MIN', MINVAL)
-                CALL MSG_OUT( 'MESSAGE', 
-     :            'Maximum = ^MAX, Minimum = ^MIN', 
+                CALL MSG_OUT( 'MESSAGE',
+     :            'Maximum = ^MAX, Minimum = ^MIN',
      :            STATUS)
                 CALL MSG_SETR( 'BZE', BZERO)
                 CALL MSG_SETR( 'BSC', BSCALE)
-                CALL MSG_OUT( 'MESSAGE', 
-     :            'Bzero   = ^BZE, Bscale  = ^BSC', 
+                CALL MSG_OUT( 'MESSAGE',
+     :            'Bzero   = ^BZE, Bscale  = ^BSC',
      :            STATUS)
 
 *              form the image name string
@@ -441,7 +441,7 @@
                 CALL CHR_CLEAN( CONTNAME( J) )
                 LEN = 0
                 CALL CHR_APPND( CONTNAME( J), CONTNAME( J), LEN )
-                IMAGENAME = 
+                IMAGENAME =
      :           CONTNAME( J)( 1:LEN)//'.OBS('//KC(1:KL)//').PHASEA'
 
 *              write header to the text file
@@ -459,26 +459,26 @@
      :                 2880, LUNO, STATUS )
                   IF (STATUS .NE. SAI__OK) GO TO 996
                   CALL MSG_SETC( 'FI', DISKFITS )
-                  CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', 
+                  CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI',
      :                           STATUS)
                 END IF
 
 *              call subroutine to write image to tape in fits format
-                CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO, 
-     :                         DIMS( 1), DIMS( 2), 
-     :                         %VAL( PNTRI), BZERO, BSCALE, 
-     :                         ARRAY, INST, PLATESCALE, 
-     :                         OBSERVERS, ORIGIN, SOFTWARE, 
-     :                         HEIGHT, LAT, LONG, 
-     :                         TELESCOPE, BIAS, CONF, 
-     :                         MAXVAL, MINVAL, DEC, 
-     :                         AIRMASS, EQUINOX, EVENMEAN, 
-     :                         EVENSTD, EXPO, FILTER, 
-     :                         GAIN, GATE, LOCALTIME, 
-     :                         MODE, COADDS, OBJECT, 
+                CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO,
+     :                         DIMS( 1), DIMS( 2),
+     :                         %VAL( PNTRI), BZERO, BSCALE,
+     :                         ARRAY, INST, PLATESCALE,
+     :                         OBSERVERS, ORIGIN, SOFTWARE,
+     :                         HEIGHT, LAT, LONG,
+     :                         TELESCOPE, BIAS, CONF,
+     :                         MAXVAL, MINVAL, DEC,
+     :                         AIRMASS, EQUINOX, EVENMEAN,
+     :                         EVENSTD, EXPO, FILTER,
+     :                         GAIN, GATE, LOCALTIME,
+     :                         MODE, COADDS, OBJECT,
      :                         ODDMEAN, ODDSTD, OFFSETDEC,
-     :                         OFFSETRA, RA, READRATE, 
-     :                         TEMP, TITLE, IMAGENAME, 
+     :                         OFFSETRA, RA, READRATE,
+     :                         TEMP, TITLE, IMAGENAME,
      :                         UT, HA, ST, FPX, FPY, FPZ,
      :                         XHEAD_ARCSECPMM,
      :                         XHEAD_DEC_ZERO, XHEAD_RA_ZERO,
@@ -494,15 +494,15 @@
                 CALL DAT_ANNUL( LOCDA, STATUS)
                 CALL DAT_ANNUL( LOCBUFF, STATUS)
               END IF
-              IF( DATA_FLAG .EQ. 3 .OR. 
+              IF( DATA_FLAG .EQ. 3 .OR.
      :            DATA_FLAG .EQ. 4) THEN
 
 *              if CHOP then get buffer 2, PHASEB
-                CALL DAT_FIND( LOCCELL, 'PHASEB', LOCBUFF, STATUS)              
-                CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)            
+                CALL DAT_FIND( LOCCELL, 'PHASEB', LOCBUFF, STATUS)
+                CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)
                 CALL DAT_SHAPE( LOCDA, 2, DIMS, NDIMS, STATUS)
-        
-*              test the status to see if the find on the data_array etc 
+
+*              test the status to see if the find on the data_array etc
 *              was successful, if not then tell user and release this element
                 IF( STATUS .NE. SAI__OK) THEN
                   STATUS = SAI__OK
@@ -518,14 +518,14 @@
                 END IF
 
 *              map the data array component ...
-                CALL DAT_MAPR( LOCDA, 'READ', NDIMS, DIMS, PNTRI, 
+                CALL DAT_MAPR( LOCDA, 'READ', NDIMS, DIMS, PNTRI,
      :                         STATUS)
 
 *              increment counter for number of images written to tape
                 COUNTER = COUNTER + 1
 
 *              call subroutine to calculate max,min in data and BZERO, BSCALE
-                CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+                CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :                          MAXVAL, MINVAL, BZERO, BSCALE)
 
 *              tell user of the max,min and b values calculated
@@ -536,13 +536,13 @@
      :            STATUS)
                 CALL MSG_SETR( 'MAX', MAXVAL)
                 CALL MSG_SETR( 'MIN', MINVAL)
-                CALL MSG_OUT( 'MESSAGE', 
-     :            'Maximum = ^MAX, Minimum = ^MIN', 
+                CALL MSG_OUT( 'MESSAGE',
+     :            'Maximum = ^MAX, Minimum = ^MIN',
      :            STATUS)
                 CALL MSG_SETR( 'BZE', BZERO)
                 CALL MSG_SETR( 'BSC', BSCALE)
-                CALL MSG_OUT( 'MESSAGE', 
-     :            'Bzero   = ^BZE, Bscale  = ^BSC', 
+                CALL MSG_OUT( 'MESSAGE',
+     :            'Bzero   = ^BZE, Bscale  = ^BSC',
      :            STATUS)
 
 *              form the image name string
@@ -550,7 +550,7 @@
                 CALL CHR_CLEAN( CONTNAME( J) )
                 LEN = 0
                 CALL CHR_APPND( CONTNAME( J), CONTNAME( J), LEN)
-                IMAGENAME = 
+                IMAGENAME =
      :            CONTNAME( J)( 1:LEN)//'.OBS('//KC(1:KL)//').PHASEB'
 
 *              write header to the text file
@@ -561,31 +561,31 @@
                   CALL CHR_ITOC( STARTNUM, CCOUNTER, L1 )
                   STARTNUM = STARTNUM + 1
                   CALL CHR_CLEAN( CCOUNTER )
-                  L1 = 0 
+                  L1 = 0
                   CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
                   DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
                   CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
      :                 2880, LUNO, STATUS )
                   IF (STATUS .NE. SAI__OK) GO TO 996
                   CALL MSG_SETC( 'FI', DISKFITS )
-                  CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', 
+                  CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI',
      :                           STATUS)
                 END IF
 
 *              call subroutine to write image to tape in fits format
-                CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO, 
-     :                         DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :                         BZERO, BSCALE, ARRAY, INST, 
-     :                         PLATESCALE, OBSERVERS, ORIGIN, 
-     :                         SOFTWARE, HEIGHT, LAT, LONG, 
-     :                         TELESCOPE, BIAS, CONF, 
-     :                         MAXVAL, MINVAL, DEC, AIRMASS, 
-     :                         EQUINOX, EVENMEAN, EVENSTD, 
-     :                         EXPO, FILTER, GAIN, GATE, 
-     :                         LOCALTIME, MODE, COADDS, 
-     :                         OBJECT, ODDMEAN, ODDSTD, 
-     :                         OFFSETDEC, OFFSETRA, RA, 
-     :                         READRATE, TEMP, TITLE, IMAGENAME, 
+                CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO,
+     :                         DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :                         BZERO, BSCALE, ARRAY, INST,
+     :                         PLATESCALE, OBSERVERS, ORIGIN,
+     :                         SOFTWARE, HEIGHT, LAT, LONG,
+     :                         TELESCOPE, BIAS, CONF,
+     :                         MAXVAL, MINVAL, DEC, AIRMASS,
+     :                         EQUINOX, EVENMEAN, EVENSTD,
+     :                         EXPO, FILTER, GAIN, GATE,
+     :                         LOCALTIME, MODE, COADDS,
+     :                         OBJECT, ODDMEAN, ODDSTD,
+     :                         OFFSETDEC, OFFSETRA, RA,
+     :                         READRATE, TEMP, TITLE, IMAGENAME,
      :                         UT, HA, ST, FPX, FPY, FPZ,
      :                         XHEAD_ARCSECPMM, XHEAD_DEC_ZERO,
      :                         XHEAD_RA_ZERO, XHEAD_DEC,
@@ -600,15 +600,15 @@
                 CALL DAT_ANNUL( LOCDA, STATUS)
                 CALL DAT_ANNUL( LOCBUFF, STATUS)
               END IF
-!             IF( DATA_FLAG .EQ. 2 .OR. 
+!             IF( DATA_FLAG .EQ. 2 .OR.
 !     :           DATA_FLAG .EQ. 4) THEN
 
 *              if STARE + KTC ON or CHOP + KTC ON then get buffer 3, KTCA
-!               CALL DAT_FIND( LOCCELL, 'KTCA', LOCBUFF, STATUS)                
-!               CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)            
+!               CALL DAT_FIND( LOCCELL, 'KTCA', LOCBUFF, STATUS)
+!               CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)
 !               CALL DAT_SHAPE( LOCDA, 2, DIMS, NDIMS, STATUS)
-        
-*              test the status to see if the find on the data_array etc 
+
+*              test the status to see if the find on the data_array etc
 *              was successful, if not then tell user and release this element
 !               IF( STATUS .NE. SAI__OK) THEN
 !                 STATUS = SAI__OK
@@ -630,7 +630,7 @@
 !               COUNTER = COUNTER + 1
 
 *              call subroutine to calculate max,min in data and BZERO, BSCALE
-!               CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), MAXVAL, 
+!               CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), MAXVAL,
 !     :                         MINVAL, BZERO, BSCALE)
 
 *              tell user of the max,min and b values calculated
@@ -641,13 +641,13 @@
 !     :           STATUS)
 !               CALL MSG_SETR( 'MAX', MAXVAL)
 !               CALL MSG_SETR( 'MIN', MINVAL)
-!               CALL MSG_OUT( 'MESSAGE', 
-!     :           'Maximum = ^MAX, Minimum = ^MIN', 
+!               CALL MSG_OUT( 'MESSAGE',
+!     :           'Maximum = ^MAX, Minimum = ^MIN',
 !     :           STATUS)
 !               CALL MSG_SETR( 'BZE', BZERO)
 !               CALL MSG_SETR( 'BSC', BSCALE)
-!               CALL MSG_OUT( 'MESSAGE', 
-!     :           'Bzero   = ^BZE, Bscale  = ^BSC', 
+!               CALL MSG_OUT( 'MESSAGE',
+!     :           'Bzero   = ^BZE, Bscale  = ^BSC',
 !     :           STATUS)
 
 *              form the image name string
@@ -665,7 +665,7 @@
 !                 CALL STR$TRIM( CCOUNTER, CCOUNTER, L1)
 !                 DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
 !                 CALL LIB$GET_LUN( LUNO)
-!                 OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
+!                 OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN',
 !     :                 FORM='UNFORMATTED', RECORDTYPE='FIXED',
 !     :                 RECL=2880/4, ERR=996)
 !                 CALL MSG_SETC( 'FI', DISKFITS)
@@ -673,50 +673,50 @@
 !               END IF
 
 *              call subroutine to write image to tape in fits format
-!               CALL FITSWSUB( TAPEORDISK, 
-!     :                        MTCHAN, 
-!     :                        LUNO, 
-!     :                        DIMS( 1), 
-!     :                        DIMS( 2), 
-!     :                        %VAL( PNTRI), 
-!     :                        BZERO, 
-!     :                        BSCALE, 
-!     :                        ARRAY, 
-!     :                        INST, 
-!     :                        PLATESCALE, 
-!     :                        OBSERVERS, 
-!     :                        ORIGIN, 
-!     :                        SOFTWARE, 
-!     :                        HEIGHT, 
-!     :                        LAT, 
-!     :                        LONG, 
-!     :                        TELESCOPE, 
-!     :                        BIAS, 
-!     :                        CONF, 
-!     :                        MAXVAL, 
-!     :                        MINVAL, 
-!     :                        DEC, 
-!     :                        AIRMASS, 
-!     :                        EQUINOX, 
-!     :                        EVENMEAN, 
-!     :                        EVENSTD, 
-!     :                        EXPO, 
-!     :                        FILTER, 
-!     :                        GAIN, 
-!     :                        GATE, 
-!     :                        LOCALTIME, 
-!     :                        MODE, 
-!     :                        COADDS, 
-!     :                        OBJECT, 
-!     :                        ODDMEAN, 
-!     :                        ODDSTD, 
+!               CALL FITSWSUB( TAPEORDISK,
+!     :                        MTCHAN,
+!     :                        LUNO,
+!     :                        DIMS( 1),
+!     :                        DIMS( 2),
+!     :                        %VAL( PNTRI),
+!     :                        BZERO,
+!     :                        BSCALE,
+!     :                        ARRAY,
+!     :                        INST,
+!     :                        PLATESCALE,
+!     :                        OBSERVERS,
+!     :                        ORIGIN,
+!     :                        SOFTWARE,
+!     :                        HEIGHT,
+!     :                        LAT,
+!     :                        LONG,
+!     :                        TELESCOPE,
+!     :                        BIAS,
+!     :                        CONF,
+!     :                        MAXVAL,
+!     :                        MINVAL,
+!     :                        DEC,
+!     :                        AIRMASS,
+!     :                        EQUINOX,
+!     :                        EVENMEAN,
+!     :                        EVENSTD,
+!     :                        EXPO,
+!     :                        FILTER,
+!     :                        GAIN,
+!     :                        GATE,
+!     :                        LOCALTIME,
+!     :                        MODE,
+!     :                        COADDS,
+!     :                        OBJECT,
+!     :                        ODDMEAN,
+!     :                        ODDSTD,
 !     :                        OFFSETDEC,
 !     :                        OFFSETRA,
-!     :                        RA, 
-!     :                        READRATE, 
-!     :                        TEMP, 
-!     :                        TITLE, 
-!     :                        IMAGENAME, 
+!     :                        RA,
+!     :                        READRATE,
+!     :                        TEMP,
+!     :                        TITLE,
+!     :                        IMAGENAME,
 !     :                        UT,
 !     :                        HA,
 !     :                        ST,
@@ -744,11 +744,11 @@
 !             IF( DATA_FLAG .EQ. 4) THEN
 
 *              if CHOP + KTC ON then get buffer 4, KTCB
-!               CALL DAT_FIND( LOCCELL, 'KTCB', LOCBUFF, STATUS)                
-!               CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)            
+!               CALL DAT_FIND( LOCCELL, 'KTCB', LOCBUFF, STATUS)
+!               CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)
 !               CALL DAT_SHAPE( LOCDA, 2, DIMS, NDIMS, STATUS)
-        
-*              test the status to see if the find on the data_array etc 
+
+*              test the status to see if the find on the data_array etc
 *              was successful, if not then tell user and release this element
 !               IF( STATUS .NE. SAI__OK) THEN
 !                 STATUS = SAI__OK
@@ -770,7 +770,7 @@
 !               COUNTER = COUNTER + 1
 
 *              call subroutine to calculate max,min in data and BZERO, BSCALE
-!               CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), MAXVAL, 
+!               CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), MAXVAL,
 !     :                         MINVAL, BZERO, BSCALE)
 
 *              tell user of the max,min and b values calculated
@@ -781,13 +781,13 @@
 !     :           STATUS)
 !               CALL MSG_SETR( 'MAX', MAXVAL)
 !               CALL MSG_SETR( 'MIN', MINVAL)
-!               CALL MSG_OUT( 'MESSAGE', 
-!     :           'Maximum = ^MAX, Minimum = ^MIN', 
+!               CALL MSG_OUT( 'MESSAGE',
+!     :           'Maximum = ^MAX, Minimum = ^MIN',
 !     :           STATUS)
 !               CALL MSG_SETR( 'BZE', BZERO)
 !               CALL MSG_SETR( 'BSC', BSCALE)
-!               CALL MSG_OUT( 'MESSAGE', 
-!     :           'Bzero   = ^BZE, Bscale  = ^BSC', 
+!               CALL MSG_OUT( 'MESSAGE',
+!     :           'Bzero   = ^BZE, Bscale  = ^BSC',
 !     :           STATUS)
 
 *              form the image name string
@@ -805,7 +805,7 @@
 !                 CALL STR$TRIM( CCOUNTER, CCOUNTER, L1)
 !                 DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
 !                 CALL LIB$GET_LUN( LUNO)
-!                 OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
+!                 OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN',
 !     :                 FORM='UNFORMATTED', RECORDTYPE='FIXED',
 !     :                 RECL=2880/4, ERR=996)
 !                 CALL MSG_SETC( 'FI', DISKFITS)
@@ -813,50 +813,50 @@
 !               END IF
 
 *              call subroutine to write image to tape in fits format
-!               CALL FITSWSUB( TAPEORDISK, 
-!     :                        MTCHAN, 
-!     :                        LUNO, 
-!     :                        DIMS( 1), 
-!     :                        DIMS( 2), 
-!     :                        %VAL( PNTRI), 
-!     :                        BZERO, 
-!     :                        BSCALE, 
-!     :                        ARRAY, 
-!     :                        INST, 
-!     :                        PLATESCALE, 
-!     :                        OBSERVERS, 
-!     :                        ORIGIN, 
-!     :                        SOFTWARE, 
-!     :                        HEIGHT, 
-!     :                        LAT, 
-!     :                        LONG, 
-!     :                        TELESCOPE, 
-!     :                        BIAS, 
-!     :                        CONF, 
-!     :                        MAXVAL, 
-!     :                        MINVAL, 
-!     :                        DEC, 
-!     :                        AIRMASS, 
-!     :                        EQUINOX, 
-!     :                        EVENMEAN, 
-!     :                        EVENSTD, 
-!     :                        EXPO, 
-!     :                        FILTER, 
-!     :                        GAIN, 
-!     :                        GATE, 
-!     :                        LOCALTIME, 
-!     :                        MODE, 
-!     :                        COADDS, 
-!     :                        OBJECT, 
-!     :                        ODDMEAN, 
-!     :                        ODDSTD, 
+!               CALL FITSWSUB( TAPEORDISK,
+!     :                        MTCHAN,
+!     :                        LUNO,
+!     :                        DIMS( 1),
+!     :                        DIMS( 2),
+!     :                        %VAL( PNTRI),
+!     :                        BZERO,
+!     :                        BSCALE,
+!     :                        ARRAY,
+!     :                        INST,
+!     :                        PLATESCALE,
+!     :                        OBSERVERS,
+!     :                        ORIGIN,
+!     :                        SOFTWARE,
+!     :                        HEIGHT,
+!     :                        LAT,
+!     :                        LONG,
+!     :                        TELESCOPE,
+!     :                        BIAS,
+!     :                        CONF,
+!     :                        MAXVAL,
+!     :                        MINVAL,
+!     :                        DEC,
+!     :                        AIRMASS,
+!     :                        EQUINOX,
+!     :                        EVENMEAN,
+!     :                        EVENSTD,
+!     :                        EXPO,
+!     :                        FILTER,
+!     :                        GAIN,
+!     :                        GATE,
+!     :                        LOCALTIME,
+!     :                        MODE,
+!     :                        COADDS,
+!     :                        OBJECT,
+!     :                        ODDMEAN,
+!     :                        ODDSTD,
 !     :                        OFFSETDEC,
 !     :                        OFFSETRA,
-!     :                        RA, 
-!     :                        READRATE, 
-!     :                        TEMP, 
-!     :                        TITLE, 
-!     :                        IMAGENAME, 
+!     :                        RA,
+!     :                        READRATE,
+!     :                        TEMP,
+!     :                        TITLE,
+!     :                        IMAGENAME,
 !     :                        UT,
 !     :                        HA,
 !     :                        ST,
@@ -925,24 +925,24 @@
               STATUS = SAI__OK
               COUNTER = COUNTER - 1
               CALL MSG_SETC( 'IMAGE', IMAGENAME)
-              CALL MSG_OUT( 'MESSAGE', 
+              CALL MSG_OUT( 'MESSAGE',
      :         'Image ^IMAGE NOT FOUND ...',
      :         STATUS)
               GOTO 600
             END IF
 
 *            get the primitive parameters defining observation for header
-              CALL FITSWGET( LOCI, LOCI, LOCI, LOCI, ARRAY, INST, 
-     :                       PLATESCALE, OBSERVERS, ORIGIN, 
-     :                       SOFTWARE, HEIGHT, LAT, LONG, 
-     :                       TELESCOPE, BIAS, CONF, MAXXY, 
-     :                       MINNY, DEC, AIRMASS, UT, EQUINOX, 
+              CALL FITSWGET( LOCI, LOCI, LOCI, LOCI, ARRAY, INST,
+     :                       PLATESCALE, OBSERVERS, ORIGIN,
+     :                       SOFTWARE, HEIGHT, LAT, LONG,
+     :                       TELESCOPE, BIAS, CONF, MAXXY,
+     :                       MINNY, DEC, AIRMASS, UT, EQUINOX,
      :                       EVENMEAN, EVENSTD,  EXPO, FPX,
-     :                       FPY, FPZ, FILTER, GAIN, GATE, 
-     :                       HA, LOCALTIME, MODE, COADDS, OBJECT, 
-     :                       ODDMEAN, 
-     :                       ODDSTD, OFFSETDEC, OFFSETRA, RA, 
-     :                       READRATE, ST, TEMP, TITLE, 
+     :                       FPY, FPZ, FILTER, GAIN, GATE,
+     :                       HA, LOCALTIME, MODE, COADDS, OBJECT,
+     :                       ODDMEAN,
+     :                       ODDSTD, OFFSETDEC, OFFSETRA, RA,
+     :                       READRATE, ST, TEMP, TITLE,
      :                       XHEAD_ARCSECPMM, XHEAD_DEC_ZERO,
      :                       XHEAD_RA_ZERO, XHEAD_DEC, XHEAD_RA,
      :                       COMMENTS, STATUS)
@@ -955,7 +955,7 @@
               STATUS = SAI__OK
               COUNTER = COUNTER - 1
               CALL MSG_SETC( 'IMAGE', IMAGENAME)
-              CALL MSG_OUT( 'MESSAGE', 
+              CALL MSG_OUT( 'MESSAGE',
      :         'Image ^IMAGE DATA_ARRAY mapping error ...',
      :         STATUS)
               GOTO 600
@@ -970,17 +970,17 @@
      : 'Image ^COUN = ^NAME, ^XDIM by ^YDIM pixels', STATUS )
 
 *          call subroutine to calculate max,min in data and BZERO, BSCALE
-            CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), MAXVAL, 
+            CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), MAXVAL,
      :                      MINVAL, BZERO, BSCALE)
 
 *          tell user of the max,min and b values calculated
             CALL MSG_SETR( 'MAX', MAXVAL)
             CALL MSG_SETR( 'MIN', MINVAL)
-            CALL MSG_OUT( 'MESSAGE', 'Maximum = ^MAX, Minimum = ^MIN', 
+            CALL MSG_OUT( 'MESSAGE', 'Maximum = ^MAX, Minimum = ^MIN',
      :                     STATUS)
             CALL MSG_SETR( 'BZE', BZERO)
             CALL MSG_SETR( 'BSC', BSCALE)
-            CALL MSG_OUT( 'MESSAGE', 'Bzero   = ^BZE, Bscale  = ^BSC', 
+            CALL MSG_OUT( 'MESSAGE', 'Bzero   = ^BZE, Bscale  = ^BSC',
      :                     STATUS)
 
 *          write the header to the output text file for image written
@@ -991,8 +991,8 @@
               CALL CHR_ITOC( STARTNUM, CCOUNTER, L1 )
               STARTNUM = STARTNUM + 1
               CALL CHR_CLEAN( CCOUNTER )
-              L1 = 0 
-              CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)              
+              L1 = 0
+              CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
               DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
               CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
      :             2880, LUNO, STATUS )
@@ -1002,18 +1002,18 @@
             END IF
 
 *          call subroutine to write image to tape in fits format
-            CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO, DIMS( 1), 
-     :                     DIMS( 2), %VAL( PNTRI), BZERO, 
-     :                     BSCALE, ARRAY, INST, PLATESCALE, 
-     :                     OBSERVERS, ORIGIN, SOFTWARE, 
-     :                     HEIGHT, LAT, LONG, TELESCOPE, 
-     :                     BIAS, CONF, MAXVAL, MINVAL, 
-     :                     DEC, AIRMASS, EQUINOX, EVENMEAN, 
-     :                     EVENSTD, EXPO, FILTER, GAIN, 
-     :                     GATE, LOCALTIME, MODE, COADDS, 
-     :                     OBJECT, ODDMEAN, ODDSTD, 
-     :                     OFFSETDEC, OFFSETRA, RA, 
-     :                     READRATE, TEMP, TITLE, IMAGENAME, 
+            CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO, DIMS( 1),
+     :                     DIMS( 2), %VAL( PNTRI), BZERO,
+     :                     BSCALE, ARRAY, INST, PLATESCALE,
+     :                     OBSERVERS, ORIGIN, SOFTWARE,
+     :                     HEIGHT, LAT, LONG, TELESCOPE,
+     :                     BIAS, CONF, MAXVAL, MINVAL,
+     :                     DEC, AIRMASS, EQUINOX, EVENMEAN,
+     :                     EVENSTD, EXPO, FILTER, GAIN,
+     :                     GATE, LOCALTIME, MODE, COADDS,
+     :                     OBJECT, ODDMEAN, ODDSTD,
+     :                     OFFSETDEC, OFFSETRA, RA,
+     :                     READRATE, TEMP, TITLE, IMAGENAME,
      :                     UT, HA, ST, FPX, FPY,FPZ,
      :                     XHEAD_ARCSECPMM, XHEAD_DEC_ZERO,
      :                     XHEAD_RA_ZERO, XHEAD_DEC,
@@ -1051,7 +1051,7 @@
               COUNTER = COUNTER - 1
               CALL SUBPAR_GETNAME ( IMCODE2, IMAGENAME, STATUS)
               CALL MSG_SETC( 'IMAGE', IMAGENAME)
-              CALL MSG_OUT( 'MESSAGE', 
+              CALL MSG_OUT( 'MESSAGE',
      :         'Image ^IMAGE NOT FOUND ...',
      :         STATUS)
               GOTO 601
@@ -1059,17 +1059,17 @@
             CALL SUBPAR_GETNAME ( IMCODE2, IMAGENAME, STATUS)
 
 *            get the primitive parameters defining observation for header
-              CALL FITSWGET( LOCI, LOCI, LOCI, LOCI, ARRAY, 
-     :                       INST, PLATESCALE, OBSERVERS, 
-     :                       ORIGIN, SOFTWARE, HEIGHT, LAT, 
-     :                       LONG, TELESCOPE, BIAS, CONF, 
-     :                       MAXXY, MINNY, DEC,  AIRMASS, 
-     :                       UT, EQUINOX, EVENMEAN, EVENSTD, 
-     :                       EXPO, FPX, FPY, FPZ, FILTER, 
-     :                       GAIN, GATE, HA, LOCALTIME, 
-     :                       MODE, COADDS, OBJECT, ODDMEAN, 
+              CALL FITSWGET( LOCI, LOCI, LOCI, LOCI, ARRAY,
+     :                       INST, PLATESCALE, OBSERVERS,
+     :                       ORIGIN, SOFTWARE, HEIGHT, LAT,
+     :                       LONG, TELESCOPE, BIAS, CONF,
+     :                       MAXXY, MINNY, DEC,  AIRMASS,
+     :                       UT, EQUINOX, EVENMEAN, EVENSTD,
+     :                       EXPO, FPX, FPY, FPZ, FILTER,
+     :                       GAIN, GATE, HA, LOCALTIME,
+     :                       MODE, COADDS, OBJECT, ODDMEAN,
      :                       ODDSTD, OFFSETDEC, OFFSETRA,
-     :                       RA, READRATE, ST, TEMP, TITLE, 
+     :                       RA, READRATE, ST, TEMP, TITLE,
      :                       XHEAD_ARCSECPMM, XHEAD_DEC_ZERO,
      :                       XHEAD_RA_ZERO, XHEAD_DEC,
      :                       XHEAD_RA, COMMENTS, STATUS)
@@ -1081,7 +1081,7 @@
             IF( STATUS .NE. SAI__OK) THEN
               STATUS = SAI__OK
               COUNTER = COUNTER - 1
-              CALL MSG_OUT( 'MESSAGE', 
+              CALL MSG_OUT( 'MESSAGE',
      :         'DATA_ARRAY mapping error ...',
      :         STATUS)
               GOTO 601
@@ -1096,17 +1096,17 @@
      :      'Image ^COUN = ^NAME, ^XDIM by ^YDIM pixels', STATUS )
 
 *          call subroutine to calculate max,min in data and BZERO, BSCALE
-            CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+            CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :                      MAXVAL, MINVAL, BZERO, BSCALE)
 
 *          tell user of the max,min and b values calculated
             CALL MSG_SETR( 'MAX', MAXVAL)
             CALL MSG_SETR( 'MIN', MINVAL)
-            CALL MSG_OUT( 'MESSAGE', 'Maximum = ^MAX, Minimum = ^MIN', 
+            CALL MSG_OUT( 'MESSAGE', 'Maximum = ^MAX, Minimum = ^MIN',
      :                     STATUS)
             CALL MSG_SETR( 'BZE', BZERO)
             CALL MSG_SETR( 'BSC', BSCALE)
-            CALL MSG_OUT( 'MESSAGE', 'Bzero   = ^BZE, Bscale  = ^BSC', 
+            CALL MSG_OUT( 'MESSAGE', 'Bzero   = ^BZE, Bscale  = ^BSC',
      :                    STATUS)
 
 *          write the header to the output text file for image written
@@ -1117,7 +1117,7 @@
               CALL CHR_ITOC( STARTNUM, CCOUNTER, L1 )
               STARTNUM = STARTNUM + 1
               CALL CHR_CLEAN( CCOUNTER )
-              L1 = 0 
+              L1 = 0
               CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
               DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
               CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
@@ -1128,17 +1128,17 @@
             END IF
 
 *          call subroutine to write image to tape in fits format
-            CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO, DIMS( 1), 
-     :                     DIMS( 2), %VAL( PNTRI), BZERO,  BSCALE, 
-     :                     ARRAY, INST, PLATESCALE, OBSERVERS, 
-     :                     ORIGIN, SOFTWARE, HEIGHT, LAT, 
-     :                     LONG, TELESCOPE, BIAS, CONF, 
-     :                     MAXVAL, MINVAL, DEC,  AIRMASS, 
-     :                     EQUINOX, EVENMEAN, EVENSTD, 
-     :                     EXPO, FILTER, GAIN, GATE, 
-     :                     LOCALTIME, MODE,  COADDS, 
-     :                     OBJECT, ODDMEAN,  ODDSTD, 
-     :                     OFFSETDEC, OFFSETRA, RA, READRATE, 
+            CALL FITSWSUB( TAPEORDISK, MTCHAN, LUNO, DIMS( 1),
+     :                     DIMS( 2), %VAL( PNTRI), BZERO,  BSCALE,
+     :                     ARRAY, INST, PLATESCALE, OBSERVERS,
+     :                     ORIGIN, SOFTWARE, HEIGHT, LAT,
+     :                     LONG, TELESCOPE, BIAS, CONF,
+     :                     MAXVAL, MINVAL, DEC,  AIRMASS,
+     :                     EQUINOX, EVENMEAN, EVENSTD,
+     :                     EXPO, FILTER, GAIN, GATE,
+     :                     LOCALTIME, MODE,  COADDS,
+     :                     OBJECT, ODDMEAN,  ODDSTD,
+     :                     OFFSETDEC, OFFSETRA, RA, READRATE,
      :                     TEMP, TITLE, IMAGENAME,  UT, HA,
      :                     ST, FPX, FPY, FPZ,
      :                     XHEAD_ARCSECPMM, XHEAD_DEC_ZERO,
@@ -1182,7 +1182,7 @@
             IF( STATUS .NE. SAI__OK) THEN
               STATUS = SAI__OK
               CALL MSG_SETC( 'CONT', CONTNAME( J))
-              CALL MSG_OUT( 'MESSAGE', 
+              CALL MSG_OUT( 'MESSAGE',
      :        'ERROR, SNAPSHOT observation file ^CONT NOT FOUND ...',
      :         STATUS)
               GOTO 501
@@ -1195,13 +1195,13 @@
             ENDOBS = MIN( CONTEND( J), DIMS( 1))
             CALL MSG_SETI( 'ST', STARTOBS)
             CALL MSG_SETI( 'EN', ENDOBS)
-            CALL MSG_OUT( 'MESS', 
+            CALL MSG_OUT( 'MESS',
      :       'Start observation = ^ST, End observation = ^EN', STATUS)
 
 *          loop for all images from container file specified by user
             DO K = STARTOBS, ENDOBS
 
-*            get the parameters from the current container file observation 
+*            get the parameters from the current container file observation
 *            after getting locator to current obs cell elements
               NDIMS = 1
               DIMS( 1) = K
@@ -1213,24 +1213,24 @@
                 STATUS = SAI__OK
                 CALL MSG_SETI( 'NUMO', K)
                 CALL MSG_SETC( 'CON', CONTNAME( J))
-                CALL MSG_OUT( 'MESSAGE', 
+                CALL MSG_OUT( 'MESSAGE',
      :'IRCAM Container file ^CON, Obs number ^NUMO NOT FOUND ...',
      :           STATUS)
                 GOTO 201
               END IF
 
-*            get the UT from the observation 
+*            get the UT from the observation
               CALL FITSWGET2( LOCCELL, UT, STATUS)
 
-*            set number of dimensions to zero for scalar primitives 
+*            set number of dimensions to zero for scalar primitives
               NDIMS = 0
 
 *            for any data flag other than 0 get buffer 1, PHASEA
-              CALL DAT_FIND( LOCCELL, 'PHASEA', LOCBUFF, STATUS)                
-              CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)              
+              CALL DAT_FIND( LOCCELL, 'PHASEA', LOCBUFF, STATUS)
+              CALL DAT_FIND( LOCBUFF, 'DATA_ARRAY', LOCDA, STATUS)
               CALL DAT_SHAPE( LOCDA, 2, DIMS, NDIMS, STATUS)
-        
-*            test the status to see if the find on the data_array etc 
+
+*            test the status to see if the find on the data_array etc
 *            was successful, if not then tell user and release this element
               IF( STATUS .NE. SAI__OK) THEN
                 STATUS = SAI__OK
@@ -1252,7 +1252,7 @@
               COUNTER = COUNTER + 1
 
 *            call subroutine to calculate max,min in data and BZERO, BSCALE
-              CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+              CALL FITSWCALB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :                        MAXVAL, MINVAL, BZERO, BSCALE)
 
 *            tell user of the max,min and b values calculated
@@ -1263,21 +1263,21 @@
      :          STATUS)
               CALL MSG_SETR( 'MAX', MAXVAL)
               CALL MSG_SETR( 'MIN', MINVAL)
-              CALL MSG_OUT( 'MESSAGE', 
-     :          'Maximum = ^MAX, Minimum = ^MIN', 
+              CALL MSG_OUT( 'MESSAGE',
+     :          'Maximum = ^MAX, Minimum = ^MIN',
      :          STATUS)
               CALL MSG_SETR( 'BZE', BZERO)
               CALL MSG_SETR( 'BSC', BSCALE)
-              CALL MSG_OUT( 'MESSAGE', 
-     :          'Bzero   = ^BZE, Bscale  = ^BSC', 
+              CALL MSG_OUT( 'MESSAGE',
+     :          'Bzero   = ^BZE, Bscale  = ^BSC',
      :          STATUS)
 
 *            form the image name string
               CALL CHR_ITOC( K, KC, KL )
               CALL CHR_CLEAN( CONTNAME( J))
-              LEN = 0 
+              LEN = 0
               CALL CHR_APPND( CONTNAME( J), CONTNAME( J), LEN)
-              IMAGENAME = 
+              IMAGENAME =
      :            CONTNAME( J)( 1:LEN)//'.OBS('//KC(1:KL)//').PHASEA'
 
 *            write header to the text file
@@ -1288,30 +1288,30 @@
                 CALL CHR_ITOC( STARTNUM, CCOUNTER, L1 )
                 STARTNUM = STARTNUM + 1
                 CALL CHR_CLEAN( CCOUNTER )
-                L1 = 0 
+                L1 = 0
                 CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
                 DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
                 CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
      :               2880, LUNO, STATUS )
                 IF (STATUS .NE. SAI__OK) GO TO 996
                 CALL MSG_SETC( 'FI', DISKFITS)
-                CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', 
+                CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI',
      :                STATUS)
               END IF
 
 *            call subroutine to write image to tape in fits format
-              CALL FITSWSUB( TAPEORDISK, MTCHAN,  LUNO, 
-     :                       DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :                       BZERO, BSCALE, ARRAY, INST, 
-     :                       PLATESCALE, OBSERVERS, ORIGIN, 
-     :                       SOFTWARE, HEIGHT, LAT, LONG, 
-     :                       TELESCOPE, BIAS, CONF, MAXVAL, 
-     :                       MINVAL, DEC, AIRMASS, EQUINOX, 
-     :                       EVENMEAN, EVENSTD, EXPO, 
-     :                       FILTER, GAIN,  GATE,  LOCALTIME, 
-     :                       MODE, COADDS, OBJECT, ODDMEAN, 
+              CALL FITSWSUB( TAPEORDISK, MTCHAN,  LUNO,
+     :                       DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :                       BZERO, BSCALE, ARRAY, INST,
+     :                       PLATESCALE, OBSERVERS, ORIGIN,
+     :                       SOFTWARE, HEIGHT, LAT, LONG,
+     :                       TELESCOPE, BIAS, CONF, MAXVAL,
+     :                       MINVAL, DEC, AIRMASS, EQUINOX,
+     :                       EVENMEAN, EVENSTD, EXPO,
+     :                       FILTER, GAIN,  GATE,  LOCALTIME,
+     :                       MODE, COADDS, OBJECT, ODDMEAN,
      :                       ODDSTD, OFFSETDEC, OFFSETRA,
-     :                       RA, READRATE, TEMP, TITLE, 
+     :                       RA, READRATE, TEMP, TITLE,
      :                       IMAGENAME, UT, HA, ST, FPX,
      :                       FPY, FPZ, XHEAD_ARCSECPMM,
      :                       XHEAD_DEC_ZERO, XHEAD_RA_ZERO,
@@ -1348,13 +1348,13 @@
         RETURN
   998   CONTINUE
         CALL FIO_CLOSE( LUN, STATUS )
-        CALL ERR_REP( 'MESSAGE', 
+        CALL ERR_REP( 'MESSAGE',
      :                'Error, cannot read from specified file',
      :                STATUS)
         RETURN
   996   CONTINUE
         CALL RIO_CLOSE( LUNO, STATUS)
-        CALL ERR_REP( 'MESSAGE', 
+        CALL ERR_REP( 'MESSAGE',
      :                'Error, cannot write disk fits file',
      :                STATUS)
         END

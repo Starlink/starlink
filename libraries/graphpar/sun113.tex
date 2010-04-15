@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -82,7 +82,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -502,12 +502,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -556,7 +556,7 @@
 
 This guide outlines the options available to a programmer writing an ADAM
 applications program who wishes to incorporate graphics into the program and
-describes the routines that handle the necessary interaction with the ADAM 
+describes the routines that handle the necessary interaction with the ADAM
 parameter system when a graphics device is opened for a GKS based graphics
 package.
 
@@ -570,10 +570,10 @@ this document.
 
 \section{Application}
 
-For most ADAM applications, 
+For most ADAM applications,
 \xref{PGPLOT}{sun15}{} (SUN/15) is the graphics package of choice;
-it provides an easy to use yet powerful interface for plotting 2D axes, contour 
-maps, grey-scale, colour images and many other styles of plot. The 
+it provides an easy to use yet powerful interface for plotting 2D axes, contour
+maps, grey-scale, colour images and many other styles of plot. The
 \xref{NCAR package}{sun88}{}
 (SUN/88) provides similar facilities and some additional styles of plot
 (e.g.\ stream-line diagrams) and is in general more powerful (for example, NCAR
@@ -582,8 +582,8 @@ is somewhat harder to use. NCAR also contains a 3D drawing package. It
 is possible to combine NCAR graphics with calls to SGS and GKS by using
 the \xref{Starlink Extensions to NCAR}{sun90}{} (SNX---SUN/90) package.
 
-The NAG graphics package can also be used but it is forbidden for 
-software that is to become part of the Starlink software collection because 
+The NAG graphics package can also be used but it is forbidden for
+software that is to become part of the Starlink software collection because
 its availability on all hardware platforms is not guaranteed
 (particularly in its single precision form) and non-Starlink sites may
 not have a licence to use it.
@@ -612,7 +612,7 @@ Programs requiring intimate interaction with an image display device should use
 the \xref{Image Display Interface}{sun65}{}
 (IDI---SUN/65) which is not based on GKS and offers
 access to facilities that are outside the GKS model of a graphics device.
-Currently the only device supported by IDI is 
+Currently the only device supported by IDI is
 X-windows. The routines for opening and closing an IDI device in an
 ADAM program are described in SUN/65.
 
@@ -626,26 +626,26 @@ following routines, which must {\em never} be called in ADAM programs :
 \item \xref{PGEND}{sun15}{PGEND}
 \item \xref{PGASK}{sun15}{PGASK}
 \end{itemize}
-The functions of {\tt PGBEG} (and the equivalent obsolete routine {\tt 
-PGBEGIN}) are performed by the environment routine 
-\htmlref{{\tt PGP\_ASSOC}}{PGP_ASSOC}. The 
-environment routines \htmlref{{\tt PGP\_ANNUL}}{PGP_ANNUL}, 
-\htmlref{{\tt PGP\_CANCL}}{PGP_CANCL} and 
-\htmlref{{\tt PGP\_DEACT}}{PGP_DEACT} all call {\tt PGEND}, 
+The functions of {\tt PGBEG} (and the equivalent obsolete routine {\tt
+PGBEGIN}) are performed by the environment routine
+\htmlref{{\tt PGP\_ASSOC}}{PGP_ASSOC}. The
+environment routines \htmlref{{\tt PGP\_ANNUL}}{PGP_ANNUL},
+\htmlref{{\tt PGP\_CANCL}}{PGP_CANCL} and
+\htmlref{{\tt PGP\_DEACT}}{PGP_DEACT} all call {\tt PGEND},
 but should be used as
-described \hyperref{here}{in section~}{}{pgplot} in order to be compatible 
+described \hyperref{here}{in section~}{}{pgplot} in order to be compatible
 with any future
 enhancements to PGPLOT which might separate the action of closing a
 workstation and closing down PGPLOT itself.
 
-{\tt PGASK} controls whether PGPLOT prompts the user for confirmation before 
+{\tt PGASK} controls whether PGPLOT prompts the user for confirmation before
 clearing
 the screen of a graphics device; if used in an ADAM program PGPLOT will bypass
 the parameter system and attempt to read directly from the users terminal. So
-the ``prompt state'' must never be changed from its 
+the ``prompt state'' must never be changed from its
 default state ({\tt{'OFF'}} in
 ADAM programs). If prompting is required it is up to the application to keep
-track of when 
+track of when
 \xref{{\tt PGPAGE}}{sun15}{PGPAGE}
 will clear the screen and issue its own prompt.
 
@@ -659,12 +659,12 @@ following routines, which must {\em never} be called in ADAM programs :
 \item \xref{SGS\_OPNWK}{sun85}{SGS_OPNWK}
 \item \xref{SGS\_CLOSE}{sun85}{SGS_CLOSE}
 \end{itemize}
-The functions of {\tt SGS\_INIT}, {\tt SGS\_OPEN} and {\tt SGS\_OPNWK} are 
+The functions of {\tt SGS\_INIT}, {\tt SGS\_OPEN} and {\tt SGS\_OPNWK} are
 performed by the environment routine \htmlref{{\tt SGS\_ASSOC}}{SGS_ASSOC}.
 The environment routines \htmlref{{\tt SGS\_ANNUL}}{SGS_ANNUL}
-and \htmlref{{\tt SGS\_CANCL}}{SGS_CANCL} dispose of 
-resources used in SGS programs.  {\tt SGS\_CLOSE} will be called by the 
-environment level SGS de-activation routine 
+and \htmlref{{\tt SGS\_CANCL}}{SGS_CANCL} dispose of
+resources used in SGS programs.  {\tt SGS\_CLOSE} will be called by the
+environment level SGS de-activation routine
 \htmlref{{\tt SGS\_DEACT}}{SGS_DEACT}.
 
 
@@ -683,11 +683,11 @@ following routines, which must {\em never} be called in ADAM applications:
 \item GCLKS
 \end{itemize}
 
-The functions of {\tt GOPKS} and {\tt GOPWK} are performed by the environment 
-level routine \htmlref{{\tt GKS\_ASSOC}}{GKS_ASSOC}. The function of 
-{\tt GCLWK} is performed by the routines 
-\htmlref{{\tt GKS\_ANNUL}}{GKS_ANNUL} or 
-\htmlref{{\tt GKS\_CANCL}}{GKS_CANCL}. The function of {\tt GCLKS} 
+The functions of {\tt GOPKS} and {\tt GOPWK} are performed by the environment
+level routine \htmlref{{\tt GKS\_ASSOC}}{GKS_ASSOC}. The function of
+{\tt GCLWK} is performed by the routines
+\htmlref{{\tt GKS\_ANNUL}}{GKS_ANNUL} or
+\htmlref{{\tt GKS\_CANCL}}{GKS_CANCL}. The function of {\tt GCLKS}
 is performed by the routine \htmlref{{\tt GKS\_DEACT}}{GKS_DEACT}.
 
 \section{Environment Level Routines}
@@ -699,7 +699,7 @@ environment level routines.
 
 \subsection{SGS routines\xlabel{sgs}}
 
-SGS has four environment level subroutines (the SGS `parameter' or SGSPAR 
+SGS has four environment level subroutines (the SGS `parameter' or SGSPAR
 routines) which provide the necessary interaction with the outside world.
 They are :
 
@@ -745,15 +745,15 @@ Here is a skeletal example of a program using SGS :
 
 \htmlref{{\tt SGS\_ASSOC}}{SGS_ASSOC}
 should be the first SGS routine to be called in the application.
-It obtains (via the parameter system) the name of the graphics workstation 
+It obtains (via the parameter system) the name of the graphics workstation
 to be used, creates an initial SGS zone on the workstation, and returns an
 SGS zone identifier which can be used in subsequent SGS subroutine calls.
 
-The first argument of {\tt SGS\_ASSOC} is an ADAM program parameter. 
+The first argument of {\tt SGS\_ASSOC} is an ADAM program parameter.
 It should be
 defined to be a graphics device parameter in the interface module for the
-application (see the 
-\hyperref{example interface file}{example interface file 
+application (see the
+\hyperref{example interface file}{example interface file
 in section}{}{ifl}). The value of
 this parameter should be the name of a workstation as defined by GNS (see
 \xref{SUN/57}{sun57}{GKSWorkstationNames}).
@@ -761,12 +761,12 @@ this parameter should be the name of a workstation as defined by GNS (see
 The second argument is the access mode required. This can be one of :
 \begin{description}
 \item[{\tt 'READ'}] The application is only going to `read' from the workstation
-({\em i.e.}\ perform cursor or similar operations). 
+({\em i.e.}\ perform cursor or similar operations).
 Screens will not be cleared when vdu workstations are opened.
 \item[{\tt 'WRITE'}] The application is going to `write' on the workstation,
-{\em i.e.}\ actually do some graphics. 
+{\em i.e.}\ actually do some graphics.
 Workstations are completely initialized when they are opened.
-\item[{\tt 'UPDATE'}] The application will modify the graphics on the 
+\item[{\tt 'UPDATE'}] The application will modify the graphics on the
 workstation.
 Screens will not be cleared when vdu workstations are opened.
 \end{description}
@@ -780,9 +780,9 @@ The fourth argument is the usual status value. It follows the ADAM error
 strategy as described in \xref{SUN/104}{sun104}{}.
 
 When the application has finished using the workstation, it should be closed
-using \htmlref{{\tt SGS\_CANCL}}{SGS_CANCL} unless it is 
-required to keep the parameter active 
-(to update a global parameter for example), in which case 
+using \htmlref{{\tt SGS\_CANCL}}{SGS_CANCL} unless it is
+required to keep the parameter active
+(to update a global parameter for example), in which case
 \htmlref{{\tt SGS\_ANNUL}}{SGS_ANNUL}
 should be used.
 
@@ -791,7 +791,7 @@ calling \htmlref{{\tt SGS\_DEACT}}{SGS_DEACT}.
 
 \subsection{PGPLOT routines\label{pgplot}\xlabel{pgplot}}
 
-PGPLOT has four environment level subroutines (the PGPLOT `parameter' or PGPPAR 
+PGPLOT has four environment level subroutines (the PGPLOT `parameter' or PGPPAR
 routines) which provide the necessary interaction with the outside world.
 They are :
 
@@ -835,7 +835,7 @@ Here is a skeletal example of a program using PGPLOT :
 \end{verbatim}
 \end{quote}
 
-Note the close similarity with the SGS skeleton program. 
+Note the close similarity with the SGS skeleton program.
 \htmlref{{\tt PGP\_ASSOC}}{PGP_ASSOC} should be
 the first PGPLOT routine called in the application. It obtains (via the
 parameter system) the name of the graphics workstation  to be used, opens the
@@ -855,8 +855,8 @@ The fifth argument is the unit identifier returned to the application.
 
 When the application has finished using the workstation, it should be closed
 using \htmlref{{\tt PGP\_CANCL}}{PGP_CANCL}
-unless it is required to keep the parameter active 
-(to update a global parameter for example), in which case 
+unless it is required to keep the parameter active
+(to update a global parameter for example), in which case
 \htmlref{{\tt PGP\_ANNUL}}{PGP_ANNUL} should be used.
 
 When the application has finished using PGPLOT, it should be de-activated by
@@ -875,8 +875,8 @@ Subroutine & \multicolumn{1}{c||}{Function} \\ \hline
 GKS\_ASSOC  & Associate a graphics workstation with a parameter and open it.\\
 GKS\_ANNUL  & Close a graphics workstation without cancelling the parameter.\\
 GKS\_CANCL  & Close a graphics workstation and cancel the parameter.\\
-GKS\_DEACT  & De-activate ADAM GKS.\\ 
-GKS\_GSTAT  & Inquire whether GKS has reported an error 
+GKS\_DEACT  & De-activate ADAM GKS.\\
+GKS\_GSTAT  & Inquire whether GKS has reported an error
 (see Section \ref{errhnd}). \\ \hline
 \end{tabular}
 \end{center}
@@ -910,7 +910,7 @@ Here is a skeletal example of a program using GKS :
 \end{verbatim}
 \end{quote}
 
-Note the close similarity with the SGS skeleton program. 
+Note the close similarity with the SGS skeleton program.
 \htmlref{{\tt GKS\_ASSOC}}{GKS_ASSOC} should be
 the first GKS routine to be called in the application. It obtains (via the
 parameter system) the name of the graphics workstation to be used, opens it,
@@ -922,8 +922,8 @@ The notes in the previous section on the arguments of {\tt SGS\_ASSOC}
 well to {\tt GKS\_ASSOC} with the exception that the third argument is a GKS
 workstation identifier rather than an SGS zone identifier.
 
-The workstation is closed using 
-\htmlref{{\tt GKS\_ANNUL}}{GKS_ANNUL} or 
+The workstation is closed using
+\htmlref{{\tt GKS\_ANNUL}}{GKS_ANNUL} or
 \htmlref{{\tt GKS\_CANCL}}{GKS_CANCL}
 when the application has finished using it.
 
@@ -959,7 +959,7 @@ PGPTEST' or `interface GKSTEST.
 
 \section{Error Handling}
 \label{errhnd}
-The PGPLOT, SGS and GKS parameter routines conform to the Starlink error 
+The PGPLOT, SGS and GKS parameter routines conform to the Starlink error
 reporting and inherited status strategy described in \xref{SUN/104}{sun104}{}.
 Error reports will generally be of the form:
 \begin{quote}
@@ -1016,7 +1016,7 @@ net effect is as if the GKS routine(s) did have an inherited status argument.
 
 Note that for stand alone GKS routines which do have a status argument, the
 environment status variable should {\em not} be used. Use a local variable,
-ignore its value and use {\tt GKS\_GSTAT} to get an environment status value 
+ignore its value and use {\tt GKS\_GSTAT} to get an environment status value
 for the
 routine. Liberal use of IF .. THEN .. ELSE .. ENDIF structures testing the
 environment status value is recommended to prevent invalid output from GKS and
@@ -1081,7 +1081,7 @@ Example :\nopagebreak
 
 \section{Compiling and Linking}
 
-Graphics programs are linked by including {\tt `pgp\_link\_adam`}, 
+Graphics programs are linked by including {\tt `pgp\_link\_adam`},
 {\tt `sgs\_link\_adam`} or {\tt `gks\_link\_adam`} as appropriate on
 the alink command line.
 
@@ -1131,7 +1131,7 @@ GKS\_\_DVERR     & Workstation name not defined by GNS
 }{
    \sstdescription{
       De-activate and close the graphics workstation whose Workstation
-      Identifier was obtained using \htmlref{GKS\_ASSOC}{GKS_ASSOC}, and 
+      Identifier was obtained using \htmlref{GKS\_ASSOC}{GKS_ASSOC}, and
       annul the
       Workstation Identifier. Do not cancel the associated parameter.
    }
@@ -1214,7 +1214,7 @@ GKS\_\_DVERR     & Workstation name not defined by GNS
    \sstdescription{
       De-activate and close the graphics workstation associated with
       the specified Graphics Device Parameter and cancel the parameter.
-      The workstation must have been opened using 
+      The workstation must have been opened using
       \htmlref{GKS\_ASSOC}{GKS_ASSOC}.
    }
    \sstinvocation{
@@ -1532,7 +1532,7 @@ GKS\_\_DVERR     & Workstation name not defined by GNS
    \sstdescription{
       De-activate and close the graphics workstation associated with
       the specified graphics device parameter and cancel the parameter.
-      The workstation must have been opened using 
+      The workstation must have been opened using
       \htmlref{SGS\_ASSOC}{SGS_ASSOC}.
    }
    \sstinvocation{

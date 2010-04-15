@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine creates following components in the IMAGE_INFO
-*     structure of an IRAS ALLSKY NDF file. 
+*     structure of an IRAS ALLSKY NDF file.
 *                     HCON <_INTEGER>
 *                     MINSOP <_INTEGER>
 *                     MAXSOP <_INTEGER>
@@ -56,13 +56,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                                 
+
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
 
@@ -70,7 +70,7 @@
       INTEGER NCARD
       CHARACTER FITS( NCARD )*(*)
       CHARACTER LOC*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -86,7 +86,7 @@
       INTEGER CMNTLN             ! Used length of CMNT
       INTEGER FEQPSN             ! Position of the fisrt equal sign
       INTEGER HCON               ! Hours confirmation of the image
-      INTEGER MAXSOP             ! Value of keyword MAXSOP 
+      INTEGER MAXSOP             ! Value of keyword MAXSOP
       INTEGER MINSOP             ! Value of keyword MINSOP
       INTEGER OBJLN              ! Length of string OBJECT
       INTEGER SEPPSN             ! Position of the separation sign
@@ -94,7 +94,7 @@
       INTEGER STCARD             ! Start card number when search FITS
       LOGICAL CENTRE             ! Galactic centre image flag
       LOGICAL THERE              ! FITS keyword flag
-              
+
 *.
 
 *  Check inherited global status.
@@ -117,13 +117,13 @@
 *  Get the last character of the OBJECT string.
       HCNSTR = OBJECT( OBJLN : OBJLN )
 
-*  Convert it to an integer. 
+*  Convert it to an integer.
       CALL CHR_CTOI( HCNSTR, HCON, STATUS )
 
 *  Write the HCON components of the IMAGE_INFO structure.
       CALL CMP_PUT0I( LOC, 'HCON', HCON, STATUS )
 
-*  If the first character of object string is 'C', the image is 
+*  If the first character of object string is 'C', the image is
 *  Galactic Centre.
       IF ( OBJECT( 1 : 1 ) .EQ. 'C' ) THEN
          CENTRE = .TRUE.
@@ -132,11 +132,11 @@
 *  Galactic Anti-Centre.
       ELSE IF ( OBJECT( 1 : 1 ) .EQ. 'A' ) THEN
          CENTRE = .FALSE.
-      END IF 
+      END IF
 
 *  Write the component GELCEN.
       CALL CMP_PUT0L( LOC, 'GALCEN', CENTRE, STATUS )
-      
+
 *  Get the first FITS comment string after keyword OBJECT.
       STCARD = CARD
       CALL IRM_COMNT( NCARD, FITS, STCARD, THERE, CMNT, CARD, STATUS )

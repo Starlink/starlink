@@ -20,28 +20,28 @@
 *        The global status.
 
 *  Description:
-*     This routine removes bad pixels from a 2-d NDF, replacing them with 
+*     This routine removes bad pixels from a 2-d NDF, replacing them with
 *     the median of the eight (or less at the edges) neighbouring pixels.
 *     At least three of these eight neighbouring pixels must have good
-*     values (that is, they must not set to the bad value) otherwise the 
+*     values (that is, they must not set to the bad value) otherwise the
 *     resultant pixel becomes bad.
 *
 *     The positions of the pixels to be removed can be supplied in four
 *     ways (see parameter MODE):
 *
-*     - In response to parameter prompts. A single bad pixel position is 
-*     supplied at each prompt, and the user is re-prompted until a null value 
+*     - In response to parameter prompts. A single bad pixel position is
+*     supplied at each prompt, and the user is re-prompted until a null value
 *     is supplied.
 *
-*     - Within a positions list such as produced by applications CURSOR, 
+*     - Within a positions list such as produced by applications CURSOR,
 *     LISTMAKE, etc.
 *
-*     - Within a simple text file. Each line contains the position of a 
+*     - Within a simple text file. Each line contains the position of a
 *     pixel to be replaced.
 *
 *     - Alternatively, each bad pixel in the input NDF can be used
-*     (subject to the above requirement that at least three out of the 
-*     eight neighbouring pixels are not bad). 
+*     (subject to the above requirement that at least three out of the
+*     eight neighbouring pixels are not bad).
 
 *  Usage:
 *     glitch in out [title] { incat=?
@@ -54,14 +54,14 @@
 *        The input image.
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the pixels
-*        to be replaced, such as produced by applications CURSOR, LISTMAKE, 
-*        etc. Only accessed if parameter MODE is given the value "Catalogue". 
+*        to be replaced, such as produced by applications CURSOR, LISTMAKE,
+*        etc. Only accessed if parameter MODE is given the value "Catalogue".
 *     INFILE = FILENAME (Read)
 *        The name of a text file containing the positions of the pixels
 *        to be replaced. The positions should be given in the current
 *        co-ordinate Frame of the input NDF, one per line. Spaces or
-*        commas can be used as delimiters between axis values. The file 
-*        may contain comment lines with the first character # or !. This 
+*        commas can be used as delimiters between axis values. The file
+*        may contain comment lines with the first character # or !. This
 *        parameter is  only used if parameter MODE is set to "File".
 *     MODE =  LITERAL (Read)
 *        The method used to obtain the positions of the pixels to be
@@ -76,8 +76,8 @@
 *        - "File"      --  The pixel positions are read from a text file
 *                          specified by parameter INFILE.
 *
-*        - "Interface" --  The position of each pixel is obtained using 
-*                          parameter PIXPOS.  The number of positions 
+*        - "Interface" --  The position of each pixel is obtained using
+*                          parameter PIXPOS.  The number of positions
 *                          supplied must not exceed 200.
 *
 *        [current value]
@@ -88,14 +88,14 @@
 *        co-ordinate Frame of the input NDF. Axis values should be
 *        separated by spaces or commas. This parameter is only used if
 *        parameter MODE is set to "Interface". If a value is supplied on
-*        the command line, then the application exits after processing the 
+*        the command line, then the application exits after processing the
 *        single specified pixel. Otherwise, the application loops to
 *        obtain multiple pixels to replace, until a null (!) value is
 *        supplied. Entering a colon (":") will result in a description of
 *        the required co-ordinate Frame being displayed, followed by a
 *        prompt for a new value.
 *     TITLE  =  LITERAL (Read)
-*        Title for the output image.  A null value (!) propagates the title 
+*        Title for the output image.  A null value (!) propagates the title
 *        from the input image to the output image. [!]
 
 *  Examples:
@@ -103,7 +103,7 @@
 *        Reads pixel positions from the positions list stored in the FITS
 *        file badpix.FIT, and replaces the corresponding pixels in the
 *        2-d NDF m51.sdf by the median of the surrounding neighbouring
-*        pixels. The cleaned image is written to cleaned.sdf. 
+*        pixels. The cleaned image is written to cleaned.sdf.
 
 *  Notes:
 *     -  If the current co-ordinate Frame of the input NDF is not PIXEL,
@@ -121,7 +121,7 @@
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  Only single and double precision floating point data can be
-*     processed directly. All integer data will be converted to floating 
+*     processed directly. All integer data will be converted to floating
 *     point before being processed.
 
 *  Copyright:
@@ -161,8 +161,8 @@
 *  Type Definitions:
       IMPLICIT NONE            ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'        ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE parameters
       INCLUDE 'NDF_PAR'        ! NDF definitions
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
@@ -221,7 +221,7 @@
 
 *  Now get the WCS FrameSet from the NDF, ensuring we have exactly
 *  two axes in the Base Frame.
-      CALL KPG1_ASGET( INDF1, 2, .TRUE., .FALSE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDF1, 2, .TRUE., .FALSE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Get a pointer to the current Frame. This is the Frame in which
@@ -235,18 +235,18 @@
 *  Find the index of the PIXEL Frame in the WCS FrameSet.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
 
-*  Create the output NDF. This is initially a copy of the input NDF, which 
+*  Create the output NDF. This is initially a copy of the input NDF, which
 *  will then be altered.
       CALL LPG_PROP( INDF1, 'WCS,Data,Variance,Quality,Axis,Units',
      :               'OUT', INDF2, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
-      
-*  This application supports only non-complex floating point types directly.  
-*  Therefore for the given type of the image find in which type it should 
+
+*  This application supports only non-complex floating point types directly.
+*  Therefore for the given type of the image find in which type it should
 *  be processed.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF2, INDF2, 'Data', ITYPE, 
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF2, INDF2, 'Data', ITYPE,
      :                DTYPE, STATUS )
 
 *  Map the input and output data arrays.
@@ -259,9 +259,9 @@
 
 *  If so, map the input and output variance arrays.
       IF( VAR ) THEN
-         CALL NDF_MAP( INDF1, 'VARIANCE', ITYPE, 'READ', IPVIN, EL, 
+         CALL NDF_MAP( INDF1, 'VARIANCE', ITYPE, 'READ', IPVIN, EL,
      :                 STATUS )
-         CALL NDF_MAP( INDF2, 'VARIANCE', ITYPE, 'UPDATE', IPVOUT, EL, 
+         CALL NDF_MAP( INDF2, 'VARIANCE', ITYPE, 'UPDATE', IPVOUT, EL,
      :                 STATUS )
       ELSE
          IPVIN = IPDIN
@@ -273,12 +273,12 @@
      :                'Interface', .TRUE., MODE, STATUS )
 
 *  In "Catalogue" mode, open a positions list catalogue and read its
-*  contents. A pointer to a FrameSet is returned, together with pointers 
-*  to positions and identifiers, and a title. The positions are returned 
+*  contents. A pointer to a FrameSet is returned, together with pointers
+*  to positions and identifiers, and a title. The positions are returned
 *  in the Base Frame of this FrameSet.
       IF( MODE .EQ. 'CATALOGUE' ) THEN
          IWCSC = AST__NULL
-         CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSC, NPOS, NAXCAT, IPPOS, 
+         CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSC, NPOS, NAXCAT, IPPOS,
      :                    IPID, TITLE, ' ', STATUS )
 
 *  Make the PIXEL Frame the current Frame in the NDFs FrameSet.
@@ -292,15 +292,15 @@
 *  Get the mapping which transforms the positions supplied in the catalogue
 *  (i.e. Base Frame positions) into PIXEL positions (i.e. Current Frame
 *  positions).
-         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCSC, AST__BASE, 
-     :                                       AST__CURRENT, STATUS ), 
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCSC, AST__BASE,
+     :                                       AST__CURRENT, STATUS ),
      :                       STATUS )
 
 *  Allocate memory to hold the corresponding PIXEL positions.
          CALL PSX_CALLOC( 2*NPOS, '_DOUBLE', IPPIX, STATUS )
 
 *  Transform the supplied Current Frame positions into the PIXEL Frame.
-         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS, 
+         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS,
      :                   %VAL( CNF_PVAL( IPPOS ) ), .TRUE.,
      :                   2, NPOS, %VAL( CNF_PVAL( IPPIX ) ), STATUS )
 
@@ -315,10 +315,10 @@
 *  interpreting them as positions within the Current Frame of the NDF.
 *  A pointer to memory holding the positions is returned.
       ELSE IF( MODE .EQ. 'FILE' ) THEN
-         CALL KPG1_ASFIL( 'INFILE', ' ', CFRM, NPOS, IPPOS, ' ', 
+         CALL KPG1_ASFIL( 'INFILE', ' ', CFRM, NPOS, IPPOS, ' ',
      :                    STATUS )
 
-*  Get the Mapping from the current NDF Frame to the PIXEL Frame. 
+*  Get the Mapping from the current NDF Frame to the PIXEL Frame.
          MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__CURRENT, IPIX,
      :                                       STATUS ), STATUS )
 
@@ -326,7 +326,7 @@
          CALL PSX_CALLOC( 2*NPOS, '_DOUBLE', IPPIX, STATUS )
 
 *  Transform the supplied Current Frame positions into the PIXEL Frame.
-         CALL AST_TRANN( MAP, NPOS, NAX, NPOS, 
+         CALL AST_TRANN( MAP, NPOS, NAX, NPOS,
      :                   %VAL( CNF_PVAL( IPPOS ) ), .TRUE.,
      :                   2, NPOS, %VAL( CNF_PVAL( IPPIX ) ), STATUS )
 
@@ -336,11 +336,11 @@
 *  The stride between axis values is NPOS.
          INDIM = NPOS
 
-*  If in "Interface" mode, allocate memory to store the maximum number of 
+*  If in "Interface" mode, allocate memory to store the maximum number of
 *  positions, and then get them.
       ELSE IF( MODE .EQ. 'INTERFACE' ) THEN
          CALL PSX_CALLOC( MAXPIX*2, '_DOUBLE', IPPIX, STATUS )
-         CALL KPS1_GLIGT( IWCS, IPIX, 'PIXPOS', MAXPIX, 
+         CALL KPS1_GLIGT( IWCS, IPIX, 'PIXPOS', MAXPIX,
      :                    %VAL( CNF_PVAL( IPPIX ) ),
      :                    NPOS, STATUS )
 
@@ -350,17 +350,17 @@
 *  If in "Bad" mode, get the pixel positions of all the bad pixels.
       ELSE
          IF( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_GLIBR( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                       SUBND( 2 ), %VAL( CNF_PVAL( IPDIN ) ), 
+            CALL KPS1_GLIBR( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ),
+     :                       SUBND( 2 ), %VAL( CNF_PVAL( IPDIN ) ),
      :                       IPPIX, NPOS,
-     :                       STATUS ) 
-   
+     :                       STATUS )
+
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_GLIBD( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                       SUBND( 2 ), %VAL( CNF_PVAL( IPDIN ) ), 
+            CALL KPS1_GLIBD( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ),
+     :                       SUBND( 2 ), %VAL( CNF_PVAL( IPDIN ) ),
      :                       IPPIX, NPOS,
-     :                       STATUS ) 
-   
+     :                       STATUS )
+
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'I', ITYPE )
@@ -378,20 +378,20 @@
 
 *  Do the work, using a subroutine for each different data type.
          IF( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_GLIWR( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                    SUBND( 2 ), VAR, NPOS, INDIM, 
+            CALL KPS1_GLIWR( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ),
+     :                    SUBND( 2 ), VAR, NPOS, INDIM,
      :                    %VAL( CNF_PVAL( IPPIX ) ),
-     :                    %VAL( CNF_PVAL( IPDIN ) ), 
-     :                    %VAL( CNF_PVAL( IPVIN ) ), 
+     :                    %VAL( CNF_PVAL( IPDIN ) ),
+     :                    %VAL( CNF_PVAL( IPVIN ) ),
      :                    %VAL( CNF_PVAL( IPDOUT ) ),
      :                    %VAL( CNF_PVAL( IPVOUT ) ), NREP, STATUS )
 
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_GLIWD( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                    SUBND( 2 ), VAR, NPOS, INDIM, 
+            CALL KPS1_GLIWD( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ),
+     :                    SUBND( 2 ), VAR, NPOS, INDIM,
      :                    %VAL( CNF_PVAL( IPPIX ) ),
-     :                    %VAL( CNF_PVAL( IPDIN ) ), 
-     :                    %VAL( CNF_PVAL( IPVIN ) ), 
+     :                    %VAL( CNF_PVAL( IPDIN ) ),
+     :                    %VAL( CNF_PVAL( IPVIN ) ),
      :                    %VAL( CNF_PVAL( IPDOUT ) ),
      :                    %VAL( CNF_PVAL( IPVOUT ) ), NREP, STATUS )
 
@@ -408,7 +408,7 @@
 
 *  Report the number of pixel replaced.
       IF( NREP .EQ. 0 ) THEN
-         CALL MSG_OUT( 'GLITCH_MSG1', '   No pixels replaced.', 
+         CALL MSG_OUT( 'GLITCH_MSG1', '   No pixels replaced.',
      :                  STATUS )
 
       ELSE IF( NREP .EQ. 1 ) THEN
@@ -441,7 +441,7 @@
 *  Add a context report if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'GLITCH_ERR3', 'GLITCH: Failed to replace '//
-     :                 'selected pixels within a 2-dimensional NDF.', 
+     :                 'selected pixels within a 2-dimensional NDF.',
      :                 STATUS )
       END IF
 

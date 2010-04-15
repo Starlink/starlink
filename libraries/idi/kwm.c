@@ -30,12 +30,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -173,14 +173,14 @@ nitf = 0;
 while  (found == 0)
    {
    i = 0;
-   while (((line[i] = (char) fgetc(fwnd)) != '\n') && (line[i] != EOF))  
+   while (((line[i] = (char) fgetc(fwnd)) != '\n') && (line[i] != EOF))
       {
       if (line[i] == '/')             /*  / is the continuation char */
-         {        
+         {
          while ((line[i] = (char) fgetc(fwnd)) != '\n');
          i--;
          }
-      i++;                            
+      i++;
       }
    if (line[i] == EOF )
       {
@@ -191,7 +191,7 @@ while  (found == 0)
    i = 0;
    while ( (i < keywidl) && (keywid[i] == line[i]) )
       i++;
-   if ( (i == keywidl) && ((line[i] == ' ') || (line[i] == '=')) ) 
+   if ( (i == keywidl) && ((line[i] == ' ') || (line[i] == '=')) )
       found = 1;
    if (found == 1)
       {
@@ -296,7 +296,7 @@ while  (found == 0 )
    i = 0;
    while ( (i < keywidl) && (keywid[i] == line[i]) )
       i++;
-   if ( (i == keywidl) && ((line[i] == ' ') || (line[i] == '=')) ) 
+   if ( (i == keywidl) && ((line[i] == ' ') || (line[i] == '=')) )
       found = 1;
    if (found == 1)
       {
@@ -388,14 +388,14 @@ nitf = 0;
 while  (found == 0)
    {
    i = 0;
-   while (((line[i] = getc(fwnd)) != '\n') && (line[i] != EOF)) 
+   while (((line[i] = getc(fwnd)) != '\n') && (line[i] != EOF))
       {
       if (line[i] == '/')             /*  / is the continuation char */
-         {        
+         {
          while ((line[i] = getc(fwnd)) != '\n');
          i--;
          }
-      i++;                 
+      i++;
       }
    if (line[i] == EOF )
       {
@@ -406,7 +406,7 @@ while  (found == 0)
    i = 0;
    while ( (i < keywidl) && (keywid[i] == line[i]) )
       i++;
-   if ( (i == keywidl) && ((line[i] == ' ') || (line[i] == '=')) ) 
+   if ( (i == keywidl) && ((line[i] == ' ') || (line[i] == '=')) )
       found = 1;
    if (found == 1)
       {

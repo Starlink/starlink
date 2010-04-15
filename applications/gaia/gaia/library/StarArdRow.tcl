@@ -77,21 +77,21 @@
 #.
 
 itcl::class gaia::StarArdRow {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
-      #  Set the type of canvas object. 
+      #  Set the type of canvas object.
       configure -mode row
       eval configure $args
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
@@ -112,14 +112,14 @@ itcl::class gaia::StarArdRow {
       set y [expr round($y0+0.5)]
       return "ROW($y)"
    }
-   
+
    #  Set the properties of the object to those of an ARD description
    #  of an object of this type.
    method setard {desc} {
-      if {$desc != "" } { 
-         set failed 1 
-         if { [check_description row $desc] } { 
-            if { [llength $qualifiers_] == 1 } { 
+      if {$desc != "" } {
+         set failed 1
+         if { [check_description row $desc] } {
+            if { [llength $qualifiers_] == 1 } {
 
             #  Pixel indices to coordinates before transformation.
                set y [expr $qualifiers_-0.5]
@@ -133,7 +133,7 @@ itcl::class gaia::StarArdRow {
          }
       }
    }
-   
+
    #  Create a new row using an ARD description.
    method createard {desc {cmd ""}} {
       setard "$desc"
@@ -178,7 +178,7 @@ itcl::class gaia::StarArdRow {
    #  -----------
 
    #  Position of the row in pixel coordinates.
-   public variable y {1} { 
+   public variable y {1} {
       if { [winfo exists $Y_] } {
          $Y_ configure -value $y
          lassign [canvas_coord 1 $y] xs ys

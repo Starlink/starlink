@@ -26,7 +26,7 @@
 *           name of action to be staged
 
 *  Algorithm:
-*     Disable further AST events. 
+*     Disable further AST events.
 *     Signal the MESSYS that an AST interrupt has occurred.
 
 *  Copyright:

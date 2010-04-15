@@ -31,7 +31,7 @@
 *        The name of a component of the NDF extension holding the
 *        astrometry information. Blank if none found.
 *     LOC = CHARACTER * ( * ) (Returned)
-*        A locator to the extension identified by XNAME. DAT__NOLOC if 
+*        A locator to the extension identified by XNAME. DAT__NOLOC if
 *        no astrometry structure is found.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,7 +92,7 @@
       CHARACTER XNAME*(*)
       CHARACTER ASNAME*(*)
       CHARACTER LOC*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -143,17 +143,17 @@
 *  See if the extension is a structure.
          CALL DAT_STRUC( XLOC, STRUC, STATUS )
 
-*  If so, find the number of components within the extension. DAT_NCOMP 
-*  reports an error (DAT__OBJIN) if the structure is empty. If this 
-*  happens, annul the error and set the number of components to zero 
+*  If so, find the number of components within the extension. DAT_NCOMP
+*  reports an error (DAT__OBJIN) if the structure is empty. If this
+*  happens, annul the error and set the number of components to zero
          IF( STRUC .AND. STATUS .EQ. SAI__OK ) THEN
             CALL DAT_NCOMP( XLOC, NCOMP, STATUS )
             IF( STATUS .EQ. DAT__OBJIN ) THEN
                CALL ERR_ANNUL( STATUS )
                NCOMP = 0
-            END IF           
+            END IF
 
-*  If the extension is a primitive, set the number of components to 
+*  If the extension is a primitive, set the number of components to
 *  zero.
          ELSE
             NCOMP = 0
@@ -204,7 +204,7 @@
 *  Check the next component in this extension.
          END DO
 
-*  Annul the locator to the current extension, so long as it is not the 
+*  Annul the locator to the current extension, so long as it is not the
 *  returned locator.
          IF( LOC .NE. XLOC ) CALL DAT_ANNUL( XLOC, STATUS )
 
@@ -223,7 +223,7 @@
      :                 STATUS )
       END IF
 
-*  If anything went wrong, ensure locators are annulled and add a 
+*  If anything went wrong, ensure locators are annulled and add a
 *  context report.
  999  CONTINUE
       IF( STATUS .NE. SAI__OK ) THEN

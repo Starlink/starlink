@@ -13,7 +13,7 @@
 *     BLOCK DATA
 
 *  Description:
-*     All IRA identifiers are set un-used. The state of IRA is set to 
+*     All IRA identifiers are set un-used. The state of IRA is set to
 *     STOPPED. Initial values for graphics options are set up.
 
 *  Authors:
@@ -53,7 +53,7 @@
       DATA ACM_STATE/'STOPPED'/
 
 *  Initialise graphics options.
-      DATA ACM_DROPT/ 1.25D-2, 1.25D-2, 6.0D0, 1.0D0, -1.0D0, -1.0D0, 
+      DATA ACM_DROPT/ 1.25D-2, 1.25D-2, 6.0D0, 1.0D0, -1.0D0, -1.0D0,
      :                1.0D0, 1.0D0, -1.0D0, -1.0D0, 1.0D0, 1.0D0 /
 
 *  Indicate that no curve has yet been drawn for which IRA_DRBRK can

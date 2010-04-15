@@ -13,7 +13,7 @@
 *     been produced to simplify the high-level code by removing the
 *     frequently used low level DTA calls and checks.
 *    Invocation :
-*      CALL RED4_COPY_OBS_STRUCTURE( SOURCE, DESTINATION, STATUS ) 
+*      CALL RED4_COPY_OBS_STRUCTURE( SOURCE, DESTINATION, STATUS )
 *    Parameters :
 *     SOURCE        = CHARACTER*(*)( READ )
 *        The DTA address of the structure to be copied.
@@ -24,9 +24,9 @@
 *           Global ADAM status
 *    Method :
 *    Deficiencies :
-*     At first it may seem silly to copy a whole structure and then delete 
+*     At first it may seem silly to copy a whole structure and then delete
 *     the unwanted items, but this is the easiest way of partially copying
-*     a structure with DTA. If this strategy leads to inefficiency, the 
+*     a structure with DTA. If this strategy leads to inefficiency, the
 *     routine could be modified to read, create and write each wanted item
 *     instead. (N.B. DTA_CYVAR produced an "attempt to copy incompatible
 *     objects" error when I tried to copy the wanted items individually).
@@ -73,7 +73,7 @@
 *   Check for error on entry
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
-*   Attempt to delete the destination structure, to ensure it does 
+*   Attempt to delete the destination structure, to ensure it does
 *   not exist. Ignore the status returned.
       DTA_STATUS = DTA__OK
       CALL DTA_DLVAR( DESTINATION, DTA_STATUS )

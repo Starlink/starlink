@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine looks at all the values in the vectorised array
-*     VEC and counts the number that have value above VAL. 
+*     VEC and counts the number that have value above VAL.
 
 *  Arguments:
 *     ITYPE = CHARACTER * ( * ) (Given)
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -95,26 +95,26 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Call the appropriate version of CCG1_NAB to count the values.
-      IF ( ITYPE .EQ. '_BYTE' ) THEN 
-         CALL CCG1_NABB( %VAL( CNF_PVAL( VEC ) ), 
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         CALL CCG1_NABB( %VAL( CNF_PVAL( VEC ) ),
      :                   EL, BAD, VAL, NUM, STATUS )
-      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN 
-         CALL CCG1_NABUB( %VAL( CNF_PVAL( VEC ) ), 
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         CALL CCG1_NABUB( %VAL( CNF_PVAL( VEC ) ),
      :                    EL, BAD, VAL, NUM, STATUS )
-      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN 
-         CALL CCG1_NABW( %VAL( CNF_PVAL( VEC ) ), 
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL CCG1_NABW( %VAL( CNF_PVAL( VEC ) ),
      :                   EL, BAD, VAL, NUM, STATUS )
-      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN 
-         CALL CCG1_NABUW( %VAL( CNF_PVAL( VEC ) ), 
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         CALL CCG1_NABUW( %VAL( CNF_PVAL( VEC ) ),
      :                    EL, BAD, VAL, NUM, STATUS )
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN 
-         CALL CCG1_NABI( %VAL( CNF_PVAL( VEC ) ), 
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         CALL CCG1_NABI( %VAL( CNF_PVAL( VEC ) ),
      :                   EL, BAD, VAL, NUM, STATUS )
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN 
-         CALL CCG1_NABR( %VAL( CNF_PVAL( VEC ) ), 
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL CCG1_NABR( %VAL( CNF_PVAL( VEC ) ),
      :                   EL, BAD, VAL, NUM, STATUS )
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN 
-         CALL CCG1_NABD( %VAL( CNF_PVAL( VEC ) ), 
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL CCG1_NABD( %VAL( CNF_PVAL( VEC ) ),
      :                   EL, BAD, VAL, NUM, STATUS )
       ELSE
 
@@ -123,7 +123,7 @@
          CALL MSG_SETC( 'TYPE', ITYPE )
          CALL ERR_REP( 'CCD1_NABV',
      :   '  CCD1_NABV: Unsupported data type (^TYPE).', STATUS )
-      
+
       END IF
       END
 * $Id$

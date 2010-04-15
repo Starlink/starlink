@@ -31,7 +31,7 @@
       INTEGER FTUNIT
 *   Location of the projection pole, in pixels
       DOUBLE PRECISION XZPIX,YZPIX
-*   Transformation from pixel coordinates (px, py) to plate coordinates (ax, ay), 
+*   Transformation from pixel coordinates (px, py) to plate coordinates (ax, ay),
 *   in radians, is
 *       ax = cd11 * px + cd12 * py
 *       ay = cd21 * px + cd22 * py
@@ -67,7 +67,7 @@
      :     'RA -- tangent-plane projection', FTSTAT)
       CALL FTPKYS (FTUNIT, 'CTYPE2', 'DEC--TAN',
      :     'DEC -- tangent-plane projection', FTSTAT)
-      CALL FTPKYS (FTUNIT, 'RADESYS', 'FK5', 
+      CALL FTPKYS (FTUNIT, 'RADESYS', 'FK5',
      :     'Celestial coordinates in FK5 system', FTSTAT)
 *   Default equinox J2000
       CALL FTPKYG (FTUNIT, 'EQUINOX', 2000.0D0, 1,
@@ -104,18 +104,18 @@
       CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCX/D2R, 7,
      :     WRKSTR, FTSTAT)
 
-      CALL FTPKYG (FTUNIT, 'CRPIX1', 
+      CALL FTPKYG (FTUNIT, 'CRPIX1',
      :     XZPIX, 7,
      :     'Projection pole -- x-pixels', FTSTAT)
-      CALL FTPKYG (FTUNIT, 'CRPIX2', 
+      CALL FTPKYG (FTUNIT, 'CRPIX2',
      :     YZPIX, 7,
      :     'Projection pole -- y-pixels', FTSTAT)
 *   Note that the coordinates, and the
 *   transformation matrix, are required to be in degrees
 *   rather than radians.
-      CALL FTPKYS (FTUNIT, 'CUNIT1', 'deg', 
+      CALL FTPKYS (FTUNIT, 'CUNIT1', 'deg',
      :     'RA always given in degrees', FTSTAT)
-      CALL FTPKYS (FTUNIT, 'CUNIT2', 'deg', 
+      CALL FTPKYS (FTUNIT, 'CUNIT2', 'deg',
      :     'Dec always given in degrees', FTSTAT)
 *   Transformation matrix, again in units of degrees, not radians
       CALL FTPKYD (FTUNIT, 'CD1_1',
@@ -130,7 +130,7 @@
      :     CD22/D2R, 7, ' ', FTSTAT)
 *   Include the relevant coefficients of the TAN distortion.
 *   If we write the undistorted gnomonic projection
-*   coordinates as (\xi, \eta), following C&G, and the distorted 
+*   coordinates as (\xi, \eta), following C&G, and the distorted
 *   coordinates (ie, the plate coordinates) as (x,y), then
 *   ASTROM handles the relationship between these as
 *   x=\xi(1+q\rho^2) and y=\eta(1+q\rho^2), where
@@ -141,7 +141,7 @@
 *   terms to O(r^6), to obtain Q=1 - qr^2 + 3q^2r^4 -
 *   12q^3r^6 + O(r^8), and the distortion functions become
 *   \xi=Q(r)x, \eta=Q(r)y.  The parameter q in this program
-*   has units rad^{-2} (I'm pretty sure), but since the FITS 
+*   has units rad^{-2} (I'm pretty sure), but since the FITS
 *   files work in degrees, we need to convert it to deg^{-2}.
       WRITE (WRKSTR,'("ASTROM projection: ",A)') KPROJ
       CALL FTPCOM (FTUNIT, WRKSTR, FTSTAT)
@@ -182,5 +182,5 @@
      :     'b_31 y^7  = -12q^3', FTSTAT)
       CALL FTPKYD (FTUNIT, FPAR//'2_37', -12*DISTORD2**3, 7,
      :     'b_37 yx^6 = -12q^3', FTSTAT)
-      
+
       END

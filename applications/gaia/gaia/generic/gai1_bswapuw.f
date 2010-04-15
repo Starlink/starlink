@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Byte swap an (unsigned) integer*2 (word) data value (assumes wrong
-*     endianness of data). 
+*     endianness of data).
 
 *  Language:
 *     Starlink Fortran 77

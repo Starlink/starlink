@@ -16,9 +16,9 @@
 *     CALL TASK_TRIGGER ( NAME, VALUE, STATUS )
 
 *  Description:
-*     Return a trigger message to the task which issued the OBEY to 
-*     start the current action in this task. If the other task is 
-*     waiting in its fixed-part, this will cause it to reschedule the 
+*     Return a trigger message to the task which issued the OBEY to
+*     start the current action in this task. If the other task is
+*     waiting in its fixed-part, this will cause it to reschedule the
 *     action.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Look-up the communications path back to the controlling task and 
+*     Look-up the communications path back to the controlling task and
 *     send it a trigger message.
 
 *  Implementation Deficiencies:

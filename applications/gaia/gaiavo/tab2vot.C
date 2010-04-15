@@ -18,7 +18,7 @@
  *     tab2vot in out
 
  *  Parameters:
- *     in = string 
+ *     in = string
  *        Filename of the tab table.
  *     out = string
  *        Filename for the VOTable.
@@ -51,7 +51,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     01-JUL-2008 (PWD):
  *        Original version.
@@ -91,7 +91,7 @@ int main( int argc, char* argv[] )
         string confile = "file://" + string( home ) + "/.skycat/skycat.cfg";
         setenv( "CATLIB_CONFIG", confile.c_str(), 1 );
 #else
-        string confile = "CATLIB_CONFIG=file://" + string( home ) + 
+        string confile = "CATLIB_CONFIG=file://" + string( home ) +
                          "/.skycat/skycat.cfg";
         putenv( (char *) confile.c_str() );
 #endif

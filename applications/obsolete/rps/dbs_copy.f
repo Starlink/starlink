@@ -10,17 +10,17 @@
       INTEGER RECREAD	! 	Number of record to read
       INTEGER RECWRITE	! 	Number of record to write to
       INTEGER IERROR	! Out	Error indicator.
- 
+
 *  Global Variables
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_iof.inc'
       INCLUDE 'com_dbs_rec.inc'
- 
+
 *  Local Variables
 
-      CALL DBS_READ ( REF_NO , RECREAD, IERROR )			! Read record 
+      CALL DBS_READ ( REF_NO , RECREAD, IERROR )			! Read record
       IF (IERROR .NE.0) GOTO 10
- 
+
       CALL DBS_WRITE( REF_NO , RECWRITE, IERROR )
 
 10    CONTINUE

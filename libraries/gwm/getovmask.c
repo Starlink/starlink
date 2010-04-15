@@ -19,7 +19,7 @@ int GWM_GetOvMask( Display *display, Window win_id, unsigned long *mask)
 *
 *  Purpose:
 *     Get overlay mask
-*     
+*
 *  Language:
 *     C
 *
@@ -28,7 +28,7 @@ int GWM_GetOvMask( Display *display, Window win_id, unsigned long *mask)
 *
 *  Description:
 *     The GMW_ov_mask property is fetched from the window.
-*     
+*
 *  Arguments:
 *     display = *Display (given)
 *        Display id
@@ -46,12 +46,12 @@ int GWM_GetOvMask( Display *display, Window win_id, unsigned long *mask)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,10 +78,10 @@ int GWM_GetOvMask( Display *display, Window win_id, unsigned long *mask)
     int actual_format;
     unsigned long nitems, bytes_after;
     unsigned long *local_mask;
-        
-/*	  
+
+/*
 **  Get the value of the GWM_ov_mask property from the window.
-*/	  
+*/
     atom = XInternAtom(display, "GWM_ov_mask", False );
     if (!atom) return GWM_NO_OVMASK;
 
@@ -89,7 +89,7 @@ int GWM_GetOvMask( Display *display, Window win_id, unsigned long *mask)
 	XA_INTEGER, &actual_type, &actual_format, &nitems, &bytes_after,
 	(unsigned char**)(&local_mask));
     if ( status != Success || nitems == 0) return GWM_NO_OVMASK;
-    
+
 /*
 **  Copy the mask to the output argument
 */

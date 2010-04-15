@@ -1724,11 +1724,11 @@ returns the index of the name within the specified group. If the name does
 not exist within the group, the returned index is set to zero but no error is
 reported.
 
-The routines \htmlref{GRP\_LIST}{GRP_LIST} and \htmlref{GRP\_LISTF}{GRP_LISTF} 
+The routines \htmlref{GRP\_LIST}{GRP_LIST} and \htmlref{GRP\_LISTF}{GRP_LISTF}
 each create a text file containing a
 subset of the names stored in a specified group. The names are written one per
 record, and a comment is stored as the first record. The difference between
-\htmlref{GRP\_LIST}{GRP_LIST} and \htmlref{GRP\_LISTF}{GRP_LISTF} is that the former 
+\htmlref{GRP\_LIST}{GRP_LIST} and \htmlref{GRP\_LISTF}{GRP_LISTF} is that the former
 obtains the name of the text file to
 be created through the parameter system, whereas the latter requires the calling
 application to provide it. These routines are useful for passing groups of names
@@ -1877,12 +1877,12 @@ character to suppress use of that control character (see below). The NULL
 character defaults to ``\%''.
 
 \item [ESCAPE] - This is a character which can be used to ``escape'' another
-control character within a group expression. If a GRP control character is 
+control character within a group expression. If a GRP control character is
 encountered within a group expression, its special meaning is ignored
 and it is treated literally if it is preceeded by an escape character.
 Such escape characters are removed before storing the corresponding
 strings in the returned group (escape character which do not preceed
-another control character are not removed). Escape characters can 
+another control character are not removed). Escape characters can
 themselves be escaped. By default, the escape character is equal to the
 null character (i.e. escaping is not available by default).
 
@@ -2855,7 +2855,7 @@ environment}
          bounds, then zero is returned.
 
          NGRP - The number of GRP group identifiers currently in use.
-         The values of the IGRP and INDEX arguments are ignored. 
+         The values of the IGRP and INDEX arguments are ignored.
 
          ACTIVE - Like NGRP, except that in addition to returning the
          number of GRP group identifiers currently in use, the numerical
@@ -2864,8 +2864,8 @@ environment}
 
          ALLSIMPLE - A value of 1 is returned if all elements within the
          group were specified explicitly (i.e. by a literal name rather
-         than by indirection or modification). Otherwise a value of zero 
-         is returned. The value of the INDEX argument is ignored. 
+         than by indirection or modification). Otherwise a value of zero
+         is returned. The value of the INDEX argument is ignored.
       }
       \sstsubsection{
          VALUE = INTEGER (Returned)
@@ -3198,11 +3198,11 @@ environment}
    \sstdescription{
       The given name is stored in the group in the form in which it is
       supplied (including any control characters). It overwrites
-      any previous name stored at the specified index. The name can be 
-      appended to the end of the group by giving INDEX a value of zero 
-      or one greater than the current size of the group. An error is 
-      reported if the name is added beyond the end of the group (i.e.  
-      if adding the name would result in a gap within the group for 
+      any previous name stored at the specified index. The name can be
+      appended to the end of the group by giving INDEX a value of zero
+      or one greater than the current size of the group. An error is
+      reported if the name is added beyond the end of the group (i.e.
+      if adding the name would result in a gap within the group for
       which no names would be defined).
    }
    \sstinvocation{
@@ -3217,7 +3217,7 @@ environment}
       \sstsubsection{
          NAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name to be stored in the group. 
+         The name to be stored in the group.
       }
       \sstsubsection{
          INDEX = INTEGER (Given)
@@ -3399,8 +3399,8 @@ environment}
          character.
 
          \sstitem
-         ESCAPE: (Default to the NULL character) The name given to the 
-         character which can be used to escape control characters within 
+         ESCAPE: (Default to the NULL character) The name given to the
+         character which can be used to escape control characters within
          a group expression.
       }
    }
@@ -3671,9 +3671,9 @@ The following changes have occurred in the GRP\_ system since version 2.0:
 has been increased from 100 to 500.
 
 \item An escape control character can now be defined which allows other
-control characters within a group expression to be treated literally 
-(i.e. their usual special meaning is suppressed and they are trated like a 
-normal text character if they are preceeded by an escape character). By 
+control characters within a group expression to be treated literally
+(i.e. their usual special meaning is suppressed and they are trated like a
+normal text character if they are preceeded by an escape character). By
 default, no escape character is defined.
 
 \item If the NULL control character is changed using GRP\_SETCC, then any

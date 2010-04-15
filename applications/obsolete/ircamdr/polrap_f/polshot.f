@@ -5,7 +5,7 @@
 * Description :
 *
 * This routine takes in a polarization image and a polarization error
-* image and removes the error due to shot-noise biasing from the 
+* image and removes the error due to shot-noise biasing from the
 * polarization image. This is done in quadrature i.e. the square of the
 * error image (output from POLCAL) is subtrac ted from the square of
 * the polarization image. The results is square rooted and put into
@@ -41,8 +41,8 @@
 * Global constants :
 
         INCLUDE  'SAE_PAR'              ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 * Status :
 
@@ -52,7 +52,7 @@
 
 * Local variables :
 
-        INTEGER 
+        INTEGER
      :      ACTDIM,               ! actual dimensions from NDF_DIM
      :      NELEMENTS,            ! number of elements mapped by NDF_MAP
      :	    IDIMS_1( 2),
@@ -111,7 +111,7 @@
 
 *      check sizes of input images are same
 
-	IF( IDIMS_1( 1) .NE. IDIMS_2( 1) .OR. 
+	IF( IDIMS_1( 1) .NE. IDIMS_2( 1) .OR.
      :	    IDIMS_1( 2) .NE. IDIMS_2( 2)) THEN
 
 	  CALL MSG_OUT( 'MESSAGE',
@@ -168,7 +168,7 @@
 
 *      pass the pointer to the subroutine to remove the shot-noise error
 
-	CALL POLSHOT_REMOVE( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRIP), 
+	CALL POLSHOT_REMOVE( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRIP),
      :	                     %VAL( PNTRIPE), %VAL( PNTRO))
 
 *      annul association with the input and output images

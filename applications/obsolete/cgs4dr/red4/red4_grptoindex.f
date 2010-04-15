@@ -94,7 +94,7 @@
      :     ( BUFFER(1:2) .EQ. 'RO' .OR. BUFFER(1:2) .EQ. 'ro') ) THEN
 
 *      Extract the "yymmdd" characters lying between this "RG" (or "ST")
-*      and the "_". 
+*      and the "_".
          UNDER_POS = INDEX( BUFFER, '_' )
 
 *      Check that an underscore has been found in the right place,

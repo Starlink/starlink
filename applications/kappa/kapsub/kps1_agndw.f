@@ -86,13 +86,13 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! Parameter system error constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER IPLOT
       INTEGER IGRP
       INTEGER NREG
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -102,7 +102,7 @@
 
       INTEGER MXREG              ! Maximum number of regions
       PARAMETER ( MXREG = 100 )
-      
+
 *  Local Variables:
       CHARACTER EXPR( MXEXPR )*10 ! The range expression
       CHARACTER TEXT*(GRP__SZNAM)! GRP element text
@@ -130,7 +130,7 @@
      :                 'regions defined.', STATUS )
          GO TO 999
       END IF
-      
+
 *  Report an error and abort if there are too many regions.
       IF( NREG .GT. MXREG .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -139,12 +139,12 @@
      :                 'defined (>^MX).', STATUS )
          GO TO 999
       END IF
-         
+
 *  Obtain a list of indices for the regions to be drawn.
       CALL PAR_DEF1C( PARAM, 1, '*', STATUS )
       CALL PAR_GET1C( PARAM, MXEXPR, EXPR, NEXPR, STATUS )
       CALL MSG_BLANK( STATUS )
-      
+
 *  If a null value was supplied, assume that the user no longer wants
 *  to draw anything.  Annul the error, warn the user and return.
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -155,13 +155,13 @@
       END IF
 
 *  Cancel the current value of the parameter, ready for next time.
-      CALL PAR_CANCL( PARAM, STATUS )      
+      CALL PAR_CANCL( PARAM, STATUS )
 
 *  Clear the flags which identify the regions which are to be drawn.
-      DO REG = 1, NREG      
+      DO REG = 1, NREG
          DRAW( REG ) = .FALSE.
       END DO
-         
+
 *  Scan through each supplied expression.  Each expression specifies a
 *  range of region indices.
       DO IEXPR = 1, NEXPR
@@ -197,11 +197,11 @@
 
          END IF
 
-*  Flag the regions for drawing. 
+*  Flag the regions for drawing.
          DO REG = FIRST, LAST
             DRAW( REG ) = .TRUE.
          END DO
-         
+
       END DO
 
 *  Create a copy of the suplied group.
@@ -212,9 +212,9 @@
 
 *  Initialise the index within the group at which the next region starts.
 *  and set the number of regions drawn so far to zero.
-      I = 1      
+      I = 1
       NDRAW = 0
-      
+
 *  Go through each region.
       DO REG = 1, NREG
 
@@ -268,7 +268,7 @@
 
 *  Delete the group.
       CALL GRP_DELET( IGRP2, STATUS )
-      
+
 *  Tell the user how many regions were drawn.
       IF( NDRAW .EQ. 1 ) THEN
          CALL MSG_OUT( 'KPS1_AGNDW_MSG6', '1 region drawn.', STATUS )
@@ -276,7 +276,7 @@
          CALL MSG_SETI( 'N', NDRAW )
          CALL MSG_OUT( 'KPS1_AGNDW_MSG7', 'The union of ^N regions '//
      :                 'drawn.', STATUS )
-      END IF      
+      END IF
 
  999  CONTINUE
 

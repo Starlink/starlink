@@ -155,7 +155,7 @@ void ardWork( const Grp *grp,
                         INTEGER_ARRAY_ARG(flbnde),
                         INTEGER_ARRAY_ARG(fubnde),
                         INTEGER_ARG(&fstatus) );
-    
+
     /* Free local variables and import and results */
     F77_FREE_INTEGER(flbnd);
     F77_FREE_INTEGER(fubnd);
@@ -205,7 +205,7 @@ void ardGrpex( const char *desc,
     figrp2 = grpC2F( *grp2, status );
 
     F77_EXPORT_INTEGER(*status,fstatus);
-    
+
     /* Do the work */
     F77_CALL(ard_grpex)( CHARACTER_ARG(fdesc),
                          INTEGER_ARG(&figrp1),
@@ -213,7 +213,7 @@ void ardGrpex( const char *desc,
                          LOGICAL_ARG(&fflag),
                          INTEGER_ARG(&fstatus)
                          TRAIL_ARG(fdesc) );
-    
+
 
     /* Free local variables and import and results */
     F77_FREE_CHARACTER(fdesc);
@@ -222,6 +222,6 @@ void ardGrpex( const char *desc,
 
     F77_IMPORT_LOGICAL(fflag,*flag);
     F77_IMPORT_INTEGER(fstatus,*status);
-    
+
    return;
 }

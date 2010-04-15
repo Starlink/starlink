@@ -48,7 +48,7 @@ PROC LOAD_CGS3DR
   PRINT " "
   PRINT "Primary facilities available:"
   PRINT " "
-  DEFSTRING INIT OBEYW cgs3dr INIT 
+  DEFSTRING INIT OBEYW cgs3dr INIT
   PRINT "INIT         - (Re)Initialise the system with a given date"
   DEFSTRING REDUCE_RUN OBEYW cgs3dr REDUCE_RUN RUNNUM=
   PRINT "REDUCE_RUN   - Reduce a single CGS3 run"

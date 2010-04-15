@@ -99,27 +99,27 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
- 
+
       DOUBLE PRECISION I( M, N )
       DOUBLE PRECISION R( M, N )
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION H( M, N )
       DOUBLE PRECISION MAXDEV
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER FM                 ! Reflection constant for columns
       INTEGER FN                 ! Reflection constant for lines
@@ -135,12 +135,12 @@
       INTEGER NP3H               ! ( N+3 ) / 2
       DOUBLE PRECISION V1                 ! First estimate
       DOUBLE PRECISION V2                 ! Second estimate
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Get upper limits for the column and line loops.
       IF ( MOD( N, 2 ) .EQ. 0 ) THEN
          NEVEN = .TRUE.
@@ -149,7 +149,7 @@
          NEVEN = .FALSE.
          KLIM = N
       END IF
- 
+
       IF ( MOD( M, 2 ) .EQ. 0 ) THEN
          MEVEN = .TRUE.
          JLIM = M - 1
@@ -157,7 +157,7 @@
          MEVEN = .FALSE.
          JLIM = M
       END IF
- 
+
 *  Calculate often-used constants.
       MP1H = ( M + 1 ) / 2
       MP3H = ( M + 3 ) / 2
@@ -165,13 +165,13 @@
       NP1H = ( N + 1 ) / 2
       NP3H = ( N + 3 ) / 2
       FN = 2 * NP1H
- 
+
 *  Do the lowest line in the top-left quadrant.
       MAXDEV = 0.0D0
       H( MP1H, NP1H ) = R( MP1H, NP1H )
- 
+
       DO J = MP3H, JLIM
- 
+
 *  Get the mean and difference of the two real estimates about the
 *  reflection column.  Store the Hermitian value in the top-left
 *  quadrant.
@@ -179,97 +179,97 @@
          V2 = R( FM - J, NP1H )
          H( J, NP1H ) = ( V1 + V2 ) / 2.0D0
          MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
 *  Repeat for the imaginary data, but storing in the top-right-hand
 *  quadrant.
          V1 = I( FM - J, NP1H )
          V2 = -I( J, NP1H )
          H( FM - J, NP1H ) = ( V1 + V2 ) / 2.0D0
          MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
       END DO
- 
+
       IF ( MEVEN ) H( M, NP1H ) = R( M, NP1H )
- 
+
 *  Now repeat the above for the remaining lines in the top-left
 *  quadrant which have matching lines in the bottom-left and
 *  bottom-right quadrants.  This will leave one left over if the
 *  number of lines is even.
       DO K = NP3H, KLIM
- 
+
          V1 = R( MP1H, K )
          V2 = R( MP1H, FN - K )
          H( MP1H, K ) = ( V1 + V2 ) / 2.0D0
          MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
          V1 = I( MP1H, FN - K )
          V2 = -I( MP1H, K )
          H( MP1H, FN - K ) = ( V1 + V2 ) / 2.0D0
          MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
          DO J = MP3H, JLIM
- 
+
             V1 = ( R( J, K ) + R( FM - J, K ) ) / 2.0D0
             V2 = ( R( J, FN - K ) + R( FM - J, FN - K ) ) / 2.0D0
             H( J, K ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
             V1 = ( R( J, FN - K ) - R( FM - J, FN - K ) ) / 2.0D0
             V2 = ( R( FM - J, K ) - R( J, K ) ) / 2.0D0
             H( FM - J, FN - K ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
             V1 = ( I( FM - J, K ) - I( J, K ) ) / 2.0D0
             V2 = ( I( FM - J, FN - K ) - I( J, FN - K ) ) / 2.0D0
             H( FM - J, K ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
             V1 = ( - I( FM - J, K ) - I( J, K ) ) / 2.0D0
             V2 = ( I( FM - J, FN - K ) + I( J, FN - K ) ) / 2.0D0
             H( J, FN - K ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
          END DO
- 
+
 *  Handle the remaining line in a similar fashion.
          IF ( MEVEN ) THEN
- 
+
             V1 = R( M, K )
             V2 = R( M, FN - K )
             H( M, K ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
             V1 = -I( M, K )
             V2 = I( M, FN - K )
             H( M, FN - K ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
          END IF
- 
+
       END DO
- 
+
 *  If the number of lines is even do the remaining unmatched top line
 *  of the top-left quadrant.
       IF ( NEVEN ) THEN
- 
+
          H( MP1H, N ) = R( MP1H, N )
- 
+
          DO J = MP3H, JLIM
- 
+
             V1 = R( J, N )
             V2 = R( FM - J, N )
             H( J, N ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
             V1 = -I( J, N )
             V2 = I( FM - J, N )
             H( FM - J, N ) = ( V1 + V2 ) / 2.0D0
             MAXDEV = MAX( MAXDEV, ABS( V2 - V1 ) )
- 
+
          END DO
- 
+
          IF ( MEVEN ) H( M, N ) = R( M, N )
- 
+
       END IF
- 
+
       END

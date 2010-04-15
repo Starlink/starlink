@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,11 +65,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'KPG_PAR'          ! KPG constants
 
 *  Status:
@@ -89,8 +89,8 @@
 *  picture. The transformation routine uses the TRANSFORM structure
 *  associated with the current AGI picture.
       PURPOSE = 'Converts AGI World co-ords to AGI DATA co-ords'
-      CALL AST_INTRAREG( 'ASAGD', 2, 2, KPG1_ASAGD, 
-     :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 46 ), 
+      CALL AST_INTRAREG( 'ASAGD', 2, 2, KPG1_ASAGD,
+     :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 46 ),
      :                   KPG_AUTHOR, KPG_CONTACT, STATUS )
 
       END

@@ -1,5 +1,5 @@
 { PROCEDURE CXWIN : changes window size for plotting
-proc cxwin 
+proc cxwin
   print "New window Large, Medium or Small ? "
   askchoice (nwin) "New Size (L,M,S) \L\ ? "
   pclose

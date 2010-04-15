@@ -33,22 +33,22 @@ C
 C     all in blocks MUINFO and MUCHAR
 C
 C     Subroutines / functions used -
-C 
+C
 C     DAT_ANNUL    (HDS_ package) Annul an HDS locator
 C     DTA_HDSERC   (DTA_    "   ) Convert an HDS error to a DTA code
 C     DTA_TRNAME   ( "      "   ) Fold name to upper case and tidy up
 C     EMS_BEGIN    (EMS_  "     ) Start a new reporting environment.
 C     EMS_ANNUL    ( "    "     ) Clear current EMS error status.
 C     EMS_END      ( "    "     ) End current reporting environment.
-C     
+C
 C                                         KS / CIT  16th March 1983
 C     Modified:
 C
 C     23rd Sept 1985  KS / AAO.  Now uses DTA_FMTCON instead of STL_FMTCON
 C     28th March 1986 KS / AAO.  Re-written for the HDS based version
 C                     of the DTA- routines.
-C     10th Jan  1992. KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     10th Jan  1992. KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN.
 C     24th Jan 1992.  KS / AAO. Calls to EMS added to control error reporting.
 C                     Setting STATUS=0 before a call to HDS replaced by an
@@ -83,7 +83,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert name to upper case
 C

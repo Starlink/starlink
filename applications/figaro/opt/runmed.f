@@ -20,7 +20,7 @@
       integer n,  len, NW, err, status
       real y(n), work(nw), save(nw)
 *-
-      integer  OK 
+      integer  OK
       parameter( OK = 0)
       real temp, TWO
       parameter (TWO = 2.0)

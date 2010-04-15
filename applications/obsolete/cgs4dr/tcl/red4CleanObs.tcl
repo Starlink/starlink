@@ -1,6 +1,6 @@
 proc red4CleanObs {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -23,8 +23,8 @@ proc red4CleanObs {taskname} {
     set Red4Widgets(CO_LAB01) [label $top.l1 -text "Filename"]
     set Red4Widgets(CO_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(CO_LAB01) $Red4Widgets(CO_ENT01) -in $top -side left
-    $Red4Widgets(CO_ENT01) insert end $Red4Widgets(RO) 
-    
+    $Red4Widgets(CO_ENT01) insert end $Red4Widgets(RO)
+
     set Red4Widgets(CO_LAB02) [label $bot.l1 -text "Min S/N"]
     set Red4Widgets(CO_ENT02) [entry $bot.sn]
     set Red4Widgets(CO_LAB03) [label $bot.l2 -text "Min Value"]

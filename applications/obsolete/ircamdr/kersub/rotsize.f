@@ -1,7 +1,7 @@
 
 *+  ROTSIZE - works out size of output array for ROTATE
 
-      SUBROUTINE ROTSIZE ( IDIMS1, IDIMS2, ANGLE, ODIMS1, ODIMS2, 
+      SUBROUTINE ROTSIZE ( IDIMS1, IDIMS2, ANGLE, ODIMS1, ODIMS2,
      :                     STATUS )
 
 *    Description :
@@ -18,8 +18,8 @@
 *
 *    Method :
 *
-*     Just calls NEWCOORDS for the each of the array corners, which 
-*     returns the x and y distances of the transformed extremities 
+*     Just calls NEWCOORDS for the each of the array corners, which
+*     returns the x and y distances of the transformed extremities
 *     from the array centre. Taking maxima and minima of these values
 *     and adding them finds the size of output array required to hold
 *     the rotated input array dimensions.
@@ -37,7 +37,7 @@
 *
 *     14-11-1985 :  First implementation
 *                :  (REVA::MJM)
-*     17-July-1994  Converted angles to radians to avoid VAX-specific 
+*     17-July-1994  Converted angles to radians to avoid VAX-specific
 *                   trig functions, changed arguments to input DIMS
 *                   separately so that routine will still compile (SKL@JACH)
 *
@@ -56,14 +56,14 @@
      :    IDIMS1,             ! dimensions of image to be rotated
      :    IDIMS2             ! dimensions of image to be rotated
 
-      REAL  
+      REAL
      :    ANGLE                  ! rotation angle in degrees
 
 *    Export :
 
       INTEGER
      :    ODIMS1,             ! dimensions of output array to hold
-     :                           ! rotated imag     
+     :                           ! rotated imag
      :    ODIMS2              ! dimensions of output array to hold
      :                            ! rotated image
 
@@ -92,7 +92,7 @@
      :    SANGLE,                 ! sine of the rotation angle
      :    DTOR                    ! factor for converting degrees to radians
 
-      PARAMETER ( DTOR = 3.141592 / 180.0 ) 
+      PARAMETER ( DTOR = 3.141592 / 180.0 )
 
       INTEGER
      :    IMAXX,                  ! rounded up integer version of MAXX
@@ -108,10 +108,10 @@
          RETURN
       ENDIF
 
-*    set up the sine and cosine of the rotation angle 
+*    set up the sine and cosine of the rotation angle
 *    first convert degrees to radians
       ANGLE = ANGLE * DTOR
-*    
+*
       CANGLE  =  COS( ANGLE )
       SANGLE  =  SIN( ANGLE )
 
@@ -123,7 +123,7 @@
       CENTREY  =  REAL( IDIMS2 ) / 2.0
 
       CX( 1 )  =  - CENTREX         ! bottom left corner
-      CY( 1 )  =  - CENTREY 
+      CY( 1 )  =  - CENTREY
       CX( 2 )  =  - CENTREX         ! top left corner
       CY( 2 )  =  + CENTREY
       CX( 3 )  =  + CENTREX         ! top right corner
@@ -134,7 +134,7 @@
 *    now transform each of these corners into the rotated frame
 
       DO  I  =  1, 4
-         CALL NEWCOORDS( CX( I ), CY( I ), CANGLE, SANGLE, CXP( I ), 
+         CALL NEWCOORDS( CX( I ), CY( I ), CANGLE, SANGLE, CXP( I ),
      :                   CYP( I ), STATUS )
       END DO
 

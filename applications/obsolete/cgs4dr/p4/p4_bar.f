@@ -1,4 +1,4 @@
-*+  P4_BAR - Plot a colour scale bar 
+*+  P4_BAR - Plot a colour scale bar
       SUBROUTINE P4_BAR( STATUS )
 *    Description :
 *     This routine plots a colour scale bar on the right hand side.
@@ -22,7 +22,7 @@
       INCLUDE 'SAE_PAR'
 *    Status :
       INTEGER STATUS
-*    Local variables : 
+*    Local variables :
       INTEGER PORT                            ! Port number
 *-
 

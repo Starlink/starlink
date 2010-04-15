@@ -1,14 +1,14 @@
-#include "sae_par.h" 
-#include "mers.h" 
-#include "ndf.h" 
-#include "star/ndg.h" 
-#include "star/kaplibs.h" 
-#include "star/grp.h" 
-#include "par.h" 
-#include "cupid.h" 
+#include "sae_par.h"
+#include "mers.h"
+#include "ndf.h"
+#include "star/ndg.h"
+#include "star/kaplibs.h"
+#include "star/grp.h"
+#include "par.h"
+#include "cupid.h"
 #include "prm_par.h"
-#include <math.h> 
-#include <string.h> 
+#include <math.h>
+#include <string.h>
 #include <stdio.h>
 
 void findback( int *status ){
@@ -21,7 +21,7 @@ void findback( int *status ){
 *     Estimate the background in an NDF by removing small scale structure.
 
 *  Language:
-*     C 
+*     C
 
 *  Type of Module:
 *     ADAM A-task
@@ -31,21 +31,21 @@ void findback( int *status ){
 
 *  Description:
 *     This application uses spatial filtering to remove structure with a
-*     scale size less than a specified size from a 1, 2, or 3 dimensional 
+*     scale size less than a specified size from a 1, 2, or 3 dimensional
 *     NDF, thus producing an estimate of the local background within the NDF.
 *
-*     The algorithm proceeds as follows. A filtered form of the input data 
+*     The algorithm proceeds as follows. A filtered form of the input data
 *     is first produced by replacing every input pixel by the minimum of
 *     the input values within a rectangular box centred on the pixel.
 *     This filtered data is then filtered again, using a filter that
-*     replaces every pixel value by the maximum value in a box centred on 
+*     replaces every pixel value by the maximum value in a box centred on
 *     the pixel. This produces an estimate of the lower envelope of the data,
-*     but usually contains unacceptable sharp edges. In addition, this 
+*     but usually contains unacceptable sharp edges. In addition, this
 *     filtered data has a tendency to hug the lower envelope of the
-*     noise, thus under-estimating the true background of the noise-free 
+*     noise, thus under-estimating the true background of the noise-free
 *     data. The first problem is minimised by smoothing the background
 *     estimate using a filter that replaces every pixel value by the mean
-*     of the values in a box centred on the pixel. The second problem 
+*     of the values in a box centred on the pixel. The second problem
 *     is minimised by estimating the difference between the input data
 *     and the background estimate within regions well removed from any
 *     bright areas. This difference is then extrapolated into the bright
@@ -69,15 +69,15 @@ void findback( int *status ){
 *     BOX() = _INTEGER (Read)
 *        The dimensions of each of the filters, in pixels. Each value
 *        should be odd (if an even value is supplied, the next higher odd
-*        value will be used). The number of values supplied should not 
-*        exceed the number of pixel axes in the input array. If any trailing 
-*        values of 1 are supplied, then each pixel value on the corresponding 
-*        axes will be fitted independently of its neighbours. For instance, 
-*        if the data array is 3-dimensional, and the third BOX value is 1, 
-*        then each x-y plane will be fitted independently of the neighbouring 
-*        planes. If the NDF has more than 1 pixel axis but only 1 value is 
-*        supplied, then the same value will be used for the both the first 
-*        and second pixel axes (a value of 1 will be assumed for the third 
+*        value will be used). The number of values supplied should not
+*        exceed the number of pixel axes in the input array. If any trailing
+*        values of 1 are supplied, then each pixel value on the corresponding
+*        axes will be fitted independently of its neighbours. For instance,
+*        if the data array is 3-dimensional, and the third BOX value is 1,
+*        then each x-y plane will be fitted independently of the neighbouring
+*        planes. If the NDF has more than 1 pixel axis but only 1 value is
+*        supplied, then the same value will be used for the both the first
+*        and second pixel axes (a value of 1 will be assumed for the third
 *        axis if the input array is 3-dimensional).
 *     MSG_FILTER = _CHAR (Read)
 *        Controls the amount of diagnostic information reported. This is the
@@ -87,20 +87,20 @@ void findback( int *status ){
 *     IN = NDF (Read)
 *        The input NDF.
 *     RMS = _DOUBLE (Read)
-*        Specifies a value to use as the global RMS noise level in the 
-*        supplied data array. The suggested default value is the square root 
+*        Specifies a value to use as the global RMS noise level in the
+*        supplied data array. The suggested default value is the square root
 *        of the mean of the values in the input NDF's Variance component.
-*        If the NDF has no Variance component, the suggested default 
-*        is based on the differences between neighbouring pixel values. Any 
-*        pixel-to-pixel correlation in the noise can result in this estimate 
-*        being too low. 
+*        If the NDF has no Variance component, the suggested default
+*        is based on the differences between neighbouring pixel values. Any
+*        pixel-to-pixel correlation in the noise can result in this estimate
+*        being too low.
 *     SUB = _LOGICAL (Read)
 *        If a TRUE value is supplied, the output NDF will contain the
-*        difference between the supplied input data and the estimated 
+*        difference between the supplied input data and the estimated
 *        background. If a FALSE value is supplied, the output NDF will
 *        contain the estimated background itself. [FALSE]
 *     OUT = NDF (Write)
-*        The output NDF containing either the estimated background, or the 
+*        The output NDF containing either the estimated background, or the
 *        background-subtracted input data, as specified by parameter SUB.
 
 *  Notes:
@@ -147,7 +147,7 @@ void findback( int *status ){
 *     {enter_further_changes_here}
 
 *-
-*/      
+*/
 
 /* Local Variables: */
    Grp *grp;                 /* GRP identifier for configuration settings */
@@ -194,14 +194,14 @@ void findback( int *status ){
    void *ipdout;             /* Pointer to output Data array */
    void *wa;                 /* Pointer to work array */
    void *wb;                 /* Pointer to work array */
- 
+
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
 /* Start an NDF context */
    ndfBegin();
 
-/* Record the existing AST status pointer, and ensure AST uses the supplied 
+/* Record the existing AST status pointer, and ensure AST uses the supplied
    status pointer instead. */
    old_status = astWatch( status );
 
@@ -247,7 +247,7 @@ void findback( int *status ){
 /* Create the output by propagating everything except the Data and
    (if we are outputting the background itself) Variance arrays. */
    if( sub ) {
-      ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY,VARIANCE", "OUT", &indf2, 
+      ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY,VARIANCE", "OUT", &indf2,
                status );
    } else {
       ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY", "OUT", &indf2, status );
@@ -257,7 +257,7 @@ void findback( int *status ){
 
 /* Get the dimensions of each of the filters, in pixels. If only one
    value is supplied, duplicate it as the second value if the second axis
-   is significant. If fewer than 3 values were supplied, use 1 for the 3rd 
+   is significant. If fewer than 3 values were supplied, use 1 for the 3rd
    value (whether or not it is significant). This results in each plane
    being fitted independently of the adjacent planes by default. */
    parGet1i( "BOX", nsdim, box, &nval, status );
@@ -266,16 +266,16 @@ void findback( int *status ){
    if( nval < 3 ) box[ 2 ] = 1;
 
 /* Ensure box sizes are odd. */
-   box[ 0 ] = 2*( box[ 0 ] / 2 ) + 1; 
-   box[ 1 ] = 2*( box[ 1 ] / 2 ) + 1; 
-   box[ 2 ] = 2*( box[ 2 ] / 2 ) + 1; 
+   box[ 0 ] = 2*( box[ 0 ] / 2 ) + 1;
+   box[ 1 ] = 2*( box[ 1 ] / 2 ) + 1;
+   box[ 2 ] = 2*( box[ 2 ] / 2 ) + 1;
 
    msgOutiff( MSG__VERB, "", "Using box sizes [%d,%d,%d].", status,
               box[0], box[1], box[2]);
 
-/* If any trailing axes have a cell size of 1, then we apply the algorithm 
-   independently to every pixel index on the trailing axes. First of all 
-   set things up assuming that there are no trailing axes with cell size 
+/* If any trailing axes have a cell size of 1, then we apply the algorithm
+   independently to every pixel index on the trailing axes. First of all
+   set things up assuming that there are no trailing axes with cell size
    of 1. */
    nystep = 1;
    nzstep = 1;
@@ -298,14 +298,14 @@ void findback( int *status ){
          nystep = sdim[ 1 ];
          slice_dim[ 1 ] = 1;
       }
-   } 
+   }
 
 /* Determine the number of pixels in each independent slice. */
    slice_size = slice_dim[ 0 ]*slice_dim[ 1 ]*slice_dim[ 2 ];
 
 /* Decide what numeric data type to use, and set the output NDF data type. */
-   ndfMtype( "_REAL,_DOUBLE", indf1, indf1, "Data,Variance", itype, 
-             20, dtype, 20, status ); 
+   ndfMtype( "_REAL,_DOUBLE", indf1, indf1, "Data,Variance", itype,
+             20, dtype, 20, status );
    if( !strcmp( itype, "_DOUBLE" ) ) {
       type = CUPID__DOUBLE;
    } else {
@@ -320,10 +320,10 @@ void findback( int *status ){
 
 /* Calculate the default RMS value. If the NDF has a Variance component
    it is the square root of the mean Variance value. Otherwise, it is found
-   by looking at differences between adjacent pixel values in the Data 
+   by looking at differences between adjacent pixel values in the Data
    component. */
    ndfState( indf1, "VARIANCE", &var, status );
-   if( *status == SAI__OK && var ) {   
+   if( *status == SAI__OK && var ) {
       ndfMap( indf1, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
       sum = 0.0;
@@ -334,7 +334,7 @@ void findback( int *status ){
             n++;
          }
       }
-      
+
       if( n > 0 ) {
          rms = sqrtf( sum/n );
 
@@ -342,12 +342,12 @@ void findback( int *status ){
          *status = SAI__ERROR;
          errRep( "", "The supplied data contains insufficient "
                  "good Variance values to continue.", status );
-      }         
+      }
 
    } else {
       ipv = NULL;
       rms = cupidRms( type, ipdin, el, sdim[ 0 ], status );
-   }   
+   }
 
 /* Get the RMS noise level. */
    parDef0d( "RMS", rms, status );
@@ -400,7 +400,7 @@ void findback( int *status ){
 
 /* Increment the lower bound on the 3rd pixel axis. */
       slice_lbnd[ 2 ]++;
-   }     
+   }
 
 /* The output currently holds the background estimate. If the user has
    requested that the output should hold the background-subtracted input
@@ -428,7 +428,7 @@ void findback( int *status ){
             }
          }
 
-      }            
+      }
    }
 
 /* Tidy up */
@@ -445,7 +445,7 @@ L999:;
 /* End the NDF context */
    ndfEnd( status );
 
-/* If an error has occurred, issue another error report identifying the 
+/* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
       errRep( "FINDBACK_ERR", "FINDBACK: Failed to find the background "

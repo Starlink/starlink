@@ -9,7 +9,7 @@ C
 C     Function:
 C        Read CGS2 Polarimetry Data
 C
-C     Description:   
+C     Description:
 C        RCGS2 reads a polarimetry data file in Figaro format as produced
 C        by the CGS2 Polarimetry system at UKIRT and reduces it to
 C        a TSP polarization spectrum.
@@ -23,16 +23,16 @@ C    (1) FIGARO     (Char)     The IRPS Figaro file to read.
 C    (2) OUTPUT     (TSP, 1D)  The output time series dataset.
 C    (3) NSIGMA     (Real)     Sigma level for despiking.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         28/8/1990
 C
 C-
 C
 C  History:
-C    28/8/1990   Original Version.   JAB/AAO 
+C    28/8/1990   Original Version.   JAB/AAO
 C
 
 
@@ -85,7 +85,7 @@ C
       LENNAME = ICH_LEN(FNAME)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME(:LENNAME),STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -100,12 +100,12 @@ C
             CALL MSG_OUT(' ','Incorrect number of Dimensions',
      :          STATUS)
             STATUS = USER__001
-         ELSE                        
+         ELSE
 
 *  Copy the dimensions
             NPOINTS = DIMS(2)
             NPLATES = DIMS(1)
-            NBEAMS = DIMS(3) 
+            NBEAMS = DIMS(3)
             NCYCLES = DIMS(4)
 
 *  Check that NPLATES is 4 as it must be for linear polarimetry data
@@ -148,7 +148,7 @@ C
              CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
 
 *  Create the structure
-                                                          
+
              DIMS(1) = NPOINTS
              CALL TSP_CREATE_1D(OLOC,NPOINTS,'QU',.TRUE.,
      :               .TRUE.,STATUS)
@@ -172,7 +172,7 @@ C
 *  ... and its variance
              CALL TSP_MAP_VAR(SULOC,'WRITE',UVPTR,UVLOC,STATUS)
 
-*  Get the sigma for despiking   
+*  Get the sigma for despiking
              CALL PAR_GET0R('NSIGMA',NSIGMA,STATUS)
 
 *  Copy the data
@@ -183,7 +183,7 @@ C
      :           %VAL(QVPTR),%VAL(UPTR),%VAL(UVPTR),NSIGMA)
              ENDIF
 
-*  Copy the wavelength axis data                         
+*  Copy the wavelength axis data
 
              CALL TSP_MAP_LAMBDA(OLOC,'WRITE',DPTR,DLOC,STATUS)
              CALL GEN_MOVE(4*NPOINTS,%VAL(XPTR),%VAL(DPTR))
@@ -208,7 +208,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
 
       SUBROUTINE TSP_RCGS2_COPY(N1,N2,N3,N4,IN,I,IV,Q,QV,U,UV,NSIGMA)
@@ -332,6 +332,6 @@ C
           QV(J) = QV(J)*QV(J)
           UV(J) = UUE(J)*C(J)/100.0
           UV(J) = UV(J)*UV(J)
-      ENDDO    
+      ENDDO
 
       END

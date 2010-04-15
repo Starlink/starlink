@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,14 +86,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
@@ -129,7 +129,7 @@
       DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID coords at min WCS axis value
       DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID coords at max WCS axis value
       INTEGER F                  ! First non-blank character position
-      INTEGER FRAME1( NDF__MXDIM )! Frame used by VALUE1 
+      INTEGER FRAME1( NDF__MXDIM )! Frame used by VALUE1
       INTEGER FRAME2( NDF__MXDIM )! Frame used by VALUE2
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IDCB               ! Index to data object entry in the DCB
@@ -180,8 +180,8 @@
 *  coordinates or WCS coordinates.
       ELSE
 
-*  If the opening parenthesis is followed by an asterisk  "*" the section 
-*  refers purely to WCS coords (in which case step over the asterisk). 
+*  If the opening parenthesis is followed by an asterisk  "*" the section
+*  refers purely to WCS coords (in which case step over the asterisk).
 *  Otherwise, it may contain a mix of axis/wcs coords and pixel indices.
          IF( STR( F + 1 : F + 1 ) .EQ. '*' ) THEN
             WCSSEC = .TRUE.
@@ -194,7 +194,7 @@
          CALL ARY_BOUND( ACB_DID( IACB1 ), NDF__MXDIM, LBNDD, UBNDD,
      :                   NDIMD, STATUS )
 
-*  Get the WCS FrameSet. 
+*  Get the WCS FrameSet.
          CALL NDF1_RDWCS( IACB1, IWCS, STATUS )
 
 *  If we are using WCS syntax, the default bounds are the WCS values at
@@ -217,7 +217,7 @@
             NAX = AST_GETI( IWCS, 'Nout', STATUS )
             DO I = 1, NAX
                CALL AST_MAPBOX( WCSMAP, GLBND, GUBND, .TRUE., I,
-     :                          DFLBND( I ), DFUBND( I ), XL, XU, 
+     :                          DFLBND( I ), DFUBND( I ), XL, XU,
      :                          STATUS )
             END DO
 
@@ -229,8 +229,8 @@
          ELSE
             NAX = NDIMD
             DO I = 1, NAX
-               DFLBND( I ) = DBLE( LBNDD( I ) ) 
-               DFUBND( I ) = DBLE( UBNDD( I ) ) 
+               DFLBND( I ) = DBLE( LBNDD( I ) )
+               DFUBND( I ) = DBLE( UBNDD( I ) )
             END DO
 
 *  If the current WCS Frame is the AXIS Frame, we interpret non-integer
@@ -238,7 +238,7 @@
 *  WCS-based code.
             USEWCS = ( AST_GETC( IWCS, 'Domain', STATUS ) .NE. 'AXIS' )
 
-         END IF       
+         END IF
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -276,7 +276,7 @@
 *  If we are using WCS syntax, we do all axes together,
                IF( WCSSEC ) THEN
                   CALL NDF1_WCLIM( IWCS, NDIM, NDIMD, LBNDD, UBNDD,
-     :                             ISDEF1, ISDEF2, VALUE1, VALUE2, 
+     :                             ISDEF1, ISDEF2, VALUE1, VALUE2,
      :                             ISBND, LBND, UBND, STATUS )
 
 *  For the old pixel/axis syntax, do each axis independently unless
@@ -284,9 +284,9 @@
                ELSE IF( .NOT. USEWCS ) THEN
 
                   DO 1 I = 1, NDIM
-                     CALL NDF1_AXLIM( I, IACB1, VALUE1( I ), 
-     :                                VALUE2( I ), FRAME1( I ), 
-     :                                FRAME2( I ), ISBND( I ), 
+                     CALL NDF1_AXLIM( I, IACB1, VALUE1( I ),
+     :                                VALUE2( I ), FRAME1( I ),
+     :                                FRAME2( I ), ISBND( I ),
      :                                LBND( I ), UBND( I ), STATUS )
 
 *  If an error occurs, then report context information and quit.
@@ -300,14 +300,14 @@
      :                                STATUS )
                         GO TO 2
                      END IF
- 1                CONTINUE              
- 2                CONTINUE              
+ 1                CONTINUE
+ 2                CONTINUE
 
 *  If we are using the old syntax, but non-integer values are being
 *  interpretde as WCS values...
                ELSE
-                  CALL NDF1_WPLIM( IWCS, NDIM, LBNDD, UBNDD, VALUE1, 
-     :                             VALUE2, FRAME1, FRAME2, ISBND, 
+                  CALL NDF1_WPLIM( IWCS, NDIM, LBNDD, UBNDD, VALUE1,
+     :                             VALUE2, FRAME1, FRAME2, ISBND,
      :                             ISDEF1, ISDEF2, LBND, UBND, STATUS )
                END IF
 
@@ -328,7 +328,7 @@
          IF( IWCS .NE. AST__NULL ) CALL AST_ANNUL( IWCS, STATUS )
 
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_NCUT', STATUS )
 

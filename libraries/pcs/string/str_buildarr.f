@@ -1,4 +1,4 @@
-      SUBROUTINE STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING, 
+      SUBROUTINE STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING,
      :  STATUS )
 *+
 *  Name:
@@ -14,12 +14,12 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING, 
+*     CALL STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING,
 *     :  STATUS )
 
 *  Description:
-*     Given an N-dimensional array of strings, build them into a single 
-*     string with dimensions and values separated by brackets and 
+*     Given an N-dimensional array of strings, build them into a single
+*     string with dimensions and values separated by brackets and
 *     commas.
 
 *  Arguments:
@@ -125,7 +125,7 @@
             NUMPACK = NUMPACK * DIMS(J)
          ENDDO
 
-         CALL STRING_PACK ( NUMPACK, DIMS(K), INARRAY, OUTARRAY, 
+         CALL STRING_PACK ( NUMPACK, DIMS(K), INARRAY, OUTARRAY,
      :     STATUS )
 
          DO J = 1, NUMPACK

@@ -32,7 +32,7 @@
 *     You can control whether or not to propagate extensions and
 *     history information.
 *
-*     The application also accepts NDFs stored as top-level components 
+*     The application also accepts NDFs stored as top-level components
 *     of an HDS container file.
 
 *  Usage:
@@ -44,25 +44,25 @@
 *        This specifies the data type of the output FITS file.
 *        Permitted values are: 8 for unsigned byte, 16 for signed word,
 *        32 for integer, -32 for real, -64 for double precision.  There
-*        are three other special values.  
+*        are three other special values.
 *
-*        -- BITPIX=0 will cause the output file to have the data type 
-*           equivalent to that of the input NDF.  
+*        -- BITPIX=0 will cause the output file to have the data type
+*           equivalent to that of the input NDF.
 *        -- BITPIX=-1 requests that the output file has the data
-*           type corresponding to the value of the BITPIX keyword in 
-*           the NDF's FITS extension.  If the extension or BITPIX 
-*           keyword is absent, the output file takes the data type of 
-*           the input array. 
+*           type corresponding to the value of the BITPIX keyword in
+*           the NDF's FITS extension.  If the extension or BITPIX
+*           keyword is absent, the output file takes the data type of
+*           the input array.
 *        -- BITPIX="Native" requests that any scaled arrays in the
 *           NDF be copied to the scaled data type.  Otherwise behaviour
 *           reverts to BITPIX=-1, which may in turn be effectively
-*           BITPIX=0.  The case-insensitive value may be abbreviated 
+*           BITPIX=0.  The case-insensitive value may be abbreviated
 *           to "n".
 *
-*        BITPIX must be enclosed in double quotes and may be a list of 
+*        BITPIX must be enclosed in double quotes and may be a list of
 *        comma-separated values to be applied to each conversion in
 *        turn.  An error results if more values than the number of input
-*        NDFs  are supplied.  If too few are given, the last value in 
+*        NDFs  are supplied.  If too few are given, the last value in
 *        the list applied to all the conversions.  The given values must
 *        be in the file may be used.  If more than one line is required
 *        to enter the information at a prompt then place a "-" at the
@@ -85,7 +85,7 @@
 *        FITS primary array.  The order of the variance and quality
 *        in COMP decides the order they will appear in the FITS file.
 *
-*        The choice of COMP may affect automatic quality masking. 
+*        The choice of COMP may affect automatic quality masking.
 *        See "Quality Masking" for the details.
 *
 *        COMP may be a list of comma-separated values to be applied to
@@ -103,24 +103,24 @@
 *        If TRUE, the supplied IN files are any multi-NDF HDS container
 *        files, in which the NDFs reside as top-level components.  This
 *        option is primarily intended to support the UKIRT format, where
-*        the NDFs are named .In, n >=1, and one named HEADER containing 
-*        global metadata in its FITS airlock.  The .In NDFs may also 
-*        contain FITS airlocks, storing metadata pertinent to that NDF, 
+*        the NDFs are named .In, n >=1, and one named HEADER containing
+*        global metadata in its FITS airlock.  The .In NDFs may also
+*        contain FITS airlocks, storing metadata pertinent to that NDF,
 *        such as observation times.  The individual NDFs often represent
-*        separate integrations nodded along a slit or spatially.  Note 
-*        that this is not a group, so a single value applies to all the 
+*        separate integrations nodded along a slit or spatially.  Note
+*        that this is not a group, so a single value applies to all the
 *        supplied input files.  [FALSE]
 *     DUPLEX = _LOGICAL (Read)
-*        This qualifies the effect of PROFITS=TRUE.  DUPLEX=FALSE means 
+*        This qualifies the effect of PROFITS=TRUE.  DUPLEX=FALSE means
 *        that the airlock headers only appear with the primary array.
-*        DUPLEX=TRUE, propagates the FITS airlock headers for other 
+*        DUPLEX=TRUE, propagates the FITS airlock headers for other
 *        array components of the NDF.  [FALSE]
 *     ENCODING = LITERAL (Read)
-*        Controls the FITS keywords which will be used to encode the 
-*        World Co-ordinate System (WCS) information within the FITS 
-*        header.  The value supplied should be one of the encodings 
-*        listed in the "World Co-ordinate Systems" section below.  In 
-*        addition, the value "Auto" may also be supplied, in which case 
+*        Controls the FITS keywords which will be used to encode the
+*        World Co-ordinate System (WCS) information within the FITS
+*        header.  The value supplied should be one of the encodings
+*        listed in the "World Co-ordinate Systems" section below.  In
+*        addition, the value "Auto" may also be supplied, in which case
 *        a suitable default encoding is chosen based on the contents of
 *        the NDF's FITS extension and WCS component.  ["Auto"]
 *     IN = LITERAL (Read)
@@ -130,19 +130,19 @@
 *        may include wild-cards ("*", "?").  Indirection may occur
 *        through text files (nested up to seven deep).  The indirection
 *        character is "^".  If extra prompt lines are required, append
-*        the continuation character "-" to the end of the line. 
+*        the continuation character "-" to the end of the line.
 *        Comments in the indirection file begin with the character "#".
 *     MERGE = _LOGICAL (Read)
-*        Whether or not to merge the FITS-airlocks' headers of the 
-*        header NDF of a UKIRT multi-NDF container file with its sole 
-*        data NDF into the primary header and data unit (HDU).  This 
-*        parameter is only used when CONTAINER is TRUE; and when the 
+*        Whether or not to merge the FITS-airlocks' headers of the
+*        header NDF of a UKIRT multi-NDF container file with its sole
+*        data NDF into the primary header and data unit (HDU).  This
+*        parameter is only used when CONTAINER is TRUE; and when the
 *        container file only has two component NDFs: one data NDF of
-*        arbitrary name, and the other called HEADER that stores the 
+*        arbitrary name, and the other called HEADER that stores the
 *        global headers of the dataset.  [TRUE]
 *     NATIVE = _LOGICAL (Read)
 *        If a TRUE value is given for Parameter NATIVE, then World
-*        Co-ordinate System (WCS) information will be written to the 
+*        Co-ordinate System (WCS) information will be written to the
 *        FITS header in the form of a `native' encoding (see "World
 *        Co-ordinate Systems" below).  This will be in addition to the
 *        encoding specified using Parameter ENCODING, and will usually
@@ -165,8 +165,8 @@
 *        or they may be created automatically on the basis of the input
 *        NDF names.  To do this, the string supplied for this parameter
 *        should include an asterisk "*".  This character is a token
-*        that represents the name of the corresponding input NDF, but 
-*        with a file type of ".fit" instead of ".sdf", and with no 
+*        that represents the name of the corresponding input NDF, but
+*        with a file type of ".fit" instead of ".sdf", and with no
 *        directory specification.  Thus, simply supplying "*" for this
 *        parameter will create a group of output files in the current
 *        directory with the same names as the input NDFs, but with file
@@ -181,7 +181,7 @@
 *     PROFITS = _LOGICAL (Read)
 *        If TRUE, the contents of the FITS extension of the NDF are
 *        merged with the header information derived from the standard
-*        NDF components.  See the Notes for details of the merger. 
+*        NDF components.  See the Notes for details of the merger.
 *        [TRUE]
 *     PROHIS = _LOGICAL (Read)
 *        If TRUE, any NDF history records are written to the primary
@@ -189,7 +189,7 @@
 *        headers and any merged FITS-extension headers (see parameter
 *        PROFITS).  [TRUE]
 *     PROVENANCE = LITERAL (Read)
-*        This controls the export of NDF provenance information to the 
+*        This controls the export of NDF provenance information to the
 *        FITS file.  Allowed values are as follows.
 *
 *        "None" -- No provenance is written.
@@ -200,7 +200,7 @@
 *        It also modifies the PRODUCT keyword to be unique for each FITS
 *        extension.
 *
-*        "Generic" -- Encapsulates the entire PROVENANCE structure in 
+*        "Generic" -- Encapsulates the entire PROVENANCE structure in
 *        FITS headers in sets of five character-value indexed headers.
 *        there is a set for the current NDF and each parent.
 *
@@ -251,27 +251,27 @@
 *        native encoding provides a `loss-free' means of transferring
 *        co-ordinate system information (i.e. no information is lost;
 *        other encodings may cause information to be lost).  Only
-*        applications based on the AST library (such as FITS2NDF) 
+*        applications based on the AST library (such as FITS2NDF)
 *        are able to interpret native encodings.
 *     ndf2fits u20040730_00675 merge container accept
-*        This converts the UIST container file u20040730_00675.sdf to 
+*        This converts the UIST container file u20040730_00675.sdf to
 *        FITS file u20040730_00675.fit, merging its .I1 and .HEADER
 *        structures into a single NDF before the conversion.  The output
 *        file has only one header and data unit.
 *     ndf2fits in=c20011204_00016 out=cgs4_16.fit container
 *        This converts the CGS4 container file c20011204_00016.sdf to
-*        the multiple-extension FITS file cgs4_16.fit.  The primary HDU 
-*        has the global metadata from the .HEADER's FITS airlock.  The 
+*        the multiple-extension FITS file cgs4_16.fit.  The primary HDU
+*        has the global metadata from the .HEADER's FITS airlock.  The
 *        four integrations in I1, I2, I3, and I4 components of the
 *        container file are converted to FITS IMAGE extensions.
 *     ndf2fits in=huge out=huge.fits comp=d bitpix=n
 *        This converts the NDF called huge to the FITS file called
-*        huge.fits.  The data type of the FITS primary data array 
+*        huge.fits.  The data type of the FITS primary data array
 *        matches that of the NDF's scaled data array.  The scale and
 *        offset coefficients used to form the FITS array are also taken
 *        from the NDF's scaled array.
 *     ndf2fits in=huge out=huge.fits comp=d bitpix=-1
-*        As the previous example, except that the data type of the FITS 
+*        As the previous example, except that the data type of the FITS
 *        primary data array is that given by the BITPIX keyword in the
 *        FITS airlock of NDF huge and the scaling factors are
 *        determined.
@@ -290,7 +290,7 @@
 *     not support these data types).
 *     -  The FITS keyword BLANK records the bad values for integer
 *     output types.  Bad values in floating-point output arrays are
-*     denoted by IEEE not-a-number values. 
+*     denoted by IEEE not-a-number values.
 *     -  The NDF's quality and variance arrays appear in individual
 *     FITS IMAGE extensions immediately following the primary header
 *     and data unit, unless that component already appears as the
@@ -306,13 +306,13 @@
 *          is transferred when Parameter BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF WCS component if possible (see "World Co-ordinate
-*          Systems").  If this is not possible, and if PROFITS is TRUE, 
+*          Systems").  If this is not possible, and if PROFITS is TRUE,
 *          then they are copied from the NDF's FITS extension.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
 *          LABEL, and UNITS components respectively are used if
 *          they are defined; otherwise any values found in the FITS
 *          extension are used (provided Parameter PROFITS is TRUE).
-*          For a variance array, BUNIT is assigned to "(<unit>)**2", 
+*          For a variance array, BUNIT is assigned to "(<unit>)**2",
 *          where <unit> is the DATA unit; the BUNIT header is absent
 *          for a quality array.
 *        DATE --- is created automatically.
@@ -327,13 +327,13 @@
 *          elements of any array structures present; the indices are in
 *          a comma-separated list within parentheses.
 *
-*          If the component is too long to fit within the header 
-*          (68 characters), EXTNAME is set to  '@EXTNAMEF'.  The full 
-*          path is then stored in keyword EXTNAMEF using the HEASARC 
+*          If the component is too long to fit within the header
+*          (68 characters), EXTNAME is set to  '@EXTNAMEF'.  The full
+*          path is then stored in keyword EXTNAMEF using the HEASARC
 *          Long-string CONTINUE convention
 *          (http://fits.gsfc.nasa.gov/registry/continue_keyword.html)
 *        EXTVER --- is only set when EXTNAME (q.v.) cannot accommodate
-*          the component name, and it is assigned the HDU index to 
+*          the component name, and it is assigned the HDU index to
 *          provide a unique identifier.
 *        EXTLEVEL --- is the level in the hierarchical structure of the
 *          extensions.  Thus a top-level extension has value 1,
@@ -364,15 +364,15 @@
 *        HISTORY headers are propagated from the FITS airlock when
 *          PROFITS is TRUE, and from the NDF history component when
 *          PROHIS is TRUE.
-*        DATASUM and CHECKSUM --- data-integrity keywords are written 
+*        DATASUM and CHECKSUM --- data-integrity keywords are written
 *          when Parameter CHECKSUM is TRUE, replacing any existing
 *          values.  When Parameter CHECKSUM is FALSE and PROFITS is
-*          TRUE any existing values inherited from the FITS airlock are 
-*          removed to prevent storage of invalid checksums relating to 
+*          TRUE any existing values inherited from the FITS airlock are
+*          removed to prevent storage of invalid checksums relating to
 *          another data file.
 *
 *     See also the sections "Provenance" and "World Co-ordinate Systems"
-*     for details of headers used to describe the PROVENANCE extension 
+*     for details of headers used to describe the PROVENANCE extension
 *     and WCS information respectively.
 *
 *     -  Extension information may be transferred to the FITS file when
@@ -397,7 +397,7 @@
 *
 *     There are additional rules if a multi-NDF container file is being
 *     converted (see Parameter CONTAINER).  This excludes the case where
-*     there are but two NDFs---one data and the other just 
+*     there are but two NDFs---one data and the other just
 *     headers---that have already been merged (see Parameter MERGE):
 *     -  For multiple NDFs a header-only HDU may be created followed by
 *     an IMAGE extension containing the data array (or whichever other
@@ -419,20 +419,20 @@
 *        the system commonly used by IRAF.  It is described in the
 *        document "World Coordinate Systems Representations Within the
 *        FITS Format" by R.J. Hanisch and D.G. Wells, 1988, available by
-*        ftp from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
+*        ftp from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z.
 *
 *        "FITS-WCS" --- This is the FITS standard WCS encoding
 *        scheme described in the paper "Representation of celestial
 *        coordinates in FITS"
 *        (http://www.atnf.csiro.au/people/mcalabre/WCS/).  It is
 *        very similar to "FITS-IRAF" but supports a wider range of
-*        projections and co-ordinate systems. 
+*        projections and co-ordinate systems.
 *
 *        "FITS-WCS(CD)" --- This is the same as "FITS-WCS" except that
-*        the scaling and rotation of the data array is described by a 
+*        the scaling and rotation of the data array is described by a
 *        CD matrix instead of a PC matrix with associated CDELT values.
 *
-*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, 
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi,
 *        PCiiijjj, etc., as described in a previous (now superseded)
 *        draft of the above FITS world co-ordinate system paper by
 *        E.W.Greisen and M.Calabretta.
@@ -442,34 +442,34 @@
 *        (revised 9th September, 1994), available by ftp from
 *        fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z.  It is
 *        currently employed by the AIPS data-analysis facility (amongst
-*        others), so its use will facilitate data exchange with AIPS. 
+*        others), so its use will facilitate data exchange with AIPS.
 *        This encoding uses CROTAi and CDELTi keywords to describe axis
 *        rotation and scaling.
 *
-*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which 
+*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which
 *        allows the use of a wider range of celestial projections, as
 *        used by the AIPS++ project.
 *
-*        "FITS-CLASS" --- This uses the conventions of the CLASS 
+*        "FITS-CLASS" --- This uses the conventions of the CLASS
 *        project.  CLASS is a software package for reducing single-dish
-*        radio and sub-mm spectroscopic data.  It supports double 
-*        sideband spectra.  See 
+*        radio and sub-mm spectroscopic data.  It supports double
+*        sideband spectra.  See
 *        http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
 *
 *        "DSS" --- This is the system used by the Digital Sky Survey,
 *        and uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *
-*        "NATIVE" --- This is the native system used by the AST library 
+*        "NATIVE" --- This is the native system used by the AST library
 *        (see SUN/210) and provides a loss-free method for transferring
 *        WCS information between AST-based application.  It allows more
 *        complicated WCS information to be stored and retrieved than any
 *        of the other encodings.
 *
 *     Values for FITS keywords generated by the above encodings will
-*     always be used in preference to any corresponding keywords found 
+*     always be used in preference to any corresponding keywords found
 *     in the FITS extension (even if PROFITS is TRUE). If this is not
 *     what is required, the WCS component of the NDF should be erased
-*     using the KAPPA command ERASE before running NDF2FITS.  Note, if 
+*     using the KAPPA command ERASE before running NDF2FITS.  Note, if
 *     PROFITS is TRUE, then any WCS-related keywords in the FITS
 *     extension which are not replaced by keywords derived from the WCS
 *     component may appear in the output FITS file.  If this causes a
@@ -480,15 +480,15 @@
 *     The following PROVENANCE headers are written if parameter
 *     PROVENANCE is set to "Generic".
 *        PRVPn --- is the path of the <nth> NDF.
-*        PRVIn --- is a comma-seapated list of the identifiers of the 
+*        PRVIn --- is a comma-seapated list of the identifiers of the
 *          direct parents for <nth> ancestor.
 *        PRVDn --- is the creation date of <nth> ancestor in ISO order.
 *        PRVCn --- is the software used to create the <nth> ancestor.
-*        PRVMn --- lists the contents of the MORE structure of <nth> 
+*        PRVMn --- lists the contents of the MORE structure of <nth>
 *          parent.
-*     All have value '<unknown>' if the information could not be found, 
-*     except for the PRVMn header, which is omitted if there is no MORE 
-*     information to record.   The index n used in each keyword's name 
+*     All have value '<unknown>' if the information could not be found,
+*     except for the PRVMn header, which is omitted if there is no MORE
+*     information to record.   The index n used in each keyword's name
 *     is the provenance identifier for the NDF, and starts at 0 for the
 *     NDF being converted to FITS.
 *
@@ -503,7 +503,7 @@
 *          file extension.
 *
 *        PRODUCT is modified or added to each extension's header to
-*        be the primary header's value of PRODUCT with a '_<extnam>' 
+*        be the primary header's value of PRODUCT with a '_<extnam>'
 *        suffix, where <extnam> is the extension name in lowercase.
 *
 *     When PROFITS is TRUE any existing provenance keywords in the FITS
@@ -511,12 +511,12 @@
 
 *  Quality Masking:
 *     -  NDF automatic quality masking is a facility whereby any bad
-*     quality information (flagged by the bad-bits mask) present can be 
-*     incorporated in the data or variance as bad values.  NDF2FITS uses 
-*     this facility in exported data variance information provided the 
-*     quality array is not transferred.  Thus if a QUALITY component is 
+*     quality information (flagged by the bad-bits mask) present can be
+*     incorporated in the data or variance as bad values.  NDF2FITS uses
+*     this facility in exported data variance information provided the
+*     quality array is not transferred.  Thus if a QUALITY component is
 *     present in the input NDF, the data and any variance arrays will
-*     not be masked whenever Parameter COMP's value is 'A' or contains 
+*     not be masked whenever Parameter COMP's value is 'A' or contains
 *     'Q'.
 
 *  Special Formats:
@@ -646,10 +646,10 @@
 *        Report an error if no usable input NDFs are supplied.
 *     11-APR-2000 (DSB):
 *        Added FITS-PC and FITS-AIPS encodings. Default encoding (if
-*        ENCODING=AUTO) is now chosen on the basis of the contents of 
+*        ENCODING=AUTO) is now chosen on the basis of the contents of
 *        the FITS extension (because DSS and FITS-WCS can both now
 *        be used to encode a TAN projection and so we need to look at
-*        what encoding was used in the original data to make the 
+*        what encoding was used in the original data to make the
 *        choice).
 *     21-AUG-2000 (DSB):
 *        Converted to use NDG to access the input NDFs.
@@ -682,7 +682,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -721,7 +721,7 @@
       INTEGER BITPIX             ! BITPIX code
       INTEGER BPGRP              ! Group identifier of BITPIXs
       CHARACTER * ( 3 ) CBP      ! Character form of a BITPIX value
-      LOGICAL CFLAG              ! A group requires further input via 
+      LOGICAL CFLAG              ! A group requires further input via
                                  ! continuation lines?
       LOGICAL CHECKS             ! Write CHECKSUM and DATASUM headers?
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a component
@@ -820,7 +820,7 @@
 
 *  Get the list of output file names from the environment.  Allow
 *  modification of the input file names.
-            CALL GRP_GROUP( 'IN', GRP__NOID, IGRP2, NIFILE, ADDED, 
+            CALL GRP_GROUP( 'IN', GRP__NOID, IGRP2, NIFILE, ADDED,
      :                      CFLAG, STATUS )
 
 *  Cancel the parameter association in order to get more group values
@@ -837,8 +837,8 @@
 *  but later we need to known the number of files, not just the number
 *  of NDFs they contain.
       ELSE
-         CALL CON_RGNDF( 'IN', 0, 1, 
-     :                   '  Give more '//ITEM( :NITC)//'...', 
+         CALL CON_RGNDF( 'IN', 0, 1,
+     :                   '  Give more '//ITEM( :NITC)//'...',
      :                   IGRP2, NIFILE, STATUS )
       END IF
 
@@ -871,8 +871,8 @@
       END IF
 
 *  At this point the output group contains the paths and names of the
-*  NDFs/HDS container files to be processed.  Tell the user how many 
-*  have been found to help them supply the appropriate number of BITPIX 
+*  NDFs/HDS container files to be processed.  Tell the user how many
+*  have been found to help them supply the appropriate number of BITPIX
 *  and output file names.
       CALL MSG_SETI( 'NF', NIFILE )
       IF ( NIFILE .NE. 1 ) THEN
@@ -891,9 +891,9 @@
 *  Create a new group to contain the output file names.
       CALL GRP_NEW( 'Default output files', FGROUP, STATUS )
 
-*  For the group containing the list of NDFs or container files, 
-*  substitute the ".fit" file extension for the existing ".sdf" 
-*  extension, and remove any section-defining text.  Store the modified 
+*  For the group containing the list of NDFs or container files,
+*  substitute the ".fit" file extension for the existing ".sdf"
+*  extension, and remove any section-defining text.  Store the modified
 *  names in the group just created.
       CALL CON_GEXCH( IGRP3, '.fit', FGROUP, STATUS )
 
@@ -944,7 +944,7 @@
          CALL MSG_SETI( 'NO', NOFILE )
          CALL ERR_REP( 'NDF2FITS_FILECOUNT',
      :     'NDF2FITS: The number of output files (^NO) does not '/
-     :     /'equal the number of input '//ITEM( :NITC)//' (^NI).', 
+     :     /'equal the number of input '//ITEM( :NITC)//' (^NI).',
      :     STATUS )
 
 *  Tidy up and exit.
@@ -1133,7 +1133,7 @@
             CALL MSG_SETI( 'NA', NAC )
             CALL ERR_REP( 'NDF2FITS_FILECOUNT',
      :        'NDF2FITS: The number of COMP values (^NA) exceeds '/
-     :        /'the number of input '//ITEM( :NITC )//' (^NI).', 
+     :        /'the number of input '//ITEM( :NITC )//' (^NI).',
      :        STATUS )
 
 *  Tidy up and exit.
@@ -1233,12 +1233,12 @@
                   IF ( MERGE ) THEN
 
 *  Import the HEADER NDF.
-                     CALL NDF_FIND( FLOC, 'HEADER', NDFHDR, STATUS ) 
+                     CALL NDF_FIND( FLOC, 'HEADER', NDFHDR, STATUS )
 
 *  Find the name of the other NDF.
                      ICOMP = 1
                      HDSNAM = 'HEADER'
-                     DO WHILE ( HDSNAM .EQ. 'HEADER' .AND. 
+                     DO WHILE ( HDSNAM .EQ. 'HEADER' .AND.
      :                          ICOMP .LE. NCOMP )
                         CALL DAT_INDEX( FLOC, ICOMP, CLOC, STATUS )
                         CALL DAT_NAME( CLOC, HDSNAM, STATUS )
@@ -1247,7 +1247,7 @@
                      END DO
 
 *  Import the data NDF.
-                     CALL NDF_FIND( FLOC, HDSNAM, NDF, STATUS ) 
+                     CALL NDF_FIND( FLOC, HDSNAM, NDF, STATUS )
 
 *  Make a copy of the other NDF in a temporary NDF that by definition
 *  can be edited.
@@ -1285,10 +1285,10 @@
                   CALL DAT_INDEX( FLOC, ICOMP, CLOC, STATUS )
                   CALL DAT_TYPE( CLOC, CTYPE, STATUS )
                   CALL DAT_NAME( CLOC, CNAME, STATUS )
-            
+
                   IF ( CTYPE .EQ. 'NDF' .AND.
      :                 CNAME .NE. 'HEADER' ) THEN
-                  
+
 * This is a valid NDF, so append its name to the group.
                      CALL GRP_PUT1( NGROUP, CNAME, 0, STATUS )
                      NONDF = NONDF + 1
@@ -1299,7 +1299,7 @@
          ELSE
             HDRPRS = .FALSE.
             NONDF = 1
-         END IF             
+         END IF
 
 *  Obtain the values for the parameters.
 *  =====================================
@@ -1437,7 +1437,7 @@
 *  Indicate that the FITS file has not been produced.
                IF ( ( MULTI .AND. INDF .EQ. 1 ) .OR. .NOT. MULTI ) THEN
                   CALL ERR_REP( 'NDF2FITS_NOCOMP',
-     :              'The output FITS file has not been produced.', 
+     :              'The output FITS file has not been produced.',
      :              STATUS )
 
 *  Flush the error, as this needs to be regarded as fatal by the
@@ -1496,9 +1496,9 @@
 *  ================
 
 *  Finally convert the NDF to the FITS file, as best we can.
-               CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, 
-     :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT, 
-     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE, 
+               CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
+     :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
+     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
      :                         FOPEN, FCLOSE, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
@@ -1507,24 +1507,24 @@
 
 *  Although strictly there are no arrays present, the routine COF_NDF2F
 *  called later uses it for an adjustable-array size.  So we pass a
-*  standard but dummy name.  We also use a dummy BITPIX if the special 
+*  standard but dummy name.  We also use a dummy BITPIX if the special
 *  value 0 is used, as it will not be changed to an actual BITPIX since
 *  we are not processing a data array for the header NDF.
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
-     :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, 
-     :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN, 
+     :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
+     :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN,
      :                         FCLOSE, STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE, 
+     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
      :                         FOPEN, FCLOSE, STATUS )
             END IF
- 
+
 *  Tidy the NDF.
             CALL NDF_ANNUL( NDF, STATUS )
 

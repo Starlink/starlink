@@ -1,6 +1,6 @@
 *+  CRED4_CHECK_GRP - Check a group has been sky-subtracted properly.
       SUBROUTINE CRED4_CHECK_GRP( GROUP, NOBJ, NSKY, EXPOSED, SKYEXP,
-     :  OK, STATUS ) 
+     :  OK, STATUS )
 *    Description :
 *     This routine checks that a given group has been sky-subtracted
 *     properly. Either the number of OBJECT and SKY observations
@@ -93,7 +93,7 @@
       CALL DSA_OPEN( DSA_STATUS )
 
 *   Open the specified GROUP file.
-      CALL DSA_NAMED_INPUT( 'GROUP', GROUP, DSA_STATUS ) 
+      CALL DSA_NAMED_INPUT( 'GROUP', GROUP, DSA_STATUS )
 
 *   Obtain the number of OBJECT observations (NOBJ) and the number
 *   of SKY observations (NSKY) from the FITS parameters.
@@ -105,10 +105,10 @@
 
 *   Obtain the object exposure time (EXPOSED) and sky exposure time
 *   (SKYEXP) for this group from the FITS parameters.
-      CALL DSA_GET_FITS_F( 'GROUP', 'EXPOSED', 0, EXPOSED, 
+      CALL DSA_GET_FITS_F( 'GROUP', 'EXPOSED', 0, EXPOSED,
      :  COMMENT, DSA_STATUS )
 
-      CALL DSA_GET_FITS_F( 'GROUP', 'SKYEXP', 0, SKYEXP, 
+      CALL DSA_GET_FITS_F( 'GROUP', 'SKYEXP', 0, SKYEXP,
      :  COMMENT, DSA_STATUS )
 
 *   Check everything has worked so far.

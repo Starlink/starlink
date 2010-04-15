@@ -28,9 +28,9 @@
 *
 * Arguments:
 *    LEFT(NYP) = REAL ARRAY (Returned)
-*       
+*
 *    RIGHT(NYP) = REAL ARRAY (Returned)
-*       
+*
 * History:
 *   Workspace for COMB_SPACING now real, TNW 16/6/92
 *

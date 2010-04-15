@@ -22,7 +22,7 @@ static double Q34=350.737486,QBLAcK=445267.1142,Q35=-
 0.001436,q36=0.0000019;double q37,q38;static double q39=
 11.250889,qred=483202.0251,QgreEN=-0.003211,QYELLOW=-
 0.0000003;double q40,QBLUE;static double QMAGENTA=259.183275
-,QCyaN=-1934.1420,Q41=0.002078,QWHITE=0.0000022;double 
+,QCyaN=-1934.1420,Q41=0.002078,QWHITE=0.0000022;double
 qclinton,q42;static double qbUsh=-0.002495,q43=-0.00000752;
 double Q44,Q45,q46,qJFK;static double Q47=0.000233,q48=51.2,
 Q49=20.2;static double Q50=-0.001778;static double q51=
@@ -32,7 +32,7 @@ Q49=20.2;static double Q50=-0.001778;static double q51=
 static double q55=0.001964;static double QbAR_FObAR=-
 0.024691;static double q56=-0.004328,Q57=275.05,Q58=-2.30;
 static double Q59=0.0004664;static double qbaR_FoOBaR=
-0.0000754;struct Q60{double Qbar_fOBaZ;int q61;int Q62;int 
+0.0000754;struct Q60{double Qbar_fOBaZ;int q61;int Q62;int
 qbar_foobaz;int q63;int q64;};static struct Q60 Q65[]={{
 6.288750,0,1,0,0,0},{1.274018,0,-1,2,0,0},{0.658309,0,0,2,0,
 0},{0.213616,0,2,0,0,0},{-0.185596,1,0,0,0,1},{-0.114336,0,0
@@ -52,8 +52,8 @@ qbar_foobaz;int q63;int q64;};static struct Q60 Q65[]={{
 0.000811,1,1,2,0,1},{0.000761,-1,-2,4,0,1},{0.000717,-2,1,0,
 0,2},{0.000704,-2,1,-2,0,2},{0.000693,1,-2,2,0,1},{0.000598,
 -1,0,2,-2,1},{0.000550,0,1,4,0,0},{0.000538,0,4,0,0,0},{
-0.000521,-1,0,4,0,1},{0.000486,0,2,-1,0,0}};static int 
-qbar_quux=(sizeof Q65/sizeof(struct Q60));static struct Q60 
+0.000521,-1,0,4,0,1},{0.000486,0,2,-1,0,0}};static int
+qbar_quux=(sizeof Q65/sizeof(struct Q60));static struct Q60
 QBaR_fRed[]={{5.128189,0,0,0,1,0},{0.280606,0,1,0,1,0},{
 0.277693,0,1,0,-1,0},{0.173238,0,0,2,-1,0},{0.055413,0,-1,2,
 1,0},{0.046272,0,-1,2,-1,0},{0.032573,0,0,2,1,0},{0.017198,0
@@ -84,7 +84,7 @@ sizeof(struct Q60));static struct Q60 qbar_cat[]={{0.950724,
 0,1},{0.000041,1,0,1,0,1},{0.000035,-1,2,0,0,1},{-0.000033,0
 ,3,-2,0,0},{-0.000030,0,1,1,0,0},{-0.000029,0,0,-2,2,0},{-
 0.000029,1,2,0,0,1},{0.000026,-2,0,2,0,2},{-0.000023,0,1,-2,
-2,0},{0.000019,-1,-1,4,0,1}};static int qbar_fish=(sizeof 
+2,0},{0.000019,-1,-1,4,0,1}};static int qbar_fish=(sizeof
 qbar_cat/sizeof(struct Q60));q1=(qfoo-15019.5)/36525.0;Q26=
 DD2R*dmod(qrms+(QfbI+(Qcia+Q25*q1)*q1)*q1,360.0);QNASA=DD2R*
 (QfbI+(2.0*Qcia+3.0*Q25*q1)*q1);q29=DD2R*dmod(QERR+(Q27+(Q28

@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This application looks for corresponding axes within two supplied 
+*     This application looks for corresponding axes within two supplied
 *     Frames. A list array of integers is displayed with one element
 *     for each axis in the second supplied Frame. An element in this list
 *     will be set to zero if the associated axis within the second Frame
@@ -29,21 +29,21 @@
 *     corresponding axis within the first supplied Frame.
 
 *  Usage:
-*     astmatchaxes frm1 frm2 
+*     astmatchaxes frm1 frm2
 
 *  ADAM Parameters:
-*     AXES() = _INTEGER (Write) 
-*        An output parameter to which is written an integer array holding 
-*        the indices of the axes (within the first Frame) that correspond to 
-*        each axis within the second Frame. Axis indices start at 1. A value 
-*        of zero will be stored in the returned array for each axis in the 
+*     AXES() = _INTEGER (Write)
+*        An output parameter to which is written an integer array holding
+*        the indices of the axes (within the first Frame) that correspond to
+*        each axis within the second Frame. Axis indices start at 1. A value
+*        of zero will be stored in the returned array for each axis in the
 *        second Frame that has no corresponding axis in the first Frame.
 *     FRM1 = LITERAL (Read)
 *        An NDF or text file holding the first Frame or FrameSet. If an NDF
-*        is supplied, the WCS FrameSet will be used. 
+*        is supplied, the WCS FrameSet will be used.
 *     FRM2 = LITERAL (Read)
-*        An NDF or text file holding the second Frame or FrameSet. If an NDF 
-*        is supplied, the WCS FrameSet will be used. 
+*        An NDF or text file holding the second Frame or FrameSet. If an NDF
+*        is supplied, the WCS FrameSet will be used.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -94,10 +94,10 @@
 
 *  Local Constants:
       INTEGER COL1               ! Index of start of first displayed column
-      PARAMETER ( COL1 = 3 )    
+      PARAMETER ( COL1 = 3 )
 
       INTEGER COL2               ! Index of start of second displayed column
-      PARAMETER ( COL2 = 35 )    
+      PARAMETER ( COL2 = 35 )
 
 *  Local Variables:
       CHARACTER ATTR*15
@@ -112,18 +112,18 @@
       INTEGER NAX
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the first Frame.
-      CALL KPG1_GTOBJ( 'FRM1', 'Frame or FrameSet', AST_ISAFRAME, FRM1, 
+      CALL KPG1_GTOBJ( 'FRM1', 'Frame or FrameSet', AST_ISAFRAME, FRM1,
      :                 STATUS )
 
 *  Get the second Frame.
-      CALL KPG1_GTOBJ( 'FRM2', 'Frame or FrameSet', AST_ISAFRAME, FRM2, 
+      CALL KPG1_GTOBJ( 'FRM2', 'Frame or FrameSet', AST_ISAFRAME, FRM2,
      :                 STATUS )
 
 *  Get the required axis indices.
@@ -171,7 +171,7 @@
          CALL CHR_APPND( LAB1, TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
 
-         IAT = COL2 
+         IAT = COL2
 
          IF( AXES( I ) .GT. 0 ) THEN
             CALL CHR_PUTI( AXES( I ), TEXT, IAT )

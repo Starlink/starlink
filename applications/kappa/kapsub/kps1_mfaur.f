@@ -5,36 +5,36 @@
 *     KPS1_MFAUR
 
 *  Purpose:
-*     Determines automatically ranges of pixels to be included in 
+*     Determines automatically ranges of pixels to be included in
 *     fitting by MFITTREND.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFAUR( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MAXRNG, 
+*     CALL KPS1_MFAUR( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MAXRNG,
 *                      NRANGE, RANGES, STATUS )
 
 *  Description:
-*     This routine serves MFITTREND.  It averages a section defined 
+*     This routine serves MFITTREND.  It averages a section defined
 *     through the supplied identifier to create a one-dimensional
 *     representative line of data that is being detrended by MFITTREND.
 *     This average line is rebinned by an integer factor to improve
-*     the signal-to-noise ratio.  Then the routine fits a straight 
-*     line to the rebinned data, and sigma-clipped outliers rejected.  
-*     The regions encompassing the unrejected parts of the line are 
+*     the signal-to-noise ratio.  Then the routine fits a straight
+*     line to the rebinned data, and sigma-clipped outliers rejected.
+*     The regions encompassing the unrejected parts of the line are
 *     returned in the unbinned grid co-ordinates.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
-*        The NDF identifier of the representative section to be 
+*        The NDF identifier of the representative section to be
 *        averaged and analysed.
 *     DTAXIS = INTEGER (Given)
 *        The axis index of the dimension that is being detrended.
 *     NCLIP = INTEGER (Given)
 *        The number of clipping cycles for the rejection of outliers.
 *     CLIP( NCLIP ) = REAL (Given)
-*        The clipping levels in standard deviations for the rejection 
+*        The clipping levels in standard deviations for the rejection
 *        of outliers.
 *     NUMBIN = INTEGER (Given)
 *        The number of bins in the compressed line.  This may be set
@@ -45,7 +45,7 @@
 *        The number of ranges returned.  This is always a multiple of
 *        two, i.e pairs of lower and upper ranges.
 *     RANGES( MAXRNG ) = INTEGER (Returned)
-*        The ranges to include in the detrending fits found from the 
+*        The ranges to include in the detrending fits found from the
 *        averaged representative line.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -117,7 +117,7 @@
 
 *  Local Variables:
       INTEGER COMPRS( NDF__MXDIM ) ! Compression factors
-      INTEGER D                  ! No. of o/p pixels from reference to 
+      INTEGER D                  ! No. of o/p pixels from reference to
                                  ! i/p pixel 1
       CHARACTER DTYPE *( NDF__SZFTP ) ! Numeric type for output arrays
       INTEGER EL                 ! Number of mapped elements
@@ -128,12 +128,12 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER NBIN               ! Number of bins
-      INTEGER NDFS               ! Identifier to the used section of 
+      INTEGER NDFS               ! Identifier to the used section of
                                  ! the input NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
       INTEGER PNTRI( 1 )         ! Pointer to input array component
-      INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of 
+      INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of
                                  ! a compression box
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
@@ -144,15 +144,15 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Find the shape and bound of the section.
       CALL NDF_DIM( INDF, NDF__MXDIM, IDIMS, NDIM, STATUS )
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
-*  Work out the bounds for the output array and the size of the output 
-*  array from the input array dimensions, compression factor and 
-*  alignment to origin.  Also modify the input bounds so that they 
-*  correspond to the section of the input array that is actually used. 
+*  Work out the bounds for the output array and the size of the output
+*  array from the input array dimensions, compression factor and
+*  alignment to origin.  Also modify the input bounds so that they
+*  correspond to the section of the input array that is actually used.
       DO I = 1, MAX( 2, NDIM )
          IF ( I .NE. DTAXIS ) THEN
             COMPRS( I ) = IDIMS( I )
@@ -161,7 +161,7 @@
             COMPRS( I ) = IDIMS( I ) / NBIN
          END IF
 
-*  Align with the origin.  However, leave it parameterised in case this 
+*  Align with the origin.  However, leave it parameterised in case this
 *  alignment no longer is no longer the only option.
          REF( I ) = LBND( I ) - 1
          D = KPG1_CEIL( REAL( 1 - REF( I ) ) / REAL( COMPRS( I ) ) ) - 1
@@ -169,7 +169,7 @@
 *  Pad the input image to make it a whole number of compression boxes.
          LBNDO( I ) = KPG1_FLOOR( REAL( LBND( I ) - 1 - REF( I ) )
      :                           / REAL( COMPRS( I ) ) ) - D + 1
-         UBNDO( I ) = MAX( LBNDO( I ), 
+         UBNDO( I ) = MAX( LBNDO( I ),
      :                     KPG1_CEIL( REAL( UBND( I ) - REF( I ) )
      :                               / REAL( COMPRS( I ) ) ) - D )
 
@@ -183,7 +183,7 @@
 *  Determine the numeric type to be used for processing the sample
 *  lines.  This step supports single- and double-precision
 *  floating-point processing.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE, 
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE,
      :                DTYPE, STATUS )
 
 *  Create a section of the input NDF containing the region will actually
@@ -205,17 +205,17 @@
 *  Average the lines in the section.  The routine expects at least two
 *  dimensions.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CMAVR( MAX( 2, NDIM ), IDIMS, 
+         CALL KPG1_CMAVR( MAX( 2, NDIM ), IDIMS,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    COMPRS, 1,  %VAL( CNF_PVAL( IPAL ) ),
-     :                    %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ),
      :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CMAVD( MAX( 2, NDIM ), IDIMS, 
+         CALL KPG1_CMAVD( MAX( 2, NDIM ), IDIMS,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    COMPRS, 1, %VAL( CNF_PVAL( IPAL ) ),
-     :                    %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ),
      :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
       END IF
 
@@ -231,23 +231,23 @@
 
 *  Perform fits and iteratively reject outliers.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_MFEDR( NCLIP, CLIP, ODIMS( DTAXIS ), 
+         CALL KPS1_MFEDR( NCLIP, CLIP, ODIMS( DTAXIS ),
      :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_MFEDD( NCLIP, CLIP, ODIMS( DTAXIS ), 
+         CALL KPS1_MFEDD( NCLIP, CLIP, ODIMS( DTAXIS ),
      :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
       END IF
 
 *  Determine the ranges from the good elements remaining in the line.
       IF ( ITYPE .EQ. '_REAL' ) THEN
           CALL KPS1_MFFRR( COMPRS( DTAXIS ), ODIMS( DTAXIS ),
-     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE, 
+     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE,
      :                     RANGES, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
           CALL KPS1_MFFRD( COMPRS( DTAXIS ), ODIMS( DTAXIS ),
-     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE, 
+     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE,
      :                     RANGES, STATUS )
       END IF
 

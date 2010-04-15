@@ -116,7 +116,7 @@ static symtab *symbols = &world_syms;
  *
  ******************************************************************************
  */
-value 
+value
 value_symbols(void)
 {
     return (value_symtab(symbols));
@@ -142,7 +142,7 @@ value_symbols(void)
 static symtab *symbolstack[ICL_BUFSIZE];
 static int symbolstacklevel = 0;
 
-value 
+value
 savesymboltablecontext(node *procnode)
 {
     if (symbolstacklevel == ICL_BUFSIZE)
@@ -160,7 +160,7 @@ savesymboltablecontext(node *procnode)
  *
  ******************************************************************************
  */
-value 
+value
 restoresymboltablecontext(void)
 {
     if (symbolstacklevel <= 0)
@@ -218,7 +218,7 @@ new_symtab(char *name, int type, node * n)
  *
  ******************************************************************************
  */
-value 
+value
 value_emptysymtab(void)
 {
     return (value_symtab(new_symtab(CHARNIL, 0, NODENULL)));
@@ -240,7 +240,7 @@ value_emptysymtab(void)
  *
  *****************************************************************************
  */
-static int 
+static int
 symbol_total(symtab *sym, int type)
 {
     symtab *p;
@@ -367,7 +367,7 @@ get_passbyreferencevar(node * var)
  *
  ******************************************************************************
  */
-value 
+value
 lookfor_variable_value(symtab * sym, char *name)
 {
     node *var, *var2;
@@ -386,7 +386,7 @@ lookfor_variable_value(symtab * sym, char *name)
     else
 	return exception2(
 		"UNDEFVAR Parameter \"%s\" is undefined variable \"%s\"",
-		 name, 
+		 name,
 		 string_part(var->sub[0]->val));
 }
 
@@ -399,7 +399,7 @@ lookfor_variable_value(symtab * sym, char *name)
  *
  ******************************************************************************
  */
-value 
+value
 lookup_variable_value(char *name)
 {
     return (lookfor_variable_value(symbols, name));
@@ -413,15 +413,15 @@ lookup_variable_value(char *name)
  * Looks up a variable in an ICL procedure symbol table or, if 'procnode'
  * is NULL in the world table.
  *
- * On entry 'procnode' is either NODENULL or  will point to 
- * a procedure_interpret() node the symboltable_part() of which points to the 
+ * On entry 'procnode' is either NODENULL or  will point to
+ * a procedure_interpret() node the symboltable_part() of which points to the
  * symbol table of that procedure.
  *
  * Uses lookfor_variable_value() to search this table for name.
  *
  ******************************************************************************
  */
-value 
+value
 lookup_procvariable_value(node * procnode, char *name)
 {
     if( procnode != NODENULL)
@@ -470,7 +470,7 @@ lookup_proc(char *name)
  * new value. I don't believe anything relies on this feature currently.
  ******************************************************************************
  */
-value 
+value
 put_symbol(value symbval, char *name, int type, node * n)
 {
     node *found;
@@ -506,7 +506,7 @@ put_symbol(value symbval, char *name, int type, node * n)
  *
  ******************************************************************************
  */
-value 
+value
 store_symbol(char *name, int type, node * n)
 {
     if (n == NODENIL)
@@ -532,7 +532,7 @@ store_symbol(char *name, int type, node * n)
  *
  ******************************************************************************
  */
-value 
+value
 install_abbrevs(char *name, node * n)
 {
     value val;
@@ -586,7 +586,7 @@ install_abbrevs(char *name, node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 put_value(symtab * symb, char *name, int type, value val)
 {
     node *found;
@@ -663,25 +663,25 @@ put_value(symtab * symb, char *name, int type, value val)
  * entry, actual parameter's name,SYM_VARIABLE,val).
  ******************************************************************************
  */
-value 
+value
 assign_helper(node *var, value val)
 {
     node *param;
 
-    if ((param = lookup_symbol(string_part(var->val), SYM_PARAMETER)) 
+    if ((param = lookup_symbol(string_part(var->val), SYM_PARAMETER))
 	    != NODENIL) {
 	if (param->interpret == parameter_interpret)
 	    return (put_value(symboltable_part(param->val),
 		    string_part(param->sub[0]->val), SYM_VARIABLE, val));
 	else if( param->interpret == undefined_interpret)
 	    put_value(symbols, string_part(var->val), SYM_PARAMETER, val);
-	else               
+	else
 	    return exception(
 		"ASSNOTVAR Assignment to parameter not passed as a variable");
     } else
 	return (put_value(activesymtab(SYM_VARIABLE), string_part(var->val),
 		SYM_VARIABLE, val));
-}               
+}
 
 /*****************************************************************************
  * A S S I G N _ H E L P E R 1 ( node *var, value val )
@@ -691,12 +691,12 @@ assign_helper(node *var, value val)
  * not required to be reset.
  ******************************************************************************
  */
-value 
+value
 assign_helper1(node *var, value val)
 {
     node *param;
 
-    if ((param = lookup_symbol(string_part(var->val), SYM_PARAMETER)) 
+    if ((param = lookup_symbol(string_part(var->val), SYM_PARAMETER))
 	    != NODENIL)
 	if (param->interpret == parameter_interpret)
 	    return (put_value(symboltable_part(param->val),
@@ -726,7 +726,7 @@ assign_helper1(node *var, value val)
  *
  ******************************************************************************
  */
-int 
+int
 delete_symbol(char *name, int type)
 {
     symtab *found, *symb;
@@ -760,7 +760,7 @@ delete_symbol(char *name, int type)
  *
  ******************************************************************************
  */
-void 
+void
 delete_sym_parameters(value symbval)
 {
     symtab *found, *next, *symb, *cfound, *csymb, *caller_symtab;
@@ -807,7 +807,7 @@ delete_sym_parameters(value symbval)
  *
  ******************************************************************************
  */
-static int 
+static int
 forall_typed_symbols(int type, int (*fn) (char *name, node *valu, int type))
 {
     symtab *p, *sym;
@@ -830,7 +830,7 @@ forall_typed_symbols(int type, int (*fn) (char *name, node *valu, int type))
  *
  ******************************************************************************
  */
-static int 
+static int
 print_typed(char *name, node * p, int sym_type)
 {
     char buf[512];
@@ -862,7 +862,7 @@ print_typed(char *name, node * p, int sym_type)
  *
  ******************************************************************************
  */
-static int 
+static int
 print_typed_symbols(int sym_type)
 {
     return (forall_typed_symbols(sym_type, print_typed));
@@ -885,7 +885,7 @@ print_typed_symbols(int sym_type)
  *
  ******************************************************************************
  */
-static int 
+static int
 listproc(char *name, node *val, int dummy)
 {
     outfpstring("PROC ");
@@ -908,7 +908,7 @@ listproc(char *name, node *val, int dummy)
  *
  ******************************************************************************
  */
-value 
+value
 listaproc(char *name)
 {
     node *proc;
@@ -932,7 +932,7 @@ listaproc(char *name)
  *
  ******************************************************************************
  */
-value 
+value
 listallprocs(void)
 {
     bufnewline();
@@ -963,7 +963,7 @@ listallprocs(void)
  *
  ******************************************************************************
  */
-value 
+value
 listprocsvars(char *name)
 {
     if (name != CHARNIL) {
@@ -1009,7 +1009,7 @@ listprocsvars(char *name)
  *
  ******************************************************************************
  */
-value 
+value
 fileaproc(char *procname, char *filename, char *comm)
 {
     extern value iclopenasoutfp (char *whofor, char *filename);	/* output.c */

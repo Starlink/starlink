@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-*                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
-*                   int *moving, AstSkyFrame **skyframe, int *sparse, 
+*     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
+*                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
+*                   int *moving, AstSkyFrame **skyframe, int *sparse,
 *                   int *gottsys, int *status );
 
 *  Arguments:
@@ -25,55 +25,55 @@
 *        Number of elements in igrp
 *     system = char* (Given)
 *        Specifies the celestial coordinate system which will be used to
-*        describe the spatial axes of the output cube. It should be a 
+*        describe the spatial axes of the output cube. It should be a
 *        valid value for the System attribute of an AST SkyFrame, or
-*        "TRACKING". 
+*        "TRACKING".
 *     usedetpos = int (Given)
 *        If a non-zero value is supplied, then the detector positions for
-*        a given time slice are read directly from the input NDF. Otherwise 
+*        a given time slice are read directly from the input NDF. Otherwise
 *        the detector positions are calculated on the basis of the focal
 *        plane detector positions and the telescope pointing information.
 *     autogrid = int (Given)
 *        Determines how the values returned in "par" are found. If autogrid
 *        is non-zero, then projection parameters are determined by
 *        adjusting the grid until as many data samples as possible fall
-*        close to the centre of pixels in the output cube. If this automatic 
+*        close to the centre of pixels in the output cube. If this automatic
 *        determination fails, then the par[0] is returned holding AST__BAD.
-*        If autogrid is zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to 
-*        the first pointing BASE position, CROTA2 is set to zero, CDELT1/2 
+*        If autogrid is zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to
+*        the first pointing BASE position, CROTA2 is set to zero, CDELT1/2
 *        are set to 6 arc-seconds.
 *     alignsys = int (Given)
-*        If non-zero, then the input data will be aligned in the coordinate 
+*        If non-zero, then the input data will be aligned in the coordinate
 *        system specified by "system" rather than in the default system
 *        (ICRS).
 *     detgrp = Grp* (Given)
-*        A Group of detectors names to include in or exclude from the 
-*        output cube. If the first name begins with a minus sign then the 
-*        contents of the group are replaced on exit by the names of the 
+*        A Group of detectors names to include in or exclude from the
+*        output cube. If the first name begins with a minus sign then the
+*        contents of the group are replaced on exit by the names of the
 *        available detectors that were not originally included in the group.
 *     par = double[ 7 ] (Returned)
 *        An array holding the parameters describing the spatial projection
 *        between celestial (longitude,latitude) in the system specified
 *        by "system", and GRID coordinates in the output cube. These are
-*        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, 
-*        CROTA2. The CRPIX1 and CRPIX2 values are in units of pixels, and 
-*        all other values are in units of radians. The values refer to the 
-*        celestial coodinate represented by the returned SkyFrame. Returned 
-*        holding the values indicated by the "autogrid" argument. 
+*        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2,
+*        CROTA2. The CRPIX1 and CRPIX2 values are in units of pixels, and
+*        all other values are in units of radians. The values refer to the
+*        celestial coodinate represented by the returned SkyFrame. Returned
+*        holding the values indicated by the "autogrid" argument.
 *
 *        If a NULL pointer is supplied for this parameter, then it is
 *        assumed that the spatial projection for the output cube is
 *        already known.
 *     moving = int* (Returned)
-*        Address of an int in which to return a flag indicating if the 
+*        Address of an int in which to return a flag indicating if the
 *        telescope is tracking a moving object. If so, the returned
 *        SkyFrame will describe offsets (in the system specified by "system")
 *        from the base pointing position for the first time slice.
 *     skyframe = AstFrameSet ** (Returned)
-*        A pointer to a location at which to return a pointer to an AST 
+*        A pointer to a location at which to return a pointer to an AST
 *        SkyFrame describing the spatial axes of the output WCS FrameSet.
-*        If "moving" is non-zero, the spatial axes represent (lon,lat) 
-*        offsets (in the requested "system") from the base telescope position 
+*        If "moving" is non-zero, the spatial axes represent (lon,lat)
+*        offsets (in the requested "system") from the base telescope position
 *        associated with the first time slice.
 *     sparse = int* (Returned)
 *        Should a sparse output cube be created?
@@ -106,7 +106,7 @@
 *     14-NOV-2006 (DSB):
 *        Initial version.
 *     20-NOV-2006 (DSB):
-*        In OUTCAT, use monotonically increasing integer identifiers, and 
+*        In OUTCAT, use monotonically increasing integer identifiers, and
 *        store detector names as labels in the output catalogue.
 *     21-NOV-2006 (DSB):
 *        Set the SkyRef attribute in the returned SkyFrame to be the
@@ -173,7 +173,7 @@
 *        adjacent pixels.
 *     28-MAR-2008 (DSB):
 *        Use the size of the Airy disk (which is a function of local
-*        oscillator frequency) as the criterion for all points being 
+*        oscillator frequency) as the criterion for all points being
 *        co-incident.
 *     08-APR-2008 (TIMJ):
 *        Use tcs_tai instead of rts_end for position calculations.
@@ -243,9 +243,9 @@
 #define FUNC_NAME "smf_cubegrid"
 
 
-void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
-                   int *moving, AstSkyFrame **skyframe, int *sparse, 
+void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
+                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
+                   int *moving, AstSkyFrame **skyframe, int *sparse,
                    int *gottsys, int *status ){
 
 /* Local Variables */
@@ -273,7 +273,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double *yout = NULL;  /* Workspace for detector output pixel positions */
    double a;             /* Longitude value */
    double b;             /* Latitude value */
-   double map_pa=0;      /* Map position angle in output coord system (rads) */ 
+   double map_pa=0;      /* Map position angle in output coord system (rads) */
    double skyref[ 2 ];   /* Values for output SkyFrame SkyRef attribute */
    float *pdata;         /* Pointer to next data sample */
    float rtsys;          /* Tsys value */
@@ -356,26 +356,26 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       } else {
          if( data->file == NULL ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, "No smfFile associated with smfData.", 
+            errRep( FUNC_NAME, "No smfFile associated with smfData.",
                         status );
             break;
 
          } else if( data->hdr == NULL ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, "No smfHead associated with smfData.", 
+            errRep( FUNC_NAME, "No smfHead associated with smfData.",
                         status );
             break;
 
          } else if( data->hdr->fitshdr == NULL ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, "No FITS header associated with smfHead.", 
+            errRep( FUNC_NAME, "No FITS header associated with smfHead.",
                         status );
             break;
 
-         } 
+         }
       }
 
-/* Check that the detector sky positions implied by the RECEPPOS and FPLANEX/Y 
+/* Check that the detector sky positions implied by the RECEPPOS and FPLANEX/Y
    values in the file are consistent. Issue a warning message if not, but
    then continue. */
       (void) smf_check_detpos( data, 1, status );
@@ -389,14 +389,14 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       msgSetc( "FILE", pname );
       msgSeti( "I", ifile );
       msgSeti( "N", size );
-      msgOutif( MSG__VERB, " ", "SMF_CUBEGRID: Processing ^I/^N ^FILE", 
+      msgOutif( MSG__VERB, " ", "SMF_CUBEGRID: Processing ^I/^N ^FILE",
                      status );
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
          msgSetc( "FILE", pname );
          *status = SAI__ERROR;
-         errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.", 
+         errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.",
                      status );
          break;
       }
@@ -406,24 +406,24 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          msgSetc( "FILE", pname );
          msgSeti( "NDIMS", data->ndims );
          *status = SAI__ERROR;
-         errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.", 
+         errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",
                      status );
          break;
       }
 
-/* Calculate the telescope resolution (in radians) is this has not already 
+/* Calculate the telescope resolution (in radians) is this has not already
    been done. */
       if( ifile == 1 ) telres = smf_calc_telres( hdr->fitshdr, status )
-                                   *AST__DD2R/3600.0; 
+                                   *AST__DD2R/3600.0;
 
 /* If the detector positions are to calculated on the basis of FPLANEX/Y
    rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
       if( !usedetpos && hdr->detpos ) {
-         hdr->detpos = smf_free( (double *) hdr->detpos, status );      
+         hdr->detpos = smf_free( (double *) hdr->detpos, status );
       }
 
-/* Extend the work arrays so that they are big enough to hold the coords 
+/* Extend the work arrays so that they are big enough to hold the coords
    of all the detectors in the current input file. */
       xin = astGrow( xin, (data->dims)[ 1 ], sizeof( double ) );
       yin = astGrow( yin, (data->dims)[ 1 ], sizeof( double ) );
@@ -458,10 +458,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Loop round all the time slices in the input file. */
       for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
-/* Get a FrameSet describing the spatial coordinate systems associated with 
-   the current time slice of the current input data file. The base frame in 
-   the FrameSet will be a 2D Frame in which axis 1 is detector number and 
-   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame 
+/* Get a FrameSet describing the spatial coordinate systems associated with
+   the current time slice of the current input data file. The base frame in
+   the FrameSet will be a 2D Frame in which axis 1 is detector number and
+   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
          smf_tslice_ast( data, itime, 1, status );
@@ -472,7 +472,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If we have not yet created the output SkyFrame, do so now. */
          if( ! *skyframe ) {
-           smf_calc_skyframe( skyin, system, hdr, alignsys, skyframe, skyref, 
+           smf_calc_skyframe( skyin, system, hdr, alignsys, skyframe, skyref,
                               moving, status );
 
 /* Get the orientation of the map vertical within the output celestial
@@ -509,13 +509,13 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* The "fs" FrameSet goes from GRID to absolute coords in the requested
    system. If the source is moving, we now adjust this FrameSet so that,
-   instead of going to absolute coords in the requested system, it goes to 
+   instead of going to absolute coords in the requested system, it goes to
    offsets from the current telescope base pointing position in the
    current system. */
          if( *moving ){
 
 /* Get the Mapping from AZEL (at the current input epoch) to the output
-   sky system. Use it to convert the telescope base pointing position from 
+   sky system. Use it to convert the telescope base pointing position from
    (az,el) to the requested system. */
             sf1 = astCopy( skyin );
             astSetC( sf1, "System", "AZEL" );
@@ -527,9 +527,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             azel2usesys = astAnnul( azel2usesys );
             sf1 = astAnnul( sf1 );
 
-/* Modified the FrameSet to represent offsets from this origin. We use the 
-   FrameSet pointer "fs" rather than a pointer to the current Frame within 
-   the FrameSet. This means that the Mapping in the FrameSet will be 
+/* Modified the FrameSet to represent offsets from this origin. We use the
+   FrameSet pointer "fs" rather than a pointer to the current Frame within
+   the FrameSet. This means that the Mapping in the FrameSet will be
    modified to remap the current Frame. */
             astSetD( fs, "SkyRef(1)", a );
             astSetD( fs, "SkyRef(2)", b );
@@ -558,15 +558,15 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
 /* See if this detector is included in the group of detectors to be used. */
-            if( detgrp ) {    
+            if( detgrp ) {
                found = grpIndex( lab, detgrp, 1, status );
             } else {
                found = 1;
             }
 
-/* If it is, and if the detector has a valid position, see if it produced 
+/* If it is, and if the detector has a valid position, see if it produced
    any good data values. */
-            if( found && xout[ irec ] != AST__BAD && 
+            if( found && xout[ irec ] != AST__BAD &&
                   yout[ irec ] != AST__BAD ) {
                good = 0;
                for( ispec = 0; ispec < (data->dims)[ 0 ]; ispec++ ){
@@ -575,9 +575,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                      pdata += (data->dims)[ 0 ] - ispec - 1;
                      break;
                   }
-               }         
+               }
 
-/* If it did, store it. Also, see if this detector has a good Tsys value. 
+/* If it did, store it. Also, see if this detector has a good Tsys value.
    Also, store any extra columns values requested for the outptu
    catalogue. */
                if( good ) {
@@ -609,7 +609,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          skyin = astAnnul( skyin );
          fs = astAnnul( fs );
          fsmap = astAnnul( fsmap );
-      }   
+      }
 
 /* Close the current input data file. */
       smf_close_file( &data, status);
@@ -629,8 +629,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                     allpos, telres, map_pa, par, sparse, &useauto, status );
 
 
-/* If creating an output catalogue, re-order the array containing the 
-   positions so that all the longitude values come at the start of the 
+/* If creating an output catalogue, re-order the array containing the
+   positions so that all the longitude values come at the start of the
    array, followed by all the latitude values. */
    if( outcat && *status == SAI__OK ) {
       allpos2 = astMalloc( sizeof( double )*2*nallpos );
@@ -641,20 +641,20 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       for( ipos = 0; ipos < nallpos; ipos++ ) {
          *(px++) = *(p++);
          *(py++) = *(p++);
-      } 
+      }
 
 /* Create a KeyMap holding the values for any extra requested columns,
    and free the resources used by cols_info. */
       smf_extracols( NULL, colgrp, &cols_info, &cols_km, status );
 
 /* Create the catalogue. */
-      kpg1Wrcat( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
-                 astFrameSet( *skyframe, " " ), "Detector positions", 1, 
+      kpg1Wrcat( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT,
+                 astFrameSet( *skyframe, " " ), "Detector positions", 1,
                  NULL, cols_km, labgrp, NULL, 1, status );
 
 /* Free resources. */
       allpos2 = astFree( allpos2 );
-   } 
+   }
 
 /* Free work space. */
    allpos = astFree( allpos );
@@ -665,7 +665,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    if( labgrp ) grpDelet( &labgrp, status );
    if( colgrp ) grpDelet( &colgrp, status );
 
-/* If no error has occurred, export the returned SkyFrame pointer from the 
+/* If no error has occurred, export the returned SkyFrame pointer from the
    current AST context so that it will not be annulled when the AST
    context is ended. Otherwise, ensure a null pointer is returned. */
    if( *status == SAI__OK ) {

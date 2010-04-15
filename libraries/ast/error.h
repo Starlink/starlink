@@ -28,12 +28,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,12 +64,12 @@
 *        Added astAssert
 *     20-MAY-2005 (DSB):
 *        Modified astAssert so that it does nothing if the AST error
-*        status is already set, and also so that does nothing unless 
+*        status is already set, and also so that does nothing unless
 *        the DEBUG macro is defined.
 *     16-FEB-2006 (DSB):
 *        Improve efficiency by replacing the astOK_ function with a macro
 *        which tests the value of status variable. The pointer which points
-*        to the status variable are now global rather than static. 
+*        to the status variable are now global rather than static.
 *     1-MAR-2006 (DSB):
 *        Remove astAssert.
 *     19-SEP-2008 (DSB)
@@ -79,7 +79,7 @@
 
 /* Suppress "operands are evaluated in unspecified order" warnings from
    the Intel icc compiler. These are caused by the astGetStatusPtr_
-   function being called several times within each of the macros that 
+   function being called several times within each of the macros that
    form the public interface for AST. */
 #ifdef __INTEL_COMPILER
 #pragma warning(disable:981)
@@ -187,9 +187,9 @@ typedef struct AstStatusBlock {
 *     astErrorBegin( AstErrorContext *context );
 
 *  Description:
-*     This macro starts a new error reporting context. It saves any 
-*     existing error status in the supplied ontext structure, and then 
-*     clears the status value. It also defers further error reporting. 
+*     This macro starts a new error reporting context. It saves any
+*     existing error status in the supplied ontext structure, and then
+*     clears the status value. It also defers further error reporting.
 *
 *     Each invocation of this macro should be followed (eventually) by a
 *     matching invocation of astErrorEnd.
@@ -236,9 +236,9 @@ typedef struct AstStatusBlock {
 
 *  Description:
 *     This macro ends an error reporting context started using
-*     astErrorBegin. 
+*     astErrorBegin.
 *
-*     Each invocation of this macro should correspond to an earlier 
+*     Each invocation of this macro should correspond to an earlier
 *     invocation of astErrorBegin.
 
 *  Parameters:
@@ -279,7 +279,7 @@ void astAt_( const char *, const char *, int, int, int * );
 int astReporting_( int, int * );
 void astError_( int, const char *, int *, ... )__attribute__((format(printf,2,4)));
 void astBacktrace_( int * );
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitErrorGlobals_( AstErrorGlobals * );
 #endif
 #endif

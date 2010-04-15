@@ -1,5 +1,5 @@
 *+  MA3TO2 - Subroutine to extract a 2-D image from a 3-D image
-      SUBROUTINE MA3TO2( MODE, IDIMS1, IDIMS2, IDIMS3, ARRIN, ODIMS1, 
+      SUBROUTINE MA3TO2( MODE, IDIMS1, IDIMS2, IDIMS3, ARRIN, ODIMS1,
      :                   ODIMS2, ARROUT, STATUS )
 *    Description :
 *     The 2-dimensional output array, ARROUT, is created from the 3-dimensional
@@ -104,7 +104,7 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-      
+
 *    Local variables :
       INTEGER
      :  X, ! index to input array elements, 1st dimension
@@ -122,11 +122,11 @@
          IF( MODE .EQ. 1 )  THEN
 
 *          output array is the sum of all the X,Y planes of the input array
-            DO Z = 1, IDIMS3 
+            DO Z = 1, IDIMS3
 
-               DO Y = 1, IDIMS2 
+               DO Y = 1, IDIMS2
 
-                  DO X = 1, IDIMS1 
+                  DO X = 1, IDIMS1
 
                      ARROUT( X, Y ) = ARROUT( X, Y ) + ARRIN( X, Y, Z )
                   ENDDO
@@ -138,9 +138,9 @@
 *          output array is the sum of all the X,Z planes of the input array
             DO Z = 1, IDIMS3
 
-               DO Y = 1, IDIMS2 
+               DO Y = 1, IDIMS2
 
-                  DO X = 1, IDIMS1 
+                  DO X = 1, IDIMS1
 
                      ARROUT( X, Z ) = ARROUT( X, Z ) + ARRIN( X, Y, Z )
                   ENDDO
@@ -152,9 +152,9 @@
 *          output array is the sum of all the Y,Z planes of the input array
             DO Z = 1, IDIMS3
 
-               DO Y = 1, IDIMS2 
+               DO Y = 1, IDIMS2
 
-                  DO X = 1, IDIMS1 
+                  DO X = 1, IDIMS1
 
                      ARROUT( Y, Z ) = ARROUT( Y, Z ) + ARRIN( X, Y, Z )
                   ENDDO

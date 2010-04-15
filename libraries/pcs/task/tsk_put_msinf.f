@@ -1,5 +1,5 @@
       SUBROUTINE TASK_PUT_MESSINFO ( PATH, CONTEXT, NAME, VALUE, MESSID,
-     :  STATUS ) 
+     :  STATUS )
 *+
 *  Name:
 *     TASK_PUT_MESSINFO

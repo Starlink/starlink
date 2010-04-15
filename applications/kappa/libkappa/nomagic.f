@@ -4,7 +4,7 @@
 *     NOMAGIC
 
 *  Purpose:
-*     Replaces all occurrences of magic value pixels in an NDF array 
+*     Replaces all occurrences of magic value pixels in an NDF array
 *     with a new value.
 
 *  Language:
@@ -91,7 +91,7 @@
 *        propagates the title from the input NDF to the output NDF. [!]
 
 *  Examples:
-*     nomagic aitoff irasmap repval=-2000000 
+*     nomagic aitoff irasmap repval=-2000000
 *        This copies the NDF called aitoff to the NDF irasmap, except
 *        that any bad values in the data array are replaced with the
 *        IPAC blank value, -2000000, in the NDF called irasmap.
@@ -277,7 +277,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Associate the input NDF. 
+*  Associate the input NDF.
 *  ========================
 
 *  Begin an NDF context.
@@ -382,7 +382,7 @@
      :                   DTYPE, STATUS )
 
       ELSE IF ( PROCES( 2 ) ) THEN
-         CALL LPG_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
+         CALL LPG_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
@@ -415,7 +415,7 @@
 
       DO I = 1, 2
          IF ( PROCES( I ) ) THEN
-      
+
 *  Map the arrays.
             CALL KPG1_MAP( NDFI, COMP( I ), ITYPE, 'READ', PNTRI, EL,
      :                    STATUS )
@@ -442,13 +442,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -458,7 +458,7 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Convert the replacement value and sigma to the desired type.  Use
 *  VAL_ to protect against potentionally harmful values when there is a
 *  bad status.
@@ -469,14 +469,14 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             VAL__BADR,
-     :                             RSUVAL, 
+     :                             RSUVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -486,33 +486,33 @@
      :                COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAR( EL, 
+                        CALL KPG1_CHVAR( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADR, RSDVAL**2, 
+     :                                   VAL__BADR, RSDVAL**2,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAR( EL, 
+                        CALL KPG1_CHVAR( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADR, RSDVAL, 
+     :                                   VAL__BADR, RSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
- 
+
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1R( EL, 
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                     CALL KPS1_NOM1R( EL,
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                VAL__BADR,
-     :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               REPVAL, SIGMA, MINREP, MAXREP,
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                               NREP, STATUS )
-                  END IF                     
+                  END IF
 
                END IF
-                  
+
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
 *  Define the acceptable range of values and the suggested default
@@ -532,13 +532,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -548,7 +548,7 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Convert the replacement value and sigma to the desired type.  Use
 *  VAL_ to protect against potentionally harmful values when there is a
 *  bad status.
@@ -559,14 +559,14 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             VAL__BADB,
-     :                             BSUVAL, 
+     :                             BSUVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -576,30 +576,30 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAB( EL, 
+                        CALL KPG1_CHVAB( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADB, BSDVAL*BSDVAL, 
+     :                                   VAL__BADB, BSDVAL*BSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAB( EL, 
+                        CALL KPG1_CHVAB( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADB, BSDVAL, 
+     :                                   VAL__BADB, BSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
- 
+
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1B( EL, 
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                     CALL KPS1_NOM1B( EL,
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                VAL__BADB,
-     :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               REPVAL, SIGMA, MINREP, MAXREP,
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                               NREP, STATUS )
-                  END IF                     
+                  END IF
 
                END IF
 
@@ -622,13 +622,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -638,19 +638,19 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             VAL__BADD,
-     :                             REPVAL, 
+     :                             REPVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -659,16 +659,16 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAD( EL, 
+                        CALL KPG1_CHVAD( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADD, SIGMA*SIGMA, 
+     :                                   VAL__BADD, SIGMA*SIGMA,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAD( EL, 
+                        CALL KPG1_CHVAD( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADD, SIGMA, 
+     :                                   VAL__BADD, SIGMA,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
@@ -676,13 +676,13 @@
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1D( EL, 
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                     CALL KPS1_NOM1D( EL,
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                VAL__BADD,
-     :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               REPVAL, SIGMA, MINREP, MAXREP,
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                               NREP, STATUS )
-                  END IF                     
+                  END IF
 
                END IF
 
@@ -705,13 +705,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -721,7 +721,7 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Convert the replacement value and sigma to the desired type.  Use
 *  VAL_ to protect against potentionally harmful values when there is a
 *  bad status.
@@ -732,14 +732,14 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             VAL__BADI,
-     :                             ISUVAL, 
+     :                             ISUVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -748,16 +748,16 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAI( EL, 
+                        CALL KPG1_CHVAI( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADI, ISDVAL*ISDVAL, 
+     :                                   VAL__BADI, ISDVAL*ISDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAI( EL, 
+                        CALL KPG1_CHVAI( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADI, ISDVAL, 
+     :                                   VAL__BADI, ISDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
@@ -765,13 +765,13 @@
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1I( EL, 
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                     CALL KPS1_NOM1I( EL,
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                VAL__BADI,
-     :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               REPVAL, SIGMA, MINREP, MAXREP,
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                               NREP, STATUS )
-                  END IF                     
+                  END IF
 
                END IF
 
@@ -794,13 +794,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -810,7 +810,7 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Convert the replacement value and sigma to the desired type.  Use
 *  VAL_ to protect against potentionally harmful values when there is a
 *  bad status.
@@ -821,14 +821,14 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              VAL__BADUB,
-     :                             BSUVAL, 
+     :                             BSUVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -837,16 +837,16 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAUB( EL, 
+                        CALL KPG1_CHVAUB( EL,
      :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADUB, BSDVAL*BSDVAL, 
+     :                                   VAL__BADUB, BSDVAL*BSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAUB( EL, 
+                        CALL KPG1_CHVAUB( EL,
      :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADUB, BSDVAL, 
+     :                                   VAL__BADUB, BSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
@@ -854,14 +854,14 @@
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1UB( EL, 
+                     CALL KPS1_NOM1UB( EL,
      :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                 VAL__BADUB, REPVAL, SIGMA,
-     :                                 MINREP, MAXREP, 
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 MINREP, MAXREP,
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                 NREP,
      :                                 STATUS )
-                  END IF                     
+                  END IF
 
                END IF
 
@@ -884,13 +884,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -900,7 +900,7 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Convert the replacement value and sigma to the desired type.  Use
 *  VAL_ to protect against potentionally harmful values when there is a
 *  bad status.
@@ -911,14 +911,14 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              VAL__BADUW,
-     :                             WSUVAL, 
+     :                             WSUVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -927,16 +927,16 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAUW( EL, 
+                        CALL KPG1_CHVAUW( EL,
      :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADUW, WSDVAL*WSDVAL, 
+     :                                   VAL__BADUW, WSDVAL*WSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAUW( EL, 
+                        CALL KPG1_CHVAUW( EL,
      :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADUW, WSDVAL, 
+     :                                   VAL__BADUW, WSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
@@ -944,14 +944,14 @@
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1UW( EL, 
+                     CALL KPS1_NOM1UW( EL,
      :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                 VAL__BADUW, REPVAL, SIGMA,
-     :                                 MINREP, MAXREP, 
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 MINREP, MAXREP,
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                 NREP,
      :                                 STATUS )
-                  END IF                     
+                  END IF
 
                END IF
 
@@ -974,13 +974,13 @@
 
 *  Abort if an error has occurred. This clears the way for the check
 *  on STATUS following the attempt to get a value for parameter SIGMA.
-               IF ( STATUS .NE. SAI__OK ) GO TO 999               
-               
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the standard deviation to use if replacing bad pixels with
 *  random values (REPVAL will be used as the mean of the distribution).
 *  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
 *  REPVAL and the nearest limit. A null value is treated as a request
-*  for constant values. 
+*  for constant values.
                MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
 
                CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
@@ -990,7 +990,7 @@
                   CALL ERR_ANNUL( STATUS )
                   SIGMA = 0.0D0
                END IF
-                  
+
 *  Convert the replacement value and sigma to the desired type.  Use
 *  VAL_ to protect against potentionally harmful values when there is a
 *  bad status.
@@ -1001,14 +1001,14 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                  CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             VAL__BADW,
-     :                             WSUVAL, 
+     :                             WSUVAL,
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
-               ELSE                   
+               ELSE
 
 *  If both VARIANCE and DATA components were specified, replace bad
 *  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
@@ -1017,16 +1017,16 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAW( EL, 
+                        CALL KPG1_CHVAW( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADW, WSDVAL*WSDVAL, 
+     :                                   VAL__BADW, WSDVAL*WSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
- 
+
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAW( EL, 
+                        CALL KPG1_CHVAW( EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   VAL__BADW, WSDVAL, 
+     :                                   VAL__BADW, WSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
@@ -1034,21 +1034,21 @@
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1W( EL, 
+                     CALL KPS1_NOM1W( EL,
      :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                VAL__BADW, REPVAL, SIGMA,
-     :                                MINREP, MAXREP, 
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                MINREP, MAXREP,
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                NREP,
      :                                STATUS )
-                  END IF                     
+                  END IF
 
                END IF
 
             END IF
 
 *  Unmap the arrays. Note, COMP( I ) cannot be used to identify the
-*  component to be unmapped because NDF_UNMAP does not accept 'Error' 
+*  component to be unmapped because NDF_UNMAP does not accept 'Error'
 *  as a component name.
             CALL NDF_UNMAP( NDFI, '*', STATUS )
             CALL NDF_UNMAP( NDFO, '*', STATUS )

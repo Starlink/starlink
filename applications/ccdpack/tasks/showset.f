@@ -24,13 +24,13 @@
 *     of NDFs.  It will show the Set Name and Set Index attributes for
 *     each NDF, and whether it contains a CCD_SET coordinate frame
 *     in its WCS component.  The NDFs are output grouped by Set Name
-*     or Set Index.  If required, a restricted list of NDFs, those with 
+*     or Set Index.  If required, a restricted list of NDFs, those with
 *     certain Name and/or Index attributes, may be selected for output;
 *     in this case the acceptable Names/Indexes can be given explicitly
 *     or as a list of template NDFs whose attributes they have to match.
-*     The names of the NDFs selected for output may be written to a 
-*     list file.  SHOWSET can therefore be used to construct files 
-*     listing those NDFs in a given Set, or corresponding NDFs in 
+*     The names of the NDFs selected for output may be written to a
+*     list file.  SHOWSET can therefore be used to construct files
+*     listing those NDFs in a given Set, or corresponding NDFs in
 *     different Sets.
 
 *  Usage:
@@ -43,23 +43,23 @@
 *        If PICKINDEX=EQUAL this parameter restricts which files will
 *        be selected for output.  It must be a group expression
 *        (a comma-separated list) each member of which is an acceptable
-*        INDEX value.  Only files with a Set Index value equal to 
+*        INDEX value.  Only files with a Set Index value equal to
 *        one of these will be selected.
 *     INDEXLIKE = LITERAL (Read)
 *        If PICKINDEX=LIKE this parameter restricts which files will
-*        be selected for output.  It must be a group expression 
-*        (a comma-separated list which may employ wildcards or 
+*        be selected for output.  It must be a group expression
+*        (a comma-separated list which may employ wildcards or
 *        indirection) each member of which represents an image to
-*        be used as a template.  Only images with a Set Index value 
+*        be used as a template.  Only images with a Set Index value
 *        matching that of one of the template images will be selected.
 *     LISTBY = LITERAL (Read)
 *        Indicates the way in which NDFs should be grouped for output.
-*        It may take the values 'NAME', 'INDEX' or 'NONE'. 
+*        It may take the values 'NAME', 'INDEX' or 'NONE'.
 *        If set to NAME, then all the NDFs in the same Set are grouped
-*        together in the output; if set to INDEX then all the 
+*        together in the output; if set to INDEX then all the
 *        corresponding NDFs from different Sets are grouped together,
 *        and if set to NONE NDFs will be listed in the same order as
-*        the IN parameter.  If only NDFs with the same Name or with 
+*        the IN parameter.  If only NDFs with the same Name or with
 *        the same Index are being output, this will have no effect.
 *        [NAME]
 *     LOGFILE = FILENAME (Read)
@@ -91,18 +91,18 @@
 *        If PICKNAME=EQUAL this parameter restricts which files will
 *        be selected for output.  It must be a group expression
 *        (a comma-separated list) each member of which is a string.
-*        Only files with a Set Name value the same as one of these 
+*        Only files with a Set Name value the same as one of these
 *        will be selected.
 *     NAMELIKE = LITERAL (Read)
 *        If PICKNAME=LIKE this parameter restricts which files will
-*        be selected for output.  It must be a group expression 
-*        (a comma-separated list which may employ wildcards or 
+*        be selected for output.  It must be a group expression
+*        (a comma-separated list which may employ wildcards or
 *        indirection) each member of which represents an image to
-*        be used as a template.  Only images with a Set Name value 
+*        be used as a template.  Only images with a Set Name value
 *        matching that of one of the template images will be selected.
 *     NAMELIST = LITERAL (Read)
 *        The name of an output file in which to write the names of
-*        the images selected for output.  The (non-comment) lines of 
+*        the images selected for output.  The (non-comment) lines of
 *        this file are of the form:
 *
 *           ndf-name # set-index set-name
@@ -135,7 +135,7 @@
 *        If there are no restrictions on which Sets to display, because
 *        PICKNAME and PICKINDEX are both set to ALL, this parameter
 *        determines what happens to NDFs which have no Set headers.
-*        If SETLESS is true, they are selected for output, but if 
+*        If SETLESS is true, they are selected for output, but if
 *        SETLESS is false, they are discarded.
 *        [FALSE]
 
@@ -387,7 +387,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  If the question might arise, see what we should do with NDFs which 
+*  If the question might arise, see what we should do with NDFs which
 *  have no Set headers.
       SETLES = .TRUE.
       IF ( INDGRP .EQ. GRP__NOID .AND. NAMGRP .EQ. GRP__NOID ) THEN
@@ -395,7 +395,7 @@
 
 *  Log setless selection criteria.
          IF ( .NOT. SETLES ) THEN
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      :      '  Selection excludes NDFs with no Set headers.', STATUS )
          END IF
       END IF
@@ -406,7 +406,7 @@
          DO I = 1, NNAM
             CALL GRP_GET( NAMGRP, I, 1, LINE( 44: ), STATUS )
             CALL MSG_SETC( 'LINE', LINE )
-            CALL CCD1_MSG( ' ', '^LINE', STATUS ) 
+            CALL CCD1_MSG( ' ', '^LINE', STATUS )
             LINE = ' '
          END DO
       END IF
@@ -421,7 +421,7 @@
             LINE = ' '
          END DO
       END IF
-         
+
 *  Split the NDFs up by Set.
       NSPLIT = 0
       CALL CCD1_SETSP( INGRP, SRTKEY, CCD1__MXNDF, SPLGRP, NSPLIT,
@@ -607,6 +607,6 @@
      :    'SHOWSET: Failed to output selected Set information.',
      :    STATUS )
       END IF
-      
+
       END
 * $Id$

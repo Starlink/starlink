@@ -63,13 +63,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
-      CHARACTER STRING * ( * ) 
-      
+      CHARACTER STRING * ( * )
+
 *  Arguments Returned:
       DOUBLE PRECISION VALUES( 4 )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -119,10 +119,10 @@
 *  Do conversion of the substrings to numbers.
       IF ( OK ) THEN
          DO I = 1, 4
-            CALL CHR_CTOD( STRING( START( I ) : STOP( I ) ), 
+            CALL CHR_CTOD( STRING( START( I ) : STOP( I ) ),
      :                     VALUES( I ), STATUS )
          END DO
       END IF
-     
+
       END
 * $Id$

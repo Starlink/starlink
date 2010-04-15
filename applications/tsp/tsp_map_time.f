@@ -21,7 +21,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the NDF
-C                       structure.     
+C                       structure.
 C     (>) MODE          (Fixed string,descr) The access mode,
 C                       'READ','WRITE' or 'UPDATE'.
 C     (<) PTR           (Integer,ref) Pointer to the mapped data.
@@ -32,7 +32,7 @@ C                       be unmapped.
 C     (!) STATUS	(Integer,ref) The Status
 C
 C  External subroutines / functions used:
-C              
+C
 C     Various HDS routines
 C
 C  Support: Jeremy Bailey, JAC
@@ -51,7 +51,7 @@ C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -62,9 +62,9 @@ C
 C
 C     Local variables
 C
-      INTEGER ID,LENGTH,ACTDIM,DIMS(7)                   
+      INTEGER ID,LENGTH,ACTDIM,DIMS(7)
 
-C                                    
+C
 
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -82,7 +82,7 @@ C
           ELSE
               CALL MSG_OUT(' ','Attempt to map time axis of 1D data',
      :            STATUS)
-          ENDIF              
+          ENDIF
       END IF
 C
       END

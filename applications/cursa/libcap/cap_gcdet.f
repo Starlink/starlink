@@ -2,7 +2,7 @@
      :  START, WIDTH, STATUS)
 *+
 *  Name:
-*     CAP_GCDET 
+*     CAP_GCDET
 *  Purpose:
 *     Get details for components to be listed.
 *  Language:
@@ -52,7 +52,7 @@
 *       Determine the width required for displaying a field from the
 *       component.
 *       Determine the width to allocated for displaying the component;
-*       the maximum of the widths of the its name, units and field 
+*       the maximum of the widths of the its name, units and field
 *       width.
 *       If there is space to display this component then
 *         Add the details to the list.
@@ -200,7 +200,7 @@
 
 *
 *          Determine the width to allocated for displaying the
-*          component; the maximum of the widths of the its name, units 
+*          component; the maximum of the widths of the its name, units
 *          and field width.
 
             IF (NAME(CURCMP) .NE. ' ') THEN

@@ -72,7 +72,7 @@
 *  External References:
       INTEGER CHR_LEN
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  LCNAME,   ! Length of CNAME (excl. trail. blanks).
      :  NUMROW,   ! Number of rows       in the catalogue.
      :  NUMCOL,   !   "    "  columns    "   "     "     .

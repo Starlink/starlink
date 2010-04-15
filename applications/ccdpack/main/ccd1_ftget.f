@@ -14,12 +14,12 @@
 *     CALL CCD1_FTGET( NCARD, IPFITS, SCARD, NAME, VALUE, ICARD, STATUS )
 
 *  Description:
-*     This routine attempts to retrieve from a buffer containing a 
+*     This routine attempts to retrieve from a buffer containing a
 *     mapped FITS extension the value of a header card with a given
-*     keyword.  If no matching header card is found then an error 
+*     keyword.  If no matching header card is found then an error
 *     message is output and STATUS is set.
 *
-*     The value returned is a string representation of the value 
+*     The value returned is a string representation of the value
 *     requested.
 
 *  Arguments:
@@ -47,7 +47,7 @@
 *        Global status value.
 
 *  Notes:
-*     This routine is passed a pointer to the FITS buffer rather than 
+*     This routine is passed a pointer to the FITS buffer rather than
 *     the pointer itself.  This is so that the calling routine does not
 *     need to worry about the rather ugly business of passing character
 *     lengths by value to the routine (this routine does that instead).
@@ -91,7 +91,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER NCARD
       INTEGER SCARD
@@ -101,7 +101,7 @@
 *  Arguments Returned:
       CHARACTER * ( * ) VALUE
       INTEGER ICARD
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -132,7 +132,7 @@
 *  If there are no mapped cards, we will not find an answer.
       IF ( NCARD .LE. 0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCD1_FTGET_NOFITS', 
+         CALL ERR_REP( 'CCD1_FTGET_NOFITS',
      :                 '  No FITS extension found', STATUS )
          GO TO 99
       END IF
@@ -140,11 +140,11 @@
 *  Defer delivery of error messages.
       CALL ERR_MARK
 
-*  In the following calls to FTS1_GKEY<T> look out for fortran magic 
-*  getting the FITS character array lengths passed. 
+*  In the following calls to FTS1_GKEY<T> look out for fortran magic
+*  getting the FITS character array lengths passed.
 
 *  Attempt to get numerical value for named keyword.
-      CALL FTS1_GKEYR( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+      CALL FTS1_GKEYR( NCARD, %VAL( CNF_PVAL( IPFITS ) ),
      :                 1, NAME, THERE, RVAL,
      :                 ICARD, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
@@ -155,7 +155,7 @@
       END IF
 
 *  Attempt to get logical value for named keyword.
-      CALL FTS1_GKEYL( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+      CALL FTS1_GKEYL( NCARD, %VAL( CNF_PVAL( IPFITS ) ),
      :                 1, NAME, THERE, LVAL,
      :                 ICARD, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
@@ -166,26 +166,26 @@
       END IF
 
 *  Attempt to get character value for named keyword.
-      CALL FTS1_GKEYC( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+      CALL FTS1_GKEYC( NCARD, %VAL( CNF_PVAL( IPFITS ) ),
      :                 1, NAME, THERE, CVAL,
      :                 ICARD, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          VALUE = '''' // CVAL
          VALUE( CHR_LEN( VALUE ) + 1: ) = ''''
-         GO TO 1 
-      ELSE IF ( STATUS .NE. SAI__OK ) THEN 
+         GO TO 1
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
       END IF
 
 *  No conversion could be made.
       STATUS = SAI__ERROR
       CALL MSG_SETC( 'HEAD', NAME )
-      CALL ERR_REP( 'CCD1_GTVAL', 
+      CALL ERR_REP( 'CCD1_GTVAL',
      :'  Failed to find value for FITS header ^HEAD', STATUS )
 
 *  Release error context.
  1    CONTINUE
-      CALL ERR_RLSE 
+      CALL ERR_RLSE
 
 *  Tidy up and exit.
  99   CONTINUE

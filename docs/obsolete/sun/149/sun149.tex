@@ -116,7 +116,7 @@ SAM expects the input file to contain error (or variance) arrays if spectra
 are to be ``optimally extracted''.  If a file does not contain such an error
 array, then it won't be rejected and a simple tramline extraction will be
 performed by default.  Error arrays must be generated and propagated properly
-during the initial processing of the data frames (e.g. flat fielding). 
+during the initial processing of the data frames (e.g. flat fielding).
 Packages such as CCDPACK and SCP will do this and their use is recommended.
 
 \section{Package overview}
@@ -126,7 +126,7 @@ involves running separate applications for each step of the reduction process.
 This has the advantage that it allows the user to examine the data after each
 step in order to see what exactly is happening.  The disadvantages are that it
 (1) is more time consuming and (2) creates extra output files which may be of
-no interest to the user and could take up a lot of valuable space on disk. 
+no interest to the user and could take up a lot of valuable space on disk.
 The second method for running SAM involves using just two routines---one
 which  sets up all of the input parameters and another which combines all the
 repetitive applications into one. Such a system can therefore be run fairly
@@ -235,9 +235,9 @@ user should refer to section \ref{sec:indiv} for this.
 
 From here onwards the assumption is made that the input data frames have been
 processed (e.g. flat-fielded, bias subtracted, etc.) and contain the necessary
-error arrays.  
+error arrays.
 
-The first question to ask is: are the spectra distorted?  The answer 
+The first question to ask is: are the spectra distorted?  The answer
 obviously depends on the instrument which was used in the observations.   But
 it also depends on what one means by ``distorted''.  SAM offers two  optimal
 extraction algorithms and a tramline extraction algorithm.  One of  the
@@ -252,12 +252,12 @@ used. The tramline algorithm works both  with or without a TRACE file.
 A TRACE file is created with SAM\_TRACE.  With the help of the  user, this
 routine locates and centroids the spectrum.  It then does a  polynomial fit to
 the centroid positions as a function of wavelength.  In  general the shape of
-the distortion will not change substantially over  the course of a night, so 
+the distortion will not change substantially over  the course of a night, so
 it should only be necessary to do this step once for a given night's data.
 
 The second step in this stage is to define the DEKKER file.  SAM doesn't  like
 to carry around any more data than it has to (especially as CCD frames get
-bigger and bigger).  Generally a spectrum is only likely to fall on a 
+bigger and bigger).  Generally a spectrum is only likely to fall on a
 particular part of a chip and the rest is pretty much irrelevant.  A  DEKKER
 file is used to define the region of the chip where the data (both  spectrum
 and sky) are going to fall. SAM\_DEKKER displays a given frame and  asks the
@@ -287,31 +287,31 @@ on either side of the spectrum.  This is accomplished with SAM\_FIND.
 SAM\_FIND either allows you to define all these things yourself or will do it
 automatically.  In both methods, the first thing which SAM\_FIND does is to
 use the window defined by the DEKKER file and the curvature defined by  the
-TRACE file (if one exists) in order to sum up the data in the spectral 
-direction.  What is left is a one dimensional array of total flux as a 
+TRACE file (if one exists) in order to sum up the data in the spectral
+direction.  What is left is a one dimensional array of total flux as a
 function of `comoving' position on the dekker.  What is done with this  array
 makes the difference between the two methods for defining the  quantities
 listed above.
 
-In the interactive version this array is plotted.  The user is asked to 
+In the interactive version this array is plotted.  The user is asked to
 indicate on the plot the location of the spectrum (i.e. the peak of the  flux
 in general) and the limits of the spectrum in the spatial direction  (i.e.
 where the spectral flux has fallen off such that it isn't really much above
-sky).  SAM\_FIND then goes away and finds the median location of the 
+sky).  SAM\_FIND then goes away and finds the median location of the
 spectrum.  The resulting median is indicated on the plot by an arrow. The user
 is then asked to indicated two points on either side of the spectrum which
 define the range of sky pixels.  Care should be taken here that  none of the
 indicated sky pixels overlaps with the spectral pixels which have  just been
 defined.
 
-In the automatic version SAM\_FIND tries to define these quantities by 
+In the automatic version SAM\_FIND tries to define these quantities by
 looking for pixels whose flux is a certain threshold over what it has decided
-is sky.  These pixels are then defined as part of the object.  The user is 
+is sky.  These pixels are then defined as part of the object.  The user is
 asked to supply this threshold and a nominal width for the spectrum (used as a
 first guess). A polynomial is fit to the sky pixels in order to define the sky
 values and sigma. The order of this polynomial should  not in general be
 greater than 1 as this is not a proper sky subtraction. The user is also asked
-for a maximum distance for the sky pixels to be from the last object pixel. 
+for a maximum distance for the sky pixels to be from the last object pixel.
 This is to guard against large scale variations in  the sky value which may be
 a result of bad flat fielding or vignetting by  the dekker.  This routine is
 designed to cope with multiple  objects on the slit.  Thus the user must
@@ -321,7 +321,7 @@ spectra which are parallel to the $x$ axis, counting is done from the bottom
 upwards and for spectra which are parallel to the $y$ axis, counting from left
 to right.
 
-SAM\_FIND writes the results of all this into the input file header.  The 
+SAM\_FIND writes the results of all this into the input file header.  The
 information can be found by doing:
 
 \begin{verbatim}
@@ -330,7 +330,7 @@ information can be found by doing:
 
 {\bf Sky subtraction}
 
-Sky subtraction is done by SAM\_SKY and is very straight forward.  Most of 
+Sky subtraction is done by SAM\_SKY and is very straight forward.  Most of
 the information which SAM\_SKY requires is stored in the header of the  input
 file.  If these can't be found there, then the user will be prompted  for
 them. See section \ref{sec:indiv} for more details.  Basically what is  done
@@ -355,8 +355,8 @@ explained elsewhere (Horne 1986, Marsh 1989 and Mukai 1990) and  the
 interested  reader is strongly advised to consult these sources for more
 information.
 
-Optimal extraction attempts to maximise the signal to noise ratio of the 
-output spectrum by giving lower weights to pixels which have little or no 
+Optimal extraction attempts to maximise the signal to noise ratio of the
+output spectrum by giving lower weights to pixels which have little or no
 signal from the object.  To do this the seeing disk is modelled with a series
 of polynomials, each fitting the relative fraction of the object flux in  a
 spatial pixel as a function of wavelength. In the case of Horne's method the
@@ -369,7 +369,7 @@ TRACE file is being used or not.
 
 The fits are done iteratively hence the user specifies a threshold (in
 sigma---usually 4 or 5 suffices) above which a pixel will be deleted from the
-fits.  The user is also asked for the order of the polynomials to be fit. 
+fits.  The user is also asked for the order of the polynomials to be fit.
 High order polynomials are not usually required as, if the distortion is bad,
 then the TRACE file takes out most of that anyway. Since Marsh's method
 involves using rows and columns which have been defined by the TRACE file
@@ -413,7 +413,7 @@ SAM\_ARC was written specifically with arc frames in mind, but can in theory
 be used for any frame.  If a spectrum is optimally extracted, then very likely
 the user will want the same optimal extraction weights to be applied to the
 corresponding arc exposures.  As most of the information in SAM is passed
-around in the input file headers, SAM\_ARC will copy the necessary header 
+around in the input file headers, SAM\_ARC will copy the necessary header
 information from one frame (the `basis' frame) to another (the `output'
 frame).  For example, the user can optimally extract a star. Then SAM\_ARC can
 be run specifying the input star frame as the basis and the arc frame as the
@@ -430,7 +430,7 @@ still is needed to extract the spectrum.
 \subsubsection{Using combined routines}
 
 Once the user has established how the data should be reduced, then using the
-procedure outlined in section \ref{subsec:useind} can become a downright bore. 
+procedure outlined in section \ref{subsec:useind} can become a downright bore.
 In this section a method which combines all the repetitive elements of stage 2
 is discussed.
 
@@ -449,7 +449,7 @@ in case.
 
 When it was stated that SAM\_PROC only has two parameters I wasn't telling the
 whole truth.  SAM\_PROC will accept {\em any} of the parameters which is
-accepted in SAM\_SETUP, but only if they are specified on the command line. 
+accepted in SAM\_SETUP, but only if they are specified on the command line.
 This allows the user to tweak the reduction procedure without having to go
 through the exercise of re-running SAM\_SETUP.  Thus if a comparison was to be
 made of a spectrum extracted optimally and non-optimally, then SAM\_SETUP only
@@ -498,7 +498,7 @@ direction which are to be considered part of the spectrum.  Note that these
 limits are found by SAM\_FIND. Two values are required.
 
 \item[SPEC\_POS*] This is the median location of the spectrum in the spatial
-direction as found by SAM\_FIND. 
+direction as found by SAM\_FIND.
 
 \item[DEKKER*] This is the name of the DEKKER file as written by SAM\_DEKKER.
 
@@ -542,7 +542,7 @@ the x axis and `2' for the y axis.
 \end{description}
 \end{description}
 
-\subsection{SAM\_EXTRACT} 
+\subsection{SAM\_EXTRACT}
 
 This program does the actual extraction of the spectra.  It offers two optimal
 extraction algorithms as well as tramline extraction.  If the user wants
@@ -592,7 +592,7 @@ wanted, then NOOPTIMAL must be specified on the command line.
 
 SAM\_FIND locates the spectrum, defines the width of the spectrum (e.g. the
 width of the seeing disc), and defines the bands to be used for sky
-subtraction.  It can be used in either an interactive mode (where the user 
+subtraction.  It can be used in either an interactive mode (where the user
 indicates all these things with a cursor) or an automatic mode (where the
 program locates the spectrum itself with the help of a few parameters). If
 interactive mode is used, then a device for line plotting will be needed.  The
@@ -667,9 +667,9 @@ located automatically.
 SAM\_PROC is a routine which combines all the functions of routines SAM\_FIND,
 SAM\_SKY,  SAM\_PROFILE and SAM\_EXTRACT into one routine.  It needs SAM\_SETUP
 to have been run first.  If it is to be run in batch, then SAM\_SETUP must also
-be run in batch.  It has many parameters, but only two of them are unhidden. 
+be run in batch.  It has many parameters, but only two of them are unhidden.
 This means that a parameter which has been set by SAM\_SETUP can be overridden
-for one particular run of SAM\_PROC (by specifying it on the command line), 
+for one particular run of SAM\_PROC (by specifying it on the command line),
 but will still remain the default for future runs until it is reset by
 SAM\_SETUP.  In addition to the list below, one should consult section
 \ref{sec:samsetup} for a list of the hidden parameters which can be set.
@@ -722,7 +722,7 @@ direction which are to be considered part of the spectrum.  Note that these
 limits are found by SAM\_FIND. Two values are required.
 
 \item[BLOCK] The user may block the spectra in wavelength in order to increase
-the signal to noise. The value tells how many rows/columns will be added 
+the signal to noise. The value tells how many rows/columns will be added
 together to make one block. It is recommended that this value be 1 except in
 cases of very bad signal/noise.
 
@@ -825,7 +825,7 @@ pixels.  One should be extremely careful about using orders higher than about
 gradient of the polynomials becomes very large.
 
 \item[NREJECT]  The sky polynomial fits are done iteratively with the worst
-fitting pixel from each fit being rejected in each iteration.  This is the 
+fitting pixel from each fit being rejected in each iteration.  This is the
 number of pixels which will be rejected.  Again one should be careful to not
 reject too many pixels as it may become impossible to get a good fit.
 
@@ -838,7 +838,7 @@ reject too many pixels as it may become impossible to get a good fit.
 \begin{description}
 
 \item[BLOCK] The user may block the spectra in wavelength in order to increase
-the signal to noise.  The value tells how many rows/columns will be added 
+the signal to noise.  The value tells how many rows/columns will be added
 together to make one block. It is recommended that this value be 1 except in
 cases of very bad signal/noise.
 
@@ -852,7 +852,7 @@ extraction profile.
 
 \item[PRO\_THR]  The profile fitting is done iteratively where pixels whose
 residuals are this number of sigma above the predicted profile are rejected.
-The sigma here is the error for the individual pixel. 
+The sigma here is the error for the individual pixel.
 
 \end{description}
 \end{description}
@@ -867,7 +867,7 @@ optimal extraction.  This is a way of getting rid of cosmic ray hits and other
 defects.  This is only prompted for when optimal extraction is being used.  The
 units are in number of sigma of the individual pixels.
 
-\item[OPTIMAL]  This is TRUE if the user wants optimal extraction.  
+\item[OPTIMAL]  This is TRUE if the user wants optimal extraction.
 
 \end{description}
 \end{description}
@@ -969,7 +969,7 @@ pixels.  One should be extremely careful about using orders higher than about
 gradient of the polynomials becomes very large.
 
 \item[NREJECT]  The sky polynomial fits are done iteratively with the worst
-fitting pixel from each fit being rejected in each iteration.  This is the 
+fitting pixel from each fit being rejected in each iteration.  This is the
 number of pixels which will be rejected.  Again one should be careful to not
 reject too many pixels as it may be impossible to get a good fit.
 
@@ -992,7 +992,7 @@ are:
 \begin{description}
 \begin{description}
 
-\item[INPUT] This is the name of the input frame with the spectrum to be 
+\item[INPUT] This is the name of the input frame with the spectrum to be
 straightened.
 
 \item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
@@ -1036,7 +1036,7 @@ the x axis and `2' for the y axis.
 \item[LOW, HIGH] These are the low and high data values for the greyscale.
 
 \item[BLOCK] The user may block the spectra in wavelength in order to increase
-the signal to noise.  The value tells how many rows/columns will be added 
+the signal to noise.  The value tells how many rows/columns will be added
 together to make one block. It is recommended that this value be 1 except in
 cases of very bad signal/noise.
 
@@ -1098,7 +1098,7 @@ written by T.R. Marsh.  The author wishes to thank Dr. Marsh publicly for his
 generous permission to ransack his software.
 
 \begin{tabbing}
-\=\kill 
+\=\kill
 \>Horne, K, 1986, {\it P.A.S.P.}, {\bf 98}, 609. \\
 \>Marsh, T.R., 1989, {\it P.A.S.P.}, {\bf 101}, 1032. \\
 \>Mukai, K, 1990, {\it P.A.S.P.}, {\bf 102}, 183. \\

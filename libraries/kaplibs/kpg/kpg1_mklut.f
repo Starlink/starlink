@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_MKLUT( IX, IY, NPNT, NVAR, FRM, TABLE, MAP, 
+      SUBROUTINE KPG1_MKLUT( IX, IY, NPNT, NVAR, FRM, TABLE, MAP,
      :                       STATUS )
 *+
 *  Name:
@@ -17,7 +17,7 @@
 *     This routine creates a 1D Mapping which translates an X into a Y
 *     value on the basis of supplied tables of corresponding X and Y.
 *     This is like an AST LutMap except that the LutMap class requires Y
-*     to be tabulated at equal X intervals, whereas this routine allows 
+*     to be tabulated at equal X intervals, whereas this routine allows
 *     Y to be tabulated at arbitrary X intervals.
 
 *  Arguments:
@@ -34,7 +34,7 @@
 *     FRM = INTEGER (Given)
 *        If not AST__NULL, then this should be an AST pointer to a Frame
 *        with NVAR axes which will be used to normalise the axis values
-*        before creating the LutMap. No normalisation occurs if a value of 
+*        before creating the LutMap. No normalisation occurs if a value of
 *        AST__NULL is supplied.
 *     TABLE( NPNT, NVAR ) = DOUBLE PRECISION (Given and Returned)
 *        The table containing corresponding X and Y values. The table can
@@ -42,13 +42,13 @@
 *        These will be normalised on exit using the AST Frame supplied by
 *        FRM.
 *     MAP = INTEGER (Returned)
-*        An AST pointer to the returned Mapping, or AST__NULL if no Mapping 
+*        An AST pointer to the returned Mapping, or AST__NULL if no Mapping
 *        could be created.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     - It is only possible to create the Mapping if the tabluated X values 
+*     - It is only possible to create the Mapping if the tabluated X values
 *     are monotonic increasing or decreasing.
 *     - The returned Mapping will have an inverse Transformation only if Y
 *     increases or decreases monotonically with X.
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,14 +147,14 @@
 
 *  Create a normalisation Mapping for the X axis
          NMAP = AST_NORMMAP( AST_PICKAXES( FRM, 1, IX, TMAP, STATUS ),
-     :                       ' ', STATUS )   
+     :                       ' ', STATUS )
       ELSE
          NMAP = AST__NULL
 
       END IF
 
 *  Create a LutMap which gives X as a function of index within the table.
-      MAP1 = AST_LUTMAP( NPNT, TABLE( 1, IX ), 1.0D0, 1.0D0, ' ', 
+      MAP1 = AST_LUTMAP( NPNT, TABLE( 1, IX ), 1.0D0, 1.0D0, ' ',
      :                   STATUS )
 
 *  Check this LutMap can be inverted. This will be so if the X values are
@@ -172,10 +172,10 @@
          END IF
 
 *  Create a LutMap which gives Y as a function of index within the table.
-         MAP2 = AST_LUTMAP( NPNT, TABLE( 1, IY ), 1.0D0, 1.0D0, ' ', 
+         MAP2 = AST_LUTMAP( NPNT, TABLE( 1, IY ), 1.0D0, 1.0D0, ' ',
      :                      STATUS )
 
-*  Combine these two Mappings in series to get a Mapping which goes 
+*  Combine these two Mappings in series to get a Mapping which goes
 *  from X to Y (via index).
          MAP = AST_CMPMAP( MAP1, MAP2, .TRUE., ' ', STATUS )
 
@@ -187,5 +187,5 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
-    
+
       END

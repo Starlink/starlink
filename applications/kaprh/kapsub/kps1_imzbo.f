@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -78,7 +78,7 @@
       CALL SGS_IZONE( X1, X2, Y1, Y2, XM, YM )
 
 *    Redefine the bounds of the image zone in terms of device pixels,
-*    otherwise the centering and scaling will be wrong.  Dummy variables 
+*    otherwise the centering and scaling will be wrong.  Dummy variables
 *    must be used as the limits are changing during the calculations.
 
       T1 = X1

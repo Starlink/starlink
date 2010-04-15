@@ -30,7 +30,7 @@
 *     value occurs. In such cases, it may be useful to regard the
 *     distribution as continuous, and therefore to interpolate linearly
 *     between data values when obtaining the result.
-*     
+*
 *     b) Alternatively, the values may represent residuals from some
 *     fitted function. In this case, by setting FRACT to 0.5, the
 *     "weighted median residual" may be found. This has the property
@@ -53,7 +53,7 @@
 *        0.0 to 1.0.
 *     EL = INTEGER (Given)
 *        Number of values in the IP array. This will be less than the
-*        size of the X and W arrays if any values form X and W are to 
+*        size of the X and W arrays if any values form X and W are to
 *        be omitted from the estimation.
 *     X( * ) = REAL (Given)
 *        Array of data values.
@@ -558,7 +558,7 @@
          ITMP = IP( L )
          IP( L ) = IP( K )
          IP( K ) = ITMP
-            
+
          IF ( X( IP( R ) ) .GT. T ) THEN
             ITMP = IP( R )
             IP( R ) = IP( L )
@@ -711,7 +711,7 @@
 *  cumulative sum of weights for each element.
          I1 = MAX( 1, L - 1 )
          I2 = MIN( R + 1, EL )
-         ALPHA = ( WTARG - WLEFT + HALF * W( IP( I1 ) ) ) /      
+         ALPHA = ( WTARG - WLEFT + HALF * W( IP( I1 ) ) ) /
      :           ( HALF * ( W( IP( I1 ) ) + W( IP( I2 ) ) ) )
          ALPHA = MIN( MAX( 0.0, ALPHA ), 1.0 )
 

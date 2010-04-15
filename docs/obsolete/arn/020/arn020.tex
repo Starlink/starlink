@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ fixed-part is no longer valid for all cases.
 %------------------------------------------------------------------------------
 
 \section{INSTALLATION}
-Full installation instructions are given in SSN/44 and the Starlink Software 
+Full installation instructions are given in SSN/44 and the Starlink Software
 Change Notice.
 
 The full system requires about 38000 blocks of disk storage and includes a
@@ -105,28 +105,28 @@ tables when first used. Users should get more accurate error messages when
 tasks abort and will not experience the long delays seen at present.\\
 (ICLADAM.PAS)
 \subsection{Improved DCL Subprocess Control}
-It is now possible to send a CTRL/C to a DCL subprocess command 
+It is now possible to send a CTRL/C to a DCL subprocess command
 ({\em e.g.}\ MAIL)
 correctly and without interfering with ICL (which sometimes used to hang).
-Also a CTRL/Y typed to the DCL subprocess will abort only the subprocess and 
+Also a CTRL/Y typed to the DCL subprocess will abort only the subprocess and
 not ICL.\\
 (ICLIO.PAS)
 
-\subsection{Error Handling} 
+\subsection{Error Handling}
 \label{errs}
 A number of improvements to error handling within ICL have been made.
 \begin{itemize}
-\item ICL now uses EMS internally and will process EMS 
+\item ICL now uses EMS internally and will process EMS
 errors from HDS correctly.\\
 (Various modules)
-\item Internally ICL now holds its own error status and any status it can 
-derive from external functions in one global location. 
+\item Internally ICL now holds its own error status and any status it can
+derive from external functions in one global location.
 This can be accessed by the user in
-one of several formats using a new function, SYSERR (see 
+one of several formats using a new function, SYSERR (see
 Section \ref{syserr}). The ICL exception
-mechanism and exception names are left unchanged for compatibility reasons. 
+mechanism and exception names are left unchanged for compatibility reasons.
 Use
-of SYSERR after an exception should provide more information on what 
+of SYSERR after an exception should provide more information on what
 occurred.\\
 (All modules)
 \item Numerous other improvements to error messages to improve clarity and
@@ -137,15 +137,15 @@ accuracy.\\
 \subsection{Miscellaneous Other Improvements to ICL}
 \label{iclmisc}
 \begin{itemize}
-\item ICL.SDF is now called ICL\_\verb%<process_id>%.SDF and 
+\item ICL.SDF is now called ICL\_\verb%<process_id>%.SDF and
 created in
 ADAM\_USER by default (or in old location of SYS\$SCRATCH if ADAM\_USER is not
-defined). The file is deleted at ICL exit. 
+defined). The file is deleted at ICL exit.
 This should avoid conflicts when several copies of ICL are run from
 one username.\\
 (ICLMAIN.PAS)
-\item The DECW\$DISPLAY logical name will be copied into the LNM\$JOB table 
-on ICL startup. 
+\item The DECW\$DISPLAY logical name will be copied into the LNM\$JOB table
+on ICL startup.
 This avoids a problem whereby graphics could work from tasks started
 from DCL but not from ICL.\\
 (Routine ICL\_INIT in ICLMAIN.PAS)
@@ -155,10 +155,10 @@ help in response to ? or ?? at parameter prompts.
 
 If the given library file extension is .SHL, the portable system will be used.
 If the library file extension is omitted or .HLB, the system will look for a
-file with the given name and extension .SHL. If one is found, the portable 
+file with the given name and extension .SHL. If one is found, the portable
 system will be called to use it: if not, VMS help will be used.
 
-In the interests of portability, library names may include logical names in 
+In the interests of portability, library names may include logical names in
 either of the following forms:
 \begin{quote} \begin{verbatim}
 logical_name:filename
@@ -174,7 +174,7 @@ where \verb%filename% is optional.\\
 \subsection{Modified Commands}
 \begin{description}
 \item[DEFAULT] may now be used to set the default directory for loaded tasks.
-This involves a related change to the DTASK fixed part 
+This involves a related change to the DTASK fixed part
 (see Section \ref{dtask}).
 \begin{quote} \begin{verbatim}
 DEFAULT [directory [taskname]]
@@ -200,12 +200,12 @@ listing of procedures is now possible.
 \begin{quote} \begin{verbatim}
 PROCS [string]
 \end{verbatim} \end{quote}
-If \verb%string% is specified, only those procedures whose names begin with 
+If \verb%string% is specified, only those procedures whose names begin with
 `\verb%string%' will be listed.\\
 (ICLMAIN.PAS, ICLPROC.PAS)
 \item[KILL and KILLW]
 Users can now refer to tasks by their DEFINEd command name rather
-than their full name ({\em e.g.} KILL KAPPA rather than 
+than their full name ({\em e.g.} KILL KAPPA rather than
 KILL KAPPA\_DIR:KAPPA).\\
 (ICLADAM.PAS)
 \item[DEFSTRING, DEFUSER, DEFPROC]
@@ -226,8 +226,8 @@ prompt will be substituted.
 SET PROMPT '$DATE $TIME ICL >'
 \end{verbatim} \end{quote}
 (ICLMAIN.PAS)
-\item[EDIT] In addition to editing procedures, this command may now be used to 
-edit normal files without creating a subprocess. If the parameter contains `.', 
+\item[EDIT] In addition to editing procedures, this command may now be used to
+edit normal files without creating a subprocess. If the parameter contains `.',
 it is assumed to be a filename rather than a procedure, {\em e.g.\ }
 \begin{quote} \begin{verbatim}
 ICL> EDIT MYDIR:MYFILE.TXT   ! edits a file
@@ -246,12 +246,12 @@ There are some differences from using the editors in DCL:
 \subsection{New Commands}
 \begin{description}
 \item[STRINGS]
-This will list, in alphabetical order, the strings defined by DEFSTRING, 
+This will list, in alphabetical order, the strings defined by DEFSTRING,
 DEFUSER, DEFHELP or DEFPROC.
 \begin{quote} \begin{verbatim}
 STRINGS [string]
 \end{verbatim} \end{quote}
-If \verb%string% is specified, only those strings whose names begin with 
+If \verb%string% is specified, only those strings whose names begin with
 `\verb%string%' will be listed.\\
 (ICLUSER.PAS)
 \item[VERSION]
@@ -265,7 +265,7 @@ The default is AUTODCL.\\
 (ICLPROC.PAS)
 \item[SET (NO)COMMENTS] SET NOCOMMENTS will cause ICL not to save comments
 when procedures are loaded. In large systems this can cut down considerably
-the memory required and the number of page faults. 
+the memory required and the number of page faults.
 The default is SET COMMENTS so there is no change in behaviour by default.\\
 (ICLMAIN.PAS, ICLDEF.PAS)
 \item[SET (NO)CTRLZ]
@@ -285,7 +285,7 @@ ERR = SYSERR([part])
 \end{verbatim} \end{quote}
 \verb%part% may be:
 \begin{description}
-\item[omitted or 'default'] A string in the form {\em fac\_\_ident} will be 
+\item[omitted or 'default'] A string in the form {\em fac\_\_ident} will be
 returned.
 \item['full'] The translated message is returned in full.
 \item['facility'] The facility name for the message is returned.
@@ -305,13 +305,13 @@ The login banner has been changed to display the new version number, 1.6.
 library.\\
 (ICLHELP.HLP, ICLHELP.HLB)
 \item[LINK\_ICL] The procedure for linking ICL has been changed to pick up all
-libraries {\em etc.\ } from the appropriate source directory -- previously some 
+libraries {\em etc.\ } from the appropriate source directory -- previously some
 libraries were picked up from ADAM\_LIB.
 The HLP shareable library is also included in the link.
 \item[SMSLINK] The procedure for linking SMSICL has been renamed to SMSLINK\_ICL
-and changed to pick up ICLSMS from the ICL object library and certain UFACE 
-routines from the ICL UFACE library rather than the SMS UFACE library (see 
-Section \ref{uface}). 
+and changed to pick up ICLSMS from the ICL object library and certain UFACE
+routines from the ICL UFACE library rather than the SMS UFACE library (see
+Section \ref{uface}).
 Furthermore, the image produced is named SMSICL.EXE rather than just SMS.
 \item[COMPILE\_ICL] Allow for revised format for ICL library.
 \end{description}
@@ -351,17 +351,17 @@ task is activated direct from the operating system is separated out into a new
 (Modified DTASK\_DCLTASK, DTASK\_ERR; New DTASK\_GTCMD)
 \item The task of including the message associated with a status value within
 an error message is now done in two stages. The special syntax \verb%^STATUS%
-is not used. 
-In this way the fact that there is no message associated with status 
+is not used.
+In this way the fact that there is no message associated with status
 values on Unix can be handled whilst retaining the existing behaviour on VMS.
-A new (system-specific) routine is provided to set a normal token to the 
+A new (system-specific) routine is provided to set a normal token to the
 appropriate message.
 In the Unix version, the message will be the status value.\\
 ( Modified DTASK\_DCLTASK, \_DTASK, \_CANCEL, \_COMSHUT,
 \_RESCHED, \_SUBSID; New DTASK\_ESETK)
 \item An additional constant, DTASK\_\_SYSNORM is defined in DTASK\_SYS.
 It is set to 1, the value of VMS SS\$\_NORMAL. The application reschedule
-request is tested against this constant, rather than SS\$\_NORMAL, at the end 
+request is tested against this constant, rather than SS\$\_NORMAL, at the end
 of an obey action to trap the special case which may occur with some tasks on
 VMS.\\
 (DTASK\_OBEY, \_OBEYDCL, DTASK\_SYS)
@@ -369,8 +369,8 @@ VMS.\\
 
 \section{NEW FEATURES OF THE PARAMETER SYSTEM}
 \subsection{ACCEPT at a Prompt}
-It is now possible to reply to a prompt with `\verb%\%'. 
-The effect will be to take the suggested (prompt) value for the current 
+It is now possible to reply to a prompt with `\verb%\%'.
+The effect will be to take the suggested (prompt) value for the current
 parameter and for all remaining unset parameters.
 
 {\em Note that this overrides the VPATH for the remaining parameters.}\\
@@ -385,7 +385,7 @@ It also allows dynamic defaults set using SUBPAR\_DEF0C.
 {\em Note that the above does not apply to names to be associated by DAT\_ASSOC
 or NDF\_ASSOC.}
 
-Names specified as default in the interface file may now be enclosed in 
+Names specified as default in the interface file may now be enclosed in
 quotes. How the string is interpreted will depend on how the parameter value
 is obtained.\\
 (Modified: SUBPAR\_GETNAME, \_CHECKNAME, PARSECON\_CONVERT)
@@ -403,7 +403,7 @@ updated by specifying:
 vpath   default
 default n
 \end{verbatim} \end{quote}
-where \verb%n% is a constant of an appropriate type, in the interface file, 
+where \verb%n% is a constant of an appropriate type, in the interface file,
 Appendix C of SUN/115 will be modified to reflect this shortly.\\
 (Modified: SUBPAR\_PUT1/V/N.GEN)
 
@@ -412,9 +412,9 @@ This version of ADAM is linked with version 1\_2-3 of EMS which will be
 released at the same time. (See SUN/104.5 for details of changes to
 MSG/ERR/EMS.)
 
-The ADAM versions of MSG and ERR have been changed to output their messages 
-using two new routines, SUBPAR\-\_WRMSG and SUBPAR\-\_WRERR, respectively. 
-Currently both these routines call SUBPAR\-\_WRITE so there is effectively no 
+The ADAM versions of MSG and ERR have been changed to output their messages
+using two new routines, SUBPAR\-\_WRMSG and SUBPAR\-\_WRERR, respectively.
+Currently both these routines call SUBPAR\-\_WRITE so there is effectively no
 change.
 
 A new routine, SUBPAR\_EFLSH, has been written to flush error messages from
@@ -424,9 +424,9 @@ Various routines have been modified to use SUBPAR\_EFLSH.\\
 (Modified: SUBPAR\_GETNAME, \_FINDHDS, \_GET0C/D/I/L/R)
 
 \subsection{Dynamic Default Storage}
-Pointers to the common block areas used for storing dynamic defaults 
+Pointers to the common block areas used for storing dynamic defaults
 {\em etc.\ }
-at run time are reset at SUBPAR de-activation to avoid overflowing the 
+at run time are reset at SUBPAR de-activation to avoid overflowing the
 available space after multiple task invocations, particularly with large
 monoliths.\\
 (Modified: SUBPAR\_RDIF, \_DEACT, \_DATDEF, \_DEF1C/D/I/L/R, \_HDSDYN, \_INPUT,
@@ -455,7 +455,7 @@ in preparation for the MIN/MAX system.\\
 \begin{itemize}
 \item Changes have been made to handle the new (CONTROL) context.\\
 (UFACE\_MSGINFO, \_SEND)
-\item Changes have been made to define termination mailboxes for the improved 
+\item Changes have been made to define termination mailboxes for the improved
 task failure reporting system. This includes additional arguments in two
 routines.\\
 (UFACE\_LOAD, \_LOADD)
@@ -463,17 +463,17 @@ routines.\\
 strings.\\
 (UFACE\_SEND)
 \item The returned value will no longer be displayed if it is the same as
-the sent value when an error occurs on SET or GET contexts. 
+the sent value when an error occurs on SET or GET contexts.
 (UFACE\_SEND)
-\item UFACE\_SEND will now correctly handle information (error) messages 
+\item UFACE\_SEND will now correctly handle information (error) messages
 returned from the task during transactions it handles (GET, SET {\em etc}).\\
 (UFACE\_SEND)
 \item The system will now handle help from either portable help or VMS help
-libraries. For details of the help library selection process see Section 
+libraries. For details of the help library selection process see Section
 \ref{iclmisc}.\\
-(Modified: UFACE\_WRHELP, \_IPUT, \_OPUT,\\ 
+(Modified: UFACE\_WRHELP, \_IPUT, \_OPUT,\\
 New: UFACE\_PWHLP, \_VWHLP, \_SCRNSZ)
-\item The AST handler is changed to use MESSYS\_ASTMSG rather than 
+\item The AST handler is changed to use MESSYS\_ASTMSG rather than
 MESSYS\_ASTINT which is now obsolete.\\
 (UFACE\_ASTHDLR)
 \end{itemize}
@@ -482,11 +482,11 @@ MESSYS\_ASTINT which is now obsolete.\\
 \item The changed calling sequence for UFACE\_LOAD and UFACE\_LOADD implies
 changes to ADAMCL, which is effectively frozen.
 As a consequence of this, the SMS versions of these have not been changed but
-the procedure (in ICL\_DIR) for linking 
+the procedure (in ICL\_DIR) for linking
 ICLSMS has been modified to take the LOAD routines from ICL UFACE.\\
 (ICL\_DIR:SMSLINK\_ICL.COM)
 \item The changes listed for UFACE\_SEND in the ICL UFACE library have been
-made to the SMS UFACE library. In addition, because the SMS version now 
+made to the SMS UFACE library. In addition, because the SMS version now
 calls SMS\_INFORM to handle returned information messages, it has diverged from
 the other two versions (which call UFACE\_INFORM).\\
 (UFACE\_SEND)
@@ -497,23 +497,23 @@ the other two versions (which call UFACE\_INFORM).\\
 {\em etc.}\ have not been re-linked to use it, nor will the new context be
 used).\\
 (UFACE\_SEND)
-\item Error codes UFACE\_\_IFNF and UFACE\_\_HLPER have been added for use 
+\item Error codes UFACE\_\_IFNF and UFACE\_\_HLPER have been added for use
 with the help system and
-the message associated with the status UFACE\_\_ILLCONTEXT has been 
+the message associated with the status UFACE\_\_ILLCONTEXT has been
 changed to allow for the new context.\\
 (UFACERR.MSG/.OBJ/.FOR)
 \item The AST handler is changed to use MESSYS\_ASTMSG rather than
 MESSYS\_ASTINT which is now obsolete.\\
 (UFACE\_ASTHDLR)
 \end{itemize}
-{\em Note that ADAMCL etc.\ have not been re-linked to include the above 
+{\em Note that ADAMCL etc.\ have not been re-linked to include the above
 changes.}
 
 \subsection{SMS}
 The following changes have been made to the SMS library.
 \begin{description}
 \item[Pre-entry] The pre-entry actions for switch fields are now carried out
-BEFORE any  values for parameters are obtained using the `from' statement. 
+BEFORE any  values for parameters are obtained using the `from' statement.
 This potentially allows the latter values to be updated by carrying out an
 action of some sort.  This change could affect the behaviour of existing systems
 but is desired by both UKIRT and JCMT who are believed to be the only serious
@@ -521,7 +521,7 @@ users of SMS, so has been included.\\
 (SMS\_NEWSWITCH)
 \item[New Configuration Parameters] There are two new configuration parameters.
 They may be set using the configuration switch (type keypad `,') or by the
-+config+ command in a control table. The initial settings preserve the existing 
++config+ command in a control table. The initial settings preserve the existing
 behaviour.
 \begin{description}
 \item[pf4\_prompt]
@@ -551,17 +551,17 @@ the obsolete MESSYS\_ASTINT.\\
 \item[HELPSYS] An additional possible status value from HELPSYS is allowed
 for.\\
 (SMS\_BRIEFHELP)
-\item[SCT Include files] The new configuration parameters have been added to 
-the configuration switch in the include files defining the `system' part of 
+\item[SCT Include files] The new configuration parameters have been added to
+the configuration switch in the include files defining the `system' part of
 control tables.
 The changes are also reflected in the modified include files
 AON004.INC and AON004ICL.INC in directory ADAM\_TEST.\\
 (FIXED.SCT, SMSSYSTAB.INC, ICL\_DIR:SMSICLSYSTAB.INC)
-\item[SMS\_HELPFILE] Both the ADAM HELPSYS and VMS HELP versions of 
+\item[SMS\_HELPFILE] Both the ADAM HELPSYS and VMS HELP versions of
 SMS\_HELPFILE have been updated. The source file and a HELPINFO file describing
-how to produce the help files have been moved from [ADAM.HELP] to SMS\_DIR 
-\item[SMSLINK] SMSLINK.COM is renamed SMSLINK\_ADAMCL.COM and produces 
-executable image SMSADAMCL.EXE. 
+how to produce the help files have been moved from [ADAM.HELP] to SMS\_DIR
+\item[SMSLINK] SMSLINK.COM is renamed SMSLINK\_ADAMCL.COM and produces
+executable image SMSADAMCL.EXE.
 The procedure has also been updated to use the ISD\_MAX link option.
 \end{description}
 
@@ -597,13 +597,13 @@ to define the names of the four possible systems.\\
 
 \subsection{FIO/RIO}
 The FIO/RIO library has been released as a separate Starlink software item.
-The new release has changed and enhanced functionality and uses a shareable 
+The new release has changed and enhanced functionality and uses a shareable
 image with different linking instructions.
 
-The existing system will remain within the ADAM release for a short while to 
+The existing system will remain within the ADAM release for a short while to
 allow users to make any necessary changes to their software. The old linking
-instruction will link with the old library but ADAMDEV will obey FIO\_DEV to 
-set up logical names FIO\_PAR and FIO\_ERR pointing to the new system (if it 
+instruction will link with the old library but ADAMDEV will obey FIO\_DEV to
+set up logical names FIO\_PAR and FIO\_ERR pointing to the new system (if it
 is installed).
 The FIO shareable image will be searched automatically by ALINK, MLINK and
 ICLMLINK.
@@ -612,11 +612,11 @@ For full details of the new facilities, see SUN/143.
 
 \subsection{SHR}
 \label{shr}
-A new library, SHR,  has been created in SHARE\_DIR to contain routines 
+A new library, SHR,  has been created in SHARE\_DIR to contain routines
 for use in building shareable images containing obsolete or not-yet-implemented
-routines. The principle is that the shareable images will be built without 
-defining universal symbols for the missing routine so that it will not be 
-possible to link with the new image. However, if a task was linked with a 
+routines. The principle is that the shareable images will be built without
+defining universal symbols for the missing routine so that it will not be
+possible to link with the new image. However, if a task was linked with a
 previous image which did define the symbol, and the symbol is accessed, some
 error messages will be reported and a bad status returned.\\
 (SHARE\_DIR:SHR.OLB/.TLB, SHR\_ERR.MSG/.FOR/.OBJ)
@@ -642,8 +642,8 @@ Where \verb%x% is JOB, GROUP or SYSTEM.\\
 \item[ADAMSTART.COM] Changes are:
 \begin{itemize}
 \item The ADAM version number has been updated. So that
-only a single change to the procedure is required to update the version 
-number, the latest number is set as a symbol and the symbol used wherever the 
+only a single change to the procedure is required to update the version
+number, the latest number is set as a symbol and the symbol used wherever the
 version number is needed in the procedure,
 {\em i.e.\ }:
 \begin{itemize}
@@ -700,7 +700,7 @@ allow the ICL `DEFAULT' command to work with them.\\
 (LISTLOG, SDFCREATE, TAPECREATE, TAPEDISM, TAPEMOUNT)
 
 \subsection{ADAM\_HELP}
-A number of unnecessary files have been deleted from the help source directory 
+A number of unnecessary files have been deleted from the help source directory
 [ADAM.HELP]. SMS\_HELPFILE.HLP and INFO.LIS have been moved to SMS\_DIR.\\
 (SMS\_HELPFILE.HLP, ADAMCL.AHF, ADAMCL.HEL, ADAMCL.LIS, CHECKTASK.HLP)
 
@@ -708,7 +708,7 @@ A number of unnecessary files have been deleted from the help source directory
 \label{docs}
 \begin{itemize}
 \item SSN/45 and ARN/2.0-2 describe ADAM release 2.0-2.
-\item The ADAM\_CHANGES help library has been updated 
+\item The ADAM\_CHANGES help library has been updated
 with the information contained in this document. The information for earlier
 releases is
 retained in the library.
@@ -733,7 +733,7 @@ last ADAM release:
 \item SUN/35 ICL -- Interactive Command Language: An Introduction.
 \end{itemize}
 \item The summaries, 0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS in
-ADAM\-\_DOCS, have been updated. 
+ADAM\-\_DOCS, have been updated.
 \end{itemize}
 
 \section{BUGS FIXED}
@@ -777,20 +777,20 @@ WRITE them.
 Failures on the Fortran WRITE are trapped and status SUBPAR\_\_OPTER returned.\\
 (SUBPAR\_WRITE, SUBPAR\_ERR)
 \item A bug which caused an HDS object slice such as ARRAY(x,y1:y2) to be
-interpreted as ARRAY(1:x,y1:y2) instead of ARRAY(x:x,y1:y2), has been 
+interpreted as ARRAY(1:x,y1:y2) instead of ARRAY(x:x,y1:y2), has been
 corrected.\\
 (SUBPAR\_HDSARR)
 \item A bug which caused RESET to have no effect on the VPATH for some
 name-type parameters ({\em e.g.\ }FIO filenames) has been corrected.\\
 (SUBPAR\_GETNAME)
-\item Numerous other minor changes to error reports and layout 
+\item Numerous other minor changes to error reports and layout
 {\em etc.\ }have been made.
 \end{itemize}
 
 \subsection{PARSECON}
 A bug which prevented task names in INTERFACE or MONOLITH statements in the
 interface file being of the form `D' or `E' possibly followed by
-an integer, has been corrected. The mod also fixes a problem on Suns whereby a 
+an integer, has been corrected. The mod also fixes a problem on Suns whereby a
 single-letter name could not be specified.\\
 (PARSECON\_TOKTYP)
 
@@ -816,7 +816,7 @@ strings have been eliminated.\\
 "X (AXIS)") has been fixed.\\
 (ICLPARSE.PAS)
 \item ICL will now correctly handle error messages returned from the task
-during SEND SET and SEND GET contexts. Furthermore, the returned value will 
+during SEND SET and SEND GET contexts. Furthermore, the returned value will
 not be displayed on error if it is the same as the value sent.\\
 (See section \ref{ufbugs} on UFACE\_SEND)
 \end{itemize}
@@ -832,13 +832,13 @@ A bug which prevented ADAMNET\_4 being used has been corrected.\\
 task was out by one. This has been corrected in both ICL and SMS UFACE
 libraries.\\
 (UFACE\_CHECKQUOT)
-\item Information (error) messages returned from tasks during SET and GET 
+\item Information (error) messages returned from tasks during SET and GET
 contexts will now be correctly handled.\\
 (UFACE\_SEND)
 \end{itemize}
 
 \subsection{SMS}
-\begin{itemize} 
+\begin{itemize}
 \item `\verb%+config+ refresh%' in an action will now correctly
 refresh the SMS screen.\\
 (SMS\_DORFSH)
@@ -854,8 +854,8 @@ corrected.\\
 (AON004.SCT)
 
 \subsection{HELPSYS}
-A bug in the ADAM help system has been fixed. It caused access violation if 
-the variable supplied to receive the brief help string was not long enough. 
+A bug in the ADAM help system has been fixed. It caused access violation if
+the variable supplied to receive the brief help string was not long enough.
 This caused SMS to crash occasionally when running CGS4.\\
 (HELPSYS\_BRIEFGET, HELPMSG)
 

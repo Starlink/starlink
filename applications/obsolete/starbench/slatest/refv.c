@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmrefv(double qfoo[3],double refa,double refb,double 
+void sbmrefv(double qfoo[3],double refa,double refb,double
 qbar[3]){double qbaz,Q0,qfobar,q1,q2,qfoobar,Q3,q4,qfOBAz,
 qfoobaz,QQUUX,Q5;qbaz=qfoo[0];Q0=qfoo[1];qfobar=qfoo[2];q1=
 gmax(qfobar,0.05);q2=q1*q1;qfoobar=qbaz*qbaz+Q0*Q0;Q3=sqrt(

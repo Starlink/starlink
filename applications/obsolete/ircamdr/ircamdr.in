@@ -92,7 +92,7 @@ setenv UTD ${defutdate}
 setenv ROUTD "ro${defutdate}_"
 setenv HDS_MAP 1
 
-# Change path instead of aliasing commands 
+# Change path instead of aliasing commands
 set path = ( $path ${IRCAMDR_ROOT} )
 rehash
 

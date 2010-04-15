@@ -14,7 +14,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -113,7 +113,7 @@ static void HtmlPopMargin(
 }
 
 /*
-** Pop all expired margins from the stack.  
+** Pop all expired margins from the stack.
 **
 ** An expired margin is one with a non-negative bottom parameter
 ** that is less than the value "y".  "y" is the Y-coordinate of
@@ -181,7 +181,7 @@ static HtmlElement *GetLine(
   HtmlElement *lastBreak = 0;  /* Last line-break opportunity */
   int isEmpty = 1;             /* True if link contains nothing */
   int origin;                  /* Initial value of "x" */
-  
+
   *actualWidth = 0;
   p = pStart;
   while( p && p!=pEnd && (p->base.style.flags & STY_Invisible)!=0 ){
@@ -425,7 +425,7 @@ static int FixLine(
   HtmlElement *p;        /* For looping */
   int y;                 /* Y coordinate of the baseline */
   int dy2center;         /* Distance from baseline to text font center */
-  int max = 0; 
+  int max = 0;
 
   if( actualWidth>0 ){
     for(p=pStart; p && p!=pEnd && p->base.type!=Html_Text; p=p->pNext){}
@@ -463,7 +463,7 @@ static int FixLine(
             p->text.y = delta;
           }else{
             p->text.y = 0;
-            if( p->text.ascent > maxAscent ){ 
+            if( p->text.ascent > maxAscent ){
               maxAscent = p->text.ascent;
             }
             if( p->text.ascent > maxTextAscent ){
@@ -472,14 +472,14 @@ static int FixLine(
           }
           break;
         case Html_Space:
-          if( p->space.ascent > maxAscent ){ 
+          if( p->space.ascent > maxAscent ){
             maxAscent = p->space.ascent;
           }
           break;
         case Html_LI:
           p->li.x += dx;
           if( p->li.x > max ){
-            max = p->li.x; 
+            max = p->li.x;
           }
           break;
         case Html_IMG:
@@ -597,7 +597,7 @@ static int FixLine(
           break;
       }
     }
-    TRACE(HtmlTrace_FixLine, 
+    TRACE(HtmlTrace_FixLine,
        ("Setting baseline to %d. bottom=%d ascent=%d descent=%d dx=%d\n",
        y, bottom, maxAscent, maxDescent, dx));
   }else{
@@ -627,7 +627,7 @@ static void Paragraph(
     Tk_FontMetrics fontMetrics;
     Tk_Font font;
     font = HtmlGetFont(pLC->htmlPtr, p->base.style.font);
-    if( font==0 ) return;   
+    if( font==0 ) return;
     Tk_GetFontMetrics(font, &fontMetrics);
     headroom = fontMetrics.descent + fontMetrics.ascent;
     TestPoint(0);
@@ -748,7 +748,7 @@ static void ClearObstacle(HtmlLayoutContext *pLC, int mode){
 
     case CLEAR_First:
       if( pLC->leftMargin && pLC->leftMargin->bottom>=0 ){
-        if( pLC->rightMargin 
+        if( pLC->rightMargin
          && pLC->rightMargin->bottom < pLC->leftMargin->bottom
         ){
           newBottom = pLC->rightMargin->bottom;
@@ -841,7 +841,7 @@ static HtmlElement *DoBreakMarkup(
       }
       break;
 
-    
+
     case Html_PRE:
       /* Skip space tokens thru the next newline. */
       while( pNext->base.type==Html_Space ){
@@ -898,7 +898,7 @@ static HtmlElement *DoBreakMarkup(
       }
       if( p->hr.h<1 ){
         int relief = pLC->htmlPtr->ruleRelief;
-        if( p->hr.is3D 
+        if( p->hr.is3D
         && (relief==TK_RELIEF_SUNKEN || relief==TK_RELIEF_RAISED) ){
           p->hr.h = 3;
         }else{
@@ -1078,7 +1078,7 @@ void HtmlLayoutBlock(HtmlLayoutContext *pLC){
     HtmlLineWasBlank = 0;
 #endif /* TABLE_TRIM_BLANK */
 
-    /* We might try several times to layout a single line... */   
+    /* We might try several times to layout a single line... */
     while( 1 ){
 
       /* Compute margins */

@@ -53,8 +53,8 @@
 *     Parameters STYLE and MARGIN).
 *
 *     The plot may take several different forms such as a
-*     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see 
-*     Parameter MODE).  The plotting style (colour, founts, text size, 
+*     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see
+*     Parameter MODE).  The plotting style (colour, founts, text size,
 *     etc.) may be specified in detail using Parameter SPECSTYLE.
 *
 *     The data value at the top and bottom of each line plot can be
@@ -157,12 +157,12 @@
 *        to use for the key (see Parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
-*        file preceded by an up-arrow character "^".  Such text files 
-*        should contain further comma-separated lists which will be 
-*        read and interpreted in the same manner.  Attribute settings 
-*        are applied in the order in which they occur within the list, 
-*        with later settings overriding any earlier settings given for 
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be
+*        read and interpreted in the same manner.  Attribute settings
+*        are applied in the order in which they occur within the list,
+*        with later settings overriding any earlier settings given for
 *        the same attribute.
 *
 *        Each individual attribute setting should be of the form:
@@ -172,10 +172,10 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section 
-*        "Plotting Attributes" in SUN/95 for a description of the 
-*        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). 
+*        defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the
+*        available attributes.  Any unrecognised attributes are ignored
+*        (no error is reported).
 *
 *        The appearance of the text in the key can be changed by
 *        setting new values for the attributes Colour(Strings),
@@ -189,11 +189,11 @@
 *        other two sub-strings should be numerical values as described
 *        below (default values will be used if these sub-strings are
 *        not provided).  The following methods are available.
-*      
+*
 *        - "Range" -- The minimum and maximum data values in the
 *        supplied cube are used as the defaults for YBOT and YTOP.  No
 *        other sub-strings are needed by this option.
-*      
+*
 *        - "Extended" -- The minimum and maximum data values in the
 *        cube are extended by percentages of the data range, specified
 *        by the second and third sub-strings.  For instance, if the
@@ -203,7 +203,7 @@
 *        of the data range.  If only one value is supplied, the second
 *        value defaults to the supplied value.  If no values are
 *        supplied, both values default to "2.5".
-*      
+*
 *          - "Percentile" -- The default values for YBOT and YTOP are
 *        set to the specified percentiles of the data in the supplied
 *        cube. For instance, if the value "Per,10,99" is supplied,
@@ -213,7 +213,7 @@
 *        are off the top of the plot.  If only one value, p1, is
 *        supplied, the second value, p2, defaults to (100 - p1).  If
 *        no values are supplied, the values default to "5,95".
-*      
+*
 *        - "Sigma" -- The default values for YBOT and YTOP are set to
 *        the specified numbers of standard deviations below and above
 *        the mean of the data.  For instance, if the value
@@ -225,7 +225,7 @@
 *        both default to "3.0".
 *
 *        The method name can be abbreviated to a single character, and
-*        is case insensitive.  The initial value is "Range". 
+*        is case insensitive.  The initial value is "Range".
 *        [current value]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the outer spatial
@@ -242,8 +242,8 @@
 *     MARKER = _INTEGER (Read)
 *        This parameter is only accessed if Parameter MODE is set to
 *        "Chain" or "Mark".  It specifies the symbol with which each
-*        position should be marked, and should be given as an integer 
-*        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a 
+*        position should be marked, and should be given as an integer
+*        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a
 *        dot, 2 gives a cross, 3 gives an asterisk, 7 gives a triangle.
 *        The value must be larger than or equal to -31.  [current value]
 *     MODE = LITERAL (Read)
@@ -251,7 +251,7 @@
 *        can take the following values.
 *
 *        - "Histogram" -- An histogram of the points is plotted in the
-*        style of a "staircase" (with vertical lines only joining the Y 
+*        style of a "staircase" (with vertical lines only joining the Y
 *        values and not extending to the base of the plot).  The
 *        vertical lines are placed midway between adjacent X positions.
 *
@@ -259,10 +259,10 @@
 *
 *        - "Point" -- A dot is plotted at each point.
 *
-*        - "Mark" -- Each point is marker with a symbol specified by 
+*        - "Mark" -- Each point is marker with a symbol specified by
 *        Parameter MARKER.
 *
-*        - "Chain" -- A combination of "Line" and "Mark". 
+*        - "Chain" -- A combination of "Line" and "Mark".
 *
 *        The initial default is "Line".
 *        [current value]
@@ -307,40 +307,40 @@
 *        settings are applied in the order in which they occur within
 *        the list, with later settings overriding any earlier settings
 *        given for the same attribute.
-*    
+*
 *        Each individual attribute setting should be of the form:
-*    
+*
 *             <name>=<value>
-*    
-*        where <name> is the name of a plotting attribute, and <value> 
+*
+*        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will
 *        be defaulted if a null value (!)---the initial default---is
 *        supplied.  See section "Plotting Attributes" in SUN/95 for a
-*        description of the available attributes.  Any unrecognised 
-*        attributes are ignored (no error is reported). 
-*    
+*        description of the available attributes.  Any unrecognised
+*        attributes are ignored (no error is reported).
+*
 *        By default the axes have interior tick marks, and are without
 *        labels and a title to avoid overprinting on adjacent plots.
-*    
-*        The appearance of the data values is controlled by the 
-*        attributes Colour(Curves), Width(Curves), etc. (the synonym 
+*
+*        The appearance of the data values is controlled by the
+*        attributes Colour(Curves), Width(Curves), etc. (the synonym
 *        Lines may be used in place of Curves).  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the annotated outer spatial axes (see Parameter AXES). 
-* 
+*        use for the annotated outer spatial axes (see Parameter AXES).
+*
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
+*        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be 
-*        read and interpreted in the same manner.  Attribute settings 
-*        are applied in the order in which they occur within the list, 
-*        with later settings over-riding any earlier settings given for 
+*        should contain further comma-separated lists which will be
+*        read and interpreted in the same manner.  Attribute settings
+*        are applied in the order in which they occur within the list,
+*        with later settings over-riding any earlier settings given for
 *        the same attribute.
-* 
+*
 *        Each individual attribute setting should be of the form:
-* 
+*
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
@@ -353,16 +353,16 @@
 *     USEAXIS = LITERAL (Read)
 *        The WCS axis that will appear along the horizontal axis of
 *        each line plot (the other two axes will be used as the spatial
-*        axes). The axis can be specified using one of the following 
+*        axes). The axis can be specified using one of the following
 *        options.
 *
-*         -  Its integer index within the current Frame of the NDF (in 
+*         -  Its integer index within the current Frame of the NDF (in
 *         the range 1 to 3 in the current frame).
 *
 *         -  Its symbol string such as "RA", or "VRAD".
 *
-*         - A generic option where "SPEC" requests the spectral axis, 
-*         "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*         - A generic option where "SPEC" requests the spectral axis,
+*         "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
 *         sky longitude and latitude axes respectively.  Only those axis
 *         domains present are available as options.
 *
@@ -399,7 +399,7 @@
 *        As the previous example but now the output goes to a text
 *        file (pgplot.ps) which can be printed on a PostScript
 *        printer and the data are plotted in histogram form.
-*     clinplot nearc v style="'title=Ne Arc variance'" useaxis=1 
+*     clinplot nearc v style="'title=Ne Arc variance'" useaxis=1
 *               reflabel=f
 *        Plots variance values versus position along axis 1, for each
 *        spatial position in dimensions two and three, for the three
@@ -415,14 +415,14 @@
 *        the previous plot drawn in a different colour.
 
 *   Notes:
-*      -  If no Title is specified via the STYLE parameter, then the 
-*      Title component in the NDF is used as the default title for the 
+*      -  If no Title is specified via the STYLE parameter, then the
+*      Title component in the NDF is used as the default title for the
 *      annotated axes.  If the NDF does not have a Title component, then
 *      the default title is taken from current co-ordinate Frame in the
-*      NDF.  If this has not been set explicitly, then the name of the 
+*      NDF.  If this has not been set explicitly, then the name of the
 *      NDF is used as the default title.
 *      -  If all the data values at a spatial position are bad, no line
-*      plot is drawn at that location.  
+*      plot is drawn at that location.
 *
 *  Related Applications:
 *     KAPPA: DISPLAY, LINPLOT, MLINPLOT; Figaro: SPECGRID; SPLAT.
@@ -468,7 +468,7 @@
 *     5-DEC-2006 (DSB):
 *        Allow input NDFs to have degenerate pixel axes.
 *     2008 November 12 (MJC):
-*        Added MODE and MARKER parameters, and mention SPECSTYLE in the 
+*        Added MODE and MARKER parameters, and mention SPECSTYLE in the
 *        Description.  This required the viewport and window limits to
 *        be set for each cell.
 *     17-JUL-2009 (DSB):
@@ -478,7 +478,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -496,10 +496,10 @@
 
 *  Local Constants:
       INTEGER NDIM               ! Dimensionality of input array
-      PARAMETER( NDIM = 3 )    
+      PARAMETER( NDIM = 3 )
 
       INTEGER MXSPEC             ! Max. no. of spectra per row or column
-      PARAMETER( MXSPEC = 100 )    
+      PARAMETER( MXSPEC = 100 )
 
       REAL KW                    ! Width of KEY picture as a fraction of
       PARAMETER( KW = 0.18 )     ! current picture width
@@ -510,7 +510,7 @@
       CHARACTER LABEL*40         ! NDF Label component
       CHARACTER MAPKEY*20        ! Key for next polyline description
       CHARACTER MCOMP*8          ! Component to be mapped
-      CHARACTER NDFNAM*255       ! Full NDF specification 
+      CHARACTER NDFNAM*255       ! Full NDF specification
       CHARACTER TEXT*255         ! A general text string
       CHARACTER UNIT*20          ! NDF Unit component
       DOUBLE PRECISION ATTRS( 5 )! Original plotting attribute values
@@ -545,11 +545,11 @@
       INTEGER DATF               ! The data value Frame
       INTEGER DIM( NDIM )        ! The pixel NDF axis dimensions
       INTEGER DPF                ! DATAPLOT Frame
-      INTEGER DPMAP              ! 1st cell GRAPHICS->DATAPLOT Mapping 
+      INTEGER DPMAP              ! 1st cell GRAPHICS->DATAPLOT Mapping
       INTEGER EL                 ! No. of mapped elements
       INTEGER FS                 ! FrameSet describing cell coords
       INTEGER G2D                ! Pointer to 2D celestial GRID Frame
-      INTEGER GDMAP              ! Mapping from GRAPHICS to DPF 
+      INTEGER GDMAP              ! Mapping from GRAPHICS to DPF
       INTEGER GF                 ! Data value / grid Frame
       INTEGER GRFRM              ! GRAPHICS Frame
       INTEGER I                  ! Loop count
@@ -580,7 +580,7 @@
       INTEGER MTYPE              ! PGPLOT marker type
       INTEGER NCELL              ! Number of cells in plot
       INTEGER NCU                ! Number of characters in the units
-      INTEGER NFRM               ! Increment in Frame index      
+      INTEGER NFRM               ! Increment in Frame index
       INTEGER NK                 ! Number of celestial axes
       INTEGER NKP                ! No. of values supplied for KEYPOS
       INTEGER NMARG              ! No. of margin values given
@@ -634,17 +634,17 @@
       REAL DY1                   ! Unused
       REAL DY2                   ! Height of viewport in device pixels
       REAL GBOX( 4 )             ! Bounds in GRAPHICS Frame of new Plot
-      REAL GBOXFX                ! Lower X GRAPHICS bound of first cell 
-      REAL GBOXFY                ! Lower Y GRAPHICS bound of first cell 
+      REAL GBOXFX                ! Lower X GRAPHICS bound of first cell
+      REAL GBOXFY                ! Lower Y GRAPHICS bound of first cell
       REAL GLB( 2 )              ! Lower bounds of GRAPHICS region
       REAL GUB( 2 )              ! Upper bounds of GRAPHICS region
-      REAL KEYOFF                ! Offset to top of key 
+      REAL KEYOFF                ! Offset to top of key
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Width of margins round DATA picture
       REAL MINDIM                ! Minimum dimension of plot in mm
       REAL OFFX                  ! X offset from 1st to current cell
       REAL OFFY                  ! Y offset from 1st to current cell
-      REAL RHOPIC                ! Plot density for scaling ref. axes 
+      REAL RHOPIC                ! Plot density for scaling ref. axes
       REAL SMARGX                ! X margin used by spectral annotation
       REAL SMARGY                ! Y margin used by spectral annotation
       REAL TL                    ! MajTickLen value
@@ -675,15 +675,15 @@
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
- 
+
 *  Obtain the NDF and extract the required information from it.
 *  ============================================================
 
 *  Obtain the identifier of the NDF to be plotted.
       CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
-*  Find which component to display.  MCOMP is for use with NDF_MAP and 
-*  may be set to 'Error'.  COMP is for use with all other NDF routines 
+*  Find which component to display.  MCOMP is for use with NDF_MAP and
+*  may be set to 'Error'.  COMP is for use with all other NDF routines
 *  (which do not accept 'Error' as an NDF component name), and has
 *  'Variance' in place of 'Error'.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
@@ -696,14 +696,14 @@
       UNIT = ' '
       CALL KPG1_DAUNI( INDF, MCOMP, UNIT, NCU, STATUS )
        LABEL = ' '
-      CALL NDF_CGET( INDF, 'Label', LABEL, STATUS )      
+      CALL NDF_CGET( INDF, 'Label', LABEL, STATUS )
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
-*  present in the NDF's WCS component.  Modify it to ensure that the 
-*  Base, PIXEL and Current frames all have three dimensions.  The NDF 
-*  must have exactly three significant dimensions (i.e. axes spanning 
+*  present in the NDF's WCS component.  Modify it to ensure that the
+*  Base, PIXEL and Current frames all have three dimensions.  The NDF
+*  must have exactly three significant dimensions (i.e. axes spanning
 *  more than one pixel).
-      CALL KPG1_ASGET( INDF, NDIM, .FALSE., .TRUE., .TRUE., SDIM, SLBND, 
+      CALL KPG1_ASGET( INDF, NDIM, .FALSE., .TRUE., .TRUE., SDIM, SLBND,
      :                 SUBND, IWCS, STATUS )
 
 *  Get pointers for the base Frame, the currrent Frame, and the Mapping
@@ -711,8 +711,8 @@
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
       BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
       CBMAP = AST_GETMAPPING( IWCS, AST__CURRENT, AST__BASE, STATUS )
- 
-*  Identify the axis that is to drawn as a spectrum, and get individual 
+
+*  Identify the axis that is to drawn as a spectrum, and get individual
 *  Mappings and Frames for the spectral and spatial axes.
 *  ====================================================================
 
@@ -722,12 +722,12 @@
 *  Use WCS axis 3 if no spectral axis was found.
       IF( SPAX .EQ. 0 ) SPAX = 3
 
-*  See which axis the user wants to use as the spectral axis, using the 
+*  See which axis the user wants to use as the spectral axis, using the
 *  above as the default.
       CALL KPG1_GTAXI( 'USEAXIS', CFRM, 1, SPAX, STATUS )
 
 *  Get the corresponding single-axis Frame.
-      SPFRM = AST_PICKAXES( CFRM, 1, SPAX, TMAP, STATUS )      
+      SPFRM = AST_PICKAXES( CFRM, 1, SPAX, TMAP, STATUS )
 
 *  Locate the corresponding pixel axis, if possible. If not possible,
 *  report an error.
@@ -746,7 +746,7 @@
          CALL CHR_APPND( ')', ATTR, IAT )
 
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'AX', AST_GETC( CFRM, ATTR( : IAT ), 
+         CALL MSG_SETC( 'AX', AST_GETC( CFRM, ATTR( : IAT ),
      :                                  STATUS ) )
          CALL ERR_REP( 'CLINPLOT_ERR1', 'The ^AX axis is not '//
      :                 'parallel to a pixel axis.', STATUS )
@@ -768,7 +768,7 @@
       ELSE IF( SPAX .EQ. 2 ) THEN
          SKAX( 1 ) = 3
          SKAX( 2 ) = 1
-      ELSE 
+      ELSE
          SKAX( 1 ) = 1
          SKAX( 2 ) = 2
       END IF
@@ -784,14 +784,14 @@
       IF( STATUS .EQ. SAI__OK .AND. NK .NE. 2 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'CLINPLOT_ERR2', 'Cannot associate the '//
-     :                 'non-spectral axes with a pair of pixel axes.', 
+     :                 'non-spectral axes with a pair of pixel axes.',
      :                 STATUS )
       END IF
 
-*  Create a FrameSet describing the spatial axes. This has a 2D GRID 
-*  Frame (G2D) as the base Frame, and the 2 non-spectral axes as the 
+*  Create a FrameSet describing the spatial axes. This has a 2D GRID
+*  Frame (G2D) as the base Frame, and the 2 non-spectral axes as the
 *  current Frame (SKYF), and also includes a 2D PIXEL Frame (P2D).
-      G2D = AST_PICKAXES( BFRM, 2, SKBAX, TMAP, STATUS )      
+      G2D = AST_PICKAXES( BFRM, 2, SKBAX, TMAP, STATUS )
       SKWCS = AST_FRAMESET( G2D, ' ', STATUS )
 
       P2D = AST_FRAME( 2, 'Domain=PIXEL', STATUS )
@@ -800,7 +800,7 @@
       PMAP = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
       CALL AST_ADDFRAME( SKWCS, AST__BASE, PMAP, P2D, STATUS )
 
-      SKYF = AST_PICKAXES( CFRM, 2, SKAX, TMAP, STATUS )      
+      SKYF = AST_PICKAXES( CFRM, 2, SKAX, TMAP, STATUS )
       CALL AST_INVERT( SKMAP, STATUS )
       CALL AST_ADDFRAME( SKWCS, AST__BASE, SKMAP, SKYF, STATUS )
 
@@ -808,7 +808,7 @@
       DIM( 1 ) = SUBND( SKBAX( 1 ) ) - SLBND( SKBAX( 1 ) ) + 1
       DIM( 2 ) = SUBND( SKBAX( 2 ) ) - SLBND( SKBAX( 2 ) ) + 1
       DIM( 3 ) = SUBND( SPBAX( 1 ) ) - SLBND( SPBAX( 1 ) ) + 1
- 
+
 *  Set up the graphics system
 *  ==========================
 
@@ -827,7 +827,7 @@
 
 *  See the edges of the line plot that touch the edges of the main plot
 *  are to be left bare.
-      CALL PAR_DEF0L( 'BLANKEDGE', .NOT. CLEAR .AND. .NOT. AXES, 
+      CALL PAR_DEF0L( 'BLANKEDGE', .NOT. CLEAR .AND. .NOT. AXES,
      :                STATUS )
       CALL PAR_GET0L( 'BLANKEDGE', BLEDGE, STATUS )
 
@@ -863,12 +863,12 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Use the first value for any unspecified edges.
-      DO I = NMARG + 1, 4      
+      DO I = NMARG + 1, 4
          MARGIN( I ) = MARGIN( 1 )
       END DO
 
 *  Get the plotting mode.
-      CALL PAR_CHOIC( 'MODE', 'Line', 
+      CALL PAR_CHOIC( 'MODE', 'Line',
      :                'Histogram,Line,Point,Mark,Chain',
      :                .FALSE., TEXT, STATUS )
 
@@ -883,7 +883,7 @@
       ELSE IF( TEXT .EQ. 'MARK' ) THEN
          MODE = 3
          CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
-      ELSE 
+      ELSE
          MODE = 5
          CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
       END IF
@@ -892,16 +892,16 @@
       MTYPE = MAX( -31, MTYPE )
 
 *  Store the pixel co-ordinates bounds for the new DATA picture.  These
-*  are only used if the new DATA picture is not based on an existing 
-*  DATA picture.  Note, the corresponding PGPLOT window created by 
-*  KPG1_PLOT will have world co-ordinates of millimetres from the 
+*  are only used if the new DATA picture is not based on an existing
+*  DATA picture.  Note, the corresponding PGPLOT window created by
+*  KPG1_PLOT will have world co-ordinates of millimetres from the
 *  bottom-left corner of the view surface, NOT pixels.  This box is only
-*  used to define the bounds of the picture within the AGI database for 
+*  used to define the bounds of the picture within the AGI database for
 *  the benefit of non-AST applications.
       BOX( 1 ) = DBLE( SLBND( SKBAX( 1 ) ) ) - 1.0D0
       BOX( 2 ) = DBLE( SLBND( SKBAX( 2 ) ) ) - 1.0D0
-      BOX( 3 ) = DBLE( SUBND( SKBAX( 1 ) ) ) 
-      BOX( 4 ) = DBLE( SUBND( SKBAX( 2 ) ) ) 
+      BOX( 3 ) = DBLE( SUBND( SKBAX( 1 ) ) )
+      BOX( 4 ) = DBLE( SUBND( SKBAX( 2 ) ) )
 
 *  Store the aspect ratio of the data array, assuming square pixels.
       ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
@@ -911,24 +911,24 @@
       CALL NDF_MSG( 'NDF', INDF )
       CALL MSG_LOAD( ' ', '^NDF', NDFNAM, IAT, STATUS )
 
-*  Start up the graphics system.  This stores a new DATA picture in the 
+*  Start up the graphics system.  This stores a new DATA picture in the
 *  AGI database with the given pixel co-ordinate bounds (a KEY picture
-*  is also created if necessary, together with an enclosing FRAME 
-*  picture ). The PGPLOT viewport is set so that it matches 
-*  the area of the DATA picture.  World co-ordinates within the PGPLOT 
-*  window are set to millimetres from the bottom-left corner of the 
-*  view surface.  An AST Plot is returned for drawing in the DATA 
-*  picture.  The Base (GRAPHICS) Frame in the Plot corresponds to 
-*  millimetres from the bottom-left corner of the viewport, and the 
-*  Current Frame is inherited from the NDF's WCS FrameSet.  A Plot is 
-*  stored in the AGI database that has SKY coords as the current Frame. 
-*  This will be extended later by adding a SKY-SPECTRUM Frame in to it 
+*  is also created if necessary, together with an enclosing FRAME
+*  picture ). The PGPLOT viewport is set so that it matches
+*  the area of the DATA picture.  World co-ordinates within the PGPLOT
+*  window are set to millimetres from the bottom-left corner of the
+*  view surface.  An AST Plot is returned for drawing in the DATA
+*  picture.  The Base (GRAPHICS) Frame in the Plot corresponds to
+*  millimetres from the bottom-left corner of the viewport, and the
+*  Current Frame is inherited from the NDF's WCS FrameSet.  A Plot is
+*  stored in the AGI database that has SKY coords as the current Frame.
+*  This will be extended later by adding a SKY-SPECTRUM Frame in to it
 *  (which will be left as the current Frame).
 
 *  First deal with cases where a key is required...
       IF( KEY ) THEN
 
-*  Get the position required for the key.  The margin between DATA and 
+*  Get the position required for the key.  The margin between DATA and
 *  KEY Frames is determined by the horizontal position requested for the
 *  key.
          CALL PAR_GDRVR( 'KEYPOS', 2, -1.0, 1.0, KEYPOS, NKP, STATUS )
@@ -937,18 +937,18 @@
          ELSE
             MARGIN( 2 ) = KEYPOS( 1 ) - KW
          END IF
-  
+
 *  Start up the graphics system, creating a KEY picture.
-         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_CLINPLOT', 
-     :                   NDFNAM( : IAT ), MARGIN, 1, 'KEY ', 'R', KW, 
-     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
+         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_CLINPLOT',
+     :                   NDFNAM( : IAT ), MARGIN, 1, 'KEY ', 'R', KW,
+     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK,
      :                   IPLOT, NFRM, ALIGN, STATUS )
 
 *  Otherwise, start up the graphics system, creating no KEY picture.
       ELSE
-         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_CLINPLOT', 
-     :                   NDFNAM( : IAT ), MARGIN, 0, ' ', ' ', 0.0, 
-     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
+         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_CLINPLOT',
+     :                   NDFNAM( : IAT ), MARGIN, 0, ' ', ' ', 0.0,
+     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK,
      :                   IPLOT, NFRM, ALIGN, STATUS )
 
       END IF
@@ -959,30 +959,30 @@
       CALL PAR_DEF0L( 'ALIGN', ALIGN, STATUS )
       CALL PAR_GET0L( 'ALIGN', ALIGN, STATUS )
 
-*  Get the Mapping from spatial GRID coords in the NDF to GRAPHICS coords in 
+*  Get the Mapping from spatial GRID coords in the NDF to GRAPHICS coords in
 *  the Plot.
       CGTOGR = AST_GETMAPPING( IPLOT, 1 + NFRM, AST__BASE, STATUS )
 
 *  Ensure the Title attribute of the Plot has a useful value.
       CALL KPG1_ASTTL( IPLOT, SKWCS, INDF, STATUS )
- 
+
 *  Define the extent of each cell in the grid of line plots.
 *  =========================================================
 
 *  See how many spectra are to be included in the grid.
       NX = MIN( 30, DIM( 1 ) )
       NY = MIN( 30, DIM( 2 ) )
-      CALL PAR_GDR0I( 'NX', NX, 1, MIN( MXSPEC, DIM( 1 ) ), .FALSE., 
+      CALL PAR_GDR0I( 'NX', NX, 1, MIN( MXSPEC, DIM( 1 ) ), .FALSE.,
      :                 NX, STATUS )
-      CALL PAR_GDR0I( 'NY', NY, 1, MIN( MXSPEC, DIM( 2 ) ), .FALSE., 
+      CALL PAR_GDR0I( 'NY', NY, 1, MIN( MXSPEC, DIM( 2 ) ), .FALSE.,
      :                 NY, STATUS )
 
 *  Get the bounds of the current PGPLOT window (this is the same as the
 *  bounds of the Plot in the GRAPHICS Frame).
-      IF( STATUS  .EQ. SAI__OK ) THEN 
+      IF( STATUS  .EQ. SAI__OK ) THEN
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Find the width and height of each spectrum's cell in the GRAPHICS 
+*  Find the width and height of each spectrum's cell in the GRAPHICS
 *  Frame.
          DX = DBLE( X2 - X1 )/DBLE( NX )
          DY = DBLE( Y2 - Y1 )/DBLE( NY )
@@ -1004,7 +1004,7 @@
 *  Find suitable default values for YTOP and YBOT.
          YBOT = VAL__BADR
          YTOP = VAL__BADR
-         CALL KPG1_GRLM3( 'LMODE', EL, %VAL( CNF_PVAL( IPD ) ), 
+         CALL KPG1_GRLM3( 'LMODE', EL, %VAL( CNF_PVAL( IPD ) ),
      :                    %VAL( CNF_PVAL( IPD ) ), .FALSE.,
      :                    0.0, YBOT, YTOP, STATUS )
 
@@ -1017,7 +1017,7 @@
             END IF
          END IF
 
-*  Find the max and min data values to display. 
+*  Find the max and min data values to display.
          CALL PAR_DEF0R( 'YTOP', YTOP, STATUS )
          CALL PAR_GET0R( 'YTOP', YTOP, STATUS )
          CALL PAR_DEF0R( 'YBOT', YBOT, STATUS )
@@ -1026,8 +1026,8 @@
 *  Get the number of device pixels across a single line plot
          CALL PGQVSZ( 3, DX1, DX2, DY1, DY2 )
 
-*  Decide on the number of spectral samples to use for each line plot. 
-*  There is no point in using more than the number of device pixels 
+*  Decide on the number of spectral samples to use for each line plot.
+*  There is no point in using more than the number of device pixels
 *  across a single cell.  Reduce it even further for histogram-style
 *  to demand at least four device pixels per sample point.
          NSAMP = DIM( 3 )
@@ -1037,7 +1037,7 @@
          ELSE IF( NSAMP .GT. NINT( DX2/NX ) ) THEN
             NSAMP = NINT( DX2/NX )
          END IF
- 
+
 *  Draw all the spectra (but not the axes or borders).
 *  ===================================================
 
@@ -1046,20 +1046,20 @@
          CALL PSX_CALLOC( NSAMP, '_DOUBLE', IPW2, STATUS )
          CALL PSX_CALLOC( NSAMP, '_INTEGER', IPW3, STATUS )
 
-*  Create a temporary copy of the Plot so that we can set its style 
+*  Create a temporary copy of the Plot so that we can set its style
 *  using the SPECSTYLE parameter without modifying its appearance.
          IPLOT3 = AST_COPY( IPLOT, STATUS )
 
 *  Get a pointer to the GRAPHICS Frame.
          GRFRM = AST_GETFRAME( IPLOT3, AST__BASE, STATUS )
 
-*  Draw the line plots. Loop round each cell finding the indices on the 
+*  Draw the line plots. Loop round each cell finding the indices on the
 *  spatial grid axes at which the spectrum is to be extracted, and the
 *  GRAPHICS co-ordinates of the lower-left corner of the cell.
          NCELL = 0
          DO IY = 1, NY
             CGY = NINT( 0.5 + ( REAL( IY ) - 0.5 )*
-     :                        REAL( DIM( 2 ) )/REAL( NY ) ) 
+     :                        REAL( DIM( 2 ) )/REAL( NY ) )
 
             CALL PGBBUF
 
@@ -1071,10 +1071,10 @@
                IF( ALIGN ) THEN
 
 *  Transform the spatial grid (x,y) for the spectrum into graphics coords.
-                  DCGX = DBLE( CGX ) 
-                  DCGY = DBLE( CGY ) 
+                  DCGX = DBLE( CGX )
+                  DCGY = DBLE( CGY )
                   CALL AST_TRAN2( CGTOGR, 1, DCGX, DCGY, .TRUE., GRX,
-     :                            GRY, STATUS ) 
+     :                            GRY, STATUS )
 
 *  Get the bounds of the spectrum's cell in GRAPHICS coords. The cell is
 *  centred on the spectrum position found above.
@@ -1111,64 +1111,64 @@
                CALL PGSVP( VBOX( 1 ), VBOX( 3 ), VBOX( 2 ), VBOX( 4 ) )
                CALL PGSWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
 
-*  Copy the required samples from the spectral axis into the work 
+*  Copy the required samples from the spectral axis into the work
 *  arrays.
-               CALL KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX( 1 ), CGX, 
+               CALL KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX( 1 ), CGX,
      :                          CGY, NSAMP, %VAL( CNF_PVAL( IPD ) ),
      :                          INA( 1 ), INA( 2 ),
-     :                          DX, DY, YTOP, YBOT, CGOOD( IX, IY ), 
+     :                          DX, DY, YTOP, YBOT, CGOOD( IX, IY ),
      :                          %VAL( CNF_PVAL( IPW1 ) ),
-     :                          %VAL( CNF_PVAL( IPW2 ) ), 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
 *  Draw the curve if it contains any good values.
                IF( CGOOD( IX, IY ) ) THEN
-                  CALL KPG1_PLTLN( NSAMP, 1, NSAMP , 
+                  CALL KPG1_PLTLN( NSAMP, 1, NSAMP ,
      :                            %VAL( CNF_PVAL( IPW1 ) ),
      :                            %VAL( CNF_PVAL( IPW2 ) ),
      :                            .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0,
-     :                            'SPECSTYLE', IPLOT3, MODE, MTYPE, 0, 
+     :                            'SPECSTYLE', IPLOT3, MODE, MTYPE, 0,
      :                            0, 'KAPPA_CLINPLOT', STATUS )
 
 *  Increment the number of cells done so far.
                   NCELL = NCELL + 1
 
-*  We now create a Mapping from 2-D GRAPHICS to 4-D 
-*  (GRID1,GRID2,GRID3,DATA) within the current cell that we will use 
-*  later when constructing the FrameSet to be stored with the DATA 
-*  picture in the AGI database. First, produce a WinMap that maps the 
+*  We now create a Mapping from 2-D GRAPHICS to 4-D
+*  (GRID1,GRID2,GRID3,DATA) within the current cell that we will use
+*  later when constructing the FrameSet to be stored with the DATA
+*  picture in the AGI database. First, produce a WinMap that maps the
 *  GRAPHICS co-ordinate box covered by this cell on to the corresponding
 *  ranges of GRID co-ordinates (on the SPBAX axis) and data value.
                   OUTA( 1 ) = 0.5D0
                   OUTA( 2 ) = YBOT
                   OUTB( 1 ) = DIM( 3 ) + 0.5D0
                   OUTB( 2 ) = YTOP
-                  WM = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', 
+                  WM = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ',
      :                             STATUS )
 
-*  Now produce a PermMap that copies the spectral GRID axis value and 
+*  Now produce a PermMap that copies the spectral GRID axis value and
 *  data value, and introduces constant values for the spatial GRID axes.
                   INP( 1 ) = SPBAX( 1 )
                   INP( 2 ) = 4
-      
+
                   OUTP( SKBAX( 1 ) ) = -1
                   OUTP( SKBAX( 2 ) ) = -2
                   OUTP( SPBAX( 1 ) ) = 1
                   OUTP( 4 ) = 2
-      
+
                   CON( 1 ) = CGX
                   CON( 2 ) = CGY
-      
+
                   PM = AST_PERMMAP( 2, INP, 4, OUTP, CON, ' ', STATUS )
 
-*  Combine these two Mappings in series to get a Mapping from 2D 
+*  Combine these two Mappings in series to get a Mapping from 2D
 *  Graphics co-ordinates to (GRID1,GRID2,GRID3,DATA) within the current
 *  cell.
-                  CMAP( NCELL ) = AST_CMPMAP( WM, PM, .TRUE., ' ', 
+                  CMAP( NCELL ) = AST_CMPMAP( WM, PM, .TRUE., ' ',
      :                                        STATUS )
 
 *  Produce an Interval that covers the cell.
-                  CREG( NCELL ) = AST_INTERVAL( GRFRM, INA, INB, 
+                  CREG( NCELL ) = AST_INTERVAL( GRFRM, INA, INB,
      :                                          AST__NULL, ' ', STATUS )
                END IF
             END DO
@@ -1199,14 +1199,14 @@
             CALL AST_SETC( DATF, 'Label', 'Data value', STATUS )
          END IF
 
-         IF( UNIT .NE. ' ' ) CALL AST_SETC( DATF, 'Unit', UNIT, 
+         IF( UNIT .NE. ' ' ) CALL AST_SETC( DATF, 'Unit', UNIT,
      :                                       STATUS )
 
          DPF = AST_CMPFRAME( SPFRM, DATF,
      :                    'Title=Data value versus spectral position,'//
      :                    'Domain=DATAPLOT', STATUS )
 
-*  Create a 2D Frame representing data value and the position on the 
+*  Create a 2D Frame representing data value and the position on the
 *  spectral GRID axis.
          GF = AST_FRAME( 2, 'Title=Data value versus spectral '//
      :                   'grid position', STATUS )
@@ -1214,7 +1214,7 @@
 *  Get a Mapping from GF to DPF. This is a UnitMap on the data (second)
 *  axis, and is the SPMAP found earlier on the spectral axis.
          CALL AST_INVERT( SPMAP, STATUS )
-         GDMAP = AST_CMPMAP( SPMAP, AST_UNITMAP( 1, ' ', STATUS ), 
+         GDMAP = AST_CMPMAP( SPMAP, AST_UNITMAP( 1, ' ', STATUS ),
      :                       .FALSE., ' ', STATUS )
 
 *  Create a FrameSet from these in which GF is the base Frame and DPF is
@@ -1226,14 +1226,14 @@
 *  on to each spectrum's cell.
          BBOX( 1 ) = 0.5
          BBOX( 2 ) = YBOT
-         BBOX( 3 ) = DBLE( SUBND( SPBAX( 1 ) ) - 
+         BBOX( 3 ) = DBLE( SUBND( SPBAX( 1 ) ) -
      :                     SLBND( SPBAX( 1 ) ) ) + 1.5D0
          BBOX( 4 ) = YTOP
 
 *  Indicate we have not yet draw a spectrum.
-         FIRST = .TRUE.   
+         FIRST = .TRUE.
 
-*  Loop round each spectrum cell. CGX and CGY are the spatial GRID indices 
+*  Loop round each spectrum cell. CGX and CGY are the spatial GRID indices
 *  of the spectrum in the supplied cube.
          DO IX = 1, NX
             CGX = NINT( 0.5 + ( REAL( IX ) - 0.5 )*
@@ -1241,19 +1241,19 @@
             CALL PGBBUF
             DO IY = 1, NY
 
-*  Skip if no spectrum was drawn in this cell. 
+*  Skip if no spectrum was drawn in this cell.
                IF( CGOOD( IX, IY ) ) THEN
                   CGY = NINT( 0.5 + ( REAL( IY ) - 0.5 )*
-     :                        REAL( DIM( 2 ) )/REAL( NY ) ) 
+     :                        REAL( DIM( 2 ) )/REAL( NY ) )
 
 *  If the spectra are being aligned spatially with an existing data plot...
                   IF( ALIGN ) THEN
 
 *  Transform the spatial grid (x,y) for the spectrum into graphics coords.
-                     DCGX = DBLE( CGX ) 
-                     DCGY = DBLE( CGY ) 
+                     DCGX = DBLE( CGX )
+                     DCGY = DBLE( CGY )
                      CALL AST_TRAN2( CGTOGR, 1, DCGX, DCGY, .TRUE., GRX,
-     :                               GRY, STATUS ) 
+     :                               GRY, STATUS )
 
 *  Get the bounds of the spectrum's cell in GRAPHICS coords. The cell is
 *  centred on the spectrum position found above.
@@ -1272,10 +1272,10 @@
                      GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
                   END IF
 
-*  If this is the first spectrum, we draw a grid around it using 
+*  If this is the first spectrum, we draw a grid around it using
 *  AST_GRID.
                   IF( FIRST ) THEN
-                     FIRST = .FALSE.              
+                     FIRST = .FALSE.
 
 *  Record the bounds of the first cell in GRAPHICS co-ordinates.
                      GBOXFX = GBOX( 1 )
@@ -1284,14 +1284,14 @@
 *  Create a new Plot covering just the current cell.
                      IPLOT2 = AST_PLOT( FS, GBOX, BBOX, ' ', STATUS )
 
-*  Save the Mapping from GRAPHICS to the DATAPLOT Frame. We will later 
+*  Save the Mapping from GRAPHICS to the DATAPLOT Frame. We will later
 *  add the DATAPLOT Frame into the Plot stored in the AGI database, so
 *  that subsequent calls to LINPLOT can align with it.
                      DPMAP = AST_GETMAPPING( IPLOT2, AST__BASE,
      :                                       AST__CURRENT, STATUS )
 
 *  Set the style for plotting in the line plot.
-                     CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'SPECSTYLE', 
+                     CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'SPECSTYLE',
      :                                 IPLOT2, STATUS )
 
 *  Ensure no title or minor tick marks are produced.
@@ -1305,28 +1305,28 @@
      :                             STATUS )
                      END IF
 
-*  Reduce the text size (this is normally done by KPG1_PLOT, but the 
-*  Plot we are using here was not created by KPG1_PLOT).  The 
+*  Reduce the text size (this is normally done by KPG1_PLOT, but the
+*  Plot we are using here was not created by KPG1_PLOT).  The
 *  non-linear scaling gives better results in practise than the linear.
                      RHOPIC = SQRT( REAL( MAX( NX, NY ) ) )
-                     CALL AST_SETR( IPLOT2, 'Size(NumLab1)', 
-     :                              AST_GETR( IPLOT2, 'Size(NumLab1)', 
+                     CALL AST_SETR( IPLOT2, 'Size(NumLab1)',
+     :                              AST_GETR( IPLOT2, 'Size(NumLab1)',
      :                              STATUS )/ RHOPIC, STATUS )
-                     CALL AST_SETR( IPLOT2, 'Size(NumLab2)', 
-     :                              AST_GETR( IPLOT2, 'Size(NumLab2)', 
+                     CALL AST_SETR( IPLOT2, 'Size(NumLab2)',
+     :                              AST_GETR( IPLOT2, 'Size(NumLab2)',
      :                              STATUS )/ RHOPIC, STATUS )
-                     CALL AST_SETR( IPLOT2, 'Size(TextLab1)', 
-     :                              AST_GETR( IPLOT2, 'Size(TextLab1)', 
+                     CALL AST_SETR( IPLOT2, 'Size(TextLab1)',
+     :                              AST_GETR( IPLOT2, 'Size(TextLab1)',
      :                              STATUS )/ RHOPIC, STATUS )
-                     CALL AST_SETR( IPLOT2, 'Size(TextLab2)', 
-     :                              AST_GETR( IPLOT2, 'Size(TextLab2)', 
+                     CALL AST_SETR( IPLOT2, 'Size(TextLab2)',
+     :                              AST_GETR( IPLOT2, 'Size(TextLab2)',
      :                              STATUS )/ RHOPIC, STATUS )
 
 *  Draw lines using KPG1_ASPLN. This records details of the lines
 *  drawn in the AST KeyMap (TICKMAP) specified when calling KPG1_ASPLG.
                      TICKMAP = AST_KEYMAP( ' ', STATUS )
                      CALL KPG1_ASPLG( TICKMAP, BLEDGE, X1, X2, Y1, Y2 )
-                     CALL AST_GRFSET( IPLOT2, 'Line', KPG1_ASPLN, 
+                     CALL AST_GRFSET( IPLOT2, 'Line', KPG1_ASPLN,
      :                                STATUS )
                      CALL AST_SETL( IPLOT2, 'Grf', .TRUE., STATUS )
 
@@ -1335,7 +1335,7 @@
                      CALL KPG1_SETASTDSB( .FALSE. )
 
 *  Draw the grid if required.
-                     IF( SPAXES ) CALL KPG1_ASGRD( IPLOT2, IPICF, 
+                     IF( SPAXES ) CALL KPG1_ASGRD( IPLOT2, IPICF,
      :                                             .TRUE., STATUS )
 
 *  Get the bounding box of the graphics produced by the above call to
@@ -1355,9 +1355,9 @@
                         MAPKEY = 'POLYLINE'
                         IAT = 8
                         CALL CHR_PUTI( I, MAPKEY, IAT )
-                        IF( AST_MAPGET0A( TICKMAP, MAPKEY, KM, 
+                        IF( AST_MAPGET0A( TICKMAP, MAPKEY, KM,
      :                                    STATUS ) ) THEN
-                           IF( AST_MAPGET0I( KM, 'N', NP, 
+                           IF( AST_MAPGET0I( KM, 'N', NP,
      :                                       STATUS ) ) THEN
                               NPTOT = NPTOT + NP
                            END IF
@@ -1370,26 +1370,26 @@
                      CALL PSX_CALLOC( NPTOT, '_REAL', IPY, STATUS )
                      CALL PSX_CALLOC( NPOLY, '_INTEGER', IPN, STATUS )
 
-*  Establish the graphical attributes that AST_GRID uses to draw the 
+*  Establish the graphical attributes that AST_GRID uses to draw the
 *  tick marks.
-                     CALL KPG1_PGSTY( IPLOT2, 'TICKS', .TRUE., ATTRS, 
+                     CALL KPG1_PGSTY( IPLOT2, 'TICKS', .TRUE., ATTRS,
      :                               STATUS )
 
-*  For subsequent cells, draw the tick marks by translating the 
-*  polylines stored in TICKMAP from the first cell to the current cell. 
+*  For subsequent cells, draw the tick marks by translating the
+*  polylines stored in TICKMAP from the first cell to the current cell.
 *  This is faster than drawing the ticks using AST_GRID.
                   ELSE IF( SPAXES ) THEN
 
-*  Find the offset in graphics co-ordinates from the bottom-left corner 
+*  Find the offset in graphics co-ordinates from the bottom-left corner
 *  of the first cell to be annotated to the current cell.
                      OFFX = GBOX( 1 ) - GBOXFX
                      OFFY = GBOX( 2 ) - GBOXFY
 
 *  Draw the tick marks for this cell.
-                     CALL KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY, 
-     :                                TICKMAP, %VAL( CNF_PVAL( IPX ) ), 
-     :                                %VAL( CNF_PVAL( IPY ) ), 
-     :                                %VAL( CNF_PVAL( IPN ) ), 
+                     CALL KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY,
+     :                                TICKMAP, %VAL( CNF_PVAL( IPX ) ),
+     :                                %VAL( CNF_PVAL( IPY ) ),
+     :                                %VAL( CNF_PVAL( IPN ) ),
      :                                STATUS )
                    END IF
                END IF
@@ -1420,13 +1420,13 @@
             DGLB( 2 ) = Y1 - SMARGY
             DGUB( 1 ) = X2 + SMARGX
             DGUB( 2 ) = Y2 + SMARGY
-            CALL ATL_CUTPL( IPLOT, AST__BASE, DGLB, DGUB, IPLOT4, 
+            CALL ATL_CUTPL( IPLOT, AST__BASE, DGLB, DGUB, IPLOT4,
      :                      STATUS )
 
 *  Draw the axes.
             CALL KPG1_ASGRD( IPLOT4, IPICF, .TRUE., STATUS )
 
-*  If a key is being drawn, move it to the right to take account of the 
+*  If a key is being drawn, move it to the right to take account of the
 *  expansion to the spatial axes above.
             IF( KEY ) KEYX = SMARGX
 
@@ -1443,10 +1443,10 @@
 *  (GRID1,GRID2,GRID3,DATA) co-ordinates.
          SWM = AST_SWITCHMAP( SLM, AST__NULL, NCELL, CMAP, ' ', STATUS )
 
-*  Create a Mapping that transforms (GRID1,GRID2,GRID3,DATA) into the 
+*  Create a Mapping that transforms (GRID1,GRID2,GRID3,DATA) into the
 *  current Frame of the NDF's WCS FrameSet (with a fourth DATA axis).
          CALL AST_INVERT( CBMAP, STATUS )
-         CPM = AST_CMPMAP( CBMAP, AST_UNITMAP( 1, ' ', STATUS ), 
+         CPM = AST_CMPMAP( CBMAP, AST_UNITMAP( 1, ' ', STATUS ),
      :                     .FALSE., ' ', STATUS )
          WCM = AST_CMPMAP( SWM, CPM, .TRUE., ' ', STATUS )
 
@@ -1457,31 +1457,31 @@
 *  earlier.
          CALL KPG1_GDGET( IPICD, AST__NULL, .FALSE., IPLOTD, STATUS )
 
-*  Add in the DATAPLOT Frame (that describes the data value/frequency 
+*  Add in the DATAPLOT Frame (that describes the data value/frequency
 *  axes for the first valid cell). LINPLOT can align with this Frame.
          CALL AST_ADDFRAME( IPLOTD, AST__BASE, DPMAP, DPF, STATUS )
-         
+
 *  Add in the SKY Frame (which describes the celestial axes of the outer
 *  grid). DISPLAY/CONTOUR can align with this. The GRAPHICS to SKY
 *  Mapping is obtained from the Plot used to draw the celestial axes.
-         CALL AST_ADDFRAME( IPLOTD, AST__BASE, 
-     :                      AST_GETMAPPING( IPLOT, AST__BASE, 
+         CALL AST_ADDFRAME( IPLOTD, AST__BASE,
+     :                      AST_GETMAPPING( IPLOT, AST__BASE,
      :                                      AST__CURRENT, STATUS ),
      :                      SKYF, STATUS )
-         
-*  Add in the (GRID1,GRID2,GRID3,DATA) Frame using the WCM Mapping to 
+
+*  Add in the (GRID1,GRID2,GRID3,DATA) Frame using the WCM Mapping to
 *  connect it to the GRAPHICS (base) Frame.
          CALL AST_ADDFRAME( IPLOTD, AST__BASE, WCM, WCF, STATUS )
 
 *  Store the modified Plot back in the AGI database
          CALL KPG1_GDPUT( IPICD, 'PIXEL', ' ', IPLOTD, STATUS )
- 
+
 *  Plot the key if necessary.
 *  ==========================
          IF ( KEY ) THEN
 
-*  If no value was supplied for the vertical position of the KEY using 
-*  Parameter KEYPOS, find the value which puts the top of the key level 
+*  If no value was supplied for the vertical position of the KEY using
+*  Parameter KEYPOS, find the value which puts the top of the key level
 *  with the top of the DATA picture.
             IF ( NKP .LT. 2 ) THEN
 
@@ -1504,7 +1504,7 @@
 *  Activate the KEY picture.  This returns a pointer to an AST Plot
 *  which can be used to draw in the KEY picture, and sets the current
 *  PGPLOT viewport so that it corresponds to the KEY picture.
-               CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, 
+               CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK,
      :                          STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -1514,22 +1514,22 @@
                CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
                KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
 
-*  If the horizontal positions was given using Parameter KEYPOS, just 
-*  activate the KEY picture. 
+*  If the horizontal positions was given using Parameter KEYPOS, just
+*  activate the KEY picture.
             ELSE
                KEYOFF = KEYPOS( 2 )
-               CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, 
+               CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK,
      :                          STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 999
             END IF
 
-*  Set the style for plotting in the key picture. 
-            CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'KEYSTYLE', IPLOTK, 
+*  Set the style for plotting in the key picture.
+            CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'KEYSTYLE', IPLOTK,
      :                       STATUS )
 
 *  Draw the key to the right of the grid plot and aligned with
 *  the top axis.
-            CALL KPS1_CLPKY( IPLOTK, YTOP, YBOT, SPBND, SPFRM, 
+            CALL KPS1_CLPKY( IPLOTK, YTOP, YBOT, SPBND, SPFRM,
      :                       LABEL, UNIT, KEYOFF, KEYX, STATUS )
 
 *  Report a context message if anything went wrong.
@@ -1562,7 +1562,7 @@
 *  Add a context report if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CLINPLOT_ERR', 'CLINPLOT: Failed to plot '//
-     :                 'line plots of a three-dimensional data set.', 
+     :                 'line plots of a three-dimensional data set.',
      :                 STATUS )
       END IF
 

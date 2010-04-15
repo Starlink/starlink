@@ -152,7 +152,7 @@
         else
           fmode = ' '
         end if
- 
+
         call dsa_specific_structure(refnam,name,fmode,dtanam,status)
 
         if(fmode.eq.' ') then
@@ -163,7 +163,7 @@
 
              call dta_loc(dtanam,nloc,status)
              call dat_type(nloc,type,status)
-             call dta_annul(nloc,status)           
+             call dta_annul(nloc,status)
         end if
         dtalen = chr_len(dtanam)
 
@@ -198,7 +198,7 @@
           else if(umode(2:2).eq.'S') then
 * Old DSA library
 *            call dta_wrvars(fulnam,nelm,work,status)
-*          call cmp_put1i(nloc,fulnam,nelm,work,status)   
+*          call cmp_put1i(nloc,fulnam,nelm,work,status)
 
              call dta_loc(fulnam,nloc,status)
 *             call dat_put(nloc,'_WORD',1,nelm,work,status)
@@ -207,7 +207,7 @@
              else
                call dat_put(nloc,'_WORD',0,0,work,status)
              end if
-                
+
              call dta_annul(nloc,status)
 
           else
@@ -233,14 +233,14 @@
 
         else if(umode(1:1).eq.'R') then
           if(umode(2:2).eq.'C') then
-* Old DTA library 
+* Old DTA library
 *           call dta_rdvarc(fulnam,nelm,chwork,status)
 *CALL CMP_GET0C(NLOC,fulnam, chwork, STATUS)
 
              call dta_loc(fulnam,nloc,status)
 
              call dat_state(nloc,state,status)
-             
+
              if(state) then
 
                 call dat_get0c(nloc,chwork,status)
@@ -256,7 +256,7 @@
 
              call dta_loc(fulnam,nloc,status)
              call dat_state(nloc,state,status)
-             if(state) then             
+             if(state) then
 
                call dat_get(nloc,'_REAL',1,nelm,work,status)
 
@@ -278,14 +278,14 @@
                 call dat_get(nloc,'_WORD',1,nelm,work,status)
              else
                  call dat_state(nloc,state,status)
-             
+
                  if(state) then
 
                     call dat_get(nloc,'_WORD',0,0,work,status)
 
                  end if
              end if
- 
+
              call dta_annul(nloc,status)
 
 
@@ -334,16 +334,16 @@
 
 
           call DAT_PAREN(dloc, chars1p, status)
- 
-          
+
+
           call dat_ncomp(cloc, ncomp, status)
           do 1 i=1, ncomp
              call dat_index(cloc, i, tloc, status)
              call dat_name(tloc, tname, status)
              call dat_copy(tloc, chars1p, name, status)
-             call dat_annul(tloc, status)             
+             call dat_annul(tloc, status)
  1        continue
-          
+
           call dat_annul(chars1p, status)
           call dat_annul(cloc, status)
           call dat_annul(dloc, status)
@@ -369,7 +369,7 @@
          CALL ERR_REP( 'FDA_E084', 'DTA1_DLVAR: Error deleting the ' //
      :        'object ^FDA_T016. The DTA object name cannot be ' //
      :        'split into parent and new component.', STATUS )
-         
+
          GO TO 500
       END IF
 *     Locate the parent.
@@ -391,7 +391,7 @@
          STATUS = 0
       END IF
       CALL ERR_RLSE
-      
+
 
           if(status.ne.SAI__OK) then
             call tnw_dtaerr(status,'deleting',dtanam)
@@ -419,13 +419,13 @@
 
                 call dat_mapv(nloc,'_CHAR','UPDATE',work,
      $               el,status)
-             
+
              else
                 call dat_mapv(nloc,'_CHAR','WRITE',work,
      $               el,status)
-                
+
              endif
-             
+
 *             call dta_annul(nloc,status)
 
 
@@ -510,7 +510,7 @@
              call dat_mapv(nloc,'_INTEGER','UPDATE',work,
      $            el,status)
 
-             else 
+             else
              call dat_mapv(nloc,'_INTEGER','WRITE',work,
      $            el,status)
 
@@ -549,7 +549,7 @@
              else
              call dat_mapv(nloc,'_WORD','WRITE',work,
      $            el,status)
-  
+
              endif
 
 *             call dta_annul(nloc,status)
@@ -571,14 +571,14 @@
 
 *      Convert to array element
 * AJH 5/99 Only if mode is not SU,FU,CU,IU
-       
+
 	if (umode(2:2).ne.'U') then
-	
+
 		  work = dyn_element(work)
-	  end if   
+	  end if
           if(status.ne.SAI__OK) then
             call tnw_dtaerr(status,'mapping',fulnam)
-          end if 
+          end if
         end if
       end if
       return

@@ -92,7 +92,7 @@ itcl::class gaia::GaiaPolUKey {
 #  Increment the number of objects created.
       incr id_
 
-#  Create a unique font name for key labels. 
+#  Create a unique font name for key labels.
       set lfont_ "GaiaPolKeyFont$id_"
 
 #  Create the font

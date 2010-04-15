@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*     This application determines if the two supplied Regions overlap. The 
-*     two Regions are converted to a commnon coordinate system before 
-*     performing the check. If this conversion is not possible (for instance 
-*     because the two Regions represent areas in different domains), then 
+*     This application determines if the two supplied Regions overlap. The
+*     two Regions are converted to a commnon coordinate system before
+*     performing the check. If this conversion is not possible (for instance
+*     because the two Regions represent areas in different domains), then
 *     the check cannot be performed.
 
 *  Usage:
@@ -31,11 +31,11 @@
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the first region. If an NDF is 
-*        supplied, the current Frame in the WCS FrameSet will be used. 
+*        An NDF or text file holding the first region. If an NDF is
+*        supplied, the current Frame in the WCS FrameSet will be used.
 *     THAT = LITERAL (Read)
-*        An NDF or text file holding the second region. If an NDF is 
-*        supplied, the current Frame in the WCS FrameSet will be used. 
+*        An NDF or text file holding the second region. If an NDF is
+*        supplied, the current Frame in the WCS FrameSet will be used.
 *     RESULT = _INTEGER (Write)
 *        On exit, this holds an integer indicating if there is any overlap
 *        between the two Regions. Possible values are:
@@ -109,7 +109,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -157,7 +157,7 @@
          CALL MSG_OUT( ' ', 'The second Region is the exact negation '//
      :                 'of the first Region to within their '//
      :                 'uncertainties.', STATUS )
-      END IF    
+      END IF
 
       CALL MSG_BLANK( STATUS )
 

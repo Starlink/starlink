@@ -1,8 +1,8 @@
- 
- 
-      SUBROUTINE PERIOD_WINDOW(YPTR, MXCOL, MXSLOT, NPTSARRAY, 
+
+
+      SUBROUTINE PERIOD_WINDOW(YPTR, MXCOL, MXSLOT, NPTSARRAY,
      :                         YERRORARRAY, INFILEARRAY, DETRENDARRAY)
- 
+
 C==============================================================================
 C Sets all data points to unity so that the window function can be generated.
 C
@@ -12,22 +12,22 @@ C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C==============================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'
- 
+
 C-----------------------------------------------------------------------------
 C PLT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER MXCOL, MXSLOT
       INTEGER YPTR(MXSLOT), NPTSARRAY(MXSLOT)
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_WINDOW declarations.
 C-----------------------------------------------------------------------------
- 
+
       DOUBLE PRECISION WINDOW, EWINDOW
       INTEGER NDATA, FIRSTSLOT, LASTSLOT, SLOT, FIRSTOUT, IFAIL
       INTEGER COUNTER, SLOTOUT
@@ -35,11 +35,11 @@ C-----------------------------------------------------------------------------
       LOGICAL YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT)
       CHARACTER*72 INFILEARRAY(MXSLOT)
       DATA WINDOW, EWINDOW/1.0D0, 0.0D0/
- 
+
 C-----------------------------------------------------------------------------
 C Select input and output data slots.
 C-----------------------------------------------------------------------------
- 
+
       WRITE (*, *) ' '
       CALL PERIOD_SELECT(FIRSTSLOT, LASTSLOT, FIRSTOUT, MXSLOT, IFAIL)
       IF ( IFAIL.EQ.1 ) GO TO 200
@@ -77,7 +77,7 @@ C-----------------------------------------------------------------------------
          INFILEARRAY(SLOTOUT) = 'Windowed ' // INFILEARRAY(SLOT)
          WRITE (*, *) '** OK: Filled slot = ', SLOTOUT
  100  CONTINUE
- 
+
  200  CONTINUE
       RETURN
       END

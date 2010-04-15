@@ -4,7 +4,7 @@ C
 C     G E N _ R E V R 8
 C
 C     Reverses the rows of a 2D array.  That is, reverses
-C     the order of the data along each of the rows - the 
+C     the order of the data along each of the rows - the
 C     data remains in the same row.  This routine is the same
 C     as GEN_REV2D, except that it works on 8-byte data.
 C
@@ -50,7 +50,7 @@ C
                OUT(IPTR2)=TEMP
                IPTR1=IPTR1+1
                IPTR2=IPTR2-1
-            END DO 
+            END DO
             IBASE=IBASE+IX
          END DO
       ELSE

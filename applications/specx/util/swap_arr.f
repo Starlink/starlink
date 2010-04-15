@@ -20,7 +20,7 @@ C   Swap each byte of DATA(J) with those of DATA(J1)
           IDATA(IOFF+IB)=IDATA(IOFF1+IB)
           IDATA(IOFF1+IB)=TEMP
         END DO
-      END DO        
+      END DO
       RETURN
       END
 

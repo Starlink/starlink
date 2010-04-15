@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_SPLINE_REGRID_1 (EFF_RADIUS,
-     :     IN_DATA, X, Y, NPIX, 
+     :     IN_DATA, X, Y, NPIX,
      :     PIXSPACE, NI, NJ, ICEN, JCEN, QUALITY, STATUS)
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL SCULIB_SPLINE_REGRID_1 (EFF_RADIUS,
-*    :     IN_DATA, X, Y, NPIX, 
+*    :     IN_DATA, X, Y, NPIX,
 *    :     PIXSPACE, NI, NJ, ICEN, JCEN, QUALITY, STATUS)
 
 *  Description:
@@ -68,7 +68,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -110,7 +110,7 @@
       REAL RDIST_SQ                              ! RDIST squared
       INTEGER PIX_RANGE                          ! Pixel range
       REAL RES_ELEMENT                           ! Resolution element
-      
+
 *   local data
 *.
 
@@ -135,8 +135,8 @@
       END DO
 
 *  go through the input pixels of this dataset, set all elements of
-*  the scratch array to zero that lie within one res element of an input 
-*  point. 
+*  the scratch array to zero that lie within one res element of an input
+*  point.
 
       DO PIX = 1, NPIX
          IF (IN_DATA(PIX) .NE. VAL__BADR) THEN
@@ -157,5 +157,5 @@
             END DO
          END IF
       END DO
- 
+
       END

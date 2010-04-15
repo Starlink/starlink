@@ -58,7 +58,7 @@
 #        Added facility to use netscape (1.1) as well as Mosaic.
 #     17-APR-1997 (PDRAPER):
 #        Modified to show a message when an existing browser is
-#        found (which is not started here). This is meant to 
+#        found (which is not started here). This is meant to
 #        draw the users attention when the browser is iconified.
 #     22-JUL-2003 (MBT):
 #        Added the ability to use Mozilla.
@@ -79,7 +79,7 @@
 #.
 
 #  Check the browser to use.
-      if { ! [info exists CCDbrowser] } { 
+      if { ! [info exists CCDbrowser] } {
          set CCDbrowser netscape
       }
       switch -regexp $CCDbrowser {
@@ -100,13 +100,13 @@
 	       if { [catch {exec kill -USR1 $mosaicpid}] } {
 		  set mosaicpid 0
 	       }
-	    } 
+	    }
 	    if { $mosaicpid == 0 } {
 	       exec  $CCDbrowser $filename &
                set showhelp_started 1
                CCDIssueInfo "Starting up $CCDbrowser"
 	    } else {
-               if { ! [info exists showhelp_started] } { 
+               if { ! [info exists showhelp_started] } {
                   set showhelp_started 1
                   CCDIssueInfo "Help is displayed in $CCDbrowser"
                }
@@ -114,20 +114,20 @@
 	 }
 
          [Nn]etscape|[Mm]ozilla|[Ff]irefox {
-	       
+
 #  Use Mozilla/variant. This uses the NCAPIs methods as of netscape 1.1b1.
-#  Attempt to make browser goto the required page. If this fails then the 
+#  Attempt to make browser goto the required page. If this fails then the
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
 	    if { [catch {exec $CCDbrowser -noraise -remote openURL(file://localhost/$filename)}] } {
 	       set netscapepid 0
 	    }
-            if { $netscapepid == 0 } { 
+            if { $netscapepid == 0 } {
                set netscapepid [exec $CCDbrowser file://localhost/$filename &]
                CCDIssueInfo "Starting up $CCDbrowser"
                set showhelp_started 1
 	    } else {
-               if { ! [info exists showhelp_started] } { 
+               if { ! [info exists showhelp_started] } {
                   set showhelp_started 1
                   CCDIssueInfo "Help is displayed in $CCDbrowser"
                }

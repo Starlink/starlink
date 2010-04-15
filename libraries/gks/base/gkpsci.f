@@ -38,7 +38,7 @@ C# IL>=a, OL>=0
 *
       INTEGER NP, NCROSS, INDEX(NCROSS),ICLIPS(NCROSS), ICLPS1
       REAL    RECT(4), PX(NP),PY(NP)
- 
+
 *  COMMON BLOCK USAGE
 *  ------------------
 *     None
@@ -126,5 +126,5 @@ C# IL>=a, OL>=0
 *       Move to next two points
         ICLPSA = ICLPSB
   300 CONTINUE
- 
+
       END

@@ -13,17 +13,17 @@
 *     C function
 
 *  Invocation:
-*     int *smf_find_median( const float *farray, const double *darray, int nel, 
+*     int *smf_find_median( const float *farray, const double *darray, int nel,
 *                           int *hist, float *median, int *status )
 
 *  Arguments:
 *     farray = const float * (Given)
 *        Pointer to an array of single precision data for which the
-*        median is to be returned. Only one of "farray" and "darray" 
+*        median is to be returned. Only one of "farray" and "darray"
 *        should be non-NULL.
 *     darray = const float * (Given)
 *        Pointer to an array of double precision data for which the
-*        median is to be returned. Only one of "farray" and "darray" 
+*        median is to be returned. Only one of "farray" and "darray"
 *        should be non-NULL.
 *     nel = int (Given)
 *        The number of elements in farray or darray (which ever is
@@ -41,7 +41,7 @@
 *  Returned Value:
 *     A pointer to the histogram array that was used. This will be a copy
 *     of "hist" if "hist" was supplied non-NULL, or a pointer to a new array
-*     if "hist" was supplied NULL. This pointer can be passed to subsequent 
+*     if "hist" was supplied NULL. This pointer can be passed to subsequent
 *     calls to this function as the "hist" argument. It should be freed
 *     using astFree when it is no longer needed.
 
@@ -103,7 +103,7 @@
 #include "smf.h"
 #include "smf_err.h"
 
-int *smf_find_median( const float *farray, const double *darray, size_t nel, 
+int *smf_find_median( const float *farray, const double *darray, size_t nel,
                       int *hist, float *median, int *status ){
 
   const size_t threshold = 10000;  /* point at which we abandon sorting */
@@ -177,7 +177,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
 /* First deal with single precision data... */
       if( farray ) {
 
-/* Initialise the max and min values in the data to bad so that kpg1Ghstx 
+/* Initialise the max and min values in the data to bad so that kpg1Ghstx
    will find them itself. */
          fvalmax = VAL__BADR;
          fvalmin = VAL__BADR;
@@ -193,7 +193,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
 /* Now deal with double precision data. */
       } else {
 
-/* Initialise the max and min values in the data to bad so that kpg1Ghstx 
+/* Initialise the max and min values in the data to bad so that kpg1Ghstx
    will find them itself. */
          valmax = VAL__BADD;
          valmin = VAL__BADD;
@@ -212,7 +212,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
 
 /* Otherwise, find the median value in the histogram. */
       } else {
-         kpg1Hsstp( numbin, result, valmax, valmin, &dsum, &dmean, &dmedian, 
+         kpg1Hsstp( numbin, result, valmax, valmin, &dsum, &dmean, &dmedian,
                     &dmode, status );
       }
 
@@ -222,7 +222,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
        *status = SMF__NOMEM;
        msgSeti( "NB", numbin);
        errRep(" ", "smf_find_median unable to allocate memory for histogram"
-              " of ^NB bins", status);  
+              " of ^NB bins", status);
    }
 
 /* Return a pointer to the histogram array. */

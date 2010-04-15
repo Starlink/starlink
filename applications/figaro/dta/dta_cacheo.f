@@ -33,7 +33,7 @@ C     (>) CACHEI   Cache initialisation flag
 C
 C     All in common blocks CACHEN and CACHEC
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     DAT_ANNUL    (HDS_ package) Annul an HDS locator
 C     EMS_BEGIN    (EMS_   "    ) Start a new EMS reporting environment
@@ -46,8 +46,8 @@ C
 C     20th March 1986. KS / AAO. Modified for use with the HDS version
 C                      of the DTA package.  Locators for all deleted
 C                      cache entries are now annulled.
-C     8th  Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     8th  Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C     20th Jan  1992.  KS / AAO.  Add calls to EMS. DUMMY set to zero before
 C                      being used as an inherited status value.

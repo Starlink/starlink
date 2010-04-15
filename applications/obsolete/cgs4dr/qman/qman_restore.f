@@ -17,13 +17,13 @@
 *    Global variables :
       INCLUDE 'QMAN_GLOBAL.PAR'       ! QMAN common block
       INCLUDE 'QMAN_COMMON.BLK'       ! QMAN global parameter constants
-*    External references : 
+*    External references :
       INTEGER CHR_LEN                 ! Finds used length of string
 *    Local variables :
       CHARACTER*( MSG_VAL_LEN ) FILE  ! Output filename
-      CHARACTER*( MSG_VAL_LEN+36 ) 
+      CHARACTER*( MSG_VAL_LEN+36 )
      :   CREC                         ! Input from file
-      CHARACTER*( MSG_VAL_LEN+36 ) 
+      CHARACTER*( MSG_VAL_LEN+36 )
      :   DREC                         ! Input from file
       INTEGER DLEN                    ! Length of string
       INTEGER CLEN                    ! Length of string
@@ -40,13 +40,13 @@
 *   Check the password (if specified)
       CALL QMAN_CHECK_PWD( STATUS )
 
-*   Get the output file 
+*   Get the output file
       CALL CHR_FILL( ' ', FILE )
       CALL PAR_GET0C( 'FILE', FILE, STATUS )
 
 *   Open it for read access
-      CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'READ', 
-     :  'LIST', 0, FD, STATUS )      
+      CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'READ',
+     :  'LIST', 0, FD, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'QMAN_RESTORE: '/
@@ -86,8 +86,8 @@
             CALL MSG_OUT( ' ', 'Command string is ^REC', STATUS )
           ENDIF
 
-          IF ( ( DREC(1:DLEN) .NE. ' ' ) .AND. 
-     :         ( DATE_TMP .NE. 0.0 )     .AND. 
+          IF ( ( DREC(1:DLEN) .NE. ' ' ) .AND.
+     :         ( DATE_TMP .NE. 0.0 )     .AND.
      :         ( STATUS .EQ. SAI__OK ) ) THEN
             MAXREC_PTR = MAXREC_PTR + 1
             DATEQ( MAXREC_PTR ) = DATE_TMP

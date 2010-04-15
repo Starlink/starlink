@@ -13,11 +13,11 @@
 *     POSITION = STRING_INANYL ( STRING, CHOICE )
 
 *  Description:
-*     Finds the position of the first character in STRING which fails to 
+*     Finds the position of the first character in STRING which fails to
 *     match any of the characters in CHOICE.
 
 *  Algorithm:
-*     Each character of STRING is compared with the characters in CHOICE 
+*     Each character of STRING is compared with the characters in CHOICE
 *     until no match is found, or STRING is exhausted.
 
 *  Copyright:
@@ -54,7 +54,7 @@
 
 *  Result:
 *     POSITION = INTEGER
-*           The value returned is the position in STRING at which the 
+*           The value returned is the position in STRING at which the
 *           first character mis-match occurs.
 *           If no mis-match found, then POSITION is set to zero.
 

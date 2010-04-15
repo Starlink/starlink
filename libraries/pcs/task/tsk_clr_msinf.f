@@ -16,7 +16,7 @@
 *     CALL TASK_CLEAR_MESSINFO ( ACTPTR, STATUS )
 
 *  Description:
-*     Marks all entries in the list of active subsidiary actions for an action 
+*     Marks all entries in the list of active subsidiary actions for an action
 *     as being unused. Entries are added to the list when user code calls
 *     TASK_ADD_MESSINFO to indicate that it has initiated an action in a
 *     subsidiary (lower-level) task. Entries are removed from the list when
@@ -96,7 +96,7 @@
 
 *  Arguments Given:
       INTEGER ACTPTR                  ! action pointer for which entries
-                                      ! are to be cleared 
+                                      ! are to be cleared
 
 *  Status:
       INTEGER STATUS
@@ -107,7 +107,7 @@
 *  Local Variables:
       INTEGER I                       ! counter
       LOGICAL DONE                    ! whether have finished going
-                                      ! through the list 
+                                      ! through the list
       CHARACTER*(MESSYS__TNAME) TASK  ! task name used in error messages
 *.
       IF ( STATUS .NE. SAI__OK ) RETURN

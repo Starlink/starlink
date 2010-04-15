@@ -13,7 +13,7 @@ C     reference name of what should be an empty structure - that is one
 C     created by DSA_OUTPUT (or equivalent), with no basis structure
 C     specified, and creates in that a specified set of the basic items
 C     one finds in a data structure such as a main data array, an error
-C     array, axis arrays, etc.  
+C     array, axis arrays, etc.
 C
 C  Language:
 C     FORTRAN
@@ -23,9 +23,9 @@ C     CALL DSA_SIMPLE_OUTPUT (REF_NAME,ITEM_LIST,TYPE,NDIM,DIMS,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) REF_NAME       (Fixed string,descr) The reference name 
+C     (>) REF_NAME       (Fixed string,descr) The reference name
 C                        associated with the outut structure.
-C     (>) ITEM_LIST      (Fixed string,descr) A list of the items to 
+C     (>) ITEM_LIST      (Fixed string,descr) A list of the items to
 C                        be created.  The format is described in detail
 C                        below.
 C     (>) TYPE           (Fixed string,descr) The default type for the
@@ -63,7 +63,7 @@ C     following the name (and dimensions, if specified) by a type in
 C     parentheses, eg `D,A1[1024,2](DOUBLE)' which indicates that the
 C     first axis array is to be double precision.  Note that you cannot
 C     specify both `ERRORS' and `VARIANCE'.
-C     
+C
 C  External variables used:
 C     Only common variables internal to the DSA package
 C
@@ -90,7 +90,7 @@ C     ICH_DELIM          Find next occurrence of one of a set of delimiters
 C     ICH_FOLD           Convert string to upper case
 C     ICH_KEY            See if a word is one of a set of keywords
 C     ICH_VERIF          Next character not in a specified set of characters
-C     DSA_CREATE_ARRAY   Create a data array 
+C     DSA_CREATE_ARRAY   Create a data array
 C     DSA_DECODE_DIMS    Decode a character string dimension specification
 C     DSA_REF_SLOT       Look up a reference name in common tables
 C     DSA_WRUSER         Output message to user
@@ -234,7 +234,7 @@ C
             IF ((KEY.EQ.VAR_KEY).OR.(KEY.EQ.ERR_KEY)) THEN
                ERRCNT=ERRCNT+1
                IF (ERRCNT.GT.1) THEN
-                  STRING='The string "'//ITEM_LIST(:ICH_LEN(ITEM_LIST))       
+                  STRING='The string "'//ITEM_LIST(:ICH_LEN(ITEM_LIST))
                   CALL DSA_WRUSER(STRING)
                   CALL DSA_WRUSER(
      :                    '" specifies both error and variance data.')
@@ -315,7 +315,7 @@ C
                END IF
             END IF
 C
-C           Now we have a name for the item, the dimensions for it, 
+C           Now we have a name for the item, the dimensions for it,
 C           and the type for it.  So we create it.
 C
             IF ((KEY.EQ.DATA_KEY).OR.(KEY.EQ.ERR_KEY).OR.

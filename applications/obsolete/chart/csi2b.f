@@ -5,29 +5,29 @@
 * C S I 2 B
 *- - - - - -
 *
-* A program which converts an ASCII version of the star catalog in 
+* A program which converts an ASCII version of the star catalog in
 * CSI format, as output by CSI2A, back into it's original binary
-* format. 
+* format.
 *     CSI2A and this program, CSI2B, are intended to make possible the
-* porting of CSI format star catalog files between systems, by 
+* porting of CSI format star catalog files between systems, by
 * converting the file into ASCII to make it portable, and back to binary
 * on the target machine.
 *
 * The program will ask the user which machine it is running on, first,
-* to be able to select the right record length for the RECL specifier 
-* of the OPEN statement, as the VAX expects it in longwords for 
-* unformatted files. It will then prompt the user for the pathnames 
-* for both the existing CSI ASCII file and the binary file which is 
+* to be able to select the right record length for the RECL specifier
+* of the OPEN statement, as the VAX expects it in longwords for
+* unformatted files. It will then prompt the user for the pathnames
+* for both the existing CSI ASCII file and the binary file which is
 * to be output.
 * The binary file is 14.9 Mbytes.
-* 
+*
 * It's all standard FORTRAN 77, and uses no external or internal
 * subroutines.
 *
 * Author:
 *       A J J Broderick, Starlink, 27 Jan 1993
 *-
-                   
+
       IMPLICIT NONE
 
       INTEGER LEN, COUNT, IOSTAT, NHD, IRA, IDEC, START, NUMBER
@@ -54,17 +54,17 @@
          LEN = 36
       ENDIF
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname of CSI ASCII file ?'
       READ(*, '(A)') FILE
 
       OPEN(UNIT = 11, FILE = FILE, FORM = 'FORMATTED', STATUS = 'OLD')
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname for CSI binary file ?'
       READ(*, '(A)') FILE
 
-      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN, 
+      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN,
      +     FORM = 'UNFORMATTED', STATUS = 'NEW')
 
       WRITE(*,*)
@@ -88,7 +88,7 @@
 
  300  WRITE(10, REC = COUNT, IOSTAT = IOSTAT)  NHD, SPEC, MB, MV,
      +     IRA, IDEC, DM, DMSIGN, DMZ, DMN, DMSUPP, ID
-                   
+
       COUNT = COUNT + 1
 
       READ(11, 1010, IOSTAT = IOSTAT) NHD, SPEC, MB, MV,

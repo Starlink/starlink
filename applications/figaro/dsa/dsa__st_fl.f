@@ -50,7 +50,7 @@ C     DTA_WRVARI        Write an integer to a data object.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -75,9 +75,9 @@ C     1st  Feb 1995.    I disagree with the 'wrongly' in the above comnment
 C                       for 4th Sep 92. My reading of the SDF format is that
 C                       you can have a top level BAD_PIXEL flag. The problem
 C                       was that the original code didn't allow for the case
-C                       where there was a structured array that could have 
+C                       where there was a structured array that could have
 C                       its own BAD_PIXEL flag. The new version allows for
-C                       both cases. KS/AAO.                  
+C                       both cases. KS/AAO.
 C
 C  Note:
 C     This version supports both the original Figaro data structures
@@ -156,7 +156,7 @@ C
 C
       ELSE
 C
-C        Original Figaro format. 
+C        Original Figaro format.
 C
 C        Generate flag name and try to write to it.  If this fails, it
 C        just may be because it didn't exist.  If so, attempt to create it

@@ -11,13 +11,13 @@ C     may be to a range of addresses which have been mapped
 C     directly onto the data structure disk file itself, or
 C     if conversion or alignment changes were needed, will be to
 C     a range of addresses containing the converted or
-C     aligned data. 
+C     aligned data.
 C
 C     Parameters -   (">" input, "<" output )
 C
 C     (>) NAME     (Character) The object name, in the standard
 C                  data structure format.  Should end with a
-C                  blank or the string end, and is case 
+C                  blank or the string end, and is case
 C                  insignificant.
 C     (>) NITEM    (Integer) The number of elements to be
 C                  read from the data structure.
@@ -32,7 +32,7 @@ C
 C     Common variables used - None
 C
 C     Subroutines / functions used -
-C 
+C
 C     DTA_MVAR     (DTA_ package) General mapping routine
 C
 C                                         KS / CIT 16th March 1983

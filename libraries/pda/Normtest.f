@@ -10,9 +10,9 @@
       DOUBLE PRECISION RESULT
 
       RESULT = PDA_PPND16( 0.5D0, IFAIL )
-      IF ( RESULT .NE. 0.0 ) THEN 
+      IF ( RESULT .NE. 0.0 ) THEN
          WRITE(*,*) 'Normal deviate routine fails test', RESULT
-      ELSE 
+      ELSE
          WRITE(*,*) 'Normal deviate routine passes test'
       END IF
       END

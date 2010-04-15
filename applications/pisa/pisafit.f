@@ -239,7 +239,7 @@
 *     11-AUG-1992 (PDRAPER):
 *        Now uses simple NDFs correctly.
 *     31-AUG-1996 (PDRAPER):
-*        Removed call to NAG routine E04JAF and replaced with PDA_LMDIF1.     
+*        Removed call to NAG routine E04JAF and replaced with PDA_LMDIF1.
 *     07-SEP-2004 (PDRAPER):
 *        Changed to use CNF_PVAL.
 *     14-AUG-2005 (TIMJ):
@@ -288,7 +288,7 @@
       PARAMETER ( CSIZE = 0.75 ) ! relative to norm
       REAL LOGE
       PARAMETER ( LOGE = 0.43429 ) ! LOG10( E )
-      
+
 *  Global variables:
       REAL XDAT, XCOR           ! Data values to fit
       INTEGER II                ! Number of points in XDAT and XCOR
@@ -300,8 +300,8 @@
                                 ! gaussian sigma can take
       REAL MINTHR, MAXTHR       ! Maximum and minimum values that
                                 ! fractional threshold can take
-      COMMON /PSA1_FITCM/ SD( FITSIZ ), XDAT( FITSIZ ), XCOR( FITSIZ ), 
-     :                    II, MINMIX, MAXMIX, MINSIG, MAXSIG, MINTHR, 
+      COMMON /PSA1_FITCM/ SD( FITSIZ ), XDAT( FITSIZ ), XCOR( FITSIZ ),
+     :                    II, MINMIX, MAXMIX, MINSIG, MAXSIG, MINTHR,
      :                    MAXTHR, NOTWEI
 
 *  Input array sizes passed solely to and from RDBUF2.
@@ -364,7 +364,7 @@
       DOUBLE PRECISION W( LIW )
       DOUBLE PRECISION EPS
       INTEGER IW( LW )
-      
+
 *  Miscellaneous local variables (from old style declarations).
       REAL YCURVE( FITSIZ )
       REAL XLIST( MAXOBJ ),YLIST( MAXOBJ )
@@ -465,7 +465,7 @@
 *  Offer this value as a default and accept user returned value.
       CALL PAR_DEF0R( 'BACKGROUND', XPEAK, STATUS )
       CALL PAR_GET0R( 'BACKGROUND', XPEAK, STATUS )
-     
+
 *  Open the input file.
       CALL PSA1_ASFIO( 'POSITIONS', 'READ', 'LIST', 0, IFS, OPEN,
      :                 STATUS )
@@ -545,7 +545,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
          DO 360 I = 1, SUBSIZ
             XBUF( I ) = 0.0
  360     CONTINUE
-     
+
 *  Form the limits of an area (+/- SUBSID/2 ish ) pixels about the centre
 *  of the object.
 *
@@ -563,7 +563,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
 
 *  Map the appropriate part of map array into our box and subtract the
 *  sky value.
-         CALL PSA1_EXSS( %VAL( CNF_PVAL( MAP ) ), IQL, IQH, IYL, IYH, 
+         CALL PSA1_EXSS( %VAL( CNF_PVAL( MAP ) ), IQL, IQH, IYL, IYH,
      :                   NYOUT, SUBSID, XPEAK, XBUF, STATUS )
 
 *  Form the actual position of object in sub-array
@@ -645,7 +645,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
             IF ( TEMP .GT. 0.0 ) THEN
                NTRUE = NTRUE + 1
                SBUF( NTRUE ) = LOG10( TEMP )
-     
+
 *  Find the mean radius of points contributing to this bin.
                IF ( ISBUF( I ) .GT. 0 ) THEN
                   RBUF( NTRUE ) = RSBUF( I ) / ISBUF( I )
@@ -681,7 +681,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
 *  Do not go past radius limit.
             IF ( RBUF( I ) .GT. RLIM ) GO TO 865
             II = II + 1
-            
+
 *  Record data in minimisation buffer and record distance estimate.
             XDAT( II ) = SBUF( I )
             XCOR( II ) = RBUF( I )
@@ -702,37 +702,37 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
             CALL MSG_OUT( 'NOT_ENOUGH',
      :           ' The attempted fit does not contain enough points ',
      :           STATUS)
-            
+
 *  Try again.
             GO TO 3
          END IF
-     
+
 *  Find the best fit to the data.
          XC( 1 ) = 2.0D0
          XC( 2 ) = 0.5D0
          XC( 3 ) = 0.1D0
          EPS = DBLE( VAL__EPSR )
-         CALL PDA_LMDIF1( PSA1_FITFN, II, 3, XC, FVEC, EPS, IFAIL, 
+         CALL PDA_LMDIF1( PSA1_FITFN, II, 3, XC, FVEC, EPS, IFAIL,
      :                    IW, W, LIW )
-         IF ( IFAIL .EQ. 0 ) THEN 
+         IF ( IFAIL .EQ. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'PISAFIT_BADARGS', 
+            CALL ERR_REP( 'PISAFIT_BADARGS',
      :           'Minization routine reports bad input arguments'//
      :           ' - possible programming error', STATUS )
             GO TO 999
-         ELSE IF ( IFAIL .GT. 4 ) THEN 
+         ELSE IF ( IFAIL .GT. 4 ) THEN
             CALL MSG_OUT( ' ', '  Problems with the fit, check plot',
      :                   STATUS )
          END IF
 
 *  Write out the final RMS value.
          EPS = 0.0D0
-         DO 132 I = 1, II 
+         DO 132 I = 1, II
             EPS = EPS + FVEC( I )
  132     CONTINUE
          EPS = ABS ( EPS )
          CALL MSG_SETR( 'RMS', REAL( SQRT( EPS ) ) )
-         CALL MSG_OUT( 'RMS_MESS', 
+         CALL MSG_OUT( 'RMS_MESS',
      :        ' RMS of fit                 = ^RMS ', STATUS )
 
 *  Set the model parameters.
@@ -775,7 +775,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
                FLOR = Q / ( 1.0 - XINT / LOG( 2.0 ) )
                YCURVE( I ) = LOG10( MAX( FGAUSS + FLOR, NOTZER ) )
             ELSE
-               FEXP= ( 1.0 - Q ) *  
+               FEXP= ( 1.0 - Q ) *
      :               EXP( CHANGE + ( RADTHR - XX ) * COEF2 )
                FLOR= Q / ( 1.0 - XINT / LOG( 2.0 ) )
                YCURVE( I ) = LOG10( MAX( FEXP + FLOR, NOTZER ) )
@@ -793,7 +793,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
             MINRES = MIN( RESIDS( I ) - REAL( SD( I ) ), MINRES )
  5       CONTINUE
          IF ( .NOT. NULL ) THEN
-            
+
 *  Plot the current fit.
             CALL FITPLO( ID0, ID1, ID2, RBUF, SBUF, YCURVE, RESIDS, SD,
      :                   RLIM, DLIM, CSIZE, II, NTRUE, MINRES, MAXRES,
@@ -841,7 +841,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
          CALL ERR_REP( 'PISAFIT_ERR',
      :        'PISAFIT: error producing fit',STATUS )
       ENDIF
-         
+
 *  Release the NDF, unmapping etc.
       CALL NDF_END( STATUS )
       END

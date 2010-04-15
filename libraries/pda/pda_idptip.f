@@ -1,11 +1,11 @@
- 
- 
-      SUBROUTINE PDA_IDPTIP(xd,yd,zd,nt,ipt,nl,ipl,pdd,iti,xii, 
+
+
+      SUBROUTINE PDA_IDPTIP(xd,yd,zd,nt,ipt,nl,ipl,pdd,iti,xii,
      :                      yii,zii,istat)
- 
+
 c this subroutine performs punctual interpolation or extrapola-
 c tion, i.e., determines the z value at a point.
- 
+
 c the input parameters are
 c     xd,yd,zd = arrays of dimension ndp containing the x,
 c           y, and z coordinates of the data points, where
@@ -25,21 +25,21 @@ c           the point for which interpolation is to be
 c           performed,
 c     xii,yii = x and y coordinates of the point for which
 c           interpolation is to be performed.
- 
+
 c the output parameter is
 c     zii = interpolated z value.
 *     istat = starlink error message.
- 
- 
+
+
 c declaration statements
       dimension xd(100), yd(100), zd(100), ipt(585), ipl(300), pdd(500)
       common /idpi  / itpv
-      dimension x(3), y(3), z(3), pd(15), zu(3), zv(3), zuu(3), zuv(3), 
+      dimension x(3), y(3), z(3), pd(15), zu(3), zv(3), zuu(3), zuv(3),
      :          zvv(3)
       real lu, lv
       equivalence (p5, p50)
       integer istat
- 
+
 *   check the inherited error status.
       if ( istat.ne.0 ) return
 
@@ -79,11 +79,11 @@ c preliminary processing
       it0 = iti
       ntl = nt + nl
       if ( it0.le.ntl ) then
- 
+
 c calculation of zii by interpolation.
 c checks if the necessary coefficients have been calculated.
          if ( it0.ne.itpv ) then
- 
+
 c loads coordinate and partial derivative values at the
 c vertices.
             jipt = 3*(it0-1)
@@ -101,7 +101,7 @@ c vertices.
                   pd(jpd) = pdd(jpdd)
  10            continue
  20         continue
- 
+
 c determines the coefficients for the coordinate system
 c transformation from the x-y system to the u-v system
 c and vice versa.
@@ -118,7 +118,7 @@ c and vice versa.
             bp = -b/dlt
             cp = -c/dlt
             dp = a/dlt
- 
+
 c converts the partial derivatives at the vertices of the
 c triangle for the u-v coordinate system.
             aa = a*a
@@ -138,7 +138,7 @@ c triangle for the u-v coordinate system.
                zuv(i) = ab*pd(jpd-2) + adbc*pd(jpd-1) + cd*pd(jpd)
                zvv(i) = bb*pd(jpd-2) + bdt2*pd(jpd-1) + dd*pd(jpd)
  40         continue
- 
+
 c calculates the coefficients of the polynomial.
             p00 = z(1)
             p10 = zu(1)
@@ -193,13 +193,13 @@ c calculates the coefficients of the polynomial.
             p23 = h3 - p22
             itpv = it0
          end if
- 
+
 c converts xii and yii to u-v system.
          dx = xii - x0
          dy = yii - y0
          u = ap*dx + bp*dy
          v = cp*dx + dp*dy
- 
+
 c evaluates the polynomial.
          p0 = p00 + v*(p01+v*(p02+v*(p03+v*(p04+v*p05))))
          p1 = p10 + v*(p11+v*(p12+v*(p13+v*p14)))
@@ -212,11 +212,11 @@ c evaluates the polynomial.
          il1 = it0/ntl
          il2 = it0 - il1*ntl
          if ( il1.eq.il2 ) then
- 
+
 c calculation of zii by extrapolation in the rectangle.
 c checks if the necessary coefficients have been calculated.
             if ( it0.ne.itpv ) then
- 
+
 c loads coordinate and partial derivative values at the end
 c points of the border line segment.
                jipl = 3*(il1-1)
@@ -234,7 +234,7 @@ c points of the border line segment.
                      pd(jpd) = pdd(jpdd)
  45               continue
  50            continue
- 
+
 c determines the coefficients for the coordinate system
 c transformation from the x-y system to the u-v system
 c and vice versa.
@@ -251,7 +251,7 @@ c and vice versa.
                bp = -b/dlt
                cp = -bp
                dp = ap
- 
+
 c converts the partial derivatives at the end points of the
 c border line segment for the u-v coordinate system.
                aa = a*a
@@ -271,7 +271,7 @@ c border line segment for the u-v coordinate system.
                   zuv(i) = ab*pd(jpd-2) + adbc*pd(jpd-1) + cd*pd(jpd)
                   zvv(i) = bb*pd(jpd-2) + bdt2*pd(jpd-1) + dd*pd(jpd)
  60            continue
- 
+
 c calculates the coefficients of the polynomial.
                p00 = z(1)
                p10 = zu(1)
@@ -294,24 +294,24 @@ c calculates the coefficients of the polynomial.
                p22 = -1.5*p23
                itpv = it0
             end if
- 
+
 c converts xii and yii to u-v system.
             dx = xii - x0
             dy = yii - y0
             u = ap*dx + bp*dy
             v = cp*dx + dp*dy
- 
+
 c evaluates the polynomial.
             p0 = p00 + v*(p01+v*(p02+v*(p03+v*(p04+v*p05))))
             p1 = p10 + v*(p11+v*(p12+v*p13))
             p2 = p20 + v*(p21+v*(p22+v*p23))
             zii = p0 + u*(p1+u*p2)
             return
- 
+
 c calculation of zii by extrapolation in the triangle.
 c checks if the necessary coefficients have been calculated.
          else if ( it0.ne.itpv ) then
- 
+
 c loads coordinate and partial derivative values at the vertex
 c of the triangle.
             jipl = 3*il2 - 2
@@ -324,7 +324,7 @@ c of the triangle.
                jpdd = jpdd + 1
                pd(kpd) = pdd(jpdd)
  80         continue
- 
+
 c calculates the coefficients of the polynomial.
             p00 = z(1)
             p10 = pd(1)
@@ -335,11 +335,11 @@ c calculates the coefficients of the polynomial.
             itpv = it0
          end if
       end if
- 
+
 c converts xii and yii to u-v system.
       u = xii - x(1)
       v = yii - y(1)
- 
+
 c evaluates the polynomial.
       p0 = p00 + v*(p01+v*p02)
       p1 = p10 + v*p11

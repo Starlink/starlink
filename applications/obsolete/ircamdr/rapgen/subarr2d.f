@@ -1,5 +1,5 @@
 
-*+  SUBARR2D - subtract two 2-d arrays 
+*+  SUBARR2D - subtract two 2-d arrays
 
       SUBROUTINE SUBARR2D ( INARRAY1, INARRAY2, OUTARRAY, DIMS1, DIMS2,
      :                      STATUS )
@@ -65,7 +65,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J             ! counter variables 
+     :   I, J             ! counter variables
 
 *-
 *    check status on entry - return if not o.k.
@@ -80,7 +80,7 @@
 *       loop round all pixels of the current row
          DO  I  =  1, DIMS1
 
-*          set output pixel to be first input array pixel minus 
+*          set output pixel to be first input array pixel minus
 *          second input array pixel
             OUTARRAY( I, J )  =  INARRAY1( I, J ) - INARRAY2( I, J )
 

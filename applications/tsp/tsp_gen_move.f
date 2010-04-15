@@ -1,4 +1,4 @@
-                                   
+
       SUBROUTINE TSP_GEN_MOVE(NB,A,B)
       IMPLICIT NONE
       INTEGER NB
@@ -8,5 +8,5 @@
           B(I)=A(I)
       ENDDO
       END
-   
+
 

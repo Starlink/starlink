@@ -22,7 +22,7 @@
 #     Unsetbox = string
 #        The name of the listbox containing all the available NDFs.
 #     Setbox = string
-#        The name of the listbox which will contain Sets of NDFs. 
+#        The name of the listbox which will contain Sets of NDFs.
 #     items = list of integers
 #        A list of integers (indexes) identifying items from the list in
 #        Unsetbox which will consitute a new Set in the Setbox.
@@ -86,8 +86,8 @@
 #  Check this item is in the range of the unsetted box.
             if { $item >= 0 && $item < $usize } {
 
-#  Set the Set Index value; it should be one of the values in the 
-#  CCDsetindices global if that exists.  If it's outside that range 
+#  Set the Set Index value; it should be one of the values in the
+#  CCDsetindices global if that exists.  If it's outside that range
 #  the user is asking for trouble anyway; just make something up.
                if { $hassetindices && $srank < [llength $CCDsetindices] } {
                   set sindex [lindex $CCDsetindices $srank]
@@ -98,7 +98,7 @@
 #  Annotate with the Set Index in the unsetted list.
                set olditem [CCDItemSetIndex $Unsetbox $item $sindex]
 
-#  If it was previously in a Set, remove its old appearance in the 
+#  If it was previously in a Set, remove its old appearance in the
 #  setted list.
                if { [regexp {^-?[0-9]*$} [lindex $olditem 0]] } {
                   set pos 0
@@ -110,7 +110,7 @@
                      }
                   }
                }
-               
+
 #  Add a new item to the setted list.
                $Setbox insert end [$Unsetbox get $item]
                incr srank
@@ -120,7 +120,7 @@
          CCDPurgeEmptySets $Setbox
 
 #  Adjust the position of the scroll box so we can see the items just
-#  appended.   
+#  appended.
          $Setbox vmoveto 1
       }
    }

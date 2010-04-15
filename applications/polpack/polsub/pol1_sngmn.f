@@ -27,7 +27,7 @@
 *        which had good values at the corresponding element, BEFORE any
 *        bad data has been rejected from the input images.
 *     MNFRAC = REAL (Given)
-*        The minimum fraction of good input images which must be retained 
+*        The minimum fraction of good input images which must be retained
 *        in order to create a good output pixel value. The number of images
 *        is rounded to the nearest integer, and limited to be at least 3.
 *     NOUT( EL ) = REAL (Given)
@@ -38,9 +38,9 @@
 *        The output Stokes vectors. Plane 1 holds I, plane 2 holds Q
 *        and plane 3 holds U.
 *     VOUT( EL, 3 ) = REAL (Given and Returned)
-*        The output variance values. 
+*        The output variance values.
 *     COUT( EL ) = REAL (Given and Returned)
-*        The output QU co-variance values. 
+*        The output QU co-variance values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -48,7 +48,7 @@
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
 
 *  Local Variables:
       CHARACTER BUF*10           ! Buffer for output message text
-      INTEGER I                  ! Loop index 
+      INTEGER I                  ! Loop index
       INTEGER NREJ               ! No of rejected output pixels
 *.
 
@@ -117,7 +117,7 @@
 
             NREJ = NREJ + 1
 
-         END IF            
+         END IF
 
       END DO
 

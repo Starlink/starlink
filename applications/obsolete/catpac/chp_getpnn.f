@@ -50,7 +50,7 @@
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'CHP_PAR'   ! Standard CHP constants
       INCLUDE 'CHP_ERR'   ! Standard CHP errors
-      
+
 *  Global Variables:
       INCLUDE 'CHP_CMN'   ! Standard CHP variables
 

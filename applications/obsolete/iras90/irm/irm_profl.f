@@ -17,8 +17,8 @@
 *     This subroutine is used to input a point source profile from the
 *     environment. See the help on application MAKEPORF for a
 *     description of the required format on the input NDF. The returned
-*     pointer DPNTR points to the first element of the mapped data 
-*     array and XPNTR points to the mapped AXIS CENTRE array of the 
+*     pointer DPNTR points to the first element of the mapped data
+*     array and XPNTR points to the mapped AXIS CENTRE array of the
 *     mapped data array.
 
 *  Arguments:
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,11 +140,11 @@
       CALL NDF_AMAP( NDF, 'Centre', 1, '_REAL', 'READ', XPNTR, EL,
      :               STATUS )
 
-*  Returne the number of samples and number of profiles contained in 
+*  Returne the number of samples and number of profiles contained in
 *  in the input NDF.
       NSMP = DIM( 1 )
       NPROF = DIM( 2 )
 
  999  CONTINUE
-      
+
       END

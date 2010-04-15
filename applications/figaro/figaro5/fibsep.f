@@ -198,7 +198,7 @@
      :                  %VAL(CNF_PVAL(tstart)))
         if ( isnew ) call cnf_unregp(tstart)
       end do
-      
+
       yeen = nint(centre(nfound) + widths(nfound)*2.0)
       call dyn_incad(zptr,'FLOAT',(nfound-1)*nl,tstart,isnew,status)
       call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,

@@ -6,10 +6,10 @@
 /*+
  *  Name:
  *     StarWCS
- 
+
  *  Purpose:
  *     Include file that defines the StarWCS class.
- 
+
  *  Authors:
  *     P.W. Draper (PWD)
  *     Allan Brighton, ESO (ALLAN)
@@ -18,7 +18,7 @@
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     24-JUL-1997 (PWD):
  *        Original version based on WCS for RTD.
@@ -157,12 +157,12 @@ public:
   int isCelestial() {return issky_;}
 
   //  Return the world coordinates string for the given image coords
-  char* pix2wcs( double x, double y, char* buf, int bufsz, 
+  char* pix2wcs( double x, double y, char* buf, int bufsz,
                  int hms_flag = 1 ) const;
 
   //  Return the world coordinates string for the given image
   //  coords. Choose if offimage coordinates should be converted.
-  char* pix2wcs( double x, double y, int notbound, char* buf, int bufsz, 
+  char* pix2wcs( double x, double y, int notbound, char* buf, int bufsz,
                 int hms_flag = 1 ) const;
 
   //  Return the world coords (in degrees, as 2 doubles) for the ximage coords
@@ -175,7 +175,7 @@ public:
   int wcs2pix(double ra, double dec, double &x, double &y) const;
 
   //  Get the image coordinates for the given world coords
-  int anyWcs2pix(double inx, double iny, int notcelestial, 
+  int anyWcs2pix(double inx, double iny, int notcelestial,
                  double &outx, double &outy) const;
 
   //  Get the image coordinates distance for the given world coords distance in deg
@@ -268,7 +268,7 @@ public:
 
   //  Get a list of the domains available in the frameset.
   char *getDomains( int dimens );
-  
+
   //  Set an AST attribute.
   int astSetAttrib( const char *what, const char *value );
 

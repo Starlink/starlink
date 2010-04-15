@@ -18,10 +18,10 @@
 *
 *   Returned   (arguments)
 *   SMARGE  RA  marginal distribution
-*	
+*
 *   B.D.Kelly/ROE/1981
 *-
- 
+
       REAL ARRAY(NX,NY),SMARGE(NS)
 
       IF(IFLAG.EQ.0) THEN

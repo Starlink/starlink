@@ -98,7 +98,7 @@ Notes:
 ;;; Save the initial position and line break context.
   (let ((opoint (point))
         (context (starfort-line-break-context)))
-    
+
 ;;; If we we are inside a quoted string, move backards until either white space
 ;;; or a quote is encountered. This will place us at the start of a word
 ;;; (if possible) while remaining within the quoted string.
@@ -126,7 +126,7 @@ Notes:
 ;;; If we ended up at the start of the line, there is no perfect break point,
 ;;; so return to the initial position.
     (if (bolp) (goto-char opoint))
-  
+
 ;;; Return the final line break context.
     context))
 

@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,11 +141,11 @@
 *  Set the range of bins to consider when determining fit. Look for the
 *  nearest left and right bins with 20% of the number count of the
 *  modal bin.
-      LIMIT = 0.2D0 * PEAK 
+      LIMIT = 0.2D0 * PEAK
       START = 1
       IEND = NBIN
       DO 1 I = MODE, NBIN
-         IF ( HIST( I ) .NE. 0 ) THEN 
+         IF ( HIST( I ) .NE. 0 ) THEN
             IF ( HIST( I ) .LE. LIMIT ) THEN
                IEND = I
                GO TO 7
@@ -157,7 +157,7 @@
          IF ( HIST( I ) .NE. 0 ) THEN
             IF ( HIST( I ) .LE. LIMIT ) THEN
                START = I
-               GO TO 8 
+               GO TO 8
             END IF
          END IF
  2    CONTINUE
@@ -174,8 +174,8 @@
          YSUM = 0.0D0
          XSUM = 0.0D0
          DO 4 J = START, IEND
-            IF ( HIST( J ) .NE. 0 ) THEN 
-               Y = DBLE( HIST( J ) ) 
+            IF ( HIST( J ) .NE. 0 ) THEN
+               Y = DBLE( HIST( J ) )
                YSUM = YSUM + LOG( Y )
                X = DBLE( J - MODE )
                XSUM = XSUM + X * X
@@ -185,7 +185,7 @@
 
 *  Form the sigma estimate.
          DENOM = ( DBLE( NCOUNT ) * LNPEAK - YSUM )
-         IF ( DENOM .NE. 0.0D0 ) THEN 
+         IF ( DENOM .NE. 0.0D0 ) THEN
             SD = XSUM / ( DBLE( NCOUNT ) * LNPEAK - YSUM )
             SD = SQRT( ABS( SD /2.0D0 ) )
          ELSE
@@ -215,7 +215,7 @@
 *  End the refinement.
             GO TO 5
          END IF
-      
+
  3    CONTINUE
  5    CONTINUE
 

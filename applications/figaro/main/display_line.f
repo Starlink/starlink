@@ -37,13 +37,13 @@
 *    RIGHT = REAL (Given)
 *        right tram for current line
 *    XLABEL = CHARACTER*(*) (Given)
-*       
+*
 *    XUNITS = CHARACTER*(*) (Given)
-*       
+*
 *    YUNITS = CHARACTER*(*) (Given)
-*       
+*
 *    HALF_WINDOW = REAL (Given)
-*       
+*
 
 * History:
 *  23-Oct-1989 TNW/CAVAD Made so that prompt for change of data range

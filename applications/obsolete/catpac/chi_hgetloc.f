@@ -1,13 +1,13 @@
       SUBROUTINE CHI_HGETLOC( INPUT, MODE, CATNO, STATUS )
 
 *     3-9-93 DLG  added initialisation of CHIH_LASTRECACC
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR' 
+      INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
       INCLUDE 'CMP_ERR'
       INCLUDE 'CHI_PAR'          ! CHI constants
@@ -65,7 +65,7 @@
 
       IF ( .NOT. ALREADY_OPEN) THEN
           IF ( MODE .EQ. CHIH__READ .OR. MODE .EQ. CHIH__UPDATE) THEN
-              CALL TBL_OPEN( INPUT, CHIH_MODECODE(MODE), 
+              CALL TBL_OPEN( INPUT, CHIH_MODECODE(MODE),
      :                          CHIH_LOC( 1, NCATS_OPEN+1), STATUS)
               IF ( STATUS .EQ. SAI__OK) THEN
                   NCATS_OPEN                = NCATS_OPEN + 1
@@ -78,25 +78,25 @@
                   CHIH_MAPSEC(1, CATNO)     = 0
                   CHIH_MAPSEC(2, CATNO)     = 0
                   TBDSCR = CHIH_LOC( 1, CURR_CAT)
-                  CALL CMP_GET0I( TBDSCR, 'NROWSW', 
+                  CALL CMP_GET0I( TBDSCR, 'NROWSW',
      :                          CHIH_TOTUSED(1, CURR_CAT), STATUS)
-                  CALL CMP_GET0I( TBDSCR, 'NROWS', 
+                  CALL CMP_GET0I( TBDSCR, 'NROWS',
      :                          CHIH_TOTSIZE(1, CURR_CAT), STATUS)
 
 * See if this is an INDEX, and if so, to what - open the
 *                   indexed catalogue(s) 'READ'
 
-                  CALL DAT_THERE( TBDSCR, 'INDEX_TO', 
+                  CALL DAT_THERE( TBDSCR, 'INDEX_TO',
      :                                  REPLY, STATUS)
                   IF ( .NOT. REPLY) THEN
                       CHIH_NUMASSOC( CURR_CAT ) = 1
                   ELSE
                       CALL CMP_GET1C( TBDSCR, 'INDEX_TO', CHIH__NUMASS,
      :                          CHIH_CATNAME(1, CURR_CAT),
-     :                          CHIH_NUMASSOC( CURR_CAT), STATUS) 
+     :                          CHIH_NUMASSOC( CURR_CAT), STATUS)
 
                       DO I = 2, CHIH_NUMASSOC( CURR_CAT)
-                          CALL TBL_OPEN( CHIH_CATNAME( I, CURR_CAT), 
+                          CALL TBL_OPEN( CHIH_CATNAME( I, CURR_CAT),
      :                        'READ', CHIH_LOC( I, CURR_CAT), STATUS )
                           CHIH_MODE( I, CURR_CAT) = CHIH__READ
                       ENDDO
@@ -111,11 +111,11 @@
      :                         PLOC, STATUS)
                       CALL DAT_NCOMP( PLOC, NCOMP, STATUS)
                       DO I = 1, NCOMP
-                          CALL DAT_INDEX(PLOC, I, CHIH_COLLOC(I,CATNO), 
+                          CALL DAT_INDEX(PLOC, I, CHIH_COLLOC(I,CATNO),
      :                                                     STATUS)
-                          CALL DAT_NAME(  CHIH_COLLOC(I, CATNO), NAME, 
+                          CALL DAT_NAME(  CHIH_COLLOC(I, CATNO), NAME,
      :                                                     STATUS)
-                          CALL DAT_TYPE(  CHIH_COLLOC(I, CATNO), TYPE, 
+                          CALL DAT_TYPE(  CHIH_COLLOC(I, CATNO), TYPE,
      :                                                     STATUS)
                           IF ( TYPE .EQ. 'COLUMN') THEN
                               NUMFLDS = NUMFLDS + 1
@@ -140,13 +140,13 @@
                   CHIH_CATNAME(1, CURR_CAT) = INPUT
                   CHIH_NUMASSOC(CURR_CAT)   = 1
                   CHIH_TOTUSED(1, CURR_CAT) = 0
-                  CHIH_TOTSIZE(1, CURR_CAT) = 0   
+                  CHIH_TOTSIZE(1, CURR_CAT) = 0
                   CHIH_LASTRECACC(1, CURR_CAT) = 0
                   CHIH_MAPSEC(1, CATNO) = 0
                   CHIH_MAPSEC(2, CATNO) = 0
               ENDIF
           ENDIF
-          
+
       ELSE
           IF ( (MODE .EQ. CHIH__WRITE .OR. MODE .EQ. CHIH__UPDATE)
      :          .AND.  CHIH_MODE(1, CURR_CAT) .EQ. CHIH__READ ) THEN
@@ -159,5 +159,5 @@
 
 
 9999  RETURN
-          
+
       END

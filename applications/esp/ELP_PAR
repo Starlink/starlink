@@ -35,7 +35,7 @@
 
 *  Global constants:
 
-*  The maximum size of the results arrays. 
+*  The maximum size of the results arrays.
       INTEGER ELP__RESUL
       PARAMETER ( ELP__RESUL = 10001 )
 
@@ -46,13 +46,13 @@
       INTEGER ELP__STAT         ! Statistic returned from elp1_stats
       PARAMETER (ELP__STAT = 18)
 
-*  The maximum number of points in an ellipse. 
+*  The maximum number of points in an ellipse.
       INTEGER ELP__MXPOI
       PARAMETER ( ELP__MXPOI = 500 )
 
 *  Used to indicate if the fast analysis is to be employed.
 *  Should only be set to false if accurate (but slow) estimates
-*  of the profile at small radii are required. 
+*  of the profile at small radii are required.
       LOGICAL ELP__FAST
       PARAMETER ( ELP__FAST = .TRUE. )
 
@@ -68,7 +68,7 @@
 
 *  The factor used to determine the size of mean count value increase at which
 *  the ellipse fitting will stop. It is assumed that if the fluctuations have
-*  become this big then the galaxy can no longer be properly profiled.   
+*  become this big then the galaxy can no longer be properly profiled.
       REAL ELP__LIM1
       PARAMETER ( ELP__LIM1 = 1.2 )
 
@@ -78,13 +78,13 @@
       REAL ELP__LIM2
       PARAMETER ( ELP__LIM2 = 0.8 )
 
-*  Radius value (in pixels) at which the position angle, ellipticity and 
+*  Radius value (in pixels) at which the position angle, ellipticity and
 *  origin are no longer adjusted when a new radius is tried. Default
 *  value is for no cutoff.
       REAL ELP__LIM3
       PARAMETER ( ELP__LIM3 = -1.0 )
 
-*  Fraction of the number of points in an ellipse that must be non-bad for the 
+*  Fraction of the number of points in an ellipse that must be non-bad for the
 *  ellipse profile parameters to be retained.
       REAL ELP__FRACT
       PARAMETER ( ELP__FRACT = 40. )
@@ -93,13 +93,13 @@
       REAL ELP__PIVAL
       PARAMETER ( ELP__PIVAL = 3.1415926 )
 
-*  The value of the geometric constant needed to convert radians to 
+*  The value of the geometric constant needed to convert radians to
 *  degrees format.
       REAL ELP__PI2360
       PARAMETER ( ELP__PI2360 = ELP__PIVAL*2./360. )
 
-*  The maximum number of ellipses that will be generated during 
-*  the fitting. Units 
+*  The maximum number of ellipses that will be generated during
+*  the fitting. Units
       REAL ELP__RLIM
       PARAMETER ( ELP__RLIM = 150. )
 

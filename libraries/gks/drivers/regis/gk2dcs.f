@@ -1,13 +1,13 @@
       SUBROUTINE GK2DCS(ICODE,X,Y)
 
       INCLUDE '../../include/check.inc'
-      
+
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-*  
+*
       INCLUDE '../../include/gkio.par'
-      
+
 *  Read cursor position
 *
       INTEGER ICODE

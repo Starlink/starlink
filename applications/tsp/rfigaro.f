@@ -23,16 +23,16 @@ C    (2) STOKESPAR  (Char)     The Stokes parameter (Q,U,V) for the
 C                               output data.
 C    (3) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C          Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C          17/03/2000
 C
 C-
 C
 C  History:
-C    Aug/1987   Original Version.   JAB/AAO 
+C    Aug/1987   Original Version.   JAB/AAO
 C    26/2/1988   TSP Monolith version.  JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
 C    21/08/2005  Fix typo in argument! TIMJ/JACH
@@ -76,7 +76,7 @@ C
       LENNAME = ICH_LEN(FNAME)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME(:LENNAME),STATUS)
-      
+
 *  Get the data array
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -113,7 +113,7 @@ C
                UNITS = ' '
                STATUS = SAI__OK
             ENDIF
-            
+
 *  Map .X.DATA if it exists
 
             CALL DSA_MAP_AXIS_DATA('INPUT',1,'READ','FLOAT',XPTR,
@@ -133,7 +133,7 @@ C
                    CALL PAR_CANCL('STOKESPAR',STATUS)
                 ENDIF
              ENDDO
-      
+
 *  Get the output file
 
              CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -150,13 +150,13 @@ C
              CALL TSP_WLU_LAMBDA(OLOC,XLABEL,XUNITS,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,STOKESPAR,SLOC,STATUS)
              CALL TSP_MAP_DATA(SLOC,'WRITE',OSPTR,ESLOC,STATUS)
              CALL TSP_MAP_VAR(SLOC,'WRITE',OEPTR,ELOC,STATUS)
              CALL TSP_WLU(OLOC,LABEL,UNITS,STATUS)
              CALL TSP_MAP_DATA(OLOC,'WRITE',OIPTR,ILOC,STATUS)
-             
+
 *  Copy the data
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -180,7 +180,7 @@ C
       ENDIF
       END
 
-      
+
 
 
       SUBROUTINE TSP_READ_COPY(SIZE,I1,O1,I2,O2,I3,O3,I4,O4)
@@ -194,7 +194,7 @@ C
 *   arrays
 *
 *   Parameters:
-*    
+*
 *   (>)  SIZE      (Integer)            Size of arrays to be copied
 *   (>)  I1        (Real array(SIZE))   First input array
 *   (<)  O1        (Real array(SIZE))   First output array
@@ -226,4 +226,4 @@ C
          O4(I)=I4(I)
       ENDDO
       END
-      
+

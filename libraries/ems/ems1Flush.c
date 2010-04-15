@@ -2,19 +2,19 @@
  *+
  *  Name:
  *     ems1Flush
- 
+
  *  Purpose:
  *     Flush the current error context.
- 
+
  *  Language:
  *     Starlink ANSI C
- 
+
  *  Invocation:
  *     ems1Flush( status )
- 
+
  *  Description:
- *     This subroutine ensures that all pending error messages in the 
- *     current error context have been output to the user. The status 
+ *     This subroutine ensures that all pending error messages in the
+ *     current error context have been output to the user. The status
  *     argument is reset to SAI__OK.
 
  *  Arguments:
@@ -37,17 +37,17 @@
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     JRG: Jack Giddings (UCL)
  *     SLW: Sid Wright (UCL)
@@ -73,7 +73,7 @@
  *     13-MAY-2008 (PWD):
  *        Use struct to access message table.
  *     {enter_further_changes_here}
- 
+
  *  Bugs:
  *     {note_any_bugs_here}
 
@@ -90,7 +90,7 @@
 /*  Local Constants: */
 #define MAXTAB 3                  /* Maximum tab index */
 
-void ems1Flush( int *status ) 
+void ems1Flush( int *status )
 {
     char line[ EMS__SZMSG + MAXTAB + 1];  /*  Constructed output line */
     char tabs[ MAXTAB + 1 ];              /* Tab string */
@@ -101,7 +101,7 @@ void ems1Flush( int *status )
     int istat = SAI__OK;           /* Local status */
     int lstat = SAI__OK;           /* Local status */
     Logical tmprvl;                /* Temporary storage for MSGRVL */
-    
+
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
 
     TRACE( "ems1Flush" );
@@ -122,7 +122,7 @@ void ems1Flush( int *status )
     if ( iend >= istart ) {
         for ( i = istart; i <= iend; i++ ) {
             strcpy( line, tabs );
-            
+
             /*  Construct the output line and send it. */
             if ( msgtab->msglen[ i ] > 0 ) {
                 strncat( line, msgtab->msgstr[ i ], EMS__SZMSG );
@@ -132,7 +132,7 @@ void ems1Flush( int *status )
                 line[2] = '\0';
             }
             ems1Prerr( line, &istat );
-            
+
             /*  Check the returned status. */
             if ( istat != SAI__OK ) lstat = istat;
 
@@ -166,6 +166,6 @@ void ems1Flush( int *status )
         }
     }
     msgtab->msgrvl = tmprvl;
-    
+
     return;
 }

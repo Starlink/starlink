@@ -26,7 +26,7 @@
 *                     that have not been flagged as preconnected in GKIOOP
 *                     are closed (S434).
 *     04/02/91  KEVP  Prevented error stream from being closed, if 6 (S440).
-*     07/02/91  PLP   Added preconnection flag checking for the error 
+*     07/02/91  PLP   Added preconnection flag checking for the error
 *                     logfile(S441).
 *
 *  ARGUMENTS

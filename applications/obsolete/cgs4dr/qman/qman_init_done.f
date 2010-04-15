@@ -26,7 +26,7 @@
 *   Has the task been initialised?
       IF ( .NOT. INITIALISED ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 
+        CALL ERR_REP( ' ',
      :    'QMAN_INIT_DONE: Task has not been initialised', STATUS )
       ENDIF
 

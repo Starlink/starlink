@@ -45,7 +45,7 @@
 *  References:
 *     -  POSIX standard (1988), section 8.1
 *     -  ANSI C standard (1989), section 4.12.3.2
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *        variable since the cast does not work reliably if sizeof(Fortran int)
 *        != sizeof(time_t).
 *     09-MAR-2005 (PWD):
-*        Include unistd.h to get POSIX environment. 
+*        Include unistd.h to get POSIX environment.
 *        Test for HAVE_CTIME_R_THREE_ARGS to work around Solaris ctime_r
 *        having three arguments by default.
 *     {enter_changes_here}
@@ -152,7 +152,7 @@ F77_SUBROUTINE(psx_ctime)( INTEGER(nticks), CHARACTER(string),
 # else
    ctime_r( &timep, time_s );
 # endif
-#else 
+#else
 #  if HAVE_CTIME
    temps = ctime( &timep );
    if (temps) {

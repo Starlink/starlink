@@ -82,7 +82,7 @@
 	      END IF
 	    ELSE
 
-*            if there is going to be an overflow 
+*            if there is going to be an overflow
 	      IMAGE_OUT( J, I) = -999
 	      IMAGE_OUT2( J, I) = -999
 	    END IF

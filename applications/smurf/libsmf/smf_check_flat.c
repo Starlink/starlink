@@ -98,5 +98,5 @@ void smf_check_flat ( const smfData *data, int *status ) {
     *status = SMF__FLATN;
     errRep(FUNC_NAME, "Data are already flatfielded", status);
   }
-  
+
 }

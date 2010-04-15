@@ -107,7 +107,7 @@ namespace eval ::WS::Utils {
 }
 
 
-
+
 ###########################################################################
 #
 # Public Procedure Header - as this procedure is modified, please be sure
@@ -645,7 +645,7 @@ proc ::WS::Utils::BuildRequest {mode serviceName tagName typeName valueInfos} {
     return $xml
 }
 
-
+
 ###########################################################################
 #
 # Private Procedure Header - as this procedure is modified, please be sure
@@ -699,7 +699,7 @@ proc ::WS::Utils::convertTypeToDict {mode serviceName node type} {
         set partType [dict get $typeDefInfo definition $partName type]
 
         if {[string equal $partName *] && [string equal $partType *]} {
-           
+
             ##
             ## Type infomation being handled dynamically for this part
             ##
@@ -1872,7 +1872,7 @@ proc ::WS::Utils::parseSimpleType {mode dictVar serviceName node tns} {
     }
 }
 
-
+
 ###########################################################################
 #
 # Private Procedure Header - as this procedure is modified, please be sure
@@ -1993,7 +1993,7 @@ proc ::WS::Utils::checkTags {mode serviceName currNode typeName} {
     return $result
 }
 
-
+
 ###########################################################################
 #
 # Private Procedure Header - as this procedure is modified, please be sure
@@ -2067,7 +2067,7 @@ proc ::WS::Utils::checkValue {mode serviceName type value} {
     return $result
 }
 
-
+
 ###########################################################################
 #
 # Private Procedure Header - as this procedure is modified, please be sure

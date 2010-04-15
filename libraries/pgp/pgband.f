@@ -26,7 +26,7 @@ C treated as MODE=0.
 C
 C -- If MODE=0, the anchor point is ignored and the routine behaves
 C like PGCURS.
-C -- If MODE=1, a straight line is drawn joining the anchor point 
+C -- If MODE=1, a straight line is drawn joining the anchor point
 C and the cursor position.
 C -- If MODE=2, a hollow rectangle is extended as the cursor is moved,
 C with one vertex at the anchor point and the opposite vertex at the

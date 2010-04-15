@@ -61,7 +61,7 @@ proc GetRow rows {
     wm transient .getrow   .
 
 #
-#  Bind the return key to set global variable button to "ok".  That is, 
+#  Bind the return key to set global variable button to "ok".  That is,
 #  hitting return will have the same effect as clicking on the "ok"
 #  button.
 
@@ -142,7 +142,7 @@ proc GetRow rows {
       -command {HelpText GetRow_help}
 
 #
-#  Pack the buttons into their enclosing frame with a default border around 
+#  Pack the buttons into their enclosing frame with a default border around
 #  the OK button.
 
     frame .getrow.buttonrow.default -relief sunken -bd 1
@@ -186,7 +186,7 @@ proc GetRow rows {
     grab  .getrow
     focus .getrow
 
-    tkwait variable getRowButton 
+    tkwait variable getRowButton
 
     if {$getRowButton == "ok"} then {
        set currentRow [.getrow.input.value get]

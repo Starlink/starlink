@@ -7,7 +7,7 @@ C   -----------------
 C
 C   Description
 C   -----------
-C   Returns the range of values in a REAL array. If the bad data flag is 
+C   Returns the range of values in a REAL array. If the bad data flag is
 C   set, magic value pixels are ignored.
 C
 C
@@ -29,7 +29,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'MAGIC_VALUES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -66,13 +66,13 @@ C
       INCLUDE 'MAGIC_VALUES'
 C
 C     Check for an array which is entirely magic values
-C  
+C
       IF(.NOT.BADPIX)THEN
         VMIN=ARRAY(IST)
       ELSE
         DO I=IST,IEN
           VMIN=ARRAY(I)
-          IF(VMIN.GT.MAGIC_FLOAT)GO TO 10           
+          IF(VMIN.GT.MAGIC_FLOAT)GO TO 10
         END DO
         VMIN=0.0
         VMAX=0.0
@@ -81,7 +81,7 @@ C
    10 VMAX=VMIN
 C
 C     Loop through and find the actual range
-C                
+C
       IF(IST.LT.IEN)THEN
         IF(.NOT.BADPIX)THEN
           DO I=IST+1,IEN

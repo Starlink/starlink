@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,7 +91,7 @@
 *     22-SEP-2004 (TIMJ):
 *        Use asctime_r if present
 *     09-MAR-2005 (PWD):
-*        Include unistd.h to get POSIX environment. 
+*        Include unistd.h to get POSIX environment.
 *        Test for HAVE_ASCTIME_R_THREE_ARGS to work around Solaris asctime_r
 *        having three arguments by default.
 *     {enter_further_changes_here}

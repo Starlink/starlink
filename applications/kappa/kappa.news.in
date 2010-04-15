@@ -1,7 +1,7 @@
 1 KAPPA_Version_1.12
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
-   changes so far are listed below.  For complete details of all 
+   changes so far are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 Modified_applications
@@ -13,25 +13,25 @@
 
    o  PSF
 
-      - A bug has fixed in the normalisation of the fit in cases where 
+      - A bug has fixed in the normalisation of the fit in cases where
       both the NORM and GAUSS parameters are set FALSE.
 
    o  WCSSLIDE
 
-      - A bug has been fixed that could lead to incorrect shifts when using 
+      - A bug has been fixed that could lead to incorrect shifts when using
       the ABS parameter.
 
 1 KAPPA_Version_1.11
 
-   A new release of KAPPA (V1.11-11) is available.  The main changes 
-   are listed below.  For complete details of all changes, see the 
+   A new release of KAPPA (V1.11-11) is available.  The main changes
+   are listed below.  For complete details of all changes, see the
    "Release Notes" appendix in SUN/95.
 
 2 Global_changes
 
    o  Control of the verbosity of informational messages is now
    possible through the environment variable MSG_FILTER.  ILEVEL
-   and QUIET parameters that previously controlled messaging are no 
+   and QUIET parameters that previously controlled messaging are no
    longer used.  See Modified_applications for details.
 
    o  Added support and documentation for the new FRACTION Frame
@@ -39,8 +39,8 @@
    defined by percentages along each dimension.
 
    o  The default for the CATFRAME parameter (used by various
-   applications to indicate the Frame in which axis values should be 
-   stored within an output catalogue) has changed. It is now the 
+   applications to indicate the Frame in which axis values should be
+   stored within an output catalogue) has changed. It is now the
    current Frame in the WCS FrameSet associated with the input data.
 
    o  Additional colour tables from GAIA have been added.
@@ -48,15 +48,15 @@
    o  Application parameters that take "groups" of values are now
    stored in expanded form in the HISTORY component of any output
    NDFs.
-   
+
 2 New_applications
 
 The following new applications have been added:
 
    o  CARPET is intended for the creation of `carpet plots' of images.
    It forms a three-dimensional NDF from a two-dimensional NDF where
-   the original input axes are retained and the new third axis is 
-   proportional to the data values or signal-to-noise ratios of the 
+   the original input axes are retained and the new third axis is
+   proportional to the data values or signal-to-noise ratios of the
    input NDF.
 
 2 Modified_applications
@@ -69,13 +69,13 @@ The following new applications have been added:
       output messaging.
 
    o  BEAMFIT
-      -  The map of residuals now contains the normal 
+      -  The map of residuals now contains the normal
       `data minus fit' evaluations rather than the reverse sense.
-      -  The total background-subtracted data sum in the 
+      -  The total background-subtracted data sum in the
       multi-Gaussian fit is now written to the output parameter SUM.
       -  After a bug fix it is now possible to fit beams within an
       arbitrary plane of a cube.
-      -  Relax a constraint to cater better for a poor initial 
+      -  Relax a constraint to cater better for a poor initial
       position.
 
    o  BLOCK
@@ -85,18 +85,18 @@ The following new applications have been added:
       dimensions simultaneously.  As a consequence the AXES
       parameter is withdrawn.  However, you can replicate its
       function by setting one of the three BOX-parameter sizes to
-      1 to specify the axis not being smoothed; the remaining two 
+      1 to specify the axis not being smoothed; the remaining two
       BOX values of 3 or more define a plane that is smoothed
       independently for all parallel planes.  The independent
       smoothing of axes is now generalised, so for example, you can
       smooth all lines in an image or cube; or all lines, planes,
       or cubes in a hypercube.
-      -  It reports the input NDF's dimensionality if it is more 
+      -  It reports the input NDF's dimensionality if it is more
       than one, before prompting for Parameter BOX.
 
    o  CHANMAP, MSTATS
 
-      -  Fix bug whereby Cmean and Csigma estimators were not 
+      -  Fix bug whereby Cmean and Csigma estimators were not
       amongst the allowed options.
       -  Allow ESTIMATOR=Median to operate on just three channels
       or NDFs.
@@ -106,69 +106,69 @@ The following new applications have been added:
       - The output NDF inherits data type of the input NDF, not that
       of the NDF given by Parameter REF.
 
-   o  FFCLEAN 
-   
+   o  FFCLEAN
+
       -  Now works with double-precision data.
 
    o  FFCLEAN, MSTATS, WCSMOSAIC
 
-      -  Parameter ILEVEL has been withdrawn.  Instead use the 
+      -  Parameter ILEVEL has been withdrawn.  Instead use the
       MSG_FILTER environment variable to control the output
       messaging.
 
    o  FITSLIST
 
-      -  New Parameters ENCODING and FULLWCS allow the list of 
-      displayed FITS cards to include cards derived from the NDF WCS 
+      -  New Parameters ENCODING and FULLWCS allow the list of
+      displayed FITS cards to include cards derived from the NDF WCS
       component, in addition to those read from the FITS extension.
 
-   o  HISTAT 
+   o  HISTAT
 
       -  Works for data ranges smaller than the type precision.
       -  The minimum sparseness increased from 4 to 16 percent to cope
       with extreme outliers, at the cost of poorer handling of
       quantized distributions.
-      -  Generates a new histogram between any narrowed value limits 
+      -  Generates a new histogram between any narrowed value limits
       to yield more-accurate statistics.
 
-   o  HISTOGRAM 
+   o  HISTOGRAM
 
       -  This now displays an improved X-axis label on its plot.
 
    o  LINPLOT
 
       -  The Y-axis Symbol has changed from the NDF's label to the name
-      of its plotted array component.  A long Symbol including spaces 
-      caused issues in other tasks like CURSOR, where the Symbol is used 
+      of its plotted array component.  A long Symbol including spaces
+      caused issues in other tasks like CURSOR, where the Symbol is used
       as a column name in the output catalogue.
 
    o  LOOK
 
-      -  A bug has been fixed that caused logfile output to be 
+      -  A bug has been fixed that caused logfile output to be
       truncated to 255 characters per row even if MAXLEN was greater
       than 255.
 
    o  NDFCOPY
 
       -  There is a new COMP parameter that permits the QUALITY,
-      or VARIANCE components or the errors (square root of the 
+      or VARIANCE components or the errors (square root of the
       VARIANCE) to become the DATA_ARRAY in the output NDF.
 
    o  PROVSHOW
 
-      -  There is a new DOTFILE parameter that permits a summary of 
-      the provenance tree to be written to a text file in "dot" 
-      format, suitable for visualising with third-party tools such 
+      -  There is a new DOTFILE parameter that permits a summary of
+      the provenance tree to be written to a text file in "dot"
+      format, suitable for visualising with third-party tools such
       as Graphviz, ZGRViewer or OmniGraffle.
 
    o REGRID
-      
+
      -  METHOD=GAUSS can now be used when re-sampling as well as
      when re-binning.
 
    o  SCATTER
 
-      -  The calculation of the axis ranges now excludes any pixels 
+      -  The calculation of the axis ranges now excludes any pixels
       that are bad in either NDF.
 
    o  SETAXIS
@@ -186,23 +186,23 @@ The following new applications have been added:
 
 1 KAPPA_Version_1.10
 
-   A new release of KAPPA (V1.10-10) is available.  The main 
-   changes so far are listed below.  For complete details of all 
+   A new release of KAPPA (V1.10-10) is available.  The main
+   changes so far are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 Modified_applications
 
    o  CHANMAP
 
-      -  There are new estimators for clipped mean and clipped 
-      standard deviation and associated new CLIP parameter for 
+      -  There are new estimators for clipped mean and clipped
+      standard deviation and associated new CLIP parameter for
       controlling the clip level.
 
    o  CLINPLOT
 
-      -  New MODE and MARKER parameters permit different ways to 
+      -  New MODE and MARKER parameters permit different ways to
       show the loci of data values including the histogram
-      `staircase', dots or markers at each point, and lines 
+      `staircase', dots or markers at each point, and lines
       connecting data points (the only available mode previously).
 
       -  New SPECAXES parameter can be used to suppress the drawing
@@ -212,36 +212,36 @@ The following new applications have been added:
       spatially with an existing picture.
 
    o  COLCOMP
-   
-      -  Parameter BADCOL has the additional option of an HTML 
+
+      -  Parameter BADCOL has the additional option of an HTML
       colour code.
 
    o  COLLAPSE
 
-      -  There are new estimators for clipped mean and clipped 
-      standard deviation and associated new CLIP parameter for 
+      -  There are new estimators for clipped mean and clipped
+      standard deviation and associated new CLIP parameter for
       controlling the clip level.
 
       - There is an improved WLIM-related WARNING message.  The
       calculations used to decide whether or not to issue a
       warning and the reported fractions of bad values therein
-      have been corrected.  These fractions had been in terms of 
+      have been corrected.  These fractions had been in terms of
       elements along the collapse axis, not the number of elements
       in the output NDF.
 
    o  CONVOLVE
 
-      -  No longer aborts if a slice within a cube contains no 
+      -  No longer aborts if a slice within a cube contains no
       good data.
 
    o  DISPLAY
-   
-      -  Parameter BADCOL has the additional option of an HTML 
+
+      -  Parameter BADCOL has the additional option of an HTML
       colour code.
 
    o  FITSMOD
 
-      -  Parameter EDIT has a new option "Null".  This will 
+      -  Parameter EDIT has a new option "Null".  This will
       nullify the value of the chosen keyword, by substituting
       spaces for its value.
 
@@ -250,22 +250,22 @@ The following new applications have been added:
 
    o  HISCOM
 
-      -  A new parameter called DATE has been added.  This allows 
-      the date and time of the new history record to be set explicitly 
-      rather than to the default current time.  There is a choice of 
+      -  A new parameter called DATE has been added.  This allows
+      the date and time of the new history record to be set explicitly
+      rather than to the default current time.  There is a choice of
       formats including Gregorian Date and Time, and Julian Date.
 
    o  LISTMAKE
 
       -  The FRAME parameter now allows the co-ordinate frame to be
-      specified in more ways (for example, as an AST Object dump or 
+      specified in more ways (for example, as an AST Object dump or
       the current Frame in an NDF).
 
    o  LISTSHOW
 
       -  A new option ``STCS'' has been added to the PLOT parameter.
-      This marks each position by drawing the shape giving in the 
-      column specified by new parameter STCSCOL. The shape is 
+      This marks each position by drawing the shape giving in the
+      column specified by new parameter STCSCOL. The shape is
       specified using the IVOA "STC-S" format.
 
    o  LOOK
@@ -276,35 +276,35 @@ The following new applications have been added:
 
    o  MSTATS
 
-      -  There are new estimators for clipped mean and clipped 
-      standard deviation and associated new CLIP parameter for 
+      -  There are new estimators for clipped mean and clipped
+      standard deviation and associated new CLIP parameter for
       controlling the clip level.
 
    o  NDFCOPY
 
       -  A new parameter caller EXTEN has been added.  This can be set
-      TRUE to cause any extension NDFs contained within the supplied 
+      TRUE to cause any extension NDFs contained within the supplied
       NDF to be modified to match the shape of the output NDF.
 
-      -  A new parameter called LIKEWCS has been added.  This 
-      allows the shape of the template NDF in the WCS Frame to be 
+      -  A new parameter called LIKEWCS has been added.  This
+      allows the shape of the template NDF in the WCS Frame to be
       used to determine the bounds of the output NDF.
 
-      -  A new logical parameter called TRIMBAD has been added.  If 
+      -  A new logical parameter called TRIMBAD has been added.  If
       TRUE, the output NDF is trimmed to exclude any border of bad
       pixels.
 
    o PROVREM
       -  Has a new parameter called HIDE that can be set to TRUE
       to hide the selected ancestors rather than permanently deleting
-      them. Hidden ancestors in an NDF PROVENANCE extension will in 
-      general be ignored by subsequent applications, but all the 
-      provenance information for hidden ancestors is retained 
+      them. Hidden ancestors in an NDF PROVENANCE extension will in
+      general be ignored by subsequent applications, but all the
+      provenance information for hidden ancestors is retained
       unchanged in the PROVENANCE extension.
 
    o PROVSHOW
       -  Has a new parameter called HISTORY that can be set to TRUE
-      to display any history records stored in the provenance 
+      to display any history records stored in the provenance
       extension of each ancestor NDF.
       -  Has a new parameter called HIDE that can be set to TRUE
       to include "hidden" ancestors in the display. Ancestors can be
@@ -312,19 +312,19 @@ The following new applications have been added:
 
    o  ROTATE
 
-      -  Efficiency improvements have been made for rotations of 180 
-      degrees and arbitrary angles that should greatly reduce the 
-      memory requirements for processing cubes.  Additional 
-      efficiencies have be made for the 0-degree rotation special 
+      -  Efficiency improvements have been made for rotations of 180
+      degrees and arbitrary angles that should greatly reduce the
+      memory requirements for processing cubes.  Additional
+      efficiencies have be made for the 0-degree rotation special
       case.
 
    o STATS
       -  Can calculate accurate median and percentile values using
       sorting by setting the new ORDER parameter to TRUE,
       and optionally supplying percentiles through the new PERCENTILES
-      parameter.  There are corresponding results parameters---MEDIAN 
+      parameter.  There are corresponding results parameters---MEDIAN
       and PERVAL---to record these additional statistics.
-   
+
    o THRESH
       -  New result parameters NUMHI, NUMLO, NUMRANGE, and NUMSAME
       return the number of changed and unchanged pixels.
@@ -332,21 +332,21 @@ The following new applications have been added:
 1 KAPPA_Version_1.9
 
    A new release of KAPPA (V1.9-11) is available.  The main changes
-   are listed below.  For complete details of all changes, see the 
+   are listed below.  For complete details of all changes, see the
    "Release Notes" appendix in SUN/95.
 
 2 New_applications
 
-   o  PROVMOD allows provenance to be modified within an NDF.  The 
-   CREATOR, DATE, and PATH components of the PROVENANCE extension 
-   may be altered using a substitution syntax incorporating string 
+   o  PROVMOD allows provenance to be modified within an NDF.  The
+   CREATOR, DATE, and PATH components of the PROVENANCE extension
+   may be altered using a substitution syntax incorporating string
    matching atoms and quantifiers.
 
    o  PROVREM allows selected provenance to be removed from an NDF.
    Ancestors can be removed by their indices or by pattern matching
    against their names.
 
-   o  REGIONMASK masks an NDF using an AST Region description held 
+   o  REGIONMASK masks an NDF using an AST Region description held
    in a text file.  Such descriptions can be generated, for instance,
    using the commands within the ATOOLS package.
 
@@ -362,8 +362,8 @@ The following new applications have been added:
       -  A COMP parameter is now available to collapse variance
       and quality information.
 
-   o  FFCLEAN 
-   
+   o  FFCLEAN
+
       -  This has been extended to operate on cubes, either by
       processing the cubes as a set of independent one-dimensional
       spectra, or as a set of independent two-dimensional images
@@ -379,16 +379,16 @@ The following new applications have been added:
 
    o  FITSMOD
 
-      -  Parameter EDIT has a new option "Amend".  This will write a 
-      new header if the chosen keyword does not exist, but will only 
-      modify an existing header.  Using this option, it is now not 
-      necessary to know whether or not a header exists.  
-       
-      -  Likewise there is an Amend option for Field 1 of the file
-      format. 
+      -  Parameter EDIT has a new option "Amend".  This will write a
+      new header if the chosen keyword does not exist, but will only
+      modify an existing header.  Using this option, it is now not
+      necessary to know whether or not a header exists.
 
-   o  MAKESNR 
-   
+      -  Likewise there is an Amend option for Field 1 of the file
+      format.
+
+   o  MAKESNR
+
       -  It is now faster when Parameter MINVAR is supplied on the
       command line.
 
@@ -403,8 +403,8 @@ The following new applications have been added:
       splines. For the former, there is an additional parameter
       POSKNOT to specify knot locations.
 
-   o  MSTATS 
-   
+   o  MSTATS
+
       -  This now offers a wider selection of statistics to combine
       the supplied NDFs.  Note that for consistency with other
       applications, the SMODE parameter has been replaced by
@@ -423,7 +423,7 @@ The following new applications have been added:
    ancestors that are to be displayed (root ancestors, direct parents,
    or all ancestors).
 
-   o  SETBB can now use a comma-separated list of quality names 
+   o  SETBB can now use a comma-separated list of quality names
    (such as created by SETQUAL) to define the bit mask instead of
    a numerical value.
 
@@ -432,7 +432,7 @@ The following new applications have been added:
    that an error should be reported if any subsequent attempt is
    made to remove the quality name (for instance, using REMQUAL).
 
-   o  WCSMOSAIC Parameter GENVAR now allows a null value.  Null 
+   o  WCSMOSAIC Parameter GENVAR now allows a null value.  Null
    requests that a value of FALSE be adopted if and only if all the
    input NDFs have variance components.  TRUE is used otherwise.
 
@@ -442,38 +442,38 @@ The following new applications have been added:
    specified---these are usually called USEAXIS, AXIS or AXES and
    appear in applications such LINPLOT, COLLAPSE and PLUCK---now
    accept generic names of those axes present (in addition to axis
-   Symbol or indices).  These generic names are: "SPEC" to select 
+   Symbol or indices).  These generic names are: "SPEC" to select
    the spectral axis, "TIME" to pick the time axis, and "SKYLON" and
-   "SKYLAT" to choose the sky longitude and latitude axes 
+   "SKYLAT" to choose the sky longitude and latitude axes
    respectively.
 
 
 1 KAPPA_Version_1.8
 
    A new release of KAPPA (V1.8-9) is available.  The main changes are
-   listed below.  For complete details of all changes, see the 
+   listed below.  For complete details of all changes, see the
    "Release Notes" appendix in SUN/95.
 
 2 New_applications
 
-   o  PLUCK extracts slices parallel to pixel axes from an NDF.  The 
+   o  PLUCK extracts slices parallel to pixel axes from an NDF.  The
    slices are nominated positions that are not at pixel centres.  Thus
    it can be used for example, with a spectral imaging cube to extract
    spectra at specified equatorial co-ordinates, or an image at a
    given spectral co-ordinate.
 
-   o  PROVADD modifies the provenance information stored in an NDF.  It 
-   records a second specified NDF as a direct parent of the first NDF. 
-   
-   o  PROVSHOW displays details of the NDFs that were used in the 
-   creation of a supplied NDF.  This information is read from the 
-   PROVENANCE extension within the NDF, and includes both immediate 
+   o  PROVADD modifies the provenance information stored in an NDF.  It
+   records a second specified NDF as a direct parent of the first NDF.
+
+   o  PROVSHOW displays details of the NDFs that were used in the
+   creation of a supplied NDF.  This information is read from the
+   PROVENANCE extension within the NDF, and includes both immediate
    parent NDFs and older ancestor NDFs.
 
 2 Modified_applications
 
-   o  ARDMASK 
-   
+   o  ARDMASK
+
       -  This now has an option to use WCS co-ordinates in the input
       NDF as the default co-ordinate system for the supplied ARD
       description.  See the new parameter DEFPIX.
@@ -492,10 +492,10 @@ The following new applications have been added:
 
       -  This is no longer limited to two-dimensional data.  The scale
       lengths (parameter SIZE) may be different along each pixel axis,
-      and can be disabled along axes by supplying a scale length of 
+      and can be disabled along axes by supplying a scale length of
       zero for that axis.
 
-   o  MAKESURFACE parameter VARIANCE set to TRUE now writes a uniform 
+   o  MAKESURFACE parameter VARIANCE set to TRUE now writes a uniform
       VARIANCE component to the output NDF.  Since the constant
       variance is the mean squared residual of the fit, variance
       information can be created for a spline fit.
@@ -509,34 +509,34 @@ The following new applications have been added:
       NUMBIN specifies the number of bins for the automatic mode.
 
       -  The reported fitting ranges are now given in the current
-      co-ordinate system, along with the previously listed 
+      co-ordinate system, along with the previously listed
       pixel ranges in parentheses.
 
    o  PSF has a new output parameter TOTAL which returns the total
       flux for the fitted Sersic function.
 
-   o  SURFIT has a new parameter GENVAR to enable creation of a uniform 
-      VARIANCE component in the output NDF.  The constant variance is 
+   o  SURFIT has a new parameter GENVAR to enable creation of a uniform
+      VARIANCE component in the output NDF.  The constant variance is
       the mean squared residual of the fit.
 
-   o  WCSATTRIB permits the setting of multiple attributes through new 
+   o  WCSATTRIB permits the setting of multiple attributes through new
       MSET option for parameter MODE, and the new parameter SETTING.
 
 2 General_changes
 
-   Each KAPPA command can now store provenance information in its 
-   output NDF(s) describing the input NDFs (this includes the 
+   Each KAPPA command can now store provenance information in its
+   output NDF(s) describing the input NDFs (this includes the
    provenance for each input NDF).
 
 1 KAPPA_Version_1.7
 
    A new release of KAPPA (V1.7-10) has been made.  The main changes
-   are listed below.  For complete details of all changes, see the 
+   are listed below.  For complete details of all changes, see the
    "Release Notes" appendix in SUN/95.
 
 2 New_applications
 
-   o  BEAMFIT fits up to five Gaussians to beam features in a 
+   o  BEAMFIT fits up to five Gaussians to beam features in a
    two-dimensional NDF, given initial co-ordinates defined in one
    of four modes.  Various fixed and relative constraints may be
    placed. It reports the coefficients and associated errors to
@@ -544,34 +544,34 @@ The following new applications have been added:
 
 2 Modified_applications
 
-   o  ADD now propagates the UNITS component if it is the same in 
+   o  ADD now propagates the UNITS component if it is the same in
    both input NDFs.
 
    o  ARDPLOT can now draw outlines around AST regions as well as
    ARD regions specified through a new REGION parameter.
 
    o  DIV now propagates any UNITS, combining them into a normalised
-   form. 
+   form.
 
-   o  COLLAPSE can now correctly collapse along a sky co-ordinate 
-   axis such as right-ascension or declination.  
-   
+   o  COLLAPSE can now correctly collapse along a sky co-ordinate
+   axis such as right-ascension or declination.
+
    o  COLLAPSE: The co-ordinate extent over which the collapse occurs
    may be retained in a dummy dimension provided a new parameter TRIM
    is set to FALSE.  The default of TRUE gives the current behaviour.
 
    o  FITSURFACE supports bi-cubic spline fitting and there is a new
-   parameter KNOTS for that.  It creates a new provisional BSPLINE 
+   parameter KNOTS for that.  It creates a new provisional BSPLINE
    variant of the POLYNOMIAL structure in the NDF being fitted.
-   
-   o  FITSURFACE now writes PIXEL or AXIS values to the 
+
+   o  FITSURFACE now writes PIXEL or AXIS values to the
    SURFACEFIT.COSYS component to bring it into line with AST usage.
 
-   o  HISTAT has new parameters METHOD and NUMBIN that permit other 
-   ways to obtain the mode including the peak bin of an optimally 
+   o  HISTAT has new parameters METHOD and NUMBIN that permit other
+   ways to obtain the mode including the peak bin of an optimally
    binned histogram.
-   
-   o  HISTAT has additional and modified results parameters.  See 
+
+   o  HISTAT has additional and modified results parameters.  See
    the STATS changes below.
 
    o  LINPLOT has a new parameter ALIGNSYS that specifies the
@@ -579,20 +579,20 @@ The following new applications have been added:
    aligned when ALIGN is TRUE.
 
    o  MAKESURFACE reads the provisional BSPLINE variant of the
-   POLYNOMIAL structure, and thus evaluates a spline fit of the 
+   POLYNOMIAL structure, and thus evaluates a spline fit of the
    input NDF.
-   
+
    o  MAKESURFACE recognises GRID, PIXEL, and AXIS values for the
    SURFACEFIT.COSYS component.
 
    o  MFITTREND can now cope without an inverse WCS transformation.
 
    o  MULT now propagates any UNITS, combining them into a normalised
-   form. 
+   form.
 
    o  NDFTRACE now reports a nominal pixel scale in output parameter
    FPIXSCALE.
-   
+
    o  NDFTRACE has a new output parameter, FPIXSCALE, to store
    the nominal pixel scale or each axis in the current WCS Frame.
 
@@ -600,7 +600,7 @@ The following new applications have been added:
    again rotate a two-dimensional array with a dimension of one
    element, or a cube with two single-element dimensions.
 
-   o  SQORST has a new MODE ="PixelScale" option, and new 
+   o  SQORST has a new MODE ="PixelScale" option, and new
    corresponding PIXSCALE and AXIS parameters.  These allow the WCS
    scales per pixel to be modified.  So for example, it can resample
    a spectral cube into a cube with a specified channel width.
@@ -615,12 +615,12 @@ The following new applications have been added:
    o  SUB now propagates the UNITS component if it is the same in
    both input NDFs.
 
-   o  SURFIT This now uses singular value decomposition to solve the 
+   o  SURFIT This now uses singular value decomposition to solve the
    normal equations and hence provide the variances of the Chebyshev
-   polynomial coefficients, stored in the SURFACEFIT extension. 
-   
-   o  For the polynomial fit type, SURFIT creates a SURFACEFIT 
-   extension in the output NDF to hold the polynomial coefficients 
+   polynomial coefficients, stored in the SURFACEFIT extension.
+
+   o  For the polynomial fit type, SURFIT creates a SURFACEFIT
+   extension in the output NDF to hold the polynomial coefficients
    just as FITSURFACE does.
 
    o  WCSMOSAIC: VARIANCE components may be used to weight the
@@ -633,8 +633,8 @@ The following new applications have been added:
 
 1 KAPPA_Version_1.6
 
-   A new release of KAPPA (V1.6-5) is available.  The main changes 
-   are listed below.  For complete details of all changes, see 
+   A new release of KAPPA (V1.6-5) is available.  The main changes
+   are listed below.  For complete details of all changes, see
    the "Release Notes" appendix in SUN/95.
 
 2 New_applications
@@ -644,12 +644,12 @@ The following new applications have been added:
    o  ODDEVEN removes odd-even defects from a one-dimensional NDF.
    To correct a two dimensional NDF of odd-even patterning in its
    columns or rows, first use COLLAPSE.
-   
+
 2 Modified_applications
 
-   o  COLLAPSE now has a WCSATTS parameter to allow control of the 
+   o  COLLAPSE now has a WCSATTS parameter to allow control of the
    frameset before collapsing occurs. This is important for estimators
-   whose values depend on the WCS.  A new parameter VARIANCE controls 
+   whose values depend on the WCS.  A new parameter VARIANCE controls
    whether or not variance information present in the input NDF is
    actually used.
 
@@ -668,8 +668,8 @@ The following new applications have been added:
 
    o  In MFITTREND fits to lines may be rejected and flagged bad in
    the output data using the new parameter CLIPRMS.  Given the number
-   of clipping standard deviations, MFITTREND locates positive 
-   outliers from the distribution of root-mean-squared residuals of 
+   of clipping standard deviations, MFITTREND locates positive
+   outliers from the distribution of root-mean-squared residuals of
    the fits.  MFITTREND has a new output parameter, ARANGES, to
    record the fitting ranges found in automatic mode.  The automatic
    ranges are now constrained to the input NDF bounds.
@@ -680,20 +680,20 @@ The following new applications have been added:
    output parameters as well as the log file.
 
    o  ROTATE can now reorient three-dimensional NDFs, in the sense
-   that it will rotate all the two-dimensional planes within a 
-   three-dimensional NDF independently, applying the same rotation 
-   angle to each plane.  The rotation plane can be parallel to any 
+   that it will rotate all the two-dimensional planes within a
+   three-dimensional NDF independently, applying the same rotation
+   angle to each plane.  The rotation plane can be parallel to any
    face of the cube, and is defined by a new parameter AXES.
 
-   o  WCSMOSAIC has nw eoutput parameters LBOUND and UBOUND record 
+   o  WCSMOSAIC has nw eoutput parameters LBOUND and UBOUND record
    thec pixel bounds of the output NDF.  If parameter OUT is set to
-   null, the mosaic's bounds can be examined without creating a 
+   null, the mosaic's bounds can be examined without creating a
    potentially huge NDF.
 
 1 KAPPA_Version_1.5
 
    A new release of KAPPA (V1.5) has been made.  The main changes are
-   listed below.  For complete details of all changes, see the 
+   listed below.  For complete details of all changes, see the
    "Release Notes" appendix in SUN/95.
 
 2 New_applications
@@ -704,30 +704,30 @@ The following new applications have been added:
    margins to form the output channel map.  A wide selection of
    statistics is available for the collapsing.
 
-   o  CLINPLOT draws a spatial grid of line plots for an axis of a 
-   cube NDF.  This is highly relevant to inspection of spectral-line 
-   data cubes.  In addition to the normal spectral axes around a line 
+   o  CLINPLOT draws a spatial grid of line plots for an axis of a
+   cube NDF.  This is highly relevant to inspection of spectral-line
+   data cubes.  In addition to the normal spectral axes around a line
    plot, there may be spatial axes drawn around the grid.
 
-   o  INTERLEAVE forms a higher-resolution NDF by interleaving a set 
+   o  INTERLEAVE forms a higher-resolution NDF by interleaving a set
    of NDFs of the same dimensionality.
 
-   o  MAKESNR creates a signal-to-noise array from an NDF with 
+   o  MAKESNR creates a signal-to-noise array from an NDF with
    defined VARIANCE component, rejecting unusably small variances.
 
-   o  MFITTREND offers multiple fitting of trends to individual data 
-   lines of multi-dimensional NDFs has been added.  The trends are 
-   actually polynomials, which can be restricted to selected 
-   co-ordinate ranges, making this a useful tool for fitting the 
+   o  MFITTREND offers multiple fitting of trends to individual data
+   lines of multi-dimensional NDFs has been added.  The trends are
+   actually polynomials, which can be restricted to selected
+   co-ordinate ranges, making this a useful tool for fitting the
    continua of independent spectra stored in data cubes.
 
-   o  NDFCOMPRESS compresses an NDF so that it occupies less disk 
-   space.  The initial version has only one compression method, 
-   which scales using a linear transformation such that data values 
-   fit into a smaller data type.  Applications accessing the 
+   o  NDFCOMPRESS compresses an NDF so that it occupies less disk
+   space.  The initial version has only one compression method,
+   which scales using a linear transformation such that data values
+   fit into a smaller data type.  Applications accessing the
    compressed NDF can reconstruct the original unscaled values.
-            
-   o  WCSMOSAIC forms a mosaic from a group of input NDFs using the 
+
+   o  WCSMOSAIC forms a mosaic from a group of input NDFs using the
    associated WCS information to align them.
 
 2 Modified_applications
@@ -736,44 +736,44 @@ The following new applications have been added:
    (if the position falls within the bounds of a displayed NDF).  This
    is controlled via the new parameters SHOWDATA and COMP.
 
-   o  CHPIX has a new output parameter OLDVAL.  If the section being 
-   modified comprises one pixel, OLDVAL stores the original value of 
+   o  CHPIX has a new output parameter OLDVAL.  If the section being
+   modified comprises one pixel, OLDVAL stores the original value of
    that pixel.
 
    o  COLLAPSE has eleven new statistics available to estimate
-   the output values, intended for cube analysis.  The collapsed NDF 
+   the output values, intended for cube analysis.  The collapsed NDF
    is now physically smaller than the input NDF.
 
-   o  CONTOUR parameter MODE has a new option to calculate contour 
-   heights called "Scale".  This sets a specified number of contour 
+   o  CONTOUR parameter MODE has a new option to calculate contour
+   heights called "Scale".  This sets a specified number of contour
    levels to be equally spaced between two pixel values that you supply.
 
    o  CONVOLVE and GAUSMOOTH can now smooth three-dimensional NDFs,
    in the sense that it will apply the PSF convolution or Gaussian
-   filter respectively to all the two-dimensional planes within a 
+   filter respectively to all the two-dimensional planes within a
    three-dimensional NDF independently.  The smoothing plane can be
-   parallel to any face of the cube and is defined by the new 
+   parallel to any face of the cube and is defined by the new
    parameter AXES.
-   
+
    o  COPYBAD now has an extra parameter called INVERT which, if set
    TRUE, causes output pixels to be set bad if the corresponding pixels
    in the reference NDF are good.
 
-   o  FITSEXIST is now a self-contained application.  It needs only 
+   o  FITSEXIST is now a self-contained application.  It needs only
    read access to an NDF, unlike the former version that was an alias
    to FITSMOD.  It should be faster too.
 
    o  A new parameter called CUMUL has been added to HISTOGRAM.  Setting
    CUMUL to TRUE will result in a cumulative histogram being produced.
 
-   o  The MODE parameter in LISTMAKE now has an option "Good" which is 
-   like the existing "Pixel" option in that it creates a list 
+   o  The MODE parameter in LISTMAKE now has an option "Good" which is
+   like the existing "Pixel" option in that it creates a list
    containing pixel centres taken from the supplied NDF, but differs in
-   that it only stored the centres of pixels which have a good value in 
-   the NDF Data array (the "Pixel" option stores all pixel centres, 
+   that it only stored the centres of pixels which have a good value in
+   the NDF Data array (the "Pixel" option stores all pixel centres,
    whether the pixel values are good or bad).
 
-   o  LOOK parameter FORMAT has an extra option "cglist".  This is like 
+   o  LOOK parameter FORMAT has an extra option "cglist".  This is like
    "clist" except that bad values are not included in the list.
 
    o  NDFTRACE now displays details of the scaling used for Data or
@@ -791,15 +791,15 @@ The following new applications have been added:
    algorithm. See the new parameter CONSERVE.
 
    o  The WCSALIGN and REGRID applications now have options to use
-   resampling or rebinning kernels based on a sombrero function 
-   2*J1(x)/x, where J1(x) is the first-order Bessel function of the 
+   resampling or rebinning kernels based on a sombrero function
+   2*J1(x)/x, where J1(x) is the first-order Bessel function of the
    first kind.
 
    o  WCSATTRIB permits read only access to the NDF for MODE=Get.
-   
+
    o  The default values for the TOL parameter for REGRID, and the ACC
    parameter for WCSALIGN, have been reduced to 0.05, in order to
-   reduce artefacts when transforming large images with flux 
+   reduce artefacts when transforming large images with flux
    conservation.
 
 2 General_changes
@@ -811,12 +811,12 @@ The following new applications have been added:
    The main changes made at Version 1.4-2 were as follows.
 
    o  The BLOCK application can now smooth three-dimensional NDFs, in
-   the sense that it will smooth all the two-dimensional planes within a 
-   three-dimensional NDF independently, using the same two-dimensional 
+   the sense that it will smooth all the two-dimensional planes within a
+   three-dimensional NDF independently, using the same two-dimensional
    box.  The smoothing plane can be parallel to any face of the cube.
 
-   o  The NDFTRACE application now displays the bounds of the NDF within 
-   each WCS Frame if FULLFRAME is set to YES.  Also, the bounds of the 
+   o  The NDFTRACE application now displays the bounds of the NDF within
+   each WCS Frame if FULLFRAME is set to YES.  Also, the bounds of the
    NDF within the current WCS Frame are written to the new output
    parameters FLBND and FUBND.
 
@@ -824,11 +824,11 @@ The following new applications have been added:
 1 KAPPA_Version_1.4-1
 
    The main changes made at Version 1.4-1 were as follows.
-   
-   o  The PIXDUPE application now has a facility for applying a mask to 
+
+   o  The PIXDUPE application now has a facility for applying a mask to
    each block of output pixels.
 
    o  The WCSALIGN application now has a facility for aligning the input
-   NDFs in-situ if possible (that is, if the alignment Mapping is a 
+   NDFs in-situ if possible (that is, if the alignment Mapping is a
    simple shift of origin).  The new parameters are INSITU and ABORT.
 

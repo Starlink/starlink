@@ -92,7 +92,7 @@
          unsigned char byte[ 8 ];
          unsigned int value[ 2 ];
       };
-      
+
 /* Local Variables:                                                         */
       int i;                     /* Loop counter for data elements          */
       static int init = 0;       /* Initialisation performed?               */
@@ -125,7 +125,7 @@
       if ( !init )
       {
          init = 1;
-         
+
          bad_vaxf.byte[ 0 ] = 0xff;
          bad_vaxf.byte[ 1 ] = 0xff;
          bad_vaxf.byte[ 2 ] = 0xff;
@@ -620,7 +620,7 @@ programming error).",
             {
                switch ( exp->format )
                {
-               
+
 /* ...to VAX/VMS double precision (D) floating point.                       */
 /* --------------------------------------------------                       */
                   case DAT__VAXD:

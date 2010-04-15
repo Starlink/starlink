@@ -9,25 +9,25 @@ C     Creates axis arrays with modified dimensions in a structure.
 C
 C  Description:
 C     This routine produces axis arrays with specified dimensions.  With
-C     the exception of the dimensions, the axis structure will be the 
-C     same as that for an existing specified axis structure.  This routine 
-C     will modify the shapes of any arrays in the model structure whose 
-C     function it thinks it understands; if it finds other arrays it will 
-C     reshape them if they are the same shape as the main axis data array, 
-C     but will issue warning messages.  The contents of any resulting data 
+C     the exception of the dimensions, the axis structure will be the
+C     same as that for an existing specified axis structure.  This routine
+C     will modify the shapes of any arrays in the model structure whose
+C     function it thinks it understands; if it finds other arrays it will
+C     reshape them if they are the same shape as the main axis data array,
+C     but will issue warning messages.  The contents of any resulting data
 C     arrays whose dimensions have changed are undefined, but any whose
-C     dimensions are unchanged will just have been copied.  The structure 
-C     being created may already have data arrays, in which case they will 
-C     be lost.  The structure being created and the structure being used 
-C     as a model may be the same.  If the model structure in fact has no 
-C     information for the specified axis, then nor will the resulting 
+C     dimensions are unchanged will just have been copied.  The structure
+C     being created may already have data arrays, in which case they will
+C     be lost.  The structure being created and the structure being used
+C     as a model may be the same.  If the model structure in fact has no
+C     information for the specified axis, then nor will the resulting
 C     structure - but this is not regarded as an error.
 C
 C  Language:
 C     FORTRAN
 C
 C  Call:
-C     CALL DSA_RESHAPE_AXIS (REF_NAME, AXIS, MODEL_NAME, MODEL_AXIS, 
+C     CALL DSA_RESHAPE_AXIS (REF_NAME, AXIS, MODEL_NAME, MODEL_AXIS,
 C                                                   NDIM, DIMS, STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
@@ -37,7 +37,7 @@ C                       associated with the axis structure.
 C     (>) AXIS          (Integer, ref) The number of the axis to be
 C                       reshaped.
 C     (>) MODEL_NAME    (Fixed string,descr) The reference name
-C                       associated with the structure whose axis data is 
+C                       associated with the structure whose axis data is
 C                       to serve as model for the reshaped structure.
 C     (>) MODEL_AXIS    (Integer, ref) The number of the axis in the model
 C                       structure that is to serve as the model for the
@@ -58,7 +58,7 @@ C     DSA_AXIS_SIZE, GEN_MOVE, DSA_PREFERRED_TYPE, DSA_UNMAP,
 C     DSA_AXIS_TYPE, DSA_MAP_AXIS_DATA, DSA_SEEK_WIDTH,
 C     DSA_AXIS_WIDTH_TYPE, DSA_MAP_WIDTH, DSA_GET_AXIS_INFO,
 C     DSA_SET_AXIS_INFO, DSA_SET_WIDTH, DSA_TYPESIZE,  DSA_FIND_REF,
-C     DSA_GET_ACTUAL_NAME, DSA_COERCE_ARRAY, DSA_WRUSER, 
+C     DSA_GET_ACTUAL_NAME, DSA_COERCE_ARRAY, DSA_WRUSER,
 C     DSA_VALIDATE_ARRAY, DSA__CREATE_AXIS, DSA__AXIS_NAME,
 C     DSA__DELETE_AXIS, DSA_WRNAME, DTA_CYVAR, DTA_CRVAR, DTA_CRNAM,
 C     DTA_DLVAR, DTA_ERROR, DTA_NMVAR, DTA_STRUC, DTA_TYVAR
@@ -244,7 +244,7 @@ C     reset the `known' flag for it.
 C
       AXIS_EXIST(AXIS,REF_SLOT)=0
 C
-C     We validate the value of AXIS and MODEL_AXIS first.  
+C     We validate the value of AXIS and MODEL_AXIS first.
 C
       CALL DSA_VALIDATE_AXIS (AXIS,REF_NAME_UC,STATUS)
       CALL DSA_VALIDATE_AXIS (MODEL_AXIS,MODEL_NAME_UC,STATUS)
@@ -276,8 +276,8 @@ C
          END IF
       END DO
 C
-C     If the input and output axis arrays are the same, and the dimensions 
-C     are unchanged, then we don't want to do anything.  In any case, we'll 
+C     If the input and output axis arrays are the same, and the dimensions
+C     are unchanged, then we don't want to do anything.  In any case, we'll
 C     need the array sizes and the 'same' information later.
 C
       SAME=OBJ_NAME.EQ.MOD_NAME
@@ -292,7 +292,7 @@ C
       END IF
       IF (SAME.AND.(.NOT.CHANGE)) GO TO 500   ! Everything done
 C
-C     The model axis has to be a structure.  So we look through 
+C     The model axis has to be a structure.  So we look through
 C     its data structure, reshaping any arrays we find.  We
 C     only do this to one level, unless we find any contracted
 C     structures.
@@ -460,14 +460,14 @@ C
 C
 C        This is the problem case where the two files have different
 C        formats.  In this case, we can't handle the reshape by just
-C        handling every item we find in the structure, but have to 
+C        handling every item we find in the structure, but have to
 C        do it at a higher level, taking each element we expect to
-C        find in an axis array and copying it over.  First, we get rid 
+C        find in an axis array and copying it over.  First, we get rid
 C        of any existing axis in the target structure.
 C
          CALL DSA__DELETE_AXIS (REF_SLOT,AXIS,IGNORE)
 C
-C        We will have to copy data over explicitly, so see how many 
+C        We will have to copy data over explicitly, so see how many
 C        data elements will have to be copied.
 C
          NELM=1

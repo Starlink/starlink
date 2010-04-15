@@ -1,4 +1,4 @@
-      SUBROUTINE ECH_FIT_REF_FWHMS(                  
+      SUBROUTINE ECH_FIT_REF_FWHMS(
      :           EXTRACTED_REF,
      :           NX,
      :           MAX_PERM_LINES,
@@ -96,8 +96,8 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              
- 
+      IMPLICIT NONE
+
 *  Include Files:
       INCLUDE 'ECH_REPORT.INC'
       INCLUDE 'ECH_FEATURE.INC'

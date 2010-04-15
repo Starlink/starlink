@@ -106,7 +106,7 @@
          END IF
 
 *      Tell DSA about the input and use it's quality array
-         CALL DSA_NAMED_INPUT( 'GRPFILE', GROUP, DSA_STATUS ) 
+         CALL DSA_NAMED_INPUT( 'GRPFILE', GROUP, DSA_STATUS )
          IF ( DSA_STATUS .NE. DSA__OK ) THEN
              STATUS = SAI__ERROR
              CALL MSG_SETC( 'GROUP', GROUP )
@@ -134,7 +134,7 @@
          END IF
 
 *     Open the STANDARD file
-         CALL DSA_NAMED_INPUT( 'STDFILE', STANDARD_NAME, DSA_STATUS ) 
+         CALL DSA_NAMED_INPUT( 'STDFILE', STANDARD_NAME, DSA_STATUS )
          IF ( DSA_STATUS .NE. DSA__OK ) THEN
              STATUS = SAI__ERROR
              CALL MSG_SETC( 'STANDARD', STANDARD_NAME )
@@ -174,7 +174,7 @@
 *     Has all this worked?
          IF ( (STATUS.EQ.SAI__OK) .AND. (DSA_STATUS.EQ.DSA__OK) ) THEN
 
-*         Obtain the size of the data array in the input group (which 
+*         Obtain the size of the data array in the input group (which
 *         will also be the same size as the one in the output group).
             CALL DSA_DATA_SIZE( 'GRPFILE', RMAXDIM, NDIM, DIMS, NELM, DSA_STATUS )
 
@@ -197,7 +197,7 @@
             IF ( (STATUS.EQ.SAI__OK) .AND. (DSA_STATUS.EQ.DSA__OK) ) THEN
 
 *            Do the multiplication propagating variance
-               CALL GEN_MULCAFV( %val(GDATA_PTR), NELM, FLAM, 
+               CALL GEN_MULCAFV( %val(GDATA_PTR), NELM, FLAM,
      :            %val(ODATA_PTR), %val(GQUAL_PTR), %val(OQUAL_PTR),
      :            %val(GVAR_PTR), %val(OVAR_PTR), .TRUE., .FALSE.,
      :            0.0, .TRUE. )

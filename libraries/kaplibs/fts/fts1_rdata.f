@@ -90,12 +90,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -145,7 +145,7 @@
 
 *  Arguments Given:
       CHARACTER * ( * ) MEDIUM
-      INTEGER MD    
+      INTEGER MD
       INTEGER SIZE
       INTEGER BPV
       LOGICAL REVERS
@@ -210,7 +210,7 @@
 *  ========================
       DO WHILE ( DISP .LT. NBYTES )
 
-*  Are there data already read in the last block of header cards, 
+*  Are there data already read in the last block of header cards,
 *  waiting to be transferred to the array?
          IF ( RDISP .EQ. RECLEN ) THEN
 
@@ -223,7 +223,7 @@
 
 *  Read the disk file.
             ELSE
-               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER, 
+               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
      :                          OFFSET, RECORD, STATUS )
             END IF
 

@@ -25,7 +25,7 @@
    exit;
 
 
-#  Fortran normalisation routine.  Gets rid of continuation lines, 
+#  Fortran normalisation routine.  Gets rid of continuation lines,
 #  spaces, and (most) CNF_PVAL invocations.
 
    sub normalise {
@@ -36,4 +36,4 @@
       s/cnf_pval\(([^)]*)\)/$1/ig;
       return( $_ );
    }
-      
+

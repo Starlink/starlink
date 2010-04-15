@@ -15,7 +15,7 @@ ICL Version 3.1-9 is released
 The SEND command now works for all CONTROL messages - ie:
     o PAR_RESET Force reset of the parameter system for task actions.
                 Particular actions within a monolith may now be specified.
-    o SETENV Set an environment variable for a task. 
+    o SETENV Set an environment variable for a task.
     o DEFAULT Set or get a current working directory for a task.
 
 The help file has been updated appropriately.
@@ -23,8 +23,8 @@ The help file has been updated appropriately.
 
 Known Bugs:
 
- 1. There are some poblems when using ICL screen mode in an xterm. They 
-    are believed to be shortcomings of the xterm implementations on 
+ 1. There are some poblems when using ICL screen mode in an xterm. They
+    are believed to be shortcomings of the xterm implementations on
     various platforms and can be overcome by typing "setenv TERM vt102"
     before running ICL. In particular:
 

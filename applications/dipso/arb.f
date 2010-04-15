@@ -2,7 +2,7 @@
        SUBROUTINE ARB(STEP,MK,RESP,MID,MAX,IK,LTEST,RF,POSN,NRF,NUT)
        DIMENSION RESP(MK), RF(1), POSN(1)
        COMMON /MAD5  / MARB
-       DATA ZERO/0.0E0/, IZ/0/, ONE/1.0E0/, IONE/1/, IT/2/, 
+       DATA ZERO/0.0E0/, IZ/0/, ONE/1.0E0/, IONE/1/, IT/2/,
      :      HALF/ - 5.0E-1/
        DATA TWO/2.0E0/
        LTEST = IZ

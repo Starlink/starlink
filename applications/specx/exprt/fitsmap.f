@@ -20,7 +20,7 @@
 
       INCLUDE   'FLAGCOMM'
       INCLUDE   'SPECX_FITS'
-      
+
 *  Ok, go...
 
       IF (.NOT.FITS_OPEN) THEN

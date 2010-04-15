@@ -59,7 +59,7 @@
       SEQUENCE_SETUP = .FALSE.
       PAUSE_REDUCTION = .FALSE.
 
-*   There are no integrations, observations or reduced groups available 
+*   There are no integrations, observations or reduced groups available
       REDUCTION_OK          = .FALSE.
       INTEGRATION_AVAILABLE = .FALSE.
       OBSERVATION_AVAILABLE = .FALSE.

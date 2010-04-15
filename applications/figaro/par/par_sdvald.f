@@ -21,7 +21,7 @@ C
 C  Parameters:     (">" input, "<" output)
 C     (>) NAME     (Fixed string, descr) The name of the parameter
 C     (>) DEFAULT  (Double, ref) The default value for the parameter.
-C     (<) STATUS   (Integer, ref) Indicates the result of the 
+C     (<) STATUS   (Integer, ref) Indicates the result of the
 C                  operation.  0 => OK.  A non-zero value
 C                  indicates failure.
 C

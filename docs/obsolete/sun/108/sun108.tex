@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -41,11 +41,11 @@ RUTHERFORD APPLETON LABORATORY\\
 
 \section{Introduction}
 
-The Exabyte CTS is a high performance, high capacity 8mm Cartridge Tape 
+The Exabyte CTS is a high performance, high capacity 8mm Cartridge Tape
 Subsystem. It uses helical scan technology, in the same way as a video
 recorder,
 to attain a very high areal recording density and data storage capacity.
-It uses industry standard 8mm tape cartridges, which are capable of storing 
+It uses industry standard 8mm tape cartridges, which are capable of storing
 up to 2.3Gbyte of formatted user data.
 
 This document is designed to introduce both users and system managers
@@ -58,16 +58,16 @@ rumours are factual and which are not.
 
 \subsection{Loading and unloading}
 
-The Exabyte drive has two LEDs and an unload button on the front panel. 
+The Exabyte drive has two LEDs and an unload button on the front panel.
 
 After powering up the drive, the amber and green LEDs remain lit for
 up to 2 minutes whilst the drive performs self tests. When the diagnostics are
 complete, both LEDs are turned off. During normal use, the green LED indicates
-that a cartridge is loaded. The amber LED flashes intermittently when 
+that a cartridge is loaded. The amber LED flashes intermittently when
 the drive is reading/writing.
 
 To load a cartridge, press the unload switch to open the door. Insert the
-cartridge, label side up, cartridge lid facing towards the drive. 
+cartridge, label side up, cartridge lid facing towards the drive.
 Gently close the door. The cartridge will load automatically.
 
 Simply press the unload switch to rewind, unload and eject the cartridge.
@@ -81,7 +81,7 @@ It is recommended that users issue the command
 \end{quote}
 
 to unload a tape if they do not intend to remove the cartridge immediately,
-since otherwise the drive door will open automatically and allow dust 
+since otherwise the drive door will open automatically and allow dust
 particles to enter the drive.
 
 To write-protect a cartridge, use a ballpoint pen to change the
@@ -96,11 +96,11 @@ If you experience difficulty initializing a blank Exabyte tape, try
 
 \end{quote}
 
-to stop the tape deck getting confused when trying to read the 
+to stop the tape deck getting confused when trying to read the
 (non-existent) previous label.
 
 Initializing tapes can take up to two minutes and mounting them can take
-over half a minute so be patient. Do not panic and hit CTRL/Y. 
+over half a minute so be patient. Do not panic and hit CTRL/Y.
 
 \subsection{Capacity}
 
@@ -113,38 +113,38 @@ cartridge, a factor of 15,000 less than  advertised. The reason for this is
 that the tape marks that separate  files are several inches long and take up as
 much space as about  2Mbyte (4,000 blocks) of data. Also, on a labelled tape,
 each file is  preceded by a header file (plus tape mark) and a trailer file
-(plus a  tape mark). The upshot of this is that unless your files are more than 
-30,000 blocks in size you are wasting more than 50\% of the cartridge. 
+(plus a  tape mark). The upshot of this is that unless your files are more than
+30,000 blocks in size you are wasting more than 50\% of the cartridge.
 The simple test above was wasting 99.993\% of the capacity of the  cartridge.
 
 \begin{itemize}
 
 \item COPY is supported only on Exabytes with CS1000 (rev. level H)
-or more recent 
-controllers. If you {\it must} use COPY, ask your system manager to 
+or more recent
+controllers. If you {\it must} use COPY, ask your system manager to
 confirm that it is supported on your Exabyte. If it is not supported,
 you may find that the drive lets you use COPY to write to the
 tape but that you are then unable to read the data back! Always
 use BACKUP if possible.
 
 \item Do not use COPY to write Exabyte cartridges unless your files are
-    {\bf much} bigger than 30,000 blocks. 
-    Use BACKUP instead. This is much more efficient as no matter how many 
-    files you are saving, BACKUP only writes a single saveset (plus 
-    header and trailer) on the cartridge. Writing multiple savesets is 
-    fine, but again they should be bigger than 30,000 blocks to use 
+    {\bf much} bigger than 30,000 blocks.
+    Use BACKUP instead. This is much more efficient as no matter how many
+    files you are saving, BACKUP only writes a single saveset (plus
+    header and trailer) on the cartridge. Writing multiple savesets is
+    fine, but again they should be bigger than 30,000 blocks to use
     the cartridge really effectively.
 
-\item If you want to write many small files to tape, or your BACKUP 
-    savesets are typically less than a few thousand blocks, then you 
+\item If you want to write many small files to tape, or your BACKUP
+    savesets are typically less than a few thousand blocks, then you
     will get more on a standard half-inch magnetic tape then on an
     Exabyte cartridge.
 
-\item Sometimes, the smaller physical size of the Exabyte cartridge 
-    compared with even a 600ft tape will be of overriding importance. 
+\item Sometimes, the smaller physical size of the Exabyte cartridge
+    compared with even a 600ft tape will be of overriding importance.
     However, no matter what you do, you cannot get more than about 320
     files on a labelled cartridge or 950 files on an unlabelled
-    cartridge. 
+    cartridge.
 
 \end{itemize}
 
@@ -155,7 +155,7 @@ for about a minute (hence long INIT times) and watching the spool
 rotation speed. From that, it
 deduces which size of tape loaded and hence the capacity.
 Hence, when sensing the tape length, it assumes
-the American size corresponding to the rotation speed. For P5-90 type tapes, 
+the American size corresponding to the rotation speed. For P5-90 type tapes,
 the tape is
 actually longer. For shorter P5 tapes, the American tapes are
 longer than the equivalent British ones (due to the different video/TV
@@ -164,18 +164,18 @@ you fill the tape, since there is no way to write end-of-volume labels etc.
 when you have genuinely run out of tape. The logical end-of-tape is determined by
 counting blocks down the tape. With a P5-90 tape the drive will ignore the last section
 of the tape, whereas with shorter P5 tapes it will suddenly
-discover the tape is shorter than expected. 
+discover the tape is shorter than expected.
 To avoid this potential problem, use only P5-90 tapes even if you are only
 going to be using a small fraction of the tape.
 
-Your site manager will supply you with Exabyte tapes. 
+Your site manager will supply you with Exabyte tapes.
 At present, the only recommended tapes are Sony P5-90MP and the Exabyte
 data tapes specifically designed for use with the drive. The latter
-are more expensive but are said to be more reliable for very long term 
+are more expensive but are said to be more reliable for very long term
 archiving.
 
 Another important question plagued by hearsay is the lifetime and re-usability
-of the tapes. Some sources preach  that tapes should be discarded 
+of the tapes. Some sources preach  that tapes should be discarded
 after as little as 6 passes (reads or writes).
 Fortunately, these rumours appear to be unfounded. Our tests have
 shown
@@ -187,7 +187,7 @@ dramatically reduced.
 Exabyte's lab testing claim that tapes would not
 even begin to `degrade' until after around 800-900 passes, but due to their
 super ECC methods they were still usable well beyond 2000-3000 passes.
-Most Starlink users are unlikely to get anywhere near this many passes on 
+Most Starlink users are unlikely to get anywhere near this many passes on
 their backup tapes!
 
 \subsection{Using the Exabyte for long-term archive}
@@ -210,16 +210,16 @@ shape.  This causes distortion of the tape geometry that is especially damaging
 to helical recording schemes (like Exabyte and DAT). Note that quarter--inch
 cartridge (QIC) and half--inch tapes do not use tensilized tape and moreover
 do not depend on helical recording.
- 
-The second problem is that most recent tapes use a metal particle (MP) 
+
+The second problem is that most recent tapes use a metal particle (MP)
 formulation. The metal particles are encapsulated in a ceramic material to
 prevent them from rusting.  Nonetheless, the magnetic properties of MP tapes
 seem to be very sensitive to their environment.  Either high temperatures and
 high humidity, or contaminants in the air can cause a rapid decrease in the
-magnetic properties of the media.  Again, both DAT and Exabytes use MP tape. 
+magnetic properties of the media.  Again, both DAT and Exabytes use MP tape.
 Apparently QIC tapes use an older magnetic layer which is much more stable than
 either of these.
- 
+
 Given these problems, the people from NML think that DAT or Exabyte tapes
 should last for two to three years in a typical office environment, and longer
 in a computer room.   In a report by NML on ``Proper Archival Data Storage on
@@ -236,19 +236,19 @@ manufacturing debris that gets removed in the first few passes.
 
 \item The operational and storage environments should be maintained at a
 constant temperature and humidity to reduce media stress.  The preferred
-environment is between 62 and 75 degrees Fahrenheit at 40 percent humidity.  
+environment is between 62 and 75 degrees Fahrenheit at 40 percent humidity.
 
 \item Always return the tapes to their protective enclosures and store them on
-edge rather than stacked flat.  
+edge rather than stacked flat.
 
-\item Do not drop them and or put heavy weights on top of them.  
+\item Do not drop them and or put heavy weights on top of them.
 
-\item Keep the operational and storage areas clean.  
+\item Keep the operational and storage areas clean.
 
 \item Clean your Exabyte drives regularly, using only the Exabyte cleaning
 tapes.  In order to assure that things are going well, sample data sets should
 be read back periodically and the error rates should be carefully monitored.
- 
+
 \end{itemize}
 
 The Exabyte manufacturers themselves have concluded after their own extensive
@@ -256,12 +256,12 @@ tests that the only thing that they feel is crucial is that you allow a tape to
 acclimatize to the environment for 24 hours before writing or reading it.  This
 means that you should remove the plastic wrapper on a brand new tape at least a
 day before you use it.
- 
+
 
 
 \subsection{General}
 
-All of the Starlink SI59 Exabytes should be capable of fast file skip. 
+All of the Starlink SI59 Exabytes should be capable of fast file skip.
 If you suspect that your drive is not, then see your site manager.
 For example, they
 can skip a BACKUP saveset containing 60,000 disc blocks in around 30 seconds.
@@ -282,16 +282,16 @@ scan. It is not thought that this gives a higher overhead on the data check.
 A user may operate the Exabyte in fixed block mode or variable block mode.
 Organisation of user blocks into fixed length blocks for recording on the tape
 is preformed by the controller. Each fixed length data block contains bytes
-from only one user block. Multiple fixed length data blocks are required 
+from only one user block. Multiple fixed length data blocks are required
 when the user block is greater than 1024 bytes. In the case of a data block
-which contains less then 1024 user bytes, the remaining bytes are 
+which contains less then 1024 user bytes, the remaining bytes are
 ``pad bytes''.
 
-Exabytes all do a read-after-write and their own CRC checking. This is how 
+Exabytes all do a read-after-write and their own CRC checking. This is how
 they are able to cope with bad patches of tape. Use of the /NOCRC is
 recommended if efficiency is of paramount importance. However, it should be
 noted that if you have a fault with your controller, then this may not be
-apparent unless you enable software CRC. 
+apparent unless you enable software CRC.
 Use of the /VERIFY qualifier in BACKUP should not be
 necessary since the read-after-write ensures the integrity of the data
 written but this is left up to the individual user's discretion.
@@ -302,11 +302,11 @@ Rumours concerning how regularly you should clean an Exabyte drive are legion.
 The manual instructs us that the drive does not require routine maintenance
 such as tape head/path cleaning.
 
-However, the suppliers and maintainers recommend that the drive should be 
+However, the suppliers and maintainers recommend that the drive should be
 cleaned but {\bf only} with the wet type cleaners supplied by SI. These cost
 around \pounds 20 each and can be used 3 times. You should clean the drive once
 per month or once per 30Gbyte.
-    
+
 This discrepancy in advice would appear to stem from the fact that the manufacturers of
 the Exabyte originally believed that cleaning was not necessary, but have
 recently revised their opinion and now recommend it.
@@ -321,24 +321,24 @@ actual tape movement is less than 0.5 inches/sec.
 
 The data are written as diagonal stripes (tracks) that are around  three inches
 long and have an angle of 5 degrees to the edge of the tape. Each track
-consists of 8 fixed length data blocks and a servo zone. 
+consists of 8 fixed length data blocks and a servo zone.
 The Exabyte writes fixed length data blocks.
-Each data block 
+Each data block
 contains up to 1024 bytes of user data plus address and ECC information.
 The ECC can correct a burst as long as 264 bytes in error and as many as 80
 additional random errors in each block. The servo zone information is used
-to ensure proper head-to-track alignment and hence allow read interchange of 
+to ensure proper head-to-track alignment and hence allow read interchange of
 cartridges between different drives.
 
 The logical beginning of tape (LBOT) is composed of an erased length of tape,
 followed by a series of tracks. The logical end of tape is determined by the
 controller based on the number of tracks recorded on the tape beyond LBOT.
-    
-An end-of-file mark is a composite of an erased length of tape, followed by a 
+
+An end-of-file mark is a composite of an erased length of tape, followed by a
 series of unique Analogue Tape Marks (ATM) tracks.
 Data on labelled tapes are preceded by header and trailer
 records, so each logical file is actually written as three physical files on
-the tape, each with its own tape mark. 
+the tape, each with its own tape mark.
 
 \section{Acknowledgements}
 

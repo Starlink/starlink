@@ -18,7 +18,7 @@
      :        YDATA( I ) .EQ. ECH__BAD_REAL ) THEN
             GO TO 100
          END IF
-         OUT = OUT + 1         
+         OUT = OUT + 1
       END DO
   100 CONTINUE
       DO I = OUT, N

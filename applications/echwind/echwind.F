@@ -104,7 +104,7 @@
 *                     one memory; tidied up use of PGPLOT routines; removed
 *                     unused variables.
 *      3 Mar 1995   : Added more data to text file, now same as on VAX version.
-*                     Remove marked boxes on echelle change. Added instrument 
+*                     Remove marked boxes on echelle change. Added instrument
 *                     name to display; draw menu in white for clarity, chosen
 *                     item in green. If detector box is completely outside
 *                     the echellogram area, write message instead of wavelength
@@ -113,13 +113,13 @@
 *                     120 to 80 to allow for default number of colours in
 *                     native PGPLOT /xwin window as define by pgxwin_server
 *                     in pgplot v5.1.  (BLY/RAL)
-*     26 Sep 1996   : Removed output from save_text about 'Echwind V2.0 - 
-*                     UCL Optical Laboratory'. Removed echelle from 
+*     26 Sep 1996   : Removed output from save_text about 'Echwind V2.0 -
+*                     UCL Optical Laboratory'. Removed echelle from
 *                     argument list for save_text. It was not used. (ACC/RAL)
 *     30 Sep 1996   : Since save_AAT was commented out, got rid of it.
 *                     Expanded save_text to write out maximum and minimum
 *                     wavelengths and detector length. (ACC/RAL)
-*      1 Oct 1996   : Moved all graphics calls to after all prompts were 
+*      1 Oct 1996   : Moved all graphics calls to after all prompts were
 *                     made. This entailed the creation of three new subroutines:
 *                     prepare_graphics, setup_colourtable, write_instrument.
 *                     (ACC/RAL)
@@ -259,9 +259,9 @@
          call plot_movcur(cursor_present,mstatus)
 
          if(cursor_present.ne.1) then
-            write(*,*) 
+            write(*,*)
      :        'You have requested a device which has no cursor.'
-            write(*,*) 
+            write(*,*)
      :        'If you requested /ps, a plot file has been created.'
             goto 500
          endif
@@ -916,8 +916,8 @@
 *  Calculate the current detector centre position
 *
       call calculate_config(
-     :   cen_wc, cen_mc, max_wc, max_mc, min_wc, min_mc, 
-     :   cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle, 
+     :   cen_wc, cen_mc, max_wc, max_mc, min_wc, min_mc,
+     :   cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle,
      :   range, on_echellogram)
 *
 *   Tell the user
@@ -928,10 +928,10 @@
          write(*,*) buff
 *
 *   Determine dispersion and cross-dispersion at field centre
-*   (Note: I can't see why the dispersions and offsets are computed. 
+*   (Note: I can't see why the dispersions and offsets are computed.
 *    They don't seem to be used. 30-SEP-1996, ACC)
 *
-*        call ech_disp(cen_wc, cen_mc, deltheta, ech_gamma0, del, 
+*        call ech_disp(cen_wc, cen_mc, deltheta, ech_gamma0, del,
 *    :                 status)
 *        call ech_xdispfs(cen_wc, ech_gamma0, xdel, status)
 *
@@ -991,7 +991,7 @@
             write(lun, *) '       Theta        Gamma'
      :                  //'    prism (mm)   slit angle'
             write(lun, '(f12.3, f13.3, f12.2, f13.3)')
-     :            cen_theta*rad, cen_gamma*rad, cen_prism_pos, 
+     :            cen_theta*rad, cen_gamma*rad, cen_prism_pos,
      :            cen_slit_angle*rad
          endif
 *
@@ -1252,7 +1252,7 @@
      :              //linelist(prefix_pos+len('${ECHWIND_HOME}')
      :              :str_len(linelist))
          endif
-           
+
          write(*,*) 'linelist file =',
      $                  linelist(:str_len(linelist))
          open(unit=lun, file=linelist(:str_len(linelist)),
@@ -1896,7 +1896,7 @@
       logical first, on_echellogram
       real cen_wc, max_wc, min_wc
       real range
-      real cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle 
+      real cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle
 
       save first
       save oldmaxbuff, oldcenbuff, oldranbuff, oldminbuff
@@ -1911,8 +1911,8 @@
 *  of the detector in Angstroms).
 *
       call calculate_config(
-     :   cen_wc, cen_mc, max_wc, max_mc, min_wc, min_mc, 
-     :   cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle, 
+     :   cen_wc, cen_mc, max_wc, max_mc, min_wc, min_mc,
+     :   cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle,
      :   range, on_echellogram)
       if (on_echellogram) then
          write(cenbuff, '(''Central wavelength:'', i5,'//
@@ -1970,11 +1970,11 @@
 
 
       subroutine calculate_config(
-     :   cen_wc, cen_mc, max_wc, max_mc, min_wc, min_mc, 
-     :   cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle, 
+     :   cen_wc, cen_mc, max_wc, max_mc, min_wc, min_mc,
+     :   cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle,
      :   range, on_echellogram)
 *
-*   Determine and calculate the current detector center position 
+*   Determine and calculate the current detector center position
 *   (wavelength and order).
 *
       implicit none
@@ -1986,7 +1986,7 @@
       real    cen_wc, max_wc, min_wc
 *   Other central position parameters
       real cen_theta, cen_gamma, cen_prism_pos, cen_slit_angle
-*   Detector length (length of one order in Angstroms, at center of 
+*   Detector length (length of one order in Angstroms, at center of
 *                    detector)
       real    range
 *   Whether detector is on the echellogram
@@ -2018,13 +2018,13 @@
 *  wavelength at the centre of the detector (and also estimate the width
 *  of the detector in Angstroms).
 *
-         call how_do_i_get_there(echxc, echyc, cen_theta, cen_gamma, 
+         call how_do_i_get_there(echxc, echyc, cen_theta, cen_gamma,
      :      colour, cen_prism_pos, cen_slit_angle)
          call ech_wavecen(cen_theta, cen_gamma, cen_wc, cen_mc, status)
 
-         call ech_disp(cen_wc, cen_mc, cen_theta, cen_gamma, dx1, 
+         call ech_disp(cen_wc, cen_mc, cen_theta, cen_gamma, dx1,
      :      status)
-         call ech_disp(cen_wc+1.0, cen_mc, cen_theta, cen_gamma, dx2, 
+         call ech_disp(cen_wc+1.0, cen_mc, cen_theta, cen_gamma, dx2,
      :      status)
          range=(detx2-detx1)/(dx2-dx1)
 *

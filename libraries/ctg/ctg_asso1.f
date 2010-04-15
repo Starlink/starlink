@@ -4,7 +4,7 @@
 *     CTG_ASSO1
 
 *  Purpose:
-*     Obtain an identifier for a single existing catalogue using a 
+*     Obtain an identifier for a single existing catalogue using a
 *     specified parameter.
 
 *  Language:
@@ -14,21 +14,21 @@
 *     CALL CTG_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )
 
 *  Description:
-*     This routine is equivalent to CAT_ASSOC except that it allows the 
+*     This routine is equivalent to CAT_ASSOC except that it allows the
 *     catalogue to be specified using a GRP group expression (for instance,
-*     its name may be given within a text file, etc). The first catalogue in 
+*     its name may be given within a text file, etc). The first catalogue in
 *     the group expression is returned. Any other names in the group
-*     expression are ignored. Supplemental information describing the 
+*     expression are ignored. Supplemental information describing the
 *     separate fields in the catalogue specification are also returned.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the ADAM parameter.
 *     VERB = LOGICAL (Given)
-*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        If TRUE then errors which occur whilst accessing supplied catalogues
 *        are flushed so that the user can see them before re-prompting for
-*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     MODE = CHARACTER * ( * ) (Given)
 *        Type of catalogue access required: 'READ', 'UPDATE' or 'WRITE'.
@@ -41,7 +41,7 @@
 *           2 - File type
 *           3 - Base file name
 *           4 - Directory path
-*           5 - Full catalogue specification 
+*           5 - Full catalogue specification
 *
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -115,7 +115,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get a group of catalogues from the environment using the supplied parameter.
-*  There is no need to loop if a group expression is given which is 
+*  There is no need to loop if a group expression is given which is
 *  terminated by a flag character since we only want one catalogue.
       IGRP = GRP__NOID
       CALL CTG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
@@ -123,7 +123,7 @@
 *  Get the supplemental fields for the first catalogue in the group.
       CALL CTG_GTSUP( IGRP, 1, FIELDS, STATUS )
 
-*  Get the first catalogue from the group.         
+*  Get the first catalogue from the group.
       CALL CTG_CATAS( IGRP, 1, MODE, CI, STATUS )
 
 *  Delete the group.

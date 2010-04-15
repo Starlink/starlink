@@ -14,10 +14,10 @@
 
 *  Description:
 *     The routine obtains the extension name of a FITS extension.
-*     from the EXTNAME keyword.  Should the EXTNAME value have a 
+*     from the EXTNAME keyword.  Should the EXTNAME value have a
 *     redirection to another header, as indicated by the presence
 *     of an '@' in its first character, the remainder of the value is
-*     interpreted as another KEYWORD.  This is only used when the 
+*     interpreted as another KEYWORD.  This is only used when the
 *     extension name is longer than the 68 characters than the EXTNAME
 *     keyword can accommodate.
 
@@ -31,7 +31,7 @@
 *        80 be exceeded.
 *     COMENT, = CHARACTER * ( * ) (Returned)
 *        The comment associated with the extension name's header
-*        keyword.  Space should be allowed for up to 48 characters. 
+*        keyword.  Space should be allowed for up to 48 characters.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -68,7 +68,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

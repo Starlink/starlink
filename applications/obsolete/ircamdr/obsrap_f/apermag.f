@@ -12,7 +12,7 @@
 *     D (input)                          The diameter in pixels of the aperture
 *     REAL
 
-*     DOLD (input)                       The diameter in pixels of the old 
+*     DOLD (input)                       The diameter in pixels of the old
 *     REAL                               aperture
 
 *     SKY (input)                        Sky value - required for poisson errors
@@ -24,19 +24,19 @@
 *     AXRAT (input)
 *     REAL
 
-*     FLUX (output)                
-*     REAL                               
+*     FLUX (output)
+*     REAL
 
-*     MEANFLUX (output)                
-*     REAL                               
+*     MEANFLUX (output)
+*     REAL
 
-*     FLUXSE (output)                
-*     REAL                               
+*     FLUXSE (output)
+*     REAL
 
 *     MAGNITUDE (output)
 *     REAL
 
-*     ERRORMAG (output) 
+*     ERRORMAG (output)
 *     REAL
 
 *     NO (output)
@@ -78,13 +78,13 @@ C     Set up object position and aperture radius
       YO=XO
       APERRAD=D/2.0
       APERRADOLD=DOLD/2.0
-     
+
 C     Set initial flux to zero
 
       FLUX=0.0
       NO=0
-      DO J=1,CLEANSIZE 
-         DO I=1,CLEANSIZE 
+      DO J=1,CLEANSIZE
+         DO I=1,CLEANSIZE
             X=REAL(I)
             Y=REAL(J)
             THETA=ATAN((XO-X)/(Y-YO))
@@ -96,7 +96,7 @@ C     Set initial flux to zero
             XSQUARE=1.0 / ((1.0/(APERRAD*APERRAD*TAN(THETA)*
      >             TAN(THETA))) + (1.0/(AXRAT*AXRAT*
      >             APERRAD*APERRAD)))
-            YSQUARE=1.0 / ((1.0/(APERRAD*APERRAD)) + 
+            YSQUARE=1.0 / ((1.0/(APERRAD*APERRAD)) +
      >             ((TAN(THETA)*TAN(THETA))/(AXRAT*AXRAT*
      >             APERRAD*APERRAD)))
             APERRAD_THETA=SQRT(XSQUARE+YSQUARE)
@@ -104,7 +104,7 @@ C     Set initial flux to zero
             XSQUAREOLD=1.0 / ((1.0/(APERRADOLD*APERRADOLD*TAN(THETA)*
      >             TAN(THETA))) + (1.0/(AXRAT*AXRAT*
      >             APERRADOLD*APERRADOLD)))
-            YSQUAREOLD=1.0 / ((1.0/(APERRADOLD*APERRADOLD)) + 
+            YSQUAREOLD=1.0 / ((1.0/(APERRADOLD*APERRADOLD)) +
      >             ((TAN(THETA)*TAN(THETA))/(AXRAT*AXRAT*
      >             APERRADOLD*APERRADOLD)))
             APERRADOLD_THETA=SQRT(XSQUAREOLD+YSQUAREOLD)
@@ -127,7 +127,7 @@ C        Statistics
       SUM=0.0
       DO I=1,NO
          RESID=(ANULUS(I)-MEANFLUX)
-         SUM=SUM+(RESID**2.0)     
+         SUM=SUM+(RESID**2.0)
       ENDDO
       FLUXSD=(SUM/(REAL(NO)-1.0))**0.5
       FLUXSE=FLUXSD/((REAL(NO))**0.5)
@@ -158,7 +158,7 @@ C     2 sigma cut -- if not wanted, comment out.
 
 *         DO I=1,NO
 *            RESID=(NEWANULUS(I)-MEANFLUX)
-*            SUM=SUM+(RESID**2.0)     
+*            SUM=SUM+(RESID**2.0)
 *         ENDDO
 *         FLUXSD=(SUM/(REAL(NO)-1.0))**0.5
 *         FLUXSE=FLUXSD/((REAL(NO))**0.5)
@@ -169,7 +169,7 @@ c---------------------------------------------------------------------------
       IF (FLUX.GE.0.000001) THEN
          MAGNITUDE=-2.5*(LOG10(FLUX))
 
-C        Errors-assuming 1% error in flatfielding and  
+C        Errors-assuming 1% error in flatfielding and
 C        photon-count conversion factor of 15.0 for AAT or
 C        2.5 for UH 88inch
 
@@ -177,7 +177,7 @@ C        2.5 for UH 88inch
          FLATFIELD=(REAL(NO)*SKY)/100.0
          ERROR=SQRT((POISSON*POISSON)+(FLATFIELD*FLATFIELD))
          UPFLUX=FLUX+ERROR
-         DOWNFLUX=FLUX-ERROR      
+         DOWNFLUX=FLUX-ERROR
          IF (UPFLUX.GE.0.0) THEN
             UPMAG=MAG-((-2.5)*(LOG10(UPFLUX)))
          ELSE

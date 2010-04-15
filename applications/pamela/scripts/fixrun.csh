@@ -1,11 +1,11 @@
 #!/bin/csh -f
 #
-# !!begin 
+# !!begin
 # !!title  Fix run number of SAAO data
 # !!author T.R. Marsh
 # !!created  ?
 # !!revised  08 December 2005
-# !!root   fixrun 
+# !!root   fixrun
 # !!index  fixrun.csh
 # !!descr  Script to fix run numbers of SAAO data
 # !!head1  Debiassing script

@@ -15,8 +15,8 @@
 *  Description:
 *     Any message tokens which have been annulled by a call to msgOut,
 *     msgOutif, msgLoad, errRep, errAnnul or errLoad are renewed.
-*     If any new token value has been defined (using the msgSetx and 
-*     msgFmt routines) since the previous tokens were annulled, no 
+*     If any new token value has been defined (using the msgSetx and
+*     msgFmt routines) since the previous tokens were annulled, no
 *     action is taken. The intended use of msgRenew is to renew all message
 *     tokens immediately after a call msgOut, msgOutif, msgLoad,
 *     errRep, errAnnul or errLoad for re-use in a subsequent message.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

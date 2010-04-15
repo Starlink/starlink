@@ -42,7 +42,7 @@
          if(y2.ge.dev_ysize)then
             y2=dev_ysize - 1
             y1=y2 - ylen
-         endif 
+         endif
          win_x1=x1
          win_y1=y1
          win_x2=x2

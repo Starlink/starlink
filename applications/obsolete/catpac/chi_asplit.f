@@ -25,14 +25,14 @@
 *     numbers associated with user defined functions are the function number
 *     plus 100.
 *
-*     ASPLIT first convert the expression to uppercase except between 
+*     ASPLIT first convert the expression to uppercase except between
 *     CHI__DELIM (").
 *
 *     Included blanks are removed.
 *
-*     Each character is examined in turn and checked to see if it is 
-*     recognised as known item or the start of a known item. If it is 
-*     subsequent characters may have to be examined before the item is 
+*     Each character is examined in turn and checked to see if it is
+*     recognised as known item or the start of a known item. If it is
+*     subsequent characters may have to be examined before the item is
 *     identified. When an item is identified it is loaded onto the stack in
 *     the common area.
 *
@@ -66,7 +66,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,9 +76,9 @@
       INCLUDE 'CHIPAR_PAR'       ! Standard CHI parser constants
       INCLUDE 'CHIPAR1_PAR'      ! Standard CHI parser precedence constants
       INCLUDE 'CHI_ERR'          ! Standard CHI errors
-*    Global constants : 
+*    Global constants :
       include 'CHIPAR_ERR'
-*  Global variables : 
+*  Global variables :
       INCLUDE 'CHIWRK_CMN'
 
 *  Arguments Given:
@@ -330,7 +330,7 @@
           istat= status
           status = SAI__OK
           if (i.ne.start_item) then
-            call chi_anxtitm ( expr(start_item:i-1), CHI__NULID, 
+            call chi_anxtitm ( expr(start_item:i-1), CHI__NULID,
      :                        wsptr, item, status)
           endif
           call chi_anxtitm ( expr(i:i+obj_len-1), obj_num,

@@ -25,9 +25,9 @@
 *     half of the second weight etc.) until the half weight is
 *     exceeded. The data values around this half weight position are
 *     then found and a linear interpolation of these values is the
-*     weighted median. This routine also uses the order statistic 
-*     covariance array (for a population NENT big) to estimate the 
-*     change in the variance from a optimal measurement from the 
+*     weighted median. This routine also uses the order statistic
+*     covariance array (for a population NENT big) to estimate the
+*     change in the variance from a optimal measurement from the
 *     given population, returning the adjusted variance.
 
 *  Arguments:
@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -148,15 +148,15 @@
       IF ( NENT .EQ. 1 ) THEN
 
 *  Just one value, copy the input values to the output values.
-         RESULT = ORDDAT( 1 ) 
+         RESULT = ORDDAT( 1 )
          RESVAR = VAR
       ELSE
 
-*  More than one value so process in earnest. 
+*  More than one value so process in earnest.
 *  Sum weights.
          TOTWT = 0.0D0
          DO 1 I = 1, NENT
-            TOTWT = TOTWT + WEIGHT( I ) 
+            TOTWT = TOTWT + WEIGHT( I )
  1       CONTINUE
 
 * Search for median weight.
@@ -176,8 +176,8 @@
 *  Bounds are present value and previous one.
          LBND = I - 1
          UBND = I
-         D1 = ORDDAT( LBND ) 
-         D2 = ORDDAT( I ) 
+         D1 = ORDDAT( LBND )
+         D2 = ORDDAT( I )
 
 *  Set weights factors
          W1 = ( WTSUM - TOTWT ) / MAX( WTINC, 1.0D-20 )

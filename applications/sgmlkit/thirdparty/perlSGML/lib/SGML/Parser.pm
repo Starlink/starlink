@@ -13,12 +13,12 @@
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation; either version 2 of the License, or
 ##  (at your option) any later version.
-## 
+##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##  GNU General Public License for more details.
-##  
+##
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program; if not, write to the Free Software
 ##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -87,7 +87,7 @@ $namechars	= '\w\.\-';
 sub new {
     my $this = { };
     my $class = shift;
-    
+
     ## Private variables
     $this->{'_input_stack'} = [ ];	# Input stack
     $this->{'_input'} = undef;		# Reference to current input info
@@ -100,7 +100,7 @@ sub new {
     $this->{'mode'} = $ModePCData;	# Parsing mode: Can be set
 					# by method callbacks to control
 					# recognition modes.
-                                
+
     bless $this, $class;
     $this;
 }
@@ -148,7 +148,7 @@ sub new {
 ##
 ##	These methods should be redefined by subclasses to perform
 ##	whatever parsing tasks are required.
-##        
+##
 sub parse_data {
 
     my $this = shift;		# Self reference
@@ -158,10 +158,10 @@ sub parse_data {
     $href->{'_label'} = shift;	# Input label (Optional)
     my $buf = shift || '';	# Initial buffer (Optional)
     $href->{'_ln'} = shift || 0;# Starting line number (Optional).
-    
+
     my($before, $after, $type, $tmp);
     my($m1, $gi, $name);
-    
+
     ## Set values for subsequent calls to _get_line()
     if (ref($in) eq 'SCALAR') {
 	$href->{'_string'} = $in;
@@ -181,7 +181,7 @@ sub parse_data {
 
 	## Parse input
 	LOOP: while (defined($buf)) {
-	
+
 	    # Fill working buffer if empty
 	    if ($buf eq '') {
 		last LOOP  unless defined($buf = $this->_get_line());
@@ -254,7 +254,7 @@ sub parse_data {
 	    #--------------------------------------------------------------
 	    # Now, check what the type is and process accordingly.
 	    #--------------------------------------------------------------
-	    
+
 	    ## Invoke cdata callback if any before text -------------------
 	    if ($before ne '') {
 		$this->{'mode'} == $ModeIgnore ?
@@ -265,7 +265,7 @@ sub parse_data {
 	    if ($type == $TypeERO) {
 		$buf = $after;
 		$name = $m1;
-	
+
 		if ($name eq '#') {	# Character reference
 		    if ($buf =~ s/^([$namechars]+);?//o) {
 			$name = $1;
@@ -281,13 +281,13 @@ sub parse_data {
 
 		next LOOP;
 	    }
-	    
+
 
 	    ## End tag ----------------------------------------------------
 	    if ($type == $TypeETagO) {
 		$buf = $after;
 		$gi = '';
-	
+
 		# Get rest of generic identifier
 		if ($buf =~ s/^([$namechars]*)\s*//o) {
 		    $gi = $1;
@@ -303,11 +303,11 @@ sub parse_data {
 		$this->{'mode'} = $ModePCData;
 		next LOOP;
 	    }
-	    
+
 	    ## Start tag --------------------------------------------------
 	    if ($type == $TypeSTagO) {
 		$gi = $m1;  $buf = $after;
-	
+
 		# Check for null start tag
 		if ($gi eq '>') {
 		    $this->start_tag('', '');
@@ -316,7 +316,7 @@ sub parse_data {
 
 		# Get rest of generic identifier
 		if ($buf =~ s/^([$namechars]*)//o) { $gi .= $1; }
-	    
+
 		# Get attribute specification list and tagc
 		$attr = '';
 		STAG: while (1) {
@@ -345,7 +345,7 @@ sub parse_data {
 	    if ($type == $TypePIO) {
 		$buf = $after;
 		$tmp = '';
-	    
+
 		# Read up to tagc
 		PI: while (1) {
 		    if ($buf =~ />/o) { $tmp .= $`;  $buf = $'; last PI; }
@@ -357,7 +357,7 @@ sub parse_data {
 		$this->processing_inst($tmp);
 		next LOOP;
 	    }
-	    
+
 	    ## Marked section end -----------------------------------------
 	    if ($type == $TypeMSC) {
 		$buf = $after;
@@ -443,7 +443,7 @@ sub parse_data {
 			# Push comment block on list
 			push(@comms, $tmp);
 			last COMM  unless defined($buf);
-			
+
 			# Check for declaration close or another comment block
 			while ($buf !~ /\S/) {
 			    if (!defined($buf = $this->_get_line())) {
@@ -471,7 +471,7 @@ sub parse_data {
 
 	    } # end markup declaration
 
-	
+
 	    ## If not markup, invoke cdata callback -----------------------
 	    $this->{'mode'} == $ModeIgnore ?
 		$this->ignored_data($buf) :
@@ -550,10 +550,10 @@ sub _get_line {
     my $ret = undef;
     my $href = $this->{'_input'};
     my($sref, $fh);
-    
+
     if (defined($fh = $href->{'_fh'})) {
 	$href->{'_ln'} = $.  if defined($ret = <$fh>);
-        
+
     } elsif (defined($sref = $href->{'_string'})) {
         if ($$sref =~ s%(.*?${/})%%o) {
             $ret = $1;

@@ -5,14 +5,14 @@
      &             STK_NPTS,TOP_STK,NPARAMS,PARAMS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C          L I S T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C TITLE (<), LAMBDA (<), STOKES_I (<), STOKES_Q (<), STOKES_QV (<)
 C STOKES_U (<), STOKES_UV (<), NPTS (<),
@@ -20,10 +20,10 @@ C STK_TITLE (<), STK_LAMBDA (<), STK_STOKES_I (<), STK_STOKES_Q (<),
 C STK_STOKES_QV (<), STK_STOKES_U (<), STK_STOKES_UV (<),
 C STK_NPTS (<), TOP_STK (<), NPARAMS (<), PARAMS (<) ,OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C
 C This subroutine lists the stack contents.

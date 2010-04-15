@@ -3,7 +3,7 @@
 *    Description :
 *     This routine reads the value from a scalar primitive component
 *     of a structure.
-*     There is a routine for each access type, 
+*     There is a routine for each access type,
 *
 *        CMP_GET0D    DOUBLE PRECISION
 *        CMP_GET0R    REAL
@@ -71,7 +71,7 @@
 *    Description :
 *     This routine reads the value from a scalar primitive component
 *     of a structure.
-*     There is a routine for each access type, 
+*     There is a routine for each access type,
 *
 *        CMP_GET0D    DOUBLE PRECISION
 *        CMP_GET0R    REAL
@@ -139,7 +139,7 @@
 *    Description :
 *     This routine reads the value from a scalar primitive component
 *     of a structure.
-*     There is a routine for each access type, 
+*     There is a routine for each access type,
 *
 *        CMP_GET0D    DOUBLE PRECISION
 *        CMP_GET0R    REAL
@@ -207,7 +207,7 @@
 *    Description :
 *     This routine reads the value from a scalar primitive component
 *     of a structure.
-*     There is a routine for each access type, 
+*     There is a routine for each access type,
 *
 *        CMP_GET0D    DOUBLE PRECISION
 *        CMP_GET0R    REAL
@@ -275,7 +275,7 @@
 *    Description :
 *     This routine reads the value from a scalar primitive component
 *     of a structure.
-*     There is a routine for each access type, 
+*     There is a routine for each access type,
 *
 *        CMP_GET0D    DOUBLE PRECISION
 *        CMP_GET0R    REAL

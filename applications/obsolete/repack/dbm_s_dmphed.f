@@ -19,9 +19,9 @@
 	INTEGER		CW			! Temp config word
 	INTEGER		NXREC			! Map file rec pointer
 	REAL*8		DELT
- 
+
 	IF (STATUS .NE. 0) RETURN
- 
+
 * Dump key parameters to user
 	WRITE(ILIS,10) HEAD.MODE, HEAD.MDR_SEQ,
      :		    HEAD.NLON, HEAD.NLAT,
@@ -32,7 +32,7 @@
      :		    HEAD.END_MJD, HEAD.NEVENT,
      :		    HEAD.NMAP, HEAD.CRE_DATE,
      :		    HEAD.REVISION
- 
+
 10	FORMAT (//,' Mode                    : ',A1,/,
      :		   ' MDR Sequence #          : ',A10,/,
      :		   ' # Azim maps             : ',I3,/,
@@ -50,11 +50,11 @@
      :		   ' Active maps             : ',I5,/,
      :             ' File Creation           : ',A9,/,
      :		   ' File Revision           : ',A4,//)
- 
- 
- 
+
+
+
 999	IF (STATUS .NE. 0) THEN
 	  WRITE(*,*) '   Error in DBM_S_DMPHED'
 	ENDIF
- 
+
 	END

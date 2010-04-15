@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
       DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
 
 *  Get the list of file names from the environment.
-         CALL GRP_GROUP( PNIN, GRP__NOID, IGRP1, NGLIST, ADDED, 
+         CALL GRP_GROUP( PNIN, GRP__NOID, IGRP1, NGLIST, ADDED,
      :                   CFLAG, STATUS )
 
 *  Cancel the parameter association in order to get more group values
@@ -181,7 +181,7 @@
 
 *  Add this NDF into the output group.  NFILE keeps a count of the
 *  number of files in the output group.
-                  CALL GRP_GRPEX( FSPEC, GRP__NOID, IGRP2, NIFILE, 
+                  CALL GRP_GRPEX( FSPEC, GRP__NOID, IGRP2, NIFILE,
      :                            ADDED, CFLAG, STATUS )
                END IF
 

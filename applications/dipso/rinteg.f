@@ -3,7 +3,7 @@
 C   SIMPSON"S RULE VERSION OF RINTEG.
        INTEGER TWO
        DIMENSION X(M), Y(M)
-       DATA THREE/3.0E0/, ONE/1.0E0/, TWO/2/, IZ/0/, HALF/0.5E0/, 
+       DATA THREE/3.0E0/, ONE/1.0E0/, TWO/2/, IZ/0/, HALF/0.5E0/,
      :      FOUR/4.0E0/, ZERO/0.0E0/, IONE/1/, KTEST/0/
        KTEST = IZ
        H = ABS((X(2)-X(1))/THREE)

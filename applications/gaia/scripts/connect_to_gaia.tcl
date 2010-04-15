@@ -14,7 +14,7 @@
 #     will be started. The return is a file descriptor to the socket, this
 #     can be used to send "remotetcl" commands, and a flag indicating if a
 #     new instance of GAIA was started.
-#     
+#
 #     To detach from GAIA just close the given file descriptor.
 #
 #     To send to GAIA see the simple "send_to_gaia" proc also included,

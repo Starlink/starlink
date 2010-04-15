@@ -94,7 +94,7 @@ C     Return immediately if bad status passed.
 C
       IF (STATUS.NE.0) RETURN
 C
-C     Start looking through the items in the FITS array.  
+C     Start looking through the items in the FITS array.
 C
       BLANK=0
       COMMENT=0

@@ -20,7 +20,7 @@
 *
 *  Arguments :
 *     None
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *

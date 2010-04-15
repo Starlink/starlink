@@ -24,7 +24,7 @@
 #        The name of the listbox which will contain Sets of NDFs.
 #     items = list of integers
 #        A list of integers (indexes) identifying items from the list in
-#        Unsetbox which will consitute a new Set in the Setbox.   
+#        Unsetbox which will consitute a new Set in the Setbox.
 
 #  Global Variables:
 #     CCDsetindices = list of integers
@@ -73,7 +73,7 @@
          CCDGetSetIndices $Setbox.getsetindices
       }
       set hassetindices [info exists CCDsetindices]
- 
+
 #  Only proceed if this is not an empty list.
       if { [llength $items] > 0 } {
          set usize [$Unsetbox size]
@@ -105,9 +105,9 @@
 
 #  If starting a new Set, insert a SET header line and bump the insertion
 #  point.
-            if { $newset } { 
+            if { $newset } {
                set newset 0
-               set srank 0 
+               set srank 0
                $Setbox insert $point ""
                CCDItemSetIndex $Setbox $point "SET"
                incr point

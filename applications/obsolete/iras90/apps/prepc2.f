@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
       IF( .NOT. VAROUT .OR. STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get workspace to hold character information describing each input
-*  NDF. 
+*  NDF.
       CALL PSX_MALLOC( NITEM*SIZE*LNITEM, IPWORK, STATUS )
 
 *  Convert the pointer to the array into a pointer to a character
@@ -190,7 +190,7 @@
 
 *  Give an introductory message for the displayed file name pairs.
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
-         CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG1', 
+         CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG1',
      : '  The following pairs of data and noise maps will be stored '//
      : 'together:', STATUS )
 
@@ -235,13 +235,13 @@
                IF( PAIR ) THEN
                   CALL GRP_GET( IGRP(1), INOISE, 1, NAME2, STATUS )
                   CALL GRP_PUT( JGRP(7), 1, NAME2, 0, STATUS )
-   
+
 *  Tell the user the names of the associatied NDFs.
                   CALL MSG_SETC( 'D', NAME1 )
-                  CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG2', 
+                  CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG2',
      :                            '    ^D (data map)', STATUS )
                   CALL MSG_SETC( 'N', NAME2 )
-                  CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG3', 
+                  CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG3',
      :                            '    ^N (noise map)', STATUS )
                   CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
@@ -249,7 +249,7 @@
 *  map.
                ELSE
                   CALL GRP_PUT( JGRP(7), 1, ' ', 0, STATUS )
-   
+
                END IF
 
             END IF
@@ -267,7 +267,7 @@
                CALL GRP_DELET( JGRP( I ), STATUS )
             END DO
 
-*  If any pairs were found... 
+*  If any pairs were found...
          ELSE
 
 *  ...delete the supplied groups, and return the identifiers of the "J"
@@ -300,6 +300,6 @@
       CALL PSX_FREE( IPWORK, STATUS )
 
 *  Finish
- 999  CONTINUE   
+ 999  CONTINUE
 
       END

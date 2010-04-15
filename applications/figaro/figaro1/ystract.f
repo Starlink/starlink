@@ -14,7 +14,7 @@ C                are to be taken.
 C
 C     'XSTART'   The AXIS(1)-value of the first row to be used.
 C                If IMAGE has an AXIS(1) structure, the data from this
-C                is used.  If not, the column numbers are used, 
+C                is used.  If not, the column numbers are used,
 C                starting from 1.
 C
 C     'XEND'     The AXIS(1)-value of the last column to be used.
@@ -51,23 +51,23 @@ C
 C     Local variables
 C
       INTEGER   DIMS(2)          ! IMAGE dimensions
-      LOGICAL   EXIST            ! Used to check for existence of 
+      LOGICAL   EXIST            ! Used to check for existence of
                                  ! AXIS(2) data
       INTEGER   IPTR             ! Dynamic-memory pointer to IMAGE data
       INTEGER   IXEN             ! Last image column to extract
       INTEGER   IXST             ! First image column to extract
-      INTEGER   NDIM             ! Number of dimensions 
+      INTEGER   NDIM             ! Number of dimensions
       INTEGER   NELM             ! Number of elements - ignored
       INTEGER   NX               ! First dimension of image
       INTEGER   NY               ! Second dimension of image
       INTEGER   SLOT             ! Slot number - ignored
       INTEGER   SPTR             ! Dynamic-memory pointer to SPECT data
       INTEGER   STATUS           ! Running status for DSA_ routines
-      INTEGER   SVPTR            ! Dynamic memory pointer to SPECT 
+      INTEGER   SVPTR            ! Dynamic memory pointer to SPECT
                                  ! variances
-      LOGICAL   VEXIST           ! Does IMAGE have a variance 
+      LOGICAL   VEXIST           ! Does IMAGE have a variance
                                  ! structure?
-      INTEGER   VPTR             ! Dynamic-memory pointer to IMAGE 
+      INTEGER   VPTR             ! Dynamic-memory pointer to IMAGE
                                  ! variances
       REAL      XEND             ! Last AXIS(1) value used - ignored
       REAL      XSTART           ! First AXIS(1) value used - ignored
@@ -76,7 +76,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -141,7 +141,7 @@ C
      :                %VAL(CNF_PVAL(SPTR)))
 C
 C     If variances exist, pass these through FIG_YTRACT as well.
-C    
+C
       IF (VEXIST) THEN
          CALL FIG_YTRACT(%VAL(CNF_PVAL(VPTR)),NX,NY,IXST,IXEN,
      :                   %VAL(CNF_PVAL(SVPTR)))

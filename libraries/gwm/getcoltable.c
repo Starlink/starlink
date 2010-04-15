@@ -11,7 +11,7 @@
 #include "gwm_err.h"
 #include "gwm.h"
 
-int GWM_GetColTable( Display *display, Window win_id, 
+int GWM_GetColTable( Display *display, Window win_id,
 	unsigned long **table, unsigned long *size)
 /*
 *+
@@ -20,7 +20,7 @@ int GWM_GetColTable( Display *display, Window win_id,
 *
 *  Purpose:
 *     Get window's colour table
-*     
+*
 *  Language:
 *     C
 *
@@ -50,12 +50,12 @@ int GWM_GetColTable( Display *display, Window win_id,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,10 +88,10 @@ int GWM_GetColTable( Display *display, Window win_id,
 	XA_INTEGER, &actual_type, &actual_format, size, &bytes_after,
 	(unsigned char**)(&local_table));
     if ( status != Success || *size == 0) return GWM_NO_COLTAB;
-    
+
     *table = (unsigned long*)malloc( sizeof(unsigned long) * (*size));
     if (!table) return( GWM_MEM_ALLOC);
-    
+
     for ( i = 0; i < *size; i++ ) (*table)[i] = local_table[i];
 
     XFree( (char*)local_table );

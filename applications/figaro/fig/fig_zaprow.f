@@ -8,7 +8,7 @@ C
 C     Flags a set of rows as bad, recording their numbers in the
 C     bad row table and also flagging them in the data array by
 C     setting their elements to a flag value. If a variance structure
-C     exists, its elements are all set to be zero. They may be changed 
+C     exists, its elements are all set to be zero. They may be changed
 C     using GENVAR if required.
 C
 C     Parameters -  (">" input, "<" output, "!" modified)
@@ -79,7 +79,7 @@ C
 C
 C     If variances exist, set them all to zero.
 C
-               IF (VEXIST) THEN 
+               IF (VEXIST) THEN
                  CALL FIG_PUNCHOUT(VARIANCE,NX,NY,LX1,ROW,LX2,
      :                             ROW,0.0)
                ENDIF

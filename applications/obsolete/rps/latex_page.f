@@ -1,11 +1,11 @@
 *+LATEX_PAGE       Outputs one copy of the given page
       SUBROUTINE LATEX_PAGE(IPAGE,LUN_OUT,FILE,FTYPE,STATUS)
- 
+
 *  Type Declaration
       IMPLICIT NONE
 
 	real x
-	integer*4 y 
+	integer*4 y
 *  Calling Arguments
       INTEGER IPAGE
       INTEGER TARGET
@@ -13,13 +13,13 @@
       CHARACTER*(*) FILE		! Output file name - use for i/p file
       CHARACTER*(*) FTYPE
       INTEGER STATUS			! Status, 0 = OK
- 
+
 *  Global Variables
       INCLUDE 'com_form_latex.inc'
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_points.inc'
       INCLUDE 'com_form_ao.inc'
- 
+
 *******************************************************************************
 *  History
 *     1988 October	M Ricketts	1st Version
@@ -39,7 +39,7 @@
       CHARACTER*60 DBS_GETC
       INTEGER DBS_FIELDNO
       INTEGER DBS_GETL
- 
+
 *  Local Variables
       INTEGER LUN_IN, IOSTATUS, NCHAR, FIELD_NO, ntargs
       CHARACTER*128 FILE_IN
@@ -59,7 +59,7 @@
 *  Executable Code
 
       IF (STATUS.NE.0) GOTO 99
- 
+
       IF (FTYPE.EQ.'SELECT' ) THEN
          IF (IPAGE.EQ.1) THEN
             DO_PAGE = FORM_GETC('Do you want Cover page printed','Y')
@@ -77,7 +77,7 @@
             DO_PAGE = FORM_GETC('Do you want Target remarks printed','Y')
             WRITE(*,*)'        '
          END IF
-         
+
          IF (DO_PAGE.EQ.'N' .OR. DO_PAGE.EQ.'n' .OR. DO_PAGE.EQ.'F' .OR. DO_PAGE.EQ.'f') GOTO 99
          IF (DO_PAGE.EQ.'E' .OR. DO_PAGE.EQ. 'e') THEN
             STATUS = 1
@@ -85,7 +85,7 @@
          END IF
 
       END IF					! 'SELECT' type
- 
+
       MORE = .TRUE.
       CON_TARG = 1
       REM_TARG = 1
@@ -102,7 +102,7 @@
       NCHAR = MDH_ENDWORD (dscfrps_data)
 
       FILE_IN  = dscfrps_data(:NCHAR)//'rps_form'//PAGE//'.tex'
- 
+
       OPEN(LUN_IN,FILE=FILE_IN,STATUS='OLD',IOSTAT=IOSTATUS)
       IF (IOSTATUS.NE.0) THEN
          CALL FORM_ERR('Error opening LaTeX source')
@@ -116,7 +116,7 @@
       END DO
 
 20    CONTINUE
- 
+
 C      IF ((IPAGE.EQ.1).OR.(IPAGE.EQ.2).OR.(IPAGE.EQ.6).OR.(IPAGE.EQ.7)) THEN
         LINE = BSLASH//'put(170,251){'//BSLASH//'framebox(20,10){'//
      &        BSLASH//'Large '//BSLASH//
@@ -131,7 +131,7 @@ C      END IF
       WRITE(LUN_OUT,*)LINE(:NCHAR)
       IF (FTYPE.NE. 'BLANK' )THEN
          CALL LATEX_DBS(IPAGE,LUN_OUT)
- 
+
          IF (IPAGE.EQ.1) THEN
 	    CALL DBS_GETTARG( NTARGET, TOT_TIME)
 	    WRITE(LUN_OUT,'(A)') BSLASH//'put(150,73){'//BSLASH//
@@ -171,7 +171,7 @@ C      END IF
 
          IF (IPAGE.EQ.1) WRITE(LUN_OUT,'(A)') BSLASH//'put(50,60){'//
      &        BSLASH//'makebox(0,0)[bl]{(800 characters maximum)}}'
- 
+
          IF (IPAGE .EQ.2) THEN
             WRITE(LUN_OUT,'(A)') BSLASH//'put(130,63){'//BSLASH//
      &         'makebox(0,0)[tl]{(delete TWO agencies)}}'
@@ -200,7 +200,7 @@ c     &          BSLASH//'line(1,0){170}}'
         MORE = .TRUE.
       END IF
 
-      END DO 
+      END DO
 99    CONTINUE
- 
+
       END

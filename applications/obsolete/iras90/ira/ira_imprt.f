@@ -13,12 +13,12 @@
 *     CALL IRA_IMPRT( INDF, IDA, STATUS )
 
 *  Description:
-*     A search is made for an astrometry structure through all the 
-*     extensions in the supplied NDF. If one is found, the astrometry 
-*     information is copied into internal common blocks and an "IRA 
-*     identifier" is returned which can be passed to other IRA routines 
-*     to refer to the stored astrometry information.  This identifier 
-*     should be annulled when it is no longer required by calling 
+*     A search is made for an astrometry structure through all the
+*     extensions in the supplied NDF. If one is found, the astrometry
+*     information is copied into internal common blocks and an "IRA
+*     identifier" is returned which can be passed to other IRA routines
+*     to refer to the stored astrometry information.  This identifier
+*     should be annulled when it is no longer required by calling
 *     IRA_ANNUL. An error is reported if no astrometry structure is
 *     found in the NDF.
 
@@ -78,7 +78,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER 
+      CHARACTER
      :          ASNAME*(DAT__SZNAM),! Name of the AS
      :          LOC*(DAT__SZLOC), ! HDS locator for the AS.
      :          XLOC*(DAT__SZLOC),! HDS locator to the NDF extension.
@@ -100,7 +100,7 @@
      :             'been initialised', STATUS )
       END IF
 
-*  Obtain an HDS locator to the NDF extension holding the astrometry 
+*  Obtain an HDS locator to the NDF extension holding the astrometry
 *  structure.
       CALL IRA_FIND( INDF, THERE, XNAME, ASNAME, XLOC, STATUS )
 

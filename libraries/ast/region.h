@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -202,7 +202,7 @@ typedef struct AstRegionVtab {
    void (* SetAdaptive)( AstRegion *, int, int * );
 
 } AstRegionVtab;
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -225,7 +225,7 @@ astPROTO_ISA(Region)           /* Test class membership */
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstRegion *astInitRegion_( void *, size_t, int, AstRegionVtab *, const char *, 
+AstRegion *astInitRegion_( void *, size_t, int, AstRegionVtab *, const char *,
                            AstFrame *, AstPointSet *, AstRegion *, int * );
 
 /* Vtab initialiser. */
@@ -236,7 +236,7 @@ AstRegion *astLoadRegion_( void *, size_t, AstRegionVtab *,
                            const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitRegionGlobals_( AstRegionGlobals * );
 #endif
 
@@ -448,8 +448,8 @@ astINVOKE(V,astGetRegionPoints_(astCheckRegion(this),maxpoint,maxcoord,npoint,po
 #define astResetCache(this) astINVOKE(V,astResetCache_(astCheckRegion(this),STATUS_PTR))
 #define astRegTrace(this,n,dist,ptr) astINVOKE(V,astRegTrace_(astCheckRegion(this),n,dist,ptr,STATUS_PTR))
 
-/* Since a NULL PointSet pointer is acceptable for "out", we must omit the 
-   argument checking in that case. (But unfortunately, "out" then gets 
+/* Since a NULL PointSet pointer is acceptable for "out", we must omit the
+   argument checking in that case. (But unfortunately, "out" then gets
    evaluated twice - this is unlikely to matter, but is there a better way?) */
 
 #define astRegTransform(this,in,forward,out,frm) \

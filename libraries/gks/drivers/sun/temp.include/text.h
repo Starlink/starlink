@@ -16,4 +16,4 @@
 #define TEXT textsw_window_object, WIN_COMPATIBILITY
 typedef Textsw Text;
 
-#endif ~text_DEFINED 
+#endif ~text_DEFINED

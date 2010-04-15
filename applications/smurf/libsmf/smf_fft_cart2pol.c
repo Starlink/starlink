@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     void smf_fft_cart2pol( smfData *data, int inverse, int power, 
+*     void smf_fft_cart2pol( smfData *data, int inverse, int power,
 *                            int *status );
 
 *  Arguments:
@@ -27,9 +27,9 @@
 *        Pointer to global status.
 
 *  Description:
-*     Convert between cartesian representation of the transform (real, 
+*     Convert between cartesian representation of the transform (real,
 *     imaginary) and polar form (amplitude, argument). The argument is
-*     stored in radians in the range (-PI,PI). 
+*     stored in radians in the range (-PI,PI).
 
 *  Authors:
 *     Ed Chapin (UBC)

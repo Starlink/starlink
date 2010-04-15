@@ -28,7 +28,7 @@
 \newcommand{\stardocabstract}  {
 The CNF package comprises two sets of software which ease the task of writing
 portable programs in a mixture of FORTRAN and C\@.
-F77 is a set of C macros for handling the FORTRAN/C subroutine linkage in a 
+F77 is a set of C macros for handling the FORTRAN/C subroutine linkage in a
 portable way, and CNF is a set of functions to handle the difference between
 FORTRAN and C character strings, logical values and pointers to
 dynamically allocated memory.}
@@ -88,7 +88,7 @@ dynamically allocated memory.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -568,12 +568,12 @@ dynamically allocated memory.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -609,9 +609,9 @@ dynamically allocated memory.}
 \section{\xlabel{how_to_read_this_document}\label{how_to}How to read this document}
 
 This document tells a programmer how to mix program segments written in FORTRAN
-and C\@ \textit{in a portable way}. 
+and C\@ \textit{in a portable way}.
 It provides information on several levels from a quick ``how to get
-started'' cookbook, down to machine-specific details. 
+started'' cookbook, down to machine-specific details.
 The cookbook will tell you how to
 write programs, but without much of the background information of what is
 really going on. After you have tried a few programs, you will probably want to
@@ -619,41 +619,41 @@ read the rest of the document.
 
 Before you embark upon mixed language programming, it may be worth reading the
 \htmlref{Rationale for mixed language programming}{rationale}
-\latex{ in Appendix~\ref{rationale}} which discusses the problems and 
+\latex{ in Appendix~\ref{rationale}} which discusses the problems and
 offers some alternatives.
 
-The current system is supported for Sun systems running Solaris, DEC Alphas 
-running OSF/1, and PC's running Linux but in the past has run successfully on 
-SunOS, Ultrix and VAX/VMS. 
+The current system is supported for Sun systems running Solaris, DEC Alphas
+running OSF/1, and PC's running Linux but in the past has run successfully on
+SunOS, Ultrix and VAX/VMS.
 Reference is made to the VAX/VMS system in this document as it is in
 many respects very different from the Unix systems and so provides a useful
 comparison. You should consult the VMS Starlink documentation set
-about the VAX/VMS version however, as not all the facilities described here are 
+about the VAX/VMS version however, as not all the facilities described here are
 available in it, \textit{even if a VAX/VMS example is given}.
 
 Full descriptions of the C
 \htmlref{macros}{f77_description}
-and 
+and
 \htmlref{functions}{cnf_description}
 involved are
 \begin{htmlonly}
 provided.
 \end{htmlonly}
-\latex{provided in appendices \ref{f77_description} and 
+\latex{provided in appendices \ref{f77_description} and
 \ref{cnf_description}.} The macro names in the text will often include the
 legend \texttt{\textit{type}} to indicate a generic macro name. In this case,
-\texttt{\textit{type}}\/ may normally be one of \texttt{INTEGER}, 
-\texttt{REAL}, \texttt{DOUBLE}, \texttt{LOGICAL} or \texttt{CHARACTER}. 
-Types \texttt{BYTE} and \texttt{WORD} and their unsigned versions 
-\texttt{UBYTE} and \texttt{UWORD} are also available but do not correspond to 
-standard FORTRAN types so should be avoided. 
-\texttt{\textit{type}} may also be \texttt{POINTER} -- again this is not a 
-standard FORTRAN type but it is more commonly 
+\texttt{\textit{type}}\/ may normally be one of \texttt{INTEGER},
+\texttt{REAL}, \texttt{DOUBLE}, \texttt{LOGICAL} or \texttt{CHARACTER}.
+Types \texttt{BYTE} and \texttt{WORD} and their unsigned versions
+\texttt{UBYTE} and \texttt{UWORD} are also available but do not correspond to
+standard FORTRAN types so should be avoided.
+\texttt{\textit{type}} may also be \texttt{POINTER} -- again this is not a
+standard FORTRAN type but it is more commonly
 \htmlref{used in Starlink software}
 {f77_pointers}\latex{ (see Section~\ref{f77_pointers})}.
 
 For consistency with other Starlink libraries the CNF function names were
-changed (at Version 4.0) from the form \texttt{cnf\_name} to the form 
+changed (at Version 4.0) from the form \texttt{cnf\_name} to the form
 \texttt{cnfName}.
 The old names are still permitted via macros defined in the \texttt{f77.h}
 header file.
@@ -664,7 +664,7 @@ There is also a section \latex{(\ref{compiling_and_linking})} on
 
 \section{\xlabel{cookbook}Cookbook}
 
-This section 
+This section
 introduces mixed language programming. It skips over many of the
 details and concentrates on how to get programs going. For a fuller explanation
 of mixed language programming, you should read the rest of this document.
@@ -741,25 +741,25 @@ C function:
 This is a rather silly example, but it does illustrate all of the important
 points of calling C from FORTRAN\@. The FORTRAN program is completely standard.
 The name of the C function is declared using a macro \texttt{F77\_\-SUBROUTINE}.
-Do not leave any spaces around the name of the routine as this can cause 
-problems on some systems. 
+Do not leave any spaces around the name of the routine as this can cause
+problems on some systems.
 The dummy arguments of the function are declared using macros
 named after the FORTRAN type of the actual argument. The only odd thing is the
-macro called \texttt{TRAIL}. 
-Each argument of type \texttt{CHARACTER} should have a corresponding 
-\texttt{TRAIL} added to the end of the argument list. N.B. \texttt{TRAIL} 
-macros must not have a comma in front of them. 
-All C functions that are to be called from FORTRAN should be declared in a 
+macro called \texttt{TRAIL}.
+Each argument of type \texttt{CHARACTER} should have a corresponding
+\texttt{TRAIL} added to the end of the argument list. N.B. \texttt{TRAIL}
+macros must not have a comma in front of them.
+All C functions that are to be called from FORTRAN should be declared in a
 similar manner.
 
-There then follows a set of \texttt{GENPTR\_\-\textit{type}}\/ macros; one 
-for each argument of the function. \texttt{TRAIL} arguments are not counted as 
-being true arguments and so there are no \texttt{GENPTR} statements for them. 
+There then follows a set of \texttt{GENPTR\_\-\textit{type}}\/ macros; one
+for each argument of the function. \texttt{TRAIL} arguments are not counted as
+being true arguments and so there are no \texttt{GENPTR} statements for them.
 Note that there are no semicolons at the end of these lines.
 
-The only other macro used is \texttt{F77\_\-ISTRUE}. 
-This should be used whenever an argument is treated as a logical value, and 
-takes into account the different ways that FORTRAN and C may interpret bit 
+The only other macro used is \texttt{F77\_\-ISTRUE}.
+This should be used whenever an argument is treated as a logical value, and
+takes into account the different ways that FORTRAN and C may interpret bit
 patterns as logical values.
 
 Note that all explicit function arguments are pointer arguments. This is
@@ -768,8 +768,8 @@ this is that scalar arguments must be referred to by \texttt{*\textit{arg}}\/
 within the function.
 
 FORTRAN and C store character strings in different ways. FORTRAN stores them as
-fixed-length, blank-filled strings while C stores them as variable-length, 
-null-terminated strings. 
+fixed-length, blank-filled strings while C stores them as variable-length,
+null-terminated strings.
 If a C function needs to work with character strings that
 have been passed from a calling FORTRAN routine, then the FORTRAN string must
 be copied into an equivalent local copy. Similarly, a C function may need to
@@ -777,11 +777,11 @@ return a string to the calling FORTRAN routine. This is a very common
 occurrence, so some
 \htmlref{``CNF functions''}{cnf}
 are provided to do this.
-Essentially they are just C functions which copy a FORTRAN string to a C 
-string and vice versa. 
+Essentially they are just C functions which copy a FORTRAN string to a C
+string and vice versa.
 \latex{(They are more fully described in Section~\ref{cnf}.)}
 
-In the above example, the function \texttt{cnfExprt} copies the C string 
+In the above example, the function \texttt{cnfExprt} copies the C string
 \texttt{str} into the FORTRAN string \texttt{line}. Function \texttt{cnfImprt}
 performs the converse operation in
 \htmlref{``Calling FORTRAN from C''
@@ -791,8 +791,8 @@ example}{cook_argsc2f}\latex{ in Section \ref{f_from_c}}.
 
 Why would you want to call a FORTRAN subprogram from a C routine? Typically
 this would be because you want to use a precompiled library of routines that
-were written in FORTRAN\@. The NAG library is a prime example. 
-This can be bought in a C callable version, but this is not available on 
+were written in FORTRAN\@. The NAG library is a prime example.
+This can be bought in a C callable version, but this is not available on
 Starlink machines.
 
 To see how to call FORTRAN from C, let us consider the above example, but now
@@ -810,7 +810,7 @@ C program:
       #include "f77.h"
 
       #define FLINE_LENGTH 80
-      
+
       extern F77_SUBROUTINE(silly2)( REAL(a), REAL(b), INTEGER(i), INTEGER(j),
          CHARACTER(line), INTEGER(line_l), LOGICAL(x) TRAIL(line) );
 
@@ -865,13 +865,13 @@ FORTRAN function:
 In the above C main program, the variable \texttt{fline\_l} is declared and set
 equal to the constant {\tt FLINE\_LENGTH}. At first sight this is unnecessary.
 However, this is not the case, as we need to pass the value of
-\texttt{FLINE\_LENGTH} to the subroutine and it is not possible to pass 
+\texttt{FLINE\_LENGTH} to the subroutine and it is not possible to pass
 constants to FORTRAN subroutines. Only variables can be passed.
 
 \subsection{\xlabel{building_the_program}Building the Program}
 The final step is compiling and linking the program.
 
-Suppose, on Unix, the main FORTRAN program is in the file \texttt{cook1.f} and 
+Suppose, on Unix, the main FORTRAN program is in the file \texttt{cook1.f} and
 the C function is in the file \texttt{silly1.c}, then the commands might be:
 
 \begin{quote} \begin{verbatim}
@@ -893,22 +893,22 @@ on.
 \section{\xlabel{representation_of_data}Representation of Data}
 
 Different languages have differing fundamental data types on which they can
-operate. FORTRAN has the types \texttt{INTEGER}, \texttt{REAL}, 
-\texttt{DOUBLE  PRECISION}, \texttt{COMPLEX}, \texttt{LOGICAL} and 
+operate. FORTRAN has the types \texttt{INTEGER}, \texttt{REAL},
+\texttt{DOUBLE  PRECISION}, \texttt{COMPLEX}, \texttt{LOGICAL} and
 \texttt{CHARACTER}\@. The only aggregate data type that it supports is the
 array, although a character variable can store many characters. C supports the
 fundamental types \texttt{int}, \texttt{float}, \texttt{double}, \texttt{char},
-and \texttt{void}. It also allows \texttt{int} to be modified by the type 
-specifiers \texttt{short} or \texttt{long}, \texttt{signed} or 
+and \texttt{void}. It also allows \texttt{int} to be modified by the type
+specifiers \texttt{short} or \texttt{long}, \texttt{signed} or
 \texttt{unsigned}, \texttt{char} to be modified
 by \texttt{signed} or \texttt{unsigned} and \texttt{double} to be modified by
-\texttt{long}. However, on any given machine, some of the \texttt{short}, 
+\texttt{long}. However, on any given machine, some of the \texttt{short},
 normal and \texttt{long} types may be represented in the same way.
 C also provides a range of pointer types which may, for purposes of
 interchange with FORTRAN, all be condensed into the generic pointer
 type \texttt{void*}.
-Note that, unlike FORTRAN, a C character variable can only store a single 
-character. 
+Note that, unlike FORTRAN, a C character variable can only store a single
+character.
 Also unlike FORTRAN, a C
 character variable is treated as a type of integer rather than as a separate
 type. Finally, ANSI C has the type \texttt{enum}, an enumerated list of values.
@@ -917,7 +917,7 @@ defined in terms of the basic types by means of a \texttt{typedef} statement.
 
 When writing mixed language programs, it is clearly important to know which
 FORTRAN types map on to which C types; in particular, which similar types use
-the same amount of storage. This is discussed more fully in 
+the same amount of storage. This is discussed more fully in
 \htmlref{the machine dependent sections}{implement}
 \latex{in appendix~\ref{implement}}; however, there are some general
 points to be considered first.
@@ -964,8 +964,8 @@ language programming though.
 
 An important point about character data is that they are stored differently in
 FORTRAN and C\@. FORTRAN stores character data as a fixed-length string padded
-with trailing blanks whereas C stores character data as a variable-length, 
-null-terminated string. 
+with trailing blanks whereas C stores character data as a variable-length,
+null-terminated string.
 The difference is standardized, so it does not lead to
 problems with portability, but it is something that will involve extra work
 when passing character data between routines written in different languages.
@@ -1045,16 +1045,16 @@ you remember it.
 Multi-dimensional arrays are a well known problem since FORTRAN stores
 consecutive array elements in column-major order (this \textit{is}\/ specified
 in the FORTRAN standard) whereas other languages store them in row-major order.
-For example, in FORTRAN, the order of elements in a 2 x 2 array called 
-\texttt{A} are \texttt{A(1,1), A(2,1), A(1,2), A(2,2)}, whereas in C this would 
-be \texttt{A[0][0], A[0][1], A[1][0], A[1][1]}. 
+For example, in FORTRAN, the order of elements in a 2 x 2 array called
+\texttt{A} are \texttt{A(1,1), A(2,1), A(1,2), A(2,2)}, whereas in C this would
+be \texttt{A[0][0], A[0][1], A[1][0], A[1][1]}.
 In practice this is rarely a serious problem as long as you
 remember to take account of the reversed order when writing a program. However,
 when coupled with the difference in default lower bounds (zero in C, one in
 FORTRAN) it is a fruitful source of bugs.
 
 There are additional problems with FORTRAN character arrays.
-This is because C handles a one dimensional FORTRAN character array as a two 
+This is because C handles a one dimensional FORTRAN character array as a two
 dimensional array of type \texttt{char}, \textit{i.e.}\ the FORTRAN statement:
 
 \begin{quote}
@@ -1078,7 +1078,7 @@ the integer 1, whereas another might just as reasonably use $-1$. This is not
 just a hypothetical problem; the FORTRAN for RISC compiler from MIPS and the
 DEC FORTRAN for RISC compiler both work on the DECstation and interpret the
 same number as different logical values. I shall continue to refer to ``the way
-that FORTRAN does it'', even though it is more correct to refer to ``the way 
+that FORTRAN does it'', even though it is more correct to refer to ``the way
 that FORTRAN compiler XYZ implements it''.
 The distinction is rarely important, but should be borne in mind.
 
@@ -1104,8 +1104,8 @@ modifying the data in some or all of the arguments. As far as passing arguments
 between a program and a subprogram is concerned, the principal difference
 between FORTRAN and C is the method used for passing the arguments.
 
-Note that the above paragraph refers to modifying arguments. 
-On all the machines we support, the actual contents of the argument list is 
+Note that the above paragraph refers to modifying arguments.
+On all the machines we support, the actual contents of the argument list is
 never modified.
 What may be modified is the contents of the location pointed to by an element
 of the argument list. This is not to say that other computers would not modify
@@ -1114,15 +1114,15 @@ the argument list itself.
 There are three commonly used methods for passing subprogram arguments: call by
 value, call by reference and call by descriptor. Call by value passes the
 actual value of the argument to the called routine, call by reference passes a
-pointer to the value of the argument (\textit{i.e.}\ the address of the 
-argument) and call by descriptor passes a pointer to a structure describing 
+pointer to the value of the argument (\textit{i.e.}\ the address of the
+argument) and call by descriptor passes a pointer to a structure describing
 the argument.
 
 Although these are the basic methods of passing arguments, a particular type of
 argument may be passed by a combination of these. For example, some compilers
-use a combination of call by reference and call by value to pass character 
+use a combination of call by reference and call by value to pass character
 arguments.
-What is common is that all arguments are passed by exchanging data values. 
+What is common is that all arguments are passed by exchanging data values.
 It is how those values are to be interpreted that gives rise to the different
 mechanisms.
 
@@ -1149,7 +1149,7 @@ language programming. Fortunately the facilities described in
 \htmlref{More on Calling C from FORTRAN}{f77_cfromf}
 \latex{(Section~\ref{f77_cfromf})} and
 \htmlref{More on Calling FORTRAN from C}{f77_ffromc}
-\latex{(Section~\ref{f77_ffromc})} hide much of this from the programmer. 
+\latex{(Section~\ref{f77_ffromc})} hide much of this from the programmer.
 
 \subsection{\xlabel{function_values}Function Values}
 
@@ -1159,7 +1159,7 @@ function. FORTRAN makes a distinction between subprograms that return a value
 subprograms are functions that return a value (even the main program), although
 that value may be \texttt{void}. Since it is simply a value that is being
 returned, the mechanisms for returning scalar numeric values tend to be just
-that -- a value is returned. 
+that -- a value is returned.
 However, things get more complicated in the case of
 functions returning things like character variables. This will be discussed
 further in \latex{appendix~\ref{implement} on}
@@ -1187,15 +1187,15 @@ calls the C function can pass as an argument, the first element of the common
 block. As long as FORTRAN passes this argument by reference, then the C
 function can use this address to access all of the other elements of the common
 block. The elements of the common block must be stored contiguously. Whether
-this method, or the use of the 
-\htmlref{F77 macros}{f77_common}\latex{ (described in 
+this method, or the use of the
+\htmlref{F77 macros}{f77_common}\latex{ (described in
 Section~\ref{f77_common})},
 achieve a greater degree of portability in this respect is not known at
 present. On account of these potential portability problems, you should avoid
 passing global data between routines written in different languages, whenever
 possible.
 
-\section{\xlabel{more_on_calling_c_from_fortran}\label{f77_cfromf}More on 
+\section{\xlabel{more_on_calling_c_from_fortran}\label{f77_cfromf}More on
 Calling C from FORTRAN}
 As the examples in the appendix on machine specific details show, different
 computers handle subroutine interfaces in different ways. This apparently makes
@@ -1207,15 +1207,15 @@ in such a way that they can accommodate other subroutine passing mechanisms;
 however, it is not possible to guess all the types of mechanisms that we might
 come across.
 
-The macros can be used in a C function by including the file \texttt{f77.h}. 
-This file will naturally be stored in different places on different types of 
-system, even if it is only the syntax of the file name that is different. 
+The macros can be used in a C function by including the file \texttt{f77.h}.
+This file will naturally be stored in different places on different types of
+system, even if it is only the syntax of the file name that is different.
 It would be a
 pity if all of the implementation specific details were hidden away in these
 macros, only to have to have an implementation specific \texttt{\#include}
 statement in each C source file. Fortunately there is a way around this
-problem that is described in 
-\latex{Section~\ref{compiling_and_linking} on} \htmlref{compiling and 
+problem that is described in
+\latex{Section~\ref{compiling_and_linking} on} \htmlref{compiling and
 linking}{compiling_and_linking}.
 
 Let us now consider an example of using the F77 macros to illustrate
@@ -1225,7 +1225,7 @@ consists of some hyphens, followed by some stars and finally the same number
 of hyphens again. There are also some blanks between the beginning of the line
 and between the hyphens and stars. The work is done in the subroutine BANNER
 and the form of the output is governed by the three arguments FIRST, MIDDLE and
-GAP\@. For example, 
+GAP\@. For example,
 \texttt{CALL BANNER( LINE, 5, 10, 3 )} would return with \texttt{LINE} set to
 the following character string.
 
@@ -1262,7 +1262,7 @@ C function:
 {\small \begin{verbatim}
       #include "f77.h"
 
-      F77_SUBROUTINE(banner)( CHARACTER(line), INTEGER(first), INTEGER(middle), 
+      F77_SUBROUTINE(banner)( CHARACTER(line), INTEGER(first), INTEGER(middle),
                               INTEGER(gap) TRAIL(line) )  {
          GENPTR_CHARACTER(line)
          GENPTR_INTEGER(first)
@@ -1302,30 +1302,30 @@ C function:
 
 The FORTRAN part of this example is completely standard; it is the C code that
 need further explanation. Firstly there is the declaration of the subroutine
-with the macro \texttt{F77\_SUBROUTINE}\@. 
+with the macro \texttt{F77\_SUBROUTINE}\@.
 This handles the fact that some computer
 systems require a trailing underscore to be added to the name of the C function
 if it is to be called from FORTRAN\@. In the same statement there are the
-function's dummy arguments, declared using the macros \texttt{CHARACTER}, 
-\texttt{INTEGER} and \texttt{TRAIL}\@. 
+function's dummy arguments, declared using the macros \texttt{CHARACTER},
+\texttt{INTEGER} and \texttt{TRAIL}\@.
 The \texttt{INTEGER} macro declares the appropriate dummy argument to handle an
 incoming argument passed from FORTRAN\@. This will usually be declared to be
-``pointer to \texttt{int}''. The \texttt{CHARACTER} and \texttt{TRAIL} macros 
-come in pairs. 
-The \texttt{CHARACTER} macro declares the appropriate argument to handle the 
-incoming character variable and \texttt{TRAIL} may declare an extra argument 
+``pointer to \texttt{int}''. The \texttt{CHARACTER} and \texttt{TRAIL} macros
+come in pairs.
+The \texttt{CHARACTER} macro declares the appropriate argument to handle the
+incoming character variable and \texttt{TRAIL} may declare an extra argument
 to handle those
 cases where an extra hidden argument is added to specify the length of a
-character argument. On some machines, \texttt{TRAIL} will be null and on 
+character argument. On some machines, \texttt{TRAIL} will be null and on
 account of this
-\emph{there should not be a comma before any \texttt{TRAIL} macros}. 
+\emph{there should not be a comma before any \texttt{TRAIL} macros}.
 When \texttt{TRAIL} is not
 null, then it will add the comma itself. If there are several \texttt{TRAIL}
 macros then there must not be a comma directly in front of any of them.
 
-The next set of macros are the \texttt{GENPTR\_\textit{type}}\/ macros, one 
-for each argument of the FORTRAN subroutine (\texttt{TRAIL} arguments are not 
-counted as separate arguments for this purpose). 
+The next set of macros are the \texttt{GENPTR\_\textit{type}}\/ macros, one
+for each argument of the FORTRAN subroutine (\texttt{TRAIL} arguments are not
+counted as separate arguments for this purpose).
 These handle the ways that subprogram arguments
 may be passed on different machines. They ensure that a pointer to the argument
 exists. On most systems, this is exactly what is passed from the FORTRAN
@@ -1333,29 +1333,29 @@ program and so the macros for numeric arguments are null. If a particular
 system passed the value of an argument, rather than its address, then these
 macros would generate the appropriate pointers.
 
-The \texttt{CHARACTER}, \texttt{TRAIL} and \texttt{GENPTR\_CHARACTER} macros 
-have to cope with the different ways that systems deal with passing character 
+The \texttt{CHARACTER}, \texttt{TRAIL} and \texttt{GENPTR\_CHARACTER} macros
+have to cope with the different ways that systems deal with passing character
 variables. Although the
 way that these macros are implemented can be a bit complex, what the programmer
 sees is essentially simple. For each character argument, the macros generate a
 pointer to a character variable and an integer holding the length of that
 character variable. The above example will create the variable \texttt{line} of
-type \texttt{char *} and variable \texttt{line\_length} of type \texttt{int}. 
+type \texttt{char *} and variable \texttt{line\_length} of type \texttt{int}.
 If these are available directly as function arguments, then the macro
-\texttt{GENPTR\_CHARACTER} will be null, otherwise it will generate these two 
-variables from the arguments. 
+\texttt{GENPTR\_CHARACTER} will be null, otherwise it will generate these two
+variables from the arguments.
 The best way of seeing what is going on is to compile a
 function with macro expansion turned on and list the output.
 
 There is an important difference between this example and the one in the
 cookbook. In this case, an \texttt{int} variable containing the length of the
 character argument is generated automatically whereas in the example in the
-cookbook the length was passed explicitly. 
+cookbook the length was passed explicitly.
 In fact, the \texttt{int} variable was
 also generated in the example in the cookbook, but it was not used. It is more
-portable to explicitly pass the length of \texttt{CHARACTER} variables and to 
-ignore the automatically generated length as this will cope with the situation 
-where the length cannot be generated automatically. 
+portable to explicitly pass the length of \texttt{CHARACTER} variables and to
+ignore the automatically generated length as this will cope with the situation
+where the length cannot be generated automatically.
 No such machines are known to the
 author at present, but Murphy's Law would indicate that the next machine that
 we desperately need to use will have this problem.
@@ -1389,16 +1389,16 @@ not. Those that do not have the F77 prefix are those that occur in standard
 places in the source code and so are unlikely to be confused with other macros.
 The macros that do have the F77 prefix are those that declare a C function and
 others that are less commonly used, and when they are, they can occur anywhere
-within the body of the C routine. 
-A 
-\htmlref{full description of each macro}{f77_description} is 
+within the body of the C routine.
+A
+\htmlref{full description of each macro}{f77_description} is
 available\latex{ in appendix~\ref{f77_description}}.
 
 The whole ethos of the F77 macros is to try to isolate the FORTRAN/C
 interface to the beginning of the C function. Within the body of the C
 function, the programmer should not need to be aware of the fact that this
 function is designed to be called from FORTRAN\@. It is not possible to achieve
-this completely and at the same time retain portability of code, but the 
+this completely and at the same time retain portability of code, but the
 intention is there none the less.
 
 \subsection{\xlabel{declaration_of_a_function}Declaration of a Function}
@@ -1406,27 +1406,27 @@ intention is there none the less.
 There are two types of macros involved in declaring a C function that is to be
 called from FORTRAN; the function name and the function arguments. If the C
 function is to be treated as a FORTRAN subroutine, then it should be declared
-with the macro 
-\htmlref{\texttt{F77\_SUBROUTINE}}{F77_SUBROUTINE}. 
-This will declare the C function to be of type \texttt{void} and will generate 
-the correct form of the of the routine name, handling such things as appending 
+with the macro
+\htmlref{\texttt{F77\_SUBROUTINE}}{F77_SUBROUTINE}.
+This will declare the C function to be of type \texttt{void} and will generate
+the correct form of the of the routine name, handling such things as appending
 a trailing underscore where required.
 
-If the C function is to be treated as a FORTRAN numerical or logical function, 
-then it should be declared with one of the macros 
+If the C function is to be treated as a FORTRAN numerical or logical function,
+then it should be declared with one of the macros
 \htmlref{\texttt{F77\_\textit{type}\_FUNCTION}}{F77_type_FUNCTION}.
-These macros will declare the function to be of the appropriate type, 
-\textit{e.g.}\ a function declared with 
-\texttt{F77\_\-INTEGER\_\-FUNCTION} is 
+These macros will declare the function to be of the appropriate type,
+\textit{e.g.}\ a function declared with
+\texttt{F77\_\-INTEGER\_\-FUNCTION} is
 likely to be of type \texttt{int}.
 
 The declaration of a C function that is to be treated as a FORTRAN character
 function is more complex than one that returns a scalar numeric or logical
-value. The first argument of the function should be 
+value. The first argument of the function should be
 \htmlref{\texttt{CHARACTER\_\-RETURN\_\-VALUE}}
-{CHARACTER_RETURN_VALUE}(return\_value), 
+{CHARACTER_RETURN_VALUE}(return\_value),
 where
-\texttt{return\_value} is a variable of type ``pointer to \texttt{char}''. 
+\texttt{return\_value} is a variable of type ``pointer to \texttt{char}''.
 Although character functions work
 perfectly well on all current Starlink hardware, it is one of the more
 difficult things to guess how other manufacturer might implement them.
@@ -1438,33 +1438,33 @@ instead.
 
 Scalar arguments are declared with the macros \texttt{INTEGER}, \texttt{REAL},
 \texttt{DOUBLE}, \texttt{LOGICAL}, \texttt{CHARACTER} and \texttt{TRAIL}.
-(Or the non-standard \texttt{BYTE}, \texttt{WORD}, \texttt{UBYTE}, 
+(Or the non-standard \texttt{BYTE}, \texttt{WORD}, \texttt{UBYTE},
 \texttt{UWORD} or \texttt{POINTER}.)
 The macros that declare numeric and logical arguments take account of the fact
-that a FORTRAN integer variable may correspond to a C type of \texttt{int} on 
-one machine, but to \texttt{long int} on another. 
+that a FORTRAN integer variable may correspond to a C type of \texttt{int} on
+one machine, but to \texttt{long int} on another.
 They also handle the mechanism that is used to pass the arguments.
 
 Character arguments are more complex as different computers use differing
 mechanisms for passing the arguments. To take account of this, for every
-argument that is declared using the 
+argument that is declared using the
 \htmlref{\texttt{CHARACTER}}{CHARACTER}
-(or 
+(or
 \htmlref{\texttt{CHARACTER\_ARRAY}}{CHARACTER_ARRAY})
-macro, there should be a corresponding 
+macro, there should be a corresponding
 \htmlref{\texttt{TRAIL}}{TRAIL}
-macro at the end of the list of dummy arguments. 
-As mentioned in a preceding example, \textit{there should not be a comma before 
+macro at the end of the list of dummy arguments.
+As mentioned in a preceding example, \textit{there should not be a comma before
 any \texttt{TRAIL} macros}.
 
 C differs from FORTRAN in that it has pointer variables. These are often used to
 manipulate arrays, rather than by using array subscripts. The macros that are
-used to declare array arguments do in fact declare them to be arrays. 
+used to declare array arguments do in fact declare them to be arrays.
 If programmers wish to manipulate these arrays by means of pointer arithmetic,
 then for maximum portability they should declare separate pointers within the C
 function that point to the array argument.
 
-Array arguments are declared by one of the macros 
+Array arguments are declared by one of the macros
 \htmlref{\texttt{\textit{type}\_ARRAY}}{type_ARRAY}.
 The macros that declare numeric or
 logical array arguments declare the arrays to be pointers to \textit{type}.
@@ -1474,8 +1474,8 @@ the dimensions of the array should be passed as additional arguments.
 The F77 macros do not allow you to declare fixed sized dimensions for an array
 that is a dummy argument. Normally, it is necessary to pass the dimensions as
 arguments of the routine anyway, but there are circumstances where the
-dimensions of the array will be fixed, \textit{e.g.}\ an array might specify a 
-rotation in space and hence is always 3 \texttt{x} 3. 
+dimensions of the array will be fixed, \textit{e.g.}\ an array might specify a
+rotation in space and hence is always 3 \texttt{x} 3.
 What is gained by declaring the
 fixed dimensions of the array is that subscript calculations can be done on
 arrays of more than one dimension. Unfortunately, such declarations cannot be
@@ -1491,7 +1491,7 @@ must declare arrays with fixed dimensions, you can do so as follows:
       }
 \end{verbatim} }
 
-This example declares the dummy argument to be an INTEGER array of fixed size. 
+This example declares the dummy argument to be an INTEGER array of fixed size.
 Although the subscript calculation can be performed as the routine knows the
 size of the array, the \texttt{sizeof} operator does not return the full size of
 the array as the complier casts \texttt{array[3][3]} to \texttt{*array}. All
@@ -1554,7 +1554,7 @@ C function:
       }
 \end{verbatim} }
 
-In this example, each element of the array \texttt{a} is accessed via the 
+In this example, each element of the array \texttt{a} is accessed via the
 pointer \texttt{ptr}, which is incremented each time around the last loop.
 
 \subsection{\xlabel{arguments_dash_and_pointers_to_them}Arguments -- and Pointers to Them}
@@ -1569,15 +1569,15 @@ called from FORTRAN, all function arguments should be treated as though the
 address of the actual argument had been passed, not its value. This means that
 the arguments should be referenced as \texttt{*\textit{arg}}\/ from within the C
 function and not directly as \textit{arg}. This may seem odd to a FORTRAN
-programmer, but is natural to a C programmer. 
+programmer, but is natural to a C programmer.
 
 To ensure that there always exists a pointer to each dummy argument,
 the first lines of code in the body of any C function that is to be called from
-FORTRAN should be \texttt{GENPTR} macros for each of the function arguments. 
-The macros 
+FORTRAN should be \texttt{GENPTR} macros for each of the function arguments.
+The macros
 \htmlref{\texttt{GENPTR\_\textit{type}}}{GENPTR_type}
-always result in there being a C variable of type ``pointer to type'' for 
-all non-character variables. 
+always result in there being a C variable of type ``pointer to type'' for
+all non-character variables.
 For example, \texttt{GENPTR\_\-INTEGER(first)} ensures that there will be
 a variable declared as \texttt{int *first}. On all current types of system,
 this macro will actually be null since the pointer is available directly as an
@@ -1587,29 +1587,29 @@ passed FORTRAN variables by value rather than by reference, then this macro
 would construct the appropriate pointer.
 
 Character arguments are different in that the \texttt{GENPTR} macro ensures that
-there are two variables available, one of type ``pointer to char'' that points 
+there are two variables available, one of type ``pointer to char'' that points
 to the actual character data, and one of type \texttt{int} that is the length
-of the character variable. 
+of the character variable.
 The name of the variable that holds the length of the
 character string is constructed by appending ``\texttt{\_length}'' to the name
-of the character variable. 
+of the character variable.
 For example, if a function is declared to have a dummy
-argument with the macro \texttt{CHARACTER(ch)} and a corresponding 
-\texttt{TRAIL(ch)}, then after the execution of whatever the macro 
-\texttt{GENPTR\_CHARACTER(ch)} expands into, there will be a ``pointer to 
-character'' variable called \texttt{ch} and an integer variable called 
+argument with the macro \texttt{CHARACTER(ch)} and a corresponding
+\texttt{TRAIL(ch)}, then after the execution of whatever the macro
+\texttt{GENPTR\_CHARACTER(ch)} expands into, there will be a ``pointer to
+character'' variable called \texttt{ch} and an integer variable called
 \texttt{ch\_length}.
 Although the length of a character variable is directly accessible through the
-\texttt{int} variable \texttt{ch\_length}, it is better to pass the length of 
+\texttt{int} variable \texttt{ch\_length}, it is better to pass the length of
 the character variable explicitly if maximum portability is sought. This is
 because, although it works on all currently supported platforms, it may not be
 possible to gain access to the length on some machines.
 
 It is important to remember that what is available after the execution of what
-a \texttt{GENPTR} macro expands into will be a pointer to the dummy argument, 
-not a variable of numeric or character type. Consequently the body of the code 
-should refer to it as \texttt{*\texttt{arg}}\/ and not as 
-\texttt{\textit{arg}}. 
+a \texttt{GENPTR} macro expands into will be a pointer to the dummy argument,
+not a variable of numeric or character type. Consequently the body of the code
+should refer to it as \texttt{*\texttt{arg}}\/ and not as
+\texttt{\textit{arg}}.
 In a long C function, it
 may be worth copying scalar arguments into local variables to avoid having to
 remember to put the \texttt{*} on each reference to an argument. If the variable
@@ -1621,13 +1621,13 @@ refer to the pointers, such as
 \texttt{\#define STATUS *status}
 \end{quote}
 
-Note that although ANSI C will allow the above as \texttt{status} and 
+Note that although ANSI C will allow the above as \texttt{status} and
 \texttt{STATUS}
 are distinct names, you should beware of the possibility of a computer that
 does not have lower case characters. Such machines used to exist in abundance,
 but at present, this does seem a remote possibility.
 
-Array arguments should have pointers generated (if necessary) by using the 
+Array arguments should have pointers generated (if necessary) by using the
 \htmlref{\texttt{GENPTR\_\-\textit{type}\_\-ARRAY}}{GENPTR_type_ARRAY}
 macros. All arrays are handled by these macros.
 
@@ -1635,32 +1635,32 @@ macros. All arrays are handled by these macros.
 
 There are macros \texttt{F77\_\textit{type}\_TYPE}
 which expand to the C data type that corresponds to the FORTRAN data type of
-the macro name, \textit{e.g.}\ on a particular computer 
-\htmlref{\texttt{F77\_\-INTEGER\_\-TYPE}}{F77_INTEGER_TYPE} may expand to 
-\texttt{int}. 
-These are usually not needed explicitly within user written code, but can be 
-required when declaring common blocks, casting values from a variable of one 
+the macro name, \textit{e.g.}\ on a particular computer
+\htmlref{\texttt{F77\_\-INTEGER\_\-TYPE}}{F77_INTEGER_TYPE} may expand to
+\texttt{int}.
+These are usually not needed explicitly within user written code, but can be
+required when declaring common blocks, casting values from a variable of one
 type to one of a different type and when using the \texttt{sizeof} operator.
 
 \subsection{\xlabel{logical_values}Logical Values}
 
-The macros 
+The macros
 \htmlref{\texttt{F77\_\-FALSE}}{F77_FALSE}
-and 
+and
 \htmlref{\texttt{F77\_\-TRUE}}{F77_TRUE}
-expand to the 
-numerical values that FORTRAN treats as false and true ({\em{e.g.}}\ 0 and 1). 
-They should be used when setting logical values to be returned to the calling 
+expand to the
+numerical values that FORTRAN treats as false and true ({\em{e.g.}}\ 0 and 1).
+They should be used when setting logical values to be returned to the calling
 FORTRAN routine.
-There are also macros 
-\htmlref{\texttt{F77\_\-ISFALSE}}{F77_ISFALSE} 
-and 
+There are also macros
+\htmlref{\texttt{F77\_\-ISFALSE}}{F77_ISFALSE}
+and
 \htmlref{\texttt{F77\_\-ISTRUE}}{F77_ISTRUE}
 that should be used when testing a function argument for truth or falsehood.
 
 \subsection{\xlabel{external_names}External Names}
 
-The macro 
+The macro
 \htmlref{\texttt{F77\_\-EXTERNAL\_\-NAME}}{F77_EXTERNAL_NAME}
 handles the difference between the
 actual external name of a function called from FORTRAN and a function that
@@ -1670,14 +1670,14 @@ directly by the programmer, but is called by other macros.
 
 \subsection{\xlabel{common_blocks}\label{f77_common}Common Blocks}
 
-There are two macros that deal with common blocks, 
+There are two macros that deal with common blocks,
 \htmlref{\texttt{F77\_\-NAMED\_\-COMMON}}{F77_NAMED_COMMON}
-and 
-\htmlref{\texttt{F77\_\-BLANK\_\-COMMON}}{F77_BLANK_COMMON}\@. 
+and
+\htmlref{\texttt{F77\_\-BLANK\_\-COMMON}}{F77_BLANK_COMMON}\@.
 They are used when declaring external
 structures that corresponds to FORTRAN common blocks and when referring to
 components of those structures in the C code. The following declares a common
-block named ``block'' that contains three \texttt{INTEGER} variables and three 
+block named ``block'' that contains three \texttt{INTEGER} variables and three
 \texttt{REAL} variables.
 
 {\small \begin{verbatim}
@@ -1698,8 +1698,8 @@ The corresponding FORTRAN statements are
 
 Within the C function the variables would be referred to as:
 
-\texttt{F77\_\-NAMED\_\-COMMON(block).i}, 
-\texttt{F77\_\-NAMED\_\-COMMON(block).j}, 
+\texttt{F77\_\-NAMED\_\-COMMON(block).i},
+\texttt{F77\_\-NAMED\_\-COMMON(block).j},
 \textit{etc.}
 
 Note that all that these macros do is to hide the actual name of the external
@@ -1714,26 +1714,26 @@ be practical.
 \section{\xlabel{converting_between_fortran_and_c_strings}Converting Between FORTRAN and C Strings}
 
 \subsection{\xlabel{the_cnf_functions}\label{cnf}The CNF Functions}
-FORTRAN stores \texttt{CHARACTER} strings as fixed-length strings 
+FORTRAN stores \texttt{CHARACTER} strings as fixed-length strings
 filled with trailing blanks, whereas C stores them as a variable-length strings
-each terminated by the null character. 
+each terminated by the null character.
 Although C strings are of variable length,
 there must of course be enough space reserved to store the maximum length that
 the string ever reaches \textit{plus one more character for the trailing null}.
 
 To aid the programmer in converting between the two forms of character strings,
 a number of C functions are provided in the CNF library.
-These handle all aspects of converting between the two types of string and 
-provide options such as creating temporary strings, including the trailing 
-blanks in the C version of a string and only copying a maximum number of 
-characters. 
+These handle all aspects of converting between the two types of string and
+provide options such as creating temporary strings, including the trailing
+blanks in the C version of a string and only copying a maximum number of
+characters.
 The process of converting from FORTRAN to C strings is known as ``importing''
 and from C to FORTRAN as ``exporting''.
 
-None of the functions are very complicated and some of them are just a tidier 
-way of achieving what could be done with a few lines of C in the calling 
-program. Consequently in a time critical application it may be appropriate to 
-include the source of a CNF function in your code, rather than incur the 
+None of the functions are very complicated and some of them are just a tidier
+way of achieving what could be done with a few lines of C in the calling
+program. Consequently in a time critical application it may be appropriate to
+include the source of a CNF function in your code, rather than incur the
 overheads of a making a function call.
 
 \htmlref{Full descriptions}{cnf_description}
@@ -1784,12 +1784,12 @@ Other examples in this document illustrate the use of CNF functions for
 importing strings and calling FORTRAN from C.
 
 \subsection{\xlabel{handling_byte_strings_hds_locators}\label{locators}Handling Byte Strings (HDS Locators)}
-Sometimes FORTRAN \texttt{CHARACTER} variables are used to contain strings of 
-bytes rather than normal, printable character strings -- a particular case 
-of this is 
+Sometimes FORTRAN \texttt{CHARACTER} variables are used to contain strings of
+bytes rather than normal, printable character strings -- a particular case
+of this is
 \xref{HDS locators}{sun92}{using_locators}\latex{ (see SUN/92)}.
-In this case, special characters, such as NULL, cease to have their normal 
-meaning and this could confuse the standard CNF import and export functions. 
+In this case, special characters, such as NULL, cease to have their normal
+meaning and this could confuse the standard CNF import and export functions.
 For this reason, functions
 \htmlref{\texttt{cnfImpch}}{cnfImpch}
 and
@@ -1798,17 +1798,17 @@ are provided.
 These functions just import and export a given number of characters.
 
 \subsection{\xlabel{using_dynamic_fortran_character_strings}\label{f77_chardyn}Using Dynamic FORTRAN Character Strings}
-The 
+The
 \htmlref{\texttt{DECLARE\_CHARACTER}}{DECLARE_CHARACTER}
-macro used in 
+macro used in
 \htmlref{an earlier example}{cook_argsc2f} \latex{(\ref{cook_argsc2f})}
 assumes that the length of the required FORTRAN character string is a constant,
-known at compile time. 
-This is not always the case -- for example, the character argument to be 
-passed to the FORTRAN subroutine may be derived from an argument of the 
+known at compile time.
+This is not always the case -- for example, the character argument to be
+passed to the FORTRAN subroutine may be derived from an argument of the
 calling C function as in the case of a C wrap-around for a FORTRAN subroutine.
 To cater for this situation, macros are provided which will allocate and free
-space for the FORTRAN character string at run time. 
+space for the FORTRAN character string at run time.
 They make use of the CNF functions
 \htmlref{\texttt{cnfCref}}{cnfCref}
 and
@@ -1875,11 +1875,11 @@ which is a C wrapper for the FORTRAN subroutine:
       INTEGER I, J
       CHARACTER*(*) FIN
       CHARACTER*(*) FOUT
-      
+
       FOUT = FIN(1:1)
       I = 2
       J = 1
-      
+
       DOWHILE ( I .LE. LEN(FIN) )
          IF ( FIN(I:I) .NE. ' ' ) THEN
             J = J + 1
@@ -1897,16 +1897,16 @@ which is a C wrapper for the FORTRAN subroutine:
 \end{verbatim} \end{quote} }
 Here,
 \htmlref{\texttt{DECLARE\_CHARACTER\_DYN}}{DECLARE_CHARACTER_DYN}
-is used in place of 
+is used in place of
 \htmlref{\texttt{DECLARE\_CHARACTER}}{DECLARE_CHARACTER}\@.
 It declares pointers rather than allocating space for the FORTRAN character
 strings to be passed to the FORTRAN subroutine. A variable to hold the string
 length is also declared.
 
-The 
+The
 \htmlref{\texttt{F77\_CREATE\_CHARACTER}}{F77_CREATE_CHARACTER}
-expands to executable statements which allocate space and set the pointers and 
-string length. The 
+expands to executable statements which allocate space and set the pointers and
+string length. The
 \htmlref{\texttt{F77\_\-FREE\_\-CHARACTER}}{F77_FREE_type}
 macro expands to executable statements which free the previously allocated
 space.
@@ -1925,7 +1925,7 @@ the array are accessed.
 
 C, of course, does provide pointers -- in fact you can hardly avoid
 using them -- and they are distinct from C integers (\texttt{int}s). To
-take account of this, a macro 
+take account of this, a macro
 \htmlref{\texttt{POINTER}}{type}
 is defined to declare C
 function arguments that the calling FORTRAN program declares as an
@@ -1933,7 +1933,7 @@ function arguments that the calling FORTRAN program declares as an
 routine should not process a \texttt{POINTER} variable in any way.
 The only valid operations it may perform are to copy it, to pass it to
 a subprogram using the normal parameter passing mechanism, or to pass
-its value to a subprogram using the 
+its value to a subprogram using the
 \htmlref{\texttt{\%VAL} facility}{percentval}\latex{ (as
 described in Section~\ref{percentval})} in order to access the contents
 of the array to which it points.
@@ -1989,7 +1989,7 @@ FORTRAN.
 When converting a C pointer into a FORTRAN pointer, it is sufficient
 simply to mask out all bits except those that will fit into a FORTRAN
 \texttt{INTEGER}. This is performed by the function
-\htmlref{\texttt{cnfFptr}}{cnfFptr}.  
+\htmlref{\texttt{cnfFptr}}{cnfFptr}.
 When converting in the opposite direction, the
 internal table must be searched to locate a pointer which has the same
 value stored in the set of masked bits (e.g.\ the lowest 32 bits) as
@@ -2010,7 +2010,7 @@ library functions \texttt{malloc}, \texttt{calloc} and \texttt{free}.
 \subsection{\xlabel{allocating_exportable_dynamic_memory}Allocating
 Exportable Dynamic Memory}
 
-The CNF functions 
+The CNF functions
 \htmlref{\texttt{cnfMalloc}}{cnfMalloc}
 and
 \htmlref{\texttt{cnfCalloc}}{cnfCalloc}
@@ -2036,8 +2036,8 @@ F77_POINTER_FUNCTION(ralloc)( INTEGER(N) )
 \end{verbatim} \end{quote} }
 
 When the allocated memory is no longer required, it should be freed
-using 
-\htmlref{\texttt{cnfFree}}{cnfFree}. 
+using
+\htmlref{\texttt{cnfFree}}{cnfFree}.
 This is how you might import the FORTRAN
 pointer value allocated above back into C in order to free it:
 
@@ -2058,7 +2058,7 @@ additional functions:
 \begin{itemize}
 
 \item They maintain the internal table of ``registered'' pointers, so
-that the conversion functions 
+that the conversion functions
 \htmlref{\texttt{cnfFptr}}{cnfFptr}
 and
 \htmlref{\texttt{cnfCptr}}{cnfCptr}
@@ -2147,13 +2147,13 @@ follows:
 \end{verbatim} \end{quote} }
 
 Note how the argument of the \texttt{\%VAL} directive is
-\texttt{CNF\_PVAL(PNTR)}. The FORTRAN-callable 
+\texttt{CNF\_PVAL(PNTR)}. The FORTRAN-callable
 \htmlref{\texttt{CNF\_PVAL}}{CNF_PVAL}
 function serves to expand the pointer value out to its full length
-(equivalent to calling 
+(equivalent to calling
 \htmlref{\texttt{cnfCptr}}{cnfCptr}
-from C). 
-The data type returned by this function will depend on the length of C pointers 
+from C).
+The data type returned by this function will depend on the length of C pointers
 on the machine being used and may not be a standard FORTRAN type (for
 instance, on DEC Alphas it is an \texttt{INTEGER*8}
 function). However, the data type declaration for this function is
@@ -2163,7 +2163,7 @@ include non-standard type declarations directly in your own software.
 \subsection{\xlabel{registering_your_own_pointers}Registering Your Own
 Pointers}
 
-CNF also provides two functions, 
+CNF also provides two functions,
 \htmlref{\texttt{cnfRegp}}{cnfRegp}
 and
 \htmlref{\texttt{cnfUregp}}{cnfUregp},
@@ -2177,15 +2177,15 @@ which CNF provides.
 The reason for providing them is that there may be ways of
 creating new memory, for which \texttt{cnfMalloc} or \texttt{cnfCalloc} cannot
 be used.
-For example, mapping data files directly into memory. 
+For example, mapping data files directly into memory.
 If the resulting C pointers are to be exported to FORTRAN,
 they must be accessible to CNF for conversion purposes, so they must
 be registered in CNF's internal table.
 
 If you should ever need to use this facility, then the main point to
 note is that attempting to register a C pointer can potentially fail
-(\htmlref{\texttt{cnfRegp}}{cnfRegp} returns -1 to indicate this). 
-This will occur if, when the C pointer is converted to a FORTRAN 
+(\htmlref{\texttt{cnfRegp}}{cnfRegp} returns -1 to indicate this).
+This will occur if, when the C pointer is converted to a FORTRAN
 \texttt{INTEGER}, it
 clashes with a FORTRAN pointer value which is already in use. In such
 a case you cannot safely export your pointer to FORTRAN, so you must
@@ -2221,7 +2221,7 @@ C main program:
       extern F77_SUBROUTINE(pgbegin)
          ( INTEGER(unit), CHARACTER(file), INTEGER(nxsub), INTEGER(nysub)
            TRAIL(file) );
-     
+
       extern F77_SUBROUTINE(pgenv)
          ( REAL(xmin), REAL(xmax), REAL(ymin), REAL(ymax), INTEGER(just),
            INTEGER(axis) );
@@ -2264,7 +2264,7 @@ C main program:
 
 
          unit = 0; cnfExprt( "?", file, file_length); nxsub = 1; nysub = 1;
-         F77_CALL(pgbegin) ( INTEGER_ARG(&unit), CHARACTER_ARG(file), 
+         F77_CALL(pgbegin) ( INTEGER_ARG(&unit), CHARACTER_ARG(file),
                              INTEGER_ARG(&nxsub), INTEGER_ARG(&nysub)
                              TRAIL_ARG(file) );
 
@@ -2306,20 +2306,20 @@ C main program:
 This is a realistic example of calling PGPLOT routines from C\@. The module
 begins with a set of function prototypes for the FORTRAN routines that will be
 called in the C main program. All variables that need to be passed to FORTRAN
-subroutines are declared using 
-\htmlref{\texttt{DECLARE\_\-\textit{type}}}{DECLARE_type}\/ 
-macros. 
+subroutines are declared using
+\htmlref{\texttt{DECLARE\_\-\textit{type}}}{DECLARE_type}\/
+macros.
 These macros ensure that the variables are declared to be of the correct type
 and storage size expected by the FORTRAN subroutine.
-There then follow the calls to the subroutines that do the actual plotting. 
-The most notable things about these calls is that the actual arguments are 
-explicitly passed by address. 
-This seems strange to a FORTRAN programmer, but is natural to a C programmer. 
-Arguments that may be modified must always have their addresses passed, not 
+There then follow the calls to the subroutines that do the actual plotting.
+The most notable things about these calls is that the actual arguments are
+explicitly passed by address.
+This seems strange to a FORTRAN programmer, but is natural to a C programmer.
+Arguments that may be modified must always have their addresses passed, not
 their values.
-It may be thought that the 
+It may be thought that the
 \htmlref{\texttt{\textit{type}\_ARG}}{type_ARG}
-macros should add the \texttt{\&} character where it is needed. 
+macros should add the \texttt{\&} character where it is needed.
 However, this gives rise to problems when calling
 FORTRAN from C from FORTRAN, as well as being rather misleading. Note that
 scalar arguments need the ampersand character adding, whereas array arguments
@@ -2329,8 +2329,8 @@ function.
 What is clear from this example is that the inability to put arguments that are
 constant expressions directly in the call to the routine makes the program a
 lot more verbose than the equivalent FORTRAN program. Unfortunately, the
-obvious solution of writing an actual argument as something like 
-\texttt{INTEGER\_ARG(\&5)} does not work as you cannot take the address of a 
+obvious solution of writing an actual argument as something like
+\texttt{INTEGER\_ARG(\&5)} does not work as you cannot take the address of a
 constant.
 This is not a failing of the F77 macros, but is inherent in the C language. For
 routines that are called in many places, it will be more convenient to write a
@@ -2340,25 +2340,25 @@ code, since there is an extra level of subroutine call. However, in many
 situations, the extra cost will be outweighed by the benefits of more
 transparent code.
 
-The macro 
+The macro
 \htmlref{\texttt{F77\_CALL}}{F77_CALL}
-actually expands to the same thing as the macro 
+actually expands to the same thing as the macro
 \htmlref{\texttt{F77\_\-EXTERNAL\_\-NAME}}{F77_EXTERNAL_NAME},
-but is included as it is more descriptive of 
+but is included as it is more descriptive of
 what is being done when calling a FORTRAN routine from C\@.
 
 \section{\xlabel{more_on_arrays}More on Arrays}
 For most data types arrays are handled simply, using pointers as already
 demonstrated. However, for arrays of some types the data in the arrays
-must be converted back and forth between C and FORTRAN representations. 
-Macros and functions are provided to facilitate the conversions. 
+must be converted back and forth between C and FORTRAN representations.
+Macros and functions are provided to facilitate the conversions.
 
-Very often, the actual size of the FORTRAN array required will not be known 
+Very often, the actual size of the FORTRAN array required will not be known
 until runtime so space for it must be allocated dynamically in a similar way
-to 
+to
 \htmlref{dynamic character strings}{f77_chardyn}.
 
-Macros  
+Macros
 \htmlref{\texttt{DECLARE\_\-\textit{type}\_\-ARRAY\_\-DYN}}
         {DECLARE_type_ARRAY_DYN}
 and
@@ -2366,7 +2366,7 @@ and
         {F77_CREATE_type_ARRAY}
 are defined to do this.
 They are designed for 1-dimensional arrays, having just the name and the number
-of elements as parameters, but for Unix systems, at least, will work for 
+of elements as parameters, but for Unix systems, at least, will work for
 multi-dimensional arrays.
 
 For most types on all current systems, the \texttt{CREATE\_ARRAY} macros
@@ -2375,7 +2375,7 @@ they are provided for contingency and completeness.
 
 \subsection{\xlabel{character_and_logical_arrays}\label{char_arrays}CHARACTER and LOGICAL Arrays}
 There are two versions of the macros for creating dynamic \texttt{CHARACTER}
-and \texttt{LOGICAL} arrays: 
+and \texttt{LOGICAL} arrays:
 \htmlref{\texttt{F77\_CREATE\_CHARACTER\_ARRAY}}{F77_CREATE_CHARACTER_ARRAY}
 will create a 1-dimensional array with the given number of elements, and
 \htmlref{\texttt{F77\_CREATE\_CHARACTER\_ARRAY\_M}}
@@ -2389,10 +2389,10 @@ and
         {F77_CREATE_LOGICAL_ARRAY\_M}
 
 Consider the following example of a C program which calls a FORTRAN subroutine
-which returns a \texttt{CHARACTER} array produced by setting to blank every 
-non-blank element of a given array for which the corresponding element of a 
-given \texttt{LOGICAL} array is TRUE. A \texttt{LOGICAL} output array is 
-produced with \texttt{TRUE} in the element corresponding with each element of 
+which returns a \texttt{CHARACTER} array produced by setting to blank every
+non-blank element of a given array for which the corresponding element of a
+given \texttt{LOGICAL} array is TRUE. A \texttt{LOGICAL} output array is
+produced with \texttt{TRUE} in the element corresponding with each element of
 the \texttt{CHARACTER} array which has been reset, and \texttt{FALSE} elsewhere.
 
 \refstepcounter{examples}
@@ -2404,7 +2404,7 @@ Example\latex{~\ref{cook_reset}}
 {\small \begin{quote} \begin{verbatim}
 #include <stdio.h>
 #include "f77.h"
-F77_SUBROUTINE(str_reset)(CHARACTER_ARRAY(in), LOGICAL_ARRAY(lin), 
+F77_SUBROUTINE(str_reset)(CHARACTER_ARRAY(in), LOGICAL_ARRAY(lin),
                           INTEGER(dim1), INTEGER(dim2),
                           CHARACTER_ARRAY(out), LOGICAL_ARRAY(lout)
                           TRAIL(in) TRAIL(out) );
@@ -2429,7 +2429,7 @@ int i,j;
    F77_CREATE_CHARACTER_ARRAY_M(fout,3,ndims,dims);
    F77_CREATE_LOGICAL_ARRAY_M(flout,ndims,dims);
 
-   (void) cnfExprta( 
+   (void) cnfExprta(
       (char *)inarr, inarr_length, (char *)fin, fin_length, ndims, dims );
    (void) cnfExpla( (int *)lin, (F77_LOGICAL_TYPE *)flin, ndims, dims );
 
@@ -2452,7 +2452,7 @@ int i,j;
    for (j=0;j<3;j++){
       for (i=0;i<2;i++){
          printf("%d %d %c  %s  %c  %s\n",
-            i, j, lin[j][i]?'T':'F', inarr[j][i], 
+            i, j, lin[j][i]?'T':'F', inarr[j][i],
                   lout[j][i]?'T':'F', outarr[j][i] );
       }
    }
@@ -2483,7 +2483,7 @@ int i,j;
       CHARACTER*(*) OUT(2,3)
       LOGICAL LIN(2,3)
       LOGICAL LOUT(2,3)
-      
+
       DO 20, J = 1, 3
          DO 10, I = 1, 2
             IF( LIN(I,J) .AND. (ARRAY(I,J) .NE. ' ') )THEN
@@ -2526,7 +2526,7 @@ int dims[2];
    dims[0] = *dim1;
    dims[1] = *dim2;
    nels = *dim1 * *dim2;
-   
+
    in_c = cnfCreat( nels*(in_f_length+1) );
    out_c = cnfCreat( nels*(out_f_length+1) );
    lin_c = (int *)malloc( nels*sizeof(int) );
@@ -2557,7 +2557,7 @@ int dims[2];
 \end{verbatim} \end{quote} }
 
 \subsection{\xlabel{arrays_of_pointer_to_char}\label{char_ptrs}Arrays of \texttt{pointer to char}}
-In C, arrays of character strings are often held as arrays of 
+In C, arrays of character strings are often held as arrays of
 \texttt{pointer to char}.
 This allows strings of varying length and not necessarily in contiguous
 memory.
@@ -2565,7 +2565,7 @@ CNF functions
 \htmlref{\texttt{cnfImprtap}}{cnfImprtap}
 and
 \htmlref{\texttt{cnfExprtap}}{cnfExprtap}
-can be used to import/export arrays of pointer to char from/to 
+can be used to import/export arrays of pointer to char from/to
 FORTRAN \texttt{CHARACTER} arrays.
 The following example shows how to do this. The FORTRAN subroutine, PRARR,
 prints the given \texttt{CHARACTER} array and returns it set to blank strings.
@@ -2635,9 +2635,9 @@ See also
 \section{\xlabel{the_import_and_export_macros}\label{import_export}The IMPORT and EXPORT Macros}
 We have already seen that character strings and \texttt{LOGICAL} and
 \texttt{POINTER} variables
-have to be converted between the different forms used by FORTRAN and C, and 
-the idea of ``importing'' a FORTRAN value to a C value, and ``exporting'' a C 
-value to a FORTRAN value has been introduced with the CNF routines.. 
+have to be converted between the different forms used by FORTRAN and C, and
+the idea of ``importing'' a FORTRAN value to a C value, and ``exporting'' a C
+value to a FORTRAN value has been introduced with the CNF routines..
 
 Potentially all the other types could differ so macros
 \htmlref{\texttt{F77\_\-IMPORT\_\-\textit{type}}}{F77_IMPORT_type},
@@ -2647,10 +2647,10 @@ Potentially all the other types could differ so macros
 and
 \htmlref{\texttt{F77\_\-EXPORT\_\-\textit{type}\_\-ARRAY}}
 {F77_EXPORT_type_ARRAY}
-are defined to copy the data as required -- they will use CNF routines 
+are defined to copy the data as required -- they will use CNF routines
 where appropriate. An additional \texttt{\textit{type}} of \texttt{LOCATOR}
-is allowed for the \texttt{IMPORT/EXPORT} macros to handle character strings 
-used as 
+is allowed for the \texttt{IMPORT/EXPORT} macros to handle character strings
+used as
 \htmlref{HDS locators}{locators}.
 There are also macros
 \htmlref{\texttt{F77\_\-IMPORT\_\-CHARACTER\_\-ARRAY\_P}}
@@ -2658,16 +2658,16 @@ There are also macros
 and
 \htmlref{\texttt{F77\_\-EXPORT\_\-CHARACTER\_\-ARRAY\_P}}
         {F77_EXPORT_CHARACTER_ARRAY_P}
-to handle the CHARACTER conversion if the C array is an 
+to handle the CHARACTER conversion if the C array is an
 \htmlref{array of pointers to char}{char_ptrs}.
 
-The \texttt{IMPORT/EXPORT\_ARRAY} macros have arguments giving pointers to 
+The \texttt{IMPORT/EXPORT\_ARRAY} macros have arguments giving pointers to
 the data and the number of elements to be converted. This is assumed to be
-sufficient for both single and multi-dimensional arrays. 
+sufficient for both single and multi-dimensional arrays.
 
 These macros impose a slight overhead in that they require both the FORTRAN and
 C variables to be set up and some copying done, even when this is not strictly
-necessary. 
+necessary.
 However, they do protect against possible future problems and ease the
 problem of deciding whether and how the import/export should be done.
 
@@ -2676,17 +2676,17 @@ required (as in the case of \texttt{CHARACTER} and \texttt{LOGICAL} arrays, for
 example).
 
 A complication arises where the actual argument for a FORTRAN subroutine to be
-called from C is an array which is only returned. 
+called from C is an array which is only returned.
 In that case, no exporting is
 required but the FORTRAN array must still be associated with the C array so
 that the FORTRAN subroutine knows where to store the results.
-For those types which require genuine conversion, a pointer to the FORTRAN 
+For those types which require genuine conversion, a pointer to the FORTRAN
 array will have been set when the space was allocated but for others the
 pointer must be set to point to the actual C array.
-Macros 
+Macros
 \htmlref{\texttt{F77\_\-ASSOC\_\-\textit{type}\_\-ARRAY}}
 {F77_ASSOC_type_ARRAY}
-are defined to do this where necessary. 
+are defined to do this where necessary.
 They are complementary to the
 \htmlref{\texttt{F77\_\-CREATE\_\-\textit{type}\_\-ARRAY}}
 {F77_CREATE_type_ARRAY}
@@ -2794,14 +2794,14 @@ int lin[3][2]={{1,0},{1,1},{0,1}};
 int lout[3][2];
 int i,j;
 
-   strReset(&inarr[0][0][0], 4, &lin[0][0], 3, 2, 
+   strReset(&inarr[0][0][0], 4, &lin[0][0], 3, 2,
             &outarr[0][0][0], 4, &lout[0][0] );
 
    printf("i j in  lin out lout\n");
    for (j=0;j<3;j++){
       for (i=0;i<2;i++){
          printf("%d %d %c  %s  %c  %s\n",
-            i, j, lin[j][i]?'T':'F', inarr[j][i], 
+            i, j, lin[j][i]?'T':'F', inarr[j][i],
                   lout[j][i]?'T':'F', outarr[j][i] );
      }
    }
@@ -2870,10 +2870,10 @@ The INTEGER function:
 
       END
 \end{verbatim} \end{quote} }
-Corresponding macros are defined for other types of function and for 
+Corresponding macros are defined for other types of function and for
 FORTRAN subroutines.
 
-Now suppose in the above example the subroutine TST\_IFUN was written in C to 
+Now suppose in the above example the subroutine TST\_IFUN was written in C to
 be called from FORTRAN. The code would be something like:
 
 \refstepcounter{examples}
@@ -2912,15 +2912,15 @@ GENPTR_INTEGER(status)
 \section{\xlabel{other_approaches_to_mixed_language_programming}Other Approaches to Mixed Language Programming}
 
 The F77 macros and CNF functions described in this document provide a
-complete way of writing portable programs in a mixture of FORTRAN and C\@. 
+complete way of writing portable programs in a mixture of FORTRAN and C\@.
 All of the work necessary to provide the correct interface goes into writing
 the C routines. It is relatively painless to call C from FORTRAN, since the
 work of writing the interface need only be done once, but it can be annoying to
 have to write a lot of extra code every time that a FORTRAN routine is called
-from a C one. 
-As mentioned in 
+from a C one.
+As mentioned in
 \htmlref{More on Calling FORTRAN from C}{f77_ffromc}
-\latex{(Section~\ref{f77_ffromc})}, it may be appropriate to write 
+\latex{(Section~\ref{f77_ffromc})}, it may be appropriate to write
 wrap-around routines when calling FORTRAN from C\@.
 
 Another package that tackles the problem of mixing C and FORTRAN is one called
@@ -2942,9 +2942,9 @@ system in preference to F77.
 
 \section{\xlabel{compiling_and_linking}Compiling and Linking\label{compiling_and_linking}}
 
-Unless they are passing pointers to subprograms, FORTRAN programs do not need 
+Unless they are passing pointers to subprograms, FORTRAN programs do not need
 to be compiled in any special way when employing mixed language programming
-since they are not aware that the subprogram that they are calling is not 
+since they are not aware that the subprogram that they are calling is not
 written in FORTRAN\@. However, when pointers are passed using the mechanism
 described in
 \htmlref{Accessing Dynamic Memory from C and
@@ -2968,12 +2968,12 @@ to be called from FORTRAN, it should contain the line:
 \texttt{\#include "f77.h"}
 \end{quote}
 
-to define the F77 macros and CNF functions\footnote{The two CNF header files, 
+to define the F77 macros and CNF functions\footnote{The two CNF header files,
 \texttt{cnf.h} and \texttt{f77.h} are now identical. For legacy reasons
 it is acceptable to \texttt{\#include} either or both in the code -- just
 \texttt{f77.h} is preferred.}.
 
-On a Unix system, you can usually tell the C compiler where to look for 
+On a Unix system, you can usually tell the C compiler where to look for
 header files with the \texttt{-I} qualifier to the cc command,
 \textit{e.g.}:
 
@@ -2981,12 +2981,12 @@ header files with the \texttt{-I} qualifier to the cc command,
 % cc -I/star/include -c func.c
 \end{verbatim}\end{quote}
 
-All FORTRAN \texttt{INCLUDE} and C header files for Starlink software are 
+All FORTRAN \texttt{INCLUDE} and C header files for Starlink software are
 stored in the directory \texttt{/star/include}, and the object files for all
-Starlink libraries reside in \texttt{/star/lib}. 
+Starlink libraries reside in \texttt{/star/lib}.
 
 To link a FORTRAN program \texttt{prog.f} and a C function \texttt{sub.c} with
-the CNF library, first compile the C function and then compile and link the 
+the CNF library, first compile the C function and then compile and link the
 FORTRAN program:
 
 \begin{quote} \begin{verbatim}
@@ -3008,9 +3008,9 @@ For example, on Alpha/OSF1 it might be:
 % cc prog.c sub.o -L/star/lib `cnf_link` -lfor -lots -o prog
 \end{verbatim} \end{quote}
 
-For 
+For
 \xref{ADAM}{sg4}{}
-tasks\latex{ (see SG/4)}, much of the complication is removed by the task 
+tasks\latex{ (see SG/4)}, much of the complication is removed by the task
 linking scripts
 \xref{alink and ilink}{sun144}{ADAM_link_scripts} which will accept a mixture of
 FORTRAN and C modules to compile. For example:
@@ -3026,7 +3026,7 @@ for any required C header files.
 
 The first program module specified for the ADAM link script must be the main
 routine of the ADAM task, which is written as a FORTRAN subroutine or C function
-with a single \texttt{INTEGER}, or \texttt{int *}, argument (see 
+with a single \texttt{INTEGER}, or \texttt{int *}, argument (see
 \xref{SUN/144}{sun144}{ADAM_link_scripts}
 for details).
 
@@ -3057,15 +3057,15 @@ and C in this subsection refer to the Sun~FORTRAN and ANSI~C compilers.
 
 \subsubsection{Data Types}
 
-There is a simple correspondence between Sun FORTRAN and C numeric variable 
+There is a simple correspondence between Sun FORTRAN and C numeric variable
 types.
 The standard types are given in the upper part of
 \begin{htmlonly}
 the table below,
-\end{htmlonly} 
+\end{htmlonly}
 \latex{Table~\ref{sun_datatypes}} and
 non-standard extensions in the lower part. These should generally be avoided
-for reasons of portability, however, they are provided since 
+for reasons of portability, however, they are provided since
 \xref{HDS}{sun92}{} \latex{(see SUN/92)}
 has corresponding data types.
 
@@ -3091,33 +3091,33 @@ POINTER & INTEGER & unsigned int\\ \hline
 \label{sun_datatypes}
 \end{table}
 
-Although C defines unsigned data types of \texttt{unsigned char} 
-(range 0 to 255), \texttt{unsigned short} (range 0 to 32767) and 
-\texttt{unsigned int} (range 0 to $2^{32}-1$), there are no corresponding 
-unsigned data types in FORTRAN\@. 
-There is also a C type called \texttt{long int}, however on Suns, this is the 
+Although C defines unsigned data types of \texttt{unsigned char}
+(range 0 to 255), \texttt{unsigned short} (range 0 to 32767) and
+\texttt{unsigned int} (range 0 to $2^{32}-1$), there are no corresponding
+unsigned data types in FORTRAN\@.
+There is also a C type called \texttt{long int}, however on Suns, this is the
 same as an \texttt{int}.
 
-The C language does not specify whether variables of type \texttt{char} should 
+The C language does not specify whether variables of type \texttt{char} should
 be stored as signed or unsigned values. On Suns, they are stored as signed
 values in the range -128 to 127.
 
 Similarly there is no C data type that corresponds to the FORTRAN data type of
-\texttt{COMPLEX}\@. However, since Sun~FORTRAN passes all numeric variable by 
-reference, a \texttt{COMPLEX} variable could be passed to a C subprogram where 
-it might be handled as a structure consisting of two variables of type 
+\texttt{COMPLEX}\@. However, since Sun~FORTRAN passes all numeric variable by
+reference, a \texttt{COMPLEX} variable could be passed to a C subprogram where
+it might be handled as a structure consisting of two variables of type
 \texttt{float}.
 
-A Sun~FORTRAN \texttt{LOGICAL} value can be passed to a C \texttt{int}. 
-Sun~FORTRAN and C both use zero to represent a false value and anything else 
-to represent a true value, so there is no problem with converting the data 
+A Sun~FORTRAN \texttt{LOGICAL} value can be passed to a C \texttt{int}.
+Sun~FORTRAN and C both use zero to represent a false value and anything else
+to represent a true value, so there is no problem with converting the data
 values.
 
 \subsubsection{External Names}
 
 The Sun~FORTRAN compiler appends an underscore character to all external names
-that it generates. 
-This applies to the names of subroutines, functions, labelled common blocks 
+that it generates.
+This applies to the names of subroutines, functions, labelled common blocks
 and block data subprograms.
 
 \subsubsection{\label{sun_arg}Arguments}
@@ -3127,14 +3127,14 @@ necessary to understand the possible methods that the operating system can use
 for passing arguments and how each language makes use of them. There are three
 ways that an actual argument may be passed to a subroutine. What is actually
 passed as an argument should always be a four byte word. It is the
-interpretation of that word that is where the differences arise. 
+interpretation of that word that is where the differences arise.
 
 Sun~FORTRAN passes all data types other than \texttt{CHARACTER} by reference,
 \textit{i.e.}\ the address of the variable or array is put in the argument list.
-\texttt{CHARACTER} variables are passed by  a mixture of reference and value. 
+\texttt{CHARACTER} variables are passed by  a mixture of reference and value.
 The argument list contains the address of the character variable being passed,
 but there is also an extra argument added at the end of the argument list for
-each character variable. 
+each character variable.
 This gives the actual length of the FORTRAN \texttt{CHARACTER} variable and so
 this datum is being passed by value. These extra arguments are hidden from the
 FORTRAN programmer, but must be explicitly included in any C routines.
@@ -3148,7 +3148,7 @@ To pass a C variable of type \texttt{double} by value requires the use of two
 longwords in the argument list. Similarly, if a C structure is passed by value,
 then the number of bytes that it takes up in the argument list can be large.
 This is a dangerous practice and all structures should be passed by reference.
-Since, by default, Sun~FORTRAN does not pass variables by value anyway, this 
+Since, by default, Sun~FORTRAN does not pass variables by value anyway, this
 should not give rise to any problems.
 
 In Sun~FORTRAN, the default argument passing mechanism can be overridden by use
@@ -3157,8 +3157,8 @@ and should be avoided whenever possible. The \texttt{\%DESCR} function provided 
 VAX~FORTRAN is \textit{not}\, provided on a Sun. In C there is no similar way of
 ``cheating'' as there is in FORTRAN; however, this is not necessary as the
 language allows more flexibility itself. For example, if you wish to pass a
-variable named \texttt{x} by reference rather than by value, you simply put 
-\texttt{\&x} as the actual argument instead of \texttt{x}. 
+variable named \texttt{x} by reference rather than by value, you simply put
+\texttt{\&x} as the actual argument instead of \texttt{x}.
 
 Since C provides more flexibility in the mechanism of passing arguments than
 does FORTRAN, it is C that ought to shoulder the burden of handling the
@@ -3171,7 +3171,7 @@ actual argument in a function call, it can only pass it by value. Sun~FORTRAN
 cannot cope with this and so in a C program, all expressions should be assigned
 to variables before being passed to a FORTRAN routine.
 
-Here are some examples to illustrate these points. 
+Here are some examples to illustrate these points.
 
 \refstepcounter{examples}
 \label{sun_f2c}
@@ -3209,14 +3209,14 @@ C function:
 \end{verbatim} }
 
 The C function name requires the underscore as the FORTRAN compiler generates
-this automatically. 
+this automatically.
 
-In this first example, a Sun~FORTRAN program passes an \texttt{INTEGER} and 
-\texttt{REAL} variable to a C function. 
+In this first example, a Sun~FORTRAN program passes an \texttt{INTEGER} and
+\texttt{REAL} variable to a C function.
 The values of these arguments are then assigned to
 two local variables. They could just as well have been used directly in the
-function by referring to the variables \texttt{*a} and \texttt{*b} instead of 
-assigning their values to the local variables \texttt{x} and \texttt{y}. 
+function by referring to the variables \texttt{*a} and \texttt{*b} instead of
+assigning their values to the local variables \texttt{x} and \texttt{y}.
 Since the FORTRAN program passes the actual arguments by reference, the dummy
 arguments used in the declaration of the C function should be a pointer to the
 variable that is being passed.
@@ -3266,10 +3266,10 @@ argument list that is the size of the character variable.  Furthermore, there
 is the point that FORTRAN deals with fixed-length, blank-padded strings,
 whereas C deals with variable-length, null-terminated strings. The simplest
 possible example of a character argument is given here as an illustration.
-Don't worry if it looks complicated, the 
+Don't worry if it looks complicated, the
 \htmlref{F77 macros }{f77_cfromf}
 \latex{described in Section~\ref{f77_cfromf}} hide all
-of these details from the programmer, and in a portable manner as well! 
+of these details from the programmer, and in a portable manner as well!
 
 \refstepcounter{examples}
 \label{sun_char}
@@ -3314,7 +3314,7 @@ to be a string and initializes it. This string is then copied to the storage
 area that the subprogram argument points to, taking care not to copy more
 characters than the argument has room for. Finally any remaining space in the
 argument is filled with blanks, the null character being overwritten. You
-should always fill any trailing space with blanks in this way. 
+should always fill any trailing space with blanks in this way.
 
 \subsubsection{Function Values}
 
@@ -3323,8 +3323,8 @@ simple assignment statement. The value is actually returned in one or two of
 the registers of the CPU, depending on the size of the data type. Consequently
 there is no problem in handling the value of any function that returns a
 numerical value as long as the storage used by the value being returned and the
-value expected correspond 
-(see Table~\ref{sun_datatypes}\latex{ on page~\pageref{sun_datatypes}}). 
+value expected correspond
+(see Table~\ref{sun_datatypes}\latex{ on page~\pageref{sun_datatypes}}).
 
 The case of a function that returns a character string is more complex. The way
 that Sun~FORTRAN returns a character variable as a function value is to add two
@@ -3381,7 +3381,7 @@ C function:
 \end{verbatim} }
 
 The C function copies some asterisks into the location that Sun~FORTRAN will
-interpret as the return value of the FORTRAN \texttt{CHARACTER} function. 
+interpret as the return value of the FORTRAN \texttt{CHARACTER} function.
 The number of
 such asterisks is specified by the single argument of the FORTRAN function and
 the rest of the string is filled with blanks.
@@ -3419,10 +3419,10 @@ can use the same storage area for both Sun~FORTRAN and C strings, however, you
 must still beware of the different way in which FORTRAN and C handle the end of
 a string.
 
-If the FORTRAN common block contains more than one variable or array, then the 
+If the FORTRAN common block contains more than one variable or array, then the
 C variables must be contained in a structure.
 
-If you wish to access the Sun~FORTRAN blank common block, then the 
+If you wish to access the Sun~FORTRAN blank common block, then the
 corresponding C structure should be called \texttt{\_BLNK\_\_}.
 
 \refstepcounter{examples}
@@ -3459,18 +3459,18 @@ impinge on the question of mixed language programming.
 \subsubsection{LOGICAL Values}
 One place where the DEC system may differ from the Sun is in how logical
 values are handled. The original FORTRAN compiler for the DECstation (FORTRAN
-for RISC) used the Sun interpretation of logical values, \textit{i.e.}\ zero is 
+for RISC) used the Sun interpretation of logical values, \textit{i.e.}\ zero is
 false, non-zero is true. The more recent DEC~FORTRAN compiler uses the VMS
 convention that only checks the lowest bit of a value, so 0 is false, 1 is
-true, 2 is false, 3 is true, \textit{etc}. 
-When DEC~FORTRAN sets a \texttt{LOGICAL} variable to \texttt{TRUE}, all the 
-bits in the data are set to 1, resulting in a numerical equivalent value of -1. 
+true, 2 is false, 3 is true, \textit{etc}.
+When DEC~FORTRAN sets a \texttt{LOGICAL} variable to \texttt{TRUE}, all the
+bits in the data are set to 1, resulting in a numerical equivalent value of -1.
 Unfortunately this means that the correct value of the
-macros 
+macros
 \htmlref{\texttt{F77\_ISFALSE}}{F77_ISFALSE}
 and
 \htmlref{\texttt{F77\_ISTRUE}}{F77_ISTRUE}
-used in a C function, depend on which FORTRAN compiler you are using. 
+used in a C function, depend on which FORTRAN compiler you are using.
 It is not possible to handle this
 automatically, so you must be sure to use the right values for the macros. The
 default assumption is that you are using the newer DEC~FORTRAN compiler.
@@ -3505,10 +3505,10 @@ types. The standard types are given in the upper part of
 \begin{htmlonly}
 the table below
 \end{htmlonly}
-\latex{Table~\ref{vms_datatypes}} and non-standard extensions in the lower 
-part. 
+\latex{Table~\ref{vms_datatypes}} and non-standard extensions in the lower
+part.
 These should generally be avoided for reasons of portability. However, they are
-provided since 
+provided since
 \xref{HDS}{sun92}{} \latex{(see SUN/92)}
 has corresponding data types.
 
@@ -3534,9 +3534,9 @@ POINTER & INTEGER & unsigned int\\ \hline
 \label{vms_datatypes}
 \end{table}
 
-Although VAX~C defines unsigned data types of \texttt{unsigned char} (range 0 
-to 255),  \texttt{unsigned short} (range 0 to 32767) and \texttt{unsigned int} 
-(range 0 to $2^{32}-1$), there are no corresponding unsigned data types in 
+Although VAX~C defines unsigned data types of \texttt{unsigned char} (range 0
+to 255),  \texttt{unsigned short} (range 0 to 32767) and \texttt{unsigned int}
+(range 0 to $2^{32}-1$), there are no corresponding unsigned data types in
 FORTRAN\@.
 There is also a C type called \texttt{long int}; however in VAX~C, this is the
 same as an \texttt{int}.
@@ -3548,13 +3548,13 @@ values in the range -128 to 127.
 Similarly there is no C data type that corresponds to the FORTRAN data type of
 \texttt{COMPLEX}\@.
 However, since VAX~FORTRAN passes all numeric variable by reference, a
-\texttt{COMPLEX} variable could be passed to a VAX~C subprogram where it might 
+\texttt{COMPLEX} variable could be passed to a VAX~C subprogram where it might
 be handled as a structure consisting of two variables of type \texttt{float}.
 
-A VAX~FORTRAN \texttt{LOGICAL} value can be passed to a VAX~C \texttt{int}, but 
-care must be taken over the interpretation of the value since VAX~FORTRAN only 
-considers the lower bit of the longword to be significant (0 is false, 1 is 
-true) whereas VAX~C treats any numerical value other than 0 as true. 
+A VAX~FORTRAN \texttt{LOGICAL} value can be passed to a VAX~C \texttt{int}, but
+care must be taken over the interpretation of the value since VAX~FORTRAN only
+considers the lower bit of the longword to be significant (0 is false, 1 is
+true) whereas VAX~C treats any numerical value other than 0 as true.
 When VAX~FORTRAN sets a
 logical value to true, it sets all the bits. This corresponds to a numerical
 value of minus one.
@@ -3578,10 +3578,10 @@ This is a violation of the VAX procedure calling standard. It causes no
 problems for pure VAX~C programs, but is a potential source of problems for
 mixed language programs.
 
-VAX~FORTRAN passes all data types other than \texttt{CHARACTER} by reference, 
+VAX~FORTRAN passes all data types other than \texttt{CHARACTER} by reference,
 \textit{i.e.}\ the address of the variable or array is put in the argument list.
-\texttt{CHARACTER} variables are passed by descriptor. 
-The descriptor contains the type and class of descriptor, the length of the 
+\texttt{CHARACTER} variables are passed by descriptor.
+The descriptor contains the type and class of descriptor, the length of the
 string and the address where the characters are actually stored.
 
 VAX~C uses call by value to pass all variables, constants (except string
@@ -3600,15 +3600,15 @@ a mixture of FORTRAN and C, you would not normally pass variables by value
 anyway.
 
 In VAX~FORTRAN, the default argument passing mechanism can be overridden by use
-of the \texttt{\%VAL}, \texttt{\%REF} and \texttt{\%DESCR} functions. 
-These functions are not portable and should be avoided whenever possible. 
-The only exception is that \texttt{\%VAL} is used in Starlink software for 
-passing pointer variables. 
+of the \texttt{\%VAL}, \texttt{\%REF} and \texttt{\%DESCR} functions.
+These functions are not portable and should be avoided whenever possible.
+The only exception is that \texttt{\%VAL} is used in Starlink software for
+passing pointer variables.
 In VAX~C there is no similar way of ``cheating'' as there is in VAX~FORTRAN;
 however, this is not necessary as the language allows more flexibility itself.
 For example, if you wish to pass a variable named \texttt{x} by reference rather
-than by value, you simply put \texttt{\&x} as the actual argument instead of 
-\texttt{x}. 
+than by value, you simply put \texttt{\&x} as the actual argument instead of
+\texttt{x}.
 To pass something by descriptor, you need to construct the appropriate
 structure and pass the address of that. See the DEC manual ``Guide to VAX~C''
 for further details.
@@ -3625,7 +3625,7 @@ value. VAX~FORTRAN cannot cope with this and so in a VAX~C program, all
 expressions should be assigned to variables before being passed to a FORTRAN
 routine.
 
-Here are some examples to illustrate these points. 
+Here are some examples to illustrate these points.
 
 \refstepcounter{examples}
 \label{vms_f2c}
@@ -3662,14 +3662,14 @@ C function:
       }
 \end{verbatim} }
 
-In this first example, a FORTRAN program passes an \texttt{INTEGER} and 
-\texttt{REAL} variable to a C function. 
+In this first example, a FORTRAN program passes an \texttt{INTEGER} and
+\texttt{REAL} variable to a C function.
 The values of these arguments are then assigned to two local
 variables. They could just as well have been used directly in the function by
 referring to the variables  \texttt{*a} and \texttt{*b} instead of
-assigning their values to the local variables \texttt{x} and \texttt{y}. 
-Since the VAX~FORTRAN program passes the actual arguments by reference, the 
-dummy arguments used in the declaration of the VAX~C function should be a 
+assigning their values to the local variables \texttt{x} and \texttt{y}.
+Since the VAX~FORTRAN program passes the actual arguments by reference, the
+dummy arguments used in the declaration of the VAX~C function should be a
 pointer to the variable that is being passed.
 
 Now an example of calling a VAX~FORTRAN subroutine from VAX~C\@.
@@ -3705,26 +3705,26 @@ FORTRAN subroutine:
       END
 \end{verbatim} }
 
-The VAX~C main function declares and initializes a variable, \texttt{i}, and 
-declares a function \texttt{fort2}. 
-It calls \texttt{fort2}, passing the address of the variable \texttt{i} rather 
+The VAX~C main function declares and initializes a variable, \texttt{i}, and
+declares a function \texttt{fort2}.
+It calls \texttt{fort2}, passing the address of the variable \texttt{i} rather
 than its value, as this is what the VAX~FORTRAN subroutine will be expecting.
 
 As we have seen, the case of scalar numeric arguments is fairly
-straightforward. 
+straightforward.
 However, the passing of \texttt{CHARACTER} variables between VAX~FORTRAN
-and VAX~C is more complicated. VAX~FORTRAN passes \texttt{CHARACTER} variables 
+and VAX~C is more complicated. VAX~FORTRAN passes \texttt{CHARACTER} variables
 by descriptor and VAX~C must handle these descriptors.
-Furthermore, there is the point that FORTRAN deals with fixed-length, 
+Furthermore, there is the point that FORTRAN deals with fixed-length,
 blank-padded strings, whereas C deals with variable-length, null-terminated
 strings. It is also worth noting that VAX/VMS machines handle
 \texttt{CHARACTER} arguments in a manner which is different from the usual Unix
-way. 
-The simplest possible example of a \texttt{CHARACTER} argument is given here 
-in all of its gory detail. 
-You will be pleased to discover that this example is purely for illustration. 
+way.
+The simplest possible example of a \texttt{CHARACTER} argument is given here
+in all of its gory detail.
+You will be pleased to discover that this example is purely for illustration.
 The important point is that it is different from the Sun example and, anyway,
-the 
+the
 \htmlref{F77 macros}{f77_cfromf}
 \latex{described in Section~\ref{f77_cfromf}} hide all of these
 differences from the programmer, thereby making the code portable.
@@ -3733,7 +3733,7 @@ differences from the programmer, thereby making the code portable.
 \label{vms_char}
 \begin{center}
 Example\latex{~\ref{vms_char}}
--- Passing character arguments from VAX~FORTRAN to 
+-- Passing character arguments from VAX~FORTRAN to
 VAX~C\@.
 \end{center}
 \nopagebreak[4]
@@ -3785,7 +3785,7 @@ than just a single character variable, the descriptor that describes the data
 is different. It is defined by the macro \texttt{dsc\$descriptor\_a} instead of
 \texttt{dsc\$descriptor\_s}. This contains extra information about the number of
 dimensions and their bounds; however, this can generally be ignored since the
-first part of the \texttt{dsc\$descriptor\_a} descriptor is the same as the 
+first part of the \texttt{dsc\$descriptor\_a} descriptor is the same as the
 \texttt{dsc\$descriptor\_s} descriptor. This extra information can be unpacked from the
 descriptor, however, to do so would lead to non-portable code. It is generally
 better to use the address of the array that is passed in the descriptor and to
@@ -3801,17 +3801,17 @@ simple assignment statement. In practice, the value is actually returned in one
 or two of the registers of the CPU, depending on the size of the data type.
 Consequently there is no problem in handling the value of any function that
 returns a numerical value as long as the storage used by the value being
-returned and the value expected correspond 
+returned and the value expected correspond
 (see Table~\ref{vms_datatypes}\latex{ on page~\pageref{vms_datatypes}}).
-If a VAX~C function is treated as a \texttt{LOGICAL} function by VAX~FORTRAN, 
-there is no problem as long as the VAX~C function ensures that it returns a 
+If a VAX~C function is treated as a \texttt{LOGICAL} function by VAX~FORTRAN,
+there is no problem as long as the VAX~C function ensures that it returns a
 value that will be interpreted correctly.
-The best thing to do is to make sure that the C function can only return zero 
+The best thing to do is to make sure that the C function can only return zero
 (for false) or minus one (for true).
 
 The case of a function that returns a character string is more complex. The way
-that VAX~FORTRAN returns a \texttt{CHARACTER} variable as a function value is 
-to add a hidden extra entry to the beginning of the argument list. 
+that VAX~FORTRAN returns a \texttt{CHARACTER} variable as a function value is
+to add a hidden extra entry to the beginning of the argument list.
 This is a pointer to
 a character descriptor. If a VAX~C function wishes to return a function value
 that VAX~FORTRAN will interpret as a character string, then you must explicitly
@@ -3838,8 +3838,8 @@ VMS subroutine.
       CHARACTER*(10) RETURN, CHARFN
       RETURN = CHARFN( A, B )
 \end{verbatim} }
-If written as a function, CHARFN returns a value of type \texttt{CHARACTER}\@. 
-It is left as an exercise for the reader to demonstrate that the above 
+If written as a function, CHARFN returns a value of type \texttt{CHARACTER}\@.
+It is left as an exercise for the reader to demonstrate that the above
 assertion is true using just FORTRAN\@.
 
 \subsubsection{Global Data}
@@ -3847,7 +3847,7 @@ assertion is true using just FORTRAN\@.
 Although FORTRAN and C use different methods for representing global data, it is
 actually very easy to mix them. If a VAX~FORTRAN common block contains a single
 variable or array, then the corresponding VAX~C variable simply needs to be
-declared as \texttt{extern} and the two variables will use the same storage. 
+declared as \texttt{extern} and the two variables will use the same storage.
 
 \refstepcounter{examples}
 \label{vms_common}
@@ -3873,7 +3873,7 @@ can use the same storage area for both VAX~FORTRAN and VAX~C strings. However, y
 still beware of the different way in which FORTRAN and C handle the end of
 a string.
 
-If the FORTRAN common block contains more than one variable or array, then the 
+If the FORTRAN common block contains more than one variable or array, then the
 C variables must be contained in a structure.
 
 If you wish to access the VAX~FORTRAN blank common block, then the
@@ -3900,8 +3900,8 @@ C external variable:
 \subsection{\xlabel{other_operating_systems}Other Operating Systems}
 
 The F77 macros have been designed to cope with other systems as far as is
-possible. It should be possible to modify the include file \texttt{f77.h} to 
-cope with most computers. 
+possible. It should be possible to modify the include file \texttt{f77.h} to
+cope with most computers.
 The places where this may prove difficult, or even impossible,
 are likely to be due to arguments being passed in an unforeseen way.
 
@@ -3922,7 +3922,7 @@ situations it may be better to write programs in a language other than FORTRAN,
 rather than try to persuade FORTRAN to do something that it is not suited to.
 Writing recursive procedures is the classic example, but there are many more.
 Starlink has recognised the need for a language other than FORTRAN by providing
-C compilers at all Starlink nodes. 
+C compilers at all Starlink nodes.
 
 There are in fact good reasons to avoid diversifying into trendy new languages
 unless it is absolutely necessary. Any substantial piece of software will
@@ -3930,65 +3930,65 @@ require someone to support it long after the original author has moved on to
 other things and it is not reasonable to expect that person to have expertise
 in a large number of programming languages. However, for some purposes, FORTRAN
 77 is simply not adequate. In fact some major parts of Starlink software have
-been written in other languages because of this. 
+been written in other languages because of this.
 \xref{HDS\@.}{sun92}{} \latex{(See SUN/92.)}
-is written in C (it was originally written in Bliss, in the days when even C 
+is written in C (it was originally written in Bliss, in the days when even C
 was impractical because of restrictions in the early compilers).
-In the future, FORTRAN~90 will overcome many of the limitations that 
-FORTRAN~77 has but, until that becomes readily available (and even after), 
+In the future, FORTRAN~90 will overcome many of the limitations that
+FORTRAN~77 has but, until that becomes readily available (and even after),
 some things are simply better written in C\@.
 
 It is often the case that most of a program can be written in FORTRAN, leaving
 only a few tricky parts that cannot be written using standard (or even non
-standard) FORTRAN\@. An example of a task that cannot be performed using 
-standard FORTRAN is getting some memory for use in your program. 
+standard) FORTRAN\@. An example of a task that cannot be performed using
+standard FORTRAN is getting some memory for use in your program.
 Admittedly, there are often system service subroutines available but these are
 virtually guaranteed to be non portable to other computers.
 Often a better approach is to write the tricky parts in C\@. This is exactly the
 approach that has been adopted for HDS.
 The problem then is how to pass data between FORTRAN routines and C functions.
-This document will describe  how to do this. 
+This document will describe  how to do this.
 Clearly the details of passing information between program segments
 written in different languages will be machine dependent; however, there are
 also many important similarities. Despite any problems that may arise, it is
 easier to port programs written in a mixture of FORTRAN and C to other computer
 systems than to port programs written purely in FORTRAN that make use of
-machine-specific routines for system services. 
+machine-specific routines for system services.
 
-How to mix FORTRAN and C in a way that is portable to all current Starlink 
+How to mix FORTRAN and C in a way that is portable to all current Starlink
 hardware is described in
 \begin{htmlonly}
 \htmlref{More on Calling C from FORTRAN}{f77_cfromf}
 and
-\htmlref{More on Calling FORTRAN from C}{f77_ffromc}. 
+\htmlref{More on Calling FORTRAN from C}{f77_ffromc}.
 \end{htmlonly}
 \latex{Sections \ref{f77_cfromf} and \ref{f77_ffromc}.}
 
 It is quite likely that you will often want to use C to make use of something
 that the C run time library provides, such as allocating memory. This
 requirement is sufficiently common that a library of FORTRAN callable routines
-has already been provided to do exactly that. 
-It is called PSX and is described in 
-\xref{SUN/121}{sun121}{}. 
-In many programs, use of the PSX library will remove the need to write any C 
+has already been provided to do exactly that.
+It is called PSX and is described in
+\xref{SUN/121}{sun121}{}.
+In many programs, use of the PSX library will remove the need to write any C
 code at all.
 
 You may think that if you want to use C for part of a program then you should
 use C for all of the program. This may indeed be the best option; however, if
-you also want to call subroutines that are written in FORTRAN ({\em{e.g.}}\ 
-just about any Starlink library), then you are going to be involved in mixed 
-language programming anyway. 
+you also want to call subroutines that are written in FORTRAN ({\em{e.g.}}\
+just about any Starlink library), then you are going to be involved in mixed
+language programming anyway.
 The correct choice will depend on the circumstances.
 
 Writing mixed language programs is not something that should be embarked upon
 lightly. There might be a better way of achieving the same result using just
-FORTRAN\@. 
+FORTRAN\@.
 The source code may not look as pretty, but if it runs effectively and
 efficiently then that is all that is required. If you can achieve what you want
 using standard FORTRAN then you should do so. If you cannot, then this document
-will tell you how to mix FORTRAN and C \textit{in a portable way}. 
-The programming language manuals of the computer manufacturers tell you how to 
-mix languages on their own hardware, but achieving portability needs a little 
+will tell you how to mix FORTRAN and C \textit{in a portable way}.
+The programming language manuals of the computer manufacturers tell you how to
+mix languages on their own hardware, but achieving portability needs a little
 more thought.
 
 Finally, if you are new to C, you should be aware that the way that things are
@@ -4026,7 +4026,7 @@ REAL, BYTE, WORD, UBYTE, UWORD or POINTER.
     specified type}
    {type_FUNCTION}
 \listgenroutine{\textit{type}\_FUNCTION\_ARG}
-   {Pass a FORTRAN-callable FUNCTION of the specified type as an argument to a 
+   {Pass a FORTRAN-callable FUNCTION of the specified type as an argument to a
     FORTRAN routine}
    {type_FUNCTION_ARG}
 \listroutine{CHARACTER\_RETURN\_ARG}
@@ -4305,7 +4305,7 @@ REAL, BYTE, WORD, UBYTE, UWORD or POINTER.
    {Pass an array argument of the specified type to a FORTRAN routine}
    {type_ARRAY_ARG}
 \listgenroutine{\textit{type}\_FUNCTION\_ARG}
-   {Pass a FORTRAN-callable FUNCTION of the specified type as an argument to a 
+   {Pass a FORTRAN-callable FUNCTION of the specified type as an argument to a
     FORTRAN routine}
    {type_FUNCTION_ARG}
 \listroutine{CHARACTER\_RETURN\_ARG}
@@ -4321,13 +4321,13 @@ REAL, BYTE, WORD, UBYTE, UWORD or POINTER.
 \section{\xlabel{full_description_of_f77_macros}\label{f77_description}Full Description of F77 Macros}
 This appendix contains a full description of each macro. It is in two sections:
 \htmlref{Generic Descriptions}{f77_generic}
-containing those macros which may be described generically for the various 
+containing those macros which may be described generically for the various
 types and
-\htmlref{Specific Descriptions}{f77_specific} 
+\htmlref{Specific Descriptions}{f77_specific}
 for those which need a specific description.
 
-The effect of each macro is described and the expansion of the macro on each 
-of the supported systems is given. 
+The effect of each macro is described and the expansion of the macro on each
+of the supported systems is given.
 The following classes are defined for the examples:
 \begin{center}
 \begin{tabular}{|l|l|}
@@ -4338,17 +4338,17 @@ All Unix & All supported Unix systems\\
 \end{tabular}
 \end{center}
 \textit{Not all the facilities listed here are available for VAX/VMS even
-if a VMS example is given. 
-In some cases the macro expansions described here will not be correct for 
+if a VMS example is given.
+In some cases the macro expansions described here will not be correct for
 VAX/VMS.
 Consult the VMS Starlink documentation set for information on the VMS release.}
 
-N.B. 
+N.B.
 It is important not to leave spaces around arguments in macros calls
 as these spaces are then included in the macro expansion on some systems,
-\textit{i.e.}\ write \texttt{F77\_\-SUBROUTINE(fred)}, not 
-\texttt{F77\_\-SUBROUTINE( fred )}. 
-This seems to be a bug in the offending compilers, but the problem is there 
+\textit{i.e.}\ write \texttt{F77\_\-SUBROUTINE(fred)}, not
+\texttt{F77\_\-SUBROUTINE( fred )}.
+This seems to be a bug in the offending compilers, but the problem is there
 none the less.
 
 Many macros currently expand to an empty string on all currently supported
@@ -4357,7 +4357,7 @@ being necessary on future systems.
 
 \newpage
 \subsection{\xlabel{generic_descriptions}\label{f77_generic}Generic Descriptions}
-Unless otherwise stated, \textit{type} is one of CHARACTER, INTEGER, REAL, 
+Unless otherwise stated, \textit{type} is one of CHARACTER, INTEGER, REAL,
 DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
 \sstmacro{
@@ -4391,7 +4391,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {F77\_\textit{type}\_TYPE arg}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C 
+         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
@@ -4448,7 +4448,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
           }
       }
 
-      \item where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate 
+      \item where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate
             C type.
    }
    \sstdiytopic{Associated macro:}{
@@ -4463,8 +4463,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Declare a dynamic \textit{type} array that will be passed to a FORTRAN
-      routine using the \textit{type}\_ARRAY\_ARG macro. Use this macro, in 
-      combination with the F77\_\-CREATE\_\-\textit{type}\_\-ARRAY and 
+      routine using the \textit{type}\_ARRAY\_ARG macro. Use this macro, in
+      combination with the F77\_\-CREATE\_\-\textit{type}\_\-ARRAY and
       F77\_\-FREE\_\-\textit{type} macros, where the size of the array is not
       known until run time.
       (\textit{type} not LOCATOR\@.)
@@ -4486,7 +4486,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All systems:}  
+            \sstexamplestableentry{All systems:}
                     {F77\_\textit{type}\_TYPE *farg}
           }
       \sstexamplesubsection{
@@ -4495,17 +4495,17 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {char *fstring; int fstring\_length}\\
             \sstexamplestableentry{VAX/VMS:}
                     {char *fstring; int fstring\_length}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {struct dsc\$descriptor\_a fstring\_arg}\\
           }
       }
    }
    \sstnotes{
-         On VMS, for CHARACTER, the expansion of the macro is quite complex. 
+         On VMS, for CHARACTER, the expansion of the macro is quite complex.
          A pointer to a descriptor structure is declared in addition to a
          pointer to char (used to point to the actual string of characters)
          and an int variable to  store the length of the array. The address
@@ -4521,8 +4521,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \relabel{F77_ASSOC_type_ARRAY}Associate a FORTRAN array with a C array.
 }{
    \sstdescription{
-      For types which do not require separate memory allocated to hold the 
-      FORTRAN array, this macro ensures that the pointer to the FORTRAN array 
+      For types which do not require separate memory allocated to hold the
+      FORTRAN array, this macro ensures that the pointer to the FORTRAN array
       points to the memory allocated for the C array.
       (\textit{type} not LOCATOR\@.)
    }
@@ -4545,7 +4545,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       \sstexamplesubsection{
          F77\_ASSOC\_\textit{type}\_ARRAY(farg,carg)
       }{
-         \textit{type} {\em not} CHARACTER, LOGICAL or POINTER will expand as 
+         \textit{type} {\em not} CHARACTER, LOGICAL or POINTER will expand as
          follows:
 
           \sstexamplestable{
@@ -4553,7 +4553,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {farg=carg}
           }
 
-         \textit{type} CHARACTER, LOGICAL or POINTER will expand as 
+         \textit{type} CHARACTER, LOGICAL or POINTER will expand as
          follows:
 
           \sstexamplestable{
@@ -4710,7 +4710,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Depending upon the type and system, the C array will be copied to the
-      FORTRAN array, making any required changes to the data, or the pointer 
+      FORTRAN array, making any required changes to the data, or the pointer
       to the FORTRAN array will be set to point to the C array.
       (\textit{type} not CHARACTER\@.)
    }
@@ -4799,7 +4799,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All systems:}  
+            \sstexamplestableentry{All systems:}
                     {cnfFree((char *)flog)}
           }
       }
@@ -4876,8 +4876,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    to C
 }{
    \sstdescription{
-      Depending upon the type and system, the FORTRAN array will be copied to 
-      the C array, making any required changes to the data, or the pointer 
+      Depending upon the type and system, the FORTRAN array will be copied to
+      the C array, making any required changes to the data, or the pointer
       to the C array will be set to point to the FORTRAN array.
       (\textit{type} not CHARACTER\@.)
    }
@@ -4983,11 +4983,11 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \relabel{GENPTR_type}Generate a pointer to an argument
 }{
    \sstdescription{
-      Ensure that there exists a pointer of the appropriate type to the 
-      variable that has been passed as an actual argument from FORTRAN to 
-      a C routine. 
-      Since FORTRAN usually passes arguments by reference, the pointer is 
-      commonly available directly from the argument list, so this macro is 
+      Ensure that there exists a pointer of the appropriate type to the
+      variable that has been passed as an actual argument from FORTRAN to
+      a C routine.
+      Since FORTRAN usually passes arguments by reference, the pointer is
+      commonly available directly from the argument list, so this macro is
       null.
       (\textit{type} not LOCATOR\@.)
    }
@@ -5024,9 +5024,9 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Ensure that there exists a pointer of the appropriate type to the array
-      that has been passed as an actual argument to the C routine. 
-      Since FORTRAN usually passes arguments by reference, the pointer is 
-      commonly available directly from the argument list, so this macro is 
+      that has been passed as an actual argument to the C routine.
+      Since FORTRAN usually passes arguments by reference, the pointer is
+      commonly available directly from the argument list, so this macro is
       null.
       (\textit{type} not LOCATOR\@.)
    }
@@ -5062,11 +5062,11 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    Generate a pointer to a FUNCTION argument
 }{
    \sstdescription{
-      Ensure that there exists a pointer of the appropriate type to the 
-      FORTRAN FUNCTION that has been passed as an actual argument from 
-      FORTRAN to a C routine. 
-      Since FORTRAN usually passes arguments by reference, the pointer is 
-      commonly available directly from the argument list, so this macro is 
+      Ensure that there exists a pointer of the appropriate type to the
+      FORTRAN FUNCTION that has been passed as an actual argument from
+      FORTRAN to a C routine.
+      Since FORTRAN usually passes arguments by reference, the pointer is
+      commonly available directly from the argument list, so this macro is
       null.
       (\textit{type} not LOCATOR\@.)
    }
@@ -5093,7 +5093,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstnotes{
-      The dummy argument should have been declared with the 
+      The dummy argument should have been declared with the
       \textit{type}\_FUNCTION macro.
    }
 }
@@ -5131,7 +5131,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                 {F77\_\textit{type}\_TYPE $*$const arg}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C 
+         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
@@ -5146,7 +5146,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \relabel{type_ARG}Pass a \textit{type} argument to a FORTRAN routine
 }{
    \sstdescription{
-      Pass an argument of the appropriate type to a FORTRAN routine. 
+      Pass an argument of the appropriate type to a FORTRAN routine.
       The argument should be the address of the variable.
       (\textit{type} not LOCATOR\@.)
    }
@@ -5209,7 +5209,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {F77\_\textit{type}\_TYPE $*$const arg}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C 
+         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
@@ -5223,7 +5223,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \relabel{type_ARRAY_ARG}Pass an array argument to a FORTRAN routine
 }{
    \sstdescription{
-      Pass an array argument of the appropriate type to a FORTRAN routine. 
+      Pass an array argument of the appropriate type to a FORTRAN routine.
       The argument should be the address of the array.
       (\textit{type} not LOCATOR\@.)
    }
@@ -5251,7 +5251,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
    \sstnotes{
       The cast in the expansion for Unix ensures that multi-dimensional
-      arrays (arrays of arrays), for example as declared by 
+      arrays (arrays of arrays), for example as declared by
       DECLARE\_\textit{type}\_ARRAY, may be passed.
    }
    \sstdiytopic{Associated macro:}{
@@ -5265,9 +5265,9 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \relabel{type_FUNCTION}Declare a FUNCTION argument
 }{
    \sstdescription{
-      Declare a C function argument, to be a FORTRAN-callable FUNCTION of 
+      Declare a C function argument, to be a FORTRAN-callable FUNCTION of
       the specified type, passed from a FORTRAN program.
-      (\textit{type} is one of CHARACTER, INTEGER, REAL, DOUBLE, LOGICAL, BYTE, 
+      (\textit{type} is one of CHARACTER, INTEGER, REAL, DOUBLE, LOGICAL, BYTE,
       WORD, UBYTE, UWORD or POINTER\@.)
    }
    \sstinvocation{
@@ -5291,7 +5291,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {F77\_\textit{type}\_TYPE ($*$F77\_EXTERNAL\_NAME(arg))()}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} and 
+         where {\ssttt F77\_\textit{type}\_TYPE} and
          {\ssttt F77\_EXTERNAL\_NAME} expand appropriately for the platform.
       }
    }
@@ -5303,7 +5303,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Pass a FORTRAN-callable FUNCTION of the appropriate type to a FORTRAN
-      routine. 
+      routine.
       The argument should be the address of the function being passed.
       (\textit{type} is one of CHARACTER, INTEGER, REAL, DOUBLE, LOGICAL, BYTE,
        WORD, UBYTE, UWORD or POINTER\@.)
@@ -5468,7 +5468,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                {(char *)charg}\\
             \sstexamplestableentry{VAX/VMS:}{charg\_arg}
           }
@@ -5476,7 +5476,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
    \sstnotes{
       The cast in the expansion for Unix ensures that multi-dimensional
-      arrays (arrays of arrays), for example as declared by 
+      arrays (arrays of arrays), for example as declared by
       DECLARE\_\textit{type}\_ARRAY, may be passed.
    }
 }
@@ -5491,7 +5491,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       Pass the function return value argument(s) to a FORTRAN CHARACTER
       FUNCTION. There is no corresponding dummy argument in the FORTRAN
       FUNCTION, but the compiler generates an extra argument specifying
-      the address and possibly another one, specifying the length of the 
+      the address and possibly another one, specifying the length of the
       value to be returned.
       The argument should be the address of a FORTRAN CHARACTER variable.
    }
@@ -5527,10 +5527,10 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    FUNCTION
 }{
    \sstdescription{
-      Declare the C function argument(s) to return the value of a FORTRAN 
-      CHARACTER FUNCTION. There is no corresponding actual argument in the 
+      Declare the C function argument(s) to return the value of a FORTRAN
+      CHARACTER FUNCTION. There is no corresponding actual argument in the
       FORTRAN call but the compiler generates an extra argument specifying
-      the address and possibly another one, specifying the length of the 
+      the address and possibly another one, specifying the length of the
       value to be returned.
    }
    \sstinvocation{
@@ -5590,15 +5590,15 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {char C[50]; const int C\_length = 50}\\
             \sstexamplestableentry{VAX/VMS:}
                     {char C[50]; const int C\_length = 50;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s C\_descr =}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {\{\ssttt 50, DSC\$K\_DTYPE\_T, DSC\$K\_CLASS\_S, C \};}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s $*$C\_arg =\&C\_descr}
           }
       }
@@ -5648,15 +5648,15 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {char C[10][50]; const int C\_length}\\
             \sstexamplestableentry{VAX/VMS:}
                     {char C[10][50]; const int C\_length = 50;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s C\_descr =}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {\{\ssttt 50, DSC\$K\_DTYPE\_T, DSC\$K\_CLASS\_S, C \};}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s $*$C\_arg =\&C\_descr}
           }
       }
@@ -5678,7 +5678,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \sstdescription{
       Declare a CHARACTER variable that will be passed to a FORTRAN routine
       using the CHARACTER\_ARG macro. Use this macro, in combination with
-      the F77\_\-CREATE\_\-CHARACTER\ and F77\_\-FREE\_\-CHARACTER 
+      the F77\_\-CREATE\_\-CHARACTER\ and F77\_\-FREE\_\-CHARACTER
       macros, where the length of the CHARACTER string is not known until
       run time.
    }
@@ -5699,17 +5699,17 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {char *fstring; int fstring\_length}\\
             \sstexamplestableentry{VAX/VMS:}
                     {char *fstring; int fstring\_length}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s *fstring\_arg}\\
           }
       }
    }
    \sstnotes{
-         On VMS, the expansion of the macro is quite complex. 
+         On VMS, the expansion of the macro is quite complex.
          A pointer to a descriptor structure is declared in addition to a
          pointer to char (used to point to the actual string of characters)
          and an int variable to  store the length of the array. The address
@@ -5835,7 +5835,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {char}\\
             \sstexamplestableentry{VAX/VMS:}
                     {struct dsc\$descriptor\_s}\\
@@ -5868,7 +5868,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {char}\\
             \sstexamplestableentry{VAX/VMS:}
                     {struct dsc\$descriptor\_a}\\
@@ -5876,7 +5876,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstnotes{
-      The type of the CHARACTER array argument passed to a FORTRAN subroutine 
+      The type of the CHARACTER array argument passed to a FORTRAN subroutine
       is not the same as the CHARACTER\_TYPE on VMS so this macro is provided.
       It is unlikely to be used directly.
    }
@@ -5914,8 +5914,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    \sstdescription{
       Create a CHARACTER variable that will be passed to a FORTRAN routine
       using the CHARACTER\_\-ARG macro. Use this macro, in combination with
-      the DECLARE\-\_\-CHARACTER\_\-DYN and F77\_\-FREE\_\-\-CHARACTER 
-      macros, where the length of the CHARACTER string is not known until 
+      the DECLARE\-\_\-CHARACTER\_\-DYN and F77\_\-FREE\_\-\-CHARACTER
+      macros, where the length of the CHARACTER string is not known until
       run time. A pointer to the actual string of characters and an integer
       variable giving the length of the string are set.
    }
@@ -5942,24 +5942,24 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                     {fstring\_length = strlen(cstring);}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring = cnfCref(fstring\_length)}\\
             \sstexamplestableentry{VAX/VMS:}
                     {fstring\_arg = cnfCref(strlen(cstring));}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring = fstring\_arg->pointer;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring\_length = fstring\_arg->length}
           }
       }
    }
    \sstnotes{
-         On VMS, the expansion of the macro is quite complex. 
+         On VMS, the expansion of the macro is quite complex.
          A descriptor structure and a pointer to it are set up in
          addition to the pointer to the actual string of characters and
-         the length of the string. (The address of the descriptor is what 
+         the length of the string. (The address of the descriptor is what
          is actually passed to the called FORTRAN routine.)
    }
 }
@@ -5971,10 +5971,10 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Create a CHARACTER array that will be passed to a FORTRAN routine
-      using the CHARACTER\_\-ARRAY\_\-ARG macro. Use this macro, in combination 
+      using the CHARACTER\_\-ARRAY\_\-ARG macro. Use this macro, in combination
       with
-      the DECLARE\_\-CHARACTER\_\-ARRAY\_\-DYN and F77\_\-FREE\_\-CHARACTER 
-      macros, where the size of the CHARACTER array is not known until 
+      the DECLARE\_\-CHARACTER\_\-ARRAY\_\-DYN and F77\_\-FREE\_\-CHARACTER
+      macros, where the size of the CHARACTER array is not known until
       run time. A pointer to the actual string of characters and an integer
       variable giving the length of the string are set.
    }
@@ -6006,28 +6006,28 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                {fstring=cnfCrefa(strlen(cstring),1,f77dims);}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                {fstring\_length=strlen(cstring);\}}\\
             \sstexamplestableentry{VAX/VMS:}
                     {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring\_arg = cnfCrefa(strlen(cstring),1,f77dims);}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring = fstring\_arg->pointer;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring\_length = fstring\_arg->length;\}}
           }
       }
    }
    \sstnotes{
-         On VMS, the expansion of the macro is quite complex. 
+         On VMS, the expansion of the macro is quite complex.
          A descriptor structure and a pointer to it are set up in
          addition to the pointer to the actual array of strings and
-         the length of the strings. (The address of the descriptor is what 
+         the length of the strings. (The address of the descriptor is what
          is actually passed to the called FORTRAN routine.)
    }
 }
@@ -6039,10 +6039,10 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Create an n-D CHARACTER array that will be passed to a FORTRAN routine
-      using the CHARACTER\_\-ARRAY\_\-ARG macro. Use this macro, in combination 
+      using the CHARACTER\_\-ARRAY\_\-ARG macro. Use this macro, in combination
       with
-      the DECLARE\_\-CHARACTER\_\-ARRAY\_\-DYN and F77\_\-FREE\_\-CHARACTER 
-      macros, where the size of the CHARACTER array is not known until 
+      the DECLARE\_\-CHARACTER\_\-ARRAY\_\-DYN and F77\_\-FREE\_\-CHARACTER
+      macros, where the size of the CHARACTER array is not known until
       run time. A pointer to the actual string of characters and an integer
       variable giving the length of the string are set.
    }
@@ -6079,24 +6079,24 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  
+            \sstexamplestableentry{All Unix:}
                {fstring=cnfCrefa(strlen(cstring),ndims,dims);}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                {fstring\_length=strlen(cstring)}\\
             \sstexamplestableentry{VAX/VMS:}
                     {fstring\_arg = cnfCrefa(strlen(cstring),ndims,dims);}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring = fstring\_arg->pointer;}\\
-            \sstexamplestableentry{}        
+            \sstexamplestableentry{}
                     {fstring\_length = fstring\_arg->length}
           }
       }
    }
    \sstnotes{
-         On VMS, the expansion of the macro is quite complex. 
+         On VMS, the expansion of the macro is quite complex.
          A descriptor structure and a pointer to it are set up in
          addition to the pointer to the actual array of strings and
-         the length of the strings. (The address of the descriptor is what 
+         the length of the strings. (The address of the descriptor is what
          is actually passed to the called FORTRAN routine.)
    }
 }
@@ -6108,11 +6108,11 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Create a LOGICAL array that will be passed to a FORTRAN routine
-      using the LOGICAL\_\-ARRAY\_\-ARG macro. Use this macro, in combination 
+      using the LOGICAL\_\-ARRAY\_\-ARG macro. Use this macro, in combination
       with
-      the DECLARE\_\-LOGICAL\_\-ARRAY\_\-DYN and F77\_\-FREE\_\-LOGICAL 
-      macros, where the size of the LOGICAL array is not known until 
-      run time. 
+      the DECLARE\_\-LOGICAL\_\-ARRAY\_\-DYN and F77\_\-FREE\_\-LOGICAL
+      macros, where the size of the LOGICAL array is not known until
+      run time.
    }
    \sstinvocation{
       F77\_CREATE\_LOGICAL\_ARRAY\_M(arg,ndims,dims)
@@ -6141,7 +6141,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All systems:}  
+            \sstexamplestableentry{All systems:}
                {flog=cnfCrela(ndims,dims);}\\
           }
       }
@@ -6284,8 +6284,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    Export an array of pointers to char from C to a FORTRAN CHARACTER array.
 }{
    \sstdescription{
-      The strings pointed to by the specified number of elements of the C 
-      array will be copied to the FORTRAN array, making any required changes 
+      The strings pointed to by the specified number of elements of the C
+      array will be copied to the FORTRAN array, making any required changes
       to the data.
    }
    \sstinvocation{
@@ -6439,7 +6439,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    Import a CHARACTER array from FORTRAN to C.
 }{
    \sstdescription{
-      The FORTRAN array will be copied to the the C array, making any 
+      The FORTRAN array will be copied to the the C array, making any
       required changes to the data.
    }
    \sstinvocation{
@@ -7095,7 +7095,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Pass a SUBROUTINE argument to a FORTRAN routine.
-      The argument should be a pointer to a subroutine designed to be called 
+      The argument should be a pointer to a subroutine designed to be called
       from a FORTRAN program.
    }
    \sstinvocation{
@@ -7163,8 +7163,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 }{
    \sstdescription{
       Pass the length of a CHARACTER argument or a CHARACTER array argument
-      element length to a FORTRAN routine if the FORTRAN routine expects to 
-      receive it as a separate argument. The corresponding integer variable is 
+      element length to a FORTRAN routine if the FORTRAN routine expects to
+      receive it as a separate argument. The corresponding integer variable is
       handled automatically where it is needed.
    }
    \sstinvocation{
@@ -7174,7 +7174,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       \sstsubsection{
          arg
       }{
-         The name of the CHARACTER or CHARACTER array actual argument being 
+         The name of the CHARACTER or CHARACTER array actual argument being
          passed.
       }
    }
@@ -7225,10 +7225,10 @@ of char}
 \subsection{\xlabel{export_a_c_string_to_fortran}Export a C String to FORTRAN}
 \routinelist{
 \listroutine{cnfExpch}
-{   Export a given number of characters from an array of char into a FORTRAN 
+{   Export a given number of characters from an array of char into a FORTRAN
 string}
 \listroutine{cnfExpn}
-{   Export a C string to a FORTRAN string, copying given a maximum number of 
+{   Export a C string to a FORTRAN string, copying given a maximum number of
 characters}
 \listroutine{cnfExprt}
 {   Export a C string to a FORTRAN string}
@@ -7308,10 +7308,10 @@ characters}
       for use
       from both C and FORTRAN. This means that the returned pointer
       may subsequently be converted into a FORTRAN pointer of type
-      F77\_POINTER\_TYPE (using 
-     \htmlref{\texttt{cnfFptr}}{cnfFptr}) 
+      F77\_POINTER\_TYPE (using
+     \htmlref{\texttt{cnfFptr}}{cnfFptr})
       and back into a C pointer
-      (using 
+      (using
      \htmlref{\texttt{cnfCptr}}{cnfCptr}).
       The contents of the space may therefore be
       accessed from both languages.
@@ -7347,7 +7347,7 @@ characters}
          bytes.
 
          \sstitem
-         The space should be freed using 
+         The space should be freed using
         \htmlref{\texttt{cnfFree }}{cnfFree}
          when no longer
          required.
@@ -7399,7 +7399,7 @@ characters}
       Given a FORTRAN pointer, stored in a variable of type
       F77\_POINTER\_TYPE, this function returns the equivalent C
       pointer. Note that this conversion is only performed if the C
-      pointer has originally been registered (using 
+      pointer has originally been registered (using
      \htmlref{\texttt{cnfRegp}}{cnfRegp})
       for use
       from both C and FORTRAN. All pointers to space allocated by
@@ -7483,7 +7483,7 @@ characters}
    Create a temporary FORTRAN CHARACTER string and return a pointer to it.
 }{
    \sstdescription{
-      Memory is obtained for a FORTRAN CHARACTER string of the specified 
+      Memory is obtained for a FORTRAN CHARACTER string of the specified
       length and a pointer is returned which may be passed from C to a FORTRAN
       subroutine. The string is not initialised to blanks.
    }
@@ -7527,7 +7527,7 @@ characters}
 }{
    \sstdescription{
       Memory is obtained for a FORTRAN CHARACTER array, of the specified
-      dimensions and a pointer is returned which may be passed from C to a 
+      dimensions and a pointer is returned which may be passed from C to a
       FORTRAN subroutine. The array is not initialised to blanks.
    }
    \sstinvocation{
@@ -7664,7 +7664,7 @@ characters}
 }{
    \sstdescription{
       Memory is obtained for a FORTRAN LOGICAL array, of the specified
-      dimensions and a pointer is returned which may be passed from C to a 
+      dimensions and a pointer is returned which may be passed from C to a
       FORTRAN subroutine. The array is not initialised.
    }
    \sstinvocation{
@@ -7849,8 +7849,8 @@ characters}
    \sstdescription{
       Export a C string array to a FORTRAN CHARACTER array. A null character
       is assumed to terminate each C string -- it will not be copied.
-      If the C string is shorter than the space allocated to the FORTRAN 
-      string, then pad it with blanks. 
+      If the C string is shorter than the space allocated to the FORTRAN
+      string, then pad it with blanks.
       No more than `dest\_len' characters will be copied for each string.
    }
    \sstinvocation{
@@ -7888,14 +7888,14 @@ characters}
       \sstsubsection{
          const int $*$dims (Given)
       }{
-         A pointer to a 1-D array specifying the dimensions of the FORTRAN 
+         A pointer to a 1-D array specifying the dimensions of the FORTRAN
          array.
       }
    }
    \sstnotes{
       The C array is treated as an array of strings but it will actually
-      be an array of \texttt{char} with one more dimension than the FORTRAN 
-      array, the last dimension being source\_len. The other dimensions must 
+      be an array of \texttt{char} with one more dimension than the FORTRAN
+      array, the last dimension being source\_len. The other dimensions must
       be as for the FORTRAN array.
    }
 }
@@ -7905,11 +7905,11 @@ characters}
    Export a C array of pointers to char, to a FORTRAN CHARACTER array
 }{
    \sstdescription{
-      Export a C array of pointers to char to a FORTRAN CHARACTER array. 
-      A null character is assumed to terminate each C string -- it 
+      Export a C array of pointers to char to a FORTRAN CHARACTER array.
+      A null character is assumed to terminate each C string -- it
       will not be copied.
-      If the C string is shorter than the space allocated to the FORTRAN 
-      string, then pad it with blanks. 
+      If the C string is shorter than the space allocated to the FORTRAN
+      string, then pad it with blanks.
       No more than `dest\_len' characters will be copied for each string.
    }
    \sstinvocation{
@@ -7948,7 +7948,7 @@ characters}
       strings. The dimensions of the array of pointers and the FORTRAN
       character array must be the same.
 
-      Strictly, the input array should be declared as 
+      Strictly, the input array should be declared as
       `\texttt{const char $*$const $*$source\_c}', but this would not allow
       non-constant char to be given.
    }
@@ -7962,12 +7962,12 @@ characters}
       Given a C pointer, this function returns the equivalent FORTRAN
       pointer of type F77\_POINTER\_TYPE. Note that this conversion is
       only performed if the C pointer has originally been registered
-      (using 
+      (using
      \htmlref{\texttt{cnfRegp}}{cnfRegp})
       for use from both C and FORTRAN. All pointers
-      to space allocated by 
-     \htmlref{\texttt{cnfCalloc}}{cnfCalloc} 
-      and 
+      to space allocated by
+     \htmlref{\texttt{cnfCalloc}}{cnfCalloc}
+      and
      \htmlref{\texttt{cnfMalloc}}{cnfMalloc}
       are
       automatically registered in this way.
@@ -8006,11 +8006,11 @@ characters}
 }{
    \sstdescription{
       Free space allocated by a call to
-     \htmlref{\texttt{cnfCalloc}}{cnfCalloc}, 
-     \htmlref{\texttt{cnfCreat}}{cnfCreat}, 
+     \htmlref{\texttt{cnfCalloc}}{cnfCalloc},
+     \htmlref{\texttt{cnfCreat}}{cnfCreat},
      \htmlref{\texttt{cnfCreib}}{cnfCreib},
-     \htmlref{\texttt{cnfCreim}}{cnfCreim} 
-      or 
+     \htmlref{\texttt{cnfCreim}}{cnfCreim}
+      or
      \htmlref{\texttt{cnfMalloc}}{cnfMalloc}.
    }
    \sstinvocation{
@@ -8055,7 +8055,7 @@ characters}
 }{
    \sstdescription{
       Return the temporary storage space which was allocated by a previous call
-      to 
+      to
      \htmlref{\texttt{cnfCref}}{cnfCref}
       or
      \htmlref{\texttt{cnfCrefa}}{cnfCrefa}.
@@ -8070,7 +8070,7 @@ characters}
           A pointer (as returned by
          \htmlref{\texttt{cnfCref}}{cnfCref}
           or
-         \htmlref{\texttt{cnfCrefa}}{cnfCrefa}) 
+         \htmlref{\texttt{cnfCrefa}}{cnfCrefa})
           to the string to be freed.
       }
    }
@@ -8170,7 +8170,7 @@ characters}
    Import a FORTRAN string into a C array of char.
 }{
    \sstdescription{
-      Import a FORTRAN string into a C array of char, copying `nchars' 
+      Import a FORTRAN string into a C array of char, copying `nchars'
       characters.
       No characters, are special so this may be used to import an HDS locator
       which could contain any character.
@@ -8325,9 +8325,9 @@ characters}
    Import a FORTRAN CHARACTER array into a C string array.
 }{
    \sstdescription{
-      Import a FORTRAN CHARACTER array into a C string array, discarding 
-      trailing blanks. 
-      The null character is appended to the C string after the last non-blank 
+      Import a FORTRAN CHARACTER array into a C string array, discarding
+      trailing blanks.
+      The null character is appended to the C string after the last non-blank
       character copied from the FORTRAN string if there is room.
       No more than `dest\_len' characters will be copied for each string.
    }
@@ -8372,7 +8372,7 @@ characters}
    \sstnotes{
       The C array is treated as an array of strings but it will actually
       be a char array with one more dimension than the FORTRAN array, the
-      last dimension being `dest\_len'. The other dimensions must be as for 
+      last dimension being `dest\_len'. The other dimensions must be as for
       the FORTRAN array.
    }
 }
@@ -8382,11 +8382,11 @@ characters}
    Import a FORTRAN CHARACTER array into a C array of pointers to char.
 }{
    \sstdescription{
-      Import a FORTRAN CHARACTER array into a C array of pointers to char, 
-      discarding trailing blanks. 
-      The pointers must each point to an area of allocated memory at least 
+      Import a FORTRAN CHARACTER array into a C array of pointers to char,
+      discarding trailing blanks.
+      The pointers must each point to an area of allocated memory at least
       `dest\_len' characters long.
-      The null character is appended to the C string after the last non-blank 
+      The null character is appended to the C string after the last non-blank
       character copied from the FORTRAN string if there is room.
       No more than `dest\_len' characters will be copied for each string.
    }
@@ -8414,7 +8414,7 @@ characters}
          int dest\_len (Given)
       }{
          The maximum number of characters to be copied for each string
-         (including terminating null if required). 
+         (including terminating null if required).
       }
       \sstsubsection{
          int ndims (Given)
@@ -8512,15 +8512,15 @@ characters}
    \sstdescription{
       This function allocates space in the same way as the standard C
       malloc() function, except that the pointer to the space
-      allocated is automatically registered (using 
-     \htmlref{\texttt{cnfRegp}}{cnfRegp}) 
+      allocated is automatically registered (using
+     \htmlref{\texttt{cnfRegp}}{cnfRegp})
       for use
       from both C and FORTRAN. This means that the returned pointer
       may subsequently be converted into a FORTRAN pointer of type
-      F77\_POINTER\_TYPE (using 
+      F77\_POINTER\_TYPE (using
      \htmlref{\texttt{cnfFptr}}{cnfFptr}),
       and back into a C pointer
-      (using 
+      (using
      \htmlref{\texttt{cnfCptr}}{cnfCptr}).
       The contents of the space may therefore be
       accessed from both languages.
@@ -8547,7 +8547,7 @@ characters}
       \sstitemlist{
 
          \sstitem
-         The allocated space should be freed using 
+         The allocated space should be freed using
         \htmlref{\texttt{cnfFree}}{cnfFree}
          when no
          longer required.
@@ -8562,9 +8562,9 @@ characters}
    \sstdescription{
       This is a low-level function which will normally only be
       required if you are implementing your own memory allocation
-      facilities (all memory allocated by 
+      facilities (all memory allocated by
      \htmlref{\texttt{cnfCalloc}}{cnfCalloc}
-      and 
+      and
      \htmlref{\texttt{cnfMalloc}}{cnfMalloc}
       is
       automatically registered using this function).
@@ -8572,9 +8572,9 @@ characters}
       The function attempts to register a C pointer so that it may be
       used from both C and FORTRAN. If successful, registration
       subsequently allows the pointer to be converted into a FORTRAN
-      pointer of type F77\_POINTER\_TYPE (using 
+      pointer of type F77\_POINTER\_TYPE (using
      \htmlref{\texttt{cnfFptr}}{cnfFptr}), and then back
-      into a C pointer (using 
+      into a C pointer (using
      \htmlref{\texttt{cnfCptr}}{cnfCptr}).
       These conversions are
       possible even if the FORTRAN pointer is stored in a shorter data
@@ -8616,7 +8616,7 @@ characters}
 \sstroutine{
    cnfUregp
 }{
-   Unregister a pointer previously registered using 
+   Unregister a pointer previously registered using
   \htmlref{\texttt{cnfRegp}}{cnfRegp}
 }{
    \sstdescription{
@@ -8625,12 +8625,12 @@ characters}
       facilities.
 
       The function accepts a C pointer which has previously been
-      registered for use from both C and FORTRAN (using 
-     \htmlref{\texttt{cnfRegp}}{cnfRegp}) 
+      registered for use from both C and FORTRAN (using
+     \htmlref{\texttt{cnfRegp}}{cnfRegp})
       and
       removes its registration. Subsequently, conversion between the C
       pointer and its FORTRAN equivalent (and vice versa) will no
-      longer be performed by 
+      longer be performed by
      \htmlref{\texttt{cnfFptr}}{cnfFptr}
       and
      \htmlref{\texttt{cnfCptr}}{cnfCptr}.
@@ -8705,7 +8705,7 @@ characters}
       When passing dynamically allocated character strings to Fortran
       or C routines the character string length is passed as a hidden
       argument after the visible ones (see \htmlref{TRAIL}{TRAIL}). With some
-      compilers this 
+      compilers this
       length is a 64bit long (INTEGER*8), whereas for others it is more
       typically a 32bit int (INTEGER*4). Using this function avoids the need
       to know which size is used for the configured compiler.
@@ -8734,7 +8734,7 @@ characters}
          \sstitem
          The data type of this function will depend on the platform in
          use and is declared in the include file CNF\_PAR.
-         
+
          \sstitem
          When mixing calls that pass locally declared character strings
          and dynamically allocated ones, all the declared strings
@@ -8749,12 +8749,12 @@ characters}
 \section{\xlabel{references}References}
 
 \begin{thebibliography}{9}
-\bibitem{fortran:std}American National Standard -- Programming Language 
--- FORTRAN (ANSI X3.9-1978, ISO 1539-1980(E)). Publ, American National 
+\bibitem{fortran:std}American National Standard -- Programming Language
+-- FORTRAN (ANSI X3.9-1978, ISO 1539-1980(E)). Publ, American National
 Standards Institute.
 %
 \bibitem{c:std}American National Standard for Information Systems --
-Programming Language -- C (ANSI X3.159-1989). Publ, American National 
+Programming Language -- C (ANSI X3.159-1989). Publ, American National
 Standards Institute.
 %\bibitem{psx:std}IEEE Standard Portable Operating System Interface for Computer
 %Environments (IEEE Std 1003.1-1988). Publ, Institute of Electrical and

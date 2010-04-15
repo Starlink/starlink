@@ -4,7 +4,7 @@
      :                      DARKCR, DODARK, DRKTIM, MKFLAS, FLASH,
      :                      HVFLAS, DOFLAS, FLASCR, FLSTIM, MKFLAT,
      :                      FLAT, HVFLAT, DOFLAT, FILNMS, NFILS, DEBEXT,
-     :                      DRKEXT, FLSEXT, FLTEXT, SAVER, IRFLAT, 
+     :                      DRKEXT, FLSEXT, FLTEXT, SAVER, IRFLAT,
      :                      PTEMP1, PTEMP2, STATUS )
 *+
 *  Name:
@@ -38,7 +38,7 @@
 *  Arguments:
 *     STYPE = CHARACTER * ( * ) (Given)
 *        The type of script file to be generated. Must be one of
-*        "csh" or "icl". 
+*        "csh" or "icl".
 *     FD = INTEGER (Given)
 *        FIO file descriptor for output script.
 *     GIDIN = INTEGER (Given)
@@ -133,7 +133,7 @@
 *        all files except pre-debiassing NDFs and MASTERs. LOTS delete
 *        the pre-debiassinf NDFs as well.
 *     IRFLAT = LOGICAL (Given)
-*        Whether or not TARGET frames may be used to flatfield.  This 
+*        Whether or not TARGET frames may be used to flatfield.  This
 *        is an IR option and will only be used if no flatfields of an
 *        appropriate colour exist.
 *     PTEMP1( NNDF ) = INTEGER (Given and Returned)
@@ -193,7 +193,7 @@
 *     23-AUG-1994 (PDRAPER):
 *        Now checks if NDFs have already been processed.
 *     10-NOV-1995 (PDRAPER):
-*        Added IRFLAT for IR data reductions. Now keeps input to 
+*        Added IRFLAT for IR data reductions. Now keeps input to
 *        MAKEFLAT if IRFLAT is TRUE (regardless, this could be more
 *        elegant).
 *     4-OCT-1996 (PDRAPER):
@@ -202,7 +202,7 @@
 *        Modified to deal with foreign data formats correctly. These
 *        need special care when modifying the names of any products.
 *     19-JUN-1997 (PDRAPER):
-*        PROTEC now correctly defined as an array of size 2 
+*        PROTEC now correctly defined as an array of size 2
 *        (stopped working on Linux).
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
@@ -233,7 +233,7 @@
       CHARACTER * ( * ) BIAS
       LOGICAL HVBIAS
       LOGICAL DEBICR( NNDF )
-      LOGICAL DODEBI 
+      LOGICAL DODEBI
       INTEGER DEBTYP
       INTEGER INTERP
       LOGICAL MKDARK
@@ -246,7 +246,7 @@
       CHARACTER * ( * ) FLASH
       LOGICAL HVFLAS
       LOGICAL FLASCR( NNDF )
-      LOGICAL DOFLAS 
+      LOGICAL DOFLAS
       DOUBLE PRECISION FLSTIM( NNDF )
       LOGICAL MKFLAT( NNDF )
       CHARACTER * ( * ) FLAT
@@ -269,8 +269,8 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL CHR_LEN 
-      INTEGER CHR_LEN            ! Used length of string 
+      EXTERNAL CHR_LEN
+      INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
       CHARACTER * ( 1 ) PREFIX  ! Command-line prefix
@@ -311,7 +311,7 @@
 *=======================================================================
 *  Produce a MASTER_BIAS if required.
 *=======================================================================
-      IF ( HVBIAS .AND. DODEBI ) THEN 
+      IF ( HVBIAS .AND. DODEBI ) THEN
 
 *  Should have a master bias already. Get a pointer to it.
          CALL CCD1_LOCS2( FTYPES, 2, NNDF, 1, VALID, 'MASTER_BIAS',
@@ -329,13 +329,13 @@
 *  Report the selection of the first master. Actually we will not use
 *  this if the debiassing type does need it, but we do need to get
 *  rid of any MASTER_BIASes in the list so have proceeded this far.
-            IF ( DEBTYP .EQ. 1 .OR. DEBTYP .EQ. 2 ) THEN 
+            IF ( DEBTYP .EQ. 1 .OR. DEBTYP .EQ. 2 ) THEN
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL MSG_SETC( 'MBIAS', MBIAS )
                CALL CCD1_MSG( ' ',
      :         '  Using NDF: ^MBIAS as master bias.', STATUS )
             END IF
-         ELSE IF ( DEBTYP .EQ. 1 .OR. DEBTYP .EQ. 2 ) THEN 
+         ELSE IF ( DEBTYP .EQ. 1 .OR. DEBTYP .EQ. 2 ) THEN
 
 *  There is no master bias frame, should be one as we have been told
 *  there is one and we need it to debias.
@@ -354,8 +354,8 @@
 *  Generate the command to make a master bias frame.
          CALL FIO_WRITE( FD, COMMEN, STATUS )
          CALL CCD1_WMMC( .TRUE., 'makebias', PREFIX, USEPRO, PROTEC,
-     :                   CONTIN, 'BIAS', ' ', FD, FTYPES, GIDIN, 
-     :                   NNDF, MBIAS, IRFLAT, VALID, PTEMP1, TEMP, 
+     :                   CONTIN, 'BIAS', ' ', FD, FTYPES, GIDIN,
+     :                   NNDF, MBIAS, IRFLAT, VALID, PTEMP1, TEMP,
      :                   STATUS )
 
 *  Make sure extension information is used and terminate it.
@@ -388,13 +388,13 @@
             IF ( FTYPES( 1, I ) .EQ. 'BIAS' ) THEN
                VALID( I ) = .FALSE.
             END IF
- 21      CONTINUE      
+ 21      CONTINUE
       END IF
 
 *=======================================================================
 *  Sort out debiassing
 *=======================================================================
-      IF ( DODEBI ) THEN 
+      IF ( DODEBI ) THEN
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', '  Debiassing NDFs:', STATUS )
 
@@ -467,7 +467,7 @@
 
 *  Add the name of the master bias if we have one.
          IF ( MBIAS .NE. ' ' .AND. DEBTYP .EQ. 1 .OR. DEBTYP .EQ. 2 )
-     :   THEN 
+     :   THEN
             IAT = 3
             MESS = ' '
             CALL CCD1_ADKEY( 'BIAS', MBIAS, USEPRO, PROTEC, MESS, IAT,
@@ -498,7 +498,7 @@
 *=======================================================================
 *  Generate master DARK count frame.
 *=======================================================================
-      IF ( HVDARK .AND. DODARK ) THEN 
+      IF ( HVDARK .AND. DODARK ) THEN
 
 *  Should have a master dark already. Get a pointer to it.
          CALL CCD1_LOCS2( FTYPES, 2, NNDF, 1, VALID, 'MASTER_DARK',
@@ -536,8 +536,8 @@
 *  Generate the command to make a master dark frame.
          CALL FIO_WRITE( FD, COMMEN, STATUS )
          CALL CCD1_WMMC( .TRUE., 'makecal', PREFIX, USEPRO, PROTEC,
-     :                   CONTIN, 'DARK', ' ', FD, FTYPES, GIDIN, 
-     :                   NNDF, MDARK, IRFLAT, VALID, PTEMP1, TEMP, 
+     :                   CONTIN, 'DARK', ' ', FD, FTYPES, GIDIN,
+     :                   NNDF, MDARK, IRFLAT, VALID, PTEMP1, TEMP,
      :                   STATUS )
 
 *  Make sure extension information is used and terminate it.
@@ -583,7 +583,7 @@
          CALL CCD1_WDPC( .TRUE., 'calcor', ' ', PREFIX, USEPRO, PROTEC,
      :                   CONTIN, DRKEXT, FD, FTYPES, GIDIN, NNDF,
      :                   PTEMP2, PTEMP1, NFRMS, TEMP, STATUS )
-         IF ( NFRMS .GT. 0 ) THEN 
+         IF ( NFRMS .GT. 0 ) THEN
 
 *  Add the name of the master dark frame.
             IAT = 3
@@ -617,7 +617,7 @@
 *=======================================================================
 *  Generate master pre-flash frame.
 *=======================================================================
-      IF ( HVFLAS .AND. DOFLAS ) THEN 
+      IF ( HVFLAS .AND. DOFLAS ) THEN
 
 *  Should have a master flash already. Get a pointer to it.
          CALL CCD1_LOCS2( FTYPES, 2, NNDF, 1, VALID, 'MASTER_FLASH',
@@ -655,8 +655,8 @@
 *  Generate the command to make a master flash frame.
          CALL FIO_WRITE( FD, COMMEN, STATUS )
          CALL CCD1_WMMC( .TRUE., 'makecal', PREFIX, USEPRO, PROTEC,
-     :                   CONTIN, 'FLASH', ' ', FD, FTYPES, GIDIN, 
-     :                   NNDF, MFLASH, IRFLAT, VALID, PTEMP1, TEMP, 
+     :                   CONTIN, 'FLASH', ' ', FD, FTYPES, GIDIN,
+     :                   NNDF, MFLASH, IRFLAT, VALID, PTEMP1, TEMP,
      :                   STATUS )
 
 *  Make sure extension information is used and terminate it.
@@ -666,7 +666,7 @@
          END IF
          MESS = '  TYPE=FLASH'//CONTIN
          CALL FIO_WRITE( FD, MESS( :12+LCONT ), STATUS )
-         MESS = '  USEEXT'//CONTIN 
+         MESS = '  USEEXT'//CONTIN
          CALL FIO_WRITE( FD, MESS( :8+LCONT ), STATUS )
          CALL FIO_WRITE( FD, '  ACCEPT', STATUS )
 
@@ -680,7 +680,7 @@
       END IF
 
 *=======================================================================
-*  Do the pre-flash corrections. 
+*  Do the pre-flash corrections.
 *=======================================================================
 *  These are applied to all valid frames.
       IF ( DOFLAS ) THEN
@@ -703,7 +703,7 @@
          CALL CCD1_WDPC( .TRUE., 'calcor', ' ', PREFIX, USEPRO, PROTEC,
      :                   CONTIN, FLSEXT, FD, FTYPES, GIDIN, NNDF,
      :                   PTEMP2, PTEMP1, NFRMS, TEMP, STATUS )
-         IF ( NFRMS .GT. 0 ) THEN 
+         IF ( NFRMS .GT. 0 ) THEN
 
 *  Add the name of the master flash if we have one.
             IAT = 3
@@ -751,7 +751,7 @@
             CALL CCD1_LOCS3( FTYPES, 2, NNDF, 1, 2, VALID,
      :                       'MASTER_FLAT', FILNMS( J ), PTEMP1,
      :                       NMAST, STATUS )
-            IF ( NMAST .GT. 0 ) THEN 
+            IF ( NMAST .GT. 0 ) THEN
 
 *  Flag any master flats with this filter as no longer valid.
                DO 4 I = 1, NMAST
@@ -774,7 +774,7 @@
                CALL ERR_REP( ' ', '  CCD1_AUTO: cannot re-locate'//
      :         ' a master flatfield for filter ^FILTER', STATUS )
                GO TO 99
-            END IF  
+            END IF
          ELSE IF ( MKFLAT( J ) ) THEN
 
 *  Will be making a flatfield for this filter.
@@ -792,13 +792,13 @@
             CALL FIO_WRITE( FD, COMMEN, STATUS )
             CALL CCD1_WMMC( .TRUE., 'makeflat', PREFIX, USEPRO, PROTEC,
      :                      CONTIN, 'FLAT', FILNMS( J ), FD, FTYPES,
-     :                      GIDIN, NNDF, MFLAT, IRFLAT, VALID, PTEMP1, 
+     :                      GIDIN, NNDF, MFLAT, IRFLAT, VALID, PTEMP1,
      :                      TEMP, STATUS )
 
 *  Terminate it. Only delete input files if IRFLAT is FALSE, otherwise
-*  assume we've used TARGETS and want to hang on to these for a while 
+*  assume we've used TARGETS and want to hang on to these for a while
 *  longer.
-            IF ( SAVER .EQ. 'LOTS' .OR. SAVER .EQ. 'SOME' 
+            IF ( SAVER .EQ. 'LOTS' .OR. SAVER .EQ. 'SOME'
      :           .AND. .NOT. IRFLAT ) THEN
                MESS = '  KEEPIN=FALSE'//CONTIN
                CALL FIO_WRITE( FD, MESS( :14+LCONT ), STATUS )
@@ -829,10 +829,10 @@
 *  names will be a modification of the originals these should be stored
 *  in the GIDIN group. If no TARGET frames exist this is not an error
 *  just issue a warning.
-         IF ( DOFLAT( J ) .AND. ( HVFLAT( J ) .OR. MKFLAT( J ) ) ) THEN 
+         IF ( DOFLAT( J ) .AND. ( HVFLAT( J ) .OR. MKFLAT( J ) ) ) THEN
             CALL CCD1_LOCS2( FTYPES, 2, NNDF, 1, VALID, 'TARGET',
      :                       PTEMP1, NFRMS, STATUS )
-            IF ( NFRMS .GT. 0 ) THEN 
+            IF ( NFRMS .GT. 0 ) THEN
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL MSG_SETC( 'MFLAT', MFLAT )
                CALL CCD1_MSG( ' ', '  Using ^MFLAT to flatfield NDFs:',
@@ -840,13 +840,13 @@
                CALL FIO_WRITE( FD, COMMEN, STATUS )
                CALL CCD1_WFFC( .TRUE., PREFIX, USEPRO, PROTEC, CONTIN,
      :                         FLTEXT, FILNMS( J ), FD, FTYPES, GIDIN,
-     :                         NNDF, VALID, PTEMP1, NFRMS, TEMP, 
+     :                         NNDF, VALID, PTEMP1, NFRMS, TEMP,
      :                         STATUS )
 
 *  Add the appropriate flatfield.
                IAT = 3
                MESS = ' '
-               CALL CCD1_ADKEY( 'FLAT', MFLAT, USEPRO, PROTEC, MESS, 
+               CALL CCD1_ADKEY( 'FLAT', MFLAT, USEPRO, PROTEC, MESS,
      :                          IAT, STATUS )
                MESS = MESS( :IAT )//CONTIN
                CALL FIO_WRITE( FD, MESS( :IAT+LCONT ), STATUS )

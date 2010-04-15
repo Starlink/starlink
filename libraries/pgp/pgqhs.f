@@ -8,7 +8,7 @@ C Query the style to be used hatching (fill area with fill-style 3).
 C
 C Arguments:
 C  ANGLE  (output) : the angle the hatch lines make with the
-C                    horizontal, in degrees, increasing 
+C                    horizontal, in degrees, increasing
 C                    counterclockwise (this is an angle on the
 C                    view surface, not in world-coordinate space).
 C  SEPN   (output) : the spacing of the hatch lines. The unit spacing

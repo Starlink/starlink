@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
  10      CONTINUE
          CALL NDF_ASSOC( PARAM, 'READ', INDF, STATUS )
 
-*  If a null value was supplied, annul the error, cancel the parameter 
+*  If a null value was supplied, annul the error, cancel the parameter
 *  and loop back for a new value.
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -104,15 +104,15 @@
 
 *  If all has gone OK, indicate that astrometry information is now
 *  available, and get the bounds of the NDF.
-         IF( STATUS .EQ. SAI__OK ) THEN      
-            ASTAVL = .TRUE.                  
+         IF( STATUS .EQ. SAI__OK ) THEN
+            ASTAVL = .TRUE.
             CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
 
 *  Otherwise, annul the IRA identifier.
          ELSE
             CALL IRA_ANNUL( IDA, STATUS )
          END IF
-   
+
 *  End the NDF context.
          CALL NDF_END( STATUS )
 

@@ -56,7 +56,7 @@
 *
 *     preval
 *        The text to precede the next yylval.
-*     preleng  
+*     preleng
 *        The length of preval, excluding the terminating NULL.
 *     prealloc
 *        The space allocated for preval, excluding the terminating NULL.

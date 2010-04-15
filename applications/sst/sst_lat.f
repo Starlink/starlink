@@ -53,11 +53,11 @@
 *     the terms of the GNU General Public License as published by the Free Software
 *     Foundation; either version 2 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,but WITHOUT ANY
 *     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 *     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License along with
 *     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 *     Place,Suite 330, Boston, MA  02111-1307, USA
@@ -158,7 +158,7 @@
 *  Detect those requiring {\tt} text.
          ELSE IF ( ( CH .EQ. '''' ) .OR.
      :             ( CH .EQ. '"' ) ) THEN
-            BUF( II + 1 : II + 7 ) = 
+            BUF( II + 1 : II + 7 ) =
      :         '{' // SST__BKSLH // 'tt ' // CH // '}'
             II = II + 7
 

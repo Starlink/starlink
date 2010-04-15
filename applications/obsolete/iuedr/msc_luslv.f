@@ -1,5 +1,5 @@
       SUBROUTINE MSC_LUSLV(M, N, A, B)
- 
+
 *+
 *
 *   Name:
@@ -22,14 +22,14 @@
 *   Import:
       INTEGER M                    ! declared size of A-matrix and B-vector
       INTEGER N                    ! used size of A-matrix and B-vector
- 
+
 *   Import-Export:
       DOUBLE PRECISION A(M, M)     ! matrix operator
       DOUBLE PRECISION B(M)        ! rhs and result
 
 *   LU reduce A-matrix
       CALL MSC_LURED(M, N, A)
- 
+
 *   Resolve for B-vector
       CALL MSC_RESLV(M, N, A, B)
 

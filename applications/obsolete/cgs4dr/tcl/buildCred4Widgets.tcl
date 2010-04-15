@@ -35,7 +35,7 @@ proc buildCred4Widgets w {
 # Create DR status layout.
     set lmiddleFrame [frame $middleFrame.lef]
     set rmiddleFrame [frame $middleFrame.rig]
-    pack $lmiddleFrame -in $middleFrame -side left -expand yes 
+    pack $lmiddleFrame -in $middleFrame -side left -expand yes
     pack $rmiddleFrame -in $middleFrame -side right -expand yes
     set Cred4Widgets(RSTAT) [label $rmiddleFrame.label -bg white -fg black -textvariable Cred4Widgets(REDUCTION_STATE) -width 20 \
       -font -adobe-helvetica-medium-o-normal--*-180-* -relief ridge -bd 2]
@@ -61,20 +61,20 @@ proc buildCred4Widgets w {
     set Cred4Widgets(CONFIGS) [button $tbf.dr -text "Configs"]
     set Cred4Widgets(DRMASKS) [button $tbf.dm -text "Masks"]
     pack $Cred4Widgets(SETUP) $Cred4Widgets(DISPLAY) $Cred4Widgets(CONFIGS) $Cred4Widgets(DRMASKS) \
-      -in $tbf -expand yes -fill both -side left 
+      -in $tbf -expand yes -fill both -side left
 
     set Cred4Widgets(BIAS) [button $mbf.as -text "Bias"]
     set Cred4Widgets(DARK) [button $mbf.di -text "Dark"]
     set Cred4Widgets(FLAT) [button $mbf.dr -text "Flat"]
     set Cred4Widgets(CALIB) [button $mbf.dm -text "Calibration"]
     pack $Cred4Widgets(BIAS) $Cred4Widgets(DARK) $Cred4Widgets(FLAT) $Cred4Widgets(CALIB) \
-      -in $mbf -expand yes -fill both -side left 
+      -in $mbf -expand yes -fill both -side left
 
     set Cred4Widgets(STANDARD) [button $bbf.as -text "Standard"]
     set Cred4Widgets(SKY) [button $bbf.di -text "Sky"]
     set Cred4Widgets(POLYSKY) [button $bbf.dr -text "Polysky"]
     set Cred4Widgets(EXTRACT) [button $bbf.dm -text "Extract"]
     pack $Cred4Widgets(STANDARD) $Cred4Widgets(SKY) $Cred4Widgets(POLYSKY) $Cred4Widgets(EXTRACT) \
-      -in $bbf -expand yes -fill both -side left 
+      -in $bbf -expand yes -fill both -side left
     return $mainFrame
 }

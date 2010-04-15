@@ -4,7 +4,7 @@
  *
  * History:
  *   10-DEC-1993 (AJC):
- *      Extracted from ADAM.C 
+ *      Extracted from ADAM.C
  *      Added UFACE_SPLITVAL   (previously SUBPAR_SPLITVAL)
  *      UFACE_IPUT, UFACE_OPUT, UFACE_NAMETR for use by HLP_HELP
  *    3-FEB-1994 (AJC):
@@ -43,7 +43,7 @@ extern struct {
 
 extern value icl_gets  (int interruptable,
 			char *whofor,
-			char *buffer, 
+			char *buffer,
 			int buffersize,
 			char *prompt,
 			char *dflt);				/* input.c */
@@ -53,7 +53,7 @@ extern F77_SUBROUTINE(uface_pwhlp)(CHARACTER(topic),
 				   INTEGER(status)
 				   TRAIL(topic) TRAIL(library) );
 
-F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt), 
+F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt),
                                   INTEGER(len) TRAIL(string) TRAIL(prompt) );
 
 /******************************************************************************
@@ -98,11 +98,11 @@ F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt),
  *     If multi-line help is indicated in response to a single '?', set
  *     LBSRCH false. If it is indicated in response to '??', set LBSRCH
  *     true to indicate that a search of the library is required.
- * 
+ *
  *  Authors:
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original C version - from the Fortran
@@ -238,14 +238,14 @@ int *status		/* global status */
  *     It handles paging with the aid of uface_iput and the external
  *     structure (Fortran COMMON block) ufaceg06
  *     Eventually it calls outstring
- * 
+ *
  *  Authors:
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
- *        Original 
+ *        Original
  *      8-FEB-1994 (AJC):
  *        Add paging
  *     10-AUG-1995 (AJC):
@@ -254,7 +254,7 @@ int *status		/* global status */
  *
  ******************************************************************************
  */
-F77_INTEGER_FUNCTION(uface_oput) ( CHARACTER(string) TRAIL(string) ) 
+F77_INTEGER_FUNCTION(uface_oput) ( CHARACTER(string) TRAIL(string) )
 {
     GENPTR_CHARACTER(string)
     DECLARE_CHARACTER(reply,  10);
@@ -278,29 +278,29 @@ F77_INTEGER_FUNCTION(uface_oput) ( CHARACTER(string) TRAIL(string) )
 	    cnf_exprt("Press RETURN to continue...", prompt, prompt_length);
 	    istat=F77_CALL(uface_iput)
 		( CHARACTER_ARG(reply), CHARACTER_ARG(prompt),
-		  INTEGER_ARG(&replen) TRAIL_ARG(reply) 
+		  INTEGER_ARG(&replen) TRAIL_ARG(reply)
 	          TRAIL_ARG(prompt) );
    	    F77_NAMED_COMMON(ufaceg06).ufacelcnt--;
 	}
     }
-    /* If all OK, output the line 
+    /* If all OK, output the line
      * unless it is the first line on the page and blank
      */
     if ( istat == 1 ) {
-       if ( ( F77_NAMED_COMMON(ufaceg06).ufacelcnt != 
+       if ( ( F77_NAMED_COMMON(ufaceg06).ufacelcnt !=
               ( F77_NAMED_COMMON(ufaceg06).ufacepgsz - 1 ) )
             || *string_c ) {
  	  outstring( string_c );
           outstring("\n");
        } else {
-          F77_NAMED_COMMON(ufaceg06).ufacelcnt++;   
+          F77_NAMED_COMMON(ufaceg06).ufacelcnt++;
        }
     }
     cnf_free(string_c);
 
     return istat;
 }
-                                          
+
 /******************************************************************************
  *
  *  U F A C E _ I P U T
@@ -324,21 +324,21 @@ F77_INTEGER_FUNCTION(uface_oput) ( CHARACTER(string) TRAIL(string) )
  *     The routine also resets the line count, UFACELCNT, to UFACEPGSZ.
  *     Both are integers in tne external structure (Fortran COMMON block)
  *     ufaceg06 and allow a paging system.
- * 
+ *
  *  Authors:
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
- *        Original 
+ *        Original
  *      8-FEB-1994 (AJC):
  *        Add paging
  *     {enter_further_changes_here}
  *
  ******************************************************************************
  */
-F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt), 
+F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt),
                                   INTEGER(len) TRAIL(string) TRAIL(prompt) )
 {
     GENPTR_CHARACTER(string)
@@ -355,7 +355,7 @@ F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt),
     string_c = cnf_creat( string_length + 2 );
     prompt_c = cnf_creib( prompt, prompt_length );
 
-    if ( ! isexc( val = 
+    if ( ! isexc( val =
 	icl_gets( 0, "uface_iput", string_c, string_length, prompt_c,
 		CHARNIL) ) )
     {
@@ -370,11 +370,11 @@ F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt),
     }
     cnf_free(string_c);
     cnf_free(prompt_c);
-    F77_NAMED_COMMON(ufaceg06).ufacelcnt = 
+    F77_NAMED_COMMON(ufaceg06).ufacelcnt =
 	F77_NAMED_COMMON(ufaceg06).ufacepgsz;
     return got;
 }
-                                          
+
 /******************************************************************************
  *
  *  U F A C E _ N A M E T R
@@ -398,14 +398,14 @@ F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt),
  *     The resulting string sent to csh to be echoed so that environment
  *     variables and ~ are translated. If the resultant filename does not
  *     have extension .shl,  .shl is appended
- * 
+ *
  *  Authors:
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
- *        Original 
+ *        Original
  *     24-JAN-1994 (AJC):
  *        Make uface_nametr use expand_name
  *     17-FEB-1993 (AJC):
@@ -446,7 +446,7 @@ CHARACTER(outstr), INTEGER(jstat) TRAIL(instr) TRAIL(outstr) )
        *inpt2 = '\0';
 
        expand_name(&buffer, instr_c2 );
-       free( instr_c2 );              
+       free( instr_c2 );
     } else {
 /*    Expand environment variable names etc. */
        expand_name(&buffer, instr_c );
@@ -462,13 +462,13 @@ CHARACTER(outstr), INTEGER(jstat) TRAIL(instr) TRAIL(outstr) )
     if ( (int)strlen(buffer) > 4 )
 	if ( strcmp( buffer + strlen(buffer) - 4, ".shl") )
 	{
-	    cnf_exprt( instr_c=strconcat(buffer,".shl"), outstr, 
+	    cnf_exprt( instr_c=strconcat(buffer,".shl"), outstr,
 		outstr_length );
 	    free( instr_c );
 	} else
 	    cnf_exprt( buffer, outstr, outstr_length );
 	else {
-	    cnf_exprt( instr_c=strconcat(buffer,".shl"), outstr, 
+	    cnf_exprt( instr_c=strconcat(buffer,".shl"), outstr,
 		outstr_length );
 	    free( instr_c );
 	}
@@ -489,11 +489,11 @@ CHARACTER(outstr), INTEGER(jstat) TRAIL(instr) TRAIL(outstr) )
  *  Description:
  *     The supplied string is terminated correctly, then output via the
  *     normal ICL output mechanism.
- * 
+ *
  *  Authors:
  *     BKM: B K McIlwrath (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original removed from adam.c
@@ -501,7 +501,7 @@ CHARACTER(outstr), INTEGER(jstat) TRAIL(instr) TRAIL(outstr) )
  *
  ******************************************************************************
  */
-extern void 
+extern void
 uface_inform(int path, char *svalue, int svlen, int *status)
 {
     char infostr[MSG_VAL_LEN + 1];
@@ -530,12 +530,12 @@ uface_inform(int path, char *svalue, int svlen, int *status)
  *     C
  *
  *  Description:
- * 
+ *
  *  Authors:
  *     SKR: S K Robinson (INFOMATICS)
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original removed from adam.c
@@ -665,12 +665,12 @@ int *status		/* global status (given and returned) */
  *     its default value, its one-line help info, and an error message if an
  *     earlier attempt to get its value failed.  This information is put into
  *     variables which can be used by uface_askparam().
- * 
+ *
  *  Authors:
  *     SKR: S K Robinson (INFOMATICS)
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original moved from adam.c
@@ -731,12 +731,12 @@ int *status		/* global status (given and returned) */
  *     The user's response is checked for any special characters (? etc)
  *     and those are handled if necessary.
  *     When a normal response is received, it is returned to the task.
- * 
+ *
  *  Authors:
  *     SKR: S K Robinson (INFOMATICS)
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original moved from adam.c
@@ -771,7 +771,7 @@ int *status		/* global status (given and returned) */
 
     ams_plookup(path, taskname, status); /* Get task name from path */
 
-    uface_splitval(message_value, &param, &prompt, &param_dflt, &hlp_txt, 
+    uface_splitval(message_value, &param, &prompt, &param_dflt, &hlp_txt,
 		   &hlp_key, &errmess,  status);
 /*
  * Construct user prompt
@@ -831,7 +831,7 @@ int *status		/* global status (given and returned) */
 	    }
 	} else {
 	    gotval = 1;
-	    user_vlen = strlen(user_value) - 1;	/* remove newline added by 
+	    user_vlen = strlen(user_value) - 1;	/* remove newline added by
 						 * io system */
 	}
     }
@@ -846,7 +846,7 @@ int *status		/* global status (given and returned) */
 
 /******************************************************************************
  *
- *	U F A C E _ S T A R T O B E Y (char *taskname, char *actionname, 
+ *	U F A C E _ S T A R T O B E Y (char *taskname, char *actionname,
  *                                      char valu[], int *status)
  *  Purpose:
  *     Send OBEY with action 'actionname' and value 'value' to task 'taskname'
@@ -860,13 +860,13 @@ int *status		/* global status (given and returned) */
  *     The required OBEY message is sent to the task and a reply awaited.
  *
  *     On return status is SAI__OK or indicative of some error which may be
- *     qualified by string returned in value[] (no qualification will have 
+ *     qualified by string returned in value[] (no qualification will have
  *     value set to the null string).
  *
  *  Authors:
  *     BKM: B K McIlwrath (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     12-SEP-1994 (BKM):
  *        Original extracted from uface_obeyw()
@@ -878,7 +878,7 @@ void uface_startobey
 (
 char *taskname,		/* taskname to send to (given) */
 char *actionname,	/* action within task to obey (given) */
-char *tvalue,		/* task value string (given and returned) */ 
+char *tvalue,		/* task value string (given and returned) */
 int  value_len,		/* length of value string (given and returned) */
 int *path,		/* path to task (returned) */
 int *messid,		/* message system id (returned) */
@@ -906,12 +906,12 @@ int *status		/* global status (given and returned) */
     /* Process messages from parameter system before initial acknowledgement */
     finished = 0;
     while (!finished && *status == SAI__OK) {
-	ams_getreply(20000, *path, *messid, MSG_NAME_LEN, 
+	ams_getreply(20000, *path, *messid, MSG_NAME_LEN,
 		     MSG_VAL_LEN, &message_status, &message_context,
 		     actionname, &rvalue_len, rvalue, status);
         if (*status != SAI__OK)
 	    return;
-	    
+
 	switch (message_status) {
 
 	  case DTASK__ACTSTART:
@@ -948,7 +948,7 @@ int *status		/* global status (given and returned) */
  *     C
  *
  *  Description:
- *     SEND OBEY has sent an OBEY command to the task on the end of path 
+ *     SEND OBEY has sent an OBEY command to the task on the end of path
  *     'path', transaction 'messid'.  We now wait for its completion.
  *     On return status is SAI__OK or indicative of some error which may be
  *     qualified by returned 'value[]' (no qualification will have value set
@@ -958,7 +958,7 @@ int *status		/* global status (given and returned) */
  *     SKR: S K Robinson (INFOMATICS)
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original moved from adam.c
@@ -983,7 +983,7 @@ int *status		/* global status (given and returned) */
 
     while (!finished && *status == SAI__OK) {
 	ams_getreply(MESSYS__INFINITE, path, messid,
-		     MSG_NAME_LEN, MSG_VAL_LEN, 
+		     MSG_NAME_LEN, MSG_VAL_LEN,
 		     &message_status, &message_context,
 		     replyaction, &rvalue_len, rvalue, status);
 	switch (message_status) {
@@ -1042,14 +1042,14 @@ fprintf(stderr, "Return\n");
  *     The required OBEY message is sent to the task and a reply awaited.
  *
  *     On return status is SAI__OK or indicative of some error which may be
- *     qualified by string returned in value[] (no qualification will have 
+ *     qualified by string returned in value[] (no qualification will have
  *     value set to the null string).
  *
  *  Authors:
  *     SKR: S K Robinson (INFOMATICS)
  *     AJC: A J Chipperfield (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original moved from adam.c
@@ -1064,7 +1064,7 @@ void uface_obeyw
 (
 char *taskname,		/* taskname to send to (given) */
 char *actionname,	/* action within task to obey (given) */
-char *tvalue,		/* task value string (given and returned) */ 
+char *tvalue,		/* task value string (given and returned) */
 int  value_len,		/* length of value string (given and returned) */
 int *status		/* global status (given and returned) */
 )
@@ -1085,8 +1085,8 @@ int *status		/* global status (given and returned) */
     /* Main task OBEY processing loop */
     finished = 0;
     while (!finished && *status == SAI__OK) {
-	ams_getreply(MESSYS__INFINITE, path, messid, MSG_NAME_LEN, MSG_VAL_LEN, 
-		     &message_status, &message_context, actionname, 
+	ams_getreply(MESSYS__INFINITE, path, messid, MSG_NAME_LEN, MSG_VAL_LEN,
+		     &message_status, &message_context, actionname,
 		     &rvalue_len, rvalue, status);
 	if (*status != SAI__OK)
 	    break;
@@ -1141,7 +1141,7 @@ int *status		/* global status (given and returned) */
  *  Description:
  *     This function loops waiting for messages to arrive. These messages
  *     may be from other ADAM tasks or from the io-subsystem containing ICL
- *     command input. The status of each message received determines the 
+ *     command input. The status of each message received determines the
  *     action to be taken and the appropriate function is called.
  *
  *     This function will return only when an io-subsystem message is received
@@ -1152,7 +1152,7 @@ int *status		/* global status (given and returned) */
  *     AJC: A J Chipperfield (STARLINK)
  *     BKM: B K McIlwrath (STARLINK)
  *     {enter_new_authors_here}
- * 
+ *
  *  History:
  *     10-DEC-1993 (AJC):
  *        Original moved from adam.c
@@ -1179,7 +1179,7 @@ int *status	/* global status (given and returned) */
 	return;
 
     iclcmd = 0;
-    while (!iclcmd && 
+    while (!iclcmd &&
 	   *status == SAI__OK) {
 /*
  * Note: the ams_receive() return status is used to indicate the queue
@@ -1274,9 +1274,9 @@ int *status	/* global status (given and returned) */
  *     Check for an user interface interrupt.
  *
  *  Method:
- *     The io-subsystem will send an "interrupt" message to our 
+ *     The io-subsystem will send an "interrupt" message to our
  *	"external-interrupt" messys queue. We could check for the arrival of
- *	this message quite easily but it is presently ignored (see 
+ *	this message quite easily but it is presently ignored (see
  *	uface_getcom()). Instead we return the state of the interrupt flag
  *	set by the SIGINT handler in main()
  *

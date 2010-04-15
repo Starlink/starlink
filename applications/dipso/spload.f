@@ -1,26 +1,26 @@
        SUBROUTINE SPLOAD(CMD,PARAMS,TITLE,IHHEAD,WORKSZ,WORK,NPOINT,
      :                   WAVE,FLUX,NBREAK,BREAK,IH1,MAXOUT,SUBCHK,
      :                   STATUS)
- 
+
        IMPLICIT NONE
        INCLUDE 'SAE_PAR'
        INTEGER STATUS
- 
+
        CHARACTER*(*) CMD, PARAMS, TITLE, IHHEAD
- 
+
        INTEGER WORKSZ, NPOINT, NBREAK
        INTEGER BREAK(NBREAK)
        INTEGER IH1, MAXOUT
- 
+
        REAL WORK(WORKSZ), WAVE(NPOINT), FLUX(NPOINT)
- 
+
        LOGICAL SUBCHK
- 
+
        INTEGER IAN, IBRK, IH, I
        REAL DWAV, DDWAV, WTST
 
        IF( STATUS .NE. SAI__OK ) RETURN
- 
+
        DO 100 I = 1, 80
           IF (PARAMS(I:I).NE.' ') GOTO 300
   100  CONTINUE
@@ -32,7 +32,7 @@
           SUBCHK = .FALSE.
           GO TO 500
        END IF
- 
+
   300  CONTINUE
        CALL SSTRIP(PARAMS)
        IF (PARAMS(1:2).EQ.'!!') THEN
@@ -86,7 +86,7 @@
              ENDIF
           ENDIF
   400  CONTINUE
- 
+
   500  CONTINUE
 
        END

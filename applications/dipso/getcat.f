@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GETCAT( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, MODE, 
+*     CALL GETCAT( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, MODE,
 *                  CI, FILE, STATUS )
 
 *  Description:
@@ -24,7 +24,7 @@
 *        A string containing the supplied command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
 *        supplied default value will be used if no value has
@@ -47,7 +47,7 @@
 
 *  Notes:
 *     -  If an error occurs, a null value is returned for CI.
-      
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -72,7 +72,7 @@
       INCLUDE 'CAT_PAR'          ! CAT_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -85,14 +85,14 @@
 *  Arguments Returned:
       INTEGER CI
       CHARACTER * ( * ) FILE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER
      :        NAME*80            ! Catalogue title
-      
+
       LOGICAL
      :        ISVERB             ! Is VERBOSE or DEBUG
 *.
@@ -114,16 +114,16 @@
      :            STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999      
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Jump to here if a new catalogue name has been obtained.
  10   CONTINUE
-      
+
 *  Attempt to open the catalogue.
       CALL CAT_TOPEN( FILE, 'OLD', MODE, CI, STATUS )
 
-*  If an error has occured, 
-      IF( STATUS .NE. SAI__OK ) THEN 
+*  If an error has occured,
+      IF( STATUS .NE. SAI__OK ) THEN
 
 *  If the MSG message filtering level is verbose flush all the error
 *  messages. Otherwise, annul them.
@@ -143,7 +143,7 @@
          CALL RDSTR( COMM, PROMPT, DEFVAL, FILE, STATUS )
 
 *  If a new name was supplied, go round to try to open the catalogue.
-         IF( STATUS .EQ. SAI__OK ) GO TO 10         
+         IF( STATUS .EQ. SAI__OK ) GO TO 10
 
 *  If a catalogue has been obtained succesfully, display its name (unless
 *  it is blank or undefined).
@@ -152,7 +152,7 @@
          CALL CAT_TIQAC( CI, 'NAME', NAME, STATUS )
 
          IF( NAME .NE. ' ' ) THEN
-            CALL MSG_SETC( 'NAME', NAME )         
+            CALL MSG_SETC( 'NAME', NAME )
             CALL MSGOUT( COMM, 'Catalogue name - ''^NAME''', .FALSE.,
      :                   STATUS )
          END IF
@@ -182,6 +182,6 @@
       END IF
 
 *  Release the error stack.
-      CALL ERR_RLSE      
+      CALL ERR_RLSE
 
       END

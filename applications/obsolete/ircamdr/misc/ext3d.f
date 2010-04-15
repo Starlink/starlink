@@ -44,9 +44,9 @@
 	parameter ( mmax=256, kplus1max=40, nrows=kplus1max)
 
 	real
-     :	  aarr( nx, ny),      ! work array for data 
-     :	  barr( nx, ny),      ! work array for data 
-     :	  restval,            ! value for rest of output array 
+     :	  aarr( nx, ny),      ! work array for data
+     :	  barr( nx, ny),      ! work array for data
+     :	  restval,            ! value for rest of output array
      :	  threshup,           ! upper threshold level for fit
      :	  threshdn,           ! lower threshold level for fit
      :	  minrms,             ! minimum rms from poly-fit data
@@ -55,8 +55,8 @@
      :	  median,             ! median of array
      :	  mode                ! mode of array
 
-	real*8 
-     :	  sum, 
+	real*8
+     :	  sum,
      :	  x( mmax),           ! x values fitted
      :	  y( mmax),           ! y values fitted
      :	  w( mmax),           ! weights of fitted data
@@ -85,7 +85,7 @@
 	ystart = 127
 	xend = 129
 	yend = 129
-	
+
   50	type *, 'Start, End number in seq. : '
 	read( 5, *) stn, ste
 
@@ -108,7 +108,7 @@
 	  filenam1 = tline( 1:l1)
 	  type *, 'Filename = ', filenam1( 1:20)
 
-*        Read sdf file of input data 
+*        Read sdf file of input data
 	  call mapgl_readsdf2( filenam1, nx, ny, aarr, xdim, ydim)
 
 	  sum = 0.0d0
@@ -118,7 +118,7 @@
 	    end do
 	  end do
 	  mean = sngl( sum/real( (yend-ystart+1)*(xend-xstart+1)))
-	  
+
 	  fpjj = fps + (kk-1)*fpi
 	  write( 142, *) fpjj, mean
 

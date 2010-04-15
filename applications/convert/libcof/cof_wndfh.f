@@ -23,7 +23,7 @@
 *     defined.
 *
 *     The keywords are:
-*        o  NAXIS, and NAXISn are derived from the dimensions of 
+*        o  NAXIS, and NAXISn are derived from the dimensions of
 *           the NDF data array, unless COMP='HEADER', whereupon NAXIS=0.
 *        o  For an NDF whose origin is not 1 along each axis, LBOUNDn
 *           cards are written. (These are not part of the standard.)
@@ -45,9 +45,9 @@
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF.
 *     COMP = CHARACTER * ( * ) (Given)
-*        The array component (in uppercase) to write to the HDU.  A 
-*        special value of 'HEADER' is also recognised; this indicates 
-*        that no array-related headers such as BSCALE, BZEROm, and 
+*        The array component (in uppercase) to write to the HDU.  A
+*        special value of 'HEADER' is also recognised; this indicates
+*        that no array-related headers such as BSCALE, BZEROm, and
 *        BLANK should be written, and sets keyword NAXIS to 0.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
@@ -104,14 +104,14 @@
 *        Original version.
 *     1996 September 16 (MJC):
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
-*        for axis units.  Write CRPIXn. 
+*        for axis units.  Write CRPIXn.
 *     1998 January 5 (MJC):
 *        Added ORIGIN argument.
 *     18-FEB-1998 (DSB):
 *        Converted VAL__BADUB and VAL__BADW to INTEGER before passing as
 *        an integer argument to FTPKYJ.
 *     4-FEB-2003 (DSB):
-*        Modified to suppress output of AXIS information if the NDF 
+*        Modified to suppress output of AXIS information if the NDF
 *        has a WCS component or if the FITS extension has usable WCS
 *        information. Added argument PROPEX.
 *     2004 September 9 (TIMJ):
@@ -131,7 +131,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE               ! No implicit typing
 
@@ -149,7 +149,7 @@
                                   ! presence of certain components
       INTEGER   BITPIX            ! Bits per pixel
       CHARACTER * ( * ) ORIGIN    ! The value of the ORIGIN card
-      LOGICAL PROPEX              ! Propagate contents of FITS 
+      LOGICAL PROPEX              ! Propagate contents of FITS
                                   ! extension?
 
 *  Arguments Returned:
@@ -248,7 +248,7 @@
 *  Obtain the NDF bounds.
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
-*  A header-only NDF has dummy dimensions, as there must always be an 
+*  A header-only NDF has dummy dimensions, as there must always be an
 *  NDF, but we want no dimensions in the HDU.
       IF ( COMP .EQ. 'HEADER' ) NDIM = 0
 
@@ -268,12 +268,12 @@
 
 *  Handle axis header cards.
 *  =========================
-*      
+*
 *  If the NDF has a WCS component do not propagate the AXIS information.
       CALL NDF_STATE( NDF, 'WCS', GOTWCS, STATUS )
 
-*  If the FITS extension contains usable WCS information and the 
-*  contents of the FITS extension are being propagated to the output 
+*  If the FITS extension contains usable WCS information and the
+*  contents of the FITS extension are being propagated to the output
 *  FITS file, do not propagate the AXIS information.
       IF ( PROPEX .AND. COF_ISWCS( NDF, STATUS ) ) GOTWCS = .TRUE.
 
@@ -285,7 +285,7 @@
 *  respectively.  This is rather crude, as it deals with the axis
 *  system as a whole, and that the flags to indicate presence of
 *  components are for any of the axes.
-      DO I = 1, NDIM 
+      DO I = 1, NDIM
          CALL NDF_ASTAT( NDF, 'Centre', I, THERE, STATUS )
 
          IF ( THERE .AND. .NOT. GOTWCS ) THEN
@@ -297,7 +297,7 @@
 *  type.  Use _REAL for all but double-precision centres.  See if the
 *  axis is linear.
             IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
@@ -325,7 +325,7 @@
 
 *  Repeat for all other axis-centre data types mapped as real.
             ELSE
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
@@ -466,7 +466,7 @@
                   CALL FTPKYS( FUNIT, KEYWRD,
      :                         VALUE( :MIN( SZVAL, NCHAR ) ),
      :                         'Units for axis '//C, FSTAT )
-               
+
                END IF
 
             END IF
@@ -480,7 +480,7 @@
      :                      STATUS )
             GOTO 999
          END IF
-         
+
       END DO
 
 *  Write cards for the pixel origin.
@@ -504,7 +504,7 @@
             KEYWRD = 'LBOUND'//C( 1:NCHAR )
 
 *  Write the actual card.
-            CALL FTPKYJ( FUNIT, KEYWRD, LBND( I ), 
+            CALL FTPKYJ( FUNIT, KEYWRD, LBND( I ),
      :                   'Pixel origin along axis '//C, FSTAT )
          END DO
 
@@ -517,7 +517,7 @@
             GOTO 999
          END IF
       END IF
-         
+
 *  Process the title.
 *  ==================
 *
@@ -545,7 +545,7 @@
 
 *  Process the label.
 *  ==================
-*   
+*
 *  Determine whether or not there is a label present in the NDF.
       CALL NDF_STATE( NDF, 'LABEL', THERE, STATUS )
 
@@ -570,7 +570,7 @@
 
 *  Process the units.
 *  ==================
-*   
+*
 *  Determine whether or not there is a label present in the NDF.
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )
 
@@ -580,7 +580,7 @@
          CALL NDF_CGET( NDF, 'UNITS', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'UNITS', NCHAR, STATUS )
 
-*  Do not write blank units strings.  These look especially silly 
+*  Do not write blank units strings.  These look especially silly
 *  for variance.
          IF ( VALUE .NE. ' ' ) THEN
 
@@ -679,11 +679,11 @@
      :                      FSTAT )
 
             ELSE IF ( BITPIX .EQ. 16 ) THEN
-               CALL FTPKYJ( FUNIT, 'BLANK', NUM_WTOI( VAL__BADW ), 
+               CALL FTPKYJ( FUNIT, 'BLANK', NUM_WTOI( VAL__BADW ),
      :                      'Bad value', FSTAT )
 
             ELSE IF ( BITPIX .EQ. 8 ) THEN
-               CALL FTPKYJ( FUNIT, 'BLANK', NUM_UBTOI( VAL__BADUB ), 
+               CALL FTPKYJ( FUNIT, 'BLANK', NUM_UBTOI( VAL__BADUB ),
      :                      'Bad value', FSTAT )
             END IF
 

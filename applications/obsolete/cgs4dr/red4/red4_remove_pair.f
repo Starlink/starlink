@@ -127,7 +127,7 @@
 *      Check this has worked.
          IF ( STATUS .EQ. ADAM__OK ) THEN
 
-*         Ensure that the OBJECT observation is of type 'OBJECT', and 
+*         Ensure that the OBJECT observation is of type 'OBJECT', and
 *         the SKY observation is of type 'SKY'.
             IF ( (OBJTYPE .EQ. 'OBJECT') .AND.
      :           (SKYTYPE .EQ. 'SKY') ) THEN
@@ -138,7 +138,7 @@
 *               Convert the OBJECT observation file name, together with the
 *               group number obtained above, into the name of the
 *               reduced group file.
-                  CALL RED4_ROBSTOGRP( OBJRED, OBJGRP, GRPRED, STATUS ) 
+                  CALL RED4_ROBSTOGRP( OBJRED, OBJGRP, GRPRED, STATUS )
 
 *               Issue a message.
                   CALL MSG_SETC( 'OBJECTOBS', OBJECTOBS )
@@ -203,7 +203,7 @@
 *               Check everything has worked so far.
                   IF ( STATUS .EQ. ADAM__OK ) THEN
 
-*                  Check to see if both coadd structures exists. If 
+*                  Check to see if both coadd structures exists. If
 *                  either does not, then this observation pair cannot
 *                  have been previously applied and therefore cannot be
 *                  removed.
@@ -219,10 +219,10 @@
 *                     of the data.
                         CALL RED4_REMOVE_OBSERVATION_PAIR( OBJECTOBS,
      :                    SKYOBS, COADDED_OBS, COADD_OBJ, COADD_SKY,
-     :                    ERRPROP, VARIANCE_WT, SKY_WT,STATUS ) 
+     :                    ERRPROP, VARIANCE_WT, SKY_WT,STATUS )
                      ELSE
 
-*                     One or both of the observations have not been applied. 
+*                     One or both of the observations have not been applied.
 *                     Issue a warning message and ignore this pair.
                         IF ( SKYFOUND ) THEN
 

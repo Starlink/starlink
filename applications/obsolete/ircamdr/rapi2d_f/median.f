@@ -14,7 +14,7 @@
 *                %SIDE   .  %CENTRE  .   %SIDE
 *                  .           .           .
 *               %CORNER  .   %SIDE   .  %CORNER
-* 
+*
 *     The . indicates that the weights are separated by (%STEP-1) zeros.
 *     A threshold, %DIFF, for replacement of a value by the median can be set.
 *     If the absolute value of the difference between the actual value and the
@@ -66,7 +66,7 @@
 *     Allocate the workspace required by MEDWTS
 *     If no errors so far then
 *        Copy input array into the output array
-*        Call MEDSET to set up weighting function, position of median and 
+*        Call MEDSET to set up weighting function, position of median and
 *          sample offset information
 *        For required number of iterations
 *           Put output array into workspace padding the edges by either
@@ -82,7 +82,7 @@
 *     20/10/1983 : Original version                (ROE::ASOC5)
 *     17/02/1984 : Modified to use TITLE component (ROE::ASOC5)
 *     12-APR-1994  CHANGED DAT AND CMP CALLS TO NDF (SKL@JACH)
-*     11-AUG-1994  Changed DIM arguments for COPY2D and 
+*     11-AUG-1994  Changed DIM arguments for COPY2D and
 *                  MEDREP, MEDREF, MEDWTS  (SKL@JACH)
 *
 *    Type Definitions :
@@ -146,7 +146,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *       map the input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :     PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions
@@ -190,7 +190,7 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          map the output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 *          calculate dimensions of workspace array
@@ -199,16 +199,16 @@
 
 *          create and map workspace array
             CALL NDF_TEMP( PLACE, STATUS )
-            CALL NDF_NEW(  '_REAL', NDIM, LBND, WDIMS, PLACE, WLOC, 
-     :                     STATUS )  
-            CALL NDF_MAP( WLOC, 'DATA', '_REAL', 'WRITE', WPNTR, 
+            CALL NDF_NEW(  '_REAL', NDIM, LBND, WDIMS, PLACE, WLOC,
+     :                     STATUS )
+            CALL NDF_MAP( WLOC, 'DATA', '_REAL', 'WRITE', WPNTR,
      :                    NELEMENTS, STATUS )
 
 *          check for errors
             IF( STATUS .EQ. SAI__OK ) THEN
 
 *             copy input DATA_ARRAY component into output DATA_ARRAY component
-               CALL COPY2D( DIMS(1), DIMS(2), %VAL( PNTRI ), 
+               CALL COPY2D( DIMS(1), DIMS(2), %VAL( PNTRI ),
      :                      %VAL( PNTRO ), STATUS )
 
 *             set up the weighting function, position of median etc.
@@ -222,18 +222,18 @@
                   IF( CHR_SIMLR( 'REF', BOUND ) ) THEN
 
 *                   pad edges by reflection
-                     CALL MEDREF( STEP, DIMS(1), DIMS(2), %VAL( PNTRO ), 
+                     CALL MEDREF( STEP, DIMS(1), DIMS(2), %VAL( PNTRO ),
      ;                 WDIMS(1), WDIMS(2), %VAL( WPNTR ), STATUS )
                   ELSE
 
 *                   pad edges by replication
-                     CALL MEDREP( STEP, DIMS(1), DIMS(2), %VAL( PNTRO ), 
+                     CALL MEDREP( STEP, DIMS(1), DIMS(2), %VAL( PNTRO ),
      :                 WDIMS(1), WDIMS(2), %VAL( WPNTR ), STATUS )
                   ENDIF
 
 *                perform the 2-D median filtering using MEDWTS
                   CALL MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, SAMSIZ,
-     :              SAMINF, WDIMS(1), WDIMS(2), %VAL( WPNTR ), 
+     :              SAMINF, WDIMS(1), WDIMS(2), %VAL( WPNTR ),
      :              DIMS(1), DIMS(2), %VAL( PNTRO ),
      :              SAMPLE, SAMWT, STATUS )
 

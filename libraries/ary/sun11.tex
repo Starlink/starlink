@@ -24,7 +24,7 @@
 \newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {Reference Manual}
 \newcommand{\stardocabstract}  {%
-The ARY library is a set of routines for accessing Starlink ARRAY data 
+The ARY library is a set of routines for accessing Starlink ARRAY data
 structures built using the Hierarchical Data System (HDS).
 }
 % ? End of document identification
@@ -79,7 +79,7 @@ structures built using the Hierarchical Data System (HDS).
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -148,7 +148,7 @@ structures built using the Hierarchical Data System (HDS).
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -191,10 +191,10 @@ structures built using the Hierarchical Data System (HDS).
 %     source prior to any statements that make use of the SST commands.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -417,7 +417,7 @@ structures built using the Hierarchical Data System (HDS).
    }
 
 %  \sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -507,12 +507,12 @@ structures built using the Hierarchical Data System (HDS).
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -584,17 +584,17 @@ These NDF\_ routines are described in \xref{SUN/33}{sun33}{}.
 The most likely reason for needing to use the ARY\_ routines directly at
 present is for accessing ARRAY structures stored in NDF extensions.
 Since most ARY\_ routines closely resemble the equivalent NDF\_ routine,
-\xref{SUN/33}{sun33}{} should initially form an adequate introduction to 
-their use, in conjunction with the detailed routine descriptions contained in 
-Appendix~\ref{ss:routinedescriptions} of this document. 
+\xref{SUN/33}{sun33}{} should initially form an adequate introduction to
+their use, in conjunction with the detailed routine descriptions contained in
+Appendix~\ref{ss:routinedescriptions} of this document.
 
 
 
 \section{\xlabel{array_storage_forms}Array Storage Forms}
 \label{array_storage_forms}
 
-Note that at present, the ARY\_ system provides full support only for the 
-``primitive'' and ``simple'' forms of the ARRAY data structure. 
+Note that at present, the ARY\_ system provides full support only for the
+``primitive'' and ``simple'' forms of the ARRAY data structure.
 
 However, some support is also provided for the ``scaled'' form described
 in SGP/38. This form is the same as the ``simple'' form except that two
@@ -637,7 +637,7 @@ reported if an attempt is made to to import an HDS structure describing a
 complex scaled array, or to assign scale and zero values to an array with
 complex data values.
 
-\item When applied to a scaled array, the ARY\_TYPE and ARY\_FTYPE routines 
+\item When applied to a scaled array, the ARY\_TYPE and ARY\_FTYPE routines
 return information about the data type of the unscaled data values. In
 practice, this means that they return the data type of the SCALE and ZERO
 constants, rather than the data type of the array holding the stored
@@ -650,14 +650,14 @@ constants, rather than the data type of the array holding the stored
 \label{compiling_and_linking}
 
 Before compiling or linking applications which call ARY\_ routines, you
-should first ``log in'' for software development using these routines. 
+should first ``log in'' for software development using these routines.
 This is done using the \texttt{ary\_dev} command.
 
 \begin{quote}\begin{verbatim}
 % ary_dev
 \end{verbatim}\end{quote}
 
-This will generate links to the ARY include files required for 
+This will generate links to the ARY include files required for
 programming (note that this is only necessary if you reference ARY\_
 system include files, or call ARY\_ routines explicitly in your
 application).
@@ -684,7 +684,7 @@ following might be used:
 \end{verbatim}\end{quote}
 
 Both versions of the ARY\_ system contain the same set of user-callable
-routines.  
+routines.
 
 \newpage
 \appendix
@@ -3173,7 +3173,7 @@ fixed.  This could occasionally result in corrupted files if the
 ARY\_STYPE routine was called repeatedly from successive invocations of
 an application in an ADAM monolith.
 
-\item Two new routines have been introduced, primarily to provide facilities 
+\item Two new routines have been introduced, primarily to provide facilities
 required by the NDF\_ system:
 
 \begin{itemize}
@@ -3193,14 +3193,14 @@ with either version.
 \item The encoding of ARY\_ system identifiers has been changed to
 improve the chance of detecting erroneous identifier values.
 
-\item Messages about array data structures now contain the full HDS object 
+\item Messages about array data structures now contain the full HDS object
 name, including the full container file name.
 
 \item A few minor documentation errors have been corrected.
 
 \end{enumerate}
 
-No changes to existing applications should be required, neither should any 
+No changes to existing applications should be required, neither should any
 re-compilation or re-linking be necessary.
 
 % ? End of main text

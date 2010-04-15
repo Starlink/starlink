@@ -190,7 +190,7 @@ datPutI(const HDSLoc   *locator,
    datPut(locator,
           "_INTEGER",
           ndim,
-          dims, 
+          dims,
           values,
           status);
    return hds_gl_status;
@@ -215,7 +215,7 @@ datPutR( const HDSLoc    *locator,
   datPut(locator,
           "_REAL",
           ndim,
-          dims, 
+          dims,
           values,
           status);
      return hds_gl_status;
@@ -240,7 +240,7 @@ datPutD( const HDSLoc    *locator,
    datPut(locator,
           "_DOUBLE",
           ndim,
-          dims, 
+          dims,
           values,
           status);
      return hds_gl_status;
@@ -265,7 +265,7 @@ datPutL( const HDSLoc    *locator,
      datPut(locator,
           "_LOGICAL",
           ndim,
-          dims, 
+          dims,
           values,
           status);
      return hds_gl_status;
@@ -306,7 +306,7 @@ datPutC( const HDSLoc    *locator,
    datPut(locator,
           stype,
           ndim,
-          dims, 
+          dims,
           string1,
           status);
      return hds_gl_status;

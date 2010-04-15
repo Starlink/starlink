@@ -1,7 +1,7 @@
 *+  P4_GET_AXLIM - Get the axis limits for plot
       SUBROUTINE P4_GET_AXLIM( PORT, DIM1, DIM2, STATUS )
 *    Description :
-*     This routine gets the axis limits 
+*     This routine gets the axis limits
 *    Invocation :
 *     CALL P4_GET_AXLIM( PORT, DIM1, DIM2, STATUS )
 *    Deficiencies :
@@ -26,7 +26,7 @@
 *    Global variables :
       INCLUDE 'P4COM.INC'                     ! P4 common block
 *    Local Constants :
-      REAL TOLER                              ! Tolerance for testing 
+      REAL TOLER                              ! Tolerance for testing
       PARAMETER ( TOLER = 1.0E-10 )
 *    Local variables :
       REAL XMAX, XMIN, YMAX, YMIN             ! Axis limits
@@ -47,7 +47,7 @@
       IF ( VERBOSE ) THEN
         CALL MSG_SETI( 'IMIN', IMIN )
         CALL MSG_SETI( 'IMAX', IMAX )
-        CALL MSG_OUT( ' ', 'P4_GET_AXLIM: X-axis pixel range is ^IMIN to ^IMAX', STATUS ) 
+        CALL MSG_OUT( ' ', 'P4_GET_AXLIM: X-axis pixel range is ^IMIN to ^IMAX', STATUS )
       ENDIF
 
 *   Set the Y-axis pixel limits
@@ -61,7 +61,7 @@
       IF ( VERBOSE ) THEN
         CALL MSG_SETI( 'JMIN', JMIN )
         CALL MSG_SETI( 'JMAX', JMAX )
-        CALL MSG_OUT( ' ', 'P4_GET_AXLIM: Y-axis pixel range is ^JMIN to ^JMAX', STATUS ) 
+        CALL MSG_OUT( ' ', 'P4_GET_AXLIM: Y-axis pixel range is ^JMIN to ^JMAX', STATUS )
       ENDIF
 
 *   Get the X-axis data limits
@@ -71,7 +71,7 @@
         IF ( VERBOSE ) THEN
           CALL MSG_SETR( 'XMIN', XMIN )
           CALL MSG_SETR( 'XMAX', XMAX )
-          CALL MSG_OUT( ' ', 'P4_GET_AXLIM: X-axis data range is ^XMIN to ^XMAX', STATUS ) 
+          CALL MSG_OUT( ' ', 'P4_GET_AXLIM: X-axis data range is ^XMIN to ^XMAX', STATUS )
         ENDIF
       ENDIF
 
@@ -82,7 +82,7 @@
         IF ( VERBOSE ) THEN
           CALL MSG_SETR( 'YMIN', YMIN )
           CALL MSG_SETR( 'YMAX', YMAX )
-          CALL MSG_OUT( ' ', 'P4_GET_AXLIM: Y-axis data range is ^YMIN to ^YMAX', STATUS ) 
+          CALL MSG_OUT( ' ', 'P4_GET_AXLIM: Y-axis data range is ^YMIN to ^YMAX', STATUS )
         ENDIF
       ENDIF
 
@@ -144,7 +144,7 @@
           IF ( IMAX .GT. 1 ) THEN
             IF ( (ISTART(PORT).LT.IMIN) .OR. (ISTART(PORT).GT.IMAX) ) ISTART(PORT) = IMIN
             IF ( (IEND(PORT).LT.IMIN) .OR. (IEND(PORT).GT.IMAX) ) IEND(PORT) = IMAX
-            XSTART(PORT) = REAL( ISTART(PORT) ) 
+            XSTART(PORT) = REAL( ISTART(PORT) )
             XEND(PORT)   = REAL( IEND(PORT) )
           ENDIF
           IF ( JMAX .GT. 1 ) THEN
@@ -154,9 +154,9 @@
             YEND(PORT)   = REAL( JEND(PORT) )
           ENDIF
         ENDIF
-      ENDIF 
+      ENDIF
 
-*   At this point we should have a cosher X,Y and I,J 
+*   At this point we should have a cosher X,Y and I,J
       IF ( VERBOSE ) THEN
          CALL MSG_SETI( 'IMIN', ISTART(PORT) )
          CALL MSG_SETI( 'IMAX', IEND(PORT) )
@@ -169,7 +169,7 @@
          CALL MSG_SETR( 'YMAX', YEND(PORT) )
          CALL MSG_OUT( ' ', 'Y-axis : Data range = ^YMIN to ^YMAX, Pixel range = ^JMIN to ^JMAX', STATUS )
       ENDIF
- 
+
 *   Reset the limits if necessary
       IF ( IMAX .GT. 1 ) THEN
         IF ( ABS( XSTART(PORT) - XEND(PORT) ) .LT. TOLER ) THEN
@@ -197,7 +197,7 @@
 *    If we have a contour plot, calculate the transformation matrix
       IF ( DISPLAY_TYPE(PORT) .EQ. 'CONTOUR' )  THEN
          CALL P4_GENTRAN2( ISTART(PORT), IEND(PORT), JSTART(PORT),
-     :      JEND(PORT), %val( AXIS1_PTR ), %val( AXIS2_PTR ), 
+     :      JEND(PORT), %val( AXIS1_PTR ), %val( AXIS2_PTR ),
      :      TMATRIX, STATUS )
 
 *    If we have a graph or overgraph, calculate the start and end of slice
@@ -225,9 +225,9 @@
            ISTART(PORT) = JSTART(PORT)
            IEND(PORT) = JEND(PORT)
          ENDIF
-      ENDIF 
+      ENDIF
 
-*   At this point we should have the final X,Y and I,J 
+*   At this point we should have the final X,Y and I,J
       IF ( VERBOSE ) THEN
          CALL MSG_SETI( 'IMIN', ISTART(PORT) )
          CALL MSG_SETI( 'IMAX', IEND(PORT) )

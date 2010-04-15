@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -174,7 +174,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Omit any directory specification (the default will be used) and
-*  form the file name from the name and foreign extension fields of the 
+*  form the file name from the name and foreign extension fields of the
 *  foreign file (if present). Replace any non-alphanumeric characters in
 *  the foreign extension specifier with underscores, to ensure the
 *  resulting NDF name is legal.
@@ -189,7 +189,7 @@
                      CALL CHR_PUTC( FORFIL( I : I ), NAME, LNAM )
                   ELSE
                      CALL CHR_PUTC( '_', NAME, LNAM )
-                  END IF        
+                  END IF
                END DO
             END IF
 
@@ -233,7 +233,7 @@
             END IF
          END IF
       END IF
-      
+
 *  If an error occurred, then return an invalid locator value.
       IF ( STATUS .NE. SAI__OK ) THEN
          NDFLOC = DAT__NOLOC

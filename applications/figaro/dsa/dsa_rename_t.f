@@ -25,7 +25,7 @@ C     CALL DSA_RENAME_TEMP (STATUS)
 C
 C  Parameters:
 C     (!) STATUS      (Integer) Inherited status. If passed as non-zero,
-C                     routine returns immediately. 
+C                     routine returns immediately.
 C
 C  Prior requirements:
 C     This routine should be called from any DSA routine that closes a file,
@@ -52,7 +52,7 @@ C
 C  History:
 C     17th Dec 1992.  Original version, KS/AAO.
 C     19th Jul 1995.  Disuse GEN_SYSERR and GEN_ERRMSG, HME/UoE, Starlink.
-C        
+C
 C+
       SUBROUTINE DSA_RENAME_TEMP (STATUS)
 C
@@ -72,7 +72,7 @@ C
       INTEGER GEN_RENAME, ICH_LEN
 C
 C     Local variables
-C    
+C
       INTEGER   IFILE             ! Loop index through open files
       INTEGER   ITEMP             ! Loop index through temp name tables
       LOGICAL   MATCH             ! True if temp file matches open file
@@ -103,10 +103,10 @@ C
                IF (STATUS.NE.0) THEN
                   CALL DSA_WRUSER(
      :                  'Unable to rename the temporary file ')
-                  CALL DSA_WRUSER(FILE_TEMP_NAMES(ITEMP)  
+                  CALL DSA_WRUSER(FILE_TEMP_NAMES(ITEMP)
      :                           (:ICH_LEN(FILE_TEMP_NAMES(ITEMP))))
                   CALL DSA_WRUSER(' as ')
-                  CALL DSA_WRUSER(FILE_REAL_NAMES(ITEMP)  
+                  CALL DSA_WRUSER(FILE_REAL_NAMES(ITEMP)
      :                           (:ICH_LEN(FILE_REAL_NAMES(ITEMP))))
                   CALL DSA_WRUSER('.')
                   CALL DSA_WRFLUSH
@@ -125,4 +125,4 @@ C
 C
       END
 
-            
+

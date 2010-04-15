@@ -29,7 +29,7 @@
       end if
 
       end
-   
+
 
 
 
@@ -43,7 +43,7 @@
       include 'PRM_PAR'
       include 'CNF_PAR'
 
-      integer m, lbnd_in(10), ubnd_in(10), ipin, ipin_var, 
+      integer m, lbnd_in(10), ubnd_in(10), ipin, ipin_var,
      :        lbnd_out(10), ubnd_out(10), lbnd(10), ubnd(10), ipout,
      :        ipout_var, status, nin, nout, i, nel_in, nel_out,
      :        spreads(6), j
@@ -53,17 +53,17 @@
 
       data types/ '_DOUBLE', '_REAL', '_INTEGER' /
 
-      data spreads/ AST__SINC, AST__NEAREST, AST__LINEAR, 
+      data spreads/ AST__SINC, AST__NEAREST, AST__LINEAR,
      :              AST__SINCSINC, AST__SINCCOS, AST__SINCGAUSS /
 
 
       if( status .ne. sai__ok ) return
 
 *  Get the scalar properties of the test.
-      call testfun( 0, name, types(1), 
-     :              lbnd_in, ubnd_in, ipin, ipin_var, 
-     :              lbnd_out, ubnd_out, ipout, ipout_var, 
-     :              lbnd, ubnd, m, params, tol, j, status ) 
+      call testfun( 0, name, types(1),
+     :              lbnd_in, ubnd_in, ipin, ipin_var,
+     :              lbnd_out, ubnd_out, ipout, ipout_var,
+     :              lbnd, ubnd, m, params, tol, j, status )
 
 *  Get the number of input and output axes.
       nin = ast_geti( m, 'Nin', status )
@@ -87,7 +87,7 @@
 *  Allocate memory for input and output data and variance arrays
          call psx_calloc( nel_in, types(i), ipin, status )
          call psx_calloc( nel_in, types(i), ipin_var, status )
-   
+
          call psx_calloc( nel_out, types(i), ipout, status )
          call psx_calloc( nel_out, types(i), ipout_var, status )
 
@@ -95,45 +95,45 @@
          do j = 1, 6
 
 *  Get the scalar properties of the test. This may change the Mapping.
-            call testfun( 0, name, types(i), 
-     :              lbnd_in, ubnd_in, ipin, ipin_var, 
-     :              lbnd_out, ubnd_out, ipout, ipout_var, 
-     :              lbnd, ubnd, m, params, tol, spreads(j), status ) 
+            call testfun( 0, name, types(i),
+     :              lbnd_in, ubnd_in, ipin, ipin_var,
+     :              lbnd_out, ubnd_out, ipout, ipout_var,
+     :              lbnd, ubnd, m, params, tol, spreads(j), status )
 
 *  Fill the input data and variance arrays using the supplied function.
-            call testfun( 1, name, types(i), 
-     :                 lbnd_in, ubnd_in, ipin, ipin_var, 
-     :                 lbnd_out, ubnd_out, ipout, ipout_var, 
-     :                 lbnd, ubnd, m, params, tol, spreads(j), 
-     :                 status ) 
+            call testfun( 1, name, types(i),
+     :                 lbnd_in, ubnd_in, ipin, ipin_var,
+     :                 lbnd_out, ubnd_out, ipout, ipout_var,
+     :                 lbnd, ubnd, m, params, tol, spreads(j),
+     :                 status )
 
 *  Rebin the input data using the AST function appropriate to the
 *  supplied data type.
             if( types(i) .eq. '_REAL' ) then
-               call ast_rebinr( m, 0.0D0, nin, lbnd_in, ubnd_in, 
-     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )), 
-     :              spreads(j), params, 
+               call ast_rebinr( m, 0.0D0, nin, lbnd_in, ubnd_in,
+     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )),
+     :              spreads(j), params,
      :              AST__USEBAD+AST__USEVAR, tol, 100, VAL__BADR,
-     :              nout, lbnd_out, ubnd_out, 
-     :              lbnd, ubnd, %val( cnf_pval( ipout )), 
+     :              nout, lbnd_out, ubnd_out,
+     :              lbnd, ubnd, %val( cnf_pval( ipout )),
      :              %val( cnf_pval( ipout_var )), status )
-  
+
             else if( types(i) .eq. '_DOUBLE' ) then
-               call ast_rebind( m, 0.0D0, nin, lbnd_in, ubnd_in, 
-     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )), 
-     :              spreads(j), params, 
+               call ast_rebind( m, 0.0D0, nin, lbnd_in, ubnd_in,
+     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )),
+     :              spreads(j), params,
      :              AST__USEBAD+AST__USEVAR, tol, 100, VAL__BADD,
-     :              nout, lbnd_out, ubnd_out, 
-     :              lbnd, ubnd, %val( cnf_pval( ipout ) ), 
+     :              nout, lbnd_out, ubnd_out,
+     :              lbnd, ubnd, %val( cnf_pval( ipout ) ),
      :              %val( cnf_pval( ipout_var )), status )
-  
+
             else if( types(i) .eq. '_INTEGER' ) then
-               call ast_rebini( m, 0.0D0, nin, lbnd_in, ubnd_in, 
-     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )), 
-     :              spreads(j), params, 
+               call ast_rebini( m, 0.0D0, nin, lbnd_in, ubnd_in,
+     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )),
+     :              spreads(j), params,
      :              AST__USEBAD+AST__USEVAR, tol, 100, VAL__BADI,
-     :              nout, lbnd_out, ubnd_out, 
-     :              lbnd, ubnd, %val( cnf_pval( ipout )), 
+     :              nout, lbnd_out, ubnd_out,
+     :              lbnd, ubnd, %val( cnf_pval( ipout )),
      :              %val( cnf_pval( ipout_var )), status )
 
             else if( status .eq. sai__ok ) then
@@ -141,14 +141,14 @@
                call msg_setc( 'T', types(i) )
                call err_rep( ' ', 'Bad data type (^T) supplied to '//
      :                       'rebin', status )
-            end if      
+            end if
 
 *  Call the supplied function to test the results.
-            call testfun( 2, name, types(i), 
-     :                    lbnd_in, ubnd_in, ipin, ipin_var, 
-     :                    lbnd_out, ubnd_out, ipout, ipout_var, 
-     :                    lbnd, ubnd, m, params, tol, 
-     :                    spreads(j), status ) 
+            call testfun( 2, name, types(i),
+     :                    lbnd_in, ubnd_in, ipin, ipin_var,
+     :                    lbnd_out, ubnd_out, ipout, ipout_var,
+     :                    lbnd, ubnd, m, params, tol,
+     :                    spreads(j), status )
 
 *  Report the data type and spread function if an error occurred, and
 *  abort.
@@ -162,7 +162,7 @@
             end if
 
          end do
-  
+
 *  Free resources.
          call psx_free( ipout, status )
          call psx_free( ipout_var, status )
@@ -232,16 +232,16 @@
 *  Test 7
 *
 
-      SUBROUTINE TEST7( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST7( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -253,38 +253,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST7R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST7R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST7D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST7D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST7I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST7I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST7',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST7D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST7D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -294,7 +294,7 @@
       INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, NZ
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), SUM, KT
       DOUBLE PRECISION TOL, PARAMS(*), K
@@ -312,7 +312,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_SHIFTMAP( 1, 1.5D0, ' ', STATUS )         
+         M = AST_SHIFTMAP( 1, 1.5D0, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.1
@@ -340,7 +340,7 @@
 
          IF( 'D' .EQ. 'R' .OR. 'D' .EQ. 'D' ) THEN
             GOOD = EQUALD( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 3 )
          END IF
 
@@ -348,7 +348,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST7D Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST7D Data sum is ^S should be ^K',
      :                    STATUS )
          END IF
 
@@ -362,7 +362,7 @@
                      IF( OUT( I - LBND_OUT(1) + 1) .NE. KT ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', I )
-                        CALL MSG_SETD( 'D1', 
+                        CALL MSG_SETD( 'D1',
      :                      DBLE( OUT( I - LBND_OUT(1) + 1)))
                         CALL MSG_SETD( 'K', dble( KT ) )
                         CALL ERR_REP( ' ', 'TEST7D ^I: ^D1 ^K',
@@ -371,12 +371,12 @@
                   ELSE
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', I )
-                     CALL MSG_SETD( 'D1', 
+                     CALL MSG_SETD( 'D1',
      :                   DBLE( OUT( I - LBND_OUT(1) + 1)))
                      CALL ERR_REP( ' ', 'TEST7D ^I: ^D1',
      :               STATUS )
                   END IF
-               END IF                  
+               END IF
             END DO
 
          ELSE
@@ -386,9 +386,9 @@
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'I1', 15 - I )
                   CALL MSG_SETI( 'I2', 16 + I )
-                  CALL MSG_SETD( 'D1', 
+                  CALL MSG_SETD( 'D1',
      :                            DBLE( OUT( 15 - I - LBND_OUT(1) + 1)))
-                  CALL MSG_SETD( 'D2', 
+                  CALL MSG_SETD( 'D2',
      :                            DBLE( OUT( 16 + I - LBND_OUT(1) + 1)))
                   CALL ERR_REP( ' ', 'TEST7D ^I1 (^D1) != '//
      :                          '^I2 (^D2)', STATUS )
@@ -401,9 +401,9 @@
       END
 
 
-      SUBROUTINE TEST7I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST7I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -413,7 +413,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, NZ
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), SUM, KT
       DOUBLE PRECISION TOL, PARAMS(*), K
@@ -431,7 +431,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_SHIFTMAP( 1, 1.5D0, ' ', STATUS )         
+         M = AST_SHIFTMAP( 1, 1.5D0, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.1
@@ -459,7 +459,7 @@
 
          IF( 'I' .EQ. 'R' .OR. 'I' .EQ. 'D' ) THEN
             GOOD = EQUALI( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 3 )
          END IF
 
@@ -467,7 +467,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST7I Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST7I Data sum is ^S should be ^K',
      :                    STATUS )
          END IF
 
@@ -481,7 +481,7 @@
                      IF( OUT( I - LBND_OUT(1) + 1) .NE. KT ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', I )
-                        CALL MSG_SETD( 'D1', 
+                        CALL MSG_SETD( 'D1',
      :                      DBLE( OUT( I - LBND_OUT(1) + 1)))
                         CALL MSG_SETD( 'K', dble( KT ) )
                         CALL ERR_REP( ' ', 'TEST7I ^I: ^D1 ^K',
@@ -490,12 +490,12 @@
                   ELSE
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', I )
-                     CALL MSG_SETD( 'D1', 
+                     CALL MSG_SETD( 'D1',
      :                   DBLE( OUT( I - LBND_OUT(1) + 1)))
                      CALL ERR_REP( ' ', 'TEST7I ^I: ^D1',
      :               STATUS )
                   END IF
-               END IF                  
+               END IF
             END DO
 
          ELSE
@@ -505,9 +505,9 @@
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'I1', 15 - I )
                   CALL MSG_SETI( 'I2', 16 + I )
-                  CALL MSG_SETD( 'D1', 
+                  CALL MSG_SETD( 'D1',
      :                            DBLE( OUT( 15 - I - LBND_OUT(1) + 1)))
-                  CALL MSG_SETD( 'D2', 
+                  CALL MSG_SETD( 'D2',
      :                            DBLE( OUT( 16 + I - LBND_OUT(1) + 1)))
                   CALL ERR_REP( ' ', 'TEST7I ^I1 (^D1) != '//
      :                          '^I2 (^D2)', STATUS )
@@ -520,9 +520,9 @@
       END
 
 
-      SUBROUTINE TEST7R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST7R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -532,7 +532,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, NZ
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), SUM, KT
       DOUBLE PRECISION TOL, PARAMS(*), K
@@ -550,7 +550,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_SHIFTMAP( 1, 1.5D0, ' ', STATUS )         
+         M = AST_SHIFTMAP( 1, 1.5D0, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.1
@@ -578,7 +578,7 @@
 
          IF( 'R' .EQ. 'R' .OR. 'R' .EQ. 'D' ) THEN
             GOOD = EQUALR( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 3 )
          END IF
 
@@ -586,7 +586,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST7R Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST7R Data sum is ^S should be ^K',
      :                    STATUS )
          END IF
 
@@ -600,7 +600,7 @@
                      IF( OUT( I - LBND_OUT(1) + 1) .NE. KT ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', I )
-                        CALL MSG_SETD( 'D1', 
+                        CALL MSG_SETD( 'D1',
      :                      DBLE( OUT( I - LBND_OUT(1) + 1)))
                         CALL MSG_SETD( 'K', dble( KT ) )
                         CALL ERR_REP( ' ', 'TEST7R ^I: ^D1 ^K',
@@ -609,12 +609,12 @@
                   ELSE
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', I )
-                     CALL MSG_SETD( 'D1', 
+                     CALL MSG_SETD( 'D1',
      :                   DBLE( OUT( I - LBND_OUT(1) + 1)))
                      CALL ERR_REP( ' ', 'TEST7R ^I: ^D1',
      :               STATUS )
                   END IF
-               END IF                  
+               END IF
             END DO
 
          ELSE
@@ -624,9 +624,9 @@
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'I1', 15 - I )
                   CALL MSG_SETI( 'I2', 16 + I )
-                  CALL MSG_SETD( 'D1', 
+                  CALL MSG_SETD( 'D1',
      :                            DBLE( OUT( 15 - I - LBND_OUT(1) + 1)))
-                  CALL MSG_SETD( 'D2', 
+                  CALL MSG_SETD( 'D2',
      :                            DBLE( OUT( 16 + I - LBND_OUT(1) + 1)))
                   CALL ERR_REP( ' ', 'TEST7R ^I1 (^D1) != '//
      :                          '^I2 (^D2)', STATUS )
@@ -645,16 +645,16 @@
 *  Test 8
 *
 
-      SUBROUTINE TEST8( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST8( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -666,38 +666,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST8R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST8R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST8D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST8D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST8I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST8I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST8',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST8D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST8D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -707,7 +707,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, NZ,
      :        II, JJ, KK
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), SUM, KT
@@ -734,7 +734,7 @@
          UBND( 2 ) = 5
          SHIFTS(1) = 0.5D0
          SHIFTS(2) = -0.5D0
-         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -768,7 +768,7 @@
 
          IF( 'D' .EQ. 'R' .OR. 'D' .EQ. 'D' ) THEN
             GOOD = EQUALD( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 5 )
          END IF
 
@@ -776,7 +776,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST8D Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST8D Data sum is ^S should be ^K',
      :                    STATUS )
             GO TO 999
          END IF
@@ -818,9 +818,9 @@
                   K = K + 1
                   II = 1 - I
                   JJ = 5 - J
-                  IF( II .GE. LBND_OUT(1) .AND. 
+                  IF( II .GE. LBND_OUT(1) .AND.
      :                II .LE. UBND_OUT(1) .AND.
-     :                JJ .GE. LBND_OUT(2) .AND. 
+     :                JJ .GE. LBND_OUT(2) .AND.
      :                JJ .LE. UBND_OUT(2) ) THEN
                      KK = 6*JJ + ( II + 3 )
 
@@ -847,9 +847,9 @@
 
 
 
-      SUBROUTINE TEST8I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST8I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -859,7 +859,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, NZ,
      :        II, JJ, KK
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), SUM, KT
@@ -886,7 +886,7 @@
          UBND( 2 ) = 5
          SHIFTS(1) = 0.5D0
          SHIFTS(2) = -0.5D0
-         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -920,7 +920,7 @@
 
          IF( 'I' .EQ. 'R' .OR. 'I' .EQ. 'D' ) THEN
             GOOD = EQUALI( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 5 )
          END IF
 
@@ -928,7 +928,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST8I Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST8I Data sum is ^S should be ^K',
      :                    STATUS )
             GO TO 999
          END IF
@@ -970,9 +970,9 @@
                   K = K + 1
                   II = 1 - I
                   JJ = 5 - J
-                  IF( II .GE. LBND_OUT(1) .AND. 
+                  IF( II .GE. LBND_OUT(1) .AND.
      :                II .LE. UBND_OUT(1) .AND.
-     :                JJ .GE. LBND_OUT(2) .AND. 
+     :                JJ .GE. LBND_OUT(2) .AND.
      :                JJ .LE. UBND_OUT(2) ) THEN
                      KK = 6*JJ + ( II + 3 )
 
@@ -999,9 +999,9 @@
 
 
 
-      SUBROUTINE TEST8R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST8R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1011,7 +1011,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, NZ,
      :        II, JJ, KK
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), SUM, KT
@@ -1038,7 +1038,7 @@
          UBND( 2 ) = 5
          SHIFTS(1) = 0.5D0
          SHIFTS(2) = -0.5D0
-         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -1072,7 +1072,7 @@
 
          IF( 'R' .EQ. 'R' .OR. 'R' .EQ. 'D' ) THEN
             GOOD = EQUALR( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 5 )
          END IF
 
@@ -1080,7 +1080,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST8R Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST8R Data sum is ^S should be ^K',
      :                    STATUS )
             GO TO 999
          END IF
@@ -1122,9 +1122,9 @@
                   K = K + 1
                   II = 1 - I
                   JJ = 5 - J
-                  IF( II .GE. LBND_OUT(1) .AND. 
+                  IF( II .GE. LBND_OUT(1) .AND.
      :                II .LE. UBND_OUT(1) .AND.
-     :                JJ .GE. LBND_OUT(2) .AND. 
+     :                JJ .GE. LBND_OUT(2) .AND.
      :                JJ .LE. UBND_OUT(2) ) THEN
                      KK = 6*JJ + ( II + 3 )
 
@@ -1157,16 +1157,16 @@
 *  Test 9
 *
 
-      SUBROUTINE TEST9( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST9( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -1178,38 +1178,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST9R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST9R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST9D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST9D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST9I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST9I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST9',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST9D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST9D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1219,7 +1219,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), KT, SUM
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(3), G(3), W
@@ -1260,7 +1260,7 @@
             SHIFTS(3) = -0.5D0
          END IF
 
-         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -1298,7 +1298,7 @@
 
          IF( 'D' .EQ. 'R' .OR. 'D' .EQ. 'D' ) THEN
             GOOD = EQUALD( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 5 )
          END IF
 
@@ -1306,7 +1306,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST9D Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST9D Data sum is ^S should be ^K',
      :                    STATUS )
             GO TO 999
          END IF
@@ -1387,9 +1387,9 @@
 
 
 
-      SUBROUTINE TEST9I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST9I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1399,7 +1399,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), KT, SUM
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(3), G(3), W
@@ -1440,7 +1440,7 @@
             SHIFTS(3) = -0.5D0
          END IF
 
-         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -1478,7 +1478,7 @@
 
          IF( 'I' .EQ. 'R' .OR. 'I' .EQ. 'D' ) THEN
             GOOD = EQUALI( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 5 )
          END IF
 
@@ -1486,7 +1486,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST9I Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST9I Data sum is ^S should be ^K',
      :                    STATUS )
             GO TO 999
          END IF
@@ -1567,9 +1567,9 @@
 
 
 
-      SUBROUTINE TEST9R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST9R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1579,7 +1579,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*), KT, SUM
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(3), G(3), W
@@ -1620,7 +1620,7 @@
             SHIFTS(3) = -0.5D0
          END IF
 
-         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -1658,7 +1658,7 @@
 
          IF( 'R' .EQ. 'R' .OR. 'R' .EQ. 'D' ) THEN
             GOOD = EQUALR( SUM, KT )
-         ELSE 
+         ELSE
             GOOD = ( ABS( SUM - KT ) .LT. 5 )
          END IF
 
@@ -1666,7 +1666,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETD( 'K', dble( KT ) )
             CALL MSG_SETD( 'S', dble( SUM ) )
-            CALL ERR_REP( ' ', 'TEST9R Data sum is ^S should be ^K', 
+            CALL ERR_REP( ' ', 'TEST9R Data sum is ^S should be ^K',
      :                    STATUS )
             GO TO 999
          END IF
@@ -1753,16 +1753,16 @@
 *  Test 1
 *
 
-      SUBROUTINE TEST1( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST1( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -1774,38 +1774,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST1R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST1R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST1D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST1D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST1I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST1I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST1',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST1D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST1D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1815,7 +1815,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), STATUS, M, I, SPREAD
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       LOGICAL EQUALD, IGNORE
@@ -1833,7 +1833,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_UNITMAP( 1, ' ', STATUS )         
+         M = AST_UNITMAP( 1, ' ', STATUS )
          IF( SPREAD .EQ. AST__GAUSS ) THEN
             PARAMS(1) = 2.0
             PARAMS(2) = 2.0
@@ -1852,9 +1852,9 @@
 
 *  Otherwise check output data and variance arrays look right.
       ELSE
-         DO I = LBND_OUT(1), UBND(1) 
-            IGNORE = ( SPREAD .EQ. AST__GAUSS .AND. 
-     :               ( I .LE. LBND_OUT(1) + 1 .OR. 
+         DO I = LBND_OUT(1), UBND(1)
+            IGNORE = ( SPREAD .EQ. AST__GAUSS .AND.
+     :               ( I .LE. LBND_OUT(1) + 1 .OR.
      :                 I .GE. UBND(1) - 1 ) )
             IF( IGNORE ) THEN
 
@@ -1872,7 +1872,7 @@
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1) ) )
                CALL MSG_SETD( 'B', DBLE( IN_VAR(I-LBND_IN(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST1D ^I: variance ^V != ^B', 
+               CALL ERR_REP( ' ', 'TEST1D ^I: variance ^V != ^B',
      :                       STATUS )
                RETURN
             END IF
@@ -1885,12 +1885,12 @@
                CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1)))
                CALL ERR_REP( ' ', 'TEST1D ^I: ^V != 0.0', STATUS )
                RETURN
-            ELSE IF( .NOT. EQUALD( OUT_VAR( I - LBND_OUT(1) + 1 ), 
+            ELSE IF( .NOT. EQUALD( OUT_VAR( I - LBND_OUT(1) + 1 ),
      :                               0.0D0 ) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1)))
-               CALL ERR_REP( ' ', 'TEST1D ^I: variance ^V != 0.0', 
+               CALL ERR_REP( ' ', 'TEST1D ^I: variance ^V != 0.0',
      :                       STATUS )
                RETURN
             END IF
@@ -1902,9 +1902,9 @@
 
 
 
-      SUBROUTINE TEST1I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST1I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1914,7 +1914,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), STATUS, M, I, SPREAD
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       LOGICAL EQUALI, IGNORE
@@ -1932,7 +1932,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_UNITMAP( 1, ' ', STATUS )         
+         M = AST_UNITMAP( 1, ' ', STATUS )
          IF( SPREAD .EQ. AST__GAUSS ) THEN
             PARAMS(1) = 2.0
             PARAMS(2) = 2.0
@@ -1951,9 +1951,9 @@
 
 *  Otherwise check output data and variance arrays look right.
       ELSE
-         DO I = LBND_OUT(1), UBND(1) 
-            IGNORE = ( SPREAD .EQ. AST__GAUSS .AND. 
-     :               ( I .LE. LBND_OUT(1) + 1 .OR. 
+         DO I = LBND_OUT(1), UBND(1)
+            IGNORE = ( SPREAD .EQ. AST__GAUSS .AND.
+     :               ( I .LE. LBND_OUT(1) + 1 .OR.
      :                 I .GE. UBND(1) - 1 ) )
             IF( IGNORE ) THEN
 
@@ -1971,7 +1971,7 @@
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1) ) )
                CALL MSG_SETD( 'B', DBLE( IN_VAR(I-LBND_IN(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST1I ^I: variance ^V != ^B', 
+               CALL ERR_REP( ' ', 'TEST1I ^I: variance ^V != ^B',
      :                       STATUS )
                RETURN
             END IF
@@ -1984,12 +1984,12 @@
                CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1)))
                CALL ERR_REP( ' ', 'TEST1I ^I: ^V != 0.0', STATUS )
                RETURN
-            ELSE IF( .NOT. EQUALI( OUT_VAR( I - LBND_OUT(1) + 1 ), 
+            ELSE IF( .NOT. EQUALI( OUT_VAR( I - LBND_OUT(1) + 1 ),
      :                               0  ) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1)))
-               CALL ERR_REP( ' ', 'TEST1I ^I: variance ^V != 0.0', 
+               CALL ERR_REP( ' ', 'TEST1I ^I: variance ^V != 0.0',
      :                       STATUS )
                RETURN
             END IF
@@ -2001,9 +2001,9 @@
 
 
 
-      SUBROUTINE TEST1R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST1R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2013,7 +2013,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), STATUS, M, I, SPREAD
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       LOGICAL EQUALR, IGNORE
@@ -2031,7 +2031,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_UNITMAP( 1, ' ', STATUS )         
+         M = AST_UNITMAP( 1, ' ', STATUS )
          IF( SPREAD .EQ. AST__GAUSS ) THEN
             PARAMS(1) = 2.0
             PARAMS(2) = 2.0
@@ -2050,9 +2050,9 @@
 
 *  Otherwise check output data and variance arrays look right.
       ELSE
-         DO I = LBND_OUT(1), UBND(1) 
-            IGNORE = ( SPREAD .EQ. AST__GAUSS .AND. 
-     :               ( I .LE. LBND_OUT(1) + 1 .OR. 
+         DO I = LBND_OUT(1), UBND(1)
+            IGNORE = ( SPREAD .EQ. AST__GAUSS .AND.
+     :               ( I .LE. LBND_OUT(1) + 1 .OR.
      :                 I .GE. UBND(1) - 1 ) )
             IF( IGNORE ) THEN
 
@@ -2070,7 +2070,7 @@
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1) ) )
                CALL MSG_SETD( 'B', DBLE( IN_VAR(I-LBND_IN(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST1R ^I: variance ^V != ^B', 
+               CALL ERR_REP( ' ', 'TEST1R ^I: variance ^V != ^B',
      :                       STATUS )
                RETURN
             END IF
@@ -2083,12 +2083,12 @@
                CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1)))
                CALL ERR_REP( ' ', 'TEST1R ^I: ^V != 0.0', STATUS )
                RETURN
-            ELSE IF( .NOT. EQUALR( OUT_VAR( I - LBND_OUT(1) + 1 ), 
+            ELSE IF( .NOT. EQUALR( OUT_VAR( I - LBND_OUT(1) + 1 ),
      :                               0.0E0 ) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1)))
-               CALL ERR_REP( ' ', 'TEST1R ^I: variance ^V != 0.0', 
+               CALL ERR_REP( ' ', 'TEST1R ^I: variance ^V != 0.0',
      :                       STATUS )
                RETURN
             END IF
@@ -2106,16 +2106,16 @@
 *  Test 2
 *
 
-      SUBROUTINE TEST2( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST2( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -2127,38 +2127,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST2R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST2R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST2D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST2D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST2I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST2I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST2',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST2D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST2D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2168,7 +2168,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), STATUS, M, I, J, K, SPREAD
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC
@@ -2192,7 +2192,7 @@
          UBND_OUT( 2 ) = 5
          LBND( 2 ) = 3
          UBND( 2 ) = 6
-         M = AST_UNITMAP( 2, ' ', STATUS )         
+         M = AST_UNITMAP( 2, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -2219,7 +2219,7 @@
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', K )
                      CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
-                     CALL ERR_REP( ' ', 'TEST2D ^I: ^V != 0', 
+                     CALL ERR_REP( ' ', 'TEST2D ^I: ^V != 0',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALD( OUT_VAR( K ), 0.0D0 ) ) THEN
@@ -2238,9 +2238,9 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN( K - 3 ) ) )
-                     CALL ERR_REP( ' ', 'TEST2D ^I: data ^V != ^B', 
+                     CALL ERR_REP( ' ', 'TEST2D ^I: data ^V != ^B',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALD( OUT( K ), IN( K-3 ) ) ) THEN
@@ -2250,10 +2250,10 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN_VAR( K - 3 ) ) )
-                     CALL ERR_REP( ' ', 
-     :                             'TEST2D ^I: variance ^V != ^B', 
+                     CALL ERR_REP( ' ',
+     :                             'TEST2D ^I: variance ^V != ^B',
      :                             STATUS )
                      RETURN
                   END IF
@@ -2268,9 +2268,9 @@
 
 
 
-      SUBROUTINE TEST2I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST2I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2280,7 +2280,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), STATUS, M, I, J, K, SPREAD
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC
@@ -2304,7 +2304,7 @@
          UBND_OUT( 2 ) = 5
          LBND( 2 ) = 3
          UBND( 2 ) = 6
-         M = AST_UNITMAP( 2, ' ', STATUS )         
+         M = AST_UNITMAP( 2, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -2331,7 +2331,7 @@
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', K )
                      CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
-                     CALL ERR_REP( ' ', 'TEST2I ^I: ^V != 0', 
+                     CALL ERR_REP( ' ', 'TEST2I ^I: ^V != 0',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALI( OUT_VAR( K ), 0  ) ) THEN
@@ -2350,9 +2350,9 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN( K - 3 ) ) )
-                     CALL ERR_REP( ' ', 'TEST2I ^I: data ^V != ^B', 
+                     CALL ERR_REP( ' ', 'TEST2I ^I: data ^V != ^B',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALI( OUT( K ), IN( K-3 ) ) ) THEN
@@ -2362,10 +2362,10 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN_VAR( K - 3 ) ) )
-                     CALL ERR_REP( ' ', 
-     :                             'TEST2I ^I: variance ^V != ^B', 
+                     CALL ERR_REP( ' ',
+     :                             'TEST2I ^I: variance ^V != ^B',
      :                             STATUS )
                      RETURN
                   END IF
@@ -2380,9 +2380,9 @@
 
 
 
-      SUBROUTINE TEST2R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST2R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2392,7 +2392,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), STATUS, M, I, J, K, SPREAD
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC
@@ -2416,7 +2416,7 @@
          UBND_OUT( 2 ) = 5
          LBND( 2 ) = 3
          UBND( 2 ) = 6
-         M = AST_UNITMAP( 2, ' ', STATUS )         
+         M = AST_UNITMAP( 2, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -2443,7 +2443,7 @@
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', K )
                      CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
-                     CALL ERR_REP( ' ', 'TEST2R ^I: ^V != 0', 
+                     CALL ERR_REP( ' ', 'TEST2R ^I: ^V != 0',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALR( OUT_VAR( K ), 0.0E0 ) ) THEN
@@ -2462,9 +2462,9 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN( K - 3 ) ) )
-                     CALL ERR_REP( ' ', 'TEST2R ^I: data ^V != ^B', 
+                     CALL ERR_REP( ' ', 'TEST2R ^I: data ^V != ^B',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALR( OUT( K ), IN( K-3 ) ) ) THEN
@@ -2474,10 +2474,10 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN_VAR( K - 3 ) ) )
-                     CALL ERR_REP( ' ', 
-     :                             'TEST2R ^I: variance ^V != ^B', 
+                     CALL ERR_REP( ' ',
+     :                             'TEST2R ^I: variance ^V != ^B',
      :                             STATUS )
                      RETURN
                   END IF
@@ -2498,16 +2498,16 @@
 *  Test 3
 *
 
-      SUBROUTINE TEST3( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST3( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -2519,38 +2519,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST3R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST3R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST3D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST3D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST3I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST3I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST3',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST3D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST3D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2560,7 +2560,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :  SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC
@@ -2590,7 +2590,7 @@
          UBND_OUT( 3 ) = 2
          LBND( 3 ) = -1
          UBND( 3 ) = 1
-         M = AST_UNITMAP( 3, ' ', STATUS )         
+         M = AST_UNITMAP( 3, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -2626,11 +2626,11 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
-                        CALL ERR_REP( ' ', 'TEST3D ^I: ^V != 0', 
+                        END IF
+                        CALL ERR_REP( ' ', 'TEST3D ^I: ^V != 0',
      :                                STATUS )
                         RETURN
-                     ELSE IF( .NOT. EQUALD( OUT_VAR( K ), 
+                     ELSE IF( .NOT. EQUALD( OUT_VAR( K ),
      ;                                        0.0D0 ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', K )
@@ -2638,7 +2638,7 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL ERR_REP( ' ', 'TEST3D ^I: variance ^V '//
      :                                '!= 0', STATUS )
                         RETURN
@@ -2651,9 +2651,9 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN( K+13 ) ) )
-                        CALL ERR_REP( ' ', 'TEST3D ^I: data ^V != ^B', 
+                        CALL ERR_REP( ' ', 'TEST3D ^I: data ^V != ^B',
      :                                STATUS )
                         RETURN
                      ELSE IF( .NOT. EQUALD( OUT( K ), IN(K+13) ) ) THEN
@@ -2663,10 +2663,10 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN_VAR( K+13 ) ) )
-                        CALL ERR_REP( ' ', 
-     :                                'TEST3D ^I: variance ^V != ^B', 
+                        CALL ERR_REP( ' ',
+     :                                'TEST3D ^I: variance ^V != ^B',
      :                                STATUS )
                         RETURN
                      END IF
@@ -2681,9 +2681,9 @@
 
 
 
-      SUBROUTINE TEST3I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST3I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2693,7 +2693,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :  SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC
@@ -2723,7 +2723,7 @@
          UBND_OUT( 3 ) = 2
          LBND( 3 ) = -1
          UBND( 3 ) = 1
-         M = AST_UNITMAP( 3, ' ', STATUS )         
+         M = AST_UNITMAP( 3, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -2759,11 +2759,11 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
-                        CALL ERR_REP( ' ', 'TEST3I ^I: ^V != 0', 
+                        END IF
+                        CALL ERR_REP( ' ', 'TEST3I ^I: ^V != 0',
      :                                STATUS )
                         RETURN
-                     ELSE IF( .NOT. EQUALI( OUT_VAR( K ), 
+                     ELSE IF( .NOT. EQUALI( OUT_VAR( K ),
      ;                                        0  ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', K )
@@ -2771,7 +2771,7 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL ERR_REP( ' ', 'TEST3I ^I: variance ^V '//
      :                                '!= 0', STATUS )
                         RETURN
@@ -2784,9 +2784,9 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN( K+13 ) ) )
-                        CALL ERR_REP( ' ', 'TEST3I ^I: data ^V != ^B', 
+                        CALL ERR_REP( ' ', 'TEST3I ^I: data ^V != ^B',
      :                                STATUS )
                         RETURN
                      ELSE IF( .NOT. EQUALI( OUT( K ), IN(K+13) ) ) THEN
@@ -2796,10 +2796,10 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN_VAR( K+13 ) ) )
-                        CALL ERR_REP( ' ', 
-     :                                'TEST3I ^I: variance ^V != ^B', 
+                        CALL ERR_REP( ' ',
+     :                                'TEST3I ^I: variance ^V != ^B',
      :                                STATUS )
                         RETURN
                      END IF
@@ -2814,9 +2814,9 @@
 
 
 
-      SUBROUTINE TEST3R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST3R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2826,7 +2826,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :  SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC
@@ -2856,7 +2856,7 @@
          UBND_OUT( 3 ) = 2
          LBND( 3 ) = -1
          UBND( 3 ) = 1
-         M = AST_UNITMAP( 3, ' ', STATUS )         
+         M = AST_UNITMAP( 3, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -2892,11 +2892,11 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
-                        CALL ERR_REP( ' ', 'TEST3R ^I: ^V != 0', 
+                        END IF
+                        CALL ERR_REP( ' ', 'TEST3R ^I: ^V != 0',
      :                                STATUS )
                         RETURN
-                     ELSE IF( .NOT. EQUALR( OUT_VAR( K ), 
+                     ELSE IF( .NOT. EQUALR( OUT_VAR( K ),
      ;                                        0.0E0 ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', K )
@@ -2904,7 +2904,7 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL ERR_REP( ' ', 'TEST3R ^I: variance ^V '//
      :                                '!= 0', STATUS )
                         RETURN
@@ -2917,9 +2917,9 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN( K+13 ) ) )
-                        CALL ERR_REP( ' ', 'TEST3R ^I: data ^V != ^B', 
+                        CALL ERR_REP( ' ', 'TEST3R ^I: data ^V != ^B',
      :                                STATUS )
                         RETURN
                      ELSE IF( .NOT. EQUALR( OUT( K ), IN(K+13) ) ) THEN
@@ -2929,10 +2929,10 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN_VAR( K+13 ) ) )
-                        CALL ERR_REP( ' ', 
-     :                                'TEST3R ^I: variance ^V != ^B', 
+                        CALL ERR_REP( ' ',
+     :                                'TEST3R ^I: variance ^V != ^B',
      :                                STATUS )
                         RETURN
                      END IF
@@ -2953,16 +2953,16 @@
 *  Test 4
 *
 
-      SUBROUTINE TEST4( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST4( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -2974,38 +2974,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST4R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST4R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST4D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST4D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST4I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST4I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST4',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST4D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST4D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3015,7 +3015,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), K
@@ -3033,7 +3033,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_SHIFTMAP( 1, 3.0D0, ' ', STATUS )         
+         M = AST_SHIFTMAP( 1, 3.0D0, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.1
@@ -3048,20 +3048,20 @@
 *  Otherwise check output data and variance arrays look right.
       ELSE
 
-         DO I = LBND_OUT(1), LBND(1) + 2 
-            IF( .NOT. EQUALD( OUT( I - LBND_OUT(1) + 1 ), 
+         DO I = LBND_OUT(1), LBND(1) + 2
+            IF( .NOT. EQUALD( OUT( I - LBND_OUT(1) + 1 ),
      :                          0.0D0) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1 ) ) )
                CALL ERR_REP( ' ', 'TEST4D ^I: ^V != BAD', STATUS )
                RETURN
-            ELSE IF( .NOT. EQUALD( OUT_VAR( I - LBND_OUT(1) + 1 ), 
+            ELSE IF( .NOT. EQUALD( OUT_VAR( I - LBND_OUT(1) + 1 ),
      :                          0.0D0) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST4D ^I: variance ^V != BAD', 
+               CALL ERR_REP( ' ', 'TEST4D ^I: variance ^V != BAD',
      :                       STATUS )
                RETURN
             END IF
@@ -3076,7 +3076,7 @@
                   CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1)))
                ELSE
                   CALL MSG_SETC( 'V', 'BAD' )
-               END IF 
+               END IF
                CALL MSG_SETD( 'B', DBLE( IN( I -3 - LBND_IN(1) + 1 ) ) )
                CALL ERR_REP( ' ', 'TEST4D ^I: data ^V != ^B', STATUS )
                RETURN
@@ -3088,9 +3088,9 @@
                   CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1)))
                ELSE
                   CALL MSG_SETC( 'V', 'BAD' )
-               END IF 
+               END IF
                CALL MSG_SETD( 'B', DBLE( IN_VAR(I-3-LBND_IN(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST4D ^I: variance ^V != ^B', 
+               CALL ERR_REP( ' ', 'TEST4D ^I: variance ^V != ^B',
      :                       STATUS )
                RETURN
             END IF
@@ -3100,9 +3100,9 @@
 
       END
 
-      SUBROUTINE TEST4I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST4I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3112,7 +3112,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), K
@@ -3130,7 +3130,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_SHIFTMAP( 1, 3.0D0, ' ', STATUS )         
+         M = AST_SHIFTMAP( 1, 3.0D0, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.1
@@ -3145,20 +3145,20 @@
 *  Otherwise check output data and variance arrays look right.
       ELSE
 
-         DO I = LBND_OUT(1), LBND(1) + 2 
-            IF( .NOT. EQUALI( OUT( I - LBND_OUT(1) + 1 ), 
+         DO I = LBND_OUT(1), LBND(1) + 2
+            IF( .NOT. EQUALI( OUT( I - LBND_OUT(1) + 1 ),
      :                          0 ) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1 ) ) )
                CALL ERR_REP( ' ', 'TEST4I ^I: ^V != BAD', STATUS )
                RETURN
-            ELSE IF( .NOT. EQUALI( OUT_VAR( I - LBND_OUT(1) + 1 ), 
+            ELSE IF( .NOT. EQUALI( OUT_VAR( I - LBND_OUT(1) + 1 ),
      :                          0 ) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST4I ^I: variance ^V != BAD', 
+               CALL ERR_REP( ' ', 'TEST4I ^I: variance ^V != BAD',
      :                       STATUS )
                RETURN
             END IF
@@ -3173,7 +3173,7 @@
                   CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1)))
                ELSE
                   CALL MSG_SETC( 'V', 'BAD' )
-               END IF 
+               END IF
                CALL MSG_SETD( 'B', DBLE( IN( I -3 - LBND_IN(1) + 1 ) ) )
                CALL ERR_REP( ' ', 'TEST4I ^I: data ^V != ^B', STATUS )
                RETURN
@@ -3185,9 +3185,9 @@
                   CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1)))
                ELSE
                   CALL MSG_SETC( 'V', 'BAD' )
-               END IF 
+               END IF
                CALL MSG_SETD( 'B', DBLE( IN_VAR(I-3-LBND_IN(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST4I ^I: variance ^V != ^B', 
+               CALL ERR_REP( ' ', 'TEST4I ^I: variance ^V != ^B',
      :                       STATUS )
                RETURN
             END IF
@@ -3197,9 +3197,9 @@
 
       END
 
-      SUBROUTINE TEST4R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST4R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3209,7 +3209,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), K
@@ -3227,7 +3227,7 @@
          UBND_OUT( 1 ) = 20
          LBND( 1 ) = 11
          UBND( 1 ) = 17
-         M = AST_SHIFTMAP( 1, 3.0D0, ' ', STATUS )         
+         M = AST_SHIFTMAP( 1, 3.0D0, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.1
@@ -3242,20 +3242,20 @@
 *  Otherwise check output data and variance arrays look right.
       ELSE
 
-         DO I = LBND_OUT(1), LBND(1) + 2 
-            IF( .NOT. EQUALR( OUT( I - LBND_OUT(1) + 1 ), 
+         DO I = LBND_OUT(1), LBND(1) + 2
+            IF( .NOT. EQUALR( OUT( I - LBND_OUT(1) + 1 ),
      :                          0.0E0) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1 ) ) )
                CALL ERR_REP( ' ', 'TEST4R ^I: ^V != BAD', STATUS )
                RETURN
-            ELSE IF( .NOT. EQUALR( OUT_VAR( I - LBND_OUT(1) + 1 ), 
+            ELSE IF( .NOT. EQUALR( OUT_VAR( I - LBND_OUT(1) + 1 ),
      :                          0.0E0) ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST4R ^I: variance ^V != BAD', 
+               CALL ERR_REP( ' ', 'TEST4R ^I: variance ^V != BAD',
      :                       STATUS )
                RETURN
             END IF
@@ -3270,7 +3270,7 @@
                   CALL MSG_SETD( 'V', DBLE( OUT( I - LBND_OUT(1) + 1)))
                ELSE
                   CALL MSG_SETC( 'V', 'BAD' )
-               END IF 
+               END IF
                CALL MSG_SETD( 'B', DBLE( IN( I -3 - LBND_IN(1) + 1 ) ) )
                CALL ERR_REP( ' ', 'TEST4R ^I: data ^V != ^B', STATUS )
                RETURN
@@ -3282,9 +3282,9 @@
                   CALL MSG_SETD( 'V', DBLE( OUT_VAR(I-LBND_OUT(1)+1)))
                ELSE
                   CALL MSG_SETC( 'V', 'BAD' )
-               END IF 
+               END IF
                CALL MSG_SETD( 'B', DBLE( IN_VAR(I-3-LBND_IN(1)+1) ) )
-               CALL ERR_REP( ' ', 'TEST4R ^I: variance ^V != ^B', 
+               CALL ERR_REP( ' ', 'TEST4R ^I: variance ^V != ^B',
      :                       STATUS )
                RETURN
             END IF
@@ -3300,16 +3300,16 @@
 *  Test 5
 *
 
-      SUBROUTINE TEST5( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST5( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -3321,38 +3321,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST5R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST5R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST5D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST5D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST5I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST5I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST5',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST5D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST5D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3362,7 +3362,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(2)
@@ -3388,7 +3388,7 @@
          UBND( 2 ) = 6
          SHIFTS(1) = 3.0D0
          SHIFTS(2) = -1.0D0
-         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -3417,11 +3417,11 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
-                     CALL ERR_REP( ' ', 'TEST5D ^I: ^V != BAD', 
+                     END IF
+                     CALL ERR_REP( ' ', 'TEST5D ^I: ^V != BAD',
      :                             STATUS )
                      RETURN
-                  ELSE IF( .NOT. EQUALD( OUT_VAR( K ), 
+                  ELSE IF( .NOT. EQUALD( OUT_VAR( K ),
      :                                     0.0D0 ) ) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', K )
@@ -3429,7 +3429,7 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL ERR_REP( ' ', 'TEST5D ^I: variance ^V '//
      :                             '!= BAD', STATUS )
                      RETURN
@@ -3442,9 +3442,9 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN( K - 2 ) ) )
-                     CALL ERR_REP( ' ', 'TEST5D ^I: data ^V != ^B', 
+                     CALL ERR_REP( ' ', 'TEST5D ^I: data ^V != ^B',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALD( OUT( K ), IN( K-2 ) ) ) THEN
@@ -3454,10 +3454,10 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN_VAR( K - 2 ) ) )
-                     CALL ERR_REP( ' ', 
-     :                             'TEST5D ^I: variance ^V != ^B', 
+                     CALL ERR_REP( ' ',
+     :                             'TEST5D ^I: variance ^V != ^B',
      :                             STATUS )
                      RETURN
                   END IF
@@ -3472,9 +3472,9 @@
 
 
 
-      SUBROUTINE TEST5I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST5I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3484,7 +3484,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(2)
@@ -3510,7 +3510,7 @@
          UBND( 2 ) = 6
          SHIFTS(1) = 3.0D0
          SHIFTS(2) = -1.0D0
-         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -3539,11 +3539,11 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
-                     CALL ERR_REP( ' ', 'TEST5I ^I: ^V != BAD', 
+                     END IF
+                     CALL ERR_REP( ' ', 'TEST5I ^I: ^V != BAD',
      :                             STATUS )
                      RETURN
-                  ELSE IF( .NOT. EQUALI( OUT_VAR( K ), 
+                  ELSE IF( .NOT. EQUALI( OUT_VAR( K ),
      :                                     0  ) ) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', K )
@@ -3551,7 +3551,7 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL ERR_REP( ' ', 'TEST5I ^I: variance ^V '//
      :                             '!= BAD', STATUS )
                      RETURN
@@ -3564,9 +3564,9 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN( K - 2 ) ) )
-                     CALL ERR_REP( ' ', 'TEST5I ^I: data ^V != ^B', 
+                     CALL ERR_REP( ' ', 'TEST5I ^I: data ^V != ^B',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALI( OUT( K ), IN( K-2 ) ) ) THEN
@@ -3576,10 +3576,10 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN_VAR( K - 2 ) ) )
-                     CALL ERR_REP( ' ', 
-     :                             'TEST5I ^I: variance ^V != ^B', 
+                     CALL ERR_REP( ' ',
+     :                             'TEST5I ^I: variance ^V != ^B',
      :                             STATUS )
                      RETURN
                   END IF
@@ -3594,9 +3594,9 @@
 
 
 
-      SUBROUTINE TEST5R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST5R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3606,7 +3606,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(2)
@@ -3632,7 +3632,7 @@
          UBND( 2 ) = 6
          SHIFTS(1) = 3.0D0
          SHIFTS(2) = -1.0D0
-         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 2, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -3661,11 +3661,11 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
-                     CALL ERR_REP( ' ', 'TEST5R ^I: ^V != BAD', 
+                     END IF
+                     CALL ERR_REP( ' ', 'TEST5R ^I: ^V != BAD',
      :                             STATUS )
                      RETURN
-                  ELSE IF( .NOT. EQUALR( OUT_VAR( K ), 
+                  ELSE IF( .NOT. EQUALR( OUT_VAR( K ),
      :                                     0.0E0 ) ) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', K )
@@ -3673,7 +3673,7 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL ERR_REP( ' ', 'TEST5R ^I: variance ^V '//
      :                             '!= BAD', STATUS )
                      RETURN
@@ -3686,9 +3686,9 @@
                         CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN( K - 2 ) ) )
-                     CALL ERR_REP( ' ', 'TEST5R ^I: data ^V != ^B', 
+                     CALL ERR_REP( ' ', 'TEST5R ^I: data ^V != ^B',
      :                             STATUS )
                      RETURN
                   ELSE IF( .NOT. EQUALR( OUT( K ), IN( K-2 ) ) ) THEN
@@ -3698,10 +3698,10 @@
                         CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                      ELSE
                         CALL MSG_SETC( 'V', 'BAD' )
-                     END IF 
+                     END IF
                      CALL MSG_SETD( 'B', DBLE( IN_VAR( K - 2 ) ) )
-                     CALL ERR_REP( ' ', 
-     :                             'TEST5R ^I: variance ^V != ^B', 
+                     CALL ERR_REP( ' ',
+     :                             'TEST5R ^I: variance ^V != ^B',
      :                             STATUS )
                      RETURN
                   END IF
@@ -3722,16 +3722,16 @@
 *  Test 6
 *
 
-      SUBROUTINE TEST6( DO, NAME, TYPE, 
-     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR, 
-     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR, 
-     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+      SUBROUTINE TEST6( DO, NAME, TYPE,
+     :                  LBND_IN, UBND_IN, IPIN, IPIN_VAR,
+     :                  LBND_OUT, UBND_OUT, IPOUT, IPOUT_VAR,
+     :                  LBND, UBND, M, PARAMS, TOL, J, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'CNF_PAR'
 
-      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
      :        STATUS, DO, J
       DOUBLE PRECISION TOL, PARAMS(*)
@@ -3743,38 +3743,38 @@
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST6R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST6R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST6D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST6D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST6I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
-     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
-     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
-     :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
+         CALL TEST6I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)),
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT,
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)),
+     :                LBND, UBND, M, PARAMS, TOL, J, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'T', TYPE )
          CALL ERR_REP( ' ', 'Bad data type (^T) supplied to TEST6',
      :                    STATUS )
-      END IF      
+      END IF
 
       END
 
 
 
 
-      SUBROUTINE TEST6D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST6D( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3784,7 +3784,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       DOUBLE PRECISION IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(3)
@@ -3817,7 +3817,7 @@
          SHIFTS(1) = 3.0D0
          SHIFTS(2) = -1.0D0
          SHIFTS(3) = 1.0D0
-         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -3851,11 +3851,11 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
-                        CALL ERR_REP( ' ', 'TEST6D ^I: ^V != BAD', 
+                        END IF
+                        CALL ERR_REP( ' ', 'TEST6D ^I: ^V != BAD',
      :                                STATUS )
                         RETURN
-                     ELSE IF( .NOT. EQUALD( OUT_VAR( K ), 
+                     ELSE IF( .NOT. EQUALD( OUT_VAR( K ),
      :                                        0.0D0 ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', K )
@@ -3863,7 +3863,7 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL ERR_REP( ' ', 'TEST6D ^I: variance ^V '//
      :                                '!= BAD', STATUS )
                         RETURN
@@ -3876,9 +3876,9 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN( K-2 ) ) )
-                        CALL ERR_REP( ' ', 'TEST6D ^I: data ^V != ^B', 
+                        CALL ERR_REP( ' ', 'TEST6D ^I: data ^V != ^B',
      :                                STATUS )
                         RETURN
                      ELSE IF( .NOT. EQUALD( OUT( K ), IN(K-2) ) ) THEN
@@ -3888,10 +3888,10 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN_VAR( K-2 ) ) )
-                        CALL ERR_REP( ' ', 
-     :                                'TEST6D ^I: variance ^V != ^B', 
+                        CALL ERR_REP( ' ',
+     :                                'TEST6D ^I: variance ^V != ^B',
      :                                STATUS )
                         RETURN
                      END IF
@@ -3906,9 +3906,9 @@
 
 
 
-      SUBROUTINE TEST6I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST6I( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3918,7 +3918,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       INTEGER IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(3)
@@ -3951,7 +3951,7 @@
          SHIFTS(1) = 3.0D0
          SHIFTS(2) = -1.0D0
          SHIFTS(3) = 1.0D0
-         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -3985,11 +3985,11 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
-                        CALL ERR_REP( ' ', 'TEST6I ^I: ^V != BAD', 
+                        END IF
+                        CALL ERR_REP( ' ', 'TEST6I ^I: ^V != BAD',
      :                                STATUS )
                         RETURN
-                     ELSE IF( .NOT. EQUALI( OUT_VAR( K ), 
+                     ELSE IF( .NOT. EQUALI( OUT_VAR( K ),
      :                                        0  ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', K )
@@ -3997,7 +3997,7 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL ERR_REP( ' ', 'TEST6I ^I: variance ^V '//
      :                                '!= BAD', STATUS )
                         RETURN
@@ -4010,9 +4010,9 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN( K-2 ) ) )
-                        CALL ERR_REP( ' ', 'TEST6I ^I: data ^V != ^B', 
+                        CALL ERR_REP( ' ', 'TEST6I ^I: data ^V != ^B',
      :                                STATUS )
                         RETURN
                      ELSE IF( .NOT. EQUALI( OUT( K ), IN(K-2) ) ) THEN
@@ -4022,10 +4022,10 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN_VAR( K-2 ) ) )
-                        CALL ERR_REP( ' ', 
-     :                                'TEST6I ^I: variance ^V != ^B', 
+                        CALL ERR_REP( ' ',
+     :                                'TEST6I ^I: variance ^V != ^B',
      :                                STATUS )
                         RETURN
                      END IF
@@ -4040,9 +4040,9 @@
 
 
 
-      SUBROUTINE TEST6R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT, 
-     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M, 
-     :                  PARAMS, TOL, SPREAD, STATUS ) 
+      SUBROUTINE TEST6R( DO, LBND_IN, UBND_IN, IN, IN_VAR, LBND_OUT,
+     :                  UBND_OUT, OUT, OUT_VAR, LBND, UBND, M,
+     :                  PARAMS, TOL, SPREAD, STATUS )
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -4052,7 +4052,7 @@
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
-      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
+      INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*),
      :        SPREAD, LBND(*), UBND(*), STATUS, M, I, J, K, L, K2
       REAL IN(*), IN_VAR(*), OUT(*), OUT_VAR(*)
       DOUBLE PRECISION TOL, PARAMS(*), KFAC, SHIFTS(3)
@@ -4085,7 +4085,7 @@
          SHIFTS(1) = 3.0D0
          SHIFTS(2) = -1.0D0
          SHIFTS(3) = 1.0D0
-         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )         
+         M = AST_SHIFTMAP( 3, SHIFTS, ' ', STATUS )
          PARAMS(1) = 2.0
          PARAMS(2) = 2.0
          TOL = 0.0
@@ -4119,11 +4119,11 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
-                        CALL ERR_REP( ' ', 'TEST6R ^I: ^V != BAD', 
+                        END IF
+                        CALL ERR_REP( ' ', 'TEST6R ^I: ^V != BAD',
      :                                STATUS )
                         RETURN
-                     ELSE IF( .NOT. EQUALR( OUT_VAR( K ), 
+                     ELSE IF( .NOT. EQUALR( OUT_VAR( K ),
      :                                        0.0E0 ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', K )
@@ -4131,7 +4131,7 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K )))
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL ERR_REP( ' ', 'TEST6R ^I: variance ^V '//
      :                                '!= BAD', STATUS )
                         RETURN
@@ -4144,9 +4144,9 @@
                            CALL MSG_SETD( 'V', DBLE( OUT( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN( K-2 ) ) )
-                        CALL ERR_REP( ' ', 'TEST6R ^I: data ^V != ^B', 
+                        CALL ERR_REP( ' ', 'TEST6R ^I: data ^V != ^B',
      :                                STATUS )
                         RETURN
                      ELSE IF( .NOT. EQUALR( OUT( K ), IN(K-2) ) ) THEN
@@ -4156,10 +4156,10 @@
                            CALL MSG_SETD( 'V', DBLE( OUT_VAR( K ) ) )
                         ELSE
                            CALL MSG_SETC( 'V', 'BAD' )
-                        END IF 
+                        END IF
                         CALL MSG_SETD( 'B', DBLE( IN_VAR( K-2 ) ) )
-                        CALL ERR_REP( ' ', 
-     :                                'TEST6R ^I: variance ^V != ^B', 
+                        CALL ERR_REP( ' ',
+     :                                'TEST6R ^I: variance ^V != ^B',
      :                                STATUS )
                         RETURN
                      END IF

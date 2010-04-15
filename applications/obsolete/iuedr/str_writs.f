@@ -1,5 +1,5 @@
       SUBROUTINE str_WRITS(CNTRL, SVALUE, MAXC, LINE, POS)
- 
+
 *+
 *
 *   Name:
@@ -39,17 +39,17 @@
 *   Import:
       BYTE CNTRL(MAXTOK)    ! control string
       BYTE SVALUE(MAXTOK)   ! string value
- 
+
       INTEGER MAXC          ! size of value
- 
+
 *   Import/Export:
       BYTE LINE(MAXC)       ! line to be modified
- 
+
       INTEGER POS           ! character position
- 
+
 *   External references:
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL FIXED         ! whether fixed point
       LOGICAL RIGHT         ! whether right justified

@@ -27,7 +27,7 @@
 *        The column containing the trailing quote of the string value.
 *        This is set to zero if no string value could be found.
 *     VALUE = CHARACTER * ( * ) (Returned)
-*        The character value.  CARD should contain at least 68 
+*        The character value.  CARD should contain at least 68
 *        characters.  A blabnnk string is returned if the header failed
 *        to contain a character value.
 *     STATUS = INTEGER (Given and Returned)
@@ -37,7 +37,7 @@
 *     -  It is assumed that the header conforms to the FITS Standard,
 *     with one exception.  Single quotes within a string---these should
 *     be doubled---are detected provided that the next solidus after a
-*     single quote will be a comment delimiter rather than literal text 
+*     single quote will be a comment delimiter rather than literal text
 *     in the string.
 
 *  Copyright:
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -71,7 +71,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,7 +104,7 @@
       CHARACTER*( VALLN ) CDUMMY ! Work string for value
       INTEGER COLEQS             ! Character pointer to the equals sign
       INTEGER CPOS               ! Integer pointer for appending
-                                 ! right-justified non-character values 
+                                 ! right-justified non-character values
       INTEGER ENDW               ! Column position of the end of the
                                  ! header value (w.r.t. = sign)
       CHARACTER*( VALLN ) FITDAT ! FITS value
@@ -135,7 +135,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the first equals 
+*  Locate the first equals
       COLEQS = INDEX( HEADER, '=' )
 
 *  Copy the buffer from the equals sign and remove the leading blanks.
@@ -149,7 +149,7 @@
 *  allow for additional or no spaces between the value and equals sign.
 *  Search for the leading quote.
        IF ( CDUMMY( 1:1 ) .EQ. '''' ) THEN
-         
+
 *  Initialise the character value.
          FITDAT = ' '
 
@@ -160,7 +160,7 @@
 
 *  Determine where the trailing quote is located.
 *  ==============================================
- 
+
 *  First look for any double quotes.  These mean a single quote, so
 *  O'Hara appears as O''Hara in a FITS card image.  Start the search
 *  immediately after the leading quote, and subsequently immediately
@@ -173,7 +173,7 @@
          NCSTQ = NCSTQ + 1
          DO WHILE ( NCDQ .NE. 0 )
             NCDQ = INDEX( HEADER( NCSTQ: ), '''''' )
- 
+
 *  If there is no double quote no action is necessary.  When there is,
 *  we form part of the value, removing the second quote.
             IF ( NCDQ .GT. 0 ) THEN
@@ -187,7 +187,7 @@
 *  quote.
                NCSTQ = NCSTQ + NCDQ + 1
             END IF
-         END DO 
+         END DO
 
 *  We need some method for detecting single quotes within the string.
 *  Any that lie before the last correctly doubled quote will be in the

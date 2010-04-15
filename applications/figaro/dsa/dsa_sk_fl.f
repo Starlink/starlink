@@ -8,7 +8,7 @@ C  Function:
 C     Determines whether or not a data array may contain flagged values.
 C
 C  Description:
-C     This routine looks to see if a the main data array in a data structure 
+C     This routine looks to see if a the main data array in a data structure
 C     may contain `flagged' values (otherwise known as `bad' values or
 C     `magic numbers').  If this routine indicates that this is the case,
 C     is does not guarantee that flagged values are actually present in
@@ -21,7 +21,7 @@ C     quite naturally have pixels with a value of -128, and a character
 C     array may have characters which are '*', even if these are the flag
 C     values for those types).  Note that if a data quality array is present
 C     then its contents may be used to flag pixels in the data array, but this
-C     routine ignores that. DSA_SEEK_QUALITY should be used to test for 
+C     routine ignores that. DSA_SEEK_QUALITY should be used to test for
 C     the presence of a quality array.
 C
 C  Language:
@@ -40,7 +40,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
@@ -91,7 +91,7 @@ C
 C     Local variables
 C
       INTEGER   DTA_STATUS                  ! Status from seek - ignored
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     DSA system common
 C

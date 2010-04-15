@@ -27,7 +27,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -43,7 +43,7 @@
       INTEGER          CHR_LEN   ! CHR string-length function
 
 *  Status:
-      INTEGER STATUS             ! Global status 
+      INTEGER STATUS             ! Global status
 
 *  Local Constants:
 

@@ -541,7 +541,7 @@ When moving vertically over several lines, EDSTAR keeps the cursor on
 the same column throughout (subject to the length of the lines, but
 returning to the correct column after visiting a short line). Neither
 LSE nor emacs does this particularly well on their own.
- 
+
 Recent Changes:
 ==============
 Version 0.5 of EDSTAR incorporates the following recent changes:

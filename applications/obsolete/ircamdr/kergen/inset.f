@@ -53,7 +53,7 @@
      :  SET,   ! "set" of possible values
      :  STRING ! string to be tested for inclusion in the "set"
 *    External references :
-      LOGICAL 
+      LOGICAL
      :  CHR_SIMLR   ! true if two strings given match
       INTEGER
      :  CHR_LEN,    ! length of string ignoring stripped blanks
@@ -77,7 +77,7 @@
 *    get the length of the string, stripping trailing blanks
       STRLEN = CHR_LEN( STRING )
 
-*    initialise the current position pointer - points to the 
+*    initialise the current position pointer - points to the
 *    first character of the next string
       CURR = 1
 

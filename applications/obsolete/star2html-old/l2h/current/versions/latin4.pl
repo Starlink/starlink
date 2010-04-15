@@ -104,95 +104,95 @@ sub do_cmd_times { join('', &iso_map("times", ""), $_[0]);}
 
 %iso_8859_4_character_map
      = (
-	'Aacute', '&#193;', 	# capital A, acute accent 
-	'Acirc', '&#194;', 	# capital A, circumflex accent 
+	'Aacute', '&#193;', 	# capital A, acute accent
+	'Acirc', '&#194;', 	# capital A, circumflex accent
        'AElig', '&#198;',       # capital AE diphthong (ligature)
 	'Aogon', '&#161;',	# capital A, ogonek accent
 	'Amacr', '&#192;',	# capital A, macron accent
        'Aring', '&#197;',       # capital A, ring
         'Atilde', '&#195;',     # capital A, tilde
-	'Auml', '&#196;', 	# capital A, dieresis or umlaut mark   
-	'Ccaron', '&#200;', 	# capital C, caron accent 
+	'Auml', '&#196;', 	# capital A, dieresis or umlaut mark
+	'Ccaron', '&#200;', 	# capital C, caron accent
 	'Dstrok', '&#208;', 	# capital D, stroke
-	'ETH', '&#208;', 	# capital Eth, Icelandic 
-	'Eacute', '&#201;', 	# capital E, acute accent 
+	'ETH', '&#208;', 	# capital Eth, Icelandic
+	'Eacute', '&#201;', 	# capital E, acute accent
 	'Edot', '&#204;',	# capital E, dot above
 	'Eng', '&#189;',	# capital Eng (Sami)
-	'Eogon', '&#202;', 	# capital E, ogonek accent 
+	'Eogon', '&#202;', 	# capital E, ogonek accent
 	'Emacr', '&#170;',	# capital E, macron accent
-	'Euml', '&#203;', 	# capital E, dieresis or umlaut mark 
+	'Euml', '&#203;', 	# capital E, dieresis or umlaut mark
 	'Gcedil', '&#171;',	# capital G, cedilla accent
-	'Iacute', '&#205;', 	# capital I, acute accent 
-	'Icirc', '&#206;', 	# capital I, circumflex accent 
+	'Iacute', '&#205;', 	# capital I, acute accent
+	'Icirc', '&#206;', 	# capital I, circumflex accent
 	'Imacr', '&#207;',	# capital I, macron accent
 	'Iogon', '&#199;',	# capital I, ogonek accent
 	'Itilde', '&#165;',	# capital I, tilde accent
 	'Lcedil', '&#166;',	# capital L, cedil accent
 	'Kcedil', '&#211;',	# capital K, cedilla accent
 	'Ncedil', '&#209;',	# capital N, cedil accent
-	'Ocirc', '&#212;', 	# capital O, circumflex accent 
+	'Ocirc', '&#212;', 	# capital O, circumflex accent
 	'Omacr', '&#210;',	# capital O, macron accent
        'Oslash', '&#216;',      # capital O, slash
        'Otilde', '&#213;',      # capital O, tilde
 	'Ouml', '&#214;', 	# capital O, dieresis or umlaut mark
-	'Racute', '&#192;', 	# capital R, acute accent 
+	'Racute', '&#192;', 	# capital R, acute accent
 	'Rcedil', '&#163;',	# capital R, cedilla accent
 	'Scaron', '&#169;',	# capital S, caron accent
 	'Tstrok', '&#172;',	# capital T, stroke
-	'Uacute', '&#218;', 	# capital U, acute accent 
+	'Uacute', '&#218;', 	# capital U, acute accent
        'Ucirc', '&#219;',       # capital U, circumflex accent
 	'Umacr', '&#222;',	# capital U, macron accent
 	'Uogon', '&#217;',	# capital U, ogonek accent
 	'Utilde', '&#221;',	# capital U, tilde accent
-	'Uuml', '&#220;', 	# capital U, dieresis or umlaut mark 
+	'Uuml', '&#220;', 	# capital U, dieresis or umlaut mark
 	'Zcaron', '&#174;',	# capital Z, caron accent
-	'aacute', '&#225;', 	# small a, acute accent 
-	'acirc', '&#226;', 	# small a, circumflex accent 
+	'aacute', '&#225;', 	# small a, acute accent
+	'acirc', '&#226;', 	# small a, circumflex accent
        'aelig', '&#230;',       # small ae diphthong (ligature)
 	'amacr', '&#224;',	# small a, macron accent
-	'amp', '&amp;', 	# ampersand 
+	'amp', '&amp;', 	# ampersand
 	'aogon', '&#177;',	# small a, ogonek accent
        'aring', '&#229;',       # small a, ring
         'atilde', '&#227;',     # small a, tilde
-	'auml', '&#228;', 	# small a, dieresis or umlaut mark   
-	'ccaron', '&#232;', 	# small c, caron accent 
+	'auml', '&#228;', 	# small a, dieresis or umlaut mark
+	'ccaron', '&#232;', 	# small c, caron accent
 	'dstrok', '&#240;', 	# small d, stroke
-	'eacute', '&#233;', 	# small e, acute accent 
+	'eacute', '&#233;', 	# small e, acute accent
 	'edot', '&#236;',	# small e, dot above
 	'emacr', '&#186;',	# small e, macron accent
-	'eogon', '&#234;', 	# small e, ogonek accent 
+	'eogon', '&#234;', 	# small e, ogonek accent
 	'eng', '&#191;',	# small eng (Sami)
 	'eth', '&#240;', 	# small eth, Icelandic
-	'euml', '&#235;', 	# small e, dieresis or umlaut mark 
+	'euml', '&#235;', 	# small e, dieresis or umlaut mark
 	'gcedil', '&#187;',	# small g, cedilla accent
-	'gt', '&#62;',		# greater than 
-	'iacute', '&#237;', 	# small i, acute accent 
-	'icirc', '&#238;', 	# small i, circumflex accent 
+	'gt', '&#62;',		# greater than
+	'iacute', '&#237;', 	# small i, acute accent
+	'icirc', '&#238;', 	# small i, circumflex accent
 	'imacr', '&#239;',	# small i, macron accent
 	'iogon', '&#231;',	# small i, ogonek accent
 	'itilde', '&#181;',	# small i, tilde accent
 	'kcedil', '&#243;',	# small k, cedilla accent
 	'kgreen', '&#162;',	# small kra (Greenlandic)
 	'lcedil', '&#182;',	# small l, cedil accent
-	'lt', '&lt;',		# less than 
+	'lt', '&lt;',		# less than
 	'ncedil', '&#241;',	# small n, cedil accent
-	'ocirc', '&#244;', 	# small o, circumflex accent 
+	'ocirc', '&#244;', 	# small o, circumflex accent
 	'omacr', '&#242;',	# small o, macron accent
        'oslash', '&#248;',      # small o, slash
        'otilde', '&#245;',      # small o, tilde
 	'ouml', '&#246;', 	# small o, dieresis or umlaut mark
 	'quot', '&quot;',	# double quote
-	'racute', '&#224;', 	# small r, acute accent 
+	'racute', '&#224;', 	# small r, acute accent
 	'rcedil', '&#179;',	# small r, cedilla accent
 	'scaron', '&#185;',	# small s, caron accent
-	'szlig', '&#223;', 	# small sharp s, German (sz ligature) 
+	'szlig', '&#223;', 	# small sharp s, German (sz ligature)
 	'tstrok', '&#188;',	# small t, stroke
-	'uacute', '&#250;', 	# small u, acute accent 
+	'uacute', '&#250;', 	# small u, acute accent
        'ucirc', '&#251;',       # small u, circumflex accent
 	'umacr', '&#254;',	# small u, macron accent
 	'uogon', '&#249;',	# small u, ogonek accent
 	'utilde', '&#253;',	# small u, tilde accent
-	'uuml', '&#252;', 	# small u, dieresis or umlaut mark 
+	'uuml', '&#252;', 	# small u, dieresis or umlaut mark
 	'zcaron', '&#190;',	# small z, caron accent
 
 # These do not have HTML mnemonic names ...

@@ -18,7 +18,7 @@
 *     The supplied Gaussian parameters from BEAMFIT are written to the
 *     environment.  Each output parameter is a two-element vector
 *     containing the fit coefficient in the first element, and its error
-*     in the second for the primary beam. 
+*     in the second for the primary beam.
 *
 *     The parameters written are as follows.
 *
@@ -42,12 +42,12 @@
 *
 *    Two further parameters are written if the number of beam
 *    positions is more than one.  Each is an array of length twice the
-*    number of secondary beams, storing alternatinng value then error 
-*    for each secondary beam position, starting with the first and 
+*    number of secondary beams, storing alternatinng value then error
+*    for each secondary beam position, starting with the first and
 *    progressing in order.
 *
 *        OFFSET   LITERAL   The radial offsets of the secondary beam
-*                           positions from the primary beam, each 
+*                           positions from the primary beam, each
 *                           formatted as a single single string in the
 *                           reference co-ordinate Frame
 *        PA      _REAL      The position angles of the secondary beam
@@ -71,7 +71,7 @@
 *        used.
 *     SIGMA( NP ) = DOUBLE PRECISION (Given)
 *        The errors in the fit parameters.   Spatial co-ordinates should
-*        be measured in the reporting Frame.  Only the first BF_MXCOEF 
+*        be measured in the reporting Frame.  Only the first BF_MXCOEF
 *        elements are used.
 *     NBEAM = INTEGER (Given)
 *        The number of beam positions.
@@ -82,11 +82,11 @@
 *         The polar co-ordinates of the beam features with respect to
 *         the primary beam measured in the current co-ordinate Frame.
 *         The orientation is a position angle in degrees, measured from
-*         North through East if the current Frame is a Skyframe, or 
+*         North through East if the current Frame is a Skyframe, or
 *         anticlockwise from the Y axis otherwise.  The POLAR(*,1)
 *         values of the primary beam are ignored.
 *     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Given)
-*         The standard-deviation errors associated with the polar 
+*         The standard-deviation errors associated with the polar
 *          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
 *         values of the primary beam are ignored.
 *     RMS = DOUBLE PRECISION (Given)
@@ -96,7 +96,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -153,7 +153,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message-system public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
 
@@ -213,7 +213,7 @@
 
 *  Inquire current number of SkyFrame format precision digits
 *  and whether the axis should be formatted as a time axis.
-*  Not all types of Frame have an AsTime attribute, so check for 
+*  Not all types of Frame have an AsTime attribute, so check for
 *  and annull any errors that occur when getting the value of AsTime.
       PREC( 1 ) = AST_GETI( RFRM, 'Digits(1)', STATUS )
       PREC( 2 ) = AST_GETI( RFRM, 'Digits(2)', STATUS )
@@ -244,7 +244,7 @@
 *  CENTRE
 *  ======
 
-*  Now write the primary-beam position out to the output parameters. 
+*  Now write the primary-beam position out to the output parameters.
 *  The complete set of axis values (separated by spaces) is written to
 *  a buffer.
       IAT = 0
@@ -332,7 +332,7 @@
 
       CALL PAR_PUT1C( 'REFOFF', 2, LINE, STATUS )
 
-      
+
 *  OFFSET and PA of secondary beam positions
 *  =========================================
       IF ( NBEAM .GT. 1 ) THEN
@@ -340,14 +340,14 @@
          DO IB = 2, NBEAM
 
 *  Now write the secondary-beam polar position and error out to the output
-*  parameters.  The complete set of values (separated by spaces) is 
+*  parameters.  The complete set of values (separated by spaces) is
 *  written to OFFSET.
             K = K + 1
             LINE( K ) = AST_FORMAT( RFRM, 1, POLAR( 1, IB ), STATUS )
 
             K = K + 1
             IF ( POLSIG( 1, IB ) .NE. VAL__BADD ) THEN
-               LINE( K ) = AST_FORMAT( RFRM, 1, POLSIG( 1, IB ), 
+               LINE( K ) = AST_FORMAT( RFRM, 1, POLSIG( 1, IB ),
      :                                 STATUS )
             ELSE
                LINE( K ) = 'bad'

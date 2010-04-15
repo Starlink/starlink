@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine maps the main data array in an NDF, returning
-*     the address of the dynamic memory array that may be used to 
+*     the address of the dynamic memory array that may be used to
 *     access it. This routine makes sure there are no bad values in
 *     the mapped array. If necessary, bad-value information will be
 *     moved to a separate quality array, which for update access may
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,7 +158,7 @@
          CALL NDF_MAP( DSA__REFID1(SLOT), 'DATA', NDFTYP, 'READ',
      :      ADDRESS, NELM, STATUS )
          CALL NDF_BAD( DSA__REFID1(SLOT), 'DATA', .TRUE.,
-     :      EXIST, STATUS ) 
+     :      EXIST, STATUS )
 
 
 *     If read access to data with bad values.

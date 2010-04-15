@@ -13,14 +13,14 @@
 *     CALL NDG_NDFAS( IGRP, INDEX, MODE, INDF, STATUS )
 
 *  Description:
-*     The routine returns an NDF identifier for an existing NDF. The 
+*     The routine returns an NDF identifier for an existing NDF. The
 *     name of the NDF is held at a given index within a given group.
 *     It is equivalent to NDF_ASSOC.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the names of NDFs. This
-*        will often be created using NDG_ASSOC, but groups created "by 
+*        will often be created using NDG_ASSOC, but groups created "by
 *        hand" using GRP directly (i.e. without the supplemental groups
 *        created by NDG_ASSOC) can also be used.
 *     INDEX = INTEGER (Given)
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -122,14 +122,14 @@
 *  Get the required name.
       CALL GRP_GET( IGRP, INDEX, 1, NAME, STATUS )
 
-*  If the name could not be obtained, set the name blank and abort.     
+*  If the name could not be obtained, set the name blank and abort.
       IF ( STATUS .NE. SAI__OK ) THEN
          NAME = ' '
          GO TO 999
       END IF
 
 *  See if the supplied group was created by NDG. This will be the case if
-*  the group has associated supplemental information stored in "slave" 
+*  the group has associated supplemental information stored in "slave"
 *  groups.
       CALL GRP_OWN( IGRP, IGRPD, STATUS )
       IF( IGRPD .NE. GRP__NOID ) THEN
@@ -144,11 +144,11 @@
 *  has the benefit that spaces within file names will be interpreted
 *  correctly by HDS. First get the original value of the SHELL tuning
 *  parameter and then set it to -1 to indicate that no expansion of
-*  shell metacharacters should be performed by HDS. 
-         CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )         
-         CALL HDS_TUNE( 'SHELL', -1, STATUS )         
+*  shell metacharacters should be performed by HDS.
+         CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )
+         CALL HDS_TUNE( 'SHELL', -1, STATUS )
       ELSE
-         SHELL = -1         
+         SHELL = -1
       END IF
 
 *  Open the NDF.
@@ -157,7 +157,7 @@
 *  Re-instate the original value of the HDS SHELL tuning parameter.
       IF( SHELL .NE. -1 ) THEN
          CALL ERR_BEGIN( STATUS )
-         CALL HDS_TUNE( 'SHELL', SHELL, STATUS )         
+         CALL HDS_TUNE( 'SHELL', SHELL, STATUS )
          CALL ERR_END( STATUS )
       END IF
 
@@ -172,7 +172,7 @@
      :                    'identifier for ''^NAME''', STATUS )
          ELSE
             CALL ERR_REP( 'NDG_NDFAS_ERR2', 'Unable to get an NDF '//
-     :                    'identifier for an existing data set.', 
+     :                    'identifier for an existing data set.',
      :                    STATUS )
          END IF
 

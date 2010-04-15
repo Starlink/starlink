@@ -5,10 +5,10 @@ proc polreg
   askname (polly_3) "Image at 45 degs. \pol45\ : "
   askname (polly_2) "Image at 22 degs. \pol22\ : "
   askname (polly_4) "Image at 67 degs. \pol67\ : "
-  out_1 = polly_1 & "r" 
-  out_2 = polly_2 & "r" 
-  out_3 = polly_3 & "r" 
-  out_4 = polly_4 & "r" 
+  out_1 = polly_1 & "r"
+  out_2 = polly_2 & "r"
+  out_3 = polly_3 & "r"
+  out_4 = polly_4 & "r"
   print "Final output images will be called :"
   print (out_1) "," (out_2) "," (out_3) "," (out_4)
   obeyw rapi2d SHSIZE (polly_1) \

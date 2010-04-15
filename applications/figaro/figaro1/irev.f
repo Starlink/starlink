@@ -8,7 +8,7 @@ C     is treated as an image with one dimension 1).  The reversal
 C     is in the X-direction or the Y-direction.
 C
 C     Command parameters -
-C  
+C
 C     IMAGE    (Character) The name of the file containing the image.
 C              The data and error components are reversed; the quality
 C              component is reversed implicitly by internally using
@@ -31,8 +31,8 @@ C     2nd  Jul 1984  PCP / CIT.  Renamed from IREVX to IREV, now
 C                    supports both IREVX and IREVY.
 C     27th May 1986  KS / AAO.  Now closes down the output file
 C                    properly.
-C     27th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs 
-C                    changed. Modified dynamic emmeory handling - now 
+C     27th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs
+C                    changed. Modified dynamic emmeory handling - now
 C                    uses DYN_ routines.
 C     18th Sep 1988  KS / AAO. Use of SAME corrected.  Was only working
 C                    properly for in situ reversals.
@@ -59,7 +59,7 @@ C
 C
 C     Local variables
 C
-      INTEGER      APTR          ! Dynamic-memory pointer to xy-axis 
+      INTEGER      APTR          ! Dynamic-memory pointer to xy-axis
                                  ! data
       INTEGER      ASLOT         ! Map slot number of xy-axis data
       INTEGER      AXIS          ! The axis number of rotation
@@ -78,7 +78,7 @@ C
       INTEGER      OPTR          ! Dynamic-memory pointer to output
                                  ! data array
       INTEGER      OSLOT         ! Map slot number for output data array
-      INTEGER      EPTR          ! Dynamic-memory pointer to errors 
+      INTEGER      EPTR          ! Dynamic-memory pointer to errors
                                  ! array
       INTEGER      ESLOT         ! Map slot number for errors array
       LOGICAL      REV           ! Axis-data is to be reversed?

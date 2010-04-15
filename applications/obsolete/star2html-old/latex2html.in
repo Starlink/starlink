@@ -73,13 +73,13 @@ if ( ! ( -x $GS && ! -d $GS ) ) {
    foreach ( split(/:/, $ENV{'PATH'} ) ) {
       $executable = join( '', $_, '/', $GS );
       if ( -x $executable && ! -d $executable ) {
- 
+
 #  Trackdown the real name of the executable if this is a symbolic link.
-	 if ( -l $executable ) { 
+	 if ( -l $executable ) {
 	    $tmpfile='NULL';
 	    while ( $tmpfile ne '' ) {
 	       $tmpfile = readlink($executable);
-	       if ( $tmpfile ne '' ) { 
+	       if ( $tmpfile ne '' ) {
                   $executable = join( '', $_, '/', $tmpfile )
                }
 	    }
@@ -98,23 +98,23 @@ if ( ! ( -x $GS && ! -d $GS ) ) {
 #  Do this by parsing the output from "gs -h" command.
 #|| die "Fatal: execution of \"$gs -h\" failed\n";
 
-open( GS, "$GS -h |" ); 
+open( GS, "$GS -h |" );
 $flag = 0;
 while ( <GS> ) {
     if( /^\s*Search path/i ) {
 
 # Now look for the gs lib path
-	$flag = 1; 
+	$flag = 1;
     } elsif ( $flag == 1 ) {
 
 # If line starts with whitespace, then we're in the search path list
 	if ( /^\s+/ ) {
 	    chop;
 	    push( @gs_lib_path, split( ":", $_ ) );
-	} else { 
+	} else {
 
 # No more path entries
-	    $flag = 0; 
+	    $flag = 0;
 	}
     }
 }
@@ -160,7 +160,7 @@ $ENV{'GS_LIB'} = $GS_LIB;
 $ENV{'GSLANDSCAPE'} = $GSLANDSCAPE;
 
 #  Use the same version of Perl as this script, just add our Perl to
-#  head of PATH. 
+#  head of PATH.
 ($perldir = '@PERL@') =~ s{/[^/]*$}{};
 $ENV{'PATH'} = "$perldir:" . $ENV{'PATH'};
 

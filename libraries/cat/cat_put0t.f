@@ -1,15 +1,15 @@
       SUBROUTINE CAT_PUT0B (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0B 
+*     CAT_PUT0B
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0B (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -230,15 +230,15 @@
       SUBROUTINE CAT_PUT0C (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0C 
+*     CAT_PUT0C
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0C (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)
@@ -443,15 +443,15 @@
       SUBROUTINE CAT_PUT0D (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0D 
+*     CAT_PUT0D
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0D (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)
@@ -656,15 +656,15 @@
       SUBROUTINE CAT_PUT0I (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0I 
+*     CAT_PUT0I
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0I (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)
@@ -869,15 +869,15 @@
       SUBROUTINE CAT_PUT0L (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0L 
+*     CAT_PUT0L
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0L (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)
@@ -1082,15 +1082,15 @@
       SUBROUTINE CAT_PUT0R (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0R 
+*     CAT_PUT0R
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0R (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)
@@ -1295,15 +1295,15 @@
       SUBROUTINE CAT_PUT0W (PI, VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*     CAT_PUT0W 
+*     CAT_PUT0W
 *  Purpose:
-*     Put a value to a scalar part (field or column). 
+*     Put a value to a scalar part (field or column).
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_PUT0W (PI, VALUE, NULFLG; STATUS)
 *  Description:
-*     Put a value to a scalar part (field or column). If the identifier 
+*     Put a value to a scalar part (field or column). If the identifier
 *     refers to a field the value is written to the current row buffer.
 *  Arguments:
 *     PI  =  INTEGER (Given)

@@ -73,7 +73,7 @@
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
 #     31-JAN-2006 (PDRAPER):
-#        Finally removed all colour defaults. Standard set are no 
+#        Finally removed all colour defaults. Standard set are no
 #        longer bisque, so may as well use them.
 #     {enter_further_changes_here}
 

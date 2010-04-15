@@ -23,7 +23,7 @@
       CHARACTER*(*) CONDNULL(*)	!	null value for array skip
       CHARACTER*(*) HELP_PREFIX	!
       INTEGER       N		! 	Form number and number of fields.
-      INTEGER FORM_FIELD	! 	Field at which to start 
+      INTEGER FORM_FIELD	! 	Field at which to start
       CHARACTER*(*) VAL(*)	! I/Out	The field values.
 
 *  Functions
@@ -112,7 +112,7 @@
             status = MDH_ENDWORD(help_prefix) + 2
 *	write(*,*) ' calling helplib '//helplib//': '
 *	write(*,*) ' fld '//help_prefix(:status) //fields(i)(strt:char_end)
-            CALL MDH_HELP(helplib,help_prefix(:status) 
+            CALL MDH_HELP(helplib,help_prefix(:status)
      &           //fields(i)(strt:char_end)) ! Access help library.
             i = i - 1
           ELSE IF (status .EQ. 3) THEN ! exit

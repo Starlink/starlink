@@ -1,16 +1,16 @@
- 
+
       SUBROUTINE PERIOD_INTRO
- 
+
 C=============================================================================
 C Routine to show introductory message for PERIOD.
 C
 C Written by Vikram Singh Dhillon @Sussex 13-June-1992.
 C
 C
-C GJP October 1995 
+C GJP October 1995
 C
 C Modified at request of Vik Dhillon
-C 
+C
 C GJP March 1997
 C
 C New heading for Linux port.
@@ -24,25 +24,25 @@ C
 C Implementation of Dynamic Memory Allocation.
 C
 C=============================================================================
- 
+
       IMPLICIT NONE
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_INTRO declarations.
 C-----------------------------------------------------------------------------
- 
+
       WRITE (*, *) ' '
-      WRITE (*, *) 
+      WRITE (*, *)
      :            '|**************************************************|'
-      WRITE (*, *) 
+      WRITE (*, *)
      :            '|**| PERIOD  :>  A time-series analysis package |**|'
-      WRITE (*, *) 
+      WRITE (*, *)
      :            '|**| Version :>  5.0-2 for UNIX                 |**|'
-      WRITE (*, *) 
+      WRITE (*, *)
      :            '|**| Date    :>  18-JUN-2003                    |**|'
-      WRITE (*, *) 
+      WRITE (*, *)
      :            '|**************************************************|'
-      WRITE (*, *) 
- 
+      WRITE (*, *)
+
       RETURN
       END

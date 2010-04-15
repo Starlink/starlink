@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MLCOF( OFMTHD, NDISP, YLMT, AVERAG, PARAM, 
-     :                       OFFSET, STATUS ) 
+      SUBROUTINE KPS1_MLCOF( OFMTHD, NDISP, YLMT, AVERAG, PARAM,
+     :                       OFFSET, STATUS )
 *+
 *  Name:
 *     KPS1_MLCOF
@@ -21,13 +21,13 @@
 *     a multi-line plot.
 *
 *     The three methods are:
-*       'FREE'     -- In this method nothing need be calculated, 
+*       'FREE'     -- In this method nothing need be calculated,
 *                     get the offset value from the user.
-*       'CONSTANT' -- In this method the lines are evenly spaced 
+*       'CONSTANT' -- In this method the lines are evenly spaced
 *                     between upper and lower vertical limits.
 *       'AVERAGE'  -- In this method the 'averages' of the lines
 *                     are equally spaced between upper and lower
-*                     vertical limits.                    
+*                     vertical limits.
 
 *  Arguments:
 *     OFMTHD = INTEGER (Given)
@@ -38,7 +38,7 @@
 *
 *         1 :'CONSTANT' offset
 *
-*         2 :'AVERAGE' offset 
+*         2 :'AVERAGE' offset
 *     NDISP = INTEGER (Given)
 *        The number of lines to be displayed.
 *     YLMT( 2 ) = REAL (Given)
@@ -86,14 +86,14 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Magic value Definition
-                                
+
 *  Arguments Given:
       INTEGER OFMTHD
       INTEGER NDISP
@@ -137,10 +137,10 @@
          I = 1
          GOT = .FALSE.
          DO WHILE ( .NOT. GOT .AND. I .LE. NDISP )
-            IF ( AVERAG( I ) .NE. VAL__BADR ) THEN 
+            IF ( AVERAG( I ) .NE. VAL__BADR ) THEN
                AVEBTM = AVERAG( I )
-               GOT = .TRUE. 
-         
+               GOT = .TRUE.
+
 *  If the average is invalid, this line contains no valid samples and so
 *  will not appear in the plot, consider the next line.
             ELSE
@@ -151,9 +151,9 @@
 *  Enter a do loop to calculate the offset for each trace.
          DO I = 1, NDISP
 
-*  If the trace is valid, calculate its offset. 
+*  If the trace is valid, calculate its offset.
             IF ( AVERAG( I ) .NE. VAL__BADR ) THEN
-               OFFSET( I ) = AVEBTM - AVERAG( I )  
+               OFFSET( I ) = AVEBTM - AVERAG( I )
      :                       + REAL( I - 1 ) * ( YLMT( 2 ) - AVEBTM )
      :                                        / REAL( NDISP )
 
@@ -165,5 +165,5 @@
       END IF
 
  999  CONTINUE
-      
+
       END

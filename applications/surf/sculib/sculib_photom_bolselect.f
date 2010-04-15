@@ -1,7 +1,7 @@
-      SUBROUTINE SCULIB_PHOTOM_BOLSELECT (BOLOMETERS, BOL_TYPE, 
-     :   BOL_CALIB, BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, 
+      SUBROUTINE SCULIB_PHOTOM_BOLSELECT (BOLOMETERS, BOL_TYPE,
+     :   BOL_CALIB, BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN,
      :   NUM_ADC, BOL_SELECT_CHAN, BOL_SELECT_ADC, N_BOLS, MAX_SUB,
-     :   SUB_INSTRMNT, N_SUB, CENTRE_DU3, CENTRE_DU4, CHOP_COORDS, 
+     :   SUB_INSTRMNT, N_SUB, CENTRE_DU3, CENTRE_DU4, CHOP_COORDS,
      :   BOL_SPACING, CHOP_PA, N_BOL_SUB, BOLS_MEASURED,
      :   PHOT_BEAM_CHAN, PHOT_BEAM_ADC, PHOT_BEAM_BOL, STATUS)
 *+
@@ -19,21 +19,21 @@
 *     directly specified in BOLOMETERS.
 *
 *       The observer can specify between 1 and 3 bolometers by name. Otherwise
-*     an error will be reported and the routine will return with bad status. 
+*     an error will be reported and the routine will return with bad status.
 *     Likewise, if any of these directly selected bolometers have bad quality
 *     or have identical Nasmyth offsets.
 *
 *     Now the routine branches on the number of directly selected bolometers:-
 *
-*      - 3 bolometers specified. In this case the observer must want to chop 
+*      - 3 bolometers specified. In this case the observer must want to chop
 *      between 3 bolometers on an array.
 *        All 3 bolometers should belong to a single array, if not the routine
-*      will error and return with bad status. The routine will arbitrarily 
-*      assign the 3 bolometers to the `left', 'middle' and `right' projected 
-*      positions in the order they were selected. The routine now checks that 
-*      the 3 bolometers do lie in roughly a straight line on the sky (allowing 
-*      for distortion) and that the left and right bolometers lie roughly the 
-*      same distance on either side of the middle. Errors will occur and the 
+*      will error and return with bad status. The routine will arbitrarily
+*      assign the 3 bolometers to the `left', 'middle' and `right' projected
+*      positions in the order they were selected. The routine now checks that
+*      the 3 bolometers do lie in roughly a straight line on the sky (allowing
+*      for distortion) and that the left and right bolometers lie roughly the
+*      same distance on either side of the middle. Errors will occur and the
 *      routine return with bad status if these conditions are not met.
 *        If all is OK the routine will now store the channel/ADC numbers of
 *      the directly selected bolometers, set CHOP_COORDS to Nasmyth, the
@@ -47,32 +47,32 @@
 *        Lastly, the routine will set the bolometers to actually be measured
 *      to all those belonging to the array(s) containing the bolometers
 *      already selected.
-*      - 2 bolometers specified. In this case the observer must want to observe 
-*      a source by chopping between the 2 named bolometers. 
+*      - 2 bolometers specified. In this case the observer must want to observe
+*      a source by chopping between the 2 named bolometers.
 *        The routine will arbitrarily call the first of the 2 bolometers
 *      the `middle' projected bolometer, the second `right'. Then it will
-*      store the channel/ADC numbers of these directly selected bolometers and 
-*      set the types of sub-instruments that they imply. If any of the 
-*      sub-instruments are arrays the routine will search for bolometer(s) 
+*      store the channel/ADC numbers of these directly selected bolometers and
+*      set the types of sub-instruments that they imply. If any of the
+*      sub-instruments are arrays the routine will search for bolometer(s)
 *      at the same Nasmyth offset in the other array and select them too.
 *        Lastly, the routine will set the bolometers to actually be measured
-*      to all those in the selected sub-instruments. CHOP_COORDS is set to 
-*      Nasmyth, the bolometer spacing to the distance between the 
-*      directly selected bolometers, the chopper position angle is set, and 
+*      to all those in the selected sub-instruments. CHOP_COORDS is set to
+*      Nasmyth, the bolometer spacing to the distance between the
+*      directly selected bolometers, the chopper position angle is set, and
 *      the instrument `centre' to the Nasmyth coords of the middle bolometer.
-*      - 1 bolometer specified. In this case the observer must want to observe 
+*      - 1 bolometer specified. In this case the observer must want to observe
 *      a source without chopping between different bolometers.
 *        The routine will arbitrarily call the primary selected bolometer
 *      the `middle' projected bolometer. `Left' and `right' bolometers will
 *      not be assigned.
 *        The routine will now store the channel/ADC numbers of the directly
-*      selected bolometer and set the type of sub-instrument that is implied. 
-*      If the sub-instrument is one of the arrays the routine will search 
-*      for a bolometer at the same Nasmyth offset in the other array and 
+*      selected bolometer and set the type of sub-instrument that is implied.
+*      If the sub-instrument is one of the arrays the routine will search
+*      for a bolometer at the same Nasmyth offset in the other array and
 *      select it too.
 *        Lastly, the routine will set the bolometers to actually be measured
 *      to all those in the selected sub-instruments. The instrument `centre'
-*      is set to the Nasmyth offset of the primary selected bolometer. 
+*      is set to the Nasmyth offset of the primary selected bolometer.
 *      CHOP_COORDS, the bolometer spacing and chopper position angle are
 *      all set to bad values so that the calling routine knows these have to
 *      be read explicitly from the observation definition file.
@@ -84,10 +84,10 @@
 *     in each sub-instrument that was directly selected.
 
 *  Invocation:
-*     CALL  SCULIB_PHOTOM_BOLSELECT (BOLOMETERS, BOL_TYPE, 
-*    :   BOL_CALIB, BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, 
+*     CALL  SCULIB_PHOTOM_BOLSELECT (BOLOMETERS, BOL_TYPE,
+*    :   BOL_CALIB, BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN,
 *    :   NUM_ADC, BOL_SELECT_CHAN, BOL_SELECT_ADC, N_BOLS, MAX_SUB,
-*    :   SUB_INSTRMNT, N_SUB, CENTRE_DU3, CENTRE_DU4, CHOP_COORDS, 
+*    :   SUB_INSTRMNT, N_SUB, CENTRE_DU3, CENTRE_DU4, CHOP_COORDS,
 *    :   BOL_SPACING, CHOP_PA, N_BOL_SUB, BOLS_MEASURED,
 *    :   PHOT_BEAM_CHAN, PHOT_BEAM_ADC, PHOT_BEAM_BOL, STATUS)
 
@@ -107,14 +107,14 @@
 *     BOL_QUAL (NUM_CHAN, NUM_ADC)
 *                                 = INTEGER (Given)
 *           quality of bolometers
-*     BOL_ENABLED (NUM_CHAN, NUM_ADC) 
+*     BOL_ENABLED (NUM_CHAN, NUM_ADC)
 *                                 = LOGICAL (Returned)
 *           .TRUE. if bolometer was selected
 *     NUM_CHAN                    = INTEGER (Given)
 *           number of channels per A/D
 *     NUM_ADC                     = INTEGER (Given)
 *           number of A/D cards
-*     BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)   
+*     BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)
 *                                 = INTEGER (Returned)
 *           channel numbers of selected bolometers
 *     BOL_SELECT_ADC (NUM_CHAN * NUM_ADC)
@@ -129,10 +129,10 @@
 *     N_SUB                       = INTEGER (Returned)
 *           the number of sub instruments to be used
 *     CENTRE_DU3                  = REAL (Returned)
-*           Nasmyth DU3 offset from instrument centre to which telescope 
+*           Nasmyth DU3 offset from instrument centre to which telescope
 *           is to pointed
 *     CENTRE_DU4                  = REAL (Returned)
-*           Nasmyth DU4 offset from instrument centre to which telescope 
+*           Nasmyth DU4 offset from instrument centre to which telescope
 *           is to pointed
 *     CHOP_COORDS                 = CHARACTER*(*) (Returned)
 *           Chopper coordinate system required
@@ -145,11 +145,11 @@
 *     BOLS_MEASURED               = CHARACTER*(*) (Returned)
 *           Bolometers to be measured by transputer system
 *     PHOT_BEAM_CHAN (3, MAX_SUB) = INTEGER (Returned)
-*           Channel numbers of selected bolometers projected left, middle, 
+*           Channel numbers of selected bolometers projected left, middle,
 *           right on sky for each sub-instrument (I index = 1 for left, 2
 *           for middle and 3 for right)
 *     PHOT_BEAM_ADC (3, MAX_SUB)  = INTEGER (Returned)
-*           ADC numbers of selected bolometers projected left, middle, 
+*           ADC numbers of selected bolometers projected left, middle,
 *           right on sky for each sub-instrument
 *     PHOT_BEAM_BOL (3, MAX_SUB)  = INTEGER (Returned)
 *           The index in the array of selected bolometers of those projected
@@ -237,9 +237,9 @@
       INTEGER LEFT, MIDDLE, RIGHT     ! indices of bolometers projected to
                                       ! left, middle and right
       INTEGER CHAN, ADC               ! channel and ADC of bolometer
-      INTEGER OTHER_CHAN, OTHER_ADC   ! channel and ADC of bolometer at same 
+      INTEGER OTHER_CHAN, OTHER_ADC   ! channel and ADC of bolometer at same
                                       ! position on other array as that
-                                      ! selected directly 
+                                      ! selected directly
       INTEGER N_SUB_AFTER             ! number of sub instruments after check
                                       ! has been made for bolometers on the
                                       ! `other' array
@@ -248,8 +248,8 @@
       REAL DELTA_DU3                  ! used in calculation of SLOPE
       REAL SLOPE, CONSTANT            ! constants of equation of line linking
                                       ! left and right bolometers
-      REAL SLOPE_P, CONSTANT_P        ! constants of equation of line 
-                                      ! perpendicular to the above running 
+      REAL SLOPE_P, CONSTANT_P        ! constants of equation of line
+                                      ! perpendicular to the above running
                                       ! through the middle bolometer
       REAL DU3_I, DU4_I               ! coords of intersection between the 2
                                       ! lines
@@ -293,7 +293,7 @@
      :   BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC,
      :   BOL_SELECT_CHAN, BOL_SELECT_ADC, N_BOLS, MAX_SUB,
      :   SUB_INSTRMNT, N_SUB, STATUS)
-      
+
 *  there should have been 1-3 bolometers
 
       IF ((N_BOLS .GT. 3) .OR. (N_BOLS .LT. 1)) THEN
@@ -309,7 +309,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
          ERROR = .FALSE.
          DO I = 1, N_BOLS
-            IF (BOL_QUAL(BOL_SELECT_CHAN(I),BOL_SELECT_ADC(I)) .NE. 0) 
+            IF (BOL_QUAL(BOL_SELECT_CHAN(I),BOL_SELECT_ADC(I)) .NE. 0)
      :        THEN
                ERROR = .TRUE.
             END IF
@@ -349,7 +349,7 @@
          END DO
       END IF
 
-      
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  now go through various possible combinations
@@ -382,27 +382,27 @@
 
 *  first get equation of line between L and R bolometers
 
-               DELTA_DU3 = 
+               DELTA_DU3 =
      :           BOL_DU3(BOL_SELECT_CHAN(RIGHT),BOL_SELECT_ADC(RIGHT)) -
      :           BOL_DU3(BOL_SELECT_CHAN(LEFT),BOL_SELECT_ADC(LEFT))
-               DELTA_DU3 = MAX (DELTA_DU3, 1.0E-10)    
+               DELTA_DU3 = MAX (DELTA_DU3, 1.0E-10)
 
-               SLOPE = 
+               SLOPE =
      :           (BOL_DU4(BOL_SELECT_CHAN(RIGHT),BOL_SELECT_ADC(RIGHT))-
      :           BOL_DU4(BOL_SELECT_CHAN(LEFT),BOL_SELECT_ADC(LEFT))) /
-     :           DELTA_DU3     
+     :           DELTA_DU3
 
-               CONSTANT = 
+               CONSTANT =
      :           BOL_DU4(BOL_SELECT_CHAN(RIGHT),BOL_SELECT_ADC(RIGHT)) -
-     :           SLOPE * 
+     :           SLOPE *
      :           BOL_DU3(BOL_SELECT_CHAN(RIGHT),BOL_SELECT_ADC(RIGHT))
 
 *  now of line perpendicular to the first passing through the M bolometer
 
                SLOPE_P = -1.0 / SLOPE
-               CONSTANT_P = 
+               CONSTANT_P =
      :           BOL_DU4(BOL_SELECT_CHAN(MIDDLE),BOL_SELECT_ADC(MIDDLE))
-     :           - SLOPE_P * 
+     :           - SLOPE_P *
      :           BOL_DU3(BOL_SELECT_CHAN(MIDDLE),BOL_SELECT_ADC(MIDDLE))
 
 *  now coord where 2 lines intersect
@@ -412,7 +412,7 @@
 
 *  distance from the middle beam to the 3 points on the line between L and R
 
-               M_L = 
+               M_L =
      :           (BOL_DU3(BOL_SELECT_CHAN(MIDDLE),
      :           BOL_SELECT_ADC(MIDDLE)) -
      :           BOL_DU3(BOL_SELECT_CHAN(LEFT),
@@ -424,8 +424,8 @@
                IF (M_L .GT. 0.0) THEN
                   M_L = SQRT (M_L)
                END IF
-                  
-               M_R = 
+
+               M_R =
      :           (BOL_DU3(BOL_SELECT_CHAN(MIDDLE),
      :           BOL_SELECT_ADC(MIDDLE)) -
      :           BOL_DU3(BOL_SELECT_CHAN(RIGHT),
@@ -437,8 +437,8 @@
                IF (M_R .GT. 0.0) THEN
                   M_R = SQRT (M_R)
                END IF
-                  
-               M_M = 
+
+               M_M =
      :           (BOL_DU3(BOL_SELECT_CHAN(MIDDLE),
      :           BOL_SELECT_ADC(MIDDLE)) - DU3_I) **2 +
      :           (BOL_DU4(BOL_SELECT_CHAN(MIDDLE),
@@ -449,7 +449,7 @@
 
 *  and from L to R
 
-               L_R = 
+               L_R =
      :           (BOL_DU3(BOL_SELECT_CHAN(LEFT),
      :           BOL_SELECT_ADC(LEFT)) -
      :           BOL_DU3(BOL_SELECT_CHAN(RIGHT),
@@ -462,7 +462,7 @@
                   L_R = SQRT (L_R)
                END IF
 
-              
+
 *  check that M_L and M_R are roughly equal
 
                IF (ABS(M_L - M_R) .GT. 5.0) THEN
@@ -480,17 +480,17 @@
      :              'in 3 bolometer selection; middle bolometer does '//
      :              'not lie between left and right', STATUS)
                END IF
- 
+
 *  and that M is close to the line joing L and R
 
                IF (M_M .GT. 5.0) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP (' ', 'SCULIB_PHOTOM_BOLSELECT: error '//
      :              'in 3 bolometer selection; middle bolometer does '//
-     :              'not lie close to line joining left and right', 
+     :              'not lie close to line joining left and right',
      :              STATUS)
                END IF
-    
+
             END IF
 
 
@@ -507,7 +507,7 @@
                PHOT_BEAM_CHAN (3,1) = BOL_SELECT_CHAN (RIGHT)
                PHOT_BEAM_ADC (3,1) = BOL_SELECT_ADC (RIGHT)
 
-*  set the chop coords, calculate the spacing between bolometers and position 
+*  set the chop coords, calculate the spacing between bolometers and position
 *  angle
 
                CHOP_COORDS = 'NA'
@@ -559,11 +559,11 @@
                            END IF
 
                            IF ((PRIME_TYPE .EQ. OTHER_TYPE) .AND.
-     :                       ((SEC_TYPE .EQ. ' ') .OR. 
+     :                       ((SEC_TYPE .EQ. ' ') .OR.
      :                       (SEC_TYPE .EQ. 'CENTRE'))) THEN
-                              IF ((ABS(DU3-BOL_DU3(CHAN,ADC)).LT.0.5) 
-     :                          .AND. 
-     :                          (ABS(DU4-BOL_DU4(CHAN,ADC)).LT.0.5))  
+                              IF ((ABS(DU3-BOL_DU3(CHAN,ADC)).LT.0.5)
+     :                          .AND.
+     :                          (ABS(DU4-BOL_DU4(CHAN,ADC)).LT.0.5))
      :                          THEN
                                  OTHER_CHAN = CHAN
                                  OTHER_ADC = ADC
@@ -584,7 +584,7 @@
 
                END DO
 
-*  set N_SUB to 2 and set the second sub instrument if both arrays are to be 
+*  set N_SUB to 2 and set the second sub instrument if both arrays are to be
 *  used
 
                IF (BOTH_ARRAYS) THEN
@@ -597,7 +597,7 @@
                BOLS_MEASURED = SUB_INSTRMNT (1)
                IF (N_SUB .GT. 1) THEN
                   DO I = 2, N_SUB
-                     BOLS_MEASURED = 
+                     BOLS_MEASURED =
      :                 BOLS_MEASURED (:CHR_LEN(BOLS_MEASURED))//
      :                 ','//SUB_INSTRMNT (I)
                   END DO
@@ -634,7 +634,7 @@
 
                N_BOL_SUB (1) = 1
                N_BOL_SUB (2) = 1
-  
+
                TYPE = SUB_INSTRMNT (1)
 
                IF (INDEX(BOL_TYPE(BOL_SELECT_ADC(MIDDLE),
@@ -669,8 +669,8 @@
                      OTHER_TYPE = 'LONG'
                   END IF
 
-                  DO I = 1, 3                  
- 
+                  DO I = 1, 3
+
                      IF (PHOT_BEAM_CHAN(I,J) .NE. 0) THEN
 
                         CHAN = PHOT_BEAM_CHAN (I,J)
@@ -680,7 +680,7 @@
                         DU4 = BOL_DU4 (CHAN, ADC)
 
                         OTHER_CHAN = VAL__BADI
-    
+
                         DO ADC = 1, NUM_ADC
                            DO CHAN = 1, NUM_CHAN
 
@@ -691,25 +691,25 @@
                                     PRIME_TYPE = BOL_TYPE(CHAN,ADC)
                                     SEC_TYPE = ' '
                                  ELSE
-                                    PRIME_TYPE = 
+                                    PRIME_TYPE =
      :                                BOL_TYPE(CHAN,ADC)(:SLASH-1)
-                                    SEC_TYPE = 
+                                    SEC_TYPE =
      :                                BOL_TYPE(CHAN,ADC)(SLASH+1:)
                                  END IF
 
                                  IF ((PRIME_TYPE .EQ. OTHER_TYPE) .AND.
-     :                             ((SEC_TYPE .EQ. ' ') .OR. 
+     :                             ((SEC_TYPE .EQ. ' ') .OR.
      :                             (SEC_TYPE .EQ. 'CENTRE'))) THEN
- 
-                                    IF ((ABS(DU3-BOL_DU3(CHAN,ADC)) 
-     :                                .LT. 0.5) .AND. 
-     :                                (ABS(DU4-BOL_DU4(CHAN,ADC)) 
+
+                                    IF ((ABS(DU3-BOL_DU3(CHAN,ADC))
+     :                                .LT. 0.5) .AND.
+     :                                (ABS(DU4-BOL_DU4(CHAN,ADC))
      :                                .LT. 0.5)) THEN
                                        OTHER_CHAN = CHAN
                                        OTHER_ADC = ADC
                                     END IF
 
-                                 END IF   
+                                 END IF
                               END IF
 
                            END DO
@@ -720,7 +720,7 @@
                            DONE = .FALSE.
 
                            DO K = 1, N_SUB_AFTER
-                              IF (SUB_INSTRMNT(K) .EQ. OTHER_TYPE) 
+                              IF (SUB_INSTRMNT(K) .EQ. OTHER_TYPE)
      :                          THEN
                                  DONE = .TRUE.
                                  PHOT_BEAM_CHAN (I,K) = OTHER_CHAN
@@ -731,14 +731,14 @@
                            IF (.NOT. DONE) THEN
                               N_SUB_AFTER = N_SUB_AFTER + 1
                               SUB_INSTRMNT (N_SUB_AFTER) = OTHER_TYPE
-                              PHOT_BEAM_CHAN (I,N_SUB_AFTER) = 
+                              PHOT_BEAM_CHAN (I,N_SUB_AFTER) =
      :                          OTHER_CHAN
                               PHOT_BEAM_ADC (I,N_SUB_AFTER) = OTHER_ADC
                            END IF
 
                         END IF
                      END IF
-     
+
                   END DO
 
                END IF
@@ -753,14 +753,14 @@
             BOLS_MEASURED = SUB_INSTRMNT (1)
             IF (N_SUB .GT. 1) THEN
                DO I = 2, N_SUB
-                  BOLS_MEASURED = 
+                  BOLS_MEASURED =
      :              BOLS_MEASURED (:CHR_LEN(BOLS_MEASURED))//
      :              ','//SUB_INSTRMNT (I)
                END DO
             END IF
 
 
-*  set the chop coords, calculate the bolometer spacing and position 
+*  set the chop coords, calculate the bolometer spacing and position
 *  angle
 
             CHOP_COORDS = 'NA'
@@ -808,7 +808,7 @@
             PHOT_BEAM_CHAN (2,1) = BOL_SELECT_CHAN (MIDDLE)
             PHOT_BEAM_ADC (2,1) = BOL_SELECT_ADC (MIDDLE)
 
-*  now, if the selected bolometer belongs to one of the arrays select the 
+*  now, if the selected bolometer belongs to one of the arrays select the
 *  one at the same position on the other array if such exists.
 
             IF ((SUB_INSTRMNT(MIDDLE) .EQ. 'LONG') .OR.
@@ -820,9 +820,9 @@
                   OTHER_TYPE = 'LONG'
                END IF
 
-               DU3 = BOL_DU3 (BOL_SELECT_CHAN(MIDDLE), 
+               DU3 = BOL_DU3 (BOL_SELECT_CHAN(MIDDLE),
      :           BOL_SELECT_ADC(MIDDLE))
-               DU4 = BOL_DU4 (BOL_SELECT_CHAN(MIDDLE), 
+               DU4 = BOL_DU4 (BOL_SELECT_CHAN(MIDDLE),
      :           BOL_SELECT_ADC(MIDDLE))
 
                OTHER_CHAN = VAL__BADI
@@ -840,10 +840,10 @@
                      END IF
 
                      IF ((PRIME_TYPE .EQ. OTHER_TYPE) .AND.
-     :                 ((SEC_TYPE .EQ. ' ') .OR. 
+     :                 ((SEC_TYPE .EQ. ' ') .OR.
      :                 (SEC_TYPE .EQ. 'CENTRE'))) THEN
 
-                        IF ((ABS(DU3-BOL_DU3(CHAN,ADC)) .LT. 0.5) .AND. 
+                        IF ((ABS(DU3-BOL_DU3(CHAN,ADC)) .LT. 0.5) .AND.
      :                    (ABS(DU4-BOL_DU4(CHAN,ADC)) .LT. 0.5))  THEN
 
                            OTHER_CHAN = CHAN
@@ -863,13 +863,13 @@
                END IF
 
             END IF
-   
+
 *  set types of bolometers to be measured by the transputer system
 
             BOLS_MEASURED = SUB_INSTRMNT (1)
             IF (N_SUB .GT. 1) THEN
                DO I = 2, N_SUB
-                  BOLS_MEASURED = 
+                  BOLS_MEASURED =
      :              BOLS_MEASURED (:CHR_LEN(BOLS_MEASURED))//
      :              ','//SUB_INSTRMNT (I)
                END DO
@@ -910,7 +910,7 @@
 
 *  and set the PHOT_BEAM_BOL array to point to the positions in the demodulated
 *  data array where the bolometers to be used directly for the PHOTOM
-*  observation can be found 
+*  observation can be found
 
          DO J = 1, N_SUB
             DO I = 1, 3
@@ -920,9 +920,9 @@
      :              (BOL_SELECT_ADC(K) .EQ. PHOT_BEAM_ADC(I,J))) THEN
                      PHOT_BEAM_BOL (I,J) = K
                   END IF
-               END DO               
+               END DO
             END DO
-         END DO         
+         END DO
 
       END IF
 

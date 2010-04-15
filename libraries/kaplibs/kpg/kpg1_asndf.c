@@ -4,7 +4,7 @@
 #include "sae_par.h"
 
 F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
-                            INTEGER_ARRAY(UBND), INTEGER(IWCS), 
+                            INTEGER_ARRAY(UBND), INTEGER(IWCS),
                             INTEGER(STATUS) ) {
 /*
 *+
@@ -28,8 +28,8 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 
 *  Arguments:
 *     INDF = INTEGER (Given)
-*        An NDF from which to propagate AXIS information. May be NDF__NOID, 
-*        in which case the AXIS Frame in the returned FrameSet will describe 
+*        An NDF from which to propagate AXIS information. May be NDF__NOID,
+*        in which case the AXIS Frame in the returned FrameSet will describe
 *        the default AXIS coordinate system (i.e. pixel coords).
 *     NDIM = INTEGER (Given)
 *        The number of pixel axes in the modified FrameSet.
@@ -38,8 +38,8 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 *     UBND( NDIM ) = INTEGER (Given)
 *        The upper pixel index bounds in the modified FrameSet.
 *     IWCS = INTEGER (Returned)
-*        Pointer to a new FrameSet holding GRID, FRACTION, PIXEL and AXIS 
-*        Frames describing the supplied NDF bounds, plus AXIS information 
+*        Pointer to a new FrameSet holding GRID, FRACTION, PIXEL and AXIS
+*        Frames describing the supplied NDF bounds, plus AXIS information
 *        from the supplied NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -53,12 +53,12 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

@@ -71,7 +71,7 @@
       CHARACTER           ORIGIN*32
 
 *     variables used to interface FIT_ routines.
-  
+
       LOGICAL   CHECK
       REAL      DMIN
       REAL      DMAX
@@ -142,14 +142,14 @@
 
 *     Map the map into virtual memory
 
-      CALL MAPIMAGE ('mapplane.tmp', IPTR, NMAP, IMX, IMY, ISTAT) 
+      CALL MAPIMAGE ('mapplane.tmp', IPTR, NMAP, IMX, IMY, ISTAT)
       IF (ISTAT.NE.0) THEN
         IFAIL = 67
         RETURN
       END IF
 
 *     Substitute BAD values with RBLANK (returned). Scale RBLANK to
-*     BLANK after call to FIT_SCALC. 
+*     BLANK after call to FIT_SCALC.
 
       CALL BAD2BLANK (2, %VAL(IPTR), IMX*IMY, RBLANK, NBLANK, IFAIL)
 
@@ -168,8 +168,8 @@
 
       NAXES(1) = IMX
       NAXES(2) = IMY
-      NAXES(3) = 1    
-      NAXES(4) = 1    
+      NAXES(3) = 1
+      NAXES(4) = 1
 
       CALL FIT_HSTAN (BITPIX, NAXIS, NAXES, BSCALE, BZERO, STATUS)
       IF (STATUS.NE.0) GO TO 99
@@ -208,7 +208,7 @@
 *     Increment (in arcseconds) of X & Y associated with each
 *     pixel (L->R, T->B). Remember that map has
 *     been inverted (top-bottom) inside MAKE_MAP, so start and end
-*     of axis 2 have been reversed. 
+*     of axis 2 have been reversed.
 
       DXC  = SIGN (CELL_XSIZE, PEND(1)-PBEG(1)) / (LXPIX-1)
       DYC  = SIGN (CELL_YSIZE, PBEG(2)-PEND(2)) / (LYPIX-1)
@@ -438,7 +438,7 @@
 
       CALL FIT_WDBLE ('OBSTIME ', DFLOAT(INTT)/1000.,
      &                'Integration time (sec)',              STATUS)
-      CALL FIT_WDBLE ('SCAN-NUM', DFLOAT(LSCAN), 
+      CALL FIT_WDBLE ('SCAN-NUM', DFLOAT(LSCAN),
      &                'Scan number ',                        STATUS)
 
       CALL FIT_WDBLE ('TAU-ATM ', TAUATM,

@@ -17,7 +17,7 @@ C
 C     Parameters -   (">" input, "<" output)
 C
 C     (>) NAME     (Character) The name of the object to be
-C                  created.  The form is as described above, 
+C                  created.  The form is as described above,
 C                  ie a standard data structure name, and
 C                  must be terminated either by a blank or by
 C                  the end of the string. NAME can be upper or
@@ -29,7 +29,7 @@ C                  any other string.  If it is not one of the
 C                  recognised types, it is treated as a user-
 C                  defined structure name.  TYPE is case-
 C                  independent, and must end with a blank or
-C                  the end of the string.  Note that if TYPE 
+C                  the end of the string.  Note that if TYPE
 C                  contains characters (such as '-') that would
 C                  be rejected by HDS, the actual type used will
 C                  have underscores substituted.
@@ -57,8 +57,8 @@ C                                      KS / CIT  18th Nov 1982
 C     Modified:
 C
 C     12th Mar 1986.  KS / AAO.  Re-written to use HDS routines.
-C     8th  Jan 1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     8th  Jan 1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN.
 C     24th Jan 1992.  KS / AAO. Calls to EMS added to control error reporting.
 C     12th Mar 1993.  HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
@@ -100,7 +100,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert name to upper case, and analyse it
 C
@@ -130,7 +130,7 @@ C
           GO TO 600
       END IF
 C
-C     It looks OK, so get the HDS object type corresponding to 
+C     It looks OK, so get the HDS object type corresponding to
 C     the DTA type specified.  Note the complication that since
 C     HDS supports character strings, it has been decided to treat
 C     a DTA array CHARS[n,m] of type CHAR, for example, as an
@@ -156,7 +156,7 @@ C
 C
 C     Now create the data object.  Note that at this point we
 C     don't bother getting a locator, so we can't put it in the
-C     name cache.  
+C     name cache.
 C
       CALL DAT_NEW(ENVLOC,FNAME(LASTC(LEVELS-1)+2:LASTC(LEVELS)),
      :                             HDSTYPE,NDIM,DIMS,STATUS)

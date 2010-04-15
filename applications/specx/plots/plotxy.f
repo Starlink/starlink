@@ -8,7 +8,7 @@ C-----------------------------------------------------------------------
 
       SUBROUTINE PLOTXY (XSCALE, BUF, NCH, IFAIL)
 
-C   Subroutine to plot data in DATA array against XSCALE for use in 
+C   Subroutine to plot data in DATA array against XSCALE for use in
 C   finding baseline fit regions, etc.
 
       IMPLICIT NONE
@@ -86,7 +86,7 @@ C   Copy relevant parameters to PLOTPAR1 and FREQ2
 
       NQUAD1  = 1
       NPTS1(1)= NCH
-      MASK1(1)= 1      
+      MASK1(1)= 1
       NQUAD1  = 1
       NMASK1  = NMASK
 
@@ -116,7 +116,7 @@ C   else change axes if change in effect
           END IF
         END IF
 
-      ELSE 
+      ELSE
         XST1    = XXST
         XEND1   = XXEND
         YST1    = YYST
@@ -154,7 +154,7 @@ C   Plot
       END IF
 
       CALL DRAW_AXES (PLOT_HEADER, .TRUE., XTITLE1, YTITLE1,
-     &                XW1, YW1, XLEN1, YLEN1, CHARHT1, 1, 1, 
+     &                XW1, YW1, XLEN1, YLEN1, CHARHT1, 1, 1,
      &                TOPSCAL, A0, A1)
 
       RETURN

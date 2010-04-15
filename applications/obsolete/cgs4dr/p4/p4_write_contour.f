@@ -19,7 +19,7 @@
 *    Common block :
       INCLUDE 'P4COM.INC'
 *    Local Variables :
-      INTEGER 
+      INTEGER
      :  CLEN,                    ! String length
      :  CIVALEN,                 ! String length
      :  CRVALEN,                 ! String length
@@ -97,10 +97,10 @@
       ENDDO
 
 *  Write out a success message
-      CALL FIO_CLOSE( LUN, STATUS ) 
+      CALL FIO_CLOSE( LUN, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL MSG_SETC( 'FILE', OFILE )
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :      'Contour levels written to file ^FILE', STATUS )
       ELSE
          STATUS = SAI__ERROR

@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -157,7 +157,7 @@
      :                  'READ', PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'CENTRE', AXIS2, '_REAL',
      :                  'READ', PNTR2, NELM, STATUS )
-         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ), 
+         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ),
      :                   %VAL( CNF_PVAL( PNTR2 ) ), 1E-5,
      :                   MATCH, STATUS )
          CALL NDF_AUNMP( NDF1, 'CENTRE', AXIS1, STATUS )
@@ -176,7 +176,7 @@
      :                  'READ', PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'WIDTH', AXIS2, '_REAL',
      :                  'READ', PNTR2, NELM, STATUS )
-         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ), 
+         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ),
      :                   %VAL( CNF_PVAL( PNTR2 ) ), 1E-5,
      :                   MATCH, STATUS )
          CALL NDF_AUNMP( NDF1, 'WIDTH', AXIS1, STATUS )
@@ -190,7 +190,7 @@
      :                  'READ', PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'VARIANCE', AXIS2, '_REAL',
      :                  'READ', PNTR2, NELM, STATUS )
-         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ), 
+         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ),
      :                   %VAL( CNF_PVAL( PNTR2 ) ), 1E-5,
      :                   MATCH, STATUS )
          CALL NDF_AUNMP( NDF1, 'VARIANCE', AXIS1, STATUS )

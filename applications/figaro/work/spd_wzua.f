@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  The format used.
- 101  FORMAT ( '  ', 6(' ',G14.7E2) )     
+ 101  FORMAT ( '  ', 6(' ',G14.7E2) )
 
 *  Default local copies.
       LY = 0.

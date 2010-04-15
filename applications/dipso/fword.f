@@ -15,14 +15,14 @@
 *  Description:
 *     The word within STRING with the position specified by POS is found
 *     and returned in WORD (or as much of it as there is room for). Its
-*     length is returned in WLEN. 
+*     length is returned in WLEN.
 *
 *     A word is a group of contiguous non-blank (or tab) characters.
 *     Blanks contained within single quotes are not treated as word
-*     delimiters. Quotes, spaces and "\" characters can be escaped 
-*     using the "\" character if they need to be included literally within 
+*     delimiters. Quotes, spaces and "\" characters can be escaped
+*     using the "\" character if they need to be included literally within
 *     a word (the escape characters are not included in the returned word).
-      
+
 *  Arguments:
 *     STRING = CHARACTER * ( * ) (Given)
 *        The string.
@@ -32,7 +32,7 @@
 *     WORD = CHARACTER * ( * ) (Returned)
 *        The required word extracted from STRING.
 *     WLEN = INTEGER (Returned)
-*        The index of the last character in the word. 
+*        The index of the last character in the word.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -54,14 +54,14 @@
 *  Arguments Given:
       CHARACTER * ( * ) STRING
       INTEGER POS
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) WORD
       INTEGER WLEN
 
 *  External References:
-      INTEGER CHR_LEN            ! Index of last non-blank character      
-      
+      INTEGER CHR_LEN            ! Index of last non-blank character
+
 *  Local Variables:
       CHARACTER
      :     C*1,                  ! Current character
@@ -74,10 +74,10 @@
 
       LOGICAL
      :     BLANK,                ! An inter-word blank?
-     :     LBLANK,               ! Was previous an inter-word blank?      
+     :     LBLANK,               ! Was previous an inter-word blank?
      :     LESC,                 ! Was previous an escape character?
      :     QUOTED                ! Inside a quoted string?
-      
+
 *.
 
 *  Initialise WLEN and WORD to indicate that the word has not been found.
@@ -95,33 +95,33 @@
          QUOTED = .FALSE.
          WMAX = LEN( WORD )
          ESC = '\\'    ! Some compilers treat \ as an escape character
-                       ! and so need two ("\\") in the source code in 
+                       ! and so need two ("\\") in the source code in
                        ! order to get one ("\") in the object code. ESC
                        ! has a declared length of 1 and so will only
                        ! store a single \ if the compiler doesn't treat
                        ! \ as an escape character.
-         
+
 *  Loop round each character in the string.
          DO I = 1, CHR_LEN( STRING )
-            
+
 *  Save the character.
             C = STRING( I : I )
 
 *  If this is an unescaped escape character, flag that the next
 *  character has been escaped and pass on.
-            IF( ( C .EQ. ESC ) .AND. ( .NOT. LESC ) ) THEN            
+            IF( ( C .EQ. ESC ) .AND. ( .NOT. LESC ) ) THEN
                LESC = .TRUE.
 
             ELSE
-               
+
 *  If this character is an unescaped single quote, toggle a flag which
 *  says if we are in a quoted string or not, and pass on.
                IF( C .EQ. '''' .AND. ( .NOT. LESC ) ) THEN
                   QUOTED = .NOT. QUOTED
 
-               ELSE 
-               
-*  Set a flag to indicate if this character is an unescaped space or 
+               ELSE
+
+*  Set a flag to indicate if this character is an unescaped space or
 *  non-printing (eg tab) character. Spaces, etc, are not treated as word
 *  delimiters if they occur within quoted strings.
                   BLANK = ( ( C .LE. ' ' ) .AND. ( .NOT. LESC ) .AND.
@@ -140,20 +140,20 @@
                      WLEN = WLEN + 1
                      WORD( WLEN : WLEN ) = C
 
-                  END IF                        
+                  END IF
 
                   LBLANK = BLANK
-                  
+
                END IF
 
                LESC = .FALSE.
-               
+
             END IF
 
          END DO
-      
+
       END IF
 
  999  CONTINUE
-      
+
       END

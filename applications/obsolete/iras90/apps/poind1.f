@@ -19,7 +19,7 @@
 *     associated with the given waveband in the same rate as the IRAS
 *     scans. The segment to be re-sampled is centred at the profile
 *     centre, which has the zero X axis value, and has the length of
-*     PRFWID. 
+*     PRFWID.
 
 *  Arguments:
 *     NPSMP = INTEGER (Given)
@@ -29,7 +29,7 @@
 *        Number of profile in the input ideal point source profile data
 *        array.
 *     DATA( NPSMP, NPROF ) = REAL (Given)
-*        The input ideal point source profile data array. 
+*        The input ideal point source profile data array.
 *     AXIS( NPSMP ) = REAL (Given)
 *        The in-scan axis of the point source profile, in arc-min from
 *        its centre.
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -115,7 +115,7 @@
       END IF
 
 *  Calculate the new sample size in arcmin.
-      SMPSIZ = I90__SPEED / I90__SRATE( BAND ) 
+      SMPSIZ = I90__SPEED / I90__SRATE( BAND )
 
 *  Find the samples along the profile's X axis which is just above 0
 *  arcmin.
@@ -131,7 +131,7 @@
       END DO
 
 *  Find the value of the profile at the 0 arc-min position by linear
-*  interpolation. 
+*  interpolation.
       DIS1 = - AXIS( LOSMP )
       VAL1 = DATA( LOSMP, LINNO )
       DIS2 = AXIS( UPSMP )
@@ -144,7 +144,7 @@
 *  Set the inital serach sample for the further re-sampling.
       J = LOSMP
       K = UPSMP
-      
+
 *  Find the re-sampled values for the lower half of the output segment.
       DO I = PRFWID / 2, 1, -1
 
@@ -179,7 +179,7 @@
          END IF
 
 *  Put the value to the output array at the resample position.
-         PRFSEG( I ) = VAL   
+         PRFSEG( I ) = VAL
       END DO
 
 *  Find the resampled values in the upper half of the output segment.
@@ -216,7 +216,7 @@
          END IF
 
 *  Put the value to the output array at the resample position.
-         PRFSEG( I ) = VAL   
+         PRFSEG( I ) = VAL
       END DO
-         
+
       END

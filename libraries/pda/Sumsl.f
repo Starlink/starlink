@@ -8,12 +8,12 @@
 *     Tests the pda_sumsl minimisation routine.
 
 *  Description:
-*     We create a 3D data array using the following model: 
+*     We create a 3D data array using the following model:
 *
 *     array(i,j,k) = ( i - X1 )*( j/X2 - X3 )*( k/X4 - X5 )
 *
-*     where the 5 parameters X1 to X5 are set to (1, 2, 3, 4, 5). We then 
-*     use PDA_SUMSL to fit the same 5 parameter model to the data array, 
+*     where the 5 parameters X1 to X5 are set to (1, 2, 3, 4, 5). We then
+*     use PDA_SUMSL to fit the same 5 parameter model to the data array,
 *     using the objective function:
 
 *     f( X ) = SUM( ( array - model( X ) )**2 ) over all i,j,k
@@ -123,7 +123,7 @@
             do k = 1, dims( 3 )
                ivec = ivec + 1
                m = model( 0, i, j, k, x, nf )
-               r = array( ivec ) - model( 0, i, j, k, x, nf ) 
+               r = array( ivec ) - model( 0, i, j, k, x, nf )
                f = f + r**2
             end do
          end do
@@ -148,7 +148,7 @@
          do j = 1, dims( 2 )
             do k = 1, dims( 3 )
                ivec = ivec + 1
-               res = array( ivec ) - model( 0, i, j, k, x, nf ) 
+               res = array( ivec ) - model( 0, i, j, k, x, nf )
 
                g(1) = g(1) + res*model( 1, i, j, k, x, nf )
                g(2) = g(2) + res*model( 2, i, j, k, x, nf )
@@ -182,10 +182,10 @@
          a = dble( i ) - x( 1 )
          b = dble( j )/x( 2 ) - x( 3 )
          c = dble( k )/x( 4 ) - x( 5 )
-   
+
          if( axis .eq. 0 ) then
             model = a*b*c
-  
+
          else if( axis .eq. 1 ) then
             model = -b*c
 

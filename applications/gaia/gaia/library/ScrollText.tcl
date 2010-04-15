@@ -115,7 +115,7 @@
 itk::usual ScrollText {}
 
 itcl::class gaia::ScrollText {
-                       
+
    #  Inheritances:
    inherit util::FrameWidget
 
@@ -173,12 +173,12 @@ itcl::class gaia::ScrollText {
 
    #  Methods.
    #  --------
-   
+
    #  Insert line of text method.
    method insert { index args } {
       eval $itk_component(Text) insert $index $args
    }
-      
+
    #  Clear range of lines of text method.
    method clear { args } {
       if { [lindex $args 0 ] != "all" } {
@@ -207,7 +207,7 @@ itcl::class gaia::ScrollText {
 
    #  Set text of label.
    itk_option define -label scrolltextlabel ScrolltextLabel {} {
-      if { [info exists itk_component(Label)] } { 
+      if { [info exists itk_component(Label)] } {
          $itk_component(Label) configure -text "$itk_option(-label)"
       }
    }

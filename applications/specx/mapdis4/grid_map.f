@@ -120,10 +120,10 @@ C  Save the existing LINK array and set to 1,2,3 for these maps
 
       CALL GEN_GETR4A ('Y-axis range in Kelvins?',
      &                  TLIM, 2, 'F9.3'',''F9.3', TLIM, ISTAT)
-      
+
       CALL GEN_YESNO ('Also plot interpolated spectra?',
      &                 .FALSE., PLOT_INTERP, ISTAT)
-      
+
 *     Make sure this routine uses uninterpolated, unrotated map (if
 *     interpolated spectra are required they are interpolated on demand).
 
@@ -221,7 +221,7 @@ CD    PRINT *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
 
       MAP_NAME = MAP_ID
       CALL COPY_MAPPOS (RA, DEC, RAM, DECM, MAP_RA, MAP_DEC)
-      
+
       CALL SXGLWEIGHT    (LWEIGHT)
       CALL SXGEXPAND     (CHARHT/3.)
       CALL SXGFONT       (1)
@@ -231,7 +231,7 @@ CD    PRINT *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
       END IF
 
 *     Get spectra one at a time and window onto map area.
-        
+
       DO J = 1, NJ
         DO I = 1, NI
 

@@ -85,15 +85,15 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
-      
+
 *  Arguments Given:
       INTEGER AGRP1
       INTEGER BGRP1
       INTEGER AGRP2
-      
+
 *  Arguments Returned:
       INTEGER BGRP2
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -103,7 +103,7 @@
       INTEGER N2                 ! Size of the output group
       CHARACTER * ( GRP__SZNAM ) ANAME ! Name got from AGRP1
       CHARACTER * ( GRP__SZNAM ) BNAME ! Name got from BGRP1
-      
+
 *.
 
 *  Initialise error status return value.
@@ -111,7 +111,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Find the size of the output group.
       CALL GRP_GRPSZ( AGRP2, N2, STATUS )
 
@@ -131,8 +131,8 @@
             GO TO 99
          END IF
 
-*  Copy the corresponding name from BGRP1 to BGRP2.  For the first 
-*  item only use GRP_COPY, since this should copy across all the 
+*  Copy the corresponding name from BGRP1 to BGRP2.  For the first
+*  item only use GRP_COPY, since this should copy across all the
 *  auxiliary data like case significance flags etc.
          IF ( I .EQ. 1 ) THEN
             CALL GRP_COPY( BGRP1, IGOT, IGOT, .FALSE., BGRP2, STATUS )

@@ -13,15 +13,15 @@
 *     CALL IRA_IDPROJN( IDA, PROJN, STATUS )
 
 *  Description:
-*     This routine returns the Sky Coordinate System associated with an 
+*     This routine returns the Sky Coordinate System associated with an
 *     IRA identifier.
 
 *  Arguments:
 *     IDA = INTEGER (Given)
 *        The IRA identifier for the astrometry information.
 *     PROJN = CHARACTER * ( * ) (Returned)
-*        On exit, contains the projection name associated with the IRA 
-*        identifier. The supplied variable should have a declared length 
+*        On exit, contains the projection name associated with the IRA
+*        identifier. The supplied variable should have a declared length
 *        given by symbolic constant IRA__SZPRJ.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -52,7 +52,7 @@
 
 *  History:
 *     4-OCT-2004 (DSB):
-*        Original version. 
+*        Original version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,12 +92,12 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Store the required SCS string.
-         PROJN = ACM_PROJN( IDA ) 
+         PROJN = ACM_PROJN( IDA )
 
 *  If an error occurred, give a context message.
       ELSE
          CALL ERR_REP( 'IRA_IDPROJN_ERR1', 'IRA_IDPROJN: Unable to '//
-     :                 'get the projection name for an IRA identifier', 
+     :                 'get the projection name for an IRA identifier',
      :                 STATUS )
       END IF
 

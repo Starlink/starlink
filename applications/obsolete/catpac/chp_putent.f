@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHP_PUTENT( INPUT, CHECK, NUMCOLS, NAMES, COLTYPES, CHARVALS, 
+     : CHP_PUTENT( INPUT, CHECK, NUMCOLS, NAMES, COLTYPES, CHARVALS,
      : DOUBVALS, INTVALS, LOGVALS, REALVALS, PTRVALS,  NULLS, STATUS)
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHP_PUTENT( INPUT, CHECK, NUMCOLS, NAMES, COLTYPES, CHARVALS, 
+*     CALL CHP_PUTENT( INPUT, CHECK, NUMCOLS, NAMES, COLTYPES, CHARVALS,
 *     DOUBVALS, INTVALS, LOGVALS, REALVALS, PTRVALS,  NULLS, STATUS)
 *
 *  Description:
@@ -23,9 +23,9 @@
 *     an array CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS and PTRVALS
 *     respecitvely.
 *
-*     The columns in each of these arrays appear in the same order as they 
-*     appear in NAMES, the given list of column names to be placed. So if 
-*     we have 
+*     The columns in each of these arrays appear in the same order as they
+*     appear in NAMES, the given list of column names to be placed. So if
+*     we have
 *
 *     NAMES     COL1  COL2  COL3  COL4  COL5  COL6  COL7  COL8  COL9  COL10
 *
@@ -33,51 +33,51 @@
 *
 *     NULLS       T     T     T     T     F     T     T     T     T      T
 *
-*     then INTVALS(1)  should contain the data for COL1. INTVALS(2) the data 
+*     then INTVALS(1)  should contain the data for COL1. INTVALS(2) the data
 *     for COL3, INTVALS(3) the data for COL6 and INTVALS(4) the data for COL10.
 *
-*     Columns that are given but are not in the catalogue or are of the wrong 
-*     type are ignored. 
+*     Columns that are given but are not in the catalogue or are of the wrong
+*     type are ignored.
 *
 *     There are four levels of checking which are selected using the argument
 *     CHECK. Modes 1 and 2 are efficient and should be used whenever possible.
 *     You are advised not to change the level of checking when putting data
-*     into a catalogue unless you are moving to a mode where more checking is 
+*     into a catalogue unless you are moving to a mode where more checking is
 *     done
 *
-*     CHECK=1. The lowest level of checking. The routine processes the column 
-*     names given in NAMES. Only if the column appears in the catalogue and 
+*     CHECK=1. The lowest level of checking. The routine processes the column
+*     names given in NAMES. Only if the column appears in the catalogue and
 *     the type agrees with the that given in COLTYPES will data be put into
 *     the column for this entry. All other columns take their null values. The
 *     routine remembers where it found the data for each column (Eg. FLUX1 data
-*     in REALVALS(5)). On subsequent calls the routine assumes that the FLUX1 
-*     value will be in REALVALS(5). 
+*     in REALVALS(5)). On subsequent calls the routine assumes that the FLUX1
+*     value will be in REALVALS(5).
 *
 *     CHECK=2. The routine processes the column names given in NAMES and only
 *     if the all the columns in the catalogue are given in NAMES and the
 *     types are correct will the entry be put into the catalogue. If, during
-*     checking, an error is found the error is reported and the name of the 
+*     checking, an error is found the error is reported and the name of the
 *     offending column is returned in NAMES(1). Again after
-*     the first call the routine remembers where it found the data for each 
+*     the first call the routine remembers where it found the data for each
 *     column and on subsequent calls the routine assumes that the data will be
-*     in the same place. This mode ensures that genuine data is put into the 
+*     in the same place. This mode ensures that genuine data is put into the
 *     catalogue. Columns cannot be overlooked.
 *
-*     CHECK=3. In this mode the routine processes the column names given in 
-*     NAMES and their column types every time the routine is called. This 
-*     means that different columns can contribute to each entry. Only if 
-*     the column appears in the catalogue and 
+*     CHECK=3. In this mode the routine processes the column names given in
+*     NAMES and their column types every time the routine is called. This
+*     means that different columns can contribute to each entry. Only if
+*     the column appears in the catalogue and
 *     the type agrees with that given in COLTYPES will data be put into
 *     the column for this entry. All other column take their null values.
 *
-*     CHECK=4. Again in this mode the routine processes the column names given 
+*     CHECK=4. Again in this mode the routine processes the column names given
 *     in NAMES and their column types every time the routine is called.  Only
 *     if the all the columns in the catalogue are given in NAMES and the
 *     types are correct will the entry be put into the catalogue.  If, during
-*     checking, an error is found the error is reported and the name of the 
+*     checking, an error is found the error is reported and the name of the
 *     offending column is returned in NAMES(1). Subsequent
 *     calls to the routine may have the columns in NAMES in a different order
-*     but they must all be their and the respective column types must be 
+*     but they must all be their and the respective column types must be
 *     correct.
 *
 *
@@ -134,7 +134,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,11 +158,11 @@
       INTEGER PTRVALS ( * )
       CHARACTER * ( 1 ) COLTYPES( * )
       LOGICAL NULLS ( * )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References: 
+*  External References:
       logical chr_simlr
 
 *  Local Variables:
@@ -214,7 +214,7 @@
             notfnd = .FALSE.
             if (EPnsflag(cd,colcount)) then
               cval = charvals(cc)
-              call chp_connds(cval, EPnsformat(cd,colcount), 
+              call chp_connds(cval, EPnsformat(cd,colcount),
      :              dval, status)
               realvals(cc) = dval
               coltypes(cc) = 'R'
@@ -229,14 +229,14 @@
 *   The offset of the start of the array is stored in the CHI catalogue
 *   as an integer column and a length of the array is stored in another
 *   column. For a fixed size N-dimensional array this is the product
-*   of the dimensions, for a variable length array this is just the 
+*   of the dimensions, for a variable length array this is just the
 *   size. Only 1-dimensional variable length arrays are supported.
 *
 *
 *   Check through the columns. If the calumn has an array shape 0 (it
 *   is not and array) copy it straight the arguments for the CHI call.
 *   If it is an array then INTVALS(x) is a pointer to the dynamic memory
-*   and ARRLEN(x) is th size. Copy this to the array file starting at 
+*   and ARRLEN(x) is th size. Copy this to the array file starting at
 *   the current offset and then increment the offset.xxxxx
 *
 *

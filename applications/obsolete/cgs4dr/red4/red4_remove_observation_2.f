@@ -1,5 +1,5 @@
 *+  RED4_REMOVE_OBSERVATION_2 - Subtract observation from reduced group file - 2
-      SUBROUTINE RED4_REMOVE_OBSERVATION_2( OBSTYPE, COADDED_OBS, 
+      SUBROUTINE RED4_REMOVE_OBSERVATION_2( OBSTYPE, COADDED_OBS,
      :  COADD_NAME, VARIANCE_WT, SKY_WT, STATUS )
 *    Description :
 *     This is a lower level routine, called by RED4_REMOVE_OBSERVATION, which
@@ -10,14 +10,14 @@
 *     observation has been opened with a DSA reference of 'OBSRED',
 *     the reduced group has been opened with a DSA reference of 'GRPRED',
 *     and the .MORE.CGS4_COADDS structure within the reduced group has
-*     been opened with a reference of 'COADDS'. When this routine is 
+*     been opened with a reference of 'COADDS'. When this routine is
 *     called non of the data arrays have been mapped.
 *
 *     It is assumed that reduced observations of type OBJECT were added
 *     to the contents of the reduced group file, and reduced observations
 *     of type SKY were subtracted from the contents of the reduced group
 *     file, after being optionally multiplied by a weighting factor
-*     indicated by the SKY_WT parameter. 
+*     indicated by the SKY_WT parameter.
 *     Observations may also have been weighted according to their variance
 *     if observing conditions dictate.
 *     Observation types other than OBJECT and SKY are not allowed.
@@ -31,7 +31,7 @@
 *     previous values of RUTSTART, RUTEND, UTSTART, UTEND, AMSTART and
 *     AMEND cannot be restored.
 *    Invocation :
-*     CALL RED4_REMOVE_OBSERVATION_2( OBSTYPE, COADDED_OBS, COADD_NAME, 
+*     CALL RED4_REMOVE_OBSERVATION_2( OBSTYPE, COADDED_OBS, COADD_NAME,
 *     :  STATUS )
 *    Parameters :
 *     OBSTYPE     = CHARACTER*(*)
@@ -130,28 +130,28 @@
      :  NELM,                      ! Number of elements in data array.
      :  ADDRESS,                   ! Address returned when mapping.
      :  OBSDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    reduced observation file 
+*                                  !    reduced observation file
      :  OBSDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    reduced observation file
      :  OBSVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    reduced observation file 
+*                                  !    reduced observation file
      :  OBSVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    reduced observation file
      :  OBSQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    reduced observation file 
+*                                  !    reduced observation file
      :  OBSQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    reduced observation file
      :  GRPDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPDATA_PTR                ! Pointer to data array mapped from
 *                                  !    reduced group file
       INTEGER
      :  GRPVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    reduced group file
      :  GRPQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    reduced group file
      :  COADDS_SLOT,               ! Mapping slot for data array in COADDS
@@ -170,12 +170,12 @@
 *   observation file).
       CALL DSA_DATA_SIZE( 'GRPRED', MAXDIM, NDIM, DIMS, NELM, STATUS )
 
-*   Indicate to DSA that a data quality array will be used to 
+*   Indicate to DSA that a data quality array will be used to
 *   indicate bad values in both structures.
       CALL DSA_USE_QUALITY( 'OBSRED', STATUS )
       CALL DSA_USE_QUALITY( 'GRPRED', STATUS )
 
-*   Map the data, variance and quality arrays from the reduced 
+*   Map the data, variance and quality arrays from the reduced
 *   observation file.
       CALL DSA_MAP_DATA( 'OBSRED', 'READ', 'FLOAT', ADDRESS,
      :  OBSDATA_SLOT, STATUS )
@@ -211,7 +211,7 @@
          IF ( VARIANCE_WT ) THEN
 
 *         Clean up the observation before checking it. (THIS IS A FUDGE!!).
-            CALL GEN_CLEANV( NELM, %val(OBSDATA_PTR), 
+            CALL GEN_CLEANV( NELM, %val(OBSDATA_PTR),
      :        %val(OBSVAR_PTR), %val(OBSQUAL_PTR), SNCUT, TLOW,
      :        .TRUE., .FALSE., 0.0 )
 
@@ -225,7 +225,7 @@
      :           ( VARMAX .GT. LARGEST_VAR ) ) THEN
 
                STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/ 
+               CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/
      :           /'These data are not suitable for variance '/
      :           /'weighting, and should never '/
      :           /'have been added!', STATUS )
@@ -242,7 +242,7 @@
 *            Subtract the observation data from the reduced group,
 *            propagating variance and quality and updating the
 *            COADDS array.
-               CALL RED4_SUBTRACT_OBS( DIMS(1), DIMS(2), 1.0, 
+               CALL RED4_SUBTRACT_OBS( DIMS(1), DIMS(2), 1.0,
      :           VARIANCE_WT,
      :           %val(OBSDATA_PTR), %val(OBSVAR_PTR),
      :           %val(OBSQUAL_PTR),
@@ -290,7 +290,7 @@
 
 *               An error occurred during the removal.
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/ 
+                  CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/
      :              /'First arithmetic error during '/
      :              /'removal - suspect zero variance in group '/
      :              /'file', STATUS )
@@ -301,7 +301,7 @@
 *            Add back the observation data from the reduced group,
 *            propagating variance and quality and updating the COADDS
 *            array. (Note that the same routine as that to subtract
-*            the OBJECT observation is used, but the weight is 
+*            the OBJECT observation is used, but the weight is
 *            multiplied by -1 so the data values are added back).
                CALL RED4_SUBTRACT_OBS( DIMS(1), DIMS(2), -SKY_WT,
      :           VARIANCE_WT,
@@ -334,7 +334,7 @@
 
 *               An error occurred during the removal.
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/ 
+                  CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/
      :              /'Second arithmetic error during '/
      :              /'removal - suspect zero variance in group '/
      :              /'file', STATUS )
@@ -350,7 +350,7 @@
       ELSE
 
          STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/ 
+         CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION_2: '/
      :     /'Error mapping arrays', STATUS )
       END IF
 

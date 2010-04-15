@@ -10,19 +10,19 @@ C FINDHEAD     Find column header with a character string
 C GETTHEH      Get header order in the input list
 C GTHEAD       Get a character string from a file column header
 C IDENT        Fill identifiers columns of a table with #1 - #n
-C LBGONE       Remove leading blanks from string    
+C LBGONE       Remove leading blanks from string
 C LENS         (FN) Find position of last non-blank character in a string
 C LOWCASE      Convert a character string to lower case
 C NAMECHR      See if two 20 character 'names' are the same
 C NAMEGT       Get the 20 character 'name' identifier from a line in a table
-C NAMETR       Translate a 20 character 'name' into 5 Reals 
+C NAMETR       Translate a 20 character 'name' into 5 Reals
 C NUMEL        Get no and location of elements in a text string
 C PARGBEG      Start text values text loading
-C PARG(CILR)   Load (string:int:logical:real) value for text loading 
+C PARG(CILR)   Load (string:int:logical:real) value for text loading
 C PRINTD       Output text string to CL with embedded constants
 C PTHEAD       Put a character string as a file column header
 C RCHECK       Read a real number; return true if bit n is set, false if not
-C RCHZERO      Check a 2-d sub-image in a 3-d real array, and returns 
+C RCHZERO      Check a 2-d sub-image in a 3-d real array, and returns
 C RVTEXT       Put a real number into a character string
 C TRUNC        (Function) Truncate no of digits before decimal point
 C TRUNC_E      (Function) Truncate no of digits after decimal point
@@ -193,7 +193,7 @@ Cbegin
             ncol = j
          endif
       enddo
-      
+
 
       end
 
@@ -242,7 +242,7 @@ C GTHEAD -- Get a character string from a file column header
 C   It assumes the file is an XYlist and finds how many parameters
 C   it has and then reads the decsriptor 'HEAD00n' , where 'n'
 C   is the number of the wanted Header.
-C   
+C
 C   If the descriptor is missing it is set to ' ' and an error flagged.
 C
 C   alan penny                       ral                    1990 Jan
@@ -276,9 +276,9 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C IDENT -- Fill identifier columns of a table with #1 - #n
-C   Load the identifier characters one by one into ID, and then 
+C   Load the identifier characters one by one into ID, and then
 C   transfer them byte by byte into the correct place in the table.
-C   
+C
 C   The identifiers take up the first 20 bytes (1st 5 real words)
 C   of each row.
 C
@@ -292,7 +292,7 @@ C   alan penny                       ral                   1990-02-16
       include 'STARMAN_INC'
 
       integer    nx		!i: No of columns (inc identifier columns)
-      integer    ny		!i: No of rows 
+      integer    ny		!i: No of rows
       byte       data(nx*4,ny)	!o: Table
 C--
       character id*20
@@ -314,7 +314,7 @@ Cbegin
 
       end
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C LBGONE -- Remove leading blanks from a character string
 C
@@ -329,7 +329,7 @@ C   alan penny               ral         1990 Jan
 C--
       integer start, stop, lencpy, curorg, curshf
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
@@ -349,10 +349,10 @@ Cbegin
          enddo
          str(lencpy+1:) = ' '
       endif
-    
- 
+
+
       end
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C LENS -- (FN) Find position of last non-blank character in a string
 C  If all blank, then 0 is returned
@@ -369,7 +369,7 @@ C--
       integer ip
 Cbegin
 
- 
+
       lens = 0
 
       if ( ST_FAILED ) return
@@ -382,7 +382,7 @@ Cbegin
       enddo
       lens = ip
 
- 
+
       end
 
 
@@ -421,13 +421,13 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C NAMECHR -- See if two 20 character 'names' are the same
 C
 C a j penny             ral                          1990-06-06
- 
+
       subroutine namechr ( na, nb, ka )
 
       implicit none
       include 'STARMAN_INC'
 
-      byte	na(20)			!i: First name 
+      byte	na(20)			!i: First name
       byte	nb(20)			!i: Second name
       integer	ka			!o: Match flag (0=same;1=different)
 C--
@@ -452,7 +452,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C NAMEGT -- Get the 20 character 'name' identifier from a line in a table
 C
 C a j penny             stsci                  1987-03-22
- 
+
       subroutine namegt ( tb, tbvx, tby, kl, name )
 
       implicit none
@@ -475,7 +475,7 @@ Cbegin
 
       call amovz ( tb(1,kl), buf(1), 20 )		!Load name
 
-      do i = 1, 20					!Convert identifier bytes 
+      do i = 1, 20					!Convert identifier bytes
          nchar = asc(i)					! to characters
          name(i:i) = char(nchar)
       enddo
@@ -485,16 +485,16 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C NAMETR -- Translate a 20 character 'name' into 5 Reals 
+C NAMETR -- Translate a 20 character 'name' into 5 Reals
 C
 C a j penny             ral                     1990-06-06
- 
+
       subroutine nametr ( na, rna )
 
       implicit none
       include 'STARMAN_INC'
 
-      character na*20			!i: Input name 
+      character na*20			!i: Input name
       real	rna(5)			!o: Output name
 C--
       real rid(5)
@@ -544,7 +544,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       klen = lens(text)
-      
+
       if ( klen.lt.1 ) then
          num = 0
          ks(1) = 1
@@ -632,7 +632,7 @@ C alan penny                  ral          1990-06-24
 
       implicit none
       include 'STARMAN_INC'
-      
+
 C--
       integer nint, nreal, aint(1000), nlog, nch, nach(100)
       real areal(1000)
@@ -653,7 +653,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PARGC -- Load character string for text loading with constant value 
+C PARGC -- Load character string for text loading with constant value
 C
 C alan penny                  ral          1990-06-24
 
@@ -661,7 +661,7 @@ C alan penny                  ral          1990-06-24
 
       implicit none
       include 'STARMAN_INC'
-      
+
       character*(*)	ch		!i: Input character string
 C--
       integer nint, nreal, aint(1000), nlog, nch, nach(100)
@@ -702,7 +702,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PARGI -- Load integer for text loading with constant value 
+C PARGI -- Load integer for text loading with constant value
 C
 C alan penny                  ral          1990-06-24
 
@@ -710,7 +710,7 @@ C alan penny                  ral          1990-06-24
 
       implicit none
       include 'STARMAN_INC'
-      
+
       integer	n		!i: Input integer
 C--
       integer nint, nreal, aint(1000), nlog, nch, nach(100)
@@ -735,7 +735,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PARGL -- Load boolean for text loading with constant value 
+C PARGL -- Load boolean for text loading with constant value
 C
 C alan penny                  ral          1990-06-24
 
@@ -743,7 +743,7 @@ C alan penny                  ral          1990-06-24
 
       implicit none
       include 'STARMAN_INC'
-      
+
       logical	l		!i: Input integer
 C--
       integer nint, nreal, aint(1000), nlog, nch, nach(100)
@@ -768,7 +768,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PARGR -- Load real for text loading with constant value 
+C PARGR -- Load real for text loading with constant value
 C
 C alan penny                  ral          1990-06-24
 
@@ -776,7 +776,7 @@ C alan penny                  ral          1990-06-24
 
       implicit none
       include 'STARMAN_INC'
-      
+
       real	r		!i: Input real
 C--
       integer nint, nreal, aint(1000), nlog, nch, nach(100)
@@ -811,7 +811,7 @@ C alan penny                  ral          1990-06-24
 
       implicit none
       include 'STARMAN_INC'
-      
+
       character*(*)	ch		!i: Input text string
 C--
       integer nint, nreal, aint(1000), nlog, nch, nach(100)
@@ -847,7 +847,7 @@ Cbegin
                textt(kout:kout+ka-2) = ch(kin:kin+ka-2)
                kout = kout + ka - 1
             endif
-            kin = kin + ka 
+            kin = kin + ka
 
             ktext = 0
             if ( ch(kin:kin).eq.'d' ) then
@@ -935,7 +935,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PTHEAD -- Put a character string as a file column header
 C     It is put as the contents of a descriptor onto a file where the
-C     descriptor is of the form 'HEADn' where 'n' is the desired 
+C     descriptor is of the form 'HEADn' where 'n' is the desired
 C     number 001 or 002 thru 099 to 999.
 C     They should be at least 20 characters long and must be 72 or less.
 C
@@ -975,7 +975,7 @@ C
 C     a j penny                stsci                   1987-02-24
 
 
-      logical function rcheck ( val, num ) 
+      logical function rcheck ( val, num )
       implicit none
 
       real val		!i: Number to get result from
@@ -1006,16 +1006,16 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C RCHZERO -- Check a 2-d sub-image in a 3-d real array, and returns 
+C RCHZERO -- Check a 2-d sub-image in a 3-d real array, and returns
 C            .FALSE. if it is ALL zero, .TRUE.  if NOT ALL zero
 C
 C  a j penny                stsci                    1987-02-23
- 
+
       subroutine rchzero ( data, nx, ny, nz, num, nxa, nya, check )
 
       implicit none
       include 'STARMAN_INC'
-      
+
       integer nx		!i: X size of input array
       integer ny		!i: Y size of input array
       integer nz		!i: Z size of input array
@@ -1027,7 +1027,7 @@ C  a j penny                stsci                    1987-02-23
 				!            False if non-zero)
 C--
       integer j, k
-Cbegin      
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -1052,9 +1052,9 @@ C alan penny                  ral          1993 Feb
 
       implicit none
       include 'STARMAN_INC'
-      
+
       real              rv              !i: Input number
-      character*(*)	text		!o: Output text string 
+      character*(*)	text		!o: Output text string
 					!    Must be >= 11 characters long
 C--
       integer j, kl
@@ -1085,7 +1085,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TRUNC -- (Function) Truncate no of digits before decimal point
 C  Thus if you want a number to be limited between
 C                +99*99.0 and -9*99.0
-C  where * can be any number of nines, but the -ve one has one less. 
+C  where * can be any number of nines, but the -ve one has one less.
 C  Useful in listing numbers to ensure they do not overflow bounds.
 C
 C    alan penny             ral               1989-08-13
@@ -1099,19 +1099,19 @@ C    alan penny             ral               1989-08-13
 C--
       real rmin, rmax
 Cbegin
- 
+
 
       rmax = 10.0**max(1.0,real(n))
       rmin = -1.0*(rmax/10.0)
       trunc = max((rmin+1.0),min((rmax-1.0),a))
 
 
-      end 
+      end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TRUNC_E -- (Function) Truncate no of digits after decimal point
-C  Thus if you want a number to be rounded 
+C  Thus if you want a number to be rounded
 C      123.4567 can go to  123.45
 C     -123.4567 can go to -123.4567
 C
@@ -1127,7 +1127,7 @@ C--
       real ab, aat, sv
       integer k
 Cbegin
- 
+
 
       sv = sign(1.0,a)
       ab = abs(a)
@@ -1136,7 +1136,7 @@ Cbegin
       trunc_e = sv*(real(k)+(real(int(aat*(ab-real(k))))/aat))
 
 
-      end 
+      end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -1151,7 +1151,7 @@ C     a j penny                stsci                   1987-02-24
 
       integer		nh		!i: No of help lines
       character*68	thelp(*)	!i: Help text
-      character*(*)	cmdlst		!i: Command list 
+      character*(*)	cmdlst		!i: Command list
       integer		ksw(200)	!i: Start posn of commands in list
       integer		klw(200)	!i: Length of commands in list
       integer		jcon(200)	!i: Order of commands in list
@@ -1183,7 +1183,7 @@ Cbegin
             endif
          enddo
       else
-         call printo ( 
+         call printo (
      +           'No help available. Try "?" or "$help PROGRAM_NAME"' )
          call printo ( 'Options are:-' )
          call printo ( '--------------------------------' )
@@ -1287,7 +1287,7 @@ C
 C     a j penny                stsci                   1987-02-24
 
 
-      subroutine wcheck ( val, num, test ) 
+      subroutine wcheck ( val, num, test )
 
       implicit none
       include 'STARMAN_INC'
@@ -1362,8 +1362,8 @@ C  alan Penny               ral             1991 Dec
       implicit none
       character*1      arg	!i: Input character
 C--
-Cbegin 
-      ischar = (arg.ge.'A') .and. (arg.le.'Z')	
+Cbegin
+      ischar = (arg.ge.'A') .and. (arg.le.'Z')
       end
 
 
@@ -1376,7 +1376,7 @@ C  alan Penny               ral             1991 Dec
       implicit none
       character*1      arg	!i: Input character
 C--
-Cbegin 
+Cbegin
       isnumb = ((arg.ge.'0') .and. (arg.le.'9')).or.(arg.eq.'.' )
       end
 
@@ -1390,7 +1390,7 @@ C  alan Penny               ral             1991 Dec
       implicit none
       character*1      arg	!i: Input character
 C--
-Cbegin 
+Cbegin
       issign = (arg.eq.'+') .or. (arg.eq.'-')
       end
 
@@ -1400,18 +1400,18 @@ C  This is  STARFLIB1.FOR
 C
 C It contains:-
 C
-C ACUBINT    Cubic interpolates value/slope at a point in a set of 4 values 
-C CUBINT     Cubic interpolates value/slope at a point in a set of 4 values 
-C CUBINTX    Cubic interpolates value at a point in a set of 4 values 
+C ACUBINT    Cubic interpolates value/slope at a point in a set of 4 values
+C CUBINT     Cubic interpolates value/slope at a point in a set of 4 values
+C CUBINTX    Cubic interpolates value at a point in a set of 4 values
 
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C CUBINT -- Cubic interpolates value/slope at a point in a set of 4 values 
-C  Given values for a function F(x) at positions x=-1,0,1,2, this 
-C  function estimates a value for the function at a position X, 
-C  using a cubic interpolating polynomial.  The specific polynomial used 
-C  has the properties CUBINT(0)=F(0), CUBINT(1)=F(1), and the first 
+C CUBINT -- Cubic interpolates value/slope at a point in a set of 4 values
+C  Given values for a function F(x) at positions x=-1,0,1,2, this
+C  function estimates a value for the function at a position X,
+C  using a cubic interpolating polynomial.  The specific polynomial used
+C  has the properties CUBINT(0)=F(0), CUBINT(1)=F(1), and the first
 C  derivative of CUBINT with respect to x is continuous at x=0 and x=1.
 C
 C  P B STETSON                  DAO                1986
@@ -1439,11 +1439,11 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ACUBINT -- Cubic interpolates value/slope at a point in a set of 4 values 
-C  Given values for a function F(x) at positions x=-1,0,1,2, this 
-C  function estimates a value for the function at a position X, 
-C  using acubic interpolating polynomial.  The specific polynomial used 
-C  has the properties ACUBINT(0)=F(0), ACUBINT(1)=F(1), and the first 
+C ACUBINT -- Cubic interpolates value/slope at a point in a set of 4 values
+C  Given values for a function F(x) at positions x=-1,0,1,2, this
+C  function estimates a value for the function at a position X,
+C  using acubic interpolating polynomial.  The specific polynomial used
+C  has the properties ACUBINT(0)=F(0), ACUBINT(1)=F(1), and the first
 C  derivative of ACUBINT with respect to x is continuous at x=0 and x=1.
 C
 C  P B STETSON                  DAO                1986
@@ -1471,11 +1471,11 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C CUBINTX -- Cubic interpolates value at a point in a set of 4 values 
-C  Given values for a function F(x) at positions x=-1,0,1,2, this 
-C  function estimates a value for the function at a position X, 
-C  using a cubic interpolating polynomial.  The specific polynomial used 
-C  has the properties CUBINTX(0)=F(0), CUBINTX(1)=F(1), and the first 
+C CUBINTX -- Cubic interpolates value at a point in a set of 4 values
+C  Given values for a function F(x) at positions x=-1,0,1,2, this
+C  function estimates a value for the function at a position X,
+C  using a cubic interpolating polynomial.  The specific polynomial used
+C  has the properties CUBINTX(0)=F(0), CUBINTX(1)=F(1), and the first
 C  derivative of CUBINTX with respect to x is continuous at x=0 and x=1.
 C
 C  P B STETSON                      DAO 1989
@@ -1623,7 +1623,7 @@ C   a j penny                 dao           1988-04-25
       character*(*)	xt	!i: Text for X axis
       real		ys	!i: User Y start
       real		ye	!i: User Y end
-      character*(*)	yt	!i: Text for Y axis 
+      character*(*)	yt	!i: Text for Y axis
       character*(*)     capt    !i: Caption
       integer           kj      !i: 1=X/Y scaled equal;0=scaled indep
 C--
@@ -1635,7 +1635,7 @@ Cbegin
       GD_XS = xs
       GD_XE = ye
       GD_YS = ys
-      GD_YE = ye      
+      GD_YE = ye
 
       call pgbbuf
       call pgenv ( xs, xe, ys, ye, kj, 0 )        !Draw axes
@@ -1766,13 +1766,13 @@ C   a j penny                 dao           1988-04-25
 C--
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       GD_DISPOP = .false.
       GD_BAD = 1
 
-  
+
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -1787,7 +1787,7 @@ C   a j penny                 dao           1988-04-25
 C--
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       call pgbbuf
@@ -1808,7 +1808,7 @@ C   a j penny                 dao           1988-04-25
 C--
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       call pgebuf
@@ -1829,7 +1829,7 @@ C   a j penny                 dao           1988-04-25
 C--
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       call pgupdt
@@ -1844,7 +1844,7 @@ C
 C ADDCOL(IRS)  Add a constant to a column in a (int:real:short) array
 C ADIFFR       See if two real arrays are different
 C ARRSC        Scale a real array (Out = in*BS + BZ)
-C COP(ab)      Copy array part into another array part (to:fm int:int*2:real) 
+C COP(ab)      Copy array part into another array part (to:fm int:int*2:real)
 C COPFR(IR)    Copy vertical column of a real 2-D array to (int:real) vector
 C COPRR(R)     Copy real array ([scaled]; invalid flags) to real array
 C COPSS(IRS)   Copy int*2 array ([scaled]; invalid flags) to int*2:int:real array
@@ -1874,9 +1874,9 @@ C MATINV       Invert a matrix
 C MEANSTD(IR)  Calc mean and std deviation of an (integer:real) vector.
 C POIDEV       Make a poisson randomised integer output of a real input number
 C POLFIT       Least squares fit to data with a polynomial curve,
-C PROD(CR/CR)  Sum products of an array row/column with row/column of another 
-C MEDIAN(RS)   Find median of real:int*2 bad pixel flagged image section 
-C RANGE(IRS)   Find mean, std dev of int:real:int*2 bad pixeled image section 
+C PROD(CR/CR)  Sum products of an array row/column with row/column of another
+C MEDIAN(RS)   Find median of real:int*2 bad pixel flagged image section
+C RANGE(IRS)   Find mean, std dev of int:real:int*2 bad pixeled image section
 C RANO         Make random number between 0 and 1.
 C RINTER       (function) Interpolate in a two-dimensional look-up table.
 C RSSCALE      Scale a real array into an integer*2 array in range
@@ -1894,7 +1894,7 @@ C SRT2S(IR)    Shell's method sort (ints:reals) with alignment of another
 C ST_MINMAX    Get max and min of flagged area of array
 C ST_MINMAX(RS) Get max and min of flagged area of (real:int*2) array
 C TRAN_DOIT    Transfromation between two sets of x,y posns - set up
-C TRAN_LINTRAN Transformation between points - calculate 
+C TRAN_LINTRAN Transformation between points - calculate
 
 
 
@@ -2018,7 +2018,7 @@ C COPII -- Copy part of an integer array into an area of an integer array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine copii ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine copii ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -2048,7 +2048,7 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
      +              oy.le.m1 ) out(ox,oy) = real(in(i,j))
             endif
          enddo
@@ -2056,14 +2056,14 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPIR -- Copy part of an integer array into an area of a real array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine copir ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine copir ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -2093,7 +2093,7 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
      +              oy.le.m1 ) out(ox,oy) = real(in(i,j))
             endif
          enddo
@@ -2101,14 +2101,14 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPRR -- Copy part of a real array into an area of a real array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine coprr ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine coprr ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -2138,7 +2138,7 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
      +              oy.le.m1 ) out(ox,oy) = in(i,j)
             endif
          enddo
@@ -2146,14 +2146,14 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPRS -- Copy part of a real array into an area of a short array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine coprs ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine coprs ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -2183,8 +2183,8 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
-     +              oy.le.m1 ) out(ox,oy) = 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
+     +              oy.le.m1 ) out(ox,oy) =
      +                           int(max(-32768.0,min(32767.0,in(i,j))))
             endif
          enddo
@@ -2192,14 +2192,14 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPSR -- Copy part of a short array into an area of a real array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine copsr ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine copsr ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -2229,7 +2229,7 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
      +              oy.le.m1 ) out(ox,oy) = real(in(i,j))
             endif
          enddo
@@ -2237,7 +2237,7 @@ Cbegin
 
 
       end
-                 
+
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -2245,7 +2245,7 @@ C COPSS -- Copy part of a short array into an area of a short array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine copss ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine copss ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -2275,7 +2275,7 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
      +              oy.le.m1 ) out(ox,oy) = in(i,j)
             endif
          enddo
@@ -2283,10 +2283,10 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C COPFRI -- Copy vertical column of a real 2-D array to an integer vector 
+C COPFRI -- Copy vertical column of a real 2-D array to an integer vector
 C
 C    a j penny                ral                 1990 Jan
 
@@ -2315,10 +2315,10 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C COPFRR -- Copy vertical column of a real 2-D array to a real vector 
+C COPFRR -- Copy vertical column of a real 2-D array to a real vector
 C
 C    a j penny                ral                 1990 Jan
 
@@ -2347,11 +2347,11 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPSSI -- Copy a integer*2 array (with invalid flags) to an integer one.
-C  Integer = integer*2. Invalid points replaced with last (in fortran 
+C  Integer = integer*2. Invalid points replaced with last (in fortran
 C  sense ) pixel value, or 0 if it is the first pixel
 C
 C  Deals with case in an X row where contiguous pixels are invalid coming
@@ -2365,8 +2365,8 @@ C     a j penny                  ral          1991 apr
       implicit none
       include 'STARMAN_INC'
 
-      integer	nx		!i: X size of array 
-      integer	ny		!i: X size of array 
+      integer	nx		!i: X size of array
+      integer	ny		!i: X size of array
       integer*2 in(nx,ny)	!i: Input array
       integer	inval		!i: Input array invalid flag value
       integer	out(nx,ny)	!o: Output array
@@ -2421,7 +2421,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPSSR -- Copy a integer*2 array (scaled with invalid flags) to a real one.
-C  Real = scale.integer*2 + zero. Invalid points replaced with last (in 
+C  Real = scale.integer*2 + zero. Invalid points replaced with last (in
 C  fortran sense ) pixel value, or 0.0 if it is the first pixel
 C
 C  Deals with case in an X row where contiguous pixels are invalid coming
@@ -2435,8 +2435,8 @@ C     a j penny                  ral          1991 apr
       implicit none
       include 'STARMAN_INC'
 
-      integer	nx		!i: X size of array 
-      integer	ny		!i: X size of array 
+      integer	nx		!i: X size of array
+      integer	ny		!i: X size of array
       integer*2 in(nx,ny)	!i: Input array
       real	bs		!i: Scale of input array
       real	bz		!i: Zero of invalid array
@@ -2495,7 +2495,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPRRR -- Copy a real array (scaled with invalid flags) to a real one.
-C  Real = scale.real + zero. Invalid points replaced with last (in 
+C  Real = scale.real + zero. Invalid points replaced with last (in
 C  fortran sense ) pixel value, or 0.0 if it is the first pixel
 C
 C  Deals with case in an X row where contiguous pixels are invalid coming
@@ -2509,8 +2509,8 @@ C     a j penny                  ral          1991 apr
       implicit none
       include 'STARMAN_INC'
 
-      integer	nx		!i: X size of array 
-      integer	ny		!i: X size of array 
+      integer	nx		!i: X size of array
+      integer	ny		!i: X size of array
       real      in(nx,ny)	!i: Input array
       real	bs		!i: Scale of input array
       real	bz		!i: Zero of invalid array
@@ -2670,7 +2670,7 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPTRR -- Copy part of a real vector into a vertical part of a real array
@@ -2705,7 +2705,7 @@ Cbegin
 
 
       end
-                 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPR1 -- Copy a single real value from a real array into a value
@@ -2821,8 +2821,8 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPVSI -- Extract part of an integer*2 array to an integer array.
-C  INVALID pixels are copied over. The copying can either add to the input 
-C  values or replace them. It deals with areas outside of input and output 
+C  INVALID pixels are copied over. The copying can either add to the input
+C  values or replace them. It deals with areas outside of input and output
 C  areas.
 C
 C    a j penny                      stsci                     87-12-30
@@ -2844,8 +2844,8 @@ C    a j penny                      stsci                     87-12-30
       integer kys     		!i: The first row to be stored
       integer kye     		!i: The last row to be stored.
       integer inval   		!i: The flag value for an INVALID pixel
-      integer ninval		!o: The number of INVALID pixels found 
-      integer kadd	    	!i: The flag for adding (1) into PART 
+      integer ninval		!o: The number of INVALID pixels found
+      integer kadd	    	!i: The flag for adding (1) into PART
 				!   or overwriting (0)
 C--
       integer j, ja, k, ka, kv
@@ -2889,8 +2889,8 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPVRR -- Extract part of a real array to a real array.
-C  INVALID pixels are copied over. The copying can either add to the input 
-C  values or replace them. It deals with areas outside of input and output 
+C  INVALID pixels are copied over. The copying can either add to the input
+C  values or replace them. It deals with areas outside of input and output
 C  areas.
 C
 C
@@ -2915,8 +2915,8 @@ C    a j penny                      stsci                     87-12-30
       real	bs		!i: Image pixel value scale
       real	bz		!i: Image pixel value zero
       real	rinval   	!i: The flag value for an INVALID real pixel
-      integer	ninval		!o: The number of INVALID pixels found 
-      integer	kadd    	!i: The flag for adding (1) into PART 
+      integer	ninval		!o: The number of INVALID pixels found
+      integer	kadd    	!i: The flag for adding (1) into PART
 				!   or overwriting (0)
 C--
       integer j, ja, k, ka
@@ -2961,8 +2961,8 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPVSR -- Extract part of an integer*2 array to a real array.
-C  INVALID pixels are copied over. The copying can either add to the input 
-C  values or replace them. It deals with areas outside of input and output 
+C  INVALID pixels are copied over. The copying can either add to the input
+C  values or replace them. It deals with areas outside of input and output
 C  areas.
 C
 C
@@ -2988,8 +2988,8 @@ C    a j penny                      stsci                     87-12-30
       real	bz		!i: Image pixel value zero
       integer	inval   	!i: The flag value for a INVALID int*2 pixel
       real	rinval   	!i: The flag value for an INVALID real pixel
-      integer	ninval		!o: The number of INVALID pixels found 
-      integer	kadd    	!i: The flag for adding (1) into PART 
+      integer	ninval		!o: The number of INVALID pixels found
+      integer	kadd    	!i: The flag for adding (1) into PART
 				!   or overwriting (0)
 C--
       integer j, ja, k, ka, kv
@@ -3033,13 +3033,13 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C COPVSS -- Extract part of an integer*2 array to an integer*2 array.
-C  INVALID pixels are copied over. The copying can either add to the input 
-C  values or replace them. It deals with areas outside of input and output 
+C  INVALID pixels are copied over. The copying can either add to the input
+C  values or replace them. It deals with areas outside of input and output
 C  areas.
 C
 C    a j penny                      stsci                     87-12-30
 
-      subroutine copvss ( kwhole, n, m, part, no, mo, kxs, kxe, 
+      subroutine copvss ( kwhole, n, m, part, no, mo, kxs, kxe,
      +                    kys, kye, inval, ninval, kadd )
 
       implicit none
@@ -3056,8 +3056,8 @@ C    a j penny                      stsci                     87-12-30
       integer   kys    		!i: The first row to be stored
       integer	kye     	!i: The last row to be stored.
       integer	inval   	!i: The flag value for an INVALID pixel
-      integer	ninval		!o: The number of INVALID pixels found 
-      integer	kadd    	!i: The flag for adding (1) into PART 
+      integer	ninval		!o: The number of INVALID pixels found
+      integer	kadd    	!i: The flag for adding (1) into PART
 				!   or overwriting (0)
 C--
       integer j, ja, k, ka, kv
@@ -3207,7 +3207,7 @@ C   Subtract row k from lower rows to get diagonal matrix
             k1 = k + 1
             do i = k1, norder
                do j = k1, norder
-                 array(i,j) = array(i,j) - 
+                 array(i,j) = array(i,j) -
      +                        array(i,k)*array(k,j)/array(k,k)
                enddo
             enddo
@@ -3224,7 +3224,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C FOURC -- Calc Fourier Transform
 C  Takes complex data and calculates its fourier transform
 C  The input data is stored as 'DATA(1),DATA(2),DATA(3),DATA(4)..'
-C  as 'real part of 1st point, complex part of 1st point, real part 
+C  as 'real part of 1st point, complex part of 1st point, real part
 C  of 2nd point, complex part of 2nd point..'. The number of
 C  data points must be a power of 2.
 C
@@ -3256,7 +3256,7 @@ Cbegin
             data(i+1) = tempi
          endif
          m = n/2
-         do while ( m.ge.2 .and. j.gt.m ) 
+         do while ( m.ge.2 .and. j.gt.m )
             j = j - m
             m = m/2
          enddo
@@ -3295,7 +3295,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C FOURN -- Calc Fourier Transform in N dimensions
-C  Does a N-dimensional FFT. Calculates either the FFT, or its inverse 
+C  Does a N-dimensional FFT. Calculates either the FFT, or its inverse
 C  times the product of the lengths of all dimensions.
 C
 C   a j penny                 dao           1988-04-25
@@ -3315,7 +3315,7 @@ C--
      +        i3rev, i1, i2, i3, ibit, ifp1, ifp2, k1, k2
       real tempr, tempi
 Cbegin
-      
+
 
       if ( ST_FAILED ) return
 
@@ -3350,7 +3350,7 @@ Cbegin
             endif
 
             ibit = ip2/2
-            do while ( (ibit.ge.ip1) .and. (i2rev.gt.ibit) ) 
+            do while ( (ibit.ge.ip1) .and. (i2rev.gt.ibit) )
                i2rev = i2rev - ibit
                ibit = ibit/2
             enddo
@@ -3397,7 +3397,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GASDEV -- Make normally (Gauss) distributed random number
 C   zero mean, unit standard deviation. Uses call to uniform
-C   distribution RANO(IDUM). 
+C   distribution RANO(IDUM).
 C
 C   a j penny                ral         88-07-04
 
@@ -3526,7 +3526,7 @@ Cbegin
          call azeror ( cmat, npfa*npfa )				!Zero norm eqns
          call azeror ( cvec, npfa  )
 
-         do n = nxa, nxb						!Loop through the data, setting 
+         do n = nxa, nxb						!Loop through the data, setting
 									! up the simultaenous equations
             x = n - cc(5)
             if ( isdist ) x = dist(n) - cc(5)
@@ -3562,14 +3562,14 @@ Cbegin
             res = data(n) - z						!residual from data
             if ( abs(res).lt.1e-30 ) res = 0.0
 
-            if ( npf.ge.1 ) then					!Accumulate vector and matrix 
+            if ( npf.ge.1 ) then					!Accumulate vector and matrix
                do k = 1, npf						! contributions at this pixel
                   if ( abs(erf(k)).lt.1.0e-5 ) erf(k) = 0.0
                enddo
                do k = 1, npf
                   cvec(k) = cvec(k) + erf(k)*res
                   do j = k, npf
-                     jk =  (k-1)*npf + j 
+                     jk =  (k-1)*npf + j
                      cmat(jk) = cmat(jk) + erf(j)*erf(k)
                   enddo
                enddo
@@ -3596,12 +3596,12 @@ Cbegin
          call simulx ( cvec, cmat, rvec, npf )				!Solve the normal equations
 
          nc = 0								!Update the solution. check
-         do k = 1, npfa							! for radius, power, posn 
+         do k = 1, npfa							! for radius, power, posn
             if ( jf(k).eq.1 ) then					! changing too rapidly
                nc = nc + 1
                if ( k.eq.3 .or. k.eq.4 .or. k.eq.5 ) then
                   diff = rvec(nc)/cc(k)
-                  if ( abs(diff).gt.0.1 ) rvec(nc) = 
+                  if ( abs(diff).gt.0.1 ) rvec(nc) =
      +                                    sign((0.1*cc(k)),rvec(nc))
                endif
                cc(k) = cc(k) + rvec(nc)
@@ -3612,7 +3612,7 @@ Cbegin
          again = .false.						!Compare new parameters with the old ones.
          do k = 1, npfa
             if ( abs(cclast(k)-cc(k)).gt.1.0e-6 ) then
-               if ( abs(cclast(k)).lt.1.0e-10 ) cclast(k) = 
+               if ( abs(cclast(k)).lt.1.0e-10 ) cclast(k) =
      +                                       sign(1.0e-10,cclast(k))
                diff = min(abs(cc(k)-cclast(k)),1.0e10)
                fdiff = diff/cclast(k)
@@ -3632,7 +3632,7 @@ Cbegin
      +                      '' Ht '',g12.2, '' Rad '',g12.3)' )
      +                      iter, cc(1), cc(2), cc(3)
             call printo ( text )
-            write ( text, '(12x, ''  Pow '',g12.3, '' Posn '',g12.3)' ) 
+            write ( text, '(12x, ''  Pow '',g12.3, '' Posn '',g12.3)' )
      +                     cc(4), cc(5)
             call printo ( text )
          endif
@@ -3650,7 +3650,7 @@ Cbegin
          cc(5) = xo
       endif
 
-      b  = cc(1)							!Translate back from CC to outside 
+      b  = cc(1)							!Translate back from CC to outside
       ht = cc(2)
       r  = cc(3)
       p  = cc(4)
@@ -3676,9 +3676,9 @@ C                   I  = HEIGHT.e      + BASE
 C
 C          where d = sqrt(((x-XO)/RX)**2+((y-YO)/RY)**2)
 C
-C It assumes a single star near the centre and either using fixed 
-C orthogonal radii, or floating ones with a first estimate of 
-C boxsize/6, the s/r fits the data by means of an iterative 
+C It assumes a single star near the centre and either using fixed
+C orthogonal radii, or floating ones with a first estimate of
+C boxsize/6, the s/r fits the data by means of an iterative
 C linearised fully 2-d approximation method using least squares.
 C
 C      The Output mag is = 30 - 2.5*log  (HEIGHT.RX.RY)
@@ -3693,9 +3693,9 @@ C
 C
 C   alan penny                        ral          1990-05-22
 
-      subroutine gauss2ra ( pt, kx, ky, ax, ay, nx, ny, kw, orix, 
-     +                      oriy, rinval, itlim, amag, height, base, 
-     +                      dxo, dyo, anx, any, rx, ry, rms, iter, 
+      subroutine gauss2ra ( pt, kx, ky, ax, ay, nx, ny, kw, orix,
+     +                      oriy, rinval, itlim, amag, height, base,
+     +                      dxo, dyo, anx, any, rx, ry, rms, iter,
      +                      ninval )
 
       implicit none
@@ -3704,27 +3704,27 @@ C   alan penny                        ral          1990-05-22
       integer   kx		!i: X length of the image
       integer   ky		!i: Y length of image
       real      pt(kx,ky)	!i: The input image
-      real      ax		!i: X position of star in image 
-      real      ay		!i: Y position of star in image 
-      integer   nx		!i: X size of box round star 
-      integer   ny		!i: Y size of box round star 
-      integer   kw		!i: Flag- radii fixed/to be found (1/0) 
+      real      ax		!i: X position of star in image
+      real      ay		!i: Y position of star in image
+      integer   nx		!i: X size of box round star
+      integer   ny		!i: Y size of box round star
+      integer   kw		!i: Flag- radii fixed/to be found (1/0)
       real      orix		!i: Value of X radius (if fixed to be used)
       real      oriy		!i: Value of Y radius (if fixed to be used)
       real      rinval		!i: Flag value of a pixel if Invalid
       integer   itlim		!i: Limit of no of iterations to try
       real      amag		!o: Output magnitude (may be false if failed)
       real	height		!o: Fitted Gaussian height
-      real	base		!o: Fitted Gaussian base 
-      real	dxo		!o: X diff of fitted posn from input posn 
+      real	base		!o: Fitted Gaussian base
+      real	dxo		!o: X diff of fitted posn from input posn
       real	dyo		!o: Y diff of fitted posn from input posn
-      real	anx		!o: X fitted position 
+      real	anx		!o: X fitted position
       real	any		!o: Y fitted position
-      real	rx		!o: X fitted radius (=input if fixed) 
+      real	rx		!o: X fitted radius (=input if fixed)
       real	ry		!o: Y fitted radius (=input if fixed)
-      real	rms		!o: RMS error between fit and data in box 
+      real	rms		!o: RMS error between fit and data in box
       integer   iter		!o: No of iterations done
-      integer   ninval		!o: No of Invalid pixels in box 
+      integer   ninval		!o: No of Invalid pixels in box
 C--
       real data(100*100), xo, yo, rlast, rd
       integer jx, jy, js, je, ks, ke, j, ja, jj, k, ka
@@ -3754,7 +3754,7 @@ Cbegin
       ke = ks + ny - 1
       if ( js.lt.1 .or. je.gt.kx .or. ks.lt.1 .or. ke.gt.ky ) then
          amag = 60.0							!Return if not
-         return 
+         return
       endif
 
       if ( nx.lt.2 .or. nx.gt.100 .or. ny.lt.2 .or. ny.gt.100 ) then	!Check if box size ok
@@ -3804,7 +3804,7 @@ Cbegin
      +               height, base, xo, yo, rx, ry, rms, iter )
 
       anx = xo + js 							!Calc position in main image
-      any = yo + ks 
+      any = yo + ks
       dxo = anx - ax
       dyo = any - ay
 
@@ -3828,9 +3828,9 @@ C                   I  = HEIGHT.e      + BASE
 C
 C          where d = sqrt(((x-XO)/RX)**2+((y-YO)/RY)**2)
 C
-C It assumes a single star near the centre and either using fixed 
-C orthogonal radii, or floating ones with a first estimate of 
-C boxsize/6, the s/r fits the data by means of an iterative 
+C It assumes a single star near the centre and either using fixed
+C orthogonal radii, or floating ones with a first estimate of
+C boxsize/6, the s/r fits the data by means of an iterative
 C linearised fully 2-d approximation method using least squares.
 C
 C      The Output mag is = 30 - 2.5*log  (HEIGHT.RX.RY)
@@ -3845,9 +3845,9 @@ C
 C
 C   alan penny                        ral          1990-05-22
 
-      subroutine gauss2sa ( kpt, kx, ky, ax, ay, nx, ny, kw, orix, 
-     +                      oriy, inval, itlim, amag, height, base, 
-     +                      dxo, dyo, anx, any, rx, ry, rms, iter, 
+      subroutine gauss2sa ( kpt, kx, ky, ax, ay, nx, ny, kw, orix,
+     +                      oriy, inval, itlim, amag, height, base,
+     +                      dxo, dyo, anx, any, rx, ry, rms, iter,
      +                      ninval )
 
       implicit none
@@ -3856,27 +3856,27 @@ C   alan penny                        ral          1990-05-22
       integer   kx		!i: X length of the image
       integer   ky		!i: Y length of image
       integer*2 kpt(kx,ky)	!i: The input image
-      real      ax		!i: X position of star in image 
-      real      ay		!i: Y position of star in image 
-      integer   nx		!i: X size of box round star 
-      integer   ny		!i: Y size of box round star 
-      integer   kw		!i: Flag- radii fixed/to be found (1/0) 
+      real      ax		!i: X position of star in image
+      real      ay		!i: Y position of star in image
+      integer   nx		!i: X size of box round star
+      integer   ny		!i: Y size of box round star
+      integer   kw		!i: Flag- radii fixed/to be found (1/0)
       real      orix		!i: Value of X radius (if fixed to be used)
       real      oriy		!i: Value of Y radius (if fixed to be used)
       integer   inval		!i: Flag value of a pixel if Invalid
       integer   itlim		!i: Limit of no of iterations to try
       real      amag		!o: Output magnitude (may be false if failed)
       real	height		!o: Fitted Gaussian height
-      real	base		!o: Fitted Gaussian base 
-      real	dxo		!o: X diff of fitted posn from input posn 
+      real	base		!o: Fitted Gaussian base
+      real	dxo		!o: X diff of fitted posn from input posn
       real	dyo		!o: Y diff of fitted posn from input posn
-      real	anx		!o: X fitted position 
+      real	anx		!o: X fitted position
       real	any		!o: Y fitted position
-      real	rx		!o: X fitted radius (=input if fixed) 
+      real	rx		!o: X fitted radius (=input if fixed)
       real	ry		!o: Y fitted radius (=input if fixed)
-      real	rms		!o: RMS error between fit and data in box 
+      real	rms		!o: RMS error between fit and data in box
       integer   iter		!o: No of iterations done
-      integer   ninval		!o: No of Invalid pixels in box 
+      integer   ninval		!o: No of Invalid pixels in box
 C--
       real data(100*100), xo, yo
       integer jx, jy, js, je, ks, ke, j, ja, jj, k, ka, kd, last
@@ -3906,7 +3906,7 @@ Cbegin
       ke = ks + ny - 1
       if ( js.lt.1 .or. je.gt.kx .or. ks.lt.1 .or. ke.gt.ky ) then
          amag = 60.0							!Return if not
-         return 
+         return
       endif
 
       if ( nx.lt.2 .or. nx.gt.100 .or. ny.lt.2 .or. ny.gt.100 ) then	!Check if box size ok
@@ -3956,7 +3956,7 @@ Cbegin
      +               height, base, xo, yo, rx, ry, rms, iter )
 
       anx = xo + js 							!Calc position in main image
-      any = yo + ks 
+      any = yo + ks
       dxo = anx - ax
       dyo = any - ay
 
@@ -3966,9 +3966,9 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GAUSS2R -- Fit a 2-D Gaussian (fast) to real array with centered star
-C It assumes a single star near the centre of the data and either using 
-C fixed orthogonal radii, or floating ones with a first estimate of 
-C boxsize/6.0, the s/r fits the data by means of an iterative linearised 
+C It assumes a single star near the centre of the data and either using
+C fixed orthogonal radii, or floating ones with a first estimate of
+C boxsize/6.0, the s/r fits the data by means of an iterative linearised
 C fully 2-d approximation method using least squares.
 C
 C          The profile fitted is :-
@@ -4360,7 +4360,7 @@ C HGRAMR -- Load histogram from values in a real array
 C
 C a j penny                         dao           1988-04-19
 
-      subroutine hgramr ( rdata, kx, ky, lxa, lxb, lya, lyb, rmin, 
+      subroutine hgramr ( rdata, kx, ky, lxa, lxb, lya, lyb, rmin,
      +                    kgram, numbin, rbin, rinval )
 
       implicit none
@@ -4405,7 +4405,7 @@ C HGRAMS -- Load histogram from values in an integer*2 array
 C
 C a j penny                         dao           1988-04-19
 
-      subroutine hgrams ( kdata, kx, ky, lxa, lxb, lya, lyb, kmin, 
+      subroutine hgrams ( kdata, kx, ky, lxa, lxb, lya, lyb, kmin,
      +                    kgram, numbin, kbin, inval )
 
       implicit none
@@ -4506,7 +4506,7 @@ C Rescale answer back
       zero = da(1)*yr + ymin - da(2)*yr*xmin/xr
       rms  = drms*yr
       chi  = dchi
-     
+
 
       end
 
@@ -4530,7 +4530,7 @@ C alan penny            ral               nov 89
       real    sl		!o: Slope
 C--
       real e, ak, g, rh
-      integer j 
+      integer j
 Cbegin
 
 
@@ -4540,7 +4540,7 @@ Cbegin
       am = e/real(n)
 
       ak = 1 + real(n-1)/2.0				!Slope
-      g = 0.0		
+      g = 0.0
       do j = 1, n
          g = g + (real(j)-ak)*(gx(j)-am)
       enddo
@@ -4565,7 +4565,7 @@ C    alan penny             ral          1990 apr 14
       real      a(np,np)	!i/o: Matrix and solution
       integer   n		!i:   Size of matrix contents
       integer   indx(n)		!o:   Row permutation
-      real      d		!o:   =+1 if even no of interchanges, 
+      real      d		!o:   =+1 if even no of interchanges,
 				!     =-1 if odd number
       integer   ierr		!o:   Error flag 0=ok;1=bad
 C--
@@ -4574,7 +4574,7 @@ C--
       parameter ( tiny=1.0e-18 )
 Cbegin
 
-  
+
       if ( ST_FAILED ) then
          ierr = 1
          return
@@ -4732,7 +4732,7 @@ C   a j penny             stsci     86-11-26
       integer	ix2(n2)		!i: 2nd group data
       real	sig		!o: prob groups are same
       logical	larger		!o: True if group2 median>group1
-      integer   ierr		!o: Failure flag: 0=ok;1= bad (total no of 
+      integer   ierr		!o: Failure flag: 0=ok;1= bad (total no of
 				!    values > 2000)
 C--
       integer   ix(2000), iw(2000)
@@ -4752,7 +4752,7 @@ Cbegin
       larger = .false.							!Default
       sig = 1.0
 									!Load data
-      n = n1 + n2							!Total number of points	
+      n = n1 + n2							!Total number of points
 
       if ( n.gt.2000 ) then						!Size check
          print *,'Mann-Whitney U test failed. Over 2000 points'
@@ -4809,7 +4809,7 @@ Cbegin
       r3 = r4 + 1
       diff = sum - (r2*r3)/2.0
       larger = .false.
-      if ( diff.gt.0.0 ) larger = .true.      
+      if ( diff.gt.0.0 ) larger = .true.
       sig = 1.0
       var = (r1*r2/(r4*(r4-1.0)))*((r4*r4*r4-r4-sumt)/12.0)
       rv = abs(diff)/sqrt(var)
@@ -4839,7 +4839,7 @@ C   a j penny             stsci     86-11-26
       real      ix2(n2)		!i: 2nd group data
       real	sig		!o: prob groups are same
       logical	larger		!o: True if group2 median>group1
-      integer   ierr		!o: Failure flag: 0=ok;1= bad (total no of 
+      integer   ierr		!o: Failure flag: 0=ok;1= bad (total no of
 				!    values > 2000)
 C--
       real      ix(2000), iw(2000)
@@ -4859,7 +4859,7 @@ Cbegin
       larger = .false.							!Default
       sig = 1.0
 									!Load data
-      n = n1 + n2							!Total number of points	
+      n = n1 + n2							!Total number of points
 
       if ( n.gt.2000 ) then						!Size check
          print *,'Mann-Whitney U test failed. Over 2000 points'
@@ -4916,7 +4916,7 @@ Cbegin
       r3 = r4 + 1
       diff = sum - (r2*r3)/2.0
       larger = .false.
-      if ( diff.gt.0.0 ) larger = .true.      
+      if ( diff.gt.0.0 ) larger = .true.
       sig = 1.0
       var = (r1*r2/(r4*(r4-1.0)))*((r4*r4*r4-r4-sumt)/12.0)
       rv = abs(diff)/sqrt(var)
@@ -5007,7 +5007,7 @@ C--
       double precision dav, dsw, dsvw, dsvvw, dv, dw
 Cbegin
 
-    
+
       if ( ST_FAILED ) return
 
       av = 0.0								!Default and Checks
@@ -5039,8 +5039,8 @@ Cbegin
       dv = max (1.0d-20,(dsvvw-dsw*dav*dav))
       sd = sqrt(dv/(dsw-1.0d0))
 
-C  If wanted, recalculate mean, by throwing out largest diff and 
-C  recalculating until none thrown out as too far off mean 
+C  If wanted, recalculate mean, by throwing out largest diff and
+C  recalculating until none thrown out as too far off mean
 
       if ( .not.dosdlim .and. .not.doalim ) return
 
@@ -5162,8 +5162,8 @@ Cbegin
       dv = max (1.0d-20,(dsvvw-dsw*dav*dav))
       sd = sqrt(dv/(dsw-1.0d0))
 
-C  If wanted, recalculate mean, by throwing out largest diff and 
-C  recalculating until none thrown out as too far off mean 
+C  If wanted, recalculate mean, by throwing out largest diff and
+C  recalculating until none thrown out as too far off mean
 
       if ( .not.doalim .and. .not.dosdlim ) return
 
@@ -5218,20 +5218,20 @@ C  recalculating until none thrown out as too far off mean
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C POIDEV -- Make a poisson randomised integer output of a real input number
-C 1)Numbers < 20 
-C        choose a random number between 0 and 1. then calc the probability 
-C        p0 of 0 as exp(-s). if nr is less than p0 exit with answer 0. else 
-C        calc prob p1 of 1 as s*exp(-s)/1. if nr less than p0+p1, exit with 
+C 1)Numbers < 20
+C        choose a random number between 0 and 1. then calc the probability
+C        p0 of 0 as exp(-s). if nr is less than p0 exit with answer 0. else
+C        calc prob p1 of 1 as s*exp(-s)/1. if nr less than p0+p1, exit with
 C        ans 1. else calc prob p2 of 2 as s*s*exp(-s)/2.1  if nr less than
 C        p0+p1+p2, exit with ans 2. and so on
-C 2)Numbers >=20 
-C        a gaussian scatter times the square root of the number, which is 
+C 2)Numbers >=20
+C        a gaussian scatter times the square root of the number, which is
 C        very nearly a poissonian scatter.
 C
-C 3)Numbers < 1.0e-10 
+C 3)Numbers < 1.0e-10
 C        These get a return of 0.0
 C
-C   The seed number is changed after each call, but can be set to any number 
+C   The seed number is changed after each call, but can be set to any number
 C   to start the random number pattern
 C
 C     a.j. penny               stsci                        1989-04-21
@@ -5243,7 +5243,7 @@ C     a.j. penny               stsci                        1989-04-21
 
       real    s		!i:   input number
       real    ss	!o:   output number (integral value)
-      integer nran	!i/o: Seed number for the random number 
+      integer nran	!i/o: Seed number for the random number
 			!     generator
 C--
       real b, r, a, c
@@ -5258,7 +5258,7 @@ Cbegin
          call rano ( b, nran )				! called anyway)
          return
       endif
-      
+
       if ( s.lt.20.0 ) then				!Do full calc
          call rano (b, nran )
          k = 0
@@ -5307,7 +5307,7 @@ C     Got from m j currie by a j penny     rgo      7-sep-82
 				! -1=(statistical)  weight(i)=1.0/y(i)
       double precision da(nfp)	!o: coeffs of polynomial
       double precision dchisq	!o: Reduced chi square for fit
-      double precision drms	!o: Std deviation of fit      
+      double precision drms	!o: Std deviation of fit
 C--
       double precision dsumx(19), dsumy(10), darray(10,10), dxi, dyi,
      +                 dweight, dxterm, dyterm, ddelta, dcalc
@@ -5483,7 +5483,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PRODCR -- Sum the products of a column of one array with the row of another 
+C PRODCR -- Sum the products of a column of one array with the row of another
 C    It takes any column in each of the arrays and multiplies and sums
 C    the elements of the same section in those columns.
 C
@@ -5522,7 +5522,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PRODRC -- Sum the products of a row of one array with the column of another 
+C PRODRC -- Sum the products of a row of one array with the column of another
 C    It takes any column in each of the arrays and multiplies and sums
 C    the elements of the same section in those columns.
 C
@@ -5601,8 +5601,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C RANGEI -- Find mean, std dev of an integer bad pixel flagged image section 
-C  It calcs the mean and std dev. Then recalcs (2 more times) using only 
+C RANGEI -- Find mean, std dev of an integer bad pixel flagged image section
+C  It calcs the mean and std dev. Then recalcs (2 more times) using only
 C  those points within 3 std dev of the calculated mean.
 C  If the section is more than 80 on either side, a grid of points
 C  is taken so that between 40 and 80 on a side is sampled.
@@ -5625,7 +5625,7 @@ C   alan penny             ral         1990 jan
       integer   ierr		!o: Error flag. 0=ok;1=all same;2=only
 				!   one good point; 3=no good points
 				!   (in sampling grid)
-C--   
+C--
       double precision s, ss, sn, an
       integer nxa, nya, j, k, iter, kn, iv
       real amax, amin, rmin, rmax
@@ -5654,7 +5654,7 @@ Cbegin
          enddo
       enddo
 
-      ierr = 0	
+      ierr = 0
       am = 0.0
       std = 0.0
       if ( kn.eq.0 ) then				!Check none good
@@ -5677,7 +5677,7 @@ Cbegin
          do k = ky(1), ky(2), nya
             do j = kx(1), kx(2), nxa
                iv = data(j,k)
-               if ( iv.ne.inval .and. real(iv).ge.rmin 
+               if ( iv.ne.inval .and. real(iv).ge.rmin
      +              .and. real(iv).le.rmax ) then
                   an = dble(real(iv))
                   s = s + an
@@ -5704,8 +5704,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C RANGER -- Find mean, std dev of a real bad pixel flagged image section 
-C  It calcs the mean and std dev. Then recalcs (2 more times) using only 
+C RANGER -- Find mean, std dev of a real bad pixel flagged image section
+C  It calcs the mean and std dev. Then recalcs (2 more times) using only
 C  those points within 3 std dev of the calculated mean.
 C  If the section is more than 80 on either side, a grid of points
 C  is taken so that between 40 and 80 on a side is sampled.
@@ -5728,9 +5728,9 @@ C   alan penny             ral         1990 jan
       integer   ierr		!o: Error flag. 0=ok;1=all same;2=only
 				!   one good point; 3=no good points
 				!   (in sampling grid)
-C--   
+C--
       double precision s, ss, sn, an
-      integer nxa, nya, j, k, iter, kn, 
+      integer nxa, nya, j, k, iter, kn,
      +        kxs, kxe, kys, kye
       real amax, amin, rv, rmin, rmax
 Cbegin
@@ -5750,7 +5750,7 @@ Cbegin
       kys = min(ky(1),ky(2))
       kye = max(ky(1),ky(2))
 
-      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny 
+      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny
      +     .or. kye.lt.1 ) then
           ierr = 3
           return
@@ -5798,7 +5798,7 @@ Cbegin
          do k = kys, kye, nya
             do j = kxs, kxe, nxa
                rv = data(j,k)
-               if ( rv.ne.rinval .and. 
+               if ( rv.ne.rinval .and.
      +              rv.ge.rmin .and. rv.le.rmax ) then
                   an = dble(rv)
                   s = s + an
@@ -5825,7 +5825,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C MEDIANR -- Find median of real bad pixel flagged image section 
+C MEDIANR -- Find median of real bad pixel flagged image section
 C
 C   alan penny             ral         1990 jan
 
@@ -5845,7 +5845,7 @@ C   alan penny             ral         1990 jan
       integer   ierr		!o: Error flag. 0=ok;1=all same;2=only
 				!   one good point; 3=no good points
 				!   (in sampling grid)
-C--   
+C--
       integer j, k, kn, ka, kxs, kxe, kys, kye
       real rv
 Cbegin
@@ -5864,7 +5864,7 @@ Cbegin
       kys = min(ky(1),ky(2))
       kye = max(ky(1),ky(2))
 
-      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny 
+      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny
      +     .or. kye.lt.1 ) then
           ierr = 3
           return
@@ -5922,7 +5922,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C MEDIANS -- Find median int*2 bad pixel flagged image section 
+C MEDIANS -- Find median int*2 bad pixel flagged image section
 C
 C   alan penny             ral         1990 jan
 
@@ -5942,7 +5942,7 @@ C   alan penny             ral         1990 jan
       integer   ierr		!o: Error flag. 0=ok;1=all same;2=only
 				!   one good point; 3=no good points
 				!   (in sampling grid)
-C--   
+C--
       integer j, k, ka, kn, kv, kxs, kxe, kys, kye
 Cbegin
 
@@ -5960,7 +5960,7 @@ Cbegin
       kys = min(ky(1),ky(2))
       kye = max(ky(1),ky(2))
 
-      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny 
+      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny
      +     .or. kye.lt.1 ) then
           ierr = 3
           return
@@ -6018,8 +6018,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C RANGES -- Find mean, std dev of int*2 bad pixel flagged image section 
-C  It calcs the mean and std dev. Then recalcs (2 more times) using only 
+C RANGES -- Find mean, std dev of int*2 bad pixel flagged image section
+C  It calcs the mean and std dev. Then recalcs (2 more times) using only
 C  those points within 3 std dev of the calculated mean.
 C  If the section is more than 80 on either side, a grid of points
 C  is taken so that between 40 and 80 on a side is sampled.
@@ -6042,7 +6042,7 @@ C   alan penny             ral         1990 jan
       integer   ierr		!o: Error flag. 0=ok;1=all same;2=only
 				!   one good point; 3=no good points
 				!   (in sampling grid)
-C--   
+C--
       double precision s, ss, sn, an
       integer nxa, nya, kmin, kmax, kv, j, k, iter, kn,
      +        kxs, kxe, kys, kye
@@ -6064,7 +6064,7 @@ Cbegin
       kys = min(ky(1),ky(2))
       kye = max(ky(1),ky(2))
 
-      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny 
+      if ( kxs.gt.nx .or. kxe.lt.1 .or. kys.gt.ny
      +     .or. kye.lt.1 ) then
           ierr = 3
           return
@@ -6092,7 +6092,7 @@ Cbegin
          enddo
       enddo
 
-      ierr = 0	
+      ierr = 0
       am = 0.0
       std = 0.0
       if ( kn.eq.0 ) then				!Check none good
@@ -6115,7 +6115,7 @@ Cbegin
          do k = kys, kye, nya
             do j = kxs, kxe, nxa
                kv = kdata(j,k)
-               if ( kv.ne.inval .and. kv.ge.kmin .and. 
+               if ( kv.ne.inval .and. kv.ge.kmin .and.
      +              kv.le.kmax ) then
                   an = dble(kv)
                   s = s + an
@@ -6143,13 +6143,13 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C RANO -- Make random number between 0 and 1.
-C   Takes machine supplied generator (RAN) and randomises it a bit more. 
+C   Takes machine supplied generator (RAN) and randomises it a bit more.
 C
 C   AJSEED should be called before this. If not treated as
 C   call with seed set to 1.
 C
-C   On 1st use, the routine sets itself up, using many calls to the 
-C   machine random generator. After that, it calls machine generator 
+C   On 1st use, the routine sets itself up, using many calls to the
+C   machine random generator. After that, it calls machine generator
 C   only once per call.
 C
 C     a j penny               ral                      88-07-04
@@ -6199,11 +6199,11 @@ C
 C Input arguments
 C
 C        F  is an NX by NY array, where X=1.0, Y=1.0 refers to the center
-C           of the first pixel and X=FLOAT(NX), Y=FLOAT(NY) refers to the 
-C           center of the last pixel.  
+C           of the first pixel and X=FLOAT(NX), Y=FLOAT(NY) refers to the
+C           center of the last pixel.
 C
 C      X,Y  are the real coordinates of the point, relative to the corner
-C           of the array, to which the table is to be interpolated.  
+C           of the array, to which the table is to be interpolated.
 C
 C
 C Output arguments
@@ -6213,15 +6213,15 @@ C
 C   DFDX,   are the estimated first spatial derivatives of F with
 C   DFDY    respect to x and y, evaluated at (X, Y).
 C
-C The method used is cubic interpolation: first, at four integral 
-C values of y, the values of F at integral values of x are interpolated 
-C to the point x=X, yielding four values for the function and its first 
-C derivative with respect to x.  Then these four are interpolated to 
-C the point x,y=X,Y to give one functional value and one first 
-C derivative with respect to y.  Finally, the four first derivatives 
-C of F with respect to x are interpolated to x,y=X,Y.  It so happens 
-C that the final value obtained for the function and its derivatives 
-C would have come out the same if we had interpolated in y first, 
+C The method used is cubic interpolation: first, at four integral
+C values of y, the values of F at integral values of x are interpolated
+C to the point x=X, yielding four values for the function and its first
+C derivative with respect to x.  Then these four are interpolated to
+C the point x,y=X,Y to give one functional value and one first
+C derivative with respect to y.  Finally, the four first derivatives
+C of F with respect to x are interpolated to x,y=X,Y.  It so happens
+C that the final value obtained for the function and its derivatives
+C would have come out the same if we had interpolated in y first,
 C rather than in x.
 C
 C This has been modified to work on a 2-D (XY) plane in a 3-D (XYZ)
@@ -6229,7 +6229,7 @@ C cube. In the Z plane chosen, only a (sub)area is used.
 C
 C  P B STETSON                         DAO    1986
 C  Modified by  A J PENNY          STScI              1987 jan 20
-C 
+C
 
 
       real function rinter ( f, nxa, nya, nza, num, nx, ny, x, y, dfdx,
@@ -6277,7 +6277,7 @@ C  If outside box by 1 or more
       endif
 
 C  If in body or not
-      
+
       if ( ix.ge.2 .and. ix.le.nx-2 .and. iy.ge.2 .and. iy.le.ny-2 )then
          do i = -1, 2
             j = iy + i
@@ -6465,7 +6465,7 @@ Cbegin
                ja = col(j)
                ik = row(j)
                if ( abs(x(ik)).gt.1.0e12 ) x(ik) = sign(1.0e12,x(ik))
-               if ( abs(a(ia,ja)).gt.1.0e12 ) a(ia,ja) = 
+               if ( abs(a(ia,ja)).gt.1.0e12 ) a(ia,ja) =
      +                                        sign(1.0e12,a(ia,ja))
                x(ia) = x(ia) - a(ia,ja)*x(ik)
             enddo
@@ -6487,7 +6487,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SMOOTHR -- Smooth a real array with a rectangular 'local mean' filter
-C  Smooth each line by running a local mean filter through it. Store the 
+C  Smooth each line by running a local mean filter through it. Store the
 C  result in workspace, then repeat the process down the image columns.
 C
 C  Taken from EDRS of R Warren-Smith
@@ -6527,23 +6527,23 @@ Cbegin
       idy = max(0,iy/2)
       jside = 2*idy+1
 
-      thresh = min(max(1,nmin),iside*jside)				!Set threshold for no. of good pixels 
+      thresh = min(max(1,nmin),iside*jside)				!Set threshold for no. of good pixels
 									! in box between 1 and max possible number
 
       do j = 1, ny							!First smooth along each line
 									!----------------------------
 
-	 sum = 0.0							!initiallise running sum of data (isum) and no. of 
+	 sum = 0.0							!initiallise running sum of data (isum) and no. of
 	 nsum = 0 							! good pixels (nsum)
 
 	 do ii = -idx, idx						!Start with box size iside*1 centred on pixel (0,j)
 	    i = ii
 
-            if ( i.lt.1 ) i = 2 - i					!Box will project off ends of lines, 
+            if ( i.lt.1 ) i = 2 - i					!Box will project off ends of lines,
 	    if ( i.gt.nx )  i = nx2 - i					! so reflect to keep it inside
 
 
-            i = min(max(1,i),nx)					!Protect against extreme cases where box is so big it 
+            i = min(max(1,i),nx)					!Protect against extreme cases where box is so big it
 									! goes off opposite end after reflection
 
             sum = sum + ia(i,j)					! it to sum of pixels within box
@@ -6553,7 +6553,7 @@ Cbegin
 
          do i = 1, nx							!Now step the box along the line
 
-	    oldx = i - idx - 1						!Find position of old pixel to be removed from left 
+	    oldx = i - idx - 1						!Find position of old pixel to be removed from left
 	    newx = i + idx						! and new pixel to be added at right
 
 	    if ( oldx.lt.1 ) oldx = 2 - oldx				!Reflect at ends of line
@@ -6578,7 +6578,7 @@ Cbegin
 									!Now smooth down columns
 									!-----------------------
 
-      do i = 1, nx							!Initiallise sums.. this time 
+      do i = 1, nx							!Initiallise sums.. this time
          iline(i) = 0.0							! processing a whole line at once
          nline(i) = 0
       enddo
@@ -6590,7 +6590,7 @@ Cbegin
          if ( j.gt.ny ) j = ny2 - j
          j = min(max(1,j),ny)
 
-         do i = 1, nx							!Form a sum for each pixel in the line from the 
+         do i = 1, nx							!Form a sum for each pixel in the line from the
             iline(i) = iline(i) + istor(i,j)				! data now stored in the workspace
             nline(i) = nline(i) + nstor(i,j)
          enddo
@@ -6599,7 +6599,7 @@ Cbegin
 
       do j = 1, ny							!Now step down the image
 
-         oldy = j- idy - 1						!Find location of old line to subtract at top 
+         oldy = j- idy - 1						!Find location of old line to subtract at top
          newy = j + idy							! and new line to add at bottom
 
          if ( oldy.lt.1 ) oldy = 2 - oldy				!Reflect at top and bottom of image
@@ -6616,7 +6616,7 @@ Cbegin
             iline(i) = iline(i) + istor(i,newy)				!Add new line
             nline(i) = nline(i) + nstor(i,newy)
 
-            if ( nline(i).ge.thresh ) then				!If sufficient pixels present, form 
+            if ( nline(i).ge.thresh ) then				!If sufficient pixels present, form
                ia(i,j) = iline(i)/real(nline(i))			! output, otherwise output is not valid
             else
                ia(i,j) = 0.0
@@ -6631,7 +6631,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SMOOTHBR -- Smooth a real flagged array with rectangular 'local mean' filter
-C  Smooth each line by running a local mean filter through it. Store the 
+C  Smooth each line by running a local mean filter through it. Store the
 C  result in workspace, then repeat the process down the image columns. Take
 C  account of invalid pixels.
 C
@@ -6650,7 +6650,7 @@ C  alan penny                  ral                  1990-05-022
       real      rinval			!i: Invalid pixel magic value flag
       integer   ix			!i: X size of smoothing rectangle
       integer   iy			!i: Y size of smoothing rectangle
-      integer   nmin			!i: Min no of valid pixels required 
+      integer   nmin			!i: Min no of valid pixels required
 					!   in smoothing area
       real      ristor(nx,ny)		!w: Workspace
       real      rnstor(nx,ny)		!w: Workspace
@@ -6673,26 +6673,26 @@ Cbegin
       idy = max(0,iy/2)
       jside = 2*idy+1
 
-      thresh = min(max(1,nmin),iside*jside)				!Set threshold for no. of good pixels 
+      thresh = min(max(1,nmin),iside*jside)				!Set threshold for no. of good pixels
 									! in box between 1 and max possible number
 
       do j = 1, ny							!First smooth along each line
 									!----------------------------
 
-	 sum = 0.0							!initiallise running sum of data (isum) and no. of 
+	 sum = 0.0							!initiallise running sum of data (isum) and no. of
 	 rnsum = 0.0 							! good pixels (nsum)
 
 	 do ii = -idx, idx						!Start with box size iside*1 centred on pixel (0,j)
 	    i = ii
 
-            if ( i.lt.1 ) i = 2 - i					!Box will project off ends of lines, 
+            if ( i.lt.1 ) i = 2 - i					!Box will project off ends of lines,
 	    if ( i.gt.nx )  i = nx2 - i					! so reflect to keep it inside
 
 
-            i = min(max(1,i),nx)					!Protect against extreme cases where box is so big it 
+            i = min(max(1,i),nx)					!Protect against extreme cases where box is so big it
 									! goes off opposite end after reflection
 
-            if ( ra(i,j).ne.rinval ) then				!If pixel found is valid, add 
+            if ( ra(i,j).ne.rinval ) then				!If pixel found is valid, add
                sum = sum + ra(i,j)					! it to sum of pixels within box
                rnsum = rnsum + 1.0
             endif
@@ -6701,7 +6701,7 @@ Cbegin
 
          do i = 1, nx							!Now step the box along the line
 
-	    oldx = i - idx - 1						!Find position of old pixel to be removed from left 
+	    oldx = i - idx - 1						!Find position of old pixel to be removed from left
 	    newx = i + idx						! and new pixel to be added at right
 
 	    if ( oldx.lt.1 ) oldx = 2 - oldx				!Reflect at ends of line
@@ -6730,7 +6730,7 @@ Cbegin
 									!Now smooth down columns
 									!-----------------------
 
-      do i = 1, nx							!Initiallise sums.. this time 
+      do i = 1, nx							!Initiallise sums.. this time
          riline(i) = 0.0						! processing a whole line at once
          rnline(i) = 0.0
       enddo
@@ -6742,7 +6742,7 @@ Cbegin
          if ( j.gt.ny ) j = ny2 - j
          j = min(max(1,j),ny)
 
-         do i = 1, nx							!Form a sum for each pixel in the line from the 
+         do i = 1, nx							!Form a sum for each pixel in the line from the
             riline(i) = riline(i) + ristor(i,j)				! data now stored in the workspace
             rnline(i) = rnline(i) + rnstor(i,j)
          enddo
@@ -6751,7 +6751,7 @@ Cbegin
 
       do j = 1, ny							!Now step down the image
 
-         oldy = j - idy - 1						!Find location of old line to subtract at top 
+         oldy = j - idy - 1						!Find location of old line to subtract at top
          newy = j + idy							! and new line to add at bottom
 
          if ( oldy.lt.1 ) oldy = 2 - oldy				!Reflect at top and bottom of image
@@ -6768,7 +6768,7 @@ Cbegin
             riline(i) = riline(i) + ristor(i,newy)			!Add new line
             rnline(i) = rnline(i) + rnstor(i,newy)
 
-            if ( rnline(i).ge.thresh ) then				!If sufficient pixels present, form 
+            if ( rnline(i).ge.thresh ) then				!If sufficient pixels present, form
                ra(i,j) = riline(i)/rnline(i)				! output, otherwise output is not valid
             else
                ra(i,j) = rinval
@@ -6783,7 +6783,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SMOOTHBS -- Smooth a int*2 flagged array with rectangular 'local mean' filter
-C  Smooth each line by running a local mean filter through it. Store the 
+C  Smooth each line by running a local mean filter through it. Store the
 C  result in workspace, then repeat the process down the image columns. Take
 C  account of invalid pixels.
 C
@@ -6802,7 +6802,7 @@ C  alan penny                  ral                  1990-05-022
       integer   inval			!i: Invalid pixel magic value flag
       integer   ix			!i: X size of smoothing rectangle
       integer   iy			!i: Y size of smoothing rectangle
-      integer   nmin			!i: Min no of valid pixels required 
+      integer   nmin			!i: Min no of valid pixels required
 					!   in smoothing area
       real      ristor(nx,ny)		!w: Workspace
       real      rnstor(nx,ny)		!w: Workspace
@@ -6825,26 +6825,26 @@ Cbegin
       idy = max(0,iy/2)
       jside = 2*idy+1
 
-      thresh = min(max(1,nmin),iside*jside)				!Set threshold for no. of good pixels 
+      thresh = min(max(1,nmin),iside*jside)				!Set threshold for no. of good pixels
 									! in box between 1 and max possible number
 
       do j = 1, ny							!First smooth along each line
 									!----------------------------
 
-	 sum = 0.0							!initiallise running sum of data (isum) and no. of 
+	 sum = 0.0							!initiallise running sum of data (isum) and no. of
 	 rnsum = 0.0 							! good pixels (nsum)
 
 	 do ii = -idx, idx						!Start with box size iside*1 centred on pixel (0,j)
 	    i = ii
 
-            if ( i.lt.1 ) i = 2 - i					!Box will project off ends of lines, 
+            if ( i.lt.1 ) i = 2 - i					!Box will project off ends of lines,
 	    if ( i.gt.nx )  i = nx2 - i					! so reflect to keep it inside
 
 
-            i = min(max(1,i),nx)					!Protect against extreme cases where box is so big it 
+            i = min(max(1,i),nx)					!Protect against extreme cases where box is so big it
 									! goes off opposite end after reflection
 
-            if ( ia(i,j).ne.inval ) then				!If pixel found is valid, add 
+            if ( ia(i,j).ne.inval ) then				!If pixel found is valid, add
                sum = sum + ia(i,j)					! it to sum of pixels within box
                rnsum = rnsum + 1.0
             endif
@@ -6853,7 +6853,7 @@ Cbegin
 
          do i = 1, nx							!Now step the box along the line
 
-	    oldx = i - idx - 1						!Find position of old pixel to be removed from left 
+	    oldx = i - idx - 1						!Find position of old pixel to be removed from left
 	    newx = i + idx						! and new pixel to be added at right
 
 	    if ( oldx.lt.1 ) oldx = 2 - oldx				!Reflect at ends of line
@@ -6882,7 +6882,7 @@ Cbegin
 									!Now smooth down columns
 									!-----------------------
 
-      do i = 1, nx							!Initiallise sums.. this time 
+      do i = 1, nx							!Initiallise sums.. this time
          riline(i) = 0.0						! processing a whole line at once
          rnline(i) = 0.0
       enddo
@@ -6894,7 +6894,7 @@ Cbegin
          if ( j.gt.ny ) j = ny2 - j
          j = min(max(1,j),ny)
 
-         do i = 1, nx							!Form a sum for each pixel in the line from the 
+         do i = 1, nx							!Form a sum for each pixel in the line from the
             riline(i) = riline(i) + ristor(i,j)				! data now stored in the workspace
             rnline(i) = rnline(i) + rnstor(i,j)
          enddo
@@ -6903,7 +6903,7 @@ Cbegin
 
       do j = 1, ny							!Now step down the image
 
-         oldy = j - idy - 1						!Find location of old line to subtract at top 
+         oldy = j - idy - 1						!Find location of old line to subtract at top
          newy = j + idy							! and new line to add at bottom
 
          if ( oldy.lt.1 ) oldy = 2 - oldy				!Reflect at top and bottom of image
@@ -6920,7 +6920,7 @@ Cbegin
             riline(i) = riline(i) + ristor(i,newy)			!Add new line
             rnline(i) = rnline(i) + rnstor(i,newy)
 
-            if ( rnline(i).ge.thresh ) then				!If sufficient pixels present, form 
+            if ( rnline(i).ge.thresh ) then				!If sufficient pixels present, form
                ia(i,j) = riline(i)/rnline(i)				! output, otherwise output is not valid
             else
                ia(i,j) = inval
@@ -7116,7 +7116,7 @@ Cbegin
             endif
          enddo
       enddo
-         
+
 
       end
 
@@ -7179,7 +7179,7 @@ Cbegin
             endif
          enddo
       enddo
-         
+
 
       end
 
@@ -7284,7 +7284,7 @@ Cbegin
          do j = 1, k
             i = j
             l = i + m
-            do while ( i.ge.1 .and. ia(l).lt.ia(i) ) 
+            do while ( i.ge.1 .and. ia(l).lt.ia(i) )
                it = ia(i)
                ia(i) = ia(l)
                ia(l) = it
@@ -7329,7 +7329,7 @@ Cbegin
          do j = 1, k
             i = j
             l = i + m
-            do while ( i.ge.1 .and. a(l).lt.a(i) ) 
+            do while ( i.ge.1 .and. a(l).lt.a(i) )
                t = a(i)
                a(i) = a(l)
                a(l) = t
@@ -7407,7 +7407,7 @@ Cbegin
             endif
          enddo
       enddo
-         
+
 
       end
 
@@ -7478,7 +7478,7 @@ Cbegin
             endif
          enddo
       enddo
-         
+
 
       end
 
@@ -7486,8 +7486,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SRT2PI -- Straight insertion sort of int array with alignment of another 
-C    (ascending order) 
+C SRT2PI -- Straight insertion sort of int array with alignment of another
+C    (ascending order)
 C
 C   a j penny                 dao           1988-04-25
 
@@ -7595,7 +7595,7 @@ Cbegin
          do j = 1, k
             i = j
             l = i + m
-            do while ( i.ge.1 .and. ia(l).lt.ia(i) ) 
+            do while ( i.ge.1 .and. ia(l).lt.ia(i) )
                it = ia(i)
                ia(i) = ia(l)
                ia(l) = it
@@ -7645,7 +7645,7 @@ Cbegin
          do j = 1, k
             i = j
             l = i + m
-            do while ( i.ge.1 .and. a(l).lt.a(i) ) 
+            do while ( i.ge.1 .and. a(l).lt.a(i) )
                t = a(i)
                a(i) = a(l)
                a(l) = t
@@ -7694,10 +7694,10 @@ Cbegin
 
 
       if ( gtype.eq.'SHORT' ) then
-         call st_minmaxs ( im, nx, ny, bs, bz, inval, nxs, nxe, 
+         call st_minmaxs ( im, nx, ny, bs, bz, inval, nxs, nxe,
      +                     nys, nye, amin, amax, kp, ngood, nbad )
       else
-         call st_minmaxr ( im, nx, ny, bs, bz, rinval, nxs, nxe, 
+         call st_minmaxr ( im, nx, ny, bs, bz, rinval, nxs, nxe,
      +                     nys, nye, amin, amax, kp, ngood, nbad )
       endif
 
@@ -7710,7 +7710,7 @@ C ST_MINMAXR -- Get max and min of flagged area of real array
 C
 C  alan penny                ral                      1990-06-15
 
-      subroutine st_minmaxr ( im, nx, ny, bs, bz, rinval, 
+      subroutine st_minmaxr ( im, nx, ny, bs, bz, rinval,
      +               nxs, nxe, nys, nye, amin, amax, kp, ngood, nbad )
 
       implicit none
@@ -7793,7 +7793,7 @@ C ST_MINMAXS -- Get max and min of flagged area of array
 C
 C  alan penny                ral                      1990-06-15
 
-      subroutine st_minmaxs ( im, nx, ny, bs, bz, inval, 
+      subroutine st_minmaxs ( im, nx, ny, bs, bz, inval,
      +               nxs, nxe, nys, nye, amin, amax, kp, ngood, nbad )
 
       implicit none
@@ -7876,7 +7876,7 @@ C TRAN_DOIT -- Transfromation between two sets of x,y posns - set up
 C
 C    a j penny               rgo                      82-11-4
 
-      subroutine tran_doit ( xy1, xy2, num, numa, ktype, siglim, ok, 
+      subroutine tran_doit ( xy1, xy2, num, numa, ktype, siglim, ok,
      +                       trc, ngood, sd )
 
       implicit none
@@ -7910,8 +7910,8 @@ Cbegin
       more = .true.
       do while ( more )
 
-         call tran_lintran ( xy1(1,1), xy1(1,2), xy2(1,1), 
-     +                       xy2(1,2), ok, num, numa, ktype, trc, 
+         call tran_lintran ( xy1(1,1), xy1(1,2), xy2(1,1),
+     +                       xy2(1,2), ok, num, numa, ktype, trc,
      +                       ierr )
 
          if ( ierr.ne.0 ) then
@@ -7929,7 +7929,7 @@ Cbegin
                   dx = dble(xy2(k,1)) - xd
                   dy = dble(xy2(k,2)) - yd
                   errsq = dx*dx + dy*dy
-                  s = s + dsqrt(errsq)   
+                  s = s + dsqrt(errsq)
                   ss = ss + errsq
                   sn = sn + 1.0d0
                   if ( errsq.gt.errmax ) then
@@ -7965,7 +7965,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TRAN_LINTRAN -- Transformation between points - calculate 
+C TRAN_LINTRAN -- Transformation between points - calculate
 C
 C    a j penny               ral                      1991 may
 
@@ -7995,7 +7995,7 @@ C--
       logical solved
       integer j, k, ka, ifit, npts
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
@@ -8008,17 +8008,17 @@ Cbegin
          ierr = 1
          return
       endif
- 
+
       sw = 0.0d0							!Number of good points
       do k = 1, n
          if ( ok(k) ) sw = sw + 1.0d0
-      enddo 
+      enddo
       npts = nint(sw)
 
       if ( npts.le.0 ) then						!No good points
          ierr = 2
          return
-      endif 
+      endif
 
       if ( npts.le.2 ) ifit = min(ifit,3)				!check degrees of freedom
       if ( npts.le.1 ) ifit = 1
@@ -8042,7 +8042,7 @@ Cbegin
             swy  = swy + ya(k)
             swxd = swxd + xb(k)
             swyd = swyd + yb(k)
- 
+
             if ( ifit.ne.1 ) then
                wx = xa(k)
                wy = ya(k)
@@ -8070,14 +8070,14 @@ Cbegin
             c(5) = 0.0
             c(6) = 1.0
             solved = .true.
- 
+
          elseif ( ifit.eq.2 ) then					!Shift and rotation
- 
+
             xd0 = swxd/sw						!Centroids
             yd0 = swyd/sw
             x0  = swx/sw
             y0  = swy/sw
- 
+
             swyxd0 = 0.0d0						!Deviations from centroids
             swxyd0 = 0.0d0
             swxxd0 = 0.0d0
@@ -8089,7 +8089,7 @@ Cbegin
                   swxxd0 = swxxd0 + (xa(k)-x0)*(xb(k)-xd0)
                   swyyd0 = swyyd0 + (ya(k)-y0)*(yb(k)-yd0)
                endif
-            enddo 
+            enddo
 
             top = swyxd0 - swxyd0					!Rotation angle not defined
             bot = swyyd0 + swxxd0
@@ -8103,7 +8103,7 @@ Cbegin
                c(6) = cos(theta)
                solved = .true.
             endif
- 
+
          elseif ( ifit.eq.3 ) then					!Shift, rotation and magnification
 
             a(1,1) = sw
@@ -8127,7 +8127,7 @@ Cbegin
             b(2) = swxxd + swyyd
             b(3) = swyxd - swxyd
             b(4) = swyd
- 
+
             call achtdr ( a, rra, 16 )
             call achtdr ( b, rrb, 4 )
             call simulx ( rrb, rra, c, 4 )
@@ -8135,7 +8135,7 @@ Cbegin
             c(6) = c(2)
 
             solved = .true.
- 
+
          elseif ( ifit.eq.4 ) then					!Full fit
 
             a(1,1) = sw
@@ -8165,7 +8165,7 @@ Cbegin
             b(1) = swyd
             b(2) = swxyd
             b(3) = swyyd
- 
+
             ka = 0
             do k = 1, 3
                do j = 1, 3
@@ -8175,14 +8175,14 @@ Cbegin
             enddo
             call achtdr ( b, rrb, 3 )
             call simulx ( rrb, rra, c(4), 3 )
- 
+
             solved = .true.
 
          endif
 
          ifit = ifit - 1
- 
+
       enddo
- 
+
 
       end

@@ -21,7 +21,7 @@ C     SIGMA  (Numeric) The sigma of the gaussian, expressed in array
 C            elements.  (This is approximately the half width at
 C            half maximum, to within a factor of ~1.17).
 C
-C     WIDTH  (Numeric) The number of array elements over which the 
+C     WIDTH  (Numeric) The number of array elements over which the
 C            gaussian is calcualted - ie outside this range the
 C            gaussian is assumed to be zero.  This simplifies the
 C            computation and also allows the use of strangely shaped
@@ -38,9 +38,9 @@ C                                      KS / CIT 23rd March 1983
 C
 C     Modified:
 C
-C     28th July 1987  DJA/AAO.Revised DSA_ routines - some specs 
-C                     changed. Now uses DYN_ package for 
-C                     dynamic-memory handling. All WRUSERs changed to 
+C     28th July 1987  DJA/AAO.Revised DSA_ routines - some specs
+C                     changed. Now uses DYN_ package for
+C                     dynamic-memory handling. All WRUSERs changed to
 C                     PAR_WRUSERs.
 C     26th Mar  1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
 C                     in mapping calls.

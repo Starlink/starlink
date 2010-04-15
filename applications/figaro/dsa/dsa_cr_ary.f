@@ -10,7 +10,7 @@ C
 C  Description:
 C     This routine creates a data array.  This can be a complicated
 C     operation if the array type is not one of the primitive types,
-C     and a structure has to be created.  
+C     and a structure has to be created.
 C
 C  Language:
 C     FORTRAN
@@ -46,7 +46,7 @@ C     DTA_CRNAM, DTA_CRVAR, DTA_WRVARC, DSA_TYPESIZE, DSA_WRNAME, DSA_WRUSER
 C     DSA_REF_SLOT, DSA__TYPE_DETAILS
 C
 C  Prior requirements:
-C     DSA_OPEN should have been called to initialise the system.  The 
+C     DSA_OPEN should have been called to initialise the system.  The
 C     environment for the array should already exist.
 C
 C  Support: Keith Shortridge, AAO
@@ -175,7 +175,7 @@ C        For a structured array, create the structure, then the
 C        components, one by one.  This code is a bit messy - for a
 C        'CSTRUCT' it creates .BSCALE,.BZERO,.DATA; for a 'SCALED'
 C        array it creates .VARIANT,.SCALE,.ZERO,.DATA;  for a
-C        'COMPLEX' array it creates .VARIANT,.REAL,.IMAGINARY. 
+C        'COMPLEX' array it creates .VARIANT,.REAL,.IMAGINARY.
 C        For a 'SIMPLE' type it creates .VARIANT,.DATA. Those
 C        are all the types we know about at present.  Note that this
 C        needs to be changed at the same time as DSA__TYPE_DETAILS,

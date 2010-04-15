@@ -278,13 +278,13 @@ itcl::class gaia::GaiaForeignExec {
             #  as if ordinary text.
             inform_ $msg
             if { $show_traceback } {
-               for { set i [info level] } { $i > -1 } { incr i -1 } { 
+               for { set i [info level] } { $i > -1 } { incr i -1 } {
                   inform_ "$i: [info level $i]"
                }
             }
          } else {
             if { $show_traceback } {
-               for { set i [info level] } { $i > -1 } { incr i -1 } { 
+               for { set i [info level] } { $i > -1 } { incr i -1 } {
                   append msg "\n$i: [info level $i]"
                }
             }

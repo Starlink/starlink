@@ -342,8 +342,8 @@ static int ConfigureWord( Tcl_Interp *interp, Tk_Canvas canvas,
     Tk_Window tkwin;
 
     tkwin = Tk_CanvasTkwin( canvas );
-    if ( Tk_ConfigureWidget( interp, tkwin, configSpecs, objc, 
-                             (CONST char **) objv, (char *) wordPtr, 
+    if ( Tk_ConfigureWidget( interp, tkwin, configSpecs, objc,
+                             (CONST char **) objv, (char *) wordPtr,
                              flags|TK_CONFIG_OBJS )
          != TCL_OK )
     {
@@ -533,7 +533,7 @@ static void ComputeWordBbox( Tk_Canvas canvas, WordItem *wordPtr )
  *--------------------------------------------------------------
  */
 static void DisplayWord( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
-                         Drawable drawable, int x, int y, int width, 
+                         Drawable drawable, int x, int y, int width,
                          int height )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;

@@ -169,7 +169,7 @@
 
 *  At what value ?
          CALL MSG_SETR( 'REPEXP_SATVAL', REAL( SATVAL ) )
-         IF ( EXTSAT ) THEN 
+         IF ( EXTSAT ) THEN
             CALL CCD1_MSG( ' ', '  Saturation value          :'//
      :                       ' ^REPEXP_SATVAL*' , STATUS )
          ELSE
@@ -202,7 +202,7 @@
 
 *  Write out the deferred charge value.
       CALL MSG_SETR( 'REPEXP_DEFER', REAL( DEFER ) )
-      IF ( EXTDEF ) THEN 
+      IF ( EXTDEF ) THEN
          CALL CCD1_MSG( ' ', '  Deferred charge value        :'//
      :                    ' ^REPEXP_DEFER*', STATUS )
       ELSE

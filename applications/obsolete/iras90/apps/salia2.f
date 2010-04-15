@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MAXSID             ! Max. no. of test points along each 
+      INTEGER MAXSID             ! Max. no. of test points along each
       PARAMETER ( MAXSID = 65 )  ! edge
 
 *  Local Variables:
@@ -127,7 +127,7 @@
      :         NSIDE              ! No. of test points along each edge.
 
       LOGICAL
-     :         OK                 ! True if a good estimate of output 
+     :         OK                 ! True if a good estimate of output
                                   ! bounds has been obtained.
 
       REAL
@@ -139,7 +139,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Start off with 2 test points along each side, and initialise "last 
+*  Start off with 2 test points along each side, and initialise "last
 *  times" image size to 1x1.
       NSIDE = 2
       LSIZEX = 1
@@ -158,7 +158,7 @@
       N = 0
 
 *  Loop round each row of test points.
-      DO J = 1, NSIDE 
+      DO J = 1, NSIDE
 
 *  Calculate the Y image coordinate for this row of test points.
          Y = DBLE( LBND1( 2 ) - 1 ) + ( J - 1 )*DY
@@ -172,7 +172,7 @@
             XX( N ) = DBLE( LBND1( 1 ) - 1 ) + ( I - 1 )*DX
 
          END DO
-      
+
       END DO
 
 *  Transform the test points into sky coordinates in the system
@@ -207,7 +207,7 @@
          END DO
       END DO
 
-*  If sufficient test points were transformed succesfully, convert the 
+*  If sufficient test points were transformed succesfully, convert the
 *  pixel coordinates to pixel index bounds.
       IF( NGOOD .GE. 2 ) THEN
          LBND2( 1 ) = NINT( XMIN ) + 1
@@ -215,13 +215,13 @@
          LBND2( 2 ) = NINT( YMIN ) + 1
          UBND2( 2 ) = NINT( YMAX )
 
-*  Find the fractional change in output image size compared to that 
+*  Find the fractional change in output image size compared to that
 *  estimated using the previous (smaller) number of test points.
          FRACX = REAL( UBND2( 1 ) - LBND2( 1 ) + 1 )/REAL( LSIZEX )
          FRACY = REAL( UBND2( 2 ) - LBND2( 2 ) + 1 )/REAL( LSIZEY )
 
 *  If either dimension increased by more than 10%, we still havn't got
-*  a good estimate of the output image size. 
+*  a good estimate of the output image size.
          IF( FRACX .GT. 1.1 .OR. FRACY .GT. 1.1 ) THEN
             OK = .FALSE.
 
@@ -234,24 +234,24 @@
          END IF
 
 *  If less than 2 test points could be transformed, we still havn't got
-*  a good estimate of the output image size. 
+*  a good estimate of the output image size.
       ELSE
          OK = .FALSE.
       END IF
 
-*  If we still havn't got a good estimate of the output image size, try 
+*  If we still havn't got a good estimate of the output image size, try
 *  again using more test points.
       IF( .NOT. OK ) THEN
 
 *  Increase the number of test points on each side.
          NSIDE = 2*NSIDE - 1
 
-*  If the maximum no. of test points has not yet been reached, jump 
+*  If the maximum no. of test points has not yet been reached, jump
 *  back to produce a new estimate of the output image size.
          IF( NSIDE .LE. MAXSID .AND. STATUS .EQ. SAI__OK ) GO TO 10
 
 *  If the maximum no. of test points has been reached, report an error.
-         IF( STATUS .EQ. SAI__OK ) THEN         
+         IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SALIA2_ERR1',
      :     'SALIA2: Unable to find default bounds for the output image',

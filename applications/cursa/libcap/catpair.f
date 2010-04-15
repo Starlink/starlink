@@ -223,7 +223,7 @@
 *       Close the input catalogues.
 *     else
 *       Report error opening the input catalogues.
-*     end if 
+*     end if
 *     Report either success or an error, as appropriate.
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
@@ -367,7 +367,7 @@
                END DO
 
 *
-*             Get names and identifiers for the columns to be used for 
+*             Get names and identifiers for the columns to be used for
 *             pairing the primary.  Note that the default column names
 *             depend on whether spherical-polar or Cartesian coordinates
 *             are being used.
@@ -611,8 +611,8 @@
                   CALL CAP_PAIR (CIP, PRMROW, PCRD1I, PCRD2I,
      :              CIS, SECROW, SCRD1I, SCRD2I, PDISTI, CRDTYP,
      :              MULTP, MULTS, MAXROW, %VAL(CNF_PVAL(WRKPTR)),
-     :              NPAIR, %VAL(CNF_PVAL(PRMPTR)), 
-     :              %VAL(CNF_PVAL(SECPTR)), %VAL(CNF_PVAL(SPNPTR)), 
+     :              NPAIR, %VAL(CNF_PVAL(PRMPTR)),
+     :              %VAL(CNF_PVAL(SECPTR)), %VAL(CNF_PVAL(SPNPTR)),
      :              %VAL(CNF_PVAL(PMMPTR)), %VAL(CNF_PVAL(SMMPTR)),
      :              NPRNUL, NPMULT, NSMULT, STATUS)
 
@@ -620,13 +620,13 @@
 *                Generate a list of objects corresponding to the type of
 *                pairing required.
 
-                  CALL CAP_PAIRT (SECROW, NPAIR, 
-     :              %VAL(CNF_PVAL(PRMPTR)), %VAL(CNF_PVAL(SECPTR)), 
+                  CALL CAP_PAIRT (SECROW, NPAIR,
+     :              %VAL(CNF_PVAL(PRMPTR)), %VAL(CNF_PVAL(SECPTR)),
      :              %VAL(CNF_PVAL(SPNPTR)), %VAL(CNF_PVAL(PMMPTR)),
-     :              %VAL(CNF_PVAL(SMMPTR)), PRTYP, MAXROW, 
+     :              %VAL(CNF_PVAL(SMMPTR)), PRTYP, MAXROW,
      :              %VAL(CNF_PVAL(WRKPTR)), OPAIR,
-     :              %VAL(CNF_PVAL(OPRPTR)), %VAL(CNF_PVAL(OSCPTR)), 
-     :              %VAL(CNF_PVAL(OSPPTR)), %VAL(CNF_PVAL(OPMPTR)), 
+     :              %VAL(CNF_PVAL(OPRPTR)), %VAL(CNF_PVAL(OSCPTR)),
+     :              %VAL(CNF_PVAL(OSPPTR)), %VAL(CNF_PVAL(OPMPTR)),
      :              %VAL(CNF_PVAL(OSMPTR)), STATUS)
 
 *
@@ -691,8 +691,8 @@
 
                      CALL CAP_JTWRT (CIP, CIS, CIOUT, PCOLS, FIPRIM,
      :                 FIPOUT, SCOLS, FISEC, FISOUT, SEPNI, PMLTI,
-     :                 SMLTI, OPAIR, %VAL(CNF_PVAL(OPRPTR)), 
-     :                 %VAL(CNF_PVAL(OSCPTR)), %VAL(CNF_PVAL(OSPPTR)), 
+     :                 SMLTI, OPAIR, %VAL(CNF_PVAL(OPRPTR)),
+     :                 %VAL(CNF_PVAL(OSCPTR)), %VAL(CNF_PVAL(OSPPTR)),
      :                 %VAL(CNF_PVAL(OPMPTR)), %VAL(CNF_PVAL(OSMPTR)),
      :                 STATUS)
 
@@ -710,7 +710,7 @@
                         END IF
 
 *
-*                      If required copy the textual information from 
+*                      If required copy the textual information from
 *                      the primary.
 
                         IF (PTEXT(1 : 1) .NE. 'N') THEN
@@ -722,7 +722,7 @@
                         END IF
 
 *
-*                      If required copy the textual information from 
+*                      If required copy the textual information from
 *                      the secondary.
 
                         IF (STEXT(1 : 1) .NE. 'N') THEN

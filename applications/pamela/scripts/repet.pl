@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 #
-# !!begin 
+# !!begin
 # !!title  Repeater script
 # !!author T.R. Marsh
 # !!created 14 January 2001
 # !!revised 08 December 2005
-# !!root   repet 
-# !!index  repet.pl 
-# !!descr  Perl script for repeting a command on a set of files 
+# !!root   repet
+# !!index  repet.pl
+# !!descr  Perl script for repeting a command on a set of files
 # !!head1  Repeating script
 #
 # On many occasions one has to subtract a constant from a series of
@@ -26,7 +26,7 @@
 # of files. Thus:
 #
 # repet "mv %%%.sdf\;1 %%%.sdf" @flist
-# 
+#
 # can be used to change the names of the form r345.sdf;1 to r345.sdf
 # thus removing the irritating ; which needs to be escaped all the time.
 # If something goes wrong, check the junkzzz script that is produced.

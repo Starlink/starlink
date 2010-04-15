@@ -8,9 +8,9 @@ C   ---------------
 C
 C   Description
 C   -----------
-C   Collapses an n-D image in one or more dimensions to form an (n-c)-D 
+C   Collapses an n-D image in one or more dimensions to form an (n-c)-D
 C   image, where c is the number of collapsed dimensions. The pixel values
-C   are summed along the specified axes. If a magic value pixel is found 
+C   are summed along the specified axes. If a magic value pixel is found
 C   while summing it is ignored, but the sum is still valid.
 C
 C
@@ -43,51 +43,51 @@ C
 C   END    Coordinate in each dimension of IMAGE at which the summation is
 C          to end. (real, array)(prompted for).
 C
-C   OUTPUT Name of the structure containing the output image. May be the 
+C   OUTPUT Name of the structure containing the output image. May be the
 C          same as IMAGE. (character)(prompted for).
 C
 C
 C   Keywords
 C   --------
-C   WHOLE  Instructs the program to sum along the whole ranges of the 
+C   WHOLE  Instructs the program to sum along the whole ranges of the
 C          selected axes, using the whole range of all other dimensions.
 C          Otherwise, a subset of each dimension may be selected.
 C
 C   FLOAT  Instructs the program to create an output structure containing a
-C          data array of type FLOAT. Otherwise, the output data array will 
+C          data array of type FLOAT. Otherwise, the output data array will
 C          be of the same type as the input.
 C
 C
 C   Propagation of data structure
 C   -----------------------------
-C   - All standard objects except the data array and axes are copied from 
+C   - All standard objects except the data array and axes are copied from
 C     IMAGE.
 C   - Data array and axes are modified and reshaped.
 C
 C
 C   Method
 C   ------
-C   - The IMAGE structure is tested for the bad data flag. If is it found 
-C     and non-zero, magic values are assumed to be present and are left in 
+C   - The IMAGE structure is tested for the bad data flag. If is it found
+C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
 C   - If the data array in IMAGE is of type SHORT, the option of creating an
-C     OUTPUT array of type FLOAT is given, to prevent overflow errors. If 
+C     OUTPUT array of type FLOAT is given, to prevent overflow errors. If
 C     this option is selected, the OUTPUT structure is created using the
 C     appropriate structure definition file.
 C   - If the OUTPUT array is to be of the same type as the IMAGE array, the
 C     structure IMAGE is copied to OUTPUT, with the exception of the data
-C     array and axes.  DSA_RESHAPE_ routines are called to modify the 
+C     array and axes.  DSA_RESHAPE_ routines are called to modify the
 C     dimensions of the OUTPUT data and axis arrays.
 C   - The calibrations, labels, and units of the uncollapsed IMAGE axes are
-C     copied to the appropriate OUTPUT axes. 
+C     copied to the appropriate OUTPUT axes.
 C   - A subroutine appropriate to the data type, the presence or absence of
-C     magic values, and whether or not axis 1 is collapsed is called to 
+C     magic values, and whether or not axis 1 is collapsed is called to
 C     collapse the OUTPUT data array. If axis 1 is not involved, it is more
 C     efficient to use a routine which does not test for the fact.
-C   - If a magic value pixel is found while summing, it is ignored, but the 
-C     sum is still valid. This method differs from the usual treatment of 
-C     magic values, since the occurrence of an input magic value pixel 
-C     generally renders the corresponding output pixel invalid.  
+C   - If a magic value pixel is found while summing, it is ignored, but the
+C     sum is still valid. This method differs from the usual treatment of
+C     magic values, since the occurrence of an input magic value pixel
+C     generally renders the corresponding output pixel invalid.
 C     In the case of a quality array, the output pixel is flagged as bad
 C     in the quality array if any of the summed pixels is bad.
 C
@@ -96,7 +96,7 @@ C   ---------------------------------------
 C   Library DSA:
 C     DSA_CLOSE
 C     DSA_CREATE_STRUCTURE
-C     DSA_DATA_SIZE 
+C     DSA_DATA_SIZE
 C     DSA_GET_AXIS_INFO
 C     DSA_INPUT
 C     DSA_MAP_AXIS_DATA
@@ -132,7 +132,7 @@ C     NDP_PAR_RDARY
 C
 C   Library PAR:
 C     PAR_RDVAL
-C     
+C
 C   Library GEN:
 C     GEN_FILL
 C
@@ -154,13 +154,13 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
-C   -----------------------                           
+C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
-C                           
+C
 C   Possible future upgrades
 C   ------------------------
 C
@@ -190,10 +190,10 @@ C
       CHARACTER ICH_CI*8
       INTEGER   DYN_ELEMENT
       INTEGER   DSA_TYPESIZE
-C               
+C
 C   Local variables.
 C
-      INTEGER   ADDRESS             ! Address of dynamic memory element   
+      INTEGER   ADDRESS             ! Address of dynamic memory element
       INTEGER   AXKEY(6)            ! Keys to dimensions to be collapsed
       CHARACTER AXINFO(2)*32        ! Axis label and units
       INTEGER   AXPTR(6)            ! Dynamic memory pointers to input axes
@@ -216,7 +216,7 @@ C
       INTEGER   ISLOT               ! Map slot number for IMAGE data
       INTEGER   J                   ! Loop counter
       INTEGER   NDIM                ! Number of dimensions in IMAGE
-      INTEGER   NELM                ! Number of elements in IMAGE  
+      INTEGER   NELM                ! Number of elements in IMAGE
       INTEGER   OAXPTR(6)           ! Dynamic memory pointers to output axes
       INTEGER   OAXSLOT(6)          ! Map slot numbers for output axes
       INTEGER   ODIMS(10)           ! Dimensions of OUTPUT
@@ -243,7 +243,7 @@ C
       INCLUDE 'MAGIC_VALUES'
       INCLUDE 'NUMERIC_RANGES'
 C
-C   Initialize.        
+C   Initialize.
 C
       STATUS=0
 C
@@ -256,7 +256,7 @@ C   Open file for IMAGE.
 C
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
 C
-C   Get information about IMAGE.              
+C   Get information about IMAGE.
 C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -326,7 +326,7 @@ C
 C
 C   If the IMAGE data array is of type SHORT, ask whether the OUTPUT array
 C   should be FLOAT. It is normal for the two arrays to be of the same type,
-C   but this option prevents the overflow errors which often occur when SHORT 
+C   but this option prevents the overflow errors which often occur when SHORT
 C   data is summed over a large area.
 C
       IF(TYPE.EQ.'SHORT')THEN
@@ -334,12 +334,12 @@ C
       END IF
 C
 C   If so, create OUTPUT structure with a data array of type FLOAT.
-C      
+C
       IF(FLOAT)THEN
 C
 C   - change type indicator to FLOAT, so that the data arrays will be mapped as
 C     FLOAT, and the computations will be done in floating point.
-C                                                   
+C
         TYPE='FLOAT'
 C
 C   - Create a new structure...
@@ -394,7 +394,7 @@ C
           OAXPTR(J)=DYN_ELEMENT(ADDRESS)
 C
 C   - copy values from appropriate IMAGE axis.
-C           
+C
           CALL COLLAPSE_NEWAXIS
      &      (DYNAMIC_MEM(AXPTR(I)),DYNAMIC_MEM(OAXPTR(J)),
      &       DIMS(I),ODIMS(J),STAPIX(I))
@@ -403,7 +403,7 @@ C   - transfer axis label and units.
 C
           CALL DSA_GET_AXIS_INFO('IMAGE',I,2,AXINFO,0,DUMINT,STATUS)
           CALL DSA_SET_AXIS_INFO('OUTPUT',J,2,AXINFO,0,DUMINT,STATUS)
-        END IF     
+        END IF
       END DO
 C
 C   Magic values are not to be removed from data arrays (unless quality
@@ -421,7 +421,7 @@ C
       IF(TYPE.EQ.'SHORT')THEN
         CALL DSA_MAP_DATA('IMAGE','READ','SHORT',ADDRESS,ISLOT,STATUS)
         IF(STATUS.NE.0)GO TO 500
-        IMPTR=DYN_ELEMENT(ADDRESS)                 
+        IMPTR=DYN_ELEMENT(ADDRESS)
         IF (ERR) THEN
           CALL DSA_MAP_ERRORS('IMAGE','READ','SHORT',
      &                        ADDRESS,IESLOT,STATUS)
@@ -431,7 +431,7 @@ C
       ELSE
         CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,ISLOT,STATUS)
         IF(STATUS.NE.0)GO TO 500
-        IMPTR=DYN_ELEMENT(ADDRESS)                 
+        IMPTR=DYN_ELEMENT(ADDRESS)
         IF (ERR) THEN
           CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',
      &                        ADDRESS,IESLOT,STATUS)
@@ -452,7 +452,7 @@ C
         CALL DSA_MAP_DATA('OUTPUT','WRITE','SHORT',
      &                    ADDRESS,OSLOT,STATUS)
         IF(STATUS.NE.0)GO TO 500
-        OUTPTR=DYN_ELEMENT(ADDRESS)                 
+        OUTPTR=DYN_ELEMENT(ADDRESS)
         IF (ERR) THEN
           CALL DSA_MAP_ERRORS('OUTPUT','WRITE','SHORT',
      &                        ADDRESS,OESLOT,STATUS)
@@ -463,7 +463,7 @@ C
         CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',
      &                    ADDRESS,OSLOT,STATUS)
         IF(STATUS.NE.0)GO TO 500
-        OUTPTR=DYN_ELEMENT(ADDRESS)                 
+        OUTPTR=DYN_ELEMENT(ADDRESS)
         IF (ERR) THEN
           CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',
      &                        ADDRESS,OESLOT,STATUS)
@@ -513,7 +513,7 @@ C
      &        (DYNAMIC_MEM(IMPTR),DYNAMIC_MEM(OUTPTR),
      &         DIMS,NDIM,NELM,ONELM,STAPIX,ENDPIX,AXKEY,MAGIC_SHORT,
      &         ERR,DYNAMIC_MEM(IEPTR),DYNAMIC_MEM(OEPTR))
-          END IF 
+          END IF
         ELSE
           IF(.NOT.BADPIX)THEN
             CALL COLLAPSE_AX1COL_R
@@ -586,7 +586,7 @@ C
       ELSE
         CALL DSA_WRUSER('\\n')
       END IF
-C                
+C
 C   Tidy up and exit
 C
 500   CONTINUE
@@ -600,7 +600,7 @@ C
 
       SUBROUTINE COLLAPSE_NEWAXIS(ARRAY,OARRAY,NELM,ONELM,STAPIX)
 C
-      IMPLICIT NONE               
+      IMPLICIT NONE
 C
 C     Parameters
 C
@@ -608,7 +608,7 @@ C
       REAL      ARRAY(NELM),OARRAY(ONELM)
 C
 C     Local variables
-C                                                
+C
       INTEGER   I,J
 C
       J=1

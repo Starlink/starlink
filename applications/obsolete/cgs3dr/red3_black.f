@@ -4,17 +4,17 @@ C
 C     R E D 3 _ B L A C K
 C
 C     Creates a 1D spectrum corresponding to a black body of given
-C     temperature, normalised to to a given flux at a given reference 
-C     wavelength. The name of a data spectrum is also required to provide 
-C     a wavelength grid on which to put the black body spectrum. The black 
-C     body spectrum is created with error and data quality arrays, containing 
+C     temperature, normalised to to a given flux at a given reference
+C     wavelength. The name of a data spectrum is also required to provide
+C     a wavelength grid on which to put the black body spectrum. The black
+C     body spectrum is created with error and data quality arrays, containing
 C     zeroes.
 C
 C     Only produces F_lambda spectra
 C
 C     Command parameter -
 C
-C     TEMPLATE (>) Name of structure containing 1D spectrum to provide a 
+C     TEMPLATE (>) Name of structure containing 1D spectrum to provide a
 C                  template wavelength grid (wavelengths in microns)
 C
 C     BB_TEMP  (>) [REAL] Temperature of required spectrum
@@ -41,7 +41,7 @@ C    Input parameters
 C
       INTEGER  STATUS
 C
-C    Local variables 
+C    Local variables
 C
       LOGICAL
      :    EXIST                 ! Is AXIS1 array present in template file?
@@ -113,7 +113,7 @@ C
       CALL DSA_SIMPLE_OUTPUT ('OUTPUT', 'D,A,Q,E', 'FLOAT', 1,
      :   DIMS(1), STATUS)
       CALL DSA_USE_QUALITY ('OUTPUT', STATUS)
-      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
      :   D_SLOT, STATUS)
       D_PTR = ADDRESS
       CALL DSA_MAP_VARIANCE ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
@@ -133,7 +133,7 @@ C
       CALL DSA_SET_DATA_INFO ('OUTPUT', 2, CHAR_ARRAY, 0, 0, STATUS)
       CHAR_ARRAY (2) = 'Wavelength'
       CHAR_ARRAY (1) = 'microns'
-      CALL DSA_SET_AXIS_INFO ('OUTPUT', 1, 2, CHAR_ARRAY, 0, 0, 
+      CALL DSA_SET_AXIS_INFO ('OUTPUT', 1, 2, CHAR_ARRAY, 0, 0,
      :   STATUS)
       CHAR_ARRAY (2) = 'Flux'
       CHAR_ARRAY (1) = ' '
@@ -149,7 +149,7 @@ C
 C    call routine to create black body
 C
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL GEN_BBSPC (REFWAVE, TEMPERATURE, %VAL(OUT_A1_PTR), 
+         CALL GEN_BBSPC (REFWAVE, TEMPERATURE, %VAL(OUT_A1_PTR),
      :      DIMS(1), %VAL(D_PTR))
       ENDIF
 C

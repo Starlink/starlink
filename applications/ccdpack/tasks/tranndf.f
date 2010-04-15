@@ -24,25 +24,25 @@
 *     of NDFs.  The output NDFs are calculated by resampling
 *     the data of the input NDFs. Output array elements are set to the
 *     bad value if their inverse-transformed coordinates lie outside the
-*     corresponding input NDF's coordinate limits.  Many NDFs can 
+*     corresponding input NDF's coordinate limits.  Many NDFs can
 *     be resampled with a single invocation of TRANNDF, but it is
-*     the user's responsibility to ensure that they are resampled 
+*     the user's responsibility to ensure that they are resampled
 *     into the same coordinate system if they are subsequently to be
 *     combined or compared on a pixel-by-pixel basis.
 *
 *     Images processed by CCDPACK are resampled in one of two ways,
 *     depending on the value of the USEWCS parameter.
 *
-*     If USEWCS is TRUE then they are resampled from their Pixel 
+*     If USEWCS is TRUE then they are resampled from their Pixel
 *     coordinates into their Current attached coordinate system
 *     (this is the default).  Since the resampling means that a 1 x 1
 *     square in the Current coordinates will represent one pixel
-*     in the output image, the Current coordinate system must be of 
-*     an appropriate size (so for instance resampling into SKY 
+*     in the output image, the Current coordinate system must be of
+*     an appropriate size (so for instance resampling into SKY
 *     coordinates is not suitable because they have units of radians).
-*     The Current coordinate system will typically have been added 
-*     by the CCDPACK REGISTER or WCSREG applications, and be labelled 
-*     'CCD_REG' or 'CCD_WCSREG' accordingly - if it has another label 
+*     The Current coordinate system will typically have been added
+*     by the CCDPACK REGISTER or WCSREG applications, and be labelled
+*     'CCD_REG' or 'CCD_WCSREG' accordingly - if it has another label
 *     (domain) a warning will be issued but resampling will proceed.
 *     A copy of the original PIXEL coordinate system will be retained
 *     in the WCS component of the new image under the name CCD_OLDPIXEL;
@@ -51,7 +51,7 @@
 *
 *     If USEWCS is set to FALSE, then the resampling will take place
 *     according to the TRANSFORM structure stored in the .MORE.CCDPACK
-*     extension of the file.  This option exists chiefly for 
+*     extension of the file.  This option exists chiefly for
 *     compatibility with older versions of CCDPACK.
 
 *  Usage:
@@ -60,9 +60,9 @@
 *  ADAM Parameters:
 *     CONSERVE = _LOGICAL (Read)
 *        If CONSERVE is TRUE, the output values are normalised by the
-*        ratio of the output-to-input pixel areas.  In other words 
-*        this conserves flux.  If CONSERVE is FALSE, there is no 
-*        normalisation.  Flux can only be conserved if the 
+*        ratio of the output-to-input pixel areas.  In other words
+*        this conserves flux.  If CONSERVE is FALSE, there is no
+*        normalisation.  Flux can only be conserved if the
 *        transformation is linear, so that even if CONSERVE is TRUE,
 *        flux will be incorrectly conserved if the transformation is
 *        of a non-linear nature.
@@ -175,18 +175,18 @@
 *        [Dynamic default]
 *     USEWCS = _LOGICAL (Read)
 *        If TRUE then the transformation which is to be applied to the
-*        NDF is stored in the NDF's WCS extension as an attached 
-*        coordinate system. If FALSE then the transformation is either 
-*        stored as a TRN structure in the NDF's CCDPACK extension 
-*        (.MORE.CCDPACK.TRANSFORM), or is supplied by the user (see 
+*        NDF is stored in the NDF's WCS extension as an attached
+*        coordinate system. If FALSE then the transformation is either
+*        stored as a TRN structure in the NDF's CCDPACK extension
+*        (.MORE.CCDPACK.TRANSFORM), or is supplied by the user (see
 *        the INEXT parameter). [TRUE]
 
 *  Examples:
 *     tranndf '*' '*-resamp' reset
 *        This transforms all the NDFs in the current directory from
 *        pixel coordinates to their Current coordinate system.
-*        It uses nearest-neighbour resampling and conserves the flux 
-*        levels (assuming that the transformation is linear). 
+*        It uses nearest-neighbour resampling and conserves the flux
+*        levels (assuming that the transformation is linear).
 *        The output NDFs are of a size such that all the input
 *        pixels have contributed.
 *     tranndf curved straight linint shape=same
@@ -195,7 +195,7 @@
 *     tranndf 'a119*' '*s' inext=false transform=proj.merc shape=bounds
 *             lbound='[1,-20]' ubound='[256,172]'
 *        This transforms the images called a119*, using the transformation
-*        structure merc in the HDS file called proj, into images called 
+*        structure merc in the HDS file called proj, into images called
 *        a119*s.  It uses nearest-neighbour resampling.  All the output
 *        images have size 256 x 192 pixels and origin (1,-20).
 
@@ -433,10 +433,10 @@
       LOGICAL VAR                ! Variance array is present in NDF
       REAL VARR                  ! Dummy input variance
 
-      CHARACTER * ( 20 ) TEMP    
+      CHARACTER * ( 20 ) TEMP
 
 *  Declare Functions:
-      
+
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
       DATA OPIXDM / 'CCD_OLDPIXEL' /
@@ -465,7 +465,7 @@
 *
 *  Start a new NDF context.
       CALL NDF_BEGIN
-      
+
 *  Start a new AST context
       CALL AST_BEGIN( STATUS )
 
@@ -481,9 +481,9 @@
 
 *  Are we using AST FrameSets or TRN structures?
       CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
-      
+
       IF( .NOT. USEWCS ) THEN
-        
+
 *  The user wants to read data with the old TRN structures.
 
 *  Does the user want transformation structures to be located in the NDF
@@ -496,10 +496,10 @@
 
 *  User supplies a single locator to a transformation structure.
             CALL DAT_ASSOC( 'TRANSFORM', 'READ', LOCTR, STATUS )
-            
+
          END IF
 
-      ELSE 
+      ELSE
 
 *  These are checked regardless, so initialise.
          CLASS( TRN__LIN ) = .FALSE.
@@ -529,10 +529,10 @@
 *  If flux levels are conserved.
       IF ( NORM ) THEN
          IF ( USEWCS ) THEN
-            CALL CCD1_MSG( ' ', '  Attempting to conserve flux levels', 
+            CALL CCD1_MSG( ' ', '  Attempting to conserve flux levels',
      :                     STATUS )
          ELSE
-            CALL CCD1_MSG( ' ', '  Total flux levels conserved', 
+            CALL CCD1_MSG( ' ', '  Total flux levels conserved',
      :                     STATUS )
          ENDIF
       ELSE
@@ -544,9 +544,9 @@
       IF( USEWCS ) THEN
          CALL CCD1_MSG( ' ',
      :'  Using AST FrameSet in NDF extensions', STATUS )
-     
+
       ELSE
-     
+
 *  Are we using a TRN structure from the NDFs or user?
          IF ( INEXT ) THEN
             CALL CCD1_MSG( ' ',
@@ -555,7 +555,7 @@
             CALL CCD1_MSG( ' ',
      :'  Using transform structure $STRUCT', STATUS )
          END IF
-        
+
       ENDIF
 
 *  Are we using auto-sizing or will the user get to specify a single
@@ -593,7 +593,7 @@
 
 *  Decide whether we're using AST or TRN structres
          IF ( USEWCS ) THEN
-                              
+
 *  Get the transformation associated with this NDF. This should be
 *  stored in the WCS extention of the NDF.
 
@@ -604,25 +604,25 @@
                CALL NDF_MSG( 'NDFNAME', IDIN )
                CALL ERR_REP( 'TRANNDF_NOAST', '  NDF ^NDFNAME '//
      :'does not have a WCS component (try setting USEWCS to .FALSE.).',
-     :                       STATUS ) 
+     :                       STATUS )
                GO TO 940
-            ENDIF  
-            
-*  It appears we have a WCS component, get a pointer to the current 
+            ENDIF
+
+*  It appears we have a WCS component, get a pointer to the current
 *  Frame.
             CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
             MAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
             MAP = AST_SIMPLIFY( MAP, STATUS )
             FRCUR = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  Get the index of the current frame for future use 
+*  Get the index of the current frame for future use
             CFRAME = AST_GETI( IWCS, 'Current', STATUS )
 
          ELSE
 
 *  The user wishes to use TRANSFORM structures.
             IF ( INEXT ) THEN
-            
+
 *  Get the transformation associated with this NDF. This should be
 *  stored in the CCDPACK extension item TRANSFORM.
 
@@ -636,7 +636,7 @@
 *  If have one get a locator to it.
                  IF ( THERE ) THEN
                     CALL DAT_FIND( LOCEXT, 'TRANSFORM', LOCTR, STATUS )
-                 
+
                  ELSE
 
 *  Failed to find component TRANSFORM.
@@ -657,21 +657,21 @@
                  GO TO 940
                END IF
             END IF
-            
+
          END IF
-         
-                  
+
+
 *  We need to validate the transformations
          IF( USEWCS ) THEN
-         
+
 *  We are using AST FrameSets
 *  ==========================
 
-*  Note there is a danger here that for nonlinear AST mappings the 
+*  Note there is a danger here that for nonlinear AST mappings the
 *  flux tranformation will be incorrect.  AST mappings are (in this
 *  respect) opaque however so there's no way of telling whether it's
-*  linear or not.  We hope that it is, or that the user will have 
-*  specified that flux is not to be conserved (in any case it is 
+*  linear or not.  We hope that it is, or that the user will have
+*  specified that flux is not to be conserved (in any case it is
 *  unlikely that deviations from linearity will be very great).
 
 *  Validate the transformation
@@ -679,31 +679,31 @@
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
                CALL ERR_REP( 'TRANNDF_NOAST', '  NDF ^NDFNAME '//
-     :'does not have a valid WCS component.', STATUS ) 
-               GO TO 940 
+     :'does not have a valid WCS component.', STATUS )
+               GO TO 940
 
-            ELSE IF ( AST_GETC( IWCS,'Class', STATUS ) .NE. 'FrameSet' ) 
+            ELSE IF ( AST_GETC( IWCS,'Class', STATUS ) .NE. 'FrameSet' )
      :      THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
                CALL ERR_REP( 'TRANNDF_FRAME', '  NDF ^NDFNAME '//
      :'does not have a WCS component with class FrameSet.',STATUS )
-               GO TO 940             
+               GO TO 940
 
-*  Check that we are not trying to resample into a SkyFrame.  This 
+*  Check that we are not trying to resample into a SkyFrame.  This
 *  pretty much has to be a silly thing to do, and probably indicates
 *  that the user has failed to stick a sensible frame onto the NDF.
             ELSE IF ( AST_ISASKYFRAME( FRCUR, STATUS ) ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'TRANNDF_SKYFRM', 'TRANNDF: It makes no'//
-     :' sense to resample into a SkyFrame (units are all wrong).', 
+     :' sense to resample into a SkyFrame (units are all wrong).',
      :STATUS )
                CALL ERR_REP( ' ', '         Try adding a pixel-like'//
      :' frame using WCSREG with DOMAINS=!.', STATUS )
                GO TO 940
-                                     
-            ELSE 
-                              
+
+            ELSE
+
 *  Tell the user which co-ordinate frame we'll be resampling into.
                DMN = AST_GETC( FRCUR, 'Domain', STATUS )
                CALL MSG_SETC( 'DMN', DMN )
@@ -720,13 +720,13 @@
 
 *  Obtain the number of input and output co-ordinates for a Mapping
             NVIN = AST_GETI( MAP, 'Nin', STATUS )
-            NVOUT = AST_GETI( MAP, 'Nout', STATUS )    
-                               
+            NVOUT = AST_GETI( MAP, 'Nout', STATUS )
+
          ELSE
-         
+
 *  We are using TRN structres
 *  ==========================
-           
+
 *  Now validate the transformation.  Need forward and backward
 *  transformations.
             IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
@@ -756,9 +756,9 @@
                   GO TO 940
                END IF
             END IF
-            
-         ENDIF   
-         
+
+         ENDIF
+
 *  Get the properties of the NDF.
 *  ==============================
 *  Dimensions.
@@ -766,7 +766,7 @@
 
 *  Bounds.
          CALL NDF_BOUND( IDIN, NDF__MXDIM, ILBND, IUBND, NDIMI, STATUS )
-                     
+
          IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 *  Validate dimensions and number of input coordinates.
@@ -799,7 +799,7 @@
             CALL CCD1_MALL( AEL( IAXIS ), '_DOUBLE', AXPNTR( IAXIS ),
      :                      STATUS )
             CALL CCG1_AXIND( ILBND( IAXIS ), IUBND( IAXIS ),
-     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ), 
+     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ),
      :                       STATUS )
          END DO
 
@@ -820,11 +820,11 @@
 *  We're using AST framesets.
             DO IAXIS = 1, NVIN
                CALL AST_MAPBOX( MAP, ASTART, AEND, .TRUE., IAXIS,
-     :                          DDLBND(IAXIS), DDUBND(IAXIS), DDXL, 
+     :                          DDLBND(IAXIS), DDUBND(IAXIS), DDXL,
      :                          DDXU, STATUS )
-            END DO                   
+            END DO
          ELSE
-         
+
 *  We're using old fashioned TRN structures
             CALL KPG1_TRBOD( NVIN, ASTART, AEND, TRIDF, NVOUT, DDLBND,
      :                       DDUBND, STATUS )
@@ -935,9 +935,9 @@
 
 *  Paste each axis into the work array.
             CALL KPG1_PASTD( .FALSE., .TRUE., AXOFFS, ADIMS, ADIMS( 1 ),
-     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ), 
+     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ),
      :                       CADIMS,
-     :                       CADIMS( 1 ), %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                       CADIMS( 1 ), %VAL( CNF_PVAL( CAXPTR ) ),
      :                       STATUS )
 
 *  Increment the offsets for the next axis.
@@ -954,7 +954,7 @@
 
 *  Create the output NDF.
 *  ======================
-         CALL NDG_NDFPR( IDIN, 'Axis,Units', GIDOUT, INDEX, IDOUT, 
+         CALL NDG_NDFPR( IDIN, 'Axis,Units', GIDOUT, INDEX, IDOUT,
      :                   STATUS )
 
 *  Tell user the name of the output NDF.
@@ -962,16 +962,16 @@
          CALL CCD1_MSG( ' ', '  Output NDF: ^OUTNDF', STATUS )
 
 *  Report the extent of the input NDF, useful if using shape=auto to compare
-*  with the ouptut NDF shape and see if something stupid is happening. 
+*  with the ouptut NDF shape and see if something stupid is happening.
          DO IAXIS = 1, NVIN
             CALL MSG_SETI( 'LOW', ILBND( IAXIS ) )
             CALL MSG_SETI( 'HIGH', IUBND( IAXIS ) )
             IF ( IAXIS .EQ. 1 ) THEN
                CALL CCD1_MSG( 'INBOUNDS',
      :'  Input NDF bounds : ^LOW to ^HIGH', STATUS )
-            ELSE 
+            ELSE
                CALL CCD1_MSG( 'INBOUNDS',
-     :'                   : ^LOW to ^HIGH', STATUS )      
+     :'                   : ^LOW to ^HIGH', STATUS )
             END IF
          END DO
 
@@ -1020,7 +1020,7 @@
 *  Apply the transformation.
             IF( USEWCS ) THEN
               CALL AST_TRANN( MAP, EL, NVIN, NDF__MXDIM + 1, COIN,
-     :                        .TRUE., NVOUT, NDF__MXDIM + 1, COOUT, 
+     :                        .TRUE., NVOUT, NDF__MXDIM + 1, COOUT,
      :                        STATUS )
             ELSE
               CALL TRN_TRND( .FALSE., NDF__MXDIM + 1, NVIN, EL, COIN,
@@ -1054,7 +1054,7 @@
 *  See if there is any conservation of flux required.
          CONSRV = ABS( FLUX - 1.0D0 ) .GT. VAL__EPSD
          IF ( STATUS .NE. SAI__OK ) GO TO 940
-         
+
 
 *  Resample using the nearest-neighbour technique.
 *  ===============================================
@@ -1085,21 +1085,21 @@
 
 *  Generate the list of vector indices for the resampling.
             IF( USEWCS ) THEN
-                CALL CCG1_ASPID( NDIMI, IDIMS, MAP, 
+                CALL CCG1_ASPID( NDIMI, IDIMS, MAP,
      :                           %VAL( CNF_PVAL( CAXPTR ) ),
      :                           WDIMS( 1 ), NVOUT, OLBND, ODIMS,
-     :                           %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                           %VAL( CNF_PVAL( WPNTR1 ) ),
      :                           %VAL( CNF_PVAL( WPNTR3 ) ),
-     :                           %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                           %VAL( CNF_PVAL( WPNTR2 ) ),
      :                           %VAL( CNF_PVAL( INPNTR ) ),
-     :                           STATUS )            
+     :                           STATUS )
             ELSE
-                CALL KPG1_TRPID( NDIMI, IDIMS, TRIDI, 
+                CALL KPG1_TRPID( NDIMI, IDIMS, TRIDI,
      :                           %VAL( CNF_PVAL( CAXPTR ) ),
      :                        WDIMS( 1 ), NVOUT, OLBND, ODIMS,
-     :                        %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                        %VAL( CNF_PVAL( WPNTR1 ) ),
      :                        %VAL( CNF_PVAL( WPNTR3 ) ),
-     :                        %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                        %VAL( CNF_PVAL( WPNTR2 ) ),
      :                        %VAL( CNF_PVAL( INPNTR ) ), STATUS )
             ENDIF
 *  Free the workspace that is no longer needed.
@@ -1145,58 +1145,58 @@
 *  Perform the transformation on the data array for the numeric data
 *  type.  First for a byte array
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL KPG1_VASVB( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVB( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPG1_VASVD( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVD( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL KPG1_VASVI( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVI( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL KPG1_VASVUB( ELOUT, 
+                     CALL KPG1_VASVUB( ELOUT,
      :                                 %VAL( CNF_PVAL( INPNTR ) ), ELIN,
      :                                 %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                 %VAL( CNF_PVAL( OPNTRW ) ),
      :                                 NBAD, STATUS )
 
 *  Transform an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL KPG1_VASVUW( ELOUT, 
+                     CALL KPG1_VASVUW( ELOUT,
      :                                 %VAL( CNF_PVAL( INPNTR ) ), ELIN,
      :                                 %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                 %VAL( CNF_PVAL( OPNTRW ) ),
      :                                 NBAD, STATUS )
 
 *  Transform a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL KPG1_VASVW( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVW( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
                   END IF
 
@@ -1268,204 +1268,204 @@
 *  Perform the transformation on the data array for the numeric data
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  IF( USEWCS ) THEN 
-                    CALL CCG1_ASLIB( NDIMI, IDIMS, 
+                  IF( USEWCS ) THEN
+                    CALL CCG1_ASLIB( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             MAP,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ELSE
-                    CALL KPG1_TDLIB( NDIMI, IDIMS, 
+                    CALL KPG1_TDLIB( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             TRIDI,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  IF( USEWCS ) THEN 
-                    CALL CCG1_ASLID( NDIMI, IDIMS, 
+                  IF( USEWCS ) THEN
+                    CALL CCG1_ASLID( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             MAP,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ELSE
-                    CALL KPG1_TDLID( NDIMI, IDIMS, 
+                    CALL KPG1_TDLID( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             TRIDI,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   IF ( USEWCS ) THEN
-                    CALL CCG1_ASLII( NDIMI, IDIMS, 
+                    CALL CCG1_ASLII( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             MAP,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                  ELSE
-                    CALL KPG1_TDLII( NDIMI, IDIMS, 
+                    CALL KPG1_TDLII( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             TRIDI,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                  ENDIF
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIR( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIR( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             MAP,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ELSE
-                    CALL KPG1_TDLIR( NDIMI, IDIMS, 
+                    CALL KPG1_TDLIR( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             TRIDI,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   IF (USEWCS ) THEN
-                    CALL CCG1_ASLIUB( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIUB( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                              MAP,
-     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ELSE
-                    CALL KPG1_TDLIUB( NDIMI, IDIMS, 
+                    CALL KPG1_TDLIUB( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                              TRIDI,
-     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIUW( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIUW( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                              MAP,
-     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ELSE
-                    CALL KPG1_TDLIUW( NDIMI, IDIMS, 
+                    CALL KPG1_TDLIUW( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                              VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                              TRIDI,
-     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   IF(USEWCS) THEN
-                    CALL CCG1_ASLIW( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIW( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             MAP,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ELSE
-                    CALL KPG1_TDLIW( NDIMI, IDIMS, 
+                    CALL KPG1_TDLIW( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ), 
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             TRIDI,
-     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
@@ -1486,27 +1486,27 @@
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIB( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIB( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARB, MAP, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
-     :                             STATUS )    
-                  ELSE           
-                    CALL KPG1_TDLIB( NDIMI, IDIMS, 
+     :                             STATUS )
+                  ELSE
+                    CALL KPG1_TDLIB( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARB, TRIDI, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                   ENDIF
@@ -1514,55 +1514,55 @@
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLID( NDIMI, IDIMS, 
+                    CALL CCG1_ASLID( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARD, MAP, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
-                  ELSE           
-                    CALL KPG1_TDLID( NDIMI, IDIMS, 
+                  ELSE
+                    CALL KPG1_TDLID( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARD, TRIDI, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                   ENDIF
-     
+
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLII( NDIMI, IDIMS, 
+                    CALL CCG1_ASLII( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARI, MAP, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
-                  ELSE           
-                    CALL KPG1_TDLII( NDIMI, IDIMS, 
+                  ELSE
+                    CALL KPG1_TDLII( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARI, TRIDI, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                   ENDIF
@@ -1570,27 +1570,27 @@
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIR( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIR( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARR, MAP, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
-                  ELSE           
-                    CALL KPG1_TDLIR( NDIMI, IDIMS, 
+                  ELSE
+                    CALL KPG1_TDLIR( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARR, TRIDI, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                   ENDIF
@@ -1598,83 +1598,83 @@
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIUB( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIUB( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                              VAR, VARB, MAP, FLUX,
-     :                              %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
-     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              VARBO,
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-                  ELSE           
-                    CALL KPG1_TDLIUB( NDIMI, IDIMS, 
+                  ELSE
+                    CALL KPG1_TDLIUB( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                              VAR, VARB, TRIDI, FLUX,
-     :                              %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
-     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              VARBO,
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
-                  
+
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIUW( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIUW( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                              VAR, VARW, MAP, FLUX,
-     :                              %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
-     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              VARBO,
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-                  ELSE           
-                    CALL KPG1_TDLIUW( NDIMI, IDIMS, 
+                  ELSE
+                    CALL KPG1_TDLIUW( NDIMI, IDIMS,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                              VAR, VARW, TRIDI, FLUX,
-     :                              %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                              %VAL( CNF_PVAL( CAXPTR ) ),
      :                              ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
-     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                              VARBO,
-     :                              %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                              %VAL( CNF_PVAL( WPNTR1 ) ),
      :                              %VAL( CNF_PVAL( WPNTR3 ) ),
      :                              %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                   ENDIF
-                  
+
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   IF (USEWCS) THEN
-                    CALL CCG1_ASLIW( NDIMI, IDIMS, 
+                    CALL CCG1_ASLIW( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARW, MAP, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
-                  ELSE           
-                    CALL KPG1_TDLIW( NDIMI, IDIMS, 
+                  ELSE
+                    CALL KPG1_TDLIW( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARW, TRIDI, FLUX,
-     :                             %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
      :                             ODIMS( 1 ), NDIMI,
-     :                             OLBND, ODIMS, 
+     :                             OLBND, ODIMS,
      :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                             %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                   ENDIF
@@ -1710,25 +1710,25 @@
             CALL CCD1_FRDM( IWCS, 'PIXEL', JPIX, STATUS )
             PFRM = AST_GETFRAME( IWCS, JPIX, STATUS )
             CALL AST_SETC( PFRM, 'DOMAIN', OPIXDM, STATUS )
-    
-*  Remove any remaining GRID, PIXEL, AXIS frames from original frameset 
-*  since they're out of date now.  This just leaves the non-automatic 
+
+*  Remove any remaining GRID, PIXEL, AXIS frames from original frameset
+*  since they're out of date now.  This just leaves the non-automatic
 *  frames of the input WCS component.
             CALL CCD1_DMPRG( IWCS, 'PIXEL', .FALSE., 0, STATUS )
             CALL CCD1_DMPRG( IWCS, 'AXIS', .FALSE., 0, STATUS )
             CALL CCD1_DMPRG( IWCS, 'GRID', .FALSE., 0, STATUS )
-    
+
 *  Find out which frame contains the PIXEL domain in the output frameset.
             CALL CCD1_FRDM( OWCS, 'PIXEL', JPIX, STATUS )
 
 *  And add the remaining bits of IWCS to OWCS
-            CALL AST_ADDFRAME( OWCS, JPIX, 
+            CALL AST_ADDFRAME( OWCS, JPIX,
      :                         AST_UNITMAP( NDIMI, ' ', STATUS ),
      :                         IWCS, STATUS )
-    
+
 *  Write it out.
             CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
-            
+
          END IF
 
 *  Release NDFs and close container files. Retain locator to transform
@@ -1765,14 +1765,14 @@
       CALL CCD1_FRTMP( -1, STATUS )
 
   960 CONTINUE
-      IF( USEWCS ) THEN 
+      IF( USEWCS ) THEN
 *  Tidy up any remaining AST FrameSets
         CALL AST_END( STATUS )
       ELSE
 *  Free any remaining transformation resources.
-        CALL TRN_CLOSE( STATUS ) 
-      ENDIF     
- 
+        CALL TRN_CLOSE( STATUS )
+      ENDIF
+
 *  Tidy the NDF context.
       CALL NDF_END( STATUS )
 
@@ -1786,8 +1786,8 @@
          IF( USEWCS ) THEN
             CALL ERR_REP( 'TRANNDF_ERR',
      :        'TRANNDF: Unable to transform the NDF '/
-     :       /'using WCS extensions.', STATUS ) 
-         ELSE        
+     :       /'using WCS extensions.', STATUS )
+         ELSE
             CALL ERR_REP( 'TRANNDF_ERR',
      :        'TRANNDF: Unable to transform the NDF '/
      :       /'using TRN structures.', STATUS )
@@ -1796,5 +1796,5 @@
 
 *  Close the log file.
       CALL CCD1_END( STATUS )
-      
+
       END

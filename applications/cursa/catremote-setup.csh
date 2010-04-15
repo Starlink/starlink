@@ -14,7 +14,7 @@
 #
 #  Define the utility program to be used to submit the query.  The options
 #  are:
-#    "/star/bin/cursa/geturl" -- geturl utility, 
+#    "/star/bin/cursa/geturl" -- geturl utility,
 #    "lynx -source"           -- lynx command line browser,
 #    "java  UrlReader"        -- Java utility.
 #    "wget -q -O -"           -- wget utility (probably RedHat Linux only).

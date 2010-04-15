@@ -13,7 +13,7 @@
 *     CALL KPG1_DSFRM( FSET, TEXT, FULL, STATUS )
 
 *  Description:
-*     This routine displays a textual description of the Current Frame 
+*     This routine displays a textual description of the Current Frame
 *     in the supplied AST FrameSet.
 
 *  ADAM Parameters:
@@ -23,7 +23,7 @@
 *        The pixel scale values as displayed on standard output by this
 *        routine. Celestial axes are in arc-seconds, all other axes are
 *        in the units of the corresponding current frame axis. This
-*        parameter is only written if the TEXT string starts with 
+*        parameter is only written if the TEXT string starts with
 *        "NDFTRACE:".
 
 *  Arguments:
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,7 +81,7 @@
 *        Display meaningful text if the pixel scale cannot be found.
 *     19-JUN-2007 (DSB):
 *        Allow pixel scales to be written to an output parameter. To
-*        avoid changing the calling signature of this function, control 
+*        avoid changing the calling signature of this function, control
 *        over this feature is provided via a special string flag supplied
 *        at the start of TEXT.
 *     {enter_changes_here}
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,7 +138,7 @@
       LOGICAL SERIES             ! Frames in series?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -154,7 +154,7 @@
       END IF
 
 *  Get a pointer to the Frame to be described.
-      GOTFS = AST_ISAFRAMESET( FSET, STATUS ) 
+      GOTFS = AST_ISAFRAMESET( FSET, STATUS )
 
       IF( GOTFS ) THEN
          CFRM = AST_GETFRAME( FSET, AST__CURRENT, STATUS )
@@ -168,7 +168,7 @@
          CALL ERR_REP( 'KPG1_DSFRM_ERR', 'KPG1_DSFRM: Inappropriate '//
      :                 'AST Object (class ^CLASS) supplied '//
      :                 '(programming error).', STATUS )
-      END IF      
+      END IF
 
 *  Display the global properties of the Frame.
       CALL KPG1_DSFR1( CFRM, TEXT( ITEXT: ), 8, FULL, STATUS )
@@ -185,7 +185,7 @@
 *  Only proceed if we have a FrameSet.
       IF( GOTFS ) THEN
 
-*  See if there is a GRID Frame in the FrameSet. 
+*  See if there is a GRID Frame in the FrameSet.
          CALL KPG1_ASFFR( FSET, 'GRID', IGRID, STATUS )
          IF( IGRID .NE. AST__NOFRAME ) THEN
 
@@ -204,8 +204,8 @@
                   GFIRST( 1, IAXIS ) = 1.0
                END DO
 
-*  Map the GRID coordinates at the centre of the first pixel to obtain the 
-*  corresponding coordinates in the Frame. 
+*  Map the GRID coordinates at the centre of the first pixel to obtain the
+*  corresponding coordinates in the Frame.
                CALL AST_TRANN( FSET, 1, NDIM, 1, GFIRST, .TRUE., FRMNAX,
      :                         1, CFIRST, STATUS )
 
@@ -213,14 +213,14 @@
                CALL AST_NORM( FSET, CFIRST, STATUS )
 
 *  Display the resulting coordinates.
-               CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, 1, 
-     :                                             CFIRST( 1, 1 ), 
+               CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, 1,
+     :                                             CFIRST( 1, 1 ),
      :                                             STATUS ) )
 
                DO IAXIS = 2, FRMNAX
                   CALL MSG_SETC( 'FIRST', ',' )
                   CALL MSG_SETC( 'FIRST', ' ' )
-                  CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, IAXIS, 
+                  CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, IAXIS,
      :                            CFIRST( 1, IAXIS ), STATUS ) )
                END DO
 
@@ -228,7 +228,7 @@
      :      '        First pixel centre  : ^FIRST', STATUS )
 
 *  Get the pixel scales at the first pixel.
-               CALL KPG1_PIXSC( FSET, GFIRST, PIXSC, FPIXSC, UPIXSC, 
+               CALL KPG1_PIXSC( FSET, GFIRST, PIXSC, FPIXSC, UPIXSC,
      :                          STATUS )
 
             END IF
@@ -256,7 +256,7 @@
          CALL CHR_APPND( ')', ATTRIB, IAT )
 
 *  Get the label and display it.
-         CALL MSG_SETC( 'LABEL', AST_GETC( CFRM, ATTRIB( : IAT ), 
+         CALL MSG_SETC( 'LABEL', AST_GETC( CFRM, ATTRIB( : IAT ),
      :                                     STATUS ) )
          CALL MSG_OUT( 'AXIS_LABEL',
      :   '              Label              : ^LABEL', STATUS )
@@ -278,7 +278,7 @@
 *  display the pixel scale at the first pixel
          CALL MSG_SETC( 'V', FPIXSC( IAXIS ) )
          CALL MSG_SETC( 'U', UPIXSC( IAXIS ) )
-         CALL MSG_OUT( 'AXIS_SCALE', 
+         CALL MSG_OUT( 'AXIS_SCALE',
      :      '              Nominal Pixel scale: ^V ^U', STATUS )
 
 *  Add a spacing line after the information for each axis.
@@ -298,10 +298,10 @@
          I = 1
          TOP = 1
          COUNT = 1
-         DO WHILE( I .LE. TOP .AND. TOP .LE. NDF__MXDIM ) 
+         DO WHILE( I .LE. TOP .AND. TOP .LE. NDF__MXDIM )
             IF( AST_ISACMPFRAME( FRM( I ), STATUS ) ) THEN
-               CALL AST_DECOMPOSE( FRM( I ), FRM( TOP + 1 ), 
-     :                             FRM( TOP + 2 ), SERIES, INV1, INV2, 
+               CALL AST_DECOMPOSE( FRM( I ), FRM( TOP + 1 ),
+     :                             FRM( TOP + 2 ), SERIES, INV1, INV2,
      :                             STATUS )
                TOP = TOP + 2
                CALL AST_ANNUL( FRM( I ), STATUS )
@@ -313,7 +313,7 @@
                CALL CHR_PUTI( COUNT, STEXT, IAT )
                CALL CHR_PUTC( ':', STEXT, IAT )
 
-               CALL KPG1_DSFR1( FRM( I ), STEXT( : IAT ), 11, FULL, 
+               CALL KPG1_DSFR1( FRM( I ), STEXT( : IAT ), 11, FULL,
      :                          STATUS )
                COUNT = COUNT + 1
                CALL MSG_BLANK( STATUS )

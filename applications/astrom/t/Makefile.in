@@ -13,7 +13,7 @@ FFLAGS=@FFLAGS@
 # C compiler and flags
 CC=@CC@
 CFLAGS=@CFLAGS@
-# Flags given to the C compiler to let it link C object modules against the 
+# Flags given to the C compiler to let it link C object modules against the
 # Fortran runtime
 FLIBS=@FLIBS@
 # Extra linker flags

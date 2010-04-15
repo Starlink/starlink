@@ -7686,7 +7686,7 @@ package starman {
 		    helpkey LINECOL
 		    prompt {Colour of plot lines? (black:white)}
 		}
-		
+
 	    }
 	    #
 	    # SIMPLEMAG.IFL
@@ -8343,16 +8343,16 @@ package starman {
 	    }
 	    #
 	    #   STARMANGRIPE.IFL
-	    # 
+	    #
 	    action starmangripe {
-		
-		
+
+
 	    }
 	    #
 	    #  STARMANHELP.IFL
-	    # 
+	    #
 	    action starmanhelp {
-		
+
 		parameter topic {
 		    position 1
 		    vpath global
@@ -8363,7 +8363,7 @@ package starman {
 		    prompt {Help topic}
 		    default {         }
 		}
-		
+
 		parameter subtopic {
 		    position 2
 		    vpath global
@@ -8374,7 +8374,7 @@ package starman {
 		    prompt {Help subtopic}
 		    default {         }
 		}
-		
+
 		parameter subsubtopic {
 		    position 3
 		    vpath global
@@ -8385,7 +8385,7 @@ package starman {
 		    prompt {Help subsubtopic}
 		    default {         }
 		}
-		
+
 		parameter subsubsubtopic {
 		    position 4
 		    vpath global
@@ -8396,7 +8396,7 @@ package starman {
 		    prompt {Help subsubsubtopic}
 		    default {         }
 		}
-		
+
 	    }
 	    #
 	}
@@ -14110,8 +14110,8 @@ package starman {
 	icl {defhelp starman $STARMAN_HELP/starman_help_a 0}
 
 	display {
-	    
-    ____________________________________________________________________ 
+
+    ____________________________________________________________________
     |  Starman - Stellar Photometry               Version @PACKAGE_VERSION@   |
     |            Image and Table Handling                                |
     |                                                                    |
@@ -14123,7 +14123,7 @@ package starman {
     |                                    e.g. $STARMAN_DATA/measure_in   |
     |5) Demonstration:                starmandemo                        |
     |                                                                    |
-    |All rights reserved. Starlink copyright and disclaimer notices apply| 
+    |All rights reserved. Starlink copyright and disclaimer notices apply|
      --------------------------------------------------------------------
 
 }

@@ -3,7 +3,7 @@ C+
 C
 C   -------------
 C   S L I C E 3 D
-C   -------------   
+C   -------------
 C
 C   Description
 C   -----------
@@ -27,16 +27,16 @@ C
 C
 C   Parameters (read or written)
 C   ----------------------------
-C   IMAGE    Name of the structure containing the image to be displayed. 
+C   IMAGE    Name of the structure containing the image to be displayed.
 C            (character)(prompted for).
 C
 C   OUTPUT   Name of file the slice is to be written to. (character)
 C
-C   LOW      Data value which is plotted in the lowest colour index or as 
-C            black. (real)(prompted for). 
+C   LOW      Data value which is plotted in the lowest colour index or as
+C            black. (real)(prompted for).
 C
 C   HIGH     Data value which is plotted in the highest colour index or as
-C            white. (real)(prompted for). 
+C            white. (real)(prompted for).
 C
 C   PLACE    Code for one of nine possible locations on the display surface,
 C            being a combination of T, C, or B, and L, C, or R. (character)
@@ -46,8 +46,8 @@ C   MAG      Magnification of the plot. Magnification 1 fits the plot to the
 C            whole display surface. (real)(prompted for).
 C
 C   TABLE    Name of colour or grey scale lookup table. (character)
-C            (prompted for).      
-C            
+C            (prompted for).
+C
 C   SOFTDEV  Current screen device name (character)(read from file).
 C
 C   VIEW     Axis to view cube along. (integer)
@@ -58,10 +58,10 @@ C   Keywords
 C   --------
 C   AXES     Instruction to plot calibrated axes. Otherwise, the image is
 C            framed with a plain box.
-C   RAMP     Instruction to plot a calibrated bar of the colour or grey 
+C   RAMP     Instruction to plot a calibrated bar of the colour or grey
 C            scale to the right of the image.
 C
-C   ERASE    Instruction to erase screen before plotting. 
+C   ERASE    Instruction to erase screen before plotting.
 C
 C   VERBOSE  Make the program garrulous in the extreme. (Hidden)
 C
@@ -80,7 +80,7 @@ C   - The view axis is obtained from the user. The cube is then collapsed
 C     (summed) over that axis.
 C   - The collapsed cube is then plotted. The plotting is handled similarly
 C     to (cf) DEPICT.
-C   - The user can then select 2 points using the cursor which define the 
+C   - The user can then select 2 points using the cursor which define the
 C     slice.
 C   - The display is cleared and the slice is plotted.
 C   - If the user is happy with this, he/she can save the slice to a file.
@@ -131,7 +131,7 @@ C     PAR_CNPAR
 C     PAR_RDCHAR
 C     PAR_RDKEY
 C     PAR_RDVAL
-C     
+C
 C   Library VAR:
 C     VAR_GETCHR
 C
@@ -164,13 +164,13 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'NUMERIC_RANGES'
 C   INCLUDE 'MAGIC_VALUES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
-C   -----------------------                           
+C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters  / WHILE
 C
-C                           
+C
 C   Possible future upgrades
 C   ------------------------
 C   Have the slice and original view displayed simultaneously.
@@ -189,9 +189,9 @@ C
 C
 C+-----------------------------------------------------------------------------
 c
-      implicit none    
+      implicit none
 c
-c   Functions. 
+c   Functions.
 c
       integer   dyn_element,ich_len,pgbegin,dsa_typesize
       real      gen_elemf
@@ -200,8 +200,8 @@ c
 c   Local variables.
 c
       character action*16
-      integer   address  
-      integer   ax1,ax2 
+      integer   address
+      integer   ax1,ax2
       logical   axes
       integer   axptr(3)
       integer   axslot(3)
@@ -231,7 +231,7 @@ c
       real      low
       real      mag
       integer   ndim
-      integer   nelm      
+      integer   nelm
       integer   nelm1
       integer   nelm2
       integer   nxpix,nypix
@@ -242,7 +242,7 @@ c
       integer   oeslot
       integer   optr
       integer   oqptr
-      integer   oqslot      
+      integer   oqslot
       integer   oslot
       character place*2
       logical   qual
@@ -275,11 +275,11 @@ c
       integer   x1,x2
       real      ximv(2)
       real      xlast
-      real      xr 
+      real      xr
       integer   y1,y2
       real      yimv(2)
       real      ylast
-      real      yr 
+      real      yr
 c
       include 'DYNAMIC_MEMORY'
       include 'NUMERIC_RANGES'
@@ -297,7 +297,7 @@ c
       if(status.ne.0)go to 999
 c
 c  Get hidden parameters(s)
-c   
+c
       call par_rdkey('verbose',.false.,verbose)
 c
 c  Get current PGPLOT screen device.
@@ -311,18 +311,18 @@ c
       end if
 c
 c  Get name of image.
-c                        
+c
       call dsa_input('image','image',status)
       if (status .ne. 0) go to 999
       call ndp_get_image_info('image',.true.,.false.,type,badpix,status)
-      if (status .ne. 0) go to 999  
+      if (status .ne. 0) go to 999
 c
 c  Get dimensions of image.
 c
-      call dsa_data_size('image',3,ndim,dims,nelm,status)      
+      call dsa_data_size('image',3,ndim,dims,nelm,status)
       if (status .ne. 0) go to 999
-      if(ndim .ne. 3)then  
-        call dsa_wruser('%SLICE3D-E-NOT3D  ')         
+      if(ndim .ne. 3)then
+        call dsa_wruser('%SLICE3D-E-NOT3D  ')
         call dsa_wruser('This is not a 3-D image.\\N')
         go to 999
       end if
@@ -341,15 +341,15 @@ c
 c  Quality, quality, quality street?
 c
       call dsa_seek_quality('image',qual,status)
-      if (status .ne. 0) go to 999 
+      if (status .ne. 0) go to 999
 c
 c  Might as well have a look for error arrays while we're at it (oo-er missus)
-c 
+c
       call dsa_seek_errors('image',err,status)
       if (status .ne. 0) go to 999
 c
-c  Map data array as FLOAT (this is required by PGPLOT).  
-c              
+c  Map data array as FLOAT (this is required by PGPLOT).
+c
         call dsa_map_data('image','read','FLOAT',address,islot,status)
         if ( status .ne. 0) go to 999
         imptr=dyn_element(address)
@@ -448,7 +448,7 @@ c
      &                       qual,dynamic_mem(iqptr),low)
           end if
         end if
-c                  
+c
 c  Get image viewport location.
 c
         call par_cnpar('place')
@@ -458,14 +458,14 @@ c  Get magnification factor.
 c
         call par_cnpar('mag')
         call par_rdval('mag',0.1,1.0,1.0,' ',mag)
-c                  
+c
 c  Set label for image.
 c
         label = 'View along axis '//ich_ci(vaxis)
 c
 c  Get instruction to plot axes.
 c
-        call par_cnpar('axes')   
+        call par_cnpar('axes')
         call par_rdkey('axes',.true.,axes)
         if (axes) control(ich_len(control)+1:)='A'
 c
@@ -482,18 +482,18 @@ c
         if (status .ne. 0) go to 999
         wptr = dyn_element(address)
 c
-c   
+c
 c  Get name of LUT.
 c
         call par_cnpar('table')
         call par_rdchar('table',' ',table)
 c
 c  Get instruction to erase screen.
-c       
-        call par_cnpar('erase')  
+c
+        call par_cnpar('erase')
         call par_rdkey('erase',.false.,erase)
 c
-c  Open required plot device.       
+c  Open required plot device.
 c
         if(erase)then
           status=pgbegin(0,softdev,1,1)
@@ -523,7 +523,7 @@ c
         else
           ind1 = 1
           ind2 = 2
-        end if 
+        end if
 
         epix(1) = dims(ind1)
         epix(2) = dims(ind2)
@@ -583,7 +583,7 @@ c
           call dsa_wruser('Slice dimensions: ')
           call dsa_wruser(ich_ci(nxpix)//' x '//ich_ci(nypix)//'\\n')
         end if
-       
+
         call dsa_get_work_array(nelm2,'float',address,sldslot,status)
         if (status .ne. 0) go to 999
         sldptr = dyn_element(address)
@@ -623,13 +623,13 @@ c
         end if
 c
 c  Unmap temporary stuff and re-allocate workspace
-c 
+c
         call dsa_free_workspace(wslot,status)
         call dsa_get_work_array(nelm2,'int',address,wslot,status)
         if (status .ne. 0) go to 999
 c
 c  Plot slice and free up the temporary slot
-c    
+c
         epix(1) = nxpix
         epix(2) = nypix
         start(1) = 1.0
@@ -651,7 +651,7 @@ c
         call dsa_free_workspace(wslot,status)
 c
 c  What to do next?
-c       
+c
         call par_cnpar('write')
         call par_rdkey('write',.true.,write)
         if (write) then
@@ -704,7 +704,7 @@ c
             call slice_copy_w(
      &                 dynamic_mem(sldptr),nxpix,nypix,
      &                 dynamic_mem(optr),
-     &                 err,dynamic_mem(sleptr),dynamic_mem(oeptr), 
+     &                 err,dynamic_mem(sleptr),dynamic_mem(oeptr),
      &                 qual,dynamic_mem(slqptr),dynamic_mem(oqptr),
      &                 dynamic_mem(oaxptr(1)),dynamic_mem(oaxptr(2)),
      &                 start,end)
@@ -712,7 +712,7 @@ c
             call slice_copy_r(
      &                 dynamic_mem(sldptr),nxpix,nypix,
      &                 dynamic_mem(optr),
-     &                 err,dynamic_mem(sleptr),dynamic_mem(oeptr), 
+     &                 err,dynamic_mem(sleptr),dynamic_mem(oeptr),
      &                 qual,dynamic_mem(slqptr),dynamic_mem(oqptr),
      &                 dynamic_mem(oaxptr(1)),dynamic_mem(oaxptr(2)),
      &                 start,end)
@@ -744,9 +744,9 @@ c
           end if
         end if
       end do ! while
-c                            
+c
 c   Tidy and exit
-c          
+c
   999 continue
       call pgend
       call dsa_close(status)
@@ -757,7 +757,7 @@ c
       subroutine crush_axis1(array3d,nx,ny,nz,array2d,qual,qarray,low)
 c------------------------------------------------------------------------------
 c     Description:
-c       Crush cube along axis 1. 
+c       Crush cube along axis 1.
 c     Parameters:
 c       > array3d              The original cube (real 3D array)
 c       > nx,ny,nz             Cube dimensions (integers)
@@ -785,7 +785,7 @@ c
               if (qarray(i,j,k) .eq. 0) then
                 sum = sum + array3d(i,j,k)
                 valid = valid + 1
-              end if       
+              end if
             else
               sum = sum + array3d(i,j,k)
               valid = valid + 1
@@ -848,7 +848,7 @@ c
       subroutine crush_axis2(array3d,nx,ny,nz,array2d,qual,qarray,low)
 c------------------------------------------------------------------------------
 c     Description:
-c       Crush cube along axis 2. 
+c       Crush cube along axis 2.
 c     Parameters:
 c       > array3d              The original cube (real 3D array)
 c       > nx,ny,nz             Cube dimensions (integers)
@@ -876,7 +876,7 @@ c
               if (qarray(i,j,k) .eq. 0) then
                 sum = sum + array3d(i,j,k)
                 valid = valid + 1
-              end if       
+              end if
             else
               sum = sum + array3d(i,j,k)
               valid = valid + 1
@@ -939,7 +939,7 @@ c
       subroutine crush_axis3(array3d,nx,ny,nz,array2d,qual,qarray,low)
 c------------------------------------------------------------------------------
 c     Description:
-c       Crush cube along axis 3. 
+c       Crush cube along axis 3.
 c     Parameters:
 c       > array3d              The original cube (real 3D array)
 c       > nx,ny,nz             Cube dimensions (integers)
@@ -967,7 +967,7 @@ c
               if (qarray(i,j,k) .eq. 0) then
                 sum = sum + array3d(i,j,k)
                 valid = valid + 1
-              end if       
+              end if
             else
               sum = sum + array3d(i,j,k)
               valid = valid + 1
@@ -1192,7 +1192,7 @@ c
           if (err) error2d(i,j) = error3d(int(xr),int(yr),j)
           if (qual) qual2d(i,j) = qual3d(int(xr),int(yr),j)
         end do
-      end do           
+      end do
 
       return
       end

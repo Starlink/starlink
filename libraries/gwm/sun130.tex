@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -84,7 +84,7 @@ windows on an X display that do not disappear when a program terminates.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -504,12 +504,12 @@ windows on an X display that do not disappear when a program terminates.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -561,7 +561,7 @@ properties of X that make an X window fundamentally different from a
 traditional graphics device.
 Firstly, windows ``belong'' to applications programs and are deleted when the
 application exits unlike the picture on an image display which remains there
-until replaced by something else. 
+until replaced by something else.
 
 Secondly, applications
 programs are expected respond to ``events'' occurring in their windows;
@@ -583,12 +583,12 @@ of any applications program and by handling window expose events. Applications
 still send plotting commands directly to the window; they don't have to go via
 a ``server'' process, so there is no adverse impact on performance. All
 communication between the window manager and the application is via the X
-server and the graphics window manager does not have to run on the same 
+server and the graphics window manager does not have to run on the same
 machine as the application.
 Indeed the manager and applications can even be running on different operating
-systems. 
+systems.
 
-\section{Creating a window\xlabel{xmakeCommand}} 
+\section{Creating a window\xlabel{xmakeCommand}}
 
 The simplest way to create a window (in terms of understanding what is
 happening) is to use the {\tt xmake} command and specify the properties that
@@ -618,7 +618,7 @@ pixels. The
 border width is ignored by many window managers but the value specified
 is used to calculate the window position so should match the actual
 border width used by the window manager. The default is 10 which is what
-the Motif window manager uses. 
+the Motif window manager uses.
 
 If the window appears to
 be incorrectly position when a geometry specification of {\tt -geometry
@@ -626,15 +626,15 @@ be incorrectly position when a geometry specification of {\tt -geometry
 
 \item[{\tt -colours {\em number}}] The number of colour table entries to be
 allocated to the window; {\em number} should be an integer greater than or
-equal to 2. 
+equal to 2.
 
 On a server with a writable colour table, the requested number of colour table
-entries are reserved for the exclusive use of the window; if there are 
+entries are reserved for the exclusive use of the window; if there are
 insufficient free entries in the default colour map, a private colour map
 is created and the entries allocated from that.
 On a server with a fixed colour table, entries can
 be shared between windows and any number up to the maximum supported by the
-server can be requested. 
+server can be requested.
 
 Examples:
 \begin{quote}{\tt
@@ -647,7 +647,7 @@ The default depends on the properties of the X server.
 
 \item[{\tt -foreground {\em colour}}] The foreground colour of the window; {\em
 colour} is the name of a colour or RGB specification in X windows format.
-Case does not matter but colour names cannot be abbreviated. 
+Case does not matter but colour names cannot be abbreviated.
 Examples:
 \begin{quote}{\tt
 xmake test -foreground white\\
@@ -656,7 +656,7 @@ xmake test -foreground \#FF00FF}
 \end{quote}
 The default is {\tt White}.
 
-\item[{\tt -geometry {\em specification}}\label{geometryOpt}] 
+\item[{\tt -geometry {\em specification}}\label{geometryOpt}]
 The size and position of the window;
 {\em specification} is a window geometry specification of the form:
 \begin{quote}{\tt
@@ -684,7 +684,7 @@ To position the window in the top right corner:
 xmake test -geom -0+0}
 \end{quote}
 The default is {\tt 780x512} (this leaves it up to the window manager to
-decide where to place the window). 
+decide where to place the window).
 
 The geometry specification is only a hint to the window manager and may be
 ignored.
@@ -694,7 +694,7 @@ ignored.
 \item[{\tt -interactive}] Allows the window size to be set interactively. When
 the window appears on the screen its size can be modified before the window
 creation is completed and the window size fixed. Resize the window with the
-facilities provided by the window manager that you are using 
+facilities provided by the window manager that you are using
 and then click the mouse on the
 interior of the window to indicate that the desired size has been set.
 
@@ -705,7 +705,7 @@ the default.
 
 \item[{\tt -nooverlay}] Do not allocate an overlay plane. This option
 would be required if a default overlay colour had been set using the ``X
-defaults'' file \htmlref{(see below)}{xdefaults} but a window without an 
+defaults'' file \htmlref{(see below)}{xdefaults} but a window without an
 overlay plane was required.
 
 \item[{\tt -ovcolour {\em colour}}]
@@ -724,7 +724,7 @@ when required.
 \item[{\tt -title {\em title}}] The window title that is displayed in the
 window's title bar;
 {\em title} is a character string. If it contains spaces or other
-special characters it must be enclosed in quotes 
+special characters it must be enclosed in quotes
 Example:
 \begin{quote}{\tt
 xmake test -title Test\_Window}
@@ -733,14 +733,14 @@ The default title is ``{\tt{GWM Window - }{\em window name}}''
 
 \end{description}
 
-\label{xdefaults}\xlabel{xdefaults}There are defaults 
-for all these options but they are not 
+\label{xdefaults}\xlabel{xdefaults}There are defaults
+for all these options but they are not
 necessarily appropriate. You can provide your own defaults by putting
-them in your ``X defaults'' file ({\tt\~{}/.Xdefaults}) 
-and to have different defaults for different window names. If you 
+them in your ``X defaults'' file ({\tt\~{}/.Xdefaults})
+and to have different defaults for different window names. If you
 edit your X defaults file, the changes won't have any effect until they
 have been loaded into the resource database in your X server. This is normally
-done by the window manager when you first log in to the server but can 
+done by the window manager when you first log in to the server but can
 be done explicitly with the command:
 \begin{quote}{\tt
 xrdb -merge \$HOME/.Xdefaults}
@@ -778,7 +778,7 @@ colours, suitable for black and white line plots, 3801 is a bit bigger and has
 colours for image display applications and 3803 is the same but the window size
 is set interactively.
 
-A complete list of the resources used and their default values are shown in 
+A complete list of the resources used and their default values are shown in
 Table~\ref{resources}.
 \begin{htmlonly}
 \subsection{GWM X resources}
@@ -795,7 +795,7 @@ overlay &False\\
 overlayColour &\\
 iconic &False\\
 interactive &False\\
-title &\\\hline 
+title &\\\hline
 \end{tabular}\]
 \end{table}
 
@@ -828,7 +828,7 @@ xdestroy {\em name}}
 \end{quote}
 where {\em name} is the window name. There are no command options.
 
-Resetting the X server (i.e. by logging out) will also delete all windows 
+Resetting the X server (i.e. by logging out) will also delete all windows
 and all window manager processes will exit.
 
 \section{The FORTRAN interface}
@@ -839,7 +839,7 @@ use the {\em inherited status strategy} which means that if the {\tt STATUS}
 argument is not set to the value {\tt SAI\_\_OK} on entry the routine will
 exit without performing any action. If an error occurs during the execution
 of a routine the {\tt STATUS} will be set and an error will be reported
-using the error message service 
+using the error message service
 (EMS---\xref{SUN/104}{sun104}{}).
 
 \subsection{Summary of GWM calls}
@@ -886,7 +886,7 @@ connection is established with the following call
 where the second argument is set to true to indicate that the default
 connection is to be used.
 
-The connection is ended with a call to 
+The connection is ended with a call to
 \texttt{\htmlref{GWM\_CLOSE}{GWM_CLOSE}}.
 These two routines
 ({\tt GWM\_OPEN} and {\tt GWM\_CLOSE}) should bracket all other routines
@@ -907,7 +907,7 @@ is created (remember GWM window names are case sensitive).
 \end{verbatim}
 On its own this call will create a window with the default characteristics
 of shape, colour etc. To select different characteristics calls to the
-routines \texttt{\htmlref{GWM\_WSETx}{GWM_WSETC}} are made before 
+routines \texttt{\htmlref{GWM\_WSETx}{GWM_WSETC}} are made before
 the call to {\tt GWM\_CRWIN}.
 
 Each required window characteristic is selected with a separate call to
@@ -929,7 +929,7 @@ NOINTERACTIVE  & L    \\
 NOOVERLAY      & L    \\
 OVCOLOUR       & C    \\
 OVERLAY        & L    \\
-TITLE          & C    \\ 
+TITLE          & C    \\
 WIDTH          & I    \\
 XORIGIN        & I    \\
 XSIGN          & I    \\
@@ -939,7 +939,7 @@ YSIGN          & I    \\ \hline
 \end{center}
 
 Most of these characteristics are directly comparable to the options
-of the {\tt xmake} command. The only major difference is the 
+of the {\tt xmake} command. The only major difference is the
 \texttt{\htmlref{-geometry}{geometryOpt}}
 option which here is split into its four components WIDTH, HEIGHT, XORIGIN
 and YORIGIN. The XSIGN and YSIGN characteristic is used to override the sign of
@@ -986,7 +986,7 @@ characteristics have to be re-defined before the next call to
 {\tt GWM\_CRWIN}.
 
 A GWM window will remain on the server after the program which created
-it has terminated unless it is explicitly deleted using 
+it has terminated unless it is explicitly deleted using
 \texttt{\htmlref{GWM\_DSWIN}{GWM_DSWIN}}.
 
 \subsection{Inquiries}
@@ -1329,13 +1329,13 @@ Adam programs are linked with GMW by including {\tt `gwm\_link\_adam`} on the
 \newpage
 \section{Graphics Driver Interface}
 
-This section describes the routines that are used by low level graphics 
+This section describes the routines that are used by low level graphics
 software to interact with GWM windows. A working knowledge of Xlib
 programming is assumed.
 \begin{quote}{\em
 The routines described here are for the use of ``system'' software only
 and all this information in this section is subject to change without
-notice. Therefore before making any use of it you should consult the 
+notice. Therefore before making any use of it you should consult the
 \htmladdnormallink{Starlink project staff}{http://www.starlink.ac.uk/people.html}
 at RAL.}
 \end{quote}
@@ -1359,15 +1359,15 @@ write them. The {\tt GWM\_Set{\em Xxxx}} and {\tt GWM\_Get{\em Xxxx}}
 routines can be used to access them. The properties are:
 \begin{description}
 
-\item[{\tt GWM\_background}] The background colour of the window (a character 
-string) 
+\item[{\tt GWM\_background}] The background colour of the window (a character
+string)
 
 \item[{\tt GWM\_colour\_table}] An array of integers that lists the colour
-cells allocated to the window. The first element of the array 
+cells allocated to the window. The first element of the array
 defines the background colour.
 
-\item[{\tt GWM\_foreground}] The foreground colour of the window (a character 
-string) 
+\item[{\tt GWM\_foreground}] The foreground colour of the window (a character
+string)
 
 \item[{\tt GWM\_name}] The window name (a character string). This enables a
 window id to be translated into a GWM window name.
@@ -1429,7 +1429,7 @@ On a display with a fixed colour table the colour table property will
 list all possible pixel values---since the colour cells can't be changed
 they can be used by all windows---and the colour table can be used to
 map ``virtual'' pixel values to the real pixel values used to write to
-the window and may be altered. For example, GKS uses the colour table to 
+the window and may be altered. For example, GKS uses the colour table to
 map colour indices onto pixel values.
 
 If a window has an overlay plane, the colour of the overlay plane is set
@@ -1448,7 +1448,7 @@ copy the window contents to the new position itself.
 \subsection{Examples}
 
 Some example programs that illustrate how to perform various operations on a
-GWM window can be found in the gwm examples directory 
+GWM window can be found in the gwm examples directory
 ({\tt \$STARLINK\_DIR/share/gwm}
 on Starlink systems).
 

@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL PSA1_MKHII( ARRAY, NPIX, BAD, NHIST, HIST, MODE, ZERO, 
+*     CALL PSA1_MKHII( ARRAY, NPIX, BAD, NHIST, HIST, MODE, ZERO,
 *                      WIDTH, STATUS )
 
 *  Description:
@@ -99,7 +99,7 @@
       IMAX = VAL__MINI
       DO 21 I = 1, NPIX
          IF ( ARRAY( I ) .GT. IMAX ) IMAX = ARRAY( I )
-         IF ( ARRAY( I ) .LT. IMIN ) IMIN = ARRAY( I ) 
+         IF ( ARRAY( I ) .LT. IMIN ) IMIN = ARRAY( I )
  21   CONTINUE
 
 *  Check that array was not single valued.

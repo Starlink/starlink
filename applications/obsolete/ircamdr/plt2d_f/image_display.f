@@ -29,7 +29,7 @@
 *      SKL  27thJul94   changed error reporting to use ERR_, removed VALUE
 *                       changed IFIX to INT
 *      SKL  28thJul94   corrected logic for annulling sub-image locator
-*      CAA  20thAug94   modified image st,end calculation 
+*      CAA  20thAug94   modified image st,end calculation
 *      SKL  2ndSept94   removed unused variables flagged by UNIX compiler
 *      SKL  29thSep94   changed GCA calls for UNIX version of GKS
 *      SKL  25thOct94   changed INT magnification variables to REAL
@@ -89,12 +89,12 @@
 	INTEGER LOCSR		                ! locator for scratch image
 	INTEGER LOC_SUBIM	                ! locator for input sub-image
         INTEGER NELEMENTS                       ! number of pointer elements
-        INTEGER LBND(2)                         ! lower pixel bounds 
+        INTEGER LBND(2)                         ! lower pixel bounds
 
 	PARAMETER ( MAX_MAGNIF = 500.0)		! Max mag allowed
         DATA LBND / 1, 1 /
 
-			
+
 	REAL RANGE				! range for ranplot option
 	REAL SIGMA_DOWN				! lower sigma level
 	REAL SIGMA_LEVEL			! sigma level
@@ -222,12 +222,12 @@
 	  IF( PLOT_WHICH .EQ. 'FLASH' .OR.
      :	      PLOT_WHICH .EQ. 'CFLASH') THEN
 
-	    CALL NDF_MAP( LOC_IMAGE, 'DATA', '_INTEGER', 'READ', 
+	    CALL NDF_MAP( LOC_IMAGE, 'DATA', '_INTEGER', 'READ',
      :	                  POINTER_IMAGE, NELEMENTS, STATUS)
 
 	  ELSE
 
-	    CALL NDF_MAP( LOC_IMAGE, 'Data', '_REAL', 'READ', 
+	    CALL NDF_MAP( LOC_IMAGE, 'Data', '_REAL', 'READ',
      :	                  POINTER_IMAGE, NELEMENTS, STATUS)
 
 	  END IF
@@ -264,19 +264,19 @@
 	  IF( PLOT_WHICH .EQ. 'FLASH' .OR.
      :	      PLOT_WHICH .EQ. 'CFLASH') THEN
 
-	    CALL NDF_MAP( LOC_SUBIM, 'Data', '_INTEGER', 'READ', 
+	    CALL NDF_MAP( LOC_SUBIM, 'Data', '_INTEGER', 'READ',
      :	                  POINTER_IMAGE, NELEMENTS, STATUS)
 
 	  ELSE
 
-	    CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ', 
+	    CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ',
      :	                  POINTER_IMAGE, NELEMENTS, STATUS)
 
 	  END IF
 
 	  IF( STATUS. NE. SAI__OK) THEN
 
-            CALL ERR_REP('ERR', 'Error : During NDF_MAP sub-image', 
+            CALL ERR_REP('ERR', 'Error : During NDF_MAP sub-image',
      :                   STATUS )
 	    CALL NDF_ANNUL( LOC_SUBIM, STATUS)
 	    CALL NDF_ANNUL( LOC_IMAGE, STATUS)
@@ -303,16 +303,16 @@
      :	    PLOT_WHICH .NE. 'CFLASH') THEN
 
 	  CALL NDF_ASSOC( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)
- 
+
 *        reset scratch file pixel boundaries
           CALL NDF_SBND( 2, LBND, NAXIS, LOCSR, STATUS )
 
-	  CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE', 
+	  CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE',
      :	                POINTER_SCRATCH, NELEMENTS, STATUS)
 
 	  IF( STATUS. NE. SAI__OK) THEN
 
-            CALL ERR_REP('ERR', 'Error : During NDF_ scratch area', 
+            CALL ERR_REP('ERR', 'Error : During NDF_ scratch area',
      :                   STATUS )
 
 	    IF( SUBIM_OPTION .EQ. 'S' .OR. SUBIM_OPTION .EQ. 'SUBIM' .OR.
@@ -543,8 +543,8 @@ d      write (6,*) 'got y start, end:  ', im_yst, im_yen
 
 	IF( IM_XST .LT. 1 .OR. IM_YST .LT. 1 .OR.
      :	    IM_XEN .GT. MAX_X .OR. IM_YEN .GT. MAX_Y) THEN
-          CALL MSG_OUT( 'ERR', 
-     :  'With current magnification image exceeds display  - QUITING', 
+          CALL MSG_OUT( 'ERR',
+     :  'With current magnification image exceeds display  - QUITING',
      :	    STATUS)
 	  IF( SUBIM_OPTION .EQ. 'S' .OR. SUBIM_OPTION .EQ. 'SUBIM' .OR.
      :	      SUBIM_OPTION .EQ. 'SUB_IMAGE') THEN
@@ -611,15 +611,15 @@ d	type *, 'nx, ny   = ', naxis(1), naxis( 2)
 
 	ELSE
 
-	  CALL GCA( IM_XST, 			
-     :	            IM_YEN, 			
-     :	            IM_XEN,		
-     :	            IM_YST, 		
-     :	            NAXIS( 1),			
-     :	            NAXIS( 2),			
+	  CALL GCA( IM_XST,
+     :	            IM_YEN,
+     :	            IM_XEN,
+     :	            IM_YST,
+     :	            NAXIS( 1),
+     :	            NAXIS( 2),
      :              1, 1,
-     :	            NAXIS( 1),	NAXIS( 2),		
-     :	            %VAL( POINTER_IMAGE))	
+     :	            NAXIS( 1),	NAXIS( 2),
+     :	            %VAL( POINTER_IMAGE))
 
 	END IF
 
@@ -641,7 +641,7 @@ d	type *, 'nx, ny   = ', naxis(1), naxis( 2)
      :	    SUBIM_OPTION .EQ. 'SUB_IMAGE') THEN
 
  	  CALL NDF_ANNUL( LOC_SUBIM, STATUS)
- 
+
 	END IF
 
 *      delete the temporary working space

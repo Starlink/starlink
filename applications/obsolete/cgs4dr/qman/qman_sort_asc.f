@@ -20,7 +20,7 @@
 *    Local variables :
       INTEGER SWAP_FLAG, I            ! Flag for swapping (0=done), counter
       CHARACTER*( MSG_VAL_LEN ) CTEMP ! Temporary character variable
-      DOUBLE PRECISION TEMP           ! Temporary date variable 
+      DOUBLE PRECISION TEMP           ! Temporary date variable
 *-
 
 *   Return immediately if status bad.

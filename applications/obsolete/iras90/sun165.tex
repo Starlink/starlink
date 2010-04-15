@@ -51,7 +51,7 @@ This document gives some guide-lines for users who want to produce their own
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -140,7 +140,7 @@ This document gives some guide-lines for users who want to produce their own
 % ? Document-specific \newcommand or \newenvironment commands.
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}} 
+\newcommand{\dgs}{\hbox{$^\circ$}}
 
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
@@ -226,12 +226,12 @@ This document gives some guide-lines for users who want to produce their own
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -276,11 +276,11 @@ information on existing {\small IRAS90} applications see
 document gives some guide-lines for users who want to produce their own
 {\small IRAS90} applications.
 
-{\small IRAS90} contains applications that can determine positions in 
-astrometric coordinates, draw grids and other functions relating to some 
-standard astronomical measurement systems and some standard projections. These 
+{\small IRAS90} contains applications that can determine positions in
+astrometric coordinates, draw grids and other functions relating to some
+standard astronomical measurement systems and some standard projections. These
 do not provide the full flexibility required by a fully functional astrometric
-system, but will provide limited capabilities for images which have {\small 
+system, but will provide limited capabilities for images which have {\small
 IRAS90} astrometry extensions containing the relevant positional information.
 
 The {\small IRAS90} system is written in {\small FORTRAN} and is
@@ -295,7 +295,7 @@ producing {\small IRAS90} code as this will help to produce portable,
 maintainable, reliable code which is consistent with the existing
 {\small IRAS90} code. Adherence to the Starlink programming standards
 is particularly important if you intend to submit your applications for
-inclusion in the {\small IRAS90} package. 
+inclusion in the {\small IRAS90} package.
 
 \section{Writing Programs for IRAS90
 \xlabel{writing_programs_for_iras90}}
@@ -319,8 +319,8 @@ to provide a logfile or reprocessable data file.
 \item The applications are written in such a way that they are easy to
 understand. A programmer needing to enhance, debug, or use a set of code as an
 example should find a structured program, containing sufficient comment that
-he can not only understand the logic, but finds it also describes the problems 
-presented by the application and the way in which the code overcomes the 
+he can not only understand the logic, but finds it also describes the problems
+presented by the application and the way in which the code overcomes the
 problem.
 
 \end{itemize}
@@ -345,14 +345,14 @@ Diana Parsons, and other Starlink programmers.
 \section{Existing Source Code and Documentation
 \xlabel{existing_source_code_and_documentation}}
 
-Existing source code is stored within the released {\small IRAS90} system. 
+Existing source code is stored within the released {\small IRAS90} system.
 The majority of routines can be classified as follows:
 
 \begin{description}
 
 \item [A-task routines :] These are the top-level routines for each
 application and include user documentation in the form of a prologue.
-The prologue also contains descriptions of each parameter used. 
+The prologue also contains descriptions of each parameter used.
 
 \item [Other application-specific routines :] These are routines which
 are specific to a particular application and which are called from the
@@ -365,7 +365,7 @@ specification, for each application.
 
 \item [Utility subsystem routines :] These are routines which perform commonly
 used operations. They are not associated with any one application and
-can be called by any. Details of the subsystems are given in \ref{SEC:UTIL} 
+can be called by any. Details of the subsystems are given in \ref{SEC:UTIL}
 below.
 
 \item [Include files:] The Utility subsystems have associated with them include
@@ -379,13 +379,13 @@ used see sections \ref{SEC:UNIXS} and \ref{SEC:VMSS} below
 
 \subsection{IRAS90 documentation\xlabel{iras90_documentation}}
 
-The main {\small IRAS90} documentation consists of three Sun's: 
+The main {\small IRAS90} documentation consists of three Sun's:
 
 \begin{itemize}
 
 \item \xref{SUN/161}{sun161}{} --
 IRAS90 Introductory/User Guide to Calibrated Reconstructed Data Analysis.
- 
+
 \item \xref{SUN/163}{sun163}{} --
 IRAS90 -- IRAS Survey and PO Data Analysis Package -- Reference Guide
 
@@ -400,7 +400,7 @@ In addition there are three ID documents
 \begin{itemize}
 
 \item ID 10 -- MAPCRDD mapping algorithms
- 
+
 \item ID 28 -- IRAS90 Maintenance guide
 
 \item ID 29 -- COLTEMP and COLCORR Algorithms
@@ -412,12 +412,12 @@ section \ref{SEC:UTIL} below.
 
 The structure and contents of the CRDD NDF data file is described in the ID
 document associated with IRC. Notes on the Astrometry extension will be found
-in the IRA ID document. Notes on the processing applied to translate other 
+in the IRA ID document. Notes on the processing applied to translate other
 standard forms of IRAS image data into IRAS90 Image NDF format are contained
 in the PREPARE section of \xref{SUN/163}{sun163}{}.
 
-Anyone needing copies of the ID documents will first need to process the 
-distributed files using {\small LATEX}, etc. 
+Anyone needing copies of the ID documents will first need to process the
+distributed files using {\small LATEX}, etc.
 
 
 \subsection{Utility Routines
@@ -433,7 +433,7 @@ letter names beginning with ``IR'':
 Each sub-system is described in a separate document distributed with
 the {\small IRAS90} package. These files give a
 general over-view of the purpose of the sub-system and also included
-specific details about the routines contained in the sub-system. 
+specific details about the routines contained in the sub-system.
 
 \begin{description}
 
@@ -443,7 +443,7 @@ trigonometry, handling of formatted sky coordinate values (eg getting
 sky coordinates from the user), and generation of astrometric graphics
 (eg sky coordinate grids, meridians, parallels, etc). {\small IRA}
 documentation is in file {\small ID2.TEX}. The full {\small ID2}
-document is a pain to prepare. A user who is content with a document in 
+document is a pain to prepare. A user who is content with a document in
 which some diagrams eg of projections, are missing can run {\small ID2.TEX}
 through Latex three times and print the result. If the diagrams are required
 we suggest contacting IRAS or Starlink staff.
@@ -478,7 +478,7 @@ ID20.TEX}.
 \xlabel{location_of_code_and_documentation_on_unix_systems}\label{SEC:UNIXS}}
 
 All A-task routines, applications specific routines and interface files are
-stored in the 
+stored in the
 \newline
 \$IRAS90\_SOURCE directory which is defined when the command iras90 is executed.
 
@@ -486,36 +486,36 @@ The majority of source code are stored in XXXX\_source.tar files as follows
 
 \begin{description}
 
-\item [apps\_source.tar :] contains A\_task routines and other application 
+\item [apps\_source.tar :] contains A\_task routines and other application
 specific routines.
 
-\item [data\_source.tar :] contains IRAS90 data, including the point spread 
+\item [data\_source.tar :] contains IRAS90 data, including the point spread
 functions for each detector, and the SPF archive file containing details of
-the {\small IRAS} observation schedule. The spectral response files are 
-generated by makeresp, but the files can be inspected by looking in 
+the {\small IRAS} observation schedule. The spectral response files are
+generated by makeresp, but the files can be inspected by looking in
 \$IRAS90\_DIR.
 
 \item [ifl\_source.tar :] contains the interface files for {\small IRAS90}
 applications.
 
 \item [iras90\_source.tar :] contains non {\small ADAM} applications eg pscont
-and ffield, common files used by {\small IRAS90} applications, the tex files 
+and ffield, common files used by {\small IRAS90} applications, the tex files
 for the {\small ID} documents not associated with utility subsystems, the help
 file, and various {\small IRAS90} system files.
 
-\item [ira\_source.tar (etc.) :] There is a xxx\_source.tar file for each 
-utility subsystem including {\small i90}. Note that the file names are all 
+\item [ira\_source.tar (etc.) :] There is a xxx\_source.tar file for each
+utility subsystem including {\small i90}. Note that the file names are all
 small letters not capitals. Each file contains all the source code, the
 include files containing parameter values, constants,and error values, plus the
 tex of the corresponding {\small ID} document.
 
-\item [Files not included in a XXX\_source.tar file :] These include the 
-tex files and postscript and canon picture files associated with the released 
+\item [Files not included in a XXX\_source.tar file :] These include the
+tex files and postscript and canon picture files associated with the released
 SUNs.
 
 \end{description}
 
-The contents of an archive file can be listed using the command: 
+The contents of an archive file can be listed using the command:
 
 \small
 \begin{verbatim}
@@ -523,21 +523,21 @@ The contents of an archive file can be listed using the command:
 \end{verbatim}
 \normalsize
 
-To get the A-task source code for the application {\small DESTCRDD}, use 
-the command: 
+To get the A-task source code for the application {\small DESTCRDD}, use
+the command:
 
 \small
 \begin{verbatim}
-   % tar xvf $IRAS90_SOURCE/apps_source.tar destcrdd.f 
+   % tar xvf $IRAS90_SOURCE/apps_source.tar destcrdd.f
 \end{verbatim}
 \normalsize
 
 To extract the interface file for application {\small DESTCRDD}, use the
-command: 
+command:
 
 \small
 \begin{verbatim}
-   % tar xvf $IRAS90_SOURCE/ifl_source.tar destcrdd.ifl 
+   % tar xvf $IRAS90_SOURCE/ifl_source.tar destcrdd.ifl
 \end{verbatim}
 \normalsize
 
@@ -553,7 +553,7 @@ The contents are as follows
 \item A-task routines are stored in the text library
 {\small IRAS90\_DIR:IRAS90.TLB}, and other application specific
 routines are stored in he text library {\small
-IRAS90\_DIR:IRAS90\_SUB.TLB}. These correspond to the contents of 
+IRAS90\_DIR:IRAS90\_SUB.TLB}. These correspond to the contents of
 apps\_source.tar on a Unix machine.
 
 \item Interface files are stored in {\small IRAS90\_DIR:IRAS90\_IFL.TLB}.
@@ -569,7 +569,7 @@ and support files only, therefore there is no {\small I90.TLB}.  These
 correspond to the contents of the xxx\_source.tar files on Unix where xxx is a
 utility subsystem name.
 
-\item The contents of the VMS equivalent of data\_source.tar and 
+\item The contents of the VMS equivalent of data\_source.tar and
 iras90\_source.tar on Unix, are held loose in {\small IRAS90\_DIR}.
 
 \item The released SUNs are available only as a printed copy.
@@ -585,7 +585,7 @@ To list the existing application specific routines, use the command:
 \end{verbatim}
 \normalsize
 
-To get the A-task source code for the application {\small DESTCRDD}, use the 
+To get the A-task source code for the application {\small DESTCRDD}, use the
 command:
 
 \small
@@ -627,7 +627,7 @@ LOGFILE}.
 \item If multiple {\small NDF}s are processed or created, then the list
 of {\small NDF}s should be obtained using the facilities of the {\small
 IRM} and {\small NDG} packages (see section \ref{SEC:UTIL} and appendix
-\ref{APP:NDG}). As an example, see the way that {\small MAPCRDD} accesses 
+\ref{APP:NDG}). As an example, see the way that {\small MAPCRDD} accesses
 its list of input {\small CRDD} files.
 
 \item If the application processes a single input {\small NDF} to
@@ -659,11 +659,11 @@ routine {\small IRM\_LISTN}, specifying {\small ADAM} parameter
 at the specification of parameters {\small OUT} and {\small NDFLIST} in
 the interface file for {\small DESTCRDD}).
 
-\item Checks for bad pixel values should always be made unless a call to 
-{\small NDF\_BAD} has been made to confirm that the {\small NDF} contains 
+\item Checks for bad pixel values should always be made unless a call to
+{\small NDF\_BAD} has been made to confirm that the {\small NDF} contains
 no bad values.
 
-\item If convenient, the bad pixel flag should be set in all output {\small 
+\item If convenient, the bad pixel flag should be set in all output {\small
 NDF}s, using routine {\small NDF\_SBAD}.
 
 \item The {\small PSX} library should be used for getting dynamic workspace
@@ -692,19 +692,19 @@ flushed (using routine ERR\_FLUSH) and the application should continue
 to process the other input {\small NDF}s (see {\small DESTCRDD} for
 instance).
 
-\item The following names should be used for parameters associated with 
+\item The following names should be used for parameters associated with
 {\small NDF}s:
 
 \begin{description}
 
-\item [IN] - if {\small READ} access is required to the {\small NDF} (i.e. if 
+\item [IN] - if {\small READ} access is required to the {\small NDF} (i.e. if
 the {\small NDF} is read but not modified).
 
-\item [OUT] - if {\small WRITE} access is required to the {\small NDF} (i.e. if 
+\item [OUT] - if {\small WRITE} access is required to the {\small NDF} (i.e. if
 a new {\small NDF} is created).
 
 \item [NDF] - if {\small UPDATE} access is required to the {\small NDF} (i.e. if
-the {\small NDF} is read and then modified). 
+the {\small NDF} is read and then modified).
 
 \end{description}
 
@@ -744,7 +744,7 @@ error value being over-written, as in the following code fragment:
    *  If the pixel size is zero, report an error.
          IF( PIXSIZ .EQ. 0.0 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'CTEMA0_ERR1', 
+            CALL ERR_REP( 'CTEMA0_ERR1',
         :                 'CTEMA0: Zero pixel size encountered',
         :                 STATUS )
             GO TO 999
@@ -752,14 +752,14 @@ error value being over-written, as in the following code fragment:
 \end{verbatim}
 \normalsize
 
-\item All ``{\small DO WHILE}'' loops should terminate if {\small STATUS} 
+\item All ``{\small DO WHILE}'' loops should terminate if {\small STATUS}
 indicates an error has occurred:
 
 \small
 \begin{verbatim}
    *  Loop until all values have been done, or an error occurs.
          MORE = .TRUE.
-         DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK )
             ...
             ...
          END DO
@@ -826,11 +826,11 @@ before the subroutine call which generates the status to be annulled:
 \item All error reports should correspond to parameters with names of the form
 {\em xxxxx\_ERRy} where {\em xxxxxx} is the name of the routine, and {\em y} is
 a number which increases monotonically for each call to {\small ERR\_REP} made
-by the routine (starting at 1 for the first error). 
+by the routine (starting at 1 for the first error).
 
-\item The text of error reports should start with the name of the routine in 
-which the call to {\small ERR\_REP} is made, followed by a colon and a space. 
-They should include as much information as possible about the conditions under 
+\item The text of error reports should start with the name of the routine in
+which the call to {\small ERR\_REP} is made, followed by a colon and a space.
+They should include as much information as possible about the conditions under
 which the error occurred:
 
 \small
@@ -841,7 +841,7 @@ which the error occurred:
             CALL MSG_SETR( 'D', DATA( COLUMN, ROW ) )
             CALL MSG_SETR( 'L', MAXDAT )
 
-            CALL ERR_REP( 'CTEMA2_ERR1', 
+            CALL ERR_REP( 'CTEMA2_ERR1',
         : 'CTEMA2: Illegal value (^D) found at column ^C, row ^R of '//
         : '^NDF. Maximum legal value is ^L.', STATUS )
 \end{verbatim}
@@ -849,12 +849,12 @@ which the error occurred:
 
 \item Checks for the error conditions {\small PAR\_\_NULL} and {\small
 PAR\_\_ABORT} should be made and, if found, these errors should be annulled
-before returning from an application. 
+before returning from an application.
 
 \item The very last thing that an application does before returning should be to
-check the status and issue a contextual report if an error has occurred. 
+check the status and issue a contextual report if an error has occurred.
 
-\item Output {\small NDF}s should be deleted if an error occurs while output 
+\item Output {\small NDF}s should be deleted if an error occurs while output
 data is being calculated.
 
 \small
@@ -877,79 +877,79 @@ data is being calculated.
 \end{verbatim}
 \normalsize
 
-\item The A-task prologue should conform to the style generated by the Language 
+\item The A-task prologue should conform to the style generated by the Language
 Sensitive Editor {\small STARLSE}
 (see \xref{SUN/105}{sun105}{}).
 
-\item The first two words of the A-task prologue ``Description'' section should be ``This 
+\item The first two words of the A-task prologue ``Description'' section should be ``This
 routine''.
 
 \item The ``Description'' section should be as short as possible and give just a
 general over-view of what the application does. Different ways of using the
 application should not be included in the ``Description'' but should be put into
 separate ``DIY topics'' sections, following the ``Examples'' section (eg see
-{\small TRACECRDD} prologue). 
+{\small TRACECRDD} prologue).
 
 \item Any general information included in the A-task prologue which will need to
 be duplicated in other applications should be removed from the prologue and put
 into the on-line help library. The prologue should contain a reference to the
 relevant topic within the help library. (This will only be of relevance to
-people updating the released {\small IRAS90} system). 
+people updating the released {\small IRAS90} system).
 
 \item References to the on-line help library should be made if any potentially
 unfamiliar general terms or concepts are mentioned in the prologue (rather than
 duplicating descriptions within the applications prologue). For example,
 ``Detector numbers should be given in the form of a group expression (see help
-on ``Group\_Expressions'')''. 
+on ``Group\_Expressions'')''.
 
 \item The A-task prologue should contain a description of how {\em each} {\small NDF}
 component is processed, particularly a description of what happens to the
 {\small QUALITY} and {\small VARIANCE} components should be included.
 
 \item The ``Usage'' and ``Examples'' sections of the standard {\small STARLSE}
-prologue should be filled in. 
+prologue should be filled in.
 
 \item Parameter should be described in alphabetical order.
 
-\item {\em All} parameters used by the application should be described in the 
+\item {\em All} parameters used by the application should be described in the
 prologue (except for {\small NDFLIST}, see item \ref{IT:NDFLIST}).
 
 \item If a parameter is normally defaulted, the description of the parameter
 should include the default value by placing it in square brackets at the end of
-the parameter description. 
+the parameter description.
 
-\item The parameter descriptions should make it clear if a scalar value, array 
+\item The parameter descriptions should make it clear if a scalar value, array
 or group expression is required for the parameter.
 
-\item Information should not be duplicated in different sections of the 
-prologue, but should be included once only, with relevant references in other 
+\item Information should not be duplicated in different sections of the
+prologue, but should be included once only, with relevant references in other
 sections.
 
-\item Parameters associated with groups of {\small NDF}s should refer to a 
+\item Parameters associated with groups of {\small NDF}s should refer to a
 ``group'' of {\small NDF}s (not a ``set'', or ``list'', etc).
 
 \item If a parameter is associated with a group expression, and if modification
 elements are allowed within the group expression, then a description of what the
 ``{\small NAME\_TOKEN}'' character (usually an asterisk) refers to should be
-included in the parameter description. 
+included in the parameter description.
 
-\item There should be no occurrences of the word ``{\small ADAM}'' within the 
+\item There should be no occurrences of the word ``{\small ADAM}'' within the
 prologue.
 
 \item Documentation generated from the A-task prologue using {\small PROLAT}
 (see \xref{SUN/110}{sun110}{}) should successfully pass through a spelling
 checker such as {\small SPELL}.
 
-\item All parameters used within the application should have entries in the 
+\item All parameters used within the application should have entries in the
 interface file.
 
 \item Parameters should be listed in alphabetical order in the interface file.
 
 \item The {\small HELPLIB} field in the interface file should have the value
-``{\small IRAS90\_DIR:IRAS90\_HELP}'' (on {\small VMS} systems), or 
+``{\small IRAS90\_DIR:IRAS90\_HELP}'' (on {\small VMS} systems), or
 ``{\small \$IRAS90\_DIR/iras90\_help.shl}'' (on {\small UNIX} systems).
 
-\item Each parameter should have a {\small HELPKEY} field with the value 
+\item Each parameter should have a {\small HELPKEY} field with the value
 ``\lsk''.
 
 \item The following associations with ``global'' parameters should be used:
@@ -957,34 +957,34 @@ interface file.
 \item [GLOBAL.DATA\_ARRAY ] should be read by parameters associated with input
 {\small NDF}s, and written by ``{\small NDFLIST}'' parameters (see item
 \ref{IT:NDFLIST}), and {\em not} by parameters associated with output {\small
-NDF}s unless there is no {\small NDFLIST} parameter. 
-\item [GLOBAL.MSG\_FILTER ] should be read and written by ``{\small 
+NDF}s unless there is no {\small NDFLIST} parameter.
+\item [GLOBAL.MSG\_FILTER ] should be read and written by ``{\small
 MSG\_FILTER}'' parameters (see item \ref{IT:MSG_FILTER}).
 \item [GLOBAL.QUALITY\_EXP ] should be read and written by parameters associated
 with quality expression (but only used to provide the suggested default, i.e.
-the {\small PPATH}, not the {\small VPATH}). 
-\item [GLOBAL.IRAS90\_HISTORY] should be read and written by all ``{\small 
+the {\small PPATH}, not the {\small VPATH}).
+\item [GLOBAL.IRAS90\_HISTORY] should be read and written by all ``{\small
 HISTORY} parameters'' (see item \ref{IT:HIS}).
-\item [GLOBAL.SKY\_COORDS] should be read and written by all parameters 
+\item [GLOBAL.SKY\_COORDS] should be read and written by all parameters
 associated with a sky coordinate system.
 \end{description}
 
 \item As many parameters as possible should be normally defaulted.
 
 \item Positional parameters should be given positions in the same order in which
-they are prompted for if not supplied on the command line. 
+they are prompted for if not supplied on the command line.
 
 \item {\small IRAS} wave-bands should be obtained using the routine {\small
-IRM\_GTBND} specifying the parameter ``{\small BAND}''. 
+IRM\_GTBND} specifying the parameter ``{\small BAND}''.
 
 \item Status Values Returned by Utility Routines ---
 
-The utility routines (and all other {\small IRAS90} routines) use the 
-``inherited status'' error system described in 
-\xref{SUN/104}{sun104}{}. Utility routines flag 
-errors by reporting an error message and setting the returned status to some 
-specific value indicating the type of error which has occurred. These status 
-values are unique amongst {\em all} status values used by any {\small ADAM} 
+The utility routines (and all other {\small IRAS90} routines) use the
+``inherited status'' error system described in
+\xref{SUN/104}{sun104}{}. Utility routines flag
+errors by reporting an error message and setting the returned status to some
+specific value indicating the type of error which has occurred. These status
+values are unique amongst {\em all} status values used by any {\small ADAM}
 software, and are calculated using the expression:
 
 \small
@@ -1019,7 +1019,7 @@ package has been assigned a range of error numbers as follows:
 
 \subsection{On UNIX Systems\xlabel{on_unix_systems}}
 
-Before starting to develop {\small IRAS90} software the following commands 
+Before starting to develop {\small IRAS90} software the following commands
 should be issued:
 
 \small
@@ -1032,11 +1032,11 @@ should be issued:
 The iras90\_dev script sets up softlinks to all the {\small IRAS90} utility
 subsystem and Starlink include files in your current directory. It also sets
 up an environment variable {\small \$IRAS90\_SOURCE} to point to the source
-directory in which the {\small IRAS90} link scripts and link libraries are 
+directory in which the {\small IRAS90} link scripts and link libraries are
 stored, and adds it to your path.
 
 Note, to develop {\small IRAS90} applications on {\small UNIX} systems
-requires the {\small IRAS90} ``source directory'' {\small \$IRAS90\_SOURCE} 
+requires the {\small IRAS90} ``source directory'' {\small \$IRAS90\_SOURCE}
 to be present. It is possible for system managers
 to delete the source directory in order to save disk space, without
 stopping the released {\small IRAS90} applications from working. If the
@@ -1044,16 +1044,16 @@ necessary {\small IRAS90} files do not exist on your system the
 \verb+iras90_dev+ script will issue a warning.
 
 
-Next all the application specific routines (but not the {\small A\_task}) 
-should be compiled to create corresponding object modules using the 
-\verb+f77+ command. If the application name is \verb+fred+, the commands 
-could be: 
+Next all the application specific routines (but not the {\small A\_task})
+should be compiled to create corresponding object modules using the
+\verb+f77+ command. If the application name is \verb+fred+, the commands
+could be:
 
-\small 
+\small
 \begin{verbatim}
    % f77 -O -c freda0.f
    % f77 -O -c freda1.f
-     ...  
+     ...
      (etc)
      ...
 \end{verbatim}
@@ -1067,19 +1067,19 @@ for all the application specific routines ({\em not} the A-task object
 module) should be inserted into the archive. If you are not running under
 Solaris the archive should finally be ``randomised'':
 
-\small 
+\small
 \begin{verbatim}
    % ar c fred.a
    % ar r fred.a freda0.o
    % ar r fred.a freda1.o
-     ...  
+     ...
      (etc)
      ...
    % ranlib fred.a
 \end{verbatim}
 \normalsize
 
-The application \verb+fred+ can then be linked using the following command: 
+The application \verb+fred+ can then be linked using the following command:
 
 \small
 \begin{verbatim}
@@ -1090,7 +1090,7 @@ The application \verb+fred+ can then be linked using the following command:
 
 Note the use of left quote marks (\verb+`+) rather than the more usual right
 quote marks (\verb+'+). After completing all compilations and linkings, the
-command: 
+command:
 
 \small
 \begin{verbatim}
@@ -1121,7 +1121,7 @@ up for it using the command:
 
 \subsection{On VMS Systems\xlabel{on_vms_systems}}
 
-Before starting to develop {\small IRAS90} software the following commands 
+Before starting to develop {\small IRAS90} software the following commands
 should be issued:
 
 \small
@@ -1140,12 +1140,12 @@ application specific routines ({\em not} the A-task object module)
 should be inserted into the library. If the application name is {\small
 FRED}, the commands would be:
 
-\small 
+\small
 \begin{verbatim}
    $ LIB/CRE FRED.OLB
    $ LIB FRED FREDA0
    $ LIB FRED FREDA1
-     ...  
+     ...
      (etc)
      ...
 \end{verbatim}
@@ -1154,7 +1154,7 @@ FRED}, the commands would be:
 This assumes that the application conforms to the conventions described in
 section \ref{SEC:CONV} in that the names of the application specific routines
 end in {\small A0, A1, ... B0, B1, ... } etc. The application FRED can then be
-linked using the following command: 
+linked using the following command:
 
 \small
 \begin{verbatim}
@@ -1190,7 +1190,7 @@ this logical name is {\small FRED\_DIR}, then the command:
 \end{verbatim}
 \normalsize
 
-will define the foreign command {\small FRED}, so that the application can 
+will define the foreign command {\small FRED}, so that the application can
 be run (from any directory) with command line parameter assignments:
 
 \small
@@ -1199,7 +1199,7 @@ be run (from any directory) with command line parameter assignments:
 \end{verbatim}
 \normalsize
 
-To run the application from {\small ICL}, first start up {\small ICL} and then 
+To run the application from {\small ICL}, first start up {\small ICL} and then
 issue the command:
 
 \small
@@ -1232,6 +1232,6 @@ utility libraries. The draft documentation is in the file {\small SUN2.TEX}
 which is stored in the same places as the other utility library documentation.
 This documentation is rather sketchy at the moment, but hopefully it will be
 sufficient, when combined with studies of existing {\small IRAS90} application,
-to enable programmers to use {\small NDG}. 
+to enable programmers to use {\small NDG}.
 
 \end{document}

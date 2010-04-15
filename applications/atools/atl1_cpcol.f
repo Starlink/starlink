@@ -5,19 +5,19 @@
 *     ATL1_CPCOL
 
 *  Purpose:
-*     Copies selected columns of a 2D array to or from another 
+*     Copies selected columns of a 2D array to or from another
 *     array suitable for use as an AST position list.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL1_CPCOL( LBND1, UBND1, LBND2, UBND2, NCOL, COLS, 
+*     CALL ATL1_CPCOL( LBND1, UBND1, LBND2, UBND2, NCOL, COLS,
 *                      FORWRD, A, B, STATUS )
 
 *  Description:
 *     Transfers position data between two 2D arrays, one of which (A) is
-*     arranged so that selected columns corresponds to the coordinate axes, 
+*     arranged so that selected columns corresponds to the coordinate axes,
 *     and each row corresponds to a position. The other array (B) is arranged
 *     so that each row corresponds to a coordinate axis and each column to
 *     a position. The A array may have extra unused columns, but the B
@@ -35,10 +35,10 @@
 *     NCOL = INTEGER (Given)
 *        The number of columns of data to be transferred.
 *     COLS( NCOL ) = INTEGER (Given)
-*        The column indices within array A to use. These must be in the 
+*        The column indices within array A to use. These must be in the
 *        range LBND1 to UBND1.
 *     FORWRD = LOGICAL (Given)
-*        If .TRUE., then data is copied from array A into array B. If 
+*        If .TRUE., then data is copied from array A into array B. If
 *        .FALSE., data is copied from array B into array A.
 *     A( LBND1:UBND1, LBND2:UBND2 ) = DOUBLE PRECISION (Given and Returned)
 *        The A array.
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,7 +128,7 @@
          END IF
       END DO
 
-*  Loop round each column to be copied.      
+*  Loop round each column to be copied.
       DO I = 1, NCOL
 
 *  Get the index within A of the column to be copied.
@@ -138,13 +138,13 @@
          IF( FORWRD ) THEN
             DO J = LBND2, UBND2
                B( J, I ) = A( K, J )
-            END DO            
+            END DO
 
 *  or copy it from B to A.
          ELSE
             DO J = LBND2, UBND2
-               A( K, J ) = B( J, I ) 
-            END DO            
+               A( K, J ) = B( J, I )
+            END DO
          END IF
 
       END DO

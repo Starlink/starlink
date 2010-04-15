@@ -27,8 +27,8 @@
 *     the user-given values are taken , otherwise the
 *     values are used. This is repeated for the range
 *     of the Y-axis. The type of axes of the plot is set
-*     as LINEAR , but a change in this has been 
-*     accommodated. If the user changes the axes , his 
+*     as LINEAR , but a change in this has been
+*     accommodated. If the user changes the axes , his
 *     axis types are taken. The types are then checked to
 *     determine whether they conflict with the X and Y
 *     ranges given (e.g. LOG axes produce an error when

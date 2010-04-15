@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CCMPP( FD, NX, NY, RDATA, RHI, RLO, GDATA, GHI, GLO, 
+*     CALL KPS1_CCMPP( FD, NX, NY, RDATA, RHI, RLO, GDATA, GHI, GLO,
 *                      BDATA, BHI, BLO, BAD, STATUS )
 
 *  Description:
@@ -138,34 +138,34 @@
       CALL CHR_PUTI( MXVAL, BUF, IAT )
 
 *  Write out the PPM header.
-      CALL FIO_WRITE( FD, BUF( : IAT ), STATUS ) 
+      CALL FIO_WRITE( FD, BUF( : IAT ), STATUS )
 
 *  Form factors for scaling data values into RGB intensity.
       IF( RLO .NE. VAL__BADR ) THEN
-         IF( RLO .NE. RHI ) THEN 
+         IF( RLO .NE. RHI ) THEN
             FR = 1.0/( RHI - RLO )
          ELSE
-            FR = 1.0E6   
+            FR = 1.0E6
          END IF
       ELSE
          FR = 0.0
       END IF
 
       IF( GLO .NE. VAL__BADR ) THEN
-         IF( GLO .NE. GHI ) THEN 
+         IF( GLO .NE. GHI ) THEN
             FG = 1.0/( GHI - GLO )
          ELSE
-            FG = 1.0E6   
+            FG = 1.0E6
          END IF
       ELSE
          FG = 0.0
       END IF
 
       IF( BLO .NE. VAL__BADR ) THEN
-         IF( BLO .NE. BHI ) THEN 
+         IF( BLO .NE. BHI ) THEN
             FB = 1.0/( BHI - BLO )
          ELSE
-            FB = 1.0E6   
+            FB = 1.0E6
          END IF
       ELSE
          FB = 0.0
@@ -182,9 +182,9 @@
             IF( FR .NE. 0.0 ) R = RDATA( I, J )
             IF( FG .NE. 0.0 ) G = GDATA( I, J )
             IF( FB .NE. 0.0 ) B = BDATA( I, J )
-   
-            IF( R .NE. VAL__BADR .AND. B .NE. VAL__BADR .AND. 
-     :          B .NE. VAL__BADR ) THEN         
+
+            IF( R .NE. VAL__BADR .AND. B .NE. VAL__BADR .AND.
+     :          B .NE. VAL__BADR ) THEN
 
 *  Convert pixel values to RGB intensities in the range 0 to MXVAL
                IR = MAX( 0, MIN( MXVAL, NINT( MXVAL*( R - RLO )*FR ) ) )
@@ -208,7 +208,7 @@
             CALL CHR_PUTI( IB, BUF, IAT )
 
 *  Write out the buffer.
-            CALL FIO_WRITE( FD, BUF( : IAT ), STATUS ) 
+            CALL FIO_WRITE( FD, BUF( : IAT ), STATUS )
 
          END DO
 

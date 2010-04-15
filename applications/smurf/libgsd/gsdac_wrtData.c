@@ -13,8 +13,8 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_wrtData ( const gsdVars *gsdVars, char *directory, 
-*                     const unsigned int nSteps, const dasFlag dasFlag, 
+*     gsdac_wrtData ( const gsdVars *gsdVars, char *directory,
+*                     const unsigned int nSteps, const dasFlag dasFlag,
 *                     int *status );
 
 *  Arguments:
@@ -31,7 +31,7 @@
 
 *  Description:
 *     Initializes the ACSIS directory for writing, writes a file for
-*     each subsystem, then closes the files and writes the FITS 
+*     each subsystem, then closes the files and writes the FITS
 *     headers.
 
 *  Authors:
@@ -48,7 +48,7 @@
 *     2008-02-20 (JB):
 *        Set memory usage for specwrite.
 *     2008-02-21 (JB):
-*        Allocate enough memory for fitschans.  
+*        Allocate enough memory for fitschans.
 *     2008-02-26 (JB):
 *        Make gsdac_getWCS per-subsystem.
 *     2008-02-28 (JB):
@@ -126,11 +126,11 @@
 
 #define FUNC_NAME "gsdac_wrtData"
 
-#define MAXRECEP 2  
+#define MAXRECEP 2
 #define MAXSUBSYS 16
 
-void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory, 
-                     const unsigned int nSteps, const dasFlag dasFlag, 
+void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
+                     const unsigned int nSteps, const dasFlag dasFlag,
                      int *status )
 {
 
@@ -144,13 +144,13 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   dateVars dateVars;          /* date/time variables */
   double elEnd = -1.0;        /* elevation at observation end (deg) */
   double elStart = -1.0;      /* elevation at observation start (deg) */
-  AstFitsChan *fitschan[MAXSUBSYS];  
+  AstFitsChan *fitschan[MAXSUBSYS];
                               /* Array of FITS headers */
-  float fPlaneX[MAXRECEP]; 
+  float fPlaneX[MAXRECEP];
   float fPlaneY[MAXRECEP];
   int i;                      /* loop counter */
   double *IFFreqs;            /* IFFreqs for each subband */
-  double *lineFreqs;          /* transition line frequencies for 
+  double *lineFreqs;          /* transition line frequencies for
                                  each subband */
   mapVars mapVars;            /* map/chop/scan variables */
   double mem;                 /* amount of memory for spectrum */
@@ -158,7 +158,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   int obsNum;                 /* current observation number */
   char obsType[SZFITSCARD];   /* type of observation */
   char *OCSConfig = NULL;     /* OCS configuration XML */
-  JCMTState *record = NULL;   /* JCMT state information for the 
+  JCMTState *record = NULL;   /* JCMT state information for the
                                  current spectrum */
   int recepFlags[MAXRECEP];   /* flags for which receptors were used */
   char *recepNames[MAXRECEP]; /* names of the receptors */
@@ -187,7 +187,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   }
 
   /* Get the UTDate and convert to YYYYMMDD format. */
-  msgOutif(MSG__VERB," ", 
+  msgOutif(MSG__VERB," ",
 	   "Checking UTDate to retrieve observation number", status);
 
   /* Get the sample mode and obs type. */
@@ -198,11 +198,11 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   /* If the UTDate is prior to 20030202, prompt the user for the observation
      number.  Otherwise, use the value in NOBS. */
   if ( utDate < 20030202 )
-    parGet0i ( "OBSNUM", &obsNum, status ); 
-  else 
+    parGet0i ( "OBSNUM", &obsNum, status );
+  else
     obsNum = (int)gsdVars->nObs;
 
-  for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
+  for ( i = 0; i < gsdVars->nFEChans; i++ ) {
     recepNames[i] = smf_malloc ( 3, sizeof( char ), 0, status );
     fPlaneX[i] = 0.0;
     fPlaneY[i] = 0.0;
@@ -216,13 +216,13 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   /* Determine how much memory we need and set the memory
      allocation in specwrite accordingly.  acsSpecSetMem wants
      to know how many bytes to allocate. */
-  mem = gsdVars->nBEChansOut * gsdVars->noScans * 
+  mem = gsdVars->nBEChansOut * gsdVars->noScans *
         gsdVars->nScanPts * sizeof(float);
 
-  acsSpecSetMem ( mem, status ); 
+  acsSpecSetMem ( mem, status );
 
-  msgOutif(MSG__VERB," ", 
-	     "Preparing file writing system", status); 
+  msgOutif(MSG__VERB," ",
+	     "Preparing file writing system", status);
 
   /* Find out how many subsystems there are (number of subbands
      divided by number of receptors). */
@@ -244,7 +244,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   }
 
   /* DAS era instruments were always in the cabin */
-  acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed, 
+  acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed,
                   nSubsys, recepNames, "DIRECT",
                   fPlaneX, fPlaneY, OCSConfig, status );
 
@@ -252,11 +252,11 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
 
-  msgOutif(MSG__VERB," ", "Getting date and time values", status); 
+  msgOutif(MSG__VERB," ", "Getting date and time values", status);
 
   gsdac_getDateVars ( gsdVars, backend, obsNum, &dateVars, status );
 
-  msgOutif(MSG__VERB," ", "Getting map, chop, and scan values", status); 
+  msgOutif(MSG__VERB," ", "Getting map, chop, and scan values", status);
 
   gsdac_getMapVars ( gsdVars, samMode, &mapVars, status );
 
@@ -266,35 +266,35 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   }
 
   /* Allocate memory for the lineFreqs and IFFreqs. */
-  lineFreqs = smf_malloc ( gsdVars->nBESections, 
+  lineFreqs = smf_malloc ( gsdVars->nBESections,
                            sizeof(double), 0, status );
-  IFFreqs = smf_malloc ( gsdVars->nBESections, 
+  IFFreqs = smf_malloc ( gsdVars->nBESections,
                          sizeof(double), 0, status );
 
-  /* Check to see if this is a special configuration and 
+  /* Check to see if this is a special configuration and
      determine which subbands belong together. */
-  gsdac_matchFreqs ( gsdVars, lineFreqs, IFFreqs, status );  
+  gsdac_matchFreqs ( gsdVars, lineFreqs, IFFreqs, status );
 
   /* Get the size of the data array */
   spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->nScan;
-                
+
   /* Iterate through each time step. */
   for ( stepNum = 0; stepNum < nSteps; stepNum++ ) {
 
     specIndex = ( stepNum * spectrumSize ) / nSteps;
 
     /* Fill JCMTState. */
-    gsdac_putJCMTStateC ( gsdVars, stepNum, backend, dasFlag, 
-                          record, status );  
+    gsdac_putJCMTStateC ( gsdVars, stepNum, backend, dasFlag,
+                          record, status );
 
     /* For each subband, write the files. */
     for ( subBandNum = 0; subBandNum < gsdVars->nBESections; subBandNum++ ) {
 
       /* Get the pointing and time values. */
-      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, lineFreqs, 
+      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, lineFreqs,
                      IFFreqs, &wcs, &WCSFrame, status );
 
-      /* If this is the first spectrum, get the amStart, 
+      /* If this is the first spectrum, get the amStart,
          azStart and elStart. */
       if ( stepNum == 0 && subBandNum == 0 ) {
         amStart = wcs.airmass;
@@ -302,28 +302,28 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
         elStart = wcs.acEl / AST__DD2R;
       }
 
-      /* For each step, update the amEnd, azEnd, and elEnd, so that the 
+      /* For each step, update the amEnd, azEnd, and elEnd, so that the
          final values are those for the last time step. */
       if ( stepNum == nSteps-1 && subBandNum == 0 ) {
         amEnd = wcs.airmass;
         azEnd = wcs.acAz / AST__DD2R;
         elEnd = wcs.acEl / AST__DD2R;
-      }      
+      }
 
       /* Get the subsystem-dependent JCMTState values. */
-      gsdac_putJCMTStateS ( gsdVars, stepNum, subBandNum, dasFlag, 
+      gsdac_putJCMTStateS ( gsdVars, stepNum, subBandNum, dasFlag,
       	                    &wcs, record, status );
 
       /* Get the ACSIS SpecHdr. */
-      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subBandNum, recepFlags, 
+      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subBandNum, recepFlags,
                          dasFlag, record, specHdr, status );
 
-      msgOutif(MSG__VERB," ", "Writing data", status); 
+      msgOutif(MSG__VERB," ", "Writing data", status);
 
       /* Write a spectrum to the file. */
-      acsSpecWriteTS( ( subBandNum % nSubsys ) + 1, 
-                      gsdVars->BEChans[subBandNum], 
-      	              &(gsdVars->data[specIndex]), record, 
+      acsSpecWriteTS( ( subBandNum % nSubsys ) + 1,
+                      gsdVars->BEChans[subBandNum],
+      	              &(gsdVars->data[specIndex]), record,
                       specHdr, NULL, status );
 
       /* Have we written a fitschan for this output file yet? */
@@ -333,9 +333,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
         fitschan[subBandNum % nSubsys] = astFitsChan ( NULL, NULL, " " );
 
         /* Fill the FITS headers. */
-        gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
-                        backend, recepsUsed, recepNames, samMode, obsType, 
-                        &dateVars, &mapVars, lineFreqs, IFFreqs, 
+        gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps,
+                        backend, recepsUsed, recepNames, samMode, obsType,
+                        &dateVars, &mapVars, lineFreqs, IFFreqs,
                         fitschan[subBandNum % nSubsys], status );
 
         /* Write the WCSFrame information to the fitschan. */
@@ -351,12 +351,12 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   }
 
-  /* Update the FITS headers for amStart, amEnd, azStart, azEnd, 
+  /* Update the FITS headers for amStart, amEnd, azStart, azEnd,
      elStart, and elEnd. */
   for ( i = 0; i < nSubsys; i++ ) {
 
     astClear( fitschan[i], "Card" );
-   
+
     astFindFits( fitschan[i], "AMSTART", card, 0 );
     astSetFitsF( fitschan[i], "AMSTART", amStart, NULL, 1 );
     astFindFits( fitschan[i], "AMEND", card, 0 );
@@ -370,15 +370,15 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     astFindFits( fitschan[i], "ELEND", card, 0 );
     astSetFitsF( fitschan[i], "ELEND", elEnd, NULL, 1 );
 
-  }    
+  }
 
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Error writing data", status );
     return;
-  }  
+  }
 
-  msgOutif(MSG__VERB," ", 
+  msgOutif(MSG__VERB," ",
 	   "Closing new file(s)", status);
 
 
@@ -391,7 +391,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   smf_free ( lineFreqs, status );
   smf_free ( IFFreqs, status );
 
-  for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
+  for ( i = 0; i < gsdVars->nFEChans; i++ ) {
     smf_free ( recepNames[i], status );
   }
 

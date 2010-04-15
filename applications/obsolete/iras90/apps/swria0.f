@@ -28,7 +28,7 @@
 *        attribute to be set.
 *     PDIR = CHARACTER*( * ) (Given)
 *        The name of the parameter used to get the new value of text
-*        direction. 
+*        direction.
 *     PHIGT = CHARACTER*( * ) (Given)
 *        The name of the parameter used to get the new value of text
 *        height.
@@ -48,7 +48,7 @@
 *        The name of the parameter used to get the new value of the pen
 *        used to write the texts.
 *     DIR( 2 ) = REAL (Given and Returned)
-*        The up direction vector of the text. 
+*        The up direction vector of the text.
 *     HEIGHT = REAL (Given and Returned )
 *        The height of the text.
 *     RATIO = REAL (Given and Returned)
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,11 +86,11 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'SKY_PAR'          ! SKY_ constants
-                              
+
 *  Arguments Given:
       CHARACTER*( * ) PATRB, PDIR, PHIGT, PRATIO, PJSTF, PSPACE,
      :                PFONT, PPEN
-      
+
 
 *  Arguments Given and Returned:
       REAL DIR( 2 )
@@ -107,9 +107,9 @@
 *  Local variables:
       CHARACTER*( 15 ) ATRB      ! Attribute to set
       CHARACTER*( 3 ) CVAL       ! Character string
-      REAL DEFDIR( 2 )           ! Default text direction 
+      REAL DEFDIR( 2 )           ! Default text direction
       LOGICAL EXIT               ! Exit flag
-      
+
 *.
 
 *  Check inherited global status.
@@ -118,7 +118,7 @@
 *  Enter a do loop to set the attributes until exit is required.
       EXIT = .FALSE.
       DO WHILE ( .NOT.EXIT .AND. STATUS .EQ. SAI__OK )
-      
+
 *  See which attribute to set.
          CALL PAR_CHOIC( PATRB, 'DEFAULT', 'DEFAULT,SHOW,DIRECTION,'/
      :                 /'HEIGHT,ASPECT_RATIO,JUSTIFICATION,SPACE,FONT,'/
@@ -191,7 +191,7 @@
 
 *  Cancel the parameter for use next time.
                CALL PAR_CANCL( PDIR, STATUS )
-      
+
 *  If height of the text is to be set, get a value from the user
             ELSE IF ( ATRB( : 6 ) .EQ. 'HEIGHT' ) THEN
                CALL PAR_DEF0R( PHIGT, SKY__DFHT, STATUS )
@@ -200,7 +200,7 @@
 *  Cancel the parameter for use next time.
                CALL PAR_CANCL( PHIGT, STATUS )
 
-*  If aspect ratio is to be set, get a value from the user.            
+*  If aspect ratio is to be set, get a value from the user.
             ELSE IF ( ATRB( : 12 ) .EQ. 'ASPECT_RATIO' ) THEN
                CALL PAR_DEF0R( PRATIO, SKY__DFRTO, STATUS )
                CALL PAR_GET0R( PRATIO, RATIO, STATUS )
@@ -210,7 +210,7 @@
 
 *  If the justification is to be set, get a value from the user.
             ELSE IF ( ATRB( : 13 ) .EQ. 'JUSTIFICATION' ) THEN
-               CALL PAR_CHOIC( PJSTF, 'BL', 
+               CALL PAR_CHOIC( PJSTF, 'BL',
      :                         'BL,BC,BR,CL,CC,CR,TL,TC,TR', .FALSE.,
      :                         JSTFCT, STATUS )
 
@@ -227,7 +227,7 @@
 
 *  If the text font is to be set, set a font number.
             ELSE IF ( ATRB( : 4 ) .EQ. 'FONT' ) THEN
-               CALL PAR_CHOIC( PFONT, '1', 
+               CALL PAR_CHOIC( PFONT, '1',
      :                      '1,101,102,103,104,105,106,107,108,109,110',
      :                         .FALSE., CVAL, STATUS )
                CALL CHR_CTOI( CVAL, FONT, STATUS )
@@ -247,11 +247,11 @@
 *  If a null is obtained when setting one particular attribute, reset
 *  the status to prevent exit.
             IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-       
+
          END IF
 
 *  Cancel the parameter PATRB to get another attribute to set.
          CALL PAR_CANCL( PATRB, STATUS )
       END DO
-      
+
       END

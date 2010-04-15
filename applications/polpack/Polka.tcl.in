@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next lines are executed by /bin/sh, but not Tcl \
 if test -f @AWISH@; then \
    exec @AWISH@ $0 ${1+"$@"} ; \
@@ -23,14 +23,14 @@ fi
 #               given or if the file does not exist. On entry
 #               the file should contain a valid set of Tcl commands to be
 #               executed before anything else is done. These commands for
-#               instance could initialise option values passed from the 
+#               instance could initialise option values passed from the
 #               A-task.
-#             
+#
 #               On exit, the contents of the file are replaced by a set
 #               of lines of the form  "<name> <value>" where name is the
 #               name of a Tcl global variable and <value> is the value of
 #               the variable. The values are stored by the A-task within
-#               the parameter file to provide default options values for 
+#               the parameter file to provide default options values for
 #               the next invocation of polka.
 #
 #  Copyright:
@@ -39,7 +39,7 @@ fi
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #
-#  History: 
+#  History:
 #     4-JUN-1998 (DSB):
 #        Original version.
 #     22-JUN-1998 (DSB):
@@ -49,7 +49,7 @@ fi
 #        menus.
 #     3-NOV-1998 (DSB):
 #        Ensure the current WCS Frame in the copies of the supplied input
-#        images is PIXEL. 
+#        images is PIXEL.
 #     22-MAR-1999 (DSB):
 #        Make rotation available in single-beam mode.
 #     22-APR-1999 (DSB):
@@ -59,8 +59,8 @@ fi
 #        Modified to pass values to and from the A-task using a text file.
 #        This allows this script to run in a different process to the
 #        A-task. This is necessary so that different AMS processes will
-#        be used for the script<->KAPPA/CCDPACK communication, and the 
-#        atask<->ICL (or IRAF) communication. 
+#        be used for the script<->KAPPA/CCDPACK communication, and the
+#        atask<->ICL (or IRAF) communication.
 #     23-NOV-1999 (DSB):
 #        Fixed a bug which caused the names of the output NDFs to get out
 #        of sync by 1 with the names of the input NDFs, when the first
@@ -69,7 +69,7 @@ fi
 #        Check that the right versions of CCDPACK and KAPPA are available.
 #-
 
-# Uncomment this section to see the names of all procedure as they are 
+# Uncomment this section to see the names of all procedure as they are
 # called...
 
 #rename proc tclproc
@@ -93,7 +93,7 @@ fi
          puts "   $msg"
          exit 1
       }
-      
+
 # Store the name of the communications file in a glbal variable.
       set COMFILE $comfile
 
@@ -109,7 +109,7 @@ fi
 # Get the pixels per inch on the screen.
    if { ![info exists dpi] } {
       set dpi [winfo fpixels . "1i"]
-   }       
+   }
 
 # Set the size of the GWM canvas item.
    set SIZE [expr round( ( 350.0 * $dpi ) / 88.0 ) ]
@@ -129,7 +129,7 @@ fi
    set E_RAY_SKY 6
    set GWM_NAME "polka_$PID"
    set MAPTYPE(0) "<not used in single-beam mode>"
-   set MAPTYPE(1) "Shift of origin only" 
+   set MAPTYPE(1) "Shift of origin only"
    set MAPTYPE(2) "Shift and rotation"
    set MAPTYPE(3) "Shift and magnification"
    set MAPTYPE(4) "Shift, rotation and magnification"
@@ -145,10 +145,10 @@ fi
    set SKY_FRAME "sky frames"
 
 # Store object names.
-   set OBJTYPE($E_RAY_FEATURES) "E-ray features" 
+   set OBJTYPE($E_RAY_FEATURES) "E-ray features"
    set OBJTYPE($E_RAY_MASK) "E-ray mask"
    set OBJTYPE($NONE) "None"
-   set OBJTYPE($O_RAY_FEATURES) "O-ray features" 
+   set OBJTYPE($O_RAY_FEATURES) "O-ray features"
    set OBJTYPE($O_RAY_MASK) "O-ray mask"
    set OBJTYPE($O_RAY_SKY) "O-ray sky area"
    set OBJTYPE($E_RAY_SKY) "E-ray sky area"
@@ -163,7 +163,7 @@ fi
    set CUROBJ_REQ $O_RAY_FEATURES
    set CURRENT_INFO ""
    set CURSOR_STACK ""
-   set CURITEM "" 
+   set CURITEM ""
    set DEFAULT_INFO ""
    set DEF_OEMAP ""
    set DOING_DOUBLE 0
@@ -211,7 +211,7 @@ fi
    set V1 ""
    set VID0 ""
    set VID1 ""
-   set VID2 ""                
+   set VID2 ""
    set XHAIR 0
    set XHAIR_IDH ""
    set XHAIR_IDV ""
@@ -261,7 +261,7 @@ fi
 # Save the path to the directory containing POLPACK hypertext documents.
    set POLPACK_HELP $POLPACK_DIR/../../help/polpack
 
-# Get the paths to the CCDPACK, KAPRH and KAPPA directories from the 
+# Get the paths to the CCDPACK, KAPRH and KAPPA directories from the
 # corresponding environment variables.
    if { [info exists env(KAPPA_DIR)] } {
       set KAPPA_DIR $env(KAPPA_DIR)
@@ -285,7 +285,7 @@ fi
    tk appname Polka
 
 # Rename the "exit" command so that it calls a procedure which cleans up,
-# and then calls the built-in shut-down commands. This new exit command is 
+# and then calls the built-in shut-down commands. This new exit command is
 # called even if an exceptional exit occurs.
    rename exit tcl_exit
 
@@ -299,9 +299,9 @@ fi
 
 # Set the font pixel sizes, so that he fonts are the same physical size
 # independant of the screen resolution.
-   set px140 [expr round( ( 14.0 * $dpi ) / 88.0 ) ]   
-   set px120 [expr round( ( 12.0 * $dpi ) / 88.0 ) ]   
-   set px100 [expr round( ( 10.0 * $dpi ) / 88.0 ) ]   
+   set px140 [expr round( ( 14.0 * $dpi ) / 88.0 ) ]
+   set px120 [expr round( ( 12.0 * $dpi ) / 88.0 ) ]
+   set px100 [expr round( ( 10.0 * $dpi ) / 88.0 ) ]
 
 # Attempt to find suitable fonts. Issue a warning and use default fonts
 # if the fonts cannot be found.
@@ -322,7 +322,7 @@ fi
       Message "The preferred fonts for use on a $dpi pixels per inch screen cannot be found. Using default fonts..."
    }
 
-# Try to stop problems with the AMS (ADAM Message System) rendevous files 
+# Try to stop problems with the AMS (ADAM Message System) rendevous files
 # by creating a new directory as ADAM_USER.
    if { [info exists env(ADAM_USER)] } {
       set OLD_ADAM_USER $env(ADAM_USER)
@@ -367,26 +367,26 @@ fi
 # Record the process id's of any existing KAPPA processes. All new processes
 # are killed on exit, but processes active on entry are not killed.
    if { ![ catch {exec ps | grep kappa | grep -v grep | \
-                  awk {{print $1}} } OLDKAPPA ] } { 
+                  awk {{print $1}} } OLDKAPPA ] } {
       set OLDKAPPA {}
    }
 
 # Do the same for any existing CCDPACK processes.
    if { ![ catch {exec ps | grep ccdpack | grep -v grep | \
-                  awk {{print $1}} } OLDCCDPACK ] } { 
+                  awk {{print $1}} } OLDCCDPACK ] } {
       set OLDCCDPACK {}
    }
 
 # Save the current value of environment variable NDF_FORMATS_OUT (if any),
-# and ensure that NDF applications will create output NDFs, by default, rather 
-# than any other data format. This is done here so that the tasks about to be 
+# and ensure that NDF applications will create output NDFs, by default, rather
+# than any other data format. This is done here so that the tasks about to be
 # loaded will inherit it.
    if { [info exists env(NDF_FORMATS_OUT)] } {
       set ndf_formats_out $env(NDF_FORMATS_OUT)
       set env(NDF_FORMATS_OUT) ".,$ndf_formats_out"
    }
 
-# Load the required ADAM monoliths. 
+# Load the required ADAM monoliths.
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa    $KAPPA_DIR/kappa_mon
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
@@ -399,7 +399,7 @@ fi
 # causes the polka A-task to die in an uncontrolled manner! Do away with it.
    bind . <Destroy> ""
 
-# Re-instate the original value of environment variable NDF_FORMATS_OUT 
+# Re-instate the original value of environment variable NDF_FORMATS_OUT
 # (if any).
    if { [info exists ndf_formats_out] } {
       set env(NDF_FORMATS_OUT) $ndf_formats_out
@@ -443,7 +443,7 @@ fi
 
 # Save the number of supplied E and O output image names.
    set NEOUT 0
-   set NOOUT 0 
+   set NOOUT 0
    if { [info exists o_list] } { set NOOUT [llength $o_list] }
    if { $DBEAM && [info exists e_list] } { set NEOUT [llength $e_list] }
 
@@ -487,21 +487,21 @@ fi
    if { $FONT != "" } { option add *font $FONT }
 
 # Set the default font for radiobuttons and checkbuttons.
-   if { $RB_FONT != "" } { 
-      option add *Radiobutton.font $RB_FONT 
-      option add *Checkbutton.font $RB_FONT 
+   if { $RB_FONT != "" } {
+      option add *Radiobutton.font $RB_FONT
+      option add *Checkbutton.font $RB_FONT
    }
 
 # Set the default font for buttons and menus.
-   if { $B_FONT != "" } { 
-      option add *Button.font $B_FONT 
-      option add *Menubutton.font $B_FONT 
-      option add *Menu.font $B_FONT 
+   if { $B_FONT != "" } {
+      option add *Button.font $B_FONT
+      option add *Menubutton.font $B_FONT
+      option add *Menu.font $B_FONT
    }
 
 # Radiobuttons and Checkbuttons do not have a highlighted border.
-   option add *Radiobutton.highlightThickness 0 
-   option add *Checkbutton.highlightThickness 0 
+   option add *Radiobutton.highlightThickness 0
+   option add *Checkbutton.highlightThickness 0
 
 # Ensure that listbox entries are white on black when selected.
    option add *Listbox.selectForeground white
@@ -519,7 +519,7 @@ fi
    bind all <F1> {ShowHelp [FindHelp %X %Y]}
 
 # When the focus enters the main Polka window, hand the focus to the window
-# which has claimed it by setting the global variable F_OWNER. 
+# which has claimed it by setting the global variable F_OWNER.
    bind . <FocusIn> "focus -force \$F_OWNER"
 
 # Set up a binding so that the focus window is automatically raised above the
@@ -534,7 +534,7 @@ fi
                                   catch \"raise \$F_OWNER \"
                                   focus -force \$F_OWNER
                                }
-                            } { 
+                            } {
                                set F_OWNER .
                             }
                          }"
@@ -560,11 +560,11 @@ fi
          set TOP [frame .top -relief raised -bd 2]
       }
 
-# Create a frame which goes at the top of the screen but contains nothing. 
+# Create a frame which goes at the top of the screen but contains nothing.
 # X events will be directed to this window during any pauses
 # (see procedure WaitFor). The window has no user controls and so is
-# "safe" (i.e. it will just ignore any button presses, mouse movements, etc). 
-# This ensures that new commands cannot be initiated by the user before 
+# "safe" (i.e. it will just ignore any button presses, mouse movements, etc).
+# This ensures that new commands cannot be initiated by the user before
 # previous ones have finished.
       set SAFE [frame $TOP.dummy ]
       pack $SAFE
@@ -598,9 +598,9 @@ fi
 # Set up the main frame (F2) first so that if the gwm canvas item cannot
 # be created we can quickly go back and try again with a private colour map.
 # It is made up from three columns arranged horizontally...
-      set col1 [frame $F2.col1 -bd 0]   
+      set col1 [frame $F2.col1 -bd 0]
       set col2 [frame $F2.col2 -bd 0]
-      set col3 [frame $F2.col3 -bd 0]   
+      set col3 [frame $F2.col3 -bd 0]
       pack $col1 $col2 $col3 -side left -fill y -ipadx 2m -ipady 2m -expand 1
 
 # Create the third column first since it contains the GWM canvas item...
@@ -622,7 +622,7 @@ fi
 # colour map should be used.
          if { !$usingnewcmap } {
             destroy $TOP
-            set usingnewcmap 1 
+            set usingnewcmap 1
 
 # If we failed while using a private colour map, give up.
          } {
@@ -666,15 +666,15 @@ fi
 # Execute procedure ReleaseBind when button 1 is released over the canvas.
    $CAN bind current <ButtonRelease-1> "ReleaseBind %x %y"
 
-# Execute procedure B1MotionBind when the pointer is moved over the canvas 
+# Execute procedure B1MotionBind when the pointer is moved over the canvas
 # with button 1 pressed.
    $CAN bind current <B1-Motion> "B1MotionBind %x %y"
 
-# Execute procedure MotionBind when the pointer is moved over the canvas 
+# Execute procedure MotionBind when the pointer is moved over the canvas
 # with no buttons pressed.
    $CAN bind current <Motion> "MotionBind %x %y"
 
-# Leave the rest of the main Frame (col1 and col2) until later. Go on to 
+# Leave the rest of the main Frame (col1 and col2) until later. Go on to
 # build the menu bar and menus.
    set file [menubutton $F1.file -text File -menu $F1.file.menu -background $MENUBACK ]
    set filemenu [menu $file.menu]
@@ -720,7 +720,7 @@ fi
    $helpmenu add command -label "Contents" -command {ShowHelp "POLKA_CONTENTS"}
    $helpmenu add command -label "Controls" -command {ShowHelp "POLKA_CONTROLS"}
    $helpmenu add command -label "How do I..." -command {ShowHelp "POLKA_HOW_DO_I"}
-   $helpmenu add command -label "Search for..." -command SearchHelp 
+   $helpmenu add command -label "Search for..." -command SearchHelp
    $helpmenu add command -label "Tutorial" -command {ShowHelp "POLKA_TUTORIAL"}
    $helpmenu add command -label "Using Help" -command {ShowHelp "POLKA_USING_HELP"}
 
@@ -758,16 +758,16 @@ fi
 
 # Add menu items to the Dump and Restore sub-menus.
    $dumpmenu add command -label "Everything " -command {Dump ""} -accelerator "Ctrl-d"
-   $dumpmenu add command -label "Masks Only  " -command {DumpMask ""} 
-   $dumpmenu add command -label "Displayed Image" -command {DumpImage ""} 
+   $dumpmenu add command -label "Masks Only  " -command {DumpMask ""}
+   $dumpmenu add command -label "Displayed Image" -command {DumpImage ""}
    MenuHelp $dumpmenu "Everything " ".  Dump feature positions, mappings and masks for all images, plus all option settings, to a text file."
    MenuHelp $dumpmenu "Masks Only  " ".  Dump the O and E ray masks for the reference image to a text file."
    MenuHelp $dumpmenu "Displayed Image" ".  Dump feature positions and masks for the displayed image to a text file."
    bind . <Control-d> {Dump ""}
 
    $restmenu add command -label "Everything " -command {Restore ""} -accelerator "Ctrl-r"
-   $restmenu add command -label "Masks Only  " -command {RestoreMask ""} 
-   $restmenu add command -label "Displayed Image" -command {RestoreImage ""} 
+   $restmenu add command -label "Masks Only  " -command {RestoreMask ""}
+   $restmenu add command -label "Displayed Image" -command {RestoreImage ""}
    MenuHelp $restmenu "Everything " ".  Restore feature positions, mappings and masks for all images, plus all option settings, from a text file."
    MenuHelp $restmenu "Masks Only  " ".  Restore the O and E ray masks for the reference image from a text file."
    MenuHelp $restmenu "Displayed Image" ".  Restore feature positions and masks for the displayed image from a text file."
@@ -781,7 +781,7 @@ fi
    $EFFECTSMENU add command -label "Show Effects" -command {Effects $IMAGE_DISP Show 0}
    $EFFECTSMENU add command -label "Undo" -command {Effects $IMAGE_DISP Undo 0} -state disabled
    $EFFECTSMENU add command -label "Undo All" -command {Effects $IMAGE_DISP "Undo All" 0} -state disabled
-   
+
    MenuHelp $EFFECTSMENU "Align"     ".  Align the displayed image with another specified image using the current mappings (if available)."
    MenuHelp $EFFECTSMENU "Fill"      ".  Replace any missing pixels with a constant value or smoothly varying surface."
    MenuHelp $EFFECTSMENU "Filter"    ".  Apply a Gaussian high-pass filter to the currently displayed image. The size of the filter is specified by the \"Feature Size\" option in the \"Options\" menu."
@@ -826,18 +826,18 @@ fi
    $OPTSMENU add cascade -label "Colours" -menu $OPTSMENU.cols
    $OPTSMENU add cascade -label "Feature Size" -menu $OPTSMENU.psf
    $OPTSMENU add cascade -label "Interpolation method" -menu $OPTSMENU.meth
-   $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map 
+   $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map
    $OPTSMENU add cascade -label "Polarimetry mode" -menu $OPTSMENU.pol -state $stokestate
-   $OPTSMENU add cascade -label "Sky Order" -menu $OPTSMENU.sky -state $skystate 
+   $OPTSMENU add cascade -label "Sky Order" -menu $OPTSMENU.sky -state $skystate
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
    $OPTSMENU add separator
-   $OPTSMENU add checkbutton -label "Use Cross-hair" -variable XHAIR -selectcolor $CB_COL 
+   $OPTSMENU add checkbutton -label "Use Cross-hair" -variable XHAIR -selectcolor $CB_COL
    $OPTSMENU add checkbutton -label "Remove Sky" -variable SKYOFF -selectcolor $CB_COL -command SkyOff
    $OPTSMENU add checkbutton -label "Display Help Area" -variable HAREA -command HelpArea -selectcolor $CB_COL
    $OPTSMENU add checkbutton -label "Display Status Area" -variable SAREA -command "StatusArea \$SAREA" -selectcolor $CB_COL
    $OPTSMENU add separator
-   $OPTSMENU add command -label "Save Options" -command SaveOptions 
+   $OPTSMENU add command -label "Save Options" -command SaveOptions
 
    MenuHelp $OPTSMENU "Colours"         ".  Change the colours used for various parts of the display."
    MenuHelp $OPTSMENU "Feature Size"    ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
@@ -864,9 +864,9 @@ fi
 # Add items to the View sub-menu.
    set viewmenu [menu $OPTSMENU.view]
    $viewmenu add radiobutton -label Unzoomed -variable VIEW \
-                             -value Unzoomed -selectcolor $RB_COL 
+                             -value Unzoomed -selectcolor $RB_COL
    $viewmenu add radiobutton -label Zoomed -variable VIEW \
-                             -value Zoomed -selectcolor $RB_COL 
+                             -value Zoomed -selectcolor $RB_COL
 
    MenuHelp $viewmenu "Unzoomed"   ".  Display the whole image."
    MenuHelp $viewmenu "Zoomed"     ".  Retain the displayed section, but do not align the new image with the previous image."
@@ -875,18 +875,18 @@ fi
 # Add items to the Interpolation Method sub-menu.
    set methmenu [menu $OPTSMENU.meth]
    $methmenu add radiobutton -label Linear -variable INTERP \
-                             -value Linear -selectcolor $RB_COL 
+                             -value Linear -selectcolor $RB_COL
    $methmenu add radiobutton -label "Nearest neighbour" -variable INTERP \
-                             -value "Nearest neighbour" -selectcolor $RB_COL 
+                             -value "Nearest neighbour" -selectcolor $RB_COL
    SetHelp $methmenu ".  The interpolation method to use when sampling the input images."
 
 # Add items to the "Feature size" sub-menu.
    set psfmenu [menu $OPTSMENU.psf]
-   $psfmenu add radiobutton -label "Zero" -variable PSF_SIZE -selectcolor $RB_COL -value 0 
+   $psfmenu add radiobutton -label "Zero" -variable PSF_SIZE -selectcolor $RB_COL -value 0
 
    foreach s "3 5 9 13 19 29 39 49" {
       $psfmenu add radiobutton -label "$s pixels" -variable PSF_SIZE \
-              -selectcolor $RB_COL -value $s 
+              -selectcolor $RB_COL -value $s
    }
 
    SetHelp $psfmenu ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
@@ -896,7 +896,7 @@ fi
 # mode.
    set polmenu [menu $OPTSMENU.pol]
    $polmenu add radiobutton -label Linear -variable POLMODE \
-                             -value Linear -selectcolor $RB_COL 
+                             -value Linear -selectcolor $RB_COL
    $polmenu add radiobutton -label Circular -variable POLMODE \
                              -value Circular -selectcolor $RB_COL \
                              -state $DBEAM_STATE
@@ -919,7 +919,7 @@ fi
       set MAPSTATE(4) normal
       set MAPSTATE(5) normal
 
-   } elseif { $DBEAM } { 
+   } elseif { $DBEAM } {
       set MAPSTATE(1) normal
       set MAPSTATE(2) disabled
       set MAPSTATE(3) normal
@@ -963,11 +963,11 @@ fi
 
 # Set a flag indicating if the next input image is to be used purely as a
 # reference image to define the co-ordinate system. If so it will not be
-# included in the list of input files processed to produce the output files. 
+# included in the list of input files processed to produce the output files.
    if { $REFONLY } {
       set ref 1
    } {
-      set ref 0 
+      set ref 0
    }
 
 #  Create a label telling the user about the process towards preparing
@@ -983,7 +983,7 @@ fi
    MenuHelp $imagesmenu "Transfer..." ".  Transfer the features from the current image to a group of other images."
    $imagesmenu add separator
 
-# Initialise the i variable which indexes the lists of output and sky images. 
+# Initialise the i variable which indexes the lists of output and sky images.
    set i 0
 
 # Go through every supplied image section.
@@ -1021,7 +1021,7 @@ fi
 
       $imagesmenu add radiobutton -label $imlab -variable IMSEC_REQ \
                                   -value $stdsec  -command UpdateDisplay \
-                                  -selectcolor $RB_COL 
+                                  -selectcolor $RB_COL
 
 # Store the names of the O and E ray output image for this input image.
 # If these will be the output images, then use the names supplied by the
@@ -1036,14 +1036,14 @@ fi
       } {
 
          if { $i < $NOOUT } {
-            set OUTIMS($image,O) [lindex $o_list $i] 
+            set OUTIMS($image,O) [lindex $o_list $i]
          } {
             set OUTIMS($image,O) [UniqueFile]
          }
 
          if { $DBEAM } {
             if { $i < $NEOUT } {
-               set OUTIMS($image,E) [lindex $e_list $i] 
+               set OUTIMS($image,E) [lindex $e_list $i]
             } {
                set OUTIMS($image,E) [UniqueFile]
             }
@@ -1062,7 +1062,7 @@ fi
 # remaining input object frames. Also, update the maximum length of a sky
 # frame name.
       if { $nsky > 0 && !$ref } {
-         if { $i < $nsky } { 
+         if { $i < $nsky } {
             set SKYIMS($image) [lindex $sky_list $i]
          } {
             set SKYIMS($image) [lindex $sky_list end]
@@ -1078,7 +1078,7 @@ fi
       MenuHelp $edmapmenu $image ".  Edit the mappings associated with image \"$image\"."
 
 # Indicate the stored (null) mappings are up-to-date with respect to the
-# feature positions currently stored for each image. 
+# feature positions currently stored for each image.
       set RECALC_IMMAP($image) 0
       set RECALC_OEMAP($image) 0
 
@@ -1101,7 +1101,7 @@ fi
 #   - Checking it has a POLPACK extension containing either WPLATE or ANLANG.
 #   - Saving the current WCS Frame in the NDF so that it can be re-instated
 #     when the output images are saved.
-#   - Setting the current WCS Frame in the NDF explicitly to pixel 
+#   - Setting the current WCS Frame in the NDF explicitly to pixel
 #     co-ordinates.
 #
 # Do not check for the POLPACK extension if the image is the reference
@@ -1111,7 +1111,7 @@ fi
       } {
          set refpar F
       }
-     
+
       set copy [UniqueFile]
       Obey polpack polprep "in=$imsec ref=$refpar out=$copy" 1
       set WCSDOMAIN($image) [GetParam polpack polprep:frame]
@@ -1120,14 +1120,14 @@ fi
          exit 1
       }
 
-# Push the name of the NDF copy onto the image's IMAGE_STACK. 
+# Push the name of the NDF copy onto the image's IMAGE_STACK.
       set IMAGE_STACK($image) $copy
       set EFFECTS_MAPPINGS($image) ""
       set EFFECTS_STACK($image) ""
 
 # The i variable indexes the lists of output and sky images. If the input
 # image we have just processed was for "reference purposes only", it will
-# not have had any associated output or sky images. So we only increment i 
+# not have had any associated output or sky images. So we only increment i
 # if the input image just processed was *not* for reference purposes only.
       if { !$ref } { incr i }
 
@@ -1136,7 +1136,7 @@ fi
    }
 
 # Pack the menu buttons.
-   pack $file $edit $opts $images $effects -side left 
+   pack $file $edit $opts $images $effects -side left
    pack $help -side right
 
 # The menu bar is now complete. Go back and create the remaining two
@@ -1146,7 +1146,7 @@ fi
 
 # Create and pack the frame containing everything else.
    set cur [frame $col1.cur -bd 2 -relief groove ]
-   pack $cur -fill y -expand 1 -padx 3m -pady 3m 
+   pack $cur -fill y -expand 1 -padx 3m -pady 3m
 
 # Create and pack the label containing the title.
    set clab [label $cur.clab -text "Current:"]
@@ -1193,7 +1193,7 @@ fi
 # The radiobutton array which selects the reference object...
 # Create and pack the frame.
    set ref [frame $col1.ref -bd 2 -relief groove ]
-   pack $ref -fill y -expand 1 -padx 3m -pady 3m 
+   pack $ref -fill y -expand 1 -padx 3m -pady 3m
    SetHelp $ref ".  Click to select the reference objects to be displayed." POLKA_REFERENCE
 
 # Create and pack the label.
@@ -1236,7 +1236,7 @@ fi
 # Next is a frame containing the "Draw Aligned and Ref. Image buttons.
    set bfrm [frame $ref.bfrm]
 
-# Create the "Draw Aligned" checkbutton which causes the reference objects to 
+# Create the "Draw Aligned" checkbutton which causes the reference objects to
 # be drawn in registration with the frame of the current objects. The
 # associated command ensures that the mappings for this image are up to date
 # and then re-configures the reference objects.
@@ -1247,7 +1247,7 @@ fi
    SetHelp $REFALIGN ".  Should the reference objects be mapped into the coordinate frame of the current objects before being displayed?" POLKA_DRAW_ALIGNED
 
 # The reference image menu. Use a normal "button" (instead of the more
-# obvious "menubutton") to post the menu for cosmetic purposes (so that 
+# obvious "menubutton") to post the menu for cosmetic purposes (so that
 # the button looks the same as the following "Register" button).
    set refmenu [menu $bfrm.menu]
    set refim [button $bfrm.image -text "Ref. Image" -width 10 -relief raised -bd 2 ]
@@ -1258,7 +1258,7 @@ fi
    foreach image $IMAGES {
       $refmenu add radiobutton -label $image -variable REFIM_REQ \
                                -value $image -command UpdateDisplay \
-                               -selectcolor $RB_COL 
+                               -selectcolor $RB_COL
    }
    set REFIM_REQ [lindex $IMAGES 0]
    SetHelp $refim ".  Select the image from which reference objects will be displayed." POLKA_REF_IMAGE
@@ -1278,7 +1278,7 @@ fi
    set ACCEPT [button $cfrm.accept -text "Accept" -width 10 -relief raised -bd 2 -command Accept -state disabled]
    SetHelp $ACCEPT ".  Click to search for image features at the positions of the displayed reference features." POLKA_ACCEPT
 
-# Pack the "Redraw" and "Accept" buttons. 
+# Pack the "Redraw" and "Accept" buttons.
    pack $REDRAW $ACCEPT -side left -pady 1m -expand 1
 
 # Pack the frame holding the buttons.
@@ -1320,7 +1320,7 @@ fi
 # feature label.
    lappend LABEL_OFF $DELETE
 
-# Create the "widgets" for entering the lower (black) and upper (white) 
+# Create the "widgets" for entering the lower (black) and upper (white)
 # percentile values.
    set BLACK [Value $col2f.black "% black" 6 PLO_REQ 100 0 CheckVal]
    set WHITE [Value $col2f.white "% not white" 6 PHI_REQ 100 0 CheckVal]
@@ -1370,12 +1370,12 @@ fi
 # Load the options supplied by the polka atask.
    LoadOptions
 
-# Destroy the "preparing input images" label, displayed while the main 
+# Destroy the "preparing input images" label, displayed while the main
 # interface is being created.
    destroy $prep
 
 # Pack the top level frame. This make it appear on the screen.
-   pack $TOP -padx 2m -pady 2m 
+   pack $TOP -padx 2m -pady 2m
 
 # Create the status area if required.
    StatusArea $SAREA
@@ -1400,7 +1400,7 @@ fi
 
 # Clear the display.
    ClearGwm
-  
+
 # Display the first image.
    SetMode 0
    UpdateDisplay

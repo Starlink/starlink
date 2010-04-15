@@ -205,7 +205,7 @@
 *       Reverse the sign of the longitude.
 *
 *       SLA_OBS returns longitude with a sign such that west is
-*       positive (in conformance with normal geographical 
+*       positive (in conformance with normal geographical
 *       convention).  Longitudes supplied through the parameter
 *       system should follow the same convention.
 *
@@ -267,7 +267,7 @@ C3000       format(1x, 'utmjd: ', 1pd20.8 )
          CALL PAR_CANCL ('UTMJD', STATUS)
 
 *
-*       Get the temperature, atmospheric pressure, humidity, 
+*       Get the temperature, atmospheric pressure, humidity,
 *       wavelength and tropospheric lapse rate.
 
          CALL PAR_GET0D ('TEMP', TEMP, STATUS)
@@ -336,7 +336,7 @@ C3000       format(1x, 'utmjd: ', 1pd20.8 )
 
             WAVEM = WAVE / 1.0D4
 
-            CALL SLA_AOPPA (UTMJD, 0.0D0, LONG, LAT, HEIGHT, 0.0D0, 
+            CALL SLA_AOPPA (UTMJD, 0.0D0, LONG, LAT, HEIGHT, 0.0D0,
      :        0.0D0, TEMP, ATMOSP, HUMID, WAVEM, TROPL, MO(22) )
          END IF
 

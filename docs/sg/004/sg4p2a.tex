@@ -19,7 +19,7 @@ you will be shown two lists of packages.
 The first contains {\em Standard} packages which are available at all
 Starlink sites.
 The other contains {\em Options} which are made available at a site only
-on request. 
+on request.
 
 This Chapter gives a brief overview of each package, while Chapter~\ref{C_rsapp}
 describes the specific commands available within each package.
@@ -36,7 +36,7 @@ Without recommending some standard structure there would be a danger of
 programmers writing applications which could not read each other's data.
 If the standard is also implemented in a small number of routines, the
 restrictions imposed by the standard also make programming easier.
-The main unifying theme of Starlink applications is the standard data format 
+The main unifying theme of Starlink applications is the standard data format
 defined by Starlink; this is the Extensible $N$-dimensional Data Format ---
 NDF --- described in Section \ref{S_NDF}.
 This is centred on an $n$-dimensional data array that can store most
@@ -156,7 +156,7 @@ The packages are then described in alphabetical order on separate pages.
 
 \newpage
 
-\section{ASTERIX --- X-ray data analysis} 
+\section{ASTERIX --- X-ray data analysis}
 
 \vspace{-11mm}
 
@@ -169,14 +169,14 @@ waveband.
 Many of the programs are general purpose and are capable of analysing any data
 in the correct format.
 It is instrument independent and currently has interfaces to the Exosat and
-Rosat instruments. 
+Rosat instruments.
 
 ASTERIX data are stored in HDS files and are therefore compatible with all ADAM
 packages.
 There are basically two different types: binned and event datasets.
 {\em Binned data} (e.g.\ time series, spectra, images) are stored in files whose
 structure is based on the Starlink standard NDF format
-(\xref{SGP/38}{sgp38}{}). 
+(\xref{SGP/38}{sgp38}{}).
 Data errors (stored in the form of variances) and quality are catered for.
 {\em Event data sets} store information about a set of photon `events'.
 Each event will have a set of properties, e.g.\ X position, Y position, time,
@@ -248,7 +248,7 @@ The commands may be classified as follows:
 
 \newpage
 
-\section{CCDPACK --- CCD data reduction} 
+\section{CCDPACK --- CCD data reduction}
 
 \vspace{-11mm}
 
@@ -320,7 +320,7 @@ The following features are of particular note:
 
 \newpage
 
-\section{CONVERT --- Data format conversion} 
+\section{CONVERT --- Data format conversion}
 
 \vspace{-11mm}
 
@@ -388,7 +388,7 @@ A file IMAGE.BDF will have been created in your current directory.
 
 \newpage
 
-\section{DAOPHOT --- Stellar photometry} 
+\section{DAOPHOT --- Stellar photometry}
 
 \vspace{-11mm}
 
@@ -450,7 +450,7 @@ make any progress with this program.
 
 \newpage
 
-\section{FIGARO --- General spectral reduction} 
+\section{FIGARO --- General spectral reduction}
 
 \vspace{-11mm}
 
@@ -557,7 +557,7 @@ An extensive range of options is available, especially for output.
 
 \newpage
 
-\section{IRCAM --- Infrared camera data reduction} 
+\section{IRCAM --- Infrared camera data reduction}
 
 \vspace{-11mm}
 
@@ -593,7 +593,7 @@ The graphics and image display facilities available are:
 \item Image display of various types (PLOT, CONTOUR, NSIGMA, RANPLOT).
 \item Display cursor position and value.
 \item Colour control.
-\item Line graphics such as 1-dimensional cuts/slices through images and 
+\item Line graphics such as 1-dimensional cuts/slices through images and
  contour maps.
 \item Annotation.
 \end{itemize}
@@ -633,7 +633,7 @@ The graphics and image display facilities available are:
 
 \newpage
 
-\section{KAPPA --- Kernel applications} 
+\section{KAPPA --- Kernel applications}
 
 \vspace{-11mm}
 
@@ -693,7 +693,7 @@ There are also many applications for data visualization:
  obtaining world and data co-ordinate information from them.
 \item Image and greyscale plots with a selection of scaling modes and many
  options such as axes.
-\item Creation, selection, saving and manipulation of colour tables and 
+\item Creation, selection, saving and manipulation of colour tables and
  palettes (for axes, annotation, coloured markers and borders).
 \item Snapshot of an image display to hardcopy.
 \item Blinking and visibility of image-display planes.
@@ -714,7 +714,7 @@ There are also many applications for data visualization:
 
 \newpage
 
-\section{PHOTOM --- Aperture photometry} 
+\section{PHOTOM --- Aperture photometry}
 
 \vspace{-11mm}
 
@@ -774,7 +774,7 @@ the aperture, or automatically from an annulus surrounding the object.
 
 \newpage
 
-\section{PISA --- Object finding and analysis} 
+\section{PISA --- Object finding and analysis}
 
 \vspace{-11mm}
 
@@ -861,7 +861,7 @@ The results are then plotted on a suitable device.
 
 \newpage
 
-\section{SCAR --- Star catalogue database system} 
+\section{SCAR --- Star catalogue database system}
 
 \vspace{-11mm}
 
@@ -944,14 +944,14 @@ It can be invoked by typing:
 \end{verbatim}
 \end{small}
 
-It is suggested that you run this in an empty directory so that you can 
+It is suggested that you run this in an empty directory so that you can
 identify the files which have been created.
 \end{description}
 \end{quote}
 
 \newpage
 
-\section{SPECDRE --- Spectroscopy data reduction} 
+\section{SPECDRE --- Spectroscopy data reduction}
 
 \vspace{-11mm}
 
@@ -996,7 +996,7 @@ must be the first axis.
 
 \newpage
 
-\section{SST --- Simple software tools} 
+\section{SST --- Simple software tools}
 
 \vspace{-11mm}
 
@@ -1005,14 +1005,14 @@ must be the first axis.
 \vspace{5mm}
 
 The Simple Software Tools package helps produce software and documentation,
-with particular emphasis on ADAM programming using Fortran~77. 
+with particular emphasis on ADAM programming using Fortran~77.
 It performs fairly simple manipulations of software, and also tackles some of
 the commonly encountered problems which are not catered for in the more
 sophisticated commercial software tools (such as FORCHECK and VAXset)
-available on Starlink. 
+available on Starlink.
 
 The main purpose of the first version is to extract information from subroutine
-`prologues', and to format it to produce various forms of user documentation. 
+`prologues', and to format it to produce various forms of user documentation.
 A simple source-code and comment statistics tool is also included.
 
 There are five applications:
@@ -1084,7 +1084,7 @@ be the one which is run in the demonstration.
 
 \newpage
 
-\section{TSP --- Time-series and polarimetry analysis} 
+\section{TSP --- Time-series and polarimetry analysis}
 
 \vspace{-11mm}
 

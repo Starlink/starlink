@@ -7,8 +7,8 @@
 
       REAL FUNCTION XSNART (X, V, NX, IFAIL)
 
-C  Routine to return postion in X array (i.e. fractional points) 
-C  corresponding to the input value V. 
+C  Routine to return postion in X array (i.e. fractional points)
+C  corresponding to the input value V.
 C  Algorithm:
 C      o  find approximate starting value
 C      o  apply correction until V lies between translations
@@ -65,11 +65,11 @@ CD    print *, '  left and right limits: ', xl, xr
         XLL = 0.5*X(N1) ! Assume X(N1-1)=0
         XRR = 0.5*(X(N1)+X(N1+1))
       ELSE IF (N1.EQ.NX) THEN
-        XLL = 0.5*(X(NX)+X(NX-1)) 
+        XLL = 0.5*(X(NX)+X(NX-1))
         XRR = XR
       ELSE
 *     Can not use this for N1=1 since that would address index 0
-        XLL = 0.5*(X(N1)+X(N1-1)) 
+        XLL = 0.5*(X(N1)+X(N1-1))
         XRR = 0.5*(X(N1)+X(N1+1))
       END IF
 
@@ -92,11 +92,11 @@ CD    print *, '  channel increment dx: ', dx
           XLL = 0.5*X(N1) ! Assume X(N1-1)=0
           XRR = 0.5*(X(N1)+X(N1+1))
         ELSE IF (N1.GE.NX) THEN
-          XLL = 0.5*(X(NX)+X(NX-1)) 
+          XLL = 0.5*(X(NX)+X(NX-1))
           XRR = XR
         ELSE
 C     Can not use this with N1=1 since that uses index=0
-          XLL = 0.5*(X(N1)+X(N1-1)) 
+          XLL = 0.5*(X(N1)+X(N1-1))
           XRR = 0.5*(X(N1)+X(N1+1))
         END IF
 
@@ -108,7 +108,7 @@ CD      print *, '  channel increment dx: ', dx
 
       END DO
 
-*     final interpolation 
+*     final interpolation
 
       IF (N1 .NE. 0) THEN
          XSNART = N1 + (V-X(N1))/DX

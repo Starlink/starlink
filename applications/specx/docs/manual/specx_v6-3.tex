@@ -210,7 +210,7 @@ another program or read directly by the IMAGE
 have recently also managed to read \texttt{mapplane.tmp} directly into the
 image-processing program VIEW (from Lawrence Livermore Laboratory), running
 under Unix on a Sun (VIEW has a command which converts DEC reals to IEEE reals,
-including the necessary byte-swapping). 
+including the necessary byte-swapping).
 
 \section{PROGRAM STRUCTURE}
 
@@ -226,7 +226,7 @@ bottom two spectra, ROLL\index{ROLL-STACK} rotates the stack down
 
 One difference between the calculator and SPECX is that in the latter
 the number and length of the stack positions are user-definable
-\index{stack!defining the}. At present a given amount of memory is set 
+\index{stack!defining the}. At present a given amount of memory is set
 aside for the stack, so that you can declare a very long stack of
 short spectra, or a short stack of very long spectra, as
 required. Eventually I will move over to a dynamic stack, of arbitrary
@@ -235,13 +235,13 @@ length.
 Spectra may also be stored in any of 5 storage registers\index{storage
 registers}, and retrieved from them, or written to an output data file. Output
 files and input files have identical formats, and any data file may be opened
-for Read, Write or Read/Write access\index{data files!access} as desired. 
+for Read, Write or Read/Write access\index{data files!access} as desired.
 
 \section{INSTALLING SPECX}
 
 \subsection{UNIX}
 
-The UNIX\index{UNIX}version of SPECX is available in compiled form 
+The UNIX\index{UNIX}version of SPECX is available in compiled form
 (e.g.\ http://www.jach.hawaii.edu/JCMT) and there should be no need
 to build the program. Currently supported UNIX platforms are
 Solaris\index{Solaris}, SunOS\index{SunOS} and OSF1\index{OSF1}.
@@ -282,9 +282,9 @@ you will want to run this again before the final run of \LaTeX.
 
 UNIX Specx uses the native Caltech version of PGPLOT. Be careful that
 the logicals defined in \$SYS\_SPECX/specxstart do not conflict with
-a local version of PGPLOT. The X-window geometry is defined in 
+a local version of PGPLOT. The X-window geometry is defined in
 the same file but users can also add the following line to their X
-resources file (e.g.\ .Xdefaults): 
+resources file (e.g.\ .Xdefaults):
 \begin{verbatim}
 pgxwin.Win.geometry:            720x576+10+10
 \end{verbatim}
@@ -300,7 +300,7 @@ name\index{logical names!required} {\em must} be defined before the
 installation can start --- SYS\_SPECX\index{logical names!SYS\_SPECX} points to
 the top level SPECX directory, in which the various .EXE and initialization
 files will be put (note that in the following examples ``mydisk'' and ``mydir''
-should be replaced with something suitable to your own circumstances!)\\ 
+should be replaced with something suitable to your own circumstances!)\\
 \begin{verbatim}
 $ assign mydisk::[mydir.specx] sys_specx
 \end{verbatim}
@@ -357,7 +357,7 @@ Edit the file [specx.local]specx\_logicals.com If you are a non-MRAO,
 non-JCMT/JACH site, then the appropriate assignments are easy: Note that the
 assignment for DISK\$SPECX requires the physical device name, and the directory
 name will need changing depending on where you have put things. As an example,
-the MRAO version of this file is reproduced below. 
+the MRAO version of this file is reproduced below.
 
 \begin{verbatim}
    $ !------------------------------------------------------
@@ -386,7 +386,7 @@ Edit sys\_specx:link.com to make sure you are linking in the correct
 mode.
 
 Try to link:
- 
+
 \begin{verbatim}
         $ @link
 \end{verbatim}
@@ -439,7 +439,7 @@ passed to it as a parameter (i.e. 'p1') on an appropriate printer
 Similarly, if using a CANON laser printer, you need to define the
 logical PG\_CANON.
 
-These assignments are most easily made in the file 
+These assignments are most easily made in the file
 [.LOCAL]SPECXSTART.COM, which is called by the global
 startup file SYS\_SPECX:SPECXSTART.COM  --- The appropriate .COM
 file can conveniently be kept in the [.LOCAL] directory also.
@@ -448,7 +448,7 @@ file can conveniently be kept in the [.LOCAL] directory also.
 
 A list of the logical names required to run SPECX is given below for reference.
 (defaults shown in brackets). All except \verb+sys_specx+ will be set up in
-\verb+SPECXSTART.COM+ 
+\verb+SPECXSTART.COM+
 
 \begin{tabular}{ll}
 \verb+SYS_SPECX+ &      \begin{minipage}[t]{4.5in}
@@ -494,7 +494,7 @@ A list of the logical names required to run SPECX is given below for reference.
                         you enter SPECX (\verb+SYS_SPECX:SPECX_WELCOME.TXT+).
                         \end{minipage}\\
 \end{tabular}
-      
+
 \subsection{VMS: Documentation}
 
 Copies of the manual can be obtained by {\LaTeX}-ing the file
@@ -543,11 +543,11 @@ their PGPLOT device drivers. Since SPECX needs to know things about the
 different devices that can not be obtained from the various enquiry routines,
 an interface routine is required to set various parameters for each device.
 This routine is called SXGDEVICE; SXGTERMDEV and SXGPRINTDEV merely specify
-which are for immediate (terminal) output and which are hardcopy devices. 
+which are for immediate (terminal) output and which are hardcopy devices.
 
 In this case the procedure specified above should be prefaced as follows:
 \begin{itemize}
-\item Go into the appropriate interface library subdirectory: 
+\item Go into the appropriate interface library subdirectory:
 \begin{description}
 \item{Mongo83:} [SPECX.LIB.GRAPHICS.MONGO83]
 \item{Mongo87:} [SPECX.LIB.GRAPHICS.MONGO87]
@@ -596,7 +596,7 @@ then you should arrange that you install it yourself, using the command:
 \subsection{Invoking SPECX\index{SPECX!invoking}}
 
 Once the SPECX command has been installed in the command tables, as described
-above, it can be invoked from DCL using the command: 
+above, it can be invoked from DCL using the command:
 \begin{verbatim}
     $ specx
 \end{verbatim}
@@ -611,7 +611,7 @@ This command has two options:
   allows you to choose the map file that the program opens on start up, or to
   prevent automatic opening of any map file that was open when the program last
   exited. The /NOMAP option can save you {\em considerable} time if you don't
-  need to access the map again. 
+  need to access the map again.
 \end{itemize}
 
 Thus valid command lines could be:
@@ -629,7 +629,7 @@ programs flags and variables, particularly those relating to hardware. The
 actual file normally resides in the directory with logical name sys\_specx, and
 should be maintained/altered {\em only by the site manager}. SPECX\_INIT is
 internally documented, so that any changes should be straightforward, but note
-that it is actually a FORTRAN namelist, and the format is rather fussy. 
+that it is actually a FORTRAN namelist, and the format is rather fussy.
 
 The second initialization file is actually a .SPX script, which is run
 when the program is started (analogous to your DCL LOGIN.COM). This command
@@ -640,11 +640,11 @@ mostly geared towards JCMT observing.
 You may however wish to modify this file for your own purposes. By far the best way
 is to generate your own .SPX file, assign it the USER logical name
 SPINIT\index{SPINIT}, and to start it by invoking the default file. Thus your
-initialization file might also be called init.spx, and look like this: 
+initialization file might also be called init.spx, and look like this:
 \begin{verbatim}
     !  init.spx
     !  Command file to define user symbols etc
-    ! 
+    !
     !  First run default initialization file
        @specx_local:init
     !
@@ -698,15 +698,15 @@ key while the graphics crosshair is showing, the terminal should write only
 the 4 Tek4010/4014 location bytes, plus a byte corresponding to the key that
 was struck, and a further byte as terminator (carriage return is OK, ETX hangs
 PGPLOT). Use the terminal setup to ensure that these are not followed by
-spurious extra carriage returns, line feeds or EOTs. 
+spurious extra carriage returns, line feeds or EOTs.
 
 \subsection{Using a separate terminal as graphics display}
 
 \label{graphics}
-If necessary a second terminal can be used for the display of graphics. 
+If necessary a second terminal can be used for the display of graphics.
 This may be useful if a dual-screen alpha/graphics terminal is not available
 for example, and you want to retain the display while continuing to issue
-SPECX commands. 
+SPECX commands.
 
 This arrangement is set up using the SET-TERMINAL-DEVICE command, in which
 you nominate both the type of terminal and the VMS device name. For terminals
@@ -760,13 +760,13 @@ subsequent versions. More recently Remo Tilanus at JACH has provided much
 useful feedback which has enabled me to fix problems more speedily than in the
 past. Horst Meyerdierks at ROE is currently working on the UNIX version. I am
 grateful to Keith Shortridge for permission to use his routines to write FITS
-data files. 
+data files.
 
 I especially thank Thomas Walker\index{Walker, Thomas}, one-time JCMT Telescope
 Operator, who compiled the V5.3 SPECX Cookbook\index{SPECX cookbook}, which
 greatly enlightened the users {\em and} showed me how many improvements there
 were still to make (many of the improvements in later versions exist only as a
-result of the deficiencies described in the Cookbook). 
+result of the deficiencies described in the Cookbook).
 
 \chapter{The Command Language}\index{command language}
 
@@ -777,16 +777,16 @@ The prompt given when the program is in command mode is the double arrow
 \verb+>>+. \index{prompt!SPECX (double arrow)}
 The allowable responses are:
 \begin{itemize}
-\item 
+\item
 A SPECX command (defined below)
-\item 
+\item
 A VMS command\index{commands!VMS} preceded by a \verb+$+ character.
-\item 	
+\item
 A script file\index{command files} name, preceded by an `@' character.
-\item 
+\item
 A comment\index{comments}, preceded by a `!' or `*' character (most
 useful inside script files).
-\item 
+\item
 CTRL(C)\index{CTRL(C)} (here represented as \verb+^C+) to exit the
 program immediately.
 \end{itemize}
@@ -858,7 +858,7 @@ example) to include a decimal point in a floating-point value. Suppose
 you do want to read a spectrum. The dialogue might go like this:
 
 \begin{verbatim}
-    >> read-spectrum File number?  1 
+    >> read-spectrum File number?  1
     >> Scan number?  27
 \end{verbatim}
 
@@ -885,7 +885,7 @@ GENLIB\index{GENLIB} routines to accept the default value for the
 omitted array element or line of input respectively. Defaults may also
 optionally be indicated by using the placeholder\index{placeholder
 (\#)} character
-\verb+#+\index{#@\# -- placeholder} in place of the individual items. 
+\verb+#+\index{#@\# -- placeholder} in place of the individual items.
 
 Some commands request a character string\index{input!character} as
 input.  Problems could arise if the string includes a separator (
@@ -901,7 +901,7 @@ the first part of the string (``Rachael'') would have been accepted.
 Some commands require input of a list\index{input!of lists} of
 variables, where the list length is not determined in advance. In
 general such lists use the
-\verb+#+\index{#@\# -- placeholder} character as a prompt, and can be 
+\verb+#+\index{#@\# -- placeholder} character as a prompt, and can be
 terminated by a CTRL(Z)\index{CTRL(Z)} (the FORTRAN end-of-file
 character). The initial prompt for the list will always specify the
 terminating character. CTRL(Z) terminates input immediately, so it
@@ -1014,7 +1014,7 @@ Command files may be nested\index{command files!nested} to a depth of 8, that
 is, it is permissable to include lines such as `@filename' in a script
 file. A `?'\index{?} encountered in response to a prompt is referred to
 the calling file for resolution, and this process may be repeated. Suppose you
-had two command files TEST1.SPX and TEST2.SPX: 
+had two command files TEST1.SPX and TEST2.SPX:
 
 \begin{verbatim}
     print 'TEST1.SPX'
@@ -1044,7 +1044,7 @@ The command interpreter encounters the first `?'\index{?} in TEST2 and consults
 TEST1. It finds the value 1, which it accepts. On encountering the second `?'
 and consulting TEST1 it finds a further `?', so it moves up to the next level
 (the terminal), finds that it {\em is} the terminal, puts out a prompt and
-accepts the reply (27). Note that all input directed to a script 
+accepts the reply (27). Note that all input directed to a script
 file at a lower level {\em must} be included in the line that calls the file.
 Thus in the example above, it would {\em not} be correct to define TEST1.SPX
 as follows:
@@ -1064,7 +1064,7 @@ result when TEST2 is completed, and SPECX then tries to execute the command
 ``1''. Also note that the prompt is modified\index{prompt!modified} when it is
 the result of a command from within a command file: the prompt is prefixed by
 the name of the calling file, to indicate just who it is that you are talking
-to. 
+to.
 
 \subsection{Command symbols}\index{symbols!command}
 
@@ -1073,7 +1073,7 @@ by the command parser. For an example, you may repeatedly want to change the
 plot device to a different one, make a new plot, and change it back. In this
 case we could just define a symbol, MAKE-LNO3-PLOT say, that would execute this
 simple ``command line macro''.\index{command line macro} The syntax is similar
-to that of DCL: 
+to that of DCL:
 \begin{verbatim}
     >> MAKE-LN03-PLOT := 'set-plot-device H;new-plot;set-plot-device T;'
 \end{verbatim}
@@ -1084,7 +1084,7 @@ your symbol some fairly explicit name so that you don't forget what it was for
 --- the command ``SHOW-COMMANDS plot" will now list your new symbol as well as
 all the built-in commands that include the word ``PLOT'' in their name. The
 equivalence string\index{equivalence string!max length = 64 chars} may be up to
-64 characters long at present. 
+64 characters long at present.
 
 It is also possible to allow for the possibility of a more general command,
 whereby one or more parameters is unknown at the time the symbol is
@@ -1093,7 +1093,7 @@ plotting to the hardcopy device in the above example we wanted to choose, at
 the time, which device we meant. There are two ways of passing the parameter to
 the new command. The first is to declare a string parameter --- \verb+DEVICE+
 say --- that you can set using the `=' command, and to use this parameter in
-the symbol: 
+the symbol:
 \begin{verbatim}
     >> declare device c1
     >> make-plot := 'set-plot-device device;new-plot;set-plot-device T;'
@@ -1135,13 +1135,13 @@ expression\index{expressions!arithmetic} involving only constants, {\em
 defined} variables, and supplied functions, then the expression will be
 evaluated and the resulting value used as input. As a concrete example, let us
 suppose that the (real) variable x and the (integer) variable n have both been
-defined, and have sensible values. Then for instance the transaction: 
+defined, and have sensible values. Then for instance the transaction:
 \begin{verbatim}
     >> offset-spectrum x+2*n
 \end{verbatim}
 would be a valid command line. The expression $x+2*n$ is first translated
 according to the normal rules of precedence, and
-then used as a response to the ``Offset? " prompt. 
+then used as a response to the ``Offset? " prompt.
 
 \subsubsection{Variables}\index{variables}
 
@@ -1159,7 +1159,7 @@ contain the number of scans in the current file, the number of spectra in a GSD
 file, and the no of entries in the map file. The six integer counting
 variables\index{variables!counting} i,j,k,l,m,n, and logical
 constants\index{constants!logical} TRUE\index{TRUE@\verb+TRUE+} \&
-FALSE\index{FALSE@\verb+FALSE+}, are also predefined. 
+FALSE\index{FALSE@\verb+FALSE+}, are also predefined.
 
 The full set of currently defined variables, together with their type and
 vector length, may be inspected using the SHOW-VARIABLES\index{SHOW-VARIABLES}
@@ -1169,7 +1169,7 @@ variables are read-only\index{variables!read-only}, and must not (cannot) be
 altered by the SPECX user. In general things are only read-only if the result
 of changing them would be to risk damage to your files etc, but (for example)
 the logical variable TRUE is readonly too; the consequences of redefining TRUE
-to be false may be imagined. 
+to be false may be imagined.
 
 Variables may be set using the = command\index{=} (see below), and inspected
 using the PRINT\index{PRINT} command (also described later). It is possible to
@@ -1177,7 +1177,7 @@ give any variable or arithmetic expression\index{expressions!arithmetic}
 involving defined variables in response to a prompt. Thus, for example,
 \verb#4*x + 5# would be a valid response to the OFFSET? prompt, provided that
 \verb+x+ had already been declared. Note that variable names are not case
-sensitive (or are not meant to be - let me know of any that appear to be!) 
+sensitive (or are not meant to be - let me know of any that appear to be!)
 
 \subsubsection{Expressions}\index{expressions}
 
@@ -1189,7 +1189,7 @@ I4 $\rightarrow$ R4 $\rightarrow$ R8. Conversions between character (Cnnn),
 logical and numeric types are not supported. Expressions may contain
 subexpressions\index{subexpressions} (contained within ordinary brackets), and
 are evaluated left to right, with normal FORTRAN operator precedence. Array
-subscripts\index{subscripts!array} may also be expressions. 
+subscripts\index{subscripts!array} may also be expressions.
 
 \index{-}\index{^@\verb$^$}\index{*}\index{/}\index{+}\index{minus!unary}
 \begin{center}
@@ -1208,7 +1208,7 @@ subscripts\index{subscripts!array} may also be expressions.
 A higher precedence indicates that the operator is applied before
 any operator of lower precedence that could also act on the same argument(s).
 A small set of standard real functions is also provided. For now only the 13
-functions listed below are available, but I can put in more if there is 
+functions listed below are available, but I can put in more if there is
 user demand.
 
 \index{functions, built-in}\index{sin (sine)}\index{cos (cosine)}
@@ -1250,7 +1250,7 @@ default directory. INSERT mode is terminated by a CTRL(Z)\index{CTRL(Z)},
 whereupon the command file is submitted to be run. This means that there is no
 syntax checking as you enter the commands. If it fails to run you can edit a
 file TEMP.SPX (or anything else.SPX) and then submit it (via the @ command) as
-usual. 
+usual.
 
 The IF command cannot be used at interactive level.\index{IF!not interactive}
 
@@ -1266,7 +1266,7 @@ treated as an error, so that the current DO-loop or script file is
 abandoned. Occasionally, when SPECX is outputting data to the screen, and for
 reasons I do not understand, it does not recover from a CTRL(C) interrupt
 and goes into a mode where it produces the same error message continuously ---
-just CTRL(Y)\index{CTRL(Y)} out of the program and start again. 
+just CTRL(Y)\index{CTRL(Y)} out of the program and start again.
 
 \section{THE SCL COMMANDS.}\index{commands!SCL}
 
@@ -1319,7 +1319,7 @@ creation. One prompt:
 Note that VMS-type wildcard matching is supported, as shown in the examples
 below: all strings, ranging from length 0 upwards, that match the wildcard
 character (*) are accepted as a valid match. Note that the asterisk at the
-start of the {\em output} variable name indicates that the variable is 
+start of the {\em output} variable name indicates that the variable is
 readonly.
 
 Examples:
@@ -1367,9 +1367,9 @@ way as other SCL/SPECX commands. It has two prompts:
 
 The SCL preparser\index{preparser!SCL} {\em also} traps commands of the form
 ``Variable =" or ``variable=" and modifies them to the form ``= variable". Thus
-you can make an assignment in two basically different ways: 
+you can make an assignment in two basically different ways:
 
-Examples: 
+Examples:
 \begin{verbatim}
            >>  n = 5  or n=5 etc
            >>  = n 5  or =n 5 etc
@@ -1383,7 +1383,7 @@ Examples:
 As noted above, the DO command works basically within command files, although
 there is an interactive-level form which has basically the same structure.
 Within a command file\index{DO!in command files}, the DO command has two
-prompts: 
+prompts:
 \begin{description}
 \item{}             Do variable?             (string)
 \item{}             Do range (n1, n2, n3)?   (integer array)
@@ -1394,7 +1394,7 @@ starting with the user-defined variable set to n1, and incrementing by n3 until
 it is greater than n2. If you forget to put the ENDDO in, the DO loop should
 exit at the end of the command file (it is not necessary to insert the ENDDO
 yourself in interactive mode; it is done for you when you hit
-\verb+^Z+\index{CTRL(Z)} to end insert mode). 
+\verb+^Z+\index{CTRL(Z)} to end insert mode).
 
 Note again that DO is a standard command, and thus n1, n2, n3 may be given as
 integer values, defaults (including \verb+#+) or arithmetic expressions. n3 will be
@@ -1402,7 +1402,7 @@ defaulted to $\pm 1$ if omitted, depending on whether n2 is $>$ or $<$ n1. If n2
 omitted it defaults to n1 (trivial case) and the loop is executed once only. DOs
 may be nested to a depth of 16.\index{DO!maximum nesting depth = 16}
 
-Example:   
+Example:
 \begin{verbatim}
           !  Command file to test DO construct
                declare n i4
@@ -1429,7 +1429,7 @@ expression consisting of one or more relational expressions separated by
 logical operators\index{operators!logical}. Relational expressions are defined to be simple binary
 expressions - i.e. one operand and two operators, and may compare either two
 string items or two numeric items. String items\index{strings} may be tested only for equality
-or inequality and are case-independent. 
+or inequality and are case-independent.
 
 \index{operators!relational}\index{=@\verb$=$}\index{<>@\verb$<>$}
 \index{><@\verb$><$}
@@ -1476,7 +1476,7 @@ ELSEIFs having been true the commands following the ELSE are executed. IF
 structures can be nested to a depth of 16.\index{IF!nested}\index{nested IF}
 \index{IF!maximum nesting depth = 16}
 
-Example: 
+Example:
 \begin{verbatim}
              !  Command file to demonstrate IF command
                    if 3*x^2+4 <= 27
@@ -1512,9 +1512,9 @@ in brackets.
 
 Items may optionally be followed immediately by a colon (:\index{:}) and a
 FORTRAN format\index{format!PRINT} specifier, to control the width of the
-output field. 
+output field.
 
-Examples:  
+Examples:
 \begin{verbatim}
        >>  print x
        >>  print (x/3)
@@ -1539,9 +1539,9 @@ in brackets.
 
 Items may optionally be followed immediately by a colon (:\index{:}) and a
 FORTRAN format\index{format!WRITE} specifier, to control the width of the
-output field. 
+output field.
 
-Examples:  
+Examples:
 \begin{verbatim}
        >>  declare string c80
        >>  write string  x
@@ -1559,7 +1559,7 @@ See also the PRINT command, to write output to the terminal.
 READ reads a variable of numeric type (I, R, L) from a character string,
 or expression.
 
-Examples:  
+Examples:
 \begin{verbatim}
        >>  read
        Variable name?  azimuth
@@ -1602,14 +1602,14 @@ terminal you can call this ``subcommand" from within another command file AND
 supply values, so that no terminal input is then necessary.
 
 see also the READ command to read from an internal character string.
-        
+
 \subsection{Command symbol assignment (:=)}\index{:=}\index{assignment!symbol}
 
 This command lets you define a command symbol, of the same form as an inbuilt
 SPECX command, and to set it equal to a (max 64) character string of SPECX
 commands. Once declared the symbol is parsed in the same way as any other SPECX
 command (\ie minimum matched)\index{minimum matching!of symbols}, and the
-equivalence string substituted. 
+equivalence string substituted.
 
 Like the = command, the := command is actually a full SCL command, with two
 parameters:
@@ -1619,9 +1619,9 @@ parameters:
 \end{description}
 The preparser\index{preparser!SCL} also recognizes the forms ``symbol :=
 string" and ``symbol:=string" and reorganizes them to standard form before
-passing them on. Thus: 
+passing them on. Thus:
 
-Examples:   
+Examples:
 \begin{verbatim}
        >>  := new-command string...
        >>  :=new-command string...
@@ -1633,7 +1633,7 @@ Examples:
 \subsection{SHOW-SYMBOLS}\index{SHOW-SYMBOLS}
 
 This replaces the previous .SS\index{.SS} command of V5.4\index{SPECX!V5.4}.
-It has one argument: 
+It has one argument:
 \begin{description}
 \item  {Symbol name?}   (string)
 \end{description}
@@ -1641,7 +1641,7 @@ If \verb+<string>+ is null, then all currently defined symbols will be printed,
 together with their translation; otherwise only those symbols which have
 a match with \verb+<string>+ will be printed.
 
-Examples:  
+Examples:
 \begin{verbatim}
     >> show-symb \\
     >> show-symb ln03
@@ -1651,7 +1651,7 @@ Examples:
 
 Within a command file, lines beginning with * or with ! are treated as
 comments. These characters are ONLY interpreted as comment introducers if they
-are the first character on the line. Note that comments which echo to the 
+are the first character on the line. Note that comments which echo to the
 terminal have been removed --- use PRINT 'string' for this purpose.
 
 \chapter{SPECX Reduction Commands}
@@ -1698,14 +1698,14 @@ the input string are listed.
 
 Notifications of recent changes are held in the news\index{News} file. This
 also uses the VMS help\index{Help!VMS} facility, with topics including a date
-for ready identification. Use SHOW-NEWS to enter this facility. 
+for ready identification. Use SHOW-NEWS to enter this facility.
 
 PAUSE has been most useful in command files. It allows you to suspend execution
 of a command file, while you assess whether you wish to continue. The current
 command file can be abandoned by answering ``N" to the prompt, or indeed by
 typing \verb+^C+ to get you back to command level. With the advent of the ASK
 and IF/ELSEIF/ENDIF commands however there is much less call for this command
---- in the current argot, its use is ``deprecated''. 
+--- in the current argot, its use is ``deprecated''.
 
 By turning on \index{Journal file}journalling, using the SET-JOURNAL command,
 SPECX can be persuaded to write each input line received from the terminal
@@ -1724,7 +1724,7 @@ on its type and length is also printed.
 
 EXIT allows you to quit the program tidily, and writes the final dump file. If
 you don't want the dump then you can always \verb+^C+ or \verb+^Y+ out of the
-program. 
+program.
 
 \subsection{User supplied subroutines}\index{user routines}
 
@@ -1770,12 +1770,12 @@ C   This routine is just to demonstrate the form
 Any user input required by the subroutine should be obtained by using the
 rout\-ines GEN\_GETtna\index{GEN\_GETtna -- i/o routines} (where t is the type I
 or R, n is the number of bytes per word, 4 or 8, and a is equal to A for input
-of arrays). 
+of arrays).
 
 Use of the routines is facilitated by defining a commands symbol with an
 informative name so that information is available through the SHOW-COMMANDS facility.
 For example, if the purpose of your subroutine is to do some fancy filtering
-you might define a symbol FANCY-FILTER-SPECTRUM, which contains a single 
+you might define a symbol FANCY-FILTER-SPECTRUM, which contains a single
 command, EXTERNAL-1.
 
 For further information on external commands, and on how to link and run your
@@ -1799,14 +1799,14 @@ the top-level which alters the contents of either FLAGS\index{FLAGS} for
 STACKCOMM\index{STACKCOMM.INC}; by using DUMP explicitly however the environment
 can be saved on a special file, either as protection against a crash, or for
 later use (via the RESTORE command). Automatic dumping (after each top-level
-command) is controlled by the SET-DUMP command. 
+command) is controlled by the SET-DUMP command.
 
 \subsection{File system}
 
 Once you are inside the program you will need to get at some data. How you
 do this depends on the sort of data it is. For data direct from the JCMT,
 which is stored in GSD (Global Section Datafile) format, you can use the
--GSD- commands. 
+-GSD- commands.
 
 \index{SET-GSD-FILENAME}\index{INDEX-GSD-FILES}\index{READ-GSD-DATA}
 \index{READ-GSD-MAP}
@@ -1820,7 +1820,7 @@ READ-GSD-MAP           & Read all spectra from a GSD file to a map\\
 GSD filenames have the form \verb+<prefix>_<nnnn>.DAT+, where the
 prefix is currently ``OBS\_\verb+<+be\verb+>+"  (\verb+<be>+ is one of
 `UKT14', `AOSC', `RXA', `RXC' \etc), and nnnn is the scan number.
-SET-GSD-FILENAME allows you to change the prefix from the default. 
+SET-GSD-FILENAME allows you to change the prefix from the default.
 
 Since GSD files may contain any number of observations of
 different points, you may be asked which one you require. In order to get a
@@ -1828,7 +1828,7 @@ better idea in advance of what each GSD file holds you can get a quick summary
 by using INDEX-GSD-FILES. This is most useful if you first change the list file
 to the printer (using SET-LIST-FILE) so that you have a hardcopy record.
 
-You may also read data directly from GSD files into a SPECX map - see the 
+You may also read data directly from GSD files into a SPECX map - see the
 section on creating maps for more details.
 
 If you are {\em not} accessing JCMT data, then you will first have to translate
@@ -1880,10 +1880,10 @@ This system, although it may appear cumbersome, is actually very flexible.
 Usually, there will be at most one file open with each of R and W access, and
 this will then appear as the default, but equally, for example, it
 is possible to have all eight files open for READ and to read from them in turn,
-writing back to any file which has WRITE access. 
+writing back to any file which has WRITE access.
 
 To check which file is intended for a read or write operation, SPECX uses a
-single routine, which therefore always supplies the same prompt: 
+single routine, which therefore always supplies the same prompt:
 \begin{verbatim}
     File number?
 \end{verbatim}
@@ -1903,7 +1903,7 @@ file or the same one using WRITE-SPECTRUM. (Data can also be written to an
 ASCII file for plotting by MONGO\index{MONGO} or whatever using
 WRITE-ASCII-SPECTRUM --- see next section for further details).
 
-REWRITE-SPECTRUM allows you to put a scan back in the same position in a 
+REWRITE-SPECTRUM allows you to put a scan back in the same position in a
 SPECX file that it came from (WRITE-SPECTRUM always adds a new one at the end).
 However it won't work if you have extended the spectrum beyond the room occupied
 by the original scan.
@@ -1922,7 +1922,7 @@ number positive again. RECOVER-FILE does this for all deleted spectra in the
 file. It follows that DELETE-SPECTRUM does not free any space, and if you are
 really sure that you want to get rid of the spectra then you can COMPRESS the
 file, which removes the deleted spectra irretrievably (honestly, then they are
-{\em gone}). 
+{\em gone}).
 
 \subsection{Data export}
 
@@ -1948,7 +1948,7 @@ or not --- if the latter you can set the blocking factor as required, and
 also choose whether the new file will be placed at the beginning of the tape,
 or appended to it. Use WRITE-FITS to write the (single) spectrum or map to disk
 or tape, and CLOSE-FITS either to close the disk file or to write a double tape
-mark to the tape. 
+mark to the tape.
 
 \subsection{Data import}
 
@@ -1979,7 +1979,7 @@ SPECX contains a vast array of flags, variables and default values. The first
 time you use the program you don't want to have to set all of these up, and
 so they have been assigned standard default values, most of which will work
 after a fashion for nearly all data. As you use the program these flags and
-defaults will change - either because you use one of the SET commands to 
+defaults will change - either because you use one of the SET commands to
 change them directly, or because when you enter a value in response to a
 prompt it then becomes the new default.
 
@@ -2006,7 +2006,7 @@ CLEAR-STACK            & Initialize stack registers to all empty\\
 ROLL-STACK             & Y$\rightarrow$X, X$\rightarrow$T etc\\
 PUSH-STACK-UP          & X$\rightarrow$X,Y, Y$\rightarrow$Z, etc\\
 POP-STACK-DOWN         & \parbox[t]{4.5in}{
-                         Pop stack down (T$\rightarrow$T-1, Z$\rightarrow$Y, 
+                         Pop stack down (T$\rightarrow$T-1, Z$\rightarrow$Y,
                          Y$\rightarrow$X)}\\
 XY-INTERCHANGE         & Swap X and Y register contents\\
 SHOW-STACK             & Show contents of current stack registers\\
@@ -2021,14 +2021,14 @@ calculator\index{calculator!HP-45}. Reading a spectrum automatically causes
 the stack\index{stack} to be pushed to create space for it. The stack can be
 moved up or down using PUSH or POP. ROLL first POPs, then puts the previous
 current scan into the top-of-stack position. XY interchanges the bottom (\ie
-two most recently read) spectra. 
+two most recently read) spectra.
 
 It may be helpful to find out how many stack positions are currently in use,
 and what's in them. This may be determined using SHOW-STACK, which uses
 Hewlett-Packard notation for the stack positions, i.e. X
 \index{X (stack register)},
 Y\index{Y (stack register)}
-and Z\index{Z (stack register)} 
+and Z\index{Z (stack register)}
 for the first (bottom) three positions, T\index{T (stack register)} for the last
 (top) position, and 4 thru n-1 for intermediate positions if any. If you want
 to alter the length or number of stack registers, use SET-STACK. Note that the
@@ -2036,13 +2036,13 @@ length of stack registers\index{stack registers, length} need not be the same
 as the data length - equal to or greater is fine, although for the fixed amount
 of memory allocated to the stack at present you get more possible stack
 positions if you make them shorter. The stack can be ``zeroed" or cleared
-(reset to empty) using CLEAR-STACK. 
+(reset to empty) using CLEAR-STACK.
 
 As well as the stack registers 5 other storage registers\index{registers,
 storage: see Storage registers} are available, and are accessed with the STORE-SPECTRUM and
 RECALL-SPECTRUM commands. Note that the storage register 5 is sometimes used by
 the rest of the program as a buffer for reduction operations, and so must be
-regarded as volatile memory. 
+regarded as volatile memory.
 
 \subsection{Scan arithmetic}
 
@@ -2064,7 +2064,7 @@ The commands MULTIPLY-SPECTRUM and DIVIDE-SPECTRUM operate on the current
 spectrum with a scalar. OFFSET-SPECTRUM adds a scalar quantity to all
 data elements in the spectrum.
 
-ADD-SPECTRA adds the current spectrum to the one above it in the stack, 
+ADD-SPECTRA adds the current spectrum to the one above it in the stack,
 while SUBTRACT-SPECTRUM subtracts it from the one above it. AVERAGE-SPECTRUM
 averages the two spectra with weights defined by their integration times
 and system noise temperatures. FORM-QUOTIENT-SPECTRUM can be used to
@@ -2111,12 +2111,12 @@ FIND-ZENITH-DISTANCE evaluates the zenith distance\index{zenith distance
 resets the value in the header in cases where the latter is in error. As for
 evaluating the LSR velocity\index{velocity!LSR}, the telescope
 site\index{telescope site} must be defined for this to
-work --- use SET-SITE-PARAMETERS. 
+work --- use SET-SITE-PARAMETERS.
 
 The current spectrum header can be printed on the current list device
-(the terminal or printer, depending on what is set up by SET-LIST-FILE) 
-using PRINT-SPECTRUM-HEADER, while the data values can be listed 
-using LIST-SPECTRUM. 
+(the terminal or printer, depending on what is set up by SET-LIST-FILE)
+using PRINT-SPECTRUM-HEADER, while the data values can be listed
+using LIST-SPECTRUM.
 
 \subsection{Plotting data}
 
@@ -2149,7 +2149,7 @@ printer}
 MONGO\index{MONGO} plotting routines, although it may be necessary at some
 stage to changeover to a more GKS-friendly\index{GKS} package such as
 PGPLOT\index{PGPLOT}. In order to use the plotting facilities to the full, it
-is necessary to understand how (1-D) plotting works. 
+is necessary to understand how (1-D) plotting works.
 
 SPECX uses an intermediary plot file\index{files!plot}, which contains all the
 information that finally appears on your screen. It is not necessary to know
@@ -2214,7 +2214,7 @@ and the overlaid gaussian with a weight of 1.
 \end{center}
 \end{figure}
 as with NEW-PLOT the plot-so-far is automatically displayed on a
-terminal device, but held over for later on a hardcopy device. 
+terminal device, but held over for later on a hardcopy device.
 
 If you want to make a plot come out on a hardcopy\index{hardcopy} unit, then
 you can close the plot file explicitly, using CLOSE-PLOT, or it can be closed
@@ -2222,10 +2222,10 @@ implicitly as when a new plot is begun or when you exit from SPECX. In either
 case, if the originally nominated plot device is capable of producing hardcopy,
 the hardcopy output is produced at this time (terminal output is just discarded
 when the file is closed implicitly). Alternatively the plot-so-far can be
-printed on a hardcopy device, without closing the plot file, using SEE-PLOT. 
+printed on a hardcopy device, without closing the plot file, using SEE-PLOT.
 
 The size of the plot\index{plot!size}
-is set up using SET-PLOT-SIZE in all cases (use sizes of zero to get 
+is set up using SET-PLOT-SIZE in all cases (use sizes of zero to get
 defaults which use all of the available plot area), while the plot scales
 \index{plot axes!to set scales}
 are set up by SET-PLOT-SCALES --- these may be set to explicit limits or the
@@ -2233,7 +2233,7 @@ program can select appropriate limits automatically. Minor details which you
 probably won't want to change often are set in SET-PLOT-PARAMETERS.
 Both X and Y-axis labels may be altered directly by setting the variables
 \verb+X_NAME+, \verb+X_UNITS+, \verb+Y_NAME+ and \verb+Y_UNITS+ to the chosen
-(character) value. 
+(character) value.
 \index{X_NAME@\verb+X_NAME+}\index{X_UNITS@\verb+X_UNITS+}
 \index{Y_NAME@\verb+Y_NAME+}\index{Y_UNITS@\verb+Y_UNITS+}
 
@@ -2249,12 +2249,12 @@ job\index{plot!batch job} to be submitted to rasterize the plot - the batch
 queue has lower priority than the on-line task, so the plot may take some time
 to materialize. If you use SEE-PLOT to produce hard-copy then the
 rasterizer\index{plot!rasterizer} runs on-line, and you have to wait for it to
-finish before you can continue working. 
+finish before you can continue working.
 
 A null device\index{plot!to null device} is defined to let you accumulate a
 plot file (i.e. the results of a NEW-PLOT and several OVERLAY-SPECTRUMs) without
 having the intermediate product displayed - just use SEE-PLOT to look at it
-when you want to. 
+when you want to.
 
 For plotting on the graphics terminals both alpha and graphics screens are used
 simultaneously.\index{graphics terminal!alpha screen} \index{graphics
@@ -2267,7 +2267,7 @@ co-ordinates of the cross-hair at that time. At all times when a plot is
 displayed in this way it is possible to rescale the plot interactively, or to
 measure positions on the screen. Other options are possible, depending on the
 command - FIT-POLYNOMIAL-BASELINE for example requires input of a number of
-regions within which the baseline is to be fitted. 
+regions within which the baseline is to be fitted.
 
 Whenever the graphics cross-hair is displayed, typing `H' will cause a list of
 all valid keys \index{graphics menu!valid keys} and their meanings to be
@@ -2280,7 +2280,7 @@ When you are satisfied with the limits you can pass them to the computer, using
 one of the other keys as appropriate. You can hit any of the L, R, T or B keys
 more than once - the new value simply replaces the old one. To see the current
 box hit the D key, and it will be displayed. On Pericom type terminals, the old
-box will be erased and a new one drawn each time you type D. 
+box will be erased and a new one drawn each time you type D.
 
 Interactive specification of baseline regions\index{baseline fitting and
 removal!regions specified interactively}
@@ -2298,7 +2298,7 @@ the Accept (A) key. In either case, the finally selected baseline region will
 be marked by a {\em solid} box, and the next default box \index{default box}
 \index{box!default} displayed (if it exists). If you accept the maximum number
 of baseline regions you automatically exit the plot, and continue with the
-command --- otherwise you need to hit `E' or `Q' to exit, as per usual. 
+command --- otherwise you need to hit `E' or `Q' to exit, as per usual.
 
 \index{graphics menu!1-D}
 \begin{table}[htbp]
@@ -2332,7 +2332,7 @@ You can actually edit whole sections of the current spectrum\index{editing!the
 spectrum} using the graphics crosshair to mark out straight line sections of
 the spectrum. Use the `+' character to mark vertices of the new spectrum, and
 the data in the stack will be amended to fit the straight line segments between
-successive `+' marks\index{+}. This facility is invoked using DRAW-PLOT. 
+successive `+' marks\index{+}. This facility is invoked using DRAW-PLOT.
 
 \subsection{Frequency parameters}
 
@@ -2354,21 +2354,21 @@ SHOW-X-SCALE            & Show limits and units of X-axis scale\\
 In all cases where it is relevant the choice of units for the X-axis is
 \index{X-axis (of plot)!units} \index{scales!velocity} \index{scales!channels}
 \index{scales!frequency} governed by responses to SET-X-SCALE. This allows the
-use of numbered points, frequency or velocity, or of arbitrary units. 
+use of numbered points, frequency or velocity, or of arbitrary units.
 
 Both frequency and velocity can be plotted in any one of four frames of
 reference, using either the so-called ``radio'' or ``optical'' velocity laws
 or a full relativistic velocity law (which, however, does not take into account
 the possible effect of the transverse velocity of the source). The default
 frame for display of frequencies or velocities is the one in which the data
-were observed. Note, however, that the frequency offset applied when the 
+were observed. Note, however, that the frequency offset applied when the
 observation is made allows for both the motion of the reference frame with
 respect to the telescope, and for the additional velocity of the source with
 respect to the selected frame. For display purposes the only correction made
 is to the {\em reference frame}, so that frequency scales would be as measured
 with a frequency counter by an observer at rest in the frame, while velocities
 are those that she would deduce by applying the appropriate form of doppler
-correction. 
+correction.
 
 The reference frames and velocity scaling laws supported within SPECX are
 as listed below:
@@ -2422,14 +2422,14 @@ velocity with respect to that frame. Thus data observed using the radio
 definition of velocity, with a known $v_{lsr}$, frequency in the source rest
 frame, can be displayed by selecting the LSR frame but with velocity offset
 $v_{off}=v_{lsr}$. Similarly, in this new frame velocities will those as
-deduced by an observer at rest with respect to the source. 
+deduced by an observer at rest with respect to the source.
 
 As the exact frequency or velocity in various reference frames is dependent on
 the lsr velocity at the time of observation it is necessary for the program to
 know the line rest frequency for some of the options. SPECX assumes that the
 line rest frequency is the same as given in the scan header, but
 the default can be changed by using SET-LINE-REST-FREQ(uencies). The current
-x-axis scaling and range may be shown by SHOW-X-SCALE. 
+x-axis scaling and range may be shown by SHOW-X-SCALE.
 
 For display in most frames (other than the observed one) SPECX must be able to
 work out the velocity of the telescope with respect to the astronomical
@@ -2446,7 +2446,7 @@ Since most binary operations (ADD-SPECTRA, AVERAGE \etc) are performed on a
 \index{binary operations on spectra!channel by channel} channel-by-channel
 basis, it is sometimes necessary to resample one spectrum \index{resample
 spectrum!see REGRID-SPECTRUM} onto the frequency or velocity sampling of
-another. Use REGRID-SPECTRUM. 
+another. Use REGRID-SPECTRUM.
 
 The spectrum can be shifted in x using SHIFT-SPECTRUM (useful for bringing a
 line into the centre channel for example). SHIFT-SPECTRUM changes the vlsr of
@@ -2455,7 +2455,7 @@ velocity, although it will move within the total ``passband" or spectrum. In
 order to correct mistakes in the data file etc it is necessary to change the
 observing frequency or the vlsr (using VLSR \index{VLSR@\verb+VLSR+}= nn.mm for example).
 Sometimes it may be necessary to do both to average together data
-\index{averaging spectra!different sampling} taken at different times. 
+\index{averaging spectra!different sampling} taken at different times.
 
 An experimental facility is provided to let you change the header parameters to
 give appropriate scaling for a line appearing in the image sideband.
@@ -2473,7 +2473,7 @@ will be indicated at the top of the box.\index{image sideband!to plot}
 \index{frequency scale!polynomial correction to}
 From V6.1 onwards, the frequency algorithm includes a polynomial correction to
 the frequency scale. This is provided in case the supplied data is not on a
-regular grid --- as may be the case for an AOS for example. You turn the 
+regular grid --- as may be the case for an AOS for example. You turn the
 polynomial correction on and off in SET-X-SCALES; the actual coefficients ---
 up to 6 for a 5th order polynomial --- are entered directly into the array
 \verb+FRQCOEFF+\index{FRQCOEFF@\verb+FRQCOEFF+} and can also be turned on and off by
@@ -2505,7 +2505,7 @@ observing simultaneously with two or more different spectral resolutions.
 describe this system --- at NRAO Kitt Peak they refer to different `Receivers',
 \index{Receivers!12-metre terminology} while historically the different channels of an
 autocorrelation backend have generally been referred to as `Quadrants' or
-`Sectors'. We use `quadrants' here to describe the general case. 
+`Sectors'. We use `quadrants' here to describe the general case.
 
 SET-QUADRANT-DISPLAY allows you to control which quadrants are displayed by
 commands such as LIST-SPECTRUM, PLOT \etc --- it also controls to some degree
@@ -2513,7 +2513,7 @@ which quadrants are affected by various reduction operations
 such as baseline fitting. Enter a 0 in a particular position to turn that
 quadrant off --- otherwise a 1 to leave it activated for processing. The current
 quadrant masking function\index{quadrant masking function} can be determined by
-typing SET-QUADRANT-DISPLAY, and then accepting the default again. 
+typing SET-QUADRANT-DISPLAY, and then accepting the default again.
 
 \index{quadrants!extracting one from many} A single quadrant may be extracted
 from a multi-quadrant spectrum by the command EXTRACT-QUADRANT. This replaces
@@ -2524,15 +2524,15 @@ and removal!one quadrant at at time}
 SPECX requires that only a single quadrant be reduced
 at a time. The program attempts to deduce which quadrant is required from the
 masking function and the information in the spectrum header, according to the
-following rules. 
+following rules.
 \begin{itemize}
 \item If there are {\em no} unmasked quadrants, and the spectrum header does
 not indicate a preferred or `centre' channel (IQCEN=0) \index{IQCEN@\verb+IQCEN+} then
-either no action takes place or a prompt requesting clarification appears. 
+either no action takes place or a prompt requesting clarification appears.
 \item If there are {\em no} unmasked quadrants, but the spectrum header
 indicates that one quadrant is the 'centre' quadrant (IQCEN.NE.0), then that
-quadrant is selected. 
-\item If there is only {\em one} unmasked quadrant then that quadrant is 
+quadrant is selected.
+\item If there is only {\em one} unmasked quadrant then that quadrant is
 {\em always} selected.
 \item If there are more than one unmasked quadrants, then all are processed if
 possible. If a single quadrant is required for baseline fitting etc then
@@ -2591,9 +2591,9 @@ symmetrically about the centre channel if possible. For deconvolution
 \index{differentiation} of moon \index{Moon} observations \etc
 DIFFERENTIATE-SPECTRUM is provided. FOLD-SPECTRUM extracts the symmetric part
 \index{symmetric part (of spectrum)!see FOLD-SPECTRUM}of the spectrum (about
-the centre channel). 
+the centre channel).
 
-All operations may be performed in the Fourier Transform \index{Fourier 
+All operations may be performed in the Fourier Transform \index{Fourier
 Transform!of spectrum} domain using
 FOURIER-TRANSFORM for both forward and reverse transforms. Note that this is a
 direct discrete transform, so that spectra of an arbitrary length can be
@@ -2602,7 +2602,7 @@ spectrum can be calculated using FOURIER-POWER-SPECTRUM. \index{Fourier power
 spectrum!of spectrum} This displays the squared modulus of the Fourier
 transform, with the magnitude plotted on arbitrary log scales. This is useful
 for checking the noise level before applying a Fourier or Wiener filter, for
-\index{filter!Fourier} \index{filter!Wiener} example. 
+\index{filter!Fourier} \index{filter!Wiener} example.
 
 \subsection{Editing data} \index{editing!data}
 
@@ -2629,7 +2629,7 @@ FITS\index{FITS} data files, for example, to prevent loss of precision.
 
 The x-extent of the spectrum may be modified by a number of commands.
 TRUNCATE-SPECTRUM drops channels symmetrically from both ends of the spectrum,
-while DROP-CHANNELS truncates asymmetrically. 
+while DROP-CHANNELS truncates asymmetrically.
 INVERT-SPECTRUM swaps the data array end-for-end in physical storage, to allow
 multi-scan arithmetic operations (commands like ADD-SPECTRA and AVERAGE operate
 \index{ADD-SPECTRA} \index{AVERAGE-SPECTRA}
@@ -2645,10 +2645,10 @@ value!see magic value} Data points set to this value are ignored in all
 applications -- they are not visible on plots, and are not used in spectral
 reduction operations. Where they would otherwise prevent operations, such as
 addition of two spectra, affected channels in the result are also set to the
-magic value. 
+magic value.
 
 \subsection{Baseline fitting and removal}
-\index{baseline!removal} \index{baseline!fitting} \index{gaussian fitting 
+\index{baseline!removal} \index{baseline!fitting} \index{gaussian fitting
 \etc}
 
 \index{REMOVE-LINEAR-BASELINE}\index{FIT-POLYNOMIAL-BASELINE}
@@ -2676,7 +2676,7 @@ is a horrible routine for fitting \index{least-squares fitting!polynomial +
 harmonic sinusoids} a sum of a polynomial and harmonic sinusoids (including the
 fundamental frequency if desired). The number of iterations, tolerance, and
 amount of output for these last two commands is determined by SET-BASELINE-FIT.
-\index{SET-BASELINE-FIT} 
+\index{SET-BASELINE-FIT}
 
 \index{fitting!gaussian}
 Additional facilities are available for investigating gaussian fits.
@@ -2685,7 +2685,7 @@ position in current X-axis units) of up to 10 gaussian profiles into the
 ``current model". This is used as the basis for both gaussian fitting and to
 calculate ``baselines" consisting of the sum of some combination of these
 gaussians. SHOW-GAUSSIAN-MODEL produces a listing of the current gaussian model
-on the current listing file. 
+on the current listing file.
 
 FIT-GAUSSIAN-MODEL \index{least-squares fitting!multiple gaussians}
 accepts up to 8 regions of the X-axis over which to fit
@@ -2693,7 +2693,7 @@ the baseline, updates the model and uses this as the starting point for a
 non-linear least squares fit to the current spectrum in X. If the fitting
 procedure converges within the number of iterations set in SET- BASELINE then
 the stack is pushed to leave the spectrum in Y and the least-squares baseline
-in X - just do SUBTRACT to get the residuals. 
+in X - just do SUBTRACT to get the residuals.
 
 The current gaussian model can be used to manufacture a ``gaussian baseline"
 spectrum at any time using CALCULATE-GAUSSIAN-MODEL. This pushes the stack, and
@@ -2702,14 +2702,14 @@ The prompts let you select which lines in the current model are to be used for
 the calculation. You can give either a range (e.g. 5,8 implies lines 5 to 8
 inclusively) or a single line. Regions are added to the ``baseline" until you
 exit the routine by using \verb+^Z+ or CTRL(Z) \index{CTRL(Z)} in response to
-the prompt. 
+the prompt.
 
 If the current plot device is a graphics terminal the regions for fitting
 baselines are determined by cursor \index{graphics!cursor input} input.
 Up to ten regions can usually be selected, so that lines or other features are
 excluded if so desired. If the plot device is not a graphics terminal the
 baseline regions are input one (a region is defined by two values) at a time,
-using \verb+^Z+ to terminate the list. 
+using \verb+^Z+ to terminate the list.
 
 A baseline may also be drawn on the graphics terminal, using DRAW-PLOT.
 This replaces the current spectrum with the straight-line segments joining
@@ -2732,11 +2732,11 @@ line maps are often only sparsely sampled, the data are stored sequentially in
 the order they are added to the map, with an index block \index{index
 block!map} to describe where in the file the data for each map point are to be
 found. This index block is consulted whenever a spectrum is taken from the
-mapfile, and modified whenever a spectrum is added or deleted. 
+mapfile, and modified whenever a spectrum is added or deleted.
 
 Given that there is only one header, it follows that all points in the map will
 be described as if they have the same integration time, velocity resolution
-etc. 
+etc.
 
 In order to obtain faster access to the data, SPECX also maintains a temporary
 form of the map whenever a map file is opened. This is a 3-D array, known as
@@ -2749,7 +2749,7 @@ whether or not certain areas of the map are contoured. SPECX is full of tricky
 stuff to maintain the mapfile in parallel with the cube - thus once the cube is
 loaded i/o is confined to modifying small parts of the map file in response to
 the various operations on the map itself. Interpolated data are never stored in
-the map file, but can be obtained relatively quickly on demand. 
+the map file, but can be obtained relatively quickly on demand.
 
 \subsubsection {Creating and maintaining the map file}
 
@@ -2788,7 +2788,7 @@ sufficiently close to one of the (regularly-sampled) map grid points, and if
 there is not a spectrum there already - use SET-MAP-ACCEPT to modify this
 behaviour. Retrieval of a single spectrum from the file, for inspection or
 modification, is by means of GET-SPECTRUM-FROM-MAP. An unwanted or incorrect
-spectrum can be removed using DELETE-FROM-MAP. 
+spectrum can be removed using DELETE-FROM-MAP.
 
 The map file, and hence data cube, may use spatial coordinates rotated with
 respect to RA and Dec axes, \index{map!rotated coordinates} to suit maps taken
@@ -2797,7 +2797,7 @@ need not equal that of the data being read in though, although it is generally
 more satisfactory if it does. The position angle (P.A.) \index{map!position
 angle} of the map file is specified when the map is opened. Use ROTATE-MAP to
 get SPECX to interpolate from the P.A. of the map file to some other P.A. prior
-to plotting. 
+to plotting.
 
 The contents of a map may be listed using LIST-MAP. At present the map may
 contain a maximum of 4096 spectra, \index{map!maximum 4096 spectra} although
@@ -2805,7 +2805,7 @@ this is set by the size of the array INDEX declared in various of the mapping
 routines, and not by anything intrinsic to the file structure. (This is a way
 of saying that the size limit can be increased easily if there is any pressure
 from users for me to do so, but remember that 4096 spectra of even only 64
-points each takes up quite a lot of memory...) 
+points each takes up quite a lot of memory...)
 
 If the map file is declared to have sampling closer than that of the data, then
 the ``unsampled" points can be deduced from the known ones using a gaussian
@@ -2826,7 +2826,7 @@ also specify a (gaussian) convolving function for the velocity dimension of the
 cube. This convolving function is only applied if velocity is one of the map
 axes, and is applied only after the map has been extracted from the cube. It
 thus provides a method for smoothing the velocity dimension of a
-position-velocity diagram. 
+position-velocity diagram.
 
 Loading the data cube from the map file can be quite tedious, \index{data cube!
 loading is slow} so you don't want to be opening it unnecessarily. On the other
@@ -2834,7 +2834,7 @@ hand, if the program crashes and you come back in you don't want to have to
 remember that you had the cube all loaded just before. So if a map is already
 open it will be reopened on entry to SPECX or RESTART (unless you use the
 /NOMAP option). \index{/NOMAP} To prevent this happening use CLOSE-MAP, which
-closes the map file and releases the cube. 
+closes the map file and releases the cube.
 
 \subsubsection{Displaying contour maps}
 
@@ -2869,7 +2869,7 @@ data exist in the input map. For contours, this requires that for a given
 vertices. If this condition is not met no contours are plotted in the cell. I
 think this is better than using zeros to fill-in for missing data, as this may
 lead to a spurious boundary to the source. \index{contour plot!no spurious
-boundary} 
+boundary}
 
 Map spatial coordinates can be presented in either relative form, as offsets
 \index{coordinates!absolute}\index{coordinates!relative}
@@ -2923,7 +2923,7 @@ for more fancy plotting. SET-MAP-SCALES should be used both to choose {\em
 which} co-ordinates are plotted, and to set the scales for x and y co-ordinates
 \index{map!scales} and binning in the z-coordinate. \index{map!integration in
 third coord} Cuts in arbitrary spatial directions can made by defining a
-non-zero rotation angle in ROTATE-MAP. 
+non-zero rotation angle in ROTATE-MAP.
 
 The map size \index{map!size} (in mm) must have been defined using SET-MAP-SIZE
 --- use $0 \times 0$ to use the entire available plot area. The contouring is
@@ -2931,13 +2931,13 @@ set using SET-CONTOUR, which allows automatic contouring
 \index{contouring!automatic} if so desired. You can set parameters to control
 whether the sample points are indicated on the map, the level of interpolation
 \index{map!smoothing} applied to the raw map and the line types to use for
-\index{map!line types} various contours, by using SET-MAP-PARAMETERS. 
+\index{map!line types} various contours, by using SET-MAP-PARAMETERS.
 
 The 2-D graphics associated with GREYSCALE and CONTOUR-MAP (and to a lesser
 extent PLOT-LINE PARAMETERS and CHANNEL-MAPS) are very similar in the use of
 the cursor \index{graphics cursor} to those that apply to 1-D
 plotting. Possible menu items are given below --- not all are available for all
-commands: 
+commands:
 
 \begin{table}[htbp]
 \index{graphics menu!2-D}
@@ -2951,7 +2951,7 @@ R &RIGHT &Define the right-hand boundary of the current box\\
 T &TOP &Define the top boundary of the current box\\
 B &BOTTOM &Define the bottom boundary of the current box\\
 D &DRAW &Draw the current box\\
-N & NEWLIM & \parbox[t]{3.7in}{ Redraw the plot taking the current box as new 
+N & NEWLIM & \parbox[t]{3.7in}{ Redraw the plot taking the current box as new
                       limits. Note that if the limits have not been
                       redefined in one co-ordinate then you get back the
                       original limits according to SET-MAP-SCALES} \\
@@ -2984,7 +2984,7 @@ working out positions. \index{editing!spectra in map} Just position the cursor
 at the position with suspect data, type G and then exit the map. Now work on
 the spectrum, which is tagged with the correct position, and when you are happy
 with it, type ADD-TO-MAP, and it will replace the old version. Iterate until
-the map suits you and then quit. 
+the map suits you and then quit.
 
 \index{maps!export of}
 Two commands have been provided to help you export maps to other formats.
@@ -3016,7 +3016,7 @@ ROTATE-MAP              & Regrid cube to new set of spatial axes\\
 In addition to the normal contour maps of a single plane of the cube, there are
 also three other display modes. Spectra at each point can be displayed using
 GRID-SPECTRA (Fig \ref{GRID}) where the area treated in this way is decided
-using SET-MAP-SCALES and SET-MAP-PARAMETERS as before. 
+using SET-MAP-SCALES and SET-MAP-PARAMETERS as before.
 \begin{figure}[htbp]
 %\vspace*{3.0in}
 %\psfig{psfile=grid-spec.ps hoffset=60 hscale=0.65 vscale=0.65}
@@ -3073,9 +3073,9 @@ longitude-velocity diagrams \index{position-velocity diagrams} or whatever.
 Like CONTOUR-MAP, the maps from CHANNEL-MAPS can be rotated with respect to the
 nominal map axes to give cuts along arbitrary spatial directions. The contours
 used are those set by SET-CONTOUR-LEVELS on the last occasion it was used in
-manual (\ie non-automatic) mode. 
+manual (\ie non-automatic) mode.
 
-Where possible, a scale-bar\index{greyscale!scale bar} is presented either 
+Where possible, a scale-bar\index{greyscale!scale bar} is presented either
 above or to the right of a greyscaled plot --- where ever there is most room.
 A scale bar is {\em not} presented however when there are multiple greyscales
 in force on the one picture, as in the output from PLOT-LINE-PAR when more
@@ -3092,7 +3092,7 @@ positions.\index{coordinates!absolute}\index{coordinates!relative}
 
 One argument, which is the command line to be sent direct to VMS/DCL. \index
 {DCL!commands from SPECX} Uses the LIB\$SPAWN \index{LIB\$SPAWN} runtime
-library routine. 
+library routine.
 
 Examples:
 \begin{verbatim}
@@ -3118,8 +3118,8 @@ Examples:
 \subsection{:=} \index{:=} \index{command symbols!to define}
 
 Command symbol definition. Creates the specified command name, and assigns
-it the string value given in response to the second prompt. If the value 
-string is null (' ') then the symbol is deleted. Command names defined 
+it the string value given in response to the second prompt. If the value
+string is null (' ') then the symbol is deleted. Command names defined
 this way are decoded using the same minimum-matching as used to decode the
 built-in commands. Can be redefined without first being deleted.
 
@@ -3168,7 +3168,7 @@ Examples:
 
 Add the two spectra in the stack X \& Y registers together, pop the stack,
 and leave the result in X. Requires that both spectra have the same number
-of quadrants, and the same number of channels in each quadrant. The scan 
+of quadrants, and the same number of channels in each quadrant. The scan
 header of the current spectrum (\ie that in the X-register) is retained,
 and that of the spectrum in the Y-register is lost.
 
@@ -3183,7 +3183,7 @@ Insert the spectrum currently held in the X-register into the open map.
 Evaluates the nominal position by adding the RA and Dec. offsets from the
 map header to the ``map\_centre'' position stored in the header --- then
 determines the offset from the actual center of` the map, and attempts to
-put the spectrum in the pixel nearest to this calculated offset. 
+put the spectrum in the pixel nearest to this calculated offset.
 
 Before inserting the spectrum in the map file, the routine checks that the
 positional discrepancy (in pixels) is less than the maximum ``tolerance''
@@ -3209,7 +3209,7 @@ Examples:
   Total RA, Dec offsets (arcsec):   0.0000000E+00  0.0000000E+00
   Total X, Y offsets (cells):   0.0000000E+00  0.0000000E+00
   Spectrum position is 0.0 arcsec in X and 0.0 arcsec in Y from nearest pixel
-  Spectrum placed in cell (  0.0,  0.0) 
+  Spectrum placed in cell (  0.0,  0.0)
 
 \end{verbatim}
 
@@ -3242,7 +3242,7 @@ Examples:
 \begin{verbatim}
     >> average-spectra <CR>
     Averaging quadrant:            1
-    New effective system temperature:    987.7298    
+    New effective system temperature:    987.7298
     ..
 \end{verbatim}
 
@@ -3254,7 +3254,7 @@ proceeds until too few channels are left for a complete bin. The unused
 channels are abandoned, and the sector centre frequency \etc are modified as
 appropriate. BIN-SPECTRUM is equivalent to a boxcar average over N channels,
 followed by copy of every $N^{th}$ channel into a new spectrum, with resolution
-bandwidth N times that of the original. 
+bandwidth N times that of the original.
 
 Examples:
 \begin{verbatim}
@@ -3291,7 +3291,7 @@ variables NGAUSS and AMP\_WID\_POS.
 
 Relevant flags:\\
 \begin{tabular}{lll}
-  \verb+NGAUSS+          & I4 & Number of gaussian components currently 
+  \verb+NGAUSS+          & I4 & Number of gaussian components currently
                                 defined. \\
   \verb+AMP_WID_POS(30)+ & R4 & \parbox[t]{4in}
                                 {Amplitude, width and position of each
@@ -3340,7 +3340,7 @@ in successive declination strips.
 
 The maps cover intervals of the nominated width, beginning at the left hand end
 of the chosen range. I am not quite sure what happens if the interval and range
-are non-commensurate --- I suspect that only complete channels are plotted. 
+are non-commensurate --- I suspect that only complete channels are plotted.
 
 The contours are determined using SET-CONTOUR-LEVELS in manual mode ---
 it is not simple to autoscale over more than one image, while the use
@@ -3355,7 +3355,7 @@ of position-velocity diagrams however.
 
 The program integrates the intensity over the nominated range of the third
 ``z-axis'' coordinate (most commonly velocity), and if AVERAGE intensity
-over the range is selected then divides by the overall z-axis range to 
+over the range is selected then divides by the overall z-axis range to
 produce an average intensity (otherwise just the integrated total is plotted).
 If smoothing is selected in SET-MAP-PARAMETERS then the data plane is
 interpolated onto a finer sampling before plotting, which yields a more
@@ -3504,7 +3504,7 @@ For plotting to a hardcopy device, this causes the final plot to be sent to
 the device.
 
 CLOSE-PLOT \index{CLOSE-PLOT!implicit in NEW-PLOT} is implicit in a NEW-PLOT,
-whatever the graphics device, and is also called on EXIT from SPECX. 
+whatever the graphics device, and is also called on EXIT from SPECX.
 
 Examples:
 \begin{verbatim}
@@ -3522,10 +3522,10 @@ Examples:
     >> compress-file<CR>
     File number? (^z to list) [1] <CR>
 
-    INDEX LISTING OF FILE : l483small.dat                           
+    INDEX LISTING OF FILE : l483small.dat
 
-    File title : test                                    
-    Owner :      me          
+    File title : test
+    Owner :      me
     No. of scans in file =   4  Max no. =  20
     Last record used =  48
     Date of listing : 26-AUG-90
@@ -3553,14 +3553,14 @@ may not be concatenated if the final spectrum would have either more sectors or
 more data points than the limits (currently 8 sectors and 2048 data points
 total). Logically, the inverse operation of \verb+EXTRACT-QUADRANT+
 \index{EXTRACT-QUADRANT}, in that the spectra so formed can be put back
-together into the original spectrum with this operation. 
+together into the original spectrum with this operation.
 
 \begin{verbatim}
     >> pr-sp
 
     -------------------------------------------------------------------------
-   
-    Scan :  29  Title : 0029.001   W3(H20)   JCMT 
+
+    Scan :  29  Title : 0029.001   W3(H20)   JCMT
     Recorded on 24-JUL-93 at 15:59:09(UT)
 
     -------------------------------------------------------------------------
@@ -3574,7 +3574,7 @@ together into the original spectrum with this operation.
     Data observed using RAD velocity law; Freq's corrected to LSR  ref. frame.
     Master sub-band =  1
     Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
-     1    512    256.5       240.5000      240.3125       -0.313    977.44    
+     1    512    256.5       240.5000      240.3125       -0.313    977.44
 
     -------------------------------------------------------------------------
 
@@ -3585,7 +3585,7 @@ together into the original spectrum with this operation.
 
     -------------------------------------------------------------------------
 
-    Scan :  29  Title : 0029.001   W3(H20)   JCMT 
+    Scan :  29  Title : 0029.001   W3(H20)   JCMT
      Recorded on 24-JUL-93 at 15:59:09(UT)
 
     -------------------------------------------------------------------------
@@ -3599,7 +3599,7 @@ together into the original spectrum with this operation.
     Data observed using RAD velocity law; Freq's corrected to LSR  ref. frame.
     Master sub-band =  1
     Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
-     1    512    256.5       240.5000      240.4375       -0.313    977.44    
+     1    512    256.5       240.5000      240.4375       -0.313    977.44
 
     -------------------------------------------------------------------------
 
@@ -3610,10 +3610,10 @@ together into the original spectrum with this operation.
     >> pr-sp
 
     -------------------------------------------------------------------------
-   
-    Scan :  29  Title : 0029.001   W3(H20)   JCMT 
+
+    Scan :  29  Title : 0029.001   W3(H20)   JCMT
      Recorded on 24-JUL-93 at 15:59:09(UT)
- 
+
     -------------------------------------------------------------------------
 
     Map centre: R.A.  2 23 17.30  Dec.  61 38 58.00
@@ -3625,8 +3625,8 @@ together into the original spectrum with this operation.
     Data observed using RAD velocity law; Freq's corrected to LSR  ref. frame.
     Master sub-band =  1
     Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
-     1    512    256.5       240.5000      240.3125       -0.313    977.44    
-     2    512    768.5       240.5000      240.4375       -0.313    977.44    
+     1    512    256.5       240.5000      240.3125       -0.313    977.44
+     2    512    768.5       240.5000      240.4375       -0.313    977.44
 
     -------------------------------------------------------------------------
 \end{verbatim}
@@ -3635,15 +3635,15 @@ together into the original spectrum with this operation.
 
 Make a plot of any slice \index{slice, of data cube} of the spectral data cube.
 Select the plot axes using SET-MAP-SCALES, while various other features can be
-turned on or off using SET-MAP-PARAMETERS. 
+turned on or off using SET-MAP-PARAMETERS.
 
 The program integrates the intensity over the nominated range of the third
 ``z-axis'' coordinate (most commonly velocity), and if AVERAGE intensity
-over the range is selected, then divides by the overall z-axis range to 
+over the range is selected, then divides by the overall z-axis range to
 produce an average intensity (otherwise just the integrated total is plotted).
 If smoothing is selected in SET-MAP-PARAMETERS then the data plane is
 interpolated \index{interpolation!map} onto a finer sampling before plotting,
-which yields a more aesthetically pleasing image. 
+which yields a more aesthetically pleasing image.
 
 If zero sizes are selected in SET-MAP-SIZE then the routine uses the
 available graphics area to its fullest; if zero limits are selected in
@@ -3689,7 +3689,7 @@ Examples:
 
 Convolve the current X-register spectrum with a truncated gaussian of
 specified width and cutoff level. Points at the ends of the spectrum,
-for which the convolution is not defined, are deleted, and the 
+for which the convolution is not defined, are deleted, and the
 header information modified accordingly.
 
 Examples:
@@ -3709,8 +3709,8 @@ Examples:
 {\caption[CONVOLVE]
 {\sl
 CONVOLVE-SPECTRUM: The spectrum at top has been convolved with a gaussian
-of width $3\kms$, cut off at the 20\% level. Channels at the end of the 
-plot have been convolved with a truncated (asymmetric) version of the 
+of width $3\kms$, cut off at the 20\% level. Channels at the end of the
+plot have been convolved with a truncated (asymmetric) version of the
 nominal convolving function.
 \label{CONVOLVE}
 }
@@ -3722,7 +3722,7 @@ nominal convolving function.
 
 Create a SCL variable, of the nominated type (Logical, L4; Integer, I4;
 Real, R4; double precision, R8; or string, Cnnn [nnn is the length in characters
-of the string variable]). The variable may 
+of the string variable]). The variable may
 optionally be a one-dimensional array, with length as indicated by a
 bracketed length after the variable name.
 
@@ -3754,8 +3754,8 @@ Examples:
 
 Most useful when constructing plots with more than one spectrum. After using
 NEW-PLOT to define the first spectrum, and axes, subsequent spectra can be
-added on the same axes using OVERLAY-SPECTRUM. Any spectrum, including the 
-first, can be removed using DELETE-LAST-PLOT, which gives you a way to 
+added on the same axes using OVERLAY-SPECTRUM. Any spectrum, including the
+first, can be removed using DELETE-LAST-PLOT, which gives you a way to
 recover should the wrong spectrum inadvertently be added to the plot file.
 
 Examples:
@@ -3835,7 +3835,7 @@ to +1 if N2 is greater than N1, and to -1 if N2 is less than N1.
 
 At the top level (\ie the terminal), the format is slightly different, in
 that after specifying the DO range you are put into INSERT mode, whereupon
-you enter the sequence of command lines you wish to see iterated. Use 
+you enter the sequence of command lines you wish to see iterated. Use
 CTRL(Z) to exit this mode --- the file thus generated is then executed as
 a script.
 Since there is no syntax checking at INSERT time,
@@ -3879,7 +3879,7 @@ you hit the `+' key again the straight line segment between the last two
 positions is plotted on the terminal, {\em and} substituted for the data
 in the X-register. Hit the `E' or `Q' keys to stop, in the usual way.
 
-Clearly only applicable when the plot device is the terminal and 
+Clearly only applicable when the plot device is the terminal and
 INTERACTIVE is set true (\ie INTERACTIVE mode is selected).
 
 Examples:
@@ -3908,7 +3908,7 @@ using the cursor; the outer parts of the spectrum are unchanged.
 Delete channels from both ends of the spectrum. May be useful, for example,
 before adding long AOS spectra to a map file, when only a small velocity
 range in the middle is of interest, as the savings in memory requirements
-may be important. Can also be used to eliminate junk channels 
+may be important. Can also be used to eliminate junk channels
 \index{eliminating junk channels} from the end
 of an autocorrelation spectrum. The scan header is modified to reflect
 the change in number of channels and the center frequency.
@@ -3946,7 +3946,7 @@ in memory, in the data stack \index{stack!saved by DUMP} and storage registers.
 \index{storage registers!saved by DUMP} These two data sets together constitute
 the {\em environment}. \index{environment} A particular environment may take
 some time to develop for a particular application, and it would be a shame to
-lose it each time you exit the program, either willingly or inadvertently. 
+lose it each time you exit the program, either willingly or inadvertently.
 
 DUMP thus saves the current environment \index{environment!saving the} to the
 nominated file. Useful if you are using SPECX for analysis of several different
@@ -3954,13 +3954,13 @@ data sets, and want to switch between two different setups; also useful if you
 do not have the automatic dumping facility turned on with SET-DUMP, and you
 want to protect yourself against losing everything in a crash (not that the
 program crashes any more!) Use RESTORE to recover an old environment from a
-dump file. 
+dump file.
 
 Examples:
 \begin{verbatim}
     >> dump<CR>
     Dump file name? [SPECX_DUMP] specx.dmp<CR>
-    Common blocks dumped onto: specx.dmp           
+    Common blocks dumped onto: specx.dmp
 \end{verbatim}
 
 \subsection{EDIT-FILE-HEADER} \index{EDIT-FILE-HEADER}
@@ -3968,7 +3968,7 @@ Examples:
 Not really a very important function. Just lets you change the name and
 file owner of a standard SPECX-format data file, \index{data files!owner}
 but since these are purely informative, and are not
-used by the operating system, there is rarely any urgency to correct them. 
+used by the operating system, there is rarely any urgency to correct them.
 
 Examples:
 \begin{verbatim}
@@ -3998,11 +3998,11 @@ Relevant flags:\\
 Examples:
 \begin{verbatim}
     >> enter-gaussian-model<CR>
- 
+
     Estimates of Amp.,Width(FWHM) and Pos'n for each line
     Line at a time, CTRL(Z) to finish
 
-    Current units are km/s  
+    Current units are km/s
 
     Line  1: 10 5 0.0<CR>
     Line  2: 5 3 15.7<CR>
@@ -4065,7 +4065,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+N_INTS+   & I4 & Number of intervals to use for analysis.\\
   \verb+BLF_INTS+ & R4 & \parbox[t]{4in}
-                          {Pairs of channels defining spectral intervals to 
+                          {Pairs of channels defining spectral intervals to
                            be used for baseline fitting, analysis \etc.}
 \end{tabular}
 
@@ -4073,11 +4073,11 @@ Examples:
 \begin{verbatim}
     >> find-centroid<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
 
-    Quadrant 1 : Centroid is at    5.86 km/s  
+    Quadrant 1 : Centroid is at    5.86 km/s
 \end{verbatim}
 
 \subsection{FIND-INTEGRATED-INTENSITY} \index{FIND-INTEGRATED-INTENSITY}
@@ -4092,7 +4092,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+N_INTS+   & I4 & Number of intervals to use for analysis.\\
   \verb+BLF_INTS+ & R4 & \parbox[t]{4in}
-                         {Pairs of channels defining spectral intervals to 
+                         {Pairs of channels defining spectral intervals to
                           be used for baseline fitting, analysis \etc.}
 \end{tabular}
 
@@ -4100,10 +4100,10 @@ Examples:
 \begin{verbatim}
     >> find-integrated-intensity<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
-    Integrated intensity is    8.12 Kelvin-km/s  
+    Integrated intensity is    8.12 Kelvin-km/s
     ..
 \end{verbatim}
 
@@ -4118,11 +4118,11 @@ Examples:
 \begin{verbatim}
     >> find-line-width<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -4 27.0<CR>
 
-    Quadrant  1  Line equivalent width  3.86 km/s  
+    Quadrant  1  Line equivalent width  3.86 km/s
     ..
 \end{verbatim}
 
@@ -4137,7 +4137,7 @@ The maximum and the location of the maximum are saved in the scan header.
 Examples:
 \begin{verbatim}
     >> find-maximum<CR>
-    Quadrant: 1 Interpolated max.is   3.325     at      5.71km/s  
+    Quadrant: 1 Interpolated max.is   3.325     at      5.71km/s
     ..
 \end{verbatim}
 
@@ -4145,7 +4145,7 @@ Examples:
 
 Find the moments of the emission on the current spectrum. Written by
 Buddy Martin to find the mass, momentum and energy in high velocity line
-wings. Calculates zeroth, first and second moments of the emission 
+wings. Calculates zeroth, first and second moments of the emission
 in ``red'' and ``blue'' intervals of width ``int.width'' adjacent to
 a line of width ``gap'' centered on ``Ref pt.''.
 
@@ -4180,7 +4180,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+N_INTS+    & I4 & Number of intervals to use for analysis.\\
   \verb+BLF_INTS+  & R4 & \parbox[t]{4in}
-                          {Pairs of channels defining spectral intervals to 
+                          {Pairs of channels defining spectral intervals to
                            be used for baseline fitting, analysis \etc.}
 \end{tabular}
 
@@ -4188,12 +4188,12 @@ Examples:
 \begin{verbatim}
     >> find-skewness<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
     Moments about mean? (Y/N) [Y] <CR>
-    Integrated profile :   8.1 K-km/s  
-    Mean position :  9.0 km/s  
+    Integrated profile :   8.1 K-km/s
+    Mean position :  9.0 km/s
 
     Moments of line profile;
     Mu(0) :     1.0 K-km/s  (0)
@@ -4216,7 +4216,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+N_FSSP+    & I4 & Number of intervals to use for spectrum stats.\\
   \verb+FSS_INTS+  & R4 & \parbox[t]{4in}
-                          {Pairs of channels defining spectral intervals to 
+                          {Pairs of channels defining spectral intervals to
                            be used for FIND-SPECTRUM-STATISTICS.}
 \end{tabular}
 
@@ -4224,7 +4224,7 @@ Examples:
 \begin{verbatim}
     >> find-spectrum-statistics<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
     # ^z<CR>
@@ -4285,17 +4285,17 @@ Relevant flags:\\
                                to be constant).}\\
   \verb+N_INTS+         & I4 & Number of intervals to use for analysis.\\
   \verb+BLF_INTS+       & R4 & \parbox[t]{4in}
-                               {Pairs of channels defining spectral intervals to 
+                               {Pairs of channels defining spectral intervals to
                                be used for baseline fitting, analysis \etc.}\\
   \verb+FIT_TOL+        & I4 & \parbox[t]{4in}
                                {Specifies the convergence criterion. If the fractional change
                                in the sum-squared-error from one interation to the next is
                                less than FIT\_TOL then the process has
                                converged. [.05]}\\
-  \verb+MAX_ITS+        & I4 & Specifies the maximum number of iterations to 
+  \verb+MAX_ITS+        & I4 & Specifies the maximum number of iterations to
                                be executed. [20]\\
   \verb+FIT_DEBUG+      & I4 & \begin{minipage}[t]{4in}
-                               Determines the type and amount of debug 
+                               Determines the type and amount of debug
                                information written to the screen.
                                \begin{tabular}[t]{rl}
                                   -1 & no printing [Default]\\
@@ -4310,7 +4310,7 @@ Examples:
 \begin{verbatim}
     >> fit-composite-baseline<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
     # ^z<CR>
@@ -4318,7 +4318,7 @@ Examples:
     Estimate of polynomial coefficients for x**n
     One at a time, CTRL(Z) to finish
 
-    Current units are km/s  
+    Current units are km/s
 
     # (x** 0) 0.2<CR>
     # (x** 1) ^z<CR>
@@ -4328,7 +4328,7 @@ Examples:
     Estimates of Amplitude and phase for each harmonic
     Term at a time, CTRL(Z) to finish
 
-    Current units are km/s  
+    Current units are km/s
 
     # 1 0<CR>
     # ^z<CR>
@@ -4339,7 +4339,7 @@ Examples:
                   Parameters of Least-Square Baseline
                 Polynomial terms - Coefficients of X**n
                            0      0.36
-                  Fundamental period is  25.2 km/s  
+                  Fundamental period is  25.2 km/s
                   Harmonic  Amplitude    Phase(km/s  )
                        1       0.92         13.04
 
@@ -4357,7 +4357,7 @@ Uses a non-linear least squares routine to fit a set of gaussians to the
 current spectrum, using only data points within the nominated intervals
 (10 intervals max.) Since the general problem is non-linear it is necessary
 to input an initial guess - this consists of up to 10 gaussian components,
-defined by their amplitude, width and position. 
+defined by their amplitude, width and position.
 
 The fitting procedure is controlled by setting the control parameters
 FIT\_TOL, MAX\_ITS and FIT\_DEBUG. These have the meanings listed below:
@@ -4371,10 +4371,10 @@ FIT\_TOL, MAX\_ITS and FIT\_DEBUG. These have the meanings listed below:
                                in the sum-squared-error from one interation to the next is
                                less than FIT\_TOL then the process has
                                converged. [.05]}\\
-  \verb+MAX_ITS+        & I4 & Specifies the maximum number of iterations to 
+  \verb+MAX_ITS+        & I4 & Specifies the maximum number of iterations to
                                be executed. [20]\\
   \verb+FIT_DEBUG+      & I4 & \begin{minipage}[t]{4in}
-                               Determines the type and amount of debug 
+                               Determines the type and amount of debug
                                information written to the screen.
                                \begin{tabular}[t]{rl}
                                   -1 & no printing [Default]\\
@@ -4393,7 +4393,7 @@ Other flags:\\
 \begin{tabular}{lll}
   \verb+N_INTS+   & I4 &  Number of intervals to use for analysis.\\
   \verb+BLF_INTS+ & R4 &  \parbox[t]{4in}
-                          {Pairs of channels defining spectral intervals to 
+                          {Pairs of channels defining spectral intervals to
                            be used for baseline fitting, analysis \etc.}\\
   \verb+NGAUSS+   & I4 &  Number of gaussian components currently defined.\\
   \verb+AMP_WID_POS(30)+ & R4 & \parbox[t]{4in}
@@ -4412,7 +4412,7 @@ Examples:
     fit_debug = -1
     >> fit-gaussian-model<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
     # ^z<CR>
@@ -4420,7 +4420,7 @@ Examples:
     Estimates of Amp.,Width(FWHM) and Pos'n for each line
     Line at a time, CTRL(Z) to finish
 
-    Current units are km/s  
+    Current units are km/s
 
     Line  1: 10 5 0<CR>
     Line  2: 5 3 7<CR>
@@ -4454,7 +4454,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+N_INTS+     & I4 & Number of intervals to use for analysis.\\
   \verb+BLF_INTS+   & R4 & \parbox[t]{4in}
-                           {Pairs of channels defining spectral intervals to 
+                           {Pairs of channels defining spectral intervals to
                             be used for baseline fitting, analysis \etc.}
 \end{tabular}
 
@@ -4462,7 +4462,7 @@ Examples:
 \begin{verbatim}
     >> fit-polynomial-baseline<CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -10 10<CR>
     # ^z<CR>
@@ -4472,7 +4472,7 @@ Examples:
 
 \subsection{FOLD-SPECTRUM} \index{FOLD-SPECTRUM}
 
-Find the symmetric part of the current spectrum. The $n^{th}$ channel is set to 
+Find the symmetric part of the current spectrum. The $n^{th}$ channel is set to
 the average value of it and the corresponding $(N+1-n)^{th}$ channel
 symmetrically located with respect to the scan centre.
 
@@ -4515,7 +4515,7 @@ ratio spectrum, below.
 \subsection{FOURIER-POWER-SPECTRUM} \index{FOURIER-POWER-SPECTRUM}
 
 Fourier transforms the current spectrum (assumed to be real-symmetric about
-the first channel) and sets each channel equal to $2\times\log_{10}$ of the 
+the first channel) and sets each channel equal to $2\times\log_{10}$ of the
 absolute magnitude of the result. This is an extremely sensitive
 way of looking for systematic effects such as baseline ripple.
 
@@ -4616,11 +4616,11 @@ features can be turned on or off using SET-MAP-PARAMETERS ({\it q.v.})
 
 The program integrates the intensity over the nominated range of the third
 ``z-axis'' coordinate (most commonly velocity), and if AVERAGE intensity
-over the range is selected, then divides by the overall z-axis range to 
+over the range is selected, then divides by the overall z-axis range to
 produce an average intensity (otherwise just the integrated total is plotted).
 If smoothing is selected in SET-MAP-PARAMETERS then the data plane is
 interpolated \index{interpolation!map} onto a finer sampling before plotting,
-which yields a more aesthetically pleasing image. 
+which yields a more aesthetically pleasing image.
 
 If zero sizes are selected in SET-MAP-SIZE then the routine uses the
 available graphics area to its fullest; if zero limits are selected in
@@ -4753,7 +4753,7 @@ current listing file (as determined by SET-LIST-FILE). The short listing is 80
 characters wide, and is suitable for display on a conventional terminal; the
 long listing gives much more information, but is 132 characters wide and can
 only be displayed on a line printer, or output on a terminal set to 132 column
-mode. 
+mode.
 
 Relevant flags:\\
 \index{NO_SPECTRA@\verb+NO_SPECTRA+!returned by INDEX-FILE}
@@ -4768,10 +4768,10 @@ Examples:
     Listing of data file headers on logical unit            6
     Long or short listing? (L/S) s<CR>
 
-INDEX LISTING OF FILE : l483small.dat                           
+INDEX LISTING OF FILE : l483small.dat
 
-File title : dummy                                   
-Owner :      rachael     
+File title : dummy
+Owner :      rachael
 No. of scans in file =   4  Max no. =  20
 Last record used =  48
 Date of listing : 27-AUG-90
@@ -4798,7 +4798,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+NO_GSD_SPECTRA+ & I4 & \parbox[t]{4in}
                                {No of spectra (including any incomplete
-                                ones due to aborting the scan) in the 
+                                ones due to aborting the scan) in the
                                 GSD file just INDEXed.}
 \end{tabular}
 
@@ -4812,7 +4812,7 @@ Data seem to be pre-Sept.88
 Scan #  244
 --------------------
 
-Source_name L483                                Observer: NDP             
+Source_name L483                                Observer: NDP
 Recorded on 03-SEP-87 at 05:06:17 (UT)
 
 Map centre is at R.A.  18 14 50.5 Dec. - 4 40 49.00
@@ -4820,7 +4820,7 @@ Map centre is at R.A.  18 14 50.5 Dec. - 4 40 49.00
 Local coordinate system: ;  Position angle of y-axis   0.0 (degrees E of N)
 Local cell size   10. by   10. arcsec
 Offset is (   0.00,   0.00) raster units
-Scan direction HORIZONTAL       Scan type is DISCRETE        
+Scan direction HORIZONTAL       Scan type is DISCRETE
 Map size   7 by   7
 Map start at (  -3.00,  -3.00) raster units
 
@@ -4831,7 +4831,7 @@ File contains  49 spectra
 
 Reset the environment \index{environment!to reset} parameters to the defaults
 specified in the initialization file SPECX\_INIT \index{SPECX\_INIT} and by the
-initialization routine. 
+initialization routine.
 
 Examples:
 \begin{verbatim}
@@ -4861,7 +4861,7 @@ During INTERPOLATE-MAP you also specify a (gaussian) convolving function for
 the velocity dimension of the cube. This convolving function is only applied if
 velocity is one of the map axes, and is applied only after the map has been
 extracted from the cube. It thus provides a method for smoothing the velocity
-dimension of a position-velocity diagram. 
+dimension of a position-velocity diagram.
 
 Relevant flags:\\
 \index{BEAM_WIDTH@\verb+BEAM_WIDTH+}
@@ -4969,7 +4969,7 @@ Examples:
 
     -----------------------------------------------------------------------
 
-    Scan : 244  Title : DARK_CLOUDS     L483      
+    Scan : 244  Title : DARK_CLOUDS     L483
      Recorded on 03-SEP-87 at 05:06:17(UT)   Mode : ON-OFF
 
     -----------------------------------------------------------------------
@@ -4982,7 +4982,7 @@ Examples:
 
     Observed frequencies are LSR corrected, Exact in Quadrant 0
     Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
-     1     65     33.0       230.5380      230.5380        0.742    860.40    
+     1     65     33.0       230.5380      230.5380        0.742    860.40
 
     ***** Line parameters ******
     Quad.  T(max)  V(max)  Int.Intsty.  FWHM  TREC(K)  TSKY(K)  TTEL(K)
@@ -5008,7 +5008,7 @@ Examples:
 \subsection{LIST-SPECTRUM} \index{LIST-SPECTRUM}
 
 Lists the values of the data points of the current spectrum to the current
-listing unit, as set by SET-LIST-FILE. 
+listing unit, as set by SET-LIST-FILE.
 
 Examples:
 \begin{verbatim}
@@ -5016,7 +5016,7 @@ Examples:
 
 ---------------------------------------------------------------------------
 
-Scan :   0  Title : DARK_CLOUDS     L483      
+Scan :   0  Title : DARK_CLOUDS     L483
  Recorded on 03-SEP-87 at 05:06:17(UT)   Mode : ON-OFF
 
 ---------------------------------------------------------------------------
@@ -5024,19 +5024,19 @@ Scan :   0  Title : DARK_CLOUDS     L483
 
 
 Quadrant no : 1
-   1 -0.47729      -0.81307E-01   0.16204       0.29462       0.24917    
+   1 -0.47729      -0.81307E-01   0.16204       0.29462       0.24917
    6  0.50025E-01  -0.10932       0.16700E-02   0.11184       0.57822E-01
-  11 -0.96139E-01  -0.20968      -0.75067E-01   0.27106E-01   0.11011    
-  16  0.27376       0.17693      -0.57153E-01  -0.13929      -0.14958    
-  21 -0.94339E-01   0.85196E-01   0.18444       0.11115       0.11376    
-  26  0.20713       0.18537       0.20807       0.35796       0.52436    
-  31  0.52276       0.39217        1.0260        2.9639        4.9641    
-  36   4.5421        2.6619        2.4735        2.3985        1.1315    
+  11 -0.96139E-01  -0.20968      -0.75067E-01   0.27106E-01   0.11011
+  16  0.27376       0.17693      -0.57153E-01  -0.13929      -0.14958
+  21 -0.94339E-01   0.85196E-01   0.18444       0.11115       0.11376
+  26  0.20713       0.18537       0.20807       0.35796       0.52436
+  31  0.52276       0.39217        1.0260        2.9639        4.9641
+  36   4.5421        2.6619        2.4735        2.3985        1.1315
   41  0.47001       0.31754       0.60795E-01  -0.12401E-01  -0.13485E-01
   46 -0.21540      -0.35910      -0.14511       0.67066E-01   0.20679E-01
-  51  0.33756E-01   0.53776E-01   0.99781E-01   0.38686       0.47943    
-  56  0.24005       0.87160E-02  -0.29614E-01  -0.12741      -0.31328    
-  61 -0.15324       0.52936E-01   0.24852    
+  51  0.33756E-01   0.53776E-01   0.99781E-01   0.38686       0.47943
+  56  0.24005       0.87160E-02  -0.29614E-01  -0.12741      -0.31328
+  61 -0.15324       0.52936E-01   0.24852
 \end{verbatim}
 
 \subsection{MERGE-QUADRANTS} \index{MERGE-QUADRANTS}
@@ -5131,7 +5131,7 @@ X \& Y axis scaling can be changed with SET-PLOT-SCALES.
 If the interactive flag is set (by SET-INTERACTIVE), and the plot device is
 the terminal, then you are left in the interactive graphics menu, which
 allows you to perform many functions interactively, including rescaling the
-plot and measuring values. 
+plot and measuring values.
 
 Relevant flags:\\
 \index{HISTOGRAM@\verb+HISTOGRAM+}
@@ -5149,7 +5149,7 @@ Relevant flags:\\
   \verb+X_UNITS+     & C6 & Units for the X-axis (\eg ``GHz''.)\\
   \verb+X_NAME+      & C10 & Name for X-axis (\eg ``Frequency'')\\
   \verb+Y_UNITS+     & C16 & Units for the Y-axis (\eg ``Kelvin''.)\\
-  \verb+Y_NAME+      & C16 & Name for Y-axis (\eg ``\verb+T\dA\u*+'' to 
+  \verb+Y_NAME+      & C16 & Name for Y-axis (\eg ``\verb+T\dA\u*+'' to
                              give ${\rm T}_A^*$)
 \end{tabular}
 
@@ -5230,14 +5230,14 @@ end.
    Do you want input (I) or output (O)? [O] O
    Are FITS files on disk (D) or tape (T)? T
    Tape drive name (e.g. _MTA0:) msa0 <CR>
- 
+
    Tape should be mounted foreign before starting
     e.g. $ mount/for/block=2880/density=6250 msa0:
- 
+
    Tape blocking factor? [  1] <CR>
    Begin at start (S) or end (E) of tape? [Start] S <CR>
 
-   >> 
+   >>
 \end{verbatim}
 
 \begin{verbatim}
@@ -5245,7 +5245,7 @@ end.
    Do you want input (I) or output (O)? [O] I
    Are FITS files on disk (D) or tape (T)? D
    Should disk file be byte-reversed? (Y/N) [Y] y
-   >> 
+   >>
 \end{verbatim}
 
 \subsection{OPEN-MAP-FILE} \index{OPEN-MAP-FILE}
@@ -5269,10 +5269,10 @@ This is partly to simplify the code, which previously delayed asking for
 virtual memory until you added the first spectrum, but also to `remind'
 you how much memory you might require. SPECX may require a total of 3
 cubes to reside in virtual memory at once --- the original raw cube (which
-is maintained during ADD-TO-MAP, DELETE-FROM-MAP etc); the interpolated 
+is maintained during ADD-TO-MAP, DELETE-FROM-MAP etc); the interpolated
 or rotated cube used for display purposes; and at times a third cube when
 the previously rotated or interpolated cube is being interpolated or rotated.
-If the total memory required by these cubes significantly exceeds the 
+If the total memory required by these cubes significantly exceeds the
 working set size these commands will lead to a huge amount of paging, and
 can essentially halt the system.
 
@@ -5304,7 +5304,7 @@ Examples:
     File already exists - Opening it.
 
     Map file l483core.MAP opened on unit 119
-    Map version number:    2.000000    
+    Map version number:    2.000000
           39780 bytes required for data cube
              72 spectra from current map file read into data cube
 
@@ -5313,7 +5313,7 @@ Examples:
 
     >> open-map-file<CR>
     File name? (extension will be .MAP) [    l483core] test<CR>
- 
+
     Inquiring about file: test.MAP
     File does not exist - Creating it now...
     Map file opened on unit          119
@@ -5342,7 +5342,7 @@ Relevant flags:\\
 \begin{tabular}{lll}
   \verb+HISTOGRAM+   & L4 & Plot spectrum as histogram if TRUE,
                             join-the-dots otherwise.\\
-  \verb+INTERACTIVE+ & L4 & Enter 1-D interactive graphics mode when 
+  \verb+INTERACTIVE+ & L4 & Enter 1-D interactive graphics mode when
                             plot is done.\\
   \verb+LINE_WEIGHT+ & I4 & Default line weight for plotting axes,
                             labels etc.
@@ -5448,10 +5448,10 @@ Examples:
     Dec. offset scaled from   30.000 to  -30.000
     Which parameters do you want to plot?
     Tmax (1), Vmax (2), Integrated Intensity (3),
-    Equivalent width (4), Centroid (5),  or 2nd Moment (6) 
+    Equivalent width (4), Centroid (5),  or 2nd Moment (6)
     [ 3]  1 4 5 6 <CR>
 
-    -- Make-line-pars -- 
+    -- Make-line-pars --
       extracting maps from data...
       applying smoothing to maps...
       - map 1 smoothed
@@ -5471,10 +5471,10 @@ Examples:
 \begin{verbatim}
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            3      grumpy                    
-        Z            2      sneezy                    
-        T            1      dopey                     
+        X            4      doc
+        Y            3      grumpy
+        Z            2      sneezy
+        T            1      dopey
 
     >> pop-stack-down <CR>
     X-register now contains scan    3: grumpy
@@ -5487,10 +5487,10 @@ Examples:
               Data stack contents
 
     Stack posn    Scan no    Title
-        X            3      grumpy                    
-        Y            2      sneezy                    
-        Z            1      dopey                     
-        T                                             
+        X            3      grumpy
+        Y            2      sneezy
+        Z            1      dopey
+        T
 
 \end{verbatim}
 
@@ -5509,7 +5509,7 @@ in brackets.
 Items may optionally be followed immediately by a colon (:) and a FORTRAN
 format specifier, to control the width of the output field.
 
-Examples:  
+Examples:
 \begin{verbatim}
        >>  print x
        >>  print (x/3)
@@ -5531,7 +5531,7 @@ Examples:
 
     -----------------------------------------------------------------------
 
-    Scan : 247  Title : 0046.001_B L483      JCMT 
+    Scan : 247  Title : 0046.001_B L483      JCMT
      Recorded on 03-SEP-87 at 08:32:24(UT)
 
     -----------------------------------------------------------------------
@@ -5545,10 +5545,10 @@ Examples:
     Data observed using RAD velocity law; Freq's corrected to LSR  ref. frame.
     Master sub-band =  0
     Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
-     1     65     33.0       230.5380      230.5380        0.742    1195.9    
-     2     65     98.0       230.5380      230.5780        0.742    1196.0    
-     3     65    163.0       230.5380      230.6180        0.742    1196.0    
-     4     65    228.0       230.5380      230.6580        0.742    1196.0    
+     1     65     33.0       230.5380      230.5380        0.742    1195.9
+     2     65     98.0       230.5380      230.5780        0.742    1196.0
+     3     65    163.0       230.5380      230.6180        0.742    1196.0
+     4     65    228.0       230.5380      230.6580        0.742    1196.0
 
     ***** Line parameters ******
     Quad.  T(max)  V(max)  Int.Intsty.  FWHM  TREC(K)  TSKY(K)  TTEL(K)
@@ -5580,10 +5580,10 @@ Examples:
 
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            3      grumpy                    
-        Z            2      sneezy                    
-        T            1      dopey                     
+        X            4      doc
+        Y            3      grumpy
+        Z            2      sneezy
+        T            1      dopey
 
     >> push-stack-up <CR>
     X-register now contains scan    4: doc
@@ -5596,10 +5596,10 @@ Examples:
 
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            4      doc                       
-        Z            3      grumpy                    
-        T            2      sneezy                    
+        X            4      doc
+        Y            4      doc
+        Z            3      grumpy
+        T            2      sneezy
 
 \end{verbatim}
 
@@ -5609,7 +5609,7 @@ Examples:
 READ reads a variable of numeric type (I, R, L) from a character string,
 or expression.
 
-Examples:  
+Examples:
 \begin{verbatim}
      >>  read
      Variable name?  azimuth
@@ -5668,14 +5668,14 @@ Examples:
 
 
     Stack posn    Scan no    Title
-        X          247      0046.001_B L483      JCMT 
-        Y          247      0046.001_A L483      JCMT 
+        X          247      0046.001_B L483      JCMT
+        Y          247      0046.001_A L483      JCMT
     ..
 \end{verbatim}
 
 \subsection{READ-GSD-MAP} \index{READ-GSD-MAP}
 
-Similar to READ-GSD-DATA, but it reads spectra from a GSD spectrum 
+Similar to READ-GSD-DATA, but it reads spectra from a GSD spectrum
 {\em directly} into the map file. This is fine if there are no duplicates,
 but gets tricky if, for example, your observation sequence came back to the
 center every $5^{th}$ integration for calibration purposes. Also not clear
@@ -5695,21 +5695,21 @@ Examples:
 
 
 Stack posn    Scan no    Title
-    X          244              _1 L483      JCMT 
-Total RA, Dec offsets (arcsec):    30.00000      -30.00000    
-Total X, Y offsets (cells):    3.000000      -3.000000    
+    X          244              _1 L483      JCMT
+Total RA, Dec offsets (arcsec):    30.00000      -30.00000
+Total X, Y offsets (cells):    3.000000      -3.000000
 Spectrum position is 0.0 arcsec in X and 0.0 arcsec in Y from nearest pixel
-Spectrum placed in cell (  3.0, -3.0) 
+Spectrum placed in cell (  3.0, -3.0)
 
            :
            :
 
 Stack posn    Scan no    Title
-    X          244              _1 L483      JCMT 
-Total RA, Dec offsets (arcsec):   -30.00000       30.00000    
-Total X, Y offsets (cells):   -3.000000       3.000000    
+    X          244              _1 L483      JCMT
+Total RA, Dec offsets (arcsec):   -30.00000       30.00000
+Total X, Y offsets (cells):   -3.000000       3.000000
 Spectrum position is 0.0 arcsec in X and 0.0 arcsec in Y from nearest pixel
-Spectrum placed in cell ( -3.0,  3.0) 
+Spectrum placed in cell ( -3.0,  3.0)
 GSD scan numbers? (^Z to finish) ^Z
 \end{verbatim}
 
@@ -5718,7 +5718,7 @@ GSD scan numbers? (^Z to finish) ^Z
 Push the stack and transfer the desired spectrum from the nominated
 SPECX-format file to the X-register. An error will be notified if there is no
 open file with READ access --- use SET-FILE-ACCESS to modify access if
-\index{SET-FILE-ACCESS} necessary. 
+\index{SET-FILE-ACCESS} necessary.
 
 Relevant flags:\\
 \index{NO_SPECTRA@\verb+NO_SPECTRA+!returned by READ-SPECTRUM}
@@ -5730,8 +5730,8 @@ Examples:
 \begin{verbatim}
     >> read-spectrum <CR>
     File number? (^z to list) [1] ^z <CR>
-     1  l483small.dat                             R 
-     2  test.dat                                  W 
+     1  l483small.dat                             R
+     2  test.dat                                  W
     File number? (^z to list) [1]  <CR>
     Scan? 1 <CR>
     ..
@@ -5776,7 +5776,7 @@ scale is flagged as non-linear (\verb+FCORRECT = T+) \index{FCORRECT@\verb+FCORR
 the sampling of the output spectrum will be {\em linear}, and centred on the
 nominal centre value of the {\em uncorrected} spectrum. \verb+FCORRECT+ will be
 set to \verb+FALSE+ after the operation so the regridded spectrum is treated
-correctly from then on. 
+correctly from then on.
 
 Examples:
 \begin{verbatim}
@@ -5797,7 +5797,7 @@ Examples:
 {\sl
 REGRID-SPECTRUM: The spectrum at top has been re-sampled on to a new grid. The
 original spectrum had 65 channels sampled in velocity space at $-0.965 \kms$;
-the new spectrum also has 65 channels, sampled at $-0.9\kms$. Note the 
+the new spectrum also has 65 channels, sampled at $-0.9\kms$. Note the
 apparent `beats' in the noise: new channels positioned at the boundaries of
 the original channels will effectively average the two input channels together.
 \label{REGRID}
@@ -5817,7 +5817,7 @@ plot device is a terminal) or manually otherwise (as in the example below).
 This is the {\em only} baseline fitting command that actually goes ahead
 and removes the baseline from the spectrum. If you want to retain the
 baseline for other purposes you can PUSH the stack before removing the
-slope, and then subtract the residuals from the original spectrum. 
+slope, and then subtract the residuals from the original spectrum.
 Alternatively you can use FIT-POLYNOMIAL-BASELINE or FIT-COMPOSITE-BASELINE.
 \index{FIT-POLYNOMIAL-BASELINE} \index{FIT-COMPOSITE-BASELINE}
 
@@ -5837,7 +5837,7 @@ Examples:
 \begin{verbatim}
     >> remove-linear-baseline <CR>
     Type intervals, one at a time, CTRL(Z) to finish
-    Current units are km/s  
+    Current units are km/s
 
     # -20 -10 <CR>
     # 10 20 <CR>
@@ -5873,7 +5873,7 @@ Examples:
     Remove up to 16 spikes over interval?km/s [   -9.7   -3.0] -20 20 <CR>
     Spike tolerance(K)? [  0.00] 5 <CR>
      1 spike(s) removed:
-       -7.0 km/s    
+       -7.0 km/s
     ..
 \end{verbatim}
 
@@ -5898,7 +5898,7 @@ resulting spectrum (bottom).
 
 Reload the environment \index{environment!to reload from dump} (\ie scan stack
 and flags) from a dump file. The routine also attempts to reopen any data files
-that were open when the dump was made, and to reopen the map if there was one. 
+that were open when the dump was made, and to reopen the map if there was one.
 
 Examples:
 \begin{verbatim}
@@ -5910,8 +5910,8 @@ Examples:
 
 
     Files successfully reopened..
-    1  l483small.dat                             R 
-    2  test.dat                                  W 
+    1  l483small.dat                             R
+    2  test.dat                                  W
     Error opening map file
 
 \end{verbatim}
@@ -5922,7 +5922,7 @@ Write a spectrum back to the data file whence it came. This is a hairy
 routine --- there is no checking that you are actually rewriting the spectrum
 to the same file, and if the scan number has been changed, or the number of
 data points is different, you may not get what you expected. Nonetheless this
-does provide a way of ``editing'' a spectrum in a file, without having to 
+does provide a way of ``editing'' a spectrum in a file, without having to
 READ it, edit it, DELETE it from the file, and WRITE it back to a {\em
 different} location.
 
@@ -5936,13 +5936,13 @@ Examples:
 \begin{verbatim}
     >> rewrite-spectrum <CR>
     File number? (^z to list) 1 <CR>
-    Filed as scan   1 of l483small.dat                           
+    Filed as scan   1 of l483small.dat
 
 \end{verbatim}
 
 \subsection{ROLL-STACK} \index{ROLL-STACK}
 
-Rotate the spectra within the data stack, in the sense that the stack is 
+Rotate the spectra within the data stack, in the sense that the stack is
 popped and the old current spectrum then reinserted at the top position.
 This is thus a way of accessing a scan other than the current one, without
 losing any members of the stack.
@@ -5951,10 +5951,10 @@ Examples:
 \begin{verbatim}
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            3      grumpy                    
-        Z            2      sneezy                    
-        T            1      dopey                     
+        X            4      doc
+        Y            3      grumpy
+        Z            2      sneezy
+        T            1      dopey
 
     >> roll-stack <CR>
     X-register now contains scan    3: grumpy
@@ -5965,24 +5965,24 @@ Examples:
 
     ( 4 stack positions, length 2048 points)
     (Y-register data starts at STACK(2304))
- 
+
 
                   Data stack contents
 
     Stack posn    Scan no    Title
-        X            3      grumpy                    
-        Y            2      sneezy                    
-        Z            1      dopey                     
-        T            4      doc                       
+        X            3      grumpy
+        Y            2      sneezy
+        Z            1      dopey
+        T            4      doc
 
 \end{verbatim}
 
 \subsection{ROTATE-MAP} \index{ROTATE-MAP}
 
-Sets a flag to indicate that the map should be plotted in a rotated 
+Sets a flag to indicate that the map should be plotted in a rotated
 coordinate frame. The rotation is in the sense of the increase in
 position angle of the plot box with respect to that of the original
-vertical (Y) axis of the map. Can be turned off again by a further 
+vertical (Y) axis of the map. Can be turned off again by a further
 use of ROTATE-MAP.
 
 This is of most use when generating position-velocity diagrams along
@@ -6010,8 +6010,8 @@ Examples:
                       \index{null device}
 
 ``Preview'' an open 1-D plot file on any available device. For example,
-you may be accumulating a set of overlaid plots with the plot device set 
-to `Null'', and then at some stage wish to see  what you have on the 
+you may be accumulating a set of overlaid plots with the plot device set
+to `Null'', and then at some stage wish to see  what you have on the
 terminal or hardcopy device. Note that ``SEEing'' a plot on the null device,
 although permitted, is nonsensical!
 
@@ -6028,7 +6028,7 @@ Set the contour levels to be used in  CONTOUR-MAP and CHANNEL-MAPS.
 For CONTOUR you may elect to use automatic contouring, in which case only
 the {\em number} of contours is used, but for CHANNEL-MAPS you must set
 the contours explicitly, either at regular intervals (specified by a base
-level and increment) or irregularly (with the levels individually 
+level and increment) or irregularly (with the levels individually
 specified). All three methods are illustrated below.
 
 Relevant flags:\\
@@ -6078,13 +6078,13 @@ Select whether or not you want the environment saved each time either the
 modified. The regular dump is always to the file with logical name SPECX\_DUMP.
 \index{SPECX\_DUMP} \index{logical names!SPECX\_DUMP}
 Dumps are not made during the execution of a command file
-(to save time and disc access). 
+(to save time and disc access).
 
 If regular dumping is enabled then you should be able to resume execution of
 SPECX exactly where you were after an inadvertent crash or other mixup - if you
 do not have dumping enabled then you should nevertheless occasionally save the
 environment explicitly (using DUMP) \index{DUMP} to prevent you losing too much
-if a crash does occur. 
+if a crash does occur.
 
 Examples:
 \begin{verbatim}
@@ -6132,7 +6132,7 @@ Examples:
     >> set-file-access <CR>
     File number? (^z to list) ^z <CR>
     1  l483small.dat                             RW
-    2  test.dat                                  W 
+    2  test.dat                                  W
     File number? (^z to list) 1 <CR>
     File access ? (R/W/RW) R <CR>
     ..
@@ -6146,7 +6146,7 @@ only, you may choose to have the greyscale limits set automatically or manually;
 if automatically they are set to the minimum and maximum `good' values on the
 map. In manual mode you specify the limits. You can also choose whether or not
 contours should be overplotted on the greyscale --- the contour `colour' will
-normally be chosen to contrast with the greyscale as far as possible. 
+normally be chosen to contrast with the greyscale as far as possible.
 
 Five separate colour tables are available (courtesy of John Richer at MRAO).
 Number 1 --- the linear greyscale --- is perfectly standard, as is number
@@ -6218,7 +6218,7 @@ Set the prefix to be attached to the scan number to generate a GSD filename.
 Originally all JCMT data files were called SCAN\_nnnn.DAT, but now they are all
 given a label of the form:\\
 \hspace*{2in} OBS\_\verb+<+backend\verb+>+\_nnnn.DAT \\
- --- existing JCMT spectral line backends are 
+ --- existing JCMT spectral line backends are
 `AOSC', `KENT', `RXC' and `DAS'. \index{AOSC} \index{KENT}
 \index{RXC} \index{DAS}
 
@@ -6244,7 +6244,7 @@ Apple Laserwriter (and other \index{Apple Laserwriter} postcript printers), and
 the Anadex \index{Anadex dot-matrix printer} dot matrix printer (a Printronix
 driver is also available, but not installed). Plots are normally made in
 landscape \index{landscape mode} mode, but the devices can be switched into
-portrait mode \index{portrait mode} for tall thin plots if so desired. 
+portrait mode \index{portrait mode} for tall thin plots if so desired.
 
 Examples:
 \begin{verbatim}
@@ -6264,10 +6264,10 @@ measure the maximum, minimum, and integrated intensity within a user
 defined ``box''.
 
 In interactive mode the graphics cursor is also used to define the baseline
-regions to be used for baseline fitting, determination of spectrum 
+regions to be used for baseline fitting, determination of spectrum
 statistics etc. However if you want to run a command file it may be sensible
 to turn off the interactive graphics within the file so that the baseline
-regions can be entered in a more conventional way, as illustrated in the 
+regions can be entered in a more conventional way, as illustrated in the
 examples in this section.
 
 Interactive mode can also be switched on and off using a simple logical
@@ -6281,7 +6281,7 @@ Relevant flag:
 
 Examples:
 \begin{verbatim}
->> 
+>>
     set-interactive <CR>
     Interactive plotting? (Y/N) [Y] Y <CR>
     ..
@@ -6305,8 +6305,8 @@ Examples:
 SPECX normally assumes that the ``Centre frequency'' stored in the scan
 \index{frequency!center}
 \index{frequency!line rest}
-is the same as the rest frequency of the line being observed. This may 
-sometimes not be the case, and in this event it is unclear whether the 
+is the same as the rest frequency of the line being observed. This may
+sometimes not be the case, and in this event it is unclear whether the
 velocity scale (with velocity {\em defined} by $v/c = \Delta\nu/\nu_0$)
 should be defined by the centre frequency or the true line frequency.
 If the line rest frequency is {\em not} equal to zero, then SPECX uses
@@ -6332,7 +6332,7 @@ The data output by SPECX in response to commands such as LIST-SPECTRUM,
 PRINT-SPECTRUM-HEADER, PRINT, FIT-GAUSSIAN-MODEL \etc
 normally appears on the terminal. However it may be
 redirected elsewhere using SET-LIST-FILE, either direct to the printer queue,
-or to a file. 
+or to a file.
 
 Examples:
 \begin{verbatim}
@@ -6351,7 +6351,7 @@ Examples:
 This command lets you set two flags, that determine
 \begin{itemize}
 \item Whether a new spectrum being ADDed to the map is to overwrite an
-      existing spectrum at the same location or else to generate an 
+      existing spectrum at the same location or else to generate an
       error message.
 \item How close the spectrum position needs to be to a map sample point
       (in map pixels) for it to be acceptable to insert it at that point.
@@ -6389,7 +6389,7 @@ desired. The line types for contours greater than, equal to or less than zero
 can be set --- the line types \index{map!line types} referred to are those
 defined in MONGO, which are unfortunately somewhat different on different
 devices. Line type 0 however is always a solid line, while line type 1 is
-usually a dotted line and line type 2 is usually dashed. 
+usually a dotted line and line type 2 is usually dashed.
 
 There is an option to plot the {\em absolute} positions as R.A. and Dec. if
 the map is aligned with the equatorial coordinate system. The map is assumed
@@ -6424,13 +6424,13 @@ Examples:
 \subsection{SET-MAP-SCALES} \index{SET-MAP-SCALES}
 
 Lets you choose two coordinates (out of the cube's three total) for the map.
-Data are integrated across a defined range of the third coordinate before 
-being plotted either as the average value in the interval or as the 
+Data are integrated across a defined range of the third coordinate before
+being plotted either as the average value in the interval or as the
 integrated value.
 
 Select left \& right or top \& bottom limits of zero to make the program plot
 the entire available data; otherwise choose the limits you want either to
-window out a region of the slice, or to embed it within a larger box. 
+window out a region of the slice, or to embed it within a larger box.
 
 Examples:
 \begin{verbatim}
@@ -6460,12 +6460,12 @@ Examples:
 
 \subsection{SET-PLOT-DEVICE} \index{SET-PLOT-DEVICE}
 
-Direct both 1-D and 2-D plot output to one of the graphics terminal, 
-hardcopy device, or bit-bucket. 
-When plotting 1-D data to the null device, 
+Direct both 1-D and 2-D plot output to one of the graphics terminal,
+hardcopy device, or bit-bucket.
+When plotting 1-D data to the null device,
 a plot file is still
-generated, so the plot can still 
-be inspected using SEE-PLOT, but 
+generated, so the plot can still
+be inspected using SEE-PLOT, but
 for 2-D data, which does not use an
 intermediary plot file yet, the routine just returns before plotting
 and generates an -I- error message.
@@ -6483,14 +6483,14 @@ Examples:
 This command controls the appearance of both 1-D (spectrum) plots {\em and} 2-D
 plots (maps). For 1-D plots, you can choose to omit the axes and labels etc if
 \index{plot axes!to omit from 1-D plots} you only want a quick look, and don't want
-to wait around for all that stuff to come down through a 1200 baud modem. 
+to wait around for all that stuff to come down through a 1200 baud modem.
 
 The character height \index{plot!to set character size} is a nominal value
 only. SPECX uses this to form some general opinion of what size characters you
 want. For MONGO graphics libraries only, if the value is set to exactly 3 mm
 then those plot devices that have internal character generators will be told to
 use them, which reduces the number of bytes that need to be sent, and
-consequently speeds up the plotting. 
+consequently speeds up the plotting.
 
 Examples:
 \begin{verbatim}
@@ -6519,7 +6519,7 @@ automatic scaling.
 Note that, when rescaling using the L, R, T and B interactive menu options,
 SPECX then does some autoscaling to generate a nice plot range, on the
 assumption that if you want to set {\em exact} values you will enter them
-from the keyboard, and not fuss around trying to make the cursor go to 
+from the keyboard, and not fuss around trying to make the cursor go to
 exactly the right place.
 
 Examples:
@@ -6557,9 +6557,9 @@ Set a masking function that controls the processing and display of
 multiquadrant data. Usually best either to set all masking values to 1,
 so that all quadrants are displayed (only those actually present are
 affected of course, regardless of how many are enabled by the mask), or
-to select just one (normally the one with the line in). 
+to select just one (normally the one with the line in).
 
-Many reduction operations can only work on a single quadrant, and if 
+Many reduction operations can only work on a single quadrant, and if
 there are several enabled then SPECX will prompt you to nominate a
 single quadrant. This step can be eliminated by masking out just one
 quadrant.
@@ -6573,7 +6573,7 @@ Relevant flags:\\
 Examples:
 \begin{verbatim}
     >> set-quadrant-display <CR>
-    Define function to mask processing and 
+    Define function to mask processing and
     display of individual quadrants:
     MASK(n) = 1   Turns processing/display ON for quadrant n
             = 0   Turns quadrant OFF
@@ -6609,7 +6609,7 @@ The stack is an area of common memory of length 8704 4-byte words. This is
 enough room to hold 4 spectra each having the standard 128-word header and 2048
 channels, arbitrarily distributed between up to 8 quadrants. On the other hand
 we could also hold up to 45 spectra of 64 channels each. This command lets you
-tailor your usage of the stack to suit your needs. 
+tailor your usage of the stack to suit your needs.
 
 Examples:
 \begin{verbatim}
@@ -6618,7 +6618,7 @@ Examples:
 
     Maximum number of data points? [2048] 2048 <CR>
     No of levels in stack? [ 4] 4 <CR>
-    Stack defined 
+    Stack defined
      Levels:  4
      Length:2048
     ..
@@ -6634,7 +6634,7 @@ Pericom, Graphon or Selanar Hirez, the VT100-series with Retrographics 640 or
 650 upgrade, and the VT200 series with Selanar SG220 upgrade. \index{Pericom
 (terminal)} \index{Graphon (terminal)} \index{Selanar (terminal)!Hirez}
 \index{Selanar (terminal)!SG220} \index{VT100 (terminal)!Retrographics upgrade}
-\index{terminals!dual screen} 
+\index{terminals!dual screen}
 
 Terminals which support only the Tektronix 4010/4014 protocol are also
 \index{Tektronix 4010/4014 (terminal)}
@@ -6668,7 +6668,7 @@ Examples:
 
 \subsection{SET-VELOCITY-FRAME} \index{SET-VELOCITY-FRAME}
 
-Sets the velocity frame, velocity law and velocity offset for plotting 
+Sets the velocity frame, velocity law and velocity offset for plotting
 frequencies and velocities in a reference frame other than that in which
 they were observed. See \S\ref{frames}
 
@@ -6688,7 +6688,7 @@ Examples:
      Output in different vel frame? (Y/N) [N] y
      Velocity frame? (TELLuric, LSR, HELIocentric, GEOcentric) [ LSR] HELI
      Velocity law definition? (OPTical, RADio, RELativistic) [RAD] rel
-     Velocity in new frame? (km/s) [  20.0] 
+     Velocity in new frame? (km/s) [  20.0]
   ..
 
   >> set-vel
@@ -6698,7 +6698,7 @@ Examples:
 
 \subsection{SET-X-SCALE} \index{SET-X-SCALE}
 
-You can display your spectra (and integrated intensities on maps \etc) in 
+You can display your spectra (and integrated intensities on maps \etc) in
 any of a number of coordinate systems. Most commonly for spectral line
 work you want to display things in terms of velocities with respect to
 the local standard of rest, but you may also wish to display the spectrum
@@ -6708,7 +6708,7 @@ Most of these options are available, as shown by the following examples.
 
 Both frequency and velocity can be plotted in any one of four frames of
 reference, as described in \S\ref{frames}.
-The frequency scale can also be plotted in either {\em relative} or 
+The frequency scale can also be plotted in either {\em relative} or
 {\em absolute} scales: in the former the frequencies are plotted with
 respect to the nominal frequency of the line, in the latter the absolute
 frequency (in \ghz) is plotted.
@@ -6761,12 +6761,12 @@ Examples:
             3      Velocity scale
             4      User defined scale
 
-       Current units are km/s  
+       Current units are km/s
 
 
        Key?  [3] 1 <CR>
 
-    X-scale units set - Chans 
+    X-scale units set - Chans
     ..
 
     >> set-x-scale <CR>
@@ -6778,14 +6778,14 @@ Examples:
             3      Velocity scale
             4      User defined scale
 
-        Current units are Chans 
+        Current units are Chans
 
 
        Key?  [1] 2 <CR>
     Apply polynomial correction to frequency scale? (Y/N) [Y] <CR>
     Absolute or relative frequencies? (A/R) [A]  <CR>
 
-    X-scale units set - GHz   
+    X-scale units set - GHz
     ..
 
     >> set-x-scale <CR>
@@ -6797,7 +6797,7 @@ Examples:
             3      Velocity scale
             4      User defined scale
 
-       Current units are GHz   
+       Current units are GHz
 
 
        Key?  [2]  <CR>
@@ -6805,7 +6805,7 @@ Examples:
     Absolute or relative frequencies? (A/R) [A]  R <CR>
     Relative to line rest freq. or to other freq? (R/F) [R] R
 
-    X-scale units set - MHz   
+    X-scale units set - MHz
     ..
 
     >> set-x-scale <CR>
@@ -6817,7 +6817,7 @@ Examples:
             3      Velocity scale
             4      User defined scale
 
-       Current units are GHz   
+       Current units are GHz
 
 
        Key?  [2]  <CR>
@@ -6826,7 +6826,7 @@ Examples:
     Relative to line rest freq. or to other freq? (R/F) [R] F <CR>
     Reference frequency (GHz)? [ 338.493988] 338 <CR>
 
-    X-scale units set - MHz   
+    X-scale units set - MHz
     ..
 
 
@@ -6839,7 +6839,7 @@ Examples:
             3      Velocity scale
             4      User defined scale
 
-       Current units are MHz   
+       Current units are MHz
 
 
       Key?  [2] 4 <CR>
@@ -6847,7 +6847,7 @@ Examples:
     Title? [ Frequency] 'user units' <CR>
     Units [   MHz] grex <CR>
 
-    X-scale units set - grex  
+    X-scale units set - grex
     ..
 
     >> set-x-scale <CR>
@@ -6859,13 +6859,13 @@ Examples:
             3      Velocity scale
             4      User defined scale
 
-       Current units are grex  
+       Current units are grex
 
 
        Key?  [4] 3 <CR>
     Apply polynomial correction to frequency scale? (Y/N) [Y] <CR>
 
-    X-scale units set - km/s  
+    X-scale units set - km/s
     ..
 \end{verbatim}
 
@@ -6875,7 +6875,7 @@ This routine exists to let you move the the spectrum relative to the
 physical channel numbers. Thus, for a spectrum with a maximum originally
 in channel 64, you could (with the X-scale set to \verb+POINTS+) do a
 shift of 10 points to move the maximum to channel 74. The header frequency
-and velocity parameters are reset to be consistent with the move, so you 
+and velocity parameters are reset to be consistent with the move, so you
 will not see any effect if you replot on a frequency or velocity scale.
 
 This is most useful if you have two spectra with different centre frequencies,
@@ -6903,7 +6903,7 @@ SHIFT-SPECTRUM: The top spectrum has been shifted by $+5\kms$ to produce
 the bottom spectrum, and the header information has been updated to maintain
 the frequency and velocity scales. Accordingly, fewer data channels remain to
 the right of the plot, while those now appearing at the left are undefined, and
-so filled with bad-channel values (and do not appear on the plot). 
+so filled with bad-channel values (and do not appear on the plot).
 \label{SHIFT}
 }
 }
@@ -6916,7 +6916,7 @@ Uses the command interpreter to search the command table \index{command table}
 for commands containing a word that starts with the string you give it. Command
 names are generally chosen to include some useful keyword \index{keyword} (such
 a `PLOT', `MAP' \etc) so this is a useful way to find out what commands relate
-to a particular topic. 
+to a particular topic.
 
 Examples:
 \begin{verbatim}
@@ -6930,7 +6930,7 @@ Examples:
     contour
     -------
     CONTOUR-MAP
-    SET-CONTOUR-LEVELS      
+    SET-CONTOUR-LEVELS
 
     String to match (topic)? ( ^Z to quit ) ^z <CR>
 \end{verbatim}
@@ -7001,10 +7001,10 @@ Examples:
 
 
     Stack posn    Scan no    Title
-        X            3      grumpy                    
-        Y            4      doc                       
-        Z            2      sneezy                    
-        T                                             
+        X            3      grumpy
+        Y            4      doc
+        Z            2      sneezy
+        T
 \end{verbatim}
 
 \subsection{SHOW-STORE-REGISTERS} \index{SHOW-STORE-REGISTERS}
@@ -7019,11 +7019,11 @@ Examples:
 
     Store posn    Scan no    Title
     ----------------------------------------------------
-        1            3      grumpy                    
-        2            0      
-        3            0      
-        4            0      
-        5            0      
+        1            3      grumpy
+        2            0
+        3            0
+        4            0
+        5            0
 \end{verbatim}
 
 \subsection{SHOW-SYMBOLS} \index{SHOW-SYMBOLS}
@@ -7031,7 +7031,7 @@ Examples:
 
 Prints the translation of the selected symbols to the current
 listing file. The matching symbols are selected using the standard
-minimum-matching technique. 
+minimum-matching technique.
 
 Examples:
 \begin{verbatim}
@@ -7150,7 +7150,7 @@ resulting spectrum, where the convolution is not defined.
 \subsection{STORE-SPECTRUM} \index{STORE-SPECTRUM}
                             \index{storage registers!max length = 2048}
                             \index{storage registers!to use}
-                            
+
 
 Copy the current (X-register) spectrum to a specified storage register.
 All storage registers are 128+2048 words long, so this facility cannot
@@ -7182,10 +7182,10 @@ Examples:
 
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            3      grumpy                    
-        Z            2      sneezy                    
-        T            1      dopey                     
+        X            4      doc
+        Y            3      grumpy
+        Z            2      sneezy
+        T            1      dopey
 
     >> subtract-spectrum <CR>
     ..
@@ -7196,10 +7196,10 @@ Examples:
               Data stack contents
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            2      sneezy                    
-        Z            1      dopey                     
-        T                                             
+        X            4      doc
+        Y            2      sneezy
+        Z            1      dopey
+        T
 \end{verbatim}
 
 \subsection{TRUNCATE-SPECTRUM} \index{TRUNCATE-SPECTRUM}
@@ -7244,9 +7244,9 @@ in brackets.
 
 Items may optionally be followed immediately by a colon (:\index{:}) and a
 FORTRAN format\index{format!WRITE} specifier, to control the width of the
-output field. 
+output field.
 
-Examples:  
+Examples:
 \begin{verbatim}
        >>  declare string c80
        >>  write string  x
@@ -7284,7 +7284,7 @@ Examples:
     Map file opened on channel            256
     Map array size - IMX * IMY             43          19
     -- MAP_ASCIIWR --
-    Pixel sizes:   -10.00000       10.00000    
+    Pixel sizes:   -10.00000       10.00000
 
     $ type ascii_map.tmp <CR>
        30.00000      -30.00000      2.1045541E-02  0.0000000E+00
@@ -7320,7 +7320,7 @@ Examples:
 
  ---------------------------------------------------------------------------
 
- Scan :   4  Title : doc                       
+ Scan :   4  Title : doc
   Recorded on 03-SEP-87 at 05:06:17(UT)   Mode : ON-OFF
 
  --------------------------------------------------------------------------
@@ -7333,7 +7333,7 @@ Examples:
 
  Observed frequencies are LSR corrected, Exact in Quadrant 0
  Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
-  1     65     33.0       230.5380      230.5380        0.742    860.40    
+  1     65     33.0       230.5380      230.5380        0.742    860.40
 
 ****** Line parameters ******
  Quad.  T(max)  V(max)  Int.Intsty.  FWHM  TREC(K)  TSKY(K)  TTEL(K)
@@ -7365,7 +7365,7 @@ corrected with GILDAS, using the HEADER command, with details obtained from
 the SPECX commands LIST-MAP and SHOW-X-SCALE.
 
 Note that the data cube, as written, consists of a single 3-D array
-of the form \verb+DATA(iv,ix,iy)+. That is, the cube is stored as a 
+of the form \verb+DATA(iv,ix,iy)+. That is, the cube is stored as a
 sequence of spectra, rather than as a sequence of channel maps. GILDAS
 \index{GILDAS!to import a cube from SPECX}
 by default assumes the reverse, so that it is necessary to use the GILDAS
@@ -7380,7 +7380,7 @@ Examples:
 \subsection{WRITE-FITS-MAP} \index{WRITE-FITS-MAP}
                                  \index{FITS!to write}
 
-Makes a map as in CONTOUR-MAP or GREYSCALE-MAP and writes it 
+Makes a map as in CONTOUR-MAP or GREYSCALE-MAP and writes it
 to an open FITS file on either disk or tape. The FITS file is
 suitable for reading directly into AIPS\index{AIPS!export to}
 There are no parameters:
@@ -7432,9 +7432,9 @@ Examples:
     >> write-spectrum <CR>
     File number? (^z to list) ^z <CR>
     1  l483small.dat                             RW
-    2  test.dat                                  W 
+    2  test.dat                                  W
     File number? (^z to list) 2 <CR>
-    Filed as scan   1 of test.dat                                
+    Filed as scan   1 of test.dat
 \end{verbatim}
 
 \subsection{XY-INTERCHANGE} \index{XY-INTERCHANGE}
@@ -7447,10 +7447,10 @@ Examples:
 
 
     Stack posn    Scan no    Title
-        X            4      doc                       
-        Y            3      grumpy                    
-        Z            2      sneezy                    
-        T            1      dopey                     
+        X            4      doc
+        Y            3      grumpy
+        Z            2      sneezy
+        T            1      dopey
 
     >> xy-interchange <CR>
     X-register now contains scan    3: grumpy
@@ -7462,10 +7462,10 @@ Examples:
                   Data stack contents
 
     Stack posn    Scan no    Title
-        X            3      grumpy                    
-        Y            4      doc                       
-        Z            2      sneezy                    
-        T            1      dopey                     
+        X            3      grumpy
+        Y            4      doc
+        Z            2      sneezy
+        T            1      dopey
 \end{verbatim}
 
 \part{Appendices}
@@ -7555,7 +7555,7 @@ CLEAR-STACK            & Initialize stack registers to all empty\\
 ROLL-STACK             & Y$\rightarrow$X, X$\rightarrow$T etc\\
 PUSH-STACK-UP          & X$\rightarrow$X,Y, Y$\rightarrow$Z, etc\\
 POP-STACK-DOWN         & \parbox[t]{4.5in}{
-                         Pop stack down (T$\rightarrow$T-1, Z$\rightarrow$Y, 
+                         Pop stack down (T$\rightarrow$T-1, Z$\rightarrow$Y,
                          Y$\rightarrow$X)}\\
 XY-INTERCHANGE         & Swap X and Y register contents\\
 SHOW-STACK             & Show contents of current stack registers\\
@@ -8008,7 +8008,7 @@ WRITE-GILDAS-IMAGE      & Write cube to a basic GILDAS cube (``image'').\\
   COLOR5_START     R4      1    }
   COLOR5_ROTATE    R4      1    }  Define the MRAO colour spiral
   COLOR5_EXPONENT  R4      1    }
- 
+
   BEAM_FWHM        R4      1    FWHM (arcseconds) of the beam for INT-MAP
   BEAM_EXTENT      R4      1    Full extent of the beam (arcsec) for INT-MAP
 
@@ -8056,8 +8056,8 @@ WRITE-GILDAS-IMAGE      & Write cube to a basic GILDAS cube (``image'').\\
 \section{Errors}
 \begin{verbatim}
 
-  ERROR_SET        L4      1     
-  ERROR            I4      1  
+  ERROR_SET        L4      1
+  ERROR            I4      1
   LAST_ERROR       I4      1     Error number of last error
   SEVERITY         I4      1     Severity of last error
 
@@ -8091,7 +8091,7 @@ Those included are:
        spectra in different SPECX data files. Includes allowance for
        aborted scans, \etc.
 \item{skytemp.spx} Makes an ``index listing'' of all the spectra in a
-       file, listing (in this case) parameters relevant to the sky 
+       file, listing (in this case) parameters relevant to the sky
        transmission, in a form suitable for direct plotting by MONGO.
 \item{source\_select.spx} Select all scans with the same source name from a
        SPECX data file and average them together.
@@ -8101,15 +8101,15 @@ Those included are:
 \end{description}
 
 \newpage
-\section{Remove a spectrum from an average} 
+\section{Remove a spectrum from an average}
     \index{Command files!examples!Unaverage}
 
 \begin{verbatim}
-!-------------------------------------------------- 
+!--------------------------------------------------
 !         unaverage.spx
 !   Routine to remove spectrum in stack register x from
 !   average (assumed stored in stack-register y)
-!-------------------------------------------------- 
+!--------------------------------------------------
 
 print  ' Unaverage -- assumes average is now in Y'
 print  ' and spectrum to be removed from average is in X'
@@ -8154,7 +8154,7 @@ return
     \index{Command files!examples!Newton\_root}
 
 \begin{verbatim}
-!-------------------------------------------------- 
+!--------------------------------------------------
 !           newton_root.spx
 !     Routine to evaluate square root of real variable
 !     using Newton's method
@@ -8163,7 +8163,7 @@ return
 !           value  : r4
 !           result : r4
 !
-!-------------------------------------------------- 
+!--------------------------------------------------
 
 declare value    r4
 
@@ -8222,7 +8222,7 @@ do n nmin  nmax
 
 ! Check for predictable errors and reset
 
-  if (last_error = 10) 
+  if (last_error = 10)
     last_error = 0
     nspec = 0
   elseif (last_error = 38)
@@ -8268,7 +8268,7 @@ do n nmin  nmax
         write-spectrum out_file
         if (no_new_spectra>1)
           pop-stack-down
-          out_file=out_file - 1 
+          out_file=out_file - 1
           write-spectrum out_file
         endif
       endif
@@ -8285,11 +8285,11 @@ enddo
     \index{Command files!examples!Skytemp}
 
 \begin{verbatim}
-!-------------------------------------------------- 
+!--------------------------------------------------
 !   skytemp.spx
 !     command file to list relevant calibration temperatures
 !     as a function of UT time and source.
-!-------------------------------------------------- 
+!--------------------------------------------------
 
 declare filename c40
 
@@ -8317,10 +8317,10 @@ $show time
       \index{Command files!examples!Source\_select}
 
 \begin{verbatim}
-!-------------------------------------------------- 
+!--------------------------------------------------
 !   source_select.spx
 ! Tests selection of scan by source
-!-------------------------------------------------- 
+!--------------------------------------------------
 
   declare n      i4
   declare source c10
@@ -8332,7 +8332,7 @@ $show time
 
   do n 1 no_file_spectra
     read-spec n
-    if (source_name<>source) 
+    if (source_name<>source)
       print 'Scan ', n:i3.3, '  for wrong source, continuing'
       pop
     else
@@ -8350,7 +8350,7 @@ $show time
 is somewhat simplistic, and in particular that it does not allow for the
 integration time and system temperature to be stored for each individual
 spectrum. It is thus not possible to average spectra into the map with
-the appropriate weighting for their signal-to-noise ratio. 
+the appropriate weighting for their signal-to-noise ratio.
 Here I discuss briefly two ways of overcoming this deficiency, both
 of which are available in V6.0A and later versions.
 
@@ -8379,7 +8379,7 @@ the current number of spectra in the last opened map file, while ``in\_file" is
 another variable that tells you the number of the file you read from last time
 round. So this is all very easy. There is also another slightly messier way of
 doing this, that circumvents the intermediate SPECX data file. The trick is to
-realize that in general you have rather more spectral data points than you 
+realize that in general you have rather more spectral data points than you
 actually intend to use, so that there is no loss in sacrificing a few points
 at one end of the spectrum to hold relevant information. In the example below
 I copy the integration time and system temperature from the scan header into
@@ -8387,7 +8387,7 @@ the first and second data points respectively before adding the spectrum into
 the map. The second, much shorter, command file below (fetch.spx) copies these
 parameters back into the header when the spectrum is extracted from the map.
 
-Map\_av.spx also illustrates the use of the error trapping facility to 
+Map\_av.spx also illustrates the use of the error trapping facility to
 test whether or not the map already contains a spectrum at the particular
 map point. On the first attempt to include the spectrum in the map, the
 ``replace" variable is set false, so that an error number 58 is returned
@@ -8402,13 +8402,13 @@ and predeclared variables is given in appendices to the user manual.)
 !                  map_av.spx
 !   Command file to average a spectrum into the map
 !   Checks whether there is already a spectrum in the map at this
-!     position, and if not inserts the current one: if there is 
+!     position, and if not inserts the current one: if there is
 !     it extracts the current one and averages the two together before
 !     reinserting it.
 !-----------------------------------------------------
 
-    declare scan_npts     i4 
-    declare save_severity i4 
+    declare scan_npts     i4
+    declare save_severity i4
     declare save_d1       r4
     declare save_d2       r4
 
@@ -8422,7 +8422,7 @@ and predeclared variables is given in appendices to the user manual.)
     set-error-return F
 
     scan_npts = npts(1)
-    
+
     save_d1   = data(1)
     save_d2   = data(2)
     data(1)   = int_time
@@ -8430,7 +8430,7 @@ and predeclared variables is given in appendices to the user manual.)
     add-to-map
     severity  = save_severity
 
-    if ( last_error = 58 ) 
+    if ( last_error = 58 )
       print '...averaging with existing spectrum'
       get-spectrum-from-map \\ ra_offset, dec_offset
 
@@ -8539,7 +8539,7 @@ Many thanks to Keith Shortridge for the use of his FITS-writing routines.
 
 SPECX FITS output file header (1-D):
 \begin{verbatim}
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SIMPLE  =                    T /
 BITPIX  =                   32 /
 NAXIS   =                    4 /
@@ -8577,7 +8577,7 @@ BLANK   =             -5779834 / Bad channel (blanking) value
 LINE    = '*                 ' / Line name
 RESTFREQ=  2.4172963100000E+11 / Rest frequency (HZ)
 VLSR    =  1.7501582336426E+05 / Velocity of reference channel (M/S)
-VELREF  =                  257 / >256 RADIO, 1 LSR 2 HEL 3 OBS                  
+VELREF  =                  257 / >256 RADIO, 1 LSR 2 HEL 3 OBS
 ALTRVAL =  1.7501582336426E+05 / Alternate freq/vel ref value
 ALTRPIX =  6.1500000000000E+02 / Alternate freq/vel ref pixel
 DELTAV  = -7.7564631263973E+02 / Nominal velocity resolution (M/S)
@@ -8598,19 +8598,19 @@ ELEVATIO=  5.6094484334757E+01 / Telescope elevation (deg)
 AZIMUTH = -1.5997278233626E+02 / Telescope azimuth (deg)
 UT      = ' 9:05:30.000      ' / Universal Time at start of obs'n
 LST     = ' 2:56:56.690      ' / Sidereal Time at start of obs'n
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 \end{verbatim}
 
 Unfortunately AIPS\index{AIPS} and CLASS\index{CLASS} do not use exactly the
 same set of non-standard keywords; so the SPECX-generated header for 2-D data
 has been modified to conform with the AIPS usage, in the belief that this is
-likely to be a more common use. 
+likely to be a more common use.
 
 \section{2-D FITS header specification}\index{FITS header!2-D}
 
 SPECX FITS output file header (2-D):
 \begin{verbatim}
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SIMPLE  =                    T /
 BITPIX  =                   32 /
 NAXIS   =                    4 /
@@ -8650,7 +8650,7 @@ BLANK   =               -32764 / Bad channel (blanking) value
 LINE    = '*                 ' / Line name
 RESTFREQ=  3.4579600000000E+11 / Rest frequency (HZ)
 VLSR    =  4.9999322891235E+03 / Velocity of reference channel (M/S)
-VELREF  =                  257 / >256 RADIO, 1 LSR 2 HEL 3 OBS                  
+VELREF  =                  257 / >256 RADIO, 1 LSR 2 HEL 3 OBS
 ALTRVAL =  4.9999322891235E+03 / Alternate freq/vel ref value
 ALTRPIX =  1.0000000000000E+00 / Alternate freq/vel ref pixel
 DELTAV  = -2.1530029664689E+02 / Nominal velocity resolution (M/S)
@@ -8659,19 +8659,19 @@ IFFREQ  =  0.0000000000000E+00 / Intermediate frequency (HZ)
 IMAGFREQ=  0.0000000000000E+00 / Image sideband frequency (HZ)
 TSYS    =  6.7204174804688E+02 / System temperature (K)
 OBSTIME =  2.1000000000000E+02 / Integration time (sec)
-SCAN-NUM=  1.0000000000000E+00 / Scan number                                    
+SCAN-NUM=  1.0000000000000E+00 / Scan number
 TAU-ATM =  8.9185588061810E-02 / Zenith opacity (nepers)
 BEAMEFF =  1.0000000000000E+00 / Beam efficiency
-FORWEFF =  1.0000000000000E+00 / Forward efficiency 
+FORWEFF =  1.0000000000000E+00 / Forward efficiency
 GAINIMAG=  1.0000000000000E+00 / Image sideband gain ratio
-ORIGIN  = 'VAX-VMS SPECX V6.3' / Originating reduction system 
+ORIGIN  = 'VAX-VMS SPECX V6.3' / Originating reduction system
 DATE-MAP= '18/12/93          ' / Date FITS file written
 DATE-OBS= '12/04/93          ' / Date of observation
 ELEVATIO=  3.5738928416765E+01 / Telescope elevation (deg)
 AZIMUTH =  1.7051416596108E+00 / Telescope Azimuth (deg)
 UT      = '17:09:56.000      ' / Universal Time at start of obs'n
 LST     = '20:11:40.760      ' / Sidereal Time at start of obs'n
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 \end{verbatim}
 
 \newpage
@@ -8685,7 +8685,7 @@ disk, this information is stored in direct-access binary files. When
 accessed by the program, the data and associated header are read into
 an area of labelled COMMON memory for processing. This note describes
 how SPECX-format spectra may be accessed by other programs, or how
-``foreign" data may be read into SPECX. 
+``foreign" data may be read into SPECX.
 
 There are two options for exchanging data with SPECX (other than by FITS
 format files); the first is to
@@ -8697,15 +8697,15 @@ exporting data, especially if you wish to read a large number of
 partially-reduced spectra already stored in a SPECX file. Since
 writing a program to read disk files is a somewhat simpler problem
 than writing a subroutine to execute as part of SPECX, this process is
-described first. 
-                                                   
+described first.
+
 \section{SPECX data-file structure} \index{data files!structure}
 
 SPECX data files are direct access, fixed record length, unformatted
 files. They contain a file header record, followed by a number of
 spectrum (``scan") header records, and finally the data records. The
 record length is 64 longwords (i.e. 256 bytes). A typical OPEN
-statement might be: 
+statement might be:
 \begin{verbatim}
                     :
                     :
@@ -8718,7 +8718,7 @@ statement might be:
 The file header record contains information such as the number of
 scans in the file, the SPECX file owner and identification, the
 sequence number of the first scan, and so on. The format is as
-follows: 
+follows:
 
 \begin{verbatim}
       INTEGER*4 NSCAN               ! Number of scans in the file
@@ -8741,7 +8741,7 @@ Integer*4 words (two records). The header information consists of
 receiver parameters (e.g. Tsys for each quadrant), positional
 information, time information and so on. The header also contains the
 sequence number of the start and end records in the file where the
-data are stored. 
+data are stored.
 
 The type declarations of all the header variables are made by SPECX in
 an include file STACKCOMM.INC. This is listed at the end of this appendix. The
@@ -8750,13 +8750,13 @@ specifies their order within the scan header record. The method used
 by SPECX to read the header information is to EQUIVALENCE an integer
 array to the start of the COMMON block, and then simply read the
 header into this. The quantities are automatically transferred to the
-header variables by the EQUIVALENCE statement. 
+header variables by the EQUIVALENCE statement.
 
 \section{Reading SPECX data-files} \index{data files!to read}
 
 Because of the equivalence detailed in the previous section, it is very easy to
 access SPECX header variables in FORTRAN. The following code fragment
-illustrates this procedure: 
+illustrates this procedure:
 
 \begin{verbatim}
       REAL*4         TSYS(8)    ! System noise temp. in each quadrant/filter-bank
@@ -8798,9 +8798,9 @@ C     Declare the common block
       EQUIVALENCE (HEADER, SCAN_HEADER)
                     :
                     :
-* read the header information of the first scan into HEADER 
+* read the header information of the first scan into HEADER
 * (equivalenced to various variables)
-      
+
       READ (10'2) (HEADER(I),I=1,64)
       READ (10'3) (HEADER(I),I=65,128)
                     :
@@ -8812,13 +8812,13 @@ records have been read from the header, the data may be easily
 transferred. [NOTE: the SPECX convention is that the first record of
 the file is record 0, while the VMS convention is to start at 1. Thus,
 the SPECX record numbers must be incremented before the transfer is
-performed.] 
-                       
+performed.]
+
 \begin{verbatim}
                     :
                     :
-      DO IREC = IST,IEND	  
-        IPOS = IREC+1                
+      DO IREC = IST,IEND
+        IPOS = IREC+1
         J = 64 * (IREC-IST)
         READ (10'IPOS) (DATA(I), I = J+1, J+64)
       END DO
@@ -8827,7 +8827,7 @@ performed.]
 \end{verbatim}
 
 All the information has now been read from the file, and it can be
-closed: 
+closed:
 
 \begin{verbatim}
                     :
@@ -8836,7 +8836,7 @@ closed:
                     :
                     :
 \end{verbatim}
-       
+
 To summarise, the method used to read SPECX data files is as follows:
 \begin{enumerate}
 \item declare all the header variables, and the STACK common
@@ -8848,18 +8848,18 @@ To summarise, the method used to read SPECX data files is as follows:
 \item Using IST and IEND, read the data records.
 \item Close the file.
 \end{enumerate}
- 
+
 
 The complete listing of STACKCOMM.INC (which gives all the header
 parameters) is given at the end of this section. The progam READFILE.FOR is an
 example of a stand-alone program which will read a SPECX data file,
-and print out the data-array of a requested scan. 
+and print out the data-array of a requested scan.
 
 Note that you should {\em always} access \verb+STACKCOMM.INC+ (and other
 standard include files) by using their standard SPECX logical names (as
 defined by executing \verb+sys_specx:specxdev.com+). This means that the
 definition you are using will remain in step with any changes in the files
-used by SPECX (and since the whole reason for using these common blocks 
+used by SPECX (and since the whole reason for using these common blocks
 is that you want your routine to communicate with SPECX, then there is no
 point at all in having {\em different} common block!).
 
@@ -8872,7 +8872,7 @@ COMMON block is identical to the ``STACK" which is manipulated by
 SPECX. [NOTE: in this document, each stack position, and hence data
 array, is assumed to be 1024 channels in length. This is not a fixed
 constraint, but processing data with different stack lengths is a more
-complicated problem not addressed here.] 
+complicated problem not addressed here.]
 
 The definition of the scan header variables, and their position within the
 common block, are made within an include file
@@ -8917,14 +8917,14 @@ C subroutine to read in data from an external disk-file,
 C and put it onto the Stack
 
 
-      INCLUDE 'STACKCOMM/LIST'           
-      INCLUDE 'STAKPAR/LIST'             
+      INCLUDE 'STACKCOMM/LIST'
+      INCLUDE 'STAKPAR/LIST'
 
-      INTEGER IFAIL, IERR                
+      INTEGER IFAIL, IERR
       INTEGER JFILE, ERRCODE,STATUS
       LOGICAL IEXIST,IANS
       CHARACTER FILENM*40
-                                                                  
+
 C initialise error code to assume success
 
       IERR = 0
@@ -8954,10 +8954,10 @@ C routines so that the units are released in case of an error or ^c).
 C  Push existing data onto the stack to make room for the new scan
 C  if required
 
-      IF (.NOT.XCLEAR) CALL PUSH  
+      IF (.NOT.XCLEAR) CALL PUSH
       IF (JTOP.EQ.0) JTOP = 1
 
-C now set-up or read from the file all the header info. 
+C now set-up or read from the file all the header info.
 C For example, we might have four quadrants per spectrum,
 C each containing 256 data points. So:
 
@@ -8989,7 +8989,7 @@ C with a data value, all repeated for each quadrant.
                   READ (LUN, *) DATA(K)
             END DO
       END DO
-      
+
 
 C now you would have to fill in the rest of the header information
 C (times, positions, etc).
@@ -9014,7 +9014,7 @@ C filled it.
 
 
  500  CONTINUE
-      
+
       IF (IERR.NE.0) THEN
             IF (.NOT.XCLEAR) CALL POP
       ELSE
@@ -9038,12 +9038,12 @@ The include files STACKCOMM.INC and STAKPAR.INC are referred to by
 logical names, so that they do not need to be in the default
 directory; these logical names are defined by running
 SYS\_SPECX:SPECXDEV.COM The /LIST qualifier can be useful if you are
-using the debugger. 
+using the debugger.
 
 As well as STACKCOMM.INC, STAKPAR.INC must be included. STAKPAR
 contains variables which describe the current state of the stack, in
 particular the logical variable XCLEAR indicates whether or not the
-x-position is in use. 
+x-position is in use.
 
 This routine assumes that each stack position will contain no more than 1024
 data-values (arbitrarily distributed amongst the ``quadrants" or ``sectors'').
@@ -9051,7 +9051,7 @@ It is possible to store more than 1024 channels - the remainder must be put
 into the array STK, which normally stores the other stack positions. If you DO
 read in more than 1024 points, however, you should do SET-STACK before calling
 this procedure, or you will over-write the beginning of the next stack
-position. 
+position.
 
 The header variables are all described in the in-line comments of
 STACKCOMM.INC. Most of these quantities must be filled in by your
@@ -9061,8 +9061,8 @@ routine. Some are optional, however, and some must not be changed
 You may not have recorded values for certain parameters (e.g. ITSKY).
 Most of these can be left blank, unless you wish to perform some
 operation which needs them, in which case you will have to somehow
-invent plausible values from your own knowledge of the data. 
-                          
+invent plausible values from your own knowledge of the data.
+
 \newpage
 \section{STACKCOMM.INC}  \index{STACKCOMM} \index{stack structure!STACKCOMM}
 \begin{verbatim}
@@ -9114,7 +9114,7 @@ C     Define the named header variables...
       INTEGER*4      LSRFLG     ! Flag: Set = 1 if JFCEN corrected for lsr.
       INTEGER*4      IQCEN      ! Sector to which LSR correction applied.
       REAL*4         DRA        ! Offset if any from RA,DEC in R.A. ( arcsec )
-      REAL*4         DDEC       !    "   in Dec.  ( arcsec )      
+      REAL*4         DDEC       !    "   in Dec.  ( arcsec )
 
       CHARACTER      ITITLE*26  ! Character title of observation.
       CHARACTER      IDATE*9    ! Character date of observation dd-MON-yy
@@ -9178,7 +9178,7 @@ C-------------------------------------------------------------------------
 \section{Notes on individual header parameters:}
 
 \begin{description}
-\item {} TSYS(n) holds the system temperature for the nth quadrant. 
+\item {} TSYS(n) holds the system temperature for the nth quadrant.
         You do not need to supply this, however,
         the value is required when averaging two spectra
         together.
@@ -9195,7 +9195,7 @@ C-------------------------------------------------------------------------
          function for all frames.
 
 \item {} LSRFLG describes both the reference frame and velocity scaling law
-         applied to the observations. It is an integer variable equal to 
+         applied to the observations. It is an integer variable equal to
          \verb$16*IVLAW + IVFRAM$, where \verb+IVLAW+ = 0, 1 or 2 for
          radio, optical or relativistic velocity laws, respectively, and
          \verb+IVFRAM+ = 0, 1, 2 or 3 for Telluric, LSR, heliocentric
@@ -9230,11 +9230,11 @@ various include files {\em via} their logical names, rather than having to
 indicate their locations explicitly (there is no point in copying them over,
 since the included common blocks constitute your communication channel with the
 rest of the program, and they must therefore be identical to those used to
-create the rest of the code). 
+create the rest of the code).
 
 Compile the subroutines, insert the object modules into an object library
 with the name EXTERNAL.OLB, point the SPECX link file at your own directory,
-and link a new executable: 
+and link a new executable:
 \begin{verbatim}
    $ @sys_specx:specxdev
    $ fortran myfiles
@@ -9322,7 +9322,7 @@ R &RIGHT &Define the right-hand boundary of the current box\\
 T &TOP &Define the top boundary of the current box\\
 B &BOTTOM &Define the bottom boundary of the current box\\
 D &DRAW &Draw the current box\\
-N & NEWLIM & \parbox[t]{3.7in}{ Redraw the plot taking the current box as new 
+N & NEWLIM & \parbox[t]{3.7in}{ Redraw the plot taking the current box as new
                       limits. Note that if the limits have not been
                       redefined in one co-ordinate then you get back the
                       original limits according to SET-MAP-SCALES} \\

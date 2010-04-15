@@ -32,7 +32,7 @@
 *     See description of these parameters in smf_get_cleanpar header.
 *     If none of these parameters are defined, nothing is done to the
 *     supplied smfFilter.
-*     
+*
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     {enter_new_authors_here}
@@ -100,7 +100,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
 
   /* Search for filtering parameters in the keymap */
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &f_edgelow, &f_edgehigh, f_notchlow, f_notchhigh, 
+                    &f_edgelow, &f_edgehigh, f_notchlow, f_notchhigh,
                     &f_nnotch, &dofft, NULL, NULL, NULL, NULL, status );
 
   /* Return dofilt if requested */
@@ -113,13 +113,13 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
     if( f_edgelow ) {
       smf_filter_edge( filt, f_edgelow, 1, status );
     }
-    
+
     if( f_edgehigh ) {
       smf_filter_edge( filt, f_edgehigh, 0, status );
     }
-    
+
     if( f_nnotch ) {
       smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch, status );
-    }    
+    }
   }
 }

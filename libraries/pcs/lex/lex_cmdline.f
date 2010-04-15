@@ -109,5 +109,5 @@
 
       CALL LEX_PARSE(INIT,STRING,25,TABLE,ACTION,TOKEN,
      :       TLEN,POSN,STATUS)
-      
+
       END

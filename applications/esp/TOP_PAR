@@ -30,8 +30,8 @@
 
 *  Global constants:
 
-*   The maximum number of pixels within an area about a bright pixel 
-*   that can be used. 
+*   The maximum number of pixels within an area about a bright pixel
+*   that can be used.
       INTEGER TOP1__PIXN
       PARAMETER ( TOP1__PIXN = 10000 )
 

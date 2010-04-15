@@ -30,7 +30,7 @@
 #     Performs the given method on this object.
 
 #  Configuration options:
-#  
+#
 #        -leftwidth
 #        -leftheight
 #        -leftrelief
@@ -94,11 +94,11 @@ option add *LabelRule.rightRelief  sunken
 option add *LabelRule.rightBorder  2
 
 itcl::class gaia::LabelRule {
-   
+
    #  Inheritances:
    #  -------------
    inherit util::LabelWidget
-   
+
    #  Constructor:
    #  ------------
    constructor {args} {
@@ -131,7 +131,7 @@ itcl::class gaia::LabelRule {
       #  Evaluate all options..
       eval itk_initialize $args
 
-   }   
+   }
 
    #  Destructor:
    #  -----------

@@ -7,7 +7,7 @@
   <path>docs/ssn/023</path>
   <description>Starlink Benchmarking Utility</description>
   <abstract><p>
-     The Starlink Benchmarking Utility provides a set of tools for 
+     The Starlink Benchmarking Utility provides a set of tools for
      investigating the performance of computer systems running
      astronomy data reduction software. This manual is intended for
      Starlink Site Managers and describes how to install and use the

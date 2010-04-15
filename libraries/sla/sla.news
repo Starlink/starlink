@@ -5,7 +5,7 @@
 
 SLALIB_Version_2.5.4
 
-* Changes to sla_EL2UE, sla_FITXY, sla_PV2EL, sla_REFRO, sla_UE2PV and 
+* Changes to sla_EL2UE, sla_FITXY, sla_PV2EL, sla_REFRO, sla_UE2PV and
   sla_SVD to avoid warnings if compiled with -Wall and -g -O.
 
 * Changes to sla_UE2PV to improve convergence in high-eccentricity
@@ -52,26 +52,26 @@ The latest releases of SLALIB include the following changes:
 
 * The documentation for the suite of heliocentric orbital elements
   routines has been improved to make it easier and more obvious how
-  to use of elements from JPL Horizons and from the Minor Planet 
+  to use of elements from JPL Horizons and from the Minor Planet
   Center.
 
   Confusion over epochs has often arisen, because the epoch of osculation
   (when the elements are momentarily correct) is completely separate from
-  the epochs that locate a body in its orbit, the former having a role 
-  only when appying perturbations.  Part of the reason for this confusion 
-  is that for major and minor planets it is conventional to adopt the 
+  the epochs that locate a body in its orbit, the former having a role
+  only when appying perturbations.  Part of the reason for this confusion
+  is that for major and minor planets it is conventional to adopt the
   same epoch for (i) osculation and (ii) computing the anomaly or longitude
   that fixes the body, even though they could in principle be different.
   For the comet case this convention is impossible because the choice of
   perihelion dictates the epoch fixing the body, and hence the existence
   of (and need for) two independent concepts of epoch is exposed.
 
-  The SLALIB routines in question, especially slaPlante, now have extra 
-  explanation dealing with the three distinct epochs (date of observation, 
+  The SLALIB routines in question, especially slaPlante, now have extra
+  explanation dealing with the three distinct epochs (date of observation,
   fixing the body, and osculation) and also some notes dealing with JPL
   and MPC elements.  Additionally, a table has been added to SUN/67
   showing how to use the JPL and MPC elements.
-   
+
  P.T.Wallace
  8 April 2005
 

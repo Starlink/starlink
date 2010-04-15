@@ -137,12 +137,12 @@ static int unpack_value( const unsigned char *ptr, struct STK *stk);
       if( hcb->stamp != REC__STAMP ||
           hcb->version > REC__VERSION4 )
       {
-         hds_gl_status = DAT__FILIN;     
+         hds_gl_status = DAT__FILIN;
          emsRep( "REC1_UNPACK_HCB_1",
                  "HDS file is invalid. Header Control Block is corrupt.",
                  &hds_gl_status);
          return hds_gl_status;
-      }         
+      }
 /* Test for older format HCB (from HDS Version 3)                           */
       if ( hcb->version < REC__VERSION4 )
       {
@@ -232,7 +232,7 @@ static int unpack_value( const unsigned char *ptr, struct STK *stk);
       return hds_gl_status;
    }
 
-static int 
+static int
 unpack_value( const unsigned char *ptr, struct STK *stk)
 {
 /* This is helper function for rec1_unpack_hcb.                             */

@@ -22,17 +22,17 @@
 *     UTS1 = CHARACTER * ( * )  (Given)
 *        The units of the input image.
 *     UTS2 = CHARACTER * ( * ) (Given)
-*        The units required for the output image. 
+*        The units required for the output image.
 *     BAND = INTEGER (Given)
-*        The survey waveband index. If CPC data is being used an 
-*        illegal survey waveband index should be supplied. An error 
-*        will only be reported if the scale factor explicitly depends 
-*        on the waveband. 
+*        The survey waveband index. If CPC data is being used an
+*        illegal survey waveband index should be supplied. An error
+*        will only be reported if the scale factor explicitly depends
+*        on the waveband.
 *     PIXSIZ = DOUBLE PRECISION (Given)
 *        The nominal solid angle of an image pixel, in steradians.
 *     SCALE = REAL (Returned)
 *        The scale factor for converting between the input and output
-*        units. 
+*        units.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -78,17 +78,17 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check the supplied waveband index. If it is illegal, only report an 
-*  error if the waveband index is actually needed to find the scale 
+*  Check the supplied waveband index. If it is illegal, only report an
+*  error if the waveband index is actually needed to find the scale
 *  factor.
       IF( BAND .LE. 0 .OR. BAND .GT. I90__BANDS ) THEN
-         IF( CHR_SIMLR( IRI__FPS, UTS1 ) .OR. 
+         IF( CHR_SIMLR( IRI__FPS, UTS1 ) .OR.
      :       CHR_SIMLR( IRI__FPP, UTS1 ) .OR.
      :       CHR_SIMLR( IRI__FPS, UTS2 ) .OR.
-     :       CHR_SIMLR( IRI__FPP, UTS2 ) ) THEN 
+     :       CHR_SIMLR( IRI__FPP, UTS2 ) ) THEN
 
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'IRM_UNTIV_ERR1', 
+            CALL ERR_REP( 'IRM_UNTIV_ERR1',
      :                    'IRM_UNTIV: CPC data cannot be handled.',
      :                    STATUS )
             GO TO 999
@@ -127,19 +127,19 @@
 
 *  Now modify the SCALE to convert units of Mega-Jansky's per staradian
 *  to the required units.
-      IF( CHR_SIMLR( IRI__JPS, UTS2 ) ) THEN 
+      IF( CHR_SIMLR( IRI__JPS, UTS2 ) ) THEN
          SCALE = SCALE*1.0E6
 
-      ELSE IF( CHR_SIMLR( IRI__MJPS, UTS2 ) ) THEN  
+      ELSE IF( CHR_SIMLR( IRI__MJPS, UTS2 ) ) THEN
          SCALE = SCALE*1.0
 
-      ELSE IF( CHR_SIMLR( IRI__JPP, UTS2 ) ) THEN   
+      ELSE IF( CHR_SIMLR( IRI__JPP, UTS2 ) ) THEN
          SCALE = SCALE*1.0E6*PIXSIZ
 
-      ELSE IF( CHR_SIMLR( IRI__FPS, UTS2 ) ) THEN   
+      ELSE IF( CHR_SIMLR( IRI__FPS, UTS2 ) ) THEN
          SCALE = SCALE*1.0E6/I90__JY( BAND )
 
-      ELSE IF( CHR_SIMLR( IRI__FPP, UTS2 ) ) THEN 
+      ELSE IF( CHR_SIMLR( IRI__FPP, UTS2 ) ) THEN
          SCALE = SCALE*1.0E6*PIXSIZ/I90__JY( BAND )
 
 *  Repor an error if the output units are unknown.

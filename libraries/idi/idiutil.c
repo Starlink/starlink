@@ -88,12 +88,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -125,9 +125,9 @@
 
 #include    "device.dep"
 
-#include    "kwm.h"   
-#include    "idi.h" 
-#include    "idi_err.h" 
+#include    "kwm.h"
+#include    "idi.h"
+#include    "idi_err.h"
 #include    "idistruct_e.h"
 #include    "iii.h"
 #include    "x11defs.h"
@@ -318,7 +318,7 @@ clear_pixmap( display, 0, 0, AllPlanes );
 nmem = 0;
 for (i = 0; i < conf->n_mem; i++)
    {                             /* Image memories */
-   mem = conf->memory[i]; 
+   mem = conf->memory[i];
    if ((mem->visibility == 1) && ((mem->type & II_IMAGE) > 0))
       {
       reflag = 0;
@@ -332,7 +332,7 @@ if ( nmem > 0 ) *iierr = IIMSMV_C (display, memlist, nmem, 1);
                                  /* Graphic memories */
 for (i = 0; i < conf->n_mem; i++)
    {
-   mem = conf->memory[i]; 
+   mem = conf->memory[i];
    if ((mem->visibility == 1) && ((mem->type & II_IMAGE) == 0))
       {
       polyrefr_p( display, curconf, i );
@@ -416,7 +416,7 @@ for (i = 0; i < device[display].n_roi; i++)
       *iierr = IIRSRV_C (display , i , 1);
       }
    }
- 
+
 for (i = 0; i < device[display].n_curs; i++)
    {
    curs = device[display].cursor[i];
@@ -766,7 +766,7 @@ conf = device[display].config[confn];
 mem = conf->memory[memid];
 lut = device[display].lookup[mem->lut_id];
 
-ilen = mem->x_size * mem->y_size; 
+ilen = mem->x_size * mem->y_size;
 
 bitmap = mem->mmbm;
 
@@ -1005,7 +1005,7 @@ double rint( double x );
 
 nb = 32 / packf;              /* no. of pixels in a longword */
                               /* input data mask             */
- bl = (int)rint( pow ((double) 2 , (double)depth) - 1); 
+ bl = (int)rint( pow ((double) 2 , (double)depth) - 1);
 
 curconf = device[display].confid;
 conf = device [display].config[curconf];
@@ -1248,16 +1248,16 @@ mem = conf->memory[memid];
                                /* retrieve external bitmap definitions */
 mem->feb  = device[display].feb;
 mem->x_wdim = device[display].extbm_xsize;
-mem->y_wdim = (device[display].extbm_ysize < mem->y_size) ? 
+mem->y_wdim = (device[display].extbm_ysize < mem->y_size) ?
                device[display].extbm_ysize : mem->y_size;
-mem->ebdepth = device[display].ebdepth; 
-mem->ebpackf = device[display].ebpackf; 
+mem->ebdepth = device[display].ebdepth;
+mem->ebpackf = device[display].ebpackf;
 
 itt = mem->itt[mem->itt_id];
 
 nb = 32 / mem->ebpackf;       /* no. of pixels in a longword */
                               /* input data mask             */
-bl = (int) rint(pow ((double) 2. , (double) mem->ebdepth) - 1); 
+bl = (int) rint(pow ((double) 2. , (double) mem->ebdepth) - 1);
                               /* no. of bits to truncate     */
 dd = mem->ebdepth - mem->depth;
 
@@ -1287,7 +1287,7 @@ while (i < bm0.y_size)
       {
       for (k = 0; k < mem->ebpackf; k++)
          {
-         pix = ((*curbm >> (k * nb)) & bl) >> dd;            
+         pix = ((*curbm >> (k * nb)) & bl) >> dd;
          *tmpbm++ = (unsigned char) (curlut.off + itt->ittlev[pix]);
          j++;
          }
@@ -1477,7 +1477,7 @@ intdata = device[display].inter[nint];
 
 *user_flag = 0;
 
-if (intdata->int_type == II_LOC) 
+if (intdata->int_type == II_LOC)
    {                          /* interactor type : II_LOCATOR ? */
    sync_loc (display, nint, ev_type, ev_data, pos, &loc_flag);
    if (loc_flag == 1)
@@ -1495,7 +1495,7 @@ else if ((intdata->int_type == II_EVLR) ||
       *user_flag = 1;
       }
    }
-else if (intdata->int_type == II_TRG) 
+else if (intdata->int_type == II_TRG)
    {                          /* interactor type : TRIGGER ? */
    sync_trg (display, nint, ev_type, ev_data, trg_flag);
    if (*trg_flag != -1)
@@ -1547,12 +1547,12 @@ int   interactor_id, loc_id, loc0, f0, zf;
 INTER_DATA     *intdata;
 
 intdata = device[display].inter[nint];
-loc0 = intdata->int_id;                 
+loc0 = intdata->int_id;
 
 get_loc (loc0, &interactor_id, &loc_id);
 
 zf = 1;
-test_loc (display, zf, ev_type, ev_data, pos, interactor_id, 
+test_loc (display, zf, ev_type, ev_data, pos, interactor_id,
           loc_id, &f0);
 
 *loc_flag = f0;
@@ -1601,7 +1601,7 @@ int   interactor_id, evl_id, evl0, f0;
 INTER_DATA     *intdata;
 
 intdata = device[display].inter[nint];
-evl0 = intdata->int_id;                 
+evl0 = intdata->int_id;
 
 get_evl (evl0, &interactor_id, &evl_id);
 
@@ -1671,7 +1671,7 @@ if (nint == -1)
       }
    }
 
-/*  nint >= 0 for interaction[nint] */ 
+/*  nint >= 0 for interaction[nint] */
 else
    {
    intdata = device[display].inter[nint];
@@ -1825,7 +1825,7 @@ void get_trg ( int trg0, int* interactor_id, int* trg_id )
 
 /* Local Variables */
 int  n;
-     
+
 n = 0;
 *interactor_id = -1;
 
@@ -1914,13 +1914,13 @@ if (curs->vis == 0)
    return;
    }
 
-loc0 = intdata->int_id;                 
+loc0 = intdata->int_id;
 get_loc ( loc0, &interactor_id, &loc_id);
 
 intdev = int_struct.int_dev[interactor_id];
 loc = intdev->loc[loc_id];
 
-if (ew == 1)                           
+if (ew == 1)
    {
    loc->x_pos = curs->x_pos;
    loc->y_pos = curs->y_pos;
@@ -1938,9 +1938,9 @@ if (curs->cur_memid != -1)
    }
 else
    zf = device[display].zoom;
-   
 
-test_loc (display, zf, ev_type, ev_data, pos, interactor_id, 
+
+test_loc (display, zf, ev_type, ev_data, pos, interactor_id,
           loc_id , &f0);
 
 if (f0 == 1)
@@ -1949,7 +1949,7 @@ if (f0 == 1)
 
    dis_mem_conv (display, curs->cur_memid, loc->x_pos, loc->y_pos ,
                  &x_cur , &y_cur);
-   
+
    *err = IICWCP_C (display, memid, curs_id, x_cur, y_cur);
    }
 
@@ -2025,7 +2025,7 @@ ROI_DATA       *roi;
 *err = II_SUCCESS;
 
 intdata = device[display].inter[nint];
-roin = intdata->obj_id;               
+roin = intdata->obj_id;
 roi = device[display].roi[roin];
 
 if (roi->sh == -1)
@@ -2039,7 +2039,7 @@ if (roi->vis == 0)
    return;
    }
 
-loc0 = intdata->int_id;                 
+loc0 = intdata->int_id;
 get_loc ( loc0 , &interactor_id , &loc_id);
 
 intdev = int_struct.int_dev[interactor_id];
@@ -2072,7 +2072,7 @@ else
    zf = mem->zoom;
    }
 
-test_loc (display, zf, ev_type, ev_data, pos, interactor_id, 
+test_loc (display, zf, ev_type, ev_data, pos, interactor_id,
           loc_id , &f0);
 
 if (f0 == 1)
@@ -2165,7 +2165,7 @@ curconf = device[display].confid;
 conf = device[display].config[curconf];
 
 intdata = device[display].inter[nint];
-roin = intdata->obj_id;               
+roin = intdata->obj_id;
 roi = device[display].roi[roin];
 if (roi->memid > 0)
    mem = conf->memory[roi->memid];
@@ -2181,7 +2181,7 @@ if (roi->vis == 0)
    return;
    }
 
-loc0 = intdata->int_id;                 
+loc0 = intdata->int_id;
 get_loc ( loc0 , &interactor_id , &loc_id);
 
 intdev = int_struct.int_dev[interactor_id];
@@ -2237,7 +2237,7 @@ if (memid >= 0)
 else
    zf = 1;
 
-test_loc (display, zf, ev_type, ev_data, pos, interactor_id, 
+test_loc (display, zf, ev_type, ev_data, pos, interactor_id,
           loc_id, &f0);
 
 if (f0 == 1)
@@ -2249,14 +2249,14 @@ if (f0 == 1)
    dx = x1 - x0;
    dy = y1 - y0;
 
-   if (roi->sh == II_CIRCLE) 
+   if (roi->sh == II_CIRCLE)
       {
       dx = ((dx > 0) || (dy > 0)) ? ((dx > dy) ? dx : dy) :
                                     ((dx < dy) ? dx : dy);
       dy = dx;
       }
-   
-   
+
+
    if (roi->memid >= 0)
       {
       dx *= mem->zoom;
@@ -2362,9 +2362,9 @@ if (f0 == 1)
 
    if (roi->memid != -1)
       {
-      dis_mem_conv (display, roi->memid, xmin, ymin, 
+      dis_mem_conv (display, roi->memid, xmin, ymin,
                     &xmin0, &ymin0);
-      dis_mem_conv (display, roi->memid, xmax, ymax, 
+      dis_mem_conv (display, roi->memid, xmax, ymax,
                     &xmax0, &ymax0);
       }
    else
@@ -2374,7 +2374,7 @@ if (f0 == 1)
       xmax0 = xmax;
       ymax0 = ymax;
       }
-   *err = IIRWRI_C (display, roi->memid, roin, xmin0, ymin0, 
+   *err = IIRWRI_C (display, roi->memid, roin, xmin0, ymin0,
                     xmax0, ymax0);
    }
 
@@ -2661,7 +2661,7 @@ LOC_DATA       *loc;
 
 *err = II_SUCCESS;
 
-pos0[0] =0; 
+pos0[0] =0;
 pos0[1] =0;
 
 intdata = device[display].inter[nint];
@@ -2677,7 +2677,7 @@ if (mem->zoom > 1)
    return;
    }
 
-loc0 = intdata->int_id;                 
+loc0 = intdata->int_id;
 get_loc (loc0, &interactor_id, &loc_id);
 
 intdev = int_struct.int_dev[interactor_id];
@@ -2689,7 +2689,7 @@ if (ew == 1)
 
 zf = mem->zoom;
 
-test_loc (display, zf, ev_type, ev_data, pos, interactor_id, 
+test_loc (display, zf, ev_type, ev_data, pos, interactor_id,
           loc_id , &f0);
 
 if (f0 == 1)
@@ -2758,7 +2758,7 @@ MEM_DATA       *mem;
 INTER_DATA     *intdata;
 
 intdata = device[display].inter[nint];
-trg0 = intdata->int_id;                 
+trg0 = intdata->int_id;
 
 get_trg (trg0, &interactor_id, &trg_id);
 
@@ -2838,7 +2838,7 @@ MEM_DATA       *mem;
 INTER_DATA     *intdata;
 
 intdata = device[display].inter[nint];
-trg0 = intdata->int_id;                 
+trg0 = intdata->int_id;
 
 get_trg (trg0, &interactor_id, &trg_id);
 
@@ -2920,7 +2920,7 @@ MEM_DATA       *mem;
 INTER_DATA     *intdata;
 
 intdata = device[display].inter[nint];
-trg0 = intdata->int_id;                 
+trg0 = intdata->int_id;
 
 get_trg (trg0, &interactor_id, &trg_id);
 

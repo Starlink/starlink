@@ -115,7 +115,7 @@ fi
     set yscrollbar [
         scrollbar $vframe.yscrollbar -orient vertical -relief sunken -bd 2
     ]
-    pack $yscrollbar -side right 
+    pack $yscrollbar -side right
     set sw [$yscrollbar cget -width]
     pack forget $yscrollbar
 

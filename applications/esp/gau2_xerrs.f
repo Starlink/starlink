@@ -2,7 +2,7 @@
 
 * See gau2_pro for discussion
 
-      subroutine gau2_xerrs (iv, v, p, liv, lv, n, 
+      subroutine gau2_xerrs (iv, v, p, liv, lv, n,
      :     xerrs, sigma, gau2par, status)
 
 *+
@@ -46,7 +46,7 @@
 
 *   local variables
       integer i, j
-      
+
 *   check inherited status
       if (status .ne. sai__ok) return
 
@@ -86,7 +86,7 @@
             j = j + i
             xerrs(i) = sqrt(v(j))
  20      continue
-         
+
       endif
 
       end

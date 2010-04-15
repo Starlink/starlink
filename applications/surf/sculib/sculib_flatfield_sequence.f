@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_FLATFIELD_SEQUENCE (BOLOMETERS, NUM_CHAN,
-     :  NUM_ADC, NUM_SUB, BOL_TYPE, BOL_CALB, BOL_DU3, BOL_DU4, 
+     :  NUM_ADC, NUM_SUB, BOL_TYPE, BOL_CALB, BOL_DU3, BOL_DU4,
      :  BOL_QUAL, BOL_ENABLED, BOLS_MEASURED, N_BOLS, BOL_SELECT_CHAN,
-     :  BOL_SELECT_ADC, N_SUBS, SUB_INSTRUMENT, FLATREF_CHAN, 
+     :  BOL_SELECT_ADC, N_SUBS, SUB_INSTRUMENT, FLATREF_CHAN,
      :  FLATREF_ADC, N_MEASUREMENTS, FLAT_CHAN, FLAT_ADC, FLAT_INDEX,
      :  STATUS)
 *+
@@ -20,20 +20,20 @@
 *     If the sub-instrument is one of the photometry pixels then only that
 *     bolometer will be measured.
 *
-*        Whatever bolometer is the target of the measurement, data will be 
-*     taken from all A/D channels. 
+*        Whatever bolometer is the target of the measurement, data will be
+*     taken from all A/D channels.
 *
 *        If status is good on entry SCULIB_BOLSELECT is called to decode
 *     the bolometers to be measured and the sub-instruments involved. If
 *     the bolometers belong to more than one sub-instrument an error will
-*     be reported and bad status returned. 
+*     be reported and bad status returned.
 *
 *        If the sub-instrument is one of the arrays then the name of the
 *     reference bolometer will be read from parameters LONGREF_BOL or
-*     SHORTREF_BOL as appropriate. The number of measurements and their 
-*     sequence is set as described above in N_MEASUREMENTS, FLAT_CHAN and 
-*     FLAT_ADC. If the sub-instrument is not one of the arrays then the 
-*     reference bolometer will not be used and the bolometers(s) will be 
+*     SHORTREF_BOL as appropriate. The number of measurements and their
+*     sequence is set as described above in N_MEASUREMENTS, FLAT_CHAN and
+*     FLAT_ADC. If the sub-instrument is not one of the arrays then the
+*     reference bolometer will not be used and the bolometers(s) will be
 *     measured in sequence.
 *
 *        For each measurement of a target bolometer data will be taken from
@@ -43,14 +43,14 @@
 *     If not, an error message will be output and bad status returned.
 *
 *        Lastly, the FLAT_INDEX array is set so that it points to the
-*     position in the datablock of data from the target bolometer at each 
+*     position in the datablock of data from the target bolometer at each
 *     measurement.
 
 *  Invocation:
 *     CALL SCULIB_FLATFIELD_SEQUENCE (BOLOMETERS, NUM_CHAN,
-*    :  NUM_ADC, NUM_SUB, BOL_TYPE, BOL_CALB, BOL_DU3, BOL_DU4, 
+*    :  NUM_ADC, NUM_SUB, BOL_TYPE, BOL_CALB, BOL_DU3, BOL_DU4,
 *    :  BOL_QUAL, BOL_ENABLED, BOLS_MEASURED, N_BOLS, BOL_SELECT_CHAN,
-*    :  BOL_SELECT_ADC, N_SUBS, SUB_INSTRUMENT, FLATREF_CHAN, 
+*    :  BOL_SELECT_ADC, N_SUBS, SUB_INSTRUMENT, FLATREF_CHAN,
 *    :  FLATREF_ADC, N_MEASUREMENTS, FLAT_CHAN, FLAT_ADC, FLAT_INDEX,
 *    :  STATUS)
 
@@ -177,7 +177,7 @@
       INTEGER       I                          ! DO loop index
       INTEGER       ITEMP                      ! scratch integer
       INTEGER       J                          ! DO loop index
-      REAL          RTEMP                      ! scratch real            
+      REAL          RTEMP                      ! scratch real
       CHARACTER*15  STEMP                      ! scratch string
 
 *  Internal References:
@@ -254,8 +254,8 @@
 *  decode the BOLS_MEASURED string
 
       STEMP = SUB_INSTRUMENT (1)
-      CALL SCULIB_BOLSELECT (BOLS_MEASURED, BOL_TYPE, BOL_CALB, 
-     :  BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC, 
+      CALL SCULIB_BOLSELECT (BOLS_MEASURED, BOL_TYPE, BOL_CALB,
+     :  BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC,
      :  0.0, 0.0, BOL_SELECT_CHAN, BOL_SELECT_ADC, N_BOLS, NUM_SUB,
      :  SUB_INSTRUMENT, ITEMP, RTEMP, RTEMP, STATUS)
       SUB_INSTRUMENT (1) = STEMP

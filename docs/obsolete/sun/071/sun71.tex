@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -53,14 +53,14 @@ RUTHERFORD APPLETON LABORATORY\\
 %  \markright{\stardocname}
 %------------------------------------------------------------------------------
 
-\section{Purpose} 
+\section{Purpose}
 
 IKONPAINT provides ``push-button'' colour hard-copy from the Ikon screen
 or from a GWM window to an inkjet printer.
 The DEC {\it Companion Colour Printer} (LJ250/LJ252) and the Hewlett-Packard
 {\it Paintjet} are both supported.
 These printers normally take 8 $\times$ 11 inch fan-fold paper but
-single transparency sheets can be hand-fed. 
+single transparency sheets can be hand-fed.
 
 \section{Changes in version 4.0}
 A number of changes have been made in version 4.0:
@@ -77,10 +77,10 @@ hidden ADAM parameter. The default is to remain in HP mode.
 \section{How to use IKONPAINT}
 
 IKONPAINT simply reads the contents of an Ikon screen or GWM window
-left on the display by some other program. It is run with the command 
+left on the display by some other program. It is run with the command
 %******* poss change here ********
 \begin{verbatim}
-      $ IKONPAINT		    
+      $ IKONPAINT
 \end{verbatim}
 This invokes a short DCL command procedure which ensures that ADAM has
 been started. The program then prompts for the graphics device to be
@@ -91,7 +91,7 @@ prompts for which of the planes are required for output. If the user
 specifies 'BASE', or 'OVERLAY' then only that plane is output. If the
 user specifies 'BOTH' then a composite image is achieved by
 taking the overlay image and substituting base plane pixels where an
-overlay pixel has a zero value (i.e. it is transparent at that point). 
+overlay pixel has a zero value (i.e. it is transparent at that point).
 
 IKONPAINT can copy any rectangular region of the screen: if you enter
 YES (the default) to the first prompt it asks you to use the mouse to
@@ -107,7 +107,7 @@ may enter zero to get another chance of choosing the rectangular region.
 The output quality is slightly better for magnification factors which
 are integers, but with a higher magnification than the default you will
 either lose some of the right-hand side of the chosen area or cause the
-printout to use more than one sheet of paper. 
+printout to use more than one sheet of paper.
 
 The program then asks you whether to invert white and black.  If selected
 this means that white lines on a dark CRT are printed as black lines on
@@ -115,11 +115,11 @@ the white paper: IKONPAINT actually examines all colour indices in the
 range 0 to 15 (which are used in many packages for line-drawing) and
 inverts any shades found to be close to black or white. This also helps
 to reduce ink consumption.  Note that other shades including
-intermediate shades of grey are not affected. 
+intermediate shades of grey are not affected.
 
 If the transparency mode is chosen then a printer control code is
 inserted to make the print-head cover each line twice, as recommended
-for transparencies. 
+for transparencies.
 
 The conversion to HP printer control codes can take a minute or more for
 a full screen. A temporary file {\tt INKJET.DAT} is written to {\tt
@@ -127,7 +127,7 @@ SYS\$SCRATCH:} which may reach several hundred blocks in length. The
 program also gives you an estimate of the cost of consumables used: the
 ink is rather expensive, often 30 to 50 pence for a highly-coloured
 image on plain paper.  Transparency sheets add at least a pound to this
-figure. 
+figure.
 
 When processing is finished the output file is automatically sent to the
 queue {\tt SYS\_INKJET} (and deleted on completion).  A printer on a
@@ -137,9 +137,9 @@ and when output is complete.  Note that if your inkjet printer is on a
 queue with a different name then {\tt SYS\_INKJET} should be redefined
 to point to it.   If the queue cannot be found then the file will be
 left on {\tt SYS\$SCRATCH} and must be printed using the appropriate
-queue with the {\tt /PASSALL} option. 
+queue with the {\tt /PASSALL} option.
 
-\section{How it works} 
+\section{How it works}
 
 The program uses IDI routines
 to read the current device colour tables and then the contents
@@ -162,21 +162,21 @@ proportions of each.  The {\it saturation} and {\it value} determine how
 much white or black to admix. In theory this can generate up to 256
 shades from a palette of 740, but astronomers quite sensibly tend to use
 colour tables in which saturated colours predominate, so that printouts
-do not often contain more than 150 different shades. 
+do not often contain more than 150 different shades.
 
-\section{Some limitations} 
+\section{Some limitations}
 
 If the image displayed on the device just uses a simple grey-scale
 the results are not very impressive because the printer can show no more
 than 9 different grey levels (including black and white).  It is best to
-use a colour table containing a good range of hues. 
+use a colour table containing a good range of hues.
 
 The printer mixes its three primary ink colours (cyan, magenta, and
 yellow) to produce red, green, and blue.  Unfortunately the resulting
 blue is very dark, while the yellow is rather pale. This means that some
 shades are are poor approximation to those shown on the screen,
 though different shades can usually be distinguished adequately on the
-hard-copy even if they are not very faithful to the original. 
+hard-copy even if they are not very faithful to the original.
 
 The DEC version of the printer can be set in either DEC or HP mode by a
 button on the control-panel panel (the default is set by a DIP switch at
@@ -195,9 +195,9 @@ represented adequately if their shade requires two basic colours to be
 mixed. This must be regarded as an intrinsic limition of the
 ordered-dither technique.  Lines drawn in the six basic colours or in
 black reproduce correctly at all widths, those at least 4 dots wide will
-be reproduced in the correct shade. 
+be reproduced in the correct shade.
 
-\section{References} 
+\section{References}
 
 SUN/57: GNS - Graphics Workstation Name Service.
 
@@ -205,4 +205,4 @@ SUN/65: IDI - Image Display Interface.
 
 SUN/130: GWM - X Graphics Window Manager.
 
-\end{document} 
+\end{document}

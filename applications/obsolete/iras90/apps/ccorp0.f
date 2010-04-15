@@ -14,7 +14,7 @@
 *     CALL CCORP0( NU, T, DERIV, B, DBBYDT )
 
 *  Description:
-*     The returned B value is a surface brightness value in ExaJanskys 
+*     The returned B value is a surface brightness value in ExaJanskys
 *     per steradian (1E18 Jy/sr) emitted by a blackbody at temperature T
 *     at frequency NU. If DERIV is supplied true, then the rate of
 *     change of B with respect to temperature is also returned.
@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -78,15 +78,15 @@
       IF( ARG .GT. 20.0D0 ) THEN
          B = C1*(NU**3)*EXP( -ARG )
 
-*  Otherwise, use the exact expression.      
+*  Otherwise, use the exact expression.
       ELSE IF( ARG .GT. 0.0D0 ) THEN
          B = C1*(NU**3)/(EXP( ARG ) - 1.0D0 )
 
 *  Return zero for any bad values of ARG.
       ELSE
          B = 0.0D0
-   
-      END IF      
+
+      END IF
 
 *  If required, calculate the derivative.
       IF( DERIV ) THEN
@@ -95,7 +95,7 @@
          IF( ARG .GT. 20.0D0 ) THEN
             DBBYDT = C2*NU*B/(T**2)
 
-*  Otherwise, use the exact expression.      
+*  Otherwise, use the exact expression.
          ELSE IF( ARG .GT. 0.0D0 ) THEN
             DBBYDT = ( C2*EXP( ARG )/C1 )*
      :               ( B/(NU*T) )**2
@@ -103,8 +103,8 @@
 *  Return zero for any bad values of ARG.
          ELSE
             DBBYDT = 0.0D0
-   
-         END IF      
+
+         END IF
 
       END IF
 

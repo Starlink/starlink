@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -634,7 +634,7 @@ F77_LOGICAL_FUNCTION(ast_mapget1c)( INTEGER(THIS),
    astWatchSTATUS(
       values = astMalloc( sizeof( char )*(size_t) (*MXVAL)*( VALUE_length + 1 ) );
       key = astString( KEY, KEY_length );
-      RESULT = astMapGet1C( astI2P( *THIS ), key, VALUE_length + 1, *MXVAL, 
+      RESULT = astMapGet1C( astI2P( *THIS ), key, VALUE_length + 1, *MXVAL,
                             NVAL, values ) ? F77_TRUE : F77_FALSE;
       astFree( key );
 
@@ -655,10 +655,10 @@ F77_LOGICAL_FUNCTION(ast_mapget1c)( INTEGER(THIS),
                } else if( (*d = *c) == 0 ) {
                   *d = ' ';
                   term = 1;
-               } 
+               }
             }
 
-/* Skip over the extra character at the end of each element in the work 
+/* Skip over the extra character at the end of each element in the work
    array. */
             c++;
          }
@@ -696,7 +696,7 @@ F77_INTEGER_FUNCTION(ast_mapsize)( INTEGER(THIS), INTEGER(STATUS) ) {
    return RESULT;
 }
 
-F77_INTEGER_FUNCTION(ast_maplength)( INTEGER(THIS), 
+F77_INTEGER_FUNCTION(ast_maplength)( INTEGER(THIS),
                                      CHARACTER(KEY),
                                      INTEGER(STATUS)
                                      TRAIL(KEY) ) {
@@ -714,7 +714,7 @@ F77_INTEGER_FUNCTION(ast_maplength)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_INTEGER_FUNCTION(ast_maplenc)( INTEGER(THIS), 
+F77_INTEGER_FUNCTION(ast_maplenc)( INTEGER(THIS),
                                    CHARACTER(KEY),
                                    INTEGER(STATUS)
                                    TRAIL(KEY) ) {
@@ -732,7 +732,7 @@ F77_INTEGER_FUNCTION(ast_maplenc)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_INTEGER_FUNCTION(ast_maptype)( INTEGER(THIS), 
+F77_INTEGER_FUNCTION(ast_maptype)( INTEGER(THIS),
                                    CHARACTER(KEY),
                                    INTEGER(STATUS)
                                    TRAIL(KEY) ) {
@@ -750,7 +750,7 @@ F77_INTEGER_FUNCTION(ast_maptype)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_LOGICAL_FUNCTION(ast_maphaskey)( INTEGER(THIS), 
+F77_LOGICAL_FUNCTION(ast_maphaskey)( INTEGER(THIS),
                                      CHARACTER(KEY),
                                      INTEGER(STATUS)
                                      TRAIL(KEY) ) {
@@ -789,7 +789,7 @@ F77_SUBROUTINE(ast_mapkey)( CHARACTER_RETURN_VALUE(RESULT),
    GENPTR_CHARACTER(RESULT)
    GENPTR_INTEGER(THIS)
    GENPTR_INTEGER(INDEX)
-   const char *result; 
+   const char *result;
    int i;
 
    astAt( "AST_MAPKEY", NULL, 0 );
@@ -919,7 +919,7 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemc)( INTEGER(THIS),
    astWatchSTATUS(
       values = astMalloc( sizeof( char )*(size_t) ( VALUE_length + 1 ) );
       key = astString( KEY, KEY_length );
-      RESULT = astMapGetElemC( astI2P( *THIS ), key, VALUE_length + 1, *ELEM - 1, 
+      RESULT = astMapGetElemC( astI2P( *THIS ), key, VALUE_length + 1, *ELEM - 1,
                                values ) ? F77_TRUE : F77_FALSE;
       astFree( key );
 
@@ -934,7 +934,7 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemc)( INTEGER(THIS),
             if( (*d = *c) == 0 ) {
                *d = ' ';
                break;
-            } 
+            }
          }
 
          for( ; j < VALUE_length; j++, d++ ) *d = ' ';

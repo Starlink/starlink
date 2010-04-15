@@ -6,7 +6,7 @@
 
 *  Purpose:
 *     Copy the LST, x, y info for each pixel from SCAN_TABLE_1 into LST
-*     X and Y arrays. 
+*     X and Y arrays.
 
 *  Language:
 *     Starlink Fortran 77
@@ -34,17 +34,17 @@
 *     Y (C3NIS) = REAL (Returned)
 *        The y offset of each observed point
 *     STATUS = INTEGER (Given and Returned)
-*        The global status.                                               
+*        The global status.
 
 *  [optional_subroutine_items]...
-*  Authors:                                                 
+*  Authors:
 *     REVAD::JFL: J.Lightfoot, adapted from a similar routine by
 *     JBVAD::PAH: Paul Harrison (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     15-MAY-1991: (REVAD::JFL): Original version.
-*     11-NOV-1991: (REVAD::JFL): Modified to read only first C3NSAMPLE 
+*     11-NOV-1991: (REVAD::JFL): Modified to read only first C3NSAMPLE
 *                                items from scan table to cater for case
 *                                where observation was aborted.
 *     10-FEB-1992: (REVAD::JFL): calculation of map extent removed
@@ -69,7 +69,7 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Transfer the first C3NSAMPLE values from the scan table to the appropriate 
+*  Transfer the first C3NSAMPLE values from the scan table to the appropriate
 *  places
 
       DO I = 1, C3NSAMPLE
@@ -79,4 +79,4 @@
       END DO
 
       END
-      
+

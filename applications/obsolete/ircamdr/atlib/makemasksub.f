@@ -1,14 +1,14 @@
 	SUBROUTINE MAKEMASKSUB( DIMSX, DIMSY, ARRIN, ARROUT, IXST,
-     :	                        IYST, IXEN, IYEN, SIGMALEVEL, 
+     :	                        IYST, IXEN, IYEN, SIGMALEVEL,
      :	                        MEAN_VALUE, SIGMA, NUMPIX, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
      :	  IXST,
      :	  IYST,
      :	  IXEN,
@@ -19,7 +19,7 @@
      :	  NUMPIX,
      :	  BAD_NUMBER
 
-	REAL 
+	REAL
      :	  ARRIN( DIMSX, DIMSY),
      :	  ARROUT( DIMSX, DIMSY),
      :	  SIGMALEVEL,
@@ -43,7 +43,7 @@
 	ONE_SIGMA = 1.0
 	BAD_NUMBER = 0
 
-*      calculate mean value in sub-image 
+*      calculate mean value in sub-image
 	DO J = IYST, IYEN
 	  DO K = IXST, IXEN
 
@@ -61,7 +61,7 @@
 *      calculate maximum and minimum from sigma level
 	IF( NUMPIX .GT. 0) THEN
 	  MEAN_VALUE = SUM/NUMPIX
-          VARIANCE = ( SUMSQ - 2*MEAN_VALUE*SUM + 
+          VARIANCE = ( SUMSQ - 2*MEAN_VALUE*SUM +
      :	               NUMPIX*MEAN_VALUE**2)
 
           IF( NUMPIX .EQ. 1 ) THEN
@@ -80,7 +80,7 @@
 
 	NUMPIX = 0
 
-*      scan through all the input pixels 
+*      scan through all the input pixels
 	DO J = 1, DIMSY
 	  DO K = 1, DIMSX
 

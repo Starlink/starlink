@@ -1,6 +1,6 @@
 	subroutine mapgl_readsdf( sdf_filename, nx, ny, arr, xdim, ydim)
 
-	integer 
+	integer
      :	  status,
      :	  nx,
      :	  ny,
@@ -17,11 +17,11 @@
 	real
      :	  arr( nx, ny)
 
-	character*15 
+	character*15
      :	  locd,
      :	  locda
 
-	character*(*) 
+	character*(*)
      :	  sdf_filename
 
 	call hds_start( status)
@@ -33,8 +33,8 @@
         call dat_shape( locda, 2, dims, actdim, status)
 
 	ndim = actdim
-	xdim = dims( 1) 
-	ydim = dims( 2) 
+	xdim = dims( 1)
+	ydim = dims( 2)
 
 	call dat_mapr( locda, 'read', ndim, dims, sptr, status)
 

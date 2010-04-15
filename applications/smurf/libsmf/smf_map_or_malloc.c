@@ -37,7 +37,7 @@
 
 *  Description:
 *     Helper routine that will call ndfMap if supplied with an NDF identifier
-*     or else call smf_malloc to get the memory. If ndfMap is used status 
+*     or else call smf_malloc to get the memory. If ndfMap is used status
 *     will be set to bad if the number of mapped points are fewer than
 *     that requested in the call. The NDF will not be resized, it is assumed
 *     that this routine is being used to obtain a variance or quality

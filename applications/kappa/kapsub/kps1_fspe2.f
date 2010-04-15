@@ -77,7 +77,7 @@
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 1995-1996 Central Laboratory of the Research
-*     Councils. 
+*     Councils.
 *     Copyright (C) 2007 Science & Technology Facilites Council
 *     All Rights Reserved.
 
@@ -183,8 +183,8 @@
 *  a constant Y co-ordinate.  Now it could be called for each position
 *  but that could be quite inefficient for large arrays.  The
 *  folloeing identifies a run of pixels at the same Y co-ordinate.
-*  If the pixels are higgledy-piggledy then the following slows it 
-*  down further, however in the vast majority of cases it will save 
+*  If the pixels are higgledy-piggledy then the following slows it
+*  down further, however in the vast majority of cases it will save
 *  time.
          YLINE = Y( I )
          NEWLIN = .FALSE.

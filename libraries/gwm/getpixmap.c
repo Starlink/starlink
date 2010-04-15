@@ -19,7 +19,7 @@ int GWM_GetPixmap( Display *display, Window win_id, Pixmap *pix_id)
 *
 *  Purpose:
 *     Get pixmap id
-*     
+*
 *  Language:
 *     C
 *
@@ -46,12 +46,12 @@ int GWM_GetPixmap( Display *display, Window win_id, Pixmap *pix_id)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,10 +76,10 @@ int GWM_GetPixmap( Display *display, Window win_id, Pixmap *pix_id)
     int actual_format;
     unsigned long nitems, bytes_after;
     Pixmap *local_pix_id;
-        
-/*	  
+
+/*
 **  Get the value of the GWM_Pixmap property from the window.
-*/	  
+*/
     atom = XInternAtom(display, "GWM_pixmap", False );
     if (!atom) return GWM_NO_PIXMAP;
 
@@ -87,7 +87,7 @@ int GWM_GetPixmap( Display *display, Window win_id, Pixmap *pix_id)
 	XA_PIXMAP, &actual_type, &actual_format, &nitems, &bytes_after,
 	(unsigned char**)(&local_pix_id));
     if ( status != Success || nitems == 0) return GWM_NO_PIXMAP;
-    
+
 /*
 **  Copy the pixmap id to the output argument
 */

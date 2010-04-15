@@ -13,7 +13,7 @@ C-----------------------------------------------------------------------
       SUBROUTINE INTERPOLATE_CUBE (BUF1, BUF2, IFAIL)
 
 C   Routine to take the data cube and interpolate the spectra which aren't
-C   there but are close enough to others. 
+C   there but are close enough to others.
 
 C   Updated version 6/7/89 (RP) interpolates all spectra from one cube
 C   onto a new one, then just swaps the pointers and releases the VM
@@ -148,7 +148,7 @@ C         If we have data on all sides of the point to be interpolated, then
 C         go ahead and put properly weighted data back into the cube.
 
           IF (INTERP) THEN
-  
+
             LOCATION = INTCUBE_ADDRESS + MNOFFSET*NDATA
             CALL XCOPY (4*NDATA, BUF2, %VAL(LOCATION))
 
@@ -157,7 +157,7 @@ C         go ahead and put properly weighted data back into the cube.
 *           PRINT *,'Final sum of weights =',SIGMA_W
 
 *           Update the index array (make entry for an interpolated
-*           spectrum 0 rather than -1000). Note -- retain positive 
+*           spectrum 0 rather than -1000). Note -- retain positive
 *           values for positions where spectra exist in original so
 *           that valid points can be shown on plots.
 
@@ -212,13 +212,13 @@ C     Debug new INDEX array
 
         ISTAT = IFREEVM (INTCUBE_ADDRESS)
         IF (ISTAT.NE.0) THEN
-          PRINT *, ' -- interpolate_cube (error releasing cube ', 
+          PRINT *, ' -- interpolate_cube (error releasing cube ',
      &            NCUBE, ' bytes @ ', INTCUBE_ADDRESS
         END IF
 
         ISTAT = IFREEVM (INTINDEX_ADDRESS)
         IF (ISTAT.NE.0) THEN
-          PRINT *, ' -- interpolate_cube (error releasing index ', 
+          PRINT *, ' -- interpolate_cube (error releasing index ',
      &            NINDEX, ' bytes @ ', INTINDEX_ADDRESS
         END IF
 

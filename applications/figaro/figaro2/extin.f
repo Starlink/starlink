@@ -30,7 +30,7 @@ C                    changed. Modified dynamic memory handling - now
 C                    uses DYN_ package.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
 C                    in mapping calls.
-C     31st Aug 1992  INCLUDE changed. TABs removed.  HME / UoE, 
+C     31st Aug 1992  INCLUDE changed. TABs removed.  HME / UoE,
 C                    Starlink.
 C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -44,7 +44,7 @@ C
       REAL      AIRM             ! The air mass
       INTEGER   CPTR             ! Dynamic-memory pointer to coefficient
                                  ! array
-      INTEGER   CSLOT            ! Map slot number of input coefficient 
+      INTEGER   CSLOT            ! Map slot number of input coefficient
                                  ! array
       INTEGER   DIMS(10)         ! Sizes of dimensions of data
       CHARACTER DUMMY*1          ! Dummy arguement for DATA_INFO routine
@@ -52,7 +52,7 @@ C
       INTEGER   IY               !
       LOGICAL   MAGS             !
       INTEGER   NDIM             ! Number of dimensions in data
-      INTEGER   NELM             ! Total number of elements in data 
+      INTEGER   NELM             ! Total number of elements in data
                                  ! array
       INTEGER   NX               ! Size of 1st dimension
       INTEGER   NY               ! Size of 2nd dimension
@@ -102,7 +102,7 @@ C
       CALL DSA_GET_DATA_INFO ('SPECT',0,DUMMY,1,VALUE,STATUS)
       IF (STATUS.EQ.0) MAGS=(VALUE.NE.0.)
 C
-C     Get name of OUTPUT file 
+C     Get name of OUTPUT file
 C
       CALL DSA_OUTPUT ('OUTPUT','OUTPUT','SPECT',0,0,STATUS)
       IF (STATUS.NE.0) GOTO 500
@@ -112,7 +112,7 @@ C     input and result arrays to be the same)
 C
       CALL DSA_MAP_DATA ('COEFF','READ','FLOAT',CPTR,CSLOT,STATUS)
       CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
-      IF (STATUS.NE.0) GOTO 500 
+      IF (STATUS.NE.0) GOTO 500
 C
 C     Generate the corrected spectrum (or spectra).  FIG_EXTCOR
 C     processes one spectrum at at time.
@@ -161,11 +161,11 @@ C     Common variables used - None
 C
 C     Subroutines / functions used - None
 C
-C     Algorithm - 
+C     Algorithm -
 C
-C     The result spectrum is calculated as 
+C     The result spectrum is calculated as
 C     RESULT(i)=SDATA(i)*10**(0.4*CDATA(i)*AIRM)
-C     if the data is not in magnitudes (ie if MAGS=.FALSE.), and as  
+C     if the data is not in magnitudes (ie if MAGS=.FALSE.), and as
 C     RESULT(i)=SDATA(i)-CDATA(i)*AIRM
 C     for magnitude data (ie if MAGS=.TRUE.)
 C

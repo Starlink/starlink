@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -130,37 +130,37 @@
          IF ( UTYPE .EQ. '_BYTE' ) THEN
             CALL NDF1_AWIB( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...unsigned byte.
          ELSE IF ( UTYPE .EQ. '_UBYTE' ) THEN
             CALL NDF1_AWIUB( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                       STATUS )
- 
+
 *  ...double precision.
          ELSE IF ( UTYPE .EQ. '_DOUBLE' ) THEN
             CALL NDF1_AWID( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...integer.
          ELSE IF ( UTYPE .EQ. '_INTEGER' ) THEN
             CALL NDF1_AWII( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...real.
          ELSE IF ( UTYPE .EQ. '_REAL' ) THEN
             CALL NDF1_AWIR( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...word.
          ELSE IF ( UTYPE .EQ. '_WORD' ) THEN
             CALL NDF1_AWIW( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...unsigned word.
          ELSE IF ( UTYPE .EQ. '_UWORD' ) THEN
             CALL NDF1_AWIUW( LBND, UBND, DATA, %VAL( CNF_PVAL( PNTR ) ),
      :                       STATUS )
- 
+
 *  Note if the type string was not recognised.
          ELSE
             TYPOK = .FALSE.
@@ -178,7 +178,7 @@
      :      'of ''^BADTYPE'' (internal programming error).', STATUS )
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWINI', STATUS )
 

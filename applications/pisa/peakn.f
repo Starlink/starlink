@@ -8,7 +8,7 @@
 *  Purpose:
 *     To transform the PISAFIND parameters into values which can be used
 *     by discrimination and thresholding routines to separate out
-*     objects with parameters similar to stellar objects. 
+*     objects with parameters similar to stellar objects.
 
 *  Language:
 *     Starlink Fortran 77
@@ -65,7 +65,7 @@
 *        radius at.
 *     IFS = INTEGER (Given)
 *        The FIO system descriptor of file containing the PISAFIND
-*        parameterisations. 
+*        parameterisations.
 *     IFO = INTEGER (Given)
 *        The FIO system descriptor of file to contain the results.
 *     STATUS = INTEGER (Given and Returned)
@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  External References:
-      INTEGER CHR_LEN            ! Length of string 
+      INTEGER CHR_LEN            ! Length of string
       EXTERNAL CHR_LEN
 
 *  Arguments Given:
@@ -119,7 +119,7 @@
 *  Local Constants
       REAL NOTZER
       PARAMETER ( NOTZER = 1.0E-10)
-      REAL PI 
+      REAL PI
       PARAMETER ( PI = 3.1415926 )
 
 *  Status:
@@ -147,7 +147,7 @@
       REAL FUP
       REAL FVAL
       REAL INTENS
-      REAL MODIBP 
+      REAL MODIBP
       REAL MRATIO
       REAL OBJVAL
       REAL PEAK
@@ -196,14 +196,14 @@
          NOBJ = NOBJ + 1
 
 *  correct for origins
-         XPOS = XPOS - ( XORIG - 1.5 ) 
-         YPOS = YPOS - ( YORIG - 1.5 ) 
+         XPOS = XPOS - ( XORIG - 1.5 )
+         YPOS = YPOS - ( YORIG - 1.5 )
 
 *  Check that this position is within the bounds of the image.
          IX = INT( XPOS )
          IY = INT( YPOS )
          IF ( IX .GE. 1  .AND.  IX .LE. NCOLS  .AND.
-     :        IY .GE. 1  .AND.  IY .LE. NLINES ) THEN 
+     :        IY .GE. 1  .AND.  IY .LE. NLINES ) THEN
 
 *  Get the semi-major axis.
              B = SQRT( REAL( NPIX ) / ( PI * ( 1.0 - ELLIP ) ) )
@@ -233,24 +233,24 @@
                      FUP = ( 1.0 - COMIX )*
      :                     EXP( CHANGE + ( RADTHR - RAD )* COEF2 )
                   END IF
-                  SUM = SUM + FLOR + FUP 
+                  SUM = SUM + FLOR + FUP
  3             CONTINUE
  2          CONTINUE
 
-*  the mean value in THREE*THREE pixelS with central brightness at 
+*  the mean value in THREE*THREE pixelS with central brightness at
 *  current position
             SUM = SUM / 256.0
 
-*  find the intensity appropriate to scale this value by 
+*  find the intensity appropriate to scale this value by
             OBJVAL = 0.0
             NVALS = 0
             DO 7 I = -1, 1
-               IF( IY + I .GT. 1 .AND. IY + I .LT. NLINES) THEN 
+               IF( IY + I .GT. 1 .AND. IY + I .LT. NLINES) THEN
                   DO 8 J = -1, 1
                      IF( IX + J .GT. 1 .AND. IX + J .LT. NCOLS  ) THEN
                         IF( IMAGE( IX + J, IY + I ) .NE. VAL__BADR )
      :                  THEN
-                           OBJVAL = OBJVAL + IMAGE( IX + J, IY + I ) 
+                           OBJVAL = OBJVAL + IMAGE( IX + J, IY + I )
                            NVALS = NVALS + 1
                         END IF
                      END IF
@@ -261,10 +261,10 @@
             SCALE = OBJVAL / MAX( SUM, NOTZER )
 
 *  find the radius at which the psf scaled by this value equals the
-*  threshold intensity, BIT ROUGH 
+*  threshold intensity, BIT ROUGH
             UP = 100.0
             LOW = 0.0
-            STEP = 10.0 
+            STEP = 10.0
             NACC = 0
 
 9           CONTINUE
@@ -282,14 +282,14 @@
                FVAL = FVAL * SCALE
                IF( FVAL .LT. THRESH ) THEN
                   NACC = NACC + 1
-                  IF( NACC .GT. 5 ) THEN             
+                  IF( NACC .GT. 5 ) THEN
                      PSFRAD = RAD
                      GO TO 5
                   END IF
 
 *  and now set up loop variables for next refinement of value
                   UP = RAD
-                  LOW = RAD - STEP  
+                  LOW = RAD - STEP
                   STEP = STEP / 10.0
                   GO TO 9
                END IF
@@ -305,11 +305,11 @@
 
 *  divide the actual intensity by peak ratio by the model value
 *  to normalise to one
-            MRATIO = INTENS / ( PEAK * MODIBP ) 
+            MRATIO = INTENS / ( PEAK * MODIBP )
 
-*  write out the results the output file, add other useful 
+*  write out the results the output file, add other useful
 *  classification values.
-            BUF = ' ' 
+            BUF = ' '
             CALL CHR_ITOC( INDEX, BUF( 4: ), NCHAR )
             CALL CHR_RTOC( PRATIO, BUF( 12: ), NCHAR )
             CALL CHR_RTOC( MRATIO, BUF( 29: ), NCHAR )

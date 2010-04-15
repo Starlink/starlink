@@ -8,14 +8,14 @@
 *     The routine was produced as an attempt to rationalise the
 *     conversion between one form of file name and another, so that
 *     making a change to the naming convention would not be such a
-*     major task in the future, and to allow error reports to be 
+*     major task in the future, and to allow error reports to be
 *     generated if an invalid file name is given.
 *    Invocation :
 *     CALL RED4_INTTORINT( INT_FILE, RINT_FILE, STATUS )
 *    Parameters :
 *     INT_FILE  = CHARACTER*(*)( READ )
 *         The integration file name (Iyymmdd_oooo_iiii or
-*         IDIR:Iyymmdd_oooo_iiii) 
+*         IDIR:Iyymmdd_oooo_iiii)
 *     RINT_FILE = CHARACTER*(*)( WRITE )
 *         The reduced integration file name (RIDIR:RIyymmdd_oooo_iiii)
 *     STATUS    = INTEGER( UPDATE )

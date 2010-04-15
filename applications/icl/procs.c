@@ -15,7 +15,7 @@
  *                      A.J.Chipperfield 3/8/95
  *      Change ems1_starf_c to ems1Starf
  *                      A.J.Chipperfield 15/6/99
- *                     
+ *
  ******************************************************************************
  */
 #include <signal.h>
@@ -171,17 +171,17 @@ static struct comms {
  *
  ******************************************************************************
  */
-value 
+value
 sys_exception(char *mess)
 {
     char *buf;
     const char *qual1;
     value new;
 
-    qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) : 
+    qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) :
 					     "unknown error");
-    if ((buf = (char *) malloc(((unsigned int) 
-				(strlen(mess) + strlen(qual1) + 3)))) 
+    if ((buf = (char *) malloc(((unsigned int)
+				(strlen(mess) + strlen(qual1) + 3))))
 				== CHARNIL)
 	return exception("SYSERR memory exhausted in sys_exception()");
     sprintf(buf, "%s: %s", mess, qual1);
@@ -196,7 +196,7 @@ sys_exception(char *mess)
  *
  ******************************************************************************
  */
-value 
+value
 sys_exception1(char *format, char *arg1)
 {
     char *buf, *buf2;
@@ -205,13 +205,13 @@ sys_exception1(char *format, char *arg1)
 
     qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) :
 					     "unknown error");
-    if ((buf = (char *) malloc(((unsigned int) 
+    if ((buf = (char *) malloc(((unsigned int)
 				(strlen(format) + strlen(arg1)+ 1))))
 				== CHARNIL)
 	return exception("SYSERR memory exhausted in sys_exception1()");
     sprintf(buf, format, arg1);
     if ((buf2 = (char *) malloc(((unsigned int)
-				(strlen(buf) + strlen(qual1) + 3)))) 
+				(strlen(buf) + strlen(qual1) + 3))))
 				== CHARNIL)
 	return exception("SYSERR memory exhausted in sys_exception1()");
     sprintf(buf2, "%s: %s", buf, qual1);
@@ -227,7 +227,7 @@ sys_exception1(char *format, char *arg1)
  *
  ******************************************************************************
  */
-value 
+value
 sys_exception2(char *format, char *arg1, char *arg2)
 {
     char *buf, *buf2;
@@ -237,7 +237,7 @@ sys_exception2(char *format, char *arg1, char *arg2)
     qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) :
 					     "unknown error");
     if ((buf = (char *) malloc(((unsigned int)
-			(strlen(format) + strlen(arg1) + strlen(arg2) + 1)))) 
+			(strlen(format) + strlen(arg1) + strlen(arg2) + 1))))
 			== CHARNIL)
 	return exception("SYSERR memory exhausted in sys_exception2()");
     sprintf(buf, format, arg1, arg2);
@@ -265,7 +265,7 @@ sys_exception2(char *format, char *arg1, char *arg2)
  *
  ******************************************************************************
  */
-value 
+value
 proc_clear(node *n)
 {
     value val;
@@ -305,7 +305,7 @@ proc_clear(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_locate(node *n)
 {
     value val;
@@ -364,7 +364,7 @@ proc_locate(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_set(node *n)
 {
     int i;
@@ -411,7 +411,7 @@ proc_set(node *n)
 				comm);
 	    if (isexc(val1 = interpret_to_string(arglist[1])))
 		return val1;
-	    if ((*set_commands[i].string = strcopy(string_part(val1))) == 
+	    if ((*set_commands[i].string = strcopy(string_part(val1))) ==
 						   CHARNIL)
 		return exception("SYSERR  memory exhausted in SET command");
 	    else
@@ -461,7 +461,7 @@ proc_set(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_list(node *n)
 {
     value val;
@@ -494,7 +494,7 @@ proc_list(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_vars(node *n)
 {
     value val;
@@ -527,7 +527,7 @@ proc_vars(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_procs(node *n)
 {
     value val;
@@ -551,7 +551,7 @@ proc_procs(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_load(node *n)
 {
     extern value do_load(char *whofor, char *filenametobeloaded); /* input.c */
@@ -592,7 +592,7 @@ proc_load(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_save(node *n)
 {
     if (n != NODENIL) {
@@ -632,7 +632,7 @@ proc_save(node *n)
  */
 static node *nodeall;			/* initialised in init_procs() */
 
-value 
+value
 proc_exit(node *n)
 {
     extern void killiosubsystem(void);				/* main.c */
@@ -649,8 +649,8 @@ proc_exit(node *n)
     deinit_hdsfile();
     killiosubsystem();
 
-/* wait for iosubsystem and all child process to die */       
-    while( (pid = wait((int *) 0)) != -1) /* Null statement */; 
+/* wait for iosubsystem and all child process to die */
+    while( (pid = wait((int *) 0)) != -1) /* Null statement */;
 
     exit(0);
     return trueval; /* for lint */
@@ -676,7 +676,7 @@ proc_exit(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_signal(node *n)
 {
     value val;
@@ -703,7 +703,7 @@ proc_signal(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_delete(node *n)
 {
     value val;
@@ -727,7 +727,7 @@ proc_delete(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_defhelp(node *n)
 {
     value val;
@@ -779,7 +779,7 @@ proc_defhelp(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_defstring(node *n)
 {
     value val;
@@ -826,7 +826,7 @@ proc_defstring(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_defproc(node *n)
 {
     value val;
@@ -865,7 +865,7 @@ proc_defproc(node *n)
 	return exception("SYSERR memory exhausted in DEFPROC");
     if ((nw2 = node_value(value_string(name))) == NODENIL)
 	return exception("SYSERR memory exhausted in DEFPROC");
-    if ((nw = node2(defproc_interpret, value_string(file_name), nw1, nw2)) 
+    if ((nw = node2(defproc_interpret, value_string(file_name), nw1, nw2))
 		== NODENIL)
 	return exception("SYSERR memory exhausted in DEFPROC");
     return (install_abbrevs(name, nw));
@@ -890,7 +890,7 @@ proc_defproc(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_help(node *n)
 {
 /* Help variables */
@@ -901,7 +901,7 @@ proc_help(node *n)
     node *nw;
 
     if (nargs > 0 ) {
-/* Get the first component of the topic 
+/* Get the first component of the topic
  * There is at least one */
        if (isexc(val = interpret(arglist[0]))) return val;
        key1 = string_part( val );
@@ -920,14 +920,14 @@ proc_help(node *n)
       } else {
          if (ems1Starf
            ( "PATH", "../help/icl/iclhelp.shl", "r", &hfile, &pathlen ) ) {
-            helpfile = strcopy( hfile );                  
+            helpfile = strcopy( hfile );
          } else {
             return exception("SYSERR help file not found in HELP");
          }
       }
     }
     if ((nw = node1(help_interpret, value_string(helpfile),
-                    (nargs == 0) ? NODENIL : arglist[0] )) 
+                    (nargs == 0) ? NODENIL : arglist[0] ))
 		== NODENIL)
 	return exception("SYSERR memory exhausted in HELP");
     if ( isexc( val = interpret( nw ) ) ) return val;
@@ -945,7 +945,7 @@ proc_help(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 init_procs(void)
 {
     value val;
@@ -968,13 +968,13 @@ init_procs(void)
 					node_builtin(proc_list))))	||
 	(isexc(val = store_symbol("LOAD", SYM_BUILTIN,
 					node_builtin(proc_load))))	||
-	(isexc(val = store_symbol("PROCS", SYM_BUILTIN, 
+	(isexc(val = store_symbol("PROCS", SYM_BUILTIN,
 					node_builtin(proc_procs))))	||
 	(isexc(val = store_symbol("QUIT", SYM_BUILTIN,
 					node_builtin(proc_exit))))	||
 	(isexc(val = store_symbol("SAVE", SYM_BUILTIN,
 					node_builtin(proc_save))))	||
-	(isexc(val = store_symbol("CLEAR", SYM_BUILTIN, 
+	(isexc(val = store_symbol("CLEAR", SYM_BUILTIN,
 					node_builtin(proc_clear))))	||
 	(isexc(val = store_symbol("LOCATE", SYM_BUILTIN,
 					node_builtin(proc_locate))))	||

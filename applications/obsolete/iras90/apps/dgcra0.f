@@ -1,4 +1,4 @@
-      SUBROUTINE DGCRA0( NPSMP, NPROF, PROF, PROFX, PRFWID, STATUS ) 
+      SUBROUTINE DGCRA0( NPSMP, NPROF, PROF, PROFX, PRFWID, STATUS )
 *+
 *  Name:
 *     DGCRA0
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -70,7 +70,7 @@
                                  ! half of the max
       LOGICAL FIND               ! Find half value sample flag
       REAL MAXVAL                ! Max value of a profile
-    
+
 *.
 
 *  Check inherited global status.

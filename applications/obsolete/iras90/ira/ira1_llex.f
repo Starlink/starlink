@@ -213,7 +213,7 @@
          SZGRID = DMGRID*DMGRID
 
 *  If the maximum grid size has been exceeded, report an error and abort.
-         IF( SZGRID .GT. SZGMAX .AND. STATUS .EQ. SAI__OK ) THEN 
+         IF( SZGRID .GT. SZGMAX .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'IRA1_LLEX_ERR1', 'The image area which'//
      :                    'contain valid sky co-ordinates is too '//
@@ -236,7 +236,7 @@
          END DO
 
 *  Transform these to sky coordinates.
-         CALL IRA_TRANS( SZGRID, XX, YY, .TRUE., SCS, IDA, AA, BB, 
+         CALL IRA_TRANS( SZGRID, XX, YY, .TRUE., SCS, IDA, AA, BB,
      :                   STATUS )
 
 *  Count the valid points.
@@ -330,5 +330,5 @@
  999  CONTINUE
 
       END
- 
+
 

@@ -15,9 +15,9 @@
 *  Description:
 *     This routine copies one character string to another, checking
 *     for truncation caused by the returned string being too short to
-*     accommodate the entire given string. As much of the given string 
-*     as possible is copied to the returned string, ignoring any 
-*     trailing blanks. If truncation is found, it is indicated by the 
+*     accommodate the entire given string. As much of the given string
+*     as possible is copied to the returned string, ignoring any
+*     trailing blanks. If truncation is found, it is indicated by the
 *     returned status.
 *     Optionally, the last character of the returned string may also
 *     be set to '#' if truncation occurs.
@@ -26,10 +26,10 @@
 *     STR1 = CHARACTER * ( * ) (Given)
 *        The given string.
 *     TRUNC = LOGICAL (Given)
-*        A logical flag indicating the action to be taken if 
-*        truncation occurs: if TRUNC is .TRUE., a '#' will be 
-*        written into the last element of the returned string on 
-*        truncation; if TRUNC is .FALSE., no '#' is written to the 
+*        A logical flag indicating the action to be taken if
+*        truncation occurs: if TRUNC is .TRUE., a '#' will be
+*        written into the last element of the returned string on
+*        truncation; if TRUNC is .FALSE., no '#' is written to the
 *        returned string.
 *     STR2 = CHARACTER * ( * ) (Returned)
 *        The returned string. This will contain the given string,
@@ -50,8 +50,8 @@
 
 *  Implementation Deficiencies:
 *     This routine may be rather slow, and probably should not be
-*     used where it is going to be called many times inside a loop. 
-*     It is really for cases where it will not be called very often, 
+*     used where it is going to be called many times inside a loop.
+*     It is really for cases where it will not be called very often,
 *     but where it is imperative to check if truncation is occurring.
 
 *  Copyright:
@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

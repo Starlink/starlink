@@ -1,22 +1,22 @@
       SUBROUTINE LS(STK_TITLE,TOP_STK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C        L S
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C STK_TITLE (<), TOP_STK (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C This subroutine lists the stack contents in a page format
 C
@@ -36,7 +36,7 @@ C
          CALL WR_ERROR('Stack empty',OUT_LU)
          GOTO 666
       ENDIF
-C     
+C
       K=0
       DO I=1,TOP_STK
        K=K+1

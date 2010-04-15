@@ -13,10 +13,10 @@
 *     CALL CHR_FIWS( STRING, IPOSN, STATUS )
 
 *  Description:
-*     Find the start of the next word, signified by the character not 
-*     being a word delimiter, i.e. SPACE, TAB, or COMMA. Note that the 
-*     end of the current word is not found before looking for the start 
-*     of the next. This routine is expected to be used in conjunction 
+*     Find the start of the next word, signified by the character not
+*     being a word delimiter, i.e. SPACE, TAB, or COMMA. Note that the
+*     end of the current word is not found before looking for the start
+*     of the next. This routine is expected to be used in conjunction
 *     with CHR_FIWE.
 
 *  Arguments:
@@ -24,17 +24,17 @@
 *        The string to be searched.
 *     IPOSN = INTEGER (Given and Returned)
 *        The given value is the character position within the string
-*        at which searching is to start. If IPOSN is less than 1, the 
-*        search starts at position 1. The returned value is the 
-*        character position at which the next word starts. If IPOSN 
-*        already points to a character within a word, it is returned 
-*        unchanged. If no word is found, IPOSN is returned pointing to 
+*        at which searching is to start. If IPOSN is less than 1, the
+*        search starts at position 1. The returned value is the
+*        character position at which the next word starts. If IPOSN
+*        already points to a character within a word, it is returned
+*        unchanged. If no word is found, IPOSN is returned pointing to
 *        the end of the string, and STATUS is returned set.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value: if this value is not SAI__OK on entry, 
-*        the routine returns without action; if no word is found, STATUS 
+*        The status value: if this value is not SAI__OK on entry,
+*        the routine returns without action; if no word is found, STATUS
 *        is returned set to CHR__WNOTF.
-*        Note: The CHR__WNOTF symbolic constant is defined in the CHR_ERR 
+*        Note: The CHR__WNOTF symbolic constant is defined in the CHR_ERR
 *        include file.
 
 *  Copyright:
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -136,12 +136,12 @@
 
          DO 10 IPOSN = ISTART, LENGTH
             CVALUE = STRING( IPOSN : IPOSN )
-            IF ( ( CVALUE .NE. ' ' ) .AND. 
-     :           ( CVALUE .NE. TAB ) .AND. 
+            IF ( ( CVALUE .NE. ' ' ) .AND.
+     :           ( CVALUE .NE. TAB ) .AND.
      :           ( CVALUE .NE. ',' ) ) GO TO 20
  10      CONTINUE
 
-*     No word found, so return the position to point to the end 
+*     No word found, so return the position to point to the end
 *     of the string and set the returned status.
          IPOSN = LENGTH
          STATUS = CHR__WNOTF

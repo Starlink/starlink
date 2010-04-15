@@ -18,7 +18,7 @@
 #include "hds1_types.h"
 #include "hds_fortran.h"
 
-/* Routines to import and export arrays of type hdsdim for use in 
+/* Routines to import and export arrays of type hdsdim for use in
    Fortran libraries which require simple INTEGER*4 */
 
 /*
@@ -30,7 +30,7 @@
  *    Convert an array of hdsdim[] to F77_INTEGER_TYPE[]
 
  *  Invocation:
- *    outdims = hdsDimC2F( int ndim, const hdsdim dims[], 
+ *    outdims = hdsDimC2F( int ndim, const hdsdim dims[],
  *                         F77_INTEGER_TYPE fdims[DAT__MXDIM], int * status );
 
  *  Description:
@@ -63,7 +63,7 @@
  *      Initial version
 
  *  Notes:
- *    - Only use the pointer returned by this routine. Do not 
+ *    - Only use the pointer returned by this routine. Do not
  *      assume that fdims[] will be filled since it may not be
  *      used if the type of hdsdim is the same as a F77_INTEGER_TYPE.
  *    - Status will be set to bad if the C dimension can not fit into
@@ -98,7 +98,7 @@
  */
 
 F77_INTEGER_TYPE *
-hdsDimC2F( int ndim, const hdsdim dims[], 
+hdsDimC2F( int ndim, const hdsdim dims[],
 	   F77_INTEGER_TYPE fdims[DAT__MXDIM], int * status ) {
 
 #if HDS_COPY_FORTRAN_DIMS
@@ -114,7 +114,7 @@ hdsDimC2F( int ndim, const hdsdim dims[],
 
   for (i = 0; i < ndim; i++ ) {
     /* need to test for overflow - compare hdsdim to fortran max. Assume
-       Fortran is a signed 32-bit int and negative dims will not 
+       Fortran is a signed 32-bit int and negative dims will not
        be allowed (unsigned int would fit but fortran would treat that
        as negative dim). Do not test INT_MIN.
      */
@@ -176,7 +176,7 @@ hdsDimC2F( int ndim, const hdsdim dims[],
  *      Initial version
 
  *  Notes:
- *    - Only use the pointer returned by this routine. Do not 
+ *    - Only use the pointer returned by this routine. Do not
  *      assume that cdims[] will be filled since it may not be
  *      used if the type of hdsdim is the same as a F77_INTEGER_TYPE.
  *    - The expectation is that this routine is used solely for C

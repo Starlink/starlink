@@ -82,7 +82,7 @@
       STATUS = SAI__OK
 
       CALL PSX_GETENV (LOGNAME, VALUE, STATUS)
-      
+
       IF (STATUS.NE.SAI__OK .AND. STATUS.NE.PSX__NOENV) THEN
         PRINT *, ' -- utrnlog --'
         PRINT *, '    bad status in PSX_GETENV = ', STATUS
@@ -116,7 +116,7 @@
 *  Ok, go...
       CALL PSX_PUTENV( LOGNAME, VALUE, STATUS )
 
-*     Now check that it worked  
+*     Now check that it worked
       IF (STATUS .EQ. SAI__OK) THEN
 
 *        We stored something
@@ -128,7 +128,7 @@
      &           ' now set to: "',VALUE2(:GEN_ILEN(VALUE2)),'"'
          ELSE
             PRINT *, ' -- uputlog --'
-            PRINT *, 
+            PRINT *,
      &      '    Error reading back environment variable ',
      &      LOGNAME(:GEN_ILEN(LOGNAME))
          END IF

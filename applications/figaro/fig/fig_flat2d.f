@@ -12,7 +12,7 @@
 *     (>) fvariance (real fvariance(npix,nline)) flat field variance
 *     (>) npix      (integer) x-dimension of data
 *     (>) nline     (integer) y-dimension of data
-*     (>) iorder    (integer) order for fit to profile 
+*     (>) iorder    (integer) order for fit to profile
 *     (<) spectrum  (real spectrum(npix)) work area to hold profile
 *     (<) x         (real x(npix)) work area for profile fit
 *     (<) y         (real y(npix)) work area for profile fit
@@ -35,7 +35,7 @@
       REAL SPECTRUM(NPIX)
       REAL X(NPIX), Y(NPIX)
 
-      REAL OLDDATA, SCALE(2), JTY_LPOLY 
+      REAL OLDDATA, SCALE(2), JTY_LPOLY
       DOUBLE PRECISION COEFF(8)
 
       DO 10 I=1,NPIX
@@ -76,14 +76,14 @@ C     both the flat field and the data being zero. Also check
 C     the variance isn't zero.
 C
                IF (VARIANCE(I,J).GT.0.AND.DATA(I,J).NE.0
-     :            .AND.FVARIANCE(I,J).GT.0.AND.FLAT(I,J).GT.0) THEN 
+     :            .AND.FVARIANCE(I,J).GT.0.AND.FLAT(I,J).GT.0) THEN
 C
 C     Neither are zero
 C
-                    TEMP = VARIANCE(I,J)/(OLDDATA**2.)  
-                    TEMP = TEMP + (FVARIANCE(I,J)/(FLAT(I,J)**2.)) 
-                    TEMP = TEMP * (DATA(I,J)**2.)   
-                    VARIANCE(I,J) = TEMP     
+                    TEMP = VARIANCE(I,J)/(OLDDATA**2.)
+                    TEMP = TEMP + (FVARIANCE(I,J)/(FLAT(I,J)**2.))
+                    TEMP = TEMP * (DATA(I,J)**2.)
+                    VARIANCE(I,J) = TEMP
                ELSE
                     VARIANCE(I,J) = 0
                     DATA (I,J) = 0

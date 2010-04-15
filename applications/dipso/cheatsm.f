@@ -4,7 +4,7 @@
        REAL WAVE(NPOINT), FLUX(NPOINT)
        REAL VARRAY(10)
        LOGICAL OK
- 
+
        X1 = VARRAY(1)
        TOL = VARRAY(2)
        DO 100 I = 2, NPOINT - 1
@@ -20,7 +20,7 @@
              ENDIF
           ENDIF
   100  CONTINUE
- 
+
   200  CONTINUE
 
        END

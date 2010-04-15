@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -210,7 +210,7 @@ this would be inefficient given the number of structures that are
 already in use, let alone the ones to come.  What is required is a
 single utility that lists the contents of an HDS data structure to your
 terminal and, optionally, to a file for printing or documentation. This
-is where {\footnotesize HDSTRACE} comes in handy. 
+is where {\footnotesize HDSTRACE} comes in handy.
 
 {\footnotesize HDSTRACE} lists recursively the name, data type, and
 values of an HDS structure or object.  The type is bracketed by $<>$ to
@@ -219,12 +219,12 @@ delineates structures.  The format of the output is flexible; and more
 importantly, you can now always see the data values---something that was
 often impossible with original version.  You control the formatting by
 specifying optional parameters on the command line, otherwise they have
-sensible defaults. 
+sensible defaults.
 
 Until this release {\footnotesize HDSTRACE} was called {\footnotesize
 TRACE}. However, because of a clash with the UNIX command {\bf trace} it
 has been renamed, though on VMS the command {\tt TRACE} will continue to
-invoke this utility. 
+invoke this utility.
 
 
 \section{Running HDSTRACE}
@@ -235,9 +235,9 @@ the \$, \% or $>$ prompts.
 {\footnotesize HDSTRACE} runs as an {\footnotesize ADAM} task.
 {\footnotesize ADAM} must
 therefore be initiated directly or indirectly using the {\tt ADAMSTART}
-or {\tt ADAM} command before {\footnotesize HDSTRACE} can be run. 
+or {\tt ADAM} command before {\footnotesize HDSTRACE} can be run.
 
-{\footnotesize HDSTRACE} may be run directly from DCL with the following 
+{\footnotesize HDSTRACE} may be run directly from DCL with the following
 command.
 \small
 \begin{verbatim}
@@ -246,7 +246,7 @@ command.
 \normalsize
 You will be prompted for the HDS object or structure to be traced.
 
-If you wish to trace several files or objects 
+If you wish to trace several files or objects
 it is more efficient to run {\footnotesize HDSTRACE} from ICL.
 If you are already using ICL just enter
 
@@ -270,7 +270,7 @@ will also work from both VMS and ICL.
     % hdstrace
 \end{verbatim}
 \normalsize
-There is no initialisation procedure to run first, but the command may 
+There is no initialisation procedure to run first, but the command may
 not be abbreviated.
 
 \subsection{Getting Help}
@@ -280,7 +280,7 @@ The following command gives help on HDSTRACE.
     ICL> HELP HDSTRACE
 \end{verbatim}
 \normalsize
-Notice that this only available for ICL since there is no global help 
+Notice that this only available for ICL since there is no global help
 system for Starlink applications.  However, it is possible to access
 the full help on {\footnotesize HDSTRACE} from DCL or the UNIX shell by
 entering {\tt ??} in response to a prompt for a parameter.
@@ -300,7 +300,7 @@ prompt and each remaining parameter will take its default value.
 Normally, this should not be necessary as most of the time the defaults
 will be satisfactory or just one or two need changing by specifying them
 on the command line. Prompting does have one advantage in that a {\tt ?}
-may be entered to elicit help on that parameter. 
+may be entered to elicit help on that parameter.
 
 Parameters may be given by keyword, {\it e.g.}\
 \small
@@ -348,7 +348,7 @@ To achieve this enter the following on VMS.
 SUN/115 tells you how to interpret the interface file; it describes
 the meanings and available options of the various keywords, and the use
 of the ADAM\_IFL logical name.  The most likely things that you would
-wish to alter are the values of {\em default\/} and {\em vpath}. 
+wish to alter are the values of {\em default\/} and {\em vpath}.
 
 On UNIX you would do something like the following.
 \small
@@ -357,7 +357,7 @@ On UNIX you would do something like the following.
                                      # where you keep private versions of IFLs
     % cp $HDSTRACE_DIR/hdstrace.ifl .
     % vi trace.ifl                   # Make the changes you wish.
-    % setenv ADAM_IFL ~abc/xyz:$ADAM_IFL # Append the directory to the 
+    % setenv ADAM_IFL ~abc/xyz:$ADAM_IFL # Append the directory to the
                                      # interface-file search path.
 \end{verbatim}
 \normalsize
@@ -369,24 +369,24 @@ The best way to describe the parameters is to show some examples.
 \section{Examples}
 \label{se:example}
 In the following examples a a UNIX shell is used, but the commands would
-also work from ICL or DCL except where noted. 
+also work from ICL or DCL except where noted.
 
 \subsection{Getting Started}
 The first HDS file is quite simple.  It is an IMAGE-format file may be
 used in {\footnotesize KAPPA}.  Note that on UNIX the HDS file name
-is case sensitive.  
+is case sensitive.
 
 \small
 \begin{verbatim}
     % hdstrace beq
-  
+
     BEQ  <IMAGE>
        TITLE          <_CHAR*72>      'KAPPA - Glitch'
        DATA_ARRAY(109,64)  <_REAL>    124,92,98,156,171,166,171,181,190,180,
                                       ... 127.32,127.56,128.36,129.4,130.08,130.44
        DATA_MIN       <_REAL>         12
        DATA_MAX       <_REAL>         254
-                                                                              
+
     End of Trace.
 \end{verbatim}
 \normalsize
@@ -407,7 +407,7 @@ The third line shows an array.  The dimensions follow the name thus
 DATA\_ARRAY has 109 columns and 64 lines.  Since there is insufficient
 room to list the values of 6976 elements, {\footnotesize HDSTRACE} lists
 the first few and last few values separated by an ellipsis to indicate
-that there are missing values. 
+that there are missing values.
 
 We can look at a specific object or structure.  For example to look
 at just the data array in beq enter:
@@ -415,11 +415,11 @@ at just the data array in beq enter:
 \small
 \begin{verbatim}
     % hdstrace beq.data_array
-   
+
     BEQ.DATA_ARRAY  <_REAL>
        DATA_ARRAY(109,64)  124,92,98,156,171,166,171,181,190,180,196,205,217,
                            ... 126.6,127.32,127.56,128.36,129.4,130.08,130.44
-                                                                              
+
     End of Trace.
 \end{verbatim}
 \normalsize
@@ -431,7 +431,7 @@ We can look at more of the DATA\_ARRAY as follows.
 \small
 \begin{verbatim}
     % hdstrace beq.data_array nlines=3
-   
+
     BEQ  <IMAGE>
        TITLE          <_CHAR*72>      'KAPPA - Glitch'
        DATA_ARRAY(109,64)  <_REAL>    124,92,98,156,171,166,171,181,190,180,
@@ -440,15 +440,15 @@ We can look at more of the DATA\_ARRAY as follows.
         ... 127.16,126.2,126.36,126.6,127.32,127.56,128.36,129.4,130.08,130.44
        DATA_MIN       <_REAL>         12
        DATA_MAX       <_REAL>         254
- 
+
     End of Trace.
 \end{verbatim}
 \normalsize
-The {\tt nlines=3} specifies that up to a maximum of three lines, 
+The {\tt nlines=3} specifies that up to a maximum of three lines,
 excluding any extra line that shows the final few values, can be
-used to present the values.  In order to present more values the 
+used to present the values.  In order to present more values the
 continuation lines are indented one column right of the object's name.
-Notice {\tt nlines=3} has no effect on the other objects in the 
+Notice {\tt nlines=3} has no effect on the other objects in the
 structure because their values each fit onto a line; had there been
 other arrays these too may have up to three lines to list their
 values.  The NLINES parameter normally defaults to one, hence we usually
@@ -460,19 +460,19 @@ has the added advantage that it is more distinctive.
 
 For inspection of two-dimensional arrays and subsets {\footnotesize KAPPA}
 offers a number of applications such as INSPECT and LOOK which may be
-more convenient. 
+more convenient.
 
-If the array was much smaller we could display all the values on a single 
+If the array was much smaller we could display all the values on a single
 line.
 
 \small
 \begin{verbatim}
     % hdstrace SMALL.DATA_ARRAY
-   
+
     SMALL  <IMAGE>
        TITLE          <_CHAR*72>      'KAPPA - Pick2d'
        DATA_ARRAY(3,2)  <_REAL>       124,92,98,156,156,149
- 
+
     End of Trace.
 \end{verbatim}
 \normalsize
@@ -482,13 +482,13 @@ If you wish to use the output for some documentation you might like
 to align the trace into neat columns.  In the above examples the
 type of the DATA\_ARRAY is displaced because of the dimensions.  The
 indentation of the type with respect to the start of the name, and the
-values with respect to the start of the type may be controlled by 
+values with respect to the start of the type may be controlled by
 parameters TYPIND and VALIND respectively.  For example,
 
 \small
 \begin{verbatim}
     % hdstrace beq typind=20
- 
+
     BEQ  <IMAGE>
        TITLE               <_CHAR*72>      'KAPPA - Glitch'
        DATA_ARRAY(109,64)  <_REAL>         124,92,98,156,171,166,171,181,190,
@@ -508,22 +508,22 @@ This can help when dealing with moderate-sized arrays.
 \small
 \begin{verbatim}
     % hdstrace beq newline
- 
+
     BEQ  <IMAGE>
-       TITLE          <_CHAR*72>   
+       TITLE          <_CHAR*72>
         'KAPPA - Glitch'
-       DATA_ARRAY(109,64)  <_REAL>   
+       DATA_ARRAY(109,64)  <_REAL>
         124,92,98,156,171,166,171,181,190,180,196,205,217,211,204,210,202,197,
         ... 127.16,126.2,126.36,126.6,127.32,127.56,128.36,129.4,130.08,130.44
-       DATA_MIN       <_REAL>   
+       DATA_MIN       <_REAL>
         12
-       DATA_MAX       <_REAL>   
+       DATA_MAX       <_REAL>
         254
 
     End of Trace.
 \end{verbatim}
 \normalsize
-A record of the trace may be stored in an text file given by the 
+A record of the trace may be stored in an text file given by the
 parameter LOGFILE.  The width of the output may be altered to 132
 characters instead of 80 via parameter WIDEPAGE.
 
@@ -534,27 +534,27 @@ the other parameters of {\footnotesize HDSTRACE}.
 
 \small
 \begin{verbatim}
-    % hdstrace $ADAM_USER/global valind=18 
-  
+    % hdstrace $ADAM_USER/global valind=18
+
     GLOBAL  <STRUC>
        LUT            <ADAM_PARNAME>     {structure}
-          NAMEPTR        <_CHAR*132>        'xmascomet_lut' 
+          NAMEPTR        <_CHAR*132>        'xmascomet_lut'
 
-       IMAGE_OVERLAY  <ADAM_PARNAME>     {structure} 
-          NAMEPTR        <_CHAR*132>        'ikonov' 
+       IMAGE_OVERLAY  <ADAM_PARNAME>     {structure}
+          NAMEPTR        <_CHAR*132>        'ikonov'
 
        GRAPHICS_DEVICE  <ADAM_PARNAME>   {structure}
-          NAMEPTR        <_CHAR*132>        'ikon' 
+          NAMEPTR        <_CHAR*132>        'ikon'
 
        IMAGE_DISPLAY  <ADAM_PARNAME>     {structure}
-          NAMEPTR        <_CHAR*132>        'ikon' 
+          NAMEPTR        <_CHAR*132>        'ikon'
 
        DATA_ARRAY     <ADAM_PARNAME>     {structure}
-          NAMEPTR        <_CHAR*132>        'cac1d' 
+          NAMEPTR        <_CHAR*132>        'cac1d'
 
-       HDSOBJ         <_CHAR*132>        'AST_ROOT:<DATA.DEMO>PSS_DEMO' 
-       SST_SOURCE     <_CHAR*132>        'TRACE.FOR' 
-                                                                             
+       HDSOBJ         <_CHAR*132>        'AST_ROOT:<DATA.DEMO>PSS_DEMO'
+       SST_SOURCE     <_CHAR*132>        'TRACE.FOR'
+
     End of Trace.
 \end{verbatim}
 \normalsize
@@ -565,13 +565,13 @@ therefore instead of listing values, {\footnotesize HDSTRACE} writes the
 comment {\tt \{structure\}}.  Each of these structures contains one
 object, NAMEPTR, which is indented in the trace.  {\footnotesize HDSTRACE} inserts
 a blank line after listing the contents at the end of a structure for
-clarity. 
+clarity.
 
 On VMS the command would be
 
 \small
 \begin{verbatim}
-    $ HDSTRACE ADAM_USER:GLOBAL VALIND=18 
+    $ HDSTRACE ADAM_USER:GLOBAL VALIND=18
 \end{verbatim}
 \normalsize
 Structures can also be arrays, as in the following example of an NDF.
@@ -595,15 +595,15 @@ Structures can also be arrays, as in the following example of an NDF.
        MORE           <EXT>           {structure}
           FITS(31)       <_CHAR*80>      'SIMPLE  =                    T / St...'
                                          ... 'HISTORY  ESO-DESCRIPTOR...','','END'
-                                                                             
+
     End of Trace.
 \end{verbatim}
 \normalsize
 AXIS is an array of structures.  Therefore it has no values and
-{\footnotesize TRACE} puts the comment {\tt \{array of structures\}}. 
+{\footnotesize TRACE} puts the comment {\tt \{array of structures\}}.
 By default {\footnotesize HDSTRACE} only lists the contents of the first
 element of an array of structures.  To obtain a full trace of arrays of
-structures you must set the parameter FULL to be true. 
+structures you must set the parameter FULL to be true.
 
 \small
 \begin{verbatim}
@@ -644,22 +644,22 @@ above trace only part of the first FITS header card is shown.  Part of
 the anti-penultimate header is reported.  The last two lines are blank
 and 'END' and are listed in full.  These truncations are not very
 convenient. {\footnotesize HDSTRACE} provides a mechanism for placing
-each character-array element on a new line. 
+each character-array element on a new line.
 
 \small
 \begin{verbatim}
     % hdstrace moimp.more.fits newline eachline
 
     MOIMP.MORE.FITS  <_CHAR*80>
-       FITS(31)  
+       FITS(31)
         'SIMPLE  =                    T / Standard FITS format', ...
         'END'
 
     End of Trace.
 \end{verbatim}
 \normalsize
-To list the whole array specify {\tt nlines=all} or give an NLINES with at 
-least the number of array elements.  Note the object need not 
+To list the whole array specify {\tt nlines=all} or give an NLINES with at
+least the number of array elements.  Note the object need not
 necessarily be the array.  Below we trace the MORE extension.\footnote{
 FITSLIST in {\footnotesize KAPPA} offers a more-convenient way of listing the
 FITS headers within NDFs.}
@@ -669,7 +669,7 @@ FITS headers within NDFs.}
     % hdstrace moimp.more nlines=a newline eachline
 
     MOIMP.MORE  <EXT>
-       FITS(31)       <_CHAR*80>      
+       FITS(31)       <_CHAR*80>
         'SIMPLE  =                    T / Standard FITS format',
         'BITPIX  =                   32 / No. of bits per pixel',
         'NAXIS   =                    2 / No. of axes in image',
@@ -706,7 +706,7 @@ FITS headers within NDFs.}
 \end{verbatim}
 \normalsize
 The {\tt nlines=all} facility should be used with care; select an individual
-component or a structure that does not contain a large array.  The 
+component or a structure that does not contain a large array.  The
 output from a data array such as found in a typical NDF will be huge.
 
 \subsection{Current Value}

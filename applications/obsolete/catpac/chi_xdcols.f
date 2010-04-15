@@ -43,7 +43,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -146,7 +146,7 @@
       call chi_crecat(output, numents, newcolc, newcnames,
      :  newcformats, newcunits, newccomments, status)
 *
-*    Loop through the input catalogue until the end reading the data and 
+*    Loop through the input catalogue until the end reading the data and
 *    copying the data.
 *
         do entscount = 1, numents
@@ -172,7 +172,7 @@
             endif
           enddo
           call chi_putent( output, newcnames, newcolc, 1 , newcharvals,
-     :    newdoubvals, newintvals, newlogvals, newrealvals, 
+     :    newdoubvals, newintvals, newlogvals, newrealvals,
      :    newcoltypes, newnulls, status )
        enddo
 *

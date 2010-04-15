@@ -34,7 +34,7 @@
 
 *  History:
 *     13-OCT-1993 (DSB):
-*        Original version modified from routine IRAS90 routine IRM_GTHLP.FOR 
+*        Original version modified from routine IRAS90 routine IRM_GTHLP.FOR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,7 +84,7 @@
                                  ! trailing blanks
      :  GHLPI,                   ! Routine for reading help command
      :  HLP_HELP,                ! Interactive help
-     :  PTOUT                    ! Routine for outputting help 
+     :  PTOUT                    ! Routine for outputting help
 
       EXTERNAL
      :  GHLPI,                   ! Gets the help information
@@ -150,7 +150,7 @@
 
 *  Initiate interactive help session.
       ISTAT = HLP_HELP( PTOUT, WIDTH, KEYWRD( :KWRDLN ), LUHLP,
-     :                  HELPLB( :HLPLEN ), HFLAGS, GHLPI, 
+     :                  HELPLB( :HLPLEN ), HFLAGS, GHLPI,
      :                  NAMTR )
 
 *  Watch for an error status.

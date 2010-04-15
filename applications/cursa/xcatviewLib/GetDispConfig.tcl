@@ -2,7 +2,7 @@ proc GetDispConfig { } {
 
 #+ GetDispConfig
 #
-#  Get the display configuration options.  Note that the current values are 
+#  Get the display configuration options.  Note that the current values are
 #  used as defaults.
 #
 #  Given
@@ -67,7 +67,7 @@ proc GetDispConfig { } {
 #   --------------------
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -317,7 +317,7 @@ proc GetDispConfig { } {
        -command {HelpText GetDispConfig_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getdispconfig.button.default -relief sunken -bd 1
@@ -402,7 +402,7 @@ proc GetDispConfig { } {
 
      .getdispconfig.opt.width.value  configure  -state normal
      .getdispconfig.opt.width.value  delete 0 end
-     .getdispconfig.opt.width.value  insert 0 $widthGetDispConfig 
+     .getdispconfig.opt.width.value  insert 0 $widthGetDispConfig
      .getdispconfig.opt.width.value  configure  -state disabled
 
 #
@@ -412,7 +412,7 @@ proc GetDispConfig { } {
 
      if {$getDispConfigButton == "ok"} then {
         set sequenceNumber $seqnoGetDispConfig
-        set angleRepn      $angleGetDispConfig  
+        set angleRepn      $angleGetDispConfig
 
         set screenWidth    $widthGetDispConfig
         set widthChange    $changeGetDispConfig

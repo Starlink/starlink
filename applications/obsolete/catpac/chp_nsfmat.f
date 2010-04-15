@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHP_NSFMAT( NSFORMAT, NSFLAG, CHIFORMAT, STATUS) 
+     : CHP_NSFMAT( NSFORMAT, NSFLAG, CHIFORMAT, STATUS)
 *+
 *  Name:
 *     CHP_NSFMAT
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL CHP_NSFMAT( NSFORMAT, NSFLAG, CHIFORMAT, STATUS) 
+*      CALL CHP_NSFMAT( NSFORMAT, NSFLAG, CHIFORMAT, STATUS)
 *
 *  Description:
 *     Test a format against the allowed Non standard formats.
@@ -43,7 +43,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

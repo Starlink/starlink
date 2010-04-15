@@ -26,15 +26,15 @@
 *    KP1 = INTEGER (Given)
 *        Order+1
 *    I = INTEGER (Given)
-*       
+*
 *    ADD = LOGICAL (Given)
-*       
+*
 *    DATA(NL,NI) = REAL ARRAY (Given and returned)
 *        The data
 *    LCOR(NL) = DOUBLE PRECISION ARRAY (Workspace)
-*       
+*
 *    XIN(NL) = DOUBLE PRECISION ARRAY (Workspace)
-*       
+*
 * History:
 *   TNW/CAVAD 17/8/90 ADD argument added
 *-

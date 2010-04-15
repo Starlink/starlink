@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Copy value string into token string with justification.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -33,23 +33,23 @@
 
 *   Import:
       BYTE VALUE(256)      ! value string
- 
+
       LOGICAL RIGHT        ! whether right justified
- 
+
       INTEGER FIELD        ! field size
       INTEGER MAXC         ! size of TOKEN
- 
+
 *   Export:
       BYTE TOKEN(MAXC)     ! string to receive value
- 
+
 *   External references:
       INTEGER STR_LEN      ! string length
- 
+
 *   Local variables:
       INTEGER FIRST        ! start position of VALUE in TOKEN
       INTEGER I            ! loop index
       INTEGER NCHAR        ! character counter
- 
+
 *   Blank fill TOKEN
       NCHAR = MIN(FIELD, MAXC - 1)
 
@@ -60,7 +60,7 @@
  100  CONTINUE
 
       CALL str_TERM(NCHAR, MAXC, TOKEN)
- 
+
 *   Plant VALUE in TOKEN
       NCHAR = str_LEN(VALUE)
 

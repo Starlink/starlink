@@ -38,7 +38,7 @@
 
       INCLUDE 'PGP_ERR'
 
-      
+
       INTEGER I
       IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRFA - No PGPLOT device open', GRNODO)

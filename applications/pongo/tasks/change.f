@@ -36,7 +36,7 @@
 *        The pen number (colour index) PGPLOT uses for plotting. The
 *        value should be between 0 and 255. Usually the first 16 pens
 *        are predefined to have the following colours:
-*        
+*
 *           - 0 -- background,
 *           - 1 -- foreground (default),
 *           - 2 -- red,
@@ -72,12 +72,12 @@
 *     FONT = _INTEGER (Read)
 *        The font used by PGPLOT. The styles for each font are as
 *        follows:
-*        
+*
 *           - 1 -- single-stroke font (default),
 *           - 2 -- roman font,
 *           - 3 -- italic font,
 *           - 4 -- script font.
-*           
+*
 *        If the value is not specified on the command line, the current
 *        value is used. The current value is initially set to 1 (i.e.
 *        single-stroke font).
@@ -97,13 +97,13 @@
 *     LINESTY = _INTEGER (Read)
 *        The line style used by PGPLOT.  The line style may be one of
 *        the following:
-*        
+*
 *           - 1 -- full line (default),
 *           - 2 -- dashed,
 *           - 3 -- dot-dash-dot-dash,
 *           - 4 -- dotted,
 *           - 5 -- dash-dot-dot-dot.
-*           
+*
 *        If the value is not specified on the command line, the current
 *        value is used. The current value is initially set to 1 (i.e.
 *        full line).
@@ -116,18 +116,18 @@
 *        value is used. The current value is initially set to 1.
 *        [1]
 *     PHASE = _REAL (Read)
-*        The fraction of SEPARATION that hatched lines are displaced. 
-*        Modifying this between regions makes their separation more 
+*        The fraction of SEPARATION that hatched lines are displaced.
+*        Modifying this between regions makes their separation more
 *        obvious. This is only used when FILLSTY is 3.
 *        [0]
 *     SEPARATION = _REAL (Read)
 *        The separation of hatched lines. The unit spacing is 1 percent
 *        of the smaller of the height or width of the view surface.
-*        Only used when FILLSTY is 3. 
+*        Only used when FILLSTY is 3.
 *        [1]
 *     TEXTBACK = _INTEGER (Read)
 *        The pen number (colour index) of the background used when
-*        drawing text. If less than zero then a transparent 
+*        drawing text. If less than zero then a transparent
 *        background is used. Zero erases the plot under the text
 *        region.
 *        [-1]
@@ -166,7 +166,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -185,7 +185,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       INTEGER IFONT
       INTEGER ICIDX
@@ -206,19 +206,19 @@
 
 *  Check that a PGPLOT device is open for plotting.
       IF ( .NOT. PON_DEVOP( .TRUE., STATUS ) ) GO TO 99
-      
+
 *  Set the colour index (pen).
       CALL PAR_GET0I( 'COLOUR', ICIDX, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
-            CALL ERR_REP( 'CHANGE_COLOUR', 
-     :                    'CHANGE: Unable to change the colour index.', 
+            CALL ERR_REP( 'CHANGE_COLOUR',
+     :                    'CHANGE: Unable to change the colour index.',
      :                    STATUS )
             GO TO 99
          END IF
-      ELSE 
+      ELSE
          CALL PGSCI( ICIDX )
       END IF
 
@@ -228,12 +228,12 @@
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
-            CALL ERR_REP( 'CHANGE_CHEIGHT', 
-     :           'CHANGE: Unable to change the character height.', 
+            CALL ERR_REP( 'CHANGE_CHEIGHT',
+     :           'CHANGE: Unable to change the character height.',
      :           STATUS )
             GO TO 99
          END IF
-      ELSE 
+      ELSE
          CALL PGSCH( CHARHT )
       END IF
 
@@ -261,12 +261,12 @@
      :                  /'the point fill style.', STATUS )
             GO TO 99
          END IF
-      ELSE 
+      ELSE
          CALL PGSFS( IFS )
       END IF
 
 *  If fill style is 3 then set the other related attributes.
-      IF ( IFS .EQ. 3 ) THEN 
+      IF ( IFS .EQ. 3 ) THEN
          CALL PAR_GET0R( 'ANGLE', ANGLE, STATUS )
          CALL PAR_GET0R( 'SEPARATION', SEPN, STATUS )
          CALL PAR_GET0R( 'PHASE', PHASE, STATUS )
@@ -278,7 +278,7 @@
      :                     'change the hatch fill attributes.', STATUS )
                GO TO 99
             END IF
-         ELSE 
+         ELSE
             CALL PGSHS( ANGLE, SEPN, PHASE )
          END IF
       END IF
@@ -293,7 +293,7 @@
      :                  //'the line style.', STATUS )
             GO TO 99
          END IF
-      ELSE 
+      ELSE
          CALL PGSLS( ILS )
       END IF
 
@@ -307,13 +307,13 @@
      :                  /'the line width.', STATUS )
             GO TO 99
          END IF
-      ELSE 
+      ELSE
          CALL PGSLW( ILW )
       END IF
 
 *  Set the text background colour index.
       CALL PAR_GET0I( 'TEXTBACK', TBCI, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
@@ -321,7 +321,7 @@
      :                  //'the text background colour index.', STATUS )
             GO TO 99
          END IF
-      ELSE 
+      ELSE
          CALL PGSTBG( TBCI )
       END IF
 

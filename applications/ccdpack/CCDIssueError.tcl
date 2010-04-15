@@ -78,7 +78,7 @@
 #  it to go away before proceeding.
       set Issueerror $MAIN(window).ccdissueerror
       set issueerror [CCDPathOf $Issueerror]
-      if { [winfo exists $issueerror] } { 
+      if { [winfo exists $issueerror] } {
          tkwait window $issueerror
       }
       CCDDialog $Issueerror "Error..." "$message" error
@@ -87,6 +87,6 @@
    }
 
 #  All done.
-   return      
+   return
    }
 # $Id$

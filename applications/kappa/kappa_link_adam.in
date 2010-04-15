@@ -34,7 +34,7 @@
 
 #  Copyright:
 #     Copyright (C) 1992 Science & Engineering Research Council.
-#     Copyright (C) 1995, 1997, 1998, 2001, 2004 Central Laboratory of 
+#     Copyright (C) 1995, 1997, 1998, 2001, 2004 Central Laboratory of
 #     the Research Councils.
 #     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
@@ -73,7 +73,7 @@
 #     1997 May 31 (MJC)
 #        Removed NAG.
 #     15-OCT-1998 (DSB):
-#        Added AST (following NDF because ndf_link_adam includes AST with 
+#        Added AST (following NDF because ndf_link_adam includes AST with
 #        no graphics), and CAT.
 #     11-JUL-2001 (DSB):
 #        Replace most of the library list with `kaplibs_link_adam`.

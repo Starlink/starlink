@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,14 +66,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ATL_PAR'          ! ATL constants 
+      INCLUDE 'ATL_PAR'          ! ATL constants
 
 *  Arguments Given:
       INTEGER FRAME
@@ -100,15 +100,15 @@
       LONAX = 0
       LATAX = 0
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create a default skyframe to use as the template when searching the
 *  supplied Frame for SkyFrames.
-      TMPLT = AST_SKYFRAME( ' ', STATUS )  
+      TMPLT = AST_SKYFRAME( ' ', STATUS )
 
 *  Set the MinAxes and MaxAxes attributes of this SkyFrame to equal the
-*  number of axes in the supplied Frame. Normally a SkyFrame will only 
+*  number of axes in the supplied Frame. Normally a SkyFrame will only
 *  match a 2D Frame, but setting these attributes makes it possible for a
 *  SkyFrame to match a Frame like the supplied Frame.
       NAX = AST_GETI( FRAME, 'Naxes', STATUS )
@@ -132,7 +132,7 @@
 *  Pick the celestial axes from the supplied frame.
                SKYFRAME = AST_PICKAXES( FRAME, 2, OUTAX, JUNK, STATUS )
 
-*  The lat/lon axes in FRAME will be in the same order as they are in 
+*  The lat/lon axes in FRAME will be in the same order as they are in
 *  SKYFRAME. Get their indices.
                IF( AST_GETI( SKYFRAME, 'LatAxis', STATUS ) .EQ. 1 ) THEN
                   LATAX = OUTAX( 1 )

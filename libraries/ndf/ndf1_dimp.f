@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -110,7 +110,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -262,14 +262,14 @@ c            CALL ERR_RLSE
 *  refused to handle their data as a result).
                      IF ( .NOT. CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SIMPLE',
-     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :THEN
                         IF ( TCB_WARN ) THEN
                            CALL ERR_MARK
                            STATUS = NDF__VARIN
                            CALL DAT_MSG( 'NDF', LOC )
                            CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADVARIANT', 
+     :                                     'BADVARIANT',
      :                                     %VAL( CNF_CVAL( LENV ) ) )
                            CALL ERR_REP( 'NDF1_DIMP_WVRNT',
      :                     'Warning: the VARIANT component in the ' //
@@ -313,7 +313,7 @@ c            CALL ERR_RLSE
             CALL NDF1_RLS( NDF__DCB, IDCB, STATUS )
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_DIMP', STATUS )
 

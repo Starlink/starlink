@@ -81,7 +81,7 @@ C# IL>=b, OL>=0
 *  ERRORS
 *  ------
 *    152  Initial value is invalid
-*    154  Length of initial string greater than the buffer size 
+*    154  Length of initial string greater than the buffer size
 *   2003  Invalid data record
 *
 *   Detected by GKIEA:
@@ -113,7 +113,7 @@ C# IL>=b, OL>=0
 * Check echo area
       CALL GKIEA (IWKID,XMIN,XMAX,YMIN,YMAX,ISTAT)
       IF(ISTAT .NE. 0) GOTO 88
- 
+
 * Check Initial string (plus one char) will fit into buffer
       ISTAT = 154
       LSTR = MIN(INLSTR,LEN(INSTR))

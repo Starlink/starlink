@@ -27,7 +27,7 @@ extern value reload_vars_hds(void);
 extern value name_interpret_hds ( node *n, int op );
 
 /*
- * Internal prototypes for hds.c 
+ * Internal prototypes for hds.c
  */
 
 static int init_hdsfile(void);

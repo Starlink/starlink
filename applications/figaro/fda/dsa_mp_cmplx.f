@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -231,7 +231,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -299,7 +299,7 @@
          CALL NDF_MAPZ( DSA__REFID1(SLOT), 'DATA', NDFTYP, 'READ',
      :      RADDR, IADDR, NELM, STATUS )
          CALL NDF_BAD( DSA__REFID1(SLOT), 'DATA', .TRUE.,
-     :      EXIST, STATUS ) 
+     :      EXIST, STATUS )
 
 
 *     If read access to data with bad values.

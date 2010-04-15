@@ -2,28 +2,28 @@
 *+
 *  Name:
 *     MAG1_CPTDS
- 
+
 *  Purpose:
 *     copy system-wide tape dataset to local storage.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG1_CPTDS(ELOC, NAME, LOC, STATUS)
- 
+
 *  Description:
-*     This routine copies the specified structure in the system-wide device 
+*     This routine copies the specified structure in the system-wide device
 *     dataset to the structure located by the given locator (usually the
 *     users own DEVICES data structure). The system-wide device dataset is
 *     defined by the environment variable DEVDATASET or. failing that, at
 *     ../etc/devdataset.sdf relative to one of the directories on the user's
 *     PATH.
 *     If there is no system-wide device dataset, or the specified structure
-*     cannot be found in it, a new structure is created in the users file 
+*     cannot be found in it, a new structure is created in the users file
 *     with the given name and assuming that the required device has the same
 *     name (in lower case).
- 
+
 *  Arguments:
 *     ELOC=CHARACTER*(*) Given)
 *        Locator to the (user) tape data structure
@@ -36,12 +36,12 @@
 *        SAI__OK on input, then the routine will return without action.  If
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
- 
+
 *  Algorithm:
 *     A locator to the tape device data set within the system defined devices
 *     data structure is obtained.   The tape device data set is then copied to
 *     a user specified data structure.
- 
+
 *  Copyright:
 *     Copyright (C) 1991, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 *  Authors:
 *     Sid Wright  (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     Sid Wright         22-Apr-82
 *     A.Chipperfield 03-Jun-86  ADAM version use hds_open
@@ -89,31 +89,31 @@
 *        Create structure if system-wide one doesn't exist
 *        Avoid hardwired /star/etc/devdataset by using EMS1_STARF
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     Formerly known as MAG_$CPTDS
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'MAG_ERR'         ! MAG Errors
- 
+
 *  Arguments Given:
       CHARACTER*(DAT__SZLOC) ELOC
       CHARACTER*(*) NAME        ! parameter name
- 
+
 *  Arguments Returned:
       CHARACTER*(*) LOC         ! locator to tape device dataset
       INTEGER STATUS            ! status return
- 
+
 *  Local Variables:
       INTEGER ISTAT             ! local status
       INTEGER PATHLEN
@@ -121,7 +121,7 @@
       CHARACTER*200 DATASET
       CHARACTER*200 UNAME
 *.
- 
+
       IF ( STATUS.NE.SAI__OK ) RETURN
       CALL ERR_MARK
 
@@ -139,7 +139,7 @@
       IF ( DATASET .EQ. ' ' ) THEN
          STATUS = MAG__LCERR
       END IF
-    
+
 *   If we have the device dataset
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL HDS_OPEN( DATASET, 'READ', TLOC, STATUS)
@@ -186,5 +186,5 @@
       END IF
 
       CALL ERR_RLSE
- 
+
       END

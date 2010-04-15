@@ -15,13 +15,13 @@ class Ccdtop {
 #  Description:
 #     This class provides a mega-widget to be used as a general-purpose
 #     toplevel.  It provides a control panel, a mechanism for displaying
-#     help text, a mechanism for watching its status, and a childsite 
+#     help text, a mechanism for watching its status, and a childsite
 #     into which client widget can put their own content.
 
 #  Public Methods:
 #     addcontrol widget grpname
 #        Adds a control widget to the control panel.  The widget
-#        argument should be the pathname of a widget which has 
+#        argument should be the pathname of a widget which has
 #        as an ancestor the path given by the 'panel' method of this
 #        class, and which has a '-state' configuration variable with
 #        valid 'normal' and 'disabled' values.  Such widgets should be
@@ -32,9 +32,9 @@ class Ccdtop {
 #     addgroup grpname heading
 #        Adds a grouping frame to the control panel.  This can be used
 #        for grouping controls; the grpname specified here, which should
-#        be unique, must be referred to when controls are added 
+#        be unique, must be referred to when controls are added
 #        with the addcontrol method.  The return value of this method
-#        is the name of the group widget, which may be used to 
+#        is the name of the group widget, which may be used to
 #        modify the packing.
 #           - grpname    -- Tag to identify the group
 #           - heading    -- Short text string to label the group
@@ -43,7 +43,7 @@ class Ccdtop {
 #        Returns the path of a frame into which windows can be placed.
 #
 #     container component parent ?install?
-#        This method creates a frame capable in terms of colormaps of 
+#        This method creates a frame capable in terms of colormaps of
 #        holding a GWM widget.
 #           - component  -- Itk component name of the container frame
 #           - parent     -- Pathname of the parent window
@@ -72,7 +72,7 @@ class Ccdtop {
 #     waitpush msg
 #        If the widget is not already in a "waiting" state, put it in
 #        such a state, and present the msg argument to the user by way
-#        of explanation.  If the widget is already in waiting state, 
+#        of explanation.  If the widget is already in waiting state,
 #        no action is taken.  A waitpush should be executed any time
 #        that the widget is likely to be unresponsive to user activity
 #        for a significant amount of time (especially if attempted user
@@ -85,7 +85,7 @@ class Ccdtop {
 #        state has finished, the winch method will be called if one
 #        has been ignored in the mean time.
 #
-#        A matching waitpop must be executed for every waitpush after 
+#        A matching waitpop must be executed for every waitpush after
 #        the action has completed.
 #
 #     Ccdtop also inherits all the public methods of itk::Toplevel.
@@ -98,25 +98,25 @@ class Ccdtop {
 #     status = string
 #        A value which gives the status of the object.  It may have the
 #        following values:
-#           inactive:  
-#              The viewer will not attempt to reflect changes in its 
+#           inactive:
+#              The viewer will not attempt to reflect changes in its
 #              configuration on the display.
 #           active:
-#              The viewer will attempt to reflect changes in its 
+#              The viewer will attempt to reflect changes in its
 #              configuration on the display.
 #           done:
-#              The viewer's work is done (e.g. the exit button has 
+#              The viewer's work is done (e.g. the exit button has
 #              been pressed).
 #
-#        Only the values 'active' and 'inactive' may be written into this 
-#        variable from outside.  This variable may be tracked from 
-#        outside the class (for instance if a trace is to be run on it) 
+#        Only the values 'active' and 'inactive' may be written into this
+#        variable from outside.  This variable may be tracked from
+#        outside the class (for instance if a trace is to be run on it)
 #        using the 'watchstatus' public variable.
 #
 #     watchstatus = string
-#        This gives a name of a variable in the caller's context which 
+#        This gives a name of a variable in the caller's context which
 #        will be kept up to date with the status of this object, i.e.
-#        it will have the same value as the object's $status public 
+#        it will have the same value as the object's $status public
 #        variable.  It is useful to configure this so that the variable
 #        can be traced to watch for changes in status.
 #
@@ -125,9 +125,9 @@ class Ccdtop {
 #  Public Procedures:
 #     bestvisual window visual ...
 #        Returns a visual (in the form {visualtype depth}) which represents
-#        the best choice among those indicated of the ones available in 
+#        the best choice among those indicated of the ones available in
 #        the window specified.  There may be any number of visual arguments,
-#        of the form {visualtype mindepth}; the first which can be 
+#        of the form {visualtype mindepth}; the first which can be
 #        satisfied is returned.
 #
 #     max num ...
@@ -453,7 +453,7 @@ class Ccdtop {
          set newgeo [winfo geometry $itk_interior]
          if { $itk_option(-geometry) != $newgeo } {
             configure -geometry $newgeo
-         } 
+         }
       }
 
 

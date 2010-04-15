@@ -20,9 +20,9 @@ F77_CHARACTER_ARG_TYPE *cnfCrefa( int length, int ndims, const int *dims )
 *  Description:
 *     Create a temporary Fortran CHARACTER arry and return a pointer to it.
 *     The space allocated is sufficient to contain an array with the given
-*     dimensions, of strings "length" characters long. The strings are not 
+*     dimensions, of strings "length" characters long. The strings are not
 *     initialised.
-*     
+*
 
 *  Arguments:
 *     int length (Given)
@@ -52,12 +52,12 @@ F77_CHARACTER_ARG_TYPE *cnfCrefa( int length, int ndims, const int *dims )
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,10 +84,10 @@ F77_CHARACTER_ARG_TYPE *cnfCrefa( int length, int ndims, const int *dims )
 {
 /* Local Variables:							    */
    int size;         /* Space required */
-   int i;            /* Loop counter */                         
+   int i;            /* Loop counter */
 
 /* Find the space required                                                  */
-   size = length; 
+   size = length;
    for ( i=0; i<ndims; i++ ) size *= *(dims+i);
 
 /* Allocate the space and return a pointer to it			    */

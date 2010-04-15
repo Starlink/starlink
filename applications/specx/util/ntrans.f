@@ -26,7 +26,7 @@ C  Take care of the case where one or both points are outside the plot
 C  limits (should NOT cause an error!)
 
 C     First case: first point outside plot limits -- must figure out
-C     whether to assume high or low limit from value of X. 
+C     whether to assume high or low limit from value of X.
       IF (NO_LOW) THEN
         IF (XFAC*(X1-XMIN).LT.0.0) THEN
           NLOW = 1
@@ -51,7 +51,7 @@ C  Test that we span at least one point
         RETURN
       END IF
 
-C  Assign result to NLOW and NHIGH in such a way that N1 is 
+C  Assign result to NLOW and NHIGH in such a way that N1 is
 C  always less than N2 (to facilitate direct use of routine with
 C  range selection for plotting etc).
 

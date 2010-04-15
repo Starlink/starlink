@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include "f77.h"
 
-extern F77_SUBROUTINE(shl_adam)( CHARACTER(libnam), LOGICAL(isenv), 
+extern F77_SUBROUTINE(shl_adam)( CHARACTER(libnam), LOGICAL(isenv),
                                  INTEGER(status) TRAIL(libnam) );
 
 void cupidhelp( int *status ){
@@ -42,17 +42,17 @@ void cupidhelp( int *status ){
 *        Subsubsubtopic for which help is to be given. [" "]
 
 *  Navigating The Help Tree:
-*     The text for each topic is displayed in screen-fulls. A prompt is issued 
+*     The text for each topic is displayed in screen-fulls. A prompt is issued
 *     at the end of each topic at which you may:
 *
-*        -  enter a topic and/or subtopic name(s) to display the help for 
+*        -  enter a topic and/or subtopic name(s) to display the help for
 *           that topic or subtopic, so for example, "polka parameters dpi"
 *           gives help on DPI, which is a subtopic of Parameters, which
 *           in turn is a subtopic of FINDCLUMPS;
-*        -  press the RETURN key to see more text at a "Press RETURN to 
+*        -  press the RETURN key to see more text at a "Press RETURN to
 *           continue ..." request;
-*        -  press the RETURN key at topic and subtopic prompts to move up 
-*           one level in the hierarchy, and if you are at the top level it 
+*        -  press the RETURN key at topic and subtopic prompts to move up
+*           one level in the hierarchy, and if you are at the top level it
 *           will terminate the help session;
 *        -  enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
 *           response to any prompt will terminate the help session;
@@ -133,7 +133,7 @@ void cupidhelp( int *status ){
    cnfExprt( "CUPID_HELP", LIBNAM, LIBNAM_length );
    STATUS = SAI__OK;
    ISENV = F77_TRUE;
-   F77_CALL(shl_adam)( CHARACTER_ARG(LIBNAM), LOGICAL_ARG(&ISENV), 
+   F77_CALL(shl_adam)( CHARACTER_ARG(LIBNAM), LOGICAL_ARG(&ISENV),
                        INTEGER_ARG(&STATUS) TRAIL_ARG(LIBNAM) );
    *status = STATUS;
 

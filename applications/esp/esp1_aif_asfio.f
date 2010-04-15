@@ -17,7 +17,7 @@
 *
 *    Invocation :
 *
-*      CALL ESP1_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN, 
+*      CALL ESP1_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
 *                      EXCLAIM,STATUS)
 
 *

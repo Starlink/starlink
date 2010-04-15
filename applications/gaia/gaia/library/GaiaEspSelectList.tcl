@@ -83,7 +83,7 @@ itcl::class gaia::GaiaEspSelectList {
 
 	default_config
     }
-    
+
     # --- Destructor
     destructor {
 	# Nothing

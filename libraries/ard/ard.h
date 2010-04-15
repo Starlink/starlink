@@ -10,7 +10,7 @@
 
 *  Description:
 *     This module defines the C interface to the functions of the ARD
-*     library. The file ard.c contains C wrappers for the Fortran 
+*     library. The file ard.c contains C wrappers for the Fortran
 *     ARD routines.
 
 *  Authors:

@@ -83,7 +83,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,7 +145,7 @@
       K( 3 ) = MAJOR * SIN( THETA )
       K( 2 ) = MINOR * SIN( THETA )
       K( 4 ) = MINOR * COS( THETA )
-      
+
 *  Find the orientation in polar co-ordinates of the points in the
 *  locus that correspond to the maximum x and y co-ordinates.  This is
 *  done by differentiating the x-y co-ordinates with respect to the

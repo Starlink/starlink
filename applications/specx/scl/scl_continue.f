@@ -32,7 +32,7 @@
 
         IF (SEVERITY.GT.MAX_OK_ERROR) THEN
           SCL_CONTINUE = .FALSE.
-        ELSE 
+        ELSE
           IF (SEVERITY.NE.1) CALL CLI_EMPTY
           ERROR = 0
         END IF
@@ -48,8 +48,8 @@
       SUBROUTINE ERRMESS (IERR,ISEV)
 
 C  Routine to print out SPECX error messages and return severity.
-  
-C  The error messages are held in the file SPXDEF.UNF which is 
+
+C  The error messages are held in the file SPXDEF.UNF which is
 C  produced by running the program Error_compile with the text file
 C  SPXDEF.DAT as input. The messages can be changed at any time
 C  by amending the text file and rerunning Error_compile, then rename
@@ -73,7 +73,7 @@ C  the result fine SPXDEF.UNF into SYS_SPECX:
 
 CD    PRINT *, '--- errmess ---'
 CD    PRINT *, '    error # = ', IERR
-       
+
       IF ( IERR .EQ.  1 ) THEN
          ISEV = 3
          MESS = 'No file opened with required access'

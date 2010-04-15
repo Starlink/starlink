@@ -1,7 +1,7 @@
 
 * See gau2_pro for discussion
-      
-      subroutine gau2_calc (which, n, p, l, x, nf, xv, yv, 
+
+      subroutine gau2_calc (which, n, p, l, x, nf, xv, yv,
      :     gau2par, a, da)
 
 *+
@@ -50,30 +50,30 @@
 *     The code in here is derived from the following Maple program:
 *
 *        # read into maple with   > read `gaussian.ms`:
-*        
+*
 *        gi:=amp*exp(-(aparam^2/sa^2+bparam^2/sb^2)/2):
 *        aparam:=cos(theta)*(xc-x0)+sin(theta)*(yc-y0):
 *        bparam:=-sin(theta)*(xc-x0)+cos(theta)*(yc-y0):
-*        
+*
 *        xa := array(1..5):
 *        ca := array(1..1):
-*        
+*
 *        x0 := xa[1]:
 *        y0 := xa[2]:
 *        sa := xa[3]:
 *        sb := xa[4]:
 *        theta := xa[5]:
 *        amp := ca[1]:
-*        
+*
 *        # aadf are the variables we'll differentiate with respect to
 *        aadf:=[x0,y0,sa,sb,theta]:
 *        # array of differentials.
 *        dyda:=array(1..6):
 *        for i to 5 do
-*        	dyda[i]:=diff(gi,aadf[i]) 
+*        	dyda[i]:=diff(gi,aadf[i])
 *        od:
 *        dyda[6] := gi:
-*        
+*
 *        fortran (dyda, filename=`gaussianab.f`, optimized);
 *
 *     This calculates the five partial differentials of the gaussian `gi'
@@ -90,10 +90,10 @@
       doubleprecision x(p), a(n,l+1), da(n,p)
       integer xv(n), yv(n)
 
-*   local variables      
+*   local variables
 *   pixi is index 1..n
       integer pixi
-*   Renamed parameters: ngaussians is the number of gaussians.  
+*   Renamed parameters: ngaussians is the number of gaussians.
       integer ngaussians
 *   fitbkgd is true if we're fitting the background
       logical fitbkgd
@@ -104,7 +104,7 @@
      :     t16,t17,t21,t23,t26
 
       fitbkgd = (gau2par(gau2bg) .ne. 0)
-   
+
       if (gau2par(gau2debug) .gt. 0)
      :     write (*, '("calcada: nf=",i2,"   which=",sp,i2)') nf, which
 
@@ -113,18 +113,18 @@
       else
          ngaussians = l
       endif
-      
+
 *   loop over gaussians
       do 20, gn=1,ngaussians
          ofs = (gn-1)*5
 
 *      loop over pixel numbers, increasing y fastest
          do 10, pixi=1,n
-*         Parameters in x are x(ofs+1)=x0, x(ofs+2)=y0, 
+*         Parameters in x are x(ofs+1)=x0, x(ofs+2)=y0,
 *         x(ofs+3)=sa, x(ofs+4)=sb, x(ofs+5)=theta
 *         partial derivatives in da are da(pixi,ofs+1)=dA(pixi)/dx0, etc
 *         This is all made a bit simpler by each of the terms A_ij
-*         depending on a separate set of parameters 
+*         depending on a separate set of parameters
 *         x_{5(i-1)+1} to x_{5(i-1)+5}.
 
             t1 = cos(x(ofs+5))

@@ -13,7 +13,7 @@
 *     Method'.
 *
 *        The routine does this by calling the routine SCULIB_FIT_DXISQ_DAJ
-*     for each element required. The routine will only execute if entered 
+*     for each element required. The routine will only execute if entered
 *     with good status.
 
 *  Invocation:

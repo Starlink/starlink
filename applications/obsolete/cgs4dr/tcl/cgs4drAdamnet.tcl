@@ -14,7 +14,7 @@ proc cgs4drAdamnet {cmd} {
       }
       set ADAMnet "???"
 
-# Start the adamnet process 
+# Start the adamnet process
     } elseif {[string trim [string tolower $cmd]] == "start"} {
       set ADAMnet [exec /ukirt_sw/sun4_Solaris/bin/adamnet/adamnet &]
     }

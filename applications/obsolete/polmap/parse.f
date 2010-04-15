@@ -1,27 +1,27 @@
       SUBROUTINE PARSE (INP,CMD,PARAMS,NPARAMS,CPARAM,FSTR,OK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   P A R S E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C INP (<), CMD (>), PARAMS (>), NPARAMS (>), CPARAM (>),
 C FSTR (>), OK (>), OUT_LU (>)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C This subroutine hacks up an input string into the command verb
-C followed by several numerical parameters. The cparam is the stuff 
+C followed by several numerical parameters. The cparam is the stuff
 C following the command or the stuff enclosed in quotes.
 C
 C
@@ -75,7 +75,7 @@ C
 C Now check whether there are quotes. In this case it is ASSUMED that
 C the string is like 'command "char string"'.
 C
-      I  =  INDEX(INP,'"') 
+      I  =  INDEX(INP,'"')
       IF (I .NE. 0) THEN
        J  =  INDEX(INP,' ')
        IF (J .NE. 0) THEN
@@ -103,7 +103,7 @@ C
        ENDIF
       ENDIF
 C
-C Set the input string to lower case. Unless any character string 
+C Set the input string to lower case. Unless any character string
 C parameters have been enclosed in quotes these too will be recased.
 C
       IF (.NOT.GOTCMD) THEN
@@ -154,7 +154,7 @@ C
         I = INDEX(INP,' ')
         INP = INP((I+1):)
         CALL SSTRIP(INP)
-        IF (INP.EQ.' ') THEN 
+        IF (INP.EQ.' ') THEN
           MORE_PARAMS = .FALSE.
           IF (T_PARAMS(T_NPARAMS).EQ.-1.30) THEN
            CALL WR_ERROR('No upper range limit',OUT_LU)

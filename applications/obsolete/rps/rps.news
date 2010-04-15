@@ -1,7 +1,7 @@
 1 RPS - ROSAT Proposal Submission software - update
                                                         Expires: 98.**.**
 
- The RPS software has been updated to provide proposal submission for 
+ The RPS software has been updated to provide proposal submission for
  the ROSAT AO-9 round.  RPS may be run as follows:
 
 	% rps

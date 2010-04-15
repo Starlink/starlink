@@ -41,11 +41,11 @@
 *     the terms of the GNU General Public License as published by the Free Software
 *     Foundation; either version 2 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,but WITHOUT ANY
 *     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 *     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License along with
 *     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 *     Place,Suite 330, Boston, MA  02111-1307, USA
@@ -161,7 +161,7 @@
          SCB_LC( LAST ) = SCB_LC( LAST ) - 1
       ENDIF
       CALL SST_PUT( 0, '<H3>Purpose</H3>', STATUS )
-      IF ( PREFOR ) THEN 
+      IF ( PREFOR ) THEN
          CALL SST_PUT( 3, '<PRE>', STATUS )
          CALL SST_PUTP( 3, FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '</PRE>', STATUS )
@@ -342,7 +342,7 @@
 *  body of the section in paragraph mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
          CALL SST_PUT( 0, '<H3>Notes</H3>', STATUS )
-         IF ( PREFOR ) THEN 
+         IF ( PREFOR ) THEN
             CALL SST_PUT( 3, '<PRE>', STATUS )
             CALL SST_PUTP( 3, FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '</PRE>', STATUS )
@@ -398,7 +398,7 @@
 *  Output the heading, followed by the body of the section in paragraph
 *  mode.
          CALL SST_PUT( 0, BUF( : NC ), STATUS )
-         IF ( PREFOR ) THEN 
+         IF ( PREFOR ) THEN
             CALL SST_PUT( 3, '<PRE>', STATUS )
             CALL SST_PUTP( 3, FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '</PRE>', STATUS )
@@ -442,7 +442,7 @@
 *  section body in paragraph mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
          CALL SST_PUT( 0, '<H3>Bugs</H3>', STATUS )
-         IF ( PREFOR ) THEN 
+         IF ( PREFOR ) THEN
             CALL SST_PUT( 3, '<PRE>', STATUS )
             CALL SST_PUTP( 3, FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '</PRE>', STATUS )

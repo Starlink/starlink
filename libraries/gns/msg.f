@@ -59,7 +59,7 @@
       IMPLICIT NONE
       INTEGER STATUS, LEN
       CHARACTER*(*) MSG
-      
+
       INCLUDE 'GNS_ERR'
 
       IF (STATUS.EQ.GNS__INWKID) THEN
@@ -118,4 +118,4 @@
          LEN = 0
       END IF
       END
-       
+

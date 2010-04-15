@@ -1,9 +1,9 @@
-      SUBROUTINE SCULIB_SKYDIP_TEMPERATURES (T_COLD, T_HOT, N_SUB, 
+      SUBROUTINE SCULIB_SKYDIP_TEMPERATURES (T_COLD, T_HOT, N_SUB,
      :  SUB_INSTRUMENT, WAVELENGTH, NUM_CHAN, NUM_ADC, BOL_TYPE,
-     :  N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES_IN, RAW_DATA, 
-     :  N_SAMPLES_OUT, J_SKY, J_SKY_VARIANCE, J_SKY_QUALITY, J_SKY_AV, 
+     :  N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES_IN, RAW_DATA,
+     :  N_SAMPLES_OUT, J_SKY, J_SKY_VARIANCE, J_SKY_QUALITY, J_SKY_AV,
      :  J_SKY_AV_VARIANCE, J_SKY_AV_QUALITY, STATUS)
-*+  
+*+
 *  Name:
 *     SCULIB_SKYDIP_TEMPERATURES
 
@@ -22,13 +22,13 @@
 *        In addition, mean values of the sky temperature for each bolometer
 *     are derived from the samples taken. If more than one sample contributes
 *     to the mean then the variance is calculated from the spread of samples
-*     about the mean. 
+*     about the mean.
 
 *  Invocation:
-*     CALL SCULIB_SKYDIP_TEMPERATURES (T_COLD, T_HOT, N_SUB, 
+*     CALL SCULIB_SKYDIP_TEMPERATURES (T_COLD, T_HOT, N_SUB,
 *    :  SUB_INSTRUMENT, WAVELENGTH, NUM_CHAN, NUM_ADC, BOL_TYPE,
-*    :  N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES_IN, RAW_DATA, 
-*    :  N_SAMPLES_OUT, J_SKY, J_SKY_VARIANCE, J_SKY_QUALITY, J_SKY_AV, 
+*    :  N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES_IN, RAW_DATA,
+*    :  N_SAMPLES_OUT, J_SKY, J_SKY_VARIANCE, J_SKY_QUALITY, J_SKY_AV,
 *    :  J_SKY_AV_VARIANCE, J_SKY_AV_QUALITY, STATUS)
 
 *  Arguments:
@@ -64,7 +64,7 @@
 *             -  RAW_DATA (3,i,j) = cold load signal
 *     N_SAMPLES_OUT              = INTEGER (Given)
 *           the number of samples requested for each bolometer
-*     J_SKY (N_BOLS, N_SAMPLES_OUT) = REAL (Returned) 
+*     J_SKY (N_BOLS, N_SAMPLES_OUT) = REAL (Returned)
 *           the brightness temperature of the sky
 *     J_SKY_VARIANCE (N_BOLS, N_SAMPLES_OUT) = REAL (Returned)
 *           the variance on J_SKY
@@ -256,9 +256,9 @@
 
                      IF ( ABS(RAW_DATA(1,BOL,I)-RAW_DATA(3,BOL,I))
      :                    .GT.0.00001) THEN
-                        
-                        J_SKY (BOL,I) = J_COLD + 
-     :                       (J_HOT - J_COLD) * 
+
+                        J_SKY (BOL,I) = J_COLD +
+     :                       (J_HOT - J_COLD) *
      :                       (RAW_DATA(2,BOL,I) - RAW_DATA(3,BOL,I)) /
      :                       (RAW_DATA(1,BOL,I) - RAW_DATA(3,BOL,I))
                         J_SKY_VARIANCE (BOL,I) = 0.0
@@ -268,7 +268,7 @@
 
                         J_SKY_AV_QUALITY (BOL) = J_SKY_AV_QUALITY (BOL)
      :                       + 1
-                        J_SKY_AV_VARIANCE (BOL) = J_SKY_AV_VARIANCE(BOL) 
+                        J_SKY_AV_VARIANCE (BOL) = J_SKY_AV_VARIANCE(BOL)
      :                       + J_SKY (BOL,I) **2
                         J_SKY_AV (BOL) = J_SKY_AV (BOL) + J_SKY (BOL,I)
 
@@ -288,12 +288,12 @@
                      J_SKY_AV_VARIANCE (BOL) = 0.0
                      J_SKY_AV_QUALITY (BOL) = 0
                   ELSE
-                     J_SKY_AV (BOL) = J_SKY_AV (BOL) / 
+                     J_SKY_AV (BOL) = J_SKY_AV (BOL) /
      :                    REAL (J_SKY_AV_QUALITY(BOL))
                      J_SKY_AV_VARIANCE (BOL) = (J_SKY_AV_VARIANCE(BOL) -
-     :                    REAL (J_SKY_AV_QUALITY(BOL)) 
+     :                    REAL (J_SKY_AV_QUALITY(BOL))
      :                          * J_SKY_AV(BOL) **2)
-     :                    / REAL (J_SKY_AV_QUALITY(BOL) * 
+     :                    / REAL (J_SKY_AV_QUALITY(BOL) *
      :                    (J_SKY_AV_QUALITY(BOL) - 1))
                      J_SKY_AV_QUALITY (BOL) = 0
                   END IF
@@ -309,7 +309,7 @@
      :     status)
          call msg_setc ('bol',bolname)
          call msg_setr ('wave', wave)
-         call msg_setr ('j_cold', j_cold)      
+         call msg_setr ('j_cold', j_cold)
          call msg_setr ('j_hot', j_hot)
          call msg_setr ('j_sky', j_sky_av(bol))
          call msg_out (' ', 'bol=^bol wave=^wave j_cold=^j_cold '//

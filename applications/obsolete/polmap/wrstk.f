@@ -3,26 +3,26 @@
      &                STK_STOKES_UV,STK_LAMBDA,STK_TITLE,TOP_STK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    W R S T K
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), STK_NPTS (<), STK_STOKES_I (<), STK_STOKES_Q (<),
 C STK_STOKES_QV (<), STK_STOKES_U (<),
 C STK_STOKES_UV (<), STK_LAMBDA (<), STK_TITLE (<), TOP_STK (<),
 C OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This routine writes out a polarization spectrum into a TSP format file
@@ -66,7 +66,7 @@ C
       INTEGER NELM,IPTR
 C
 C
-      CHARACTER*(DAT__SZLOC) PLOC,LOC      
+      CHARACTER*(DAT__SZLOC) PLOC,LOC
       INTEGER STATUS
 C
       STATUS = SAI__OK
@@ -106,7 +106,7 @@ C
       CALL NDF_PLACE(PLOC,'LAMBDA',PLACE,STATUS)
       CALL NDF_NEW('_REAL',2,LBND,UBND,PLACE,NDFA,STATUS)
       CALL CMP_MOD(PLOC,'TITLES','_CHAR*80',1,TOP_STK,STATUS)
-       
+
       CALL NDF_MAP(NDFO,'DATA','_REAL','WRITE',IPTR,NELM,STATUS)
       CALL NDF_MAP(NDFQ,'DATA','_REAL','WRITE',QPTR,NELM,STATUS)
       CALL NDF_MAP(NDFU,'DATA','_REAL','WRITE',UPTR,NELM,STATUS)

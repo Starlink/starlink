@@ -149,7 +149,7 @@
          YMDHM[ 2 ] = (F77_INTEGER_TYPE) ( local->tm_mday );
 	 YMDHM[ 3 ] = (F77_INTEGER_TYPE) ( local->tm_hour );
 	 YMDHM[ 4 ] = (F77_INTEGER_TYPE) ( local->tm_min );
-	 
+
 /* Return the seconds value.						    */
          *SEC = (F77_REAL_TYPE) ((float)local->tm_sec + ((float)usec/1.0E6));
       }

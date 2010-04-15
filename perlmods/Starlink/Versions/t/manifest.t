@@ -18,9 +18,9 @@ BEGIN {
 
 my $root = File::Spec->catdir(File::Spec->curdir, 'star');
 
-$ENV{THIS_PROG_DIR} = File::Spec->catdir( 
+$ENV{THIS_PROG_DIR} = File::Spec->catdir(
 					 $root,
-					 'bin', 
+					 'bin',
 					 'this_prog'
 					);
 
@@ -29,7 +29,7 @@ my $datedir = File::Spec->catdir(
 				 'manifests',
 				);
 
-mkpath( [$ENV{THIS_PROG_DIR}, $datedir]) 
+mkpath( [$ENV{THIS_PROG_DIR}, $datedir])
   or die "Could not create skeleton Starlink tree";
 
 
@@ -41,7 +41,7 @@ END {
 # Now create a datestamp file
 my $outfile = File::Spec->catfile($datedir,"this_prog");
 # Use global filehandles for backwards compatibility with perl5.005
-open MANIFEST, "> $outfile" or 
+open MANIFEST, "> $outfile" or
   die "Could not create test file: $!\n";
 
 print MANIFEST "<?xml version='1.0'?>\n";

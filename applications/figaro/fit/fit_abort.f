@@ -6,10 +6,10 @@ C
 C     Aborts the writing of a FITS image, backspacing the tape to
 C     the start of the image and writing an end of tape mark.  This
 C     can be used, for example, if the end of tape is reached during
-C     the writing of the image and the calling program wishes to 
-C     abort the output and leave itself with a properly terminated 
+C     the writing of the image and the calling program wishes to
+C     abort the output and leave itself with a properly terminated
 C     tape.  The tape is left positioned between the two file marks
-C     that constitute the end of tape.  If output is to disk, this 
+C     that constitute the end of tape.  If output is to disk, this
 C     routine does nothing.  This routine closes down the FIT_
 C     package for the current image in the same way as does FIT_CLOSE.
 C     FIT_END still needs to be called to close down the whole system.
@@ -28,7 +28,7 @@ C     (<) FPTR       (Integer) Pointer to next free byte in FBUFF.
 C     (<) MTSTAT     (Integer) Last TIO_ error code
 C     (>) DEVICE     (Character) The device name for the tape drive.
 C     (>) LUFILE     (Integer) Logical unit number for disk file, if used.
-C     (<) BCOUNT     (Integer) Is the number of logical records already held 
+C     (<) BCOUNT     (Integer) Is the number of logical records already held
 C                    in TBUFF.
 C
 C     MTERR, DEVICE defined in COMB.INC, the others in COMF.INC
@@ -54,7 +54,7 @@ C     seems particularly VAX-specific, some tape operations that work on
 C     VAXES may not work on other machines: some systems may not let you
 C     do anything with a tape that has hit the end of tape marker.  Even
 C     on VMS some things changed with version 5, which got stricter about
-C     dismounting tapes, although that isn't strictly relevant to this 
+C     dismounting tapes, although that isn't strictly relevant to this
 C     routine.
 C+
       IMPLICIT NONE

@@ -28,7 +28,7 @@
 *        The index of the spectral axis within the CmpFrame. Returned
 *        equal to zero if no spectral axis is found.
 *     SPFRM = INTEGER (Returned)
-*        A pointer to the SpecFrame. Returned equal to AST__NULL if no 
+*        A pointer to the SpecFrame. Returned equal to AST__NULL if no
 *        spectral axis is found.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,12 +102,12 @@
       DO I = 1, NAX
 
 *  Skip if we have already found a SpecFrame.
-         IF( SPAX .EQ. 0 ) THEN   
+         IF( SPAX .EQ. 0 ) THEN
 
 *  Get a Frame containing just this one axis.
             SPFRM = AST_PICKAXES( FRM, 1, I, MAP, STATUS )
 
-*  If it is SpecFrame, note its index. Otherwise, annnul the Frame 
+*  If it is SpecFrame, note its index. Otherwise, annnul the Frame
 *  pointer.
             IF( AST_ISASPECFRAME( SPFRM, STATUS ) ) THEN
                SPAX = I

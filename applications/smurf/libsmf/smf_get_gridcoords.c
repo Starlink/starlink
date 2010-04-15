@@ -24,7 +24,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate the native GRID coordinates of each bolometer in the 
+*     Calculate the native GRID coordinates of each bolometer in the
 *     subarray, in the same order they are stored in memory / identified
 *     in framesets created by sc2ast_createwcs
 
@@ -54,7 +54,7 @@
 
 #define FUNC_NAME "smf_get_gridcoords"
 
-void smf_get_gridcoords( double *row, double *col, int nrow, int ncol, 
+void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
 			 int *status ) {
   /* Local variables */
   int i;           /* row counter */
@@ -63,7 +63,7 @@ void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
 
   /* Check status */
   if ( *status != SAI__OK ) return;
-  
+
   /* Get the grid coordinates */
   bol = 0;
   for( j=1; j<=nrow; j++ ) {

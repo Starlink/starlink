@@ -41,10 +41,10 @@
 *  GREY              - Grey value (0.0 to 1.0)
 *  RED, GREEN, BLUE  - RGB values (0.0 to 1.0)
 *
- 
+
       INTEGER MINDEX
       REAL GREY, RED, GREEN, BLUE
- 
+
 *
 *  ALGORITHM
 *  ---------
@@ -80,15 +80,15 @@
 *
 *--------------------------------------------------------------------------
 *
- 
+
 *     Ensure that the colour index is inside the workstation colour table
       MINDEX = MOD(MOD(INDEX, KPCI(KWKIX))+KPCI(KWKIX),KPCI(KWKIX))
- 
+
 *     Get the RGB components of colour with colour index MINDEX.
       RED    = QHP(KHPXR(KCTBPT(1,KWKIX))+MINDEX)
       GREEN  = QHP(KHPXR(KCTBPT(2,KWKIX))+MINDEX)
       BLUE   = QHP(KHPXR(KCTBPT(3,KWKIX))+MINDEX)
- 
+
       IF(NBC .EQ. 1)THEN
 *     Monochrome Workstation
 *

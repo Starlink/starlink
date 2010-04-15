@@ -17,29 +17,29 @@ is, what it can do, and where to find more information.
 It is only for people doing data analysis.
 Features of ADAM which are particularly relevant to data acquisition are not
 covered.
-  
+
 \section{What is ADAM?}
 \label{S_what}
 \markboth{Introduction}{\stardocname}
 
-This question is often asked, and various equally valid answers are possible. 
+This question is often asked, and various equally valid answers are possible.
 This Guide is based on the view that ADAM is about {\em astronomical
 applications software} written in a particular way.
-Specifically, it is about applications written using the {\em ADAM subroutine 
+Specifically, it is about applications written using the {\em ADAM subroutine
 libraries}.
 It has usually been found that when a collection of application programs has
 been developed, the need is perceived for a {\em command language} to invoke
 them and to offer useful features over and above those provided by the
-operating system command language.  
+operating system command language.
 These, then, are the three major components of ADAM: {\bf Applications,
 Subroutine libraries, Command language(s)}\@.
-However, there are other aspects to ADAM. 
+However, there are other aspects to ADAM.
 
 Firstly, it is about a certain style in constructing applications, sometimes
 called a software {\em architecture}, and about coding {\em standards}.
 ADAM also stands for {\em professional} software of high quality.
 It means that attention is given to {\em supportability}, {\em
-portability}, and {\em performance}. 
+portability}, and {\em performance}.
 
 Secondly, it is concerned with a consistent way of handling the storage of
 large quantities of {\em astronomical data} from all possible sources.
@@ -51,7 +51,7 @@ will fit in better with existing ADAM applications.
 It must be emphasized that this document refers to the VMS version of the
 software being discussed.
 There will be minor differences when ADAM is ported to other systems.
-Subsequent versions of this document will specify those differences. 
+Subsequent versions of this document will specify those differences.
 
 \section{The structure of this document}
 \label{S_strucdoc}
@@ -282,11 +282,11 @@ programs:
 \item from ICL (the `ADAM' command language)
 \item from SMS.
 \end{itemize}
-ICL is recommended for most purposes because it gives flexibility and good 
+ICL is recommended for most purposes because it gives flexibility and good
 performance when you are using many commands.
 It also offers you an easy, yet efficient, way of writing simple procedures,
 and a comprehensive scientific calculator (with the ability to feed the results
-directly into programs). 
+directly into programs).
 It also allows you to run multiple applications at the same time.
 Most of this Guide will assume that ICL is being used.
 
@@ -300,8 +300,8 @@ DCL commands from ICL.
 
 SMS (`Simple Menu System') is primarily used for data-acquisition, though
 there is no reason why it should not be used for data-analysis.
-Its main advantage is that it requires little typing, and gives maximum 
-efficiency when a few programs are being run which have lots of 
+Its main advantage is that it requires little typing, and gives maximum
+efficiency when a few programs are being run which have lots of
 parameters but only a few change for each run.
 Its main drawbacks are that it is quite difficult to set up the description of
 what is to appear in the various menus and how they are to look, and that this
@@ -504,7 +504,7 @@ the ICL command language.
 
 One of the best ways of learning how to use ADAM is to play with one of the
 applications packages.
-There are many of these and they are described in Chapter \ref{C_applic}. 
+There are many of these and they are described in Chapter \ref{C_applic}.
 The KAPPA package is used below because it conforms to ADAM conventions and
 has a lot of useful commands for processing data.
 
@@ -594,7 +594,7 @@ You may find the following topics particularly useful :
 \item [Classified\_commands] --- displays a list of subject areas as subtopics.
 Each subtopic lists all KAPPA applications in that classification, and gives
 their functions.
-\item [Summary] --- gives a brief description of the function of each 
+\item [Summary] --- gives a brief description of the function of each
 application within KAPPA.
 \item [Using\_Help] --- tells you how to use this particular Help system.
 \item [$<$command$>$ param] --- describes all the parameters of the particular
@@ -619,7 +619,7 @@ Now have a look in your ADAM\_USER directory:
 \end{verbatim}
 \end{small}
 
-The attempt to use the DIR command fails\footnote{It is intended to change 
+The attempt to use the DIR command fails\footnote{It is intended to change
 this soon.} because it is only recognized by the DCL command interpreter, and
 you are talking to the ICL command interpreter.
 What you need to do is to tell ICL that this is a DCL command.
@@ -662,11 +662,11 @@ to specify a value for one of the program parameters:
 
 \begin{small}
 \begin{verbatim}
-    XDIM - x dimension of output array /64/ > 
+    XDIM - x dimension of output array /64/ >
 \end{verbatim}
 \end{small}
 
-(If you have used CREFRAME before, you might find the `\verb+/64/+' in the 
+(If you have used CREFRAME before, you might find the `\verb+/64/+' in the
 above
 line comes out as something else.)
 This line is typical of the way in which ADAM asks for {\em parameter values.}
@@ -699,7 +699,7 @@ parameter value:
 
 \begin{small}
 \begin{verbatim}
-    YDIM - y dimension of output array /64/ > 
+    YDIM - y dimension of output array /64/ >
 \end{verbatim}
 \end{small}
 
@@ -719,9 +719,9 @@ The system now presents you with the following lines:
 \begin{verbatim}
     GS = Gaussians, RR = Random 0 to 1, RL = Random from Min to Max,
     RA = Ramp across image, FL = Flat, BL = Blank,
-    GN = Gaussian noise with standard deviation about the mean, 
+    GN = Gaussian noise with standard deviation about the mean,
     RP = Poissonian noise about mean.
-    TYPED - Type of data to be generated /'GS'/ > 
+    TYPED - Type of data to be generated /'GS'/ >
 \end{verbatim}
 \end{small}
 
@@ -748,7 +748,7 @@ You may wonder why the suggested value is surrounded by quotes but the supplied
 value is not.
 In fact, the supplied value should strictly be \verb+'RA'+, but it is
 permissible to omit the quote characters as long as there is no ambiguity in
-doing so\footnote{This is not the right place to become embroiled in a 
+doing so\footnote{This is not the right place to become embroiled in a
 discussion of what is a quite complicated subject --- see
 Chapter~\ref{C_prompts}.}.
 
@@ -851,12 +851,12 @@ Generating the next image is going to be easy, isn't it?
 
 \begin{small}
 \begin{verbatim}
-    YDIM - y dimension of output array /10/ > 
+    YDIM - y dimension of output array /10/ >
     GS = Gaussians, RR = Random 0 to 1, RL = Random from Min to Max,
     RA = Ramp across image, FL = Flat, BL = Blank,
-    GN = Gaussian noise with standard deviation about mean, 
+    GN = Gaussian noise with standard deviation about mean,
     RP = Poissonian noise about mean.
-    TYPED - Type of data to be generated /'GS'/ > 
+    TYPED - Type of data to be generated /'GS'/ >
 \end{verbatim}
 \end{small}
 
@@ -1063,7 +1063,7 @@ sequential names:
 \end{verbatim}
 \end{small}
 
-produces a name which is the concatenation of the `string' with the 
+produces a name which is the concatenation of the `string' with the
 integer $n$.
 A third parameter $m$ specifies a minimum number of digits for the
 numeric part of the name. Leading zeros are inserted if necessary to produce at
@@ -1094,8 +1094,8 @@ together:
 \end{small}
 
 The line starting \verb+PROC+ tells ICL you wish to write a procedure called
-\verb+RAMPADD+ which is to have one parameter called \verb+N+. 
-This will use the KAPPA application \verb+ADD+ to 
+\verb+RAMPADD+ which is to have one parameter called \verb+N+.
+This will use the KAPPA application \verb+ADD+ to
 add successive
 images together in the new image \verb+SUM+.
 
@@ -1121,7 +1121,7 @@ Thus, to add together the images RAMP1, RAMP2, RAMP3, and RAMP4 enter:
 An ADD statement is executed three times within the procedure, and a suitable
 title is generated for each image which is created.
 If you use LOOK to `Peep' at the new image called `SUM', you will see that
-every pixel has the value `22' as you would expect. 
+every pixel has the value `22' as you would expect.
 Note that four SUM.SDF files have been created.
 You should PURGE or DELETE them.
 

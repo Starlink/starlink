@@ -12,7 +12,7 @@
  *     Global constants header file.
 
  *  Description:
- *     This file contains the definitions of the public global constants 
+ *     This file contains the definitions of the public global constants
  *     used by the EMS_ system.
 
  *  Authors:

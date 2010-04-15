@@ -79,7 +79,7 @@
       END IF
 
 *     Work out TOTAL radial velocity used when the data were taken.
-*     Assume that as with JCMT the LSR correction is applied to bring 
+*     Assume that as with JCMT the LSR correction is applied to bring
 *     the spectrum centre to the chosen frequency in the source frame.
 
       CALL SETXASTRO   (ITIME, IDATE, ALAT,  ALONG,  TIMCOR, IUTFLG,
@@ -124,7 +124,7 @@ CD        PRINT *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
           DF = - 2.D3 * DFLOAT(ISB) * FIRST_IF
         END IF
 
-*       Correct back to offset frequency in *source* frame using appropriate 
+*       Correct back to offset frequency in *source* frame using appropriate
 *       velocity scaling law (RADIO, OPTICAL or RELATIVISTIC).
 
         CALL SETXDOPP   (DF, 1, VFRAME, VDEF,

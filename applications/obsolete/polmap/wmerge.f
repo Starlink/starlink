@@ -5,28 +5,28 @@
      &             STOKES_QV,STOKES_U,STOKES_UV,TITLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
-C    W M E R G E 
+C    W M E R G E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<),
 C STK_TITLE (<), STK_LAMBDA (<), STK_STOKES_I (<), STK_STOKES_Q (<),
 C STK_STOKES_QV (<), STK_STOKES_U (<), STK_STOKES_UV (<),
-C STK_NPTS (<), TOP_STK (<), NPTS (><), LAMBDA (><), STOKES_I (><), 
+C STK_NPTS (<), TOP_STK (<), NPTS (><), LAMBDA (><), STOKES_I (><),
 C STOKES_Q (><), STOKES_QV (><), STOKES_U (><), STOKES_UV (><),
 C TITLE (>), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Weighted merge of two polarization spectra
 C
@@ -84,7 +84,7 @@ C
        NPARAMS = 4
       ENDIF
 C
-      IF (NPARAMS.GT.4) THEN 
+      IF (NPARAMS.GT.4) THEN
        CALL WR_ERROR('Additional parameters ignored',OUT_LU)
       ENDIF
 C

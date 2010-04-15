@@ -64,7 +64,7 @@ main ( void ) {
   int exstat = EXIT_SUCCESS;
 
   dest1[0] = '\0';
-  
+
   /* Test strlcpy */
 
   len = one_strlcpy( dest1, src1, ONEBUFSIZ, &status );

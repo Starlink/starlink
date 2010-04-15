@@ -11,9 +11,9 @@
 #include "gwm_err.h"
 #include "gwm.h"
 
-int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name, 
-			 unsigned int width, unsigned int height, int ncols, 
-			 int mincols, int fg, int bg, Boolean ovl, int ovcol) 
+int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
+			 unsigned int width, unsigned int height, int ncols,
+			 int mincols, int fg, int bg, Boolean ovl, int ovcol)
 /*
 *+
 *  Name:
@@ -36,7 +36,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 *         Pixmap created.
 *         GWM properties set on the window
 *     If any part of the operation fails, all resources allocated are released.
-*     
+*
 *
 *  Function return value:
 *     status = int
@@ -72,12 +72,12 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,8 +116,8 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
     int cols;
     XWindowAttributes winatt;
     XVisualInfo *vinfo, vinfo_template;
-    
-/*	  
+
+/*
 **  Attempt to find a window with this name in case it already exists; if
 **  it does then just exit.
 */
@@ -158,7 +158,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 **	shared by all windows and we can use the maximum available but
 **      don't use more than 256 as some applications can't cope with more.
 */
-	if (vclass == StaticGray || 
+	if (vclass == StaticGray ||
 	    vclass == StaticColor ||
 	    vclass == TrueColor )
 	{
@@ -194,13 +194,13 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
   /*  From now on there are resources to be deallocated if an error occurs */
     pix_id = 0;
 
-/*	  
+/*
 **  Allocate the number of colour cells requested - read/write if the server
 **  supports it. If the colour map is read only then we just have to check that
 **  it is at least as big as the minimum number of requested colours.
-*/	  
+*/
 
-    if ( vclass == GrayScale || 
+    if ( vclass == GrayScale ||
          vclass == PseudoColor )
     {
 	for (cols = lncols; cols >= mincols; cols-- )
@@ -227,7 +227,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 	    for (; lncols >= mincols; lncols-- )
 	    {
 		status = XAllocColorPlanes( display,
-		    winatt.colormap, False, pix_array, lncols, 0, 0, 0, 
+		    winatt.colormap, False, pix_array, lncols, 0, 0, 0,
                     &mask_return, &mask_return, &mask_return);
 		if (status) break;
 	    }
@@ -240,7 +240,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 		status = False;
 	}
     }
-    if ( !status ) 
+    if ( !status )
     {
 	status = GWM_COL_ALLOC;
 	goto cleanup;
@@ -251,16 +251,16 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 **  and background colours
 */
     fg_color.pixel = fg;
-    XQueryColor( display, winatt.colormap, &fg_color);  
+    XQueryColor( display, winatt.colormap, &fg_color);
     bg_color.pixel = bg;
-    XQueryColor( display, winatt.colormap, &bg_color);  
+    XQueryColor( display, winatt.colormap, &bg_color);
 
-    if ( winatt.visual->class == GrayScale || 
+    if ( winatt.visual->class == GrayScale ||
          winatt.visual->class == PseudoColor ||
 	 winatt.visual->class == DirectColor)
     {
 	bg_color.pixel = pix_array[0];
-	XStoreColor( display, winatt.colormap, &bg_color); 
+	XStoreColor( display, winatt.colormap, &bg_color);
 	fg_color.pixel = pix_array[1];
 	XStoreColor( display, winatt.colormap, &fg_color);
     }
@@ -278,7 +278,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
     if (ovl)
     {
 	ov_color.pixel = ovcol;
-	XQueryColor( display, winatt.colormap, &ov_color);  
+	XQueryColor( display, winatt.colormap, &ov_color);
 	for ( i = 0; i < lncols; i++)
 	{
 	    ov_color.pixel = pix_array[i] | mask;
@@ -286,10 +286,10 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 	}
     }
 
-/*	  
+/*
 **  Create the off-screen pixmap
-*/	  
-    pix_id = XCreatePixmap( display, win_id, width, height, winatt.depth); 
+*/
+    pix_id = XCreatePixmap( display, win_id, width, height, winatt.depth);
 
     if ( !(pix_id) )
     {
@@ -306,10 +306,10 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
     XFreeGC( display, gc);
 
 
-/*	  
+/*
 **  All the necessary resources have now been allocated and various window
 **  properties can be created to tie them all together.
-*/	  
+*/
     title = malloc( strlen(name) + 5 );
     if ( !title )
     {
@@ -321,7 +321,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
     atom = XInternAtom( display, title, False );
     free( title );
     XChangeProperty( display, DefaultRootWindow( display ), atom, XA_WINDOW,
-	32, PropModeReplace, (unsigned char*)&win_id, 1); 
+	32, PropModeReplace, (unsigned char*)&win_id, 1);
 
     atom = XInternAtom( display, "GWM_name", False );
     XChangeProperty( display, win_id, atom, XA_STRING, 8,PropModeReplace,
@@ -357,13 +357,13 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
     XChangeProperty( display, win_id, atom, XA_INTEGER, 32, PropModeReplace,
 	(unsigned char*)(&zero), 1 );
 
-    sprintf( colname, "#%04.4x%04.4x%04.4x", fg_color.red, 
+    sprintf( colname, "#%04.4x%04.4x%04.4x", fg_color.red,
 	fg_color.green, fg_color.blue );
     atom = XInternAtom( display, "GWM_foreground", False );
     XChangeProperty( display, win_id, atom, XA_STRING, 8, PropModeReplace,
 	(unsigned char*)colname, strlen(colname) );
 
-    sprintf( colname, "#%04.4x%04.4x%04.4x", bg_color.red, 
+    sprintf( colname, "#%04.4x%04.4x%04.4x", bg_color.red,
 	bg_color.green, bg_color.blue );
     atom = XInternAtom( display, "GWM_background", False );
     XChangeProperty( display, win_id, atom, XA_STRING, 8, PropModeReplace,
@@ -375,7 +375,7 @@ cleanup:
     if ( pix_id ) XFreePixmap( display, pix_id );
     if ( status != GWM_COL_ALLOC )
     {
-	if ( vclass == GrayScale || 
+	if ( vclass == GrayScale ||
              vclass == PseudoColor ||
 	     vclass == DirectColor )
 	{

@@ -1,9 +1,9 @@
 1 IFD - Interface File Definition package - update
                                                     Expires: ????.??.??
  19-May-2003: v1.2-8
- 
+
     Avoids misleading messages from the installation test
-    
+
  23-Jan-2002: v1.2-7
 
     In ifd2star, escape harmfull characters (like (), quotes and comma) in
@@ -28,7 +28,7 @@
 
  03-Dec-1999: v1.2-2
 
-    IFD v1.2-2 is now available.  
+    IFD v1.2-2 is now available.
 
     Any occurrence of ! is escaped in the alias commands set up in the
     .csh file by IFD2STAR for 'command/task' definitions.

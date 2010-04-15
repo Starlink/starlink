@@ -5,7 +5,7 @@ C
 C     G A U S _ R E C O R D
 C
 C     Records on a data file the results of the Gaussian
-C     fitting. The Gaussians are ordered into increasing wavelength order 
+C     fitting. The Gaussians are ordered into increasing wavelength order
 C
 C     Parameters -  (">" input, "<" output )
 C
@@ -27,7 +27,7 @@ C       SORT -  sorts profile index into increasing wavelength order
 C
 C                                            JRW / AAO  February 1987
 C
-C 
+C
 C     Modified:
 C
 C     23 Aug 1995  HME / UoE, Starlink.  No longer use NAG. Hence
@@ -66,13 +66,13 @@ C
        GJNFW(I)=GINFW(A1)
       END DO
 
-      FLU=1.06484*GJNFH(1)*GJNFW(1)*2.3540 
+      FLU=1.06484*GJNFH(1)*GJNFW(1)*2.3540
       WRITE(LU,5,ERR=90) GJNFP(1),GJNFH(1),GJNFW(1),FLU,EW,RMS,
      :MERR,ORD,SIG,ERR
 5     FORMAT(1X,F12.3,1X,E14.4,1X,F10.4,1X,E12.4,1X,F10.3,1X,
      :E11.4,1X,F10.4,6X,I5,4X,F8.3,4X,F8.3)
       DO I=2,N
-        FLU=1.06484*GJNFH(I)*GJNFW(I)*2.3540 
+        FLU=1.06484*GJNFH(I)*GJNFW(I)*2.3540
         WRITE(LU,6,ERR=90) GJNFP(I),GJNFH(I),GJNFW(I),FLU
       END DO
 6     FORMAT(1X,F12.3,1X,E14.4,1X,F10.4,1X,E12.4)

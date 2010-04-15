@@ -1,4 +1,4 @@
-{+          
+{+
 {  Name:
 {     extractor.icl
 
@@ -12,7 +12,7 @@
 {     load extractor.icl
 
 {  Description:
-{     This procedure defines an command for each EXTRACTOR command, and 
+{     This procedure defines an command for each EXTRACTOR command, and
 {     also defines the help commands.
 
 {  Authors:
@@ -30,10 +30,10 @@
 {-
 
 {  Define main package help
- 
+
 defhelp extractor $EXTRACTOR_HELP 0
 defstring extractorhelp help extractor
- 
+
 {  Basic command definitions.
 {  eg:  define command $EXTRACTOR_DIR/extractor_mon command
 

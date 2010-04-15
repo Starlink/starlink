@@ -10,7 +10,7 @@ C
 C  Description:
 C     Given a type (eg 'FLOAT') and a number of elements, this routine
 C     obtains workspace for an array of the specified size and type,
-C     and returns its address. It also returns a slot number which should 
+C     and returns its address. It also returns a slot number which should
 C     be used to refer to the memory in order to release it later.
 C
 C  Language:
@@ -37,7 +37,7 @@ C
 C  External subroutines / functions used:
 C     DSA_TYPESIZE, DSA_GET_WORKSPACE
 C
-C  Prior requirements:  
+C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the DSA_ system.
 C
 C  Support: Keith Shortridge, AAO
@@ -66,7 +66,7 @@ C
 C     Functions used
 C
       INTEGER DSA_TYPESIZE
-C 
+C
 C     Local variables
 C
       INTEGER   BYTES                    ! Number of bytes required.

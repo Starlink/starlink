@@ -9,7 +9,7 @@ C Return the window, in a variety of units, defined by the full
 C device view surface (0 -> 1 in normalized device coordinates).
 C
 C Input:
-C   UNITS    0,1,2,3 for output in normalized device coords, 
+C   UNITS    0,1,2,3 for output in normalized device coords,
 C            inches, mm, or absolute device units (dots)
 C Output
 C   X1,X2    X window

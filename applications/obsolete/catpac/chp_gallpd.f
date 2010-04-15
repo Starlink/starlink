@@ -1,6 +1,6 @@
       SUBROUTINE
-     :  CHP_GALLPD(INPUT, NUMPARS, PNAMES, PFORMATS, 
-     : PUNITS, PCOMMENTS, PPREFDIS, PARDES, PMDATAACC, PDATAACC, 
+     :  CHP_GALLPD(INPUT, NUMPARS, PNAMES, PFORMATS,
+     : PUNITS, PCOMMENTS, PPREFDIS, PARDES, PMDATAACC, PDATAACC,
      : PDATELM, PDELIND, PFMATFLAG, STATUS)
 *+
 *  Name:
@@ -13,14 +13,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHP_GALLPD (INPUT, NUMPARS, PNAMES, PFORMATS, 
-*     PUNITS, PCOMMENTS, PPREFDIS, PARDES, PMDATAACC, PDATAACC, PDATELM, 
+*     CALL CHP_GALLPD (INPUT, NUMPARS, PNAMES, PFORMATS,
+*     PUNITS, PCOMMENTS, PPREFDIS, PARDES, PMDATAACC, PDATAACC, PDATELM,
 *     PDELIND, PFMATFLAG, STATUS)
 
 *  Description :
-*     Get the information about all the parameters. Each parameter has 
+*     Get the information about all the parameters. Each parameter has
 *     associated with it a name, format, units, comment,
-*     preferred dislay flag, parameter designation, access information, date 
+*     preferred dislay flag, parameter designation, access information, date
 *     last modified and delete indicator.
 
 *  Arguments:
@@ -69,7 +69,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,24 +122,24 @@
 *
       numpars = CPnumpars(cd)
       do cc = 1, numpars
-*        ptypes(cc) = PPtype(cd,cc) 
-        pnames(cc) = PPname(cd,cc) 
-        pformats(cc) = PPformat(cd,cc) 
-        punits(cc) = PPunit(cd,cc) 
+*        ptypes(cc) = PPtype(cd,cc)
+        pnames(cc) = PPname(cd,cc)
+        pformats(cc) = PPformat(cd,cc)
+        punits(cc) = PPunit(cd,cc)
         pcomments(cc) = PPcomment(cd,cc)
         pmdataacc(cc) = PPmdataacc(cd,cc)
-        pdataacc(cc) = PPdataacc(cd,cc) 
+        pdataacc(cc) = PPdataacc(cd,cc)
         pdatelm(cc) = PPdatelm(cd,cc)
-        pdelind(cc) = PPdelind(cd,cc) 
-        pprefdis(cc) = PPprefdis(cd,cc) 
-*        parrshp(cc) = PParrshp(cd,cc) 
+        pdelind(cc) = PPdelind(cd,cc)
+        pprefdis(cc) = PPprefdis(cd,cc)
+*        parrshp(cc) = PParrshp(cd,cc)
 *        if (parrshp(cc) .ge. 1) then
 *          do asc = 1, parrshp(cc)
 *            parrdim(cc,asc) = PParrdim(cd,cc,asc)
 *          enddo
 *        endif
 *        parrtyp(cc) = PParrtype(cd,cc)
-*        pstruct(cc) = PPstruct(cd,cc) 
+*        pstruct(cc) = PPstruct(cd,cc)
       enddo
 *
       END

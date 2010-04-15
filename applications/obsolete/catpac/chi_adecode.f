@@ -1,13 +1,13 @@
 *+  CHI_ADECODE - Analyses the ASCII string and returns its type and format spec
-      subroutine chi_adecode(expression, type, width, format_spec, 
-     :                      string, status) 
-*    Description : 
+      subroutine chi_adecode(expression, type, width, format_spec,
+     :                      string, status)
+*    Description :
 *     Analyses the ASCII expression and returns its type and format spec.
 *    Invocation
 *     CALL CHI_ADECODE(EXPRESSION, TYPE, WIDTH, FORMAT_SPEC, STRING, STATUS)
-*    Parameters : 
+*    Parameters :
 *     EXPRESSION=CHAR(INPUT)
-*           The expression to be analysed. 
+*           The expression to be analysed.
 *     TYPE=CHAR(OUTPUT)
 *           The data type of the expression: C, D, I, L, R.
 *     WIDTH=INTEGER(OUTPUT)
@@ -17,13 +17,13 @@
 *     STRING=CHAR(OUTPUT)
 *           The input string with leading blanks and apostrophes removed
 *     STATUS=INTEGER(UPDATE)
-*           Status variable.  
-*           If the string is too longer than 99999 bytes then 
+*           Status variable.
+*           If the string is too longer than 99999 bytes then
 *           Status = CHI__DECOD is returned.
 *           Else if the string cannot be decoded then
 *           Status = CHI__DECOD is returned
 *           STRING is set to EXPRESSION on error end
-*    Method : 
+*    Method :
 *     Parse assuming the string is a FORTRAN constant.
 *     Note : Text constants are delimted by the: " character, not: '.
 *     If the parsing fails then
@@ -33,14 +33,14 @@
 *    Deficiences :
 *     Integer, real, double precision, logical, character constants only.
 *     Octal, hexadecimal constants etc not parsed for.
-*    Authors : 
+*    Authors :
 *     Alan Wood (STADAT::ARW)     Jon Fairclough (RAL::IPMAF)
-*    History : 
+*    History :
 *     30-Jan-1992:Original
-*    Type Definitions : 
-      implicit none 
-*    Global constants : 
-      include 'sae_par'                 ! SAI Symbolic Constants 
+*    Type Definitions :
+      implicit none
+*    Global constants :
+      include 'sae_par'                 ! SAI Symbolic Constants
       include 'chipar_par'
       include 'chipar_err'
 *    Import
@@ -50,13 +50,13 @@
       character*(*) type
       character*(*) format_spec
       character*(*) string
-*    Status : 
+*    Status :
       integer status
 *    External refernces
 *    Local constant
       integer szmx                      ! Maximium length of w
       parameter (szmx=5)                ! Limit of 99999 bytes !!!!!
-*    Local variables : 
+*    Local variables :
       integer i,j                       ! Counters
       integer l                         ! Length of string
       logical start_str                 ! Start of string
@@ -76,7 +76,7 @@
       real rtest
       integer istat
       logical error
-*- 
+*-
 *    Begin
 *
       if (status .ne. SAI__OK) return
@@ -182,10 +182,10 @@
                   locD = index(expression(dot:j),'D')
                   if (locE .ne. 0) then
                      type = 'E'
-                     digits = locE - 2 
+                     digits = locE - 2
                   elseif (locD .ne. 0) then
                      type = 'D'
-                     digits = locD - 2 
+                     digits = locD - 2
                   else
                      if (wsz .gt. 1) then
                         type = 'D'
@@ -209,7 +209,7 @@
                      type = 'R'
                   elseif (type(:1) .eq. 'D') then
                      format_spec = 'D'//w(:wsz)//'.'//d
-                  endif                  
+                  endif
                   string = expression(i:j)
                endif
             endif
@@ -236,7 +236,7 @@
       endif
 *
       goto 4
-*    
+*
 1     continue
       status = CHI__DECOD
       goto 3

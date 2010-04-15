@@ -150,7 +150,7 @@
 *               out by the variance weighting. Only its sign will
 *               be significant).
                   OBS = DBLE( WEIGHT ) * DBLE( OBSDATA( I, J ) )
-                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) ) 
+                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) )
 
 *               Check the quality of the corresponding datum in the
 *               reduced group data array.
@@ -164,7 +164,7 @@
 
                      IF ( VARIANCE( I, J ) .GT. 0.0 ) THEN
 
-                        SUMINVAR = 1.0D0 / DBLE( VARIANCE( I, J ) ) 
+                        SUMINVAR = 1.0D0 / DBLE( VARIANCE( I, J ) )
                         SUM = DBLE( DATA( I, J ) ) * SUMINVAR
                      ELSE
 
@@ -192,13 +192,13 @@
 
 *                     This is not the last co-add to be removed.
 *                     Subtract the observation value and inverse
-*                     variance, weighting the datum by its inverse 
+*                     variance, weighting the datum by its inverse
 *                     variance.
                         SUM = SUM - OBS / OVAR
                         SUMINVAR = SUMINVAR - 1.0D0 / OVAR
 
 *                     Decrement the number of coadds and obtain a mean
-*                     and inverse "standard error squared". 
+*                     and inverse "standard error squared".
                         NUM = NUM - 1
                         MEAN = SUM / SUMINVAR
                         INSESQ = SUMINVAR
@@ -228,7 +228,7 @@
 
                         QUALITY(I,J) = GOOD
                      ELSE
-   
+
                         QUALITY(I,J) = BAD
                      END IF
                   ELSE
@@ -259,7 +259,7 @@
 *               Extract the data and variance values from the
 *               observation array.
                   OBS = DBLE( WEIGHT ) * DBLE( OBSDATA( I, J ) )
-                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) ) 
+                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) )
 
 *               Check the quality of the corresponding datum in the
 *               reduced group data array.
@@ -312,7 +312,7 @@
                      SESQ = 0.0D0
                   END IF
 
-*               Ensure that rounding errors can never make the 
+*               Ensure that rounding errors can never make the
 *               standard error squared less than zero.
                   IF ( SESQ .LT. 0.0D0 ) THEN
 
@@ -332,7 +332,7 @@
 
                      QUALITY(I,J) = GOOD
                   ELSE
-   
+
                      QUALITY(I,J) = BAD
                   END IF
                ENDIF

@@ -1,5 +1,5 @@
       SUBROUTINE str_PLANT(STR1, START, SIZE2, STR2)
- 
+
 *+
 *
 *   Name:
@@ -34,13 +34,13 @@
 
 *   Import:
       BYTE STR1(ARB)       ! sub-string to be planted
- 
+
       INTEGER START        ! character position for plant
       INTEGER SIZE2        ! maximum size of string to be changed
- 
+
 *   Import/Export:
       BYTE STR2(SIZE2)     ! string to be changed
- 
+
 *   External references:
       INTEGER str_LEN      ! string length
 

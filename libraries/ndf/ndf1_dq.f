@@ -87,12 +87,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -288,7 +288,7 @@
                            STATUS = NDF__VARIN
                            CALL DAT_MSG( 'QUAL', DCB_QLOC( IDCB ) )
                            CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADVAR', 
+     :                                     'BADVAR',
      :                                     %VAL( CNF_CVAL( LENV ) ) )
                            CALL ERR_REP( 'NDF1_DQ_VAR',
      :                     'The VARIANT component in the NDF ' //
@@ -363,7 +363,7 @@
                      CALL ERR_REP( 'NDF1_DQ_NOQLY',
      :               'The QUALITY array is missing from the NDF ' //
      :               'quality structure ^QUAL', STATUS )
-                  ELSE                  
+                  ELSE
 
 *  Import the QUALITY array component (of the QUALITY structure) into
 *  the ARY_ system, storing the resulting identifier in the DCB.
@@ -448,7 +448,7 @@
 *  Note whether quality information is now available in the DCB.
          DCB_KQ( IDCB ) = STATUS .EQ. SAI__OK
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_DQ', STATUS )
 

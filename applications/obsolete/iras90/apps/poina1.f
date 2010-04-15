@@ -1,12 +1,12 @@
-      SUBROUTINE POINA1( PNOISP, PSCS, PTHCOR, PTHFIL, PTHSD, 
-     :                   PTHS2N, LOGFID, LOGREQ, NOISMP, S2NREQ, SCS, 
-     :                   THCORR, THFILT, THSD, THS2N, STATUS ) 
+      SUBROUTINE POINA1( PNOISP, PSCS, PTHCOR, PTHFIL, PTHSD,
+     :                   PTHS2N, LOGFID, LOGREQ, NOISMP, S2NREQ, SCS,
+     :                   THCORR, THFILT, THSD, THS2N, STATUS )
 *+
 *  Name:
 *     POINA1
 
 *  Purpose:
-*     To obtain parameters such as coordinate system, thresholds, 
+*     To obtain parameters such as coordinate system, thresholds,
 *     and local noise size for pointcrdd.
 
 
@@ -14,17 +14,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA1( PNOISP, PSCS, PTHCOR, PTHFIL, PTHSD, 
-*                  PTHS2N, LOGFID, LOGREQ, NOISMP, S2NREQ, SCS, 
-*                  THCORR, THFILT, THSD, THS2N, STATUS ) 
+*     CALL POINA1( PNOISP, PSCS, PTHCOR, PTHFIL, PTHSD,
+*                  PTHS2N, LOGFID, LOGREQ, NOISMP, S2NREQ, SCS,
+*                  THCORR, THFILT, THSD, THS2N, STATUS )
 
 *  Description:
-*     To obtain parameters such as coordinate system, thresholds, 
+*     To obtain parameters such as coordinate system, thresholds,
 *     and local noise size for pointcrdd.
 *
 *  Arguments:
 *     PNOISP = CHARACTER (Given)
-*        The name of the parameter used to get the value of the Number of 
+*        The name of the parameter used to get the value of the Number of
 *        samples in scan segments used to calculate the local noise
 *     PSCS = CHARACTER (Given)
 *        The name of the parameter used to get the name of the sky coordinate
@@ -40,7 +40,7 @@
 *        for rejecting samples in calculation of various noise values.
 *     PTHS2N = CHARACTER (Given)
 *        The name of the parameter used to get the value of the threshold
-*        of signal to local noise at which a candidate should be accepted 
+*        of signal to local noise at which a candidate should be accepted
 *        as a point source.
 *     LOGFID = INTEGER (Given)
 *        When logging is required, it gives the ID of the logfile.
@@ -59,7 +59,7 @@
 *     THFILT = REAL (Returned)
 *        Threshold of the square wave filter signal to noise.
 *     THSD = REAL (Returned)
-*        Threshold for rejection of samples in calculation of various noise 
+*        Threshold for rejection of samples in calculation of various noise
 *        values.
 *     THS2N = REAL (Returned)
 *        Threshold of signal to local noise at which a candidate point source
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
 
 *  Arguments Returned:
       INTEGER NOISMP
-      LOGICAL S2NREQ 
+      LOGICAL S2NREQ
       CHARACTER*( * ) SCS
       REAL THCORR
       REAL THFILT
@@ -141,7 +141,7 @@
       CALL PAR_GET0R( PTHSD, THSD, STATUS )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the threshold of the signal to local noise used to accept a candidate 
+*  Get the threshold of the signal to local noise used to accept a candidate
 *  as a point source
       CALL PAR_GET0R( PTHS2N, THS2N, STATUS )
 
@@ -163,33 +163,33 @@
          CALL FIO_WRITE( LOGFID, ' ', STATUS )
          CALL FIO_WRITE( LOGFID, 'Parameters used :- ', STATUS )
          CALL CHR_RTOC( THSD, THSDS, THSDL)
-         CALL FIO_WRITE( LOGFID, 
+         CALL FIO_WRITE( LOGFID,
      :                    'Threshold at which samples are '/
      :                   /'rejected when calculating noise = '/
      :                   /THSDS( :THSDL), STATUS )
          CALL CHR_RTOC( THFILT, THFILS, THFILL)
-         CALL FIO_WRITE( LOGFID, 
+         CALL FIO_WRITE( LOGFID,
      :                    'Threshold at which candidates '/
      :                   /'are selected from filtered data = '/
      :                   /THFILS( :THFILL), STATUS )
          CALL CHR_RTOC( THCORR, THCORS, THCORL)
-         CALL FIO_WRITE( LOGFID, 
+         CALL FIO_WRITE( LOGFID,
      :                    'Threshold of correlation '/
      :                   /'coeff. at which candidates are '/
      :                   /'accepted = '//THCORS( :THCORL), STATUS )
 
          IF ( S2NREQ ) THEN
             CALL CHR_RTOC( THS2N, THS2NS, THS2NL)
-            CALL FIO_WRITE( LOGFID, 
+            CALL FIO_WRITE( LOGFID,
      :                    'Threshold of signal to '/
      :                   /'local noise at which sources are '/
      :                   /'finally accepted = '/
      :                   /THS2NS( :THS2NL), STATUS )
          ELSE
-            CALL FIO_WRITE( LOGFID, 
+            CALL FIO_WRITE( LOGFID,
      :                    'Final signal to local noise '/
      :                   /'test is not carried out', STATUS )
-         END IF 
+         END IF
          CALL FIO_WRITE( LOGFID, ' ', STATUS )
       END IF
 

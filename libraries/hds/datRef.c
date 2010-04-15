@@ -35,7 +35,7 @@
 *     loc = const HDSLoc * (Given)
 *        Locator to the HDS object.
 *     ref = char * (Returned)
-*        Pointer to character buffer to receive the reference. It must be 
+*        Pointer to character buffer to receive the reference. It must be
 *        preallocated by the caller. The reference will be truncated
 *        to fit if the buffer is not large enough, and status will be
 *        set to DAT__TRUNC.
@@ -150,7 +150,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
 #endif
 
     /* Find the filename length */
-    ncf = strlen( file );    
+    ncf = strlen( file );
 
     /*  See if the file is "odd". Check to see if it has the default file
      *  extension of '.SDF' with at least one character preceding it. */
@@ -168,7 +168,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
      *  a '.' to the end of it. This is done to counteract the removal of a
      *  terminating '.' which HDS performs on all Unix file names (to permit
      *  the creation of files without a '.' in their names if required).
-     *  Initially assume an extra '.' is needed. 
+     *  Initially assume an extra '.' is needed.
      */
 
     if (odd) {
@@ -206,7 +206,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
 	if (add_dot) {
 	  strcat( file, "." );
 	}
-	
+
       }
 
     }

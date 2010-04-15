@@ -1,12 +1,12 @@
       SUBROUTINE VARSKY(MASK,SLO,NS,NPOLY,XLO,NX,VARMAT,STATUS)
 C
-C This subroutine computes the covariance matrix on the fitted sky 
+C This subroutine computes the covariance matrix on the fitted sky
 C values (over a region starting at XLO and extending NX pixels
-C therefore giving an NX by NX matrix) assuming that they have been 
-C derived by polynomial fits with NPOLY coefficients over the sky mask 
-C MASK(NS) starting at SLO. Sky pixels are indicated by MASK = 1. This 
-C matrix is needed for more precise uncertainty estimates (rather than 
-C just ignoring it). The calculation assumes that the variance is the 
+C therefore giving an NX by NX matrix) assuming that they have been
+C derived by polynomial fits with NPOLY coefficients over the sky mask
+C MASK(NS) starting at SLO. Sky pixels are indicated by MASK = 1. This
+C matrix is needed for more precise uncertainty estimates (rather than
+C just ignoring it). The calculation assumes that the variance is the
 C same on all the sky pixels and that they are independent.
 C
       IMPLICIT NONE
@@ -35,9 +35,9 @@ C
      &        STATUS)
          RETURN
       END IF
-C     
+C
 C     First compute the matrix to be inverted
-C     
+C
       DO J = 1, NPOLY
          DO I = 1, J
             SUM = 0.D0
@@ -57,9 +57,9 @@ C
             DWORK1(J,I) = SUM
          END DO
       END DO
-C     
+C
 C     LU decompose
-C     
+C
       CALL LUDCMP(DWORK1,NPOLY,MXPOLY,IWORK,D,IFAIL)
       IF(IFAIL.NE.0) THEN
          STATUS = SAI__ERROR
@@ -69,7 +69,7 @@ C
       END IF
 C
 C     Set up identity matrix
-C     
+C
         DO J = 1, NPOLY
            DO I = 1, NPOLY
               DWORK2(I,J) = 0.D0

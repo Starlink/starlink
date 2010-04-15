@@ -1,24 +1,24 @@
- 
+
       SUBROUTINE MAG_MOVE(TP, FILE, START, BLOCK, STATUS)
 *+
 *  Name:
 *     MAG_MOVE
- 
+
 *  Purpose:
 *     Move to a specified file and block on tape.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_MOVE(TD, FILE, START, BLOCK, STATUS)
- 
+
 *  Description:
 *     Assuming that the current tape position is known, move to a
 *     position on the tape specified by a file and block number.
 *     The block number can be relative either to the start or the
 *     end of the specified file.
- 
+
 *  Arguments:
 *     TD=INTEGER (Given)
 *        A variable containing the tape descriptor.
@@ -42,7 +42,7 @@
 *        will return without action.
 *        If the routine fails to complete, this variable will be set
 *        to an appropriate error number.
- 
+
 *  Algorithm:
 *     The current file and block positions are obtained. If they are
 *     not already defined in the MAG_IO Common Block, the tape will be
@@ -55,7 +55,7 @@
 *     The required block position is then found by skipping blocks
 *     forwards or backwards as required by the values of BLOCK and
 *     START.
- 
+
 *  Copyright:
 *     Copyright (C) 1981, 1983, 1986, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *  Authors:
 *     Jack Giddings (UCL::JRG)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-OCT-1981:  Original  (UCL::JRG)
 *     01-FEB-1983:  Fortran 77 Version. (UCL::JRG)
@@ -92,20 +92,20 @@
 *    22-Jan-1993:  Change include file names
 *           Convert code to uppercase using SPAG (RAL::BKM)
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definition:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
       INCLUDE 'MAG_ERR'         ! MAG Errors
- 
+
 *  Arguments Given:
       INTEGER TP                ! tape descriptor
       INTEGER FILE              ! required file
@@ -113,7 +113,7 @@
       INTEGER BLOCK             ! block number
 *    Status return :
       INTEGER STATUS            ! status return
- 
+
 *  Local Variables:
       INTEGER CFILE             ! current file number
       INTEGER CSTART            ! current file offset position
@@ -121,12 +121,12 @@
       LOGICAL MOVED             ! has tape been moved ?
       INTEGER NSKIP             ! number of files/blocks to be skipped
       INTEGER DIR               ! direction of file/block skips
- 
+
 *.
- 
- 
+
+
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *    Get current position and check requested arguments
       CALL MAG_POS(TP, CFILE, CSTART, CBLOCK, MOVED, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -135,7 +135,7 @@
          STATUS = MAG__NOFIL
          CALL MAG1_ERRTP(TP, STATUS)
       ELSE
-         IF ( CFILE.LE.0 ) CALL MAG1_FXPOS(TP, CFILE, CSTART, CBLOCK, 
+         IF ( CFILE.LE.0 ) CALL MAG1_FXPOS(TP, CFILE, CSTART, CBLOCK,
      :        STATUS)
          IF ( STATUS.EQ.SAI__OK ) THEN
 *       skip to requested file
@@ -145,12 +145,12 @@
             ELSE IF ( CFILE.LE.0 ) THEN
                STATUS = MAG__NOPOS
                CALL MAG1_ERRTP(TP, STATUS)
-            ELSE IF ( (FILE.GT.CFILE.AND.START) .OR. 
+            ELSE IF ( (FILE.GT.CFILE.AND.START) .OR.
      :                (FILE.LT.CFILE.AND..NOT.START) ) THEN
                NSKIP = FILE - CFILE
                CALL MAG_SKIP(TP, NSKIP, STATUS)
                IF ( STATUS.EQ.SAI__OK ) CBLOCK = 1
-            ELSE IF ( (FILE.GT.CFILE.AND..NOT.START) .OR. 
+            ELSE IF ( (FILE.GT.CFILE.AND..NOT.START) .OR.
      :                (FILE.LT.CFILE.AND.START) ) THEN
                IF ( FILE.GT.CFILE ) THEN
                   DIR = 1
@@ -166,7 +166,7 @@
             END IF
          END IF
       END IF
- 
+
 *    Skip to specified block if all is correct up to this point
       IF ( STATUS.EQ.SAI__OK ) THEN
          IF ( BLOCK.GT.0 ) THEN
@@ -180,6 +180,6 @@
             END IF
          END IF
       END IF
- 
+
       RETURN
       END

@@ -3,7 +3,7 @@
 *    Description :
 *     This routine reads the data reduction configuration stored in a
 *     file and copies it to the common block variables.
-*     The file is assumed to be in the CGS4_CONFIG directory by default. 
+*     The file is assumed to be in the CGS4_CONFIG directory by default.
 *    Invocation :
 *     CALL CRED4_RESTORE_CONFIG( STATUS )
 *    Authors :
@@ -27,7 +27,7 @@
 *   Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Ensure that a data reduction sequence has been set up 
+*   Ensure that a data reduction sequence has been set up
       IF ( SEQUENCE_SETUP ) THEN
 
 *      Restore the configuration from the specified file to the parameter file

@@ -1,9 +1,9 @@
 /*
  * Valuator.c --- Module for handling a valuator tool on the SUN workstation
- * for RAL GKS. 
+ * for RAL GKS.
  *
  * Written by: A C Arnold, University of Manchester Computer Graphics Unit,
- * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405 
+ * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405
  *
  * Maintenance Log:
  *
@@ -66,7 +66,7 @@ gk0xrv_(value)
 		      (int) reala[KIPEXR],
 		      (int)(gkywdt_.kdsry[gkywca_.kwkix - 1] - 1) - (int) reala[KIPEYB]);
   (*xvaluatorecb[inta[KIPPRT]-1].open)();	/* Open up the echo area */
-  gk0xipset(IPON);					/* Enable input */  
+  gk0xipset(IPON);					/* Enable input */
   do {
     (*xvaluatorecb[inta[KIPPRT]-1].echo)();	/* Echo current value */
     gk0xipwait();					/* Wait for input */
@@ -217,7 +217,7 @@ static int digitalecho()
 
 static int digitalerase()
 {
-    gk0xftprint(ddbm->bm_box, label, 
+    gk0xftprint(ddbm->bm_box, label,
             FTCENTRE | FTOVER);			/* Erase the value */
     currentvalue = (ival = dd->d_x) * xs + xt;	/* Convert to a value */
     ival = max(min(ival, ddbm->bm_box.b_right-1),/* Constrain position */

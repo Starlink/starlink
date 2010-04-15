@@ -41,12 +41,12 @@ int main( int argc, char *argv[])
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,10 +69,10 @@ int main( int argc, char *argv[])
     Widget top;
     Display *display;
     int i, status;
-/*	  
+/*
 **  Use XtInitialize to parse the command arguments using the standard Xt
 **  options. The one we are interested in is -display.
-*/	  
+*/
     top = XtInitialize("main", "Xrefresh", NULL, 0, &argc, argv);
 
 /*
@@ -80,10 +80,10 @@ int main( int argc, char *argv[])
 */
     display = XtDisplay( top );
 
-/*	  
+/*
 **  Search the argument list for an argument that doesn't begin with "-"; this
 **  must be the window name.
-*/	  
+*/
     for ( i = 1; argv[i]; i++ ) if (*argv[i] != '-') break;
     if ( !argv[i] )
     {
@@ -91,9 +91,9 @@ int main( int argc, char *argv[])
 	goto error;
     }
 
-/*	  
+/*
 **  Destroy the window
-*/	  
+*/
     status = GWM_DestroyWindow( display, argv[i]);
     if ( status ) GWM_Error( status );
 

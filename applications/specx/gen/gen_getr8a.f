@@ -1,7 +1,7 @@
 
 C-----------------------------------------------------------------------
 
-      LOGICAL*4 FUNCTION GEN_GETR8A 
+      LOGICAL*4 FUNCTION GEN_GETR8A
      &                   (PROMPT, DEF, NSIZ, FDEF, R8ARR, JDEF)
 
 C   Routine to put a prompt message to the terminal and receive a

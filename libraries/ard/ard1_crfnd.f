@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_CRFND( FRM, NDIM, LBND, UBND, NPAR, D, PAR, 
+      SUBROUTINE ARD1_CRFND( FRM, NDIM, LBND, UBND, NPAR, D, PAR,
      :                       LBINTB, UBINTB, STATUS )
 *+
 *  Name:
@@ -17,8 +17,8 @@
 *  Description:
 *     The user co-ordinates of the intersection of the sphere with each
 *     each axis of the user coordinate system are found (this allows for
-*     different axis scales, e.g. for RA/DEC). These are transformed into 
-*     pixel indices and the supplied bounds of the internal bounding box 
+*     different axis scales, e.g. for RA/DEC). These are transformed into
+*     pixel indices and the supplied bounds of the internal bounding box
 *     are updated to include all the corners.
 
 *  Arguments:
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,7 +97,7 @@
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER NPAR
-      DOUBLE PRECISION D( * ) 
+      DOUBLE PRECISION D( * )
       DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Returned:
@@ -113,7 +113,7 @@
      :     J,                    ! Dimension counter
      :     PINDEX                ! Pixel index value
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :     P2( ARD__MXDIM ),     ! User coordinates of target point
      :     PIXCO( ARD__MXDIM ),  ! Pixel coordinates for current corner
      :     ROOT2,                ! Square root of 2
@@ -134,7 +134,7 @@
       ROOT2 = SQRT( 2.0D0 )
       DO I = 1, NDIM
 
-*  Store the user coords of a point displaced a little away from the centre 
+*  Store the user coords of a point displaced a little away from the centre
 *  along the I'th axis.
          DO J = 1, NDIM
             P2( J ) = PAR( J )
@@ -144,11 +144,11 @@
             P2( I ) = 0.1
          ELSE
             P2( I ) = 1.1*P2( I )
-         END IF            
+         END IF
 
 *  Offset away from the centre towards this second point, going a
 *  distance equal to the sphere radius*sqrt(2) to get the exterior box.
-         CALL AST_OFFSET( FRM, PAR, P2, ROOT2*PAR( NDIM + 1), USERCO, 
+         CALL AST_OFFSET( FRM, PAR, P2, ROOT2*PAR( NDIM + 1), USERCO,
      :                    STATUS )
 
 *  Transform the resulting user position to pixel coordinates.
@@ -167,7 +167,7 @@
 
 *  Now offset in the opposite direction by the same amount (do this by
 *  negating the offset distance).
-         CALL AST_OFFSET( FRM, PAR, P2, -ROOT2*PAR( NDIM + 1), USERCO, 
+         CALL AST_OFFSET( FRM, PAR, P2, -ROOT2*PAR( NDIM + 1), USERCO,
      :                    STATUS )
 
 *  Transform the resulting user position to pixel coordinates.
@@ -192,7 +192,7 @@
          LBINTB( I ) = MAX( LBINTB( I ), LBND( I ) )
          UBINTB( I ) = MIN( UBINTB( I ), UBND( I ) )
 
-*  If the lower bound is higher than the upper bound, return with a 
+*  If the lower bound is higher than the upper bound, return with a
 *  null box
          IF( LBINTB( I ) .GT. UBINTB( I ) ) THEN
             LBINTB( 1 ) = VAL__MINI

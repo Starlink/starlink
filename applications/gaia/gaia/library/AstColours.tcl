@@ -89,7 +89,7 @@ itcl::class gaia::AstColours {
    #  -----------
    private destructor  {
    }
-   
+
    #  Procs:
    #  ------
 
@@ -102,7 +102,7 @@ itcl::class gaia::AstColours {
    #  colour is made. Set index to -1 for automatic chosing of index
    #  (this is returned). Maximum colour index is 63 (i.e. 64 colours).
    public proc add_custom_colour {index colour} {
-      if { $index == -1 } { 
+      if { $index == -1 } {
          set index $count_
       }
       if { $index > 63 } {
@@ -111,7 +111,7 @@ itcl::class gaia::AstColours {
       if { $index >= $standard_count_ } {
          set colours_($index) $colour
          set indices_($colour) $index
-         
+
          #  Add colour to GRF interface.
          gaiautils::grfaddcolour $index $colour
 

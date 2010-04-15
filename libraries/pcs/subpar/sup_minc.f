@@ -2,16 +2,16 @@
 *+
 *  Name:
 *     SUBPAR_MINC
- 
+
 *  Purpose:
 *     To set the minimum value which the parameter may take.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_MINC( NAMECODE, VALUE, STATUS )
- 
+
 *  Description:
 *     This routine saves the specified value in the SUBPAR common
 *     'values' array corresponding with the type of the parameter,
@@ -39,10 +39,10 @@
 *        The pointer to the common blocks for the parameter.
 *     VALUE = REAL (Given)
 *        The required minimum parameter value.
- 
+
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Copyright:
 *     Copyright (C) 1990, 1991, 1992, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     27-SEP-1990 (AJC):
 *        Original version.
@@ -82,15 +82,15 @@
 *      1_FEB-1996 (AJC):
 *        Use SUBPAR__STRLEN
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
@@ -99,16 +99,16 @@
                                  !
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'       ! SUBPAR common blocks etc.
- 
+
 *  Arguments Given:
       INTEGER NAMECODE
       CHARACTER*(*)VALUE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
- 
+
 *  Local Variables:
       INTEGER TYPE               ! The type of the parameter
       REAL TREAL                 ! Temporary REAL value
@@ -119,7 +119,7 @@
 *.
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Get parameter type
       TYPE = MOD(PARTYPE(NAMECODE), 10)
 
@@ -193,7 +193,7 @@
                CALL EMS_REP( 'SUP_MIN5', 'SUBPAR: Parameter ^NAME'
      :         // ' - ran out of space for MIN values', STATUS )
             END IF
-         END IF 
+         END IF
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated
@@ -247,7 +247,7 @@
                CALL EMS_REP( 'SUP_MIN5', 'SUBPAR: Parameter ^NAME'
      :         // ' - ran out of space for MIN values', STATUS )
             END IF
-         END IF 
+         END IF
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated
@@ -301,7 +301,7 @@
      :         // ' - ran out of space for MIN values', STATUS )
             END IF
 
-         END IF 
+         END IF
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated

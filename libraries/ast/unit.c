@@ -24,12 +24,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -46,25 +46,25 @@
 *     15-JUL-2004 (DSB):
 *        In astUnitMapper: if no Mapping can be found from input to
 *        output units (e.g. because fo the less than perfect simplication
-*        algorithm in SimplifyTree), try finding a Mapping from output to 
+*        algorithm in SimplifyTree), try finding a Mapping from output to
 *        input units and inverting the result.
 *     14-DEC-2004 (DSB):
-*        In CreateTree, move the invocation of FixConstants from after 
+*        In CreateTree, move the invocation of FixConstants from after
 *        InvertConstants to before InvertConstants. This is because
 *        InvertConstants ignores nodes which contain all constant
 *        arguments. This results in constants not being inverted in
-*        expressions such as "1/60 deg" (because all arguments are 
+*        expressions such as "1/60 deg" (because all arguments are
 *        constant in the the "1/60" node).
 *     18-JAN-2005 (DSB):
 *        Fix memory leaks.
 *     2-FEB-2005 (DSB):
 *        - Avoid using astStore to allocate more storage than is supplied
-*        in the "data" pointer. This can cause access violations since 
+*        in the "data" pointer. This can cause access violations since
 *        astStore will then read beyond the end of the "data" area.
 *     15-FEB-2005 (DSB):
 *        - Modified CleanExp to fix up some common units mistakes.
 *     21-FEB-2005 (DSB):
-*        - Modified CleanExp to accept <word><digit> as equivalent to 
+*        - Modified CleanExp to accept <word><digit> as equivalent to
 *        <word>^<digit>.
 *        - Modified MakeTree to do case insensitive checking if case
 *        sensitive checking failsto produce a match to a multiplier/unit
@@ -75,7 +75,7 @@
 *     6-APR-2006 (DSB):
 *        Modify CleanExp to convert "MJY/STER" to standard form ("MJy/sr").
 *     7-JUL-2006 (DSB):
-*        Correct initialisation of "word" flag in CleanExp. 
+*        Correct initialisation of "word" flag in CleanExp.
 *     17-MAY-2007 (DSB):
 *        Simplify the units string returned by astUnitNormaliser.
 *        - Fix indexing bug in CombineFactors.
@@ -96,7 +96,7 @@
 #define PI 3.141592653589793
 #define E 2.718281828459045
 
-/* Macro which returns the nearest integer to a given floating point 
+/* Macro which returns the nearest integer to a given floating point
    value. */
 #define NINT(x) (int)((x)+(((x)>0.0)?0.5:-0.5))
 
@@ -113,9 +113,9 @@
 + or -. */
 #define ISWORD(c) (isalnum(c)||((c)=='+')||((c)=='-'))
 
-/* The number of basic dimension quantities used for dimensional analysis. 
-   In addition to the usual M, L and T, this includes pseudo-dimensions 
-   describing strictly dimensionless quantities such as plane angle, 
+/* The number of basic dimension quantities used for dimensional analysis.
+   In addition to the usual M, L and T, this includes pseudo-dimensions
+   describing strictly dimensionless quantities such as plane angle,
    magnitude, etc. */
 #define NQUANT 9
 
@@ -123,14 +123,14 @@
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
-#include "error.h"               
-#include "memory.h"              
-#include "pointset.h"            
-#include "mapping.h"             
-#include "unitmap.h"             
-#include "zoommap.h"             
-#include "mathmap.h"             
-#include "unit.h"                
+#include "error.h"
+#include "memory.h"
+#include "pointset.h"
+#include "mapping.h"
+#include "unitmap.h"
+#include "zoommap.h"
+#include "mathmap.h"
+#include "unit.h"
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -187,7 +187,7 @@ typedef struct UnitNode {
    double con;              /* Constant to be loaded by OP_LDCON operations */
    struct KnownUnit *unit;  /* Known unit referred to by OP_LDVAR nodes */
    Multiplier *mult;        /* Multiplier used by OP_LDVAR nodes */
-   const char *name;        /* User-defined unit referred to by OP_LDVAR 
+   const char *name;        /* User-defined unit referred to by OP_LDVAR
                                nodes (no multiplier prefix included) */
 } UnitNode;
 
@@ -221,17 +221,17 @@ static Multiplier *multipliers = NULL;
 #ifdef THREAD_SAFE
 
 static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 ); 
-#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 ); 
+#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 );
+#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 );
 
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
-#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 );
 
 #else
 
-#define LOCK_MUTEX1 
-#define UNLOCK_MUTEX1 
+#define LOCK_MUTEX1
+#define UNLOCK_MUTEX1
 
 #define LOCK_MUTEX2
 #define UNLOCK_MUTEX2
@@ -274,7 +274,7 @@ static int SplitUnit( const char *, int, const char *, int, Multiplier **, int *
 static UnitNode *ModifyPrefix( UnitNode *, int * );
 static int ConStart( const char *, double *, int *, int * );
 
-/*  Debug functions... 
+/*  Debug functions...
 static const char *DisplayTree( UnitNode *, int );
 static void OpSym( UnitNode *, char * );
 static const char *OpName( Oper );
@@ -312,7 +312,7 @@ static const char *CleanExp( const char *exp, int *status ) {
 *        - translates various common non-standard units into equivalent
 *          standard units.
 *
-*     Such carefull handling of spaces is necessary since a space is 
+*     Such carefull handling of spaces is necessary since a space is
 *     recognised by the MakeTree function as a multiplication operator.
 
 *  Parameters:
@@ -324,7 +324,7 @@ static const char *CleanExp( const char *exp, int *status ) {
 *     astFree when no longer needed.
 
 *  Notes:
-*     - This function returns NULL if it is invoked with the global error 
+*     - This function returns NULL if it is invoked with the global error
 *     status set, or if it should fail for any reason.
 */
 
@@ -353,7 +353,7 @@ static const char *CleanExp( const char *exp, int *status ) {
    if( !astOK ) return result;
 
 /* Split the supplied string up into tokens. Each block of contiguous
-   alphanumeric characters is a token. Each contiguous block of 
+   alphanumeric characters is a token. Each contiguous block of
    non-alphanumerical characters is also a token. The + and - signs are
    counted as alphanumeric. */
    start = exp;
@@ -366,7 +366,7 @@ static const char *CleanExp( const char *exp, int *status ) {
          if( !ISWORD( *p ) ) {
             l = p - start;
             t = astStore( NULL, start, l + 1 );
-            if( t ) t[ l ] = 0;            
+            if( t ) t[ l ] = 0;
             tok = astGrow( tok, ntok + 1, sizeof( char * ) );
             if( tok ) tok[ ntok++ ] = t;
             start = p;
@@ -376,7 +376,7 @@ static const char *CleanExp( const char *exp, int *status ) {
          if( ISWORD( *p ) ) {
             l = p - start;
             t = astStore( NULL, start, l + 1 );
-            if( t ) t[ l ] = 0;            
+            if( t ) t[ l ] = 0;
             tok = astGrow( tok, ntok + 1, sizeof( char * ) );
             if( tok ) tok[ ntok++ ] = t;
             start = p;
@@ -387,12 +387,12 @@ static const char *CleanExp( const char *exp, int *status ) {
 
    l = p - start;
    t = astStore( NULL, start, l + 1 );
-   if( t ) t[ l ] = 0;            
+   if( t ) t[ l ] = 0;
    tok = astGrow( tok, ntok + 1, sizeof( char * ) );
    if( tok ) tok[ ntok++ ] = t;
 
-/* Check the tokens for known non-standard unit syntax, and replace with the 
-   equivalent standard syntax. Starlink SPLAT has a class called UnitUtilities 
+/* Check the tokens for known non-standard unit syntax, and replace with the
+   equivalent standard syntax. Starlink SPLAT has a class called UnitUtilities
    which has more of these common units mistakes. AST has to be a bit
    more conservative than SPLAT though because of its wider remit. */
    len = 0;
@@ -402,10 +402,10 @@ static const char *CleanExp( const char *exp, int *status ) {
       l = strlen( t );
       tt = astStore( tt, t, l + 1 );
 
-/* Any alphabetical word followed by a digit is taken as <word>^<digit>. 
-   Any alphabetical word followed by a sign and a digit is taken as 
+/* Any alphabetical word followed by a digit is taken as <word>^<digit>.
+   Any alphabetical word followed by a sign and a digit is taken as
    <word>^<sign><digit>. */
-      if( l > 1 && *t != '-' && *t != '+' && 
+      if( l > 1 && *t != '-' && *t != '+' &&
           strcspn( t, "0123456789" ) == l - 1 ) {
          tok[ i ] = astMalloc( l + 2 );
          if( tok[ i ] ) {
@@ -422,7 +422,7 @@ static const char *CleanExp( const char *exp, int *status ) {
          }
          l++;
 
-/* If the word ends with "micron" change to "(<start>m*1.0E-6)". Should be OK 
+/* If the word ends with "micron" change to "(<start>m*1.0E-6)". Should be OK
    for things like "Kmicron". */
       } else if( ( s = strstr( t, "micron" ) ) ) {
          tok[ i ] = astMalloc( s - t + 11 );
@@ -444,14 +444,14 @@ static const char *CleanExp( const char *exp, int *status ) {
          l = 2;
          t = astFree( t );
 
-/* If the word ends with "JY" and is preceeded by a single character, change 
+/* If the word ends with "JY" and is preceeded by a single character, change
    to "<start>Jy". Should be OK for things like "MJY". */
       } else if( l == 3 && !strcmp( t + 1, "JY" ) ) {
          tok[ i ][ 2 ] = 'y';
 
 /* If the word begins with "nano" (case-insensitive) change "nano" to
    "n". Such changes are usually handled by SplitUnit, but we need to
-   handle this as a special case here since scanf seems to read "nan" as 
+   handle this as a special case here since scanf seems to read "nan" as
    a string representation of NaN. */
       } else if( !Ustrncmp( t, "nano", 4, status ) ) {
          tok[ i ] = astStore( NULL, t + 3, l - 2 );
@@ -481,7 +481,7 @@ static const char *CleanExp( const char *exp, int *status ) {
       *p = 0;
       tok = astFree( tok );
 
-/* Now do other cleaning. 
+/* Now do other cleaning.
    ---------------------- */
 
 /* Initialise a pointer to the previous character read from the string. */
@@ -508,7 +508,7 @@ static const char *CleanExp( const char *exp, int *status ) {
                ps = 1;
             }
 
-/* Write all non-space characters to the string, and clear the flag which 
+/* Write all non-space characters to the string, and clear the flag which
    indicates if the previous character written to the string was a space. */
          } else {
             *(w++) = *r;
@@ -540,8 +540,8 @@ static const char *CleanExp( const char *exp, int *status ) {
                ps = 1;
             }
 
-/* If the current character is an operator or parenthesis, back up one 
-   character before writing it out if the previous written character was 
+/* If the current character is an operator or parenthesis, back up one
+   character before writing it out if the previous written character was
    a space. */
          } else if( *r == '*' || *r == '/' || *r == '^' || *r == '.' ||
                     *r == ')' || *r == '(' ) {
@@ -550,7 +550,7 @@ static const char *CleanExp( const char *exp, int *status ) {
             po = 1;
             ps = 0;
 
-/* If the current character is not a space and not an operator symbol, 
+/* If the current character is not a space and not an operator symbol,
    just write it out. */
          } else {
             *(w++) = *r;
@@ -590,7 +590,7 @@ static int CmpTree( UnitNode *tree1, UnitNode *tree2, int exact, int *status ) {
 *  Description:
 *     This function returns a zero value if the two trees are
 *     equivalent. This requires the trees to have identical structure
-*     except that, if "exact" is zero, arguments for OP_MULT nodes can 
+*     except that, if "exact" is zero, arguments for OP_MULT nodes can
 *     be swapped.
 *
 *     If the trees are not equivalent then a value of +1 or -1 is returned
@@ -611,7 +611,7 @@ static int CmpTree( UnitNode *tree1, UnitNode *tree2, int exact, int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Zero if the two trees are equal. +1 if tree1 should be placed before 
+*     Zero if the two trees are equal. +1 if tree1 should be placed before
 *     tree2 in a sorted list of trees. -1 if tree1 should be placed after
 *     tree2 in a sorted list of trees.
 
@@ -643,8 +643,8 @@ static int CmpTree( UnitNode *tree1, UnitNode *tree2, int exact, int *status ) {
 
 /* If both supplied nodes are constant nodes, compare the constant values. */
    } else if( tree1->con != AST__BAD ){
-      result = EQUAL( tree1->con, tree2->con ) ? 0 : ( 
-                 ( tree1->con > tree2->con ) ? 1 : -1 ); 
+      result = EQUAL( tree1->con, tree2->con ) ? 0 : (
+                 ( tree1->con > tree2->con ) ? 1 : -1 );
 
 /* Otherwise, compare the arguments for the node. */
    } else {
@@ -654,10 +654,10 @@ static int CmpTree( UnitNode *tree1, UnitNode *tree2, int exact, int *status ) {
       }
 
 /* If the head nodes of the two trees are OP_MULT nodes, and the above
-   check determined they are different, this may be just because they 
-   have their operands swapped. If "exact" si zero, this is considered an 
-   insignificant difference between the two trees which we should ignore. 
-   To check for this try comparing the arguments again, this time swapping 
+   check determined they are different, this may be just because they
+   have their operands swapped. If "exact" si zero, this is considered an
+   insignificant difference between the two trees which we should ignore.
+   To check for this try comparing the arguments again, this time swapping
    the arguments of tree2. */
       if( result && op == OP_MULT && !exact ) {
          for( i = 0; i < tree1->narg; i++ ) {
@@ -674,7 +674,7 @@ static int CmpTree( UnitNode *tree1, UnitNode *tree2, int exact, int *status ) {
    return result;
 }
 
-static UnitNode *CombineFactors( UnitNode **factors, double *powers, 
+static UnitNode *CombineFactors( UnitNode **factors, double *powers,
                                  int nfactor, double coeff, int *status ) {
 /*
 *  Name:
@@ -688,7 +688,7 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
 
 *  Synopsis:
 *     #include "unit.h"
-*     UnitNode *CombineFactors( UnitNode **factors, double *powers, 
+*     UnitNode *CombineFactors( UnitNode **factors, double *powers,
 *                               int nfactor, double coeff, int *status )
 
 *  Class Membership:
@@ -702,17 +702,17 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
 
 *  Parameters:
 *     factors
-*        A pointer to an array with "nfactor" elements, each element being 
+*        A pointer to an array with "nfactor" elements, each element being
 *        a pointer to a UnitNode which is a factor of the required tree.
 *        On exit, the array is sorted.
 *     powers
-*        A pointer to an array with "nfactor" elements, each element being a 
+*        A pointer to an array with "nfactor" elements, each element being a
 *        double holding the power of the associated factor in "factors".
 *        On exit, the array reflects the sorting applied to "factors".
 *     nfactor
-*        The number of elements in the "factors" and "powers" arrays. 
+*        The number of elements in the "factors" and "powers" arrays.
 *     coeff
-*        The overall coefficient to be applied to the product of the factors. 
+*        The overall coefficient to be applied to the product of the factors.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -736,7 +736,7 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
    UnitNode *node2;
    UnitNode *pnode;
    double ptmp;
-  
+
 /* Initialise. */
    result = NULL;
 
@@ -783,7 +783,7 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
          if( EQUAL( powers[ i ], 1.0 ) ) {
             node2 = CopyTree( factors[ i ], status );
 
-/* Otherwise, for non-zero, non-unity powers, we create a POW node for 
+/* Otherwise, for non-zero, non-unity powers, we create a POW node for
    the factor. */
          } else {
             node2 = NewNode( NULL, OP_POW, status );
@@ -796,8 +796,8 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
          }
 
 /* We now combine node1 and node2 using an OP_MULT node, which becomes
-   the "node1" for the next pass. On the first pass we may have no node1 (if 
-   the supplied coefficient was 1.0), in which case we reserve the current 
+   the "node1" for the next pass. On the first pass we may have no node1 (if
+   the supplied coefficient was 1.0), in which case we reserve the current
    node2 as the node1 for the next pass. */
          if( node1 ) {
             result = NewNode( NULL, OP_MULT, status );
@@ -847,14 +847,14 @@ static int ComplicateTree( UnitNode **node, int *status ) {
 *     Unit member function.
 
 *  Description:
-*     This function modifies a tree of UnitNodes by removing standardisations 
+*     This function modifies a tree of UnitNodes by removing standardisations
 *     introduced by SimplifyTree. The standardisations removed are ones
-*     which would make the corresponding algebraic expression (as produced 
+*     which would make the corresponding algebraic expression (as produced
 *     by MakeExp) unnatural to a human reader.
 
 *  Parameters:
 *     node
-*        The address of a pointer to the UnitNode at the head of the tree 
+*        The address of a pointer to the UnitNode at the head of the tree
 *        which is to be complicated. On exit the supplied tree is freed and
 *        a pointer to a new tree is placed at the given address.
 
@@ -893,19 +893,19 @@ static int ComplicateTree( UnitNode **node, int *status ) {
       if( ComplicateTree( &( (*node)->arg[ i ] ), status ) ) result = 1;
    }
 
-/* Now undo specific simplifications appropriate to the nature of the node at 
+/* Now undo specific simplifications appropriate to the nature of the node at
    the head of the tree. */
    op = (*node)->opcode;
 
 /* If the head is an OP_MULT node with a constant first argument and
-   a "LN" second argument, rearrange the nodes to represent ln(x**k) instead 
-   of k*ln(x). If k is an integer multiple of "0.1/ln(10)" convert the "ln" 
+   a "LN" second argument, rearrange the nodes to represent ln(x**k) instead
+   of k*ln(x). If k is an integer multiple of "0.1/ln(10)" convert the "ln"
    function into a "log" (base 10) function. Check for "k==1" in which
    case we do not need a POW node. */
    if( (*node)->opcode == OP_MULT ) {
 
       con = (*node)->arg[ 0 ]->con;
-      if( con != AST__BAD && (*node)->arg[ 1 ]->opcode == OP_LN ) {      
+      if( con != AST__BAD && (*node)->arg[ 1 ]->opcode == OP_LN ) {
          fk = 10.0*con*log( 10.0 );
          k = NINT(fk);
          if( EQUAL(fk,k) ) {
@@ -926,35 +926,35 @@ static int ComplicateTree( UnitNode **node, int *status ) {
                node1->con = con;
                node3->arg[ 0 ] = node2;
                node3->arg[ 1 ] = node1;
-               newnode->arg[ 0 ] = node3;            
+               newnode->arg[ 0 ] = node3;
             } else {
-               newnode->arg[ 0 ] = node2;            
-            }         
+               newnode->arg[ 0 ] = node2;
+            }
          }
 
 /* Replace "(A**-1)*B" with "B/A" */
       } else if( (*node)->arg[ 0 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, -1.0 )) {      
+                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, -1.0 )) {
          newnode = NewNode( NULL, OP_DIV, status );
          if( astOK ) {
-            newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 1 ], status );             
+            newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 1 ], status );
             newnode->arg[ 1 ] = CopyTree( (*node)->arg[ 0 ]->arg[ 0 ], status );
          }
 
 /* Replace "B*(A**-1)" with "B/A" */
       } else if( (*node)->arg[ 1 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 1 ]->arg[ 1 ]->con, -1.0 )) {      
+                 EQUAL( (*node)->arg[ 1 ]->arg[ 1 ]->con, -1.0 )) {
          newnode = NewNode( NULL, OP_DIV, status );
          if( astOK ) {
-            newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 0 ], status );             
+            newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 0 ], status );
             newnode->arg[ 1 ] = CopyTree( (*node)->arg[ 1 ]->arg[ 0 ], status );
          }
 
 /* Convert (x**k)*(y**k) to (x*y)**k. */
       } else if( (*node)->arg[ 0 ]->opcode == OP_POW &&
                  (*node)->arg[ 1 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, 
-                        (*node)->arg[ 1 ]->arg[ 1 ]->con )) {      
+                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con,
+                        (*node)->arg[ 1 ]->arg[ 1 ]->con )) {
          newnode = NewNode( NULL, OP_POW, status );
          node1 = NewNode( NULL, OP_MULT, status );
          if( astOK ) {
@@ -1052,7 +1052,7 @@ static UnitNode *ConcatTree( UnitNode *tree1, UnitNode *tree2, int *status ) {
 *     tree1
 *        A pointer to the first tree.
 *     tree2
-*        A pointer to the second tree. This should have no more than one 
+*        A pointer to the second tree. This should have no more than one
 *        OP_LDVAR node.
 *     status
 *        Pointer to the inherited status variable.
@@ -1074,7 +1074,7 @@ static UnitNode *ConcatTree( UnitNode *tree1, UnitNode *tree2, int *status ) {
    UnitNode *result;
    UnitNode **units;
    int nunits;
-  
+
 /* Initialise. */
    result = NULL;
 
@@ -1082,14 +1082,14 @@ static UnitNode *ConcatTree( UnitNode *tree1, UnitNode *tree2, int *status ) {
    if( !astOK ) return result;
 
 /* Produce a copy of tree2. */
-   result = CopyTree( tree2, status );   
+   result = CopyTree( tree2, status );
 
 /* Locate the OP_LDVAR node in the copy of tree2. */
    units = NULL;
    nunits = 0;
    LocateUnits( result, &units, &nunits, status );
 
-/* If no OP_LDVAR nodes were found in tree2, we cannot concatenate the 
+/* If no OP_LDVAR nodes were found in tree2, we cannot concatenate the
    trees. */
    if( nunits > 0 ) {
 
@@ -1111,7 +1111,7 @@ static UnitNode *ConcatTree( UnitNode *tree1, UnitNode *tree2, int *status ) {
 
 /* Otherwise, search for the node to be replaced and do the substitution
    within the tree created earlier. */
-         } else {      
+         } else {
             ReplaceNode( result, units[ 0 ], CopyTree( tree1, status ), status );
          }
       }
@@ -1140,7 +1140,7 @@ static int ConStart( const char *text, double *val, int *nc, int *status ) {
 
 *  Synopsis:
 *     #include "unit.h"
-*     int ConStart( const char *text, double *val, int *nc, int *status ) 
+*     int ConStart( const char *text, double *val, int *nc, int *status )
 
 *  Class Membership:
 *     Unit member function.
@@ -1148,7 +1148,7 @@ static int ConStart( const char *text, double *val, int *nc, int *status ) {
 *  Description:
 *     This function checks if the supplied string starts with a literal
 *     numeric constant and returns it if it does. It is a wrap-up for scanf
-*     since scanf has non-standard behaviour on some platforms (e.g. Cygwin 
+*     since scanf has non-standard behaviour on some platforms (e.g. Cygwin
 *     scanf interprets the character "n" as a floating point number!).
 
 *  Parameters:
@@ -1156,7 +1156,7 @@ static int ConStart( const char *text, double *val, int *nc, int *status ) {
 *        The text to check.
 *     val
 *        Address of a double to receive any numerical constant read
-*        from the start of the string. Unity is returned if the string 
+*        from the start of the string. Unity is returned if the string
 *        does not start with a numerical constant.
 *     nc
 *        Address of an int to receive the number of characters used to
@@ -1174,7 +1174,7 @@ static int ConStart( const char *text, double *val, int *nc, int *status ) {
    int result;
    const char *c;
 
-/* Initialise */      
+/* Initialise */
    *nc = 0;
    *val = 1.0;
 
@@ -1184,11 +1184,11 @@ static int ConStart( const char *text, double *val, int *nc, int *status ) {
 /* Use sscanf to see if the string begin with a numerical constant */
    result = astSscanf( text, "%lf%n", val, nc );
 
-/* If so, check that the first non-blank character in the string 
+/* If so, check that the first non-blank character in the string
    is not "N" (interpreted by Cygwin as numerical zero!). */
    if( result ) {
       c = text;
-      while( isspace( *c ) ) c++;   
+      while( isspace( *c ) ) c++;
       if( *c == 'n' || *c == 'N' ) {
          result = 0;
          *nc = 0;
@@ -1231,7 +1231,7 @@ static UnitNode *CopyTree( UnitNode *tree, int *status ) {
 *     A pointer to the UnitNode at the head of the new tree.
 
 *  Notes:
-*     - A value of NULL will be returned if this function is invoked with 
+*     - A value of NULL will be returned if this function is invoked with
 *     the global error status set, or if it should fail for any reason.
 */
 
@@ -1239,8 +1239,8 @@ static UnitNode *CopyTree( UnitNode *tree, int *status ) {
    UnitNode **args;
    UnitNode *result;
    int i;
-   int narg;      
-   
+   int narg;
+
 /* Initialise. */
    result = NULL;
 
@@ -1249,7 +1249,7 @@ static UnitNode *CopyTree( UnitNode *tree, int *status ) {
 
 /* Create a new node to represent the head of the supplied tree. */
    result = astMalloc( sizeof( UnitNode ) );
-  
+
 /* Check pointers can be used safely. */
    if( astOK ) {
 
@@ -1262,7 +1262,7 @@ static UnitNode *CopyTree( UnitNode *tree, int *status ) {
       result->opcode = tree->opcode;
       result->narg = narg;
       result->con = tree->con;
-      result->name = tree->name ? astStore( NULL, tree->name, 
+      result->name = tree->name ? astStore( NULL, tree->name,
                                             strlen( tree->name ) + 1 ) : NULL;
 
 /* Create an array of UnitNode pointers for the arguments. */
@@ -1306,7 +1306,7 @@ static UnitNode *CreateTree( const char *exp, int basic, int lock, int *status )
 *     This function converts the supplied algebraic units expression into
 *     a tree of UnitNodes. The result tree can optionally be expanded to
 *     create a tree in which the "roots" (LDVAR nodes) all refer to
-*     basic units. 
+*     basic units.
 
 *  Parameters:
 *     exp
@@ -1345,13 +1345,13 @@ static UnitNode *CreateTree( const char *exp, int basic, int lock, int *status )
    multiplication symbols). */
    cleanex = CleanExp( exp, status );
 
-/* If the string is blank, return the NULL pointer. Otherwise, create a 
-   tree of UnitNodes describing the units. The returned tree has LDVAR 
+/* If the string is blank, return the NULL pointer. Otherwise, create a
+   tree of UnitNodes describing the units. The returned tree has LDVAR
    nodes which refer to the unit symbols contained in the supplied string. */
    if( cleanex && (*cleanex) ) {
       result = MakeTree( cleanex, strlen( cleanex ), lock, status );
 
-/* Replace each subtree which simply combines constants (i.e. which has no 
+/* Replace each subtree which simply combines constants (i.e. which has no
    OP_LDVAR nodes) with a single OP_LDCON node. */
       FixConstants( &result, 0, status );
 
@@ -1393,25 +1393,25 @@ static int DimAnal( UnitNode *node, double powers[NQUANT], double *scale, int *s
 *     Unit member function.
 
 *  Description:
-*     This function returns a set of powers and a scaling factor which 
+*     This function returns a set of powers and a scaling factor which
 *     represent the units tree.
 
 *  Parameters:
 *     node
 *        Pointer to the UnitNode at the head of the unit tree.
 *     powers
-*        An array in which are returned the powers for each of the following 
-*        basic units (in the order shown): kilogramme, metre, second, radian, 
-*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does 
-*        not depend on a given basic unit a value of 0.0 will be returned in 
-*        the array. The returns values represent a system of units which is a 
-*        scaled form of the supplied units, expressed in the basic units of m, 
-*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned 
+*        An array in which are returned the powers for each of the following
+*        basic units (in the order shown): kilogramme, metre, second, radian,
+*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does
+*        not depend on a given basic unit a value of 0.0 will be returned in
+*        the array. The returns values represent a system of units which is a
+*        scaled form of the supplied units, expressed in the basic units of m,
+*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned
 *        array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
 *     scale
-*        Pointer to a location at which to return a scaling factor for the 
-*        supplied units. The is the value, in the units represented by the 
-*        returned powers, which corresponds to a value of 1.0 in the supplied 
+*        Pointer to a location at which to return a scaling factor for the
+*        supplied units. The is the value, in the units represented by the
+*        returned powers, which corresponds to a value of 1.0 in the supplied
 *        units.
 *     status
 *        Pointer to the inherited status variable.
@@ -1517,7 +1517,7 @@ static int DimAnal( UnitNode *node, double powers[NQUANT], double *scale, int *s
 
    } else if( oper == OP_LDE ) {
       *scale = 1.0/E;
-   
+
    }
 
    return result;
@@ -1578,7 +1578,7 @@ static int EndsWith( const char *c, int nc, const char *test, int *status ){
    tlen = strlen( test );
    if( tlen <= nc ){
 
-/* Get a pointer to where the matching string would start if the string "c" 
+/* Get a pointer to where the matching string would start if the string "c"
    ends with the required string "test". */
       start = c - tlen + 1;
 
@@ -1597,7 +1597,7 @@ static int EndsWith( const char *c, int nc, const char *test, int *status ){
 
 }
 
-static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers, 
+static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
                          int *nfactor, double *coeff, int *status ){
 /*
 *  Name:
@@ -1611,7 +1611,7 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
 
 *  Synopsis:
 *     #include "unit.h"
-*     void FindFactors( UnitNode *node, UnitNode ***factors, double **powers, 
+*     void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
 *                       int *nfactor, double *coeff, int *status )
 
 *  Class Membership:
@@ -1622,28 +1622,28 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
 *     an array of pointers to nodes within the supplied tree which form
 *     factors of the tree. The power associated with each factor is also
 *     returned, together with an overall coefficient for the tree. The
-*     expression represented by the tree is thus the product of the 
+*     expression represented by the tree is thus the product of the
 *     coefficient with each of the factors, each raised to the associated
 *     power.
 
 *  Parameters:
 *     node
-*        A pointer to the UnitNode at the head of the tree which is to be 
+*        A pointer to the UnitNode at the head of the tree which is to be
 *        analysed.
 *     factors
-*        The address at which to return a pointer to an array with "*nfactor" 
+*        The address at which to return a pointer to an array with "*nfactor"
 *        elements, each element being a pointer to a UnitNode within the
 *        supplied tree which is a factor of the supplied tree.
 *     powers
-*        The address at which to return a pointer to an array with "*nfactor" 
+*        The address at which to return a pointer to an array with "*nfactor"
 *        elements, each element being a double holding the power of the
 *        associated factor in "*factors".
 *     nfactor
 *        The address of an int containing the number of elements in the
-*        returned "*factors" and "*powers" arrays. 
+*        returned "*factors" and "*powers" arrays.
 *     coeff
 *        The address of a double containing the overall coefficient to be
-*        applied to the product of the factors. 
+*        applied to the product of the factors.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -1686,7 +1686,7 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
 /* Combine the two lists. Loop round the factors of the seocnd argument. */
       for( i = 0; i < nfac1; i++ ) {
 
-/* See if there is already an equivalent factor in the returned list of 
+/* See if there is already an equivalent factor in the returned list of
    factors. */
          found = 0;
          for( j = 0; j < *nfactor; j++ ) {
@@ -1750,7 +1750,7 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
    (the denominator). */
       for( i = 0; i < nfac1; i++ ) {
 
-/* See if there is already an equivalent factor in the returned list of 
+/* See if there is already an equivalent factor in the returned list of
    factors. */
          found = 0;
          for( j = 0; j < *nfactor; j++ ) {
@@ -1812,7 +1812,7 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
    } else if( node->con != AST__BAD ) {
       *coeff = node->con;
 
-/* Other nodes have no factors other than themselves, so just return a 
+/* Other nodes have no factors other than themselves, so just return a
    pointer to the supplied node. */
    } else {
       *factors = astMalloc( sizeof( UnitNode *) );
@@ -1822,7 +1822,7 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
          (*factors)[ 0 ] = node;
          (*powers)[ 0 ] = 1.0;
          *coeff = 1.0;
-      }        
+      }
    }
 
 /* If an error has occurred, free any returned resources. */
@@ -1858,11 +1858,11 @@ static void FixConstants( UnitNode **node, int unity, int *status ) {
 
 *  Parameters:
 *     node
-*        The address of a pointer to the UnitNode at the head of the tree 
+*        The address of a pointer to the UnitNode at the head of the tree
 *        which is to be fixed. On exit the supplied tree is freed and a
 *        pointer to a new tree is palced at he given address.
 *     unity
-*        If non-zero, then all multiplicative constants are set to 1.0, and 
+*        If non-zero, then all multiplicative constants are set to 1.0, and
 *        their original values are forgotten, but only if the other
 *        argument of the OP_MULT node is an OP_LDVAR, OP_POW or OP_SQRT Node.
 *     status
@@ -1902,8 +1902,8 @@ static void FixConstants( UnitNode **node, int unity, int *status ) {
    it will always be argument zero.  If this is an OP_MULT node and arg[0]
    is constant and "unity" is non-zero and arg[1] is an OP_LDVAR, OP_POW
    or OP_SQRT node, replace the constant value by 1.0. */
-      if( unity && op == OP_MULT && 
-          (*node)->arg[ 0 ]->con != AST__BAD && 
+      if( unity && op == OP_MULT &&
+          (*node)->arg[ 0 ]->con != AST__BAD &&
           ( (*node)->arg[ 1 ]->opcode == OP_LDVAR ||
             (*node)->arg[ 1 ]->opcode == OP_SQRT ||
             (*node)->arg[ 1 ]->opcode == OP_POW ) ) {
@@ -1921,47 +1921,47 @@ static void FixConstants( UnitNode **node, int unity, int *status ) {
                      newcon = log10( (*node)->arg[ 0 ]->con );
                   } else {
                      astError( AST__BADUN, "Illegal negative or zero constant "
-                               "value '%g' encountered.", status, 
+                               "value '%g' encountered.", status,
                                (*node)->arg[ 0 ]->con );
                   }
-               } else if( op == OP_LN ){   
+               } else if( op == OP_LN ){
                   if( (*node)->arg[ 0 ]->con > 0.0 ) {
                      newcon = log( (*node)->arg[ 0 ]->con );
                   } else {
                      astError( AST__BADUN, "Illegal negative or zero constant value "
                                "'%g' encountered.", status, (*node)->arg[ 0 ]->con );
                   }
-               } else if( op == OP_EXP ){  
+               } else if( op == OP_EXP ){
                   newcon = exp( (*node)->arg[ 0 ]->con );
-   
-               } else if( op == OP_SQRT ){ 
+
+               } else if( op == OP_SQRT ){
                   if( (*node)->arg[ 0 ]->con >= 0.0 ) {
                      newcon = sqrt( (*node)->arg[ 0 ]->con );
                   } else {
                      astError( AST__BADUN, "Illegal negative constant value "
                                "'%g' encountered.", status, (*node)->arg[ 0 ]->con );
                   }
-   
-               } else if( op == OP_POW ){  
-                  if( (*node)->arg[ 0 ]->con >= 0.0 || 
+
+               } else if( op == OP_POW ){
+                  if( (*node)->arg[ 0 ]->con >= 0.0 ||
                       (int) (*node)->arg[ 1 ]->con == (*node)->arg[ 1 ]->con ) {
-                     newcon = pow( (*node)->arg[ 0 ]->con, 
+                     newcon = pow( (*node)->arg[ 0 ]->con,
                                    (*node)->arg[ 1 ]->con );
                   } else {
                      astError( AST__BADUN, "Illegal negative constant value "
                                "'%g' encountered.", status, (*node)->arg[ 0 ]->con );
                   }
-   
-               } else if( op == OP_DIV ){  
+
+               } else if( op == OP_DIV ){
                   if( (*node)->arg[ 1 ]->con != 0.0 ) {
                      newcon = (*node)->arg[ 0 ]->con / (*node)->arg[ 1 ]->con;
                   } else {
                      astError( AST__BADUN, "Illegal zero constant value encountered." , status);
                   }
-   
-               } else if( op == OP_MULT ){ 
+
+               } else if( op == OP_MULT ){
                   newcon = (*node)->arg[ 0 ]->con * (*node)->arg[ 1 ]->con;
-   
+
                }
 
 
@@ -2003,8 +2003,8 @@ static UnitNode *FixUnits( UnitNode *node, UnitNode *test, int *status ) {
 
 *  Description:
 *     This function returns a copy of the supplied tree of UnitNodes. All
-*     OP_LDVAR nodes within the copy which refer to units which differ 
-*     from those referred to by the supplied test node are replaced by 
+*     OP_LDVAR nodes within the copy which refer to units which differ
+*     from those referred to by the supplied test node are replaced by
 *     OP_LDCON nodes which load the constant value 1.0.
 
 *  Parameters:
@@ -2042,8 +2042,8 @@ static UnitNode *FixUnits( UnitNode *node, UnitNode *test, int *status ) {
 /* Is the node at the head of the supplied tree an OP_LDVAR node? */
    if( node->opcode == OP_LDVAR ) {
 
-/* Does it refer to a unit which differs from that of the test node? If so 
-   annul the copy created above and return a new OP_LDCON node which loads 
+/* Does it refer to a unit which differs from that of the test node? If so
+   annul the copy created above and return a new OP_LDCON node which loads
    the constant value 1.0. */
       if( strcmp( test->name, node->name ) ) {
          FreeTree( result, status );
@@ -2060,7 +2060,7 @@ static UnitNode *FixUnits( UnitNode *node, UnitNode *test, int *status ) {
    above. */
          FreeTree( result->arg[ i ], status );
 
-/* Create a new argument tree by calling this function recursively to 
+/* Create a new argument tree by calling this function recursively to
    fix units in the argument sub-trees. */
          result->arg[ i ] = FixUnits( node->arg[ i ], test, status );
       }
@@ -2096,7 +2096,7 @@ static UnitNode *FreeTree( UnitNode *node, int *status ) {
 
 *  Parameters:
 *     node
-*        A pointer to the UnitNode at the head of the tree which is to be 
+*        A pointer to the UnitNode at the head of the tree which is to be
 *        freed.
 *     status
 *        Pointer to the inherited status variable.
@@ -2105,7 +2105,7 @@ static UnitNode *FreeTree( UnitNode *node, int *status ) {
 *     A NULL pointer is returned.
 
 *  Notes:
-*     - This function attempts to execute even if it is invoked with 
+*     - This function attempts to execute even if it is invoked with
 *     the global error status set.
 */
 
@@ -2151,20 +2151,20 @@ static KnownUnit *GetKnownUnits( int lock, int *status ) {
 
 *  Synopsis:
 *     #include "unit.h"
-*     KnownUnit *GetKnownUnits( int lock, int *status ) 
+*     KnownUnit *GetKnownUnits( int lock, int *status )
 
 *  Class Membership:
 *     Unit member function.
 
 *  Description:
-*     This function returns a pointer to the head of a linked list of known 
+*     This function returns a pointer to the head of a linked list of known
 *     unit definitions. The unit definitions are created as static module
 *     variables if they have not previously been created.
 
 *  Parameters:
-*     lock 
+*     lock
 *        If non-zero, then lock a mutex prior to accessing the list of
-*        known units. 
+*        known units.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -2172,7 +2172,7 @@ static KnownUnit *GetKnownUnits( int lock, int *status ) {
 *     A pointer to the first known unit definition.
 
 *  Notes:
-*     - A NULL pointer is returned if it is invoked with the global error 
+*     - A NULL pointer is returned if it is invoked with the global error
 *     status set, or if an error occurs.
 */
 
@@ -2192,11 +2192,11 @@ static KnownUnit *GetKnownUnits( int lock, int *status ) {
    }
 
 /* If the linked list of KnownUnit structures describing the known units
-   has not yet been created, create it now. A pointer to the head of the 
+   has not yet been created, create it now. A pointer to the head of the
    linked list is put into the static variable "known_units". */
    if( !known_units ) {
 
-/* At the same time we store pointers to the units describing the basic 
+/* At the same time we store pointers to the units describing the basic
    quantities used in dimensional analysis. Initialise th index of the
    next such unit. */
       iq = 0;
@@ -2314,21 +2314,21 @@ static Multiplier *GetMultipliers( int *status ) {
 
 *  Synopsis:
 *     #include "unit.h"
-*     Multiplier *Multipliers( void ) 
+*     Multiplier *Multipliers( void )
 
 *  Class Membership:
 *     Unit member function.
 
 *  Description:
-*     This function returns a pointer to the head of a linked list of known 
-*     multiplier definitions. The multiplier definitions are created as 
+*     This function returns a pointer to the head of a linked list of known
+*     multiplier definitions. The multiplier definitions are created as
 *     static module variables if they have not previously been created.
 
 *  Returned Value:
 *     A pointer to the first known multiplier definition.
 
 *  Notes:
-*     - A NULL pointer is returned if it is invoked with the global error 
+*     - A NULL pointer is returned if it is invoked with the global error
 *     status set, or if an error occurs.
 */
 
@@ -2346,7 +2346,7 @@ static Multiplier *GetMultipliers( int *status ) {
    LOCK_MUTEX2
 
 /* If the linked list of Multiplier structures describing the known
-   multipliers has not yet been created, create it now. A pointer to the 
+   multipliers has not yet been created, create it now. A pointer to the
    head of the linked list is put into the static variable "multipliers". */
    if( !multipliers ) {
 
@@ -2365,7 +2365,7 @@ static Multiplier *GetMultipliers( int *status ) {
       }
 
 /* Use the above macro to create all the standard multipliers listed in the
-   FITS WCS paper I. */   
+   FITS WCS paper I. */
       MAKEMULT("d",1,1.0E-1,"deci",4)
       MAKEMULT("c",1,1.0E-2,"centi",5)
       MAKEMULT("m",1,1.0E-3,"milli",5)
@@ -2422,7 +2422,7 @@ static void InvertConstants( UnitNode **node, int *status ) {
 
 *  Description:
 *     This function replaces constant unit coefficients by their reciprocal.
-*     This is because a string such as "0.01 m" will be interpreted as 
+*     This is because a string such as "0.01 m" will be interpreted as
 *     meaning "multiply a value in metres by 0.01 to get the value in the
 *     required units", whereas what is actually meant is "use units of
 *     0.01 of a metre" which requires us to divide the value in metres by
@@ -2431,7 +2431,7 @@ static void InvertConstants( UnitNode **node, int *status ) {
 *  Parameters:
 *     node
 *        The address of a pointer to the UnitNode at the head of the tree.
-*        On exit the supplied tree is freed and a pointer to a new tree is 
+*        On exit the supplied tree is freed and a pointer to a new tree is
 *        placed at the given address.
 *     status
 *        Pointer to the inherited status variable.
@@ -2467,7 +2467,7 @@ static void InvertConstants( UnitNode **node, int *status ) {
 /* If all nodes are constant, there are no co-efficients to invert. */
       if( !allcon ) {
 
-/* Iif this is a multiplication node, see if either of its arguments 
+/* Iif this is a multiplication node, see if either of its arguments
    is a constant. If so, invert the constant. This is because a string like
    "0.01 m" means "each unit is 0.01 of a metre". Therefore, to transform
    a value in metres into required units means multiplying the metres
@@ -2536,14 +2536,14 @@ static UnitNode *InvertTree( UnitNode *fwdnode, UnitNode *src, int *status ) {
 
 *  Description:
 *     This function inverts a tree of UnitNodes. The supplied tree should
-*     have exactly one OP_LDVAR node. This will be the quantity represented 
+*     have exactly one OP_LDVAR node. This will be the quantity represented
 *     by the node at the head of the returned tree.
 
 *  Parameters:
 *     fwdnode
-*        A pointer to the UnitNode at the head of the tree which is to be 
+*        A pointer to the UnitNode at the head of the tree which is to be
 *        inverted.
-*     src 
+*     src
 *        A pointer to a UnitNode which is to be used as the root of the
 *        inverted tree. That is, the output from this node should form
 *        the (one and only) varying input to the inverted tree. If the
@@ -2576,7 +2576,7 @@ static UnitNode *InvertTree( UnitNode *fwdnode, UnitNode *src, int *status ) {
 *     using SimplifyTree. This means that the tree contains no nodes with
 *     the following op codes: OP_LOG, OP_SQRT. OP_DIV (SimplifyTree
 *     converts these nodes into OP_LN, OP_POW and OP_MULT nodes).
-*     - A value of NULL will be returned if this function is invoked with 
+*     - A value of NULL will be returned if this function is invoked with
 *     the global error status set, or if it should fail for any reason.
 
 */
@@ -2620,7 +2620,7 @@ static UnitNode *InvertTree( UnitNode *fwdnode, UnitNode *src, int *status ) {
          nextnode = fwdnode->arg[ 0 ];
       }
 
-/* If the head of the forward tree is a OP_POW node. Inverse of 
+/* If the head of the forward tree is a OP_POW node. Inverse of
    "x**k" is "x**(1/k)" */
    } else if( fop == OP_POW ) {
       newnode = NewNode( NULL, OP_POW, status );
@@ -2644,9 +2644,9 @@ static UnitNode *InvertTree( UnitNode *fwdnode, UnitNode *src, int *status ) {
                  fwdnode->arg[ 1 ]->con != AST__BAD ) {
          varg = 0;
       } else {
-         varg = -1; 
+         varg = -1;
       }
-      if( varg != -1 ) {      
+      if( varg != -1 ) {
 
 /* The inverse of "k*x" is "(1/k)*x" (we use MULT nodes instead of DIV
    nodes to maintain the standardisation implemented by SimplifyTree). */
@@ -2658,18 +2658,18 @@ static UnitNode *InvertTree( UnitNode *fwdnode, UnitNode *src, int *status ) {
             newnode->arg[ 1 ] = src;
             nextnode = fwdnode->arg[ varg ];
          }
-      }      
+      }
 
 /* If the head of the forward tree is a OP_LDVAR node, there is nothing
    left to invert. SO return a pointer to the suppleid source node. */
    } else if( fop == OP_LDVAR ) {
       result = src;
-      nextnode = NULL;      
+      nextnode = NULL;
 
 /* If the head of the forward tree is any other node (e.g. a OP_LDCON node),
    the tree cannot be inverted. */
    } else {
-      nextnode = NULL;      
+      nextnode = NULL;
    }
 
 /* If we managed to invert the node at the head of the supplied tree,
@@ -2706,7 +2706,7 @@ static void LocateUnits( UnitNode *node, UnitNode ***units, int *nunits, int *st
 *     Unit member function.
 
 *  Description:
-*     This function locates the units used by a supplied tree of 
+*     This function locates the units used by a supplied tree of
 *     UnitNodes.
 
 *  Parameters:
@@ -2716,16 +2716,16 @@ static void LocateUnits( UnitNode *node, UnitNode ***units, int *nunits, int *st
 *        The address at which is stored a pointer to an array of "*nunits"
 *        elements. Each element of the array holds a pointer to a UnitNode.
 *        The array is extended on exit to hold pointers to the OP_LDVAR nodes
-*        within the supplied tree (i.e. nodes which represent named units, 
-*        either known or unknown). A node is only included in the returned 
-*        array if no other node for the same unit is already included in the 
+*        within the supplied tree (i.e. nodes which represent named units,
+*        either known or unknown). A node is only included in the returned
+*        array if no other node for the same unit is already included in the
 *        array. A NULL pointer should be supplied on the first invocation of
-*        this function. 
+*        this function.
 *     nunits
 *        The address of an integer which holds the number of elements in
 *        the array given by "*units". Updated on exit to included any
-*        elements added to the array. Zero should be supplied on the first 
-*        invocation of this function. 
+*        elements added to the array. Zero should be supplied on the first
+*        invocation of this function.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -2741,7 +2741,7 @@ static void LocateUnits( UnitNode *node, UnitNode ***units, int *nunits, int *st
 /* Is the node at the head of the supplied tree an OP_LDVAR node? */
    if( node->opcode == OP_LDVAR ) {
 
-/* If an array was supplied, see if it already contains a pointer to a node 
+/* If an array was supplied, see if it already contains a pointer to a node
    which refers to the same units. */
       found = 0;
       if( *units ) {
@@ -2788,16 +2788,16 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
 *     Unit member function.
 
 *  Description:
-*     This function produces a string holding an algebraic expression 
+*     This function produces a string holding an algebraic expression
 *     corresponding to a supplied tree of UnitNodes.
 
 *  Parameters:
 *     tree
 *        A pointer to the UnitNode at the head of the tree to be converted
-*        into an algebraic expression. 
+*        into an algebraic expression.
 *     mathmap
-*        If zero, format as an axis label expression. If 1, format as a 
-*        MathMap expression. If 2, format as a FITS unit string. 
+*        If zero, format as an axis label expression. If 1, format as a
+*        MathMap expression. If 2, format as a FITS unit string.
 *     top
 *        Should be non-zero for a top-level entry to this function, and
 *        zero for a recursive entry.
@@ -2809,7 +2809,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
 *     astFree when no longer needed.
 
 *  Notes:
-*     - This function returns NULL if it is invoked with the global error 
+*     - This function returns NULL if it is invoked with the global error
 *     status set, or if it should fail for any reason.
 */
 
@@ -2823,7 +2823,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
    const char *arg1;
    const char *mtxt;
    int larg0;
-   int larg1;          
+   int larg1;
    int lbuff;
    int mlen;
    int par;
@@ -2833,7 +2833,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
    result = NULL;
    if( !astOK ) return result;
 
-/* Modify the tree to make the resulting transformation functions more 
+/* Modify the tree to make the resulting transformation functions more
    natural to human readers. */
    newtree = CopyTree( tree, status );
    ComplicateTree( &newtree, status );
@@ -2842,17 +2842,17 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
    if( !mathmap ) {
 
 /* Fix all multiplicative constants to 1.0 if they multiply an OP_LDVAR
-   OP_SQRT or OP_POW node. This is on the assumption that the returned label 
-   should not include any simple unit scaling (e.g. if the output label would 
-   be "2.345*wavelength", we prefer simply to use "wavelength" since a scaled 
-   wavelength is still a wavelength - i.e. simple scaling does not change 
+   OP_SQRT or OP_POW node. This is on the assumption that the returned label
+   should not include any simple unit scaling (e.g. if the output label would
+   be "2.345*wavelength", we prefer simply to use "wavelength" since a scaled
+   wavelength is still a wavelength - i.e. simple scaling does not change
    the dimensions of a quantity). */
       FixConstants( &newtree, 1, status );
 
 /* Simplify the tree again to get rid of the 1.0 terms which may have
    been introduced by the previous line (but do not re-introduce any
    standardisations - removing them was the reason for calling ComplicateTree).
-   If this simplication introduces any changes, try fixing multiplicative 
+   If this simplication introduces any changes, try fixing multiplicative
    constants again, and so on, until no more changes occur. */
       while( SimplifyTree( &newtree, 0, status ) ) {
          FixConstants( &newtree, 1, status );
@@ -2871,18 +2871,18 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       result = astStore( NULL, buff, lbuff + 1 );
 
 /* "Load Variable Value" nodes - return the variable name. If this is a
-   recursive call to this function, and we are producing a label, append a 
+   recursive call to this function, and we are producing a label, append a
    single space before and after the name. */
    } else if( newtree->opcode ==  OP_LDVAR ) {
       tlen = strlen( newtree->name );
 
-      if( !mathmap && !top ){ 
+      if( !mathmap && !top ){
          result = astMalloc( tlen + 3 );
          if( result ) {
             result[ 0 ] = ' ';
             memcpy( result + 1, newtree->name, tlen );
             memcpy( result + tlen + 1, " ", 2 );
-         }  
+         }
 
       } else if( mathmap == 2 ) {
 
@@ -2906,14 +2906,14 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
 
 /* Single argument functions... place the argument in parentheses after
    the function name. */
-   } else if( newtree->opcode ==  OP_LOG ) {  
+   } else if( newtree->opcode ==  OP_LOG ) {
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
       larg0 = strlen( arg0 );
       if( mathmap == 1 ) {
          result = astMalloc( larg0 + 8 );
          if( result ) memcpy( result, "log10(", 7 );
          a = result + 6;
-      } else { 
+      } else {
          result = astMalloc( larg0 + 6 );
          if( result ) memcpy( result, "log(", 5 );
          a = result + 4;
@@ -2924,7 +2924,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       }
       arg0 = astFree( (void *) arg0 );
 
-   } else if( newtree->opcode ==  OP_LN ) {   
+   } else if( newtree->opcode ==  OP_LN ) {
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
       larg0 = strlen( arg0 );
       if( mathmap == 1 ) {
@@ -2942,7 +2942,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       }
       arg0 = astFree( (void *) arg0 );
 
-   } else if( newtree->opcode ==  OP_EXP ) {  
+   } else if( newtree->opcode ==  OP_EXP ) {
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
       larg0 = strlen( arg0 );
       result = astMalloc( larg0 + 6 );
@@ -2953,7 +2953,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       }
       arg0 = astFree( (void *) arg0 );
 
-   } else if( newtree->opcode ==  OP_SQRT ) { 
+   } else if( newtree->opcode ==  OP_SQRT ) {
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
       larg0 = strlen( arg0 );
       result = astMalloc( larg0 + 7 );
@@ -2964,14 +2964,14 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       }
       arg0 = astFree( (void *) arg0 );
 
-/* POW... the exponent (arg[1]) is always a constant and so does not need 
+/* POW... the exponent (arg[1]) is always a constant and so does not need
    to be placed in parentheses. The first argument only needs to be
    placed in parentheses if it is a two arg node (except we also put it
    in parentheses if it is an OP_LDVAR node and "mathmap" is zero - this is
    because such OP_LDVAR nodes will correspond to axis labels which will
    have spaces before and after them which would look odd if not encloses
    in parentheses). */
-   } else if( newtree->opcode ==  OP_POW ) {  
+   } else if( newtree->opcode ==  OP_POW ) {
 
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
       larg0 = strlen( arg0 );
@@ -3006,21 +3006,21 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       arg1 = astFree( (void *) arg1 );
 
 /* DIV... the first argument (numerator) never needs to be in parentheses.
-   The second argument (denominator) only needs to be placed in parentheses 
+   The second argument (denominator) only needs to be placed in parentheses
    if it is a MULT node. */
-   } else if( newtree->opcode ==  OP_DIV ) {  
+   } else if( newtree->opcode ==  OP_DIV ) {
 
       if( mathmap == 2 && ( sunit = ModifyPrefix( newtree, status ) ) ) {
          result = (char *) MakeExp( sunit, mathmap, 0, status );
          sunit = FreeTree( sunit, status );
 
-      } else {         
+      } else {
          arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
          larg0 = strlen( arg0 );
-   
+
          arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0, status );
          larg1 = strlen( arg1 );
-   
+
          if( newtree->arg[ 1 ]->opcode == OP_MULT &&
              strchr( arg1, '*' ) ) {
             par = 1;
@@ -3029,7 +3029,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
             par = 0;
             result = astMalloc( larg0 + larg1 + 2 );
          }
-   
+
          if( result ) {
             memcpy( result, arg0, larg0 );
             a = result + larg0;
@@ -3040,15 +3040,15 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
             if( par ) *(a++) = ')';
             *a = 0;
          }
-   
+
          arg0 = astFree( (void *) arg0 );
          arg1 = astFree( (void *) arg1 );
       }
 
-/* MULT... the second argument never needs to be in parentheses. The first 
-   argument only needs to be placed in parentheses if it is a DIV or POW 
+/* MULT... the second argument never needs to be in parentheses. The first
+   argument only needs to be placed in parentheses if it is a DIV or POW
    node. */
-   } else if( newtree->opcode ==  OP_MULT ) { 
+   } else if( newtree->opcode ==  OP_MULT ) {
       if( mathmap == 2 && ( sunit = ModifyPrefix( newtree, status ) ) ) {
          result = (char *) MakeExp( sunit, mathmap, 0, status );
          sunit = FreeTree( sunit, status );
@@ -3056,7 +3056,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
       } else {
          arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0, status );
          larg0 = strlen( arg0 );
-   
+
          arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0, status );
          larg1 = strlen( arg1 );
 
@@ -3067,11 +3067,11 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
             if( newtree->arg[ 1 ]->con != AST__BAD ) arg1 = astFree( (void *) arg1 );
          }
 
-/* If we have two arguments, concatentate them, placing the operands in 
+/* If we have two arguments, concatentate them, placing the operands in
    parentheses if necessary. */
          if( arg0 && arg1 ) {
-   
-            if( ( newtree->arg[ 0 ]->opcode == OP_DIV && 
+
+            if( ( newtree->arg[ 0 ]->opcode == OP_DIV &&
                   strchr( arg0, '/' ) ) ||
                 ( newtree->arg[ 0 ]->opcode == OP_POW &&
                   strstr( arg0, "**" ) ) ) {
@@ -3084,7 +3084,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
                result = astMalloc( larg0 + larg1 + 2 );
                a = result;
             }
-      
+
             if( result ) {
                memcpy( a, arg0, larg0 );
                a += larg0;
@@ -3094,14 +3094,14 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top, int *status ) 
                a += larg1;
                *a = 0;
             }
-      
+
             arg0 = astFree( (void *) arg0 );
             arg1 = astFree( (void *) arg1 );
 
 /* If we do not have two arguments, just return the one we do have. */
          } else if( arg0 ){
             result = (char *) arg0;
-   
+
          } else {
             result = (char *) arg1;
          }
@@ -3144,8 +3144,8 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp, 
 *  Parameters:
 *     sym
 *        A pointer to a string which can be used as a symbol to represent
-*        the new named unit. Once defined, this symbol can be included within 
-*        the definition of other derived units. The string should contain 
+*        the new named unit. Once defined, this symbol can be included within
+*        the definition of other derived units. The string should contain
 *        only alphabetical characters (no digits, spaces, punctuation,
 *        etc). Symbols are case sensitive (e.g. "s" is second, but "S" is
 *        Siemens). The string should not include any multiplier prefix.
@@ -3158,8 +3158,8 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp, 
 *        "in" and "out" parameters for the astUnitMapper function.
 *
 *        A NULL pointer or a blank string may supplied for "exp", which
-*        is interpreted as a request for a new basic unit to be created with 
-*        the symbol and label given by the other parameters. 
+*        is interpreted as a request for a new basic unit to be created with
+*        the symbol and label given by the other parameters.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3187,7 +3187,7 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp, 
    if( astOK ) {
 
 /* In case of errors, first nullify the pointer to the next KnownUnit. */
-      result->next = NULL;      
+      result->next = NULL;
 
 /* Store the supplied label and symbol pointers. */
       result->sym = sym;
@@ -3206,10 +3206,10 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp, 
 /* Unit aliases are replaced in use by the KnownUnit pointed to by the
    "use" component of the structure. Indicate this KnownUnitis not an
     alias by setting its "use" component NULL. */
-      result->use = NULL; 
+      result->use = NULL;
    }
 
-/* Mark the end of the section in which memory allocations may never be  
+/* Mark the end of the section in which memory allocations may never be
    freed (other than by any AST exit handler). */
    astEndPM;
 
@@ -3260,7 +3260,7 @@ static AstMapping *MakeMapping( UnitNode *tree, int *status ) {
 *     A pointer to the Mapping. Its Nin and Nout attributes will both be 1.
 
 *  Notes:
-*     - A value of NULL will be returned if this function is invoked with 
+*     - A value of NULL will be returned if this function is invoked with
 *     the global error status set, or if it should fail for any reason.
 */
 
@@ -3274,26 +3274,26 @@ static AstMapping *MakeMapping( UnitNode *tree, int *status ) {
    char *invfun;
    int lfwd;
    int linv;
-   
+
 /* Initialise. */
    result = NULL;
 
 /* Check the inherited status. */
    if( !astOK ) return result;
 
-/* First see if a UnitMap can be used to represent the Mapping from 
-   input units to output units. This will be the case if the supplied tree 
+/* First see if a UnitMap can be used to represent the Mapping from
+   input units to output units. This will be the case if the supplied tree
    consists of a aingle OP_LDVAR node (corresponding to the input units). */
    if( tree->opcode == OP_LDVAR ) {
       result = (AstMapping *) astUnitMap( 1, "", status );
 
-/* Now see if a UnitMap or ZoomMap can be used to represent the Mapping from 
-   input units to output units. This will be the case if the supplied tree 
+/* Now see if a UnitMap or ZoomMap can be used to represent the Mapping from
+   input units to output units. This will be the case if the supplied tree
    consists of a OP_MULT node with one constant argument and on OP_LDVAR
    argument (corresponding to the input units). The standardisation done by
    SimplifyTree will have ensured that the constant will be argument 0
    (and will also have converted "x/k" trees into "(1/k)*x" trees). */
-   } else if( tree->opcode == OP_MULT && 
+   } else if( tree->opcode == OP_MULT &&
               tree->arg[ 0 ]->con != AST__BAD &&
               tree->arg[ 1 ]->opcode == OP_LDVAR ) {
 
@@ -3324,7 +3324,7 @@ static AstMapping *MakeMapping( UnitNode *tree, int *status ) {
       if( !inv ) {
          src = FreeTree( src, status );
          astError( AST__BADUN, "MakeMapping(Unit): Failed to invert "
-                   "supplied tree '%s' (internal AST programming error).", status, 
+                   "supplied tree '%s' (internal AST programming error).", status,
                    fwdexp );
 
 /* If inverted succesfully (which it should be since astUnitMapper should
@@ -3345,25 +3345,25 @@ static AstMapping *MakeMapping( UnitNode *tree, int *status ) {
          if( invfun ) {
             memcpy( fwdfun, "output_units=", 14 );
             memcpy( invfun, "input_units=", 13 );
- 
+
 /* Append the expressions following the equals signs. */
             strcpy( fwdfun + 13, fwdexp );
             strcpy( invfun + 12, invexp );
 
 /* Create the MathMap. */
-            result = (AstMapping *) astMathMap( 1, 1, 1, 
-                                                (const char **) &fwdfun, 1, 
-                                                (const char **) &invfun, 
+            result = (AstMapping *) astMathMap( 1, 1, 1,
+                                                (const char **) &fwdfun, 1,
+                                                (const char **) &invfun,
                                                 "SimpFI=1,SimpIF=1", status );
          }
 
 /* Free resources. */
          inv = FreeTree( inv, status );
-         fwdfun = astFree( fwdfun );  
-         invfun = astFree( invfun );  
-         invexp = astFree( (void *) invexp );  
+         fwdfun = astFree( fwdfun );
+         invfun = astFree( invfun );
+         invexp = astFree( (void *) invexp );
       }
-      fwdexp = astFree( (void *) fwdexp );  
+      fwdexp = astFree( (void *) fwdexp );
    }
 
 /* Free any result if an error occurred. */
@@ -3392,16 +3392,16 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
 *     Unit member function.
 
 *  Description:
-*     This function converts an axis label into a tree of UnitNodes. 
-*     It is assumed the supplied label represents some "basic" label 
+*     This function converts an axis label into a tree of UnitNodes.
+*     It is assumed the supplied label represents some "basic" label
 *     modified by the application of one or more single function arguments
-*     and/or exponentiation operators. The (single) OP_LDVAR node in the 
+*     and/or exponentiation operators. The (single) OP_LDVAR node in the
 *     returned tree refers to the basic label (it is stored as the "name"
 *     component of UnitNode structure).
 
 *  Parameters:
 *     lab
-*        The label expression. 
+*        The label expression.
 *     nc
 *        The number of characters from "lab" to use.
 *     status
@@ -3435,15 +3435,15 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
 /* Check the global error status, and that we have a string. */
    if ( !astOK || !lab || !nc ) return result;
 
-/* Get a pointer to the first non-blank character, and store the number of 
-   characters to examine (this excludes any trailing white space). */  
+/* Get a pointer to the first non-blank character, and store the number of
+   characters to examine (this excludes any trailing white space). */
    exp = lab;
    while( isspace( *exp ) ) exp++;
-   c = lab + nc - 1; 
+   c = lab + nc - 1;
    while( c >= exp && isspace( *c ) ) c--;
    nc = c - exp + 1;
 
-/* Scan through the supplied string looking for the first pow operator at 
+/* Scan through the supplied string looking for the first pow operator at
    zero depth of nesting within parentheses. */
    depth = 0;
    c = exp;
@@ -3454,18 +3454,18 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
 /* If this character is an opening parenthesis, increment the depth of
    nesting. */
       if( *c == '(' ) {
-         depth++;   
+         depth++;
 
 /* If this character is an closing parenthesis, decrement the depth of
    nesting. Report an error if it ever goes negative. */
       } else if( *c == ')' ) {
-         depth--;   
+         depth--;
          if( depth < 0 && astOK ) {
             astError( AST__BADUN, "Missing opening parenthesis." , status);
             break;
          }
 
-/* Ignore all other characters unless they are at zero depth of nesting. 
+/* Ignore all other characters unless they are at zero depth of nesting.
    Also ignore spaces. */
       } else if( depth == 0 && !isspace( *c ) ) {
 
@@ -3487,8 +3487,8 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
       c++;
    }
 
-/* If a "pow" operator was found, the strings on either side of it should be 
-   valid unit expressions, in which case we use this routine recursively to 
+/* If a "pow" operator was found, the strings on either side of it should be
+   valid unit expressions, in which case we use this routine recursively to
    create corresponding trees of UnitNodes. */
    if( op != OP_NULL ) {
 
@@ -3515,8 +3515,8 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
          }
       }
 
-/* If no binary operator was found at depth zero, see if the supplied string 
-   starts with a function name (the only legal place for a function name 
+/* If no binary operator was found at depth zero, see if the supplied string
+   starts with a function name (the only legal place for a function name
    given that the string has no binary operators at depth zero). */
    } else {
       if( !strncmp( exp, "sqrt(", 5 ) || !strncmp( exp, "SQRT(", 5 ) ) {
@@ -3535,8 +3535,8 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
 
 /* If a function was found, the string following the function name
    (including the opening parenthesis) should form a legal units
-   expresssion (all the supported functions take a single argument and 
-   so we do not need to worry about comma-separated lists of function 
+   expresssion (all the supported functions take a single argument and
+   so we do not need to worry about comma-separated lists of function
    arguments). Use this routine recursively to create a tree of UnitNodes
    from the string which forms the function argument. */
       if( op != OP_NULL ) {
@@ -3619,7 +3619,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 
 *  Description:
 *     This function converts an algebraic units expression into a tree of
-*     UnitNodes. It is a service routine for CreateTree. The roots of the 
+*     UnitNodes. It is a service routine for CreateTree. The roots of the
 *     returned tree (i.e. the LDVAR nodes) refer to the unit symbols
 *     contained within the supplied expression (i.e. definitions of these
 *     units are not grafted onto the tree in place of the original nodes,
@@ -3658,9 +3658,9 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
    double con;
    int depth;
    int i;
-   int l;                
+   int l;
    int maxlen;
-   int n;           
+   int n;
    int oplen;
    int plural;
 
@@ -3670,8 +3670,8 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* Check the global error status, and that we have a string. */
    if ( !astOK || !exp || nc <= 0 ) return result;
 
-/* Scan through the supplied string from the end to the start looking for 
-   the last multiplication or division operator at zero depth of nesting 
+/* Scan through the supplied string from the end to the start looking for
+   the last multiplication or division operator at zero depth of nesting
    within parentheses. We go backwards through the string in order to
    give the correct priority to multiple division operators (i.e. "a/b/c"
    needs to be interpreted as "(a/b)/c", not "a/(b/c)"). */
@@ -3685,20 +3685,20 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* If this character is an opening parenthesis, decrement the depth of
    nesting. Report an error if it ever goes negative. */
       if( *c == '(' ) {
-         depth--;   
+         depth--;
          if( depth < 0 && astOK ) {
             astError( AST__BADUN, "Missing closing parenthesis." , status);
             break;
          }
 
 /* An opening parenthesis at level zero must always be either the first
-   character in the string, or be preceeded by the name of a function, or 
-   be preceeded by an operator. If none of these are true, assume there is 
+   character in the string, or be preceeded by the name of a function, or
+   be preceeded by an operator. If none of these are true, assume there is
    an implicit multiplication operator before the parenthesis. */
          if( depth == 0 && i > 0 ) {
             d = *( c - 1 );
             if( d != '*' && d != '/' && d != '^' && d != '.' && d != ' ' &&
-                !EndsWith( c, i + 1, "sqrt(", status ) && !EndsWith( c, i + 1, "exp(", status ) && 
+                !EndsWith( c, i + 1, "sqrt(", status ) && !EndsWith( c, i + 1, "exp(", status ) &&
                 !EndsWith( c, i + 1, "ln(", status ) && !EndsWith( c, i + 1, "log(", status ) ) {
                op = OP_MULT;
                oplen = 0;
@@ -3709,7 +3709,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* If this character is an closing parenthesis, increment the depth of
    nesting. */
       } else if( *c == ')' ) {
-         depth++;   
+         depth++;
 
 /* A closing parenthesis at level zero must always be either the last
    character in the string, or be followed by an operator. If neither of
@@ -3732,31 +3732,31 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* Ignore all other characters unless they are at zero depth of nesting. */
       } else if( depth == 0 ) {
 
-/* Compare the next part of the string with each of the multiplication 
+/* Compare the next part of the string with each of the multiplication
    and division operators. */
          if( *c == '/' ) {
             op = OP_DIV;
 
          } else if( *c == ' ' ) {
-            op = OP_MULT;            
+            op = OP_MULT;
 
 /* An asterisk is only treated as a multiplication symbol if it does not occur
    before or after another asterisk. */
          } else if( *c == '*' ) {
             if(  c == exp ) {
-               if( *(c+1) != '*' ) op = OP_MULT;            
+               if( *(c+1) != '*' ) op = OP_MULT;
             } else if( i == nc - 1 ) {
-               if( *(c-1) != '*' ) op = OP_MULT;            
+               if( *(c-1) != '*' ) op = OP_MULT;
             } else {
-               if( *(c+1) != '*' && *(c-1) != '*' ) op = OP_MULT;            
+               if( *(c+1) != '*' && *(c-1) != '*' ) op = OP_MULT;
             }
 
 /* A dot is only treated as a multiplication symbol if it does not occur
    between two digits. */
          } else if( *c == '.' ) {
-            if( ( c == exp || !isdigit( *(c-1) ) ) && 
+            if( ( c == exp || !isdigit( *(c-1) ) ) &&
                 ( i == nc - 1 || !isdigit( *(c+1) ) ) ) {
-               op = OP_MULT;            
+               op = OP_MULT;
             }
          }
       }
@@ -3769,8 +3769,8 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
       c--;
    }
 
-/* If a multiplication or division operator was found, the strings on either 
-   side of it should be valid unit expressions, in which case we use this 
+/* If a multiplication or division operator was found, the strings on either
+   side of it should be valid unit expressions, in which case we use this
    routine recursively to create corresponding trees of UnitNodes. */
    if( op != OP_NULL ) {
 
@@ -3797,7 +3797,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
          }
       }
 
-/* If no multiplication or division operator was found at depth zero, check 
+/* If no multiplication or division operator was found at depth zero, check
    that the final depth of nesting was zero. Report an error if not. */
    } else if( depth > 0 && astOK ) {
       astError( AST__BADUN, "Missing opening parenthesis." , status);
@@ -3805,7 +3805,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* Otherwise check for a "Pow" operator at depth zero. */
    } else {
 
-/* Scan through the supplied string looking for the first pow operator at 
+/* Scan through the supplied string looking for the first pow operator at
    zero depth of nesting within parentheses. */
       depth = 0;
       c = exp;
@@ -3815,12 +3815,12 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* If this character is an opening parenthesis, increment the depth of
    nesting. */
          if( *c == '(' ) {
-            depth++;   
+            depth++;
 
 /* If this character is an closing parenthesis, decrement the depth of
    nesting. Report an error if it ever goes negative. */
          } else if( *c == ')' ) {
-            depth--;   
+            depth--;
             if( depth < 0 && astOK ) {
                astError( AST__BADUN, "Missing opening parenthesis." , status);
                break;
@@ -3847,8 +3847,8 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
          c++;
       }
 
-/* If a "pow" operator was found, the strings on either side of it should be 
-   valid unit expressions, in which case we use this routine recursively to 
+/* If a "pow" operator was found, the strings on either side of it should be
+   valid unit expressions, in which case we use this routine recursively to
    create corresponding trees of UnitNodes. */
       if( op != OP_NULL ) {
 
@@ -3875,8 +3875,8 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
             }
          }
 
-/* If no binary operator was found at depth zero, see if the supplied string 
-   starts with a function name (the only legal place for a function name 
+/* If no binary operator was found at depth zero, see if the supplied string
+   starts with a function name (the only legal place for a function name
    given that the string has no binary operators at depth zero). */
       } else {
          if( !strncmp( exp, "sqrt(", 5 ) || !strncmp( exp, "SQRT(", 5 ) ) {
@@ -3895,8 +3895,8 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 
 /* If a function was found, the string following the function name
    (including the opening parenthesis) should form a legal units
-   expresssion (all the supported functions take a single argument and 
-   so we do not need to worry about comma-separated lists of function 
+   expresssion (all the supported functions take a single argument and
+   so we do not need to worry about comma-separated lists of function
    arguments). Use this routine recursively to create a tree of UnitNodes
    from the string which forms the function argument. */
          if( op != OP_NULL ) {
@@ -3940,13 +3940,13 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
                          "numerical string '%.*s'.", status, n, exp );
             }
 
-/* Does the string represent one of the named constants? If so represent it 
+/* Does the string represent one of the named constants? If so represent it
    by a an appropriate operator. */
-         } else if( nc == 2 && ( !strncmp( exp, "pi", 2 ) || 
+         } else if( nc == 2 && ( !strncmp( exp, "pi", 2 ) ||
                                  !strncmp( exp, "PI", 2 ) ) ) {
             result = NewNode( NULL, OP_LDPI, status );
 
-         } else if( nc == 1 && ( !strncmp( exp, "e", 1 ) || 
+         } else if( nc == 1 && ( !strncmp( exp, "e", 1 ) ||
                                  !strncmp( exp, "E", 1 ) ) ) {
             result = NewNode( NULL, OP_LDE, status );
 
@@ -3955,7 +3955,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
          } else {
 
 /* See if the string ends with the symbol for any of the known basic
-   units. If it matches more than one basic unit, choose the longest. 
+   units. If it matches more than one basic unit, choose the longest.
    First ensure descriptions of the known units are  available. */
             mmult = NULL;
             plural = 0;
@@ -3971,7 +3971,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
                         munit = unit;
                         mmult = mult;
                      }
-                  } 
+                  }
                   unit = unit->next;
                }
 
@@ -3986,7 +3986,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
                            munit = unit;
                            mmult = mult;
                         }
-                     } 
+                     }
                      unit = unit->next;
                   }
                }
@@ -4002,7 +4002,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
                            munit = unit;
                            mmult = mult;
                         }
-                     } 
+                     }
                      unit = unit->next;
                   }
                }
@@ -4010,7 +4010,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
 /* If we still do not have a match, and if the string ends with "s", try
    removing the "s" (which could be a plural as in "Angstroms") and
    trying again. */
-               if( !munit && nc > 1 && !plural && 
+               if( !munit && nc > 1 && !plural &&
                    ( exp[ nc - 1 ] == 's' || exp[ nc - 1 ] == 'S' ) ) {
                   plural = 1;
                   nc--;
@@ -4027,7 +4027,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
             if( unit ) {
 
 /* If the unit is an alias for another unit, it will have a non-NULL
-   value for its "use" component.In this case, use the unit for which the 
+   value for its "use" component.In this case, use the unit for which the
    identified unit is an alias. */
                result = NewNode( NULL, OP_LDVAR, status );
                if( astOK ) {
@@ -4104,16 +4104,16 @@ static void MakeUnitAlias( const char *sym, const char *alias, int *status ){
 
 *  Description:
 *     This function creates a KnownUnit structure decribing an alias for a
-*     known unit, and adds it to the head of the linked list of known units 
+*     known unit, and adds it to the head of the linked list of known units
 *     stored in a module variable. An alias is a KnownUnit which is
 *     identical to an existing known but which has a different symbol.
 
 *  Parameters:
 *     sym
-*        A pointer to the symbol string of an existing KnwonUnit. The string 
+*        A pointer to the symbol string of an existing KnwonUnit. The string
 *        should not include any multiplier prefix.
 *     alias
-*        A pointer to the symbol string to use as the alasi for the existing 
+*        A pointer to the symbol string to use as the alasi for the existing
 *        KnownUnit. The string should not include any multiplier prefix.
 *     status
 *        Pointer to the inherited status variable.
@@ -4145,7 +4145,7 @@ static void MakeUnitAlias( const char *sym, const char *alias, int *status ){
    alias. */
          known_units->use = unit;
 
-/* Leave the loop. */         
+/* Leave the loop. */
          break;
       }
 
@@ -4183,7 +4183,7 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
 *     This function checks the supplied node. If it is a DIV or MULT node
 *     in which one argument is an LDVAR and the other is a constant, then
 *     its checks to see if the constant can be absorbed into the LDVAR by
-*     changing the multiplier in the LDVAR node. If so, it returns a new 
+*     changing the multiplier in the LDVAR node. If so, it returns a new
 *     node which is an LDVAR with the modified multiplier. Otherwise it
 *     returns NULL.
 
@@ -4197,7 +4197,7 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
 *     A pointer to the new UnitNode.
 
 *  Notes:
-*     - A value of NULL will be returned if this function is invoked with 
+*     - A value of NULL will be returned if this function is invoked with
 *     the global error status set, or if it should fail for any reason.
 */
 
@@ -4212,7 +4212,7 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
    double cmult;
    double r;
    double rmin;
-   int recip;              
+   int recip;
    int changed;
 
 /* Initialise. */
@@ -4232,10 +4232,10 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
       newtree = CopyTree( old, status );
 
 /* Identify the LDVAR argument (if any). */
-      if( newtree->arg[ 0 ]->opcode == OP_LDVAR ) { 
+      if( newtree->arg[ 0 ]->opcode == OP_LDVAR ) {
          ldvar = newtree->arg[ 0 ];
 
-      } else if( newtree->arg[ 1 ]->opcode == OP_LDVAR ) { 
+      } else if( newtree->arg[ 1 ]->opcode == OP_LDVAR ) {
          ldvar = newtree->arg[ 1 ];
 
       } else {
@@ -4243,10 +4243,10 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
       }
 
 /* Identify the LDCON argument (if any). */
-      if( newtree->arg[ 0 ]->opcode == OP_LDCON ) { 
+      if( newtree->arg[ 0 ]->opcode == OP_LDCON ) {
          ldcon = newtree->arg[ 0 ];
 
-      } else if( newtree->arg[ 1 ]->opcode == OP_LDCON ) { 
+      } else if( newtree->arg[ 1 ]->opcode == OP_LDCON ) {
          ldcon = newtree->arg[ 1 ];
 
       } else {
@@ -4259,14 +4259,14 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
 
 /* Otherwise, extract the multiplier constant. If there is no multiplier, the
    constant is 1.0. */
-      } else {      
+      } else {
          cmult = ldvar->mult ? ldvar->mult->scale: 1.0;
 
 /* Extract the constant. */
          con = ldcon->con;
 
 /* Combine the multiplier and the constant. The resulting constant is a
-   factor which is used to multiply the LDVAR quantity. If the original 
+   factor which is used to multiply the LDVAR quantity. If the original
    node is a DIV node in which the LDVAR is in the denominator, then
    flag that we need to reciprocate the new MULT node which represents
    "constant*LDVAR" before returning. */
@@ -4295,12 +4295,12 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
    above. "mmult" will be NULL if the best multiplier is unity. */
          if( mmult ) con = con/mmult->scale;
 
-/* If they have changed, associate the chosen multiplier with the LDVAR node, 
+/* If they have changed, associate the chosen multiplier with the LDVAR node,
    and the constant with the LDCON node. */
          if( ldvar->mult != mmult ) {
             ldvar->mult = mmult;
             changed = 1;
-         }         
+         }
 
          if( ldcon->con != con ) {
             ldcon->con = con;
@@ -4314,7 +4314,7 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
                newtree->opcode = OP_MULT;
                changed = 1;
             }
-            
+
 /* If the constant is 1.0 we can just return the LDVAR node by itself. */
             if( fabs( con - 1.0 ) < 1.0E-6 ) {
                result = CopyTree( ldvar, status );
@@ -4330,8 +4330,8 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
    new node will already be a DIV node and will have an LDCON as the first
    argument (numerator) and an LDVAR as the second argument (denominator). */
          } else {
-            
-/* The first argument (the numerator) should be the reciprocal of the constant 
+
+/* The first argument (the numerator) should be the reciprocal of the constant
    found above. */
             ldcon->con = 1.0/ldcon->con;
             if( !EQUAL( ldcon->con, old->arg[0]->con ) ) changed = 1;
@@ -4364,7 +4364,7 @@ static UnitNode *NewNode( UnitNode *old, Oper code, int *status ) {
 
 *  Synopsis:
 *     #include "unit.h"
-*     UnitNode *NewNode( UnitNode *old, Oper code, int *status ) 
+*     UnitNode *NewNode( UnitNode *old, Oper code, int *status )
 
 *  Class Membership:
 *     Unit member function.
@@ -4386,7 +4386,7 @@ static UnitNode *NewNode( UnitNode *old, Oper code, int *status ) {
 *     A pointer to the new UnitNode.
 
 *  Notes:
-*     - A value of NULL will be returned if this function is invoked with 
+*     - A value of NULL will be returned if this function is invoked with
 *     the global error status set, or if it should fail for any reason.
 */
 
@@ -4434,16 +4434,16 @@ static UnitNode *NewNode( UnitNode *old, Oper code, int *status ) {
             result->con = E;
             break;
 
-         case OP_LOG:  
-         case OP_LN:   
-         case OP_EXP:  
-         case OP_SQRT: 
+         case OP_LOG:
+         case OP_LN:
+         case OP_EXP:
+         case OP_SQRT:
             result->narg = 1;
             break;
 
-         case OP_POW:  
-         case OP_DIV:  
-         case OP_MULT: 
+         case OP_POW:
+         case OP_DIV:
+         case OP_MULT:
             result->narg = 2;
             break;
 
@@ -4492,13 +4492,13 @@ static void RemakeTree( UnitNode **node, int *status ) {
 
 *  Description:
 *     This function searches for LDVAR nodes (i.e. references to unit
-*     symbols) within the given tree, and replaces each such node which 
+*     symbols) within the given tree, and replaces each such node which
 *     refers to known derived unit with a sub-tree of nodes which
 *     define the derived unit in terms of known basic units.
 
 *  Parameters:
 *     node
-*        The address of a pointer to the UnitNode at the head of the tree 
+*        The address of a pointer to the UnitNode at the head of the tree
 *        which is to be simplified. On exit the supplied tree is freed and a
 *        pointer to a new tree is placed at the given address.
 *     status
@@ -4521,17 +4521,17 @@ static void RemakeTree( UnitNode **node, int *status ) {
    if( (*node)->opcode == OP_LDVAR ) {
 
 /* If the LDVAR node has a multiplier associated with it, we need to
-   introduce a OP_MULT node to perform the scaling. */ 
+   introduce a OP_MULT node to perform the scaling. */
       if( (*node)->mult ) {
          newnode = NewNode( NULL, OP_MULT, status );
          if( astOK ) {
-            newnode->arg[0] = NewNode( NULL, OP_LDCON, status ); 
+            newnode->arg[0] = NewNode( NULL, OP_LDCON, status );
             if( astOK ) {
                newnode->arg[0]->con = 1.0/(*node)->mult->scale;
 
 /* See if the node refers to a known unit. If not, or if the known unit
    is a basic unit (i.e. not a derived unit) use the supplied node for
-   the second argument of the OP_MULT node (without the multiplier). 
+   the second argument of the OP_MULT node (without the multiplier).
    Otherwise, use a copy of the tree which defines the derived unit. */
                unit = (*node)->unit;
                if( unit && unit->head ) {
@@ -4551,7 +4551,7 @@ static void RemakeTree( UnitNode **node, int *status ) {
          if( unit && unit->head ) newnode = CopyTree( unit->head, status );
       }
 
-/* If this is not an LDVAR Node, remake the sub-trees which form the 
+/* If this is not an LDVAR Node, remake the sub-trees which form the
    arguments of this node. */
    } else {
       for( i = 0; i < (*node)->narg; i++ ) {
@@ -4609,11 +4609,11 @@ static int ReplaceNode( UnitNode *target, UnitNode *old, UnitNode *new, int *sta
 
 *  Notes:
 *     - It is assumed that the "old" node occurs at most once within the
-*     target tree. 
+*     target tree.
 *     - The node at the head of the target tree is not compared with the
 *     "old" node. It is assumed the called will already have done this.
 *     - A value of zero is returned if an error has already occurred, or
-*     if this function fails for any reason. 
+*     if this function fails for any reason.
 
 */
 
@@ -4627,7 +4627,7 @@ static int ReplaceNode( UnitNode *target, UnitNode *old, UnitNode *new, int *sta
 /* Check inherited status. */
    if( !astOK ) return result;
 
-/* Loop round the arguments of the node at the head of the target tree. 
+/* Loop round the arguments of the node at the head of the target tree.
    Break out of the loop as soone as the old node is found. */
    for( i = 0; i < target->narg; i++ ) {
 
@@ -4675,21 +4675,21 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
 *     This function simplifies a tree of UnitNodes. It is assumed that
 *     all the OP_LDVAR nodes in the tree refer to the same basic unit.
 *     A primary purpose of this function is to standardise the tree so
-*     that trees which implement equivalent transformations but which 
+*     that trees which implement equivalent transformations but which
 *     have different structures can be compared (for instance, so that
-*     "2*x" and "x*2" are treated as equal trees). If "std" is non-zero, 
-*     reducing the complexity of the tree is only of secondary importance. 
-*     This explains why some "simplifications" actually produced trees which 
+*     "2*x" and "x*2" are treated as equal trees). If "std" is non-zero,
+*     reducing the complexity of the tree is only of secondary importance.
+*     This explains why some "simplifications" actually produced trees which
 *     are more complicated.
 
 *  Parameters:
 *     node
-*        The address of a pointer to the UnitNode at the head of the tree 
+*        The address of a pointer to the UnitNode at the head of the tree
 *        which is to be simplified. On exit the supplied tree is freed and a
 *        pointer to a new tree is placed at the given address.
 *     std
 *        If non-zero, perform standardisations. Otherwise only perform
-*        genuine simplifications. 
+*        genuine simplifications.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -4729,7 +4729,7 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
       if( SimplifyTree( &( (*node)->arg[ i ] ), std, status ) ) result = 1;
    }
 
-/* Now do specific simplifications appropriate to the nature of the node at 
+/* Now do specific simplifications appropriate to the nature of the node at
    the head of the tree. */
    op = (*node)->opcode;
 
@@ -4738,15 +4738,15 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
 /* We standardise argument powers into coefficients of the LN value. */
    if( op == OP_LN ) {
 
-/* If the argument is a OP_EXP node, they cancel out. Return a copy of the 
+/* If the argument is a OP_EXP node, they cancel out. Return a copy of the
    argument of OP_EXP node. */
       if( (*node)->arg[ 0 ]->opcode == OP_EXP ) {
          newnode = CopyTree( (*node)->arg[ 0 ]->arg[ 0 ], status );
 
 /* If the argument is an OP_POW node, rearrange the nodes to represent
    k*ln(x) instead of ln(x**k) (note pow nodes always have a constant
-   exponent - this is checked in InvertConstants). SQRT arguments will 
-   not occur because they will have been changed into POW nodes when the 
+   exponent - this is checked in InvertConstants). SQRT arguments will
+   not occur because they will have been changed into POW nodes when the
    arguments of the supplied head node were simplified above. */
       } else if( std && (*node)->arg[ 0 ]->opcode == OP_POW ) {
          newnode = NewNode( NULL, OP_MULT, status );
@@ -4777,14 +4777,14 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
 
 /* Exponential */
 /* =========== */
-/* We prefer to minimise the number of EXP nodes, so, for instance, we do not 
+/* We prefer to minimise the number of EXP nodes, so, for instance, we do not
    change "exp(x*y)" to "exp(x)+exp(y)" (and the code for ADD nodes does
    the inverse conversion). */
    } else if( op == OP_EXP ) {
 
-/* If the argument is an OP_LN node, they cancel out. Return a copy of the 
+/* If the argument is an OP_LN node, they cancel out. Return a copy of the
    argument of the OP_LN node. Common log arguments will not occur because
-   they will have been changed into natural logs when the arguments of 
+   they will have been changed into natural logs when the arguments of
    the supplied head node were simplified above. */
       if( (*node)->arg[ 0 ]->opcode == OP_LN ) {
          newnode = CopyTree( (*node)->arg[ 0 ]->arg[ 0 ], status );
@@ -4807,7 +4807,7 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
 
 /* Exponentiation */
 /* ============== */
-/* We want to simplfy factors. So, for instance, (x*y)**k is converted to 
+/* We want to simplfy factors. So, for instance, (x*y)**k is converted to
    (x**k)*(y**k). */
    } else if( op == OP_POW ) {
 
@@ -4963,7 +4963,7 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
 
 }
 
-static int SplitUnit( const char *str, int ls, const char *u, int cs, 
+static int SplitUnit( const char *str, int ls, const char *u, int cs,
                       Multiplier **mult, int *l, int *status ) {
 /*
 *  Name:
@@ -4977,8 +4977,8 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
 
 *  Synopsis:
 *     #include "unit.h"
-*     int SplitUnit( const char *str, int ls, const char *u, int cs, 
-*                    Multiplier **mult, int *l, int *status  ) 
+*     int SplitUnit( const char *str, int ls, const char *u, int cs,
+*                    Multiplier **mult, int *l, int *status  )
 
 *  Class Membership:
 *     Unit member function.
@@ -4995,7 +4995,7 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
 *        Number of characters to use from "str" (not including trailing null)
 *     u
 *        Pointer to the unit label or symbol string to be searched for.
-*     cs 
+*     cs
 *        If non-zero, the test for "u" is case insensitive.
 *     mult
 *        Address of a location at which to return the multiplier at the
@@ -5014,7 +5014,7 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
 */
 
 /* Local Variables: */
-   int ret;                
+   int ret;
    int lm;
    int lu;
 
@@ -5024,9 +5024,9 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
    *l = 0;
 
 /* Check inherited status. */
-   if( !astOK ) return ret;   
+   if( !astOK ) return ret;
 
-/* Find the number of characters in the supplied unit label or symbol. The 
+/* Find the number of characters in the supplied unit label or symbol. The
    difference between lu and ls must be the length of the multiplier. */
    lu = strlen( u );
    lm = ls - lu;
@@ -5035,7 +5035,7 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
    if( lm >= 0 ) {
 
 /* Compare the end of "str" against "u" */
-      if( cs ? !strncmp( str + lm, u, lu ) : 
+      if( cs ? !strncmp( str + lm, u, lu ) :
                !Ustrncmp( str + lm, u, lu, status ) ) {
          ret = 1;
 
@@ -5082,7 +5082,7 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
 
    *l = lu;
    return ret;
-} 
+}
 
 double astUnitAnalyser_( const char *in, double powers[9], int *status ){
 /*
@@ -5105,20 +5105,20 @@ double astUnitAnalyser_( const char *in, double powers[9], int *status ){
 
 *  Description:
 *     This function parses the supplied units string if possible, and
-*     returns a set of pwoers and a scaling factor which represent the 
-*     units string. 
+*     returns a set of pwoers and a scaling factor which represent the
+*     units string.
 
 *  Parameters:
 *     in
-*        A string representation of the units, for instance "km/h". 
+*        A string representation of the units, for instance "km/h".
 *     powers
-*        An array in which are returned the powers for each of the following 
-*        basic units (in the order shown): kilogramme, metre, second, radian, 
-*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does 
-*        not depend on a given basic unit a value of 0.0 will be returned in 
-*        the array. The returns values represent a system of units which is a 
-*        scaled form of the supplied units, expressed in the basic units of m, 
-*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned 
+*        An array in which are returned the powers for each of the following
+*        basic units (in the order shown): kilogramme, metre, second, radian,
+*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does
+*        not depend on a given basic unit a value of 0.0 will be returned in
+*        the array. The returns values represent a system of units which is a
+*        scaled form of the supplied units, expressed in the basic units of m,
+*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned
 *        array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
 
 *  Returned Value:
@@ -5146,7 +5146,7 @@ double astUnitAnalyser_( const char *in, double powers[9], int *status ){
 
 /* Parse the input units string, producing a tree of UnitNodes which
    represents the input units. A pointer to the UnitNode at the head of
-   the tree is returned if succesfull. Report a context message if this 
+   the tree is returned if succesfull. Report a context message if this
    fails. */
    in_tree = CreateTree( in, 1, 1, status );
    if( in_tree ) {
@@ -5211,7 +5211,7 @@ const char *astUnitLabel_( const char *sym, int *status ){
 
 /* Local Variables: */
    const char *result;
-   KnownUnit *unit; 
+   KnownUnit *unit;
 
 /* Initialise */
    result = NULL;
@@ -5238,7 +5238,7 @@ const char *astUnitLabel_( const char *sym, int *status ){
    return result;
 }
 
-AstMapping *astUnitMapper_( const char *in, const char *out, 
+AstMapping *astUnitMapper_( const char *in, const char *out,
                             const char *in_lab, char **out_lab, int *status ){
 /*
 *+
@@ -5261,24 +5261,24 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
 *  Description:
 *     This function creates a Mapping between two specified system of
-*     units. It also modifes a supplied label (which is typically 
-*     the axis label associated with the input units) so that it includes 
+*     units. It also modifes a supplied label (which is typically
+*     the axis label associated with the input units) so that it includes
 *     any functional change implied by the supplied "in" and "out" units.
 
 *  Parameters:
 *     in
-*        A string representation of the input units, for instance "km/h". 
+*        A string representation of the input units, for instance "km/h".
 *        See "Unit Representations:" below.
 *     out
-*        A string representation of the output units, for instance "m/s". 
+*        A string representation of the output units, for instance "m/s".
 *        See "Unit Representations:" below.
 *     in_lab
 *        A label describing the quantity associated with the input units.
 *        If the "in" string is the Units attribute of an Axis, then
 *        "in_lab" should be the Label of the same Axis. May be supplied
-*        NULL in which case "out_lab" is ignored. 
+*        NULL in which case "out_lab" is ignored.
 *     out_lab
-*        The address at which to return a pointer to a label describing the 
+*        The address at which to return a pointer to a label describing the
 *        quantity associated with the output units. For instance, if the
 *        input and output units are "Hz" and "sqrt(Hz)", and the input
 *        label is "Frequency", then the returned output label will be
@@ -5299,15 +5299,15 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *
 *     To summarise, a string describing a system of units should be an
 *     algebraic expression which combines one or more named units. The
-*     following functions and operators may be used within these algebraic 
+*     following functions and operators may be used within these algebraic
 *     expressions:
 *
 *     - "*": multiplication. A period "." or space " " may also be used
 *       to represent multiplication (a period is only interpreted as a
 *       multiplication operator if it is not positioned between two digits,
-*       and a space is only interpreted as a multiplication operator if it 
+*       and a space is only interpreted as a multiplication operator if it
 *       occurs between two operands).
-*     - "/": division. 
+*     - "/": division.
 *     - "**": exponentiation. The exponent (i.e. the operand following the
 *       exponentiation operator) must be a constant. The symbol "^" is also
 *       interpreted as an exponentiation operator. Exponentiation is also
@@ -5320,16 +5320,16 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *
 *     Function names are case insensitive. White space may be included
 *     within an expression (note that white space between two operands
-*     will be interpreted as a muiltiplication operator as described 
+*     will be interpreted as a muiltiplication operator as described
 *     above). Parentheses may be used to indicate the order in which
 *     expressions are to be evaluated (normal mathematical precedence is
-*     used otherwise). The following symbols may be used to represent 
+*     used otherwise). The following symbols may be used to represent
 *     constants:
 *
 *     - "pi"
 *     - "e"
 *
-*     These symbols are also case in-sensitive. 
+*     These symbols are also case in-sensitive.
 *
 *     The above operators and functions are used to combine together one
 *     or more "unit symbols". The following base unit symbols are recognised:
@@ -5343,7 +5343,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "mol":  mole.
 *     - "cd":  candela.
 *
-*     The following symbols for units derived fro the above basic units are 
+*     The following symbols for units derived fro the above basic units are
 *     recognised:
 *
 *     - "sec":  second (1 s)
@@ -5390,7 +5390,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "photon":  photon.
 *     - "ph":  photon.
 *     - "Jy":  Jansky  (1.0E-26 W /m**2 /Hz).
-*     - "Jan":  Jansky  
+*     - "Jan":  Jansky
 *     - "mag":  magnitude.
 *     - "G":  Gauss  (1.0E-4 T).
 *     - "pixel":  pixel.
@@ -5398,11 +5398,11 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "barn":  barn  (1.0E-28 m**2).
 *     - "D":  Debye  (1.0E-29/3 C.m).
 *
-*     Note, AST follows the widespread practice within astronomy of using 
-*     "A" as an alias for "Angstrom". This replaces the association of "A" 
+*     Note, AST follows the widespread practice within astronomy of using
+*     "A" as an alias for "Angstrom". This replaces the association of "A"
 *     with Ampere included in the FITS-WCS standard.
 *
-*     In addition, any other unknown unit symbol may be used (but of course 
+*     In addition, any other unknown unit symbol may be used (but of course
 *     no mapping will be possible between unknown units).
 *
 *     Unit symbols may be preceeded with a numerical constant (for
@@ -5410,26 +5410,26 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     to represent some multiple of the unit. The following standard
 *     multipliers are recognised:
 *
-*     - "d":   deci   (1.0E-1)  
-*     - "c":   centi  (1.0E-2)  
-*     - "m":   milli  (1.0E-3)  
-*     - "u":   micro  (1.0E-6)  
-*     - "n":   nano   (1.0E-9)  
-*     - "p":   pico   (1.0E-12) 
-*     - "f":   femto  (1.0E-15) 
-*     - "a":   atto   (1.0E-18) 
-*     - "z":   zepto  (1.0E-21) 
-*     - "y":   yocto  (1.0E-24) 
-*     - "da":  deca   (1.0E1)   
-*     - "h":   hecto  (1.0E2)   
-*     - "k":   kilo   (1.0E3)   
-*     - "M":   mega   (1.0E6)   
-*     - "G":   giga   (1.0E9)   
-*     - "T":   tera   (1.0E12)  
-*     - "P":   peta   (1.0E15)  
-*     - "E":   exa    (1.0E18)  
-*     - "Z":   zetta  (1.0E21)  
-*     - "Y":   yotta  (1.0E24)  
+*     - "d":   deci   (1.0E-1)
+*     - "c":   centi  (1.0E-2)
+*     - "m":   milli  (1.0E-3)
+*     - "u":   micro  (1.0E-6)
+*     - "n":   nano   (1.0E-9)
+*     - "p":   pico   (1.0E-12)
+*     - "f":   femto  (1.0E-15)
+*     - "a":   atto   (1.0E-18)
+*     - "z":   zepto  (1.0E-21)
+*     - "y":   yocto  (1.0E-24)
+*     - "da":  deca   (1.0E1)
+*     - "h":   hecto  (1.0E2)
+*     - "k":   kilo   (1.0E3)
+*     - "M":   mega   (1.0E6)
+*     - "G":   giga   (1.0E9)
+*     - "T":   tera   (1.0E12)
+*     - "P":   peta   (1.0E15)
+*     - "E":   exa    (1.0E18)
+*     - "Z":   zetta  (1.0E21)
+*     - "Y":   yotta  (1.0E24)
 
 *  Notes:
 *     -  NULL values are returned without error if the supplied units are
@@ -5445,20 +5445,20 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    UnitNode **units;
    UnitNode *in_tree;
    UnitNode *intemp;
-   UnitNode *inv;         
+   UnitNode *inv;
    UnitNode *labtree;
    UnitNode *newtest;
    UnitNode *out_tree;
    UnitNode *outtemp;
    UnitNode *src;
    UnitNode *testtree;
-   UnitNode *tmp;         
+   UnitNode *tmp;
    UnitNode *totaltree;
    UnitNode *totlabtree;
    const char *c;
    const char *exp;
    int i;
-   int nc;             
+   int nc;
    int nunits;
    int ipass;
 
@@ -5469,12 +5469,12 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* A quick check for a common simple case: if the two strings are 
+/* A quick check for a common simple case: if the two strings are
    identical, return a UnitMap.*/
    if( !strcmp( in, out ) ) {
       if( in_lab ) *out_lab = astStore( NULL, in_lab, strlen( in_lab ) + 1 );
       return (AstMapping *) astUnitMap( 1, "", status );
-   }   
+   }
 
 /* More initialisation. */
    in_tree = NULL;
@@ -5483,7 +5483,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
 /* Parse the input units string, producing a tree of UnitNodes which
    represents the input units. A pointer to the UnitNode at the head of
-   the tree is returned if succesfull. Report a context message if this 
+   the tree is returned if succesfull. Report a context message if this
    fails. The returned tree contains branch nodes which correspond to
    operators or functions, and leaf nodes which represent constant values
    or named basic units (m, s, g, K, etc). Each branch node has one or more
@@ -5493,21 +5493,21 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    the string supplied by the user refers to any known derived units (e.g. "N",
    Newton) then each such unit is represented in the returned tree by a
    complete sub-tree in which the head node corresponds to the derived
-   unit (e.g. "N") and the leaf nodes correspond to the basic units needed 
-   to define the derived unit ( for instance, "m", "s" and "g" - metres, 
-   seconds and grammes), or numerical constants. Thus every leaf node in the 
-   returned tree will be a basic unit (i.e. a unit which is not defined in 
+   unit (e.g. "N") and the leaf nodes correspond to the basic units needed
+   to define the derived unit ( for instance, "m", "s" and "g" - metres,
+   seconds and grammes), or numerical constants. Thus every leaf node in the
+   returned tree will be a basic unit (i.e. a unit which is not defined in
    terms of other units), or a numerical constant. */
    in_tree = CreateTree( in, 1, 1, status );
    if( !astOK ) astError( AST__BADUN, "astUnitMapper: Error parsing input "
                           "units string '%s'.", status, in );
 
 /* Do the same for the output units. */
-   if( astOK ) {   
+   if( astOK ) {
       out_tree = CreateTree( out, 1, 1, status );
       if( !astOK ) astError( AST__BADUN, "astUnitMapper: Error parsing output "
                              "units string '%s'.", status, out );
-   } 
+   }
 
 /* If a blank string is supplied for both input and output units, then
    assume a UnitMap is the appropriate Mapping. */
@@ -5538,48 +5538,48 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    Mapping should be inverted before being used. */
       for( ipass = 0; ipass < 2; ipass++ ){
          if( ipass == 1 ) {
-            tmp = in_tree;            
-            in_tree = out_tree;            
+            tmp = in_tree;
+            in_tree = out_tree;
             out_tree = tmp;
          }
 
 /* We are going to create a new tree of UnitNodes in which the head node
    corresponds to the requested output units, and which has a single
-   non-constant leaf node corresponding to the input units. Initialise a 
+   non-constant leaf node corresponding to the input units. Initialise a
    pointer to this new tree to indicate that it has not yet been created. */
          testtree = NULL;
 
 /* Loop round each basic unit used in the definition of either the input
    or the output units (i.e. the elements of the array created above by
-   "LocateUnits"). The unit selected by this loop is referred to as the 
+   "LocateUnits"). The unit selected by this loop is referred to as the
    "current" unit. On each pass through this loop, we create a tree which
    is a candidate for the final required tree (the "test tree" pointed to
    by the testtree pointer initialised above). In order for a mapping to
    be possible between input and output units, the test tree created on
    each pass through this loop must be equivalent to the test tree for the
-   previous pass (in other words, all the test trees must be equivalent). 
-   We break out of the loop (and return a NULL Mapping) as soon as we find 
+   previous pass (in other words, all the test trees must be equivalent).
+   We break out of the loop (and return a NULL Mapping) as soon as we find
    a test tree which differs from the previous test tree. */
          for( i = 0; i < nunits; i++ ) {
 
-/* Create copies of the trees describing the input and output units, in which 
-   all units other than the current unit are set to a constant value of 1. 
+/* Create copies of the trees describing the input and output units, in which
+   all units other than the current unit are set to a constant value of 1.
    This is done by replacing OP_LDVAR nodes (i.e. nodes which "load" the
    value of a named basic unit) by OP_LDCON nodes (i.e. nodes which load
    a specified constant value) in the tree copy. */
-            intemp = FixUnits( in_tree, units[ i ], status );         
-            outtemp = FixUnits( out_tree, units[ i ], status );         
+            intemp = FixUnits( in_tree, units[ i ], status );
+            outtemp = FixUnits( out_tree, units[ i ], status );
 
 /* Simplify these trees. An important side-effect of this simplification
    is that trees are "standardised" which allows them to be compared for
-   equivalence. A single mathematical expression can often be represented 
-   in many different ways (for instance "A/B" is equivalent to "(B**(-1))*A"). 
+   equivalence. A single mathematical expression can often be represented
+   in many different ways (for instance "A/B" is equivalent to "(B**(-1))*A").
    Standardisation is a process of forcing all equivalent representations
-   into a single "standard" form. Without standardisation, trees representing 
+   into a single "standard" form. Without standardisation, trees representing
    the above two expressions would not be considered to be equivalent
    since thy would contain different nodes and have different structures.
-   As a consequence of this standardisation, the "simplification" performed 
-   by SimplifyTree can sometimes actually make the tree more complicated 
+   As a consequence of this standardisation, the "simplification" performed
+   by SimplifyTree can sometimes actually make the tree more complicated
    (in terms of the number of nodes in the tree). */
             SimplifyTree( &intemp, 1, status );
             SimplifyTree( &outtemp, 1, status );
@@ -5588,16 +5588,16 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    then the node at the head of the simplified tree will have a constant
    value (because all the units other than the current unit have been fixed
    to a constant value of 1.0 above by FixUnits, leaving only the current
-   unit to vary in value). If both simplified trees are constants, then 
-   neither tree depends on the current basic unit (i.e. references to the 
+   unit to vary in value). If both simplified trees are constants, then
+   neither tree depends on the current basic unit (i.e. references to the
    current basic unit cancel out within each string expression - for
    instance if converting from "m.s.Hz" to "km" and the current unit
-   is "s", then the "s.Hz" term will cause the "s" units to cancel out). In 
+   is "s", then the "s.Hz" term will cause the "s" units to cancel out). In
    this case ignore this basic unit and pass on to the next. */
             if( outtemp->con != AST__BAD && intemp->con != AST__BAD ) {
 
 /* If just one simplified tree is constant, then the two units cannot
-   match since one depends on the current basic unit and the other does 
+   match since one depends on the current basic unit and the other does
    not. Free any test tree from previous passes and break out of the loop. */
             } else if( outtemp->con != AST__BAD || intemp->con != AST__BAD ) {
                intemp = FreeTree( intemp, status );
@@ -5614,9 +5614,9 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    simplified "intemp" tree. That is, the new tree will have a head node
    corresponding to the current unit, and a single non-constant leaf node
    corresponding to the input units. Create an OP_LDVAR node which can be
-   used as the leaf node for this inverted tree. If the input tree is 
-   inverted successfully, this root node becomes part of the inverted tree, 
-   and so does not need to be freed explicitly (it will be freed when the 
+   used as the leaf node for this inverted tree. If the input tree is
+   inverted successfully, this root node becomes part of the inverted tree,
+   and so does not need to be freed explicitly (it will be freed when the
    inverted tree is freed). */
                src = NewNode( NULL, OP_LDVAR, status );
                if( astOK ) src->name = astStore( NULL, "input_units", 12 );
@@ -5627,8 +5627,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
                inv = InvertTree( intemp, src, status );
                if( inv ) {
 
-/* Concatenate this tree (which goes from "input units" to "current unit") 
-   with the simplified output tree (which goes from "current unit" to 
+/* Concatenate this tree (which goes from "input units" to "current unit")
+   with the simplified output tree (which goes from "current unit" to
    "output units"), to get a new tree which goes from input units to output
    units. */
                   totaltree = ConcatTree( inv, outtemp, status );
@@ -5654,8 +5654,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
                if( inv ) {
                   inv = FreeTree( inv, status );
 
-/* If the input tree could not be inverted, we cannot convert between input 
-   and output units. Free the node which was created to be the root of the 
+/* If the input tree could not be inverted, we cannot convert between input
+   and output units. Free the node which was created to be the root of the
    inverted tree (and which has consequently not been incorporated into the
    inverted tree), free any testtree and break out of the loop. */
                } else {
@@ -5671,7 +5671,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
          }
 
-/* If all the basic units used by either of the supplied system of units 
+/* If all the basic units used by either of the supplied system of units
    produced the same test tree, leave the "swap in and out units" loop. */
          if( testtree ) break;
 
@@ -5680,8 +5680,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 /* If the input and output units have been swapped, swap them back to
    their original order, and invert the test tree (if there is one). */
       if( ipass > 0 ) {
-         tmp = in_tree;            
-         in_tree = out_tree;            
+         tmp = in_tree;
+         in_tree = out_tree;
          out_tree = tmp;
          if( testtree ) {
             src = NewNode( NULL, OP_LDVAR, status );
@@ -5690,10 +5690,10 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
             FreeTree( testtree, status );
             testtree = newtest;
             if( !newtest ) src = FreeTree( src, status );
-         } 
+         }
       }
 
-/* If all the basic units used by either of the supplied system of units 
+/* If all the basic units used by either of the supplied system of units
    produced the same test tree, create a Mapping which is equivalent to the
    test tree and return it. */
       if( testtree ) {
@@ -5701,16 +5701,16 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
 /* We now go on to produce the output axis label from the supplied input
    axis label. Get a tree of UnitNodes which describes the supplied label
-   associated with the input axis. The tree will have single OP_LDVAR node 
-   corresponding to the basic label (i.e. the label without any single 
+   associated with the input axis. The tree will have single OP_LDVAR node
+   corresponding to the basic label (i.e. the label without any single
    argument functions or exponentiation operators applied). */
          if( in_lab && astOK ) {
 
-/* Get a pointer to the first non-blank character, and store the number of 
-   characters to examine (this excludes any trailing white space). */  
+/* Get a pointer to the first non-blank character, and store the number of
+   characters to examine (this excludes any trailing white space). */
             exp = in_lab;
             while( isspace( *exp ) ) exp++;
-            c = exp + strlen( exp ) - 1; 
+            c = exp + strlen( exp ) - 1;
             while( c >= exp && isspace( *c ) ) c--;
             nc = c - exp + 1;
 
@@ -5718,8 +5718,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
             labtree = MakeLabelTree( exp, nc, status );
             if( astOK ) {
 
-/* Concatenate this tree (which goes from "basic label" to "input label") 
-   with the test tree found above (which goes from "input units" to "output 
+/* Concatenate this tree (which goes from "basic label" to "input label")
+   with the test tree found above (which goes from "input units" to "output
    units"), to get a tree which goes from basic label to output label. */
                totlabtree = ConcatTree( labtree, testtree, status );
 
@@ -5787,7 +5787,7 @@ const char *astUnitNormaliser_( const char *in, int *status ){
 
 *  Parameters:
 *     in
-*        A string representation of the units, for instance "km/h". 
+*        A string representation of the units, for instance "km/h".
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string holding the normalized
@@ -5813,7 +5813,7 @@ const char *astUnitNormaliser_( const char *in, int *status ){
 
 /* Parse the input units string, producing a tree of UnitNodes which
    represents the input units. A pointer to the UnitNode at the head of
-   the tree is returned if succesfull. Report a context message if this 
+   the tree is returned if succesfull. Report a context message if this
    fails. */
    in_tree = CreateTree( in, 0, 1, status );
    if( in_tree ) {
@@ -5821,9 +5821,9 @@ const char *astUnitNormaliser_( const char *in, int *status ){
 /* Simplify the units expression, only doing genuine simplifications. */
       SimplifyTree( &in_tree, 1, status );
 
-/* Invert literal constant unit multipliers. This is because a constant of 
-   say 1000 for a unit of "m" means "multiply the value in metres by 1000", 
-   but a unit string of "1000 m" means "value in units of 1000 m" (i.e. 
+/* Invert literal constant unit multipliers. This is because a constant of
+   say 1000 for a unit of "m" means "multiply the value in metres by 1000",
+   but a unit string of "1000 m" means "value in units of 1000 m" (i.e.
    *divide* the value in metres by 1000). */
       InvertConstants( &in_tree, status );
 
@@ -5866,7 +5866,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *     Unit member function.
 
 *  Description:
-*     Returns 0 if there are no differences between the two strings, and 1 
+*     Returns 0 if there are no differences between the two strings, and 1
 *     otherwise. Comparisons are case blind.
 
 *  Parameters:
@@ -5883,7 +5883,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strcmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -5971,7 +5971,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strncmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -5986,7 +5986,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
    ret = 0;
 
 /* Check pointer have been supplied. */
-   if( !a || !b ) return ret;   
+   if( !a || !b ) return ret;
 
 /* Initialise pointers to the start of each string. */
    aa = a;
@@ -6036,8 +6036,8 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 
 
 
-/* The rest of this file contains functions which are of use for debugging 
-   this module. They are usually commented out. 
+/* The rest of this file contains functions which are of use for debugging
+   this module. They are usually commented out.
 
 static const char *DisplayTree( UnitNode *node, int ind ) {
    int i;
@@ -6078,7 +6078,7 @@ static const char *DisplayTree( UnitNode *node, int ind ) {
          printf( "%s Arg 0:\n", buf );
          arg[ 0 ] = DisplayTree( (node->arg)[ 0 ], ind + 2 );
          rl += strlen( arg[ 0 ] );
-   
+
          result = astMalloc( rl + 1 );
          if( astOK ) {
             a = (char *) result;
@@ -6097,7 +6097,7 @@ static const char *DisplayTree( UnitNode *node, int ind ) {
             arg[ i ] = DisplayTree( (node->arg)[ i ], ind + 2 );
             rl += strlen( arg[ i ] );
          }
-   
+
          result = astMalloc( rl + 1 );
          if( astOK ) {
             a = (char *) result;
@@ -6130,23 +6130,23 @@ static const char *OpName( Oper op ) {
       name = "LDCON";
    } else if( op ==  OP_LDVAR ) {
       name = "LDVAR";
-   } else if( op ==  OP_LOG ) {  
+   } else if( op ==  OP_LOG ) {
       name = "LOG";
-   } else if( op ==  OP_LN ) {   
+   } else if( op ==  OP_LN ) {
       name = "LN";
-   } else if( op ==  OP_EXP ) {  
+   } else if( op ==  OP_EXP ) {
       name = "EXP";
-   } else if( op ==  OP_SQRT ) { 
+   } else if( op ==  OP_SQRT ) {
       name = "SQRT";
-   } else if( op ==  OP_POW ) {  
+   } else if( op ==  OP_POW ) {
       name = "POW";
-   } else if( op ==  OP_DIV ) {  
+   } else if( op ==  OP_DIV ) {
       name = "DIV";
-   } else if( op ==  OP_MULT ) { 
+   } else if( op ==  OP_MULT ) {
       name = "MULT";
-   } else if( op ==  OP_LDPI ) { 
+   } else if( op ==  OP_LDPI ) {
       name = "LDPI";
-   } else if( op ==  OP_LDE ) {  
+   } else if( op ==  OP_LDE ) {
       name = "LDE";
    } else if( op ==  OP_NULL ) {
       name = "NULL";
@@ -6166,25 +6166,25 @@ static void OpSym( UnitNode *node, char *buff ) {
    } else if( node->opcode ==  OP_LDVAR ) {
       sym = node->name;
 
-   } else if( node->opcode ==  OP_LOG ) {  
+   } else if( node->opcode ==  OP_LOG ) {
       sym = "log";
 
-   } else if( node->opcode ==  OP_LN ) {   
+   } else if( node->opcode ==  OP_LN ) {
       sym = "ln";
 
-   } else if( node->opcode ==  OP_EXP ) {  
+   } else if( node->opcode ==  OP_EXP ) {
       sym = "exp";
 
-   } else if( node->opcode ==  OP_SQRT ) { 
+   } else if( node->opcode ==  OP_SQRT ) {
       sym = "sqrt";
 
-   } else if( node->opcode ==  OP_POW ) {  
+   } else if( node->opcode ==  OP_POW ) {
       sym = "**";
 
-   } else if( node->opcode ==  OP_DIV ) {  
+   } else if( node->opcode ==  OP_DIV ) {
       sym = "/";
 
-   } else if( node->opcode ==  OP_MULT ) { 
+   } else if( node->opcode ==  OP_MULT ) {
       sym = "*";
 
    } else if( node->opcode ==  OP_NULL ) {

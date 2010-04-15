@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_DRAWA( PLOT, IDS, POS, NMARK, NVAL, MTYPE, 
+      SUBROUTINE CCD1_DRAWA( PLOT, IDS, POS, NMARK, NVAL, MTYPE,
      :                       STATUS )
 *+
 *  Name:
@@ -28,7 +28,7 @@
 *        at the X and Y positions if the marker type is less than zero.
 *        If MTYPE is greater than zero this array is not used.
 *     POS( NMARK, NVAL ) = DOUBLE PRECISION (Given)
-*        The positions at which the markers are to be plotted.  For 
+*        The positions at which the markers are to be plotted.  For
 *        point number IMARK, the X coordinate is POS( IMARK, 1 ) and
 *        the Y coordinate is POS( IM, 2 ).
 *     NMARK = INTEGER (Given)
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

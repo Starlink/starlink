@@ -28,8 +28,8 @@
 
 #  Constructor:
 #     vectordialog number ?-option value ...?
-#        The obligatory constructor argument num gives the number of 
-#        values in the vector, which is the same as the number of scale 
+#        The obligatory constructor argument num gives the number of
+#        values in the vector, which is the same as the number of scale
 #        widgets which will appear in the dialog box.
 
 #  Public Methods:
@@ -218,7 +218,7 @@
 ########################################################################
 
    itk::usual Vectordialog {
-      keep -background -cursor -foreground 
+      keep -background -cursor -foreground
    }
 
 
@@ -229,6 +229,6 @@
    proc vectordialog { pathname args } {
       uplevel Vectordialog $pathname $args
    }
-   
+
 
 # $Id$

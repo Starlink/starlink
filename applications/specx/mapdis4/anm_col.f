@@ -65,13 +65,13 @@
       call gen_geti4a('Min and max colours to address:',
      &    colmin,2,'2i5',colmin,jdef)
 
-      end 
+      end
 *----6-----------------------------------------------------------------*-------
       subroutine anmscr(i,r,g,b)
- 
+
       implicit none
       include 'ANM_COL.INC'
- 
+
       integer i
       real*4    r,g,b
 
@@ -83,19 +83,19 @@
         col_blue(i)=b
       else
         write(*,*) 'Illegal parameter passed to ANMSCR',i
-      endif      
+      endif
 
       end
 *----6-----------------------------------------------------------------*-------
       subroutine set_colours
- 
+
       implicit none
       include 'ANM_COL.INC'
       include 'FLAGCOMM'
- 
+
       integer i
- 
-      call sxgqcol (colmin, colmax) 
+
+      call sxgqcol (colmin, colmax)
 *     print *, '-- set_colours --- min and max colours...',
 *    &           colmin, colmax
 
@@ -119,7 +119,7 @@
 
       logcol  = .false.
 
-      if (i.le.5 .and.i.ge.1) then 
+      if (i.le.5 .and.i.ge.1) then
         col_num = i
         ifail   = 0
 
@@ -133,7 +133,7 @@
       end
 *----6-----------------------------------------------------------------*-------
       subroutine coltab(i)
- 
+
       include 'ANM_COL.INC'
       include 'FLAGCOMM'
 
@@ -151,7 +151,7 @@
       subroutine colour1(colmin,colmax)
 
       implicit none
-      
+
       real*4    r,g,b,x
       integer colmin,colmax,i
 
@@ -179,7 +179,7 @@
           G = x
           B = x
 
-*         call wrap(r,g,b) 
+*         call wrap(r,g,b)
           call anmscr(i,r,g,b)
       end do
 
@@ -188,7 +188,7 @@
       subroutine colour2(colmin,colmax)
 
       implicit none
-      
+
       real*4    r,g,b
 
       integer colmin,colmax,nstep,jdef,istep,isize,icol,istart,iend
@@ -201,7 +201,7 @@
       isize=(colmax-colmin)/nstep
 
       do istep = 1,nstep
-      
+
        istart = colmin + ((istep-1)*isize)
        iend =  istart+isize
 
@@ -221,7 +221,7 @@
       subroutine colour3(colmin,colmax)
 
       implicit none
-      
+
       integer colmin,colmax,jdef,nstep,i
       data nstep/10/
 
@@ -250,9 +250,9 @@
       end
 *----6-----------------------------------------------------------------*-------
       subroutine colour4(colmin,colmax)
- 
+
       implicit none
-      
+
       include 'ANM_LOGCOL.INC'
 
       integer colmin,colmax,i
@@ -273,7 +273,7 @@
         r=x
         g=x*x
         b=0.35 * (1.-x)**2.
-        call wrap(r,g,b) 
+        call wrap(r,g,b)
         call anmscr(i,r,g,b)
       end do
       end
@@ -302,14 +302,14 @@ C-----------------------------------------------------------------------
       subroutine spiral (start,  rotation, exponent,
      &                   logcol, vmin,     vmax,
      &                   vref,   colmin,   colmax)
- 
+
       implicit  none
 
       real      start,  rotation, exponent
       logical   logcol
       real      vmin,   vmax
       real      vref
-      integer   colmin, colmax 
+      integer   colmin, colmax
 
       integer   i, iz
       real      r, g, b
@@ -360,7 +360,7 @@ C Now put in intensity variation
         r = max (min (rtable(1)*x,1.0 ),0.0)
         g = max (min (rtable(2)*x,1.0 ),0.0)
         b = max (min (rtable(3)*x,1.0 ),0.0)
-       
+
         call anmscr (i,r,g,b)
 
       end do
@@ -383,14 +383,14 @@ C Now put in intensity variation
        character char*3
 
 * Wrap the colours if too many are asked for:
-       istep = mod(n,ncol) 
-       
+       istep = mod(n,ncol)
+
        write(char,'(i3.3)') col(istep)
 
        read(char(1:1),'(i1)',err=1) i1
        read(char(2:2),'(i1)',err=1) i2
        read(char(3:3),'(i1)',err=1) i3
-     
+
        r = real(i1)/9.
        g = real(i2)/9.
        b = real(i3)/9.
@@ -402,6 +402,6 @@ C Now put in intensity variation
 1      r = 1
        g = 1
        b = 1
-       
+
        end
 *----6-----------------------------------------------------------------*-------

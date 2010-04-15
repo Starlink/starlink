@@ -33,8 +33,8 @@
 *     IN = CHARACTER * ( * ) (Given)
 *        The input text stream.
 *     INDENT = INTEGER (Given)
-*        The number of leading spaces to include in the output buffer. 
-*        It can be set negative to indicate that any spaces in the input 
+*        The number of leading spaces to include in the output buffer.
+*        It can be set negative to indicate that any spaces in the input
 *        should be preserved.
 *     FP = INTEGER (Given and Returned)
 *        The formatting pointer. On entry it should point to the next
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
       FP = MAX( FP, 1 )
 
 *  Ensure the output buffer starts with the required number of leading
-*  spaces, and reduce the maximum length of the output string by the number 
+*  spaces, and reduce the maximum length of the output string by the number
 *  of leading spaces.
       IF( INDENT .GT. 0 ) THEN
          OUT( : INDENT ) = ' '
@@ -134,7 +134,7 @@
       IF( INDENT .GE. 0 .AND. L1 .GT. 0 ) THEN
          DO WHILE( FP .LT. L1 .AND. IN( FP : FP ) .EQ. ' ' )
             FP = FP + 1
-         END DO         
+         END DO
 
 *  Note the index of the first output character to be written.
          OFIRST = INDENT + 1
@@ -153,7 +153,7 @@
          NC = L1 - FP + 1
 
 *  If these characters will fit into the output string, then copy them
-*  into the output buffer (following any leading spaces) and advance FP 
+*  into the output buffer (following any leading spaces) and advance FP
 *  beyond the last character transferred.
          IF ( NC .LE. L2 ) THEN
             OUT( OFIRST : ) = IN( FP : L1 )
@@ -170,9 +170,9 @@
 *  If no suitable line break character was found, then simply break the
 *  input line at the first character to overflow the output.
             BREAK = FP + L2
- 4          CONTINUE           
+ 4          CONTINUE
 
-*  Copy input characters to the output (after any the leading spaces), as 
+*  Copy input characters to the output (after any the leading spaces), as
 *  far as the line break. Advance FP to point at the next input character.
             OUT( OFIRST : )  = IN( FP : BREAK - 1 )
             FP = BREAK
@@ -187,4 +187,4 @@
 *  input string is exhausted. Set FP to zero to indicate this.
       IF ( FP .GT. L1 ) FP = 0
 
-      END      
+      END

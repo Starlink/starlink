@@ -19,9 +19,9 @@
 *                      OUTARR, RMS, STATUS )
 
 *  Description:
-*     This routine fills a two-dimensional array by evaluating a 
-*     supplied bi-cubic spline (in its a B-spline representation) at 
-*     each pixel's position.  The rms difference between the fitted, 
+*     This routine fills a two-dimensional array by evaluating a
+*     supplied bi-cubic spline (in its a B-spline representation) at
+*     each pixel's position.  The rms difference between the fitted,
 *     interpolated pixels and the original pixels is also calculated.
 
 *  Arguments:
@@ -118,7 +118,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -166,7 +166,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       SCALED = SCALE .GT. 0.0
-      
+
 *  Initialise sums to form the rms error of the fit.
       SUMSQ = 0.0
       NPT = 0
@@ -179,14 +179,14 @@
          DO I = 1, DIM1
             WORK( I, 2 ) = REAL( I ) - 0.5
          END DO
- 
+
 *  Evaluate the fitted surface for pixels in the line.  By definition
 *  we are using a bi-cubic.
          CALL PDA_BISPEV( XKNOT, NXKNOT + 8, YKNOT, NYKNOT + 8, COEFF,
      :                    3, 3, WORK( 1, 2 ), DIM1, Y, 1, WORK( 1, 1 ),
      :                    POINT, NPOINT, IWORK, DIM1 + 1, IFAIL,
      :                    STATUS )
- 
+
 *  Test for an error.
          IF ( IFAIL .NE. 0 ) THEN
             STATUS = SAI__ERROR
@@ -221,11 +221,11 @@
 
 *  Calculate the rms error of the fit.
       IF ( NPT .GE. 1 ) THEN
-         RMS = SQRT( SUMSQ / REAL( NPT ) ) 
+         RMS = SQRT( SUMSQ / REAL( NPT ) )
       ELSE
          RMS = VAL__BADR
       END IF
 
   999 CONTINUE
- 
+
       END

@@ -13,10 +13,10 @@
 *     ems1Gesc( escchr, string, iposn )
 
 *  Description:
-*     The given string is searched forward from the index IPOSN+1 for the 
+*     The given string is searched forward from the index IPOSN+1 for the
 *     next occurrence of any of the chars given in the escape string.
-*     The char pointer IPOSN is returned pointing to this next escape 
-*     char in the given string. if no escape char is found, 
+*     The char pointer IPOSN is returned pointing to this next escape
+*     char in the given string. if no escape char is found,
 *     IPOSN is returned set to zero.
 
 *  Arguments:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,7 +94,7 @@ void ems1Gesc( const char *escchr, const char *string, int *iposn ) {
 /*  Initialise NEWPOS. */
    newpos = -1;
 
-/*  Check that IPOSN points to somewhere within the string and that 
+/*  Check that IPOSN points to somewhere within the string and that
 *  the length of the escape char string is non-zero. */
    if ( *iposn+1 < strln && esclen > 0 ) {
 

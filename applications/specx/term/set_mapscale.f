@@ -47,7 +47,7 @@
 
       INTEGER  GEN_ILEN
 
-*  Ok, go... 
+*  Ok, go...
 
       IFAIL=0
 

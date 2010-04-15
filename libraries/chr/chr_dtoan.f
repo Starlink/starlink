@@ -27,23 +27,23 @@
 *     value for the conversion to be carried out.
 *
 *     The value is written into the part of the string beginning
-*     at position IPOSN+1 and IPOSN is returned updated to the 
+*     at position IPOSN+1 and IPOSN is returned updated to the
 *     position of the end of the encoded angle in STRING.
 
 *  Arguments:
 *     DVALUE = DOUBLE PRECISION (Given)
-*        The value to be encoded into the string. This value should 
+*        The value to be encoded into the string. This value should
 *        represent an angular measure.
 *     UNITS = CHARACTER * ( * ) (Given)
 *        This string controls the maximum value which will be formatted
-*        as hr/deg:min:sec: if UNITS = 'HOURS', the maximum permitted 
-*        value is 24.0; if UNITS = 'DEGREES', the  maximum permitted is 
+*        as hr/deg:min:sec: if UNITS = 'HOURS', the maximum permitted
+*        value is 24.0; if UNITS = 'DEGREES', the  maximum permitted is
 *        360.0. In all other cases the maximum is 1000.0.
 *     STRING = CHARACTER * ( * ) (Given and Returned)
 *        The string into which DVALUE is written.
 *     IPOSN = INTEGER (Given and Returned)
 *        Given as the last element in STRING before the beginning of the
-*        encoded angle. Returned as the element in STRING corresponding 
+*        encoded angle. Returned as the element in STRING corresponding
 *        to the end of the encoded angle.
 
 *  Algorithm:
@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -109,7 +109,7 @@
 *     10-MAR-1994 (ACC for PCTR):
 *        Modifications to prologue.
 *     31-MAR-1994 (ACC):
-*        Change from call to CHR_PUTR to call to CHR_PUTD to write DVALUE 
+*        Change from call to CHR_PUTR to call to CHR_PUTD to write DVALUE
 *        to STRING.
 *     {enter_further_changes_here}
 
@@ -144,7 +144,7 @@
       DOUBLE PRECISION MAXHR     ! Maximum number of Hours
       PARAMETER ( MAXHR = 2.4D+01 )
 
-      DOUBLE PRECISION SIXTY     ! Number of minutes in hour, seconds in 
+      DOUBLE PRECISION SIXTY     ! Number of minutes in hour, seconds in
                                  ! minute etc.
       PARAMETER ( SIXTY = 6.0D+01 )
 

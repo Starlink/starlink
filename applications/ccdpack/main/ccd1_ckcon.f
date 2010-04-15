@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
       RANGE = 3.0D0 * VAL__EPSD
 
 *  Loop over all values counting the number of mismatches.
-      MISS = 0 
+      MISS = 0
       DO 1 I = 1, NVAL
          IF ( FOR( I ) .LT. INV( I ) - RANGE .OR.
      :        FOR( I ) .GT. INV( I ) + RANGE ) THEN

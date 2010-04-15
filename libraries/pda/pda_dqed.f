@@ -1,5 +1,5 @@
-      SUBROUTINE PDA_DQED( PDA_DQEDEV, MEQUA, NVARS, MCON, IND, BL, BU, 
-     :                     X, FJAC, LDFJAC, FNORM, IGO, IOPT, ROPT, 
+      SUBROUTINE PDA_DQED( PDA_DQEDEV, MEQUA, NVARS, MCON, IND, BL, BU,
+     :                     X, FJAC, LDFJAC, FNORM, IGO, IOPT, ROPT,
      :                     IWA, WA )
 C***  BEGIN PROLOGUE  DQED
 C***  DATE WRITTEN   851210   (YYMMDD)

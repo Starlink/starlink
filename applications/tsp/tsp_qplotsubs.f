@@ -12,7 +12,7 @@
 *  (!) FIN     (Integer) Finish index
 *  (<) XN      (Double)  New array of X data for restricted range
 *  (!) STATUS  (Integer) status value
-*    
+*
 *  Jeremy Bailey  28/2/1988
 *
 *  Modified:
@@ -25,14 +25,14 @@
 
 *  Parameters
       INTEGER STRT,FIN,STATUS
-      DOUBLE PRECISION X(*),XN(*)               
+      DOUBLE PRECISION X(*),XN(*)
 
 *  Local variables
-      DOUBLE PRECISION XS,XE 
+      DOUBLE PRECISION XS,XE
       INTEGER ISTRT,IFIN
       INTEGER I
       LOGICAL WHOLE
-                                        
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Get WHOLE parameter (plot all of data)
@@ -42,7 +42,7 @@
 *  If not WHOLE prompt for X range using start and end of data as defaults
 
               CALL PAR_DEF0D('XSTART',X(STRT),STATUS)
-              CALL PAR_GET0D('XSTART',XS,STATUS)     
+              CALL PAR_GET0D('XSTART',XS,STATUS)
               CALL PAR_DEF0D('XEND',X(FIN),STATUS)
               CALL PAR_GET0D('XEND',XE,STATUS)
           ELSE
@@ -53,7 +53,7 @@
 *  Search through array for indices that correspond to these limits
 
           ISTRT = STRT
-          IFIN = FIN 
+          IFIN = FIN
           DO I=STRT,FIN-1
               IF (X(I) .LE. XS .AND. X(I+1) .GE. XS) THEN
                   ISTRT=I
@@ -66,14 +66,14 @@
 *  Fill the output X array with the appropriate values
 
           STRT = ISTRT
-          FIN = IFIN             
+          FIN = IFIN
           DO I=1,FIN-STRT+1
               XN(I)=X(I+STRT-1)
           ENDDO
       ENDIF
       END
 
-      
+
 
       SUBROUTINE TSP_QPLTGETITEM(LOC,CHAN,STRT,FIN,IPTR,QPTR,UPTR,
      :   VPTR,IEPTR,QEPTR,UEPTR,VEPTR,STATUS)
@@ -108,7 +108,7 @@
 *     11/12/1991
 *
 *+
-                        
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -116,7 +116,7 @@
 *  Parameters
       INTEGER CHAN
       INTEGER STRT,FIN,IPTR,QPTR,UPTR,VPTR,STATUS
-      INTEGER IEPTR,QEPTR,UEPTR,VEPTR        
+      INTEGER IEPTR,QEPTR,UEPTR,VEPTR
 
 *  HDS locators
       CHARACTER*(DAT__SZLOC) LOC,ILOC,ILOC2,QLOC,QLOC2,ULOC,ULOC2
@@ -132,31 +132,31 @@
       INTEGER STAT
       IF (STATUS .EQ. SAI__OK) THEN
 
-*  Intensity Data  -  Map the Intensity Array  
-               
+*  Intensity Data  -  Map the Intensity Array
+
 *  Set limits of slice. The data is extracted from the selcted channel
 *  and only the range in X between STRT and FIN is included
-                        
-          UPPER(1) = CHAN                                            
-          UPPER(2) = FIN                                             
-          LOWER(1) = CHAN                                            
-          LOWER(2) = STRT 
+
+          UPPER(1) = CHAN
+          UPPER(2) = FIN
+          LOWER(1) = CHAN
+          LOWER(2) = STRT
 
 *  Map the slice - set the pointer to zero if unsuccesful
-                                        
+
           CALL TSP_MAP_SLICE(LOC,2,LOWER,UPPER,'READ',IPTR,
      :        ILOC2,STATUS)
-          IF (STATUS .NE. SAI__OK) THEN                             
+          IF (STATUS .NE. SAI__OK) THEN
               IPTR = 0
-              CALL ERR_REP('MSG','Error Accessing Data ^STATUS',STATUS)      
+              CALL ERR_REP('MSG','Error Accessing Data ^STATUS',STATUS)
           ENDIF
 
-*  Intensity Variance -   
-                                       
+*  Intensity Variance -
+
           CALL ERR_MARK
           CALL TSP_MAP_VSLICE(LOC,2,LOWER,UPPER,'READ',IEPTR,
      :        IELOC,STATUS)
-          IF (STATUS .NE. SAI__OK) THEN                             
+          IF (STATUS .NE. SAI__OK) THEN
               IEPTR = 0
               CALL ERR_ANNUL(STATUS)
           ENDIF
@@ -171,17 +171,17 @@
      :        QLOC2,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               QPTR = 0
-          ENDIF 
+          ENDIF
 
 *  Q Stokes variance
-            
+
           CALL TSP_MAP_VSLICE(QLOC,2,LOWER,UPPER,'READ',QEPTR,
      :        QELOC,STATUS)
           CALL DAT_ANNUL(QLOC,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               QEPTR = 0
               CALL ERR_ANNUL(STATUS)
-          ENDIF             
+          ENDIF
 
 *  Get the U stokes parameter
 
@@ -193,10 +193,10 @@
      :        ULOC2,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               UPTR = 0
-          ENDIF     
+          ENDIF
 
 *  U Stokes variance
-        
+
           CALL TSP_MAP_VSLICE(ULOC,2,LOWER,UPPER,'READ',UEPTR,
      :        UELOC,STATUS)
           CALL DAT_ANNUL(ULOC,STATUS)
@@ -208,31 +208,31 @@
 *  Get the V stokes parameter
 
           CALL TSP_GET_STOKES(LOC,'V',VLOC,STATUS)
-             
+
 *  V Stokes parameter  -  Map the V array
 
           CALL TSP_MAP_SLICE(VLOC,2,LOWER,UPPER,'READ',VPTR,
      :        VLOC2,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               VPTR = 0
-          ENDIF     
+          ENDIF
 
 *  V Stokes variance
-        
+
           CALL TSP_MAP_VSLICE(VLOC,2,LOWER,UPPER,'READ',VEPTR,
      :        VELOC,STATUS)
           CALL DAT_ANNUL(VLOC,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               VEPTR = 0
               CALL ERR_ANNUL(STATUS)
-          ENDIF             
+          ENDIF
           CALL ERR_RLSE
 
-       ENDIF                                                     
+       ENDIF
        END
-                            
 
-      
+
+
 
 
       SUBROUTINE TSP_QPLTUNMAPITEM(LOC,STATUS)
@@ -257,7 +257,7 @@
 *         11/12/1991     Tidy up and improve commenting
 *+
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'           
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters
@@ -267,7 +267,7 @@
       CHARACTER*(DAT__SZLOC) LOC,ILOC2,QLOC2,ULOC2,VLOC2
       CHARACTER*(DAT__SZLOC) IELOC,QELOC,UELOC,VELOC
       COMMON /GET_ITEM/ILOC2,QLOC2,ULOC2,VLOC2,IELOC,QELOC,UELOC,VELOC
-      
+
 *  Unmap each item
       CALL TSP_UNMAP(ILOC2,STATUS)
       CALL TSP_UNMAP(QLOC2,STATUS)
@@ -278,5 +278,5 @@
       CALL TSP_UNMAP(UELOC,STATUS)
       CALL TSP_UNMAP(VELOC,STATUS)
       STATUS = SAI__OK
-      END      
+      END
 

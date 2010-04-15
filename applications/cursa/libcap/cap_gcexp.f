@@ -97,7 +97,7 @@
             IF (SELS__SGZ .LT. SGZ__MXSEL) THEN
 
 *
-*             Attempt to get an identifier for the expression and 
+*             Attempt to get an identifier for the expression and
 *             proceed if all is ok.
 
                CALL CAT_EIDNT (CI__SGZ, EXPR, EI, STATUS)
@@ -106,7 +106,7 @@
 
 *
 *                Attempt to generate a selection comprising rows which
-*                satisfy this expression and proceed if ok.  Note that the 
+*                satisfy this expression and proceed if ok.  Note that the
 *                selection operates on the current selection.
 
                   SIOLD = SELID__SGZ(CSEL__SGZ)
@@ -136,7 +136,7 @@
                         SELRW__SGZ(SELS__SGZ) = NUMSEL
 
 *
-*                      Adopt this selection as the new current 
+*                      Adopt this selection as the new current
 *                      selection.
 
                         CSEL__SGZ = SELS__SGZ
@@ -167,7 +167,7 @@
                   ELSE
 
 *
-*                   A failure occurred generating the selection; report 
+*                   A failure occurred generating the selection; report
 *                   an error.
 
                      CALL ERR_REP ('CAP_GCEXP_SLCT', 'Failure '/
@@ -177,7 +177,7 @@
                ELSE
 
 *                A failure occurred getting an identifier for the
-*                expression.  In practice this error will usuall be 
+*                expression.  In practice this error will usuall be
 *                caused by a failure parsing the expression.
 
                   CALL ERR_REP ('CAP_GCEXP_EI', 'Failed to parse '/

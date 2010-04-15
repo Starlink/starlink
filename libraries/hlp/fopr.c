@@ -62,7 +62,7 @@ int hlpFopr ( int ( *nametr ) ( int, char*, int, char* ),
 {
    char filetr [ LFILETR ];
    int j;
- 
+
 /* Translate the HELP library name into a filename. */
    if ( ( j = ( * nametr ) ( 0, file, LFILETR, filetr ) ) ) return j;
 

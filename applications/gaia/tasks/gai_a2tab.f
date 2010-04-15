@@ -245,7 +245,7 @@
                      ELSE
 
 *  Error getting three words. Assume we just have less.
-                        CALL ERR_ANNUL( STATUS ) 
+                        CALL ERR_ANNUL( STATUS )
                      END IF
 
                   END IF
@@ -257,24 +257,24 @@
                   IA = ID + 1
                   OK = .TRUE.
  2                CONTINUE
-                  IF ( OK .AND. STATUS .EQ. SAI__OK ) THEN 
+                  IF ( OK .AND. STATUS .EQ. SAI__OK ) THEN
                      CALL CHR_FIWS( LINE, IA, STATUS )
                      CALL CHR_FIWE( LINE, IA, STATUS)
                      IA = IA + 1
-                     IF ( STATUS .EQ. SAI__OK ) THEN 
+                     IF ( STATUS .EQ. SAI__OK ) THEN
                         ICOL = ICOL + 1
                      ELSE
                         OK = .FALSE.
                      END IF
                      GO TO 2
                   END IF
-                  IF ( STATUS .NE. SAI__OK ) THEN 
+                  IF ( STATUS .NE. SAI__OK ) THEN
                      CALL ERR_ANNUL( STATUS )
                   END IF
                   CALL ERR_RLSE
                END IF
             END IF
-            
+
 *  Back for next line, or exit.
             GO TO 1
          END IF
@@ -313,7 +313,7 @@
                IAT = IAT + 1 + ( ID - IC + 1 )
 
 *  Check for SExtractor special names (only used if RACOL and DECCOL are
-*  not established). 
+*  not established).
                IF ( LINE( IC : ID ) .EQ. 'X_WORLD' ) THEN
                   IF ( RACOL .EQ. -1 ) RACOL = ICOL
                ELSE IF ( LINE( IC : ID )  .EQ. 'Y_WORLD' ) THEN
@@ -325,7 +325,7 @@
                END IF
                ICOL = ICOL + 1
             ELSE
-               
+
 *  First none comment-line, so end of headers.
                MORE = .FALSE.
                CALL FIO_RWIND( IFIN, STATUS )
@@ -336,7 +336,7 @@
 
 *  Automatically generate column names.
          DO 4 I = 1, ICOL
-            CALL CHR_ITOC( I, VALUE, NCHAR ) 
+            CALL CHR_ITOC( I, VALUE, NCHAR )
             COLS( IAT: ) = 'COLUMN'//VALUE( :NCHAR )//TAB
             IAT = IAT + NCHAR + 9
  4       CONTINUE
@@ -371,9 +371,9 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       MORE = .TRUE.
  5    CONTINUE
-      IF ( MORE .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF ( MORE .AND. STATUS .EQ. SAI__OK ) THEN
          CALL FIO_READF( IFIN, LINE, STATUS )
-         IF ( LINE( 1 : 1 ) .NE. '#' .AND. STATUS .EQ. SAI__OK ) THEN 
+         IF ( LINE( 1 : 1 ) .NE. '#' .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Extract each word and append to buffer.
             COLS = ' '
@@ -390,7 +390,7 @@
             WRITE( FI, '(A)' ) COLS( :IAT )
          ELSE
 
-*  Probably end-of-file.            
+*  Probably end-of-file.
             IF ( STATUS .EQ. FIO__EOF ) THEN
                CALL ERR_ANNUL( STATUS )
                MORE = .FALSE.

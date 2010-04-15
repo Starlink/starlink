@@ -30,14 +30,14 @@ C
 C     CUBE is created with the same structure as HCUBE
 C     except that the dta array will only have 3 dimensions, and any
 C     AXIS(4) sub-structures that HCUBE has will be deleted.
-C     
+C
 C                                     KS / AAO 19th May 1986
 C
 C     11th July 1989 JM / RAL. Modified to use DSA_ routines
 C                    Dynamic-memory handling changed to use
 C                    DYN_ routines
 C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT'
-C                    when mapping input data. Added STATUS checks to 
+C                    when mapping input data. Added STATUS checks to
 C                    support user-requested aborts.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
@@ -71,7 +71,7 @@ C
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   STATUS           ! Running status for DSA routines
       REAL      VALUE            ! Used by PAR_ calls to read in
-                                 ! parameters  
+                                 ! parameters
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
@@ -189,7 +189,7 @@ C
       END DO
       IF(STATUS.NE.0)GOTO 500
 C
-C     Perform the basic processing of the hypercube down to 
+C     Perform the basic processing of the hypercube down to
 C     a cube.
 C
       CALL FIG_FIGS423(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,NU,ICYST,ICYEN,
@@ -208,7 +208,7 @@ C+
 C
 C     F I G _ F I G S 4 2 3
 C
-C     Sums all the cycles of a FIGS image mode hypercube to 
+C     Sums all the cycles of a FIGS image mode hypercube to
 C     produce an CUBE.
 C
 c     Parameters -  (">" input, "!" modified, "W" workspace)
@@ -225,7 +225,7 @@ C     (<) CUBE      (Real array CUBE(NX,NY,NT)) The resulting CUBE.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_FILL      Sets an array of bytes to a constant value
 C

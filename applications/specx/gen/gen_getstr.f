@@ -72,7 +72,7 @@ CD      PRINT *, '   Good hollerith string; accept it'
       ELSE IF (GEN_ALPHANUM (STR(:ILS))) THEN
 CD      PRINT *, '   String is alphanumeric; test for string-symbol'
         CALL GEN_INQSYMB (STR(:ILS), SYM_INDEX, TYPE, LENGTH,
-     &                    ADDRESS, READONLY, IERR) 
+     &                    ADDRESS, READONLY, IERR)
         IF (SYM_INDEX.EQ.0 .OR. TYPE(1:1).NE.'C') THEN
 CD        PRINT *, '   String not a string-symbol name; use as is'
           STRING = STR(:ILS) // ' '

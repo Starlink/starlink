@@ -917,8 +917,8 @@ itcl::class gaia::ETable {
    #  Number of rows of table that actually exist (note column must be
    #  created first, hence the check for havrows).
    itk_option define -rows rows Rows 0 {
-      if { [info exists itk_option(-rows) ] && 
-           [info exists havrows(0)] } { 
+      if { [info exists itk_option(-rows) ] &&
+           [info exists havrows(0)] } {
          for { set j 0 } { $j < $itk_option(-columns) } { incr j } {
             if { $havrows($j) < $itk_option(-rows) } {
                for { set i $havrows($j) } { $i < $itk_option(-rows) } { incr i } {
@@ -928,7 +928,7 @@ itcl::class gaia::ETable {
                         -highlightbackground $itk_option(-background)
                   }
                   set ent $itk_component(${j}${i})
-                  
+
                   #  Set bindings for controlling selection.
                   ::bind $ent <1>         [code $this _beginselect $i $j %X %Y]
                   ::bind $ent <B1-Leave>  [code $this _autoscan $i $j]
@@ -940,22 +940,22 @@ itcl::class gaia::ETable {
                   ::bind $ent <Down>      [code $this _updown $i $j 1]
                   ::bind $ent <Shift-Up>  [code $this _extendupdown $i $j -1]
                   ::bind $ent <Shift-Down> [code $this _extendupdown $i $j 1]
-                  
+
                   #  And watch for potential modifications.
                   ::bind $ent <KeyPress>   [code $this configure -modified 1]
-                  
+
                   #  Set the action command if defined already.
                   if { $itk_option(-action) != {} } {
                      ::bind $ent <Return> [code $itk_option(-action)]
                   }
-                  
+
                   #  Pack entry widget into frame.
                   pack $ent -fill x
                   set state($i) 0
                }
                set havrows($j) $itk_option(-rows)
             } elseif { $havrows($j) > $itk_option(-rows) } {
-               
+
                #  Need to delete some.
                for { set i $itk_option(-rows) } { $i < $havrows($j) } { incr i } {
                   destroy $itk_component(${j}${i})
@@ -963,16 +963,16 @@ itcl::class gaia::ETable {
                }
                set havrows($j) $itk_option(-rows)
             }
-            
+
          }
          #  Set the scrollregion to this new size.
          _scrollregion {}
       }
    }
-   
+
    #  If any of the entries have been modified (i.e. keypress of unknown nature).
    itk_option define -modified modified Modified 0 {}
-   
+
    #  Number of columns that exist in widget.
    itk_option define -columns columns Columns 0 {
       if { $havcols < $itk_option(-columns) } {
@@ -992,7 +992,7 @@ itcl::class gaia::ETable {
             pack $f.label -fill x
             lappend tags c$i
             set xoff [expr $xoff +$columnwidth]
-            
+
             #  No rows created in this column yet.
             set havrows($i) 0
          }
@@ -1071,7 +1071,7 @@ itcl::class gaia::ETable {
             $itk_component(canvas) configure \
                -yscrollcommand  [code $itk_component(vscroll) set]
          }
-         
+
          #  Horizontal scrollbar requires packing frames for indentation at corners.
          if { $hori != -1 } {
             itk_component add pad {
@@ -1099,7 +1099,7 @@ itcl::class gaia::ETable {
                -xscrollcommand [code $itk_component(hscroll) set]
             set side [lindex $itk_option(-scrollbarplaces) $hori]
          }
-         
+
          #  Now do packing. Place horizontal first to fill extent and get
          #  padding frames to take up extra.
          if { $hori != -1 } {

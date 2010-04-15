@@ -106,7 +106,7 @@
      :        /'Error getting observation type', STATUS )
          END IF
 
-*      The observation type should be 'ARC', indicating a new 
+*      The observation type should be 'ARC', indicating a new
 *      observation which has been processed with the Figaro ARC
 *      function, or 'CALIB', indicating an old CALIBRATION
 *      which is being re-filed. It is possible to define other
@@ -163,9 +163,9 @@
          IF ( (INDEX(OLDTYPE,'CALIB').EQ.0) ) THEN
 
             CLEN = MAX( 1, CHR_LEN( OLDTYPE ) )
-            CALL DSA_PUT_FITS_C( 'CALIB', 'OLDTYPE', 
+            CALL DSA_PUT_FITS_C( 'CALIB', 'OLDTYPE',
      :        OLDTYPE(1:CLEN), ' ', DSA_STATUS )
-            CALL DSA_PUT_FITS_C( 'OBSFILE', 'OLDTYPE', 
+            CALL DSA_PUT_FITS_C( 'OBSFILE', 'OLDTYPE',
      :        OLDTYPE(1:CLEN), ' ', DSA_STATUS )
             CALL DSA_PUT_FITS_C( 'CALIB', 'OBSTYPE',
      :        'CALIBRATION', ' ', DSA_STATUS )
@@ -196,8 +196,8 @@
      :        /'Error closing DSA', STATUS )
          END IF
 
-         CALL RED4_FILE_OBSERVATION_2( OBSERVATION, CALIB, 
-     :      'WHATEVER_IT_IS', STATUS ) 
+         CALL RED4_FILE_OBSERVATION_2( OBSERVATION, CALIB,
+     :      'WHATEVER_IT_IS', STATUS )
       ELSE
 
          STATUS = SAI__ERROR

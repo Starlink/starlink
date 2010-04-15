@@ -23,7 +23,7 @@
 *        An identifier for the group
 *     NEL = INTEGER (Given)
 *        The size of the array.
-*     ISTART = INTEGER (Given) 
+*     ISTART = INTEGER (Given)
 *        The index of the array element to receive the first value read
 *        from the group.
 *     DATA( NEL ) = DOUBLE PRECISION (Returned)
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,8 +104,8 @@
       DO I = 1, MIN( SIZE, NEL - ISTART + 1 )
 
 *  Get this element.
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
+         IF( STATUS .EQ. SAI__OK ) THEN
 
 *  If the string contains the word "bad" use a bad value.
             CALL CHR_UCASE( TEXT )
@@ -114,15 +114,15 @@
 
 *  Otherwise, attempt to convert it to a double.
             ELSE
-               CALL CHR_CTOD( TEXT, DATA( I + ISTART - 1 ), STATUS ) 
+               CALL CHR_CTOD( TEXT, DATA( I + ISTART - 1 ), STATUS )
                IF( STATUS .NE. SAI__OK ) THEN
-	       
-                  CALL ERR_BEGIN( STATUS )               
-                  CALL GRP_INFOC( IGRP, I, 'NAME', FILE, STATUS ) 
-                  CALL ERR_END( STATUS )               
-	       
+
+                  CALL ERR_BEGIN( STATUS )
+                  CALL GRP_INFOC( IGRP, I, 'NAME', FILE, STATUS )
+                  CALL ERR_END( STATUS )
+
                   CALL MSG_SETC( 'C', TEXT )
-                  IF( FILE .EQ. ' ' ) THEN 
+                  IF( FILE .EQ. ' ' ) THEN
                      CALL ERR_REP( 'ATL1_GTOFL_ERR1', 'Error reading '//
      :                             'string ''^C''.', STATUS )
                   ELSE
@@ -130,9 +130,9 @@
                      CALL ERR_REP( 'ATL1_GTOFL_ERR2', 'Error reading '//
      :                             'string ''^C'' in file ^F.', STATUS )
                   END IF
-	       
+
                   GO TO 999
-	       
+
                END IF
             END IF
          ELSE

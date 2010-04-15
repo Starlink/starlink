@@ -54,30 +54,30 @@
 *     GINFH( GN ) = REAL (Given)
 *        Height of Gaussian peak
 *     GINFW( GN ) = REAL (Given)
-*        Width (sigma) of Gaussian 
+*        Width (sigma) of Gaussian
 *     CONP( GN ) = INTEGER (Given)
-*        The array of the index number of the 
+*        The array of the index number of the
 *        Gaussians whose peak position is to be held
 *     CONH( GN ) = INTEGER (Given)
-*        The array of the index number of the 
+*        The array of the index number of the
 *        Gaussians whose peak height is to be held
 *     CONW( GN ) = INTEGER (Given)
-*        The array of the index number of the 
+*        The array of the index number of the
 *        Gaussians whose sigma is to be held
 *     ICHAINP( GN ) = INTEGER (Given)
-*        The array of the chaining index 
+*        The array of the chaining index
 *        number of the Gaussians to be chained in position
 *     CHAINP( GN ) = REAL (Given)
 *        The array of values of the line seperations
 *        of lines to be locked
 *     ICHAINH( GN ) = INTEGER (Given)
-*        The array of the chaining index number 
+*        The array of the chaining index number
 *        of the Gaussians to be chained in height
 *     CHAINH( GN ) = REAL (Given)
 *        The array of values of the line height
 *        ratios to be locked
 *     ICHAINW( GN ) = INTEGER (Given)
-*        The array of the chaining index number 
+*        The array of the chaining index number
 *        of the Gaussians to be chained in width
 *     CHAINW( GN ) = REAL (Given)
 *        The array of values of the line width
@@ -89,7 +89,7 @@
 *     GONFH( NG ) = REAL (Returned)
 *        Height of optimized Gaussian peak
 *     GONFW( NG ) = REAL (Returned)
-*        Width (sigma) of optimized Gaussian 
+*        Width (sigma) of optimized Gaussian
 *     IFAIL1 = INTEGER (Returned)
 *        Always returned zero.
 *     IFAIL2 = INTEGER (Returned)
@@ -110,7 +110,7 @@
 *     25 Apr 1987 (jrw):
 *        Handles weighting of the residuals
 *     15 Sep 1987 (jrw):
-*        Handles single constraints or chained sets of 
+*        Handles single constraints or chained sets of
 *        Gaussian fit parameters
 *     26 Jul 1994 (hme):
 *        Make common blocks SAVE. HME / UoE, Starlink.
@@ -122,7 +122,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

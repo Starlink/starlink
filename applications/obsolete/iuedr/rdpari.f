@@ -128,7 +128,7 @@
          ACTVAL = 1
       END IF
 
-      IF ( ( PRTRED .OR. ISLOG ) .AND. PARRED .AND. 
+      IF ( ( PRTRED .OR. ISLOG ) .AND. PARRED .AND.
      :     STATUS.EQ.SAI__OK ) THEN
          IF ( ISLOG ) THEN
             IOU = LOGFILE

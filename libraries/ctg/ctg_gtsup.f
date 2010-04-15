@@ -14,11 +14,11 @@
 
 *  Description:
 *     Returns the supplemental information associated with a given entry
-*     in a CTG group. 
+*     in a CTG group.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
-*        The CTG group as returned by CTG_ASSOC, etc. This should be the last 
+*        The CTG group as returned by CTG_ASSOC, etc. This should be the last
 *        group in a GRP owner-slave chain.
 *     I = INTEGER (Given)
 *        The index of the required entry.
@@ -30,13 +30,13 @@
 *           2 - File type
 *           3 - Base file name
 *           4 - Directory path
-*           5 - Full catalogue specification 
+*           5 - Full catalogue specification
 *
-*        This information is obtained from a set of groups associated with 
+*        This information is obtained from a set of groups associated with
 *        the supplied group IGRP by means of a chain of GRP "owner-slave"
 *        relationships. If any of these groups do not exist, the correponding
 *        elements of the above array are returned blank. Note, Element 5,
-*        the full catalogue specification, is obtained directly from the 
+*        the full catalogue specification, is obtained directly from the
 *        supplied group IGRP.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,8 +81,8 @@
 
 *  Arguments Given:
       INTEGER IGRP
-      INTEGER I 
-      
+      INTEGER I
+
 *  Arguments Returned:
       CHARACTER FIELDS( 5 )*(*)
 

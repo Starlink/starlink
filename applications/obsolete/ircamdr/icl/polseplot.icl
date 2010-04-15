@@ -34,7 +34,7 @@ proc polseplot
         return
       end if
     else
-      im = ffpre & dummy & ffsuf 
+      im = ffpre & dummy & ffsuf
     end if
     obeyw rapi2d shsize (im) \
     getpar glob shsize_xdim (xdim)
@@ -52,7 +52,7 @@ proc polseplot
     y2 = ty1+1
     x2z = xdim
     y2z = ysz
-    out = im & "b" 
+    out = im & "b"
     print "Extracting image " (im) " ... lower-centre strip = b" (out)
     print "  X,Y start = " (x2) "," (y2) " - X,Y size = " (x2z) "x" (y2z)
     obeyw rapi2d PICKIM (im) (x2) (y2) (x2z) (y2z) (out) \
@@ -61,7 +61,7 @@ proc polseplot
     y3 = ty2+1
     x3z = xdim
     y3z = ysz
-    out = im & "c" 
+    out = im & "c"
     print "Extracting image " (im) " ... upper-centre strip = c" (out)
     print "  X,Y start = " (x3) "," (y3) " - X,Y size = " (x3z) "x" (y3z)
     obeyw rapi2d PICKIM (im) (x3) (y3) (x3z) (y3z) (out) \
@@ -70,7 +70,7 @@ proc polseplot
     y4 = ty3+1
     x4z = xdim
     y4z = ysz
-    out = im & "d" 
+    out = im & "d"
     print "Extracting image " (im) " ... top strip = d" (out)
     print "  X,Y start = " (x4) "," (y4) " - X,Y size = " (x4z) "x" (y4z)
     obeyw rapi2d PICKIM (im) (x4) (y4) (x4z) (y4z) (out) \

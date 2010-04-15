@@ -64,7 +64,7 @@
 *  Notes:
 *     -  How the images are transfered.
 *
-*                |-----|    
+*                |-----|
 *                |     |
 *                |     |
 *                |     |
@@ -117,7 +117,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
       INTEGER YPOS2              ! Y position in IN2 indices
       INTEGER NVAL               ! Number of values
       INTEGER VAL                ! Sum of values
-      
+
 
 *.
 
@@ -191,7 +191,7 @@
                IF ( XPOS1 .LE. XDIM1 ) THEN
                   IF ( YPOS1 .GE. 1 ) THEN
                      IF ( YPOS1 .LE. YDIM1 ) THEN
-                        IF ( IN1( XPOS1, YPOS1 ) .GT. 0 ) THEN 
+                        IF ( IN1( XPOS1, YPOS1 ) .GT. 0 ) THEN
                            VAL = IN1( XPOS1, YPOS1 )
                            NVAL = NVAL + 1
                         END IF
@@ -203,7 +203,7 @@
                IF ( XPOS2 .LE. XDIM2 ) THEN
                   IF ( YPOS2 .GE. 1 ) THEN
                      IF ( YPOS2 .LE. YDIM2 ) THEN
-                        IF ( IN2( XPOS2, YPOS2 ) .GT. 0 ) THEN 
+                        IF ( IN2( XPOS2, YPOS2 ) .GT. 0 ) THEN
                            VAL = VAL + IN2( XPOS2, YPOS2 )
                            NVAL = NVAL + 1
                         END IF
@@ -219,7 +219,7 @@
                TRN( I, J ) = 0
             END IF
 
-*  Work out which 
+*  Work out which
  2       CONTINUE
  1    CONTINUE
 

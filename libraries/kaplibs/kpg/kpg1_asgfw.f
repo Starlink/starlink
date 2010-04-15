@@ -18,7 +18,7 @@
 
 *  Description:
 *     This routine writes a line of an AST Object description to a GRP
-*     group, optionally prepending it with the a given string. It is 
+*     group, optionally prepending it with the a given string. It is
 *     intended to be used as a sink function with AST_CHANNEL.
 
 *  Arguments:
@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,12 +83,12 @@
 
 *  Get the line of text to be written to the group.
       LINE = ' '
-      CALL AST_GETLINE( LINE, L, STATUS ) 
+      CALL AST_GETLINE( LINE, L, STATUS )
 
 *  If required, prepend it with the supplied character.
-      IF( ASTGSP .NE. ' ' ) CALL CHR_PREFX( ASTGSP, LINE, L ) 
+      IF( ASTGSP .NE. ' ' ) CALL CHR_PREFX( ASTGSP, LINE, L )
 
 *  Append it to the group.
-      CALL GRP_PUT( ASTGRP, 1, LINE( : L ), 0, STATUS ) 
+      CALL GRP_PUT( ASTGRP, 1, LINE( : L ), 0, STATUS )
 
       END

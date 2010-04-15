@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_LFTA( QUICK, ITYPE, ORDER, AXIS, NRANGE, RANGES, 
-     :                      USEVAR, IPVAR, USEMSK, MASK, DIMS, IPDAT, 
+      SUBROUTINE KPS1_LFTA( QUICK, ITYPE, ORDER, AXIS, NRANGE, RANGES,
+     :                      USEVAR, IPVAR, USEMSK, MASK, DIMS, IPDAT,
      :                      AS, BS, WRK1, WRK2, STATUS )
 
 *+
@@ -19,14 +19,14 @@
 *                     WRK2, STATUS )
 
 *  Description:
-*     This wrapper routine fits polynomials, of a given order, to all 
-*     lines of data that lie parallel to a given axis, and lie within 
-*     ranges along that axis for any numeric data type.  It is 
-*     essentially code lifted from MFITTREND to make the task code more 
+*     This wrapper routine fits polynomials, of a given order, to all
+*     lines of data that lie parallel to a given axis, and lie within
+*     ranges along that axis for any numeric data type.  It is
+*     essentially code lifted from MFITTREND to make the task code more
 *     manageable and readable.
 *
 *     It invokes KPS1_LFTx or KPS1_LFTQx for the supplied ITYPE data
-*     type to do the work.  The latter routine set is used for quick 
+*     type to do the work.  The latter routine set is used for quick
 *     processing when there are no bad pixels or weights (see QUICK).
 *     See these two routines for details of the various mapped arrays.
 
@@ -55,10 +55,10 @@
 *        If .TRUE., then the variances will be used to weight the fits.
 *     IPVAR = INTEGER (Given)
 *        Pointer to the variances of the data, mapped using type ITYPE.
-*        These variaces will be used to weight the fits if USEVAR is 
+*        These variaces will be used to weight the fits if USEVAR is
 *        true.
 *     USEMSK = LOGICAL (Given)
-*        If .TRUE. then the supplied mask (argument MASK) is used to 
+*        If .TRUE. then the supplied mask (argument MASK) is used to
 *        omit parts of the data from the fitting process.
 *     MASK( * ) = BYTE (Given)
 *        A mask in which bad values indicate that a given element of
@@ -207,41 +207,41 @@
          END IF
       ELSE
 
-*  As there are no variances, no bad values and no mask, we can use 
+*  As there are no variances, no bad values and no mask, we can use
 *  the fastest method.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LFTQB( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
            CALL KPS1_LFTQUB( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_LFTQD( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LFTQI( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LFTQR( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
-  
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_LFTQW( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
 
         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_LFTQUW( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                        %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2, 
+     :                        %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                        STATUS )
          END IF
       END IF

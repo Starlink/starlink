@@ -22,10 +22,10 @@
 *    Global variables :
       INCLUDE 'P4COM.INC'        ! P4 common block
 *    Local variables :
-      INTEGER 
+      INTEGER
      :  ACTBYTES,                ! Actual number of bytes read from NBS
      :  NSTART,                  ! Start of DO-loop value
-     :  NEND,                    ! End of DO-loop value 
+     :  NEND,                    ! End of DO-loop value
      :  I,                       ! Counter for Do-loop
      :  ERR_STAT                 ! An error status
 *-
@@ -139,7 +139,7 @@ C        DEVICE_XOPT(I) = ' '
         ENDIF
       ELSE
         IF ( VERBOSE ) THEN
-          CALL MSG_OUT( ' ', 
+          CALL MSG_OUT( ' ',
      :      'Restored noticeboard from common block OK', STATUS )
         ENDIF
       ENDIF

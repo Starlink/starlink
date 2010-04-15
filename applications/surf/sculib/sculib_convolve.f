@@ -135,7 +135,7 @@
          R_QUALITY (JK) = 1
          QUAL = 0
          DONE = .FALSE.
-         
+
          DO KL = MIN(1,1+N_MIDDLE-JK), N_B
             JK1 = JK - N_MIDDLE + KL
 

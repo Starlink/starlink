@@ -15,7 +15,7 @@
 
 * History:
 *  Changed to use DSA routine, TNW 17/10/88
-*  
+*
 * Arguments:
 *    STATUS = INTEGER (Given and returned)
 *        Error status

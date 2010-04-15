@@ -13,22 +13,22 @@
 *     CALL KPS1_PRFLT( AXIS, NP, NDIM, POS, MAP, STATUS )
 
 *  Description:
-*     This routine creates an AST LutMap which transforms the 1-D 
-*     co-ordinate in the input Frame into the co-ordinate on a given axis 
+*     This routine creates an AST LutMap which transforms the 1-D
+*     co-ordinate in the input Frame into the co-ordinate on a given axis
 *     of a given output Frame. It also fills the supplied 1-D LUT with
-*     the corresponding 1-D GRID co-ordinates. It is used by PROFILE. 
+*     the corresponding 1-D GRID co-ordinates. It is used by PROFILE.
 
 *  Arguments:
 *     AXIS = INTEGER (Given)
-*        The index of the axis within the output Frame for which the LutMap 
+*        The index of the axis within the output Frame for which the LutMap
 *        is required.
 *     NP = INTEGER (Given)
 *        The number of positions to be described in the look-up-table.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the supplied POS array.
 *     POS( NP, NDIM ) = DOUBLE PRECISION (Given and Returned)
-*        A set of look-up-tables, one for each of the NDIM output axes, each 
-*        with NP entries. On exit, the row specified by AXIS is set holding 
+*        A set of look-up-tables, one for each of the NDIM output axes, each
+*        with NP entries. On exit, the row specified by AXIS is set holding
 *        values 1.0, 2.0, 3.0, ... DBLE( NP ).
 *     MAP = INTEGER (Returned)
 *        An AST pointer to the returned LutMap for the required axis.
@@ -67,11 +67,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER AXIS
@@ -115,11 +115,11 @@
 *  which performs the required mapping.
       IF( EQUAL ) THEN
          MAP = AST_PERMMAP( 1, 0, 1, -1, VAL0, ' ', STATUS )
- 
+
 *  If the LUT values are not all equal, create the LutMap.
-      ELSE 
-         MAP = AST_LUTMAP( NP, POS( 1, AXIS ), 1.0D0, 1.0D0, ' ', 
-     :                     STATUS ) 
+      ELSE
+         MAP = AST_LUTMAP( NP, POS( 1, AXIS ), 1.0D0, 1.0D0, ' ',
+     :                     STATUS )
       END IF
 
 *  Return an array holding GRID co-ordinate within the LUT.

@@ -53,14 +53,14 @@
 *     the routine:-
 *      - USER (1) = J_TEL
 *      - USER (2) = J_ATM
-*      - USER (3) = ETA_TEL 
-*      - USER (4:M+3)     = the measured airmasses 
-*      - USER (M+4:2M+3)  = the measured sky temperatures 
+*      - USER (3) = ETA_TEL
+*      - USER (4:M+3)     = the measured airmasses
+*      - USER (M+4:2M+3)  = the measured sky temperatures
 *      - USER (2M+4:3M+3) = the errors on the measured sky temperatures
 *
 
 *  Invocation:
-*     CALL SCULIB_SKYFUNC_2 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE, 
+*     CALL SCULIB_SKYFUNC_2 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE,
 *    :  IUSER, USER)
 
 *  Arguments:
@@ -175,7 +175,7 @@
 
       IF ((MODE .EQ. 1) .OR. (MODE .EQ. 2)) THEN
 
-*  calculate Jacobian matrix 
+*  calculate Jacobian matrix
 
          DO I = 1, M
 
@@ -185,7 +185,7 @@
 
             IF (ABS(TAU * AIRMASS) .LT. 20.0D0) THEN
 
-               FJAC (I,1) = (- ETA_TEL * J_ATM * 
+               FJAC (I,1) = (- ETA_TEL * J_ATM *
      :           EXP (-TAU * AIRMASS)) / MAX (J_ERROR,1.0D-5)
                FJAC (I,2) = (AIRMASS * B * ETA_TEL * J_ATM *
      :           EXP (-TAU * AIRMASS)) / MAX (J_ERROR,1.0D-5)

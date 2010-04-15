@@ -30,8 +30,8 @@
 *  ADAM Parameters:
 *     AXIS = _LOGICAL (Read)
 *        If a TRUE value is given for this parameter (the default),
-*        then any axis values and WCS information associated with the 
-*        NDF dimension being reversed will also be reversed in the same 
+*        then any axis values and WCS information associated with the
+*        NDF dimension being reversed will also be reversed in the same
 *        way.  If a FALSE value is given, then all axis values and WCS
 *        information will be left unchanged. [TRUE]
 *     DIM = _INTEGER (Read)
@@ -119,7 +119,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -198,53 +198,53 @@
 
 *  Determine if the input array is defined.
          CALL NDF_STATE( NDF1, COMP( ICOMP ), THERE, STATUS )
-      
+
 *  If so, then determine its numeric type and map the input and output
 *  arrays for access using this type.
-         IF ( THERE ) THEN      
+         IF ( THERE ) THEN
             CALL NDF_TYPE( NDF1, COMP( ICOMP ), TYPE, STATUS )
-            CALL KPG1_MAP( NDF1, COMP( ICOMP ), TYPE, 'READ', PNTR1, 
+            CALL KPG1_MAP( NDF1, COMP( ICOMP ), TYPE, 'READ', PNTR1,
      :                     EL, STATUS )
-            CALL KPG1_MAP( NDF2, COMP( ICOMP ), TYPE, 'WRITE', PNTR2, 
+            CALL KPG1_MAP( NDF2, COMP( ICOMP ), TYPE, 'WRITE', PNTR2,
      :                     EL, STATUS )
 
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
             IF ( TYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_FLIPB( NDIM, DIM, 
+               CALL KPG1_FLIPB( NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_FLIPUB( NDIM, DIM, 
+               CALL KPG1_FLIPUB( NDIM, DIM,
      :                           %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
-     :                           %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                           STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_FLIPD( NDIM, DIM, 
+               CALL KPG1_FLIPD( NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_FLIPI( NDIM, DIM, 
+               CALL KPG1_FLIPI( NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_FLIPR( NDIM, DIM, 
+               CALL KPG1_FLIPR( NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_FLIPW( NDIM, DIM, 
+               CALL KPG1_FLIPW( NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_FLIPUW( NDIM, DIM, 
+               CALL KPG1_FLIPUW( NDIM, DIM,
      :                           %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
-     :                           %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                           STATUS )
             END IF
 
@@ -268,7 +268,7 @@
             CALL NDF_UNMAP( NDF1, COMP( ICOMP ), STATUS )
             CALL NDF_UNMAP( NDF2, COMP( ICOMP ), STATUS )
          END IF
- 1    CONTINUE     
+ 1    CONTINUE
 
 *  Process the axis arrays.
 *  =======================
@@ -281,10 +281,10 @@
 
 *  Determine if the input axis array is defined.
             CALL NDF_ASTAT( NDF1, ACOMP( ICOMP ), IDIM, THERE, STATUS )
-      
+
 *  If so, then determine its numeric type and map the input and output
 *  axis arrays for access using this type.
-            IF ( THERE ) THEN      
+            IF ( THERE ) THEN
                CALL NDF_ATYPE( NDF1, ACOMP( ICOMP ), IDIM, TYPE,
      :                         STATUS )
                CALL NDF_AMAP( NDF1, ACOMP( ICOMP ), IDIM, TYPE, 'READ',
@@ -295,45 +295,45 @@
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
                IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_FLIPB( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPB( 1, DIM( IDIM ),
      :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                             STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_FLIPUB( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPUB( 1, DIM( IDIM ),
      :                              %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                              1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                              1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                              STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_FLIPD( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPD( 1, DIM( IDIM ),
      :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                             STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_FLIPI( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPI( 1, DIM( IDIM ),
      :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                             STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_FLIPR( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPR( 1, DIM( IDIM ),
      :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                             STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_FLIPW( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPW( 1, DIM( IDIM ),
      :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                             STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_FLIPUW( 1, DIM( IDIM ), 
+                  CALL KPG1_FLIPUW( 1, DIM( IDIM ),
      :                              %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                              1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                              1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                              STATUS )
                END IF
 
@@ -348,7 +348,7 @@
 *  ============================
       IF( AXIS ) THEN
 
-*  Set up a matrix and offset vector describing the linear mapping from 
+*  Set up a matrix and offset vector describing the linear mapping from
 *  input pixel coordinates to output pixel coordinates. First of all
 *  set the matrix and vector to a unit transformation.
          DO I = 1, NDIM*NDIM
@@ -359,7 +359,7 @@
             OFFSET( I ) = 0.0D0
             MATRIX( NDIM*( I - 1 ) + I ) = 1.0D0
          END DO
-   
+
 *  Now change the scale factor for the flipped axis to -1.0
          MATRIX( NDIM*( IDIM - 1 ) + IDIM ) = -1.0D0
 

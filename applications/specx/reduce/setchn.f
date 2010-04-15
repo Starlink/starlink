@@ -30,7 +30,7 @@ C       Declare external function INQUAD LOGICAL
       CALL QLIM(NQ,NQ1,NQ2)
       OUTRNGE=.TRUE.
 
-      DO NQ=NQ1,NQ2 
+      DO NQ=NQ1,NQ2
        IF(DOQUAD(NQ)) THEN
         JC1=MAX0(IC1,NTOT(NQ-1)+1)
         JC2=MIN0(IC2,NTOT(NQ))

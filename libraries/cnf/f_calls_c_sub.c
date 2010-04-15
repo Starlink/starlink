@@ -237,7 +237,7 @@ F77_CHARACTER_FUNCTION(fc)( CHARACTER_RETURN_VALUE(text), CHARACTER(c)
    GENPTR_CHARACTER(c)
 
    static char local[41];
-   
+
    cnf_imprt( c, c_length, local );
    strcat( local, " to you too" );
    cnf_exprt( local, text, text_length );
@@ -289,7 +289,7 @@ F77_SUBROUTINE(getmem)( POINTER(ptr), INTEGER(n) )
 
    temp = cnfMalloc( (size_t)(*n) );
    *ptr = cnfFptr( temp );
-}   
+}
 
 F77_SUBROUTINE(freemem)( POINTER(ptr) )
 {

@@ -52,7 +52,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  Subroutine / function details:

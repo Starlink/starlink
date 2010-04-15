@@ -4,9 +4,9 @@
 *     JCMT_IUNSORT
 
 *  Purpose:
-*     This routine unsorts the IN integer array that has previously been 
-*     sorted using the Figaro GEN_IVSORT routine working with the index 
-*     array INDEX. The output is placed in OUT. IN and OUT must NOT be the 
+*     This routine unsorts the IN integer array that has previously been
+*     sorted using the Figaro GEN_IVSORT routine working with the index
+*     array INDEX. The output is placed in OUT. IN and OUT must NOT be the
 *     same array.
 
 *  Language:
@@ -45,10 +45,10 @@
 *  Local variables:
       INTEGER I
 *.
-       
+
       DO I = 1, N
          OUT(INDEX(I)) = IN(I)
       END DO
 
       END
-              
+

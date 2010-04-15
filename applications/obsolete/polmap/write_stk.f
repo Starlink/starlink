@@ -5,7 +5,7 @@
      &Q,QV,U,UV)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   W R I T E _ S T K
 C
@@ -13,19 +13,19 @@ C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
 C
-C Parameters: 
+C Parameters:
 C
 C STK_NPTS (<), STK_LAMBDA (<), STK_STOKES_I (<),
 C STK_STOKES_Q (<),
 C STK_STOKES_QV (<), STK_STOKES_U (<), STK_STOKES_UV (<), TOP_STK (<),
 C NPTS (<), WA (>), IAR (>), Q (>), QV (>), U (>), UV (>)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Writes out a stack mapped previously
 C

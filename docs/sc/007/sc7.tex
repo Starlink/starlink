@@ -19,7 +19,7 @@
 
 This Cookbook describes the basic concepts and methods used in optical
 astronomical spectroscopy; it is aimed at those new to the field.
-Complete worked example reductions for both one- and two-dimensional 
+Complete worked example reductions for both one- and two-dimensional
 longslit spectra, using real datasets, are described.  Common problems and
 their solutions are discussed.  A section on related resources is
 included, as is a glossary of commonly used terms.  }
@@ -434,8 +434,8 @@ astronomical spectroscopy; it is aimed at those new to the field.
 The term `spectroscopy' covers quite a few areas, each within itself
 worthy of a Cookbook.
 For the sake of brevity, the scope of this document is limited to
-one-dimensional (1-D) and longslit (2-D) spectra, in the optical 
-waveband, recorded with \htmlref{CCD}{gl_ccd} detectors. 
+one-dimensional (1-D) and longslit (2-D) spectra, in the optical
+waveband, recorded with \htmlref{CCD}{gl_ccd} detectors.
 
 The reductions described in later sections of this document are the
 most-common, simple, and straightforward that you might encounter.
@@ -471,7 +471,7 @@ The concepts used in spectrum extraction, problems and how to get
 around them, are covered in \scspec{\S\ref{basic_reduction_steps}}
 {\htmlref{Basic Steps}{basic_reduction_steps}} for 1-D data and in
 \scspec{\S\ref{longslit_reduction_steps}} {\htmlref{Longslit
-reduction}{longslit_reduction_steps}} for longslit data. 
+reduction}{longslit_reduction_steps}} for longslit data.
 
 Once you have an idea of what you're doing, you'll want to know how to
 do it; this is covered in \scspec{\S\ref{simple_worked_example}}
@@ -1153,7 +1153,7 @@ The basic steps here are:
          {\leavevmode\epsfysize=136mm\epsfbox{sc7_08.eps}}
 
   \parbox{140mm}{
-    \caption{Line Identification: a typical plot during interactive 
+    \caption{Line Identification: a typical plot during interactive
              fitting with \xref{{\bf echmenu}}{sun152}{}.}
     \label{fi_echarc_plot}
   }
@@ -1352,7 +1352,7 @@ and the commands you must execute are:
 \end{verbatim}
 }
 
-If your Starlink software is installed somewhere other than 
+If your Starlink software is installed somewhere other than
 \verb+/star+---one place to look is \verb+STARLINK_DIR+---then
 modify the commands appropriately.  Most people include these lines in
 their shell login file (\verb+.login+ in your home directory).
@@ -1439,7 +1439,7 @@ object1.sdf  Frame with a rotated spectrum
 \subsection{\mlabel{inspecting_the_images}Inspecting the Images}
 
 The first thing you need to do is ensure that the images are oriented
-correctly.  To do this use \xref{{\sc kappa}}{sun95}{} 
+correctly.  To do this use \xref{{\sc kappa}}{sun95}{}
 \xref{{\bf display}}{sun95}{DISPLAY} to look at the image:
 
 {
@@ -1807,9 +1807,9 @@ strong absorption feature.
   \scspec{\leavevmode\epsfysize=100mm\epsfbox{sc7_12.eps}}
          {\leavevmode\epsfysize=136mm\epsfbox{sc7_12.eps}}
 
-  \parbox{140mm}{ 
+  \parbox{140mm}{
     \caption{Finding the dekker-limits of the slit: a plot of a section
-             through a flat field, produced using {\bf echmenu} Option~4.1 
+             through a flat field, produced using {\bf echmenu} Option~4.1
              {\sl Determine dekker extent.}}
     \label{fi_dekker_limits}
   }
@@ -1840,7 +1840,7 @@ the dekker hit the \verb+E+ key.
 
   \parbox{140mm}{
     \caption{Selecting object and background channels: a plot of a section
-             through an object spectrum, produced using {\bf echmenu} 
+             through an object spectrum, produced using {\bf echmenu}
              Option~4.2 {\sl Determine object limits.}}
     \label{fi_channel_select_again}
   }
@@ -2318,7 +2318,7 @@ software.
 \markboth{Longslit Reduction Steps}{\stardocname}
 
 In this section each of the basic steps in the longslit spectral data reduction
-procedure are described. Many of the initial steps are similar to those 
+procedure are described. Many of the initial steps are similar to those
 for 1-D data and reference will be made to those sections with notes
 for any slight differences. Later steps do become 2-D data specific.
 
@@ -2336,19 +2336,19 @@ in the spectrum with position.
 
 Given this, the initial image preparation is the same as for 1-D data
 which is described in \scspec{\S\ref{image_preparation}}
-{\htmlref{{\sl Image Preparation}}{image_preparation}} and 
+{\htmlref{{\sl Image Preparation}}{image_preparation}} and
  \scspec{\S\ref{flat_fielding}}
 {\htmlref{Flat Fielding}{flat_fielding}}.
 
 
 
-The order in which 2-D data is calibrated is different to that for 1-D 
+The order in which 2-D data is calibrated is different to that for 1-D
 data. Many of the tasks in processing the data (e.g. background sky
 emission line subtraction) require the 2-D frame to be correctly
 oriented with spatial and dispersion axes perpendicular.
 
 As can be seen in the example arc line image (see
-\scspec{Figure~\ref{arc_line_curve},page~\pageref{arc_line_curve},}{the 
+\scspec{Figure~\ref{arc_line_curve},page~\pageref{arc_line_curve},}{the
 figure below} for an example) the
 lines have a definite curvature along the spatial axis. This is due to
 the different path lengths the light takes through the optics along
@@ -2378,7 +2378,7 @@ described above.
 
 The wavelength calibration works in the same way as described for 1-D
 spectra, matching the wavelengths of known arc lines to the pixel
-values for the centres of the lines and performing a polynomial fit to 
+values for the centres of the lines and performing a polynomial fit to
 the data. Before this can be done we must calculate the curvature of the arc
 lines on the frame in order to straighten them.
 
@@ -2390,14 +2390,14 @@ line. A polynomial matching pixel and wavelength values along the
 dispersion axis can then be fitted.
 
 For 2-D frames these fits are output in an .iar file, which contains
-the polynomial coefficients. These can then be used by other programs 
+the polynomial coefficients. These can then be used by other programs
 to 'scrunch' the data, in other words to resample the data correcting
 the distortions and calibrating the wavelength axis.
 
 As with 1-D spectra it is important to use arc lines which enable a
-sensible polynomial fit to be made, i.e. well spaced over the whole of 
+sensible polynomial fit to be made, i.e. well spaced over the whole of
 the CCD. Similarly, as low an order polynomial as sensibly fits the
-data should be used to prevent large errors being generated at the ends 
+data should be used to prevent large errors being generated at the ends
 of the dispersion axis.
 
 \subsection{\mlabel{scrunching}Scrunching}
@@ -2422,7 +2422,7 @@ shift from arc line images taken before and after the data.
 
 \subsection{\mlabel{fluxcal_2d}Flux calibration}
 
-Flux calibration works in much the same way as for 1-D spectra, see 
+Flux calibration works in much the same way as for 1-D spectra, see
 \scspec{\S\ref{flux_calibration}}
 {\htmlref{{\sl Flux Calibration \&
                Extinction Correction}}{flux_calibration}}.
@@ -2484,16 +2484,16 @@ something like:
 \begin{verbatim}
 
    % figaro     # Only needed once per session.
- 
+
  ----------- Initialising for  Figaro ------------
               General data reduction
             Version 5.3-0  29 December 1997
- 
+
           Type "fighelp figaro" for help
       or "fighelp news" for news on changes
- 
+
  Type "showme sun86" to browse HTML documentation
- 
+
  Use "abbrev" and "noabbrev" to turn parameter name
  abbreviation on and off.
 
@@ -2506,11 +2506,11 @@ something like:
       Type kaphelp for help on KAPPA commands
       Type "showme sun95" to browse the hypertext documentation
 
- 
+
    % twodspec   # Only needed once per session.
- 
+
    TWODSPEC commands are now available -- (Version 0.9-0)
- 
+
    Type "showme sun16" to browse the hypertext documentation.
 \end{verbatim}
 }
@@ -2645,7 +2645,7 @@ Picture comment: KAPPA_DISPLAY, name: DATA, reporting: PIXEL coordinates
  p1 = 144.6 (pixel)   p2 = 12.9 (pixel)
  p1 = 149.8           p2 = 492.7
 \end{verbatim}
-} 
+}
 
 So we have a range of 13 to 493 in the y-axis.
 
@@ -2661,7 +2661,7 @@ interactive displays and will be described in the text.
 {
 \scspec{\small}{ }
 \begin{verbatim}
-   % arc2d arcframe2d      
+   % arc2d arcframe2d
 
 arcframe2d[1024,525] THAR FOR PREV
 Results structure present
@@ -2727,7 +2727,7 @@ below.})
        {\leavevmode\epsfysize=136mm\epsfbox{sc7_14.eps}}
 
   \parbox{140mm}{
-    \caption{An arc line spectrum with lines selected between the 
+    \caption{An arc line spectrum with lines selected between the
              tram-lines.}
     \label{arc_select}
   }
@@ -2895,7 +2895,7 @@ looks to be a good one.
          {\leavevmode\epsfysize=136mm\epsfbox{sc7_16.eps}}
 
   \parbox{140mm}{
-    \caption{The residuals with increasing order for a polynomial fit to 
+    \caption{The residuals with increasing order for a polynomial fit to
              the arc line curvature.}
     \label{poly_order}
   }
@@ -2913,7 +2913,7 @@ further orders.
 The program then asks for the order you wish to use:
 {\scspec{\small}{ }
 \begin{verbatim}
-ORDER - order for polynomial fitting /2/ > 
+ORDER - order for polynomial fitting /2/ >
 \end{verbatim}
 }
 
@@ -2935,7 +2935,7 @@ Accept : Accept fits
 Retry  : Try again
 Quit   : Give up
 
-CHARACTER_VALUE - Continuity Fits /'ACCEPT'/ > 
+CHARACTER_VALUE - Continuity Fits /'ACCEPT'/ >
 \end{verbatim}
 }
 
@@ -2966,7 +2966,7 @@ of that line in the calculations.
 \end{figure}
 
 
-On the far right of the display is a selector for the order of fit to be used 
+On the far right of the display is a selector for the order of fit to be used
 and then the y-axis (or X-section) number to perform the fit at.
 
 In this case we shall use a 3rd order fit (which should already be
@@ -2990,8 +2990,8 @@ page~\pageref{dispfit},}{the figure below} for an example fit.
          {\leavevmode\epsfysize=136mm\epsfbox{sc7_18.eps}}
 
   \parbox{140mm}{
-    \caption{An example dispersion fit, displaying the polynomial used 
-             for the fit in the upper panel and the residuals in the lower 
+    \caption{An example dispersion fit, displaying the polynomial used
+             for the fit in the upper panel and the residuals in the lower
              panel.}
     \label{dispfit}
   }
@@ -2999,13 +2999,13 @@ page~\pageref{dispfit},}{the figure below} for an example fit.
 \end{figure}
 
 
- 
+
 We could then go on to try a 2nd order polynomial fit - select order
 two by clicking the order selector at the right of the screen and
 press {\tt f} again. You can see then residuals are now around
 $\pm0.5$.
 
-Select order 3 again and refit the data (press {\tt f} again). 
+Select order 3 again and refit the data (press {\tt f} again).
 
 When you are happy you press {\tt a} to accept the fit. Control now
 reverts to the terminal window where you can opt to see tables of the
@@ -3035,11 +3035,11 @@ The .iar file generated is a simple ascii file and can be looked at with more:
  % more arcframe2d.iar
 
  2d fit to data in image arcframe2d
- 
-image dimensions  1024 by   525                                         
-number of rows that could not be fitted =     0                         
-maximum chi-squared error =       0.00                                  
-maximum degree polynomial used =   3                                    
+
+image dimensions  1024 by   525
+number of rows that could not be fitted =     0
+maximum chi-squared error =       0.00
+maximum degree polynomial used =   3
              1            0.3543959884354487D-07 -0.1650474022720115D-04
   0.2625885040194589D-01  0.6705221506967161D+04
              2            0.3544256762805665D-07 -0.1649068558149317D-04
@@ -3138,7 +3138,7 @@ scrunched quartz lamp image.
 {\scspec{\small}{ }
 \begin{verbatim}
    % display object2dscrunch mode=pe accept
-   % lutgrey 
+   % lutgrey
 \end{verbatim}
 }
 
@@ -3150,11 +3150,11 @@ lines.
 
 {\scspec{\small}{ }
 \begin{verbatim}
-   % extract quartz2dscrunch 13 493 quartzspec 
+   % extract quartz2dscrunch 13 493 quartzspec
 \end{verbatim}
 }
 
-This generates a spectrum quartzspec.sdf which we can view with 
+This generates a spectrum quartzspec.sdf which we can view with
 
 {\scspec{\small}{ }
 \begin{verbatim}
@@ -3194,7 +3194,7 @@ the exit. The fitted line is then drawn over the spectrum.
 
 
 
-We can view this on its own with 
+We can view this on its own with
 
 {\scspec{\small}{ }
 \begin{verbatim}
@@ -3232,7 +3232,7 @@ For my fitted spectrum this gave these results:
             At pixel            : (1)
             Co-ordinate         : (6700.157)
          Total number of pixels : 1024
-         Number of pixels used  : 1024 
+         Number of pixels used  : 1024
 \end{verbatim}
 }
 
@@ -3266,13 +3266,13 @@ page~\pageref{finalcal}.}{the figure below.}
           {\leavevmode\epsfysize=136mm\epsfbox{sc7_21.eps}}
 
   \parbox{140mm}{
-    \caption{The calibrated data frame, corrected for the instrumental 
+    \caption{The calibrated data frame, corrected for the instrumental
              response.}
     \label{finalcal}
   }
 \end{center}
 \end{figure}
- ) with:  
+ ) with:
 
 {
 \scspec{\small}{ }
@@ -3561,7 +3561,7 @@ try \xref{{\bf echmenu} Option~2}{sun152}{option2}\@.
 
 \subsection{\mlabel{cook_tracing}Tracing Strategies}
 
-Usually the default value {\tt C}, `centroid' for 
+Usually the default value {\tt C}, `centroid' for
 \xref{{\tt trace\_mode}}{sun152}{par_TRACE_MODE} works reasonably
 well. Running \xref{{\bf echmenu}}{sun152}{ECHMENU} \xref{Option~3
 {\sl Clip fitted traces}}{sun152}{option3}, and performing some small
@@ -4126,7 +4126,7 @@ Y
       you to select which orders you wish to extract.
 
 \item {\bf\label{gl_scrunch}Scrunch, scrunching}\\
-      The process of correcting a raw 2-D spectral image for curvature 
+      The process of correcting a raw 2-D spectral image for curvature
       along the slit length and calibrating the wavelength axis.
 
 \item {\bf\label{gl_slit}Slit}\\
@@ -4184,7 +4184,7 @@ Y
       across an image frame.
 
 \item {\bf\label{gl_twodspec}TWODSPEC}\\
-      A 2-D spectral data reduction and analysis package. It is described in 
+      A 2-D spectral data reduction and analysis package. It is described in
       \xref{SUN/16}{sun16}{}.
 
 \item {\bf\label{gl_ucles}UCLES}\\

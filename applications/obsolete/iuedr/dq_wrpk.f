@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Pack value into subset of packed data quality value.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -32,10 +32,10 @@
       INTEGER SUBVAL       ! subset value to be planted
       INTEGER START        ! start bit
       INTEGER NBIT         ! number of bits to be planted
- 
+
 *   Import-Export:
       INTEGER VALUE        ! value to be modified
- 
+
 *   Local variables:
       INTEGER FIN          ! end bit position
       INTEGER QBITS(8)     ! bit array

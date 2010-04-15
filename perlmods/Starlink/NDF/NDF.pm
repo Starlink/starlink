@@ -29,7 +29,7 @@ $VERSION = '1.49';
                             ndf_aform ndf_amap ndf_annul ndf_anorm ndf_arest
                             ndf_asnrm ndf_astat ndf_astyp ndf_atype
                             ndf_aunmp ndf_bad ndf_base ndf_bb ndf_begin
-                            ndf_block ndf_bound ndf_cget ndf_chunk 
+                            ndf_block ndf_bound ndf_cget ndf_chunk
                             ndf_clen ndf_clone ndf_cmplx ndf_cmsg ndf_copy
                             ndf_cput ndf_delet ndf_dim
                             ndf_end ndf_find ndf_form ndf_ftype
@@ -96,8 +96,8 @@ $VERSION = '1.49';
                             cmp_get1c cmp_get1d cmp_get1i cmp_get1r cmp_getvc
                             cmp_getvd cmp_getvi cmp_getvr cmp_len cmp_mapv
                             cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d
-                            cmp_put0i cmp_put0l cmp_put0r cmp_put1c cmp_put1d 
-                            cmp_put1i cmp_put1r 
+                            cmp_put0i cmp_put0l cmp_put0r cmp_put1c cmp_put1d
+                            cmp_put1i cmp_put1r
                             cmp_putni cmp_putvc cmp_putvd cmp_putvi cmp_putvr
                             cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
                           /],
@@ -144,7 +144,7 @@ sub pack1Dchar {
   $maxlength = 0;
   foreach (@$arg) {
     $size = length($_);
-    $maxlength = $size if $size > $maxlength; 
+    $maxlength = $size if $size > $maxlength;
   }
 
   return ($maxlength, pack("A$maxlength" x $array_len, @$arg))
@@ -152,7 +152,7 @@ sub pack1Dchar {
       (ref($arg) eq "ARRAY" && ref(\$$arg[0]) eq "SCALAR");
   croak "Something has gone wrong";
 }
-  
+
 
 
 # Now deal with the calls which use character arrays
@@ -162,7 +162,7 @@ sub ndf_hput ($$$$\@$$$$$) {
   my($hmode, $appn, $repl, $nlines, $text, $trans, $wrap, $rjust,
      $indf, $status) = @_;
   $nlines = ($nlines > $#{$text} + 1 ? $#{$text} + 1 : $nlines);
-  ndf_hput_r($hmode, $appn, $repl, $nlines, pack1Dchar($text), $trans, 
+  ndf_hput_r($hmode, $appn, $repl, $nlines, pack1Dchar($text), $trans,
              $wrap, $rjust, $indf, $status);
   $_[9] = $status;
 }
@@ -225,7 +225,7 @@ sub ndf_qmask ($$) {
 sub array2mem  (\@$$) {
   my ($ref, $packtype, $pntr) = @_;
 
-  string2mem(pack($packtype, @$ref), &byte_size($packtype) * ($#{$ref}+1), 
+  string2mem(pack($packtype, @$ref), &byte_size($packtype) * ($#{$ref}+1),
              $pntr);
 }
 
@@ -248,9 +248,9 @@ sub ndfGtwcs {
   my $buffer = ndfGtwcs_( $_[0], $_[1]);
   return undef unless $_[1] == &NDF::SAI__OK;
   my @strings = split(/\n/, $buffer);
-  my $chan = new Starlink::AST::Channel( 
-                                        source => sub { 
-                                          return shift(@strings); 
+  my $chan = new Starlink::AST::Channel(
+                                        source => sub {
+                                          return shift(@strings);
                                         }
                                        );
   return $chan->Read();
@@ -366,8 +366,8 @@ sub par_get ($$$) {
   return if $$status != $SAI__OK;
 
   # Allow one extra level of nesting (rather than abritrary
-  # recursion). Monolith parameter files store parameters for 
-  # all actions/tasks in a single file. This means that the 
+  # recursion). Monolith parameter files store parameters for
+  # all actions/tasks in a single file. This means that the
   # stats parameters are in kappa_mon.stats rather than simply
   # kappa_mon.sdf
 
@@ -408,7 +408,7 @@ sub par_get ($$$) {
   # Obtain a locator to the desired value from the primitive object
 
   dat_find($loc, $parname, $loco, $$status);
-  
+
   # Find out if the object is primitive
   dat_prim($loco, $prim, $$status);
 
@@ -540,7 +540,7 @@ sub fits_read_header ($) {
         }
 
       } else {
-	
+
         err_rep(' ',"$task: Error reading FITS array", $status);
 
       }
@@ -769,7 +769,7 @@ sub fits_extract_key_val ($) {
     if ($comment =~ /^\s+$/) {
       $comment  = ' ';
     } else {
-      # Trim it 
+      # Trim it
       $comment =~ s/\s+$//;
       $comment =~ s/^\s+//;
     }
@@ -810,7 +810,7 @@ sub fits_construct_string ($$$) {
 
     # Check that a value is there
     if (defined $value) {
-	
+
       # Check whether we have a number or character string or nothing
       if ($value eq '') {
         $value = "''" . (" " x 18);
@@ -965,7 +965,7 @@ is through method calls ($prov->CountProv etc)
 
 =item :misc
 
-This imports routines for converting DATA pointers to arrays and routines for 
+This imports routines for converting DATA pointers to arrays and routines for
 easy access to FITS arrays commonly found in NDFs. A routine for accessing
 parameters stored by ADAM tasks is also available.
 
@@ -985,7 +985,7 @@ C<
   print "An error occurred\n" if ($status != &NDF::SAI__OK);>
 >
 
-At present all the DAT__, ERR__, EMS__, MSG__ and SAI__ constants are 
+At present all the DAT__, ERR__, EMS__, MSG__ and SAI__ constants are
 available. More can be included as more C include files are created.
 In the absence of the include files a request for a specific compiler
 constant will be refused.
@@ -997,9 +997,9 @@ arrays. These pointers are handled differently in perl than in Fortran.
 
 To read a mapped array you must first I<copy> the data from the mapped
 array into a perl array. Modifiying this perl array I<will not> change
-the mapped array. The perl array must be copied back into the mapped 
+the mapped array. The perl array must be copied back into the mapped
 array for any changes to become permanent. To reduce memory requirements
-you may want to unmap the array as soon as it has been copied to the 
+you may want to unmap the array as soon as it has been copied to the
 perl array.
 
 In perl the array must first be packed into a single string and this
@@ -1013,7 +1013,7 @@ C<
 >
 
 This maps a perl data array to the NDF DATA_ARRAY. If $el does not equal
-$#data + 1 then odd things will happen. 
+$#data + 1 then odd things will happen.
 
 The reverse process can be achieved using mem2string as follows:
 
@@ -1128,7 +1128,7 @@ This routine ignores the FITS header END record.
 
 =head2 Function calls
 
-The commands in this module use  perl prototypes to check argument 
+The commands in this module use  perl prototypes to check argument
 passing. This means that arrays do not have to be referenced when being
 used as arguments I<unless> the routine is called with a &.
 
@@ -1140,12 +1140,12 @@ and
 
    $value = &fits_get_item(\@fits, $keyword);
 
-are correct but 
+are correct but
 
    $value = &fits_get_item(@fits, $keyword);
 
 will fail because perl will pass all the members of the array and not the
-reference to the array. 
+reference to the array.
 
 =head2 Arrays
 
@@ -1181,16 +1181,16 @@ implemented and NDF_HECHO is called by default.
 =head2 Accessing ADAM parameters from A-tasks
 
 ADAM A-task store their parameters in HDS files in the ADAM_USER
-directory (usually ~/adam). This routine retrieves the value of 
+directory (usually ~/adam). This routine retrieves the value of
 a parameter for any ADAM task that uses the ADAM_USER directory.
 
 For example
 
       ($in) = par_get("data_array","GLOBAL", \$status);
 
-returns the current data set (stored in GLOBAL.sdf). Note that the 
+returns the current data set (stored in GLOBAL.sdf). Note that the
 data is returned in an array context. The routine returns without
-action if $status is not set to SAI__OK on entry. 
+action if $status is not set to SAI__OK on entry.
 
 Either the  $ADAM_USER or $HOME environment variable must be set so that
 the location of the parameter files can be determined.
@@ -1218,7 +1218,7 @@ The following routines are available from this module:
 =item :ndf
 
 All ndf_ routines are implemented except those dealing with ADAM parameters
-(eg ndf_assoc). 
+(eg ndf_assoc).
 
 =item :ary
 
@@ -1277,7 +1277,7 @@ ndgReadProv
 =item :misc
 
 mem2string string2mem array2mem mem2array fits_get_nth_item
-fits_read_header fits_get_item fits_extract_key_val 
+fits_read_header fits_get_item fits_extract_key_val
 fits_construct_string par_get err_flush_to_string
 
 

@@ -1,5 +1,5 @@
 	SUBROUTINE CUT_MAXMIN( CUT_SCALING, NUMBER_POINTS, MAXP, LINE_DATA,
-     :	                       CUT_VALUES, X_LO, X_HI, Y_LO, Y_HI, 
+     :	                       CUT_VALUES, X_LO, X_HI, Y_LO, Y_HI,
      :	                       CUT_POINTER)
 
 * Calculates the maximum and minimum values or plotting as cut
@@ -8,13 +8,13 @@
 
 	INCLUDE 'PLT2DCOM'
 
-	INTEGER 
+	INTEGER
      :	  J,
      :	  NUMBER_POINTS,
      :	  MAXP,
      :	  STATUS
 
-	REAL 
+	REAL
      :	  CUT_MEAN,
      :	  CUT_RANGE,
      :	  CUT_VALUES( MAXP),
@@ -35,7 +35,7 @@
 
 	PARAMETER ( TOLERANCE = 1.0E-10)
 
-	CHARACTER 
+	CHARACTER
      :	  CUT_POINTER*1,
      :	  CUT_SCALING*1
 

@@ -73,7 +73,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -136,13 +136,13 @@
 
 *  Initialise the Descriptor Word Number to the start of the block.
       DWN = 1
- 
+
 *  Search through the descriptor block(s).
       NUMDES = 0
       LOOP = .TRUE.
 
       DO WHILE ( LOOP )
- 
+
 *  Skip over the current descriptor if it is not marked for deletion,
 *  and the end of the descriptors has not been reached.
          DO WHILE ( LDB_DWORD( DWN ) .LT. 0 .AND. LOOP )
@@ -177,6 +177,6 @@
 
       END DO
 
- 999  CONTINUE   
+ 999  CONTINUE
 
       END

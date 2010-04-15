@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -216,7 +216,7 @@
 
 *  Replace the identifiers to the supplied NDFs with identifiers for
 *  sections of the supplied NDFs which have equal bounds.
-      CALL NDF_MBNDN( 'TRIM', 4, NDFIN, STATUS )      
+      CALL NDF_MBNDN( 'TRIM', 4, NDFIN, STATUS )
 
 *  Map the data arrays of each NDF section, and if all NDFs have
 *  VARIANCE components, also map the VARIANCE components.
@@ -231,7 +231,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an output NDF to hold total intensity.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'I', NDFI, 
+      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'I', NDFI,
      :               STATUS )
 
 *  If succesful, set a flag indicating that a total intensity NDF is to
@@ -371,7 +371,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an output NDF to hold polarised intensity.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IP', NDFIP, 
+      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IP', NDFIP,
      :               STATUS )
 
 *  If succesful, set a flag indicating that a polarised intensity NDF
@@ -400,7 +400,7 @@
 
 *  Attempt to get an output NDF to hold total intensity estimate based
 *  on the first and third input NDFs.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IA', NDFIA, 
+      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IA', NDFIA,
      :               STATUS )
 
 *  If succesful, set a flag indicating that this total intensity NDF is
@@ -429,7 +429,7 @@
 
 *  Attempt to get an output NDF to hold total intensity estimate based
 *  on the second and fourth input NDFs.
-      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IB', NDFIB, 
+      CALL NDF_PROP( NDFIN( 1 ), 'AXIS,QUALITY,UNITS', 'IB', NDFIB,
      :               STATUS )
 
 *  If succesful, set a flag indicating that this total intensity NDF is
@@ -463,7 +463,7 @@
          CALL ERR_REP( 'CALPOL_ERR1', 'No output NDFs requested',
      :                 STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  See if a correction is to be made to the percentage polarisation to
 *  correct for bias introduced as a result of the noise distribution not
@@ -495,7 +495,7 @@
  999  CONTINUE
 
 *  If an error has occurred, delete the output NDFs.
-      IF( STATUS .NE. SAI__OK ) THEN 
+      IF( STATUS .NE. SAI__OK ) THEN
          IF( MAKEI ) CALL NDF_DELET( NDFI, STATUS )
          IF( MAKEQ ) CALL NDF_DELET( NDFQ, STATUS )
          IF( MAKEU ) CALL NDF_DELET( NDFU, STATUS )

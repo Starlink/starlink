@@ -6,26 +6,26 @@
 
 *  Purpose:
 *     Given the co-ordinates of the region of the image in question, the
-*     routine takes values from the pixels in a square of defined 
-*     width about the chosen co-ordinates and places them in an array for 
-*     subsequent use.      
+*     routine takes values from the pixels in a square of defined
+*     width about the chosen co-ordinates and places them in an array for
+*     subsequent use.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *     CALL LOB1_FILL(ELEMS,ARRAY1,PRANGE,LBND,UBND,X,Y,NUMP,
-*                    WIDTH,NUMPS,ARRAY2,STATUS)    
+*                    WIDTH,NUMPS,ARRAY2,STATUS)
 
 *  Description:
-*     Transfers the required pixels to the memory array that will be used 
+*     Transfers the required pixels to the memory array that will be used
 *     later to construct the pixel count histogram.
 
-*  Arguments:              
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        Number of pixels in the source image.
 *     ARRAY1(ELEMS) = REAL (Given)
-*        The source image array. 
+*        The source image array.
 *     PRANGE(2) = INTEGER (Given)
 *        Size of each image axis.
 *     LBND(2) = INTEGER (Given)
@@ -59,15 +59,15 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ELEMS                   ! The number of pixels in the source
                                       ! image
-      INTEGER LBND(2)                 ! Lower bounds of image axes 
-      INTEGER NUMP                    ! Size of the array in which all the 
+      INTEGER LBND(2)                 ! Lower bounds of image axes
+      INTEGER NUMP                    ! Size of the array in which all the
                                       ! pixel counts are to be placed
       INTEGER PRANGE(2)               ! Size of each image axis
       INTEGER UBND(2)                 ! Upper bounds of image axes
@@ -77,11 +77,11 @@
       REAL Y                          ! Y co-ordinate of the image position
 
 *  Arguments Returned:
-      INTEGER NUMPS                   ! The number of pixel taken from the 
-                                      ! source image 
+      INTEGER NUMPS                   ! The number of pixel taken from the
+                                      ! source image
       REAL ARRAY2(NUMP)               ! The pixel count values to be used to
                                       ! construct the histogram
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -96,7 +96,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set up the values for the co-rdinates (in terms of data) of the
 *   box surrounding the required image area.
@@ -106,12 +106,12 @@
       YHIGH=YLOW+WIDTH-1
 
 *   Adjust limits of the box to ensure the image edges are not exceeded.
-      IF (XLOW.LT.1) XLOW=1  
+      IF (XLOW.LT.1) XLOW=1
       IF (XHIGH.GT.PRANGE(1)) XHIGH=PRANGE(1)
-      IF (YLOW.LT.1) YLOW=1  
+      IF (YLOW.LT.1) YLOW=1
       IF (YHIGH.GT.PRANGE(2)) YHIGH=PRANGE(2)
 
-*   Examine all pixels in that box and initialise the 
+*   Examine all pixels in that box and initialise the
 *   pixels stored counter.
       NUMPS=0
       DO 10 YV=YLOW,YHIGH
@@ -124,10 +124,10 @@
 *         Calculate the pixel address required.
             ADD=ADDP+XV
 
-*         Increment the pixel counter and store the value found.        
+*         Increment the pixel counter and store the value found.
             NUMPS=NUMPS+1
-            ARRAY2(NUMPS)=ARRAY1(ADD) 
-     
+            ARRAY2(NUMPS)=ARRAY1(ADD)
+
  20      CONTINUE
 
  10   CONTINUE

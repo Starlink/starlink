@@ -13,8 +13,8 @@
 *     CALL POL1_CPCTR( CI, GI, NEL, OUT, NGOOD, STATUS )
 
 *  Description:
-*     This routine gets NEL values for a given CAT (see SUN/181) expression, 
-*     column or parameter, derived from rows 1 to NEL of a given catalogue, 
+*     This routine gets NEL values for a given CAT (see SUN/181) expression,
+*     column or parameter, derived from rows 1 to NEL of a given catalogue,
 *     selection, or index, and stores them in array OUT.
 
 *  Arguments:
@@ -36,7 +36,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -50,13 +50,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER CI
@@ -78,7 +78,7 @@
 *  Initialise returned value.
       NGOOD = 0
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop round each row.

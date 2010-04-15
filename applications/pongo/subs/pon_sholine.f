@@ -1,26 +1,26 @@
-      SUBROUTINE PON_SHOLINE( XMIN, XMAX, YMIN, YMAX, NDAT, WEIGHT, 
+      SUBROUTINE PON_SHOLINE( XMIN, XMAX, YMIN, YMAX, NDAT, WEIGHT,
      :                        XMEAN, YMEAN, XSIG, YSIG, INTCPT, SLOPE,
      :                        INTCPTSIG, SLOPESIG, PCORR, STATUS )
 *+
 *  Name:
 *     PON_SHOLINE
- 
+
 *  Purpose:
 *     Display the results of a straight line fit.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
-*     CALL PON_SHOLINE( XMIN, XMAX, YMIN, YMAX, NDAT, WEIGHT, 
-*    :                  XMEAN, YMEAN, XSIG, YSIG, INTCPT, SLOPE, 
+*     CALL PON_SHOLINE( XMIN, XMAX, YMIN, YMAX, NDAT, WEIGHT,
+*    :                  XMEAN, YMEAN, XSIG, YSIG, INTCPT, SLOPE,
 *    :                  INTCPTSIG, SLOPESIG, PCORR, STATUS )
- 
+
 *  Description:
 *     The results of a least squares fit to a straight line are
 *     delivered to the user. The information is passed through the
 *     argument list. MSG is used to build and deliver the messages.
- 
+
 *  Arguments:
 *     XMIN = REAL (Given)
 *        X-axis minimum.
@@ -60,7 +60,7 @@
 *     PCTR: P.C.T. Rees (STARLINK)
 *     PDRAPER: P.W. Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     10-APR-1990 (JBVAD::PAH):
 *        Original version.
@@ -71,12 +71,12 @@
 *     6-JUN-1994 (PDRAPER):
 *        Removed unused arguments CHI2, CORRPROB and FITPROB.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
       INTEGER NDAT
 
       LOGICAL WEIGHT
-      
+
       REAL XSIG
       REAL YSIG
       REAL INTCPT
@@ -167,14 +167,14 @@
       CALL MSG_SETR( 'INTCPTSIG', INTCPTSIG )
       CALL MSG_OUT( ' ', '   Intercept = ^INTCPT +/- ^INTCPTSIG',
      :              STATUS )
- 
+
       CALL MSG_SETR( 'SLOPE', SLOPE )
       CALL MSG_SETR( 'SLOPESIG', SLOPESIG )
       CALL MSG_OUT( ' ', '   Slope = ^SLOPE +/- ^SLOPESIG', STATUS )
- 
+
       CALL MSG_SETR( 'PCORR', PCORR )
       CALL MSG_OUT( ' ', '   Pearson correlation coefficient = ^PCORR',
      :              STATUS )
-      
+
       END
 * $Id$

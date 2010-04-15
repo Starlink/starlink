@@ -63,7 +63,7 @@
 *  Suppress the reporting of errors so that alternative workstation name
 *  syntaxes can be tried with out generating error message
       CALL ERR_MARK
-      
+
       IERR = SAI__OK
 *  Split the workstation name into its component part (separated by /
 *  characters).
@@ -167,7 +167,7 @@
          CALL ERR_ANNUL(IERR)
          CALL ERR_RLSE
          CALL MSG_SETC('NAME',FILE(:LFILE))
-         CALL ERR_REP('GRIWKN', 
+         CALL ERR_REP('GRIWKN',
      :        'GROPWK - ^NAME is not a valid workstation name', GRIWKN)
          ISTAT = -1
          GO TO 9999
@@ -190,7 +190,7 @@
             CALL MSG_SETI('TYPE', IWKTYP)
             CALL ERR_REP('GRIWKT',
      :      'GROPWK - ^TYPE is not a valid GKS workstation type',
-     :      GRIWKT)  
+     :      GRIWKT)
             ISTAT = -1
             GO TO 9999
          ENDIF
@@ -219,7 +219,7 @@
 *       Suppress screen clear
 
 *---Uncomment these line if your GKS doesn't support the escape function to
-*   suppress the clearing of the display surface when a workstation is 
+*   suppress the clearing of the display surface when a workstation is
 *   opened
 *               CALL ERR_REP('GRNOAP',
 *     :            'GROPWK - append qualifier not supported', GRNOAP)
@@ -229,7 +229,7 @@
                 CALL ERR_MARK
                 IA(1) = IWKTYP
                 IA(2) = GYES
-                CALL GPREC(2, IA, 1, RA, 1, 1, STR, 1, IER, LIESC, 
+                CALL GPREC(2, IA, 1, RA, 1, 1, STR, 1, IER, LIESC,
      :                     IESCDR)
                 CALL GESC(-3, LIESC, IESCDR, 1, LOESC, OESCDR)
 
@@ -270,7 +270,7 @@ C     :            'GROPWK - append qualifier not supported', GRNOAP)
                      CALL gns_TNG(PART(IQUAL)(I+1:),IWKTYP,ITMP,IERR)
                      IF (IERR.NE.SAI__OK) THEN
                         CALL MSG_SETC('NAME',PART(IQUAL)(I+1:))
-                        CALL ERR_REP('GRIWKN', 
+                        CALL ERR_REP('GRIWKN',
      :        'GROPWK - ^NAME is not a valid workstation name', GRIWKN)
                      END IF
                      IQUAL = 0
@@ -281,7 +281,7 @@ C     :            'GROPWK - append qualifier not supported', GRNOAP)
 *       Report unknown qualifier
             IF (IQUAL.NE.0) THEN
                CALL MSG_SETC('NAME',PART(IQUAL))
-               CALL ERR_REP('GRUNKQ', 
+               CALL ERR_REP('GRUNKQ',
      :        'GROPWK - Workstation qualifer ^NAME ignored', GRUNKQ)
             END IF
 

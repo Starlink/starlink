@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine returns the the value being used as the `flag'
-*     value (`bad' value, `magic number', or whatever) for a specified 
+*     value (`bad' value, `magic number', or whatever) for a specified
 *     data type such as 'FLOAT' or 'DOUBLE'.
 
 *  Arguments:
@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

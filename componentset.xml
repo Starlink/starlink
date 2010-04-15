@@ -44,7 +44,7 @@ ATOOLS is a package of applications which manipulate descriptions
 of coordinate frames, mappings, etc, in the form of AST Objects (see
 SUN/210). Each application within the ATOOLS package corresponds closely
 to one of the functions within the AST library. ATOOLS thus provides a
-high-level interface to the AST library. 
+high-level interface to the AST library.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
@@ -251,7 +251,7 @@ on-line catalogues via the Internet.
     <p>DAOPHOT is a stellar photometry package designed by Peter Stetson
     at DAO to deal with crowded fields. The package performs various
     tasks including finding objects, aperture photometry, obtaining the
-    point-spread function, and profile-fitting photometry. 
+    point-spread function, and profile-fitting photometry.
     Profile fitting in crowded regions is performed iteratively,
     which improves the accuracy of the photometry.</p>
   </abstract>
@@ -305,7 +305,7 @@ cube manipulation. </p></abstract>
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>
   <abstract><p>
-      
+
   </p></abstract>
   <dependencies >
     <build option='link'>ast</build><build option='link'>cat</build><build option='link'>kaplibs</build><build option='link'>snx</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
@@ -842,7 +842,7 @@ Traces an HDS file
   <path>applications/ifd</path>
   <description>Interface Definition Files</description>
   <abstract>
-    <p>Interface Definition Files (IFDs) provide a generic method of 
+    <p>Interface Definition Files (IFDs) provide a generic method of
     defining the interface between Starlink (ADAM) applications and
     various software environments. Software is described which enables
     developers to create IFDs and use them to create files required
@@ -902,10 +902,10 @@ packages.
   <path>applications/kaprh</path>
   <description>KAPRH - A home for retired KAPPA applications</description>
   <abstract><p>
-KAPRH is an applications package containing commands 
+KAPRH is an applications package containing commands
 which have been ``retired'' from the KAPPA package (see SUN/95). They
 are retained within KAPRH to satisfy any occasional need there may be for
-them. 
+them.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build>ast</build><build>fio</build><build>gks</build><build>gns</build><build>hds</build><build>idi</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>par</build><build>pcs</build><build>prm</build><build>sae</build><build>trn</build><build>ifd</build><build>generic</build><build option='link'>agi</build><build option='link'>ard</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>gks</build><build option='link'>gns</build><build option='link'>grp</build><build option='link'>gwm</build><build option='link'>idi</build><build option='link'>kaplibs</build><build option='link'>mag</build><build option='link'>ncar</build><build option='link'>ndf</build><build option='link'>ndg</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>psx</build><build option='link'>ref</build><build option='link'>sgs</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>snx</build><build option='link'>trn</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
@@ -1024,7 +1024,7 @@ them.
   <path>applications/obsolete/cgs3dr</path>
   <description>CGS3DR - CGS3 Data Reduction</description>
   <abstract><p>
-      
+
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>ary</build><build option='link'>ndf</build><build option='link'>prm</build><build option='link'>fio</build><build option='link'>tsp</build><build option='link'>figaro</build><build option='link'>chr</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
@@ -1220,7 +1220,7 @@ file extension stored in the standard Starlink NDF data format.
       links to the hypertext version of your document (without
       affecting the paper version). </p></abstract>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -1367,7 +1367,7 @@ A software package designed to search for periodicities in data.
   <path>applications/pisa</path>
   <description>PISA - Position Intensity and Shape Analysis</description>
   <abstract><p>
-      
+
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>agi</build><build option='link'>cat</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>sae</build><build option='link'>shl</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
@@ -1392,7 +1392,7 @@ A software package designed to search for periodicities in data.
 POLPACK is a package of applications for
 reducing imaging polarimetry or spectropolarimetry data. They cover
 registration, sky subtraction, calculation of Stokes parameters, and
-display of vector maps.  
+display of vector maps.
 </p></abstract>
   <dependencies >
     <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>kaplibs</build><build option='link'>ctg</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
@@ -1424,7 +1424,7 @@ display of vector maps.
   <abstract><p>
 PONGO is a set of commands for interactively plotting data stored
 in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
-package. 
+package.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>agi</build><build option='link'>sla</build><build option='link'>fio</build><build option='link'>pda</build><sourceset>star2html</sourceset>
@@ -1617,7 +1617,7 @@ with the ACSIS correlator at JCMT.
   <version>0.7-2</version>
   <path>libraries/acsisio</path>
   <description>I/O routines for ACSIS data files</description>
-  <abstract><p> 
+  <abstract><p>
 	Collection of routines for reading and writing ACSIS format
         data files containing collections of spectra.
     </p></abstract>
@@ -1927,7 +1927,7 @@ to handle data from a variety of different instruments.
   <version>3</version>
   <path>docs/sc/002</path>
   <description>The DX Cookbook</description>
-  <abstract><p>IBM DX (Data Explorer) is the data visualisation package 
+  <abstract><p>IBM DX (Data Explorer) is the data visualisation package
      recommended by Starlink, particularly for the visualisation of
      three-dimensional scalar and vector data. This cookbook provides
      a set of simple recipes for performing common operations using
@@ -2025,7 +2025,7 @@ to handle data from a variety of different instruments.
   <version>3</version>
   <path>docs/sc/005</path>
   <description>The 2-D CCD Data Reduction Cookbook</description>
-  <abstract><p>This cookbook presents simple recipes and scripts for 
+  <abstract><p>This cookbook presents simple recipes and scripts for
       reducing direct images acquired with optical CCD detectors.
       Using these recipes and scripts you can correct un-processed
       images obtained from CCDs for various instrumental effects to
@@ -2143,7 +2143,7 @@ to handle data from a variety of different instruments.
   <path>docs/sc/009</path>
   <description>LaTeX Cookbook</description>
   <abstract><p>
-      This cookbook shows some examples of LaTeX in action 
+      This cookbook shows some examples of LaTeX in action
       and should help you to get to know how to use LaTeX effectively.
     </p></abstract>
   <dependencies >
@@ -2413,8 +2413,8 @@ to handle data from a variety of different instruments.
   <path>docs/sg/009</path>
   <description>Introduction to Echelle Spectroscopy</description>
   <abstract><p>
-      Echelle spectrographs are available as common-user instruments 
-      at several observatories and satellites.  These spectrographs 
+      Echelle spectrographs are available as common-user instruments
+      at several observatories and satellites.  These spectrographs
       offer the observer both a reasonably high resolution and a wide
       wavelength-coverage; at the expense of a fairly complex
       data-reduction procedure.
@@ -2562,10 +2562,10 @@ to handle data from a variety of different instruments.
   <description>Starlink C Programming Standard</description>
   <abstract><p>
     This describes Starlink's coding standard for the C language.
-    The advice wis grouped into five sections concerning 
-    Starlink naming conventions, programming advice, program design, 
+    The advice wis grouped into five sections concerning
+    Starlink naming conventions, programming advice, program design,
     machine independence, and preprocessor advice respectively.
-    The suggestions are made with maintainability, portability and 
+    The suggestions are made with maintainability, portability and
     efficiency in mind.
     </p></abstract>
   <dependencies >
@@ -2624,7 +2624,7 @@ to handle data from a variety of different instruments.
   <description>AVS as a GUI for ADAM</description>
   <abstract><p>
     This describes an experiment to test the feasiblity of using AVS networks
-    in the ADAM context, based upon the conversion of an ADAM application into 
+    in the ADAM context, based upon the conversion of an ADAM application into
     an AVS module.  After an outline of AVS and its data types, this
     paper reports various steps in the conversion of the KAPPA ADD task.
     </p></abstract>
@@ -2718,14 +2718,14 @@ to handle data from a variety of different instruments.
   <developers>
     <person>
       <name>Starlink Project</name>
-      <name>M J Bly</name> 
-      <name>C A Clayton</name> 
-      <name>M J Currie</name> 
-      <name>M D Lawden</name> 
-      <name>A J Penny</name> 
+      <name>M J Bly</name>
+      <name>C A Clayton</name>
+      <name>M J Currie</name>
+      <name>M D Lawden</name>
+      <name>A J Penny</name>
       <name>D J Rawlinson</name>
-      <name>A V Roberts</name> 
-      <name>J C Sherman</name> 
+      <name>A V Roberts</name>
+      <name>J C Sherman</name>
       <name>P T Wallace</name>
     </person>
   </developers>
@@ -2747,7 +2747,7 @@ to handle data from a variety of different instruments.
      liked in the 1994 Starlink Software Survey, and identifies common
      characteristics of style and organisation which can be
      recommended to authors.
-  
+
      Various features of documentation which the authors believe to be
      harmful are specified, including common problems with pages
      produced for the World Wide Web. Many of these will inevitably
@@ -2779,8 +2779,8 @@ to handle data from a variety of different instruments.
   <description>STARLINK</description>
   <abstract><p>
      This describes the Starlink Project.  Topics include hardware,
-     software, sites, the user population, the organisational aspects, 
-     and the work supported within Starlink.  There is also a brief 
+     software, sites, the user population, the organisational aspects,
+     and the work supported within Starlink.  There is also a brief
      history of the Project.
   </p></abstract>
   <dependencies >
@@ -2999,7 +2999,7 @@ to handle data from a variety of different instruments.
      running Linux, a variant of Unix, and to integrate them with
      existing Unix systems.  We also aim to make most Starlink
      software available for the PC/Linux platform.
- 
+
      Starlink's policy on support of PCs is likely to develop over the
      next few years.  Readers are therefore advised to check that they
      have the most up-to-date version of this document.  The policy
@@ -3032,13 +3032,13 @@ to handle data from a variety of different instruments.
      for Starlink documents. It also explains how to use the templates
      which are provided by Starlink to help authors create documents
      in a standard style.
-     
+
      This paper is concerned mainly with conveying the "look and
      feel" of the various styles of Starlink document rather than
      describing the technical details of how to produce them. Other
      Starlink papers give recommendations for the detailed aspects of
      document production, design, layout, and typography.
-     
+
      The only style that is likely to be used by most Starlink authors
      is the Standard style.
   </p></abstract>
@@ -3305,7 +3305,7 @@ to handle data from a variety of different instruments.
   <path>docs/ssn/023</path>
   <description>Starlink Benchmarking Utility</description>
   <abstract><p>
-     The Starlink Benchmarking Utility provides a set of tools for 
+     The Starlink Benchmarking Utility provides a set of tools for
      investigating the performance of computer systems running
      astronomy data reduction software. This manual is intended for
      Starlink Site Managers and describes how to install and use the
@@ -3719,7 +3719,7 @@ to handle data from a variety of different instruments.
     the item name. If you are using the hypertext version of this
     document, the most up-to-date document references can be found by
     following the link from the software item name.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3745,7 +3745,7 @@ to handle data from a variety of different instruments.
     gives a brief description of how LaTeX works. It also tells how
     to display or print the document, and how to include a PostScript
     file.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3785,7 +3785,7 @@ to handle data from a variety of different instruments.
      on object class, image number, camera, aperture, homogeneous ID,
      sky position or any combination of these attributes. Users in the
      UK will use the USSP on the Starlink database Microvax (STADAT).
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3818,7 +3818,7 @@ to handle data from a variety of different instruments.
      and a variety of spectral atlases. It is not a general purpose
      computer, and users will not have permanent file space or private
      usernames allocated on it.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3843,7 +3843,7 @@ to handle data from a variety of different instruments.
     This document describes the GNU EMACS editor as distributed by
     Starlink for UNIX systems. It is intended to provide an
     introduction for the new user.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3876,7 +3876,7 @@ to handle data from a variety of different instruments.
      to provide UK astronomers with quick and painless access to IUE
      data. This document describes how to interrogate the catalogue
      and extract data from the archive.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3903,7 +3903,7 @@ to handle data from a variety of different instruments.
      of the Fortran is improved, whilst remaining logically equivalent
      to the original program. The result improves the readability and
      maintainability of badly-written Fortran.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3930,7 +3930,7 @@ to handle data from a variety of different instruments.
      Database computer (STADAT) for the use of all Starlink users. It
      is only available on STADAT and is not installed on any other
      Starlink nodes.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3956,7 +3956,7 @@ to handle data from a variety of different instruments.
      describe how to gain access or obtain copies of selected data,
      and to guide potential users to Starlink software and
      documentation which can help in the analysis of the data.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3982,7 +3982,7 @@ to handle data from a variety of different instruments.
      This guide describes the IRAS Calibrated Raw Detector Data, how
      to access the data, and the programs available to process it and
      examine the results.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4016,7 +4016,7 @@ to handle data from a variety of different instruments.
 
     This manual is an introduction to the use of TeX on Starlink
     machines.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4041,7 +4041,7 @@ to handle data from a variety of different instruments.
   <abstract><p>
      This document is a tutorial in the art of ADAM programming.  ADAM
      is the Starlink Software Environment.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4069,7 +4069,7 @@ to handle data from a variety of different instruments.
     the central Unix service at RAL. MAPLE has facilities for symbolic
     algebra mathematical manipulation and provides a powerful facility
     for solving many types of mathematical problem.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4096,7 +4096,7 @@ to handle data from a variety of different instruments.
      systems. Applications written using the CHI and CHP routines will
      run on the current STARLINK database (ADC) and any future
      STARLINK database systems.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4132,7 +4132,7 @@ to handle data from a variety of different instruments.
      databases. Some of these databases have data products associated
      with them, these may be plotted and analysed using software
      within the EXOSAT database system.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4164,7 +4164,7 @@ to handle data from a variety of different instruments.
     facilities available and how to use them.  This is important
     because Starlink Sites differ in their computer hardware and in
     their versions of Unix.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4192,7 +4192,7 @@ to handle data from a variety of different instruments.
      of Starlink's ADAM environment, which provides multi-platform availability
      of both data and the programs to process it, and the user friendly interface of
      the parameter entry system.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4222,7 +4222,7 @@ to handle data from a variety of different instruments.
      which can be accessed from Starlink computers. It also describes
      the Starlink software for manipulating catalogues and tables. A
      brief description is given of each facility or software item.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4248,8 +4248,8 @@ to handle data from a variety of different instruments.
      the reduction and analysis of {\small IRAS} Survey and Pointed
      Observation (PO) data (also known as ``Additional Observation'',
      or ``AO'' data). It does not provide facilities for handling Low
-     Resolution Spectrometer (LRS) data, or catalogue data. 
-  </p></abstract>  
+     Resolution Spectrometer (LRS) data, or catalogue data.
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4280,7 +4280,7 @@ to handle data from a variety of different instruments.
     Spectrometer (LRS) data, or catalogue data. This document gives
     some guide-lines for users who want to produce their own IRAS90
     applications.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4308,7 +4308,7 @@ to handle data from a variety of different instruments.
     advanced facilities of DEC VTn00, xterm and similar terminals. JED
     in this mode provides a reasonably good emulation of the VAX/VMS
     editor EDT in addition to many extra facilities
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4335,7 +4335,7 @@ to handle data from a variety of different instruments.
      systems. It has been adopted by Starlink as the recommended mail
      utility because of its ease of use compared with the mail
      utilities supplied as standard with the Unix operating system.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4364,7 +4364,7 @@ to handle data from a variety of different instruments.
      many such alternatives exist; there is not one single editor that
      everyone finds acceptable and hence each user must decide for
      himself or herself which to adopt.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4386,8 +4386,8 @@ to handle data from a variety of different instruments.
   <path>docs/sun/172</path>
   <description>FTNCHEK: A Fortran77 Source-code Checker</description>
   <abstract><p>
-  
-  </p></abstract>  
+
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4423,7 +4423,7 @@ to handle data from a variety of different instruments.
      described here from Starlink computers. This document is
      complementary to SUN/162 which describes some of the observation
      and data archives available on-line.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4448,7 +4448,7 @@ to handle data from a variety of different instruments.
     ISPELL is a screen-oriented spelling checker that shows errors in
     the context of the original file, and suggests possible
     corrections when it can figure them out.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4470,12 +4470,12 @@ to handle data from a variety of different instruments.
   <path>docs/sun/247</path>
   <description>nu/TPU --- A DEC TPU compatible editor for UNIX</description>
   <abstract><p>
-  
+
     nu/TPU is a fully programmable text processing utility compatible
     with the TPU system found on VMS systems. People used to using
     TPU or EDT on the former Starlink VAX/VMS service will find that
-    nu/TPU is very similar to these editors.  
-  </p></abstract>  
+    nu/TPU is very similar to these editors.
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4497,8 +4497,8 @@ to handle data from a variety of different instruments.
   <path>docs/sun/247</path>
   <description>GHOSTSCRIPT - PostScript Interpreter/previewer</description>
   <abstract><p>
-    This document announces the availability of GHOSTSCRIPT on Starlink.  
-  </p></abstract>  
+    This document announces the availability of GHOSTSCRIPT on Starlink.
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4524,8 +4524,8 @@ to handle data from a variety of different instruments.
      LATEX2HTML converts \LaTeX\ source files into a set of HTML
      files, suitable for browsing on the World Wide Web. It is used by
      STAR2HTML, which is the preferred program to use for converting
-     Starlink documents to hypertext form.  
-    </p></abstract>  
+     Starlink documents to hypertext form.
+    </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4557,8 +4557,8 @@ to handle data from a variety of different instruments.
     same way, so it is possible to give a general guide to the
     principles involved.  However, some libraries do differ, and for
     precise details of how to use a particular subroutine library, you
-    should consult the Starlink document for that library. 
-  </p></abstract>  
+    should consult the Starlink document for that library.
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4598,7 +4598,7 @@ to handle data from a variety of different instruments.
      has also been described in a Starlink Bulletin} article, December
      1995.
 
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4623,7 +4623,7 @@ to handle data from a variety of different instruments.
   <abstract><p>
      This is a brief manual indicating the availability of the NRAO
      Astronomical Image Processing System (AIPS) on Starlink.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4653,10 +4653,10 @@ to handle data from a variety of different instruments.
     operates on data produced by these instruments and can be used to
     transform them into calibrated images, spectra, time-series etc.
 
-   XRT was created by taking the ROSAT XRT-specific functions in the 
-   ASTERIX general X-ray astronomy data reduction system and 
+   XRT was created by taking the ROSAT XRT-specific functions in the
+   ASTERIX general X-ray astronomy data reduction system and
    re-packaging them as stand-alone applications.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4707,7 +4707,7 @@ to handle data from a variety of different instruments.
    gives a quantitative description of these distortions. It also
    explains how they can be corrected for easily using the
    CCDPACK package.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4733,7 +4733,7 @@ to handle data from a variety of different instruments.
     </p>
   </abstract>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -4802,7 +4802,7 @@ to handle data from a variety of different instruments.
   <version>2.2</version>
   <path>libraries/ard</path>
   <description>ASCII Region Definition</description>
-  <abstract><p>The ARD (ASCII Region Definition) system provides a 
+  <abstract><p>The ARD (ASCII Region Definition) system provides a
      textual language for describing regions within a data array,
      together with software for converting a textual description
      into a pixel mask, or plotting it on a graphics device.
@@ -4907,7 +4907,7 @@ to handle data from a variety of different instruments.
   <version>1.3</version>
   <path>libraries/atl</path>
   <description>ATL - A Library of AST Utility Routines</description>
-  <abstract><p>ATL provides routines that perform high-level AST-related 
+  <abstract><p>ATL provides routines that perform high-level AST-related
             functions.</p></abstract>
   <dependencies >
     <build>cnf</build><build>fio</build><build>grp</build><build>ast</build><build>sae</build><link>chr</link><link>cfitsio</link><link>mers</link><link>ast</link><link>psx</link><link>fio</link><link>grp</link><sourceset>star2html</sourceset>
@@ -4933,7 +4933,7 @@ to handle data from a variety of different instruments.
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
   <abstract><p>
-CAT is the Starlink Fortran subroutine library for manipulating 
+CAT is the Starlink Fortran subroutine library for manipulating
 astronomical catalogues and similar tabular datasets.
 </p></abstract>
   <dependencies >
@@ -5048,10 +5048,10 @@ No longer under active control.
   <version>3.0</version>
   <path>libraries/ctg</path>
   <description>Library to access groups of catalogues.</description>
-  <abstract><p> 
+  <abstract><p>
      CTG provides routines for accessing groups of catalogues through
-     a single parameter using wild-cards, and lists in text files.  This is 
-     analogous to the way the NDG library accesses groups of NDFs using a 
+     a single parameter using wild-cards, and lists in text files.  This is
+     analogous to the way the NDG library accesses groups of NDFs using a
      single parameter.
   </p></abstract>
   <dependencies >
@@ -5453,7 +5453,7 @@ understand.
   <path>libraries/irq</path>
   <description>Library to manage NDF QUALITY information textually</description>
   <abstract><p> This library is a set of Fortran routines that permit
-  management and use of textual names representing bits in the NDF QUALITY 
+  management and use of textual names representing bits in the NDF QUALITY
   component.
     </p></abstract>
   <dependencies >
@@ -5503,7 +5503,7 @@ understand.
   <version>3.0</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
-  <abstract><p>KAPLIBS is a package of Fortran subroutine 
+  <abstract><p>KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
 package of general-purpose image-processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
@@ -5535,10 +5535,10 @@ independently of KAPPA.</p></abstract>
   <path>libraries/lpg</path>
   <description>Library to manage NDF QUALITY information textually
   </description>
-  <abstract><p> 
-     This library is a set of Fortran routines that provides looping of 
-     tasks within a monolith, in order to allow a command to be invoked 
-     repeatedly until all supplied data files (catalogues or NDFs) have 
+  <abstract><p>
+     This library is a set of Fortran routines that provides looping of
+     tasks within a monolith, in order to allow a command to be invoked
+     repeatedly until all supplied data files (catalogues or NDFs) have
      been processed.  Thus it can be used to enable lists of files
      including wildcards to be processed in a single command.
   </p></abstract>
@@ -5627,7 +5627,7 @@ Ultrix and for SunOS and may still work for them.
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
   </developers>
-  <documentation> sun104</documentation> 
+  <documentation> sun104</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
@@ -5806,7 +5806,7 @@ Ultrix and for SunOS and may still work for them.
   <description>PCS -- Parameter and Communication Subsystems</description>
   <abstract>
     <p>Application programs often need to obtain parameter
-      values from a variety of sources and to communicate with other programs. 
+      values from a variety of sources and to communicate with other programs.
       The Parameter and Communication Subsystems (PCS) are a set of
       closely-related subroutine libraries which provide these
       facilities for many Starlink applications and the associated
@@ -5816,7 +5816,7 @@ Ultrix and for SunOS and may still work for them.
       Software Environment which is described in Starlink Guide SG/4.
       Additional notes on using it under Unix are given in Starlink
       User Note SUN/144.</p>
-  </abstract> 
+  </abstract>
   <dependencies >
     <build>cnf</build><build>ems</build><build>hds</build><build>hlp</build><build>mers</build><build>psx</build><build>sae</build><build option='link'>chr</build><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>mers</link><link>psx</link><sourceset>messgen</sourceset>
   </dependencies>
@@ -6049,13 +6049,13 @@ Ultrix and for SunOS and may still work for them.
   <path>libraries/prm</path>
   <description>PRM --- Processing of Primitive Numerical Data</description>
   <abstract><p>This document describes the PRM package (once called
-      PRIMDAT), which 
+      PRIMDAT), which
       is a collection of Fortran functions and subroutines providing
       support for ``primitive data processing''.  Routines from this
       package may be used to perform arithmetic, mathematical
       operations, type conversion and inter-comparison of any of the
       primitive numerical data types supported by the Starlink
-      Hierarchical Data System HDS (SUN/92). 
+      Hierarchical Data System HDS (SUN/92).
     </p></abstract>
   <dependencies >
     <build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
@@ -6090,7 +6090,7 @@ Ultrix and for SunOS and may still work for them.
       programmers to use the functionality provided by the POSIX and
       X/OPEN libraries. The use of this library will enable
       programmers to make use of operating system facilities in a
-      machine independent way.</p></abstract> 
+      machine independent way.</p></abstract>
   <dependencies >
     <build>cnf</build><build>ems</build><build>sae</build><build>starmem</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
@@ -6156,7 +6156,7 @@ Ultrix and for SunOS and may still work for them.
       <email>NONE</email>
     </person>
   </developers>
- <documentation> sun191</documentation> 
+ <documentation> sun191</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
@@ -6301,7 +6301,7 @@ Ultrix and for SunOS and may still work for them.
 	<p>C Memory management wrapper routines.</p>
   </abstract>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -6322,7 +6322,7 @@ Ultrix and for SunOS and may still work for them.
    functions.
     </p></abstract>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -6376,7 +6376,7 @@ Ultrix and for SunOS and may still work for them.
   <path>thirdparty/apache/xerces-c</path>
   <description>Apache Xerces-c library for parsing XML</description>
   <dependencies >
-    
+
   </dependencies>
   <!--developers>
     <person>
@@ -6496,7 +6496,7 @@ Ultrix and for SunOS and may still work for them.
   <path>thirdparty/fsf/gsl</path>
   <description>GNU Scientific Library</description>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -6589,7 +6589,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>
   <dependencies >
-    
+
   </dependencies>
   <!--developers>
     <person>
@@ -6657,7 +6657,7 @@ The well known LaTeX2HTML converter. Used only for converting Starlink
 documents to hypertext.
 </p></abstract>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -6673,7 +6673,7 @@ documents to hypertext.
   <path>thirdparty/mesa3d/mesa</path>
   <description>Mesa library for OpenGL support</description>
   <dependencies >
-    
+
   </dependencies>
   <!--developers>
     <person>
@@ -6687,7 +6687,7 @@ documents to hypertext.
   <path>thirdparty/mit/fftw</path>
   <description>Fastest Fourier Transform in the West</description>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -6711,7 +6711,7 @@ documents to hypertext.
       XBM, XPM, GIF and PNG files.
     </p></abstract>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <person>
@@ -6734,7 +6734,7 @@ documents to hypertext.
   <path>thirdparty/perlsys/perl</path>
   <description>Perl</description>
   <dependencies >
-    
+
   </dependencies>
   <!--developers>
     <person>
@@ -6753,7 +6753,7 @@ another list, allowing for arbitrary translation, rotation, scaling,
 and some distortion.
 </p></abstract>
     <dependencies >
-    
+
   </dependencies>
   <developers>
     <!-- MATCH is maintained by Michael Richmond http://spiff.rit.edu/match,
@@ -6811,7 +6811,7 @@ and some distortion.
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
-    
+
   </dependencies>
   <developers>
     <!-- Tcl is maintained by Scriptics, but this part of the tree

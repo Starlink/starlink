@@ -34,7 +34,7 @@ C
 C  External variables used:
 C     Only common variables internal to the DSA routines.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DTA_NMVAR, DTA_DLVAR, DSA__NDF-TOP_NAME
 C
 C  Prior requirements:
@@ -55,7 +55,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  History:
@@ -99,7 +99,7 @@ C        deleted.  DSA__NDF_TOP_NAME knows the difference.
 C
          MORE=.TRUE.
          IPOS=1
-         DO WHILE (MORE) 
+         DO WHILE (MORE)
             CALL DTA_NMVAR (OBJ_NAMES(REF_SLOT),IPOS,NAME,DTA_STATUS)
             IF (DTA_STATUS.NE.0) THEN
                DTA_STATUS=0

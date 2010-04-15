@@ -30,29 +30,29 @@ C
 C
 C   Parameters
 C   ----------
-C   OUTPUT    Name of output ASCII file for results. The output info 
-C             goes in the following order: (1) Either 'O' or 'S' for 
-C             "object" or  "sky"; (2) a sequence number; (3) the x,y 
+C   OUTPUT    Name of output ASCII file for results. The output info
+C             goes in the following order: (1) Either 'O' or 'S' for
+C             "object" or  "sky"; (2) a sequence number; (3) the x,y
 C             coordinates of the cursor, (4) the radius of the aperture;
 C             (5) the total flux in pixels which are with a radial
-C             distance less than or equal to the aperture radius.  No 
-C             correction is made for partial pixels; (6) the total 
+C             distance less than or equal to the aperture radius.  No
+C             correction is made for partial pixels; (6) the total
 C             number of pixels included.
 C             (character)(prompted for)
 C
-C   IMAGE     Name of individual images in case you're not using a 
+C   IMAGE     Name of individual images in case you're not using a
 C             list file. (character)(prompted for)
 C
 C   RADIUS    Radius for integration. (real)(prompted for)
 C
-C   LOW       Data value for lowest level in 2-d plot 
+C   LOW       Data value for lowest level in 2-d plot
 C             (real)(prompted for)
 C
 C   HIGH      Data value for highest level in 2-d plot
 C             (real)(prompted for)
 C
 C
-C   Keywords 
+C   Keywords
 C   --------
 C   OK
 C
@@ -67,11 +67,11 @@ C   ------
 C   - The image name is read and that image is plotted on the current
 C     plot device.
 C   - The user is presented with a menu which allows him/her/it to
-C     specify object and sky regions, change the colour levels, change 
+C     specify object and sky regions, change the colour levels, change
 C     the radius of the aperture, show cuts or quit.
 C   - Integrations are a simple sum of the values of the pixels within
 C     the aperture radius.
-C   
+C
 C
 C   External functions & subroutines called
 C   ---------------------------------------
@@ -152,22 +152,22 @@ C     04 Feb 1992  Modified to use new NDP 2d graphics routines. (JRL)
 C     27 Aug 1992  Modified to allow list directed parameters.  A bit
 C                  of general tidying up was also done. (JRL)
 C     16 Jun 1993  Use user variable SOFT, not SOFTDEV. Allow "?"
-C                  instead of "H" to get help. In "P" option do not 
-C                  cancel TABLE parameter. Thus it should not be asked 
-C                  for, a new value would have no effect anyway. Check 
+C                  instead of "H" to get help. In "P" option do not
+C                  cancel TABLE parameter. Thus it should not be asked
+C                  for, a new value would have no effect anyway. Check
 C                  PAR_ABORT flag. (hme)
 C     24 Aug 1994  Port to Unix. Change INCLUDE. Disable colour table.
 C                  Problem is that the PGBEGIN calls will reset the
 C                  colour table from what might be set previously. Must
 C                  use the technique of IMAGE, i.e. open /append and
-C                  draw some nonsense and advance one page. Use 
+C                  draw some nonsense and advance one page. Use
 C                  DSA_WRUSER with DSA_FLUSH where appropriate.
 C                  Reserve 16 pens instead of four. Thus compatible with
 C                  IMAGE. Then also use IDEV instead of SOFT.
 C                  (hme)
 C     15 Sep 1994  Where the two 1-D cuts are plotted, two calls
 C                  PGPOINT/PGPAGE are necessary. In the same area,
-C                  disuse PAR_RDUSER and introduce the logical 
+C                  disuse PAR_RDUSER and introduce the logical
 C                  parameter OK. (hme)
 C     15 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Avoid _NAMED_ routines.
@@ -223,7 +223,7 @@ C
       call dsa_input('image','image',status)
       call dsa_get_actual_name('image',input,status)
       if (status .ne. 0) go to 500
-C     
+C
 C     Get the output file name
 C
       call par_rdchar('output',' ',output)
@@ -248,7 +248,7 @@ C
       end if
 C
 C     Get dimensionality and map input
-C     
+C
       call dsa_data_size('image',2,ndim,dims,nelm,status)
       call dsa_use_flagged_values('image',status)
       call dsa_map_data('image','read','float',iptr,islot,status)
@@ -278,7 +278,7 @@ C
   102 format('Begining analysis of file: ',a)
       call dsa_wruser(message(:ich_len(message)))
       call dsa_wrflush
-C     
+C
 C     Now do any work required
 C
       call sub_aperture(dims(1),dims(2),%VAL(CNF_PVAL(iptr)),
@@ -363,7 +363,7 @@ C
       REAL      MIN_FLOAT,MAX_FLOAT
       PARAMETER (MAX_FLOAT=1.7E38,MIN_FLOAT=-1.7E38)
 C
-C     Data statements 
+C     Data statements
 C
       data init /.true./
 C
@@ -395,7 +395,7 @@ C     Initialise a few things
 C
       iobj = 0
       isky = 0
-      sumsky = 0.0  
+      sumsky = 0.0
       picture = .false.
 C
 C     Preliminary set of radius
@@ -459,7 +459,7 @@ C
                call ndp_image_index(nx*ny,low,high,input,badpix,
      :                              work,status)
                if (status .ne. 0) go to 500
-            end if             
+            end if
             call pgpage
             call display(work,nx,ny,low,high,xaxis,yaxis,table,status)
             if (status .ne. 0) go to 500
@@ -575,9 +575,9 @@ C
             call dsa_wrflush
             call dsa_wrflush
          end if
-      end do      
+      end do
       call pgend
-      
+
       call dsa_free_workspace(wslot4,status)
       call dsa_free_workspace(wslot3,status)
       call dsa_free_workspace(wslot2,status)
@@ -681,7 +681,7 @@ C     (>) Y:         (real array Y(NPIX)) Y values for circle
 C
 C
 C     AUTHOR:      Jim Lewis -- RGO
-C     DATE:        05-SEP-1991 
+C     DATE:        05-SEP-1991
 C     UPDATE:
 C
 C+-----------------------------------------------------------------------------
@@ -728,7 +728,7 @@ C     (>) YOUT:      (real array YOUT(NPIX)) Output Y values for circle
 C
 C
 C     AUTHOR:      Jim Lewis -- RGO
-C     DATE:        05-SEP-1991 
+C     DATE:        05-SEP-1991
 C     UPDATE:
 C
 C+-----------------------------------------------------------------------------
@@ -781,12 +781,12 @@ C+----------------------------------------------------------------------
       implicit none
 C
 C     Parameters
-C  
+C
       integer nx,ny,ix1,ix2,iy1,iy2
       real radius,x,y,input(nx,ny),sum,apparea
 C
 C     Local variables
-C 
+C
       integer i,j,status
       real dy2,dx2,rad,magic_float
 C
@@ -896,7 +896,7 @@ C
 C     Get cut in Y
 C
       ix = nint(x)
-      amin = input(ix,1)      
+      amin = input(ix,1)
       amax = amin
       do i = 1,ny
          work1(i) = float(i)
@@ -1098,12 +1098,12 @@ C
 C   History
 C   -------
 C   01-FEB-1989   - Original program
-C   14-JUN-1900   - Changed calling parameters so that ARRAY isn't 
+C   14-JUN-1900   - Changed calling parameters so that ARRAY isn't
 C                   dimensions with elements of another array.  (JRL)
-C   21-JAN-1992   - Input array is now an integer array of colour 
+C   21-JAN-1992   - Input array is now an integer array of colour
 C                   indices. The original data should have been
-C                   processed with NDP_IMAGE_INDEX.  Now makes use of 
-C                   PGPIXL which give more control over colour 
+C                   processed with NDP_IMAGE_INDEX.  Now makes use of
+C                   PGPIXL which give more control over colour
 C                   plotting. (JRL)
 C
 C
@@ -1155,7 +1155,7 @@ c   Plot label.
 c
       call pglabel(' ',' ',label)
 c
-c   Plot colour or grey scale ramp if required. Afterwards restore the 
+c   Plot colour or grey scale ramp if required. Afterwards restore the
 c   image viewport.
 c
       if(ramp)then
@@ -1175,11 +1175,11 @@ C   -----------------------------------
 C
 C   Description
 C   -----------
-C   Sets the PGPLOT viewport for image display. The image size may be 
+C   Sets the PGPLOT viewport for image display. The image size may be
 C   selected as a fraction of the whole display durface. The location on
-C   the surface may be any combination of Top/Centre/Bottom paired with 
-C   Left/Centre/Right, e.g. 'TL' is top left. A central position is 
-C   always returned unless otherwise specified, e.g. 'L' gives left of 
+C   the surface may be any combination of Top/Centre/Bottom paired with
+C   Left/Centre/Right, e.g. 'TL' is top left. A central position is
+C   always returned unless otherwise specified, e.g. 'L' gives left of
 C   screen, vertically centred.
 C
 C
@@ -1210,7 +1210,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -1239,7 +1239,7 @@ c
       character*(*) control
       integer       stapix(2),endpix(2)
       real          mag,ximv(2),yimv(2),square
-c                   
+c
       logical       bottom
       logical       left
       integer       ncol
@@ -1264,8 +1264,8 @@ c
 c
 c   Default is right-left and top-bottom centering.
 c
-      rlcent=.true.      
-      tbcent=.true.      
+      rlcent=.true.
+      tbcent=.true.
 c
 c   Interpret control instructions.
 c
@@ -1287,8 +1287,8 @@ c   Compute device aspect ratio.
 c
       call pgvstand
       call pgqvp(1,xmin,xmax,ymin,ymax)
-      ratio=(ymax-ymin)/(xmax-xmin)            
-c       
+      ratio=(ymax-ymin)/(xmax-xmin)
+c
 c   Compute location of largest possible square.
 c
       xmin1=xmin
@@ -1369,7 +1369,7 @@ c
       ximv(2)=xmax2
       yimv(1)=ymin2
       yimv(2)=ymax2
-c      
+c
       if(right)then
         ximv(1)=xmin2+(xmax2-xmin2)*(1.0-mag)
         ximv(2)=xmax2
@@ -1539,8 +1539,8 @@ C
 C
 C   Author/s
 C   --------
-C   Nick Fuller  RGO  
-C   Guy Rixon    RGO  
+C   Nick Fuller  RGO
+C   Guy Rixon    RGO
 C   Jim Lewis    RGO
 C
 C
@@ -1558,10 +1558,10 @@ c
 
 c    Given parameters:
 c
-      real          
+      real
      :   ximv(2), yimv(2),  ! limits of imge viewport
      :   low, high          ! extreme data-values to be plotted
-c                   
+c
 c    local constants:
 c
       integer
@@ -1570,20 +1570,20 @@ c
 c
 c    Local variables:
 c
-      integer       
+      integer
      :   cispan,            ! number of colour values to be set
      :   i, j,              ! loop indices
      :   iarray(xdim,ydim), ! colour index array
      :   ci_start,ci_end,   ! colour index range
      :   status             ! status variable
-      real          
+      real
      :   rarray(xdim,ydim), ! array of ramp values
      :   xmax, xmin,        ! limits of the ramp viewport
      :   val                ! dummy variable
 
 
 c
-c    Set the ramp viewport. The ramp will appear at the right of the 
+c    Set the ramp viewport. The ramp will appear at the right of the
 c    image.
 c
       xmin=ximv(2)+0.025*(ximv(2)-ximv(1))

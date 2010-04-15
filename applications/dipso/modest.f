@@ -1,60 +1,60 @@
        SUBROUTINE MODEST(OK,X,NPTS,XWK,XP,DXP,JFORCE)
- 
+
 *   Mode estimation for sampled data from a continuous distribution,
 *   by estimating the rate of an inhomogeneous Poisson process by
 *   Jth waiting times, selecting maximum likelihood value of J
 *   Reference:  Numerical Recipes, section 13.3
- 
+
        IMPLICIT NONE
- 
+
        INTEGER NPTS
        REAL X(NPTS)
        LOGICAL OK, FOUND
- 
+
        REAL XWK(NPTS), XP(NPTS/5), DXP(NPTS/5)
- 
- 
+
+
 *
- 
+
        INTEGER I, J, N, JFORCE
        INTEGER J1, J2, JMAX
- 
+
        REAL FCTR1, FCTR2, PTEMP, PMAX
        REAL PVAL, PLIM, HMAX
        REAL XLOW, XHI
        REAL TX1, TX2, TY1, TY2
        REAL RJ, HJ, PA, PX, PAX
        REAL GAMMODE
- 
+
        CHARACTER*1 BLEEP
        COMMON /BLEEP / BLEEP
- 
+
 *  Initialise
- 
+
        OK = .TRUE.
- 
+
 *  Estimate window size, J
- 
+
        J1 = MAX(5,MIN(9,NPTS/30))
        J1 = MIN(J1,MAX(JFORCE,3))
        J2 = NPTS/5
- 
+
        IF (J1.GE.J2) THEN
           WRITE (*,'(''   MODE:  insufficient samples'',A)') BLEEP
           OK = .FALSE.
           GOTO 800
        ENDIF
- 
+
 *   Sort input data
- 
+
        DO 100 I = 1, NPTS
           XWK(I) = X(I)
   100  CONTINUE
- 
+
        CALL HEAPSRT(NPTS,XWK)
- 
+
 *   Evaluate p(x) for all J, store X and DX at peak p(x) for each J
- 
+
        DO 200 J = J1, J2
           PVAL = 0.0
           FCTR1 = REAL(J)/REAL(NPTS)
@@ -68,7 +68,7 @@
                 ENDIF
              ENDIF
              IF (FCTR2.EQ.0.0) FCTR2 = 1.0E-30
- 
+
              PTEMP = FCTR1/FCTR2
              IF (PTEMP.GT.PVAL) THEN
                 PVAL = PTEMP
@@ -77,14 +77,14 @@
              ENDIF
   150     CONTINUE
   200  CONTINUE
- 
+
 *   Find maximum likelihood J value for XP
- 
+
        IF (JFORCE.GE.3) THEN
           J1 = JFORCE
           J2 = JFORCE
        ENDIF
- 
+
        HMAX = 0.0
        DO 300 J = J1, J2
           HJ = 1.0
@@ -98,17 +98,17 @@
                 HJ = HJ*PAX
              ENDIF
   250     CONTINUE
- 
+
           IF (HJ.GT.HMAX) THEN
              HMAX = HJ
              JMAX = J
           ENDIF
   300  CONTINUE
- 
- 
- 
+
+
+
 *   Estimate 1 sigma range for mode
- 
+
        N = 0
        FOUND = .FALSE.
        FCTR1 = REAL(JMAX)/REAL(NPTS)
@@ -116,7 +116,7 @@
        PLIM = PMAX*(1.0-1.0/SQRT(REAL(JMAX)))
        XLOW = XP(JMAX) - XWK(1)
        XHI = XWK(NPTS) - XP(JMAX)
- 
+
        WRITE (*,'(''   MODE:  value'',1PE12.4)') XP(JMAX)
        DO 400 I = 1, NPTS - JMAX
           PVAL = FCTR1/(XWK(I+JMAX)-XWK(I))
@@ -157,7 +157,7 @@
              N = I
           ENDIF
   400  CONTINUE
- 
+
        IF (N.EQ.1) THEN
           WRITE (*,
      :    '(''          Limits not found (no significant peak)'',A)')
@@ -168,7 +168,7 @@
           WRITE (*,'(''          Minus'',1PE12.4)') XLOW
        ENDIF
        GOTO 700
- 
+
   500  CONTINUE
        WRITE (*,'(''          Plus '',1PE12.4)') XHI
        IF (N.EQ.1) THEN
@@ -177,11 +177,11 @@
        ELSE
           WRITE (*,'(''          Minus'',1PE12.4)') XLOW
        ENDIF
- 
+
 *   Estimate 2 sigma range for mode
- 
+
        IF (JMAX.GT.4) THEN
- 
+
           N = 0
           FOUND = .FALSE.
           FCTR1 = REAL(JMAX)/REAL(NPTS)
@@ -191,7 +191,7 @@
           XHI = XWK(NPTS) - XP(JMAX)
           XLOW = XP(JMAX) - XWK(1)
           XHI = XWK(NPTS) - XP(JMAX)
- 
+
           DO 550 I = 1, NPTS - JMAX
              PVAL = FCTR1/(XWK(I+JMAX)-XWK(I))
   520        CONTINUE
@@ -231,7 +231,7 @@
                 N = I
              ENDIF
   550     CONTINUE
- 
+
           IF (N.EQ.1) THEN
              WRITE (*,
      :       '(''          2sigma limits not found '',
@@ -243,7 +243,7 @@
           ENDIF
        ENDIF
        GOTO 700
- 
+
   600  CONTINUE
        IF (N.EQ.1) THEN
           WRITE (*,'(''          No 2sigma lower limit located'',A)')
@@ -252,7 +252,7 @@
           WRITE (*,'(''          2sigma minus'',1PE12.4)') XLOW
        ENDIF
        WRITE (*,'(''          2sigma plus '',1PE12.4)') XHI
- 
+
   700  CONTINUE
        IF (JFORCE.LT.3) THEN
           WRITE (*,
@@ -263,7 +263,7 @@
      :    '(''   MODE:  forced J, optimum J:'',    I4,'','',I4)')
      :    JFORCE, JMAX
        ENDIF
- 
+
   800  CONTINUE
 
        END

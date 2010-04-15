@@ -27,13 +27,13 @@
 
 #  Notes:
 #     This widget doesn't currently allow the user to specify his own
-#     Set Index values (it assumes 1, 2, 3,...).  I don't think this 
-#     will often be required, but if it is this routine could be 
+#     Set Index values (it assumes 1, 2, 3,...).  I don't think this
+#     will often be required, but if it is this routine could be
 #     ehnanced.
 
 #  Global Variables:
 #     CCDsetindices = list of integers (read and write)
-#        The NDF Set Index values got from the user.  If the user 
+#        The NDF Set Index values got from the user.  If the user
 #        gives an invalid response or invokes a cancel on the dialog,
 #        an empty list will be returned.
 #     CCDsetindicesvalid = boolean (write)
@@ -84,8 +84,8 @@
 
 #  Initialise set indices variable list if it does not already exist.
       if { ! [info exists CCDsetindices] || \
-           ! [info exists CCDsetindicesvalid] } { 
-         set CCDsetindices {} 
+           ! [info exists CCDsetindicesvalid] } {
+         set CCDsetindices {}
          set CCDsetindicesvalid 0
       }
       set setsize [llength $CCDsetindices]
@@ -123,7 +123,7 @@
             $Top kill $Top
          "
 
-#  Set window acceptance as the default button if the current value of 
+#  Set window acceptance as the default button if the current value of
 #  CCDsetindices is sensible.
          if { [llength $CCDsetindices] > 1 } {
             $Choice focus OK
@@ -142,7 +142,7 @@
          pack $menu -fill x -side top
          pack $frame -fill both -expand 1
          pack $value -fill x -expand 1
-         pack $choice -side bottom -fill x 
+         pack $choice -side bottom -fill x
 
 #  Add contextual help.
          $Top sethelp ccdpack CCDGetSetIndicesWindow

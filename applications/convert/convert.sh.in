@@ -202,7 +202,7 @@ export NDF_FORMATS_OUT
 
 #  FITS conversions
 #  ----------------
-#  Because NDF2FITS uses HDS_WILD which will only accept container files 
+#  Because NDF2FITS uses HDS_WILD which will only accept container files
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
 #  HDS scratch file.
 if test -n "$HDS_SCRATCH"; then
@@ -324,7 +324,7 @@ else
    NDF_TEMP_COMPRESSED='temp_Z_^name'
 fi
 export NDF_TEMP_COMPRESSED
- 
+
 #  GZIP compression conversions
 #  ----------------------------
 NDF_FROM_GZIP="\$CONVERT_DIR/convertndf from '^fmt' '^dir' '^name' '^type' '^fxs' '^ndf'"

@@ -88,7 +88,7 @@
       CHARACTER
      :  CLASS*10,          ! Class of text info.
      :  TEXT*(SGZ__SZOPR)  ! Current line of text info.
-      INTEGER 
+      INTEGER
      :  LTEXT,    ! Length of TEXT (excl. trail. blanks).
      :  LSTAT     ! Local Fortran I/O status.
 *.

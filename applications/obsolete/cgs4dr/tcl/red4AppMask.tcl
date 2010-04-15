@@ -1,6 +1,6 @@
 proc red4AppMask {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -24,7 +24,7 @@ proc red4AppMask {taskname} {
     set Red4Widgets(AM_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(AM_LAB01) $Red4Widgets(AM_ENT01) -in $top -side left
     $Red4Widgets(AM_ENT01) insert end $Red4Widgets(MASK)
- 
+
     set Red4Widgets(AM_LAB02) [label $bot.l2 -text "Data"]
     set Red4Widgets(AM_ENT02) [entry $bot.e2 -width 40]
     pack $Red4Widgets(AM_LAB02) $Red4Widgets(AM_ENT02) -in $bot -side left -pady 2m

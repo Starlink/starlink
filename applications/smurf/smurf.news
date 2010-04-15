@@ -43,7 +43,7 @@
 2 Bug_Fixes
 
  o A problem with astrometry calculations for data after mid-2008
-   when using the USEDETPOS=NO option has been fixed. 
+   when using the USEDETPOS=NO option has been fixed.
 
  o Fixed a problem with tiling when a tile was 1 pixel wide.
 
@@ -145,20 +145,20 @@
 
 1 SMURF_Version_0.2-2
 
- o Implemented a system for automatic determination of optimal WCS grid parameters in 
+ o Implemented a system for automatic determination of optimal WCS grid parameters in
    MAKECUBE.
  o Allow MAKECUBE to generate a cube from a subset of the available detectors.
  o Allow MAKECUBE to generate an output catalogue containing all used detector positions.
  o Allow use of other rebinning methods in addition to "nearest neighbour" in MAKECUBE.
- o Allow MAKECUBE to create output cubes from randomly positioned ("sparse") input 
+ o Allow MAKECUBE to create output cubes from randomly positioned ("sparse") input
    spectra.
- o Make some components of the output cube optional, in order to reduce the size of the 
+ o Make some components of the output cube optional, in order to reduce the size of the
    output cube.
- o Add option to restrict the spectral range of the output cube, in order to reduce the 
+ o Add option to restrict the spectral range of the output cube, in order to reduce the
    size of the output cube.
  o Allow output variances to be created from the input TSYS values.
 
 2 Bug_Fixes
 
-Fixed a large number of bugs in makecube that prevented it from generating cubes which were 
+Fixed a large number of bugs in makecube that prevented it from generating cubes which were
 consistent with those created by the on-line system.

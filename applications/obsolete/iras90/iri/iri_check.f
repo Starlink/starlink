@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -70,7 +70,7 @@
 
 *  Initialise the returned flag to indicate that the units are known.
       OK = .TRUE.
-      
+
 *  Check ths supplied units against each of the known system of units,
 *  ignoring case. Once found, replace the supplied string with the
 *  case-corrected string.

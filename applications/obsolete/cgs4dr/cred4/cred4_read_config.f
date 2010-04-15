@@ -1,7 +1,7 @@
 *+  CRED4_READ_CONFIG - Read a configuration from an ASCII file
       SUBROUTINE CRED4_READ_CONFIG( STATUS )
 *    Description :
-*     This routine reads an ASCII configuration file and sets 
+*     This routine reads an ASCII configuration file and sets
 *     values in the noticeboard.
 *    Invocation :
 *     CALL CRED4_READ_CONFIG( STATUS )
@@ -50,12 +50,12 @@
        CALL MSG_OUT( ' ', 'Restoring configuration from ^CONFIG', STATUS )
 
 *   Open the configuration file
-      IF ( INDEX( CONFIG_FILE, SEPARATOR ) .EQ. 0 ) 
+      IF ( INDEX( CONFIG_FILE, SEPARATOR ) .EQ. 0 )
      :  CONFIG_FILE = CGS4_CONFIG(1:CHR_LEN(CGS4_CONFIG)) // CONFIG_FILE(1:CHR_LEN(CONFIG_FILE))
-      IF ( INDEX( CONFIG_FILE, '.cred4' ) .EQ. 0 ) 
+      IF ( INDEX( CONFIG_FILE, '.cred4' ) .EQ. 0 )
      :  CONFIG_FILE = CONFIG_FILE(1:CHR_LEN(CONFIG_FILE)) // '.cred4'
       CALL CHR_RMBLK( CONFIG_FILE )
-      CALL FIO_OPEN( CONFIG_FILE(1:CHR_LEN(CONFIG_FILE)), 'READ', 
+      CALL FIO_OPEN( CONFIG_FILE(1:CHR_LEN(CONFIG_FILE)), 'READ',
      :   'LIST', 0, LUN, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          ERR_STAT = STATUS
@@ -65,7 +65,7 @@
      :      /'Failed to open configuration file (Status = ^ES)', STATUS )
       END IF
 
-*    Recursively read the contents of the file 
+*    Recursively read the contents of the file
       EOF = .FALSE.
       DO WHILE ( ( .NOT. EOF ) .AND. ( STATUS .EQ. SAI__OK ) )
 

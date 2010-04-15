@@ -13,10 +13,10 @@
 *     RESULT = CHR_ACHR( ASCII )
 
 *  Description:
-*     The given ASCII value is converted to a single returned character 
-*     in the machine's character set. If no such character 
-*     exists within the machine's character set, the character code 0 
-*     (the ASCII NUL character) is returned. 
+*     The given ASCII value is converted to a single returned character
+*     in the machine's character set. If no such character
+*     exists within the machine's character set, the character code 0
+*     (the ASCII NUL character) is returned.
 
 *  Arguments:
 *     ASCII = INTEGER (Given)
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,23 +62,23 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  System-specific:
 *     This subprogram has been implemented for machines which use
 *     the ASCII character set.
-*     Semi-portable code (commented out) has been appended which 
-*     may be used on any machine architecture. This code is only 
-*     semi-portable because it uses an extended character set to that 
-*     of Fortran 77. 
-*     The appended code may be made fully portable by replacing all 
-*     non-Fortran 77 characters in the DATA statement with tokens which 
+*     Semi-portable code (commented out) has been appended which
+*     may be used on any machine architecture. This code is only
+*     semi-portable because it uses an extended character set to that
+*     of Fortran 77.
+*     The appended code may be made fully portable by replacing all
+*     non-Fortran 77 characters in the DATA statement with tokens which
 *     may be subsequently decoded by CHR_ATOK.
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Arguments Given:
-      INTEGER ASCII 
+      INTEGER ASCII
 
 *  Version for machines which use the ASCII character set.
 *  Local Constants:
@@ -116,17 +116,17 @@
 
 *  Local Data:
 *     DATA TOKVAL / 'NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK',
-*    : 'BEL', 'BS',  'HT',  'LF',  'VT',  'FF',  'CR',  'SO',  'SI',  
-*    : 'DLE', 'DC1', 'DC2', 'DC3', 'DC4', 'NAK', 'SYN', 'ETB', 'CAN', 
-*    : 'EM',  'SUB', 'ESC', 'FS',  'GS',  'RS',  'US',  ' ',   '!', 
-*    : '"',   '#',   '$',   '%',   '&',   '''',  '(',   ')',   '*', 
-*    : '+',   ',',   '-',   '.',   '/',   '0',   '1',   '2',   '3', 
-*    : '4',   '5',   '6',   '7',   '8',   '9',   ':',   ';',   '<', 
+*    : 'BEL', 'BS',  'HT',  'LF',  'VT',  'FF',  'CR',  'SO',  'SI',
+*    : 'DLE', 'DC1', 'DC2', 'DC3', 'DC4', 'NAK', 'SYN', 'ETB', 'CAN',
+*    : 'EM',  'SUB', 'ESC', 'FS',  'GS',  'RS',  'US',  ' ',   '!',
+*    : '"',   '#',   '$',   '%',   '&',   '''',  '(',   ')',   '*',
+*    : '+',   ',',   '-',   '.',   '/',   '0',   '1',   '2',   '3',
+*    : '4',   '5',   '6',   '7',   '8',   '9',   ':',   ';',   '<',
 *    : '=',   '>',   '?',   '@',   'A',   'B',   'C',   'D',   'E',
-*    : 'F',   'G',   'H',   'I',   'J',   'K',   'L',   'M',   'N', 
-*    : 'O',   'P',   'Q',   'R',   'S',   'T',   'U',   'V',   'W', 
-*    : 'X',   'Y',   'Z',   '[',   '\',   ']',   '^',   '_',   '`', 
-*    : 'a',   'b',   'c',   'd',   'e',   'f',   'g',   'h',   'i', 
+*    : 'F',   'G',   'H',   'I',   'J',   'K',   'L',   'M',   'N',
+*    : 'O',   'P',   'Q',   'R',   'S',   'T',   'U',   'V',   'W',
+*    : 'X',   'Y',   'Z',   '[',   '\',   ']',   '^',   '_',   '`',
+*    : 'a',   'b',   'c',   'd',   'e',   'f',   'g',   'h',   'i',
 *    : 'j',   'k',   'l',   'm',   'n',   'o',   'p',   'q',   'r',
 *    : 's',   't',   'u',   'v',   'w',   'x',   'y',   'z',   '{',
 *    : '|',   '}',   '~',   'DEL' /

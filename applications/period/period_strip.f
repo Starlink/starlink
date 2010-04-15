@@ -1,17 +1,17 @@
 
-      SUBROUTINE PERIOD_STRIP(STRING1,STRING2) 
- 
+      SUBROUTINE PERIOD_STRIP(STRING1,STRING2)
+
 C=============================================================================
 C
 C Routine to remove the leading and following ' characters from a string
-C returned by FITSIO. 
+C returned by FITSIO.
 C
 C Written by Grant Privett 25th September 1995.
 C
 C=============================================================================
- 
+
       IMPLICIT NONE
- 
+
 C-----------------------------------------------------------------------------
 C Declarations.
 C-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ C-----------------------------------------------------------------------------
       INTEGER I
       INTEGER SECOND
 
-*   Find the first and second ' character. 
+*   Find the first and second ' character.
       FOUND=0
       STRING2=' '
       DO 10 I=1,40
@@ -41,6 +41,6 @@ C-----------------------------------------------------------------------------
            STRING2(I-FIRST+1:I-FIRST+1)=STRING1(I:I)
  20      CONTINUE
          STRING2(SECOND-FIRST:SECOND-FIRST)=CHAR(0)
-      END IF  
+      END IF
 
       END

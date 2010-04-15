@@ -4,7 +4,7 @@
 *        Unused K, II1, II2, JJ1, JJ2, X, Y
 *-----------------------------------------------------------------------
 
-      SUBROUTINE INTERPARR (A1, M1, N1, A2, M2, N2, BADPIX, 
+      SUBROUTINE INTERPARR (A1, M1, N1, A2, M2, N2, BADPIX,
      &                      FWHMX, WMAXX, FWHMY, WMAXY,
      &                      CELLX, CELLY, IFAIL)
 
@@ -23,7 +23,7 @@ C   Formal parameter:
       REAL      A2(M2, N2)
       REAL      BADPIX
       REAL      FWHMX, WMAXX    ! Fwhm and max radius of X-beam
-      REAL      FWHMY, WMAXY    ! Fwhm and max radius of Y-beam 
+      REAL      FWHMY, WMAXY    ! Fwhm and max radius of Y-beam
       REAL      CELLX, CELLY    ! Input map cell X and Y sizes.
       INTEGER   IFAIL
 
@@ -96,14 +96,14 @@ C     Set up the weights array (to save working out lots of trig functions later
           ELSE IF (XRAD.EQ.0.0) THEN
             IF (I.NE.0) THEN
               WEIGHT(I,J) = 0.0
-            ELSE 
+            ELSE
               WEIGHT(I,J) = EXP(-(J**2/YRAD**2))
             END IF
 
           ELSE IF (YRAD.EQ.0.0) THEN
             IF (J.NE.0) THEN
               WEIGHT(I,J) = 0.0
-            ELSE 
+            ELSE
               WEIGHT(I,J) = EXP(-(I**2/XRAD**2))
             END IF
 

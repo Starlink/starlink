@@ -39,7 +39,7 @@ int *status            /* global status (given and returned) */
 *     SOCK_ACCEPT
 
 *  Purpose:
-*     Accept a network call 
+*     Accept a network call
 
 *  Language:
 *     Starlink C
@@ -124,7 +124,7 @@ int *status                     /* global status (given and returned) */
 *     SOCK_CONNECT
 
 *  Purpose:
-*     Make a connection 
+*     Make a connection
 
 *  Language:
 *     Starlink C
@@ -207,7 +207,7 @@ int *status                /* global status (given and returned) */
 *     SOCK_GHBA
 
 *  Purpose:
-*     Get host detail by address 
+*     Get host detail by address
 
 *  Language:
 *     Starlink C
@@ -308,7 +308,7 @@ int *status                /* global status (given and returned) */
 void sock_ghbn
 (
 char *rmach,                /* name of remote machine (given) */
-struct hostent *retentptr,  /* network data structure for other 
+struct hostent *retentptr,  /* network data structure for other
                                machine (returned) */
 int *status                 /* global status (given and returned) */
 )
@@ -319,7 +319,7 @@ int *status                 /* global status (given and returned) */
 *     SOCK_GHBN
 
 *  Purpose:
-*     Get host details by name 
+*     Get host details by name
 
 *  Language:
 *     Starlink C
@@ -363,7 +363,7 @@ int *status                 /* global status (given and returned) */
 */
 
 {
-   struct hostent *hostentptr;       /* pointer to network data structure 
+   struct hostent *hostentptr;       /* pointer to network data structure
                                         for other machine */
 
    if ( *status != SAI__OK ) return;
@@ -418,7 +418,7 @@ int *status                 /* global status (given and returned) */
 
 void sock_gpn
 (
-int channel,           /* i/o channel for communications, bound to a socket 
+int channel,           /* i/o channel for communications, bound to a socket
                           (given) */
 struct sockaddr_in *peer, /* structure for peer details (returned) */
 int *status            /* global status (given and returned) */
@@ -430,7 +430,7 @@ int *status            /* global status (given and returned) */
 *     SOCK_GPN
 
 *  Purpose:
-*     Get peer details 
+*     Get peer details
 
 *  Language:
 *     Starlink C
@@ -517,7 +517,7 @@ int *status            /* global status (given and returned) */
 *     SOCK_READ
 
 *  Purpose:
-*     Read a complete message from a socket 
+*     Read a complete message from a socket
 
 *  Language:
 *     Starlink C
@@ -569,7 +569,7 @@ int *status            /* global status (given and returned) */
 {
    int length;            /* Length of a message segment */
    int length_received;   /* Cumulative length of message segments
-                             received */ 
+                             received */
 
 
    if ( *status != SAI__OK ) return;
@@ -579,9 +579,9 @@ int *status            /* global status (given and returned) */
    length_received = 0;
 
    while ( length_received < length_required )
-     
+
    {
-      length = read ( read_socket, (char *) (buffer+length_received), 
+      length = read ( read_socket, (char *) (buffer+length_received),
         length_required-length_received );
       if ( length > 0 )
       {
@@ -621,7 +621,7 @@ int *status           /* global status (given and returned) */
 *     SOCK_WRITE
 
 *  Purpose:
-*     Write a complete message to a socket 
+*     Write a complete message to a socket
 
 *  Language:
 *     Starlink C
@@ -682,7 +682,7 @@ int *status           /* global status (given and returned) */
    length_sent = 0;
    while ( length_sent < length_to_send )
    {
-      length = write ( write_socket, (char *)(buffer + length_sent), 
+      length = write ( write_socket, (char *)(buffer + length_sent),
         length_to_send-length_sent );
       if ( length > 0 )
       {

@@ -1,4 +1,4 @@
-      SUBROUTINE MAPCF2( NDFOUT, IDA, SCS, AREF, BREF, BAND0, MAXSOP, 
+      SUBROUTINE MAPCF2( NDFOUT, IDA, SCS, AREF, BREF, BAND0, MAXSOP,
      :                   MINSOP, OUNITS, STATUS )
 *+
 *  Name:
@@ -11,13 +11,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL MAPCF2( NDFOUT, IDA, SCS, AREF, BREF, BAND0, MAXSOP, MINSOP, 
+*     CALL MAPCF2( NDFOUT, IDA, SCS, AREF, BREF, BAND0, MAXSOP, MINSOP,
 *                  OUNITS, STATUS )
 
 *  Description:
 *     The extension is created by IRI_NEW holding the mandatory items,
 *     together with the following optional items; FIELDLON, FIELDLAT,
-*     FIELDSCS, MAXSOP, MINSOP. An astrometry structure is created and 
+*     FIELDSCS, MAXSOP, MINSOP. An astrometry structure is created and
 *     the astrometry information identified by IDA is copied to it.
 
 *  Arguments:
@@ -93,7 +93,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create the IRAS extension with the mandatory components.
-      CALL IRI_NEW( NDFOUT, 'SURVEY', BAND0, IRI__MAPCR, OUNITS, IILOC, 
+      CALL IRI_NEW( NDFOUT, 'SURVEY', BAND0, IRI__MAPCR, OUNITS, IILOC,
      :              STATUS )
 
 *  Create the FIELDLAT component within IMAGE_INFO, and store the

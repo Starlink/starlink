@@ -1,5 +1,5 @@
       SUBROUTINE STR_PRO(RIGHT, FIELD, STR, FIRST, IVALUE, STATUS)
- 
+
 *+
 *
 *   Name:
@@ -13,7 +13,7 @@
 *      Paul Rees          28-OCT-88     IUEDR Vn. 2.0
 *
 *   Method:
-*      The string is scanned for an octal value specified by the edit 
+*      The string is scanned for an octal value specified by the edit
 *      parameters.
 *      The FIRST parameter is left pointing to the next character
 *      after the present field.
@@ -27,28 +27,28 @@
 
 *   Import:
       LOGICAL RIGHT         ! whether right justified
- 
+
       INTEGER FIELD         ! field size
- 
+
       BYTE STR(100)         ! string to be scanned
- 
+
 *   Import/Export:
       BYTE FIRST            ! first character position containing float
- 
+
 *   Export:
       INTEGER IVALUE        ! decoded value
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       INTEGER STR_LEN       ! string length
       INTEGER STR_INDEX     ! index of character in string
- 
+
 *   Local variables:
       LOGICAL NOUSED        ! no characters used yet
       LOGICAL NOVAL         ! no numeric value yet
 
       BYTE VALUE(256)       ! local copy of field
- 
+
       INTEGER DIG           ! character index
       INTEGER FUSED         ! position of first used character
       INTEGER LAST          ! last character position in string
@@ -57,10 +57,10 @@
 
 *   Length of string
       LAST = STR_LEN(STR)
- 
+
 *   FIELD specified
       IF (FIELD.LE.0) THEN
- 
+
 *      FIELD unspecified means must search for valid format
          NOUSED = .TRUE.
          NOVAL = .TRUE.
@@ -107,7 +107,7 @@
             GO TO 50
 
          END IF
- 
+
 *   Right justified means grab next FIELD characters
       ELSE IF (RIGHT) THEN
 
@@ -123,7 +123,7 @@
             STATUS = -3
 
          END IF
- 
+
 *   Left justified means find first valid character
       ELSE
 
@@ -158,7 +158,7 @@
       END IF
 
  200  CONTINUE
- 
+
 *   Update FIRST based of number of characters used, field size and
 *   justification
       IF (STATUS.EQ.0) THEN

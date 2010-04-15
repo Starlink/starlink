@@ -10,7 +10,7 @@ C     Parameters -   (">" input, "<" output)
 C
 C     (>) N    (Integer) The number in question.
 C     (<) NP2  (Integer) The next number that is a power of 2.
-C     
+C
 C     Returns -  (if called as a function)
 C
 C     (<) GEN_POWER2   (Integer) The power of 2.  ie NP2=2**GEN_POWER2

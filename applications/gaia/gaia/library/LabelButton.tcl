@@ -31,7 +31,7 @@ itcl::class gaia::LabelButton {
     constructor {args} {
 	# The button
 	itk_component add b {
-	    button $w_.b 
+	    button $w_.b
 	} {
 	    keep -relief -borderwidth -state -command -textvariable
 	    rename -text -buttontext buttonText Text
@@ -46,7 +46,7 @@ itcl::class gaia::LabelButton {
 	eval itk_initialize $args
     }
 
-    
+
     # options
 
     # widget orientation: horizontal or vertical

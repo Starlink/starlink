@@ -1,5 +1,5 @@
       SUBROUTINE CON_WRPGM( EL, IMAGE, DIMS, OIMAGE, STATUS )
-* + 
+* +
 *+
 *  Name:
 *     CON_WRPGM
@@ -71,22 +71,22 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
- 
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External references:
-      INTEGER CHR_LEN            ! Length of a string 
+      INTEGER CHR_LEN            ! Length of a string
       INTEGER CON_CWRIT          ! C function
       INTEGER CON_CWRI2          ! C function
- 
+
 *  Arguments Given:
       INTEGER EL                 ! Number of pixels
       DOUBLE PRECISION IMAGE( EL ) ! The image data
@@ -108,10 +108,10 @@
       CHARACTER * ( 255 ) TEMP   ! Output header string
       BYTE TEMPB( 33000 )        ! Temporary storage
       INTEGER X                  ! Pixel column
-      INTEGER Y                  ! Pixel row 
+      INTEGER Y                  ! Pixel row
 
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -145,13 +145,13 @@
             OIMAGE( I ) = 0
 
          ELSE IF ( IMAGE( I ) .GE. MAXI ) THEN
-*  Fudge high pixels to the maximum pgm value 
+*  Fudge high pixels to the maximum pgm value
             OIMAGE( I ) = 255
 
          ELSE
 *  Scale the pixel appropriately.
             OIMAGE( I ) = INT( ( IMAGE( I ) - MINI ) / SCFACT )
-            
+
          END IF
    20 CONTINUE
 
@@ -164,14 +164,14 @@
 
 *  Check for an error.
       STATC = CON_CWRIT( STRING( 1:NC ) )
-      IF ( STATC .EQ. 0 ) THEN 
+      IF ( STATC .EQ. 0 ) THEN
          CALL ERR_REP( ' ', 'Failed writing the file header.', STATUS )
          GOTO 999
       END IF
 
 *  Swap the image rows to avoid inverting the image.
       DO 100 Y = 1, DIMS( 2 ) / 2
-          
+
 *  Fill the temporary storage with row y.
          INDEX1 = ( Y - 1 ) * DIMS( 1 )
          DO 200 X = 1, DIMS( 1 )
@@ -184,21 +184,21 @@
             OIMAGE( INDEX1 + X ) = OIMAGE( INDEX2 + X )
   300    CONTINUE
 
- 
+
 *  Copy the stored version of row y to row ymax - y.
          DO 400 X = 1, DIMS( 1 )
             OIMAGE( INDEX2 + X ) = TEMPB( X )
   400    CONTINUE
- 
+
   100 CONTINUE
- 
+
 *  Write out the image.
       DO 500 Y = 1, DIMS(2)
          INDEX1 = ( Y - 1 ) * DIMS( 1 ) + 1
          STATC = CON_CWRI2( OIMAGE( INDEX1 ), DIMS(1) )
   500 CONTINUE
 
-      IF ( STATC .EQ. 0 ) THEN 
+      IF ( STATC .EQ. 0 ) THEN
          CALL ERR_REP( ' ', 'Failed writing the image.', STATUS )
          GOTO 999
       END IF

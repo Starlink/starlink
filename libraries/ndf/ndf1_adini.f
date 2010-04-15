@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,32 +130,32 @@
          IF ( UTYPE .EQ. '_BYTE' ) THEN
             CALL NDF1_ADIB( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...unsigned byte.
          ELSE IF ( UTYPE .EQ. '_UBYTE' ) THEN
             CALL NDF1_ADIUB( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
      :                       STATUS )
- 
+
 *  ...double precision.
          ELSE IF ( UTYPE .EQ. '_DOUBLE' ) THEN
             CALL NDF1_ADID( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...integer.
          ELSE IF ( UTYPE .EQ. '_INTEGER' ) THEN
             CALL NDF1_ADII( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...real.
          ELSE IF ( UTYPE .EQ. '_REAL' ) THEN
             CALL NDF1_ADIR( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...word.
          ELSE IF ( UTYPE .EQ. '_WORD' ) THEN
             CALL NDF1_ADIW( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
      :                      STATUS )
- 
+
 *  ...unsigned word.
          ELSE IF ( UTYPE .EQ. '_UWORD' ) THEN
             CALL NDF1_ADIUW( LBNDA, UBNDA, %VAL( CNF_PVAL( PNTR ) ),
@@ -178,7 +178,7 @@
      :      'of ''^BADTYPE'' (internal programming error).', STATUS )
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_ADINI', STATUS )
 

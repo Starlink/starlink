@@ -1,26 +1,26 @@
       SUBROUTINE ELF1_FIND(ELEMS,ARRAY,PRANGE,XO,YO,SEARCH,
-     :                     LOW,HIGH,COUNTR,XE,YE,PCV,STATUS)        
+     :                     LOW,HIGH,COUNTR,XE,YE,PCV,STATUS)
 *+
 *  Name:
 *     ELF1_FIND
 
 *  Purpose:
 *     Locates pixels on the image that are within the pixel brightness
-*     range LOW to HIGH. 
+*     range LOW to HIGH.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *     CALL ELF_FIND(ELEMS,ARRAY,PRANGE,XO,YO,SEARCH,
-*                   LOW,HIGH,COUNTR,XE,YE,PCV,STATUS)         
+*                   LOW,HIGH,COUNTR,XE,YE,PCV,STATUS)
 
 *  Description:
-*      A circular area of the image (radius SEARCH) centred on the 
+*      A circular area of the image (radius SEARCH) centred on the
 *      data co-ordinates XO and YO is searched for non-bad pixels within the
 *      pixel count range LOW to HIGH. If too many are found (number exceeds
 *      storage array size) the range of pixel counts permitted is reduced
-*      by a factor of two. If too many are still found only a fraction 
+*      by a factor of two. If too many are still found only a fraction
 *      of those found are retained.
 
 *  Arguments:
@@ -78,11 +78,11 @@
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
-      INTEGER PRANGE(2)               ! Size of the x and y dimensions of the 
+      INTEGER PRANGE(2)               ! Size of the x and y dimensions of the
       REAL ARRAY(ELEMS)               ! Image array
       REAL HIGH                       ! Higher brightness limit
       REAL LOW                        ! Lower brightness limit
-      REAL SEARCH                     ! Radius within which the 
+      REAL SEARCH                     ! Radius within which the
                                       ! pixels should be taken (relative
                                       ! to XO and YO
       REAL XO                         ! X co-ord of the galaxy centre
@@ -97,7 +97,7 @@
 
 *  Arguments Given and Returned:
 
-*  Local variables:     
+*  Local variables:
 
       INTEGER FINISH                  ! Finished selecting some pixels flag
       INTEGER HIX                     ! Upper x limit of the image
@@ -115,7 +115,7 @@
       INTEGER X                       ! X co-ordinate being considered
       INTEGER Y                       ! Y co-ordinate being considered
       REAL FRACT                      ! Fraction of the points found for the
-                                      ! current isophote that may be used 
+                                      ! current isophote that may be used
                                       ! (due to array size limit)
       REAL MEAN                       ! Mean value of high and lOW
       REAL RND                        ! A random number
@@ -128,7 +128,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set the x axis limits for the part of the image to be examined.
       LOX=XO-SEARCH
@@ -159,9 +159,9 @@
 
                DO 20 Y=LOY,HIY
 
-*               Check that the pixel is within the specified distance of the 
+*               Check that the pixel is within the specified distance of the
 *               galaxy centre.
-                  IF (XS+(Y-YO)*(Y-YO).LT.RSQLIM) THEN 
+                  IF (XS+(Y-YO)*(Y-YO).LT.RSQLIM) THEN
 
 *                  Get the pixel value.
                      V=ARRAY((Y-1)*PRANGE(1)+X)
@@ -183,13 +183,13 @@
             END IF
 
  10      CONTINUE
-         
-*      Narrow the range if too many were found. 
+
+*      Narrow the range if too many were found.
          IF (NUMBER.GT.ELF__PIXEL) THEN
-     
+
 *         Set range and see if new range is too narrow.
             RANGE=(HIGH-LOW)/3.
-       
+
             IF (RANGE.GT.0.5) THEN
 
 *            Narrow the bounds.
@@ -197,37 +197,37 @@
                LOW=MEAN-RANGE
                HIGH=MEAN+RANGE
 
-           ELSE 
+           ELSE
 
 *            Set flag to show that there is no point narrowing the range
 *            further.
                FINISH=2
-             
+
             END IF
 
          ELSE
-     
+
             FINISH=1
-           
+
          END IF
- 
+
       END DO
-     
+
 *   Calculate the fraction of the points within the brightness range required
-*   that are to be retained.  
+*   that are to be retained.
       IF (FINISH.EQ.1) THEN
          FRACT=1.
       ELSE
          FRACT=REAL(ELF__PIXEL)/REAL(NUMBER)/2.
       END IF
-   
+
 *   Initialise the pixel COUNTR.
       COUNTR=0
-        
+
 *   Look through all columns.
       X=LOX
       DO WHILE (X.LE.HIX)
-     
+
 *      Avoid calculating this for all values of Y.
          XS=(X-XO)*(X-XO)
 
@@ -237,10 +237,10 @@
 *         Look through all rows.
             Y=LOY
             DO WHILE (Y.LE.HIY)
-       
-*            Check that the pixel is within the specified distance of the 
+
+*            Check that the pixel is within the specified distance of the
 *            galaxy centre.
-               IF (XS+(Y-YO)*(Y-YO).LT.RSQLIM) THEN 
+               IF (XS+(Y-YO)*(Y-YO).LT.RSQLIM) THEN
 
 *               Get the current pixel value.
                   V=ARRAY((Y-1)*PRANGE(1)+X)
@@ -252,31 +252,31 @@
 *                     Check that it was not a BAD pixel.
                         IF (V.NE.VAL__BADR) THEN
 
-*                        Ensure that the right proportion of the acceptable 
+*                        Ensure that the right proportion of the acceptable
 *                        pixels are retained.
                            CALL ELF1_RAND(1,0,RND,STATUS)
                            IF (RND.LT.FRACT) THEN
 
-*                           Increment COUNTR.           
+*                           Increment COUNTR.
                               COUNTR=COUNTR+1
-                              IF (COUNTR.GT.ELF__PIXEL) 
+                              IF (COUNTR.GT.ELF__PIXEL)
      :                            COUNTR=ELF__PIXEL
-                          
+
 *                           Store the co-ordinates of the pixel.
                               XE(COUNTR)=X
                               YE(COUNTR)=Y
                               PCV(COUNTR)=V
-         
+
                            END IF
-   
+
                         END IF
-   
+
                      END IF
-   
+
                   END IF
-     
+
                END IF
-   
+
 *            Increment the column COUNTR.
                Y=Y+1
 
@@ -291,11 +291,11 @@
 
 *   Scramble the values so that they are not in X/Y order.
       DO 40 I=1,COUNTR
-       
+
 *      Swap the Ith and Jth pixel data.
          CALL ELF1_RAND(1,0,RND,STATUS)
          J=INT(RND*COUNTR+1)
-        
+
 *      X co-ordinates of pixels.
          VALUE=XE(J)
          XE(J)=XE(I)

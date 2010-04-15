@@ -21,7 +21,7 @@
 *        Function TRULEN removed from the end if this file as it's in
 *        it's own file, TRULEN.
 
-*       
+*
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -31,7 +31,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       CALL IIDATE(N, STATUS )
       TJDATE = FLOAT(N) + 2415019.0
       DATE = 1900.0 + (TJDATE-2415020.313)/365.2422

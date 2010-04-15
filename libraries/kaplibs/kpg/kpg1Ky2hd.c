@@ -19,16 +19,16 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *     void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status )
 
 *  Description:
-*     This routine copies the contents of an AST KeyMap into a supplied 
+*     This routine copies the contents of an AST KeyMap into a supplied
 *     HDS structure.
 
 *  Arguments:
-*     keymap 
+*     keymap
 *        An AST pointer to the KeyMap.
-*     loc 
+*     loc
 *        A locator for the HDS object into which the KeyMap contents
 *        are to be copied.
-*     status 
+*     status
 *        The inherited status.
 
 *  Copyright:
@@ -40,12 +40,12 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,7 +91,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    size = astMapSize( keymap );
    for( i = 0; i < size; i++ ) {
 
-/*  Get the key. the data type and the vector length for the current 
+/*  Get the key. the data type and the vector length for the current
    KeyMap entry. */
       key = astMapKey( keymap, i );
       type = astMapType( keymap, key );
@@ -118,7 +118,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             }
 
             datAnnul( &cloc, status );
-         
+
 /* Now deal with vector entries holding multiple KeyMaps. */
          } else {
             datNew( loc, key, "KEYMAP_ENTRY", 1, &veclen, status );
@@ -128,7 +128,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             if( objArray ) {
                (void) astMapGet1A( keymap, key, veclen, &nval, objArray );
 
-               for( j = 1; j <= veclen; j++ ) {                  
+               for( j = 1; j <= veclen; j++ ) {
                   datCell( cloc, 1, &j, &dloc, status );
 
                   if( astIsAKeyMap( objArray[ j - 1 ] ) ) {
@@ -157,7 +157,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             (void) astMapGet0I( keymap, key, &ival );
             datPut0I( cloc, ival, status );
             datAnnul( &cloc, status );
-         
+
          } else {
             datNew1I( loc, key, veclen, status );
             datFind( loc, key, &cloc, status );
@@ -175,7 +175,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             (void) astMapGet0D( keymap, key, &dval );
             datPut0D( cloc, dval, status );
             datAnnul( &cloc, status );
-         
+
          } else {
             datNew1D( loc, key, veclen, status );
             datFind( loc, key, &cloc, status );
@@ -192,7 +192,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             (void) astMapGet0F( keymap, key, &fval );
             datPut0R( cloc, fval, status );
             datAnnul( &cloc, status );
-         
+
          } else {
             datNew1R( loc, key, veclen, status );
             datFind( loc, key, &cloc, status );
@@ -211,7 +211,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             (void) astMapGet0C( keymap, key, &cval );
             datPut0C( cloc, cval, status );
             datAnnul( &cloc, status );
-         
+
          } else {
             datNew1C( loc, key, lenc, veclen, status );
             datFind( loc, key, &cloc, status );

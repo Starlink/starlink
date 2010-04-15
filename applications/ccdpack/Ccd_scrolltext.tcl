@@ -14,15 +14,15 @@
 #  Description:
 #     This class description defines methods and configurations for
 #     creating a text widget with scrollbars. The scrolltext widget may
-#     have scrollbars positioned either at the left or right, top or bottom. 
-#     The scrollbars are arranged to give a Motif-like look (with spaces in 
+#     have scrollbars positioned either at the left or right, top or bottom.
+#     The scrollbars are arranged to give a Motif-like look (with spaces in
 #     the corners) and may be reconfigured at any time.
 
 #  Configuration Options:
 #        -scrollbarplaces "(right|left)" "(top|bottom)"
 #
 #     This option configures the placing of the scrollbars. These may
-#     be either "left" or "right" or "top" or bottom. The default is 
+#     be either "left" or "right" or "top" or bottom. The default is
 #     "right bottom"
 #
 #        -exportselect boolean
@@ -187,13 +187,13 @@
 #  Insert line of text method.
       method insert { index args } {
          eval $Text insert $index $args
-	 
+
 #  Make sure that the text is visible.
          set textlen [expr int([$Text index end])]
          $Text see $index
 #         update idletasks
       }
-      
+
 #  Clear range of lines of text method.
       method clear { args } {
          if { [lindex $args 0 ] != "all" } {
@@ -289,7 +289,7 @@
             set Scrolls(right) $Scroll
          }
 
-         if { $havetop } { 
+         if { $havetop } {
             CCDTkWidget Frame frame frame $oldthis.top -borderwidth 0
             if { $haveleft } {
                CCDTkWidget Frame1 frame1 \
@@ -315,7 +315,7 @@
             }
          }
 
-         if { $havebottom } { 
+         if { $havebottom } {
             CCDTkWidget Frame frame frame $oldthis.bottom -borderwidth 0
             if { $haveleft } {
                CCDTkWidget Frame1 frame1 \
@@ -342,23 +342,23 @@
 
 #  Perform packing of main elements (need to do this now to get into
 #  correct places.
-         if { $havetop && $haveleft } { 
-            pack [CCDPathOf $Frames(top.left)]     -side top    -fill x 
+         if { $havetop && $haveleft } {
+            pack [CCDPathOf $Frames(top.left)]     -side top    -fill x
          }
          if { $havetop && $haveright } {
             pack [CCDPathOf $Frames(top.right)]    -side top    -fill x
          }
-         if { $havebottom && $haveleft } { 
+         if { $havebottom && $haveleft } {
             pack [CCDPathOf $Frames(bottom.left)]  -side bottom -fill x
          }
          if { $havebottom && $haveright } {
-            pack [CCDPathOf $Frames(bottom.right)] -side bottom -fill x 
+            pack [CCDPathOf $Frames(bottom.right)] -side bottom -fill x
          }
-         if { $haveleft }   { 
-            pack [CCDPathOf $Scrolls(left)]       -side left   -fill y 
+         if { $haveleft }   {
+            pack [CCDPathOf $Scrolls(left)]       -side left   -fill y
          }
-         if { $haveright }  { 
-            pack [CCDPathOf $Scrolls(right)]      -side right  -fill y 
+         if { $haveright }  {
+            pack [CCDPathOf $Scrolls(right)]      -side right  -fill y
          }
          pack $oldthis.text -expand true -fill both
       }
@@ -367,11 +367,11 @@
       method textname {} {
          return $Text
       }
-   
+
 #  Method to return the names of the scrollbar widgets
       method scrollbarnames { places } {
          foreach side $places {
-            if { ! [ regexp (left|right|top|bottom) $side ] } { 
+            if { ! [ regexp (left|right|top|bottom) $side ] } {
                error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
             }
          }
@@ -380,7 +380,7 @@
                lappend barnames $Scrolls($side)
             }
          }
-         if { [ info exists barnames ] } { 
+         if { [ info exists barnames ] } {
             return "$barnames"
          } else {
             return {}
@@ -393,14 +393,14 @@
 #  Insert and pack the required scrollbars. Remove existing scrollbars first.
       public variable scrollbarplaces { right bottom } {
          foreach side $scrollbarplaces {
-            if { ! [ regexp (left|right|top|bottom) $side ] } { 
+            if { ! [ regexp (left|right|top|bottom) $side ] } {
                error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
             }
          }
 
 #  Only proceed if the object exists (this means that constructor has
 #  been invoked).
-         if { $exists } { 
+         if { $exists } {
             _repack $scrollbarplaces
          }
       }

@@ -17,7 +17,7 @@
 *      YSIZE    r     Y   "  "      "        "
 *
 *   Read from COMMON
-*      GRCIDE   i     Device identifier 
+*      GRCIDE   i     Device identifier
 *      GRXMAX   r()   Workstation size (x)
 *      GRYMAX   r()   Workstation size (y)
 *      GRXMIN   r()   Workstation origin (x)
@@ -38,14 +38,14 @@
 
       INCLUDE 'PGP_ERR'
 
-      
+
       REAL X1, X2, Y1, Y2, WINDO(4), VIEWP(4), XSCALE, YSCALE
       INTEGER IERR
 
       IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRAREA - No PGPLOT device open',
      :   GRNODO)
-      ELSE               
+      ELSE
 
 *    Update workstation
          CALL GRTERM
@@ -85,7 +85,7 @@
             X2 = GRXMAX(GRCIDE)-GRXMIN(GRCIDE)
             Y2 = GRYMAX(GRCIDE)-GRYMIN(GRCIDE)
          ENDIF
-      
+
 *     Set new world coordinates
          CALL GSWN(TRN,X1,X2,Y1,Y2)
 

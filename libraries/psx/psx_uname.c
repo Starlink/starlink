@@ -55,7 +55,7 @@
 
 *  References:
 *     -  POSIX standard (1988), section 4.4.1
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -153,13 +153,13 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
 
    int pstat;			 /* Status returned by uname		    */
    struct utsname temp_space;	 /* Temporary space to store results	    */
-   struct utsname *name = &temp_space; 
+   struct utsname *name = &temp_space;
 				 /* Pointer to temporary space		    */
 
 /* Check inherited global status.					    */
 
    if( *status != SAI__OK ) return;
-   
+
 /* Get the information that uname provides.				    */
 
    pstat = uname( name );
@@ -225,7 +225,7 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
 /* Check inherited global status.					    */
 
    if( *status != SAI__OK ) return;
-   
+
 /* Set up the item list.						    */
 
    itmlst[0].buffer_length         = 4;
@@ -250,7 +250,7 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
    itmlst[4].return_length_address = &temp_machine_len;
    itmlst[5].buffer_length         = 0;
    itmlst[5].item_code             = 0;
-    
+
 /* Get the information using GETSYIW.					    */
 
    vstat = sys$getsyiw( 0, 0, 0, itmlst, 0, 0, 0 );
@@ -285,7 +285,7 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
 
 /* Not VMS and system doesn't have a uname function. Not much we can do. */
 /* If this is Windows (probably MinGW) we could try harder and look at  */
-/* GetSystemInfo, GetVersion etc. if the need arises. */ 
+/* GetSystemInfo, GetVersion etc. if the need arises. */
 
   if( *status != SAI__OK ) return;
 

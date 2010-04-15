@@ -39,14 +39,14 @@
 *
 *     Check for error on entry - return if not o.k.
 *     Get locator to input image structure
-*     If no error then 
+*     If no error then
 *        Map the data array component
 *        Output image dimensions to user
 *        Do while another inspection wanted and no error
 *           Get choice of Peep, Examine, or List
 *           If Peep then
 *              Get x and y coords of centre of 7x7 box to be peeped
-*              If no error then 
+*              If no error then
 *                 Call subroutine to output 7x7 box to screen
 *              Endif
 *              Ask if another inspection wanted
@@ -97,7 +97,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'         
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'
 
 *    Status :
@@ -151,7 +151,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions
@@ -183,7 +183,7 @@
             CALL UPCASE( CHOICE, CHOICE, STATUS )
 
 *          act accordingly - check first for a Peep
-            IF ( CHOICE .EQ. 'P' ) THEN 
+            IF ( CHOICE .EQ. 'P' ) THEN
 
 *             get the coordinates of the centre of the box to be output
 *             to the screen
@@ -202,7 +202,7 @@
 
 *                call subroutine to output to the screen a 7x7 box
 *                centred on XCEN,YCEN
-                  CALL PEEPSUB( %VAL( PNTRI ), DIMS(1), DIMS(2), XLOW, 
+                  CALL PEEPSUB( %VAL( PNTRI ), DIMS(1), DIMS(2), XLOW,
      :                          YLOW, XSIZE, YSIZE, STATUS )
 
                END IF
@@ -223,7 +223,7 @@
 *             get the x and y lower bounds and box size to be examined
                CALL AIF_GET0I( 'XLOW', 1, 1, DIMS( 1 ), XLOW, STATUS )
                CALL AIF_GET0I( 'YLOW', 1, 1, DIMS( 2 ), YLOW, STATUS )
-               CALL AIF_GET0I( 'XSIZE', MIN( DIMS( 2 ), 9 ), 
+               CALL AIF_GET0I( 'XSIZE', MIN( DIMS( 2 ), 9 ),
      :                          1, 9, XSIZE, STATUS )
                CALL AIF_GET0I( 'YSIZE', DIMS( 2 ) - YLOW + 1, 1,
      :                          DIMS( 2 ), YSIZE, STATUS )
@@ -232,7 +232,7 @@
                IF ( STATUS .EQ. SAI__OK ) THEN
 
 *                call subroutine to output box to screen
-                  CALL PEEPSUB( %VAL( PNTRI ), DIMS(1), DIMS(2), 
+                  CALL PEEPSUB( %VAL( PNTRI ), DIMS(1), DIMS(2),
      :                          XLOW, YLOW, XSIZE, YSIZE, STATUS )
 
                END IF
@@ -250,12 +250,12 @@
                CALL PAR_CANCL( 'ANOTHER', STATUS )
 
 *          else check if a List is wanted
-            ELSE IF ( CHOICE .EQ. 'L' ) THEN 
+            ELSE IF ( CHOICE .EQ. 'L' ) THEN
 
 *             get the x and y lower bounds and box size to be examined
                CALL AIF_GET0I( 'XLOW', 1, 1, DIMS( 1 ), XLOW, STATUS )
                CALL AIF_GET0I( 'YLOW', 1, 1, DIMS( 2 ), YLOW, STATUS )
-               CALL AIF_GET0I( 'XSIZE', DIMS( 1 ) - XLOW + 1, 1, 
+               CALL AIF_GET0I( 'XSIZE', DIMS( 1 ) - XLOW + 1, 1,
      :                          DIMS( 1 ), XSIZE, STATUS )
                CALL AIF_GET0I( 'YSIZE', DIMS( 2 ) - YLOW + 1, 1,
      :                          DIMS( 2 ), YSIZE, STATUS )
@@ -274,8 +274,8 @@
                IF ( STATUS .EQ. SAI__OK ) THEN
 
 *                call subroutine to output image listing to file
-                  CALL LISTSUB( %VAL( PNTRI ), DIMS(1), DIMS(2), 
-     :                           XLOW, YLOW, XUPP, YUPP, FILENAME, 
+                  CALL LISTSUB( %VAL( PNTRI ), DIMS(1), DIMS(2),
+     :                           XLOW, YLOW, XUPP, YUPP, FILENAME,
      :                           STATUS )
 
 *                check for bad status on return - this may be

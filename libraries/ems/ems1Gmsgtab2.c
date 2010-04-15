@@ -18,7 +18,7 @@
  *     within nested emsMark/emsRlse calls when using the POSIX threads
  *     build. When not using POSIX threads the global spare table is always
  *     returned.
- *  
+ *
  *     The spare is intended for use when a copy of the current state is
  *     required between calls, but the current state of the main table needs
  *     to be changed (see emsEload for instance).
@@ -103,7 +103,7 @@ ems_msgtab_t *ems1Gmsgtab2( void )
     /*  If the thread ID doesn't match that of the initial thread then then
      *  look for a local thread-specific data structure. If not found create
      *  one and associate it. */
-    if ( ems_thread_initial_set == 0 || 
+    if ( ems_thread_initial_set == 0 ||
          pthread_equal( pthread_self(), ems_thread_initial_id ) ) {
 
         /* This is the initial thread, so we use the global table. */

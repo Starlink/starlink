@@ -18,7 +18,7 @@
 *     co-ordinate system of the Current Frame in the supplied WCS FrameSet.
 *     To be acceptable, the supplied position must correspond to a valid
 *     position (on all axes) in the Base Frame of the supplied FrameSet. If
-*     a Frame is supplied instead of a FrameSet this restriction is not 
+*     a Frame is supplied instead of a FrameSet this restriction is not
 *     imposed.
 *
 *     If the position supplied in argument CC on entry is valid (i.e. does
@@ -26,12 +26,12 @@
 *     default for the parameter. Otherwise, no dynamic default is used.
 *
 *     The parameter is accessed as a single literal string containing a
-*     space or comma separated list of axis values. The allowed formats for 
-*     the axis values depends on the class of the Current Frame in the 
+*     space or comma separated list of axis values. The allowed formats for
+*     the axis values depends on the class of the Current Frame in the
 *     supplied FrameSet, and are described in SUN/210.
 *
 *     If the string supplied for the parameter consists of a single colon,
-*     then a description of the Current co-ordinate Frame is displayed, 
+*     then a description of the Current co-ordinate Frame is displayed,
 *     together with an indication of the format required for each axis
 *     value, and a new parameter value is then obtained.
 
@@ -60,7 +60,7 @@
 
 *  Notes:
 *     -  CC and BC are left unchanged if an error has already occurred.
-*     -  Values of AST__BAD are returned in CC (and optionally BC) if an 
+*     -  Values of AST__BAD are returned in CC (and optionally BC) if an
 *     error occurs during this routine.
 
 *  Copyright:
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 *     25-JUN-1999 (DSB):
 *        Increase the accuracy of the formatted default value so that
 *        it accurately represents the supplied default values. Normalize
-*        the supplied default position. 
+*        the supplied default position.
 *     30-AUG-1999 (DSB):
 *        If a null parameter is given use the dynamic default value.
 *     3-SEP-1999 (DSB):
@@ -104,15 +104,15 @@
 *        formatting accuracy.
 *     15-DEC-2006 (DSB):
 *        The 25-JUN-1999 changes were intended to ensure that formatting
-*        and then unformatting the default values did not result in any 
+*        and then unformatting the default values did not result in any
 *        significant difference between the default values and the values
 *        returned, for cases where the dynamic default is accepted. However,
 *        the Format attribute not only controls the accuracy but may also
 *        control the units (e.g. setting "d" or "s" for a sky axis), so
-*        clearing the pre-existing Formats can result in the returned values 
+*        clearing the pre-existing Formats can result in the returned values
 *        not being in the same units as the supplied default values. To
 *        avoid this, I have changed things so that the original Format
-*        attributes are retained, and a check is made on the user-supplied 
+*        attributes are retained, and a check is made on the user-supplied
 *        strings to compare them to the default strings. If they are the
 *        same then the default values are used directly, rather than the
 *        unformatted user-supplied strings.
@@ -126,7 +126,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -188,12 +188,12 @@
 *  See if a FrameSet has been supplied.
       GOTFS = AST_ISAFRAMESET( IWCS, STATUS )
 
-*  If so, get a pointer to the Current and Base Frames, and get the 
-*  number of axes in the Base Frame. Also get a simplified Mapping for 
+*  If so, get a pointer to the Current and Base Frames, and get the
+*  number of axes in the Base Frame. Also get a simplified Mapping for
 *  the FrameSet.
       IF( GOTFS ) THEN
-         CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )         
-         BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )         
+         CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+         BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
          NBAXES = AST_GETI( BASFRM, 'NAXES', STATUS )
          CALL AST_ANNUL( BASFRM, STATUS )
 
@@ -241,7 +241,7 @@
          IAT = 7
          CALL CHR_PUTI( I, ATT, IAT )
          CALL CHR_APPND( ')', ATT, IAT )
-         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT, 
+         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT,
      :                   FIAT )
 
       END DO
@@ -269,7 +269,7 @@
 *  Clear the Digits value.
          CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
 
-*  Otherwise, use PAR_UNSET to ensure any previous dynamic default is 
+*  Otherwise, use PAR_UNSET to ensure any previous dynamic default is
 *  cancelled.
       ELSE
          CALL PAR_UNSET( PARAM, 'DEFAULT', STATUS )
@@ -279,10 +279,10 @@
 *  Note the Domain of the Current Frame for use in messages.
       DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
 
-*  Loop until a valid position has been obtained from the user, or an 
+*  Loop until a valid position has been obtained from the user, or an
 *  error occurs.
       LOOP = .TRUE.
-      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )       
+      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, POS, STATUS )
@@ -292,7 +292,7 @@
          IF( STATUS .EQ. PAR__NULL .AND. GOOD .AND. NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             POS = DPOS
-         END IF            
+         END IF
 
 *  Get the indices of the first and last non-blank characters.
          CALL CHR_FANDL( POS, F, L )
@@ -304,7 +304,7 @@
             CALL ERR_REP( 'KPG1_GTPOS_1', 'Blank value supplied for '//
      :                    'parameter %^PAR.', STATUS )
 
-*  Otherwise, if the supplied string is just a colon, display a description 
+*  Otherwise, if the supplied string is just a colon, display a description
 *  of the Current Frame, and the default format.
          ELSE IF( POS( F : L ) .EQ. ':' ) THEN
             CALL KPG1_DSFRM( IWCS, 'A position is required in the '//
@@ -326,11 +326,11 @@
             LOOP = .FALSE.
             GOOD = .TRUE.
 
-*  If we have a FrameSet, get the base Frame position corresponding to 
+*  If we have a FrameSet, get the base Frame position corresponding to
 *  the default position.
             IF( GOTFS ) THEN
                CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE., NBAXES,
-     :                         1, BC, STATUS ) 
+     :                         1, BC, STATUS )
 
 *  See if this gave a good Base Frame position.
                DO I = 1, NBAXES
@@ -346,7 +346,7 @@
                   CALL MSG_SETC( 'POS', POS( F: L ) )
                   CALL ERR_REP( 'KPG1_GTPOS_7A', 'The default '//
      :                          'position was accepted for parameter '//
-     :                          '%^PAR (''^POS'') but cannot be used!', 
+     :                          '%^PAR (''^POS'') but cannot be used!',
      :                          STATUS )
                END IF
 
@@ -372,9 +372,9 @@
 *  Find the start of the next but one axis value (if there is more than 1 axis
 *  value remaining in the string).
                IEND = IPOS
-               CALL CHR_TOCHR( ' ', POS, .TRUE., IEND ) 
-               IF( IEND .LT. L ) CALL CHR_SKCHR( ' ', POS, .TRUE., 
-     :                                           IEND ) 
+               CALL CHR_TOCHR( ' ', POS, .TRUE., IEND )
+               IF( IEND .LT. L ) CALL CHR_SKCHR( ' ', POS, .TRUE.,
+     :                                           IEND )
 
 *  Set the index of the last character to be read by AST_UNFORMAT. This
 *  is done since AST_UNFORMAT may allow spaces within axis values, but
@@ -384,10 +384,10 @@
 *  Read the value for the next axis. NC is the number of characters#
 *  read by AST_UNFORMAT including trailing spaces.
                I = I + 1
-               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), CC( I ), 
-     :                            STATUS ) 
+               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), CC( I ),
+     :                            STATUS )
 
-*  Get the last character read by AST_UNFORMAT. If there are no characters 
+*  Get the last character read by AST_UNFORMAT. If there are no characters
 *  left pretend the last character read was a space (i.e. an axis delimiter).
                IPOS = IPOS + NC - 1
                IF( IPOS .LT. L ) THEN
@@ -404,7 +404,7 @@
 *  If the supplied string was invalid, report an error. This is the
 *  case if no characters were read form the string, or if the next
 *  character is not a space.
-               IF( ( NC .EQ. 0 .OR. NEXT .NE. ' ' ) .AND. 
+               IF( ( NC .EQ. 0 .OR. NEXT .NE. ' ' ) .AND.
      :             STATUS .EQ. SAI__OK ) THEN
                   LOOP = .TRUE.
                   STATUS = SAI__ERROR
@@ -440,7 +440,7 @@
                   IF( LAB( I + 1 )( : 5 ) .NE. 'axis ' ) THEN
                      CALL ERR_REP( 'KPG1_GTPOS_4', 'No ^LAB value '//
      :                             '(axis ^I) supplied using '//
-     :                             'parameter %^PAR - ''^POS''.', 
+     :                             'parameter %^PAR - ''^POS''.',
      :                             STATUS )
                   ELSE
                      CALL ERR_REP( 'KPG1_GTPOS_5', 'No ^LAB value '//
@@ -482,7 +482,7 @@
 
 *  Transform the supplied position into the Base Frame.
                CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE., NBAXES,
-     :                         1, BC, STATUS ) 
+     :                         1, BC, STATUS )
 
 *  See if this gave a good Base Frame position.
                GOOD = .TRUE.
@@ -523,7 +523,7 @@
             CALL MSG_SETC( 'DOM', DOM )
             CALL MSG_SETC( 'PAR', PARAM )
             CALL MSG_OUT( 'KPG1_GTPOS_M1', 'Please supply a new ^DOM '//
-     :                    'Domain position for parameter %^PAR.', 
+     :                    'Domain position for parameter %^PAR.',
      :                    STATUS )
 
 *  Cancel the parameter value.
@@ -543,7 +543,7 @@
             CC( I ) = AST__BAD
          END DO
 
-         IF( GOTFS ) THEN    
+         IF( GOTFS ) THEN
             DO I =1, NBAXES
                BC( I ) = AST__BAD
             END DO

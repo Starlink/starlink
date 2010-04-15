@@ -20,7 +20,7 @@
 *     and returns the value for a named parameter.  Values are either
 *     terminated by spaces or the trailing quotes.  Values may be
 *     enclosed in "" quotes; these are necessary whenever the value
-*     has embedded spaces. 
+*     has embedded spaces.
 *
 *     A returned flag indicates whether the parameter was present.
 
@@ -74,7 +74,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

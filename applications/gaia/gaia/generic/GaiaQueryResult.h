@@ -59,7 +59,7 @@ public:
     void setAssumeDegrees( int assume_degrees ) { assume_degrees_ = assume_degrees; }
 
     //  See if a row of the table matches a query.
-    int circularCompareRow( const TabTable& table, int row, 
+    int circularCompareRow( const TabTable& table, int row,
                             const AstroQuery& q, int mag_col,
                             int* search_cols );
 };

@@ -14,7 +14,7 @@ C used. The program can be used in two modes: if IMODE equals zero then
 C the output bins will be shifted by SSKEW relative to the input bins,
 C and each output bin will consis of the sum of NRBIN input bins; otherwise
 C the rebinnning will be done from the wavelength scale WAVES to the scale
-C WAVESR with NRBIN now meaning the number of output bins. 
+C WAVESR with NRBIN now meaning the number of output bins.
 C
 C
 C      HISTORY OF DEVELOPMENT
@@ -30,15 +30,15 @@ C values and Lolita uses arrays of polynomial wavelength coefficients.
 C This current version is based on Ashley's REBIN version 1.4, dated
 C 8th July 1983.  The subroutine REBIN_TFORM has been totally replaced,
 C and the initialisation sequence has changed to comply with the new
-C version.  The error messages have been removed. The calling sequence 
-C has had to be changed.  However, the main body of the program is 
+C version.  The error messages have been removed. The calling sequence
+C has had to be changed.  However, the main body of the program is
 C unchanged.  The CFLUX argument is new.  For compatibility with other
 C Figaro programs, the convention regarding the sign of SSKEW has been
 C reversed.
 C
 C First Fig_Rebin working version  -  20th July 1983
 C
-C Modifications 
+C Modifications
 C     3rd Oct 1983   KS/CIT Minor modification. Sense of SSKEW reversed to
 C                    conform to normal Figaro conventions.
 C
@@ -100,7 +100,7 @@ C                        increase logarithmically.
 C
 C   LOGWR   - LOGICAL    Mode 1 only - true if the wavelengths given in WAVESR
 C                        increase logarithmically.
-C   
+C
 C
 C
 C POTENTIAL PROBLEMS
@@ -140,7 +140,7 @@ C from integrating this parabola from <n-0.5> to <n+0.5>. When a fraction
 C of an input bin is required, the equation of the parabola which fits this
 C bin and the neighbouring bins is found, and then integrated appropriately.
 C
-C      If the program is called with CFLUX=.FALSE. after the number of 
+C      If the program is called with CFLUX=.FALSE. after the number of
 C counts in each output bin has been found, these are divided by the width of
 C each output bin in terms of input bins. This ensures that the mean level
 C of the data doess not change. Hence, after rebinning it is not necessarily

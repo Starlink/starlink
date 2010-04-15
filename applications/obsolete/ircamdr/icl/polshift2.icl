@@ -42,7 +42,7 @@ proc polshift2 cur
     asknum (posy_4o) "Y-Position in o-ray image at 67.5 deg. ? "
     asknum (posx_4e) "X-Position in e-ray image at 67.5 deg. ? "
     asknum (posy_4e) "Y-Position in e-ray image at 67.5 deg. ? "
-  else 
+  else
 { 0 degrees o- e- images
     obeyw plt2d clear
     send plt2d set cursor_image (polly_1o)

@@ -24,11 +24,11 @@
 *     the box size in arcminutes are input as parameters.
 *     From this, the program calculates
 *     which ISSA plates are contained within (part of) the box. It
-*     also tells the user what CDs the plate is on, whether it is a 
+*     also tells the user what CDs the plate is on, whether it is a
 *     reject, and the plate centre.
-*     In addition, it displays which corners of the box lie on each plate. 
+*     In addition, it displays which corners of the box lie on each plate.
 *     The corners are labelled thus:
-*     Centre: C, Top-left: C1, Bottom-left: C2, Top-right: C3, 
+*     Centre: C, Top-left: C1, Bottom-left: C2, Top-right: C3,
 *     Bottom-Right: C4.
 
 *     The program uses the following algorithm.
@@ -41,7 +41,7 @@
 *     to include the box centre for all plates in the list.
 
 *     Assuming the user wanted a box rather than a point, the
-*     co-ordinates of each corner of the box are calculated. Then the 
+*     co-ordinates of each corner of the box are calculated. Then the
 *     following process is repeated for each corner in turn.
 
 *     Just as with the centre point, a list of all plates containing the
@@ -51,7 +51,7 @@
 *     string is initialised to the current corner.
 
 *     The final output list is displayed. The ordering of the original lists
-*     means that the better plates will be first. 
+*     means that the better plates will be first.
 
 *  Arguments:
 *     STATUS = INTEGER (Read/Write)
@@ -88,7 +88,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*- 
+*-
 
 c  No implicit typing
       IMPLICIT NONE
@@ -111,10 +111,10 @@ c  Local variables
       INTEGER PLATE(4)             ! All the plates in which the point appears
       INTEGER RLEASE               ! Release number
 
-      DOUBLEPRECISION CRA(4),      ! Centre RA and DEC of 
+      DOUBLEPRECISION CRA(4),      ! Centre RA and DEC of
      *                CDEC(4)      ! each plate
 
-      LOGICAL REJECT               ! whether the current plate is a reject 
+      LOGICAL REJECT               ! whether the current plate is a reject
 
       DOUBLEPRECISION LONR, LATR   ! Lon, Lat in radians
       DOUBLEPRECISION RA, DEC      ! Lon, Lat (Eq1950) in radians
@@ -128,7 +128,7 @@ c  Local variables
      *                SIZER        ! Box size in degrees
 
       INTEGER FINPLT(20)           ! Final plate nummber array
-    
+
       DOUBLEPRECISION FINRA(20),   ! Final RA
      *                FINDEC(20)   ! and DEC
 
@@ -198,9 +198,9 @@ c  Get the coordinate system and possibly the equinox as well.
 c  Keep looping until the user wants no more input
       DO WHILE (AGAIN)
 
-c  Get the Longitude and Latitude in radians (in the current coordinate 
+c  Get the Longitude and Latitude in radians (in the current coordinate
 c  system)
-      CALL IRA_GETCO('LON', 'LAT', ' ', CSYS, .FALSE., 
+      CALL IRA_GETCO('LON', 'LAT', ' ', CSYS, .FALSE.,
      *                 LONR, LATR, STATUS)
       CALL PAR_CANCL('LON', STATUS)
       CALL PAR_CANCL('LAT', STATUS)
@@ -212,10 +212,10 @@ c  Normalise the co-ordinates
       TY1(1) = LATR
 
 c  Convert into equatorial values, in radians
-      CALL IRA_CONVT(1, TX1(1), TY1(1), CSYS, 'EQ(1950)', IRA__IRJEP, 
+      CALL IRA_CONVT(1, TX1(1), TY1(1), CSYS, 'EQ(1950)', IRA__IRJEP,
      *                 TX2(1), TY2(1), STATUS)
       RA = TX2(1)
-      DEC = TY2(1) 
+      DEC = TY2(1)
 
 c  Create a charater string containing the equatorial coordinates
       CALL IRA_DTOC(RA, DEC, 'EQ', 1, RAC, DECC, STATUS)
@@ -235,7 +235,7 @@ c  Get the Hcon
 
 
 c  Now we have all the input
-c  Calculate all the plates on which the centre point lies 
+c  Calculate all the plates on which the centre point lies
       CALL IFLDZ0(RA, DEC, PLATE, CRA, CDEC, NUMPLT, STATUS)
 
 c  Check the global status
@@ -262,7 +262,7 @@ c  is no need to check for repitiion - just add straight to the final array
 
 c  Total number of distinct late numbers found so far
       TOTPLT = NUMPLT
-      
+
 c  For each corner in turn
 c  Only do the rest of this if the user asked for a box rather than a point
       IF (SIZE .GT. 0.0) THEN
@@ -282,7 +282,7 @@ c  Loop over each corner in turn
         DO I = 1, 4
 
 c  For each corner, calculate the list of plates on which it may be found
-          CALL IFLDZ0(RACRN(I), DECCRN(I), PLATE, CRA, CDEC, 
+          CALL IFLDZ0(RACRN(I), DECCRN(I), PLATE, CRA, CDEC,
      *                 NUMPLT, STATUS)
 
 c  Check the global status
@@ -384,7 +384,7 @@ c  If a logfile is wanted, then write all this to the logfile as well
       CALL CHR_PUTC(LONC, LINE, LENGTH)
       CALL CHR_PUTC(LATC, LINE, LENGTH)
       CALL FIO_WRITE(FD, LINE, STATUS)
- 
+
       IF (CSYS .NE. 'EQUATORIAL(B1950)') THEN
         CALL FIO_WRITE(FD, 'Input Coordinates -      ' //
      *                 ' EQUATORIAL(B1950):', STATUS)
@@ -419,14 +419,14 @@ c  latitude of the point in both equatorial and ecliptic is needed. The
 c  equatorial is already known, but the ecliptic needs to be calculated
         TX1(1) = FINRA(I) * IRA__DTOR
         TY1(1) = FINDEC(I) * IRA__DTOR
-        CALL IRA_CONVT(1, TX1, TY1, 'EQ', 'EC', IRA__IRJEP, 
+        CALL IRA_CONVT(1, TX1, TY1, 'EQ', 'EC', IRA__IRJEP,
      *                   TX2, TY2, STATUS)
 
 c  Convert into degrees
         BETA = TY2(1) * IRA__RTOD
 
 c  Calculate which disk each plate may be found on.
-        CALL IFLDZ1(FINPLT(I), FINDEC(I), BETA, HCON, DISK, 
+        CALL IFLDZ1(FINPLT(I), FINDEC(I), BETA, HCON, DISK,
      *                REJECT, STATUS)
 
 c  Check the global status
@@ -454,7 +454,7 @@ c  Convert the disk numbers to a string
         CALL CHR_FILL(' ', FDSK)
         LENGTH = 1
         CALL CHR_PUTI(DISK(1), FDSK, LENGTH)
- 
+
 c  Take into account the fact that the plate may be found on two disks
         IF (DISK(2) .NE. -1) THEN
           CALL CHR_APPND(', ', FDSK, LENGTH)
@@ -475,7 +475,7 @@ c  Build the reject string
         ENDIF
 
 c  Build the output string
-        CALL CHR_FILL(' ', LINE)	
+        CALL CHR_FILL(' ', LINE)
         LENGTH = 1
         CALL CHR_APPND(FPLT, LINE, LENGTH)
         LENGTH = 6

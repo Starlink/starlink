@@ -1,7 +1,7 @@
 *+WFC_SENS         Gives estimated sensitivity for given exposure
       REAL FUNCTION WFC_SENS(SIGMA, BCELL,TSEC,F,NMIN)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       REAL SIGMA
       REAL BCELL

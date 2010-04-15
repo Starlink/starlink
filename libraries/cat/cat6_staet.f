@@ -3,13 +3,13 @@
 *  Name:
 *     CAT6_STAEB
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAEB (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -104,13 +104,13 @@
 *  Name:
 *     CAT6_STAEC
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAEC (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -189,13 +189,13 @@
 *  Name:
 *     CAT6_STAED
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAED (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -274,13 +274,13 @@
 *  Name:
 *     CAT6_STAEI
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAEI (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -359,13 +359,13 @@
 *  Name:
 *     CAT6_STAEL
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAEL (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -444,13 +444,13 @@
 *  Name:
 *     CAT6_STAER
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAER (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -529,13 +529,13 @@
 *  Name:
 *     CAT6_STAEW
 *  Purpose:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STAEW (ROWS, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in an array of column values. 
+*     Set a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.

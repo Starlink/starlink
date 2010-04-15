@@ -38,7 +38,7 @@
 *     describing the fields in the table, and the ENDFIELD record.
 *     Finally all the comment lines in the FITS header are copied, in
 *     order, to the FACTS file.  Blank comment entries are inserted in
-*     the 
+*     the
 
 *     The syntax of the field's format descriptor is checked to see that
 *     it is standard.
@@ -161,12 +161,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -856,7 +856,7 @@
             IF ( COLD .NE. 0 ) THEN
 
 *  Get its length and append the ! terminator.
-               CP = CHR_LEN( DESCRP ) 
+               CP = CHR_LEN( DESCRP )
                CALL CHR_APPND( '!', DESCRP, CP )
             END IF
          END IF
@@ -936,7 +936,7 @@
 
 *  Write a comment about the scale and offset.
             FMT1 = '( '' C Note field '',A,'' has a scale factor of'','/
-     :             /'G14.6,'' and an offset of'',G14.6)' 
+     :             /'G14.6,'' and an offset of'',G14.6)'
             WRITE( BUFFER, FMT1 )
      :        NDTYPE( I )( 1:CHR_LEN( NDTYPE( I ) ) ),
      :        NDSCAL( I ), NDZERO( I )

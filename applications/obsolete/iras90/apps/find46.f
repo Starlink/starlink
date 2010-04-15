@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIND46( TIMCT, SPPAFT, SPSTCL, SPSTCR, TIMYRS, STATUS ) 
+*     CALL FIND46( TIMCT, SPPAFT, SPSTCL, SPSTCR, TIMYRS, STATUS )
 
 *  Description:
 *     To change a time from SATCAL to years ( with decimal places )
@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
 
 *  Calculate the time in seconds from the satcal base time
       TEMPTI = ( TIMCT - SPSTCL ) / SPSTCR
-      
+
 *  Calculate time in days from 1st Jan 1983
       TEMPTI = TEMPTI / SECDAY + SPPAFT
 

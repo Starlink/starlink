@@ -45,7 +45,7 @@
 *        Initial version.
 
 *  Notes:
-*     - This is for use from C only. 
+*     - This is for use from C only.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.

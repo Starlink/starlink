@@ -186,7 +186,7 @@
 
 static mapping_id nbs_gl_mlist = NIL; /* Mapping list */
 
-
+
 
 /* see Apple Developer Connection Tech Notes
   http://developer.apple.com/technotes/tn2002/tn2071.html */
@@ -257,7 +257,7 @@ key_t NBS_MAKE_KEY(char *name)
   {
   key_t	   key = (key_t) 0;
   int	i;
- 
+
 /* Start of code */
 /* The key is the sum of the character values of NAME, with the character */
 /* position of each character used to shift the bits to left. This is a */
@@ -268,7 +268,7 @@ key_t NBS_MAKE_KEY(char *name)
    return key;
 }
 #endif
-
+
 /*
 *
 *  Section Name:
@@ -302,7 +302,7 @@ extern char *nbs_ga_alloc_next; /* Next free byte             */
 extern char *nbs_ga_alloc_last; /* Byte after last free byte  */
 extern char *nbs_ga_alloc_data; /* Next "free byte" for data  */
 
-
+
 /*
 *+
 *  Name:
@@ -402,7 +402,7 @@ char *NBS_INIT_ALLOC (int nbytes,char *data)
 
    return (nbs_ga_alloc_base);
 }
-
+
 /*
 *+
 *  Name:
@@ -492,7 +492,7 @@ char *NBS_ALLOC (int nbytes)
       return (nbs_ga_alloc_next-lnbytes);
    }
 }
-
+
 /*
 *+
 *  Name:
@@ -583,7 +583,7 @@ char *NBS_DATA_ALLOC (int nbytes)
    nbs_ga_alloc_data += lnbytes;
    return (nbs_ga_alloc_data-lnbytes);
 }
-
+
 /*
 *+
 *  Name:
@@ -657,7 +657,7 @@ char *NBS_DEINIT_ALLOC ()
    free( nbs_ga_alloc_base);
    return NULL;
 }
-
+
 /*
 *
 *  Section Name:
@@ -702,7 +702,7 @@ char *NBS_DEINIT_ALLOC ()
 *     {note_any_bugs_here}
 *
 */
-
+
 /*
 *+
 *  Name:
@@ -866,7 +866,7 @@ NBS_WRITE_FILE (
       fclose (chan);
    }
 }
-
+
 /*
 *+
 *  Name:
@@ -1019,7 +1019,7 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
       }
    }
 }
-
+
 /*
 *+
 *  Name:
@@ -1118,7 +1118,7 @@ NBS_READ_FILE ( FILE *chan,
                  "Can't read noticeboard definition file", status );
       }
 }
-
+
 /*
 *+
 *  Name:
@@ -1194,7 +1194,7 @@ NBS_CLOSE_FILE ( RW_POINTER(chan) )
 
    fclose ((FILE *) chan);
 }
-
+
 /*
 *+
 *  Name:
@@ -1287,7 +1287,7 @@ NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
                  "Can't open noticeboard definition file", status );
       }
 }
-
+
 /*
 *+
 *  Name:
@@ -1402,7 +1402,7 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
          }
    }
 }
-
+
 /*
 *
 *  Section Name:
@@ -1423,7 +1423,7 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 *     global section. The last one unmaps an existing global section.
 *
 */
-
+
 /*
 *+
 *  Name:
@@ -1630,7 +1630,7 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 
    return (retadr[0]);
 }
-
+
 /*
 *+
 *  Name:
@@ -1837,7 +1837,7 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 
    return (retadr[0]);
 }
-
+
 /*
 *+
 *  Name:
@@ -1963,7 +1963,7 @@ NBS_MLIST_UNMAP ((char *) start,status);
 
 #endif
 }
-
+
 /*
 *
 *  Section Name:
@@ -1999,7 +1999,7 @@ NBS_MLIST_UNMAP ((char *) start,status);
 *     {enter_changes_here}
 *
 */
-
+
 /*
 *+
 *  Name:
@@ -2121,7 +2121,7 @@ NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
 	 NBS_RELOCATE_ITEM (id,i_offset,fbs_offset,d_offset,add);
    }
 }
-
+
 /*
 *+
 *  Name:
@@ -2221,7 +2221,7 @@ NBS_RELOCATE_ITEM (item_id id,int i_offset,int fbs_offset,int d_offset,int add)
    id->da.data    = (data_id)
    	    	   NBS_RELOCATE_ADDRESS ((char *) id->da.data  ,d_offset  ,add);
 }
-
+
 /*
 *+
 *  Name:
@@ -2315,7 +2315,7 @@ char *NBS_RELOCATE_ADDRESS (char *address,int offset,int add)
    else
       return (address);
 }
-
+
 /*
 *
 *  Section name:
@@ -2341,7 +2341,7 @@ char *NBS_RELOCATE_ADDRESS (char *address,int offset,int add)
 *     {enter_changes_here}
 *
 */
-
+
 /*
 *+
 *  Name:
@@ -2463,7 +2463,7 @@ char *F77_EXTERNAL_NAME(nbs_strimp) ( char *out, RW_CHARACTER(in),
       out[out_ptr] = '\0';
    return (out);
 }
-
+
 /*
 *+
 *  Name:
@@ -2587,7 +2587,7 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
   http://developer.apple.com/technotes/tn2002/tn2071.html */
 #if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
 
-
+
 /*
 *  Section name:
 *     NBS_MLIST
@@ -2612,7 +2612,7 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
 *     {enter_changes_here}
 *
 */
-
+
 /*
 *+
 *  Name:
@@ -2698,7 +2698,7 @@ void NBS_MLIST_EXITHANDLER ()
     NBS_MLIST_UNMAP( nbs_gl_mlist->addr, &lstatus );
     }
 }
-
+
 /*
 *+
 *  Name:
@@ -2834,7 +2834,7 @@ else
     }
   }
 }
-
+
 /*
 *+
 *  Name:
@@ -2934,7 +2934,7 @@ if ( found )
 
 return addr;
 }
-
+
 /*
 *+
 *  Name:
@@ -3060,7 +3060,7 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
     }
 }
 #endif
-
+
 /*
 *+
 *  Name:
@@ -3155,7 +3155,7 @@ void NBS_SLEEPMS ( int msecs )
 /* Local Variables:							    */
 
    static float wait_secs;      /* Interval to eait in seconds */
-   
+
    wait_secs = ((float) msecs);   /* Convert to seconds */
 
    LIB$WAIT(&wait_secs);          /* And wait */

@@ -74,7 +74,7 @@
 *     {enter_further_changes_here}
 
 *-
- */ 
+ */
 
 /* Internal prototypes */
 void decode_type( int type, char **string);
@@ -124,7 +124,7 @@ main(int argc, char **argv)
       fprintf(stderr, "HDS file name must be first and only parameter!\n");
       exit(1);
    }
-/* Open HDS file  and read packed HCB into buffer */   
+/* Open HDS file  and read packed HCB into buffer */
    if( (fp = fopen(argv[1], "rb")) == NULL ) {
       perror("hds file open error");
       exit(1);
@@ -134,18 +134,18 @@ main(int argc, char **argv)
       perror("HCB block read error");
       fclose( fp );
       exit(1);
-   }   
-      
+   }
+
 /*
  * Decode and print HCB contents
- */      
+ */
    status = rec1_unpack_hcb( block, &hcb );
    if (status != DAT__OK) {
      printf("Unable to unpack HCB. Aborting dump.\n");
      fclose( fp );
      exit(1);
    }
-   printf("HCB information:\n HDS version %d, eof block=%" HDS_INT_BIG_S "\n", 
+   printf("HCB information:\n HDS version %d, eof block=%" HDS_INT_BIG_S "\n",
           hcb.version, hcb.eof);
    printf(" Stack information (LRB)\n");
    for( i=0; i<REC__MXSTK; i++ ) {
@@ -156,7 +156,7 @@ main(int argc, char **argv)
        }
        printf(" Block %"HDS_INT_BIG_S", spare %"
 	      HDS_INT_BIG_S"\n", hcb.stk[i].bloc, hcb.stk[i].spare );
-   }    
+   }
    printf("\n Stack information (PDB)\n");
    for( i=REC__MXSTK-1; i > 0; i-- ) {
        if( hcb.stk[i].bloc < 0 )
@@ -164,23 +164,23 @@ main(int argc, char **argv)
           printf(" PDB stack ends at entry %d\n", i);
           break;
        }
-       printf(" Block %" HDS_INT_BIG_S 
+       printf(" Block %" HDS_INT_BIG_S
 	      ", spare %" HDS_INT_BIG_S "\n", hcb.stk[i].bloc, hcb.stk[i].spare );
    }
 
 /* Set 64-bit flag - used internally by various decode routines */
    hds_gl_64bit = hcb.version > REC__VERSION3;
-   
+
 /* Zero the array of next LRB block numbers */
    for(i=0; i<50; i++)
       nxtblk[i] = 0;
-      
+
 /* Read and decode LRB entries  starting at (2,0) container record */
    nxtblk[0] = 2;
    blkcnt = 1;
    tlrb = 0;
    tpdb = 0;
-   
+
    do {
       tlrb++;
       cur_block = nxtblk[0];
@@ -198,13 +198,13 @@ main(int argc, char **argv)
       }
 
       for( chip=0; chip < REC__MXCHIP ; chip+=rcl.size ) {
-         ptr = block + REC__SZCBM + (chip * REC__SZCHIP ); 
+         ptr = block + REC__SZCBM + (chip * REC__SZCHIP );
          rec1_unpack_rcl( ptr, &rcl );
          if ( !rcl.size || rcl.active > 1 || rcl.active <= 0 ||
               rcl.class <= 0 || rcl.class > 4 || rcl.dlen <0 ) {
              rcl.size = 1;
              continue;
-         }    
+         }
          decode_type( rcl.class, &type);
          printf("\n%s record (%"HDS_INT_BIG_S",%d):\n", type, cur_block, chip);
          printf(" Parent(b=%" HDS_INT_BIG_S ",c=%d),size=%d,chained=%d,active=%d,"
@@ -215,7 +215,7 @@ main(int argc, char **argv)
          if( rcl.chain ) {
              rec1_unpack_chain( ptr+rcl.slen, rcl.extended, &cblk);
              size = (rcl.dlen + REC__SZBLK-1)/REC__SZBLK;
-             printf(" Chained data starts block = %" HDS_INT_BIG_S 
+             printf(" Chained data starts block = %" HDS_INT_BIG_S
 		    " size(blocks)=%" HDS_INT_BIG_U "\n",
                       cblk, size);
              tpdb += size;
@@ -242,7 +242,7 @@ main(int argc, char **argv)
                      printf("(");
                   printf("%" HDS_DIM_FORMAT " ", odl.axis[i] );
                }
-               if( odl.naxes != 0 )   
+               if( odl.naxes != 0 )
                   printf(")");
                printf("\n Next record(s):\n");
                ptr += rcl.slen;
@@ -258,7 +258,7 @@ main(int argc, char **argv)
                   odl.axis[0] = 1;
                }
                for(i=0; i<odl.naxes; i++) {
-                  for(axsz=0; axsz<odl.axis[i]; axsz++) {  
+                  for(axsz=0; axsz<odl.axis[i]; axsz++) {
 		     dat1_unpack_srv( ptr, &rid );
                      printf("  (%" HDS_INT_BIG_S",%d)\n",rid.bloc, rid.chip);
                      if( rid.bloc > cur_block )
@@ -284,7 +284,7 @@ main(int argc, char **argv)
 		  _chmove( DAT__SZNAM, ptr, name );
 		  name[DAT__SZNAM] = '\0';
 		  dat1_unpack_crv( ptr, 0, &rid );
-                  printf("  Name = %s rid=(%" HDS_INT_BIG_S",%d)\n", name, rid.bloc, 
+                  printf("  Name = %s rid=(%" HDS_INT_BIG_S",%d)\n", name, rid.bloc,
                          rid.chip);
                   if( rid.bloc > cur_block )
                      add_block( rid.bloc );
@@ -296,7 +296,7 @@ main(int argc, char **argv)
             case DAT__PRIMITIVE:
                dat1_unpack_odl( ptr, &odl );
                dat1_unpack_type( odl.type, &pdd );
-            
+
                if( ptr[1] == '_' ) {
                   printf(" Packed ");
                   decode_pdd( &pdd );
@@ -309,7 +309,7 @@ main(int argc, char **argv)
                      printf("(");
                   printf("%" HDS_DIM_FORMAT" ", odl.axis[i] );
                }
-               if( odl.naxes != 0 )   
+               if( odl.naxes != 0 )
                   printf(")\n");
                else
                   printf("\n");
@@ -319,7 +319,7 @@ main(int argc, char **argv)
          nxtblk[i-1] = nxtblk[i];
       blkcnt--;
    } while ( nxtblk[0] != 0);
-   printf("\nTotal LRB blocks = %" HDS_INT_BIG_U 
+   printf("\nTotal LRB blocks = %" HDS_INT_BIG_U
 	  " Total PDB blocks = %" HDS_INT_BIG_U "\n", tlrb, tpdb);
    fclose(fp);
    exit(0);
@@ -343,9 +343,9 @@ add_block(INT_BIG bloc)
             return;
        }
     }
-    nxtblk[blkcnt++] = bloc;   
-} 
- 
+    nxtblk[blkcnt++] = bloc;
+}
+
 
 void
 decode_type( int type, char **string)
@@ -369,7 +369,7 @@ void
 decode_pdd( struct PDD *pdd )
 {
    char *string;
-   
+
    switch (pdd->dtype) {
       case DAT__B:
           string = "_DOUBLE";
@@ -401,7 +401,7 @@ decode_pdd( struct PDD *pdd )
       default:
           string = "Unknown!!";
    }
-          
+
    printf("dtype = %s length=%d", string, (int)pdd->length);
 }
 
@@ -425,7 +425,7 @@ void read_block ( FILE * fp, INT_BIG bloc, size_t nbytes, void * ptr ) {
      readok = 0;
    }
 
-   if (!readok) { 
+   if (!readok) {
      memset( ptr, 0, nbytes );
      printf("Had trouble reading from file for some unknown reason. Not good.\n");
      exit(1);

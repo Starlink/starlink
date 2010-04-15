@@ -49,7 +49,7 @@
 *  MFxxxx  - Arrays which map each workstation's WDT's fonts ordering to
 *            internal font ordering.
 *
- 
+
 *     Integer workspace offset parameters
       INTEGER    ILNTYP,   IMKTYP,   IFASTY,   ICLIND
       PARAMETER (ILNTYP=1, IMKTYP=2, IFASTY=4, ICLIND=5)
@@ -138,7 +138,7 @@
 *     Send header and prologue.
 * --------------------------------------------------------------
 *
- 
+
 *
 *     Initialise the KWKDAT and QWKDAT variables thus forcing
 *     the output primitives to set the values first time round.
@@ -150,12 +150,12 @@
       DO 30 I=1,KMXWKR
          QWKDAT(I,KWKIX)=QNIL
    30 CONTINUE
- 
+
 *
 *     Initialise output buffering
 *
       CALL GKFOCO(KIOIT,DUMMY,IREM)
- 
+
 *
 *     Depending on workstation type, set display area's left/right margin
 *     and orientation indicator.
@@ -237,17 +237,17 @@ C        KWKDAT(ICOLR ,KWKIX) = GCOLOR
          KERROR = -2010
          RETURN
       ENDIF
- 
+
 *
 *     initialise the page counter
 *
       KWKDAT(IPAGES,KWKIX) = 0
- 
+
 *
 *     initialise number of internally known fonts
 *
       KWKDAT(IFTINT,KWKIX) = NUMFNT
- 
+
 *
 *     Allocate Character Heap Space to store the font names
 *
@@ -261,7 +261,7 @@ C        KWKDAT(ICOLR ,KWKIX) = GCOLOR
       ELSE
          RETURN
       ENDIF
- 
+
 *
 *     Allocate Integer Heap space to store individual fonts starting positions
 *
@@ -274,7 +274,7 @@ C        KWKDAT(ICOLR ,KWKIX) = GCOLOR
       ELSE
          RETURN
       ENDIF
- 
+
 *
 *     Allocate Integer Heap space to store the current workstation's font
 *     order mapping array
@@ -293,20 +293,20 @@ C        KWKDAT(ICOLR ,KWKIX) = GCOLOR
       ELSE
          RETURN
       ENDIF
- 
+
 *
 *     Allocate Integer Heap space to record the hardware font usage
 *
       CALL GKHPAL(NUMFNT,KINTGS,KWKDAT(IFTUSD,KWKIX))
       IF(KERROR.NE.0) RETURN
- 
- 
- 
+
+
+
 *
 *     Send PostScript Header and then PostScript Prologue to the device
 *
- 
+
       CALL GK1AHD (IWHOLE)
       CALL GK1APS
- 
+
       END

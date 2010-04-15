@@ -68,7 +68,7 @@ proc cred4Display {} {
         $Cred4Widgets(DIS_IP$ifr) insert 0 $istring
       } elseif {[string range $istring 0 2]=="YES"} {
         set Cred4Widgets(IP$ifr) 1
-      } 
+      }
       incr ifr
     }
 
@@ -99,7 +99,7 @@ proc cred4Display {} {
         $Cred4Widgets(DIS_OP$ofr) insert 0 $ostring
       } elseif {[string range $ostring 0 2]=="YES"} {
         set Cred4Widgets(OP$ofr) 1
-      } 
+      }
       incr ofr
     }
 
@@ -130,7 +130,7 @@ proc cred4Display {} {
         $Cred4Widgets(DIS_GP$gfr) insert 0 $gstring
       } elseif {[string range $gstring 0 2]=="YES"} {
         set Cred4Widgets(GP$gfr) 1
-      } 
+      }
       incr gfr
     }
 
@@ -161,7 +161,7 @@ proc cred4Display {} {
         $Cred4Widgets(DIS_SP$sfr) insert 0 $sstring
       } elseif {[string range $sstring 0 2]=="YES"} {
         set Cred4Widgets(SP$sfr) 1
-      } 
+      }
       incr sfr
     }
 
@@ -173,7 +173,7 @@ proc cred4Display {} {
     trace variable Cred4Widgets(DTYPE) w "CNewDisplayType $flip"
 
 # If NONE< default to OBS otherwise re-write same value so trace will work
-    if {$Cred4Widgets(DTYPE) == "NONE"} { 
+    if {$Cred4Widgets(DTYPE) == "NONE"} {
       set Cred4Widgets(DTYPE) "OBS"
     } else {
       set Cred4Widgets(DTYPE) $Cred4Widgets(DTYPE)

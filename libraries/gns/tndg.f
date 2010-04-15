@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,7 +84,7 @@
 *     14-JUL-1995 (DLT):
 *        Don't create recursive GKS_xxxx_xxxx environment variables.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -155,7 +155,7 @@
          IF (CNAME(:4).NE.'GKS_') THEN
 
 *     Try logical name translation
-            CALL GETENV( CNAME(:LNAME), TNAME ) 
+            CALL GETENV( CNAME(:LNAME), TNAME )
 
 *     If it succeded then go back for another go
             IF (INDEX( TNAME, ' ').NE.1) THEN
@@ -171,7 +171,7 @@
 *     Open GNS database
          CALL gns_1INITG(STATUS)
          IF (STATUS.EQ.0) THEN
-      
+
 *        Convert name to GKS workstation type
             MATCH = 0
             DO 30 I = 1,NUMNAM
@@ -203,7 +203,7 @@
                GO TO 9000
             END IF
          END IF
-      
+
 *     No match was found (maybe because we couldn't open the database
 *     but maybe it is an explicit type,connection id specification so
 *     try decoding it.
@@ -247,7 +247,7 @@
             ENDIF
             GO TO 9000
          END IF
-      
+
    40    CONTINUE
 
 *   Make sure that the common block contains data for this type
@@ -385,5 +385,5 @@
       ENDIF
 
  9000 CONTINUE
-      END       
+      END
 

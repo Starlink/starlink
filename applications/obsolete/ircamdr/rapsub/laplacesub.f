@@ -1,6 +1,6 @@
 *+  LAPLACESUB - subtracts Laplacian of input image to form output
 
-      SUBROUTINE LAPLACESUB ( INARRAY, DIMS1, DIMS2, NUMBER, 
+      SUBROUTINE LAPLACESUB ( INARRAY, DIMS1, DIMS2, NUMBER,
      :                        OUTARRAY, STATUS )
 
 *    Description :
@@ -8,14 +8,14 @@
 *     This routine subtracts NUMBER times the Laplacian of the input
 *     array from that array to create the output array. This can be
 *     thought of as a convolution by
-*  
+*
 *                             -N   -N   -N
 *                             -N   +8N  -N
 *                             -N   -N   -N
 *
 *     where N is the integer number NUMBER. The convolution acts as
-*     a unidirectional edge detector, and for a flat areas in the 
-*     input array, the convolution sums to zero. 
+*     a unidirectional edge detector, and for a flat areas in the
+*     input array, the convolution sums to zero.
 *
 *    Invocation :
 *
@@ -61,7 +61,7 @@
       INTEGER
      :     DIMS1, DIMS2,    ! dimensions of input and output arrays
      :     NUMBER           ! number of times Laplacian is subtracted
- 
+
       REAL
      :     INARRAY( DIMS1, DIMS2 )   ! input array
 

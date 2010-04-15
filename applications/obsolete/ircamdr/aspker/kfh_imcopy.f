@@ -12,7 +12,7 @@
 *     IMAGE(XDIM,YDIM) = REAL
 *           The array containing the data of the whole image.
 *     COPY(270000) = DOUBLE PRECISION
-*           The 1-D array to hold the data elements of the 
+*           The 1-D array to hold the data elements of the
 *           specified region.
 *     XDIM = INTEGER
 *           The X-dimension of the whole image.

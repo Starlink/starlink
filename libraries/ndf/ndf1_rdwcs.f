@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,8 +84,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'AST_PAR'          ! AST_ public interface
 
@@ -114,20 +114,20 @@
 *           ARY_ system identifier for the NDF's data array.
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
-      
+
 *  Arguments Given:
       INTEGER IACB
 
 *  Arguments Returned:
       INTEGER IWCS
-      
+
 *  Local Constants:
       INTEGER NSTD               ! No. standard NDF coordinate systems
       PARAMETER ( NSTD = 4 )
 
 *  Status:
       INTEGER STATUS             ! Global status
-      
+
 *  Local Variables:
       DOUBLE PRECISION ACA( NDF__MXDIM ) ! Axis coordinate, 1st point
       DOUBLE PRECISION ACB( NDF__MXDIM ) ! Axis coordinate, 2nd point
@@ -182,13 +182,13 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Obtain the index of the data object in the DCB and ensure that AXIS
 *  and WCS information is available for it.
       IDCB = ACB_IDCB( IACB )
       CALL NDF1_DA( IDCB, STATUS )
       CALL NDF1_DW( IDCB, STATUS )
-      
+
 *  Obtain the pixel-index bounds of the NDF entry in the ACB and of the
 *  data object in the DCB.
       CALL ARY_BOUND( ACB_DID( IACB ), NDF__MXDIM, LBNDA, UBNDA, NDIMA,
@@ -238,7 +238,7 @@
             CALL AST_ANNUL( FRAME, STATUS )
 
 *  Add a fourth Frame to represent normalised pixel coordinates (each
-*  pixel axis spans a range 0.0 to 1.0 in this Frame). Again, use a 
+*  pixel axis spans a range 0.0 to 1.0 in this Frame). Again, use a
 *  UnitMap.
             FRAME = AST_FRAME( NDIMD, 'Domain=FRACTION', STATUS )
             CALL AST_ADDFRAME( IWCS, AST__BASE, UNIT, FRAME, STATUS )
@@ -248,7 +248,7 @@
             CALL AST_ANNUL( UNIT, STATUS )
 
 *  The FRACTION Frame will now be current in our dummy FrameSet. If the
-*  NDF's AXIS component is defined, change this to make the AXIS 
+*  NDF's AXIS component is defined, change this to make the AXIS
 *  coordinate Frame current instead. Otherwise, change it to make the
 *  pixel coordinate Frame current.
             IF ( .NOT. AXSTAT ) THEN
@@ -339,7 +339,7 @@
 *  FrameSet.
             IBASE = AST_GETI( IWCS, 'Base', STATUS )
             ICURR = AST_GETI( IWCS, 'Current', STATUS )
-                        
+
 *  Make the base Frame current and add the original FrameSet to the new
 *  one we have just created. Their base Frames (i.e. data grid indices)
 *  are inter-related by the PermMap created above.
@@ -390,7 +390,7 @@
 
 *  Remap the base Frame to reflect the change of data grid origin (so
 *  that all other coordinate systems described by the FrameSet remain
-*  attached to the same actual data pixels). 
+*  attached to the same actual data pixels).
          CALL AST_REMAPFRAME( IWCS, AST__BASE, MAP0, STATUS )
 
 *  Set up pixel coordinate system.
@@ -409,7 +409,7 @@
 *  coordinate system.
          MAP = AST_WINMAP( NDIMA, IDA, IDB, PCA, PCB, ' ', STATUS )
          CALL AST_REMAPFRAME( IWCS, 2, MAP, STATUS )
-                  
+
 *  Set up axis coordinate system.
 *  ------------------------------
 *  If the NDF's AXIS component is in an undefined state, then remap the
@@ -546,7 +546,7 @@
 *  Set up normalised pixel coordinate system.
 *  ------------------------------------------
 *  Set up a Mapping which converts from grid indices in the section (note
-*  section, not base) NDF and pixel coordinates corresponding with the ACB 
+*  section, not base) NDF and pixel coordinates corresponding with the ACB
 *  entry.
          DO 5 IDIM = 1, NDIMA
             IAA( IDIM ) = 0.5D0
@@ -557,7 +557,7 @@
          MAP = AST_WINMAP( NDIMA, IAA, IAB, NPCA, NPCB, ' ', STATUS )
 
 *  In order to remap the FRACTION frame, we need the mapping from the
-*  base NDF (base, not section) to the FRACTION Frame. This Mapping is 
+*  base NDF (base, not section) to the FRACTION Frame. This Mapping is
 *  the formed by applying the Mapping from base to section (MAP0),
 *  followed by the Mapping from section to FRACTION (MAP).
          CMPMAP = AST_CMPMAP( MAP0, MAP, .TRUE., ' ', STATUS )
@@ -565,7 +565,7 @@
 *  Use this Mapping to remap the fourth Frame to define the normalised
 *  pixel coordinate system.
          CALL AST_REMAPFRAME( IWCS, 4, CMPMAP, STATUS )
-                  
+
 *  Free remaining resource.
          CALL AST_ANNUL( MAP, STATUS )
          CALL AST_ANNUL( CMPMAP, STATUS )

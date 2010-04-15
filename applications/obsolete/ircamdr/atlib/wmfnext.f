@@ -1,5 +1,5 @@
 C
-*+  WMFNEXT - gets next image and offsets in sequence for mosaic from file 
+*+  WMFNEXT - gets next image and offsets in sequence for mosaic from file
 
       SUBROUTINE WMFNEXT ( LUN, PARAM, LOC, OFFSET, WT, STATUS )
 
@@ -94,7 +94,7 @@ C
      :    LUN,                    ! unit number associated with open file
      :    LOC                     ! locator to image structure
 
-      CHARACTER*80     
+      CHARACTER*80
      :    PARAM                   ! parameter to be associated with image
 
 *    Export :
@@ -146,7 +146,7 @@ C
       CALL NDF_EXIST( 'CURPIC', 'READ', LOC, STATUS )
 
 *    check for error on return or non-existing file
-      IF ( (LOC .EQ. NDF__NOID) .OR. 
+      IF ( (LOC .EQ. NDF__NOID) .OR.
      :      (STATUS .NE. SAI__OK) ) GOTO 999
 
 *    return

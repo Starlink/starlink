@@ -15,7 +15,7 @@
 *  Description:
 *     This creates headers in the current FITS header that record the
 *     number and names of all the immediate parents of the NDF being
-*     converted.  It also records the number of root parents---those 
+*     converted.  It also records the number of root parents---those
 *     without ancestors---and their observation identifiers from
 *     component OBIDSS within the PROVENANCE's own extension.  These
 *     are the observations.
@@ -25,7 +25,7 @@
 *
 *     PRVCNT  =             _INTEGER / Number of parents
 *     PRV1    = _CHAR                / Name of the first parent
-*     PRV2    = _CHAR                / Name of the second parent 
+*     PRV2    = _CHAR                / Name of the second parent
 *         :        :        :        :        :        :
 *     PRVn    = _CHAR                / Name of the PRVCNTth parent
 *
@@ -96,7 +96,7 @@
 *     2008 January 11 (MJC):
 *        Original version.
 *     2008 February 4 (MJC):
-*        Use indexed keyword names more in keeping with the FITS 
+*        Use indexed keyword names more in keeping with the FITS
 *        standard.  Fix bug from a misunderstanding of KeyMap returned
 *        by NDG_GTPRV.  Look for OBSIDSS in ANCESTORS structure, not
 *        ANCESTOR as in the specification.
@@ -129,8 +129,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! Data-system public constants      
-      INCLUDE 'MSG_PAR'          ! Message-system constants    
+      INCLUDE 'DAT_PAR'          ! Data-system public constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -190,7 +190,7 @@
       LOGICAL THERE              ! Component is present
 
 *  The PRODUCT keyword may only exist in the primary HDU, so save its
-*  value and comment when this routine is called for writing the FITS 
+*  value and comment when this routine is called for writing the FITS
 *  extension headers.
       SAVE COMENT, PRODUC
 
@@ -216,7 +216,7 @@
 *  Free the original provenance structure, and use the cleansed structure
 *  instead.
          CALL NDG_FREEPROV( IPROV, STATUS )
-         IPROV = IPROV2         
+         IPROV = IPROV2
 
 *  Direct parents
 *  ==============
@@ -235,8 +235,8 @@
             CALL PSX_CALLOC( NPAR, '_INTEGER', PIPNTR, STATUS )
 
 *  Obtain the array of parents' indices.
-            THERE = AST_MAPGET1I( PRVKM, 'PARENTS', NPAR, NPAR, 
-     :                            %VAL( CNF_PVAL( PIPNTR ) ), 
+            THERE = AST_MAPGET1I( PRVKM, 'PARENTS', NPAR, NPAR,
+     :                            %VAL( CNF_PVAL( PIPNTR ) ),
      :                            STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -258,12 +258,12 @@
                CALL KPG1_RETRI( NPAR, IREC, %VAL( CNF_PVAL( PIPNTR ) ),
      :                          IDP, STATUS )
 
-*  Obtain the path of the current immediate ancestor. Annul any MORE 
+*  Obtain the path of the current immediate ancestor. Annul any MORE
 *  locator immediately since we do not need it.
                CALL NDG_GETPROV( IPROV, IDP, ANCKM, MORLOC, STATUS )
-               IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC, 
+               IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC,
      :                                                       STATUS )
-               IF ( .NOT. AST_MAPGET0C( ANCKM, 'PATH', PATH, L, 
+               IF ( .NOT. AST_MAPGET0C( ANCKM, 'PATH', PATH, L,
      :                                  STATUS ) ) THEN
                   IF( STATUS .EQ. SAI__OK ) THEN
                      STATUS = SAI__ERROR
@@ -275,7 +275,7 @@
                END IF
                IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Extract the name excluding the file extension. 
+*  Extract the name excluding the file extension.
 *  *** Assume UNIX for the moment. ***
                CALL CHR_LASTO( PATH, '/', CPOS )
                CALL CHR_LASTO( PATH, '.', SOE )
@@ -300,7 +300,7 @@
                CALL CHR_APPND( ' parent', ANCCOM, CPOS )
 
 *  Write the PRVnnnnn header.
-               CALL FTPKYS( FUNIT, KEYWRD, NAME( :NCNAME ), 
+               CALL FTPKYS( FUNIT, KEYWRD, NAME( :NCNAME ),
      :                      ANCCOM( :CPOS ), FSTAT )
 
 *  Free the information for the current parent.
@@ -414,11 +414,11 @@
 *  *** Alert!  UNIX assumption. *** We need a generic routine to extract
 *  the filename, path, and extension. ***
          CALL CHR_LASTO( FNAME, '/', CPOS )
-         
+
          CALL CHR_LASTO( FNAME, '.', SOE )
          IF ( SOE .EQ. 0 ) SOE = CHR_LEN( FNAME ) + 1
 
-         CALL FTPKYS( FUNIT, 'FILEID', FNAME( CPOS + 1 : SOE - 1 ), 
+         CALL FTPKYS( FUNIT, 'FILEID', FNAME( CPOS + 1 : SOE - 1 ),
      :                'Filename minus extension', FSTAT )
 
 *  Write a blank header.
@@ -452,7 +452,7 @@
 *  Write the PRODUCT keyword's new value leaving the comment unchanged.
 *  A new keyword is written should the PRODUCT keyword not exist in
 *  the extension.
-         CALL FTUKYS( FUNIT, 'PRODUCT', PRODUC( :CPOS ), COMENT, 
+         CALL FTUKYS( FUNIT, 'PRODUCT', PRODUC( :CPOS ), COMENT,
      :                 FSTAT )
       END IF
 

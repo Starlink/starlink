@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_READ_TAUZ (FILE, MAX_FILT, N_FILT, FILTER, 
+      SUBROUTINE SCULIB_READ_TAUZ (FILE, MAX_FILT, N_FILT, FILTER,
      :  TAUZ, DATEM, DAY, RUN, STATUS)
 *+
 *  Name:
@@ -8,12 +8,12 @@
 *     read sky zenith optical depths from a named file
 
 *  Description:
-*     This routine reads filter names and associated sky zenith opacities 
-*     from an ASCII file named in FILE. The format of each line in the file 
+*     This routine reads filter names and associated sky zenith opacities
+*     from an ASCII file named in FILE. The format of each line in the file
 *     that contains sky information is assumed to be:-
 *
 *      FIT1 <qual> <sub_inst> <filter> <eta_tel> <b> <tauz> <date> <day> <run>
-*       
+*
 *     Errors will be reported and bad status returned if;
 *
 *       - there is an error opening or reading the file
@@ -38,7 +38,7 @@
 *
 
 *  Invocation:
-*     CALL SCULIB_READ_TAUZ (FILE, MAX_FILT, N_FILT, FILTER, 
+*     CALL SCULIB_READ_TAUZ (FILE, MAX_FILT, N_FILT, FILTER,
 *    :  TAUZ, DATEM, DAY, RUN, STATUS)
 
 *  Arguments:
@@ -129,14 +129,14 @@
       INTEGER          I_FILT         ! array index where filter info should be
                                       ! written
       CHARACTER*132    LINE           ! buffer to hold line read from file
-      INTEGER          NWRD           ! number of words on bolometer definition 
+      INTEGER          NWRD           ! number of words on bolometer definition
                                       ! line
       INTEGER          START (MAX_WRD)! index of beginnings of words in LINE
       INTEGER          STOP (MAX_WRD) ! index of ends of words      "
       REAL             T_B            !
       DOUBLE PRECISION T_DAY          !
       REAL             T_ETA_TEL      !
-      INTEGER          T_QUAL         ! 
+      INTEGER          T_QUAL         !
       INTEGER          T_RUN          !
       REAL             T_TAUZ         !
       CHARACTER*30     WORD (MAX_WRD) ! individual words in LINE
@@ -175,13 +175,13 @@
             FINISHED = .TRUE.
          END IF
 
-*  loop through lines in file. 
+*  loop through lines in file.
 
          DO WHILE (.NOT. FINISHED)
 
 *  read a line. If an error occurs then terminate the loop. If the error is
 *  EOF then set status OK, otherwise output an error message and leave
-*  status bad. 
+*  status bad.
 
             READ (FUNIT, 10, IOSTAT = IOSTAT) LINE
   10        FORMAT (A)
@@ -216,7 +216,7 @@
 
 *  break the line up into its component words, check it's the right `shape'
 
-                  CALL CHR_DCWRD (LINE, MAX_WRD, NWRD, START, 
+                  CALL CHR_DCWRD (LINE, MAX_WRD, NWRD, START,
      :              STOP, WORD, STATUS)
 
                   IF (STATUS .NE. SAI__OK) THEN
@@ -333,9 +333,9 @@
                            ERROR = .TRUE.
                            ERROR_INFO = 'too many types of filter'
                         END IF
-    
-*  copy into arrays if new measurement is either the first found, or more 
-*  recently measured than the current measurement 
+
+*  copy into arrays if new measurement is either the first found, or more
+*  recently measured than the current measurement
 
                         IF (.NOT. ERROR) THEN
                            IF ((DAY(I_FILT) .EQ. VAL__BADD) .OR.
@@ -360,8 +360,8 @@
             END IF
 
          END DO
-                     
-*  close the file 
+
+*  close the file
 
          CALL FIO_CLOSE (FD, STATUS)
 

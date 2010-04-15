@@ -16,7 +16,7 @@
 *     CALL DTASK_SET ( PATH, NAME, VALUE, MESSID, STATUS )
 
 *  Description:
-*     Sets the named task parameter to the given value. 
+*     Sets the named task parameter to the given value.
 *     Sends acknowledgment to initiating task.
 
 *  Arguments:
@@ -32,7 +32,7 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Calls the ADAM parameter system primitives, so that the user is 
+*     Calls the ADAM parameter system primitives, so that the user is
 *     not prompted for an HDS structure to put the parameter value in.
 
 *  Copyright:
@@ -131,7 +131,7 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-*   If this is a monolith, the name must include the keyword of the 
+*   If this is a monolith, the name must include the keyword of the
 *   relevant action within the monolith in the form KEY:PARNAME.
 *   If not a monolith this form is optional, any KEY part will be ignored.
 *
@@ -143,7 +143,7 @@
       CALL SUBPAR_MLITH ( MONO, STATUS )
       IF ( MONO ) THEN
 *
-*      It is a monolith 
+*      It is a monolith
 *
          IF ( COLPOS .GT. 1 ) THEN
 *
@@ -177,7 +177,7 @@
 *
       MESSTATUS = STATUS
       STATUS = SAI__OK
-      CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, SET, NAME, VALUE, 
+      CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, SET, NAME, VALUE,
      :  STATUS )
 
       END

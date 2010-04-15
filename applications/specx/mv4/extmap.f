@@ -67,7 +67,7 @@ C  have to convert R.A. and Dec. if map position angle .ne. 0 degrees.
           X2OFF = OFFSET(1)*SP + OFFSET(2)*CP
           PRINT *,'Offsets in map coordinates: ',X1OFF, X2OFF
         END IF
-        
+
       END IF
 
       CALL GET_SPECTRUM (X1OFF, X2OFF, IPOS, IFAIL)

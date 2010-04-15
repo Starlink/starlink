@@ -30,11 +30,11 @@
 *     astmapregion this map frame result
 
 *  ADAM Parameters:
-*     FRAME = LITERAL (Read) 
-*        An NDF or text file holding the Frame that describes the 
+*     FRAME = LITERAL (Read)
+*        An NDF or text file holding the Frame that describes the
 *        coordinate system in which the new Region is required. If an NDF
 *        is supplied, the current Frame will be used.
-*     MAP = LITERAL (Read) 
+*     MAP = LITERAL (Read)
 *        An NDF or text file holding the Mapping which transforms
 *        positions from the coordinate system represented by the supplied
 *	 Region to the coordinate system specified by FRAME. The supplied
@@ -46,7 +46,7 @@
 *	 as PermMap, MathMap, SphMap) can result in Mappings for which
 *	 this is not true.
 *     RESULT = LITERAL (Read)
-*        An NDF or text file to receive the new Region. 
+*        An NDF or text file to receive the new Region.
 *     THIS = LITERAL (Read)
 *        A text file holding the original Region.
 
@@ -105,26 +105,26 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a Region.
-      CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, THIS, 
+      CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, THIS,
      :                 STATUS )
 
 *  Get a Mapping.
-      CALL KPG1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, 
+      CALL KPG1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP,
      :                 STATUS )
 
 *  Get a Frame.
-      CALL KPG1_GTOBJ( 'FRAME', ' ', AST_ISAFRAME, FRAME, 
+      CALL KPG1_GTOBJ( 'FRAME', ' ', AST_ISAFRAME, FRAME,
      :                 STATUS )
 
 *  Map the Region.
-      RESULT = AST_MAPREGION( THIS, MAP, FRAME, STATUS ) 
+      RESULT = AST_MAPREGION( THIS, MAP, FRAME, STATUS )
 
 *  Write the new Region out.
       CALL ATL1_PTOBJ( 'RESULT', 'THIS', RESULT, STATUS )

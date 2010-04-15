@@ -13,16 +13,16 @@
 *     CALL POL1_SNGBM( IGRP1, IVAR, STATUS )
 
 *  Description:
-*     This routine creates a 3D NDF holding Stokes vectors calculated from 
+*     This routine creates a 3D NDF holding Stokes vectors calculated from
 *     a set of supplied 2D NDFs each holding a single-beam intensity image.
 
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
-*        A GRP identifier for the group containing the input NDF names. 
+*        A GRP identifier for the group containing the input NDF names.
 *     IVAR = INTEGER (Given)
 *        If greater than zero, output variances are requried and an error
 *        will be reported if variances cannot be created. If less than zero
-*        then output variances are not required. If zero, then output 
+*        then output variances are not required. If zero, then output
 *        variances will be created if possible, but no error is reported
 *        otherwise.
 *     STATUS = INTEGER (Given and Returned)
@@ -32,7 +32,7 @@
 *     DEZERO = _LOGICAL (Read)
 *        Perform zero point corrections?
 *     MAXIT = _INTEGER (Read)
-*        The maximum number of rejection iterations to perform. 
+*        The maximum number of rejection iterations to perform.
 *     NSIGMA = _REAL (Read)
 *        The rejection threshold for aberant points, expressed as a
 *        multiple of the standard deviation of the intensity data.
@@ -45,15 +45,15 @@
 *        Only accessed if input variances are being estimated.
 *     SMBOX = _INTEGER (Read)
 *        The size of the box to use when smoothing Stokes vectors prior to
-*        estimating the input variances (in pixels). Only accessed if input 
+*        estimating the input variances (in pixels). Only accessed if input
 *        variances are being estimated.
 *     MINFRAC = _REAL (Read)
 *        This controls how much good input data is required to form a
 *        good output pixel. It is given as a fraction in the range 0 to 1.
 *        The miminum number of good input values required to form a good
-*        output value at a particular pixel is equal to this fraction 
-*        multiplied by the number of input NDFs which have good values 
-*        for the pixel. The number is rounded to the nearest integer and 
+*        output value at a particular pixel is equal to this fraction
+*        multiplied by the number of input NDFs which have good values
+*        for the pixel. The number is rounded to the nearest integer and
 *        limited to at least 3. [0.0]
 *     TITLE = LITERAL (Read)
 *        A title for the output cube.
@@ -61,8 +61,8 @@
 *        Specifies the convergence criterion for the iterative process
 *        which estimates the input variances, and rejects bad input values.
 *        No more iterations are performed once convergence is reached, or
-*        once MAXIT iterations have been performed. If the number of pixels 
-*        rejected from any input NDF changes by more than TOLR pixels between 
+*        once MAXIT iterations have been performed. If the number of pixels
+*        rejected from any input NDF changes by more than TOLR pixels between
 *        two succesive iterations, then the process is assumed not to
 *        have converged. [0]
 *     TRIMBAD = _LOGICAL (Read)
@@ -77,28 +77,28 @@
 *
 *        2 - Use the reciprocal of the variances supplied with the
 *        input images. If an input image does not have associated variances
-*        then the weights used for that image are based on an estimate of the 
-*        variances derived from the spread of input intensity values. 
+*        then the weights used for that image are based on an estimate of the
+*        variances derived from the spread of input intensity values.
 *
 *        3 - Use the reciprocal of an estimate of the input variance
-*        derived from the spread of input intensity values. Any variances 
+*        derived from the spread of input intensity values. Any variances
 *        supplied with the input images are ignored.
 *
-*        4 - Use a constant weight of 1.0 for all input images. Any 
-*        variances supplied with the input images are ignored. 
+*        4 - Use a constant weight of 1.0 for all input images. Any
+*        variances supplied with the input images are ignored.
 
 *  Notes:
 *     -  The reference direction for the output Stokes vectors is chosen
 *     as follows: If the output cube has a WCS component containing a
 *     SkyFrame, then the direction of the positive latitude axis (i.e.
-*     north) at the centre of the field is used as the Stokes vector 
+*     north) at the centre of the field is used as the Stokes vector
 *     reference direction. If no SkyFrame is available or if the
 *     direction of north is not defined, then the positive direction of
 *     the second pixel axis (Y) is used instead. The selected reference
 *     direction is recorded in the output cube in the form of a Frame
 *     with Domain POLANAL in the WCS FrameSet. The first axis of the
 *     POLANAL Frame corresponds to the reference direction.
-*     -  An item VERSION is added to the polpack extension indicating the 
+*     -  An item VERSION is added to the polpack extension indicating the
 *     current version number of the POLPACK package.
 
 *  Copyright:
@@ -135,7 +135,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -210,7 +210,7 @@
       IPTVAR = 0
       IPNREJ = 0
       IPZERO = 0
-      IGRP2 = GRP__NOID      
+      IGRP2 = GRP__NOID
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
@@ -242,7 +242,7 @@
       CALL PSX_CALLOC( NNDF, '_INTEGER', IPNREJ, STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999     
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the number of rejection iterations to perform. If constant weights
 *  are being used for all input data, no iterations can be performed since
@@ -258,9 +258,9 @@
 *  (because its so slow to iterate), and 8 if they will be estimated from
 *  the spread of data values (since we've *GOT* to iterate to make variance
 *  estimates).
-         IF( WEIGHT .EQ. 1 ) THEN 
+         IF( WEIGHT .EQ. 1 ) THEN
             CALL PAR_DEF0I( 'MAXIT', 0, STATUS )
-         ELSE 
+         ELSE
             CALL PAR_DEF0I( 'MAXIT', 8, STATUS )
          END IF
 
@@ -280,15 +280,15 @@
 *  in all input NDFs, and the orientation of the required reference
 *  direction for the Stokes parameters.
       CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( CNF_PVAL( IPPHI ) ),
-     :                 %VAL( CNF_PVAL( IPAID ) ), 
-     :                 %VAL( CNF_PVAL( IPT ) ), 
+     :                 %VAL( CNF_PVAL( IPAID ) ),
+     :                 %VAL( CNF_PVAL( IPT ) ),
      :                 %VAL( CNF_PVAL( IPEPS ) ), IGRP2,
      :                 LBNDO, UBNDO, NDIMO, ANGROT, STATUS )
 
 *  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
 *  can only be made if we are allowed to iterate (i.e. if MAXIT is
-*  greater than zero). WSCH = 1, 2, 3 corresponds to "use NDF variances", 
+*  greater than zero). WSCH = 1, 2, 3 corresponds to "use NDF variances",
 *  "use estimated variances", and "use constant variances".
       IF( WEIGHT .EQ. 1 ) THEN
          IF( INVAR ) THEN
@@ -324,13 +324,13 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'POL1_SNGBM_ERR1', 'Output variances have '//
      :                    'been requested but cannot be produced. See'//
-     :                    ' parameters VARIANCE, WEIGHTS and TOLR.', 
+     :                    ' parameters VARIANCE, WEIGHTS and TOLR.',
      :                    STATUS )
          ELSE
             OUTVAR = .TRUE.
          END IF
 
-      ELSE IF( IVAR .EQ. 0 ) THEN      
+      ELSE IF( IVAR .EQ. 0 ) THEN
          OUTVAR = ( WSCH .LT. 3 )
 
       ELSE
@@ -344,32 +344,32 @@
       CALL NDG_NDFAS( IGRP1, 1, 'READ', INDF1, STATUS )
 
 *  Initially create the output NDF by propagation from the first input
-*  NDF. This will create a 2/3D NDF. We will convert it into a 3/4D NDF 
-*  later. Propagation from the input NDF ensures that UNITS, WCS and AXIS  
-*  (etc) information is copied from input to output. The HISTORY, LABEL and 
+*  NDF. This will create a 2/3D NDF. We will convert it into a 3/4D NDF
+*  later. Propagation from the input NDF ensures that UNITS, WCS and AXIS
+*  (etc) information is copied from input to output. The HISTORY, LABEL and
 *  TITLE components (but no extensions) are also propagated.
       CALL NDF_PROP( INDF1, 'UNITS,WCS,AXIS,'//
-     :               'NOEXT(FITS,CCDPACK,POLPACK)', 'OUT', INDFO, 
+     :               'NOEXT(FITS,CCDPACK,POLPACK)', 'OUT', INDFO,
      :               STATUS )
 
 *  Set the LABEL component for the output.
-      CALL NDF_CPUT( 'Stokes parameters (I, Q, U)', INDFO, 'LABEL', 
+      CALL NDF_CPUT( 'Stokes parameters (I, Q, U)', INDFO, 'LABEL',
      :               STATUS )
 
 *  Set the default TITLE component for the output, and then ask the user for a
 *  new title.
-      CALL NDF_CPUT( 'Output from POLCAL: Linear polarimetry', INDFO, 
+      CALL NDF_CPUT( 'Output from POLCAL: Linear polarimetry', INDFO,
      :               'TITLE', STATUS )
       CALL NDF_CINP( 'TITLE', INDFO, 'TITLE', STATUS )
 
 *  Make the output NDF 3/4 dimensional and set the required bounds.
-      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
+      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS )
 
-*  Remove the existing POLPACK extension in the output NDF and create a 
+*  Remove the existing POLPACK extension in the output NDF and create a
 *  new one.
       CALL NDF_XDEL( INDFO, 'POLPACK', STATUS )
-      CALL NDF_XNEW( INDFO, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS ) 
-	
+      CALL NDF_XNEW( INDFO, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
+
 *  Store the current POLPACK version string in the POLPACK extension.
       CALL POL1_PTVRS( INDFO, STATUS )
 
@@ -377,7 +377,7 @@
       CALL KPG1_GTWCS( INDFO, IWCS, STATUS )
 
 *  Add a Frame with Domain POLANAL to the WCS FrameSet (any existing
-*  POLANAL Frameis first deleted). The first axis of this Frame defines 
+*  POLANAL Frameis first deleted). The first axis of this Frame defines
 *  the reference direction.
       CALL POL1_PTANG( ANGROT, IWCS, STATUS )
 
@@ -390,16 +390,16 @@
 
 *  Store the STOKES value which indicates what each "plane" of the "cube"
 *  contains.
-      CALL NDF_XPT0C( 'IQU', INDFO, 'POLPACK', 'STOKES', STATUS ) 
+      CALL NDF_XPT0C( 'IQU', INDFO, 'POLPACK', 'STOKES', STATUS )
 
-*  If VARIANCES are being produced, create a 2/3D NDF within the POLPACK 
+*  If VARIANCES are being produced, create a 2/3D NDF within the POLPACK
 *  extension to hold the QU co-variance. This NDF has the same shape, size
-*  and type as the base NDF (except that it is 2/3D instead of 3/4D). 
+*  and type as the base NDF (except that it is 2/3D instead of 3/4D).
       IF( OUTVAR ) THEN
 
 *  Create a _REAL 2/3D NDF with the bounds of a plane in the 3/4D NDF.
-         CALL NDF_PLACE( XLOC, 'COVAR', PLACE, STATUS ) 
-         CALL NDF_NEW( '_REAL', NDIMO - 1, LBNDO, UBNDO, PLACE, INDFC, 
+         CALL NDF_PLACE( XLOC, 'COVAR', PLACE, STATUS )
+         CALL NDF_NEW( '_REAL', NDIMO - 1, LBNDO, UBNDO, PLACE, INDFC,
      :                 STATUS )
       ELSE
          INDFC = NDF__NOID
@@ -419,19 +419,19 @@
          NSIGMA = MAX( 0.0, NSIGMA )
 
 *  Also get the minimum fraction of good input values required.
-         CALL PAR_GDR0R( 'MINFRAC', 0.0, 0.0, 1.0, .FALSE., MNFRAC, 
+         CALL PAR_GDR0R( 'MINFRAC', 0.0, 0.0, 1.0, .FALSE., MNFRAC,
      :                   STATUS )
 
       END IF
 
-*  Get the size of the box to use when smoothing Stokes vectors prior to 
+*  Get the size of the box to use when smoothing Stokes vectors prior to
 *  estimating input variances. Also see if the estimated variances should
-*  be stored in the input NDFs. 
+*  be stored in the input NDFs.
       IF( WSCH .EQ. 2 ) THEN
          CALL PAR_GET0I( 'SMBOX', SMBOX, STATUS )
          SMBOX = MAX( 0, SMBOX )
 
-*  Also see if the estimated variances should be stored in the input NDFs. 
+*  Also see if the estimated variances should be stored in the input NDFs.
          CALL PAR_GET0L( 'SETVAR', SETVAR, STATUS )
 
 *  Also see if zero point corrections should be applied to the input
@@ -447,16 +447,16 @@
 *  See if we should trim any bad margins from the output NDF.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
 
-*  Calculate the I,Q,U values.        
-      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, 
+*  Calculate the I,Q,U values.
+      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR,
      :                 %VAL( CNF_PVAL( IPPHI ) ),
-     :                 %VAL( CNF_PVAL( IPAID ) ), 
-     :                 %VAL( CNF_PVAL( IPT ) ), 
+     :                 %VAL( CNF_PVAL( IPAID ) ),
+     :                 %VAL( CNF_PVAL( IPT ) ),
      :                 %VAL( CNF_PVAL( IPEPS ) ),
-     :                 %VAL( CNF_PVAL( IPTVAR ) ), 
+     :                 %VAL( CNF_PVAL( IPTVAR ) ),
      :                 %VAL( CNF_PVAL( IPNREJ ) ), IGRP2, TOL,
      :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA,
-     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, 
+     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO,
      :                 %VAL( CNF_PVAL( IPZERO ) ),
      :                 STATUS )
 

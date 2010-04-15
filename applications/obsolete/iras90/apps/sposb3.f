@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SPOSB3( GOTSKY, INVER, SCS, IDA, LOGING, FD, TITLE, A, B, X, 
+*     CALL SPOSB3( GOTSKY, INVER, SCS, IDA, LOGING, FD, TITLE, A, B, X,
 *                  Y, STATUS )
 
 *  Description:
@@ -40,7 +40,7 @@
 *     FD = INTEGER (Given)
 *        An FIO identifier for the log file. Ignored if LOGING is false.
 *     TITLE = LOGICAL (Given and Returned)
-*        If true then a title is displayed for each column. TITLE is 
+*        If true then a title is displayed for each column. TITLE is
 *        always returned false.
 *     A = DOUBLE PRECISION (Given and Returned)
 *        The longitude of the position, either given or returned
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,7 +143,7 @@
 
 *  First deal with cases where the supplied positions are specified by
 *  sky coordinates.
-      IF( GOTSKY ) THEN      
+      IF( GOTSKY ) THEN
 
 *  Initialise the returned image coordnates.
          X = VAL__BADR
@@ -157,14 +157,14 @@
 
 *  Now check for bad image coordinates. This may happen if the supplied
 *  sky coordinates refer to a position on the wrong side of the sky,
-*  for instance. 
+*  for instance.
          IF( XX .EQ. VAL__BADD .OR. YY .EQ. VAL__BADD ) THEN
             CALL MSG_SETC( 'A', ATEXT )
             CALL MSG_SETC( 'B', BTEXT )
             CALL MSG_OUTIF( MSG__NORM, 'SPOSB3_MSG1',
      :           '    Supplied position (^A, ^B) cannot be transformed',
      :                      STATUS )
-                     
+
 *  Now check for image coordinates greater than 9999.9 These cannot be
 *  fitted into the used field width.
          ELSE IF( ABS( XX ) .GT. 9999.9 ) THEN
@@ -194,7 +194,7 @@
 
 *  Now deal with cases where the supplied coordinates are image
 *  coordinates.
-      ELSE 
+      ELSE
 
 *  Initialise the returned sky coordinates.
          A = VAL__BADD
@@ -225,7 +225,7 @@
 *  Now transform them.
             CALL IRA_TRANS( 1, XX, YY, .TRUE., SCS, IDA, A, B, STATUS )
 
-*  Now check for bad sky coordinates. 
+*  Now check for bad sky coordinates.
             IF( A .EQ. VAL__BADD .OR. A .EQ. VAL__BADD ) THEN
                CALL MSG_OUTIF( MSG__NORM, 'SPOSB3_MSG6',
      :          '    Image coordinates (^XX,^YY) cannot be transformed',
@@ -248,12 +248,12 @@
       END IF
 
 *  If the coordinates can be displayed...
-      IF( OK ) THEN      
+      IF( OK ) THEN
 
 *  Display a title if requested.
          IF( TITLE ) THEN
 
-*  Get abbreviations for the the names of the longitude and latitude 
+*  Get abbreviations for the the names of the longitude and latitude
 *  in the sky coordinate system.
             CALL IRA_SCNAM( SCS, 1, DESCR, LD, AABB, LAA, STATUS )
             CALL IRA_SCNAM( SCS, 2, DESCR, LD, BABB, LBA, STATUS )
@@ -287,7 +287,7 @@
 *  Write it to the log file if required, placing a comment character (#)
 *  in the first column.
             IF( LOGING ) THEN
-               BUF( 1 : 1 ) = '#'   
+               BUF( 1 : 1 ) = '#'
                CALL FIO_WRITE( FD, BUF( : MIN( 80, BLEN ) ),  STATUS )
                CALL FIO_WRITE( FD, ' ',  STATUS )
             END IF
@@ -300,10 +300,10 @@
 *  Initialise the output buffer, to overwrite any previous contents.
          BUF = ' '
 
-*  Construct a buffer containing the text. The transformed coordinates 
-*  are put first, and the input coordinates are appended as an end of 
-*  line comment, so that the log file conforms to the format required 
-*  for input files to SKYPOS. 
+*  Construct a buffer containing the text. The transformed coordinates
+*  are put first, and the input coordinates are appended as an end of
+*  line comment, so that the log file conforms to the format required
+*  for input files to SKYPOS.
          IF( .NOT. INVER ) THEN
 
             TLEN = CHR_LEN( ATEXT )
@@ -337,7 +337,7 @@
          CALL MSG_OUTIF( MSG__NORM, 'SPOSB3_MSG9', BUF, STATUS )
 
 *  If required write the buffer to the log file.
-         IF( LOGING ) CALL FIO_WRITE( FD, BUF( : MIN( 80, BLEN ) ),  
+         IF( LOGING ) CALL FIO_WRITE( FD, BUF( : MIN( 80, BLEN ) ),
      :                                STATUS )
 
       END IF

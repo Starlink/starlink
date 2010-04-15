@@ -1,11 +1,11 @@
- 
+
        SUBROUTINE GSERMODE (GAMSER, A, X, GLN, OK)
        LOGICAL OK
        CHARACTER*1 BLEEP
        COMMON /BLEEP / BLEEP
- 
+
        PARAMETER (ITMAX=100,EPS=3.E-7)
- 
+
        GLN = GAMMLN(A)
        IF (X.EQ.0.) THEN
           GAMSER = 0.

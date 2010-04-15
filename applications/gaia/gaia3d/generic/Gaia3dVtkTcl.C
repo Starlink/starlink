@@ -93,9 +93,9 @@ static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
 static int Gaia3dVtkColourMap( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 
-static int Gaia3dVtkAstSetPolyDataFilterTransform( ClientData clientData, 
+static int Gaia3dVtkAstSetPolyDataFilterTransform( ClientData clientData,
                                                    Tcl_Interp *interp,
-                                                   int objc, 
+                                                   int objc,
                                                    Tcl_Obj *CONST objv[] );
 
 /**
@@ -116,7 +116,7 @@ int Gaia3dVtk_Init( Tcl_Interp *interp )
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gvtk::astsetpolydatafiltertransform",
-                          Gaia3dVtkAstSetPolyDataFilterTransform, 
+                          Gaia3dVtkAstSetPolyDataFilterTransform,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gvtk::createmask", Gaia3dVtkCreateMask,
@@ -131,12 +131,12 @@ int Gaia3dVtk_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gvtk::grfinit", Gaia3dVtkGrfInit,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gvtk::grffreecontext", 
-                          Gaia3dVtkGrfFreeContext, (ClientData) NULL, 
+    Tcl_CreateObjCommand( interp, "gvtk::grffreecontext",
+                          Gaia3dVtkGrfFreeContext, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gvtk::grfsetcontext", 
-                          Gaia3dVtkGrfSetContext, (ClientData) NULL, 
+    Tcl_CreateObjCommand( interp, "gvtk::grfsetcontext",
+                          Gaia3dVtkGrfSetContext, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gvtk::setarray", Gaia3dVtkSetArray,
@@ -184,14 +184,14 @@ static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
 
         /* Get the vtkImageImport object */
         ClientData cd = cmdInfo.clientData;
-        vtkImageImport *vii = 
+        vtkImageImport *vii =
             (vtkImageImport *)(((vtkTclCommandArgStruct *)cd)->Pointer);
 
         /* Get the dimensions. */
         int dims[3];
         Tcl_Obj **dimObjv;
         int ndims;
-        if ( Tcl_ListObjGetElements( interp, objv[3], &ndims, &dimObjv ) != 
+        if ( Tcl_ListObjGetElements( interp, objv[3], &ndims, &dimObjv ) !=
              TCL_OK) {
             return TCL_ERROR;
         }
@@ -203,7 +203,7 @@ static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
 
         /* See if a section of the data is required. */
         int nvals;
-        if ( Tcl_ListObjGetElements( interp, objv[4], &nvals, &dimObjv ) != 
+        if ( Tcl_ListObjGetElements( interp, objv[4], &nvals, &dimObjv ) !=
              TCL_OK) {
             return TCL_ERROR;
         }
@@ -211,11 +211,11 @@ static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
         int ubnd[3];
         if ( nvals > 1 ) {
             for ( int i = 0, j = 0; i < 3; i++, j += 2  ) {
-                if ( Tcl_GetIntFromObj( interp, dimObjv[j], &lbnd[i] ) 
+                if ( Tcl_GetIntFromObj( interp, dimObjv[j], &lbnd[i] )
                      != TCL_OK ) {
                     return TCL_ERROR;
                 }
-                if ( Tcl_GetIntFromObj( interp, dimObjv[j+1], &ubnd[i] ) 
+                if ( Tcl_GetIntFromObj( interp, dimObjv[j+1], &ubnd[i] )
                      != TCL_OK) {
                     return TCL_ERROR;
                 }
@@ -239,12 +239,12 @@ static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
         int nobad = 0;
         int savemem = 0;
         if ( nvals > 1 ) {
-            gaiaArrayRawCubeFromCube( arrayInfo, dims, lbnd, ubnd, 
+            gaiaArrayRawCubeFromCube( arrayInfo, dims, lbnd, ubnd,
                                       &currentInfo, GAIA_ARRAY_NEW );
         }
         gaiaArrayNormalisedFromArray( currentInfo, &normInfo, nullcheck,
                                       nullvalue, GAIA_ARRAY_NEW, &nobad );
-            
+
         /* If new memory was allocated need to handle it */
         if ( normInfo == NULL ) {
             normInfo = currentInfo;
@@ -396,7 +396,7 @@ static int Gaia3dVtkGrfInit( ClientData clientData, Tcl_Interp *interp,
 
     /* Do initialisation of the GRF3D interface. */
     void *gc = Grf3dVtk_Init( vtkr, 0 );
-    
+
     /* Export the graphics context. */
     Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) gc ) );
     return TCL_OK;
@@ -405,7 +405,7 @@ static int Gaia3dVtkGrfInit( ClientData clientData, Tcl_Interp *interp,
 /**
  *  Add a new VTK colour to the standard colourmap used by the GRF interface.
  *
- *  Four arguments are required, the index to insert the colour at (can 
+ *  Four arguments are required, the index to insert the colour at (can
  *  overwrite the standard set, but that shouldn't normally be done) and
  *  the VTK RGB values.
  */
@@ -431,7 +431,7 @@ static int Gaia3dVtkGrfAddColour( ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
     }
-    
+
     /* Add colour, but make sure we're initialised first. */
     Grf3dVtk_InitColours();
     Grf3dVtk_AddColour( index, colour[0], colour[1], colour[2] );
@@ -600,7 +600,7 @@ static int Gaia3dVtkAstGrid( ClientData clientData, Tcl_Interp *interp,
         astSet( plot, Tcl_GetString( objv[3] ) );
         if ( ! astOK ) {
             char buf[1024];
-            sprintf( buf, "Failed to apply AST attributes to plot: %s", 
+            sprintf( buf, "Failed to apply AST attributes to plot: %s",
                      Tcl_GetString( objv[3] ) );
             Tcl_SetResult( interp, buf, TCL_VOLATILE );
             return TCL_ERROR;
@@ -815,9 +815,9 @@ static int Gaia3dVtkColourMap( ClientData clientData, Tcl_Interp *interp,
  * vtkAstTransform as a Tcl Command, which would require working out how to
  * integrate that into VTK (easy when building VTK from scratch).
  */
-static int Gaia3dVtkAstSetPolyDataFilterTransform( ClientData clientData, 
+static int Gaia3dVtkAstSetPolyDataFilterTransform( ClientData clientData,
                                                    Tcl_Interp *interp,
-                                                   int objc, 
+                                                   int objc,
                                                    Tcl_Obj *CONST objv[] )
 {
     /* Check arguments. Need a vtkTransformPolyDataFilter and an AST mapping.*/

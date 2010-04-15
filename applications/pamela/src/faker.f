@@ -7,11 +7,11 @@
 *
 * Parameters:
 *
-* TEMPLATE  -- ASCII file specifying frame format. 
+* TEMPLATE  -- ASCII file specifying frame format.
 *
 * SEED      -- Seed integer for random number generator.
 *
-* OUTPUT    -- The image file to create 
+* OUTPUT    -- The image file to create
 *
 * Here is an example template file (the comments should be removed
 * however)
@@ -28,16 +28,16 @@
 * 20. 10            ! Continuum of sky, number of lines
 * 2.5 3             ! FWHM of sky lines, number of coeffs
 * 20. 100. 400. 400. 300. 50. 60. 350. 600. 100. ! Counts/col of lines
-* 10. 1. 1.         ! Poly coeffs of line 1 
-* 30. 1. 1.         ! Poly coeffs of line 2 
-* 60. 1. 1.         ! Poly coeffs of line 3 
-* 90. 1. 1.         ! Poly coeffs of line 4 
-* 150. 1. 1.        ! Poly coeffs of line 5 
-* 180. 1. 1.        ! Poly coeffs of line 6 
-* 220. 1. 1.        ! Poly coeffs of line 7 
-* 340. 1. 1.        ! Poly coeffs of line 8 
+* 10. 1. 1.         ! Poly coeffs of line 1
+* 30. 1. 1.         ! Poly coeffs of line 2
+* 60. 1. 1.         ! Poly coeffs of line 3
+* 90. 1. 1.         ! Poly coeffs of line 4
+* 150. 1. 1.        ! Poly coeffs of line 5
+* 180. 1. 1.        ! Poly coeffs of line 6
+* 220. 1. 1.        ! Poly coeffs of line 7
+* 340. 1. 1.        ! Poly coeffs of line 8
 * 390. 1. 1.        ! Poly coeffs of line 9
-* 410. 1. 1.        ! Poly coeffs of line 10 
+* 410. 1. 1.        ! Poly coeffs of line 10
 * 200 5000.         ! Number of cosmic rays, number of counts/ray
 *
 * History: adapted to NDF 13/01/1998 by TRM
@@ -64,7 +64,7 @@ C
       CHARACTER*32 OBJECT
       CHARACTER*128 TEMPLATE
       CHARACTER*(DAT__SZLOC) LOC
-C 
+C
       INTEGER OUTPUT, OPTR, EL, I, J, LUNIT
       DATA LUNIT/31/
 C
@@ -209,12 +209,12 @@ C
            CALL ERR_REP(' ','Failed to read SFWHM, NSKYPOLY',
      &          STATUS)
            CLOSE(LUNIT)
-           RETURN      
+           RETURN
         ELSE IF(NSKYPOLY.LT.1 .OR. NSKYPOLY.GT.MAXPOLY) THEN
            STATUS = SAI__ERROR
            CALL ERR_REP(' ','NSKYPOLY out of range',STATUS)
            CLOSE(LUNIT)
-           RETURN      
+           RETURN
         END IF
         CALL MSG_SETR('SFWHM',SFWHM)
         CALL MSG_SETI('NSKYPOLY',NSKYPOLY)
@@ -226,7 +226,7 @@ C
            CALL ERR_REP(' ',
      &          'Failed to read sky intensities', STATUS)
            CLOSE(LUNIT)
-           RETURN      
+           RETURN
         END IF
         DO J=1, NSKYLINES
            IF(SKYINT(J).LT.0.) THEN
@@ -245,7 +245,7 @@ C
              CALL ERR_REP(' ',
      &            'Failed to read sky polys', STATUS)
              CLOSE(LUNIT)
-             RETURN      
+             RETURN
           END IF
         END DO
       END IF
@@ -256,7 +256,7 @@ C
          CALL ERR_REP(' ',
      &        'Failed to read NCOSRAYS, COSINT', STATUS)
          CLOSE(LUNIT)
-         RETURN      
+         RETURN
       END IF
       CALL MSG_SETI('NCOSRAYS',NCOSRAYS)
       CALL MSG_SETR('COSINT',COSINT)
@@ -302,7 +302,7 @@ C
      &NOBJPOLY,OBJPOLY,OBJFWHM,OBJCOUNTS,NSKYLINES,SKYPOLY,
      &NSKYPOLY,SKYINT,SKYFWHM,NCOSRAYS,COSINT,NSEED,MAXOBJ,
      &MAXSKY,MAXPOLY,STATUS)
-* 
+*
 * Routine to fake data
 *
       IMPLICIT NONE
@@ -316,14 +316,14 @@ C
       REAL DEVIATION, SIGMA, PEAKXPOS, PEAKYPOS
       REAL RAN2, GAUSS2
       DOUBLE PRECISION OBJPOLY(MAXPOLY,MAXOBJ)
-      DOUBLE PRECISION SKYPOLY(MAXPOLY,MAXSKY) 
+      DOUBLE PRECISION SKYPOLY(MAXPOLY,MAXSKY)
       DOUBLE PRECISION AREA, OBJVAL, SKYVAL
       DOUBLE PRECISION POLY, Z
 C
       IF(STATUS.NE.SAI__OK) RETURN
 C
 C Set background level to 'sky'
-C      
+C
       DO J = 1, NY
          DO I = 1, NX
             DATA(I,J) = SKY

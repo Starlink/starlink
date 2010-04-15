@@ -7,7 +7,7 @@
 *    ARD Installation test program
 
 *  Copyright:
-*     Copyright (C) 1995-2005 Central Laboratory of the 
+*     Copyright (C) 1995-2005 Central Laboratory of the
 *     Research Councils. All Rights Reserved.
 
 *  Licence:
@@ -15,12 +15,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -42,9 +42,9 @@
 
       INTEGER NDIM
       PARAMETER ( NDIM = 2 )
- 
-      INTEGER I, J, LBND( NDIM ), UBND( NDIM ), LBNDE( NDIM ), 
-     :        UBNDE( NDIM ), LBNDI( NDIM ), UBNDI( NDIM ), 
+
+      INTEGER I, J, LBND( NDIM ), UBND( NDIM ), LBNDE( NDIM ),
+     :        UBNDE( NDIM ), LBNDI( NDIM ), UBNDI( NDIM ),
      :        IP, EL, IGRP, STATUS, INDEX
       REAL C( 1 )
       LOGICAL FLAG
@@ -69,13 +69,13 @@
 
 *  Store the ARD description.
       IGRP = GRP__NOID
-      CALL ARD_GRPEX( 'CIR(0,0,20)OFF(10,0)CIR(0,0,20)', GRP__NOID, 
+      CALL ARD_GRPEX( 'CIR(0,0,20)OFF(10,0)CIR(0,0,20)', GRP__NOID,
      :                IGRP, FLAG, STATUS )
 
 *  Create the mask.
       INDEX = 2
-      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, C, .FALSE., INDEX, 
-     :               %VAL( CNF_PVAL( IP ) ), 
+      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, C, .FALSE., INDEX,
+     :               %VAL( CNF_PVAL( IP ) ),
      :               LBNDI, UBNDI, LBNDE, UBNDE, STATUS )
 
 *  Check the returned index is corect.
@@ -92,28 +92,28 @@
 *  If the test has failed, display the bounding boxes.
          WRITE(*,*) 'ARD installation test failed...'
          WRITE(*,*) 'Internal bounding box:'
-   
+
          IF( LBNDI(1) .GT. UBNDI(1) ) THEN
             WRITE(*,*) '... null'
-   
-         ELSE      
+
+         ELSE
             DO I = 1, NDIM
                WRITE(*,*) I,'; ',LBNDI(I),':',UBNDI(I)
             END DO
-   
+
          END IF
-   
+
          WRITE(*,*)
          WRITE(*,*) 'External bounding box:'
-   
+
          IF( LBNDE(1) .GT. UBNDE(1) ) THEN
             WRITE(*,*) '... null'
-   
-         ELSE      
+
+         ELSE
             DO I = 1, NDIM
                WRITE(*,*) I,'; ',LBNDE(I),':',UBNDE(I)
             END DO
-   
+
          END IF
 
 * Otherwise, indicate that the test has been passed.
@@ -121,7 +121,7 @@
          WRITE(*,*) 'ARD installation test succeeded'
 
       END IF
-      
+
 *  Delete the GRP group.
       CALL GRP_DELET( IGRP, STATUS )
 

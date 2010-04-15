@@ -1,7 +1,7 @@
 *+  RED4_MAKE_GRPREDFILE - Create a reduced group file for a particular group
       SUBROUTINE RED4_MAKE_GRPREDFILE( OBSRED, GRPRED, STATUS )
 *    Description :
-*     This routine creates a container file into which all the 
+*     This routine creates a container file into which all the
 *     observations obtained for a particular group will be co-added.
 *     The file is based on the structure of a reduced observation, and
 *     a reduced observation file is therefore used as a template.
@@ -9,26 +9,26 @@
 *     CALL RED4_MAKE_GRPREDFILE( OBSRED, GRPRED, STATUS )
 *    Parameters :
 *     OBSRED   = CHARACTER*(*)( READ )
-*           The name of the reduced observation file to be used as a 
+*           The name of the reduced observation file to be used as a
 *           template.
 *     GRPRED   = CHARACTER*(*)( READ )
 *           The name of the reduced group file to be created.
 *     STATUS   = INTEGER( UPDATE )
 *           Global ADAM status. This must be ADAM__OK on entry, or the
-*           routine will not execute. It will be returned ADAM__OK if 
-*           the routine is successful. Otherwise it will contain an 
+*           routine will not execute. It will be returned ADAM__OK if
+*           the routine is successful. Otherwise it will contain an
 *           error status.
 *    Method :
 *    Deficiencies :
 *     DSA status values no not follow the usual ADAM scheme.
 *
 *     This routine, and all the other routines in RED4 which use GEN_FILL
-*     to initialise an array to zero, assumes that the host computer 
+*     to initialise an array to zero, assumes that the host computer
 *     stores a zero floating point number with all 4 bytes zero.
 *
 *     I have tried to stick to naming conventions which are consistent
 *     with those used in the rest of the RED4 task. Hence the variable
-*     for a reduced group file is called GRPRED (and not REDGRPFILE, 
+*     for a reduced group file is called GRPRED (and not REDGRPFILE,
 *     which is what I would have preferred).
 *    Bugs :
 *    Authors :
@@ -124,14 +124,14 @@
       CALL DSA_NAMED_INPUT( 'OBSRED', OBSRED, STATUS )
 
 *   Create the reduced group file, using the reduced observation file
-*   as a template. The flags given to DSA_NAMED_OUTPUT will ensure 
-*   that it will copy data and axis arrays, and that if a structure 
+*   as a template. The flags given to DSA_NAMED_OUTPUT will ensure
+*   that it will copy data and axis arrays, and that if a structure
 *   of the same name already exists a new one will be created. Using
 *   a template in this way will automatically ensure that the data
 *   arrays and axis structures in the reduced group file are the
 *   same. The header items in the FITS structure may not be
 *   appropriate at this point, but they will be replaced when the
-*   first OBJECT observation is co-added. 
+*   first OBJECT observation is co-added.
       CALL DSA_NAMED_OUTPUT( 'GRPRED', GRPRED, 'OBSRED', 0, 1, STATUS )
 
 *   Define some structures
@@ -139,7 +139,7 @@
       COADDED_INTS = 'GRPRED.MORE.CGS4_COADDS.COADDED_INTS'
       COADDED_OBS  = 'GRPRED.MORE.CGS4_COADDS.COADDED_OBS'
 
-*   Now delete the COADDED_INTS structure and create an empty 
+*   Now delete the COADDED_INTS structure and create an empty
 *   COADDED_OBS structure of type 'COADDS_LIST'.
       CALL RED4_DELETE_STRUCTURE( COADDED_INTS, STATUS )
       CALL RED4_CREATE_STRUCTURE( COADDED_OBS, 'COADDS_LIST', STATUS )
@@ -166,8 +166,8 @@
 *   CHAR_ARRAY(1), are not changed.
 *   (Note that, as DSA_GET_DATA_INFO is a general purpose routine,
 *   dummy arguments are needed to take the place of values we don't
-*   need or don't want to change). 
-      CALL DSA_GET_DATA_INFO( 'GRPRED', NINFO, CHAR_ARRAY, 0, 
+*   need or don't want to change).
+      CALL DSA_GET_DATA_INFO( 'GRPRED', NINFO, CHAR_ARRAY, 0,
      :  DIGNORE, STATUS )
 
 *   (Replace 'SKY' by 'OBJECT' if necessary, and copy the result
@@ -180,15 +180,15 @@
 
          IF ( SKYPOS .GT. 1 ) THEN
 
-            CALL CHR_PUTC( CHAR_ARRAY(2)(1:SKYPOS-1), 
-     :        NEWLABEL, CPOS ) 
+            CALL CHR_PUTC( CHAR_ARRAY(2)(1:SKYPOS-1),
+     :        NEWLABEL, CPOS )
          END IF
 
          CALL CHR_PUTC( 'OBJECT', NEWLABEL, CPOS )
 
          IF ( SKYPOS+3 .LE. CLEN ) THEN
 
-            CALL CHR_PUTC( CHAR_ARRAY(2)(SKYPOS+3:CLEN), 
+            CALL CHR_PUTC( CHAR_ARRAY(2)(SKYPOS+3:CLEN),
      :        NEWLABEL, CPOS )
          END IF
 
@@ -204,7 +204,7 @@
       CALL CHR_PUTC( ')', NEWLABEL, CPOS )
 
       CHAR_ARRAY(2) = NEWLABEL(1:CPOS)
-      CALL DSA_SET_DATA_INFO( 'GRPRED', NINFO, CHAR_ARRAY, 0, 0.0D0, 
+      CALL DSA_SET_DATA_INFO( 'GRPRED', NINFO, CHAR_ARRAY, 0, 0.0D0,
      :   STATUS )
 
 *   Check everything has worked so far
@@ -217,7 +217,7 @@
          SHORTSIZE = DSA_TYPESIZE( 'SHORT', STATUS )
 
 *      Determine the size of the data array in the reduced group file.
-         CALL DSA_DATA_SIZE( 'GRPRED', RMAXDIM, NDIM, DIMS, NELM, 
+         CALL DSA_DATA_SIZE( 'GRPRED', RMAXDIM, NDIM, DIMS, NELM,
      :     STATUS )
 
 *      Indicate to DSA that a data quality array will be used to
@@ -225,29 +225,29 @@
          CALL DSA_USE_QUALITY( 'GRPRED', STATUS )
 
 *      Map the data array for write access as floating point numbers.
-         CALL DSA_MAP_DATA( 'GRPRED', 'WRITE', 'FLOAT', DATA_PTR, 
+         CALL DSA_MAP_DATA( 'GRPRED', 'WRITE', 'FLOAT', DATA_PTR,
      :     DATA_SLOT, STATUS )
 
 *      Map the variance array for write access as floating point numbers.
-         CALL DSA_MAP_VARIANCE( 'GRPRED', 'WRITE', 'FLOAT', VAR_PTR, 
+         CALL DSA_MAP_VARIANCE( 'GRPRED', 'WRITE', 'FLOAT', VAR_PTR,
      :     VAR_SLOT, STATUS )
 
 *      Map the quality array for write access as byte values
-         CALL DSA_MAP_QUALITY( 'GRPRED', 'WRITE', 'BYTE', QUAL_PTR, 
+         CALL DSA_MAP_QUALITY( 'GRPRED', 'WRITE', 'BYTE', QUAL_PTR,
      :     QUAL_SLOT, STATUS )
 
 *      Check the mapping of these arrays has been successful.
          IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *         Fill the data and variance arrays with zeros, and fill the
-*         quality array with "bad" values. 
-            IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+*         quality array with "bad" values.
+            IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :        'Initialising reduced group data array', STATUS )
             CALL GEN_FILL( FLOATSIZE*NELM, 0.0, %val(DATA_PTR) )
-            IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+            IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :        'Initialising reduced group variance array', STATUS )
             CALL GEN_FILL( FLOATSIZE*NELM, 0.0, %val(VAR_PTR) )
-            IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+            IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :        'Initialising reduced group quality array', STATUS )
             CALL GEN_FILL( BYTESIZE*NELM, BAD, %val(QUAL_PTR) )
 
@@ -255,17 +255,17 @@
 *         The name of this structure is constructed by appending
 *         '.MORE.CGS4_COADDS' to the name of the reduced group structure.
             CLEN = MAX( 1, CHR_LEN( GRPRED ) )
-            CALL DSA_NAMED_INPUT( 'COADDS', 
+            CALL DSA_NAMED_INPUT( 'COADDS',
      :        GRPRED(1:CLEN)//'.MORE.CGS4_COADDS', STATUS )
 
 *         Make sure the data array in this structure is the same size
 *         and shape as the main data array, and is of WORD type.
-            CALL DSA_COERCE_DATA_ARRAY( 'COADDS', 'SHORT', NDIM, 
+            CALL DSA_COERCE_DATA_ARRAY( 'COADDS', 'SHORT', NDIM,
      :        DIMS, STATUS )
 
 *         Map the COADDS array for write access as SHORT (i.e. 2-byte
 *         integer) values.
-            CALL DSA_MAP_DATA( 'COADDS', 'WRITE', 'SHORT', ADDRESS, 
+            CALL DSA_MAP_DATA( 'COADDS', 'WRITE', 'SHORT', ADDRESS,
      :        COADDS_SLOT, STATUS )
             COADDS_PTR = ADDRESS
 
@@ -273,7 +273,7 @@
             IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *            Fill the COADDS array with zeros.
-               CALL GEN_FILL( SHORTSIZE*NELM, 0, %val(COADDS_PTR) ) 
+               CALL GEN_FILL( SHORTSIZE*NELM, 0, %val(COADDS_PTR) )
 
 *            If everything has worked, initialise the last observation
 *            record and observation counter for the sky background
@@ -305,7 +305,7 @@
 
 *   Close DSA and tidy up, regardless of whether an error has occurred.
 *   This routine will unmap all the mapped arrays and close any open
-*   data structures. 
+*   data structures.
       CALL DSA_CLOSE( STATUS )
 
       IF ( VERBOSE .AND. STATUS.EQ.SAI__OK ) THEN

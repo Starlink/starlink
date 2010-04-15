@@ -1,5 +1,5 @@
 *+  GEN_NORMFE - Normalise an array at a given element
-      SUBROUTINE GEN_NORMFE( NELM, REF, DATA, VAR, QUAL, QUALITY, 
+      SUBROUTINE GEN_NORMFE( NELM, REF, DATA, VAR, QUAL, QUALITY,
      :  FLAGGED, FBAD, VARIANCE )
 *    Description :
 *     This routine normalises a given real array so that the value at
@@ -9,7 +9,7 @@
 *     be a bad value, the nearest good value will be chosen. The actual
 *     element used will be returned in REF.
 *    Invocation :
-*     CALL GEN_NORMFE( NELM, REF, DATA, VAR, QUAL, QUALITY, FLAGGED, 
+*     CALL GEN_NORMFE( NELM, REF, DATA, VAR, QUAL, QUALITY, FLAGGED,
 *     :  FBAD, VARIANCE )
 *    Parameters :
 *     NELM            = INTEGER( READ )
@@ -85,7 +85,7 @@
 *      Quality handling is by means of a quality array.
 
 *      Obtain the data value at the reference element, and use this as
-*      the scaling factor. (If the reference element happens to be a bad 
+*      the scaling factor. (If the reference element happens to be a bad
 *      point, use the next nearest good point).
 
          FACTOR = DATA(REF)
@@ -105,7 +105,7 @@
 
             FACTORSQ = FACTOR * FACTOR
 
-*         Scale the data array accordingly, and the variance array as 
+*         Scale the data array accordingly, and the variance array as
 *         well if there is one (ignoring bad values).
 
             DO I = 1, NELM
@@ -127,7 +127,7 @@
 *      Quality handling is by means of a flagged values.
 
 *      Obtain the data value at the reference element, and use this as
-*      the scaling factor. (If the reference element happens to be a bad 
+*      the scaling factor. (If the reference element happens to be a bad
 *      point, use the next nearest good point).
 
          FACTOR = DATA(REF)
@@ -146,7 +146,7 @@
 
             FACTORSQ = FACTOR * FACTOR
 
-*         Scale the data array accordingly, and the variance array as 
+*         Scale the data array accordingly, and the variance array as
 *         well if there is one (ignoring bad values).
 
             DO I = 1, NELM
@@ -167,7 +167,7 @@
 *      There is no quality information.
 
 *      Obtain the data value at the reference element, and use this as
-*      the scaling factor. 
+*      the scaling factor.
 
          FACTOR = DATA(REF)
 
@@ -179,7 +179,7 @@
 
             FACTORSQ = FACTOR * FACTOR
 
-*         Scale the data array accordingly, and the variance array as 
+*         Scale the data array accordingly, and the variance array as
 *         well if there is one.
 
             DO I = 1, NELM

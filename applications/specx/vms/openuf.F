@@ -5,7 +5,7 @@
 
       SUBROUTINE UOPENUF (UNIT, FILENAME, STATUS, RECLW, READONLY, IERR)
 
-*     Routine to open an unformatted direct access file. Need to 
+*     Routine to open an unformatted direct access file. Need to
 *     wrap up the OPEN statement this way because Suns do not obey
 *     the FORTRAN 77 standard for the OPEN statement.
 

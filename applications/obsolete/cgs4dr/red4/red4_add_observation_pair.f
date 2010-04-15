@@ -15,7 +15,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *+  RED4_ADD_OBSERVATION_PAIR - Add pair of observations to reduced group file.
       SUBROUTINE RED4_ADD_OBSERVATION_PAIR( OBJECT_OBS, SKY_OBS,
      :  COADDED_OBS, COADD_OBJ, COADD_SKY, ERRORS, SKY_WT, VARIANCE_WT,
-     :  STATUS ) 
+     :  STATUS )
 *    Description :
 *     This is a lower level routine, called by RED4_CONSTRUCT_PAIR, which
 *     adds a pair of reduced observations belonging to a particular group
@@ -24,7 +24,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *     of the reduced group have been made. It is assumes that the reduced
 *     group has been opened with a DSA reference of 'GRPRED',
 *     and the .MORE.CGS4_COADDS structure within the reduced group has
-*     been opened with a reference of 'COADDS'. When this routine is 
+*     been opened with a reference of 'COADDS'. When this routine is
 *     called non of the data arrays have been mapped.
 *
 *     The SKY observation is subtracted from the OBJECT observation
@@ -34,7 +34,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *     Observation types other than OBJECT and SKY are not allowed.
 *
 *     The FITS header information from the first OBJECT observation is
-*     copied to the reduced group file. When subsequent OBJECT observations 
+*     copied to the reduced group file. When subsequent OBJECT observations
 *     are added, the header information is updated as follows :-
 *
 *     EXPOSED     - Value is accumulated (new = old + current)
@@ -48,7 +48,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *     OBJECT observations making up the group.
 *
 *     A record of the total exposure time contributed from the SKY
-*     observations will be accumulated in a SKYEXP parameter, taking 
+*     observations will be accumulated in a SKYEXP parameter, taking
 *     into account any weighting factors used :-
 *
 *     SKYEXP      - Value is accumulated (new = old + current*SKY_WT)
@@ -212,27 +212,27 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
      :  NELM,                      ! Number of elements in data array.
      :  ADDRESS,                   ! Address returned when mapping.
      :  OBJDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    OBJECT reduced observation file 
+*                                  !    OBJECT reduced observation file
      :  OBJDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    OBJECT reduced observation file
      :  OBJVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    OBJECT reduced observation file 
+*                                  !    OBJECT reduced observation file
      :  OBJVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    OBJECT reduced observation file
      :  OBJQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    OBJECT reduced observation file 
+*                                  !    OBJECT reduced observation file
      :  OBJQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    OBJECT reduced observation file
      :  SKYDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    SKY reduced observation file 
+*                                  !    SKY reduced observation file
      :  SKYDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    SKY reduced observation file
      :  SKYVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    SKY reduced observation file 
+*                                  !    SKY reduced observation file
      :  SKYVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    SKY reduced observation file
      :  SKYQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    SKY reduced observation file 
+*                                  !    SKY reduced observation file
      :  SKYQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    SKY reduced observation file
      :  WDATA_SLOT,                ! Mapping slot for work data array for
@@ -248,15 +248,15 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
      :  WQUAL_PTR,                 ! Pointer to work quality array for
 *                                  !    sky-subtracted data
      :  GRPDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    reduced group file
      :  GRPVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    reduced group file
      :  GRPQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    reduced group file
      :  COADDS_SLOT,               ! Mapping slot for data array in COADDS
@@ -286,13 +286,13 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
       CALL DSA_DATA_SIZE( 'GRPRED', MAXDIM, NDIM, DIMS, NELM,
      :  DSA_STATUS )
 
-*   Indicate to DSA that a data quality array will be used to 
+*   Indicate to DSA that a data quality array will be used to
 *   indicate bad values in all the structures.
       CALL DSA_USE_QUALITY( 'OBJFILE', DSA_STATUS )
       CALL DSA_USE_QUALITY( 'SKYFILE', DSA_STATUS )
       CALL DSA_USE_QUALITY( 'GRPRED', DSA_STATUS )
 
-*   Map the data, variance and quality arrays from the OBJECT reduced 
+*   Map the data, variance and quality arrays from the OBJECT reduced
 *   observation file.
       CALL DSA_MAP_DATA( 'OBJFILE', 'READ', 'FLOAT', OBJDATA_PTR,
      :  OBJDATA_SLOT, DSA_STATUS )
@@ -306,7 +306,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
       CALL DSA_MAP_QUALITY( 'OBJFILE', 'READ', 'BYTE', OBJQUAL_PTR,
      :  OBJQUAL_SLOT, DSA_STATUS )
 
-*   Map the data, variance and quality arrays from the SKY reduced 
+*   Map the data, variance and quality arrays from the SKY reduced
 *   observation file.
       CALL DSA_MAP_DATA( 'SKYFILE', 'READ', 'FLOAT', SKYDATA_PTR,
      :  SKYDATA_SLOT, DSA_STATUS )
@@ -324,11 +324,11 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *   data, variance and quality.
       IF ( ERRORS .EQ. 'FROM_INT' ) THEN
 
-         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WDATA_PTR, 
+         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WDATA_PTR,
      :     WDATA_SLOT, DSA_STATUS )
-         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WVAR_PTR, 
+         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WVAR_PTR,
      :     WVAR_SLOT, DSA_STATUS )
-         CALL DSA_GET_WORK_ARRAY( NELM, 'BYTE', WQUAL_PTR, 
+         CALL DSA_GET_WORK_ARRAY( NELM, 'BYTE', WQUAL_PTR,
      :     WQUAL_SLOT, DSA_STATUS )
       END IF
 
@@ -394,7 +394,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 
 *            Clean up the observation pair before checking it.
 *            (THIS IS A FUDGE!!).
-               CALL GEN_CLEANV( NELM, %val(WDATA_PTR), 
+               CALL GEN_CLEANV( NELM, %val(WDATA_PTR),
      :           %val(WVAR_PTR), %val(WQUAL_PTR), SNCUT, TLOW,
      :           .TRUE., .FALSE., 0.0 )
 
@@ -417,15 +417,15 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *         Before coadding POLYFIT the OBJ-SKY if required
             IF ( PF_POLYFIT .EQ. 'OBJ-SKY' ) THEN
 
-              CALL RED4_RPOLYFIT( DIMS(1), DIMS(2), 
-     :           %val(WDATA_PTR), %val(WVAR_PTR), 
+              CALL RED4_RPOLYFIT( DIMS(1), DIMS(2),
+     :           %val(WDATA_PTR), %val(WVAR_PTR),
      :           %val(WQUAL_PTR), STATUS )
             END IF
 
 *         Coadd this sky-subtracted pair into the reduced group,
 *         propagating the variance and quality.
             CALL RED4_COADD_OBS( DIMS(1), DIMS(2), 1.0,
-     :        VARIANCE_WT,   
+     :        VARIANCE_WT,
      :        %val(WDATA_PTR), %val(WVAR_PTR), %val(WQUAL_PTR),
      :        %val(GRPDATA_PTR), %val(GRPVAR_PTR), %val(GRPQUAL_PTR),
      :        %val(COADDS_PTR), STATUS )
@@ -446,19 +446,19 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 
 *         1) First add the OBJECT observation information to the
 *            group file header.
-*         2) For an OBJECT observation, the FITS parameters in the 
+*         2) For an OBJECT observation, the FITS parameters in the
 *            reduced group file now need to be updated.
 *         3) Check if this is the very first OBJECT observation to be added.
 *            It is assumed that a reduced group file with no OBJECT
 *            observations added will have an EXPOSED parameter of zero
-*            in the FITS structure. 
+*            in the FITS structure.
             CALL DSA_GET_FITS_F( 'GRPRED', 'EXPOSED', 0,
      :        EXPOSED, COMMENT, DSA_STATUS )
 
             IF ( EXPOSED .LE. 0.0 ) THEN
 
 *            This is the first OBJECT observation.
-*            Remember the value of the SKYEXP item in the FITS 
+*            Remember the value of the SKYEXP item in the FITS
 *            structure (just in case there have been any SKY
 *            observations before this OBJECT observation).
                CALL DSA_GET_FITS_F( 'GRPRED', 'SKYEXP', 0,
@@ -470,12 +470,12 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
                CALL DSA_GET_FITS_I( 'GRPRED', 'NSKY', 0,
      :           NSKY, COMMENT, DSA_STATUS )
 
-*            Copy all the FITS structure from the reduced observation 
+*            Copy all the FITS structure from the reduced observation
 *            file to the reduced group file (deleting any existing FITS
-*            structure in that file). 
+*            structure in that file).
                FLEN = CHR_LEN( FITS_STRUCTURE )
-               CALL RED4_COPY_STRUCTURE( 
-     :           'OBJFILE.'//FITS_STRUCTURE(1:FLEN), 
+               CALL RED4_COPY_STRUCTURE(
+     :           'OBJFILE.'//FITS_STRUCTURE(1:FLEN),
      :           'GRPRED.'//FITS_STRUCTURE(1:FLEN), STATUS )
 
 *            Restore the SKYEXP item.
@@ -499,7 +499,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
                CALL DSA_PUT_FITS_C( 'GRPRED', 'STDUSED',
      :           '(none)', ' ', DSA_STATUS )
 
-*            Obtain the correct values for the object name and 
+*            Obtain the correct values for the object name and
 *            observation time, and update these in the OBS structure.
                CALL DSA_GET_FITS_C( 'GRPRED', 'OBJECT', 0,
      :           OBJECT, COMMENT, DSA_STATUS )
@@ -529,12 +529,12 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
             ELSE
 
 *            This is the second or subsequent OBJECT observation.
-*            Most of the fixed FITS parameters will already be 
+*            Most of the fixed FITS parameters will already be
 *            correct, but the following will need updating:
 *            Update RUTSTART and RUTEND to be the minimum and
 *            maximum respectively of those found to far (carry
 *            the UTSTART, AMSTART, UTEND and AMEND parameters with
-*            these). 
+*            these).
                CALL DSA_GET_FITS_F( 'GRPRED', 'RUTSTART', 0,
      :           RUTSTART, COMMENT, DSA_STATUS )
                CALL DSA_GET_FITS_F( 'GRPRED', 'RUTEND', 0,
@@ -576,7 +576,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
                CALL DSA_PUT_FITS_F( 'GRPRED', 'EXPOSED',
      :           EXPOSED, ' ', DSA_STATUS )
                CALL DSA_SET_EXPOSURE( 'GRPRED', EXPOSED,
-     :           DSA_STATUS ) 
+     :           DSA_STATUS )
             END IF
 
 *         If everything has worked, copy relevant items from the FITS
@@ -584,8 +584,8 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *         corresponding to this observation.
             CLEN = MAX( 1, CHR_LEN( COADDED_OBS ) )
             FLEN = CHR_LEN( FITS_STRUCTURE )
-            CALL RED4_COPY_STRUCTURE( 
-     :        'OBJFILE.'//FITS_STRUCTURE(1:FLEN), 
+            CALL RED4_COPY_STRUCTURE(
+     :        'OBJFILE.'//FITS_STRUCTURE(1:FLEN),
      :        COADDED_OBS(1:CLEN)//'.'//COADD_OBJ, STATUS )
 
 *         1) Secondly, add the SKY observation information to the
@@ -597,7 +597,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *         3) Check if this is the very first SKY observation to be added.
 *            It is assumed that a reduced group file with no sky
 *            observations added will have a SKYEXP parameter of zero
-*            in the FITS structure. 
+*            in the FITS structure.
             DSA_STATUS = STATUS
             CALL DSA_GET_FITS_F( 'GRPRED', 'SKYEXP', 0, SKYEXP,
      :        COMMENT, DSA_STATUS )
@@ -611,7 +611,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *            CHAR_ARRAY(1), are not changed.
 *            (Note that, as DSA_GET_DATA_INFO is a general purpose routine,
 *            dummy arguments are needed to take the place of values we don't
-*            need or don't want to change). 
+*            need or don't want to change).
                CALL DSA_GET_DATA_INFO( 'GRPRED', NINFO,
      :           CHAR_ARRAY, 0, DIGNORE, DSA_STATUS )
 
@@ -629,9 +629,9 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
      :           ' ', DSA_STATUS )
             END IF
 
-*         Add the observation time of the current sky observation 
+*         Add the observation time of the current sky observation
 *         (multiplied by SKY_WT) to SKYEXP and write the new value
-*         back to the reduced group file. 
+*         back to the reduced group file.
             CALL DSA_GET_FITS_F( 'SKYFILE', 'EXPOSED', 0,
      :        OBSEXPOSED, COMMENT, DSA_STATUS )
 
@@ -649,7 +649,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_ADD_OBSERVATION_PAIR.FOR
 *         corresponding to this observation.
             CLEN = MAX( 1, CHR_LEN( COADDED_OBS ) )
             FLEN = CHR_LEN( FITS_STRUCTURE )
-            CALL RED4_COPY_STRUCTURE( 
+            CALL RED4_COPY_STRUCTURE(
      :        'SKYFILE.'//FITS_STRUCTURE(1:FLEN),
      :        COADDED_OBS(1:CLEN)//'.'//COADD_SKY, STATUS )
          END IF

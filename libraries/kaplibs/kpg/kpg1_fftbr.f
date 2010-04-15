@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Column counter
       INTEGER IPW                ! Pointer to work space
@@ -135,7 +135,7 @@
 *  Transform each column of the current output array.
       DO I = 1, M
 
-*  Copy this column to the end of the work array, beyond the part used 
+*  Copy this column to the end of the work array, beyond the part used
 *  to store trig. functions.
          DO  J = 1, N
             WORK( IW + J ) = OUT( I, J )
@@ -148,7 +148,7 @@
 
 *  Copy the transformed column back to the output array.
          DO  J = 1, N
-            OUT( I, J ) = WORK( IW + J ) 
+            OUT( I, J ) = WORK( IW + J )
          END DO
 
       END DO
@@ -157,13 +157,13 @@
 *  FFT of the input image rows.
       CALL PDA_RFFTI( M, WORK )
 
-*  Transform each row of the output array. 
+*  Transform each row of the output array.
       DO J = 1, N
          CALL KPG1_NAG2R( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) )  )
          CALL PDA_RFFTB( M, OUT( 1, J ), WORK )
       END DO
 
-*  Free work space 
+*  Free work space
       CALL PSX_FREE( IPW, STATUS )
 
       END

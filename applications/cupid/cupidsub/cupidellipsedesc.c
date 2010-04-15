@@ -7,10 +7,10 @@
 #define ROOT_TWO 1.4142136
 
 AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
-                             double beamcorr[ 3 ], double cu, 
-                             double cu2, double cv2, double cv, double cx, 
-                             double cy, float sig[ 4 ], int deconv, int *ok, 
-                             AstMapping *wcsmap, AstFrame *space_frm, 
+                             double beamcorr[ 3 ], double cu,
+                             double cu2, double cv2, double cv, double cx,
+                             double cy, float sig[ 4 ], int deconv, int *ok,
+                             AstMapping *wcsmap, AstFrame *space_frm,
                              AstMapping *space_map, int *status ){
 /*
 *+
@@ -18,28 +18,28 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
 *     cupidEllipseDesc
 
 *  Purpose:
-*     Create an AST Ellipse describing the spatial extent of a clump. 
+*     Create an AST Ellipse describing the spatial extent of a clump.
 
 *  Language:
 *     Starlink C
 
 *  Synopsis:
 *     AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
-*                                  double beamcorr[ 3 ], double cu, 
+*                                  double beamcorr[ 3 ], double cu,
 *                                  double cu2, double cv2, double cv, double cx,
-*                                  double cy, float sig[ 4 ], int deconv, int *ok, 
-*                                  AstMapping *wcsmap, AstFrame *space_frm, 
+*                                  double cy, float sig[ 4 ], int deconv, int *ok,
+*                                  AstMapping *wcsmap, AstFrame *space_frm,
 *                                  AstMapping *space_map, int *status )
 
 *  Description:
 *     This function returns an Ellipse describing the spatial extent of the
 *     clump specified by the supplied statistics.
-*     
-*     The supplied statistics include the ellipse centre, and the distance 
-*     from the centre to the ellipse perimeter in four different directions, 
-*     all specified in pixels coords. These directions are the pixel X and Y 
-*     axes, plus the "U" and "V" axes, which are axes at 45 degrees to the X 
-*     and Y spatial axes. 
+*
+*     The supplied statistics include the ellipse centre, and the distance
+*     from the centre to the ellipse perimeter in four different directions,
+*     all specified in pixels coords. These directions are the pixel X and Y
+*     axes, plus the "U" and "V" axes, which are axes at 45 degrees to the X
+*     and Y spatial axes.
 
 *  Parameters:
 *     pixel_frm
@@ -47,8 +47,8 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
 *     space_axes[ 2 ]
 *        Zero based indices of the two spatial pixel axes.
 *     beamcorr
-*        An array holding the FWHM (in pixels) describing the instrumental 
-*        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
+*        An array holding the FWHM (in pixels) describing the instrumental
+*        smoothing along each pixel axis. If "deconv" is non-zero, the clump
 *        widths and peak values stored in the output catalogue are modified
 *        to correct for this smoothing.
 *     cu
@@ -69,9 +69,9 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
 *        entry. Values for U and V will be added by this function.
 *     deconv
 *        If non-zero then the clump property values stored in the
-*        catalogue and NDF are modified to remove the smoothing effect 
+*        catalogue and NDF are modified to remove the smoothing effect
 *        introduced by the beam width. If zero, the undeconvolved values
-*        are stored in the output catalogue and NDF. Note, the filter to 
+*        are stored in the output catalogue and NDF. Note, the filter to
 *        remove clumps smaller than the beam width is still applied, even
 *        if "deconv" is zero.
 *     ok
@@ -79,14 +79,14 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
 *        clump can be used or not. This will be set to zero if the clump
 *        size is zero after correction for the effect of beam smoothing.
 *     wcsmap
-*        If the returns Ellipse is to be deifne din pixel coordinates, then 
-*        a NULL pointer should be supplied for "wcsmap". Otherwise, a pointer 
-*        to a Mapping from the input PIXEL Frame to the WCS Frame should be 
+*        If the returns Ellipse is to be deifne din pixel coordinates, then
+*        a NULL pointer should be supplied for "wcsmap". Otherwise, a pointer
+*        to a Mapping from the input PIXEL Frame to the WCS Frame should be
 *        supplied.
 *     space_frm
 *        A pointer to the 2D spatial WCS Frame. Ignored if "wcsmap" is NULL.
 *     space_map
-*        A pointer to the 2D spatial pixel->WCS Mapping. Ignored if "wcsmap" 
+*        A pointer to the 2D spatial pixel->WCS Mapping. Ignored if "wcsmap"
 *        is NULL.
 *     status
 *        Pointer to the inherited status value.
@@ -184,7 +184,7 @@ AstRegion *cupidEllipseDesc( AstFrame *pixel_frm, int space_axes[ 2 ],
    frame. */
       cen[ 0 ] = 0.5*( cx + ( cu - cv )/ROOT_TWO );
       cen[ 1 ] = 0.5*( cy + ( cu + cv )/ROOT_TWO );
-      
+
       axlens[ 0 ] = sig0*axisr;
       axlens[ 1 ] = sig0;
       angle = AST__DPIBY2 - theta;

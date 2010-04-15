@@ -47,7 +47,7 @@
 
 *  History:
 *     17-SEP-1992 (DSB):
-*        Original version, modified from equivalent KAPPA routine 
+*        Original version, modified from equivalent KAPPA routine
 *        written by MJC.
 *      8-AUG-2004 (TIMJ):
 *        Use modern monolith style
@@ -83,7 +83,7 @@
 
 *  Identify and execute the task.
 *  ==============================
-*  
+*
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 

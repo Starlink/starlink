@@ -5,7 +5,7 @@ C-------------------------------------------------------------------------
 
       SUBROUTINE LSQFIT (NQ, XSCALE, BUF, IFAIL)
 
-C   This subroutine performs a least squares fit of an N'th order 
+C   This subroutine performs a least squares fit of an N'th order
 C   polynomial to the data in the x-register of 'STACK'
 C
 C   IFAIL  - Set to 0 on output if B-L removal successful
@@ -83,7 +83,7 @@ C   Determine order of polynomial to be fitted
         IFAIL=16
         CALL POP
         RETURN
-      END IF      
+      END IF
 
 C   Copy appropriate points to arrays for GAUSSF
 
@@ -133,7 +133,7 @@ C  Solve S * T = A for T
 
       CALL SOLVE4 (SD, T, A, NT+1, 11)
 
-C   Calculate baseline 
+C   Calculate baseline
 
       N = NCH
       DO I = NST, NST+N-1

@@ -133,7 +133,7 @@ be executed:
 \end{verbatim}
 \end{small}
 
-When you enter {\small\tt command}, the shareable image {\small\tt image-name} 
+When you enter {\small\tt command}, the shareable image {\small\tt image-name}
 is executed.
 
 \item [DEFPROC] --- defines a command which causes an ICL procedure to be
@@ -295,7 +295,7 @@ These have the form \verb+HEX(X,n,m)+ which would return a string of n
 characters containing the number X with m significant digits.
 Parameters n and m may be omitted, in which case they default to the number of
 digits needed to represent a full 32 bit word.
-Using these forms together with constants in various bases, ICL can be used to 
+Using these forms together with constants in various bases, ICL can be used to
 perform conversions between bases.
 For example:
 
@@ -458,7 +458,7 @@ procedure:
     KEYTRAP ENTER
     KEYTRAP LEFT
     KEYTRAP RIGHT
-                                              
+
     LOOP
       K = INKEY()
       IF K = KEYVAL('ENTER') THEN
@@ -631,20 +631,20 @@ If that program wishes to run another program or do something else, it must
 first create a {\em subprocess}.
 ICL is such a program and it runs application programs.
 The applications thus run in subprocesses, and so do DCL commands issued from
-ICL. 
-This is the heart of many of the sometimes unexpected properties of ICL. 
+ICL.
+This is the heart of many of the sometimes unexpected properties of ICL.
 
 VMS is not particularly efficient at starting up processes, so loading a
 program takes time.
 ADAM deals with this through a structure called a monolith (discussed in
 Chapter~\ref{C_runap}).
 
-The worst problems with subprocesses arise when something goes wrong. 
+The worst problems with subprocesses arise when something goes wrong.
 Uninhibited use of such things as ctrl/C to kill an application can have serious
 consequences for ICL, resulting in a loss of context and the consequent waste
 of time getting back to where you started.
 Ctrl/C returns you to the ICL prompt, while ctrl/Y takes you right out of ICL
-and back into DCL. 
+and back into DCL.
 A better way to get out of a program is to enter the {\em abort} response `!!'
 when prompted for a parameter (see Chapter \ref{C_prompts}.)
 

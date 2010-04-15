@@ -23,13 +23,13 @@
 
 *   Import:
       INTEGER NPOINT     ! number of points
- 
+
       REAL*8 X(NPOINT)     ! x-values
- 
+
 *   Export:
       INTEGER DIR        ! direction (1=increasing, -1=decreasing)
       INTEGER STATUS     ! status return
- 
+
 *   Local variables:
       INTEGER I          ! loop index
 
@@ -46,7 +46,7 @@
          RETURN
 
       END IF
- 
+
 *   Get initial direction from first 2 points
       IF (X(2).GT.X(1)) THEN
 
@@ -57,7 +57,7 @@
          DIR = -1
 
       END IF
- 
+
 *   Go through comparing adjacent values
       DO 100 I = 2, NPOINT
 

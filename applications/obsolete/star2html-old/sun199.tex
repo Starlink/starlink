@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the Research Councils
 <br>
 Copyright \copyright\ 2008 Science and Technology Facilities Council}
@@ -789,12 +789,12 @@ Not all Starlink documents are available in hypertext form but the link will
 even work in that case \dash\  browsers will usually just display the paper
 version.
 
-There is one further step required to create a link to another local 
+There is one further step required to create a link to another local
 Starlink document \dash\ you must run the hypertext linker \texttt{hlink},
 after running \texttt{star2html} on your source file, so that the links
 between the two documents can be resolved. If you do not do this then all the
 cross references will be passed to the Starlink central document server for
-resolution. 
+resolution.
 Thus, if your document contains links to other Starlink documents, you
 can convert, link it locally, and view it by:
 
@@ -899,7 +899,7 @@ This text will only appear in the hypertext version. \\
 
 Note:
 
-\begin{itemize} 
+\begin{itemize}
 \item The \verb!\begin!\verb!{htmlonly}!, \verb!\end!\verb!{htmlonly}!,
   \verb!\begin!\verb!{latexonly}! and \verb!\end!\verb!{latexonly}!
   statements should be on separate lines from other text or \LaTeX\ commands.
@@ -1281,8 +1281,8 @@ Rutherford Appleton Laboratory'' is now a single hypertext link to CCLRC.
 
 The templates also now include a copyright statement for the paper document
 and the star2html script will add a copyright statement to the footer of each
-page unless it is specifically prevented. (The action of the -c switch and 
-HTX\_COPYRIGHT environment variable has changed.) By default the copyright 
+page unless it is specifically prevented. (The action of the -c switch and
+HTX\_COPYRIGHT environment variable has changed.) By default the copyright
 statement will assign copyright to STFC.
 
 This document has been updated to describe the new scheme.
@@ -1320,7 +1320,7 @@ features of these changes are:
 \end{itemize}
 
 Changes in Star2HTML, other than to support \latextohtml, are the
-addition of the ``\verb#-s#'', ``\verb#-c#'' and ``\verb#-old#'' flags 
+addition of the ``\verb#-s#'', ``\verb#-c#'' and ``\verb#-old#'' flags
 and a new command \verb#latex2html#.
 
 The ``\verb#-s#'' flag (which is on by default) greatly speeds up
@@ -1336,7 +1336,7 @@ versions of \latextohtml.
 
 Unfortunately changes in \latextohtml\ version 98.2 mean that several
 major incompatibilities with previous versions of Star2HTML documents
-have been introduced. 
+have been introduced.
 
 To ease the transition process -- so that you can still process your
 existing documents -- Star2HTML is accompanied by two versions of
@@ -1398,7 +1398,7 @@ whole prologue, then try the following sequence of changes:
 \item Move your \verb#sst.tex# definitions into the prologue.
 \item Change any \verb#\renewcommands# in \verb#htmlonly# environments
       to \verb#\newcommands# (this includes the SST definitions).
-\item Change any \verb#\latexonly{}# commands to \verb#\latex{}# 
+\item Change any \verb#\latexonly{}# commands to \verb#\latex{}#
 (leave your \verb#latexonly# environments as they are).
 \item Modify the font declaration in the SST definitions to:
 \begin{quote}
@@ -1413,7 +1413,7 @@ Removing any other such definitions and adding a command:
   \newcommand{\html}[1]{}
 \end{verbatim}
 \end{quote}
-To the standard part of the prologue. 
+To the standard part of the prologue.
 \item An additional space issue means you also need to change:
 \begin{quote}
 \begin{verbatim}
@@ -1426,7 +1426,7 @@ to:
   \stardoccategory\ \stardocnumber \\
 \end{verbatim}
 \end{quote}
-\item And finally add the following definition to the standard part of 
+\item And finally add the following definition to the standard part of
       the prologue.
 \begin{quote}
 \begin{verbatim}
@@ -1454,8 +1454,8 @@ The full format of the command is:
 
 \begin{quote}
 \begin{verbatim}
-# star2html [-a author(s)] [-aux] [-c copyright_statement] 
-            [-d document_date] [-m email_address] [-s 0|1] 
+# star2html [-a author(s)] [-aux] [-c copyright_statement]
+            [-d document_date] [-m email_address] [-s 0|1]
             [-old] [-obsolete] [-t title] [arguments for LaTeX2HTML] document
 \end{verbatim}
 \end{quote}
@@ -1482,7 +1482,7 @@ The switches (all of which are optional) have the following meanings:
 \item[\texttt{-c copyright\_statement}] \dash\
    A copyright statement to override the default which will appear
    in the footer of each page. The default statement is found from
-   the \verb#\stardoccopyright# command if there is one in the document, or 
+   the \verb#\stardoccopyright# command if there is one in the document, or
    failing that from the environment variable \verb#HTX_COPYRIGHT# if defined,
    or failing that the default is: ``Copyright \copyright\ YYYY Council for
    the Central Laboratory of the Research Councils'' (where YYYY is the
@@ -1582,7 +1582,7 @@ When you are happy with the result, copy \texttt{new}\textit{document} back to
 \textit{document}.
 
 \section{\xlabel{the_latex2html_command}\label{latex2html_command}
-         The \texttt{latex2html} command} 
+         The \texttt{latex2html} command}
 The \verb#latex2html# command runs the current version of
 \latextohtml\ using the command-line options supplied (see the
 \latextohtml\ \htmladdnormallinkfoot{manual}{\LtoHManURL}

@@ -10,7 +10,7 @@ C     Given a real value, returns a character string.
 C
 C  Description:
 C     ICH_CF converts a single precision floating point number into
-C     a character string.  ICH_CF returns the number formatted in as few 
+C     a character string.  ICH_CF returns the number formatted in as few
 C     characters as possible without sacrificing precision.
 C
 C  Language:
@@ -58,8 +58,8 @@ C
       INTEGER   LASTCH                    ! Last non-blank character
       INTEGER   LNZCH                     ! Last non-zero character
       INTEGER   LSTDIG                    ! Last digit in fraction
-      CHARACTER WORK*13                   ! Work string 
-      CHARACTER WORK2*13                  ! Work string 
+      CHARACTER WORK*13                   ! Work string
+      CHARACTER WORK2*13                  ! Work string
       LOGICAL   USE_FLOAT                 ! Floating point format needed
 C
 C     See if we can get away with using an integer format.  If so,

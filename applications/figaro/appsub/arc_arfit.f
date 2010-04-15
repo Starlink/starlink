@@ -12,7 +12,7 @@ C     (>) CHANS    (Real array CHANS(NLID)) The centers of the
 C                  identified lines, in pixel numbers.
 C     (>) WAVES    (Real array WAVES(NLID)) The wavelengths of the
 C                  identified lines.
-C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (>) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (>) CLASS    (Integer array CLASS(NLMAX)) The class codes for
 C                  the identified arc lines.
@@ -24,7 +24,7 @@ C     (>) DRMS     (Logical) True if the RMS if omitted statistic
 C                  is to be output for each line.
 C     (>) NCOEFF   (Integer) Passed as the initial number of parameters
 C                  used for the fit, returned as the final number used.
-C     (<) COEFFS   (Double precision array COEFFS(NC)) The 
+C     (<) COEFFS   (Double precision array COEFFS(NC)) The
 C                  coefficients of the final fit.
 C
 C                                            KS / CIT 14th June 1983
@@ -40,7 +40,7 @@ C     WFL / AAO 31st May 1988. Avoid crash if NLID is too small.
 C+
       IMPLICIT NONE
 C
-C     Parameters - 
+C     Parameters -
 C
       LOGICAL DRMS
       INTEGER NLID,NX,NC,NCOEFF,CLASS(NLID)

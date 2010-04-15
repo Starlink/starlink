@@ -7,7 +7,7 @@
 *     MARQUART
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -17,35 +17,35 @@
 *    1		     COVAR, DIM_C, CHI, N_PAR, N_TERM, FUNCTN, FDERIV )
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
-*     POINTS = INTEGER 	
+*     POINTS = INTEGER
 *       number of data points
-*     X( POINTS ) = REAL 
+*     X( POINTS ) = REAL
 *       x-data
-*     Y( POINTS ) = REAL 
+*     Y( POINTS ) = REAL
 *       y-data
-*     W( POINTS ) = REAL	
+*     W( POINTS ) = REAL
 *       weight for data
-*     LAMBDA = REAL 	
+*     LAMBDA = REAL
 *       fit control variable
-*     N_PAR = INTEGER 	
+*     N_PAR = INTEGER
 *       Number of paras if model
 *     A( N_PAR ) = REAL
 *       parameters
 *     DA( N_PAR ) = REAL
 *       increments of paras
 *     DIM_C = INTEGER
-*       covar dimension		
+*       covar dimension
 *     CHI = REAL
-*       chi squared			
-*     N_TERM = INTEGER			
+*       chi squared
+*     N_TERM = INTEGER
 *       Number of free paras
 *     FUNCTN, FDERIV = EXTERNAL
-*       User supplied model function and its derivative		
+*       User supplied model function and its derivative
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -65,11 +65,11 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-     
+
 	IMPLICIT NONE
-	
+
 	SAVE	! All local variables MUST be saved between calls
-	
+
 	INTEGER M_PAR
 	PARAMETER( M_PAR = 32 )		! cf. mrq_cof
 	INTEGER POINTS			! number of data points
@@ -103,15 +103,15 @@
 	COMMON / FREE_LIST / INDEX, TABLE_FREE
 	COMMON / SCALE_DOWN / TAME_FACTOR
 	COMMON / BUG / DEBUG
-	
+
 *    First call: Initialize and return
-	
+
 	IF( LAMBDA .LT. 0.0 ) THEN
 	  LAMBDA = 0.001	! Initialize Lambda
-	  
+
 	  CALL MRQ_COF( X, Y, W, POINTS, A, DA, N_PAR, N_TERM,
      1			ALPHA, BETA, M_PAR, CHI, FUNCTN, FDERIV )
-	  
+
 	  O_CHI = CHI
 	  DO K = 1, N_PAR
 	    TRY_A( K ) = A( K )
@@ -139,9 +139,9 @@
 	      SVD_U( I, I ) = ALPHA( I, I ) * ( 1.0 + LAMBDA )
 	      INCR_A( I ) = BETA( I )
 	    END DO
-	    CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W, 
+	    CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W,
      :                     SVD_V )
-	    CALL SVD_REC( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, 
+	    CALL SVD_REC( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM,
      :                    N_TERM )
 	    DO I = 1, N_TERM
 	      DO J = 1, N_TERM
@@ -161,10 +161,10 @@
 	    SVD_U( I, I ) = ALPHA( I, I ) * ( 1.0 + LAMBDA )
 	    INCR_A( I ) = BETA( I )
 	  END DO
-	  CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W, 
+	  CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W,
      :                   SVD_V )
 	  CALL SV_BCSB
-     1		( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, N_TERM, 
+     1		( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, N_TERM,
      :            INCR_A )
 	END IF
 

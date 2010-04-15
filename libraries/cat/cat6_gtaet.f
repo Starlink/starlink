@@ -3,13 +3,13 @@
 *  Name:
 *     CAT6_GTAEB
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAEB (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -104,13 +104,13 @@
 *  Name:
 *     CAT6_GTAEC
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAEC (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -189,13 +189,13 @@
 *  Name:
 *     CAT6_GTAED
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAED (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -274,13 +274,13 @@
 *  Name:
 *     CAT6_GTAEI
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAEI (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -359,13 +359,13 @@
 *  Name:
 *     CAT6_GTAEL
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAEL (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -444,13 +444,13 @@
 *  Name:
 *     CAT6_GTAER
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAER (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -529,13 +529,13 @@
 *  Name:
 *     CAT6_GTAEW
 *  Purpose:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_GTAEW (ROWS, ROW, COLIST; VALUE; STATUS)
 *  Description:
-*     Get a specified element in an array of column values. 
+*     Get a specified element in an array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.

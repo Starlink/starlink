@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,13 +113,13 @@
 
 *  Change search to new position for next time around.
          IAT = LAST + 1
-         IF ( STATUS .EQ. SAI__OK .AND. .NOT. NOTFND ) THEN 
+         IF ( STATUS .EQ. SAI__OK .AND. .NOT. NOTFND ) THEN
 
 *  Increment word count.
             NVAL = NVAL + 1
          END IF
          GO TO 1
-      END IF        
+      END IF
 
 *  How many words have we found? Need at least one.
       IF ( NVAL .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -134,6 +134,6 @@
          HAVIND  = .TRUE.
          NUMVAL = MAX( 0, NVAL - 1 )
       END IF
-      
+
       END
 * $Id$

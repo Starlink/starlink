@@ -4,7 +4,7 @@
 *     This subroutine reads the observation index file and displays
 *     its contents. The output may be directed to the screen or written
 *     to a file, which may optionally be printed. The screen display may
-*     be in one of two selected formats. 
+*     be in one of two selected formats.
 *     Format 1 gives:
 *      Observation, Quality, Type, Time, Exposure, Grating, Slit, CVF, Filters
 *     Format 2 gives:
@@ -93,7 +93,7 @@
      :  IF_HITIME,                     ! T if system is running Hawaii time
      :  PRINTER                        ! T if output is to be printed
       CHARACTER*8
-     :  DESTINATION,                    ! Destination for output (SCREEN, 
+     :  DESTINATION,                    ! Destination for output (SCREEN,
 *                                      !   FILE or PRINTER).
      :  SUTDATE                        ! UTDATE as a string.
       CHARACTER*80

@@ -18,7 +18,7 @@ proc p4Configs {taskname} {
 
     set l1 [label $frame.l1 -text "Filename"]
     set P4Widgets(CONFIG) [entry $frame.config -width 60 -relief sunken -bd 2 -textvariable p4config_file]
-    pack $l1 $P4Widgets(CONFIG) -in $frame -side left 
+    pack $l1 $P4Widgets(CONFIG) -in $frame -side left
 
     set p4config_file [string trim $p4config_file]
     if {$p4config_file == ""} {

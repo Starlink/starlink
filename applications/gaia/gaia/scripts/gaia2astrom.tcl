@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
 exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #+
@@ -13,7 +13,7 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #
 #   Description:
 #      This commands converts a plain text file of the type produced
-#      by the astrometry toolboxes in GAIA, into a file suitable 
+#      by the astrometry toolboxes in GAIA, into a file suitable
 #      for giving to ASTROM (SUN/5) to perform a "plate" solution.
 
 #  Copyright:
@@ -50,14 +50,14 @@ global argc
 global argv
 
 #  Get names of files.
-if { $argc == 0 } { 
+if { $argc == 0 } {
    puts -nonewline "Input file: "
    flush stdout
    gets stdin infile
 } else {
    set infile [lindex $argv 0]
 }
-if { ! [file exists $infile] } { 
+if { ! [file exists $infile] } {
    puts stderr "Sorry file: $infile, does not exist"
    exit 1
 }
@@ -71,10 +71,10 @@ if { $argc <= 1 } {
 }
 
 #  Open the files.
-if { [catch "open $infile r" instr] } { 
+if { [catch "open $infile r" instr] } {
    puts stderr "Failed to open input file: $infile ($instr)"
 }
-if { [catch "open $outfile w" outstr] } { 
+if { [catch "open $outfile w" outstr] } {
    puts stderr "Failed to open output file: $infile ($outstr)"
 }
 
@@ -102,7 +102,7 @@ flush stdout
 gets stdin telescope_centre
 
 
-#  Add the initialising commands to the output file. 
+#  Add the initialising commands to the output file.
 puts $outstr "J2000                               *Results in Fk5"
 puts $outstr "$telescope_type                     *Telescope type"
 puts $outstr "~ $telescope_centre J2000  2000     *Plate center"
@@ -111,7 +111,7 @@ puts $outstr "~ $telescope_centre J2000  2000     *Plate center"
 #  back out as required. Keep a list of the RA and Decs to append as
 #  results.
 set coords ""
-while { [gets $instr line] > -1 } { 
+while { [gets $instr line] > -1 } {
    set nitems [llength $line]
    if { $nitems > 0 } {
       foreach {id ra dec x y} $line {

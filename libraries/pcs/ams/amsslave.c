@@ -101,20 +101,20 @@ int main()
    }
    for ( j=0; j<1000; j++ )
    {
-      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status, 
-        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path, 
+      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status,
+        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path,
         &messid, &status );
 
       outmsg_status = DTASK__ACTSTART;
 
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
 
       outmsg_status = SAI__OK;
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
    }
    if ( status != 0 )
    {

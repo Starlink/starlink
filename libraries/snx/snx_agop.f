@@ -41,7 +41,7 @@
 *        Original.
 *     01-MAR-1995 (BLY):
 *        Adden null calls to AGPWRT, AGCHNL to force linking with
-*        SNX versions.  
+*        SNX versions.
 *     {enter_further_changes_here}
 
 *  Bugs:

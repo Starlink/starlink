@@ -13,19 +13,19 @@ C         Either or both of the vacuum and recession corrections may be
 C     applied in the one run.
 C         The resulting X structure will be (slightly) non-linear, due
 C     to the wavelength dependence of the refractive index of air. It
-C     will therefore generally be advisable to rescrunch after use of 
+C     will therefore generally be advisable to rescrunch after use of
 C     this routine.  An exception is if only a recession correction is
 C     made: this leaves a linear scale (if the input is linear).
 C         The input wavelength (X) data must be in Angstroms for the
 C     air to vacuum conversion to work correctly.
 C
-C                                          
+C
 C     Command parameters -
 C
 C     IMAGE  (Character) The name of the structure containing the image.
 C     VEL    (Float) Recession velocity for which wavelength is to be
 C            corrected
-C     OUTPUT (Character) The name of the result of the operation.  This 
+C     OUTPUT (Character) The name of the result of the operation.  This
 C            can be the same as for IMAGE.  If not, a new structure
 C            is created, with everything but the x-data a direct
 C            copy of the input.
@@ -41,16 +41,16 @@ C
 C                                      JGR  July 1985
 C     Modified:
 C
-C     22nd April 1986  KS / AAO.  EXTRACT routine name changed to 
+C     22nd April 1986  KS / AAO.  EXTRACT routine name changed to
 C                      avoid conflict with Figaro routine of same name.
 C     7 th Aug   1987  DJA/ AAO.  Revised DSA_ routines - some specs
 C                      changed. Now uses DYN_ routines for dynamic-
 C                      memory handling.
 C     3rd  Feb   1988  KS / AAO.  Modified to work properly with data
 C                      of any dimensions.
-C     20th April 1989  KS / AAO.  Now maps axis data array for update 
-C                      and not for write - was mapping arrays of zeros 
-C                      if the array was not of the type mapped. Also 
+C     20th April 1989  KS / AAO.  Now maps axis data array for update
+C                      and not for write - was mapping arrays of zeros
+C                      if the array was not of the type mapped. Also
 C                      changed to work internally in double precision.
 C     23rd Sep 1992    HME / UoE, Starlink.  TABs removed. INCLUDE
 C                      changed.
@@ -80,7 +80,7 @@ C
       CHARACTER    STRING*64     ! Used to format result details
       REAL         XEND          ! Last resulting wavelength
       LOGICAL      XEXIST        ! There is a valid x-axis structure?
-      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis 
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis
                                  ! data array
       INTEGER      XSLOT         ! Map slot number x-axis data array
       REAL         XST           ! First resulting wavelength
@@ -177,9 +177,9 @@ C
 C
 C     This routine does the calculation of the new wavelength scale,
 C     with conversion for one or both of air to vacuum and correction
-C     for recession velocity VEL. 
-C     ARRAY is the (data mapped) output array, which also holds the 
-C     input data when entering this routine. 
+C     for recession velocity VEL.
+C     ARRAY is the (data mapped) output array, which also holds the
+C     input data when entering this routine.
 C     NX is the size of the X structure (wavelength array).
 C     VEL is the recession velocity in Km/s which is to be corrected
 C     for (negative if approach velocity).
@@ -198,7 +198,7 @@ C
         IF(.NOT.VACLG)GO TO 1             ! Do vacuum conversion here
         WAVM=1./(ARRAY(I)*1.E-4)**2       ! 1/(wavelength in microns)**2
         SUM = 64.328 + 29498.1/(146.-WAVM) + 255.4/(41.-WAVM)
-        REFIND = SUM*1.E-6 + 1.            ! Refractive index 
+        REFIND = SUM*1.E-6 + 1.            ! Refractive index
         ARRAY(I) = ARRAY(I)*REFIND
 C
    1    IF(.NOT.VELLG)GO TO 2             ! Do velocity conversion here

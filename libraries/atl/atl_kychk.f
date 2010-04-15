@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -61,11 +61,11 @@
 
 *  Check for the key and report an error if it does not exist.
       IF( .NOT. AST_MAPHASKEY( KEYMAP, KEY, STATUS ) ) THEN
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'K', KEY )
             CALL ERR_REP( ' ', ERRMSG, STATUS )
          END IF
-      END IF         
+      END IF
 
       END

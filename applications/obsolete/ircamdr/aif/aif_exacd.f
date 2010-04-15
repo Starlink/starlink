@@ -81,54 +81,54 @@
       DOUBLE PRECISION
      :  WORK (MAXVAL)  ! work array in which to obtain values
 *-
- 
+
 *   check for error on entry
- 
+
       IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *      ensure the number of values needed does not exceed the maximum
          IF ( NVALS .LE. MAXVAL ) THEN
- 
+
 *         initialise the number of values obtained to zero and the
 *         number of values needed to the number of values requested
- 
+
             NGOT   = 0
             NEEDED = NVALS
- 
+
 *         loop until no more values are needed
 *         or until an error occurs
- 
+
             DO WHILE ( ( NEEDED .GT. 0 ) .AND. ( STATUS .EQ. SAI__OK ) )
- 
+
 *            check if values are needed
                IF ( NEEDED .GT. 0 ) THEN
- 
+
 *               obtain values associated with parameter
                   CALL PAR_GETVD( PARNAM, NEEDED, WORK, NOBT, STATUS )
- 
+
 *               check the status return
- 
+
                   IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *                  put the numbers obtained into the VALUES array
- 
+
                      DO IVAL = 1,NOBT
                         VALUES (NGOT+IVAL) = WORK (IVAL)
                      ENDDO
- 
+
 *                  add the number of values obtained here to the
 *                  number of values obtained altogether,
 *                  and subtract the number of values obtained
 *                  from the number of values needed
- 
+
                      NGOT   = NGOT   + NOBT
                      NEEDED = NEEDED - NOBT
- 
+
 *                  if values are still required then indicate this
 *                  and cancel the parameter
- 
+
                      IF ( NEEDED .GT. 0 ) THEN
- 
+
                         CALL MSG_SETI( 'NEEDED', NEEDED )
                         IF ( NEEDED .EQ. 1 ) THEN
                            CALL MSG_SETC( 'WORDS', 'value is' )
@@ -137,40 +137,40 @@
                         ENDIF
                         CALL MSG_OUT( 'AIF_EXAC_NEEDED', '^NEEDED '/
      :                    /'more ^WORDS still needed.', STATUS )
- 
+
                         CALL PAR_CANCL( PARNAM, STATUS )
- 
+
                      ENDIF
- 
+
                   ELSE
- 
+
 *                  some miscellaneous error has occurred
 *                  terminate the loop and exit with the error status
- 
+
                      NEEDED = 0
- 
+
                   ENDIF
- 
+
                ENDIF
- 
+
             ENDDO
- 
+
 *            supply the complete VALUES array back to the parameter system
                CALL PAR_PUTVD( PARNAM, NVALS, VALUES, STATUS )
- 
+
          ELSE
- 
+
 *      number of values requested exeeds the maximum
 *      report the error
- 
+
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NVALS', NVALS )
          CALL MSG_SETI( 'MAXVAL', MAXVAL )
          CALL ERR_REP( 'AIF_EXAC_EXMX', 'AIF_EXACD: Request for '/
      :     /'^NVALS exceeds maximum of ^MAXVAL.', STATUS )
- 
+
          ENDIF
- 
+
       ENDIF
- 
+
       END

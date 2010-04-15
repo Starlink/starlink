@@ -2,25 +2,25 @@
      &                  STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C      M A X P O L
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NZONES (<), CONT_ST (<), CONT_EN (<), NPTS (<), STOKES_I (<),
 C STOKES_Q (<), STOKES_QV (<), STOKES_U (<), STOKES_UV (<),
 C LAMBDA (<) ,OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C   Finds the maximum polarization in the continuum bins.
 C
 C
@@ -82,17 +82,17 @@ C
         UTOT = STOKES_U(J)
         UVTOT = STOKES_UV(J)
         THETA  =  ATAN2(UTOT,QTOT) * 90.0/3.1415926
-        IF (THETA .LT. 0.0) THETA  =  THETA + 180.0  
+        IF (THETA .LT. 0.0) THETA  =  THETA + 180.0
         QQ  =  100.0*QTOT/ITOT
         UU  =  100.0*UTOT/ITOT
         QQE  =  100.0*SQRT(QVTOT)/ITOT
         UUE  =  100.0*SQRT(UVTOT)/ITOT
         P  =  SQRT(QQ*QQ+UU*UU)
         THETA  =  ATAN2(UU,QQ) * 90.0/3.1415926
-        IF (THETA .LT. 0.0) THETA  =  THETA + 180.0  
+        IF (THETA .LT. 0.0) THETA  =  THETA + 180.0
         IF (P .GT. 0.0) THEN
              X  =  QQE*QQE*QQ*QQ + UUE*UUE*UU*UU
-             PE  =  SQRT(X)/P  
+             PE  =  SQRT(X)/P
              X  =  QQ*QQ*UUE*UUE + UU*UU*QQE*QQE
              X  =  0.5*SQRT(X)
              X  =  X/(P*P)
@@ -117,7 +117,7 @@ C
        WRITE(OUT_LU,10) I,PMAX,PMAXE,THETAMAX,THETAMAXE
        WRITE(OUT_LU,20) QMAX,QMAXE,UMAX,UMAXE
        WRITE(OUT_LU,*) ' '
-C       
+C
       ENDDO
 666   CONTINUE
       END

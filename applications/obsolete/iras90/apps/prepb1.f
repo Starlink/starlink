@@ -50,10 +50,10 @@
 *        if the input image type is unrecognised.
 *     FLDLON = CHARACTER * ( * ) (Given)
 *        The longitude value to be stored as the field position (as a
-*        formatted string). 
+*        formatted string).
 *     FLDLAT = CHARACTER * ( * ) (Given)
 *        The latitude value to be stored as the field position (as a
-*        formatted string). 
+*        formatted string).
 *     A = DOUBLE PRECISION (Returned)
 *        The longitude to use for the field position. This is taken from
 *        FLDLON if FLDLON is not blank, and CRVAL1 otherwise. The value
@@ -91,7 +91,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,8 +159,8 @@
 
 *  Get the value of FITS keyword EPOCH (the epoch of the reference
 *  equinox, not of the observations).
-      CALL IRM_GKEYR( NCARD, FITS, 1, 'EPOCH', THERE, EQU, CARD, 
-     :                STATUS )   
+      CALL IRM_GKEYR( NCARD, FITS, 1, 'EPOCH', THERE, EQU, CARD,
+     :                STATUS )
 
 *  If the keyword EPOCH does not exit, set a default value for the
 *  equinox.
@@ -169,17 +169,17 @@
 *  Get values for FITS keywords CRVAL1, CRVAL2, CRPIX1, CRPIX2, CDELT1,
 *  CDELT2.
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CRVAL1', THERE, CRVAL1, CARD,
-     :             STATUS )   
+     :             STATUS )
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CRVAL2', THERE, CRVAL2, CARD,
-     :             STATUS )   
+     :             STATUS )
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CRPIX1', THERE, CRPIX1, CARD,
-     :             STATUS )   
+     :             STATUS )
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CRPIX2', THERE, CRPIX2, CARD,
-     :             STATUS )   
+     :             STATUS )
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CDELT1', THERE, CDELT1, CARD,
-     :             STATUS )   
+     :             STATUS )
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CDELT2', THERE, CDELT2, CARD,
-     :             STATUS )   
+     :             STATUS )
 
 *  Get a value for FITS keyword CROTA1. If it does not exist use zero.
       CALL IRM_GKEYR( NCARD, FITS, 1, 'CROTA1', THERE, CROTA1, CARD,
@@ -194,8 +194,8 @@
 *  Among the eight projection parameters defined in the IRA system, P1
 *  to P6 are related to FITS keywords, CRVAL1, CRVAL2, CRPIX1, CRPIX2,
 *  CDELT1 and CDELT2 in the same way for all kinds of images.
-      P( 1 ) = DBLE( CRVAL1 ) * IRA__DTOR  
-      P( 2 ) = DBLE( CRVAL2 ) * IRA__DTOR  
+      P( 1 ) = DBLE( CRVAL1 ) * IRA__DTOR
+      P( 2 ) = DBLE( CRVAL2 ) * IRA__DTOR
       P( 3 ) = DBLE( CRPIX1 ) - 0.5D0
       P( 4 ) = DBLE( CRPIX2 ) - 0.5D0
       P( 5 ) = DBLE( ABS( CDELT1 ) ) * IRA__DTOR
@@ -208,9 +208,9 @@
          CALL IRA_SETEQ( DBLE( EQU ), 'B', SCSIN, STATUS )
          PROJIN = 'GNOMONIC'
 
-*  The rotation angle of ISSA is not defind in the FITS header. Regard 
-*  it as having a rotation of zero (i.e. north upwards) and the 
-*  definition of positive rotation being the same as that in IRA system 
+*  The rotation angle of ISSA is not defind in the FITS header. Regard
+*  it as having a rotation of zero (i.e. north upwards) and the
+*  definition of positive rotation being the same as that in IRA system
 *  (north through east).
          ROTDIR = .TRUE.
 
@@ -232,19 +232,19 @@
          ROTDIR = .TRUE.
          XFLIP = .FALSE.
 
-*  The second ("Y") axis of the input SKYFLUX plate is in the direction 
+*  The second ("Y") axis of the input SKYFLUX plate is in the direction
 *  of decreasing DEC, which is opposite to the Y axis definition of IRA
 *  system, so the Y axis of the output image needs to be flipped.
          YFLIP = .TRUE.
 
-*  Now do the same for galactic plane maps.      
+*  Now do the same for galactic plane maps.
       ELSE IF( TYPE .EQ. IRI__GALPL ) THEN
          SCSIN = 'GALACTIC'
          PROJIN = 'LAMBERT'
          ROTDIR = .TRUE.
          XFLIP = .FALSE.
          YFLIP = .FALSE.
-      
+
 *  Now do the same for all sky maps.
       ELSE IF( TYPE .EQ. IRI__ALLSK ) THEN
          SCSIN = 'GALACTIC'
@@ -264,7 +264,7 @@
 *  The definition of the positive rotation direction of the DEEPSKY,
 *  IRAS-CPC and YORIC images is opposite to that of IRAS sytem.
          ROTDIR = .FALSE.
-  
+
 *  X axes (Z-axis) of the unprepared DEEPSKY, IRAS-CPC and YORIC are in
 *  the direction of decreasing RA, no flipping is required for this
 *  axis.
@@ -273,7 +273,7 @@
 *  Y axes of these kinds of images is in the direction of increasing
 *  DEC, no flipping is required for this axis as well.
          YFLIP = .FALSE.
-        
+
 *  If the image is unknown kind, default values are used.
       ELSE IF( TYPE .EQ. IRI__NONAM ) THEN
 
@@ -296,7 +296,7 @@
       IF( ROTDIR ) THEN
 
 *  In some case only one axis rotation is specified in the FITS header
-*  leaving the other unspecified or being 0, so take the one which is 
+*  leaving the other unspecified or being 0, so take the one which is
 *  not zero.
          IF( CROTA1 .EQ. 0.0  ) THEN
             P( 7 ) = DBLE( CROTA2 ) * IRA__DTOR
@@ -315,10 +315,10 @@
 
 *  For all IRAS images, projection parameter P8 is zero.
       P( 8 ) = 0.0D0
- 
+
 *  Create an Astrometry structure within the output NDF, and then annul
 *  the identifier to it.
-      CALL IRA_CREAT( PROJIN, 8, P, SCSIN, IRA__IRJEP, INDF, IDA, 
+      CALL IRA_CREAT( PROJIN, 8, P, SCSIN, IRA__IRJEP, INDF, IDA,
      :                STATUS )
       CALL IRA_ANNUL( IDA, STATUS )
 
@@ -328,12 +328,12 @@
 *  If text was supplied for both FLDLON adn FLDLAT, convert the strings
 *  to numeric values and return in A and B.
       IF( FLDLON .NE. ' ' .AND. FLDLAT .NE. ' ' ) THEN
-         CALL IRA_CTOD( FLDLON, FLDLAT, SCS, A, B, STATUS )        
+         CALL IRA_CTOD( FLDLON, FLDLAT, SCS, A, B, STATUS )
 
-*  Otherwise, convert the projection parameters P1 and P2 to the sky 
+*  Otherwise, convert the projection parameters P1 and P2 to the sky
 *  coordinate  system specified by SCS.
       ELSE
-         CALL IRA_CONVT( 1, P(1), P(2), SCSIN, SCS, IRA__IRJEP, A, B, 
+         CALL IRA_CONVT( 1, P(1), P(2), SCSIN, SCS, IRA__IRJEP, A, B,
      :                   STATUS )
       END IF
 

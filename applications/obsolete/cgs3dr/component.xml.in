@@ -7,7 +7,7 @@
   <path>applications/obsolete/cgs3dr</path>
   <description>CGS3DR - CGS3 Data Reduction</description>
   <abstract><p>
-      
+
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@

@@ -23,7 +23,7 @@
 #     args = string(s) (read)
 #        Extra arguments that will be executed as a command when the
 #        CCDSETUP application is run (for resetting state buttons
-#        etc.). 
+#        etc.).
 
 #  Returned Value:
 #     No value is returned.
@@ -35,10 +35,10 @@
 #        parameters (i.e. CCDglobalpars(ADC) is the ADC factor).
 #     CCDgloprefix = string (read and write)
 #        Keeps track of the Set Index to which the currently displayed
-#        entry panel refers.  If Sets are in use it will be the current 
+#        entry panel refers.  If Sets are in use it will be the current
 #        Set Index followed by a comma, otherwise it will be the empty
 #        string.  It is used to index the elements of CCDglobalpars;
-#        e.g. the ADC value corresponding to the panel currently 
+#        e.g. the ADC value corresponding to the panel currently
 #        displayed can be accessed as $CCDglobalpars(${CCDgloprefix}ADC).
 #     CCDsetindices = list of integers (read and write)
 #        The NDF Set Index values that we know about.
@@ -84,7 +84,7 @@
 #     29-SEP-1995 (PDRAPER):
 #        Added CCD geometry stuff.
 #     19-OCT-1995 (PDRAPER):
-#        Added bias level entry. This was seen a reduce option 
+#        Added bias level entry. This was seen a reduce option
 #        but not available here.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
@@ -111,7 +111,7 @@
 
 #.
 
-#  If we are using CCDPACK Sets, work out how many different Set Index 
+#  If we are using CCDPACK Sets, work out how many different Set Index
 #  values we have (hence how many panels are required to get values).
       if { $CCDglobalpars(USESET) == "TRUE" } {
          CCDGetSetIndices $Topwin 1
@@ -123,7 +123,7 @@
       } else {
          set useset 0
       }
-     
+
 
 #------------------------------------------------------------------------------
 #  Widget Creation
@@ -139,7 +139,7 @@
 #  Frame for containing the parameter regions.
       CCDTkWidget Frame frame frame $top.center
 
-#  Buttons for selecting Set Index.  If we are using Sets, then allow 
+#  Buttons for selecting Set Index.  If we are using Sets, then allow
 #  for selecting a different window for each one.  Otherwise, just
 #  create a dummy frame here which will have no effect.
       if { $useset } {
@@ -246,8 +246,8 @@
            global CCDimportfilter
            set CCDimportfilter \"*.DAT\"
            CCDGetFileName $Top.restore \"Read restoration file\" 0
-           if { \$CCDimportexists } { 
-              CCDReadRestoreFile \"\$CCDimportfile\" 
+           if { \$CCDimportexists } {
+              CCDReadRestoreFile \"\$CCDimportfile\"
               $Choice invoke OK
               CCDIssueInfo \"Parameters restored from file \$CCDimportfile\"
            } else {
@@ -276,7 +276,7 @@
          "CCDGeometry $Top.geom"
 
 #  Add bindings for an expose of each of the Set Index-specific panels.
-#  Then when any of them is exposed, it will fill in blank fields 
+#  Then when any of them is exposed, it will fill in blank fields
 #  from the corresponding fields on panels which have already been
 #  filled in.  This means you don't have to type the same thing for
 #  each Set Index if they have the same values.
@@ -312,7 +312,7 @@
            global CCDimportexists
            global CCDimportfile
            CCDGetFileName $Top.restore \"Select MASK (NDF or ARD file)\" 1
-           if { \$CCDimportexists } { 
+           if { \$CCDimportexists } {
               set CCDglobalpars(\${CCDgloprefix}MASK) \"\$CCDimportfile\"
            }
          "
@@ -326,7 +326,7 @@
 #  Add OK to choice bar. This runs the CCDSETUP application and exits.
       $Choice addbutton OK \
          "global CCDglobalpars
-          if { ! \[info exists CCDglobalpars(MASK)\] } { 
+          if { ! \[info exists CCDglobalpars(MASK)\] } {
              set CCDglobalpars(MASK) \"!\"
           } elseif { \$CCDglobalpars(MASK) == \"\" } {
              set CCDglobalpars(MASK) \"!\"

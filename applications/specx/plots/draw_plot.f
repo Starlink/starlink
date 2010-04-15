@@ -150,7 +150,7 @@ C         histogram if wanted, and plot
 
             NPPTS = I2+1-I1
 
-*           PRINT *, 'Data stretch: ', I1, ' to ', I2, 
+*           PRINT *, 'Data stretch: ', I1, ' to ', I2,
 *    &              '(length=', NPPTS, ')'
 
 C           Copy data (with window that preserves magic values)
@@ -174,7 +174,7 @@ C           Copy data (with window that preserves magic values)
               END IF
 
 C             Plot and go back for more
- 
+
 *             PRINT *, 'Final value of NPPTS = ', NPPTS
 
               CALL SXGCONNECT (XPLOT, YPLOT, NPPTS)

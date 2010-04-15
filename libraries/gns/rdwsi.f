@@ -90,7 +90,7 @@
 
 *   Make sure that the database is open
             CALL GNS_1INITI(STATUS)
-            IF (STATUS.NE.0) GO TO 9999      
+            IF (STATUS.NE.0) GO TO 9999
 
 *   Hash the first two characters of the workstation name to get
 *   a record number and search the file from that point until we

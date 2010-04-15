@@ -30,12 +30,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -161,7 +161,7 @@ for (i = 0; i < ittlen; i++)
    itt->ittlev[ittstart + i] = im;
    itt->ittinv[im] = ittstart + i;
    }
- 
+
 itt->itt_def = 1;
 
 return(iilerr);
@@ -257,9 +257,9 @@ if (ittstart + ittlen > itt->itt_len)
 /* get ITT values */
 
 for (i = 0; i < ittlen; i++)
-   ittdata[i] = (float) itt->ittlev[ittstart + i] / 
+   ittdata[i] = (float) itt->ittlev[ittstart + i] /
                 (float) (itt->itt_len - 1);
- 
+
 return(iilerr);
 }
 
@@ -356,7 +356,7 @@ for (i = 0; i < lutlen; i++)
    lut->lutg[lutstart + i] = icolg;
    lut->lutb[lutstart + i] = icolb;
    }
- 
+
 lut->lut_free = 0;
                                  /* Current LUT : Update */
 if ( (lutn == curlut.id) | (curlut.nalloc > curlut.len) )
@@ -461,7 +461,7 @@ for (i = 0; i < lutlen; i++)
    lutdata [lutlen + i] = icol1 (lut->lutg[lutstart + i]);
    lutdata [2 * lutlen + i] = icol1 (lut->lutb[lutstart + i]);
    }
- 
+
 return(iilerr);
 }
 
@@ -536,7 +536,7 @@ if (lvis == 0)
    device[display].bar.vis = 0;
    refr (display , &iilerr);
    return(iilerr);
-   }                      
+   }
 */
 
 curconf = device[display].confid;

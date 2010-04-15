@@ -9,8 +9,8 @@ C     Indicates that the calling routine will accept flagged values.
 C
 C  Description:
 C     An application uses this routine to indicate that it expects flagged
-C     (`bad' values, or `magic numbers') in the main data array from a 
-C     specified structure.  `Expects' here merely means that it is 
+C     (`bad' values, or `magic numbers') in the main data array from a
+C     specified structure.  `Expects' here merely means that it is
 C     prepared to process such values should there be any in the data,
 C     and it is not necessary to protect it by removing any such values.
 C
@@ -62,7 +62,7 @@ C     14th July 1988   Original version.  KS / AAO.
 C     21st Aug 1992    Automatic portability modifications
 C                      ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992    "INCLUDE" filenames now upper case. KS/AAO
-C     6th  Feb 1995    Now allows both this and DSA_USE_QUALITY to be 
+C     6th  Feb 1995    Now allows both this and DSA_USE_QUALITY to be
 C                      called for the same file. KS/AAO.
 C     17th Feb 1995    Now sets and checks QF_HANDLING. KS/AAO.
 C+
@@ -85,7 +85,7 @@ C
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       INTEGER   REFLEN                      ! Length of REF_NAME_UC
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     DSA system common
 C

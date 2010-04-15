@@ -66,8 +66,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR' 
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -80,7 +80,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  IDIMS( NDIMS ),       ! dimensions of input DATA_ARRAY
      :  NELEMENTS,            ! Number of elements mapped
      :  NDIM,                 ! Number of dimensions from NDF_DIM
@@ -103,17 +103,17 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error getting input structure then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions of array
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS )
-      
+
 *       tell user dimensions of input array
          CALL MSG_SETI( 'XDIM', IDIMS(1) )
          CALL MSG_SETI( 'YDIM', IDIMS(2) )
@@ -131,8 +131,8 @@
 *       Also, initialise compress variable in case null parameter
 *       is given - otherwise may get divide by zero error later.
          COMPRESS  =  1
-         CALL AIF_GET0I( 'COMPRESS', 2, 2, MAXCOM, COMPRESS, 
-     :                    STATUS ) 
+         CALL AIF_GET0I( 'COMPRESS', 2, 2, MAXCOM, COMPRESS,
+     :                    STATUS )
 
 *       now work out the size of the output array from the input image
 *       dimensions and the compression factor - relies on integer
@@ -151,14 +151,14 @@
 
 
 *       now get an output array to contain added pixels from input array
-         CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, 
+         CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS,
      :                 LOCO, STATUS )
 
 *       if no error creating output structure then continue
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                     PNTRO, NELEMENTS, STATUS )
 
 *          check for error before calling working subroutine
@@ -166,7 +166,7 @@
 
 *             now call the subroutine that does the actual work
                CALL COMPADDSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
-     :                 %VAL( PNTRO ), ODIMS(1), ODIMS(2), COMPRESS, 
+     :                 %VAL( PNTRO ), ODIMS(1), ODIMS(2), COMPRESS,
      :                 STATUS )
 
             ENDIF

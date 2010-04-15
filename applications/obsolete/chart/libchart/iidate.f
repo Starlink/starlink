@@ -21,7 +21,7 @@
 *     15-MAR-1993 (AJJB):
 *        Functions LENG and LTOI removed from the end of this file and
 *        put in their own files, called, unsurprisingly, LENG and LTOI.
-*       
+*
 *   Method due to W.F. Lupton
 *-
 
@@ -32,7 +32,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       CALL IDATE(J,I,K)
       IF (J.LE.2) THEN
          J=J+9
@@ -42,4 +42,4 @@
       ENDIF
       N=(1461*K)/4 + (153*J+2)/5 + I + 59
       END
- 
+

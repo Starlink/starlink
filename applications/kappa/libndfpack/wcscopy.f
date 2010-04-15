@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application copies the WCS component from one NDF to
-*     another, optionally modifying it to take account of a linear 
+*     another, optionally modifying it to take account of a linear
 *     mapping between the pixel co-ordinates in the two NDFs. It can be
 *     used, for instance, to rectify the loss of WCS information
 *     produced by older applications which do not propagate the WCS
@@ -44,10 +44,10 @@
 *        be stored. Any existing WCS component is over-written (see
 *        parameter CONFIRM).
 *     OK = _LOGICAL (Read)
-*        This parameter is used to get a confirmation that an existing 
-*        WCS component within the input NDF can be over-written. 
+*        This parameter is used to get a confirmation that an existing
+*        WCS component within the input NDF can be over-written.
 *     TR( ) = _DOUBLE (Read)
-*        The values of this parameter are the coefficients of a linear 
+*        The values of this parameter are the coefficients of a linear
 *        transformation from pixel co-ordinates in the reference NDF
 *        given for parameter LIKE, to pixel co-ordinates in the input
 *        NDF given for parameter NDF. For instance, if a feature has
@@ -58,7 +58,7 @@
 *
 *        - 1-dimensional:
 *
-*              U = TR(1) + TR(2)*X 
+*              U = TR(1) + TR(2)*X
 *
 *        - 2-dimensional:
 *
@@ -86,8 +86,8 @@
 *        aligned (i.e. the pixel co-ordinates of any feature are the
 *        same in both NDFs).
 *     wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
-*        This example assumes that an application similar to SQORST has 
-*        previously been used to change the size of a 2-dimensional NDF 
+*        This example assumes that an application similar to SQORST has
+*        previously been used to change the size of a 2-dimensional NDF
 *        called m51, producing a new NDF called m51_sqorst. It is
 *        assumed that this SQORST-like application does not propagate
 *        WCS and also resets the pixel origin to [1,1]. In fact, this is
@@ -136,16 +136,16 @@
 
 *  Notes:
 *     -  An error is reported if the transformation supplied using
-*     parameter TR is singular. 
+*     parameter TR is singular.
 *     -  The pixel with pixel index I spans a range of pixel co-ordinate
 *     from (I - 1.0) to (I).
 *     -  The pixel indices of the bottom left pixel in an NDF is called
 *     the "pixel origin" of the NDF, and can take any value. The pixel
-*     origin can be examined using application NDFTRACE and set using 
+*     origin can be examined using application NDFTRACE and set using
 *     application SETORIGIN. WCSCOPY takes account of the pixel origins
 *     in the two NDFs when modifying the WCS component. Thus, if a null
 *     value is given for parameter TR, the supplied WCS component may
-*     still be modified if the two NDFs have different pixel origins. 
+*     still be modified if the two NDFs have different pixel origins.
 
 *  Related Applications:
 *     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
@@ -185,8 +185,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Status:
@@ -207,7 +207,7 @@
       INTEGER J                  ! Column index
       INTEGER K                  ! Index within supplied list of co-efficients
       INTEGER L                  ! Index within vectorised matrix array
-      INTEGER NCOEF              ! Required no. of transformation co-efficients 
+      INTEGER NCOEF              ! Required no. of transformation co-efficients
       INTEGER NDIM1              ! No. of pixel axes in INDF1
       INTEGER NDIM2              ! No. of pixel axes in INDF2
       INTEGER SING               ! Non-zero if matrix is singular
@@ -248,7 +248,7 @@
          STATUS = SAI__ERROR
          CALL ERR_REP( 'WCSCOPY_ERR1', 'The number of pixel axes '//
      :                 '(^ND1) in ''^NDF1'' is not the same as the '//
-     :                 'number of pixel axes (^ND2) in ''^NDF2''.', 
+     :                 'number of pixel axes (^ND2) in ''^NDF2''.',
      :                 STATUS )
          GO TO 999
       END IF
@@ -290,7 +290,7 @@
 *  number are supplied.
       ACTVAL = 0
       NCOEF = ( NDIM1 + 1 )*NDIM1
-      DO WHILE( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK )
          CALL PAR_GET1D( 'TR', NCOEF, TR, ACTVAL, STATUS )
          IF( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETI( 'N', NCOEF )
@@ -317,7 +317,7 @@
                ELSE
                   MATRIX( L ) = 0.0D0
                END IF
-   
+
                L = L + 1
 
             END DO
@@ -325,7 +325,7 @@
          END DO
 
 *  Otherwise, if no error has occurred, extract the offset and matrix
-*  from the supplied list of co-efficients.         
+*  from the supplied list of co-efficients.
       ELSE
 
 *  Extract the offset into a separate vector, making two copies.
@@ -339,14 +339,14 @@
          L = 1
          DO I = 1, NDIM1
             K = K + 1
-   
+
             DO J = 1, NDIM1
                MATRIX( L ) = TR( K )
                MTEST( L ) = TR( K )
                L = L + 1
                K = K + 1
             END DO
-   
+
          END DO
 
 *  See if the matrix is singular. The MTEST and OTEST arrays are changed

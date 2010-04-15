@@ -86,7 +86,7 @@ C  Ok, go...
       A(2) = AX2REQ
 
 C  Initialize characters (DATA statement doesn't work since in common /CURSOR/
- 
+
       ZCHAR(1) = 076  ! LEFT
       ZCHAR(2) = 082  ! RIGHT
       ZCHAR(3) = 013  ! <CR>
@@ -213,7 +213,7 @@ C  Then decode options
         ELSE IF (CHR.EQ.BOTTOM) THEN
           Q(1) = Y
         ELSE IF (CHR.EQ.TOP) THEN
-          Q(2) = Y 
+          Q(2) = Y
 
         ELSE IF (CHR.EQ.ONE) THEN
           CALL COLOUR_PLOT (1, IFAIL)
@@ -233,7 +233,7 @@ C  Then decode options
           CALL SET_COLOURS
         ELSE IF (CHR.EQ.LOGCOL) THEN
           CALL TOGGLE_LOG  (GRLIMITS(1), GRLIMITS(2))
-          CALL SET_COLOURS 
+          CALL SET_COLOURS
 
         ELSE IF (CHR.EQ.HSIZE) THEN
           A(1) = XPOS - XOFF
@@ -265,7 +265,7 @@ C  Then decode options
           CALL MARK_POINT (XPOS, YPOS, Z)
           CALL SXGLIMITS  (XLIM(1), XLIM(2), YLIM(1), YLIM(2))
           CALL SXGSCI     (1)
- 
+
         ELSE IF (CHR.EQ.GETSPEC .AND..NOT.XBOUNDS) THEN
           CALL SXGTIDLE
 
@@ -317,7 +317,7 @@ C  Then decode options
           CALL SXGCLEAR
           REPEAT = .TRUE.
           I2DOPT = 4
- 
+
         ELSE IF (CHR.EQ.MAXMIN) THEN
           CALL MAP_MAXMIN (MAP, NAXX, NAXY, XLIM, YLIM,
      &                     BADPIX_VAL, AMAPMIN, AMAPMAX)
@@ -336,7 +336,7 @@ C  Then decode options
             LU = GEN_ILEN(AXTIT(3))
             WRITE (TXTLIN,
      &        '(''Integrated intensity in box: '', F10.1,'//
-     &        ''' K.'',A,''.arcsec**2'')', IOSTAT=IERR) 
+     &        ''' K.'',A,''.arcsec**2'')', IOSTAT=IERR)
      &        SIGMA, AXTIT(3)(:LU)
           ELSE
             WRITE (TXTLIN,'(''Undefined data in box!'')')
@@ -351,7 +351,7 @@ C  Then decode options
 
         END IF
 
-      END DO         
+      END DO
 
       RETURN
       END

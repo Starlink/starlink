@@ -8,14 +8,14 @@
 *     The routine was produced as an attempt to rationalise the
 *     conversion between one form of file name and another, so that
 *     making a change to the naming convention would not be such a
-*     major task in the future, and to allow error reports to be 
+*     major task in the future, and to allow error reports to be
 *     generated if an invalid file name is given.
 *    Invocation :
 *     CALL RED4_INTTOCOADD( INT_FILE, COADD_NAME, STATUS )
 *    Parameters :
 *     INT_FILE  = CHARACTER*(*)( READ )
 *         The integration file name (Iyymmdd_oooo_iiii or
-*         IDIR:Iyymmdd_oooo_iiii) 
+*         IDIR:Iyymmdd_oooo_iiii)
 *     COADD_NAME = CHARACTER*(*)( WRITE )
 *         The name of the corresponding COADD structure (I_oooo_iiii)
 *     STATUS    = INTEGER( UPDATE )
@@ -82,7 +82,7 @@
       IF ( BUFFER(1:1) .EQ. 'I' .OR. BUFFER(1:1) .EQ. 'i') THEN
 
 *      Remove the "yymmdd" characters lying between this "I"
-*      and the "_". 
+*      and the "_".
          UNDER_POS = INDEX( BUFFER, '_' )
 
 *      Check that an underscore has been found, otherwise the

@@ -15,7 +15,7 @@
 int
 hdsTune(const char *param_str,
         int  value,
-        int  *status) 
+        int  *status)
 {
 /*
 *+

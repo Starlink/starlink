@@ -32,7 +32,7 @@ defstring p4_bar        obeyw (p4_alias) bar
 defstring p4_clear      obeyw (p4_alias) clear
 defstring p4_close_nb   obeyw (p4_alias) close_nb
 defstring p4_close_port obeyw (p4_alias) close_port
-defstring p4_close_dev  obeyw (p4_alias) close_port 
+defstring p4_close_dev  obeyw (p4_alias) close_port
 defstring p4_cursor     obeyw (p4_alias) cursor
 defstring p4_cursorval  obeyw (p4_alias) cursorval
 defstring p4_display    obeyw (p4_alias) display
@@ -56,7 +56,7 @@ defstring p4_restored   obeyw (p4_alias) restore file=(p4_df) port=-1
 defstring p4_loadw         loadw ${P4_EXE}/p4 (p4_alias)
 defstring p4_killw         killw (p4_alias)
 defstring p4_set_nb        send (p4_alias) set noticeboard (p4_nb_alias)
-defstring p4_get_nb        send (p4_alias) get noticeboard 
+defstring p4_get_nb        send (p4_alias) get noticeboard
 defstring p4_get_cs        get (p4_alias) cursor_status
 defstring p4_get_param     get (p4_alias)
 defstring p4_get_act_x     get (p4_alias) act_x
@@ -601,7 +601,7 @@ proc p4_load
   p4_lut port=0
   set_title0 ' '
   set_axes0 FALSE
-  p4_display data=$P4_CT/cgs4 
+  p4_display data=$P4_CT/cgs4
   set_axes0 TRUE
   p4_status
 endproc
@@ -616,7 +616,7 @@ proc p4_kill
 endproc
 
 {
-{ PROC SET_DEVICE 
+{ PROC SET_DEVICE
 proc set_device p1
   if UNDEFINED(p1)
     input 'Plot device?  > ' (device)
@@ -770,7 +770,7 @@ proc set_high p1
 endproc
 
 {
-{ PROC SET_LOW 
+{ PROC SET_LOW
 proc set_low p1
   if UNDEFINED(p1)
     inputr 'Low data value for scaling?  > ' (low)
@@ -808,7 +808,7 @@ proc set_whole p1
 endproc
 
 {
-{ PROC SET_XSTART 
+{ PROC SET_XSTART
 proc set_xstart p1
   if UNDEFINED(p1)
     inputr 'X-start for sub-array plotting?  > ' (xstart)
@@ -827,7 +827,7 @@ proc set_xstart p1
 endproc
 
 {
-{ PROC SET_YSTART 
+{ PROC SET_YSTART
 proc set_ystart p1
   if UNDEFINED(p1)
     inputr 'Ystart for sub-array plotting?  > ' (ystart)
@@ -846,7 +846,7 @@ proc set_ystart p1
 endproc
 
 {
-{ PROC SET_XEND 
+{ PROC SET_XEND
 proc set_xend p1
   if UNDEFINED(p1)
     inputr 'X-end for sub-array plotting?  > ' (xend)
@@ -884,7 +884,7 @@ proc set_yend p1
 endproc
 
 {
-{ PROC SET_ISTART 
+{ PROC SET_ISTART
 proc set_istart p1
   if UNDEFINED(p1)
     inputi 'I-start for sub-array plotting?  > ' (istart)
@@ -903,7 +903,7 @@ proc set_istart p1
 endproc
 
 {
-{ PROC SET_JSTART 
+{ PROC SET_JSTART
 proc set_jstart p1
   if UNDEFINED(p1)
     inputi 'J-start for sub-array plotting?  > ' (jstart)
@@ -922,7 +922,7 @@ proc set_jstart p1
 endproc
 
 {
-{ PROC SET_IEND 
+{ PROC SET_IEND
 proc set_iend p1
   if UNDEFINED(p1)
     inputi 'I-end for sub-array plotting?  > ' (iend)
@@ -1134,9 +1134,9 @@ proc set_cut_end p1
 endproc
 
 {
-{ PROC SET_DISPLAY 
+{ PROC SET_DISPLAY
 proc set_display p0
-  if UNDEFINED(p0) 
+  if UNDEFINED(p0)
     input 'Port number?  > ' (port)
   else
     port = INTEGER(p0)
@@ -1151,7 +1151,7 @@ proc set_display p0
     if actval = ''
       actval = defval
     endif
-    setval = UPCASE( actval ) 
+    setval = UPCASE( actval )
     set_type0 (setval)
     if setval = 'GRAPH'
       get_cut_dir0 (defval)
@@ -1241,7 +1241,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour0 (actval)
-    endif    
+    endif
     get_plane0 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -1249,7 +1249,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane0 (actval)
-    get_autoscale0 (defval)    
+    get_autoscale0 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -1258,7 +1258,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale0 (actval)
     if not actval
-      get_low0 (defval)      
+      get_low0 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1284,7 +1284,7 @@ proc set_display p0
     is_logical (actval)
     set_whole0 (actval)
     if not actval
-      get_xstart0 (defval)      
+      get_xstart0 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1300,7 +1300,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend0 (setval)
-      get_ystart0 (defval)      
+      get_ystart0 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1325,7 +1325,7 @@ proc set_display p0
       actval = defval
     endif
     setval = UPCASE( actval )
-    set_type1 (setval) 
+    set_type1 (setval)
     if setval = 'GRAPH'
       get_cut_dir1 (defval)
       msj = 'Direction of cut? /'&(defval)&'/  > '
@@ -1414,7 +1414,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour1 (actval)
-    endif    
+    endif
     get_plane1 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -1422,7 +1422,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane1 (actval)
-    get_autoscale1 (defval)    
+    get_autoscale1 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -1431,7 +1431,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale1 (actval)
     if not actval
-      get_low1 (defval)      
+      get_low1 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1457,7 +1457,7 @@ proc set_display p0
     is_logical (actval)
     set_whole1 (actval)
     if not actval
-      get_xstart1 (defval)      
+      get_xstart1 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1473,7 +1473,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend1 (setval)
-      get_ystart1 (defval)      
+      get_ystart1 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1498,7 +1498,7 @@ proc set_display p0
       actval = defval
     endif
     setval = UPCASE( actval )
-    set_type2 (setval) 
+    set_type2 (setval)
     if setval = 'GRAPH'
       get_cut_dir2 (defval)
       msj = 'Direction of cut? /'&(defval)&'/  > '
@@ -1587,7 +1587,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour2 (actval)
-    endif    
+    endif
     get_plane2 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -1595,7 +1595,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane2 (actval)
-    get_autoscale2 (defval)    
+    get_autoscale2 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -1604,7 +1604,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale2 (actval)
     if not actval
-      get_low2 (defval)      
+      get_low2 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1630,7 +1630,7 @@ proc set_display p0
     is_logical (actval)
     set_whole2 (actval)
     if not actval
-      get_xstart2 (defval)      
+      get_xstart2 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1646,7 +1646,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend2 (setval)
-      get_ystart2 (defval)      
+      get_ystart2 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1760,7 +1760,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour3 (actval)
-    endif    
+    endif
     get_plane3 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -1768,7 +1768,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane3 (actval)
-    get_autoscale3 (defval)    
+    get_autoscale3 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -1777,7 +1777,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale3 (actval)
     if not actval
-      get_low3 (defval)      
+      get_low3 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1803,7 +1803,7 @@ proc set_display p0
     is_logical (actval)
     set_whole3 (actval)
     if not actval
-      get_xstart3 (defval)      
+      get_xstart3 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1819,7 +1819,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend3 (setval)
-      get_ystart3 (defval)      
+      get_ystart3 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1844,7 +1844,7 @@ proc set_display p0
       actval = defval
     endif
     setval = UPCASE( actval )
-    set_type4 (setval) 
+    set_type4 (setval)
     if setval = 'GRAPH'
       get_cut_dir4 (defval)
       msj = 'Direction of cut? /'&(defval)&'/  > '
@@ -1933,7 +1933,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour4 (actval)
-    endif    
+    endif
     get_plane4 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -1941,7 +1941,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane4 (actval)
-    get_autoscale4 (defval)    
+    get_autoscale4 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -1950,7 +1950,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale4 (actval)
     if not actval
-      get_low4 (defval)      
+      get_low4 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1976,7 +1976,7 @@ proc set_display p0
     is_logical (actval)
     set_whole4 (actval)
     if not actval
-      get_xstart4 (defval)      
+      get_xstart4 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -1992,7 +1992,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend4 (setval)
-      get_ystart4 (defval)      
+      get_ystart4 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2106,7 +2106,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour5 (actval)
-    endif    
+    endif
     get_plane5 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -2114,7 +2114,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane5 (actval)
-    get_autoscale5 (defval)    
+    get_autoscale5 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -2123,7 +2123,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale5 (actval)
     if not actval
-      get_low5 (defval)      
+      get_low5 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2149,7 +2149,7 @@ proc set_display p0
     is_logical (actval)
     set_whole5 (actval)
     if not actval
-      get_xstart5 (defval)      
+      get_xstart5 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2165,7 +2165,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend5 (setval)
-      get_ystart5 (defval)      
+      get_ystart5 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2279,7 +2279,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour6 (actval)
-    endif    
+    endif
     get_plane6 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -2287,7 +2287,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane6 (actval)
-    get_autoscale6 (defval)    
+    get_autoscale6 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -2296,7 +2296,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale6 (actval)
     if not actval
-      get_low6 (defval)      
+      get_low6 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2322,7 +2322,7 @@ proc set_display p0
     is_logical (actval)
     set_whole6 (actval)
     if not actval
-      get_xstart6 (defval)      
+      get_xstart6 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2338,7 +2338,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend6 (setval)
-      get_ystart6 (defval)      
+      get_ystart6 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2363,7 +2363,7 @@ proc set_display p0
       actval = defval
     endif
     setval = UPCASE( actval )
-    set_type7 (setval) 
+    set_type7 (setval)
     if setval = 'GRAPH'
       get_cut_dir7 (defval)
       msj = 'Direction of cut? /'&(defval)&'/  > '
@@ -2452,7 +2452,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour7 (actval)
-    endif    
+    endif
     get_plane7 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -2460,7 +2460,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane7 (actval)
-    get_autoscale7 (defval)    
+    get_autoscale7 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -2469,7 +2469,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale7 (actval)
     if not actval
-      get_low7 (defval)      
+      get_low7 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2495,7 +2495,7 @@ proc set_display p0
     is_logical (actval)
     set_whole7 (actval)
     if not actval
-      get_xstart7 (defval)      
+      get_xstart7 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2511,7 +2511,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend7 (setval)
-      get_ystart7 (defval)      
+      get_ystart7 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2625,7 +2625,7 @@ proc set_display p0
         actval = defval
       endif
       set_contour8 (actval)
-    endif    
+    endif
     get_plane8 (defval)
     msj = 'Data plane? /'&(defval)&'/  > '
     input (msj) (actval)
@@ -2633,7 +2633,7 @@ proc set_display p0
       actval = defval
     endif
     set_plane8 (actval)
-    get_autoscale8 (defval)    
+    get_autoscale8 (defval)
     msj = 'Autoscale? /'&(defval)&'/  > '
     input (msj) (actval)
     if actval = ''
@@ -2642,7 +2642,7 @@ proc set_display p0
     is_logical (actval)
     set_autoscale8 (actval)
     if not actval
-      get_low8 (defval)      
+      get_low8 (defval)
       msj = 'Low value? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2668,7 +2668,7 @@ proc set_display p0
     is_logical (actval)
     set_whole8 (actval)
     if not actval
-      get_xstart8 (defval)      
+      get_xstart8 (defval)
       msj = 'X start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2684,7 +2684,7 @@ proc set_display p0
       endif
       setval = REAL( actval )
       set_xend8 (setval)
-      get_ystart8 (defval)      
+      get_ystart8 (defval)
       msj = 'Y start? /'&(defval)&'/  > '
       input (msj) (actval)
       if actval = ''
@@ -2710,31 +2710,31 @@ endproc
 { PROC GET_DEVICE
 proc get_device
   device0 = ' '
-  get_device0 (device0) 
+  get_device0 (device0)
   print 'Port 0 plot device = ' (device0)
   device1 = ' '
-  get_device1 (device1) 
+  get_device1 (device1)
   print 'Port 1 plot device = ' (device1)
   device2 = ' '
-  get_device2 (device2) 
+  get_device2 (device2)
   print 'Port 2 plot device = ' (device2)
   device3 = ' '
-  get_device3 (device3) 
+  get_device3 (device3)
   print 'Port 3 plot device = ' (device3)
   device4 = ' '
-  get_device4 (device4) 
+  get_device4 (device4)
   print 'Port 4 plot device = ' (device4)
   device5 = ' '
-  get_device5 (device5) 
+  get_device5 (device5)
   print 'Port 5 plot device = ' (device5)
   device6 = ' '
-  get_device6 (device6) 
+  get_device6 (device6)
   print 'Port 6 plot device = ' (device6)
   device7 = ' '
-  get_device7 (device7) 
+  get_device7 (device7)
   print 'Port 7 plot device = ' (device7)
   device8 = ' '
-  get_device8 (device8) 
+  get_device8 (device8)
   print 'Port 8 plot device = ' (device8)
 endproc
 
@@ -3573,7 +3573,7 @@ endproc
 {
 { PROC GET_DISPLAY
 proc get_display p0
-  if UNDEFINED(p0) 
+  if UNDEFINED(p0)
     inputi 'Port number?  > ' (port)
   else
     port = INTEGER(p0)
@@ -4195,7 +4195,7 @@ proc plot_image p1 p2
     set_type8 'IMAGE'
   endif
   {
-  { Display the dataset 
+  { Display the dataset
   p4_lut
   p4_display data=(data) port=(port)
 endproc
@@ -4211,7 +4211,7 @@ proc plot_graph p1 p2
     data = p1
   endif
   if UNDEFINED(p2)
-    port = 0 
+    port = 0
   else
     port = INTEGER(p2)
   endif
@@ -4237,7 +4237,7 @@ proc plot_graph p1 p2
     set_type8 'GRAPH'
   endif
   {
-  { Display the dataset 
+  { Display the dataset
   p4_lut
   p4_display data=(data) port=(port)
 endproc
@@ -4279,7 +4279,7 @@ proc plot_overgraph p1 p2 p3
     set_type8 'OVERGRAPH'
   endif
   {
-  { Display the dataset 
+  { Display the dataset
   p4_lut
   p4_display data=(data) port=(port)
 endproc
@@ -4321,7 +4321,7 @@ proc plot_surface p1 p2
     set_type8 'SURFACE'
   endif
   {
-  { Display the dataset 
+  { Display the dataset
   p4_lut
   p4_display data=(data) port=(port)
 endproc
@@ -4363,7 +4363,7 @@ proc plot_contour p1 p2
     set_type8 'CONTOUR'
   endif
   {
-  { Display the dataset 
+  { Display the dataset
   p4_lut
   p4_display data=(data) port=(port)
 endproc
@@ -4405,7 +4405,7 @@ proc plot_histogram p1 p2
     set_type8 'HISTOGRAM'
   endif
   {
-  { Display the dataset 
+  { Display the dataset
   p4_lut
   p4_display data=(data) port=(port)
 endproc

@@ -198,7 +198,7 @@ itcl::class gaia::Scrollbox {
    public method curselection {} {
       return [$itk_component(List) curselection]
    }
-   
+
    #  Get information back from the listbox.
    public method get { args } {
       if { [lindex $args 0 ] == "all" } {
@@ -214,9 +214,9 @@ itcl::class gaia::Scrollbox {
    public method size {} {
       return [$itk_component(List) size]
    }
-   
+
    #  Make sure we can see the given item.
-   public method see {index} { 
+   public method see {index} {
       $itk_component(List) see $index
    }
 
@@ -227,7 +227,7 @@ itcl::class gaia::Scrollbox {
       foreach side "Left Right" {
          if { [info exists itk_component($side)] } {
             pack forget $itk_component($side)
-            
+
             #  Destroy the scrollbar and make the listbox forget about
             #  the scrollcommand.
             destroy $itk_component($side)
@@ -237,7 +237,7 @@ itcl::class gaia::Scrollbox {
       foreach side "Top Bottom" {
          if { [info exists itk_component($side)] } {
             pack forget $itk_component($side)
-            
+
             #  Destroy the scrollbar and make the listbox forget about
             #  the scrollcommand.
             destroy $itk_component($side)
@@ -255,17 +255,17 @@ itcl::class gaia::Scrollbox {
             destroy itk_component(Bottom${side})
          }
       }
-      
+
       #  And unpack the listbox itself (so that rearrangement is easy).
       pack forget $itk_component(List)
-      
+
       #  Find out if any packing frames are required (this fill the corners of
       #  the base frame so that scrollbars look natural).
       set haveleft   [string match *left*   $places]
       set haveright  [string match *right*  $places]
       set havetop    [string match *top*    $places]
       set havebottom [string match *bottom* $places]
-      
+
       #  Create the necessary scrollbars. Append any names etc. to the
       #  sub-widget control variables.
       if { $haveleft } {
@@ -277,7 +277,7 @@ itcl::class gaia::Scrollbox {
          $itk_component(List) configure \
             -yscrollcommand [code $itk_component(Left) set]
       }
-      
+
       if { $haveright } {
          itk_component add Right {
             scrollbar $w_.scrollright \
@@ -287,7 +287,7 @@ itcl::class gaia::Scrollbox {
          $itk_component(List) configure \
             -yscrollcommand [code $itk_component(Right) set]
       }
-      
+
       if { $havetop } {
          itk_component add TopFrame {
             frame $w_.top -borderwidth 0
@@ -315,7 +315,7 @@ itcl::class gaia::Scrollbox {
             pack $itk_component(TopRight) -side left
          }
       }
-      
+
       if { $havebottom } {
          itk_component add BottomFrame {
             frame $w_.bottom -borderwidth 0
@@ -343,24 +343,24 @@ itcl::class gaia::Scrollbox {
             pack $itk_component(BottomRight) -side left
          }
       }
-      
+
       #  Perform packing of main elements (need to do this now to get into
       #  correct places.
-      if { $havetop } { 
-         pack $itk_component(TopFrame) -side top -fill x 
+      if { $havetop } {
+         pack $itk_component(TopFrame) -side top -fill x
       }
-      if { $havebottom } { 
-         pack $itk_component(BottomFrame) -side bottom -fill x 
+      if { $havebottom } {
+         pack $itk_component(BottomFrame) -side bottom -fill x
       }
-      if { $haveleft } { 
-         pack $itk_component(Left) -side left -fill y 
+      if { $haveleft } {
+         pack $itk_component(Left) -side left -fill y
       }
-      if { $haveright } { 
-         pack $itk_component(Right) -side right -fill y 
+      if { $haveright } {
+         pack $itk_component(Right) -side right -fill y
       }
       pack $itk_component(List) -expand true -fill both
    }
-   
+
    #  Method to return the name of the listbox widget, use this to set
    #  bindings etc.
    public method listname {} {
@@ -391,7 +391,7 @@ itcl::class gaia::Scrollbox {
          return {}
       }
    }
-   
+
    #  Configuration options:
    #  ----------------------
 
@@ -406,7 +406,7 @@ itcl::class gaia::Scrollbox {
          }
          _repack $itk_option(-scrollbarplaces)
       }
-   
+
    #  If a label has been requested then add one.
    itk_option define -label label Label {} {
       if { $itk_option(-label) != {} } {
@@ -429,12 +429,12 @@ itcl::class gaia::Scrollbox {
 	 }
       }
    }
-   
+
    #  Set anchor position of the label.
    itk_option define -anchor anchor Anchor w {
       configure -label $itk_option(-label)
    }
-   
+
    #  Can more than one entry be selected at a time?
    itk_option define -singleselect singleselect Singleselect 1 {
       if { $itk_option(-singleselect) } {
@@ -443,7 +443,7 @@ itcl::class gaia::Scrollbox {
          $itk_component(List) configure -selectmode extended
       }
    }
-   
+
    #  Protected variables:
    #  --------------------
 

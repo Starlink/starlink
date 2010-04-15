@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -59,7 +59,7 @@
       REAL VALUE
       REAL SELVAL
       REAL SELVAL2
-      
+
       INTEGER NLIST
 
       CHARACTER LIST( NLIST ) * ( * )
@@ -73,14 +73,14 @@
       INTEGER I                  ! Loop index
 
 *.
- 
+
       IF ( ICOND.EQ.0 ) THEN
          PON_LSELECT = .TRUE.
       ELSE
          PON_LSELECT = .FALSE.
- 
+
          IF ( ICOND.EQ.2 ) THEN
- 
+
 *        Select not equal to value.
             IF ( VALUE.NE.SELVAL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.3 ) THEN
@@ -88,7 +88,7 @@
 *        Select greater than value.
             IF ( VALUE.GT.SELVAL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.4 ) THEN
- 
+
 *        Select less than value.
             IF ( VALUE.LT.SELVAL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.5 ) THEN
@@ -96,11 +96,11 @@
 *        Select equal to string.
             IF ( CHARVAL.EQ.CHARSEL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.6 ) THEN
- 
+
 *        Select no equal to string.
             IF ( CHARVAL.NE.CHARSEL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.7 ) THEN
- 
+
 *        Select valuse in range.
             IF ( VALUE.GE.SELVAL
      :           .AND. VALUE.LT.SELVAL2 ) PON_LSELECT = .TRUE.
@@ -114,20 +114,20 @@
                I = I + 1
             END DO
          ELSE IF ( ICOND.EQ.9 ) THEN
- 
+
 *        Select if substring found in string.
             IF ( INDEX( CHARVAL, CHARSEL(: CHR_LEN( CHARSEL ))).NE.0 )
      :         PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.10 ) THEN
- 
+
 *        Select on greater than the absolute value.
             IF ( ABS( VALUE ).GT.SELVAL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.11 ) THEN
- 
+
 *        Select on less than the absolute value.
             IF ( ABS( VALUE ).LT.SELVAL ) PON_LSELECT = .TRUE.
          ELSE IF ( ICOND.EQ.12 ) THEN
- 
+
 *        Select by excluding values.
             I = 1
             PON_LSELECT = .TRUE.
@@ -137,11 +137,11 @@
                I = I + 1
             END DO
          ELSE
- 
+
 *        Select equal to value.
             IF ( VALUE.EQ.SELVAL ) PON_LSELECT = .TRUE.
          END IF
       END IF
- 
+
       END
 * $Id$

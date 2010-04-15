@@ -53,7 +53,7 @@
 *        used to define some attribute of the NDF.  Only those columns
 *        for which USED is .FALSE. will appear in the FITS extension.
 *     NHEAD = INTEGER (Given)
-*        Number of headers from the primary HDU, supplied in HEADER. 
+*        Number of headers from the primary HDU, supplied in HEADER.
 *     MXHEAD = INTEGER (Given)
 *        Maximum number of headers.
 *     HEADER( MXHEAD ) = CHARACTER * ( 80 ) (Given and Returned)
@@ -100,7 +100,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -244,13 +244,13 @@
      :                         IVALUE, BAD, FSTAT )
                   ROUTIN = 'FTGCVJ'
                   CALL CHR_ITOC( IVALUE, CVALUE, NC )
-      
+
                ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                   CALL FTGCVE( FUNIT, COLNUM, OBSNO, 1, 1, VAL__BADR,
      :                         RVALUE, BAD, FSTAT )
                   ROUTIN = 'FTGCVE'
                   CALL CHR_RTOC( RVALUE, CVALUE, NC )
-      
+
                ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGCVD( FUNIT, COLNUM, OBSNO, 1, 1, VAL__BADD,
      :                         DVALUE, BAD, FSTAT )

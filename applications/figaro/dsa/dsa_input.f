@@ -23,16 +23,16 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name to be
 C                      associated with the opened data object.
-C     (>) PARM_NAME    (Fixed string, descr) The name of the Figaro 
+C     (>) PARM_NAME    (Fixed string, descr) The name of the Figaro
 C                      parameter giving the name of the data object.
 C     (!) STATUS       (Integer,ref) Status code.  If a bad status value
 C                      is passed, this routine returns immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables internal to the DSA system.
 C
 C  External subroutines / functions used:
-C     DSA_NAMED_INPUT, PAR_RDCHAR, PAR_BATCH, PAR_CNPAR, PAR_ABORT, 
+C     DSA_NAMED_INPUT, PAR_RDCHAR, PAR_BATCH, PAR_CNPAR, PAR_ABORT,
 C     PAR_SDCHAR, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_WRUSER
 C
 C  Prior requirements:
@@ -85,7 +85,7 @@ C
       INTEGER ICH_FOLD, ICH_LEN
 C
 C     DSA_ system error codes
-C 
+C
       INCLUDE 'DSA_ERRORS'
 C
 C     Local variables
@@ -101,7 +101,7 @@ C
       INTEGER   SLOT                            ! Common index for ref name
       CHARACTER STRUCTURE_NAME*80               ! Name of input structure
 C
-C     DSA system common 
+C     DSA system common
 C
       INCLUDE 'DSA_COMMON'
 C

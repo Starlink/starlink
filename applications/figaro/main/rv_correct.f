@@ -48,9 +48,9 @@
 *  TNW: 26-JAN-2-FEB-1994 Start to allow user to set FITS keyword
 *       mapping
 *  TNW: 8-FEB-1994 If observatory not read correctly, only prompt for
-*       that 
+*       that
 *  JWP: 5-OCT-1995 Bug fixed regarding picking up correct values for
-*       RA and DEC from the FITS header    
+*       RA and DEC from the FITS header
 *  ACD: 5-SEP-2000 Made reading year from character string more robust.
 *  ACD: 28/9/00 Remove local unused variables.
 *  MJC: 2005 February 22:  Removed NSMALL definition for f90 compiler.
@@ -118,7 +118,7 @@
  1    continue
 
 * Dec
-* JWP code to set up correct values for dec() (Oct 1995)   
+* JWP code to set up correct values for dec() (Oct 1995)
       dsign = 0
       status = SAI__OK
       call rdinf(filnam,'DEC',1,dec(1),nfnd,status)
@@ -126,14 +126,14 @@
          status=0
          call rdinf(filnam,'MEANDEC',1,dec(1),nfnd,status)
       endif
-      if(status.eq.SAI__OK) then       
+      if(status.eq.SAI__OK) then
          if(dec(1).lt.0.0) then
             dsign = -1
          else
             dsign = 1
          endif
          d = dsign*dec(1)
-         dec(1) = AINT(d) 
+         dec(1) = AINT(d)
          dec(2) = AINT((d-dec(1))*60.0)
          dec(3) = (((d-dec(1))*60.0)-dec(2))*60.0
          dec(1) = dsign*dec(1)
@@ -187,7 +187,7 @@
       call par_wruser(string,status)
 
 * RA
-* JWP code to set up correct values for ra() (Oct 1995)  
+* JWP code to set up correct values for ra() (Oct 1995)
       status = SAI__OK
       call rdinf(filnam,'RA',3,ra,nfnd,status)
       if(status.ne.SAI__OK) then
@@ -196,9 +196,9 @@
       endif
       if(status.eq.SAI__OK) then
 * (RA seems to be in degrees)
-         ra(1)=ra(1)/15.0          
+         ra(1)=ra(1)/15.0
          h = ra(1)
-         ra(1) = AINT(h) 
+         ra(1) = AINT(h)
          ra(2) = AINT((h-ra(1))*60.0)
          ra(3) = (((h-ra(1))*60.0)-ra(2))*60.0
       else

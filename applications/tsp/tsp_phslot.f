@@ -1,14 +1,14 @@
-      SUBROUTINE TSP_PHSLOT(SIZE,FSIZE,X,XD,Y,YE,XR,XR2, 
-     :  XLABEL,YLABEL,TOP,BOT,FIRST,PHSTART,PHEND, 
+      SUBROUTINE TSP_PHSLOT(SIZE,FSIZE,X,XD,Y,YE,XR,XR2,
+     :  XLABEL,YLABEL,TOP,BOT,FIRST,PHSTART,PHEND,
      :  LAST,ITEM,IMIN,IMAX,BINSIZE,PLABEL,FILE,STATUS)
-*+                          
+*+
 *
 *   T S P _ P H S L O T
 *
 *   PHASEPLOT command
 *
 *   Subroutine to do the plot
-*       
+*
 *  (>)  SIZE    (Integer) -  The number of data points to plot
 *  (>)  FSIZE   (Integer) -  The number of points before binning
 *  (>)  X       (Double)  -  The X data array before binning
@@ -20,17 +20,17 @@
 *  (>)  YLABEL  (Char)    -  Y axis label
 *  (>)  TOP     (Real)    -  Position of top of plot
 *  (>)  BOT     (Real)    -  Position of bottom of plot
-*  (>)  FIRST   (Logical) -  TRUE if first plot of series   
+*  (>)  FIRST   (Logical) -  TRUE if first plot of series
 *  (>)  PHSTART (Double)  -  Starting phase for plot
 *  (>)  PHEND   (Double)  -  End phase for plot
-*  (>)  LAST    (Logical) -  TRUE if last plot of series 
+*  (>)  LAST    (Logical) -  TRUE if last plot of series
 *  (>)  ITEM    (Char)    -  Item to be plotted
 *  (>)  IMIN    (Real)    -  Minimum Y value for plot scaling
 *  (>)  IMAX    (Real)    -  Maximum Y value for plot scaling
 *  (>)  BINSIZE (Double)  -  Bin size
 *  (>)  PLABEL  (Char)    -  Label for plot
 *  (>)  FILE    (Logical) -  True to create file
-*  (!)  STATUS  (Integer) -  Status value 
+*  (!)  STATUS  (Integer) -  Status value
 *
 *   Jeremy Bailey  28/2/1988
 *
@@ -47,43 +47,43 @@
       INTEGER SIZE,FSIZE
       REAL Y(SIZE),YE(SIZE)
       DOUBLE PRECISION X(FSIZE)
-      DOUBLE PRECISION XD(SIZE)            
+      DOUBLE PRECISION XD(SIZE)
       REAL XR(SIZE),XR2(SIZE)
       REAL TOP,BOT
       LOGICAL ERRORS
-      LOGICAL FIRST,LAST 
+      LOGICAL FIRST,LAST
       DOUBLE PRECISION PHSTART,PHEND
       CHARACTER*(*) ITEM
       DOUBLE PRECISION BINSIZE
       REAL IMIN,IMAX
       INTEGER STATUS
-      CHARACTER*(*) YLABEL 
+      CHARACTER*(*) YLABEL
       CHARACTER*(*) PLABEL
-      CHARACTER*40 XLABEL                                      
+      CHARACTER*40 XLABEL
       LOGICAL FILE
 
 *  Local variables
-      INTEGER I                
+      INTEGER I
       CHARACTER*80 TSTRING
 
 *  JD zero point
       INTEGER JDZERO
 
-*  Data in autograph coordinates                                       
+*  Data in autograph coordinates
       REAL GX,GY,GY1,GY2
 
 *  Coordinate conversion functions
-      REAL SNX_AGUGX,SNX_AGUGY 
-      REAL ZEROPT,ZEROT   
-      CHARACTER*40 LABEL                       
+      REAL SNX_AGUGX,SNX_AGUGY
+      REAL ZEROPT,ZEROT
+      CHARACTER*40 LABEL
 
 *  True for line plot
-      LOGICAL LINE         
+      LOGICAL LINE
 
 *  Pen number
-      INTEGER PEN                              
+      INTEGER PEN
       REAL CSIZE
-      INTEGER IZ,J,IZA                     
+      INTEGER IZ,J,IZA
       REAL AX(2),AY(2)
 
 *  File descriptor
@@ -101,32 +101,32 @@
       SAVE ERRORS,LINE,PEN,CSIZE
 
       IF (STATUS .EQ. SAI__OK) THEN
-                              
+
          IF (FIRST) THEN
-                            
+
 *  Get the plot label
- 
-             CALL PAR_GET0C('LABEL',LABEL,STATUS)   
+
+             CALL PAR_GET0C('LABEL',LABEL,STATUS)
 
 *  Get LINE parameter
 
              CALL PAR_GET0L('LINE',LINE,STATUS)
-                 
+
 *  Get PEN parameter
 
-             CALL PAR_GET0I('PEN',PEN,STATUS) 
-              
+             CALL PAR_GET0I('PEN',PEN,STATUS)
+
 *  Get Size parameter
 
              CALL PAR_GET0R('SIZE',CSIZE,STATUS)
 
 *  Get ERRORS parameter
- 
+
              CALL PAR_GET0L('ERRORS',ERRORS,STATUS)
-                 
+
 *  Copy original phase array
 
-         ENDIF    
+         ENDIF
 
 *  Set X axis label
 
@@ -148,7 +148,7 @@
              DO I=1,SIZE
                  XR(I) = REAL(XD(I) - DBLE(JDZERO))
              ENDDO
-                          
+
 *  Set up X label
 
              WRITE(BUFF,'('' - '',I5,''$'')') JDZERO
@@ -167,8 +167,8 @@
              DO I=1,SIZE
                  XR(I) = REAL(XD(I))
              ENDDO
-                        
-         ENDIF    
+
+         ENDIF
 
 
 *  If output is to a file - open the file
@@ -178,17 +178,17 @@
          ENDIF
 
 *  Position plot
-        
+
          CALL AGSETF('GRID/TOP.',TOP)
          CALL AGSETF('GRID/BOTTOM.',BOT)
 
          IF (LAST) THEN
 
-*  output the X-axis label                 
+*  output the X-axis label
 
              CALL AGSETC('LABEL/NAME.','B')
              CALL AGSETI('LINE/NUMBER.',-100)
-             CALL AGSETC('LINE/TEXT.',XLABEL) 
+             CALL AGSETC('LINE/TEXT.',XLABEL)
 
 *  Set character size depending on number of plots
 
@@ -210,7 +210,7 @@
              CALL AGSETI('LINE/NUMBER.',-100)
              CALL AGSETC('LINE/TEXT.',' $')
              CALL AGSETF('AXIS/BOTTOM/NUMERIC/TYPE.',0.0)
-         ENDIF             
+         ENDIF
          IF (FIRST) THEN
 
 *  Top label - Only output it if it is the top plot
@@ -226,17 +226,17 @@
              CALL AGSETC('LABEL/NAME.','M')
              CALL AGSETF('LABEL/BASEPOINT/X.',0.05)
              CALL AGSETF('LABEL/BASEPOINT/Y.',1.0)
-             CALL AGSETF('LABEL/OFFSET/Y.',-0.05) 
+             CALL AGSETF('LABEL/OFFSET/Y.',-0.05)
              CALL AGSETF('LABEL/CENTERING.',-1.0)
 
 *  Blank label
- 
+
          ELSE
              CALL AGSETC('LABEL/NAME.','T')
              CALL AGSETI('LINE/NUMBER.',100)
              CALL AGSETC('LINE/TEXT.',' $')
              CALL AGSETF('AXIS/TOP/NUMERIC/TYPE.',0.0)
-         ENDIF                                   
+         ENDIF
 
 *  Output the plot label - one for each plot
 
@@ -282,21 +282,21 @@
             CALL AGSETF('Y/ORDER.',1.0)
          ELSE
             CALL AGSETF('Y/ORDER.',0.0)
-         ENDIF                     
+         ENDIF
 
 *  Set up a dashed line pattern (used for zero polarization lines)
 
          CALL AGSETI('DASH/PATTERNS/2.',61680)
 
 *  Set up phase range
-                             
+
          AX(1)=PHSTART
-         AX(2)=PHEND         
+         AX(2)=PHEND
 
 *  Draw the axes
 
          CALL AGSTUP(AX,1,1,2,1,Y,1,1,SIZE,1)
-         CALL AGBACK                     
+         CALL AGBACK
 
 *  Draw the zero line
 
@@ -309,7 +309,7 @@
 
 *  Set SGS Zone to correspond to Autograph User Coordinates
 
-         CALL SNX_AGCS                                     
+         CALL SNX_AGCS
 
 *  Select Window
 
@@ -345,8 +345,8 @@
 
 *  ... and of ends of error bars if required
 
-                GY1=SNX_AGUGY(Y(I)+YE(I)) 
-                GY2=SNX_AGUGY(Y(I)-YE(I)) 
+                GY1=SNX_AGUGY(Y(I)+YE(I))
+                GY2=SNX_AGUGY(Y(I)-YE(I))
 
 *  Draw the error bar
 
@@ -356,20 +356,20 @@
 
 *  Draw the point (as a small polygon)
 
-            CALL SGS_BPOLY(GX+.002,GY)                
-            CALL SGS_APOLY(GX+.0014,GY+.0020)         
-            CALL SGS_APOLY(GX,GY+.003)                
-            CALL SGS_APOLY(GX-.0014,GY+.0020)         
-            CALL SGS_APOLY(GX-.002,GY)                
-            CALL SGS_APOLY(GX-.0014,GY-.0020)         
-            CALL SGS_APOLY(GX,GY-.003)                
-            CALL SGS_APOLY(GX+.0014,GY-.0020)         
-            CALL SGS_APOLY(GX+.002,GY)                
+            CALL SGS_BPOLY(GX+.002,GY)
+            CALL SGS_APOLY(GX+.0014,GY+.0020)
+            CALL SGS_APOLY(GX,GY+.003)
+            CALL SGS_APOLY(GX-.0014,GY+.0020)
+            CALL SGS_APOLY(GX-.002,GY)
+            CALL SGS_APOLY(GX-.0014,GY-.0020)
+            CALL SGS_APOLY(GX,GY-.003)
+            CALL SGS_APOLY(GX+.0014,GY-.0020)
+            CALL SGS_APOLY(GX+.002,GY)
 
 *  Output the polygon
-            CALL SGS_OPOLY           
-          ENDIF                 
-         ENDDO             
+            CALL SGS_OPOLY
+          ENDIF
+         ENDDO
 
 *  draw a connecting line if required
 
@@ -382,7 +382,7 @@
             ELSE
                 GX=SNX_AGUGX(XR(1))
             ENDIF
-            GY=SNX_AGUGY(Y(1))                    
+            GY=SNX_AGUGY(Y(1))
             CALL SGS_BPOLY(GX,GY)
 
 *  Loop over remaining points
@@ -394,21 +394,21 @@
 
                 GX=SNX_AGUGX(XR(I))
                 GY=SNX_AGUGY(Y(I))
-                CALL SGS_APOLY(GX,GY)    
+                CALL SGS_APOLY(GX,GY)
               ENDIF
             ENDDO
 
 *  Output the line
             CALL SGS_OPOLY
-         ENDIF               
+         ENDIF
 
 *  Restore pen
          CALL SGS_SPEN(1)
 
 *  Flush buffers
-         CALL SGS_FLUSH     
+         CALL SGS_FLUSH
          CALL SGS_SELZ(IZA,J)
-                             
+
       ENDIF
 
 *  Close the FILE if the FILE option was set

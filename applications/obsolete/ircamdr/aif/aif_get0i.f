@@ -69,35 +69,35 @@
       LOGICAL
      :  NOTOK ! true while no acceptable value obtained
 *-
- 
+
 *    check for error on entry
       IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       initialise NOTOK to start off the loop
          NOTOK = .TRUE.
- 
+
 *       suggest value in DEFAUL to data system as dynamic default
          CALL PAR_DEF0I( PARNAM, DEFAUL, STATUS )
- 
+
 *       check for a dynamic default having already been set
          IF( STATUS .EQ. PAR__INVST ) THEN
- 
+
 *           clear the error and continue
              CALL ERR_ANNUL( STATUS )
          ENDIF
- 
+
 *       loop will keep going as long as dont have o.k. value and no error
          DO WHILE( NOTOK .AND. ( STATUS .EQ. SAI__OK ) )
- 
+
 *          get parameter value
             CALL PAR_GET0I( PARNAM, VALUE, STATUS )
- 
+
 *          check for error
             IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *             check for value is within specified range
                IF( ( VALUE .LT. MIN ) .OR. ( VALUE .GT. MAX ) ) THEN
- 
+
 *                report as an error
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'VALUE', VALUE )
@@ -110,12 +110,12 @@
                   CALL ERR_FLUSH( STATUS )
                   CALL PAR_CANCL( PARNAM, STATUS )
                ELSE
- 
+
 *                value must be o.k. so terminate the loop
                   NOTOK = .FALSE.
                ENDIF
             ENDIF
          ENDDO
       ENDIF
- 
+
       END

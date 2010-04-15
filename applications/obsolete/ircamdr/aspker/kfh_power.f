@@ -1,4 +1,4 @@
-                                                                               
+
 *+   POWER - raises an array to an arbitrary power
       SUBROUTINE KFH_POWER(ARRA,INVA,NVALS,POWER,ARRC,INVC,MIN,MAX,
      :                     STATUS)

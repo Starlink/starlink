@@ -2,19 +2,19 @@
 *+
 *  Name:
 *     MAG_SKIP
- 
+
 *  Purpose:
 *     Skip a specified number of tape marks.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_SKIP(TD, NTM, STATUS)
- 
+
 *  Description:
 *     The tape is moved over a specified number of tape marks.
- 
+
 *  Arguments:
 *     TD=INTEGER (Given)
 *        A variable containing the tape descriptor.
@@ -29,7 +29,7 @@
 *        will return without action.
 *        If the routine fails to complete, this variable will be set
 *        to an appropriate error number.
- 
+
 *  Algorithm:
 *     Obtain the tape descriptor for the physical tape drive and skip
 *     the files. Re-adjust the current tape position if necessary.
@@ -39,7 +39,7 @@
 *     An EOV condition can only be cleared by the MIO__JEOV routine.
 *     After skipping each file, the file/position details are
 *     updated in MAG_IO.
- 
+
 *  Copyright:
 *     Copyright (C) 1980, 1981, 1983, 1986, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,7 +64,7 @@
 *     Sid Wright (UCL::SLW)
 *     Jack Giddings (UCL::JRG)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     14-APR-1980:  Original.  (UCL::SLW)
 *     11-SEP-1981:  Added code to remember tape position.  (UCL::JRG)
@@ -78,28 +78,28 @@
 *    22-Jan-1993:  Change include file names
 *           Convert code to uppercase using SPAG (RAL::BKM)
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definition:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
- 
+
 *  Arguments Given:
       INTEGER TP                ! tape descriptor
       INTEGER NTM               ! number of tape marks to be skipped
 *    Status return :
       INTEGER STATUS            ! status return
- 
+
 *  Global Variables:
       INCLUDE 'MAGIO_CMN'       ! MAG library states
- 
+
 *  External References:
       EXTERNAL MAG1_BLK          ! Block data subprogram that
                                  ! initializes MAGINT
@@ -107,10 +107,10 @@
       INTEGER TD                ! Physical tape descriptor
       INTEGER NLEFT             ! number of tape marks to be skipped
       INTEGER DIR               ! direction of skip
- 
+
 *.
- 
- 
+
+
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MAG1_GETTD(TP, TD, STATUS)
          IF ( STATUS.EQ.SAI__OK ) THEN
@@ -151,6 +151,6 @@
             END IF
          END IF
       END IF
- 
+
       RETURN
       END

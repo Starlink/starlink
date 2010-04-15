@@ -25,7 +25,7 @@
 *        The name of the ADAM parameter via which the AST file is to
 *        be opened.
 *     MXFSET = INTEGER (Given)
-*        The maximum number of framesets which can be read from the 
+*        The maximum number of framesets which can be read from the
 *        AST file.
 *     FSET( MXFSET ) = INTEGER (Returned)
 *        On exit, the first NFSET elements of this array will be AST
@@ -82,7 +82,7 @@
       INCLUDE 'FIO_PAR'          ! Standard FIO constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARNAM
       INTEGER MXFSET
@@ -92,7 +92,7 @@
       CHARACTER * ( * ) FSID( MXFSET )
       CHARACTER * ( * ) FITRTS( MXFSET )
       INTEGER NFSET
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -171,7 +171,7 @@
          IF ( .NOT. AST_ISAFRAMESET( FS, STATUS ) ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'ASTFIL', ASTFIL )
-            CALL ERR_REP( 'CCD1_AFRD_BADAST', 
+            CALL ERR_REP( 'CCD1_AFRD_BADAST',
      :'  Non-frameset object found in file ^ASTFIL', STATUS )
             GO TO 99
          END IF
@@ -180,7 +180,7 @@
          IF ( NFSET .GE. MXFSET ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'ASTFIL', ASTFIL )
-            CALL ERR_REP( 'CCD1_AFRD_NFSET', 
+            CALL ERR_REP( 'CCD1_AFRD_NFSET',
      :      '  Too many items in AST file ^ASTFIL', STATUS )
             GO TO 99
          END IF
@@ -261,7 +261,7 @@
       END IF
 
 *  If any global modifier flags have been specified, use them in place
-*  of unspecified per-frameset modifier flags.  Currently only one 
+*  of unspecified per-frameset modifier flags.  Currently only one
 *  is defined, FITSROT.
       IF ( FITRT0 .NE. ' ' ) THEN
          DO I = 1, NFSET

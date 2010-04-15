@@ -343,13 +343,13 @@ c$$$      endif
      :        %val(cnf_pval(point(5))),
      :        %val(cnf_pval(point(6))),
      :        %val(cnf_pval(x)), %val(cnf_pval(c)),
-     :        elems, upix, p, l, gau2par, %val(cnf_pval(a)), 
+     :        elems, upix, p, l, gau2par, %val(cnf_pval(a)),
      :        %val(cnf_pval(point(3))),
      :        status)
       endif
 
       call gau2_uinit (guess, guesserrs, calcerrs,
-     :     %val(cnf_pval(x)), %val(cnf_pval(xerrs)), 
+     :     %val(cnf_pval(x)), %val(cnf_pval(xerrs)),
      :     %val(cnf_pval(c)), p, l, back, status)
 
       call gau2_uprep (img, in, iv, v, x, xinit, c, gau2par, status)

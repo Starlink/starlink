@@ -12,7 +12,7 @@ C     Command parameters -
 C
 C     SPECTRUM    The spectrum from which bad points will be removed.
 C     OUTPUT      The resulting spectrum.
-C    
+C
 C     Command keywords -
 C
 C
@@ -29,7 +29,7 @@ C     04 Feb 1991  JMS / AAO. Added STATUS checks to abort. Modified
 C                  to use flagged data. Now aborts if all data is bad,
 C                  or if quality data is non-existent. Tidied up last
 C                  message.
-C     24 Mar 1991  JMS / AAO. Removed 'COMMAND' option (not used at 
+C     24 Mar 1991  JMS / AAO. Removed 'COMMAND' option (not used at
 C                  all).
 C     07 Oct 1992  HME / UoE, Starlink.  INCLUDE changed.
 C                  Map the data after (!) telling DSA that we use
@@ -165,7 +165,7 @@ C
       STRING=ICH_CI(NELM-NGOOD)
       IPT=ICH_LEN(STRING)
       STRING(IPT+2:)='bad points removed.'
-      CALL PAR_WRUSER(STRING,IGNORE)             
+      CALL PAR_WRUSER(STRING,IGNORE)
 C
 C     Close down everything
 C
@@ -194,7 +194,7 @@ C
       END DO
       END
 
-  
+
       SUBROUTINE FIG_REMBAD(NELM,D1,E1,X1,QUALITY,ERRUSE,QUAL,FLAGS,
      :                                            FBAD,NGOOD,D2,E2,X2)
 C

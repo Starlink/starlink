@@ -6,7 +6,7 @@ C+
       INTEGER UNITS
       CHARACTER*(*) STRING
 C
-C Work out length of a string in x and y directions 
+C Work out length of a string in x and y directions
 C
 C Input
 C  UNITS    :  0 => answer in normalized device coordinates

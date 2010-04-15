@@ -39,7 +39,7 @@
 
 *  History:
 *     4-NOV-1992 (DSB):
-*        Original version, copied from KAPPA routine KPG1_LITRx.GEN 
+*        Original version, copied from KAPPA routine KPG1_LITRx.GEN
 *        written by MJC.
 *     {enter_further_changes_here}
 
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -56,7 +56,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
-      REAL 
+      REAL
      :  SCALE( 2 ),
      :  OFFSET( 2 )
 
@@ -98,24 +98,24 @@
 *    Substitute the actual scales for the tokens.
 
       CALL TRN_STOKR( 'x_scale', SCALE( 1 ), WTOD( 1 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
       CALL TRN_STOKR( 'y_scale', SCALE( 2 ), WTOD( 2 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
       CALL TRN_STOKR( 'x_scale', SCALE( 1 ), DTOW( 1 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
       CALL TRN_STOKR( 'y_scale', SCALE( 2 ), DTOW( 2 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
 
 *    Substitute the actual offsets for the tokens.
 
       CALL TRN_STOKR( 'x_offset', OFFSET( 1 ), WTOD( 1 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
       CALL TRN_STOKR( 'y_offset', OFFSET( 2 ), WTOD( 2 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
       CALL TRN_STOKR( 'x_offset', OFFSET( 1 ), DTOW( 1 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
       CALL TRN_STOKR( 'y_offset', OFFSET( 2 ), DTOW( 2 ), NSUBS,
-     :                  STATUS ) 
+     :                  STATUS )
 
 *    Save the transformation in the database associated with the current
 *    picture.

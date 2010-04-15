@@ -65,24 +65,24 @@
       INTEGER N
       INTEGER M
       INTEGER A( NDEC, * )
-      
+
 *  Arguments Given and Returned:
       INTEGER LINK( * )
-      
+
 *  Arguments Returned:
       INTEGER IP( * )
       INTEGER IFAIL
-      
+
 *  Local Variables:
       INTEGER I
       INTEGER J
       INTEGER K
-      
+
 *.
 
 *  Check any bounds that we can.
       IFAIL = 0
-      IF ( NDEC .LT. N ) THEN 
+      IF ( NDEC .LT. N ) THEN
          IFAIL = 1
       ELSE IF ( M .EQ. 1 ) THEN
 

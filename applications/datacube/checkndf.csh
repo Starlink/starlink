@@ -24,16 +24,16 @@
 #
 #  Parameters:
 #     -s script
-#       The name of the calling script.  This name in uppercase without 
+#       The name of the calling script.  This name in uppercase without
 #       any path or file extension is used in error reports.  [""]
 #
 #  Shell Variables:
 #     $gotinfile = CHARACTER (Given)
-#        If set to "FALSE" the NDF has not been supplied on the command 
+#        If set to "FALSE" the NDF has not been supplied on the command
 #        line.
 #     $dims[] = INTEGER (Returned)
 #        The NDF's dimensions.
-#     $infile = CHARACTER (Returned) 
+#     $infile = CHARACTER (Returned)
 #        The name of the NDF with any .sdf and any supplied section
 #        removed.
 #     $ndf_section = CHARACTER (Returned)
@@ -41,7 +41,7 @@
 #        If no NDF section was specified, this is a null string.
 #
 #  Notes:
-#      -  It invokes KAPPA:NDFTRACE on the supplied NDF, so output 
+#      -  It invokes KAPPA:NDFTRACE on the supplied NDF, so output
 #      parameters may be accessed, but any previous NDFTRACE information
 #      is lost.
 #
@@ -101,7 +101,7 @@ set ndf_section = `echo $infile | \
       awk '{if (index($0,"(") > 0) print substr($0,index($0,"(")); else print ""}'`
 
 # This must occur after stripping the section, as the section
-# specification must come after the file extension in file names 
+# specification must come after the file extension in file names
 # presented to the NDF library (cf. SSN/20).  Also this step is
 # necessary when the version of KAPPA does not support the .sdf file
 # extension being supplied in the name.

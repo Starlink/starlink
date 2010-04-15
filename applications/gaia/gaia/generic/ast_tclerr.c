@@ -1,16 +1,16 @@
 /*
  *  Name:
  *     ast_tclerr.c
- 
+
  *  Purpose:
  *     Implements error reporting for Tcl applications.
- 
+
  *  Description:
  *     This routine implements the AST error reporting mechanism to
  *     work though Tcl. Before this can be used a call to the routine
  *     errTcl_Init must be made. This establishes the name of the Tcl
  *     interpreter that should deal with the report.
- 
+
  *  Copyright:
  *     Copyright (C) 1998 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -36,7 +36,7 @@
  *  Authors:
  *     PWD: Peter W. Draper (Durham University- STARLINK)
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     8-SEP-1997 (PWD):
  *        Original version. Based on err_null.c module.
@@ -84,26 +84,26 @@ static int lastStatus = SAI__OK;     /* The last error status */
  *+
  *  Name:
  *     errTcl_Init
- 
+
  *  Purpose:
  *     Initialise error reporting system for Tcl.
- 
+
  *  Synopsis:
  *     #include "tcl_err.h"
  *     void errTcl_Init( Tcl_interp *newinterp )
- 
+
  *  Description:
  *     This function initialises the AST error reporting system to
  *     return any error message via the Tcl interpreter.
- 
+
  *  Parameters:
  *     newinterp
  *        The Tcl interpreter that is being used and which should have
  *        any error message returned in its result.
- 
+
  *-
  */
-void errTcl_Init( Tcl_Interp *newinterp) 
+void errTcl_Init( Tcl_Interp *newinterp)
 {
     Interp = newinterp;
 }
@@ -112,27 +112,27 @@ void errTcl_Init( Tcl_Interp *newinterp)
  *+
  *  Name:
  *     errTcl_Inhibit
-   
+
  *  Purpose:
  *     Controls whether error reports are actually made.
- 
+
  *  Synopsis:
  *     #include "tcl_err.h"
  *     int errTcl_Init( int report )
- 
+
  *  Description:
  *     This function allows the suppression of error messages. It also
  *     returns the current status of error reporting.
- 
+
  *  Parameters:
  *     int report
  *        If 1 then error messages will be reported. Otherwise they
  *        will be inhibitied, until this routine is called to enable
- *        them. 
- 
+ *        them.
+
  *-
  */
-int errTcl_Inhibit( int report ) 
+int errTcl_Inhibit( int report )
 {
     int oldvalue = Report;
     Report = report;
@@ -143,27 +143,27 @@ int errTcl_Inhibit( int report )
  *+
  *  Name:
  *     errTcl_LastError
-   
+
  *  Purpose:
  *     Returns the last error message and status.
- 
+
  *  Synopsis:
  *     #include "tcl_err.h"
  *     void errTcl_LastError( int *status, const char **message )
- 
+
  *  Description:
  *     This function returns the last error status seen and the associated
  *     message. The message is volatile and should be copied if kept.
- 
+
  *  Parameters:
  *     int *status
  *        The status value;
  *     const char **message
  *        The message.
- 
+
  *-
  */
-void errTcl_LastError( int *status, const char **message ) 
+void errTcl_LastError( int *status, const char **message )
 {
     *status = lastStatus;
     *message = lastError;
@@ -173,23 +173,23 @@ void errTcl_LastError( int *status, const char **message )
  *+
  *  Name:
  *     astPutErr
- 
+
  *  Purpose:
  *     Deliver an error message.
- 
+
  *  Type:
  *     Protected function.
- 
+
  *  Synopsis:
  *     #include "asttcl_err.h"
  *     void astPutErr( int status, const char *message )
- 
+
  *  Description:
  *     This function delivers an error message and (optionally) an
  *     accompanying status value to the user. It may be re-implemented
  *     in order to deliver error messages in different ways, according
  *     to the environment in which the AST library is being used.
- 
+
  *  Parameters:
  *     status
  *        The error status value.
@@ -197,31 +197,31 @@ void errTcl_LastError( int *status, const char **message )
  *        A pointer to a null-terminated character string containing
  *        the error message to be delivered. This should not contain
  *        newline characters.
- 
+
  *  Notes:
  *     - This function is documented as "protected" but, in fact, is
  *     publicly accessible so that it may be re-implemented as
  *     required.
  *-
  */
-void astPutErr_( int status, const char *message ) 
+void astPutErr_( int status, const char *message )
 {
-  
+
     /* By default we pass any AST related to FITS back through the Tcl
      * interpreter and through standard error. These are important and
      * resolve many issues with bad WCS calibrations, other errors are
      * only delivered through standard error if DEBUG is set. If no
      * interpreter is available then all messages are delivered through
-     * standard error. 
+     * standard error.
      */
     if ( Interp != NULL ) {
         Tcl_AppendResult( Interp, (char *) message, "\n", (char *)NULL );
-        
-#ifdef DEBUG 
-        (void) fprintf( stderr, "DEBUG: %s%s\n", astOK ? "!! " : "!  ", 
+
+#ifdef DEBUG
+        (void) fprintf( stderr, "DEBUG: %s%s\n", astOK ? "!! " : "!  ",
                         message );
         (void) fflush( stderr );
-#else 
+#else
         if ( strstr( message, "FITS" ) != NULL ||
              strstr( message, "Fits" ) != NULL ) {
             (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );

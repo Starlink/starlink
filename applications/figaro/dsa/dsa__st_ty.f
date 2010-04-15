@@ -31,7 +31,7 @@ C
 C  External variables used:
 C     Only common variables internal to the DSA system.
 C
-C  External subroutines / functions used: 
+C  External subroutines / functions used:
 C     DTA_NMVAR, DTA_TYVAR, DTA_STRUC, DSA_WRUSER, ICH_LEN
 C
 C  Prior requirements:
@@ -62,7 +62,7 @@ C     (>) NDF_ONLY      (Integer parameter) Only NDF format is supported.
 C     (>) FILE_NAMES    (String array) Full file specification for each file.
 C     (>) REF_FILE      (Integer array) File slot number of file in question.
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (<) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -183,7 +183,7 @@ C
       END IF
 C
 C     At this point, either we found something in the file to tell us
-C     it's type, or we are reduced to looking at the file name. If it is 
+C     it's type, or we are reduced to looking at the file name. If it is
 C     a file with a .SDF extension, assume NDF format.  If it has a
 C     .DST format, assume Figaro format.  If it has a different extension,
 C     use the system default format.

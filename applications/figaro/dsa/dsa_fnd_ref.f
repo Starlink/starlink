@@ -27,7 +27,7 @@ C                        should be in upper case.
 C     (<) REF_SLOT       (Integer,ref) The slot number for the name.
 C     (<) OBJ_NAME       (Fixed string,descr) The DTA_ object name
 C                        corresponding to REF_NAME.
-C     (<) LENGTH         (Integer,ref) The number of non-blank characters 
+C     (<) LENGTH         (Integer,ref) The number of non-blank characters
 C                        in OBJ_NAME.
 C     (!) STATUS         (Integer,ref) Status code.  If a bad status value
 C                        is passed, this routine returns immediately.
@@ -51,7 +51,7 @@ C-
 C  Common variable details:
 C     (>) MAX_REFS    (Integer parameter) Maximum number of reference names.
 C     (>) OBJ_LEN     (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data
 C                     object corresponding to reference name.
 C     (>) REF_NAMES   (String array) Reference names in use.
 C     (>) REF_USED    (Logical array) Inidcates reference slot in use.
@@ -93,7 +93,7 @@ C
       LOGICAL FOUND                            ! Indicates ref name in tables
       INTEGER I                                ! Loop index through tables
 C
-C     We look through the tables backwards, since they generally 
+C     We look through the tables backwards, since they generally
 C     fill up from the top down.
 C
       FOUND=.FALSE.

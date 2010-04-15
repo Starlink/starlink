@@ -14,13 +14,13 @@
 
 *  Description:
 *     This subroutine estimates the average of a data series by
-*     iteratively calculating the average of the data series with the 
-*     data samples which are too far away from the current data average 
+*     iteratively calculating the average of the data series with the
+*     data samples which are too far away from the current data average
 *     being excluded. The samples whose distances from the current data
-*     average are more than THRD * (Current standard deviation ) will 
-*     be regarded as too far from the current average and will be 
-*     excluded from the next iteration to calculate the new average and 
-*     standard deviation. This procedure will be repeated until the 
+*     average are more than THRD * (Current standard deviation ) will
+*     be regarded as too far from the current average and will be
+*     excluded from the next iteration to calculate the new average and
+*     standard deviation. This procedure will be repeated until the
 *     successive standard deviations are the same or specified iteration
 *     number (NITRN) is rearched.
 
@@ -31,13 +31,13 @@
 *        The inut data series.
 *     THRD = REAL (Given)
 *        The multiple of the standard deviation. Samples will not be
-*        included in the calculation of the average and standart 
-*        deviation of the next iteration if they are more than this 
+*        included in the calculation of the average and standart
+*        deviation of the next iteration if they are more than this
 *        multiple away from the current average.
 *     NITRN = INTEGER (Given)
 *        Max. number of iterations at which the standard deviation will
 *        be returned as the estimated noise no matter the convergence
-*        has achieved. 
+*        has achieved.
 *     AVG = REAL (Returned)
 *        The average of the data series.
 *     STATUS = INTEGER (Given and Returned)
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,11 +68,11 @@
       INTEGER NSMP
       REAL DATA( NSMP )
       REAL THRD
-      INTEGER NITRN      
+      INTEGER NITRN
 
 *  Arguments Returned:
       REAL AVG
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -84,7 +84,7 @@
       REAL SGM                   ! Standard deviate
       REAL SUM                   ! Sum of samples
       REAL SQSUM                 ! Sum of squared samples
-      REAL THRSHD                ! Threshold for excluding samples 
+      REAL THRSHD                ! Threshold for excluding samples
 
 *.
 
@@ -111,7 +111,7 @@
 
 *  Record the standard deviation obtained in the previous iteration.
          PSGM = SGM
-      
+
 *  Calculate the sum of the data sample and the sum of the squared
 *  sample.
          NSUM = 0
@@ -137,17 +137,17 @@
             CALL ERR_REP( 'IRM_AVERG_ERR1', 'IRM_NOISE: Data series '/
      :                   /'contains no valid data or the threshold '/
      :                   /'for excluding data is not properly '/
-     :                   /'selected (possibly programming error).', 
-     :                     STATUS )   
+     :                   /'selected (possibly programming error).',
+     :                     STATUS )
             GOTO 999
          END IF
-      
-*  Get the current average and current standard deviation.         
+
+*  Get the current average and current standard deviation.
          AVG = SUM / REAL( NSUM )
          SGM = SQRT( SQSUM / REAL( NSUM ) - AVG * AVG )
 
 *  Update the threshold.
-         THRSHD = THRD * SGM        
+         THRSHD = THRD * SGM
       END DO
 
  999  CONTINUE

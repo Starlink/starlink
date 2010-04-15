@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_GLIWR( LBND1, LBND2, UBND1, UBND2, VAR, NPOS, 
+      SUBROUTINE KPS1_GLIWR( LBND1, LBND2, UBND1, UBND2, VAR, NPOS,
      :                       INDIM, PIXPOS, DIN, VIN, DOUT, VOUT, NREP,
-     :                       STATUS ) 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_GLIWR
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_GLIWR( LBND1, LBND2, UBND1, UBND2, VAR, NPOS, INDIM, 
-*                      PIXPOS, DIN, VIN, DOUT, VOUT, NREP, STATUS ) 
+*     CALL KPS1_GLIWR( LBND1, LBND2, UBND1, UBND2, VAR, NPOS, INDIM,
+*                      PIXPOS, DIN, VIN, DOUT, VOUT, NREP, STATUS )
 
 *  Description:
 *     This routine replaces specified pixels in the dupplied data and
@@ -85,8 +85,8 @@
 *  Type Definitions:
       IMPLICIT NONE            ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'        ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE parameters
       INCLUDE 'PRM_PAR'        ! VAL__ constants
       INCLUDE 'AST_PAR'        ! AST__ constants
 
@@ -141,8 +141,8 @@
       REAL NEWVAR              ! New variance
       REAL SUM                 ! Sum of weights
       REAL SVAR                ! Variance of the unordered sample
-      REAL WRK1( NPIX )        ! Data values to use 
-      REAL WRK2( NPIX )        ! Variance/Weight values to use 
+      REAL WRK1( NPIX )        ! Data values to use
+      REAL WRK2( NPIX )        ! Variance/Weight values to use
 *.
 
 *  Initialise
@@ -151,8 +151,8 @@
 *  Check inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Derive the variance-covariance matrix for the order statistics of a 
-*  normal population with up to 8 members. This also sets up the scale factor 
+*  Derive the variance-covariance matrix for the order statistics of a
+*  normal population with up to 8 members. This also sets up the scale factor
 *  for converting mean variances to median variances.
       CALL KPG1_ORVAR( NPIX, NMAT, PP, COVEC, STATUS )
 
@@ -164,7 +164,7 @@
      :       PIXPOS( IPIX, 2 ) .NE. AST__BAD ) THEN
 
 *  Get the indices of the pixel to be replaced. Round up so that a
-*  supplied value of 1.0 causes pixel index 1 to be used. 
+*  supplied value of 1.0 causes pixel index 1 to be used.
             I0 = KPG1_CEIL( REAL( PIXPOS( IPIX, 1 ) ) )
             J0 = KPG1_CEIL( REAL( PIXPOS( IPIX, 2 ) ) )
 
@@ -172,14 +172,14 @@
             IF( I0 .GE. LBND1 .AND. I0 .LE. UBND1 .AND.
      :          J0 .GE. LBND2 .AND. J0 .LE. UBND2 ) THEN
 
-*  Find the bounds of a 3x3 square of pixels centred on the pixel being 
+*  Find the bounds of a 3x3 square of pixels centred on the pixel being
 *  replaced
                JLO = MAX( LBND2, J0 - 1 )
-               JHI = MIN( UBND2, J0 + 1 ) 
+               JHI = MIN( UBND2, J0 + 1 )
                ILO = MAX( LBND1, I0 - 1 )
-               IHI = MIN( UBND1, I0 + 1 ) 
+               IHI = MIN( UBND1, I0 + 1 )
 
-*  Loop round this square, storing the values of all pixels, except the 
+*  Loop round this square, storing the values of all pixels, except the
 *  central pixel.
                K = 1
                DO J = JLO, JHI
@@ -194,7 +194,7 @@
 *  Save the number of values stored in the array.
                KTOP = K - 1
 
-*  Do the same for the variance, if variance is available. 
+*  Do the same for the variance, if variance is available.
                IF( VAR ) THEN
                   K = 1
                   DO J = JLO, JHI
@@ -230,7 +230,7 @@
                      POINT( NGOOD ) = K
                      SUM = SUM + WRK2( NGOOD )
                   END IF
-               END DO       
+               END DO
 
 *  Store bad output values if there are less than 3 good input values in
 *  the box.
@@ -249,11 +249,11 @@
                   CALL KPG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Find the weighted median.
-                  CALL KPG1_WTM3R( WRK1, WRK2, SVAR, NGOOD, 
-     :                      COVEC( 1, NGOOD ), DOUT( I0, J0 ), NEWVAR, 
+                  CALL KPG1_WTM3R( WRK1, WRK2, SVAR, NGOOD,
+     :                      COVEC( 1, NGOOD ), DOUT( I0, J0 ), NEWVAR,
      :                      STATUS )
 
-                  IF( VAR ) VOUT( I0, J0 ) = NEWVAR 
+                  IF( VAR ) VOUT( I0, J0 ) = NEWVAR
 
 *  Increment the number of modified pixels.
                   NREP = NREP + 1

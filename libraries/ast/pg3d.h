@@ -16,12 +16,12 @@
 
 *  Description:
 *     This include file defines the interface to the pg3d module
-*     (implemented in file grf3d_pgplot.c) and provides the type 
-*     definitions, function prototypes and macros, etc. needed to 
-*     use this module. 
+*     (implemented in file grf3d_pgplot.c) and provides the type
+*     definitions, function prototypes and macros, etc. needed to
+*     use this module.
 *
-*     The functions in the pg3d interface provide control of the view 
-*     of the 3D world coordinate system visible on the 2D PGPLOT 
+*     The functions in the pg3d interface provide control of the view
+*     of the 3D world coordinate system visible on the 2D PGPLOT
 *     viewport. They are provided for users of the PGPLOT implementation
 *     of the grf3D interface distributed with AST. No calls to these
 *     functions are made from within AST itself.
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

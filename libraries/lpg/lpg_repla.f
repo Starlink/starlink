@@ -16,7 +16,7 @@
 *     Sets a flag indicating if LPG applications can use a single NDF as
 *     both input and output. If so, a temporary NDF is used to store
 *     the output. This NDF is then used to replace the existing input NDF once
-*     the application has completed. If REPLAC is .FALSE. (the default), an 
+*     the application has completed. If REPLAC is .FALSE. (the default), an
 *     error is reported if an attempt is made to use a single NDF as both input
 *     and output.
 
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

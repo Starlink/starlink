@@ -1,5 +1,5 @@
-      SUBROUTINE TRACB2( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,  
-     :                   NDISP, DTINDX, SCALE, OFFSET, XLMT, 
+      SUBROUTINE TRACB2( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
+     :                   NDISP, DTINDX, SCALE, OFFSET, XLMT,
      :                   YDAT, XDAT, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACB2( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,  
-*                  NDISP, DTINDX, SCALE, OFFSET, XLMT, 
+*     CALL TRACB2( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
+*                  NDISP, DTINDX, SCALE, OFFSET, XLMT,
 *                  YDAT, XDAT, STATUS )
 
 *  Description:
@@ -37,12 +37,12 @@
 *     NDISP = INTEGER (Given)
 *        The number of detectors to be displayed.
 *     DTINDX( NDISP ) = INTEGER (Given)
-*        Detector index in input arrays whose data to be put into output 
+*        Detector index in input arrays whose data to be put into output
 *        arrays.
 *     SCALE( NDISP ) = REAL (Given)
 *        The scale factor to produce scaled data.
 *     OFFSET( NDISP ) = REAL (Given)
-*        The offset for scaled y data of each row when put into 
+*        The offset for scaled y data of each row when put into
 *        output array.
 *     XLMT( 2 ) = REAL (Given)
 *        The in-scan display limits.
@@ -107,7 +107,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Process the data row by row 
+*  Process the data row by row
       DO I = 1, NDISP
 
 *  Initial the data account.
@@ -115,7 +115,7 @@
 
          DO J = BSMP, ESMP
 
-*  Process the sample only if the in-scan distance of the sample 
+*  Process the sample only if the in-scan distance of the sample
 *  drops inside the display limits.
             IF ( INSCN( J, DTINDX( I ) ) .GE. XLMT( 1 ) .AND.
      :           INSCN( J, DTINDX( I ) ) .LE. XLMT( 2 ) ) THEN
@@ -145,4 +145,4 @@
 
       END DO
 
-      END               
+      END

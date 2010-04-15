@@ -246,7 +246,7 @@
 
             CALL DAT_FIND (QSLOC, 'BADBITS', BDLOC, STATUS)
             CALL DAT_GET (BDLOC, '_UBYTE', 0, 0, BADBIT, STATUS)
-            
+
 *
 *          Attempt to get an identifier for the output cube and proceed
 *          if ok.  First construct the array bounds.
@@ -262,7 +262,7 @@
 
             CALL NDF_CREAT ('OUT', '_REAL', 3, CLWBND, CUPBND,
      :        CUBID, STATUS)
- 
+
             IF (STATUS .EQ. SAI__OK) THEN
 
 *
@@ -289,9 +289,9 @@
                NY = DIM(1)
                NZ = DIM(2)
 
-               CALL CON_RCPY (NX, NY, NZ, %VAL(CNF_PVAL(INPTR)), 
+               CALL CON_RCPY (NX, NY, NZ, %VAL(CNF_PVAL(INPTR)),
      :                        %VAL(CNF_PVAL(QLPTR)),
-     :           BADBIT, VARFLG, %VAL(CNF_PVAL(IVRPTR)), 
+     :           BADBIT, VARFLG, %VAL(CNF_PVAL(IVRPTR)),
      :           %VAL(CNF_PVAL(CUBPTR)),
      :           %VAL(CNF_PVAL(OVRPTR)), BADPIX, STATUS)
 

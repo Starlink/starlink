@@ -30,62 +30,62 @@
        INTEGER SIZE
        REAL Q(SIZE),U(SIZE)
        REAL QMIN,QMAX,UMIN,UMAX
-       INTEGER STATUS       
+       INTEGER STATUS
 
 *  Local variables
        INTEGER I
        REAL RANGE
-                               
+
        IF (STATUS .EQ. SAI__OK) THEN
-  
+
 *  Set initial max and min values
 
-          QMIN = VAL__MAXR                       
-          QMAX = VAL__MINR       
+          QMIN = VAL__MAXR
+          QMAX = VAL__MINR
 
 *  Loop over good data values data replacing current value of QMAX with
-*  any data value larger than QMAX, similarly for QMIN                  
-           
-          DO I = 1,SIZE        
-            IF (Q(I) .NE. VAL__BADR) THEN             
-              IF (Q(I) .GT. QMAX) THEN    
-                  QMAX=Q(I)               
-              ENDIF                         
-              IF (Q(I) .LT. QMIN) THEN    
-                  QMIN=Q(I)               
-              ENDIF                      
-            ENDIF   
-          ENDDO                             
+*  any data value larger than QMAX, similarly for QMIN
 
-*  Expand range slightly for tidier plot                                        
-                                        
+          DO I = 1,SIZE
+            IF (Q(I) .NE. VAL__BADR) THEN
+              IF (Q(I) .GT. QMAX) THEN
+                  QMAX=Q(I)
+              ENDIF
+              IF (Q(I) .LT. QMIN) THEN
+                  QMIN=Q(I)
+              ENDIF
+            ENDIF
+          ENDDO
+
+*  Expand range slightly for tidier plot
+
           RANGE=QMAX-QMIN
           QMAX=QMAX+0.05*RANGE
           QMIN=QMIN-0.05*RANGE
-  
+
 *  Set initial max and min values
 
-          UMIN = VAL__MAXR                       
-          UMAX = VAL__MINR                      
+          UMIN = VAL__MAXR
+          UMAX = VAL__MINR
 
 *  Loop over good data values data replacing current value of UMAX with
-*  any data value larger than UMAX, similarly for UMIN                  
-           
-          DO I = 1,SIZE                     
+*  any data value larger than UMAX, similarly for UMIN
+
+          DO I = 1,SIZE
             IF (U(I) .NE. VAL__BADR) THEN
-              IF (U(I) .GT. UMAX) THEN    
-                  UMAX=U(I)               
-              ENDIF   
+              IF (U(I) .GT. UMAX) THEN
+                  UMAX=U(I)
+              ENDIF
               IF (U(I) .LT. UMIN) THEN
                   UMIN=U(I)
-              ENDIF                      
+              ENDIF
             ENDIF
-          ENDDO    
+          ENDDO
 
-*  Expand range slightly for tidier plot                                        
-                                        
+*  Expand range slightly for tidier plot
+
           RANGE=UMAX-UMIN
           UMAX=UMAX+0.05*RANGE
-       ENDIF                         
+       ENDIF
        END
 

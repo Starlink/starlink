@@ -10,7 +10,7 @@
 *
 *   Given
 *      SAVE   l    Save operation (TRUE) or restore (FALSE)
-*   
+*
 *   D.L.Terrett  Starlink  Oct 1988
 *+
       IMPLICIT NONE
@@ -18,7 +18,7 @@
 
       INCLUDE 'PGP_ERR'
 
-      
+
       LOGICAL SAVE, SAVEOK
       INTEGER IERR
       SAVE SAVEOK
@@ -28,7 +28,7 @@
       REAL WINDO(4), VIEWP(4), WIND2(4), VIEW2(4), WSC, CLRECT(4)
 
       SAVE LASF, ICLIP, ITRN, WINDO, VIEWP, WIND2, VIEW2, IFACI, IFAIS,
-     1     WSC, ITYPE, MTYPE, MCI, IPLCI 
+     1     WSC, ITYPE, MTYPE, MCI, IPLCI
 
       DATA SAVEOK/.FALSE./
 

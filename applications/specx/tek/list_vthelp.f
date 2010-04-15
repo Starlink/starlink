@@ -14,7 +14,7 @@ C   Routine to list valid options on character page on VT100 or equivalent
       CHARACTER     VOPTS(NMAX)*16, OPTIONS(NMAX)*1
       INTEGER       IOPT(NMAX)
 
-      DATA IOPT    / 68, 76, 82, 66, 84, 72, 13, 69, 67, 78, 65, 
+      DATA IOPT    / 68, 76, 82, 66, 84, 72, 13, 69, 67, 78, 65,
      &               81, 43, 63, 83  /
       DATA VOPTS   / 'Draw last box'    , 'Mark left bndy',
      &               'Mark right bndy'  , 'Mark bottom bndy',
@@ -42,8 +42,8 @@ C   Routine to list valid options on character page on VT100 or equivalent
       END DO
 *     CALL ISET_CURSOR(1,1)
 *     CALL LIB$SET_CURSOR(1,1)
-      
-  
+
+
       RETURN
       END
 

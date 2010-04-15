@@ -101,7 +101,7 @@ PUBLIC void gk0xbmcircle(bm,x,y,radius,flags)bitmap *bm;int x,y,radius,flags;{
  * Uses Bresenham's algorithm to compute pixel coordinates
  * which approximate a circle  centre (0,0) in the first octant
  * (E to SE) ie from (Radius,0) to (Radius/Sqrt(2),Radius/Sqrt(2).
- * 
+ *
  * translated to C. Mark Martin @ RAL Jan 86.
  * and made to do whole solid circle. Apr 86
 
@@ -137,7 +137,7 @@ PRIVATE Arc(Radius){
 /*
  * Uses Bresenham's algorithm to compute the pixel coordinates which
  * approximate the straight line from (0,0) to (dx,dy). Other starting
- * positions can obviously be achieved by applying a translation 
+ * positions can obviously be achieved by applying a translation
  * in the routine Point
  */
 PRIVATE LineSegment(dx,dy){

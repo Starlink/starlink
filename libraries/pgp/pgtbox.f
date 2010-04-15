@@ -8,20 +8,20 @@ C
       INTEGER NXSUB, NYSUB
       CHARACTER XOPT*(*), YOPT*(*)
 C
-C Draw a box and optionally label one or both axes with (DD) HH MM SS 
-C style numeric labels (useful for time or RA - DEC plots).   If this 
+C Draw a box and optionally label one or both axes with (DD) HH MM SS
+C style numeric labels (useful for time or RA - DEC plots).   If this
 C style of labelling is desired, then PGSWIN should have been called
 C previously with the extrema in SECONDS of time.
 C
 C In the seconds field, you can have at most 3 places after the decimal
 C point, so that 1 ms is the smallest time interval you can time label.
 C
-C Large numbers are coped with by fields of 6 characters long.  Thus 
-C you could have times with days or hours as big as 999999.  However, 
+C Large numbers are coped with by fields of 6 characters long.  Thus
+C you could have times with days or hours as big as 999999.  However,
 C in practice, you might have trouble with labels overwriting  themselves
-C with such large numbers unless you a) use a small time INTERVAL, 
-C b) use a small character size or c) choose your own sparse ticks in 
-C the call to PGTBOX.  
+C with such large numbers unless you a) use a small time INTERVAL,
+C b) use a small character size or c) choose your own sparse ticks in
+C the call to PGTBOX.
 C
 C PGTBOX will attempt, when choosing its own ticks, not to overwrite
 C the labels, but this algorithm is not very bright and may fail.
@@ -48,22 +48,22 @@ C     0h0m20s      10s      -0h0m0s      10s        20s
 C
 C Knowing that the left field always has a full label and that
 C positive fields are unsigned, informs that time is decreasing
-C from left to right, not vice versa.   This can become very 
+C from left to right, not vice versa.   This can become very
 C unclear if you have used the 'F' option, but that is your problem !
 C
 C Exceptions to this labelling philosophy are when the finest time
-C increment being displayed is hours (with option 'Y') or days.  
+C increment being displayed is hours (with option 'Y') or days.
 C Then all fields carry a label.  For example,
 C
 C        +----------+----------+----------+----------+
 C      -10h        -8h        -6h        -4h        -2h
 C
 C
-C PGTBOX can be used in place of PGBOX; it calls PGBOX and only invokes 
+C PGTBOX can be used in place of PGBOX; it calls PGBOX and only invokes
 C time labelling if requested. Other options are passed intact to PGBOX.
 C
 C Inputs:
-C  XOPT   :  X-options for PGTBOX.  Same as for PGBOX plus 
+C  XOPT   :  X-options for PGTBOX.  Same as for PGBOX plus
 C
 C             'Z' for (DD) HH MM SS.S time labelling
 C             'Y' means don't include the day field so that labels
@@ -72,18 +72,18 @@ C                 will accumulate beyond 24 if necessary in this case.
 C             'X' label the HH field as modulo 24.  Thus, a label
 C                 such as 25h 10m would come out as 1h 10m
 C             'H' means superscript numbers with d, h, m, & s  symbols
-C             'D' means superscript numbers with    o, ', & '' symbols 
+C             'D' means superscript numbers with    o, ', & '' symbols
 C             'F' causes the first label (left- or bottom-most) to
 C                 be omitted. Useful for sub-panels that abut each other.
 C                 Care is needed because first label carries sign as well.
 C             'O' means omit leading zeros in numbers < 10
 C                 E.g.  3h 3m 1.2s rather than 03h 03m 01.2s  Useful
-C                 to help save space on X-axes. The day field does not 
+C                 to help save space on X-axes. The day field does not
 C                 use this facility.
 C
 C  YOPT   :  Y-options for PGTBOX.  See above.
-C  XTICK  :  X-axis major tick increment.  0.0 for default. 
-C  YTICK  :  Y-axis major tick increment.  0.0 for default. 
+C  XTICK  :  X-axis major tick increment.  0.0 for default.
+C  YTICK  :  Y-axis major tick increment.  0.0 for default.
 C            If the 'Z' option is used then XTICK and/or YTICK must
 C            be in seconds.
 C  NXSUB  :  Number of intervals for minor ticks on X-axis. 0 for default
@@ -113,13 +113,13 @@ C  1 : force decimal labelling, instead of automatic choice (see PGNUMB).
 C  2 : force exponential labelling, instead of automatic.
 C
 C      The default is to write Y-labels parallel to the axis
-C  
+C
 C
 C        ******************        EXCEPTIONS       *******************
 C
-C        Note that 
+C        Note that
 C          1) PGBOX option 'L' (log labels) is ignored with option 'Z'
-C          2) The 'O' option will be ignored for the 'V' option as it 
+C          2) The 'O' option will be ignored for the 'V' option as it
 C             makes it impossible to align the labels nicely
 C          3) Option 'Y' is forced with option 'D'
 C
@@ -130,11 +130,11 @@ C--
 C 05-Sep-1988 - new routine (Neil Killeen)
 C 20-Apr-1991 - add support for new DD (day) field and implement
 C               labelling on any axis (bottom,top,left,right) [nebk]
-C 10-Jun-1993 - add option 'O' for leading zeros, correctly deal with 
+C 10-Jun-1993 - add option 'O' for leading zeros, correctly deal with
 C               user ticks, fully support 'V' and 'NM' options, modify
 C               slightly meaning of 'F' option [nebk]
 C 16-Jan-1995 - add option 'X' [nebk]
-C 16-Aug-1996 - Bring axis labelling displacements more in line with 
+C 16-Aug-1996 - Bring axis labelling displacements more in line with
 C               those of pgbox.f [nebk]
 C-----------------------------------------------------------------------
       REAL XTICKD, YTICKD, XMIN, XMAX, YMIN, YMAX
@@ -151,7 +151,7 @@ C
       NYSUBD = NYSUB
 C
 C  Get window in world coordinates
-C 
+C
       CALL PGQWIN (XMIN, XMAX, YMIN, YMAX)
 C
 C  X-axis first
@@ -168,11 +168,11 @@ C
         ELSE
           XTIME = .TRUE.
           DODAYX = .TRUE.
-          IF (INDEX(XXOPT,'Y').NE.0 .OR. INDEX(XXOPT,'D').NE.0) 
+          IF (INDEX(XXOPT,'Y').NE.0 .OR. INDEX(XXOPT,'D').NE.0)
      *        DODAYX = .FALSE.
 C
           DOPARA = .TRUE.
-          CALL PGTBX1 ('X', DODAYX, DOPARA, XMIN, XMAX, XTICKD, 
+          CALL PGTBX1 ('X', DODAYX, DOPARA, XMIN, XMAX, XTICKD,
      *                 NXSUBD, TSCALX)
         END IF
       END IF
@@ -194,13 +194,13 @@ C
           DOPARA = .TRUE.
           IF (INDEX(YYOPT,'V').NE.0) DOPARA = .FALSE.
 C
-          CALL PGTBX1 ('Y', DODAYY, DOPARA, YMIN, YMAX, YTICKD, 
+          CALL PGTBX1 ('Y', DODAYY, DOPARA, YMIN, YMAX, YTICKD,
      *                 NYSUBD, TSCALY)
         END IF
       END IF
 C
-C  Parse options list.  For call to PGBOX when doing time labelling, we 
-C  don't want L (log), N or M (write numeric labels). 
+C  Parse options list.  For call to PGBOX when doing time labelling, we
+C  don't want L (log), N or M (write numeric labels).
 C
       IF (XTIME) THEN
         IPT = INDEX(XXOPT,'L')
@@ -247,11 +247,11 @@ C
         IF (INDEX(XXOPT,'X').NE.0) MOD24 = .TRUE.
 C
         IF (INDEX(XXOPT,'N').NE.0)
-     *    CALL PGTBX4 (DODAYX, SUPTYP, 'X', .TRUE., FIRST, 
+     *    CALL PGTBX4 (DODAYX, SUPTYP, 'X', .TRUE., FIRST,
      *      XMIN, XMAX, TSCALX, XTICKD, DO2, DOPARA, MOD24)
 C
         IF (INDEX(XXOPT,'M').NE.0)
-     *    CALL PGTBX4 (DODAYX, SUPTYP, 'X', .FALSE., FIRST, 
+     *    CALL PGTBX4 (DODAYX, SUPTYP, 'X', .FALSE., FIRST,
      *       XMIN, XMAX, TSCALX, XTICKD, DO2, DOPARA, MOD24)
       END IF
 C
@@ -276,11 +276,11 @@ C
         IF (INDEX(YYOPT,'X').NE.0) MOD24 = .TRUE.
 C
         IF (INDEX(YYOPT,'N').NE.0)
-     *    CALL PGTBX4 (DODAYY, SUPTYP, 'Y', .TRUE., FIRST, 
+     *    CALL PGTBX4 (DODAYY, SUPTYP, 'Y', .TRUE., FIRST,
      *       YMIN, YMAX, TSCALY, YTICKD, DO2, DOPARA, MOD24)
 C
         IF (INDEX(YYOPT,'M').NE.0)
-     *    CALL PGTBX4 (DODAYY, SUPTYP, 'Y', .FALSE., FIRST, 
+     *    CALL PGTBX4 (DODAYY, SUPTYP, 'Y', .FALSE., FIRST,
      *       YMIN, YMAX, TSCALY, YTICKD, DO2, DOPARA, MOD24)
 C
       END IF
@@ -289,7 +289,7 @@ C
       END
 C PGTBX1 -- support routine for PGTBOX
 C
-      SUBROUTINE PGTBX1 (AXIS, DODAY, DOPARA, TMIN, TMAX, TICK, 
+      SUBROUTINE PGTBX1 (AXIS, DODAY, DOPARA, TMIN, TMAX, TICK,
      *                   NSUB, TSCALE)
 C
       REAL TMIN, TMAX, TICK
@@ -300,23 +300,23 @@ C
 C Work out what the finest units the time labels will be in and
 C return the tick increments if the user does not set them.
 C
-C This is a support routine for PGTBOX and should not 
+C This is a support routine for PGTBOX and should not
 C be called by the user.
 C
 C Input:
 C  AXIS   :  'X' or 'Y' for use in determining if labels overwrite
-C  TMIN   :  Start time in seconds 
+C  TMIN   :  Start time in seconds
 C  TMAX   :  End   time in seconds
 C  DOPARA :  True if label to be parallel to axis, else perpendicular
 C Input/output:
 C  DODAY  :  Write labels as DD HH MM SS.S else HH MM SS.S with
 C            hours ranging above 24.  Useful for declination labels
-C  TICK   :  Major tick interval in seconds.  If 0.0 on input, will 
+C  TICK   :  Major tick interval in seconds.  If 0.0 on input, will
 C            be set here.
 C  NSUB   :  Number of minor ticks between major ticks. If 0 on input
 C            will be set here.
 C Outputs:
-C  TSCALE :  Determines finest unit of labelling 
+C  TSCALE :  Determines finest unit of labelling
 C            (1 => ss, 60 => mm, 3600 => hh, 3600*24 => dd)
 C
 C 05-Sep-1988 - new routine (Neil Killeen)
@@ -329,9 +329,9 @@ C-----------------------------------------------------------------------
       PARAMETER (NLIST1 = 19, NLIST2 = 10, NLIST3 = 6, NLIST4 = 8,
      *           NTICMX = 8)
 C
-      REAL TICKS1(NLIST1), TICKS2(NLIST2), TICKS3(NLIST3), 
+      REAL TICKS1(NLIST1), TICKS2(NLIST2), TICKS3(NLIST3),
      *TICKS4(NLIST4), TOCK, TOCK2, TINT, TINTS, TMINS, TMAXS
-      INTEGER NSUBS1(NLIST1), NSUBS2(NLIST2), NSUBS3(NLIST3), 
+      INTEGER NSUBS1(NLIST1), NSUBS2(NLIST2), NSUBS3(NLIST3),
      *NSUBS4(NLIST4), NPL, NTICK, ITICK, STRLEN
       CHARACTER STR*15
 C
@@ -339,13 +339,13 @@ C
       SAVE NSUBS1, NSUBS2, NSUBS3, NSUBS4
 C
       DATA TICKS1 /0.001,  0.002,                 0.005,
-     *             0.01,   0.02,                  0.05,  
-     *             0.1,    0.2,                   0.5,  
+     *             0.01,   0.02,                  0.05,
+     *             0.1,    0.2,                   0.5,
      *             1.0,    2.0,   3.0,    4.0,    5.0,
      *             6.0,   10.0,  15.0,   20.0,   30.0/
-      DATA NSUBS1 / 4,      4,                     2,    
-     *              4,      4,                     2,    
-     *              4,      4,                     2,    
+      DATA NSUBS1 / 4,      4,                     2,
+     *              4,      4,                     2,
+     *              4,      4,                     2,
      *              4,      4,     3,      4,      5,
      *              3,      2,     3,      2,      3/
 C
@@ -379,7 +379,7 @@ C
           CALL GRWARN ('PGTBX1: user given tick too small (< 1 ms); '
      *                 //'will auto-tick')
           TICK = 0.0
-        ELSE 
+        ELSE
           IF (MOD(TICK, 60.0) .NE. 0.0) THEN
             TSCALE = 1
           ELSE IF (MOD(TICK, 3600.0).NE.0.0) THEN
@@ -399,14 +399,14 @@ C
         END IF
       END IF
 C
-C  Work out label units depending on time interval if user 
+C  Work out label units depending on time interval if user
 C  wants auto-ticking
 C
       IF (TINT.LE.5*60) THEN
         TSCALE = 1
       ELSE IF (TINT.LE.5*3600) THEN
         TSCALE = 60
-      ELSE 
+      ELSE
         IF (.NOT.DODAY) THEN
           TSCALE = 3600
         ELSE
@@ -421,15 +421,15 @@ C
 CCCCC
 C  Divide interval into NTICK major ticks and NSUB minor intervals
 C  The tick choosing algorithm is not very robust, so watch out
-C  if you fiddle anything. 
+C  if you fiddle anything.
 CCCCC
 C
       TINTS = TINT / TSCALE
       IF (TSCALE.EQ.1) THEN
 C
-C  Time in seconds.  If the time interval is very small, may need to 
+C  Time in seconds.  If the time interval is very small, may need to
 C  label with up to 3 decimal places.  Have less ticks to help prevent
-C  label overwrite. STR is a dummy tick label to assess label 
+C  label overwrite. STR is a dummy tick label to assess label
 C  overwrite potential
 C
         IF (DOPARA) THEN
@@ -468,7 +468,7 @@ C
      *               TICK, NSUB)
       ELSE IF (TSCALE.EQ.60) THEN
 C
-C  Time in minutes 
+C  Time in minutes
 C
         NTICK = 6
         TOCK = TINTS / NTICK
@@ -489,10 +489,10 @@ C
         CALL PGTBX3 (DODAY, 0, TSCALE, TINTS, NTICMX, NLIST2, TICKS2,
      *               NSUBS2, ITICK, AXIS, DOPARA, STR(1:STRLEN),
      *               TICK, NSUB)
-      ELSE 
+      ELSE
         IF (TSCALE.EQ.3600 .AND. DODAY) THEN
 C
-C  Time in hours with the day field 
+C  Time in hours with the day field
 C
           NTICK = 6
           TOCK = TINTS / NTICK
@@ -520,7 +520,7 @@ C  ticks for big numbers or the parallel labels will overwrite.
 
           IF (DOPARA) THEN
             TMINS = ABS(TMIN) / TSCALE
-            TMAXS = ABS(TMAX) / TSCALE            
+            TMAXS = ABS(TMAX) / TSCALE
             CALL PGNPL (-1, NINT(MAX(TINTS,TMINS,TMAXS)), NPL)
             IF (NPL.LE.3) THEN
               NTICK = 6
@@ -539,7 +539,7 @@ C  ticks for big numbers or the parallel labels will overwrite.
           END IF
           TOCK = TINTS / NTICK
 C
-C   Select nearest tick from list; 1 choose nearest nice integer 
+C   Select nearest tick from list; 1 choose nearest nice integer
 C   scaled by the appropriate power of 10
 C
           CALL PGNPL (-1, NINT(TOCK), NPL)
@@ -550,7 +550,7 @@ C
 C
 C  Check label overwrite and/or too many ticks.
 C
-          CALL PGTBX3 (DODAY, NPL, TSCALE, TINTS, NTICMX, NLIST4, 
+          CALL PGTBX3 (DODAY, NPL, TSCALE, TINTS, NTICMX, NLIST4,
      *                 TICKS4, NSUBS4, ITICK, AXIS, DOPARA,
      *                 STR(1:STRLEN), TICK, NSUB)
         END IF
@@ -617,14 +617,14 @@ C
       CHARACTER AXIS*1, STR*(*)
       LOGICAL DODAY, DOPARA
 C
-C Try to see if label overwrite is going to occur with this tick 
+C Try to see if label overwrite is going to occur with this tick
 C selection, or if there are going to be more than a reasonable
-C number of ticks in the displayed time range.  If so, choose, 
+C number of ticks in the displayed time range.  If so, choose,
 C if available, the next tick (bigger separation) up in the list.
 C If the overwrite requires that we would need to go up to the bext
 C TSCALE, give up.  They will need to choose a smaller character size
 C
-C This is a support routine for PGTBOX and should not 
+C This is a support routine for PGTBOX and should not
 C be called by the user.
 C
 C Input:
@@ -642,9 +642,9 @@ C  AXIS   :  'X' or 'Y' axis
 C  DOPARA :  Labels parallel or perpendicualr to axis
 C  STR    :  A typical formatted string used for checking overwrite
 C Input/output:
-C  TICK   :  Current major tick interval in units of TSCALE. May be 
+C  TICK   :  Current major tick interval in units of TSCALE. May be
 C            made larger if possible if overwrite likely.
-C  NSUB   :  Number of minor ticks between major ticks. 
+C  NSUB   :  Number of minor ticks between major ticks.
 C
 C 10-Jun-1993 - new routine [nebk]
 C-----------------------------------------------------------------------
@@ -662,8 +662,8 @@ C
 C  Time in seconds or minutes, or in hours with a day field
 C
         NTICK = INT(TINTS / TICK)
-        IF ( (ITICK.LT.NTICKS)  .AND. 
-     *       ((DOPARA .AND. (LENS/TSCALE).GT.0.9*TICK) .OR. 
+        IF ( (ITICK.LT.NTICKS)  .AND.
+     *       ((DOPARA .AND. (LENS/TSCALE).GT.0.9*TICK) .OR.
      *       (NTICK.GT.NTICMX)) ) THEN
           IF (TICKS(ITICK+1).LT.TINTS) THEN
             NSUB = NSUBS(ITICK+1)
@@ -675,7 +675,7 @@ C
 C  Time in hours and no day field or time in days
 C
         NTICK = INT(TINTS / TICK)
-        IF ( (DOPARA .AND. (LENS/TSCALE).GT.0.9*TICK) .OR. 
+        IF ( (DOPARA .AND. (LENS/TSCALE).GT.0.9*TICK) .OR.
      *       (NTICK.GT.NTICMX) ) THEN
           IF (ITICK.LT.NTICKS) THEN
             IF (TICKS(ITICK+1)*10**(NPL-1).LT.TINTS) THEN
@@ -703,22 +703,22 @@ C
       CHARACTER AXIS*(*), SUPTYP*(*)
       LOGICAL FIRST, DODAY, CONVTL, DO2, DOPARA, MOD24
 C
-C Label an axis in (DD) HH MM SS.S style.    This is the main 
+C Label an axis in (DD) HH MM SS.S style.    This is the main
 C workhorse of the PGTBOX routines.
 C
-C This is a support subroutine for PGTBOX and should not be 
-C called by the user. 
+C This is a support subroutine for PGTBOX and should not be
+C called by the user.
 C
 C Inputs:
 C  DODAY  :  Write labels as DD HH MM SS.S else HH MM SS.S with
 C            hours ranging above 24.  Useful for declination labels
 C  SUPTYP :  If 'DHMS' then superscript the fields with d, h, m, & s
-C            If ' DMS' then superscript the fields with    o, '  & '' 
-C              Good for declination plots.  You should obviously not 
-C              ask for the day field for this to do anything sensible. 
+C            If ' DMS' then superscript the fields with    o, '  & ''
+C              Good for declination plots.  You should obviously not
+C              ask for the day field for this to do anything sensible.
 C            If '    ' then no superscripting is done.
 C  AXIS   :  'X' for x-axis, 'Y' for y-axis
-C  CONVTL :  If .true., write the labels in the conventional axis 
+C  CONVTL :  If .true., write the labels in the conventional axis
 C            locations (bottom and left for 'X' and 'Y').  Otherwise
 C            write them on the top and right axes ('X' and 'Y')
 C  FIRST  :  If .false. then omit the first label.
@@ -733,7 +733,7 @@ C  MOD24  :  HH field labelled as modulo 24
 C
 C 05-Sep-1988 - new routine (Neil Killeen)
 C 20-Apr-1991 - add support for new DD (day) field [nebk]
-C 10-Jun-1993 - complete rewrite & rename from PGTLAB. Fixes user given 
+C 10-Jun-1993 - complete rewrite & rename from PGTLAB. Fixes user given
 C               ticks bug too [nebk]
 C 15-Jan-1995 - Add argument MOD24
 C-----------------------------------------------------------------------
@@ -804,7 +804,7 @@ C
  200  CONTINUE
       IT = IT - 1
 C
-C   Work out the precision with which to write fractional seconds 
+C   Work out the precision with which to write fractional seconds
 C   labels into the SS.S field.   All other fields have integer labels.
 C
       SPREC = 0
@@ -820,7 +820,7 @@ C
 C
 C  Label special case of first tick.  Prepare fields and label
 C
-      CALL PGTBX6 (DODAY, MOD24, TSCALE, DD(1), HH(1), MM(1), 
+      CALL PGTBX6 (DODAY, MOD24, TSCALE, DD(1), HH(1), MM(1),
      *             SS(1), IVALF, RVAL, WRIT)
       SIGNF = 'H'
       IF (DODAY) SIGNF = 'D'
@@ -829,7 +829,7 @@ C
 C
 C   Set label displacements from axes.  This is messy for labels oriented
 C   perpendicularly on the right hand axis as we need to know how long
-C   the longest string we are going to write is before we write any 
+C   the longest string we are going to write is before we write any
 C   labels as they are right justified.
 C
       IF (AXIS.EQ.'X') THEN
@@ -942,7 +942,7 @@ C  Now label special case of zero tick. It carries the sign change
 C  when going from positive to negative time, left to right.
 C
       IF (IZERO.NE.0 .AND. IZERO.NE.1) THEN
-        CALL PGTBX6 (DODAY, MOD24, TSCALE, DD(IZERO), HH(IZERO), 
+        CALL PGTBX6 (DODAY, MOD24, TSCALE, DD(IZERO), HH(IZERO),
      *               MM(IZERO), SS(IZERO), IVALZ, RVAL, WRIT)
 C
         IF (ASIGN(IZERO-1).EQ.' ') ASIGN(IZERO) = '-'
@@ -958,7 +958,7 @@ C   and SD=-1 & IS=1 or SD=1 & IS=-1.  It is used to work out which
 C   fields to label on the right most tick which is labelled first.
 C
       IF (IZERO.EQ.0) THEN
-        IF (SD*IS.EQ.-1) THEN 
+        IF (SD*IS.EQ.-1) THEN
           IF ( (SD.EQ.-1 .AND. TIME.LE.0.0) .OR.
      *         (SD.EQ. 1 .AND. TIME.GE.0.0) ) TIME = 0.0
           CALL PGTBX5 (DODAY, TIME, ASIGNL, DDL, HHL, MML, SSL)
@@ -1048,13 +1048,13 @@ C
  300    CONTINUE
  400  CONTINUE
       CALL PGEBUF
-C 
+C
       RETURN
       END
 C PGTBX5 -- support routine for PGTBOX
 C
       SUBROUTINE PGTBX5 (DODAY, TSEC, ASIGN, D, H, M, S)
-C      
+C
       REAL S, TSEC
       INTEGER  D, H, M
       LOGICAL DODAY
@@ -1095,7 +1095,7 @@ C
       END
 C PGTBX6 -- support routine for PGTBOX
 C
-      SUBROUTINE PGTBX6 (DODAY, MOD24, TSCALE, DD, HH, MM, SS, IVAL, 
+      SUBROUTINE PGTBX6 (DODAY, MOD24, TSCALE, DD, HH, MM, SS, IVAL,
      *                   RVAL, WRIT)
 C
       INTEGER TSCALE, IVAL(3), DD, HH, MM
@@ -1169,7 +1169,7 @@ C
         WRIT(1) = DODAY
         WRIT(2) = T
         WRIT(3) = T
-C        
+C
         RVAL    = 0.0
         WRIT(4) = F
       ELSE IF (TSCALE.EQ.3600) THEN
@@ -1181,7 +1181,7 @@ C
 C
         IVAL(3) = 0
         WRIT(3) = F
-C  
+C
         RVAL    = 0.0
         WRIT(4) = F
       ELSE IF (TSCALE.EQ.3600*24) THEN
@@ -1218,32 +1218,32 @@ C
 C Inputs
 C  SUPTYP :  '    ', 'DHMS', or ' DMS' for no superscript labelling,
 C            d,h,m,s   or   o,','' superscripting
-C  SIGNF  :  Tells which field the sign is associated with.  
-C            One of 'D', 'H', 'M', or 'S'    
+C  SIGNF  :  Tells which field the sign is associated with.
+C            One of 'D', 'H', 'M', or 'S'
 C  ASIGN  :  ' ' or '-' for positive or negative times
 C  IVAL(3):  Day, hour, minutes of time
 C  RVAL   :  Seconds of time
 C  WRIT(4):  If .true. then write DD, HH, MM, SS  into label
-C  SPREC  :  Number of places after the decimal to write seconds 
+C  SPREC  :  Number of places after the decimal to write seconds
 C            string to.  Must be in the range 0-3
 C  DO2    :  If true, add a leading zero to numbers < 10
 C Outputs
 C  TEXT   :  Label
 C  TLEN   :  Length of label
-C  LAST   :  Is the location of the start character of the last 
+C  LAST   :  Is the location of the start character of the last
 C            field written into TEXT
 C
 C  05-Sep-1989 -- New routine (Neil Killeen)
-C  20-Apr-1991 -- Complete rewrite; support for new DD (day) field and 
+C  20-Apr-1991 -- Complete rewrite; support for new DD (day) field and
 C                 superscripted labels [nebk]
 C  14-May-1991 -- Removed BSL as a parameter (Char(92)) and made it
 C                 a variable to appease Cray compiler [mjs/nebk]
-C  10-Jun-1993 -- Rename from PGTLB1, add code to label superscript 
+C  10-Jun-1993 -- Rename from PGTLB1, add code to label superscript
 C                 seconds above the '.' and add DO2 option [nebk/jm]
 C-----------------------------------------------------------------------
-      INTEGER FLEN, FST, FMAX, TRLEN(3), SUPPNT, TMPNT, TLEN2, 
+      INTEGER FLEN, FST, FMAX, TRLEN(3), SUPPNT, TMPNT, TLEN2,
      *IR1, IR2, IP
-      CHARACTER FIELD*30, FRMAT2(3)*2, SUPER(4,3)*11, TMP*100, 
+      CHARACTER FIELD*30, FRMAT2(3)*2, SUPER(4,3)*11, TMP*100,
      *BSL*1, FRMAT*30
 C
       SAVE FRMAT2
@@ -1272,7 +1272,7 @@ C
       SUPER(2,2) = BSL//'u'//BSL//'(2729)'//BSL//'d'
       SUPER(3,2) = BSL//'u'//BSL//'(2727)'//BSL//'d'
       SUPER(4,2) = BSL//'u'//BSL//'(2728)'//BSL//'d'
-C      
+C
       SUPER(1,3) = BSL//'u'//' '//BSL//'d'
       SUPER(2,3) = BSL//'u'//' '//BSL//'d'
       SUPER(3,3) = BSL//'u'//' '//BSL//'d'
@@ -1315,7 +1315,7 @@ C
         TLEN = TLEN + TLEN2
       END IF
 C
-CCCC 
+CCCC
 C   Hours field
 CCCC
 C
@@ -1358,7 +1358,7 @@ C
 C   Write into temporary field with desired superscripting
 C
         FIELD = ' '
-        WRITE (FIELD, '(I2, A)') IVAL(3), 
+        WRITE (FIELD, '(I2, A)') IVAL(3),
      *                           SUPER(3,SUPPNT)(1:TRLEN(SUPPNT))
         FMAX = 2 + TRLEN(SUPPNT)
 C
@@ -1392,7 +1392,7 @@ C
         LAST = TLEN + 1
 C
 C   Write into temporary field
-C 
+C
         FIELD = ' '
         FST = 1
         IF (SPREC.GE.1) THEN
@@ -1403,7 +1403,7 @@ C
           IR1 = INT(RVAL)
           IR2 = NINT((RVAL - IR1) * 10**SPREC)
           FRMAT = '(I2, A1, A, '//FRMAT2(SPREC)//')'
-          WRITE (FIELD, FRMAT(1:15)) 
+          WRITE (FIELD, FRMAT(1:15))
      *                       IR1, '.',
      *                       BSL//'b'//SUPER(4,SUPPNT)(1:TRLEN(SUPPNT)),
      *                       IR2
@@ -1413,9 +1413,9 @@ C
           FMAX = 1 + 2 + SPREC
         ELSE
 C
-C   Integer label.  
+C   Integer label.
 C
-          WRITE (FIELD, '(I2,A)') NINT(RVAL), 
+          WRITE (FIELD, '(I2,A)') NINT(RVAL),
      *                            SUPER(4,SUPPNT)(1:TRLEN(SUPPNT))
           FMAX = 0
         END IF
@@ -1440,11 +1440,11 @@ C
         TEXT(TLEN+1:) = TMP(TMPNT:TMPNT+TLEN2-1)
         TLEN = TLEN + TLEN2
       END IF
-C  
+C
 C   A trailing blank will occur if no superscripting wanted
 C
       IF (TLEN.GE.5 .AND. TEXT(TLEN-4:TLEN).EQ.BSL//'u'//' '//BSL//'d')
      *   TLEN = TLEN - 5
-C      
+C
       RETURN
       END

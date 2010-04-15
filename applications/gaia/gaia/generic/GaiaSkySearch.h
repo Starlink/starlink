@@ -65,8 +65,8 @@ class GaiaSkySearch : public SkySearch
 
     //  Convert tcl list to a GaiaQueryResult given column headings and
     //  transform the coordinates using a given FrameSet (as a Mapping).
-    virtual int getQueryResult( int numCols, char** colNames, 
-                                const char* list, AstFrameSet *frmset, 
+    virtual int getQueryResult( int numCols, char** colNames,
+                                const char* list, AstFrameSet *frmset,
                                 GaiaQueryResult& r );
 
  public:

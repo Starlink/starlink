@@ -132,7 +132,7 @@
 *  TNW 8/10/93 Use arcplot
 *  TNW: 28/1/94 Moved 1st call to ARCPLOT out of loops
 *  AJH: 1/9/97 Re-write call to fit_cpoly to expect PDA_DPOLFT return
-*      of A3 matrix of co-effs. Also change of gen_cheb2no to 
+*      of A3 matrix of co-effs. Also change of gen_cheb2no to
 *      PDA_DPCOEF to obtain Taylor series co-effs.
 *  ACD: 28/9/00 Remove character strings continued across continuation
 *      lines and remove local unused variables.
@@ -362,7 +362,7 @@
 
                call zero_dble(a,MAX_KPLUS1*MAX_KPLUS1)
                call zero_dble(a3new,3*maxnpts2 + 3*max_kplus1)
- 
+
                nag_error = fit_cpoly(w,lincnt,channel,wavelength,a,ss,
      :                     kp1,MAX_KPLUS1,%VAL(CNF_PVAL(ptr1)),a3new)
                call dsa_free_workspace(slot,status)

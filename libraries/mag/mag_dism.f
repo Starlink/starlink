@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     MAG_DISM
- 
+
 *  Purpose:
 *     Dismount tape from drive.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_DISM(PARAM, UNLOAD, STATUS)
- 
+
 *  Description:
 *     Dismount a tape from the tape drive specified by the parameter
 *     and set the entry for the drive in the user's device dataset
 *     (USREDEVDATA) to unknown position.
 *     If the dismount fails, the entry will be unaltered.
- 
+
 *  Arguments:
 *     PARAM=CHARACTER*(*) (Given)
 *        Expression specifying the name of a Tape Device Parameter.
@@ -30,11 +30,11 @@
 *        will return without action.
 *        If the routine fails to complete, this variable will be set
 *        to an appropriate error number.
- 
+
 *  Algorithm:
 *     Obtain a physical tape name for the tape drive and
 *     use MIO_DISM to dismount the tape on this drive.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1986, 1988, 1990, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *  Authors:
 *     Sid Wright (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-Jul-1983:  Original.  (UCL::SLW)
 *     17-Jul-1986:  For ADAM HDS_CLOSE USRDEVDATA on exit  (RAL::AJC)
@@ -75,33 +75,33 @@
 *     4-FEB-1993 ({author_identifier}):
 *        Add INCLUDE 'DAT_PAR'
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'PAR_ERR'         ! PAR Errors
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
       INCLUDE 'MAG_ERR'         ! MAG error constants
- 
+
 *  Arguments Given:
       CHARACTER*(*) PNAME       ! Tape Parameter Name
       LOGICAL UNLOAD            ! unload tape ?
- 
+
 *  Arguments Returned:
 *    Status return :
       INTEGER STATUS            ! status return
- 
+
 *  Global Variables:
       INCLUDE 'MAGGO_SCL'       ! MAG Initialisation Switch
- 
+
 *  External References:
       EXTERNAL MAG_BLK           ! Block data subprogram that
                                  ! initializes MAGSLP
@@ -116,28 +116,28 @@
       INTEGER BLOCK             ! current block number
       INTEGER ISTAT             ! Local status
       LOGICAL FINISHED          ! Action complete flag
- 
+
 *.
- 
- 
+
+
 *    Allowed to execute ?
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *    Initialised ?
       IF ( MAGSLP ) CALL MAG_ACTIV(STATUS)
- 
+
 *    Get a Parameter descriptor
       CALL MAG1_GETTP(PNAME, TP, RTP, STATUS)
       IF ( STATUS.NE.SAI__OK ) CALL MAG1_ERNAM(PNAME, STATUS)
- 
+
       FINISHED = .FALSE.
       DO WHILE ( (STATUS.EQ.SAI__OK) .AND. (.NOT.FINISHED) )
 *       Get device name associated with parameter
          CALL MAG1_CKTDS(PNAME, ELOC, LOC, STATUS)
- 
+
          IF ( STATUS.EQ.SAI__OK ) THEN
             CALL MAG1_RDTDS(LOC, TAPE, FILE, START, BLOCK, STATUS)
- 
+
             IF ( STATUS.EQ.SAI__OK ) THEN
 *            Dismount the tape
                CALL MIO_DISM(TAPE, UNLOAD, STATUS)
@@ -154,7 +154,7 @@
             CALL DAT_ANNUL(LOC, STATUS)
             CALL HDS_CLOSE(ELOC, STATUS)
          END IF
- 
+
 *      If No entry in DEVDATASET or no such device on machine,
          IF ( (STATUS.EQ.MAG__UNKDV) .OR. (STATUS.EQ.MAG__NSHDV) ) THEN
 *         Clear the deckes and try again
@@ -164,7 +164,7 @@
 *         Otherwise exit
             FINISHED = .TRUE.
          END IF
- 
+
       END DO
- 
+
       END

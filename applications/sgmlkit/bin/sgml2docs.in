@@ -32,7 +32,7 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #     <description>SGML or XML file to be processed.  The input file
 #	is taken to be SGML or XML depending on whether its file
 #	extension is <code>.sgml</code> or <code>.xml</code>.  There
-#	is not, at present, any other way of forcing this.  If there's 
+#	is not, at present, any other way of forcing this.  If there's
 #	no extension, or the script doesn't recognise the extension,
 #	it takes a guess at SGML; if that was a bad move, you'll soon
 #	know about it.
@@ -51,7 +51,7 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #           on the input filename.
 #     <dt>--jadeflags=flags<dd>add the given flags to the invocation
 #           of Jade.  See the
-#           <webref url='http://www.jclark.com/jade/' 
+#           <webref url='http://www.jclark.com/jade/'
 #           >Jade documentation</webref> for details.
 #     <dt>--ignore-manifest<dd>Do not use the generated manifest when
 #           bundling up files, but instead just bundle everything in
@@ -87,7 +87,7 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #       HTML files, bundling the result into a tarball
 #       <code>mydocs.tar</code>, rather than the default based on the
 #       source file's name.
-#       
+#
 #  <diytopic>Environment
 #     <p>Requires that <code>dvi2bitmap</code> is in the <code>PATH</code>  The
 #     script is currently rather sensitive to the available version of
@@ -99,7 +99,7 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #     <code>BIBINPUTS</code> environment variable.
 #
 #  <authorlist>
-#  <author id=ng 
+#  <author id=ng
 #          webpage='http://www.astro.gla.ac.uk/users/norman/'
 #          email='norman@astro.gla.ac.uk'
 #          affiliation='Starlink, Glasgow University'>
@@ -220,11 +220,11 @@ while [ $# -gt 0 ]; do
 	--html) TARGETFORMAT=0 ;;
         --latex) echo "The --latex option is no longer supported; use --texml instead" >&2; exit 1;;
         --texml) TARGETFORMAT=2 ;;
-	--htmlsingle) TARGETFORMAT=0; 
+	--htmlsingle) TARGETFORMAT=0;
 	    JADEFLAGS="$JADEFLAGS -V nochunks -isingle.file" ;;
 	--packagedir*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
-	    then 
+	    then
 		PACKAGEDIR=$2; shift
 	    else
 		PACKAGEDIR=$arg
@@ -232,7 +232,7 @@ while [ $# -gt 0 ]; do
 	    ;;
 	--tarball*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
-	    then 
+	    then
 		TARNAME=$2; shift
 	    else
 		TARNAME=$arg
@@ -240,7 +240,7 @@ while [ $# -gt 0 ]; do
 	    ;;
 	--jadeflags*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
-	    then 
+	    then
 		JADEFLAGS="$JADEFLAGS $2"; shift
 	    else
 		JADEFLAGS="$JADEFLAGS $arg"
@@ -248,7 +248,7 @@ while [ $# -gt 0 ]; do
 	    ;;
 	--options*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
-	    then 
+	    then
 		OPTIONS=$2; shift
 	    else
 		OPTIONS=$arg
@@ -451,15 +451,15 @@ if [ $TARGETFORMAT -eq 0 ]; then
             echo "$PROGNAME:I: Generating equations..."
             $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list & \
                 $LATEX "\\input $ROOT.imgeq.tex" >$latexlog & \
-                $DVI2BITMAP --magnification=2 --scale=4 --font-mode=nec --resolution=180 --process=transparent --verbose=quiet --query=bitmaps --pipe $ROOT.imgeq.dvi >dvi2bitmap.log 
-#                $DVI2BITMAP --magnification=3 --scale=3 --process=transparent --verbose=quiet --query=bitmaps --pipe $ROOT.imgeq.dvi >dvi2bitmap.log 
+                $DVI2BITMAP --magnification=2 --scale=4 --font-mode=nec --resolution=180 --process=transparent --verbose=quiet --query=bitmaps --pipe $ROOT.imgeq.dvi >dvi2bitmap.log
+#                $DVI2BITMAP --magnification=3 --scale=3 --process=transparent --verbose=quiet --query=bitmaps --pipe $ROOT.imgeq.dvi >dvi2bitmap.log
             echo "$PROGNAME:I: ...done"
         fi
 
 	if [ -r dvi2bitmap.log -a -r $ROOT.imgeq.labelmap ]; then
 	    awk '
 	    /^Qb/ { map[$2]=sprintf(" width=\"%s\" height=\"%s\"", $3, $4) }
-	    /^label/ { printf("<img-eq label=\"%s\" sysid=\"%s\"%s/>\n", 
+	    /^label/ { printf("<img-eq label=\"%s\" sysid=\"%s\"%s/>\n",
 		$2, $3, map[$3]?map[$3]:"") }
 	    BEGIN { print "<?xml version=\"1.0\"?>\n<!DOCTYPE img-eqlist SYSTEM \"img-eqlist\">\n<img-eqlist>" }
 	    END { print "</img-eqlist>" }
@@ -499,7 +499,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	# just scoop everything up
 	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
     fi
-	
+
     # Copy index.html to $srcroot.html (latter required by HTX system)
     if test -e $srcroot.html; then
         $VERBOSE && echo "$PROGNAME:W: file $srcroot.html already exists.  Odd"
@@ -591,7 +591,7 @@ if [ -r MANIFEST -o -n "$run" ]; then
 	case $f in
 	*.html)
 	    case $NORMTYPE in
-		nonorm) 
+		nonorm)
 		    cp $f $PACKAGEDIR/$f ;;
 
 		simplenorm)
@@ -608,7 +608,7 @@ b a
 		*)
 		    echo "$PROGNAME:W: Impossible normtype=$NORMTYPE.  Doing simple copy"
 		    cp $f $PACKAGEDIR/$f ;;
-	    esac		    
+	    esac
 	    ;;
 	*)
 	    $run mv $f $PACKAGEDIR

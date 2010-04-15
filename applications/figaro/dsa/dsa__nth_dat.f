@@ -115,7 +115,7 @@ C
             CALL DSA__NDF_TOP_NAME (ENV_NAME,NAME,.TRUE.,USE,AXIS_ITEM)
          ELSE
 C
-C           For the original Figaro format, it's easy.  
+C           For the original Figaro format, it's easy.
 C
             USE=.TRUE.
          END IF

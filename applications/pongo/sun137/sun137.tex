@@ -1034,7 +1034,7 @@ read into \xcol\ is assumed to be a Right Ascension (\ie of the first
 form above) and any data read into \ycol\ is assumed to be a
 Declination (\ie of the second form above).
 
-The \cnam{\iref{BOXFRAME}} command can label axes using a 
+The \cnam{\iref{BOXFRAME}} command can label axes using a
 \verb+HH MM SS.S+ and \verb+DD MM SS.S+ format providing the data and frame limits
 are specified in radians.
 
@@ -1157,7 +1157,7 @@ only use is when plotting in a particular projection type:
 \begin{table}[t]
 \centering
 \begin{tabular}{|l|p{0.6\textwidth}|}
-\hline 
+\hline
 Projection & Description \\
 \hline
 NONE     & No projection is used. \\
@@ -2962,7 +2962,7 @@ when they are specified on the command-line).
          the pen colour indices using the PALETTE application.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to 1 
+         value is used. The current value is initially set to 1
          (\ie foreground).
          [1]
       }
@@ -2999,7 +2999,7 @@ when they are specified on the command-line).
 
          }
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to 1 
+         value is used. The current value is initially set to 1
          (\ie single-stroke font).
          [1]
       }
@@ -3024,7 +3024,7 @@ when they are specified on the command-line).
 
          }
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to 2 
+         value is used. The current value is initially set to 2
          (\ie hollow fill).
          [2]
       }
@@ -3053,7 +3053,7 @@ when they are specified on the command-line).
 
          }
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to 1 
+         value is used. The current value is initially set to 1
          (\ie full line).
          [1]
       }
@@ -3413,7 +3413,7 @@ when they are specified on the command-line).
          values will give intermediate justifications.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to 0.5 
+         value is used. The current value is initially set to 0.5
          (\ie centre the text).
       }
       \sstsubsection{
@@ -4304,7 +4304,7 @@ when they are specified on the command-line).
          The colour index used when plotting the fitted curve.
 
          If no value is specified on the command line, the current value
-         is used. If there is no current value, a default of 2 
+         is used. If there is no current value, a default of 2
          (\ie red) will be used.
       }
       \sstsubsection{
@@ -5584,7 +5584,7 @@ when they are specified on the command-line).
    Change the size and aspect ratio of the plotting surface
 }{
    \sstdescription{
-      The width of the plotting surface and its aspect ratio 
+      The width of the plotting surface and its aspect ratio
       (\ie height/width) are modified.
    }
    \sstusage {
@@ -7018,7 +7018,7 @@ when they are specified on the command-line).
 }{
    \sstdescription{
       The viewport is set by specifying its extent in the X and Y
-      directions in terms of normalised device coordinates 
+      directions in terms of normalised device coordinates
       (\ie coordinates that run from 0 to 1 along the horizontal and
       vertical directions).
 
@@ -8082,8 +8082,8 @@ command (from the shell after closing the existing window):
 % xmake xwindows -width xxx -height xxx
 \end{verbatim}
 \end{quote}
-You should not change the size of an X window after it is created. 
-The X window is created using the GWM services which you can read 
+You should not change the size of an X window after it is created.
+The X window is created using the GWM services which you can read
 more about in \xref{SUN/130}{sun130}{} (which, for instance, describes
 other command-line options and how to set up your X resources to define the
 window size). If you want to plot to a postscript file then there are
@@ -8124,14 +8124,14 @@ IRAF/CL then see the document \xref{SUN/217}{sun217}{}.
 \section{Changes}
 \subsection {This release (2.0-2)}
 
-PONGO now uses native PGPLOT for plotting rather than the deprecated 
-Starlink GKS PGPLOT. This should fix plotting and interoperability  
+PONGO now uses native PGPLOT for plotting rather than the deprecated
+Starlink GKS PGPLOT. This should fix plotting and interoperability
 problems with recent versions of KAPPA.
 
 \subsection{Previous release (2.0-1)}
 
 PONGO has been considerably extended to now work from the IRAF/CL
-command language. To use this load the \verb+pongo+ package. The 
+command language. To use this load the \verb+pongo+ package. The
 commands that are available are the same as when running from ICL.
 
 Other changes of note are:

@@ -157,7 +157,7 @@
 *        scale and zero points constraint proved too much for all the
 *        global minimization routines I found).
 *     01-JUL-1999 (PDRAPER):
-*        Added initialization of ORIG values. These where not set if 
+*        Added initialization of ORIG values. These where not set if
 *        GETS or GETZ only where true (Linux random values).
 *     18-MAY-2009 (PDRAPER):
 *        Correct error messages from PDA_LSQR calls to show correct
@@ -492,7 +492,7 @@
 *  extend over the approximate range [-1.0D0:+1.0D0].
          DO 3 I = 1, N
             WRK1( I ) = 0.0D0
-            
+
 *  There are no constraints on the non-reference data, so let PDA_DQED know
 *  about this.
             IND( I ) = 4
@@ -538,7 +538,7 @@
 *  Perform initialisations for PDA_DQED.
          MCON = 0               ! No linear constraints (just simple ones)
          IOPT( 1 ) = 1          ! Print no information
-         IOPT( 2 ) = 0          ! "" 
+         IOPT( 2 ) = 0          ! ""
          IOPT( 3 ) = 99         ! No more options to change
          WRK2( 1 ) = 4 * NMAX * NMAX + 86 * NMAX + 141 ! Workspace length
          WRK2( 2 ) = 17 * NMAX + 40 ! Workspace length
@@ -559,21 +559,21 @@
          ELSE
 
 *  Work out the properly corrected sum of squares of the residuals.
-            FSUMSQ = FSUMSQ * FSUMSQ 
-            IF ( M .GT. N ) THEN 
+            FSUMSQ = FSUMSQ * FSUMSQ
+            IF ( M .GT. N ) THEN
                FSUMSQ = FSUMSQ / DBLE( M - N )
             END IF
 
 *  Remove the artificial reference data from consideration, if used.
-            IF ( CCD1_IREF .EQ. 0 ) THEN 
+            IF ( CCD1_IREF .EQ. 0 ) THEN
                M = M - 2
                N = N - 2
             END IF
 
 *  Now derive the optimised corrections covariance matrix .
-            CALL CCD1_FCOV( M, N, FSUMSQ, WRK1, WRK5, NMAX, WRK3( 1 ), 
-     :                      WRK3( NMAX + 2 ), WRK4, 
-     :                      WRK3( NMAX + NMAX + 3 ), INFO ) 
+            CALL CCD1_FCOV( M, N, FSUMSQ, WRK1, WRK5, NMAX, WRK3( 1 ),
+     :                      WRK3( NMAX + 2 ), WRK4,
+     :                      WRK3( NMAX + NMAX + 3 ), INFO )
 
 *  Check for errors.
             IF ( INFO .EQ. 1 ) THEN

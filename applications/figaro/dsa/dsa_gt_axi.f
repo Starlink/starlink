@@ -105,7 +105,7 @@ C
       INTEGER   NDIM                        ! Dimensions of axis objects
       CHARACTER OBJ_NAME*32                 ! DTA_ name of data object - ignored
       CHARACTER REF_NAME_UC*32              ! Upper case version of ref_name
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     DSA_ error codes
 C
@@ -132,7 +132,7 @@ C
       DO I=1,CHAR_ITEMS
          CHAR_ARRAY(I)=' '
       END DO
-C     
+C
 C     Only one numeric item, the log binning flag, is supported.
 C
       IF (NUM_ITEMS.GE.1) THEN

@@ -44,7 +44,7 @@ int indent_count = 0;
  *
  ******************************************************************************
  */
-void 
+void
 indent(void)
 {
     int i;
@@ -67,7 +67,7 @@ indent(void)
  *
  ******************************************************************************
  */
-value 
+value
 display_interpret(node * n, int op)
 {
     value val;
@@ -113,7 +113,7 @@ display_interpret(node * n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 assign_interpret(node * n, int op)
 {
     value val;
@@ -175,7 +175,7 @@ assign_interpret(node * n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 if_interpret(node * n, int op)
 {
     value val;
@@ -245,7 +245,7 @@ if_interpret(node * n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 else_interpret(node *n, int op)
 {
     switch (op) {
@@ -254,7 +254,7 @@ else_interpret(node *n, int op)
 
       case OP_PRINT:
 	outfpstring(" ");
-	outfpstring((string_part(n->val) != CHARNIL ? 
+	outfpstring((string_part(n->val) != CHARNIL ?
 			string_part(n->val) : ""));
 	outfpstring("\n");
 	++indent_count;
@@ -325,7 +325,7 @@ else_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 loop_interpret(node *n, int op)
 {
     value val;
@@ -464,7 +464,7 @@ loop_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 while_interpret(node *n, int op)
 {
     switch (op) {
@@ -517,7 +517,7 @@ while_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 step_interpret(node *n, int op)
 {
     switch (op) {
@@ -569,7 +569,7 @@ step_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 for_interpret(node *n, int op)
 {
     switch (op) {
@@ -617,7 +617,7 @@ for_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 break_interpret(node *n, int op)
 {
     switch (op) {
@@ -662,14 +662,14 @@ break_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 proc_call_interpret(node *n, int op)
 {
     extern node **arglistp;
     node *p;
 
-    extern value checkcallstack(char *), 
-		 pushcallstack(char *), 
+    extern value checkcallstack(char *),
+		 pushcallstack(char *),
 		 popcallstack(void);			/* main.c  */
     extern char *currentproc(void);			/* main.c  */
     extern int os_command(char *command);		/* unix.c  */
@@ -778,16 +778,16 @@ proc_call_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 builtin_call_interpret(node *n, int op)
 {
     extern node **arglistp;
     node *p;
-    extern value checkcallstack(char *), 
+    extern value checkcallstack(char *),
 		 pushcallstack(char *),
 		 popcallstack(void);			/* main.c */
     value val, val1;
- 
+
     icl_command = string_part(n->val);
 
     switch (op) {
@@ -872,7 +872,7 @@ builtin_call_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 comment_interpret(node *n, int op)
 {
     switch (op) {
@@ -909,11 +909,11 @@ comment_interpret(node *n, int op)
  * Expression lists are stored the same way.
  *
  * We check for exceptions and keyboard interrupts after every statement
- * executed.                    	
+ * executed.
  *
  ******************************************************************************
  */
-value 
+value
 line_list_interpret(node *n, int op)
 {
     value val;

@@ -39,8 +39,8 @@ C  ITEM  (input)  : character string defining the information to
 C                   be returned; see above for a list of possible
 C                   values.
 C  VALUE (output) : returns a character-string containing the
-C                   requested information, truncated to the length 
-C                   of the supplied string or padded on the right with 
+C                   requested information, truncated to the length
+C                   of the supplied string or padded on the right with
 C                   spaces if necessary.
 C  LENGTH (output): the number of characters returned in VALUE
 C                   (excluding trailing blanks).

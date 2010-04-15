@@ -1,6 +1,6 @@
 2003-05-05  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* README: Update for v1.13 
+	* README: Update for v1.13
 
 	* GSD.pm: gsdClose now moved back to XS since we no longer need to
 	include the kluge that closes the perl filehandle prematurely.
@@ -10,10 +10,10 @@
 	the file itself.
 
 	* typemap: FILE* is changed to GSDFILE* and is now a T_OPAQUEPTR
-	
+
 2000-05-17  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* gsdprint: Properly determine where C13DAT is in order to omit it. 
+	* gsdprint: Properly determine where C13DAT is in order to omit it.
 
 	* GSD.pm (DESTROY): Use isa() to see if we are a hash since ref()
 	always returns that we are a GSD object regardless of whether we
@@ -21,7 +21,7 @@
 
 2000-05-16  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* gsdprint: Add -pdl option 
+	* gsdprint: Add -pdl option
 
 	* MANIFEST: Add new test plus reorganized pdl tree
 
@@ -51,7 +51,7 @@
 
 	* t/gsd.t: Use the test module
 
-	* GSD.pm: Add objects and ties 
+	* GSD.pm: Add objects and ties
 
 2000-05-11  Tim Jenness  <timj@jach.hawaii.edu>
 

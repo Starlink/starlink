@@ -31,7 +31,7 @@
 *     pixel co-ordinates is created.
 
 *  Usage:
-*     setnorm ndf dim 
+*     setnorm ndf dim
 
 *  ADAM Parameters:
 *     ANORM = _LOGICAL (Read)
@@ -111,7 +111,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

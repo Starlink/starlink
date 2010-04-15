@@ -139,14 +139,14 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'FIO_ERR'          ! FIO_ error codes
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -273,7 +273,7 @@
      :                             CVAL, COMENT, CARD, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  If a value was found, then find its length and store it in the
 *  extension.
                      IF ( FOUND ) THEN
@@ -283,7 +283,7 @@
      :                                  STATUS )
                      END IF
                   END IF
- 
+
 *  Double precision:
 *  ================
 *  Obtain a value for the keyword from the FITS header.
@@ -293,7 +293,7 @@
      :                             DVAL, COMENT, CARD, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  If a value was found, then store it in the extension.
                      IF ( FOUND ) THEN
                         CALL NDF_XPT0D( DVAL, INDF, XNAME,
@@ -301,7 +301,7 @@
      :                                  STATUS )
                      END IF
                   END IF
- 
+
 *  Integer:
 *  =======
 *  Obtain a value for the keyword from the FITS header.
@@ -311,7 +311,7 @@
      :                             IVAL, COMENT, CARD, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  If a value was found, then store it in the extension.
                      IF ( FOUND ) THEN
                         CALL NDF_XPT0I( IVAL, INDF, XNAME,
@@ -319,7 +319,7 @@
      :                                  STATUS )
                      END IF
                   END IF
- 
+
 *  Logical:
 *  =======
 *  Obtain a value for the keyword from the FITS header.
@@ -329,7 +329,7 @@
      :                             LVAL, COMENT, CARD, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  If a value was found, then store it in the extension.
                      IF ( FOUND ) THEN
                         CALL NDF_XPT0L( LVAL, INDF, XNAME,
@@ -337,7 +337,7 @@
      :                                  STATUS )
                      END IF
                   END IF
- 
+
 *  Real:
 *  ====
 *  Obtain a value for the keyword from the FITS header.
@@ -347,7 +347,7 @@
      :                             RVAL, COMENT, CARD, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  If a value was found, then store it in the extension.
                      IF ( FOUND ) THEN
                         CALL NDF_XPT0R( RVAL, INDF, XNAME,
@@ -363,7 +363,7 @@
                   CALL ERR_REP( 'FITSIMP_TYPE',
      :              'Invalid data type ''^TYPE'' specified.', STATUS )
                END IF
- 
+
 *  If there has been no other error, then check if the keyword was
 *  found. Report an error if it was not, but carry on anyway.
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -391,7 +391,7 @@
             END IF
          END IF
          GO TO 1
-      END IF     
+      END IF
 
 *  Annul end-of-file errors, end the deferral of error reporting and
 *  close the translation table file.

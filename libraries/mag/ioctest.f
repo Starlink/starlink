@@ -15,12 +15,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
       SECOND = 'uiop'
       FORWARD = 1
       BACKWARD = -1
-      
+
 *   Device etc.
 
       PRINT *, 'Enter device name'
@@ -76,7 +76,7 @@
       READ (*, '(A)') ACCESS
       write (*, '(A, A)') DEVICE, ACCESS
 
-      CALL IOC_OPEN(DEVICE, LEN(DEVICE), ACCESS, LEN(ACCESS), 
+      CALL IOC_OPEN(DEVICE, LEN(DEVICE), ACCESS, LEN(ACCESS),
      :              CHAN, STATUS)
       PRINT *, 'Status from open is ', STATUS
       IF (STATUS .NE. SAI__OK) GO TO 800
@@ -86,7 +86,7 @@
          CALL IOC_CLOSE(CHAN, STATUS)
          PRINT *, 'Status from close is ', STATUS
          GO TO 800
-      ELSE 
+      ELSE
 
       PRINT *, 'ENTER BLOCK SIZE (<=8192)'
       READ (*, '(I)') BLKSIZ
@@ -101,7 +101,7 @@
                IF (ACT .EQ. 0) THEN
                   PRINT *, 'Read a tape mark'
                ELSE
-                  PRINT *, 'Read ', ACT, ' values, first was ', 
+                  PRINT *, 'Read ', ACT, ' values, first was ',
      :                     CHAR(BUFFER(1))
                END IF
             END DO
@@ -145,14 +145,14 @@
          ELSE
 
   200       CONTINUE
-      
+
             PRINT *, 'Enter command'
             READ (*,'(A)') COMMAND
             STATUS = SAI__OK
 
             IF (COMMAND(1:2) .EQ. 'rw') THEN
                CALL IOC_REW(CHAN, STATUS)
-               PRINT *, 'Status from rewind is ', STATUS 
+               PRINT *, 'Status from rewind is ', STATUS
 
             ELSE IF (COMMAND(1:2) .EQ. 're') THEN
                CALL IOC_READ(CHAN, BLKSIZ, BUFFER, ACT, STATUS)
@@ -160,14 +160,14 @@
                IF (ACT .EQ. 0) THEN
                   PRINT *, 'Read a tape mark'
                ELSE
-                  PRINT *, 'Read ', ACT, ' values, first was ', 
+                  PRINT *, 'Read ', ACT, ' values, first was ',
      :                     CHAR(BUFFER(1))
                END IF
 
             ELSE IF (COMMAND(1:2) .EQ. 'ff') THEN
                CALL IOC_SKIPF(CHAN, FORWARD, STATUS)
                PRINT *,'Status from skip forward file is ',STATUS
-  
+
             ELSE IF (COMMAND(1:2) .EQ. 'bf') THEN
                CALL IOC_SKIPF(CHAN, BACKWARD, STATUS)
                PRINT *, 'Status from skip back file is ', STATUS

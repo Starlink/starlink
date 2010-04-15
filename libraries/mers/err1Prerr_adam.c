@@ -14,7 +14,7 @@
 
 *  Description:
 *     This uses subParWrerr to send a message to the user.
-*     Trailing blanks are removed. 
+*     Trailing blanks are removed.
 *     If subParrWrerr fails, an attempt is made to write the message
 *     on STDERR. If that fails, or if STDERR was not a TTY, attempt to
 *     output on STDOUT.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@ void err1Prerr( const char * text, int * status ) {
   /*  Attempt to deliver the message via the user interface. */
   subParWrerr( text, &lstat );
 
-  /*  Check the returned status and attempt to report the message on 
+  /*  Check the returned status and attempt to report the message on
    *  STDERR. If that fails or if STDERR was not a terminal try STDOUT. */
   if (lstat != SAI__OK) {
 

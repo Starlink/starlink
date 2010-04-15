@@ -3,19 +3,19 @@
 *     1993 Jun          P. Brisco       Removed SMG junque.
 *---------------------------------------------------------------------------
       SUBROUTINE FORM_LATEX(FTYPE,STATUS)
- 
+
 *  Type Declaration
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       CHARACTER*(*) FTYPE		! 'ALL', 'SELECT', 'BLANK', or 'SUBLTX'
       INTEGER STATUS			! Status, 0 = OK
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_latex.inc'
       INCLUDE 'com_form_mtext.inc'
- 
+
 	CHARACTER       DATE_TIME*18
 
 *******************************************************************************
@@ -25,7 +25,7 @@
 *       		Added EXTN to distinguish concurrent batch jobs
 *     1991 Oct  MJR	Create multiple .tex files if more than 8 targets etc.
 * 			to avoid Latex crashing
-*     1992 Aug  M. Duesterhaus	Remove VAX specific code 
+*     1992 Aug  M. Duesterhaus	Remove VAX specific code
 *  Method
 *     The Descriptor file for the forms contains strings in the comment fields
 *     delimited by ':'s to describe the page(s) and location(s) on which each
@@ -35,23 +35,23 @@
 *     The location is given as :P/X/Y: where -
 *     	P Defines the page number(s)	Values allowed are 1,2,3,4,A
 *     					'A' means put in the rest of the pages
- 
+
 *     	X Defines the x coordinate	Can be real or integer, max 6 characters
- 
+
 *     	Y Defines the Y coordinate,	As for X, the position and decrement
 *     	  and any step for arrays	can be up to 6 chars. each, separated
-*     					by a '-', ie the step must be a 
+*     					by a '-', ie the step must be a
 *     					decrement. The decrement MUST be given
 *     					for 'G' - type fields, ie arrays OR
 *     					only the first value will be output
- 
+
 *     	There can be several output locations defined for each field, but only
 *     	one per page. The two fields:
 *     		NUMBER.OF.TARGETS
 *     		SUBJECT.CATEGORY
 *     	are treated as special cases, so the code will need changing if these
 *     	names are changes. Also the Abstract box is fixed in LTX_ABSTRACT
-*       Otherwise, it should be possible to make any changes required by 
+*       Otherwise, it should be possible to make any changes required by
 *	editing the dscf file.
 *  ALSO Contraints page ...
 *    	The files containing the basic data for each page have the names
@@ -60,21 +60,21 @@
 *     	The output is to file <file>.tex
 
 *******************************************************************************
- 
+
 *-
- 
+
 *  Functions
       INTEGER MDH_ENDWORD
       INTEGER DBS_GETI, DBS_FIELDNO
       LOGICAL DBS_GETL
-      CHARACTER*60 DBS_GETC      
+      CHARACTER*60 DBS_GETC
 *  Local Parameters
       INTEGER NEND/2/
       CHARACTER*14 END_STRING(2)
       DATA END_STRING/'end{document}','end'/
- 
+
       CHARACTER*20 HEADING /' Process LaTeX File '/
- 
+
 *  Local Variables
       INTEGER NF, LUN_OUT, I, N, IOSTATUS, LUN_IN, NCHAR
       INTEGER IERR, NC_TEX/0/, SUB_PAGE
@@ -83,9 +83,9 @@
       CHARACTER*256  LINE
       LOGICAL time_crit, targ_constr_page, targ_rem_page, do_page, file_exist
       CHARACTER*1  RMFILE
- 
+
 *  Executable Code
- 
+
 *     Have to assign the \  character to a variable so the SUN won't
 *     interpret it as an escape character
 
@@ -95,21 +95,21 @@
       NC_TEX = MDH_ENDWORD( TEXFILE)
 
       IF (FTYPE .EQ. 'SUBLTX' ) GOTO 99			! Resubmit LaTeX job
- 
+
       IF (.NOT.DSCF_PRINT_GOT) THEN			! Get print control
         CALL LTX_DSCF_INFO(STATUS)
         IF (STATUS.NE.0) GOTO 99
       END IF
- 
+
       IF (FTYPE .NE. 'BLANK' ) THEN			! Get Params
- 
+
          NF = DBS_FIELDNO(REF_FORM,'NUMBER.OF.TARGETS')
          IF (NF.GT.NFIELD_FORM) THEN
             NTARGET = 0
          ELSE
             NTARGET = DBS_GETI(REF_FORM,NF)
          END IF
- 
+
          NF = DBS_FIELDNO(REF_FORM,'SUBJECT.CATEGORY')
          IF (NF.GT.NFIELD_FORM) THEN
             CATEGORY = 0
@@ -119,9 +119,9 @@
       ELSE
          NTARGET = 1
       END IF
- 
+
 *  Now go thru pages outputting to the .tex file
- 
+
       CALL GETLUN(LUN_OUT)
 
       FILE_NAME = TEXFILE(:NC_TEX)//'.tex'
@@ -149,7 +149,7 @@
          STATUS = -1
          GOTO 99
       END IF
- 
+
 *  Get header stuff
       CALL GETLUN(LUN_IN)
       FILEIN  = 'rps_form_0.tex'
@@ -162,7 +162,7 @@
       END IF
       CALL GETDAT(DATE_TIME)
       WRITE(LUN_OUT,'(A/A/A)' ) '%', '% RPS Latex file ' // TEXFILE(:NC_TEX) // ' written ' // DATE_TIME, '%'
- 
+
       DO WHILE (.TRUE.)				! Read whole of file
          READ(LUN_IN,'(A)',END=20) LINE
          NCHAR= MDH_ENDWORD (LINE)
@@ -171,7 +171,7 @@
 20    CONTINUE
       CLOSE(LUN_IN)
       CALL FRELUN(LUN_IN)
- 
+
       CALL LATEX_PAGE(1,LUN_OUT,FORM,FTYPE,STATUS)	! Cover page
       CALL LATEX_PAGE(2,LUN_OUT,FORM,FTYPE,STATUS)	! General form
 
@@ -244,10 +244,10 @@
       END DO
       CLOSE(LUN_OUT)
       CALL FRELUN(LUN_OUT)
- 
+
       STATUS = 0
- 
- 
+
+
 99    CONTINUE
- 
+
       END

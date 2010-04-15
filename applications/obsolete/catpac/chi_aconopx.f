@@ -37,7 +37,7 @@
 *    Status :
       integer status
 *    Global variables :
-      include 'CHIWRK_CMN'    
+      include 'CHIWRK_CMN'
       integer n_not
       parameter (n_not=CHI__UNOP)
       integer u_plus

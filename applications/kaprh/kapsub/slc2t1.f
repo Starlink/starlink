@@ -8,7 +8,7 @@
 *     The 1-dimensional output array is extracted from the
 *     2-dimensional input array as a portion of either a column or a
 *     line, depending on the chosen mode. Should the dimension of the
-*     output array be longer than the slice, the trailing unused pixels 
+*     output array be longer than the slice, the trailing unused pixels
 *     are undefined and so have the magic value.
 *
 *    Invocation :
@@ -20,7 +20,7 @@
 *
 *     MODE = INTEGER( READ )
 *         If MODE is 1 then the output 1-D array is a line or part of
-*           a line in the input 2-d array. If MODE is 2 then the output 
+*           a line in the input 2-d array. If MODE is 2 then the output
 *           1-D array is a column or part of a column in the input
 *           array.
 *     IDIM1 = INTEGER( READ )
@@ -43,7 +43,7 @@
 *           MODE.
 *     STATUS = INTEGER( UPDATE )
 *         This is the global status, if this variable has an error
-*           value on entry then an immediate return will occur. If MODE 
+*           value on entry then an immediate return will occur. If MODE
 *           has a value other than 1 or 2 then STATUS will be set to
 *           SAI__ERROR and an error reported.
 *
@@ -97,7 +97,7 @@
      :  LIMITS( 2 ),           ! Slice limits
      :  SELECT,                ! Slice line or column number
      :  MODE
-            
+
       REAL
      :  ARRIN( IDIM1, IDIM2 )
 
@@ -116,7 +116,7 @@
      :  NPTS,                  ! The number of points to be extracted
                                ! into the 1-d array
      :  I,                     ! Index to input array elements
-     :  J                      !   "    " output  "       "   
+     :  J                      !   "    " output  "       "
 
       LOGICAL                  ! True if:
      :  FORWRD                 ! Slice is in the forward direction, i.e.

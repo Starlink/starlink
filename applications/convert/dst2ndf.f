@@ -44,7 +44,7 @@
 *         The file name of the version 2 file.  A file extension must
 *         not be given after the name, since ".dst" is appended by the
 *         application.  The file name is limited to 80 characters.
-*      OUT = NDF (Write)     
+*      OUT = NDF (Write)
 *         The file name of the output NDF file.  A file extension must
 *         not be given after the name, since ".sdf" is appended by the
 *         application.  Since the NDF_ library is not used, a section
@@ -90,7 +90,7 @@
 *            .X.LOG          ->   .AXIS(1).MORE.FIGARO.LOG
 *            .X.xxxx         ->   .AXIS(1).MORE.FIGARO.xxxx
 *            (Similarly for .Y .T .U .V or .W structures which are
-*             renamed to AXIS(2), ..., AXIS(6) in the NDF.) 
+*             renamed to AXIS(2), ..., AXIS(6) in the NDF.)
 *
 *            .OBS.OBJECT     ->   .TITLE
 *            .OBS.SECZ       ->   .MORE.FIGARO.SECZ
@@ -240,7 +240,7 @@
       INCLUDE 'SAE_PAR'          ! Standard ADAM constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
 
-*  Status:                  
+*  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
@@ -286,7 +286,7 @@
 *   Get an HDS locator to the NDF.
       CALL NDF_LOC( NDF, 'READ', LOC, STATUS )
 
-*   Get the output file name.  
+*   Get the output file name.
       CALL HDS_TRACE( LOC, NLEV, PATH, NDFFIL, STATUS )
 
 *   Map the NDF array so that it is defined, and hence can be annulled
@@ -304,9 +304,9 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *   Add the appropriate extensions to the input and output files.
-         NCF = CHR_LEN( FIGFIL ) 
+         NCF = CHR_LEN( FIGFIL )
          CALL CHR_APPND( '.dst', FIGFIL, NCF )
-         NCN = CHR_LEN( NDFFIL ) 
+         NCN = CHR_LEN( NDFFIL )
 
 *   Call the conversion subroutine.
          CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), FORM, NLEV,

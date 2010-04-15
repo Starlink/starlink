@@ -28,7 +28,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -39,7 +39,7 @@
 *          already been set, otherwise not yet.
 *        MCM_LUTER = INTEGER (Write)
 *          Logical unit number for output to the terminal. Initialised
-*          to -1 to indicate that no paged text values have yet been 
+*          to -1 to indicate that no paged text values have yet been
 *          set up in common.
 
 *  Global Data:

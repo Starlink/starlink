@@ -31,18 +31,18 @@
       CHARACTER*(*) RNAME           ! The output reduced observation
                                     ! filename
 *    Export :
-      CHARACTER * (80) RODIR        ! RO image directory name 
+      CHARACTER * (80) RODIR        ! RO image directory name
       CHARACTER * (5) OBSNUM        ! Observation number
 
 *    Local Constants :
 *    Local Variables :
-      CHARACTER*80 IDIR            ! I image directory name 
-      CHARACTER*80 ODIR            ! O image directory name 
+      CHARACTER*80 IDIR            ! I image directory name
+      CHARACTER*80 ODIR            ! O image directory name
       INTEGER DASH                 ! location of '_' in DATE_OBS string
       INTEGER LEN                  ! Length of string
-      INTEGER LENI                 ! Length of dir string 
-      INTEGER LENO                 ! Length of dir string 
-      INTEGER LENR                 ! Length of dir string 
+      INTEGER LENI                 ! Length of dir string
+      INTEGER LENO                 ! Length of dir string
+      INTEGER LENR                 ! Length of dir string
 *-
 
 *   Return if status on entry is not SAI__OK
@@ -58,7 +58,7 @@
       RODIR = ' '
       LEN = 0
       LENI = 0
-      LENO = 0      
+      LENO = 0
       LENR = 0
 
 
@@ -68,24 +68,24 @@
       LEN  = CHR_LEN( DATE_OBS )
 
 *   Check that string is likely to be OK by looking for the presence
-*   of '_' 
+*   of '_'
 
       DASH = INDEX( DATE_OBS, '_' )
 
 D     write (6,*) 'RONAME:date_obs, len, dash: ', date_obs, len, dash
 
 *   Check further that the string is in the required format YYMMDD_OBS
-*   by looking for a reasonable decade value 
+*   by looking for a reasonable decade value
 *   (from the 80's to the start of the next century!)
 
-      IF ( DASH .LE. 0 .OR. 
+      IF ( DASH .LE. 0 .OR.
      :     ( DATE_OBS(1:1) .NE. '8' .AND.
      :     DATE_OBS(1:1) .NE. '9' .AND.
      :     DATE_OBS(1:1) .NE. '0'     )  ) THEN
 
         CALL MSG_SETC('DATE_OBS', DATE_OBS )
-        CALL MSG_OUT('ERR', 
-     :    'Error, format for observation date should be YYMMDD_OBS', 
+        CALL MSG_OUT('ERR',
+     :    'Error, format for observation date should be YYMMDD_OBS',
      :               STATUS )
         CALL MSG_OUT('ERR', 'Character string read as ^DATE_OBS',
      :               STATUS )
@@ -98,18 +98,18 @@ D     write (6,*) 'RONAME:date_obs, len, dash: ', date_obs, len, dash
         OBSNUM = DATE_OBS( DASH+1: )
 
 *     get names of directories and do some checking -
-*     if the directory name doesn't end in a '/' add one 
+*     if the directory name doesn't end in a '/' add one
 
         CALL PAR_GET0C( 'IDIR', IDIR, STATUS )
         CALL CHR_LDBLK( IDIR )
         LENI  = CHR_LEN( IDIR )
         IF (LENI .EQ. 0) THEN
-          CALL MSG_OUT('ERR', 'Error, IDIR string has 0 length', 
+          CALL MSG_OUT('ERR', 'Error, IDIR string has 0 length',
      :                  STATUS )
           STATUS = SAI__ERROR
           RETURN
         END IF
-        IF ( IDIR(LENI:LENI) .NE. '/'  ) 
+        IF ( IDIR(LENI:LENI) .NE. '/'  )
      :   THEN
           LENI = LENI + 1
           IDIR(LENI:LENI) = '/'
@@ -119,12 +119,12 @@ D     write (6,*) 'RONAME:date_obs, len, dash: ', date_obs, len, dash
         CALL CHR_LDBLK( ODIR )
         LENO  = CHR_LEN( ODIR )
         IF (LENO .EQ. 0 ) THEN
-          CALL MSG_OUT('ERR', 'Error, ODIR string has 0 length', 
+          CALL MSG_OUT('ERR', 'Error, ODIR string has 0 length',
      :                  STATUS )
           STATUS = SAI__ERROR
           RETURN
         END IF
-        IF ( ODIR(LENO:LENO) .NE. '/'  ) 
+        IF ( ODIR(LENO:LENO) .NE. '/'  )
      :   THEN
           LENO = LENO + 1
           ODIR(LENO:LENO) = '/'
@@ -134,12 +134,12 @@ D     write (6,*) 'RONAME:date_obs, len, dash: ', date_obs, len, dash
         CALL CHR_LDBLK( RODIR )
         LENR  = CHR_LEN( RODIR )
         IF (LENR .EQ. 0) THEN
-          CALL MSG_OUT('ERR', 'Error, RODIR string has 0 length', 
+          CALL MSG_OUT('ERR', 'Error, RODIR string has 0 length',
      :                  STATUS )
           STATUS = SAI__ERROR
           RETURN
         END IF
-        IF ( RODIR(LENR:LENR) .NE. '/' ) 
+        IF ( RODIR(LENR:LENR) .NE. '/' )
      :   THEN
           LENR = LENR + 1
           RODIR(LENR:LENR) = '/'
@@ -148,7 +148,7 @@ D     write (6,*) 'RONAME:date_obs, len, dash: ', date_obs, len, dash
 D       write (6,*) 'IDIR, ODIR, RODIR', idir, odir, rodir
 
 
-*     create filenames 
+*     create filenames
 
         INAME = IDIR(1:LENI) // 'i' // DATE_OBS(1:LEN) // '_1'
         ONAME = ODIR(1:LENO) // 'o' // DATE_OBS(1:LEN)

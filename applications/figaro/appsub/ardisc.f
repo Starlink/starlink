@@ -13,7 +13,7 @@ C     (>) CHANS    (Real array CHANS(NLID)) The channel numbers for
 C                  the lines.
 C     (>) WAVES    (Real array WAVES(NLID)) The wavelengths of the
 C                  lines.
-C     (>) WEIGHTS  (Real array WEIGHTS(NLID)) The weights for the 
+C     (>) WEIGHTS  (Real array WEIGHTS(NLID)) The weights for the
 C                  identified arc lines.
 C     (>) CLASS    (Integer array CLASS(NLID)) The class codes for
 C                  the identified arc lines.

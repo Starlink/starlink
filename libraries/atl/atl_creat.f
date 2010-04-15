@@ -54,7 +54,7 @@
 *        Original version.
 *     15-SEP-2003 (DSB):
 *        Changed call to FIO_ANNUL to FIO_CLOSE. Previously the output
-*        text file was not completely flushed when being used as a 
+*        text file was not completely flushed when being used as a
 *        monolith (e.g. from ICL), resulting in incomplete output files.
 *     11-MAY-2006 (DSB):
 *        Increase maximum line length to 300 characters.
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  Get the name of the output file.
       CALL PAR_GET0C( PARAM, FNAME, STATUS )
 
-*  We delete any pre-existing file first. 
+*  We delete any pre-existing file first.
       CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
@@ -112,7 +112,7 @@
 *  Write the Object to the Channel.
       NOBJ = AST_WRITE( CHAN, IAST, STATUS )
 
-*  Report an error if no Object was written.      
+*  Report an error if no Object was written.
       IF( STATUS .EQ. SAI__OK .AND. NOBJ .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'F', FNAME )
@@ -121,7 +121,7 @@
 
       ELSE
          CALL MSG_SETC( 'F', FNAME )
-         CALL ATL_NOTIF( '   AST data written to text file ''^F''.', 
+         CALL ATL_NOTIF( '   AST data written to text file ''^F''.',
      :                    STATUS )
       END IF
 
@@ -138,7 +138,7 @@
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'FIO_ERR'
-      
+
 *  Arguments:
       INTEGER STATUS
 

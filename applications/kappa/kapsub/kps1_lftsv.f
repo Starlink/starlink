@@ -25,7 +25,7 @@
 *        If .TRUE., then the A matrix should factored.  If .FALSE., it
 *        has already been factored on a previous call and can be reused
 *        to solve another B immediately.  When reusing A you must also
-*        return the same WRK2. 
+*        return the same WRK2.
 *     B( ORDER + 1 ) = DOUBLE PRECISION (Given and Returned)
 *        Y times power X sums (B in Ax=B).  On exit it contains the
 *        polynomial coefficients.
@@ -96,12 +96,12 @@
 
       IF ( INITA ) THEN
          ITASK = 1
-      ELSE 
+      ELSE
          ITASK = 2
       END IF
 
 *  Let PDA take the strain.
-      CALL PDA_DGEFS( A, ORDER + 1, ORDER + 1, B, ITASK, IND, 
+      CALL PDA_DGEFS( A, ORDER + 1, ORDER + 1, B, ITASK, IND,
      :                WRK1, WRK2, STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 

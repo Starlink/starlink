@@ -35,7 +35,7 @@ C
 C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DSA_FIND_REF, DSA_WRUSER, ICH_FOLD, ICH_LEN
 C
 C  Prior requirements:

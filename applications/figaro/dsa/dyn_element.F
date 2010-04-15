@@ -28,7 +28,7 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) ADDRESS     (Integer,ref) The memory address in question.
 C
-C  Returns:  
+C  Returns:
 C
 C     (<) ELEMENT     (Integer,function value) The conceptual dynamic
 C                     memory element corresponding to ADDRESS.

@@ -1,18 +1,18 @@
-      SUBROUTINE SCULIB_SET_DATA_BIT (USE_THIS, N_BOLS, N_POS, 
+      SUBROUTINE SCULIB_SET_DATA_BIT (USE_THIS, N_BOLS, N_POS,
      :     N_BEAM, MASK, BITNUM, STATE, IN_DATA, STATUS)
 *+
 *  Name:
 *     SCULIB_SET_DATA_BIT
 
 *  Purpose:
-*     set a bit in data given a byte mask 
+*     set a bit in data given a byte mask
 
 *  Language:
 *     Starlink Fortran 77
-*  
+*
 
 *  Invocation:
-*     CALL SCULIB_SET_DATA_BIT(USE_THIS, N_BOLS, N_POS, N_BEAM, 
+*     CALL SCULIB_SET_DATA_BIT(USE_THIS, N_BOLS, N_POS, N_BEAM,
 *    :    MASK, BITNUM, STATE, IN_DATA, STATUS)
 
 
@@ -136,7 +136,7 @@
 
 *       Turn the bits off
             DO BOL = 1, N_BOLS
-                  
+
                DO POS = 1, N_POS
 
                   IF (MASK(BOL,POS) .NE. 0) THEN
@@ -150,7 +150,7 @@
                   END IF
                END DO
             END DO
-            
+
          END IF
 
 *     Set unmasked data to value
@@ -160,14 +160,14 @@
 
             DO BOL = 1, N_BOLS
                DO POS = 1, N_POS
-                  
+
                   IF (MASK(BOL, POS) .EQ. 0) THEN
 
                      DO BEAM = 1, N_BEAM
 
                         IN_DATA(BOL, POS, BEAM) = SCULIB_BITON(
      :                       IN_DATA(BOL, POS, BEAM), BITNUM)
-                        
+
                      END DO
                   END IF
                END DO
@@ -177,7 +177,7 @@
 
             DO BOL = 1, N_BOLS
                DO POS = 1, N_POS
-                  
+
                   IF (MASK(BOL, POS) .EQ. 0) THEN
 
                      DO BEAM = 1, N_BEAM

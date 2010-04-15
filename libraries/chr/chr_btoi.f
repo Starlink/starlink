@@ -13,20 +13,20 @@
 *     CALL CHR_BTOI( STRING, IVALUE, STATUS )
 
 *  Description:
-*     The given binary string is decoded into an INTEGER value. 
- 
+*     The given binary string is decoded into an INTEGER value.
+
 *  Arguments:
 *     STRING = CHARACTER * ( * ) (Given)
 *        String to be decoded, e.g. `10101100'.
 *     IVALUE = INTEGER (Returned)
 *        Value decoded from the given string.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value. If this value is not SAI__OK on input, the 
-*        routine returns without action. If the routine fails to 
+*        The status value. If this value is not SAI__OK on input, the
+*        routine returns without action. If the routine fails to
 *        complete successfully, STATUS is returned set to SAI__ERROR.
 
-*  Note: 
-*     This subroutine assumes a 32-bit, twos-complement representation 
+*  Note:
+*     This subroutine assumes a 32-bit, twos-complement representation
 *     of an INTEGER.
 
 *  Algorithm:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -143,7 +143,7 @@
 
                      IF ( IVAL .GT. 1 ) THEN
 
-*                    Binary string has an integer value greater than 
+*                    Binary string has an integer value greater than
 *                    4 bytes.
                         STATUS = SAI__ERROR
                         GO TO 999

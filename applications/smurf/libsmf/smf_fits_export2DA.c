@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
-*                          char *fitsrec, 
+*     smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards,
+*                          char *fitsrec,
 *                          int *status )
 
 *  Arguments:
@@ -90,13 +90,13 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_export2DA"
 
-void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards, 
+void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
                           char *fitsrec,
                           int *status ) {
 
   /* Local variables */
   char *outpos = NULL;    /* current position in output buffer */
-  char card[SZFITSCARD];  /* temporary buffer for current card */   
+  char card[SZFITSCARD];  /* temporary buffer for current card */
   int found;              /* Boolean to indicate if a card was found */
   size_t i;               /* Loop counter */
 
@@ -111,12 +111,12 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
       *status = SAI__ERROR;
       msgSeti("NC", (int)*ncards);
       msgSeti("MC", SC2STORE__MAXFITS);
-      errRep( FUNC_NAME, 
+      errRep( FUNC_NAME,
               "Number of FITS cards ^NC exceeds maximum allowed (^MC)",
               status );
       return;
    }
-  
+
    /* Rewind */
    astClear ( fitschan, "Card");
 
@@ -125,7 +125,7 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
    for ( i = 0; i <= *ncards; i++ ) {
       found = astFindFits ( fitschan, "%f", card, 1 );
       if ( found ) {
-	 strncpy ( outpos, card, SZFITSCARD );	 
+	 strncpy ( outpos, card, SZFITSCARD );
 	 outpos += 80;
       } else {
 	break;

@@ -160,7 +160,7 @@
 *       If the polygon catalogue contains less than three corners then
 *       set the status and report an error (at least three corners are
 *       required to define an area).
-         
+
          IF (CORNER .LT. 3  .AND.  STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
 
@@ -179,7 +179,7 @@
 *
 *       Read in the polygon corners.
 
-         CALL CAP_RDPLY (CIPOLY, XCRNRI, YCRNRI, CORNER, 
+         CALL CAP_RDPLY (CIPOLY, XCRNRI, YCRNRI, CORNER,
      :     %VAL(CNF_PVAL(XCRNPT)), %VAL(CNF_PVAL(YCRNPT)), STATUS)
 
 *
@@ -205,8 +205,8 @@ C           CALL CAP_????
 *
 *       Generate a list of the points which fall inside the polygon.
 
-         CALL CAP_PLYSL (CI, XCOLI, YCOLI, ROWS, CORNER, 
-     :     %VAL(CNF_PVAL(XCRNPT)), %VAL(CNF_PVAL(YCRNPT)), 
+         CALL CAP_PLYSL (CI, XCOLI, YCOLI, ROWS, CORNER,
+     :     %VAL(CNF_PVAL(XCRNPT)), %VAL(CNF_PVAL(YCRNPT)),
      :     NUMIN, %VAL(CNF_PVAL(INPTR)), STATUS)
 
 *
@@ -217,8 +217,8 @@ C           CALL CAP_????
             CALL CAP_CRTAR (ROWS, '_INTEGER', OUTPTR, STATUS)
             CALL CAP_CRTAR (ROWS, '_INTEGER', WRKPTR, STATUS)
 
-            CALL CAP_RJLST (NUMIN, %VAL(CNF_PVAL(INPTR)), ROWS, 
-     :        %VAL(CNF_PVAL(WRKPTR)), NUMOUT, %VAL(CNF_PVAL(OUTPTR)), 
+            CALL CAP_RJLST (NUMIN, %VAL(CNF_PVAL(INPTR)), ROWS,
+     :        %VAL(CNF_PVAL(WRKPTR)), NUMOUT, %VAL(CNF_PVAL(OUTPTR)),
      :        STATUS)
          END IF
 
@@ -229,13 +229,13 @@ C           CALL CAP_????
             NUMSEL = NUMIN
             CRIT = 'Points inside polygon.'
 
-            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(INPTR)), CRIT, 
+            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(INPTR)), CRIT,
      :        REJCAT, CI, SI, SIR, NUMREJ, STATUS)
          ELSE
             NUMSEL = NUMOUT
             CRIT = 'Points outside polygon.'
 
-            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(OUTPTR)), CRIT, 
+            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(OUTPTR)), CRIT,
      :        REJCAT, CI, SI, SIR, NUMREJ, STATUS)
          END IF
 

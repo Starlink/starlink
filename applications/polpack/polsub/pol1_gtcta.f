@@ -13,11 +13,11 @@
 *     CALL POL1_GTCTA( CI, NDIM, GI, IWCS, STATUS )
 
 *  Description:
-*     This routine attempts to read an AST FrameSet from the textual 
+*     This routine attempts to read an AST FrameSet from the textual
 *     information stored with the supplied catalogue (class COMMENT). To
 *     be usable the Base Frame of the FrameSet must contain axes with
 *     symbols equal to the names of the supplied catalogue columns (GI)
-*     (and no other axes). If not succesful, a default FrameSet is created 
+*     (and no other axes). If not succesful, a default FrameSet is created
 *     containing a single Frame. The attribute sof th eaxes of this Frame
 *     are taken from the supplied columns. If these columns include an
 *     RA/DEC pair, then the retruned Frame will either be a SkyFrame, or a
@@ -33,8 +33,8 @@
 *        Ignored if NDIM is zero. The Base Frame of the returned FrameSet
 *        is spanned by these two columns.
 *     IWCS = INTEGER (Returned)
-*        An AST pointer to the returned FrameSet. AST__NULL is returned if 
-*        an error occurs. 
+*        An AST pointer to the returned FrameSet. AST__NULL is returned if
+*        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -42,7 +42,7 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -72,15 +72,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'CAT_PAR'          ! CAT constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER CI
@@ -128,7 +128,7 @@
 *  Initialise.
       IWCS = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -138,7 +138,7 @@
 *  value by concatentating the column names separated by minius signs.
       DEFDOM = ' '
       IAT = 0
-      DO I = 1, NDIM      
+      DO I = 1, NDIM
          CALL CAT_TIQAC( GI( I ), 'NAME', NAME( I ), STATUS )
          NMLEN( I ) = CHR_LEN( NAME( I ) )
          CALL CHR_APPND( NAME( I ), DEFDOM, IAT )
@@ -152,11 +152,11 @@
 *  Read Objects from the catalogue until a FrameSet is obtained in which
 *  the Base Frame has axes corresponding to columns supplied in GI.
       DONE = .FALSE.
-      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
          CALL KPG1_RCATW( CI, IWCS, STATUS )
 
          IF( IWCS .NE. AST__NULL ) THEN
-            IF( AST_ISAFRAMESET( IWCS, STATUS ) .AND. 
+            IF( AST_ISAFRAMESET( IWCS, STATUS ) .AND.
      :          AST_GETI( IWCS, 'NIN', STATUS ) .EQ. NDIM ) THEN
 
 *  Find the indices of the Base Frame axes with symbols equal to the
@@ -195,7 +195,7 @@
 
          ELSE
             DONE = .TRUE.
-         END IF         
+         END IF
 
       END DO
 
@@ -217,7 +217,7 @@
 *  If not, see if the catalogue contains integer-valued parameters RA_COL
 *  and DEC_COL. These are assumed to be the zero-based index of the RA
 *  and DEC columns.
-         IF( RAAX .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
+         IF( RAAX .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
             CALL CAT_TIDNT( CI, 'RA_COL', GC, STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
                CALL CAT_TIQAI( GC, 'VALUE', RAAX, STATUS )
@@ -242,16 +242,16 @@
             END IF
          END IF
 
-*  If we now have RA and DEC columns, we create a SkyFrame (i.e. a CURSA 
+*  If we now have RA and DEC columns, we create a SkyFrame (i.e. a CURSA
 *  "Target List" - see SUN/190).
-         FRM1 = AST__NULL 
+         FRM1 = AST__NULL
          IF( RAAX .NE. 0 .AND. DECAX .NE. 0 ) THEN
             FRM1 = AST_SKYFRAME( ' ', STATUS )
 
 *  Look for EPOCH, EQUINOX and SYSTEM catalogue parameters. If supplied
 *  set the corresponding attributes in the SkyFrame, and then retrieve
 *  them as floating point values.
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF( STATUS .EQ. SAI__OK ) THEN
                CALL CAT_TIDNT( CI, 'EQUINOX', GC, STATUS )
                IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
             END IF
@@ -284,7 +284,7 @@
                SYS = ' '
             END IF
 
-*  If no System parameter was found, choose a system based on the 
+*  If no System parameter was found, choose a system based on the
 *  epoch and equinox.
             IF( SYS .EQ. ' ' ) THEN
                IF( EQ .NE. -1.0D0 ) THEN
@@ -293,14 +293,14 @@
                   ELSE
                      SYS = 'FK5'
                   END IF
-   
+
                ELSE IF( EP .NE. -1.0D0 ) THEN
                   IF( EP .LT. 1984.0D0 ) THEN
                      SYS = 'FK4'
                   ELSE
                      SYS = 'FK5'
                   END IF
-   
+
                ELSE
                   SYS = 'FK5'
                END IF
@@ -359,8 +359,8 @@
 
          END IF
 
-*  Permute the axes of the total Frame to ensure that the indices of the 
-*  RA and DEC axes are the same as the indicies of the RA and DEC columns 
+*  Permute the axes of the total Frame to ensure that the indices of the
+*  RA and DEC axes are the same as the indicies of the RA and DEC columns
 *  in GI.
          IF( FRM1 .NE. AST__NULL ) THEN
              J = 3
@@ -370,25 +370,25 @@
                 ELSE IF( DECAX .EQ. I ) THEN
                    PERM( I ) = 2
                 ELSE
-                   PERM( I ) = J 
+                   PERM( I ) = J
                    J = J + 1
                 END IF
              END DO
 
-             CALL AST_PERMAXES( FRM, PERM, STATUS ) 
+             CALL AST_PERMAXES( FRM, PERM, STATUS )
 
          END IF
 
 *  Ensure that all the axes have the correct symbols, label and units
 *  attributes (these will already be OK if the axes belong to a SkyFrame).
-         
+
          DO I = 1, NDIM
-            IF( I .NE. RAAX .AND. I .NE. DECAX ) THEN 
+            IF( I .NE. RAAX .AND. I .NE. DECAX ) THEN
                ATTR = 'Symbol('
                IAT = 7
                CALL CHR_PUTI( I, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               CALL AST_SETC( FRM, ATTR( : IAT ), 
+               CALL AST_SETC( FRM, ATTR( : IAT ),
      :                        NAME( I )( : NMLEN( I ) ), STATUS )
 
                TEXT = ' '
@@ -403,7 +403,7 @@
                IAT = 6
                CALL CHR_PUTI( I, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               CALL AST_SETC( FRM, ATTR( : IAT ), 
+               CALL AST_SETC( FRM, ATTR( : IAT ),
      :                        TEXT( : CHR_LEN( TEXT ) ), STATUS )
 
                TEXT = ' '
@@ -421,8 +421,8 @@
 
 *  If the Frame has no DOMAIN, use a default domain formed by
 *  concatenating the column names.
-         IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. ' ' ) THEN 
-            CALL AST_SETC( FRM, 'DOMAIN', DEFDOM, STATUS ) 
+         IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. ' ' ) THEN
+            CALL AST_SETC( FRM, 'DOMAIN', DEFDOM, STATUS )
          END IF
 
 *  Create the default FrameSet holding the above Frame.
@@ -433,31 +433,31 @@
 
 *  If a FrameSet was read, check to see if it was created by V1.0 of
 *  POLPACK which left the GRID Frame as the Base Frame. These catalogues
-*  are marked by having Frames with Domain OLDGRID in the WCS FrameSet. 
+*  are marked by having Frames with Domain OLDGRID in the WCS FrameSet.
 *  Such FrameSets are changed by making the PIXEL Frame the Base Frame.
-      ELSE 
+      ELSE
          ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
          IF( AST_FINDFRAME( IWCS, AST_FRAME( 2, ' ', STATUS ),
      :                      'OLDGRID', STATUS ) .NE. AST__NULL .AND.
-     :       AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ), 
+     :       AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
      :                 'DOMAIN', STATUS ) .EQ. 'GRID' ) THEN
 
             IF( AST_FINDFRAME( IWCS, AST_FRAME( 2, ' ', STATUS ),
      :                         'PIXEL', STATUS ) .NE. AST__NULL ) THEN
-               CALL AST_SETI( IWCS, 'BASE', 
+               CALL AST_SETI( IWCS, 'BASE',
      :                        AST_GETI( IWCS, 'CURRENT', STATUS ),
      :                        STATUS )
             END IF
 
-         END IF                  
+         END IF
 
          CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
 *  Permute the Base Frame axes so that they are in the same order as the GI
 *  array.
          BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-         CALL AST_PERMAXES( BFRM, AXES, STATUS ) 
+         CALL AST_PERMAXES( BFRM, AXES, STATUS )
       END IF
 
 *  If an error has occurred, annul the returned FrameSet pointer. Otherwise

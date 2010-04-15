@@ -190,7 +190,7 @@ itcl::class gaia::GaiaAstTransferTable {
          $t clear_selection
          $t search "id" [incr ids_]
          set nselect [$t num_selected]
-      } 
+      }
 
       #  Create the new row.
       $itk_component(table) append_row [list $ids_ 00:00:00 00:00:00 0.0 0.0]
@@ -269,7 +269,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  Add a binding to update the menu item whenever it is pressed.
       #  XXX bit of a cheat to get menubutton name.
-      set menu [$itk_component(targets) component mb] 
+      set menu [$itk_component(targets) component mb]
       bind $menu <ButtonPress-1> "+[code $this update_targets_]"
 
       #  Add the menu items.
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
    #  Set the target image for RA-Dec coordinates.
    protected method set_target_ {image} {
-      if { $target_ != $image && $target_ != {} } { 
+      if { $target_ != $image && $target_ != {} } {
          #  Remove RA/Dec marker if needed (this is needed when target
          #  image is changed).
          remove_radec
@@ -435,7 +435,7 @@ itcl::class gaia::GaiaAstTransferTable {
       set itk_option(-coupled) 0
    }
 
-   #  Whether to add the any-enter binding to graphics markers. Always 
+   #  Whether to add the any-enter binding to graphics markers. Always
    #  false as causes occasional problems with selection moving in
    #  table (with updates of coordinates to wrong row).
    itk_option define -bind_enters bind_enters Bind_enters 0

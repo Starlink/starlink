@@ -30,9 +30,9 @@
 *   LJC = INTEGER (Given)
 *        =M
 *   LIW = INTEGER (Given)
-*       
+*
 *   NIW = INTEGER (Given)
-*       
+*
 *   RC(M) = DOUBLE PRECISION ARRAY (Returned)
 *        Residuals of fit?
 *   AJC(LJC,N) = DOUBLE PRECISION ARRAY (Returned)
@@ -40,7 +40,7 @@
 *   IFLAG = INTEGER (Not used)
 *   MIW(LIW) = INTEGER ARRAY (Not used)
 *   WN(NIW) = DOUBLE PRECISION ARRAY (Not used)
-*       
+*
 *
       implicit none
       include 'CNF_PAR'          ! For CNF_PVAL function

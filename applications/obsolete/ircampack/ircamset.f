@@ -62,7 +62,7 @@
 *        The current value of the maximum acceptable error in percentage
 *        polarisation used by procedure POLCAL. [!]
 *     MAXTERR = LITERAL (Read)
-*        The current value of the maximum acceptable error in 
+*        The current value of the maximum acceptable error in
 *        polarisation angle used by procedure POLCAL. [!]
 *     LOGFILE = FILENAME (Write)
 *        The name of a file to which the current global parameter values
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
       CALL ISTNDF( 'P', LOG, FD, STATUS )
       CALL ISTNDF( 'THETA', LOG, FD, STATUS )
 
-*  Now get the parameters for the Gaussian smoothing performed by 
+*  Now get the parameters for the Gaussian smoothing performed by
 *  POLSMOOTH.
       CALL ISTSTR( 'FWHM', LOG, FD, STATUS )
       CALL ISTSTR( 'BOX', LOG, FD, STATUS )

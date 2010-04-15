@@ -15,7 +15,7 @@
 #     makecube i q u cube angrot
 
 #  Description:
-#     This stacks the three input 2-dimensional NDFs holding I, Q and U 
+#     This stacks the three input 2-dimensional NDFs holding I, Q and U
 #     values into a single 3-dimensional NDF which can be processed by
 #     POLPACK application POLVEC. The input NDFs must all be aligned
 #     pixel-for-pixel.
@@ -30,9 +30,9 @@
 #     cube ...
 #        The 3-d output NDF to create.
 #     angrot
-#        The anticlockwise angle in degrees from the positive X axis 
-#        direction, to the reference direction of the Stokes vectors 
-#        supplied in i, q and u. 
+#        The anticlockwise angle in degrees from the positive X axis
+#        direction, to the reference direction of the Stokes vectors
+#        supplied in i, q and u.
 
 #  Prior Requirements:
 #     For ease of use, it's recommended that you set up an alias for
@@ -101,20 +101,20 @@
 
 # Get the lower bounds of the Q NDF.
       ndftrace qtemp quiet
-      set lb = `parget lbound ndftrace`      
+      set lb = `parget lbound ndftrace`
 
 # Shift the origin of the Q image so that it occupies the second plane.
       setorigin qtemp origin=\[$lb[1]\,$lb[2]\,2\]
 
 # Get the lower bounds of the U NDF.
       ndftrace utemp quiet
-      set lb = `parget lbound ndftrace`      
+      set lb = `parget lbound ndftrace`
 
 # Shift the origin of the U image so that it occupies the third plane.
       setorigin utemp origin=\[$lb[1]\,$lb[2]\,3\]
 
 # Paste these three 3d NDFs into a single 3d NDF.
-      paste transp noconfine in=itemp p1=qtemp p2=utemp out=$4 
+      paste transp noconfine in=itemp p1=qtemp p2=utemp out=$4
 
 # Set up the POLPACK extension in the cube.
       setext $4 xname=polpack xtype=polpack option=put noloop cname=STOKES \

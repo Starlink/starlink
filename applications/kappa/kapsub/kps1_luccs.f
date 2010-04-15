@@ -26,7 +26,7 @@
 *        Number of lines in the input data.
 *     DATA( NPIX, NLIN ) = REAL (Given)
 *        The input data.
-*     SIGMA = REAL (Returned) 
+*     SIGMA = REAL (Returned)
 *        A rough estimate of the standard deviation of the noise in the
 *        data.
 *     STATUS = INTEGER (Given and Returned)
@@ -105,7 +105,7 @@
       NSUM2 = 0
       SUM2 = 0.0
 
-*  Loop round all the input pixels.  The first pixel in each row has no 
+*  Loop round all the input pixels.  The first pixel in each row has no
 *  `previous pixel', so set the previous pixel value bad.
       DO LIN  = 1, NLIN
          LSTVAL = VAL__BADR

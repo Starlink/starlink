@@ -30,7 +30,7 @@
 *=============================================================================
 *
 *  This version of proj.h is based on the version in wcslib-2.9, but has
-*  been modified in the following ways by the Starlink project (e-mail: 
+*  been modified in the following ways by the Starlink project (e-mail:
 *  ussc@star.rl.ac.uk):
 *     -  Support for non-ANSI C prototypes removed
 *     -  Changed the name of the WCSLIB_PROJ macro to WCSLIB_PROJ_INCLUDED
@@ -43,7 +43,7 @@
 *        parameters associated with the longitude axis (for use within
 *        the tpn.c file which holds an implementation of the old "TAN with
 *        correction terms" projection).
-*     -  Added prototypes for TPN projection functions (defined in file 
+*     -  Added prototypes for TPN projection functions (defined in file
 *        tpn.c).
 *     -  Added prototypes for HPX projection functions.
 *===========================================================================*/

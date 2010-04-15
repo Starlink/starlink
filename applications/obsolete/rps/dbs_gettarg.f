@@ -3,7 +3,7 @@
 *     1993 June         P. Brisco       Recompile with new com_form_files.inc
 **********************************************************************
       SUBROUTINE DBS_GETTARG ( NTARG, TOTAL_TIME )
-*   
+*
       INTEGER	   NTARG
       CHARACTER*7  TOTAL_TIME
 
@@ -24,9 +24,9 @@
       DO TARGET_NO=1,NTARG
         CALL FORM_READ(REF_TARGET,TARGET_NO, IERR)
         FIELDNO = DBS_FIELDNO(REF_TARGET,'TOTAL.OBS.TIME')
-        TOT_TIME = TOT_TIME + DBS_GETR(REF_TARGET,FIELDNO)    
+        TOT_TIME = TOT_TIME + DBS_GETR(REF_TARGET,FIELDNO)
       END DO
-	
+
       TOTAL_TIME = MDH_RTOC(TOT_TIME)
 
       END

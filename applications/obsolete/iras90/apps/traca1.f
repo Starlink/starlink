@@ -1,5 +1,5 @@
-      SUBROUTINE TRACA1( IDC, BSMP, ESMP, BDET, EDET, DETDAT, BAND, 
-     :                   REFRA, REFDEC, ADET, SCNDIR, INSCN, XSCN, 
+      SUBROUTINE TRACA1( IDC, BSMP, ESMP, BDET, EDET, DETDAT, BAND,
+     :                   REFRA, REFDEC, ADET, SCNDIR, INSCN, XSCN,
      :                   YMX, YMN, AVERAG, SGMA, NVAL, NAVAIL, STATUS )
 *+
 *  Name:
@@ -12,16 +12,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACA1( IDC, BSMP, ESMP, BDET, EDET, DETDAT, BAND, 
-*                  REFRA, REFDEC, ADET, SCNDIR, INSCN, XSCN, 
+*     CALL TRACA1( IDC, BSMP, ESMP, BDET, EDET, DETDAT, BAND,
+*                  REFRA, REFDEC, ADET, SCNDIR, INSCN, XSCN,
 *                  YMX, YMN, AVERAGE, SGMA, NVAL, NAVAIL, STATUS )
 
 *  Description:
 *     This routine is used to get following information about a CRDD
 *     NDF file:
-*     
+*
 *     1. The wave band number of the data contained in the file.
-*     
+*
 *     2. The RA and DEC of the reference position of the file.
 *
 *     3. The detector numbers of the detectors in the file..
@@ -54,7 +54,7 @@
 *        The Declination of the reference position, in units of radians.
 *        (equinox B1950.0)
 *     ADET( I90__MAXDT ) = INTEGER (Returned)
-*        The detector numbers of the detectors which contain more than 
+*        The detector numbers of the detectors which contain more than
 *        1 valid samples. The number of values written to this array is
 *        returned in argument NAVAIL.
 *     SCNDIR = LOGICAL (Returned)
@@ -62,14 +62,14 @@
 *        to south, otherwise it is false.
 *     INSCN( BSMP : ESMP, BDET : EDET ) = REAL (Returned)
 *        In-scan distance of each sample from the reference position,
-*        positive if the displacement from the sample to the reference 
-*        position is in the same direction as the positive focal plane 
+*        positive if the displacement from the sample to the reference
+*        position is in the same direction as the positive focal plane
 *        Y axis.
 *     XSCN( BDET : EDET ) = REAL (Returned)
 *        Cross-scan offsets between the reference position and each
 *        detector centre (at the position of closest approach of the
 *        detector track to the reference point). Positive if the
-*        displacement from the reference position to the detector track 
+*        displacement from the reference position to the detector track
 *        is in the same direction as the positive focal plane Z axis.
 *     YMX( BDET : EDET ) = REAL (Returned)
 *        Max. value of each data trace.
@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       INTEGER STATUS             ! Global status
 
 *  External references:
-      INTEGER IRC_DETNO          ! Detector number of a detector 
+      INTEGER IRC_DETNO          ! Detector number of a detector
       REAL SLA_RANGE             ! put angle into [-pi, pi]
 
 *  Local Variables:
@@ -179,13 +179,13 @@
 
 *  Convert the scan angle to ecliptic coordinates.
       CALL IRA_PACON( 1, RA, DEC, ANGLE, 'EQU', 'ECL', IRA__IRJEP,
-     :                LAMBDA, BETA, ANGLE, STATUS )  
+     :                LAMBDA, BETA, ANGLE, STATUS )
 
 *  Put scan angle into [-pi, pi].
       SCNANG = SLA_RANGE( REAL( ANGLE ) )
 
 *  If scan angle is in [-pi/2, pi/2], the scan is from north to south.
-      IF ( SCNANG .GT. -1.0*IRA__PIBY2 .AND. 
+      IF ( SCNANG .GT. -1.0*IRA__PIBY2 .AND.
      :     SCNANG .LT. IRA__PIBY2 ) THEN
           SCNDIR = .TRUE.
 
@@ -193,10 +193,10 @@
       ELSE
          SCNDIR = .FALSE.
       END IF
-      
+
 *  Get the statistical properties of each data trace.
       CLIP( 1 ) = 3.0
-      CALL IRM_STATS( BSMP, ESMP, BDET, EDET, DETDAT, 1, CLIP, 
+      CALL IRM_STATS( BSMP, ESMP, BDET, EDET, DETDAT, 1, CLIP,
      :                .FALSE., .TRUE., .FALSE., YMX, YMN, AVERAG,
      :                SGMA, NVAL, STATUS )
 
@@ -213,11 +213,11 @@
 *  Find the point on this detector track closest to the reference
 *  position, and focal plane Z coordinate of the reference position
 *  at the point of closest approach.
-            CALL IRC_DCLAP( IDC, J, REFRA, REFDEC, CLSMP, XSCAN, 
-     :                      STATUS ) 
+            CALL IRC_DCLAP( IDC, J, REFRA, REFDEC, CLSMP, XSCAN,
+     :                      STATUS )
 
 *  Get its cross-scan offset from the detector centre in arcmins.
-            XSCN( J ) =  I90__DETZ( ADET( NAVAIL ) ) - 
+            XSCN( J ) =  I90__DETZ( ADET( NAVAIL ) ) -
      :                   XSCAN * REAL( IRA__RTOD ) * 60.0
 
 *  Get in-scan distance of each sample in this detector track.
@@ -225,7 +225,7 @@
             INDEX2 = J
 
             DO I = BSMP, ESMP
-               CALL IRC_DIST( IDC, REAL( I ), INDEX1, CLSMP, INDEX2, 
+               CALL IRC_DIST( IDC, REAL( I ), INDEX1, CLSMP, INDEX2,
      :                        INSCAN, STATUS )
 
 *  Convert to arcmins.

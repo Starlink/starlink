@@ -15,7 +15,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
-      INTEGER PORT                        ! the number of the port 
+      INTEGER PORT                        ! the number of the port
 *    Status :
       INTEGER STATUS
 *    Global variables :
@@ -33,11 +33,11 @@
       ELSE
 
 *    Select the viewport, using the actual limits stored by plotting subroutine
-        CALL PGVPORT( AXSTART( PORT ), AXEND( PORT ), 
+        CALL PGVPORT( AXSTART( PORT ), AXEND( PORT ),
      :    AYSTART( PORT ), AYEND( PORT ) )
 
 *    Put the window into it
-        CALL PGWINDOW( XSTART( PORT ), XEND( PORT ), 
+        CALL PGWINDOW( XSTART( PORT ), XEND( PORT ),
      :    YSTART( PORT ), YEND( PORT ) )
       ENDIF
 

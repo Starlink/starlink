@@ -21,7 +21,7 @@
 *     CI = INTEGER (Given)
 *        The catalogue identifier.
 *     FI = INTEGER (Given)
-*         FIO identifier of the file containing the ASCII 
+*         FIO identifier of the file containing the ASCII
 *         SIZEs results.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -70,12 +70,12 @@
 
 
 *  Add some parameters.
-      CALL CAT_PNEW0( CI, CAT__QITYP, 'CATSOURCE', CAT__TYPEC, QIP, 
+      CALL CAT_PNEW0( CI, CAT__QITYP, 'CATSOURCE', CAT__TYPEC, QIP,
      :                STATUS )
       CALL CAT_TATTI( QIP, 'CSIZE', 4, STATUS )
       CALL CAT_TATTC( QIP, 'VALUE', 'PISA', STATUS )
       CALL CAT_TATTC( QIP, 'COMM', 'Catalogue source', STATUS )
-      CALL CAT_PNEW0( CI, CAT__QITYP, 'KEYFIELD', CAT__TYPEC, QIP, 
+      CALL CAT_PNEW0( CI, CAT__QITYP, 'KEYFIELD', CAT__TYPEC, QIP,
      :                STATUS )
       CALL CAT_TATTI( QIP, 'CSIZE', 5, STATUS )
       CALL CAT_TATTC( QIP, 'VALUE', 'INDEX', STATUS )
@@ -125,23 +125,23 @@
 
 *  Comments.
       CALL CAT_TATTC( INDEX, 'COMM', 'INDEX NUMBER OF OBJECT', STATUS )
-      CALL CAT_TATTC( A1, 'COMM',  'NUMBER OF PIXELS IN 1ST THRESHOLD', 
+      CALL CAT_TATTC( A1, 'COMM',  'NUMBER OF PIXELS IN 1ST THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A2, 'COMM', 'NUMBER OF PIXELS IN 2ND THRESHOLD', 
+      CALL CAT_TATTC( A2, 'COMM', 'NUMBER OF PIXELS IN 2ND THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A3, 'COMM', 'NUMBER OF PIXELS IN 3RD THRESHOLD', 
+      CALL CAT_TATTC( A3, 'COMM', 'NUMBER OF PIXELS IN 3RD THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A4, 'COMM', 'NUMBER OF PIXELS IN 4TH THRESHOLD', 
+      CALL CAT_TATTC( A4, 'COMM', 'NUMBER OF PIXELS IN 4TH THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A5, 'COMM', 'NUMBER OF PIXELS IN 5TH THRESHOLD', 
+      CALL CAT_TATTC( A5, 'COMM', 'NUMBER OF PIXELS IN 5TH THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A6, 'COMM', 'NUMBER OF PIXELS IN 6TH THRESHOLD', 
+      CALL CAT_TATTC( A6, 'COMM', 'NUMBER OF PIXELS IN 6TH THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A7, 'COMM', 'NUMBER OF PIXELS IN 7TH THRESHOLD', 
+      CALL CAT_TATTC( A7, 'COMM', 'NUMBER OF PIXELS IN 7TH THRESHOLD',
      :                STATUS )
-      CALL CAT_TATTC( A8, 'COMM', 'NUMBER OF PIXELS IN 8TH THRESHOLD', 
+      CALL CAT_TATTC( A8, 'COMM', 'NUMBER OF PIXELS IN 8TH THRESHOLD',
      :                STATUS )
-      
+
 *  Enter data.
       CALL ERR_MARK
  1    CONTINUE
@@ -152,59 +152,59 @@
 
          CALL CAT_PUT0I( INDEX, IVALS( 1 ), .FALSE., STATUS )
 
-         IF ( NINT( RVALS( 2 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 2 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A1, RVALS( 2 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 3 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 3 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A2, RVALS( 3 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 4 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 4 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A3, RVALS( 4 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 5 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 5 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A4, RVALS( 5 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 6 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 6 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A5, RVALS( 6 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 7 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 7 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A6, RVALS( 7 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 8 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 8 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A7, RVALS( 8 ), NULL, STATUS )
 
-         IF ( NINT( RVALS( 9 ) ) .EQ. -1 ) THEN 
-            NULL = .TRUE. 
+         IF ( NINT( RVALS( 9 ) ) .EQ. -1 ) THEN
+            NULL = .TRUE.
          ELSE
-            NULL = .FALSE. 
+            NULL = .FALSE.
          END IF
          CALL CAT_PUT0R( A8, RVALS( 9 ), NULL, STATUS )
 

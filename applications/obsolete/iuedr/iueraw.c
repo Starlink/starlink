@@ -562,12 +562,12 @@ int etype;                         /* Type code for the file name given.      */
            etype = PHOT_IM;
 
         } else if ( ! strncmp( fname, MELO_EXT, 3 ) ) {
-           if ( ( 5 * ( (int)( fsbuf.st_size ) - 
+           if ( ( 5 * ( (int)( fsbuf.st_size ) -
                 N_SPEC_LINES * ( 2048 + n_excess_bytes ) ) ) %
                 ( 5 * HEADER_LINE_LEN + n_excess_bytes ) == 0 ) {
                etype = MELO_IM;
 
-           } else if ( ( 5 * ( (int)( fsbuf.st_size ) - 
+           } else if ( ( 5 * ( (int)( fsbuf.st_size ) -
                        N_SPEC_LINES * ( 2000 + n_excess_bytes ) ) ) %
                        ( 5 * HEADER_LINE_LEN + n_excess_bytes ) == 0 ) {
                etype = MELO2_IM;
@@ -577,17 +577,17 @@ int etype;                         /* Type code for the file name given.      */
            }
 
         } else if ( ! strncmp( fname, MEHI_EXT, 3 ) ) {
-           if ( ( 5 * ( (int)( fsbuf.st_size ) - 
+           if ( ( 5 * ( (int)( fsbuf.st_size ) -
                 N_MEHISPEC_LINES * ( 2048 + n_excess_bytes ) ) ) %
                 ( 5 * HEADER_LINE_LEN + n_excess_bytes ) == 0 ) {
                etype = MEHI_IM;
 
-           } else if ( ( 5 * ( (int)( fsbuf.st_size ) - 
+           } else if ( ( 5 * ( (int)( fsbuf.st_size ) -
                        N_MEHISPEC_LINES * ( 2000 + n_excess_bytes ) ) ) %
                        ( 5 * HEADER_LINE_LEN + n_excess_bytes ) == 0 ) {
                etype = MEHI2_IM;
 
-           } else if ( ( 5 * ( (int)( fsbuf.st_size ) - 
+           } else if ( ( 5 * ( (int)( fsbuf.st_size ) -
                        N_MEHINS1_LINES * ( 1204 + n_excess_bytes ) ) ) %
                        ( 5 * HEADER_LINE_LEN + n_excess_bytes ) == 0 ) {
                etype = MEHI3_IM;

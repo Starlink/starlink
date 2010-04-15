@@ -68,12 +68,12 @@ if test "$CONVERT_DIR" != "" -a "$NDF_FORMATS_IN" = ""; then
    export CONVERT_DIR
 fi
 
-#  Now start up the application proper. 
-if test "$GAIA_DIR" != ""; then 
+#  Now start up the application proper.
+if test "$GAIA_DIR" != ""; then
    $GAIA_DIR/gaiadisp ${1+"$@"}
-elif test -f "/star/bin/gaia/gaiadisp"; then 
+elif test -f "/star/bin/gaia/gaiadisp"; then
    /star/bin/gaia/gaiadisp ${1+"$@"}
-else 
+else
    echo Sorry cannot find 'gaiadisp' anywhere on your system
 fi
 exit

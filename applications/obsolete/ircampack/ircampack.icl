@@ -1,4 +1,4 @@
-{+          
+{+
 {  Name:
 {     ircampack.icl
 

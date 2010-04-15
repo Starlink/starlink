@@ -43,7 +43,7 @@
 *     via ERR_REP. Under no circumstances is the programme
 *     aborted. Instead this routine always returns control to the caller
 *     after setting the STATUS argument (which is new in this version)
-*     to 1. 
+*     to 1.
 
 *  Arguments:
 *     LIBRAR = CHARACTER * ( * ) (Given)
@@ -137,7 +137,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

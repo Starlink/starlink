@@ -72,7 +72,7 @@
 *      quality array will be used to store bad pixel information.
          CALL DSA_OPEN( STATUS )
          CALL RED4_CHECK_INPUT(  INPUT, STATUS )
-         CALL DSA_NAMED_INPUT( 'INFILE', INPUT, STATUS ) 
+         CALL DSA_NAMED_INPUT( 'INFILE', INPUT, STATUS )
          CALL DSA_USE_QUALITY( 'INFILE', STATUS )
 
 *      Open the output structure, using the input one as a template and
@@ -84,9 +84,9 @@
      :     'INFILE', 0, 0, STATUS )
          CALL DSA_USE_QUALITY( 'OUTFILE', STATUS )
 
-*      Obtain the size of the data array in the input structure (which 
+*      Obtain the size of the data array in the input structure (which
 *      will also be the same size as the one in the output structure).
-         CALL DSA_DATA_SIZE( 'INFILE', RMAXDIM, NDIM, DIMS, 
+         CALL DSA_DATA_SIZE( 'INFILE', RMAXDIM, NDIM, DIMS,
      :     NELM, STATUS )
 
 *      Map the data, variance and quality arrays in the input structure.
@@ -120,13 +120,13 @@
             END IF
 
 *         Mend the data arrays.
-            CALL GEN_MEND1F( NELM, %val(IDATA_PTR), %val(IVAR_PTR), 
+            CALL GEN_MEND1F( NELM, %val(IDATA_PTR), %val(IVAR_PTR),
      :        %val(IQUAL_PTR), .TRUE., .FALSE., 0.0, .TRUE.,
      :        %val(ODATA_PTR), %val(OVAR_PTR), %val(OQUAL_PTR) )
 
 *         Add a comment to the FITS structure.
             CALL DSA_PUT_FITS_C( 'OUTFILE', 'COMMENT',
-     :        'Bad pixels removed by interpolation', ' ', STATUS ) 
+     :        'Bad pixels removed by interpolation', ' ', STATUS )
          ELSE
 
             STATUS = SAI__ERROR

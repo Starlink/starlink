@@ -16,22 +16,22 @@
 *  Description:
 *     LOC1 is an locator for an HDS structure which contains components
 *     relating to one or more PGPLOT devices. These components, for
-*     instance, may contain the colour palette or colour table to be used 
+*     instance, may contain the colour palette or colour table to be used
 *     with the corresponding PGPLOT device. This routine searches the
-*     structure for a component relating to the currently opened PGPLOT 
+*     structure for a component relating to the currently opened PGPLOT
 *     device, and returns a locator for it if found. If not found, and
-*     if the currently opened PGPLOT device is a GWM window, a search is 
+*     if the currently opened PGPLOT device is a GWM window, a search is
 *     made for a component relating to a GWM window with a different name.
-*     If no such device is found, (or if an error occurs) DAT__NOLOC is 
+*     If no such device is found, (or if an error occurs) DAT__NOLOC is
 *     returned.
 *
-*     For instance, if the currently opened graphics device is "x2windows" 
-*     (i.e. "xwindows2/GWM"), a search is made first for a component called 
+*     For instance, if the currently opened graphics device is "x2windows"
+*     (i.e. "xwindows2/GWM"), a search is made first for a component called
 *     AGI_3801_2. If this is not found, a search is made for a component
 *     with a name corresponding to any /GWM device (e.g. AGI_3800_1 which
 *     corresponds to "xwindows/GWM", or one of the other xwindows sevices).
 *
-*     The component names used are the same as the names uses for the device 
+*     The component names used are the same as the names uses for the device
 *     within the AGI database (e.g. "AGI_3801_2", etc).
 
 *  Arguments:
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
 *  Initialize.
       LOC2 = DAT__NOLOC
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the AGI name for the currently opened device.
@@ -134,30 +134,30 @@
 
 *  If this is an xwindows device, set the device type to "xw".
          IW = INDEX( SPEC0, 'WINDOWS' )
-         IF( ( IW .EQ. 2 .OR. IW .EQ. 3 ) .AND. 
+         IF( ( IW .EQ. 2 .OR. IW .EQ. 3 ) .AND.
      :       SPEC0( 1:1 ) .EQ. 'X' ) SPEC0 = 'XW'
 
 *  Loop round all components in the supplied object.
-         CALL DAT_NCOMP( LOC1, NCOMP, STATUS ) 
+         CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
          DO I = 1, NCOMP
 
 *  Get a locator to this component, and its name (an AGI workstation name).
-            CALL DAT_INDEX( LOC1, I, LOC2, STATUS ) 
-            CALL DAT_NAME( LOC2, AGINAM, STATUS ) 
+            CALL DAT_INDEX( LOC1, I, LOC2, STATUS )
+            CALL DAT_NAME( LOC2, AGINAM, STATUS )
 
-*  Convert the AGI name into a GNS device specification. Anull any error 
-*  caused by the AGI name not being recognized (some old versions of 
+*  Convert the AGI name into a GNS device specification. Anull any error
+*  caused by the AGI name not being recognized (some old versions of
 *  KAPLIBS produced non-standard names).
             CALL ERR_BEGIN( STATUS )
             CALL AGP_ASPEC( AGINAM, .TRUE., SPEC, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
-               
+
 *  If the AGI name was recognized...
             ELSE
 
-*  Convert the GNS device specification to upper case, remove spaces, and 
-*  remove any file specification. 
+*  Convert the GNS device specification to upper case, remove spaces, and
+*  remove any file specification.
                CALL CHR_UCASE( SPEC )
                CALL CHR_RMBLK( SPEC )
                IFILE = INDEX( SPEC, ';' )
@@ -165,10 +165,10 @@
 
 *  If this is an xwindows device, set the device type to "xw".
                IW = INDEX( SPEC, 'WINDOWS' )
-               IF( ( IW .EQ. 2 .OR. IW .EQ. 3 ) .AND. 
+               IF( ( IW .EQ. 2 .OR. IW .EQ. 3 ) .AND.
      :             SPEC( 1:1 ) .EQ. 'X' ) SPEC = 'XW'
 
-*  Compare to the device type for the currently opened device. If 
+*  Compare to the device type for the currently opened device. If
 *  they are the same, return with the current component locator.
                IF( SPEC .EQ. SPEC0 ) THEN
                   CALL ERR_END( STATUS )
@@ -183,7 +183,7 @@
             CALL ERR_END( STATUS )
 
          END DO
-         
+
       END IF
 
  999  CONTINUE

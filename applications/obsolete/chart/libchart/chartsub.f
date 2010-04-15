@@ -59,58 +59,58 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   HW  is the Half Size in mm. of the actual Chart
 *   HA  is the half width of the zone (in mm.) that the Chart is plotted
 *   HH  is the half height of the chart zone
- 
+
       HW = SIZEMM/2.0
       HA = XDIAM/2.0
       HH = YDIAM/2.0
- 
+
 *   Set Zone to size of Overall Chart Area
- 
+
       CALL SGS_SELZ (IZBASE,ISTAT)
       CALL SGS_ZONE (0.0,XDIAM,0.0,YDIAM,IZAREA,ISTAT)
       CALL SGS_SW (-HA,HA,-HH,HH,ISTAT)
- 
+
 *   Set Zone to exact size of chart
- 
+
       CALL SGS_ZONE (-HW+5.0,HW+5.0,-HW,HW,IZCHART,ISTAT)
       CALL SGS_SW (-HW,HW,-HW,HW,ISTAT)
- 
+
 *   Select Chart Zone IZCHART for plotting
- 
+
       CALL SGS_SELZ (IZCHART,ISTAT)
- 
+
       IF (GRID(1:1).EQ.'Y'.OR.GRID(1:1).EQ.'M') THEN
- 
+
 *   If ARGS Set Pen Colour
- 
+
          IF (COLOUR) CALL SGS_SPEN (4)
- 
+
          CALL PLOTGRID (AO,DO,SCALE,GRID,DIRECT, STATUS )
- 
+
 *
 *   Clear out SGS Buffer
 *
          CALL SGS_FLUSH
- 
- 
+
+
       ENDIF
- 
+
 *   If ARGS Set Pen Colour
- 
+
       IF (COLOUR) CALL SGS_SPEN (2)
- 
+
 *   Draw a Rectangle the size of the Chart
- 
+
       CALL QUADT (HW, STATUS )
- 
+
 *   If ARGS Set Pen Colour for Stars etc.
- 
+
       IF (COLOUR) CALL SGS_SPEN (1)
- 
+
 *
 *   Plot the Star symbols - circles, spots or crosses
 *
@@ -147,28 +147,28 @@
          ELSE
             R = SIZEMM/90.0
          ENDIF
- 
+
          IF (NONS) THEN
             CALL NSSYMB(XPLOT,YPLOT,R, STATUS )
             DISPLEFT=.FALSE.
             DISPRIGHT=.FALSE.
          ELSE
- 
+
 *   If SAO/Perth Star clashes possible, sort out offsets for numbering
 *   With the possibility of new catalogues further clashes may occur
-*   so we test all the time for clashes. J.V.Carey 1984 April 11 
+*   so we test all the time for clashes. J.V.Carey 1984 April 11
 *            IF ((CATRUN).AND.(ICAT2.EQ.2).AND.(ICAT3.EQ.3).AND.
 *     :                                           (N.NE.NUM)) THEN
- 
+
 *   If clash already found set variables to displace second number to the
- 
+
                IF (CLASH) THEN
                   DISPRIGHT=.TRUE.
                   DISPLEFT=.FALSE.
                ELSE
- 
+
 *   else check for a clash
- 
+
                   DISPRIGHT=.FALSE.
                   DISPLEFT=.FALSE.
                   CALL CONV (1,DECO,0,JSIGN,DECD,DECM,DECS,FS, STATUS )
@@ -185,10 +185,10 @@
                      DIFRANGE= REAL( 30.0 * COS( ABS(
      :                         DMAX1( DECO, DECNEXT ) ) ) )
                      IF (DIF.LE.DIFRANGE) THEN
- 
+
 *   Clash only possible if stars are within 2 secs of dec of each other
 *   and 30*cos(dec) secs of each other in RA.
- 
+
                         CLASH=.TRUE.
                         DISPLEFT=.TRUE.
                         DISPRIGHT=.FALSE.
@@ -217,11 +217,11 @@
 *   Plot the supplied objects (if any)
 *
       IF (SUPP) THEN
- 
+
 *   If ARGS Set Pen Colour
- 
+
         IF (COLOUR) CALL SGS_SPEN (5)
- 
+
         DO N=1,NUMSUPP
            CALL PROJ(1,OWNOBJ(1,N),OWNOBJ(2,N),X,Y, STATUS )
            IF (DIRECT) THEN
@@ -251,7 +251,7 @@
           CALL SGS_APOLY(XX(I),YY(I))
         ENDDO
         CALL SGS_OPOLY
-    
+
       ELSE IF (ERDIAM(1).LT.0.0) THEN
         IF (COLOUR) CALL SGS_SPEN(3)
         XER = ERDIAM(1)/SCALE
@@ -265,13 +265,13 @@
         CALL SGS_OPOLY
 
 *   If QUAD then First Convert RA's and Dec's to X,Y's
- 
+
       ELSE IF (QEBOX) THEN
- 
+
 *   If ARGS Set Pen Colour
- 
+
         IF (COLOUR) CALL SGS_SPEN (3)
- 
+
         DO K=1,4
            ARG2 = DBLE( QEBC((K-1)*2 +1 )  ) ! Assign QEBC elements to
            ARG3 = DBLE( QEBC(K*2) )  ! D.P. vars as PROJ takes D.P args
@@ -285,7 +285,7 @@
            END IF
            QEBC(K*2)        = Y/( REAL( RDSA ) * SCALE)
         END DO
- 
+
         CALL SGS_BPOLY (QEBC(1),QEBC(2))
         DO J = 3,9,2
            IF (J.EQ.9) THEN
@@ -295,30 +295,30 @@
            ENDIF
         END DO
         CALL SGS_OPOLY
- 
+
       ELSE IF (ERRB.GT.1E-6) THEN
- 
+
 *   If ARGS Set Pen Colour
- 
+
         IF (COLOUR) CALL SGS_SPEN (3)
- 
+
         CALL SGS_CIRCL (0.0,0.0,ERRB/SCALE)
         CALL SGS_OPOLY
- 
+
       ENDIF
- 
+
 *   Put Tick Marks at Plot Centre
 *   but only if asked to do so
- 
+
       IF (CENCROS) THEN
- 
+
 *   First, If ARGS Set Pen Colour
- 
+
          IF (COLOUR) CALL SGS_SPEN (3)
- 
+
          SHIFT=SIZEMM/60.0
          TICK=3.0*SHIFT
- 
+
          CALL SGS_BPOLY (0.0,SHIFT)
          CALL SGS_APOLY (0.0,TICK)
          CALL SGS_OPOLY
@@ -332,17 +332,17 @@
          CALL SGS_APOLY (-TICK,0.0)
          CALL SGS_OPOLY
       END IF
- 
+
 *   Clear Out Buffer containing all Plotting Output.
- 
+
          CALL SGS_FLUSH
- 
+
 *   Release Plotting Zones
- 
+
          CALL SGS_SELZ (IZONID,ISTAT)
          CALL SGS_RELZ (IZCHART,ISTAT)
          CALL SGS_RELZ (IZAREA,ISTAT)
          CALL SGS_RELZ (IZBASE,ISTAT)
          CALL SGS_FLUSH
- 
+
       END

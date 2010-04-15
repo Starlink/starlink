@@ -23,7 +23,7 @@ my $astlibs = qx/ast_link -myerr -mygrf /;
 die "No AST libraries were found.\n This may imply that the
 ast_link command is not in your path." if $astlibs !~ /./;
 
-# Libs requires the location of the Starlink libraries 
+# Libs requires the location of the Starlink libraries
 my $libs = "-L$StarConfig{Star_Lib} $astlibs ";
 
 # Fink requires an extra path on OS X Panther
@@ -50,8 +50,8 @@ my $ast_pm = File::Spec->catfile( "lib", "Starlink", "AST.pm" );
 WriteMakefile(
     'NAME'      => 'Starlink::AST',
     'VERSION_FROM'   => $ast_pm,
-    'LIBS'      => [ $libs ],   # e.g., '-lm' 
-    'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other' 
+    'LIBS'      => [ $libs ],   # e.g., '-lm'
+    'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other'
     'TYPEMAPS'  => \@typemaps,
     'OBJECT'    => 'AST.o arrays.o grf_perl.o astTypemap.o',
     'depend'    => { 'AST.o' => "AST_ERR.xsh AST_WCSMAP.xsh AST_GRF.xsh"},

@@ -28,12 +28,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,19 +65,19 @@ f     only within textual output (e.g. from AST_WRITE).
 *        - Added argument "fmt" to definition of AxisAbbrev.
 *     3-FEB-2004 (DSB):
 *        - Added "log" formatting using the "&" flag character in the
-*        Format string.  
+*        Format string.
 *     15-SEP-2004 (DSB):
 *        - If a format string is set which includes a wildcard precision
-*        value (".*"), then use the Digits value to determine the precision 
+*        value (".*"), then use the Digits value to determine the precision
 *        to be used.
-*        - If the conversion code is of integer type (e.g. "%d") cast value 
-*        to integer before printing. 
+*        - If the conversion code is of integer type (e.g. "%d") cast value
+*        to integer before printing.
 *     2-FEB-2005 (DSB):
 *        - Avoid using astStore to allocate more storage than is supplied
-*        in the "data" pointer. This can cause access violations since 
+*        in the "data" pointer. This can cause access violations since
 *        astStore will then read beyond the end of the "data" area.
 *     15-MAR-2005 (DSB):
-*        - Avoid exponents in log format labels which are close to zero but 
+*        - Avoid exponents in log format labels which are close to zero but
 *        not quite zero.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
@@ -141,15 +141,15 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 /* Strings used as field delimiters when producing graphical labels.
    These strings include escape sequences which the Plot class interprets
    to produce super-scripts, sub-scripts, etc.*/
-static const char *log_esc  = "10%-%^50+%s70+";     
+static const char *log_esc  = "10%-%^50+%s70+";
 
 /* Plain text equivalents. */
-static const char *log_txt  = "10^";     
+static const char *log_txt  = "10^";
 
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetDefaultFormat_Buff[ 0 ] = 0; \
@@ -170,13 +170,13 @@ astMAKE_INITGLOBALS(Axis)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
-static char getdefaultformat_buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ]; 
-static char axisformat_buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ]; 
-static char getaxisnormunit_buff[ AST__AXIS_GETAXISNORMUNIT_BUFF_LEN + 1 ]; 
+static char getdefaultformat_buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ];
+static char axisformat_buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ];
+static char getaxisnormunit_buff[ AST__AXIS_GETAXISNORMUNIT_BUFF_LEN + 1 ];
 static char getattrib_buff[ AST__AXIS_GETATTRIB_BUFF_LEN + 1 ];
 
 
@@ -356,7 +356,7 @@ static double AxisDistance( AstAxis *this, double v1, double v2, int *status ) {
 *     Axis method.
 
 *  Description:
-*     This function returns a signed value representing the axis increment 
+*     This function returns a signed value representing the axis increment
 *     from axis value v1 to axis value v2.
 *
 *     For a simple Axis, this is a trivial operation. But for other
@@ -397,7 +397,7 @@ static double AxisDistance( AstAxis *this, double v1, double v2, int *status ) {
    return result;
 }
 
-static int AxisFields( AstAxis *this, const char *fmt0, const char *str, 
+static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
                        int maxfld, char **fields, int *nc, double *val, int *status ) {
 /*
 *+
@@ -412,8 +412,8 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
 
 *  Synopsis:
 *     #include "axis.h"
-*     int astAxisFields( AstAxis *this, const char *fmt0, const char *str, 
-*                        int maxfld, char **fields, int *nc, double *val ) 
+*     int astAxisFields( AstAxis *this, const char *fmt0, const char *str,
+*                        int maxfld, char **fields, int *nc, double *val )
 
 *  Class Membership:
 *     Axis member function.
@@ -436,10 +436,10 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
 *     maxfld
 *        The maximum number of fields to identify within "str".
 *     fields
-*        A pointer to an array of at least "maxfld" character pointers. 
-*        Each element is returned holding a pointer to the start of the 
-*        corresponding field  in "str" (in the order in which they occur 
-*        within "str"), or NULL if no corresponding field can be found. 
+*        A pointer to an array of at least "maxfld" character pointers.
+*        Each element is returned holding a pointer to the start of the
+*        corresponding field  in "str" (in the order in which they occur
+*        within "str"), or NULL if no corresponding field can be found.
 *     nc
 *        A pointer to an array of at least "maxfld" integers. Each
 *        element is returned holding the number of characters in the
@@ -447,7 +447,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
 *        found.
 *     val
 *        Pointer to a location at which to store the value
-*        equivalent to the returned field values. If this is NULL, 
+*        equivalent to the returned field values. If this is NULL,
 *        it is ignored.
 
 *  Returned Value:
@@ -462,9 +462,9 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
 *     - Fields are counted from the start of the formatted string. If the
 *     string contains more than "maxfld" fields, then trailing fields are
 *     ignored.
-*     - If this function is invoked with the global error status set, or 
-*     if it should fail for any reason, then a value of zero will be returned 
-*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     - If this function is invoked with the global error status set, or
+*     if it should fail for any reason, then a value of zero will be returned
+*     as the function value, and "fields", "nc" and "val"  will be returned
 *     holding their supplied values
 *-
 */
@@ -500,8 +500,8 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
    string. It also returns a pointer to a new Format string which is a
    standard C printf format specifier. Currently the only flags are "log"
    which indicates if the value should be formatted as "10**x" using
-   the graphical escape sequences defined within the Plot class to produce 
-   "x" as a superscript of "10", "sign" which is used with log to indicate 
+   the graphical escape sequences defined within the Plot class to produce
+   "x" as a superscript of "10", "sign" which is used with log to indicate
    if a sign should always be included infront of the "10", and "space"
    which indicates if a leading space should be included infronyt of "10" if
    no sign is included. */
@@ -570,7 +570,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
                   if( val ) *val = 0.0;
                }
 
-/* Zero is never formatted as an exponent. If the string starts with zero, 
+/* Zero is never formatted as an exponent. If the string starts with zero,
    return a single zero field. */
             } else if( 1 == sscanf( p, "%lg%n", &value, &n ) ) {
                if( value == 0.0 ) {
@@ -713,13 +713,13 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
    string. It also returns a pointer to a new Format string which is a
    standard C printf format specifier. Currently the only flags are "log"
    which indicates if the value should be formatted as "10**x" using
-   the graphical escape sequences defined within the Plot class to produce 
-   "x" as a superscript of "10", "sign" which is used with log to indicate 
+   the graphical escape sequences defined within the Plot class to produce
+   "x" as a superscript of "10", "sign" which is used with log to indicate
    if a sign should always be included infront of the "10", and "space"
    which indicates if a leading space should be included infronyt of "10"
    if no sign is included. It also modifies ".*" precision fields by
    replacing the "*" by the current vale of the Digits attribute. */
-      fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign, 
+      fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign,
                              &space, &integ, status );
       if( astOK ) {
 
@@ -728,29 +728,29 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
 
 /* If log format is required, find the value of the exponent "x", and
    initialise the returned string to hold the exponent and the graphical
-   escape sequence which produces a superscript. Otherwise just format the 
+   escape sequence which produces a superscript. Otherwise just format the
    supplied value. */
          if( log ) {
-   
+
             if( sign ) {
                axisformat_buff[ 0 ] ='+';
                nc = 1;
-   
+
             } else if( space ) {
                axisformat_buff[ 0 ] =' ';
                nc = 1;
             }
-   
+
             if( value > 0 ) {
                x = log10( integ ? (int) value : value );
-   
+
             } else {
                x = log10( integ ? (int) -value : -value );
                axisformat_buff[ 0 ] ='-';
                nc = 1;
             }
 
-            nc += sprintf( axisformat_buff + nc, "%s", 
+            nc += sprintf( axisformat_buff + nc, "%s",
                            astEscapes( -1 ) ? log_esc : log_txt );
 
 /* Round small exponents to zero. */
@@ -890,7 +890,7 @@ static double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) {
 
 /* Check that the supplied gap size is not zero. */
    if ( gap != 0.0 ) {
-   
+
 /* Determine if the supplied gap size is positive and obtain its
    absolute value. */
       positive = ( gap >= 0.0 );
@@ -905,7 +905,7 @@ static double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) {
    of steps in the supplied gap, and then use the look-up-table in
    "table1" to find the closest acceptable gap size. Convert this gap
    size back to an absolute value by multiplying by the step size. */
-      index = (int) ( absgap / b + 0.5 ) - 1;  
+      index = (int) ( absgap / b + 0.5 ) - 1;
       result = b * table1[ index ];
 
 /* If the target gap was negative, negate the result. */
@@ -956,14 +956,14 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, 
 *        considered to be within the interval. Otherwise they are outside.
 
 *  Returned Value:
-*     Non-zero if the test value is inside the interval. 
+*     Non-zero if the test value is inside the interval.
 
 *  Class Applicability:
 *     Axis
 *        Uses simple Euclidean test
 *     SkyAxis
-*        All angles which are numerically between "lo" and "hi" are within 
-*        the interval. Angle outside this range are also within the interval 
+*        All angles which are numerically between "lo" and "hi" are within
+*        the interval. Angle outside this range are also within the interval
 *        if they can be brought into the range by addition or subtraction
 *        of a multiple of 2.PI.
 *-
@@ -1036,7 +1036,7 @@ static double AxisOffset( AstAxis *this, double v1, double dist, int *status ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     AxisOffset( AstAxis *this, double v1, double dist ) 
+*     AxisOffset( AstAxis *this, double v1, double dist )
 
 *  Class Membership:
 *     Axis method.
@@ -1145,7 +1145,7 @@ static void AxisOverlay( AstAxis *template, AstAxis *result, int *status ) {
    extended the string syntax (see the AxisFormat function for more
    details). */
    if ( TestAxisFormat( template, status ) ) {
-      SetAxisFormat( result, GetAxisFormat( template, status ), status );  
+      SetAxisFormat( result, GetAxisFormat( template, status ), status );
    }
 
 /* Undefine macros local to this function. */
@@ -1237,7 +1237,7 @@ static int AxisUnformat( AstAxis *this, const char *string, double *value, int *
    } else {
       nc = 0;
    }
-   
+
 /* Return the number of characters read. */
    return nc;
 }
@@ -1376,7 +1376,7 @@ static const char *GetAxisNormUnit( AstAxis *this, int *status ){
 
 *  Notes:
 *     - The returned pointer points to a static memory buffer. The
-*     contents of this buffer will be over-written on each invocation of 
+*     contents of this buffer will be over-written on each invocation of
 *     this function. A copy of the returned string should therefore be
 *     taken if it will be needed later.
 *     - A NULL pointer will be returned if this function is invoked
@@ -1410,7 +1410,7 @@ static const char *GetAxisNormUnit( AstAxis *this, int *status ){
                       result, AST__AXIS_GETAXISNORMUNIT_BUFF_LEN );
          result = astFree( (void *) result );
 
-/* If so, copy it into the static buffer and free the dynamic memory returned 
+/* If so, copy it into the static buffer and free the dynamic memory returned
    by astUnitNormaliser. */
       } else {
          strcpy( getaxisnormunit_buff, result );
@@ -1437,7 +1437,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     Axis member function (over-rides the astGetObjSize protected
@@ -1551,7 +1551,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -1562,7 +1562,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "getattrib_buff" as a null-terminated string in an 
+   the value into "getattrib_buff" as a null-terminated string in an
    appropriate format.  Set "result" to point at the result string. */
 
 /* Digits. */
@@ -1653,21 +1653,21 @@ static const char *GetDefaultFormat( AstAxis *this, int *status ){
 *     const char *GetDefaultFormat( AstAxis *this, int *status )
 
 *  Class Membership:
-*     Axis member function 
+*     Axis member function
 
 *  Description:
 *     This function returns a pointer to a string holding the default
 *     Format value, which is based on the current Digits value.
 
 *  Parameters:
-*     this 
+*     this
 *        A pointer to the Axis structure.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     - Pointer to a static null-terminated character string containing 
-*     the default Format string. 
+*     - Pointer to a static null-terminated character string containing
+*     the default Format string.
 
 *  Notes:
 *     - A null string will be returned if this function is invoked
@@ -1678,7 +1678,7 @@ static const char *GetDefaultFormat( AstAxis *this, int *status ){
 /* Local Variables: */
    astDECLARE_GLOBALS         /* Pointer to thread-specific global data */
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return "";
 
 /* Get a pointer to the thread specific global data structure. */
@@ -1722,7 +1722,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1843,33 +1843,33 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 
 *  Synopsis:
 *     #include "axis.h"
-*     char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign, 
+*     char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *                            int *lspace, int *integ, int *status )
 
 *  Class Membership:
-*     Axis member function 
+*     Axis member function
 
 *  Description:
-*     This function returns a collection of flags indicating if any AST 
+*     This function returns a collection of flags indicating if any AST
 *     specific formatting features are specified in the supplied Format
 *     string. It also returns a pointer to a new Format string which is a
-*     standard C printf format specifier. 
+*     standard C printf format specifier.
 
 *  Parameters:
 *     fmt0
 *        The value of the Format attribute.
-*     digs 
+*     digs
 *        The default number of digits of precision to use. This is used
 *        if the given format specifier includes a wildcard precision (".*").
 *        In this case, the returned format specifier will be modified to
 *        include an explicit precision value equal to the supplied value
 *        of "digs".
 *     log
-*        Pointer to an integer in which to store a flag indicating if the 
-*        if the axis value should be formatted as "10**x" using the graphical 
-*        escape sequences defined within the Plot class to produce "x" as a 
+*        Pointer to an integer in which to store a flag indicating if the
+*        if the axis value should be formatted as "10**x" using the graphical
+*        escape sequences defined within the Plot class to produce "x" as a
 *        superscript of "10". A non-zero value will be returned if the
-*        supplied Format string has a '&' character in its printf <flags> 
+*        supplied Format string has a '&' character in its printf <flags>
 *        field (that is, between the leading '%' sign and the optional
 *        printf field width).
 *     sign
@@ -1877,16 +1877,16 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *        sign character ('+' or '-') should always be included in front
 *        of the "10" if "log" is returned non-zero. If "log" is returned
 *        zero, then "sign" will also be zero. If "log" is non-zero, then
-*        a non-zero value for "sign" will be returned if the supplied Format 
-*        string has a '+' character in its printf <flags> field (that is, 
+*        a non-zero value for "sign" will be returned if the supplied Format
+*        string has a '+' character in its printf <flags> field (that is,
 *        between the leading '%' sign and the optional printf field width).
 *     lspace
 *        Pointer to an integer in which to store a flag indicating if a
-*        leading space should be included in front of the "10" if "log" is 
-*        returned non-zero and "sign" is returned zero. Otherwise, "lspace" 
-*        will also be zero. If "log" is non-zero, then a non-zero value for 
-*        "lspace" will be returned if the supplied Format string has a ' ' 
-*        character in its printf <flags> field (that is, between the leading 
+*        leading space should be included in front of the "10" if "log" is
+*        returned non-zero and "sign" is returned zero. Otherwise, "lspace"
+*        will also be zero. If "log" is non-zero, then a non-zero value for
+*        "lspace" will be returned if the supplied Format string has a ' '
+*        character in its printf <flags> field (that is, between the leading
 *        '%' sign and the optional printf field width).
 *     integ
 *        Pointer to an integer in which to store a flag indicating if the
@@ -1896,7 +1896,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     - Pointer to a dynamically allocated null-terminated string containing 
+*     - Pointer to a dynamically allocated null-terminated string containing
 *     the modified Format string. This will be a copy of the supplied
 *     Format string, but with any '&' flag removed. Any '+' or ' ' flag will
 *     also be removed if "log" is returned as non-zero. An explicit
@@ -1930,7 +1930,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
    *lspace = 0;
    *integ = 0;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Take a copy of the supplied string. Check the pointer can be used
@@ -1942,7 +1942,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 
 /* Find the first percent sign. Do nothing if none is found. */
       perc = strchr( result, '%' );
-      if( perc ) {   
+      if( perc ) {
 
 /* Check each character following the percent sign until one is found
    which is not a legal printf flag, or a legal AST extension flag. Note
@@ -1951,7 +1951,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
          plus = 0;
          space = 0;
          hash = 0;
-   
+
          a = perc;
          while( ++a ){
             if( *a == '-' ){
@@ -1997,8 +1997,8 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 
 /* Find the first percent sign. Do nothing if none is found. */
       a = strchr( result, '%' );
-      if( a ) {   
- 
+      if( a ) {
+
 /* Check each character following the percent sign until one is found
    which is not a legal printf flag. */
          while( ++a ){
@@ -2007,16 +2007,16 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 
 /* Skip any field width (a decimal integer) following the flags. */
          a--;
-         while( ++a ) { 
+         while( ++a ) {
             if( !isdigit( *a ) ) break;
          }
 
 /* Get a pointer to the next alphabetic character. This will be the
    conversion code. If it an integer code, return *integ non-zero. */
          c = a - 1;
-         while( ++c ) { 
+         while( ++c ) {
             if( isalpha( *c ) ) {
-               if( *c == 'd' || *c == 'i' || *c == 'u' || *c == 'o' || 
+               if( *c == 'd' || *c == 'i' || *c == 'u' || *c == 'o' ||
                    *c == 'x' || *c == 'X' || *c == 'c' ) *integ = 1;
                break;
             }
@@ -2331,7 +2331,7 @@ static int TestAxisNormUnit( AstAxis *this, int *status ){
 *     int TestAxisNormUnit( AstAxis *this, int *status )
 
 *  Class Membership:
-*     Axis member function 
+*     Axis member function
 
 *  Description:
 *     This function returns a boolean result (0 or 1) to indicate
@@ -3151,7 +3151,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
 /* ------- */
       new->digits = astReadInt( channel, "digits", -INT_MAX );
       if ( TestAxisDigits( new, status ) ) SetAxisDigits( new, new->digits, status );
-      
+
 /* Format. */
 /* ------- */
       new->format = astReadString( channel, "format", NULL );
@@ -3228,7 +3228,7 @@ int astAxisUnformat_( AstAxis *this, const char *string, double *value, int *sta
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Axis,AxisUnformat))( this, string, value, status );
 }
-int astAxisFields_( AstAxis *this, const char *fmt, const char *str, 
+int astAxisFields_( AstAxis *this, const char *fmt, const char *str,
                     int maxfld, char **fields, int *nc, double *val, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Axis,AxisFields))( this, fmt, str, maxfld, fields, nc, val, status );

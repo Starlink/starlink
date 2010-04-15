@@ -31,7 +31,7 @@
 \newcommand{\stardocauthors}   {A.C.~Davenhall}
 \newcommand{\stardocdate}      {1st October 1997}
 \newcommand{\stardoctitle}     {The DX Cookbook}
-\newcommand{\stardocabstract}  {IBM DX (Data Explorer) is the 
+\newcommand{\stardocabstract}  {IBM DX (Data Explorer) is the
 data-visualisation package recommended by Starlink, particularly for
 the visualisation of three-dimensional scalar and vector data. This
 cookbook provides a set of simple recipes for performing common
@@ -85,7 +85,7 @@ This edition of the cookbook applies to Version \DXversion of DX.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -236,19 +236,19 @@ This edition of the cookbook applies to Version \DXversion of DX.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
-% ? New part for abstract if used.  
+% ? New part for abstract if used.
 
 %  Note this is different from most documents where a section is used.
   \section{\xlabel{abstract}Abstract}
@@ -396,9 +396,9 @@ No special privileges or quotas are required to run DX. DX (and, indeed,
 visualisation software in general) tends to be quite profligate in its
 use of computing resources. Files containing generated images can
 require a significant amount of disk space, and in particular files
-containing animations can be extremely large. Generating visualisations is 
+containing animations can be extremely large. Generating visualisations is
 computationally intensive and can require substantial amounts of computer
-memory. Therefore it is sensible to run DX on the computer with the 
+memory. Therefore it is sensible to run DX on the computer with the
 fastest processor and largest physical memory to which you have convenient
 access.
 
@@ -536,7 +536,7 @@ running a simple DX network. Only the very minimum set of features needed
 to create and run a network are mentioned; there are many features and
 facilities which are omitted. See the {\it QuickStart Guide}\cite{QUICKS}
 and other IBM DX manuals for further details (the IBM manuals are listed
-in Table 1 of \xref{SUN/203}{sun203}{}\cite{SUN203}). The best way to use 
+in Table 1 of \xref{SUN/203}{sun203}{}\cite{SUN203}). The best way to use
 this recipe is probably to have a terminal on which you can run DX to
 hand and to work through the recipe trying the various points.
 
@@ -545,7 +545,7 @@ on the leftmost mouse button.}
 
 \begin{enumerate}
 
-  \item To start DX (see also Section~\ref{START}, above), ensure that 
+  \item To start DX (see also Section~\ref{START}, above), ensure that
    your display is configured to receive X-output and then simply type:
 
   \begin{quote}
@@ -569,9 +569,9 @@ on the leftmost mouse button.}
   \epsfbox{sc2_vpe.ps}
   \end{center}
 
-  \caption[The main window for the Visual Program Editor.]{The main 
+  \caption[The main window for the Visual Program Editor.]{The main
    window for the Visual Program Editor.}
-  
+
   \end{figure}
 
   \item Figure~\ref{VPE} shows the main window for the Visual Program
@@ -721,7 +721,7 @@ on the leftmost mouse button.}
 
     \caption[Window for the `Import' module.]{Window for the `Import'
      module.\label{IMPORT} }
-    
+
 
     \end{figure}
 
@@ -759,7 +759,7 @@ on the leftmost mouse button.}
   \begin{enumerate}
 
     \item click on the `Help' menu in the top right hand corner of
-     the VPE (see Figure~\ref{VPE}), 
+     the VPE (see Figure~\ref{VPE}),
 
     \item choose menu-item `Context-Sensitive Help'; the mouse pointer
      will change to a `?',
@@ -799,7 +799,7 @@ on the leftmost mouse button.}
   \end{center}
 
   \caption[A simple network.]{A simple network. \label{SIMPLE} }
-  
+
   \end{figure}
 
    There are two ways to create the network. The first is to find the
@@ -826,7 +826,7 @@ on the leftmost mouse button.}
 
     \caption[The `Open\ldots' window.]{The `Open\ldots' window.
     \label{OPEN} }
-    
+
 
     \end{figure}
 
@@ -869,7 +869,7 @@ on the leftmost mouse button.}
      various other sorts of input to produce different sorts of display.
 
   \end{description}
-   
+
 \end{enumerate}
 
 \subsection{\label{RUNNET}Running a network}
@@ -905,7 +905,7 @@ term.
 
      This input specifies which field within the data file is to be
      read. In the current example the field is called `{\tt Gaussian}'.
-     Again see Sections~\ref{IMP_GRID} and \ref{IMP_PART} for details. 
+     Again see Sections~\ref{IMP_GRID} and \ref{IMP_PART} for details.
 
     \item Set input `format' to: {\tt general}
 
@@ -934,7 +934,7 @@ term.
      does not neatly fill the plotting window (it may be either too big
      or too small) select the `Reset' option from the `Options' menu.
 
-    \item By default DX generates a view perpendicular to one of the 
+    \item By default DX generates a view perpendicular to one of the
      axes, which gives an unnaturally `flat' appearance to the image.
      For a better perspective view select the `View Control' option
      from the `Options' menu. The `View Control' window appears. Set the
@@ -968,7 +968,7 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
   \item The DX header file for this data file is shown in
    Figure~\ref{FIELD.GENERAL}. These header files have file type
    `{\tt .general}'. Thus the present example is called `{\tt
-   field.general}'. 
+   field.general}'.
 
   \begin{figure}[htbp]
 
@@ -1160,7 +1160,7 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
       END
 \end{verbatim}
 
-\caption[Program {\tt field.f} to write gridded data.]{Program {\tt 
+\caption[Program {\tt field.f} to write gridded data.]{Program {\tt
 field.f} to write gridded data. \label{FIELD.F} }
 
 \end{figure}
@@ -1189,7 +1189,7 @@ in Figure~\ref{PARTICLE.F}.
   \item The DX header file for this data file is shown in
    Figure~\ref{PARTICLE.GENERAL}. These header files have file type
    `{\tt .general}'. Thus the present example is called `{\tt
-   particle.general}'. 
+   particle.general}'.
 
   \begin{figure}[htbp]
 
@@ -1275,7 +1275,7 @@ Section~\ref{IMP_GRID}, above.
      :  DZ,      !     "     "  z.
      :  PI       ! Pi.
       PARAMETER
-     : (DR = 1.0E-1,  DTHETA = 1.0E-2, 
+     : (DR = 1.0E-1,  DTHETA = 1.0E-2,
      :  DZ = 1.0E-1,  PI = 3.1415927E0)
       REAL
      :  R,       ! Radius.
@@ -1378,7 +1378,7 @@ with the graph.
 \subsection{Alternatives}
 
 If your data are in Starlink NDF format then an alternative way to
-generate a histogram is to use command \xref{{\tt HIST}}{sun86}{HIST} in 
+generate a histogram is to use command \xref{{\tt HIST}}{sun86}{HIST} in
 Figaro (see \xref{SUN/86}{sun86}{}\cite{SUN86}).  This option will work
 for $n$-dimensional gridded data.
 
@@ -1439,13 +1439,13 @@ display a slice through a data cube. \label{SLICNETF} }
 Module `ShowBox' extracts the bounding box of the data cube. `Slab'
 extracts the specified slice. `Statistics' finds the minimum and
 maximum values in the cube; they are used by `AutoColor' to generate
-a false colour image of the extracted slice. `Collect' combines the 
+a false colour image of the extracted slice. `Collect' combines the
 bounding box and extracted slice.
 
 \subsection{Alternatives}
 
 If your data are in Starlink NDF format then an alternative way to
-plot a slice is to use command \xref{{\tt DISPLAY}}{sun95}{DISPLAY} in KAPPA 
+plot a slice is to use command \xref{{\tt DISPLAY}}{sun95}{DISPLAY} in KAPPA
 (see \xref{SUN/95}{sun95}{}\cite{SUN95}).  You simply specify the required
 slice, for example:
 
@@ -1608,7 +1608,7 @@ The network is shown in Figure~\ref{PARTNETF}.
 \subsection{Notes}
 
 Module `ShowBox' extracts the bounding box of the data set. `AutoColor'
-generates a plot showing the positions of each point in the dataset and 
+generates a plot showing the positions of each point in the dataset and
 colours each point according to the value of its data component.
 `Collect' combines the bounding box and plot.
 
@@ -1785,7 +1785,7 @@ permission of the observers (see Section~\ref{ACK} for details).}
   \end{quote}
 
    The syntax to specify a subset of an NDF is to give the bounds of
-   the required region inside parentheses after the file name.  
+   the required region inside parentheses after the file name.
    Unfortunately however, by default the Unix shell will attempt to
    interpret these parentheses.  Thus, in the above example the input
    file name and NDF subset are enclosed in single quotes in order to
@@ -1915,7 +1915,7 @@ permission of the observers (see Section~\ref{ACK} for details).}
 \newpage
 \section{\xlabel{ROSAT}\label{ROSAT}ROSAT Data Cube}
 
-This recipe shows how to import and display a data cube observed with the 
+This recipe shows how to import and display a data cube observed with the
 \htmladdnormallink{ROSAT}{http://heasarc.gsfc.nasa.gov/0/docs/rosat/rosat3.html}
 X-ray astronomy satellite ({\it R\"{o}ntgensatellit}).  ROSAT data come
 in a number of different formats.  The example used here is an Asterix
@@ -2004,7 +2004,7 @@ described in Section~\ref{JCMT}.
   \end{quote}
 
    The syntax to specify a subset of an NDF is to give the bounds of
-   the required region inside parentheses after the file name.  
+   the required region inside parentheses after the file name.
    Unfortunately however, by default the Unix shell will attempt to
    interpret these parentheses.  Thus, in the above example the input
    file name and NDF subset are enclosed in single quotes in order to
@@ -2036,7 +2036,7 @@ described in Section~\ref{JCMT}.
   \epsfbox{sc2_rosatslice.ps}
   \end{center}
 
-  \caption[Network to display a sequence of slices through a ROSAT 
+  \caption[Network to display a sequence of slices through a ROSAT
    data cube.]{Network to display a sequence of slices through a ROSAT
    data cube. \label{ROSATSLICE} }
 
@@ -2413,7 +2413,7 @@ a draft version of the document.
    {\it CONVERT -- A Format-conversion Package}\, by M.J.~Currie,
    G.J.~Privett and A.J.~Chipperfield, 7 December 1995 (Starlink).
 
-  \bibitem{SUN86} \xref{SUN/86.12}{sun86}{}: 
+  \bibitem{SUN86} \xref{SUN/86.12}{sun86}{}:
    {\it FIGARO -- A General Data Reduction System}\, by K.~Shortridge,
    H.~Meyerdierks, M.J.~Currie and M.J.~Clayton, 26 September 1996
    (Starlink).

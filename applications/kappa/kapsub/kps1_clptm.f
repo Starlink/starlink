@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY, TICKMAP, X, Y, 
+      SUBROUTINE KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY, TICKMAP, X, Y,
      :                       N, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY, TICKMAP, X, Y, N, 
+*     CALL KPS1_CLPTM( BLEDGE, OFFX, OFFY, NPOLY, TICKMAP, X, Y, N,
 *                      STATUS )
 
 *  Description:
@@ -33,23 +33,23 @@
 *     NPOLY = INTEGER (Given)
 *        The number of polylines used to draw the tick marks.
 *     TICKMAP = INTEGER (Given and Returned)
-*        On the initial entry, this should be an AST pointer to a KeyMap 
-*        holding information about the poly lines used to draw the tick 
+*        On the initial entry, this should be an AST pointer to a KeyMap
+*        holding information about the poly lines used to draw the tick
 *        marks for the first cell. This will have been produced by
 *        KPG1_ASPLN. The information in this KeyMap is copied out of the
-*        KeyMap and into the "X" and "Y" arrays. On exit, this KeyMap is 
-*        annull and a AST__NULL value is returned. 
+*        KeyMap and into the "X" and "Y" arrays. On exit, this KeyMap is
+*        annull and a AST__NULL value is returned.
 *     X( * ) = REAL (Given and Returned)
 *        Work space used to hold the X coords at each point. If TICKMAP
-*        is supplied not equal to AST__NULL, then the contents of TICKMAP 
+*        is supplied not equal to AST__NULL, then the contents of TICKMAP
 *        are copied into X and returned.
 *     Y( * ) = REAL (Given and Returned)
 *        Work space used to hold the Y coords at each point. If TICKMAP
-*        is supplied not equal to AST__NULL, then the contents of TICKMAP 
+*        is supplied not equal to AST__NULL, then the contents of TICKMAP
 *        are copied into Y and returned.
 *     N( * ) = INTEGER (Given and Returned)
 *        Work space used to hold the number of points in each polyline. If
-*        TICKMAP is supplied not equal to AST__NULL, then the contents of 
+*        TICKMAP is supplied not equal to AST__NULL, then the contents of
 *        TICKMAP are copied into Y and returned.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
@@ -86,11 +86,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       LOGICAL BLEDGE
@@ -132,7 +132,7 @@
       IF( TICKMAP .NE. AST__NULL ) THEN
 
 *  Initalise the index of the next free entry in the X/Y work arrays.
-         IXY = 1      
+         IXY = 1
 
 *  Loop round all the entries in the KeyMap.
          DO I = 1, NPOLY
@@ -150,9 +150,9 @@
                   N( I ) = NP
 
 *  Get the X and Y values and append them to the end of the two work arrays.
-                  IF( AST_MAPGET1R( KM, 'X', NP, NVAL, X( IXY ), 
+                  IF( AST_MAPGET1R( KM, 'X', NP, NVAL, X( IXY ),
      :                              STATUS ) .AND.
-     :                AST_MAPGET1R( KM, 'Y', NP, NVAL, Y( IXY ), 
+     :                AST_MAPGET1R( KM, 'Y', NP, NVAL, Y( IXY ),
      :                              STATUS ) ) THEN
 
 *  Increment the index at which to store the next polyline coords.
@@ -167,8 +167,8 @@
       END IF
 
 *  Shift the PGPLOT viewport by the specified values. If the edges are
-*  not being blanked, expand the window slightly (0.01 mm at each edge) to 
-*  ensure graphics drawn at the edge are not acidentally trimmmed due to 
+*  not being blanked, expand the window slightly (0.01 mm at each edge) to
+*  ensure graphics drawn at the edge are not acidentally trimmmed due to
 *  rounding errors.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL PGQWIN( X1, X2, Y1, Y2 )

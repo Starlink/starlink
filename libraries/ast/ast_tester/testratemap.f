@@ -5,7 +5,7 @@
       include 'PRM_PAR'
 
       integer status, m, outp(4), inp(4), c1, c2, c3, c4, rm
-      double precision at(4), r, mat(4), b1(2), b2(2), a1(2), 
+      double precision at(4), r, mat(4), b1(2), b2(2), a1(2),
      :                 a2(4)
 
       status = sai__ok
@@ -55,7 +55,7 @@
       if( .not. ast_getl( rm, 'TranForward', status ) ) call stopit( 2,
      :                                                   r, status )
 
-      if( ast_getl( rm, 'TranInverse', status ) ) call stopit( 3, r, 
+      if( ast_getl( rm, 'TranInverse', status ) ) call stopit( 3, r,
      :                                                     status )
 
       rm = ast_ratemap( m, 1, 2, ' ', status )
@@ -106,12 +106,12 @@
 
       rm = ast_ratemap( m, 3, 1, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )
-      if( abs( r - 12.0D0/7.0D0 ) .gt. 1.0E-6 ) 
+      if( abs( r - 12.0D0/7.0D0 ) .gt. 1.0E-6 )
      :                          call stopit( 15, r, status )
 
       rm = ast_ratemap( m, 3, 2, ' ', status )
       call ast_trann( rm, 1, 4, 1, at, 1, 1, 1, r, status )
-      if( abs( r - (-8.0D0/7.0D0) ) .gt. 1.0E-6 ) 
+      if( abs( r - (-8.0D0/7.0D0) ) .gt. 1.0E-6 )
      :                          call stopit( 16, r, status )
 
       rm = ast_ratemap( m, 3, 3, ' ', status )

@@ -9,7 +9,7 @@ C The default style is ANGLE=45.0, SEPN=1.0, PHASE=0.0.
 C
 C Arguments:
 C  ANGLE  (input)  : the angle the hatch lines make with the
-C                    horizontal, in degrees, increasing 
+C                    horizontal, in degrees, increasing
 C                    counterclockwise (this is an angle on the
 C                    view surface, not in world-coordinate space).
 C  SEPN   (input)  : the spacing of the hatch lines. The unit spacing

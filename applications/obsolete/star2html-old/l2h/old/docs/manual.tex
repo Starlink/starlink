@@ -37,7 +37,7 @@
 \def\adjustfootnote{\setcounter{footnote}{6}\footnotetext{http://csep1.phy.ornl.gov/csep.html}}
 
 %
-% These are needed for the Glossary and Index. 
+% These are needed for the Glossary and Index.
 %
 \newenvironment{theglossary}{\begin{list}{}{\setlength{\labelwidth}{20pt}%
  \setlength{\leftmargin}{\labelwidth}\setlength\itemindent{-\labelwidth}%
@@ -150,14 +150,14 @@
 \begin{document}
 \sloppy
 %
-%  TITLE-PAGE 
+%  TITLE-PAGE
 %
 \Glossary{latex2html}{\LaTeX2HTML}{}
 \title{The \LaTeX2HTML{} Translator}
 \author{Nikos Drakos\\Computer Based Learning Unit\\University of Leeds.}
 \date{\today}
 \index{Computer~Based~Learning~Unit!University of Leeds}%
-\maketitle 
+\maketitle
 
 \htmlrule
 %
@@ -184,17 +184,17 @@ Macquarie University, Sydney.
 %
 \begin{latexonly}
 \begin{center}
-{\large 
+{\large
 This document accompanies \latextohtml{} version 97.1}%
 \footnote{The manuscript was updated to version \textsc{v96.1}\,,
-as indicated with thin change-bars, by Herbert W.\ Swan \Email{lanhws@expl.aai.arco.com} 
+as indicated with thin change-bars, by Herbert W.\ Swan \Email{lanhws@expl.aai.arco.com}
 and converted to \LaTeXe{} by \Goossens~\Email{goossens@cern.ch}.
 Extensive revisions of the manuscript were made by \RossMoore~\Email{ross@mpce.mq.edu.au}
 for \textsc{v96.1} \texttt{rev-f}, incorporating also suggestions from \Goossens.
-Another major revision was required to adequately describe the new features 
+Another major revision was required to adequately describe the new features
 made possible with \texttt{HTML} 3.2\,,
 and recent developments in image-generation and macro-handling.
-This work was done by \RossMoore. 
+This work was done by \RossMoore.
 Wider change-bars indicate where newly added features are described.}%
 \Glossary{latex2e}{\LaTeXe}%
 \end{center}
@@ -208,19 +208,19 @@ Wider change-bars indicate where newly added features are described.}%
 This document accompanies \latextohtml{}\Glossary{latex2html}{\LaTeX2HTML}{}, version 97.1.
 \Glossary{latex2e}{\LaTeXe}{}
 
-The manuscript was updated to version 96.1, as indicated with change-bar icons, 
-by Herbert W\,Swan \Email{lanhws@expl.aai.arco.com} 
+The manuscript was updated to version 96.1, as indicated with change-bar icons,
+by Herbert W\,Swan \Email{lanhws@expl.aai.arco.com}
 and converted to \LaTeXe{} by \Goossens~\Email{goossens@cern.ch}.
 
 Updates and extensive revisions to the manuscript for version \textsc{v96.1} \texttt{rev-f},
-were made by \RossMoore~\Email{ross@mpce.mq.edu.au}, 
-also incorporating suggestions from \Goossens. 
+were made by \RossMoore~\Email{ross@mpce.mq.edu.au},
+also incorporating suggestions from \Goossens.
 
 \bigskip
-Another major revision was required to adequately describe the new features 
+Another major revision was required to adequately describe the new features
 made possible with \texttt{HTML} 3.2\,,
 and recent developments in image-generation and macro-handling.
-This work was done by \RossMoore. 
+This work was done by \RossMoore.
 Appropriate change-bar icons indicate where newly added features are described.
 
 \htmlrule
@@ -239,11 +239,11 @@ is available, also \htmladdnormallink{compressed}%{manual.ps.gz}
 Browse the following links for information concerning:
 
 \begin{htmllist}\htmlitemmark{RedBall}
-\item[Contributions from others --- \htmlref{early development}{credits}] 
-\item[Contributions from others --- \htmlref{recent developments, 1996}{recent96}] 
-\item[Contributions from others --- \htmlref{recent developments, 1997}{recent97}] 
-\item[Proposals for \htmlref{future development}{future}] 
-\item[\htmlref{Licensing}{licence}] 
+\item[Contributions from others --- \htmlref{early development}{credits}]
+\item[Contributions from others --- \htmlref{recent developments, 1996}{recent96}]
+\item[Contributions from others --- \htmlref{recent developments, 1997}{recent97}]
+\item[Proposals for \htmlref{future development}{future}]
+\item[\htmlref{Licensing}{licence}]
 \end{htmllist}
 
 \htmlrule
@@ -269,24 +269,24 @@ authoring complex hyper-media documents using
 familiar word-processing concepts, including the power of a \LaTeX-like
 macro language capable of producing correctly structured \texttt{HTML} tags.
 
-\latextohtml{} replicates the basic structure of a \LaTeX{}  document 
+\latextohtml{} replicates the basic structure of a \LaTeX{}  document
 as a set of interconnected \texttt{HTML} files which can be explored using
-automatically generated navigation panels. 
+automatically generated navigation panels.
 The cross-references, citations, footnotes, the table-of-contents and the lists
 of figures and tables, are also translated into hypertext links. Formatting
-information which has equivalent ``tags'' in \texttt{HTML} 
-(lists, quotes, paragraph-breaks, type-styles, etc.) 
-is also converted appropriately. 
+information which has equivalent ``tags'' in \texttt{HTML}
+(lists, quotes, paragraph-breaks, type-styles, etc.)
+is also converted appropriately.
 The remaining heavily formatted items
 such as mathematical equations, pictures etc. are converted to images
 which are placed automatically at the correct position in the
 final \texttt{HTML} document.
 
-\latextohtml{} extends \LaTeX{}  by supporting arbitrary hypertext links 
-and symbolic cross-references between evolving 
+\latextohtml{} extends \LaTeX{}  by supporting arbitrary hypertext links
+and symbolic cross-references between evolving
 remote documents. It also allows the specification
 of \emph{conditional text} and the inclusion of raw \texttt{HTML} commands.
-These hyper-media extensions to \LaTeX{}  are available as 
+These hyper-media extensions to \LaTeX{}  are available as
 new commands and environments from within a \LaTeX{}  document.
 
 This document presents the main features of \latextohtml{} and
@@ -303,7 +303,7 @@ describes how to obtain and install it, and how to use it effectively.
 
 
 %
-%  CONTENTS, 
+%  CONTENTS,
 %  Lists of figures, tables
 %
 \clearpage
@@ -432,7 +432,7 @@ Nikos Drakos
 % Glossary info stored in:  manual.gls ,  which was created using:
 %
 %       makeindex -o manual.gls -s l2hglo.ist manual.glo
-%       
+%
 \begin{latexonly}
 \InputIfFileExists{manual.gls}{\clearpage\typeout{^^Jcreating Glossary...}}%
 {\typeout{^^JNo Glossary, since  manual.gls  could not be found.^^J}}
@@ -458,7 +458,7 @@ Nikos Drakos
 % Index info stored in:  manual.ind ,  which was created using:
 %
 %       makeindex -s l2hidx.ist manual.idx
-%       
+%
 \printindex
 
 %
@@ -508,7 +508,7 @@ Nikos Drakos
 %
 %% This is an alphabetical navigation panel.
 \index{@\label{AZ}\textbf{\LARGE
-\htmlref{\$}{doll} \htmlref{.}{dot} \htmlref{ A }{A} 
+\htmlref{\$}{doll} \htmlref{.}{dot} \htmlref{ A }{A}
  \htmlref{B}{B} \htmlref{C}{C} \htmlref{D}{D} \htmlref{E}{E} \htmlref{F}{F}
  \htmlref{G}{G} \htmlref{H}{H} \htmlref{I}{I} \htmlref{J}{K} \htmlref{K}{K}
  \htmlref{L}{L} \htmlref{M}{M} \htmlref{N}{N} \htmlref{O}{O} \htmlref{P}{P}

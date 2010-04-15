@@ -14,15 +14,15 @@
 
 *  Description:
 *     An HDS locator for the data object associated with the specified
-*     parameter is returned. The parameter system will attempt to associate 
-*     an object if one is not already associated. This operation is identical 
+*     parameter is returned. The parameter system will attempt to associate
+*     an object if one is not already associated. This operation is identical
 *     with DAT_ASSOC except under error conditions. When there is an error,
 *     DAT_EXIST reports the error and returns the status value immediately,
 *     whereas DAT_ASSOC repeatedly attempts to get a valid locator.
 *     If the named object does not exist, status PAR__ERROR is returned.
 *
 *     The object will be opened with the appropriate ACCESS mode. If ACCESS
-*     is incompatible with the access mode specified for the parameter in 
+*     is incompatible with the access mode specified for the parameter in
 *     the program's Interface File, status SUBPAR__ICACM will be returned.
 
 *  Arguments:
@@ -68,11 +68,11 @@
 
 *  History:
 *     25-NOV-1984 (BDK)
-*        Original 
+*        Original
 *     30-JAN-1992 (AJC)
-*        Inherit LOC size 
+*        Inherit LOC size
 *      1-SEP-1993 (AJC)
-*        Correct "Arguments" section for above mod 
+*        Correct "Arguments" section for above mod
 *     16-JUN-1998 (AJC)
 *        Re-format prologue
 *     {enter_further_changes_here}

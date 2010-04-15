@@ -11,9 +11,9 @@
 \newcommand{\stardocdate}      {1 February 1993}
 \newcommand{\stardoctitle}     {SPT --- Software Porting Tools}
 \newcommand{\stardocabstract}  {
-SPT is an inhomogeneous set of 
+SPT is an inhomogeneous set of
 software tools designed to assist in the
-conversion of code from one operating system to another (principally from 
+conversion of code from one operating system to another (principally from
 VMS to UNIX and vice-versa, and between different flavours of UNIX).
 }
 % ? End of document identification
@@ -47,7 +47,7 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -116,7 +116,7 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -197,12 +197,12 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -238,13 +238,13 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 
 \section{Introduction\xlabel{introduction}}
 
-SPT is an inhomogeneous set of 
+SPT is an inhomogeneous set of
 software tools designed to assist in the
-conversion of code from one operating system to another (principally from 
+conversion of code from one operating system to another (principally from
 VMS to UNIX and vice-versa, and between different flavours of UNIX).
 
 The tools are:
-\begin{description} 
+\begin{description}
 \item[FORCONV] Converts file name specifications in Fortran INCLUDE statements
 and ``escapes'' backslash characters. The output file on VMS is also in
 Stream\_lf format so can be read on a UNIX system using NFS.
@@ -278,7 +278,7 @@ compilers interpret a backslash as an ``escape'' character by default
 although on some systems there is a compiler switch to alter this
 behaviour).
 
-\item Generate a file containing a ``make'' dependency line for each 
+\item Generate a file containing a ``make'' dependency line for each
 include statement processed. This file can be used as a starting point for a
 make file.
 
@@ -303,7 +303,7 @@ and an example of the source code to be converted might be:
 \end{quote}
 which, after processing, would be changed to:
 \begin{quote}
-{\tt 
+{\tt
       INCLUDE 'pars'\\
       INCLUDE 'commons'}
 \end{quote}
@@ -321,12 +321,12 @@ option. So in the above example:
 \end{quote}
 would be converted to:
 \begin{quote}
-{\tt 
+{\tt
       INCLUDE '/star/include/fred'}
 \end{quote}
 As a result of this,
 when converting programs that use Starlink libraries, the substitution file
-need only specify any ``program-specific'' include files; references to 
+need only specify any ``program-specific'' include files; references to
 Starlink include files will all be converted automatically. If the
 program does not use Starlink libraries, then the prefix can be suppressed
 entirely by specifying the {\tt -p} option with an empty string.
@@ -477,7 +477,7 @@ An example is {\tt /star/include/sae\_par}.
 The second (optional) argument specifies whether the name of the soft link is
 in upper or lower case. If it is omitted (or given as the null string), then
 the name of the soft link matches exactly the name of the file that it points
-to. The value of the argument can be one of `{\tt lower}', `{\tt upper}', `{\tt 
+to. The value of the argument can be one of `{\tt lower}', `{\tt upper}', `{\tt
 both}', `{\tt all}' or `{\tt remove}'. A value of `{\tt lower}' specifies that
 the name of the soft link will be in lower case and a value of `{\tt upper}'
 specifies that the name of the soft link will be in upper case. A value of

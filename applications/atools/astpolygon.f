@@ -21,39 +21,39 @@
 
 *  Description:
 *     This application creates a new Polygon and optionally initialises
-*     its attributes. The Polygon class implements a polygonal area, defined 
+*     its attributes. The Polygon class implements a polygonal area, defined
 *     by a collection of vertices, within a 2-dimensional Frame. The vertices
 *     are connected together by geodesic curves within the encapsulated Frame.
 *     For instance, if the encapsulated Frame is a simple Frame then the
-*     geodesics will be straight lines, but if the Frame is a SkyFrame then 
+*     geodesics will be straight lines, but if the Frame is a SkyFrame then
 *     the geodesics will be great circles.
 
 *  Usage:
 *     astpolygon frame xin yin unc options result
 
 *  ADAM Parameters:
-*     FRAME = LITERAL (Read) 
+*     FRAME = LITERAL (Read)
 *        An NDF or text file holding the Frame in which the region is defined.
-*        It must have exactly 2 axes. If an NDF is supplied, the current Frame 
+*        It must have exactly 2 axes. If an NDF is supplied, the current Frame
 *        in its WCS FrameSet will be used.
 *     XIN = GROUP (Read)
-*        A comma-separated list of floating point values to be used as the X 
-*        axis value of the vertices. A text file may be specified by 
-*        preceeding the name of the file with an up arrow character "^". If 
-*        the supplied value ends with a minus sign, the user is re-prompted 
+*        A comma-separated list of floating point values to be used as the X
+*        axis value of the vertices. A text file may be specified by
+*        preceeding the name of the file with an up arrow character "^". If
+*        the supplied value ends with a minus sign, the user is re-prompted
 *        for additional values.
 *     YIN = GROUP (Read)
 *        A comma-separated list of floating point values to be used as the Y
-*        axis value of the vertices. A text file may be specified by 
-*        preceeding the name of the file with an up arrow character "^". If 
-*        the supplied value ends with a minus sign, the user is re-prompted 
+*        axis value of the vertices. A text file may be specified by
+*        preceeding the name of the file with an up arrow character "^". If
+*        the supplied value ends with a minus sign, the user is re-prompted
 *        for additional values.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new Polygon. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new Polygon.
 *     RESULT = LITERAL (Read)
-*        An text file to receive the new Polygon. 
-*     UNC = LITERAL (Read) 
+*        An text file to receive the new Polygon.
+*     UNC = LITERAL (Read)
 *        An optional text file containing an existing Region which
 *        specifies the uncertainties associated with each point on the
 *        boundary of the Polygon being created. The uncertainty at any
@@ -64,16 +64,16 @@
 *        is assumed to be the same for all points.
 *
 *        If supplied, the uncertainty Region must be either a Box, a Circle
-*        or an Ellipse. Alternatively, a null value (!) may be supplied, in 
-*        which case a default uncertainty is used equivalent to a box 
+*        or an Ellipse. Alternatively, a null value (!) may be supplied, in
+*        which case a default uncertainty is used equivalent to a box
 *        1.0E-6 of the size of the bounding box of the Polygon being created.
 *
 *        The uncertainty Region has two uses: 1) when the astOverlap
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using astSimplify), the uncertainties are 
-*        used to determine if the transformed boundary can be accurately 
+*        subsequently simplified (using astSimplify), the uncertainties are
+*        used to determine if the transformed boundary can be accurately
 *        represented by a specific shape of Region.
 
 *  Copyright:
@@ -116,9 +116,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'CNF_PAR'          ! CNF constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! CNF constants
 
 *  Status:
       INTEGER STATUS
@@ -134,14 +134,14 @@
       INTEGER NP, NP2
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME,
      :                 STATUS )
 
 *  Get two groups holding the input axis values.
@@ -162,9 +162,9 @@
       CALL PSX_CALLOC( 2*NP, '_DOUBLE', IPIN, STATUS )
 
 *  Read the values from the group into the memory.
-      CALL ATL1_GTOFL( IGRP1, 2*NP, 1, %VAL( CNF_PVAL( IPIN ) ), 
+      CALL ATL1_GTOFL( IGRP1, 2*NP, 1, %VAL( CNF_PVAL( IPIN ) ),
      :                 STATUS )
-      CALL ATL1_GTOFL( IGRP2, 2*NP, NP + 1, %VAL( CNF_PVAL( IPIN ) ), 
+      CALL ATL1_GTOFL( IGRP2, 2*NP, NP + 1, %VAL( CNF_PVAL( IPIN ) ),
      :                 STATUS )
 
 *  Get the uncertainty Frame.
@@ -176,7 +176,7 @@
       END IF
 
 *  Create the required Polygon.
-      RESULT = AST_POLYGON( FRAME, NP, NP, %VAL( CNF_PVAL( IPIN ) ), 
+      RESULT = AST_POLYGON( FRAME, NP, NP, %VAL( CNF_PVAL( IPIN ) ),
      :                      UNC, ' ', STATUS )
 
 *  Store the required attribute values.

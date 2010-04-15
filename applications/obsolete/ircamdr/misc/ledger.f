@@ -5,14 +5,14 @@
 ! not the new faint standards. It takes as input the *anstd.results files
 ! and reads in the residuals for each FS star into its own array. It then
 ! also performs some statistics. It computes the mean J-H, H-K, and K residuals
-! for each star, as well as the standard error of the mean (sem). For each 
+! for each star, as well as the standard error of the mean (sem). For each
 ! residual it then computes the number of sigmas that its away from the mean.
 ! If the residual is greater than 2 sigma away from the mean, the mean and the
 ! sem is recalculated with that residual discluded, if the disclude residual is
 ! now 3 sigma away from the NEW mean, then the new mean and sem are outputted
 ! and the residual can in fact be discarded.
 
-! The output file is ledger.txt 
+! The output file is ledger.txt
 
         implicit none
 
@@ -23,12 +23,12 @@
         integer twnine, thirty, thone, thtwo, ththree, thfour, thfive
 
         character file*80, curline*132, pref*80, read*80(200)
-        
+
 ! Declare the arrays, and variables needed
 
         real*8 fs1(200,5), fs1jmhzp, fs1hmkzp, fs1kzp, fs1jmhsq, fs1hmksq
         real*8 fs1ksq, fs1a, fs1b, fs1c
- 
+
         real*8 fs2(200,5), fs2jmhzp, fs2hmkzp, fs2kzp, fs2jmhsq, fs2hmksq
         real*8 fs2ksq, fs2a, fs2b, fs2c
 
@@ -51,8 +51,8 @@
         real*8 fs10ksq, fs10a, fs10b, fs10c
 
         real*8 fs11(200,5), fs11jmhzp, fs11hmkzp, fs11kzp, fs11jmhsq, fs11hmksq
-        real*8 fs11ksq, fs11a, fs11b, fs11c        
-       
+        real*8 fs11ksq, fs11a, fs11b, fs11c
+
         real*8 fs12(200,5), fs12jmhzp, fs12hmkzp, fs12kzp, fs12jmhsq, fs12hmksq
         real*8 fs12ksq, fs12a, fs12b, fs12c
 
@@ -118,13 +118,13 @@
 
         real*8 fs35(200,5), fs35jmhzp, fs35hmkzp, fs35kzp, fs35jmhsq, fs35hmksq
         real*8 fs35ksq, fs35a, fs35b, fs35c
- 
+
         real*8 hmkvar, jmhvar, kvar, jmhstd, hmkstd, kstd
         real*8 hmksem, jmhsem, ksem, hmkresid, jmhresid, kresid
         real*8 hmkaway(200, 4), jmhaway(200, 4)
         real*8 kaway(200, 4)
         real*8 newjmh, newhmk, newk, newjmhstd, newhmkstd, newkstd
-    
+
         real  date,std,istd
 
         logical exists, more, set, ok, jmhtrue, hmktrue, ktrue
@@ -136,7 +136,7 @@
         logical written33, written34, written35, written15
 
         include 'SAE_PAR'
-        
+
         status = SAI__OK
 
 ! Initialize
@@ -172,7 +172,7 @@
         ththree = 0
         thfour = 0
         thfive = 0
-        
+
         fs1a = 0
         fs1b = 0
         fs1c = 0
@@ -181,7 +181,7 @@
         fs1kzp = 0
         fs1jmhsq = 0
         fs1hmksq = 0
-        fs1ksq = 0       
+        fs1ksq = 0
 
         fs2a = 0
         fs2b = 0
@@ -192,7 +192,7 @@
         fs2jmhsq = 0
         fs2hmksq = 0
         fs2ksq = 0
- 
+
         fs3a = 0
         fs3b = 0
         fs3c = 0
@@ -282,7 +282,7 @@
         fs13jmhsq = 0
         fs13hmksq = 0
         fs13ksq = 0
- 
+
         fs14a = 0
         fs14b = 0
         fs14c = 0
@@ -483,7 +483,7 @@
         fs35hmksq = 0
         fs35ksq = 0
 
-! The files are continued to ask for until the user enters `-1'       
+! The files are continued to ask for until the user enters `-1'
         j = 0
 ! The user only has to enter the prefix
         type *, 'Enter the prefix of the next results file (-1 to exit): '
@@ -493,7 +493,7 @@
         else
           l1 = chr_len( pref)
           file = pref( 1:l1)//'anstd.results'
-        end if 
+        end if
 ! While we have a file to read...
         do while (file .ne. '-1')
 ! Does it exist?
@@ -557,7 +557,7 @@
              read( 142, '(a)', end=200) curline
              if( curline(1:2) .eq. '##') then
 ! get the data
-                call chr_ctor( curline(4:9), date, status) 
+                call chr_ctor( curline(4:9), date, status)
              else if(curline(21:21) .eq. 'M') then
 ! get the standard deviation from the file
                 call chr_ctor( curline(50:54), std, status)
@@ -623,7 +623,7 @@
                      end if
                     set = .false.
                   end if
-! if we haven't written the date yet, write it to the array, it will only be 
+! if we haven't written the date yet, write it to the array, it will only be
 ! written once per day, even if there is multiple observations
                   if( .not. written1) then
                      fs1(one,1) = date
@@ -635,7 +635,7 @@
                   if( ( .not. ok) .and. set) then
 ! If there wasn't a H-K or a K, then read airmass
                     call chr_ctod( curline(30:34), fs1(one,5), status)
-                    fs1(one,3) = -99.99 
+                    fs1(one,3) = -99.99
                   end if
                   ok = .false.
 ! The code was copied for the other stars, so its exactly the same...
@@ -695,7 +695,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs2(two,5), status)
-                    fs2(two,3) = -99.99 
+                    fs2(two,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS3') then
@@ -754,7 +754,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs3(three,5), status)
-                    fs3(three,3) = -99.99 
+                    fs3(three,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS4') then
@@ -813,7 +813,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs4(four,5), status)
-                    fs4(four,3) = -99.99 
+                    fs4(four,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS5') then
@@ -872,7 +872,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs5(five,5), status)
-                    fs5(five,3) = -99.99 
+                    fs5(five,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS6') then
@@ -931,7 +931,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs6(six,5), status)
-                    fs6(six,3) = -99.99 
+                    fs6(six,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS7') then
@@ -990,7 +990,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs7(seven,5), status)
-                    fs7(seven,3) = -99.99 
+                    fs7(seven,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS10') then
@@ -1049,7 +1049,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs10(ten,5), status)
-                    fs10(ten,3) = -99.99 
+                    fs10(ten,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS11') then
@@ -1108,9 +1108,9 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs11(eleven,5), status)
-                    fs11(eleven,3) = -99.99 
+                    fs11(eleven,3) = -99.99
                   end if
-                  ok = .false. 
+                  ok = .false.
                 else if( curline(1:4) .eq. 'FS12') then
                   if( curline(13:15) .eq. 'J-H') then
                     n = n + 1
@@ -1167,7 +1167,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs12(n,5), status)
-                    fs12(n,3) = -99.99 
+                    fs12(n,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS13') then
@@ -1226,7 +1226,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs13(thirteen,5), status)
-                    fs13(thirteen,3) = -99.99 
+                    fs13(thirteen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS14') then
@@ -1285,7 +1285,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs14(fourteen,5), status)
-                    fs14(fourteen,3) = -99.99 
+                    fs14(fourteen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS15') then
@@ -1344,7 +1344,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs15(fifteen,5), status)
-                    fs15(fifteen,3) = -99.99 
+                    fs15(fifteen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS16') then
@@ -1403,7 +1403,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs16(sixteen,5), status)
-                    fs16(sixteen,3) = -99.99 
+                    fs16(sixteen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS17') then
@@ -1462,7 +1462,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs17(seventeen,5), status)
-                    fs17(seventeen,3) = -99.99 
+                    fs17(seventeen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS18') then
@@ -1521,7 +1521,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs18(eighteen,5), status)
-                    fs18(eighteen,3) = -99.99 
+                    fs18(eighteen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS19') then
@@ -1580,7 +1580,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs19(nineteen,5), status)
-                    fs19(nineteen,3) = -99.99 
+                    fs19(nineteen,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS20') then
@@ -1639,7 +1639,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs20(twenty,5), status)
-                    fs20(twenty,3) = -99.99 
+                    fs20(twenty,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS21') then
@@ -1698,7 +1698,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs21(twone,5), status)
-                    fs21(twone,3) = -99.99 
+                    fs21(twone,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS23') then
@@ -1757,7 +1757,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs23(twthree,5), status)
-                    fs23(twthree,3) = -99.99 
+                    fs23(twthree,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS24') then
@@ -1816,7 +1816,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs24(twfour,5), status)
-                    fs24(twfour,3) = -99.99 
+                    fs24(twfour,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS25') then
@@ -1875,7 +1875,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs25(twfive,5), status)
-                    fs25(twfive,3) = -99.99 
+                    fs25(twfive,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS27') then
@@ -1934,7 +1934,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs27(twseven,5), status)
-                    fs27(twseven,3) = -99.99 
+                    fs27(twseven,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS28') then
@@ -1993,7 +1993,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs28(tweight,5), status)
-                    fs28(tweight,3) = -99.99 
+                    fs28(tweight,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS29') then
@@ -2052,7 +2052,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs29(twnine,5), status)
-                    fs29(twnine,3) = -99.99 
+                    fs29(twnine,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS30') then
@@ -2111,7 +2111,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs30(thirty,5), status)
-                    fs30(thirty,3) = -99.99 
+                    fs30(thirty,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS31') then
@@ -2170,7 +2170,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs31(thone,5), status)
-                    fs31(thone,3) = -99.99 
+                    fs31(thone,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS32') then
@@ -2229,7 +2229,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs32(thtwo,5), status)
-                    fs32(thtwo,3) = -99.99 
+                    fs32(thtwo,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS33') then
@@ -2288,7 +2288,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs33(ththree,5), status)
-                    fs33(ththree,3) = -99.99 
+                    fs33(ththree,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS34') then
@@ -2347,7 +2347,7 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs34(thfour,5), status)
-                    fs34(thfour,3) = -99.99 
+                    fs34(thfour,3) = -99.99
                   end if
                   ok = .false.
                 else if( curline(1:4) .eq. 'FS35') then
@@ -2406,13 +2406,13 @@
                   end if
                   if( ( .not. ok) .and. set) then
                     call chr_ctod( curline(30:34), fs35(thfive,5), status)
-                    fs35(thfive,3) = -99.99 
+                    fs35(thfive,3) = -99.99
                   end if
                   ok = .false.
                 end if
 ! we need to get the sigma for the K's off the I lines
              else if( curline(21:21) .eq. 'I') then
-               call chr_ctor( curline(50:54), istd, status)    
+               call chr_ctor( curline(50:54), istd, status)
              end if
            end do
  200       continue
@@ -2457,7 +2457,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs1c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS1'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -2610,7 +2610,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs1(i,1),
      :           '#',fs1(i,2),'$',fs1(i,3),'@',fs1(i,4), fs1(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs1(i,1),
      :           fs1(i,2),fs1(i,3),fs1(i,4), fs1(i,5)
            end if
@@ -2669,13 +2669,13 @@
 
         kvar = (fs2ksq - fs2c * (fs2kzp/fs2c)**2)
         if( fs2c .eq. 1 .or. kvar .lt. 0.0d0) then
-          kvar = 0.0d0      
+          kvar = 0.0d0
         else
           kvar = kvar/(fs2c - 1.0d0)
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs2c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS2'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -2812,7 +2812,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs2(i,1),
      :           '#',fs2(i,2),'$',fs2(i,3),'@',fs2(i,4), fs2(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs2(i,1),
      :           fs2(i,2),fs2(i,3),fs2(i,4), fs2(i,5)
            end if
@@ -2872,7 +2872,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs3c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS3'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -3009,7 +3009,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs3(i,1),
      :           '#',fs3(i,2),'$',fs3(i,3),'@',fs3(i,4), fs3(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs3(i,1),
      :           fs3(i,2),fs3(i,3),fs3(i,4), fs3(i,5)
            end if
@@ -3069,7 +3069,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs4c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS4'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -3206,7 +3206,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs4(i,1),
      :           '#',fs4(i,2),'$',fs4(i,3),'@',fs4(i,4), fs4(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs4(i,1),
      :           fs4(i,2),fs4(i,3),fs4(i,4), fs4(i,5)
            end if
@@ -3266,7 +3266,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs5c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS5'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -3403,7 +3403,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs5(i,1),
      :           '#',fs5(i,2),'$',fs5(i,3),'@',fs5(i,4), fs5(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs5(i,1),
      :           fs5(i,2),fs5(i,3),fs5(i,4), fs5(i,5)
            end if
@@ -3465,7 +3465,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs6c)
 
-         
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS6'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -3602,7 +3602,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs6(i,1),
      :           '#',fs6(i,2),'$',fs6(i,3),'@',fs6(i,4), fs6(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs6(i,1),
      :           fs6(i,2),fs6(i,3),fs6(i,4), fs6(i,5)
            end if
@@ -3663,7 +3663,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs7c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS7'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -3800,7 +3800,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
             write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs7(i,1),
      :           '#',fs7(i,2),'$',fs7(i,3),'@',fs7(i,4), fs7(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs7(i,1),
      :           fs7(i,2),fs7(i,3),fs7(i,4), fs7(i,5)
            end if
@@ -3860,7 +3860,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs10c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS10'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -3997,7 +3997,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs10(i,1),
      :           '#',fs10(i,2),'$',fs10(i,3),'@',fs10(i,4), fs10(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs10(i,1),
      :           fs10(i,2),fs10(i,3),fs10(i,4), fs10(i,5)
            end if
@@ -4057,7 +4057,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs11c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS11'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -4194,7 +4194,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs11(i,1),
      :           '#',fs11(i,2),'$',fs11(i,3),'@',fs11(i,4), fs11(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs11(i,1),
      :           fs11(i,2),fs11(i,3),fs11(i,4), fs11(i,5)
            end if
@@ -4255,7 +4255,7 @@
         end if
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs12c)
- 
+
         write(143, '(a)') ' '
         write(143, '(a)') '                           FS12'
         write(143, '(a)') '                J-H         H-K         K      airmass'
@@ -4392,7 +4392,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs12(i,1),
      :           '#',fs12(i,2),'$',fs12(i,3),'@',fs12(i,4), fs12(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs12(i,1),
      :           fs12(i,2),fs12(i,3),fs12(i,4), fs12(i,5)
            end if
@@ -4454,7 +4454,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs13c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS13'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -4590,7 +4590,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs13(i,1),
      :           '#',fs13(i,2),'$',fs13(i,3),'@',fs13(i,4), fs13(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs13(i,1),
      :           fs13(i,2),fs13(i,3),fs13(i,4), fs13(i,5)
            end if
@@ -4651,7 +4651,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs14c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS14'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -4787,7 +4787,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs14(i,1),
      :           '#',fs14(i,2),'$',fs14(i,3),'@',fs14(i,4), fs14(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs14(i,1),
      :           fs14(i,2),fs14(i,3),fs14(i,4), fs14(i,5)
            end if
@@ -4848,7 +4848,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs15c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS15'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -4984,7 +4984,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs15(i,1),
      :           '#',fs15(i,2),'$',fs15(i,3),'@',fs15(i,4), fs15(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs15(i,1),
      :           fs15(i,2),fs15(i,3),fs15(i,4), fs15(i,5)
            end if
@@ -5046,7 +5046,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs16c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS16'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -5182,7 +5182,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs16(i,1),
      :           '#',fs16(i,2),'$',fs16(i,3),'@',fs16(i,4), fs16(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs16(i,1),
      :           fs16(i,2),fs16(i,3),fs16(i,4), fs16(i,5)
            end if
@@ -5243,7 +5243,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs17c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS17'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -5379,7 +5379,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs17(i,1),
      :           '#',fs17(i,2),'$',fs17(i,3),'@',fs17(i,4), fs17(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs17(i,1),
      :           fs17(i,2),fs17(i,3),fs17(i,4), fs17(i,5)
            end if
@@ -5440,7 +5440,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs18c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS18'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -5576,7 +5576,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs18(i,1),
      :           '#',fs18(i,2),'$',fs18(i,3),'@',fs18(i,4), fs18(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs18(i,1),
      :           fs18(i,2),fs18(i,3),fs18(i,4), fs18(i,5)
            end if
@@ -5637,7 +5637,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs19c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS19'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -5773,7 +5773,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs19(i,1),
      :           '#',fs19(i,2),'$',fs19(i,3),'@',fs19(i,4), fs19(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs19(i,1),
      :           fs19(i,2),fs19(i,3),fs19(i,4), fs19(i,5)
            end if
@@ -5834,7 +5834,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs20c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS20'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -5970,7 +5970,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs20(i,1),
      :           '#',fs20(i,2),'$',fs20(i,3),'@',fs20(i,4), fs20(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs20(i,1),
      :           fs20(i,2),fs20(i,3),fs20(i,4), fs20(i,5)
            end if
@@ -6031,7 +6031,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs21c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS21'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -6167,7 +6167,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs21(i,1),
      :           '#',fs21(i,2),'$',fs21(i,3),'@',fs21(i,4), fs21(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs21(i,1),
      :           fs21(i,2),fs21(i,3),fs21(i,4), fs21(i,5)
            end if
@@ -6200,7 +6200,7 @@
      :kaway(i,4)
            end if
         end do
- 
+
         hmkvar = (fs23hmksq - fs23b * (fs23hmkzp/fs23b)**2)
         if( fs23b .eq. 1 .or. hmkvar .lt. 0.0d0) then
           hmkvar = 0.0d0
@@ -6228,7 +6228,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs23c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS23'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -6364,7 +6364,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs23(i,1),
      :           '#',fs23(i,2),'$',fs23(i,3),'@',fs23(i,4), fs23(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs23(i,1),
      :           fs23(i,2),fs23(i,3),fs23(i,4), fs23(i,5)
            end if
@@ -6425,7 +6425,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs24c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS24'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -6561,7 +6561,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs24(i,1),
      :           '#',fs24(i,2),'$',fs24(i,3),'@',fs24(i,4), fs24(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs24(i,1),
      :           fs24(i,2),fs24(i,3),fs24(i,4), fs24(i,5)
            end if
@@ -6594,7 +6594,7 @@
      :kaway(i,4)
            end if
         end do
- 
+
         hmkvar = (fs25hmksq - fs25b * (fs25hmkzp/fs25b)**2)
         if( fs25b .eq. 1 .or. hmkvar .lt. 0.0d0) then
           hmkvar = 0.0d0
@@ -6622,7 +6622,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs25c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS25'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -6758,7 +6758,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs25(i,1),
      :           '#',fs25(i,2),'$',fs25(i,3),'@',fs25(i,4), fs25(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs25(i,1),
      :           fs25(i,2),fs25(i,3),fs25(i,4), fs25(i,5)
            end if
@@ -6819,7 +6819,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs27c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS27'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -6955,7 +6955,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs27(i,1),
      :           '#',fs27(i,2),'$',fs27(i,3),'@',fs27(i,4), fs27(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs27(i,1),
      :           fs27(i,2),fs27(i,3),fs27(i,4), fs27(i,5)
            end if
@@ -6988,7 +6988,7 @@
      :kaway(i,4)
            end if
         end do
-        
+
         hmkvar = (fs28hmksq - fs28b * (fs28hmkzp/fs28b)**2)
         if( fs28b .eq. 1 .or. hmkvar .lt. 0.0d0) then
           hmkvar = 0.0d0
@@ -7016,10 +7016,10 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs28c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS28'
         write(143, '(a)') '                J-H         H-K         K      airmass'
-        
+
         jmhtrue = .false.
         hmktrue = .false.
         ktrue = .false.
@@ -7153,7 +7153,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs28(i,1),
      :           '#',fs28(i,2),'$',fs28(i,3),'@',fs28(i,4), fs28(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs28(i,1),
      :           fs28(i,2),fs28(i,3),fs28(i,4), fs28(i,5)
            end if
@@ -7214,7 +7214,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs29c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS29'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -7350,7 +7350,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs29(i,1),
      :           '#',fs29(i,2),'$',fs29(i,3),'@',fs29(i,4), fs29(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs29(i,1),
      :           fs29(i,2),fs29(i,3),fs29(i,4), fs29(i,5)
            end if
@@ -7411,7 +7411,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs30c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS30'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -7547,7 +7547,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs30(i,1),
      :           '#',fs30(i,2),'$',fs30(i,3),'@',fs30(i,4), fs30(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs30(i,1),
      :           fs30(i,2),fs30(i,3),fs30(i,4), fs30(i,5)
            end if
@@ -7608,7 +7608,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs31c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS31'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -7744,7 +7744,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs31(i,1),
      :           '#',fs31(i,2),'$',fs31(i,3),'@',fs31(i,4), fs31(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs31(i,1),
      :           fs31(i,2),fs31(i,3),fs31(i,4), fs31(i,5)
            end if
@@ -7805,7 +7805,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs32c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS32'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -7941,7 +7941,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') fs32(i,1),
      :           '#',fs32(i,2),'$',fs32(i,3),'@',fs32(i,4), fs32(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') fs32(i,1),
      :           fs32(i,2),fs32(i,3),fs32(i,4), fs32(i,5)
            end if
@@ -8002,7 +8002,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs33c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS33'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -8138,7 +8138,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') FS33(i,1),
      :           '#',FS33(i,2),'$',FS33(i,3),'@',FS33(i,4), FS33(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') FS33(i,1),
      :           FS33(i,2),FS33(i,3),FS33(i,4), FS33(i,5)
            end if
@@ -8199,7 +8199,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs34c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS34'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -8335,7 +8335,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') FS34(i,1),
      :           '#',FS34(i,2),'$',FS34(i,3),'@',FS34(i,4), FS34(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') FS34(i,1),
      :           FS34(i,2),FS34(i,3),FS34(i,4), FS34(i,5)
            end if
@@ -8396,7 +8396,7 @@
         kstd = dsqrt(kvar)
         ksem = kstd/dsqrt(fs35c)
 
-        write(143, '(a)') ' ' 
+        write(143, '(a)') ' '
         write(143, '(a)') '                           FS35'
         write(143, '(a)') '                J-H         H-K         K      airmass'
         jmhtrue = .false.
@@ -8532,7 +8532,7 @@
            else if( jmhtrue .and. hmktrue .and. ktrue) then
            write(143,'(F8.0,4X,a,F8.5,2X,a,f8.5,2x,a,f8.5,3x,f8.5)') FS35(i,1),
      :           '#',FS35(i,2),'$',FS35(i,3),'@',FS35(i,4), FS35(i,5)
-           else     
+           else
              write(143,'(F8.0,5X,F8.5,3X,f8.5,3x,f8.5,3x,f8.5)') FS35(i,1),
      :           FS35(i,2),FS35(i,3),FS35(i,4), FS35(i,5)
            end if
@@ -8567,7 +8567,7 @@
         end do
 
 ! close the file
-        close(143)            
+        close(143)
         end
 
 

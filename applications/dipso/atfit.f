@@ -42,7 +42,7 @@
        INTEGER NBREAK, BREAK(MAXBRK)
 
        WRITE (*,
-     : '(''   ATFIT:  unavailable in this version of DIPSO'')') 
+     : '(''   ATFIT:  unavailable in this version of DIPSO'')')
        OK = .FALSE.
 
        END

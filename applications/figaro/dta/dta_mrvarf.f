@@ -21,10 +21,10 @@ C     FLOAT.
 C
 C     Parameters -    (">" input, "<" output)
 C
-C     (>) NAME     (Character) The name of the object 
+C     (>) NAME     (Character) The name of the object
 C                  which is to be mapped. This should be in the
 C                  standard data system format, ie name
-C                  components separated by dots followed by 
+C                  components separated by dots followed by
 C                  optional dimensional information enclosed
 C                  in square brackets.  Ideally the name should
 C                  have been created by a call to DTA_CRVAR.

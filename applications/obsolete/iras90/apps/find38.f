@@ -18,7 +18,7 @@
 *     number of sources. Then for each source, its source name and
 *     title, source positions, extent of source required, and wavebands
 *     required. This is an HDS file.
-*     
+*
 *  Arguments:
 *     PINFIL = CHARACTER * ( * ) (Given)
 *        Parameter INSOURCEFILE1 for name of file containing previously
@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
      :      //' diferent file, or enter data anew', STATUS )
 
          END IF
-      
+
 *  Number of sources is zero, display error message and allow user to
 *  put in sources by some other means
          IF ( NOFSO .LE. 0 ) THEN
@@ -180,7 +180,7 @@
          CALL ERR_STAT( STATUS )
          IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
          CALL MSG_OUT( ' ', ' Data was not input from file', STATUS )
-      
+
 *  If DAT_ASSOC error is not null, cancel the error
       ELSE
          CALL ERR_STAT( STATUS )

@@ -124,10 +124,10 @@
          ENDIF
       ENDDO
 
-*  The IOSTAT value was not a Fortran specific code. 
+*  The IOSTAT value was not a Fortran specific code.
       IF ( IOSTAT .GE. 1 .AND. IOSTAT .LE. 200 ) THEN
 
-*  Unfortunately Fortran 95 returns system codes for I/O errors as well. 
+*  Unfortunately Fortran 95 returns system codes for I/O errors as well.
 *  Need to handle those explicitly. There may be others.
          IF ( IOSTAT .EQ. 24 ) THEN
             STATUS = FIO__TOMNY
@@ -138,9 +138,9 @@
          ELSE IF ( IOSTAT .EQ. 17 ) THEN
             STATUS = FIO__NFEXI
             GOTO 999
-         ELSE 
-            
-*  General operating system error code.      
+         ELSE
+
+*  General operating system error code.
             STATUS = FIO__OSERR
             GOTO 999
          END IF

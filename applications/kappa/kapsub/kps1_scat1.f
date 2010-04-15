@@ -57,26 +57,26 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
-      IMPLICIT NONE               
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
-      INTEGER NEL                 
+      INTEGER NEL
 
 *  Arguments Given and Returned:
-      REAL INA( NEL )             
-      REAL INB( NEL )             
+      REAL INA( NEL )
+      REAL INB( NEL )
 
 *  Status:
-      INTEGER STATUS              
+      INTEGER STATUS
 
 *  Internal Variables:
-      INTEGER I                   
+      INTEGER I
 
 *.
 
@@ -92,4 +92,4 @@
          END IF
       END DO
 
-      END 
+      END

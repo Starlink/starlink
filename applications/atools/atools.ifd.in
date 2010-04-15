@@ -10,9 +10,9 @@ package atools {
 
          parameter in {
             position 2
-            type _INTEGER 
+            type _INTEGER
             prompt {The indices of the required inputs}
-            ppath CURRENT 
+            ppath CURRENT
             helpkey *
           }
 
@@ -1093,7 +1093,7 @@ iraf! {
 
          parameter incols {
             position 2
-            type _INTEGER 
+            type _INTEGER
             prompt {The columns containing the input axis values}
             vpath DEFAULT
             ppath CURRENT DEFAULT
@@ -1114,9 +1114,9 @@ iraf! {
 
          parameter outcols {
             position 5
-            type _INTEGER 
+            type _INTEGER
             prompt {The columns to receive the output axis values}
-            vpath DYNAMIC 
+            vpath DYNAMIC
             ppath CURRENT DEFAULT
             default !
             helpkey *
@@ -1229,7 +1229,7 @@ iraf! {
 
          parameter inside {
             position 6
-            type _INTEGER 
+            type _INTEGER
             prompt {Pixel indices of a point in the polygon}
             ppath CURRENT DEFAULT
             default !
@@ -1427,7 +1427,7 @@ iraf! {
             position 1
             type _DOUBLE
             prompt {The distortion coefficient}
-            ppath CURRENT 
+            ppath CURRENT
             helpkey *
           }
 
@@ -1444,7 +1444,7 @@ iraf! {
             position 2
             type _DOUBLE
             prompt {The coordinates of the centre of the distortion}
-            ppath CURRENT 
+            ppath CURRENT
             helpkey *
           }
 
@@ -1480,7 +1480,7 @@ iraf! {
 
          parameter ncoord {
             position 1
-            type     _INTEGER 
+            type     _INTEGER
             prompt   {The number of coordinates for the WinMap}
             ppath    CURRENT DEFAULT
             default  2
@@ -1566,7 +1566,7 @@ iraf! {
 
          parameter ncoord {
             position 1
-            type     _INTEGER 
+            type     _INTEGER
             prompt   {The number of coordinates for the ShiftMap}
             ppath    CURRENT DEFAULT
             default  2
@@ -1598,7 +1598,7 @@ iraf! {
 
          parameter ncoord {
             position 1
-            type     _INTEGER 
+            type     _INTEGER
             prompt   {The number of coordinates for the ZoomMap}
             ppath    CURRENT DEFAULT
             default  2
@@ -1639,9 +1639,9 @@ iraf! {
 
          parameter perm {
             position 2
-            type _INTEGER 
+            type _INTEGER
             prompt {The new axis order}
-            ppath CURRENT 
+            ppath CURRENT
             helpkey *
           }
 
@@ -1671,9 +1671,9 @@ iraf! {
 
          parameter AXES {
             position 2
-            type _INTEGER 
+            type _INTEGER
             prompt {The indices of the required axes}
-            ppath CURRENT 
+            ppath CURRENT
             helpkey *
           }
 
@@ -3398,7 +3398,7 @@ iraf! {
    }
 
    command astshow {
-      obey {$ATOOLS_DIR/astshow.tcl}      
+      obey {$ATOOLS_DIR/astshow.tcl}
    }
 
    icl {defhelp atools $ATOOLS_HELP 0}

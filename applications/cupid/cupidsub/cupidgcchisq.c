@@ -7,7 +7,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
 
@@ -44,10 +44,10 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 *     xpar
 *        Pointer to an array holding the parameters which define the
 *        model to be measured against the data. How many of these are used
-*        depends on the value of "ndim": if "ndim" is 1 only elements 0 to 
-*        3 are used, if "ndim" is 2 only elements 0 to 6 are used, if "ndim" 
-*        is 3 all elements are used. All axis values are represented in GRID 
-*        pixels: 
+*        depends on the value of "ndim": if "ndim" is 1 only elements 0 to
+*        3 are used, if "ndim" is 2 only elements 0 to 6 are used, if "ndim"
+*        is 3 all elements are used. All axis values are represented in GRID
+*        pixels:
 *
 *           xpar[0]: Intrinsic peak intensity of clump ("a0" in Stutski & Gusten)
 *           xpar[1]: Constant intensity offset ("b0" in Stutski & Gusten)
@@ -58,27 +58,27 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 *           xpar[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
 *                   In rads, positive from +ve GRID1 axis to +ve GRID2 axis.
 *           xpar[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
-*           xpar[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
+*           xpar[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski &
 *                                                     Gusten)
-*           xpar[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
+*           xpar[9]: Axis 0 of internal velocity gradient vector ("alpha_0"
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
-*           xpar[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
+*           xpar[10]: Axis 1 of internal velocity gradient vector ("alpha_1"
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *
 *           NOTE, if the "cupidGC.fixback" value is non-zero, then the
 *           backgound level is not included in the list of free
 *           parameters which are being varied by the fitting algorithm.
 *           In this case, the above list changes: the background level is
-*           moved from element 1 to the end of the list (the actual index 
-*           depends on the value of "ndim"), and the other values are shifted 
+*           moved from element 1 to the end of the list (the actual index
+*           depends on the value of "ndim"), and the other values are shifted
 *           down to fill the gap left at element 1.
 *     xwhat
-*        If negative, then the chi-squared value is returned. Otherwise, the 
-*        partial derivative of the chi-squared value with respect to the 
+*        If negative, then the chi-squared value is returned. Otherwise, the
+*        partial derivative of the chi-squared value with respect to the
 *        parameter "xpar[what]" is returned.
 *     newp
-*        If zero, it is assumed that "xpar" is the same as on the previous 
-*        invocation of this function. This causes cached intermediate values 
+*        If zero, it is assumed that "xpar" is the same as on the previous
+*        invocation of this function. This causes cached intermediate values
 *        to be re-used, thus speeding things up. A non-zero value should
 *        be supplied if "xpar" is not the same as on the previous invocation.
 *     status
@@ -150,18 +150,18 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    double t;               /* Temporary storage */
    double wf;              /* Weight factor */
    double wsum;            /* Sum of weights */
-   double x[ 3 ];          /* Next pixel position at which to get model value */ 
+   double x[ 3 ];          /* Next pixel position at which to get model value */
    double ypar[ 11 ];      /* "xpar" ordered as if bckgnd is being fitted */
    int dbg;                /* Has background changed? */
    int i;                  /* Parameter index */
    int iax;                /* Axis index */
-   int iel;                /* Index of pixel within section currently being fitted */ 
+   int iel;                /* Index of pixel within section currently being fitted */
    int what;               /* "xwhat" value assuming bckgnd is being fitted */
    int wmod;               /* Were the weights changed? */
- 
+
    static int nwm;         /* Number of times the weights have been modified */
    static double bg;       /* Last times background value */
-   static double chisq;    /* Total modified chi squared */  
+   static double chisq;    /* Total modified chi squared */
    static double f3;       /* Beam smoothing factor for p[3] */
    static double f5;       /* Beam smoothing factor for p[5] */
    static double f8;       /* Beam smoothing factor for p[8] */
@@ -186,15 +186,15 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
       for( i = 0; i < 11; i++ ) cupidGC.pars[ i ] = xpar[ i ];
    }
 
-/* If the background is not included in the list of free parameters 
-   being varied, then the background value will be at the end of the 
-   supplied "xpar" array. Reorder the supplied parameter values to put 
-   the background value at its usual place (index [1]). This is needed 
-   since all the following code assumes that the background is stored at 
-   index [1]. Also set up terms to be added to the chi-squared value and 
-   gradient. These cause the returned chi-squared to rise if the background 
-   value wanders far from the initial background value (this is done because 
-   the background level is usually determined by data values with very low 
+/* If the background is not included in the list of free parameters
+   being varied, then the background value will be at the end of the
+   supplied "xpar" array. Reorder the supplied parameter values to put
+   the background value at its usual place (index [1]). This is needed
+   since all the following code assumes that the background is stored at
+   index [1]. Also set up terms to be added to the chi-squared value and
+   gradient. These cause the returned chi-squared to rise if the background
+   value wanders far from the initial background value (this is done because
+   the background level is usually determined by data values with very low
    weight and so is not well constrained). */
    if( cupidGC.fixback ) {
       ypar[ 0 ] = xpar[ 0 ];
@@ -229,21 +229,21 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    take account of the smoothing by the instrumental beam. */
       t = par[ 3 ]*par[ 3 ];
       dx_sq = cupidGC.beam_sq + t;
-      peakfactor = t/dx_sq;       
+      peakfactor = t/dx_sq;
       f3 = par[ 0 ]*cupidGC.beam_sq/( par[ 3 ]*dx_sq );
 
       if( ndim > 1 ) {
          t = par[ 5 ]*par[ 5 ];
          dx_sq = cupidGC.beam_sq + t;
-         peakfactor *= t/dx_sq;       
+         peakfactor *= t/dx_sq;
          f5 = par[ 0 ]*cupidGC.beam_sq/( par[ 5 ]*dx_sq );
 
          if( ndim > 2 ) {
             t = par[ 8 ]*par[ 8 ];
             dx_sq = cupidGC.velres_sq + t;
-            peakfactor *= t/dx_sq;       
+            peakfactor *= t/dx_sq;
             f8 = par[ 0 ]*cupidGC.beam_sq/( par[ 8 ]*dx_sq );
-         }     
+         }
       }
 
       if( peakfactor > 0.0 ) {
@@ -286,7 +286,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    currently being fitted. */
       for( iel = 0; iel < cupidGC.nel; iel++ ){
 
-/* Get the Gaussian model value at the centre of the current pixel. Store 
+/* Get the Gaussian model value at the centre of the current pixel. Store
    the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
          m = cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ), status );
@@ -295,25 +295,25 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 /* If the changing of the model parameters make little difference to the
    residuals at a given place in the data, then those residuals should be
    given less weight since they could dominate the chi-squared value. If
-   the residual at the current pixel has not change by much since the 
+   the residual at the current pixel has not change by much since the
    previous call, reduce the weight associated with the pixel. However,
    if the parameter has not change by much then you would not expect the
    residuals to change by much. Therefore, do not reduce the weight by so
    much if the model value at this pixel has not changed by much since the
-   last call. In order to avoid instability, we only do this modification 
+   last call. In order to avoid instability, we only do this modification
    for a few iterations near the start, and then allow the fitting
    process to complete with fixed weights. */
          if( !cupidGC.fixback && cupidGC.nf > 2 && nwm <= cupidGC.nwf ) {
             if( res != 0.0 && m != 0.0 && m != *pm ) {
 
-/* Only modify the weights if the background has changed. Without this, 
+/* Only modify the weights if the background has changed. Without this,
    the outlying background regions would be given low weights if the
    background has not changed, resulting in the background being poorly
    determined. */
                if( bg != 0.0 ) {
                   dbg = ( fabs( ( par[ 1 ] - bg )/bg ) > 0.001 );
                } else {
-                  dbg = ( par[ 1 ] != 0.0 ); 
+                  dbg = ( par[ 1 ] != 0.0 );
                }
                if( dbg ) {
                   wf = ( res - *pu )/ res;
@@ -332,20 +332,20 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
          *pm = m;
 
 /* Determine a scale factor which encourages the fitted intensity to stay
-   below the observed intensity. This does the same job as the 
+   below the observed intensity. This does the same job as the
    "s0.exp( Yi_fit - Yi )" term in the chi-squared expression given in
-   the Stutski & Gusten paper. The form used here was inherited from the 
-   implementation of GaussClumps (obtained from 
-   ftp.astro.uni-bonn.de/pub/heith/gaussclumps on 27/9/05) upon which this 
+   the Stutski & Gusten paper. The form used here was inherited from the
+   implementation of GaussClumps (obtained from
+   ftp.astro.uni-bonn.de/pub/heith/gaussclumps on 27/9/05) upon which this
    implementation was based. */
-         rr = ( res > 0.0 ) ? 1.0 : cupidGC.s0p1; 
+         rr = ( res > 0.0 ) ? 1.0 : cupidGC.s0p1;
 
 /* Increment the running sum of chi-squared. We save the scaled residuals
-   in a work array (pr) so that we do not need to calculate them again if 
+   in a work array (pr) so that we do not need to calculate them again if
    this function is called subsequently to find the gradient for the same
    set of parameer values. */
          wsum += *pw;
-         *pr = *pw*res*rr;         
+         *pr = *pw*res*rr;
          chisq += *pr*res;
          *prs = *pr*res;
 
@@ -385,8 +385,8 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    Gusten paper. */
       if( ndim == 1 ) {
          t = ( cupidGC.beam_sq > 0.0 ) ? x0_off*x0_off/cupidGC.beam_sq : 0.0;
-      } else { 
-         t = ( cupidGC.beam_sq > 0.0 ) ? 
+      } else {
+         t = ( cupidGC.beam_sq > 0.0 ) ?
                ( x0_off*x0_off + x1_off*x1_off )/cupidGC.beam_sq : 0.0;
          if( ndim == 3 && cupidGC.velres_sq > 0.0 ) t += v_off*v_off/cupidGC.velres_sq;
       }
@@ -407,7 +407,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    if( what < 0 ) {
       ret = chisq;
 
-        cupidGCDumpF( MSG__DEBUG3, NULL, 0, NULL, NULL, status ); 
+        cupidGCDumpF( MSG__DEBUG3, NULL, 0, NULL, NULL, status );
 
          msgSeti( "NF", cupidGC.nf );
          msgOutif( MSG__DEBUG3, "", "   Fit attempt ^NF:", status );
@@ -423,7 +423,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
          msgOutif( MSG__DEBUG3, "", "      Centre on 1st axis: ^V", status );
          msgSetd( "V", par[ 3 ] );
          msgOutif( MSG__DEBUG3, "", "      FWHM on 1st axis: ^V", status );
-   
+
          if( ndim > 1 ) {
             msgSetd( "V", par[ 4 ] );
             msgOutif( MSG__DEBUG3, "", "      Centre on 2nd axis: ^V", status );
@@ -431,7 +431,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
             msgOutif( MSG__DEBUG3, "", "      FWHM on 2nd axis: ^V", status );
             msgSetd( "V", par[ 6 ] );
             msgOutif( MSG__DEBUG3, "", "      Position angle: ^V", status );
-   
+
             if( ndim > 2 ) {
                msgSetd( "V", par[ 7 ] );
                msgOutif( MSG__DEBUG3, "", "      Centre on vel axis: ^V", status );
@@ -447,7 +447,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 /* If the rate of change of the chi squared with respect to one of the
    model parameters is required, we have more work. */
    } else {
-    
+
 /* Initialise pointer to the next element to be used in the array
    holding the scaled residuals at each pixel. */
       pr = cupidGC.res;
@@ -457,7 +457,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
       for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
 
 /* Loop over all pixels in the section of the data array which is being
-   fitted, accumulating the contribution to the required value caused by the 
+   fitted, accumulating the contribution to the required value caused by the
    rate of change of the model itself with respect to the required
    parameter. */
       ret = 0.0;
@@ -520,6 +520,6 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    }
 
 /* Return the required value */
-   return ret;   
+   return ret;
 
 }

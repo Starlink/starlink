@@ -16,7 +16,7 @@
 *     CALL PISAGREY( STATUS )
 
 *  Description:
-*     This routine displays a greyscale representation of the data 
+*     This routine displays a greyscale representation of the data
 *     component of an NDF.
 
 *  ADAM Parameters:
@@ -84,7 +84,7 @@
 *  Bugs:
 *     {note_new_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  Local Variables:
       LOGICAL                    ! True if :
      :  AXES,                    ! Annotated axes are to be drawn
-     :  OUTTIC                   ! Axis tick marks are to be placed 
+     :  OUTTIC                   ! Axis tick marks are to be placed
                                  ! outside the box instead of inside
 
       REAL
@@ -273,7 +273,7 @@
 
 *  Check for zero extent axes
       IF( STATUS .EQ. SAI__OK ) THEN
-         IF ( LBND( 1 ) .EQ. UBND( 1 ) .OR. 
+         IF ( LBND( 1 ) .EQ. UBND( 1 ) .OR.
      :        LBND( 2 ) .EQ. UBND( 2 ) ) THEN
             CALL MSG_OUT( 'ZERO_AXES', 'Cannot have zero extent axes',
      :                    STATUS )
@@ -281,7 +281,7 @@
             CALL PAR_CANCL( 'YPIXS', STATUS )
             GO TO 345
          END IF
-      END IF  
+      END IF
 
 *  Set range of image to display.
       ILBND( 1 ) = MAX( ILBND( 1 ) , INT( LBND( 1 ) ) )
@@ -290,17 +290,17 @@
       IUBND( 2 ) = MIN( IUBND( 2 ) , INT( UBND( 2 ) ) )
 
 *  Get data range
-      CALL PSA1_MNMAX( %VAL( CNF_PVAL( IPIN ) ), EL , RMIN, RMAX, 
+      CALL PSA1_MNMAX( %VAL( CNF_PVAL( IPIN ) ), EL , RMIN, RMAX,
      :                 STATUS )
       CALL MSG_SETR( 'MIN', RMIN )
       CALL MSG_SETR( 'MAX', RMAX )
       CALL MSG_OUT( ' ',
      : '  Data range ^MIN : ^MAX ', STATUS )
-      DRANGE( 1 ) = RMIN 
+      DRANGE( 1 ) = RMIN
       DRANGE( 2 ) = RMAX
       CALL PAR_DEF1R( 'DRANGE', 2, DRANGE, STATUS )
       CALL PAR_GET1R( 'DRANGE', 2, DRANGE, NVAL, STATUS )
-       
+
 *  Create a zone of the specified size.
       IF ( STATUS .NE. SAI__OK ) GO TO 960
       CALL PGWINDOW( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ) )
@@ -315,11 +315,11 @@
          IF ( MAJTIC( 1 ) .GT. 0 ) THEN
               MAJTIC( 1 ) = ( UBND( 1 ) - LBND( 1 ) ) /
      :                      ( MAJTIC( 1 ) + 1 )
-         END IF 
+         END IF
          IF ( MAJTIC( 2 ) .GT. 0 ) THEN
                MAJTIC( 2 ) = ( UBND( 2 ) - LBND( 2 ) )/
      :                       ( MAJTIC( 2 ) + 1 )
-         END IF 
+         END IF
 
 *  Draw axes.
          CALL PGBOX( FORSTR, MAJTIC( 1 ), MINTIC( 1 ),
@@ -329,7 +329,7 @@
 
 *  Trap invalid pixels etc.
       CALL PSX_MALLOC( EL * VAL__NBR, IPWORK, STATUS )
-      CALL PSA1_RMINV( %VAL( CNF_PVAL( IPIN ) ), EL, 
+      CALL PSA1_RMINV( %VAL( CNF_PVAL( IPIN ) ), EL,
      :                 %VAL( CNF_PVAL( IPWORK ) ), RMIN, STATUS )
 
 *  Draw greyscale.
@@ -337,14 +337,14 @@
       TR( 5 ) = 0.0
       TR( 2 ) = 1.0
       TR( 6 ) = 1.0
-      TR( 1 ) = XORIG - 1.5  
+      TR( 1 ) = XORIG - 1.5
       TR( 4 ) = YORIG - 1.5
       ILBND( 1 ) = ILBND( 1 ) - XORIG + 1
       IUBND( 1 ) = IUBND( 1 ) - XORIG + 1
       ILBND( 2 ) = ILBND( 2 ) - YORIG + 1
       IUBND( 2 ) = IUBND( 2 ) - YORIG + 1
       IF ( STATUS .NE. SAI__OK ) GO TO 960
-      CALL PGGRAY( %VAL( CNF_PVAL( IPWORK ) ), NX, NY, 
+      CALL PGGRAY( %VAL( CNF_PVAL( IPWORK ) ), NX, NY,
      :             ILBND( 1 ), IUBND( 1 ),
      :             ILBND( 2 ), IUBND( 2 ), DRANGE( 1 ), DRANGE( 2 ),
      :             TR )
@@ -365,7 +365,7 @@
  960  CONTINUE
       IF ( STATUS .NE. SAI__OK ) THEN
          TSTAT = STATUS
-         STATUS = SAI__OK 
+         STATUS = SAI__OK
 
 *  Reset the current picture.
          CALL AGI_SELP( PICID, STATUS )
@@ -381,7 +381,7 @@
       CALL AGP_DEACT( STATUS )
       CALL AGI_END( -1 , STATUS )
       CALL AGI_ANNUL( PICID, STATUS )
-      
+
  999  CONTINUE
 
       END

@@ -16,7 +16,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], 
+*     int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ],
 *                     int skip[ 3 ], int *status )
 
 *  Description:
@@ -39,9 +39,9 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 *     dims
 *        The number of pixels along each pixel axis of the arrays.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
-*        the array using a single 1D vector index and using nD coords. 
+*        the array using a single 1D vector index and using nD coords.
 *     status
 *        Pointer to the inherited status value.
 
@@ -126,7 +126,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
    if( dims[ 1 ] > 1 ) target = 5;
    if( dims[ 2 ] > 1 ) target = 14;
 
-/* Get a pointer to the input pixel which would have GRID indices [0,0,0] 
+/* Get a pointer to the input pixel which would have GRID indices [0,0,0]
    if the input array extended that far (in fact the first pixel in the
    input array has GRID indices [1,1,1]). */
       pin0 = in - skip[ 0 ] - skip[ 1 ] - skip[ 2 ];
@@ -140,7 +140,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
          for( oy = 1; oy <= dims[ 1 ]; oy++ ) {
             for( ox = 1; ox <= dims[ 0 ]; ox++, iv++ ) {
 
-/* Loop round all input pixels in the neighbourhood of the current output 
+/* Loop round all input pixels in the neighbourhood of the current output
    pixel, this is a cube of 3x3x3 input pixels, centred on the current
    output pixel. */
                nvotes = 0;
@@ -155,12 +155,12 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
                            for( ix = ox - 1; ix <= ox + 1; ix++ ) {
                               if( ix >= 1 && ix <= dims[ 0 ] ) {
 
-/* Each pixel in the 3x3x3 cube will have an integer value. Each distinct 
+/* Each pixel in the 3x3x3 cube will have an integer value. Each distinct
    integer value is associated with a "party",and the number of occurrences
    of the distinct value within the 3x3x3 cube equals the number of "votes"
    for the party. See if the current pixel belongs to a previously found
-   party. If so, increment the number of votes for the party. If the number 
-   of votes cast for any party exceeds half the maximum possible number of 
+   party. If so, increment the number of votes for the party. If the number
+   of votes cast for any party exceeds half the maximum possible number of
    votes, then it is not possible for another party to win. */
                                  for( ip = 0; ip < np; ip++ ) {
                                     if( party[ ip ] == *pin ) {
@@ -191,7 +191,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
                   }
                   pinz = pinz + skip[ 2 ];
                }
-   
+
 /* We have now considered all the pixels in the 3x3x3 cube. See which
    party got the most votes. */
                maxvotes = 0;

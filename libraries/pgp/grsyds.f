@@ -8,7 +8,7 @@ C Given a character string, this routine returns a list of symbol
 C numbers to be used to plot it. It is responsible for interpreting
 C all escape sequences.  Negative `symbol numbers' are inserted in the
 C list to represent pen movement. The following escape sequences are
-C defined (the letter following the \ may be either upper or lower 
+C defined (the letter following the \ may be either upper or lower
 C case):
 C
 C \u       :      up one level (returns -1)

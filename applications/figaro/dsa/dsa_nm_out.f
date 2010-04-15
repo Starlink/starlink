@@ -41,16 +41,16 @@ C                        for the output.  This may be blank, in which
 C                        case an empty struicture will be created.
 C     (>) BASIS_FLAGS    (Integer,ref) Flags that control the use made of
 C                        the basis object.  Those used at present are:
-C                        bit 0:  If set, data and axis structures are not to 
-C                        be copied. This usually implies that the new 
-C                        structure will have differently dimensioned data 
+C                        bit 0:  If set, data and axis structures are not to
+C                        be copied. This usually implies that the new
+C                        structure will have differently dimensioned data
 C                        arrays which will be created by routines such as
 C                        DSA_RESHAPE_AXIS, DSA_RESHAPE_DATA.
 C     (>) DETAIL_FLAGS   (Integer,ref) Flags that control other details of
 C                        the structure opening.  Those used at present are:
 C                        bit 0: If set, creation of a new data structure is
 C                        forced, even if one of the same name is already
-C                        known to the system. 
+C                        known to the system.
 C                        Note that bit 0 is the least significant bit.
 C     (!) STATUS         (Integer,ref) Status code.  If a bad status value
 C                        is passed, this routine returns immediately.
@@ -59,7 +59,7 @@ C  External variables used:
 C     Only common variables internal to the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     DTA_ERROR, DTA_ASFNAM, DTA_CYVAR, DTA_TYVAR, ICH_FOLD, ICH_LEN, 
+C     DTA_ERROR, DTA_ASFNAM, DTA_CYVAR, DTA_TYVAR, ICH_FOLD, ICH_LEN,
 C     DSA_WRUSER, DSA_FNAME, DSA_WRNAME, DTA_NMVAR, DSA_INIT_REF_SLOT,
 C     DSA__SET_FILE_TYPE, DSA__SAME_FILE_FORMAT, DSA__TOP_ITEM_TYPE
 C     DSA_REAL_NAME
@@ -99,7 +99,7 @@ C                     each file.
 C     (!) FILE_USED   (Logical array) Indicates file table slot in use..
 C     (>) MAX_REFS    (Integer parameter) Maximum number of reference names.
 C     (<) OBJ_LEN     (Integer array) Number of chars in each OBJ_NAME.
-C     (<) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data 
+C     (<) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data
 C                     object corresponding to reference name.
 C     (<) ACTUAL_NAMES(String array) Full ref name structure specification.
 C     (<) REF_FILE    (Integer array) File slot number of file in question.
@@ -290,7 +290,7 @@ C     in the list of files already open.  Rather messily, we force the
 C     default extension to match that for the type of the basis file
 C     (note: not its actual extension, but the standard one for its type.)
 C     It seems a pity to have introduced the literal file extensions in
-C     this code and it would be better to parse the basis file name and 
+C     this code and it would be better to parse the basis file name and
 C     use its actual extension.
 C
       IF (BASIS_SLOT.EQ.0) THEN

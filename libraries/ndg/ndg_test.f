@@ -29,12 +29,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *.
 
 *  Initialise inherited global status.
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
 
 *  Start up HDS.
       CALL HDS_START( STATUS )
@@ -90,7 +90,7 @@
 
 *  Store a group of NDFs to be created.
       IGRP = GRP__NOID
-      CALL NDG_CREXP( 'TOM,DICK,HARRY-', GRP__NOID, IGRP, SIZE, FLAG, 
+      CALL NDG_CREXP( 'TOM,DICK,HARRY-', GRP__NOID, IGRP, SIZE, FLAG,
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -127,7 +127,7 @@
 
 *  Get a group containing the three sdf names.
       IGRP2 = GRP__NOID
-      CALL NDG_ASEXP( 'TOM,DICK,HARRY', .TRUE., GRP__NOID, IGRP2, 
+      CALL NDG_ASEXP( 'TOM,DICK,HARRY', .TRUE., GRP__NOID, IGRP2,
      :                 SIZE, FLAG, STATUS )
 
 *  Delete the original group.

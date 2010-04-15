@@ -8,7 +8,7 @@
 *     The routine was produced as an attempt to rationalise the
 *     conversion between one form of file name and another, so that
 *     making a change to the naming convention would not be such a
-*     major task in the future, and to allow error reports to be 
+*     major task in the future, and to allow error reports to be
 *     generated if an invalid file name is given.
 *    Invocation :
 *     CALL RED4_OBSTOROBS( OBS_FILE, ROBS_FILE, STATUS )

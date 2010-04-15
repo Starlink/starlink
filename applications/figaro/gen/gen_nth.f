@@ -3,7 +3,7 @@ C+
 C
 C     G E N _ N T H
 C
-C     Returns the two character abbreviation (st,nd,rd,th) 
+C     Returns the two character abbreviation (st,nd,rd,th)
 C     appropriate for use with a specific number.
 C
 C     Parameters -   (">" input, "<" output)

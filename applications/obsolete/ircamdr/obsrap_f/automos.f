@@ -36,8 +36,8 @@
 *    Global constants :
 
 	INCLUDE 'SAE_PAR'		 ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
         INCLUDE 'CHR_ERR'
         INCLUDE 'FIO_PAR'
 
@@ -50,7 +50,7 @@
 	INTEGER
      :    LOCI1,              ! locator for input image 1
      :	  LOCI2,              ! locator for input image 2
-     :	  LOCO,               ! locator for output image 
+     :	  LOCO,               ! locator for output image
      :	  LUNT,
      :	  LUNI,
      :	  LUNO,
@@ -80,7 +80,7 @@
      :	  NXOFF,
      :	  NYOFF
 
-	PARAMETER ( NDIMS = 2 ) 
+	PARAMETER ( NDIMS = 2 )
 	PARAMETER ( MAXIMAGES = 200)
 
 	INTEGER
@@ -139,7 +139,7 @@
 	CALL PAR_GET0C( 'TELEFILE', TELEFILE, STATUS )
 	CALL PAR_GET0C( 'OUTFILE', OUTFILE, STATUS )
 
-*      get plate scale value and what to use for overlap region calc. 
+*      get plate scale value and what to use for overlap region calc.
 *      and number of iterations to perform and whether to apply correction
 	CALL AIF_GET0R( 'PLATSCAL', 1.24, 0.01, 25.0, PLATSCAL, STATUS )
 	CALL PAR_GET0C( 'USEWHAT', USEWHAT, STATUS )
@@ -188,7 +188,7 @@
 
 *        tell user number of offsets read from offset file
 	  CALL MSG_SETI( 'N', NUMTELE)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    'Number of telescope offset position read in = ^N', STATUS)
 
 *        tell user max and min in x and y in list
@@ -239,7 +239,7 @@
 
 *        tell user number of image names read in
 	  CALL MSG_SETI( 'I', NUMIMAG)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    'Number of images read in = ^I', STATUS)
 
 	  CALL MSG_OUT( 'BLANK' ,' ', STATUS)
@@ -252,7 +252,7 @@
 	    CALL MSG_OUT( 'MESS', 'Number of offsets/images are NOT EQUAL',
      :	      STATUS)
 	    CALL MSG_OUT( 'BLANK', ' ', STATUS)
-	    CALL MSG_OUT( 'MESS', 'Exiting program... fix and try again', 
+	    CALL MSG_OUT( 'MESS', 'Exiting program... fix and try again',
      :	      STATUS)
 	    GOTO 100
 	  END IF
@@ -313,7 +313,7 @@
 	  YMINVAL = YMINVAL/PLATSCAL
 	END IF
 
-*      convert all RA (X) offset to negative values and convert all 
+*      convert all RA (X) offset to negative values and convert all
 *      offsets to pixels
 	DO J = 1, NUMTELE
 	  XOFF( J) = -1.0*XOFF( J)
@@ -358,7 +358,7 @@
 
 	        JUNK2 = IMAGLIST( K)( 1:L1)
 
-	        CALL SUBPAR_PUTNAME ( INCODE2, IMAGLIST( K)( 1:L1), 
+	        CALL SUBPAR_PUTNAME ( INCODE2, IMAGLIST( K)( 1:L1),
      :	                              STATUS)
 
 	        CALL GETINP( 'INPIC2', LOCI2, STATUS )
@@ -438,7 +438,7 @@
 
 	    DO K = 1, NUMIMAG
 
-	      IF( CORR( K, J) .GT. -0.9E38 .AND. 
+	      IF( CORR( K, J) .GT. -0.9E38 .AND.
      :	          BADDY( K) .NE. 1) THEN
 
 	        NUMOVER = NUMOVER + 1
@@ -518,7 +518,7 @@
 
 *        scan through all images to subtract offset
 	  DO J = 1, NUMIMAG
- 
+
             CALL CHR_CLEAN( IMAGLIST( J) )
             L1 = 0
             CALL CHR_APPND( IMAGLIST( J), IMAGLIST( J), L1)
@@ -579,7 +579,7 @@
   999   CLOSE( LUNT)
 	CALL FIO_PUNIT( LUNT, STATUS )
 	CALL MSG_SETC( 'T', TELEFILE)
-	CALL ERR_REP( 'MESS', 'Cannot open telescope offset file ^T', 
+	CALL ERR_REP( 'MESS', 'Cannot open telescope offset file ^T',
      :    STATUS)
 	GOTO 100
 
@@ -588,37 +588,37 @@
 	CLOSE( LUNI)
 	CALL FIO_PUNIT( LUNI, STATUS )
 	CALL MSG_SETC( 'I', IMAGFILE)
-	CALL ERR_REP( 'MESS', 'Cannot open image list file ^I', 
+	CALL ERR_REP( 'MESS', 'Cannot open image list file ^I',
      :    STATUS)
 	GOTO 100
 
   996   CLOSE( LUNT)
 	CALL FIO_PUNIT( LUNT, STATUS )
 	CALL MSG_SETC( 'T', TELEFILE)
-	CALL ERR_REP( 'MESS', 
-     :    'Error reading offsets from telescope offset file ^T', 
+	CALL ERR_REP( 'MESS',
+     :    'Error reading offsets from telescope offset file ^T',
      :    STATUS)
 	GOTO 100
 
   995   CLOSE( LUNI)
 	CALL FIO_PUNIT( LUNI, STATUS )
 	CALL MSG_SETC( 'I', IMAGFILE)
-	CALL ERR_REP( 'MESS', 
-     :    'Error reading image list from image file ^I', 
+	CALL ERR_REP( 'MESS',
+     :    'Error reading image list from image file ^I',
      :    STATUS)
 	GOTO 100
 
   994   CLOSE( LUNO)
 	CALL FIO_PUNIT( LUNO, STATUS )
 	CALL MSG_SETC( 'O', OUTFILE)
-	CALL ERR_REP( 'MESS', 'Cannot open output file ^O', 
+	CALL ERR_REP( 'MESS', 'Cannot open output file ^O',
      :    STATUS)
 	GOTO 100
 
   993   CLOSE( LUNO2)
 	CALL FIO_PUNIT( LUNO2, STATUS )
 	CALL MSG_SETC( 'O', OUTFILE2)
-	CALL ERR_REP( 'MESS', 'Cannot open output file ^O', 
+	CALL ERR_REP( 'MESS', 'Cannot open output file ^O',
      :    STATUS)
 	GOTO 100
 

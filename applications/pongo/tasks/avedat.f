@@ -40,7 +40,7 @@
 *     NBIN = _INTEGER (Read)
 *        Depending upon the value of ACTION, either the number of bins
 *        (ACTION="X"), or the number of points per bin (ACTION="N").
-*        
+*
 *        [The value will be prompted for. It has the default 10.]
 *     XMIN = _REAL (Read)
 *        The minimum X value to be used in the average.
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,7 +94,7 @@
       CHARACTER * ( 1 ) ACTION   ! Type of averaging
 
       INTEGER NBIN               ! Number of bins/ number of points to
-                                 ! average 
+                                 ! average
       INTEGER I                  ! Counter
       INTEGER IDAT               ! Counter
       INTEGER IDAT2
@@ -149,11 +149,11 @@
             YYSUM = 0.0
             XSUM = 0.0
             XXSUM = 0.0
-            
+
 *  Fudge to stop errors on the final loop.
             INDEX( NDAT + 1 ) = 1
 
-            DO WHILE ( ( IDAT .LE. NDAT ) .AND. 
+            DO WHILE ( ( IDAT .LE. NDAT ) .AND.
      :                 ( XDATA( INDEX( IDAT ) ) .LE. XMAXP ) )
 
                DO WHILE ( ( XDATA( INDEX( IDAT ) ) .GE. XSTART ) .AND.
@@ -166,14 +166,14 @@
                   NDATTEMP = NDATTEMP + 1
                   IDAT = IDAT + 1
                END DO
-               
+
                IF ( NDATTEMP .NE. 0 ) THEN
                   IDAT2 = IDAT2 + 1
                   XDATATEMP( IDAT2 ) = XSUM / NDATTEMP
                   YDATATEMP( IDAT2 ) = YSUM / NDATTEMP
                   ERRX( IDAT2 ) = SQRT( MAX( 0.0,
      :                 REAL( XXSUM/NDATTEMP
-     :                 -XDATATEMP( IDAT2 )**2 
+     :                 -XDATATEMP( IDAT2 )**2
      :                 ) ) )
                   ERRY( IDAT2 ) = SQRT( MAX( 0.0,
      :                 REAL( YYSUM/NDATTEMP
@@ -185,15 +185,15 @@
                   XXSUM = 0.0
                   NDATTEMP = 0
                   XSTART = XSTART + XRANGE
-               ELSE IF ( XDATA( INDEX( IDAT ) ) 
+               ELSE IF ( XDATA( INDEX( IDAT ) )
      :                 .GT. XSTART+XRANGE ) THEN
                   XSTART = XSTART + XRANGE
                ELSE
                   IDAT = IDAT + 1
                END IF
             END DO
-         ELSE IF ( ACTION .EQ. 'N' ) THEN  
-            
+         ELSE IF ( ACTION .EQ. 'N' ) THEN
+
 *  Calculate the numbers of points to be included at the ends.
             NEND = MOD( NDAT-IDAT+1, NBIN )
             NSTART = NEND / 2
@@ -230,7 +230,7 @@
                YYSUM = 0.0
                XSUM = 0.0
                XXSUM = 0.0
-               
+
                DO I = IDAT, IDAT+NBIN-1
                   YSUM = YSUM + REAL( YDATA( INDEX( I ) ) )
                   YYSUM = YYSUM + REAL( YDATA( INDEX( I ) )**2 )
@@ -238,7 +238,7 @@
                   XXSUM = XXSUM + REAL( XDATA( INDEX( I ) )**2 )
                END DO
 
-               IDAT2 = IDAT2 + 1 
+               IDAT2 = IDAT2 + 1
                IDAT = IDAT + NBIN
                XDATATEMP( IDAT2 ) = XSUM / NBIN
                YDATATEMP( IDAT2 ) = YSUM / NBIN
@@ -282,7 +282,7 @@
 
 *  Check the returned status and report a contextual error message if
 *  necessary.
-      IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'AVEDAT_END', 
+      IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'AVEDAT_END',
      :     'AVEDAT: Cannot rebin the data in the XCOL and YCOL data ' //
      :     'areas.', STATUS )
 

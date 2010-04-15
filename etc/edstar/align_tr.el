@@ -32,10 +32,10 @@
 		       (looking-at comment-start-skip)) (setq comment (point)))
 	      (if (and (not comment)
 		       (not (looking-at "[ \t]"))) (setq last (point)))
-	      
+
 ;;; Increment to inspect the next character.
 	      (forward-char))
-	    
+
 ;;; If a trailing comment was found, save the buffer context and move to
 ;;; it.
 	    (if comment

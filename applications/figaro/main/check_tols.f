@@ -187,7 +187,7 @@
         if(anytrue(reject,nrej).and.anytrue(fails,NFAILS)) then
           if(reject(LOGFAIL)) then
             write(chars,
-     : '(''Rejected fit!!  Line='',i3,3x,''Position = '',i4,'','',i4)') 
+     : '(''Rejected fit!!  Line='',i3,3x,''Position = '',i4,'','',i4)')
      :        line,istore,jstore
             call par_wruser(chars,status)
             call decodetolfail(fails,sg_parms,sg_error)

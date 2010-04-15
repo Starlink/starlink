@@ -101,8 +101,8 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   instapx = hdr->instap[ 0 ]/DAS2R;
   instapy = hdr->instap[ 0 ]/DAS2R;
 
-  /* Try getting INSTAP keywords. An error is reported (but then annulled) 
-     if either keyword is not present in the header. The values in instapx 
+  /* Try getting INSTAP keywords. An error is reported (but then annulled)
+     if either keyword is not present in the header. The values in instapx
      and instapy are left unchanged if the keywords are not present, or
      are present but have undefined values. */
   smf_getfitsd( hdr, "INSTAP_X", &instapx, status );

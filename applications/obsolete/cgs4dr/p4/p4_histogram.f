@@ -25,11 +25,11 @@
       INCLUDE 'COLOURS.INC'                   ! Colours common block
 *    Local Constants :
       INTEGER MAXDIM                          ! Max number of dimensions
-      PARAMETER ( MAXDIM = 3 )            
+      PARAMETER ( MAXDIM = 3 )
 *    Local variables :
       LOGICAL SAME_UNITS
       LOGICAL ERRORS                          ! T if want to plot errors
-      LOGICAL QUALITY                         ! T if want to plot quality 
+      LOGICAL QUALITY                         ! T if want to plot quality
       INTEGER BYTES                           ! Number of bytes required
       INTEGER SLEN                            ! Length of sub-title string
       INTEGER TLEN                            ! Length of title string
@@ -84,7 +84,7 @@
 
 *    Map the data
       IF ( DISPLAY_PLANE( PORT ) .EQ. 'DATA' ) THEN
-         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT', 
+         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT',
      :      DATA_PTR, DATA_SLOT, STATUS )
 
 *    Or map the errors
@@ -114,7 +114,7 @@
 
 *    Map the quality as a byte array
       IF ( QUALITY ) THEN
-         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE', 
+         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE',
      :      QUAL_PTR, QUAL_SLOT, STATUS )
       ELSE
          QUAL_PTR = 0
@@ -128,10 +128,10 @@
       SIGMA( PORT ) = 0.0
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL P4_GET_STATS( DIMS(1), DIMS(2), %val(DATA_PTR),
-     :     QUALITY, %val(QUAL_PTR), PLOT_WHOLE( PORT ), ISTART( PORT ), 
-     :     IEND( PORT ), HISTOGRAM_XSTEP( PORT ), JSTART( PORT ), 
-     :     JEND( PORT ), HISTOGRAM_YSTEP( PORT ), AUTOSCALE( PORT ), 
-     :     HIGH( PORT ), LOW( PORT ), MEAN( PORT ), SIGMA( PORT ), STATUS ) 
+     :     QUALITY, %val(QUAL_PTR), PLOT_WHOLE( PORT ), ISTART( PORT ),
+     :     IEND( PORT ), HISTOGRAM_XSTEP( PORT ), JSTART( PORT ),
+     :     JEND( PORT ), HISTOGRAM_YSTEP( PORT ), AUTOSCALE( PORT ),
+     :     HIGH( PORT ), LOW( PORT ), MEAN( PORT ), SIGMA( PORT ), STATUS )
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'P4_HISTOGRAM: '/
@@ -170,10 +170,10 @@
       TOOLARGE( PORT ) = 0
       CALL P4_BIN( DIMS( 1 ), DIMS( 2 ), %val( DATA_PTR ),
      :   %val( QUAL_PTR ), QUALITY, ISTART( PORT ), IEND( PORT ),
-     :   HISTOGRAM_XSTEP( PORT ), JSTART( PORT ), JEND( PORT ), 
-     :   HISTOGRAM_YSTEP( PORT ), LOW( PORT ), HIGH( PORT ), 
-     :   HIST_SMOOTH( PORT ), HISTOGRAM_BINS( PORT ), %val( BIN_PTR ), 
-     :   %val( FREQ_PTR ), %val( WORK_PTR ), TOOSMALL( PORT ), 
+     :   HISTOGRAM_XSTEP( PORT ), JSTART( PORT ), JEND( PORT ),
+     :   HISTOGRAM_YSTEP( PORT ), LOW( PORT ), HIGH( PORT ),
+     :   HIST_SMOOTH( PORT ), HISTOGRAM_BINS( PORT ), %val( BIN_PTR ),
+     :   %val( FREQ_PTR ), %val( WORK_PTR ), TOOSMALL( PORT ),
      :   TOOLARGE( PORT ), FMIN( PORT ), FMAX( PORT ), MODE( PORT ), STATUS )
 
 *    Ensure that FMAX is never zero. (PGWINDOW will crash if it is).
@@ -205,7 +205,7 @@
 *     YSTART( PORT ) = 0.0
 *     YEND( PORT )   = FMAX( PORT )
 
-      CALL PGWINDOW( LOW( PORT ), HIGH( PORT ), 
+      CALL PGWINDOW( LOW( PORT ), HIGH( PORT ),
      :   0.0, FMAX( PORT ) )
 
 *    Remember the viewport limits in the common block (for cursoring).
@@ -215,13 +215,13 @@
       AYEND( PORT )   = VYEND( PORT )
 
 *   Draw the histogram
-      CALL PGBIN( HISTOGRAM_BINS( PORT ), %val( BIN_PTR ), 
+      CALL PGBIN( HISTOGRAM_BINS( PORT ), %val( BIN_PTR ),
      :   %val( FREQ_PTR ), .FALSE. )
 
 *    Plot the ancillary bits if need be
       IF ( PLOT_AXES( PORT ) ) THEN
 
-         CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0, 
+         CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0,
      :      DEVICE_YOPT( PORT ), 0.0, 0)
 
          XLEN = CHR_LEN( XLABEL(PORT) )
@@ -236,7 +236,7 @@
            TLEN = CHR_LEN( TITLE(PORT) )
            CALL PGLABEL( ' ', ' ', TITLE(PORT)(1:TLEN) )
          ENDIF
-                                                           
+
 *       Write RH labels
          CPOS = CHR_LEN( RH1LABEL(PORT) )
          CALL PGMTEXT('R', 2.2, 0.5, 0.5, RH1LABEL(PORT)(1:CPOS))

@@ -22,7 +22,7 @@
 *     The coefficient file will normally have been written by SDIST and
 *     if so must have been written by the version of SDIST that was
 *     modified to support ECHMASK.
-*     
+*
 *     The PERISCOPE keyword (see below) determines whether each order
 *     has two separate parts (corresponding to object and sky and due to
 *     the special periscope that samples object and sky at a wide
@@ -126,7 +126,7 @@
 *
       INTEGER MAXTRACKS
       PARAMETER (MAXTRACKS=200)
-*                             
+*
 *     Local variables
 *
       INTEGER SLOT
@@ -172,9 +172,9 @@
       END IF
       DO TRACK=1,NTRACKS
          COEFF(1,TRACK) = COEFF(1,TRACK) + YAVE(TRACK)
-      END DO                                  
+      END DO
       CALL GEN_REVR8(COEFF,11,NTRACKS,.TRUE.,COEFF)
-*          
+*
 *     Determine whether the periscope is mounted. If it is then each
 *     order is split into a sky and an object part.
 *
@@ -346,7 +346,7 @@
 *     fitted the sub-order number is one for object and two for sky.
 *
 *     Care is taken to ensure that each order and sub-order contain precisely
-*     the requested number of pixels of object and sky. 
+*     the requested number of pixels of object and sky.
 *
 *  Language:
 *     FORTRAN
@@ -469,7 +469,7 @@
 *           side of the half pixel boundary. First do the object data. The
 *           data value to write depends on the value of PERISCOPE. If it
 *           is TRUE, it is 10 * (order number) + (one or two). If it is
-*           FALSE it is 10 * (order number) + (one). 
+*           FALSE it is 10 * (order number) + (one).
 *
             IF (MOD(OBJWIDTH,2).EQ.1) THEN
                CENTRE = NINT(MID+DBLE(OBJOFFSET))

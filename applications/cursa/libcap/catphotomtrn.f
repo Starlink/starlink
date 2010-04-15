@@ -156,7 +156,7 @@
      :  ZEROP,      ! Fixed zero point.
      :  ATMOS,      !   "   atmospheric extinction.
      :  INSCON      ! Arbitrary constant applied to instrumental magnitudes.
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  ROWS,       ! No. of rows in the input catalogue.

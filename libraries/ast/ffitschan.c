@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@ F77_SUBROUTINE(ast_null)( void );
 /* Source and sink function interfaces. */
 /* ==================================== */
 /* These functions are concerned with allowing FORTRAN implementations
-   of FitsChan source and sink functions to be passed to the FitsChan 
+   of FitsChan source and sink functions to be passed to the FitsChan
    class and invoked when necessary by C code in the main class
    implementation. All FORTRAN-specific aspects of this interface are
    encapsulated here. */
@@ -113,7 +113,7 @@ static void SinkWrap( void (* sink)( const char * ), const char *line,
 *     Private function.
 
 *  Synopsis:
-*     static void SinkWrap( void (* sink)( const char * ), const char *line, 
+*     static void SinkWrap( void (* sink)( const char * ), const char *line,
 *                           int *status )
 
 *  Description:
@@ -308,7 +308,7 @@ F77_SUBROUTINE(ast_putcards)( INTEGER(THIS),
    astAt( "AST_PUTCARDS", NULL, 0 );
    astWatchSTATUS(
       cards = astString( CARDS, CARDS_length );
-      astPutCards( astI2P( *THIS ), cards );   
+      astPutCards( astI2P( *THIS ), cards );
       (void) astFree( (void *) cards );
    )
 }
@@ -328,7 +328,7 @@ F77_SUBROUTINE(ast_putfits)( INTEGER(THIS),
    astWatchSTATUS(
       card = astString( CARD, CARD_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astPutFits( astI2P( *THIS ), card, overwrite );   
+      astPutFits( astI2P( *THIS ), card, overwrite );
       (void) astFree( (void *) card );
    )
 }
@@ -339,7 +339,7 @@ F77_SUBROUTINE(ast_delfits)( INTEGER(THIS),
 
    astAt( "AST_DELFITS", NULL, 0 );
    astWatchSTATUS(
-      astDelFits( astI2P( *THIS ) );   
+      astDelFits( astI2P( *THIS ) );
    )
 }
 
@@ -349,7 +349,7 @@ F77_SUBROUTINE(ast_purgewcs)( INTEGER(THIS),
 
    astAt( "AST_PURGEWCS", NULL, 0 );
    astWatchSTATUS(
-      astPurgeWCS( astI2P( *THIS ) );   
+      astPurgeWCS( astI2P( *THIS ) );
    )
 }
 
@@ -359,7 +359,7 @@ F77_SUBROUTINE(ast_retainfits)( INTEGER(THIS),
 
    astAt( "AST_RETAINFITS", NULL, 0 );
    astWatchSTATUS(
-      astRetainFits( astI2P( *THIS ) );   
+      astRetainFits( astI2P( *THIS ) );
    )
 }
 
@@ -419,7 +419,7 @@ F77_SUBROUTINE(ast_setfitsf)( INTEGER(THIS),
       name = astString( NAME, NAME_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsF( astI2P( *THIS ), name, *VALUE, comment, overwrite );   
+      astSetFitsF( astI2P( *THIS ), name, *VALUE, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) comment );
    )
@@ -444,7 +444,7 @@ F77_SUBROUTINE(ast_setfitsu)( INTEGER(THIS),
       name = astString( NAME, NAME_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsU( astI2P( *THIS ), name, comment, overwrite );   
+      astSetFitsU( astI2P( *THIS ), name, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) comment );
    )
@@ -465,7 +465,7 @@ F77_SUBROUTINE(ast_setfitscm)( INTEGER(THIS),
    astWatchSTATUS(
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsCM( astI2P( *THIS ), comment, overwrite );   
+      astSetFitsCM( astI2P( *THIS ), comment, overwrite );
       (void) astFree( (void *) comment );
    )
 }
@@ -492,7 +492,7 @@ F77_SUBROUTINE(ast_setfitsi)( INTEGER(THIS),
       name = astString( NAME, NAME_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsI( astI2P( *THIS ), name, *VALUE, comment, overwrite );   
+      astSetFitsI( astI2P( *THIS ), name, *VALUE, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) comment );
    )
@@ -520,7 +520,7 @@ F77_SUBROUTINE(ast_setfitscf)( INTEGER(THIS),
       name = astString( NAME, NAME_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsCF( astI2P( *THIS ), name, VALUE, comment, overwrite );   
+      astSetFitsCF( astI2P( *THIS ), name, VALUE, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) comment );
    )
@@ -548,7 +548,7 @@ F77_SUBROUTINE(ast_setfitsci)( INTEGER(THIS),
       name = astString( NAME, NAME_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsCI( astI2P( *THIS ), name, VALUE, comment, overwrite );   
+      astSetFitsCI( astI2P( *THIS ), name, VALUE, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) comment );
    )
@@ -577,7 +577,7 @@ F77_SUBROUTINE(ast_setfitsl)( INTEGER(THIS),
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
       value = F77_ISTRUE( *VALUE );
-      astSetFitsL( astI2P( *THIS ), name, value, comment, overwrite );   
+      astSetFitsL( astI2P( *THIS ), name, value, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) comment );
    )
@@ -607,7 +607,7 @@ F77_SUBROUTINE(ast_setfitss)( INTEGER(THIS),
       value = astString( VALUE, VALUE_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsS( astI2P( *THIS ), name, value, comment, overwrite );   
+      astSetFitsS( astI2P( *THIS ), name, value, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) value );
       (void) astFree( (void *) comment );
@@ -637,7 +637,7 @@ F77_SUBROUTINE(ast_setfitscn)( INTEGER(THIS),
       value = astString( VALUE, VALUE_length );
       comment = astString( COMMENT, COMMENT_length );
       overwrite = F77_ISTRUE( *OVERWRITE );
-      astSetFitsCN( astI2P( *THIS ), name, value, comment, overwrite );   
+      astSetFitsCN( astI2P( *THIS ), name, value, comment, overwrite );
       (void) astFree( (void *) name );
       (void) astFree( (void *) value );
       (void) astFree( (void *) comment );
@@ -677,29 +677,29 @@ MAKE_AST_GETFITS(l,L,LOGICAL,L,int)
 #undef MAKE_AST_GETFITS
 
 
-F77_LOGICAL_FUNCTION(ast_testfits)( INTEGER(THIS), 
-                                    CHARACTER(NAME), 
+F77_LOGICAL_FUNCTION(ast_testfits)( INTEGER(THIS),
+                                    CHARACTER(NAME),
                                     LOGICAL(THERE),
-                                    INTEGER(STATUS) 
-                                    TRAIL(NAME) ){ 
-   GENPTR_INTEGER(THIS) 
-   GENPTR_CHARACTER(NAME) 
+                                    INTEGER(STATUS)
+                                    TRAIL(NAME) ){
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
    GENPTR_LOGICAL(THERE)
-   GENPTR_INTEGER(STATUS) 
-   F77_LOGICAL_TYPE(RESULT); 
+   GENPTR_INTEGER(STATUS)
+   F77_LOGICAL_TYPE(RESULT);
 
-   char *name; 
+   char *name;
    int there;
 
-   astAt( "AST_TESTFITS", NULL, 0 ); 
-   astWatchSTATUS( 
-      name = astString( NAME, NAME_length ); 
-      RESULT = astTestFits( astI2P( *THIS ), name, &there ) ? 
-               F77_TRUE : F77_FALSE; 
-      (void) astFree( (void *) name ); 
-   ) 
+   astAt( "AST_TESTFITS", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      RESULT = astTestFits( astI2P( *THIS ), name, &there ) ?
+               F77_TRUE : F77_FALSE;
+      (void) astFree( (void *) name );
+   )
    *THERE = there ? F77_TRUE : F77_FALSE;
-   return RESULT; 
+   return RESULT;
 }
 
 

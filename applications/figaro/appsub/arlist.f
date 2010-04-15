@@ -13,7 +13,7 @@ C
 C     Parameters  (">" input)
 C
 C     (>) IOUT     (Integer) Fortran unit number for output file
-C     (>) FILE     (Character) The full name of the data file 
+C     (>) FILE     (Character) The full name of the data file
 C                  containing the arc.
 C     (>) CHANS    (Real array CHANS(NLID)) The channel numbers for
 C                  the lines.

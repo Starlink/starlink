@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_CALC_GRID (N, X, Y, XMIN, XMAX, XSPACE, NX, 
+      SUBROUTINE SCULIB_CALC_GRID (N, X, Y, XMIN, XMAX, XSPACE, NX,
      :  YMIN, YMAX, YSPACE, NY, IPOS, JPOS, STATUS)
 *+
 *  Name:
@@ -9,12 +9,12 @@
 *     contain the input jiggle pattern
 
 *  Description:
-*     This routine takes the x,y coords of the mapped points and attempts to 
+*     This routine takes the x,y coords of the mapped points and attempts to
 *     fit them onto a rectangular grid. The grid contains the minimum number
-*     of points required to hold the measured positions. 
+*     of points required to hold the measured positions.
 
 *  Invocation:
-*     CALL SCULIB_CALC_GRID (N, X, Y, XMIN, XMAX, XSPACE, NX, 
+*     CALL SCULIB_CALC_GRID (N, X, Y, XMIN, XMAX, XSPACE, NX,
 *    :  YMIN, YMAX, YSPACE, NY, IPOS, JPOS, STATUS)
 
 *  Arguments:
@@ -85,7 +85,7 @@
       REAL XMIN, XMAX, XSPACE
       INTEGER NX
       REAL YMIN, YMAX, YSPACE
-      INTEGER NY 
+      INTEGER NY
       INTEGER IPOS (N), JPOS (N)
 
 *  Status:
@@ -147,7 +147,7 @@
          END DO
 
 *  find smallest non-zero spaces between pixels. Use only 2 reference pixels
-*  to stop the process taking too long. This means that the routine could fail 
+*  to stop the process taking too long. This means that the routine could fail
 *  on a valid dataset but?
 
          XSPACE = XMAX - XMIN
@@ -182,7 +182,7 @@
                IR = NINT (R)
                IF (ABS(REAL(IR)-R) .GT. 0.001) THEN
                   OK = .FALSE.
-               END IF 
+               END IF
             END IF
             IF (YMAX .NE. YMIN) THEN
                R = (Y(I) - YMIN) / YSPACE

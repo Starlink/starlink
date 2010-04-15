@@ -16,13 +16,13 @@
 *     If the device is not a hardcopy device then
 *     the routine first tests to see if the current device has a
 *     background colour with which to erase the contents of the
-*     rectangular area defined by the two sets of corner world 
+*     rectangular area defined by the two sets of corner world
 *     coordinates (x1,y1), (x2,y2). If the test is successful then the
 *     current values for colour and fill area style are stored. The
-*     corner coordinates are then used to clear a retangle. The colour 
-*     and fill area styles are then set to erase all the contents of 
-*     the area and the area is erased. Finally the entrant values of 
-*     colour and fill style are restored. 
+*     corner coordinates are then used to clear a retangle. The colour
+*     and fill area styles are then set to erase all the contents of
+*     the area and the area is erased. Finally the entrant values of
+*     colour and fill style are restored.
 
 *  Arguments:
 *     X1 = REAL (Given)
@@ -41,7 +41,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     27-SEP-1990 (PDRAPER):
 *        Original version.
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

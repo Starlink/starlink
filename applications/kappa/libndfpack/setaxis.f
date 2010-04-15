@@ -23,8 +23,8 @@
 *  Description:
 *     This routine modifies the values of an axis array component or
 *     system within an NDF data structure.  There are a number of
-*     options (see parameters LIKE and  MODE).  They permit the deletion 
-*     of the axis system, or an individual variance or width component; 
+*     options (see parameters LIKE and  MODE).  They permit the deletion
+*     of the axis system, or an individual variance or width component;
 *     the replacement of one or more individual values; assignment of the
 *     whole array using Fortran-like mathematical expressions, or values
 *     in a text file, or to pixel co-ordinates, or by copying from
@@ -95,7 +95,7 @@
 *     LIKE = NDF (Read)
 *        A template NDF containing axis arrays. These arrays will be
 *        copied into the NDF given by parameter NDF. All axes are copied.
-*        The other parameters are only accessed if a null (!) value is 
+*        The other parameters are only accessed if a null (!) value is
 *        supplied for LIKE. If the NDF being modified extends beyond the
 *        edges of the template NDF, then the template axis arrays will be
 *        extrapolated to cover the entire NDF. This is done using linear
@@ -115,12 +115,12 @@
 *           "Pixel"      - The axis centres are set to pixel
 *                          co-ordinates.  This is only available when
 *                          COMP="Data" or "Centre".
-*           "WCS"        - The axis centres are set to the values of the 
+*           "WCS"        - The axis centres are set to the values of the
 *                          selected axis in the current co-ordinate Frame
 *                          of the NDF. This is only available when
 *                          COMP="Data" or "Centre".
 *
-*        MODE is only accessed if a null (!) value is supplied for 
+*        MODE is only accessed if a null (!) value is supplied for
 *        parameter LIKE. The suggested default is the current value.
 *     NDF = NDF (Read and Write)
 *        The NDF data structure in which an axis array component is to
@@ -137,8 +137,8 @@
 *     TYPE = LITERAL (Read)
 *        The data type of the modified axis array.  TYPE can be either
 *        "_REAL" or "_DOUBLE".  It is only accessed for MODE="File",
-*        "Expression", or "Pixel".  If a null (!) value is supplied, the 
-*        value used is the current data type of the array component if 
+*        "Expression", or "Pixel".  If a null (!) value is supplied, the
+*        value used is the current data type of the array component if
 *        it exists, otherwise it is "_REAL". [!]
 
 *  Examples:
@@ -214,7 +214,7 @@
 
 *  Copyright:
 *     Copyright (C) 1995, 2000-2001, 2004 Central Laboratory of the
-*     Research Councils. 
+*     Research Councils.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -262,7 +262,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -361,7 +361,7 @@
 *  Obtain an identifier for the NDF to be modified.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
-*  Abort if an error occurred. 
+*  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain an identifier for an NDF containing AXIS structures to be
@@ -369,12 +369,12 @@
       CALL LPG_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
 
 *  If an NDF was supplied, use it.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL KPS1_SAXLK( NDF, NDF2, STATUS )
 
 *  If no LIKE NDF was supplied, annul the error and continue.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )      
+         CALL ERR_ANNUL( STATUS )
 
 *  Find the number of dimensions, and bounds in the NDF.
          CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -498,7 +498,7 @@
 *  type.
                   SUGDEF = 'Junk'
                   CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR,
-     :                             VAL__MAXR, 'Bad', .FALSE., CVALUE, 
+     :                             VAL__MAXR, 'Bad', .FALSE., CVALUE,
      :                             STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -509,8 +509,8 @@
                   END IF
 
 *  Replace the element with the new value.
-                  CALL KPG1_STORR( EL, PIND, RVALUE, 
-     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+                  CALL KPG1_STORR( EL, PIND, RVALUE,
+     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                             STATUS )
 
 *  Double precision
@@ -518,7 +518,7 @@
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                   SUGDEF = 'Junk'
                   CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND,
-     :                             VAL__MAXD,'Bad', .FALSE., CVALUE, 
+     :                             VAL__MAXD,'Bad', .FALSE., CVALUE,
      :                             STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -529,8 +529,8 @@
                   END IF
 
 *  Replace the element with the new value.
-                  CALL KPG1_STORD( EL, PIND, DVALUE, 
-     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+                  CALL KPG1_STORD( EL, PIND, DVALUE,
+     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                             STATUS )
                END IF
 
@@ -558,14 +558,14 @@
 
 *  Obtain the type of the output array.
             CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
-     :                       TYPE, STATUS ) 
+     :                       TYPE, STATUS )
 
 *  Obtain the expression relating variance values to data values.
             CALL PAR_GET0C( 'EXPRS', EXPRS, STATUS )
 
 *  Get the character lengths of the expression and the component.
             IF ( STATUS .NE. SAI__OK ) GOTO 999
-            LCOMP = CHR_LEN( COMP ) 
+            LCOMP = CHR_LEN( COMP )
             LEXP = MAX( 1, CHR_LEN( EXPRS ) )
 
 *  Find out whether or not the INDEX token appears in the expression by
@@ -655,12 +655,12 @@
 *  floating point).
                   IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_ELNMR( LBND( IAXIS ), UBND( IAXIS ), EL,
-     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                %VAL( CNF_PVAL( PNTRW ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPG1_ELNMD( LBND( IAXIS ), UBND( IAXIS ), EL,
-     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                %VAL( CNF_PVAL( PNTRW ) ),
      :                                STATUS )
                   END IF
                END IF
@@ -675,17 +675,17 @@
 *  array (considered as 2-dimensional), using the appropriate routine
 *  for the data type.
                   IF ( TYPE .EQ. '_REAL' ) THEN
-                     CALL KPG1_PROWR( EL, 
-     :                                %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+                     CALL KPG1_PROWR( EL,
+     :                                %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                                NIN,
-     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                %VAL( CNF_PVAL( PNTRW ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPG1_PROWD( EL, 
-     :                                %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+                     CALL KPG1_PROWD( EL,
+     :                                %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                                NIN,
-     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                %VAL( CNF_PVAL( PNTRW ) ),
      :                                STATUS )
 
                   END IF
@@ -696,7 +696,7 @@
 
 *  Reset any pre-existing axis-array component and set its data type
 *  to the chosen data type.
-               IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, 
+               IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP,
      :                                               IAXIS, STATUS )
                CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
 
@@ -710,18 +710,18 @@
 *  Real
 *  ----
                IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL TRN_TRNR( .TRUE., EL, NIN, EL, 
+                  CALL TRN_TRNR( .TRUE., EL, NIN, EL,
      :                           %VAL( CNF_PVAL( PNTRW ) ),
-     :                           IMAP, EL, 1, 
+     :                           IMAP, EL, 1,
      :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                           STATUS )
 
 *  Double precision
 *  ----------------
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL TRN_TRND( .TRUE., EL, NIN, EL, 
+                  CALL TRN_TRND( .TRUE., EL, NIN, EL,
      :                           %VAL( CNF_PVAL( PNTRW ) ),
-     :                            IMAP, EL, 1, 
+     :                            IMAP, EL, 1,
      :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                            STATUS )
                END IF
@@ -743,7 +743,7 @@
 
 *  Obtain the type of the output array.
             CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
-     :                      TYPE, STATUS ) 
+     :                      TYPE, STATUS )
 
 *  Attempt to obtain and open a free-format data file.
             CALL FIO_ASSOC( 'FILE', 'READ', 'LIST', 0, FD, STATUS )
@@ -762,13 +762,13 @@
 *  Append sequentially each value to the vector.  Choose the
 *  appropriate subroutine for the data type.
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_TRNDD( FD, EL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+               CALL KPS1_TRNDD( FD, EL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STATUS )
-   
+
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_TRNDR( FD, EL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+               CALL KPS1_TRNDR( FD, EL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STATUS )
-   
+
             END IF
 
 *  Unmap the array.  Note that 'Error' is not allowed as the component.
@@ -783,7 +783,7 @@
 
 *  Obtain the type of the output array.
             CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
-     :                      TYPE, STATUS ) 
+     :                      TYPE, STATUS )
 
 *  Specify the number of elements along the axis.
             EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
@@ -796,13 +796,13 @@
 *  (step size one, offset lower bound - 0.5).  Use the appropriate
 *  subroutine for the data type.
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_SSAZD( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 
-     :                          0.5D0, %VAL( CNF_PVAL( FPNTR ) ), 
+               CALL KPG1_SSAZD( EL, 1.0D0, DBLE( LBND( IAXIS ) ) -
+     :                          0.5D0, %VAL( CNF_PVAL( FPNTR ) ),
      :                          STATUS )
 
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_SSAZR( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 
-     :                          0.5D0, %VAL( CNF_PVAL( FPNTR ) ), 
+               CALL KPG1_SSAZR( EL, 1.0D0, DBLE( LBND( IAXIS ) ) -
+     :                          0.5D0, %VAL( CNF_PVAL( FPNTR ) ),
      :                          STATUS )
 
             END IF
@@ -813,7 +813,7 @@
 
 *  Reset any pre-existing axis-centre component and set its data type
 *  to the chosen data type.
-               IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, 
+               IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP,
      :                                               IAXIS, STATUS )
                CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
 
@@ -826,13 +826,13 @@
 *  appropriate routine for the data type.
                IF ( TYPE .EQ. '_DOUBLE' ) THEN
                   CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( FPNTR ) ),
-     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                           IERR, NERR,
      :                           STATUS )
 
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                   CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( FPNTR ) ),
-     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                           IERR, NERR,
      :                           STATUS )
 
@@ -854,7 +854,7 @@
             CALL KPG1_GTWCS( NDF, IWCS, STATUS )
 
 *  Get the Mapping from GRID (Base) Frame to the Current Frame.
-            MAP0 = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, 
+            MAP0 = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
      :                             STATUS )
 
 *  Get the number of input and output axes.
@@ -874,13 +874,13 @@
                CALL NDF_MSG( 'NDF', NDF )
                CALL ERR_REP( 'SETAXIS_ERR', 'The current Frame of the'//
      :                       ' NDF ''NDF'' has only ^NOUT, so the '//
-     :                       'requested axis (^IAX) cannot be used.', 
+     :                       'requested axis (^IAX) cannot be used.',
      :                       STATUS )
                GO TO 999
             END IF
 
 *  Create an AST PermMap which will feed values into the selected input
-*  axis of the above Mapping, using a value equal to half the axis length 
+*  axis of the above Mapping, using a value equal to half the axis length
 *  on all other axes.
             INPRM( 1 ) = IAXIS
             DO I = 1, NIN
@@ -907,14 +907,14 @@
      :                                           ' ', STATUS ),
      :                        .TRUE., ' ', STATUS )
 
-*  If the selected axis is a SkyAxis, add in a mapping that will scale 
+*  If the selected axis is a SkyAxis, add in a mapping that will scale
 *  the axis values from radians to degrees.
             ATTR = 'Domain('
             IAT = 7
             CALL CHR_PUTI( IAXIS, ATTR, IAT )
             CALL CHR_APPND( ')', ATTR, IAT )
             IF( AST_GETC( IWCS, ATTR, STATUS ) .EQ. 'SKY' ) THEN
-               MAP = AST_CMPMAP( MAP, AST_ZOOMMAP( 1, AST__DR2D, ' ', 
+               MAP = AST_CMPMAP( MAP, AST_ZOOMMAP( 1, AST__DR2D, ' ',
      :                                             STATUS ),
      :                           .TRUE., ' ', STATUS )
                UNIT = 'deg'
@@ -938,18 +938,18 @@
 *  Get some workspace for the grid centres.
             CALL PSX_CALLOC( EL, '_DOUBLE', PNTRW, STATUS )
 
-*  Fill the workspace with the grid coordinate at the centre of each 
+*  Fill the workspace with the grid coordinate at the centre of each
 *  pixel.
-            CALL KPG1_ELNMD( 1, EL, EL, %VAL( CNF_PVAL( PNTRW ) ), 
+            CALL KPG1_ELNMD( 1, EL, EL, %VAL( CNF_PVAL( PNTRW ) ),
      :                       STATUS )
 
-*  Calculate new AXIS centres by transforming the grid centre values 
+*  Calculate new AXIS centres by transforming the grid centre values
 *  into the current Frame.
             CALL AST_TRAN1( MAP, EL, %VAL( CNF_PVAL( PNTRW ) ), .TRUE.,
      :                      %VAL( CNF_PVAL( PNTRW ) ), STATUS )
 
 *  Count the good values in the transformed array.
-            CALL KPG1_NBADD( EL, %VAL( CNF_PVAL( PNTRW ) ), 
+            CALL KPG1_NBADD( EL, %VAL( CNF_PVAL( PNTRW ) ),
      :                       NBAD, STATUS )
 
 *  Report an error if they are all bad.
@@ -969,16 +969,16 @@
                CALL NDF_ASTYP( '_DOUBLE', NDF, COMP, IAXIS, STATUS )
 
 *  Map the array component for write access.
-               CALL NDF_AMAP( NDF, MCOMP, IAXIS, '_DOUBLE', 'WRITE', 
+               CALL NDF_AMAP( NDF, MCOMP, IAXIS, '_DOUBLE', 'WRITE',
      :                        AXPNTR, EL, STATUS )
 
 *  Copy the centre values from the work array to the axis array.
-               CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( PNTRW ) ), 
+               CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( PNTRW ) ),
      :                          1, EL,
-     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          EL, STATUS )
 
-*  Set up the axis label and units.  Note that NDF_ACPUT does not 
+*  Set up the axis label and units.  Note that NDF_ACPUT does not
 *  truncate trailing blanks.
                ATTR = 'LABEL('
                IAT = 6
@@ -1002,7 +1002,7 @@
 *  Free the workspace.
             CALL PSX_FREE( PNTRW, STATUS )
 
-*  Unmap the array.  
+*  Unmap the array.
             CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
 
          END IF

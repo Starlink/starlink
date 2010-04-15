@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN, NPOS, 
-     :                       PIXPOS, STATUS ) 
+      SUBROUTINE KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN, NPOS,
+     :                       PIXPOS, STATUS )
 *+
 *  Name:
 *     KPS1_GLIDR
@@ -11,10 +11,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN, NPOS, PIXPOS, STATUS ) 
+*     CALL KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN, NPOS, PIXPOS, STATUS )
 
 *  Description:
-*     This routine stores the pixel co-ordinates at the centre of all the 
+*     This routine stores the pixel co-ordinates at the centre of all the
 *     bad pixels in the supplied array.
 
 *  Arguments:
@@ -71,8 +71,8 @@
 *  Type Definitions:
       IMPLICIT NONE            ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'        ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE parameters
       INCLUDE 'PRM_PAR'        ! VAL__ constants
 
 *  Arguments Given:
@@ -90,7 +90,7 @@
       INTEGER STATUS
 
 *  Local Variables:
-      INTEGER COUNT,I,J      
+      INTEGER COUNT,I,J
 *.
 
 *  Check inherited global status.

@@ -2,20 +2,20 @@
 *+
 *  Name:
 *     MAG1_CHKTD
- 
+
 *  Purpose:
 *     Get tape parameter descriptor from tape descriptor.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG1_CHKTD(TD, TP, RTP, STATUS)
- 
+
 *  Description:
 *     Given the MAG Tape Descriptor, the corresponding Tape parameter
 *     descriptor is found.
- 
+
 *  Arguments:
 *     TD=INTEGER (Given)
 *        The import tape descriptor
@@ -28,12 +28,12 @@
 *        SAI__OK on input, then the routine will return without action.  If
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
- 
+
 *  Algorithm:
 *     The Tape Descriptor is looked up in the MAG_PA common block.
 *     If it is found, then the parameter descriptor corrseponding to
 *     its position in the table is returned.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1986, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -57,7 +57,7 @@
 *  Authors:
 *     Sid Wright (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     05-APR-1983:  Original.  (UCL::JRG)
 *     14-Jul-1983: Vermagn for new parameter system. (UCL::SLW)
@@ -73,18 +73,18 @@
 *        Add INCLUDE 'DAT_PAR'
 *        Add INCLUDE 'PAR_PAR'
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     Formerly known as MAG_$CHKTD
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
@@ -95,25 +95,25 @@
 *    Local Constant
       INTEGER MAG__BASE
       PARAMETER (MAG__BASE=0)
- 
+
 *  Arguments Given:
       INTEGER TD                ! Tape Descriptor
- 
+
 *  Arguments Returned:
       INTEGER TP                ! tape parameter descriptor
       INTEGER RTP               ! relative tape parameter descriptor
 *    Status return :
       INTEGER STATUS            ! status return
- 
+
 *  Global Variables:
       INCLUDE 'MAGPA_SCL'       ! MAG Parameter Table
- 
+
 *  Local Variables:
       INTEGER I                 ! Loop index
- 
+
 *.
- 
- 
+
+
 C      print *,'mag1_chktd:  td ', td
       STATUS = MAG__UNKPA
       DO 100 I = 1, MAG__MXPAR
@@ -128,6 +128,6 @@ C      print *,'mag1_chktd:  td ', td
  100  CONTINUE
  1    CONTINUE
 C      print *,'mag1_chktd:  tp,rtp ', tp,rtp
- 
+
       RETURN
       END

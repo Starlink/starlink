@@ -47,23 +47,23 @@
 *     assigned it will be defaulted or prompted as appropriate when
 *     other CCDPACK applications are run.
 *
-*     If you are using CCDPACK Sets, then some of the parameters 
+*     If you are using CCDPACK Sets, then some of the parameters
 *     describing device characteristics may differ according to
 *     which member of each Set is being described.  By setting the
 *     BYSET parameter to true, and supplying a value for the INDEX
-*     parameter, you can indicate that the global values you supply 
-*     apply to the members of each Set with that Set Index.  
+*     parameter, you can indicate that the global values you supply
+*     apply to the members of each Set with that Set Index.
 *     In this case it will be necessary to run CCDSETUP once
 *     for each Set Index to be used (for instance, once for each
 *     chip in a mosaic camera), giving a different INDEX value each
-*     time.  This applies to the global parameters ADC, BOUNDS, 
+*     time.  This applies to the global parameters ADC, BOUNDS,
 *     DEFERRED, DIRECTION, EXTENT, MASK, RNOISE and SATURATION.
 *
 *     The removal of global parameters is performed by the CCDCLEAR
 *     application.
 
 *  Usage:
-*     ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=? 
+*     ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=?
 *              mask=?  direction=? deferred=? extent=? preserve=? genvar=?
 *              ndfnames=? useset=?
 
@@ -96,8 +96,8 @@
 *     BYSET = _LOGICAL (Read)
 *        This parameter does not give the value of a global parameter
 *        to be set up, but affects the behaviour of CCDSETUP.
-*        If true, a value for the INDEX parameter will be solicited, 
-*        and all the global values supplied will apply to 
+*        If true, a value for the INDEX parameter will be solicited,
+*        and all the global values supplied will apply to
 *        the processing of images with that Set Index.  In this way,
 *        you can provide different values of certain global parameters
 *        for different members of each Set (e.g. images read from
@@ -247,10 +247,10 @@
 *        [1.0D6]
 *     SETSAT = _LOGICAL (Read)
 *        This parameter controls how saturated data will be flagged for
-*        identification by later programs. If it is set TRUE then saturated 
-*        values will be replaced by the value of the parameter SATURATION 
-*        (which is also the value used to detect saturated data). If it is 
-*        FALSE then saturated values will be set to BAD (also known as 
+*        identification by later programs. If it is set TRUE then saturated
+*        values will be replaced by the value of the parameter SATURATION
+*        (which is also the value used to detect saturated data). If it is
+*        FALSE then saturated values will be set to BAD (also known as
 *        invalid).
 *        [FALSE]
 *     SAVE = _LOGICAL (Read)
@@ -267,25 +267,25 @@
 *        [CCDPACK_SETUP.DAT]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether CCDPACK Set header information
-*        will be used when it is available.  Most of the CCDPACK 
+*        will be used when it is available.  Most of the CCDPACK
 *        reduction and registration programs will look for Set header
 *        information in the .MORE.CCDPACK extension of the NDFs they
 *        are processing, and if it exists it will be used to modify
-*        the way the processing is done: broadly speaking, reduction 
+*        the way the processing is done: broadly speaking, reduction
 *        programs will group corresponding members of different Sets
 *        together before processing, and registration programs will
 *        make use of a CCD_SET frame for alignment between members
 *        of the same Set.
 *
 *        This header information will only be present if it has been
-*        added (to the NDF itself or to one earlier in the reduction 
+*        added (to the NDF itself or to one earlier in the reduction
 *        chain from which it was produced) by running the MAKESET
 *        program.  If it is not present, the programs will behave
 *        as if USESET was false anyway, so it is normally quite safe
 *        for USESET to be TRUE.  However, in some cases (especially
-*        if intermediate files are stored in foreign, i.e. non-NDF 
+*        if intermediate files are stored in foreign, i.e. non-NDF
 *        data formats) it may be more efficient to set this parameter
-*        false.  You should also set it false if you wanted CCDPACK 
+*        false.  You should also set it false if you wanted CCDPACK
 *        programs to ignore existing Set information for some reason.
 *
 *        If BYSET is true, this parameter will default to true also.
@@ -294,18 +294,18 @@
 *  Examples:
 *     ccdsetup
 *        This will prompt you to enter all the global variables.  You
-*        can accept defaults or enter the null value for any which 
+*        can accept defaults or enter the null value for any which
 *        you do not need to set.
 *
 *     ccdsetup byset index=1
 *        In this case you will be prompted to enter values which apply
-*        to that member of each CCDPACK Set of images which has a 
+*        to that member of each CCDPACK Set of images which has a
 *        Set Index of 1.
 *
 *     ccdsetup byset index=2 adc=1.5 mask=badpix2 accept
 *        This will fix the ADC value to 1.5 and the mask image to the
 *        file badpix2 only for those Set members with a Set Index of 2.
-*        No other values will be prompted for.  If this command is 
+*        No other values will be prompted for.  If this command is
 *        issued directly after the last example, then all the other
 *        global parameters will take the same values as were entered
 *        for index=1.
@@ -370,10 +370,10 @@
 *     All parameter values are obtained by prompting. The suggested
 *     values (defaults) are either the current global values, if they
 *     exist, or the application current values (from the last time that
-*     the application was run).  Global values corresponding to the 
-*     INDEX parameter will be used as defaults if they exist.  If the 
-*     application has not been run then the "intrinsic" defaults are 
-*     shown. The intrinsic defaults may be obtained at any time 
+*     the application was run).  Global values corresponding to the
+*     INDEX parameter will be used as defaults if they exist.  If the
+*     application has not been run then the "intrinsic" defaults are
+*     shown. The intrinsic defaults may be obtained at any time
 *     (in the absence of global values) by using the RESET keyword on
 *     the command line.
 
@@ -418,7 +418,7 @@
 *        Updated help for MASK (change to official ARD). Added help
 *        for V2.0 parameters.
 *     7-JUL-1997 (PDRAPER):
-*        Modified to output a NULL symbol message according to 
+*        Modified to output a NULL symbol message according to
 *        environment (INDEF for IRAF).
 *     26-MAR-2001 (MBT):
 *        Added USESET parameter.
@@ -517,8 +517,8 @@
 *  First remind users of useful options.
       CALL CCD1_SETEX( NULL, IAT, STATUS )
       CALL MSG_BLANK( STATUS )
-      IF ( NULL .EQ. '!' ) 
-     :   CALL MSG_OUT( ' ', '  Type "?" for help on any prompt.', 
+      IF ( NULL .EQ. '!' )
+     :   CALL MSG_OUT( ' ', '  Type "?" for help on any prompt.',
      :                 STATUS )
       LINE = '  Type "'//NULL(:IAT)//'" if you do not want to set a '//
      :       'parameter.'
@@ -585,7 +585,7 @@
       CALL CCD1_START( 'CCDSETUP.............................', STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Having called CCD1_START (which initialises the keyed parameter 
+*  Having called CCD1_START (which initialises the keyed parameter
 *  information) we can load in the index-specific values into the
 *  parameter database if we are keying parameters by Set Index.
       IF ( BYSET ) THEN
@@ -803,7 +803,7 @@
       END IF
 
 *  Will we seek CCDPACK Set headers?  If BYSET is true, then set the
-*  dynamic default to true, since if you are messing around with Sets 
+*  dynamic default to true, since if you are messing around with Sets
 *  in this program you almost certainly want to be in others.
       IF ( BYSET ) CALL PAR_DEF0L( 'USESET', BYSET, STATUS )
       CALL PAR_GET0L( 'USESET', USESET, STATUS )
@@ -841,21 +841,21 @@
          CALL CCD1_GPARF( 'UPDATE', .TRUE., GLOC, SLOC, STATUS )
 
 *  Store each parameter value as appropriate.
-         IF ( GOTADC ) 
+         IF ( GOTADC )
      :      CALL CCD1_KPSV( 'ADC', SINDEX, SLOC, STATUS )
-         IF ( GOTBDS ) 
+         IF ( GOTBDS )
      :      CALL CCD1_KPSV( 'BOUNDS', SINDEX, SLOC, STATUS )
-         IF ( GOTDEF ) 
+         IF ( GOTDEF )
      :      CALL CCD1_KPSV( 'DEFERRED', SINDEX, SLOC, STATUS )
-         IF ( GOTDIR ) 
+         IF ( GOTDIR )
      :      CALL CCD1_KPSV( 'DIRECTION', SINDEX, SLOC, STATUS )
-         IF ( GOTEXT ) 
+         IF ( GOTEXT )
      :      CALL CCD1_KPSV( 'EXTENT', SINDEX, SLOC, STATUS )
-         IF ( GOTMSK ) 
+         IF ( GOTMSK )
      :      CALL CCD1_KPSV( 'MASK', SINDEX, SLOC, STATUS )
-         IF ( GOTNOI ) 
+         IF ( GOTNOI )
      :      CALL CCD1_KPSV( 'RNOISE', SINDEX, SLOC, STATUS )
-         IF ( GOTSVL ) 
+         IF ( GOTSVL )
      :      CALL CCD1_KPSV( 'SATURATION', SINDEX, SLOC, STATUS )
 
 *  Release the parameter file locators.

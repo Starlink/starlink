@@ -7,7 +7,7 @@
 * Local
 	REAL		THETA1, THETA2, AREA1, AREA2
 	REAL		TAREA2
- 
+
 * trap the easy ones
 	if (sep .gt. (r1+r2)) then
 	  CIROVL = 0.
@@ -16,7 +16,7 @@
 	  CIROVL = 1.
 	  return
 	endif
- 
+
 	tarea2 = pi*r2**2
 	theta2=2.0*acos((r2**2+sep**2-r1**2)/(2.0*sep*r2))
 	if (theta2 .eq. pi) then
@@ -33,5 +33,5 @@
 	  area2=tarea2-0.5*(theta2-sin(theta2))*(r2**2)
 	  CIROVL=(area1+area2)/tarea2
 	endif
- 
+
 	end

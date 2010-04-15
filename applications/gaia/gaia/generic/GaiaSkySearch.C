@@ -537,7 +537,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
  * In GAIA %% is a pseudonym for "::". Needed as ":" separates multiple
  * symbols and "::" allows global variable access.
  */
-static void replace_percents( char *str ) 
+static void replace_percents( char *str )
 {
     char *p = str;
     while ( ( p = strstr( p, "%%" ) ) ) {
@@ -595,7 +595,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 
         //  Parse symbol info, a variable length list of
         //  {shape color ratio angle label cond}
-        if ((status = Tcl_SplitList(interp_, glsymbol, 
+        if ((status = Tcl_SplitList(interp_, glsymbol,
                                     &nsymb, &symb)) != TCL_OK) {
             free( glsymbol );
             break;
@@ -617,7 +617,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
         // parse the size expr list: {size units}
         glexpr = strdup( expr );
         replace_percents( glexpr );
-        if ((status = Tcl_SplitList(interp_, (char*)glexpr, 
+        if ((status = Tcl_SplitList(interp_, (char*)glexpr,
                                     &nexpr, &exprList)) != TCL_OK) {
             free( glexpr );
             break;
@@ -687,7 +687,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             }
             if ((status = plot_row(image, r, rownum, id, x, y, xy_units,
                                    numCols, colNames, colIndexes, shape,
-                                   bg, fg, ratio, angle, label, cond, size, 
+                                   bg, fg, ratio, angle, label, cond, size,
                                    units)) != TCL_OK)
                 break;
         }
@@ -1546,17 +1546,17 @@ int gaiaGenAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 	}
 	else if (strcmp(option, "-nrows") == 0) {
 	    if (Tcl_GetInt(interp, value, &nrows) != TCL_OK)
-		return error("bad value for max number of rows: ", 
+		return error("bad value for max number of rows: ",
                              Tcl_GetStringResult( interp ) );;
 	}
 	else if (strcmp(option, "-width") == 0) {
 	    if (Tcl_GetDouble(interp, value, &width) != TCL_OK)
-		return error("bad -width value: ", 
+		return error("bad -width value: ",
                              Tcl_GetStringResult( interp ) );
 	}
 	else if (strcmp(option, "-height") == 0) {
 	    if (Tcl_GetDouble(interp, value, &height) != TCL_OK)
-		return error("bad -height value: ", 
+		return error("bad -height value: ",
                              Tcl_GetStringResult( interp ) );
 	}
 	else {
@@ -1606,12 +1606,12 @@ int gaiaGenAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 		    break;
 		}
 		if (numValues == 2 && Tcl_GetDouble(interp, values[1], &radius2) != TCL_OK) {
-		    status = error("bad max radius value: ", 
+		    status = error("bad max radius value: ",
                                    Tcl_GetStringResult( interp ) );
 		    break;
 		}
 		if (Tcl_GetDouble(interp, values[0], &radius1) != TCL_OK) {
-		    status = error("bad min radius value: ", 
+		    status = error("bad min radius value: ",
                                    Tcl_GetStringResult( interp ) );
 		    break;
 		}
@@ -1622,12 +1622,12 @@ int gaiaGenAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 		    break;
 		}
 		if (numValues == 2 && Tcl_GetDouble(interp, values[1], &mag2) != TCL_OK) {
-		    status = error("bad max magnitude value: ", 
+		    status = error("bad max magnitude value: ",
                                    Tcl_GetStringResult( interp ) );
 		    break;
 		}
 		if (Tcl_GetDouble(interp, values[0], &mag1) != TCL_OK) {
-		    status = error("bad min magnitude value: ", 
+		    status = error("bad min magnitude value: ",
                                    Tcl_GetStringResult( interp ) );
 		    break;
 		}

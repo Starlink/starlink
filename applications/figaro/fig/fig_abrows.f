@@ -48,8 +48,8 @@ C
 C                                           KS / CIT 26th Feb 1984
 C
 C     Modifications:
-C     27-04-1999: Tim Ash (Starlink, RAL): Corrected mistake in 
-C     initialisation of ARRAYS, and initialised NBROW to zero, to 
+C     27-04-1999: Tim Ash (Starlink, RAL): Corrected mistake in
+C     initialisation of ARRAYS, and initialised NBROW to zero, to
 C     fix bugs encountered when running under Linux.
 C+
       IMPLICIT NONE

@@ -1,9 +1,9 @@
       SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS, N_MEAS,
-     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
      :     BOL_ADC, BOL_CHAN,
-     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
      :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
@@ -17,28 +17,28 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
 *     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
-*     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+*     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
 *     :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
 *     :     BOL_ADC, BOL_CHAN,
-*     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+*     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
 *     :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
 *     :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
 *     :     NPARS, PARS, STATUS)
- 
+
 *  Description:
 *     This routine takes an input name and reads in all NDFs resulting
 *     from this name. SCUBA sections are parsed. Text files are expanded
 *     into NDF+parameters. Nested text files are allowed.
- 
+
 *  Arguments:
 *     RLEV = INTEGER (Given)
 *        Recursion level. This is the number of times that the routine
-*        has called itself. A value of 1 should be passed in by the 
+*        has called itself. A value of 1 should be passed in by the
 *        external routine.
 *     NAME = CHAR (Given)
 *        Name of input file. This may also contain scuba section
@@ -150,9 +150,9 @@
 
 *  Notes:
 *     - This subroutine can be called recursively. A limit of 5 recursion
-*       levels is imposed. Note that recursion is not approved of in 
+*       levels is imposed. Note that recursion is not approved of in
 *       Fortran 77 (mainly because local variables remember their state
-*       on entry!). 
+*       on entry!).
 *     - Text files with extension .txt are converted to NDFs by the
 *       NDF_OPEN command. This is bad - do not use .txt files as batch
 *       files.
@@ -172,10 +172,10 @@
 *       Initial version removed from reds_wtfn_rebin.f
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'SURF_PAR'         ! SURF
@@ -201,7 +201,7 @@
 *  Arguments Returned:
       REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
       REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
-      REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC, 
+      REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
      :     MAX_FILE)
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -243,7 +243,7 @@
 
 *  Local constants:
       INTEGER          MAX_RECURS      ! Maximum recursion depth
-      PARAMETER (MAX_RECURS = 5)     
+      PARAMETER (MAX_RECURS = 5)
 
 *  Local Variables:
       CHARACTER * (40) DATA_SPEC(SCUBA__MAX_SECT) ! Array of data specs
@@ -290,7 +290,7 @@
       END IF
 
 *     Check that we have not exceeded the allowed number of files
-         
+
       IF (N_FILE .GT. MAX_FILE) THEN
 
          CALL MSG_SETI ('MAX', MAX_FILE)
@@ -317,10 +317,10 @@
 
          IN_NDF = NDF__NOID
 
-         CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
- 
+         CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS)
+
 *     If the status from this action is good then proceed to read
-*     the file. If it is bad then clear status and assume that we 
+*     the file. If it is bad then clear status and assume that we
 *     are dealing with an ASCII text file.
 
          IF (STATUS .EQ. SAI__OK) THEN
@@ -336,20 +336,20 @@
             END IF
 
 *     Read in the NDF
-            CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
+            CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE,
      :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE), 
+     :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE),
      :           N_MEAS(N_FILE),
-     :           1, IN_UT1(1), IN_UT1(N_FILE), IN_RA_CEN(N_FILE), 
+     :           1, IN_UT1(1), IN_UT1(N_FILE), IN_RA_CEN(N_FILE),
      :           IN_DEC_CEN(N_FILE), FITS(1, N_FILE), N_FITS(N_FILE),
-     :           WAVELENGTH, SUB_INSTRUMENT, 
-     :           OBJECT(N_FILE), UTDATE(N_FILE), UTSTART(N_FILE), 
+     :           WAVELENGTH, SUB_INSTRUMENT,
+     :           OBJECT(N_FILE), UTDATE(N_FILE), UTSTART(N_FILE),
      :           BOL_ADC, BOL_CHAN, BOL_RA_PTR(N_FILE),
      :           BOL_RA_END(N_FILE), BOL_DEC_PTR(N_FILE),
-     :           BOL_DEC_END(N_FILE), DATA_PTR(N_FILE), 
+     :           BOL_DEC_END(N_FILE), DATA_PTR(N_FILE),
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
      :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
-     :           QUALITY_END(N_FILE), QBITS(N_FILE), 
+     :           QUALITY_END(N_FILE), QBITS(N_FILE),
      :           .FALSE., 0, ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST,
      :           BOLWT(1,N_FILE), STATUS)
 
@@ -402,7 +402,7 @@
 
             END IF
 
-*     At this point we have finished with the input NDF. We need to 
+*     At this point we have finished with the input NDF. We need to
 *     annul the identifier regardless of STATUS otherwise it will never
 *     get freed and the filename will not even be usable for output
 *     later on.
@@ -438,10 +438,10 @@
 *     I assume that the number of values found in the line is the
 *     number of parameters specified (ie assume the order in the line
 *     is fixed).
-                  
+
                   N_FOUND = 0
                   CALL SCULIB_DECODE_REBIN_LINE(LINE, N_FOUND,
-     :                 SNAME, T_WEIGHT, T_SHIFT_DX, 
+     :                 SNAME, T_WEIGHT, T_SHIFT_DX,
      :                 T_SHIFT_DY, STATUS)
 
 *     Only read an NDF if at least one parameter was found on the line
@@ -460,19 +460,19 @@
 
                      RLEV = RLEV + 1
 
-                     CALL SURF_PSEUDO_RECURSE( RLEV, SNAME, 
-     :                    MAX_FILE, OUT_COORDS, N_FILE, N_BOL, N_POS, 
-     :                    N_INTS, N_MEAS, IN_UT1, IN_RA_CEN, 
-     :                    IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
-     :                    SUB_INSTRUMENT, OBJECT, UTDATE, 
+                     CALL SURF_PSEUDO_RECURSE( RLEV, SNAME,
+     :                    MAX_FILE, OUT_COORDS, N_FILE, N_BOL, N_POS,
+     :                    N_INTS, N_MEAS, IN_UT1, IN_RA_CEN,
+     :                    IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
+     :                    SUB_INSTRUMENT, OBJECT, UTDATE,
      :                    UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
-     :                    BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
-     :                    BOL_DEC_END, DATA_PTR, DATA_END, 
+     :                    BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
+     :                    BOL_DEC_END, DATA_PTR, DATA_END,
      :                    VARIANCE_PTR, VARIANCE_END,
      :                    QMF, QUALITY_PTR, QUALITY_END, QBITS,
      :                    ANG_INT, ANG_MEAS,
-     :                    INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, 
-     :                    SHIFT_DY,  NPARS, PARS, 
+     :                    INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX,
+     :                    SHIFT_DY,  NPARS, PARS,
      :                    STATUS)
 
                      RLEV = RLEV - 1
@@ -503,10 +503,10 @@
 
       SUBROUTINE SURF_PSEUDO_RECURSE( RLEV, SNAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS, N_MEAS,
-     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
      :     BOL_ADC, BOL_CHAN,
-     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
      :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
@@ -525,9 +525,9 @@
 *  Invocation:
 *     CALL SURF_PSEUDO_RECURSE( RLEV, SNAME, MAX_FILE,
 *    :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS, N_MEAS,
-*    :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+*    :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
 *    :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
-*    :     BOL_ADC, BOL_CHAN, BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+*    :     BOL_ADC, BOL_CHAN, BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
 *    :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
 *    :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
 *    :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
@@ -565,7 +565,7 @@
 *  Arguments Returned:
       REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
       REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
-      REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC, 
+      REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
      :     MAX_FILE)
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -609,17 +609,17 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
       CALL SURF_RECURSE_READ( RLEV, SNAME, MAX_FILE,
-     :     OUT_COORDS, N_FILE, N_BOL, N_POS, 
-     :     N_INTS, N_MEAS, IN_UT1, IN_RA_CEN, 
-     :     IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
-     :     SUB_INSTRUMENT, OBJECT, UTDATE, 
+     :     OUT_COORDS, N_FILE, N_BOL, N_POS,
+     :     N_INTS, N_MEAS, IN_UT1, IN_RA_CEN,
+     :     IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
+     :     SUB_INSTRUMENT, OBJECT, UTDATE,
      :     UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
-     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
-     :     BOL_DEC_END, DATA_PTR, DATA_END, 
+     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
+     :     BOL_DEC_END, DATA_PTR, DATA_END,
      :     VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT,
-     :     ANG_MEAS, INT_LIST, MEAS_LIST,BOLWT, WEIGHT, SHIFT_DX, 
-     :     SHIFT_DY,  NPARS, PARS, 
+     :     ANG_MEAS, INT_LIST, MEAS_LIST,BOLWT, WEIGHT, SHIFT_DX,
+     :     SHIFT_DY,  NPARS, PARS,
      :     STATUS)
 
       END

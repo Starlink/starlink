@@ -25,8 +25,8 @@
 *     "command.lis" file in the local dipso directory. If such a file is
 *     found, a warning is issued, and its contents displayed without
 *     processing. If this happens, no attempt is made to use any new
-*     style "command.hlp" files which may exist. 
-      
+*     style "command.hlp" files which may exist.
+
 *  Arguments:
 *     PARAMS = CHARACTER * ( * ) (Given)
 *        The command arguments supplied by the user.
@@ -65,13 +65,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER PARAMS*(*)
       CHARACTER OWNER*(*)
       CHARACTER LOCAL*(*)
       CHARACTER SYSTEM*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -102,7 +102,7 @@
      :     NMATCH,               ! No. of matching commands
      :     TLEN( 3 ),            ! Length of each command type
      :     WLEN                  ! Length of search word
-      
+
       LOGICAL
      :     SOME,                 ! Have any command files been found?
      :     MATCH,                ! Does current command match class list?
@@ -132,7 +132,7 @@
 *  dipso directory. If it does, issue a warning message and display the
 *  contents of the file.
       IF( LOCAL .NE. ' ' ) THEN
-         FILE = LOCAL//'command.lis'            
+         FILE = LOCAL//'command.lis'
 
 *  See if the file exists.
          INQUIRE ( FILE = FILE, EXIST = THERE, IOSTAT = IOSTAT )
@@ -164,7 +164,7 @@
             CALL PRPAGE( 'COMMANDS', ' ', .FALSE., STATUS )
             CALL PRPAGE( 'COMMANDS', 'WARNING: An old style ' //
      :                   '''commands.lis'' has been found in the ' //
-     :                   'local DIPSO directory, and will be used.', 
+     :                   'local DIPSO directory, and will be used.',
      :                   .FALSE., STATUS )
 
 *  Warn the user that searches and classes are not supported by
@@ -175,11 +175,11 @@
      :                      'classifications are not available using '//
      :                      'old style ''commands.lis'' files.',
      :                      .FALSE., STATUS )
-            END IF               
-            
+            END IF
+
 *  Abort if an error has occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999
-               
+
 *  Read the next record. Jump to label 20 when the end of file is
 *  reached.
  10         READ ( 77, '(A)', IOSTAT = IOSTAT, END = 20 ) RECORD
@@ -191,16 +191,16 @@
      :                       '''^F'': ^ERR', STATUS )
                GO TO 999
             END IF
-            
+
 *  Display the record, pausing at the end of each page-full.
             CALL PRPAGE( 'COMMANDS', RECORD, .FALSE., STATUS )
-            
+
 *  Go back for the next record.
             GO TO 10
-            
+
 *  Arrive here when the end-of-file has been reached.
  20         CONTINUE
-            
+
 *  Close the file.
             CLOSE ( UNIT = 77, IOSTAT = IOSTAT )
             IF( IOSTAT .NE. 0 ) THEN
@@ -211,15 +211,15 @@
      :                       '''^F'': ^ERR', STATUS )
                GO TO 999
             END IF
-            
+
          END IF
 
       END IF
-         
-*  If no local commands.lis file was found, use the new-style "commands.hlp" 
+
+*  If no local commands.lis file was found, use the new-style "commands.hlp"
 *  file.
       IF( .NOT. THERE ) THEN
-         
+
 *  See if a search word has been given (as indicated by the first
 *  character being a minus sign). If it has, set a flag and remove
 *  the minus sign.
@@ -237,28 +237,28 @@
 
 *  Set a flag saying that no command information has been found yet.
          SOME = .FALSE.
-         
+
 *  Do the owner, local and system commands in turn.
          DO I = 1, 3
-            
+
 *  Get the name of the file containing the command classifications and
 *  descriptions. Store a blank file name if the directory is not
 *  defined.
             FILE = ' '
             IF( I .EQ. 1 ) THEN
                IF( OWNER .NE. ' ' ) FILE = OWNER//'command.hlp'
-               
+
             ELSE IF( I .EQ. 2 ) THEN
-               IF( LOCAL .NE. ' ' ) FILE = LOCAL//'command.hlp'            
-               
-            ELSE 
+               IF( LOCAL .NE. ' ' ) FILE = LOCAL//'command.hlp'
+
+            ELSE
                IF( SYSTEM .NE. ' ' ) FILE = SYSTEM//'command.hlp'
-               
+
             END IF
-            
+
 *  If the directory is defined...
             IF( FILE .NE. ' ' ) THEN
-               
+
 *  See if the file exists.
                INQUIRE ( FILE = FILE, EXIST = THERE, IOSTAT = IOSTAT )
                IF( IOSTAT .NE. 0 ) THEN
@@ -269,7 +269,7 @@
      :                 'existence of file ''^F'': ^ERR', STATUS )
                   GO TO 999
                END IF
-               
+
 *  If it does, open it on unit 77 (first attempt to close it in case it
 *  was left open last time).
                IF( THERE ) THEN
@@ -284,11 +284,11 @@
      :                             ' ''^F'': ^ERR', STATUS )
                      GO TO 999
                   END IF
-                  
+
 *  Tell the user where we are looking:
                   CALL PRPAGE( 'COMMANDS', ' ', .FALSE., STATUS )
 
-                  IF( I .LT. 3 .OR. SOME ) THEN               
+                  IF( I .LT. 3 .OR. SOME ) THEN
                      CALL PRPAGE( 'COMMANDS', '  '//
      :                    TYPE( I )( : TLEN( I ) )//' commands:',
      :                    .FALSE., STATUS )
@@ -296,14 +296,14 @@
 
 *  Abort if an error has occurred.
                   IF( STATUS .NE. SAI__OK ) GO TO 999
-                  
+
 *  Indicate that a command file has been found.
                   SOME = .TRUE.
-                  
+
 *  Initialise the number of commands which match the specified class
 *  list.
                   NMATCH = 0
-                  
+
 *  Read the next record. Jump to label 40 when the end of file is
 *  reached.
  30               READ ( 77, '(A)', IOSTAT = IOSTAT, END = 40 ) RECORD
@@ -315,35 +315,35 @@
      :                             ' ''^F'': ^ERR', STATUS )
                      GO TO 999
                   END IF
-                  
+
 *  Convert tabs to spaces, and remove all unprintable characters.
 
                   CALL CHR_TRCHR( CHAR( 9 ), ' ', RECORD, STATUS )
                   CALL CHR_CLEAN( RECORD )
-                  
+
 *  Skip blank records.
                   IF( RECORD .EQ. ' ' ) GO TO 30
-                  
+
 *  Remove leading blanks from the record.
                   CALL CHR_LDBLK( RECORD )
-                  
+
 *  Skip comment records.
                   IF( RECORD( 1 : 1 ) .EQ. '#' ) GO TO 30
-                  
+
 *  Find the end of the first word (the command name).  Remove any bad
 *  status value set by CHR_FIWE (CHR does not use ERR and so ERR_ANNUL
 *  need not be called).
                   CMLEN = 1
                   CALL CHR_FIWE( RECORD, CMLEN, STATUS )
                   IF( STATUS .NE. SAI__OK ) STATUS = SAI__OK
-                  
+
 *  Store the command name in upper case, and remove it from the record
-*  buffer. 
+*  buffer.
                   COMND = RECORD( : CMLEN )
                   CALL CHR_UCASE( COMND )
                   RECORD( : CMLEN ) = ' '
                   CALL CHR_LDBLK( RECORD )
-                  
+
 *  Now extract the second word in the record (which has become the
 *  first word in the buffer). This gives the list of classes to which
 *  the command belongs. Remove the word from the buffer once it has
@@ -353,20 +353,20 @@
                      CLLEN = 1
                      CALL CHR_FIWE( RECORD, CLLEN, STATUS )
                      IF( STATUS .NE. SAI__OK ) STATUS = SAI__OK
-                     
+
                      CLIST = RECORD( : CLLEN )
                      CALL CHR_UCASE( CLIST )
                      RECORD( : CLLEN ) = ' '
                      CALL CHR_LDBLK( RECORD )
-                     
+
                   ELSE
                      CLIST = '-'
                      CLLEN = 1
                   END IF
-                  
+
 *  If a plain list of all commands is required...
                   IF( PARAMS .EQ. ' ' ) THEN
-                     
+
 *  If there is insufficient room in the output buffer for the new
 *  command name, write out the buffer (pausing after each page-full),
 *  and reset the index of the next free cell.
@@ -376,77 +376,77 @@
                         OUT = ' '
                         IOUT = 1
                      END IF
-                     
+
 *  Append the command name to the output buffer, and increment the
 *  index for the start of the next command to the start of the next
 *  unoccupied column.
                      OUT( IOUT : ) = COMND
                      IOUT = FW*INT( ( IOUT + CMLEN - 1 )/FW ) + FW + 1
-                     
+
 *  Increment the number of matching commands.
                      NMATCH = NMATCH + 1
-                     
+
 *  If names and descriptions of commands matching the supplied class
 *  lists are required...
                   ELSE
-                     
+
 *  If a search for a given word is being performed see if the word is
 *  contained in the command description (case insensitive).
                      IF( SEARCH ) THEN
-                        
+
                         RECUP = RECORD
                         CALL CHR_UCASE( RECUP )
-                        
+
                         IF( INDEX( RECUP, PARAMS( : WLEN ) ) .GT. 0 )
      :                                                              THEN
                            MATCH = .TRUE.
-                           
+
 *  If the word was not found in the command description, compare it to
 *  the command name.
                         ELSE
-                           MATCH = ( INDEX( COMND( : CMLEN ), 
-     :                          PARAMS( : WLEN ) ) .GT. 0 ) 
+                           MATCH = ( INDEX( COMND( : CMLEN ),
+     :                          PARAMS( : WLEN ) ) .GT. 0 )
                         END IF
-                        
+
 *  Otherwise, see if this command matches the supplied class lists.
                      ELSE
                         CALL CMATCH( CLIST( : CLLEN ), PARAMS, MATCH )
-                        
+
                      END IF
-                     
+
 *  If the command matches the given criteria...
                      IF( MATCH ) THEN
-                        
+
 *  Construct the output buffer holding the command name followed by the
 *  command's description, and print it.
                         OUT = ' '
                         OUT = COMND( : CMLEN )
                         IF( RECORD .NE. ' ' ) THEN
-                           OUT( FW*INT( CMLEN/FW ) + FW + 1 : ) = 
+                           OUT( FW*INT( CMLEN/FW ) + FW + 1 : ) =
      :                          ' - '//RECORD
                         END IF
-                        
+
                         CALL PRPAGE( 'COMMANDS', OUT, .FALSE., STATUS )
-                        
+
 *  Increment the number of matching commands.
                         NMATCH = NMATCH + 1
-                        
+
                      END IF
-                     
+
                   END IF
-                  
+
 *  Close the file and abort if an error has occurred.
                   IF( STATUS .NE. SAI__OK ) THEN
                      CLOSE ( UNIT = 77 )
                      GO TO 999
                   END IF
-                  
+
 *  Read the next record.
                   GO TO 30
-                  
+
 *  Jump to to here when the end of file has been reached.
  40               CONTINUE
-                  
+
 *  Close the file.
                   CLOSE ( UNIT = 77, IOSTAT = IOSTAT )
                   IF( IOSTAT .NE. 0 ) THEN
@@ -457,7 +457,7 @@
      :                             ' ''^F'': ^ERR', STATUS )
                      GO TO 999
                   END IF
-                  
+
 *  Flush the output buffer if required.
                   IF( IOUT .GT. 1 ) THEN
                      CALL PRPAGE( 'COMMANDS', OUT, .FALSE., STATUS )
@@ -465,21 +465,21 @@
                      OUT = ' '
                      IOUT = 1
                   END IF
-                  
+
 *  Issue a message if no commands were found.
                   IF( NMATCH .EQ. 0 ) THEN
                      CALL PRPAGE( 'COMMANDS', '    <no commands found'//
-     :                    ' in the given classes>', .FALSE., 
+     :                    ' in the given classes>', .FALSE.,
      :                    STATUS )
                      IF( STATUS .NE. SAI__OK ) GO TO 999
                   END IF
-                  
+
                END IF
-               
+
             END IF
-            
+
          END DO
-         
+
 *  If no command files were found, repoort an error.
          IF( .NOT. SOME .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -488,7 +488,7 @@
          END IF
 
       END IF
-         
+
 *  Jump to here if an error has occurred.
  999  CONTINUE
 

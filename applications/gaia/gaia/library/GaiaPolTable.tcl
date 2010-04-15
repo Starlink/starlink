@@ -11,8 +11,8 @@
 
 #  Description:
 #     This class handles the visualisation of polarimetry data by creating
-#     a table of column values. 
-#    
+#     a table of column values.
+#
 #  Invocations:
 #
 #        GaiaPolTable object_name [configuration options]
@@ -84,12 +84,12 @@ itcl::class gaia::GaiaPolTable {
 #  -----------
    constructor { w rtdimage table pbar selcmd} {
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolTable" } {
-         init $w $rtdimage $table $pbar $selcmd 
+         init $w $rtdimage $table $pbar $selcmd
       }
    }
 
@@ -99,14 +99,14 @@ itcl::class gaia::GaiaPolTable {
       catch { clear }
    }
 
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolTable constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolTable constructor using a user-supplied
 #  argument list.
 #  ----------------------------------------------------------------------
    protected method init { w rtdimage table pbar selcmd } {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class.
       set w_ $w
@@ -171,7 +171,7 @@ itcl::class gaia::GaiaPolTable {
 #  Create new lists for converting between catalogue and table row
 #  indices, incorporating the effects of the sorting.
       ctrows
-      
+
 #  Ensure all the previously selected catalogue rows are still selected.
       highlight
 
@@ -205,9 +205,9 @@ itcl::class gaia::GaiaPolTable {
 
 #  Reset the progress bar.
       resetHold
- 
+
    }
-   
+
 #  Called when new rows are selected by releasing button 1 over the table.
 #  -----------------------------------------------------------------------
    public method tabSel {} {
@@ -216,24 +216,24 @@ itcl::class gaia::GaiaPolTable {
       set crows ""
       foreach trow [$table_ component listbox curselection] {
          lappend crows $crows_($trow)
-      } 
+      }
 
 #  Call the script to establish the new selection within the parent
 #  GaiaPolarimetry toolbox. This will re-style the vectors on the canvas,
 #  etc.
-      eval $selcmd_ 1 1 "rows" \{ $crows \}  
+      eval $selcmd_ 1 1 "rows" \{ $crows \}
 
    }
 
 #  Updates the table so that it represents the data in the supplied
 #  catalogue, with the correct rows shown selected. If possible, this
-#  is done by reconfiguring the existing table rows. This is possible if 
-#  the supplied catalogue refers to the same data file as the previously 
+#  is done by reconfiguring the existing table rows. This is possible if
+#  the supplied catalogue refers to the same data file as the previously
 #  tabulated catalogue (this would be the case for instance if the
 #  previous action was to select or deselect some vectors) AND none of
 #  the vectors have been removed (marked as deleted by a cut operation)
-#  If the supplied catalogue refers to a different data file, (which would 
-#  be the case for instance if the previous action was a "bin" operation) OR 
+#  If the supplied catalogue refers to a different data file, (which would
+#  be the case for instance if the previous action was a "bin" operation) OR
 #  if any vectors have been deleted, then the table is cleared first and
 #  the supplied catalogue is tabulated from scratch. If $force is non-zero
 #  the table is retabulated from scratch even if it seems not to have
@@ -244,7 +244,7 @@ itcl::class gaia::GaiaPolTable {
 #  Indicate what is happening.
       setHold "Tabulating the vectors..."
 
-#  If no catalogiue is currently displayed, or if we have been forced, we need 
+#  If no catalogiue is currently displayed, or if we have been forced, we need
 #  to tabulate the supplied catalogue from scratch.
       if { $prevcat == "" || $force } {
          set clear 1
@@ -258,12 +258,12 @@ itcl::class gaia::GaiaPolTable {
 #  supplied catalogue.
           lassign [$prevcat changes $cat] catdesc catch
 
-#  If the catalogue requires the table to be tabulated from scratch, indicate 
+#  If the catalogue requires the table to be tabulated from scratch, indicate
 #  this.
           if { $catch == "redraw" } {
              set clear 1
 
-#  Otherwise, attempt to update the current table by changing the selection. 
+#  Otherwise, attempt to update the current table by changing the selection.
 #  This will not be possible if any of the rows have been marked for deletion.
           } else {
              set clear [selTab $cat $catch]
@@ -271,9 +271,9 @@ itcl::class gaia::GaiaPolTable {
       }
 
 #  If a complete redraw from scratch is required, do it.
-      if { $clear } { 
+      if { $clear } {
          clear
-         tab $cat 
+         tab $cat
       }
 
 #  Reset the progress bar.
@@ -314,7 +314,7 @@ itcl::class gaia::GaiaPolTable {
       set deccol_ ""
       $table_ config -filtercmd  "#"
 
-#  If RA and DEC columns are available, add a filter to the TableList which converts 
+#  If RA and DEC columns are available, add a filter to the TableList which converts
 #  RA/DEC values from decimal degrees to H:M:S format.
       if { [$cat gotWcs] } {
 
@@ -357,27 +357,27 @@ itcl::class gaia::GaiaPolTable {
 #  Ensure all columns are visible.
       $table_ set_options $heads_ Show 1
 
-#  Get access to an array of row states (selected, unselected, deleted) 
+#  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
       upvar 0 [$cat getStates] states
 
 #  Initialise the list of remaining data.
       set remdata ""
 
-#  Loop round each row in the catalogue. If the row has not been marked as 
-#  deleted, add its data to the list of remaining data.  Also save a list 
+#  Loop round each row in the catalogue. If the row has not been marked as
+#  deleted, add its data to the list of remaining data.  Also save a list
 #  of all row identifiers in the catalogue.
       set crow -1
       foreach row [$cat getData] {
          incr crow
-         if { $states($crow) != "D" } { 
-            lappend remdata $row 
+         if { $states($crow) != "D" } {
+            lappend remdata $row
          }
          set catrow_([lindex $row $id_col_]) $crow
       }
 
 #  Add the remaining data into the TableList.
-      $table_ config -info $remdata 
+      $table_ config -info $remdata
 
 #  Create lists which enable conversion between table and catalogue row
 #  indices.
@@ -404,7 +404,7 @@ itcl::class gaia::GaiaPolTable {
       set ret 0
       if { [llength $crows] > 0 } {
 
-#  Get access to an array of row states (selected, unselected, deleted) 
+#  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
          upvar 0 [$cat getStates] states
 
@@ -416,14 +416,14 @@ itcl::class gaia::GaiaPolTable {
          foreach crow $crows {
             if { [catch {set trow $trows_($crow)}] } {
                set ret 1
-               break 
-            } else {            
+               break
+            } else {
                set state $states($crow)
                if { $state == "S" } {
                   $table_ select_row $trow 0
 
                } elseif { $state == "U" } {
-                  $table_ deselect_row $trow 
+                  $table_ deselect_row $trow
 
                } elseif { $state == "D" } {
                   set ret 1
@@ -439,7 +439,7 @@ itcl::class gaia::GaiaPolTable {
       return $ret
    }
 
-#  Ensure that the table is scrolled in order to make the last selected 
+#  Ensure that the table is scrolled in order to make the last selected
 #  row visible. Do this by re-selecting the last selected row (if any).
 #  --------------------------------------------------------------------
    protected method seeTabSel {} {
@@ -467,7 +467,7 @@ itcl::class gaia::GaiaPolTable {
    }
 
 
-#  Create arrays which allow row indices to be converted between catalogue 
+#  Create arrays which allow row indices to be converted between catalogue
 #  (crow) and table (trow). These may not be the same since not all
 #  catalogue rows may be included int he table, and the table may have been
 #  sorted.
@@ -475,7 +475,7 @@ itcl::class gaia::GaiaPolTable {
    protected method ctrows {} {
       catch {unset crows_}
       catch {unset trows_}
-   
+
       set trow -1
       foreach row [$table_ get_contents] {
          incr trow
@@ -494,11 +494,11 @@ itcl::class gaia::GaiaPolTable {
       for {set crow 0} {$crow < $nrow} {incr crow} {
          if { $states($crow) == "S" } {
             $table_ select_row $trows_($crow) 0
-         } 
-      }         
+         }
+      }
    }
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -506,7 +506,7 @@ itcl::class gaia::GaiaPolTable {
       variable cat_ ""
 
 #  An array of catalogue row indices indexed by row identifier.
-      variable catrow_ 
+      variable catrow_
 
 #  An array of catalogue row indices indexed by table row index.
       variable crows_
@@ -534,7 +534,7 @@ itcl::class gaia::GaiaPolTable {
       variable table_ ""
 
 #  An array of table row indices indexed by catalogue row index.
-      variable trows_ 
+      variable trows_
 
 #  Top level window.
       variable w_ ""

@@ -22,14 +22,14 @@ C  Call:
 C     CALL PAR_RDCHAR (NAME,RESET,STRING)
 C
 C  Parameters:      (">" input, "<" output )
-C     (>) NAME      (Fixed string, descr) The name of the parameter.  
-C                   Should be terminated by a blank or the end of the 
+C     (>) NAME      (Fixed string, descr) The name of the parameter.
+C                   Should be terminated by a blank or the end of the
 C                   string.  Case is not significant.  If '/NOCHECK'
 C                   is appended to the parameter name, it is ignored but
 C                   only the name itself used.
 C     (>) RESET     (Fixed string, descr) The reset value for the
 C                   parameter.
-C     (<) STRING    (Fixed string, descr) The value of the parameter as 
+C     (<) STRING    (Fixed string, descr) The value of the parameter as
 C                   obtained by the rules below.
 C
 C  Prior requirements:
@@ -45,7 +45,7 @@ C          Horst Meyerdierks, UoE, Starlink
 C
 C  Original version: KS / CIT 16th Feb 1984
 C
-C  Modified: 
+C  Modified:
 C     12th July 1985.  KS / AAO.  WRUSER, RDUSER finally replaced
 C                      by PAR_WRUSER, PAR_RDUSER calls.
 C     13th May 1986    KS / AAO.  Now gets prompt string from common,
@@ -57,7 +57,7 @@ C     5th Sept 1988.   KS / AAO.  Support for parameter abort added.
 C     20th Jan 1989.   KS / AAO.  Use of second prompt line when current
 C                      string is very long added.
 C     8th  Dec 1989.   KS / AAO.  Comments reformatted.
-C     3rd  Mar 1991.   KS / AAO.  Added support for repeated values 
+C     3rd  Mar 1991.   KS / AAO.  Added support for repeated values
 C                      read from parameter value files.  Test for file
 C                      existence (which had assumed a '.DST' file
 C                      extension and now gets in the way) removed.

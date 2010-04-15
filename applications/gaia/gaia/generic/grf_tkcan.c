@@ -675,7 +675,7 @@ int astGLine( int n, const float *x, const float *y ) {
                     RtdSegmentSetCoords( Interp, 0, xlines, ylines, npoints );
 
                     /*  Record the name of the item we have just created. */
-                    (void) strncpy( Segment, Tcl_GetStringResult( Interp ), 
+                    (void) strncpy( Segment, Tcl_GetStringResult( Interp ),
                                     TAGLEN - 1 );
                     NewSegment = 0;
                 }
@@ -966,7 +966,7 @@ int astGText( const char *text, float x, float y, const char *just,
                          "%s create text %f %f -text {%s} -angle %f "
                          "-anchor %s -font {%s %d %s} -fill %s -tag {%s} \n",
                          Canvas, (double) x, (double) y, text, angle, anchor,
-                         finfo.family, size, finfo.style, 
+                         finfo.family, size, finfo.style,
                          Colours[ConfigInfo.colour], ConfigInfo.tag );
 
         if ( Tcl_Eval( Interp, buffer ) != TCL_OK ) {
@@ -1458,13 +1458,13 @@ static int textBBox( double x, double y, const char *text,
     size = (int)( (double)finfo.size * ConfigInfo.size );
     (void) sprintf ( buffer, "%s create text %f %f -text {%s} "
                      "-anchor %s -font {%s %d %s} -tag grf_word_temp",
-                     Canvas, x, y, text, anchor, finfo.family, size, 
+                     Canvas, x, y, text, anchor, finfo.family, size,
                      finfo.style );
 
     if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
 
         /*  Now get the bounding box of the text and then remove it. */
-        (void) sprintf ( buffer, "%s bbox %s \n", Canvas, 
+        (void) sprintf ( buffer, "%s bbox %s \n", Canvas,
                          Tcl_GetStringResult( Interp ) );
         if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
 

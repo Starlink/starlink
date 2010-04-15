@@ -11,16 +11,16 @@
       subroutine utl_ls(status)
 *    Description:
 *      List the contents of a dataset.
-*   
+*
 *      The contents of the dataset specified by the DATASET parameter are
 *      listed on Standard Output.
 *      A summary of the contents of the dataset is given including the
 *      name, type and for primitive objects the first few values.
-*   
+*
 *    Parameters:
 *       DATASET = UNIV( READ )
 *                 dataset to be listed
-*   
+*
 *    Method :
 *     Check that the object is a Scalar Structure, and then use
 *     UTDIRT to list its contents.

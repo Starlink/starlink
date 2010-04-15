@@ -28,7 +28,7 @@ C AD_GCL         Get some CL parameters
 C AD_DOIT        Add the stars
 C AD_RIMGADDR    Add a constant with (scaled poisson noise) to real array.
 C AD_RIMGNOISE   Add scaled poisson noise to a real array
-C AD_RIMGADDN    Add a poisson noise (of a fixed size, mean zero) 
+C AD_RIMGADDN    Add a poisson noise (of a fixed size, mean zero)
 C AD_ADDM(SR)IR  Add a scaled integer*2/real (magic values) image to a real image
 C AD_RCOR        Correct a real array for BS, BZ
 
@@ -49,7 +49,7 @@ C--
 Cbegin
 
 
-      call ad_gcl							!Get some CL params and 
+      call ad_gcl							!Get some CL params and
       if ( ST_FAILED ) return						! open some files
 
       call gtwrkr ( 'WORK', NX*NY, ipd, istat )				!Open working image
@@ -87,7 +87,7 @@ Cbegin
       call ad_rcor ( %val(ipd), NX*NY )			 		!Scale back to input
       if ( ST_FAILED ) return
 
-      if ( OUTTYPE.eq.'SHORT' ) then					!Work image to output image 
+      if ( OUTTYPE.eq.'SHORT' ) then					!Work image to output image
          call achtrs ( %val(ipd), %val(IPO), NX*NY )
       else
          call amovr ( %val(ipd), %val(IPO), NX*NY )
@@ -133,7 +133,7 @@ Cbegin
 
       gotran = .false.							!Default
 
-      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .true., istat )		!Get the input image data 
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .true., istat )		!Get the input image data
       if ( ST_FAILED ) return
       if ( istat.eq.2 ) then						! array or new image size
          ADDIM = .false.
@@ -160,19 +160,19 @@ Cbegin
          if ( IMTYPE.eq.'SHORT' ) RINVAL = INVAL
       endif
 
-      call optabr ( 'INSTARS', IPXY, TBX5, TBY, .false., istat )	!Now seek the list of positions 
+      call optabr ( 'INSTARS', IPXY, TBX5, TBY, .false., istat )	!Now seek the list of positions
       if ( istat.ne.0 ) then						! and magnitudes
          ST_FAILED = .true.
          call printo ( 'ERROR: Star list wrong' )
       elseif ( TBX5.lt.8 ) then
          ST_FAILED = .true.
-         call printo ( 
+         call printo (
      +         'ERROR: Star list must have at least three columns' )
       endif
       if ( ST_FAILED ) return
 
       call get_mprof ( 'PROFILE', IPTMAP, PROF, MX, MY, MZ,		!Get profile
-     +                 MAGNIFK, MAPXK, MAPYK, BSM, BZM, qbase, 
+     +                 MAGNIFK, MAPXK, MAPYK, BSM, BZM, qbase,
      +                 rv, rva, istat )
       if ( istat.ne.0 ) then
          ST_FAILED = .true.
@@ -187,7 +187,7 @@ Cbegin
 
       call get1b ( 'DOMAP', DOMAP, .true. )				!Get if to use profile map
 
-      call get1b ( 'PYES', PBOSS, .true. )				!Get if profile paramaters 
+      call get1b ( 'PYES', PBOSS, .true. )				!Get if profile paramaters
 									! to overide star list profile
 
       rv = 100.0							!Get the sky level
@@ -202,8 +202,8 @@ Cbegin
             call printo ( 'Noise will be added as though stars +ve' )
          endif
          call get1r ( 'STARGAIN', STARGAIN, 1.0, 0.0, 1.0e8 )
-         if ( .not.gotran .and. STARGAIN.ne.0.0 ) then	
-            call get1i ( 'SEED', NRAN, 1234567891, 1200000001, 
+         if ( .not.gotran .and. STARGAIN.ne.0.0 ) then
+            call get1i ( 'SEED', NRAN, 1234567891, 1200000001,
      +                1400000001 )
             if ( ST_FAILED ) return
             gotran = .true.
@@ -222,7 +222,7 @@ Cbegin
             call get1r ( 'SKYGAIN', SKYGAIN, 1.0, 0.0, 1.0e8 )
             if ( ST_FAILED ) return
             if ( .not.gotran .and. SKYGAIN.ne.0.0 ) then
-               call get1i ( 'SEED', NRAN, 1234567891, 1200000001, 
+               call get1i ( 'SEED', NRAN, 1234567891, 1200000001,
      +                      1400000001 )
                gotran = .true.
             endif
@@ -232,7 +232,7 @@ Cbegin
       call get1r ( 'PIXNOISE', PIXNOISE, 0.0, 0.0, 1.0e8 )		!Get if sky image have extra noise
       if ( ST_FAILED ) return
       if ( .not.gotran .and. PIXNOISE.ne.0.0 ) then
-         call get1i ( 'SEED', NRAN, 1234567891, 1200000001, 
+         call get1i ( 'SEED', NRAN, 1234567891, 1200000001,
      +                1400000001 )
          if ( ST_FAILED ) return
          gotran = .true.
@@ -243,7 +243,7 @@ Cbegin
       if ( istat.ne.0 ) then
          ST_FAILED = .true.
          call printo ( 'ERROR: Output file wrong' )
-         return 
+         return
       endif
       if ( .not.ADDIM ) title = 'Output from ADDSTARS'
       call get1c ( 'TITLE', title, title, .true. )
@@ -327,7 +327,7 @@ Cbegin
             if ( ierr.eq.0 ) then
                call lowcase ( thead, ahead )
                if ( ahead.eq.'ht' .or. ahead.eq.'hts' .or.
-     +              ahead.eq.'height' .or. ahead.eq.'heights' ) 
+     +              ahead.eq.'height' .or. ahead.eq.'heights' )
      +              khead(3) = k
             endif
          enddo
@@ -346,19 +346,19 @@ Cbegin
       do k = 1, TBY							!Add or Remove stars
 
          call getd ( %val(IPXY), TBX5, TBY, khead, k, x, y, h, 3, PROF,
-     +               aprof, mapnum, mapx, mapy, magnif, MAGNIFK, MAPXK, 
+     +               aprof, mapnum, mapx, mapy, magnif, MAGNIFK, MAPXK,
      +               MAPYK, 1, PBOSS )
 
-         if ( DOMAP ) call rchzero ( map, MX, MY, MZ, mapnum, mapx, 
+         if ( DOMAP ) call rchzero ( map, MX, MY, MZ, mapnum, mapx,
      +                               mapy, DOMAP )
 
          if ( ADD.eq.'ADD' ) then
-            call popamr ( rim, NX, NY, 1.0, RINVAL, x, y, h, aprof, 
-     +                    map, MX, MY, MZ, mapnum, mapx, mapy, magnif, 
+            call popamr ( rim, NX, NY, 1.0, RINVAL, x, y, h, aprof,
+     +                    map, MX, MY, MZ, mapnum, mapx, mapy, magnif,
      +                    DOMAP, ierr, kxw )
          else
-            call popsmr ( rim, NX, NY, 1.0, RINVAL, x, y, h, aprof, 
-     +                    map, MX, MY, MZ, mapnum, mapx, mapy, magnif, 
+            call popsmr ( rim, NX, NY, 1.0, RINVAL, x, y, h, aprof,
+     +                    map, MX, MY, MZ, mapnum, mapx, mapy, magnif,
      +                    DOMAP, ierr, kxw )
          endif
 
@@ -393,7 +393,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( rval.eq.0 ) return
-      
+
       if ( donoise .and. scale.ne.0.0 ) then
          sval = rval*scale
          if ( sval.lt.0.0 ) sval = -1.0*sval
@@ -512,7 +512,7 @@ Cbegin
       do k = 1, NY
 	 do j = 1, NX
             if ( ia(j,k).eq.RINVAL ) then
-               rim(j,k) = RINVAL 
+               rim(j,k) = RINVAL
             else
                rim(j,k) = rim(j,k) + BS*ia(j,k) + BZ
             endif
@@ -574,7 +574,7 @@ C--
       integer k
 Cbegin
 
-  
+
       if ( ST_FAILED ) return
 
       if ( BZ.eq.0.0 .and. BS.eq.1.0 ) return

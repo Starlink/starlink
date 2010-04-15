@@ -9,13 +9,13 @@ C
 C     Function:
 C        Reduce CGS3 spectropolarimetry data.
 C
-C     Description:                           
+C     Description:
 C        RED3_CGS3POL reduces data obtained with the CGS3 instrument at UKIRT
 C        used in its spectropolarimetry mode. After initial reduction by
-C        the CGS3 DR system the data for a single observation consists 
-C        of four Figaro files containing the frames for plate position 
+C        the CGS3 DR system the data for a single observation consists
+C        of four Figaro files containing the frames for plate position
 C        0, 45, 22.5 and 67.5 degrees. Each frame contains a 1-D spectrum.
-C        These spectra are combined to derive a polarization spectrum in 
+C        These spectra are combined to derive a polarization spectrum in
 C        TSP format.
 C
 C
@@ -53,7 +53,7 @@ C
      :        TEPTR1,TEPTR2
 
 *  Number of elements in data arrays
-      INTEGER NDIM, DIMS(7),DIMS2(7)             
+      INTEGER NDIM, DIMS(7),DIMS2(7)
 
 *  HDS locators
       CHARACTER*(DAT__SZLOC) ILOC,VLOC,OLOC,ULOC,UELOC,QLOC,QELOC,
@@ -73,7 +73,7 @@ C
          CALL ERR_REP(' ','Error accessing frame 1',STATUS)
          GOTO 100
       ENDIF
-      
+
 *  Get the data array
       IF (STATUS .EQ. SAI__OK) THEN
          CALL DSA_DATA_SIZE('INPUT',1,NDIM,DIMS,ELEMENTS,STATUS)
@@ -123,7 +123,7 @@ C
                CALL ERR_REP(' ','Error accessing frame 2',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL DSA_DATA_SIZE('INPUT2',1,NDIM,DIMS2,ELEMENTS,
@@ -155,9 +155,9 @@ C
              IF (STATUS .NE. SAI__OK) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP(' ','Error accessing frame 3',STATUS)
-               GOTO 100 
+               GOTO 100
              ENDIF
-      
+
 *  Get the data array
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL DSA_DATA_SIZE('INPUT3',1,NDIM,DIMS2,ELEMENTS,
@@ -191,7 +191,7 @@ C
                CALL ERR_REP(' ','Error accessing frame 4',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL DSA_DATA_SIZE('INPUT4',1,NDIM,DIMS2,ELEMENTS,
@@ -259,7 +259,7 @@ C
              CALL TSP_TEMP(DIMS(1),'_REAL',T2PTR,T2LOC,STATUS)
              CALL TSP_TEMP(DIMS(1),'_REAL',TEPTR1,TE1LOC,STATUS)
              CALL TSP_TEMP(DIMS(1),'_REAL',TEPTR2,TE2LOC,STATUS)
-             
+
 *  Reduce the data (This is equivalent to doing CCD2STOKES on each
 *  pair and then QUMERGE).
              IF (STATUS .EQ. SAI__OK) THEN
@@ -349,11 +349,11 @@ C
 *  Local variables
       INTEGER I
 
-*  Copy X axis to output           
+*  Copy X axis to output
       DO I=1,NX
          OX(I)=IX(I)
       ENDDO
-                   
+
 *  Extract spectra
       DO I=1,NX
 
@@ -373,7 +373,7 @@ C
      : QV,UV,STATUS)
 *+
 *   Subroutine to do the merging of the data
-*       
+*
 *    Sum the intensities for the two datasets, and scale up the
 *    Stokes arrays and variances to be correct for the new intensity
 *
@@ -426,16 +426,16 @@ C
          NEWINT=I1S+I2S
 
 *  Determine scaling factor for Stokes parameters
-         IF (I1S .GT. 0.0) THEN          
-            QFAC=NEWINT/I2S              
-         ELSE                              
-            QFAC=0.0                       
-         ENDIF                             
-         IF (I1S .GT. 0.0) THEN          
-            UFAC=NEWINT/I1S              
-         ELSE                              
-            UFAC=0.0                       
-         ENDIF                             
+         IF (I1S .GT. 0.0) THEN
+            QFAC=NEWINT/I2S
+         ELSE
+            QFAC=0.0
+         ENDIF
+         IF (I1S .GT. 0.0) THEN
+            UFAC=NEWINT/I1S
+         ELSE
+            UFAC=0.0
+         ENDIF
 
          DO I=1,SIZE
 

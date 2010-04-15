@@ -3,7 +3,7 @@ C+
 C
 C     C G S 3 _ P H R E D
 C
-C     Writes statistics from a CGS3 file (e.g. 29JUN0015 as an ASCII 
+C     Writes statistics from a CGS3 file (e.g. 29JUN0015 as an ASCII
 C     output file.
 C
 C     Command parameters -
@@ -14,7 +14,7 @@ C               created.
 C
 C     Command keywords -  None
 C
-C     Modified:  
+C     Modified:
 C
 C      13-Jun-1995 : cloned from WASCII
 C      28-Jun-1995 : changed from Figaro program to Atask
@@ -35,9 +35,9 @@ C
       INTEGER DYN_ELEMENT
 
 C     Global constants
- 
+
       INCLUDE 'SAE_PAR'
- 
+
 C
 C     Local variables
 C
@@ -184,7 +184,7 @@ C     Parameters from FITS header
 C
 C     Get the object name
 C
-      CALL DSA_GET_FITS_C ('SPECT', 'OBJECT', 1, OBJECT_NAME, 
+      CALL DSA_GET_FITS_C ('SPECT', 'OBJECT', 1, OBJECT_NAME,
      *    COMMENT, STATUS )
 *      CALL MSG_SETC ('OBJ', OBJECT_NAME )
 *      CALL MSG_OUT ( ' ', 'Object = ^OBJ', STATUS )
@@ -192,13 +192,13 @@ C
 
 C     UT start
 
-      CALL DSA_GET_FITS_C ('SPECT', 'UTSTART', 1, UTSTART, 
+      CALL DSA_GET_FITS_C ('SPECT', 'UTSTART', 1, UTSTART,
      *    COMMENT, STATUS )
       IF ( STATUS .NE. 0 ) GOTO 500
 
 C     Run number
 
-      CALL DSA_GET_FITS_I ('SPECT', 'RUN', 0, RUN, COMMENT, 
+      CALL DSA_GET_FITS_I ('SPECT', 'RUN', 0, RUN, COMMENT,
      *  STATUS )
 *      CALL MSG_SETI ( 'RUN', RUN )
 *      CALL MSG_OUT ( ' ', 'Run = ^RUN', STATUS )
@@ -206,7 +206,7 @@ C     Run number
 
 C     Get integration time
 
-      CALL DSA_GET_FITS_F ('SPECT', 'C3STRDWL', 0, EXP, COMMENT, 
+      CALL DSA_GET_FITS_F ('SPECT', 'C3STRDWL', 0, EXP, COMMENT,
      *  STATUS )
 *      CALL MSG_SETR ( 'EXP', EXP )
 *      CALL MSG_OUT ( ' ', 'Integ time = ^EXP', STATUS )
@@ -214,7 +214,7 @@ C     Get integration time
 
 C     Start and end air mass
 
-      CALL DSA_GET_FITS_F ('SPECT', 'AMSTART', 0, AMSTART, COMMENT, 
+      CALL DSA_GET_FITS_F ('SPECT', 'AMSTART', 0, AMSTART, COMMENT,
      *  STATUS )
       IF ( STATUS .NE. 0 ) GOTO 500
 
@@ -223,12 +223,12 @@ C     Start and end air mass
       AMASS = 0.5 * ( AMSTART + AMEND )
       IF ( AMASS .LT. 1.0 .OR. AMASS .GT. 2.1 ) THEN
         CALL MSG_SETR ( 'AMASS', AMASS )
-        CALL MSG_OUT ( ' ', 
+        CALL MSG_OUT ( ' ',
      *       'Mean air amass = ^AMASS out of bounds', STATUS )
         CALL MSG_OUT (' ', 'It will be set to 1.0', STATUS )
         AMASS = 1.0
       ENDIF
- 
+
 C
 C     Check that there is an X array.  ***
 C
@@ -273,9 +273,9 @@ C     Get limiting number of standard deviations
 C     Get the name of the file to be created.
 
       CALL PAR_GET0C ( 'FILE', FILE, STATUS )
- 
+
 C     Put out intermediate statistics?
- 
+
       CALL PAR_GET0L ( 'VERBOSE', VERBOSE, STATUS )
 C
 C     Create file
@@ -366,13 +366,13 @@ C     (>) XBAR    work array for means of each scan
 C     (>) VERBOSE   put out intermediate statistics?
 C     (<) STATUS (Integer) Status code.  0 => OK, non-zero values are
 C                Fortran I/O error codes.
-C   
+C
 C     Common variables used - None
 C
 C     Subroutines / functions used - None
 C
 C                                        KS / AAO 10th Oct 1986
-C     Modified:  
+C     Modified:
 C
 C     24th Oct 1986.  KS / AAO.  Format code 2 data now written one pair
 C                     of values to a line.
@@ -406,7 +406,7 @@ C
 
       IF (VERBOSE) THEN
         HEAD =  'Scan  airmass  st_wavel  end_wavel'//
-     *   ' mean_flux      +/-        integ object' 
+     *   ' mean_flux      +/-        integ object'
         CALL FIO_WRITE (FD, HEAD(1:80), STATUS )
       ENDIF
 
@@ -415,7 +415,7 @@ C     Calculate statistics and write the data out
 C
 
 C     Note: IST (e.g. 1) is starting channel number and IEND (e.g. 32)
-C     is ending channel number, but data AND wavelengths have been put 
+C     is ending channel number, but data AND wavelengths have been put
 C     into the file backwards
 
       N = IEND - IST + 1
@@ -426,7 +426,7 @@ C     into the file backwards
         DO I = IST,IEND
           INDEX = NWAVE - I + 1
           IF ( NBEAMS .EQ. 2 ) THEN
-            TEMP = ( ZDATA(1,INDEX,1,ISCAN) - 
+            TEMP = ( ZDATA(1,INDEX,1,ISCAN) -
      *               ZDATA(1,INDEX,2,ISCAN) ) / 2.0
           ELSE IF ( NBEAMS .EQ. 1 ) THEN
             TEMP = ZDATA(1,INDEX,1,ISCAN)
@@ -458,7 +458,7 @@ C     into the file backwards
      *                     T34,G12.6,
      *                     T48,G12.6,
      *                     T61,F6.2,
-     *                     T68,A10)')  ISCAN, AMASS, 
+     *                     T68,A10)')  ISCAN, AMASS,
      *   XDATA(NWAVE-IST+1),
      *   XDATA(NWAVE-IEND+1), XBAR(ISCAN), SIGMA_XBAR, EXP, OBJECT_NAME
         CALL FIO_WRITE ( FD, OBSREC(1:80), STATUS )
@@ -514,7 +514,7 @@ C       to see which one might not fit the others
      *             TEST
                CALL FIO_WRITE ( FD, OBSREC(1:80), STATUS )
              ENDIF
- 
+
             SUM = SUM - XBAR(I)
             SUM2 = SUM2 - XBAR(I) * XBAR(I)
             N = N - 1

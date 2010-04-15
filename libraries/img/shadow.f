@@ -21,12 +21,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -46,7 +46,7 @@
 *     This can be done without the requirement for workspace (with a
 *     little extra effort), but then it wouldn't be an example of how
 *     to get some.
-* 
+*
 *     The PAR routines are described in SUN/114.
 
 *-
@@ -75,7 +75,7 @@
 
 *  Take the difference between the input data and the shifted data
 *  putting the result in the output image.
-      CALL DODIFF( %VAL( CNF_PVAL( IPIN ) ), %VAL( CNF_PVAL( IPTEMP ) ), 
+      CALL DODIFF( %VAL( CNF_PVAL( IPIN ) ), %VAL( CNF_PVAL( IPTEMP ) ),
      :             NX, NY, %VAL( CNF_PVAL( IPOUT ) ),
      :             ISTAT )
 
@@ -158,9 +158,9 @@
 *  Form the difference.
       DO 1 J = 1, NY
          DO 2 I = 1, NX
-            IF ( ARR2( I, J ) .NE. 0.0 ) THEN 
+            IF ( ARR2( I, J ) .NE. 0.0 ) THEN
                ARROUT( I, J ) = ARR1( I, J ) - ARR2( I, J )
-            ELSE 
+            ELSE
                ARROUT( I, J ) = 0.0
             END IF
  2       CONTINUE

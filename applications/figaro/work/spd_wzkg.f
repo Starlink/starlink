@@ -35,7 +35,7 @@
 *         feature in a subsequent entry.
 *
 *         The dispersions calculated by subsequent 'pairs' of consistent
-*         feature indentifications must be in agreement to at least a 
+*         feature indentifications must be in agreement to at least a
 *         (user tunable) threshold (meta_disp_thresh).
 *
 *         A set of n+1 consistent features is a better candidate
@@ -186,8 +186,8 @@
             features_found = 1
             distance = best_distances ( ii , i )
             temp_ftrs ( features_found ) = current_ftr
-            temp_ftr_guess ( features_found ) = 
-     :                                   current_guess 
+            temp_ftr_guess ( features_found ) =
+     :                                   current_guess
 
 *%          Loop until we fail to find a consistent neighbour
 * 3 >>>>>>>>
@@ -201,7 +201,7 @@
      :                        ( current_guess , current_ftr )
 
 *%             Save dispersion consistent with candidate identification
-               current_dispersion = best_dispersion 
+               current_dispersion = best_dispersion
      :                          ( current_guess , current_ftr )
 
 *%             If we have a neighbour to look for then
@@ -211,7 +211,7 @@
 * 4 >>>>>>>>>>>>>
                  DO try_ftr = 1 , num_active_ftrs-i
 
-*%                  If required identification not found yet the 
+*%                  If required identification not found yet the
                     IF ( .NOT. found ) THEN
 
 *%                     Loop through all candidate identifications for a feature
@@ -219,18 +219,18 @@
                        DO iii = 1 , max_ftr_cand
 
 *%                        If feature/candidate matches required identification then
-                         IF ( current_ftr + try_ftr .LE. 
+                         IF ( current_ftr + try_ftr .LE.
      :                                         num_active_ftrs ) THEN
-                          IF ((best_ftr ( iii , current_ftr+try_ftr ) 
+                          IF ((best_ftr ( iii , current_ftr+try_ftr )
      :                            .EQ.     search_for )  .OR.
-     :                         best_ftr ( iii , current_ftr+try_ftr ) 
+     :                         best_ftr ( iii , current_ftr+try_ftr )
      :                            .EQ.     search_for2 ) THEN
 
 *%                           If predicted dispersion is consistent then
                              trial_disp = best_dispersion
      :                               ( iii , current_ftr + try_ftr )
 
-                             IF ( ABS ( 1.0 - 
+                             IF ( ABS ( 1.0 -
      :                                  trial_disp /
      :                                  current_dispersion )
      :                                   .LT. meta_disp_thresh ) THEN
@@ -240,12 +240,12 @@
                                 features_found = features_found + 1
                                 current_ftr = current_ftr + try_ftr
                                 current_guess = iii
-                                distance = distance + best_distances ( 
+                                distance = distance + best_distances (
      :                                    current_guess,current_ftr )
-                                temp_ftrs ( features_found ) = 
+                                temp_ftrs ( features_found ) =
      :                                                   current_ftr
-                                temp_ftr_guess ( features_found ) = 
-     :                                                 current_guess 
+                                temp_ftr_guess ( features_found ) =
+     :                                                 current_guess
 
 *%                              EXIT INNER LOOPS (resume at ***)
                                 GOTO 100
@@ -287,7 +287,7 @@
 
 *%            If current solution has MORE features then previous best , or
 *%                    has a lower average distance then
-              IF ( features_found .GT. best_so_far .OR. 
+              IF ( features_found .GT. best_so_far .OR.
      :            (  distance .LT. best_distance ) ) THEN
 
 *%               Adopt current solution as best-so-far
@@ -297,7 +297,7 @@
 
 *%               Report on it
                  IF ( INFO ) THEN
-                    WRITE ( report_string , 1000 ) best_so_far 
+                    WRITE ( report_string , 1000 ) best_so_far
                     CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
                     WRITE ( report_string , 1001 ) distance
                     CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
@@ -311,7 +311,7 @@
                     meta_ftrs ( iv ) = temp_ftrs ( iv )
                     meta_ftr_guess ( iv ) = temp_ftr_guess ( iv )
                  END DO
- 
+
 *%            Endif
               ENDIF
 
@@ -324,7 +324,7 @@
 *%        End loop
           END DO
 * 2 <<<<<<
-      
+
 *%     End loop
        END DO
 * 1 <<<
@@ -332,7 +332,7 @@
 *%     If a viable solution has been found then
        IF ( found_match ) THEN
 
-*%        Setp up count of features in solution 
+*%        Setp up count of features in solution
           meta_count = best_so_far
 
 *%     Else set status

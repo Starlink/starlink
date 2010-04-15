@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,6 +100,6 @@
          ARRAY(I) = AWORD
  1    CONTINUE
 
-#endif 
+#endif
 
       END

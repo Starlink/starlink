@@ -15,7 +15,7 @@ extern "C" {
 #include "ems_err.h"
 #include "ems.h"
 
-MODULE = Starlink::EMS		PACKAGE = Starlink::EMS		
+MODULE = Starlink::EMS		PACKAGE = Starlink::EMS
 
 # Try some real EMS library calls as an experiment
 # Could use a Starlink::Status object
@@ -337,7 +337,7 @@ ems1_get_facility_error(inmsg_status, facility_name, error_ident, error_text)
   facility_name = facility;
   error_ident = ident;
   error_text  = text;
-  ems1_get_facility_error(inmsg_status, &facility_name, 
+  ems1_get_facility_error(inmsg_status, &facility_name,
 			  &error_ident, &error_text);
  OUTPUT:
   facility_name
@@ -368,7 +368,7 @@ SAI__WARN()
   RETVAL
 
 
-  
+
 int
 EMS__NOMSG()
  CODE:

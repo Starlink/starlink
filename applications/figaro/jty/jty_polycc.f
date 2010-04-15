@@ -1,5 +1,5 @@
       SUBROUTINE JTY_POLYCC(NX,NY,SCALE,COEFF,PCOEFF)
-* Routine to convert coefficients of a 2-d Legendre polynomial to 
+* Routine to convert coefficients of a 2-d Legendre polynomial to
 * coefficients of a plain polynomial
 * The coefficients are stored as NX polynomials of order NY-1.
 * Low order coefficient comes first, and the low order coefficient

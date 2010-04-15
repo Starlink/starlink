@@ -1,7 +1,7 @@
 *+  CHI_APCONS - Evaluate constants in expression parse system
       subroutine chi_apcons (intype, outype, comnt, status)
 *    Description :
-*     Evaluate the constants for an expression in the reverse Polish 
+*     Evaluate the constants for an expression in the reverse Polish
 *     stack and finalize the corresponding qualifier stack.
 *    Invocation :
 *     CALL CHI_APCONS ( INTYPE, OUTYPE, COMNT, STATUS )
@@ -21,7 +21,7 @@
 *    Authors :
 *     Alan Wood (STADAT::ARW) Esther Gershuny (RLVAD::EJG)
 *    History :
-*     6-Feb-1992: Original 
+*     6-Feb-1992: Original
 *    Type definitions :
       implicit none
 *    Global constants :

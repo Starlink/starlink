@@ -17,8 +17,8 @@ int *status       /* global status (given and returned) */
 
 /*=  AMS_EXIT - ams exit handler */
 
-void ams_exit 
-( 
+void ams_exit
+(
 void
 );
 
@@ -64,7 +64,7 @@ int *status
 );
 
 /*+  AMS_KICK - send a message to this task's kick queue */
-void ams_kick 
+void ams_kick
 (
 char *name,       /* name of the action to be rescheduled (given) */
 int length,       /* number of significant bytes in value (given) */
@@ -84,8 +84,8 @@ int *status             /* global status (given and returned) */
 
 /*+  AMS_PLOOKUP - look up a taskname given a path to it */
 
-void ams_plookup 
-( 
+void ams_plookup
+(
 int path,             /* the path number (given) */
 char *name,           /* the task name (returned) */
 int *status           /* global status (given and returned) */
@@ -93,8 +93,8 @@ int *status           /* global status (given and returned) */
 
 /*+  AMS_RECEIVE - receive any incoming message */
 
-void ams_receive 
-( 
+void ams_receive
+(
 int timeout,              /* timeout time in milliseconds (given) */
 int message_name_s,       /* space for name (given) */
 int message_value_s,      /* space for value (given) */
@@ -112,7 +112,7 @@ int *status               /* global status (given and returned) */
 
 void ams_reply
 (
-int path,               /* the path number for communicating with the other 
+int path,               /* the path number for communicating with the other
                            task (given) */
 int messid,             /* the number identifying the transaction (given) */
 int message_function,   /* message function (given) */

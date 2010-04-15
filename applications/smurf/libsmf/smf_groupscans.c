@@ -22,14 +22,14 @@
 *     size = int (Given)
 *        Number of elements in igrp
 *     maxsyspop = int * (Returned)
-*        Returned holding the largest number of NDFs that refer to the 
+*        Returned holding the largest number of NDFs that refer to the
 *        same observation and sub-system.
 *     conform = int * (Returned)
 *        Returned non-zero if all the input NDFs have names that conform
 *        to the naming convention for ACSIS raw time series files.
 *     ogrp = Grp ** (Returned)
 *        Location at which to return a pointer to a new GRP group. This
-*        group holds the names of the first input NDF related to each 
+*        group holds the names of the first input NDF related to each
 *        set of related sub-scans (i.e. sub-scans for the same observation
 *        and sub-system). They are ordered in the same order that the
 *        sub-scans would be accessed if the nested KeyMaps returned by this
@@ -40,11 +40,11 @@
 
 *  Description:
 *     This function classifies each NDF in the supplied group using the
-*     values for the OBSID, SUBSYSNR and NSUBSCAN keywords in the FITS 
+*     values for the OBSID, SUBSYSNR and NSUBSCAN keywords in the FITS
 *     extension. It returns a pointer to an AST KeyMap containing entries
 *     for each OBSID value found in the specified NDFs. Each of these
 *     entries has a key equal to the OBSID value, and a value which is a
-*     pointer to another AST KeyMap containing information about the NDFs 
+*     pointer to another AST KeyMap containing information about the NDFs
 *     that have the OBSID value. Each of these subsiduary KeyMaps has an
 *     entry for each SUBSYSNR value found for the OBSID value. The key is
 *     the SUBSYSNR value, and the entry is a pointer to another KeyMap
@@ -102,7 +102,7 @@
 #include "star/kaplibs.h"
 #include "star/one.h"
 
-AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, 
+AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status ){
 
 /* Local Variables */
@@ -114,18 +114,18 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    char *match = NULL;
    char *nsubscan= NULL;
    char *pname = NULL;
-   char filename[GRP__SZNAM + 1];    
+   char filename[GRP__SZNAM + 1];
    const char *key = NULL;
    char obsid[SZFITSCARD];
    char obsidss[SZFITSCARD];
    char subsysnr[SZFITSCARD];
    int ifile;
-   int indf1;             
+   int indf1;
    int iobs;
    int isys;
    int nobs;
    int nscan;
-   int nsys;                   
+   int nsys;
 
 /* Initialise returned values. */
    *maxsyspop = 0;
@@ -145,7 +145,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
       pname = filename;
       grpGet( igrp, ifile, 1, &pname, GRP__SZNAM, status );
 
-/* See if it conforms to the expected form of an ACSIS raw time series 
+/* See if it conforms to the expected form of an ACSIS raw time series
    file name (allowing optional arbitrary suffix and prefix). */
       match = astChrSub( pname, "a\\d{8}_\\d{5}_\\d{2}_\\d{4}_?", NULL, 0 );
       if( match ) {
@@ -209,7 +209,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 
 /* Now traverse the returned set of nested KeyMaps in their natural
    order. We use a separate pass through the KeyMaps (rather than storing
-   the files names at the same time that the KeyMaps are created - above) 
+   the files names at the same time that the KeyMaps are created - above)
    so that we can ensure that the order in which the names are stored in
    the group matches that in which the KeyMaps will be accessed by the
    caller. */
@@ -222,11 +222,11 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
       for( isys = 0; isys < nsys; isys++ ) {
          key = astMapKey( obsmap, isys );
          astMapGet0A( obsmap, key, &sysmap );
-   
+
 
          key = astMapKey( sysmap, 0 );
          astMapGet0I( sysmap, key, &ifile );
-   
+
          ndgCpsup( igrp, ifile, *ogrp, status );
 
 /* Update the largest number of subscans for an observation/sub-system */

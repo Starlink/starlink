@@ -34,8 +34,8 @@
 *     status = integer (given)
 *       Inherited status
 *-
-    
-*   types  
+
+*   types
       implicit none
       include 'SAE_PAR'
       include 'GAU_PAR'
@@ -49,12 +49,12 @@
       integer status
 
 *      integer i,d,rows
-      
+
       if (status .ne. sai__ok) return
 
       call gau2_divset (1, iv, liv, lv, v)
-      
-*   gau2_divset sets iv(1)=12.  We rely on this, so check it and return 
+
+*   gau2_divset sets iv(1)=12.  We rely on this, so check it and return
 *   with an error if not true
       if (iv(1) .ne. 12) then
          gau2par(gau2status) = gau2code
@@ -63,10 +63,10 @@
          call err_rep (' ','gaufit: coding error (2)',status)
          goto 999
       endif
-      
+
 *   Set the non-default upper limit on iterations
       if (niter .gt. 0) iv(18) = niter
-      
+
 *   Switch off printing altogether - set printing unit iv(prunit)=iv(21)
 *   to zero, see NSG p9.
       if (gau2par(gau2debug) .le. 1) then
@@ -83,7 +83,7 @@
       endif
 *   We want the regression diagnostic if we're being asked to produce it
 *   as one of the final products
-      if (modtyp .eq. gau2regdiag) 
+      if (modtyp .eq. gau2regdiag)
      :     iv(57) = iv(57) + 2
 
  999  return

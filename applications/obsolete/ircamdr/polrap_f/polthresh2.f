@@ -1,4 +1,4 @@
-*+  POLTHRESH2 - create thresholded version of an 8 images (new values for 
+*+  POLTHRESH2 - create thresholded version of an 8 images (new values for
 *               pixels outside thresholds are input)
 
       SUBROUTINE POLTHRESH2 ( STATUS )
@@ -96,8 +96,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'             ! SSE global definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'PRM_PAR'             ! PRIMDAT constants
 
 *    Status :
@@ -106,7 +106,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                     ! image dimensionality
       PARAMETER ( NDIMS  =  2 )     ! 2-d images only
 
@@ -118,7 +118,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    IDIMS1( NDIMS ),           ! dimensions of input data array
      :    IDIMS2( NDIMS ),           ! dimensions of input data array
      :    IDIMS3( NDIMS ),           ! dimensions of input data array
@@ -167,7 +167,7 @@
      :    LOCO7,                      ! output data structure
      :    LOCO8                       ! output data structure
 
-      REAL 
+      REAL
      :    THRLO,                    ! lower threshold value
      :	  RNUMPTY
 
@@ -232,39 +232,39 @@
 	 SUMDIM2 = IDIMS1( 2) + IDIMS2( 2) + IDIMS3( 2) + IDIMS4( 2) +
      :	           IDIMS5( 2) + IDIMS6( 2) + IDIMS7( 2) + IDIMS8( 2)
 
-	 IF( SUMDIM1 .EQ. IDIMS1( 1)*8 .AND. 
+	 IF( SUMDIM1 .EQ. IDIMS1( 1)*8 .AND.
      :	     SUMDIM2 .EQ. IDIMS2( 2)*8) THEN
 
 *       tell user size of input images
 	 CALL MSG_SETI( 'XS', IDIMS1( 1))
 	 CALL MSG_SETI( 'YS', IDIMS1( 2))
-	 CALL MSG_OUT( 'MESSAGE', 
+	 CALL MSG_OUT( 'MESSAGE',
      :                 'Input images are ^XS by ^YS pixels in size',
      :	               STATUS)
 
 *       get the low threshold value
-         CALL AIF_GET0R( 'THRLO', 0.0, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'THRLO', 0.0, MINVAL, MAXVAL,
      :                    THRLO, STATUS )
 
 *       check for error so far
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*          create output image type data structure 
-            CALL CREOUT( 'OUTPIC1', 'OTITLE', NDIMS, IDIMS1, 
+*          create output image type data structure
+            CALL CREOUT( 'OUTPIC1', 'OTITLE', NDIMS, IDIMS1,
      :                    LOCO1, STATUS )
-            CALL CREOUT( 'OUTPIC2', 'OTITLE', NDIMS, IDIMS2, 
+            CALL CREOUT( 'OUTPIC2', 'OTITLE', NDIMS, IDIMS2,
      :                    LOCO2, STATUS )
-            CALL CREOUT( 'OUTPIC3', 'OTITLE', NDIMS, IDIMS3, 
+            CALL CREOUT( 'OUTPIC3', 'OTITLE', NDIMS, IDIMS3,
      :                    LOCO3, STATUS )
-            CALL CREOUT( 'OUTPIC4', 'OTITLE', NDIMS, IDIMS4, 
+            CALL CREOUT( 'OUTPIC4', 'OTITLE', NDIMS, IDIMS4,
      :                    LOCO4, STATUS )
-            CALL CREOUT( 'OUTPIC5', 'OTITLE', NDIMS, IDIMS5, 
+            CALL CREOUT( 'OUTPIC5', 'OTITLE', NDIMS, IDIMS5,
      :                    LOCO5, STATUS )
-            CALL CREOUT( 'OUTPIC6', 'OTITLE', NDIMS, IDIMS6, 
+            CALL CREOUT( 'OUTPIC6', 'OTITLE', NDIMS, IDIMS6,
      :                    LOCO6, STATUS )
-            CALL CREOUT( 'OUTPIC7', 'OTITLE', NDIMS, IDIMS7, 
+            CALL CREOUT( 'OUTPIC7', 'OTITLE', NDIMS, IDIMS7,
      :                    LOCO7, STATUS )
-            CALL CREOUT( 'OUTPIC8', 'OTITLE', NDIMS, IDIMS8, 
+            CALL CREOUT( 'OUTPIC8', 'OTITLE', NDIMS, IDIMS8,
      :                    LOCO8, STATUS )
 
 *          check for error
@@ -290,24 +290,24 @@
 
 *             if there have been no errors then perform the thresholding
                IF ( STATUS .EQ. SAI__OK ) THEN
-  
-                  CALL POLTHRESH2SUB( %VAL( PNTRI1 ), %VAL( PNTRI2 ), 
-     :	                              %VAL( PNTRI3 ), %VAL( PNTRI4 ), 
-     :	                              %VAL( PNTRI5 ), %VAL( PNTRI6 ), 
-     :	                              %VAL( PNTRI7 ), %VAL( PNTRI8 ), 
-     :	                              %VAL( PNTRO1 ), %VAL( PNTRO2 ), 
-     :	                              %VAL( PNTRO3 ), %VAL( PNTRO4 ), 
-     :	                              %VAL( PNTRO5 ), %VAL( PNTRO6 ), 
-     :	                              %VAL( PNTRO7 ), %VAL( PNTRO8 ), 
-     :                                IDIMS1(1), IDIMS1(2), THRLO, 
+
+                  CALL POLTHRESH2SUB( %VAL( PNTRI1 ), %VAL( PNTRI2 ),
+     :	                              %VAL( PNTRI3 ), %VAL( PNTRI4 ),
+     :	                              %VAL( PNTRI5 ), %VAL( PNTRI6 ),
+     :	                              %VAL( PNTRI7 ), %VAL( PNTRI8 ),
+     :	                              %VAL( PNTRO1 ), %VAL( PNTRO2 ),
+     :	                              %VAL( PNTRO3 ), %VAL( PNTRO4 ),
+     :	                              %VAL( PNTRO5 ), %VAL( PNTRO6 ),
+     :	                              %VAL( PNTRO7 ), %VAL( PNTRO8 ),
+     :                                IDIMS1(1), IDIMS1(2), THRLO,
      :                                NUMPTY, STATUS )
 
 *             tell user number pixel below threshold
 	         CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	         RNUMPTY = 100.0-(100.0*NUMPTY/REAL( IDIMS1( 1)*IDIMS1( 2)))
 	         CALL MSG_SETR( 'NUM', RNUMPTY)
-	         CALL MSG_OUT( 'MESS', 
-     :	           '% number of pixel ABOVE threshold = ^NUM % ...', 
+	         CALL MSG_OUT( 'MESS',
+     :	           '% number of pixel ABOVE threshold = ^NUM % ...',
      :	           STATUS)
 	         CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
@@ -332,7 +332,7 @@
 *       else of if-input-images-are-different-sizes
 	 ELSE
 
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :                  'Error, input images different sizes ...',
      :	                STATUS)
 

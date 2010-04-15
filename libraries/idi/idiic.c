@@ -83,12 +83,12 @@ F77_SUBROUTINE(ixwopn) ( CHARACTER(devnam), INTEGER(lendisp),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -139,13 +139,13 @@ F77_SUBROUTINE(ixwclo) ( INTEGER(display), INTEGER(idierr) )
 *     IXWCLO
 *
 *  Purpose:
-*     F77 to C interface used to close a display 
+*     F77 to C interface used to close a display
 *
 *  Invocation:
 *     CALL IXWCLO( display, idierr )
 *
 *  Description:
-*     F77 to C interface used to close a display 
+*     F77 to C interface used to close a display
 *
 *  Arguments:
 *     display = int
@@ -284,13 +284,13 @@ F77_SUBROUTINE(ixwerr) ( INTEGER(errn), CHARACTER(errtxt),
 *     IXWERR
 *
 *  Purpose:
-*     F77 to C interface used to get error text 
+*     F77 to C interface used to get error text
 *
 *  Invocation:
 *     CALL IXWERR( errn, errtxt, txtlen )
 *
 *  Description:
-*     F77 to C interface used to get error text 
+*     F77 to C interface used to get error text
 *
 *  Arguments:
 *     errn = int
@@ -1235,7 +1235,7 @@ GENPTR_INTEGER(data)
 GENPTR_INTEGER(idierr)
 
 /* Call the C routine */
-*idierr = IIMRMY_C( *display, *memid, *npixel, *x0, *y0, *depth, 
+*idierr = IIMRMY_C( *display, *memid, *npixel, *x0, *y0, *depth,
                     *packf, *ittf, data );
 
 return;
@@ -1255,14 +1255,14 @@ F77_SUBROUTINE(ixwstw) ( INTEGER(display), INTEGER(memid),
 *     IXWSTW
 *
 *  Purpose:
-*     F77 to C interface used to select transfer window 
+*     F77 to C interface used to select transfer window
 *
 *  Invocation:
 *     CALL IXWSTW ( display, memid, loaddir, xwdim, ywdim, depth,
 *                   xwoff, ywoff, idierr )
 *
 *  Description:
-*     F77 to C interface used to select transfer window 
+*     F77 to C interface used to select transfer window
 *
 *  Arguments:
 *     display = int
@@ -1400,14 +1400,14 @@ F77_SUBROUTINE(ixwtxt) ( INTEGER(display), INTEGER(memid),
 *     IXWTXT
 *
 *  Purpose:
-*     F77 to C interface used to plot text 
+*     F77 to C interface used to plot text
 *
 *  Invocation:
 *     CALL IXWTXT ( display, memid, txt, lentxt, x0, y0, path, orient,
 *                   color, txtsize, idierr )
 *
 *  Description:
-*     F77 to C interface used to plot text 
+*     F77 to C interface used to plot text
 *
 *  Arguments:
 *     display = int
@@ -1471,7 +1471,7 @@ char *txt0;
 txt0 = cnf_creim( txt, *lentxt );
 
 /* Call the C routine */
-*idierr = IIGTXT_C( *display, *memid, txt0, *x0, *y0, *path, *orient, 
+*idierr = IIGTXT_C( *display, *memid, txt0, *x0, *y0, *path, *orient,
                     *color, *txtsize );
 
 /* Free the temporary string */
@@ -2492,7 +2492,7 @@ GENPTR_INTEGER(trigger)
 GENPTR_INTEGER(idierr)
 
 /* Call the C routine */
-*idierr = IIIENI_C( *display, *intype, *intid, *objtype, *objid, 
+*idierr = IIIENI_C( *display, *intype, *intid, *objtype, *objid,
                     *oper, *trigger );
 
 return;
@@ -3623,13 +3623,13 @@ F77_SUBROUTINE(ixwebm) ( INTEGER(display), CHARACTER(bmdscr),
 *     IXWEBM
 *
 *  Purpose:
-*     F77 to C interface used to define external bitmap 
+*     F77 to C interface used to define external bitmap
 *
 *  Invocation:
 *     CALL IXWEBM( display, bmdscr, lendscr, bmtype, xdim, ydim, idierr )
 *
 *  Description:
-*     F77 to C interface used to define external bitmap 
+*     F77 to C interface used to define external bitmap
 *
 *  Arguments:
 *     display = int

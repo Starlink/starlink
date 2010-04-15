@@ -8,8 +8,8 @@ C  Function:
 C     Fills an array of the specified type with the numbers 1..N
 C
 C  Description:
-C     Given the memory address for an array of specified type, this 
-C     routine fills the array with the numbers 1..N   This is used 
+C     Given the memory address for an array of specified type, this
+C     routine fills the array with the numbers 1..N   This is used
 C     to initialise axis arrays.
 C
 C  Language:
@@ -24,7 +24,7 @@ C     (>) NELM        (Integer,ref) The number of elements in the array.
 C     (>) ADDRESS     (Integer,ref) The address of the data array.
 C     (>) TYPE        (Fixed string,descr) The type of the data array.
 C                     This must be one of 'FLOAT','INT',SHORT','REAL'
-C                     'BYTE', 'USHORT' or 'DOUBLE'.  Anything else is 
+C                     'BYTE', 'USHORT' or 'DOUBLE'.  Anything else is
 C                     ignored.
 C     (>) STATUS      (Integer,ref) Status code.  If bad status is passed,
 C                     this routine returns immediately.

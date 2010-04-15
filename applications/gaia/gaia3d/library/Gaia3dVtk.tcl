@@ -48,7 +48,7 @@ itcl::class ::gaia3d::Gaia3dVtk {
 
    #  Inheritances:
    #  -------------
-   
+
    #  None
 
    #  Constructor:

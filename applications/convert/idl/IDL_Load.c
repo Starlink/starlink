@@ -20,7 +20,7 @@ static IDL_SYSFUN_DEF procedure_addr[] = {
   { (IDL_FUN_RET) crehds, "CREHDS", 2, 3, 0 },
 };
 /* Register our routine. The routines must be specified exactly the same way
- * as in hds2idl.dlm. 
+ * as in hds2idl.dlm.
 */
 return IDL_AddSystemRoutine(function_addr, IDL_TRUE, ARRLEN(function_addr))
    &&  IDL_AddSystemRoutine(procedure_addr, IDL_FALSE, ARRLEN(procedure_addr));

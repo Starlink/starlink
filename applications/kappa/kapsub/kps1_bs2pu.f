@@ -17,28 +17,28 @@
 
 *  Description:
 *     This routine writes information describing a two-dimensional
-*     bi-cubic polynomial surface to a standard Starlink POLYNOMIAL 
+*     bi-cubic polynomial surface to a standard Starlink POLYNOMIAL
 *     structure, as defined in SGP/38, but with a variant 'BSPLINE' not
 *     promulgated there.  An empty POLYNOMIAL structure should already
 *     have been created.  All floating-point components within the
 *     structure are written as DOUBLE PRECISION.
 *
 *     It is assumed the calling programme has a one-dimensional array of
-*     coefficients, where COEFF( ( IX - 1 ) * ( NYKNOT + 4 ) + IY ) 
-*     contains the coefficient at the (IX,IY)th knot number, where 
-*     NYKNOT + 4 is the total number of Y terms.  Such a 
+*     coefficients, where COEFF( ( IX - 1 ) * ( NYKNOT + 4 ) + IY )
+*     contains the coefficient at the (IX,IY)th knot number, where
+*     NYKNOT + 4 is the total number of Y terms.  Such a
 *     one-dimensional array is used by the PDA_SURFIT and PDA_BISPEV
-*     routines, and defined in the NAG manual (see Chapter E02 on 
+*     routines, and defined in the NAG manual (see Chapter E02 on
 *     "Curve and Surface fitting").
 *
-*     This routine will convert the coefficient array to 
+*     This routine will convert the coefficient array to
 *     two-dimensional, flip it around and store it in the POLYNOMIAL
 *     structure so that DATA_ARRAY(IX,IY) contains the coefficient for
 *     the (IX,IY)th term.
 *
-*     The routine will also load the knot positions in the vector KNOTS 
+*     The routine will also load the knot positions in the vector KNOTS
 *     storing the first dimension knots followed by the second
-*     dimension, and a data-scaling factor in SCALE, both of which have 
+*     dimension, and a data-scaling factor in SCALE, both of which have
 *     type _REAL.
 
 *  Arguments:
@@ -56,7 +56,7 @@
 *        The scale factor applied to the data values before calculating
 *        the spline.
 *     NCOEF = INTEGER (Given)
-*        The number of bi-cubic coefficients.  It must equal 
+*        The number of bi-cubic coefficients.  It must equal
 *        (%NXKNOT+4) * (%NYKNOT+4).
 *     COEFF( NCOEF ) = REAL (Given)
 *        The bi-cubic B-spline coefficients, defined at the knots in the
@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -188,8 +188,8 @@
       OFFSET( 1 ) = 0
 
       DO IX = 2, NDF__MXDIM
-         IDIMS( IX ) = 1 
-         ODIMS( IX ) = 1 
+         IDIMS( IX ) = 1
+         ODIMS( IX ) = 1
          OFFSET( IX ) = 0
       END DO
 

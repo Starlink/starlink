@@ -52,7 +52,7 @@ C-----------------------------------------------------------------------------
             IF ( ESIG.EQ.0.0D0 ) THEN
                IF ( OPARRAY(I, 2).LT.0.0D0 ) THEN
                   CALL PERIOD_WRITEBELL()
-                  WRITE (*, *) '** ERROR: Square root of' // 
+                  WRITE (*, *) '** ERROR: Square root of' //
      :                         ' negative number in PERIOD_NOISE.'
                   IFAIL = 1
                   GO TO 700

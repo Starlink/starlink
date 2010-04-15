@@ -294,7 +294,7 @@ proc package {name defn} {
 	eval $defn
 
 	rename action {}
-        
+
 	executable_end_hook $name
 
         set Context [lreplace $Context 0 0]
@@ -324,7 +324,7 @@ proc package {name defn} {
 
         proc task {action defn} {
            global Paramlist
-           
+
            proc taskparam {val} {
               taskparam_start_hook $val
            }

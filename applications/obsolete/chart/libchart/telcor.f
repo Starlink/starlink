@@ -17,7 +17,7 @@
 *     22-MAR-1993 (AJJB):
 *        Commented out declarations of local variables which are never
 *        used.
-*       
+*
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -36,7 +36,7 @@
       DATA A3/0.40724D-3/
       DATA C0,C1,C2,C3/-1.739,-0.4808,0.2362D-4,0.2200D-4/
       DATA HALFM/0.145444D-3/
-      
+
 *
 *   Define a double precision function.
 *

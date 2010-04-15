@@ -22,11 +22,11 @@
 
 *  Arguments:
 *     LOC1 = CHARACTER * ( * ) (Given)
-*         Object locator. 
+*         Object locator.
 *     LOC2 = CHARACTER * ( * ) (Given)
-*         Structure locator. 
+*         Structure locator.
 *     NAME = CHARACTER * ( * ) (Given)
-*         Component name. 
+*         Component name.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,8 +124,8 @@
 
 *  If a DAT__OBJIN error was reported, attempt to copy the slice or cell.
       IF( SORC ) THEN
-      
-*  Get the data type, and the dimensions, of the object being copied. 
+
+*  Get the data type, and the dimensions, of the object being copied.
          CALL DAT_TYPE( LOC1, TYPE, STATUS )
          CALL DAT_SHAPE( LOC1, DAT__MXDIM, DIM, NDIM, STATUS )
 
@@ -158,7 +158,7 @@
 
 *  Loop round every cell.
             CALL DAT_SIZE( LOC1V, SIZE, STATUS )
-            DO I = 1, SIZE   
+            DO I = 1, SIZE
 
 *  Get a locator to the input and output cells.
                CALL DAT_CELL( LOC1V, 1, I, LOC1C, STATUS )

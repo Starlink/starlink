@@ -33,7 +33,7 @@ C   Formal parameters
       IERR = 0
 
 C  Which point in the map do we want? (This is the tricky bit)
-C  Hunt around in the pointing history table until we 
+C  Hunt around in the pointing history table until we
 C  find a position that satisfies a nearness criterion.
 C  (Given that we may actually map in fractional raster units, this
 C   is pretty arbitrary - we don't know what the basic granularity of the

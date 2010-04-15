@@ -15,10 +15,10 @@
     operates on data produced by these instruments and can be used to
     transform them into calibrated images, spectra, time-series etc.
 
-   XRT was created by taking the ROSAT XRT-specific functions in the 
-   ASTERIX general X-ray astronomy data reduction system and 
+   XRT was created by taking the ROSAT XRT-specific functions in the
+   ASTERIX general X-ray astronomy data reduction system and
    re-packaging them as stand-alone applications.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

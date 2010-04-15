@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmdafin(char*qfoo,int*qbar,double*qbaz,int*Q0){int 
+void sbmdafin(char*qfoo,int*qbar,double*qbaz,int*Q0){int
 qfobar,q1,q2,qfoobar;double Q3,q4,qfOBAz;q1=0;qfOBAz=0.0;q4=
 0.0;Q3=0.0;sbmdfltin(qfoo,qbar,&qfOBAz,&qfobar);if(qfobar>1)
 {q1=-1;}else{sbmdfltin(qfoo,qbar,&q4,&q2);if(q2<0||q2>1){q1=

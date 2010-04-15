@@ -1,6 +1,6 @@
- 
+
       SUBROUTINE PERIOD_SHELLSORT(NDATA, XDATA, KEY)
- 
+
 C===========================================================================
 C Shell sort routine:
 C INPUT:
@@ -21,25 +21,25 @@ C Converted to Double Precision (KPD), August 2001
 C===========================================================================
 
       IMPLICIT NONE
- 
+
       INTEGER   I,NDATA,JUMP,IEND,I1,I2,KEEP
       DOUBLE PRECISION XDATA(NDATA),XX
       INTEGER   KEY(NDATA)
- 
+
 C---------------------------------------------------------------------------
 C Evaluate jump step to be used in shell sort.
 C---------------------------------------------------------------------------
- 
+
       JUMP = 2
  100  CONTINUE
       JUMP = 2*JUMP
       IF ( JUMP.LT.NDATA ) GO TO 100
       JUMP = MIN0(NDATA, (3*JUMP)/4-1)
- 
+
 C---------------------------------------------------------------------------
 C Initialise key array.
 C---------------------------------------------------------------------------
- 
+
       DO 200 I = 1, NDATA
          KEY(I) = I
  200  CONTINUE
@@ -50,14 +50,14 @@ C---------------------------------------------------------------------------
          DO 250 I = 1, IEND
             I1 = I
             I2 = I + JUMP
- 
+
 C---------------------------------------------------------------------------
 C Compare values JUMP apart in the current sorted array a value is moved
 C in the array if it is less than the value JUMP bins before it. It will
 C carry on jumping up the array until it meets a smaller value or runs out
 C of space.
 C---------------------------------------------------------------------------
- 
+
             IF ( XDATA(KEY(I1)).GT.XDATA(KEY(I2)) ) THEN
                KEEP = KEY(I2)
                XX = XDATA(KEEP)
@@ -72,6 +72,6 @@ C---------------------------------------------------------------------------
             END IF
  250     CONTINUE
       END DO
- 
+
       RETURN
       END

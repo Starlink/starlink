@@ -1,21 +1,21 @@
 *+  GEN_MEND1F - Interpolate across bad pixels in 1-D real array.
-      SUBROUTINE GEN_MEND1F( DIM, INPUT, INVAR, INQUAL, QUALITY, 
+      SUBROUTINE GEN_MEND1F( DIM, INPUT, INVAR, INQUAL, QUALITY,
      :  FLAGGED, FBAD, VARIANCE, OUTPUT, OUTVAR, OUTQUAL )
 *    Description :
 *     This routine "mends" a 1-D array by interpolating the data
 *     values across bad pixel regions. A linear interpolation is used.
 *     New variance values are calculated.
 *
-*     Note that the interpolated values will no longer have independent 
+*     Note that the interpolated values will no longer have independent
 *     variances.
 *
 *     Although this routine is designed to process 1-D arrays, it may
 *     also work with 2-D arrays, as long as interpolation across columns
 *     and not rows is acceptable.
 *    Invocation :
-*     CALL GEN_MEND1F( DIM, INPUT, INVAR, INQUAL, QUALITY, 
+*     CALL GEN_MEND1F( DIM, INPUT, INVAR, INQUAL, QUALITY,
 *     :  FLAGGED, FBAD, VARIANCE, OUTPUT, OUTVAR, OUTQUAL )
-*    Parameters 
+*    Parameters
 *     DIM           = INTEGER( READ )
 *           Dimension of the arrays
 *     INPUT( DIM )  = REAL( READ )
@@ -141,7 +141,7 @@
                IF ( I1 .EQ. 0 ) THEN
 
 *               The region touches the left hand edge. If it touches
-*               the right hand edge as well, give up! Otherwise 
+*               the right hand edge as well, give up! Otherwise
 *               duplicate the value found in the good pixel at I2.
 
                   IF ( I2 .LE. DIM ) THEN
@@ -156,7 +156,7 @@
 
                ELSE IF ( I2 .GT. DIM ) THEN
 
-*               The region touches the right hand edge. 
+*               The region touches the right hand edge.
 *               Duplicate the value found in the good pixel at I1.
 
                   DO J = I1+1, DIM
@@ -184,7 +184,7 @@
                      IF ( VARIANCE ) THEN
 
                         OUTVAR(J) = 4.0
-     :                              * ( B*B*INVAR(I1) + A*A*INVAR(I2) ) 
+     :                              * ( B*B*INVAR(I1) + A*A*INVAR(I2) )
      :                              / ABSQ
                      END IF
 
@@ -243,7 +243,7 @@
                IF ( I1 .EQ. 0 ) THEN
 
 *               The region touches the left hand edge. If it touches
-*               the right hand edge as well, give up! Otherwise 
+*               the right hand edge as well, give up! Otherwise
 *               duplicate the value found in the good pixel at I2.
 
                   IF ( I2 .LE. DIM ) THEN
@@ -257,7 +257,7 @@
 
                ELSE IF ( I2 .GT. DIM ) THEN
 
-*               The region touches the right hand edge. 
+*               The region touches the right hand edge.
 *               Duplicate the value found in the good pixel at I1.
 
                   DO J = I1+1, DIM
@@ -284,7 +284,7 @@
                      IF ( VARIANCE ) THEN
 
                         OUTVAR(J) = 4.0
-     :                              * ( B*B*INVAR(I1) + A*A*INVAR(I2) ) 
+     :                              * ( B*B*INVAR(I1) + A*A*INVAR(I2) )
      :                              / ABSQ
                      END IF
                   END DO

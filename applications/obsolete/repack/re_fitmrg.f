@@ -70,7 +70,7 @@
         CALL SYS_GETLUN(ILSI,lstat)
         OPEN (ILSI, FILE=LIST, STATUS='OLD', READONLY)
       ENDIF
- 
+
 
       nevf = 1
  700  READ(ILSI, '(a)', END=799) iname(NEVF)
@@ -118,13 +118,13 @@
 	  goto 999
 	endif
       endif
-            
+
 *
       write(*,*)
       WRITE(*,*) '   Merging ',NEVF,' event files.'
       write(*,*)
 
-* Copy first fit file to merged file. 
+* Copy first fit file to merged file.
       call ftgiou(ifit, status)
       call ftgiou(ofit, status)
 
@@ -141,9 +141,9 @@
       mrkeys = 2
       call ftcopy(ifit, ofit, mrkeys, status)
       call ftphis(ofit, 'Merged RE event file. '//version, status)
-      call ftpkyj(ofit, 'NMAPS', nevf, 
+      call ftpkyj(ofit, 'NMAPS', nevf,
      &               'number of event maps merged', status)
-      
+
 * Bintable extension
       call ftcrhd(ofit, status)
       call ftmahd(ifit, 2, hdutyp, status)
@@ -166,7 +166,7 @@
       call ftclos(ifit, status)
       call ftfiou(ifit, status)
       if (status .ne. 0) call printerror(status)
-	
+
 * Merge in the rest of the files.
       do i=2,nevf
         rw = 0

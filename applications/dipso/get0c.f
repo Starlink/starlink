@@ -26,7 +26,7 @@
 *
 *     A word is any contiguous block of non-blank characters, or a
 *     string contained within single quotes.
-      
+
 *  Arguments:
 *     PARAMS = CHARACTER * ( * ) (Given)
 *        The string containing command parameters.
@@ -37,13 +37,13 @@
 *        one.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
-*        supplied default value will be returned if no value has 
+*        supplied default value will be returned if no value has
 *        been supplied. Otherwise, the user is prompted if no value
 *        has been supplied.
 *     COMM = CHARACTER * ( * ) (Given)
 *        The command name.
 *     PROMPT = CHARACTER * ( * ) (Given)
-*        The prompt string. 
+*        The prompt string.
 *     DEFVAL = CHARACTER * ( * ) (Given)
 *        The default value.
 *     VALUE = CHARACTER * ( * ) (Returned)
@@ -72,7 +72,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -80,10 +80,10 @@
       CHARACTER * ( * ) COMM
       CHARACTER * ( * ) PROMPT
       CHARACTER * ( * ) DEFVAL
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) VALUE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -91,7 +91,7 @@
       INTEGER CHR_LEN            ! Index of last non-blank chatracter
 
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :        F,                 ! Index of first non-blank character
      :        L,                 ! Index of last non-blank character
      :        LVALUE             ! Used length of VALUE
@@ -108,15 +108,15 @@
       IF( POS .LE. 0 ) THEN
          VALUE = PARAMS
 
-*  Otherwise, try and find the required word within the supplied list 
+*  Otherwise, try and find the required word within the supplied list
 *  of parameter values.
       ELSE
          CALL FWORD( PARAMS, POS, VALUE, LVALUE )
 
       END IF
-      
+
 *  If no value was given on the command line...
-      IF( VALUE .EQ. ' ' ) THEN      
+      IF( VALUE .EQ. ' ' ) THEN
 
 *  If the parameter is optional, return the default value.
          IF( OPT ) THEN
@@ -126,7 +126,7 @@
          ELSE
             VALUE = ' '
             CALL RDSTR( COMM, PROMPT, DEFVAL, VALUE, STATUS )
-         END IF      
+         END IF
 
       END IF
 
@@ -141,7 +141,7 @@
 
          ELSE IF( VALUE( F:L ) .EQ. '!!' ) THEN
             STATUS = PAR__ABORT
-            CALL ERR_REP( 'GET0C_ERR2', 'Parameter request aborted.', 
+            CALL ERR_REP( 'GET0C_ERR2', 'Parameter request aborted.',
      :                    STATUS )
          END IF
 
@@ -149,5 +149,5 @@
 
 *  If an error has occurred, return a blank string.
       IF( STATUS .NE. SAI__OK ) VALUE = ' '
-         
+
       END

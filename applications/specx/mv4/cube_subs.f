@@ -150,9 +150,9 @@ CD   &               CURRENT_INDEX_ADDRESS
       SUBROUTINE READ_CUBE_DATA (IIN, JIN, LDATA, DATA)
 
 C  Routine to read spectrum from data cube at (x,y) position = (iin,jin)
- 
+
       IMPLICIT NONE
- 
+
 C  Formal parameters:
 
       INTEGER*4 IIN, JIN          ! Cube indices
@@ -181,11 +181,11 @@ C  Other variables:
 
       SUBROUTINE READ_NEW_CUBE2 (IIN, JIN, LDATA, I1, I2, DATA)
 
-C  Routine to read spectrum from modified data 
+C  Routine to read spectrum from modified data
 C  cube at (x,y) position = (iin,jin)
- 
+
       IMPLICIT NONE
- 
+
 C  Formal parameters:
 
       INTEGER*4 IIN, JIN          ! Cube indices

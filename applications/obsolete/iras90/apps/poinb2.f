@@ -1,6 +1,6 @@
-      SUBROUTINE POINB2( MAXDET, MAXSRC, DETNUM, EXPSRC, IDET, LOGREQ, 
-     :                   LOGFID, SCALE, SCS, SRCN, SRCAMP, SRCANG, 
-     :                   SRCBAS, SRCCOR, SRCDEC, SRCINS, SRCNON, 
+      SUBROUTINE POINB2( MAXDET, MAXSRC, DETNUM, EXPSRC, IDET, LOGREQ,
+     :                   LOGFID, SCALE, SCS, SRCN, SRCAMP, SRCANG,
+     :                   SRCBAS, SRCCOR, SRCDEC, SRCINS, SRCNON,
      :                   SRCNOS, SRCRA, SRCSLP, UNITS, STATUS )
 *+
 *  Name:
@@ -33,7 +33,7 @@
 *     EXPSRC = LOGICAL (Given)
 *        If true an expected source position was supplied.
 *     IDET = INTEGER (Given)
-*        Detector index for the current detector 
+*        Detector index for the current detector
 *     LOGFID = INTEGER (Given)
 *        When logging is required, it gives the ID of the logfile.
 *     LOGREQ = LOGICAL (Given)
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -181,13 +181,13 @@
 * Report the number of sources found
 * **************************************************************************
       CALL MSG_BLANK( STATUS )
-      IF ( SRCN .EQ. 1 ) THEN 
+      IF ( SRCN .EQ. 1 ) THEN
          CALL MSG_SETC('DETST',DETST(:DETLN))
          CALL MSG_OUT( 'POINB2_MSG1', ' A single '/
      :                /' point source is detected in the trace'/
      :                /' of the detector ^DETST',
      :                STATUS )
-      ELSE 
+      ELSE
          CALL MSG_SETC('DETST',DETST(:DETLN))
          CALL MSG_SETC('SRCNST',SRCNST(:SRCNLN))
          CALL MSG_OUT( 'POINB2_MSG1', '^SRCNST'/
@@ -207,7 +207,7 @@
          END IF
       END IF
 
-               
+
 * **************************************************************************
 *  Report the sources one by one.
 * **************************************************************************
@@ -247,7 +247,7 @@
          CALL MSG_SETC('SCS',   SCS(:SCSLN))
          CALL MSG_OUT( 'POINB2_MSG3', 'Sky position    : '/
      :                 /'^LONST ^LATSRC ^SCS', STATUS)
-         
+
          IF ( LOGREQ ) THEN
 
 *  Produce a short form of the coordinate system description
@@ -286,7 +286,7 @@
      :                     /' '//SCSST( :SCSLN ), STATUS )
          END IF
 
-*  Report the in-scan distance of the source if an expected position was 
+*  Report the in-scan distance of the source if an expected position was
 *  supplied
          IF ( EXPSRC ) THEN
             CALL CHR_RTOC( ABS( SRCINS( ISRC ) ), INSCST, INSCLN)
@@ -301,7 +301,7 @@
      :                    /' (Arcmin) ',STATUS )
             END IF
          END IF
-      
+
 * ****************************************************************************
 *  Convert or calculate point source amplitude, etc. information and report it
 * ****************************************************************************
@@ -323,7 +323,7 @@
          CALL MSG_SETC('AMPST',AMPST(:AMPLN))
          CALL MSG_SETC('UNITS',UNITS(:UNITLN))
          CALL MSG_OUT( 'POINB2_MSG4', 'Source Amplitude: '/
-     :                 /'^AMPST (^UNITS)', 
+     :                 /'^AMPST (^UNITS)',
      :                  STATUS )
          CALL MSG_SETC('SLPST',SLPST(:SLPLN))
          CALL MSG_SETC('UNITS',UNITS(:UNITLN))
@@ -390,7 +390,7 @@
      :                 /'the source',STATUS )
             CALL FIO_WRITE( LOGFID, 'Correlation coef: '/
      :                 /CORRST( : CORRLN ), STATUS )
-         END IF                  
+         END IF
 
       END DO
 

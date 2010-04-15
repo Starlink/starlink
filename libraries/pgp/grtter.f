@@ -31,7 +31,7 @@
       INTEGER ISTAT, LT
       CHARACTER*20 TERM
       LOGICAL CHR_SIMLR
-      
+
 *  Mark error stack
       CALL ERR_MARK
 

@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,17 +98,17 @@
       DO I = 1, SIZE
 
 *  Loop removing all occurences of the string "<!!".
-         START = INDEX( NAMES( I ), '<!!' ) 
-         DO WHILE( START .GT. 0 ) 
+         START = INDEX( NAMES( I ), '<!!' )
+         DO WHILE( START .GT. 0 )
             NAMES( I )( START : ) = NAMES( I )( START + 3 : )
-            START = INDEX( NAMES( I ), '<!!' ) 
+            START = INDEX( NAMES( I ), '<!!' )
          END DO
 
 *  Loop removing all occurences of the string "!!>".
-         START = INDEX( NAMES( I ), '!!>' ) 
-         DO WHILE( START .GT. 0 ) 
+         START = INDEX( NAMES( I ), '!!>' )
+         DO WHILE( START .GT. 0 )
             NAMES( I )( START : ) = NAMES( I )( START + 3 : )
-            START = INDEX( NAMES( I ), '!!>' ) 
+            START = INDEX( NAMES( I ), '!!>' )
          END DO
 
       END DO

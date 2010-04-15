@@ -45,7 +45,7 @@ C     (<) ACCESS           (Fixed string,descr) A single character that
 C                          indicates the routine to be used to access
 C                          the item in its `natural' form.  This will be
 C                          one of `L',`I',`S',`C',`F',`D', corresponding
-C                          to DSA_GET_FITS_L, DSA_GET_FITS_I, etc.  If 
+C                          to DSA_GET_FITS_L, DSA_GET_FITS_I, etc.  If
 C                          the item exists but cannot be accessed by any
 C                          of these routines (for example, because it is
 C                          a structure), ACCESS will be set to blank.

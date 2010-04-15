@@ -93,7 +93,7 @@
 #     addbutton name args
 #        Creates a button and packs it into the choice bar. "args" is
 #        optional and should be the button command if used.
-#     focus name 
+#     focus name
 #        Sets the focus to the named button.
 #     sethelp name document label.
 #        Sets the context sensitive help information for the button
@@ -195,7 +195,7 @@
       method addbutton { name args } {
          set newwidth [ string length $name ]
          if { $newwidth > $buttonwidth } {
-            if { $newwidth <= $maxwidth || $maxwidth == 0 } { 
+            if { $newwidth <= $maxwidth || $maxwidth == 0 } {
                set buttonwidth $newwidth
                set resize 1
             }

@@ -15,7 +15,7 @@
 *  Description:
 *     This routine is a service routine for LUTABLE.  It performs all
 *     the work of LUTABLE, using the supplied work arrays in place of
-*     the fixed size arrays which used to be used. Most of the LUTABLE 
+*     the fixed size arrays which used to be used. Most of the LUTABLE
 *     parameter names are hard-wired into this routine.  See the
 *     prologue in lutable.f for parameter details.
 
@@ -63,8 +63,8 @@
 
 *  History:
 *     10-OCT-2001 (DSB):
-*        Original version, extracted from lutable.f.  Also added check 
-*        that greyscale colour tables do not have a hint of colour about 
+*        Original version, extracted from lutable.f.  Also added check
+*        that greyscale colour tables do not have a hint of colour about
 *        them due to different resolutions on the three primary colours.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
@@ -78,7 +78,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Global SSE definitions
@@ -97,7 +97,7 @@
 
 *  Arguments Returned:
       REAL IMDSET( 3, 0:NINTS - 1 )
-      INTEGER PENS( 0:NINTS - 1 ) 
+      INTEGER PENS( 0:NINTS - 1 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -131,7 +131,7 @@
                                  ! fill above equal-sized coloured
                                  ! blocks
       INTEGER CIOFF              ! Offset of first colour index to
-                                 ! which to write 
+                                 ! which to write
       REAL CIFRAC                ! Fractional colour-index counter for
                                  ! coloured blocks
       REAL COLSET( NPRICL, NLUTST ) ! Standard coloured LUT
@@ -139,14 +139,14 @@
                                  ! standard colour-set block
       DOUBLE PRECISION DMAXV     ! Minimum value in the array
       DOUBLE PRECISION DMINV     ! Maximum value in the array
-      CHARACTER DTYPE * ( NDF__SZFTP ) ! Type of the image after 
+      CHARACTER DTYPE * ( NDF__SZFTP ) ! Type of the image after
                                  ! processing (not used)
       INTEGER EL                 ! Number of elements in the input array
       LOGICAL EXL1ST             ! First time to get an external LUT?
       LOGICAL FIRST              ! First time through the loop?
       REAL FROB                  ! Fraction of standard coloured blocks
                                  ! that will have an extra index
-      REAL PGPCOL( NPRICL )      ! Used to transfer the colour of one 
+      REAL PGPCOL( NPRICL )      ! Used to transfer the colour of one
                                  ! pen to the image-display colour table
       INTEGER HIST( NUMBIN )     ! Array containing histogram for
                                  ! percentiles
@@ -192,7 +192,7 @@
       LOGICAL REFOBJ             ! Is there a reference object?
       REAL RMAXV                 ! Minimum value in the array
       REAL RMINV                 ! Maximum value in the array
-      REAL RNINTS                ! Scaling factor to convert lookup 
+      REAL RNINTS                ! Scaling factor to convert lookup
                                  ! table to range 0 to 1
       INTEGER SDIM( NDIM )       ! Indices of significant axes
       REAL SHADE                 ! Type of shading emphasis
@@ -255,7 +255,7 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
-      
+
 *  This is the main loop in which the lookup table and mapping may be
 *  changed.
       DO WHILE ( LOOP )
@@ -404,7 +404,7 @@
 
 *  Obtain the identifier of the NDF already displayed.  It must have
 *  exactly two significant dimensions.
-               CALL KPG1_GTNDF( 'NDF', NDIM, .TRUE., 'Read', NDF, SDIM, 
+               CALL KPG1_GTNDF( 'NDF', NDIM, .TRUE., 'Read', NDF, SDIM,
      :                          SLBND, SUBND, STATUS )
 
 *  This application can only process real or double-precision
@@ -413,7 +413,7 @@
                CALL NDF_MTYPE( '_REAL,_DOUBLE', NDF, NDF, 'Data', ITYPE,
      :                         DTYPE, STATUS )
 
-*  Check whether or not bad pixels may be present.      
+*  Check whether or not bad pixels may be present.
                CALL NDF_BAD( NDF, 'Data', .FALSE., BAD, STATUS )
 
 *  Map the input image.
@@ -422,14 +422,14 @@
 
 *  Obtain the maximum and minimum values.
                IF( ITYPE .EQ. '_REAL' ) THEN
-                   CALL KPG1_MXMNR( BAD, EL, 
-     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                   CALL KPG1_MXMNR( BAD, EL,
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              NINVAL,
      :                              RMAXV, RMINV, MAXPOS, MINPOS,
      :                              STATUS )
                ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-                   CALL KPG1_MXMND( BAD, EL, 
-     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+                   CALL KPG1_MXMND( BAD, EL,
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              NINVAL,
      :                              DMAXV, DMINV, MAXPOS, MINPOS,
      :                              STATUS )
@@ -475,7 +475,7 @@
 *  percentile routine.
             IF( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST, 
+     :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST,
      :                          STATUS )
                DMAXV = DBLE( RMAXV )
                DMINV = DBLE( RMINV )
@@ -516,7 +516,7 @@
      :                          SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
-     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ),
      :                          %VAL( CNF_PVAL( WPNTR2 ) ),
      :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
@@ -525,7 +525,7 @@
      :                          SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
-     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ),
      :                          %VAL( CNF_PVAL( WPNTR2 ) ),
      :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
             END IF
@@ -756,7 +756,7 @@
                ELSE
 
 *  If the structure was found then read in the lookup table.
-                  CALL KPG1_LUTIN( LDIMS( 2 ), 
+                  CALL KPG1_LUTIN( LDIMS( 2 ),
      :                             %VAL( CNF_PVAL( LPNTR( 1 ) ) ),
      :                             ANINTS, NN, IMDSET, STATUS )
                END IF
@@ -793,9 +793,9 @@
                 END DO
 
 *  If we want a greyscale (positive or negative), we now check that the
-*  pens actually in use by PGPLOT are all grey.  They may not be since 
+*  pens actually in use by PGPLOT are all grey.  They may not be since
 *  some devices have finer resolution on some colours.  For example, a
-*  16-bit TrueColour X window will have 5 bits for two colours and 6 
+*  16-bit TrueColour X window will have 5 bits for two colours and 6
 *  bits for the other.  The 6-bit colour can be set twice as accurately
 *  as the 5-bit colours, resulting in the "grey" scale having a tendency
 *  to be shaded in favour of the 6-bit colour.
@@ -808,7 +808,7 @@
                       CALL PGQCR( I + CIOFF, PGPCOL( 1 ), PGPCOL( 2 ),
      :                            PGPCOL( 3 ) )
 
-*  If only two of the three RGB intensities are equal, we set the third 
+*  If only two of the three RGB intensities are equal, we set the third
 *  (unequal) intensity equal to the other intensity.
                      IF( PGPCOL( 1 ) .EQ. PGPCOL( 2 ) .AND.
      :                   PGPCOL( 1 ) .NE. PGPCOL( 3 ) ) THEN
@@ -852,7 +852,7 @@
       IF( IMAGE ) CALL NDF_END( STATUS )
 
 *  Save the current colour table in $$ADAM_USER/kappa_lut.sdf
-      CALL KPG1_LTSAV( STATUS )      
+      CALL KPG1_LTSAV( STATUS )
 
 *  Tidy up.
  999  CONTINUE

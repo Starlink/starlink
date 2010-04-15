@@ -29,7 +29,7 @@
 
 *  Notes:
 *     This routine does not define the prompts; changes here should
-*     be reflected in the prompt fields of the interface definition 
+*     be reflected in the prompt fields of the interface definition
 *     (.ifd) files.
 
 *  Copyright:
@@ -71,30 +71,30 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) PROMPT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
       INTEGER MAXNAM             ! The number of parameter names
       PARAMETER ( MAXNAM = 8 )
-      
+
 *  Local Variables:
       CHARACTER * ( DAT__SZNAM ) PNAMES( MAXNAM ) ! Parameter names
       CHARACTER * ( 80 ) PROMPS( MAXNAM ) ! Prompt strings
       INTEGER I                  ! Loop variable
 
 *  Local Data:
-      DATA PNAMES / 'ADC', 
-     :              'BOUNDS', 
-     :              'DEFERRED', 
-     :              'DIRECTION', 
+      DATA PNAMES / 'ADC',
+     :              'BOUNDS',
+     :              'DEFERRED',
+     :              'DIRECTION',
      :              'EXTENT',
      :              'MASK',
      :              'RNOISE',
@@ -112,7 +112,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Loop over all known parameters.
       DO I = 1, MAXNAM
 
@@ -128,9 +128,9 @@
 *  Dropped out of loop without finding a match.  Signal an error.
       STATUS = SAI__ERROR
       CALL MSG_SETC( 'PARAM', PARAM )
-      CALL ERR_REP( 'CCD1_GPNAM_NONAM', 
+      CALL ERR_REP( 'CCD1_GPNAM_NONAM',
      :              'CCD1_GPNAM: Parameter ''^PARAM'' unknown', STATUS )
- 
+
  1    CONTINUE
 
       END

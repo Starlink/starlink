@@ -92,59 +92,59 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER EL                 ! Number of data points before clipping
       REAL FIT( EL )           ! Fitted data
       REAL RMS                   ! RMS difference between the fitted and
                                  ! unfitted arrays
       REAL CLIP                  ! Clipping factor
- 
+
 *  Arguments Given and Returned:
       REAL X( EL )             ! X co-ordinates of the data
       REAL Y( EL )             ! Y co-ordinates of the data
       REAL Z( EL )             ! Data values
       REAL W( EL )             ! Weights of the data
- 
+
 *  Arguments Returned:
       INTEGER NBIN               ! Number of bins remaining after
                                  ! clipping
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       REAL CLIPA                 ! Absolute clipping factor
       INTEGER I                  ! Loop counter
       REAL RESID                 ! Residual of the fit at a point
       REAL RMSA                  ! Absolute rms
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Initialise absolute values and counter.
       CLIPA = ABS( CLIP )
       RMSA = ABS( RMS )
       NBIN = 0
- 
+
 *  Check each value in the list.
       DO I = 1, EL
- 
+
 *  Form the residual from the fit.
          RESID = REAL( Z( I ) - FIT( I ) )
- 
+
 *  Test to see the value lies within the allowed bounds.
          IF ( RESID .GT. -CLIPA * RMSA .AND.
      :        RESID .LT. CLIPA * RMSA ) THEN
- 
+
 *  Value lies between the clipping bounds, and so is retained.  Copy
 *  the data from in former location in the list, to its new position in
 *  the truncated list.
@@ -155,5 +155,5 @@
             Y( NBIN ) = Y( I )
          END IF
       END DO
- 
+
       END

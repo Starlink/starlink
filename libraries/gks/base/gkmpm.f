@@ -90,7 +90,7 @@ C# IL>=a, OL>=0
 *       Bring polymarker atrributes up-to-date
 *
         IF (KSPMWK.NE.KGKSFN) THEN
-*         Setting transformation and clipping information as in GKS state 
+*         Setting transformation and clipping information as in GKS state
 *         list is not required for Polymarker since it has no geometric
 *         attributes. Therefore we go straight to updating the attributes.
           CALL GKCPMG

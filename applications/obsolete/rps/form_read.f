@@ -4,21 +4,21 @@
 *---------------------------------------------------------------------------
       SUBROUTINE FORM_READ(REF_NO, IREC, IERR)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       INTEGER REF_NO		! In	File ref.
       INTEGER IREC		!	Record number
       INTEGER IERR		! Out	Status, 0: OK
- 
+
 *  Functions
       CHARACTER*1 FORM_GETC
- 
+
 *  Local Variables
       CHARACTER*1 TEXT
-      CHARACTER*43 
+      CHARACTER*43
      &  ERROR_MESSAGE/'Fortran Read error      , <RET> to continue'/
 * ________________________ Executable Code _______________________________
- 
+
       CALL DBS_READ(REF_NO, IREC, IERR)
 
       IF (IERR.NE.0) THEN

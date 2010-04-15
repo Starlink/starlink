@@ -1,4 +1,4 @@
-      SUBROUTINE PDA_DNLS1E (FCN, IOPT, M, N, X, FVEC, TOL, NPRINT, 
+      SUBROUTINE PDA_DNLS1E (FCN, IOPT, M, N, X, FVEC, TOL, NPRINT,
      +                       INFO, IW, WA, LWA,STATUS)
 C***BEGIN PROLOGUE  DNLS1E
 C***PURPOSE  An easy-to-use code which minimizes the sum of the squares

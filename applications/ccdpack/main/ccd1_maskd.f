@@ -108,31 +108,31 @@
 
 *  Have both data components.
          IF ( PTYPE .EQ. '_UBYTE') THEN
-             CALL CCG1_CPBUB( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_CPBUB( %VAL( CNF_PVAL( IPMASK ) ),
      :                        %VAL( CNF_PVAL( IPOINT ) ), EL,
      :                        STATUS )
          ELSE IF ( PTYPE .EQ. '_BYTE' ) THEN
-             CALL CCG1_CPBB( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_CPBB( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL,
      :                       STATUS )
          ELSE IF ( PTYPE .EQ. '_WORD' ) THEN
-             CALL CCG1_CPBW( %VAL( CNF_PVAL( IPMASK )), 
+             CALL CCG1_CPBW( %VAL( CNF_PVAL( IPMASK )),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL,
      :                       STATUS )
          ELSE IF ( PTYPE .EQ. '_UWORD' ) THEN
-             CALL CCG1_CPBUW( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_CPBUW( %VAL( CNF_PVAL( IPMASK ) ),
      :                        %VAL( CNF_PVAL( IPOINT ) ), EL,
      :                        STATUS )
          ELSE IF ( PTYPE .EQ. '_INTEGER' ) THEN
-             CALL CCG1_CPBI( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_CPBI( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL,
      :                       STATUS )
          ELSE IF ( PTYPE .EQ. '_REAL' ) THEN
-             CALL CCG1_CPBR( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_CPBR( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL,
      :                       STATUS )
          ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-             CALL CCG1_CPBD( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_CPBD( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT )), EL,
      :                       STATUS )
          END IF
@@ -140,31 +140,31 @@
 
 *  Have a quality array to set BAD.
          IF ( PTYPE .EQ. '_UBYTE') THEN
-             CALL CCG1_SQBUB( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_SQBUB( %VAL( CNF_PVAL( IPMASK ) ),
      :                        %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                        BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_BYTE' ) THEN
-             CALL CCG1_SQBB( %VAL( CNF_PVAL( IPMASK )), 
+             CALL CCG1_SQBB( %VAL( CNF_PVAL( IPMASK )),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                       BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_WORD' ) THEN
-             CALL CCG1_SQBW( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_SQBW( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                       BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_UWORD' ) THEN
-             CALL CCG1_SQBUW( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_SQBUW( %VAL( CNF_PVAL( IPMASK ) ),
      :                        %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                        BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_INTEGER' ) THEN
-             CALL CCG1_SQBI( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_SQBI( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                       BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_REAL' ) THEN
-             CALL CCG1_SQBR( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_SQBR( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                       BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-             CALL CCG1_SQBD( %VAL( CNF_PVAL( IPMASK ) ), 
+             CALL CCG1_SQBD( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                       BBYTE1, STATUS )
          END IF

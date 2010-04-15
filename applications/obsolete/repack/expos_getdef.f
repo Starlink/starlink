@@ -78,7 +78,7 @@
         write(*,*)'   Error in EXPOS_GETDEF'
 	write(*,*)'   Can''t get RECAL environment variable.'
 	status = 1
-	return	    
+	return
       endif
       call chr_fandl(re_res, fc, lc)
       call ftgiou(lunit, status)

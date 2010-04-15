@@ -69,7 +69,7 @@ hdsNew(const char *file_str,
 
 /* Set 64-bit file format flag appropriately                            */
    hds_gl_64bit = hds_gl_c64bit;
-   
+
 /* Validate the object name and type.   */
 
    _call( dau_check_name(  &name, data->name ))

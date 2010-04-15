@@ -24,20 +24,20 @@
 
  v2.1-2 news:
 
-  This version fixes a bug that caused the selection of the Du Pont 2.5m 
-  Telescope, Las Campanas (8 on the menu) to fail.  In addition, 6 new 
+  This version fixes a bug that caused the selection of the Du Pont 2.5m
+  Telescope, Las Campanas (8 on the menu) to fail.  In addition, 6 new
   telescope choices have been added to the menu.
 
  Older news:
 
  v2.1 news:
-  This fixes a serious bug which caused almost all results produced by 
+  This fixes a serious bug which caused almost all results produced by
   version 2.0 to be incorrect.
 
  v2.0 news:
-  OBSERVE gives an overview of the visibility of a star's location 
-  throughout the year, telling you when it rises and sets, the distance 
-  and phase of the Moon, etc.  It on all Starlink platforms, has an 
-  improved user interface, and includes information on many more 
+  OBSERVE gives an overview of the visibility of a star's location
+  throughout the year, telling you when it rises and sets, the distance
+  and phase of the Moon, etc.  It on all Starlink platforms, has an
+  improved user interface, and includes information on many more
   telescope locations.
 

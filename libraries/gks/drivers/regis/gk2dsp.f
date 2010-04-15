@@ -21,7 +21,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-*  
+*
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkwdt.cmn'

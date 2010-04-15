@@ -19,7 +19,7 @@ C     aborted.  If a previous parameter request was aborted,
 C     this routine returns immediately.
 C     This routine was added in 1989 to allow use of double precision
 C     parameters.  In principle, it could be used for all numeric
-C     parameters (in the same way that PAR_RDVAL is traditionally used 
+C     parameters (in the same way that PAR_RDVAL is traditionally used
 C     for integer values as well as for real) but PAR_RDVAL will
 C     probably continue to be used for most real numeric parameters.
 C
@@ -30,8 +30,8 @@ C  Call:
 C     CALL PAR_RDVALD (NAME,VMIN,VMAX,RESET,UNITS,VALUE)
 C
 C  Parameters:      (">" input, "<" output )
-C     (>) NAME      (Fixed string, descr) The name of the parameter.  
-C                   Should be terminated by a blank or the end of the 
+C     (>) NAME      (Fixed string, descr) The name of the parameter.
+C                   Should be terminated by a blank or the end of the
 C                   string.  Case is not significant.
 C     (>) VMIN      (Double, ref) The minimum valid value for the parameter.
 C     (>) VMAX      (Double, ref) The maximum valid value for the parameter.
@@ -54,7 +54,7 @@ C  Original version:  KS / AAO 20th Jan 1989, based on PAR_RDVAL.
 C
 C  Modified:
 C     8th  Dec 1989   KS/AAO. Comments reformatted.
-C     11th Mar 1991   KS / AAO.  Added support for repeated values 
+C     11th Mar 1991   KS / AAO.  Added support for repeated values
 C                     read from parameter value files.
 C     13th Aug 1992   HME: Translate into calls to ADAM parameter system.
 C     6th  Oct 1992   HME: If value has to be brought into range, put

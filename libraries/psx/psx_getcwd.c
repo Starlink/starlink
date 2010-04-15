@@ -87,7 +87,7 @@
 #  define USE_GETWD 1
 #else
    error Unable to find either getwd or getcwd
-#endif 
+#endif
 
 #if USE_GETWD
 #  include <sys/param.h>
@@ -155,7 +155,7 @@ F77_SUBROUTINE(psx_getcwd)( CHARACTER(CWD), INTEGER(STATUS) TRAIL(CWD) )
   /* Free result if we malloced it */
   cnfFree(tempbuf);
 #endif
-  
+
   return;
 
  ERROR:

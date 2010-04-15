@@ -18,7 +18,7 @@
       implicit none
       integer istat
 * Dummy routine to invoke sky related operations  for LONGSLIT
-      call par_wruser('Sorry, SKY_VEL not yet available',istat)      
+      call par_wruser('Sorry, SKY_VEL not yet available',istat)
       end
 
 

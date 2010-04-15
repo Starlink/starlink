@@ -13,7 +13,7 @@ C-----------------------------------------------------------------------
 C   Routine to rotate spectra around stack positions.
 C   Note that this implies that JTOP will be set to JSTK afterwards
 C   (unless the X-register was a "blank" spectrum)
-C   as the T-register will now contain the old X-register. 
+C   as the T-register will now contain the old X-register.
 C   User may need to clear and/or reset JTOP explicitly for non-standard
 C   use of this subroutine.
 

@@ -102,7 +102,7 @@ proc CCDGeomCheckandExit {} {
 	 set eymin [CCDMin $y1 $y2]
 	 set eymax [CCDMax $y1 $y2]
          if { $exmin < $xmin || $eymin < $ymin || \
-                 $exmax > $xmax || $eymax > $ymax } { 
+                 $exmax > $xmax || $eymax > $ymax } {
             CCDIssueInfo \
                "Warning: useful CCD area extends outside of the image"
          }
@@ -152,7 +152,7 @@ proc CCDGeomCheckandExit {} {
 	    set b2y1 [CCDMin $y1 $y2]
 	    set b2y2 [CCDMax $y1 $y2]
             set failed [catch  {set b2aspect [expr double($b2x2-$b2x1)/double($b2y2-$b2y1)]}]
-            if { $failed } { 
+            if { $failed } {
                set b2aspect 1
             }
             set havebias2 1
@@ -166,7 +166,7 @@ proc CCDGeomCheckandExit {} {
             set b1y1 [CCDMin $y1 $y2]
             set b1y2 [CCDMax $y1 $y2]
             set failed [catch  {set b1aspect [expr double($b1x2-$b1x1)/double($b1y2-$b1y1)]}]
-            if { $failed } { 
+            if { $failed } {
                set b1aspect 1
             }
             set havebias1 1

@@ -22,7 +22,7 @@
       COMMON / ECL_COORD/ DECLONG, DECLAT	! Available from ROS_VIEW
       LOGICAL SMG
       COMMON / SMG_KEEP / SMG
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -60,7 +60,7 @@
       END IF
 
       FIELD_NO = DBS_FIELDNO(REF_FORM,'PROPOSAL.TITLE(1)' )
- 
+
       NTARGS = DBS_GETI(REF_FORM,FLD_NTARGETS)
       lineloc = 198
       IF (MORE_SUMMARY) THEN
@@ -78,7 +78,7 @@
            IF (IERR.NE.0) GOTO 90
            TARG_NUM = DBS_GETI(REF_TARGET,1)
 
-           IF (TARG_NUM.EQ.ITARGET) THEN 
+           IF (TARG_NUM.EQ.ITARGET) THEN
              GOTO 60
            END IF
          END DO
@@ -94,9 +94,9 @@
          FIELD_NO=DBS_FIELDNO(REF_TARGET,'TARGET.DEC')
          TARG_DEC =DBS_GETC(REF_TARGET,FIELD_NO)
          CALL DEC_CONVERT(TARG_DEC, DECRADS, LSTATUS)
- 
+
          FIELD_NO=DBS_FIELDNO(REF_TARGET,'TOTAL.OBS.TIME')
-         AKSEC = DBS_GETR(REF_TARGET,FIELD_NO) 
+         AKSEC = DBS_GETR(REF_TARGET,FIELD_NO)
          KSEC = INT( AKSEC)
          WRITE(TOTOBS,'(I3)') KSEC
 
@@ -117,7 +117,7 @@
          PRIME_INSTR = '?'
          IF (HRI .EQ. 1)  PRIME_INSTR = 'H'
          IF (WFC .EQ. 1)  PRIME_INSTR = 'W'
-   
+
          FIELD_NO=DBS_FIELDNO(REF_TARGET,'WFC.ZOOM.ON')
          ZOOM_ON = DBS_GETL(REF_TARGET, FIELD_NO)
 
@@ -143,7 +143,7 @@
                CON_TYPE = 'Cntg'
             ELSE IF (LVAL4) THEN
                CON_TYPE = 'Phas'
-            ELSE 
+            ELSE
                CON_TYPE = 'Y'
             END IF
             CON_COUNT= CON_COUNT +1
@@ -154,7 +154,7 @@
          DO I=1,8
             WRITE(FLD, '(A,I1,A)' ) 'WFC.FILT.CODE(', I, ')'
             FIELD_NO=DBS_FIELDNO(REF_TARGET,FLD)
-            WFC_FILTER(I) = DBS_GETC(REF_TARGET,FIELD_NO) 
+            WFC_FILTER(I) = DBS_GETC(REF_TARGET,FIELD_NO)
             call upc( WFC_FILTER(I))
             NCHAR = MDH_ENDWORD( WFC_FILTER(I) )
 
@@ -197,7 +197,7 @@
      &               '$&%#_{}',SUBINDEX  )
             IF (ITEST .NE. 0) THEN
                LOC = START + ITEST - 1
-               TTARG_NAME= TTARG_NAME(:LOC-1) // BSLASH 
+               TTARG_NAME= TTARG_NAME(:LOC-1) // BSLASH
      &         // TTARG_NAME(LOC:LENS)
                LENS = LENS + 1
                START = LOC + 2
@@ -226,7 +226,7 @@
 
          WRITE(LUN_OUT,'(A)') BSLASH//'put(134,'// YTEXT //'){'//BSLASH//
      &	'makebox(0,0)[tl]{'//BSLASH//'tt '// PRIME_INSTR//'}}'
-         WRITE(LUN_OUT,'(A)') BSLASH//'put(144,'// YTEXT //'){'//BSLASH// 
+         WRITE(LUN_OUT,'(A)') BSLASH//'put(144,'// YTEXT //'){'//BSLASH//
      &	'makebox(0,0)[tl]{'//BSLASH//'tt '// WSTRING(1)(:2)//'}}'
          WRITE(LUN_OUT,'(A)') BSLASH//'put(153,'// YTEXT //'){'//BSLASH//
      &	'makebox(0,0)[tl]{'//BSLASH//'tt '// WSTRING(1)(4:6)//'}}'

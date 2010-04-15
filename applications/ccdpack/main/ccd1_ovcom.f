@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -173,7 +173,7 @@
 *  And find the overlap region (using the offsets)
 *  First the the coordinates of the first list.
       MINXO1 = MAX( MINX1, MINX2 + XOFF ) - ERROR
-      MINYO1 = MAX( MINY1, MINY2 + YOFF ) - ERROR 
+      MINYO1 = MAX( MINY1, MINY2 + YOFF ) - ERROR
       MAXXO1 = MIN( MAXX1, MAXX2 + XOFF ) + ERROR
       MAXYO1 = MIN( MAXY1, MAXY2 + YOFF ) + ERROR
 
@@ -205,7 +205,7 @@
       NOVER = MIN( NUMOV2, NUMOV1 )
 
 *  And get completeness factor.
-      IF ( NOVER .GT. 0 ) THEN 
+      IF ( NOVER .GT. 0 ) THEN
          COMFAC = DBLE( NSELEC ) / DBLE ( NOVER )
       ELSE
          COMFAC = 0.0D0

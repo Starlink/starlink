@@ -109,7 +109,7 @@
 	CALL PAR_PUT0R( 'CALCULATED_MIN', XMINIMUM, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : NSIGMA_SCALE : Illegal Max,Min values',
      :                  STATUS )
 	  RETURN
@@ -141,7 +141,7 @@
 
 * test value of number for values outside limits
 
-	    IF( DEVICE_NAME .EQ. 'CANON'. OR. 
+	    IF( DEVICE_NAME .EQ. 'CANON'. OR.
      :	        DEVICE_NAME .EQ. 'QMS_LANDSCAPE' .OR.
      :	        DEVICE_NAME .EQ. 'QMS_PORTRAIT' .OR.
      :	        DEVICE_NAME .EQ. 'PS_LANDSCAPE' .OR.

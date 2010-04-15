@@ -37,7 +37,7 @@
 *        values, an imaginary part containing zeros being created if
 *        necessary.  If a FALSE value is given, then the components will
 *        be altered so that they hold non-complex values, any imaginary
-*        part being deleted if necessary.  If a null (!) value is supplied, 
+*        part being deleted if necessary.  If a null (!) value is supplied,
 *        the value used is chosen so that no change is made to the current
 *        state. [!]
 *     DATA = _LOGICAL (Read)
@@ -121,7 +121,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -180,7 +180,7 @@
      :                                               TLIST, NC )
  1    CONTINUE
       CALL CHR_RMBLK( TLIST )
-      
+
 *  Obtain a new numeric type using the existing one as the default.
       CALL PAR_CHOIC( 'TYPE', 'NULL', TLIST, .TRUE., TYPE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99

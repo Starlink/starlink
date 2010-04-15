@@ -5,7 +5,7 @@ C     D T A _ M R V A R B
 C
 C     Obtains a pointer to the start of a range of virtual
 C     addresses which contains a named data object.  The
-C     object is mapped read-only, and should not be written to. 
+C     object is mapped read-only, and should not be written to.
 C     This is generally by far the most efficient means of
 C     accessing a large data array, since it generally will
 C     not require any I/O at all; the data system can simply
@@ -21,10 +21,10 @@ C     BYTE.
 C
 C     Parameters -    (">" input, "<" output)
 C
-C     (>) NAME     (Character) The name of the object 
+C     (>) NAME     (Character) The name of the object
 C                  which is to be mapped. This should be in the
 C                  standard data system format, ie name
-C                  components separated by dots followed by 
+C                  components separated by dots followed by
 C                  optional dimensional information enclosed
 C                  in square brackets.  Ideally the name should
 C                  have been created by a call to DTA_CRVAR.
@@ -54,8 +54,8 @@ C
 C                                      KS / CIT 16th March 1983
 C     Modified:
 C
-C     20th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     20th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C+
       IMPLICIT NONE

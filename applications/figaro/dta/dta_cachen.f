@@ -13,16 +13,16 @@ C                  the cache.  No validation is performed,
 C                  if the name is shorter than the cache slot
 C                  it will be blank filled, if longer it will
 C                  be truncated. Should be upper case.
-C     (>) LOC      (Character) The HDS locator to be 
+C     (>) LOC      (Character) The HDS locator to be
 C                  associated with NAME in the cache.
 C     (>) LEV      (Integer) The cache level at which NAME is
 C                  to be inserted.  Essentially, this is the
-C                  number of component names in NAME, ie 
+C                  number of component names in NAME, ie
 C                  LEV=1 => top level cache
 C                  LEV=2 => 2nd level cache
 C                  LEV=3 => 3rd level cache
 C                  LEV>3 => bottom level cache
-C     (<) STATUS   (Integer) Returns a status code. 
+C     (<) STATUS   (Integer) Returns a status code.
 C                  0 => inserted OK
 C                  DTA_INVPAR => LEV less than 1
 C                  DTA_CFULL  => LEV=1 and no slots left (ie
@@ -46,7 +46,7 @@ C     (>) CNTINT   Cache initialisation flag
 C
 C     All in common blocks CACHEC and CACHEN
 C
-C     Subroutines / functions used -  
+C     Subroutines / functions used -
 C
 C     DAT_ANNUL   (HDS_ package) Cancel a locator.
 C     DTA_HDSERC  (DTA_    "   ) Convert an HDS error code to a DTA code.

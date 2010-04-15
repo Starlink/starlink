@@ -2,16 +2,16 @@
 *+
 *  Name:
 *     SUBPAR_MAXI
- 
+
 *  Purpose:
 *     To set the maximum value which the parameter may take.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_MAXI( NAMECODE, VALUE, STATUS )
- 
+
 *  Description:
 *     This is generic for types D, I and R.
 *     This routine saves the specified value in the SUBPAR common
@@ -40,10 +40,10 @@
 *        The pointer to the common blocks for the parameter.
 *     VALUE = REAL (Given)
 *        The required maximum parameter value.
- 
+
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Copyright:
 *     Copyright (C) 1990, 1991, 1992, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     27-SEP-1990 (AJC):
 *        Original version.
@@ -80,15 +80,15 @@
 *     21-MAY-1993 (AJC):
 *        Allow when active
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS constants
@@ -97,16 +97,16 @@
                                  !
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'       ! SUBPAR common blocks etc.
- 
+
 *  Arguments Given:
       INTEGER NAMECODE
       INTEGERVALUE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
- 
+
 *  Local Variables:
       INTEGER TYPE               ! The type of the parameter
       REAL TREAL                 ! Temporary REAL value
@@ -118,10 +118,10 @@
 *.
 *  Check inherited global status.
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *  Get parameter type
       TYPE = MOD(PARTYPE(NAMECODE), 10)
- 
+
 *  For the appropriate type, obtain the pointer to storage space
 *  in the values list for the parameter's MAX value.
 *  If there is any previously allocated space, re-use it; otherwise
@@ -130,7 +130,7 @@
 *  If the conversion is OK, check that the value is within any
 *  RANGE set in the Interface File. If everything is OK, store
 *  the value and update the pointer array.
- 
+
       IF ( TYPE .EQ. SUBPAR__REAL ) THEN
 *     Parameter is REAL
 *     Find storage for its MAX value
@@ -139,21 +139,21 @@
             IF ( REALPTR .LT. SUBPAR__MAXLIMS ) THEN
                REALPTR = REALPTR + 1
                PARMAX(1, NAMECODE) = REALPTR
- 
+
             ELSE
                STATUS = SUBPAR__MNMXFL
                CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                CALL EMS_REP( 'SUP_MAX2', 'SUBPAR: Parameter ^NAME'
      :         // ' - ran out of space for MAX values', STATUS )
             END IF
- 
+
          END IF
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated
 *        Convert the value to the parameter type
             TREAL = REAL( VALUE )
- 
+
 *        Check it is within any limits
 *        .FALSE. means don't check existing MIN/MAX.
             CALL SUBPAR_RANGER( NAMECODE, TREAL, .FALSE.,
@@ -162,7 +162,7 @@
 *           Allowed value, set it.
                REALLIST(PARMAX(1,NAMECODE)) = TREAL
                PARMAX(2, NAMECODE) = SUBPAR__REAL
- 
+
             ELSE
 *           Illegal value - outside range
                IF ( STATUS .EQ. SUBPAR__OUTRANGE )
@@ -172,7 +172,7 @@
                CALL EMS_REP( 'SUP_MAX1',
      :         'SUBPAR: Parameter ^NAME - ' //
      :         'failed to define maximum value', STATUS )
- 
+
             END IF
          END IF
         ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
@@ -183,21 +183,21 @@
             IF ( INTPTR .LT. SUBPAR__MAXLIMS ) THEN
                INTPTR = INTPTR + 1
                PARMAX(1, NAMECODE) = INTPTR
- 
+
             ELSE
                STATUS = SUBPAR__MNMXFL
                CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                CALL EMS_REP( 'SUP_MAX2', 'SUBPAR: Parameter ^NAME'
      :         // ' - ran out of space for MAX values', STATUS )
             END IF
- 
+
          END IF
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated
 *        Convert the value to the parameter type
             TINT = INT( VALUE )
- 
+
 *        Check it is within any limits
 *        .FALSE. means don't check existing MIN/MAX.
             CALL SUBPAR_RANGEI( NAMECODE, TINT, .FALSE.,
@@ -206,7 +206,7 @@
 *           Allowed value, set it.
                INTLIST(PARMAX(1,NAMECODE)) = TINT
                PARMAX(2, NAMECODE) = SUBPAR__INTEGER
- 
+
             ELSE
 *           Illegal value - outside range
                IF ( STATUS .EQ. SUBPAR__OUTRANGE )
@@ -216,10 +216,10 @@
                CALL EMS_REP( 'SUP_MAX1',
      :         'SUBPAR: Parameter ^NAME - ' //
      :         'failed to define maximum value', STATUS )
- 
+
             END IF
          END IF
- 
+
       ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
 *     Parameter is DOUBLE PRECISION
 *     Find storage for its MAX value
@@ -228,21 +228,21 @@
             IF ( DOUBLEPTR .LT. SUBPAR__MAXLIMS ) THEN
                DOUBLEPTR = DOUBLEPTR + 1
                PARMAX(1, NAMECODE) = DOUBLEPTR
- 
+
             ELSE
                STATUS = SUBPAR__MNMXFL
                CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                CALL EMS_REP( 'SUP_MAX2', 'SUBPAR: Parameter ^NAME'
      :         // ' - ran out of space for MAX values', STATUS )
             END IF
- 
+
          END IF
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated
 *        Convert the value to the parameter type
             TDOUBLE = DBLE( VALUE )
- 
+
 *        Check it is within any limits
 *        .FALSE. means don't check existing MIN/MAX.
             CALL SUBPAR_RANGED( NAMECODE, TDOUBLE, .FALSE.,
@@ -251,7 +251,7 @@
 *           Allowed value, set it.
                DOUBLELIST(PARMAX(1,NAMECODE)) = TDOUBLE
                PARMAX(2, NAMECODE) = SUBPAR__DOUBLE
- 
+
             ELSE
 *           Illegal value - outside range
                IF ( STATUS .EQ. SUBPAR__OUTRANGE )
@@ -261,7 +261,7 @@
                CALL EMS_REP( 'SUP_MAX1',
      :         'SUBPAR: Parameter ^NAME - ' //
      :         'failed to define maximum value', STATUS )
- 
+
             END IF
          END IF
         ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
@@ -272,21 +272,21 @@
             IF ( CHARPTR .LT. SUBPAR__MAXLIMS ) THEN
                CHARPTR = CHARPTR + 1
                PARMAX(1, NAMECODE) = CHARPTR
- 
+
             ELSE
                STATUS = SUBPAR__MNMXFL
                CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                CALL EMS_REP( 'SUP_MAX9', 'SUBPAR: Parameter ^NAME'
      :         // ' - ran out of space for MAX values', STATUS )
             END IF
- 
+
          END IF
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
 *        Space is allocated
 *        Convert the value to the parameter type
             CALL CHR_ITOC( VALUE, TCHAR, NCHAR )
- 
+
 *        If successfully converted, check it's within any limits.
             IF ( TCHAR(1:1) .NE. '*' ) THEN
 *           (.FALSE. means don't check existing MIN/MAX.)
@@ -296,7 +296,7 @@
 *              Allowed value, set it.
                   CHARLIST(PARMAX(1,NAMECODE)) = TCHAR
                   PARMAX(2, NAMECODE) = SUBPAR__CHAR
- 
+
                ELSE
 *              Illegal value - outside range
                   IF ( STATUS .EQ. SUBPAR__OUTRANGE )
@@ -306,9 +306,9 @@
                   CALL EMS_REP( 'SUP_MAX7',
      :               'SUBPAR: Parameter ^NAME - ' //
      :               'failed to define maximum value', STATUS )
- 
+
                END IF
- 
+
             ELSE
 *           Type conversion error
                STATUS = SUBPAR__CONER
@@ -320,9 +320,9 @@
      :            'SUBPAR: Parameter ^NAME - failed to convert ' //
      :            'INTEGER to CHARACTER', STATUS )
             ENDIF
- 
+
          END IF
- 
+
       ELSE
 *     Attempt to set a maximum value for disallowed type.
          STATUS = SUBPAR__MNMXTY
@@ -330,8 +330,8 @@
          CALL EMS_REP( 'SUP_MAX10', 'SUBPAR: Parameter ^NAME' //
      :   ' - cannot set maximum value for this type', STATUS )
       END IF
- 
+
 *  Unset maximum value if routine failed
       IF ( STATUS .NE. SAI__OK ) PARMAX(2,NAMECODE) = -1
- 
+
       END

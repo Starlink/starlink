@@ -55,7 +55,7 @@
 *     22-Jul-1987 (WFL):
 *        Output modified flag value as well
 *     06-Nov-1987 (WFL):
-*        Portable VMS / UNIX version. Assume that  
+*        Portable VMS / UNIX version. Assume that
 *        the C binding is used for passing character strings.
 *     11-Feb-1988 (WFL):
 *        Allow TYPE's that look like stamdard C types to be
@@ -141,7 +141,7 @@ int siglen(char string[]);
 int
 main (argc,argv)
 
-/*                           
+/*
  *  The single argument is the name of the noticeboard item, which has the form
  *  "dir#name.item1.item2..." where "#" represents any of "]>:" and "dir#" and
  *  the ".itemn" bits can be omitted. "name" is the noticeboard name and if the
@@ -153,7 +153,7 @@ int		argc;
 char		*argv[];
 {
    char		item[81];
-   char		file[81];    
+   char		file[81];
    char		name[81];
    char		*path[11];
    int		i;
@@ -164,7 +164,7 @@ char		*argv[];
    int		section_size;
    int		version;
    int		pid;
-   int		modified;                                 
+   int		modified;
    int          restore_status;
    int	       	find_status;
    int		status=0;
@@ -474,7 +474,7 @@ output_shape (id)
 /*+ OUTPUT_SHAPE
  *
  *  If item pointed to by ID is primitive, output a string of the form
- *  "[(actdims) dim1,dim2,...,dimn]" (if there are ridiculously many dimensions 
+ *  "[(actdims) dim1,dim2,...,dimn]" (if there are ridiculously many dimensions
  *  then not all will be output). If item is structured output string of the
  *  form "(children)". Then in all cases output a tab
  */
@@ -492,9 +492,9 @@ int		id;
    int          children;
    int		status;
 
-   status = 0;         
+   status = 0;
    nbc_get_primitive (id,&primitive,&status);
-   if (primitive) {     
+   if (primitive) {
       maxdims = MAXDIMS;
       nbc_get_shape (id,&maxdims,shape,&actdims,&status);
       if (actdims > 0 && status == 0) {
@@ -503,7 +503,7 @@ int		id;
 	    printf ("%d",shape[i]);
 	    if (i < MIN (MAXDIMS,actdims) - 1)
 	       printf (",");
-	 }                
+	 }
 	 if (actdims > MAXDIMS)
 	    printf (",...");
 	 printf ("]");
@@ -513,7 +513,7 @@ int		id;
       nbc_get_children (id,&children,&status);
       printf (" (%d)",children);
    }
-   printf ("\t");  
+   printf ("\t");
 
    if (status != 0)
       printf ("Failed to get item shape / number of children\n");
@@ -579,14 +579,14 @@ int		id;
 	       if (strncmp(tmod, "_INTEGER", 2) == 0) {
 		  printf ("%d (%x)",val.i[j],val.i[j]);
 		  i += 4;
-		  }        
+		  }
 	       else if (strncmp(tmod, "_REAL", 2) == 0) {
 		  printf ("%g",val.r[j]);
 		  i += 4;
 		  }
 	       else if (strncmp(tmod, "_DOUBLE", 2) == 0) {
 		  printf ("%g",val.d[j]);
-		  i += 8;              
+		  i += 8;
 		  }
 	       else if (strncmp(tmod, "_LOGICAL", 2) == 0) {
 		  if (val.l[j] & 1) printf ("TRUE"); else printf ("FALSE");
@@ -697,8 +697,8 @@ int siglen (string)
 char	string[];
 {
    int	i;
-   
+
    for (i = strlen (string); i > 0 && string[i-1] == ' '; i--)
-      ;                                                
+      ;
    return (i);
 }

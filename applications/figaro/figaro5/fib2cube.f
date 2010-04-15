@@ -163,7 +163,7 @@
 
 * Create output cube, with Z array.
 
-* Replace with dsa_output 
+* Replace with dsa_output
 *
 *          call par_rdchar('cube',' ',file)
 *          call dsa_named_output('data',file,'image',1,1,status)

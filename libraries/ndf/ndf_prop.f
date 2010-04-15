@@ -28,10 +28,10 @@
 *     CLIST = CHARACTER * ( * ) (Given)
 *        A comma-separated list of the NDF components which are to be
 *        propagated to the new data structure. By default, the HISTORY,
-*        LABEL and TITLE components are propagated. All extensions are 
-*        also propagated by default except for any that have had a zero 
-*        value assigned to the corresponding "PXT..." tuning parameter 
-*        using NDF_TUNE. See the "Component Propagation" section for 
+*        LABEL and TITLE components are propagated. All extensions are
+*        also propagated by default except for any that have had a zero
+*        value assigned to the corresponding "PXT..." tuning parameter
+*        using NDF_TUNE. See the "Component Propagation" section for
 *        further details.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the ADAM parameter for the new NDF.
@@ -70,10 +70,10 @@
 *     -  An asterisk (*) may be used as a wild card to match all extension
 *     names. Thus 'NOEXTENSION(*),EXTENSION(IRAS)' may be used to indicate
 *     that only the IRAS extension should be propagated.
-*     -  Whether or not a named extension is propagated by default can be 
+*     -  Whether or not a named extension is propagated by default can be
 *     controlled via an NDF tuning parameter (see NDF_TUNE). The defaults
-*     established using NDF_TUNE can be over-ridden by specifying the 
-*     extension explicitly within the CLIST parameter; e.g. 
+*     established using NDF_TUNE can be over-ridden by specifying the
+*     extension explicitly within the CLIST parameter; e.g.
 *     'EXTENSION(FITS)' or 'NOEXTENSION(FITS)' can be used to over-ride
 *     the default established by the PXTFITS tuning parameter.
 *     -  Component names in the CLIST argument may be abbreviated to 3
@@ -89,12 +89,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -135,7 +135,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -230,7 +230,7 @@
 *  Return to re-prompt.
                GO TO 1
             END IF
-         END IF        
+         END IF
       END IF
 
 *  Export an NDF identifier

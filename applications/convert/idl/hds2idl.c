@@ -29,7 +29,7 @@
 *     This IDL system routine will construct an IDL variable corresponding
 *     to the specified HDS object, which may be either a structure or
 *     primitive object. Array elements and slices may be specified in the
-*     object name as for example: dataset.axis(1).data_array. A 
+*     object name as for example: dataset.axis(1).data_array. A
 *     dataset.data_array(50:200,100).  If a lower bound is omitted, 1 is
 *     assumed. If an upper bound is omitted, the upper limit is assumed.
 *
@@ -176,7 +176,7 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
                   var->type = idltype;
                   var->flags = 0;
                   tdata = &var->value;
-               }            
+               }
 
                idlprimfill( objloc, var, tdata, &status );
             }
@@ -193,9 +193,9 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
    /*  Adding Starlink-style !! and ! prefix */
       fstat = status;
       while ( status != SAI__OK ) {
-         emsEload( 
+         emsEload(
             param, &parlen, opstr, &oplen, &status );
-         if ( status != SAI__OK ) 
+         if ( status != SAI__OK )
             IDL_Message( IDL_M_NAMED_GENERIC, IDL_MSG_INFO, opstr );
       }
 

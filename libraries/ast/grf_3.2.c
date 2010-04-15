@@ -3,7 +3,7 @@
 *     grf_3.2.c
 
 *  Purpose:
-*     Implement the grf module required by AST V3.2 if no graphics system 
+*     Implement the grf module required by AST V3.2 if no graphics system
 *     is available.
 
 *  Description:
@@ -24,12 +24,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,11 +58,11 @@ static void Report( const char * );
 int astGScales( float *alpha, float *beta ){
    Report( "astGScales" );
    return 0;
-}               
+}
 
 int astGCap( int cap, int value ){
    return 0;
-}               
+}
 
 static void Report( const char *name ){
    astError( AST__GRFER, "%s: The graphics facilities implement by %s "

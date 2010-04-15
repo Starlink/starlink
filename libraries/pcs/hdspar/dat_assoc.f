@@ -14,14 +14,14 @@
 
 *  Description:
 *     An HDS locator for the data object associated with the specified
-*     parameter is returned. The parameter system will attempt to associate 
+*     parameter is returned. The parameter system will attempt to associate
 *     an object if one is not already associated. In the event of a failure,
 *     an error message will be displayed and another attempt made (usually
 *     by prompting the user). Up to five attempts will be made, after which
 *     status PAR__NULL will be returned.
 *
 *     The object will be opened with the appropriate ACCESS mode. If ACCESS
-*     is incompatible with the access mode specified for the parameter in 
+*     is incompatible with the access mode specified for the parameter in
 *     the program's Interface File, status SUBPAR__ICACM will be returned.
 
 *  Arguments:

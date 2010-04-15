@@ -25,7 +25,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------

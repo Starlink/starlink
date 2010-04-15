@@ -204,8 +204,8 @@
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Have the variance been used?
-      IF ( HAVVAR ) THEN 
-         CALL CCD1_MSG( ' ', 
+      IF ( HAVVAR ) THEN
+         CALL CCD1_MSG( ' ',
      :'  Input variances used to combine data', STATUS )
       END IF
 
@@ -276,9 +276,9 @@
      :   STATUS )
 
 *  Say if variance have been "generated".
-      IF ( GENVAR ) THEN 
-         CALL CCD1_MSG( ' ', 
-     :'  Output variances generated from data noise', 
+      IF ( GENVAR ) THEN
+         CALL CCD1_MSG( ' ',
+     :'  Output variances generated from data noise',
      :                  STATUS )
       END IF
       END

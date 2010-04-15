@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_fits_getS( const smfHead * hdr, const char * name, char * result, 
+*     smf_fits_getS( const smfHead * hdr, const char * name, char * result,
 *                    size_t len, int * status );
 
 *  Arguments:
@@ -102,14 +102,14 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_getS"
 
-void smf_fits_getS (const smfHead *hdr, const char * name, char * result, 
+void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
 		    size_t len, int * status ) {
   char * astres; /* Pointer to AST static buffer */
   int i;         /* Loop counter */
 
   /* Set a default value */
   result[0] = '\0';
-  
+
   /* Check entry status */
   if (*status != SAI__OK) return;
   if (!smf_validate_smfHead(hdr, 1, 0, status)) return;

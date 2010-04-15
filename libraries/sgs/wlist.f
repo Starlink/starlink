@@ -67,7 +67,7 @@
       JSTAT = 0
       CALL gns_START('GKS',JSTAT)
 
-      IF (JSTAT.EQ.0) THEN      
+      IF (JSTAT.EQ.0) THEN
          CALL sgs_WNAME(sgs_1WLST,LU,JSTAT)
          WRITE (LU,'(1X)')
       END IF

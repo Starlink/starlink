@@ -40,7 +40,7 @@
      :  START,
      :  INCR
       INTEGER
-     :  ELEM  
+     :  ELEM
 *  Arguments Returned:
       REAL
      :  AXVALS(ELEM)

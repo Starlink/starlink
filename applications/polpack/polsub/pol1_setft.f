@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SETFT( NCARD, FITS, CMPNAM, FTNAM, LOC, ICARD, 
+      SUBROUTINE POL1_SETFT( NCARD, FITS, CMPNAM, FTNAM, LOC, ICARD,
      :                       COMMNT, NEW, STATUS )
 *+
 *  Name:
@@ -11,12 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SETFT( NCARD, FITS, CMPNAM, FTNAM, LOC, ICARD, COMMNT, 
+*     CALL POL1_SETFT( NCARD, FITS, CMPNAM, FTNAM, LOC, ICARD, COMMNT,
 *                      NEW, STATUS )
 
 *  Description:
-*     This routine stores the value of a named component of the 
-*     HDS object given by LOC, as a FITS header card using the 
+*     This routine stores the value of a named component of the
+*     HDS object given by LOC, as a FITS header card using the
 *     keyword name given by FTNAM, in an array of character strings.
 *     The routine returns without action if the component is not of
 *     an HDS primitive type, or if it does not exist.
@@ -26,7 +26,7 @@
 
 *  Arguments:
 *     NCARD = INTEGER (Given)
-*        The number of cards to be searched in the FITS array. 
+*        The number of cards to be searched in the FITS array.
 *     FITS( * ) = CHARACTER * ( * ) (Given)
 *        The array holding the FITS cards.
 *     CMPNAM = CHARACTER * ( * ) (Given)
@@ -48,7 +48,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
       CHARACTER CMPNAM*(*)
       CHARACTER FTNAM*(*)
       CHARACTER LOC*(*)
-      INTEGER ICARD 
+      INTEGER ICARD
       CHARACTER COMMNT*(*)
 
 *  Arguments Returned:
@@ -112,7 +112,7 @@
       CALL DAT_THERE( LOC, CMPNAM, THERE, STATUS )
       IF( THERE ) THEN
 
-*  Get the component's type.      
+*  Get the component's type.
          CALL CMP_TYPE( LOC, CMPNAM, TYPE, STATUS )
 
 *  See if the keyword already exists in the FITS array.
@@ -164,7 +164,7 @@
          ELSE IF( TYPE( : 5 ) .EQ. '_CHAR' ) THEN
             CALL CMP_GET0C( LOC, CMPNAM, CVAL, STATUS )
             CLEN = MAX( 1, CHR_LEN( CVAL ) )
-            CALL FTS1_WKEYC( FTNAM, CVAL( : CLEN ), '/', COMMNT, 
+            CALL FTS1_WKEYC( FTNAM, CVAL( : CLEN ), '/', COMMNT,
      :                      .FALSE., FITS( JCARD ), STATUS )
 
          END IF

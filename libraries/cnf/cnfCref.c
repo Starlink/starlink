@@ -21,7 +21,7 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 *     Create a temporary Fortran string and return a pointer to it.
 *     The space allocated is sufficient to contain a string with
 *     "length" characters. The string is not initialised.
-*     
+*
 
 *  Arguments:
 *     int length (Given)
@@ -49,12 +49,12 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 *     20-SEP-2005 (TIMJ):
 *        Use starmem.
 *     26-SEP-2006 (PWD):
-*        Deal with negative length requests as if zero, and return 
+*        Deal with negative length requests as if zero, and return
 *        a string of size one.
 *     {enter_changes_here}
 

@@ -1,8 +1,8 @@
 1 STARPERL - Starlink Perl modules package
                                                     Expires: ????.??.??
 
- STARPERL is a package which `wraps' various Starlink Perl modules so 
- that they may be installed for use with the Starlink Software using the 
+ STARPERL is a package which `wraps' various Starlink Perl modules so
+ that they may be installed for use with the Starlink Software using the
  standard Starlink installation techniques.
 
 
@@ -27,14 +27,14 @@
 
  o  NDF v1.45 - an interface to NDF,
 
- o  Starlink v1.14 - a set of Perl modules which interface to parts of 
+ o  Starlink v1.14 - a set of Perl modules which interface to parts of
        the error reporting and process control systems,
 
  o  GSD v1.13 - an interface to GSD files,
 
  o  Astro-SLA v0.96 - an interface to the Fortran SLA library.
 
- For information on these modules and how to use them see SUN/228 
+ For information on these modules and how to use them see SUN/228
  (`showme sun228' or `findme starperl').
 
  Other modules may be added as needed in future.

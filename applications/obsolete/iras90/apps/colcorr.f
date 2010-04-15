@@ -33,7 +33,7 @@
 *     used is the same as was used when the optical depth image given
 *     for parameter TAU was created. It is assumed that all sources are
 *     optically thin.
-*     
+*
 *     The input NDFs should be aligned pixel-for-pixel. If the bounds
 *     of the two NDFs do not match, the output image covers just the
 *     overlap area. Any QUALITY component present in the temperature
@@ -55,7 +55,7 @@
 *     HISTORY = _LOGICAL (Read)
 *        Determines if history information is to be stored within the
 *        output NDF. See help on "History_in_IRAS90" for more
-*        information on history. 
+*        information on history.
 *                                              [current history setting]
 *     MSG_FILTER = LITERAL (Read)
 *        The level of information displayed on the users screen. This
@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -170,7 +170,7 @@
          CALL MSG_SETC( 'U', UNITS )
          CALL ERR_REP( 'COLCORR_ERR1',
      :'COLCORR: Temperature map has unknown units "^U". Should be "K".',
-     :                 STATUS )      
+     :                 STATUS )
          GO TO 999
       END IF
 
@@ -235,7 +235,7 @@
      :               'LABEL', STATUS )
       CALL NDF_CPUT( 'Output from IRAS90:COLCORR', INDF3, 'TITLE',
      :               STATUS )
-      
+
 *  Map the DATA component of the output map.
       CALL NDF_MAP( INDF3, 'DATA', '_REAL', 'WRITE', IPOUT, EL, STATUS )
 

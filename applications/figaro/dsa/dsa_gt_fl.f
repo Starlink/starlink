@@ -9,7 +9,7 @@ C     Gets the `flag' value for a specified type.
 C
 C  Description:
 C     This routine returns the the value being used as the `flag'
-C     value (`bad' value, `magic number', or whatever) for a specified 
+C     value (`bad' value, `magic number', or whatever) for a specified
 C     primitive data type.
 C
 C  Language:

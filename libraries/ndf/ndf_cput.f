@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,7 +152,7 @@
 *  Get the length of the VALUE string. If it has zero length we will
 *  use a single space instead.
             LV = LEN( VALUE )
- 
+
 *  If the component is already present in the NDF, then determine its
 *  length.
             IF ( DCB_CLOC( ICCOMP, IDCB ) .NE. DAT__NOLOC ) THEN
@@ -181,17 +181,17 @@
 
 *  Assign the value.
                IF( LV .GT. 0 ) THEN
-                  CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), VALUE, 
+                  CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), VALUE,
      :                            STATUS )
                ELSE
-                  CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), ' ', 
+                  CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), ' ',
      :                            STATUS )
                END IF
 
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

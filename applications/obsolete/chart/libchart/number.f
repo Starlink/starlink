@@ -13,4 +13,4 @@
       NUMBER = N.GE.ICHAR('0').AND.N.LE.ICHAR('9').OR.CHAR.
      : EQ.'.'.OR.CHAR.EQ.'+'.OR.CHAR.EQ.'-'
       END
- 
+

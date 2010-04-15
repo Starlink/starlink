@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -197,7 +197,7 @@
      :                  ( DEVICE( 2 ) .GT. CURDEV( 2 ) + SFA ) .OR.
      :                  ( DEVICE( 3 ) .LT. CURDEV( 3 ) - SFA ) .OR.
      :                  ( DEVICE( 4 ) .GT. CURDEV( 4 ) + SFA ) ) .AND.
-     :                ( STATUS .EQ. SAI__OK ) ) 
+     :                ( STATUS .EQ. SAI__OK ) )
                SPICNM = SPICNM + 1
                CALL AGI_1SEARP( WKNAME, PNAME, 'P', 'F', SPICNM, OPNAME,
      :                          COMENT, DEVICE, NDC, WORLD, MEMID,

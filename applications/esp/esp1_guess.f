@@ -1,9 +1,9 @@
 
-    
+
 
       SUBROUTINE ELP1_GUESS(DMODE,ANGCON,ANGOFF,BACK,XCO,YCO,
      :                      ELEMS,ARRAY,PRANGE,POSANG,RADIUS,
-     :                      ELLIP,STATUS)    
+     :                      ELLIP,STATUS)
 *+
 *  Name:
 *     ELP1_GUESS
@@ -19,7 +19,7 @@
 
 *  Invocation:
 *     CALL ELP1_GUESS(DMODE,ANGCON,ANGOFF,BACK,XCO,YCO,ELEMS,
-*                     ARRAY,PRANGE,POSANG,RADIUS,ELLIP,STATUS)    
+*                     ARRAY,PRANGE,POSANG,RADIUS,ELLIP,STATUS)
 
 *  Description:
 *     Looks outward from the chosen origin location along lines separated by
@@ -35,12 +35,12 @@
 *     signal strength to be high.
 
 *  Arguments:
-*     DMODE = INTEGER (Given) 
+*     DMODE = INTEGER (Given)
 *        Is a display to be generated? 0=No 1=Yes.
 *     ANGCON = LOGICAL (Given)
 *        Position angle convention. TRUE=clockwise is positive.
 *     ANGOFF = REAL (Given)
-*        Angular offset for the position angle. 
+*        Angular offset for the position angle.
 *     BACK = REAL (Given)
 *        Image background count value. Units counts.
 *     XCO = REAL (Given)
@@ -231,7 +231,7 @@
 *      Use the figures obtained.
          THRESH=( (MAX+MIN)/2.+ MEAN )/2.
 
-      ELSE                             
+      ELSE
 
 *      Use guesses and return immediately to the calling routine.
          RADIUS=6.0
@@ -249,7 +249,7 @@
 
 *   Determine how far out from the co-ordinates the search must start.
       FAR=NINT(SQRT(1.*PRANGE(1)*PRANGE(1)+1.*PRANGE(2)*PRANGE(2)))
-    
+
 *   Look along lines inward toward the centre of the galaxy to find out
 *   at what distance the pixel count value drops below the threshold.
       DO 40 J=1,8
@@ -292,7 +292,7 @@
 
  40   CONTINUE
 
-*   Average estimates for 0/180 45/225 degrees etc. 
+*   Average estimates for 0/180 45/225 degrees etc.
       DO 60 I=1,4
 
 *      Average the result if a value was found for both lines.
@@ -313,7 +313,7 @@
 
 *      Allow for the diagonal lines being root(2) longer.
          IF ((I.EQ.2).OR.(I.EQ.4)) DIST(I)=DIST(I)*SQRT(2.)
-         
+
  60   CONTINUE
 
 *   Look to see which line (0,45,90,135 degrees) has the highest value
@@ -355,7 +355,7 @@
          POSANG=0.0
          GOTO 9998
       END IF
-      
+
 *   Set value for first radius to be profiled. Set lower limit of 4.0
       RADIUS=MAX
       IF (RADIUS.LT.4.) RADIUS=4.
@@ -370,7 +370,7 @@
 *      Ensure that for the first profile the centre is within
 *      the ellipse.
          IF (ELLIP*RADIUS.LT.3.0) ELLIP=4.0/RADIUS
-        
+
       END IF
 
 *   Determine a first estimate of the position angle of the ellipse.
@@ -383,7 +383,7 @@
          POS2=(LOW-3)*45.
       END IF
       POSANG=(POS1+POS2)/2.
-     
+
 *   Line to abort to if no figure for the first guess is easily available.
  9998 CONTINUE
 
@@ -421,10 +421,10 @@
       END
 
 
-      
+
       SUBROUTINE GAU1_GUESS(NSOUR,ANGCON,ANGOFF,PSIZE,
      :     SIGMA,NSIGMA,BACK,XCO,YCO,RLIM,ELEMS,ARRAY2,PRANGE,
-     :     GUESS,HINT,STATUS)    
+     :     GUESS,HINT,STATUS)
 *+
 *  Name:
 *     GAU1_GUESS
@@ -438,11 +438,11 @@
 
 *  Invocation:
 *     CALL GAU1_GUESS(NSOUR,ANGCON,ANGOFF,PSIZE,SIGMA,NSIGMA,BACK,XCO,YCO,
-*                     RLIM,ELEMS,ARRAY2,PRANGE,GUESS,HINT,STATUS)    
+*                     RLIM,ELEMS,ARRAY2,PRANGE,GUESS,HINT,STATUS)
 
 *  Description:
 *     Crudely fits a 2-D parabola to the Gaussian peak. The slice
-*     used to generate the radius is rotated to determine the 
+*     used to generate the radius is rotated to determine the
 *     approximate position angle, sigmas, peak and position of
 *     of each source.
 
@@ -452,16 +452,16 @@
 *     ANGCON = LOGICAL (Given)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.
-*     ANGOFF = REAL (Given) 
+*     ANGOFF = REAL (Given)
 *        Angular offset for position angles generated. Units degrees.
 *     PSIZE = REAL (Given)
 *        Pixel size in arcsec
 *     NSIGMA = REAL (Given)
 *        Number of sigma at which the pixels become significant.
-*     SIGMA = REAL (Given) 
+*     SIGMA = REAL (Given)
 *        Standard deviation of the image background value.
 *     BACK = REAL (Given)
-*        Image background count value. 
+*        Image background count value.
 *     XCO(10,2) = REAL (Given)
 *        Suggested X co-ordinate for the source centre.
 *     YCO(10,2) = REAL (Given)
@@ -513,9 +513,9 @@
       REAL PSIZE		      ! Pixel size in arcsec
       REAL ARRAY2(ELEMS)              ! Image array
       REAL BACK                       ! Background count of the image
-      REAL NSIGMA                     ! Number of sigma at which pixels 
+      REAL NSIGMA                     ! Number of sigma at which pixels
                                       ! are considered
-      REAL RLIM(10)                   ! Radius of each source 
+      REAL RLIM(10)                   ! Radius of each source
       REAL SIGMA                      ! Std deviation of the background count
       REAL XCO(10,2)                  ! X co-ord of the source centre
       REAL YCO(10,2)                  ! Y co-ord of the source centre
@@ -523,7 +523,7 @@
 *  Arguments Returned:
       REAL HINT(4,10)                 ! User angle, Sa, Sb and peak values
       REAL GUESS(10,7)                ! Approximate parameters
-     
+
 *  Local variables:
       INTEGER ANG                     ! Angle of slice
       INTEGER BIGGER                  ! Total
@@ -541,7 +541,7 @@
       REAL GX                         ! Increment in X
       REAL GY                         ! Increment in Y
       REAL INPMAT(3,3)                ! Matrix array passed to
-                                      ! subroutine GAU1_GAUJO 
+                                      ! subroutine GAU1_GAUJO
       REAL MA                         ! Maximum std dev
       REAL MI                         ! Minimum std dev
       REAL PI2                        ! Useful conversion factor
@@ -551,14 +551,14 @@
       REAL TEMP(7)                    ! Temporary
       REAL TOTAL                      ! Used to calculate averages
       REAL VALUE                      ! Temporary storage
-      REAL VECTOR(3)                  ! Vector array in which parabola 
+      REAL VECTOR(3)                  ! Vector array in which parabola
       REAL V1                         ! Sum of some sdev values
       REAL V2                         ! Sum of some sdev values
-                                      ! coefficients are returned from 
+                                      ! coefficients are returned from
                                       ! subroutine GAU1_GAUJO
       REAL X                          ! Temporary X co-ordinate
       REAL XX(3)                      ! Temporary array
-      REAL Y                          ! Temporary Y co-ordinate      
+      REAL Y                          ! Temporary Y co-ordinate
 *.
 
 *   Check the inherited global status.
@@ -575,10 +575,10 @@
       CALL MSG_BLANK(STATUS)
       CALL MSG_OUT(' ','First estimates of source data',STATUS)
       CALL MSG_BLANK(STATUS)
-      
+
 **   Debugging
 *      open (50,file='debuggaufit')
-*      write (50,'("gau1_guess: nsour=",i2," xmax=",i10," ymax=",i10)') 
+*      write (50,'("gau1_guess: nsour=",i2," xmax=",i10," ymax=",i10)')
 *     :     nsour,xmax,ymax
 
 *   For each source in turn get an average value for peak etc.
@@ -586,11 +586,11 @@
 
 *      Set the radius limit.
          R=INT(RLIM(I))
-        
+
 *      Number of profile fits found.
          NFOUND=0
 
-*      Look at the current angle. Using step 2 avoid division by zero. 
+*      Look at the current angle. Using step 2 avoid division by zero.
         DO 20 ANG=1,180,2
 
 *         Find the sin/cos values of the line to be used.
@@ -604,10 +604,10 @@
                   INPMAT(J,K)=0.0
  440           CONTINUE
  450        CONTINUE
- 
+
 *         Look along the line.
             DO 30 DIST=INT(-R),INT(R)
-              
+
 *            Find the current pixel.
                X=NINT(XCO(I,1)+REAL(DIST)*GX)
                Y=NINT(YCO(I,1)+REAL(DIST)*GY)
@@ -620,7 +620,7 @@
 *            Check that the pixel is within the image.
                IF ((X.GE.1).AND.(X.LE.XMAX).AND.(Y.GE.1)
      :            .AND.(Y.LE.YMAX)) THEN
-                
+
 *               Get the pixel address.
                   ADD=(NINT(Y)-1)*XMAX+NINT(X)
 
@@ -632,7 +632,7 @@
 
 *                  Convert to log.
                      VALUE=ALOG(VALUE)
-                     
+
 *                  Prepare matrix for inversion.
                      XX(1)=1.0
                      XX(2)=REAL(DIST)
@@ -645,11 +645,11 @@
  470                CONTINUE
 
                   END IF
-              
+
                END IF
 
- 30         CONTINUE   
-          
+ 30         CONTINUE
+
 *         If sufficient data points are available, perform the matrix
 *         inversion.
             IF (INPMAT(1,1).GT.2.0) THEN
@@ -657,7 +657,7 @@
 *            Matrix inversion.
                CALL GAU1_GAUJO(VECTOR,INPMAT,DETERM,STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9999
- 
+
 *            Test for direction of parabola.
                IF(VECTOR(3).LT.0.0) THEN
 
@@ -665,7 +665,7 @@
                   NFOUND=NFOUND+1
 
 *               The amended position of the fit profile.
-                  DV=-VECTOR(2)/2./VECTOR(3) 
+                  DV=-VECTOR(2)/2./VECTOR(3)
                   SOL(NFOUND,1)=XCO(I,1)+DV*GX
                   SOL(NFOUND,2)=YCO(I,1)+DV*GY
 
@@ -675,7 +675,7 @@
                   SOL(NFOUND,4)=SQRT(EXP(VECTOR(1)-
      :                          (VECTOR(2)/2.)
      :                           **2/VECTOR(3)))
-                                 
+
 *               The angle.
                   SOL(NFOUND,5)=REAL(ANG)
 
@@ -686,13 +686,13 @@
                END IF
 
             END IF
- 
+
  20      CONTINUE
-       
-*      Find the average of each parameter.             
+
+*      Find the average of each parameter.
          DO 91 J=1,4
 
-            TOTAL=0.0   
+            TOTAL=0.0
             DO 90 K=1,NFOUND
               TOTAL=TOTAL+SOL(K,J)
  90         CONTINUE
@@ -703,18 +703,18 @@
                GUESS(I,J)=VALUE
                IF (J.EQ.3) GUESS(I,3)=VALUE*VALUE
             ELSE
-               GUESS(I,4)=GUESS(I,4)*.95+VALUE*.05                  
+               GUESS(I,4)=GUESS(I,4)*.95+VALUE*.05
             END IF
 
  91      CONTINUE
 
 
 *      Now must find most likely direction.
-*      Will take mean standard deviation of 5 orthogonal 
+*      Will take mean standard deviation of 5 orthogonal
 *      angles and find the biggest ratio.
          IF(NFOUND.LT.6) THEN
 
-*         Make a guess at parameters. 
+*         Make a guess at parameters.
             VALUE=RLIM(I)/3.
             IF (VALUE.LT.2.0) VALUE=2.0
 
@@ -728,12 +728,12 @@
             GUESS(I,5)=VALUE
             GUESS(I,6)=VALUE
 
-            GUESS(I,7)=45.       
-                       
+            GUESS(I,7)=45.
+
 *         Tell the user there are problems.
             CALL MSG_FMTI('I','I2',I)
             CALL MSG_OUT(' ','^I Could not fit a Gaussian to'/
-     :       /' this source.',STATUS)  
+     :       /' this source.',STATUS)
 
          ELSE
 
@@ -747,7 +747,7 @@
                DO 110 K=-2,2
                   V1=V1+SOL(J-K,3)
                   V2=V2+SOL(J-K+45,3)
- 110           CONTINUE                              
+ 110           CONTINUE
 
 *            Find ratio maximum and angle value at which it occurs.
                IF (ABS(V2-V1).GT.RMAX) THEN
@@ -763,9 +763,9 @@
                   MI=V1
 
                END IF
-               
+
  100        CONTINUE
-            
+
 *         Assign the values for parameters determined.
             VALUE=MAX(MI*MI/25.,MA*MA/25.)
             GUESS(I,5)=MIN(VALUE,GUESS(I,3))
@@ -774,7 +774,7 @@
          END IF
 
  10   CONTINUE
-        
+
 *   Check peak height is sane.
 *   Only do this, however, if the background is positive.  The
 *   background may legitimately be negative, if we're using the
@@ -787,21 +787,21 @@
             IF(GUESS(I,4).GT.BACK) BIGGER=BIGGER+1
  95      CONTINUE
 
-*      Abort if that is the case.        
+*      Abort if that is the case.
          IF (BIGGER.EQ.NFOUND) THEN
             CALL MSG_OUT(' ','All the peaks are below'//
      :           ' the proposed background!',STATUS)
-            CALL MSG_OUT(' ','Quitting!',STATUS)             
+            CALL MSG_OUT(' ','Quitting!',STATUS)
             STATUS=SAI__ERROR
-            GOTO 9999              
+            GOTO 9999
          END IF
       END IF
 
-*   Look at the sigma x/y values and determine if RLIM is too big 
+*   Look at the sigma x/y values and determine if RLIM is too big
 *   (the smaller the better for execution speed).
       DO 900 I=1,NSOUR
 
-*      Compare 2 sigma points in each direction with RLIM. 
+*      Compare 2 sigma points in each direction with RLIM.
          X=MIN(2.*GUESS(I,5),RLIM(I))
          Y=MIN(2.*GUESS(I,6),RLIM(I))
 
@@ -818,7 +818,7 @@
          IF(HINT(3,I).NE.VAL__BADR) GUESS(I,7)=HINT(3,I)
          IF(HINT(4,I).NE.VAL__BADR) GUESS(I,4)=HINT(4,I)
  950  CONTINUE
-  
+
 *   Sort the values into descending order.
 *   Speed is not critical for this small array manipulation.
       DO 1000 I=1,NSOUR-1
@@ -828,18 +828,18 @@
             IF (GUESS(I,4).LT.GUESS(J,4)) THEN
 
 *            Transfer the information to temp array.
-               DO 1200 K=1,7                  
+               DO 1200 K=1,7
                   TEMP(K)=GUESS(I,K)
  1200          CONTINUE
 
 *            Swap one set of values.
-               DO 1300 K=1,7                  
+               DO 1300 K=1,7
                   GUESS(I,K)=GUESS(J,K)
  1300          CONTINUE
 
 *            Sort out the remaining array using the data
 *            stored in temporary array.
-               DO 1400 K=1,7                  
+               DO 1400 K=1,7
                   GUESS(J,K)=TEMP(K)
  1400          CONTINUE
 
@@ -848,7 +848,7 @@
  1100    CONTINUE
  1000 CONTINUE
 
-*   Display the guessed parameter values.     
+*   Display the guessed parameter values.
       DO 1500 I=1,NSOUR
          CALL GAU1_DISP(I,ANGCON,ANGOFF,PSIZE,GUESS,STATUS)
  1500 CONTINUE

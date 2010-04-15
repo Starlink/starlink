@@ -6,10 +6,10 @@
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/ctg</path>
   <description>Library to access groups of catalogues.</description>
-  <abstract><p> 
+  <abstract><p>
      CTG provides routines for accessing groups of catalogues through
-     a single parameter using wild-cards, and lists in text files.  This is 
-     analogous to the way the NDG library accesses groups of NDFs using a 
+     a single parameter using wild-cards, and lists in text files.  This is
+     analogous to the way the NDG library accesses groups of NDFs using a
      single parameter.
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>

@@ -1,6 +1,6 @@
 #if !defined( _NDF_INCLUDED )	/* Protect against multiple inclusion	    */
 #define _NDF_INCLUDED 1
-/*									    
+/*
 *+
 * Name:
 *    ndf.h
@@ -29,12 +29,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,71 +71,71 @@
 /*  General.                                                                */
 /*  --------                                                                */
 /*  Maximum number of NDF dimensions.                                       */
-#define NDF__MXDIM 7 
+#define NDF__MXDIM 7
 
 /*  Value which is never used as an NDF identifier, to which an invalid     */
 /*  identifier may be set.                                                  */
-#define NDF__NOID 0 
+#define NDF__NOID 0
 
 /*  Value which is never used as an NDF placeholder, to which an invalid    */
 /*  placeholder may be set.                                                 */
-#define NDF__NOPL 0 
+#define NDF__NOPL 0
 
 /*  String lengths.                                                         */
 /*  ---------------                                                         */
 /*  Maximum size of a string describing an NDF access type, e.g.            */
 /*  'DELETE'.                                                               */
-#define NDF__SZACC 6 
+#define NDF__SZACC 6
 
 /*  Recommended maximum length of the name of the currently-executing       */
 /*  application.                                                            */
-#define NDF__SZAPP 80 
+#define NDF__SZAPP 80
 
 /*  Maximum length of a string describing the storage form of an NDF        */
 /*  array component, e.g. 'SIMPLE'.                                         */
-#define NDF__SZFRM 10 
+#define NDF__SZFRM 10
 
 /*  Maximum length of a string describing the full data type of an NDF      */
 /*  array component (including whether it is complex), e.g.                 */
 /*  'COMPLEX_REAL'.                                                         */
-#define NDF__SZFTP 15 
+#define NDF__SZFTP 15
 
 /*  Maximum length of a history component date/time string.                 */
-#define NDF__SZHDT 24 
+#define NDF__SZHDT 24
 
 /*  Recommended length of a line of history text.                           */
-#define NDF__SZHIS 72 
+#define NDF__SZHIS 72
 
 /*  Maximum length of a line of history text (this limit is determined      */
 /*  primarily by the use of MSG_ routines for expanding message tokens,     */
 /*  so is set equal to MSG__SZMSG).                                         */
-#define NDF__SZHMX 200 
+#define NDF__SZHMX 200
 
 /*  Recommended maximum length of the host machine node name recorded in    */
 /*  NDF history records.                                                    */
-#define NDF__SZHST 80 
+#define NDF__SZHST 80
 
 /*  Maximum length of a history update mode string, e.g. 'DISABLED'.        */
-#define NDF__SZHUM 8 
+#define NDF__SZHUM 8
 
 /*  Maximum length of a string describing the "mapping mode" used to map    */
 /*  an NDF array component for access, e.g. 'WRITE/ZERO'.                   */
-#define NDF__SZMMD 11 
+#define NDF__SZMMD 11
 
 /*  Recommended length of a character variable that is to hold the full     */
 /*  "reference name" of an NDF dataset.                                     */
-#define NDF__SZREF 512 
+#define NDF__SZREF 512
 
 /*  Maximum length of a string describing the numeric type of an NDF        */
 /*  array component, e.g. '_INTEGER'.                                       */
-#define NDF__SZTYP 8 
+#define NDF__SZTYP 8
 
 /*  Recommended maximum length of the user name recorded in NDF history     */
 /*  records.                                                                */
-#define NDF__SZUSR 80 
+#define NDF__SZUSR 80
 
 /*  Maximum length of a string containing an NDF extension name.            */
-#define NDF__SZXNM 15 
+#define NDF__SZXNM 15
 
 /* NDF_ error codes.                                                        */
 /* =================                                                        */
@@ -428,8 +428,8 @@ void ndfHput( const char *hmode,
               int indf,
               int *status );
 
-void ndfHgmod( int indf,   
-               char *hmode,  
+void ndfHgmod( int indf,
+               char *hmode,
                int hmode_length,
                int *status );
 

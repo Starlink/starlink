@@ -40,7 +40,7 @@
 *     IN = NDF (Read)
 *        A group of NDFs in which the quality information is to be
 *        stored. This should be in the form of a group expression (see
-*        help on "Group_expressions"). 
+*        help on "Group_expressions").
 *     MSG_FILTER = LITERAL (Read)
 *        The level of information displayed on the users screen. This
 *        should take one of the values QUIET, NORMAL or VERBOSE (see
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       CALL MSG_IFGET( STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...',
      :                IGRP, NIN, STATUS )
 
 *  See if the numbers of pixels which hold each quality are to be
@@ -176,7 +176,7 @@
             CALL IRQ_NUMQN( LOCS, NAMES, STATUS )
             QI = .TRUE.
 
-*  If no quality names information was found, annul the error and set 
+*  If no quality names information was found, annul the error and set
 *  the number of defined names to zero.
          ELSE IF( STATUS .EQ. IRQ__NOQNI ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -205,7 +205,7 @@
             CONTXT = 0
             CALL IRQ_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
      :                      COMMNT, DONE, STATUS )
-      
+
 *  Loop round displaying each quality name in turn.
             DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
@@ -285,7 +285,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was equested, 
+*  If a null parameter was given or a parameter abort was equested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

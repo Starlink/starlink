@@ -67,7 +67,7 @@
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
-*     before exit. 
+*     before exit.
 *     -  The calling routine must annul the group identifiers before exit.
 
 *  Copyright:
@@ -116,7 +116,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename 
+      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename
       INTEGER FD                 ! FIO file descriptor
       INTEGER I                  ! Loop variable
       INTEGER INGRP              ! Dummy GRP identifier
@@ -170,7 +170,7 @@
      :                    STATUS )
          CALL MSG_SETI( 'NOPEN', NRET )
          CALL MSG_SETC( 'PARNAM', PARNAM )
-         IF ( NRET .EQ. 1 ) THEN 
+         IF ( NRET .EQ. 1 ) THEN
             CALL MSG_OUT( ' ',
      :'  ^NOPEN names accessed using parameter %^PARNAM', STATUS )
          ELSE
@@ -193,7 +193,7 @@
             CALL NDG_NDFAS( NDFGR, I, 'UPDATE', NDFID, STATUS )
 
 *  Get the file name.
-            CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )  
+            CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )
             IF ( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Cannot locate the named extension item. Set status and exit.

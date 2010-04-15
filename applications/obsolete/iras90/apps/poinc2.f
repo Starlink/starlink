@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,13 +103,13 @@
       DOUBLE PRECISION SYSQ      ! Sum of squared data
       DOUBLE PRECISION SYP       ! Sum of data times profile
       DOUBLE PRECISION SYI       ! Sum of data times sample index
-      DOUBLE PRECISION SY        ! Sum of data 
+      DOUBLE PRECISION SY        ! Sum of data
       DOUBLE PRECISION SZSQ      ! Sum of squared data after removing
                                  ! linear bias
       DOUBLE PRECISION SZP       ! Sum of profile times data after
                                  ! removeing linear bias
       DOUBLE PRECISION TMP       ! A temporary buffer
-                 
+
 *.
 
 *  Check inherited global status.
@@ -130,7 +130,7 @@
          IF ( SMP .GE. BSGM ) THEN
             SYSQ = SYSQ + DBLE( SGM( SMP ) ) * DBLE( SGM( SMP ) )
             SYP = SYP + DBLE( SGM( SMP ) ) * DBLE( PROF( I ) )
-            SYI = SYI + DBLE( SGM( SMP ) ) * DBLE( I ) 
+            SYI = SYI + DBLE( SGM( SMP ) ) * DBLE( I )
             SY = SY + DBLE( SGM( SMP ) )
          END IF
       END DO
@@ -139,14 +139,14 @@
          SMP = SMP + 1
          IF ( SMP .LE. ESGM ) THEN
             SYSQ = SYSQ + DBLE( SGM( SMP ) ) * DBLE( SGM( SMP ) )
-            SYP = SYP + DBLE( SGM( SMP ) ) * DBLE( PROF( I ) ) 
+            SYP = SYP + DBLE( SGM( SMP ) ) * DBLE( PROF( I ) )
             SYI = SYI + DBLE( SGM( SMP ) ) * DBLE( I )
             SY = SY + DBLE( SGM( SMP ) )
          END IF
       END DO
 
 *  Calculate the amplitude.
-      TMP = SYP * SISQ * S1 + SIP * SI * SY + SYI * SI * SP 
+      TMP = SYP * SISQ * S1 + SIP * SI * SY + SYI * SI * SP
       TMP = TMP - SP * SISQ * SY - SIP * SYI * S1 - SYP * SI * SI
       AM = REAL( TMP / V )
 
@@ -159,7 +159,7 @@
 *  Calculate the baseline height.
       TMP = SPSQ * SISQ * SY + SIP * SYI * SP + SIP * SI * SYP
       TMP = TMP - SYP * SISQ * SP - SPSQ * SI * SYI - SIP * SIP * SY
-      BSD = TMP / V 
+      BSD = TMP / V
       BS = REAL( BSD )
 
 *  Calculate components required when finding the correlation
@@ -174,7 +174,7 @@
 *  source profile.
       IF ( SZSQ .LE. VAL__SMLD ) THEN
          CC = 0.0
-      
+
 *  Otherwise, calculate the correlation coefficient.
       ELSE
          CC = REAL( SZP / SQRT( SZSQ * SPSQ ) )

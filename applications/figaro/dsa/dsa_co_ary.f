@@ -29,7 +29,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) OBJ_NAME      (Fixed string,descr) The DTA system name for the
-C                       array to be coerced.  This should not include 
+C                       array to be coerced.  This should not include
 C                       dimension information.
 C     (>) TYPE          (Fixed string,descr) The type that the data array
 C                       is to have.  This must be one of the primitive
@@ -47,13 +47,13 @@ C     Only common variables used internally by the DSA_ routines
 C
 C  External subroutines / functions used:
 C     ICH_LEN, ICH_FOLD, DSA_WRUSER, DSA_ARRAY_SIZE, DSA_CREATE_ARRAY,
-C     DSA_RESHAPE_ARRAY, DSA_WRNAME, DSA_FIND_REF, DTA_ERROR, DTA_DLVAR, 
+C     DSA_RESHAPE_ARRAY, DSA_WRNAME, DSA_FIND_REF, DTA_ERROR, DTA_DLVAR,
 C     DSA_CHECK_MAPPING, DTA_TYVAR
 C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the DSA_ routines.
-C     The file containing the array in question must have been opened, eg 
-C     by DSA_OUTPUT, and the environment for the array (the structure 
+C     The file containing the array in question must have been opened, eg
+C     by DSA_OUTPUT, and the environment for the array (the structure
 C     that contains it) must exist, even if the array itself does not.
 C
 C  Support: Keith Shortridge, AAO
@@ -149,7 +149,7 @@ C     Return if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need an upper case version of TYPE 
+C     We need an upper case version of TYPE
 C
       TYPE_UC=TYPE
       INVOKE=ICH_FOLD(TYPE_UC)
@@ -167,7 +167,7 @@ C
       IF (DTA_STATUS.EQ.0) THEN
 C
 C        It does exist.  That's OK, it just means we probably have to
-C        delete it first.  If it's the same type, see if it also has 
+C        delete it first.  If it's the same type, see if it also has
 C        the same dimensions as what we are trying to force.
 C
          IF (OLD_TYPE.EQ.TYPE_UC) THEN
@@ -231,8 +231,8 @@ C
       END IF
 C
 C     Now, either we had an exact match with an existing array, (or managed
-C     to reshape an existing array so it did match) or there is no data 
-C     object of that type (either because there never was, or because it 
+C     to reshape an existing array so it did match) or there is no data
+C     object of that type (either because there never was, or because it
 C     was deleted.)  If there was no match, create the new array.
 C
       IF (.NOT.MATCH) THEN

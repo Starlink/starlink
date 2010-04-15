@@ -1,7 +1,7 @@
       SUBROUTINE SORTIN4(IA,IB,IC,ID,N)
 
 C     17-JUN-1995: P.W.Draper
-C        Code transformed by TOOLPACK. References to INTEGER*2 changed to 
+C        Code transformed by TOOLPACK. References to INTEGER*2 changed to
 C        INTEGER *4
 
 C     .. Scalar Arguments ..

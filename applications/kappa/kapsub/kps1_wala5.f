@@ -11,12 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WALA5( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, JB1, 
+*     CALL KPS1_WALA5( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, JB1,
 *                      JB2, XAMAP, YAMAP, STATUS )
 
 *  Description:
 *     The section (IB1:IB2,JB1:JB2) of the arrays XAMAP and YAMAP are
-*     filled using the full projection mappings. 
+*     filled using the full projection mappings.
 
 *  Arguments:
 *     MAP = INTEGER (Given)
@@ -77,7 +77,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the row and column number of the first pixel to be 
+*  Initialise the row and column number of the first pixel to be
 *  transformed.
       J0 = JB1
       J = JB1
@@ -152,17 +152,17 @@
             XX( K ) = DBLE( I ) - 0.5D0
 
 *  Increment the pixel indices.
-            I = I + 1 
+            I = I + 1
             IF( I .GT. IB2 ) THEN
                I = IB1
                J = J + 1
-            END IF            
+            END IF
 
          END DO
 
-*  Transform the points from output pixel coordinates to input pixel 
+*  Transform the points from output pixel coordinates to input pixel
 *  coordinates.
-         CALL AST_TRAN2( MAP, N, XX, YY, .FALSE., XX, YY, STATUS ) 
+         CALL AST_TRAN2( MAP, N, XX, YY, .FALSE., XX, YY, STATUS )
 
 *  Abort if an error occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -179,11 +179,11 @@
             END IF
 
 *  Increment the pixel indices.
-            I0 = I0 + 1 
+            I0 = I0 + 1
             IF( I0 .GT. IB2 ) THEN
                I0 = IB1
                J0 = J0 + 1
-            END IF            
+            END IF
 
          END DO
 

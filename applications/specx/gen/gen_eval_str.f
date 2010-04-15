@@ -55,7 +55,7 @@ CD    Print *,'  input string  = ', string1(:60)
       END IF
 
 *     If returned type is not Cnnn or error set then interpret string
-*     as a string constant. 
+*     as a string constant.
 
       IF (sym_index.eq.0 .OR. type(1:1).ne.'C' .OR. ierr.ne.0) THEN
         string2 = string1 // ' '

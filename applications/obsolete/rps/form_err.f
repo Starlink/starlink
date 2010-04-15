@@ -5,20 +5,20 @@
 ****************************************************************************
       SUBROUTINE FORM_ERR(MESSAGE)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
-      CHARACTER*(*) MESSAGE		! 
- 
+      CHARACTER*(*) MESSAGE		!
+
 *  Functions
       INTEGER POP_MENU
- 
+
 *  Local Variables
       CHARACTER*20 ERRHEAD/'RPS - error detected'/
       CHARACTER*17 ERROPT/'<ret> to continue'/
       INTEGER STATUS
- 
-*  Executable Code 
- 
+
+*  Executable Code
+
       STATUS = POP_MENU(ERROPT,1,ERRHEAD, -1, MESSAGE )
- 
+
       END

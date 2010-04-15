@@ -1,6 +1,6 @@
 proc red4TwoDLineFit {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -43,7 +43,7 @@ proc red4TwoDLineFit {taskname} {
     bind $Red4Widgets(TWD_LAB01) <Button-2> "red4Update red4TwoDLineFit ALL"
     bind $Red4Widgets(TWD_ENT01) <Button-2> "red4Update red4TwoDLineFit TWD_ENT01"
     bind $Red4Widgets(TWD_ENT01) <Double-Button-2> "$Red4Widgets(TWD_ENT01) delete 0 end"
-    
+
 # Create, pack and bind row/col widget
     set Red4Widgets(TWD_LAB02) [label $midtop.lb2 -text "X Start"]
     set Red4Widgets(TWD_ENT02) [entry $midtop.e2 -width 10]
@@ -108,7 +108,7 @@ proc red4TwoDLineFit {taskname} {
      cgs4drCursor arrow green black
      return
    } else {
- 
+
 # Remove the dialog box otherwise Figaro SPLOT can't grab input focus!
      destroy .red4Dialogue
    }
@@ -148,7 +148,7 @@ proc red4TwoDLineFit {taskname} {
      catch {exec /usr/bin/cp emlt.lis $env(CGS4_ENG)/emlt.lis}
      $taskname obey copy_to_log "source_file='emlt.lis'" -inform "cgs4drInform $taskname %V" -endmsg {set copy1_done 1}
      tkwait variable copy1_done
-     set param "xmin=$Red4Widgets(TWD_DXST) xmax=$Red4Widgets(TWD_DXEN)" 
+     set param "xmin=$Red4Widgets(TWD_DXST) xmax=$Red4Widgets(TWD_DXEN)"
      $taskname obey read_emlt "$param" -inform "cgs4drInform $taskname %V" -endmsg {set remlt1_done 1}
      tkwait variable remlt1_done
      set ycen [expr [expr $Red4Widgets(TWD_DYST) + $Red4Widgets(TWD_DYEN)] / 2.0]

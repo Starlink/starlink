@@ -22,19 +22,19 @@
 *     This function is equivalent to PDA_R2NAG except that it uses work
 *     space for greater speed.
 *
-*     The real and imaginary co-efficients produced by KPG1_RFFTF are numerically 
-*     larger than the corresponding C06FAE co-efficients by a factor of 
+*     The real and imaginary co-efficients produced by KPG1_RFFTF are numerically
+*     larger than the corresponding C06FAE co-efficients by a factor of
 *     SQRT( NP ), and are ordered differently. Both routines return A0
 *     (the zeroth real term, i.e. the DC level in the array) in element 1.
 *     KPG1_RFFTF then has corresponding real and imaginary terms in adjacent
 *     elements, whereas C06FAE has all the real terms together, followed by
 *     all the imaginary terms (in reverse order):
 *
-*        KPG1_RFFTF :  A0,    A1, B1,     A2, B2,     A3, B3,   ... 
+*        KPG1_RFFTF :  A0,    A1, B1,     A2, B2,     A3, B3,   ...
 *        C06FAE:       A0,    A1, A2, A3, ...,        ..., B3, B2, B1
 *
 *     The zeroth imaginary term (B0) always has the value zero and so is
-*     not stored in the array. Care has to be taken about the parity of the 
+*     not stored in the array. Care has to be taken about the parity of the
 *     array size. If it is even, then there is one more real term than
 *     there is imaginary terms (excluding A0), i.e. if NP = 10, then the
 *     co-efficients are stored as follows:
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,15 +99,15 @@
 *  Arguments Given and Returned:
       REAL R( NP )
       REAL WORK( NP )
-      
+
 *  Local Variables:
       REAL
      :        FAC                ! Normalisation factor
- 
-      INTEGER 
+
+      INTEGER
      :        I,                 ! Index of current input term.
      :        J                  ! Index of current output term.
-   
+
 *.
 
 *  Store the normalisation factor

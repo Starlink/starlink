@@ -1,6 +1,6 @@
 # colourDialog.tcl
 #
-# This file defines the procedure gwm_colourDialog, which creates a 
+# This file defines the procedure gwm_colourDialog, which creates a
 # dialog box for manipulating the colours of a gwm widget.
 
 # gwm_colourDialog:
@@ -40,7 +40,7 @@ proc gwm_colourDialog {w gwm c} {
 # Create and pack 3 frames arranged vertically
     pack [frame $w.top] [frame $w.mid] [frame $w.bot] -fill x
 
-# Create and pack a frame into the right hand side of the top frame to 
+# Create and pack a frame into the right hand side of the top frame to
 # hold the radio buttons for selecting the type of colour (background,
 # foreground, overlay or "other").
     pack [frame $w.top.r] [frame $w.top.pad -width 10] -side left -expand y \
@@ -81,7 +81,7 @@ proc gwm_colourDialog {w gwm c} {
     pack $w.top.s.red $w.top.s.green $w.top.s.blue -anchor w -pady 2
 
 # Create the scale for setting the pixel value and pack it into the middle
-# frame. The scale maximum is set to the number of colours in the gwm 
+# frame. The scale maximum is set to the number of colours in the gwm
 # widget minus 1.
     set maxcol [$gwm cget -colours]
     incr maxcol -1
@@ -98,7 +98,7 @@ proc gwm_colourDialog {w gwm c} {
 # Create the OK button with a default border and pack it into the bottom
 # frame.
     button $w.bot.ok -text OK -command "destroy $w"
-    
+
     frame $w.bot.default -relief sunken -bd 1
     raise $w.bot.ok $w.bot.default
     pack $w.bot.default -side left -expand 1 -padx 3m -pady 2m
@@ -162,7 +162,7 @@ proc gwm_colourDialog {w gwm c} {
     $c configure -state disabled
 
 # Withdraw the window, then update all the geometry information
-# so we know how big it wants to be, then center the window in 
+# so we know how big it wants to be, then center the window in
 # parent and de-iconify it.
     wm withdraw $w
     update idletasks
@@ -172,14 +172,14 @@ proc gwm_colourDialog {w gwm c} {
     set y [expr [winfo height $parent]/2 - [winfo reqheight $w]/2 \
 	+ [winfo y $parent]]
     wm geom $w +$x+$y
-    wm resizable $w 0 0 
+    wm resizable $w 0 0
     wm deiconify $w
 }
 
 # gwm_setColourScales:
 #
 # This procedure is called whenever one of the r g b scales is moved.
-# It sets the appropriate colour in the gwm widget and adjusts the r g b 
+# It sets the appropriate colour in the gwm widget and adjusts the r g b
 # scales.
 #
 # Arguments:

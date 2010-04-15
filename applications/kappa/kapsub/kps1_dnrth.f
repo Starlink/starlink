@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_DNRTH( INK, IPLOT, LENS, ARROW, GC0, SIZE, 
+      SUBROUTINE KPS1_DNRTH( INK, IPLOT, LENS, ARROW, GC0, SIZE,
      :                       X1, X2, Y1, Y2, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_DNRTH( INK, IPLOT, LENS, ARROW, GC0, SIZE, X1, X2, Y1, 
+*     CALL KPS1_DNRTH( INK, IPLOT, LENS, ARROW, GC0, SIZE, X1, X2, Y1,
 *                      Y2, STATUS )
 
 *  Description:
@@ -35,17 +35,17 @@
 *     SIZE = REAL (Given)
 *        The minimum dimension of the underlying DATA picture, in millimetres.
 *     X1 = REAL (Returned)
-*        The GRAPHICS X value at the left edge of the box just enclosing 
-*        the labels and arrows. 
+*        The GRAPHICS X value at the left edge of the box just enclosing
+*        the labels and arrows.
 *     X2 = REAL (Returned)
-*        The GRAPHICS X value at the right edge of the box just enclosing 
-*        the labels and arrows. 
+*        The GRAPHICS X value at the right edge of the box just enclosing
+*        the labels and arrows.
 *     Y1 = REAL (Returned)
-*        The GRAPHICS Y value at the bottom edge of the box just enclosing 
-*        the labels and arrows. 
+*        The GRAPHICS Y value at the bottom edge of the box just enclosing
+*        the labels and arrows.
 *     Y2 = REAL (Returned)
-*        The GRAPHICS Y value at the top edge of the box just enclosing 
-*        the labels and arrows. 
+*        The GRAPHICS Y value at the top edge of the box just enclosing
+*        the labels and arrows.
 
 *  Copyright:
 *     Copyright (C) 2002 Central Laboratory of the Research Councils
@@ -76,7 +76,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,10 +142,10 @@
 *.
 
 *  Initialize the returned bounding box.
-      X1 = VAL__MAXR      
-      X2 = VAL__MINR      
-      Y1 = VAL__MAXR      
-      Y2 = VAL__MINR      
+      X1 = VAL__MAXR
+      X2 = VAL__MINR
+      Y1 = VAL__MAXR
+      Y2 = VAL__MINR
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -169,40 +169,40 @@
       MAP = AST_GETMAPPING( IPLOT, AST__BASE, AST__CURRENT, STATUS )
 
 *  Map the origin into the required Frame.
-      CALL AST_TRAN2( MAP, 1, GC0( 1 ), GC0( 2 ), .TRUE., CC0( 1 ), 
-     :                CC0( 2 ), STATUS ) 
+      CALL AST_TRAN2( MAP, 1, GC0( 1 ), GC0( 2 ), .TRUE., CC0( 1 ),
+     :                CC0( 2 ), STATUS )
 
 *  Abort if the origin is bad in the required Frame.
       IF( CC0( 1 ) .EQ. AST__BAD .OR. CC0( 2 ) .EQ. AST__BAD ) GO TO 999
 
-*  Increase the graphics X value at the origin by 1 mm and map into 
+*  Increase the graphics X value at the origin by 1 mm and map into
 *  the required Frame.
       GC1( 1 ) = GC0( 1 ) + 1.0D0
-      GC1( 2 ) = GC0( 2 ) 
-      CALL AST_TRAN2( MAP, 1, GC1( 1 ), GC1( 2 ), .TRUE., CC1( 1 ), 
-     :                CC1( 2 ), STATUS ) 
+      GC1( 2 ) = GC0( 2 )
+      CALL AST_TRAN2( MAP, 1, GC1( 1 ), GC1( 2 ), .TRUE., CC1( 1 ),
+     :                CC1( 2 ), STATUS )
 
 *  Find the arc distance between these two points in the required Frame.
 *  This is our "small distance" which we will use to calculate the
 *  direction of the axis at the origin.
       D = AST_DISTANCE( RFRM, CC0, CC1, STATUS )
 
-*  Draw the arrow and label for the first axis if the arrow has non-zero 
+*  Draw the arrow and label for the first axis if the arrow has non-zero
 *  length.
-      IF( LENS( 1 ) .GT. 0.0 ) THEN      
+      IF( LENS( 1 ) .GT. 0.0 ) THEN
 
 *  Offset away from the origin along the first axis by a "small distance".
          CC2( 1 ) = CC0( 1 ) + D
          CC2( 2 ) = CC0( 2 )
-         CALL AST_OFFSET( RFRM, CC0, CC2, D, CC1, STATUS ) 
+         CALL AST_OFFSET( RFRM, CC0, CC2, D, CC1, STATUS )
 
 *  Convert this point back to GRAPHICS coords.
-         CALL AST_TRAN2( MAP, 1, CC1( 1 ), CC1( 2 ), .FALSE., 
-     :                   GC1( 1 ), GC1( 2 ), STATUS ) 
+         CALL AST_TRAN2( MAP, 1, CC1( 1 ), CC1( 2 ), .FALSE.,
+     :                   GC1( 1 ), GC1( 2 ), STATUS )
 
 *  Find the angle between the 2nd GRAPHICS axis and the line from the
 *  origin to the point found above.
-         ANG = AST_AXANGLE( BFRM, GC0, GC1, 1, STATUS ) 
+         ANG = AST_AXANGLE( BFRM, GC0, GC1, 1, STATUS )
 
 *  Abort if this angle is bad.
          IF( ANG .EQ. AST__BAD ) GO TO 999
@@ -214,8 +214,8 @@
          CALL KPG1_PGSTY( IPLOT, 'AXIS1', .TRUE., ATTR, STATUS )
 
 *  Draw the vector.
-         CALL KPS1_VECT( INK, REAL( GC0( 1 ) ), REAL( GC0( 2 ) ), 
-     :                   'START', LENS( 1 ), REAL( ANG ), ARROW, X1, 
+         CALL KPS1_VECT( INK, REAL( GC0( 1 ) ), REAL( GC0( 2 ) ),
+     :                   'START', LENS( 1 ), REAL( ANG ), ARROW, X1,
      :                   X2, Y1, Y2, STATUS )
 
 *  Re-instate the original PGPLOT attributes.
@@ -229,7 +229,7 @@
             GAP = SIZE*AST_GETR( IPLOT, 'TextLabGap(1)', STATUS )
 
 *  Find the corresponding graphics position.
-            CALL AST_OFFSET( BFRM, GC0, GC1, LENS( 1 ) + GAP, GC2, 
+            CALL AST_OFFSET( BFRM, GC0, GC1, LENS( 1 ) + GAP, GC2,
      :                       STATUS )
 
 *  Get the text for the label.
@@ -241,7 +241,7 @@
                VJ = 'B'
             ELSE IF( COSA .LT. -COSPI8 ) THEN
                VJ = 'T'
-            ELSE 
+            ELSE
                VJ = 'C'
             END IF
 
@@ -250,19 +250,19 @@
                HJ = 'R'
             ELSE IF( SINA .LT. -SINPI8 ) THEN
                HJ = 'L'
-            ELSE 
+            ELSE
                HJ = 'C'
             END IF
 
 *  Make the AST_TEXT method draw strings using the TextLab1 attributes.
-            CALL KPG1_CPSTY( IPLOT, 'TextLab1', 'Strings', RATS, 
+            CALL KPG1_CPSTY( IPLOT, 'TextLab1', 'Strings', RATS,
      :                       STATUS )
 
 *  Draw the text string, temporarily making the GRAPHICS Frame the
 *  current Frame.
             CALL AST_SETI( IPLOT, 'Current', IBASE, STATUS )
 
-            CALL AST_TEXT( IPLOT, LABEL, GC2, UP, VJ//HJ, STATUS ) 
+            CALL AST_TEXT( IPLOT, LABEL, GC2, UP, VJ//HJ, STATUS )
             CALL AST_SETI( IPLOT, 'Current', ICURR, STATUS )
 
 *  Find the bounding box enclosing the text produced by the above call to
@@ -277,22 +277,22 @@
 
       END IF
 
-*  Draw the arrow and label for the second axis if the arrow has non-zero 
+*  Draw the arrow and label for the second axis if the arrow has non-zero
 *  length.
-      IF( LENS( 2 ) .GT. 0.0 ) THEN      
+      IF( LENS( 2 ) .GT. 0.0 ) THEN
 
 *  Offset away from the origin along the second axis by a "small distance".
          CC2( 1 ) = CC0( 1 )
          CC2( 2 ) = CC0( 2 ) + D
-         CALL AST_OFFSET( RFRM, CC0, CC2, D, CC1, STATUS ) 
+         CALL AST_OFFSET( RFRM, CC0, CC2, D, CC1, STATUS )
 
 *  Convert this point back to GRAPHICS coords.
-         CALL AST_TRAN2( MAP, 1, CC1( 1 ), CC1( 2 ), .FALSE., 
-     :                   GC1( 1 ), GC1( 2 ), STATUS ) 
+         CALL AST_TRAN2( MAP, 1, CC1( 1 ), CC1( 2 ), .FALSE.,
+     :                   GC1( 1 ), GC1( 2 ), STATUS )
 
 *  Find the angle between the 2nd GRAPHICS axis and the line from the
 *  origin to the point found above.
-         ANG = AST_AXANGLE( BFRM, GC0, GC1, 1, STATUS ) 
+         ANG = AST_AXANGLE( BFRM, GC0, GC1, 1, STATUS )
 
 *  Abort if this angle is bad.
          IF( ANG .EQ. AST__BAD ) GO TO 999
@@ -304,8 +304,8 @@
          CALL KPG1_PGSTY( IPLOT, 'AXIS2', .TRUE., ATTR, STATUS )
 
 *  Draw the vector.
-         CALL KPS1_VECT( INK, REAL( GC0( 1 ) ), REAL( GC0( 2 ) ), 
-     :                   'START', LENS( 2 ), REAL( ANG ), ARROW, X1, 
+         CALL KPS1_VECT( INK, REAL( GC0( 1 ) ), REAL( GC0( 2 ) ),
+     :                   'START', LENS( 2 ), REAL( ANG ), ARROW, X1,
      :                   X2, Y1, Y2, STATUS )
 
 *  Re-instate the original PGPLOT attributes.
@@ -319,7 +319,7 @@
             GAP = SIZE*AST_GETR( IPLOT, 'TextLabGap(2)', STATUS )
 
 *  Find the corresponding graphics position.
-            CALL AST_OFFSET( BFRM, GC0, GC1, LENS( 2 ) + GAP, GC2, 
+            CALL AST_OFFSET( BFRM, GC0, GC1, LENS( 2 ) + GAP, GC2,
      :                       STATUS )
 
 *  Get the text for the label.
@@ -331,7 +331,7 @@
                VJ = 'B'
             ELSE IF( COSA .LT. -COSPI8 ) THEN
                VJ = 'T'
-            ELSE 
+            ELSE
                VJ = 'C'
             END IF
 
@@ -340,18 +340,18 @@
                HJ = 'R'
             ELSE IF( SINA .LT. -SINPI8 ) THEN
                HJ = 'L'
-            ELSE 
+            ELSE
                HJ = 'C'
             END IF
 
 *  Make the AST_TEXT method draw strings using the TextLab2 attributes.
-            CALL KPG1_CPSTY( IPLOT, 'TextLab2', 'Strings', RATS, 
+            CALL KPG1_CPSTY( IPLOT, 'TextLab2', 'Strings', RATS,
      :                       STATUS )
 
 *  Draw the text string, temporarily making the GRAPHICS Frame the
 *  current Frame.
             CALL AST_SETI( IPLOT, 'Current', IBASE, STATUS )
-            CALL AST_TEXT( IPLOT, LABEL, GC2, UP, VJ//HJ, STATUS ) 
+            CALL AST_TEXT( IPLOT, LABEL, GC2, UP, VJ//HJ, STATUS )
             CALL AST_SETI( IPLOT, 'Current', ICURR, STATUS )
 
 *  Find the bounding box enclosing the text produced by the above call to

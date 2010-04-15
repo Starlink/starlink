@@ -6,18 +6,18 @@ C+
 C
 C     G A U S S
 C
-C     Interactively fits Gaussians to an emission or absorption 
+C     Interactively fits Gaussians to an emission or absorption
 C     feature in a spectrum. A spectrum, whose length is prompted
-C     for, is plotted on the selected 'SOFT' device together with a 
-C     residual plot above. Regions of continuum are demarcated with 
+C     for, is plotted on the selected 'SOFT' device together with a
+C     residual plot above. Regions of continuum are demarcated with
 C     the cursor. Continuum is fitted by a polynomial with rejection
 C     of points a selected sigma from this continuum or a fraction
-C     of the error bar ( if available ). Single or multiple Gaussian 
-C     fits are made to the emission/absorption feature. In the case 
-C     of multiple fits interactive fitting of the profile by Gaussians 
-C     whose parameters are altered from the terminal occurs. The 
-C     residuals on the fit ( observed - fitted ) are plotted in the 
-C     residuals box above the main plot. If error bars are available 
+C     of the error bar ( if available ). Single or multiple Gaussian
+C     fits are made to the emission/absorption feature. In the case
+C     of multiple fits interactive fitting of the profile by Gaussians
+C     whose parameters are altered from the terminal occurs. The
+C     residuals on the fit ( observed - fitted ) are plotted in the
+C     residuals box above the main plot. If error bars are available
 C     for the spectrum they are plotted in the residuals box. The fit
 C     may be optimized and any single Gaussian parameter can be
 C     constrained or its value chained to another. The residuals on
@@ -27,7 +27,7 @@ C     height and sigma - are reported for each Gaussian and r.m.s. and
 C     mean fractional error (if errors available) on fit. The results
 C     may be recorded in a data file. The final fit spectrum can be
 C     saved as a file for subsequent analysis.
-C 
+C
 C     Command parameters -
 C
 C     SPECTRUM    The data to be fitted. This should be a
@@ -43,10 +43,10 @@ C     HIGH        The maximum value to be used for the plot.
 C     LOW         The minimum value to be used for the plot.
 C     BIAS        Value to be added to zero for the plot.
 C     LABEL       A label for the plot and the data file.
-C    
+C
 C     Command keywords -
 C
-C     AUTOSCALE   The program is to work out the values for HIGH 
+C     AUTOSCALE   The program is to work out the values for HIGH
 C                 and LOW, using the maximum and minimum values
 C                 in the data over the specified range.
 C     WHOLE       The program is to display all of the spectrum.
@@ -68,7 +68,7 @@ C       MAPSPEC  -  unmaps the X and Z from virtual memory into arrays
 C                   in the program
 C       MAPSPECE  -  unmaps the X, Z and error data from virtual memory
 C                    into arrays in the program
-C       MAPSPECG  - maps the output fitting spectrum Z component into 
+C       MAPSPECG  - maps the output fitting spectrum Z component into
 C                   virtual memory
 C       GAUS_XZPLOT  -  handles all the PGPLOT plotting of spectrum,
 C                       continuum fit, Gaussian fit, residuals and
@@ -80,56 +80,56 @@ C
 C                                          JRW / AAO March 1987
 C
 C     Modified:
-C      1987 Mar 13 JRW / AAO 
-C                  Highest order, highest iteration continuum fit 
-C                  plotted in continuum fitting menu (FIT) to allow 
-C                  visual check on goodness of fit. 
+C      1987 Mar 13 JRW / AAO
+C                  Highest order, highest iteration continuum fit
+C                  plotted in continuum fitting menu (FIT) to allow
+C                  visual check on goodness of fit.
 C                  Default values of ORD, ITN, SIG and ERR in continuum
 C                  fitting menu are not reset at each entry to this
-C                  subroutine. Default values printed to terminal on a 
+C                  subroutine. Default values printed to terminal on a
 C                  second entry to this subroutine are now the actual
-C                  values used.  Can fit further new lines after 
+C                  values used.  Can fit further new lines after
 C                  optimization in the Gaussian fitting menu.
 C                  Data on all fits are recorded in results file.
 C      1987 Apr 24 KS / AAO.
-C                  'DEFAULTFILE' added to INQUIRE and OPEN statements 
-C                  for the results file (prevents error if return 
+C                  'DEFAULTFILE' added to INQUIRE and OPEN statements
+C                  for the results file (prevents error if return
 C                  or blank pressed for name of file).
 C      1987 Apr 26 JRW / AAO
-C                  If OPT chosen in Gaussian fitting then residuals can 
-C                  be weighted either by inverse square of error 
+C                  If OPT chosen in Gaussian fitting then residuals can
+C                  be weighted either by inverse square of error
 C                  ( if errors available ) or by value.
 C                  Prompt for accepting manual fit changed to PAR_RDKEY
 C      1987 Jun 10 JRW/AAO
-C                  Second Gaussian has its flux correctly calculated 
+C                  Second Gaussian has its flux correctly calculated
 C                  (factor 2.354 was omitted) in RECORD.
 C                  Lower limits to line width corrected to be in terms
 C                  of sigma and not FWHM (in AUTOFIT).
-C                  In OPT of GAUMENU, a check is made for lines whose 
+C                  In OPT of GAUMENU, a check is made for lines whose
 C                  peaks occur outside the range of GXVALS and any such
 C                  are deleted.
 C      1987 Jul 6  KS/AAO
-C                  The appendage of .DAT to the file name, which 
+C                  The appendage of .DAT to the file name, which
 C                  remained from the Apr 24 bug fix is deleted.
-C      1987 Aug 6  JRW/AAO 
+C      1987 Aug 6  JRW/AAO
 C                  In Gaussian fitting menu if full name of prompt given
 C                  it would not be recognized. Full names now accepted
 C                  by ICH_KEY.
 C      1987 Sep 15 JRW/AAO
-C                  Any single Gaussian parameter ( position, width or 
+C                  Any single Gaussian parameter ( position, width or
 C                  height ) can be locked beofre the optimization or
 C                  sets of values can be chained.
 C      1987 Oct 22 JRW/AAO
-C                  Bug fix. If no .X.DATA present X values are 
-C                  assumed to be increasing channel number and 
-C                  reduction proceeds. 
+C                  Bug fix. If no .X.DATA present X values are
+C                  assumed to be increasing channel number and
+C                  reduction proceeds.
 C                  PGASK added so that prompt for " Press <RETURN>
 C                  when ready " only appears after fitting continuum
-C                  or optimization of Gaussian fit ( to allow 
+C                  or optimization of Gaussian fit ( to allow
 C                  assessment of results printed to terminal )
 C      1987 Dec 21 JRW/AAO
-C                  If dimension of spectrum greater than 4096 an error 
-C                  message is issued and program stops. 
+C                  If dimension of spectrum greater than 4096 an error
+C                  message is issued and program stops.
 C                  Can now exit from Gaussian fitting menu without
 C                  having fitted a line. This can be useful if only a
 C                  continuum fit is required.
@@ -140,9 +140,9 @@ C                  right edge. Warning messages are issued in these
 C                  cases.
 C      1988 Mar 24 KS / AAO
 C                  Modified to work with GKS version of PGPLOT.  Only
-C                  minimal changes made - replacement of 
-C                  now-discontinued GRPCKG routines and suchlike. 
-C                  Proper modifications to introduce GKD_ dialogue etc, 
+C                  minimal changes made - replacement of
+C                  now-discontinued GRPCKG routines and suchlike.
+C                  Proper modifications to introduce GKD_ dialogue etc,
 C                  are a bigger job - partly because of use of PAR_
 C                  system for dialogue - e.g. use of PAR_CNPAR.
 C      1991 Apr  5 JMS / AAO. Modified to use DSA_ routines.
@@ -238,12 +238,12 @@ C
       IF (STATUS.NE.0) GOTO 500
 C
 C     Set initial values for continuum fitting parameters ( order,
-C     sigma for point rejection and number of iterations for point 
+C     sigma for point rejection and number of iterations for point
 C     rejection. These can be amended in CONMENU
 C
       ORD=3
       SIG=2.
-      ITN=1 
+      ITN=1
 C
 C     Get name of file for SPECTRUM, and open it.
 C
@@ -260,7 +260,7 @@ C     Test for value of NX greater than 4096. If so stop with a warning.
 C
       IF (NX.GT.4096) THEN
         CALL PAR_WRUSER('Spectrum has more than 4096 channels.',
-     :                  STATUS) 
+     :                  STATUS)
         FAULT=.TRUE.
         GO TO 500
       END IF
@@ -295,7 +295,7 @@ C
          CALL DSA_MAP_ERRORS('SPECT','READ','FLOAT',EPTR,SLOT,STATUS)
          ERR=1
          EMAP=.TRUE.
-      ELSE 
+      ELSE
          CALL PAR_WRUSER('No errors available.',STATUS)
          ERR=0
          EMAP=.FALSE.
@@ -338,7 +338,7 @@ C
          ZLAB=ZUNITS
       END IF
 C
-C     Get the label for the plot - 
+C     Get the label for the plot -
 C
       CALL PAR_RDCHAR('LABEL',' ',PLAB)
       IF (PAR_ABORT()) GO TO 500
@@ -403,21 +403,21 @@ C
            WRITE(LU,217) XUNITS,ZUNITS
            WRITE(LU,215)
            WRITE(LU,218)
-           WRITE(LU,219)  
+           WRITE(LU,219)
            WRITE(LU,215)
 211       FORMAT('     DATA ON GAUSSIAN FIT')
 212       FORMAT('     --------------------')
-213       FORMAT('  Spectrum file: ',A32) 
+213       FORMAT('  Spectrum file: ',A32)
 214       FORMAT(' Spectrum label: ',A64)
 215       FORMAT('.')
 216       FORMAT(' X and E.W. units are ',A16,'; Y units are '
      :           ,A16)
 217       FORMAT(' Flux units are ',A16,'* ',A16)
-218       FORMAT('                         G a u s s i a n   F i t     
+218       FORMAT('                         G a u s s i a n   F i t
      :                                       !     C o n t i n u u m
      :   F i t')
-219       FORMAT('     Peak Posn.   Peak Height     Sigma     Flux  
-     :         E.W.    R.m.s.    Mean frac err    Order 
+219       FORMAT('     Peak Posn.   Peak Height     Sigma     Flux
+     :         E.W.    R.m.s.    Mean frac err    Order
      :  Sigma Rej.  Frac err Rej.')
          END IF
       END IF
@@ -431,7 +431,7 @@ C
       IF (PAR_ABORT()) GO TO 500
 C
 101   CONTINUE
-C      
+C
       IF (WHOLE) THEN
          IXST=1
          IXEN=NX
@@ -470,7 +470,7 @@ C
       END IF
       NNX=IXEN-IXST+1
 C
-C     Specified or not, find out the scale range 
+C     Specified or not, find out the scale range
 C
       IF (ERRUSE) THEN
          CALL GEN_RANGEF(%VAL(CNF_PVAL(EPTR)),IXST,IXEN,RMAX,RMIN)
@@ -543,7 +543,7 @@ C
         END IF
         IF (STATUS.NE.0) THEN
           CALL PAR_WRUSER('Error copying data',STAT)
-          GO TO 500 
+          GO TO 500
         END IF
       END IF
 C
@@ -569,8 +569,8 @@ C
       HARD=.FALSE.
 C
 C     ( GAUS_XZPLOT is the only plotting routine. To avoid setting
-C     arrays with variable dimensions to zero dimensions, set length 
-C     of CONVALS to NNX; and  GXVALS, GAUSUM, GAUFS and GZRESID to 
+C     arrays with variable dimensions to zero dimensions, set length
+C     of CONVALS to NNX; and  GXVALS, GAUSUM, GAUFS and GZRESID to
 C     useless array DUM, of dimension 1 )
 C
       CALL GAUS_XZPLOT(XVALS,DUM,ZVALS,ERRORS,
@@ -605,7 +605,7 @@ C     fitting options in the menu GAUMENU
 C
 C     Initial plotting done on lower spectrum plot. Set PGPLOT to this
 C     viewport
-C    
+C
       CALL PGVPORT(0.08,0.97,0.09,0.74)
       CALL PGWINDOW(XVST,XVEN,LOW,HIGH)
 C
@@ -632,9 +632,9 @@ C
       IF (LSECT) THEN
         CALL PAR_CNPAR('XSTART')
         CALL PAR_CNPAR('XEND')
-        CALL PAR_CNPAR('HIGH')        
+        CALL PAR_CNPAR('HIGH')
         CALL PAR_CNPAR('LOW')
-        CALL PAR_CNPAR('BIAS')        
+        CALL PAR_CNPAR('BIAS')
         IF (.NOT.HARD) THEN
           CALL PGEND
           PGOPEN=.FALSE.
@@ -644,7 +644,7 @@ C
       END IF
 C
 C     If fit complete and resultant fitting spectrum to be saved, then
-C     prompt for name of output spectrum. Copy the complete input 
+C     prompt for name of output spectrum. Copy the complete input
 C     structure to this file and replace the Z values by the fitting
 C     spectrum.
 C

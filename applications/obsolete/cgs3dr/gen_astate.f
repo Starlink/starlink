@@ -1,6 +1,6 @@
 C+
       SUBROUTINE GEN_ASTATE (ARRAY,QDATA, NX,NY, IXST,IXEN,IYST,IYEN,
-     :           TOTAL,AMAX,AMIN,MEAN,XMAX,XMIN,YMAX,YMIN,SIGMA,SIZE, 
+     :           TOTAL,AMAX,AMIN,MEAN,XMAX,XMIN,YMAX,YMIN,SIGMA,SIZE,
      :           QUAL, FLAGS, FBAD)
 C
 C     G E N _ A S T A T E
@@ -41,11 +41,11 @@ C
 C                                               KS / CIT  6th March 1983
 C     Modified:
 C
-C     19th March 1987.  KS / AAO. Double precision now used for total values 
+C     19th March 1987.  KS / AAO. Double precision now used for total values
 C                       in the internal calculations.
 C     Modified:
 C
-C     17th Nov  1990  PRB / ROE.  Modified from GEN_ASTAT 
+C     17th Nov  1990  PRB / ROE.  Modified from GEN_ASTAT
 C     to handle quality and flagged values on data.
 C+
       IMPLICIT NONE
@@ -189,11 +189,11 @@ C
       IF (SIZE.GT.0.0) MEAN=SNGL(TOTALDP/DBLE(SIZE))
       TOTAL=SNGL(TOTALDP)
 C
-C     Calculate sigma 
+C     Calculate sigma
 C
       IF (SIZE.GT.1.0) THEN
          SIGMA=SQRT(ABS((TOTSQ-(TOTALDP*TOTALDP)/SIZE)/(SIZE-1.0)))
-      ELSE 
+      ELSE
          SIGMA=0.0
       ENDIF
 C

@@ -16,7 +16,7 @@
 
 *  Description:
 *     This routine returns the dimensions and total number of elements
-*     in a specified axis centre array. If the axis data does not in 
+*     in a specified axis centre array. If the axis data does not in
 *     fact exist, this routine returns as if it were a 1D array of the
 *     same size as the corresponding dimension of the main NDF itself.
 *     This behaviour is in line with that of DSA_MAP_AXIS_DATA.
@@ -27,7 +27,7 @@
 *     AXIS = INTEGER (Given)
 *        The number of the axis in question.
 *     MAXDIM = INTEGER (Given)
-*        The maximum number of dimensions for the data.  
+*        The maximum number of dimensions for the data.
 *     NDIM = INTEGER (Returned)
 *        The actual number of dimensions in the data.
 *     DIMS( MAXDIM ) = INTEGER (Returned)
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,7 +129,7 @@
 
       SUBROUTINE DSA1_AXSIZ( SLOT, AXIS, MAXDIM,
      :   NDIM, DIMS, NELM, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -39,7 +39,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -200,11 +200,11 @@
 %  ==================
 
 The Image Display Interface (IDI) is an international standard for
-displaying astronomical data on an image display. 
-The specification of the interface is given in Terrett et~al, 
+displaying astronomical data on an image display.
+The specification of the interface is given in Terrett et~al,
 1988\footnote{D.L.Terrett, P.M.B.Shames, R.J.Hanisch, R.Albrecht,
-K.Banse, F.Pasian, M.Pucillo and P.Santin., 1988, 
-An image display interface for astronomical image processing, 
+K.Banse, F.Pasian, M.Pucillo and P.Santin., 1988,
+An image display interface for astronomical image processing,
 Astron.Astrophys.Suppl.Ser., {\bf 76}, 263-304.}
 This guide is an introduction to
 programming with IDI, and describes the details of the current implementation.
@@ -224,7 +224,7 @@ subroutine calls.
    \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
                                             {stardoccontents}}
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
      <HR>
      <H2>Contents</H2>
   \end{rawhtml}
@@ -243,7 +243,7 @@ subroutine calls.
 
 IDI is intended for those users (applications) that need to be able to
 manipulate images on an image display to a greater extent than is
-available with \xref{GKS}{sun83}{} and its offspring (e.g. 
+available with \xref{GKS}{sun83}{} and its offspring (e.g.
 \xref{PGPLOT}{sun15}{}). GKS allows an image to
 be displayed, its look-up table changed and a cursor to be moved over it.
 The most obvious advantage of IDI over GKS is that it allows the image
@@ -273,7 +273,7 @@ to the calling program.
 It should be noted that it is not possible to mix calls from GKS and IDI
 on the same display; the two packages use completely different models
 of the display. An application could, however, use the packages one after
-the other by utilising the \xref{Applications Graphics 
+the other by utilising the \xref{Applications Graphics
 Interface}{sun48}{} (SUN/48) to mediate between them.
 
 
@@ -282,7 +282,7 @@ Interface}{sun48}{} (SUN/48) to mediate between them.
 The following list gives all the top-level routines in the interface that
 have been implement by Starlink
 An error status will be returned if a routine that has not been implemented
-is called. The routine arguments are defined in the specification 
+is called. The routine arguments are defined in the specification
 document.
 
 \routinehead{Control}
@@ -440,7 +440,7 @@ document.
 All programs using IDI to perform graphics I/O on a device have to begin and
 end the IDI sections with calls to {\bf Open Display} and {\bf Close Display}.
 If the program is an ADAM task then these two calls have to be replaced by
-appropriate calls to \htmlref{IDI\_ASSOC}{IDI_ASSOC} and 
+appropriate calls to \htmlref{IDI\_ASSOC}{IDI_ASSOC} and
 \htmlref{IDI\_CANCL}{IDI_CANCL} or \htmlref{IDI\_ANNUL}{IDI_ANNUL}
 \latex{(see Appendix~\ref{se:apg} for more details on these functions)}.
 
@@ -690,7 +690,7 @@ of configurations available, the number of look-up tables and the number
 of cursors. More detailed inquiries of the capabilities and current
 settings for the device can be obtained with {\bf Query Capabilities
 Integer} and {\bf Query Capabilities Real}.
-\hyperref{This appendix}{Appendix~}{}{se:qcn} gives details of the 
+\hyperref{This appendix}{Appendix~}{}{se:qcn} gives details of the
 available capabilities. Note that
 some of the capabilities are arrays of numbers and so the array arguments
 should be dimensioned large enough to accommodate the returns, otherwise the
@@ -698,7 +698,7 @@ information returned will be incomplete. A global variable IDI\_\_MAXCP
 has been supplied which can be used to dimension the array and is
 as large as any capability on any implemented device. This is defined
 in the include file IDI\_PAR. Examples of using
-{\bf Query Capabilities Integer} can be found in the 
+{\bf Query Capabilities Integer} can be found in the
 \hyperref{test program}{in appendix~}{}{se:exp}.
 
 As an example of searching for a suitable configuration consider an
@@ -967,7 +967,7 @@ display or zoom look-up table, and any attempt to perform such interactions
 will result in an error.
 
 Examples of setting up interactions are shown in the following section on
-regions of interest and in the 
+regions of interest and in the
 \hyperref{example program}{example program (appendix~}{}{se:exp}).
 
 The routine {\bf Stop Interactive Input} will clear out all current
@@ -984,7 +984,7 @@ can be constructed from the output of the routine
 how the given interaction is to be performed, such as `move mouse', or
 `press centre button'. This can be output by the program to give
 instructions to the user on how to achieve the particular interaction.
-Examples of the use of this routine can be found in the 
+Examples of the use of this routine can be found in the
 \hyperref{example program}{example program in appendix~}{}{se:exp}.
 
 More complex interactions than those already offered can be programmed
@@ -1163,7 +1163,7 @@ supported using {\bf Query Capabilities Integer}
 \end{verbatim}
 \end{small}
 The global parameter ISDYNC defines the capability number used to inquire
-if the dynamic configuration is implemented (see 
+if the dynamic configuration is implemented (see
 \hyperref{this appendix}{appendix~}{}{se:qcn}).
 
 The memory allocation is begun with a call to {\bf Enable Configuration}
@@ -1230,7 +1230,7 @@ For programs in the ADAM environment the compile and link command is
 
 The choice of display device used by an IDI program is selected by
 passing the device name to {\bf Open Display} or by defining the name
-through the parameter system if 
+through the parameter system if
 \htmlref{IDI\_ASSOC}{IDI_ASSOC} is used in an ADAM task.
 
 IDI uses the \xref{Graphics Name Service}{sun57}{}
@@ -1390,9 +1390,9 @@ IIDCLO - {\bf Close Display}
 
 \end{minipage}
 
-The function of IIDOPN is performed by the environment routine 
+The function of IIDOPN is performed by the environment routine
 \htmlref{IDI\_ASSOC}{IDI_ASSOC}.
-The function of IIDCLO is performed by the environment routine 
+The function of IIDCLO is performed by the environment routine
 \htmlref{IDI\_CANCL}{IDI_CANCL},
 or \htmlref{IDI\_ANNUL}{IDI_ANNUL}.
 
@@ -1870,7 +1870,7 @@ interface IDI_TEST
 endinterface
 \end{verbatim}
 \end{small}
-      
+
 \newpage
 \section{X-WINDOWS implementation notes}
 \label{se:xin}
@@ -2029,7 +2029,7 @@ Modify object             & + & . & . & . & + & . & . \\
 Scrolling a memory or the display with the mouse begins as soon as the
 hardware pointer enters the display window, and the memory moves as
 if it were attached to the hardware pointer, however scrolling does
-not happen if the mouse is moved too quickly. 
+not happen if the mouse is moved too quickly.
 
 With the X-windows interface it is possible to display a fixed cursor
 and to scroll and zoom the memory under it, although the default hardware

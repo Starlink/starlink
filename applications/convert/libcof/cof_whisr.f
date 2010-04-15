@@ -60,14 +60,14 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF__ public constants      
-      INCLUDE 'PRM_PAR'          ! VAL__ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF__ public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ public constants
 
 *  Global Variables:
       INCLUDE 'COF_CMN'          ! Common block for passing required

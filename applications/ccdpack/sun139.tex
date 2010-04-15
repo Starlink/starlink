@@ -98,7 +98,7 @@ programs.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -585,12 +585,12 @@ programs.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -693,14 +693,14 @@ alignment of images; these may be of particular use for mosaic
 cameras, or when pointing information is available in FITS headers
 of the data products being reduced.
 
-Data resampling uses World Coordinate System information stored 
+Data resampling uses World Coordinate System information stored
 within the data, which removes the need to remember the
-appropriate transformations. 
-As well as a wide selection of general purpose combination methods 
-such as median estimators, the more specialized `drizzling' 
+appropriate transformations.
+As well as a wide selection of general purpose combination methods
+such as median estimators, the more specialized `drizzling'
 algorithm is also available.
 
-Normalisation and combination (often also called mosaicing) 
+Normalisation and combination (often also called mosaicing)
 are done in a single step, which is
 designed to deal with very large datasets.
 This uses robust methods for determining scale and/or zero point
@@ -780,13 +780,13 @@ of the useful part of a CCD you might use a command like:
 % debias in='"datar*,ffr?"' extent='[51,1094,1,1024]'
 \end{verbatim}
 \end{myquote}
-If in doubt, it is a good idea to put single quotes around arguments 
+If in doubt, it is a good idea to put single quotes around arguments
 in this way -- it can't hurt.
 
 \section{\xlabel{demos}\label{demos}Demonstrations and test data}
 
-If you want to get a feel for what CCDPACK can do before reading 
-further, you might like to run one or more of the three 
+If you want to get a feel for what CCDPACK can do before reading
+further, you might like to run one or more of the three
 demonstration scripts:
 \begin{description}
 \item[{\tt ccdexercise}]
@@ -806,7 +806,7 @@ start up CCDPACK:
 % ccdpack
 \end{verbatim}
 \end{myquote}
-and then type the name of the demonstration script you want to see, 
+and then type the name of the demonstration script you want to see,
 either
 \begin{myquote}
 \begin{verbatim}
@@ -825,14 +825,14 @@ or
 % setexercise
 \end{verbatim}
 \end{myquote}
-You will then be prompted for a graphics device: 
+You will then be prompted for a graphics device:
 answer `xw' to see the progress graphically on an Xwindows display,
 or `!' to run without graphics.
 
 Each of these scripts generates test data files (small fictional
 starfields) and various intermediate files in the current directory
 when it runs.  These can be deleted when the script has finished.
-However, you may find them useful as test data if you want to 
+However, you may find them useful as test data if you want to
 see how the scripts have operated, or to experiment with the CCDPACK
 commands.  You can also use the scripts themselves as examples or
 templates for reducing your own data.
@@ -937,7 +937,7 @@ start. Later sections are rather more technical or describe data
 registration and related topics and should really only be consulted
 when the need arises.
 
-\subsection{Using the CCDPACK data reduction GUI 
+\subsection{Using the CCDPACK data reduction GUI
             \label{usingxreduce}\xlabel{usingxreduce}}
 
 If you are sitting at an X display then type the commands:
@@ -1083,11 +1083,11 @@ use data in these formats you should initialise the CONVERT package
 % convert
 \end{verbatim}
 \end{myquote}
-and the necessary facilities will be set up. 
+and the necessary facilities will be set up.
 Having done this, the simplest way to proceed is to use the
-full name of the unconverted files (i.e.\ including an extension 
+full name of the unconverted files (i.e.\ including an extension
 such as `.fits') when giving filenames to CCDPACK; it will
-transparently convert them to NDF format as required without 
+transparently convert them to NDF format as required without
 any further effort from you.
 
 An alternative is to convert the files explicitly to NDF format
@@ -1100,10 +1100,10 @@ For instance converting all the FITS files in the current directory
 to NDF files with the same name can be done like this:
 \begin{myquote}
 \begin{verbatim}
-% fits2ndf in='*.fits' out='*' 
+% fits2ndf in='*.fits' out='*'
 \end{verbatim}
 \end{myquote}
-One useful tip for \xref{FITS2NDF}{sun55}{FITS2NDF} 
+One useful tip for \xref{FITS2NDF}{sun55}{FITS2NDF}
 is to set the CONTAINER parameter to true if you are using Multi-Extension
 FITS files (MEFs), i.e.\ type instead
 \begin{myquote}
@@ -2101,31 +2101,31 @@ usually makes use of a robust estimator to protect against spurious
 values, cosmic rays etc.
 
 {\em
-Version 3 of CCDPACK, which was released in mid-2000, 
+Version 3 of CCDPACK, which was released in mid-2000,
 handles the registration process
 differently from previous versions --- instead of using TRANSFORM
 structures it now normally makes use of World Coordinate System
 (WCS) components of the images.  For much of the time, and in particular
-to do the things which CCDPACK used to do, it is not 
+to do the things which CCDPACK used to do, it is not
 necessary to be aware of this, but it opens the way to some new
 functionality.
-Discussion specific to the old methods can be found in 
+Discussion specific to the old methods can be found in
 appendix \S\ref{transformreg}.
 }
 
 
 \subsection{\xlabel{registrationprocess}\label{regproc}The registration process}
 
-Registering a set of images requires identifying a single 
-coordinate system which can apply to all of them, so that 
-each pixel in each of the images has a definite position in 
+Registering a set of images requires identifying a single
+coordinate system which can apply to all of them, so that
+each pixel in each of the images has a definite position in
 the overall picture as well as within its own grid.
 This single coordinate system within which all the images can
 be embedded may be an actual sky coordinate system with RA and
 Dec coordinates, or an arbitrary one which coincides with the
 pixel coordinates of one of the images, or some other kind.
 Information on how to embed the images in the same coordinate
-system may come from one or more of a variety of sources, 
+system may come from one or more of a variety of sources,
 for instance:
 \begin{description}
 \item[Telescope pointing information:]
@@ -2151,16 +2151,16 @@ of the images can be determined by matching up the features.
 For a given set of data,
 some of these sources may be more accurate or reliable than others.
 
-It is possible to attach any number of these coordinate systems 
+It is possible to attach any number of these coordinate systems
 to an image.  Once all the images that you are interested in
 have the same coordinate system attached to them, then
 they can all be resampled so they match pixel for pixel,
 ready for combination or comparison.
 There are two ways of keeping track of which coordinate systems
-are attached to an image: firstly, each coordinate system has a label 
+are attached to an image: firstly, each coordinate system has a label
 (sometimes called its {\em domain\/}) which can be used to identify it.
 Some of these
-labels have special meaning, for instance a coordinate system labelled 
+labels have special meaning, for instance a coordinate system labelled
 `SKY' indicates
 positions on the sky itself and coordinates are usually reported in
 RA and Dec
@@ -2168,7 +2168,7 @@ RA and Dec
 Secondly, an image
 always has a {\em Current\/} coordinate system, which is the
 one in which positions are normally reported.
-These attached 
+These attached
 coordinate systems are understood by other Starlink applications
 so that for instance using KAPPA's
 \xref{DISPLAY}{sun95}{DISPLAY} command:
@@ -2180,33 +2180,33 @@ so that for instance using KAPPA's
 will display {\tt myimage} with axes showing coordinates from
 the Current system attached to the image.
 
-CCDPACK provides four main categories of facility 
-for adding coordinate systems to sets of images, 
+CCDPACK provides four main categories of facility
+for adding coordinate systems to sets of images,
 which are described later in this section as follows:
 \begin{description}
 \item[Object matching methods:]
 \routine{FINDOBJ}, \routine{FINDOFF}, \routine{PAIRNDF}, \routine{CCDALIGN}
-and \routine{REGISTER} are described 
+and \routine{REGISTER} are described
 \hyperref{here}{in \S}{}{object_matching}.
 These are suitable if you have a set of mutually overlapping images
 which can be aligned by identifying the same objects in different images.
 %
 \item[Direct manipulation of coordinate systems:]
-\routine{WCSEDIT} is decribed 
+\routine{WCSEDIT} is decribed
 \hyperref{here}{in \S}{}{wcsdirect} and
-can be used to examine coordinate systems attached to an image, 
-add them, remove them, or change which one is Current for an image when 
+can be used to examine coordinate systems attached to an image,
+add them, remove them, or change which one is Current for an image when
 it's necessary to do this manually.
 %
 \item[Dealing with externally stored coordinate systems:]
-\routine{ASTIMP} and \routine{ASTEXP} are described 
+\routine{ASTIMP} and \routine{ASTEXP} are described
 \hyperref{here}{in \S}{}{astfiles}.
 These allow coordinate system information to be saved in and restored
-from external files, and can be used to align multiple sets of images 
+from external files, and can be used to align multiple sets of images
 in the same way relative to each other --- this can for instance be
 used for observations from mosaic cameras.
 The \routine{MAKESET} command can also be used to read coordinate
-information from an external files --- 
+information from an external files ---
 see the section on dealing with Sets (\ref{ccdpack_sets}).
 \
 %
@@ -2216,15 +2216,15 @@ see the section on dealing with Sets (\ref{ccdpack_sets}).
 and can be used to produce a unified coordinate system out of several
 present in a set of images when this is possible.
 \end{description}
-Resampling and mosaicing registered images is discussed in 
+Resampling and mosaicing registered images is discussed in
 sections \S\ref{resampling}, \ref{mos_norm} and \ref{drizzling},
-and some examples of putting it all together are given in 
+and some examples of putting it all together are given in
 \S\ref{regexamples}.
 
 
 \subsubsection{More about attached coordinate systems}
 
-The discussion elsewhere in this document tells you all 
+The discussion elsewhere in this document tells you all
 that you need to know
 for using coordinate systems attached to image files
 in order to register them within CCDPACK.
@@ -2236,7 +2236,7 @@ However, you can get a better understanding of coordinate systems
 and what you can do with them (including using them for image display)
 in the ``\xref{Using World Coordinate Systems}{sun95}{se_wcsuse}''
 section of the KAPPA document, \xref{SUN/95}{sun95}{},
-and more detailed description of the underlying AST system in 
+and more detailed description of the underlying AST system in
 \xref{SUN/210}{sun210}{}.
 
 In general CCDPACK conforms to the normal rules about World Coordinate
@@ -2250,9 +2250,9 @@ them.
 There are a couple of additional conventions used within CCDPACK however:
 \begin{itemize}
 \item
-Some of the CCDPACK applications attach 
+Some of the CCDPACK applications attach
 new coordinate systems to images,
-and these are normally given a domain (label) 
+and these are normally given a domain (label)
 starting with the characters `CCD\_'.
 Thus it is not a good idea to pick a domain which begins `CCD\_'
 if you are assigning one yourself, unless you intend it to look
@@ -2260,7 +2260,7 @@ like an automatically generated one.
 The special domains which are currently used by CCDPACK are as follows:
 \begin{description}
 \item[CCD\_REG]
-The object-matching alignment coordinates 
+The object-matching alignment coordinates
 found by the \xroutine{REGISTER} program.
 \item[CCD\_WCSREG]
 The global alignment coordinates found by the \xroutine{WCSREG} program.
@@ -2269,8 +2269,8 @@ The alignment coordinates inserted by the \xroutine{MAKESET} program
 denoting a Set; this has special significance to most of the registration
 programs.
 \item[CCD\_OLDPIXEL]
-A copy of the pre-transformation PIXEL coordinates stored by the 
-\routine{TRANNDF} task stored in the transformed image.  This is 
+A copy of the pre-transformation PIXEL coordinates stored by the
+\routine{TRANNDF} task stored in the transformed image.  This is
 not subsequently used by CCDPACK, but may be useful for comparing
 the old and new coordinate systems.
 \item[CCD\_GEN]
@@ -2282,7 +2282,7 @@ Used internally by \xroutine{CCDALIGN}.
 \end{description}
 
 \item
-Although there is nothing to prevent multiple coordinate systems 
+Although there is nothing to prevent multiple coordinate systems
 in the same image having the same domain, this is likely to lead
 to confusion.  CCDPACK will usually try to ensure that multiple
 coordinate systems with the same domain do not exist by deleting all but one.
@@ -2291,17 +2291,17 @@ a fatal error.
 For instance, the \routine{REGISTER} program normally attaches a new
 coordinate system labelled `CCD\_REG' to the images on which it operates;
 If any of them already has a coordinate system labelled CCD\_REG,
-then the old one gets deleted, and you will be warned that this 
+then the old one gets deleted, and you will be warned that this
 has happened.
 \end{itemize}
 
 
 
-\subsection{\xlabel{objectmatching}\label{object_matching}Object matching 
+\subsection{\xlabel{objectmatching}\label{object_matching}Object matching
             and position lists}
 
 In CCDPACK three methods for determining image feature correspondence
-are provided. Two of these rely on transformations between 
+are provided. Two of these rely on transformations between
 coordinate systems being
 `well modelled' by simple offsets. These methods have the advantage of
 automated and semi-automated processing. The third method relies on
@@ -2309,15 +2309,15 @@ considerable interaction but can deal with transformations of scale,
 magnification and shear as well as offsets (i.e.\ general linear
 transformations).
 
-If images are well modelled by simple offsets apart from a 
+If images are well modelled by simple offsets apart from a
 {\em known} transformation, for instance a rotation of the
-instrument between observations, then a coordinate system 
+instrument between observations, then a coordinate system
 describing the known
 transformation can be added using \xroutine{WCSEDIT} or \xroutine{ASTIMP},
 and the automated methods still used.
 
 
-\subsubsection{\xlabel{registration}\label{registration}Determining 
+\subsubsection{\xlabel{registration}\label{registration}Determining
                transformation parameters}
 
 The routine which determines the transformations between labelled
@@ -2331,7 +2331,7 @@ star say no.\ 100 is present on several datasets it should be labelled
 no.\ 100 (or any other unique value) in all the datasets in which it
 appears {\em regardless of its coordinates}. In many ways getting
 labelled position lists may be considered as most of the process of
-object-matching-based registration, 
+object-matching-based registration,
 the rest being essentially straight-forward.
 
 The main mapping used by \routine{REGISTER} is the linear mapping:
@@ -2357,11 +2357,11 @@ When using a linear fit you can register a {\em whole\/} list of datasets
 in one go. So for instance if you have a set of position lists in which
 corresponding objects have been identified, you may pick any list as the
 reference set (the first is chosen by default) and all the mappings between
-this and the other datasets will be derived. 
-If the position lists are `associated' with images then a new 
-coordinate system, 
+this and the other datasets will be derived.
+If the position lists are `associated' with images then a new
+coordinate system,
 by default labelled `CCD\_REG', will be added to each image:
-the coordinates are the same as 
+the coordinates are the same as
 the pixel coordinates of the reference image.
 
 A general transformation between {\em two\/} datasets can also be
@@ -2374,7 +2374,7 @@ a solution which gives satisfactory values for the parameters.
 \subsubsection{\xlabel{automatedregistration}Automated registration
                \label{automatedregistration}}
 
-If the coordinates of your images are just offset from each other 
+If the coordinates of your images are just offset from each other
 (related by a translation in X and Y)
 and they have image features in
 common it may be possible to register them with a minimum of effort and
@@ -2400,12 +2400,12 @@ mappings from this information. This sequence is used in the
 demonstration script
 \hyperref{{\tt ccdexercise}}{{\tt ccdexercise} described in \S}{}{demos}.
 
-\routine{FINDOBJ} works by looking for pixels above a threshold value, 
+\routine{FINDOBJ} works by looking for pixels above a threshold value,
 objects are
 then identified as groups of `connected' pixels. The groups of connected
 pixels are then centroided to give an accurate position.
 \routine{FINDOBJ} has a number of parameters which can be tweaked
-to identify a suitable group of objects from the data; 
+to identify a suitable group of objects from the data;
 however if you can't make it work satisfactorily you could use
 the interactive program \xroutine{IDICURS} instead for this step.
 
@@ -2451,8 +2451,8 @@ Time (seconds) &
      $0.5$ & $2.5$ & $53$ & $535$ & $5800$\\
 \hline
 \end{tabular}
-\caption{Maximum time taken to process two lists of $N$ points. 
-The tests were run on a DEC Alpha 3000/300. 
+\caption{Maximum time taken to process two lists of $N$ points.
+The tests were run on a DEC Alpha 3000/300.
 \label{table1} }
 \end{center}
 \end{table}
@@ -2486,23 +2486,23 @@ with a median as opposed to a mean. This registration is then used to
 identify objects in all datasets, resulting in {\em labelled} position
 lists which are output for use by \routine{REGISTER}.
 
-Note it is not necessary that the pixel grids of the images are simply 
+Note it is not necessary that the pixel grids of the images are simply
 related by an offset,
 but that their Current coordinate systems are.
 For instance you might have two images with reasonably accurate
 SKY coordinate systems which were attached by the observing system,
 but which you wish to register more accurately by matching image features.
-The telescope was rotated as well as 
-shifted between the observations so that the 
+The telescope was rotated as well as
+shifted between the observations so that the
 X-direction of one data array is different from the X-direction of
-the other.  But since the SKY coordinate system of each only 
+the other.  But since the SKY coordinate system of each only
 has small errors, the RA-direction of each is the same.
 Then as long as SKY is the Current coordinate system,
 the methods in this section can be used to align the images automatically
 (see section \S\ref{regexamples} for an example).
 If you know the non-offset parts of the transformation
 but they are not already present as attached coordinate systems,
-then you may be able to add them yourself using \routine{WCSEDIT} 
+then you may be able to add them yourself using \routine{WCSEDIT}
 or \routine{ASTIMP} as explained in later sections.
 
 Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
@@ -2522,12 +2522,12 @@ if using `\text{*}' for both the IN and INLIST
 parameters seems mysterious.
 
 If the coordinates of the images are already quite well matched
-(offsets are expected to be small) 
+(offsets are expected to be small)
 and the object matching is just to improve the alignment,
 then \routine{FINDOFF} can be invoked with the RESTRICT parameter;
 this instructs it to look for matching objects only in the
 parts of the images which overlap according to the existing
-Current coordinate system, which can dramatically decrease running time 
+Current coordinate system, which can dramatically decrease running time
 and the likelihood of a false match.
 
 \routine{FINDOFF}'s other parameters are detailed in
@@ -2544,7 +2544,7 @@ Analysis Workshop.
 When datasets are offset in their Current attached coordinate system
 only by X and Y translations as above,
 but contain insufficient objects for the fully automated registration
-described in the previous section, 
+described in the previous section,
 registration may be done in a semi-automated way,
 using the programs:
 \begin{itemize}
@@ -2571,16 +2571,16 @@ two images side by side, along with their names and other information
 such as selected FITS headers.  They are displayed resampled into
 their current coordinate frames, so that it should be easy to see
 where any overlap between the two is.  When you have selected a pair
-which contains objects common to both, you can move to 
+which contains objects common to both, you can move to
 the alignment stage
-in which you drag one image with the mouse to the correct position 
-on top of the other.  
+in which you drag one image with the mouse to the correct position
+on top of the other.
 The display can be zoomed and scrolled to make careful positioning easy.
-You are then asked to select centroidable features in the 
+You are then asked to select centroidable features in the
 overlap region so that the program
 can determine the offset between the two accurately.
 
-To summarise, during the graphical part of \routine{PAIRNDF} 
+To summarise, during the graphical part of \routine{PAIRNDF}
 you have to do the following:
 \begin{enumerate}
 \item Select a pair with features in common
@@ -2592,7 +2592,7 @@ you have to do the following:
 \end{enumerate}
 If in the final step you select Exit yourself rather than pairing all
 the images, then \routine{PAIRNDF} will not be able to register
-all the datasets.  In this case it will behave the same as 
+all the datasets.  In this case it will behave the same as
 \xroutine{FINDOFF}, which is to do all the alignment it can,
 and associate position lists with those files whose alignment it
 can work out.
@@ -2600,7 +2600,7 @@ Running \routine{REGISTER} will then add coordinate systems only
 for those which you have paired, and you will have to align the
 others in a different way, perhaps with the help of \xroutine{WCSREG}.
 
-As with all graphically based interfaces it is difficult to 
+As with all graphically based interfaces it is difficult to
 describe the advantages and ease of use, it's best to try them out.
 
 
@@ -2630,12 +2630,12 @@ perform the fitting of the transformation parameters using all these
 positions.
 
 Selection of points on the images is done using an inuitive Xwindows-based
-graphical user interface, which allows you to mark and remove 
+graphical user interface, which allows you to mark and remove
 points with the mouse, change the brightness of the display,
 zoom and scroll the image, and read out positions in any
 of the image's attached coordinate systems.
 
-To summarise, during the graphical part of \routine{CCDALIGN} 
+To summarise, during the graphical part of \routine{CCDALIGN}
 you have to do the following:
 \begin{enumerate}
 \item Mark a set of points on the reference (or first) image
@@ -2660,7 +2660,7 @@ these may be separated by commas or blanks. The identifier is an
 integer value which is used to identify positions which are related
 (i.e.\ are of the same object) in different lists.
 
-If more than three columns exist then only the values in the first 
+If more than three columns exist then only the values in the first
 three are used, though some of the programs propagate extra columns
 from the input to the output lists.
 If only two columns exist it is assumed that they are:
@@ -2675,19 +2675,19 @@ assume they are monotonically increasing from one.
 
 Whole and in-line comments are allowed in position lists using the
 character `{\tt \#}'.  These are not propagated from input to output lists.
-Note that the final line of the file should be terminated by a 
+Note that the final line of the file should be terminated by a
 newline character (certain text editors do not always enforce this).
 
-The X and Y values in a position list always refer to the 
+The X and Y values in a position list always refer to the
 pixel coordinates of an image.
 When \routine{FINDOFF} or \routine{REGISTER} read them they
 automatically transform them into the Current image coordinate system
 where appropriate.
 For this reason there is not normally any need to transform a position
-lists the corresponding image has been resampled; 
+lists the corresponding image has been resampled;
 however if necessary it can be done using the
 \xroutine{TRANLIST} routine.  This is discussed, along with the
-methods that previous versions of CCDPACK used 
+methods that previous versions of CCDPACK used
 for storing coordinate transformations,
 in appendix \ref{transformreg}.
 
@@ -2716,10 +2716,10 @@ in its .MORE.CCDPACK extension under the item CURRENT\_LIST, and
 can be examined using \xref{HDSTRACE (SUN/102)}{sun102}{}
 or modified using \xroutine{CCDEDIT}.
 
-If you wish to view or edit positions in a list interactively, 
-you can use the \xroutine{IDICURS} program, which displays a 
+If you wish to view or edit positions in a list interactively,
+you can use the \xroutine{IDICURS} program, which displays a
 graphical interface in
-which the image is displayed with points from a position list 
+which the image is displayed with points from a position list
 plotted over it.  Points can be added and removed with the mouse.
 If you want to display points in a list non-interactively or
 to print them out, use \xroutine{PLOTLIST}.
@@ -2734,7 +2734,7 @@ CCDPACK provides the routine
 \end{itemize}
 for direct manipulation of the coordinate system information attached
 to an image or a group of images.
-It can examine, add, remove or modify coordinate systems, 
+It can examine, add, remove or modify coordinate systems,
 and select the coordinate system to be regarded as Current.
 
 To examine the coordinate systems attached to an image, you
@@ -2762,11 +2762,11 @@ obs1:
 This shows that there are five coordinate systems in the image and
 that number~4, labelled `SKY' is the Current one.
 Note that the first three coordinate systems attached to an image
-are always GRID, PIXEL and AXIS.  
-SKY is not always present but if it is, it should always represent 
+are always GRID, PIXEL and AXIS.
+SKY is not always present but if it is, it should always represent
 a celestial coordinate system.
 GRID and PIXEL always have units the same size as that of a pixel
-(the difference is that GRID is guaranteed to start at (1,1)). 
+(the difference is that GRID is guaranteed to start at (1,1)).
 
 For the other modes (add, remove, current and set) of \routine{WCSEDIT}
 you need to specify a given coordinate system,
@@ -2782,12 +2782,12 @@ The domain (name) of the coordinate system
 An integer giving the index of the coordinate system
 \item
 A \qt{Sky Co-ordinate System} (SCS) value such as EQUAT(J2000)
-(see section ``\xref{Sky Co-ordinate Systems}{sun95}{se_scs}'' in 
+(see section ``\xref{Sky Co-ordinate Systems}{sun95}{se_scs}'' in
 \xref{SUN/95}{sun95}{}).
 \end{itemize}
 The first two options are usually the most appropriate.
-As you can see above, the output of `{\tt wcsedit show}' 
-will show you what domains there are, what the index of each is, 
+As you can see above, the output of `{\tt wcsedit show}'
+will show you what domains there are, what the index of each is,
 and which coordinate system is Current for a given image.
 
 To change the coordinate system to be used as the Current one
@@ -2819,8 +2819,8 @@ Syntax for removing coordinate systems is much the same:
 will remove the fourth (as listed by {\tt wcsedit show}) coordinate
 system from file {\tt image}.
 
-When adding a new 
-coordinate system you must give the transformation which connects it 
+When adding a new
+coordinate system you must give the transformation which connects it
 to the target coordinate system.
 The transformation can be one of the following types:
 \begin{description}
@@ -2838,30 +2838,30 @@ coefficients $C_{1-6}$:
 \item[PINCUSHION:]
 A pincushion-type transformation,
 which is a common optical distortion,
-can be specified by giving three coefficients $C_{1-3}$, 
+can be specified by giving three coefficients $C_{1-3}$,
 the magnitude of the distortion followed by the coordinates of its centre:
 \begin{eqnarray*}
-   x^\prime = x \left( 1 + C_1  \left[ \left( x - C_2 \right)^2 
+   x^\prime = x \left( 1 + C_1  \left[ \left( x - C_2 \right)^2
                                      + \left( y - C_3 \right)^2 \right] \right)
    \\
-   y^\prime = y \left( 1 + C_1  \left[ \left( x - C_2 \right)^2 
+   y^\prime = y \left( 1 + C_1  \left[ \left( x - C_2 \right)^2
                                      + \left( y - C_3 \right)^2 \right] \right)
 \end{eqnarray*}
-A positive $C_1$ corresponds to a pincushion distortion and 
+A positive $C_1$ corresponds to a pincushion distortion and
 a negative $C_1$ corresponds to a barrel distortion.
 \item[MATH:]
 An arbitrary algebraic transformation.
 In this case you will be asked to specify the mapping between coordinate
 systems using a FORTRAN-like syntax.
 \end{description}
-So the following command would 
-add a new coordinate system, labelled `SQUASHED', 
-representing a barrel distortion of the coordinates labelled `FOCAL' 
-having a magnitude of $7\times 10^{-6}$ 
+So the following command would
+add a new coordinate system, labelled `SQUASHED',
+representing a barrel distortion of the coordinates labelled `FOCAL'
+having a magnitude of $7\times 10^{-6}$
 and an optical centre at coordinates (1000,1000):
 \begin{myquote}
 \begin{verbatim}
-% wcsedit 'image*' add frame=focal domain=squashed maptype=pincushion 
+% wcsedit 'image*' add frame=focal domain=squashed maptype=pincushion
           coeffs='[-7e-6,1000,1000]'
 \end{verbatim}
 \end{myquote}
@@ -2878,17 +2878,17 @@ For more sophisticated use of this feature, see the documentation
 of \xroutine{WCSEDIT} in appendix \S\ref{app:description}, and of
 the \xref{AST\_SET}{sun210}{AST\_SET} routine in \xref{SUN/210}{sun210}{}.
 
-When run, \routine{WCSEDIT} will log what it has done, 
+When run, \routine{WCSEDIT} will log what it has done,
 giving the domain of the altered coordinate system where appropriate
 (even if it was specified in some other way).
 If it could not perform the requested action on any of the images
 in the list, an appropriate message will be written, but this
 does not consitute a fatal error.
 However, it does write an list to an output file (by default called
-WCSEDIT.LIS), giving the names of only those images 
+WCSEDIT.LIS), giving the names of only those images
 which were successfully accessed, which normally
 means those which had a coordinate system matching that
-given by the FRAME parameter.  So it's easy to find out which 
+given by the FRAME parameter.  So it's easy to find out which
 images were successfully modified:
 \begin{myquote}
 \begin{verbatim}
@@ -2913,7 +2913,7 @@ data2
 data4
 \end{verbatim}
 \end{myquote}
-This name list file can be used as an indirection file to pass to the 
+This name list file can be used as an indirection file to pass to the
 input of another CCDPACK task.  For instance, if you want to do an
 interactive alignment of only those files which have coordinate
 systems with the name ``FOCAL'', you could follow the above command
@@ -2936,16 +2936,16 @@ image files using the commands:
 \item \xroutine{ASTIMP}
 \end{itemize}
 (the \xroutine{MAKESET} routine can be used as a substitute for
-\routine{ASTIMP} if CCDPACK Sets are being used --- 
+\routine{ASTIMP} if CCDPACK Sets are being used ---
 see Section \ref{ccdpack_sets}).
 
 Sometimes the coordinate transformations which must be applied
 to one set of observations are the same as those
 required for many other sets.
 One example of this is the observations from a mosaic
-CCD camera, in which multiple CCD chips are fixed adjacently 
+CCD camera, in which multiple CCD chips are fixed adjacently
 in the same focal plane to avoid needing a single very large device;
-the relative position of each chip to the others 
+the relative position of each chip to the others
 will not change as a function of pointing direction.
 Another example is when the optical distortion of an instrument
 (at a given wavelength) is known; if this can be applied
@@ -2954,20 +2954,20 @@ A third example, which is common because the large focal planes
 implied by use of a mosaic camera often lead to significant
 optical distortions, is the combination of these two.
 
-CCDPACK allows this kind of coordinate transformation information to 
-be written to (using \routine{ASTEXP}), 
+CCDPACK allows this kind of coordinate transformation information to
+be written to (using \routine{ASTEXP}),
 and read back from (using \routine{ASTIMP}),
 an external file called an AST file.
 This effectively stores a coordinate system, and enough information
 to graft it onto suitable files, for each one of a related group
 of images.
-Thus applying the AST file to a set of images adds a new 
+Thus applying the AST file to a set of images adds a new
 coordinate system to
 each of them, which can be used for the registration process.
-Where there are several images in a set, as in the case of 
+Where there are several images in a set, as in the case of
 a mosaic camera, \routine{ASTIMP} can determine which coordinate frame to
 use for which image either by the order in which they are presented,
-or by usng FITS headers in the file, 
+or by usng FITS headers in the file,
 according to how the AST file was constructed by \routine{ASTEXP}.
 
 Full details on how to use \routine{ASTIMP} and \routine{ASTEXP}
@@ -2980,27 +2980,27 @@ but the following gives an example.
 \end{verbatim}
 \end{myquote}
 The first command takes a set of 4 images, one from each chip of an array,
-which are aligned in their Current coordinate system, 
+which are aligned in their Current coordinate system,
 (possibly by object matching)
 and constructs a file \text{inst.ast} from them;
-the parameters `IDTYPE=FITSID FITSID=CHIPNAME' 
+the parameters `IDTYPE=FITSID FITSID=CHIPNAME'
 mean that the AST file labels each coordinate system with the
 value of the `CHIPNAME' FITS header from the \text{reg\_data*} images,
 since this dentifies which CCD is which in the mosaic camera.
 The second command applies the file \text{inst.ast}
-to a set of (any number of) images from the same 
+to a set of (any number of) images from the same
 instrument which have not yet been registered;
-for each one \routine{ASTIMP} works out which coordinate system to 
-add by matching the `CHIPNAME' FITS header in the image with one of 
+for each one \routine{ASTIMP} works out which coordinate system to
+add by matching the `CHIPNAME' FITS header in the image with one of
 the ones in the AST file.
 
 If a previously prepared AST file for the instrument you are using
 exists, then the \routine{ASTEXP} step can be avoided.
-In any case, once a suitable AST file is available, 
+In any case, once a suitable AST file is available,
 it can be applied to many sets of images from the same instrument,
 as long as the instrument's characteristics remain the same.
 
-There is a more detailed example of the use of \routine{ASTIMP} in 
+There is a more detailed example of the use of \routine{ASTIMP} in
 section \S\ref{regexamples}.
 
 
@@ -3016,13 +3016,13 @@ use the routine
 It is not always possible to register a group of images in a single
 step, using one kind of procedure.  For instance you might have
 a large group of images with an approximate SKY coordinate system
-inserted by the observing system, 
+inserted by the observing system,
 of which some but not all overlap with each other.
 In this case we would like to register the overlapping ones
 using the object-matching
 techniques described in section \ref{object_matching},
 but fall back to
-the tolerably accurate SKY coordinates to align the rest of the images. 
+the tolerably accurate SKY coordinates to align the rest of the images.
 
 \routine{WCSREG} can do just this.
 You give it a number of images, and a list of coordinate systems
@@ -3045,22 +3045,22 @@ The new coordinate system added is a copy of (and so has the same
 units as) the PIXEL coordinate system of the reference image,
 which is normally the first one listed.
 Because of this, if you have
-a set of images which are already aligned, but in an 
-unsuitable coordinate system, 
+a set of images which are already aligned, but in an
+unsuitable coordinate system,
 you can align them in a pixel-sized coordinate system using
-\routine{WCSREG}. 
+\routine{WCSREG}.
 Giving a null (`!') value for the list of domains will automatically
-use the current attached coordinates of the reference image for 
+use the current attached coordinates of the reference image for
 alignment, so that running
 \begin{myquote}
 \begin{verbatim}
 % wcsreg in='regdat*' domains='!'
 \end{verbatim}
 \end{myquote}
-will ensure the group of already registered images {\tt regdat*} 
-keeps its existing alignment, but in a coordinate system in 
+will ensure the group of already registered images {\tt regdat*}
+keeps its existing alignment, but in a coordinate system in
 which a unit is pixel-sized.
-This can be a useful trick prior to resampling, 
+This can be a useful trick prior to resampling,
 since the resampling program \xroutine{TRANNDF} will
 resample so that a pixel of the output image is one unit square;
 for this reason resampling directly into a SKY coordinate system,
@@ -3068,8 +3068,8 @@ in which a unit is one radian, is bound to give a useless result.
 
 In many cases it will be possible to align a set of images in
 one step without worrying about these sorts of procedure.
-For the more complicated cases where 
-coordinate information of varying levels of 
+For the more complicated cases where
+coordinate information of varying levels of
 accuracy and completeness is available from several
 different sources however,
 \routine{WCSREG}, in conjunction with the other programs described
@@ -3080,21 +3080,21 @@ in \hyperref{the examples section}{\S }{}{regexamples}.
 
 \subsection{\xlabel{view-align}\label{view-align}Viewing image alignment}
 
-The previous sections describe various methods for aligning 
-a set of images in a common coordinate system.  
+The previous sections describe various methods for aligning
+a set of images in a common coordinate system.
 Once this is done, you will usually want to resample and combine
 or compare them.
 Before, instead of, or after that however, you might want to see
-the positions of the images in the aligned coordinates. 
+the positions of the images in the aligned coordinates.
 You can do this using the application:
 \begin{itemize}
 \item \xroutine{DRAWNDF}
 \end{itemize}
-If you give \routine{DRAWNDF} 
-a list of images which are all aligned in their 
+If you give \routine{DRAWNDF}
+a list of images which are all aligned in their
 Current attached coordinate system, it will plot
-outlines of the regions covered by each image file.  
-In this way it is easy to see 
+outlines of the regions covered by each image file.
+In this way it is easy to see
 which parts of your data cover which parts of the coordinate space.
 
 There are two basic ways of running \routine{DRAWNDF}, according
@@ -3102,17 +3102,17 @@ to whether the parameter CLEAR is set to TRUE or FALSE.
 If CLEAR is TRUE, then the graphics device will be cleared and
 the outline of the area covered by each image will be shown.
 By default, a set of axes will be drawn as well.
-This will 
+This will
 give you a good idea of the alignment of your files relative to
 each other, and by examining the axes you can see the absolute
-positions too.  It can often be a good idea to do this with 
+positions too.  It can often be a good idea to do this with
 a set of data files before you resample and combine them,
 which may be a time-consuming step, just
 to check that the alignment looks sensible.
 You can see an example of this in Figure \ref{OUTCLEAR}.
 
 \myfig{sun139outclear.eps}{height=0.4\textheight}{outclear.gif}{OUTCLEAR}{
-This image was generated by registering the images and running the 
+This image was generated by registering the images and running the
 command:\protect\\
 \hspace*{2em}{\tt drawndf r1059* clear noaxes labname labnum}}
 
@@ -3122,43 +3122,43 @@ This means that if you have already displayed an image
 on your graphics device which shares a coordinate system with
 your data files, you can see where they would fit over it.
 For instance you could show an image which has SKY coordinates
-using KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} program 
+using KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} program
 and then run \routine{DRAWNDF} on a set of data files in the
-same region; if their Current coordinates are also SKY 
+same region; if their Current coordinates are also SKY
 you will be able to see how they map onto the displayed image.
-Another useful application is to \routine{DISPLAY} 
-a mosaic which has been made by combining a set of data files, 
-then to run \routine{DRAWNDF} on the originals 
+Another useful application is to \routine{DISPLAY}
+a mosaic which has been made by combining a set of data files,
+then to run \routine{DRAWNDF} on the originals
 so it is clear which file has contributed to which part of the mosaic.
-To achieve this alignment with previously drawn graphics, 
-\routine{DRAWNDF} uses the AGI graphics database in 
-the same way as KAPPA programs; 
+To achieve this alignment with previously drawn graphics,
+\routine{DRAWNDF} uses the AGI graphics database in
+the same way as KAPPA programs;
 this is described more fully in \xref{SUN/95}{sun95}{se_agitate}.
 You can see an example of this in Figure \ref{OUTSKY}.
 
 \myfig{sun139outsky.eps}{height=0.5\textheight}{outsky.gif}{OUTSKY}{DRAWNDF
 command with CLEAR=FALSE.  This picture was generated by displaying
 the sky region and then running the command:\protect\\
-\hspace*{2em}{\tt drawndf "gc6352p1-?" noclear 
+\hspace*{2em}{\tt drawndf "gc6352p1-?" noclear
                   labpos=cf style="width(curves)=2"}}
 
 Finally, \routine{DRAWNDF} can display the actual image data for you.
 Unlike KAPPA's DISPLAY program, which always displays
-an image as a rectangle whose edges are horizontal and vertical, 
-perhaps with with non-orthogonal image Current coordinate axes 
-drawn over it, \routine{DRAWNDF} always plots on a surface in which the 
+an image as a rectangle whose edges are horizontal and vertical,
+perhaps with with non-orthogonal image Current coordinate axes
+drawn over it, \routine{DRAWNDF} always plots on a surface in which the
 Current coordinate system has horizontal and vertical axes.
 The image data array is therefore resampled to fit within the
-image bounds as they would appear in these coordinates. 
-This can give you a good view of what a group of images will 
+image bounds as they would appear in these coordinates.
+This can give you a good view of what a group of images will
 look like when they have been resampled and combined into their
 Current coordinates.  Note however that unlike \xroutine{MAKEMOS},
 \routine{DRAWNDF} performs no averaging or sophisticated normalisation of
 images, so that if two images overlap in their Current coordinates,
 all but the last-plotted will be obscured, and the relative
-brightnesses may not be right. 
+brightnesses may not be right.
 When this option is used, the display is always cleared.
-An example of a set of frames from a mosaic camera displayed 
+An example of a set of frames from a mosaic camera displayed
 in this way is given in Figure \ref{OUTIM}.
 
 \myfig{sun139outim.eps}{height=0.5\textheight}{outim.gif}{OUTIM}{DRAWNDF
@@ -3185,12 +3185,12 @@ so the program has the capability of `rubber-sheeting'.
 A restriction is that both the forward and the inverse transformations
 must be available. This will only cause problems when using general
 transformations; a tractable inverse doesn't often exist.
-If you need to resample and you do not have an inverse transformation, 
+If you need to resample and you do not have an inverse transformation,
 the \xroutine{DRIZZLE} program
 may be used instead, though note this is not designed for general
 purpose resampling, and is slower than \routine{TRANNDF}.
 
-\routine{TRANNDF} resamples using 
+\routine{TRANNDF} resamples using
 one of two different techniques, linear interpolation
 or nearest neighbour. Linear interpolation uses two pixels to estimate
 the new pixel value, nearest neighbour just uses the nearest pixel. Flux
@@ -3210,14 +3210,14 @@ To use \routine{TRANNDF} type something like:
 \end{myquote}
 This resamples all the images in the current directory naming the output
 images the same as the inputs except that the string `\text{-trn}' is
-appended to each output name. 
+appended to each output name.
 By default \routine{TRANNDF} will guess a size for
 the output image, interpolate using nearest neighbour and conserve flux.
 
 Note that \routine{TRANNDF} resamples into the Current coordinate system,
-so that each pixel in the output image is a $1.0 \times 1.0$ square 
+so that each pixel in the output image is a $1.0 \times 1.0$ square
 in those coordinates.  Thus the coordinate system in question must be
-a suitable one for that purpose.  If it has units of 
+a suitable one for that purpose.  If it has units of
 the wrong size, then a suitable transformation can be made by
 adding a new coordinate system with the
 \xroutine{WCSEDIT} or \xroutine{WCSREG} programs.
@@ -3231,7 +3231,7 @@ For a quick look at what the resampled data will look like,
 the \xroutine{DRAWNDF} command with IMAGE=TRUE can be used.
 
 
-\subsection{\xlabel{mosaic_normalise}\label{mos_norm}Mosaicing and 
+\subsection{\xlabel{mosaic_normalise}\label{mos_norm}Mosaicing and
             normalisation}
 
 The tasks of mosaicing and normalisation are normally performed using the:
@@ -3240,7 +3240,7 @@ The tasks of mosaicing and normalisation are normally performed using the:
 \end{itemize}
 program.
 \routine{MAKEMOS} is a comprehensive program and has many
-capabilities. In its default mode \routine{MAKEMOS} 
+capabilities. In its default mode \routine{MAKEMOS}
 just combines images using a
 selected data combination method (\routine{MAKEMOS} supports several
 methods: mean, median, trimmed mean etc.\ \S\ref{combinations}).
@@ -3250,7 +3250,7 @@ memory (it is designed to deal with datasets which may not have much
 overlap and which might have a very large output extent, unlike with CCD
 calibration data where the overlap will usually be complete).
 
-The other capabilities of \routine{MAKEMOS} are concerned 
+The other capabilities of \routine{MAKEMOS} are concerned
 with data normalisation.
 Normalisation is determined as two components, a scaling factor and a
 zero point factor. These may be controlled independently by the
@@ -3281,7 +3281,7 @@ applications the
 \begin{itemize}
 \item \xroutine{DRIZZLE}
 \end{itemize}
-program may be superior. 
+program may be superior.
 It combines resampling and mosaicing in one task
 and the resampling is done using the Variable-Pixel Linear Reconstruction
 (or informally ``drizzling'') algorithm.
@@ -3303,7 +3303,7 @@ which rain down onto the output grid.
 Each drop affects the pixels in the output grid which it covers
 in proportion to the area of overlap; if an output pixel is
 not touched by any of the drops it receives no data from the image.
-This is shown schematically 
+This is shown schematically
 in \hyperref{the figure}{figure }{}{drizzlepicture}.
 
 \myfig{sun139driz.eps}{height=0.5\textheight}{driz.gif}{drizzlepicture}
@@ -3315,11 +3315,11 @@ from that image (Fruchter \& Hook, ADASS VI,
 ASP Conf.\ Series, Vol.\ 125, 1997, G.~Hunt and H.E.~Payne, eds., pp.\
 147--150).}
 
-The transformation of input grid to output grid is basically the 
+The transformation of input grid to output grid is basically the
 transformation between the pixel coordinates and Current coordinates
 of the image file;
 however an additional shrinking
-factor can for convenience be given using the MULTI 
+factor can for convenience be given using the MULTI
 parameter of DRIZZLE.  The ratio of the linear size of the
 drop to the size of the input pixel is controlled by the
 parameter PIXFRAC.  The default values for these
@@ -3349,7 +3349,7 @@ routine, drizzling requires the forward rather than the inverse
 mapping for the geometric transformation.
 
 If you intend to make use of \routine{DRIZZLE} it is
-recommended that you read the paper 
+recommended that you read the paper
 A.S.~Fruchter and R.N.~Hook, {\bf 1998},
 ``A Method for the Linear Reconstruction of Undersampled Images''
 (\htmladdnormallink{PASP, in
@@ -3383,18 +3383,18 @@ CORRECT parameter to point to the file. So:
 % drizzle in='*' out=mosaic scale zero correct='drizzle.dat'
 \end{verbatim}
 \end{myquote}
-would read the corrections in from the file {\tt drizzle.dat}. 
+would read the corrections in from the file {\tt drizzle.dat}.
 \routine{MAKEMOS} has the ability to generate this file,
 although it should be noted that it does so in the same manner as
 \routine{DRIZZLE} finds the corrections, so there is no advantage in
-doing it in two steps like this; the facility is provided 
-for users who wish to normalise their frames very accurately. 
+doing it in two steps like this; the facility is provided
+for users who wish to normalise their frames very accurately.
 
 A full description of \xroutine{DRIZZLE} is
 given in appendix \S\ref{descriptions}.
-Since it does its own resampling, the remarks 
+Since it does its own resampling, the remarks
 about the units of the Current coordinate systems made about
-\routine{TRANNDF} apply here --- 
+\routine{TRANNDF} apply here ---
 see \hyperref{the section on resampling}{\S }{}{resampling}.
 
 
@@ -3403,8 +3403,8 @@ see \hyperref{the section on resampling}{\S }{}{resampling}.
 
 \subsubsection{Registering images with SKY coordinates}
 
-In this example, we have a set of mutually overlapping 
-images which already contain approximately correct 
+In this example, we have a set of mutually overlapping
+images which already contain approximately correct
 SKY coordinates, attached by the observing system.
 We would like to fine-tune this alignment by matching image features.
 
@@ -3434,7 +3434,7 @@ and less prone to finding a false match.
 \end{myquote}
 The REGISTER program adds a new pixel-like coordinate system
 labelled CCD\_REG to all the images.
-We can now resample all the images into these coordinates, which 
+We can now resample all the images into these coordinates, which
 aligns them pixel-for-pixel, and combine them into a mosaic.
 \begin{myquote}
 \begin{verbatim}
@@ -3454,15 +3454,15 @@ that when it is displayed RA and Dec coordinates will be shown.
 \subsubsection{\label{mosexnoset}Registering frames from a mosaic camera}
 
 In this example we again wish to use coordinate information from
-different sources, but the procedure is more involved, bringing 
+different sources, but the procedure is more involved, bringing
 together many of the capabilities discussed in the earlier sections.
-If your data are fairly simple, you may never need to use such a 
+If your data are fairly simple, you may never need to use such a
 complicated procedure.
 
 Note that while this example provides a good demonstration of much of the
-CCDPACK World Coordinate System functionality, 
-the steps here could be achieved more simply by using 
-\htmlref{CCDPACK Sets}{ccdpack_sets}. 
+CCDPACK World Coordinate System functionality,
+the steps here could be achieved more simply by using
+\htmlref{CCDPACK Sets}{ccdpack_sets}.
 See the example in Section \ref{mosexset} for details.
 
 \myfig{sun139mos.eps}{}{mos.gif}{fig:overlap}{Overlapping observations
@@ -3476,9 +3476,9 @@ Because of the way they overlap the object matching methods of
 can be used to apply a common coordinate system to some,
 but not all, of the images.
 Furthermore, the geometry of the CCD chips in the instrument
-is known and stored in an AST file \text{instrument.ast} as 
+is known and stored in an AST file \text{instrument.ast} as
 \hyperref{explained earlier}{in section \S}{}{astfiles},
-so that a common coordinate system can be applied to 
+so that a common coordinate system can be applied to
 images \text{1a}, \text{1b} and \text{1c},
 and another to images \text{2a}, \text{2b} and \text{2c}.
 
@@ -3486,21 +3486,21 @@ First of all therefore, we attach the instrument coordinates
 to each set of files as follows:
 \begin{myquote}
 \begin{verbatim}
-% astimp in='1?' astfile=instrument.ast indomain=obs1 
+% astimp in='1?' astfile=instrument.ast indomain=obs1
 % astimp in='2?' astfile=instrument.ast indomain=obs2
 \end{verbatim}
 \end{myquote}
 The file \text{instrument.ast} has been set up previously so that
-it attaches coordinate systems to the images according to 
+it attaches coordinate systems to the images according to
 a FITS header which distinguishes them from each other.
-The FITS headers in this case contain no information about 
+The FITS headers in this case contain no information about
 telescope pointing or orientation however, so we have to add
 our knowledge that the camera was rotated 180 degrees between
-exposures by adding a new coordinate system to one set, 
+exposures by adding a new coordinate system to one set,
 related to the one just added by a linear transformation:
 \begin{myquote}
 \begin{verbatim}
-% wcsedit in='2?' mode=add frame=obs2 domain=obs2-rot 
+% wcsedit in='2?' mode=add frame=obs2 domain=obs2-rot
          maptype=linear coeffs='[0,-1,0,0,0,-1]'
 \end{verbatim}
 \end{myquote}
@@ -3512,10 +3512,10 @@ ASTIMP and the WCSEDIT could be replaced by:
 % astimp in='2?' astfile=instrument.ast indomain=obs2-rot rot=180
 \end{verbatim}
 \end{myquote}
---- this step can also be automated under some circumstances by using 
+--- this step can also be automated under some circumstances by using
 \routine{ASTIMP}'s FITSROT parameter.
-Since all the images now have the same orientation 
-(i.e.\ the X directions in the Current coordinate systems of all is the same), 
+Since all the images now have the same orientation
+(i.e.\ the X directions in the Current coordinate systems of all is the same),
 they are related
 by a simple offset so that the automatic object matching routines
 can be applied to the overlapping frames:
@@ -3527,10 +3527,10 @@ can be applied to the overlapping frames:
 \end{verbatim}
 \end{myquote}
 Note that unlike the previous example we do not use {\tt restrict=true} here,
-since although the orientations are now (about) right 
+since although the orientations are now (about) right
 the positionings may not be.
 If \routine{FINDOFF} has trouble or you would rather do the alignment
-by eye you could use \xroutine{PAIRNDF} instead of 
+by eye you could use \xroutine{PAIRNDF} instead of
 \routine{FINDOBJ} and \routine{FINDOFF} like this:
 \begin{myquote}
 \begin{verbatim}
@@ -3539,7 +3539,7 @@ by eye you could use \xroutine{PAIRNDF} instead of
 \end{myquote}
 before continuing with the \routine{REGISTER} command.
 
-To see what coordinate systems have now been attached we 
+To see what coordinate systems have now been attached we
 can examine the images using \xroutine{WCSEDIT}:
 \begin{myquote}
 \begin{verbatim}
@@ -3575,9 +3575,9 @@ can examine the images using \xroutine{WCSEDIT}:
 \end{myquote}
 and similarly for the other three.
 We can see that, because of the way the images overlap,
-\routine{REGISTER} has managed to add an aligning coordinate system 
+\routine{REGISTER} has managed to add an aligning coordinate system
 to \text{1b} and \text{1c}, but not \text{1a}.
-The following table summarises the coordinate systems that we have 
+The following table summarises the coordinate systems that we have
 added to all the images (ignoring the ever-present GRID, PIXEL and AXIS):
 \begin{center}
 \begin{tabular}{l|c|c|c|c|}
@@ -3663,9 +3663,9 @@ command:
 % drawndf '"1?,2?"' clear
 \end{verbatim}
 \end{myquote}
-This should display a plot which resembles 
+This should display a plot which resembles
 \hyperref{the above figure}{Figure }{}{fig:overlap};
-if it shows an alignment different from what you expect, 
+if it shows an alignment different from what you expect,
 now is the time to go back
 and find the problem rather than producing an incorrect mosaic.
 
@@ -3686,12 +3686,12 @@ demonstration script
 
 \subsubsection{Example AST file}
 
-Finally, we give an example of an AST file which 
-has been constructed for a real 
+Finally, we give an example of an AST file which
+has been constructed for a real
 instrument.  The instrument is the Wide Field Camera on
 the Isaac Newton Telescope at La Palma,
 and consists of four CCDs each 2048$\times$4096 pixels.
-Because the area occupied by detectors is large, 
+Because the area occupied by detectors is large,
 optical distortion effects become quite important near the edges.
 After registering four images {\tt sb1,sb2,sb3,sb4},
 which included taking account of a pincushion distortion,
@@ -3703,9 +3703,9 @@ the file was constructed by the following command:
          idtype=fitsid fitsid=chipname fitsrot=rotskypa accept
 \end{verbatim}
 \end{myquote}
-The OUTDOMAIN and OUTTITLE parameters write labels indicating 
+The OUTDOMAIN and OUTTITLE parameters write labels indicating
 the source of the coordinate information.
-The {\tt IDTYPE=FITSID} and {\tt FITSID=CHIPNAME} parameters 
+The {\tt IDTYPE=FITSID} and {\tt FITSID=CHIPNAME} parameters
 indicate that the chip which each
 one comes from is to be distinguished by the value of its
 ``CHIPNAME'' FITS header card, and the FITSROT=ROTSKYPA
@@ -3756,18 +3756,18 @@ Since they now share a coordinate system they can now be, for instance,
 aligned with other images from the same instrument or resampled directly.
 
 The AST file can be found in {\tt \$CCDPACK\_DIR/INT-WFC.ast}.
-It is thought to be correct to an accuracy of 1 or 2 pixels, 
+It is thought to be correct to an accuracy of 1 or 2 pixels,
 which is around half an arcsecond, over the whole focal plane.
 
 
 \subsection{Schematic registration sequences}
 
-One outline for using the various applications is shown in 
+One outline for using the various applications is shown in
 \hyperref{the following figure}{Figure }{}{fig:registration}.
 This illustrates the ways to proceed if you are using the
-object matching methods (\S \ref{object_matching}) 
+object matching methods (\S \ref{object_matching})
 for alignment --- if you are using coordinate system information
-from other sources then the routines 
+from other sources then the routines
 \xroutine{WCSEDIT}, \xroutine{WCSREG}, \xroutine{ASTIMP}
 will have a part to play as well.
 
@@ -3783,49 +3783,49 @@ registration, resampling and mosaicing.}
          \label{ccdpack_sets}}
 
 In the simplest case, each exposure made on an instrument
-will read out one CCD using one amplifier/ADC and provide you 
-with one data file containing an array 
+will read out one CCD using one amplifier/ADC and provide you
+with one data file containing an array
 of pixels which represents a single data or calibration frame.
 However, many instruments are now more complicated than this,
 and may feature multiple amplifiers reading out different parts of
-the same chip, 
+the same chip,
 or multiple chips on the same mosaic camera for each
-exposure, or a combination of the two.  
+exposure, or a combination of the two.
 The resulting data product may consist of one or more data
-structures (e.g.\ NDF structures or FITS Header + Data Units (HDUs)) 
+structures (e.g.\ NDF structures or FITS Header + Data Units (HDUs))
 in each of one or more containing files.
 
 Two problems arise when dealing with these sorts of data.
-Firstly, during the data reduction stage, calibration must be 
+Firstly, during the data reduction stage, calibration must be
 carried out in the same way for data read from the same bits of
 hardware and differently for data read from different bits;
 a separate master bias frame must be generated for each CCD in
 a mosaic camera and each data frame must be calibrated using
 the corresponding one.
 Secondly, during the registration stage, alignment information
-which corresponds to the positioning of the chips on the 
+which corresponds to the positioning of the chips on the
 focal plane of the instrument may be accurately known and not
 subject to change, and this must be communicated to the software
 which is attempting to align separate data frames using
 other methods such as object matching; there's no point trying
-to identify matching features on 
+to identify matching features on
 two frames which you know are glued next to each
 other on the focal plane.
 
 Both of these can be addressed to a large extent by careful use of the
-facilities of CCDPACK described so far, 
+facilities of CCDPACK described so far,
 but to make processing of this kind of
-data more painless, CCDPACK provides the concept of a Set of images.  
+data more painless, CCDPACK provides the concept of a Set of images.
 The idea is that each exposure from a given instrument produces
 a single Set of data which can contain several frames.
-All Sets from a particular instrument will 
+All Sets from a particular instrument will
 consist of a fixed number of members:
 each member of a given Set will share the same Set Name attribute
-indicating its origin, 
-and has its own Set Index attribute 
+indicating its origin,
+and has its own Set Index attribute
 indicating its r\^{o}le, or position, within the Set.
 Every exposure generated by a four-CCD mosaic camera for instance would
-produce a single Set with a unique Set Name, 
+produce a single Set with a unique Set Name,
 and four members with Set Index values of 1, 2, 3 and 4.
 
 Using this functionality is quite simple: the user tells CCDPACK
@@ -3861,19 +3861,19 @@ to set USESET true like this:
 All subsequent commands will then use Set headers where they have been
 added.  Alternatively you could specify USESET=TRUE on the command line
 of each CCDPACK program.
-Since files without Set headers are always treated the same whether 
+Since files without Set headers are always treated the same whether
 USESET is true or false, it is harmless to have set it true all
 the time, but in certain cases (especially if a non-native data
 format such as FITS is being used) it may result in slower operation.
 
 Note that Set Name attributes don't need to be (and in general will not be)
 totally unique between different Sets; for instance \routine{DEBIAS}
-will produce output files which have the same Set Names 
+will produce output files which have the same Set Names
 as the corresponding input files.  However, no ambiguity will arise
 as long as only one Set of files with the same Set Name is presented
-to any given CCDPACK program at the same time. 
+to any given CCDPACK program at the same time.
 Normally, because of the flow of
-data between applications, that situation will not arise, 
+data between applications, that situation will not arise,
 but if for some reason two Sets with the same Name do need to be
 presented in the same context, \xroutine{MAKESET} can be coerced into
 assigning a given Name to a Set by use of its NAME parameter.
@@ -3889,7 +3889,7 @@ To add Set header information you need to use the command
 \begin{itemize}
 \item \xroutine{MAKESET}
 \end{itemize}
-This can operate in a number of different ways according to 
+This can operate in a number of different ways according to
 how your data is arranged in the first place.
 The most useful ones are described in the following subsections.
 For variations on these, including the ability to construct
@@ -3899,7 +3899,7 @@ of \routine{MAKESET} in appendix \ref{MAKESET}.
 
 \subsubsection{\label{makeset_list}Grouping by explicit list}
 
-In the most straightforward case, you can use \xroutine{MAKESET} 
+In the most straightforward case, you can use \xroutine{MAKESET}
 to make a single Set out of a group of files listed by name:
 \begin{myquote}
 \begin{verbatim}
@@ -3919,8 +3919,8 @@ to make a single Set out of a group of files listed by name:
 \end{verbatim}
 \end{myquote}
 This will write a Set header to each of the named files.
-As the output shows, the same Set Name attribute ``im01'' 
-(the name of the first file in the list) is given to each, 
+As the output shows, the same Set Name attribute ``im01''
+(the name of the first file in the list) is given to each,
 and the Set Index attributes are 1, 2 and 3 respectively.
 
 If you have many files to put into Sets, this may be an unwieldy
@@ -3964,19 +3964,19 @@ you can write
 Care has to be taken with this usage however; it relies on the
 files being presented to \routine{MAKESET} in the correct order,
 which in turn may depend on how your operating system expands
-wildcards, which is normally alphabetically.  
+wildcards, which is normally alphabetically.
 If for instance in the above example the files had been named
 \begin{myquote}
 \begin{verbatim}
   im1   im2   im3   im4   im5   im6   im7   im8   im9  im10  im11  im12
 \end{verbatim}
 \end{myquote}
-(i.e.\ without the leading zero for numbers less than 10) 
-then they would probably have been presented to \routine{MAKESET} 
+(i.e.\ without the leading zero for numbers less than 10)
+then they would probably have been presented to \routine{MAKESET}
 in the order
 \begin{myquote}
-\begin{verbatim} 
-  im1   im10  im11  im12  im2   im3   im4   im5   im6  im7   im8   im9 
+\begin{verbatim}
+  im1   im10  im11  im12  im2   im3   im4   im5   im6  im7   im8   im9
 \end{verbatim}
 \end{myquote}
 which is almost certainly not what you want.
@@ -3985,10 +3985,10 @@ to check the logged output to ensure that it has done the right thing.
 
 \subsubsection{\label{makeset_container}Grouping by container}
 
-If your data exists in HDS container files 
-so that one container file contains all the images from a single 
+If your data exists in HDS container files
+so that one container file contains all the images from a single
 exposure, then adding Set headers is easier.
-By running \routine{MAKESET} 
+By running \routine{MAKESET}
 with MODE=CONTAINER,
 it will assume that each HDS container file corresponds to a single Set.
 In this case you can just type something like
@@ -3999,8 +3999,8 @@ In this case you can just type something like
 \end{myquote}
 and the correct headers will be added.
 
-Note that if your data initially exists in the form of one 
-Multi-Extension FITS file (MEF) per observation 
+Note that if your data initially exists in the form of one
+Multi-Extension FITS file (MEF) per observation
 you can convert these quite easily to
 HDS container files using the \xref{FITS2NDF}{sun55}{FITS2NDF} command
 with CONTAINER=TRUE.  So supposing you have three exposures,
@@ -4043,16 +4043,16 @@ each stored in a 2-HDU MEF, you can do:
 \end{myquote}
 For subsequent work you need only
 supply the names of the container files (\text{conv-obs*})
-and the CCDPACK commands will look inside and find the 
-data frames with their 
+and the CCDPACK commands will look inside and find the
+data frames with their
 associated Set header information.
 See \xref{SUN/55}{sun55}{} for a full description of the CONVERT
 facility.
 
-\subsubsection{\label{makeset_split}Splitting a single image into 
+\subsubsection{\label{makeset_split}Splitting a single image into
                multiple sections}
 
-If each observation initially exists as a single image 
+If each observation initially exists as a single image
 but needs to be treated as multiple images
 because different regions have been read out using different
 electronics (so that, for instance, they have to be debiassed using
@@ -4063,11 +4063,11 @@ with its own Set header.  You will have to supply the parameter OUT
 to give the name of the file containing the split data:
 this will be a single HDS container file containing as many
 NDF structures as the input array is split into.
-For full generality, the parameter SECTIONS specifies how 
+For full generality, the parameter SECTIONS specifies how
 the input image is to be split up, but for the common case of dividing the
 array into grid of rectangles which butt up to each other the
 XSTART and YSTART parameters are easier.
-The following example shows creation of a Set made by dividing 
+The following example shows creation of a Set made by dividing
 a 2048x4096 array into quarters:
 \begin{myquote}
 \begin{verbatim}
@@ -4090,30 +4090,30 @@ a 2048x4096 array into quarters:
 \end{verbatim}
 \end{myquote}
 The command creates a single new HDS container file ``sg28948\_sp'':
-when you give this as an input to CCDPACK commands they will look inside 
+when you give this as an input to CCDPACK commands they will look inside
 and process each of the four images in turn.
 
 This method could also be used to create a Set from different slices
 of a three-dimensional data set.
 
-\subsubsection{\label{ccd_set}\xlabel{ccd_set}Set alignment 
+\subsubsection{\label{ccd_set}\xlabel{ccd_set}Set alignment
                (CCD\_SET) coordinates}
 
-You may notice that in the last example, 
+You may notice that in the last example,
 a column headed ``CCD\_SET domain'' has appeared in the output,
 with the entry ``PIXEL'' for each of the new Set members.
 This indicates that as well as the Set header, each file has
 had a new coordinate system attached to its WCS component.
 This new coordinate system added by \routine{MAKESET}
-always has the Domain (name) ``CCD\_SET'', 
-and in this case is a copy of the 
+always has the Domain (name) ``CCD\_SET'',
+and in this case is a copy of the
 PIXEL-Domain coordinate system which existed
 in the input image.
 When \routine{MAKESET} adds a CCD\_SET coordinate system like this,
 it is declaring that all the members of the same Set are known to
 be correctly aligned in these coordinates.
 All the CCDPACK programs concerned with registration
-will recognise a CCD\_SET coordinate system and assume that 
+will recognise a CCD\_SET coordinate system and assume that
 the alignment of all the images in a given Set is correct in
 these coordinates and is not to be tampered with.
 Thus, it is only a good idea to add a CCD\_SET coordinate system
@@ -4122,7 +4122,7 @@ the Set and not one which, for instance, you might want to improve
 at a later date by object matching.
 When MODE=SPLIT, it is assumed that the PIXEL coordinates of
 the original image do
-represent this sort of rock-solid alignment, 
+represent this sort of rock-solid alignment,
 since the Set members have been hewn out of the same data array.
 With the other modes of \routine{MAKESET} Set alignment coordinates
 are not added by default,
@@ -4134,7 +4134,7 @@ is used for the CCD\_SET alignment coordinates.
 So suppose that you have a directory full of HDS container files
 each holding the data frames from one observation.
 Each has an attached coordinate system in its WCS component,
-with the Domain ``FOCAL'' which gives its exact position on the focal 
+with the Domain ``FOCAL'' which gives its exact position on the focal
 plane of the instrument --- this may have been added by the observing
 system, and it is known to be accurate.
 First ensure that the FOCAL coordinates are the Current coordinates
@@ -4157,9 +4157,9 @@ and then add the Set headers with the ADDWCS parameter set true:
  --------  ---------   --------                            --------------
 
  f10001:
-               1       f10001.I1                           FOCAL  
-               2       f10001.I2                           FOCAL  
-               3       f10001.I3                           FOCAL  
+               1       f10001.I1                           FOCAL
+               2       f10001.I2                           FOCAL
+               3       f10001.I3                           FOCAL
 \end{verbatim}
 \end{myquote}
 As you can see, the FOCAL coordinate system is listed as the one copied to
@@ -4173,11 +4173,11 @@ possibility of controlling Set formation from FITS headers,
 are discussed in the description of \routine{MAKESET}
 in \hyperref{the appendix}{\S}{}{MAKESET}.
 
-If you need to add Set alignment coordinates to some files after 
-\routine{MAKESET} has already been run, you can just attach a new 
+If you need to add Set alignment coordinates to some files after
+\routine{MAKESET} has already been run, you can just attach a new
 coordinate system with the name CCD\_SET, using \xroutine{WCSEDIT} or
 in some other way.
-Note however that a CCD\_SET-domain coordinate system 
+Note however that a CCD\_SET-domain coordinate system
 will only be treated as special when the images in
 question have valid Set headers.
 
@@ -4198,7 +4198,7 @@ coordinate systems (ones with Domain CCD\_SET) should be erased also.
 It normally doesn't matter much whether this is erased or not,
 since without a valid Set header it is ignored anyway.
 
-If you just want to remove the Set alignment frame, you can 
+If you just want to remove the Set alignment frame, you can
 remove this attached coordinate frame directly using \xroutine{WCSEDIT}:
 \begin{myquote}
 \begin{verbatim}
@@ -4210,7 +4210,7 @@ Both of these commands will erase the information in question if
 it exists, and note the fact with a non-fatal error if it does not.
 
 If you try to add a new Set header to
-an image which already has one using \routine{MAKESET}, 
+an image which already has one using \routine{MAKESET},
 or a new CCD\_SET coordinate system to an image which already has one
 using \routine{MAKESET} or some other method,
 a warning will be issued, but
@@ -4219,7 +4219,7 @@ the old one will be overwritten.
 \subsection{\xlabel{showsethead}\label{showsethead}Examining Set headers}
 
 For the most part, once you have added Set headers to your image
-files using \routine{MAKESET} you will be able to let them 
+files using \routine{MAKESET} you will be able to let them
 take care of themselves.
 However, you may wish to check how images are related to each other,
 or to pull out only members of a given Set or images which correspond
@@ -4236,7 +4236,7 @@ Here is a simple invocation, showing the result of the
 example in Section \ref{makeset_container}:
 \begin{myquote}
 \begin{verbatim}
-% showset 'conv-obs?' reset 
+% showset 'conv-obs?' reset
 
     SHOWSET
     =======
@@ -4261,7 +4261,7 @@ example in Section \ref{makeset_container}:
 \end{myquote}
 As you can see, it gives very similar output to that written
 by \routine{MAKESET} when the headers were being added.
-If you prefer to corresponding images from different Sets grouped together, 
+If you prefer to corresponding images from different Sets grouped together,
 then change the LISTBY parameter (which defaults to `NAME'):
 \begin{myquote}
 \begin{verbatim}
@@ -4288,9 +4288,9 @@ then change the LISTBY parameter (which defaults to `NAME'):
 \end{myquote}
 
 As well as showing the Set information of all the files presented,
-\routine{SHOWSET} is also able to 
+\routine{SHOWSET} is also able to
 select a sublist of input files according to the values in their
-Set headers.  
+Set headers.
 By supplying the PICKINDEX and/or PICKNAME parameters,
 images can be selected according
 to the values of their Set Index and/or Set Name attributes
@@ -4306,10 +4306,10 @@ and only images whose Set Name is the same as that of one of the template
 images will be selected.
 The PICKINDEX, INDEX and INDEXLIKE parameters work in the same way
 for Set Index values.
-Returning to another example in the previous section, 
+Returning to another example in the previous section,
 we can pick out only those images in the same Set as (i.e.\ having
 the same Set Name attribute as) \text{im12}
-but which have Set Index of 1 or 2 as follows 
+but which have Set Index of 1 or 2 as follows
 (in this case some of the parameters are input as the response to prompts):
 \begin{myquote}
 \begin{verbatim}
@@ -4338,7 +4338,7 @@ no grouping and lists the images in their input order.
 
 As it points out, \routine{SHOWSET} writes a list of the images it
 has output to a file given by the NAMELIST parameter, by default
-\text{showset.lis}. 
+\text{showset.lis}.
 In the above case that list would read:
 \begin{myquote}
 \begin{verbatim}
@@ -4365,13 +4365,13 @@ selected like this:
 
 Section \ref{configuration} explained how to set up global values for
 certain parameters such as the ADC factor and bias strip positions
-using the \xroutine{CCDSETUP} program; by doing this you can 
+using the \xroutine{CCDSETUP} program; by doing this you can
 set values specific to the data you are using.
 However, if you have data in Sets life becomes a bit more complicated:
-each chip will have a different ADC factor, so the value to use 
+each chip will have a different ADC factor, so the value to use
 will depend on which member of the Set is being processed.
 
-To cope with this, \routine{CCDSETUP} can be used to configure 
+To cope with this, \routine{CCDSETUP} can be used to configure
 different values for certain parameters according to Set Index value.
 The parameters which can vary with Set Index are:
 \begin{itemize}
@@ -4384,25 +4384,25 @@ The parameters which can vary with Set Index are:
 \item RNOISE
 \item SATURATION
 \end{itemize}
-To set up one or more of these values to be specific to 
+To set up one or more of these values to be specific to
 certain Set Index values, run \routine{CCDSETUP} with the
-BYSET parameter true, and the INDEX parameter equal to the 
+BYSET parameter true, and the INDEX parameter equal to the
 Set Index to which the parameters apply.
-When USESET is true, CCDPACK programs which use these global 
+When USESET is true, CCDPACK programs which use these global
 parameters will first look for a value specific to the Set Index
 of the frame being processed, and if there isn't one they will
-look for the unspecific global value (if there is no global 
+look for the unspecific global value (if there is no global
 value at all they will use the current parameter value or ask
 you to enter it or use a default as usual).
 So, since many of the parameters will probably be the same for all
-the members of each Set, the easiest thing is to run CCDSETUP 
-for one of the chips (Set Index values), and then run it again 
+the members of each Set, the easiest thing is to run CCDSETUP
+for one of the chips (Set Index values), and then run it again
 for the other ones
 just giving the values which are different for them.
 
-Here is an example. 
+Here is an example.
 Suppose that you have a group of images from a three-chip
-mosaic camera which all use the same global parameters, except that 
+mosaic camera which all use the same global parameters, except that
 the readout noise and ADC factor is different according to which
 chip each image comes from.
 You can configure the global variables like this:
@@ -4415,9 +4415,9 @@ You can configure the global variables like this:
 
 BYSET - Set up values specific to one Set Index? /NO/ > yes
 INDEX - Set Index values these parameters are specific to > 1
-RESTORE - Use a setup restoration file /NO/ > 
-LOGTO - Write log to (Logfile,Terminal,Neither,Both) /'Both'/ > 
-LOGFILE - logfile name /'CCDPACK.LOG'/ > 
+RESTORE - Use a setup restoration file /NO/ >
+LOGTO - Write log to (Logfile,Terminal,Neither,Both) /'Both'/ >
+LOGFILE - logfile name /'CCDPACK.LOG'/ >
 
     CCDSETUP.............................
     =====================================
@@ -4431,13 +4431,13 @@ RNOISE - Readout noise (ADUs) - Set Index 1 /!/ > 8.5
 BOUNDS - Pixel indices of bias strips (in pairs) - Set Index 1 /!/ > 1,12,1019,1
 024
 DIRECTION - Readout direction (X or Y) - Set Index 1 /!/ > X
-DEFERRED - Deferred charge (ADUs) - Set Index 1 /!/ > 
+DEFERRED - Deferred charge (ADUs) - Set Index 1 /!/ >
 MASK - Mask data file - Set Index 1 /!/ >
-SATURATE - Look for saturated pixels /NO/ > 
-PRESERVE - Do you want to preserve your input data types /YES/ > 
+SATURATE - Look for saturated pixels /NO/ >
+PRESERVE - Do you want to preserve your input data types /YES/ >
 GENVAR - Do you want to generate variance estimates /YES/ > no
-NDFNAMES - Associate position lists with NDF names /YES/ > 
-USESET - Use CCDPACK Set headers if available /YES/ > 
+NDFNAMES - Associate position lists with NDF names /YES/ >
+USESET - Use CCDPACK Set headers if available /YES/ >
 
   Listing of the current CCDPACK global parameters (Set Index 1)
 
@@ -4452,11 +4452,11 @@ USESET - Use CCDPACK Set headers if available /YES/ >
   Position lists will be associated with NDFs
   CCDPACK Set header information will be used where available
 
-SAVE - Save CCD parameters for future restoration /NO/ > 
+SAVE - Save CCD parameters for future restoration /NO/ >
 \end{verbatim}
 \end{myquote}
 Having set up the values for Set Index 1, you can do the same for
-the other Set Index values, entering the changed values 
+the other Set Index values, entering the changed values
 explicitly and leaving the others to default to the ones
 you have just entered:
 \begin{myquote}
@@ -4494,18 +4494,18 @@ command:
   CCDPACK Set header information will be used if available
 \end{verbatim}
 \end{myquote}
-Note that Index-specific values are only shown where they were 
-assigned and are different; 
-in the other cases a common value will be shown, and used, 
+Note that Index-specific values are only shown where they were
+assigned and are different;
+in the other cases a common value will be shown, and used,
 for all Set members.
 
 The Set Index values you should use depend on how you have used
 \xroutine{MAKESET} to add the Set headers; they will nearly
-always be 1, 2, 3, ... up to the number of members in 
+always be 1, 2, 3, ... up to the number of members in
 each Set, but if you are unsure you can use the \xroutine{SHOWSET}
 command to see the values they have.
 
-Note that when using CCDPACK with Sets, you should ensure that 
+Note that when using CCDPACK with Sets, you should ensure that
 the USESET parameter is set to true by \routine{CCDSETUP};
 when it is run with BYSET true, USESET will default to true as well.
 
@@ -4513,11 +4513,11 @@ when it is run with BYSET true, USESET will default to true as well.
 \subsection{\xlabel{setreduce}Using Sets in reduction tasks}
 
 This section provides a brief explanation of what the CCDPACK
-reduction tasks 
+reduction tasks
 (\xroutine{MAKEBIAS}, \xroutine{MAKECAL}, \xroutine{MAKEFLAT},
 \xroutine{DEBIAS}, \xroutine{CALCOR}, \xroutine{FLATCOR})
 do when they encounter input files with Set header information.
-It assumes that the global USESET parameter is TRUE, 
+It assumes that the global USESET parameter is TRUE,
 so you should first have set it using a command like
 \begin{myquote}
 \begin{verbatim}
@@ -4526,21 +4526,21 @@ so you should first have set it using a command like
 \end{myquote}
 
 The reduction tasks considered here are all concerned with constructing
-calibration frames from a stack of input frames 
+calibration frames from a stack of input frames
 (\routine{MAKEBIAS}, \routine{MAKECAL}, \routine{MAKEFLAT})
 or with applying those calibration frames to a group of data frames
 (\routine{DEBIAS}, \routine{CALCOR}, \routine{FLATCOR}).
 In the case of a single-chip instrument it is normally adequate to
 bung all the input files together and combine them or correct them
-accordingly.  In a multi-chip context however, it is necessary 
-to perform the make/apply calibration cycle separately for 
+accordingly.  In a multi-chip context however, it is necessary
+to perform the make/apply calibration cycle separately for
 the data from each chip.
 
-So the combination programs, 
+So the combination programs,
 which take multiple input images and produce one output image for each chip,
 do something like this:
 \begin{enumerate}
-\item 
+\item
 Read in all the input files
 \item
 Group them according to Set Index attribute
@@ -4560,7 +4560,7 @@ In all cases, the OUT parameter of these programs refers to a single
 filename, so the programs write a new HDS container file of this
 name and store one NDF structure inside for each Set Index.
 
-The correction programs, 
+The correction programs,
 which take one calibration image for each chip and use it to turn multiple
 input files into corrected output files,
 then do this:
@@ -4581,7 +4581,7 @@ For each Set Index value represented in the input files:
 \end{itemize}
 \end{enumerate}
 
-So if you have several observations from a three-chip mosaic camera 
+So if you have several observations from a three-chip mosaic camera
 sorted into Sets to debias, you can replace a sequence like this:
 \begin{myquote}
 \begin{verbatim}
@@ -4596,23 +4596,23 @@ sorted into Sets to debias, you can replace a sequence like this:
 by this one, which does just the same thing:
 \begin{myquote}
 \begin{verbatim}
-% makebias in='bias*_chip?' out=master 
+% makebias in='bias*_chip?' out=master
 % debias in='data*_chip?' bias=master out='debias_*'
 \end{verbatim}
 \end{myquote}
 
-You may notice from the scheme above that 
-the output frames have exactly the same Set headers 
+You may notice from the scheme above that
+the output frames have exactly the same Set headers
 (i.e.\ the same Set Index and Set Name) as the input frames.
 As long as pre-calibration and post-calibration frames will not
 be presented to the same CCDPACK program at the same time,
 which is normally the case, this will cause no trouble.
-If for some reason they will be fed together to the same 
+If for some reason they will be fed together to the same
 CCDPACK Set-aware program though, you may need to doctor the Set Name
 headers of one or other Set (use the NAME parameter of \xroutine{MAKESET}).
 
-These programs assume that only one type of Set 
-(i.e.\ Set data from only one instrument) 
+These programs assume that only one type of Set
+(i.e.\ Set data from only one instrument)
 is being considered at once --- if two images have the same Set Index
 attribute they are assumed to come from the same chip,
 so you should not mix data from different types of Set in the same
@@ -4624,13 +4624,13 @@ are specific to a given Set Index).  If they have been configured
 globally using \routine{CCDSETUP} then the appropriate values
 will be used.  Otherwise, you may be prompted for them.  In this case
 you will be prompted for the value once for each Set Index
-represented in the input files.  Note that if you supply these 
+represented in the input files.  Note that if you supply these
 parameters on the command line or use the ACCEPT keyword without
 using \routine{CCDSETUP} to assign global values, they will
 take the same value for all the files.
 
 As with the other Set processing aspects, for the most part
-{\bf it's not necessary to understand the technicalities} 
+{\bf it's not necessary to understand the technicalities}
 to use these programs,
 the upshot is that although multiple calibration frames,
 one for each chip, are constructed, they are all kept in a single file
@@ -4640,16 +4640,16 @@ to the correction programs.
 Both lots of programs will keep track of which frames have come
 from which chip and use them in the correct places.
 If you look at the output of the various calibration programs
-operating on data with Set headers, the way the 
+operating on data with Set headers, the way the
 above scheme works should be clear.  To see it in action, you can
-look at the log output of the 
+look at the log output of the
 \text{setexercise} script (see section \ref{demos}).
 
 
 \subsection{Using Sets in registration tasks}
 
 This section provides a brief explanation of what the CCDPACK
-registration tasks 
+registration tasks
 (\xroutine{FINDOFF}, \xroutine{PAIRNDF}, \xroutine{CCDALIGN},
 \xroutine{IDICURS}, \xroutine{REGISTER}, \xroutine{WCSREG})
 do when they encounter input files with Set header information.
@@ -4658,50 +4658,50 @@ By the registration stage, it is no longer of direct interest
 what the source of each image is, only how it relates to the
 others, so the Set Index attribute is simply ignored by these programs.
 In fact the registration applications will ignore Set header information
-altogether unless a Set alignment coordinate system 
+altogether unless a Set alignment coordinate system
 --- one with the special Domain name ``CCD\_SET'' ---
 is attached to the image.
-Whether there is one or not will depend on whether the 
+Whether there is one or not will depend on whether the
 ADDWCS parameter was true when the Set headers were added
 with \xroutine{MAKESET}.
 It will also disregard Set alignment if USESET=FALSE.
 
 Only the Set Name attribute and the CCD\_SET coordinate system
 are considered by these programs then.
-Since the CCD\_SET coordinates are taken to represent 
+Since the CCD\_SET coordinates are taken to represent
 a fixed and reliable alignment of images in the same Set,
-all images with the same Set Name are taken to be effectively 
+all images with the same Set Name are taken to be effectively
 glued together in those coordinates, and the registration programs
-will not take any steps to change the relative positioning of 
-the images within a Set.  
+will not take any steps to change the relative positioning of
+the images within a Set.
 
-So the programs 
+So the programs
 \routine{FINDOFF} and \routine{REGISTER} which deal in position lists
 will read in all the input images, construct a single superlist from
-the associated lists of 
+the associated lists of
 all the members of the same alignment Set, and treat this as if
 it came from a single image.
-\routine{IDICURS}, \routine{PAIRNDF} and \routine{CCDALIGN}, 
+\routine{IDICURS}, \routine{PAIRNDF} and \routine{CCDALIGN},
 which display images in a GUI and allow the user to mark points on them,
 will display a whole Set at once for marking or sliding around
 rather than one NDF at a time.
 And \routine{WCSREG}, which mediates between different coordinate
 systems to come up with a global registration using as many as necessary,
-accords maximum priority to alignment within a Set in CCD\_SET 
+accords maximum priority to alignment within a Set in CCD\_SET
 coordinates, and will not allow any realignment to occur which conflicts
 with that.
 Of course images from different Sets are not considered to be aligned
 in their CCD\_SET coordinates.
 
-Once again, for most purposes you can just feed the list of 
+Once again, for most purposes you can just feed the list of
 images to the programs and they will do the right thing.
 
 \subsection{Some examples of Set use}
 
-Not very many of the ``Examples'' sections in Appendix 
+Not very many of the ``Examples'' sections in Appendix
 \ref{app:description} give explicit examples of using the commands
 with Sets.
-This is because for the most part the commands are invoked in 
+This is because for the most part the commands are invoked in
 exactly the same way for data with Set headers as for data without them,
 but the programs take account of the grouping if there are Set present
 and the USESET parameter is true.
@@ -4711,14 +4711,14 @@ abilities.
 
 \subsubsection{Data reduction of frames from a mosaic camera}
 
-Here we give a brief example of how the CCDPACK data reduction 
-programs can take advantage of Set headers in frames obtained 
+Here we give a brief example of how the CCDPACK data reduction
+programs can take advantage of Set headers in frames obtained
 from a mosaic camera.
 
 In this case we will assume that the original data is in the form
 of multi-extension FITS files; a group of data frames \text{data-*.fit},
 a group of bias frames \text{bias-*.fit} and a group of flat fields
-\text{flat-*.fit}.  Each MEF represents a single exposure, 
+\text{flat-*.fit}.  Each MEF represents a single exposure,
 and contains one Header + Data Unit for each
 CCD chip in the mosaic camera.
 It would be possible to leave these files in their
@@ -4741,7 +4741,7 @@ We next indicate to CCDPACK that we will be using Set headers:
 % ccdsetup useset=yes accept
 \end{verbatim}
 \end{myquote}
-The next job is to inform CCDPACK that each HDS container file 
+The next job is to inform CCDPACK that each HDS container file
 represents a single Set:
 \begin{myquote}
 \begin{verbatim}
@@ -4782,7 +4782,7 @@ The thing to note is that once the Set headers have been set up,
 the commands typed are just the same as for un-Setted data
 (compare Example 3 in Section \ref{examplescripts}),
 but CCDPACK is taking care that frames are only combined/corrected
-in groups with corresponding ones; this will be clear if you 
+in groups with corresponding ones; this will be clear if you
 look at the log output of these tasks.
 
 \subsubsection{\label{mosexset}Registering frames from a mosaic camera}
@@ -4800,7 +4800,7 @@ tell CCDPACK that Set headers are important:
 \end{myquote}
 
 The data files are the same as in the un-Setted example.
-This time however the first thing we do with them is to group the 
+This time however the first thing we do with them is to group the
 images into two Sets, one for each exposure.  Using \xroutine{MAKESET}'s
 ASTFILE parameter we can import the saved AST file alignment information
 at the same time
@@ -4813,8 +4813,8 @@ at the same time
 These commands add a new coordinate system with the Domain (name)
 ``CCD\_SET'' as well as suitable Set headers.
 
-In this case we suppose that the AST file has been written to extract 
-information about telescope orientation from suitable FITS headers 
+In this case we suppose that the AST file has been written to extract
+information about telescope orientation from suitable FITS headers
 (see the description of the FITSROT parameter of \xroutine{ASTEXP}
 for more details).  This simply means we can avoid adding a
 180 degrees-rotated frame by hand.
@@ -4827,7 +4827,7 @@ and behaves just as usual.
 % findobj in='"1?,2?"' outlist='*.find'
 \end{verbatim}
 \end{myquote}
-The \xroutine{FINDOFF} program however takes special notice 
+The \xroutine{FINDOFF} program however takes special notice
 of the Set headers:
 \begin{myquote}
 \begin{verbatim}
@@ -4875,9 +4875,9 @@ of the Set headers:
 \end{myquote}
 (much of the output is omitted here for reasons of brevity).
 What it has done is to construct one list for each Set, rather than
-one for each frame, on the assumption that the CCD\_SET 
+one for each frame, on the assumption that the CCD\_SET
 alignment is correct.
-Having worked out the offsets between the two ``superlists'', 
+Having worked out the offsets between the two ``superlists'',
 it writes and associates matched position lists for each of the files
 which would actually contain at least one of the matched points.
 
@@ -4918,10 +4918,10 @@ Again it has constructed a list for each Set, and worked out the
 transformation coefficients between these.
 When it has successfully done this, every members of each Set
 which has been registered will be given a new CCD\_REG coordinate
-system defining the registration, even those which did not 
+system defining the registration, even those which did not
 have any associated position list (files \text{1a} and \text{2a} in the
 example above).
-For this reason there is no need to do extra work finding a 
+For this reason there is no need to do extra work finding a
 global registration as in Section \ref{mosexnoset}.
 Previewing (\xroutine{DRAWNDF}), resampling (\xroutine{TRANNDF}) and
 combining (\xroutine{MAKEMOS}) can now be performed without further ado.
@@ -4934,7 +4934,7 @@ groups of frames in which some have no overlap with any of the others.
 \section{Parameter behaviour and control}
 
 CCDPACK has a number of `global' {\em program\/} parameters which you
-can set up `once and for all'\footnote{This section does not apply 
+can set up `once and for all'\footnote{This section does not apply
                                        to \routine{XREDUCE} or IRAF.}.
 The usual time to do this is at the beginning of a
 reduction sequence.
@@ -5139,7 +5139,7 @@ routines may include wildcard specifications such as:
    *, ?, [a-z], {one,two,three}
 \end{verbatim}
 \end{myquote}
-all of which have usual meanings, i.e.\ any number of characters, 
+all of which have usual meanings, i.e.\ any number of characters,
 a single character, a range of characters, and a list of strings.
 The simplest return would then be:
 \begin{myquote}
@@ -5163,13 +5163,13 @@ possibilities include specifications such as:
 \end{myquote}
 
 If any of the image names you specify is an HDS container file
-holding more than one NDF structure, then each NDF contained directly 
-within that file is processed as a separate image.  
-If the data product you are using is supplied in this form, 
-which for instance is sometimes the case for a set of frames 
-from one exposure of a mosaic camera, 
+holding more than one NDF structure, then each NDF contained directly
+within that file is processed as a separate image.
+If the data product you are using is supplied in this form,
+which for instance is sometimes the case for a set of frames
+from one exposure of a mosaic camera,
 this makes it much easier to process a group of images at once.
-So if you had an 
+So if you had an
 appropriate container file \text{expos1234.sdf}, then just supplying:
 \begin{myquote}
 \begin{verbatim}
@@ -5282,7 +5282,7 @@ occurrences of the string
 `\text{\_ccd}' with `\text{-pr}'. {\em Remember the
 `\text{*}' in output expressions represents only the names of
 the input images not the directory or any other information (such as
-the extension or the NDF's name within an HDS container file)}, 
+the extension or the NDF's name within an HDS container file)},
 these are only used if no `preferences' are shown
 in the output expression. To keep images from other directories
 in the current directory use commands like:
@@ -5295,7 +5295,7 @@ OUT > ./*
 
 If the input group was a set of images in an HDS container file,
 the output group will have the same structure.
-So if the file \text{expo1234.sdf} 
+So if the file \text{expo1234.sdf}
 contains two NDFs called I1 and I2, then specifying
 \begin{myquote}
 \begin{verbatim}
@@ -5641,8 +5641,8 @@ after rejecting those outside of a given number of standard deviations
 of the initial mean. The standard deviation is derived from data
 variances if available, otherwise a standard deviation based on the
 variation of the data is used.
-\item[UNWEIGHTED MEDIAN] an unweighted median. A simple median of the 
-data values. No weighting is taken into account. This is significantly 
+\item[UNWEIGHTED MEDIAN] an unweighted median. A simple median of the
+data values. No weighting is taken into account. This is significantly
 faster than the weighted median, but takes no account of the known
 errors in the measurements.
 \item[DRIZZLE]  or variable-pixel linear reconstruction, maps weighted
@@ -5652,7 +5652,7 @@ pixels are shrunk before it is averaged into the output image.
 \end{description}
 \end{myquote}
 
-All of these methods, support variance propagation, 
+All of these methods, support variance propagation,
 provided that the input data errors have an approximately normal distribution.
 
 In general if the input data comprise less than 5 datasets and spurious
@@ -5799,12 +5799,12 @@ The CCDPACK routine descriptions are contained in the following pages.
       related images.
 
       AST files written out by this application can be applied to
-      other images of similar origin using the \xroutine{ASTIMP} 
+      other images of similar origin using the \xroutine{ASTIMP}
       or \xroutine{MAKESET} programs, so
       that registration information present in the WCS components of
-      one set of images (put there for instance by the \xroutine{REGISTER} 
+      one set of images (put there for instance by the \xroutine{REGISTER}
       or \xroutine{WCSEDIT} applications)
-      can be transferred using \xroutine{ASTIMP} and \xroutine{ASTEXP} 
+      can be transferred using \xroutine{ASTIMP} and \xroutine{ASTEXP}
       to another similar set.
       This {\tt "}similar set{\tt "} will typically be one from chips in the same
       mosaic camera instrument.
@@ -5834,7 +5834,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       \sstsubsection {
          BASEEPOCH = \_DOUBLE (Read)
       } {
-         If a \qt{Sky Co-ordinate System} specification is supplied 
+         If a \qt{Sky Co-ordinate System} specification is supplied
          (using
          parameter BASEFRAME) for a celestial co-ordinate system, then
          an epoch value is needed to qualify it. This is the epoch at
@@ -5852,10 +5852,10 @@ The CCDPACK routine descriptions are contained in the following pages.
          output AST file.  To be useful, this must specify a frame
          which occurs in all the images in the IN list, and can be
          expected to occur in any image to which the AST file will
-         later be applied using \xroutine{ASTIMP}.  
+         later be applied using \xroutine{ASTIMP}.
          AXIS is a good choice since
          this may be applicable to frames which have been modified,
-         for instance by an application like KAPPA's 
+         for instance by an application like KAPPA's
          \xref{COMPAVE}{sun95}{COMPAVE}.
 
          The value of the parameter can be one of the following:
@@ -5866,10 +5866,10 @@ The CCDPACK routine descriptions are contained in the following pages.
                An integer value giving the index of the required Frame
                within the WCS component.
             \sstitem
-               A \qt{Sky Co-ordinate System} (SCS) value such as 
+               A \qt{Sky Co-ordinate System} (SCS) value such as
                EQUAT(J2000)
-               (see section 
-               \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in 
+               (see section
+               \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in
                SUN/95).
          }
          A domain name is usually the most suitable choice.
@@ -5920,7 +5920,7 @@ The CCDPACK routine descriptions are contained in the following pages.
                     frameset generated from the N'th image in the
                     IN list an ID with index N.
             \sstitem
-              SET     -- ID is given by an integer taken from the 
+              SET     -- ID is given by an integer taken from the
                     Set Index attribute of the CCDPACK Set header
                     of each input file.
          }
@@ -6176,7 +6176,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
       values. These global values will always take precedence, except
       when an assignment is made on the command line.  Global values may
-      be set and reset using the \xroutine{CCDSETUP} and 
+      be set and reset using the \xroutine{CCDSETUP} and
       \xroutine{CCDCLEAR} commands.
    }
 }
@@ -6214,7 +6214,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          and the user need not be aware of its internal structure.
          The files are readable text however, and can in principle be
          written by other applications or doctored by hand, if this
-         is done with care, and with knowledge of AST objects 
+         is done with care, and with knowledge of AST objects
          (\xref{SUN/210}{sun210}{}).
          The format of the file is explained in the Notes section.
       }
@@ -6232,7 +6232,7 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          It will normally not be necessary to supply this keyword,
          since it can be given instead within the AST file.  If it is
-         supplied however, it overrides any value given there. 
+         supplied however, it overrides any value given there.
          [!]
       }
       \sstsubsection{
@@ -6322,7 +6322,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       } {
          This will apply the AST file \qt{camera.ast} to all the images in
          the current directory with names beginning \qt{data}.  The file
-         \qt{camera.ast} has previously been written using \xroutine{ASTEXP} 
+         \qt{camera.ast} has previously been written using \xroutine{ASTEXP}
          with the parameter ASTFILE=camera.ast.  A new frame with a Domain
          called \qt{OBS1} is added to the WCS component of each image.
       }
@@ -6462,7 +6462,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
       values. These global values will always take precedence, except
       when an assignment is made on the command line.  Global values may
-      be set and reset using the \xroutine{CCDSETUP} and 
+      be set and reset using the \xroutine{CCDSETUP} and
       \xroutine{CCDCLEAR} commands.
    }
 }
@@ -6679,14 +6679,14 @@ The CCDPACK routine descriptions are contained in the following pages.
          Whether to use Set header information or not.  If USESET is
          false then any Set header information will be ignored.
          If USESET is true, then the CAL parameter is taken to
-         refer to a group of files, and each IN file will be 
-         processed using a calibration image with a Set Index 
+         refer to a group of files, and each IN file will be
+         processed using a calibration image with a Set Index
          attribute which matches its own.  An IN file with no Set
          header is considered to match a CAL file with no Set header,
-         so USESET can safely be set true when the 
+         so USESET can safely be set true when the
          input files contain no Set header information.
 
-         If a global value for this parameter has been set using 
+         If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
          [FALSE]
       }
@@ -7131,7 +7131,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       See also
    } {
       \secref{usinglineartransforms}{General linear transformations},
-      \xroutine{IDICURS}, 
+      \xroutine{IDICURS},
       \xroutine{PAIRNDF}.
    }
    \sstdiytopic{
@@ -7434,7 +7434,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          whether the CCD\_SET coordinate frame should be removed from
          the World Coordinate System etension of the image as well.
          Since CCD\_SET coordinates are usually a copy of another
-         coordinate system, and mainly intended for Set-related 
+         coordinate system, and mainly intended for Set-related
          registration, it is usually sensible to erase this coordinate
          frame when the rest of the Set header information has
          been erased.
@@ -8218,23 +8218,23 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       assigned it will be defaulted or prompted as appropriate when
       other CCDPACK applications are run.
 
-      If you are using CCDPACK Sets, then some of the parameters 
+      If you are using CCDPACK Sets, then some of the parameters
       describing device characteristics may differ according to
       which member of each Set is being described.  By setting the
       BYSET parameter to true, and supplying a value for the INDEX
-      parameter, you can indicate that the global values you supply 
-      apply to the members of each Set with that Set Index.  
+      parameter, you can indicate that the global values you supply
+      apply to the members of each Set with that Set Index.
       In this case it will be necessary to run \routine{CCDSETUP} once
       for each Set Index to be used (for instance, once for each
       chip in a mosaic camera), giving a different INDEX value each
-      time.  This applies to the global parameters ADC, BOUNDS, 
+      time.  This applies to the global parameters ADC, BOUNDS,
       DEFERRED, DIRECTION, EXTENT, MASK, RNOISE and SATURATION.
 
       The removal of global parameters is performed by the \xroutine{CCDCLEAR}
       application.
    }
    \sstusage{
-      ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=? 
+      ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=?
                mask=?  direction=? deferred=? extent=? preserve=? genvar=?
                ndfnames=? useset=?
    }
@@ -8277,8 +8277,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          This parameter does not give the value of a global parameter
          to be set up, but affects the behaviour of CCDSETUP.
-         If true, a value for the INDEX parameter will be solicited, 
-         and all the global values supplied will apply to 
+         If true, a value for the INDEX parameter will be solicited,
+         and all the global values supplied will apply to
          the processing of images with that Set Index.  In this way,
          you can provide different values of certain global parameters
          for different members of each Set (e.g. images read from
@@ -8527,23 +8527,23 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          USESET = \_LOGICAL (Read)
       } {
          This parameter determines whether CCDPACK Set header information
-         will be used when it is available.  Most of the CCDPACK 
+         will be used when it is available.  Most of the CCDPACK
          reduction and registration programs will look for Set header
          information in the .MORE.CCDPACK extension of the NDFs they
          are processing, and if it exists it will be used to modify
-         the way the processing is done: broadly speaking, reduction 
+         the way the processing is done: broadly speaking, reduction
          programs will group corresponding members of different Sets
          together before processing, and registration programs will
          make use of a CCD\_SET frame for alignment between members
          of the same Set.
 
          This header information will only be present if it has been
-         added (to the image itself or to one earlier in the reduction 
+         added (to the image itself or to one earlier in the reduction
          chain from which it was produced) by running the \xroutine{MAKESET}
          program.  If it is not present, the programs will behave
          as if USESET was false anyway, so it is normally quite safe
          for USESET to be TRUE.  However, in some cases (especially
-         if intermediate files are stored in foreign, i.e. non-NDF 
+         if intermediate files are stored in foreign, i.e. non-NDF
          data formats) it may be more efficient to set this parameter
          false.  You should also set it false if you wanted CCDPACK
          programs to ignore existing Set information for some reason.
@@ -8572,7 +8572,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          This will fix the ADC value to 1.5 and the mask image to the
          file badpix2 only for those Set members with a Set Index of 2.
-         No other values will be prompted for.  If this command is 
+         No other values will be prompted for.  If this command is
          issued directly after the last example, then all the other
          global parameters will take the same values as were entered
          for index=1.
@@ -8583,7 +8583,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    } {
       \secref{configuration}{Package configuration},
       \secref{setglobals}{Global parameters with Sets},
-      \xroutine{CCDSHOW}, 
+      \xroutine{CCDSHOW},
       \xroutine{CCDCLEAR}.
    }
    \sstnotes{
@@ -8653,10 +8653,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       All parameters values are obtained by prompting. The suggested
       values (defaults) are either the current global values, if they
       exist, or the application current values (from the last time that
-      the application was run).  Global values corresponding to the 
-      INDEX parameter will be used as defaults if they exist.  If the 
-      application has not been run then the \qt{intrinsic} defaults are 
-      shown. The intrinsic defaults may be obtained at any time 
+      the application was run).  Global values corresponding to the
+      INDEX parameter will be used as defaults if they exist.  If the
+      application has not been run then the \qt{intrinsic} defaults are
+      shown. The intrinsic defaults may be obtained at any time
       (in the absence of global values) by using the RESET keyword on
       the command line.
    }
@@ -8756,7 +8756,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          As well as displaying the global parameter values to the
          screen, this will also write them to a restoration file
          called \qt{params.save}.  This file can be used at a later date
-         to restore the current global parameter setup using 
+         to restore the current global parameter setup using
          \xroutine{CCDSETUP}.
       }
    }
@@ -8824,9 +8824,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          The Analogue-to-Digital Conversion factor. This number converts
          input ADUs to detected electrons. This value is used to
          estimate the Poissonian noise in the output (debiassed) data
-         values.  If the EXPAND parameter is true, then the output is 
+         values.  If the EXPAND parameter is true, then the output is
          multiplied by ADC so that the output is in counts (electrons)
-         rather than ADUs.  If variances are not being generated 
+         rather than ADUs.  If variances are not being generated
          then this value will not be used.
 
          If a global value for this parameter has been set using
@@ -9005,7 +9005,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          A list of the names of the images which contain the raw CCD
          data. Note that at present the input data must have a common
          processing mode, i.e. have the same ADC factor, readout noise
-         etc. These values are represented by the parameter values of 
+         etc. These values are represented by the parameter values of
          the task.  The input data must also use the same master bias
          frame except if USESET is true and the input and bias images
          contain suitable CCDPACK Set header information, in which
@@ -9290,7 +9290,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          Whether to use Set header information or not.  If USESET is
          false then any Set header information will be ignored.
-         If USESET is true, then the BIAS parameter is 
+         If USESET is true, then the BIAS parameter is
          taken to refer to a group of files, and each IN file will
          be processed using a master bias image with a Set Index
          attribute which matches its own.  An IN file with no Set
@@ -9298,7 +9298,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          no Set header, so USESET can safely be set true
          when the input files contain no Set header information.
 
-         If a global value for this parameter has been set using 
+         If a global value for this parameter has been set using
          CCDSETUP then that value will be used.
          [FALSE]
       }
@@ -10700,7 +10700,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         Data following the third column is copied without modification
         into the results files
 
-        In all cases, the coordinates in position lists are pixel 
+        In all cases, the coordinates in position lists are pixel
         coordinates.
 
       \sstitemlist{
@@ -10791,7 +10791,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          On exit this parameter contains a list of the number of objects
          detected in each input image. This may be useful in scripts
-         where the values can be accessed using the 
+         where the values can be accessed using the
          \xref{KAPPA (SUN/95)}{sun95}{}
          \xref{PARGET}{sun95}{PARGET} command.
       }
@@ -10914,7 +10914,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstsubsection{
          OVERRIDE = \_LOGICAL (Read)
       } {
-         If TRUE then it is not a fatal error to detect no objects on an 
+         If TRUE then it is not a fatal error to detect no objects on an
          image. In this case the output list of positions will not be
          written and the value in the COUNTS parameter will be set to 0.
          [FALSE]
@@ -11076,7 +11076,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         file using the characters \# and !. Columns may be separated by
         the use of commas or spaces.
 
-        In all cases the coordinates in position lists are pixel 
+        In all cases the coordinates in position lists are pixel
         coordinates.
    }
    \sstdiytopic{
@@ -11328,7 +11328,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          subset of the input position lists have been matched.
 
          If the associating position lists with NDFs option has
-         been chosen, an position list will still be written for 
+         been chosen, an position list will still be written for
          each input NDF, but for NDFs which were not matched the
          output list will be empty (will consist only of comment lines).
 
@@ -11374,25 +11374,25 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          USESET = \_LOGICAL (Read)
       } {
          This parameter determines whether Set header information should
-         be used in the object matching.  If USESET is true, 
+         be used in the object matching.  If USESET is true,
          \routine{FINDOFF} will try to group position lists according to
          the Set Name attribute of the image to which they are attached.
          All lists coming from images which share the same (non-blank)
-         Set Name attribute, and which have a CCD\_SET coordinate frame 
+         Set Name attribute, and which have a CCD\_SET coordinate frame
          in their WCS component, will be grouped together and treated
          by the program as a single position list.  Thus no attempt
          is made to match objects between members of the same Set;
-         it is assumed that the relative alignment within a Set 
+         it is assumed that the relative alignment within a Set
          is already known and has been fixed.
 
          If USESET is false, all Set header information is ignored.
-         If NDFNAMES is false, USESET will be ignored.  If the input 
-         images have no Set headers, or if they have no CCD\_SET frame 
+         If NDFNAMES is false, USESET will be ignored.  If the input
+         images have no Set headers, or if they have no CCD\_SET frame
          in their WCS components, the setting of USESET will make
          no difference.
 
-         If a global value for this parameter has been set using 
-         CCDSETUP then that value will be used. 
+         If a global value for this parameter has been set using
+         CCDSETUP then that value will be used.
          [FALSE]
       }
       \sstsubsection{
@@ -11503,7 +11503,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         lines with the same column-1 value in different files represent
         the same object.  In the input position lists column-1 values
         are ignored.  If additional columns are present they must be
-        numeric, and there must be the same number of them in every 
+        numeric, and there must be the same number of them in every
         line.  These have no effect on the calculations, but \routine{FINDOFF}
         will propagate them to the corresponding lines in the output
         list.
@@ -11649,10 +11649,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          such as \xroutine{MAKEFLAT}. The data should have a floating point
          data type (\_REAL or \_DOUBLE).    If USESET is true, FLAT should
          be a group expression referring to one flatfield data file
-         matching each of the Set Index attributes represented in the 
-         IN list; again the name of the file produced by \routine{MAKEFLAT} will  
+         matching each of the Set Index attributes represented in the
+         IN list; again the name of the file produced by \routine{MAKEFLAT} will
          normally be suitable.  The name of this file may be specified
-         using indirection through a file. 
+         using indirection through a file.
          [Global flatfield]
       }
       \sstsubsection{
@@ -11796,17 +11796,17 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          USESET = \_LOGICAL (Read)
       } {
          Whether to use Set header information or not.  If USESET is
-         false then any Set header information will be ignored. 
-         If USESET is true, then the FLAT parameter is taken to 
+         false then any Set header information will be ignored.
+         If USESET is true, then the FLAT parameter is taken to
          refer to a group of files, and each IN file will be processed
-         using a flatfield dataset with a Set Index attribute which 
+         using a flatfield dataset with a Set Index attribute which
          matches its own.  An IN file with no Set header is considered
          to match a FLAT file with no Set header, so USESET can safely
-         be set true (the default) when the input files contain no 
+         be set true (the default) when the input files contain no
          Set header information.
 
-         If a global value for this parameter has been set using 
-         CCDSETUP then that value will be used. 
+         If a global value for this parameter has been set using
+         CCDSETUP then that value will be used.
          [FALSE]
       }
    }
@@ -11840,7 +11840,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    \sstdiytopic{
       See also
    } {
-      \secref{flatfielding}{Flatfielding}, 
+      \secref{flatfielding}{Flatfielding},
       \xroutine{MAKEFLAT}.
    }
    \sstnotes{
@@ -11934,7 +11934,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          to be centroided.  If true, then when you click on the image to
          add a new point \routine{IDICURS} will attempt to find a centroidable
          object near to where the click was made and add the point
-         there.  If no centroidable feature can be found nearby, you will 
+         there.  If no centroidable feature can be found nearby, you will
          not be allowed to add a point.  Note that the centroiding
          routine is capable of identifying spurious objects in noise,
          but where a genuine feature is nearby this should find its
@@ -11945,7 +11945,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          added by clicking on the image.  In particular any points read
          from the INLIST file will not be automatically centroided.
 
-         This parameter only gives the initial centroiding state - 
+         This parameter only gives the initial centroiding state -
          centroiding can be turned on and off interactively while the
          program is running.
       }
@@ -12238,7 +12238,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    \sstdiytopic{
       See also
    } {
-      \xroutine{CCDALIGN}, 
+      \xroutine{CCDALIGN},
       \xroutine{PAIRNDF}.
    }
    \sstnotes{
@@ -12325,12 +12325,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       and reset using the CCDSETUP and CCDCLEAR commands.
 
       Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM,
-      MARKSTYLE, CENTROID) give initial values for quantities which 
-      can be modified while the program is running.  Although these 
-      may be specified on the command line, it is normally easier to 
-      start the program up and modify them using the graphical user 
-      interface.  If the program exits normally, their values at the 
-      end of the run will be used as defaults next time the program 
+      MARKSTYLE, CENTROID) give initial values for quantities which
+      can be modified while the program is running.  Although these
+      may be specified on the command line, it is normally easier to
+      start the program up and modify them using the graphical user
+      interface.  If the program exits normally, their values at the
+      end of the run will be used as defaults next time the program
       starts up.
    }
 }
@@ -12536,10 +12536,10 @@ FTYPE & \_CHAR & OBSTYPE  OBJECT=TARGET -\\
       \qt{FALSE}, \qt{N},
       \qt{F}.
 
-      The FITS keywords may be hierarchical, and on the whole are 
+      The FITS keywords may be hierarchical, and on the whole are
       specified simply by giving their name in the normal way.
       However, there is one special case: if the value of a FITS
-      header is known to be a string of the form '[A:B,C:D]' the 
+      header is known to be a string of the form '[A:B,C:D]' the
       numbers A, B, C and D may be extracted individually by appending
       '<X1>', '<X2>', '<Y1>' or '<Y2>' respectively to the name of
       the keyword.  Hence:
@@ -12549,7 +12549,7 @@ EXTENT.MINX & TRIMSEC<X1> \\
 EXTENT.MAXX & TRIMSEC<X2>
       \end{tabular}
       \end{myquote}
-      would set the extents from the first two fields of a suitably 
+      would set the extents from the first two fields of a suitably
       formatted TRIMSEC header.
 
       Fields in the table may be separated by commas if desired, any
@@ -12802,7 +12802,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          the estimated variances.  If USESET is true and multiple Sets
          are represented in the IN list, then this name will be used
          as the name of an HDS container file containing one NDF structure for
-         each Set Index value.  
+         each Set Index value.
          This name may be specified using indirection through a file.
       }
       \sstsubsection{
@@ -12840,7 +12840,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          If a global value has been set up using \xroutine{CCDSETUP} this value
          will be used, and will be shown as the default.  If USESET
-         is true, a global value specific to each image's Set Index 
+         is true, a global value specific to each image's Set Index
          value will be sought.
          [Dynamically derived value]
       }
@@ -12886,11 +12886,11 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          output master bias frames, they will be written as separate
          NDFs into a single HDS container file.  If no Set header
          information is present in the input files, then all the
-         input files are combined together to form the master bias, 
+         input files are combined together to form the master bias,
          so USESET can usually be safely set to TRUE.
 
-         If a global value for this parameter has been set using 
-         CCDSETUP then that value will be used. 
+         If a global value for this parameter has been set using
+         CCDSETUP then that value will be used.
          [FALSE]
       }
       \sstsubsection{
@@ -13241,16 +13241,16 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          Whether to use Set header information or not.  If USESET is
          false then any Set header information will be ignored.
          If USESET is true, then input files will be considered in
-         groups; a separate calibration frame will be constructed 
+         groups; a separate calibration frame will be constructed
          for each group of corresponding input frames (i.e. those
-         sharing the same Set Index attribute).  If this results in 
-         multiple output calibration files, they will be written as 
+         sharing the same Set Index attribute).  If this results in
+         multiple output calibration files, they will be written as
          separate NDF structures into a single HDS container file.
-         If no Set header information is present in the input files, 
+         If no Set header information is present in the input files,
          then calibration is done on all the input files together,
          so USESET can usually be safely set to TRUE.
 
-         If a global value for this parameter has been set using 
+         If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
          [FALSE]
       }
@@ -13440,7 +13440,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          Note that for this option to work well you should have many
          images and that any output pixels that only have one input
-         image contributing to their value will have their variances 
+         image contributing to their value will have their variances
          set bad.
          [FALSE]
       }
@@ -13591,9 +13591,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          OUT = LITERAL (Write)
       } {
          Name of an image to contain the output flatfield data. Note this
-         image will have a precision of at least \_REAL. 
+         image will have a precision of at least \_REAL.
          If USESET is true and multiple Sets are represented in the IN
-         list then this name will be used as the name of an HDS 
+         list then this name will be used as the name of an HDS
          container file containing one NDF structure for each Set Index value.
          This name may be specified using indirection through a file.
          [TRUE]
@@ -13616,16 +13616,16 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          false then any Set header information will be ignored.
          If USESET is true, then input files will be considered in
          groups; a separate flatfield will be constructed for each
-         group of corresponding input frames (i.e. those sharing 
+         group of corresponding input frames (i.e. those sharing
          the same Set Index attribute).  If this results in multiple
          output flatfields, they will be written as separate NDF structures into
-         a single HDS container file.  If no Set header information 
-         is present in the input files, then flatfielding is done  
-         on all the input files together, so USESET can usually be 
+         a single HDS container file.  If no Set header information
+         is present in the input files, then flatfielding is done
+         on all the input files together, so USESET can usually be
          safely set to TRUE.
 
-         If a global value for this parameter has been set using 
-         \xroutine{CCDSETUP} then that value will be used. 
+         If a global value for this parameter has been set using
+         \xroutine{CCDSETUP} then that value will be used.
          [FALSE]
       }
       \sstsubsection{
@@ -13683,7 +13683,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
    \sstdiytopic{
       See also
    } {
-      \secref{flatfielding}{Flatfielding}, 
+      \secref{flatfielding}{Flatfielding},
       \xroutine{FLATCOR}.
    }
    \sstnotes{
@@ -13693,11 +13693,11 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          The data input into this routine should have bias strip
          regions and any badly vignetted parts removed.
 
-         \sstitem 
+         \sstitem
          The input images are normalised to have a mean of one
          before being combined. This makes sure that all input images
          contribute to the final result (even though, for instance,
-         they were taken on a source of varying brightness, e.g. the 
+         they were taken on a source of varying brightness, e.g. the
          twilight sky).
       }
    }
@@ -13832,7 +13832,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          CORRECT = LITERAL (Read)
       } {
          The name of the file used to output the scale and zero-point
-         corrections (see SCALE and ZERO parameters). This file can be 
+         corrections (see SCALE and ZERO parameters). This file can be
          read by the DRIZZLE task.  If the file already exists, it is
          overwritten.  If a null (!) value is supplied, or if SCALE and
          ZERO are both set to FALSE, no file is written.
@@ -14495,7 +14495,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          \sstitem
             SKYSUP  -- dynamically defaulted
-         \sstitem 
+         \sstitem
             GENVAR  -- dynamically defaulted
          \sstitem
             SCALE   -- always FALSE
@@ -14527,7 +14527,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
            types, with arithmetic being performed using the appropriate
            floating point type. It can process images with any number of
            dimensions. The DATA, TITLE and VARIANCE components of an image
-           are directly supported, with the AXIS, HISTORY, LABEL 
+           are directly supported, with the AXIS, HISTORY, LABEL
            and UNITS components and all extensions being propagated from
            the first input image supplied (note that AXIS values, if
            present, will normally be extrapolated as a result of
@@ -15071,7 +15071,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       an overlapping region which you wish to align, and click the
       {\tt "}Use this pair{\tt "} button.  The aligner window will then appear,
       displaying the two images which you have selected.
-      The chooser window can normally be resized in the normal way to 
+      The chooser window can normally be resized in the normal way to
       make the images bigger or smaller.  However there is currently
       a bug which causes this to crash in some window managers which
       use continuous resizing.  In this case you must use the PREVX
@@ -15194,7 +15194,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       }{
          A string indicating how markers are initially to be plotted in the
          aligner widget to represent points on the left hand image.
-         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type 
+         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type
          strings.  The available attributes are:
          \sstitemlist{
 
@@ -15223,7 +15223,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       }{
          A string indicating how markers are initially to be plotted in the
          aligner widget to represent points on the right hand image.
-         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type 
+         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type
          strings.  The available attributes are:
          \sstitemlist{
 
@@ -15349,11 +15349,11 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          TOLER = \_DOUBLE (Read)
       }{
          The tolerance for deduplicating centroided points (in pixels).
-         If two centroided objects on the same image are within this 
-         distance of each other they will be identified as the same 
-         object.  For a bright elliptical object, centroiding arising 
-         from any nearby point will normally arrive at the same 
-         position, so this can be set to a small value (less than 1), but 
+         If two centroided objects on the same image are within this
+         distance of each other they will be identified as the same
+         object.  For a bright elliptical object, centroiding arising
+         from any nearby point will normally arrive at the same
+         position, so this can be set to a small value (less than 1), but
          if the objects being identified cover many pixels and are close
          to the background noise level it may be advantageous to set
          it to a larger value so that centroids near to each other
@@ -15442,7 +15442,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       See also
    } {
       \secref{semiautomated}{Semi-automated registration},
-      \xroutine{CCDALIGN}, 
+      \xroutine{CCDALIGN},
       \xroutine{IDICURS}.
    }
    \sstnotes{
@@ -16528,8 +16528,8 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
                6 -- self defined function
 
          }
-         If more than two position lists are provided, then only the 
-         values 1--5 may be used. 
+         If more than two position lists are provided, then only the
+         values 1--5 may be used.
          [5]
       }
       \sstsubsection{
@@ -16728,19 +16728,19 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          \routine{REGISTER} will try to group position lists according to
          the Set Name attribute of the images to which they are attached.
          All lists coming from images which share the same (non-blank)
-         Set Name attribute, and which have a CCD\_SET coordinate 
+         Set Name attribute, and which have a CCD\_SET coordinate
          frame in their WCS component, will be grouped together and
          treated by the program as a single position list.  Images
          which have no associated position list but are in the same
          Set as ones which are successfully registered will have
-         a suitable registration frame added too, based on their 
+         a suitable registration frame added too, based on their
          Set alignment relation to the registered Set member.
-         Thus the assumption is made that the relative alignment of 
+         Thus the assumption is made that the relative alignment of
          images within a Set is already known and has been fixed.
 
          If USESET is false, all Set header information is ignored.
-         If NDFNAMES is false, USESET will be ignored.  If the input 
-         images have no Set headers, or if they have no CCD\_SET frame 
+         If NDFNAMES is false, USESET will be ignored.  If the input
+         images have no Set headers, or if they have no CCD\_SET frame
          in their WCS components, the setting of USESET will make
          no difference.
 
@@ -16875,7 +16875,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       }
       \sstexamplesubsection{
          register inlist={\tt '}{\tt "}one,two{\tt "}{\tt '} fittype=6 xfor={\tt '}pa$+$pb$*$x{\tt '} yfor={\tt '}pa$+$pb$*$y{\tt '}
-      }{ 
+      }{
          In this example the position lists associated with the images
          one and two are said to be related by the algebraic
          expressions {\tt "}pa$+$pb$*$x{\tt "} and {\tt "}pa$+$pb$*$y{\tt "}, which indicates that a
@@ -16986,7 +16986,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
         are to be used for registration.
 
         On exit, a new coordinate frame with a Domain as given by the
-        OUTDOMAIN parameter will be inserted in the WCS component of 
+        OUTDOMAIN parameter will be inserted in the WCS component of
         the input images.  Taken together these contain the registration
         information and can be inspected using WCSEDIT.
    }
@@ -17474,7 +17474,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          NAMELIST = LITERAL (Read)
       }{
          The name of an output file in which to write the names of
-         the images selected for output.  The (non-comment) lines of 
+         the images selected for output.  The (non-comment) lines of
          this file are of the form:
          \begin{quote}
             {\tt image-name \# set-index set-name}
@@ -17625,7 +17625,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstsubsection{
          EPOCHIN = \_DOUBLE (Read)
       } {
-         If a \qt{Sky Co-ordinate System} specification is supplied 
+         If a \qt{Sky Co-ordinate System} specification is supplied
          (using
          parameter FRAMEIN) for a celestial co-ordinate system, then
          an epoch value is needed to qualify it. This is the epoch at
@@ -17639,7 +17639,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstsubsection{
          EPOCHOUT = \_DOUBLE (Read)
       } {
-         If a \qt{Sky Co-ordinate System} specification is supplied 
+         If a \qt{Sky Co-ordinate System} specification is supplied
          (using
          parameter FRAMEOUT) for a celestial co-ordinate system, then
          an epoch value is needed to qualify it. This is the epoch at
@@ -17920,7 +17920,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          the FRAMEIN and FRAMEOUT parameters.
 
          STRUCT signifies that a transform structure (probably created
-         by \xroutine{REGISTER} or \xroutine{CCDEDIT}) 
+         by \xroutine{REGISTER} or \xroutine{CCDEDIT})
          is to be applied to the data. In this
          case the name of the object containing the structure should
          be supplied (this will be picked up automatically through the
@@ -18007,7 +18007,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          images.
       }
       \sstexamplesubsection{
-         tranlist inlist=\qt{$*$} outlist=\qt{$*$.tran} trtype=struct 
+         tranlist inlist=\qt{$*$} outlist=\qt{$*$.tran} trtype=struct
                   forward=false
       }{
          In this example transform structures in each of the images in
@@ -18416,8 +18416,8 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
             shape=bounds lbound=\qs{[1,-20]} ubound=\qs{[256,172]}
       }{
          This transforms the images called a119$*$, using the transformation
-         structure merc in the HDS file called proj, into images called 
-         a119$*$s.  It uses nearest-neighbour resampling.  All the output 
+         structure merc in the HDS file called proj, into images called
+         a119$*$s.  It uses nearest-neighbour resampling.  All the output
          images have size 256 x 192 pixels and origin (1,-20).
       }
    }
@@ -18599,7 +18599,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
             \sstitem
                 MODE = ADD    -- The new frame will be a copy of the
                                  target frame (though Domain and Title
-                                 will be changed), and will be mapped 
+                                 will be changed), and will be mapped
                                  from it using the mapping given.
             \sstitem
                MODE = SET     -- The frame whose attributes are to be set
@@ -18737,7 +18737,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       } {
          The name of an output file in which to write the names of all
          the NDFs which were successfully accessed.  In particular, if
-         MODE is CURRENT, this list will include all the NDFs which 
+         MODE is CURRENT, this list will include all the NDFs which
          contained the specified frame, but exclude any which did not.
          [WCSEDIT.LIS]
       }
@@ -18746,7 +18746,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       } {
          If MODE is SET, then this gives a string of the form
          \qt{attribute=value} which is to be applied to the frame.  The
-         string is passed straight to the \xref{AST\_SET}{sun210}{AST\_SET} 
+         string is passed straight to the \xref{AST\_SET}{sun210}{AST\_SET}
          routine (see \xref{SUN/210}{sun210}{}).
       }
       \sstsubsection{
@@ -18774,7 +18774,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       }{
          This sets the Current coordinate system of all the images in
          the current directory to {\tt '}CCD\_REG{\tt '}.  The names of all the
-         images which had this coordinate system are written to the 
+         images which had this coordinate system are written to the
          file WCSEDIT.LIS.  Any which do not appear in this file were
          not modified by the program.
       }
@@ -18828,9 +18828,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
    }
    \sstnotes{
       This routine provides similar functionality to that provided by
-      \xref{KAPPA}{sun95}{} applications 
-      \xref{WCSADD}{sun95}{WCSADD}, 
-      \xref{WCSREMOVE}{sun95}{WCSREMOVE} and 
+      \xref{KAPPA}{sun95}{} applications
+      \xref{WCSADD}{sun95}{WCSADD},
+      \xref{WCSREMOVE}{sun95}{WCSREMOVE} and
       \xref{WCSFRAME}{sun95}{WCSFRAME}, but allows
       use of CCDPACK-style NDF lists.
    }
@@ -18878,7 +18878,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
       If the USESET parameter is true, then \routine{WCSREG} will take account
       of alignment information stored in the CCDPACK Set header;
-      this means that the alignment implied when images were 
+      this means that the alignment implied when images were
       previously grouped into a Set can be guaranteed to be retained.
 
       If the graph is not fully connected, a list of the existing
@@ -18926,7 +18926,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
           If the application is successful, a new frame with a domain
           determined by the OUTDOMAIN parameter will be added to each of
-          the IN files containing the alignment information.  This frame 
+          the IN files containing the alignment information.  This frame
           will be made the new Current frame.
        }
       \sstsubsection{
@@ -19006,7 +19006,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          false, then it will be the same as IN unless the program fails).
          [FALSE]
       }
-      \sstsubsection{ 
+      \sstsubsection{
          REFPOS = \_INTEGER (Read)
       } {
          The position within the IN list which corresponds to the
@@ -19021,17 +19021,17 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstsubsection{
          USESET = \_LOGICAL (Read)
       } {
-         This parameter governs whether Set-based alignment 
-         information in the images, if it exists, should be used. 
-         If it is set to true, then coordinate frames with the 
-         domain CCD\_SET will take precedence over all the ones named 
+         This parameter governs whether Set-based alignment
+         information in the images, if it exists, should be used.
+         If it is set to true, then coordinate frames with the
+         domain CCD\_SET will take precedence over all the ones named
          in the DOMAINS parameter.  In this case, if two of the images
          both have a CCD\_SET coordinate frame and also share the
          same Set Name attribute, the connection will be made in
          CCD\_SET frame.  If no CCD\_SET frames are present, this
          parameter has no effect.
 
-         If a global value for this parameter has been set using 
+         If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
          [FALSE]
       }
@@ -19082,7 +19082,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          are suitable for resampling using \xroutine{TRANNDF}.  Supposing that
          they were originally aligned in SKY coordinates they could
          not have been resampled by \routine{TRANNDF} in their initial state,
-         since the SKY coordinates have units of radians, which 
+         since the SKY coordinates have units of radians, which
          are much too large compared to pixels.
       }
    }
@@ -19235,29 +19235,29 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 }
 
 \newpage
-\section{\xlabel{transformregistration}\label{transformreg}Using 
+\section{\xlabel{transformregistration}\label{transformreg}Using
          TRANSFORM structures for registration}
 
 In previous versions of CCDPACK a different method was used
 for registration, which relied only on object matching and
-stored coordinate mapping information in 
+stored coordinate mapping information in
 \xref{TRANSFORM (SUN/61)}{sun61}{} structures in the CCDPACK
-extension of the images. 
+extension of the images.
 If you are used to this way of doing things do not despair!
 In the first place,
 the object matching methods appear to work just the same as
 before (i.e.\ a CCDPACK script which used to perform registration,
 resampling and combination should still do so),
-although the routines are now storing coordinate 
+although the routines are now storing coordinate
 system information in a different way.
 Furthermore, all the programs retain their ability to read transformation
 information written as TRANSFORM structures,
 for backward compatibility
 with files which have already been partially processed by CCDPACK.
 
-The applications 
-\routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, and 
-\routine{TRANNDF} 
+The applications
+\routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, and
+\routine{TRANNDF}
 write and (by default) read coordinate system
 information using coordinate systems attached to images, but retain options
 which allow them to read the old TRANSFORM structures on request.
@@ -19331,7 +19331,7 @@ linear transformations).
 \subsection{Transforming\xlabel{transformingpositions} position lists}
 
 As explained in
-\hyperref{the section on position lists}{\S}{}{using_position_lists}, 
+\hyperref{the section on position lists}{\S}{}{using_position_lists},
 when a position list is associated with an image which has
 suitable coordinate systems attached to it,
 explicit transformation of positions in the list is usually not necessary,
@@ -19341,10 +19341,10 @@ into the Current coordinate system automatically.
 When dealing with the old TRANSFORM-based methods however this can be required,
 and it may occasionally be wanted when using the new coordinate system
 methods, for instance for examination of image coordinates by
-a human or a program other than a CCDPACK one, or if 
+a human or a program other than a CCDPACK one, or if
 position lists are still needed for some reason after the
 image is resampled.
-In these cases, the coordinates of each point in a position 
+In these cases, the coordinates of each point in a position
 list can be transformed using the routine:
 \begin{itemize}
 \item \xroutine{TRANLIST}
@@ -19357,19 +19357,19 @@ list can be transformed using the routine:
 \item general algebraic expressions.
 \end{itemize}
 The first method uses the usual format for passing transformation
-information between CCDPACK applications 
-and the second uses the format which served 
+information between CCDPACK applications
+and the second uses the format which served
 that purpose in previous versions of CCDPACK.
 The third uses the coefficients of a linear transform and the fourth
 allows you to transform a list using the algebraic expressions which are
 understood by the \xref{TRANSFORM package (SUN/61)}{sun61}{}.
 
 Transforming positions using transform structures is usually
-straight-forward, provided you've registered your data and 
+straight-forward, provided you've registered your data and
 entered this information into the images using \xroutine{REGISTER},
 or have added coordinate systems or TRANSFORM structures in some other way.
 
-Transforming positions selected from one dataset 
+Transforming positions selected from one dataset
 (say using the \xroutine{IDICURS}
 application) to a reference coordinate system (or vice-versa), is
 fairly straight-forward given registered datasets. It is also possible
@@ -19398,15 +19398,15 @@ position list \text{image.approx} and associated with the image.
 \text{img.acc} which is now associated with the image.
 \item \xroutine{TRANLIST} transforms the new positions from pixel coordinates
 to the CCD\_REG coordinate system
-\item \xroutine{TRANLIST} now transforms the positions from pixel 
+\item \xroutine{TRANLIST} now transforms the positions from pixel
 coordinates to the Current coordinate system of \text{newimg}.
 \end{enumerate}
 The final command is more complex as the mapping to be used is not
 associated with the image with which the position list to be transformed
 is associated, so it is necessary to give the location of the WCS
-component where the coordinate system information can be found.  
-This exemplifies why storing the transformations in 
-a standard way that all the CCDPACK applications know about is 
+component where the coordinate system information can be found.
+This exemplifies why storing the transformations in
+a standard way that all the CCDPACK applications know about is
 such a good idea.
 
 Using linear coefficients is a quick way of applying offsets, scales and
@@ -19457,8 +19457,8 @@ more manageable levels (\text{x} and \text{y} are offset and scaled
 to some arbitrary level and now masquerade as \text{fx} and
 \text{fy}). This also allows quick modifications since only the values
 of the parameters need to be changed on re-runs.
-Note that a coordinate system representing a pincushion distortion 
-could be added instead to an image using \xroutine{WCSEDIT} 
+Note that a coordinate system representing a pincushion distortion
+could be added instead to an image using \xroutine{WCSEDIT}
 (described \hyperref{elsewhere}{in \S}{}{wcsdirect}).
 
 
@@ -19735,7 +19735,7 @@ CCDPACK can now also be used from the IRAF/CL command interpreter.
 
 More minor changes include:
 \begin{itemize}
-\item A new data combination method has been added. This is a 
+\item A new data combination method has been added. This is a
       sigma clipped median (``clipmed'').
 
 \item An error in calculating the variances when median stacking
@@ -19773,7 +19773,7 @@ these programs where limited to 40 files in total.
 
 The propagation of QUALITY in the \xroutine{MAKEBIAS},
 \xroutine{MAKECAL}, \xroutine{MAKEFLAT} and
-\xroutine{MAKEMOS} applications has been suppressed. A bug in 
+\xroutine{MAKEMOS} applications has been suppressed. A bug in
 \xroutine{TRANNDF} when
 propagating QUALITY has been corrected.
 
@@ -19788,14 +19788,14 @@ A minor update to CCDPACK.
 \item  The \xroutine{CCDALIGN} application has been changed so that images of
   different sizes are displayed at different scales.
 
-\item  The \xroutine{FLATCOR} application has been changed to trap 
+\item  The \xroutine{FLATCOR} application has been changed to trap
   divide by zero on Linux and OSF/1.
 
 \item  The \xroutine{FINDOBJ} application has been changed so that the
   error resulting from not detecting objects on an image may be
-  overriden. 
+  overriden.
 
-\item There was a problem, under Linux, with the \xroutine{DEBIAS} 
+\item There was a problem, under Linux, with the \xroutine{DEBIAS}
       application not accepting a saturation value. This is now fixed.
 \end{itemize}
 
@@ -19842,11 +19842,11 @@ This is a major update to CCDPACK.
 \begin{itemize}
 \item
     CCDPACK has been revised to be aware of, and use, the World Coordinate
-    System (WCS) components of NDFs - see 
+    System (WCS) components of NDFs - see
     \xref{SUN/95}{sun95}{se_wcsuse} and \xref{SUN/210}{sun210}{}.
     This has had the following effects on  the package:
     \begin{itemize}
-    \item 
+    \item
     Some new applications have been introduced:
        \begin{itemize}
        \item \xroutine{ASTEXP} --
@@ -19867,30 +19867,30 @@ This is a major update to CCDPACK.
 
     \item
     Coordinate transformations are now stored using AST coordinate
-    frames in the WCS components of NDFs, rather than using 
+    frames in the WCS components of NDFs, rather than using
     TRANSFORM structures stored in the .MORE.CCDPACK extension.
-    For backward compatibility however all applications retain their 
+    For backward compatibility however all applications retain their
     old ability to read TRANFORM structures.
 
-    The position list coordinates dealt with by FINDOFF and 
+    The position list coordinates dealt with by FINDOFF and
     REGISTER are now by default converted from pixel coordinates to
-    the Current coordinate system before use (USEWCS parameter).  
+    the Current coordinate system before use (USEWCS parameter).
     In addition FINDOFF can optionally restrict attempted object
     matches to regions expected to overlap (RESTRICT parameter).
 
     The following tasks are affected:
        \begin{itemize}
-       \item \xroutine{FINDOFF} --   new parameters 
+       \item \xroutine{FINDOFF} --   new parameters
           \text{maxdisp}, \text{restrict}, \text{usewcs}
-       \item \xroutine{REGISTER} --  new parameters 
+       \item \xroutine{REGISTER} --  new parameters
           \text{outdomain}, \text{simpfi}, \text{simpif}, \text{usewcs},
           \text{wcsfile}
-       \item \xroutine{TRANLIST} --  new parameters 
-          \text{framein}, \text{epochin}, \text{frameout}, 
+       \item \xroutine{TRANLIST} --  new parameters
+          \text{framein}, \text{epochin}, \text{frameout},
           \text{epochout}, \text{wcsfile}
-       \item \xroutine{TRANNDF} --   new parameter  
+       \item \xroutine{TRANNDF} --   new parameter
           \text{usewcs}
-       \item \xroutine{MAKEMOS} --   new parameters 
+       \item \xroutine{MAKEMOS} --   new parameters
           \text{correct}, \text{writesz}
        \end{itemize}
     The following script is affected:
@@ -19900,7 +19900,7 @@ This is a major update to CCDPACK.
 
     \item
     All applications now propagate WCS components where appropriate.
-    This affects, in addition to those mentioned above, 
+    This affects, in addition to those mentioned above,
     the following applications:
        \begin{itemize}
        \item \xroutine{CALCOR}
@@ -19914,14 +19914,14 @@ This is a major update to CCDPACK.
     The package now requires AST 1.4 to build.
     \end{itemize}
 \item
-    A new application, \xroutine{DRIZZLE}, has been introduced.  
+    A new application, \xroutine{DRIZZLE}, has been introduced.
     This resamples and
     combines images in one step, optionally normalising them at the same
-    time.  It uses the variable-pixel linear reconstruction, or 
+    time.  It uses the variable-pixel linear reconstruction, or
     ``drizzling'' algorithm, which is well suited for combination of
     multiple dithered undersampled images.
 \item
-    \xroutine{FINDOFF} 
+    \xroutine{FINDOFF}
     will now deal with position lists having as few as one object
     in common.  This capability will principally be of use in conjunction
     with the new WCS awareness of the package.
@@ -19931,7 +19931,7 @@ This is a major update to CCDPACK.
     \begin{itemize}
     \item \routine{NAGMAKEMOS} -- \xroutine{MAKEMOS} should be used instead.
     \end{itemize}
-\item  
+\item
     There are other some minor changes in behaviour:
     \begin{itemize}
     \item
@@ -19939,10 +19939,10 @@ This is a major update to CCDPACK.
        \begin{itemize}
        \item
           FINDOFF erases the associated position list of NDFs which
-             cannot be matched instead of leaving the previously 
+             cannot be matched instead of leaving the previously
              associated list.
        \item
-          REGISTER ignores NDFs without associated position lists 
+          REGISTER ignores NDFs without associated position lists
              instead of exiting.
        \end{itemize}
     \item
@@ -19955,7 +19955,7 @@ This is a major update to CCDPACK.
   Release 3.0-1 makes a few non-user-visible code modifications and minor
   documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
   parameter of \xroutine{MAKEMOS} is also withdrawn and the defaults of
-  the CORRECT parameters in \xroutine{MAKEMOS} and \xroutine{DRIZZLE} 
+  the CORRECT parameters in \xroutine{MAKEMOS} and \xroutine{DRIZZLE}
   correspondingly modified.
 
 \subsection{Release 3.1-0}
@@ -19964,35 +19964,35 @@ This is a major update to CCDPACK.
 \begin{itemize}
 \item
   As of this release, the handling of group parameters is done using
-  the GRP and NDG libraries as in some other Starlink packages, notably 
-  \xref{KAPPA}{sun95}{}.  
-  For most purposes behaviour will be unchanged, 
+  the GRP and NDG libraries as in some other Starlink packages, notably
+  \xref{KAPPA}{sun95}{}.
+  For most purposes behaviour will be unchanged,
   but now when specifying a list of images, the name of an HDS container
-  file holding several NDFs may be given, and each of the contained NDFs 
+  file holding several NDFs may be given, and each of the contained NDFs
   will be processed as a separate image.  This affects almost all the
   CCDPACK tasks.
 \item
   \xroutine{DRIZZLE} has been substantially speeded up and some bugs removed.
 \item
-  The percentile location algorithm in \xroutine{FINDOBJ} has been improved to 
-  deal better with images containing a few rogue pixels with far 
+  The percentile location algorithm in \xroutine{FINDOBJ} has been improved to
+  deal better with images containing a few rogue pixels with far
   outlying values.
 \item
   The \xroutine{IMPORT} task has been improved so that it can use hierarchical
-  FITS header keywords, and values in FITS headers of the form 
+  FITS header keywords, and values in FITS headers of the form
   '[X1:X2,Y1:Y2]'.
 \item
-  The behaviour of \xroutine{IDICURS} and \xroutine{PAIRNDF} and 
+  The behaviour of \xroutine{IDICURS} and \xroutine{PAIRNDF} and
   on TrueColor visuals (typically newer Linux X displays)
   has been improved; they now signal an error rather than just crashing.
   In a future release these applications will be replaced by ones which
   run properly on these visuals.
 \item
-  An improved version of the AST file INT-WFC.ast, for astrometry of 
+  An improved version of the AST file INT-WFC.ast, for astrometry of
   frames from the WFC mosaic camera on the Isaac Newton Telescope,
   has been included in the distribution.
 \item
-  Additional FITS header translation tables INTWIDEFLAT.DAT, 
+  Additional FITS header translation tables INTWIDEFLAT.DAT,
   INTWIDESKY.DAT, WHT2000FLAT.DAT and WHT2000SKY.DAT have been added
   for use with the IMPORT task.
 \end{itemize}
@@ -20003,7 +20003,7 @@ This is a major update to CCDPACK.
 \begin{itemize}
 \item
   There has been a bugfix which affects median stacking in
-  \xroutine{MAKEBIAS} \xroutine{MAKECAL}, \xroutine{MAKEFLAT} and 
+  \xroutine{MAKEBIAS} \xroutine{MAKECAL}, \xroutine{MAKEFLAT} and
   \xroutine{MAKEMOS}.  Previously when METHOD=MEDIAN and variances
   were not being used, some pixels received the wrong weighting.
   This has now been fixed.
@@ -20037,11 +20037,11 @@ This is a major update to CCDPACK.
   \item[{\bf Interactive registration programs:}]\mbox{}\\
      The following programs have been completely rewritten:
      \begin{itemize}
-     \item \xroutine{IDICURS} -- 
+     \item \xroutine{IDICURS} --
            Views and writes position lists interactively
-     \item \xroutine{PAIRNDF} -- 
+     \item \xroutine{PAIRNDF} --
            Aligns images graphically by drag and drop
-     \item \xroutine{CCDALIGN} -- 
+     \item \xroutine{CCDALIGN} --
            Aligns images graphically by interactive object selection
      \end{itemize}
      They now feature a much more intuitive, powerful and easy to use
@@ -20055,7 +20055,7 @@ This is a major update to CCDPACK.
      The following new program has been added for viewing images and
      their alignment:
      \begin{itemize}
-     \item \xroutine{DRAWNDF} -- 
+     \item \xroutine{DRAWNDF} --
            Draws aligned images or outlines on a graphics display
      \end{itemize}
      It will plot the outline, or the pixels, or both of one or more
@@ -20072,14 +20072,14 @@ This is a major update to CCDPACK.
         when NDFNAMES=false, have been fixed.
 
       \item
-        \xroutine{FINDOFF} will now 
+        \xroutine{FINDOFF} will now
         propagate values in trailing columns from the
         input to output position lists.
 
       \item
-        \xroutine{PLOTLIST} has been modified to interact with the 
+        \xroutine{PLOTLIST} has been modified to interact with the
         \xref{AGI}{sun48}{} database
-        in a more \xref{KAPPA}{sun95}{}-compatible way, so that 
+        in a more \xref{KAPPA}{sun95}{}-compatible way, so that
         alignment with KAPPA
         graphical output should be improved.
 
@@ -20088,18 +20088,18 @@ This is a major update to CCDPACK.
         location routine used by \xroutine{FINDOBJ}.
 
       \item
-        The MODIFIED parameter of \xroutine{WCSEDIT} 
+        The MODIFIED parameter of \xroutine{WCSEDIT}
         has been withdrawn and replaced
         by the NAMELIST parameter.
 
       \item
-        \xroutine{TRANNDF} will now (sensibly) 
+        \xroutine{TRANNDF} will now (sensibly)
         refuse to resample into a SkyFrame.
 
      \item
         There is improved crossreferencing in \xref{SUN/139}{sun139}{}
         from ``See also'' sections in the
-        \htmlref{task descriptions Appendix}{descriptions} 
+        \htmlref{task descriptions Appendix}{descriptions}
         back to the main text.
 
      \item
@@ -20113,7 +20113,7 @@ This is a major update to CCDPACK.
 
 \subsection{Release 4.0-11}
 
-  \begin{description}  
+  \begin{description}
   \item[{\bf FINDOFF bug:}]\mbox{}\\
     A bug which caused problems with OVERRIDE=TRUE in FINDOFF has been
     fixed.  This is only likely to have caused problems to ORAC-DR users.
@@ -20132,13 +20132,13 @@ This is a major update to CCDPACK.
   \begin{description}
   \item[{\bf TRANNDF modification:}]\mbox{}\\
     In TRANNDF a copy of the pre-transformation PIXEL coordinate system
-    will be preserved, under the name CCD\_OLDPIXEL, in the World 
+    will be preserved, under the name CCD\_OLDPIXEL, in the World
     Coordinate System component of the transformed image.
 
   \item[{\bf Bugfixes}]\mbox{}\\
     \begin{itemize}
       \item
-        A bug in which TRANNDF with linear interpolation failed to apply 
+        A bug in which TRANNDF with linear interpolation failed to apply
         flux conservation has been fixed.
       \item
         An improvement to the histogram determination routine used by FINDOBJ

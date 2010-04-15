@@ -27,11 +27,11 @@
 {-
 
 {   Define main package help
- 
+
 defhelp ndprogs     $NDPROGS_HELP 0
 defstring ndprogshelp help ndprogs
 defstring ndp_help help ndprogs
- 
+
 {   Basic command definitions.
 
 define addnd         $NDPROGS_DIR/ndprogs_mon addnd

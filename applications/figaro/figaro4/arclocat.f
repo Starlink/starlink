@@ -191,7 +191,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -391,7 +391,7 @@
          CALL SPD_WZJA( MODE, NCOMP, TNPAR, %VAL( CNF_PVAL(PNTR(8)) ),
      :                  %VAL(CNF_PVAL(PNTR(7))),
      :                  %VAL(CNF_PVAL(PNTR(11)) ), STATUS,
-     :                  %VAL(CNF_CVAL(LEN(MODE))), 
+     :                  %VAL(CNF_CVAL(LEN(MODE))),
      :                  %VAL(CNF_CVAL(XCLEN)), %VAL(CNF_CVAL(XCLEN)) )
 
 *     Release the results' extension vectors.

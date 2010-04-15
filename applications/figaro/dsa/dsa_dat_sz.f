@@ -22,11 +22,11 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
 C                      with the structure.
-C     (>) MAX_DIM      (Integer,ref) The maximum number of dimensions 
-C                      for the data.  
+C     (>) MAX_DIM      (Integer,ref) The maximum number of dimensions
+C                      for the data.
 C     (<) NDIM         (Integer,ref) The actual number of dimensions in
 C                      the data.
-C     (<) DIMS         (Integer array,ref) The number of elements in 
+C     (<) DIMS         (Integer array,ref) The number of elements in
 C                      each axis of the data.  Elements DIMS(NDIM+1)
 C                      to DIMS(MAX_DIM) if any, are set to 1.
 C     (<) ELEMENTS     (Integer,ref) The total number of elements in the
@@ -127,7 +127,7 @@ C     since if it doesn't exist we can tell that from the bad status
 C     we'll get from DSA_MAIN_SIZE.  However, especially now that DSA
 C     makes more use of structured arrays, it's more important to be able
 C     to put out decent error messages if the structure isn't valid.
-C     
+C
       CALL DTA_STRUC (OBJ_NAME(:LENGTH),STRUCT,DTA_STATUS)
       IF (STRUCT) CALL DSA__DATA_NAME (REF_SLOT,OBJ_NAME,LENGTH)
       CALL DSA_ARRAY_EXIST (OBJ_NAME(:LENGTH),EXIST,STATUS)

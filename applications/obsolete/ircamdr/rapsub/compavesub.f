@@ -1,7 +1,7 @@
 
 *+  COMPAVESUB - compresses an image by averaging over several input pixels
 
-      SUBROUTINE COMPAVESUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, ODIMS1, 
+      SUBROUTINE COMPAVESUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, ODIMS1,
      :                        ODIMS2, COMPRESS, STATUS )
 
 *    Description :
@@ -38,7 +38,7 @@
 *     length of the input array x dimension, each column in the
 *     input is summed over the calculated number of rows, and then
 *     the columns are summed over the same calculated number and
-*     divided by the total number of pixels that were summed over 
+*     divided by the total number of pixels that were summed over
 *     to form a row of output pixels. The rolling array is then re-
 *     initialised and is used again to sum over the next set of
 *     rows and so on, until all the rows of the output image have
@@ -47,7 +47,7 @@
 *    Deficiencies :
 *
 *     Maximum input array x dimension is 2048, not adjustable.
-*     
+*
 *    Bugs :
 *
 *     None known.
@@ -78,12 +78,12 @@
      :    COMPRESS         ! the linear compression factor to be used
 
       REAL
-     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array 
+     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array
 
 *    Export :
 
       REAL
-     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array 
+     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array
 
 *    Status :
 
@@ -111,7 +111,7 @@
          RETURN
       ENDIF
 
-*    work out the size of box which we average over in the input 
+*    work out the size of box which we average over in the input
 *    image to create one new pixel in the output image - having used
 *    integer arithmetic in to calculate the output dimensions from
 *    the input dimensions and the compression factor, we can be
@@ -133,7 +133,7 @@
 *       calculate next start and end rows in  the input image which
 *       the current output row will come from
 
-         STARTROW  =  ( ( J - 1 ) * COMPRESS ) + 1      
+         STARTROW  =  ( ( J - 1 ) * COMPRESS ) + 1
          ENDROW    =  STARTROW + COMPRESS - 1
 
 *       now loop round these rows and all the input columns to get
@@ -147,7 +147,7 @@
 
 *       now loop round the number of columns in the output image,
 *       compressing the rolling row in the x direction
-       
+
          DO  I  =  1, ODIMS1
 
 *          first re-initialise the running total
@@ -158,13 +158,13 @@
 *          that go to make up the current output image column
 
             STARTCOL  =  ( ( I - 1 ) * COMPRESS ) + 1
-            ENDCOL    =  STARTCOL + COMPRESS - 1 
+            ENDCOL    =  STARTCOL + COMPRESS - 1
 
-*          loop around the appropriate columns in the input image 
+*          loop around the appropriate columns in the input image
 *          which make up the current column of the output image
 
             DO  M  =  STARTCOL, ENDCOL
-               RUNTOT  =  RUNTOT + ROW( M )        
+               RUNTOT  =  RUNTOT + ROW( M )
             END DO
 
 *          finally divide the total by the number of pixels that went

@@ -63,7 +63,7 @@ int mers1Getenv( int usemsg, const char * param, int * status );
 void err1Bell( int * status );
 void err1Flush ( int usemsg, int * errbel, int * status );
 void err1Prerr( const char * text, int * status );
-void err1Print( const char * text, const char * prefix, 
+void err1Print( const char * text, const char * prefix,
                 int * errbel, int * status );
 
 void err1Gtglbl( int *errwsz, int *errstm, int *errrvl );

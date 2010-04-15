@@ -1,11 +1,11 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 #
-# !!begin 
+# !!begin
 # !!title    Debiassing script
 # !!author   T.R. Marsh
 # !!created  14 January 2001
 # !!revised  08 December 2005
-# !!root     debias 
+# !!root     debias
 # !!index    debias.pl
 # !!descr    Perl script for debiassing multiple files
 # !!head1    Debiassing script
@@ -22,7 +22,7 @@
 # debias bias_frame bias_region file1 file2 ...
 #
 # !!head2 Arguments
-# 
+#
 # !!table
 # !!arg{bias_frame}{a mean bias frame to subtract. specify a null frame if
 # you don't want to do this}
@@ -44,7 +44,7 @@ my $bias_region = shift or die "No bias region file supplied.\n";
 -f $bias_region or die "$bias_region is not a plain file.\n";
 -r $bias_region or die "$bias_region not readable.\n";
 
-# Strip off trailing .sdf, check that files exist, 
+# Strip off trailing .sdf, check that files exist,
 # are not directories, and are readable
 
 my $file;
@@ -72,36 +72,36 @@ print DEBIAS "source \$STARLINK_DIR/etc/login; source \$STARLINK_DIR/etc/cshrc\n
 print DEBIAS "figaro\n";
 print DEBIAS "pamela\n\n";
 print DEBIAS "set verbose\n\n";
-    
+
 foreach $file (@ARGV){
     $file =~ s/\.sdf//;
 
     print DEBIAS "echo \" \"\n";
 
     print DEBIAS "echo \"Processing file = $file\"\n\n";
-    
+
     print DEBIAS "set test = \`hdstrace $file.more | awk \'/DEBIAS/{print \$1}\'\`\n";
-    
+
 # subtraction of constant frame
-    
+
     print DEBIAS "if ( \"\$test\" != \"DEBIAS\" ) then\n";
-    
+
     print DEBIAS "   creobj type=_LOGICAL dims=0 object=$file.MORE.DEBIAS\n";
-    
+
     print DEBIAS "   isub image=$file image1=$bias_frame output=$file\n\n";
-    
+
     print DEBIAS "else\n";
-    
+
     print DEBIAS "   echo \"$file has already had a bias frame subtracted\"\n\n";
-    
+
     print DEBIAS "endif\n\n";
-    
+
 # subtraction of constant
-    
+
     print DEBIAS "picstat image=$file streg=$bias_region clip=3 plot=no\n\n";
-    
+
     print DEBIAS "icsub image=$file factor=@\$ADAM_USER/GLOBAL.PIC_MEAN output=zzz_junk\n\n";
-    
+
     print DEBIAS "\\mv -v zzz_junk.sdf $file.sdf\n\n";
 }
 

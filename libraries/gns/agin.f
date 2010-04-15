@@ -82,4 +82,4 @@
       L = 4 + (LEN(CM)-I) + 1 + (LEN(CN)-J)
 
       END
-       
+

@@ -76,7 +76,7 @@
 *     22-Feb-1993: Conform to error strategy                    (PND)
 *     17-Dec-1993: Update for NDFs and use RESHAPE_DATA         (PND)
 *     11-Jan-1994: Replace COERCE_DATA_ARRAY with RESHAPE_DATA  (PND)
-*      2-Mar-1994: Update for IRCAM                             (PND) 
+*      2-Mar-1994: Update for IRCAM                             (PND)
 *     23-Mar-1994: Update for IRCAM3                            (PND)
 *     17-Apr-1995: Allow any array size for wavelength calib    (PND)
 *    endhistory
@@ -179,7 +179,7 @@
       INTSIZE   = DSA_TYPESIZE( 'INT', STATUS )
       SHORTSIZE = DSA_TYPESIZE( 'SHORT', STATUS )
 
-*    Input the observation file 
+*    Input the observation file
       CALL RED4_CHECK_INPUT( OBSFILE, STATUS )
       CALL DSA_NAMED_INPUT ('OBSERVATION', OBSFILE, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -202,7 +202,7 @@
      :     /'^OBSRED', STATUS )
       END IF
 
-*    Open an output file based upon the template 
+*    Open an output file based upon the template
       CALL DSA_NAMED_INPUT ('OBSRED_TEMPLATE', OBSRED_TEMPLATE, STATUS)
       CALL DSA_NAMED_OUTPUT ('OBSRED', OBSRED, 'OBSRED_TEMPLATE',
      :   0, 1, STATUS)
@@ -211,7 +211,7 @@
       CALL DSA_USE_QUALITY ('OBSRED', STATUS)
 
 *   Copy over the entire contents of the FITS structure
-      CALL RED4_COPY_STRUCTURE( 'OBSERVATION.'//FITS_STRUCTURE, 
+      CALL RED4_COPY_STRUCTURE( 'OBSERVATION.'//FITS_STRUCTURE,
      :   'OBSRED.'//FITS_STRUCTURE, STATUS )
       IF ( STATUS.NE.SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -233,10 +233,10 @@
 
 *       get number of detector positions
          EXIST = .FALSE.
-         CALL DSA_SEEK_FITS( 'OBSERVATION', 'DETNINCR', EXIST, 
+         CALL DSA_SEEK_FITS( 'OBSERVATION', 'DETNINCR', EXIST,
      :      ACCESS, ELEMENTS, STRLEN, STATUS )
          IF ( EXIST ) THEN
-            CALL DSA_GET_FITS_I( 'OBSERVATION', 'DETNINCR', 0, 
+            CALL DSA_GET_FITS_I( 'OBSERVATION', 'DETNINCR', 0,
      :        DET_NINCR, COMMENT, STATUS )
          ELSE
             STATUS = SAI__ERROR
@@ -256,7 +256,7 @@
 
 *       the size of the steps
          EXIST = .FALSE.
-         CALL DSA_SEEK_FITS( 'OBSERVATION', 'DETINCR', EXIST, 
+         CALL DSA_SEEK_FITS( 'OBSERVATION', 'DETINCR', EXIST,
      :      ACCESS, ELEMENTS, STRLEN, STATUS )
          IF ( EXIST ) THEN
             CALL DSA_GET_FITS_F( 'OBSERVATION', 'DETINCR', 0, DET_INCR,
@@ -318,7 +318,7 @@
       OVERSAMPLING = DET_NINCR / SUPERSAMPLING
 
 *   If supersampling, check that there are a whole number of detector
-*   positions per pixel. 
+*   positions per pixel.
       IF ( SUPERSAMPLING .GT. 1 ) THEN
 
          DPPIXEL= REAL( DET_NINCR ) / REAL( SUPERSAMPLING )
@@ -338,7 +338,7 @@
       DIMS(2) = DET_SIZE(2)
       NELM = DIMS(1) * DIMS(2)
       CALL DSA_RESHAPE_DATA ('OBSRED', 'OBSRED', MAXDIMS, DIMS,
-     :  STATUS) 
+     :  STATUS)
       IF (STATUS .NE. SAI__OK) THEN
 
          STATUS = SAI__ERROR
@@ -382,8 +382,8 @@
       CALL DSA_NAMED_INPUT ('COADDS', OBSRED(:ICH_LEN(OBSRED))//
      :  '.MORE.CGS4_COADDS', STATUS)
       CALL DSA_COERCE_DATA_ARRAY ('COADDS', 'SHORT', MAXDIMS, DIMS,
-     :  STATUS) 
-      CALL DSA_MAP_DATA ('COADDS', 'WRITE', 'SHORT', COADDS_PTR, 
+     :  STATUS)
+      CALL DSA_MAP_DATA ('COADDS', 'WRITE', 'SHORT', COADDS_PTR,
      :   COADDS_SLOT, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -449,12 +449,12 @@
          END IF
       END IF
 
-      IF ( VERBOSE .AND. PROCEED_LAMBDA ) 
+      IF ( VERBOSE .AND. PROCEED_LAMBDA )
      :  CALL MSG_OUT( ' ', 'Wavelength calibration enabled', STATUS )
 
-*    Now we must construct the axis1 array and the index arrays that 
+*    Now we must construct the axis1 array and the index arrays that
 *    point the data taken at each position to the appropriate slots in
-*    the main array. This is done even for the cases where the 
+*    the main array. This is done even for the cases where the
 *    detector isn't moved, seems simpler that way.
 *    Open the index structure, create the appropriate size array in that
 *    and map it in (stored as SHORT to save space, but note that it is
@@ -466,12 +466,12 @@
       IND_NELM = IND_DIMS(1) * IND_DIMS(2)
       CALL DSA_COERCE_DATA_ARRAY ('INDEX', 'SHORT', MAXINDDIMS,
      :   IND_DIMS, STATUS)
-      CALL DSA_MAP_DATA ('INDEX', 'WRITE', 'INT', INDEX_PTR, 
+      CALL DSA_MAP_DATA ('INDEX', 'WRITE', 'INT', INDEX_PTR,
      :   INDEX_SLOT, STATUS)
 
 *    Initialise the index array to zero, to ensure there are no
 *    numeric errors when it is converted from INT to WORD.
-      CALL GEN_FILL( INTSIZE*IND_NELM, 0, %val(INDEX_PTR) ) 
+      CALL GEN_FILL( INTSIZE*IND_NELM, 0, %val(INDEX_PTR) )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -483,7 +483,7 @@
 *   wavelength calibration is required.
 *   If ESTIMATED wavelength calibration is required, the values are
 *   calculated from the grating central wavelength and dispersion.
-*   If CALIBRATED wavelength calibration is required, the X-axis 
+*   If CALIBRATED wavelength calibration is required, the X-axis
 *   structure is copied from a CALIBRATION observation.
 *   If no wavelength calibration is required, the axis1 array is filled
 *   with pixel co-ordinates.
@@ -493,7 +493,7 @@
 *      Determine the calibration method required.
          IF ( LAMBDA_METHOD .EQ. 'ESTIMATED' ) THEN
 
-           IF( VERBOSE ) CALL MSG_OUT( ' ', 
+           IF( VERBOSE ) CALL MSG_OUT( ' ',
      :       'Estimating wavelength scale from grating dispersion', STATUS )
 
 *         A wavelength scale estimated from the grating parameters is required.
@@ -511,11 +511,11 @@
                CALL ERR_REP( ' ', 'RED4_MAKE_OBSREDFILE: '/
      :           /'Fourth error getting FITS items', STATUS )
             END IF
-   
+
             IF ( ( GLAMBDA .LE. 0.0 ) .OR.
      :           ( ABS(GDISP) .LT. 1.0E-10 ) ) THEN
 
-               CALL MSG_OUT( ' ', 'WARNING - Grating parameters are '/ 
+               CALL MSG_OUT( ' ', 'WARNING - Grating parameters are '/
      :           /'invalid. A pixel scale will be used.', STATUS )
                GLAMBDA = REAL( DET_SIZE(1) / 2 )
                GDISP   = 1.0
@@ -528,7 +528,7 @@
      :           STATUS )
                CALL MSG_SETR( 'GLAMBDA', GLAMBDA )
                CALL MSG_SETI( 'CP', DET_SIZE(1)/2 )
-               CALL MSG_OUT( ' ', 'Central (pixel ^CP) wavelength = '/ 
+               CALL MSG_OUT( ' ', 'Central (pixel ^CP) wavelength = '/
      :           /'^GLAMBDA microns.', STATUS )
                CALL MSG_SETR( 'GDISP', GDISP )
                CALL MSG_OUT( ' ', 'Grating dispersion = ^GDISP '/
@@ -536,7 +536,7 @@
             END IF
 
 *         Map the AXIS1 array.
-            CALL DSA_MAP_AXIS_DATA ('OBSRED', 1, 'WRITE', 'FLOAT', 
+            CALL DSA_MAP_AXIS_DATA ('OBSRED', 1, 'WRITE', 'FLOAT',
      :         AXIS1_PTR, AXIS1_SLOT, STATUS)
 
 *         Calculate the axis1 values, sort them into ascending order and fill
@@ -551,8 +551,8 @@
 
             IF (STATUS .EQ. SAI__OK) THEN
 
-               CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR), 
-     :            %val(INDEX_PTR), DIMS(1), 
+               CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR),
+     :            %val(INDEX_PTR), DIMS(1),
      :            IND_DIMS(1), DET_INCR, DET_NINCR, GLAMBDA, GDISP,
      :            STATUS)
             ENDIF
@@ -560,11 +560,11 @@
 *         Set up the label and units for the X axis.
             CHAR_ARRAY(1) = 'microns'
             CHAR_ARRAY(2) = 'Estimated wavelength'
-            CALL DSA_SET_AXIS_INFO( 'OBSRED', 1, NINFO, CHAR_ARRAY, 0, 
+            CALL DSA_SET_AXIS_INFO( 'OBSRED', 1, NINFO, CHAR_ARRAY, 0,
      :        DIGNORE, STATUS )
          ELSE
 
-           IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+           IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :       'Calibrating wavelength scale using '/
      :      /'previous reduced observation', STATUS )
 
@@ -610,7 +610,7 @@
 *            But copying the .X structure is exactly what we want to do!
 *            Unfortunately, this fudge has also removed the check that
 *            the .X structure in the CALIB structure exists.
-*              CALL RED4_COPY_STRUCTURE( 'CALIB.'//CALIB_STRUCTURE, 
+*              CALL RED4_COPY_STRUCTURE( 'CALIB.'//CALIB_STRUCTURE,
 *    :            'OBSRED.'//CALIB_STRUCTURE, STATUS )
 *              IF ( STATUS .NE. SAI__OK ) THEN
 *                 STATUS = SAI__ERROR
@@ -638,9 +638,9 @@
 *            Now the index array needs to be set up. The same routine
 *            is used as without wavelength calibration, but a dummy X
 *            array is filled.
-*            Map some workspace for the dummy axis1 array. 
+*            Map some workspace for the dummy axis1 array.
                CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', AXIS1_PTR,
-     :           AXIS1_SLOT, STATUS) 
+     :           AXIS1_SLOT, STATUS)
 
 *            Load dummy values into GLAMBDA and GDISP.
                GLAMBDA = REAL( DET_SIZE(1) / 2 )
@@ -657,8 +657,8 @@
 
                IF (STATUS .EQ. SAI__OK) THEN
 
-                  CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR), 
-     :               %val(INDEX_PTR), DIMS(1), 
+                  CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR),
+     :               %val(INDEX_PTR), DIMS(1),
      :               IND_DIMS(1), DET_INCR, DET_NINCR, GLAMBDA, GDISP,
      :               STATUS)
                ENDIF
@@ -674,7 +674,7 @@
 *            calibration had been asked for.
                CALL MSG_OUT( ' ', 'WARNING - No suitable reduced '/
      :           /'CALIBRATION observation found', STATUS )
-               CALL MSG_OUT( ' ', 'This observation will NOT be '/ 
+               CALL MSG_OUT( ' ', 'This observation will NOT be '/
      :           /'wavelength calibrated', STATUS )
 
 *            Define the wavelength parameters so that pixel units will be used
@@ -684,7 +684,7 @@
                GDISP   = 1.0
 
 *            Map the AXIS1 array.
-               CALL DSA_MAP_AXIS_DATA ('OBSRED', 1, 'WRITE', 'FLOAT', 
+               CALL DSA_MAP_AXIS_DATA ('OBSRED', 1, 'WRITE', 'FLOAT',
      :            AXIS1_PTR, AXIS1_SLOT, STATUS)
 
 *             Calculate the axis1 values, sort them into ascending order and
@@ -699,8 +699,8 @@
 
                IF (STATUS .EQ. SAI__OK) THEN
 
-                  CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR), 
-     :               %val(INDEX_PTR), DIMS(1), 
+                  CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR),
+     :               %val(INDEX_PTR), DIMS(1),
      :               IND_DIMS(1), DET_INCR, DET_NINCR, GLAMBDA, GDISP,
      :               STATUS)
                ENDIF
@@ -715,7 +715,7 @@
 
                   CPOS = 0
                   CHAR_ARRAY(2) = ' '
-                  CALL CHR_PUTC( 'Detector columns - ', 
+                  CALL CHR_PUTC( 'Detector columns - ',
      :              CHAR_ARRAY(2), CPOS )
                   CALL CHR_PUTI( DET_NINCR, CHAR_ARRAY(2), CPOS )
                   CALL CHR_PUTC( 'X', CHAR_ARRAY(2), CPOS )
@@ -734,7 +734,7 @@
          GDISP   = 1.0
 
 *      Map the AXIS1 array.
-         CALL DSA_MAP_AXIS_DATA ('OBSRED', 1, 'WRITE', 'FLOAT', 
+         CALL DSA_MAP_AXIS_DATA ('OBSRED', 1, 'WRITE', 'FLOAT',
      :      AXIS1_PTR, AXIS1_SLOT, STATUS)
 
 *       Calculate the axis1 values, sort them into ascending order and fill
@@ -749,8 +749,8 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
 
-            CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR), 
-     :         %val(INDEX_PTR), DIMS(1), 
+            CALL RED4_SETUP_AXIS1 (%val(AXIS1_PTR),
+     :         %val(INDEX_PTR), DIMS(1),
      :         IND_DIMS(1), DET_INCR, DET_NINCR, GLAMBDA, GDISP,
      :         STATUS)
          ENDIF
@@ -765,13 +765,13 @@
 
             CPOS = 0
             CHAR_ARRAY(2) = ' '
-            CALL CHR_PUTC( 'Detector columns - ', 
+            CALL CHR_PUTC( 'Detector columns - ',
      :        CHAR_ARRAY(2), CPOS )
             CALL CHR_PUTI( DET_NINCR, CHAR_ARRAY(2), CPOS )
             CALL CHR_PUTC( 'X', CHAR_ARRAY(2), CPOS )
          END IF
 
-         CALL DSA_SET_AXIS_INFO( 'OBSRED', 1, NINFO, CHAR_ARRAY, 0, 
+         CALL DSA_SET_AXIS_INFO( 'OBSRED', 1, NINFO, CHAR_ARRAY, 0,
      :     DIGNORE, STATUS )
       END IF
 
@@ -779,7 +779,7 @@
 *   any wavelength calibration or oversampling).
       CHAR_ARRAY(1) = ' '
       CHAR_ARRAY(2) = 'Detector rows'
-      CALL DSA_SET_AXIS_INFO( 'OBSRED', 2, NINFO, CHAR_ARRAY, 0, 
+      CALL DSA_SET_AXIS_INFO( 'OBSRED', 2, NINFO, CHAR_ARRAY, 0,
      :  DIGNORE, STATUS )
 
 *   Destination for error GOTOs

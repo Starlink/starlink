@@ -69,12 +69,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -229,39 +229,39 @@
 
          IF (CONVOK) THEN
             IF (FDTYPE .EQ. CAT__TYPEB) THEN
-               CALL CAT5_STAEB (ROWS, ROW, BVAL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT5_STAEB (ROWS, ROW, BVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-               CALL CAT5_STAEW (ROWS, ROW, WVAL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT5_STAEW (ROWS, ROW, WVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-               CALL CAT5_STAEI (ROWS, ROW, IVAL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT5_STAEI (ROWS, ROW, IVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-               CALL CAT5_STAER (ROWS, ROW, RVAL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT5_STAER (ROWS, ROW, RVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-               CALL CAT5_STAED (ROWS, ROW, DVAL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT5_STAED (ROWS, ROW, DVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-               CALL CAT5_STAEL (ROWS, ROW, LVAL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT5_STAEL (ROWS, ROW, LVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
@@ -277,19 +277,19 @@
                   END IF
                END IF
 
-               CALL CAT5_STCAE (ROWS, FCSIZE, ROW, CVAL, 
+               CALL CAT5_STCAE (ROWS, FCSIZE, ROW, CVAL,
      :                          %VAL(CNF_PVAL(PTR)),
      :           STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE
-               CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(CNF_PVAL(PTRN)), 
+               CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(CNF_PVAL(PTRN)),
      :                          STATUS)
 
             END IF
          ELSE
-            CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(CNF_PVAL(PTRN)), 
+            CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(CNF_PVAL(PTRN)),
      :                       STATUS)
 
          END IF

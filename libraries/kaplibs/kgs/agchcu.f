@@ -23,7 +23,7 @@
 *     IRM_STPEN.
 *
 *     To use this routine, it must be linked explicitly with the user
-*     program to override the default version in NCAR library.       
+*     program to override the default version in NCAR library.
 
 *  Arguments:
 *     See section 3.24.2 of AUTOGRAPH document.
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,9 +77,9 @@
 *        MCM_SOCUR = LOGICAL (Read)
 *           The flag to show whether the curve are draw in solid line.
 *        MCM_NCURV = INTEGER (Read)
-*           The number of curves which have been set pen number. 
-*           When the real number of curve exceed this value, the 
-*           routine will set the pen number in a circular fashion.      
+*           The number of curves which have been set pen number.
+*           When the real number of curve exceed this value, the
+*           routine will set the pen number in a circular fashion.
 *        MCM_CRPN( MCM__MXCUR ) = INTEGER (Read)
 *           Pen number for each curve.
 *        MCM_STDAT = INTEGER (Read)
@@ -96,7 +96,7 @@
       INTEGER STATUS             ! Global status
 *.
 
-*  If the variables in common block has been assigned values, 
+*  If the variables in common block has been assigned values,
 *  use the data. Otherwise do nothing.
       IF ( MCM_STDAT ) THEN
 
@@ -132,7 +132,7 @@
             CALL GSPLI( MCM_OLDPX )
             CALL GSTXCI( MCM_OLDTX )
          END IF
-      
+
       END IF
 
       END

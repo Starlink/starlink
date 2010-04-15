@@ -10,7 +10,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int rec_locate_block( int slot, INT_BIG bloc, char mode, 
+   int rec_locate_block( int slot, INT_BIG bloc, char mode,
 			 unsigned char **lrb )
    {
 /*+                                                                         */
@@ -156,7 +156,7 @@
 /* current Working Page List size.                                          */
             rec_alloc_mem( REC__SZBLK, (void **) &bcp->bloc );
             rec_gl_wplsize++;
-         }                      
+         }
 
 /* If the Free Page List is empty, then a BCP from the Working Page List    */
 /* must be re-used.                                                         */

@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -185,7 +185,7 @@
 *  centre of the string is to be placed.
       CALL SGS_STXJ( 'CC' )
 
-*  Format the vector scale value (data units per centimetre), remove 
+*  Format the vector scale value (data units per centimetre), remove
 *  leading blanks and get its used length.
       WRITE( VSCTXT, '(G9.2)' ) VSCALE
       CALL CHR_LDBLK( VSCTXT )
@@ -249,7 +249,7 @@
      :           0.7*( X2 - X1 )/( AR*REAL( MAXNC ) ) )
       CALL SGS_SHTX( HGT )
 
-*  Produce text describing the vector scale in words. 
+*  Produce text describing the vector scale in words.
       XC = 0.5*( X1 + X2 )
       YC = Y2 - HGT*0.6
       CALL SGS_TX( XC, YC, 'Vector scale:' )
@@ -274,11 +274,11 @@
          CALL SGS_CIRCL( XC, YC, MIN( 0.1*KEYLEN, ( X2 - X1 )*CIRAD ) )
 
       ELSE IF( JUST .EQ. 'START' ) THEN
-         CALL SGS_CIRCL( XC - 0.5*KEYLEN, YC, 
+         CALL SGS_CIRCL( XC - 0.5*KEYLEN, YC,
      :                   MIN( 0.1*KEYLEN, ( X2 - X1 )*CIRAD ) )
 
       ELSE
-         CALL SGS_CIRCL( XC + 0.5*KEYLEN, YC, 
+         CALL SGS_CIRCL( XC + 0.5*KEYLEN, YC,
      :                   MIN( 0.1*KEYLEN, ( X2 - X1 )*CIRAD ) )
       END IF
 
@@ -294,7 +294,7 @@
 
 *  Flush the graphics.
       CALL SGS_FLUSH
-      
+
 *  Re-select the original zone.
       CALL SGS_SELZ( ZONE0, STATUS )
 

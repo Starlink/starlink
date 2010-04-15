@@ -13,9 +13,9 @@
 *     CALL NDG_ENDGH( STATUS )
 
 *  Description:
-*     This routine should be called to mark the end of a GRP NDF 
-*     history block. The block should have been started by a 
-*     matching call to NDG_BEGGH. Note, GRP NDF history blocks must 
+*     This routine should be called to mark the end of a GRP NDF
+*     history block. The block should have been started by a
+*     matching call to NDG_BEGGH. Note, GRP NDF history blocks must
 *     not be nested.
 *
 *     During a GRP NDF history block, application code can register GRP
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -96,7 +96,7 @@
       INTEGER IGRP
       INTEGER INDF
       INTEGER IPATH
-      INTEGER NGRP         
+      INTEGER NGRP
       INTEGER NPATH
       INTEGER PLACE
       LOGICAL HASHIS
@@ -125,26 +125,26 @@
          CALL AST_MAPREMOVE( DHKMP_COM2, PATH, STATUS )
 
 *  Check no error has occurred.
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Get an NDF identifier for it.
-            CALL NDF_OPEN( DAT__ROOT, PATH, 'UPDATE', 'OLD', INDF, 
-     :                     PLACE, STATUS )            
+            CALL NDF_OPEN( DAT__ROOT, PATH, 'UPDATE', 'OLD', INDF,
+     :                     PLACE, STATUS )
 
 *  If the NDF could not be opened (e.g. if it was a temporary NDF
 *  that has since been deleted), annul the error and pass on.
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
-                      
+
 *  Otherwise, append a description of each registered GRP group to the
 *  current History record of the NDF.
             ELSE
                CALL NDG1_HWRGH( INDF, STATUS )
 
-*  If the NDF has a history component, set its history update mode to SKIP. 
-*  This means that no default history record will be added to the NDF when 
+*  If the NDF has a history component, set its history update mode to SKIP.
+*  This means that no default history record will be added to the NDF when
 *  it is closed below (one has already been written during the course of
-*  the application that has just finished), but the history update mode 
+*  the application that has just finished), but the history update mode
 *  stored in the NDF structure on disk will not be changed.
                CALL NDF_STATE( INDF, 'History', HASHIS, STATUS )
                IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF, STATUS )
@@ -160,9 +160,9 @@
 *  in the keymap.
       NGRP = AST_MAPSIZE( GHKMP_COM2, STATUS )
       DO I = 1, NGRP
-         KEY = AST_MAPKEY( GHKMP_COM2, I, STATUS ) 
+         KEY = AST_MAPKEY( GHKMP_COM2, I, STATUS )
          IF( AST_MAPGET0I( GHKMP_COM2, KEY, IGRP, STATUS ) ) THEN
-            CALL GRP_DELET( IGRP, STATUS ) 
+            CALL GRP_DELET( IGRP, STATUS )
          END IF
       END DO
 

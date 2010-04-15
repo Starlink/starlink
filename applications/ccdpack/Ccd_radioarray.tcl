@@ -113,7 +113,7 @@
 #        name used to refer to this button (in other methods) remains
 #        unchanged (i.e. that used in the original addbutton).
 #     resetvalue name value
-#        Reconfigures the named button to return the given value when active. 
+#        Reconfigures the named button to return the given value when active.
 #     state name button_state
 #        Set the state of the named button. "button_state" should be one
 #        of normal active or disabled. The name may be "all" in which
@@ -404,7 +404,7 @@
                   if { $adampars } {
                      addbutton true TRUE
                      addbutton false FALSE
-                  } else { 
+                  } else {
                      addbutton true 1
                      addbutton false 0
                   }
@@ -413,7 +413,7 @@
                   if { $adampars } {
                      resetvalue true TRUE
                      resetvalue false FALSE
-                  } else { 
+                  } else {
                      resetvalue true 1
                      resetvalue false 0
                   }

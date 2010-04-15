@@ -156,27 +156,27 @@
                   ELSE
 
                      STATUS = SAI__ERROR
-                     CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/ 
-     :                 /'Efficiency is greater than 100 percent!', 
+                     CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/
+     :                 /'Efficiency is greater than 100 percent!',
      :                 STATUS )
                      CALL MSG_SETR( 'USEFUL_TIME', USEFUL_TIME )
-                     CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/ 
+                     CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/
      :                 /'Total exposure time = ^USEFUL_TIME', STATUS )
                      CALL MSG_SETR( 'TOTAL_TIME', TOTAL_TIME )
-                     CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/ 
+                     CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/
      :                 /'Total elapsed time = ^TOTAL_TIME', STATUS )
                   END IF
                END IF
             ELSE
 
                STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/ 
+               CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/
      :           /'Invalid FITS items in data structure', STATUS )
                CALL MSG_SETR( 'USEFUL_TIME', USEFUL_TIME )
-               CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/ 
+               CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/
      :            /'Total exposure time = ^USEFUL_TIME', STATUS )
                CALL MSG_SETR( 'TOTAL_TIME', TOTAL_TIME )
-               CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/ 
+               CALL ERR_REP( ' ', 'RED4_EFFICIENCY_2: '/
      :            /'Total elapsed time = ^TOTAL_TIME', STATUS )
             END IF
          ELSE

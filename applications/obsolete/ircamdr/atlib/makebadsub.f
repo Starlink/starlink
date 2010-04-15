@@ -9,16 +9,16 @@
         INCLUDE 'FIO_PAR'
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
      :	  STATUS,
      :	  LUN,
      :	  J,
      :	  K,
      :	  NUMPIX,
      :	  BAD_NUMBER
-	REAL 
+	REAL
      :	  ARRIN( DIMSX, DIMSY),
      :	  SIGMA,
      :	  MEAN_VALUE,
@@ -68,7 +68,7 @@
 *      calculate maximum and minimum from sigma level
 	IF( ( DIMSX*DIMSY) .GT. 0) THEN
 	  MEAN_VALUE = SUM/( DIMSX*DIMSY)
-          VARIANCE = ( SUMSQ - 2*MEAN_VALUE*SUM + 
+          VARIANCE = ( SUMSQ - 2*MEAN_VALUE*SUM +
      :	             (DIMSX*DIMSY)*MEAN_VALUE**2)
 
           IF( (DIMSX*DIMSY) .EQ. 1 ) THEN
@@ -86,14 +86,14 @@
 *      tell user mean and sigma and maximum and minimum
 	CALL MSG_SETR( 'MEA', MEAN_VALUE)
 	CALL MSG_SETR( 'SIG', ONE_SIGMA)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Mean and one-sigma level = ^MEA +- ^SIG', STATUS)
 	CALL MSG_SETR( 'XMX', XMAXIMUM)
 	CALL MSG_SETR( 'XMN', XMINIMUM)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Maximum and Minimum levels for cut = ^XMX, ^XMN', STATUS)
 
-*      scan through all the input pixels 
+*      scan through all the input pixels
 	DO J = 1, DIMSY
 	  DO K = 1, DIMSX
 
@@ -109,7 +109,7 @@
 *      tell user how many pixels defined as bad from sigma cut
 	CALL MSG_SETR( 'VAL', SIGMA)
 	CALL MSG_SETI( 'NUM', NUMPIX)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Number of pixels outside ^VAL -sigma cut = ^NUM', STATUS)
 
 *      close output file and release lun

@@ -2,24 +2,24 @@
      &                   QU_TRIPLOT,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C WMIN (<), WMAX (<), TMIN (>), TMAX (>), TAUTOLIM (><), PFLUX (<),
 C QU_TRIPLOT (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C  Sets the position angle panel range interactively
 C
 C

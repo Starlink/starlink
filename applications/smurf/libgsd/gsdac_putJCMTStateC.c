@@ -4,7 +4,7 @@
 *     gsdac_putJCMTStateC
 
 *  Purpose:
-*     Fill the subsystem-independent JCMTState headers. 
+*     Fill the subsystem-independent JCMTState headers.
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
-*                           const char *backend, const dasFlag dasFlag,       
+*                           const char *backend, const dasFlag dasFlag,
 *                           struct JCMTState *record, int *status );
 
 *  Arguments:
@@ -35,7 +35,7 @@
 *     Determines the headers required for a JCMTState header
 *     in an ACSIS format file from a GSD file.  This routine determines
 *     the values of the JCMTState elements which are common to all
-*     subsystems.   
+*     subsystems.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -59,7 +59,7 @@
 *     2008-04-02 (JB):
 *        Get TCS_TR_SYS.
 *     2008-04-08 (JB):
-*        Don't convert PAMB, it is already in mbar. 
+*        Don't convert PAMB, it is already in mbar.
 *     2008-04-30 (JB):
 *        Allow for MPI frontend.
 
@@ -104,7 +104,7 @@
 
 #define FUNC_NAME "gsdac_putJCMTStateC"
 
-void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum, 
+void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
                            const char *backend, const dasFlag dasFlag,
                            struct JCMTState *record, int *status )
 {
@@ -113,12 +113,12 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( *status != SAI__OK ) return;
 
   /* Fill the JCMTState. */
-    
+
   record->rts_num = stepNum + 1;
 
   /* Check the frontend name to determine tasklist. */
   if ( strncmp ( gsdVars->frontend, "MPI", 3 ) == 0 ) {
-    strncpy ( record->rts_tasks, "PTCS FE_E ", 11 );    
+    strncpy ( record->rts_tasks, "PTCS FE_E ", 11 );
   } else {
     sprintf ( record->rts_tasks, "PTCS FE_%c %s",  gsdVars->frontend[2], backend );
   }
@@ -127,7 +127,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   record->smu_y = 0.0;
 
-  record->smu_z = 0.0; 
+  record->smu_z = 0.0;
 
   strncpy( record->smu_chop_phase, "M", 2 );
 
@@ -149,13 +149,13 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   record->smu_tr_chop_y = 0.0;
 
-  strncpy( record->tcs_beam, "M", 2 );    
+  strncpy( record->tcs_beam, "M", 2 );
 
-  strncpy( record->tcs_source, "SCIENCE", 8 ); 
+  strncpy( record->tcs_source, "SCIENCE", 8 );
 
   /* Get the tracking coordinate system. */
   switch ( gsdVars->centreCode ) {
-    
+
     case COORD_AZ:
       strcpy ( record->tcs_tr_sys, "AZEL" );
       break;
@@ -179,8 +179,8 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
       break;
     default:
       strcpy ( record->tcs_tr_sys, "" );
-      msgOutif(MSG__VERB," ", 
-               "Couldn't identify tracking coordinates, continuing anyway", status);   
+      msgOutif(MSG__VERB," ",
+               "Couldn't identify tracking coordinates, continuing anyway", status);
       break;
 
   }
@@ -193,16 +193,16 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* If this is a raster, the on-source integration time is
      the scan time divided by the number of points in the scan,
-     and the off-source time is the square root of the 
+     and the off-source time is the square root of the
      number of points in the scan times the on-source time.
      For non-rasters use the values stored in the INTGRN_TIME
-     array for both on- and off-exposure times. */     
-  if ( gsdVars->obsContinuous ) {  
+     array for both on- and off-exposure times. */
+  if ( gsdVars->obsContinuous ) {
     record->acs_exposure = (double)(gsdVars->scanTime) /
                            (double)(gsdVars->nScanPts);
     record->acs_offexposure = record->acs_exposure *
                               sqrt(gsdVars->nScanPts);
-  } else {  
+  } else {
     record->acs_exposure = gsdVars->intTimes[stepNum];
     record->acs_offexposure = record->acs_exposure;
   }

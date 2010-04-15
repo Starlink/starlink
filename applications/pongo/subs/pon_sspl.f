@@ -1,4 +1,4 @@
-      SUBROUTINE PON_SSPL( XMIN, XMAX, NDAT, WEIGHT, NPOLY, EPS, 
+      SUBROUTINE PON_SSPL( XMIN, XMAX, NDAT, WEIGHT, NPOLY, EPS,
      :                     IKNOTS, SFD, SFACT, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     SUBROUTINE PON_SSPL( XMIN, XMAX, NDATFIT,
-*                          WEIGHT, NPOLY, EPSR, IKNOTS, SFD, 
+*                          WEIGHT, NPOLY, EPSR, IKNOTS, SFD,
 *                          SFACT, STATUS )
 
 *  Description:
@@ -115,9 +115,9 @@
       CALL MSG_OUT( ' ', '   Smoothing factor = ^SM', STATUS )
 
 *  The spline file name.
-      CALL FIO_FNAME( SFD, FNAME, STATUS ) 
+      CALL FIO_FNAME( SFD, FNAME, STATUS )
       CALL MSG_SETC( 'FNAME', FNAME )
-      CALL MSG_OUT( ' ', '   Spline data stored in file ^FNAME', 
+      CALL MSG_OUT( ' ', '   Spline data stored in file ^FNAME',
      :              STATUS )
 
       END

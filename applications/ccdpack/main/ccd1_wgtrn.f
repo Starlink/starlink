@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -148,7 +148,7 @@
       INTEGER NPER               ! Number of values written per line
       INTEGER NLINES             ! Number of lines used to report
                                  ! parameters
-      LOGICAL RCLASS( TRN__MXCLS ) ! Classification flags sorted      
+      LOGICAL RCLASS( TRN__MXCLS ) ! Classification flags sorted
 *.
 
 *  Check inherited global status.
@@ -163,7 +163,7 @@
       CALL CCD1_MSG( ' ', '  ^FOR1', STATUS )
       CALL MSG_SETC( 'FOR2', FORMAP( 2 ) )
       CALL CCD1_MSG( ' ', '  ^FOR2', STATUS )
-      IF ( GOTINV ) THEN 
+      IF ( GOTINV ) THEN
          CALL MSG_SETC( 'INV1', INVMAP( 1 ) )
          CALL CCD1_MSG( ' ', '  ^INV1', STATUS )
          CALL MSG_SETC( 'INV2', INVMAP( 2 ) )
@@ -198,7 +198,7 @@
          IF ( CLASS( TRN__UNIDT ) ) THEN
             CALL CCD1_MSG( ' ', '    Unit determinant', STATUS )
          END IF
-      END IF             
+      END IF
 
 *  Substitute the forward transformation tokens.
       DO 1 I = 1, NUMUNI
@@ -257,7 +257,7 @@
                IAT = IAT + NCHAR + 1
             END IF
 
-*  Increment position within string. 
+*  Increment position within string.
             IAT = J * SPACE + 3
  5       CONTINUE
 
@@ -287,7 +287,7 @@
                   IAT = IAT + NCHAR + 1
                END IF
 
-*  Increment position within string. 
+*  Increment position within string.
                IAT = J * SPACE + 3
  7          CONTINUE
 
@@ -297,7 +297,7 @@
       END IF
 
 *  If given add the classifications.
-      IF ( ADDCLS ) THEN 
+      IF ( ADDCLS ) THEN
         RCLASS( TRN__LIN )   = CLASS( 1 )
         RCLASS( TRN__INDEP ) = CLASS( 2 )
         RCLASS( TRN__DIAG )  = CLASS( 3 )

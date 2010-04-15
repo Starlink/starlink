@@ -54,7 +54,7 @@ C
       INTEGER   VOPTR               ! Dynamic pointer to output image variances.
       INTEGER   VISLOT              ! DSA slot number for input image variances
       INTEGER   VOSLOT              ! DSA slot number for output image variances
-      
+
       LOGICAL   VARIANCES           ! True if both inputs have error arrays
       LOGICAL   VARI                ! True if INPUT has an error array
       REAL      FBAD                ! Flag value for 'FLOAT' data
@@ -92,7 +92,7 @@ C
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL DSA_WRUSER ('WARNING. Currently INPUT is being used ')
-         CALL DSA_WRUSER ('as the template for the OUTPUT file, ') 
+         CALL DSA_WRUSER ('as the template for the OUTPUT file, ')
          CALL DSA_WRUSER ('including the MORE structure which  ')
          CALL DSA_WRUSER ('will be inappropriate.\N')
       ENDIF
@@ -102,16 +102,16 @@ C
 C
 C     Map data arrays
 C
-      CALL DSA_MAP_DATA ( 'INPUT', 'READ', 'FLOAT', ADDRESS, DISLOT, 
+      CALL DSA_MAP_DATA ( 'INPUT', 'READ', 'FLOAT', ADDRESS, DISLOT,
      :   STATUS)
       DIPTR = ADDRESS
 
-      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, DOSLOT, 
+      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, DOSLOT,
      :   STATUS)
       DOPTR = ADDRESS
 C
 C     Process the various data arrays - allow for error arrays,
-C     quality arrays and flagged data values.  
+C     quality arrays and flagged data values.
 C
 C     If image has quality data, map that
 C
@@ -143,7 +143,7 @@ C
          CALL DSA_GET_FLAG_VALUE ('FLOAT', FBAD, STATUS)
       END IF
 C
-C     If the ERRORS parameter is not NONE and if image has error 
+C     If the ERRORS parameter is not NONE and if image has error
 C     array, map it and the output error array
 C
       CALL PAR_GET0C ('ERRORS', ERROR_TYPE, STATUS)
@@ -156,7 +156,7 @@ C
      :                         VISLOT, STATUS)
          VIPTR = ADDRESS
 
-         CALL DSA_MAP_VARIANCE ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, 
+         CALL DSA_MAP_VARIANCE ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
      :                         VOSLOT, STATUS)
          VOPTR = ADDRESS
          VARIANCES = .TRUE.

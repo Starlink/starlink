@@ -16,12 +16,12 @@
 *     CALL MESSYS_ASTINT ( STATUS )
 
 *  Description:
-*     This routine should only be called from within an AST handler 
-*     routine. Its purpose is to enable an "ASTINT" event to be 
+*     This routine should only be called from within an AST handler
+*     routine. Its purpose is to enable an "ASTINT" event to be
 *     signalled to the main-line code.
-*     It causes MESSYS_RECEIVE to detect an "ASTINT" condition 
-*     and to return with a suitable status. No information is passed 
-*     using this routine other than the fact that an interrupt has 
+*     It causes MESSYS_RECEIVE to detect an "ASTINT" condition
+*     and to return with a suitable status. No information is passed
+*     using this routine other than the fact that an interrupt has
 *     occurred.
 *     See also MESSYS_ASTMSG.
 
@@ -105,11 +105,11 @@
 *     CALL MESSYS_ASTMSG ( NAME, LENGTH, VALUE, STATUS )
 
 *  Description:
-*     This routine should only be called from within an AST handler 
-*     routine. Its purpose is to enable an "ASTINT" event to be 
+*     This routine should only be called from within an AST handler
+*     routine. Its purpose is to enable an "ASTINT" event to be
 *     signalled to the main-line code.
-*     It causes MESSYS_RECEIVE to detect an "ASTINT" condition 
-*     and to return with a suitable status and the content of the AST 
+*     It causes MESSYS_RECEIVE to detect an "ASTINT" condition
+*     and to return with a suitable status and the content of the AST
 *     message.
 
 *  Arguments:
@@ -202,12 +202,12 @@
 *     CALL MESSYS_EXTINT ( STATUS )
 
 *  Description:
-*     This routine should only be called from within an AST handler 
-*     routine. Its purpose is to enable an "EXTINT" event to be 
+*     This routine should only be called from within an AST handler
+*     routine. Its purpose is to enable an "EXTINT" event to be
 *     signalled to the main-line code.
-*     It causes MESSYS_RECEIVE or MESSYS_GETREPLY to detect an "EXTINT" 
-*     condition and to return with a suitable status. No information is 
-*     passed using this routine other than the fact that an interrupt 
+*     It causes MESSYS_RECEIVE or MESSYS_GETREPLY to detect an "EXTINT"
+*     condition and to return with a suitable status. No information is
+*     passed using this routine other than the fact that an interrupt
 *     has occurred.
 
 *  Arguments:
@@ -272,7 +272,7 @@
       END
 
 
-      SUBROUTINE MESSYS_GETREPLY ( TIMEOUT, PATH, MESSID, STUFF, 
+      SUBROUTINE MESSYS_GETREPLY ( TIMEOUT, PATH, MESSID, STUFF,
      :  STATUS )
 *+
 *  Name:
@@ -288,12 +288,12 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL MESSYS_GETREPLY ( TIMEOUT, PATH, MESSID, STUFF, 
+*     CALL MESSYS_GETREPLY ( TIMEOUT, PATH, MESSID, STUFF,
 *     :  STATUS )
 
 *  Description:
-*     Receive a data-structure as a message from a specified other 
-*     process as part of a specified transaction or from an AST event. 
+*     Receive a data-structure as a message from a specified other
+*     process as part of a specified transaction or from an AST event.
 *     The receive is performed with a timeout facility.
 
 *  Arguments:
@@ -309,9 +309,9 @@
 
 *  Algorithm:
 *     Call the FAMS library.
-*     If a message is received which has to be returned to the software 
-*     calling this routine, then translate it from internal to external 
-*     message structure format and return it along with status 
+*     If a message is received which has to be returned to the software
+*     calling this routine, then translate it from internal to external
+*     message structure format and return it along with status
 *     information.
 
 *  Implementation Deficiencies:
@@ -378,7 +378,7 @@
       INTEGER MESSID           ! message number of incoming message
 
 *  Arguments Returned:
-      CHARACTER STUFF*(*)      ! message structure received in external 
+      CHARACTER STUFF*(*)      ! message structure received in external
                                ! format
 *  Status:
       INTEGER STATUS
@@ -423,7 +423,7 @@
 *     CALL MESSYS_INIT ( OWN_NAME, STATUS )
 
 *  Description:
-*     Initialises the task into the message system. 
+*     Initialises the task into the message system.
 
 *  Algorithm:
 *     Call the FAMS library.
@@ -461,7 +461,7 @@
 *     15-APR-1988 (REVAD::BDK):
 *        Initialise MACHINE_NAMES
 *     04-MAY-1988: initialise ADAMNET_Q, remove THIS_TASK_INIT_ACK_Q,
-*                  change OTHER_TASK_T_TRANS_NUM to OTHER_TRANSNUM 
+*                  change OTHER_TASK_T_TRANS_NUM to OTHER_TRANSNUM
 *                  (REVAD::BDK)
 *     10-MAY-1988 (REVAD::BDK):
 *        Check status before using DCLEXH
@@ -486,7 +486,7 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      CHARACTER OWN_NAME*(*)     ! name of this task 
+      CHARACTER OWN_NAME*(*)     ! name of this task
 
 *  Status:
       INTEGER STATUS
@@ -519,7 +519,7 @@
 *  Description:
 *     This routine should only be called from main-line code.
 *     Its purpose is to enable a "KICK" event to be queued to the task.
-*     It causes MESSYS_RECEIVE to detect a "KICK" condition 
+*     It causes MESSYS_RECEIVE to detect a "KICK" condition
 *     and to return with a suitable status and the content of the KICK
 *     message.
 
@@ -733,10 +733,10 @@
 *     CALL MESSYS_PATH ( TASK_NAME, PATH, STATUS )
 
 *  Description:
-*     Obtains a pointer to path information ( stored in common in the 
-*     message system routines ).  This pointer points to complete 
-*     round-path information.  The task to which the path is being set 
-*     up is also requested to initialise a connection with this calling 
+*     Obtains a pointer to path information ( stored in common in the
+*     message system routines ).  This pointer points to complete
+*     round-path information.  The task to which the path is being set
+*     up is also requested to initialise a connection with this calling
 *     task.
 
 *  Arguments:
@@ -808,8 +808,8 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      CHARACTER*(*) TASK_NAME     ! name of task to which path is 
-                                  ! required, including machine name if 
+      CHARACTER*(*) TASK_NAME     ! name of task to which path is
+                                  ! required, including machine name if
                                   ! networking
 *  Arguments Returned:
       INTEGER PATH                ! pointer to the path
@@ -923,7 +923,7 @@
 *     MESSYS_RECEIVE
 
 *  Purpose:
-*     Receive a message 
+*     Receive a message
 
 *  Language:
 *     Starlink Fortran 77
@@ -935,11 +935,11 @@
 *     CALL MESSYS_RECEIVE ( TIMEOUT, PATH, STUFF, MESSID, STATUS )
 
 *  Description:
-*     Receive a data-structure as a message from another process or from 
-*     an AST event. The path and messid associated with the message are 
+*     Receive a data-structure as a message from another process or from
+*     an AST event. The path and messid associated with the message are
 *     returned to enable the higher-level software to generate replies.
 *     The receive is performed with a timeout facility.
-*     RECEIVE also handles initialisation of tasks with each other. This 
+*     RECEIVE also handles initialisation of tasks with each other. This
 *     is done "invisibly" at lower levels.
 
 *  Arguments:
@@ -955,8 +955,8 @@
 
 *  Algorithm:
 *     Call the FAMS library.
-*     If a message is received which has to be returned to the software 
-*     calling this routine, then translate it from internal to external 
+*     If a message is received which has to be returned to the software
+*     calling this routine, then translate it from internal to external
 *     message structure format and return it along with status information.
 
 *  Copyright:
@@ -1017,7 +1017,7 @@
 
 *  Arguments Returned:
       INTEGER PATH             ! pointer to the path
-      CHARACTER*(*) STUFF      ! message structure received in external 
+      CHARACTER*(*) STUFF      ! message structure received in external
                                ! format
       INTEGER MESSID           ! message number of incoming message
 
@@ -1064,8 +1064,8 @@
 *     CALL MESSYS_REPLY ( PATH, STUFF, MESSID, STATUS )
 
 *  Description:
-*     Send a data-structure as a message to another process. This must 
-*     occur as part of a previously initiated transaction - ie both PATH 
+*     Send a data-structure as a message to another process. This must
+*     occur as part of a previously initiated transaction - ie both PATH
 *     and MESSID are valid.
 
 *  Arguments:
@@ -1082,7 +1082,7 @@
 *     Call the FAMS library.
 
 *  Implementation Deficiencies:
-*     Note that the concept of END-OF-TRANSACTION implies an unfortunate 
+*     Note that the concept of END-OF-TRANSACTION implies an unfortunate
 *     link between MESSYS and the tasking model.
 
 *  Copyright:
@@ -1145,7 +1145,7 @@
       INCLUDE 'MESSYS_LEN'
 
 *  Arguments Given:
-      INTEGER PATH         ! the path number for communicating with the 
+      INTEGER PATH         ! the path number for communicating with the
                            ! other task
 
       CHARACTER*(*) STUFF  ! the message to be sent
@@ -1194,11 +1194,11 @@
 *     CALL MESSYS_RESMSG ( LENGTH, VALUE, STATUS )
 
 *  Description:
-*     This routine should only be called from within an AST handler 
-*     routine. Its purpose is to enable a "RESCHED" event to be 
+*     This routine should only be called from within an AST handler
+*     routine. Its purpose is to enable a "RESCHED" event to be
 *     signalled to the main-line code.
-*     It causes MESSYS_RECEIVE to detect a "RESCHED" condition 
-*     and to return with a suitable status and the content of the 
+*     It causes MESSYS_RECEIVE to detect a "RESCHED" condition
+*     and to return with a suitable status and the content of the
 *     RESCHED message.
 
 *  Arguments:
@@ -1287,8 +1287,8 @@
 *     CALL MESSYS_SEND ( PATH, STUFF, MESSID, STATUS )
 
 *  Description:
-*     Send a MSG data-structure as a message to another process. 
-*     The path to this process must already have been established using 
+*     Send a MSG data-structure as a message to another process.
+*     The path to this process must already have been established using
 *     the PATH call.
 *     Use of SEND implies that the other process is expected to send an
 *     acknowledgment.
@@ -1385,8 +1385,8 @@
 
 
 
-      SUBROUTINE MESSYS_UNPACK ( STUFF, MESSAGE_FUNCTION, 
-     :  MESSAGE_STATUS, MESSAGE_CONTEXT, MESSAGE_NAME, MESSAGE_LENGTH, 
+      SUBROUTINE MESSYS_UNPACK ( STUFF, MESSAGE_FUNCTION,
+     :  MESSAGE_STATUS, MESSAGE_CONTEXT, MESSAGE_NAME, MESSAGE_LENGTH,
      :  MESSAGE_VALUE, STATUS )
 *+
 *  Name:
@@ -1493,10 +1493,10 @@
       MSG = STUFF
 
       MESSAGE_STATUS = MSG_STATUS
-      MESSAGE_FUNCTION = MSG_FUNCTION 
-      MESSAGE_CONTEXT = MSG_CONTEXT 
-      MESSAGE_NAME = MSG_NAME 
-      MESSAGE_LENGTH = MSG_LENGTH 
-      MESSAGE_VALUE = MSG_VAL(1:MSG_LENGTH) 
+      MESSAGE_FUNCTION = MSG_FUNCTION
+      MESSAGE_CONTEXT = MSG_CONTEXT
+      MESSAGE_NAME = MSG_NAME
+      MESSAGE_LENGTH = MSG_LENGTH
+      MESSAGE_VALUE = MSG_VAL(1:MSG_LENGTH)
 
       END

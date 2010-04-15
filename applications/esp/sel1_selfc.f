@@ -1,7 +1,7 @@
-      SUBROUTINE SEL1_SELFC(ELEMS,ARRAY,RADIUS,MODE, 
-     :                       XMAX,YMAX,USEALL,HIEST,STATUS,ARRAY2)    
+      SUBROUTINE SEL1_SELFC(ELEMS,ARRAY,RADIUS,MODE,
+     :                       XMAX,YMAX,USEALL,HIEST,STATUS,ARRAY2)
 *+
-*  Name: 
+*  Name:
 *     SEL1_SELFC
 
 *  Purpose:
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL SEL1_GLOBAL(ELEMS,%VAL(POINT1(1)),RADIUS,MODE,
-*                      XMAX,YMAX,USEALL,HIEST,STATUS,%VAL(POINT2(1)))  
-      
+*                      XMAX,YMAX,USEALL,HIEST,STATUS,%VAL(POINT2(1)))
+
 *  Description:
 *     Given a source image, the routine generates an equivalent image of
 *     similar size that shows, at each pixel, the degree of self-correlation
@@ -25,20 +25,20 @@
 *
 *     The calculation is carried out as follows:
 *
-*     The value for each pixel of the output image is determined 
+*     The value for each pixel of the output image is determined
 *     as follows. An imaginary circle is drawn about the pixel
 *     and all pixel pairs within that circle, that lie on opposite
-*     sides of the centre from each other, are stored. 
+*     sides of the centre from each other, are stored.
 *
 *     Each pair is then considered in turn and the modal count value
 *     subtracted from each. They are then multiplied together. The
 *     value resulting is added that found for all the pixel pairs.
-*     When all the pixel pairs have been considered, the sum is 
+*     When all the pixel pairs have been considered, the sum is
 *     divided by the number of pixel pairs found and the square root
 *     taken. The resultant value is some measure of the extent to
 *     which points within that circle (about the current pixel)
 *     are correlated.
- 
+
 *  Arguments:
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image.
@@ -46,7 +46,7 @@
 *        The array containing the source NDF image count values.
 *     RADIUS = REAL (Given)
 *        The radius of the circular template that is used to define
-*        the region about a given pixel, that might contribute to the 
+*        the region about a given pixel, that might contribute to the
 *        self-correlation function value that will be inserted into
 *        the equivalent pixel in ARRAY2.
 *     MODE = REAL (Given)
@@ -60,13 +60,13 @@
 *        being used.
 *     HIEST = REAL (Given)
 *        The highest pixel count value that will be used in the analysis.
-*        All pixels with count values above this will be ignored. Units 
+*        All pixels with count values above this will be ignored. Units
 *        counts.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status.     
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 *     ARRAY2(ELEMS) = REAL (Returned)
 *        The array that eventually contains the self-correlation
-*        'image'. 
+*        'image'.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -82,14 +82,14 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'SEL_PAR'               ! SELFC constants
-                     
+
 *  Arguments Given:
-      LOGICAL USEALL                  ! Is a high count cut out being 
+      LOGICAL USEALL                  ! Is a high count cut out being
                                       ! used?
       INTEGER ELEMS                   ! Number of pixels in the data array
       INTEGER RADIUS                  ! Radius of the size of object
@@ -106,38 +106,38 @@
       REAL ARRAY2(ELEMS)              ! Image array containing the
                                       ! self-corrlelation results
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables:                 
-      INTEGER I                       ! Loop variable 
+*  Local variables:
+      INTEGER I                       ! Loop variable
       INTEGER ADD2                    ! Array element address
       INTEGER J                       ! Loop variable
       INTEGER N                       ! The number of valid pixel pairs
                                       ! that were present about a given
                                       ! origin pixel
-      INTEGER NPIX                    ! The maximum number of pixel pairs 
-                                      ! about a given origin. Depends on the 
-                                      ! pixel size and filter width. 
+      INTEGER NPIX                    ! The maximum number of pixel pairs
+                                      ! about a given origin. Depends on the
+                                      ! pixel size and filter width.
       INTEGER OFFSETS(SEL1__PIXN)     ! Address offsets for the
                                       ! pixels in one hemisphere
                                       ! of the circular area used
-      INTEGER PERC                    ! Percentage of the calculations 
-                                      ! done so far                  
+      INTEGER PERC                    ! Percentage of the calculations
+                                      ! done so far
       INTEGER X                       ! Pixel x axis index
       INTEGER X1                      ! Pixel x axis index offset
       INTEGER Y                       ! Pixel y axis index
       INTEGER Y1                      ! Pixel y axis index
 
       REAL R                          ! Temporary radius storage
-      REAL TOTAL                      ! Summation of pixel pair 
+      REAL TOTAL                      ! Summation of pixel pair
                                       ! calculation for a given origin
-                                      ! pixel 
-      REAL VALUE                      ! Temporary storage 
+                                      ! pixel
+      REAL VALUE                      ! Temporary storage
       REAL VALUES(SEL1__PIXN,2)       ! Values for pairs of pixels
                                       ! minus the mode value
-      REAL VALUE1                     ! Temporary storage 
-      REAL VALUE2                     ! Temporary storage 
+      REAL VALUE1                     ! Temporary storage
+      REAL VALUE2                     ! Temporary storage
 *.
 
 *   Check the inherited global status.
@@ -150,34 +150,34 @@
 
 *   Construct an array containing the memory address offsets of all the
 *   pixels in one hemisphere of a circular area
-*   relative to the memory address of the circle centre. 
+*   relative to the memory address of the circle centre.
 *
 *   The hemisphere is chosen so that each pixel has a matching pixel
 *   on the other side of the centre of the circle at a memory address offset
 *   that is the same in magnitude, but with an opposite sign.
-* 
-*   This allows the addresses of pairs of points, equidistantly 
+*
+*   This allows the addresses of pairs of points, equidistantly
 *   placed on opposite sides of the origin, to be found using only
-*   one array. 
+*   one array.
       NPIX=0
-      DO 30 X1=-RADIUS,RADIUS    
+      DO 30 X1=-RADIUS,RADIUS
          DO 20 Y1=-RADIUS,0
 
           R=SQRT(REAL(X1*X1+Y1*Y1))
 *         Check that the pixel at pixel offsets X1,Y1 is
-*         within a circle of the given radius and hence within the 
+*         within a circle of the given radius and hence within the
 *         required circular area.
             IF (R.LE.RADIUS) THEN
 
-*            Calculate the memory address offset. 
+*            Calculate the memory address offset.
                VALUE=Y1*XMAX+X1
-  
+
 *            Ensure that only points in the correct hemisphere
 *            are used. The point at the origin itself is ignored
 *            to reduce the influence of cosmic rays.
                IF (VALUE.LT.0) THEN
 
-*               Increment the address counter and store the 
+*               Increment the address counter and store the
 *               address offset.
                   NPIX=NPIX+1
 
@@ -200,10 +200,10 @@
 
  20      CONTINUE
 
- 30   CONTINUE  
+ 30   CONTINUE
 
 *   Consider all pixels where there is a legal pixel on the diametrically
-*   opposite side of the circle centre. Obviously, a point off the side 
+*   opposite side of the circle centre. Obviously, a point off the side
 *   of the image is not valid. This leads to the generation of a border of
 *   bad-valued points around the image. The border width is the same as
 *   the radius of the circular filter in use.
@@ -215,7 +215,7 @@
 *      high count cutoff.
          PERC=0
          DO 100 Y=RADIUS+1,YMAX-RADIUS-1
-         
+
 *         Indicate that something is happening.
             IF (Y.EQ.NINT(Y/50.)*50) THEN
                PERC=NINT((Y-RADIUS)*100./(YMAX-2.*RADIUS)+1.)
@@ -239,14 +239,14 @@
                DO 40 J=1,NPIX
 
 *               Get the values of the points and only use if
-*               they are not defined as bad. 
+*               they are not defined as bad.
                   VALUE1=ARRAY(I+OFFSETS(J))
                   IF (VALUE1.NE.VAL__BADR) THEN
 
                      VALUE2=ARRAY(I-OFFSETS(J))
                      IF (VALUE2.NE.VAL__BADR) THEN
-               
-*                     Increment the number of usable pixels pairs 
+
+*                     Increment the number of usable pixels pairs
 *                     found and retain their values.
                         N=N+1
                         VALUES(N,1)=VALUE1
@@ -256,14 +256,14 @@
 
                  END IF
 
- 40            CONTINUE  
+ 40            CONTINUE
 
 *            Consider all the pixel pairs that were found.
-               IF (N.GT.0) THEN 
+               IF (N.GT.0) THEN
 
 *               Multiply together the values of the pixels (-mode) on
 *               opposite sides of the circle origin and sum over all
-*               the usable pixels. 
+*               the usable pixels.
                   TOTAL=0.0
                   DO 50 J=1,N
                      TOTAL=TOTAL+(VALUES(J,1)-MODE)*(VALUES(J,2)-MODE)
@@ -281,7 +281,7 @@
 
  90         CONTINUE
 
- 100     CONTINUE                    
+ 100     CONTINUE
 
       ELSE
 
@@ -289,7 +289,7 @@
 *      count cutofff defined by HIEST
          PERC=0
          DO 1100 Y=RADIUS+1,YMAX-RADIUS-1
-         
+
 *         Indicate that something is happening.
             IF (Y.EQ.NINT(Y/50.)*50) THEN
                PERC=NINT((Y-RADIUS)*100./(YMAX-2.*RADIUS)+1.)
@@ -314,7 +314,7 @@
 
 *               Get the values of the points and only use if
 *               they are not defined as bad and are not above the
-*               cutoff value. 
+*               cutoff value.
                   VALUE1=ARRAY(I+OFFSETS(J))
 
                   IF ((VALUE1.NE.VAL__BADR).AND.(VALUE1.LT.HIEST)) THEN
@@ -323,8 +323,8 @@
 
                      IF ((VALUE2.NE.VAL__BADR).AND.
      :                   (VALUE2.LT.HIEST)) THEN
-               
-*                     Increment the number of usable pixels pairs 
+
+*                     Increment the number of usable pixels pairs
 *                     found and retain their values.
                        N=N+1
                        VALUES(N,1)=VALUE1
@@ -334,10 +334,10 @@
 
                  END IF
 
- 1040          CONTINUE  
+ 1040          CONTINUE
 
 *            Consider all the pixel pairs that were found.
-               IF (N.GT.0) THEN 
+               IF (N.GT.0) THEN
 
 *               Multiply together the values of the pixels (-mode) on
 *               opposite sides of the circle origin and sum over all
@@ -359,10 +359,10 @@
 
  1090       CONTINUE
 
- 1100    CONTINUE                    
-      
+ 1100    CONTINUE
+
       END IF
-        
+
  9999 CONTINUE
 
-      END 
+      END

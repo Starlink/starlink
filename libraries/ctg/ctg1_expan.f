@@ -1,4 +1,4 @@
-      SUBROUTINE CTG1_EXPAN( VERB, TEMPLT, IGRP, NFMT, FMT, FOUND, 
+      SUBROUTINE CTG1_EXPAN( VERB, TEMPLT, IGRP, NFMT, FMT, FOUND,
      :                       STATUS )
 *+
 *  Name:
@@ -14,25 +14,25 @@
 *     CALL CTG1_EXPAN( VERB, TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
 
 *  Description:
-*     The supplied wild-card template is expanded into a list of file 
-*     names, which are appended to the supplied group. If the supplied 
-*     template matches files with the same directory/basename but with 
-*     different file types, then only the file with the highest priority 
-*     file type is returned (i.e. the file type which is closest to 
+*     The supplied wild-card template is expanded into a list of file
+*     names, which are appended to the supplied group. If the supplied
+*     template matches files with the same directory/basename but with
+*     different file types, then only the file with the highest priority
+*     file type is returned (i.e. the file type which is closest to
 *     the start of CAT_FORMATS_IN).
 
 *  Arguments:
 *     VERB = LOGICAL (Given)
-*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        If TRUE then errors which occur whilst accessing supplied catalogues
 *        are flushed so that the user can see them before re-prompting for
-*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     TEMPLT = CHARACTER * ( * ) (Given)
 *        The wild card template.
 *     IGRP = INTEGER (Given)
 *        An identifier for the group to which the expanded names should
-*        be appended. On exit, this group is at the end of a chain of 
+*        be appended. On exit, this group is at the end of a chain of
 *        groups connected by a GRP "owner-slave" relationship. The other
 *        groups is the chain hold individual fields  from the full catalogue
 *        specification. The full chain (starting from the head) is as
@@ -49,7 +49,7 @@
 *     NFMT = INTEGER (Given)
 *        The number of catalogue file types stored in FMT. May be zero.
 *     FMT( NFMT ) = CHARACTER * ( * ) (Given)
-*        An array of known catalogue file types. 
+*        An array of known catalogue file types.
 *     FOUND = LOGICAL (Returned)
 *        Returned .TRUE. if one or more files were found matching the
 *        supplied template. Returned .FALSE. otherwise.
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -111,7 +111,7 @@
       INTEGER IGRP
       INTEGER NFMT
       CHARACTER FMT( * )*(*)
-      
+
 *  Arguments Returned:
       LOGICAL FOUND
 
@@ -127,7 +127,7 @@
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
       CHARACTER ESC*1            ! Single backslash
-      PARAMETER( ESC = '\\' )    
+      PARAMETER( ESC = '\\' )
 
 *  Local Variables:
       CHARACTER BN*50              ! File basename
@@ -198,7 +198,7 @@
          CALL GRP_SOWN( IGRPB, IGRPT, STATUS )
       END IF
 
-*  The file types group is owned by a group holding the FITS extension 
+*  The file types group is owned by a group holding the FITS extension
 *  specifications.
       CALL GRP_OWN( IGRPT, IGRPH, STATUS )
       IF( IGRPH .EQ. GRP__NOID ) THEN
@@ -217,7 +217,7 @@
       CALL CHR_FANDL( TEMPLT, F, L )
 
 *  If the first and last characters are backwards quotes, just search for
-*  files matching the template as supplied. This allows for shell command 
+*  files matching the template as supplied. This allows for shell command
 *  substitution to be included in the supplied string.
       IF( TEMPLT( F : F ) .EQ. '`' .AND.
      :    TEMPLT( L : L ) .EQ. '`' ) THEN
@@ -226,7 +226,7 @@
 *  Indicate that duplicate file names should not be purged.
          PURGE = .FALSE.
 
-*  Otherwise, we escape any embedded spaces in the template so that the 
+*  Otherwise, we escape any embedded spaces in the template so that the
 *  shell script used by one_find_file will interpret the spaces as part
 *  of the file path.
       ELSE
@@ -243,8 +243,8 @@
 *  Split the template into directory, basename, suffix and section.
          CALL CTG1_FPARS( TMPLT2( : J - 1 ), DIR, BN, SUF, EXT, STATUS )
 
-*  From now on, if no suffix was given, use ".*" so that we pick up files 
-*  with any of the known catalogue formats. But indicate that duplicate 
+*  From now on, if no suffix was given, use ".*" so that we pick up files
+*  with any of the known catalogue formats. But indicate that duplicate
 *  files with different file types should be purged.
          IF( SUF .EQ. ' ' ) THEN
             SUF = '.*'
@@ -272,19 +272,19 @@
                CALL CHR_APPND( DIR, FTEMP, IAT )
                CALL CHR_APPND( BN, FTEMP, IAT )
                CALL CHR_APPND( FMT( IFMT ), FTEMP, IAT )
-         
+
                IF( IAT .GT. 0 ) THEN
                   CALL CHR_APPND( FTEMP( : IAT ), SEARCH, SLEN )
                   SLEN = SLEN + 1
                END IF
-   
+
             END IF
 
          END DO
 
 *  Get a list of all matching files.
          IF( SLEN .GT. 0 ) THEN
-            CALL CTG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), EXT, 
+            CALL CTG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), EXT,
      :                       STATUS )
          END IF
 
@@ -346,13 +346,13 @@
 
 *  Release the catalogue identifier.
          CALL ERR_BEGIN( STATUS )
-         CALL CAT_TRLSE( CI, STATUS ) 
+         CALL CAT_TRLSE( CI, STATUS )
          CALL ERR_END( STATUS )
 
-*  Annul or flush any error which has occurred so that any remaining names 
+*  Annul or flush any error which has occurred so that any remaining names
 *  can be checked.
          IF( STATUS .NE. SAI__OK ) THEN
-            IF( VERB ) THEN 
+            IF( VERB ) THEN
                CALL ERR_FLUSH( STATUS )
             ELSE
                CALL ERR_ANNUL( STATUS )
@@ -362,11 +362,11 @@
       END DO
 
 *  End the error context started before the loop.
-      CALL ERR_END( STATUS )         
+      CALL ERR_END( STATUS )
 
 *  Purge the returned groups of matching files (i.e. file with the same
 *  directory and basename but differing file types).
-      IF( PURGE ) CALL CTG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, 
+      IF( PURGE ) CALL CTG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH,
      :                            SIZE0 + 1, NFMT, FMT, STATUS )
 
 *  Delete the temporary groups.

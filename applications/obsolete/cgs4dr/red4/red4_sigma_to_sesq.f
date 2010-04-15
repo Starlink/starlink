@@ -70,7 +70,7 @@
          END DO
       ELSE
 
-*      The number of coadds is zero or smaller. Return a zero standard 
+*      The number of coadds is zero or smaller. Return a zero standard
 *      error squared array.
          DO I = 1, NELM
 

@@ -6,7 +6,7 @@
 *     Implement XML functions for AST.
 
 *  Description:
-*     This file implements the Xml module which provides generic XML 
+*     This file implements the Xml module which provides generic XML
 *     reading and writing functions for the XmlChan class.
 
 *  Copyright:
@@ -18,12 +18,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@
 /* ----------------- */
 /* Set the name of the module we are implementing. This indicates to
    the header files that define class interfaces that they should make
-   "protected" symbols available. NB, this module is not a proper AST 
+   "protected" symbols available. NB, this module is not a proper AST
    class, but it defines this macro sanyway in order to get the protected
    symbols defined in memory.h */
 #define astCLASS Xml
@@ -115,7 +115,7 @@
 
 *  Description:
 *     This macro expands to an implementation of the protected
-*     astXmlCheck<type>_ function (q.v.) which validates membership of 
+*     astXmlCheck<type>_ function (q.v.) which validates membership of
 *     a specified XML data type.
 
 *  Parameters:
@@ -175,28 +175,28 @@ AstXml##type *astXmlCheck##type##_( void *this, int nullok, int *status ) { \
 /* Module variables. */
 /* ================= */
 
-/* Define macros for accessing all items of thread-safe global data 
+/* Define macros for accessing all items of thread-safe global data
    used by this module. */
 #ifdef THREAD_SAFE
 
 #define next_id astGLOBAL(Xml,Next_ID)
 #define gettag_buff astGLOBAL(Xml,GetTag_Buff)
-#define GLOBAL_inits globals->Next_ID = 0; 
+#define GLOBAL_inits globals->Next_ID = 0;
 astMAKE_INITGLOBALS(Xml)
 
 /* Set up mutexes */
 static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 ); 
-#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 ); 
+#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 );
+#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 );
 
-/* If thread safety is not needed, declare globals at static variables. */ 
+/* If thread safety is not needed, declare globals at static variables. */
 #else
 
 static int next_id = 0;
 static char gettag_buff[ AST__XML_GETTAG_BUFF_LEN + 1 ];
 
-#define LOCK_MUTEX1 
-#define UNLOCK_MUTEX1 
+#define LOCK_MUTEX1
+#define UNLOCK_MUTEX1
 
 #ifdef DEBUG   /* Not available in thread-safe compilations */
 static int nobj = 0;
@@ -307,8 +307,8 @@ static void AddContent( AstXmlParent *this, int where, AstXmlContentItem *item, 
 *          3 - In the epilogue, after the root element.
 *     item
 *        Pointer to the content item to be added to the element. If
-*        "this" is an XmlElement, this can be a pointer to any of the 
-*        following types: AstXmlElement, AstXmlWhite, AstXmlBlack, 
+*        "this" is an XmlElement, this can be a pointer to any of the
+*        following types: AstXmlElement, AstXmlWhite, AstXmlBlack,
 *        AstXmlCDataSection, AstXmlComment, AstXmlPI. If "this" is a
 *        document, the list is restricted to: AstXmlWhite, AstXmlComment,
 *        AstXmlPI.
@@ -331,9 +331,9 @@ static void AddContent( AstXmlParent *this, int where, AstXmlContentItem *item, 
 
 /* Save the number of content items currently stored in the element. */
       nitem = ( elem->items ) ? elem->nitem : 0;
- 
-/* Attempt to extend the array to hold an extra item. */      
-      elem->items = astGrow( elem->items, nitem + 1, 
+
+/* Attempt to extend the array to hold an extra item. */
+      elem->items = astGrow( elem->items, nitem + 1,
                              sizeof( AstXmlContentItem * ) );
 
 /* Check the memory was allocated succesfully. */
@@ -360,7 +360,7 @@ static void AddContent( AstXmlParent *this, int where, AstXmlContentItem *item, 
       } else if( !astXmlCheckType( this, AST__XMLDOC ) ){
          astError( AST__INTER, "AddContent(xml): Inappropriate attempt to "
                    "add an item of type %ld to an XML object of type %ld "
-                   "(internal AST programming error).", status, 
+                   "(internal AST programming error).", status,
                    ( (AstXmlObject *) item)->type,
                    ( (AstXmlObject *) this)->type );
 
@@ -418,8 +418,8 @@ static const char *AddEscapes( const char *text, int *status ){
 *     const char *AddEscapes( const char *text, int *status )
 
 *  Description:
-*     This function produces a dynamic copy of the supplied text in which 
-*     occurrences of "&", "<", ">", and "\"" are replaced by the corresponding 
+*     This function produces a dynamic copy of the supplied text in which
+*     occurrences of "&", "<", ">", and "\"" are replaced by the corresponding
 *     XML entity reference.
 *
 *     The "&" character is only replaced by an entity reference if it is
@@ -438,7 +438,7 @@ static const char *AddEscapes( const char *text, int *status ){
 *     copy.
 
 *  Notes:
-*     - NULL is returned if this function is called with the global error 
+*     - NULL is returned if this function is called with the global error
 *     status set, or if it should fail for any reason.
 */
 
@@ -654,7 +654,7 @@ static char *AppendLine( char *str1, int *nc, const char *str2, int ind, int *st
 *     allocated string, extending the dynamic string as necessary to
 *     accommodate the new characters (plus the final null).
 *
-*     A newline character is inserted if necessary to ensure that the "str2" 
+*     A newline character is inserted if necessary to ensure that the "str2"
 *     string starts on a newline. If "ind" is positive, spaces are added
 *     as necessary to ensure that "str2" begins with the specified number of
 *     spaces.
@@ -714,7 +714,7 @@ static char *AppendLine( char *str1, int *nc, const char *str2, int ind, int *st
 /* Check the global error status. */
    if ( !astOK || !str2 ) return result;
 
-/* Remove any trailing white space (except for newlines) from the supplied 
+/* Remove any trailing white space (except for newlines) from the supplied
    string. */
    if( *nc > 0 ) {
       c = str1 + *nc - 1;
@@ -753,7 +753,7 @@ static char *AppendLine( char *str1, int *nc, const char *str2, int ind, int *st
    return astAppendString( temp, nc, str2 );
 }
 
-void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value, 
+void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
                      const char *prefix, int *status ){
 /*
 *+
@@ -768,12 +768,12 @@ void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
 
 *  Synopsis:
 *     #include "xml.h"
-*     void astXmlAddAttr( AstXmlElement *this, const char *name, 
+*     void astXmlAddAttr( AstXmlElement *this, const char *name,
 *                         const char *value, const char *prefix )
 
 *  Description:
 *     This function adds an attribute to a specified XmlElement. If the
-*     element already contains an attribute with the given name amd prefix, 
+*     element already contains an attribute with the given name amd prefix,
 *     then the value of the attribute is changed to be the supplied value.
 
 *  Parameters:
@@ -781,7 +781,7 @@ void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
 *        The pointer to the element to be modified.
 *     name
 *        Pointer to a null terminated string containing the attribute name.
-*     value 
+*     value
 *        Pointer to a null terminated string containing the attribute value.
 *     prefix
 *        The namespace prefix for the attribute. May be NULL or blank, in
@@ -828,7 +828,7 @@ void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
             if( !oldattr->prefix && !attr->prefix ) {
                oldi = i;
                break;
-            } else if( oldattr->prefix && attr->prefix && 
+            } else if( oldattr->prefix && attr->prefix &&
                        !strcmp( oldattr->prefix, attr->prefix ) ){
                oldi = i;
                break;
@@ -840,12 +840,12 @@ void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
    replace the old attribute with the new one created above. */
       if( oldi > -1 ){
          ((AstXmlObject *)oldattr)->parent = NULL;
-         oldattr = astXmlAnnul( oldattr );      
+         oldattr = astXmlAnnul( oldattr );
          this->attrs[ oldi ] = attr;
 
-/* Otherwise, attempt to extend the array to hold an extra attribute. */      
+/* Otherwise, attempt to extend the array to hold an extra attribute. */
       } else {
-         this->attrs = astGrow( this->attrs, nattr + 1, 
+         this->attrs = astGrow( this->attrs, nattr + 1,
                                 sizeof( AstXmlAttribute * ) );
 
 /* Check all has gone OK. */
@@ -880,7 +880,7 @@ void astXmlAddCDataSection_( AstXmlElement *this, const char *text, int *status 
 
 *  Description:
 *     This function creates a new XmlCDataSection structure representing
-*     an unparsed character data (CDATA) section, and adds it into an 
+*     an unparsed character data (CDATA) section, and adds it into an
 *     existing element.
 
 *  Parameters:
@@ -953,7 +953,7 @@ void astXmlAddCharData_( AstXmlParent *this, int where, const char *text, int *s
 *          3 - In the epilogue, after the root element.
 *     text
 *        Pointer to a null terminated string containing the character data.
-*        If "this" is a document, the text must consist entirely of white 
+*        If "this" is a document, the text must consist entirely of white
 *        space.
 
 *-
@@ -978,8 +978,8 @@ void astXmlAddCharData_( AstXmlParent *this, int where, const char *text, int *s
    while( *(++c) && isspace( *c ) );
 
 /* If the string contains a non-white character, allocate memory for
-   a XmlBlack structure, and initialise it to hold the supplied text. 
-   Otherwise, allocate memory for a XmlWhite structure, and initialise it 
+   a XmlBlack structure, and initialise it to hold the supplied text.
+   Otherwise, allocate memory for a XmlWhite structure, and initialise it
    to hold the supplied text. */
    if( *c ) {
       if( astXmlCheckType( this, AST__XMLDOC ) ) {
@@ -1074,7 +1074,7 @@ void astXmlAddComment_( AstXmlParent *this, int where, const char *text, int *st
 
 }
 
-AstXmlElement *astXmlAddElement_( AstXmlElement *this, const char *name, 
+AstXmlElement *astXmlAddElement_( AstXmlElement *this, const char *name,
                                   const char *prefix, int *status ){
 /*
 *+
@@ -1089,7 +1089,7 @@ AstXmlElement *astXmlAddElement_( AstXmlElement *this, const char *name,
 
 *  Synopsis:
 *     #include "xml.h"
-*     AstXmlElement *astXmlAddElement( AstXmlElement *this, const char *name, 
+*     AstXmlElement *astXmlAddElement( AstXmlElement *this, const char *name,
 *                                      const char *prefix )
 
 *  Description:
@@ -1107,7 +1107,7 @@ AstXmlElement *astXmlAddElement_( AstXmlElement *this, const char *name,
 *        which case any prefix at the start of "name" is used.
 
 *  Returned Value:
-*     A pointer to the new structure is returned. This pointer should be 
+*     A pointer to the new structure is returned. This pointer should be
 *     freed using astXmlAnnul when no longer needed.
 
 *  Notes:
@@ -1160,11 +1160,11 @@ void astXmlAddPI_( AstXmlParent *this, int where, const char *target, const char
 
 *  Synopsis:
 *     #include "xml.h"
-*     void astXmlAddPI( AstXmlParent *this, int where, const char *target, 
+*     void astXmlAddPI( AstXmlParent *this, int where, const char *target,
 *                       const char *text )
 
 *  Description:
-*     This function creates a new XmlPI structure representing an 
+*     This function creates a new XmlPI structure representing an
 *     XML "programming instruction", and adds it into an existing element
 *     or document.
 
@@ -1230,27 +1230,27 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri, in
 
 *  Synopsis:
 *     #include "xml.h"
-*     void astXmlAddURI( AstXmlElement *this, const char *prefix, 
+*     void astXmlAddURI( AstXmlElement *this, const char *prefix,
 *                        const char *uri )
 
 *  Description:
-*     This function adds a namespace prefix definition to a specified 
+*     This function adds a namespace prefix definition to a specified
 *     XmlElement, or changes the default namespace. If the suppliedprefix
-*     is already defined in the element, the associated URI is changed to 
+*     is already defined in the element, the associated URI is changed to
 *     the supplied URI.
 
 *  Parameters:
 *     this
 *        The pointer to the element to be modified.
 *     prefix
-*        Pointer to a null terminated string containing the namespace 
-*        prefix. If this is NULL or blank, then the supplied URI is used 
-*        as the default namespace for this element and all child elements 
-*        (except for child elements which define their own default 
+*        Pointer to a null terminated string containing the namespace
+*        prefix. If this is NULL or blank, then the supplied URI is used
+*        as the default namespace for this element and all child elements
+*        (except for child elements which define their own default
 *        namespace).
 *     uri
 *        Pointer to a null terminated string containing the namespace URI.
-*        If this is NULL or blank, and "prefix" is also NULL or blank, then 
+*        If this is NULL or blank, and "prefix" is also NULL or blank, then
 *        this has the same effect of there being no default namespace within
 *        the supplied element.
 *-
@@ -1271,7 +1271,7 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri, in
    oldns = NULL;
 
 /* Store the used length of the namespace prefix. */
-   nc = prefix ? astChrLen( prefix ) : 0;   
+   nc = prefix ? astChrLen( prefix ) : 0;
 
 /* If no namespace prefix has been supplied, just change the default
    namespace URI. */
@@ -1306,16 +1306,16 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri, in
             }
          }
 
-/* If there is an existing namespace with the same prefix, replace the old 
+/* If there is an existing namespace with the same prefix, replace the old
    namespace with the new one created above. */
          if( oldi > -1 ){
             ((AstXmlObject *)oldns)->parent = NULL;
-            oldns = astXmlAnnul( oldns );      
+            oldns = astXmlAnnul( oldns );
             this->nsprefs[ oldi ] = ns;
 
-/* Otherwise, attempt to extend the array to hold an extra namespace definition. */      
+/* Otherwise, attempt to extend the array to hold an extra namespace definition. */
          } else {
-            this->nsprefs = astGrow( this->nsprefs, nnspref + 1, 
+            this->nsprefs = astGrow( this->nsprefs, nnspref + 1,
                                      sizeof( AstXmlNamespace * ) );
 
 /* Check all has gone OK. */
@@ -1349,7 +1349,7 @@ void *astXmlAnnul_( AstXmlObject *this, int *status ){
 *     void *astXmlAnnul( AstXmlObject *this )
 
 *  Description:
-*     This function frees the resources used to hold the XmlObject, together 
+*     This function frees the resources used to hold the XmlObject, together
 *     with any child objects contained within the supplied XmlObject. A NULL
 *     pointer is always returned. If the supplied object is still in use
 *     (that is, if its parent XmlElement still exists) then the resources
@@ -1373,7 +1373,7 @@ void *astXmlAnnul_( AstXmlObject *this, int *status ){
    if( !this ) return NULL;
 
 /* Return the supplied pointer if the objects parent still exists. */
-   if( this->parent && 
+   if( this->parent &&
        astXmlCheckType( this->parent, AST__XMLPAR ) ) return this;
 
 #ifdef DEBUG
@@ -1407,9 +1407,9 @@ void *astXmlAnnulTree_( AstXmlObject *this, int *status ){
 
 *  Description:
 *     This function finds the head of the tree containing the supplied
-*     XmlObject (either an XmlElement or an XmlDocument), and frees the 
-*     resources associated with all members of the tree. A NULL pointer 
-*     is always returned. 
+*     XmlObject (either an XmlElement or an XmlDocument), and frees the
+*     resources associated with all members of the tree. A NULL pointer
+*     is always returned.
 
 *  Parameters:
 *     this
@@ -1427,7 +1427,7 @@ void *astXmlAnnulTree_( AstXmlObject *this, int *status ){
 /* Return if a NULL pointer has been suppplied. */
    if( !this ) return NULL;
 
-/* Find the root and annull it. This will free all children (i.e. 
+/* Find the root and annull it. This will free all children (i.e.
    the entire tree). */
    return astXmlAnnul( astXmlGetRoot( this ) );
 }
@@ -1477,7 +1477,7 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this, int *status ) {
    AstXmlDocument *doc, *newdoc;
    AstXmlElement *elem, *newelem;
    AstXmlNamespace *ns;
-   AstXmlObject *new;  
+   AstXmlObject *new;
    AstXmlPI *pi;
    AstXmlPrologue *pro, *newpro;
    AstXmlWhite *white;
@@ -1495,7 +1495,7 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this, int *status ) {
    if( type == AST__XMLELEM  ){
       elem = (AstXmlElement *) this;
       new = astMalloc( sizeof( AstXmlElement ) );
-      InitXmlElement( (AstXmlElement *) new, AST__XMLELEM, 
+      InitXmlElement( (AstXmlElement *) new, AST__XMLELEM,
                       elem->name, elem->prefix, status );
 
       newelem = (AstXmlElement *) new;
@@ -1522,7 +1522,7 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this, int *status ) {
       }
 
       if( elem->defns ) {
-         newelem->defns = astStore( NULL, elem->defns, 
+         newelem->defns = astStore( NULL, elem->defns,
                                     strlen( elem->defns ) + 1 );
       }
 
@@ -1532,31 +1532,31 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this, int *status ) {
    } else if( type == AST__XMLATTR ){
       attr = (AstXmlAttribute *) this;
       new = astMalloc( sizeof( AstXmlAttribute ) );
-      InitXmlAttribute( (AstXmlAttribute *) new, AST__XMLATTR, 
+      InitXmlAttribute( (AstXmlAttribute *) new, AST__XMLATTR,
                         attr->name, attr->value, attr->prefix, status );
 
    } else if( type == AST__XMLBLACK ){
       black = (AstXmlBlack *) this;
       new = astMalloc( sizeof( AstXmlBlack ) );
-      InitXmlBlack( (AstXmlBlack *) new, AST__XMLBLACK, 
+      InitXmlBlack( (AstXmlBlack *) new, AST__XMLBLACK,
                     black->text, status );
 
    } else if( type == AST__XMLWHITE ){
       white = (AstXmlWhite *) this;
       new = astMalloc( sizeof( AstXmlWhite ) );
-      InitXmlWhite( (AstXmlWhite *) new, AST__XMLWHITE, 
+      InitXmlWhite( (AstXmlWhite *) new, AST__XMLWHITE,
                     white->text, status );
 
    } else if( type == AST__XMLCDATA ){
       cdata = (AstXmlCDataSection *) this;
       new = astMalloc( sizeof( AstXmlCDataSection ) );
-      InitXmlCDataSection( (AstXmlCDataSection *) new, AST__XMLCDATA, 
+      InitXmlCDataSection( (AstXmlCDataSection *) new, AST__XMLCDATA,
                            cdata->text, status );
- 
+
    } else if( type == AST__XMLCOM ){
       comm = (AstXmlComment *) this;
       new = astMalloc( sizeof( AstXmlComment ) );
-      InitXmlComment( (AstXmlComment *) new, AST__XMLCOM, 
+      InitXmlComment( (AstXmlComment *) new, AST__XMLCOM,
                       comm->text, status );
 
    } else if( type == AST__XMLPI ){
@@ -1567,7 +1567,7 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this, int *status ) {
    } else if( type == AST__XMLNAME ){
       ns = (AstXmlNamespace *) this;
       new = astMalloc( sizeof( AstXmlNamespace ) );
-      InitXmlNamespace( (AstXmlNamespace *) new, AST__XMLNAME, ns->prefix, 
+      InitXmlNamespace( (AstXmlNamespace *) new, AST__XMLNAME, ns->prefix,
                          ns->uri, status );
 
    } else if( type == AST__XMLDOC ){
@@ -1640,7 +1640,7 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this, int *status ) {
 
    } else if( astOK ) {
       astError( AST__INTER, "CopyXml: Invalid object type (%d) supplied "
-                "(internal AST programming error).", status, type );      
+                "(internal AST programming error).", status, type );
    }
 
 /* If an error occurred, delete the new structure. */
@@ -1792,7 +1792,7 @@ AstXmlContentItem *astXmlGetItem_( AstXmlElement *this, int item, int *status ){
    AstXmlContentItem *result;     /* The returned pointer */
 
 /* Initialise */
-   result = NULL;   
+   result = NULL;
 
 /* Check the global error status. */
    if( !astOK ) return result;
@@ -1800,19 +1800,19 @@ AstXmlContentItem *astXmlGetItem_( AstXmlElement *this, int item, int *status ){
 /* Report an error if the supplie dindex is bad. */
    if( this->nitem == 0 ) {
       astError( AST__XMLIT, "astXmlGetItem(xml): The supplied item index (%d) "
-                "is out of bounds. The supplied XmlObject has no content.", status, 
+                "is out of bounds. The supplied XmlObject has no content.", status,
                 item );
 
    } else if( item < 0 || item >= this->nitem ) {
       astError( AST__XMLIT, "astXmlGetItem(xml): The supplied item index (%d) "
-                "is out of bounds. Should be in the range 0 to %d.", status, 
+                "is out of bounds. Should be in the range 0 to %d.", status,
                 item, this->nitem-1 );
    } else {
       result = this->items[ item ];
    }
 
 /* Return the result. */
-   return result; 
+   return result;
 }
 
 const char *astXmlGetName_( AstXmlObject *this, int *status ){
@@ -1834,7 +1834,7 @@ const char *astXmlGetName_( AstXmlObject *this, int *status ){
 *  Description:
 *     This function returns a pointer to a constant string holding the
 *     name associated with an XmlObject. For elements and attributes, the
-*     "name" value is returned. For PI elements, the "target" value is 
+*     "name" value is returned. For PI elements, the "target" value is
 *     returned. For namespace definitions, the "prefix" value is returned.
 *     An error is reported if the supplied XmlObject is of any other class.
 
@@ -1877,7 +1877,7 @@ const char *astXmlGetName_( AstXmlObject *this, int *status ){
 
    } else {
       astError( AST__INTER, "astXmlGetName: Inappropriate object type (%d) supplied "
-                "(internal AST programming error).", status, type );      
+                "(internal AST programming error).", status, type );
    }
 
 /* Return the result. */
@@ -1981,10 +1981,10 @@ AstXmlParent *astXmlGetParent_( AstXmlObject *this, int *status ){
 
 *  Description:
 *     This function returns a pointer to the XmlParent object (either an
-*     XmlElement or an XmlDocument) which contains the specified XmlObject. 
-*     The object can be a content item (an element, a comment, a CDATA 
-*     section, a PI, or character data) in which case the enclosing 
-*     XmlElement is returned, or an attribute or namespace definition in 
+*     XmlElement or an XmlDocument) which contains the specified XmlObject.
+*     The object can be a content item (an element, a comment, a CDATA
+*     section, a PI, or character data) in which case the enclosing
+*     XmlElement is returned, or an attribute or namespace definition in
 *     which case the XmlElement to which object refers is returned.
 *     If "this" is the root element of a document, a pointer to the
 *     XmlDocument is returned.
@@ -2017,7 +2017,7 @@ AstXmlObject *astXmlGetRoot_( AstXmlObject *this, int *status ){
 *     astXmlGetRoot
 
 *  Purpose:
-*     Return a pointer to the root XmlObject which contains the supplied 
+*     Return a pointer to the root XmlObject which contains the supplied
 *     XmlObject.
 
 *  Type:
@@ -2028,7 +2028,7 @@ AstXmlObject *astXmlGetRoot_( AstXmlObject *this, int *status ){
 *     AstXmlObject *astXmlGetRoot( AstXmlObject *this )
 
 *  Description:
-*     This function returns a pointer to the XmlObject which is the root of 
+*     This function returns a pointer to the XmlObject which is the root of
 *     the tree containing the specified XmlObject. A pointer to the
 *     supplied XmlObject is returned if it has no parent.
 
@@ -2037,7 +2037,7 @@ AstXmlObject *astXmlGetRoot_( AstXmlObject *this, int *status ){
 *        The pointer to check.
 
 *  Returned Value:
-*     Pointer to the root XmlObject, or a copy of the supplied pointer if 
+*     Pointer to the root XmlObject, or a copy of the supplied pointer if
 *     the supplied XmlObject is the root.
 
 *  Notes:
@@ -2061,7 +2061,7 @@ AstXmlObject *astXmlGetRoot_( AstXmlObject *this, int *status ){
       if( this->parent ) {
          astError( AST__INTER, "astXmlGetRoot(xml): An XmlDocument has a "
                    "non-null parent of type %ld (internal AST programming "
-                   "error).", status, this->type );      
+                   "error).", status, this->type );
       } else {
          result = (AstXmlObject *) this;
       }
@@ -2095,7 +2095,7 @@ const char *astXmlGetTag_( AstXmlObject *this, int opening, int *status ){
 *     const char *astXmlGetTag( AstXmlObject *this, int opening )
 
 *  Description:
-*     This function returns a pointer to a static string containing an 
+*     This function returns a pointer to a static string containing an
 *     XML tag describing the given XmlObject.
 
 *  Parameters:
@@ -2103,9 +2103,9 @@ const char *astXmlGetTag_( AstXmlObject *this, int opening, int *status ){
 *        Pointer to the XmlObject.
 *     opening
 *        Indicates which tag is to be returned; the start tag or the end
-*        tag. If non-zero the start tag is returned. Otherwise, the 
+*        tag. If non-zero the start tag is returned. Otherwise, the
 *        end tag is returned. If the supplied XmlObject has no end
-*        tag (i.e. if it is an empty element, or if it is not an element), 
+*        tag (i.e. if it is an empty element, or if it is not an element),
 *        then NULL is returned but no error is reported.
 
 *  Returned Value:
@@ -2116,7 +2116,7 @@ const char *astXmlGetTag_( AstXmlObject *this, int opening, int *status ){
 *  Notes:
 *     - Subsequent invocations of this function will over-write the
 *     buffer which used to hold the returned string.
-*     - Empty elements are represented as an start tag of the form <.../>, 
+*     - Empty elements are represented as an start tag of the form <.../>,
 *     with no corresponding end tag.
 *     - NULL is returned if an error has already occurred, or if this
 *     function should fail for any reason.
@@ -2153,7 +2153,7 @@ const char *astXmlGetTag_( AstXmlObject *this, int opening, int *status ){
 
          gettag_buff[ AST__XML_GETTAG_BUFF_LEN ] = 0;
          astFree( result );
-         result = gettag_buff;          
+         result = gettag_buff;
       } else {
          result = astFree( result );
       }
@@ -2270,13 +2270,13 @@ const char *astXmlGetURI_( AstXmlObject *this, int *status ){
 *  Description:
 *     This function returns a pointer to a constant string holding the
 *     namespace URI associated with an XmlObject. Only attributes,
-*     elements and namespaces have associated URIs, so a NULL pointer is 
-*     returned for any other class of XmlObject. A NULL pointer is also 
-*     returned if XmlObject does not belong to any namespace, or if it 
-*     belongs to a unknown namespace (i.e. one for which no URI is 
-*     available). Any namespace prefix attached to the supplied object is 
-*     resolved first using any "xmlns" attributes contained in the same 
-*     element, then using any "xmlns" attributes contained in the parent 
+*     elements and namespaces have associated URIs, so a NULL pointer is
+*     returned for any other class of XmlObject. A NULL pointer is also
+*     returned if XmlObject does not belong to any namespace, or if it
+*     belongs to a unknown namespace (i.e. one for which no URI is
+*     available). Any namespace prefix attached to the supplied object is
+*     resolved first using any "xmlns" attributes contained in the same
+*     element, then using any "xmlns" attributes contained in the parent
 *     element, etc.
 
 *  Parameters:
@@ -2356,13 +2356,13 @@ const char *astXmlGetValue_( AstXmlObject *this, int report, int *status ){
 
 *  Description:
 *     This function returns a pointer to a constant string holding the
-*     value associated with an XmlObject. For attributes, the attribute value 
-*     is returned. For PI elements, the "text" value is returned. For 
+*     value associated with an XmlObject. For attributes, the attribute value
+*     is returned. For PI elements, the "text" value is returned. For
 *     namespace definitions, the "URI" value is returned. For character
 *     data, the character data is returned. For CDATA sections the "text"
 *     value is returned. For comments, the "text" value is returned.
 *     If the XmlObject is an element, then a non-NULL value is returned
-*     only if the element contains a single content item holding character 
+*     only if the element contains a single content item holding character
 *     data. In this case a pointer to the character data is returned.
 *     A null value is returned in all other cases (but no error is
 *     reported unless "report" is non-zero).
@@ -2421,7 +2421,7 @@ const char *astXmlGetValue_( AstXmlObject *this, int report, int *status ){
          item = astXmlGetItem( (AstXmlElement *) this, 0 );
          if( astXmlCheckType( item, AST__XMLCHAR ) ) {
             result = astXmlGetValue( item, report );
-         } 
+         }
       }
 
       if( !result && astOK && report ) {
@@ -2457,13 +2457,13 @@ void astXmlInsertElement_( AstXmlElement *this, AstXmlElement *elem, int *status
 *     void astXmlInsertElement( AstXmlElement *this, AstXmlElement *elem )
 
 *  Description:
-*     This function inserts a given XmlElement "elem" into another given 
+*     This function inserts a given XmlElement "elem" into another given
 *     XmlElement "this". An error is reported if "elem" already has a
 *     parent.
 
 *  Parameters:
 *     this
-*        A pointer to the element to be modified. 
+*        A pointer to the element to be modified.
 *     elem
 *        The element to be inserted into "this".
 
@@ -2479,7 +2479,7 @@ void astXmlInsertElement_( AstXmlElement *this, AstXmlElement *elem, int *status
       astError( AST__INTER, "astXmlInsertElement(xml): Cannot insert \"%s\" "
                 "into \"%s\" because it already has a parent (\"%s\") "
                 "(internal AST programming error).", status,
-                astXmlGetTag( elem, 1 ), astXmlGetTag( this, 1 ), 
+                astXmlGetTag( elem, 1 ), astXmlGetTag( this, 1 ),
                 astXmlGetTag( ((AstXmlObject *) elem)->parent, 1 ) );
 
 /* Otherwise, add the content item to the element. */
@@ -2505,8 +2505,8 @@ void astXmlPurge_( AstXmlParent *this, int *status ) {
 *     void astXmlPurge( AstXmlParent *this )
 
 *  Description:
-*     This function removes all character data containing only whitespace 
-*     from the supplied document or element. It is recursive, in that it also 
+*     This function removes all character data containing only whitespace
+*     from the supplied document or element. It is recursive, in that it also
 *     removes white space from all children elements.
 
 *  Parameters:
@@ -2532,7 +2532,7 @@ void astXmlPurge_( AstXmlParent *this, int *status ) {
       doc = (AstXmlDocument *) this;
       astXmlPurge( doc->prolog );
       astXmlPurge( doc->root );
-      
+
       i = -1;
       while( ++i < doc->nepi ) {
          misc = doc->epilog[ i ];
@@ -2572,11 +2572,11 @@ void astXmlPurge_( AstXmlParent *this, int *status ) {
       i = -1;
       while( ++i < elem->nitem ) {
          item = elem->items[ i ];
-   
+
          if( astXmlCheckType( item, AST__XMLWHITE ) ) {
             item = astXmlDelete( item );
             i--;
-   
+
          } else if( astXmlCheckType( item, AST__XMLELEM ) ) {
             astXmlPurge( (AstXmlParent *) item );
          }
@@ -2584,7 +2584,7 @@ void astXmlPurge_( AstXmlParent *this, int *status ) {
    }
 }
 
-void astXmlRemoveAttr_( AstXmlElement *this, const char *name, 
+void astXmlRemoveAttr_( AstXmlElement *this, const char *name,
                         const char *prefix, int *status ){
 /*
 *+
@@ -2599,7 +2599,7 @@ void astXmlRemoveAttr_( AstXmlElement *this, const char *name,
 
 *  Synopsis:
 *     #include "xml.h"
-*     void astXmlRemoveAttr( AstXmlElement *this, const char *name, 
+*     void astXmlRemoveAttr( AstXmlElement *this, const char *name,
 *                            const char *prefix )
 
 *  Description:
@@ -2645,7 +2645,7 @@ void astXmlRemoveAttr_( AstXmlElement *this, const char *name,
             if( !oldattr->prefix && !attr->prefix ) {
                oldi = i;
                break;
-            } else if( oldattr->prefix && attr->prefix && 
+            } else if( oldattr->prefix && attr->prefix &&
                        !strcmp( oldattr->prefix, attr->prefix ) ){
                oldi = i;
                break;
@@ -2681,7 +2681,7 @@ void astXmlRemoveItem_( AstXmlContentItem *this, int *status ){
 
 *  Description:
 *     This function removes an item of content from its parent element,
-*     or removes the root element from a document. The removed item is not 
+*     or removes the root element from a document. The removed item is not
 *     annulled and may be subsequently added into another element.
 
 *  Parameters:
@@ -2712,7 +2712,7 @@ void astXmlRemoveItem_( AstXmlContentItem *this, int *status ){
       for( i = 0; i < elem->nitem; i++ ) {
          if( elem->items[ i ] == this ) {
 
-/* When found, decrement the number of items in the element, and shuffle 
+/* When found, decrement the number of items in the element, and shuffle
    all the remaining item pointers down one slot to over-write it, then
    nullify the parent pointer in the supplied object and leave the loop. */
             (elem->nitem)--;
@@ -2764,7 +2764,7 @@ void astXmlRemoveURI_( AstXmlElement *this, const char *prefix, int *status ){
 
 *  Parameters:
 *     this
-*        The pointer to the element containing the namespace prefix to be 
+*        The pointer to the element containing the namespace prefix to be
 *        removed.
 *     prefix
 *        The namespace prefix to remove.
@@ -2977,7 +2977,7 @@ const char *astXmlShow_( AstXmlObject *this, int *status ) {
 *  Description:
 *     This function returns a pointer to a dynamically allocated string
 *     containing a textual representation of the supplied XmlObject.
-*     Newline characters are added to the string if needed to ensure that 
+*     Newline characters are added to the string if needed to ensure that
 *     each item of content within an element starts on a new line, and all
 *     tags are preceeded by an indentation string consisting of a number
 *     of spaces.
@@ -2999,7 +2999,7 @@ const char *astXmlShow_( AstXmlObject *this, int *status ) {
    return Format( this, 0, status );
 }
 
-static void CheckName( const char *name, const char *noun, const char *method, 
+static void CheckName( const char *name, const char *noun, const char *method,
                        int nullok, int *status ){
 /*
 *  Name:
@@ -3013,7 +3013,7 @@ static void CheckName( const char *name, const char *noun, const char *method,
 
 *  Synopsis:
 *     #include "xml.h"
-*     void CheckName( const char *name, const char *noun, const char *method, 
+*     void CheckName( const char *name, const char *noun, const char *method,
 *                     int nullok, int *status )
 
 *  Description:
@@ -3024,7 +3024,7 @@ static void CheckName( const char *name, const char *noun, const char *method,
 *     name
 *        The name string to check
 *     noun
-*        A word to describe the object which the name applies to - for use in 
+*        A word to describe the object which the name applies to - for use in
 *        error messages only.
 *     method
 *        The name of the calling method - for use in error messages only.
@@ -3037,7 +3037,7 @@ static void CheckName( const char *name, const char *noun, const char *method,
 
 /* Local Variables: */
    const char *c;       /* Pointer to next character to check */
-   
+
 /* Check the global error status. */
    if( !astOK ) return;
 
@@ -3056,7 +3056,7 @@ static void CheckName( const char *name, const char *noun, const char *method,
          if( !isalpha( *c ) && *c != '_' ) {
             astError( AST__XMLNM, "%s: The illegal XML %s name \"%s\" was "
                       "encountered.", status, method, noun, name );
-   
+
          } else {
             while( *(++c) ) {
                if( !isalnum( *c ) && *c != '_' && *c != '-' && *c != '.' ){
@@ -3065,7 +3065,7 @@ static void CheckName( const char *name, const char *noun, const char *method,
                   break;
                }
             }
-         } 
+         }
       }
    }
 }
@@ -3093,7 +3093,7 @@ static void CheckPrefName( char *name, const char *noun, const char *method, int
 *     name
 *        The string to check
 *     noun
-*        A word to describe the object which the name applies to - for use in 
+*        A word to describe the object which the name applies to - for use in
 *        error messages only.
 *     method
 *        The name of the calling method - for use in error messages only.
@@ -3105,7 +3105,7 @@ static void CheckPrefName( char *name, const char *noun, const char *method, int
    char *colon;             /* Pointer to first colon */
    char *temp;              /* Pointer to temporary string */
    int nc;                  /* Length of temporary string */
-   
+
 /* Check the global error status. */
    if( !astOK ) return;
 
@@ -3152,7 +3152,7 @@ static int CheckType( long int given, long int want, int *status ){
 *     int CheckType( long int given, long int want, int *status )
 
 *  Description:
-*     This function checks that the supplied type identifier identifies 
+*     This function checks that the supplied type identifier identifies
 *     a specified class of XML object, or a derived class. A flag is
 *     returned indicating if the check succeeds. No error is reported if
 *     the check fails.
@@ -3216,7 +3216,7 @@ static int CheckType( long int given, long int want, int *status ){
                    given );
       }
 
-/* If the above is OK, return a non-zero value if the type to be tested 
+/* If the above is OK, return a non-zero value if the type to be tested
    equals the wanted type. */
    } else if( want == given ) {
       result = 1;
@@ -3239,7 +3239,7 @@ static int CheckType( long int given, long int want, int *status ){
 
 /* Otherwise, for "interface" types, check if the given class "implements
    the interface". */
-   } else if( want == AST__XMLCONT ) { 
+   } else if( want == AST__XMLCONT ) {
       result = ( given == AST__XMLELEM  ||
                  given == AST__XMLBLACK ||
                  given == AST__XMLWHITE ||
@@ -3247,16 +3247,16 @@ static int CheckType( long int given, long int want, int *status ){
                  given == AST__XMLCOM   ||
                  given == AST__XMLPI    );
 
-   } else if( want == AST__XMLMISC ) { 
+   } else if( want == AST__XMLMISC ) {
       result = ( given == AST__XMLWHITE ||
                  given == AST__XMLCOM   ||
                  given == AST__XMLPI    );
 
-   } else if( want == AST__XMLCHAR ) { 
+   } else if( want == AST__XMLCHAR ) {
       result = ( given == AST__XMLWHITE ||
                  given == AST__XMLBLACK );
 
-   } else if( want == AST__XMLPAR ) { 
+   } else if( want == AST__XMLPAR ) {
       result = ( given == AST__XMLDOC ||
                  given == AST__XMLPRO ||
                  given == AST__XMLELEM );
@@ -3283,8 +3283,8 @@ int astXmlCheckType_( void *this, long int want, int *status ){
 *     int astXmlCheckType( void *this, long int want )
 
 *  Description:
-*     This function checks that the supplied XmlObject is of a specified 
-*     class of XML object, or a derived class. A flag is returned indicating 
+*     This function checks that the supplied XmlObject is of a specified
+*     class of XML object, or a derived class. A flag is returned indicating
 *     if the check succeeds. No error is reported if the check fails.
 
 *  Parameters:
@@ -3340,7 +3340,7 @@ static char *CleanText( const char *text, int *status ){
 *     copy.
 
 *  Notes:
-*     - NULL is returned if this function is called with the global error 
+*     - NULL is returned if this function is called with the global error
 *     status set, or if it should fail for any reason.
 */
 
@@ -3434,22 +3434,22 @@ static void CleanXml( AstXmlObject *this, long int type, int *status ){
       this->type = AST__XMLBAD;
       this->parent = NULL;
 
-/* For each derived class of XmlObject, first clean the parent component, 
+/* For each derived class of XmlObject, first clean the parent component,
    then clean any further resources. */
    } else if( type == AST__XMLELEM  ){
 
       elem = (AstXmlElement *) this;
 
-      elem->name = astFree( elem->name );   
-      elem->defns = astFree( elem->defns );   
-      elem->prefix = astFree( elem->prefix );   
+      elem->name = astFree( elem->name );
+      elem->defns = astFree( elem->defns );
+      elem->prefix = astFree( elem->prefix );
 
       while( elem->nattr > 0 ) astXmlDelete( elem->attrs[ 0 ] );
       elem->attrs = astFree( elem->attrs );
 
       while( elem->nitem > 0 ) astXmlDelete( elem->items[ 0 ] );
       elem->items = astFree( elem->items );
-      
+
       while( elem->nnspref > 0 ) astXmlDelete( elem->nsprefs[ 0 ] );
       elem->nsprefs = astFree( elem->nsprefs );
 
@@ -3457,41 +3457,41 @@ static void CleanXml( AstXmlObject *this, long int type, int *status ){
 
    } else if( type == AST__XMLATTR ){
       attr = (AstXmlAttribute *) this;
-      attr->name = astFree( attr->name );     
-      attr->value = astFree( attr->value );     
-      attr->prefix = astFree( attr->prefix );     
+      attr->name = astFree( attr->name );
+      attr->value = astFree( attr->value );
+      attr->prefix = astFree( attr->prefix );
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( type == AST__XMLBLACK ){
       black = (AstXmlBlack *) this;
-      black->text = astFree( black->text );     
+      black->text = astFree( black->text );
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( type == AST__XMLWHITE ){
       white = (AstXmlWhite *) this;
-      white->text = astFree( white->text );     
+      white->text = astFree( white->text );
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( type == AST__XMLCDATA ){
       cdatasec = (AstXmlCDataSection *) this;
-      cdatasec->text = astFree( cdatasec->text );     
+      cdatasec->text = astFree( cdatasec->text );
       CleanXml( this, AST__XMLOBJECT, status );
- 
+
    } else if( type == AST__XMLCOM ){
       comm = (AstXmlComment *) this;
-      comm->text = astFree( comm->text );     
+      comm->text = astFree( comm->text );
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( type == AST__XMLPI ){
       pi = (AstXmlPI *) this;
-      pi->target = astFree( pi->target );     
-      pi->text = astFree( pi->text );     
+      pi->target = astFree( pi->target );
+      pi->text = astFree( pi->text );
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( type == AST__XMLNAME ){
       ns = (AstXmlNamespace *) this;
-      ns->prefix = astFree( ns->prefix );     
-      ns->uri = astFree( ns->uri );     
+      ns->prefix = astFree( ns->prefix );
+      ns->uri = astFree( ns->uri );
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( type == AST__XMLDOC ){
@@ -3527,7 +3527,7 @@ static void CleanXml( AstXmlObject *this, long int type, int *status ){
 
    } else if( astOK ) {
       astError( AST__INTER, "CleanXml: Invalid object type (%ld) supplied "
-                "(internal AST programming error).", status, type );      
+                "(internal AST programming error).", status, type );
    }
 
 }
@@ -3550,7 +3550,7 @@ static const char *DefaultURI( AstXmlElement *elem, int *status ){
 *  Description:
 *     This function returns the default namespace URI defined within the
 *     given element. If the element does not define a default namespace URI,
-*     then this function is called recursively on the parent element. If 
+*     then this function is called recursively on the parent element. If
 *     there is no parent element, NULL is returned.
 
 *  Parameters:
@@ -3584,14 +3584,14 @@ static const char *DefaultURI( AstXmlElement *elem, int *status ){
    if( !result ) {
       parent = ( (AstXmlObject *) elem )->parent;
       if( astXmlCheckType( parent, AST__XMLELEM ) ) {
-         result = DefaultURI( (AstXmlElement *) parent, status );   
+         result = DefaultURI( (AstXmlElement *) parent, status );
       }
    }
 
 /* If the element has a blank default namespace URI, then return NULL
    since the XML namespaces specification says that "The default
-   namespace can be set to the empty string. This has the same effect, 
-   within the scope of the declaration, of there being no default 
+   namespace can be set to the empty string. This has the same effect,
+   within the scope of the declaration, of there being no default
    namespace". */
    if( result && astChrLen( result ) == 0 ) result = NULL;
 
@@ -3616,7 +3616,7 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
 *     void *astXmlDelete( void *obj )
 
 *  Description:
-*     This function removes the supplied XmlObject from its parent and 
+*     This function removes the supplied XmlObject from its parent and
 *     deletes it using astXmlAnnul.
 
 *  Parameters:
@@ -3689,7 +3689,7 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
             astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %ld has "
                       "inappropriate parent of type %ld (internal AST "
                       "programming error).", status, obj->type, parent->type );
-         }           
+         }
 
 /* Now deal with cases where we are deleting items from a prologue. */
       } else if( astXmlCheckType( parent, AST__XMLPRO ) ) {
@@ -3738,7 +3738,7 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
             astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %ld has "
                       "inappropriate parent of type %ld (internal AST "
                       "programming error).", status, obj->type, parent->type );
-         }           
+         }
 
 /* Now deal with cases where we are deleting items from an element. */
       } else if( astXmlCheckType( parent, AST__XMLELEM ) ) {
@@ -3747,7 +3747,7 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
 /* Remove the object form the appropriate list in the parent, and
    then shuffle down the remaining entries in the list and decrement the
    size of the list. */
-         if( astXmlCheckType( obj, AST__XMLATTR ) ) {      
+         if( astXmlCheckType( obj, AST__XMLATTR ) ) {
             n = elem->nattr;
             for( i = 0; i < n; i++ ) {
                if( elem->attrs[ i ] == (AstXmlAttribute *) obj ) {
@@ -3759,8 +3759,8 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
                   break;
                }
             }
-   
-         } else if( astXmlCheckType( obj, AST__XMLNAME ) ) {      
+
+         } else if( astXmlCheckType( obj, AST__XMLNAME ) ) {
             n = elem->nnspref;
             for( i = 0; i < n; i++ ) {
                if( elem->nsprefs[ i ] == (AstXmlNamespace *) obj ) {
@@ -3772,7 +3772,7 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
                   break;
                }
             }
-   
+
          } else if( astXmlCheckType( obj, AST__XMLCONT ) ) {
             n = elem->nitem;
             for( i = 0; i < n; i++ ) {
@@ -3809,32 +3809,32 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
    }
 
 /* Delete the object. */
-   result = astXmlAnnul( obj ); 
+   result = astXmlAnnul( obj );
 
 /* Annul the object and return the resulting NULL pointer. */
    return result;
 }
 
-static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0, 
+static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
                                        int *status ){
 /*
 *  Name:
 *     FindAttribute
 
 *  Purpose:
-*     Search an XmlElement for a named attribute 
+*     Search an XmlElement for a named attribute
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "xml.h"
-*     AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0, 
+*     AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
 *                                     int *status )
 
 *  Description:
 *     This function searches the supplied XmlElement for an attribute
-*     with the given name. If found, a pointer to the XmlAttribute is 
+*     with the given name. If found, a pointer to the XmlAttribute is
 *     returned. Otherwise NULL is returned.
 
 *  Parameters:
@@ -3901,7 +3901,7 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
 
       }
 
-   }      
+   }
 
 /* Loop round all the attributes in the element. */
    for( i = 0; i < this->nattr; i++ ) {
@@ -3910,7 +3910,7 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
 
 /* Compare the attribute name (and prefix) with the supplied name (and
    prefix). Leave the loop if they match. */
-      if( !strcmp( name1, name ) && 
+      if( !strcmp( name1, name ) &&
           ( !prefix || ( prefix1 && !strcmp( prefix1, prefix ) ) ) ) {
          result = this->attrs[ i ];
          break;
@@ -3993,7 +3993,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
       result = astAppendString( result, &nc, temp );
       temp = astFree( (void *) temp );
 
-      elem = (AstXmlElement *) this; 
+      elem = (AstXmlElement *) this;
       if( elem->nitem > 0 ) {
 
 /* Go round all the items of content. */
@@ -4009,9 +4009,9 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
 
 /* Now append the next item of content, and free its memory. */
                   if( ind > -1 ) {
-                     result = AppendLine( result, &nc, temp, 
+                     result = AppendLine( result, &nc, temp,
                                           ( (ind > -1) ? ind + IND_INC : -1 ), status );
-                  } else {            
+                  } else {
                      result = astAppendString( result, &nc, temp );
                   }
                   temp = astFree( (void *) temp );
@@ -4023,16 +4023,16 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
          temp = FormatTag( this, 0, status );
          if( ind > -1 ) {
             result = AppendLine( result, &nc, temp, ind, status );
-         } else {            
+         } else {
             result = astAppendString( result, &nc, temp );
          }
          temp = astFree( (void *) temp );
 
       }
-      
+
 /* If this is an attribute... */
    } else if( type == AST__XMLATTR ){
-      attrib = (AstXmlAttribute *) this; 
+      attrib = (AstXmlAttribute *) this;
 
       if( attrib->prefix ) {
          result = astAppendString( result, &nc, attrib->prefix );
@@ -4047,18 +4047,18 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
       temp = astFree( (void *) temp );
 
    } else if( type == AST__XMLWHITE ){
-      white = (AstXmlWhite *) this; 
+      white = (AstXmlWhite *) this;
       temp = AddEscapes( white->text, status );
       result = astAppendString( result, &nc, temp );
       temp = astFree( (void *) temp );
 
    } else if( type == AST__XMLBLACK ){
-      black = (AstXmlBlack *) this; 
+      black = (AstXmlBlack *) this;
       temp = AddEscapes( black->text, status );
       result = astAppendString( result, &nc, temp );
       temp = astFree( (void *) temp );
- 
-   } else if( type == AST__XMLCDATA || 
+
+   } else if( type == AST__XMLCDATA ||
               type == AST__XMLCOM ||
               type == AST__XMLPI ||
               type == AST__XMLDEC ||
@@ -4077,8 +4077,8 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
       result = astAppendString( result, &nc, "\"" );
 
    } else if( type == AST__XMLPRO ){
-      pro = (AstXmlPrologue *) this; 
-      result = astAppendString( result, &nc, 
+      pro = (AstXmlPrologue *) this;
+      result = astAppendString( result, &nc,
                              Format( (AstXmlObject *) pro->xmldecl, ind, status ) );
 
 /* Append all the miscalleneous items before the DTD. */
@@ -4087,7 +4087,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
          if( temp ) {
             if( ind > -1 ) {
                result = AppendLine( result, &nc, temp, ind, status );
-            } else {            
+            } else {
                result = astAppendString( result, &nc, temp );
             }
             temp = astFree( (void *) temp );
@@ -4099,7 +4099,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
       if( temp ) {
          if( ind > -1 ) {
             result = AppendLine( result, &nc, temp, ind, status );
-         } else {            
+         } else {
             result = astAppendString( result, &nc, temp );
          }
          temp = astFree( (void *) temp );
@@ -4111,7 +4111,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
          if( temp ) {
             if( ind > -1 ) {
                result = AppendLine( result, &nc, temp, ind, status );
-            } else {            
+            } else {
                result = astAppendString( result, &nc, temp );
             }
             temp = astFree( (void *) temp );
@@ -4119,10 +4119,10 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
       }
 
    } else if( type == AST__XMLDOC ){
-      doc = (AstXmlDocument *) this; 
+      doc = (AstXmlDocument *) this;
 
 /* Format the prologue. */
-      result = astAppendString( result, &nc, 
+      result = astAppendString( result, &nc,
                              Format( (AstXmlObject *) doc->prolog, ind, status ) );
 
 /* Append the root element. */
@@ -4130,7 +4130,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
       if( temp ) {
          if( ind > -1 ) {
             result = AppendLine( result, &nc, temp, ind, status );
-         } else {            
+         } else {
             result = astAppendString( result, &nc, temp );
          }
          temp = astFree( (void *) temp );
@@ -4142,7 +4142,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
          if( temp ) {
             if( ind > -1 ) {
                result = AppendLine( result, &nc, temp, ind, status );
-            } else {            
+            } else {
                result = astAppendString( result, &nc, temp );
             }
             temp = astFree( (void *) temp );
@@ -4151,7 +4151,7 @@ static const char *Format( AstXmlObject *this, int ind, int *status ){
 
    } else if( astOK ) {
       astError( AST__INTER, "Format(xml): Invalid object type (%d) supplied "
-                "(internal AST programming error).", status, type );      
+                "(internal AST programming error).", status, type );
    }
 
 /* Free the returned string if an error has occurred. */
@@ -4177,7 +4177,7 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
 *     char *FormatTag( AstXmlObject *this, int opening, int *status )
 
 *  Description:
-*     This function returns a pointer to a dynamic string containing an 
+*     This function returns a pointer to a dynamic string containing an
 *     XML tag describing the given XmlObject.
 
 *  Parameters:
@@ -4185,18 +4185,18 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
 *        Pointer to the XmlObject.
 *     opening
 *        Indicates which tag is to be returned; the start tag or the end
-*        tag. If non-zero the start tag is returned. Otherwise, the 
+*        tag. If non-zero the start tag is returned. Otherwise, the
 *        end tag is returned. If the supplied XmlObject has no end
-*        tag (i.e. if it is an empty element, or if it is not an element), 
+*        tag (i.e. if it is an empty element, or if it is not an element),
 *        then NULL is returned but no error is reported.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to a dynamically allocated string holding the tag. 
+*     Pointer to a dynamically allocated string holding the tag.
 
 *  Notes:
-*     - Empty elements are represented as an start tag of the form <.../>, 
+*     - Empty elements are represented as an start tag of the form <.../>,
 *     with no corresponding end tag.
 *     - NULL is returned if an error has already occurred, or if this
 *     function should fail for any reason.
@@ -4228,7 +4228,7 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
 
 /* If this is an element... */
    if( this->type == AST__XMLELEM ) {
-      elem = (AstXmlElement *) this; 
+      elem = (AstXmlElement *) this;
 
       if( opening ) {
          result = astAppendString( result, &nc, "<" );
@@ -4237,13 +4237,13 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
             result = astAppendString( result, &nc, ":" );
          }
          result = astAppendString( result, &nc, elem->name );
-   
+
          if( elem->defns ) {
             result = astAppendString( result, &nc, " xmlns=\"" );
             result = astAppendString( result, &nc, elem->defns );
             result = astAppendString( result, &nc, "\"" );
          }
-   
+
          for( i = 0; i < elem->nnspref; i++ ) {
             temp = Format( (AstXmlObject *) elem->nsprefs[ i ], -1, status );
             if( temp ) {
@@ -4252,7 +4252,7 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
                temp = astFree( (void *) temp );
             }
          }
-   
+
          for( i = 0; i < elem->nattr; i++ ) {
             temp = Format( (AstXmlObject *) elem->attrs[ i ], -1, status );
             if( temp ){
@@ -4261,7 +4261,7 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
                temp = astFree( (void *) temp );
             }
          }
-   
+
          if( elem->nitem == 0 ) result = astAppendString( result, &nc, "/" );
          result = astAppendString( result, &nc, ">" );
 
@@ -4274,9 +4274,9 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
          result = astAppendString( result, &nc, elem->name );
          result = astAppendString( result, &nc, ">" );
       }
-      
+
    } else if( type == AST__XMLDTD ){
-      dtd = (AstXmlDTDec *) this; 
+      dtd = (AstXmlDTDec *) this;
       if( opening && dtd->name && dtd->name[0] ) {
          result = astAppendString( result, &nc, "<!DOCTYPE " );
          result = astAppendString( result, &nc, dtd->name );
@@ -4291,25 +4291,25 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
          }
          result = astAppendString( result, &nc, ">" );
       }
- 
+
    } else if( type == AST__XMLCDATA ){
       if( opening ) {
-         cdata = (AstXmlCDataSection *) this; 
+         cdata = (AstXmlCDataSection *) this;
          result = astAppendString( result, &nc, "<![CDATA[" );
          result = astAppendString( result, &nc, cdata->text );
          result = astAppendString( result, &nc, "]]>" );
       }
- 
+
    } else if( type == AST__XMLCOM ){
       if( opening ) {
-         com = (AstXmlComment *) this; 
+         com = (AstXmlComment *) this;
          result = astAppendString( result, &nc, "<!--" );
          result = astAppendString( result, &nc, com->text );
          result = astAppendString( result, &nc, "-->" );
       }
 
    } else if( type == AST__XMLPI ){
-      pi = (AstXmlPI *) this; 
+      pi = (AstXmlPI *) this;
       if( opening ) {
          result = astAppendString( result, &nc, "<?" );
          result = astAppendString( result, &nc, pi->target );
@@ -4321,7 +4321,7 @@ static char *FormatTag( AstXmlObject *this, int opening, int *status ){
       }
 
    } else if( type == AST__XMLDEC ){
-      xmlpi = (AstXmlDeclPI *) this; 
+      xmlpi = (AstXmlDeclPI *) this;
       if( opening && xmlpi->text && xmlpi->text[0] ) {
          result = astAppendString( result, &nc, "<?xml" );
          if( xmlpi->text && xmlpi->text[0] ) {
@@ -4353,11 +4353,11 @@ static void InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
 
 *  Synopsis:
 *     #include "xml.h"
-*     InitXmlAttribute( AstXmlAttribute *new, int type, const char *name, 
+*     InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
 *                       const char *value, const char *prefix, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlAttribute 
+*     This function initialises supplied memory to hold an XmlAttribute
 *     structure.
 
 *  Parameters:
@@ -4390,13 +4390,13 @@ static void InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
    if( !CheckType( type, AST__XMLATTR, status ) ){
       astError( AST__INTER, "InitXmlAttribute: Supplied object type (%d) "
                 "does not represent an XmlAttribute", status, type );
-   } 
+   }
 
 /* Ensure we have non-NULL pointers. */
    if( !name ) name = "";
    if( !value ) value = "";
 
-/* If no prefix was supplied, extract any prefix from the start of the 
+/* If no prefix was supplied, extract any prefix from the start of the
    supplied name. */
    newname = (char *) name;
    newpref = (char *) prefix;
@@ -4438,7 +4438,7 @@ static void InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
    }
 }
 
-static void InitXmlCDataSection( AstXmlCDataSection *new, int type, 
+static void InitXmlCDataSection( AstXmlCDataSection *new, int type,
                                  const char *text, int *status ){
 /*
 *  Name:
@@ -4452,11 +4452,11 @@ static void InitXmlCDataSection( AstXmlCDataSection *new, int type,
 
 *  Synopsis:
 *     #include "xml.h"
-*     InitXmlCDataSection( AstXmlCDataSection *new, int type, 
+*     InitXmlCDataSection( AstXmlCDataSection *new, int type,
 *                          const char *text, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlCDataSection 
+*     This function initialises supplied memory to hold an XmlCDataSection
 *     structure.
 
 *  Parameters:
@@ -4478,7 +4478,7 @@ static void InitXmlCDataSection( AstXmlCDataSection *new, int type,
    if( !CheckType( type, AST__XMLCDATA, status ) ){
       astError( AST__INTER, "InitXmlCDataSection: Supplied object type (%d) "
                 "does not represent an XmlCDataSection", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject component. */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4506,7 +4506,7 @@ static void InitXmlWhite( AstXmlWhite *new, int type, const char *text, int *sta
 *     InitXmlWhite( AstXmlWhite *new, int type, const char *text, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlWhite 
+*     This function initialises supplied memory to hold an XmlWhite
 *     structure.
 
 *  Parameters:
@@ -4531,7 +4531,7 @@ static void InitXmlWhite( AstXmlWhite *new, int type, const char *text, int *sta
    if( !CheckType( type, AST__XMLWHITE, status ) ){
       astError( AST__INTER, "InitXmlWhite: Supplied object type (%d) "
                 "does not represent an XmlWhite", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject component. */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4544,7 +4544,7 @@ static void InitXmlWhite( AstXmlWhite *new, int type, const char *text, int *sta
    while( *(++c) ) {
       if( !isspace( *c ) ) {
          astError( AST__XMLCM, "InitXmlWhite(xml): Illegal XML whitespace "
-                   "string supplied \"%s\" - not all characters are white.", status, 
+                   "string supplied \"%s\" - not all characters are white.", status,
                     text );
          break;
       }
@@ -4570,7 +4570,7 @@ static void InitXmlBlack( AstXmlBlack *new, int type, const char *text, int *sta
 *     InitXmlBlack( AstXmlBlack *new, int type, const char *text, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlBlack 
+*     This function initialises supplied memory to hold an XmlBlack
 *     structure.
 
 *  Parameters:
@@ -4592,7 +4592,7 @@ static void InitXmlBlack( AstXmlBlack *new, int type, const char *text, int *sta
    if( !CheckType( type, AST__XMLBLACK, status ) ){
       astError( AST__INTER, "InitXmlBlack: Supplied object type (%d) "
                 "does not represent an XmlBlack", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject component. */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4620,7 +4620,7 @@ static void InitXmlComment( AstXmlComment *new, int type, const char *text, int 
 *     InitXmlComment( AstXmlComment *new, int type, const char *text, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlComment 
+*     This function initialises supplied memory to hold an XmlComment
 *     structure.
 
 *  Parameters:
@@ -4642,7 +4642,7 @@ static void InitXmlComment( AstXmlComment *new, int type, const char *text, int 
    if( !CheckType( type, AST__XMLCOM, status ) ){
       astError( AST__INTER, "InitXmlComment: Supplied object type (%d) "
                 "does not represent an XmlComment", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject component. */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4650,7 +4650,7 @@ static void InitXmlComment( AstXmlComment *new, int type, const char *text, int 
 /* Ensure we have non-NULL pointers. */
    if( !text ) text = "";
 
-/* Initialise the items specific to this class of structure. Report an error 
+/* Initialise the items specific to this class of structure. Report an error
    if the comment is illegal. */
    if( strstr( text, "--" ) && astOK ) {
       astError( AST__XMLCM, "InitXmlCom(xml): Illegal XML comment "
@@ -4678,7 +4678,7 @@ static void InitXmlDeclPI( AstXmlDeclPI *new, int type, const char *text, int *s
 *     InitXmlDeclPI( AstXmlDeclPI *new, int type, const char *text, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlDeclPI 
+*     This function initialises supplied memory to hold an XmlDeclPI
 *     structure.
 
 *  Parameters:
@@ -4700,7 +4700,7 @@ static void InitXmlDeclPI( AstXmlDeclPI *new, int type, const char *text, int *s
    if( !CheckType( type, AST__XMLDEC, status ) ){
       astError( AST__INTER, "InitXmlDeclPI: Supplied object type (%d) "
                 "does not represent an XmlDeclPI", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject component. */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4728,7 +4728,7 @@ static void InitXmlDocument( AstXmlDocument *new, int type, int *status ){
 *     InitXmlDocument( AstXmlDocument *new, int type, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlDocument 
+*     This function initialises supplied memory to hold an XmlDocument
 *     structure.
 
 *  Parameters:
@@ -4748,7 +4748,7 @@ static void InitXmlDocument( AstXmlDocument *new, int type, int *status ){
    if( !CheckType( type, AST__XMLDOC, status ) ){
       astError( AST__INTER, "InitXmlDocument: Supplied object type (%d) "
                 "does not represent an XmlDocument", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4761,7 +4761,7 @@ static void InitXmlDocument( AstXmlDocument *new, int type, int *status ){
    new->current = NULL;
 }
 
-static void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name, 
+static void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name,
                           const char *external, const char *internal, int *status ){
 /*
 *  Name:
@@ -4775,11 +4775,11 @@ static void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name,
 
 *  Synopsis:
 *     #include "xml.h"
-*     void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name, 
+*     void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name,
 *                        const char *external, const char *internal, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlDTDec 
+*     This function initialises supplied memory to hold an XmlDTDec
 *     structure.
 
 *  Parameters:
@@ -4806,7 +4806,7 @@ static void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name,
    if( !CheckType( type, AST__XMLDTD, status ) ){
       astError( AST__INTER, "InitXmlDTDec: Supplied object type (%d) "
                 "does not represent an XmlDTDec", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -4822,7 +4822,7 @@ static void InitXmlDTDec( AstXmlDTDec *new, int type, const char *name,
    new->internal = astStore( NULL, internal, strlen( internal ) + 1 );
 }
 
-static void InitXmlElement( AstXmlElement *new, int type, const char *name, 
+static void InitXmlElement( AstXmlElement *new, int type, const char *name,
                             const char *prefix, int *status ){
 /*
 *  Name:
@@ -4836,11 +4836,11 @@ static void InitXmlElement( AstXmlElement *new, int type, const char *name,
 
 *  Synopsis:
 *     #include "xml.h"
-*     InitXmlElement( AstXmlElement *new, int type, const char *name, 
+*     InitXmlElement( AstXmlElement *new, int type, const char *name,
 *                     const char *prefix, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlElement 
+*     This function initialises supplied memory to hold an XmlElement
 *     structure.
 
 *  Parameters:
@@ -4871,12 +4871,12 @@ static void InitXmlElement( AstXmlElement *new, int type, const char *name,
    if( !CheckType( type, AST__XMLELEM, status ) ){
       astError( AST__INTER, "InitXmlElement: Supplied object type (%d) "
                 "does not represent an XmlElement", status, type );
-   } 
+   }
 
 /* Ensure we have non-NULL pointers. */
    if( !name ) name = "";
 
-/* If no prefix was supplied, extract any prefix from the start of the 
+/* If no prefix was supplied, extract any prefix from the start of the
    supplied name. */
    newname = (char *) name;
    newpref = (char *) prefix;
@@ -4940,11 +4940,11 @@ static void InitXmlNamespace( AstXmlNamespace *new, int type, const char *prefix
 
 *  Synopsis:
 *     #include "xml.h"
-*     InitXmlNamespace( AstXmlNamespace *new, int type, const char *prefix, 
+*     InitXmlNamespace( AstXmlNamespace *new, int type, const char *prefix,
 *                       const char *uri, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlNamespace 
+*     This function initialises supplied memory to hold an XmlNamespace
 *     structure.
 
 *  Parameters:
@@ -4968,7 +4968,7 @@ static void InitXmlNamespace( AstXmlNamespace *new, int type, const char *prefix
    if( !CheckType( type, AST__XMLNAME, status ) ){
       astError( AST__INTER, "InitXmlNamespace: Supplied object type (%d) "
                 "does not represent an XmlNamespace", status, type );
-   } 
+   }
 
 /* Ensure we have non-NULL pointers. */
    if( !prefix ) prefix = "";
@@ -5001,7 +5001,7 @@ static void InitXmlObject( AstXmlObject *new, long int type, int *status ){
 *     InitXmlObject( AstXmlObject *new, long int type, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlObject 
+*     This function initialises supplied memory to hold an XmlObject
 *     structure.
 
 *  Parameters:
@@ -5029,7 +5029,7 @@ static void InitXmlObject( AstXmlObject *new, long int type, int *status ){
    }
 
 /* This class of structure is the base class for XML objects so it has no
-   parent class to be initialised. So just initialise the items specific to 
+   parent class to be initialised. So just initialise the items specific to
    this class of structure. */
    new->parent = NULL;
    new->type = type;
@@ -5056,11 +5056,11 @@ static void InitXmlPI( AstXmlPI *new, int type, const char *target,
 
 *  Synopsis:
 *     #include "xml.h"
-*     InitXmlPI( AstXmlPI *new, int type, const char *target, 
+*     InitXmlPI( AstXmlPI *new, int type, const char *target,
 *                const char *text, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlPI 
+*     This function initialises supplied memory to hold an XmlPI
 *     structure.
 
 *  Parameters:
@@ -5084,7 +5084,7 @@ static void InitXmlPI( AstXmlPI *new, int type, const char *target,
    if( !CheckType( type, AST__XMLPI, status ) ){
       astError( AST__INTER, "InitXmlPI: Supplied object type (%d) "
                 "does not represent an XmlPI", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject component. */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -5093,7 +5093,7 @@ static void InitXmlPI( AstXmlPI *new, int type, const char *target,
    if( !target ) target = "";
    if( !text ) text = "";
 
-/* Initialise the items specific to this class of structure. Report an error 
+/* Initialise the items specific to this class of structure. Report an error
    if anything is illegal. */
    new->target = NULL;
    new->text = NULL;
@@ -5123,7 +5123,7 @@ static void InitXmlPrologue( AstXmlPrologue *new, int type, int *status ){
 *     InitXmlPrologue( AstXmlPrologue *new, int type, int *status )
 
 *  Description:
-*     This function initialises supplied memory to hold an XmlPrologue 
+*     This function initialises supplied memory to hold an XmlPrologue
 *     structure.
 
 *  Parameters:
@@ -5143,7 +5143,7 @@ static void InitXmlPrologue( AstXmlPrologue *new, int type, int *status ){
    if( !CheckType( type, AST__XMLPRO, status ) ){
       astError( AST__INTER, "InitXmlPrologue: Supplied object type (%d) "
                 "does not represent an XmlPrologue", status, type );
-   } 
+   }
 
 /* Initialise the parent XmlObject */
    InitXmlObject( (AstXmlObject *) new, type, status );
@@ -5232,10 +5232,10 @@ static int MatchName( AstXmlElement *this, const char *name, int *status ){
    if( result ) {
       if( newname && this->name ) {
          result = !strcmp( newname, this->name );
-   
+
       } else if( !newname && !this->name ) {
          result = 1;
-   
+
       } else {
          result = 0;
       }
@@ -5251,7 +5251,7 @@ static int MatchName( AstXmlElement *this, const char *name, int *status ){
    return result;
 }
 
-static AstXmlAttribute *NewAttribute( const char *name, const char *value, 
+static AstXmlAttribute *NewAttribute( const char *name, const char *value,
                                       const char *prefix, int *status ){
 /*
 *  Name:
@@ -5270,12 +5270,12 @@ static AstXmlAttribute *NewAttribute( const char *name, const char *value,
 
 *  Description:
 *     This function creates a new XmlAttribute structure representing an
-*     XML attribute with the given name, value and namespace prefix. 
+*     XML attribute with the given name, value and namespace prefix.
 
 *  Parameters:
 *     name
 *        Pointer to a null terminated string containing the attribute name.
-*     value 
+*     value
 *        Pointer to a null terminated string containing the attribute value.
 *     prefix
 *        Pointer to a null terminated string containing the attribute
@@ -5284,7 +5284,7 @@ static AstXmlAttribute *NewAttribute( const char *name, const char *value,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the new structure is returned. 
+*     A pointer to the new structure is returned.
 
 *  Notes:
 *     - A NULL pointer is returned if the inherited status value
@@ -5339,7 +5339,7 @@ static AstXmlDocument *NewDocument( int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the new structure is returned. 
+*     A pointer to the new structure is returned.
 
 *  Notes:
 *     - A NULL pointer is returned if the inherited status value
@@ -5399,7 +5399,7 @@ static AstXmlNamespace *NewNamespace( const char *prefix, const char *uri, int *
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the new structure is returned. 
+*     A pointer to the new structure is returned.
 
 *  Notes:
 *     - A NULL pointer is returned if the inherited status value
@@ -5456,7 +5456,7 @@ static AstXmlPrologue *NewPrologue( AstXmlDocument *doc, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the new structure is returned. 
+*     A pointer to the new structure is returned.
 
 *  Notes:
 *     - A NULL pointer is returned if the inherited status value
@@ -5506,8 +5506,8 @@ static char *RemoveEscapes( const char *text, int *status ){
 *     char *RemoveEscapes( const char *text, int *status )
 
 *  Description:
-*     This function produces a dynamic copy of the supplied text in which 
-*     occurrences of XML entity references are replaced by the corresponding 
+*     This function produces a dynamic copy of the supplied text in which
+*     occurrences of XML entity references are replaced by the corresponding
 *     ASCII text.
 
 *  Parameters:
@@ -5521,7 +5521,7 @@ static char *RemoveEscapes( const char *text, int *status ){
 *     copy.
 
 *  Notes:
-*     - NULL is returned if this function is called with the global error 
+*     - NULL is returned if this function is called with the global error
 *     status set, or if it should fail for any reason.
 */
 
@@ -5550,7 +5550,7 @@ static char *RemoveEscapes( const char *text, int *status ){
       d = result;
       while( *(++c) ) {
 
-/* If this character marks the start of a entity reference, replace it by 
+/* If this character marks the start of a entity reference, replace it by
    the corresponding ascii character and shuffle the remaining text down. */
          if( !strncmp( c, "&amp;", 5 ) ) {
             rc = '&';
@@ -5582,7 +5582,7 @@ static char *RemoveEscapes( const char *text, int *status ){
          } else {
             *(d++) = *c;
          }
-        
+
       }
 
 /* Terminate the returned string. */
@@ -5613,8 +5613,8 @@ static void RemoveObjectFromList( AstXmlObject *obj ){
 *     void RemoveObjectFromList( AstXmlObject *obj )
 
 *  Description:
-*     This function removes the supplied pointer from a static list of 
-*     pointers, and decrements the number of elements in the list. This list 
+*     This function removes the supplied pointer from a static list of
+*     pointers, and decrements the number of elements in the list. This list
 *     holds pointers to all the XmlObjects which currently exist. If the
 *     supplied pointer is not found in the list, this function returns
 *     without action.
@@ -5645,7 +5645,7 @@ static void RemoveObjectFromList( AstXmlObject *obj ){
 /* Check the pointer was found. */
    if( ii != -1 ) {
 
-/* Shuffle all higher index pointers down one in the list in order to fill 
+/* Shuffle all higher index pointers down one in the list in order to fill
    the gap left by removing the supplied pointer. */
       for( ii++; ii < nobj; ii++ ){
          existing_objects[ ii - 1 ] = existing_objects[ ii ];
@@ -5752,7 +5752,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *     int Ustrcmp( const char *a, const char *b )
 
 *  Description:
-*     Returns 0 if there are no differences between the two strings, and 1 
+*     Returns 0 if there are no differences between the two strings, and 1
 *     otherwise. Comparisons are case blind.
 
 *  Parameters:
@@ -5767,7 +5767,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strcmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -5834,22 +5834,22 @@ int astXmlTrace( int show ){
 *     int astXmlTrace( int show )
 
 *  Description:
-*     Lists details of XML objects currently in existence. Details are 
+*     Lists details of XML objects currently in existence. Details are
 *     written to standard output.
 
 *  Parameters:
 *     show
 *        - 0, the ID values of all currently active XmlObjects are
-*        listed. The objects themselves are unchanged. 
+*        listed. The objects themselves are unchanged.
 *        - 1, each object is displayed using astXmlShow unless it has
-*        already been included in the display of a previous object, and then 
-*        annulled. Consequently, this mode is destructive, and none of the 
+*        already been included in the display of a previous object, and then
+*        annulled. Consequently, this mode is destructive, and none of the
 *        displayed XmlObjects will be acessable afterwards.
 *        - 2, each object is displayed using astXmlShow whether or not it
 *        has already been included in the display of a previous object.
 *        The objects are left unchanged.
 *        - 3, nothing is written to standard output, but the number of
-*        active XmlObjects is still returned. 
+*        active XmlObjects is still returned.
 
 *  Returned Value:
 *     The number of XMLObjects which are in existence on entry to this
@@ -5875,13 +5875,13 @@ int astXmlTrace( int show ){
    } else if( show ==1 ){
       while( nobj > 0 ) {
          root = astXmlGetRoot( existing_objects[0] );
-         printf( "ID = %d (type %ld)\n%s\n------------\n", 
+         printf( "ID = %d (type %ld)\n%s\n------------\n",
                  root->id, root->type, astXmlShow( root ) );
          root = astXmlAnnulTree( root );
       }
 
    } else if( show == 2 ) {
-      for( i = 0; i < nobj; i++ ) printf( "%d\n%s\n------------\n", 
+      for( i = 0; i < nobj; i++ ) printf( "%d\n%s\n------------\n",
                                           existing_objects[ i ]->id,
                                           astXmlShow(existing_objects[ i ]) );
       printf("\n");
@@ -5893,9 +5893,9 @@ int astXmlTrace( int show ){
 }
 #endif
 
-AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc, 
+AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
                                    int (*is_wanted)( AstXmlElement *, int * ),
-                                   int skip, char (*source)( void *, int * ), 
+                                   int skip, char (*source)( void *, int * ),
                                    void *data, int *status ){
 /*
 *+
@@ -5910,9 +5910,9 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 
 *  Synopsis:
 *     #include "xml.h"
-*     AstXmlElement *astXmlReadDocument( AstXmlDocument **doc, 
+*     AstXmlElement *astXmlReadDocument( AstXmlDocument **doc,
 *                                       int (*is_wanted)( AstXmlElement *, int * ),
-*                                       int skip, char (*source)( void *, int * ), 
+*                                       int skip, char (*source)( void *, int * ),
 *                                       void *data )
 
 *  Description:
@@ -5921,40 +5921,40 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 *     the next character read from the external source on each invocation.
 *
 *     The reading scheme combines elements of the SAX and DOM schemes in
-*     an attempt to minimise memory requirements (a potential problem with 
+*     an attempt to minimise memory requirements (a potential problem with
 *     DOM) whilst retaining a simple interface for accessing the XML
 *     elements of interest to the client (a potential problem for SAX).
 *
 *     When an element start tag is encountered in the source, the client
 *     is asked to indicate whether the element is of interest. This is
 *     done by calling the supplied "is_wanted" function. If the client
-*     indicates that the element is of interest, its contents are read 
+*     indicates that the element is of interest, its contents are read
 *     and a pointer to a corresponding XmlElement structure is returned.
 *     Reading stops when the element has been read. If the client
 *     indicates that the element is not of interest, then (if "skip" is
-*     non-zero) the contents of the element are skipped over, and reading 
-*     continues following the element end tag. When the next element is 
-*     encountered the client will again be asked to indicate its interest 
-*     in the element. This continues until either the client indicates that 
+*     non-zero) the contents of the element are skipped over, and reading
+*     continues following the element end tag. When the next element is
+*     encountered the client will again be asked to indicate its interest
+*     in the element. This continues until either the client indicates that
 *     an element is of interest, or the end of the source is reached. If
 *     "skip" is zero, then an error is reported if the first element in
 *     the document is not of interest.
 *
 *     The client has an option to reply that an element is not itself of
-*     interest, but may possibly contain interesting elements. In this case, 
-*     the sub-elements within the element are read and checked in the same 
+*     interest, but may possibly contain interesting elements. In this case,
+*     the sub-elements within the element are read and checked in the same
 *     way.
 *
 *     This function returns, and no more characters are read from the
-*     source, once the contents of the first "interesting" element has been 
+*     source, once the contents of the first "interesting" element has been
 *     read.
 *
 *     The function thus returns a pointer to an XmlElement containing the
-*     entire contents of the first interesting element encountered in the 
+*     entire contents of the first interesting element encountered in the
 *     source. This function can then be invoked again to read further
 *     interesting elements from the source. In this case, the XmlDocument
 *     structure created by the initial invocation (see parameter "doc")
-*     must be supplied, as this indicates the point in the total document 
+*     must be supplied, as this indicates the point in the total document
 *     structure at which the previous "interesting" element was located.
 
 *  Parameters:
@@ -5965,7 +5965,7 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 *        source (i.e. when reading from the beginning of the document).
 *        In this case a new AstXmlDocument structure will be created and a
 *        pointer to it stored at the supplied address. This structure
-*        holds the context which enables subsequent invocations of this 
+*        holds the context which enables subsequent invocations of this
 *        function to determine the point in the document structure at
 *        which to store any further text read from the source. It also
 *        holds the document prologue, root element, and epilogue.
@@ -5979,14 +5979,14 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 *                an interesting element, so look through the content and
 *                ask the client again about any elements found inside it.
 *            0 : the element definately contains nothing of interest to
-*                the client. kip its content and continue looking for new 
+*                the client. kip its content and continue looking for new
 *                elements.
 *            1 : the element is definately of interest to the client so
 *                read its contents and return a pointer to it.
 *        If NULL is supplied, a value of "+1" is assumed.
 *     skip
 *        Indicates if any uninteresting elements may proceed the first
-*        element of interest. If zero, then an error is reported if the 
+*        element of interest. If zero, then an error is reported if the
 *        first element read from the source is not of interest to the client.
 *        If non-zero, then any uninteresting elements are simply skipped
 *        over until an interesting element is found or the document ends.
@@ -6001,11 +6001,11 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 
 *  Returned Value:
 *     A pointer to the first element of interest, or NULL if there are no
-*     interesting elements in the source. The returned element will be a 
+*     interesting elements in the source. The returned element will be a
 *     descendant of "*doc". For this reason, the returned pointer need not
-*     be annulled explicitly since it will be freed when the XmlDocument 
-*     is annulled. However, if required (e.g. to save memory) it may be 
-*     annulled before the document is annulled by using astXmlRemoveItem to 
+*     be annulled explicitly since it will be freed when the XmlDocument
+*     is annulled. However, if required (e.g. to save memory) it may be
+*     annulled before the document is annulled by using astXmlRemoveItem to
 *     remove it from its parent, and then using astXmlAnnul to annul it.
 
 *  Notes:
@@ -6016,7 +6016,7 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 *-
 */
 
-/* Local Variables: */   
+/* Local Variables: */
    AstXmlElement *result;
 
 /* Check any supplied pointer is for an XmlDocument. */
@@ -6036,7 +6036,7 @@ AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc,
 
 static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                                    int (*is_wanted)( AstXmlElement *, int * ),
-                                   int skip, char (*source)( void *, int * ), 
+                                   int skip, char (*source)( void *, int * ),
                                    void *data, int depth, int *status ){
 /*
 *  Name:
@@ -6052,7 +6052,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 *     #include "xml.h"
 *     AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 *                                 int (*is_wanted)( AstXmlElement *, int * ),
-*                                 int skip, char (*source)( void *, int * ), 
+*                                 int skip, char (*source)( void *, int * ),
 *                                 void *data, int depth, int *status )
 
 *  Description:
@@ -6070,16 +6070,16 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 *        source (i.e. when reading from the beginning of the document).
 *        In this case a new AstXmlDocument structure will be created and a
 *        pointer to it stored at the supplied address. This structure
-*        holds the context which enables subsequent invocations of this 
+*        holds the context which enables subsequent invocations of this
 *        function to determine the point in the document structure at
 *        which to store any further text read from the source. It also
 *        holds the document prologue, root element, and epilogue.
 *     wanted
 *        Indicates if the content read from the XML source is of interest
-*        to the client. If a positive value is supplied, all content read 
+*        to the client. If a positive value is supplied, all content read
 *        from the source (up to the end tag which corresponds to the
-*        supplied "parent") is added to the "parent" element (if supplied). 
-*        If zero is supplied, then all content read from the source is 
+*        supplied "parent") is added to the "parent" element (if supplied).
+*        If zero is supplied, then all content read from the source is
 *        discarded. If a negative value is supplied, then all content up
 *        to the first element start tag is discarded. When the first
 *        element start tag is encountered, it is passed back to the client
@@ -6087,9 +6087,9 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 *        returns a non-zero value, then the contents of the new element
 *        is read (by calling this function recursively) and a pointer to
 *        the new element is returned as the function value (reading then
-*        stops and the function returns). If the "is_wanted" function returns 
-*        zero, then the contents of the new element is skipped over, and 
-*        reading continues until the next element start tag is encountered, 
+*        stops and the function returns). If the "is_wanted" function returns
+*        zero, then the contents of the new element is skipped over, and
+*        reading continues until the next element start tag is encountered,
 *        when the "is_wanted" function is again invoked.
 *     is_wanted
 *        Pointer to a function which is called to decide if the client is
@@ -6101,14 +6101,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 *                an interesting element, so look through the content and
 *                ask the client again about any elements found inside it.
 *            0 : the element definately contains nothing of interest to
-*                the client. kip its content and continue looking for new 
+*                the client. kip its content and continue looking for new
 *                elements.
 *            1 : the element is definately of interest to the client so
 *                read its contents and return a pointer to it.
 *        If NULL is supplied, a value of "+1" is assumed.
 *     skip
 *        Indicates if any uninteresting elements may proceed the first
-*        element of interest. If zero, then an error is reported if the 
+*        element of interest. If zero, then an error is reported if the
 *        first element read from the source is not of interest to the client.
 *        If non-zero, then any uninteresting elements are simply skipped
 *        over until an interesting element is found or the document ends.
@@ -6122,7 +6122,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 *        structure may contain any data needed by the source function.
 *     depth
 *        Depth of nesting (i.e. zero if this function was invoked from
-*        astXmlReadDocument, and a positive value if it was invoked 
+*        astXmlReadDocument, and a positive value if it was invoked
 *        recursively from within itself).
 *     status
 *        Pointer to the inherited status variable.
@@ -6183,7 +6183,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    that we ask the client when the first element start tag is encountered. */
    if( !*doc ){
       prolog_ok = 1;
-      *doc = NewDocument( status );      
+      *doc = NewDocument( status );
       wanted = -1;
    } else {
       prolog_ok = 0;
@@ -6200,7 +6200,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    action. */
    if( parent && parent->complete ) {
 
-/* If an error has occurred, or if this invocation of ReadContent was 
+/* If an error has occurred, or if this invocation of ReadContent was
    made recursively (rather than by the client), or if we have something
    to return, return. */
       if( !astOK || depth > 0 || result ) {
@@ -6245,16 +6245,16 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
       if( !astOK ) break;
 
 /* If a parent element has been supplied, (i.e. if we are currently
-   reading the content of an element), or if we are not in state zero, 
-   report an error and leave the loop if the end of the text has been 
+   reading the content of an element), or if we are not in state zero,
+   report an error and leave the loop if the end of the text has been
    reached. If no parent was supplied, just leave the loop. */
       if( !c ) {
-         if( parent ) {   
+         if( parent ) {
             astError( AST__XMLWF, "astRead(XmlChan): End of XML input text "
                       "reached whilst reading the content of element %s.", status,
                        astXmlGetTag( parent, 1 ) );
 
-         } else if( state > 1 ) {   
+         } else if( state > 1 ) {
             if( msg ) {
                astError( AST__XMLWF, "astRead(XmlChan): End of XML input text "
                          "reached whilst reading the document epilogue "
@@ -6263,7 +6263,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                astError( AST__XMLWF, "astRead(XmlChan): End of XML input text "
                          "reached whilst reading the document epilogue." , status);
             }
-         } 
+         }
          break;
       }
 
@@ -6311,7 +6311,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                         if( !isspace( *cc ) ) {
                            if( parent ) {
                               astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                                        "the input data \"%s\" within element %s.", status, 
+                                        "the input data \"%s\" within element %s.", status,
                                         text1, astXmlGetTag( parent, 1 ) );
                            } else {
                               astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
@@ -6361,7 +6361,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          } else if( c == '?' ) {
             state = 3;
 
-/* If the character is a "!", it must be a comment or a CDATA section 
+/* If the character is a "!", it must be a comment or a CDATA section
    or a DTD. */
          } else if( c == '!' ) {
             state = 4;
@@ -6377,13 +6377,13 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             text1 = AppendChar( text1, &nc1, c, status );
          }
 
-/* State 3: We are reading the initial text following the opening "<?" string 
-   of a PI tag. The characters between the initial "<?" string and the first 
+/* State 3: We are reading the initial text following the opening "<?" string
+   of a PI tag. The characters between the initial "<?" string and the first
    space or closing "?>" string is the target text. */
       } else if( state == 3 ) {
          if( c == '>' && lc == '?' ) {
             if( text1 ) text1[ --nc1 ] = 0;
-            state = 100;            
+            state = 100;
          } else if( isspace( c ) ) {
             state = 7;
          } else {
@@ -6421,7 +6421,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             text1 = AppendChar( text1, &nc1, c, status );
          }
 
-/* State 6: We are looking for the (prefix:)name combination at the start of 
+/* State 6: We are looking for the (prefix:)name combination at the start of
    an element start tag. */
       } else if( state == 6 ) {
          if( c == '>' ) {
@@ -6480,7 +6480,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          } else if( nc1 < 10 ) {
             text1 = AppendChar( text1, &nc1, c, status );
 
-         } else {  
+         } else {
             if( parent ) {
                astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
                          "starting with \"%s%c...\" encountered within "
@@ -6493,7 +6493,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             break;
          }
 
-/* State 10: We are reading the remaining text in a comment tag. When the end 
+/* State 10: We are reading the remaining text in a comment tag. When the end
    ">" is reached, check the previous 2 characters are "--" and then terminate
    the text1 string in order to remove these two characters from the comment
    text.  */
@@ -6514,7 +6514,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             text1 = AppendChar( text1, &nc1, c, status );
          }
 
-/* State 12: We are looking for an equals sign marking the end of an 
+/* State 12: We are looking for an equals sign marking the end of an
    attribute name within an element start tag. */
       } else if( state == 12 ) {
          if( c == '=' ) {
@@ -6524,7 +6524,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             if( text1 ) {
                if( parent ) {
                   astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                            " \"%s...\" encountered within element %s.", status, msg, 
+                            " \"%s...\" encountered within element %s.", status, msg,
                             astXmlGetTag( parent, 1 )  );
                } else {
                   astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"%s...\" "
@@ -6610,7 +6610,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          } else if( nc1 < 15 ) {
             text1 = AppendChar( text1, &nc1, c, status );
 
-         } else {  
+         } else {
             if( parent ) {
                astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
                          "starting with \"%s%c...\" encountered within "
@@ -6708,11 +6708,11 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    above, but which must be performed before reading the next character. */
 
 /* In most cases there will be no actions to perform. Therefore check for
-   this first (to avoid the time spent doing all the following usually 
+   this first (to avoid the time spent doing all the following usually
    irrelevant checks). */
       if( state < 23 ) {
 
-/* State 100: We have just reached the end of a PI tag. Create a new XmlPI and 
+/* State 100: We have just reached the end of a PI tag. Create a new XmlPI and
    store it in the parent (if required). */
       } else if( state == 100 ) {
          if( text1 ){
@@ -6724,7 +6724,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                   astError( AST__XMLWF, "astRead(XmlChan): An XML "
                             "declaration \"%s\" was encountered within the "
                             "body of the document.", status, msg );
-               } else { 
+               } else {
                   astXmlSetXmlDec( *doc, text2 );
                }
 
@@ -6738,7 +6738,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                   } else if( !skip ) {
                      if( parent ) {
                         astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                                  "the input data \"%s\" within element %s.", status, 
+                                  "the input data \"%s\" within element %s.", status,
                                   msg, astXmlGetTag( parent, 1 ) );
                      } else {
                         astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
@@ -6769,9 +6769,9 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          }
          state = 0;
 
-/* State 101: We have just reached the end of an element end tag. Check that 
+/* State 101: We have just reached the end of an element end tag. Check that
    the (prefix:)name is legal, and matches that of the current parent,
-   re-instate the parent's parent as the current element in the document, 
+   re-instate the parent's parent as the current element in the document,
    and leave the loop if appropriate. */
       } else if( state == 101 ) {
          if( text1 ){
@@ -6797,13 +6797,13 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             }
 
             text1 = astFree( text1 );
-           
+
          } else {
             astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"%s\" "
                       "encountered.", status, msg );
          }
 
-/* If an error has occurred, or if this invocation of ReadContent was 
+/* If an error has occurred, or if this invocation of ReadContent was
    made recursively (rather tnan by the client), or if we have something
    to return, break out of the loop. */
          if( !astOK || depth > 0 || result ) {
@@ -6817,9 +6817,9 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             state = 0;
          }
 
-/* State 102: We have just got the (prefix:)name for an element start tag, and 
-   the start tag contains no attributes, etc. Create a new XmlElement, adding 
-   it to the supplied parent, and then proceed to state 200 to read the 
+/* State 102: We have just got the (prefix:)name for an element start tag, and
+   the start tag contains no attributes, etc. Create a new XmlElement, adding
+   it to the supplied parent, and then proceed to state 200 to read the
    content of the element. */
       } else if( state == 102 ) {
          if( text1 ){
@@ -6834,7 +6834,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          }
 
 /* State 103: We have just got the (prefix:)name for an empty element tag, and
-   the tag does not contain further attributes, etc. Create a new XmlElement 
+   the tag does not contain further attributes, etc. Create a new XmlElement
    and store it in the container (if any). Indicate that there is no
    content to read, and then go on to state 200. */
       } else if( state == 103 ) {
@@ -6850,9 +6850,9 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             break;
          }
 
-/* State 104: We have just got the (prefix:)name for an element start tag, but 
-   the start tag may contain further attributes, etc. Create a new XmlElement 
-   and store it in the container (if any). Then go to state 12 in which we 
+/* State 104: We have just got the (prefix:)name for an element start tag, but
+   the start tag may contain further attributes, etc. Create a new XmlElement
+   and store it in the container (if any). Then go to state 12 in which we
    look for further attributes, etc. */
       } else if( state == 104 ) {
          if( text1 ){
@@ -6866,7 +6866,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             break;
          }
 
-/* State 105: We have just reached the end of a comment tag. Create a new 
+/* State 105: We have just reached the end of a comment tag. Create a new
    XmlComment and  store it in the parent. */
       } else if( state == 105 ) {
          if( text1 ){
@@ -6878,7 +6878,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                } else if( !skip ) {
                   if( parent ) {
                      astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                               "the input data \"%s\" within element %s.", status, 
+                               "the input data \"%s\" within element %s.", status,
                                msg, astXmlGetTag( parent, 1 ) );
                   } else {
                      astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
@@ -6917,7 +6917,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             } else if( !skip ) {
                if( parent ) {
                   astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                            "the input data \"%s\" within element %s.", status, 
+                            "the input data \"%s\" within element %s.", status,
                             msg, astXmlGetTag( parent, 1 ) );
                } else {
                   astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
@@ -6933,7 +6933,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          }
          state = 0;
 
-/* State 107: We have just reached the end of an attribute or namespace 
+/* State 107: We have just reached the end of an attribute or namespace
    setting. Create a new object and store it in the element created
    earlier. */
       } else if( state == 107 ) {
@@ -6941,8 +6941,8 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             if( !elem ) {
                astError( AST__INTER, "ReadContent(xml): Container lost at state "
                          "107 (AST internal programming error).", status );
-               break;   
-            } 
+               break;
+            }
 
             if( !strcmp( text1, "xmlns" ) ) {
                astXmlAddURI( elem, NULL, text2 );
@@ -6966,7 +6966,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          }
          state = 12;
 
-/* State 108: We have just reached the end of an empty element tag to which 
+/* State 108: We have just reached the end of an empty element tag to which
    we have been adding attributes, etc. */
       } else if( state == 108 ) {
          if( elem ) {
@@ -7009,11 +7009,11 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 
 /* State 200: We now have now read a complete element start tag and have
    a corresponding XmlElement ("elem"), with all attributes and namespaces,
-   etc (but no content). Call the "is_wanted" function to see if the client 
+   etc (but no content). Call the "is_wanted" function to see if the client
    is interested in the element. */
       if( state == 200 ) {
 
-/* If this element is found at the root level of the document, store a 
+/* If this element is found at the root level of the document, store a
    pointer to it as the root element. Report an error if there is already
    a root element. */
          if( !parent ) {
@@ -7030,7 +7030,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             }
          }
 
-/* If we do not already know, ask the caller if it is interested in this new 
+/* If we do not already know, ask the caller if it is interested in this new
    element. If no "is_wanted" function was supplied, assume all elements
    are interesting. */
          if( wanted == -1 ) {
@@ -7043,7 +7043,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          if( newwanted != 1 && !skip ) {
             if( parent ) {
                astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                         "the input data \"%s\" within element %s.", status, 
+                         "the input data \"%s\" within element %s.", status,
                          msg, astXmlGetTag( parent, 1 ) );
             } else {
                astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
@@ -7053,15 +7053,15 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          }
 
 /* Make the new element the "current" element in the document. */
-         (*doc)->current = elem;         
+         (*doc)->current = elem;
 
 /* Read the contents of the new element from the source. If the client is
    interested in the element, the read contents will be added to the
    element, otherwise they will be discarded after being read. */
-         answer = ReadContent( doc, newwanted, is_wanted, skip, source, 
+         answer = ReadContent( doc, newwanted, is_wanted, skip, source,
                                data, depth + 1, status );
 
-/* If the first interesting element was found inside "elem", then 
+/* If the first interesting element was found inside "elem", then
    return it. If "elem" is not interesting and did not contain anything
    of interest, delete it and return the initialised NULL pointer. */
          if( newwanted < 0 ) {
@@ -7080,10 +7080,10 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    the first item of interest, return it. */
          } else if( wanted < 0 ) {
             result = elem;
-         }               
+         }
 
 /* If we have an answer to return, leave the loop, otherwise re-instate the
-   original current element in the document and continue to read any text 
+   original current element in the document and continue to read any text
    following the element. */
          if( result ) {
             break;

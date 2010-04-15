@@ -14,15 +14,15 @@
 
 *  Description:
 *     This routine sets the seed for the PDA random number routines to a
-*     non-repeatable value, and must be called prior to using any PDA 
-*     random number routine. The seed is only set once in each process, 
-*     and is set to a number which combines the process id and the 
+*     non-repeatable value, and must be called prior to using any PDA
+*     random number routine. The seed is only set once in each process,
+*     and is set to a number which combines the process id and the
 *     current time.
 *
-*     The process id is included because the "time" system call 
-*     (implemented by PSX_TIME) returns the time in seconds. On modern 
-*     machines it is possible for an application to be called several times 
-*     each second, resulting in the same seed being used each time if the 
+*     The process id is included because the "time" system call
+*     (implemented by PSX_TIME) returns the time in seconds. On modern
+*     machines it is possible for an application to be called several times
+*     each second, resulting in the same seed being used each time if the
 *     seed is based only on the time.
 
 *  Arguments:
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,7 +105,7 @@
 
 *  PDA requires that the seed be one more than a mutiple of 4. We will
 *  therefore multiply the above seed by 4. To avoid the possibility of
-*  integer overflow, first find the remainder on dividing the initial 
+*  integer overflow, first find the remainder on dividing the initial
 *  seed by a quarter of the maximum integer value.
          SEED = MOD( SEED, VAL__MAXI/4 )*4 + 1
 

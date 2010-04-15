@@ -1,13 +1,13 @@
-      SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
+      SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC,
      :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :     N_BOL, N_POS, N_INTS, N_MEAS, N_BEAMS, MJD_STANDARD, IN_UT1,
-     :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+     :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH,
      :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
      :     BOL_ADC, BOL_CHAN,
-     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
-     :     USE_LST, LST_PTR, ANG_INT, ANG_MEAS,INT_LIST, MEAS_LIST, 
+     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS,
+     :     USE_LST, LST_PTR, ANG_INT, ANG_MEAS,INT_LIST, MEAS_LIST,
      :     BOLWT, STATUS)
 *+
 *  Name:
@@ -18,26 +18,26 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
-*      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
+*      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC,
 *     :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
 *     :     N_BOL, N_POS, N_INTS, N_BEAMS, MJD_STANDARD, IN_UT1,
-*     :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+*     :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH,
 *     :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
 *     :     BOL_ADC, BOL_CHAN,
-*     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+*     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-*     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
+*     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS,
 *     :     USE_LST, LST_PTR, ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST, BOLWT,
 *     :     STATUS)
 
- 
+
 *  Description:
 *     This routines reads all necessary information from an NDF (via
 *     the given NDF identifier) for rebinning. Optionally, returns
 *     the quality array (needed for despiking).
- 
+
 *  Arguments:
 *     IN_NDF = INTEGER (Given)
 *        NDF identifier of input NDF
@@ -72,7 +72,7 @@
 *     MJD_STANDARD = DOUBLE (Given & Returned)
 *        Modified Julian data of observation. Returned if N_FILE=1.
 *     IN_UT1 = DOUBLE (Returned)
-*        Modified Julian data of observation UT1 at start of an input 
+*        Modified Julian data of observation UT1 at start of an input
 *        observation, expressed as modified Julian day
 *     IN_RA_CEN = DOUBLE (Returned)
 *        RA of centre
@@ -218,10 +218,10 @@
 *
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -395,7 +395,7 @@
       INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
                                        ! in input file
       INTEGER          N_MEASUREMENTS  ! number of measurements in input file
-      INTEGER          N_POINT         ! dimension of pointing correction 
+      INTEGER          N_POINT         ! dimension of pointing correction
                                        ! array in input file
       INTEGER          N_SWITCHES      ! number of switches per exposure in
                                        ! input file
@@ -408,7 +408,7 @@
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                        ! LST of pointing corrections (radians)
-      LOGICAL          REBIN           ! .TRUE. if REBIN application has 
+      LOGICAL          REBIN           ! .TRUE. if REBIN application has
                                        ! been run on input file
       LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
                                        ! has been run on input file
@@ -461,14 +461,14 @@
       IN_DEC1_PTR = 0
       IN_DEC2_PTR = 0
 
-      
+
 *     get some general descriptive parameters of the observation
 
       CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC,
      :     STATUS)
-      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', 
+      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ',
      :     IN_SCUBAX_LOC, STATUS)
-      CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ', 
+      CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ',
      :     IN_SCUCDX_LOC, STATUS)
 
 *     The REDS extension may not be present
@@ -491,7 +491,7 @@
          END IF
       END IF
 
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, 
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS,
      :     N_FITS, STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
@@ -502,7 +502,7 @@
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MODE', OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
 
@@ -512,7 +512,7 @@
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_OUTIF(MSG__NORM, ' ', '^PKG: run ^RUN was a '//
-     :     '^MODE observation of ^OBJECT with ^SAMPLE sampling', 
+     :     '^MODE observation of ^OBJECT with ^SAMPLE sampling',
      :     STATUS)
 
       IF ((OBSERVING_MODE .NE. 'MAP')      .AND.
@@ -558,7 +558,7 @@
 
          IF (NREC .GT. 0) THEN
             DO I = 1, NREC
-               CALL NDF_HINFO (IN_NDF, 'APPLICATION', 
+               CALL NDF_HINFO (IN_NDF, 'APPLICATION',
      :              I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
                IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
@@ -613,7 +613,7 @@
          END IF
       END IF
 
-*     If this data is SCAN and has not been restored then I 
+*     If this data is SCAN and has not been restored then I
 *     need to implment SCAN_REVERSAL
 
       SCAN_REVERSAL = .FALSE.
@@ -652,7 +652,7 @@
          END IF
       END IF
 
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'WAVE_1', RTEMP, STATUS)
       IF (N_FILE .EQ. 1) THEN
          WAVELENGTH = RTEMP
@@ -674,9 +674,9 @@
       END IF
 
 *     Get telescope and instrument information...
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'INSTRUME', INSTRUMENT, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'TELESCOP', TELESCOPE, STATUS)
 
 *     ...And calculate the focal station
@@ -685,11 +685,11 @@
 
 *     coords of telescope centre
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'CENT_CRD', IN_CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (IN_CENTRE_COORDS)
 
-      IF (OUT_COORDS .EQ. 'PL' .AND. 
+      IF (OUT_COORDS .EQ. 'PL' .AND.
      :     IN_CENTRE_COORDS .NE. 'PLANET') THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC('TASK', TSKNAME)
@@ -699,10 +699,10 @@
       END IF
 
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LAT', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LAT_RAD, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LONG', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LONG_RAD, STATUS)
 
@@ -716,7 +716,7 @@
      :        STATUS)
          CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'MJD1', IN_MJD1, STATUS)
-         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'MJD2', IN_MJD2, STATUS)
       ELSE
          IN_LAT2_RAD = 0.0D0
@@ -734,7 +734,7 @@
 
 *     offset from telescope centre
 
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MAP_X', MAP_X, STATUS)
       MAP_X = MAP_X / REAL (R2AS)
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -765,16 +765,16 @@
 *     This routine returns this information for all files and relies on
 *     higher routines to select the correct one
 
-      IF (N_FILE .EQ. 1) MJD_STANDARD = IN_UT1 
+      IF (N_FILE .EQ. 1) MJD_STANDARD = IN_UT1
 
       SOBJECT = OBJECT          ! Store first object name
 
 *     These are only needed to inform user of UT for RD rebinning
-      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :     'UTDATE', SUTDATE, STATUS)
-      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :     'UTSTART', SUTSTART, STATUS)
-      
+
 *     search for pointing correction structure in the REDS extension, if there
 *     is one read in the corrections
 
@@ -786,7 +786,7 @@
      :        POINT_DAZ, N_POINT, STATUS)
          CALL CMP_GET1R(IN_REDSX_LOC,'POINT_DEL',SCUBA__MAX_POINT,
      :        POINT_DEL, N_POINT, STATUS)
-         
+
          IF (STATUS .NE. SAI__OK) THEN
             CALL ERR_ANNUL(STATUS)
             N_POINT = 0
@@ -854,7 +854,7 @@
 
       CALL NDF_SQMF(QMF, IN_NDF, STATUS)
       CALL NDF_SQMF(QMF, SECNDF, STATUS)
-      CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'READ', 
+      CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'READ',
      :     FILE_DATA_PTR, ITEMP, STATUS)
 
 *     Need to check if FIGARO has removed the VARIANCE array
@@ -878,7 +878,7 @@
             CALL SCULIB_CFILLR(ITEMP, RTEMP,
      :           %VAL(CNF_PVAL(DUMMY_VARIANCE_PTR)))
             FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR
-         END IF               
+         END IF
       END IF
 
 *     Handle the quality array if necessary
@@ -907,7 +907,7 @@
      :              %VAL(CNF_PVAL(DUMMY_QUALITY_PTR)))
                FILE_QUALITY_PTR = DUMMY_QUALITY_PTR
                BADBITS = VAL__BADUB
-            END IF               
+            END IF
          END IF
 
       END IF
@@ -917,7 +917,7 @@
 *     map the DEM_PNTR and LST arrays and check their dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
 *     Check LST_STRT
@@ -927,7 +927,7 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :                    IN_UT1,
      :     RTEMP, RTEMP, STATUS)
 
@@ -950,7 +950,7 @@
 
       IF (.NOT. ABORTED) THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
@@ -967,14 +967,14 @@
      :        'MEAS_NO', LAST_MEAS, STATUS)
 
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integration(s) in '//
      :        '^N_M measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration '//
      :        '^N_I of measurement ^N_M', STATUS)
@@ -1013,15 +1013,15 @@
       END IF
 
 *     calculate the apparent RA and Dec of the map centre at IN_UT1
-*     Cannot add MAP_X and MAP_Y here since 
+*     Cannot add MAP_X and MAP_Y here since
 *       1. This routine does not support LOCAL_COORDS
-*       2. The tracking centre moves if LOCAL_COORDS is AZ for 
+*       2. The tracking centre moves if LOCAL_COORDS is AZ for
 *          a fixed RA,Dec centre.
 *     The reference centre will always be the map centre and not the
 *     offset map centre.
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, IN_LONG_RAD, IN_LAT_RAD,
-     :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0, 
+     :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0,
      :     IN_CENTRE_COORDS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
      :     STATUS)
@@ -1044,7 +1044,7 @@
       IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
 
          CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
-     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT,
      :        JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
      :        JIGGLE_Y, STATUS)
 
@@ -1068,13 +1068,13 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL VEC_RTOR(.FALSE., N_POS * N_BOL,
-     :        %VAL(CNF_PVAL(FILE_DATA_PTR)), %VAL(CNF_PVAL(DATA_PTR)), 
+     :        %VAL(CNF_PVAL(FILE_DATA_PTR)), %VAL(CNF_PVAL(DATA_PTR)),
      :        IERR,
      :        NERR, STATUS)
          CALL VEC_RTOR(.FALSE., N_POS * N_BOL,
      :        %VAL(CNF_PVAL(FILE_VARIANCE_PTR)),
      :        %VAL(CNF_PVAL(VARIANCE_PTR)), IERR, NERR, STATUS)
-         
+
       END IF
 
 *     Copy quality if needed
@@ -1085,9 +1085,9 @@
      :        QUALITY_PTR, QUALITY_END, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
-            
+
             CALL VEC_UBTOUB(.FALSE., N_POS * N_BOL,
-     :           %VAL(CNF_PVAL(FILE_QUALITY_PTR)), 
+     :           %VAL(CNF_PVAL(FILE_QUALITY_PTR)),
      :           %VAL(CNF_PVAL(QUALITY_PTR)), IERR,
      :           NERR, STATUS)
 
@@ -1121,11 +1121,11 @@
          USE_INTS = .NOT.USE_SECTION
 
 *     decode the data specifications
-         
+
          SWITCH_EXPECTED = .FALSE.
 
          CALL SCULIB_MASK_DATA(USE_INTS, 'REAL', NSPEC, DATA_SPEC,
-     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :        1, N_EXPOSURES, N_INTEGRATIONS,
      :        N_MEASUREMENTS, N_POS, N_BOL, 1, SWITCH_EXPECTED,
      :        VAL__BADR, BTEMP, 0, .TRUE., DATA_PTR,
@@ -1149,37 +1149,37 @@
 
 *     Fill it with Bad values
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLD(N_POS, VAL__BADD, 
+            CALL SCULIB_CFILLD(N_POS, VAL__BADD,
      :                         %VAL(CNF_PVAL(LST_PTR(1))))
          END IF
-            
+
       END IF
 
 *     Loop through bolometers and find apparent RA/Dec
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL SURFLIB_PROCESS_BOLS(TSKNAME,1, N_BOL,
-     :        N_POS, N_BEAMS, N_SWITCHES, N_EXPOSURES, 
+     :        N_POS, N_BEAMS, N_SWITCHES, N_EXPOSURES,
      :        N_INTEGRATIONS, N_MEASUREMENTS,
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1,N_MEASUREMENTS,
      :        N_FILE, N_FITS, FITS,
-     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :        %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :        IN_ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :        FOCAL_STATION, IN_RA_CEN, IN_DEC_CEN,
      :        %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
-     :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)),
      :        MJD_STANDARD,
-     :        IN_UT1, IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
+     :        IN_UT1, IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2,
      :        IN_LONG2_RAD, IN_LAT2_RAD,
      :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
      :        BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0D0, 0.0D0, 0.0, 0.0,
      :        %VAL(CNF_PVAL(BOL_DEC_PTR)), %VAL(CNF_PVAL(BOL_RA_PTR)),
-     :        %VAL(CNF_PVAL(DATA_PTR)), 0, USE_LST, 
+     :        %VAL(CNF_PVAL(DATA_PTR)), 0, USE_LST,
      :        %VAL(CNF_PVAL(LST_PTR(1))),
      :        0, 0, STATUS)
 
@@ -1278,7 +1278,7 @@
             FAST_AXIS = 0.0
             CALL DAT_THERE(IN_REDSX_LOC, 'FAST_AXIS', THERE, STATUS)
             IF (THERE) THEN
-               CALL CMP_GET0R(IN_REDSX_LOC, 'FAST_AXIS', FAST_AXIS, 
+               CALL CMP_GET0R(IN_REDSX_LOC, 'FAST_AXIS', FAST_AXIS,
      :              STATUS)
             ELSE
                CALL MSG_OUTIF(MSG__QUIET, ' ','WARNING! Waveplate '//
@@ -1309,7 +1309,7 @@
                CALL SURFLIB_FILL_POLPACK_ANGLES(MAX_FILE,
      :              SCUBA__MAX_INT, SCUBA__MAX_MEAS, N_FILE,
      :              N_INTEGRATIONS,
-     :              N_MEASUREMENTS, %VAL(CNF_PVAL(WP_PTR)), 
+     :              N_MEASUREMENTS, %VAL(CNF_PVAL(WP_PTR)),
      :              %VAL(CNF_PVAL(ANG_PTR)),
      :              FAST_AXIS, ANG_INT, ANG_MEAS, STATUS)
 
@@ -1334,7 +1334,7 @@
 
       CALL NDF_CGET(IN_NDF, 'Units', UNITS, STATUS)
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'NDFUNITS', UNITS, 'Units as read from the NDF', STATUS) 
+     :     'NDFUNITS', UNITS, 'Units as read from the NDF', STATUS)
 
 
 *     annul locators and array identifiers and close the file

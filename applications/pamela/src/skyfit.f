@@ -1,18 +1,18 @@
 *SKYFIT
 *
-* SKYFIT -- fits polynomials to sky and evaluates them in the object region. 
+* SKYFIT -- fits polynomials to sky and evaluates them in the object region.
 *
 * 'skyfit' is pamela's only method for sky estimation. It assumes that
-* the slit is near-parallel to horizontal rows of pixels. If it is not 
-* quite parallel then a sky line will gradually move across the row and 
-* the resulting variation is taken out using higher order poly fits. An 
-* important benefit of this method of background estimation is that cosmic 
-* rays can be fairly well removed so long as there are more than a few 
+* the slit is near-parallel to horizontal rows of pixels. If it is not
+* quite parallel then a sky line will gradually move across the row and
+* the resulting variation is taken out using higher order poly fits. An
+* important benefit of this method of background estimation is that cosmic
+* rays can be fairly well removed so long as there are more than a few
 * pixels. This is done with a cautious one at a time reject cycle.
 *
 *
 * Bad pixels: skyfit checks for bad pixels in both the flat field and
-*             object frames. This allows the user to eliminate regions 
+*             object frames. This allows the user to eliminate regions
 *             once and for all (by setting appropriate region of the
 *             flat field) or on a frame by frame basis. If insufficient
 *             pixels on a particular row are found to fit, then in the
@@ -22,7 +22,7 @@
 * Dark frame: if a dark frame is used, the skyfit result is returned
 *             applying to true sky only, so you must use the same dark
 *             frame during extraction.
-* 
+*
 * Parameters:
 *
 *  IMAGE  -- The data under analysis
@@ -33,9 +33,9 @@
 *
 *  DARK      -- Dark frame representing counts unaffected by slit
 *               profile. This will be subtracted off data before applying
-*               the balance factors. 
+*               the balance factors.
 *
-*  REGION -- file defining sky and object regions.  
+*  REGION -- file defining sky and object regions.
 *
 *  TRACE  -- Is a poly fit to be used to define the spectrum position?
 *
@@ -55,11 +55,11 @@
 *            The correct number to be used here is best estimated by trial
 *            and error. If you end up with marked P-Cyg type residuals on
 *            sky lines then maybe you have NPOLY too small, however too
-*            high a value can cause excess noise especially if you are 
+*            high a value can cause excess noise especially if you are
 *            effectively attempting to interpolate across a large gap.
 *            You should have a very good reason for anything above 3.
 *            Remember that often there may only be a few sky lines and you
-*            may be able to accept imperfect subtraction on them if it 
+*            may be able to accept imperfect subtraction on them if it
 *            improves the rest of the spectrum.
 *
 * THRESH  -- Threshold in sigma for rejection of cosmic rays, bad pixels etc.
@@ -93,7 +93,7 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE', 'READ',IMAGE, STATUS)
 C
@@ -116,8 +116,8 @@ C     Get sky region input file
 C
       CALL NDF_ASSOC('REGION','READ',REGION,STATUS)
 C
-      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.LEFT',LEFT,STATUS)      
-      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.RIGHT',RIGHT,STATUS)    
+      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.LEFT',LEFT,STATUS)
+      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.RIGHT',RIGHT,STATUS)
       IF(STATUS.EQ.SAI__OK .AND. LEFT.GT.RIGHT .OR. LEFT.LE.0.) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP(' ','Bad object limits', STATUS)
@@ -126,7 +126,7 @@ C
       CALL PAR_GET0L('TRACE', TRACE, STATUS)
       IF(TRACE) THEN
          CALL GET_TRACK(YPOS, TOFF, STATUS)
-         CALL NDF_XGT0D(REGION,'PAMELA','REGPIC.YREF',YREF,STATUS)    
+         CALL NDF_XGT0D(REGION,'PAMELA','REGPIC.YREF',YREF,STATUS)
       END IF
 C
 C     Get sky output file name
@@ -165,7 +165,7 @@ C
      &        .FALSE.,YHI,STATUS)
 C
 C     Replace IMAGE, FLAT, DARK with section ndfs
-C 
+C
          IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
      &        YLO.NE.LBND(2) .OR. YHI.NE.UBND(2)) THEN
             LBND(1) = XLO
@@ -192,7 +192,7 @@ C
       NYS = UBND(2)-LBND(2)+1
 C
 C     Enforce same X dimensions on sky region file
-C     
+C
       CALL NDF_BOUND(REGION, 1, SLO, SHI, NDIM, STATUS)
       IF(SLO.NE.LBND(1) .OR. SHI.NE.UBND(1)) THEN
          CALL NDF_SECT(REGION, 1, LBND, UBND, TEMP, STATUS)
@@ -200,9 +200,9 @@ C
          CALL NDF_CLONE(TEMP, REGION, STATUS)
          CALL NDF_ANNUL(TEMP, STATUS)
       END IF
-C     
+C
 C     compute minimal range in X to use for sky output
-C     
+C
       CALL XLIMS(TRACE,YREF,LEFT,RIGHT,YLO,YHI,SLO,SHI,STATUS)
       NS = SHI-SLO+1
       LBND(1) = SLO
@@ -217,33 +217,33 @@ C
       CALL PAR_GDR0I('NPOLY',2,1,10,.FALSE.,NPOLY,STATUS)
 C
 C     Reject threshold in sigma units
-C     
+C
       CALL PAR_GDR0R('THRESH',3.,0.,1.E6,.FALSE.,THRESH,STATUS)
-C     
+C
 C     Noise characteristics
-C     
+C
       CALL PAR_GDR0R('READOUT',1.E-2,0.,1.E10,.FALSE.,READOUT,STATUS)
       CALL PAR_GDR0R('PHOTON',1.,1.E-10,1.E10,.FALSE.,PHOTON,STATUS)
-C     
-C     Map 
-C     
+C
+C     Map
+C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
       CALL NDF_MAP(FLAT,'Data','_REAL','READ',FPTR,EL,STATUS)
       CALL NDF_MAP(DARK,'Data','_REAL','READ/ZERO',DPTR,EL,STATUS)
       CALL NDF_MAP(REGION,'Data','_INTEGER','READ',RPTR,EL,STATUS)
       CALL NDF_MAP(SKY,'Data','_REAL','WRITE',SPTR,EL,STATUS)
-C     
+C
 C     Fit sky
-C     
-      CALL SKY_FIT(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)), 
+C
+      CALL SKY_FIT(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)),
      &     %VAL(CNF_PVAL(DPTR)), %VAL(CNF_PVAL(RPTR)),
-     &     NXS, NYS, LEFT, RIGHT, XLO, YLO, SLO, NS, 
-     &     %VAL(CNF_PVAL(SPTR)), NPOLY, THRESH, READOUT, 
+     &     NXS, NYS, LEFT, RIGHT, XLO, YLO, SLO, NS,
+     &     %VAL(CNF_PVAL(SPTR)), NPOLY, THRESH, READOUT,
      &     PHOTON, TRACE, YREF, STATUS)
-C     
+C
 C     Create 'pamela' extension if not already one present.
 C     Store NPOLY
-C     
+C
       CALL NDF_XSTAT(SKY, 'PAMELA', THERE, STATUS)
       IF(.NOT.THERE) THEN
          CALL NDF_XNEW(SKY,'PAMELA', 'Ext', 0, 0, LOC, STATUS)
@@ -251,33 +251,33 @@ C
       ELSE
          CALL NDF_XLOC(SKY,'PAMELA','UPDATE',LOC,STATUS)
          CALL DAT_THERE(LOC, 'SKYFIT', THERE, STATUS)
-         IF(.NOT.THERE) 
+         IF(.NOT.THERE)
      &        CALL DAT_NEW(LOC, 'SKYFIT', 'Struct', 0, 0, STATUS)
       END IF
       CALL DAT_ANNUL(LOC, STATUS)
-      CALL NDF_XPT0I(NPOLY,SKY,'PAMELA','SKYFIT.NPOLY',STATUS)      
-C     
+      CALL NDF_XPT0I(NPOLY,SKY,'PAMELA','SKYFIT.NPOLY',STATUS)
+C
 C     Tidy up
-C     
+C
       CALL NDF_END(STATUS)
       RETURN
       END
-C      
-      SUBROUTINE SKY_FIT(DATA, FLAT, DARK, MASK, NXS, NYS, LEFT, 
-     &RIGHT, XLO, YLO, SLO, NS, SKY, NPOLY, THRESH, READOUT, 
+C
+      SUBROUTINE SKY_FIT(DATA, FLAT, DARK, MASK, NXS, NYS, LEFT,
+     &RIGHT, XLO, YLO, SLO, NS, SKY, NPOLY, THRESH, READOUT,
      &PHOTON, TRACE, YREF, STATUS)
 C
 C     SKY_FIT -- Adapted from the PAMELA routine FITSKY
-C     
+C
 C     This routine fits low order (NPOLY terms) polynomials with
 C     reject threshold THRESH to every Y position from YLO to YLO+NYS-1
-C     It fits to the pixels specified by MASK (MASK(I) = 1 indicates 
-C     that pixels I is sky). The polynomials are then evaluated in the 
+C     It fits to the pixels specified by MASK (MASK(I) = 1 indicates
+C     that pixels I is sky). The polynomials are then evaluated in the
 C     region of the object determined by LEFT, RIGHT
-C     
-C     Lines of constant wavelength should be approximately parallel to 
+C
+C     Lines of constant wavelength should be approximately parallel to
 C     the rows.
-C     
+C
 C     History:
 C
 C     Created  June    1988 by TRM @RGO
@@ -286,46 +286,46 @@ C     Modified August  1988 to include partial pixels when distorted spectrum
 C     Modified May     1989 to include modification to CHANCE
 C     Modified July    1990 to include modification to CHANCE
 C     Modified January 1997 to include NDF changes
-C     
+C
 C     Arguments:
-C     
+C
 C     Inputs:
-C     
+C
 C     R*4 DATA(NXS,NYS)    -- Raw data frame
-C     
-C     R*4 FLAT(NXS,NYS)    -- Multiplicative balance frame such that 
+C
+C     R*4 FLAT(NXS,NYS)    -- Multiplicative balance frame such that
 C                             FLAT(I,J)*DATA(I,J) is the corrected data value.
 C
 C     R*4 DARK(NXS,NYS)    -- Dark frame of counts not affected by slit
-C     
+C
 C     I*4 MASK(NXS)       -- Sky pixel mask 1 for sky pixel, 0 otherwise
-C     
+C
 C     I*4 NXS, NYS
-C     
+C
 C     R*4 LEFT, RIGHT    -- X range over which polynomial estimate of sky will
 C     be evaluated. These limits are shifted parallel to
 C     the spectrum.
-C     
+C
 C     I*4 XLO, YLO       -- Lower left corner of section.
-C     
-C     I*4 SLO, NS        -- Left limit of sky output, number in X 
-C     
+C
+C     I*4 SLO, NS        -- Left limit of sky output, number in X
+C
 C     I*4 SKY(NS,NYS)    -- Sky output
-C     
+C
 C     I*4 NPOLY          -- Number of terms for sky polynomials
-C     
+C
 C     R*4 THRESH         -- Threshold for rejection of bad sky pixel
-C     
+C
 C     R*4 READOUT        -- Readout noise in RMS data numbers
-C     
+C
 C     R*4 PHOTON         -- Photons/data number
-C     
+C
 C     L   TRACE          -- Is a track file being used
 C
 C     D   YREF           -- Reference Y value
 C
 C     I   STATUS         -- Integer error flag
-C 
+C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
@@ -366,7 +366,7 @@ C     incorrectly weighted by more than a factor BETA
 C     for an ALPHA sigma fluctuation. For CCDs this should
 C     be unimportant (likely to be zero) whereas for
 C     photon counting detectors, it is important.
-C     
+C
       VAR0 = READOUT*READOUT
       CMIN = (ALPHA*BETA/(BETA-1.))**2./PHOTON - VAR0*PHOTON
       CMIN = MAX(0., CMIN)
@@ -374,9 +374,9 @@ C
          CALL GET_TRACK(YREF, XREF, STATUS)
          IF(STATUS.NE.SAI__OK) RETURN
       END IF
-C     
+C
 C     Zero sky frame
-C     
+C
       DO IY = 1, NYS
          DO IX = 1, NS
             SKY(IX,IY) = 0.
@@ -394,24 +394,24 @@ C
       END DO
       IF( NPIX.LT.NPOLY ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP(' ','Not enough sky pixels for fit', 
+         CALL ERR_REP(' ','Not enough sky pixels for fit',
      &        STATUS)
          RETURN
       END IF
 C
 C     Wavelength loop
-C     
+C
       NPIXTOT = 0
       NREJTOT = 0
       NFITS   = 0
       CALL MSG_BLANK(STATUS)
       RMSAVG = 0.
       NSOME = 0
-C     
+C
       DO IY = 1, NYS
-C     
+C
 C     Load sky data into arrays for poly-fit
-C     
+C
          NPIX   = 0
          XSHIFT = 0.
          IF(TRACE) THEN
@@ -419,40 +419,40 @@ C
             XSHIFT = REAL(XREF - XD)
          END IF
          DO IX = 1, NXS
-C     
+C
 C     Use mask to select sky pixels. On first cycle, weights are corrected
-C     by CMIN factor from above to prevent excessive weight being given to 
-C     low count pixels. For low signal photon counting data this gives 
+C     by CMIN factor from above to prevent excessive weight being given to
+C     low count pixels. For low signal photon counting data this gives
 C     almost uniform weights, but it allows lower weights on CCD data.
-C     
+C
 C     Partial pixels are fitted with a lower weight but are still
 C     included for continuity between rows.
-C     
+C
             XP = REAL(IX) + XSHIFT
             IM = INT(XP)
-C     
+C
 C     Compute amount of pixel covered by sky region
-C     
+C
             IF(IM.EQ.0 .AND. MASK(1).EQ.1) THEN
 
 C     At left-hand end
-               
+
                PART = XP
             ELSE IF(IM.EQ.NXS .AND. MASK(NXS).EQ.1) THEN
 
 C     At right-hand end
-               
+
                PART = REAL(NXS+1) - XP
             ELSE IF((IM.LT.1 .OR. IM.GE.NXS) .OR.
      &              (MASK(IM).NE.1 .AND. MASK(IM+1).NE.1)) THEN
 
 C     Beyond ends or not sky
-               
+
                PART = -1.
             ELSE IF(MASK(IM).EQ.1 .AND. MASK(IM+1).EQ.1) THEN
 
 C     Totally covered by sky
-               
+
                PART = 1.
             ELSE IF(MASK(IM).EQ.1) THEN
                PART = REAL(IM+1) - XP
@@ -480,30 +480,30 @@ C     pixel reject cycle and refining the variances
 C
             ICYCLE = 0
             IREJ   = 1
-            DO WHILE(NFIT.GE.NPOLY .AND. (ICYCLE.LE.1 .OR. 
+            DO WHILE(NFIT.GE.NPOLY .AND. (ICYCLE.LE.1 .OR.
      &           IREJ.GT.0))
                ICYCLE = ICYCLE + 1
-C     
+C
 C     fit polynomial by least squares
 C     First scale variances for degree of
 C     covering of each pixel
-C     
+C
                DO K = 1, NPIX
                   IF(SKYSIGMA(K).GT.0.) THEN
                      SKYSIGMA(K) = PARTIAL(K)*SKYSIGMA(K)
                   END IF
                END DO
-               CALL POLYFIT1( NPIX, XDATA, SKYDATA, SKYSIGMA, 
+               CALL POLYFIT1( NPIX, XDATA, SKYDATA, SKYSIGMA,
      #              SKYFIT, NPOLY, IFAIL )
                NFITS = NFITS + 1
-C     
+C
 C     revise sigma estimates using the polynomial sky model
 C     First estimate total counts and therefore a floor to
 C     the variance. This prevents overweighting taking into
 C     account the uncertainty in the polynomial fit.
 C     Only do this if a pixel has been rejected from previous
 C     cycle.
-C     
+C
                IF(IREJ.GT.0) THEN
                   TOTAL = 0.
                   PIX = 0.
@@ -514,9 +514,9 @@ C
                      END IF
                   END DO
                   VMIN = ALPHA*BETA/(BETA-1)*SQRT(REAL(NPOLY)/PIX)
-     &                 *SQRT(VAR0+MAX(0.,TOTAL)/(PIX*PHOTON)) - 
+     &                 *SQRT(VAR0+MAX(0.,TOTAL)/(PIX*PHOTON)) -
      &                 VAR0*PHOTON
-C     
+C
                   RMS = 0.
                   SKYMEAN = 0.
                   NFIT = 0
@@ -540,22 +540,22 @@ C
                      ELSE
                         RMS = SQRT(RMS/REAL(NDF))
                      END IF
-C     
+C
 C     Apply KDH scaling
-C     
+C
                      PROB = EXP(-MIN(80.,REAL(NDF)*(RMS-1)**2/4.))
                      RMS  = PROB + (1.-PROB)*RMS
-C     
+C
 C     apply the pixel rejection criterion (Poisson)
 C     Only one pixel at a time is rejected.
-C     
+C
                      RESCALE = MAX(0.01, RMS)
                      RMAX = -1.
                      IREJ = 0
                      DO K=1,NPIX
                         SIG = RESCALE*SKYSIGMA(K)
                         IF(SIG.GT.0) THEN
-                           RATIO = CHANCE( SKYDATA(K), SKYFIT(K), 
+                           RATIO = CHANCE( SKYDATA(K), SKYFIT(K),
      &                          SIG, THRLO, THRHI )
 C
 C     CHANCE returns the - LOG(Probability of getting as bad as the observed
@@ -603,7 +603,7 @@ C
          IF(NFIT.GE.NPOLY) THEN
             SKYMEAN = 0.
             DO IX = ILEFT, IRIGHT
-               CALL POLYCALC( 1, REAL(IX+SLO-XLO)/REAL(NXS), 
+               CALL POLYCALC( 1, REAL(IX+SLO-XLO)/REAL(NXS),
      &              SKY(IX,IY), IFAIL )
                SKYMEAN = SKYMEAN + SKY(IX,IY)
             END DO

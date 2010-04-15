@@ -335,9 +335,9 @@ C
                 IF (XTRC.LT.XBLC) KI = KI+1
                 IF (IRANGE(XBLC,XVAL,XTRC)) THEN
                     CALL PGNUMB(J,NINT(KI*XINT2),XNFORM,CLBL,NC)
-                    IF (XOPTN) 
+                    IF (XOPTN)
      1                CALL PGMTXT('B', XNDSP, XC, 0.5, CLBL(1:NC))
-                    IF (XOPTM) 
+                    IF (XOPTM)
      1                CALL PGMTXT('T', XMDSP, XC, 0.5, CLBL(1:NC))
                 END IF
   301       CONTINUE
@@ -482,14 +482,14 @@ C
                 IF (IRANGE(YBLC,YVAL,YTRC)) THEN
                     CALL PGNUMB(J,NINT(KI*YINT2),YNFORM,CLBL,NC)
                     IF (YOPTV) THEN
-                    IF (YOPTN) 
+                    IF (YOPTN)
      1                CALL PGMTXT('LV', YNVDSP, YC, 1.0, CLBL(1:NC))
-                    IF (YOPTM) 
+                    IF (YOPTM)
      1                CALL PGMTXT('RV', YMVDSP, YC, 0.0, CLBL(1:NC))
                     ELSE
-                    IF (YOPTN) 
+                    IF (YOPTN)
      1                CALL PGMTXT('L', YNDSP, YC, 0.5, CLBL(1:NC))
-                    IF (YOPTM) 
+                    IF (YOPTM)
      1                CALL PGMTXT('R', YMDSP, YC, 0.5, CLBL(1:NC))
                     END IF
                 END IF

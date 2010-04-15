@@ -28,13 +28,13 @@
 *     starts is stored as the MEMSYS3 `allocation pointers' in
 *     /MECOMS/.
 *
-*     If MODEL=CONSTANT, the model is a constant and therefore area 
+*     If MODEL=CONSTANT, the model is a constant and therefore area
 *     <20> is not needed.  Otherwise, area <20> is needed.
 *
 *     It is assumed that the output and input pixel sizes are the same.
 *     It is also assumed that the PSF image will be stored in area <3>.
 *
-*     The image dimensions stored in C1_COM should include a suitable 
+*     The image dimensions stored in C1_COM should include a suitable
 *     blank margin to overcome edge effects caused by the convolutions.
 
 *  Arguments:
@@ -137,10 +137,10 @@
 *           Pointers to the start of each external area.  These are
 *           derived from C1_IP0.
 *        C1_NPX = INTEGER (Read)
-*           The x dimension of all images and data sets (including 
+*           The x dimension of all images and data sets (including
 *           margin).
 *        C1_NLN = INTEGER (Read)
-*           The y dimension of all images and data sets (including 
+*           The y dimension of all images and data sets (including
 *           margin).
 
 *  Arguments Given:
@@ -168,7 +168,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Calculate the total number of elements in a area if the area is 
+*  Calculate the total number of elements in a area if the area is
 *  stored internally.  This is just the size of an image.  Externally
 *  stored areas may need to be a little bigger to ensure that they
 *  correspond to an integer number of buffers.
@@ -183,9 +183,9 @@
          NAREA = 12
       END IF
 
-*  See if there is enough space in the ME_ST array in common block 
-*  /MECOMS/ to store all the required areas.  Find the percentage of 
-*  the internal space which would be used, and if required, tell 
+*  See if there is enough space in the ME_ST array in common block
+*  /MECOMS/ to store all the required areas.  Find the percentage of
+*  the internal space which would be used, and if required, tell
 *  the user.
       PERCEN = REAL( NAREA * IASIZE ) / REAL( ME_MEM ) * 100.0
 
@@ -196,7 +196,7 @@
      :                 STATUS )
       END IF
 
-*  If there is sufficient internal memory, all areas will be stored 
+*  If there is sufficient internal memory, all areas will be stored
 *  within /MECOMS/.  Set the flag stored in common to indicate this.
       IF ( PERCEN .LT. 100.0 ) THEN
          C1_WEXT = .FALSE.
@@ -248,8 +248,8 @@
 *  array, and /MECOMS/ will be used to store a buffer for each area.
 *  Set a flag in common to indicate this, and if required, tell the
 *  user.
-      ELSE 
-         C1_WEXT = .TRUE. 
+      ELSE
+         C1_WEXT = .TRUE.
          IF ( ILEVEL .GE. 1 ) CALL MSG_OUT( 'REPORT', '  External '/
      :     /'memory will be used instead.', STATUS )
 
@@ -259,7 +259,7 @@
 *  used).  Find the maximum size of a buffer.
          MXB = ME_MEM/5
 
-*  Find the number of buffers (rounded up) required for a complete 
+*  Find the number of buffers (rounded up) required for a complete
 *  area.
          ME_NJ = 1 + ( IASIZE - 1 ) / MXB
          ME_NK = ME_NJ

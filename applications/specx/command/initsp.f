@@ -120,7 +120,7 @@ C  Other reduction operations
       ISMTH  = 1
 
       OFF    = 0.
-      
+
 C  Versatek, Anadex, VT240 and Tektronix plot parameters
 
       QUICK_PLOT = .FALSE.
@@ -196,7 +196,7 @@ C  Maps
       BADPIX_VAL  = -1.E2
       CLEVELS_SET = .FALSE.
       NCSET   = 0
-        
+
       INTERP_X = 2
       INTERP_Y = 2
       SMOOTH   = .TRUE.

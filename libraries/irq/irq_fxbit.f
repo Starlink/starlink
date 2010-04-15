@@ -24,11 +24,11 @@
 *     in the QUALITY_NAMES structure indicating this, and any quality bit
 *     previously associated with the quality name is released for re-use.
 *
-*     This default behaviour is changed by calling this routine. The 
-*     specified bit number will continue to be associated with the quality 
+*     This default behaviour is changed by calling this routine. The
+*     specified bit number will continue to be associated with the quality
 *     name even if all pixels do, or do not, hold the quality.
 *
-*     An error will be returned if the named quality is already associated 
+*     An error will be returned if the named quality is already associated
 *     with a different bit number when this routine is called. An error
 *     will also be reported if the specified bit number is already associated
 *     with a different quality name.
@@ -45,8 +45,8 @@
 *        currently has the value of 15.
 *     BIT = INTEGER (Given)
 *        The bit number to use. The least significant bit is Bit 1, not
-*        Bit 0. If a value below 0 or above 8 is supplied, the 
-*        properties of the quality name are left unchanged, but the 
+*        Bit 0. If a value below 0 or above 8 is supplied, the
+*        properties of the quality name are left unchanged, but the
 *        FIXBIT value is still returned.
 *     FIXBIT = LOGICAL (Returned)
 *        Returned .TRUE. if the specified quality name had a fixed bit
@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -145,7 +145,7 @@
 *  If the quality name is already associated with a different bit, report
 *  an error.
          IF( OLDBIT .NE. 0 ) THEN
-         
+
             IF( OLDBIT .NE. BIT ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -155,14 +155,14 @@
      :                          'with bit ^B.', STATUS )
                END IF
             END IF
-         
+
          END IF
 
 *  If the specified BIT number is already associated with a different
 *  quality name, report an error.
          IF( OLDBIT .NE. BIT ) THEN
             CALL IRQ1_QBIT( LOCS, BIT, OLDNAM, STATUS )
-            IF( OLDNAM .NE. ' ' .AND. OLDNAM .NE. QNAME .AND. 
+            IF( OLDNAM .NE. ' ' .AND. OLDNAM .NE. QNAME .AND.
      :          STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'N', OLDNAM )
@@ -172,8 +172,8 @@
             END IF
          END IF
 
-*  Store the new information. 
-         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, VALUE, .TRUE., 
+*  Store the new information.
+         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, VALUE, .TRUE.,
      :                  STATUS )
       END IF
 

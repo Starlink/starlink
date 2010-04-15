@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,37 +112,37 @@
 *  conversion routine.
       IF ( TYPEI .EQ. '_BYTE' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_BTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_BTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_BTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_BTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_BTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_BTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_BTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_BTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
@@ -154,37 +154,37 @@
 
       ELSE IF ( TYPEI .EQ. '_UBYTE' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_UBTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_UBTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                       NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_UBTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_UBTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_UBTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_UBTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_UBTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UBTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                       NERR, STATUS )
 
@@ -196,37 +196,37 @@
 
       ELSE IF ( TYPEI .EQ. '_DOUBLE' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_DTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_DTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_DTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_DTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_DTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_DTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_DTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
@@ -238,37 +238,37 @@
 
       ELSE IF ( TYPEI .EQ. '_INTEGER' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_ITOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_ITOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_ITOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_ITOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_ITOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_ITOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_ITOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_ITOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
@@ -280,37 +280,37 @@
 
       ELSE IF ( TYPEI .EQ. '_REAL' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_RTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_RTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_RTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_RTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_RTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_RTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_RTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_RTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
@@ -322,37 +322,37 @@
 
       ELSE IF ( TYPEI .EQ. '_WORD' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_WTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_WTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_WTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_WTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_WTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_WTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                     NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_WTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_WTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
@@ -364,37 +364,37 @@
 
       ELSE IF ( TYPEI .EQ. '_UWORD' ) THEN
          IF ( TYPEO .EQ. '_BYTE' ) THEN
-            CALL VEC_UWTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UBYTE' ) THEN
-            CALL VEC_UWTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOUB( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                       NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_DOUBLE' ) THEN
-            CALL VEC_UWTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOD( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_INTEGER' ) THEN
-            CALL VEC_UWTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOI( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_REAL' ) THEN
-            CALL VEC_UWTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOR( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_WORD' ) THEN
-            CALL VEC_UWTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                      %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                      NERR, STATUS )
 
          ELSE IF ( TYPEO .EQ. '_UWORD' ) THEN
-            CALL VEC_UWTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL VEC_UWTOUW( BAD, N, %VAL( CNF_PVAL( IPIN ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), IERR,
      :                       NERR, STATUS )
 

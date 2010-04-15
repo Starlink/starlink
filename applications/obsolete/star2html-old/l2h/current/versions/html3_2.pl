@@ -18,11 +18,11 @@ sub do_env_raggedleft { &declared_env('flushright', @_) }
 sub do_cmd_underline {
     &styled_text_chunk('U','','text','decoration','underline','',@_)}
 
-sub do_cmd_centerline { 
+sub do_cmd_centerline {
     &styled_text_block('DIV','ALIGN','CENTER','centerline',@_)}
-sub do_cmd_leftline { 
+sub do_cmd_leftline {
     &styled_text_block('DIV','ALIGN','LEFT','leftline',@_)}
-sub do_cmd_rightline { 
+sub do_cmd_rightline {
     &styled_text_block('DIV','ALIGN','RIGHT','rightline',@_)}
 
 
@@ -53,7 +53,7 @@ $color_names_list = "Black|Silver|Gray|White|Maroon|Red|Purple|Fuchsia|"
 $color_type = "\^($color_names_list|\\\\?\#?\\w{6})\$";
 
 
-%closed_tags_list = ( 'A' , '' 
+%closed_tags_list = ( 'A' , ''
 	, 'ADDRESS' , ''
 	, 'APPLET' , 'CODE,HEIGHT,WIDTH'
 	, 'BIG' , ''
@@ -104,17 +104,17 @@ $color_type = "\^($color_names_list|\\\\?\#?\\w{6})\$";
     );
 
 %unclosed_tags_list = (
-	  'AREA' , 'ALT' 
-	, 'BASE' , 'HREF' 
-	, 'BASEFONT' , '' 
-	, 'BR' , '' 
-	, 'HR' , '' 
-	, 'IMG' , 'SRC' 
-	, 'INPUT' , '' 
-	, 'ISINDEX' , '' 
-	, 'LINK' , 'HREF' 
-	, 'META' , 'CONTENT' 
-	, 'PARAM' , 'NAME' 
+	  'AREA' , 'ALT'
+	, 'BASE' , 'HREF'
+	, 'BASEFONT' , ''
+	, 'BR' , ''
+	, 'HR' , ''
+	, 'IMG' , 'SRC'
+	, 'INPUT' , ''
+	, 'ISINDEX' , ''
+	, 'LINK' , 'HREF'
+	, 'META' , 'CONTENT'
+	, 'PARAM' , 'NAME'
     );
 
 
@@ -147,7 +147,7 @@ $BASEFONT__SIZE = $fontsize_type;
 
 $BODY_attribs = "";
 $BODY_attribs_rx_list = ",TEXT,BGCOLOR,LINK,VLINK,ALINK,BACKGROUND,";
-$BODY__BGCOLOR_rx = $BODY__LINK_rx = $BODY__VLINK_rx  = $BODY__ALINK_rx = 
+$BODY__BGCOLOR_rx = $BODY__LINK_rx = $BODY__VLINK_rx  = $BODY__ALINK_rx =
     $BODY__TEXT_rx = $color_type;
 $BODY__BACKGROUND_rx = $string_type;
 
@@ -175,7 +175,7 @@ $FORM_attribs_rx_list = ",ACTION,";
 $FORM__ACTION = $URL_type;               # required
 
 
-$H1_attribs = $H2_attribs = $H3_attribs = $H4_attribs = 
+$H1_attribs = $H2_attribs = $H3_attribs = $H4_attribs =
 $H5_attribs = $H6_attribs = ",ALIGN,";
 $H1__ALIGN = $H2__ALIGN = $H3__ALIGN = $H4__ALIGN = $H5__ALIGN = $H6__ALIGN = $halign_type;
 
@@ -288,7 +288,7 @@ $UL__TYPE = $shape_type;
 ### Written by Marcus E. Hennecke <marcush@leland.stanford.edu>
 
 ### This file simplifies the earlier code, to be compatible with
-### the simpler model used in  HTML 3.2 
+### the simpler model used in  HTML 3.2
 ### Two subroutines are redefined.
 ###   ----  Ross Moore <ross@mpce.mq.edu.au>,  21 Feb 1997
 
@@ -377,7 +377,7 @@ sub translate_colspec {
 	} elsif ( $char =~ /(\@|\!)/ ) {
 # RRM: the following assumes text of the @-expression to be constant for each row.
 # Usually this will be true, but LaTeX allows otherwise
-	    $colspec =~ s/\s*\{([^\}]*)\}\s*/$celldata=$1;''/e; 
+	    $colspec =~ s/\s*\{([^\}]*)\}\s*/$celldata=$1;''/e;
 	    if ($celldata =~ /\{/ ) {
 		local($databit) = $celldata;
 		local($numopens); $celldata =~ s/\{/$numopens++;"\{"/eg;
@@ -405,7 +405,7 @@ sub translate_colspec {
 	} elsif ( $char =~ /\>/ ) {
 # RRM: the following assumes text of the @-expression to be constant for each row.
 # Usually this will be true, but LaTeX allows otherwise
-	    $colspec =~ s/\s*\{([^\}]*)\}\s*/$celldata=$1;''/e; 
+	    $colspec =~ s/\s*\{([^\}]*)\}\s*/$celldata=$1;''/e;
 	    if ($celldata =~ /\{/ ) {
 		local($databit) = $celldata;
 		local($numopens); $celldata =~ s/\{/$numopens++;"\{"/eg;
@@ -451,7 +451,7 @@ sub translate_colspec {
 	    $celldata .= ' ' if ($celldata =~ /\\\w+$/);
 
 	    $celldata =~ s/$wrap_parbox_rx/$6/g;
-	    if ($#colspec > -1) {	        
+	    if ($#colspec > -1) {
 		$colspec[$#colspec] =~ s/($art_br)?$cellclose/$celldata$1$cellclose/;
 	    } else { $at_text .=  $celldata }
 
@@ -472,13 +472,13 @@ sub translate_colspec {
 	    $celldata .= ' ' if ($celldata =~ /\\\w+$/);
 
 	    $celldata =~ s/$wrap_parbox_rx/$6/g;
-	    if ($#colspec > -1) {	        
+	    if ($#colspec > -1) {
 		$colspec[$#colspec] =~ s/($art_br)?$cellclose/$celldata$1$cellclose/;
 	    } else { $at_text .=  $celldata }
 
 	} elsif ( $char eq "*" ) {
-	    $colspec =~ s/^\s*\{([^\}]*)\}\s*/$repeat=$1;''/e; 
-	    $colspec =~ s/^\s*\{([^\}]*)\}\s*/$celldata=$1;''/e; 
+	    $colspec =~ s/^\s*\{([^\}]*)\}\s*/$repeat=$1;''/e;
+	    $colspec =~ s/^\s*\{([^\}]*)\}\s*/$celldata=$1;''/e;
 	    if ($celldata =~ /\{/ ) {
 		local($databit) = $celldata;
 		local($numopens); $celldata =~ s/\{/$numopens++;"\{"/eg;
@@ -572,7 +572,7 @@ sub process_tabular {
     local($i,@colspec,$char,$cols,$cell,$htmlcolspec,$frames,$rules);
     local(@rows,@cols,$border,$frame);
     local($colspan,$cellcount);
-    
+
     # convert \\s inside \parbox commands to \newline s;
     # catch nestings
 
@@ -614,7 +614,7 @@ sub process_tabular {
     # environments may be re-processed within a cell
     $_ =~ s/$OP(\d+)$CP/$O$1$C/g;
     undef $inside_tabular;
-    
+
     $border = ""; $frame = "";
     ($htmlcolspec,$frames,$rules,$cols,@colspec) =
 	&translate_colspec($colspec, 'TD');
@@ -657,7 +657,7 @@ sub process_tabular {
 	$return .= "\n<CAPTION>$captions</CAPTION>";
 	$captions = '';
 	$cap_anchors = '';
-    } else { 
+    } else {
 	$return = join('', "<TABLE CELLPADDING=3"
 		, $border
 		, ($halign ? " ALIGN=\"$halign\"" : '')
@@ -720,7 +720,7 @@ sub process_tabular {
 	    print "\nTABLE-CELL: $cell\n" if ($VERBOSITY > 3);
 
 	    # remove any \parbox commands, leaving the contents
-	    #RRM:  actually, there shouldn't be any left  :-) 
+	    #RRM:  actually, there shouldn't be any left  :-)
 	    $cell =~ s/\\parbox[^<]*<<(\d*)>>([\w\W]*)<<\1>>/$1/g;
 
 	    local($num);
@@ -760,7 +760,7 @@ sub process_tabular {
 		$colspec = join('',@cmds,$colspec);
 		if ($colspec =~ /\\/) {
 		    $colspec =~ s/$content_mark/$cell/;
-		} else { 
+		} else {
 		    $colspec =~ s/$content_mark${O}1$C/$cell${O}1$C/;
 		}
 		$colspec =~ s/\\mathon([.\n]*)\\mathoff/
@@ -891,7 +891,7 @@ sub make_math_comment{
     $verbatim{$global{'verbatim_counter'}} = $_;
     &write_mydb('verbatim_counter', $global{'verbatim_counter'}, $_ );
     join('', "\n", $verbatim_mark, '#math' , $global{'verbatim_counter'},'#')
-} 
+}
 
 sub do_env_math {
     local($_) = @_;
@@ -906,7 +906,7 @@ sub do_env_math {
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     $comment =~ s/^\n//; # remove the leading \n
     if ($failed) {
-	$_ = join ('', $comment, $labels 
+	$_ = join ('', $comment, $labels
             , &process_undefined_environment("tex2html_wrap_inline", $id, $saved));
     } else { $_ = join('', $comment, $labels, " ", $_ ); }
     if ($border||($attributes)) {
@@ -926,7 +926,7 @@ sub do_env_tex2html_wrap {
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     $comment =~ s/^\n//; # remove the leading \n
     if ($failed) {
-	$_ = join ('', $comment, $labels 
+	$_ = join ('', $comment, $labels
              , &process_undefined_environment("tex2html_wrap", $id, $saved));
     } else { $_ = $comment . $labels ." ".$_; }
     if ($border||($attribs)) {
@@ -947,11 +947,11 @@ sub do_env_tex2html_wrap_inline {
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     $comment =~ s/^\n//; # remove the leading \n
     if ($failed) {
-	$_ = join ('', $labels, $comment 
+	$_ = join ('', $labels, $comment
             , &process_undefined_environment("tex2html_wrap_inline", $id, $saved));
     } else { $_ = join('', $labels, $comment, $_); }
-    if ($border||($attribs)) { 
-        &make_table( $border, $attribs, '', '', '', $_ ) 
+    if ($border||($attribs)) {
+        &make_table( $border, $attribs, '', '', '', $_ )
     } else { $_ }
 }
 
@@ -1031,7 +1031,7 @@ sub do_env_equation {
 	s/^[ \t]*\n?/\n/; s/\n?[ \t]*$/\n/;
 	$_ = join('', $comment, $labels, $math_start, $_, $math_end );
     }
-    if ($border||($attribs)) { 
+    if ($border||($attribs)) {
 	join('',"<BR>\n<DIV$math_class>\n"
 	    , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "\n<BR CLEAR=\"ALL\">");
@@ -1041,7 +1041,7 @@ sub do_env_equation {
 	$fclass =~ s/(ALIGN=\")[^"]*/$1$falign/;
 	join('',"<BR>\n<DIV$fclass>\n"
 	    , $_ , "\n<BR CLEAR=\"ALL\"></DIV><P></P>")
-    } else { 
+    } else {
 	join('', "<BR><P></P>\n<DIV$math_class>\n"
 	    , $_ ."\n</DIV><BR CLEAR=\"ALL\"><P></P>");
     }
@@ -1062,7 +1062,7 @@ sub do_env_displaymath {
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     if ($failed) {
 	$_ = &process_undefined_environment("displaymath", $id, $saved);
-	s/^[ \t]*\n?/\n/; s/\n?[ \t]*$/\n/; 
+	s/^[ \t]*\n?/\n/; s/\n?[ \t]*$/\n/;
 	$_ = (($comment.$labels)? "$comment$labels\n":''). $_;
     } else {
 	s/^[ \t]*\n?/\n/; s/\n?[ \t]*$/\n/;
@@ -1072,7 +1072,7 @@ sub do_env_displaymath {
 	join('',"<BR>\n<DIV$math_class>\n"
             , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "</DIV>\n<BR CLEAR=\"ALL\">");
-    } else { 
+    } else {
         join('',"<BR><P></P>\n<DIV$math_class>",$_
             ,"</DIV><BR CLEAR=\"ALL\">\n<P></P>");
     }
@@ -1091,7 +1091,7 @@ sub do_env_eqnarray {
     local($sbig,$ebig,$falign) = ('','','CENTER');
     ($sbig,$ebig) = ('<BIG>','</BIG>')
 	if (($DISP_SCALE_FACTOR)&&($DISP_SCALE_FACTOR >= 1.2 ));
-    local($valign) = join('', ' VALIGN="', 
+    local($valign) = join('', ' VALIGN="',
 	($NETSCAPE_HTML)? "BASELINE" : "MIDDLE", '"');
     $failed = 1; # simplifies the next call
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
@@ -1116,7 +1116,7 @@ sub do_env_eqnarray {
 	s/$htmlimage_rx/$doimage = $&;''/eo ; # force an image
 	s/$htmlimage_pr_rx/$doimage .= $&;''/eo ; # force an image
 	local($sarray, $srow, $slcell, $elcell, $srcell, $ercell, $erow, $earray);
-	($sarray, $elcell, $srcell, $erow, $earray, $sempty) = ( 
+	($sarray, $elcell, $srcell, $erow, $earray, $sempty) = (
 	    "\n<TABLE$math_class CELLPADDING=\"0\""
 	    , "</TD>\n<TD ALIGN=\"CENTER\" NOWRAP>"
 	    , "</TD>\n<TD ALIGN=\"LEFT\" NOWRAP>"
@@ -1147,7 +1147,7 @@ sub do_env_eqnarray {
 	    , (($labels)? $labels : "\n") , $comment, $sarray);
 	foreach (@rows) { # displaymath
 	    $eqno = '';
-	    do { 
+	    do {
 		$global{'eqn_number'}++ ;
 		$eqno = &simplify(&translate_commands('\theequation'));
 	    } unless ((s/\\nonumber//)||($no_eqn_numbers));
@@ -1190,7 +1190,7 @@ sub do_env_eqnarray {
 			$return .= join('', $sbig, $_, $ebig, $erow)
 		    }
 		}
-		$return .= join('',";SPMnbsp;", $erow) if ($_ eq ''); 
+		$return .= join('',";SPMnbsp;", $erow) if ($_ eq '');
 		next;
 	    }
 
@@ -1204,7 +1204,7 @@ sub do_env_eqnarray {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');
 		$return .= join('',"\"RIGHT\">",$thismath) if ($thismath ne '');
-	    } elsif ($thismath ne '') { 
+	    } elsif ($thismath ne '') {
 		$savemath = $thismath;
 		$thismath = &simple_math_env($thismath);
 		if ($failed) {
@@ -1224,7 +1224,7 @@ sub do_env_eqnarray {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , 'text', '', $doimage.$thismath ):'');
 		$return .= join('', $elcell, $thismath) if ($thismath ne '');
-	    } elsif ($thismath ne '') { 
+	    } elsif ($thismath ne '') {
 		$savemath = $thismath;
 		$thismath = &simple_math_env($thismath);
 		if ($failed) {
@@ -1263,7 +1263,7 @@ sub do_env_eqnarray {
 	}
 	$_ = join('', $return , $earray, (($doimage)? '' : "</DIV>" ));
     }
-    if ($border||($attribs)) { 
+    if ($border||($attribs)) {
 	join('' #,"<BR>\n<DIV$math_class>"
 	    , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "\n</DIV><P></P><BR CLEAR=\"ALL\">");
@@ -1307,12 +1307,12 @@ sub do_env_eqnarraystar {
 		, &process_undefined_environment("eqnarray*", $id, $saved));
 	}
     }
-    if ($border||($attribs)) { 
+    if ($border||($attribs)) {
 	join('' #,"<BR>\n<DIV$math_class>"
 	    , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "\n</DIV><P></P><BR CLEAR=\"ALL\">");
     } elsif ($failed) {
-	$_ =~ s/^[ \t]*\n?/\n/; 
+	$_ =~ s/^[ \t]*\n?/\n/;
 	$_ =~ s/\n?[ \t]*/\n/;
 	join('', "<BR><P></P>\n<DIV$math_class>"
 	    , $_ ,"\n</DIV><P></P><BR CLEAR=\"ALL\">");

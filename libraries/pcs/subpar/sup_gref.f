@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -107,7 +107,7 @@
       INTEGER REFLEN
 
 *  External References:
-      INTEGER CHR_LEN                   ! String length 
+      INTEGER CHR_LEN                   ! String length
 
 *  Local Variables:
       LOGICAL VALID                     ! .TRUE. => valid locator obtained
@@ -116,9 +116,9 @@
       INTEGER STATE                     ! Parameter state
       INTEGER STATUS                    ! Local status
       INTEGER TYPE                      ! Parameter type code
-      CHARACTER * 80 FILNAM             ! Object filename 
-      
-      
+      CHARACTER * 80 FILNAM             ! Object filename
+
+
 
       CHARACTER * ( DAT__SZLOC ) LOC    ! HDS locator
 
@@ -161,11 +161,11 @@
 *           Set returned arguments for normal successful completion.
                   SUBPAR_GREF = .TRUE.
                   REFLEN = CHR_LEN( REFSTR )
-                  
+
                ELSE
 *           On error, annul the error context.
                   CALL EMS_ANNUL( STATUS )
-                  
+
                END IF
 
 *           Release the error reporting context.
@@ -204,6 +204,6 @@
       IF ( STATUS .NE. SAI__OK ) CALL EMS_ANNUL( STATUS )
 
 *  Release the error reporting context.
-      CALL EMS_RLSE 
+      CALL EMS_RLSE
 
       END

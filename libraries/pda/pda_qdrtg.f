@@ -18,7 +18,7 @@ c
       integer i
       double precision f
 c
-      if (nf .ne. uip(1)) call pda_qdrtf(n, x, nf, f, uip, urp, 
+      if (nf .ne. uip(1)) call pda_qdrtf(n, x, nf, f, uip, urp,
      1                                   pda_qdrtf)
       do 10 i = 1, n
  10      g(i) = urp(1,3) * urp(i,2)

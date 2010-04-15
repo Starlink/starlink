@@ -21,7 +21,7 @@
 
 *  Description:
 *     This program converts a disk file containing a "table tab" into a
-*     SExtractor ASCII_HEAD catalogue. The format of an ASCII_HEAD table 
+*     SExtractor ASCII_HEAD catalogue. The format of an ASCII_HEAD table
 *     is a header region containing a simple description of the columns
 *     and then a data area in which the fields are separated by
 *     spaces. The format of the header region is normally:
@@ -118,13 +118,13 @@
       CALL PAR_GET0C( 'OUT', OUTNAM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       INQUIRE( FILE = OUTNAM, EXIST = EXISTS )
-      IF ( EXISTS ) THEN 
+      IF ( EXISTS ) THEN
          CALL FIO_ERASE( OUTNAM, STATUS )
       END IF
-      CALL FIO_OPEN( OUTNAM, 'WRITE', 'LIST', 0, IFOUT, STATUS ) 
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      CALL FIO_OPEN( OUTNAM, 'WRITE', 'LIST', 0, IFOUT, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
          OUTOPN = .TRUE.
-      ELSE 
+      ELSE
          GO TO 99
       END IF
 
@@ -133,13 +133,13 @@
 
 *   Exit in error.
  99   CONTINUE
-      IF ( INOPN ) THEN 
+      IF ( INOPN ) THEN
          CALL FIO_CLOSE( IFIN, STATUS )
       END IF
-      IF ( OUTOPN ) THEN 
+      IF ( OUTOPN ) THEN
          CALL FIO_CLOSE( IFOUT, STATUS )
       END IF
-      
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'ASC2TAB',

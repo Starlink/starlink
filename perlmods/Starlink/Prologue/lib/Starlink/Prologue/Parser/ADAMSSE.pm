@@ -239,7 +239,7 @@ sub tidy_content {
   if ($section eq 'History') {
     my @out;
     for my $hline (@content) {
-      # Looking for 
+      # Looking for
       #   DD-MMM-YYYY message (user)
       #   DD.MM.YYYY: message (user)
       my $line = $hline;
@@ -308,7 +308,7 @@ sub tidy_content {
 	} else {
 
 	  # no dice, just rewrite date for now
-	  
+
 	  push(@out, "$date: ".join(" ",@rest));
 	}
 

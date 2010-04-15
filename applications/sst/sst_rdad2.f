@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
 
 *  Loop to read input lines, checking for errors.
       CALL ERR_MARK
-1     CONTINUE      
+1     CONTINUE
       CALL SST_GET( SCB_IN, LINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 

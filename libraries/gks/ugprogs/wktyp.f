@@ -1,6 +1,6 @@
       PROGRAM WKTYP
 *                      GKS Example Program 8.2
- 
+
       INTEGER N, KERROR, NAVWK, KWTYPE
       CALL GOPKS (0, -1)
       CALL GQEWK (1, KERROR, NAVWK, KWTYPE)

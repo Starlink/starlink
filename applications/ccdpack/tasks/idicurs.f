@@ -1,7 +1,7 @@
       SUBROUTINE IDICURS( STATUS )
 *+
 *  Name:
-*     IDICURS        
+*     IDICURS
 
 *  Purpose:
 *     Views and writes position lists interactively.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Type of Module:
-*     ADAM A-task    
+*     ADAM A-task
 
 *  Invocation:
 *     CALL IDICURS( STATUS )
@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This program displays an image or Set of images on the screen 
+*     This program displays an image or Set of images on the screen
 *     and provides a graphical user interface for marking points on it.
 *     Points can be read in from a position list file at the start
 *     (if READLIST is true) or written out to a position list file
@@ -29,15 +29,15 @@
 *
 *     The graphical interface used for marking features on the image
 *     should be fairly self-explanatory.  The image can be scrolled
-*     using the scrollbars, the window can be resized, and there are 
-*     controls for zooming the image in or out, changing the style of 
+*     using the scrollbars, the window can be resized, and there are
+*     controls for zooming the image in or out, changing the style of
 *     display, and altering the percentile cutoff limits which control
-*     the mapping of pixel value to displayed colour.  The position 
-*     of the cursor is reported below the display using the coordinates 
-*     of the selected coordinate frame for information, but the position 
-*     list written out is always written in Pixel coordinates, since 
+*     the mapping of pixel value to displayed colour.  The position
+*     of the cursor is reported below the display using the coordinates
+*     of the selected coordinate frame for information, but the position
+*     list written out is always written in Pixel coordinates, since
 *     that is how all CCDPACK applications expect to find it written.
-*     Points are marked on the image by clicking mouse button 1 
+*     Points are marked on the image by clicking mouse button 1
 *     (usually the left one) and may be removed using mouse button 3
 *     (usually the right one).  When you have marked all the points
 *     that you wish to, click the 'Done' button.
@@ -51,7 +51,7 @@
 *        to be centroided.  If true, then when you click on the image to
 *        add a new point IDICURS will attempt to find a centroidable
 *        object near to where the click was made and add the point
-*        there.  If no centroidable feature can be found nearby, you will 
+*        there.  If no centroidable feature can be found nearby, you will
 *        not be allowed to add a point.  Note that the centroiding
 *        routine is capable of identifying spurious objects in noise,
 *        but where a genuine feature is nearby this should find its
@@ -62,17 +62,17 @@
 *        added by clicking on the image.  In particular any points read
 *        from the INLIST file will not be automatically centroided.
 *
-*        This parameter only gives the initial centroiding state - 
+*        This parameter only gives the initial centroiding state -
 *        centroiding can be turned on and off interactively while the
 *        program is running.
 *     IN = LITERAL (Read)
 *        Gives the name of the NDFs to display and get coordinates from.
-*        If multiple NDFs are specified using wildcards or separating 
+*        If multiple NDFs are specified using wildcards or separating
 *        their names with commas, the program will run on each one in
 *        turn, or on each Set in turn if applicable (see the USESET
 *        parameter).
 *     INEXT = _LOGICAL (Read)
-*        If the READLIST parameter is true, then this parameter 
+*        If the READLIST parameter is true, then this parameter
 *        determines where the input position list comes from.  If it
 *        is true, then the position list currently associated with the
 *        NDF will be used.  If it is false, then the input position list
@@ -110,7 +110,7 @@
 *        [BOTH]
 *     MARKSTYLE = LITERAL (Read and Write)
 *        A string indicating how markers are initially to be plotted on
-*        the image.  It consists of a comma-separated list of 
+*        the image.  It consists of a comma-separated list of
 *        "attribute=value" type strings.  The available attributes are:
 *           - colour     -- Colour of the marker in Xwindows format.
 *           - size       -- Approximate height of the marker in pixels.
@@ -120,39 +120,39 @@
 *
 *        This parameter only gives the initial marker type; it can be
 *        changed interactively while the program is running.
-*        If specifying this value on the command line, it is not 
+*        If specifying this value on the command line, it is not
 *        necessary to give values for all the attributes; missing ones
 *        will be given sensible defaults.
 *        ["showindex=1"]
 *     MAXCANV = _INTEGER (Read and Write)
 *        A value in pixels for the maximum initial X or Y dimension of
-*        the region in which the image is displayed.  Note this is the 
+*        the region in which the image is displayed.  Note this is the
 *        scrolled region, and may be much bigger than the sizes given
 *        by WINX and WINY, which limit the size of the window on the
 *        X display.  It can be overridden during operation by zooming
-*        in and out using the GUI controls, but it is intended to 
+*        in and out using the GUI controls, but it is intended to
 *        limit the size for the case when ZOOM is large (perhaps
 *        because the last image was quite small) and a large image
-*        is going to be displayed, which otherwise might lead to 
+*        is going to be displayed, which otherwise might lead to
 *        the program attempting to display an enormous viewing region.
 *        If set to zero, then no limit is in effect.
 *        [1280]
 *     READLIST = _LOGICAL (Read)
-*        If this parameter is true, then the program will start up 
-*        with with some positions already marked (where the points 
+*        If this parameter is true, then the program will start up
+*        with with some positions already marked (where the points
 *        come from depends on the INEXT and INLIST parameters).
-*        If it is  false, the program will start up with no points 
+*        If it is  false, the program will start up with no points
 *        initially plotted.
 *        [FALSE]
 *     OUTLIST = FILENAME (Write)
-*        If WRITELIST is true, and OVERWRITE is false, then this 
-*        parameter determines the names of the files to use to write 
+*        If WRITELIST is true, and OVERWRITE is false, then this
+*        parameter determines the names of the files to use to write
 *        the position lists into.  It can be given as a comma-separated
 *        list with the same number of filenames as there are IN files,
 *        but wildcards can also be used to act as modifications of
 *        the input NDF names.
 *
-*        This parameter is ignored if WRITELIST is false or READLIST 
+*        This parameter is ignored if WRITELIST is false or READLIST
 *        and OVERWRITE are true.
 *     OVERWRITE = _LOGICAL (Read)
 *        If READLIST and WRITELIST are both true, then setting OVERWRITE
@@ -162,11 +162,11 @@
 *        place.
 *        [FALSE]
 *     PERCENTILES( 2 ) = _DOUBLE (Read and Write)
-*        The initial values for the low and high percentiles of the data 
+*        The initial values for the low and high percentiles of the data
 *        range to use when displaying the images; any pixels with a value
-*        lower than the first element will have the same colour, and any 
+*        lower than the first element will have the same colour, and any
 *        with a value higher than the second will have the same colour.
-*        Must be in the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) 
+*        Must be in the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 )
 *        <= 100.  These values can be changed interactively while the
 *        program runs.
 *        [2,98]
@@ -176,11 +176,11 @@
 *        IDICURS will try to group images according to their Set
 *        Name attribute before displaying them, rather than treating
 *        them one by one.  All images which share the same (non-blank)
-*        Set Name attribute, and which have a CCD_SET attached 
+*        Set Name attribute, and which have a CCD_SET attached
 *        coordinate system, will be shown together in the viewer
 *        resampled into their CCD_SET coordinates.
 *
-*        If USESET is false, then regardless of Set headers, each 
+*        If USESET is false, then regardless of Set headers, each
 *        individual NDF will be displayed for marking separately.
 *
 *        If the input images have no Set headers, or if they have no
@@ -197,8 +197,8 @@
 *     WINX = _INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
-*        allocated for display, it can be scrolled around within the 
-*        window.  The window can be resized in the normal way using 
+*        allocated for display, it can be scrolled around within the
+*        window.  The window can be resized in the normal way using
 *        the window manager while the program is running.
 *        [450]
 *     WINY = _INTEGER (Read and Write)
@@ -212,11 +212,11 @@
 *        This parameter determines whether an output position list
 *        file will be written and associated with the input images.
 *
-*        If the program exits normally, there are points are marked 
-*        on the image, and WRITELIST is true, then the points will be 
-*        written to a position list file and that file will be associated 
+*        If the program exits normally, there are points are marked
+*        on the image, and WRITELIST is true, then the points will be
+*        written to a position list file and that file will be associated
 *        with the image file.  The name of the position list file is
-*        determined by the OUTLIST and OVERWRITE parameters.  The 
+*        determined by the OUTLIST and OVERWRITE parameters.  The
 *        positions will be written to the file using the standard
 *        CCDPACK format as described in the Notes section.
 *
@@ -224,49 +224,49 @@
 *        no changes are made to the image associated position lists.
 *        [FALSE]
 *     ZOOM = _INTEGER (Read and Write)
-*        A factor giving the initial level to zoom in to the image 
+*        A factor giving the initial level to zoom in to the image
 *        displayed, that is the number of screen pixels to use for one
-*        image pixel.  It will be rounded to one of the values 
-*        ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be changed 
-*        interactively from within the program.  The initial value 
+*        image pixel.  It will be rounded to one of the values
+*        ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be changed
+*        interactively from within the program.  The initial value
 *        may be limited by MAXCANV.
 *        [1]
 
 *  Examples:
 *     idicurs mosaic mos.lis
-*        This starts up the graphical user interface, allowing you to 
-*        select a number of points which will be written to the 
+*        This starts up the graphical user interface, allowing you to
+*        select a number of points which will be written to the
 *        position list file 'mos.lis', which will be associated with
 *        the image file.
 *
 *     idicurs in=* out=*.pts percentiles=[10,90] useset=false
-*        Each of the NDFs in the current directory will be displayed, 
+*        Each of the NDFs in the current directory will be displayed,
 *        and the positions marked on it written to a list with the same
-*        name as the image but the extension '.pts', which will be 
+*        name as the image but the extension '.pts', which will be
 *        associated with the image in question.  The display will
 *        initially be scaled so that pixels with a value higher than
 *        the 90th percentile will all be displayed as the brightest
 *        colour and those with a value lower than the 10th percentile
 *        as the dimmest colour, but this may be changed interactively
 *        while the program is running.  Since USESET is explicitly
-*        set to false, each input NDF will be viewed and marked 
+*        set to false, each input NDF will be viewed and marked
 *        separately, even if some they have Set headers and Set
-*        alignment coordinates, 
+*        alignment coordinates,
 *
 *     idicurs in=gc6253 readlist inlist=found.lis outlist=out.lis
 *             markstyle="colour=skyblue,showindex=0"
 *        The image gc6253 will be displayed, with the points stored in
-*        the position list 'found.lis' already plotted on it.  These 
+*        the position list 'found.lis' already plotted on it.  These
 *        may be added to, moved and deleted, and the resulting list
 *        will be written to the file out.lis.  Points will initially
-*        be marked using skyblue markers, and not labelled with index 
+*        be marked using skyblue markers, and not labelled with index
 *        numbers.
 *
 *     idicurs * readlist writelist inext overwrite
 *        All the images in the current directory will be displayed,
-*        one after the other, with the points which are in their 
-*        currently associated position lists already plotted.  
-*        You can add and remove points, and the modified position 
+*        one after the other, with the points which are in their
+*        currently associated position lists already plotted.
+*        You can add and remove points, and the modified position
 *        lists will be written back into the same files.
 
 *  Notes:
@@ -298,18 +298,18 @@
 *       "!". Columns may be separated by the use of commas or spaces.
 *
 *       Input position lists read when READLIST is true may be in either
-*       of these formats.  The output list named by the OUTLIST 
+*       of these formats.  The output list named by the OUTLIST
 *       parameter will be written in CCDPACK (3 column) format.
 *
-*       In all cases, the coordinates in position lists are pixel 
+*       In all cases, the coordinates in position lists are pixel
 *       coordinates.
 *
-*     - NDF extension items. 
+*     - NDF extension items.
 *
-*       On normal exit, unless OUTLIST is set to null (!), the 
-*       CURRENT_LIST items in the CCDPACK extensions (.MORE.CCDPACK) of 
-*       the input NDFs are set to the name of the output list. These 
-*       items will be used by other CCDPACK position list processing 
+*       On normal exit, unless OUTLIST is set to null (!), the
+*       CURRENT_LIST items in the CCDPACK extensions (.MORE.CCDPACK) of
+*       the input NDFs are set to the name of the output list. These
+*       items will be used by other CCDPACK position list processing
 *       routines to automatically access the list.
 
 *  Behaviour of Parameters:
@@ -329,12 +329,12 @@
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *
 *     Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM,
-*     MARKSTYLE, CENTROID) give initial values for quantities which 
-*     can be modified while the program is running.  Although these 
-*     may be specified on the command line, it is normally easier to 
-*     start the program up and modify them using the graphical user 
-*     interface.  If the program exits normally, their values at the 
-*     end of the run will be used as defaults next time the program 
+*     MARKSTYLE, CENTROID) give initial values for quantities which
+*     can be modified while the program is running.  Although these
+*     may be specified on the command line, it is normally easier to
+*     start the program up and modify them using the graphical user
+*     interface.  If the program exits normally, their values at the
+*     end of the run will be used as defaults next time the program
 *     starts up.
 
 *  Copyright:
@@ -363,12 +363,12 @@
 
 *  History:
 *     17-APR-2000 (MBT):
-*        Original version (a previous file idicurs.f existed, but this 
+*        Original version (a previous file idicurs.f existed, but this
 *        is a rewrite from scratch).
 *     9-APR-2001 (MBT):
 *        Upgraded for use with Sets.
 *     22-MAY-2001 (MBT):
-*        Changed so that an empty position list file is written when 
+*        Changed so that an empty position list file is written when
 *        there are no points rather than no file at all.
 *     19-JUL-2001 (MBT):
 *        Added CENTROID parameter.
@@ -378,11 +378,11 @@
 *     {note_new_bugs_here}
 
 *-
-                     
-*  Type Definitions: 
+
+*  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-                     
-*  Global Constants: 
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'GRP_PAR'          ! GRP system constants
@@ -390,14 +390,14 @@
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
-*  Status:           
+*  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Length of string excluding trailing spaces
-                     
-*  Local Variables:  
+
+*  Local Variables:
       INTEGER FD                 ! FIO identifier of output file
       INTEGER I                  ! Loop counter
       INTEGER ILSTGR             ! GRP identifier for input position list files
@@ -466,7 +466,7 @@
       CHARACTER * ( 132 ) MSTYLE ! Marker style string
 
 *.
-                     
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -509,12 +509,12 @@
          OVERWR = .FALSE.
          IF ( RDLIST ) CALL PAR_GET0L( 'OVERWRITE', OVERWR, STATUS )
 
-*  If we are just overwriting the original files then copy the input 
+*  If we are just overwriting the original files then copy the input
 *  list group to the output list group.
          IF ( OVERWR ) THEN
             CALL GRP_COPY( ILSTGR, 1, NNDF, .FALSE., OLSTGR, STATUS )
 
-*  Otherwise get the output list group from the OUTLIST parameter, 
+*  Otherwise get the output list group from the OUTLIST parameter,
 *  using the input NDF group as a modification element.
          ELSE
             CALL CCD1_STRGR( 'OUTLIST', NDFGR, NNDF, NNDF, OLSTGR, NRET,
@@ -594,16 +594,16 @@
          IF ( USESET ) THEN
             CALL MSG_SETI( 'NUM', IS )
             CALL CCD1_MSG( ' ', '  Displaying Set ^NUM)', STATUS )
-         ELSE 
+         ELSE
             CALL MSG_SETC( 'NAME', NDFNMS( 1 ) )
             CALL CCD1_MSG( ' ', '  Displaying NDF ^NAME', STATUS )
          END IF
 
-*  Unless we read some in, there will be no positions in the initial 
+*  Unless we read some in, there will be no positions in the initial
 *  position list.
          NPOSI = 0
 
-*  If we are using an initial position list, we will have to read the 
+*  If we are using an initial position list, we will have to read the
 *  positions in.
          IF ( RDLIST ) THEN
             DO I = 1, NMEM
@@ -635,7 +635,7 @@
                         CALL CCD1_MALL( NP( I ), '_INTEGER', IPIND( I ),
      :                                  STATUS )
                         CALL CCD1_GISEQ( NPOSI + 1, 1, NP( I ),
-     :                                   %VAL( CNF_PVAL( IPIND( I ) ) ), 
+     :                                   %VAL( CNF_PVAL( IPIND( I ) ) ),
      :                                   STATUS )
 
 *  Standard file format map these in.
@@ -656,7 +656,7 @@
 *  Log to user.
                   CALL MSG_SETI( 'NP', NP( I ) )
                   CALL MSG_SETC( 'ILIST', FNAME )
-                  CALL CCD1_MSG( ' ', 
+                  CALL CCD1_MSG( ' ',
      :            '    Read ^NP positions from file ^ILIST.', STATUS )
 
 *  No input file - no points.
@@ -687,45 +687,45 @@
                   CALL CCD1_MALL( NP( I ), '_DOUBLE', IPX2, STATUS )
                   CALL CCD1_MALL( NP( I ), '_DOUBLE', IPY2, STATUS )
                   IF ( DOMAIN .EQ. 'PIXEL' ) THEN
-                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ),
      :                               NP( I ),
-     :                               NF( I ), 1, 
+     :                               NF( I ), 1,
      :                               %VAL( CNF_PVAL( IPX2 ) ), STATUS )
-                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ),
      :                               NP( I ),
-     :                               NF( I ), 2, 
+     :                               NF( I ), 2,
      :                               %VAL( CNF_PVAL( IPY2 ) ), STATUS )
                   ELSE
                      CALL CCD1_MALL( NP( I ), '_DOUBLE', IPX1, STATUS )
                      CALL CCD1_MALL( NP( I ), '_DOUBLE', IPY1, STATUS )
-                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ),
      :                               NP( I ),
-     :                               NF( I ), 1, 
+     :                               NF( I ), 1,
      :                               %VAL( CNF_PVAL( IPX1 ) ), STATUS )
-                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ),
      :                               NP( I ),
-     :                               NF( I ), 2, 
+     :                               NF( I ), 2,
      :                               %VAL( CNF_PVAL( IPY1 ) ), STATUS )
-                     CALL AST_TRAN2( MAP( I ), NP( I ), 
+                     CALL AST_TRAN2( MAP( I ), NP( I ),
      :                               %VAL( CNF_PVAL( IPX1 ) ),
      :                               %VAL( CNF_PVAL( IPY1 ) ), .TRUE.,
-     :                               %VAL( CNF_PVAL( IPX2 ) ), 
+     :                               %VAL( CNF_PVAL( IPX2 ) ),
      :                               %VAL( CNF_PVAL( IPY2 ) ),
      :                               STATUS )
                      CALL CCD1_MFREE( IPX1, STATUS )
                      CALL CCD1_MFREE( IPY1, STATUS )
                   END IF
 
-*  Copy the points from their current arrays into the right part of 
+*  Copy the points from their current arrays into the right part of
 *  the Set array.
-                  CALL CCG1_COPSI( 1, %VAL( CNF_PVAL( IPIND( I ) ) ), 
+                  CALL CCG1_COPSI( 1, %VAL( CNF_PVAL( IPIND( I ) ) ),
      :                             NP( I ),
-     :                             NPA, %VAL( CNF_PVAL( IPII ) ), 
+     :                             NPA, %VAL( CNF_PVAL( IPII ) ),
      :                             STATUS )
-                  CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPX2 ) ), 
+                  CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPX2 ) ),
      :                             NP( I ), NPA,
      :                             %VAL( CNF_PVAL( IPXI ) ), STATUS )
-                  CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPY2 ) ), 
+                  CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPY2 ) ),
      :                             NP( I ), NPA,
      :                             %VAL( CNF_PVAL( IPYI ) ), STATUS )
 
@@ -740,16 +740,16 @@
                END IF
             END DO
          END IF
-         
+
 *  Invoke the Tcl code to do the work.
-         CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN, 
+         CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN,
      :                    %VAL( CNF_PVAL( IPII ) ),
-     :                    %VAL( CNF_PVAL( IPXI ) ), 
+     :                    %VAL( CNF_PVAL( IPXI ) ),
      :                    %VAL( CNF_PVAL( IPYI ) ), NPOSI, VERBOS,
      :                    PERCNT, ZOOM, MAXCNV, WINDIM, MSTYLE, CENTRD,
      :                    IPIO, IPXO, IPYO, NPOSO, STATUS )
 
-*  If requested to do so, write the returned positions to an output 
+*  If requested to do so, write the returned positions to an output
 *  position list file.
          IF ( WRLIST ) THEN
             IF ( NMEM .EQ. 1 ) THEN
@@ -763,7 +763,7 @@
                CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
 
 *  Write the positions to the output file.
-               CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPIO ) ), 
+               CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPIO ) ),
      :                          %VAL( CNF_PVAL( IPXO ) ),
      :                          %VAL( CNF_PVAL( IPYO ) ), NPOSO, LINE,
      :                          CCD1__BLEN, STATUS )
@@ -775,7 +775,7 @@
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL MSG_SETC( 'FNAME', FNAME )
                CALL MSG_SETI( 'NPOS', NPOSO )
-               CALL CCD1_MSG( ' ', 
+               CALL CCD1_MSG( ' ',
      :         '    Wrote ^NPOS positions to file ^FNAME', STATUS )
 
 *  Modify the CURRENT_LIST item of the CCDPACK extension accordingly.
@@ -783,7 +783,7 @@
      :                          STATUS )
 
 *  Multiple members of this Set.  In this case we have to transform
-*  back from CCD_SET coordinates, and only write the appropriate 
+*  back from CCD_SET coordinates, and only write the appropriate
 *  points into each position list.
             ELSE
 
@@ -799,7 +799,7 @@
 *  Write a header to the file.
                   CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
 
-*  Allocate enough space to hold transformed coordinates, and a 
+*  Allocate enough space to hold transformed coordinates, and a
 *  subset of this Set's position list.
                   NPO = 0
                   IF ( NPOSO .GT. 0 ) THEN
@@ -810,10 +810,10 @@
                      CALL CCD1_MALL( NPOSO, '_INTEGER', IPI2, STATUS )
 
 *  Transform the positions into pixel coordinates.
-                     CALL AST_TRAN2( MAP( I ), NPOSO, 
+                     CALL AST_TRAN2( MAP( I ), NPOSO,
      :                               %VAL( CNF_PVAL( IPXO ) ),
      :                               %VAL( CNF_PVAL( IPYO ) ), .FALSE.,
-     :                               %VAL( CNF_PVAL( IPX1 ) ), 
+     :                               %VAL( CNF_PVAL( IPX1 ) ),
      :                               %VAL( CNF_PVAL( IPY1 ) ),
      :                               STATUS )
 
@@ -827,19 +827,19 @@
 
 *  Select only the points in this position list which fall within the
 *  bounds of this NDF.
-                     CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPIO ) ), 
+                     CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPIO ) ),
      :                                %VAL( CNF_PVAL( IPX1 ) ),
      :                                %VAL( CNF_PVAL( IPY1 ) ),
-     :                                NPOSO, XLO, XHI, YLO, YHI, 
-     :                                %VAL( CNF_PVAL( IPI2 ) ), 
+     :                                NPOSO, XLO, XHI, YLO, YHI,
+     :                                %VAL( CNF_PVAL( IPI2 ) ),
      :                                %VAL( CNF_PVAL( IPX2 ) ),
-     :                                %VAL( CNF_PVAL( IPY2 ) ), 
+     :                                %VAL( CNF_PVAL( IPY2 ) ),
      :                                NPO, STATUS )
 
 *  Write the positions out.
-                     CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPI2 ) ), 
+                     CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPI2 ) ),
      :                                %VAL( CNF_PVAL( IPX2 ) ),
-     :                                %VAL( CNF_PVAL( IPY2 ) ), 
+     :                                %VAL( CNF_PVAL( IPY2 ) ),
      :                                NPO, LINE,
      :                                CCD1__BLEN, STATUS )
 
@@ -915,7 +915,7 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL CCD1_ERREP( 'IDICURS_ERR', 
+         CALL CCD1_ERREP( 'IDICURS_ERR',
      :                    'IDICURS: Error in cursor program', STATUS )
       END IF
 

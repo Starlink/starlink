@@ -7,10 +7,10 @@
   <path>applications/kaprh</path>
   <description>KAPRH - A home for retired KAPPA applications</description>
   <abstract><p>
-KAPRH is an applications package containing commands 
+KAPRH is an applications package containing commands
 which have been ``retired'' from the KAPPA package (see SUN/95). They
 are retained within KAPRH to satisfy any occasional need there may be for
-them. 
+them.
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@

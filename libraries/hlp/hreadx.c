@@ -137,10 +137,10 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
 
 /* Is a switch to another library pending? */
    if ( strcmp ( hlopen, hlnext ) ) {
- 
+
    /* Yes: save the address. */
       iadrx = nextx;
- 
+
    /* Close any open HELP library file. */
       if ( ( old = *hlopen ) )
          if ( ( fclose ( fphl ) ) ) return hlp_CLOSE_ERROR;
@@ -148,13 +148,13 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
    /* Open the new HELP library file and set its logical level number. */
       if ( ( jstat = hlpHopenr ( nametr ) ) ) return jstat;
       levoff = loffnu;
- 
+
    /* Restore the address. */
       nextx = iadrx;
- 
+
    /* Are we switching to the start of a new HELP library? */
       if ( old && nextx <= 0 ) {
- 
+
       /* Yes: it will have contained an entry for the current */
       /* level and keyword, so read and ignore the top-level  */
       /* entry in the new library.                            */
@@ -162,29 +162,29 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
             return jstat;
       }
    } else if ( nextx <= 0 ) {
- 
+
    /* The right library is already open, but we are trying */
    /* to read the first record: reopen.                    */
       if ( ( jstat = hlpHopenr ( nametr ) ) ) return jstat;
    }
- 
+
 /* Remember the current positions. */
    iadrx = nextx;
    iadrd = nextd;
- 
+
 /* Read the next index entry. */
    if ( ( jstat = hlpHdread ( lstring, &nextx, string, nc ) ) )
       return jstat;
- 
+
 /* Quasi-end-of-file? */
    if ( ! *nc ) {
- 
+
    /* Yes: backspace and set the status. */
       nextx = iadrx;
       nextd = iadrd;
       jstat = 1;
    } else {
- 
+
    /* No: decode the "data", "down" and "along" addresses. */
       iptr = 0;
       nextd = hlpDec ( string, &iptr );
@@ -193,10 +193,10 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
 
    /* Make sure we've landed on a space. */
       if ( string [ iptr ] != (char) ' ' ) return hlp_BAD_INDEX;
- 
+
    /* Set iptr and ifrom to the start of the next field. */
       ifrom = ++iptr;
- 
+
    /* The next field is usually a level number but might be a pointer  */
    /* to another library.  If it is a pointer, find out where it ends. */
       if ( string [ ifrom ] == POINTR ) {
@@ -204,47 +204,47 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
          if ( iptr < ifrom || iptr >= *nc - 1 ) return hlp_BAD_INDEX;
          iptr++;
       }
- 
+
    /* ifrom points to the level number or to the special character */
    /* preceding a pointer to another HELP library.  iptr points to */
    /* the level number.                                            */
- 
+
    /* Look at navig to decide where to leave the file positioned. */
       if ( navig != 'D' && navig != 'd' && ialong >= 0 ) {
- 
+
       /* "Along" case: we have the address ready. */
          nextx = ialong;
       } else {
- 
+
       /* "Down" case: is the current entry a pointer to another library? */
          if ( string [ ifrom ] != (char) POINTR ) {
- 
+
          /* No: we have the address ready. */
             nextx = idown;
          } else {
- 
+
          /* Yes: make sure we aren't trying to switch to the */
          /* current library.                                 */
             l = iptr - ifrom - 2;
             if ( ! strncmp ( string + ifrom + 1, hlopen, l ) )
                return hlp_SELF_REF;
- 
+
          /* Store the library name, causing library switch on next */
          /* read, and set the address to indicate the first entry. */
             hlpCopyn (hlnext, string + ifrom + 1, l );
             nextx = 0l;
- 
+
          /* Decode the level number to determine the logical level */
          /* of the new library.                                    */
             loffnu = (int) hlpDec ( string, &iptr );
             if ( loffnu < 0 ) return hlp_BAD_INDEX;
             loffnu = loffnu + levoff;
- 
+
          /* Point iptr back at the level number. */
             iptr--;
          }
       }
- 
+
    /* Squeeze out the part of the record preceding the level */
    /* number and keyword.                                    */
       strcpy ( string, string + iptr );

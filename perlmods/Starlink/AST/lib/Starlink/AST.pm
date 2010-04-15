@@ -61,7 +61,7 @@ namespace.
 =head2 Constructors
 
 The following constructors are available. Currently, these
-constructors match the C constructors fairly closely. 
+constructors match the C constructors fairly closely.
 
 This is one area which may change when the class comes out of alpha
 release. The main problem with the constructors is the options string
@@ -253,9 +253,9 @@ package Starlink::AST;
 # is much more Perl like than would otherwise be the case.
 sub Set {
   my $self = shift;
-  
-  # Original code, using the lower lever _Set method. Provide the sprintf 
-  # functionality in the Perl side since it is easier than doing it in C 
+
+  # Original code, using the lower lever _Set method. Provide the sprintf
+  # functionality in the Perl side since it is easier than doing it in C
   # [but causes a problem if the string includes a comma]
   #
   #my $string = shift;
@@ -264,29 +264,29 @@ sub Set {
   #
   #$string = sprintf($string, @_) if @_;
   #return $self->_Set( $string );
-  
+
   if ( $_[0] =~ "=" ) {
      $self->_Set( $_[0] );
   } else {
      my %hash = @_;
      foreach my $key ( sort keys %hash ) {
         $self->SetC( $key, $hash{$key} );
-     }   
+     }
   }
   return;
-  
+
 }
 
 sub Get {
   my $self = shift;
   my @strings = @_;
-  
+
   my %hash;
   foreach my $i ( 0 ... $#strings ) {
      $hash{$strings[$i]} = $self->GetC( $strings[$i] );
-  }  
+  }
   return wantarray ? %hash : $hash{$strings[0]};
-    
+
 }
 
 # Rebless cloned/copied object into the original class
@@ -521,29 +521,29 @@ sub GetFrame {
 sub FindFrameByDomain {
   my $self = shift;
   my $string = shift;
-  
+
   my $frame = undef;
   my $number = $self->Get( 'Nframe' );
-  foreach my $i ( 0 ... $number ) { 
+  foreach my $i ( 0 ... $number ) {
       my $tmp_frame = $self->GetFrame( $i );
       if ( $tmp_frame->Get('Domain') eq $string ) {
          $frame = $tmp_frame;
-      }        
-  } 
-  
+      }
+  }
+
   return $frame;
 }
-  
+
 package Starlink::AST::Plot;
 use base qw/ Starlink::AST::FrameSet /;
 
 sub new {
   my $class = shift;
   my @args = @_;
- 
+
   my $gbox = $args[1];
   my $pbox = $args[2];
-    
+
   # Call the underlying routine
   my $self = $class->_new( @args );
 
@@ -551,7 +551,7 @@ sub new {
   $self->{_xghi} = $$gbox[2] if defined $$gbox[1];
   $self->{_yglo} = $$gbox[1] if defined $$gbox[2];
   $self->{_yghi} = $$gbox[3] if defined $$gbox[3];
-  
+
   $self->{_xplo} = $$pbox[0] if defined $$pbox[0];
   $self->{_xphi} = $$pbox[2] if defined $$pbox[1];
   $self->{_yplo} = $$pbox[1] if defined $$pbox[2];
@@ -562,7 +562,7 @@ sub new {
 
 sub GBox {
   my $self = shift;
-  if( @_ ) { 
+  if( @_ ) {
      my $gbox = shift;
      $self->{_xglo} = $$gbox[0];
      $self->{_xghi} = $$gbox[2];
@@ -574,7 +574,7 @@ sub GBox {
 
 sub PBox {
   my $self = shift;
-  if( @_ ) { 
+  if( @_ ) {
      my $pbox = shift;
      $self->{_xplo} = $$pbox[0];
      $self->{_xphi} = $$pbox[2];

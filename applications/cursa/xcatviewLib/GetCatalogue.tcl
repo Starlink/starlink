@@ -27,7 +27,7 @@ proc GetCatalogue { } {
 #   Pack the frame into the window.
 #   In the entry box for the current directory bind the mouse click and
 #   the return key to a script to update the current directory.
-#   In the entry box for the current catalogue bind the return key to set 
+#   In the entry box for the current catalogue bind the return key to set
 #   global variable button to "ok".
 #   Create a frame to hold the row of buttons.
 #   Create each of the buttons.
@@ -79,7 +79,7 @@ proc GetCatalogue { } {
     wm transient .getcatalogue   .
 
 #
-#  Bind the return key to set global variable button to "ok".  That is, 
+#  Bind the return key to set global variable button to "ok".  That is,
 #  hitting return will have the same effect as clicking on the "ok"
 #  button.
 
@@ -87,7 +87,7 @@ proc GetCatalogue { } {
 
 #
 #  Create a frame to hold the titles for the  subdirectories and
-#  Catalogues listboxes, put the titles in this frame and pack the frame into 
+#  Catalogues listboxes, put the titles in this frame and pack the frame into
 #  the window.  Finally pack this frame into the window.
 
      frame  .getcatalogue.title
@@ -214,8 +214,8 @@ proc GetCatalogue { } {
      }
 
 #
-#  In the entry box for the current catalogue bind the return key to set 
-#  global variable button to "ok".  That is, hitting return will have the 
+#  In the entry box for the current catalogue bind the return key to set
+#  global variable button to "ok".  That is, hitting return will have the
 #  same effect as clicking on the "ok" button.
 
     bind  .getcatalogue.current.cat  <Return> {set getCatalogueButton "ok" }
@@ -245,7 +245,7 @@ proc GetCatalogue { } {
      button .getcatalogue.buttonrow.up \
        -text Up \
        -width 6 \
-       -command { 
+       -command {
           if {[catch {cd ..}]} then {
              Error "Failure executing Unix cd (change directory) command."
              return
@@ -259,7 +259,7 @@ proc GetCatalogue { } {
      button .getcatalogue.buttonrow.home \
        -text Home \
        -width 6 \
-       -command { 
+       -command {
           if {[catch {cd}]} then {
              Error "Failure executing Unix cd (change directory) command."
              return
@@ -284,7 +284,7 @@ proc GetCatalogue { } {
        -command {HelpText GetCatalogue_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getcatalogue.buttonrow.default -relief sunken -bd 1
@@ -388,7 +388,7 @@ proc GetCatalogue { } {
      grab  .getcatalogue
      focus .getcatalogue
 
-     tkwait variable getCatalogueButton 
+     tkwait variable getCatalogueButton
 
      if {$getCatalogueButton == "ok"} {
         set catDir   [.getcatalogue.current.dir  get]

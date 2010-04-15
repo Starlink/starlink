@@ -8,7 +8,7 @@ C  Function:
 C     Indicates if any parameter request has been aborted by the user.
 C
 C  Description:
-C     This routine adds support for user-requested aborts in response 
+C     This routine adds support for user-requested aborts in response
 C     to a parameter prompt.  If the user replies with an abort request
 C     to any prompt, the parameter routine in question will return a
 C     default value and set an abort flag.  This abort flag will prevent
@@ -22,12 +22,12 @@ C     ABORT = PAR_ABORT ()
 C
 C  Parameters:   None.
 C
-C  Returns:  
+C  Returns:
 C
 C     (<) ABORT   (Logical,function value) True if the parameter system
 C                 abort flag is set, false if not.
 C
-C  Prior requirements: 
+C  Prior requirements:
 C     PAR_INIT must have been called to initialise the parameter system.
 C
 C  Common variable details:

@@ -73,7 +73,7 @@
       IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *      Open the DSA system
-         CALL DSA_OPEN (STATUS) 
+         CALL DSA_OPEN (STATUS)
 
 *      Open the observation file, assuming it is in the ODIR: directory.
          CALL DSA_NAMED_INPUT( 'OBSFILE', OBSERVATION, STATUS)
@@ -87,11 +87,11 @@
 
 *         Obtain the old observation type, which was saved to the
 *         OLDTYPE parameter, and write this to OBSTYPE in the
-*         observation file. 
+*         observation file.
             CALL DSA_GET_FITS_C( 'OBSFILE', 'OLDTYPE', 0,
      :        OLDTYPE, COMMENT, STATUS )
             CLEN = MAX( 1, CHR_LEN( OLDTYPE ) )
-            CALL DSA_PUT_FITS_C( 'OBSFILE', 'OBSTYPE', 
+            CALL DSA_PUT_FITS_C( 'OBSFILE', 'OBSTYPE',
      :        OLDTYPE(1:CLEN), ' ', STATUS )
             CALL MSG_SETC( 'OBSERVATION', OBSERVATION )
             CALL MSG_SETC( 'OLDTYPE', OLDTYPE )
@@ -100,12 +100,12 @@
      :           ( OLDTYPE(1:1) .EQ. 'A' ) ) THEN
 
                CALL MSG_OUT( ' ', 'CALIBRATION observation '/
-     :           /'^OBSERVATION will be re-filed as an ^OLDTYPE', 
+     :           /'^OBSERVATION will be re-filed as an ^OLDTYPE',
      :           STATUS )
             ELSE
 
                CALL MSG_OUT( ' ', 'CALIBRATION observation '/
-     :           /'^OBSERVATION will be re-filed as a ^OLDTYPE', 
+     :           /'^OBSERVATION will be re-filed as a ^OLDTYPE',
      :           STATUS )
             END IF
 
@@ -128,7 +128,7 @@
 *      will file the observation in the index file.
 *      (This routine will look at the same OBSERVATION parameter
 *      and so pick up the same file).
-         CALL RED4_FILE_OBSERVATION_2( OBSERVATION, 
+         CALL RED4_FILE_OBSERVATION_2( OBSERVATION,
      :     REDOBS, OLDTYPE, STATUS )
       ELSE
 

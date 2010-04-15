@@ -3,7 +3,7 @@ C===========================================================================
 
       SUBROUTINE PERIOD_PUTYMEAN(IPARRAY, NUMROWS, MXCOL, AVE,
      :                           SDEV, YERROR, OPARRAY)
- 
+
 C===========================================================================
 C Outputs mean data from DETREND. Both arrays can correspond to slices
 C of dynamically-allocated memory, provided that the appropriate "calling"
@@ -14,7 +14,7 @@ C Written by Kevin P Duffey @RAL, October 2001
 C===========================================================================
 
       IMPLICIT NONE
- 
+
       INTEGER NUMROWS, MXCOL, I
       DOUBLE PRECISION IPARRAY(NUMROWS,MXCOL)
       DOUBLE PRECISION OPARRAY(NUMROWS,MXCOL)

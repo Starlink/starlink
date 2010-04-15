@@ -77,7 +77,7 @@ C  History:
 C     29th Aug 1988.  Original version.  KS / AAO.
 C     31st Aug 1992.  Replace CNV_ call with VEC_ calls.
 C                     HME / UoE, Starlink. Added use of DSA_WRFLUSH. KS/AAO
-C     2005 June 3     Replace DYNAMIC_MEMORY with 
+C     2005 June 3     Replace DYNAMIC_MEMORY with
 C                     %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
 C                     addressing.  MJC / Starlink
 C+

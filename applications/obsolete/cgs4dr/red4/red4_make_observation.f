@@ -83,7 +83,7 @@
       INTEGER I, J                 ! temporary integer storage
       INTEGER L1                   ! length of string S1
       INTEGER DET_SIZE (2)         ! size of detector in pixels
-      INTEGER ACTVAL               ! 
+      INTEGER ACTVAL               !
       INTEGER SECTOR (4,4)         ! array sector coordinates
       INTEGER TEMP (4)             ! temporary sector information
       INTEGER CLEN                 ! Non-black length of character string
@@ -161,7 +161,7 @@
      :   STATUS)
       CALL DSA_PUT_FITS_F( 'OBSERVATION', 'DEC', 18.0100, ' ',
      :   STATUS)
-      
+
 *    For .START_END extension
       CALL DSA_PUT_FITS_F( 'OBSERVATION', 'RUTSTART', 12.000001,
      :   ' ', STATUS)
@@ -171,7 +171,7 @@
      :   STATUS)
       CALL DSA_PUT_FITS_F( 'OBSERVATION', 'AMEND', 1.25, ' ',
      :   STATUS)
-      
+
 *    For .CGS4_OBSDETAIL extension
       CALL DSA_PUT_FITS_I( 'OBSERVATION', 'GRPNUM', 1, ' ',
      :   STATUS)
@@ -300,7 +300,7 @@
 
       OBJECT = 'DET_SIZE'
       CALL PAR_GET1I( OBJECT, 2, DET_SIZE, ACTVAL, STATUS )
-      CALL DSA_PUT_FITS_I( 'OBSERVATION', 'DCOLUMNS', DET_SIZE(1), ' ', 
+      CALL DSA_PUT_FITS_I( 'OBSERVATION', 'DCOLUMNS', DET_SIZE(1), ' ',
      :   STATUS)
       CALL DSA_PUT_FITS_I( 'OBSERVATION', 'DROWS', DET_SIZE(2), ' ',
      :   STATUS)

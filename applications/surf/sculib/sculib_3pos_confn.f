@@ -20,7 +20,7 @@
 *     required for deconvolving the 3-position chop from a scan.
 *
 *     This function consists of a series of delta functions at a spacing
-*     equal to that between a -ve spike and the central spike of the 
+*     equal to that between a -ve spike and the central spike of the
 *     3-position chop. The height of the delta dunctions peaks at the
 *     centre of the convolution function and falls off by 1 at a time for
 *     the delta functions on either side, so that the envelope of the
@@ -33,7 +33,7 @@
 *     Since the raw data are not sampled such that the chop spacing is an
 *     integer number of samples, the actual convolution function must be
 *     rebinned onto the sample mesh by sinc interpolation.
-*     
+*
 *  Arguments:
 *     BSEP = REAL (Given)
 *        The beam separation in arcseconds
@@ -64,13 +64,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR' 
-      
+      INCLUDE 'SAE_PAR'
+
 *  Arguments Given:
       REAL BSEP, PIXSEP
       INTEGER NPIX
@@ -100,11 +100,11 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*  convolution function must be twice size of map, odd number of points 
+*  convolution function must be twice size of map, odd number of points
 *  because function is symmetric about central pixel.
 
       NCFN = NPIX * 2 - 1
-      
+
 *  the half-beam separation, between a -ve spike and the central spike
 *  (in map pixel units)
 
@@ -152,7 +152,7 @@
 
          END DO
 
-         CONF(I) = SUM 
+         CONF(I) = SUM
 
       END DO
 

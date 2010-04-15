@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_SUSKR( NX, X, NXKNOT, XKNOT, STATUS )
- 
+
 *+
 *  Name:
 *     KPS1_SUSKx
@@ -74,24 +74,24 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER NX                 ! Number of data points
       REAL X( NX )             ! Co-ordinates of the data
       INTEGER NXKNOT             ! Number of interior knots
- 
+
 *  Arguments Returned:
       REAL XKNOT( NXKNOT )     ! Positions of the interior knots
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       REAL DATAPT                ! Number of data points just less than
                                  ! the required knot value
@@ -103,20 +103,20 @@
                                  ! the interpolation
       REAL XINTVL                ! Number of data points per knot
                                  ! interval
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Find the mean number of data points per knot interval.
       XINTVL = REAL( NX - 1 ) / ( REAL( NXKNOT ) + 1.0 )
- 
+
 *  Count through each knot, calculating the number of data points less
 *  than the required knot value.
       DO  I = 1, NXKNOT
          DATAPT = 1.0 + XINTVL * REAL( I )
- 
+
 *  The result is not usually an integer, so interpolate linearly
 *  between the ordered data positions.
          NDAT1 = INT( DATAPT )
@@ -124,5 +124,5 @@
          FRAC = DATAPT - REAL( NDAT1 )
          XKNOT( I ) = X( NDAT1 ) * ( 1.0 - FRAC ) + X( NDAT2 ) * FRAC
       END DO
- 
+
       END

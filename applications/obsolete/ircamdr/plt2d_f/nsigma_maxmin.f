@@ -50,7 +50,7 @@
 	CALL PAR_GET0C( 'NSIGMA_CALC', NSIGMA_CALC, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                 'Error : NSIGMA_MAXMIN : illegal NSIGMA_CALC',
      :                 STATUS )
 	  RETURN
@@ -95,7 +95,7 @@
 
 * calculate maximum and minimum from sigma level
 
-            VARIANCE = ( SUMSQ - 2*MEAN_VALUE*SUM + 
+            VARIANCE = ( SUMSQ - 2*MEAN_VALUE*SUM +
      :                  (NX*NY)*MEAN_VALUE**2)
 
             IF( (NX*NY) .EQ. 1 ) THEN
@@ -109,7 +109,7 @@
             ENDIF
 	  ELSE
 
-            CALL MSG_OUT('ERR', 
+            CALL MSG_OUT('ERR',
      :            'Error : NSIGMA_MAXMIN : illegal image size, i.e. 0',
      :                 STATUS )
 	    RETURN
@@ -129,7 +129,7 @@
 
 	  IF( STATUS .NE. SAI__OK) THEN
 
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :         'Error : NSIGMA_MAXMIN : illegal subimage area values',
      :                 STATUS )
 	    RETURN
@@ -174,7 +174,7 @@
               ENDIF
 	    ELSE
 
-              CALL MSG_OUT('ERR', 
+              CALL MSG_OUT('ERR',
      :         'Error : NSIGMA_MAXMIN : illegal subimage size. i.e. 0',
      :                 STATUS )
 	      RETURN
@@ -182,7 +182,7 @@
 	    END IF
 	  ELSE
 
-            CALL MSG_OUT('ERR', 
+            CALL MSG_OUT('ERR',
      :         'Error : NSIGMA_MAXMIN : subimage area outside image',
      :                 STATUS )
 	    RETURN
@@ -214,7 +214,7 @@
 	IF( BAD_NUMBER .GT. 0) THEN
 
           CALL MSG_SETI( 'BAD', BAD_NUMBER )
-          CALL MSG_OUT('BAD', 
+          CALL MSG_OUT('BAD',
      :  'Warning ^BAD pixels have a value larger than 1e30', STATUS )
 
 	END IF

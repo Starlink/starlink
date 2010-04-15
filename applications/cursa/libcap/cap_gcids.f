@@ -11,7 +11,7 @@
 *     CALL CAP_GCIDS (CI, CMPIN, EXPFLG, NAMEIN, EXPRN, UNITS; CMPOUT,
 *       NAMOUT, IDS; STATUS)
 *  Description:
-*     Attempt to get identifiers for a list of components.  The 
+*     Attempt to get identifiers for a list of components.  The
 *     components may be either columns, expressions or parameters.
 *     A vector name is expanded into the names of all its constituent
 *     elements and a name and identifier are returned for each element.
@@ -154,7 +154,7 @@
             IF (.NOT. EXPFLG(LOOP) ) THEN
 
 *
-*             The component is not an expression; try to get an identifier 
+*             The component is not an expression; try to get an identifier
 *             for a pre-existing component and proceed if ok.
 
                CALL ERR_MARK
@@ -178,7 +178,7 @@
                      IF (IDTYPE .NE. CAT__FETYP) THEN
 
 *
-*                      The identifier is not a vector element; check 
+*                      The identifier is not a vector element; check
 *                      whether it corresponds to a scalar or an entire
 *                      vector.
 

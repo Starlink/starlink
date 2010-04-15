@@ -9,7 +9,7 @@
 *     searched for an input pixel value, which is defined to be the bad
 *     pixel value. Each time one is found, the deglitching subroutine is
 *     called to replace the bad pixel value with the value of the local
-*     median. The array is updated each time a bad pixel is found, and 
+*     median. The array is updated each time a bad pixel is found, and
 *     final resulting array returned.
 *
 *    Invocation :
@@ -111,7 +111,7 @@
             IF ( ARRAY( I, J ) .EQ. BADVAL ) THEN
 
 *             position is bad - deglitch it
-               CALL GLITCHSUB( DIMS1, DIMS2, ARRAY, I, J, OLDVAL, 
+               CALL GLITCHSUB( DIMS1, DIMS2, ARRAY, I, J, OLDVAL,
      :                         NEWVAL, STATUS )
 
 *             increment valid deglitch counter by one

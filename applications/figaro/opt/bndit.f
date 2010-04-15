@@ -46,9 +46,9 @@
 *    include file, and allow max_cmp to vary with data file
 *    Altered by J.W.Palmer Manchester Nov 1995: added another menu
 *    option to allow bounds in N2 optimization routine to be obtained
-*    from tolerance[] global array. Calls  tol_bounds() which is a 
+*    from tolerance[] global array. Calls  tol_bounds() which is a
 *    modification of find_bounds().
-*    Modified to provide adequate workspace for PDA routines called in 
+*    Modified to provide adequate workspace for PDA routines called in
 *    lock_comps. JWP Feb 1997
 *-
       implicit none

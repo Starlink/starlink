@@ -1,7 +1,7 @@
 *+  RED4_GRPTOSTD - Convert group or observation file name to standard file name
       SUBROUTINE RED4_GRPTOSTD( GRP_FILE, STD_FILE, STATUS )
 *    Description :
-*     This routine converts a group file name or reduced observation 
+*     This routine converts a group file name or reduced observation
 *     file name of the form RGDIR:RGyymmdd_gggg or RODIR:ROyymmdd_oooo
 *     into a standard file name of the form RGDIR:STyymmdd_gggg or
 *     RODIR:STyymmdd_oooo. The routine replaces the first two
@@ -12,7 +12,7 @@
 *     CALL RED4_GRPTOSTD( GRP_FILE, STD_FILE, STATUS )
 *    Parameters :
 *     GRP_FILE  = CHARACTER*(*)( READ )
-*         The group or reduced observation file name (ROyymmdd_oooo, 
+*         The group or reduced observation file name (ROyymmdd_oooo,
 *         RODIR:ROyymmdd_oooo, RGyymmdd_gggg or RGDIR:RGyymmdd_gggg).
 *     STD_FILE = CHARACTER*(*)( WRITE )
 *         The standard file name (STyymmdd_oooo, RODIR:STyymmdd_oooo,
@@ -64,7 +64,7 @@
       COLON_POS = INDEX( GRP_FILE, ':' )
       IF (COLON_POS .EQ. 0) COLON_POS = INDEX( GRP_FILE, '/')
 
-*   If there is a prefix in the string, replace the first two 
+*   If there is a prefix in the string, replace the first two
 *   characters after it with 'ST'. Otherwise replace the first two
 *   characters in the string with 'ST'.
       IF ( COLON_POS .GT. 0 ) THEN

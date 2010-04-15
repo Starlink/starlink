@@ -25,7 +25,7 @@ C
 C     12th Aug 1985  KS / AAO.  Now expects error arrays to be
 C                    percentage values rather than absolute values.
 C     22nd July 1986 KS / AAO.  Reverts to use of absolute error values.
-C     24th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs 
+C     24th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
 C                    changed. Now uses DYN_ routines for dynamic-memory
 C                    handling.
 C     11th Nov 1987  KS / AAO.  Now attempts to determine K mag from
@@ -96,7 +96,7 @@ C
                                  ! data
       INTEGER      XPTR          ! Dynamic-memory pointer to output
                                  ! x-axis data
-      INTEGER      XSLOT         ! Map slot number for output x-axis 
+      INTEGER      XSLOT         ! Map slot number for output x-axis
                                  ! data
 C
 C     Initialisation of DSA_ routines
@@ -126,7 +126,7 @@ C
       CALL DSA_MATCH_SIZES('SPECT','STAND',STATUS)
 C
 C     Get K magnitude of standard.  The program attempts to determine
-C     the default value from the object name and a file of standards and 
+C     the default value from the object name and a file of standards and
 C     their magnitudes.
 C
       IF (STATUS.NE.0) GOTO 500
@@ -188,7 +188,7 @@ C
 C     Map standard data, if SAME we got them already.
 C
       IF (.NOT.SAME) THEN
-         CALL DSA_MAP_DATA('STAND','READ','FLOAT',SPTR,SSLOT,STATUS) 
+         CALL DSA_MAP_DATA('STAND','READ','FLOAT',SPTR,SSLOT,STATUS)
          CALL DSA_MAP_QUALITY('STAND','READ','BYTE',SQPTR,SQSLOT,STATUS)
 
          IF (ERROR1) THEN
@@ -265,7 +265,7 @@ C
       REAL STAR(N), ESTAR(N), STAN(N), ESTAN(N), LAMBDA(N)
       BYTE QUALITY(N)
 C
-C     Local variables      
+C     Local variables
 C
       INTEGER I
       REAL F
@@ -342,7 +342,7 @@ C     directory sequence.
 C
 C     Parameters -  (">" input, "<" output)
 C
-C     (>) OBJECT    (Character) The name of the object, from the 
+C     (>) OBJECT    (Character) The name of the object, from the
 C                   standard structure.
 C     (<) KDEF      (Real) The default K magnitude to be used - ie the
 C                   K magnitude for the object found in the file.

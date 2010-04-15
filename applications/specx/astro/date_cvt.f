@@ -38,7 +38,7 @@
         I = I + 1
       END DO
 
-      WRITE (OUTDATE, '(A2,''/'',I2.2,''/'',A2)') 
+      WRITE (OUTDATE, '(A2,''/'',I2.2,''/'',A2)')
      &        INDATE(1:2), I, INDATE(8:9)
 
       RETURN

@@ -5,10 +5,10 @@
 *   Name:
 *      SUBROUTINE str_READF
 *
-*   Description: 
+*   Description:
 *      Decode float value into parameter string under format control.
 *
-*   History:  
+*   History:
 *      Jack Giddings      03-JAN-82     IUEDR Vn. 1.0
 *      Paul Rees          27-OCT-88     IUEDR Vn. 2.0
 *
@@ -24,34 +24,34 @@
 *   Import:
       BYTE CNTRL(256)       ! control string
       BYTE LINE(100)        ! string to be scanned
- 
+
 *   Import/Export:
       INTEGER POS           ! current character position in line
- 
+
 *   Export:
       REAL*8 FVALUE           ! float value
- 
+
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       INTEGER str_INDEX     ! character index in string
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL FOUND         ! whether a value has been found
       LOGICAL JUMPLN        ! whether jump over newlines (ignored)
       LOGICAL RIGHT         ! whether right justified
       LOGICAL SUPR          ! whether value is used or not
- 
+
       BYTE EDIT             ! edit character
       BYTE FORMAT(256)      ! format from CNTRL
- 
+
       INTEGER FIELD         ! field size
       INTEGER FIRST         ! first position in CNTRL
       INTEGER ITEMP         ! temporary integer value
       INTEGER LAST          ! last position in CNTRL
       INTEGER TYPE          ! format type index
- 
+
       REAL*8 FTEMP            ! temporary float value
 
       STATUS = 0
@@ -96,7 +96,7 @@
                FOUND = .TRUE.
 
             END IF
- 
+
 *           call str_mtch(format, line, pos, status)
 
          END IF
@@ -105,7 +105,7 @@
       END IF
 
  200  CONTINUE
- 
+
 *   Check that a value is available
       IF (.NOT.FOUND) STATUS = -3
 

@@ -20,7 +20,7 @@
  *     Copyright (C) 1998-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     21-SEP-1998 (PWD):
  *        Original version.
@@ -47,28 +47,28 @@
 
 #include "LocalCatalog.h"
 
-class CatLocalCatalog : public LocalCatalog 
+class CatLocalCatalog : public LocalCatalog
 {
  protected:
 
     //  Data members.
     char *tabData_;    // Catalogue columns converted to tab format.
     int catId_;        // Identifier of CAT catalogue.
-    
+
     //  Open and read a CAT catalogue.
     virtual int openCat( const char *filename );
-    
+
     //  Free CAT catalogue.
     virtual void freeCat();
-    
+
  public:
 
     //  Constructor.
     CatLocalCatalog( CatalogInfoEntry *e);
-    
+
     //  Destructor.
     ~CatLocalCatalog() {};
-    
+
     //  Check the validity of a catalogue.
     static int check_table(const char* file);
 

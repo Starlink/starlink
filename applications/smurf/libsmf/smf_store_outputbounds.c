@@ -4,7 +4,7 @@
 *     smf_store_outputbounds
 
 *  Purpose:
-*     Write output bounds to screen and parameters. 
+*     Write output bounds to screen and parameters.
 
 *  Language:
 *     Starlink ANSI C
@@ -39,7 +39,7 @@
 *        Output sky mapping (presumably split from wcsout). For a 2d wcsout
 *        this can be NULL since the frame set can act as a mapping.
 *     status = int * (Given & Returned)
-*       Inherited status. 
+*       Inherited status.
 
 *  Description:
 *     Reports the WCS bounds of the output map and optiontall stores the
@@ -103,7 +103,7 @@
 void
 smf_store_outputbounds (int updatepars, const int lbnd_out[3],
                         const int ubnd_out[3],
-                        const AstFrameSet * wcsout, 
+                        const AstFrameSet * wcsout,
                         const AstSkyFrame *oskyfrm,
                         const AstMapping * oskymap, int *status) {
 
@@ -131,7 +131,7 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
 /* work out how many dimensions we have */
   ndims = astGetI( wcsout, "Naxes");
 
-/* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds 
+/* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds
    are normalised. Celestial coordinates will use radians. */
    for( i = 0; i < ndims; i++ ) {
      glbnd_out[ i ] = 0.5;
@@ -139,7 +139,7 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
    }
 
    for( i = 0; i < ndims; i++ ) {
-     astMapBox( wcsout, glbnd_out, gubnd_out, 1, i+1, &(wcslbnd_out[ i ]), 
+     astMapBox( wcsout, glbnd_out, gubnd_out, 1, i+1, &(wcslbnd_out[ i ]),
                 &(wcsubnd_out[ i ]), NULL, NULL );
    }
 
@@ -195,9 +195,9 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
    }
 
 /* Now also calculate the spatial coordinates of the four corners (required
-   for CADC science archive. First, calculate input GRID coordinates for 4 
-   corners: TR, TL, BR, BL. Use pixel centres for reporting. This is 
-   important for cases where the pixels are very large and we want to make 
+   for CADC science archive. First, calculate input GRID coordinates for 4
+   corners: TR, TL, BR, BL. Use pixel centres for reporting. This is
+   important for cases where the pixels are very large and we want to make
    sure that we are conservative with the database reporting. */
 
    gx_in[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1.0; /* Right */
@@ -210,7 +210,7 @@ smf_store_outputbounds (int updatepars, const int lbnd_out[3],
    gy_in[ 3 ] = gy_in[ 2 ];                          /* Bottom */
 
    astTran2( oskymap, 4, gx_in, gy_in, 1, gx_out, gy_out );
-   
+
    /* Store the bounds in the parameters */
    for (i = 0; i < 4; i++) {
      corner[ 0 ] = gx_out[ i ];

@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE gen_STOI
 *
-*   Description: 
+*   Description:
 *      Decode integer value from string using Fortran Character File.
 *
 *   Authors:
@@ -40,7 +40,7 @@
 
 *   Import:
       BYTE SVALUE(ARB)            ! string to be scanned
- 
+
 *   Export:
       INTEGER IVALUE              ! decoded value
       INTEGER STATUS              ! status return

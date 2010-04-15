@@ -15,8 +15,8 @@
 *  Description:
 *     Names stored in the supplied group with indices greater than or
 *     equal to START are expanded into a list of explicit file names
-*     which can be accessed as catalogues using the CAT library. The 
-*     expanded set of names are appended to the end of the group, and 
+*     which can be accessed as catalogues using the CAT library. The
+*     expanded set of names are appended to the end of the group, and
 *     the original names are deleted.
 *
 *     If any of the files in the group cannot be accessed, an error is
@@ -25,10 +25,10 @@
 
 *  Arguments:
 *     VERB = LOGICAL (Given)
-*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        If TRUE then errors which occur whilst accessing supplied catalogues
 *        are flushed so that the user can see them before re-prompting for
-*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP1 = INTEGER (Given)
 *        An identifier for the group containing the catalogue names
@@ -38,14 +38,14 @@
 *        files.
 *     IGRP2 = INTEGER (Given)
 *        An identifier for a group in which to store any supplied names
-*        for which no corresponding catalogues could be found. This may be 
+*        for which no corresponding catalogues could be found. This may be
 *        GRP__NOID in which case the names of bad catalogues are discarded.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*    -  The order of the names is preserved. 
-*    -  If an input name contained a FITS extension number, it is copied to 
+*    -  The order of the names is preserved.
+*    -  If an input name contained a FITS extension number, it is copied to
 *    all related output file names.
 
 *  Copyright:
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -145,7 +145,7 @@
 *  Get the name to be expanded from the untruncated copy of the input group.
          CALL GRP_GET( IGRP3, I, 1, NAME, STATUS )
 
-*  Expand the name into separate file names, appending them to the 
+*  Expand the name into separate file names, appending them to the
 *  truncated input group.
          CALL CTG1_EXPAN( VERB, NAME, IGRP1, NFMT, FMT, FOUND, STATUS )
 

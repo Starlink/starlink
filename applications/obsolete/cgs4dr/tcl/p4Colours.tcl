@@ -133,7 +133,7 @@ proc p4Colours taskname {
     set bv [dialogShow .p4Dialogue .p4Dialogue]
     cgs4drCursor watch red white
 
-# Set all ports 
+# Set all ports
     if {$bv == 0} {
       nbs put ${P4NoticeBoard}.port_0.fg_colour  $P4Widgets(FGCOLOUR)
       nbs put ${P4NoticeBoard}.port_1.fg_colour  $P4Widgets(FGCOLOUR)

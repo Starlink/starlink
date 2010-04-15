@@ -19,7 +19,7 @@
 *  same routine (INTERPARR), but we don't. The width of the convolving
 *  gaussian may be very low, and then we get funny results when we plot
 *  the contours. Better to convolve first, then interpolate with tapered
-*  sin(x)/x (in CONVARR). 
+*  sin(x)/x (in CONVARR).
 
       IMPLICIT   NONE
 
@@ -122,7 +122,7 @@
         NAXY  = (NAXY1-1)*(INTERP_Y+1)+1
         MAPSIZEOUT = 4*NAXX*NAXY
 
-        ISTAT = IGETVM (NMAP*MAPSIZEOUT, .TRUE., 
+        ISTAT = IGETVM (NMAP*MAPSIZEOUT, .TRUE.,
      &                 'INTERPOLATE_MAP', IPTR2)
         IF (ISTAT.ne.0) THEN
           PRINT *,'Trouble getting virtual memory for smoothed maps'

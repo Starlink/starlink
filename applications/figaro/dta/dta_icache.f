@@ -10,11 +10,11 @@ C     initialises the HDS locator system, if necessary.
 C
 C     Parameters -  ("<" output)
 C
-C     (<) STATUS   (Integer) Returned status code. 
+C     (<) STATUS   (Integer) Returned status code.
 C                  0 => OK.
 C                  DTA_HDSERR => HDS_ system error.
 C
-C     Subroutines / functions used -  
+C     Subroutines / functions used -
 C
 C     HDS_START    (HDS_ package) Startup HDS locator facility.
 C     HDS_TUNE     ( "      "   ) Tune HDS parameters
@@ -47,8 +47,8 @@ C                       will now no longer work with the old Bliss version
 C                       of HDS.
 C     6th Oct 1987.     KS / AAO.  Call to HDS_START now tests for 'already
 C                       active' status.
-C     8th  Jan  1992.   KS / AAO.  Syntax of include statements changed to 
-C                       remove VMS logical names and to use lower case, to 
+C     8th  Jan  1992.   KS / AAO.  Syntax of include statements changed to
+C                       remove VMS logical names and to use lower case, to
 C                       enable compilation on a SUN.  Call to EXC_$LEVEL
 C                       removed.
 C     24th Jan 1992.    KS / AAO. Explicit calls to EMS_ANNUL replace just
@@ -128,7 +128,7 @@ C
          ELSE
             CALL EMS_ANNUL(STATUS)
          END IF
-C 
+C
 C        Indicate Cache now initialised
 C
          CACHEI=.TRUE.

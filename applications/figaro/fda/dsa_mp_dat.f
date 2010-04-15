@@ -74,7 +74,7 @@
 *        mode is not WRITE. Prologue now states correctly
 *        that USE_FLAGS and USE_QUALITY are LOGICAL.
 *     26th Oct 1994 (ks):
-*        Now uses new calling sequence for DSA_MAP_ARRAY. 
+*        Now uses new calling sequence for DSA_MAP_ARRAY.
 *      3rd Feb 1995 (ks):
 *        Now supports files that have both flagged data and
 *        quality arrays.
@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

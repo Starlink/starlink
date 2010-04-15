@@ -14,12 +14,12 @@
 *     CALL GETDIR( DIRNAM, ENV, PATH, PLEN, STATUS )
 
 *  Description:
-*     An attempt is made to translate the supplied environment variable or 
+*     An attempt is made to translate the supplied environment variable or
 *     logical name. If this fails, the associated error message is
-*     annulled and STATUS is returned indicating that no error has occurred 
-*     (PATH is returned blank in this case). If the variable is translated 
-*     successfully, then a slash is added to the end of it if required, to 
-*     ensure that a file name can be appended directly to the end of the 
+*     annulled and STATUS is returned indicating that no error has occurred
+*     (PATH is returned blank in this case). If the variable is translated
+*     successfully, then a slash is added to the end of it if required, to
+*     ensure that a file name can be appended directly to the end of the
 *     returned path.
 
 *  Arguments:
@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,10 +87,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the value of the supplied logical name (on VMS) or environment
-*  variable (on UNIX). 
+*  variable (on UNIX).
       CALL GTENV( DIRNAM, ENV, PATH, STATUS )
 
-*  If it was not defined, annul the error message. Ensure that the directory 
+*  If it was not defined, annul the error message. Ensure that the directory
 *  path returned is blank.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -104,7 +104,7 @@
 
 *  Find out what operating system we are on.
             CALL PSX_UNAME( SYS, NODE , REL, VERS, MACH, STATUS )
- 
+
 *  If we are on VMS, return the PATH without modification. If we are not
 *  on VMS, add a slash to the end of the PATH, so long as there is room
 *  for one, and so long as the PATH does not already end with a slash.
@@ -133,4 +133,4 @@
 
       IF( PATH .EQ. ' ' ) PLEN = 1
 
-      END 
+      END

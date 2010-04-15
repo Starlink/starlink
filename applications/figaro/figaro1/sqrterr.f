@@ -18,7 +18,7 @@ C
 C     FACTOR (Numeric) The value of the constant by which the data
 C            values are divided before the square root is taken.
 C
-C     OUTPUT (Character) The name of the result of the operation.  This 
+C     OUTPUT (Character) The name of the result of the operation.  This
 C            can be the same as for IMAGE.  If not, a new structure
 C            is created, with everything but the error array a direct
 C            copy of the input.
@@ -54,13 +54,13 @@ C
 C     Local variables
 C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
-      INTEGER      EPTR          ! Dynamic-memory pointer to output 
+      INTEGER      EPTR          ! Dynamic-memory pointer to output
                                  ! error array
       INTEGER      ESLOT         ! Slot number for output error array
       REAL         FACTOR        ! See above
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
-      INTEGER      OPTR          ! Dynamic-memory pointer to output 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output
                                  ! data array
       INTEGER      OSLOT         ! Map slot number for output data array
       INTEGER      STATUS        ! Running status for DSA_ routines

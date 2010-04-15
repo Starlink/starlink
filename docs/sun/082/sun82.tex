@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -50,13 +50,13 @@ RUTHERFORD APPLETON LABORATORY\\
 \pagebreak
 \section{Introduction}
 
-The purpose of this note is to introduce the IRAS data products, 
+The purpose of this note is to introduce the IRAS data products,
 describe how to gain access or obtain copies of selected data,
-and to guide potential users to Starlink software and documentation which 
+and to guide potential users to Starlink software and documentation which
 can help in the analysis of the data.
 
-For ease of readability, I have referred to the user throughout this document  
-as he, rather than he or she, and I hope that those amongst its readership 
+For ease of readability, I have referred to the user throughout this document
+as he, rather than he or she, and I hope that those amongst its readership
 who, like me, are female will excuse me.
 
 \section{IRAS}
@@ -67,8 +67,8 @@ The main detector array consisted of 62 detectors sensitive around 12$\mu$m,
 Chopped Photometric Channel (CPC) had detectors sensitive at 50$\mu$m and
 100$\mu$m.
 
-The main objective of the mission was to make a survey of the whole sky using 
-the main detector array, with multiple coverage. During this survey, the 
+The main objective of the mission was to make a survey of the whole sky using
+the main detector array, with multiple coverage. During this survey, the
 telescope scanned almost
 the same strip of sky during orbits separated in time anything from one orbit
 of the satellite (103 minutes) up to a maximum of 36 hours. This enabled
@@ -77,7 +77,7 @@ compared so that the most obvious inconsistencies could be removed. This group
 of observations is termed an HCON (for Hours Confirmed). 96\% of the sky was
 covered by at least two HCONs. A three HCON coverage was achieved over 72\% of
 the sky, and 15\% of the sky received more than three HCON coverages. A map of
-the coverage is given in Appendix {\ref a:1} (from IRAS Catalogues and Atlases: 
+the coverage is given in Appendix {\ref a:1} (from IRAS Catalogues and Atlases:
 Explanatory Supplement, p. I--5).
 
 In addition to the whole sky survey, interesting objects were scanned at higher
@@ -103,11 +103,11 @@ IRAS images were prepared from both the original CRDD data, and, for the
 unconfused higher ecliptic latitudes, from recalibrated data from which the
 modelled zodiacal light has been removed. These are known respectively as
 Skyflux Plates and IRAS Sky Survey Atlas (ISSA). Lower resolution maps of the
-original image output are available. 
+original image output are available.
 
 Details of the IRAS satellite and mission, the calibration and data
 reduction techniques used, reliability and other caveats on products are
-described in the IRAS Catalogues and Atlases Explanatory Supplement. 
+described in the IRAS Catalogues and Atlases Explanatory Supplement.
 
 The user must be aware that for most IRAS data products there are several
 versions available, due to improved calibration. When you are extracting data,
@@ -118,36 +118,36 @@ published results, check that they used the most recent version!
 MUST read the IRAS Catalogs and Atlases Explanatory Supplement before embarking
 on a research programme utilising any of the products described here.
 Particular attention should be given to section A.3 page I--2 of the Explanatory
-Supplement which directs the user to certain caveats covering each data 
+Supplement which directs the user to certain caveats covering each data
 product.}
- 
+
 \section {Catalogues}
 \label{m:cats}
 IRAS catalogues are of three types:---
 \begin{itemize}
 \item Detection catalogues containing IRAS fluxes or spectra, {\em e.g.}$\;$ the
 IRAS Point Source Catalog,
-\item Association catalogues containing one type of IRAS source, 
-{\em e.g.}$\;$ IRAS Point Source Catalog objects associated with galaxies 
+\item Association catalogues containing one type of IRAS source,
+{\em e.g.}$\;$ IRAS Point Source Catalog objects associated with galaxies
 and quasars,
 \item Position catalogues giving the positions at which observations were
 made, but no other data {\em e.g.}$\;$ for Pointed Observations.
-\end{itemize} 
+\end{itemize}
 SUN/120 (CATPAC --- Catalogue Applications Package),
-SUN/106 (SCAR --- Beginner's Guide) and SUN/70 (Starlink Catalogue Access and 
-Reporting) describe how to access the IRAS catalogues. The catalogues are 
-available on STADAT (the STArlink DATabase machine) and may also be available 
+SUN/106 (SCAR --- Beginner's Guide) and SUN/70 (Starlink Catalogue Access and
+Reporting) describe how to access the IRAS catalogues. The catalogues are
+available on STADAT (the STArlink DATabase machine) and may also be available
 at your node.
 
-It is possible, using CATPAC and SCAR, to search through the catalogues using 
-a wide range of criteria, from names and positions to flux density ratios and 
+It is possible, using CATPAC and SCAR, to search through the catalogues using
+a wide range of criteria, from names and positions to flux density ratios and
 flux quality flags.
-It is also possible to extract data from more than one catalogue for sources 
+It is also possible to extract data from more than one catalogue for sources
 present in several catalogues.
 The package allows the user to print out information about sources extracted
 from the catalogues, or to plot them.
 
-When new IRAS catalogues are released, they are added to the STADAT 
+When new IRAS catalogues are released, they are added to the STADAT
 database.
 There is an up to date on-line listing of the available catalogues on STADAT
 which can be viewed using the SCAR CAT\_HELP facility.
@@ -158,10 +158,10 @@ Until now astronomical infrared images have been very rare; IRAS has
 revolutionised this situation by providing two types of data sets.
 \begin{itemize}
 \item The first, the Extended Emission data from the survey, consists of
-the Infrared Sky Survey Atlas (ISSA), covering the higher ecliptic latitudes 
-(roughly $| \beta | >$ 20$^{\circ}$), and the infrared ``Skyflux~Plates'' 
-(also called Skyflux images), covering the whole sky --- the infrared analogues 
-of the Palomar and SERC/ESO optical sky surveys. 
+the Infrared Sky Survey Atlas (ISSA), covering the higher ecliptic latitudes
+(roughly $| \beta | >$ 20$^{\circ}$), and the infrared ``Skyflux~Plates''
+(also called Skyflux images), covering the whole sky --- the infrared analogues
+of the Palomar and SERC/ESO optical sky surveys.
 There are also lower resolution maps from the survey data.
 \item The second, from the IRAS Pointed Observation (PO) programme,
 comprises thousands of deeper images of selected objects and regions of sky,
@@ -178,28 +178,28 @@ pertinent access and analysis software.
 The IRAS survey covered most parts of the sky three times during the 10 months
 of data collection. Each of these coverages is distinct and is processed
 separately, which results in three sets of the image-like products. The first
-two coverages were of about 96\% of the sky, the third of about 72\%. 
+two coverages were of about 96\% of the sky, the third of about 72\%.
 There are 212 high resolution `Skyflux Plates' covering the whole sky in the
-first 2 HCONs, the 3rd HCON has 188 Skyflux Plates. All 3 HCONS are available, 
+first 2 HCONs, the 3rd HCON has 188 Skyflux Plates. All 3 HCONS are available,
 the 3rd HCON having been re-released after recalibration.
-Since the zodiacal light is different for each HCON, the HCONs are kept 
+Since the zodiacal light is different for each HCON, the HCONs are kept
 separate.
 
 Each plate has flux and statistical weight images stored for all 4 IRAS
 wavebands of 12, 25, 60 and 100 $\mu$m.
-Each image is about 16.7 degrees square and the plate centres are separated by 
+Each image is about 16.7 degrees square and the plate centres are separated by
 15 degrees in Right Ascension and Declination. The plates nominally have
 499 by 499 2-arcmin-square pixels, but this varies from plate to plate.
 The quoted effective resolution is 6 arcmin.
-The data are stored as FITS images, in a Gnomonic projection which is 
+The data are stored as FITS images, in a Gnomonic projection which is
 described in the header of each image.
-The Skyflux data are stored at RAL on magnetic tape, users can obtain 
+The Skyflux data are stored at RAL on magnetic tape, users can obtain
 images by contacting RLSTAR::IRASMAIL.
 
-The Skyflux Plate images are available as photographic negatives as well as 
+The Skyflux Plate images are available as photographic negatives as well as
 digital data on tape.
-The negatives have all four bands reproduced side by side in a rectangular 
-format approximately 5 inches square, which is intended for enlargement to 
+The negatives have all four bands reproduced side by side in a rectangular
+format approximately 5 inches square, which is intended for enlargement to
 prints 16 inches by 20 inches.
 In order to display the whole dynamic range of the data, the grey scale employed
 corresponds to the fifth root of the surface brightness, which is similar in
@@ -209,7 +209,7 @@ institutes.
 
 \subsubsection{IRAS Sky Survey Atlas}
 The IRAS Sky Survey Atlas consists of images made from whole sky survey data
-which has been recalibrated and from which a model of the zodiacal light has 
+which has been recalibrated and from which a model of the zodiacal light has
 been removed.
 Images are formed from the data of each HCON separately, and a combined image
 of all HCON data for each plate has also been made and is referred to as HCON0.
@@ -220,17 +220,17 @@ Each image is 12.5 degrees square. The plate centres are separated by 10 degrees
 in declination, with a variable spacing in Right Ascension due to convergence at
 the poles. They have 500 by 500 1.5 arcmin-square pixels, and the resolution is
 between 4 and 5 arcmin depending on wavelength.
-The images are stored in FITS format. 
+The images are stored in FITS format.
 
-The first release of ISSA images (Phase I) covers ecliptic latitudes more than 
+The first release of ISSA images (Phase I) covers ecliptic latitudes more than
 50$^{\circ}$ away from the ecliptic plane. These have been released on CD-ROM,
 and a set of CDs has been sent to each Starlink node manager.
-The CD set includes a program FFIELD, which tells the user which image 
+The CD set includes a program FFIELD, which tells the user which image
 contains the source position required.
 RAL has received the Phase II release (on Exabyte), and these images are stored
-on the optical disk jukebox on the Space Data Centre VAX. These images cover 
-the area between approximately 20$^{\circ}$ and 50$^{\circ}$ away from the 
-ecliptic plane. 
+on the optical disk jukebox on the Space Data Centre VAX. These images cover
+the area between approximately 20$^{\circ}$ and 50$^{\circ}$ away from the
+ecliptic plane.
 The user can obtain copies of Phase II images by contacting RLSTAR::IRASMAIL.
 Brief details of
 the processing used to obtain the ISSA images, and the caveats upon them are
@@ -240,20 +240,20 @@ should refer to the IRAS Sky Survey Atlas Explanatory Supplement.
 RAL also has a set of ISSA Reject images, available on the optical jukebox.
 These are images less than 20$^{\circ}$ away from the ecliptic plane. These
 data do not meet the standards imposed on the main product, and care is needed
-in their use. 
+in their use.
 The user can obtain copies of Reject images by contacting RLSTAR::IRASMAIL.
 
 \subsubsection{Galactic Plane Maps}
-These cover the band of sky within \underline{+}10 degrees of the galactic 
-plane. 
-They are a set of 24 images, obtained by rebinning a subset of the Skyflux 
+These cover the band of sky within \underline{+}10 degrees of the galactic
+plane.
+They are a set of 24 images, obtained by rebinning a subset of the Skyflux
 Plates.
 
 The maps are 16.7 by 20 degrees and have map centres separated by 15 degrees in
 galactic longitude.
 The maps nominally have 499 by 599 2-arcmin-square pixels.
 They consist of 4 images for each map area, one for each of the IRAS
-wavebands, 12, 25, 60 and 100 $\mu$m. 
+wavebands, 12, 25, 60 and 100 $\mu$m.
 The data from each HCON are stored separately.
 The rebinning gives some degradation of the 6 arcmin Skyflux plate resolution.
 The maps are presented in the Lambert normal equivalent cylindrical projection
@@ -265,10 +265,10 @@ The maps are available on tape at RAL.
 \subsubsection{Low Resolution All Sky Maps}
 These are derived from the first version of the Zodiacal Observation History
 File (see section \ref{m:zodiac} below), split into the three HCONs.
-The two maps each cover the whole sky, and are centred on the galactic centre 
-and anti-centre. 
+The two maps each cover the whole sky, and are centred on the galactic centre
+and anti-centre.
 They are stored in galactic coordinates.
-They each consist of 4 images, one for each of the IRAS wavebands, 12, 25, 
+They each consist of 4 images, one for each of the IRAS wavebands, 12, 25,
 60 and 100 $\mu$m.
 The maps have 325 by 649 half degree pixels, the effective resolution being
 about a degree.
@@ -277,7 +277,7 @@ each image.
 Again the maps are available on tape at RAL.
 
 \subsection{The Pointed Observation images}
-For 40\% of its lifetime, IRAS was making pointed-mode observations (usually 
+For 40\% of its lifetime, IRAS was making pointed-mode observations (usually
 small raster scans) of a large variety of interesting astronomical objects.
 These observations were to make deep maps or photometry using the survey array.
 The Pointed Observation data set consists of $\sim$10,000 fields.
@@ -295,16 +295,16 @@ Each position is observed at least twice, and separate images are made for each
 band in each coverage.
 
 The AO images are available in FITS format, so the standard packages mentioned
-below for image analysis can be used on these data, as if they were ordinary 
+below for image analysis can be used on these data, as if they were ordinary
 extended emission maps. Further details of how to extract and process these
 images are to be found in section \ref{m:imsoft} on Software for IRAS image
 analysis below.
 
 \subsubsection{The CPC images}
 IRAS Chopped Photometric Channel made pointed observations (using a small
-raster scan typically 9 arcmin in length) at 50$\mu$m and 100$\mu$m 
-simultaneously, and chopped to a reference source at a few degrees Kelvin. The 
-CPC has a higher spatial resolution than the main detector, around 1 arcmin. 
+raster scan typically 9 arcmin in length) at 50$\mu$m and 100$\mu$m
+simultaneously, and chopped to a reference source at a few degrees Kelvin. The
+CPC has a higher spatial resolution than the main detector, around 1 arcmin.
 However
 the instrument had two major instrumental problems, the most likely cause of
 which was too low a temperature in the focal plane. Maps which clearly suffered
@@ -360,17 +360,17 @@ to bring out certain features, or smoothing it.
 \end{itemize}
 \begin{description}
 \item [SUN/161] `IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
-Detector Data Analysis' provides a walkthrough of how to carry out 
+Detector Data Analysis' provides a walkthrough of how to carry out
 frequently used examples of the first two types of processing, using KAPPA
 for the image processing and IRAS90 software for applications dealing
 with astronomical coordinates.
 \item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
-Guide' provides details of the full flexibility of each of the IRAS90 
+Guide' provides details of the full flexibility of each of the IRAS90
 applications.
 \item [SUN/95] `KAPPA --- Kernel Application Package' provides full details of
 KAPPA and its applications. This is a very flexible image display and processing
 suite of applications, however it does not deal with position in astronomical
-coordinates, this facility is provided, for IRAS data, by the IRAS90 
+coordinates, this facility is provided, for IRAS data, by the IRAS90
 applications.
 \end{description}
 
@@ -421,12 +421,12 @@ data set.
 Three versions of this file are available, of which the latest was prepared from
 data from which the point sources from the IRAS point source catalogue have been
 removed. Gradients in large scale emission can cause artifacts in this product.
-These data are available as the Zodiacal Observation History File, on tape at 
+These data are available as the Zodiacal Observation History File, on tape at
 RAL. However, no software is currently planned to use them.
 
-\section{LRS Spectra} 
-The IRAS survey instrumentation included a slitless, Low Resolution 
-Spectrometer which scanned simultaneously two overlapping wavelength ranges, 
+\section{LRS Spectra}
+The IRAS survey instrumentation included a slitless, Low Resolution
+Spectrometer which scanned simultaneously two overlapping wavelength ranges,
 one extending from 7.7 to 13.4 $\mu$m and the other from 11.0 to 22.6 $\mu$m.
 The resolution varies from $\sim$50 at 8 $\mu$m to $\sim$20 at 23 $\mu$m.
 The spectrometer was in operation during the entire survey, providing spectra
@@ -435,20 +435,20 @@ The mean spectra can be found in the IRAS Low Resolution Spectrometer (LRS)
 Atlas, which has been incorporated into the SCAR online database mentioned
 in \ref{m:cats}.
 
-Program I\_$\,$LRSEXT has been written to extract the 8 -- 13 $\mu$m and 
-11 -- 22 $\mu$m spectra for a source and write the spectra to files in a 
+Program I\_$\,$LRSEXT has been written to extract the 8 -- 13 $\mu$m and
+11 -- 22 $\mu$m spectra for a source and write the spectra to files in a
 format which can be handled by the spectral analysis program DIPSO (SUN/50).
 DIPSO can then be used to display the spectra and perform some analysis on them.
 The spectra are extracted from the catalogue on the basis of position
 association, the positions being input by the user either interactively or from
 a file.
-For more details on the program I\_$\,$LRSEXT, reference should be made to 
+For more details on the program I\_$\,$LRSEXT, reference should be made to
 SUN/81.
 
-The IRAS LRS Catalogue contains mean spectra, for sources in the Point 
+The IRAS LRS Catalogue contains mean spectra, for sources in the Point
 Source Catalog.
 The Point Source Catalog flags the sources which have LRS spectra and gives
-them a spectral classification, which is described in Section IX.D of the IRAS 
+them a spectral classification, which is described in Section IX.D of the IRAS
 Catalogs and Atlases Explanatory Supplement.
 Therefore it is possible to select sub-sets of sources with LRS spectra on the
 basis of this spectral classification or indeed of any other property of the
@@ -456,13 +456,13 @@ sources in the Point Source Catalog.
 Alternatively, it is also possible to use SCAR software to associate a private
 list of sources with either the Point Source Catalog or the LRS Atlas to
 ascertain whether spectra exist for these sources.
-However, as yet there is no interface to SCAR in the program I\_$\,$LRSEXT, so 
-after producing a sub-set using SCAR, you must input the positions to 
+However, as yet there is no interface to SCAR in the program I\_$\,$LRSEXT, so
+after producing a sub-set using SCAR, you must input the positions to
 I\_$\,$LRSEXT to extract the spectra.
 
-The IRASLRS captive account on STADAT allows users to interrogate the LRS 
+The IRASLRS captive account on STADAT allows users to interrogate the LRS
 database, see SUN/14.
-This allows access to the full dataset of $\sim$170,000 spectra extracted 
+This allows access to the full dataset of $\sim$170,000 spectra extracted
 during the IRAS mission, and from which the LRS Atlas was created.
 Some spectra are very obviously ``wrong'', due to incorrect data being stored,
 or an extended object being observed.
@@ -490,21 +490,21 @@ be sent to RLSTAR::IRASMAIL.
 The IRAS data come in several categories, each of which is summarised here.
 \begin{enumerate}
 \item CATALOGUES ---
-some of these are accessible through the CATPAC and SCAR system, see NEWS for 
+some of these are accessible through the CATPAC and SCAR system, see NEWS for
 current list\\
 	\begin{enumerate}
 	\item IRAS Point Source Catalog, Version 2 (IRPS)\\
-	      A version (actually an index) of the IRPS catalogue sorted 
+	      A version (actually an index) of the IRPS catalogue sorted
 	      by Galactic coordinates is also available (GIRL)
 	\item Catalogue of associations to IRAS point sources (AIPS)
               --- the combination of IRPS and AIPS is called ASIR
         \item IRAS Faint Source Survey Catalog (V2FSSC Version 2 and FSSC the
-              original version) --- the result of 
+              original version) --- the result of
               reprocessing and coadding the IRAS data for $|$b$|>$50$^{\circ}$
               having 2 to 3 times greater sensitivity than the IRPS.
-        \item Catalogue of associations to the Faint Source Survey Catalog 
-              (FSSA)        
-	\item IRAS Low Resolution Spectrometer (LRS) Atlas (ILRS) --- 5425 
+        \item Catalogue of associations to the Faint Source Survey Catalog
+              (FSSA)
+	\item IRAS Low Resolution Spectrometer (LRS) Atlas (ILRS) --- 5425
               averaged spectra
 	\item IRAS Small Scale Structure Catalog (ISSC) --- 16,740 sources
               with sizes $<$8$'$
@@ -518,20 +518,20 @@ current list\\
               asteroids and comets
         \item IRAS Asteroid Sightings Catalog (IASC)
 	\item Catalogue listing the positions of Pointed Observations (POs)
-              in IAOD 
+              in IAOD
         \item Catalogue listing the positions of CPC observations (CPCD)
 	\item Extragalactic sub-catalogue (CATX) --- IRAS Point Sources with
               extragalactic associations, created at RAL
-        \item Catalogued galaxies and quasars, Version 2 (XCAT) --- official 
+        \item Catalogued galaxies and quasars, Version 2 (XCAT) --- official
               IRAS Point Sources with extragalactic associations
-	\item Working Survey Database(WSDB) --- available on tape, but not 
+	\item Working Survey Database(WSDB) --- available on tape, but not
               easily accessible\\
-              Contains all the HCON detections for all the sources in the 
+              Contains all the HCON detections for all the sources in the
               IRAS Point Source Catalog.
-              Hence it contains both the observation and data reduction 
-              history for each point source and can be used for more detailed 
+              Hence it contains both the observation and data reduction
+              history for each point source and can be used for more detailed
               studies such as variability.
-	      The WSDB is more than three times the size of the IRAS Point 
+	      The WSDB is more than three times the size of the IRAS Point
               Source Catalog.
 	\item High Source Density Bins --- a list of those regions of the sky
               which received more stringent processing due to the large number
@@ -539,8 +539,8 @@ current list\\
 	\end{enumerate}
 \item IMAGES --- see Software for IRAS image analysis section \ref{m:imsoft}
 above.
-	Each image consists of 4 sets of data (images), 
-	corresponding to the 4 IRAS 
+	Each image consists of 4 sets of data (images),
+	corresponding to the 4 IRAS
 	wavebands of 12, 25, 60 and 100 $\mu$m.
 	\begin{enumerate}
 	\item Extended Emission data set, consisting of (for each HCON)\\
@@ -549,21 +549,21 @@ above.
                 \item The complete set of ISSA high resolution, recalibrated,
                 Zodiacal light removed images, including reject plates.
 		\item 24 ``Galactic Plane Maps'' (a rebinning of Skyflux Plates)
-		\item 2 ``Low Resolution All Sky Maps'', each covering the 
-		whole sky, one centred at the galactic centre the other 
+		\item 2 ``Low Resolution All Sky Maps'', each covering the
+		whole sky, one centred at the galactic centre the other
 		at the anti-centre, with resolution of 0.5$^{\circ}$ (from
                 ZOHF data)
 		\end{enumerate}
 	\item Pointed Observation (PO) deep images\\
         Images are available for approximately 10,000 positions.
-	A list of the positions at which these images were taken, ordered by 
+	A list of the positions at which these images were taken, ordered by
         DEC is available in SCAR catalogue IAOD.
 	\item FITS images of IRAS Observations of Large Optical Galaxies\\
-         A FITS tape containing the ``Catalog of IRAS Observations of Large 
+         A FITS tape containing the ``Catalog of IRAS Observations of Large
          Optical Galaxies'' (Rice et al., 1988: Ap.J. Supp {\bf 68}, 91),
          with an accompanying report. This tape contains IRAS images, made
          from the co-added raw data, of 85 2nd Reference Catalogue bright
-         galaxies with blue light isophotal diameters $>$8$'$. 
+         galaxies with blue light isophotal diameters $>$8$'$.
 
 	\end{enumerate}
 \item CPC data \\
@@ -578,21 +578,21 @@ above.
          with a resolution of 0.5$^{\circ}$, in ecliptic coordinates.
 \item CALIBRATED RAW DETECTOR DATA (CRDD) --- see SUN/161\\
 	This is the ultimate source of all other survey products.
-	Users may obtain copies of data for small selected areas from RAL. 
+	Users may obtain copies of data for small selected areas from RAL.
 \item LOW RESOLUTION SPECTROMETER (LRS) SPECTRA --- see SUN/81 and SUN/14\\
-There are two overlapping wavelength ranges: 7.7 -- 13.4 $\mu$m and 
-11.0 -- 22.6 $\mu$m. 
-The spectra of the 5425 brightest (and most reliable) sources in the IRAS Low 
-Resolution Spectrometer Atlas (ILRS) are available in SCAR, and through 
+There are two overlapping wavelength ranges: 7.7 -- 13.4 $\mu$m and
+11.0 -- 22.6 $\mu$m.
+The spectra of the 5425 brightest (and most reliable) sources in the IRAS Low
+Resolution Spectrometer Atlas (ILRS) are available in SCAR, and through
 LRSEXT.\\
-The full dataset of $\sim$170,000 spectra for $\sim$40,000 sources is 
-available on STADAT using the captive account IRASLRS. 
-This includes the individual spectra contributing to the mean spectra in 
+The full dataset of $\sim$170,000 spectra for $\sim$40,000 sources is
+available on STADAT using the captive account IRASLRS.
+This includes the individual spectra contributing to the mean spectra in
 the Atlas.
 \end{enumerate}
 
 \section{References}
-{\em IRAS Catalogs and Atlases: Explanatory Supplement}, 1988. ed. C.A. 
+{\em IRAS Catalogs and Atlases: Explanatory Supplement}, 1988. ed. C.A.
 Beichman, G. Neugebauer, H.J. Habing, P.E. Clegg, and T.J. Chester (Washington,
 DC:GPO) --- This will be found in the libraries of most institutes.
 

@@ -6,7 +6,7 @@
 *  Purpose:
 *     Read upper and lower limits from a supplied range specifier.
 *     Only works for positive integer ranges.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,7 +132,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'DECRNG_ERR1', 'Blank range specifier given.',
      :                    STATUS )
-            
+
          END IF
 
       END IF
@@ -149,7 +149,7 @@
 
 *  Report an error if the obtained range goes outside the allowed range,
 *  and limit the obtained range.
-         IF( TOP .GT. MAXVAL .OR. TOP .LT. MINVAL .OR. 
+         IF( TOP .GT. MAXVAL .OR. TOP .LT. MINVAL .OR.
      :       BOT .GT. MAXVAL .OR. BOT .LT. MINVAL ) THEN
 
             STATUS = SAI__ERROR
@@ -165,4 +165,4 @@
 
       END IF
 
-      END 
+      END

@@ -111,7 +111,7 @@
                 CALL DTOUPP(STEMP)
                 J = MIN(LEN(STEMP),LENR)
                 CALL SSTRIP(STEMP)
-                IF 
+                IF
      :          ((LENR.EQ.0) .OR.
      :          (STEMP(1:J).EQ.TXTINP(1:J))) THEN
                    IF (STEMP.EQ.' ') GOTO 20

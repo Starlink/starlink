@@ -40,7 +40,7 @@
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
 *        A list of image names which contain the raw bias frame data.
-*        The image names should be separated by commas and may include 
+*        The image names should be separated by commas and may include
 *        wildcards.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -88,7 +88,7 @@
 *     The CCDPACK extension of an image may contain the following items.
 *     The names and types of the extension items are those as used in
 *     import tables. More complete descriptions of the items can be
-*     found with the applications that use these values.  
+*     found with the applications that use these values.
 *
 *        Name            HDS data type    Description
 *
@@ -167,7 +167,7 @@
 *        TIMES.DARK    _DOUBLE       (TAI1-TAI0)
 *
 *     The function may use any of the usual Fortran operators; +, -, *,
-*     /, ** and many others that are supported by the TRANSFORM package 
+*     /, ** and many others that are supported by the TRANSFORM package
 *     (SUN/61).
 *
 *     Functions are allowed to not contain any FITS-keywords in which
@@ -180,8 +180,8 @@
 *     In this way import tables could actually be used to set all the
 *     required values in the CCDPACK extension (but see PRESENT also).
 *
-*     Characters strings cannot be manipulated by functions so two 
-*     special formats for translating their values are provided. 
+*     Characters strings cannot be manipulated by functions so two
+*     special formats for translating their values are provided.
 *     The first form allows for the concatenation of keywords and
 *     the second the translation from a known word to another
 *     (which is usually one of the CCDPACK special names). The
@@ -191,14 +191,14 @@
 *        _CHAR         HWP
 *        FILTER        _CHAR          FILTER//HWP
 *
-*     Which results in the FILTER extension item being set to the 
+*     Which results in the FILTER extension item being set to the
 *     concatenation of the values of the FITS keywords FILTER and
 *     HWP (you can concatentate more than two values).
 *
-*     In the second special form the name of the destination extension 
-*     item and (optionally) its type are given as usual followed by a 
-*     FITS-keyword which contains the string to be translated. This is 
-*     then followed by statements which translate an "input" string 
+*     In the second special form the name of the destination extension
+*     item and (optionally) its type are given as usual followed by a
+*     FITS-keyword which contains the string to be translated. This is
+*     then followed by statements which translate an "input" string
 *     into an "output" string. I.e.
 *
 *        FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
@@ -219,7 +219,7 @@
 *     must be "YES", "TRUE", "T", "Y" for TRUE or "NO", "FALSE", "N",
 *     "F".
 *
-*     The FITS keywords may be hierarchical, and on the whole are 
+*     The FITS keywords may be hierarchical, and on the whole are
 *     specified simply by giving their name in the normal way.
 *     However, there is one special case: if the value of a FITS
 *     header is known to be a string of the form '[A:B,C:D]' the
@@ -230,7 +230,7 @@
 *        EXTENT.MINX   TRIMSEC<X1>
 *        EXTENT.MAXX   TRIMSEC<X2>
 *
-*     would set the extents from the first two fields of a suitably 
+*     would set the extents from the first two fields of a suitably
 *     formatted TRIMSEC header.
 *
 *     Fields in the table may be separated by commas if desired, any
@@ -357,7 +357,7 @@
 *  to be stored at this location.
          CALL GRP_GRPSZ( LINGRP, NLINES, STATUS )
          CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
-         CALL CCD1_FTGRP( WRDGRP, LINGRP, %VAL( CNF_PVAL( IPLOG ) ), 
+         CALL CCD1_FTGRP( WRDGRP, LINGRP, %VAL( CNF_PVAL( IPLOG ) ),
      :                    FITGRP, DESGRP, STATUS )
          CALL CCD1_MFREE( IPLOG, STATUS )
 
@@ -433,13 +433,13 @@
 *  systems (normally implemented by the compiler), on VMS this makes
 *  no difference.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL CCD1_IMFIT( FITGRP, DESGRP, IDIN, 
+               CALL CCD1_IMFIT( FITGRP, DESGRP, IDIN,
      :                          %VAL( CNF_PVAL( IPFIT ) ),
-     :                          FITLEN, %VAL( CNF_PVAL( IPINT ) ), 
+     :                          FITLEN, %VAL( CNF_PVAL( IPINT ) ),
      :                          %VAL( CNF_PVAL( IPREAL ) ),
-     :                          %VAL( CNF_PVAL( IPDBLE ) ), 
+     :                          %VAL( CNF_PVAL( IPDBLE ) ),
      :                          %VAL( CNF_PVAL( IPLOG ) ),
-     :                          %VAL( CNF_PVAL( IPCHR )), STATUS, 
+     :                          %VAL( CNF_PVAL( IPCHR )), STATUS,
      :                          %VAL( CNF_CVAL( 80 ) ) )
             END IF
 
@@ -472,9 +472,9 @@
  100  CONTINUE
 
 *  Write an output list of the NDF names for other applications to use.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
-         CALL CCD1_LNAM( 'NAMELIST', 1, NNDF, 
+         CALL CCD1_LNAM( 'NAMELIST', 1, NNDF,
      :                   '# IMPORT - NDF name list', GIDIN, GRP__NOID,
      :                   .FALSE., STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN

@@ -24,7 +24,7 @@
       INCLUDE 'P4COM.INC'                 ! P4 common block
       INCLUDE 'COLOURS.INC'               ! Colour common block
 *    Local variables :
-      REAL SIZE                           ! Character size 
+      REAL SIZE                           ! Character size
       INTEGER IGNORE
 *-
 
@@ -38,7 +38,7 @@
 *    Remember it
       CALL PGQVP( 0, AXSTART( PORT ), AXEND( PORT ),
      :  AYSTART( PORT ), AYEND( PORT ) )
-   
+
 *    Scale the character size to the smaller dimension of the new viewport
       SIZE = 2.0 * (MIN(ABS(VXEND(PORT)-VXSTART(PORT)),
      :  ABS(VYEND(PORT)-VYSTART(PORT))))
@@ -62,5 +62,5 @@
       ELSE
         PORT_OK( PORT ) = .TRUE.
       ENDIF
-     
+
       END

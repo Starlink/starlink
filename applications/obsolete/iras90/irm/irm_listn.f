@@ -30,7 +30,7 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        A parameter to which the name of the newly created text file
 *        will be written. IRAS90 applications should use parameter
-*        NDFLIST. 
+*        NDFLIST.
 *     IGRP = INTEGER (Given)
 *        The GRP identifier for the group containing the names of the
 *        NDFs.
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,7 +88,7 @@
       CHARACTER PVAL*(GRP__SZFNM)! The value to assign to the parameter.
       INTEGER SIZE               ! The size of the group.
       CHARACTER TIMDAT*24        ! Time and date string.
-      
+
 *.
 
 *  Check inherited global status.

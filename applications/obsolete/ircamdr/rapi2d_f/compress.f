@@ -58,7 +58,7 @@
 *
 *     21-10-1985 : First implementation (REVA::MJM)
 *     20-01-1986 : More error checking and tidying (REVA::MJM)
-*     10-MAR=94    Changed DAT_, CMP_ calls to NDF_ (SKL@JACH) 
+*     10-MAR=94    Changed DAT_, CMP_ calls to NDF_ (SKL@JACH)
 *     15-Aug-1994  Changed input DIM arguments for COMPRESSSUB (SKL@JACH)
 *
 *    Type Definitions :
@@ -68,7 +68,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'
 
 *    Status :
@@ -82,7 +82,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  IDIMS( NDIMS ),       ! dimensions of input DATA_ARRAY
      :  NELEMENTS,            ! Number of elements mapped
      :  NDIM,                 ! Number of dimensions from NDF_DIM
@@ -106,12 +106,12 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error getting input structure then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get sixe of array
@@ -137,8 +137,8 @@
 *       lead to divide by zero errors.
          XCMPRS  =  1
          YCMPRS  =  1
-         CALL AIF_GET0I( 'XCMPRS', 2, 1, MAXXCOM, XCMPRS, STATUS ) 
-         CALL AIF_GET0I( 'YCMPRS', 2, 1, MAXYCOM, YCMPRS, STATUS ) 
+         CALL AIF_GET0I( 'XCMPRS', 2, 1, MAXXCOM, XCMPRS, STATUS )
+         CALL AIF_GET0I( 'YCMPRS', 2, 1, MAXYCOM, YCMPRS, STATUS )
 
 *       now work out the size of the output array from the input image
 *       dimensions and the compression factors - relies on integer
@@ -156,22 +156,22 @@
      :        'y dimension of output image  =  ^NEWYDIM', STATUS )
 
 *       now get an output array to contain averaged data
-         CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, 
+         CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS,
      :                 LOCO, STATUS )
 
 *       if no error in creating output structure then continue
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :               PNTRO, NELEMENTS, STATUS )
 
 *          check for error before calling working subroutine
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *             now call the subroutine that does the actual work
-               CALL COMPRESSSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
-     :                  %VAL( PNTRO ), ODIMS(1), ODIMS(2), XCMPRS, 
+               CALL COMPRESSSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
+     :                  %VAL( PNTRO ), ODIMS(1), ODIMS(2), XCMPRS,
      :                  YCMPRS, STATUS )
 
             END IF

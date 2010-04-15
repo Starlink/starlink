@@ -15,10 +15,10 @@
 
 *  Description:
 *     If, on entry, the argument SCS contains an explicit IRAS90 equinox
-*     specifier (see SUN/163), the epoch contained within it is returned 
-*     in argument EQU as a double precision value, and argument BJ is 
-*     returned equal to the character "B" or "J" depending on whether the 
-*     epoch is Besselian or Julian. If there is no equinox specifier in 
+*     specifier (see SUN/163), the epoch contained within it is returned
+*     in argument EQU as a double precision value, and argument BJ is
+*     returned equal to the character "B" or "J" depending on whether the
+*     epoch is Besselian or Julian. If there is no equinox specifier in
 *     argument SCS on entry, then the default of B1950 is returned.
 *
 *     If the sky coordinate system specified by SCS is not referred to
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -146,7 +146,7 @@
 *  Return .TRUE. for the function value to indicate a good SCS.
          KPG1_ISSCS = .TRUE.
 
-*  If an error has occurred, annul it. 
+*  If an error has occurred, annul it.
       ELSE
          CALL ERR_ANNUL( STATUS )
       END IF

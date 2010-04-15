@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NBEAM, 
-     :                       NCOEF, P, SIGMA, REFOFF, REFLAB, POLAR, 
+      SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NBEAM,
+     :                       NCOEF, P, SIGMA, REFOFF, REFLAB, POLAR,
      :                       POLSIG, RMS, DPREC, STATUS )
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NCOEF, P, 
-*                      SIGMA, REFOFF, REFLAB, POLAR, POLSIG, RMS, 
+*     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NCOEF, P,
+*                      SIGMA, REFOFF, REFLAB, POLAR, POLSIG, RMS,
 *                      DPREC, STATUS )
 
 *  Description:
-*     The supplied parameters are reported and logged to the file 
+*     The supplied parameters are reported and logged to the file
 *     identified by FD.  The centre co-ordinates and beam widths
 *     are reported in the current Frame.  The reported widths are
 *     full-width half maxima.
@@ -30,31 +30,31 @@
 *        LOGF is .FALSE.
 *     PIXEL = LOGICAL (Given)
 *        If TRUE the beam centre and measures of width are in PIXEL
-*        co-ordinates.  If FALSE, reports use the current Frame's 
+*        co-ordinates.  If FALSE, reports use the current Frame's
 *        co-ordinates using AST formatting.  The P and SIGMA arrays
 *        should come supplied with co-ordinates is the resested frame.
 *        The PIXEL=.TRUE. option is largely for diagnostic purposes.
 *     MAP = INTEGER (Given)
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
-*     CFRM = INTEGER (Given) 
+*     CFRM = INTEGER (Given)
 *        A pointer to the current Frame of the NDF.  This argument is
 *        ignored if PIXEL is FALSE.
-*     NAXC = INTEGER (Given) 
-*        The number of axes in CFRM.  This argument is ignored if PIXEL 
+*     NAXC = INTEGER (Given)
+*        The number of axes in CFRM.  This argument is ignored if PIXEL
 *        is FALSE.
 *     NBEAM = INTEGER (Given)
 *        The number of beams fitted.
 *     NCOEF = INTEGER (Given)
 *        The number of coefficients per beam fit.
 *     P( NCOEF, NBEAM ) = DOUBLE PRECISION (Given)
-*        The fit parameters.  Spatial co-ordinates are measured in 
-*        the reporting frame when argument PIXEL is .FALSE. (the normal 
-*        value), or in the PIXEL Frame if PIXEL is .TRUE.  See 
+*        The fit parameters.  Spatial co-ordinates are measured in
+*        the reporting frame when argument PIXEL is .FALSE. (the normal
+*        value), or in the PIXEL Frame if PIXEL is .TRUE.  See
 *        KPS1_BFCRF to convert from PIXEL to reporting-Frame
 *        co-ordinates.
 *     SIGMA( NCOEF, NBEAM ) = DOUBLE PRECISION (Given)
-*        The errors in the fit parameters.  The errors of spatial 
+*        The errors in the fit parameters.  The errors of spatial
 *        co-ordinates are measured in the reporting frame when argument
 *        PIXEL is .FALSE. (the normal value), or in the PIXEL Frame if
 *        PIXEL is .TRUE.
@@ -62,20 +62,20 @@
 *        The offset of the primary beam with respect to the reference
 *        point measured in the current WCS Frame, followed by its error.
 *     REFLAB = CHARACTER * (*) (Given)
-*        Label used to describe reference position in the output.   At 
+*        Label used to describe reference position in the output.   At
 *        present it should be either "map centre", if that was used in
 *        the absence of a reference position stored with the original
-*        dataset; or "sky reference position".  If another value is 
+*        dataset; or "sky reference position".  If another value is
 *        supplied, "reference position" will be used.
 *     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Given)
 *        The polar co-ordinates of the beam features with respect to
 *        the primary beam measured in the current co-ordinate Frame.
 *        The orientation is a position angle in degrees, measured from
-*        North through East if the current Frame is a Skyframe, or 
+*        North through East if the current Frame is a Skyframe, or
 *        anticlockwise from the Y axis otherwise.  The POLAR(*,1)
 *        values of the primary beam are ignored.
 *     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Given)
-*        The standard-deviation errors associated with the polar 
+*        The standard-deviation errors associated with the polar
 *        co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
 *        values of the primary beam are ignored.
 *     RMS = DOUBLE PRECISION (Given)
@@ -83,13 +83,13 @@
 *     DPREC = CHARACTER ( * ) (Given)
 *        Precision of the reported amplitude and background level.
 *        Allowed values are the HDS numeric types: '_INTEGER',
-*        '_REAL', or '_DOUBLE'.  Double precision will be used 
+*        '_REAL', or '_DOUBLE'.  Double precision will be used
 *        if the supplied value is not one of these.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
+*     Copyright (C) 2007 Particle Physics and Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -131,8 +131,8 @@
 *        Add POLAR and POLSIG arguments to report polar co-ordinates of
 *        secondary-beam features.
 *     2007 June 15 (MJC):
-*        Add REFOFF argument and report its values.  Qualify sense of 
-*        polar co-ordinates in the output now there are two different 
+*        Add REFOFF argument and report its values.  Qualify sense of
+*        polar co-ordinates in the output now there are two different
 *        offsets.  Move RMS report to the end thereby placing the
 *        position directly under its the header co-ordinates
 *        description.  Create non-blank units for SkyFrame polar offset
@@ -156,7 +156,7 @@
       INCLUDE 'MSG_PAR'          ! Message-system public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       LOGICAL LOGF
@@ -215,9 +215,9 @@
       S2FWHM = SQRT( 8.D0 * LOG( 2.D0 ) )
 
 *  Determine the format units.  The convention is to use a sky latitude
-*  (since we measure small angular distances in arcseconds not seconds 
+*  (since we measure small angular distances in arcseconds not seconds
 *  of time for equatorial), or the first axis.
-      ISSKY =  AST_ISASKYFRAME( CFRM, STATUS ) 
+      ISSKY =  AST_ISASKYFRAME( CFRM, STATUS )
       IF ( ISSKY ) THEN
          LAT = AST_GETI( CFRM, 'LatAxis', STATUS )
          LON = AST_GETI( CFRM, 'LonAxis', STATUS )
@@ -241,7 +241,7 @@
       IF ( ISSKY .AND. .NOT. PIXEL ) THEN
 
 *  Set the format for the FWHM values so they are displayed with three
-*  decimal places.  We are assuming here that non-SkyFrame will be 
+*  decimal places.  We are assuming here that non-SkyFrame will be
 *  Some form of pixel-based domain, like GRID or PIXEL or OFFSET.
          CALL AST_SETC( FRM2, ATTR( : LATTR ), 's.3', STATUS )
       ELSE
@@ -281,7 +281,7 @@
                CALL CHR_APPND( ')', ATTR, LATTR )
 
 *  Get the Unit value.
-               CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, ATTR( : LATTR ), 
+               CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, ATTR( : LATTR ),
      :                                          STATUS ) )
 
 *  It would be messy inserting both of the expected sexagesimal formats.
@@ -305,7 +305,7 @@
 *  -------------
                IF ( ISSKY ) THEN
                   CALL MSG_SETC( 'XE',
-     :                           AST_FORMAT( FRM2, 2, SIGMA( 1, IB ), 
+     :                           AST_FORMAT( FRM2, 2, SIGMA( 1, IB ),
      :                                       STATUS ) )
                   CALL MSG_SETC( 'YE',
      :                           AST_FORMAT( FRM2, 2, SIGMA( 2, IB ),
@@ -313,7 +313,7 @@
 
                ELSE
                   CALL MSG_SETC( 'XE',
-     :                           AST_FORMAT( CFRM, 1, SIGMA( 1, IB ), 
+     :                           AST_FORMAT( CFRM, 1, SIGMA( 1, IB ),
      :                                       STATUS ) )
                   CALL MSG_SETC( 'YE',
      :                           AST_FORMAT( CFRM, 2, SIGMA( 2, IB ),
@@ -339,7 +339,7 @@
             ELSE
 
 *  Display the current Frame's co-ordinates of the beam offset
-               CALL MSG_SETC( 'OFF', AST_FORMAT( FRM2, REPAX, 
+               CALL MSG_SETC( 'OFF', AST_FORMAT( FRM2, REPAX,
      :                                           REFOFF( 1 ), STATUS ) )
 
 *  Form the Unit attribute name for the selected axis.
@@ -351,11 +351,11 @@
 
 *  Get the Unit value.  We use the arcseconds Format for a SkyFrame.
                   CALL MSG_SETC( 'UNIT', AST_GETC( FRM2,
-     :                                             ATTR( : LATTR ), 
+     :                                             ATTR( : LATTR ),
      :                                             STATUS ) )
                ELSE
                   CALL MSG_SETC( 'UNIT', AST_GETC( CFRM,
-     :                                             ATTR( : LATTR ), 
+     :                                             ATTR( : LATTR ),
      :                                             STATUS ) )
                END IF
             END IF
@@ -379,8 +379,8 @@
 
 *  Offset error of primary beam with to the reference point
 *  --------------------------------------------------------
-                  CALL MSG_SETC( 'OFFE', AST_FORMAT( FRM2, REPAX, 
-     :                                               REFOFF( 2 ), 
+                  CALL MSG_SETC( 'OFFE', AST_FORMAT( FRM2, REPAX,
+     :                                               REFOFF( 2 ),
      :                                               STATUS ) )
                END IF
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG3E', '    Offset      '/
@@ -405,7 +405,7 @@
             ELSE
 
 *  Display the current Frame's co-ordinates of the beam separation.
-               CALL MSG_SETC( 'RAD', AST_FORMAT( FRM2, REPAX, 
+               CALL MSG_SETC( 'RAD', AST_FORMAT( FRM2, REPAX,
      :                                           POLAR( 1, IB ),
      :                                           STATUS ) )
 
@@ -418,18 +418,18 @@
 
 *  Get the Unit value.  We use the arcseconds Format for a SkyFrame.
                   CALL MSG_SETC( 'UNIT', AST_GETC( FRM2,
-     :                                             ATTR( : LATTR ), 
+     :                                             ATTR( : LATTR ),
      :                                             STATUS ) )
                ELSE
                   CALL MSG_SETC( 'UNIT', AST_GETC( CFRM,
-     :                                             ATTR( : LATTR ), 
+     :                                             ATTR( : LATTR ),
      :                                             STATUS ) )
                END IF
             END IF
 
             IF ( POLSIG( 1, IB ) .EQ. VAL__BADD ) THEN
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG4', '    Offset      '/
-     :                        /'    : ^RAD ^UNIT from primary beam', 
+     :                        /'    : ^RAD ^UNIT from primary beam',
      :                       BUF, LBUF, STATUS )
 
             ELSE
@@ -439,8 +439,8 @@
 
 *  Polar radius errors
 *  -------------------
-                  CALL MSG_SETC( 'RADE', AST_FORMAT( FRM2, REPAX, 
-     :                                               POLSIG( 1, IB ), 
+                  CALL MSG_SETC( 'RADE', AST_FORMAT( FRM2, REPAX,
+     :                                               POLSIG( 1, IB ),
      :                                               STATUS ) )
                END IF
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG4E', '    Offset      '/
@@ -454,12 +454,12 @@
 *  ------------------------------------------
 
 * Format to left-justify the angle to two decimal places.
-            WRITE ( FORMAT, '(''F'',I1,''.2'')' ) 
+            WRITE ( FORMAT, '(''F'',I1,''.2'')' )
      :        MAX( 0, INT( LOG10( POLAR( 2, IB ) + VAL__EPSD ) ) ) + 4
             CALL MSG_FMTR( 'PA', FORMAT, SNGL( POLAR( 2, IB ) ) )
 
             IF ( PIXEL .OR. .NOT. ISSKY ) THEN
-               CALL MSG_SETC( 'SENSE', 
+               CALL MSG_SETC( 'SENSE',
      :                        '(measured anticlockwise from Y)' )
             ELSE
                CALL MSG_SETC( 'SENSE',
@@ -476,7 +476,7 @@
             ELSE
 
 * Format to left-justify the angle to two decimal places.
-               WRITE ( FORMAT, '(''F'',I1,''.2'')' ) 
+               WRITE ( FORMAT, '(''F'',I1,''.2'')' )
      :           MAX( 0, INT( LOG10( POLSIG( 2, IB ) + VAL__EPSD ) ) ) +
      :           4
                CALL MSG_FMTR( 'PAE', FORMAT, SNGL( POLSIG( 2, IB ) ) )
@@ -512,7 +512,7 @@
             CALL MSG_SETR( 'FWHM', SNGL( FWHM ) )
             CALL MSG_SETC( 'UNIT', 'pixels' )
 
-         ELSE 
+         ELSE
             CALL MSG_SETC( 'FWHM', AST_FORMAT( FRM2, REPAX, FWHM,
      :                                         STATUS ) )
 
@@ -522,7 +522,7 @@
             CALL CHR_PUTI( REPAX, ATTR, LATTR )
             CALL CHR_APPND( ')', ATTR, LATTR )
 
-            CALL MSG_SETC( 'UNIT', 
+            CALL MSG_SETC( 'UNIT',
      :                     AST_GETC( FRM2, ATTR( : LATTR ), STATUS ) )
          END IF
 
@@ -623,7 +623,7 @@
 *  meaningless orientation.
          THETA = P( 5, IB ) * R2D
          IF ( THETA .NE. 0.0D0 ) THEN
-            WRITE ( FORMAT, '(''F'',I1,''.2'')' )  
+            WRITE ( FORMAT, '(''F'',I1,''.2'')' )
      :           MAX( 0, INT( LOG10( THETA + VAL__EPSD ) ) ) + 4
             CALL MSG_FMTR( 'OR', FORMAT, REAL( THETA ) )
             IF ( SIGMA( 5, IB ) .EQ. VAL__BADD ) THEN

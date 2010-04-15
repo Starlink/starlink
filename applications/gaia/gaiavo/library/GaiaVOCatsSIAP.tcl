@@ -118,7 +118,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       #  windows. Re-uses "Open" as Display.
       $itk_component(open) configure -text "Display"
       add_short_help $itk_component(open) "Download and display selected image"
-      
+
       itk_component add displaynew {
          button $itk_component(buttons).displaynew \
             -text "Display in new" \

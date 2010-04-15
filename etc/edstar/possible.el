@@ -52,7 +52,7 @@ File Exclusion:
        (setq dir (cdr dir)))
 
 ;;; Sort the complete list of file names into reverse alphabetical order.
-     (setq files (sort files '(lambda (str1 str2) (string< str2 str1))))  
+     (setq files (sort files '(lambda (str1 str2) (string< str2 str1))))
 
 ;;; Obtain a regular expression to match the file type extensions of any files
 ;;; which are to be excluded. Supply a default if necessary.

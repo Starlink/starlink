@@ -1,5 +1,5 @@
       SUBROUTINE MSC_DATE(DATE, DAY, MONTH, YEAR, STATUS)
- 
+
 *+
 *
 *   Name:
@@ -23,23 +23,23 @@
 
 *   Import:
       INTEGER DATE         ! date from 1 JAN 1978
- 
+
 *   Export:
       INTEGER DAY          ! day in month
       INTEGER MONTH        ! month index
       INTEGER YEAR         ! year A.D.
       INTEGER STATUS       ! status return
- 
+
 *   Local variables:
       INTEGER DAYC         ! day count in year
       INTEGER DAYN         ! day number in year
       INTEGER DAYS(12)     ! days in each month
       INTEGER LEAPS        ! leap days since launch
       INTEGER I            ! loop index
- 
+
 *   Initialisations:
       DATA DAYS/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/
- 
+
 *   YEAR
       YEAR = DATE / 365 + 1978
       LEAPS = (DATE + 365) / 1461
@@ -60,7 +60,7 @@
          ELSE
             DAYC = DAYC + DAYS(I)
          END IF
-      END DO 
+      END DO
 
 *   DAY
  200  CONTINUE

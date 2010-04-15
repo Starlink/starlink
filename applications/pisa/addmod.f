@@ -50,7 +50,7 @@
 *     NOBJ = INTEGER (Given)
 *        The number of objects to generate.
 *     GSIGM = _REAL (Read)
-*        The value of the gaussian sigma. 
+*        The value of the gaussian sigma.
 *     CROSS = _REAL (Read)
 *        The value of the percentage cross over point, from the
 *        gaussian core to the exponential wings.
@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,7 +169,7 @@
       PARM2 = SQRT( -4.0 * CHANGE / GSIGM**2 )
       PARRAD = GSIGM * SQRT( -CHANGE )
       CROSS = 0.01 * CROSS
-      PARMN = 1.0 / 
+      PARMN = 1.0 /
      :       ( PI * GSIGM**2 * ( 1.0 + 0.5 * CROSS/ LOG( 1.0 / CROSS)))
       PARSQ = ( 5.0 * GSIGM )**2
       PARMN1 = -1.0 / ( GSIGM**2 )
@@ -203,7 +203,7 @@
       ACONST = 1.0 / ( A * A )
       BCONST = 1.0 / ( B * B )
 
-*  scale the dimensions of the array to those of the sampling pseudo-array 
+*  scale the dimensions of the array to those of the sampling pseudo-array
       IF( EXPAND ) THEN
          XDUM = XDIM
          YDUM = YDIM
@@ -218,11 +218,11 @@
          CALL PXYGT2( IFS, BUF, N, X, Y, MAG, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
 *
-*  correct for origin offset and scaling factor, this maps display 
+*  correct for origin offset and scaling factor, this maps display
 *  pixels to pseudo-array pixels. The pseudo array is the oversampled
 *  size ( ie at 1/scale th of a pixel )
-         X =  X * RSCALE + 1.5 - REAL( XORIG ) 
-         Y =  Y * RSCALE + 1.5 - REAL( YORIG ) 
+         X =  X * RSCALE + 1.5 - REAL( XORIG )
+         Y =  Y * RSCALE + 1.5 - REAL( YORIG )
          DO I = 1, IEXT
             XOFF = I - EXTO2
             IX = NINT( X + XOFF )
@@ -232,7 +232,7 @@
 *  equivalent ellipse radius
                   XOFFN =  XOFF * CPHI + YOFF * SPHI
                   YOFFN = -XOFF * SPHI + YOFF * CPHI
-                  RADSQ = XOFFN * XOFFN * ACONST + 
+                  RADSQ = XOFFN * XOFFN * ACONST +
      :                    YOFFN * YOFFN * BCONST
                   IF ( RADSQ .LE. RLIMSQ ) THEN
                      IY = NINT( Y + YOFF )
@@ -243,13 +243,13 @@
                         YY = IY - Y
                         XOFFN = XX * CPHI + YY * SPHI
                         YOFFN = -XX * SPHI + YY * CPHI
-                        RADSQ = XOFFN * XOFFN * ACONST + 
+                        RADSQ = XOFFN * XOFFN * ACONST +
      :                          YOFFN * YOFFN * BCONST
 
 *  Scale this radius by the inverse scaling factor.
 *  If expand is true then the scaling factor is real and the ix and iy
 *  represent the real pixels coords, if expand is false then ix and iy
-*  represent pseudo pixels and need to be scaled down. Contributions 
+*  represent pseudo pixels and need to be scaled down. Contributions
 *  are averaged by the scaling factor, if expand is false.
                         RADSQ = RADSQ / RSCSQ
                         IF ( .NOT. EXPAND ) THEN
@@ -258,13 +258,13 @@
                            IDY = IY / SCALE
                            IF ( IDY * SCALE .NE. IY ) IDY = IDY + 1
                            FRAME( IDX, IDY ) = FRAME( IDX, IDY ) +
-     :                                         MAG * FUNC( RADSQ ) / 
+     :                                         MAG * FUNC( RADSQ ) /
      :                                         RSCSQ
 *  saturate if necessary
                            FRAME( IDX, IDY )=MIN( FRAME( IDX,IDY ),SAT )
                         ELSE
 
-*  pixels values are correct for expanded frame. 
+*  pixels values are correct for expanded frame.
                            FRAME( IX, IY ) = FRAME( IX, IY ) +
      :                                       MAG * FUNC( RADSQ )
                            FRAME( IX, IY ) = MIN( FRAME( IX, IY ), SAT )

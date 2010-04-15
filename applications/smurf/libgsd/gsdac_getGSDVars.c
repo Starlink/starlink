@@ -22,7 +22,7 @@
 *     dasFlag = const dasFlag (Given)
 *        DAS file type
 *     gsdVars = gsdVars* (Given and returned)
-*        GSD headers and array data 
+*        GSD headers and array data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -124,13 +124,13 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the epoch type. */
   gsdac_get0c ( gsd, "C4EPT", gsdVars->epochType, status );
-  
+
   /* Get the centre moving flag. */
   gsdac_get0l ( gsd, "C4MCF", &(gsdVars->centreMoving), status );
 
   /* Get the centre epoch. */
   gsdac_get0d ( gsd, "C4EPH", &(gsdVars->centreEpoch), status );
- 
+
   /* Get the RA/Dec 1950 of the centre. */
   gsdac_get0d ( gsd, "C4ERA", &(gsdVars->centreRA1950), status );
   gsdac_get0d ( gsd, "C4EDEC", &(gsdVars->centreDec1950), status );
@@ -162,7 +162,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the size of the cells. */
   gsdac_get0d ( gsd, "C6DX", &(gsdVars->cellX), status );
-  gsdac_get0d ( gsd, "C6DY", &(gsdVars->cellY), status );  
+  gsdac_get0d ( gsd, "C6DY", &(gsdVars->cellY), status );
 
   /* Get the angles of the cells. */
   gsdac_get0d ( gsd, "C6MSA", &(gsdVars->cellV2X), status );
@@ -173,7 +173,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   gsdac_get0d ( gsd, "C4SX", &(gsdVars->centreOffsetX), status );
   gsdac_get0d ( gsd, "C4SY", &(gsdVars->centreOffsetY), status );
 
-  /* Get the reference position offsets. */ 
+  /* Get the reference position offsets. */
   gsdac_get0d ( gsd, "C4RX", &(gsdVars->referenceX), status );
   gsdac_get0d ( gsd, "C4RY", &(gsdVars->referenceY), status );
 
@@ -190,9 +190,9 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the frontend and backend. */
   gsdac_get0c ( gsd, "C1RCV", gsdVars->frontend, status );
-  gsdac_get0c ( gsd, "C1FTYP", gsdVars->FEType, status );   
+  gsdac_get0c ( gsd, "C1FTYP", gsdVars->FEType, status );
   gsdac_get0c ( gsd, "C1BKE", gsdVars->backend, status );
-  gsdac_get0c ( gsd, "C1BTYP", gsdVars->BEType, status ); 
+  gsdac_get0c ( gsd, "C1BTYP", gsdVars->BEType, status );
 
   /* Get the UT1 date and hour and UT1-UTC correction. */
   gsdac_get0d ( gsd, "C3DAT", &(gsdVars->obsUT1d), status );
@@ -215,11 +215,11 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   gsdac_get0i ( gsd, "C6XNP", &(gsdVars->nMapPtsX), status );
   gsdac_get0i ( gsd, "C6YNP", &(gsdVars->nMapPtsY), status );
   gsdac_get0r ( gsd, "C6XGC", &(gsdVars->mapStartX), status );
-  gsdac_get0r ( gsd, "C6YGC", &(gsdVars->mapStartY), status );  
+  gsdac_get0r ( gsd, "C6YGC", &(gsdVars->mapStartY), status );
 
   /* Get the scan reversal flag and scan direction. */
   gsdac_get0l ( gsd, "C6REV", &(gsdVars->scanRev), status );
-  gsdac_get0c ( gsd, "C6SD", gsdVars->obsDirection, status );   
+  gsdac_get0c ( gsd, "C6SD", gsdVars->obsDirection, status );
 
   /* Get the flags for direction of row/column increases. */
   gsdac_get0l ( gsd, "C6XPOS", &(gsdVars->mapPosX), status );
@@ -244,7 +244,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get environment variables. */
   gsdac_get0d ( gsd, "C5AT", &(gsdVars->tamb), status );
-  gsdac_get0d ( gsd, "C5PRS", &(gsdVars->pamb), status );  
+  gsdac_get0d ( gsd, "C5PRS", &(gsdVars->pamb), status );
   gsdac_get0d ( gsd, "C5RH", &(gsdVars->hamb), status );
 
   /* Get the Az/El offsets. */
@@ -274,10 +274,10 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Get the SMU parameters. */
   gsdac_get0r ( gsd, "C4OFFS_EW", &(gsdVars->smuOffsEW), status );
   gsdac_get0r ( gsd, "C4OFFS_NS", &(gsdVars->smuOffsNS), status );
-  gsdac_get0r ( gsd, "C4X", &(gsdVars->smuX), status ); 
-  gsdac_get0r ( gsd, "C4Y", &(gsdVars->smuY), status ); 
-  gsdac_get0r ( gsd, "C4Z", &(gsdVars->smuZ), status ); 
-  gsdac_get0r ( gsd, "C4EW_SCALE", &(gsdVars->smuEWScale), status ); 
+  gsdac_get0r ( gsd, "C4X", &(gsdVars->smuX), status );
+  gsdac_get0r ( gsd, "C4Y", &(gsdVars->smuY), status );
+  gsdac_get0r ( gsd, "C4Z", &(gsdVars->smuZ), status );
+  gsdac_get0r ( gsd, "C4EW_SCALE", &(gsdVars->smuEWScale), status );
   gsdac_get0r ( gsd, "C4NS_SCALE", &(gsdVars->smuNSScale), status );
   gsdac_get0i ( gsd, "C4EW_ENCODER", &(gsdVars->smuEWEnc), status );
   gsdac_get0i ( gsd, "C4NS_ENCODER", &(gsdVars->smuNSEnc), status );
@@ -458,133 +458,133 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Allocate memory for the GSD arrays. */
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    gsdVars->FEFreqs = smf_malloc ( gsdVars->nFEChans, 
+    gsdVars->FEFreqs = smf_malloc ( gsdVars->nFEChans,
                                     sizeof(double), 0, status );
-    gsdVars->FESBSigns = smf_malloc ( gsdVars->nFEChans, 
-                                      sizeof(int), 0, status );   
-    gsdVars->FELOFreqs = smf_malloc ( gsdVars->nFEChans, 
-                                      sizeof(double), 0, status );   
+    gsdVars->FESBSigns = smf_malloc ( gsdVars->nFEChans,
+                                      sizeof(int), 0, status );
+    gsdVars->FELOFreqs = smf_malloc ( gsdVars->nFEChans,
+                                      sizeof(double), 0, status );
   }
 
   if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
-    gsdVars->vRadial = smf_malloc ( gsdVars->nVRad, 
+    gsdVars->vRadial = smf_malloc ( gsdVars->nVRad,
                                     sizeof(double), 0, status );
   }
 
-  gsdVars->scanVars1 = smf_malloc ( gsdVars->nScanVars1, 
+  gsdVars->scanVars1 = smf_malloc ( gsdVars->nScanVars1,
                                     MAXSTRING-1 * sizeof(char), 0, status );
-  gsdVars->scanVars2 = smf_malloc ( gsdVars->nScanVars2, 
-                                    MAXSTRING-1 * sizeof(char), 0, status );  
-  gsdVars->scanTable1 = smf_malloc ( ( gsdVars->nScanVars1 * gsdVars->noScans ), 
+  gsdVars->scanVars2 = smf_malloc ( gsdVars->nScanVars2,
+                                    MAXSTRING-1 * sizeof(char), 0, status );
+  gsdVars->scanTable1 = smf_malloc ( ( gsdVars->nScanVars1 * gsdVars->noScans ),
                                      sizeof(float), 0, status );
-  gsdVars->scanTable2 = smf_malloc ( ( gsdVars->nScanVars2 * gsdVars->noScans ), 
+  gsdVars->scanTable2 = smf_malloc ( ( gsdVars->nScanVars2 * gsdVars->noScans ),
                                      sizeof(float), 0, status );
-  gsdVars->mapTable = smf_malloc ( ( gsdVars->nMapDims * gsdVars->nMapPts ), 
+  gsdVars->mapTable = smf_malloc ( ( gsdVars->nMapDims * gsdVars->nMapPts ),
                                    sizeof(float), 0, status );
-  gsdVars->phaseVars = smf_malloc ( gsdVars->nPhaseVars, 
+  gsdVars->phaseVars = smf_malloc ( gsdVars->nPhaseVars,
                                     MAXSTRING-1 * sizeof(char), 0, status );
   gsdVars->phaseTable = smf_malloc ( ( gsdVars->nPhaseVars * gsdVars->nPhases ),
                                      sizeof(float), 0, status );
-  gsdVars->corrModes = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->corrModes = smf_malloc ( gsdVars->nBESections,
                                     sizeof(int), 0, status );
-  gsdVars->bitModes = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->bitModes = smf_malloc ( gsdVars->nBESections,
                                    sizeof(int), 0, status );
-  gsdVars->sbOverlaps = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->sbOverlaps = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
-  gsdVars->mixNums = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->mixNums = smf_malloc ( gsdVars->nBESections,
                                   sizeof(float), 0, status );
-  gsdVars->BEInputChans = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->BEInputChans = smf_malloc ( gsdVars->nBESections,
                                        sizeof(int), 0, status );
-  gsdVars->BEConnChans = smf_malloc ( gsdVars->nBEChansIn, 
+  gsdVars->BEConnChans = smf_malloc ( gsdVars->nBEChansIn,
                                       sizeof(int), 0, status );
-  gsdVars->BEChans = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->BEChans = smf_malloc ( gsdVars->nBESections,
                                   sizeof(int), 0, status );
-  gsdVars->BESubsys = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->BESubsys = smf_malloc ( gsdVars->nBESections,
                                    sizeof(int), 0, status );
-  gsdVars->centreFreqs = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->centreFreqs = smf_malloc ( gsdVars->nBESections,
                                       sizeof(double), 0, status );
-  gsdVars->restFreqs = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->restFreqs = smf_malloc ( gsdVars->nBESections,
                                     sizeof(double), 0, status );
-  gsdVars->LOFreqs = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->LOFreqs = smf_malloc ( gsdVars->nBESections,
                                   sizeof(double), 0, status );
-  gsdVars->totIFs = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->totIFs = smf_malloc ( gsdVars->nBESections,
                                  sizeof(double), 0, status );
-  gsdVars->sbSigns = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->sbSigns = smf_malloc ( gsdVars->nBESections,
                                   sizeof(int), 0, status );
-  gsdVars->BEInputFreqs = smf_malloc ( gsdVars->nBEChansIn, 
+  gsdVars->BEInputFreqs = smf_malloc ( gsdVars->nBEChansIn,
                                        sizeof(double), 0, status );
-  gsdVars->freqRes = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->freqRes = smf_malloc ( gsdVars->nBESections,
                                   sizeof(float), 0, status );
   gsdVars->bandwidths = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
-  gsdVars->recTemps = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->recTemps = smf_malloc ( gsdVars->nBESections,
                                    sizeof(float), 0, status );
 
   if ( dasFlag == DAS_CONT_CAL ) {
-    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                            sizeof(float), 0, status );
-    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                      sizeof(float), 0, status );
   } else {
-    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections,
                                            sizeof(float), 0, status );
-    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
   }
 
-  gsdVars->telTemps = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->telTemps = smf_malloc ( gsdVars->nBESections,
                                    sizeof(float), 0, status );
-  gsdVars->gains = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->gains = smf_malloc ( gsdVars->nBESections,
                                 sizeof(float), 0, status );
   gsdVars->calTemps = smf_malloc ( gsdVars->nBESections,
                                    sizeof(float), 0, status );
-  gsdVars->opacities = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->opacities = smf_malloc ( gsdVars->nBESections,
                                     sizeof(float), 0, status );
 
   if ( dasFlag == DAS_CONT_CAL ) {
-    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                      sizeof(float), 0, status );
   } else {
-    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
   }
 
-  gsdVars->alphas = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->alphas = smf_malloc ( gsdVars->nBESections,
                                  sizeof(float), 0, status );
-  gsdVars->sbGainNorms = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->sbGainNorms = smf_malloc ( gsdVars->nBESections,
                                       sizeof(float), 0, status );
-  gsdVars->telTrans = smf_malloc ( gsdVars->nBESections, 
+  gsdVars->telTrans = smf_malloc ( gsdVars->nBESections,
                                    sizeof(float), 0, status );
 
   if ( dasFlag == DAS_CONT_CAL ) {
-    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                      sizeof(float), 0, status );
-    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                        sizeof(float), 0, status );
-    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                      sizeof(float), 0, status );
     gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
                                      sizeof(float), 0, status );
   } else {
-    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
-    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections,
                                        sizeof(float), 0, status );
-    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
-    gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections, 
+    gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections,
                                      sizeof(float), 0, status );
   }
 
-  gsdVars->intTimes = smf_malloc ( gsdVars->noScans, 
+  gsdVars->intTimes = smf_malloc ( gsdVars->noScans,
                                    sizeof(int), 0, status );
   gsdVars->data = smf_malloc ( ( gsdVars->nBEChansOut * gsdVars->nScanPts
                                  * gsdVars->noScans ), sizeof(float), 0, status );
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    gsdVars->hotPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection, 
+    gsdVars->hotPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection,
                                      sizeof(float), 0, status );
-    gsdVars->skyPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection, 
+    gsdVars->skyPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection,
                                      sizeof(float), 0, status );
     gsdVars->samples = smf_malloc ( gsdVars->nBEChansOut * gsdVars->IFONPhase *
                                     gsdVars->noCycles, sizeof(float), 0, status );
@@ -630,8 +630,8 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the number of BE input channels for each section. */
   gsdac_get1i ( gsd, "C3BESCONN", gsdVars->BEInputChans, status );
-  
-  /* Get the number of IF output channels connected to 
+
+  /* Get the number of IF output channels connected to
      BE input channels. */
   gsdac_get1i ( gsd, "C3BEINCON", gsdVars->BEConnChans, status );
 
@@ -645,7 +645,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   gsdac_get1d ( gsd, "C12CF", gsdVars->centreFreqs, status );
 
   /* Try to get the C3MIXNUM array.  If this array is not present
-     warn the user and try to figure out how many receptors were 
+     warn the user and try to figure out how many receptors were
      used from the centreFreqs.  */
   if ( *status == SAI__OK ) {
 
@@ -654,20 +654,20 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
     if ( *status != SAI__OK ) {
 
       errAnnul ( status );
-      msgOutif(MSG__VERB," ", "Could not find GSD C3MIXNUM array, attempting to use BES_NUOBS to determine how many receptors were used", status); 
+      msgOutif(MSG__VERB," ", "Could not find GSD C3MIXNUM array, attempting to use BES_NUOBS to determine how many receptors were used", status);
 
-      /* If there's only one subband, let's assume that the 
+      /* If there's only one subband, let's assume that the
          first receptor was used. */
       if ( gsdVars->nBESections == 1 ) gsdVars->mixNums[0] = 1;
 
       else {
 
-        /* Check to see if the centreFreqs match, if so, it's 
-           likely there were two receptors used.  Otherwise, 
-           probably one receptor was used. */        
-        if ( gsdVars->centreFreqs[0] == 
+        /* Check to see if the centreFreqs match, if so, it's
+           likely there were two receptors used.  Otherwise,
+           probably one receptor was used. */
+        if ( gsdVars->centreFreqs[0] ==
              gsdVars->centreFreqs[gsdVars->nBESections/2] ) {
-       
+
           for ( i = 0; i < gsdVars->nBESections / 2; i++ ) {
             gsdVars->mixNums[i] = 1;
             gsdVars->mixNums[i + gsdVars->nBESections/2] = 2;
@@ -704,7 +704,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the bandwidths. */
   gsdac_get1r ( gsd, "C12BW", gsdVars->bandwidths, status );
- 
+
   /* Get the temperatures and gains. */
   gsdac_get1r ( gsd, "C12RT", gsdVars->recTemps, status );
   gsdac_get1r ( gsd, "C12SST", gsdVars->sourceSysTemps, status );
@@ -727,7 +727,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the telescope transmissions. */
   gsdac_get1r ( gsd, "C12ETATEL", gsdVars->telTrans, status );
-  
+
   /* Get the FE-derived tsky image sideband for each section. */
   gsdac_get1r ( gsd, "C12TSKYIM", gsdVars->FETSkyIm, status );
 
@@ -750,8 +750,8 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   if ( dasFlag == DAS_CROSS_CORR ) {
     gsdac_get0r ( gsd, "C55HOTPOWER", gsdVars->hotPower, status );
     gsdac_get0r ( gsd, "C55SKYPOWER", gsdVars->skyPower, status );
-    gsdac_get0r ( gsd, "C55SAM", gsdVars->samples, status );    
-  } 
+    gsdac_get0r ( gsd, "C55SAM", gsdVars->samples, status );
+  }
 
   if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {
     gsdac_get0r ( gsd, "C55POWER", gsdVars->totPower, status );

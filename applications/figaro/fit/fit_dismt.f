@@ -36,7 +36,7 @@ C     TIO_SENSE      ( "      "   ) Determine information about a tape
 C
 C                                             KS / AAO 1st Feb 1990
 C     Modified:
-C     
+C
 C     27th Jun 1990.  Now sets density value in common.  KS/AAO.
 C+
       IMPLICIT NONE

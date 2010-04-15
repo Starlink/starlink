@@ -13,24 +13,24 @@
 *     CALL IRA_DRVPO( X1, Y1, X2, Y2, H, STATUS )
 
 *  Description:
-*     This routine returns items of information describing the area in 
+*     This routine returns items of information describing the area in
 *     which the last value plotted by IRA_DRVAL appeared.
 
 *  Arguments:
 *     X1 = REAL (Returned)
-*        The X coordinate at the centre of the left hand edge of the 
+*        The X coordinate at the centre of the left hand edge of the
 *        box in which the text was written.
 *     Y1 = REAL (Returned)
-*        The Y coordinate at the centre of the left hand edge of the 
+*        The Y coordinate at the centre of the left hand edge of the
 *        box in which the text was written.
 *     X2 = REAL (Returned)
-*        The X coordinate at the centre of the right hand edge of the 
+*        The X coordinate at the centre of the right hand edge of the
 *        box in which the text was written.
 *     Y2 = REAL (Returned)
-*        The Y coordinate at the centre of the right hand edge of the 
+*        The Y coordinate at the centre of the right hand edge of the
 *        box in which the text was written.
 *     H = REAL (Returned)
-*        The height of the box in which the text was written, 
+*        The height of the box in which the text was written,
 *        perpendicular to the line joining (X1,Y1) and (X2,Y2).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -63,7 +63,7 @@
 *        ACM_DRVPO( 5 ) = REAL (Read)
 *           Values defining the area occupied by the text, in the
 *           order; (X,Y) at start of box, (X,Y) at end of box, height
-*           of box (perpendicular to the line joing start and end of 
+*           of box (perpendicular to the line joing start and end of
 *           box).
 
 *  Arguments Returned:

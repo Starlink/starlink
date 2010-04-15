@@ -71,25 +71,25 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER
      :  FD,
      :  NELM
- 
+
 *  Arguments Returned:
       INTEGER
      :  ARRAY( NELM )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Constants:
       INTEGER MAXLEN             ! Maximum length records that can be
                                  ! processed
@@ -97,7 +97,7 @@
       INTEGER MXVALS             ! Maximum number of values per file
                                  ! record that can be processed
       PARAMETER ( MXVALS = ( MAXLEN + 1 ) / 2 )
- 
+
 *  Local Variables:
       INTEGER
      :  COM,                     ! Column where a comment starts in the
@@ -114,49 +114,49 @@
                                  ! file record
      :  SHRIEK                   ! Column where a shriek is found in the
                                  ! input buffer
- 
+
       INTEGER
      :  LIST( MXVALS )           ! List of values read from the current
                                  ! record in the file
- 
+
       CHARACTER * ( MAXLEN )
      :  BUFFER                   ! Buffer to hold a record from the file
- 
+
 *.
- 
+
 *    Check inherited global status.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Count the number of pixels read.
- 
+
       N = 0
- 
+
 *    Assume that the file is rewound, though the only place where this
 *    is used, the wording of the message does not make this assumption.
- 
+
       NREC = 0
- 
+
 *    Loop for all records in the file, or until an error is encountered.
- 
+
       DO WHILE ( N .LT. NELM .AND. STATUS .EQ. SAI__OK )
- 
+
 *       Read a line from the file into a buffer.
- 
+
          CALL FIO_READ( FD, BUFFER, NC, STATUS )
          NREC = NREC + 1
- 
+
 *       Look for a comment.
- 
+
          COM = 0
          SHRIEK = INDEX( BUFFER, '!' )
          HASH = INDEX( BUFFER, '#' )
- 
+
 *       We can skip the line if the first character is a comment
 *       indicator.  If there is a trailing comment it should be removed
 *       before extraction of the data occurs.  Find the leftmost comment
 *       character.
- 
+
          IF ( SHRIEK .GT. 1 .OR. HASH .GT. 1 ) THEN
             IF ( SHRIEK .GT. 1 .AND. HASH .GT. 1 ) THEN
                COM = MIN( SHRIEK, HASH )
@@ -165,55 +165,55 @@
             ELSE IF ( HASH .GT. 1 ) THEN
                COM = HASH
             END IF
- 
+
 *       Place off to the right.  There may be no data, whill will get
 *       trapped with comment lines.
- 
+
          ELSE IF ( SHRIEK .EQ. 0 .AND. HASH .EQ. 0 ) THEN
             COM = NC + 1
- 
+
 *       A comment line.
- 
+
          ELSE
             COM = 1
          END IF
- 
+
 *       There is no way of knowing if trailing values have been lost due
 *       to a record longer than the maximum that can be stored.
- 
+
          IF ( COM .GE. MAXLEN - 1 ) THEN
             CALL MSG_SETI( 'NREC', NREC )
             CALL MSG_OUT( 'RECTOOLONG', 'Record ^NREC from initial '/
      :        /'position may have been truncated.', STATUS )
          END IF
- 
+
          IF ( COM .GT. 1 ) THEN
- 
+
 *          Trim the input buffer and extract the data values.
- 
+
             CALL KPG1_PRSAI( BUFFER( 1:COM-1 ), MXVALS, LIST, NVAL,
      :                         STATUS )
- 
+
 *          If values were returned append to the data file.
- 
+
             IF ( NVAL .GT. 0 ) THEN
- 
+
 *             Count the number of data values to prevent an access
 *             violation.
- 
+
                IF ( NVAL + N .GT. NELM ) THEN
- 
+
 *                Report a warning message.
- 
+
                   CALL MSG_OUT( 'KPS1_TRNDI_TMANY',
      :              'The output array is full before all the input '/
      :              /'data values have been used.', STATUS )
                   NVAL = NELM - N
                END IF
- 
+
 *             Append the data just extracted from the string into the
 *             main array.
- 
+
                DO  I = 1, NVAL
                   N = N + 1
                   ARRAY( N ) = LIST( I )
@@ -221,5 +221,5 @@
             END IF
          END IF
       END DO
- 
+
       END

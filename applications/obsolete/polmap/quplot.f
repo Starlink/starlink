@@ -5,14 +5,14 @@
      &OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C      Q U P L O T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), TITLE (<), QUJOIN_DOTS (<),
 C IT (<), Q (<), U (<), QV (<), UV (<),
@@ -22,10 +22,10 @@ C WMAX (<), WMIN (<), WAUTOLIM (<), LCOL (<), LSTYLE (<), CROT (<),
 C PSTYLE (<), QUARROW (<),ARROWSIZE (<), OUT_LU (<)
 C
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C
 C Plots a polarization spectrum in QU-plane
@@ -187,7 +187,7 @@ C
        CALL PGSLS(1)
        CALL PGSCI(1)
        CALL PGPAGE
-       CALL PGBOX('NBCST',0.0,0.0,'NBCST',0.0,0.0)  
+       CALL PGBOX('NBCST',0.0,0.0,'NBCST',0.0,0.0)
        CALL PGLABEL('Stokes Q (%)','Stokes U (%)',TITLE)
       ENDIF
 C
@@ -199,7 +199,7 @@ C
      &             TMP_Q(I)-SQRT(TMP_QV(I)),TMP_U(I),1.)
        CALL PGERRY (1,TMP_Q(I),TMP_U(I)+SQRT(TMP_UV(I)),
      &             TMP_U(I)-SQRT(TMP_UV(I)),1.)
- 
+
       ENDDO
       IF (QUJOIN_DOTS) THEN
        CALL PGSLS(LSTYLE)

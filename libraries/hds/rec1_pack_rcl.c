@@ -79,7 +79,7 @@
 /* The RCL parent field is packed into the first 3 chars. This is a RID	    */
 /* structure; the first 2 chars hold part of the 20-bit RID bloc field and  */
 /* the third char holds the remaining 4 bits plus the 4-bit RID chip field. */
-      { 
+      {
          prcl[ 2 ] = ( ( rcl->parent.bloc >> 16 ) & 0xf ) |
 		     ( ( rcl->parent.chip & 0xf ) << 4 );
 

@@ -12,7 +12,7 @@
 
 *  Description:
 *    This program tests most of the CHR routines. It is self
-*    checking and will report as it goes along, terminating 
+*    checking and will report as it goes along, terminating
 *    with an overall result
 
 *  Copyright:
@@ -24,12 +24,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -47,19 +47,19 @@
 *        Do CHR_EQUAL and CHR_SIMLR test for unequal declared lengths
 *     14-SEP-1993 (RLVAD::ACC):
 *        Split single module into main program plus four subroutines,
-*        using grouping as in Appendix A of SUN/40.3, for easier 
+*        using grouping as in Appendix A of SUN/40.3, for easier
 *        maintenance.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:   
-*     TEST_CASE, TEST_COMPARE, TEST_DECODE, TEST_EDIT, 
+*  Subprograms called:
+*     TEST_CASE, TEST_COMPARE, TEST_DECODE, TEST_EDIT,
 *     TEST_ENCODE, TEST_ENQUIRE, TEST_PORT, TEST_SEARCH.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       PARAMETER (TSEARCH = 'SE')
       PARAMETER (ALL = 'AL')
       PARAMETER (EXIT = 'EX')
-     
+
 *.
 
 *    Initialize STATUS
@@ -118,7 +118,7 @@
 
       IF (SELECT .NE. EXIT) THEN
 
-         IF (SELECT .EQ. TCASE .OR. 
+         IF (SELECT .EQ. TCASE .OR.
      :       SELECT .EQ. ALL) THEN
 
 *  Test change case routines
@@ -130,7 +130,7 @@
             END IF
          END IF
 
-         IF (SELECT .EQ. TCOMPARE .OR. 
+         IF (SELECT .EQ. TCOMPARE .OR.
      :       SELECT .EQ. ALL) THEN
 
 *  Test compare strings routines
@@ -142,7 +142,7 @@
             END IF
          END IF
 
-         IF (SELECT .EQ. TDECODE .OR. 
+         IF (SELECT .EQ. TDECODE .OR.
      :       SELECT .EQ. ALL) THEN
 
 *  Test decode routines
@@ -224,7 +224,7 @@
             ENDIF
          END IF
 
-         GO TO 10      
+         GO TO 10
       END IF
 *     End of Loop
 

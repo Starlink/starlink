@@ -1,9 +1,9 @@
-      SUBROUTINE JCMT_SORT_DDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE, 
+      SUBROUTINE JCMT_SORT_DDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE,
      :   INDATA, NCH, X, Y, DBAD, XMIN, XSPACE, NX, YMIN, YSPACE,
      :   NY, OUTDATA, STATUS)
 *+
 *  Name:
-*      JCMT_SORT_DDATA   
+*      JCMT_SORT_DDATA
 
 *  Purpose:
 *     sort double precision data according to X, Y arrays
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE JCMT_SORT_DDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE, 
+*     SUBROUTINE JCMT_SORT_DDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE,
 *    :   INDATA, NCH, X, Y, DBAD, XMIN, XSPACE, NX, YMIN, YSPACE,
 *    :   NY, OUTDATA, STATUS)
 
@@ -21,7 +21,7 @@
 *     X, Y arrays. The input data may be multichanneled, which is
 *     indicated by the value of C3NCH. The channel which is to be selected
 *     is indicated by NCH. The data is put into OUTDATA according to the
-*     map grid calculated by JCMT_CALCULATE_GRID. Output array elements 
+*     map grid calculated by JCMT_CALCULATE_GRID. Output array elements
 *     that don't get anything put into them are set to DBAD.
 
 *  Arguments:

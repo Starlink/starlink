@@ -200,7 +200,7 @@
 
 *  Create an integer array component called MASKS, within the
 *  QEXP structure.
-      CALL DAT_NEW( QCM_LOCQ( IDQ ), 'MASKS', '_INTEGER', 1, 
+      CALL DAT_NEW( QCM_LOCQ( IDQ ), 'MASKS', '_INTEGER', 1,
      :              MAX( 1, NMASKS ), STATUS )
 
 *  Get a locator to it, and store it in common.

@@ -14,7 +14,7 @@
 
 *  Description:
 *     This file holds header information required by C language extensions
-*     to Tcl which manipulate ndf and ndfset objects, including the 
+*     to Tcl which manipulate ndf and ndfset objects, including the
 *     code which implements the objects itself.
 
 *  Copyright:
@@ -112,8 +112,8 @@
 
 
 /* Definition of the structure which holds information about an ndfset
-   object or an ndf object.  If it represents an ndfset, then nmember 
-   must be greater than zero, and the first nmember elements of 
+   object or an ndf object.  If it represents an ndfset, then nmember
+   must be greater than zero, and the first nmember elements of
    the content.ndfs[] array must point to Ndfset structures representing
    ndf objects.  If it represents and ndf object, then nmember must be
    zero, and content.ndf1 must point to an Ndf1 structure.  It is not
@@ -143,7 +143,7 @@
    Tcl_CmdDeleteProc DeleteNdfset;
 
 
-/* Prototype for ndf extension initialisation command.  This should 
+/* Prototype for ndf extension initialisation command.  This should
    initialise the "ndf" and "ndfset" object creation commands, and also
    the additional Tcl commands listed above. */
    int Ndf_Init( Tcl_Interp *interp );
@@ -159,15 +159,15 @@
    void domapdata( Ndf1 *ndf1, int *status );
    void dounmapdata( Ndf1 *ndf1, int *status );
    double getpixelsize( NdfOrNdfset *ndfset, int iframe, int *status );
-   void getbbox( NdfOrNdfset *ndfset, int iframes[], double *lbox, 
+   void getbbox( NdfOrNdfset *ndfset, int iframes[], double *lbox,
                  double *ubox, int *status );
    Tcl_ObjCmdProc ndfdisplay;
-   int *getpixbloc( NdfOrNdfset *ndfset, int iframes[], double zoom, 
+   int *getpixbloc( NdfOrNdfset *ndfset, int iframes[], double zoom,
                     double loperc, double hiperc, int locolour, int hicolour,
                     int badcolour, int *status );
    int NdfGetNdfFromObj( Tcl_Interp *interp, Tcl_Obj *obj,
                          NdfOrNdfset **ndfset );
-   int NdfGetIframeFromObj( Tcl_Interp *interp, Tcl_Obj *obj, 
+   int NdfGetIframeFromObj( Tcl_Interp *interp, Tcl_Obj *obj,
                             AstFrameSet *fset, int *iframe );
    int NdfGetIframesFromObj( Tcl_Interp *interp, Tcl_Obj *obj,
                              NdfOrNdfset *ndfset, int *iframes );
@@ -178,7 +178,7 @@
    void tclupdate( void );
 
 
-/* Utility macros. 
+/* Utility macros.
 */
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))

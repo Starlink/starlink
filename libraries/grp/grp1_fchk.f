@@ -13,11 +13,11 @@
 *     CALL GRP1_FCHK( SLOT, GRPEXP, FLAG, STATUS )
 
 *  Description:
-*     Any string following a comment character is removed from the 
-*     supplied group exression (along with the comment character 
-*     itself). The last non-blank character of the remaining group 
-*     expression is compared with the groups current flag character. 
-*     If it matches, the character is removed, and FLAG is returned 
+*     Any string following a comment character is removed from the
+*     supplied group exression (along with the comment character
+*     itself). The last non-blank character of the remaining group
+*     expression is compared with the groups current flag character.
+*     If it matches, the character is removed, and FLAG is returned
 *     .TRUE. Otherwise FLAG is returned .FALSE.
 
 *  Arguments:
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -122,11 +122,11 @@
 *  If a comment character is defined...
       IF( COMOK ) THEN
 
-*  Search for the first occurrence of the comment character in the 
+*  Search for the first occurrence of the comment character in the
 *  supplied group expression.
          COM = GRP1_INDEX( GRPEXP, COMC, ESCC, ESCOK )
 
-*  If a comment character was found, set the rest of the group 
+*  If a comment character was found, set the rest of the group
 *  expression blank (including the comment character itself).
          IF( COM .GT. 0 ) GRPEXP( COM : ) = ' '
 
@@ -149,7 +149,7 @@
             FLAG = GRP1_CHKCC( GRPEXP, LASTC, FLAGC, ESCC, ESCOK )
 
 *  If it is, remove the flag character.
-            IF( FLAG ) GRPEXP( LASTC : LASTC ) = ' '            
+            IF( FLAG ) GRPEXP( LASTC : LASTC ) = ' '
 
          END IF
 

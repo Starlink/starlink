@@ -4,7 +4,7 @@
 *     ASTTRANGRID
 
 *  Purpose:
-*     Transform a grid of positions 
+*     Transform a grid of positions
 
 *  Language:
 *     Fortran 77
@@ -44,11 +44,11 @@
 *  ADAM Parameters:
 *     LBND() = _INTEGER (Read)
 *        The lower pixel index bounds of the output NDF. The number of
-*        values supplied should equal the Nin attribute of the supplied 
+*        values supplied should equal the Nin attribute of the supplied
 *        Mapping.
 *     FORWARD = _LOGICAL (Read)
 *        A TRUE value indicates that the Mapping's forward coordinate
-*        transformation is to be applied, while a FALSE value indicates 
+*        transformation is to be applied, while a FALSE value indicates
 *        that the inverse transformation should be used. [TRUE]
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size (in input grid
@@ -58,12 +58,12 @@
 *        of the input grid being used). In this case, a first attempt to
 *        approximate the Mapping by a linear transformation will be made
 *        over the entire input region.
-* 
+*
 *        If a smaller value is used, the input region will first be divided
 *        into sub-regions whose size does not exceed "maxpix" grid points
 *        in any dimension. Only at this point will attempts at
 *        approximation commence.
-* 
+*
 *        This value may occasionally be useful in preventing false
 *        convergence of the adaptive algorithm in cases where the Mapping
 *        appears approximately linear on large scales, but has
@@ -71,7 +71,7 @@
 *        to 100 grid points can also be employed as a safeguard in
 *        general-purpose software, since the effect on performance is
 *        minimal.
-* 
+*
 *        If too small a value is given, it will have the effect of
 *        inhibiting linear approximation altogether (equivalent to setting
 *        "tol" to zero). Although this may degrade performance, accurate
@@ -79,11 +79,11 @@
 *     RESULT = NDF (Write)
 *        The output NDF. This will have "Nin+1" pixel axes, where "Nin"
 *        is the number of inputs for the supplied Mapping. The extra
-*        pixel axis in the output NDF will have bounds "1:Nout", where 
-*        "Nout" is the number of outputs for the supplied Mapping. The 
+*        pixel axis in the output NDF will have bounds "1:Nout", where
+*        "Nout" is the number of outputs for the supplied Mapping. The
 *        bounds on the first Nin axes of the output NDF are given by LBND
 *        and UBND.
-*     THIS = LITERAL (Read) 
+*     THIS = LITERAL (Read)
 *        An NDF or text file holding the Mapping. If an NDF is supplied,
 *        the Mapping from the base Frame of the WCS FrameSet to the
 *        current Frame will be used. The inputs of this Mapping
@@ -104,16 +104,16 @@
 *        problem, reduce the tolerance value used. [0.0]
 *     UBND() = _INTEGER (Read)
 *        The upper pixel index bounds of the output NDF. The number of
-*        values supplied should equal the Nin attribute of the supplied 
+*        values supplied should equal the Nin attribute of the supplied
 *        Mapping.
 
 *  Notes:
 *     - The supplied Mapping inputs correspond to pixel coordinates in
 *     the grid. Particularly, this means that integer values are located
-*     at pixel corners. But astTranGrid assumes an input coordinate system 
+*     at pixel corners. But astTranGrid assumes an input coordinate system
 *     in which integer values are located at pixel centres. Therefore,
 *     the supplied Mapping is modified before passing it to astTranGrid.
-*     This modification consists of prepending a Shiftmap that shifts each 
+*     This modification consists of prepending a Shiftmap that shifts each
 *     input axis value by -0.5.
 
 *  Copyright:
@@ -173,7 +173,7 @@
       INTEGER NIN, NOUT, THIS, MAXPIX, INDF, IP, EL, SM, I, MAP
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin AST and NDF contexts
@@ -216,21 +216,21 @@
       END IF
 
 *  Get the lower pixel bounds for the first NIN axes of the output NDF.
-      CALL PAR_EXACI( 'LBND', NIN, LBND, STATUS ) 
+      CALL PAR_EXACI( 'LBND', NIN, LBND, STATUS )
 
 *  Get the upper pixel bounds for the first NIN axes of the output NDF.
-      CALL PAR_EXACI( 'UBND', NIN, UBND, STATUS ) 
+      CALL PAR_EXACI( 'UBND', NIN, UBND, STATUS )
 
 *  Complete the bounds of the output NDF.
       LBND( NIN + 1 ) = 1
       UBND( NIN + 1 ) = NOUT
 
 *  Create the output NDF.
-      CALL NDF_CREAT( 'RESULT', '_DOUBLE', NIN + 1, LBND, UBND, INDF, 
-     :                STATUS ) 
+      CALL NDF_CREAT( 'RESULT', '_DOUBLE', NIN + 1, LBND, UBND, INDF,
+     :                STATUS )
 
-*  Map it. 
-      CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IP, EL, STATUS )  
+*  Map it.
+      CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IP, EL, STATUS )
 
 *  AST_TRANGRID uses a coordinate system in which integral values are at
 *  the centre of the grid elements. Since we have advertised that the
@@ -251,7 +251,7 @@
 
 *  Fill it with the required coordinate values.
       CALL AST_TRANGRID( MAP, NIN, LBND, UBND, TOL, MAXPIX, .TRUE.,
-     :                   NOUT, EL, %VAL(CNF_PVAL(IP)), STATUS ) 
+     :                   NOUT, EL, %VAL(CNF_PVAL(IP)), STATUS )
 
 * End the AST and NDF contexts
       CALL NDF_END( STATUS )

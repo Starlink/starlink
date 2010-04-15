@@ -1,23 +1,23 @@
       SUBROUTINE TOV(NPARAMS,PARAMS,NPTS,LAMBDA,XLAB,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  T O V
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), NPTS (<), LAMBDA (><), XLAB (>), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C

@@ -1944,7 +1944,7 @@
 \cos(H\_A) = \frac{\sin(el) - \sin(dec\_app) * \sin(lat\_obs)}{\cos(dec\_app) * \cos(lat\_obs)}
 \end{equation}
 
-$\cos(dec\_app)$ is present in the denominator of both the 
+$\cos(dec\_app)$ is present in the denominator of both the
 $\sin(H\_A)$ and $\cos(H\_A)$ terms and it could cause both to blow up -- so
 it{\tt '}s left out as only the ratio is important
 
@@ -2457,7 +2457,7 @@ rotation = \pi - (ra\_N\_app - ra\_app)
          Next the routine will calculate the 0th and 1st order moments of the
       image on the map. Map pixels with bad quality are ignored.
 
-  The 0th order is calculated as 
+  The 0th order is calculated as
 \begin{equation}
 U_0 = \sum_{ij} f_{ij},
 \end{equation}
@@ -3726,7 +3726,7 @@ THETA ($\theta$)
 
 \begin{equation}
 R_{Variance} = \frac{ \sum B^2A_{Variance}}{norm^2}
-\end{equation}        
+\end{equation}
 
       After this process the errors can no longer be considered independent.
    }
@@ -5402,13 +5402,13 @@ R_{Variance} = \frac{ \sum B^2A_{Variance}}{norm^2}
    \sstdescription{
 
       This routine fits a 2D Gaussian to an image of a source. It takes as
-      input data a map made of the source with pixels on a square grid. 
+      input data a map made of the source with pixels on a square grid.
 
  If status is good on entry, the routine will calculate the 0th ($U_0$) and
       1st order ($U_x$, $U_y$) moments of the image on the map. Map pixels
       with bad quality are ignored:
 
- The 0th order is calculated as 
+ The 0th order is calculated as
 \begin{equation}
 U_0 = \sum_{ij} f_{ij},
 \end{equation}
@@ -5445,7 +5445,7 @@ Y_\mathrm{cen} = \frac{U_y}{U_0}
           U_{yy} = \sum_{ij} (y - Y_{cen})^2  f_{ij}
 \end{equation}
 
-      If the image had a 2D Gaussian profile, 
+      If the image had a 2D Gaussian profile,
 \begin{equation}
 f = A \exp(-a_x^2 x^2) \exp(-a_y^2 y^2),
 \end{equation}
@@ -7878,7 +7878,7 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
       time taken before beginning the observation by comparing the
       LST stored in the header (written when the observation begins and
       before the telescope gets on source) and the reference LST supplied to
-      the routine (which is assumed to be the LST when the data acquisition 
+      the routine (which is assumed to be the LST when the data acquisition
       starts).
 
    }
@@ -7900,7 +7900,7 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
          LST\_REF = DOUBLE PRECISION (Given)
       }{
         Reference LST. This is the LST at which data acquisition
-        begins. The MJD should be calculated for the start of 
+        begins. The MJD should be calculated for the start of
         data taking rather than the time the telescope begain its
         slew. This number is normally read from the LST\_STRT array
         and should be in radians. If a negative value or a zero
@@ -7938,7 +7938,7 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
       }
    }
    \sstnotes{
-     Uses the UTDATE and UTSTART and STSTART FITS headers. 
+     Uses the UTDATE and UTSTART and STSTART FITS headers.
      These must be present.
       \sstitemlist{
 
@@ -7951,7 +7951,7 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
         \sstitem
      The MJD is calculated for the start of data taking rather
      than simply using the values stored in UTSTART. This is because
-     there is always a delay between writing the FITS headers and 
+     there is always a delay between writing the FITS headers and
      taking data.
       }
    }
@@ -9994,7 +9994,7 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       An error will be reported and bad status returned if the name of the
       FITS item is blank or more than 8 characters long. An error will also
       occur if the FITS character array is full.
-      The FITS array must contain a final entry of simply `END' unless 
+      The FITS array must contain a final entry of simply `END' unless
       N\_FITS is 0. The END entry is automatically moved to the last field
       as entries are added to the FITS array.
   }
@@ -10061,7 +10061,7 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       An error will be reported and bad status returned if the name of the
       FITS item is blank or more than 8 characters long. An error will also
       occur if the FITS character array is full.
-      The FITS array must contain a final entry of simply `END' unless 
+      The FITS array must contain a final entry of simply `END' unless
       N\_FITS is 0. The END entry is automatically moved to the last field
       as entries are added to the FITS array.
    }
@@ -10128,7 +10128,7 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       An error will be reported and bad status returned if the name of the
       FITS item is blank or more than 8 characters long. An error will also
       occur if the FITS character array is full.
-      The FITS array must contain a final entry of simply `END' unless 
+      The FITS array must contain a final entry of simply `END' unless
       N\_FITS is 0. The END entry is automatically moved to the last field
       as entries are added to the FITS array.
    }
@@ -12902,7 +12902,7 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       If entered with good status this routine calculates the variance
       between a SKYDIP dataset and the theoretical curve generated by
       the the sky and telescope parameters in FIT.  Additionally, the residual
-      of the fit is also returned (absolute value of measured data mins 
+      of the fit is also returned (absolute value of measured data mins
       fitted values). Data points with bad
       quality will be ignored. If no valid data points are found then an
       error will be reported and bad status returned. The data are passed
@@ -13211,14 +13211,14 @@ Airmass(i) / X\_Gconst)
 \end{equation}
 
 leading to:
- 
+
 \begin{equation}
-\frac{\partial f(i)}{\partial x(1)} = -\frac{J_\mathrm{tel}+J_\mathrm{atm} - B 
+\frac{\partial f(i)}{\partial x(1)} = -\frac{J_\mathrm{tel}+J_\mathrm{atm} - B
 J_\mathrm{tel} \exp(-\tau A(i))}{J_\mathrm{noise}(i)}
 \end{equation}
 
 \begin{equation}
-\frac{\partial f(i)}{\partial x(2)} = - \frac{\eta_\mathrm{tel} J_\mathrm{atm} 
+\frac{\partial f(i)}{\partial x(2)} = - \frac{\eta_\mathrm{tel} J_\mathrm{atm}
 \exp(-\tau A(i))}{J_\mathrm{noise}(i)}
 \end{equation}
 
@@ -13330,12 +13330,12 @@ J_\mathrm{theory} = (1-\eta_\mathrm{tel}) J_\mathrm{tel} +
 leading to:
 
 \begin{equation}
-\frac{\partial f(i)}{\partial x(1)} = - \eta_\mathrm{tel} J_\mathrm{atm} 
+\frac{\partial f(i)}{\partial x(1)} = - \eta_\mathrm{tel} J_\mathrm{atm}
 \exp(-\tau A(i))
 \end{equation}
 
 \begin{equation}
-\frac{\partial f(i)}{\partial x(2)} = A(i) B \eta_\mathrm{tel} J_\mathrm{atm} 
+\frac{\partial f(i)}{\partial x(2)} = A(i) B \eta_\mathrm{tel} J_\mathrm{atm}
 \exp(-\tau A(i))
 \end{equation}
 
@@ -13436,7 +13436,7 @@ Airmass / X\_Gconst)
 \end{equation}
 
 \begin{equation}
-\frac{\partial f(i)}{\partial B} = DR(2) = - \eta_\mathrm{tel} J_\mathrm{atm} 
+\frac{\partial f(i)}{\partial B} = DR(2) = - \eta_\mathrm{tel} J_\mathrm{atm}
 \exp(-\tau A)
 \end{equation}
 

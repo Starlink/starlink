@@ -1,8 +1,8 @@
-*+  FCOADD - coadds N separate images into 1 image 
+*+  FCOADD - coadds N separate images into 1 image
 
 	SUBROUTINE FCOADD ( STATUS)
 
-* Description : 
+* Description :
 *
 * Invocation :
 *
@@ -24,7 +24,7 @@
 *
 *     03-02-1987 : First implementation (HILO::CAA)
 *     20-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
-*     23-Jun-1994  Changed TYPE to ERR_REP, 
+*     23-Jun-1994  Changed TYPE to ERR_REP,
 *                  STR$ and LIB$ to CHR_ (SKL@JACH)
 *
 * Type definitions :
@@ -34,8 +34,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'		! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
         INCLUDE  'CHR_ERR'
 
 * Status :
@@ -115,7 +115,7 @@
 
 *          read the latest image number to be coadded
 
-	    CALL PAR_GET0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES), 
+	    CALL PAR_GET0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES),
      :                       STATUS)
 
 *          cancel the current association with this parameter
@@ -124,7 +124,7 @@
 
 *          suggest a new default of the one after the last input obs number
 
-	    CALL PAR_DEF0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES)+1, 
+	    CALL PAR_DEF0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES)+1,
      :                      STATUS)
 
 *          test if number of input images greater than image number array size
@@ -154,7 +154,7 @@
 
 	    if( status .ne. sai__ok) then
 	      CALL ERR_REP('ERR', 'Error after end of input loop ...',
-     :                      STATUS )      
+     :                      STATUS )
 	      return
 	    end if
 
@@ -176,7 +176,7 @@
 
 	  DO J = 1, NUMBER_IMAGES
 
-*          create the name of the file to be coadded, convert number to 
+*          create the name of the file to be coadded, convert number to
 *          characters
 
             CALL CHR_ITOC( NUMBER_IMAGE( J), CHARNUM, CHARLEN )
@@ -223,7 +223,7 @@
 
 *            get the name of the output image to contain coadded data
 
-	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMSO, LOCO, 
+	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMSO, LOCO,
      :                      STATUS )
 
 	      if( status .ne. sai__ok) then
@@ -238,7 +238,7 @@
      :                      PNTRO, NELEMENTS, STATUS )
 
 	      if( status .ne. sai__ok) then
-                CALL ERR_REP( 'ERR', 
+                CALL ERR_REP( 'ERR',
      :                        'Error after ndf_map output image ...',
      :                        STATUS )
 	        return
@@ -265,14 +265,14 @@
      :                      PNTRDA, NELEMENTS, STATUS )
 
 	    if( status .ne. sai__ok) then
-              CALL ERR_REP('ERR', 
+              CALL ERR_REP('ERR',
      :                     'Error after ndf_map image ...', STATUS )
 	      return
 	    end if
 
 *          call subroutine to coadd the data into the output image
 
-	    CALL STCOADD_IMAGE( DIMS( 1), DIMS( 2), %VAL( PNTRDA), 
+	    CALL STCOADD_IMAGE( DIMS( 1), DIMS( 2), %VAL( PNTRDA),
      :                          %VAL( PNTRO))
 
 *          release the input structure image and annul locators
@@ -395,7 +395,7 @@
      :	                   NAME( NUMBER_IMAGES),
      :	                   PRELEN)
 
-	    CALL SUBPAR_PUTNAME( INCODE, 
+	    CALL SUBPAR_PUTNAME( INCODE,
      :	                         NAME( J)( 1:PRELEN),
      :	                         STATUS)
 
@@ -432,7 +432,7 @@
 
 *            get the name of the output image to contain coadded data
 
-	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMSO, LOCO, 
+	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMSO, LOCO,
      :                      STATUS )
 	      if( status .ne. sai__ok) then
                 CALL ERR_REP('ERR', 'Error after creout ...',
@@ -446,8 +446,8 @@
      :                      PNTRO, NELEMENTS, STATUS )
 
 	      if( status .ne. sai__ok) then
-                CALL ERR_REP('ERR', 
-     :                        'Error after ndf_map output image ...', 
+                CALL ERR_REP('ERR',
+     :                        'Error after ndf_map output image ...',
      :                         STATUS )
 	        return
 	      end if
@@ -480,7 +480,7 @@
 
 *          call subroutine to coadd the data into the output image
 
-	    CALL STCOADD_IMAGE( DIMS( 1), DIMS( 2), %VAL( PNTRDA), 
+	    CALL STCOADD_IMAGE( DIMS( 1), DIMS( 2), %VAL( PNTRDA),
      :                          %VAL( PNTRO))
 
 *          release the input structure image and annul locators

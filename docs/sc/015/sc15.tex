@@ -75,7 +75,7 @@ how to deal with commonly occurring graphics problems.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -253,12 +253,12 @@ how to deal with commonly occurring graphics problems.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -285,7 +285,7 @@ how to deal with commonly occurring graphics problems.}
 \html{\section*{Revision history}}
 
 \begin{enumerate}
-  \item 2nd February 2000; Version 1. Release version (AA) 
+  \item 2nd February 2000; Version 1. Release version (AA)
   \item 22nd August 2000; Version 2. Checked URLs + minor updates (AA)
 
 \end{enumerate}
@@ -333,7 +333,7 @@ you to help yourself. This document is therefore more of a collection
 of basic material with pointers to move advanced and in-depth
 documents, than a cookbook which provides set recipes to approach your
 graphics problems. Indeed, perhaps it should be referred to as an
-``ingredients'' book rather than a cookbook. 
+``ingredients'' book rather than a cookbook.
 
 The cookbook is probably best browsed in the HTML version since much
 of its content is pointers to packages, anonymous FTP sites and
@@ -362,7 +362,7 @@ favourite applications, such as PGPLOT. Comments should be sent either
 to me at \htmladdnormallink{{\tt
 aa@astro.keele.ac.uk}}{mailto:aa@astro.keele.ac.uk} or to the Starlink
 software librarian \htmladdnormallink{{\tt
-ussc@star.rl.ac.uk}}{mailto:ussc@star.rl.ac.uk}. 
+ussc@star.rl.ac.uk}}{mailto:ussc@star.rl.ac.uk}.
 
 \section{\xlabel{sc15_libraries}Subroutine Libraries\label{sc15_libraries}}
 
@@ -400,17 +400,17 @@ Figure~\ref{sc15_pgplot_example}.
 \begin{quote}
 \begin{verbatim}
       PROGRAM GRAPH
-      
+
       INTEGER I, IER, PGBEG
       REAL XR(100), YR(100)
       REAL XS(5), YS(5)
-      
+
       DATA XS/1.,2.,3.,4.,5./
       DATA YS/1.,4.,9.,16.,25./
-      
+
       IER = PGBEG(0,'?',1,1)                     ! Start PGPLOT
                                                  ! Specify the device
-                                                 
+
       IF (IER.NE.1) STOP                         ! No response? Stop execution
       CALL PGENV(0.,10.,0.,20.,0,1)              ! Initialise the axes
       CALL PGLAB('(x)', '(y)', 'A Simple Graph') ! Label the axes
@@ -427,8 +427,8 @@ Figure~\ref{sc15_pgplot_example}.
 \end{quote}
 \normalsize
 
-\myfig{sc15_pgplot.eps}{height=0.3\textheight}{sc15_pgplot.gif}{sc15_pgplot_example}{Output from the simple PGPLOT Fortran program.} 
-    
+\myfig{sc15_pgplot.eps}{height=0.3\textheight}{sc15_pgplot.gif}{sc15_pgplot_example}{Output from the simple PGPLOT Fortran program.}
+
 \subsubsection{Encapsulated Postscript and PGPLOT}
 
 A commonly asked question is how to get PGPLOT to produce valid
@@ -492,9 +492,9 @@ programs that already include these calls. On some devices, buffering
 output can lead to large improvements in speed, but enabling buffering
 may upset synchronization between graphical output and other program
 activity, {\em e.g.\ }{\tt setenv PGPLOT\_BUFFER yes}
- 
+
 \end{description}
-   
+
 \subsubsection{\xlabel{sc15_pgplot_postscript}PGPLOT Postscript
 Environment Variables}
 
@@ -519,12 +519,12 @@ are appropriate in most circumstances. The maximum dimensions of a
 PGPLOT image are {\tt WIDTH} by {\tt HEIGHT}, with the lower left
 corner offset by {\tt HOFFSET} horizontally and {\tt VOFFSET}
 vertically from the lower left corner of the paper. The ``top'' of the
-paper is the edge that comes out of the printer first. 
+paper is the edge that comes out of the printer first.
 
 \item{{\tt PGPLOT\_IDENT}} If this variable is defined (with any
 value), the user name, date and time are written in the bottom right
 corner of each page.
- 
+
 \item{{\tt PGPLOT\_PS\_BBOX}} Normally, PGPLOT computes the bounding
 box for the entire plot (the smallest rectangle that includes all the
 graphics) as it creates the PostScript file, and writes this
@@ -537,25 +537,25 @@ special program. Alternatively, you can define {\tt PGPLOT\_PS\_BBOX =
 MAX}. This tells PGPLOT to put a \%\%BoundingBox comment in the header
 of the PostScript file; the bounding box is one which encompasses the
 whole plotable area, not a minimal one, because PGPLOT does not know
-the correct bounding box until it has finished writing the file. 
+the correct bounding box until it has finished writing the file.
 
 \item{{\tt PGPLOT\_PS\_DRAW\_BBOX}} If this variable is set, the
 bounding box (the smallest rectangle that includes all the graphics)
 is drawn on each page.
- 
+
 \item{{\tt PGPLOT\_PS\_VERBOSE\_TEXT}} If this variable is set, the
 text of each plotted character string is included in the PostScript
 file as a comment before the sequence of vectors that represents the
 string. This makes the file slightly larger, but it can be useful if
 you want to hand edit the PostScript file.
- 
+
 \item{{\tt PGPLOT\_PS\_EOF}} Normally the output file does not contain
 special end-of-file characters. But if environment variable {\tt
 PGPLOT\_PS\_EOF} is defined (with any value) PGPLOT writes a Control-D
 job-separator character at the beginning and at the end of the file.
 This is appropriate for Apple LaserWriters using the serial interface,
 but it may not be appropriate for other PostScript devices.
- 
+
 \item{{\tt PGPLOT\_PS\_MARKERS}} Specify {\tt NO} to suppress use of a
 PostScript font for the graph markers; markers are then emulated by
 line-drawing. If this option is not requested, PGPLOT graph markers
@@ -564,7 +564,7 @@ line-width attribute is ignored. This is different from most of the
 other drivers, where the line-width used for markers is set by the
 line-width attribute rather than the character-height attribute.
 Requesting this option makes the PostScript driver behave like the
-other drivers, but it also makes the PostScript files larger. 
+other drivers, but it also makes the PostScript files larger.
 
 \end{description}
 
@@ -584,7 +584,7 @@ character ``\verb*|\|''. The following escape sequences are defined:
 \begin{description}
 
 \item \verb*|\u| Start a superscript, or end a subscript
-\item \verb*|\d| Start a subscript, or end a superscript 
+\item \verb*|\d| Start a subscript, or end a superscript
 \item \verb*|\b| Do not advance text pointer after plotting the previous character
 \item \verb*|\fn| Switch to  Normal font (1)
 \item \verb*|\fr| Switch to Roman font (2)
@@ -764,18 +764,18 @@ and is in the current directory).
 
        CALL PGEND
        STOP
-       
+
 100    FORMAT(A,$)
        END
 \end{verbatim}
 \end{quote}
-\normalsize       
-       
+\normalsize
+
 The BUTTON library is available from \htmladdnormallink{
 http://www.ucm.es/info/Astrof/button/button.html}{
 http://www.ucm.es/info/Astrof/button/button.html} along with
 installation instructions and a description of the library functions.
-       
+
 \subsection{\xlabel{sc15_pgperl}The {\tt pgperl} package\label{sc15_pgperl}}
 
 The \htmladdnormallink{{\tt
@@ -786,7 +786,7 @@ a superset of the features of the useful UNIX utilities \texttt{awk}
 and \texttt{sed} and is the ``Swiss-Army Chainsaw'' of UNIX
 programming. Users of \htmlref{PONGO}{sc15_pongo} and
 \htmlref{SM}{sc15_sm} packages will be familiar with this style of
-programming. 
+programming.
 
 The simple example shown below, taken from the {\tt pgperl}
 distribution, shows how the {\tt Fortran} routines are interfaced into
@@ -796,7 +796,7 @@ Figure~\ref{sc15_pgperl_example}.
 \small
 \begin{quote}
 \begin{verbatim}
-#!/usr/local/bin/perl  
+#!/usr/local/bin/perl
 
 use PGPLOT;                                 # Load PGPLOT PERL module
 
@@ -808,7 +808,7 @@ print "PGPLOT $val library\n\n";
 
 $dev = "?" unless defined $dev;             # "?" will prompt for device
 
-pgbegin(0,$dev,1,1);                        # Open plot device    
+pgbegin(0,$dev,1,1);                        # Open plot device
 
 pgscf(2);                                   # Set character font
 pgslw(4);                                   # Set line width
@@ -822,17 +822,17 @@ pgsci(5);                                   # Change plot colour
 @x=(); @y=(); $i=0;
 
 
-while(<DATA>){                              
-                                            # Read data in 2 columns 
+while(<DATA>){
+                                            # Read data in 2 columns
                                             # from file handle and
-                                            # put in two perl arrays       
-   ($x[$i], $y[$i]) = split(' ');    
+                                            # put in two perl arrays
+   ($x[$i], $y[$i]) = split(' ');
    $i++;
 }
 
 
 pgpoint($i,\@x,\@y,17);                    # Plot points
-                                           # note how perl arrays are passed  
+                                           # note how perl arrays are passed
 pgend;                                     # Close plot
 
 __DATA__
@@ -871,7 +871,7 @@ Therefore to draw a line to point \verb+(42,$x)+:
 \small
 \begin{quote}
 \begin{verbatim}
-   pgdraw(42,$x); 
+   pgdraw(42,$x);
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -888,8 +888,8 @@ PGPLOT module as follows:
 \end{quote}
 \normalsize
 
- 
-Label the axes: 
+
+Label the axes:
 
 \small
 \begin{quote}
@@ -917,16 +917,16 @@ arguments. Several methods to access these subroutines are provided by
 {\tt pgperl}:
 
 \begin{enumerate}
-\item Pass a reference to a 2D array: 
+\item Pass a reference to a 2D array:
    \small
    \begin{quote}
    \begin{verbatim}
       # Create 2D array
       $x=[];
 
-            for($i=0; $i<128; $i++) { 
+            for($i=0; $i<128; $i++) {
          for($j=0; $j<128; $j++) {
-            $$x[$i][$j] = sqrt($i*$j); 
+            $$x[$i][$j] = sqrt($i*$j);
          }
       }
       pggray( $x, 128, 128, ...);
@@ -940,9 +940,9 @@ arguments. Several methods to access these subroutines are provided by
    \begin{quote}
    \begin{verbatim}
       @x=();
-      for($i=0; $i<128; $i++) { 
+      for($i=0; $i<128; $i++) {
          for($j=0; $j<128; $j++) {
-            $x[$i][$j] = sqrt($i*$j); 
+            $x[$i][$j] = sqrt($i*$j);
          }
       }
       pggray( \@x, 128, 128, ...);
@@ -953,7 +953,7 @@ arguments. Several methods to access these subroutines are provided by
 Here {\tt @x} is a 1D array of 1D arrays.  Alternatively {\tt @x}
 could be a flat 1D array with 128x128 elements, 2D routines such as
 {\tt pggray()} are programmed to do the right thing as long as the
-number of elements match. 
+number of elements match.
 
 \item If your image data is packed in raw binary form into a character
 string you can simply pass the raw string:
@@ -961,7 +961,7 @@ string you can simply pass the raw string:
    \small
    \begin{quote}
    \begin{verbatim}
-      read(IMG, $img, 32768); 
+      read(IMG, $img, 32768);
       pggray($img, $xsize, $ysize, ...);
    \end{verbatim}
    \end{quote}
@@ -974,7 +974,7 @@ string you can simply pass the raw string:
    packed as a ``{\tt f*}'' for example to use {\tt pggray}. This is
    intended as a short-cut for sophisticated users. Even more
    sophisticated users will want to download the PDL module which
-   provides a wealth of functions for manipulating binary data. 
+   provides a wealth of functions for manipulating binary data.
 
 \end{enumerate}
 
@@ -1004,11 +1004,11 @@ name, for example:
 \subsubsection{Argument mapping -- general handling of binary data}
 
 In addition to the implicit rules mentioned above PGPLOT now provides
-a scheme for explictly handling binary data in all routines. 
+a scheme for explictly handling binary data in all routines.
 
 If your scalar variable ({\em e.g.\ }\verb+\$x+) holds binary data
 ({\em i.e.\ }'packed') then simply pass PGPLOT a reference to it ({\em
-e.g.\ }\verb+\$x+). Thus one can say: 
+e.g.\ }\verb+\$x+). Thus one can say:
 
 \small
 \begin{quote}
@@ -1021,7 +1021,7 @@ e.g.\ }\verb+\$x+). Thus one can say:
 \normalsize
 
 This is very efficient as we can be sure the data never gets copied
-and will always be interpreted as binary. 
+and will always be interpreted as binary.
 
 \subsection{\xlabel{sc15_pgpython}Python PGPLOT\label{sc15_pgpython}}
 
@@ -1056,10 +1056,10 @@ languages like Matlab and IDL while maintaining all of the advantages
 of the general-purpose programming language Python. If you are running
 Linux it is possible that NumPy may already be installed, else or
 otherwise, it can be found at \latex{{\tt
-http://andrich.net/python/}.} 
-\begin{htmlonly} 
+http://andrich.net/python/}.}
+\begin{htmlonly}
 \htmladdnormallink{{\tt http://andrich.net/python/}}{http://andrich.net/python/}.
-\end{htmlonly} 
+\end{htmlonly}
 
 One interface also requires you to install
 \htmladdnormallink{SWIG}{http://www.swig.org/}. The Simplified Wrapper
@@ -1072,7 +1072,7 @@ extended to include languages such as Java.
 More details of the interfaces available, including some basic usage
 and installation instructions, can be found on the UBC Python Page at
 \latex{{\tt http://www.geog.ubc.ca/$\sim$phil/ubc\_python.html}.}
-\begin{htmlonly} 
+\begin{htmlonly}
 \htmladdnormallink{{\tt http://www.geog.ubc.ca/~phil/ubc_python.html}}{http://www.geog.ubc.ca/~phil/ubc_python.html}.
 \end{htmlonly}
 
@@ -1085,9 +1085,9 @@ device drivers, only the Tk and PostScript drivers are available from
 GLISH. More information on the PGPLOT bindings in GLISH can be found
 at \latex{{\tt
 http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}.}
-\begin{htmlonly} 
+\begin{htmlonly}
 \htmladdnormallink{{\tt http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}}{http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}.
-\end{htmlonly} 
+\end{htmlonly}
 
 \subsection{\xlabel{sc15_pgtcl}{\tt ptcl} Tk/Tcl and PGPLOT\label{sc15_pgtcl}}
 
@@ -1108,7 +1108,7 @@ low level graphics package GRPCKG, which was also written at Caltech,
 and a version developed by Starlink, in collaboration with Dr Pearson,
 which uses \htmlref{RAL GKS}{sc15_gks}. The two versions have
 identical subroutine interfaces and in most cases, applications can be
-moved from one version to the other simply by re-linking. 
+moved from one version to the other simply by re-linking.
 
 Starlink currently supports both the native version and the Starlink
 versions. Most packages available in the Starlink Software Collection
@@ -1124,8 +1124,8 @@ should use the following command line:
 
 \small
 \begin{quote}
-\begin{verbatim}              
-% f77 prog.f -L/star/lib `pgplot_link` 
+\begin{verbatim}
+% f77 prog.f -L/star/lib `pgplot_link`
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1134,8 +1134,8 @@ While to use the Starlink version you should use:
 
 \small
 \begin{quote}
-\begin{verbatim}   
-% f77 prog.f -L/star/lib `pgp_link` 
+\begin{verbatim}
+% f77 prog.f -L/star/lib `pgp_link`
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1144,8 +1144,8 @@ Or to link the code in an \xref{ADAM}{sun113}{} application:
 
 \small
 \begin{quote}
-\begin{verbatim}   
-% alink prog.f -L/star/lib `pgp_link_adam` 
+\begin{verbatim}
+% alink prog.f -L/star/lib `pgp_link_adam`
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1175,7 +1175,7 @@ at RAL).
 
 %\subsubsection{Graphical workstation name service (GNS)}
 
-% Any program that displays graphics needs a way for the user to specify the type of device the graphics are to be displayed on. When using \xref{GKS}{sun83}{} this is done using GNS. Most of the higher level Starlink packages also use this convention ({\em e.g.\ }\xref{SGS}{sc15}{sc15_sgs} and Starlink \xref{PGPLOT}{sc15}{sc15_pgplot}). 
+% Any program that displays graphics needs a way for the user to specify the type of device the graphics are to be displayed on. When using \xref{GKS}{sun83}{} this is done using GNS. Most of the higher level Starlink packages also use this convention ({\em e.g.\ }\xref{SGS}{sc15}{sc15_sgs} and Starlink \xref{PGPLOT}{sc15}{sc15_pgplot}).
 
 \subsubsection{Enquiring about the display}
 
@@ -1186,9 +1186,9 @@ A good indicator as to the type of X display available is whether the
 colour table is writable. If it is, then your user is probably sitting
 in front of a pseudo-colour display. If it's not, then it is more
 likely that the display is True Colour \latex{ (see Section
-\ref{sc15_display}).} 
-\begin{htmlonly} 
-(see the section on \htmlref{X displays}{sc15_display}). 
+\ref{sc15_display}).}
+\begin{htmlonly}
+(see the section on \htmlref{X displays}{sc15_display}).
 \end{htmlonly}
 
 GKS provides a function to enquire whether the colour table (amongst
@@ -1228,22 +1228,22 @@ http://www.itd.clrc.ac.uk/Publications/RAL-GKS/gks\_cat.html}}.
 \subsubsection{Compiling and Linking GKS programs}
 
 Before compiling a program that uses the GKS include file {\tt
-GKS\_PAR} you must first execute the command: 
+GKS\_PAR} you must first execute the command:
 
 \small
 \begin{quote}
 \begin{verbatim}
-$ gks_dev 
+$ gks_dev
 \end{verbatim}
 \end{quote}
 \normalsize
 
-Programs are linked with GKS by: 
+Programs are linked with GKS by:
 
 \small
 \begin{quote}
 \begin{verbatim}
-$ ld objmodule -L/star/lib `gks_link` 
+$ ld objmodule -L/star/lib `gks_link`
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1276,7 +1276,7 @@ http://emma.la.asu.edu/plplot/}.}
 
 One important feature available in PLplot, which is not (trivially)
 available in PGPLOT is the ability to represent a single-valued
-function of two variables as a surface. 
+function of two variables as a surface.
 
 As usual, we would like to refer to a three dimensional point $(X, Y,
 Z)$ in terms of some meaningful user-specified coordinate system.
@@ -1289,7 +1289,7 @@ enclosing cuboid is performed. Firstly, it is mapped into another
 cuboid called the normalized box whose size must also be specified by
 the user, and secondly this normalized box is viewed from a particular
 azimuth and elevation so that it can be projected onto the
-two-dimensional window. 
+two-dimensional window.
 
 This two-stage transformation process allows considerable flexibility
 in specifying how the surface is depicted. The lengths of the sides of
@@ -1307,11 +1307,11 @@ represents the viewing angle above the $xy$ plane. The azimuth is
 defined so that when $az = 0$, the observer sees the $xz$ plane face
 on, and as the angle is increased, the observer moves clockwise around
 the box as viewed from above the $xy$ plane. The azimuth can take on
-any value. 
+any value.
 
 The routine {\tt PLWIND} or {\tt PLENV} (equivalent to the PGPLOT {\tt
 PGENV} routine) is used in the usual way to establish the size of the
-two-dimensional window. 
+two-dimensional window.
 
 \small
 \begin{quote}
@@ -1328,11 +1328,11 @@ two-dimensional window.
 The routine {\tt PLW3D} must then be called to establish the range of
 the three dimensional world coordinates, the size of the normalized
 box and the viewing angles. After calling {\tt PLW3D}, the actual
-surface is drawn by a call to {\tt PLOT3D}. 
+surface is drawn by a call to {\tt PLOT3D}.
 
 \small
 \begin{quote}
-\begin{verbatim}    
+\begin{verbatim}
     BASEX = 2.0;
     BASEY = 4.0;
     HEIGHT = 3.0;
@@ -1369,19 +1369,19 @@ representing z as a function of $y$ for each value of $x$, and if $opt
 if one of the independent variables is to be regarded as a parameter,
 whilst the third is better for getting an overall picture of the
 surface. If side is equal to one then sides are drawn on the figure so
-that the graph doesn't appear to float. 
+that the graph doesn't appear to float.
 
 The routine {\tt PLMESH} is similar to {\tt PLOT3D}, except that it is
 used for drawing mesh plots. Mesh plots allow you to see both the top
 and bottom sides of a surface mesh, while 3D plots allow you to see
 the top side only (like looking at a solid object). The side option is
-not available with {\tt PLMESH}. 
+not available with {\tt PLMESH}.
 
 Labelling a three-dimensional or mesh plot is somewhat more
 complicated than a two dimensional plot due to the need for skewing
 the characters in the label so that they are parallel to the
 coordinate axes. The routine {\tt PLBOX3} thus combines the functions
-of box drawing and labelling. 
+of box drawing and labelling.
 
 \subsection{\xlabel{sc15_libjpeg}The {\tt libjpeg} Library\label{sc15_libjpeg}}
 
@@ -1446,7 +1446,7 @@ GIF files use Lempel-Ziv-Welsh (LZW) compression algorithm to encode
 the image data to save space, however there is a great deal of
 controversy over the GIF \htmlref{legal position}{sc15_giflegal}
 \latex{(see Section \ref{sc15_giflegal})} due to the Unisys patent
-issue. 
+issue.
 
 Eric S.\ Raymond, the maintainer of {\tt giflib} has this to say about
 Unisys's licensing: ``Due to Unisys's increasingly aggressive
@@ -1468,7 +1468,7 @@ files that, while not using LZW compression, are still recognizable as
 GIF files by decoders which expect normal (compressed) GIFs. The
 obvious problem is that the uncompressed GIF images will be larger
 than those encoded using the LZW algorithm. This library speaks both
-GIF87a and GIF89. 
+GIF87a and GIF89.
 
 The latest version of the {\tt libungif} library can be obtained from
 the anonymous FTP archive at \htmladdnormallink{{\tt
@@ -1516,7 +1516,7 @@ rules them out for use on the web. Additionally, the format makes use
 of gamma correction, allowing cross-platform control of image
 brightness. Finally, the PNG format specifies two-dimensional
 interlacing (progressive display) rather than the one-dimensional
-scheme used by GIF images. 
+scheme used by GIF images.
 
 PNG also compresses better than GIF in almost every case, but the
 difference is generally only around 5 to 25 per cent. Additionally,
@@ -1568,7 +1568,7 @@ PPM, TIFF and XBM, and apply a rich set of image operations to them.
 See the \htmladdnormallink{feature
 sheet}{http://www.python.org/sigs/image-sig/Features.html} \latex{{\tt
 at http://www.python.org/sigs/image-sig/Imaging.html}} for more
-details. 
+details.
 
 \subsection{\xlabel{sc15_gd}The {\tt gd} Library\label{sc15_gd}}
 
@@ -1606,21 +1606,21 @@ int main() {
         /* Allocate the color black (red, green and blue all minimum).
                 Since this is the first color in a new image, it will
                 be the background color. */
-        black = gdImageColorAllocate(im, 0, 0, 0);      
+        black = gdImageColorAllocate(im, 0, 0, 0);
 
         /* Allocate the color white (red, green and blue all maximum). */
-        white = gdImageColorAllocate(im, 255, 255, 255);        
-        
+        white = gdImageColorAllocate(im, 255, 255, 255);
+
         /* Draw a line from the upper left to the lower right,
                 using white color index. */
-        gdImageLine(im, 0, 0, 63, 63, white);   
+        gdImageLine(im, 0, 0, 63, 63, white);
 
         /* Open a file for writing. "wb" means "write binary", important
                 under MSDOS, harmless under Unix. */
         out = fopen("test.png", "wb");
 
         /* Output the image to the disk file. */
-        gdImagePng(im, out);    
+        gdImagePng(im, out);
 
         /* Close the file. */
         fclose(out);
@@ -1635,7 +1635,7 @@ int main() {
 When run, this program creates an image, allocates two colours (the
 first colour allocated becomes the background colour) and draws a
 diagonal line (note that 0, 0 is the upper left corner) before writing
-the image to a PNG file. 
+the image to a PNG file.
 
 \subsubsection{{\tt gd} from other languages}
 
@@ -1654,7 +1654,7 @@ languages\latex{, see {\tt http://www.tcltk.com/ftp/ellson/}}.
 is an interactive graphics plotting package that began life in the
 late seventies on a PDP 11/70 at the Goddard Space Flight Center, it
 doesn't seem that likely that any of code has survived from that first
-version. 
+version.
 
 QDP is now an interactive front end to Tim Pearson's
 \htmlref{PGPLOT}{sc15_pgplot} package, and is distributed by
@@ -1692,7 +1692,7 @@ is shown below:
    1   1  16
    2   4   9 ! Another Comment
    3   9   4
-   4  15   NO  
+   4  15   NO
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1733,7 +1733,7 @@ Figure~\ref{sc15_qdp_plot_1}.
 
 \myfig{sc15_qdp_plot_1.eps}{height=0.3\textheight}{sc15_qdp_plot_1.gif}{sc15_qdp_plot_1}{The
 default appearance of the {\tt test.qdp} data file when plotted using
-QDP.} 
+QDP.}
 
 Since the file contained three columns of numbers, the default mode
 assumes there are three plot groups. The first plot group determines
@@ -1797,7 +1797,7 @@ copy device by:
 \begin{verbatim}
 PLT> hard ?
  Current hardcopy device is: /PS
-PLT> 
+PLT>
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1822,8 +1822,8 @@ one pixel). For instance:
 \small
 \begin{quote}
 \begin{verbatim}
-PLT> font Roman  
-PLT> csize 1.3   
+PLT> font Roman
+PLT> csize 1.3
 PLT> lwidth 7
 PLT> hard
 \end{verbatim}
@@ -1839,7 +1839,7 @@ in Figure~\ref{sc15_qdp_plot_1}).
 
 \myfig{sc15_qdp_plot_2.eps}{height=0.3\textheight}{sc15_qdp_plot_2.gif}{sc15_qdp_plot_2}{The
 appearance of the {\tt test.qdp} data file when plotted in QDP using a
-Roman font with {\tt csize 1.3} and {\tt lwidth 7}.} 
+Roman font with {\tt csize 1.3} and {\tt lwidth 7}.}
 
 \subsubsection{Error Bars}
 
@@ -1891,7 +1891,7 @@ columns (one for data, one for errors). You can see what QDP makes of
 this file in Figure~\ref{sc15_qdp_plot_3}.
 
 \myfig{sc15_qdp_plot_3.eps}{height=0.3\textheight}{sc15_qdp_plot_3.gif}{sc15_qdp_plot_3}{Our
-second test data set plotted using QDP with the default options.} 
+second test data set plotted using QDP with the default options.}
 
 You can also tell QDP to use two-sided errors using the {\tt READ
 Terr} command. It takes three real columns to specify a two-sided
@@ -1931,11 +1931,11 @@ X^{2} + X + C$) we must first define a model, {\em e.g.\ }
 \begin{verbatim}
 PLT> model cons linr quad
   1 CO: VAL( -1.000    ), SIG(  0.000    ), PLO(  0.000    ), PHI(  0.000    )?
- 
+
   2 LI: VAL(  1.000    ), SIG(  0.000    ), PLO(  0.000    ), PHI(  0.000    )?
- 
+
   3 QU: VAL(  1.000    ), SIG(  0.000    ), PLO(  0.000    ), PHI(  0.000    )?
- 
+
 PLT>
 \end{verbatim}
 \end{quote}
@@ -1951,14 +1951,14 @@ now type {\tt fit}.
 \begin{quote}
 \begin{verbatim}
 PLT> fit
- Fitting group   2,  from  0.850     to   7.15    
+ Fitting group   2,  from  0.850     to   7.15
  Fitting      5 points in a band of      5.
  -1.  1.  1.
- ( -3)   W-VAR=0.5758    
- ( -4)   W-VAR=0.4192    
- ( -5)   W-VAR=0.4189    
+ ( -3)   W-VAR=0.5758
+ ( -4)   W-VAR=0.4192
+ ( -5)   W-VAR=0.4189
   0.764678299 -0.742543042  1.09179008
-PLT> 
+PLT>
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1986,7 +1986,7 @@ variance, along with the number of data points fitted, is shown down
 the right hand side of the plot.
 
 \myfig{sc15_qdp_plot_4.eps}{height=0.3\textheight}{sc15_qdp_plot_4.gif}{sc15_qdp_plot_4}{Our
-second test data set plotted using QDP with best fit model.} 
+second test data set plotted using QDP with best fit model.}
 
 You can get a list of the different possible models available by
 typing {\tt model}, {\em e.g.\ }
@@ -1999,7 +1999,7 @@ PLT> model
   CONS  LINR  QUAD  CUBI  X4    X5    POWR  SIN   GAUS
   EXP   AEXP  BURS  SBUR  PEAR  WIND  KING  LN    LORE
   DEMO  SPLN  AKIM
-PLT> 
+PLT>
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2043,7 +2043,7 @@ FNY=FNY+GN*EXP(-Z*Z/2.),
 
 where Z=(X-GC)/GW and with integral SQRT(2*PI)*GN*GW.
 
-help> 
+help>
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2063,7 +2063,7 @@ PLT> wmodel file
 will create a {\tt file.mod} file. To read this model back into QDP
 use the command {\tt model @file}. If you do not enter a file name
 with the {\tt wmodel} command, then the model is written to the
-screen. 
+screen.
 
 The {\tt uncertain} command can now used to estimate uncertainties in
 the parameter values, {\em e.g.\ }
@@ -2073,10 +2073,10 @@ the parameter values, {\em e.g.\ }
 \begin{verbatim}
 PLT> uncertain 1
  Delta parm   Delta Chi^2
-  -2.19          2.70    
-   2.19          2.70    
- Parameter   1, Delta CHI^2=  2.700      -1.424       2.953    
-PLT> 
+  -2.19          2.70
+   2.19          2.70
+ Parameter   1, Delta CHI^2=  2.700      -1.424       2.953
+PLT>
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2177,7 +2177,7 @@ Newpar       Quit         RUn          Step
 cod topic?
 \end{verbatim}
 \end{quote}
-\normalsize 
+\normalsize
 
 \subsection{\xlabel{sc15_pongo}PONGO\label{sc15_pongo}}
 
@@ -2261,7 +2261,7 @@ functions and show the result graphically.
 \myfig{sc15_gnuplot_demo_para.eps}{height=0.4\textheight}{sc15_gnuplot_demo_para.gif}{sc15_gnuplot_demo_para}{A
 plot of the function
 $(1-0.1\cos(v))\cos(u),(1-0.1\cos(v))\sin(u),0.1(\sin(v)+u/1.7-10)$, a
-parametric helix, using GNUplot} 
+parametric helix, using GNUplot}
 
 \subsubsection{Co-ordinate systems}
 
@@ -2271,7 +2271,7 @@ Figure~\ref{sc15_gnuplot_demo_0} shows a plot of the function
 $\cos(2x)$ in polar co-ordinates.
 
 \myfig{sc15_gnuplot_demo_0.eps}{height=0.4\textheight}{sc15_gnuplot_demo_0.gif}{sc15_gnuplot_demo_0}{A
-plot of the function $\cos(2x)$ in polar co-ordinates using GNUplot.} 
+plot of the function $\cos(2x)$ in polar co-ordinates using GNUplot.}
 
 \subsubsection{\xlabel{sc15_gnuplot_3d}Plotting 3D data\label{sc15_gnuplot_3d}}
 
@@ -2318,10 +2318,10 @@ impressive, example from the GNUplot manual is shown in
 Figure~\ref{sc15_gnuplot_demo_2}.
 
 \myfig{sc15_gnuplot_demo_1.eps}{height=0.4\textheight}{sc15_gnuplot_demo_1.gif}{sc15_gnuplot_demo_1}{A
-3D plot using GNUplot.} 
+3D plot using GNUplot.}
 
 \myfig{sc15_gnuplot_demo_2.eps}{height=0.4\textheight}{sc15_gnuplot_demo_2.gif}{sc15_gnuplot_demo_2}{A
-3D plot of a digitised blue whale using GNUplot.} 
+3D plot of a digitised blue whale using GNUplot.}
 
 \section{\xlabel{sc15_image}Image Display\label{sc15_image}}
 
@@ -2346,11 +2346,11 @@ environment. It was written at the Smithsonian Astrophysical
 Observatory by Mike Van Hilst in 1990 and is now maintained by Doug
 Mink. Image files (including \xref{NDF}{sun33}{}) can be read
 directly, or image data may be passed through a named pipe from IRAF
-display tasks. 
+display tasks.
 
 SAOimage provides a large selection of options for zooming, panning,
 scaling, coloring, pixel readback, display blinking, and region
-specification. 
+specification.
 
 The SAOimage desktop includes, a main image display window, a button
 menu panel, a display magnifier, a pan and zoom reference image, and a
@@ -2402,7 +2402,7 @@ resources available in on-line catalogues and archives. An example of
 GAIA in action is shown in Figure~\ref{sc15_gaia_interface}
 
 \myfig{sc15_gaia.eps}{height=0.7\textheight}{sc15_gaia.gif}{sc15_gaia_interface}{The
-GAIA interface.} 
+GAIA interface.}
 
 A full discussion of GAIA's capabilities can be found in \xref{SUN/214}{sun214}{}.
 
@@ -2441,7 +2441,7 @@ There is so much graphics and image manipulation software available,
 usually under the \htmladdnormallink{GNU Public
 License}{http://www.gnu.org/copyleft/gpl.html} (GPL), that I couldn't
 possibly hope to cover it all. Although I have tried to cover the
-major packages, new (sometimes better) applications appear every day. 
+major packages, new (sometimes better) applications appear every day.
 
 \subsection{\xlabel{sc15_magick}ImageMagick\label{sc15_magick}}
 
@@ -2479,14 +2479,14 @@ to get a intensity histogram for the image {\tt file.jpg}. Here the
 use of ``\verb+-+'' for the file specifier (for both {\tt convert} and
 {\tt display}) directs the applications to use standard input and
 output ({\em i.e.\ }streams).
-    
+
 \subsubsection{{\tt display}}
 
 Not to be confused with \xref{KAPPA}{sun95}{} {\tt display}, the
 ImageMagick {\tt display} program is an image processing tool. The
 program is invoked from the command line as below,
 Figure~\ref{sc15_magick_display} shows the interface to the
-application. 
+application.
 
 \small
 \begin{quote}
@@ -2495,17 +2495,17 @@ application.
 \end{verbatim}
 \end{quote}
 \normalsize
- \myfig{sc15_magick_display.eps}{height=0.45\textheight}{sc15_magick_display.gif}{sc15_magick_display}{The ImageMagick {\tt display} GUI.} 
+ \myfig{sc15_magick_display.eps}{height=0.45\textheight}{sc15_magick_display.gif}{sc15_magick_display}{The ImageMagick {\tt display} GUI.}
 
 The {\tt display} application is a powerful image manipulation and
 processing tool, full details of its functions can be found at
 \htmladdnormallink{{\tt
 http://www.wizards.dupont.com/cristy/www/display.html}}{http://www.wizards.dupont.com/cristy/www/display.html}.
- 
+
 One important point for people used to \htmlref{{\tt xv}}{sc15_xv} is
 that the command menu is brought up by {\em left} clicking on the
-image rather than {\em right} clicking (as with {\tt xv}). 
-       
+image rather than {\em right} clicking (as with {\tt xv}).
+
 \subsubsection{{\tt import}}
 
 {\tt import} reads an image from any visible window on your X Windows
@@ -2520,7 +2520,7 @@ JPEG image format in a file titled {\tt root.jpg}, use:
 \small
 \begin{quote}
 \begin{verbatim}
-% import -window root root.jpg 
+% import -window root root.jpg
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2530,8 +2530,8 @@ Encapsulated Postscript format use:
 
 \small
 \begin{quote}
-\begin{verbatim} 
-% import figure.eps 
+\begin{verbatim}
+% import figure.eps
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2539,11 +2539,11 @@ Encapsulated Postscript format use:
 A common problem with {\tt import} running on \htmlref{pseudo colour
 }{sc15_pseudo} displays is that the image it captures sometimes has
 the wrong colour map. To correct this use the {\tt -descend option},
-{\em e.g.\ } 
+{\em e.g.\ }
 
 \small
 \begin{quote}
-\begin{verbatim} 
+\begin{verbatim}
 % import -descend image.miff
 \end{verbatim}
 \end{quote}
@@ -2569,12 +2569,12 @@ the colours in the image before you ``animate'' them. Use {\tt
 mogrify} to colour reduce the images to a single colourmap. Full
 details can be found at \htmladdnormallink{{\tt
 http://www.wizards.dupont.com/cristy/www/animate.html}}{http://www.wizards.dupont.com/cristy/www/animate.html}.
-    
+
 \subsubsection{{\tt montage}}
 
 {\tt montage} creates a composite by combining several separate
 images. The images are tiled on the composite image with the name of
-the image optionally appearing just below the individual tile. 
+the image optionally appearing just below the individual tile.
 
 \subsubsection{{\tt convert}}
 
@@ -2582,7 +2582,7 @@ Not to be confused with the Starlink \xref{CONVERT}{sun55}{} package,
 the ImageMagick {\tt convert} program converts an input file from one
 image format to an output file with a differing image format. Various
 types of image processing can be performed on the converted image
-during the conversion process. 
+during the conversion process.
 
 For example, to convert a TIFF image to an A4 Postscript page with the
 image in the lower left corner we would use:
@@ -2590,7 +2590,7 @@ image in the lower left corner we would use:
 \small
 \begin{quote}
 \begin{verbatim}
-% convert -page A4+0+0 image.tiff document.ps 
+% convert -page A4+0+0 image.tiff document.ps
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2600,7 +2600,7 @@ Or to annotate an image with the word ``Stuff'' written in blue at position (100
 \small
 \begin{quote}
 \begin{verbatim}
-%convert -font helvetica -pen blue -draw "text 100,100 Stuff" in.jpg out.miff 
+%convert -font helvetica -pen blue -draw "text 100,100 Stuff" in.jpg out.miff
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2621,7 +2621,7 @@ For instance to scale an image to 640$\times$40 pixels we would use:
 \small
 \begin{quote}
 \begin{verbatim}
-% mogrify -geometry 640x480! image.miff 
+% mogrify -geometry 640x480! image.miff
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -2645,7 +2645,7 @@ example line output from {\tt identify} follows:
 \end{quote}
 \normalsize
 
-If {\tt -verbose} is set, expect additional output including any image comment, {\em e.g.\ } 
+If {\tt -verbose} is set, expect additional output including any image comment, {\em e.g.\ }
 
 \small
 \begin{quote}
@@ -2684,17 +2684,17 @@ Or to combine a red, green and blue colour plane into a single composite image:
 \small
 \begin{quote}
 \begin{verbatim}
-% combine -compose ReplaceGreen red.png green.png red-green.png 
+% combine -compose ReplaceGreen red.png green.png red-green.png
 % combine -compose ReplaceBlue red-green.png blue.png composite.png
 \end{verbatim}
 \end{quote}
 \normalsize
 
 \subsubsection{{\tt XTP}}
- 
+
 Not strictly an image-processing application, {\tt xtp} is a
-non-interactive replacement for {\tt ftp}.  
-    
+non-interactive replacement for {\tt ftp}.
+
 \subsubsection{XMagick}
 
 \htmladdnormallink{XMagick}{http://siag.nu/xmagick/} is a C library,
@@ -2704,7 +2704,7 @@ image format (XImage) and the native ImageMagick format (Image).
 
 The example code below, which is included in the library, reads an
 image {\tt image.xpm}, converts the Image to an XImage and back, and
-stores the result as {\tt image2.xpm}. 
+stores the result as {\tt image2.xpm}.
 
 \small
 \begin{quote}
@@ -2840,7 +2840,7 @@ The \htmladdnormallink{XV}{http://www.trilon.com/xv/} program seems to
 have been around forever, it was first released sometime during 1990,
 with the current release version being 3.10a. For a long time it was
 not only the best image manipulation package available for UNIX, it
-was the only image manipulation package available for UNIX. 
+was the only image manipulation package available for UNIX.
 
 Despite many people using it to convert images from one format to
 another, XV doesn't have any support for bulk conversions, if you want
@@ -2859,7 +2859,7 @@ Figure~\ref{sc15_xv_interface}.
 
 \myfig{sc15_xv.eps}{height=0.8\textheight}{sc15_xv.gif}{sc15_xv_interface}{The
 {\tt xv} interface along with the Color Editor Dialog (accessed from
-the Windows pull down menu).} 
+the Windows pull down menu).}
 
 While the interface is usually fairly self explanatory, the package
 has a very good online
@@ -2944,7 +2944,7 @@ information about XV licensing issues can be found
 http://www.trilon.com/xv/pricing.html}}{http://www.trilon.com/xv/pricing.html}.
 
 \subsection{\xlabel{sc15_xpaint}XPaint\label{sc15_xpaint}}
- 
+
 \htmladdnormallink{XPaint}{http://home.worldonline.dk/~torsten/xpaint/}
 is a color image editing tool which features most standard paint
 program options. It allows for the editing of multiple images
@@ -2959,7 +2959,7 @@ windows. An example of the interface in use is shown in
 Figure~\ref{sc15_xpaint_interface}.
 
 \myfig{sc15_xpaint.eps}{height=0.4\textheight}{sc15_xpaint.gif}{sc15_xpaint_interface}{The
-{\tt xpaint} interface.} 
+{\tt xpaint} interface.}
 
 \latex{More information on {\tt xpaint} can be found at {\tt
 http://home.worldonline.dk/$\sim$torsten/xpaint/}.}
@@ -2982,7 +2982,7 @@ package is shown in Figure~\ref{sc15_xfig_interface}.
 
 \myfig{sc15_xfig.eps}{height=0.4\textheight}{sc15_xfig.gif}{sc15_xfig_interface}{Creating
 a figure showing line of sight effects on a magnetically accreting
-white dwarf using the {\tt xfig} package.} 
+white dwarf using the {\tt xfig} package.}
 
 {\tt xfig} saves figures in its native format, Fig format, but they
 may be converted into various formats such as PostScript, GIF or JPEG.
@@ -2990,7 +2990,7 @@ There are other applications that are capable of producing output in
 Fig format that can subsequently be read into {\tt xfig}. For example,
 {\tt xfig} doesn't have a facility to create graphs, but tools such as
 \htmlref{GNUPLOT}{sc15_gnuplot} can create graphs and output them in
-Fig format. 
+Fig format.
 
 \latex{More information on {\tt xfig} can be found at {\tt
 http://epb1.lbl.gov/xfig/}.}
@@ -3036,7 +3036,7 @@ Figure~\ref{sc15_gimp_interface} shows the interface during a typical
 GIMP session.
 
 \myfig{sc15_gimp.eps}{height=0.8\textheight}{sc15_gimp.gif}{sc15_gimp_interface}{The
-GIMP interface.} 
+GIMP interface.}
 
 It requires the presence of the
 \htmladdnormallink{GTK+}{http://www.gtk.org/} library. If you are
@@ -3063,17 +3063,17 @@ I'd also like point you towards the following books:
 
 \begin{itemize}
 \item {\em GIMP: The Official Handbook}\\
-By Karin Kylander, Olof S. Kylander\\ 
+By Karin Kylander, Olof S. Kylander\\
 US List Price: \$49.99\\
 UK List Price: $\pounds$46.99\\
-Paperback -- 895 pages ( 3 November, 1999)\\ 
+Paperback -- 895 pages ( 3 November, 1999)\\
 Coriolis Group Books; ISBN: 1576105202
 
-\item {\em The Artists' Guide to the GIMP}\\ 
+\item {\em The Artists' Guide to the GIMP}\\
 By Hammel, Michael J.\\
 US List Price: \$39.95\\
 UK Equivalent: $\pounds$24.54\\
-Paperback -- 332 pages ( 1 December, 1998)\\ 
+Paperback -- 332 pages ( 1 December, 1998)\\
 Specialized Systems Consultants; ISBN: 1578310113
 
 \end{itemize}
@@ -3228,7 +3228,7 @@ the more commonly used (under Python) Tkinter extentions for a more
 consistent {\em look and feel} interface to the GIMP. The package
 provides an almost complete wrapper for the {\tt libgimp} plug-in
 library, and also offers {\tt Script-Fu} capabilities through the {\tt
-gimpfu} module. 
+gimpfu} module.
 
 An example of a GIMP-Python plug-in (a translation of the {\tt
 Script-Fu} clothify plug-in) is shown below, in this example the GUI
@@ -3296,7 +3296,7 @@ main()
 \end{quote}
 \normalsize
 
-The GIMP-Python manual is available as either HTML or DocBook SGML at: 
+The GIMP-Python manual is available as either HTML or DocBook SGML at:
 
 \begin{itemize}
 \item {GIMP-Python Documentation (HTML)}\\
@@ -3337,15 +3337,15 @@ example we are going to want to modify the channel levels of the
 image, since my example image was a GIF (pseudo colour) image we need
 to convert it to RGB before we start to play with it. Alot of the GIMP
 tools work only on RGB (true colour) images rather than indexed (which
-is how the GIMP refers to \htmlref{pseudo colour}{sc15_pseudo}). 
+is how the GIMP refers to \htmlref{pseudo colour}{sc15_pseudo}).
 
 This is not a problem, if your image is not RGB to begin with {\em
 right click} on the image to bring up the actions menu and choose {\sc
-Image}$\rightarrow${\sc RGB} 
+Image}$\rightarrow${\sc RGB}
 
 \myfig{sc15_gimp_layer_1.eps}{height=0.3\textheight}{sc15_gimp_layer_1.gif}{sc15_gimp_layer_1}{Larry
 Ewing's image of \htmladdnormallink{Tux the
-penguin}{http://www.woodsoup.org/projs/tux_aqfh/doc/index.html}.} 
+penguin}{http://www.woodsoup.org/projs/tux_aqfh/doc/index.html}.}
 
 We now want the Layers \& Channels dialog, so bring up the action menu
 again and choose {\sc Layers}$\rightarrow${\sc Layers \& Channels},
@@ -3360,7 +3360,7 @@ on the image, we're going to put some text in the box so it needs to
 be big enough to write in.
 
 \myfig{sc15_gimp_layer_3.eps}{height=0.3\textheight}{sc15_gimp_layer_3.gif}{sc15_gimp_layer_3}{Making
-a ``floating selection'' in GIMP.} 
+a ``floating selection'' in GIMP.}
 
 We want to select this area to work with, go to the menu and choose
 {\sc Select}$\rightarrow${\sc Float}. If you look at the Layers \&
@@ -3368,7 +3368,7 @@ Channels dialog (Figure~\ref{sc15_gimp_layer_4}) you should see that a
 ``Floating Selection'' has appeared.
 
 \myfig{sc15_gimp_layer_4.eps}{height=0.3\textheight}{sc15_gimp_layer_4.gif}{sc15_gimp_layer_4}{A
-new layer has been created for the image.} 
+new layer has been created for the image.}
 
 {\em Double click} on the Floating Selection layer in the Layers \&
 Channels dialog, a pop-up dialog will appear allowing you to rename it
@@ -3376,7 +3376,7 @@ Channels dialog, a pop-up dialog will appear allowing you to rename it
 text layer, so call it something appropriate like ``text Box''.
 
 \myfig{sc15_gimp_layer_5.eps}{height=0.1\textheight}{sc15_gimp_layer_5.gif}{sc15_gimp_layer_5}{The
-pop-up dialog.} 
+pop-up dialog.}
 
 Make sure the new layer is selection in the Layers \& Channels dialog
 (see Figure~\ref{sc15_gimp_layer_6}).
@@ -3387,7 +3387,7 @@ renamed text layer is selected in the dialog.}
 Back to the image and bring up the menu, select {\sc
 Image}$\rightarrow${\sc Colors}$\rightarrow${\sc Levels} to bring up
 the Levels dialog (see Figure~\ref{sc15_gimp_layer_7}).
- 
+
 \myfig{sc15_gimp_layer_7.eps}{height=0.3\textheight}{sc15_gimp_layer_7.gif}{sc15_gimp_layer_7}{The
 GIMP Levels dialog.}
 
@@ -3398,15 +3398,15 @@ preview} button above this slider is selected you should see out text
 box getting darker. If you are not sure what I'm talking about here
 compare Figure~\ref{sc15_gimp_layer_7} (before) and
 Figure~\ref{sc15_gimp_layer_8} (after).
- 
+
 \myfig{sc15_gimp_layer_8.eps}{height=0.3\textheight}{sc15_gimp_layer_8.gif}{sc15_gimp_layer_8}{The
-Levels dialog again, note the position of the bottom slider.} 
+Levels dialog again, note the position of the bottom slider.}
 
 Hit {\sc OK} and the you should end up with something like
 Figure~\ref{sc15_gimp_layer_9}.
 
 \myfig{sc15_gimp_layer_9.eps}{height=0.3\textheight}{sc15_gimp_layer_9.gif}{sc15_gimp_layer_9}{Tux
-with his darkened text layer.} 
+with his darkened text layer.}
 
 Now we want some text, bring up the menu and select {\sc
 Tools}$\rightarrow${\sc Text}. Alternatively, you can also go to the
@@ -3422,7 +3422,7 @@ side of the control panel, or {\sc Tools}$\rightarrow${\sc Move} from
 the action menu).
 
 \myfig{sc15_gimp_layer_10.eps}{height=0.3\textheight}{sc15_gimp_layer_10.gif}{sc15_gimp_layer_10}{The
-GIMP Text dialog.} 
+GIMP Text dialog.}
 
 If you look at your Layers \& Channels dialog again you'll see that
 the the text has appeared as another ``Floating Selection''. We've
@@ -3432,7 +3432,7 @@ image, see Figure~\ref{sc15_gimp_layer_11}
 
 \myfig{sc15_gimp_layer_11.eps}{height=0.3\textheight}{sc15_gimp_layer_11.gif}{sc15_gimp_layer_11}{Our
 Tux image with text added as additional layers ontop of the box we
-prepared earlier.} 
+prepared earlier.}
 
 Figure~\ref{sc15_gimp_layer_12} shows the Layers \& Channels dialog
 after adding two additional layers with the {\sc Text Tool}, the first
@@ -3440,17 +3440,17 @@ text layer is selected (which is why the words ``Tux the Penguin'' are
 surrounded with a dotted line in Figure~\ref{sc15_gimp_layer_11}.
 
 \myfig{sc15_gimp_layer_12.eps}{height=0.3\textheight}{sc15_gimp_layer_12.gif}{sc15_gimp_layer_12}{The
-Layers \& Channels dialog again with the first text layer selected.} 
+Layers \& Channels dialog again with the first text layer selected.}
 
 Click on the ``Background'' layer in the Layers \& Channels dialog,
 and you should be left with something like the pen-ultimate figure in
 the series, Figure~\ref{sc15_gimp_layer_13}.
 
 \myfig{sc15_gimp_layer_13.eps}{height=0.3\textheight}{sc15_gimp_layer_13.gif}{sc15_gimp_layer_13}{The
-final product, Tux with text.} 
+final product, Tux with text.}
 
 \myfig{sc15_gimp_layer_14.eps}{height=0.3\textheight}{sc15_gimp_layer_14.gif}{sc15_gimp_layer_14}{The
-GIMP File dialog.} 
+GIMP File dialog.}
 
 Now select {\sc File}$\rightarrow${\sc Save As} from the action menu,
 see Figure~\ref{sc15_gimp_layer_14}, to bring up the File dialog.
@@ -3493,13 +3493,13 @@ images more complex objects, however the version I was using (v1.0.4,
 shipped with RedHat 6.0) only allows you to map objects to a sphere
 (see Figure~\ref{sc15_gimp_map_2}) or a plane (see
 Figure~\ref{sc15_gimp_map_3}).
- 
+
 \myfig{sc15_gimp_map_2.eps}{height=0.4\textheight}{sc15_gimp_map_2.gif}{sc15_gimp_map_2}{Star
 spot image mapped on sphere illuminated from the upper left quadrant
-by a point source.} 
+by a point source.}
 
 \myfig{sc15_gimp_map_3.eps}{height=0.4\textheight}{sc15_gimp_map_3.gif}{sc15_gimp_map_3}{Star
-spot image projected on plane.} 
+spot image projected on plane.}
 
 Another interesting thing that you can do with the mapping functions
 in the GIMP is bump map our image (see Figure~\ref{sc15_gimp_map_4})
@@ -3510,22 +3510,22 @@ Blur}$\rightarrow${\sc Gaussian Blur (IIR)}, to soften the effect. The
 bump mapped image can be seen in mapped onto a plane in
 Figure~\ref{sc15_gimp_map_5}. The {\sc Map Object} dialog can be seen
 in \latex{Figures~\ref{sc15_gimp_map_6}, \ref{sc15_gimp_map_7},
-\ref{sc15_gimp_map_8} and \ref{sc15_gimp_map_9}.} 
+\ref{sc15_gimp_map_8} and \ref{sc15_gimp_map_9}.}
 \begin{htmlonly}
  Figure~\ref{sc15_gimp_map_anim}.
 \end{htmlonly}
 
 \myfig{sc15_gimp_map_4.eps}{height=0.4\textheight}{sc15_gimp_map_4.gif}{sc15_gimp_map_4}{Star
-spot image with an inverse bump map and gaussian blur.} 
+spot image with an inverse bump map and gaussian blur.}
 
 \myfig{sc15_gimp_map_5.eps}{height=0.4\textheight}{sc15_gimp_map_5.gif}{sc15_gimp_map_5}{Bump
-mapped star spot image projected on a plane} 
+mapped star spot image projected on a plane}
 
 \begin{latexonly}
-\myfig{sc15_gimp_map_6.eps}{height=0.4\textheight}{sc15_gimp_map_6.gif}{sc15_gimp_map_6}{The GIMP Map Object Dialog ``Options''} 
-\myfig{sc15_gimp_map_7.eps}{height=0.4\textheight}{sc15_gimp_map_7.gif}{sc15_gimp_map_7}{The GIMP Map Object Dialog ``Light''} 
+\myfig{sc15_gimp_map_6.eps}{height=0.4\textheight}{sc15_gimp_map_6.gif}{sc15_gimp_map_6}{The GIMP Map Object Dialog ``Options''}
+\myfig{sc15_gimp_map_7.eps}{height=0.4\textheight}{sc15_gimp_map_7.gif}{sc15_gimp_map_7}{The GIMP Map Object Dialog ``Light''}
 \myfig{sc15_gimp_map_8.eps}{height=0.4\textheight}{sc15_gimp_map_8.gif}{sc15_gimp_map_8}{The GIMP Map Object Dialog ``Material''}
-\myfig{sc15_gimp_map_9.eps}{height=0.4\textheight}{sc15_gimp_map_9.gif}{sc15_gimp_map_9}{The GIMP Map Object Dialog ``Orientation''} 
+\myfig{sc15_gimp_map_9.eps}{height=0.4\textheight}{sc15_gimp_map_9.gif}{sc15_gimp_map_9}{The GIMP Map Object Dialog ``Orientation''}
 \end{latexonly}
 \begin{htmlonly}
     \label{sc15_gimp_map_anim} \htmladdimg{sc15_gimp_map_anim.gif}\\
@@ -3549,7 +3549,7 @@ facilities. An example of the Electric Eyes interface, which is
 typically GNOMEish, is shown in Figure~\ref{sc15_ee_example}
 
 \myfig{sc15_ee.eps}{height=0.7\textheight}{sc15_ee.gif}{sc15_ee_example}{The
-Electric Eyes interface.} 
+Electric Eyes interface.}
 
 If you have GNOME\latex{, for more information see {\tt
 http://www.gnome.org/},} installed then Electric Eye will likely also
@@ -3570,11 +3570,11 @@ http://www.msg.net/utility/whirlgif/}.} For example:
 \end{verbatim}
 \end{quote}
 \normalsize
- 
+
 would create an animated GIF (directed to standard out) from all files
 in the current directory fitting the pattern {\tt file*.gif}, which
 would loop five times before stoping and have colour {\tt \#00f10e}
-set to be the transparent index. While: 
+set to be the transparent index. While:
 
 \small
 \begin{quote}
@@ -3588,7 +3588,7 @@ would create an animated GIF (called {\tt out.gif}) from the files
 {\tt a.gif}, {\tt b.gif}, {\tt c.gif}, {\tt d.gif} and {\tt e.gif}.
 The {\tt d.gif} file would be displayed for 1s, while the remaining
 frames would be displayed for only 50ms each (delays are in units of
-$1/100$ th of a second). 
+$1/100$ th of a second).
 
 \section{\xlabel{sc15_qcad}CAD Applications\label{sc15_qcad}}
 
@@ -3646,12 +3646,12 @@ discussed in depth in SUN/55.}
 Starting up the CONVERT package will also set up defaults for the
 \xref{automatic NDF conversion}{sun55}{sect_auto} facilities to enable
 applications which use the \xref{NDF}{sun33}{} library to read and
-write most of the file formats handled by the CONVERT package. 
+write most of the file formats handled by the CONVERT package.
 
 An application to convert NDF to a \htmlref{PBMplus}{sc15_pbmplus}
 format PGM file is one of the conversion utilities available, so
 further conversion (to formats not handled by CONVERT) can be carried
-out using the PBMplus package. 
+out using the PBMplus package.
 
 \subsubsection{NDF2GIF}
 
@@ -3704,7 +3704,7 @@ Postscript file you'd use something that looks like:
 \small
 \begin{quote}
 \begin{verbatim}
-% rasttopnm < infile | pnmtops > outfile 
+% rasttopnm < infile | pnmtops > outfile
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -3765,7 +3765,7 @@ PDF interpreter implemented in hardware, {\em i.e.\ }you can not sent
 a PDF file directly to the printer but must first convert it to
 PostScript using display software such as Adobe
 \htmlref{Acrobat}{sc15_acrobat}.
- 
+
 \subsection{\xlabel{sc15_gs}Ghostscript\label{sc15_gs}}
 
 The \htmladdnormallink{Ghostscript}{http://www.cs.wisc.edu/~ghost/}
@@ -3777,7 +3777,7 @@ as an interpreter for Portable Document Format (PDF) files, with the
 much the same capabilities. Finally the suite also contains a C
 subroutine library (the Ghostscript library) that implements the
 graphics capabilities that appear as primitive operations in the
-PostScript language. 
+PostScript language.
 
 There are actually two different versions of
 \htmladdnormallink{Ghostscript}{http://www.cs.wisc.edu/~ghost/aladdin/index.html},
@@ -3808,7 +3808,7 @@ is a full fuction X Windows interface for the
 and Ghostscript function as two cooperating programs. Ghostview
 creates the viewing window and Ghostscript draws in it. The GUI is
 fairly self explanatory, however the application ships with an
-extensive manual page (type {\tt man ghostview} at the UNIX prompt). 
+extensive manual page (type {\tt man ghostview} at the UNIX prompt).
 
 \htmladdnormallink{GV}{http://www.cs.wisc.edu/~ghost/gv/index.html} is
 a version of Ghostview that was modified for VMS, some enhancements
@@ -3821,7 +3821,7 @@ be seen in Figure~\ref{sc15_gv_interface}. Further information on GV
 and Ghostview can be found at \htmladdnormallink{{\tt
 http://www.cs.wisc.edu/$\sim$ghost/}}{http://www.cs.wisc.edu/~ghost/}.
 
-\myfig{sc15_gv.eps}{height=0.6\textheight}{sc15_gv.gif}{sc15_gv_interface}{The GV interface.} 
+\myfig{sc15_gv.eps}{height=0.6\textheight}{sc15_gv.gif}{sc15_gv_interface}{The GV interface.}
 
 \subsection{\xlabel{sc15_acrobat}Acrobat\label{sc15_acrobat}}
 
@@ -3863,7 +3863,7 @@ first command-line argument. Usage is:
 
 The output file will be given the same base name as the input file,
 with its file extension set to one of {\tt .html} or {\tt .txt},
-according to the first command-line argument. 
+according to the first command-line argument.
 
 {\tt prescript} uses a PostScript interpreter, normally \htmlref{{\tt
 gs}}{sc15_gs}, to execute the PostScript program, so that even text
@@ -3871,7 +3871,7 @@ that is generated programmatically, rather than being explicitly
 present in PostScript strings, can be extracted. Particular attention
 is paid to heuristic recognition of word breaks, to reconstruction of
 words hyphenated at line breaks, to preservation of paragraph breaks,
-and to recognition of \TeX ligatures. 
+and to recognition of \TeX ligatures.
 
 The {\tt prescript} program can be downloaded from
 \htmladdnormallink{{\tt
@@ -3881,7 +3881,7 @@ A possible substitute for {\tt prescript} is the
 \htmladdnormallink{{\tt
 pstotext}}{http://www.research.digital.com/SRC/virtualpaper/pstotext.html}
 utility. \latex{ More information can be found at {\tt
-http://www.research.digital.com/SRC/virtualpaper/pstotext.html}.} 
+http://www.research.digital.com/SRC/virtualpaper/pstotext.html}.}
 
 \subsection{\xlabel{sc15_pstopdf}Postscript to PDF\label{sc15_pstopdf}}
 
@@ -3901,7 +3901,7 @@ manipulating PostScript documents. Programs included are {\tt psnup},
 for placing out several logical pages on a single sheet of paper, {\tt
 psselect}, for selecting pages from a document, {\tt pstops}, for
 general imposition, {\tt psbook}, for signature generation for booklet
-printing, and {\tt psresize}, for adjusting page sizes. 
+printing, and {\tt psresize}, for adjusting page sizes.
 
 \begin{itemize}
 
@@ -3909,12 +3909,12 @@ printing, and {\tt psresize}, for adjusting page sizes.
 
 The {\tt psbook} program rearranges pages from a PostScript document
 into ``signatures'' for printing books or booklets, creating a new
-PostScript file. 
+PostScript file.
 
-Usage is: 
+Usage is:
 
 \begin{quote}
-\verb+   psbook [ -q ] [ -s+{\em signature}\verb+ ] [ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+ 
+\verb+   psbook [ -q ] [ -s+{\em signature}\verb+ ] [ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+
 \end{quote}
 
 Where {\tt -q} surpresses printing of page numbers below the pages
@@ -3923,7 +3923,7 @@ being rearranged (by default page numbers are printed), and {\tt
 The signature size is the number of sides which will be folded and
 bound together; the number given should be a multiple of four. The
 default is to use one signature for the whole file. Extra blank sides
-will be added if the file does not contain a multiple of four pages.  
+will be added if the file does not contain a multiple of four pages.
 
 \item {\tt psnup}
 
@@ -3931,7 +3931,7 @@ The {\tt psnup} program puts multiple logical pages onto each physical
 sheet of paper. The potential use of this utility is varied but one
 particular use is in conjunction with {\tt psbook}. For example, using
 {\tt groff} to create a PostScript document and {\tt lpr} as the UNIX
-print spooler a typical command line might look like this: 
+print spooler a typical command line might look like this:
 
 \small
 \begin{quote}
@@ -3945,7 +3945,7 @@ Where file is a four-page document this command will result in a
 two-page document printing two pages of file per page and rearranges
 the page order to match the input Pages 4 and 1 on the first output
 page and Pages 2 then 3 of the input document on the second output
-page. 
+page.
 
 Usage is:
 
@@ -3953,7 +3953,7 @@ Usage is:
 \verb+   psnup [ -w+{\em width}\verb+ ] [ -h+{\em height}\verb+ ] [ -p+{\em paper}\verb+ ] [ -W+{\em width}\verb+ ] [ -H+{\em height}\verb+ ]+\\
 \verb+         [ -P+{\em paper}\verb+ ] [ -l ] [ -r ] [ -f ] [ -c ] [ -m+{\em margin}\verb+ ]+\\
 \verb+         [ -b+{\em border}\verb+ ] [ -d+{\em lwidth}\verb+ ] [ -s+{\em scale} ] [ -+{\em nup}\verb+ ] [ -q ]+\\
-\verb+         [ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+ 
+\verb+         [ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+
 \end{quote}
 
 The {\tt -w} option gives the paper width, and the {\tt -h} option
@@ -3961,39 +3961,39 @@ gives the paper height, normally specified in `cm' or `in' to convert
 PostScript's points (1/72 of an inch) to centimeters or inches. The
 {\tt -p} option can be used as an alternative, to set the paper size
 to A3, A4, A5, B5, letter, legal, tabloid, statement, executive,
-folio, quarto or 10x14. The default paper size is A4. 
+folio, quarto or 10x14. The default paper size is A4.
 
 The {\tt -W}, {\tt -H}, and {\tt -P} options set the input paper size,
 if it is different from the output size. This makes it easy to impose
-pages of one size on a different size of paper. 
+pages of one size on a different size of paper.
 
 The {\tt -l} option should be used for pages which are in landscape
 orientation (rotated 90 degrees anticlockwise). The {\tt -r} option
 should be used for pages which are in seascape orientation (rotated 90
 degrees clockwise), and the {\tt -f} option should be used for pages
-which have the width and height interchanged, but are not rotated. 
+which have the width and height interchanged, but are not rotated.
 
 Psnup normally uses ``row-major'' layout, where adjacent pages are
 placed in rows across the paper. The {\tt -c} option changes the order
 to ``column-major'', where successive pages are placed in columns down
-the paper. 
+the paper.
 
 A margin to leave around the whole page can be specified with the {\tt
 -m} option. This is useful for sheets of ``thumbnail'' pages, because
 the normal page margins are reduced by putting multiple pages on a
-single sheet. 
+single sheet.
 
 The {\tt -b} option is used to specify an additional margin around
-each page on a sheet. 
+each page on a sheet.
 
 The {\tt -d} option draws a line around the border of each page, of
 the specified width. If the {\em lwidth} parameter is omitted, a
 default linewidth of 1 point is assumed. The linewidth is relative to
 the original page dimensions, {\em i.e.\ }it is scaled down with the
-rest of the page. 
+rest of the page.
 
 The scale chosen by psnup can be overridden with the {\tt -s} option.
-This is useful to merge pages which are already reduced. 
+This is useful to merge pages which are already reduced.
 
 The {\tt -}{\em nup} option selects the number of logical pages to put
 on each sheet of paper. This can be any whole number; psnup tries to
@@ -4002,12 +4002,12 @@ psnup cannot find a layout within its tolerance limit, it will abort
 with an error message. The alternative form {\tt -n }{\em nup} can
 also be used, for compatibility with other n-up programs. {\tt psnup}
 normally prints the page numbers of the pages re-arranged; the {\tt
--q} option suppresses this feature. 
+-q} option suppresses this feature.
 
 \item {\tt psselect}
 
 The {\tt psselect} program selects pages from a PostScript document,
-creating a new PostScript file. Usage is: 
+creating a new PostScript file. Usage is:
 
 \begin{quote}
 \verb+   psselect [ -q ] [ -e ] [ -o ] [ -r ] [ -p+{\em pages}\verb+ ] [ +{\em pages}\verb+ ]+\\
@@ -4019,7 +4019,7 @@ used in conjunction with the other page selection options to select
 the even pages from a range of pages, alternatively the {\tt -o}
 option selects all of the odd pages; it also may be used in
 conjunction with the other page selection options.
- 
+
 The {\tt -p}{\em pages} option specifies the pages which are to be
 selected. Pages is a comma-separated list of page ranges, each of
 which may be a page number, or a page range of the form first-last. If
@@ -4027,14 +4027,14 @@ first is omitted, the first page is assumed, and if last is omitted,
 the last page is assumed. The prefix character ``\_'' indicates that
 the page number is relative to the end of the document, counting
 backwards. If just this character with no page number is used, a blank
-page will be inserted in the output. 
+page will be inserted in the output.
 
-The {\tt -r} option causes psselect to output the selected pages in reverse order. 
+The {\tt -r} option causes psselect to output the selected pages in reverse order.
 
 {\tt psselect} normally prints the page numbers of the pages
 rearranged; the {\tt -q} option suppresses this.  If any of the {\tt
 -r}, {\tt -e}, or {\tt -o} options are specified, the page range must
-be given with the {\tt -p} option. 
+be given with the {\tt -p} option.
 
 \item {\tt pstops}
 
@@ -4051,14 +4051,14 @@ Usage is:
 \verb+          +{\em pagespecs} \verb+[ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+
 \end{quote}
 
-where {\em pagespecs} follow the syntax: 
+where {\em pagespecs} follow the syntax:
 
 \small
 \begin{quote}
 \begin{verbatim}
-    pagespecs = [modulo:]specs 
-    specs = spec[+specs][,specs] 
-    spec = [-]pageno[L][R][U][@scale][(xoff,yoff)] 
+    pagespecs = [modulo:]specs
+    specs = spec[+specs][,specs]
+    spec = [-]pageno[L][R][U][@scale][(xoff,yoff)]
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -4080,10 +4080,10 @@ page is relative to the end of the document, instead of the start. If
 page {\em specs} are separated by `{\tt +}' the pages will be merged
 into one page; if they are separated by `{\tt ,}' they will be on
 separate pages. If there is only one page specification, with {\em
-pageno} zero, it may be omitted. 
+pageno} zero, it may be omitted.
 
 The shift, rotation, and scaling are performed in that order
-regardless of which order they appear on the command line. 
+regardless of which order they appear on the command line.
 
 The {\tt -w} option gives the width which is used by the `{\tt w}'
 dimension specifier, and the {\tt -h} option gives the height which is
@@ -4091,17 +4091,17 @@ used by the `{\tt h}' dimension specifier. These dimensions are also
 used (after scaling) to set the clipping path for each page. The {\tt
 -p} option can be used as an alternative, to set the paper size to A3,
 A4, A5, B5, letter, legal, tabloid, statement, executive, folio,
-quarto or 10x14. The default paper size is A4. 
+quarto or 10x14. The default paper size is A4.
 
 The {\tt -b} option prevents any bind operators in the PostScript
 prolog from binding. This may be needed in cases where complex
-multi-page re-arrangements are being done. 
+multi-page re-arrangements are being done.
 
 The {\tt -d} option draws a line around the border of each page, of
 the specified width. If the lwidth parameter is omitted, a default
 linewidth of 1 point is assumed. The linewidth is relative to the
 original page dimensions, {\em i.e.\ }it is scaled up or down with the
-rest of the page. 
+rest of the page.
 
 {\tt pstops} normally prints the page numbers of the pages
 re-arranged; the {\tt -q} option suppresses this feature.
@@ -4113,7 +4113,7 @@ different size of paper. Usage is:
 
 \begin{quote}
 \verb+   psresize [ -w+{\em width}\verb+ ] [ -h+{\em height}\verb+ ] [ -p+{\em paper}\verb+ ] [ -W+{\em width}\verb+ ] [ -H+{\em height}\verb+ ]+\\
-\verb+            [ -P+{\em paper}\verb+ ] [ -q ] [ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+ 
+\verb+            [ -P+{\em paper}\verb+ ] [ -q ] [ +{\em infile}\verb+ [ +{\em outfile}\verb+ ] ]+
 \end{quote}
 
 The {\tt -w} option gives the output paper width, and the {\tt -h}
@@ -4126,7 +4126,7 @@ default output paper size is A4. The {\tt -W} option gives the input
 paper width, and the {\tt -H} option gives the input paper height. The
 {\tt -P} option can be used as an alternative, to set the input paper
 size. {\tt psresize} normally prints the page numbers of the pages
-output; the {\tt-q} option suppresses this feature. 
+output; the {\tt-q} option suppresses this feature.
 
 \end{itemize}
 
@@ -4178,8 +4178,8 @@ lookup table each of which holds the intensity of the appropriate primary
 colour. A typical configuration is a frame buffer with 24 bits per pixel
 divided into three 8 bit fields each of which addresses a 256 entry colour
 table with 8 bits per entry. Such a configuration will be described by a
-manufacturer as supporting 2$^{24}$ (16 million) colours out of a palette 
-of 16 million. 
+manufacturer as supporting 2$^{24}$ (16 million) colours out of a palette
+of 16 million.
 
 \subsection{\xlabel{sc15_true}Truecolor\label{sc15_true}}
 
@@ -4196,7 +4196,7 @@ pseudocolor or directcolor and supporting both in the same application
 is not trivial---different X lib calls are needed for setting the colour
 tables in the two models and the way that images are formatted is
 different. This means that there are still plenty of application in use
-that display pseudocolor on a directcolor or truecolor display. 
+that display pseudocolor on a directcolor or truecolor display.
 Most modern hardware supports both pseudocolor and directcolor with a
 24 bit frame buffer and you are typically given the choice of either 8 bit
 pseudocolor or 24-bit directcolor (or 24-bit truecolor---more on
@@ -4221,7 +4221,7 @@ that satisfy this condition. The end result is that if you want to be able
 to change the colours of things without effecting the colours of anything
 drawn with a different colour you find that you are back to only 256
 colours---exactly what you get with 8-bit pseudocolor (and for 1 third
-of the video memory). 
+of the video memory).
 
 So, for a typical astronomical image display application which enables
 you to adjust the colour table interactively you are no better off
@@ -4238,7 +4238,7 @@ which has a {\tt -visual} qualifier that enables you to select the visual type
 when you start the application. One undesirable consequence of running
 applications with different visual types on the same display is ``colour
 flashing'' where as the focus moves to one application the display of
-others is garbled. This effect is only absent on very high-end hardware. 
+others is garbled. This effect is only absent on very high-end hardware.
 
 Many X servers allow the default visual type to be specified when they are
 started (sometimes indirectly by specifying the frame buffer depth---{\em e.g.\ }8 implies pseudocolor while 24 implies truecolor). The choice of
@@ -4375,7 +4375,7 @@ Truecolor displays. Effectively you use VNC to display a
 self-contained 8-bit Pseudocolor X display on your desktop, programs
 which require such a display will then run happily in that window, and
 colour hungry applications which can run in True color can run outside
-it. 
+it.
 
 With \htmladdnormallink{VNC}{http://www.uk.research.att.com/vnc/}
 installed on your system, and the binaries in your {\tt PATH}, to
@@ -4385,7 +4385,7 @@ server using:
 \small
 \begin{quote}
 \begin{verbatim}
-% vncserver -cc 3 -depth 8 
+% vncserver -cc 3 -depth 8
 
         New 'X' desktop is mypc:1
 
@@ -4398,7 +4398,7 @@ server using:
 The first time you do this, you will be asked for a password for
 protecting your VNC sessions. This can be the same or different from
 the password you use for logging in on that computer. Choose it in the
-same way as you would a normal Unix password. 
+same way as you would a normal Unix password.
 
 You must then start a VNC viewer using the display numebr reported by
 the preceeding command:
@@ -4418,21 +4418,21 @@ vncserver}. A window will now pop up on your screen, this is a new X
 Windows desktop. Run Starlink programs from xterms in that window, and
 they will pop up as sub-windows in that window and run without
 problem. Outside that window, the X display will carry on working as
-normal. 
+normal.
 
 When you have finished with the pseudocolour desktop, close down the
 windows as in a normal X session and terminate the server, using the
-display number again: 
+display number again:
 
 \small
 \begin{quote}
 \begin{verbatim}
-% vncserver -kill :1    
+% vncserver -kill :1
 \end{verbatim}
 \end{quote}
-\normalsize   
+\normalsize
  \myfig{sc15_vnc.eps}{height=0.45\textheight}{sc15_vnc.gif}{sc15_vnc_example1}{VNC displaying a pseudo colour desktop on a true colour display.}
- 
+
 Figure~\ref{sc15_vnc_example1} illustrates several aspects of the VNC
 system. Here we show a Pseudocolor VNC X Windows desktop
 (1024$\times$768 pixels) running the {\tt twm} window manager on a DEC
@@ -4442,7 +4442,7 @@ desktop is being displayed ontop of a True colour X Windows desktop
 on a Linux PC.
 
 You can customise the size of the pop up desktop by using the command
-line option {\tt -geometry}, {\em e.g.\ } 
+line option {\tt -geometry}, {\em e.g.\ }
 
 \small
 \begin{quote}
@@ -4471,7 +4471,7 @@ ever increasing number of unused servers running on the system. If
 it's more convenient, you can simply close the VNC viewer window at
 the end of a session, and next time you wish to use it start {\tt
 vncviewer} again, without having to rerun {\tt vncserver}, and your
-desktop will be exactly as you left it. 
+desktop will be exactly as you left it.
 
 \subsubsection{Computing by remote control}
 
@@ -4479,7 +4479,7 @@ desktop will be exactly as you left it.
 comes in other flavours, with versions for many different operating
 systems. If you think hard enough you can come up with lots of
 different possible uses, but one that has proved useful for teaching
-is the remote control of single user machines. 
+is the remote control of single user machines.
 
 If you run a VNC server on a MS Windows PC and display the screen on
 your UNIX workstation (or even another Windows machine) you can
@@ -4537,7 +4537,7 @@ requires repartitioning a disk. By contrast, VMware allows multiple
 operating systems to run simultaneously on the same computer. VMware
 can work with existing disk partitions on an IDE drive or can support
 new operating systems in VMware logical disks without the need to
-repartition a disk. 
+repartition a disk.
 
 \myfig{sc15_vmware2.eps}{height=0.42\textheight}{sc15_vmware2.gif}{sc15_vmware_example2}{VMWare
 booting the virtual machine using Linux as the ``host'' OS.}
@@ -4608,7 +4608,7 @@ The \htmladdnormallink{SANE Project}{http://www.mostang.com/sane/}
 attempts to provide a standardised application programming interface
 (API) for access to any raster image scanner hardware (flatbed
 scanner, hand-held scanner, video- and still-cameras, frame-grabbers,
-{\em etc.}). 
+{\em etc.}).
 
 The SANE package is divided into two parts: a selection of {\em
 backend} hardware drivers which support scanners from different
@@ -4694,7 +4694,7 @@ matches the color of the pixel you selected and is a neighbour.
 Select your transparent pixel with the pointer and press a button. The
 image is redisplayed with any transparent pixels recolored to the
 background color. You can select other pixels or areas to force to
-transparent. When you are satisfied, press {\tt Return}. 
+transparent. When you are satisfied, press {\tt Return}.
 
 Alternatively you can do this from the command line using the
 \htmladdnormallink{{\tt
@@ -4740,11 +4740,11 @@ To set colour index zero a the transparent colour you would then use:
 
 You can also specify the color as an RGB triple or an X Windows color
 name; invoke {\tt giftrans} with the -? option to see a complete usage
-description. 
+description.
 
 If you intend to use GIF images on your web pages, you should make
 yourself aware of the \htmlref{legal position}{sc15_giflegal} before
-proceeding. 
+proceeding.
 
 \subsection{\xlabel{sc15_animated}Animated GIFs\label{sc15_animated}}
 
@@ -4778,7 +4778,7 @@ sequence. For example, if the delay was 20, 10, and 5, use:
 \end{quote}
 \normalsize
 
-Use {\tt -page} to specify the left and top locations of the image frame: 
+Use {\tt -page} to specify the left and top locations of the image frame:
 
 \small
 \begin{quote}
@@ -4789,7 +4789,7 @@ Use {\tt -page} to specify the left and top locations of the image frame:
 \end{quote}
 \normalsize
 
-If you want the image to loop within Netscape, use {\tt -loop} option, for instance: 
+If you want the image to loop within Netscape, use {\tt -loop} option, for instance:
 
 \small
 \begin{quote}
@@ -4811,14 +4811,14 @@ to split a GIF animation into individual image files, {\em e.g.\ }
 \normalsize
 
 The resulting image files are titled {\tt frame01.gif}, {\tt
-frame02.gif}, {\tt frame03.gif}, {\em etc.} 
+frame02.gif}, {\tt frame03.gif}, {\em etc.}
 
 If you intend to use GIF images on your web pages, you should make
 yourself aware of the \htmlref{legal position}{sc15_giflegal} before
 proceeding.
-  
+
 \subsection{\xlabel{sc15_bevel}Beveled Images\label{sc15_bevel}}
-        
+
 Again, most packages including the \htmlref{GIMP}{sc15_gimp} and
 \htmlref{ImageMagick}{sc15_magick} will allow you to add borders to
 your image to make buttons.
@@ -4827,8 +4827,8 @@ The simplest method is using the GIMP. Make sure you are working on an
 RGB image (using {\sc Image}$\rightarrow${RGB}) and then select {\sc
 Script-Fu}$\rightarrow${\sc Decor}$\rightarrow${\sc Add Bevel}. You'll
 be queried as to the width of the bevel in pixels, and it will then be
-automagically generated for you.  
-  
+automagically generated for you.
+
 \subsection{\xlabel{sc15_websafe}``Web Safe'' Colour Maps\label{sc15_websafe}}
 
 Netscape predefines 216 colours for colour mapped (\htmlref{pseudo
@@ -4857,7 +4857,7 @@ netscape}}{http://www.netscape.com}. Details of the extent of PNG
 support implemented into the different browsers are listed at
 \htmladdnormallink{{\tt
 http://www.libpng.org/pub/png/pngapbr.html}}{http://www.libpng.org/pub/png/pngapbr.html}.
-    
+
 \section{\xlabel{sc15_giflegal}The GIF Legal Position\label{sc15_giflegal}}
 
 The Lempel-Ziv-Welsh (LZW) compression algorithm is
@@ -4866,7 +4866,7 @@ by UniSys.  This algorithim is used in the GIF image standard to store
 the image data inside the GIF image, and because of this software
 which creates GIFs are subject to licensing fees by UniSys. However
 Unisys has refused to issue licences to open-source software producers
-for the use of LZW. 
+for the use of LZW.
 
 While this contraversy has being going on for several years, Unisys
 \htmladdnormallink{recently}{http://www.unisys.com/unisys/lzw/lzw-license.asp}
@@ -4883,7 +4883,7 @@ from this decision.
 While it is debatable whether the patent covers LZW decompressors,
 while the Open Source community take the view that it does not, Unisys
 argues otherwise. It is possible you may be liable if you distribute
-code which implements LZW decompression. 
+code which implements LZW decompression.
 
 For a history of the patent controversy, see \htmladdnormallink{{\tt
 http://lpf.ai.mit.edu/Patents/Gif/Gif.html}}{http://lpf.ai.mit.edu/Patents/Gif/Gif.html}
@@ -4954,9 +4954,9 @@ examples of such tinkering are shown in the script (shown below).
 #     generate an mpeg animation file.
 
 #  Description:
-#     The script tries to find the files ( *.FITS) which must be in 
+#     The script tries to find the files ( *.FITS) which must be in
 #     the correct order when listed with ls. The program then generates
-#     the pnm files in the local directory and finally produces the 
+#     the pnm files in the local directory and finally produces the
 #     mpeg animation.
 
 #  Authors:
@@ -5003,7 +5003,7 @@ foreach file (*.sdf)
 #    rm -f $file
 
 
-# Optional pgm image manipulation 
+# Optional pgm image manipulation
 # NB: Final image must be animframe$i.pgm, hence mv command
 # e.g. Scaling by a factor 0.25
 #
@@ -5019,7 +5019,7 @@ foreach file (*.sdf)
 end
 
 @ i = $i - 1
-    
+
 echo "Total number of frames is $i"
 echo "Editing the default.param file to set this value"
 
@@ -5054,7 +5054,7 @@ mpeg_encode default.param
 \htmladdnormallink{{\tt http://www.libpng.org/pub/png/pngcode.html}}{http://www.libpng.org/pub/png/pngcode.html}
 
  \item {\bf\label{sc15_available_libungif}{\tt libungif}}\\
-\htmladdnormallink{{\tt http://prtr-13.ucsc.edu/$\sim$badger/software/libungif/index.shtml}}{http://prtr-13.ucsc.edu/~badger/software/libungif/index.shtml} 
+\htmladdnormallink{{\tt http://prtr-13.ucsc.edu/$\sim$badger/software/libungif/index.shtml}}{http://prtr-13.ucsc.edu/~badger/software/libungif/index.shtml}
 
 \item {\bf\label{sc15_available_pgplot}PGPLOT}\\
 \htmladdnormallink{{\tt http://astro.caltech.edu/$\sim$tjp/pgplot/index.html}}{http://astro.caltech.edu/~tjp/pgplot/index.html}
@@ -5073,33 +5073,33 @@ mpeg_encode default.param
 
 \item {\bf\label{sc15_available_qdp}QDP}\\
 \htmladdnormallink{{\tt http://heasarc.gsfc.nasa.gov/docs/software/ftools/ftools\_menu.html}}{http://heasarc.gsfc.nasa.gov/docs/software/ftools/ftools\_menu.html}
- 
+
 \item {\bf\label{sc15_available_pongo}PONGO}\\
-\htmladdnormallink{{\tt http://www.starlink.ac.uk/}}{http://www.starlink.ac.uk/}  
+\htmladdnormallink{{\tt http://www.starlink.ac.uk/}}{http://www.starlink.ac.uk/}
 
 \item {\bf\label{sc15_available_vnc}VNC}\\
-\htmladdnormallink{{\tt http://www.uk.research.att.com/vnc/}}{http://www.uk.research.att.com/vnc/} 
+\htmladdnormallink{{\tt http://www.uk.research.att.com/vnc/}}{http://www.uk.research.att.com/vnc/}
 
 \item {\bf\label{sc15_available_zlib}{\tt zlib}}\\
-\htmladdnormallink{{\tt ftp://ftp.freesoftware.com/pub/infozip/zlib/index.html}}{ftp://ftp.freesoftware.com/pub/infozip/zlib/index.html} 
+\htmladdnormallink{{\tt ftp://ftp.freesoftware.com/pub/infozip/zlib/index.html}}{ftp://ftp.freesoftware.com/pub/infozip/zlib/index.html}
 
 \item {\bf\label{sc15_available_gphoto}{\tt gphoto}}\\
-\htmladdnormallink{{\tt http://www.gphoto.org/}}{http://www.gphoto.org/} 
+\htmladdnormallink{{\tt http://www.gphoto.org/}}{http://www.gphoto.org/}
 
 \item {\bf\label{sc15_available_sane}SANE}\\
-\htmladdnormallink{{\tt http://www.mostang.com/sane/}}{http://www.mostang.com/sane/} 
+\htmladdnormallink{{\tt http://www.mostang.com/sane/}}{http://www.mostang.com/sane/}
 
 \item {\bf\label{sc15_available_mpegencode}{\tt mpeg\_encode}}\\
-\htmladdnormallink{{\tt ftp://mm-ftp.cs.berkeley.edu/pub/mpeg/encode/}}{ftp://mm-ftp.cs.berkeley.edu/pub/mpeg/encode/} 
+\htmladdnormallink{{\tt ftp://mm-ftp.cs.berkeley.edu/pub/mpeg/encode/}}{ftp://mm-ftp.cs.berkeley.edu/pub/mpeg/encode/}
 
 \item {\bf\label{sc15_available_gtk+}GTK+}\\
-\htmladdnormallink{{\tt http://www.gtk.org}}{http://www.gtk.org} 
+\htmladdnormallink{{\tt http://www.gtk.org}}{http://www.gtk.org}
 
 \item {\bf\label{sc15_available_pygtk}PyGTK}\\
-\htmladdnormallink{{\tt http://www.daa.com.au/$\sim$james/pygtk/}}{http://www.daa.com.au/~james/pygtk/} 
+\htmladdnormallink{{\tt http://www.daa.com.au/$\sim$james/pygtk/}}{http://www.daa.com.au/~james/pygtk/}
 
 \item {\bf\label{sc15_available_gimppython}GIMP-Python}\\
-\htmladdnormallink{{\tt http://www.daa.com.au/$\sim$james/pygimp/}}{http://www.daa.com.au/~james/pygimp/} 
+\htmladdnormallink{{\tt http://www.daa.com.au/$\sim$james/pygimp/}}{http://www.daa.com.au/~james/pygimp/}
 
 \item {\bf\label{sc15_available_pythonimg}Python Imaging Library}\\
 \htmladdnormallink{{\tt http://www.python.org/sigs/image-sig/Imaging.html}}{http://www.python.org/sigs/image-sig/Imaging.html}
@@ -5117,7 +5117,7 @@ mpeg_encode default.param
 \htmladdnormallink{{\tt http://www.dcs.ed.ac.uk/home/ajcd/psutils/index.html}}{http://www.dcs.ed.ac.uk/home/ajcd/psutils/index.html}
 
 \end{itemize}
-           
+
 \section*{\xlabel{sc15_acks}Acknowledgments\label{sc15_acks}}
 
 In compiling this document I have leant heavily on already available

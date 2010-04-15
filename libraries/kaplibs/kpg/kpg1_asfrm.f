@@ -16,33 +16,33 @@
 *                      STATUS )
 
 *  Description:
-*     This routine allows the user to specify a new Current Frame for a 
+*     This routine allows the user to specify a new Current Frame for a
 *     FrameSet using an environment parameter.
 
 *  Environment Parameters:
 *     %PARAM = LITERAL (Read)
-*        A string specifying the new co-ordinate Frame. If a null parameter 
-*        value is supplied, then the error is annulled and the current Frame 
+*        A string specifying the new co-ordinate Frame. If a null parameter
+*        value is supplied, then the error is annulled and the current Frame
 *        is left unchanged. The string can be one of the following:
 *
 *        - A Domain name such as SKY, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
 *        translated into the values supplied for arguments WCDOM and DCDOM
-*        respectively, so long as the FrameSet does not contain Frames with 
+*        respectively, so long as the FrameSet does not contain Frames with
 *        Domains WORLD or DATA.
 *
 *        - An integer value giving the index of the required Frame within
 *        the WCS component.
 *
-*        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*        - An IRAS90 Sky Co-ordinate System (SCS) values such as
 *        EQUAT(J2000) (see SUN/163).
 *     %EPARAM = _DOUBLE (Read)
-*        If a celestial co-ordinate system is supplied (using parameter 
-*        %PARAM) then an epoch value is needed to qualify it. This is the 
-*        epoch at which the supplied sky positions were determined. It should 
-*        be given as a decimal years value, with or without decimal places 
-*        ("1996.8" for example). Such values are interpreted as a Besselian 
-*        epoch if less than 1984.0 and as a Julian epoch otherwise. 
+*        If a celestial co-ordinate system is supplied (using parameter
+*        %PARAM) then an epoch value is needed to qualify it. This is the
+*        epoch at which the supplied sky positions were determined. It should
+*        be given as a decimal years value, with or without decimal places
+*        ("1996.8" for example). Such values are interpreted as a Besselian
+*        epoch if less than 1984.0 and as a Julian epoch otherwise.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -50,7 +50,7 @@
 *     EPARAM = CHARACTER * ( * ) (Given)
 *        Name of parameter to use to get Epoch value (if needed).
 *     IWCS = INTEGER (Given)
-*        An AST pointer to the FrameSet. 
+*        An AST pointer to the FrameSet.
 *     WCDOM = CHARACTER * ( * ) (Given)
 *        The Domain name to use if the user requests "WORLD" co-ordinates.
 *        No translation of WORLD takes place if a blank value is supplied.
@@ -61,22 +61,22 @@
 *        An error is always reported if the requested Frame is not
 *        available in the FrameSet. PROMPT controls what happens after
 *        the error has been reported. If .TRUE., then the error is
-*        flushed, the parameter is cancelled, and the user is re-prompted 
-*        for a new %PARAM value. Otherwise, the error is retained, and the 
+*        flushed, the parameter is cancelled, and the user is re-prompted
+*        for a new %PARAM value. Otherwise, the error is retained, and the
 *        routine exits with STATUS set to SAI__ERROR.
 *     TOKEN = CHARACTER * ( * ) (Given)
-*        A string containing an MSG message token reference (eg "^FRED"). 
-*        The value of the token is used within error messages and should 
-*        describe the object (NDF, catalogue, etc) from which the supplied 
-*        FrameSet is derived. If the token reference string is blank it is 
+*        A string containing an MSG message token reference (eg "^FRED").
+*        The value of the token is used within error messages and should
+*        describe the object (NDF, catalogue, etc) from which the supplied
+*        FrameSet is derived. If the token reference string is blank it is
 *        ignored.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  This routine may add a new co-ordinate Frame into the FrameSet.
-*     -  If the FrameSet contains more than one Frame with the requested 
-*        Domain, then the last matching Frame in the FrameSet will be 
+*     -  If the FrameSet contains more than one Frame with the requested
+*        Domain, then the last matching Frame in the FrameSet will be
 *        used (i.e. the one with highest index).
 
 *  Copyright:
@@ -88,12 +88,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'IRA_PAR'          ! IRAS90 astrometry library constants
 
 *  Arguments Given:
@@ -149,12 +149,12 @@
       CHARACTER OBJ*255          ! The value of the supplied message TOKEN
       CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
       CHARACTER T1*16            ! Terminated domain name
-      DOUBLE PRECISION EQU       ! Equinox 
+      DOUBLE PRECISION EQU       ! Equinox
       INTEGER FRM                ! Pointer to matching Frame
       INTEGER IAT	         ! Current length of string
       INTEGER IFRM               ! Sub-Frame index
       INTEGER JAT	         ! Current length of string
-      INTEGER LSTAT              ! CHR status 
+      INTEGER LSTAT              ! CHR status
       INTEGER MAP                ! Pointer to mapping
       INTEGER OBJLEN             ! The used length of the supplied message TOKEN
       INTEGER SF2                ! Copy of SkyFrame
@@ -168,17 +168,17 @@
 
 *  Get the value of any supplied message token. Do it now while we know
 *  the token is still defined.
-      IF( TOKEN .NE. ' ' ) THEN 
-         CALL MSG_LOAD( ' ', TOKEN, OBJ, OBJLEN, STATUS ) 
+      IF( TOKEN .NE. ' ' ) THEN
+         CALL MSG_LOAD( ' ', TOKEN, OBJ, OBJLEN, STATUS )
       ELSE
          OBJ = ' '
          OBJLEN = 0
-      END IF        
+      END IF
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Construct a list of the Domains of the Frames in the supplied FrameSet. 
+*  Construct a list of the Domains of the Frames in the supplied FrameSet.
 *  This will be used in error messages. This may not be an exhaustive
 *  list of the available Domains because some of the Frames may be
 *  compound frames containing sub-Frames with other Domains.
@@ -230,7 +230,7 @@
 
 *  If the domain is not already in the list, append it to the end.
             IF( .NOT. THERE ) THEN
-               IAT = IAT + 1            
+               IAT = IAT + 1
                CALL CHR_APPND( DOM, AVDOMS, IAT )
             END IF
 
@@ -240,7 +240,7 @@
 
 *  Loop until a usable frame specificiation is obtained.
       IFRM = AST__NOFRAME
-      DO WHILE( IFRM .EQ. AST__NOFRAME .AND. STATUS .EQ. SAI__OK  ) 
+      DO WHILE( IFRM .EQ. AST__NOFRAME .AND. STATUS .EQ. SAI__OK  )
 
 *  Get the string describing the required co-ordinate Frame.
          CALL PAR_GET0C( PARAM, FRAME, STATUS )
@@ -263,21 +263,21 @@
          IF( IFRM .NE. AST__NOFRAME ) THEN
             CALL AST_SETI( IWCS, 'CURRENT', IFRM, STATUS )
 
-*  Othewise, see if the supplied string is an integer. If so, set the index 
+*  Othewise, see if the supplied string is an integer. If so, set the index
 *  of the Current Frame.
-         ELSE 
-            LSTAT = SAI__OK 
+         ELSE
+            LSTAT = SAI__OK
             CALL CHR_CTOI( FRAME, IFRM, LSTAT )
             IF( LSTAT .EQ. SAI__OK ) THEN
-               CALL AST_SETI( IWCS, 'CURRENT', IFRM, STATUS )          
+               CALL AST_SETI( IWCS, 'CURRENT', IFRM, STATUS )
 
 *  If the supplied string is not an integer, is it an IRAS90 SCS?
             ELSE IF( KPG1_ISSCS( FRAME, EQU, BJ, SCSNAM, STATUS ) ) THEN
-       
+
 *  If so, search for a Frame with Domain SKY.
                CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
 
-*  If one was found, we need to set its attributes so that they describe 
+*  If one was found, we need to set its attributes so that they describe
 *  the requested sky coordinate system.
                IF( IFRM .NE. AST__NOFRAME ) THEN
 
@@ -285,7 +285,7 @@
                   SKYFRM = AST_GETFRAME( IWCS, IFRM, STATUS )
 
 *  If it is not a SkyFrame, we have no match.
-                  IF( .NOT. AST_ISASKYFRAME( SKYFRM, STATUS ) ) THEN     
+                  IF( .NOT. AST_ISASKYFRAME( SKYFRM, STATUS ) ) THEN
                      IFRM = AST__NOFRAME
 
 *  If it is a SkyFrame, make it the Current Frame.
@@ -296,16 +296,16 @@
                      SF2 = AST_COPY( SKYFRM, STATUS )
 
 *  Now set the attributes of the SkyFrame to match the values specified
-*  by the SCS. 
+*  by the SCS.
                      ISSCS = KPG1_ASSIR( SKYFRM, FRAME, EPARAM, STATUS )
 
 *  Get the Mapping from the original SkyFrame to the modified SkyFrame.
-                     MAP = AST_GETMAPPING( AST_FINDFRAME( SF2, SKYFRM, 
+                     MAP = AST_GETMAPPING( AST_FINDFRAME( SF2, SKYFRM,
      :                                                    ' ', STATUS ),
      :                                 AST__BASE, AST__CURRENT, STATUS )
 
-*  Remap the SkyFrame using this Mapping.                  
-                     CALL AST_REMAPFRAME( IWCS, IFRM, MAP, STATUS ) 
+*  Remap the SkyFrame using this Mapping.
+                     CALL AST_REMAPFRAME( IWCS, IFRM, MAP, STATUS )
 
                   END IF
 
@@ -320,8 +320,8 @@
                   DOM = WCDOM
                ELSE IF( FRAME .EQ. 'DATA' ) THEN
                   DOM = DCDOM
-               ELSE    
-                  DOM = ' ' 
+               ELSE
+                  DOM = ' '
                END IF
 
 *  If a pseudo-domain was given, look for a Frame with the corresponding
@@ -333,13 +333,13 @@
                   IF( IFRM .NE. AST__NOFRAME ) THEN
                      CALL AST_SETI( IWCS, 'CURRENT', IFRM, STATUS )
                   END IF
-   
+
                ELSE
                   IFRM = AST__NOFRAME
                END IF
-   
+
             END IF
-   
+
          END IF
 
 *  Report an error if the requested Frame was not found.
@@ -350,7 +350,7 @@
                CALL MSG_SETC( 'FRAME', FRAME )
                CALL MSG_SETC( 'PAR', PARAM )
                CALL MSG_SETC( 'AVDOMS', AVDOMS )
-   
+
                IF( OBJLEN .EQ. 0 ) THEN
                   CALL ERR_REP( 'KPG1_ASFRM_1', 'The co-ordinate '//
      :                    'system (^FRAME) requested using parameter '//
@@ -367,7 +367,7 @@
             ELSE
                CALL MSG_SETC( 'FRAME', FRAME )
                CALL MSG_SETC( 'PAR', PARAM )
-   
+
                IF( OBJLEN .EQ. 0 ) THEN
                   CALL ERR_REP( 'KPG1_ASFRM_1c', 'The co-ordinate '//
      :                    'system (^FRAME) requested using parameter '//

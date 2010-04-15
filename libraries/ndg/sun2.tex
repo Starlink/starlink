@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -25,8 +25,8 @@
 \newcommand{\stardocversion}   {Version 5.8}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
-This document describes the routines provided within the NDG subroutine 
-library for accessing groups of NDF data objects. 
+This document describes the routines provided within the NDG subroutine
+library for accessing groups of NDF data objects.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ library for accessing groups of NDF data objects.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -522,12 +522,12 @@ library for accessing groups of NDF data objects.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -574,13 +574,13 @@ library for accessing groups of NDF data objects.
 
 \section {Introduction}
 
-If an application prompts the user for an NDF using the facilities of the NDF\_ 
+If an application prompts the user for an NDF using the facilities of the NDF\_
 system (see \xref{SUN/33}{sun33}{}), the user may only reply with the name of a single NDF. Some
 applications allow many input NDFs to be specified and the need to
 type in every NDF name explicitly each time the program is run can become time
 consuming. The NDG package provides a means of giving the user the
 ability to specify a list (or ``Group'') of NDFs as a reply to a single prompt
-for an parameter. 
+for an parameter.
 
 The current version of NDG can process NDFs which are stored as
 components within an HDS container file, and can also process foreign
@@ -598,13 +598,13 @@ As a broad outline, applications use the NDG\_ package as follows:
 
 \begin{enumerate}
 
-\item A call is made to \htmlref{NDG\_ASSOC}{NDG\_ASSOC} which causes the user 
+\item A call is made to \htmlref{NDG\_ASSOC}{NDG\_ASSOC} which causes the user
 to be prompted for a single parameter. This parameter can be of any type.
 The user replies with a ``group expression'' (see
 \xref{SUN/150}{sun150}{}), which contains the names of a group of {\em
 existing} NDFs to be used as inputs by the application\footnote{The routine
 \htmlref{NDG\_ASEXP}{NDG\_ASEXP} performs the same function but does not
-use the parameter system - it expects the group expression to be supplied by 
+use the parameter system - it expects the group expression to be supplied by
 the calling routine.}. For instance, the group expression may be
 
 \begin{verbatim}
@@ -617,11 +617,11 @@ packages, e.g. wild cards (``?'', ``$*$'' or ``[..]'' ), lists of files,
 or indirection through a text file (``\verb+^+'').
 
 The \htmlref{NDG\_ASSOC}{NDG\_ASSOC} routine produces a list of explicit NDF names, which are stored
-internally within the GRP system. 
+internally within the GRP system.
 
 \item What happens next depends on the application, but a common example may be
 the initiation of a DO loop to loop through the input NDFs (NDG\_ASSOC returns
-the total number of NDF names in the group). 
+the total number of NDF names in the group).
 
 \item To access a particular NDF, the application calls routine \htmlref{NDG\_NDFAS}{NDG\_NDFAS}
 supplying an index, $n$, within the group (i.e $n$ is an integer in the range 1
@@ -631,23 +631,23 @@ NDF in the normal manner using the NDF\_ routines (\xref{SUN/33}{sun33}{}). The 
 should be annulled when it is no longer needed using \xref{NDF\_ANNUL}{sun33}{NDF\_ANNUL} in the
 normal way.
 
-\item Once the application has finished processing the group of NDFs, it calls 
+\item Once the application has finished processing the group of NDFs, it calls
 \xref{GRP\_DELET}{sun150}{GRP\_DELET} which deletes the group, releasing all resources reserved by the group.
 
-\item Routine NDG\_ASSOC can also be used to append a list of NDF names 
+\item Routine NDG\_ASSOC can also be used to append a list of NDF names
 obtained from the environment, to a previously defined group.
 
-The routine \htmlref{NDG\_CREAT}{NDG\_CREAT} produces a group containing the names of 
-NDFs which are to be created by the application. The routine \htmlref{NDG\_NDFCR}{NDG\_NDFCR} will 
-create a new NDF with a name given by a group member, and returns an NDF 
-identifier to it. Routine \htmlref{NDG\_NDFPR}{NDG\_NDFPR} creates a new NDF by propagation from a 
-previously existing NDF, in a similar manner to the NDF routine \xref{NDF\_PROP}{sun33}{NDF\_PROP} (see 
+The routine \htmlref{NDG\_CREAT}{NDG\_CREAT} produces a group containing the names of
+NDFs which are to be created by the application. The routine \htmlref{NDG\_NDFCR}{NDG\_NDFCR} will
+create a new NDF with a name given by a group member, and returns an NDF
+identifier to it. Routine \htmlref{NDG\_NDFPR}{NDG\_NDFPR} creates a new NDF by propagation from a
+previously existing NDF, in a similar manner to the NDF routine \xref{NDF\_PROP}{sun33}{NDF\_PROP} (see
 \xref{SUN/33}{sun33}{}).
 
 The names of output NDFs given by users usually relate to the input NDF names.
 When NDG\_CREAT is called, it creates a group of NDF names either by modifying
 all the names in a specified input group using a ``modification element'' (see
-\xref{SUN/150}{sun150}{}), or by getting a list of new names from the user. 
+\xref{SUN/150}{sun150}{}), or by getting a list of new names from the user.
 
 \item Applications which produce a group of output NDFs could also produce a
 text file holding the names of the output NDFs. Such a file can be used
@@ -657,12 +657,12 @@ GRP\_LIST (or GRP\_LISTF).
 
 \end{enumerate}
 
-See the detailed descriptions of \htmlref{NDG\_ASSOC}{NDG\_ASSOC} and \htmlref{NDG\_CREAT}{NDG\_CREAT} below for details 
+See the detailed descriptions of \htmlref{NDG\_ASSOC}{NDG\_ASSOC} and \htmlref{NDG\_CREAT}{NDG\_CREAT} below for details
 of the processing of existing and new NDF names.
 
 \section{An example NDG application}
 
-The following gives a short example of how NDG routines might be 
+The following gives a short example of how NDG routines might be
 used within an ADAM task.
 \begin{quote}
 \latexonly{\small}
@@ -718,9 +718,9 @@ used within an ADAM task.
       END
 \end{verbatim}
 \end{quote}
-When this program is compiled and run, the user is asked for 
+When this program is compiled and run, the user is asked for
 two ADAM parameters, IN and OUT.  Each NDF in the list specified
-by the IN parameter is simply copied to the corresponding name in the 
+by the IN parameter is simply copied to the corresponding name in the
 list specified by the OUT parameter.  For instance, running
 \begin{quote}
 \latexonly{\small}
@@ -745,7 +745,7 @@ its top level called O1, O2 and O3, then invoking
 copy in=obs out=obs-copy
 \end{verbatim}
 \end{quote}
-will result in a new container file {\tt obs-copy.sdf} being written, 
+will result in a new container file {\tt obs-copy.sdf} being written,
 which contains three NDF structures called O1, O2 and O3.
 
 Note that a few corners have been cut in the above code,
@@ -807,7 +807,7 @@ to add further members.
 \noteroutine{
       CALL NDG\_NDFCO( INDF1, IGRP, INDEX, INDF2, STATUS )
 }{
-   Obtain an NDF identifier for a new NDF created by copying an 
+   Obtain an NDF identifier for a new NDF created by copying an
    existing NDF
 }
 \noteroutine{
@@ -2257,7 +2257,7 @@ when no longer needed, using ndgFreeProv.
 The following public functions are available. There is an equivalent set
 of F77 routines with names formed by converting the C name to upper case
 and inserting an underscore after the initial ``NDG'' string (C and F77
-versions are - for the most part - documented individually in separate 
+versions are - for the most part - documented individually in separate
 prologues below):
 
 \begin{itemize}
@@ -2436,10 +2436,10 @@ another statement of the software that performed the action.
       matching call to NDG\_BEGPV. Note, provenance blocks must
       not be nested.
 
-      During a provenance block, a list is maintained of all the 
-      existing NDFs that have had their Data array mapped (either in 
-      read or update mode) during the block. Another list is maintained 
-      of all the NDFs that have been written (either existing NDFs 
+      During a provenance block, a list is maintained of all the
+      existing NDFs that have had their Data array mapped (either in
+      read or update mode) during the block. Another list is maintained
+      of all the NDFs that have been written (either existing NDFs
       accessed in update mode or new NDFs) during the block.
 
       When the block ends, the provenance information within each
@@ -2459,8 +2459,8 @@ another statement of the software that performed the action.
       \sstsubsection{
          CREATR = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         An identifier for the calling application. The format of the 
-         identifier is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} 
+         An identifier for the calling application. The format of the
+         identifier is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "}
          is recommended.
       }
       \sstsubsection{
@@ -3340,10 +3340,10 @@ another statement of the software that performed the action.
       matching call to ndgBegpv. Note, provenance blocks must
       not be nested.
 
-      During a provenance block, a list is maintained of all the 
-      existing NDFs that have had their Data array mapped (either in 
-      read or update mode) during the block. Another list is maintained 
-      of all the NDFs that have been written (either existing NDFs 
+      During a provenance block, a list is maintained of all the
+      existing NDFs that have had their Data array mapped (either in
+      read or update mode) during the block. Another list is maintained
+      of all the NDFs that have been written (either existing NDFs
       accessed in update mode or new NDFs) during the block.
 
       When the block ends, the provenance information within each
@@ -3363,8 +3363,8 @@ another statement of the software that performed the action.
       \sstsubsection{
          creatr
       }{
-         An identifier for the calling application. The format of the 
-         identifier is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} 
+         An identifier for the calling application. The format of the
+         identifier is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "}
          is recommended.
       }
       \sstsubsection{
@@ -4167,8 +4167,8 @@ another statement of the software that performed the action.
 
 \section{Routines for controling recording of GRP group contents}
 
-The functions described in this section allow the contents of GRP 
-groups to be appended to the default history record written by the 
+The functions described in this section allow the contents of GRP
+groups to be appended to the default history record written by the
 NDF library.
 
 If an ADAM application accesses a parameter as a GRP group, the default
@@ -4211,7 +4211,7 @@ calling ndgHltgh again afterwards to re-establish the recording of NDF
 names.
 
 The C interfaces are the direct equivalent of the F77 interfaces
-described below - convert the F77 name to lower-case, remove the 
+described below - convert the F77 name to lower-case, remove the
 underscore and capitalise the following character.
 
 \sstroutine{
@@ -4415,9 +4415,9 @@ underscore and capitalise the following character.
 \section{Changes Introduced in NDG Version 5.7}
 \begin{itemize}
    \item The Provenance handling API has changed to use a temporary
-    in-memory structure to describe a PROVENANCE extension, rather than 
+    in-memory structure to describe a PROVENANCE extension, rather than
     every function accessing the NDF on disk.
-   \item The PROVENANCE extension now allows the recording of NDF History 
+   \item The PROVENANCE extension now allows the recording of NDF History
     with each ancestor.
 \end{itemize}
 
@@ -4449,15 +4449,15 @@ underscore and capitalise the following character.
 
 \section{Changes Introduced in NDG Version 5.2}
 \begin{itemize}
-   \item The C routine ndg1\_regsb.c has been changed to avoid warning 
-         message about "tmpnam" when linking applications on Redhat Linux 
+   \item The C routine ndg1\_regsb.c has been changed to avoid warning
+         message about "tmpnam" when linking applications on Redhat Linux
 	 systems.
 \end{itemize}
 
 \section{Changes Introduced in NDG Version 5.1}
 \begin{itemize}
    \item A new routine NDG\_ASEXP has been added which allows a group of
-         existing NDFs to be created from a group expression supplied as 
+         existing NDFs to be created from a group expression supplied as
          a subroutine argument. This is very similar to NDG\_ASSOC except
          that NDG\_ASSOC gets the group expression from the parameter system
          instead of from its argument list.

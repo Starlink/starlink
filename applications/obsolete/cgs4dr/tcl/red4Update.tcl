@@ -2,90 +2,90 @@ proc red4Update {item value} {
   global env
   global Red4Widgets
   if {[string trim ${item}] == "red4Int"} {
-    selection clear $Red4Widgets(AI_ENTRY) 
+    selection clear $Red4Widgets(AI_ENTRY)
     $Red4Widgets(AI_ENTRY) delete 0 end
     $Red4Widgets(AI_ENTRY) insert end $Red4Widgets(DIN)
 
   } elseif {[string trim ${item}] == "red4ReadObs"} {
-    selection clear $Red4Widgets(ERO_ENTRY) 
+    selection clear $Red4Widgets(ERO_ENTRY)
     $Red4Widgets(ERO_ENTRY) delete 0 end
     $Red4Widgets(ERO_ENTRY) insert end $Red4Widgets(DRO)
 
   } elseif {[string trim ${item}] == "red4TwoDLineFit"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(TWD_ENT01) 
+      selection clear $Red4Widgets(TWD_ENT01)
       $Red4Widgets(TWD_ENT01) delete 0 end
       $Red4Widgets(TWD_ENT01) insert end $Red4Widgets(DRO)
-      selection clear $Red4Widgets(TWD_ENT02) 
+      selection clear $Red4Widgets(TWD_ENT02)
       $Red4Widgets(TWD_ENT02) delete 0 end
       $Red4Widgets(TWD_ENT02) insert end 1
-      selection clear $Red4Widgets(TWD_ENT03) 
+      selection clear $Red4Widgets(TWD_ENT03)
       $Red4Widgets(TWD_ENT03) delete 0 end
       $Red4Widgets(TWD_ENT03) insert end 256
-      selection clear $Red4Widgets(TWD_ENT04) 
+      selection clear $Red4Widgets(TWD_ENT04)
       $Red4Widgets(TWD_ENT04) delete 0 end
       $Red4Widgets(TWD_ENT04) insert end 1
-      selection clear $Red4Widgets(TWD_ENT05) 
+      selection clear $Red4Widgets(TWD_ENT05)
       $Red4Widgets(TWD_ENT05) delete 0 end
       $Red4Widgets(TWD_ENT05) insert end 256
     } elseif {[string trim ${value}] == "TWD_ENT01"} {
-      selection clear $Red4Widgets(TWD_ENT01) 
+      selection clear $Red4Widgets(TWD_ENT01)
       $Red4Widgets(TWD_ENT01) delete 0 end
       $Red4Widgets(TWD_ENT01) insert end $Red4Widgets(DRO)
     } elseif {[string trim ${value}] == "TWD_ENT02"} {
-      selection clear $Red4Widgets(TWD_ENT02) 
+      selection clear $Red4Widgets(TWD_ENT02)
       $Red4Widgets(TWD_ENT02) delete 0 end
       $Red4Widgets(TWD_ENT02) insert end 1
     } elseif {[string trim ${value}] == "TWD_ENT03"} {
-      selection clear $Red4Widgets(TWD_ENT03) 
+      selection clear $Red4Widgets(TWD_ENT03)
       $Red4Widgets(TWD_ENT03) delete 0 end
       $Red4Widgets(TWD_ENT03) insert end 256
     } elseif {[string trim ${value}] == "TWD_ENT04"} {
-      selection clear $Red4Widgets(TWD_ENT04) 
+      selection clear $Red4Widgets(TWD_ENT04)
       $Red4Widgets(TWD_ENT04) delete 0 end
       $Red4Widgets(TWD_ENT04) insert end 1
     } elseif {[string trim ${value}] == "TWD_ENT05"} {
-      selection clear $Red4Widgets(TWD_ENT05) 
+      selection clear $Red4Widgets(TWD_ENT05)
       $Red4Widgets(TWD_ENT05) delete 0 end
       $Red4Widgets(TWD_ENT05) insert end 256
     }
 
   } elseif {[string trim ${item}] == "red4TwoLineFit"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(TLF_ENT01) 
+      selection clear $Red4Widgets(TLF_ENT01)
       $Red4Widgets(TLF_ENT01) delete 0 end
       $Red4Widgets(TLF_ENT01) insert end $Red4Widgets(DRO)
-      selection clear $Red4Widgets(TLF_ENT02) 
+      selection clear $Red4Widgets(TLF_ENT02)
       $Red4Widgets(TLF_ENT02) delete 0 end
       $Red4Widgets(TLF_ENT02) insert end 29
-      selection clear $Red4Widgets(TLF_ENT03) 
+      selection clear $Red4Widgets(TLF_ENT03)
       $Red4Widgets(TLF_ENT03) delete 0 end
       $Red4Widgets(TLF_ENT03) insert end 29
-      selection clear $Red4Widgets(TLF_ENT04) 
+      selection clear $Red4Widgets(TLF_ENT04)
       $Red4Widgets(TLF_ENT04) delete 0 end
       $Red4Widgets(TLF_ENT04) insert end 1
-      selection clear $Red4Widgets(TLF_ENT05) 
+      selection clear $Red4Widgets(TLF_ENT05)
       $Red4Widgets(TLF_ENT05) delete 0 end
       $Red4Widgets(TLF_ENT05) insert end 256
       set Red4Widgets(TLF_RAD01) 1
     } elseif {[string trim ${value}] == "TLF_ENT01"} {
-      selection clear $Red4Widgets(TLF_ENT01) 
+      selection clear $Red4Widgets(TLF_ENT01)
       $Red4Widgets(TLF_ENT01) delete 0 end
       $Red4Widgets(TLF_ENT01) insert end $Red4Widgets(DRO)
     } elseif {[string trim ${value}] == "TLF_ENT02"} {
-      selection clear $Red4Widgets(TLF_ENT02) 
+      selection clear $Red4Widgets(TLF_ENT02)
       $Red4Widgets(TLF_ENT02) delete 0 end
       $Red4Widgets(TLF_ENT02) insert end 29
     } elseif {[string trim ${value}] == "TLF_ENT03"} {
-      selection clear $Red4Widgets(TLF_ENT03) 
+      selection clear $Red4Widgets(TLF_ENT03)
       $Red4Widgets(TLF_ENT03) delete 0 end
       $Red4Widgets(TLF_ENT03) insert end 29
     } elseif {[string trim ${value}] == "TLF_ENT04"} {
-      selection clear $Red4Widgets(TLF_ENT04) 
+      selection clear $Red4Widgets(TLF_ENT04)
       $Red4Widgets(TLF_ENT04) delete 0 end
       $Red4Widgets(TLF_ENT04) insert end 1
     } elseif {[string trim ${value}] == "TLF_ENT05"} {
-      selection clear $Red4Widgets(TLF_ENT05) 
+      selection clear $Red4Widgets(TLF_ENT05)
       $Red4Widgets(TLF_ENT05) delete 0 end
       $Red4Widgets(TLF_ENT05) insert end 256
     } elseif {[string trim ${value}] == "TLF_RAD01"} {
@@ -94,165 +94,165 @@ proc red4Update {item value} {
 
   } elseif {[string trim ${item}] == "red4FileStd"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(FS_ENT01) 
+      selection clear $Red4Widgets(FS_ENT01)
       $Red4Widgets(FS_ENT01) delete 0 end
       $Red4Widgets(FS_ENT01) insert end $Red4Widgets(DRG)
-      selection clear $Red4Widgets(FS_ENT02) 
+      selection clear $Red4Widgets(FS_ENT02)
       $Red4Widgets(FS_ENT02) delete 0 end
       $Red4Widgets(FS_ENT02) insert end 5000.0
-      selection clear $Red4Widgets(FS_ENT03) 
+      selection clear $Red4Widgets(FS_ENT03)
       $Red4Widgets(FS_ENT03) delete 0 end
       $Red4Widgets(FS_ENT03) insert end 2.2
-      selection clear $Red4Widgets(FS_ENT04) 
+      selection clear $Red4Widgets(FS_ENT04)
       $Red4Widgets(FS_ENT04) delete 0 end
       $Red4Widgets(FS_ENT04) insert end 29
-      selection clear $Red4Widgets(FS_ENT05) 
+      selection clear $Red4Widgets(FS_ENT05)
       $Red4Widgets(FS_ENT05) delete 0 end
       $Red4Widgets(FS_ENT05) insert end 29
     } elseif {[string trim ${value}] == "FS_ENT01"} {
-      selection clear $Red4Widgets(FS_ENT01) 
+      selection clear $Red4Widgets(FS_ENT01)
       $Red4Widgets(FS_ENT01) delete 0 end
       $Red4Widgets(FS_ENT01) insert end $Red4Widgets(DRG)
     } elseif {[string trim ${value}] == "FS_ENT02"} {
-      selection clear $Red4Widgets(FS_ENT02) 
+      selection clear $Red4Widgets(FS_ENT02)
       $Red4Widgets(FS_ENT02) delete 0 end
       $Red4Widgets(FS_ENT02) insert end 5000.0
     } elseif {[string trim ${value}] == "FS_ENT03"} {
-      selection clear $Red4Widgets(FS_ENT03) 
+      selection clear $Red4Widgets(FS_ENT03)
       $Red4Widgets(FS_ENT03) delete 0 end
       $Red4Widgets(FS_ENT03) insert end 2.2
     } elseif {[string trim ${value}] == "FS_ENT04"} {
-      selection clear $Red4Widgets(FS_ENT04) 
+      selection clear $Red4Widgets(FS_ENT04)
       $Red4Widgets(FS_ENT04) delete 0 end
       $Red4Widgets(FS_ENT04) insert end 29
     } elseif {[string trim ${value}] == "FS_ENT05"} {
-      selection clear $Red4Widgets(FS_ENT05) 
+      selection clear $Red4Widgets(FS_ENT05)
       $Red4Widgets(FS_ENT05) delete 0 end
       $Red4Widgets(FS_ENT05) insert end 29
     }
 
   } elseif {[string trim ${item}] == "red4Fits"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(FI_ENT01) 
+      selection clear $Red4Widgets(FI_ENT01)
       $Red4Widgets(FI_ENT01) delete 0 end
       $Red4Widgets(FI_ENT01) insert end $Red4Widgets(DRO)
-      selection clear $Red4Widgets(FI_ENT02) 
+      selection clear $Red4Widgets(FI_ENT02)
       $Red4Widgets(FI_ENT02) delete 0 end
       $Red4Widgets(FI_ENT02) insert end OBJECT
     } elseif {[string trim ${value}] == "FI_ENT01"} {
-      selection clear $Red4Widgets(FI_ENT01) 
+      selection clear $Red4Widgets(FI_ENT01)
       $Red4Widgets(FI_ENT01) delete 0 end
       $Red4Widgets(FI_ENT01) insert end $Red4Widgets(DRO)
     } elseif {[string trim ${value}] == "FI_ENT02"} {
-      selection clear $Red4Widgets(FI_ENT02) 
+      selection clear $Red4Widgets(FI_ENT02)
       $Red4Widgets(FI_ENT02) delete 0 end
       $Red4Widgets(FI_ENT02) insert end OBJECT
     }
 
   } elseif {[string trim ${item}] == "red4Polysky"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(PF_INPUT) 
+      selection clear $Red4Widgets(PF_INPUT)
       $Red4Widgets(PF_INPUT) delete 0 end
       $Red4Widgets(PF_INPUT) insert end $Red4Widgets(DRG)
       set Red4Widgets(PF_POLYFIT) REDUCED_GRP
-      selection clear $Red4Widgets(PF_DEGREE) 
+      selection clear $Red4Widgets(PF_DEGREE)
       $Red4Widgets(PF_DEGREE) delete 0 end
       $Red4Widgets(PF_DEGREE) insert end 1.0
-      selection clear $Red4Widgets(PF_NREJECT) 
+      selection clear $Red4Widgets(PF_NREJECT)
       $Red4Widgets(PF_NREJECT) delete 0 end
       $Red4Widgets(PF_NREJECT) insert end 0
       set Red4Widgets(PF_WEIGHT) 1
-      selection clear $Red4Widgets(PF_SAYS1) 
+      selection clear $Red4Widgets(PF_SAYS1)
       $Red4Widgets(PF_SAYS1) delete 0 end
       $Red4Widgets(PF_SAYS1) insert end 20
-      selection clear $Red4Widgets(PF_SAYE1) 
+      selection clear $Red4Widgets(PF_SAYE1)
       $Red4Widgets(PF_SAYE1) delete 0 end
       $Red4Widgets(PF_SAYE1) insert end 25
-      selection clear $Red4Widgets(PF_SAYS2) 
+      selection clear $Red4Widgets(PF_SAYS2)
       $Red4Widgets(PF_SAYS2) delete 0 end
       $Red4Widgets(PF_SAYS2) insert end 35
-      selection clear $Red4Widgets(PF_SAYE2) 
+      selection clear $Red4Widgets(PF_SAYE2)
       $Red4Widgets(PF_SAYE2) delete 0 end
       $Red4Widgets(PF_SAYE2) insert end 40
-      selection clear $Red4Widgets(PF_SAYS3) 
+      selection clear $Red4Widgets(PF_SAYS3)
       $Red4Widgets(PF_SAYS3) delete 0 end
       $Red4Widgets(PF_SAYS3) insert end -1
-      selection clear $Red4Widgets(PF_SAYE3) 
+      selection clear $Red4Widgets(PF_SAYE3)
       $Red4Widgets(PF_SAYE3) delete 0 end
       $Red4Widgets(PF_SAYE3) insert end -1
-      selection clear $Red4Widgets(PF_SAYS4) 
+      selection clear $Red4Widgets(PF_SAYS4)
       $Red4Widgets(PF_SAYS4) delete 0 end
       $Red4Widgets(PF_SAYS4) insert end -1
-      selection clear $Red4Widgets(PF_SAYE4) 
+      selection clear $Red4Widgets(PF_SAYE4)
       $Red4Widgets(PF_SAYE4) delete 0 end
       $Red4Widgets(PF_SAYE4) insert end -1
     } elseif {[string trim ${value}] == "PF_INPUT"} {
-      selection clear $Red4Widgets(PF_INPUT) 
+      selection clear $Red4Widgets(PF_INPUT)
       $Red4Widgets(PF_INPUT) delete 0 end
       $Red4Widgets(PF_INPUT) insert end $Red4Widgets(DRG)
     } elseif {[string trim ${value}] == "PF_POLYFIT"} {
       set Red4widgets(PF_POLYFIT) REDUCED_GRP
     } elseif {[string trim ${value}] == "PF_DEGREE"} {
-      selection clear $Red4Widgets(PF_DEGREE) 
+      selection clear $Red4Widgets(PF_DEGREE)
       $Red4Widgets(PF_DEGREE) delete 0 end
       $Red4Widgets(PF_DEGREE) insert end 1.0
     } elseif {[string trim ${value}] == "PF_NREJECT"} {
-      selection clear $Red4Widgets(PF_NREJECT) 
+      selection clear $Red4Widgets(PF_NREJECT)
       $Red4Widgets(PF_NREJECT) delete 0 end
       $Red4Widgets(PF_NREJECT) insert end 0
     } elseif {[string trim ${value}] == "PF_WEIGHT"} {
       set Red4widgets(PF_WEIGHT) 1
     } elseif {[string trim ${value}] == "PF_SAYS1"} {
-      selection clear $Red4Widgets(PF_SAYS1) 
+      selection clear $Red4Widgets(PF_SAYS1)
       $Red4Widgets(PF_SAYS1) delete 0 end
       $Red4Widgets(PF_SAYS1) insert end 20
     } elseif {[string trim ${value}] == "PF_SAYE1"} {
-      selection clear $Red4Widgets(PF_SAYE1) 
+      selection clear $Red4Widgets(PF_SAYE1)
       $Red4Widgets(PF_SAYE1) delete 0 end
       $Red4Widgets(PF_SAYE1) insert end 25
     } elseif {[string trim ${value}] == "PF_SAYS2"} {
-      selection clear $Red4Widgets(PF_SAYS2) 
+      selection clear $Red4Widgets(PF_SAYS2)
       $Red4Widgets(PF_SAYS2) delete 0 end
       $Red4Widgets(PF_SAYS2) insert end 35
     } elseif {[string trim ${value}] == "PF_SAYE2"} {
-      selection clear $Red4Widgets(PF_SAYE2) 
+      selection clear $Red4Widgets(PF_SAYE2)
       $Red4Widgets(PF_SAYE2) delete 0 end
       $Red4Widgets(PF_SAYE2) insert end 40
     } elseif {[string trim ${value}] == "PF_SAYS3"} {
-      selection clear $Red4Widgets(PF_SAYS3) 
+      selection clear $Red4Widgets(PF_SAYS3)
       $Red4Widgets(PF_SAYS3) delete 0 end
       $Red4Widgets(PF_SAYS3) insert end -1
     } elseif {[string trim ${value}] == "PF_SAYE3"} {
-      selection clear $Red4Widgets(PF_SAYE3) 
+      selection clear $Red4Widgets(PF_SAYE3)
       $Red4Widgets(PF_SAYE3) delete 0 end
       $Red4Widgets(PF_SAYE3) insert end -1
     } elseif {[string trim ${value}] == "PF_SAYS4"} {
-      selection clear $Red4Widgets(PF_SAYS4) 
+      selection clear $Red4Widgets(PF_SAYS4)
       $Red4Widgets(PF_SAYS4) delete 0 end
       $Red4Widgets(PF_SAYS4) insert end -1
     } elseif {[string trim ${value}] == "PF_SAYE4"} {
-      selection clear $Red4Widgets(PF_SAYE4) 
+      selection clear $Red4Widgets(PF_SAYE4)
       $Red4Widgets(PF_SAYE4) delete 0 end
       $Red4Widgets(PF_SAYE4) insert end -1
     }
 
   } elseif {[string trim ${item}] == "red4Flux"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(FC_ENT01) 
+      selection clear $Red4Widgets(FC_ENT01)
       $Red4Widgets(FC_ENT01) delete 0 end
       $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DSP)
-      selection clear $Red4Widgets(FC_ENT02) 
+      selection clear $Red4Widgets(FC_ENT02)
       $Red4Widgets(FC_ENT02) delete 0 end
       $Red4Widgets(FC_ENT02) insert end 0.0
       set Red4Widgets(FC_IN) 0.0
       set Red4Widgets(FC_FIN) "J"
       set Red4Widgets(FC_FOUT) "W/m2/um"
     } elseif {[string trim ${value}] == "FC_ENT01"} {
-      selection clear $Red4Widgets(FC_ENT01) 
+      selection clear $Red4Widgets(FC_ENT01)
       $Red4Widgets(FC_ENT01) delete 0 end
       $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DSP)
     } elseif {[string trim ${value}] == "FC_ENT02"} {
-      selection clear $Red4Widgets(FC_ENT02) 
+      selection clear $Red4Widgets(FC_ENT02)
       $Red4Widgets(FC_ENT02) delete 0 end
       $Red4Widgets(FC_ENT02) insert end 0.0
       set Red4Widgets(FC_IN) 0.0
@@ -264,26 +264,26 @@ proc red4Update {item value} {
 
   } elseif {[string trim ${item}] == "red4NormObs"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(NO_ENT01) 
+      selection clear $Red4Widgets(NO_ENT01)
       $Red4Widgets(NO_ENT01) delete 0 end
       $Red4Widgets(NO_ENT01) insert end $Red4Widgets(DRO)
-      selection clear $Red4Widgets(NO_ENT02) 
+      selection clear $Red4Widgets(NO_ENT02)
       $Red4Widgets(NO_ENT02) delete 0 end
       $Red4Widgets(NO_ENT02) insert end 3
-      selection clear $Red4Widgets(NO_ENT03) 
+      selection clear $Red4Widgets(NO_ENT03)
       $Red4Widgets(NO_ENT03) delete 0 end
       $Red4Widgets(NO_ENT03) insert end 5
       set Red4Widgets(NO_METHOD) POLYFIT
     } elseif {[string trim ${value}] == "NO_ENT01"} {
-      selection clear $Red4Widgets(NO_ENT01) 
+      selection clear $Red4Widgets(NO_ENT01)
       $Red4Widgets(NO_ENT01) delete 0 end
       $Red4Widgets(NO_ENT01) insert end $Red4Widgets(DRO)
     } elseif {[string trim ${value}] == "NO_ENT02"} {
-      selection clear $Red4Widgets(NO_ENT02) 
+      selection clear $Red4Widgets(NO_ENT02)
       $Red4Widgets(NO_ENT02) delete 0 end
       $Red4Widgets(NO_ENT02) insert end 3
     } elseif {[string trim ${value}] == "NO_ENT03"} {
-      selection clear $Red4Widgets(NO_ENT03) 
+      selection clear $Red4Widgets(NO_ENT03)
       $Red4Widgets(NO_ENT03) delete 0 end
       $Red4Widgets(NO_ENT03) insert end 5
     } elseif {[string trim ${value}] == "NO_METHOD"} {
@@ -292,103 +292,103 @@ proc red4Update {item value} {
 
   } elseif {[string trim ${item}] == "red4ModelBB"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(BB_ENT01) 
+      selection clear $Red4Widgets(BB_ENT01)
       $Red4Widgets(BB_ENT01) delete 0 end
       $Red4Widgets(BB_ENT01) insert end $Red4Widgets(DRO)
-      selection clear $Red4Widgets(BB_ENT02) 
+      selection clear $Red4Widgets(BB_ENT02)
       $Red4Widgets(BB_ENT02) delete 0 end
       $Red4Widgets(BB_ENT02) insert end 5000.0
-      selection clear $Red4Widgets(BB_ENT03) 
+      selection clear $Red4Widgets(BB_ENT03)
       $Red4Widgets(BB_ENT03) delete 0 end
       $Red4Widgets(BB_ENT03) insert end 2.2
-      selection clear $Red4Widgets(BB_ENT04) 
+      selection clear $Red4Widgets(BB_ENT04)
       $Red4Widgets(BB_ENT04) delete 0 end
       $Red4Widgets(BB_ENT04) insert end 0.0
     } elseif {[string trim ${value}] == "BB_ENT01"} {
-      selection clear $Red4Widgets(BB_ENT01) 
+      selection clear $Red4Widgets(BB_ENT01)
       $Red4Widgets(BB_ENT01) delete 0 end
       $Red4Widgets(BB_ENT01) insert end $Red4Widgets(DRO)
     } elseif {[string trim ${value}] == "BB_ENT02"} {
-      selection clear $Red4Widgets(BB_ENT02) 
+      selection clear $Red4Widgets(BB_ENT02)
       $Red4Widgets(BB_ENT02) delete 0 end
       $Red4Widgets(BB_ENT02) insert end 5000.0
     } elseif {[string trim ${value}] == "BB_ENT03"} {
-      selection clear $Red4Widgets(BB_ENT03) 
+      selection clear $Red4Widgets(BB_ENT03)
       $Red4Widgets(BB_ENT03) delete 0 end
       $Red4Widgets(BB_ENT03) insert end 2.2
     } elseif {[string trim ${value}] == "BB_ENT04"} {
-      selection clear $Red4Widgets(BB_ENT04) 
+      selection clear $Red4Widgets(BB_ENT04)
       $Red4Widgets(BB_ENT04) delete 0 end
       $Red4Widgets(BB_ENT04) insert end 0.0
     }
 
   } elseif {[string trim ${item}] == "red4Derip"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(DR_ENT01) 
+      selection clear $Red4Widgets(DR_ENT01)
       $Red4Widgets(DR_ENT01) delete 0 end
       $Red4Widgets(DR_ENT01) insert end $Red4Widgets(DSP)
-      selection clear $Red4Widgets(DR_ENT02) 
+      selection clear $Red4Widgets(DR_ENT02)
       $Red4Widgets(DR_ENT02) delete 0 end
       $Red4Widgets(DR_ENT02) insert end 0.5
-      selection clear $Red4Widgets(DR_ENT03) 
+      selection clear $Red4Widgets(DR_ENT03)
       $Red4Widgets(DR_ENT03) delete 0 end
       $Red4Widgets(DR_ENT03) insert end 255.5
     } elseif {[string trim ${value}] == "DR_ENT01"} {
-      selection clear $Red4Widgets(DR_ENT01) 
+      selection clear $Red4Widgets(DR_ENT01)
       $Red4Widgets(DR_ENT01) delete 0 end
       $Red4Widgets(DR_ENT01) insert end $Red4Widgets(DSP)
     } elseif {[string trim ${value}] == "DR_ENT02"} {
-      selection clear $Red4Widgets(DR_ENT02) 
+      selection clear $Red4Widgets(DR_ENT02)
       $Red4Widgets(DR_ENT02) delete 0 end
       $Red4Widgets(DR_ENT02) insert end 0.5
     } elseif {[string trim ${value}] == "DR_ENT03"} {
-      selection clear $Red4Widgets(DR_ENT03) 
+      selection clear $Red4Widgets(DR_ENT03)
       $Red4Widgets(DR_ENT03) delete 0 end
       $Red4Widgets(DR_ENT03) insert end 255.5
     }
 
   } elseif {[string trim ${item}] == "red4Stats"} {
     if {[string trim ${value}] == "ALL"} {
-      selection clear $Red4Widgets(GS_ENT01) 
+      selection clear $Red4Widgets(GS_ENT01)
       $Red4Widgets(GS_ENT01) delete 0 end
       $Red4Widgets(GS_ENT01) insert end $Red4Widgets(DRO)
       set Red4Widgets(GS_PLANE) DATA
       set Red4Widgets(GS_WHOLE) 1
       set Red4Widgets(GS_AUTOSCALE) 1
     } elseif {[string trim ${value}] == "GS_ENT01"} {
-      selection clear $Red4Widgets(GS_ENT01) 
+      selection clear $Red4Widgets(GS_ENT01)
       $Red4Widgets(GS_ENT01) delete 0 end
       $Red4Widgets(GS_ENT01) insert end $Red4Widgets(DRO)
     } elseif {[string trim ${value}] == "GS_ENT02"} {
-      selection clear $Red4Widgets(GS_ENT02) 
+      selection clear $Red4Widgets(GS_ENT02)
       $Red4Widgets(GS_ENT02) delete 0 end
       $Red4Widgets(GS_ENT02) insert end 1
     } elseif {[string trim ${value}] == "GS_ENT03"} {
-      selection clear $Red4Widgets(GS_ENT03) 
+      selection clear $Red4Widgets(GS_ENT03)
       $Red4Widgets(GS_ENT03) delete 0 end
       $Red4Widgets(GS_ENT03) insert end 256
     } elseif {[string trim ${value}] == "GS_ENT04"} {
-      selection clear $Red4Widgets(GS_ENT04) 
+      selection clear $Red4Widgets(GS_ENT04)
       $Red4Widgets(GS_ENT04) delete 0 end
       $Red4Widgets(GS_ENT04) insert end 1
     } elseif {[string trim ${value}] == "GS_ENT05"} {
-      selection clear $Red4Widgets(GS_ENT05) 
+      selection clear $Red4Widgets(GS_ENT05)
       $Red4Widgets(GS_ENT05) delete 0 end
       $Red4Widgets(GS_ENT05) insert end 1
     } elseif {[string trim ${value}] == "GS_ENT06"} {
-      selection clear $Red4Widgets(GS_ENT06) 
+      selection clear $Red4Widgets(GS_ENT06)
       $Red4Widgets(GS_ENT06) delete 0 end
       $Red4Widgets(GS_ENT06) insert end 256
     } elseif {[string trim ${value}] == "GS_ENT07"} {
-      selection clear $Red4Widgets(GS_ENT07) 
+      selection clear $Red4Widgets(GS_ENT07)
       $Red4Widgets(GS_ENT07) delete 0 end
       $Red4Widgets(GS_ENT07) insert end 1
     } elseif {[string trim ${value}] == "GS_ENT08"} {
-      selection clear $Red4Widgets(GS_ENT08) 
+      selection clear $Red4Widgets(GS_ENT08)
       $Red4Widgets(GS_ENT08) delete 0 end
       $Red4Widgets(GS_ENT08) insert end 1000.0
     } elseif {[string trim ${value}] == "GS_ENT09"} {
-      selection clear $Red4Widgets(GS_ENT09) 
+      selection clear $Red4Widgets(GS_ENT09)
       $Red4Widgets(GS_ENT09) delete 0 end
       $Red4Widgets(GS_ENT09) insert end 0.0
     } elseif {[string trim ${value}] == "GS_PLANE"} {
@@ -400,7 +400,7 @@ proc red4Update {item value} {
     }
 
   } elseif {[string trim ${item}] == "red4Remove"} {
-    selection clear $Red4Widgets(RM_ENTRY) 
+    selection clear $Red4Widgets(RM_ENTRY)
     $Red4Widgets(RM_ENTRY) delete 0 end
     if {[string trim ${value}] == "grp"} {
       $Red4Widgets(RM_ENTRY) insert end $Red4Widgets(DRG)
@@ -409,32 +409,32 @@ proc red4Update {item value} {
     }
 
   } elseif {[string trim ${item}] == "red4Dbs"} {
-    selection clear $Red4Widgets(DBS_ENTRY) 
+    selection clear $Red4Widgets(DBS_ENTRY)
     $Red4Widgets(DBS_ENTRY) delete 0 end
     $Red4Widgets(DBS_ENTRY) insert end $Red4Widgets(DRG)
 
   } elseif {[string trim ${item}] == "red4Efficiency"} {
-    selection clear $Red4Widgets(EF_ENTRY) 
+    selection clear $Red4Widgets(EF_ENTRY)
     $Red4Widgets(EF_ENTRY) delete 0 end
     $Red4Widgets(EF_ENTRY) insert end $Red4Widgets(DRO)
 
   } elseif {[string trim ${item}] == "red4Cgs4List"} {
-    selection clear $Red4Widgets(LH_ENTRY) 
+    selection clear $Red4Widgets(LH_ENTRY)
     $Red4Widgets(LH_ENTRY) delete 0 end
     $Red4Widgets(LH_ENTRY) insert end $env(ODIR)
 
   } elseif {[string trim ${item}] == "red4FileObs"} {
-    selection clear $Red4Widgets(FO_ENTRY) 
+    selection clear $Red4Widgets(FO_ENTRY)
     $Red4Widgets(FO_ENTRY) delete 0 end
     $Red4Widgets(FO_ENTRY) insert end $Red4Widgets(DOB)
 
   } elseif {[string trim ${item}] == "red4Package"} {
-    selection clear $Red4Widgets(PK_ENTRY) 
+    selection clear $Red4Widgets(PK_ENTRY)
     $Red4Widgets(PK_ENTRY) delete 0 end
     $Red4Widgets(PK_ENTRY) insert end $Red4Widgets(DRO)
 
   } elseif {[string trim ${item}] == "red4LogComment"} {
-    selection clear $Red4Widgets(LC_ENTRY) 
+    selection clear $Red4Widgets(LC_ENTRY)
     $Red4Widgets(LC_ENTRY) delete 0 end
 
   } elseif {[string trim ${item}] == "red4Calibrate"} {

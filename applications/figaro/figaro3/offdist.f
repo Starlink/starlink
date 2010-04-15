@@ -3,12 +3,12 @@ C+
 C
 C     O F F D I S T
 C
-C     Modifies the output s-distortion file produced by SDIST 
+C     Modifies the output s-distortion file produced by SDIST
 C     to add an offset in Y to the fitted positions.
 C
 C     Command parameters -
 C
-C     INFILE    (Character) The name of the distortion file to 
+C     INFILE    (Character) The name of the distortion file to
 C               be modified.
 C     OFFSET    (Numeric) The offset in Y to be added to the fits.
 C     OUTFILE   (Character) The name of the resulting modified file.
@@ -26,11 +26,11 @@ C               SDIST, in a format treated as follows -
 C
 C               3 header lines, all beginning with '*'
 C               One line giving the number of spectra traced, in the
-C               format 20X,I5.  
-C               Then, for each spectrum traced, one record giving 
+C               format 20X,I5.
+C               Then, for each spectrum traced, one record giving
 C               the spectrum number, and the leftmost and rightmost
 C               pixels covered by the trace, then 1 record including
-C               the average Y value in the spectrum, in format 16X,F13.7, 
+C               the average Y value in the spectrum, in format 16X,F13.7,
 C               which is followed by 4 records giving the 11
 C               polynomial coefficients for the fit.  Note that this
 C               program only assumes the number of records for each
@@ -80,7 +80,7 @@ C
       STATUS=0
       CALL DSA_OPEN(STATUS)
 C
-C     Get name and open distortion file 
+C     Get name and open distortion file
 C
       CALL PAR_RDCHAR('INFILE','sdist.dat',INFILE)
       CALL DSA_GET_LU(INLU,STATUS)
@@ -112,7 +112,7 @@ C
          GO TO 500
       END IF
 C
-C     Copy header records and number of fitted spectra.  
+C     Copy header records and number of fitted spectra.
 C
       DO I=1,4
          CALL FIG_DIST_READ (INLU,INFILE,RECORD,FAULT)
@@ -156,7 +156,7 @@ C
 C
 C        Modify the Y value and write the record out.
 C
-         YPOSN = YPOSN + OFFSET         
+         YPOSN = YPOSN + OFFSET
          WRITE (RECORD(17:29),'(F13.7)',IOSTAT=FSTATUS) YPOSN
          IF (FSTATUS.NE.0) THEN
             CALL PAR_WRUSER('Error formatting average Y position for '//
@@ -175,7 +175,7 @@ C
             CALL FIG_DIST_WRITE (OUTLU,OUTFILE,RECORD,FAULT)
             IF (FAULT) GO TO 500
          END DO
-C 
+C
       END DO
 C
 C     Record full name of output file.

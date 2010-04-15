@@ -13,7 +13,7 @@
 *     CALL NDG1_HWRGH( INDF, STATUS )
 
 *  Description:
-*     This routine appends a description of each currently registered GRP 
+*     This routine appends a description of each currently registered GRP
 *     group to the current History record in the supplied NDF. See
 *     NDF_ENDGH.
 
@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -96,7 +96,7 @@
       INTEGER JAT
       INTEGER NC
       INTEGER NEL
-      INTEGER NGRP         
+      INTEGER NGRP
       INTEGER NLEFT
       INTEGER NPAR
       INTEGER NPATH
@@ -109,7 +109,7 @@
 *  Loop round every entry in the GRP NDF history keymap.
       NPAR = AST_MAPSIZE( GHKMP_COM2, STATUS )
       DO IPAR = 1, NPAR
-         PARAM = AST_MAPKEY( GHKMP_COM2, IPAR, STATUS ) 
+         PARAM = AST_MAPKEY( GHKMP_COM2, IPAR, STATUS )
          IF( AST_MAPGET0I( GHKMP_COM2, PARAM, IGRP, STATUS ) ) THEN
 
 *  Initialise the first line to hold the parameter name.
@@ -122,9 +122,9 @@
             CALL CHR_APPND( '="', LINES( 1 ), IAT )
 
 *  Loop round every element in the group.
-            CALL GRP_GRPSZ( IGRP, NEL, STATUS ) 
+            CALL GRP_GRPSZ( IGRP, NEL, STATUS )
             DO IEL = 1, NEL
-               CALL GRP_GET( IGRP, IEL, 1, ELEM, STATUS ) 
+               CALL GRP_GET( IGRP, IEL, 1, ELEM, STATUS )
 
 *  Get the total length of the element and initialise the number of
 *  element characters still to be appended to the history text, and the
@@ -135,7 +135,7 @@
 
 *  Loop round until the whole element has been appended to the history
 *  text, or we have filled the array of lines.
-               DO WHILE( NLEFT .GT. 0 .AND. ILINE .LE. MXLINE ) 
+               DO WHILE( NLEFT .GT. 0 .AND. ILINE .LE. MXLINE )
 
 *  Determine how much room is left at the end of the current line.
                   NREM = NDF__SZHMX - IAT
@@ -144,13 +144,13 @@
                   IF( NREM .LE. 0 ) THEN
                      ILINE = ILINE + 1
                      IAT = 0
-                     NREM = NDF__SZHMX 
-                  END IF   
+                     NREM = NDF__SZHMX
+                  END IF
 
 *  If we have filled the array of history text lines, append an ellipsis
 *  to the end of the last line.
                   IF( ILINE .GT. MXLINE ) THEN
-                     LINES( MXLINE )( NDF__SZHMX - 4 : ) = 
+                     LINES( MXLINE )( NDF__SZHMX - 4 : ) =
      :                                                   ' ...'
 
 *  Otherwise, append as much of the element as possible to the end of the
@@ -171,7 +171,7 @@
                   END IF
                END DO
 
-*  If there is not room to append a comma and space, or a closing quote to 
+*  If there is not room to append a comma and space, or a closing quote to
 *  the end of the line, start a new line.
                IF( IAT .GE. NDF__SZHMX - 1 ) THEN
                   ILINE = ILINE + 1
@@ -196,8 +196,8 @@
 
 *  Append the array of lines describing the contents of the expanded group
 *  to the current history record.
-         CALL NDF_HPUT( ' ', '<APPEND>', .FALSE., ILINE, LINES, .FALSE., 
-     :                  .FALSE., .FALSE., INDF, STATUS ) 
+         CALL NDF_HPUT( ' ', '<APPEND>', .FALSE., ILINE, LINES, .FALSE.,
+     :                  .FALSE., .FALSE., INDF, STATUS )
       END DO
 
       END

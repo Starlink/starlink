@@ -84,8 +84,8 @@ C     Set up loop through all items in FITS substructure.  We loop
 C     so long as the last item existed.  Once we reach an item that
 C     doesn't exist, we can stop.
 C
-      N = 1                             
-      EXIST = .TRUE.                     
+      N = 1
+      EXIST = .TRUE.
       DO WHILE (EXIST.AND.STATUS.EQ.0)
 C
 C        See if the Nth item exists, and get its details.
@@ -99,11 +99,11 @@ C
             ELSE
 C
 C              We can handle this item.  For all its elements,
-C              either read strings directly into STRING or read 
-C              numeric values into variables of suitable type 
+C              either read strings directly into STRING or read
+C              numeric values into variables of suitable type
 C              and then format them into STRING.
 C
-               DO I=1,NELM              
+               DO I=1,NELM
 C
 C                 Character strings
 C

@@ -1,6 +1,6 @@
 	SUBROUTINE MED3D( STATUS)
 
-*+ MED3D - median filters image stack pixels by pixel 
+*+ MED3D - median filters image stack pixels by pixel
 
 *    Invocation :
 *
@@ -18,10 +18,10 @@
 *
 *    History :
 *
-*     20-10-1987 : First implementation 
+*     20-10-1987 : First implementation
 *     20-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
 *     29-JUN-1994  Changed MSG_OUT on error to ERR_REP, LIB$ and STR$
-*                  to CHR_, FIO_ (SKL@JACH)  
+*                  to CHR_, FIO_ (SKL@JACH)
 *
 *    Type definitions :
 
@@ -30,8 +30,8 @@
 *    Global constants :
 
 	INCLUDE 'SAE_PAR'          ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
         INCLUDE 'FIO_PAR'
         INCLUDE 'CHR_ERR'
 
@@ -46,7 +46,7 @@
 
 *    Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,           ! locator for input data structure
      :    LOCW,           ! locator for work data structure
      :    LOCWL,          ! locator for linear work data structure
@@ -70,7 +70,7 @@
      :    PNTRI,          ! pointer to input DATA_ARRAY component
      :    PNTRO,          ! pointer to output DATA_ARRAY component
      :    WDIMS( 3),      ! dimensions of work DATA_ARRAY
-     :    LBND( 3),       ! lower bounds of work array 
+     :    LBND( 3),       ! lower bounds of work array
      :    WLDIMS( 1),     ! dimensions of linear work DATA_ARRAY
      :	  XPIX,           ! X coordinate of pixel to be viewed
      :	  YPIX,           ! Y coordinate of pixel to be viewed
@@ -97,10 +97,10 @@
 	CHARACTER
      :	  FFILE*80,                    ! name of file containing stack
      :	  IMAGENAME( 100)*80,          ! name of images in stack
-     :	  WHICH*80                     ! 
+     :	  WHICH*80                     !
 
 	LOGICAL
-     :	  MORE,                        ! 
+     :	  MORE,                        !
      :	  VIEW,                        ! view a pixel during median filtering
      :	  SCALING,                     ! scale images before filtering
      :	  NORMALIZATION                ! normalization of output image
@@ -113,13 +113,13 @@
 	END IF
 
 *      tell user what we are ...
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :	  'MED3D - Median filtering through image stack', STATUS)
 
 *      get the code of the image interface file entry parameter
 	CALL SUBPAR_FINDPAR( 'INPIC', IMCODE, STATUS)
 
-*      get the name of the file containing the list of images 
+*      get the name of the file containing the list of images
 	CALL PAR_GET0C( 'FILENAME', FFILE, STATUS)
 
 *      get a lun and try to open the file
@@ -138,7 +138,7 @@
 *        test if the number of filenames read in is greater than the max
 	  IF( COUNTER .GT. MAXFILES) GOTO 100
 
-*        read the image name from the file 
+*        read the image name from the file
 	  READ( LUN, '(A)', END=100, ERR=998) IMAGENAME( COUNTER)
 
 *        put name to upper case and trim it to get length
@@ -150,28 +150,28 @@
 	CLOSE( LUN)
 	CALL FIO_PUNIT( LUN, STATUS )
 
-*      decrement counter with number of image names 
+*      decrement counter with number of image names
 	COUNTER = COUNTER - 1
 
 *      test the number of files for number greater than 0
 	IF( COUNTER .LE. 0 .OR. COUNTER .GE. MAXFILES) THEN
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :                  'Error, number of files read in illegal',
      :	                STATUS)
 	  CALL MSG_SETI( 'MAXF', MAXFILES)
-	  CALL MSG_OUT( 'MESSAGE', 
-     :	    'Number of files should be between 1 and ^MAXF ...', 
+	  CALL MSG_OUT( 'MESSAGE',
+     :	    'Number of files should be between 1 and ^MAXF ...',
      :      STATUS)
 	END IF
 
 *      tell user number of filenames read in
 	CALL MSG_SETI( 'NUMF', COUNTER)
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :                'Number of IMAGES in median stack = ^NUMF',
      :	              STATUS)
 
 *      create work 1D and 3D array on disk
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :                'Creating disk work file ... please wait',
      :	              STATUS)
 
@@ -182,9 +182,9 @@
 	WDIMS( 1) = MAXX
 	WDIMS( 2) = MAXY
 	WDIMS( 3) = COUNTER
-	CALL NDF_CREAT( 'WORKFILE', '_REAL', NUMDIMS, LBND, WDIMS, 
+	CALL NDF_CREAT( 'WORKFILE', '_REAL', NUMDIMS, LBND, WDIMS,
      :                   LOCW, STATUS)
-        CALL NDF_MAP( LOCW, 'DATA', '_REAL', 'WRITE', PNTRW, 
+        CALL NDF_MAP( LOCW, 'DATA', '_REAL', 'WRITE', PNTRW,
      :                NELEMENTS, STATUS )
 
 	IF( STATUS .NE. SAI__OK) THEN
@@ -196,10 +196,10 @@
 
 	NUMDIMS = 1
 	WLDIMS( 1) = MAXL
-	CALL NDF_CREAT( 'LWORKFILE', '_DOUBLE', NUMDIMS, LBND(1), WLDIMS, 
+	CALL NDF_CREAT( 'LWORKFILE', '_DOUBLE', NUMDIMS, LBND(1), WLDIMS,
      :                   LOCWL, STATUS)
 
-        CALL NDF_MAP( LOCWL, 'DATA', '_DOUBLE', 'WRITE', PNTRWL, 
+        CALL NDF_MAP( LOCWL, 'DATA', '_DOUBLE', 'WRITE', PNTRWL,
      :                NELEMENTS, STATUS )
 
 	IF( STATUS .NE. SAI__OK) THEN
@@ -208,7 +208,7 @@
 	END IF
 
 *      set working array to zero
-	CALL MED3D_TOZERO( WDIMS( 1), WDIMS( 2), WDIMS( 3), 
+	CALL MED3D_TOZERO( WDIMS( 1), WDIMS( 2), WDIMS( 3),
      :                     %VAL( PNTRW))
 
 *      set the sum of the dimensions variables to 0
@@ -228,7 +228,7 @@
           CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
           CALL NDF_DIM( LOCI, NDIMS, DIMS, ACTDIM, STATUS )
- 
+
 	  IF( J .EQ. 1) THEN
 	    ACTDIMS( 1) = DIMS( 1)
 	    ACTDIMS( 2) = DIMS( 2)
@@ -242,12 +242,12 @@
           CALL MSG_SETI( 'YDIM', DIMS( 2 ) )
           CALL MSG_SETI( 'COUN', J)
           CALL MSG_OUT( 'INPUT_DIMS',
-     :                  'Image ^COUN = ^NAME, ^XDIM by ^YDIM pixels', 
+     :                  'Image ^COUN = ^NAME, ^XDIM by ^YDIM pixels',
      :                   STATUS)
 
 *        call subroutine to put data into the 3d array
-	  CALL MED3D_TO3D( J, DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :	                   WDIMS( 1), WDIMS( 2), WDIMS( 3), 
+	  CALL MED3D_TO3D( J, DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :	                   WDIMS( 1), WDIMS( 2), WDIMS( 3),
      :	                   %VAL( PNTRW))
 
 
@@ -261,9 +261,9 @@
 *      test the dimensions of the input arrays to see if all the same
 	ACTDIMS( 1) = ACTDIMS( 1)*COUNTER
 	ACTDIMS( 2) = ACTDIMS( 2)*COUNTER
-	IF( ABS( SUMDIM1-ACTDIMS( 1)) .GT. TOLERANCE .OR. 
-     :	    ABS( SUMDIM2-ACTDIMS( 2)) .GT. TOLERANCE) THEN 
-	  CALL MSG_OUT( 'MESSAGE', 
+	IF( ABS( SUMDIM1-ACTDIMS( 1)) .GT. TOLERANCE .OR.
+     :	    ABS( SUMDIM2-ACTDIMS( 2)) .GT. TOLERANCE) THEN
+	  CALL MSG_OUT( 'MESSAGE',
      :                  'Error, input arrays of different sizes',
      :	                STATUS)
 	  CALL NDF_ANNUL( LOCW, STATUS)
@@ -280,7 +280,7 @@
 
 *      ask user if he/she wants to use median, mean or mode value
 	CALL PAR_GET0C( 'WHICH', WHICH, STATUS)
-	CALL CHR_UCASE( WHICH ) 
+	CALL CHR_UCASE( WHICH )
 
 *      ask user if he/she wants to view data on one pixel
 	CALL PAR_GET0L( 'VIEW', VIEW, STATUS)
@@ -291,7 +291,7 @@
           CALL AIF_GET0I( 'YPIX', DIMS( 2)/2, 1, DIMS( 2), YPIX, STATUS)
 	END IF
 
-*      ask user if he/she wants to scale the stack images to same value in 
+*      ask user if he/she wants to scale the stack images to same value in
 *      sub-image
 	CALL PAR_GET0L( 'SCALING', SCALING, STATUS)
 
@@ -299,9 +299,9 @@
 	IF( SCALING) THEN
           CALL AIF_GET0I( 'XST', 1, 1, DIMS( 1), XST, STATUS)
           CALL AIF_GET0I( 'YST', 1, 1, DIMS( 2), YST, STATUS)
-          CALL AIF_GET0I( 'XSZ', DIMS( 1)-XST+1, 1, DIMS( 1)-XST+1, XSZ, 
+          CALL AIF_GET0I( 'XSZ', DIMS( 1)-XST+1, 1, DIMS( 1)-XST+1, XSZ,
      :                     STATUS)
-          CALL AIF_GET0I( 'YSZ', DIMS( 2)-YST+1, 1, DIMS( 2)-YST+1, YSZ, 
+          CALL AIF_GET0I( 'YSZ', DIMS( 2)-YST+1, 1, DIMS( 2)-YST+1, YSZ,
      :                     STATUS)
 	END IF
 
@@ -312,9 +312,9 @@
 	IF( .NOT. SCALING .AND. NORMALIZATION) THEN
           CALL AIF_GET0I( 'XST', 1, 1, DIMS( 1), XST, STATUS)
           CALL AIF_GET0I( 'YST', 1, 1, DIMS( 2), YST, STATUS)
-          CALL AIF_GET0I( 'XSZ', DIMS( 1)-XST+1, 1, DIMS( 1)-XST+1, XSZ, 
+          CALL AIF_GET0I( 'XSZ', DIMS( 1)-XST+1, 1, DIMS( 1)-XST+1, XSZ,
      :                     STATUS)
-          CALL AIF_GET0I( 'YSZ', DIMS( 2)-YST+1, 1, DIMS( 2)-YST+1, YSZ, 
+          CALL AIF_GET0I( 'YSZ', DIMS( 2)-YST+1, 1, DIMS( 2)-YST+1, YSZ,
      :                    STATUS)
 	END IF
 
@@ -328,10 +328,10 @@
 
 *      call subroutine to do the median filtering through the images and put
 *      result into the output image
-	CALL MED3D_MEDFIL( COUNTER, WDIMS( 1), WDIMS( 2), WDIMS( 3), 
+	CALL MED3D_MEDFIL( COUNTER, WDIMS( 1), WDIMS( 2), WDIMS( 3),
      :	                   %VAL( PNTRW), WLDIMS( 1), %VAL( PNTRWL),
-     :	                   DIMSO( 1), DIMSO( 2), %VAL( PNTRO), VIEW, 
-     :	                   XPIX, YPIX, WHICH, SCALING, XST, XSZ, YST, 
+     :	                   DIMSO( 1), DIMSO( 2), %VAL( PNTRO), VIEW,
+     :	                   XPIX, YPIX, WHICH, SCALING, XST, XSZ, YST,
      :	                   YSZ, NORMALIZATION)
 
 
@@ -352,7 +352,7 @@
   998	CONTINUE
 	CLOSE( LUN)
 	CALL FIO_PUNIT( LUN, STATUS )
-	CALL ERR_REP( 'MESSAGE', 
+	CALL ERR_REP( 'MESSAGE',
      :                'Error, cannot read from specified file',
      :	              STATUS)
 	END

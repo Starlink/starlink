@@ -15,14 +15,14 @@
 *                     STATUS )
 
 *  Description:
-*     This routine serves MFITTREND.  This processes each line whose 
+*     This routine serves MFITTREND.  This processes each line whose
 *     trend is to be fit within the NDF whose identifier is supplied.
-*     The routine rebins by an integer factor to improve the 
-*     signal-to-noise ratio.  Then the routine fits a straight line to 
+*     The routine rebins by an integer factor to improve the
+*     signal-to-noise ratio.  Then the routine fits a straight line to
 *     the rebinned data, and sigma-clipped outliers rejected.  There is
-*     a choice of dispersions to use for the clipping, either the 
-*     standard deviation from the whole array or just within the line 
-*     being filtered.  The regions encompassing the rejected parts of 
+*     a choice of dispersions to use for the clipping, either the
+*     standard deviation from the whole array or just within the line
+*     being filtered.  The regions encompassing the rejected parts of
 *     the line are set bad in the supplied mask.
 
 *  Arguments:
@@ -34,7 +34,7 @@
 *     NCLIP = INTEGER (Given)
 *        The number of clipping cycles for the rejection of outliers.
 *     CLIP( NCLIP ) = REAL (Given)
-*        The clipping levels in standard deviations for the rejection 
+*        The clipping levels in standard deviations for the rejection
 *        of outliers.
 *     NUMBIN = INTEGER (Given)
 *        The number of bins in the compressed line.  This may be set
@@ -47,7 +47,7 @@
 *        The mask of features.  Features have the bad value VAL__BADB
 *        and the remainder are set to 0.  The supplied array should
 *        have the number of data-array elements contained in the
-*        supplied NDF. 
+*        supplied NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -118,7 +118,7 @@
 
 *  Local Variables:
       INTEGER COMPRS( NDF__MXDIM ) ! Compression factors
-      INTEGER D                  ! No. of o/p pixels from reference to 
+      INTEGER D                  ! No. of o/p pixels from reference to
                                  ! i/p pixel 1
       CHARACTER DTYPE *( NDF__SZFTP ) ! Numeric type for output arrays
       INTEGER EL                 ! Number of mapped elements
@@ -129,13 +129,13 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER NBIN               ! Number of bins
-      INTEGER NDFS               ! Identifier to the used section of 
+      INTEGER NDFS               ! Identifier to the used section of
                                  ! the input NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
       INTEGER OEL                ! Number of elements in output array
       INTEGER PNTRI( 1 )         ! Pointer to input array component
-      INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of 
+      INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of
                                  ! a compression box
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
@@ -153,11 +153,11 @@
 
 *  Compress along the axis being detrended.
 *  ========================================
- 
-*  Work out the bounds for the output array and the size of the output 
-*  array from the input array dimensions, compression factor and 
-*  alignment to origin.  Also modify the input bounds so that they 
-*  correspond to the section of the input array that is actually used. 
+
+*  Work out the bounds for the output array and the size of the output
+*  array from the input array dimensions, compression factor and
+*  alignment to origin.  Also modify the input bounds so that they
+*  correspond to the section of the input array that is actually used.
       OEL = 1
       DO I = 1, NDF__MXDIM
          IF ( I .NE. DTAXIS ) THEN
@@ -167,7 +167,7 @@
             COMPRS( I ) = IDIMS( I ) / NBIN
          END IF
 
-*  Align with the origin.  However, leave it parameterised in case this 
+*  Align with the origin.  However, leave it parameterised in case this
 *  alignment no longer is no longer the only option.
          REF( I ) = LBND( I ) - 1
          D = KPG1_CEIL( REAL( 1 - REF( I ) ) / REAL( COMPRS( I ) ) ) - 1
@@ -175,7 +175,7 @@
 *  Pad the input image to make it a whole number of compression boxes.
          LBNDO( I ) = KPG1_FLOOR( REAL( LBND( I ) - 1 - REF( I ) )
      :                           / REAL( COMPRS( I ) ) ) - D + 1
-         UBNDO( I ) = MAX( LBNDO( I ), 
+         UBNDO( I ) = MAX( LBNDO( I ),
      :                     KPG1_CEIL( REAL( UBND( I ) - REF( I ) )
      :                               / REAL( COMPRS( I ) ) ) - D )
 
@@ -190,7 +190,7 @@
 *  Determine the numeric type to be used for processing the sample
 *  lines.  This step supports single- and double-precision
 *  floating-point processing.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE, 
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE,
      :                DTYPE, STATUS )
 
 *  Create a section of the input NDF containing the region will actually
@@ -211,17 +211,17 @@
 *  Average the lines in the section.  The routine expects at least two
 *  dimensions.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CMAVR( MAX( 2, NDIM ), IDIMS, 
+         CALL KPG1_CMAVR( MAX( 2, NDIM ), IDIMS,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    COMPRS, 1,  %VAL( CNF_PVAL( IPAL ) ),
-     :                    %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ),
      :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CMAVD( MAX( 2, NDIM ), IDIMS, 
+         CALL KPG1_CMAVD( MAX( 2, NDIM ), IDIMS,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    COMPRS, 1, %VAL( CNF_PVAL( IPAL ) ),
-     :                    %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ),
      :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
       END IF
 
@@ -239,11 +239,11 @@
 *  the whole array.
       IF ( ALL ) THEN
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_MFADR( DTAXIS, NCLIP, CLIP, ODIMS, 
+            CALL KPS1_MFADR( DTAXIS, NCLIP, CLIP, ODIMS,
      :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_MFADD( DTAXIS, NCLIP, CLIP, ODIMS, 
+            CALL KPS1_MFADD( DTAXIS, NCLIP, CLIP, ODIMS,
      :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
          END IF
 
@@ -251,11 +251,11 @@
 *  from each line being filtered in turn.
       ELSE
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_MFLDR( DTAXIS, NCLIP, CLIP, ODIMS, 
+            CALL KPS1_MFLDR( DTAXIS, NCLIP, CLIP, ODIMS,
      :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_MFLDD( DTAXIS, NCLIP, CLIP, ODIMS, 
+            CALL KPS1_MFLDD( DTAXIS, NCLIP, CLIP, ODIMS,
      :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
          END IF
       END IF
@@ -268,7 +268,7 @@
 *  Transfer the bad pixels from the binned to the unbinned mask
 *  array.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_MFEBR( COMPRS, IDIMS, ODIMS, 
+         CALL KPS1_MFEBR( COMPRS, IDIMS, ODIMS,
      :                    %VAL( CNF_PVAL( IPAL ) ), MASK, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN

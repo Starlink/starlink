@@ -335,7 +335,7 @@
 
 *        If so, delete it
           IF ( THERE ) THEN
-            CALL PSX_REMOVE( LFILE(:FLEN+1), STATUS ) 
+            CALL PSX_REMOVE( LFILE(:FLEN+1), STATUS )
           END IF
 
 *        Rename old file

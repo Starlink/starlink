@@ -36,4 +36,4 @@
                                  ! the text to be displayed.
 
       COMMON /TRA_COM/ TRA_FD, TRA_LOG, TRA_NBL, TRA_FILT
-      
+

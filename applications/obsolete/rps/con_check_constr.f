@@ -10,7 +10,7 @@
 *   Output :
       CHARACTER*1 XTYPE
       INTEGER FIELD_NO						!Field number being referenced.
- 
+
 *  Global Variables
       INCLUDE 'com_form_qual.inc'
       DOUBLE PRECISION AO_MJD0, AO_PERIOD, AO_DELAY
@@ -30,7 +30,7 @@
       LOGICAL DBS_GETL						!Gets logical value from user (screen mode).
       CHARACTER*1 CON_CHECK_ERR, CON_CHECK_WARN
       LOGICAL CON_RECHECK_TARG
-      
+
 *   Local :
       REAL RVAL							!Real value.
       INTEGER IVAL						!Integer value.
@@ -136,7 +136,7 @@
             MESSAGE='End day'
             GO TO 10
          END IF
-     
+
          IF(ERRF3.EQ.1)THEN
             FIELD_NO=DBS_FIELDNO(REF_NO,'START.HOUR')
             MESSAGE='Start hour'
@@ -146,7 +146,7 @@
             MESSAGE='Start minute'
             GO TO 10
          END IF
-     
+
          IF(ERRF4.EQ.1)THEN
             FIELD_NO=DBS_FIELDNO(REF_NO,'END.HOUR')
             MESSAGE='End hour'
@@ -163,20 +163,20 @@
             FIELD_NO=DBS_FIELDNO(REF_NO,'START.YEAR')
             MESSAGE='End before start time'
             GO TO 10
-         END IF	
+         END IF
 
 * check within AO
          IF (MJD1 .LT. AO_MJD0) THEN
             FIELD_NO=DBS_FIELDNO(REF_NO,'START.YEAR')
             MESSAGE='Start time before AO start'
             GO TO 10
-         END IF	
+         END IF
 
          IF (MJD2 .GT. AO_MJD0 + AO_PERIOD + AO_DELAY) THEN
             FIELD_NO=DBS_FIELDNO(REF_NO,'START.YEAR')
             MESSAGE='End time after AO end'
             GO TO 10
-         END IF	
+         END IF
 
 * check visibility
 
@@ -203,7 +203,7 @@
          IF (NPER_MOON .EQ.1) THEN					! Moon prevents some of chosen slot
             DAYS_MOONC = MJD_MOONC(2) - MJD_MOONC(1)
             DAYS_TOTAL = MJD2 - MJD1
-            PCNT_LOST = 100.0 * DAYS_MOONC / DAYS_TOTAL 
+            PCNT_LOST = 100.0 * DAYS_MOONC / DAYS_TOTAL
             IF (PCNT_LOST .GT. 25 ) THEN
                WRITE( MESSAGE,'(A,I3,A)' ) 'Moon may stop ', PCNT_LOST, ' percent!'
 5              CONTINUE							! until acceptable reply
@@ -269,7 +269,7 @@
          QUAL_TARGET(QTARGET) = .FALSE.
       END IF
       GOTO 20
- 
+
 10    CONTINUE
       XTYPE = CON_CHECK_ERR(MESID,MESSAGE)
       QUAL_TARGET(QTARGET) = .FALSE.

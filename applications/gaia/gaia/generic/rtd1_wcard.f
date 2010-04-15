@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine writes a FITS card  into the "FITS block" by
-*     appending it just before the 'END' keyword. No checking is 
+*     appending it just before the 'END' keyword. No checking is
 *     made.
 
 *  Arguments:
@@ -88,10 +88,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Scan the BLOCK until the END keyword is located. 
+*  Scan the BLOCK until the END keyword is located.
       DO 1 I = 1, NCARD
-         IF ( BLOCK( I ) .EQ. 'END' ) THEN 
-            IF ( I .NE. NCARD ) THEN 
+         IF ( BLOCK( I ) .EQ. 'END' ) THEN
+            IF ( I .NE. NCARD ) THEN
                BLOCK( I ) = CARD
                BLOCK( I + 1 ) = 'END'
             END IF

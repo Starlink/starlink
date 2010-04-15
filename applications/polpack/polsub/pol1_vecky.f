@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, 
-     :                       KDATA, UNITS, JUST, HGTFAC, CLRKEY, 
+      SUBROUTINE POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF,
+     :                       KDATA, UNITS, JUST, HGTFAC, CLRKEY,
      :                       STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS, 
+*     CALL POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS,
 *                      JUST, HGTFAC, CLRKEY, STATUS )
 
 *  Description:
@@ -68,7 +68,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -80,7 +80,7 @@
 *     1995 April 13 (MJC):
 *        Corrected millimetre documentation error and typo's.  Made
 *        minor stylistic changes.  Used modern-style variable
-*        declarations.  
+*        declarations.
 *     1995 April 19 (MJC):
 *        Improved the format of the scale value.  Left-justify the
 *        text for consistency with other keys in KAPPA.  Used more of
@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -146,7 +146,7 @@
 
 *  Local Variables:
       CHARACTER KEYTXT*80        ! Text describing the key vector
-      CHARACTER VSCTXT*80        ! Title text 
+      CHARACTER VSCTXT*80        ! Title text
       DOUBLE PRECISION ATTS( 20 )! Saved graphics attribute values
       INTEGER CI                 ! Original colour index
       INTEGER CI1                ! Lowest available colour index
@@ -174,7 +174,7 @@
       REAL XCH                   ! Height of text with vertical baseline
       REAL XL                    ! X co-ordinate of left of text
       REAL XM                    ! X extent of key picture, in metres
-      REAL XV                    ! X centre of vector 
+      REAL XV                    ! X centre of vector
       REAL Y1                    ! Lower y bound of key picture
       REAL Y2                    ! Upper y bound of key picture
       REAL YC                    ! Y coord. of centre of key object
@@ -213,9 +213,9 @@
       ELSE
 
 *  Note we do need to draw the "Vector scale" string.
-         DRTOP = .TRUE. 
+         DRTOP = .TRUE.
 
-*  Format the vector scale value (data units per centimetre), using the Plot's 
+*  Format the vector scale value (data units per centimetre), using the Plot's
 *  1st axis format attribute.
          VSCTXT = AST_FORMAT( IPLOT, 1, DBLE( VSCALE ), STATUS )
          VSCNC = CHR_LEN( VSCTXT )
@@ -252,7 +252,7 @@
       END IF
 
 *  Find the data value corresponding to a vector length equal to the
-*  largest allowed fraction of the width of the key picture.  If the 
+*  largest allowed fraction of the width of the key picture.  If the
 *  supplied data value is smaller than this, use it.
       KEYDAT = ABS( VECMAX * 100.0 * XM * VSCALE )
       IF ( KDATA .GT. 0.0 .AND. KDATA .LT. KEYDAT ) KEYDAT = KDATA
@@ -324,13 +324,13 @@
       CALL PGQCS( 4, XCH, HGT )
 
 *  Note the Y value at the top of the key.
-      YC = Y1 + KEYOFF*( Y2 - Y1 ) 
-      TY = YC 
+      YC = Y1 + KEYOFF*( Y2 - Y1 )
+      TY = YC
 
 *  Find the Y value at the bottom of the key.
       YC = YC - GAP * 3.0 * HGT
 
-      IF( DRTTL ) THEN 
+      IF( DRTTL ) THEN
 
          IF( DRTOP ) THEN
             YC = YC - GAP * 2.0 * HGT
@@ -341,7 +341,7 @@
       END IF
 
 *  See if we can write in the background colour on the current device.
-      CALL PGQCOL( CI1, CI2 ) 
+      CALL PGQCOL( CI1, CI2 )
 
 *  If we can, clear the area covered by the key, but only if the key is
 *  being drawn over the top of the vector map, and the text background
@@ -371,11 +371,11 @@
       END IF
 
 *  Set the Y world co-ordinate back to the top of the key.
-      YC = Y1 + KEYOFF*( Y2 - Y1 ) 
+      YC = Y1 + KEYOFF*( Y2 - Y1 )
 
 *  Produce text describing the vector scale in words.  Left justify.
       XL = X1 + 0.01 * ( X2 - X1 )
-      IF( DRTTL ) THEN 
+      IF( DRTTL ) THEN
 
          IF( DRTOP ) THEN
             CALL PGTEXT( XL, YC - 0.5*HGT, 'Vector scale:' )
@@ -395,16 +395,16 @@
 *  co-ordinates.
       AHSIZE = ( X2 - X1 ) * AHSIZM / XM
 
-*  Revert to the previous PGPOLOT attribute settings, and then establish the 
+*  Revert to the previous PGPOLOT attribute settings, and then establish the
 *  style requested by the user for lines.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTS, STATUS )
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTS, STATUS )
 
 *  Define the y position of the vector, and the radius of the circle
-*  indicating the justification.  Usually draw the vector justified to 
+*  indicating the justification.  Usually draw the vector justified to
 *  the left, but allowing room for the circle when the justification is
 *  left justified too. Draw the vector centre justified if the key is
-*  drawn on top of the vector map. 
+*  drawn on top of the vector map.
       YC = YC - GAP * HGT
       RADIUS = MIN( 0.1 * KEYLEN, ( X2 - X1 ) * CIRAD )
 
@@ -416,7 +416,7 @@
          XV = XL + 0.5 * KEYLEN
       END IF
 
-      CALL POL1_VECT( XV, YC, 'CENTRE', KEYLEN, -90.0 * DTOR, AHSIZE, 
+      CALL POL1_VECT( XV, YC, 'CENTRE', KEYLEN, -90.0 * DTOR, AHSIZE,
      :                STATUS )
 
 *  Draw a hollow circle to mark the vector reference position.
@@ -434,14 +434,14 @@
       END IF
       CALL PGSFS( FS0 )
 
-*  Revert to the previous PGPOLOT attribute settings, and then establish the 
+*  Revert to the previous PGPOLOT attribute settings, and then establish the
 *  style requested by the user for text.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTS, STATUS )
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTS, STATUS )
 
 *  Plot the text below the vector.
-      IF( CLRKEY ) THEN 
-         CALL PGTEXT( XV - 0.3*HGT*KEYNC, YC - GAP * 2.0 * HGT, 
+      IF( CLRKEY ) THEN
+         CALL PGTEXT( XV - 0.3*HGT*KEYNC, YC - GAP * 2.0 * HGT,
      :                KEYTXT( : KEYNC ) )
       ELSE
          CALL PGTEXT( XL, YC - GAP * 2.0 * HGT, KEYTXT( : KEYNC ) )
@@ -452,7 +452,7 @@
 
 *  Flush the graphics.
       CALL PGUPDT
-      
+
 *  Arrive here if an error has occurred.
  999  CONTINUE
 

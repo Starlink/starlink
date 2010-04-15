@@ -60,7 +60,7 @@
 *  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
-*     Copyright (C) 1996, 2000 Central Laboratory of the Research 
+*     Copyright (C) 1996, 2000 Central Laboratory of the Research
 *     Councils.
 *     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -70,12 +70,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -101,7 +101,7 @@
 *        Modified to accept:
 *         - blank keyword values
 *         - missing equals sign (but only iof the value is blank)
-*        Also fixed bug which caused comments to be lost if they abut 
+*        Also fixed bug which caused comments to be lost if they abut
 *        the keyword value.
 *     2009 January 11 (MJC):
 *        Use new FTS1_GVALC routine to find the location of a string
@@ -112,7 +112,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,7 +164,7 @@
       INTEGER CLEN               ! String length
       INTEGER COLEQS             ! Character pointer to the equals sign
       INTEGER CPOS               ! Integer pointer for appending
-                                 ! right-justified non-character values 
+                                 ! right-justified non-character values
       INTEGER CSTAT              ! Status value in CHR calls
       INTEGER ENDW               ! Column position of the end of the
                                  ! header value (w.r.t. = sign)
@@ -212,7 +212,7 @@
       CARD = ' '
       VALID = .TRUE.
       NOEQS = .FALSE.
-       
+
 *  Validate the length of the card.
 *  ================================
 
@@ -348,7 +348,7 @@
                   CALL MSG_OUTIF( MSG__NORM, 'FITS_VHEAD_NOEQS',
      :              'The header card has no equals sign.', STATUS )
 
-*  If the value strign is blank, we do not need an equals in the 
+*  If the value strign is blank, we do not need an equals in the
 *  returned card.
                ELSE
                   NOEQS = .TRUE.
@@ -395,7 +395,7 @@
                VALDEF = .TRUE.
 
 *  Make NCFD hold the original length of the FITSDAT string (including
-*  any trailing spaces which were included inside the delimiting 
+*  any trailing spaces which were included inside the delimiting
 *  quotes).
                NCFD = NCCQ - NCSTQ - 1
 
@@ -618,7 +618,7 @@
 *  -----------------------
                      ELSE IF ( CDUMMY .EQ. ' '  ) THEN
 
-*  Create the output card by appending as much of the comment as will 
+*  Create the output card by appending as much of the comment as will
 *  fit into the header card.
                         IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                            CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )

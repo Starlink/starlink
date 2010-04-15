@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_get_moltrans( double restFreq, char **molecule, 
+*     smf_get_moltrans( double restFreq, char **molecule,
 *                       char **transition, int * status);
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function uses the look up table of frequencies in 
+*     This function uses the look up table of frequencies in
 *     smf_moltrans.h to determine the most likely target transition
 *     for a given rest frequency.  The name of the molecule and
 *     transition of the closest frequency is returned.
@@ -85,7 +85,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_get_moltrans"
 
-void smf_get_moltrans( double restFreq, const char **molecule, 
+void smf_get_moltrans( double restFreq, const char **molecule,
                        const char **transition, int *status ) {
 
   /* Local variables. */
@@ -97,7 +97,7 @@ void smf_get_moltrans( double restFreq, const char **molecule,
   /* First check to make sure that the frequency is positive. */
   if ( restFreq < 0 ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Rest frequency must be positive", status);  
+    errRep(FUNC_NAME, "Rest frequency must be positive", status);
   }
 
   /* First, check to see if the given rest frequency is less than
@@ -119,15 +119,15 @@ void smf_get_moltrans( double restFreq, const char **molecule,
          the previous one. */
       if ( fabs ( transitions[i].freq - restFreq ) <
            fabs ( transitions[i-1].freq - restFreq ) ) {
- 
+
         *molecule = &(transitions[i].molecule[0]);
-        *transition = &(transitions[i].transiti[0]); 
+        *transition = &(transitions[i].transiti[0]);
         return;
 
       } else {
 
         *molecule = &(transitions[i-1].molecule[0]);
-        *transition = &(transitions[i-1].transiti[0]); 
+        *transition = &(transitions[i-1].transiti[0]);
         return;
 
       }
@@ -141,7 +141,7 @@ void smf_get_moltrans( double restFreq, const char **molecule,
   /* We got to the end of the list, so select the last
      transition. */
   *molecule = &(transitions[i-1].molecule[0]);
-  *transition = &(transitions[i-1].transiti[0]);       
+  *transition = &(transitions[i-1].transiti[0]);
 
 }
 

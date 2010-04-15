@@ -129,7 +129,7 @@
         CALL PAR_GET0R( 'MINIMUM', DEFANN_MIN, STATUS)
 
         IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                 'Error : DEFAULT_ANNOTATION : after PAR_GETS',
      :                 STATUS )
           RETURN

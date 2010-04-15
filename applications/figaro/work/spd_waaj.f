@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -150,7 +150,7 @@
 *  Write to file.
       IF ( FILENO .GT. 0 ) THEN
          WRITE ( FILENO, '(A1)' ) ' '
-         STRNG = 
+         STRNG =
      :      ' Two-parameter linear fit' //
      :      '   y = A0 + A1 * x1 + A2 * x2   from files'
          WRITE ( FILENO, '(A79)' ) STRNG

@@ -39,7 +39,7 @@ in addition to descriptions of the library routines.
 %
 %  Purpose:
 %     Documentation for GSD library.
-%     
+%
 %
 %  Authors:
 %     AJC: A.J.Chipperfield (Starlink, RAL)
@@ -89,7 +89,7 @@ in addition to descriptions of the library routines.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -427,7 +427,7 @@ in addition to descriptions of the library routines.
       \end{itemize}
       \\
    }
-%  sstitem    
+%  sstitem
    \newcommand{\sstitem}{\item}
 
 \end{htmlonly}
@@ -505,12 +505,12 @@ in addition to descriptions of the library routines.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -658,7 +658,7 @@ The math library (\texttt{-lm}) is required when using the C interface.
 
 This command creates the correct links to the Fortran include files,
 effectively making a link from \texttt{GSD\_PAR} to
-\texttt{/star/include/gsd\_par}. 
+\texttt{/star/include/gsd\_par}.
 Use the `\texttt{remove}' argument to remove the link.
 
 \end{description}
@@ -687,7 +687,7 @@ SPECX and JCMTDR distributions. First release for Linux.
 \addcontentsline{toc}{section}{References}
 
 \bibitem{F89}
-Fairclough~J.~H., 1989, {\it GSD -- Global Section Datafile System}, 
+Fairclough~J.~H., 1989, {\it GSD -- Global Section Datafile System},
 JCMT Note MT/IN/33
 
 \bibitem{scuba}
@@ -701,7 +701,7 @@ Warren-Smith~R.~F., 1998, {\it NDF -- Routines for Accessing the Extensible
 N-Dimensional Data Format}, \xref{Starlink User Note 33}{sun33}{}
 
 \bibitem{jcmtdr}
-Lightfoot~J.~F., Harrison~P.~A., Meyerdierks~H., 1995, 
+Lightfoot~J.~F., Harrison~P.~A., Meyerdierks~H., 1995,
 {\it JCMTDR -- Applications for reducing JCMT data},
 \xref{Starlink User Note 132}{sun132}{}
 
@@ -1299,13 +1299,13 @@ form \texttt{GSD\_XXX} rather than \texttt{gsdXxx}.
       number of bytes needed to store a pointer. actual\_space would need a
       step in memory by 16 bytes, i.e. the distance from one string to the
       next. The main routine knows about this, because it declared
-      actual\_space \_and\_ pointr\_array.  
-} \sstdiytopic{ 
-    Copyright 
+      actual\_space \_and\_ pointr\_array.
+} \sstdiytopic{
+    Copyright
 }{
       Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
-      All Rights Reserved.  
-} 
+      All Rights Reserved.
+}
 }
 \sstroutine{
    gsdItem

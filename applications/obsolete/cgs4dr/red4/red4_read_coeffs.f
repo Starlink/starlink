@@ -1,5 +1,5 @@
 *+  RED4_READ_COEFFS - Read linearisation coefficients from a file.
-      SUBROUTINE RED4_READ_COEFFS( FILE, MAXCOEFFS, NCOEFFS, COEFFS, 
+      SUBROUTINE RED4_READ_COEFFS( FILE, MAXCOEFFS, NCOEFFS, COEFFS,
      :  STATUS )
 *    Description :
 *     This routine reads the linearisation coefficients from the
@@ -145,7 +145,7 @@
      :              ( IOS .EQ. FOR__EOF ) ) THEN
 
 *               If the maximum number of coefficients have been read
-*               and an end-of-file has not been reached, give a 
+*               and an end-of-file has not been reached, give a
 *               warning but carry on using the coefficients read.
                   IF ( ( NCOEFFS .GT. MAXCOEFFS ) .AND.
      :                 ( IOS .EQ. FOR__OK ) ) THEN
@@ -159,7 +159,7 @@
      :                 /'ignored', STATUS )
                   END IF
 
-*               Reset the status, to ensure that a legitimate 
+*               Reset the status, to ensure that a legitimate
 *               "end-of-file" is not reported as an error later on.
                   IOS = FOR__OK
                END IF
@@ -171,7 +171,7 @@
 
                STATUS = SAI__ERROR
                CALL ERR_REP( ' ', 'RED4_READ_COEFFS: '/
-     :           /'Error reading linearisation '/ 
+     :           /'Error reading linearisation '/
      :           /'coefficients file (reason follows)', STATUS )
                CALL MSG_SETI( 'IOS', IOS )
                CALL ERR_REP( ' ', 'RED4_READ_COEFFS: '/

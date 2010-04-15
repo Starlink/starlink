@@ -138,7 +138,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   if( *status != SAI__OK ) return;
   if( !(flags&SMF__DIMM_INVERT) ) return;
 
-  /* Get the number of blocks into which to split each time series. Each box 
+  /* Get the number of blocks into which to split each time series. Each box
      (except possibly the last one contains "gain_box" time slices. */
   gain_box = 6000;
   if( astMapGet0A( keymap, "COM", &kmap ) ) {
@@ -146,7 +146,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
         gain_box = ival;
      }
      kmap = astAnnul( kmap );
-  }                 
+  }
 
   /* Obtain pointer to sub-keymap containing GAI parameters */
   if( astMapGet0A( keymap, "GAI", &kmap ) ) {
@@ -199,7 +199,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
       wg = astMalloc( ntslice*sizeof( *wg ) );
 
       /* Get the number of blocks into which the time stream is divided.
-         Each block has a separate gain, offset and correlation factor 
+         Each block has a separate gain, offset and correlation factor
          for each bolometer. */
       nblock = npar/3;
 
@@ -209,7 +209,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
         if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
 
           /* Get the gain and offset for each time slice of this bolometer. */
-          smf_gandoff( i, 0, ntslice - 1, ntslice, gbstride, gcstride, 
+          smf_gandoff( i, 0, ntslice - 1, ntslice, gbstride, gcstride,
                        model_data, nblock, gain_box, wg, woff, status );
 
           /* First undo the flatfield correction to the signal */

@@ -694,7 +694,7 @@ ability to automatically track along the spectrum to account for small
 shifts of the spectrum from its standard position.
 
 In our LORES example, this rather trusting approach to using TRAK is
-probably safe in the case of point source objects which have a reasonably 
+probably safe in the case of point source objects which have a reasonably
 strong signal.  However, you should find out how to use TRAK for less typical
 cases.
 
@@ -802,7 +802,7 @@ might not)\@.
 
 Now that we have produced a calibrated spectrum, the next thing to do is
 analyse it.  By analyse we mean that measurements are made on it (line
-strengths, continuum shapes, {\it etc.})\ and that it is compared to other 
+strengths, continuum shapes, {\it etc.})\ and that it is compared to other
 spectra.
 
 None of these Analysis facilities are yet available in IUEDR\@.  However,
@@ -857,7 +857,7 @@ where \xref{\verb+DATASET+}{sg3}{DATASET}
  and \xref{\verb+DEVICE+}{sg3}{DEVICE}
  are assumed predefined.  This sequence
 is almost the same as for our LORES example, except that we have specified that
-the scan cover \'{E}chelle orders 66 to 69.  This means that when 
+the scan cover \'{E}chelle orders 66 to 69.  This means that when
 \xref{\verb+PLSCAN+}{sg3}{PLSCAN}
 produces the scan plot it will contain only a few peaks (instead of about 60!)
 which are well resolved.  \xref{\verb+CGSHIFT+}{sg3}{CGSHIFT}
@@ -881,7 +881,7 @@ which will let you work with the higher numbered orders (which are much
 closer together on the image)\@.
 
 Once the global spectrum shift has been determined, you can then extract the
-spectrum from the image using \xref{\verb+TRAK+}{sg3}{TRAK}\@. In the HIRES 
+spectrum from the image using \xref{\verb+TRAK+}{sg3}{TRAK}\@. In the HIRES
 case, \verb+TRAK+
 differs in that you must specify which \'{E}chelle orders are to be extracted.
 To extract a single order:
@@ -901,7 +901,7 @@ the \verb+TRAK+ command is not very fast, and you will notice this all the more
 working with HIRES data.
 
 The HIRES spectrum is broken up into individual \'{E}chelle orders, so that
-when we display it, for example using \xref{\verb+PLFLUX+}{sg3}{PLFLUX}, 
+when we display it, for example using \xref{\verb+PLFLUX+}{sg3}{PLFLUX},
 then the \xref{\verb+ORDER+}{sg3}{ORDER}
 parameter is used to specify which one we want.  Consider the example:
 
@@ -952,7 +952,7 @@ You can plot the mean spectrum using:
    > PLMEAN
 \end{verbatim}
 
-which operates much like \xref{\verb+PLFLUX+}{sg3}{PLFLUX}\@.  You can also 
+which operates much like \xref{\verb+PLFLUX+}{sg3}{PLFLUX}\@.  You can also
 output it to a Starlink NDF file using:
 
 \begin{verbatim}
@@ -1751,7 +1751,7 @@ The first line of attack given a GO tape is to perform an analysis of it.
 The \xref{\verb+LISTIUE+}{sg3}{LISTIUE}
  command can be used for this.
 This will provide a listing of the IUE tape header for each file on the tape
-along with an opinion of what it contains (image, spectrum, {\it etc.})\ and 
+along with an opinion of what it contains (image, spectrum, {\it etc.})\ and
 which version of IUESIPS was used.
 \verb+LISTIUE+ is described in Section~\ref{subse:tape_anal}\@.
 
@@ -2307,8 +2307,8 @@ a tape, or find out the current position.  For example, during a `think'
 period, it may save time if the tape is rewound to its start position.
 
 To this end, IUEDR has a number of tape utility commands; we have already
-encountered \xref{\verb+MTREW+}{sg3}{MTREW}\@.  In all these commands, the 
-tape drive is specified by the \xref{\verb+DRIVE+}{sg3}{DRIVE} parameter, 
+encountered \xref{\verb+MTREW+}{sg3}{MTREW}\@.  In all these commands, the
+tape drive is specified by the \xref{\verb+DRIVE+}{sg3}{DRIVE} parameter,
 which will generally take its default value.
 
 A tape can be positioned at the start of a particular file by, for example:
@@ -2339,7 +2339,7 @@ where \xref{\verb+NSKIP+}{sg3}{NSKIP}
 \verb+NSKIP+
 is negative, then tape marks are skipped in the reverse direction
 (towards the start of the tape)\@.  \verb+NSKIP+ defaults to \verb+1+ after each
-invocation of \xref{\verb+MTSKIPF+}{sg3}{MTSKIPF}, so that the normal 
+invocation of \xref{\verb+MTSKIPF+}{sg3}{MTSKIPF}, so that the normal
 default is to skip forward over the next tape mark.
 
 If it is necessary to access data beyond a standard End-of-Volume (EOV) mark
@@ -2665,14 +2665,14 @@ Manual; however, some would benefit further explanation here.
 
 The \xref{\verb+DRIVE+}{sg3}{DRIVE}, \xref{\verb+FILE+}{sg3}{FILE}
 and \xref{\verb+NLINE+}{sg3}{NLINE} parameters are used in the same
-way as for \xref{\verb+LISTIUE+}{sg3}{LISTIUE}\@.  If the header text 
-has been inspected and relevant information obtained, then a value 
-\verb+NLINE=10+ will keep the output to a minimum, yet still print enough 
+way as for \xref{\verb+LISTIUE+}{sg3}{LISTIUE}\@.  If the header text
+has been inspected and relevant information obtained, then a value
+\verb+NLINE=10+ will keep the output to a minimum, yet still print enough
 of the header to remind you of what the observation is about.
 
-The \xref{\verb+DATASET+}{sg3}{DATASET} parameter value should correspond to 
-the main part of a file name.  The name is limited to 9 characters, and 
-should ideally describe the observation in terms of the 
+The \xref{\verb+DATASET+}{sg3}{DATASET} parameter value should correspond to
+the main part of a file name.  The name is limited to 9 characters, and
+should ideally describe the observation in terms of the
 \xref{\verb+CAMERA+}{sg3}{CAMERA} and \xref{\verb+IMAGE+}{sg3}{IMAGE}
  used.
 
@@ -2682,15 +2682,15 @@ PHOT and GPHOT requires that the \xref{\verb+TYPE+}{sg3}{TYPE}
  parameter be specified.
 
 The \xref{\verb+CAMERA+}{sg3}{CAMERA}, \xref{\verb+IMAGE+}{sg3}{IMAGE},
-\xref{\verb+APERTURES+}{sg3}{APERTURES} and 
-\xref{\verb+RESOLUTION+}{sg3}{RESOLUTION} parameters should always be 
-specified correctly. Apart from providing identification information for 
+\xref{\verb+APERTURES+}{sg3}{APERTURES} and
+\xref{\verb+RESOLUTION+}{sg3}{RESOLUTION} parameters should always be
+specified correctly. Apart from providing identification information for
 the observation, they are used in providing default calibration data.
 
 The \verb+APERTURES+ parameter determines how many apertures have been exposed.
 Values of \verb+SAP+ or \verb+LAP+ indicate a single aperture, whereas
 \verb+BAP+ indicates both of these.  In the case of \verb+BAP+, it should be
-noted that two values will be required for the 
+noted that two values will be required for the
 \xref{\verb+EXPOSURES+}{sg3}{EXPOSURES} parameter
 (exposure time in seconds)\@.
 
@@ -2699,7 +2699,7 @@ The \xref{\verb+THDA+}{sg3}{THDA}, \xref{\verb+YEAR+}{sg3}{YEAR},
 parameters are used for temperature and time dependent calibration
 corrections.
 
-The \xref{\verb+BADITF+}{sg3}{BADITF} parameter determines whether a 
+The \xref{\verb+BADITF+}{sg3}{BADITF} parameter determines whether a
 simple correction is made to
 remove errors in the intensity caused by use of inaccurate or wrong ITF tables.
 This ITF correction is only available for LORES\@.  For the SWP camera at
@@ -2707,26 +2707,26 @@ LORES, this corrects for quite major errors in the Faulty (2nd) production
 ITF\@.  For the LWR camera at LORES, this corrects for minor errors in the 2nd
 production ITF\@.
 
-The \xref{\verb+ITFMAX+}{sg3}{ITFMAX} parameter is only needed for GPHOT 
+The \xref{\verb+ITFMAX+}{sg3}{ITFMAX} parameter is only needed for GPHOT
 images.  It is used in
 determining whether pixels have suffered from ITF saturation or
 extrapolation.  A suitable value can be determined from the GPHOT VICAR
 header text (see Section~\ref{subse:itf_prob} of this Guide, and/or the
 Manual)\@.
 
-The \xref{\verb+NGEOM+}{sg3}{NGEOM} parameter is there for the sake of 
+The \xref{\verb+NGEOM+}{sg3}{NGEOM} parameter is there for the sake of
 flexibility.  It is the
 number of terms used (per axis) in the 2-D Chebyshev Polynomial series that
 describes the geometric distortion for RAW and PHOT images.  A default value is
 provided, and should not be altered unless vital.
 
-The \xref{\verb+OBJECT+}{sg3}{OBJECT} parameter is a line of text used 
+The \xref{\verb+OBJECT+}{sg3}{OBJECT} parameter is a line of text used
 to describe the object of
 the observation.  This text is used for display purposes ({\it{e.g.,}} above
 plots), and should include the object identification.
 It does no harm to append the Camera and Image as in the above example.
 
-It is a good idea to provide correct values for these 
+It is a good idea to provide correct values for these
 \xref{\verb+READIUE+}{sg3}{READIUE} parameters.
 However, it should be noted that some of these can be changed after dataset
 creation.  These include the \xref{\verb+OBJECT+}{sg3}{OBJECT},
@@ -2759,7 +2759,7 @@ otherwise have meaningless values left over from earlier images.
 
 The \xref{\verb+READSIPS+}{sg3}{READSIPS}
  command reads a MELO/MEHI product from an IUESIPS\#1 or
-IUESIPS\#2 tape.  Operation is much like \xref{\verb+READIUE+}{sg3}{READIUE}, 
+IUESIPS\#2 tape.  Operation is much like \xref{\verb+READIUE+}{sg3}{READIUE},
 except that some
 parameters and associated information are not needed.  Only calibration
 (\verb+*.UEC+) and spectrum (\verb+*_UES.sdf+) files are created.  The values
@@ -2772,7 +2772,7 @@ will not be prompted for them.
 \markboth{Displaying Images \& Plotting Spectra}{\stardocname}
 
 
-\subsection{\xlabel{drimage}\label{subse:drimage}Displaying Images with 
+\subsection{\xlabel{drimage}\label{subse:drimage}Displaying Images with
             {\tt DRIMAGE}}
 
 The image dataset read from tape with \xref{\verb+READIUE+}{sg3}{READIUE}
@@ -3035,10 +3035,10 @@ further on. Here is a summary of these (and other) calibrations:
 \item [{\bf Fiducials:}]
       This is a description of the grid of fiducial marks formed
       on the image by reseaux marks on one of the in-focus camera surfaces.
-      The image coordinates, (S, L), of each fiducial are given.  In some 
+      The image coordinates, (S, L), of each fiducial are given.  In some
       cases, the coordinates are a function of the camera temperature
       (\xref{\verb+THDA+}{sg3}{THDA})\@.
-      A global fiducial size is also specified so that pixels affected by 
+      A global fiducial size is also specified so that pixels affected by
       them can be marked.
 
 \item [{\bf Geometry:}]
@@ -3355,7 +3355,7 @@ completeness, the number of terms along each axis can be specified by:
    > SETD NGEOM=5
 \end{verbatim}
 
-This is the default value provided by \xref{\verb+READIUE+}{sg3}{READIUE}, 
+This is the default value provided by \xref{\verb+READIUE+}{sg3}{READIUE},
 and should be quite adequate.
 
 Only information about the large-scale geometric distortion can be provided
@@ -3784,7 +3784,7 @@ a large number of parameters.  However, initially these are defaulted to
 handle the simplest case: that of point source spectra with good
 signal-to-noise.
 
-The \xref{\verb+LBLS+}{sg3}{LBLS} command is also available for spectrum 
+The \xref{\verb+LBLS+}{sg3}{LBLS} command is also available for spectrum
 extraction.
 This produces a line-by-line spectrum similar to the corresponding IUESIPS
 product.  The LBLS is a 2-dimensional array with wavelength along one axis and
@@ -4069,7 +4069,7 @@ a few special cases (to be elaborated below)\@.
 When \verb+AUTOSLIT=FALSE+, you can specify the channel details as required.
 
 For LORES extractions, when \verb+AUTOSLIT=TRUE+ the
-\xref{\verb+APERTURE+}{sg3}{APERTURE} and \xref{\verb+EXTENDED+}{sg3}{EXTENDED} 
+\xref{\verb+APERTURE+}{sg3}{APERTURE} and \xref{\verb+EXTENDED+}{sg3}{EXTENDED}
 parameters are used.  If \verb+EXTENDED=TRUE+ and \verb+APERTURE=LAP+ then a
 wide object channel is used so that all the object signal is integrated.
 Otherwise, a point-source object channel is used.  The background channels are
@@ -4222,7 +4222,7 @@ Even if there is no continuum, care is needed to avoid situation where the
 background channel for one order includes emission lines from another.
 Probably the best approach to adopt for emission-line objects is to let
 the background run along the middle of the inter-order channel
-(\verb+CONTINUUM=YES+, \verb+EXTENDED=YES+), and  let  the  background 
+(\verb+CONTINUUM=YES+, \verb+EXTENDED=YES+), and  let  the  background
 smoothing/discrimination mechanism reject any contaminating signals.
 
 \subsubsection{{\tt TRAK} parameters that affect the Background subtraction}
@@ -4499,8 +4499,8 @@ However, better resolution can be obtained with:
 \begin{latexonly}
 Each pixel in the LBLS array represents a surface integral of size
 \xref{\verb+RSAMP+}{sg3}{RSAMP} $\times$ \xref{\verb+GSAMP+}{sg3}{GSAMP}
-geometric pixels (spatial $\times$ wavelength)\@.  However, the intensities 
-have been scaled (as with \xref{\verb+TRAK+}{sg3}{TRAK}) so that the 
+geometric pixels (spatial $\times$ wavelength)\@.  However, the intensities
+have been scaled (as with \xref{\verb+TRAK+}{sg3}{TRAK}) so that the
 effective wavelength bin is equivalent to 1.414 geometric pixels.
 This is so that, if the background were removed and pixels for a given
 wavelength were summed then the existing IUESIPS absolute calibration could
@@ -4510,8 +4510,8 @@ be used directly (LORES at least).
 \begin{htmlonly}
 Each pixel in the LBLS array represents a surface integral of size
 \xref{\verb+RSAMP+}{sg3}{RSAMP}x\xref{\verb+GSAMP+}{sg3}{GSAMP}
-geometric pixels (spatial times wavelength)\@.  However, the intensities 
-have been scaled (as with \xref{\verb+TRAK+}{sg3}{TRAK}) so that the 
+geometric pixels (spatial times wavelength)\@.  However, the intensities
+have been scaled (as with \xref{\verb+TRAK+}{sg3}{TRAK}) so that the
 effective wavelength bin is equivalent to 1.414 geometric pixels.
 This is so that, if the background were removed and pixels for a given
 wavelength were summed then the existing IUESIPS absolute calibration could
@@ -6241,7 +6241,7 @@ for example, \xref{DIPSO}{sun50}{}\@.
 This  is a very versatile programme that allows the manipulation, display and
 measurement of spectra.  It would be out of place to give a thorough
 description of DIPSO here.  However, if you are dealing with calibrated 1-D
-spectra from almost any source (IUE, IPCS, Model Atmospheres, {\it etc.}) 
+spectra from almost any source (IUE, IPCS, Model Atmospheres, {\it etc.})
 then you will probably find it very useful.
 
 It is the purpose of this Section to show how to create various kinds of
@@ -6281,10 +6281,10 @@ The commands provided are as follows:
       NDF\@.
 
 \item [{\bf Output of Scan data:} {\tt OUTSCAN}]
-      The data produced by a \xref{\verb+SCAN+}{sg3}{SCAN} command can be 
+      The data produced by a \xref{\verb+SCAN+}{sg3}{SCAN} command can be
       output to an NDF\@.  A scan profile is quite
       spectrum-like and so these data can easily be read by other packages for
-      visualisation purposes {\it etc.}  It should be pointed out that in a 
+      visualisation purposes {\it etc.}  It should be pointed out that in a
       scan, the ordinate ($x$-axis) can include negative values, and that such
       `spectra' may not be handled sensibly in some programmes.
 

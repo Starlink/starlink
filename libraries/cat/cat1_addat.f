@@ -1,7 +1,7 @@
       SUBROUTINE CAT1_ADDAB (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAB 
+*     CAT1_ADDAB
 *  Purpose:
 *     Add an attribute of type B to the list of atributes.
 *  Language:
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@ C        write(17, 2001) natt__cat1, nattB__cat1
 C2001    format(1x, 'natt__cat1, nattB__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN
@@ -128,7 +128,7 @@ C2001    format(1x, 'natt__cat1, nattB__cat1: ', I6, I6 )
       SUBROUTINE CAT1_ADDAC (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAC 
+*     CAT1_ADDAC
 *  Purpose:
 *     Add an attribute of type C to the list of atributes.
 *  Language:
@@ -199,7 +199,7 @@ C        write(17, 2001) natt__cat1, nattC__cat1
 C2001    format(1x, 'natt__cat1, nattC__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN
@@ -239,7 +239,7 @@ C2001    format(1x, 'natt__cat1, nattC__cat1: ', I6, I6 )
       SUBROUTINE CAT1_ADDAD (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAD 
+*     CAT1_ADDAD
 *  Purpose:
 *     Add an attribute of type D to the list of atributes.
 *  Language:
@@ -310,7 +310,7 @@ C        write(17, 2001) natt__cat1, nattD__cat1
 C2001    format(1x, 'natt__cat1, nattD__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN
@@ -350,7 +350,7 @@ C2001    format(1x, 'natt__cat1, nattD__cat1: ', I6, I6 )
       SUBROUTINE CAT1_ADDAI (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAI 
+*     CAT1_ADDAI
 *  Purpose:
 *     Add an attribute of type I to the list of atributes.
 *  Language:
@@ -421,7 +421,7 @@ C        write(17, 2001) natt__cat1, nattI__cat1
 C2001    format(1x, 'natt__cat1, nattI__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN
@@ -461,7 +461,7 @@ C2001    format(1x, 'natt__cat1, nattI__cat1: ', I6, I6 )
       SUBROUTINE CAT1_ADDAL (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAL 
+*     CAT1_ADDAL
 *  Purpose:
 *     Add an attribute of type L to the list of atributes.
 *  Language:
@@ -532,7 +532,7 @@ C        write(17, 2001) natt__cat1, nattL__cat1
 C2001    format(1x, 'natt__cat1, nattL__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN
@@ -572,7 +572,7 @@ C2001    format(1x, 'natt__cat1, nattL__cat1: ', I6, I6 )
       SUBROUTINE CAT1_ADDAR (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAR 
+*     CAT1_ADDAR
 *  Purpose:
 *     Add an attribute of type R to the list of atributes.
 *  Language:
@@ -643,7 +643,7 @@ C        write(17, 2001) natt__cat1, nattR__cat1
 C2001    format(1x, 'natt__cat1, nattR__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN
@@ -683,7 +683,7 @@ C2001    format(1x, 'natt__cat1, nattR__cat1: ', I6, I6 )
       SUBROUTINE CAT1_ADDAW (ID, NAME, MUTBLE, VALUE, STATUS)
 *+
 *  Name:
-*     CAT1_ADDAW 
+*     CAT1_ADDAW
 *  Purpose:
 *     Add an attribute of type W to the list of atributes.
 *  Language:
@@ -754,7 +754,7 @@ C        write(17, 2001) natt__cat1, nattW__cat1
 C2001    format(1x, 'natt__cat1, nattW__cat1: ', I6, I6 )
 
 *
-*       Check whether there is space for any more attributes, both in 
+*       Check whether there is space for any more attributes, both in
 *       total and of the appropriate data type.
 
          IF (NATT__CAT1    .LT.  CAT1__MXATT) THEN

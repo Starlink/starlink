@@ -12,7 +12,7 @@ C
 C  Description:
 C     This routine checks that the axis information for two structures
 C     matches.  It checks that a) the two structures have the same
-C     number of axes, b) that the units, if any are given, are the same 
+C     number of axes, b) that the units, if any are given, are the same
 C     for each axis, c) that the axis data, if it exists, is the same
 C     for each axis.  If there are any discrepancies, an error message
 C     is output, and bad status is returned.  This routine is intended

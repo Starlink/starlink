@@ -176,7 +176,7 @@ datGet(const HDSLoc     *locator,
 /* If a temporary buffer has been used to ensure correct data alignment,    */
 /* copy the results to the true application buffer and deallocate the      */
 /* temporary one.                  */
-      
+
     if ( fixalign )
     {
        if ( _ok( hds_gl_status ) )
@@ -209,7 +209,7 @@ datGetI(const HDSLoc    *locator,
         int       ndim,
         const HDS_PTYPE dims[],
         int       values[],
-        int       *status) 
+        int       *status)
 {
 #undef context_name
 #undef context_message
@@ -217,7 +217,7 @@ datGetI(const HDSLoc    *locator,
 #define context_message\
         "DAT_GETI: Error reading integer value(s) from an HDS primitive."
 
-   datGet(locator, "_INTEGER", ndim, dims, 
+   datGet(locator, "_INTEGER", ndim, dims,
                      values, status );
 
    return hds_gl_status;
@@ -231,7 +231,7 @@ datGetR(const HDSLoc    *locator,
         int       ndim,
         const HDS_PTYPE dims[],
         float     values[],
-        int       *status) 
+        int       *status)
 {
 #undef context_name
 #undef context_message
@@ -253,14 +253,14 @@ datGetD(const HDSLoc    *locator,
         int       ndim,
         const HDS_PTYPE dims[],
         double    values[],
-        int       *status) 
+        int       *status)
 {
 #undef context_name
 #undef context_message
 #define context_name "DAT_GETD_ERR"
 #define context_message\
     "DAT_GETD: Error reading double precision value(s) from an HDS primitive."
-        
+
    datGet(locator, "_DOUBLE", ndim, dims,
                      values, status );
 
@@ -275,14 +275,14 @@ datGetL(const HDSLoc    *locator,
         int       ndim,
         const HDS_PTYPE dims[],
         int       values[],
-        int       *status) 
+        int       *status)
 {
 #undef context_name
 #undef context_message
 #define context_name "DAT_GETL_ERR"
 #define context_message\
         "DAT_GETL: Error reading logical value(s) from an HDS primitive."
-        
+
    datGet(locator, "_LOGICAL", ndim, dims,
                      values, status );
 
@@ -298,7 +298,7 @@ datGetC(const HDSLoc    *locator,
         const HDS_PTYPE dims[],
         char      values[],
         size_t    char_len,
-        int       *status) 
+        int       *status)
 {
 #undef context_name
 #undef context_message
@@ -455,7 +455,7 @@ datGetVD( const HDSLoc * locator,
   if (*status != DAT__OK) return *status;
   datVec(locator, &vec, status );
   datGet1D( vec, maxval, values, actval, status );
-  datAnnul( &vec, status );  
+  datAnnul( &vec, status );
   return *status;
 }
 /*==========================================*/
@@ -472,7 +472,7 @@ datGetVI( const HDSLoc * locator,
   if (*status != DAT__OK) return *status;
   datVec(locator, &vec, status );
   datGet1I( vec, maxval, values, actval, status );
-  datAnnul( &vec, status );  
+  datAnnul( &vec, status );
   return *status;
 }
 
@@ -490,7 +490,7 @@ datGetVR( const HDSLoc * locator,
   if (*status != DAT__OK) return *status;
   datVec(locator, &vec, status );
   datGet1R( vec, maxval, values, actval, status );
-  datAnnul( &vec, status );  
+  datAnnul( &vec, status );
   return *status;
 }
 
@@ -508,6 +508,6 @@ datGetVL( const HDSLoc * locator,
   if (*status != DAT__OK) return *status;
   datVec(locator, &vec, status );
   datGet1L( vec, maxval, values, actval, status );
-  datAnnul( &vec, status );  
+  datAnnul( &vec, status );
   return *status;
 }

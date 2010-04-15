@@ -19,7 +19,7 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The XmlChan class provides facilities for reading and writing AST 
+*     The XmlChan class provides facilities for reading and writing AST
 *     Objects in the form of XML.
 
 *  Inheritance:
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -144,14 +144,14 @@ typedef struct AstXmlChanVtab {
 
 } AstXmlChanVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 typedef struct AstXmlChanGlobals {
    AstXmlChanVtab Class_Vtab;
    int Class_Init;
    AstXmlChan *IsUsable_This;
    char GetAttrib_Buff[ 51 ];
-   char *GetNextChar_C;    
-   char *GetNextChar_Buf;  
+   char *GetNextChar_C;
+   char *GetNextChar_Buf;
 } AstXmlChanGlobals;
 
 #endif
@@ -183,10 +183,10 @@ AstXmlChan *astXmlChanForId_( const char *(*)( void ),
 
 /* Initialiser. */
 AstXmlChan *astInitXmlChan_( void *, size_t, int, AstXmlChanVtab *,
-                             const char *, const char *(*)( void ), 
-                             char *(*)( const char *(*)( void ), int * ), 
-                             void (*)( const char * ), 
-                             void (*)( void (*)( const char * ), 
+                             const char *, const char *(*)( void ),
+                             char *(*)( const char *(*)( void ), int * ),
+                             void (*)( const char * ),
+                             void (*)( void (*)( const char * ),
                              const char *, int * ), int * );
 
 /* Vtab initialiser. */
@@ -199,7 +199,7 @@ AstXmlChan *astLoadXmlChan_( void *, size_t, AstXmlChanVtab *,
                                const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitXmlChanGlobals_( AstXmlChanGlobals * );
 #endif
 

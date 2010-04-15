@@ -1,5 +1,5 @@
 *+  MEDREP - expands ARRIN into ARROUT by replication of edge pixels of ARRIN
-      SUBROUTINE MEDREP( STEP, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, 
+      SUBROUTINE MEDREP( STEP, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2,
      :                   ARROUT, STATUS )
 *    Description :
 *     The input array, ARRIN, is copied into the central section of the

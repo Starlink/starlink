@@ -82,7 +82,7 @@ C
 C     Note that all this assumes that the data is held as 2's complement.
 C     as does the rather dirty code involving the use of long integers
 C     and adding or subtracting 32768.  (Personally, I think a better way
-C     to do this would be to call a C subroutine to do the work, but 
+C     to do this would be to call a C subroutine to do the work, but
 C     didn't want to add multi-lingual complications as well.)  The flipping
 C     of the sign bit works as follows:
 C
@@ -93,7 +93,7 @@ C     0000                   0               -32768             8000
 C     EFFF                 32767               -1               FFFF
 C     FFFF                  -1                32767             EFFF
 C
-C     So this should work on any machine that uses two's complement 
+C     So this should work on any machine that uses two's complement
 C     integers and supports INTEGER*2 and INTEGER (with INTEGER able
 C     to hold the value 32768)
 C
@@ -118,7 +118,7 @@ C
             IF (STATUS.NE.0) GO TO 600
          END IF
       END DO
-      IF ((.NOT.NOSWAP).AND.FPTRS.GT.1) 
+      IF ((.NOT.NOSWAP).AND.FPTRS.GT.1)
      :       CALL GEN_BSWAP(FBUFFS(FPTRO),FPTRS-FPTRO)
       FPTR=(FPTRS-1)*2+1
 C

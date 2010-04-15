@@ -56,7 +56,7 @@ struct      int_bar     /* intensity bar structure              */
     };
 typedef struct int_bar INT_BAR;
 
-struct 
+struct
    {
    int     id;          /* current LUT id                      */
    int     nalloc;      /* number of cells allocated from X    */

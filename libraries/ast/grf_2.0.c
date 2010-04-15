@@ -3,7 +3,7 @@
 *     grf_2.0.c
 
 *  Purpose:
-*     Implement the grf module required by AST V2.0 if no graphics system 
+*     Implement the grf module required by AST V2.0 if no graphics system
 *     is available.
 
 *  Description:
@@ -22,12 +22,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,13 +81,13 @@ int astGText( const char *text, float x, float y, const char *just,
               float upx, float upy ){
    Report( "astGText" );
    return 0;
-}               
+}
 
 int astGTxExt( const char *text, float x, float y, const char *just,
                float upx, float upy, float *xb, float *yb ){
    Report( "astGTxExt" );
    return 0;
-}               
+}
 
 int astGAttr( int attr, double value, double *old_value, int prim ){
    Report( "astGAttr" );

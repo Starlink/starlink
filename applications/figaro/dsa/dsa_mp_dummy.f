@@ -9,7 +9,7 @@ C     Creates and maps a workspace data array.
 C
 C  Description:
 C     This routine creates a workspace array of specified dimension
-C     and type and maps it, returning the address of the dynamic 
+C     and type and maps it, returning the address of the dynamic
 C     memory array that may be used to access the data.
 C
 C  Language:
@@ -28,18 +28,18 @@ C                    data is to be accessed.  Only the first character is
 C                    significant.
 C     (>) TYPE       (Fixed string,descr) A string specifying the type of
 C                    the array that the data is to be mapped onto.  This
-C                    can be one of 'BYTE', 'CHAR', 'FLOAT', 'SHORT', 
-C                    'USHORT', 'INT' or 'DOUBLE' - and must be in upper 
-C                    case.  
+C                    can be one of 'BYTE', 'CHAR', 'FLOAT', 'SHORT',
+C                    'USHORT', 'INT' or 'DOUBLE' - and must be in upper
+C                    case.
 C     (>) NELM       (Integer,ref) The number of elements in the data
-C                    array.  
+C                    array.
 C     (<) ADDRESS    (Integer,ref) The memory address of the mapped data.
 C     (<) SLOT       (Integer,ref) Slot number used as a handle for the
 C                    mapping.
 C     (!) STATUS     (Integer,ref) Status code.  If a non-zero value is
 C                    passed, this routine will return immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ system.
 C
 C  External subroutines / functions used:
@@ -104,7 +104,7 @@ C
       LOGICAL   TYPE_OK                  ! Indicates requested type is valid
       INTEGER   WORK_SLOT                ! Slot number of work area
 C
-C     DSA_ type definitions.  Defines MAX_TYPES, xxxx_TYPE, 
+C     DSA_ type definitions.  Defines MAX_TYPES, xxxx_TYPE,
 C                             TYPE_NAMES, TYPE_SIZE, FMTCON_CODE
 C
       INCLUDE 'DSA_TYPES'

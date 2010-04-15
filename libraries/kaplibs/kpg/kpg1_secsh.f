@@ -16,7 +16,7 @@
 *  Description:
 *     This routine shifts the origin to the default of one of each
 *     dimension of an NDF greater than a nominated dimension and whose
-*     size is one. 
+*     size is one.
 *
 *     The routine is required in applications that require NDFs of a
 *     specific dimensionality and which also call NDF_SECT.  This is
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -144,7 +144,7 @@
      :         STATUS )
 
 *  And for the output NDF, correcting if the origin is fixed?
-      IF ( FORI ) THEN 
+      IF ( FORI ) THEN
          CALL MSG_SETI( 'REND_B1', 1 )
          CALL MSG_SETI( 'REND_B2', UBND2( 1 ) - LBND2( 1 ) + 1 )
          CALL MSG_SETI( 'REND_B3', 1 )
@@ -155,7 +155,7 @@
          CALL MSG_SETI( 'REND_B3', LBND2( 2 ) )
          CALL MSG_SETI( 'REND_B4', UBND2( 2 ) )
       END IF
-      IF ( EXTSEC ) THEN 
+      IF ( EXTSEC ) THEN
          CALL CCD1_MSG( ' ','  Output NDF extent (xmin:xmax,ymin:ymax):'
      :         //' (^REND_B1:^REND_B2,^REND_B3:^REND_B4)*',STATUS )
       ELSE
@@ -168,7 +168,7 @@
       CALL CCD1_MSG( ' ','  Output data type                       :'//
      :                    ' ^REND_TYPE', STATUS )
 
-      
+
 
       END
 * $Id$

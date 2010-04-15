@@ -1,4 +1,4 @@
- 
+
 *--------------------------------------------------------------------
       SUBROUTINE GK1ACC(IOPT, NRD, XW, YW)
 *---------------------------------------------------------------------
@@ -70,23 +70,23 @@
 *   YCEN   - Centre of Arc Circle in Postscript Coordinates
 *  XP,YP   - Coordinates of Points in Postscript Coordinates
 *
- 
+
 *     Offsets in KWKDAT
       INTEGER   IFASTY
       PARAMETER (IFASTY=4)
- 
+
 *     Parameters (values of IOPT)
       INTEGER    JARC,    JCHORD,    JPIE,    JCIRC
       PARAMETER (JARC=-1, JCHORD=-2, JPIE=-3, JCIRC=-4)
- 
+
 *     Parameters (values of ISTAT)
       INTEGER    JENDS,   JFULL,   JLIN
       PARAMETER (JENDS=0, JFULL=1, JLIN=2)
- 
+
 *     small real
       REAL       SMALL
       PARAMETER (SMALL=1.0E-4)
- 
+
 *
       LOGICAL CHANGE
       CHARACTER S*100, DUMMY
@@ -108,7 +108,7 @@
 *     system is 'gsave'd and afterwards 'grestore'd.
 *
 *---------------------------------------------------------------------
- 
+
 *     Check if Curve Option is in range
       IF((IOPT .LT. -4) .OR. (IOPT .GT. -1)) GOTO 999
 *     Check that number of points is correct for Curve Option.
@@ -121,13 +121,13 @@
 *
 *     Calculate the number of Degrees Per Radian
       DPR = 45.0/ATAN(1.0)
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
- 
+
+
 *     Update appropriate attributes
 *
       IF(IOPT .EQ. JARC)THEN
@@ -151,20 +151,20 @@
            CALL GKFOCO(KIOSN,DUMMY,IREM)
         ENDIF
       ENDIF
- 
+
 *
 *     Form the path for Postscript arc
 *
- 
+
 *     Take a memory snapshot, so as not to clutter the memory with
 *     temporaries.
       CALL GKFOCO(KIOPB,'save',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Prepare and postscript arc
 *
- 
+
 *     Modify the coordinate system to take account of the
 *     registration points.
 *
@@ -172,7 +172,7 @@
       DO 10 I=1,6
          TQCOPY(I) = QWTOTT(I,KWKIX)
    10 CONTINUE
- 
+
 *     Change coordinates to take account of registration points.
 *     This is done to both the total workstation transformation
 *     and the postscript coordinate transformation.
@@ -186,7 +186,7 @@
          REX(I) = RSCALE*REX(I)
          REY(I) = RSCALE*REY(I)
    20 CONTINUE
- 
+
 *     Change the Postscript Coord System and workstation transformation
       CALL GKMTDV(REX,REY,AXFM)
       CALL GKMTIV(AXFM,BXFM)
@@ -196,14 +196,14 @@
    90 FORMAT( '[', 6F10.5, ']concat')
       CALL GKFOCO(KIOPB,S(1:68),IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Transform the points to postscript coordinates
       CALL GKTWD(NRD,XW,YW,XP,YP)
- 
+
 *     Start Newpath
       CALL GKFOCO(KIOPB,'newpath',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Get the parameters required by the postscript arc operator
       IF(IOPT .EQ. JCIRC)THEN
          XCEN = XP(2)
@@ -220,7 +220,7 @@
          ANGL2 = DPR*ATAN2(YP(3)-YCEN,XP(3)-XCEN)
          IF(ANGL2 .LT. 0.0)ANGL2 = ANGL2 + 360.0
       ENDIF
- 
+
       IF(ISTAT .EQ. JLIN)THEN
 *        Collinear Points
          WRITE(S,99) XP(2),YP(2)
@@ -241,7 +241,7 @@
         ENDIF
       ENDIF
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
       IF(IOPT .EQ. JARC)THEN
 *        Arc - Just Stroke
          CALL GKFOCO(KIOPB,' stroke',IREM)
@@ -260,14 +260,14 @@
            CALL GKFOCO(KIOPB,' fasoldo', IREM)
            CALL GKFOCO(KIOSN,DUMMY,IREM)
         ELSEIF(KWFAIS(KWKIX).EQ.GPATTR)THEN
- 
+
 *
 *       Deal with pattern here.
 *
            CALL GK1APA
         ENDIF
       ENDIF
- 
+
 *
 *     End GDP - do the restores to match the saves.
 *               this will restore the original postscript coordinate
@@ -277,11 +277,11 @@
       CALL GKFOCO(KIOPB,'grestore',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'restore',IREM)
- 
+
 *     Restore the total workstation transformation
       DO 30 I=1,6
          QWTOTT(I,KWKIX) = TQCOPY(I)
    30 CONTINUE
- 
+
   999 CONTINUE
       END

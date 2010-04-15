@@ -6,7 +6,7 @@
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
-  <abstract><p>KAPLIBS is a package of Fortran subroutine 
+  <abstract><p>KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
 package of general-purpose image-processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal

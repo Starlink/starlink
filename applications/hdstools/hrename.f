@@ -23,7 +23,7 @@
 
 * Description:
 *    The object is renamed.
-*    
+*
 *    Note that if INP is specified only as a container filename, the name of
 *    the top-level object contained will be changed but not the name of the
 *    file.

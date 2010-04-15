@@ -1,13 +1,13 @@
 *+  CAR_PTLST - outputs list of field values for objects in catalogue
-      SUBROUTINE CAR_PTLST (BUFFER, MODE, UNIT, STATUS)    
+      SUBROUTINE CAR_PTLST (BUFFER, MODE, UNIT, STATUS)
 *    Description :
 *     Outputs buffer to file or environment, specified by mode.
-*    Invocation : 
-*     CALL CAR_PTLST (BUFFER, MODE, UNIT, STATUS)    
+*    Invocation :
+*     CALL CAR_PTLST (BUFFER, MODE, UNIT, STATUS)
 *    Parameters :
 *     BUFFER =  CHARACTER *(*) (READ)
 *           Output buffer
-*     MODE   =  CHARACTER *(*) (READ) 
+*     MODE   =  CHARACTER *(*) (READ)
 *           Mode for output
 *     UNIT   =  INTEGER (READ)
 *           unit number for output file
@@ -77,7 +77,7 @@
           ELSE
               BUFLEN = 1
           END IF
- 
+
           IF (MODE .EQ. 'SCREEN' .OR. MODE .EQ. 'BOTH') THEN
               CALL MSG_OUT (' ',  BUFFER(1:BUFLEN), STATUS)
           END IF
@@ -93,6 +93,6 @@
      :              STATUS)
               ENDIF
           END IF
-      END IF 
+      END IF
 
       END

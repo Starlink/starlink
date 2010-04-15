@@ -174,7 +174,7 @@
       logical par_given
       integer pstat
       character*72 chars
-      integer OPT_LOOK, OPT_SOFT, OPT_HARD, OPT_TOLS, OPT_GAUSS, 
+      integer OPT_LOOK, OPT_SOFT, OPT_HARD, OPT_TOLS, OPT_GAUSS,
      :        OPT_ADD, OPT_EXIT, OPT_POLY
       parameter (OPT_LOOK = 1, OPT_SOFT = 2, OPT_HARD = 3, OPT_TOLS = 4,
      :           OPT_POLY = 5, OPT_GAUSS = 6, OPT_ADD = 7, OPT_EXIT = 8)

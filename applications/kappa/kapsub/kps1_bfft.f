@@ -5,21 +5,21 @@
 *     KPS1_BFFT
 
 *  Purpose:
-*     Finds two-dimensional Gaussian parameter values which are 
+*     Finds two-dimensional Gaussian parameter values which are
 *     consistent with a supplied set of data values.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFFT( PIXPOS, FLBND, FUBND, FIXCON, AMPRAT, 
+*     CALL KPS1_BFFT( PIXPOS, FLBND, FUBND, FIXCON, AMPRAT,
 *                     NP, P, SIGMA, RMS, STATUS )
 
 *  Description:
 *     An initial guess is made at the fit parameters, and a PDA
 *     routine is called to vary the parameter values until the sum of
 *     the squared residuals between the supplied image and the Gaussian
-*     is minimised.  If explicit values have been supplied for any of 
+*     is minimised.  If explicit values have been supplied for any of
 *     the projection parameters, they are omitted from the optimisation.
 
 *  Arguments:
@@ -40,18 +40,18 @@
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
-*        The ratios of the secondary beam 'sources' to the first beam.  
+*        The ratios of the secondary beam 'sources' to the first beam.
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.
 *     POFSET( BF__MXPOS - 1, BF__NDIM ) = DOUBLE PRECISION (Given)
-*        The ratios of the secondary beam 'sources' to the first beam.  
+*        The ratios of the secondary beam 'sources' to the first beam.
 *        These ratios contrain the fitting provided FIXRAT is .TRUE.
 *     NP = INTEGER (Given)
 *        The size of array P.
 *     P( NP ) = DOUBLE PRECISION (Given and Returned)
 *        The Gaussian fit parameters.  On entry, the array holds any
 *        explicit parameter values requested by the user (as indicated
-*        by the argument FIXCON).  Other elements of the array are 
-*        ignored.  On exit, such values are unchanged, but the other 
+*        by the argument FIXCON).  Other elements of the array are
+*        ignored.  On exit, such values are unchanged, but the other
 *        elements are returned holding the best value of the
 *        corresponding fit parameter.
 *     SIGMA( NP ) = DOUBLE PRECISION (Returned)
@@ -64,11 +64,11 @@
 *  Notes:
 *     -  The supplied initial co-ordinates are not necessarily used
 *     directly.  Instead they are used to form marginal profiles about
-*     the location.  Filtering of those marginal profiles removes the 
-*     effect of neighbouring sources (see KPS1_CLNS) and from the 
+*     the location.  Filtering of those marginal profiles removes the
+*     effect of neighbouring sources (see KPS1_CLNS) and from the
 *     profiles the routine estimates of the initial Gaussian parameters.
-*     This gives more consistent and robust values.  The 
-*     Levenberg-Marquardt method seems temperamental to the start 
+*     This gives more consistent and robust values.  The
+*     Levenberg-Marquardt method seems temperamental to the start
 *     location.  While the centre position found for different start
 *     points agree within their errors, it is somewhat disconcerting to
 *     users.  This extra stage avoids that and appears to minimise those
@@ -116,7 +116,7 @@
 *     2007 February 15 (MJC):
 *        Original version.
 *     2007 April 27 (MJC):
-*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of 
+*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of
 *        multiple Gaussians,
 *     2007 May 11 (MJC):
 *        Pass constraint flags as an array to shorten the API.
@@ -126,7 +126,7 @@
 *        Back to using declared arrays for the unidimensional arrays
 *        passed to PDA_LMERR.
 *     2007 June 15 (MJC):
-*        Use marginal profiles to estimate the initial Gaussian 
+*        Use marginal profiles to estimate the initial Gaussian
 *        parameters.  Add the Notes.
 *     2007 June 25 (MJC):
 *        Switch ORIENT to radians to be compatible with its use within
@@ -161,7 +161,7 @@
 *           positions.
 *        PIXOFF( BF__MXPOS - 1, BF__NDIM ) = DOUBLE PRECISION (Write)
 *           The pixel offsets of the secondary beam positions with
-*           respect to the primary beam position.  
+*           respect to the primary beam position.
 *        NBEAMS = INTEGER (Read)
 *           The number of beams to fit simultaneously
 *        AMPC = LOGICAL (Write)
@@ -186,7 +186,7 @@
 *           Are the separations fixed?
 *        UBND( BF__NDIM ) = INTEGER (Write)
 *           The upper pixel bounds of the data and variance arrays.
-      
+
 *  Arguments Given:
       DOUBLE PRECISION PIXPOS( BF__MXPOS, BF__NDIM )
       INTEGER FLBND( BF__NDIM )
@@ -195,7 +195,7 @@
       REAL AMPRAT( NBEAMS - 1 )
       DOUBLE PRECISION POFSET( BF__MXPOS - 1, BF__NDIM )
       INTEGER NP
-      
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION P( NP )
 
@@ -240,7 +240,7 @@
       INTEGER IPCURV             ! Pointer to curvature array
       INTEGER IPDRES             ! Pointer to displaced-fit residuals
       INTEGER IPJAC              ! Pointer to Jacobian
-      INTEGER IPREG              ! Pointer to small-region work array 
+      INTEGER IPREG              ! Pointer to small-region work array
       INTEGER IPWEF              ! Pointer to a work array for the
                                  ! functions evaluated at XC
       INTEGER IPWNA1             ! Pointer to a PDA work array
@@ -340,7 +340,7 @@
          INIT( 1 ) = PIXPOS( IG, 1 )
          INIT( 2 ) = PIXPOS( IG, 2 )
          CALL KPS1_STPAD( DIMS( 1 ), DIMS( 2 ),
-     :                    %VAL( CNF_PVAL( IPWD ) ), FLBND, 1, 
+     :                    %VAL( CNF_PVAL( IPWD ) ), FLBND, 1,
      :                    MIN( 101, DIMS( 1 ), DIMS( 2 ) ), INIT,
      :                    SIGMIN, AXRAT, ORIENT, NGOOD, WORK, STATUS )
 
@@ -402,7 +402,7 @@
 *  =====================
 
 *  Store initial values for the parameters which the PDA routine will
-*  search through, and count the number of parameters to fit. 
+*  search through, and count the number of parameters to fit.
          IF ( .NOT. ( POSC .OR. ( SEPARC .AND. IG .GT. 1 ) ) ) THEN
             N = N + 2
             XC( N - 1 ) = INIT( 1 )
@@ -448,7 +448,7 @@
             END IF
             PC( 6, IG ) = XC( N )
          END IF
-         
+
 *  Use the same background for all beam positions.
          IF ( IG .GT. 1 ) THEN
             PC( 7, IG ) = PC( 7, 1 )
@@ -479,9 +479,9 @@
       ISTAT = SAI__OK
 
 *  Do the search.  The tolerance value is fairly arbitrary.
-      CALL PDA_LMDIF1( KPS1_BFFN, NPOS, N, XC, 
+      CALL PDA_LMDIF1( KPS1_BFFN, NPOS, N, XC,
      :                 %VAL( CNF_PVAL( IPWEF ) ), 1.0D-4, IFAIL,
-     :                 %VAL( CNF_PVAL( IPWNA1 ) ), 
+     :                 %VAL( CNF_PVAL( IPWNA1 ) ),
      :                 %VAL( CNF_PVAL( IPWNA2 ) ), LW )
 
       CALL PSX_FREE( IPWNA1, STATUS )
@@ -497,7 +497,7 @@
          CALL ERR_REP( 'KPS1_BFFT_ERR2', 'Error fitting Gaussian ',
      :                 STATUS )
       ELSE
-                  
+
 *  Report an error if the PDA routine could not find an answer.
          IF ( IFAIL .EQ. 0 .OR. IFAIL .GE. 4 ) THEN
             STATUS = SAI__ERROR
@@ -523,7 +523,7 @@
 *  residuals is dynamic it is obtained as workspace therefore a
 *  subroutine must be called to evaluate its sum.
       FS = VAL__MAXD
-      CALL KPG1_SQSUD( NPOS, %VAL( CNF_PVAL( IPWEF ) ), 
+      CALL KPG1_SQSUD( NPOS, %VAL( CNF_PVAL( IPWEF ) ),
      :                 FS, STATUS )
 
 *  If no solution was found, report an error.
@@ -554,8 +554,8 @@
       END DO
 
 *  Determine the parameter errors.
-      CALL PDA_LMERR( KPS1_BFFN, NPOS, N, XC, 
-     :                %VAL( CNF_PVAL( IPWEF ) ), 5, 
+      CALL PDA_LMERR( KPS1_BFFN, NPOS, N, XC,
+     :                %VAL( CNF_PVAL( IPWEF ) ), 5,
      :                %VAL( CNF_PVAL( IPDRES ) ),
      :                %VAL( CNF_PVAL( IPJAC ) ),
      :                %VAL( CNF_PVAL( IPCURV ) ), PIVOT, WORK, SD,
@@ -596,7 +596,7 @@
          IF ( .NOT. BACKC .AND. IG .EQ. 1 ) THEN
             N = N + 1
             SIGMA( 7 + GO ) = SD( N )
-         ELSE 
+         ELSE
             SIGMA( 7 + GO ) = SIGMA( 7 )
          END IF
       END DO

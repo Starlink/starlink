@@ -8,13 +8,13 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_EXTFLAT( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
@@ -70,10 +70,10 @@
 *     Tidy up header.
 *
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -214,12 +214,12 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM,' ', 
+      CALL MSG_OUTIF (MSG__NORM,' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
 
-*  get the number of bolometers and the name of the flatfield 
+*  get the number of bolometers and the name of the flatfield
 
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOL, STATUS)
@@ -239,7 +239,7 @@
       DIMX (1) = SCUBA__NUM_CHAN
       DIMX (2) = SCUBA__NUM_ADC
 
-      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIMX, BOL_CALB, 
+      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIMX, BOL_CALB,
      :     DIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -257,7 +257,7 @@
          END IF
       END IF
 
-      CALL CMP_GETNI (IN_SCUBAX_LOC, 'BOL_QUAL', NDIM, DIMX, BOL_QUAL, 
+      CALL CMP_GETNI (IN_SCUBAX_LOC, 'BOL_QUAL', NDIM, DIMX, BOL_QUAL,
      :     DIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -275,11 +275,11 @@
          END IF
       END IF
 
-*  flatfield the data 
+*  flatfield the data
 
       CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_SETC ('FLAT', FLAT)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: extracting flatfield ^FLAT', STATUS)
 
 *     Open an output file (Would be nice to be able to write to STDOUT)
@@ -327,12 +327,12 @@
 
             IF (BOL_TYPE(I,J) .NE. 'BAD') THEN
 
-*     Get the name of the 
+*     Get the name of the
                CALL SCULIB_BOLNAME(J, I, ID, STATUS)
 
 *     Construct the flatfield line
-               WRITE(LINE,10) ID, BOL_TYPE(I,J), BOL_DU3(I,J), 
-     :              BOL_DU4(I,J), BOL_CALB(I,J), 0.0, 0.0, 0.0, 
+               WRITE(LINE,10) ID, BOL_TYPE(I,J), BOL_DU3(I,J),
+     :              BOL_DU4(I,J), BOL_CALB(I,J), 0.0, 0.0, 0.0,
      :              BOL_QUAL(I,J), REF
 
 *     Write the line
@@ -363,5 +363,5 @@
       CALL NDF_ANNUL (IN_NDF, STATUS)
 
       CALL NDF_END (STATUS)
- 
+
       END

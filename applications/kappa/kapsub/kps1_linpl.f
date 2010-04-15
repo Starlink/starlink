@@ -38,7 +38,7 @@
 *           "LINE"       The points are joined by straight lines.
 *           "POINT"      A symbol is plotted at each point.  The symbol
 *                        is specified by argument SYMBOL and is plotted
-*                        with pen SYMPEN. 
+*                        with pen SYMPEN.
 *           "STEP"       Each point is displayed as a horizontal line,
 *                        whose length is specified by the width of the
 *                        x position (argument XWIDTH).
@@ -117,7 +117,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

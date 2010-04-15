@@ -7,8 +7,8 @@
 #
 #  Description:
 #     Search various text files containing alphabetical listings of
-#     electronic mail adresses for astronomers and astronomical sites 
-#     both local and worldwide. 
+#     electronic mail adresses for astronomers and astronomical sites
+#     both local and worldwide.
 #
 #  Usage:
 #        % email [-h|-help] <keyword< keyword>>
@@ -20,9 +20,9 @@
 #         These options provide a very brief help message.
 #
 #     <keyword< keyword>>
-#         The optional keyword(s) can be any search string (e.g. a name 
+#         The optional keyword(s) can be any search string (e.g. a name
 #         or a place) or a list of keywords (separated by spaces).  An
-#         attempt is  made to match the string(s) in all the text files 
+#         attempt is  made to match the string(s) in all the text files
 #         in the following list:
 #
 #             $emaildocs/astroplaces.lis    - astronomical places list
@@ -81,7 +81,7 @@ worldnames=${emaildocs}/astropersons.lis
 #  Check for command line arguments.
 if [ "${1}" = "" ]; then
    echo "Usage: email <keyword< keyword< ...>>>"
-   exit 
+   exit
 fi
 
 #  Interpret command line and act according to flags.
@@ -90,10 +90,10 @@ while :; do
 
 #  Help flags.
      -h | -help)
-        echo 
+        echo
         echo "To search for names with an apostrophy in (such as O'Brien),"
         echo "you should enclose the name in double quotes."
-        echo 
+        echo
         exit
         break
         ;;
@@ -118,7 +118,7 @@ echo 'email address searcher v@PACKAGE_VERSION@'
 #  Search list of observatories.
 if [ -f ${places} ]; then
    echo 'Searching the ex-RGO directory of observatories...'
-   echo 
+   echo
    for x do \
       grep -i ${x} ${places} ;\
    done
@@ -129,7 +129,7 @@ else
 fi
 
 #  Search Starlink Users list
-if [ -f ${starnames} ]; then 
+if [ -f ${starnames} ]; then
    echo 'Searching the directory of Starlink Users...'
    echo
    echo "    Starlink User's Email addresses found in this list are likely"
@@ -162,7 +162,7 @@ if [ -f ${starnames} ]; then
          print record
       }' - ;\
    done
-   echo 
+   echo
 else
    echo 'The list of Starlink Users is not available.'
    echo

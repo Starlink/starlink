@@ -22,17 +22,17 @@
 *    DATA(MPTS) = DOUBLE PRECISION ARRAY (Given)
 *        X array data
 *    FC = DOUBLE PRECISION (Given)
-*       
+*
 *    DENS(MPTS) = DOUBLE PRECISION ARRAY (Given)
 *        Y array (intensity) data
 *    XC(N) = DOUBLE PRECISION ARRAY (Given)
 *        Fit parametes
 *    GC1(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    WEIGHT(MPTS) = DOUBLE PRECISION ARRAY (Given)
 *        Weights on points
 *    G(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 
 * History:
 *      T.N.Wilkins 23/11/88

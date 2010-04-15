@@ -76,8 +76,8 @@ c  ***  no intrinsic functions  ***
 c
 c  ***  external functions and subroutines  ***
 c
-      external pda_assst, pda_dbdog, pda_deflt, pda_dotprd, pda_itsum, 
-     1         pda_litvmu, pda_livmul, pda_ltvmul, pda_lupdat, 
+      external pda_assst, pda_dbdog, pda_deflt, pda_dotprd, pda_itsum,
+     1         pda_litvmu, pda_livmul, pda_ltvmul, pda_lupdat,
      1         pda_lvmul, pda_parck, pda_reldst, pda_stopx, pda_vaxpy,
      1         pda_vcopy, pda_vscopy, pda_vvmulp, pda_v2norm, pda_wzbfgs
       logical pda_stopx
@@ -413,7 +413,7 @@ c
       call pda_wzbfgs(v(l), n, v(step1), v(w), v(g01), v(z))
 c
 c     ** use the n-vectors starting at v(step1) and v(g01) for scratch..
-      call pda_lupdat(v(temp1), v(step1), v(l), v(g01), v(l), n, v(w), 
+      call pda_lupdat(v(temp1), v(step1), v(l), v(g01), v(l), n, v(w),
      1                v(z))
       iv(1) = 2
       go to 80

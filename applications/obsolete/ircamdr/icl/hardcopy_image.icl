@@ -61,7 +61,7 @@ proc hardcopy_image
   send plt2d set im_xcen (value1)
   send plt2d set im_ycen (value2)
   send plt2d set magnification (newcmag)
-  if hard_device=18 or hard_device=19 or hard_device=20 or hard_device=21 
+  if hard_device=18 or hard_device=19 or hard_device=20 or hard_device=21
     print "Give colour code for ANNOTATION, BORDER and TICKS : "
     askchar (anco) "Colour Code \R\ : "
     anco = upcase(anco)
@@ -112,7 +112,7 @@ proc hardcopy_image
   worknum = oldnumb
   worknam = oldname
   POPEN (worknum)
-  if hard_device=18 or hard_device=19 or hard_device=20 or hard_device=21 
+  if hard_device=18 or hard_device=19 or hard_device=20 or hard_device=21
     send plt2d set annotate_colour (oancoa)
     send plt2d set border_colour (oancob)
   end if

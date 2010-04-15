@@ -13,11 +13,11 @@
 *     CALL CCD1_NDFMI( PARAM, KEYGRP, GOTGRP, STATUS )
 
 *  Description:
-*     This routine gets a group of NDFs from an ADAM parameter with 
-*     reference to a group of Set Index keys stored in KEYGRP. 
+*     This routine gets a group of NDFs from an ADAM parameter with
+*     reference to a group of Set Index keys stored in KEYGRP.
 *     The value GOTGRP is returned as a GRP identifier for an NDG
 *     group of NDFs; the Nth member of GOTGRP will have a Set Index
-*     attribute value which matches the value of the Nth member of 
+*     attribute value which matches the value of the Nth member of
 *     KEYGRP.  The members of KEYGRP must therefore be character
 *     representations of integers.  If the user does not provide
 *     a set of NDFs which allows such a GOTGRP to be constructed,
@@ -29,7 +29,7 @@
 *     KEYGRP = INTEGER (Given)
 *        The GRP identifier for a group containing string
 *        representations of integers.  For each one, the returned group
-*        GOTGRP will contain an NDF in the corresponding position which 
+*        GOTGRP will contain an NDF in the corresponding position which
 *        has that Set Index attribute value.
 *     GOTGRP = INTEGER (Returned)
 *        An NDG identifier for a group of NDFs obtained as described
@@ -80,14 +80,14 @@
       INCLUDE 'PAR_ERR'          ! PAR system error codes
       INCLUDE 'NDG_ERR'          ! NDG system error codes
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER KEYGRP
-      
+
 *  Arguments Returned:
       INTEGER GOTGRP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -110,7 +110,7 @@
       CHARACTER * ( GRP__SZNAM ) CINDEX ! Index string value
       CHARACTER * ( GRP__SZNAM ) FIELDS( 6 ) ! NDG supplementary information
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of an NDF
-      
+
 *.
 
 *  Set up error condition return values.
@@ -201,7 +201,7 @@
             CALL CCD1_SETSP( INGRP, 'INDEX', CCD1__MXNDF, SUBGRP, NSUB,
      :                       SUBKEY, STATUS )
 
-*  For each key in the input group, try to find a single corresponding 
+*  For each key in the input group, try to find a single corresponding
 *  one from the group we've just got from the user, and copy it to
 *  the right place in a new group.
             DO I = 1, NKEY
@@ -242,8 +242,8 @@
                      GO TO 2
 
 *  This subgroup is suitable.  If it's the first in the list, create
-*  a new output group using GRP_COPY to save the values of the 
-*  various GRP flags, but for subsequent groups just add names 
+*  a new output group using GRP_COPY to save the values of the
+*  various GRP flags, but for subsequent groups just add names
 *  using GRP_PUT.
                   ELSE
                      IF ( I .EQ. 1 ) THEN

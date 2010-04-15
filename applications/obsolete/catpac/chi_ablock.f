@@ -1,26 +1,26 @@
 *+   CHI_ABLOCK - Block data for CHI parser system
       BLOCK DATA CHI_ABLOCK
-*    Description : 
+*    Description :
 *     Initialises common blocks for the CHI parser
 *    Invocation
 *     None
-*    Parameters : 
+*    Parameters :
 *     None
-*    Method : 
-*     Use data statement to set common block values 
-*    Authors : 
+*    Method :
+*     Use data statement to set common block values
+*    Authors :
 *     Alan Wood (STADAT::ARW)  Jon Fairclough (RAL::IPMAF)
-*    History : 
+*    History :
 *     4-Feb-1992:Original
-*    Type Definitions : 
-      IMPLICIT NONE 
-*    Global constants : 
-      INCLUDE 'SAE_PAR'                 ! SAI Symbolic Constants 
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'                 ! SAI Symbolic Constants
       include 'CHI_PAR'
       include 'CHIPAR_PAR'
-*    Status : 
-      INTEGER STATUS 
-*    Global variables : 
+*    Status :
+      INTEGER STATUS
+*    Global variables :
       include 'CHIWRK_CMN'
 *    Local constants
       integer chi__mxitmexd
@@ -422,7 +422,7 @@
       data fcomnt(38)/'NONE'/
       data funits(38)/'NONE'/
       data fdtres(38)/CHI__D/
-      
+
       data ftions(39)/'GREAT_CIRCLE'/ ! Great circle distance in radians
       data fsizes(39)/12/             ! D = GREAT_CIRCLE(LONG1, LAT1
       data ftargs(39)/4/              !                  LONG2, LAT2)
@@ -435,7 +435,7 @@
       data funits(39)/'RADIAN'/
       data fdtres(39)/CHI__D/
 
-*      data ftions(40)/'SGLONG_GALSUP'/! SGLONG = 
+*      data ftions(40)/'SGLONG_GALSUP'/! SGLONG =
 *      data fsizes(40)/13/             ! SGLONG_GALSUP(GLONG, GLAT)
 *      data ftargs(40)/2/
 *      data fdtype(40)/CHI__D/
@@ -462,7 +462,7 @@
 *      data funits(42)/'RADIAN'/
 *      data fdtres(42)/CHI__P/
 
-*      data ftions(43)/'GLAT_SUPGAL'/   ! GLAT = 
+*      data ftions(43)/'GLAT_SUPGAL'/   ! GLAT =
 *      data fsizes(43)/11/              ! GLAT_SUPGAL(SGLONG, SGLAT)
 *      data ftargs(43)/2/
 *      data fdtype(43)/CHI__D/
@@ -471,8 +471,8 @@
 *      data funits(43)/'RADIAN'/
 *      data fdtres(43)/CHI__P/
 
-      data ftions(44)/'IRAS_TEMP23'/     
-      data fsizes(44)/11/ 
+      data ftions(44)/'IRAS_TEMP23'/
+      data fsizes(44)/11/
       data ftargs(44)/2/
       data fatype(44,1)/CHI__D/
       data fatype(44,2)/CHI__D/
@@ -481,8 +481,8 @@
       data funits(44)/'deg K'/
       data fdtres(44)/CHI__I/
 
-      data ftions(45)/'IRAS_TEMP12'/     
-      data fsizes(45)/11/ 
+      data ftions(45)/'IRAS_TEMP12'/
+      data fsizes(45)/11/
       data ftargs(45)/2/
       data fatype(45,1)/CHI__D/
       data fatype(45,2)/CHI__D/
@@ -491,8 +491,8 @@
       data funits(45)/'deg K'/
       data fdtres(45)/CHI__I/
 
-      data ftions(46)/'IRAS_TEMP34'/     
-      data fsizes(46)/11/ 
+      data ftions(46)/'IRAS_TEMP34'/
+      data fsizes(46)/11/
       data ftargs(46)/2/
       data fatype(46,1)/CHI__D/
       data fatype(46,2)/CHI__D/
@@ -501,8 +501,8 @@
       data funits(46)/'deg K'/
       data fdtres(46)/CHI__I/
 
-      data ftions(47)/'INT'/     
-      data fsizes(47)/3/ 
+      data ftions(47)/'INT'/
+      data fsizes(47)/3/
       data ftargs(47)/1/
       data fatype(47,1)/CHI__D/
       data ftcons(47)/'NOT_C'/
@@ -510,8 +510,8 @@
       data funits(47)/'NONE'/
       data fdtres(47)/CHI__I/
 
-      data ftions(48)/'NINT'/     
-      data fsizes(48)/4/ 
+      data ftions(48)/'NINT'/
+      data fsizes(48)/4/
       data ftargs(48)/1/
       data fatype(48,1)/CHI__D/
       data ftcons(48)/'NOT_C'/
@@ -519,8 +519,8 @@
       data funits(48)/'NONE'/
       data fdtres(48)/CHI__I/
 
-      data ftions(49)/'MIN'/     
-      data fsizes(49)/3/ 
+      data ftions(49)/'MIN'/
+      data fsizes(49)/3/
       data ftargs(49)/-2/
       data fatype(49,1)/CHI__D/
       data ftcons(49)/'NOT_C'/
@@ -528,8 +528,8 @@
       data funits(49)/'NONE'/
       data fdtres(49)/CHI__D/
 
-      data ftions(50)/'MAX'/     
-      data fsizes(50)/3/ 
+      data ftions(50)/'MAX'/
+      data fsizes(50)/3/
       data ftargs(50)/-2/
       data fatype(50,1)/CHI__D/
       data ftcons(50)/'NOT_C'/
@@ -537,8 +537,8 @@
       data funits(50)/'NONE'/
       data fdtres(50)/CHI__D/
 
-      data ftions(51)/'UCASE'/     
-      data fsizes(51)/5/ 
+      data ftions(51)/'UCASE'/
+      data fsizes(51)/5/
       data ftargs(51)/1/
       data fatype(51,1)/CHI__C/
       data ftcons(51)/'C_ONLY'/
@@ -546,8 +546,8 @@
       data funits(51)/'NONE'/
       data fdtres(51)/CHI__C/
 
-      data ftions(52)/'LCASE'/     
-      data fsizes(52)/5/ 
+      data ftions(52)/'LCASE'/
+      data fsizes(52)/5/
       data ftargs(52)/1/
       data fatype(52,1)/CHI__C/
       data ftcons(52)/'C_ONLY'/
@@ -556,8 +556,8 @@
       data fdtres(52)/CHI__C/
 
 
-*      data ftions(53)/'CSI1EXP'/     
-*      data fsizes(53)/7/ 
+*      data ftions(53)/'CSI1EXP'/
+*      data fsizes(53)/7/
 *      data ftargs(53)/1/
 *      data fatype(53)/CHI__C/
 *      data ftcons(53)/'C_ONLY'/
@@ -566,8 +566,8 @@
 *      data fdtres(53)/CHI__C/
 
 
-*      data ftions(54)/'CSI2EXP'/     
-*      data fsizes(54)/7/ 
+*      data ftions(54)/'CSI2EXP'/
+*      data fsizes(54)/7/
 *      data ftargs(54)/1/
 *      data fdtype(54)/CHI__C/
 *      data ftcons(54)/'C_ONLY'/
@@ -576,8 +576,8 @@
 *      data fdtres(54)/CHI__C/
 
 
-*      data ftions(55)/'CSI3EXP'/     
-*      data fsizes(55)/7/ 
+*      data ftions(55)/'CSI3EXP'/
+*      data fsizes(55)/7/
 *      data ftargs(55)/1/
 *      data fdtype(55)/CHI__C/
 *      data ftcons(55)/'C_ONLY'/
@@ -586,8 +586,8 @@
 *      data fdtres(55)/CHI__C/
 
 
-*      data ftions(56)/'CSI4EXP'/     
-*      data fsizes(56)/7/ 
+*      data ftions(56)/'CSI4EXP'/
+*      data fsizes(56)/7/
 *      data ftargs(56)/1/
 *      data fdtype(56)/CHI__C/
 *      data ftcons(56)/'C_ONLY'/
@@ -596,8 +596,8 @@
 *      data fdtres(56)/CHI__C/
 
 
-*      data ftions(57)/'CSI5EXP'/     
-*      data fsizes(57)/7/ 
+*      data ftions(57)/'CSI5EXP'/
+*      data fsizes(57)/7/
 *      data ftargs(57)/1/
 *      data fdtype(57)/CHI__C/
 *      data ftcons(57)/'C_ONLY'/
@@ -606,8 +606,8 @@
 *      data fdtres(57)/CHI__C/
 
 
-*      data ftions(58)/'CSI6EXP'/     
-*      data fsizes(58)/7/ 
+*      data ftions(58)/'CSI6EXP'/
+*      data fsizes(58)/7/
 *      data ftargs(58)/1/
 *      data fdtype(58)/CHI__C/
 *      data ftcons(58)/'C_ONLY'/
@@ -616,8 +616,8 @@
 *      data fdtres(58)/CHI__C/
 
 
-*      data ftions(59)/'CSI7EXP'/     
-*      data fsizes(59)/7/ 
+*      data ftions(59)/'CSI7EXP'/
+*      data fsizes(59)/7/
 *      data ftargs(59)/1/
 *      data fdtype(59)/CHI__C/
 *      data ftcons(59)/'C_ONLY'/
@@ -626,8 +626,8 @@
 *      data fdtres(59)/CHI__C/
 
 
-*      data ftions(60)/'CSI8EXP'/     
-*      data fsizes(60)/7/ 
+*      data ftions(60)/'CSI8EXP'/
+*      data fsizes(60)/7/
 *      data ftargs(60)/1/
 *      data fdtype(60)/CHI__C/
 *      data ftcons(60)/'C_ONLY'/
@@ -636,8 +636,8 @@
 *      data fdtres(60)/CHI__C/
 
 
-*      data ftions(61)/'CSI9EXP'/     
-*      data fsizes(61)/7/ 
+*      data ftions(61)/'CSI9EXP'/
+*      data fsizes(61)/7/
 *      data ftargs(61)/1/
 *      data fdtype(61)/CHI__C/
 *      data ftcons(61)/'C_ONLY'/
@@ -646,8 +646,8 @@
 *      data fdtres(61)/CHI__C/
 
 
-*      data ftions(62)/'CSI10EXP'/     
-*      data fsizes(62)/8/ 
+*      data ftions(62)/'CSI10EXP'/
+*      data fsizes(62)/8/
 *      data ftargs(62)/1/
 *      data fdtype(62)/CHI__C/
 *      data ftcons(62)/'C_ONLY'/

@@ -16,7 +16,7 @@ C    - calculates values of PFAC for inclusion in FLAGCOMM
 C  The reference position for the map is the top left (maybe should have been
 C  bottom left!)
 
-C  INVERT_AXIS is a logical array: For each dimension (RA, Dec, Velocity) 
+C  INVERT_AXIS is a logical array: For each dimension (RA, Dec, Velocity)
 C  in order INVERT_AXIS is TRUE if the requested map is not the "normal"
 C  way round (R.A. decreasing to right, Dec decreasing down, Velocity in
 C  same order as data coming from map file).

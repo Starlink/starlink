@@ -17,7 +17,7 @@
  *                                  TRAIL(locator1_str)
  *                                  TRAIL(locator2_str) )
  */
- 
+
 int
 datParen(const HDSLoc *locator1,
          HDSLoc **locator2,
@@ -276,7 +276,7 @@ structure (possible programming error).",
          _chmove( DAT__SZTYP, odl.type, data2->type );
          _chmove( DAT__SZGRP, data1->group, data2->group );
          data2->read = data1->read;
-         
+
 /* Initiallise the new LCP data object descriptor.                          */
          dat1_unpack_type( data2->type, &data2->obj );
 
@@ -297,7 +297,7 @@ structure (possible programming error).",
          state2->vector = 0;
          state2->broken = 0;
       }
-      
+
 /* If successful, then mark the new LCP as valid.                           */
       if ( _ok( hds_gl_status ) )
       {

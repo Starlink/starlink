@@ -57,7 +57,7 @@
 *        100. This number is factorized so that a regular grid of
 *        samples is taken. The actual number of samples is restricted to
 *        ensure that the central apertures do not overlap.
-*        
+*
 *     OUTER = _REAL (Read)
 *        The radius of the outer edge of the annular sky aperture in
 *        units of the object aperture size. The actual dimension in
@@ -98,7 +98,7 @@
 *     11-FEB-1992 (NE):
 *        Remove request for grid array workspace. Now obtained in OPTOP.
 *     07-SEP-2004 (PWD):
-*        Converted to use CNF pointers. Change dummy MASK pointer to 
+*        Converted to use CNF pointers. Change dummy MASK pointer to
 *        actual array of size 1.
 *     {enter_further_changes_here}
 
@@ -175,8 +175,8 @@
       USEMSK = .FALSE.
 
 *   Call the work routine
-      CALL OPTOP ( IDIMS( 1 ), IDIMS( 2 ), %VAL( CNF_PVAL( IPIN ) ), 
-     :             MASK, USEMSK, NE, ELLIPS, L, R, YLIST, LYLIST, 
+      CALL OPTOP ( IDIMS( 1 ), IDIMS( 2 ), %VAL( CNF_PVAL( IPIN ) ),
+     :             MASK, USEMSK, NE, ELLIPS, L, R, YLIST, LYLIST,
      :             RYLIST, INSL, INSR, POLY, FILE, STATUS )
 
 *   Unmap the arrays and annul the locators
@@ -274,7 +274,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -435,11 +435,11 @@
          IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Clear the workspace array and pass it to the photometry routine
-         CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1, GSIZE, 
+         CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1, GSIZE,
      :                1, GSIZE )
          CALL AUTOPT( NE, ELLIPS, A, A2, A3, E, THETA, NX, NY, IMAGE,
-     :                %VAL( CNF_PVAL( IG ) ), GSIZE, MASK, USEMSK, L, 
-     :                R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY, PADU, 
+     :                %VAL( CNF_PVAL( IG ) ), GSIZE, MASK, USEMSK, L,
+     :                R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY, PADU,
      :                SATURE, N, XP, YP, DIFF1, DIFF2, DIFF3, STATUS )
 
 *   Annul the workspace
@@ -632,7 +632,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -777,17 +777,17 @@
             CALL DAT_MAPR ( VLOC, 'WRITE', 1, NV, IV, STATUS )
             CALL RAGGED ( 1, NX, NY, IMAGE, 0, USEVAR, MASK, USEMSK,
      :                    NXL, NXH, NYL, NYH, XCEN, YCEN, A2, A3, E,
-     :                    THETA, %VAL( CNF_PVAL( IV ) ), NV, LSKY1, 
+     :                    THETA, %VAL( CNF_PVAL( IV ) ), NV, LSKY1,
      :                    SIGMA, VSKY )
             NV = ASKY
             CALL RAGGED ( 2, NX, NY, IMAGE, 0, USEVAR, MASK, USEMSK,
      :                    NXL, NXH, NYL, NYH, XCEN, YCEN, A2, A3, E,
-     :                    THETA, %VAL( CNF_PVAL( IV ) ), NV, LSKY2, 
+     :                    THETA, %VAL( CNF_PVAL( IV ) ), NV, LSKY2,
      :                    SIGMA, VSKY )
             NV = ASKY
             CALL RAGGED ( 3, NX, NY, IMAGE, 0, USEVAR, MASK, USEMSK,
      :                    NXL, NXH, NYL, NYH, XCEN, YCEN, A2, A3, E,
-     :                    THETA, %VAL( CNF_PVAL( IV ) ), NV, LSKY3, 
+     :                    THETA, %VAL( CNF_PVAL( IV ) ), NV, LSKY3,
      :                    SIGMA, VSKY )
             CALL DAT_UNMAP( VLOC, STATUS )
             CALL DAT_ANNUL( VLOC, STATUS )

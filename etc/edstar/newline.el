@@ -48,12 +48,12 @@ Notes:
 
 ;;; Otherwise use the auto fill function to choose the break point.
 	    (funcall auto-fill-function)))
-    
+
 ;;; If we are not within a placeholder and point is not beyond the fill
 ;;; column, simply break the line.
       (if (or (<= (current-column) (current-fill-column))
               (not auto-fill-function))
 	  (edstar-breakline)
-      
+
 ;;; Otherwise use the auto fill function to select a suitable break point.
 	(funcall auto-fill-function)))))

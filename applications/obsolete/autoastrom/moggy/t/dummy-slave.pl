@@ -8,7 +8,7 @@ open (LOGFILE, ">dummy-slave.log")
 
 while ($keepgoing) {
     $line = <STDIN>;
-    defined ($line) || die "Unexpected EOF"; 
+    defined ($line) || die "Unexpected EOF";
 
     $line =~ s/[ \t\r\n]*$//;
 

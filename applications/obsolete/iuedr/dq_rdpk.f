@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Read value fram subset of packed data quality value.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -32,10 +32,10 @@
       INTEGER VALUE        ! value to be read from
       INTEGER START        ! start bit
       INTEGER NBIT         ! number of bits to be read
- 
+
 *   Import-Export:
       INTEGER SUBVAL       ! subset value coded
- 
+
 *   Local variables:
       INTEGER FIN          ! end bit position
       INTEGER QBITS(8)     ! bit array

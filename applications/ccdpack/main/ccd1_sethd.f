@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine writes a short heading through the CCDPACK logging
-*     system to indicate that the following messages relate to 
+*     system to indicate that the following messages relate to
 *     processing a particular Set-based subgroup.  The message will
 *     look something like:
 *
@@ -28,7 +28,7 @@
 *        A GRP identifier for the group containing the names of keys
 *        identifying the Set subgroup.
 *     ISUB = INTEGER (Given)
-*        The index of the member of KEYGRP whose subgroup is about to 
+*        The index of the member of KEYGRP whose subgroup is about to
 *        be processed.
 *     PRETXT = CHARACTER * ( * ) (Given)
 *        A string to start the message.
@@ -78,13 +78,13 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
-      
+
 *  Arguments Given:
       INTEGER KEYGRP
       INTEGER ISUB
       CHARACTER * ( * ) KEYTYP
       CHARACTER * ( * ) PRETXT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -100,7 +100,7 @@
 
 *  Get the value of the key.
       CALL GRP_GET( KEYGRP, ISUB, 1, KEYVAL, STATUS )
-      
+
 *  Construct the message.
       CALL MSG_SETC( 'PRETEXT', PRETXT )
       CALL MSG_SETC( 'KEYTYPE', KEYTYP )

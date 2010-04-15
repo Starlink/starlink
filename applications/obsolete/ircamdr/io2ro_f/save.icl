@@ -13,7 +13,7 @@ PROC IO2RO istart, iend
   IF NAME_PREFIX2 = 'NONE'
     print 'Give UT date of observations to be converted (format 940428) : '
     askname (UTD) 'UT Date ? '
-  ELSE  
+  ELSE
     UTD = substr (NAME_PREFIX, 3, 6)
   END IF
   print ' '
@@ -57,13 +57,13 @@ PROC IO2RO istart, iend
   IF YN
     print 'Give start observation for conversion : '
     asknum (OSTART) 'Start Observation Number    \1\ ? '
-  ELSE  
+  ELSE
     OSTART = ISTART
   END IF
   IF YN2
     print 'Give end   observation for conversion : '
     asknum (OEND) 'End Observations Number   \500\ ? '
-  ELSE  
+  ELSE
     OEND = IEND
   END IF
   print ' '
@@ -71,4 +71,4 @@ PROC IO2RO istart, iend
     DATE_OBS = UTD & '_' & JJ
     obeyw io2ro reduce (IDIR) (ODIR) (RODIR) (DATE_OBS)
   END LOOP
-END PROC 
+END PROC

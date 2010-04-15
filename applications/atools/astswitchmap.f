@@ -20,69 +20,69 @@
 *        The global status.
 
 *  Description:
-*     This application creates a new SwitchMap and optionally initialises its 
+*     This application creates a new SwitchMap and optionally initialises its
 *     attributes. An option is provided to create a SwitchMap from an
 *     output file created by FIGARO:IARC (see parameter IARCFILE).
 *
 *     A SwitchMap is a Mapping which represents a set of alternate
-*     Mappings, each of which is used to transform positions within a 
-*     particular region of the input or output coordinate system of the 
+*     Mappings, each of which is used to transform positions within a
+*     particular region of the input or output coordinate system of the
 *     SwitchMap.
 *
 *     A SwitchMap can encapsulate any number of Mappings, but they must
-*     all have the same number of inputs (Nin attribute value) and the 
-*     same number of outputs (Nout attribute value). The SwitchMap itself 
+*     all have the same number of inputs (Nin attribute value) and the
+*     same number of outputs (Nout attribute value). The SwitchMap itself
 *     inherits these same values for its Nin and Nout attributes. Each of
 *     these Mappings represents a "route" through the switch, and are
-*     referred to as "route" Mappings below. Each route Mapping transforms 
-*     positions between the input and output coordinate space of the entire 
+*     referred to as "route" Mappings below. Each route Mapping transforms
+*     positions between the input and output coordinate space of the entire
 *     SwitchMap, but only one Mapping will be used to transform any given
-*     position. The selection of the appropriate route Mapping to use with 
+*     position. The selection of the appropriate route Mapping to use with
 *     any given input position is made by another Mapping, called the
 *     "selector" Mapping. Each SwitchMap encapsulates two selector
 *     Mappings in addition to its route Mappings; one for use with the
 *     SwitchMap's forward transformation (called the "forward selector
-*     Mapping"), and one for use with the SwitchMap's inverse transformation 
+*     Mapping"), and one for use with the SwitchMap's inverse transformation
 *     (called the "inverse selector Mapping"). The forward selector Mapping
 *     must have the same number of inputs as the route Mappings, but
 *     should have only one output. Likewise, the inverse selector Mapping
 *     must have the same number of outputs as the route Mappings, but
-*     should have only one input. 
+*     should have only one input.
 *
 *     When the SwitchMap is used to transform a position in the forward
 *     direction (from input to output), each supplied input position is
-*     first transformed by the forward transformation of the forward selector 
-*     Mapping. This produces a single output value for each input position 
-*     referred to as the selector value. The nearest integer to the selector 
-*     value is found, and is used to index the array of route Mappings (the 
-*     first supplied route Mapping has index 1, the second route Mapping has 
-*     index 2, etc). If the nearest integer to the selector value is less 
-*     than 1 or greater than the number of route Mappings, then the SwitchMap 
-*     output position is set to a value of AST__BAD on every axis. Otherwise, 
-*     the forward transformation of the selected route Mapping is used to 
-*     transform the supplied input position to produce the SwitchMap output 
-*     position. 
+*     first transformed by the forward transformation of the forward selector
+*     Mapping. This produces a single output value for each input position
+*     referred to as the selector value. The nearest integer to the selector
+*     value is found, and is used to index the array of route Mappings (the
+*     first supplied route Mapping has index 1, the second route Mapping has
+*     index 2, etc). If the nearest integer to the selector value is less
+*     than 1 or greater than the number of route Mappings, then the SwitchMap
+*     output position is set to a value of AST__BAD on every axis. Otherwise,
+*     the forward transformation of the selected route Mapping is used to
+*     transform the supplied input position to produce the SwitchMap output
+*     position.
 *
 *     When the SwitchMap is used to transform a position in the inverse
-*     direction (from "output" to "input"), each supplied "output" position 
-*     is first transformed by the inverse transformation of the inverse 
-*     selector Mapping. This produces a selector value for each "output" 
-*     position. Again, the nearest integer to the selector value is found, 
-*     and is used to index the array of route Mappings. If this selector 
-*     index value is within the bounds of the array of route Mappings, then 
-*     the inverse transformation of the selected route Mapping is used to 
-*     transform the supplied "output" position to produce the SwitchMap 
-*     "input" position. If the selector index value is outside the bounds 
-*     of the array of route Mappings, then the SwitchMap "input" position is 
-*     set to a value of AST__BAD on every axis. 
+*     direction (from "output" to "input"), each supplied "output" position
+*     is first transformed by the inverse transformation of the inverse
+*     selector Mapping. This produces a selector value for each "output"
+*     position. Again, the nearest integer to the selector value is found,
+*     and is used to index the array of route Mappings. If this selector
+*     index value is within the bounds of the array of route Mappings, then
+*     the inverse transformation of the selected route Mapping is used to
+*     transform the supplied "output" position to produce the SwitchMap
+*     "input" position. If the selector index value is outside the bounds
+*     of the array of route Mappings, then the SwitchMap "input" position is
+*     set to a value of AST__BAD on every axis.
 *
 *     In practice, appropriate selector Mappings should be chosen to
-*     associate a different route Mapping with each region of coordinate 
-*     space. Note that the SelectorMap class of Mapping is particularly 
+*     associate a different route Mapping with each region of coordinate
+*     space. Note that the SelectorMap class of Mapping is particularly
 *     appropriate for this purpose.
 *
 *     If a compound Mapping contains a SwitchMap in series with its own
-*     inverse, the combination of the two adjacent SwitchMaps will be 
+*     inverse, the combination of the two adjacent SwitchMaps will be
 *     replaced by a UnitMap when the compound Mapping is simplified using
 *     astsimplify.
 
@@ -90,49 +90,49 @@
 *     astswitchmap fsmap ismap route1 route2 options result
 
 *  ADAM Parameters:
-*     FSMAP = LITERAL (Read) 
-*        An NDF or text file holding the forward selector Mapping. If an NDF 
-*        is supplied, the Mapping from the Base Frame to the Current Frame 
+*     FSMAP = LITERAL (Read)
+*        An NDF or text file holding the forward selector Mapping. If an NDF
+*        is supplied, the Mapping from the Base Frame to the Current Frame
 *        of its WCS FrameSet will be used. The supplied Mapping must have a
 *        defined forward transformation, but need not have a defined
 *        inverse transformation. It must have one output, and the number of
-*        inputs must match the number of inputs of each of the supplied 
-*        route Mappings. A null (!) value may be supplied, in which case the 
+*        inputs must match the number of inputs of each of the supplied
+*        route Mappings. A null (!) value may be supplied, in which case the
 *        SwitchMap will have an undefined forward Mapping. This parameter
 *        is only used if a null value is supplied for IARCFILE.
-*     IARCFILE = LITERAL (Read) 
-*        The name of a text file containing the coefficients of the polynomial 
-*        fit produced by the FIGARO:IARC command. If a null value (!) is 
-*        supplied, the parameters ISMAP, FSMAP and ROUTEMAP1, etc, are used 
-*        instead to determine the nature of the required SwitchMap. Otherwise, 
+*     IARCFILE = LITERAL (Read)
+*        The name of a text file containing the coefficients of the polynomial
+*        fit produced by the FIGARO:IARC command. If a null value (!) is
+*        supplied, the parameters ISMAP, FSMAP and ROUTEMAP1, etc, are used
+*        instead to determine the nature of the required SwitchMap. Otherwise,
 *        the returned SwitchMap will have two inputs and 1 output. The
 *        inputs are channel number and row number (in that order), and
 *        the one output is wavelength in Angstroms. [!]
-*     ISMAP = LITERAL (Read) 
-*        An NDF or text file holding the inverse selector Mapping. If an NDF 
-*        is supplied, the Mapping from the Base Frame to the Current Frame 
+*     ISMAP = LITERAL (Read)
+*        An NDF or text file holding the inverse selector Mapping. If an NDF
+*        is supplied, the Mapping from the Base Frame to the Current Frame
 *        of its WCS FrameSet will be used. The supplied Mapping must have a
 *        defined inverse transformation, but need not have a defined
 *        forward transformation. It must have one input, and the number of
-*        outputs must match the number of outputs of each of the supplied 
-*        route Mappings. A null (!) value may be supplied, in which case the 
+*        outputs must match the number of outputs of each of the supplied
+*        route Mappings. A null (!) value may be supplied, in which case the
 *        SwitchMap will have an undefined inverse Mapping. This parameter
 *        is only used if a null value is supplied for IARCFILE.
 *     ROUTEMAP1-ROUTEMAP25 = LITERAL (Given)
-*        A set of 25 parameters associated with the NDFs or text files holding 
-*        the route Mappings. If an NDF is supplied, the Mapping from the Base 
-*        Frame to the Current Frame of its WCS FrameSet will be used. All the 
-*        supplied route Mappings must have common values for the Nin and Nout 
-*        attributes, and these values define the number of inputs and outputs 
+*        A set of 25 parameters associated with the NDFs or text files holding
+*        the route Mappings. If an NDF is supplied, the Mapping from the Base
+*        Frame to the Current Frame of its WCS FrameSet will be used. All the
+*        supplied route Mappings must have common values for the Nin and Nout
+*        attributes, and these values define the number of inputs and outputs
 *        of the SwitchMap. There can be no missing Mappings; if ROUTEMAP3 is
-*        to be processed then ROUTEMAP1 and ROUTEMAP2 must also be supplied. 
-*        A null value (!) should be supplied to indicate that there are no 
-*        further Mappings. ROUTEMAP3 to ROUTEMAP25 default to null (!).  At 
-*        least one Mapping must be supplied. These parameters are only used 
+*        to be processed then ROUTEMAP1 and ROUTEMAP2 must also be supplied.
+*        A null value (!) should be supplied to indicate that there are no
+*        further Mappings. ROUTEMAP3 to ROUTEMAP25 default to null (!).  At
+*        least one Mapping must be supplied. These parameters are only used
 *        if a null value is supplied for IARCFILE.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new SwitchMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new SwitchMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new SwitchMap.
 
@@ -175,11 +175,11 @@
       IMPLICIT NONE
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          
-      INCLUDE 'AST_PAR'        
-      INCLUDE 'PAR_ERR'        
-      INCLUDE 'CNF_PAR'      
-      INCLUDE 'GRP_PAR'      
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'AST_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'CNF_PAR'
+      INCLUDE 'GRP_PAR'
 
 *  Status:
       INTEGER STATUS
@@ -224,25 +224,25 @@
       LOGICAL MORE
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  See if the SwitchMap is to be created on the basis of a file containing 
-*  the output from the FIGARO:ARC command. Attempt to get a GRP group holding 
+*  See if the SwitchMap is to be created on the basis of a file containing
+*  the output from the FIGARO:ARC command. Attempt to get a GRP group holding
 *  the content of the IARC output file.
       CALL ATL_GTGRP( 'IARCFILE', IGRP, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Get the number of elements in the group. 
+*  Get the number of elements in the group.
          CALL GRP_GRPSZ( IGRP, NEL, STATUS )
 
 *  The first 5 rows are header text. We read the number of rows from the
 *  2nd line, and read the order of the polynomial from the 5th.
          CALL GRP_GET( IGRP, 2, 1, EL, STATUS )
-         NROW = -1        
+         NROW = -1
          IF( EL( : 16 ) .EQ. 'Image dimensions' ) THEN
             BY = INDEX( EL, ' by ' )
             IF( BY .GT. 0 ) THEN
@@ -257,7 +257,7 @@
          END IF
 
          CALL GRP_GET( IGRP, 5, 1, EL, STATUS )
-         ORDER = -1        
+         ORDER = -1
          IF( EL( : 32 ) .EQ. 'Maximum degree polynomial used =' ) THEN
             CALL CHR_CTOI( EL( 36 : ), ORDER, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
@@ -268,7 +268,7 @@
             END IF
          END IF
 
-         IF( ( ORDER .EQ. -1 .OR. NROW .EQ. -1 ) .AND. 
+         IF( ( ORDER .EQ. -1 .OR. NROW .EQ. -1 ) .AND.
      :       STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Unexpected header format in IARC '//
@@ -299,7 +299,7 @@
          CALL PSX_CALLOC( NROW, '_DOUBLE', IPW2, STATUS )
 
 *  Fill this array with AST__BAD values.
-         CALL KPG1_FILLD( AST__BAD, NROW, %VAL( CNF_PVAL( IPW2 ) ), 
+         CALL KPG1_FILLD( AST__BAD, NROW, %VAL( CNF_PVAL( IPW2 ) ),
      :                    STATUS )
 
 *  Read every subsequent non-header element in turn. ICO notes which
@@ -356,7 +356,7 @@
                   FCOEFF( FIN + 3 ) = 0.0
                   FIN = FIN + 4
 
-*  If we have not yet got all the coefficients for this row, move on to get 
+*  If we have not yet got all the coefficients for this row, move on to get
 *  the next coefficient.
                   IF( ICO .GT. 0 ) THEN
                      ICO = ICO - 1
@@ -364,17 +364,17 @@
 *  If we have got all the coefficients for this row, create the route
 *  Mapping (a PolyMap). These PolyMaps have no inverse transformation.
                   ELSE
-                     PM = AST_POLYMAP( 2, 1, ORDER + 1, FCOEFF, 0, 
-     :                                 0.0D0, ' ', STATUS ) 
+                     PM = AST_POLYMAP( 2, 1, ORDER + 1, FCOEFF, 0,
+     :                                 0.0D0, ' ', STATUS )
 
-*  Increment the number of route Mappings, and append the new route 
+*  Increment the number of route Mappings, and append the new route
 *  Mapping pointer in the end of the list in the work array.
                      NROUTE = NROUTE + 1
-                     CALL KPG1_STORI( NROW, NROUTE, PM, 
+                     CALL KPG1_STORI( NROW, NROUTE, PM,
      :                                %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
 *  Store the index of the route Mapping associated with this row.
-                     CALL KPG1_STORD( NROW, IROW, DBLE( NROUTE ), 
+                     CALL KPG1_STORD( NROW, IROW, DBLE( NROUTE ),
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Prepare to start reading the coefficients of the fit for the next row.
@@ -383,8 +383,8 @@
                   END IF
                END IF
 
-*  Replace the word with spaces. If this means the text is now entirely blank, 
-*  indicate that we should leave the loop to read another element from the 
+*  Replace the word with spaces. If this means the text is now entirely blank,
+*  indicate that we should leave the loop to read another element from the
 *  group.
                EL( : IAT ) = ' '
                IF( EL .EQ. ' ' ) MORE = .FALSE.
@@ -395,7 +395,7 @@
 *  Create a LutMap to use within the forward selector function. This
 *  transforms the row number supplied as the second input of the SwitchMap
 *  into the index of the associated route Mapping.
-         LUTMAP = AST_LUTMAP( NROW, %VAL( CNF_PVAL( IPW2 ) ), 1.0D0, 
+         LUTMAP = AST_LUTMAP( NROW, %VAL( CNF_PVAL( IPW2 ) ), 1.0D0,
      :                        1.0D0, ' ', STATUS )
 
 *  Create a PermMap which feeds the second of its two inputs to its
@@ -408,7 +408,7 @@
          FSMAP = AST_CMPMAP( PERMMAP, LUTMAP, .TRUE., ' ', STATUS )
 
 *  Create the required SwitchMap (it does not define an inverse transformation)
-         RESULT = AST_SWITCHMAP( FSMAP, AST__NULL, NROUTE, 
+         RESULT = AST_SWITCHMAP( FSMAP, AST__NULL, NROUTE,
      :                           %VAL( CNF_PVAL( IPW1 ) ), ' ', STATUS )
 
 *  Free the work space.
@@ -416,12 +416,12 @@
          CALL PSX_FREE( IPW2, STATUS )
 
 *  If a null value was supplied for IARCFILE, annul the error and get the
-*  required Mappings from the other parameters. 
+*  required Mappings from the other parameters.
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
 *  Get the forward selector Mapping.
-         CALL KPG1_GTOBJ( 'FSMAP', 'Mapping', AST_ISAMAPPING, FSMAP, 
+         CALL KPG1_GTOBJ( 'FSMAP', 'Mapping', AST_ISAMAPPING, FSMAP,
      :                    STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -429,7 +429,7 @@
          END IF
 
 *  Get the inverse selector Mapping.
-         CALL KPG1_GTOBJ( 'ISMAP', 'Mapping', AST_ISAMAPPING, ISMAP, 
+         CALL KPG1_GTOBJ( 'ISMAP', 'Mapping', AST_ISAMAPPING, ISMAP,
      :                    STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -437,19 +437,19 @@
          END IF
 
 *  Get the first two route Mappings. These must be supplied.
-         CALL KPG1_GTOBJ( 'ROUTEMAP1', 'Mapping', AST_ISAMAPPING, 
+         CALL KPG1_GTOBJ( 'ROUTEMAP1', 'Mapping', AST_ISAMAPPING,
      :                    ROUTEMAPS( 1 ), STATUS )
-         CALL KPG1_GTOBJ( 'ROUTEMAP2', 'Mapping', AST_ISAMAPPING, 
+         CALL KPG1_GTOBJ( 'ROUTEMAP2', 'Mapping', AST_ISAMAPPING,
      :                    ROUTEMAPS( 2 ), STATUS )
 
-*  Loop round getting route Mappings until a null value is supplied. 
+*  Loop round getting route Mappings until a null value is supplied.
 *  These can be omitted.
          NROUTE = 3
          DO WHILE( NROUTE .LE. MAXROUTE .AND. STATUS .EQ. SAI__OK )
             PARAM = 'ROUTEMAP'
             IAT = 8
             CALL CHR_PUTI( NROUTE, PARAM, IAT )
-            CALL KPG1_GTOBJ( PARAM, 'Mapping', AST_ISAMAPPING, 
+            CALL KPG1_GTOBJ( PARAM, 'Mapping', AST_ISAMAPPING,
      :                       ROUTEMAPS( NROUTE ), STATUS )
             IF( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -462,7 +462,7 @@
  10      CONTINUE
 
 *  Create the required SwitchMap.
-         RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, ' ', 
+         RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, ' ',
      :                           STATUS )
 
       END IF

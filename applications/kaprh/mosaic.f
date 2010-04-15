@@ -68,7 +68,7 @@
 *     16-09-1985 : First implementation (REVA::MJM)
 *     1986 Aug 7 : Renamed algorithm subroutines (MOSAIC_ADD to MOSCAD,
 *                  MOSAIC_DIV to MOSCDV). Correctly ordered arguments
-*                  in MOSCAD (7th to 5th). Added invocation to prologue 
+*                  in MOSCAD (7th to 5th). Added invocation to prologue
 *                  (RL.STAR::CUR).
 *     1986 Aug 29: Completed prologue (method and arguments), added
 *                  status checking, and NUMREA variable so that the
@@ -120,7 +120,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :  NDIMS,                 ! dimensionality of arrays
      :  MXFRAM                 ! maximum number of frames allowed
 
@@ -129,7 +129,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  NUMBER,                ! number of frames to be merged
      :  NUMREA,                ! number of frames located and mapped
      :  FIRSTG,                ! the number of the first data array
@@ -139,7 +139,7 @@
      :  PNTRI( MXFRAM ),       ! pointers to input DATA_ARRAYs
      :  XOFSET( MXFRAM ),      ! x offset of Nth frame from first
      :  YOFSET( MXFRAM ),      ! y   "     "  "    "     "    "
-     :  PNTRO,                 ! pointer to output DATA_ARRAY 
+     :  PNTRO,                 ! pointer to output DATA_ARRAY
      :  ODIMS( NDIMS ),        ! dimensions of output DATA_ARRAY
      :  PNTRT,                 ! pointer to data-array mask array
      :  MINX,                  ! minimum x offset from first frame
@@ -185,7 +185,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *    start by getting number of frames to be merged
-  
+
       CALL PAR_GDR0I( 'NUMBER', 2, 2, MXFRAM, .FALSE., NUMBER, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -226,10 +226,10 @@
 *       tell user which number frame is required
 
          CALL MSG_SETI( 'FRAMENO', I )
-         CALL MSG_OUT( 'NEXT_FRAME', 
+         CALL MSG_OUT( 'NEXT_FRAME',
      :                 'Input frame number ^FRAMENO', STATUS )
 
-*       get a locator to an IMAGE-type data structure then cancel 
+*       get a locator to an IMAGE-type data structure then cancel
 *       parameter.  Do not need individual origins as this information
 *       is ignored.
 
@@ -308,7 +308,7 @@
 *             current frame from the first, setting first offsets to
 *             zero, and then cancel parameter
 
-               IF ( I .NE. FIRSTG ) THEN 
+               IF ( I .NE. FIRSTG ) THEN
                   CALL PAR_GET0I( 'XOFFSET', XOFSET( I ), STATUS )
                   CALL PAR_GET0I( 'YOFFSET', YOFSET( I ), STATUS )
 
@@ -425,7 +425,7 @@
 *    offset values
 
       ODIMS( 1 ) = MAXX - MINX
-      ODIMS( 2 ) = MAXY - MINY         
+      ODIMS( 2 ) = MAXY - MINY
 
 *    inform user of output array dimensions
 
@@ -455,7 +455,7 @@
             XOFSET( K ) = XOFSET( K ) - MINX
             YOFSET( K ) = YOFSET( K ) - MINY
          END IF
-      END DO         
+      END DO
 
 *    Origin is undefined (in IMAGE context) for a series of images, so
 *    use the default.
@@ -580,7 +580,7 @@
          CALL DAT_ANNUL( LOCI( M ), STATUS )
          CALL PAR_CANCL( INPARM( M ), STATUS )
       END DO
- 
+
  999  CONTINUE
 
 *    return and end

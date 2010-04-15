@@ -24,7 +24,7 @@
 *           Expression specifying the mode in which the data are to be
 *           mapped.  (Either 'READ', 'WRITE' or 'UPDATE'.)
 *     NDIM=INTEGER
-*           Expression specifying the number of array dimensions. 
+*           Expression specifying the number of array dimensions.
 *           This must match the actual number of object dimensions.
 *     PNTR=INTEGER
 *           Variable to receive the virtual memory pointer for the

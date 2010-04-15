@@ -42,7 +42,7 @@
       real img(elems)
       integer status
 
-*   Arguments returned      
+*   Arguments returned
       integer idx(upix)
 
 *   Local variables
@@ -50,19 +50,19 @@
 
 
       if (status .ne. sai__ok) return
-      
+
 *   First, initialise the destination array with bad values
       do i=1,elems
          img(i) = VAL__BADR
       enddo
-      
+
 *   iv(67) is the starting subscript in V() for the regression
 *   diagnostic array (NSG p.14)
       j = iv(67)
       if (j .lt. 1) then
 *      This is a `can't-happen' error.
          call msg_seti ('CODE', j)
-         call msg_out (' ', 
+         call msg_out (' ',
      :        'No regression diagnostic available (code ^CODE)',
      :        status)
          status = sai__error

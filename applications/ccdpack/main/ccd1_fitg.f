@@ -232,11 +232,11 @@
       CALL NUM_CLEARERR()
 
 *  Match the identifiers of the lists and remove unmatched positions.
-      CALL CCD1_MTCHL( %VAL( CNF_PVAL( IPID1 ) ), 
-     :                 %VAL( CNF_PVAL( IPX1 ) ), 
+      CALL CCD1_MTCHL( %VAL( CNF_PVAL( IPID1 ) ),
+     :                 %VAL( CNF_PVAL( IPX1 ) ),
      :                 %VAL( CNF_PVAL( IPY1 ) ), NREC1,
-     :                 %VAL( CNF_PVAL( IPID2 ) ), 
-     :                 %VAL( CNF_PVAL( IPX2 ) ), 
+     :                 %VAL( CNF_PVAL( IPID2 ) ),
+     :                 %VAL( CNF_PVAL( IPX2 ) ),
      :                 %VAL( CNF_PVAL( IPY2 ) ), NREC2,
      :                 CCD1_NREC, STATUS )
 
@@ -290,7 +290,7 @@
          CALL CCD1_MALL( CCD1_NREC * 2, '_DOUBLE', CCD1_IPPO, STATUS )
 
 *  Transfer these to the input transformation array.
-         CALL CCD1_ITRA( PARVAL, %VAL( CNF_PVAL( IPX1 ) ), 
+         CALL CCD1_ITRA( PARVAL, %VAL( CNF_PVAL( IPX1 ) ),
      :                   %VAL( CNF_PVAL( IPY1 ) ), NREC1,
      :                   CCD1_NREC, CCD1_NPAR + 2, .TRUE.,
      :                   %VAL( CNF_PVAL( CCD1_IPPIN ) ), STATUS )
@@ -312,7 +312,7 @@
 
 *  Now try to determine the fit parameters.
          CALL PDA_LMDIF1( CCD1_LSFUN1, NRES, CCD1_NPAR, PARVAL,
-     :                    %VAL( CNF_PVAL( IPFVEC ) ), TOLER, IFAIL, 
+     :                    %VAL( CNF_PVAL( IPFVEC ) ), TOLER, IFAIL,
      :                    %VAL( CNF_PVAL( IPWRK1 ) ),
      :                    %VAL( CNF_PVAL( IPWRK2 ) ), NWORK )
 

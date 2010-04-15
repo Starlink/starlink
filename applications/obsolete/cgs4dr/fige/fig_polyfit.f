@@ -17,7 +17,7 @@
 *          The second dimension of IMAGE
 *     NW           = INTEGER( READ )
 *          Size of workspace array
-*     I            = REAL ARRAY( MODIFIED ) 
+*     I            = REAL ARRAY( MODIFIED )
 *          The image array
 *     V            = REAL ARRAY( READ )
 *          The variances on the image
@@ -25,7 +25,7 @@
 *          The quality array
 *     X            = DOUBLE ARRAY( MODIFIED )
 *          Array of X values for fit
-*     Y            = DOUBLE ARRAY( MODIFIED ) 
+*     Y            = DOUBLE ARRAY( MODIFIED )
 *          Array of Y values for fit
 *     W            = DOUBLE ARRAY( MODIFIED )
 *          Array of weights for fit
@@ -69,9 +69,9 @@
 *     GEN_FILL           ! (GEN_ package) Fill an array of bytes with constant
 *     ICH_CI             ! (ICH_ package) Convert integer to string
 *    Local variables:
-      INTEGER 
+      INTEGER
      : NX,               ! First dimension of input image
-     : NY,               ! Second dimension of input image 
+     : NY,               ! Second dimension of input image
      : NW,               ! Size of work arra y
      : SAYS1,            ! Start of first area
      : SAYE1,            ! End of first area
@@ -98,7 +98,7 @@
      : IMAX,             ! Max reject number
      : MINSKY,           ! Minimum sky coordinate
      : MAXSKY            ! Maximum sky coordinate
-      PARAMETER 
+      PARAMETER
      : (MAX_DEGREE = 10) ! Maximum degree for polynomial fit
       BYTE
      : Q(NX,NY)          ! Quality array
@@ -113,10 +113,10 @@
      : X(NY),            ! Array of X values
      : Y(NY),            ! Array of Y values
      : W(NY),            ! Array of weights
-     : W1(NW),           ! Array for NAG 
+     : W1(NW),           ! Array for NAG
      : DX,               ! Subtraction of MAXSKY and MINSKY for E02AEF
      : DX2,              ! Addition of MAXSKY and MINSKY for E02AEF
-     : XCAP,             ! Y average for E02AEF 
+     : XCAP,             ! Y average for E02AEF
      : VALUE,            ! The value of the polynomial
      : R,                ! Deviation from mean
      : RMAX,             ! Maximum deviation
@@ -193,7 +193,7 @@
           ERRORS = WEIGHT
           NGOOD  = 0
 
-*     First sky region 
+*     First sky region
 
           IF ( ( SAYS1.GE.MINSKY ) .AND. ( SAYS1.LE.MAXSKY ) .AND.
      :         ( SAYE1.GE.MINSKY ) .AND. ( SAYE1.LE.MAXSKY ) ) THEN
@@ -203,14 +203,14 @@
                    Y(INDEX) = I(IX,IY)
                    NGOOD = NGOOD + 1
                    IF ( ERRORS ) THEN
-                      IF ( ( V(IX,IY) .LE. 0 ) .OR. 
+                      IF ( ( V(IX,IY) .LE. 0 ) .OR.
      :                     ( V(IX,IY) .EQ. FUNKNOWN_IN ) ) THEN
                          ERRORS = .FALSE.
                       ENDIF
                    ENDIF
                    IF ( ERRORS ) THEN
                       W(INDEX) = 1D0/SQRT(V(IX,IY))
-                   ELSE  
+                   ELSE
                       W(INDEX) = 1D0
                    ENDIF
                    INDEX = INDEX + 1
@@ -218,7 +218,7 @@
              ENDDO
           ENDIF
 
-*     Second sky region 
+*     Second sky region
 
           IF ( ( SAYS2.GE.MINSKY ) .AND. ( SAYS2.LE.MAXSKY ) .AND.
      :         ( SAYE2.GE.MAXSKY ) .AND. ( SAYE2.LE.MAXSKY ) ) THEN
@@ -228,14 +228,14 @@
                    Y(INDEX) = I(IX,IY)
                    NGOOD = NGOOD + 1
                    IF ( ERRORS ) THEN
-                      IF ( ( V(IX,IY) .LE. 0 ) .OR. 
+                      IF ( ( V(IX,IY) .LE. 0 ) .OR.
      :                     ( V(IX,IY) .EQ. FUNKNOWN_IN ) ) THEN
                          ERRORS = .FALSE.
                       ENDIF
                    ENDIF
                    IF ( ERRORS ) THEN
                       W(INDEX) = 1D0/SQRT(V(IX,IY))
-                   ELSE  
+                   ELSE
                       W(INDEX) = 1D0
                    ENDIF
                    INDEX = INDEX + 1
@@ -243,7 +243,7 @@
              ENDDO
           ENDIF
 
-*     Third sky region 
+*     Third sky region
 
           IF ( ( SAYS3.GE.MINSKY ) .AND. ( SAYS3.LE.MAXSKY ) .AND.
      :         ( SAYE3.GE.MINSKY ) .AND. ( SAYE3.LE.MAXSKY ) ) THEN
@@ -253,14 +253,14 @@
                    Y(INDEX) = I(IX,IY)
                    NGOOD = NGOOD + 1
                    IF ( ERRORS ) THEN
-                      IF ( ( V(IX,IY) .LE. 0 ) .OR. 
+                      IF ( ( V(IX,IY) .LE. 0 ) .OR.
      :                     ( V(IX,IY) .EQ. FUNKNOWN_IN ) ) THEN
                          ERRORS = .FALSE.
                       ENDIF
                    ENDIF
                    IF ( ERRORS ) THEN
                       W(INDEX) = 1D0/SQRT(V(IX,IY))
-                   ELSE  
+                   ELSE
                       W(INDEX) = 1D0
                    ENDIF
                    INDEX = INDEX + 1
@@ -268,8 +268,8 @@
              ENDDO
           ENDIF
 
-*     Fourth sky region 
- 
+*     Fourth sky region
+
           IF ( ( SAYS4.GE.MINSKY ) .AND. ( SAYS4.LE.MINSKY ) .AND.
      :         ( SAYE4.GE.MAXSKY ) .AND. ( SAYE4.LE.MAXSKY ) ) THEN
              DO IY = SAYS4, SAYE4
@@ -278,14 +278,14 @@
                    Y(INDEX) = I(IX,IY)
                    NGOOD = NGOOD + 1
                    IF ( ERRORS ) THEN
-                      IF ( ( V(IX,IY) .LE. 0 ) .OR. 
+                      IF ( ( V(IX,IY) .LE. 0 ) .OR.
      :                     ( V(IX,IY) .EQ. FUNKNOWN_IN ) ) THEN
                          ERRORS = .FALSE.
                       ENDIF
                    ENDIF
                    IF ( ERRORS ) THEN
                       W(INDEX) = 1D0/SQRT(V(IX,IY))
-                   ELSE  
+                   ELSE
                       W(INDEX) = 1D0
                    ENDIF
                    INDEX = INDEX + 1
@@ -299,21 +299,21 @@
 
 *        by calculating the mean
 
-              MEAN = 0D0                             
-              DO INDEX = 1, NGOOD                         
-                  MEAN = MEAN + Y(INDEX)         
-              ENDDO                                  
-              MEAN = MEAN / NGOOD                         
+              MEAN = 0D0
+              DO INDEX = 1, NGOOD
+                  MEAN = MEAN + Y(INDEX)
+              ENDDO
+              MEAN = MEAN / NGOOD
 
 *        then calculating the deviation from mean and delete the worst point
 
-              RMAX = -1D0                            
-              DO INDEX = 1, NGOOD                      
-                 R = ABS( Y(INDEX) - MEAN )         
-                 IF ( R .GT. RMAX ) THEN          
-                     RMAX = R                   
-                     IMAX = INDEX               
-                 ENDIF                          
+              RMAX = -1D0
+              DO INDEX = 1, NGOOD
+                 R = ABS( Y(INDEX) - MEAN )
+                 IF ( R .GT. RMAX ) THEN
+                     RMAX = R
+                     IMAX = INDEX
+                 ENDIF
               ENDDO
               DO INDEX = IMAX, NGOOD-1
                  Y(INDEX) = Y(INDEX+1)
@@ -322,7 +322,7 @@
               ENDDO
               NGOOD = NGOOD - 1
 
-          ENDDO                                  
+          ENDDO
 
 *     Check that there are enough good points to do a polynomial fit
 *     of the required degree - if not set quality to bad for that column
@@ -340,13 +340,13 @@
 
 *     Do the polynomial fit
              EPS=0D0
-             IFAIL2=0                                                
-             CALL PDA_DPOLFT(NGOOD,X,Y,W,KPLUS1-1,NDEG,EPS,W1,IFAIL,W1(NGOOD+1),IFAIL2) 
+             IFAIL2=0
+             CALL PDA_DPOLFT(NGOOD,X,Y,W,KPLUS1-1,NDEG,EPS,W1,IFAIL,W1(NGOOD+1),IFAIL2)
              IF (NDEG.NE.KPLUS1-1.OR.IFAIL.NE.1.OR.IFAIL2.NE.0) THEN
                 CALL PAR_WRUSER('FIG_POLYFIT: Error in PDA_DPOLFT (Ndeg = '//ICH_CI(NDEG)/
      :             /', Ifail = '//ICH_CI(IFAIL)//', Ifail2 = '//ICH_CI(IFAIL2)//')',IGNORE)
-                GO TO 500                                            
-             ENDIF                                                    
+                GO TO 500
+             ENDIF
 
 *     Subtract sky values
 

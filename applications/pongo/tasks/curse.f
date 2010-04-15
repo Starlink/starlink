@@ -287,14 +287,14 @@
       DO 10 IDAT = 1,NDAT
 
          IF ( PROJECTION .NE. 1 ) THEN
-            LSTAT = SAI__OK 
+            LSTAT = SAI__OK
             CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0,
      :                          XDATA( IDAT ), YDATA( IDAT ), L, M,
      :                          LSTAT )
-            IF ( LSTAT .EQ. SAI__OK ) THEN 
+            IF ( LSTAT .EQ. SAI__OK ) THEN
                WORK( IDAT ) = REAL( L )
                WORK( IDAT+NDAT ) = REAL( M )
-            ELSE 
+            ELSE
                WORK( IDAT ) = 0.0
                WORK( IDAT+NDAT ) = 0.0
             END IF
@@ -507,18 +507,18 @@
             YLABAN( ILABPTR ) = Y
          ELSE IF ( CH .EQ. 'X' ) THEN
 
-*        Report the current cursor position. Convert this into an 
+*        Report the current cursor position. Convert this into an
 *        value in radians and RA/DEC, if using a projection.
             CALL MSG_SETR( 'X', X )
             CALL MSG_SETR( 'Y', Y )
             CALL MSG_OUT( ' ', 'Cursor position: X = ^X, Y = ^Y',
      :                    STATUS )
-            IF ( PROJECTION .NE. 1 ) THEN 
-               LSTAT = SAI__OK 
-               CALL PROJ_CONVLMPT( PROJECTION - 1 , RA0, DEC0, 
-     :                             DBLE( X ), DBLE( Y ), PHI, THETA, 
+            IF ( PROJECTION .NE. 1 ) THEN
+               LSTAT = SAI__OK
+               CALL PROJ_CONVLMPT( PROJECTION - 1 , RA0, DEC0,
+     :                             DBLE( X ), DBLE( Y ), PHI, THETA,
      :                             LSTAT )
-               IF ( LSTAT .EQ. SAI__OK ) THEN 
+               IF ( LSTAT .EQ. SAI__OK ) THEN
                   CALL MSG_SETD( 'PHI', PHI )
                   CALL MSG_SETD( 'THETA', THETA )
                   CALL MSG_OUT( ' ', '                 '//
@@ -542,7 +542,7 @@
                   CALL MSG_SETI( 'SEC2', IDMSF( 3 ) )
                   CALL MSG_SETI( 'SS2', IDMSF( 4 ) )
                   CALL MSG_OUT( ' ', '                 '//
-     :'RA = ^S1^H1:^M1:^SEC1.^SS1, DEC = ^S2^D1:^M2:^SEC2.^SS2', 
+     :'RA = ^S1^H1:^M1:^SEC1.^SS1, DEC = ^S2^D1:^M2:^SEC2.^SS2',
      :                      STATUS )
                ELSE
 

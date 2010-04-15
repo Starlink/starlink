@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -141,7 +141,7 @@
 
 *  If a new parameter slot was allocated then we need to access an NDF.
 *  The NDF data is not mapped in this case for efficiency reasons.
-                  IF ( WASNEW ) CALL IMG1_ASSOC( VPAR, 'UPDATE', SLOT, 
+                  IF ( WASNEW ) CALL IMG1_ASSOC( VPAR, 'UPDATE', SLOT,
      :                                           STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -156,7 +156,7 @@
                         IF ( WASNEW ) THEN
                            CALL ERR_REP( ' ', 'Cannot open the image '//
      :                          '''^NDF'' for modification '//
-     :                          '(write access is not allowed)', 
+     :                          '(write access is not allowed)',
      :                          STATUS )
                         ELSE
                            CALL ERR_REP( ' ', 'The image ''^NDF'' is '//

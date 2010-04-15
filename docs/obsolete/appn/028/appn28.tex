@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ received OBEY
 \item DTASK\_\_ACTCOMPLETE - return the final acknowledgement to an OBEY
 \item MESSYS\_\_PARAMREP - reply to a parameter request
 \item MESSYS\_\_PARAMREQ - send a parameter request
-\item MESSYS\_\_INFORM - request output of a string 
+\item MESSYS\_\_INFORM - request output of a string
 \item MESSYS\_\_SYNC - send a synchronisation message
 \item MESSYS\_\_SYNCREP - reply to a synchronisation message
 \item MESSYS\_\_TRIGGER - send a trigger message
@@ -322,7 +322,7 @@ proc startmsg { task name path messid msg_status msg_value } {
 #   the initialisation OBEY from wish to idler. Return an acknowledgement
    global DTASK__ACTSTART
    puts "idler: startmsg arrived"
-   tkadam_reply $path $messid $DTASK__ACTSTART $name "idler answering" 
+   tkadam_reply $path $messid $DTASK__ACTSTART $name "idler answering"
 }
 
 proc sync { task name path messid msg_status msg_value } {
@@ -330,7 +330,7 @@ proc sync { task name path messid msg_status msg_value } {
    puts "sync called"
 }
 
-proc tkadam_start {} { 
+proc tkadam_start {} {
 #   loop collecting adam messages and executing the associated command
 
    set com  ""
@@ -360,7 +360,7 @@ proc wishcmd { cmd } {
 
 #   IDLER top level
 
-set DTASK__ACTSTART 142115651 
+set DTASK__ACTSTART 142115651
 
 #   create the wish process, redirecting its stdin to wishfd
 
@@ -454,7 +454,7 @@ proc prompt { path messid param pprompt pdefault phelptxt perrmsg } {
 
    } else {
 
-      errorbox "space for prompt boxes exhausted" 
+      errorbox "space for prompt boxes exhausted"
       set cmd "paramrep temp temp $path $messid $MESSYS__NOUSR noboxes"
       idlercmd $cmd
    }
@@ -471,7 +471,7 @@ proc report { string } {
 
 set MESSYS__TRIGGER 141460483
 set MESSYS__PARAMREP 141460331
-set PAR__NOUSR 146703139 
+set PAR__NOUSR 146703139
 
 # alpha likes this set ufont "-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
 # normal is
@@ -501,7 +501,7 @@ for { set i 0 } { $i<32 } { incr i } {
 
 #   exit
 
-frame .frexit 
+frame .frexit
 button .exit -text "exit and kill all tasks" -font $ufont
 
 pack .frexit
@@ -512,7 +512,7 @@ bind .exit <Button-1> \
 
 #   load
 
-frame .frload 
+frame .frload
 
 label .label1 -text "load" -font $ufont
 entry .exename -width 32 -relief sunken -textvariable exename -font $ufont
@@ -528,7 +528,7 @@ bind .taskname <Return> { set result [ idlercmd "exec $exename $taskname &" ] }
 
 #   obey
 
-frame .frobey 
+frame .frobey
 
 label .label2 -text "obey task" -font $ufont
 entry .taskcmd -width 32 -relief sunken -textvariable taskcmd -font $ufont
@@ -545,11 +545,11 @@ bind .actioncmd <Return> \
 
 #   scrolled text
 
-toplevel .topscroll 
+toplevel .topscroll
 listbox .topscroll.msgscroll -yscrollcommand ".topscroll.scroll set" -font $ufont
 scrollbar .topscroll.scroll -command ".topscroll.msgscroll yview"
-pack .topscroll.scroll -side right -fill y 
-pack .topscroll.msgscroll -side left -fill both -expand 1 
+pack .topscroll.scroll -side right -fill y
+pack .topscroll.msgscroll -side left -fill both -expand 1
 
 wm minsize .topscroll 1 1
 

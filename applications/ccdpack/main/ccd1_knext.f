@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
       CHARACTER * ( * ) NAME
 
 *  Arguments Returned:
-      LOGICAL OK 
+      LOGICAL OK
       CHARACTER * ( * ) TYPE
 
 *  Status:

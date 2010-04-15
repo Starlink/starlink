@@ -1,13 +1,13 @@
 /*
-                                                                  
-  File name: 
+
+  File name:
     wvmCal.c
 
-  Description:  
+  Description:
 
   Functions:
 
- History: 
+ History:
    $Log: wvmCal.c,v $
    Revision 1.5  2008/04/10 21:04:56  cwalther
    Make sure the averaging is done in floating point
@@ -51,7 +51,7 @@
       of the three receivers
 
  *  Description:
-      
+
 
  *  Language:
       C
@@ -60,7 +60,7 @@
       wvmCal(int cycleCnt,float * data,float eta,float tAmb,
 	     float * tSky,float * tSys);
 
-      
+
 
  *  Parameters:
       ("<" input, "!" modified, "W" workspace, ">" output)
@@ -69,22 +69,22 @@
       (<) eta        The coupling efficiency to sky
                      If == 0.0 and internal value will get used
       (<) tAmb       The ambient temperature at the telescope
-      (>) tSky       The sky temperature measured by each 
+      (>) tSky       The sky temperature measured by each
                      receiver (3 data points)
       (>) tSys       The system temperature of each receiver (3 data points)
 
  *  Support: Craig Walther, {JAC}
 
 
- *- 
+ *-
 
  */
 
 void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
 	    float * tSky, float * tSys, FILE *rawFP)
 {
-  /* The arrays fSky, fSum and fDif will hold the average of the two 
-     readings of sky frequency, the sum of the frequency readings 
+  /* The arrays fSky, fSum and fDif will hold the average of the two
+     readings of sky frequency, the sum of the frequency readings
      looking at the load and the difference of the frequency readings
      while looking at the loads */
   float fSky[3], fSum[3], fDif[3];
@@ -98,8 +98,8 @@ void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
 
   /* tHot and tWarm are the effective temperatures of the calibration
      load.  Note that these must truely be the effective R-J brightness
-     tempertures and NOT the actual temperatures the effect of this 
-     is to subtract 4.4 K from all actual temperatures. Thus a hot 
+     tempertures and NOT the actual temperatures the effect of this
+     is to subtract 4.4 K from all actual temperatures. Thus a hot
      load at 100 C is at 368.75 effective */
   static float tHot[] = {364.7, 363.8, 364.6};
   static float tWarm[] = {303.2 , 303.2, 303.2};
@@ -113,7 +113,7 @@ void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
   char inputStr[100];
   char channel_names[3][10] = {"1.2 GHz", "4.2 GHz", "7.8 GHz"};
 
-  /* avgFacSky, avgFacSum and avgFacDif are Smoothing factors - the 
+  /* avgFacSky, avgFacSum and avgFacDif are Smoothing factors - the
      fraction carried to the next value If avgFac = 0, no averaging */
   float avgFacSky = 0.0;
   float avgFacSum = 0.6;
@@ -124,7 +124,7 @@ void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
 
   /* errCnt is an error counter */
   static int errCnt[] = {0, 0, 0};
-  
+
   /* The vfcIndex array holds the offsets to:
      1.2 GHz channel in position 0
      4.2 GHz channel in position 1
@@ -164,18 +164,18 @@ void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
       for(i=0; i<3; i++)
 	  printf("%s channel hot temp: %f  warm temp: %f\n",
 		 channel_names[i], tHot[i], tWarm[i]);
-	  
+
     }
 
-  /* Convert the data into temperatures  (just assume Rayleigh-Jeans 
+  /* Convert the data into temperatures  (just assume Rayleigh-Jeans
      for now) */
 
   for(i=0; i<3; i++)
     {
 
       /* Average of two sky readings */
-      fSky[i] = (data[vfcIndex[i] + SKY_OFF1] + 
-		 data[vfcIndex[i] + SKY_OFF2]) / 2.0; 
+      fSky[i] = (data[vfcIndex[i] + SKY_OFF1] +
+		 data[vfcIndex[i] + SKY_OFF2]) / 2.0;
 
       /* Sum and difference of the cal readings */
       fSum[i] = data[vfcIndex[i] + HOT_OFF] + data[vfcIndex[i] + WARM_OFF];
@@ -191,8 +191,8 @@ void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
       /* Begin smoothing */
       else
 	{
-	  /* Smooth these:  this is roughly equivalent to an RC 
-	     filter.  If avsk = 0.9 it gives an effective time constant 
+	  /* Smooth these:  this is roughly equivalent to an RC
+	     filter.  If avsk = 0.9 it gives an effective time constant
 	     of about 10 sample times. */
 
 	  avgSky[i] = avgSky[i] * avgFacSky + fSky[i] * (1.0 - avgFacSky);

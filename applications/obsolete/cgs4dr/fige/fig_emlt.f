@@ -6,7 +6,7 @@ C     F I G _ E M L T
 C
 C     Analyses emission lines in a spectrum, producing a list of
 C     their centers and widths, optionally from a center of moments
-C     analysis, usually from a gaussian fit.  This is essentially 
+C     analysis, usually from a gaussian fit.  This is essentially
 C     the bulk of the code from the SDRSYS routine EMLT, hacked
 C     about dreadfully to turn it into the main routine of a Figaro
 C     application.  The body of the code is unchanged, but all the
@@ -29,12 +29,12 @@ C                 specified as true, Y is returned containing a synthetic
 C                 spectrum generated from the fitted lines.
 C     (>) NX      (Integer) The number of elements in the data.
 C     (>) N1      (Integer) The number of the first element to be used
-C                 in the analysis.  
+C                 in the analysis.
 C     (>) N2      (Integer) The number of the last element to be used
 C                 in the analysis.
 C     (>) FWHM0   (Real) If non-zero, all lines fitted are constrained
 C                 to this half-width (in pixels).
-C     (>) NOCENS  (Integer) If set to 1, the center of moments analysis 
+C     (>) NOCENS  (Integer) If set to 1, the center of moments analysis
 C                 is bypassed.
 C     (>) LINES   (Integer) If non-zero, only the LINES strongest lines
 C                 in the spectrum will be analysed.
@@ -115,7 +115,7 @@ C
 C
 C   REMOVE SINGLE BIN FEATURES
 C
-      NMIN = N1 + 2 
+      NMIN = N1 + 2
       NMAX = N2 - WINDOW + 1    ! This was -4 (i.e. -5+1)
 C
       DO 10 N10 = 2,NX-1
@@ -205,7 +205,7 @@ C
          SIGMX = SIGMX + FLOAT(N101 -NLCP1)*Y(N101)
   101    CONTINUE
 C
-      XCMOM = FLOAT(NLCP1) + SIGMX /SIGM 
+      XCMOM = FLOAT(NLCP1) + SIGMX /SIGM
 C
 C   CENTROID
       SIGMH = SIGM /2.
@@ -222,7 +222,7 @@ C
       XCENTR = FLOAT(NC) + SIGML /Y(NC+2) +1.5
 C
 C   STRENGTH
-      WRITE (LOG,'(F8.1,7X,F8.1,7X,G12.4)',IOSTAT=IGNORE) 
+      WRITE (LOG,'(F8.1,7X,F8.1,7X,G12.4)',IOSTAT=IGNORE)
      :                                           XCMOM,XCENTR,STREN
       CALL PAR_WRUSER (LOG,STATUS)
       IF (LOGLU.NE.0) WRITE (LOGLU,'(A)',IOSTAT=IGNORE) LOG
@@ -337,7 +337,7 @@ C  OUTPUT FORMAT
       FMTSTR = '(F8.2,F12.N,F7.2,F10.N,F10.3,F10.3)'
       FMTSTR(11:11) = CHAR (ICHAR('0') + NDPA)
       FMTSTR(22:22) = FMTSTR(11:11)
-      IF ((STRMAX.GT.32000.0).OR.(STRMAX.LT.0.1)) 
+      IF ((STRMAX.GT.32000.0).OR.(STRMAX.LT.0.1))
      :                          FMTSTR(24:34) = '2(1PE10.3)'
 C
       DO 180 N180 = 1,LINE

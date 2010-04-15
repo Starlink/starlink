@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*     
+*
 *     Copy a catalogue.
 
-*     
+*
 *  Usage:
 *     COPYCAT INPUT OUTPUT
 
@@ -34,7 +34,7 @@
 *        New catalogue.
 
 *  Example:
-*     COPYCAT TEST NEWTEST 
+*     COPYCAT TEST NEWTEST
 
 *  Authors:
 *     ARW: Alan Wood (STARLINK)
@@ -47,7 +47,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

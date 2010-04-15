@@ -16,7 +16,7 @@
 *     CALL DTASK_SETDUMP ( STATUS )
 
 *  Description:
-*     Enable or re-enable facility for generating a stack dump of a 
+*     Enable or re-enable facility for generating a stack dump of a
 *     task.
 
 *  Arguments:
@@ -25,13 +25,13 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     The first call of this routine will be from mainline code. In this 
-*     case, create a mailbox with a name based on the process name, and 
-*     start a QIO to it declaring a completion AST handler. The AST 
-*     handler generates a stack dump when some other task writes to the 
-*     mailbox. The AST handler also calls this routine to re-enable the 
+*     The first call of this routine will be from mainline code. In this
+*     case, create a mailbox with a name based on the process name, and
+*     start a QIO to it declaring a completion AST handler. The AST
+*     handler generates a stack dump when some other task writes to the
+*     mailbox. The AST handler also calls this routine to re-enable the
 *     QIO.
-*     Subsequent calls to this routine will be from the AST handler. In 
+*     Subsequent calls to this routine will be from the AST handler. In
 *     this case, restart the QIO.
 
 *  Copyright:

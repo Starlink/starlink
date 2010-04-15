@@ -6,7 +6,7 @@
 *    Description :
 *
 *     This routine takes the logarithm to an input base of
-*     each pixel of an input image. The result goes into a 
+*     each pixel of an input image. The result goes into a
 *     new output image.
 *
 *    Invocation :
@@ -69,8 +69,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR' 
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -84,7 +84,7 @@
 
       REAL
      :    MAXBASE,                ! maximum base allowed for logarithm
-     :    MINBASE                 ! minimum   "     "     "      "   
+     :    MINBASE                 ! minimum   "     "     "      "
       PARAMETER( MAXBASE  =  1000 )
       PARAMETER( MINBASE  =  0.001 )
 
@@ -119,7 +119,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the input structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions
@@ -128,7 +128,7 @@
 *       if no error then continue
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*          try to get the logarithm base 
+*          try to get the logarithm base
             CALL AIF_GET0R( 'BASE', 2.718282, MINBASE, MAXBASE, BASE,
      :                       STATUS )
 
@@ -141,7 +141,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )

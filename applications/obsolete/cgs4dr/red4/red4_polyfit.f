@@ -59,7 +59,7 @@
      :  YPTR,                        ! Dynamic memory element of Y array
      :  YSLT,                        ! Dynamic memory slot of Y array
      :  COLON_POS                    ! position of colon in string
-      LOGICAL   
+      LOGICAL
      :  EXIST                        ! TRUE if error information present
       CHARACTER
      :  COMMENT*4,                   ! Dummy comment
@@ -184,7 +184,7 @@
          PF_WEIGHT = .FALSE.
       ENDIF
 
-*    Get the polynomial degree and rejection parameters             
+*    Get the polynomial degree and rejection parameters
       CALL PAR_GET0I( 'PF_DEGREE', PF_DEGREE, STATUS )
       CALL PAR_GET0I( 'PF_NREJECT', PF_NREJECT, STATUS )
 
@@ -276,8 +276,8 @@
 
          CALL FIG_POLYFIT( NX, NY, W1BYTES, %val(OPTR1), %val(VPTR1),
      :     %val(QPTR1), %val(XPTR), %val(YPTR), %val(WPTR),
-     :     %val(W1PTR), PF_SAYS1, PF_SAYE1, PF_SAYS2, PF_SAYE2, 
-     :     PF_SAYS3, PF_SAYE3, PF_SAYS4, PF_SAYE4, PF_DEGREE, 
+     :     %val(W1PTR), PF_SAYS1, PF_SAYE1, PF_SAYS2, PF_SAYE2,
+     :     PF_SAYS3, PF_SAYE3, PF_SAYS4, PF_SAYE4, PF_DEGREE,
      :     PF_NREJECT, PF_WEIGHT )
       ENDIF
 

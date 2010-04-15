@@ -4,7 +4,7 @@
 *     errMark
 
 *  Purpose:
-*     Mark (start) a new error context. 
+*     Mark (start) a new error context.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,10 +13,10 @@
 *     errMark();
 
 *  Description:
-*     Begin a new error reporting context so that delivery of subsequently 
-*     reported error messages is deferred and the messages held in the 
-*     error table. Calls to ERR_ANNUL, ERR_FLUSH and ERR_LOAD will only 
-*     flush or annul the contents of the error table within this new 
+*     Begin a new error reporting context so that delivery of subsequently
+*     reported error messages is deferred and the messages held in the
+*     error table. Calls to ERR_ANNUL, ERR_FLUSH and ERR_LOAD will only
+*     flush or annul the contents of the error table within this new
 *     context.
 
 *  Copyright:
@@ -29,12 +29,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

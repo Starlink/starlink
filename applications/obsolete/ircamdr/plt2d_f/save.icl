@@ -1,4 +1,4 @@
-PROC startup 
+PROC startup
   print 'Welcome to Unix IRCAM_CLRED !'
   print ' '
   set precision 6
@@ -16,7 +16,7 @@ PROC startup
     print 'Loading Vax utilities'
     load $LIRCAMDIR/utils.icl
     load $LIRCAMDIR/setfile.icl
-  ELSE  
+  ELSE
     print 'Loading Unix utilities'
     load $LIRCAMDIR/utils_unix.icl
     load $LIRCAMDIR/setfile_unix.icl
@@ -36,8 +36,8 @@ PROC startup
   load $LIRCAMDIR/lplt.icl
   load $LIRCAMDIR/logo.icl
   set prompt 'Ircam-Clred> '
-  LPLT 
-  SETFILE 
-  SETPS 
-  LOGO 
-END PROC 
+  LPLT
+  SETFILE
+  SETPS
+  LOGO
+END PROC

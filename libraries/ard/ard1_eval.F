@@ -2,8 +2,8 @@
 #include "config.h"
 #endif
       SUBROUTINE ARD1_EVAL( INDEX1, NDIM, LBND, UBND, OPCSIZ, OPNSIZ,
-     :                      STKSIZ, MSKSIZ, OPCODE, OPRNDS, STACK, 
-     :                      LEXSTK, UEXSTK, LINSTK, UINSTK, MASK, 
+     :                      STKSIZ, MSKSIZ, OPCODE, OPRNDS, STACK,
+     :                      LEXSTK, UEXSTK, LINSTK, UINSTK, MASK,
      :                      LBEXT, UBEXT, LBINT, UBINT, INDEX, STATUS )
 *+
 *  Name:
@@ -35,7 +35,7 @@
 *
 *     Each array on the stack has two bounding boxes associated with
 *     it; the exterior bounding box is the smallest box which contains
-*     all exterior pixels (i.e.  array elements with the value 0 or 
+*     all exterior pixels (i.e.  array elements with the value 0 or
 *     less ) the interior bounding box is the smallest box which
 *     contains all interior pixels (i.e.  array elements with a value
 *     greater than 0). Bounding boxes can be "infinite" in which
@@ -135,12 +135,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -166,7 +166,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -243,7 +243,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise all the bounding boxes on the stack to be of "infinite"
-*  size. 
+*  size.
       DO I = 1, STKSIZ
          LEXSTK( 1, I ) = VAL__MAXI
          LINSTK( 1, I ) = VAL__MAXI
@@ -265,12 +265,12 @@
 *  Loop round the instructions supplied in OPCODE until an "End
 *  Expression" instruction has been executed, or an error occurs.
       CODE = ARD__NUL
-      
+
       DO WHILE( IOP .LT. OPCSIZ .AND. CODE .NE. ARD__END .AND.
      :          STATUS .EQ. SAI__OK )
          IOP = IOP + 1
 
-*  Get the next instruction code. 
+*  Get the next instruction code.
          CODE = OPCODE( IOP )
 
 *  Check for stack under-flow. Note, the "End Expression" instruction
@@ -435,7 +435,7 @@
                END IF
 
                CALL ARD1_LKR( INDEX1, NDIM, LBND, UBND, MSKSIZ, MASK,
-     :                        OPNSIZ, IOPND, LEX0, UEX0, LIN0, UIN0, 
+     :                        OPNSIZ, IOPND, LEX0, UEX0, LIN0, UIN0,
      :                        OPRNDS, IPNTR,
      :                        LEXSTK( 1, TOS ), UEXSTK( 1, TOS ),
      :                        LINSTK( 1, TOS ), UINSTK( 1, TOS ),
@@ -455,14 +455,14 @@
      :                       'instruction found in ARD1_EVAL '//
      :                       '(programming error).', STATUS )
                GO TO 999
-      
+
             END IF
-      
+
 *  Ignore NULL instructions.
          ELSE IF( CODE .EQ. ARD__NUL ) THEN
 
 *  Report an error if the instruction is not recognised.
-         ELSE 
+         ELSE
             STATUS = ARD__INTER
             CALL MSG_SETI( 'CODE', CODE )
             CALL ERR_REP( 'ARD1_EVAL_ERR5', 'Illegal instruction code'//
@@ -478,7 +478,7 @@
       INDEX = INDEX +1
 
 *  Report an error if the instructions in OPCODE have been exhausted
-*  but no "End Expression" instruction has been encountered. 
+*  but no "End Expression" instruction has been encountered.
       IF( CODE .NE. ARD__END .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = ARD__INTER
 

@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -63,18 +63,18 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
-      CHARACTER * ( 10 ) FMT     ! Format statement 
+      CHARACTER * ( 10 ) FMT     ! Format statement
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Position of first non-blank character
       INTEGER LP                 ! Used length of input string
-      INTEGER STATUS             ! Local status value 
+      INTEGER STATUS             ! Local status value
 *.
 
 *  Set up the initial values.
       PARINT = .FALSE.
 
 *  Use the standard character to integer conversion routine.
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
       CALL CHR_FANDL( PAR, J, LP )
       CALL CHR_CTOI( PAR( J : LP ), VAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN

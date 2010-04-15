@@ -49,7 +49,7 @@ f77_integer gk9scm_(flag, index, red, green, blue)
 {
   char
     *calloc();				/* For allocating colourmap space */
-  
+
   f77_integer
     gk9scc_();				/* Maps GKS to SunView colour indices */
 
@@ -121,7 +121,7 @@ f77_integer gk9scm_(flag, index, red, green, blue)
        * defaults if they have the same RGB components.  Check for this
        * and tweak the last colourmap entry to prevent it.
        */
-      
+
       if((lindex == 0 || lindex == colours - 1)
       &&(*cred == *(cred + colours - 1)
       && *cgreen == *(cgreen + colours - 1)

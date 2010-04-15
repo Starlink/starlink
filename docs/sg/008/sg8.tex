@@ -4,8 +4,8 @@
 
 % Copyright 1997  Starlink, CCLRC.
 
-% This document is offered in good faith.  However, no guarantee or 
-% warranty whatsoever is offered or implied.  Neither myself, the 
+% This document is offered in good faith.  However, no guarantee or
+% warranty whatsoever is offered or implied.  Neither myself, the
 % University of Edinburgh nor the CCLRC accept any responsibility for
 % loss, damage or injury resulting from the use of this document.
 
@@ -31,7 +31,7 @@
 \newcommand{\stardoctitle}     {An Introduction to \\ Visualisation
 Software for Astronomy}
 \newcommand{\stardocabstract}  {
-This document is an introduction to various common visualisation 
+This document is an introduction to various common visualisation
 techniques and packages which might be used on Starlink systems. It is
 aimed at astronomers with complex datasets to display and explore but
 no prior knowledge of visualisation techniques. Its purpose is to
@@ -141,7 +141,7 @@ problem. It is not a manual for any particular package.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -229,12 +229,12 @@ problem. It is not a manual for any particular package.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -318,7 +318,7 @@ Richard Hamming
 \end{quote}
 \end{htmlonly}
 
-This document is an introduction to various common visualisation 
+This document is an introduction to various common visualisation
 techniques and packages which might be used on Starlink systems. It is
 aimed at astronomers with complex datasets to display and explore but
 no prior knowledge of visualisation techniques. Its purpose is to
@@ -343,7 +343,7 @@ The concentration of the points immediately suggested the likely source of
 contamination (see Figure~\ref{CHOLERA}). Classical astronomical examples
 might be E.W.~Maunder's famous `butterfly diagram' of sunspot latitude
 against time, which strikingly illustrates Sp\"{o}rer's law that sunspots
-originate at lower latitudes as the solar cycle progresses (see 
+originate at lower latitudes as the solar cycle progresses (see
 Figure~\ref{SUNSPOT}). Another example might be the Hertzsprung-Russell
 colour-magnitude diagram which underpins much of the understanding of
 stellar structure and evolution.
@@ -376,7 +376,7 @@ Broad Street. Reproduced from Gilbert\cite{GILBERT}. \label{CHOLERA} }
 \caption[Butterfly diagram for solar flares.]{Butterfly diagram for
 solar flares. Latitude on the solar disk is plotted against time. The
 flares show the same characteristic `butterfly' distribution as
-sunspots. This plot is due to K.~S.~Balasubramaniam, National Solar 
+sunspots. This plot is due to K.~S.~Balasubramaniam, National Solar
 Observatory, Sunspot, New Mexico. \label{SUNSPOT} }
 
 \end{figure}
@@ -431,12 +431,12 @@ Section~\ref{IBMDX} and its use at Starlink sites is documented in
 Similarly, some sites have bought licences for the Interactive Data
 Language (IDL, see Section~\ref{IDL}). Other packages may also be
 available. Your site manager should be able to advise on what is
-available at your site. 
+available at your site.
 
 Specialised software for plotting finding charts from astronomical
 catalogues is specifically not covered in this document. Starlink
 provides the {\tt CHART} package for this purpose and it is described
-in SUN/32\cite{CHART}. Another similar program is 
+in SUN/32\cite{CHART}. Another similar program is
 \htmladdnormallink{{\bf skymap}}
 {http://tdc-www.harvard.edu/software/skymap.html}\cite{SKYMAP}
 written by D.~Mink of the Smithsonian Astrophysical Observatory.
@@ -453,7 +453,7 @@ etc.) for a set of objects. The same set of properties are measured for
 each object. Astronomical catalogues are simply large tabular datasets.
 
 {\bf Particle} data are an important special case of tabular data where
-the properties for each object (or `particle') include two- or 
+the properties for each object (or `particle') include two- or
 three-dimensional positions. In the context of visualisation software
 these positions are usually Cartesian coordinates rather than
 spherical-polar celestial coordinates.
@@ -469,9 +469,9 @@ distinction between the cases where the sampling is a true instantaneous
 sample of the underlying distribution at a precisely defined position
 and where it represents the average value of the distribution in the
 small region defined by the point and its neighbours. However, this
-distinction is not important in the context of this document. Similarly 
-visualisation packages often provide facilities for grids where the points 
-are not regularly spaced along one or more of the axes (see 
+distinction is not important in the context of this document. Similarly
+visualisation packages often provide facilities for grids where the points
+are not regularly spaced along one or more of the axes (see
 Figure~\ref{GRIDS}).
 
 \newpage
@@ -529,13 +529,13 @@ irregularly spaced grids. \label{GRIDS} }
 \end{center}
 \end{figure}
 
-Sometimes (but not in this document) the terms `voxel' and `cell' are 
-used for individual elements of three-dimensional pixel data. A 
+Sometimes (but not in this document) the terms `voxel' and `cell' are
+used for individual elements of three-dimensional pixel data. A
 three-dimensional pixel grid is often referred to as a {\bf data cube}.
-This term is somewhat misleading as there is no constraint that the grid 
-should have the same number of elements in each dimension. Strictly 
-speaking the term `data cuboid' would be more accurate (that is, the 
-three-dimensional analogue of a rectangle rather than a square). However, 
+This term is somewhat misleading as there is no constraint that the grid
+should have the same number of elements in each dimension. Strictly
+speaking the term `data cuboid' would be more accurate (that is, the
+three-dimensional analogue of a rectangle rather than a square). However,
 in this document the more common and familiar term `data cube' will be used.
 The term `brick' is also sometimes used as a synonym for a data cube (or
 a cuboid subset inside a data cube), though again not in this document.
@@ -553,10 +553,10 @@ not tied to any particular software package. It is intended to suggest
 techniques that might be appropriate for use on your data. It is largely
 based on the review by \htmladdnormallink{Brodlie {\it et al}}
 {http://www.agocg.ac.uk:8080/agocg/New/TechReports/VisSyst/dogbook_1.html}\cite{BRODLIE},
-the introduction to visualisation by Earnshaw and Wiseman\cite{EARNSHAW}, 
+the introduction to visualisation by Earnshaw and Wiseman\cite{EARNSHAW},
 the report by \htmladdnormallink{Beli\"{e}n {\it et al}}
-{http://www.sara.nl/Rik/REPORT.update}\cite{BELIEN} and the notes by 
-Minty {\it et al}\cite{MINTY}. The report by Beli\"{e}n {\it et 
+{http://www.sara.nl/Rik/REPORT.update}\cite{BELIEN} and the notes by
+Minty {\it et al}\cite{MINTY}. The report by Beli\"{e}n {\it et
 al}\cite{BELIEN} contains a detailed description of a simulation of wave
 heating of the solar corona. Many of the features of this visualisation
 are typical of visualisations of data generated by theoretical
@@ -641,7 +641,7 @@ diagrams.
 
 \section{Colour Representation \label{COLREP} \xlabel{COLREP} }
 
-The discussion in this section is largely taken from 
+The discussion in this section is largely taken from
 \htmladdnormallink{Beli\"{e}n {\it et al}}
 {http://www.sara.nl/Rik/REPORT.update}\cite{BELIEN}. For a more
 comprehensive treatment see, for example, Foley and van Dam\cite{FOLEY1}
@@ -746,7 +746,7 @@ The principal advantage of the {\it HSV}\, system is that it
 corresponds reasonably closely to human perception of colour and thus
 the effects of specifying and manipulating colours in the {\it HSV}\,
 system are quite intuitive and predictable. It is possible to transform
-between the {\it HSV} and {\it RGB} systems; see Foley and 
+between the {\it HSV} and {\it RGB} systems; see Foley and
 van~Dam\cite{FOLEY1} and Foley {\it et al}\cite{FOLEY2} for details.
 When defining mappings between values in a dataset and colours it is
 often useful to remember that the human eye can discriminate hundreds
@@ -778,9 +778,9 @@ draped over an assemblage of bulky objects.
 
 \caption[A carpet plot.]{A carpet plot. The plot shows a small region
 of a photographic plate taken with the UK Schmidt Telescope at the
-Anglo-Australian Observatory, Siding Springs, New South Wales and 
+Anglo-Australian Observatory, Siding Springs, New South Wales and
 digitised with the SuperCOSMOS fast microdensitometer at the Royal
-Observatory Edinburgh. The plot was generated with IDL (see 
+Observatory Edinburgh. The plot was generated with IDL (see
 Section~\ref{IDL}). \label{CARPET} }
 
 \end{figure}
@@ -884,7 +884,7 @@ impression of the entire cube.
 A simple but surprisingly effective method of visualising the entire
 cube is to generate an animation showing a sequence of slices being
 swept through the cube parallel to one of the axes. The slice should be
-shown in perspective, in its correct position inside the cube, with a 
+shown in perspective, in its correct position inside the cube, with a
 wire grid or set of axes to show the extent of the cube (see
 Figure~\ref{SLICE}). The user should be able to control the speed of the
 animation, select individual frames for inspection, change the colour
@@ -900,7 +900,7 @@ an entire data cube, but nonetheless can give surprisingly good results.
 \epsfbox{sg8_slice_grey.ps}
 \end{center}
 
-\caption[Perspective view of a slice in a three-dimensional data 
+\caption[Perspective view of a slice in a three-dimensional data
 cube.]{Perspective view of a slice in a three-dimensional data cube. The data
 cube consists of a stack of radial velocity measurements of the HI 21cm
 line over a small region of sky around the North Celestial Pole. The slice
@@ -922,7 +922,7 @@ with Data Explorer (see Section~\ref{IBMDX}). \label{SLICE} }
 \epsfbox{sg8_slice_colour.ps}
 \end{center}
 
-\caption[Perspective view of a slice in a three-dimensional data 
+\caption[Perspective view of a slice in a three-dimensional data
 cube.]{Perspective view of a slice in a three-dimensional data cube. The data
 cube consists of a stack of radial velocity measurements of the HI 21cm
 line over a small region of sky around the North Celestial Pole. The slice
@@ -938,7 +938,7 @@ with Data Explorer (see Section~\ref{IBMDX}). \label{SLICE} }
 \subsection{Iso-surface rendering}
 
 In iso-surface rendering (or iso-rendering) a so-called `iso-surface'
-corresponding to a given constant value within the data cube is computed 
+corresponding to a given constant value within the data cube is computed
 and displayed. An iso-surface is the three-dimensional analogue of a
 single contour in a two-dimensional pixel data set. Typically the
 iso-surface will be displayed in perspective from a view point some
@@ -954,8 +954,8 @@ of it will be visible (see Figure~\ref{ISOSURFACE}).
 \epsfbox{sg8_iso_grey.ps}
 \end{center}
 
-\caption[Perspective view of an iso-surface in a three-dimensional data 
-cube.]{Perspective view of an iso-surface in a three-dimensional data 
+\caption[Perspective view of an iso-surface in a three-dimensional data
+cube.]{Perspective view of an iso-surface in a three-dimensional data
 cube. The visualisation shows the same data cube as Figure~\ref{SLICE}.
 It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \label{ISOSURFACE} }
@@ -971,8 +971,8 @@ It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \epsfbox{sg8_iso_colour.ps}
 \end{center}
 
-\caption[Perspective view of an iso-surface in a three-dimensional data 
-cube.]{Perspective view of an iso-surface in a three-dimensional data 
+\caption[Perspective view of an iso-surface in a three-dimensional data
+cube.]{Perspective view of an iso-surface in a three-dimensional data
 cube. The visualisation shows the same data cube as Figure~\ref{SLICE}.
 It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \label{ISOSURFACE} }
@@ -1010,7 +1010,7 @@ and Bloomenthal\cite{NING}.
 
 Volume rendering is a technique for displaying an entire data cube
 without computing any intermediate surfaces. The result is an image
-somewhat akin to an X-ray photograph (see Figure~\ref{VREND}). 
+somewhat akin to an X-ray photograph (see Figure~\ref{VREND}).
 Various algorithms for volume rendering have been proposed. Two common
 ones are ray-casting and `splatting'. Ray casting is summarised below;
 see Foley {\it et al}\cite{FOLEY2} for further details. Splatting
@@ -1026,8 +1026,8 @@ is quicker but produces less accurate results.
 \epsfbox{sg8_vol_grey.ps}
 \end{center}
 
-\caption[Perspective view of a volume rendering of a three-dimensional data 
-cube.]{Perspective view of a volume rendering of a three-dimensional data 
+\caption[Perspective view of a volume rendering of a three-dimensional data
+cube.]{Perspective view of a volume rendering of a three-dimensional data
 cube. The visualisation shows the same data cube as Figure~\ref{SLICE}.
 It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \label{VREND} }
@@ -1044,8 +1044,8 @@ It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \epsfbox{sg8_vol_colour.ps}
 \end{center}
 
-\caption[Perspective view of a volume rendering of a three-dimensional data 
-cube.]{Perspective view of a volume rendering of a three-dimensional data 
+\caption[Perspective view of a volume rendering of a three-dimensional data
+cube.]{Perspective view of a volume rendering of a three-dimensional data
 cube. The visualisation shows the same data cube as Figure~\ref{SLICE}.
 It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \label{VREND} }
@@ -1058,18 +1058,18 @@ is to generate an `{\it RGBA}\, volume' from the data cube. This
 process involves generating a conventional {\it RGB}\, colour (see
 Section~\ref{COLREP}) and an opacity, {\it A}, for every pixel in the
 data cube. Usually the colour and opacity will be derived from the
-value of the pixel using some mapping supplied by the 
+value of the pixel using some mapping supplied by the
 user\footnote{Usually the user will be required to define the colour
 mapping in terms of the {\it HSV}\, system (see Section~\ref{COLREP})
 and the visualisation software will automatically transform it to the
 {\it RGB}\, system prior to generating the {\it RGBA}\, volume.}. The
 opacity is usually normalised to the range 0 to 1, with 0 corresponding
 to complete transparency (all light entering the pixel is transmitted
-through it) and 1 to a completely opaque pixel (none of the light 
+through it) and 1 to a completely opaque pixel (none of the light
 entering the pixel is transmitted). Note that pixels can be made invisible
 by setting their opacity to 0 and their colour to black.
 
-For every pixel in the output image a ray is projected through the 
+For every pixel in the output image a ray is projected through the
 volume of the data cube. At a set of evenly spaced positions along the
 ray the colour and opacity in the data cube are obtained by
 interpolating the {\it RGBA}\, array. Starting from an opaque background
@@ -1104,8 +1104,8 @@ the mapping used to convert pixel values to colours and opacities.
 It is usually necessary to experiment in order to produce values suitable
 for a given data cube.
 
-A disadvantage of volume rendering is that usually it is very 
-computationally intensive. Further details of volume rendering 
+A disadvantage of volume rendering is that usually it is very
+computationally intensive. Further details of volume rendering
 techniques are given by Upson\cite{UPSON}.
 
 
@@ -1113,7 +1113,7 @@ techniques are given by Upson\cite{UPSON}.
 
 Particle data can be displayed as points in a perspective plot of the
 three-dimensional volume enclosing the dataset. Usually the plot will
-include a set of axes or a bounding box. Unfortunately the 
+include a set of axes or a bounding box. Unfortunately the
 three-dimensional position of a point within such a plot is completely
 ambiguous (see Figure~\ref{PART3D}).
 
@@ -1179,7 +1179,7 @@ ambiguous (see Figure~\ref{PART3D}).
 
 \end{picture}
 
-\caption[Perspective view of a schematic three-dimensional particle 
+\caption[Perspective view of a schematic three-dimensional particle
 data.]{Perspective view of a schematic three-dimensional particle data.
 \label{PART3D} }
 
@@ -1187,7 +1187,7 @@ data.]{Perspective view of a schematic three-dimensional particle data.
 \end{figure}
 
 There are several techniques which can be used to indicate the position
-of the points in three-dimensional space. If there are only a few 
+of the points in three-dimensional space. If there are only a few
 points in the data then a set of perpendiculars can be projected from
 each datum to one or more of the axes. This technique only works for
 small datasets.
@@ -1217,11 +1217,11 @@ or applicable depends on the dataset being investigated.
 
 In theory both tabular and pixel three-dimensional vector data can
 occur. In practice visualisation systems more often provide facilities
-for pixel data. In this case the basic dataset is a data cube of 
-three-dimensional vectors. These vectors represent an instantaneous 
-sampling of points in a three-dimensional vector field. Visualising 
-such a dataset is a complex and difficult task and visualisation 
-techniques are still evolving in this area. An excellent recent review 
+for pixel data. In this case the basic dataset is a data cube of
+three-dimensional vectors. These vectors represent an instantaneous
+sampling of points in a three-dimensional vector field. Visualising
+such a dataset is a complex and difficult task and visualisation
+techniques are still evolving in this area. An excellent recent review
 is given by Post and van Walsum\cite{POST}. In astronomy
 three-dimensional vector data are more likely to result from theoretical
 modelling than observations.
@@ -1234,7 +1234,7 @@ time steps.
 
 Visualising vectors in a three-dimensional cube is a similar problem
 to visualising flows in fluid mechanics. Indeed, many of the
-techniques used in vector visualisation are analogues of laboratory 
+techniques used in vector visualisation are analogues of laboratory
 techniques used to study flows in real fluids. Some of the more common
 techniques are described briefly below; the discussion is based
 on the list of \htmladdnormallink{Brodlie {\it et al}}
@@ -1312,7 +1312,7 @@ laboratory analogues of many of these techniques.
   \epsfbox{sg8_arrow.ps}
   \end{center}
 
-  \caption[An arrow drawn as a three-dimensional object.]{An arrow drawn 
+  \caption[An arrow drawn as a three-dimensional object.]{An arrow drawn
    as a three-dimensional object.
   \label{ARROW2} }
 
@@ -1390,7 +1390,7 @@ laboratory analogues of many of these techniques.
 \section{Higher Dimensions and Additional Dependent Quantities
 \xlabel{HIGHER} }
 
-In general it is not possible to satisfactorily display datasets of 
+In general it is not possible to satisfactorily display datasets of
 higher than three dimensions in a single image. It is possible to extract
 one-, two- or three-dimensional subsets from the data and display them in
 the normal fashion. Animations give a usable representation of a fourth
@@ -1438,7 +1438,7 @@ be accessed on-line via the Web at URL:
 \end{quote}
 \end{latexonly}
 \begin{htmlonly}
-A longer list of 
+A longer list of
 \htmladdnormallink{visualisation systems and related information}
 {http://www.roe.ac.uk/acdwww/vissys/index.html} is also available.
 \end{htmlonly}
@@ -1455,7 +1455,7 @@ may well be disguised as positioning boxes within a window using the
 cursor and joining them with multi-coloured lines, but nonetheless it is
 still, in essence, programming.
 
-The various visualisation systems described in the following sections 
+The various visualisation systems described in the following sections
 fall into the following broad categories:
 
 \begin{description}
@@ -1473,7 +1473,7 @@ fall into the following broad categories:
 
 To find a package suitable for your needs you should use the decision
 tree in Figure~\ref{DECPART} for particle data and in
-Figure~\ref{DECPIX} for pixel data. 
+Figure~\ref{DECPIX} for pixel data.
 \begin{latexonly}
 Table~\ref{STARDOC} lists the Starlink documentation for the packages
 mentioned in these figures.
@@ -1496,7 +1496,7 @@ else the data are higher than three-dimensional
 end if
 \end{verbatim}
 
-\caption[Decision tree to find a package for visualising particle 
+\caption[Decision tree to find a package for visualising particle
 data.]{Decision tree to find a package for visualising particle data.
 \label{DECPART} }
 
@@ -1533,7 +1533,7 @@ else the data are vector
 end if
 \end{verbatim}
 
-\caption[Decision tree to find a package for visualising pixel 
+\caption[Decision tree to find a package for visualising pixel
 data.]{Decision tree to find a package for visualising pixel data.
 \label{DECPIX} }
 
@@ -1611,7 +1611,7 @@ The following general points should be borne in mind.
    probably partly historical (IDL has been around for longer) and
    partly because PV-WAVE seems, on balance, more expensive.
 
-  \item Though, strictly speaking, Khoros (see Section~\ref{KHOROS}) is 
+  \item Though, strictly speaking, Khoros (see Section~\ref{KHOROS}) is
    not available in the public domain, it is usually available free of
    charge (though there is a charge for paper copies of the manuals).
    Nonetheless Khoros is a complex and sophisticated package, and like
@@ -1637,8 +1637,8 @@ these enhancements should be available automatically. The use of DX at
 Starlink sites and the Starlink enhancements to DX are documented in
 \xref{SUN/203}{sun203}{}\cite{SUN203}.
 
-DX is produced by IBM. It can be obtained from IBM or any IBM dealer. 
-An educational discount is usually available. Because it is the 
+DX is produced by IBM. It can be obtained from IBM or any IBM dealer.
+An educational discount is usually available. Because it is the
 visualisation package recommended by Starlink there are special
 arrangements for obtaining a copy at Starlink sites. Appendix~A of
 \xref{SUN/203}{sun203}{}\cite{SUN203} gives the details.
@@ -1659,7 +1659,7 @@ Further details can be obtained via the Web at URL:
 
 \section{AVS \label{AVS} \xlabel{AVS} }
 
-Application Visualization System (AVS) is a general-purpose software 
+Application Visualization System (AVS) is a general-purpose software
 package for data visualisation and analysis. It provides a comprehensive
 range of visualisation functions. It includes a visual computing
 environment for application development and a set of `ready to use'
@@ -1672,7 +1672,7 @@ astronomy.
 AVS is produced by Advanced Visual Systems Inc.\ of 300 Fifth Ave.
 Waltham, Massachusetts 02154, United States of America. Advanced Visual
 Systems has a subsidiary in the United Kingdom. Its address is:
-AVS/UNIRAS Ltd, Montrose House, Chertsey Boulevard, Hanworth Lane, 
+AVS/UNIRAS Ltd, Montrose House, Chertsey Boulevard, Hanworth Lane,
 Chertsey, Surrey, KT16 9JX.
 
 \begin{latexonly}
@@ -1693,10 +1693,10 @@ Further details can be obtained via the Web at URL:
 
 Khoros is a powerful, integrated software environment for performing
 image and signal processing, data exploration and visualisation. It
-includes a visual programming language, a suite of software development 
-tools that extend the visual language, an interactive user interface 
+includes a visual programming language, a suite of software development
+tools that extend the visual language, an interactive user interface
 editor, an interactive image display package, two- and three-dimensional
- plotting, and an extensive suite of image processing, data manipulation, 
+ plotting, and an extensive suite of image processing, data manipulation,
 visualization, geometry and matrix operators. It is described by
 Rasure and Kubica\cite{RASURE}.
 
@@ -1708,7 +1708,7 @@ to learn to use it effectively.
 
 Khoros is developed by Khoral Research, Inc.\ (KRI) of 6001 Indian
 School Road NE, Suite 200, Albuquerque, New Mexico 87110-4139, United
-States of America. Copies of Khoros can be obtained from various anonymous 
+States of America. Copies of Khoros can be obtained from various anonymous
 ftp sites.
 
 \begin{latexonly}
@@ -1728,26 +1728,26 @@ Further details can be obtained via the Web at URL:
 \section{IDL \label{IDL} \xlabel{IDL} }
 
 Interactive Data Language (IDL) is not simply a visualisation package
-{\it per se}, but rather is intended for interactive data analysis as 
-well as for the visualisation of scientific and engineering data. 
+{\it per se}, but rather is intended for interactive data analysis as
+well as for the visualisation of scientific and engineering data.
 Consequently it is very flexible and powerful and its usefulness is not
 limited to visualisation.
 
 The basis of IDL is a combined command and programming language similar
 to Fortran, but more powerful and easier to use. It contains many
-intrinsic functions for image and data processing and display (though 
-unfortunately its facilities for visualising three-dimensional vector 
-data are limited). Doing anything non-trivial using IDL is definitely 
-`programming', though it is a simple and straightforward language to 
+intrinsic functions for image and data processing and display (though
+unfortunately its facilities for visualising three-dimensional vector
+data are limited). Doing anything non-trivial using IDL is definitely
+`programming', though it is a simple and straightforward language to
 program in. Indeed it achieves the impressive double feat of
-simultaneously being much more powerful and easy-to-use than Fortran 
-while having a minimal learning curve for someone already familiar with 
+simultaneously being much more powerful and easy-to-use than Fortran
+while having a minimal learning curve for someone already familiar with
 Fortran.
 
 IDL has achieved a significant though not very high level of use in
 astronomy, though it is used extensively in solar physics and gamma-ray
 astronomy. A number of Starlink sites have bought IDL licences, so it
-may be available at your site.  Appendix B of 
+may be available at your site.  Appendix B of
 \xref{SUN/55}{sun55}{}\cite{SUN55} describes how to import data in the
 Starlink NDF format into IDL.
 
@@ -1788,8 +1788,8 @@ relationship between the two packages.
 \begin{quote}
 `Around the time that the Unix version of IDL first became
 available (1988), Precision Visuals Inc.\ (PVI) entered into an agreement
-with RSI [the vendors of IDL] under which they enhanced and resold IDL 
-under the name PV~WAVE. In September of 1990, they exercised an option in 
+with RSI [the vendors of IDL] under which they enhanced and resold IDL
+under the name PV~WAVE. In September of 1990, they exercised an option in
 that agreement that resulted in the following:
 
 \begin{itemize}
@@ -1801,7 +1801,7 @@ that agreement that resulted in the following:
 
 \end{itemize}
 
-IDL and PV~WAVE are now on separate development tracks. Each company 
+IDL and PV~WAVE are now on separate development tracks. Each company
 enhances, supports, and maintains its own product.
 
 PVI has since merged with IMSL and is now Visual Numerics, Inc.\ (VNI).'
@@ -1923,9 +1923,9 @@ The following people have kindly supplied either complete diagrams
 or data which were used to generate visualisations: Figures~\ref{SLICE},
 \ref{ISOSURFACE} and \ref{VREND}, H.~Meyerdierks (Institute for
 Astronomy, University of Edinburgh); Figure~\ref{CHOLERA},
-E.~Minty (Edinburgh Parallel Computer Centre); Figure~\ref{SUNSPOT}, 
+E.~Minty (Edinburgh Parallel Computer Centre); Figure~\ref{SUNSPOT},
 K.~S.~Balasubramaniam (National Solar Observatory, Sunspot, New Mexico);
-Figure~\ref{CARPET}, H.T.~MacGillivray (Royal Observatory Edinburgh). 
+Figure~\ref{CARPET}, H.T.~MacGillivray (Royal Observatory Edinburgh).
 Figure~\ref{HALLEY} is courtesy of the Anglo-Australian Observatory and
 the Royal Observatory Edinburgh.
 
@@ -1942,7 +1942,7 @@ the document.
 
   \bibitem{BELIEN} S.~Beli\"{e}n, S.~Poedts, H.~Goedbloed, H.~Spoelder,
    A.~Emmen, J.~Hollenberg and R.~Leenders, (revised) 1996,
-   {\it Comparison of Visualisation Techniques and Packages with 
+   {\it Comparison of Visualisation Techniques and Packages with
    Applications to Plasma Physics}, available via the Web from URL:
    {\tt http://www.sara.nl/Rik/REPORT.update}
 
@@ -1951,7 +1951,7 @@ the document.
    (Starlink).
 
   \bibitem{BRODLIE} K.W.~Brodlie, J.R.~Gallop, A.J.~Grant, J.~Haswell,
-   W.T.~Hewitt, S.~Larkin, C.C.~Lilley, H.~Morphet, A.~Townend, 
+   W.T.~Hewitt, S.~Larkin, C.C.~Lilley, H.~Morphet, A.~Townend,
    J.~Wood and H.~Wright, 1995, {\it Review of Visualization Systems},
    Advisory Group on Computer Graphics Technical Report (Loughborough
    University of Technology: Loughborough, Leicestershire). Also
@@ -1993,7 +1993,7 @@ the document.
    {\it PONGO --- A Set of Applications for Interactive Data Plotting}\,
    (Starlink).
 
-  \bibitem{HELMAN} J.L.~Helman and L.~Hesselink, 1989, 
+  \bibitem{HELMAN} J.L.~Helman and L.~Hesselink, 1989,
    `Representation and Display of Vector Field Topology in Fluid Flow
    Data Sets', {\it IEEE Computer}, {\bf 22}, No. 8, pp27-36.
 
@@ -2020,7 +2020,7 @@ the document.
    Introduction}, version 2.0 (Edinburgh Parallel Computing Centre
    course notes: Edinburgh).
 
-  \bibitem{SAOIMAGE} R.~Morris and G.J.~Privett, 1995, SUN/166.3, 
+  \bibitem{SAOIMAGE} R.~Morris and G.J.~Privett, 1995, SUN/166.3,
    {\it SAOIMAGE --- Astronomical Image Display} (Starlink).
 
   \bibitem{NING} P. Ning and J. Bloomenthal, 1993, `An Evaluation of

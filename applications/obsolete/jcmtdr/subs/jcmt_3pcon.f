@@ -15,12 +15,12 @@
 
 *  Description:
 *     This routine will return the asymmetric convolution function
-*     required for deconvolving a 3-position chopped map into a single beam 
+*     required for deconvolving a 3-position chopped map into a single beam
 *     map.
 *
 *     This function consists of a series of delta functions at a spacing equal
 *     to that between a -ve spike and the central spike of the 3-position chop.
-*     The height of the delta functions has a peak at the centre of the 
+*     The height of the delta functions has a peak at the centre of the
 *     convolution function and falls off by 1 at a time for the delta functions
 *     on either side so that the envelope of the function is an isosceles
 *     triangle.
@@ -30,12 +30,12 @@
 *     function must be twice the length of the raw map.
 *
 *     Since the raw data is not sampled such that the chop spacing is an
-*     integer number of samples, the actual convolution function must be 
+*     integer number of samples, the actual convolution function must be
 *     rebinned onto the sample mesh by sinc interpolation.
-*     
+*
 *  Arguments:
 *     BSEP = DOUBLE PRECISION (Given)
-*        The beam separation in arcseconds (measured between the 2 negative 
+*        The beam separation in arcseconds (measured between the 2 negative
 *        spikes flanking the central spike).
 *     PIXSEP = DOUBLE PRECISION (Given)
 *        The pixel separation in arcseconds
@@ -58,13 +58,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'ASTRO_PAR'        ! astronomical constants
-      
+
 *  Arguments Given:
       DOUBLE PRECISION BSEP, PIXSEP
       INTEGER NPIX
@@ -92,17 +92,17 @@
 
 *.
 
-*  convolution function must be twice size of map, odd number of points 
+*  convolution function must be twice size of map, odd number of points
 *  because function is symmetric about central pixel.
 
       NCFN = NPIX * 2 - 1
-      
-*  the half-beam separation between a -ve spike and the central spike in map 
+
+*  the half-beam separation between a -ve spike and the central spike in map
 *  pixels
 
       PIXBSEP = ABS (BSEP / (2.0d0 * PIXSEP))
 
-*  calculate the number of delta functions in the convolution 
+*  calculate the number of delta functions in the convolution
 *  function. This is equal to the number of half-beams covered by the map size,
 *  plus 1 to give some overlap at the end of the map, times 2 to cover the whole
 *  convolution function, plus 1 for the central delta function.
@@ -127,7 +127,7 @@
 
             XDELTA = REAL ((J-1) - (NDELTA-1)/2) * PIXBSEP
 
-*  its height 
+*  its height
 
             IF (J .LE. ((NDELTA-1)/2 + 1)) THEN
                HDELTA = REAL (J)
@@ -138,11 +138,11 @@
 *  add its contribution to this element of the convolution function by sinc
 *  interpolation
 
-            SUM = SUM + HDELTA * SINC(DX-XDELTA) 
+            SUM = SUM + HDELTA * SINC(DX-XDELTA)
 
          END DO
 
-         CONF(I) = SUM 
+         CONF(I) = SUM
 
       END DO
 

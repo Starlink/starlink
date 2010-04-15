@@ -4,7 +4,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1991
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -108,7 +108,7 @@ C# IL>=a, OL>=0
 *
 *
 *---------------------------------------------------------------------
- 
+
 * start with empty Edge table
       JETNXT(0) = 0
       JEND = 0
@@ -116,7 +116,7 @@ C# IL>=a, OL>=0
 *
 * set index of first vertex
       ISTART = 1
- 
+
       DO 40 LP=1,NP
 * For each polygon ....
 * we will be starting with the edge from the last vertex to the first
@@ -139,12 +139,12 @@ C# IL>=a, OL>=0
            GOTO 40
         ENDIF
         ITHIS = IEND
- 
+
         DO 30 IV=ISTART,IEND
 * For each vertex in the polygon ....
            ILAST = ITHIS
            ITHIS = IV
- 
+
 *  update lowest extent
            IF (VY(ITHIS) .LT. VY(IETLOW)) IETLOW = ITHIS
 *  check length of edge
@@ -163,11 +163,11 @@ C# IL>=a, OL>=0
               ITOP  = ILAST
               IBOT  = ITHIS
            ENDIF
- 
+
 *  now find a home for it
            JLPOSS = 0
            JPOSS  = JETNXT(JLPOSS)
- 
+
            DO 20 J=1,JEND+1
 *  sort on higher Y
               IF(JPOSS.EQ.0)GOTO 21
@@ -189,9 +189,9 @@ C# IL>=a, OL>=0
    20      CONTINUE
 *          should not get here, if JETNXT properly formed.
    21      CONTINUE
- 
+
 *  we need to insert new edge between (JLPOSS) and (JPOSS)
- 
+
 *  allocate new slot in the Edge Index Space (J...)
            JEND = JEND + 1
            VXETT(JEND) = VX(ITOP)
@@ -205,7 +205,7 @@ C# IL>=a, OL>=0
         ISTART = IPOLY(LP) + 1
 *  finished with polygon
   40  CONTINUE
- 
- 
+
+
   999 CONTINUE
       END

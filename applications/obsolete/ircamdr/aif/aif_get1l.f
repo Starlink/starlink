@@ -58,31 +58,31 @@
       LOGICAL
      :  NOTOK          ! true while no acceptable value obtained
 *-
- 
+
 *   check for error on entry
- 
+
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       initialise NOTOK to start off the loop
          NOTOK = .TRUE.
- 
+
 *       loop will keep going as long correct values not obtained and no error
          DO WHILE( NOTOK .AND. ( STATUS .EQ. SAI__OK ) )
- 
+
 *         obtain exactly NVALS values
             CALL AIF_EXACL( PARNAM, NVALS, VALUES, STATUS )
- 
+
 *          check for error
             IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *             obtain the range of the values given
                CALL AIF_MMVL( NVALS, VALUES, VRANGE, STATUS )
- 
+
 *             check if values are within specified range
 *             See notes in aif_get0l.f
                IF( ( VRANGE(1) .EQV. MIN ) .OR.
      :             ( VRANGE(2) .EQV. MAX ) ) THEN
- 
+
 *                report as an error
                   STATUS = SAI__ERROR
                   CALL MSG_SETL( 'MIN', MIN )
@@ -94,13 +94,13 @@
                   CALL ERR_FLUSH( STATUS )
                   CALL PAR_CANCL( PARNAM, STATUS )
                ELSE
- 
+
 *                value must be o.k. so terminate the loop
                   NOTOK = .FALSE.
                ENDIF
             ENDIF
          ENDDO
- 
+
       ENDIF
- 
+
       END

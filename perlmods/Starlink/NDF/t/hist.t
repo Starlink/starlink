@@ -45,7 +45,7 @@ print "# Record is $irec\n";
 ndf_hdef($indf,' ',$status);
 is( $status, &NDF::SAI__OK, "check status");
 
-my @text = ("This is a test of history. (Last word should be HI)", 
+my @text = ("This is a test of history. (Last word should be HI)",
 	    "Text should be formatted.", "HI");
 ndf_hput('NORMAL', '',0, 3, \@text, 1, 1, 1, $indf, $status);
 is( $status, &NDF::SAI__OK, "check status");

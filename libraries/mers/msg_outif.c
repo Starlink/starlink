@@ -13,17 +13,17 @@
 *     CALL MSG_OUTIF( PRIOR, PARAM, TEXT, STATUS )
 
 *  Description:
-*     Depending upon the given value of the given message priority and 
+*     Depending upon the given value of the given message priority and
 *     the message filtering level set using MSG_IFSET, the message
 *     text is either expanded and output to the user or discarded.
-*     The values of any existing message tokens are always annulled by 
-*     a call to MSG_OUTIF. If an output error occurs, an error is 
+*     The values of any existing message tokens are always annulled by
+*     a call to MSG_OUTIF. If an output error occurs, an error is
 *     reported and the status argument returned set to MSG__OPTER.
 
 *  Arguments:
 *     PRIOR = INTEGER (Given)
 *        Message output filter. This may be one of three values:
-*        
+*
 *           -  MSG__QUIET = always output the message, regardless of the
 *           output filter setting;
 *           -  MSG__NORM = output the message if the current output
@@ -36,9 +36,9 @@
 *        Here, the collating sequence:
 *
 *           MSG__QUIET < MSG__NORM < MSG__VERB < MSG__DEBUG
-*           
+*
 *        may be assumed. Any other value will result in an error report
-*        and the status being returned set to MSG__INVIF: no further 
+*        and the status being returned set to MSG__INVIF: no further
 *        action will be taken.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The message name.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

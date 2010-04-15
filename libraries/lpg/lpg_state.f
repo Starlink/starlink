@@ -14,7 +14,7 @@
 
 *  Description:
 *     On the first invocation of the application, this routine returns
-*     the current PAR state of specified parameter and stores it in 
+*     the current PAR state of specified parameter and stores it in
 *     common. On subsequent invocations, the stored state is returned
 *     rather than the current state.
 
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *        NRUN = INTEGER (Read)
 *           The number of times the application has been invoked.
 *        STATE2( LPG__MXPAR ) = INTEGER (Read and Write)
-*           The original PAR state of each parameter listed in array 
+*           The original PAR state of each parameter listed in array
 *           PNAME2.
 
 *  Arguments Given:
@@ -117,7 +117,7 @@
       DO I = 1, NPAR2
          IF( PNAME2( I ) .EQ. UPAR ) THEN
             IPAR = I
-            GO TO 10 
+            GO TO 10
          END IF
       END DO
  10   CONTINUE
@@ -145,7 +145,7 @@
          STATE2( NPAR ) = STATE
 
 *  If the parameter has been accessed before, but this is still the first
-*  invocation of the application (i.e. if this routine is called more than 
+*  invocation of the application (i.e. if this routine is called more than
 *  once in a single invocation of the application), store and return the
 *  current parameter state.
       ELSE IF( NRUN .EQ. 1 ) THEN

@@ -102,8 +102,8 @@
 *  is to be cleared.
       CALL PAR_GTD0L( 'CURRENT', .FALSE., .TRUE., CURRNT, STATUS )
 
-*  Open the image display device in update mode. This does not clear the current 
-*  picture. The PGPLOT viewport is set so that it corresponds to the current 
+*  Open the image display device in update mode. This does not clear the current
+*  picture. The PGPLOT viewport is set so that it corresponds to the current
 *  picture.
       CALL KPG1_PGOPN( 'DEVICE', 'WRITE', IPIC, STATUS )
 
@@ -115,15 +115,15 @@
          CALL AGP_NVIEW( .FALSE., STATUS )
       END IF
 
-*  Attempt to clear the viewport. This will only do anything if 
-*  the device allows us to draw in the background colour. 
+*  Attempt to clear the viewport. This will only do anything if
+*  the device allows us to draw in the background colour.
       CALL KPG1_PGCLR( STATUS )
 
 *  If the whole screen was cleared, empty the database of all pictures
 *  (except the Base picture).
       IF( .NOT. CURRNT ) CALL AGI_PDEL( STATUS )
 
-*  Shut down the workstation and database, retaining the original current 
+*  Shut down the workstation and database, retaining the original current
 *  picture only if the whole screen has not been cleared.
       CALL KPG1_PGCLS( 'DEVICE', .NOT.CURRNT, STATUS )
 

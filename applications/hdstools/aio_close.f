@@ -3,7 +3,7 @@
 *
 *    Description :
 *
-*     Closes input or output text channel. If the channel maps to a file 
+*     Closes input or output text channel. If the channel maps to a file
 *     then the file is closed. If the channel maps to the printer the file is
 *     spooled and deleted.
 *

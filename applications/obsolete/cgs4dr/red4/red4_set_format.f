@@ -6,8 +6,8 @@
 *    Parameters :
 *     STATUS   = INTEGER( UPDATE )
 *           Global ADAM status. This must be ADAM__OK on entry, or the
-*           routine will not execute. It will be returned ADAM__OK if 
-*           the routine is successful. Otherwise it will contain an 
+*           routine will not execute. It will be returned ADAM__OK if
+*           the routine is successful. Otherwise it will contain an
 *           error status.
 *    Method :
 *    Deficiencies :

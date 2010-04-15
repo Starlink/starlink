@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LUCOU( NPIX, NLIN, FILE_1, XMARG, YMARG, NP, NL, OUT, 
+*     CALL KPS1_LUCOU( NPIX, NLIN, FILE_1, XMARG, YMARG, NP, NL, OUT,
 *                      BAD, STATUS )
 
 *  Description:
@@ -76,7 +76,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,9 +128,9 @@
             ELSE
                GOOD = .TRUE.
             END IF
-      
+
          END DO
-   
+
       END DO
 
 *  If there were no good pixels in the output, abort.

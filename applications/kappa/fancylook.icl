@@ -46,7 +46,7 @@ PROC FANCYLOOK NDF
 { Restore the original current picture.
    PICSEL (ORIGLABEL)
 
-{ Only plot a key if there is room. 
+{ Only plot a key if there is room.
    IF MAX( XL, XR, YB, YT ) > 0.055
 
 { Determine which side has most room for the key.  First, see if the
@@ -57,7 +57,7 @@ PROC FANCYLOOK NDF
 { the right-hand side.  Part of the 0.75 is to allow for the wider
 { border to the left (0.19:0.05 of frame).  Try to obtain the same
 { width, subject to the constraint that it must fit inside the current
-{ picture. 
+{ picture.
          ASPOBL = MAX( ASP, 1.0 )
          WIDTH = MIN( 1.2 * MAX( 0.75 * XL, XR ), 0.14 / ASPOBL )
          HEIGHT = 0.7 * ( DY2 - DY1 )
@@ -78,7 +78,7 @@ PROC FANCYLOOK NDF
 
 { Determine the width and height of the horizontal key.  Try to obtain
 { the same width, subject to the constraint that it must fit inside the
-{ current picture. 
+{ current picture.
          ASPPRO = MIN( ASP, 1.0 )
          WIDTH = MIN( 1.2 * MAX( YB, YT ), 0.1 * ASPPRO )
          HEIGHT = 0.7 * ( DX2 - DX1 )
@@ -107,7 +107,7 @@ PROC FANCYLOOK NDF
          XK2 = XK2 / ASP
       END IF
 
-{ Draw the key to fit within the current picture annotating with 
+{ Draw the key to fit within the current picture annotating with
 { the scaling used in DISPLAY.
       LUTVIEW LOW=(LOW) HIGH=(HIGH) LBOUND=[ (XK1&','&YK1)] UBOUND=[ (XK2&','&YK2)] MODE=XY
    END IF

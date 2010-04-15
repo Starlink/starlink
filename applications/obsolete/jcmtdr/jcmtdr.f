@@ -12,7 +12,7 @@ C     This routine is the main control routine for the version of
 C     the JCMTDR data reduction system that runs as an ADAM monolith.
 C     It is called by the monolith fixed part in response to a JCMTDR
 C     command, and passes control to the appropriate JCMTDR applications
-C     subroutine.  
+C     subroutine.
 C
 C  Language:
 C     FORTRAN

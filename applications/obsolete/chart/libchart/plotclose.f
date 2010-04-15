@@ -21,6 +21,6 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       CALL SGS_CLOSE
       END

@@ -58,7 +58,7 @@ PRIVATE bitmap *gk0xcopycursor(jwp,from,basic)jwindow *jwp;bitmap *from;{
 		tobox = gk0xboxop(to->bm_box,from->bm_box,BOXINTERSECT);
 		gk0xbmxcopy(from,from->bm_box,to,tobox,WWCOPY);
 #ifndef WWFORSUN
-		to->bm_box = tobox;	
+		to->bm_box = tobox;
 		/* was MAXCUWIDTH*MAXCUHEIGHT: now cheat for busy add-on */
 #endif WWFORSUN
 	}else{

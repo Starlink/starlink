@@ -11,7 +11,7 @@
 
 *  Description:
 *     This routine attempts to find the value of an environment variable
-*     with the supplied name. If no such environment variable exists, 
+*     with the supplied name. If no such environment variable exists,
 *     OK is returned .FALSE., but no error is reported.
 
 *  Arguments:
@@ -33,12 +33,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -51,7 +51,7 @@
 *     31-OCT-2001 (DSB):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -71,7 +71,7 @@
 *.
 
 *  Initialize.
-      TRANS = ' '     
+      TRANS = ' '
       OK = .FALSE.
 
 *  Check the inherited status. Also return if the NAME is blank.
@@ -83,12 +83,12 @@
       CALL ERR_MARK
 
 *  Attempt to translate the environment variable.
-      CALL PSX_GETENV( NAME, TRANS, STATUS ) 
+      CALL PSX_GETENV( NAME, TRANS, STATUS )
 
 *  If no such environment variable exists, annul the error, and clear the
 *  translation.
-      IF( STATUS .EQ. PSX__NOENV ) THEN 
-         CALL ERR_ANNUL( STATUS )         
+      IF( STATUS .EQ. PSX__NOENV ) THEN
+         CALL ERR_ANNUL( STATUS )
          TRANS = ' '
 
 *  If the environment variable exists, return a .TRUE. value for OK.

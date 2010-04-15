@@ -21,8 +21,8 @@
 
 *  Description:
 *     This task performs one of a set of modifications to the WCS
-*     (World Coordinate System) components of a list of NDFs.  
-*     According to the value of the MODE parameter it will: 
+*     (World Coordinate System) components of a list of NDFs.
+*     According to the value of the MODE parameter it will:
 *        -  Set the Current coordinate system
 *        -  Add a new coordinate system
 *        -  Remove a coordinate system
@@ -30,7 +30,7 @@
 *        -  Show the coordinate system which currently exist
 *
 *     The routine does not fail if some of the requested edits cannot
-*     be performed, but a file whose name is given by the NAMELIST 
+*     be performed, but a file whose name is given by the NAMELIST
 *     parameter records which NDFs were successfully accessed.
 
 *  Usage:
@@ -38,9 +38,9 @@
 
 *  ADAM Parameters:
 *     COEFFS( * ) = _DOUBLE (Read)
-*        If MODE is ADD, this parameter is a list of the coefficients 
+*        If MODE is ADD, this parameter is a list of the coefficients
 *        used for the mapping from the target frame to the new frame.
-*        Its meaning and the number of values required depend on the 
+*        Its meaning and the number of values required depend on the
 *        value of MAPTYPE:
 *           -  UNIT       -- No values are required
 *                X' = X
@@ -59,7 +59,7 @@
 *        new frame.  Spaces in the name are ignored and letters are
 *        folded to upper case.  If the new frame is successfully added
 *        and any frame with the same domain name already exists, the
-*        old one will be removed, and a message will be printed to that 
+*        old one will be removed, and a message will be printed to that
 *        effect.
 *        [CCD_WCSEDIT]
 *     EPOCH = _DOUBLE (Read)
@@ -75,8 +75,8 @@
 *        If MODE=ADD and MAPTYPE=MATH, this gives the expressions to
 *        be used for the forward transformation to be added.  There
 *        must be at least two expressions (for the two coordinates)
-*        but there may be more if intermediate expressions are to 
-*        be used.  Expression syntax is fortran-like; see the 
+*        but there may be more if intermediate expressions are to
+*        be used.  Expression syntax is fortran-like; see the
 *        AST_MATHMAP documentation in SUN/210 for details.
 *     FRAME = LITERAL (Read)
 *        This parameter specifies the 'target frame', which has the
@@ -85,9 +85,9 @@
 *           -  MODE = REMOVE  -- The frame to remove; if it is a domain
 *                                name (see below) then all frames with
 *                                that domain will be removed.
-*           -  MODE = ADD     -- The new frame will be a copy of the 
+*           -  MODE = ADD     -- The new frame will be a copy of the
 *                                target frame (though Domain and Title
-*                                will be changed), and will be mapped 
+*                                will be changed), and will be mapped
 *                                from it using the mapping given.
 *           -  MODE = SET     -- The frame whose attributes are to be set
 *           -  MODE = SHOW    -- This parameter is ignored
@@ -103,18 +103,18 @@
 *        [!]
 *     IN = LITERAL (Read)
 *        A list specifying the names of the NDFs whose WCS components
-*        are to be modified or examined.  The NDF names should be 
+*        are to be modified or examined.  The NDF names should be
 *        separated by commas and may include wildcards.
 *     INVERT = _LOGICAL (Read)
-*        If set TRUE the mapping defined by COEFFS will be applied in 
+*        If set TRUE the mapping defined by COEFFS will be applied in
 *        the reverse direction.
 *        [FALSE]
 *     INVEXP * ( * ) = LITERAL (Read)
 *        If MODE=ADD and MAPTYPE=MATH, this gives the expressions to
 *        be used for the inverse transformation to be added.  There
 *        must be at least two expressions (for the two coordinates)
-*        but there may be more if intermediate expressions are to 
-*        be used.  Expression syntax is fortran-like; see the 
+*        but there may be more if intermediate expressions are to
+*        be used.  Expression syntax is fortran-like; see the
 *        AST_MATHMAP documentation in SUN/210 for details.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -164,15 +164,15 @@
 *     NAMELIST = LITERAL (Read)
 *        The name of an output file in which to write the names of all
 *        the NDFs which were successfully accessed.  In particular, if
-*        MODE is CURRENT, this list will include all the NDFs which 
+*        MODE is CURRENT, this list will include all the NDFs which
 *        contained the specified frame, but exclude any which did not.
 *        [WCSEDIT.LIS]
 *     SET = LITERAL (Read)
-*        If MODE is SET, then this gives a string of the form 
-*        "attribute=value" which is to be applied to the frame.  The 
+*        If MODE is SET, then this gives a string of the form
+*        "attribute=value" which is to be applied to the frame.  The
 *        string is passed straight to the AST_SET routine (see SUN/210).
 *     SIMPFI = _LOGICAL (Read)
-*        If MODE=SET and MAPTYPE=MATH, this gives the value of the 
+*        If MODE=SET and MAPTYPE=MATH, this gives the value of the
 *        mapping's SimpFI attribute (whether it is legitimate to simplify
 *        the forward followed by the inverse transformation to a unit
 *        transformation).
@@ -188,7 +188,7 @@
 *     wcsedit * current ccd_reg
 *        This sets the Current coordinate system of all the NDFs in
 *        the current directory to 'CCD_REG'.  The names of all the
-*        NDFs which had this coordinate system are written to the 
+*        NDFs which had this coordinate system are written to the
 *        file WCSEDIT.LIS.  Any which do not appear in this file were
 *        not modified by the program.
 *
@@ -205,14 +205,14 @@
 *        -6.8e-8.  If any frames with domain NEW already exist in
 *        those NDFs they are removed.
 *
-*     wcsedit ndf1 set ! set="domain=NEW,title=New frame" 
+*     wcsedit ndf1 set ! set="domain=NEW,title=New frame"
 *        This changes the value of the Domain attribute of the Current
 *        coordinate frame in the WCS component of NDF1 to the name
 *        "NEW" and  sets the Title attribute of the frame to "New
 *        frame".
 *
 *     wcsedit image1 show
-*        This displays all the coordinate frames in image1 with their 
+*        This displays all the coordinate frames in image1 with their
 *        Domains and titles, and indicates which one is Current.
 *
 *     wcsedit frm mode=add frame=pixel maptype=math simpif simpfi
@@ -222,7 +222,7 @@
 
 *  Notes:
 *     This routine provides similar functionality to that provided by
-*     KAPPA applications WCSADD, WCSREMOVE and WCSFRAME, but allows 
+*     KAPPA applications WCSADD, WCSREMOVE and WCSFRAME, but allows
 *     use of CCDPACK-style NDF lists.
 
 *  Copyright:
@@ -260,7 +260,7 @@
 *     7-DEC-2000 (MBT):
 *        Removed the MODIFIED parameter, which was not too useful since
 *        only 132 characters could be stored.  Replaced it by the more
-*        CCDPACK-like and more robust NAMELIST parameter, which can 
+*        CCDPACK-like and more robust NAMELIST parameter, which can
 *        provide the same functionality.
 *     {enter_changes_here}
 
@@ -348,7 +348,7 @@
       CALL CCD1_NDFGR( 'IN', INGRP, NNDF, STATUS )
 
 *  Get mode.
-      CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE,SET,SHOW', 
+      CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE,SET,SHOW',
      :                .FALSE., MODE, STATUS )
 
 *  Get frame specification.
@@ -363,7 +363,7 @@
       END IF
 
 *  Open file for writing names of successfully accessed files.
-      CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', 0, FD, OPEN, 
+      CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', 0, FD, OPEN,
      :                 STATUS )
 
 *  Print out any requisite header information.
@@ -431,7 +431,7 @@
             IF ( MODE .EQ. 'CURRENT' ) THEN
                CALL AST_SETI( IWCS, 'Current', JTARG, STATUS )
                CALL MSG_SETC( 'DOM', DMTARG )
-               CALL CCD1_MSG( ' ', 
+               CALL CCD1_MSG( ' ',
      :                        '      Current frame set to domain ^DOM',
      :                        STATUS )
                SUCCES = .TRUE.
@@ -469,28 +469,28 @@
                   CALL CCD1_MSG( ' ', '    ^BUFFER', STATUS )
  2             CONTINUE
                SUCCES = .TRUE.
-               
+
 *  Remove a frame.
             ELSE IF ( MODE .EQ. 'REMOVE' ) THEN
 
 *  Method depends slightly on how it was specified - if a domain was given
 *  we want to remove all frames with that domain value, otherwise we can
 *  just remove the single frame specified.
-*  First try to remove it as a domain name.  This leaves the Current 
+*  First try to remove it as a domain name.  This leaves the Current
 *  frame intact where possible.
                IF ( FRAME .NE. ' ' ) THEN
                   CALL CCD1_DMPRG( IWCS, FRAME, .TRUE., 0, STATUS )
 
 *  If this has reduced the number of frames then it has succeeded.
-                  SUCCES = AST_GETI( IWCS, 'Nframe', STATUS ) 
-     :                     .LT. NFRAME 
+                  SUCCES = AST_GETI( IWCS, 'Nframe', STATUS )
+     :                     .LT. NFRAME
                END IF
                IF ( .NOT. SUCCES ) THEN
 
 *  Otherwise we can just remove the target frame.
                   CALL AST_REMOVEFRAME( IWCS, JTARG, STATUS )
                   CALL MSG_SETC( 'DOM', DMTARG )
-                  CALL CCD1_MSG( ' ', 
+                  CALL CCD1_MSG( ' ',
      :                           '      Removed frame in domain ^DOM',
      :                           STATUS )
                   SUCCES = .TRUE.
@@ -500,7 +500,7 @@
             ELSE IF ( MODE .EQ. 'ADD' ) THEN
 
 *  Get additional required parameters.
-               CALL PAR_CHOIC( 'MAPTYPE', 'UNIT', 
+               CALL PAR_CHOIC( 'MAPTYPE', 'UNIT',
      :                         'UNIT,LINEAR,PINCUSHION,MATH', .FALSE.,
      :                         MAPTYP, STATUS )
                CALL PAR_GET0C( 'DOMAIN', DOMAIN, STATUS )
@@ -522,7 +522,7 @@
 *  Pincushion transformation.
                ELSE IF ( MAPTYP .EQ. 'PINCUSHION' ) THEN
                   CALL PAR_EXACD( 'COEFFS', 3, COEFFS, STATUS )
-                  MAP = AST_PCDMAP( COEFFS( 1 ), COEFFS( 2 ), ' ', 
+                  MAP = AST_PCDMAP( COEFFS( 1 ), COEFFS( 2 ), ' ',
      :                              STATUS )
 
 *  General algebraic transformation.
@@ -585,13 +585,13 @@
                   IF ( INVERT ) CALL AST_INVERT( MAP, STATUS )
                END IF
 
-*  Copy the target frame, and add the new domain name and title, to 
+*  Copy the target frame, and add the new domain name and title, to
 *  create the new frame.
                FRTARG = AST_GETFRAME( IWCS, JTARG, STATUS )
                FRNEW = AST_COPY( FRTARG, STATUS )
-               CALL AST_SETC( FRNEW, 'Domain', 
+               CALL AST_SETC( FRNEW, 'Domain',
      :                        DOMAIN( : CHR_LEN( DOMAIN ) ), STATUS )
-               CALL AST_SETC( FRNEW, 'Title', 'Added by WCSEDIT', 
+               CALL AST_SETC( FRNEW, 'Title', 'Added by WCSEDIT',
      :                        STATUS )
 
 *  Add the new frame to the WCS frameset.
@@ -619,7 +619,7 @@
             IF ( MODE .EQ. 'SHOW' ) THEN
                CALL CCD1_MSG( ' ', '      NDF not modified', STATUS )
             ELSE
-               CALL CCD1_MSG( ' ', 
+               CALL CCD1_MSG( ' ',
      :         '      NDF not successfully accessed', STATUS )
             END IF
          END IF

@@ -13,14 +13,14 @@
 *     CALL TEST_PORT(STATUS)
 
 *  Description:
-*     Test each of the portability routines listed in Appendix A.1 of 
+*     Test each of the portability routines listed in Appendix A.1 of
 *     SUN/40.3.
 *     If any failure occurs, return STATUS = SAI__ERROR.
 *     Otherwise, STATUS is unchanged.
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -56,7 +56,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:   
+*  Subprograms called:
 *     TEST_ACHR, TEST_ATOK, TEST_IACHR, TEST_MTOE, TEST_ETOM
 
 *-
@@ -85,48 +85,48 @@
       STATUS = SAI__OK
 
 *  Test CHR_ACHR
- 
+
       ISTAT = SAI__OK
       CALL TEST_ACHR(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
- 
+
 *  Test CHR_ATOK
- 
+
       ISTAT = SAI__OK
       CALL TEST_ATOK(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
- 
+
 *  Test CHR_ETOM
- 
+
       ISTAT = SAI__OK
       CALL TEST_ETOM(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
- 
+
 *  Test CHR_IACHR
- 
+
       ISTAT = SAI__OK
       CALL TEST_IACHR(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
- 
+
 *  Test CHR_MTOE
- 
+
       ISTAT = SAI__OK
       CALL TEST_MTOE(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
- 
+
 *    Write summary message
 
-      IF (STATUS .EQ. SAI__OK) THEN 
+      IF (STATUS .EQ. SAI__OK) THEN
          PRINT *,'*** All portability routines OK ***'
       ELSE
          PRINT *,'*** Error(s) in portability routines ***'

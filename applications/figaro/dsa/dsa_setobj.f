@@ -5,10 +5,10 @@ C     D S A _ S E T O B J
 C
 C     Creates and/or sets data objects as described in a character
 C     string.  The string should have the format 'object name = value'
-C     with the value optionally enclosed in double quotes if it is a 
+C     with the value optionally enclosed in double quotes if it is a
 C     character quantity.  The object name should be one defined in a
 C     structure definition file (ie one that will be recognised by
-C     DSA_ELEMENT_NAME). This routine will not create structures, so all 
+C     DSA_ELEMENT_NAME). This routine will not create structures, so all
 C     the upper levels should already exist.
 C
 C     Note that this routine replaces FIG_SETOBJ, which handled SET
@@ -16,13 +16,13 @@ C     commands which explicitly specified the structured name of the
 C     object in question, eg 'SET .Z.UNITS = "AB magnitudes"'. It is
 C     possible to have EQUATEd variables in a structure definition
 C     file whose names are structured, and so it is possible to achieve
-C     compatability with the old SET commands by using structure 
+C     compatability with the old SET commands by using structure
 C     definition files that EQUATE variables called, for example,
 C     ".Z.UNITS" to their proper name (".UNITS" for an NDF file, ".Z.UNITS"
 C     for a .DST file, in this case).
 C
 C     Parameters -  (">" input, "<" output)
-C     
+C
 C     (>) RECORD    (Character) String containing the assignment.
 C     (>) IST       (Integer) Character in the string (starting from 1)
 C                   at which the assignment starts.
@@ -56,7 +56,7 @@ C     will be set to 'AB magnitudes', assuming that UNITS has been
 C     equated to .Z.UNITS in a structure definition file.
 C
 C     History:
-C  
+C
 C     24th Mar 1991.  Original version, based on FIG_SETOBJ. KS/AAO.
 C     25th Mar 1991.  Fixed bug in creation of character items. KS/AAO.
 C     24th Sep 1992.  Change name from FIGX_SETOBJ. HME/UoE, Starlink.
@@ -148,7 +148,7 @@ C
          IPT=ICH_LEN(NAME)
          NAME(IPT+1:IPT+1)=']'
          CALL DTA_CRVAR(NAME,TYPE,STATUS)
-         NAME(LNAME+1:)=' '         
+         NAME(LNAME+1:)=' '
          IF (IVEN-IVST+1.LT.40) THEN
             CHARS=' '
             CALL DTA_WRVARC(NAME,40,CHARS,STATUS)

@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include <limits.h>
 
-int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ], 
+int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
                       int dims[ 3 ], int peakval, int *status ){
 /*
 *+
@@ -17,7 +17,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, 
+*     int cupidRFillClumps( int *ipa, int *out, int nel, int ndim,
 *                           int skip[ 3 ], int dims[ 3 ], int peakval,
 *                           int *status )
 
@@ -27,7 +27,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     pixels marking the peak value within a clump are marked by the
 *     value "peakval". It assigns a unique integer index to each peak
 *     and then finds the extent of the clump surrounding the peak. In the
-*     returned array, all pixels assigned to a peaks clump hold the integer 
+*     returned array, all pixels assigned to a peaks clump hold the integer
 *     index associated with the clump. Pixels not in any clump have the
 *     value -INT_MAX. Edge pixels are not considered to be part of any clump.
 *
@@ -40,27 +40,27 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *  Parameters:
 *     ipa
 *        Pointer to an array which is the same shape and size as the data
-*        array, and which holds a flag for every pixel. On entry, if the 
-*        pixel is an edge pixel this flag will be CUPID__KEDGE. If it is a 
+*        array, and which holds a flag for every pixel. On entry, if the
+*        pixel is an edge pixel this flag will be CUPID__KEDGE. If it is a
 *        peak pixel it will have the value "peakval". Unchanged on exit.
 *     out
 *        Pointer to an array which is the same shape and size as the data
 *        array, and which holds a flag for every pixel. On exit it holds
-*        the pixel index (0 or more) at all pixels which are deemed to be 
+*        the pixel index (0 or more) at all pixels which are deemed to be
 *        within a clump, and -INT_MAX everywhere else.
 *     nel
 *        The number of elements in "ipa".
 *     ndim
 *        The number of pixel axes in the data (this can be less than 3).
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if there are less than 3 pixel
 *        axes, and the extra elements should be filled with zero's.
 *     dims
-*        The no. of pixels along each pixel axis. This array should have 3 
-*        elements even if there are less than 3 pixel axes, and the extra 
+*        The no. of pixels along each pixel axis. This array should have 3
+*        elements even if there are less than 3 pixel axes, and the extra
 *        elements should be filled with one's.
 *     peakval
 *        The "ipa" value used to flag peaks.
@@ -69,7 +69,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 
 *  Returned Value:
 *     The largest integer clump identifier present in the "out" array.
-*     The smallest identifier value is zero. 
+*     The smallest identifier value is zero.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -156,15 +156,15 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
                   gpeak[ 2 ][ ipeak ] = iz;
                }
 
-/* Fill the volume between the edges marked in the "ipa" array by first 
-   moving out away from the peak along a 1D line parallel to the X axis 
-   until edge pixels are encountered. At each position along this line, 
-   store the "ipeak" value in the corresponding pixel of the "out" array, 
-   and then move out away from the position along a 1D line parallel to 
-   the Y axis until edge pixels are encountered. At each position along 
-   this line, store the "ipeak" value in the corresponding pixel of the 
-   "out" array, and then move out away from the position along a 1D line 
-   parallel to the Z axis until edge pixels are encountered. At each 
+/* Fill the volume between the edges marked in the "ipa" array by first
+   moving out away from the peak along a 1D line parallel to the X axis
+   until edge pixels are encountered. At each position along this line,
+   store the "ipeak" value in the corresponding pixel of the "out" array,
+   and then move out away from the position along a 1D line parallel to
+   the Y axis until edge pixels are encountered. At each position along
+   this line, store the "ipeak" value in the corresponding pixel of the
+   "out" array, and then move out away from the position along a 1D line
+   parallel to the Z axis until edge pixels are encountered. At each
    position along this line, store the "ipeak" value in the corresponding
    pixel of the "out" array. */
                gp[ 0 ] = ix;
@@ -184,7 +184,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
       npeak = 0;
       pa = ipa;
       i = 0;
-   
+
       for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
          for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
             for( ix = 1; ix <= dims[ 0 ]; ix++, i++, pa++ ) {
@@ -200,14 +200,14 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
          }
       }
 
-/* If we are dealing with 3 d data, we do the whole process again (without 
-   re-initialising the "out" array), but this time scanning the axes in the 
+/* If we are dealing with 3 d data, we do the whole process again (without
+   re-initialising the "out" array), but this time scanning the axes in the
    order Z, X, Y. */
       if( ndim > 2 ) {
          npeak = 0;
          pa = ipa;
          i = 0;
-      
+
          for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
             for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
                for( ix = 1; ix <= dims[ 0 ]; ix++, i++, pa++ ) {

@@ -6,7 +6,7 @@
 *     - - - - - - - -
 *
 *   Erase text screen
-*   
+*
 *   Read from COMMON
 *      GRCIDE   i     Current device id
 *
@@ -46,12 +46,12 @@
                CALL GRGLUN(LUN)
 
 *     Open a channel to the device
-               OPEN( UNIT=LUN, FILE=DEV(1:LDEV), STATUS='OLD', 
+               OPEN( UNIT=LUN, FILE=DEV(1:LDEV), STATUS='OLD',
      :               IOSTAT=ISTAT)
                IF (ISTAT.NE.0) THEN
                    CALL ERR_FIOER('IOSTAT', ISTAT)
                    CALL ERR_REP('GRUACH',
-     :           'GRETXT - Unable assign channel to terminal, ^IOSTAT', 
+     :           'GRETXT - Unable assign channel to terminal, ^IOSTAT',
      :              GRUACH)
                    GO TO 9999
                ENDIF

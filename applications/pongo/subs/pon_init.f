@@ -41,14 +41,14 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO constants
-      
+
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! The main PONGO common block.
       INCLUDE 'PROJ_CMN'         ! Projection common blocks
 
 *  Global Data:
 C      DATA XDATA/ NDATMAX * 0.0D0 / ! X-axis data array
-C      DATA YDATA/ NDATMAX * 0.0D0 / ! Y-axis data array 
+C      DATA YDATA/ NDATMAX * 0.0D0 / ! Y-axis data array
 C      DATA ERXCOL / 0 /          ! X-axis error column number
 C      DATA ERYCOL / 0 /          ! Y-axis error column number
 C      DATA ILABPTR / 0 /         ! Pointer to current label
@@ -73,9 +73,9 @@ C      DATA YLABAN/ MAXLAB * 0.0 / ! Y-axis positions of labels
 C      DATA YMAX / 1.0 /          ! Data world co-ordinate limit
 C      DATA YMIN / -1.0 /         ! Data world co-ordinate limit
 C      DATA ZDATA / NDATMAX * 0.0 / ! Z-axis data array
-C      DATA XINC / 1.0D0 / 
-C      DATA YINC / 1.0D0 / 
-C      DATA IMROT / 0.0D0 / 
+C      DATA XINC / 1.0D0 /
+C      DATA YINC / 1.0D0 /
+C      DATA IMROT / 0.0D0 /
 
 *  Character variables common block.
 C      DATA CLABELS / NDATMAX * ' ' / ! Data labels
@@ -111,7 +111,7 @@ C      DATA COLLAB / MAXCOL * ' ' / ! Data column headers
          ERRY( I ) = 0.0           ! Y-axis errors array
          ISYMBS( I ) = 0           ! Symbol numbers for each data point
          XDATA( I ) = 0.0D0        ! X-axis data array
-         YDATA( I ) = 0.0D0        ! Y-axis data array 
+         YDATA( I ) = 0.0D0        ! Y-axis data array
          ZDATA( I )  = 0.0         ! Z-axis data array
  1    CONTINUE
       DO 2 I = 1, MAXLAB
@@ -121,7 +121,7 @@ C      DATA COLLAB / MAXCOL * ' ' / ! Data column headers
          YLABAN( I ) = 0.0         ! Y-axis positions of labels
          LABLST( I ) = ' '
  2    CONTINUE
-      DO 3 I = 1, MAXCOL 
+      DO 3 I = 1, MAXCOL
          COLLAB( I ) = ' '
  3    CONTINUE
       END

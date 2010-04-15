@@ -4,7 +4,7 @@ C+
 C
 C     G E N _ C L E A N V
 C
-C     Searches through the data and variance arrays, setting quality 
+C     Searches through the data and variance arrays, setting quality
 C     or magic values to bad whenever the signal to noise falls below CUT
 C     or whenever the absolute data value falls below LIMIT.
 C
@@ -49,7 +49,7 @@ C     Initialise CUTSQ
 C
       CUTSQ = CUT * CUT
 C
-C     Handle different quality methods separately.  
+C     Handle different quality methods separately.
 C
       IF (QUAL) THEN
 C
@@ -74,7 +74,7 @@ C
                ENDIF
             ENDIF
          END DO
-                
+
       ELSE IF (FLAGS) THEN
 C
 C        Data has magic values
@@ -98,7 +98,7 @@ C
                ENDIF
             ENDIF
          END DO
-                
+
       ENDIF
 
       END

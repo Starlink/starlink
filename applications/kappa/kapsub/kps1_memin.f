@@ -24,7 +24,7 @@
 
 *  Arguments:
 *     SUMP = CHARACTER (Given)
-*        The name of the output ADAM parameter to receive the 
+*        The name of the output ADAM parameter to receive the
 *        sum of the product of the mask and the deconvolution.
 *     DSUMP = CHARACTER (Given)
 *        The name of the output ADAM parameter to receive the standard
@@ -102,7 +102,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,7 +164,7 @@
                FILE2( C1_XMG + PIX, C1_YMG + LIN ) = MSKVAL
                NGOOD = NGOOD + 1
                SUM2 = SUM2 + MSKVAL * MSKVAL
-            ENDIF         
+            ENDIF
 
          END DO
 
@@ -186,11 +186,11 @@
       END IF
 
 *  Smooth the mask with the ICF. NB, files <4> and <5> are used as
-*  work space. 
+*  work space.
       IF ( C1_WEXT ) THEN
-         CALL KPS1_ICBLU( C1_ICF, .FALSE., 
+         CALL KPS1_ICBLU( C1_ICF, .FALSE.,
      :                    %VAL( CNF_PVAL( C1_IP( 4 ) ) ),
-     :                    %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+     :                    %VAL( CNF_PVAL( C1_IP( 5 ) ) ),
      :                    FILE2, STATUS )
       ELSE
          CALL KPS1_ICBLU( C1_ICF, .FALSE., ME_ST( ME_KB( 4 ) ),
@@ -214,12 +214,12 @@
       CALL MSG_OUT( 'REPORT', ' ', STATUS )
 
       IF ( ISTAT .EQ. 1 ) THEN
-         CALL MSG_OUT( 'REPORT', 'WARNING: Results may be inaccurate', 
+         CALL MSG_OUT( 'REPORT', 'WARNING: Results may be inaccurate',
      :                 STATUS )
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
 
       ELSE IF ( ISTAT .GT. 1 ) THEN
-         CALL MSG_OUT( 'REPORT', 'WARNING: Results are inaccurate', 
+         CALL MSG_OUT( 'REPORT', 'WARNING: Results are inaccurate',
      :                 STATUS )
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
 

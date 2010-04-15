@@ -5,10 +5,10 @@ The TRACE utility for listing the names, data types, and values of
 arbitrary HDS structures and objects is now available on UNIX platforms.
 To prevent a clash with the UNIX command "trace", it now has the
 more-descriptive name of HDSTRACE.  See SUN/102.3 for details and
-examples of how to use HDSTRACE. 
+examples of how to use HDSTRACE.
 
-You run HDSTRACE from various command languages by entering the 
-appropriate one of 
+You run HDSTRACE from various command languages by entering the
+appropriate one of
 
 UNIX shell:
     % hdstrace
@@ -21,7 +21,7 @@ ICL
 
 and HDSTRACE will prompt you for the HDS structure or object to be
 listed.  Note that the TRACE command will continue to invoke the utility
-on VMS systems. 
+on VMS systems.
 
-Malcolm Currie         Internet: CUR@STAR.RL.AC.UK 
+Malcolm Currie         Internet: CUR@STAR.RL.AC.UK
                        SPAN    : RLVAD::CUR

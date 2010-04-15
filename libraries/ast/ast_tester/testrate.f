@@ -5,7 +5,7 @@
       include 'PRM_PAR'
 
       integer status, m, outp(4), inp(4), c1, c2, c3, c4
-      double precision at(4), r, mat(4), b1(2), b2(2), a1(2), 
+      double precision at(4), r, mat(4), b1(2), b2(2), a1(2),
      :                 a2(4)
 
       status = sai__ok
@@ -13,7 +13,7 @@
       at(1) = 10.0D0
       at(2) = 1.2D6
 
-*  UnitMap 
+*  UnitMap
       m = ast_unitmap( 2, ' ', status )
 
       r = ast_rate( m, at, 1, 1, status )
@@ -25,7 +25,7 @@
       r = ast_rate( m, at, 1, 1, status )
       if( r .ne. 1.0D0 ) call stopit( 202, r, status )
 
-*  ZoomMap 
+*  ZoomMap
       m = ast_zoommap( 2, 2.0D0, ' ', status )
 
       r = ast_rate( m, at, 1, 1, status )
@@ -37,7 +37,7 @@
       r = ast_rate( m, at, 1, 1, status )
       if( r .ne. 0.5D0 ) call stopit( 402, r, status )
 
-*  MatrixMap 
+*  MatrixMap
       m = ast_matrixmap( 2, 2, 2, mat, ' ', status )
 
       r = ast_rate( m, at, 1, 1, status )
@@ -86,23 +86,23 @@
       call ast_invert( m, status )
 
       r = ast_rate( m, at, 1, 1, status )
-      if( abs( r - 0.423076923 ) .gt. 1.0E-6 ) call stopit( 15, r, 
+      if( abs( r - 0.423076923 ) .gt. 1.0E-6 ) call stopit( 15, r,
      :                                                      status )
 
       r = ast_rate( m, at, 2, 2, status )
-      if( abs( r - 0.230769231 ) .gt. 1.0E-6 ) call stopit( 16, r, 
+      if( abs( r - 0.230769231 ) .gt. 1.0E-6 ) call stopit( 16, r,
      :                                                      status )
 
       r = ast_rate( m, at, 1, 2, status )
-      if( abs( r + 0.307692308 ) .gt. 1.0E-6 ) call stopit( 17, r, 
+      if( abs( r + 0.307692308 ) .gt. 1.0E-6 ) call stopit( 17, r,
      :                                                   status )
 
       r = ast_rate( m, at, 2, 1, status )
-      if( abs( r - 0.307692308 ) .gt. 1.0E-6 ) call stopit( 18, r, 
+      if( abs( r - 0.307692308 ) .gt. 1.0E-6 ) call stopit( 18, r,
      :                                                   status )
 
 
-*  ShiftMap 
+*  ShiftMap
       mat(1) = -1.2D0
       mat(2) = 1.2D0
       m = ast_shiftmap( 2, mat, ' ', status )
@@ -117,7 +117,7 @@
       if( r .ne. 1.0D0 ) call stopit( 23, r, status )
 
 
-*  WinMap 
+*  WinMap
       a1( 1 ) = 0.0D0
       a1( 2 ) = 0.0D0
       a2( 1 ) = 1.0D0
@@ -153,7 +153,7 @@
 
 
 
-*  PermMap 
+*  PermMap
       outp(1)=2
       outp(2)=1
       inp(1)=1
@@ -186,7 +186,7 @@
       r = ast_rate( m, at, 1, 2, status )
       if( r .ne. 0.0D0 ) call stopit( 44, r, status )
 
-*  TranMap 
+*  TranMap
       a1( 1 ) = 0.0D0
       a1( 2 ) = 0.0D0
       a2( 1 ) = 1.0D0
@@ -218,20 +218,20 @@
       call ast_invert( m, status )
 
       r = ast_rate( m, at, 1, 1, status )
-      if( abs( r - 0.423076923 ) .gt. 1.0E-6 ) call stopit( 51, r, 
+      if( abs( r - 0.423076923 ) .gt. 1.0E-6 ) call stopit( 51, r,
      :                                                      status )
       r = ast_rate( m, at, 2, 2, status )
-      if( abs( r - 0.230769231 ) .gt. 1.0E-6 ) call stopit( 52, r, 
+      if( abs( r - 0.230769231 ) .gt. 1.0E-6 ) call stopit( 52, r,
      :                                                      status )
       r = ast_rate( m, at, 1, 2, status )
-      if( abs( r + 0.307692308 ) .gt. 1.0E-6 ) call stopit( 53, r, 
+      if( abs( r + 0.307692308 ) .gt. 1.0E-6 ) call stopit( 53, r,
      :                                                   status )
       r = ast_rate( m, at, 2, 1, status )
-      if( abs( r - 0.307692308 ) .gt. 1.0E-6 ) call stopit( 54, r, 
+      if( abs( r - 0.307692308 ) .gt. 1.0E-6 ) call stopit( 54, r,
      :                                                   status )
 
 
-*  CmpMap 
+*  CmpMap
       mat(1) = -1.0D0
       mat(2) = 1.0D0
       c1 = ast_shiftmap( 2, mat, ' ', status )
@@ -307,11 +307,11 @@
       if( r .ne. 0.0D0 ) call stopit( 66, r, status )
 
       r = ast_rate( m, at, 3, 1, status )
-      if( abs( r - 12.0D0/7.0D0 ) .gt. 1.0D-6 ) 
+      if( abs( r - 12.0D0/7.0D0 ) .gt. 1.0D-6 )
      :                            call stopit( 67, r, status )
 
       r = ast_rate( m, at, 3, 2, status )
-      if( abs( r - (-8.0D0/7.0D0) ) .gt. 1.0D-6 ) 
+      if( abs( r - (-8.0D0/7.0D0) ) .gt. 1.0D-6 )
      :                            call stopit( 68, r, status )
 
       r = ast_rate( m, at, 3, 3, status )

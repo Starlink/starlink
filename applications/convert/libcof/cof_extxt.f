@@ -13,7 +13,7 @@
 *     CALL COF_EXTXT( FSPEC, FLEN, EXTLEN, STATUS )
 
 *  Description:
-*     If the last non-space character in FSPEC is ], returns 
+*     If the last non-space character in FSPEC is ], returns
 *     EXTLEN = length of FSPEC from the preceding [;
 *     if not, it returns EXTLEN = 0.
 *     The length of the filename part of FSPEC is returned in FLEN
@@ -105,33 +105,33 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER*(*) FSPEC
-      
+
 *  Arguments Given and Returned:
-      
+
 *  Arguments Returned:
       INTEGER FLEN
       INTEGER EXTLEN
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      INTEGER CHR_LEN           ! Used length of string     
-      
+      INTEGER CHR_LEN           ! Used length of string
+
 *  Local Variables:
       INTEGER SPECSZ            ! Used length of filename part of FSPEC
       INTEGER I                 ! Loop counter
-      
+
 *  Local Data:
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get the used length of FSPEC
       SPECSZ = CHR_LEN( FSPEC )
 
@@ -152,12 +152,12 @@
          CALL MSG_SETC( 'FSPEC', FSPEC )
          CALL ERR_REP( 'COF_EXTXT_1',
      :     'Missing open bracket in ^FSPEC', STATUS )
-         
+
 
       ELSE
 
          EXTLEN = 0
-         
+
       END IF
 
 10    CONTINUE

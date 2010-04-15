@@ -14,11 +14,11 @@
 *     CALL CHP_CREDUP( INPUT, OUTPUT, ESTNUMENTS, STATUS )
 *
 *  Description:
-*     Create a duplicate catalogue with the same columns but no entries. 
+*     Create a duplicate catalogue with the same columns but no entries.
 *     The duplicate catalogue is the same in all respects including parameters,
-*     virtual columns, non standard formats and catalogue notes. The CHP 
-*     routines that write data into this catalogue will be more 
-*     efficient if you can provide a good estimate for the size of the 
+*     virtual columns, non standard formats and catalogue notes. The CHP
+*     routines that write data into this catalogue will be more
+*     efficient if you can provide a good estimate for the size of the
 *     catalogue. (The number of entries).
 
 *  Arguments:
@@ -34,7 +34,7 @@
 *  Notes:
 *     Both the input and output catalogues are RESET to their first entries
 *     on exit from this routine.
-* 
+*
 *     If the catalogue can not be created an insufficient privilege to create
 *     error will be reported.
 
@@ -55,7 +55,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -107,7 +107,7 @@
       CPnofasorts(cd2) = 0
 
       CPname(cd2) = output
-      CPdelind(cd2) = CPdelind(cd1) 
+      CPdelind(cd2) = CPdelind(cd1)
       CPnumcols(cd2) = CPnumcols(cd1)
       CPnumpars(cd2) = CPnumpars(cd1)
 *
@@ -122,7 +122,7 @@
         EPcomment(cd2,ed) = EPcomment(cd1,ed)
         EPmdataacc(cd2,ed) =  EPmdataacc(cd1,ed)
         EPdataacc(cd2,ed) = EPdataacc(cd1,ed)
-        EPdatelm(cd2,ed) = EPdatelm(cd1,ed) 
+        EPdatelm(cd2,ed) = EPdatelm(cd1,ed)
         EPvcflag(cd2,ed) = EPvcflag(cd1,ed)
         EPvcexp(cd2,ed) = EPvcexp(cd1,ed)
         EPnvcdep(cd2,ed) = EPnvcdep(cd1,ed)
@@ -131,7 +131,7 @@
         enddo
         EPdelind(cd2,ed) = EPdelind(cd1,ed)
         EPprefdis(cd2,ed) = EPprefdis(cd1,ed)
-        EParrshp(cd2,ed) = EParrshp(cd1,ed) 
+        EParrshp(cd2,ed) = EParrshp(cd1,ed)
         do nvccount = 1, EParrshp(cd1,ed)
           EParrdim(cd2,ed,nvccount) = EParrdim(cd1,ed,nvccount)
         enddo

@@ -31,12 +31,12 @@
 
 *   Get the lockword
       CALL CHR_FILL( ' ', LOCKWORD )
-      CALL PAR_GET0C( 'LOCKWORD', LOCKWORD, STATUS ) 
+      CALL PAR_GET0C( 'LOCKWORD', LOCKWORD, STATUS )
       CALL PAR_CANCL( 'LOCKWORD', STATUS )
 
 *   Set the DB_LOCKED flag
       DB_LOCKED = .TRUE.
-      IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+      IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :      'Database locked', STATUS )
 
 *    Exit subroutine

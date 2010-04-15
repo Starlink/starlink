@@ -38,7 +38,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -221,7 +221,7 @@
 %    \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
 %                                             {stardoccontents}}
 %   \label{stardoccontents}
-%   \begin{rawhtml} 
+%   \begin{rawhtml}
 %      <HR>
 %      <H2>Contents</H2>
 %   \end{rawhtml}
@@ -237,31 +237,31 @@
 \section{INTRODUCTION}
 
 SGS is a set of subroutines for performing low-level graphics input/output.
-SGS is implemented above the GKS package (described in \xref{SUN/83}{sun83}, 
+SGS is implemented above the GKS package (described in \xref{SUN/83}{sun83},
 the RAL GKS Guide
 and the ISO document GKS 7.4) which is a device independent graphics system
 designed to be the kernel of a wide variety of graphics systems.
 GKS, which is very comprehensive, does not itself set out to provide the most
 convenient interfaces for all applications, and SGS allows easy access to many
-of its more straightforward features. 
+of its more straightforward features.
 
 SGS, while preserving GKS concepts and indeed allowing direct GKS calls to be
 interspersed with SGS calls, is optimised for convenience in simple cases.
 Many of its features are low level (for example: open, draw a line, draw a text
 string, close), but there are some routines of a slightly higher level (drawing
-arcs and formatted numbers etc). 
+arcs and formatted numbers etc).
 SGS does not include routines for high level operations like drawing annotated
 axes or complete graphs.
 
 Many plotting programs will be written entirely with SGS or higher level calls.
 There will, however, be occasions when GKS routines are used as well, usually
 because a specialised feature of GKS is needed. Therefore this user manual uses
-GKS concepts to describe SGS, and 
+GKS concepts to describe SGS, and
 \hyperref{this appendix}{Appendix~}{}{app-subroutines} describes SGS
 routines in terms of their effect on GKS. This will allow programmers to mix
 GKS and SGS calls in safety. The unadventurous user may safely ignore the
 appendices.
- 
+
 Throughout this manual the normal FORTRAN variable naming conventions are
 adhered to:  i.e.\ all integers start with the letters I--N, all reals with
 letters A--H and O--Z. Character and logical variables have their type
@@ -274,25 +274,25 @@ explicitly referenced in the text.
 \begin{routinelist}
 \routine {SGS\_OPEN}{(WKSTN, IZONID, ISTAT)}
    Open SGS \& GKS, opening and activating one workstation.
-\routine {SGS\_INIT}{(LUN, ISTAT)} 
+\routine {SGS\_INIT}{(LUN, ISTAT)}
    Open SGS \& GKS, without opening a workstation.
 \routine {SGS\_CLOSE}{}
    Shut down SGS \& GKS.
-\routine {SGS\_OPNWK}{(WKSTN, IZONID, ISTAT)} 
+\routine {SGS\_OPNWK}{(WKSTN, IZONID, ISTAT)}
    Open a new workstation and select it.
-\routine {SGS\_CLSWK}{(IZONID, ISTAT)} 
+\routine {SGS\_CLSWK}{(IZONID, ISTAT)}
    Close a workstation.
-\routine {SGS\_WLIST}{(LUN)} 
+\routine {SGS\_WLIST}{(LUN)}
    Output a list of available workstations.
-\routine {SGS\_SPEN}{(NPEN)} 
+\routine {SGS\_SPEN}{(NPEN)}
    Select pen for line and text drawing.
-\routine {SGS\_IPEN}{(NPEN)} 
+\routine {SGS\_IPEN}{(NPEN)}
    Inquire current pen number.
 \routine {SGS\_FLUSH}{}
    Complete all pending output.
-\routine {SGS\_ISLER}{(BLKER)} 
+\routine {SGS\_ISLER}{(BLKER)}
    Inquire whether device has selective erase capability.
-\routine {SGS\_CLRFG}{(ISTATE)} 
+\routine {SGS\_CLRFG}{(ISTATE)}
    Set or clear `clear display on open' flag.
 \end{routinelist}
 
@@ -441,21 +441,21 @@ explicitly referenced in the text.
 \routine {SGS\_WNAME}{(ROUTIN, I, ISTAT)}
    Get list of workstation names.
 \end{routinelist}
-                                         
+
 \section {CONTROL FUNCTIONS}\label{sec-control}
 
 \subsection {Opening and closing SGS \& GKS}\label{sec-op-cl}
 
-\begin{quote}{\em 
-If you are writing an ADAM application you should use the routines described 
+\begin{quote}{\em
+If you are writing an ADAM application you should use the routines described
 in the ADAM Graphics Programmer's Guide (\xref{SUN/113}{sun113}{}) to open
 and close workstations and not the routines described here.}
 \end{quote}
 
 Most programs that are to perform graphics I/O via SGS begin by calling
-\htmlref{SGS\_OPEN}{SGS_OPEN} and end by calling 
+\htmlref{SGS\_OPEN}{SGS_OPEN} and end by calling
 \htmlref{SGS\_CLOSE}{SGS_CLOSE}:
-\begin{verbatim}                                                  
+\begin{verbatim}
     CALL SGS_OPEN (WKSTN, IZONID, ISTAT)
               :
               :
@@ -464,7 +464,7 @@ Most programs that are to perform graphics I/O via SGS begin by calling
 The arguments of the OPEN call are as follows.
 WKSTN is the workstation name, a character string specifying the required
 graphics workstation.
-IZONID receives from SGS the `\htmlref{zone}{zones} identifier', a number 
+IZONID receives from SGS the `\htmlref{zone}{zones} identifier', a number
 allocated by SGS which
 we may need later to refer back to this workstation.
 ISTAT is the status, which will be zero if the OPEN has succeeded.
@@ -472,18 +472,18 @@ ISTAT is the status, which will be zero if the OPEN has succeeded.
 Friendly {\em workstation names}\/ (e.g.\ `PLOTTER') can be given to graphics
 workstations, either by the user or by the system manager, and then specified
 in the SGS\_OPEN call.
-More details can be found in 
-\hyperref{this appendix}{Appendix~}{}{app-linking}; 
-consult your 
-system manager about local conventions.                                     
+More details can be found in
+\hyperref{this appendix}{Appendix~}{}{app-linking};
+consult your
+system manager about local conventions.
 Alternatively, the two numbers needed to specify the workstation---the
-workstation type (what sort of device) and the connection identifier (which 
+workstation type (what sort of device) and the connection identifier (which
 one)---can be given directly, as a character string consisting of 2 numbers
 separated by a comma.
 A list of available workstation types can be obtained by running the program
-{\tt /star/bin/examples/sgs\_workstations}\footnote{if you are using this 
+{\tt /star/bin/examples/sgs\_workstations}\footnote{if you are using this
 software on a non-Starlink machines you mave to replace {\tt /star} by some
-other path name.}. 
+other path name.}.
 If the program just prints a message stating
 that the database could not be opened you should inform your system manager.
 
@@ -511,7 +511,7 @@ The purpose of the {\em zone identifier}\/ will become clearer later on; suffice
 it to say at this stage that this number (which is allocated by SGS and cannot
 be set or otherwise processed by the user's program) allows the program to refer
 back to the full display surface of the workstation that has been opened.
-A zone set up by SGS\_OPEN or 
+A zone set up by SGS\_OPEN or
 \htmlref{SGS\_OPNWK}{SGS_OPNWK} is called a `base zone'.
 
 Should any error messages be output by the SGS or GKS routines, they will be
@@ -519,9 +519,9 @@ reported through the Starlink error reporting system (EMS - see
 \xref{SUN/104}{sun104}{})
 
 A formatted table of the workstation names known to SGS can be output by
-calling \htmlref{SGS\_WLIST}{SGS_WLIST}: 
+calling \htmlref{SGS\_WLIST}{SGS_WLIST}:
 \begin{verbatim}
-    CALL SGS_WLIST (LUN) 
+    CALL SGS_WLIST (LUN)
 \end{verbatim}
 where LUN is the FORTRAN logical unit on which the table should be written.
 Each name is accompanied by a one-line description of the workstation.
@@ -553,7 +553,7 @@ devices but can also reflect the changed situation in their help information.
 \begin{quote}
 {\em Programs should not make assumptions about the properties
 of workstations given the workstation name or type, both of which are subject
-to change.  If special features of a device are to be exploited, their 
+to change.  If special features of a device are to be exploited, their
 existence must be established via the appropriate SGS and GKS inquiry calls.}
 \end{quote}
 
@@ -563,14 +563,14 @@ It is a central philosophy of SGS that only one workstation should be
 {\em active}\/ at once.
 However, multiple workstations may be {\em open}\/ at once, and plotting may
 switch between them.
-Successive workstations may be opened with calls to the routine 
+Successive workstations may be opened with calls to the routine
 \htmlref{SGS\_OPNWK}{SGS_OPNWK}:
 \begin{verbatim}
     CALL SGS_OPNWK (WKSTN, IZONID, ISTAT)
 \end{verbatim}
 WKSTN is the
 \htmlref{workstation name}{sec-op-cl}, IZONID receives the zone
-identifier for the base zone (see 
+identifier for the base zone (see
 \hyperref{this section}{section~}{}{zones}) and ISTAT is as before.
 
 On each occasion that SGS\_OPNWK is called, previously
@@ -592,7 +592,7 @@ where IZONID must be a base zone; if there are other base zones on the
 workstation the specified zone is released but the workstation is not closed.
 
 Switching between multiple workstations is accomplished by the `select
-zone' routine which will be described in the 
+zone' routine which will be described in the
 \htmlref{next}{zones} section.
 
 If we want more flexible control---for example the ability to have several
@@ -604,7 +604,7 @@ directly through the GKS activate/deactivate routines:
     CALL GDAWK(IWKID)
 \end{verbatim}
 A final call to \htmlref{SGS\_CLOSE}{SGS_CLOSE}
-will always leave the system correctly terminated.  
+will always leave the system correctly terminated.
 
 \subsection {Pens}
 
@@ -631,15 +631,15 @@ device---a solid white line on a VDU, for example, or a black
 line of ordinary width on a plotter.  SGS pens 1 to 5
 may be assumed to be available and will correspond---depending
 on the device---to different colours or
-different styles of dashed line. 
+different styles of dashed line.
 Pen numbers greater than 5 may be available depending
 on the device.  New pens may be defined or existing ones redefined with
 the GKS set polyline representation function (GSPLR) but should only
 be done immediately after opening the workstation to avoid causing implicit
 regeneration of the picture.
 
-\hyperref{This appendix}{Appendix~}{}{app-interaction} should be 
-consulted before using GKS facilities directly. 
+\hyperref{This appendix}{Appendix~}{}{app-interaction} should be
+consulted before using GKS facilities directly.
 
 The last requested SGS pen number can be obtained by means of:
 \begin{quote}{\tt
@@ -662,7 +662,7 @@ solicited.  In such cases the call:
 \end{quote}
 causes any pending output to be sent immediately (to all active
 workstations).  Unnecessary calls to SGS\_FLUSH will have no significant
-ill effects (other than defeating any benefits from the buffering of 
+ill effects (other than defeating any benefits from the buffering of
 output)\footnote{Except when plotting dashed or dotted lines as SGS\_FLUSH will
 cause the dash pattern to be restarted; if the line is being plotted with
 points very close together and SGS\_FLUSH is called after each point the
@@ -670,7 +670,7 @@ line may appear to be solid.}.
 
 It is particularly important that SGS\_FLUSH be called
 before any sequence of direct calls to GKS routines.
-For the same reason 
+For the same reason
 \htmlref{SGS\_CLOSE}{SGS_CLOSE} must be called before your program exits,
 otherwise the plot may be incomplete or even absent.
 
@@ -704,7 +704,7 @@ only be used when no other solution is possible.
     CALL \htmlref{SGS\_CLRFG}{SGS_CLRFG} (1)}
 \end{quote}
 will suppress the clearing of the display surface when the next workstation is
-opened {\em provided that the workstation supports this feature}. 
+opened {\em provided that the workstation supports this feature}.
 If it does not,
 no error message is output and the display surface is cleared as usual. After
 SGS\_OPNWK has been called, the normal GKS behaviour will have been restored
@@ -724,8 +724,8 @@ as if it were an independent plotting device.
 
 A zone has an extent (in world coordinates), a
 position and size on the display surface (or, more correctly,
-in normalised device coordinates---see 
-\hyperref{this appendix}{Appendix~}{}{app-coordinates}) and a workstation.  
+in normalised device coordinates---see
+\hyperref{this appendix}{Appendix~}{}{app-coordinates}) and a workstation.
 Clipping occurs at the zone boundary (unless disabled via GKS).
 
 There are routines to create new
@@ -733,7 +733,7 @@ zones and to switch plotting from the
 current one to another.  When
 a zone is created it is allocated a {\em zone identifier}\/ by SGS
 which is thereafter used by the program to refer to that
-zone.  When a workstation is opened (in either 
+zone.  When a workstation is opened (in either
 \htmlref{SGS\_OPEN}{SGS_OPEN} or
 \htmlref{SGS\_OPNWK}{SGS_OPNWK}), a `base' zone is created which occupies the
 whole display surface.  This base zone has a world coordinate
@@ -741,7 +741,7 @@ extent such that the square (0,0) to (1,1) spans the
 zone in
 at least one
 coordinate and appears on the display surface as
-a square;  the bottom left hand corner is (0,0).  A similar 
+a square;  the bottom left hand corner is (0,0).  A similar
 default coordinate system is set
 up whenever a zone is created.  It is possible
 to have more than one base zone on a given workstation.
@@ -757,7 +757,7 @@ zones the plotting program can operate as if the three
 plots were always on separate workstations, and switch freely
 between them during plotting.  Activation and deactivation
 of workstations as well as
-control of the various windows and viewports is handled automatically 
+control of the various windows and viewports is handled automatically
 by SGS (see \hyperref{this appendix}{Appendix~}{}{app-coordinates}).
 
 Another occasion on which SGS zones can be useful is when
@@ -871,7 +871,7 @@ To start plotting on a new \htmlref{zone}{zones}:
 Plotting is suspended on the current zone and the new
 zone, specified by the zone identifier IZONID, is made
 the current one.  Subsequent plotting goes to the new
-zone.  The selection may imply a change of workstation;  this is 
+zone.  The selection may imply a change of workstation;  this is
 handled by SGS.
 
 Once a zone is no longer required it is wise to release it:
@@ -890,24 +890,24 @@ The current zone may be cleared by:
 \end{quote}
 This will ensure that the area covered by the zone is empty.  On some devices
 only the area covered by the zone will be cleared but on others the whole
-display surface may be cleared (because the hardware is 
+display surface may be cleared (because the hardware is
 not capable of clearing selected
-areas).  On a hardcopy device a call to SGS\_CLRZ will cause the paper to 
+areas).  On a hardcopy device a call to SGS\_CLRZ will cause the paper to
 be advanced to a new
 frame except when the whole plotting surface is already empty.  If any part of
 the surface has has been plotted on, even if the current zone is empty, a new
-frame will be started.  This behaviour should be contrasted with 
-that of \htmlref{SGS\_CLRBL}{SGS_CLRBL} (see 
+frame will be started.  This behaviour should be contrasted with
+that of \htmlref{SGS\_CLRBL}{SGS_CLRBL} (see
 \hyperref{this section}{section~}{}{sec-clr-rect}) which
 never causes a frame advance.  Whether SGS\_CLRZ will clear the whole display
 surface can be inquired by:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_ISLER}{SGS_ISLER} (BLKER)}
 \end{quote}
-If BLKER (LOGICAL) is .TRUE. then the workstation is capable of 
-clearing selected areas and the whole display surface will not be cleared 
+If BLKER (LOGICAL) is .TRUE. then the workstation is capable of
+clearing selected areas and the whole display surface will not be cleared
 (unless the current zone fills
-the entire area).  The whole display surface can always be cleared by 
+the entire area).  The whole display surface can always be cleared by
 clearing the base zone.
 
 \subsection {Inquiries}
@@ -933,7 +933,7 @@ where XIN, YIN is a point in the zone IZIN, and IZOUT is the ID of the zone to
 which the position is to be converted.  The position in this zone is retured
 in XOUT, YOUT. ISTAT will be zero if both zone IDs are valid.  Although all
 plotting is clipped at the boundary of the current zone, the world coordinates
-are still meaningful outside the zone, and so the point to be converted can 
+are still meaningful outside the zone, and so the point to be converted can
 be outside one or both zones and the conversion will still succeed.
 
 To optimise plotting efficiency it is sometimes
@@ -948,17 +948,17 @@ world coordinates, in x and y separately.
 \subsection {Controlling NDC}
 
 This section is only of interest if you are mixing SGS calls with use of other
-high level graphics packages in the same program. 
+high level graphics packages in the same program.
 
 Some high level packages make make assumptions about what area of Normalized
-Device Coordinates (NDC---see 
+Device Coordinates (NDC---see
 \hyperref{this appendix}{appendix~}{}{app-coordinates}) is visible on the
 device, for example that the whole of the NDC unit square is visible. When SGS
 opens a workstation it arranges that the whole display surface is available for
 plotting and on a workstation whose display surface is not square  this
-inevitably results in part of the NDC unit square not being visible. 
+inevitably results in part of the NDC unit square not being visible.
 
-The routine \htmlref{SGS\_BZNDC}{SGS_BZNDC} allows the area of NDC 
+The routine \htmlref{SGS\_BZNDC}{SGS_BZNDC} allows the area of NDC
 occupied by a base zone to be manipulated.
 \begin{verbatim}
    CALL SGS_BZNDC (X1, X2, Y1, Y2, POS, ISTAT)
@@ -968,9 +968,9 @@ X2 in x and Y1 to Y2 in y. All four limits must be between 0.0 and 1.0, and X2
 and Y2 must be greater than X1 and Y1 respectively. Since the modified zone
 will, in general, not be the same aspect ratio as the display surface, the
 display surface will not be filled in one of either x or y. The character
-argument POS specifies how the zone should be positioned (c.f.\ 
+argument POS specifies how the zone should be positioned (c.f.\
 \htmlref{SGS\_ZSHAP}{SGS_ZSHAP}
-above). ISTAT is the usual status argument. 
+above). ISTAT is the usual status argument.
 
 In order to achieve its effect SGS\_BZNDC has to set the workstation
 transformation, which would both alter the properties of any other zones
@@ -997,9 +997,9 @@ allows a series of connected
 straight lines, called a {\em polyline},
 to be plotted as one object.  The SGS package supports both
 concepts, and includes `current position' style routines,
-called 
-\htmlref{SGS\_BPOLY}{SGS_BPOLY}, 
-\htmlref{SGS\_APOLY}{SGS_APOLY} and 
+called
+\htmlref{SGS\_BPOLY}{SGS_BPOLY},
+\htmlref{SGS\_APOLY}{SGS_APOLY} and
 \htmlref{SGS\_OPOLY}{SGS_OPOLY},
 which construct and output GKS polylines.
 
@@ -1038,7 +1038,7 @@ at (0,0),(3,0) and (0,4):
 \end{verbatim}
 In most cases the call to SGS\_OPOLY may be omitted;  any polyline
 awaiting output is automatically plotted if a
-new polyline is begun (via SGS\_BPOLY or 
+new polyline is begun (via SGS\_BPOLY or
 \htmlref{SGS\_LINE}{SGS_LINE}) or at
 various other critical places within SGS.
 It is, however, good practice to issue SGS\_OPOLY if there is
@@ -1062,7 +1062,7 @@ subsequent SGS line-drawing takes place:
           CALL SGS_OPOLY
 
           END
-\end{verbatim}           
+\end{verbatim}
 
 At any time, the current end coordinates of the polyline being
 built can be obtained by:
@@ -1084,7 +1084,7 @@ consisting of a single line:
 \begin{verbatim}
     CALL SGS_LINE (X1, Y1, X2, Y2)
 \end{verbatim}
-The polyline begins at (X1,Y1) and ends at (X2,Y2).  Output 
+The polyline begins at (X1,Y1) and ends at (X2,Y2).  Output
 of the polyline is not forced, so the LINE routine
 can be used to begin a polyline of any length.
 
@@ -1108,7 +1108,7 @@ routines.  The call is:
 \end{verbatim}
 where LENGTH is the size of the one-dimensional arrays XARRAY and
 YARRAY, which contain the X and Y coordinates of the vertices
-of the polyline, in world coordinates.  
+of the polyline, in world coordinates.
 
 The triangle plotted in the example given earlier can be produced
 with the following code:
@@ -1164,7 +1164,7 @@ was to be plotted in order to avoid the text being obscured by existing
 plotting.  On a device that cannot clear selected areas no clearing would
 take place and the end result would be the best that could be achieved without
 re-plotting the entire picture.
-If you wish to guarantee that an area is clear 
+If you wish to guarantee that an area is clear
 \htmlref{SGS\_CLRZ}{SGS_CLRZ} should be used instead.
 
 \section {PLOTTING TEXT}
@@ -1172,18 +1172,18 @@ If you wish to guarantee that an area is clear
 There are several SGS routines for creating and plotting
 strings of characters.  The most general, low level routines
 will be described first, although in many instances it will be
-more convenient to use the higher level routines 
-\htmlref{SGS\_TX}{SGS_TX}, 
+more convenient to use the higher level routines
+\htmlref{SGS\_TX}{SGS_TX},
 \htmlref{SGS\_TXI}{SGS_TXI} and
-\htmlref{SGS\_TXR}{SGS_TXR}, 
+\htmlref{SGS\_TXR}{SGS_TXR},
 which allow single strings and formatted numbers to be
 plotted;  these will be described later.
 
 A text string can be plotted by means of the
-routines 
-\htmlref{SGS\_BTEXT}{SGS_BTEXT}, 
-\htmlref{SGS\_ATEXT}{SGS_ATEXT} and 
-\htmlref{SGS\_OTEXT}{SGS_OTEXT}.  SGS\_BTEXT begins a new 
+routines
+\htmlref{SGS\_BTEXT}{SGS_BTEXT},
+\htmlref{SGS\_ATEXT}{SGS_ATEXT} and
+\htmlref{SGS\_OTEXT}{SGS_OTEXT}.  SGS\_BTEXT begins a new
 text string:
 \begin{verbatim}
     CALL SGS_BTEXT (X, Y)
@@ -1198,7 +1198,7 @@ shortly).  ATEXT appends more text onto the string:
     CALL SGS_OTEXT
 \end{verbatim}
 The call to SGS\_OTEXT can usually be omitted;  any existing string
-is output automatically when SGS\_BTEXT or 
+is output automatically when SGS\_BTEXT or
 \htmlref{SGS\_CLOSE}{SGS_CLOSE} is called (and
 at various other critical places within SGS).
 (n.b.\ The maximum length of string that can be plotted is set by
@@ -1220,7 +1220,7 @@ the two calls:
 \end{verbatim}
 produce identical results.
 
-The routine 
+The routine
 \htmlref{SGS\_ATXB}{SGS_ATXB}, in contrast, appends a right justified
 field to the text string, but replaces any leading blanks with a
 specified number of blanks.  Thus, if:
@@ -1235,9 +1235,9 @@ the two calls:
 \end{verbatim}
 produce identical results.
 
-Routines are provided for conveniently plotting numbers;  
+Routines are provided for conveniently plotting numbers;
 \htmlref{SGS\_ATXI}{SGS_ATXI}
-formats and appends an integer, and 
+formats and appends an integer, and
 \htmlref{SGS\_ATXR}{SGS_ATXR} does the same for a
 real.
 
@@ -1344,12 +1344,12 @@ The size is specified by means of the routine \htmlref{SGS\_SHTX}{SGS_SHTX}:
 The argument HT is the height of the character box, in world
 coordinates.  The size, shape and orientation of characters are defined
 in world coordinates and are mapped onto the display surface in
-the same way as lines and markers.  Therefore, 
+the same way as lines and markers.  Therefore,
 if the world coordinates are altered
 without making a corresponding change to the character height the character
 size on the display surface (in mm) will change.
 
-The orientation is specified by means of the routine 
+The orientation is specified by means of the routine
 \htmlref{SGS\_SUPTX}{SGS_SUPTX}:
 \begin{verbatim}
     CALL SGS_SUPTX (XU, YU)
@@ -1360,9 +1360,9 @@ text on its side reading upwards an up vector of (-1.0,0.0) could
 be used;  and so on.  Only the direction of the vector, not its
 magnitude, is significant.  Remember that this vector is a vector in world
 coordinates and that if plotting scale is different in X and Y and it is
-not parallel to either axis, its direction on the display surface will not 
+not parallel to either axis, its direction on the display surface will not
 be the same.  Furthermore the character boxes will be transformed from
-rectangles into parallelograms.  There is some advice on plotting text in 
+rectangles into parallelograms.  There is some advice on plotting text in
 non-uniform coordinate systems at the end of this section.
 
 The disposition of the plotted string with respect to
@@ -1387,7 +1387,7 @@ plotted and applies to all strings from then on.  (2) The directions
 bottom, left, etc., refer to the string seen in its conventional
 orientation.)
 
-The routine 
+The routine
 \htmlref{SGS\_SPREC}{SGS_SPREC} allows the text precision to be specified:
 \begin{verbatim}
     CALL SGS_SPREC (NPR)
@@ -1397,10 +1397,10 @@ discrepancy between the characters as defined by the font and as
 they appear on the display device is tolerable;  in effect, software
 generated characters will be plotted which look the same on all
 devices.  A precision value of 0 allows the use of hardware
-characters, which will be faster but may compromise appearance 
+characters, which will be faster but may compromise appearance
 especially if more than one device is used.
 
-Different fonts may 
+Different fonts may
 be selected by means of the routine \htmlref{SGS\_SFONT}{SGS_SFONT}:
 \begin{verbatim}
     CALL SGS_SFONT (NF)
@@ -1428,15 +1428,15 @@ gives no extra space between characters and results in the text being
 of normal appearance.  The spacing can be negative, which results in the
 characters overlapping.
 
-The aspect ratio and spacing are defined for a `nominal' standard 
-character.  The actual values may differ from those set for proportional fonts 
+The aspect ratio and spacing are defined for a `nominal' standard
+character.  The actual values may differ from those set for proportional fonts
 (the default font is proportional) and for fonts of unusual design.  Do
 not rely on the spacing, orientation and aspect ratio to define
 the exact length
-of a text string.  The GKS routine GQTXX (inquire text extent) should be 
+of a text string.  The GKS routine GQTXX (inquire text extent) should be
 used.
 
-The routine 
+The routine
 \htmlref{SGS\_ITXA}{SGS_ITXA}
 allows all the above text attributes to be inquired:
 \begin{verbatim}
@@ -1446,19 +1446,19 @@ If different plotting scales are in use in X and Y, plotting text requires
 considerable care.  Not only must an appropriate height be used but the aspect
 ratio must also be adjusted and if the direction of the up vector is changed
 both will need to be altered to maintain the same character size.  Futhermore
-text of normal appearance cannot be plotted with the up vector other than 
+text of normal appearance cannot be plotted with the up vector other than
 parallel with one of the axes.
 It is therefore recommended that you use a uniform coordinate system for
-plotting text and the SGS zone facility provides a convenient way of doing 
-this.  A new zone, covering the same area as the current 
+plotting text and the SGS zone facility provides a convenient way of doing
+this.  A new zone, covering the same area as the current
 one, can be created by:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_IZONE}{SGS_IZONE} (X1, X2, Y1, Y2, XM, YM)
 
     CALL \htmlref{SGS\_ZONE}{SGS_ZONE} (X1, X2, Y1, Y2, IZTXT, ISTAT)}
 \end{quote}
-The new zone will have a uniform coordinate system (c.f.\ 
-\hyperref{this section}{section~}{}{sec-op-cl}) and is 
+The new zone will have a uniform coordinate system (c.f.\
+\hyperref{this section}{section~}{}{sec-op-cl}) and is
 therefore suitable for plotting text.  If the text has to be plotted at a
 particular position X,~Y in world coordinates (for example, to label tick
 marks on an axis) the corresponding position XT,~YT in new zone can be obtained
@@ -1494,7 +1494,7 @@ routine \htmlref{SGS\_MARKL}{SGS_MARKL}:
     CALL SGS_MARKL (MTYPE)
 \end{verbatim}
 which plots the specified symbol at the current end of the polyline
-being built via \htmlref{SGS\_APOLY}{SGS_APOLY}.  
+being built via \htmlref{SGS\_APOLY}{SGS_APOLY}.
 For example, the following code will
 plot a triangle with a star marker at corner A,
 an open symbol at corner B, and an X at corner C:
@@ -1524,7 +1524,7 @@ selects one of a number of choices, usually by pressing
 a button on a control
 box or a key on a keyboard.
 \end{description}
-The most familiar form of interaction is where the cursor is displayed and the 
+The most familiar form of interaction is where the cursor is displayed and the
 program waits for the user to move it to the desired position and press one
 of the choice keys.  The cursor position (a position in world coordinates) and
 the choice selected (a positive integer) are then returned to the program.
@@ -1542,26 +1542,26 @@ set by:
     CALL \htmlref{SGS\_SETCU}{SGS_SETCU} (X, Y)}
 \end{quote}
 provided that the hardware allows the position of the cursor to be controlled
-by the computer.  Not all devices have cursors, e.g.\ pen plotters, and so a 
+by the computer.  Not all devices have cursors, e.g.\ pen plotters, and so a
 program can find out if the workstation
-of the current SGS zone has a cursor (all SGS 
+of the current SGS zone has a cursor (all SGS
 input routines operate on the currently selected SGS
 zone) with:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_ICUAV}{SGS_ICUAV} (AVAIL)}
 \end{quote}
 where AVAIL is set to the logical value .TRUE.
-or .FALSE..  The cursor can also 
-be used in a mode (sample mode) in which the cursor can be moved around by the 
+or .FALSE..  The cursor can also
+be used in a mode (sample mode) in which the cursor can be moved around by the
 user but the position is read by the program without waiting for the use to
 press a choice key.  This mode of operation has to be explicitly enabled with:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_ENSCU}{SGS_ENSCU}}
 \end{quote}
-but may not be available on all devices or at all in some GKS 
+but may not be available on all devices or at all in some GKS
 implementations {\bf (at present this
-includes the RAL implementation used by Starlink)} and if it is not 
-an error message will be generated;  the cursor position can 
+includes the RAL implementation used by Starlink)} and if it is not
+an error message will be generated;  the cursor position can
 then be sampled with:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_SAMCU}{SGS_SAMCU} (X, Y)}
@@ -1571,9 +1571,9 @@ typically in a loop.  Sample mode is disabled with:
     CALL \htmlref{SGS\_DISCU}{SGS_DISCU}}
 \end{quote}
 It is sometimes desirable to use this mode without the cursor being visible,
-its position being indicated in some other way, such as continuously drawing a 
+its position being indicated in some other way, such as continuously drawing a
 line to the cursor position from its position when last
-sampled.  In order to 
+sampled.  In order to
 allow this, the cursor can be made invisible by:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_CUVIS}{SGS_CUVIS} (.FALSE.)}
@@ -1586,30 +1586,30 @@ The cursor will, of course,
 only actually appear if sample mode is enabled or
 when SGS\_REQCU is called.
 
-The choice device, which can be invoked either in conjunction with the cursor 
+The choice device, which can be invoked either in conjunction with the cursor
 or on its own, can be one of two devices.  By
-default it is a choice device 
-associated with the graphics workstation such as the  buttons on 
-a mouse or the numeric keys on a graphics terminal and is characterised by 
-having a small number of choices.  SGS provides an 
-alternative device which is the keyboard of the terminal from which the 
+default it is a choice device
+associated with the graphics workstation such as the  buttons on
+a mouse or the numeric keys on a graphics terminal and is characterised by
+having a small number of choices.  SGS provides an
+alternative device which is the keyboard of the terminal from which the
 program is being run.  This
 has the advantage of being always available
 and of having a much larger number of
 choices.  However, since
-it is potentially a different device from the graphics device, two separate 
-read operations are required to get the choice and the cursor 
+it is potentially a different device from the graphics device, two separate
+read operations are required to get the choice and the cursor
 information,
-and 
-on a very busy system or over a network these operations may be separated by 
+and
+on a very busy system or over a network these operations may be separated by
 an appreciable length of time.
 
 The choice device you wish to use is selected by:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_SELCH}{SGS_SELCH} (NCHDEV)}
 \end{quote}
-where NCHDEV is 1 or greater for the normal GKS choice devices and 0 for the 
-command terminal keyboard.  
+where NCHDEV is 1 or greater for the normal GKS choice devices and 0 for the
+command terminal keyboard.
 The number of choices on a choice device can be inquired with:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_INCHO}{SGS_INCHO} (NCHDEV, N)}
@@ -1617,29 +1617,29 @@ The number of choices on a choice device can be inquired with:
 If the choice device does not exist, N will be returned as zero.
 
 For the terminal keyboard (choice device
-0) only, the mapping of the keyboard keys onto the integers returned by 
+0) only, the mapping of the keyboard keys onto the integers returned by
 SGS\_REQCH is controlled by:
 \begin{quote}{\tt
     CALL \htmlref{SGS\_DEFCH}{SGS_DEFCH} (CHOSTR)}
 \end{quote}
-where CHOSTR is a character string specifying which keys are to be considered 
-to be valid choices.  If the key specified by the first character in 
+where CHOSTR is a character string specifying which keys are to be considered
+to be valid choices.  If the key specified by the first character in
 the string is pressed an
-integer 1 will be 
+integer 1 will be
 returned, if the second a 2 will be returned,
-and so on.  If the key is not included in the string 
-a zero will be returned.  There is no restriction on which characters can be 
-specified but upper and lower case characters are not distinguished and you 
+and so on.  If the key is not included in the string
+a zero will be returned.  There is no restriction on which characters can be
+specified but upper and lower case characters are not distinguished and you
 are advised only to use the FORTRAN character set (\verb#A-Z 0-9 =+-*'/(),.:$#
 and blank) as other characters cannot be guaranteed to be present on a
 terminal.  For this reason, if
-the number of choices on device 0 is inquired 49 is 
+the number of choices on device 0 is inquired 49 is
 returned.
 
-A typical use of this facility might be a program which plots a star field and 
-then asks the user to identify each object on the plot as either a star a 
-galaxy or a plate defect by positioning the cursor on each object in turn and 
-pressing the S G or D keys to indicate the nature of the object or the `.' key 
+A typical use of this facility might be a program which plots a star field and
+then asks the user to identify each object on the plot as either a star a
+galaxy or a plate defect by positioning the cursor on each object in turn and
+pressing the S G or D keys to indicate the nature of the object or the `.' key
 to terminate the sequence.  The interactive part of this program might be:
 \begin{verbatim}
           INTEGER N
@@ -1675,14 +1675,14 @@ to terminate the sequence.  The interactive part of this program might be:
           GO TO 100
 
     *   No more objects ..
-      500 CONTINUE       
+      500 CONTINUE
 \end{verbatim}
-It is a Starlink recommendation that you use the ``.'' character to terminate a 
+It is a Starlink recommendation that you use the ``.'' character to terminate a
 sequence of operations such as this.
 
 \section {PROCESSING WORKSTATION NAMES}\label{sec-processing}
 
-The routine 
+The routine
 \htmlref{SGS\_WNAME}{SGS_WNAME}
 allows the list of workstation names known to SGS,
 and their associated comments, to be retrieved for processing by your
@@ -1691,14 +1691,14 @@ program.
     CALL SGS_WNAME (ROUTIN, I, ISTAT)
 \end{verbatim}
 where ROUTIN is the name of a subroutine which is to process the names, I
-is an integer which is also passed your routine, 
-and ISTAT is a status.  ROUTIN (which must of course be 
+is an integer which is also passed your routine,
+and ISTAT is a status.  ROUTIN (which must of course be
 declared as EXTERNAL) is called once for
 each workstation in the list with the following arguments:
 \[\begin{tabular}{lll}
 \tt NAME&\tt (CHARACTER)&Workstation name\\[\medskipamount]
 \tt COMMNT&\tt (CHARACTER)&Associated comment string\\[\medskipamount]
-\tt I&\tt (INTEGER)&The value specified in the call to 
+\tt I&\tt (INTEGER)&The value specified in the call to
 SGS\_WNAME\\[\medskipamount]
 \tt ISTAT&\tt (INTEGER)&Status return
 \end{tabular}\]
@@ -1708,16 +1708,16 @@ any purpose you wish; a typical use would be to pass a logical unit number
 to which the routine is to write the workstation names.  ISTAT should be
 set to zero if the routine completes successfully; if any other value is
 returned SGS\_WNAME will abandon processing the list and return immediately
-to its caller. 
+to its caller.
 
 \section {EXAMPLE PROGRAM}\label{sec-example}
 
 This section consists of a complete program using SGS.  This
 and another (longer) program are available on disc in the
-files {\tt /star/share/sgs/sgsx1.f} and 
-{\tt /star/share/sgs/sgsx2.f}\footnote{If you are using this 
+files {\tt /star/share/sgs/sgsx1.f} and
+{\tt /star/share/sgs/sgsx2.f}\footnote{If you are using this
 software on a non-Starlink machines you may have to replace {\tt /star} by some
-other path name.}. 
+other path name.}.
 \begin{quote}
 \begin{verbatim}
       PROGRAM SGSX1
@@ -1733,7 +1733,7 @@ other path name.}.
 *-
 
       CHARACTER*20 WKSTN
-      INTEGER IZONID, IZ, J 
+      INTEGER IZONID, IZ, J
 
 *  Print list of workstation names
       CALL SGS_WLIST (6)
@@ -1762,7 +1762,7 @@ other path name.}.
 
       END
 \end{verbatim}
-\end{quote}          
+\end{quote}
 
 \appendix
 \section {LINKING AND RUNNING SGS}\label{app-linking}
@@ -1777,22 +1777,22 @@ Adam application are linked with SGS by putting {\tt `sgs\_link\_adam`} on
 the alink command line.
 
 Workstation names are translated to their GKS equivalents using the `Graphics
-Name Service' (xref{SUN/57}{sun57}{}). 
-A list of those names defined on your system can be 
-output to your terminal by running the program 
-{\tt /star/bin/examples/sgs\_workstations}\footnote{if you are using this 
+Name Service' (xref{SUN/57}{sun57}{}).
+A list of those names defined on your system can be
+output to your terminal by running the program
+{\tt /star/bin/examples/sgs\_workstations}\footnote{if you are using this
 software on a non-starlink machines you may have to replace {\tt /star} by some
-other path name.}. 
+other path name.}.
 In addition to the system defined names an explicit
 GKS workstation type and \htmlref{connection identifier}{conid} can be used.
-Examples of valid strings are:             
+Examples of valid strings are:
 \begin{verbatim}
     "GKS_102_0"
     "201"
     "201,1"
     "103 0"
 \end{verbatim}
-SGS can be opened without further ado by supplying 
+SGS can be opened without further ado by supplying
 \htmlref{SGS\_OPEN}{SGS_OPEN} with such a string,
 but more friendly names can be created with environment variables.  For example after
 executing the C shell command:
@@ -1801,14 +1801,14 @@ executing the C shell command:
 \end{verbatim}
 the name `t4010' can be used to open a Tektronix 4010 as a workstation.
 When defining logical
-names you are advised to use the GKS\_ prefix to distinguish them other 
-environment variables and to use an underscore or comma as the separator as 
+names you are advised to use the GKS\_ prefix to distinguish them other
+environment variables and to use an underscore or comma as the separator as
 the space is used as a separators by most shells.
 
 The connection identifier indicates which of several devices of the same type
 to use.  For devices which are terminals, 5 indicates your own terminal.  For
 other devices 0 will be a `default' device of some sort.  For connection
-identifiers other than zero, GKS will attempt to translate the environment 
+identifiers other than zero, GKS will attempt to translate the environment
 variable
 GKS\_n\_m (where n is the workstation type and m is the connection identifier)
 in order to find the name of the device to use.
@@ -1855,7 +1855,7 @@ GKS terms will be given in capitals when they are being
 defined, and (iii) only rather ordinary cases are described.  It
 should be read in conjunction with the diagram, which follows the
 discussion.
-                     
+
 \begin{figure}
    \includegraphics[scale=.8]{sun85_diag1.eps}
 %   \vspace{190mm}
@@ -1925,7 +1925,7 @@ to be treated separately.
 
 Each workstation has its own workstation viewport and window and there can
 be many window (world coordinates) to viewport (NDC)
-transformations in existence, 
+transformations in existence,
 the one used to transform output coordinates being selected by GSELNT.
 
 \subsection* {Buffering}
@@ -1933,7 +1933,7 @@ the one used to transform output coordinates being selected by GSELNT.
 Polylines and text strings are buffered within SGS and so at any time there
 may be lines and text which have been `plotted' by SGS calls but have not yet
 been passed to GKS (let alone output to the workstation).
-Therefore any GKS calls should normally be preceded by a call to 
+Therefore any GKS calls should normally be preceded by a call to
 \htmlref{SGS\_FLUSH}{SGS_FLUSH} to
 ensure that all graphics activities are presented to GKS  in the correct order.
 
@@ -1942,7 +1942,7 @@ ensure that all graphics activities are presented to GKS  in the correct order.
 SGS only sets normalization transformation number 1.
 Selecting a new zone is the only SGS activity that selects this to be the
 current transformation.
-Transformation 1 is used by 
+Transformation 1 is used by
 \htmlref{SGS\_SETCU}{SGS_SETCU} when it sets the locator position.
 
 \htmlref{SGS\_SELZ}{SGS_SELZ}
@@ -2178,7 +2178,7 @@ Draws a rectangular box with sides parallel to the axes.
 \rparams{x1,x2,y1,y2}{R}{Extent of box in world coordinates.}
 \end{params}
 \item [GKS EFFECT:]
-A polyline is drawn (via \htmlref{SGS\_BPOLY}{SGS_BPOLY} and 
+A polyline is drawn (via \htmlref{SGS\_BPOLY}{SGS_BPOLY} and
 \htmlref{SGS\_APOLY}{SGS_APOLY}).
 \end{description}
 \goodbreak
@@ -2320,7 +2320,7 @@ The entire display surface may be cleared on some devices.
 \item [CALL:]
 {\tt SGS\_CLRZ}
 \item [GKS EFFECT:]
-If the device is capable of selective erasure 
+If the device is capable of selective erasure
 \htmlref{SGS\_CLRBL}{SGS_CLRBL} is called, otherwise
 the entire display surface is cleared.
 \end{description}
@@ -2374,8 +2374,8 @@ keyboard (SGS choice device type 0).
 \item [INPUT PARAMETERS:]
 \begin{params}
 \rparams{chostr}{C}{A character expression of up to 49 characters which defines
-the keys that are valid for choice input. The order of the characters 
-determines the number returned when a key is pressed. The first key in the 
+the keys that are valid for choice input. The order of the characters
+determines the number returned when a key is pressed. The first key in the
 string will return 1, the second 2, etc. If a key which has not been defined
 is pressed, a 0 is returned.}
 \end{params}
@@ -2517,7 +2517,7 @@ Initializes SGS and (if necessary) opens GKS.
 \rparams{istat}{I}{Status; set to 0 if SGS is successfully initialized.}
 \end{params}
 \item [GKS EFFECT:]
-If GKS is not already open GOPKS is called with the specified logical unit 
+If GKS is not already open GOPKS is called with the specified logical unit
 number as the error channel.
 \end{description}
 \goodbreak
@@ -2604,7 +2604,7 @@ Returns state of SGS buffered string.
 displacement from its starting point).}
 \end{params}
 \item [GKS EFFECT:]
-Inquiry is made of GKS to determine the concatenation point, from 
+Inquiry is made of GKS to determine the concatenation point, from
 which {\em x}\/ and {\em y}\/ are subtracted to give the SGS extent.
 \end{description}
 \goodbreak
@@ -2699,7 +2699,7 @@ It is intended to be used at the beginning of graphics.
 \item [INPUT PARAMETERS:]
 \begin{params}
 \rparams{wkstn}{C}{Workstation name: a character string which translates
-ultimately into GKS workstation sequence number and connection identifier. 
+ultimately into GKS workstation sequence number and connection identifier.
 See \xref{SUN/57}{sun57}{}
 for full details of formats supported; simplest is the two numbers
 as decimals separated by a comma.}
@@ -3119,9 +3119,9 @@ Starts a new SGS buffered text string with the specified text.
 \rparams{string}{C}{Text string to be put into emptied text buffer.}
 \end{params}
 \item [GKS EFFECT:]
-A new SGS buffered string is begun: equivalent to 
+A new SGS buffered string is begun: equivalent to
 \htmlref{SGS\_BTEXT}{SGS_BTEXT}(x,y); the
-specified string is appended to it: equivalent to 
+specified string is appended to it: equivalent to
 \htmlref{SGS\_ATEXT}{SGS_ATEXT}(string)
 \end{description}
 \goodbreak
@@ -3137,13 +3137,13 @@ integer.
 \begin{params}
 \rparams{x,y}{R}{Reference point of new SGS buffered string.}
 \rparams{i}{I}{Integer to be converted to characters.}
-\rparams{nfi}{I}{Indication of field width: similar to 
+\rparams{nfi}{I}{Indication of field width: similar to
 \htmlref{SGS\_ATXI}{SGS_ATXT}.}
 \end{params}
 \item [GKS EFFECT:]
-A new SGS buffered string is begun: equivalent to 
+A new SGS buffered string is begun: equivalent to
 \htmlref{SGS\_BPOLY}{SGS_BPOLY}(x,y).
-The converted integer is appended to it: equivalent to 
+The converted integer is appended to it: equivalent to
 \htmlref{SGS\_ATXI}{SGS_ATXI}(i,nfi).
 \end{description}
 \goodbreak
@@ -3159,13 +3159,13 @@ number.
 \begin{params}
 \rparams{x,y}{R}{Reference point of new SGS buffered string.}
 \rparams{r}{R}{Real number to be converted to characters.}
-\rparams{nfi,ndp}{I}{Conversion parameters, similar to 
+\rparams{nfi,ndp}{I}{Conversion parameters, similar to
 \htmlref{SGS\_ATXR}{SGS_ATXR}.}
 \end{params}
 \item [GKS EFFECT:]
-A new SGS buffered string is begun: equivalent to 
+A new SGS buffered string is begun: equivalent to
 \htmlref{SGS\_APOLY}{SGS_APOLY}(x,y).
-The converted real number is appended: equivalent to 
+The converted real number is appended: equivalent to
 \htmlref{SGS\_ATXR}{SGS_ATXR}(r,nfi,ndp).
 \end{description}
 \goodbreak
@@ -3290,7 +3290,7 @@ zone and then selects it.
 \begin{params}
 \rparams{ar}{R}{The absolute aspect ratio x/y of the new zone.}
 \rparams{pos}{C2}{Determines the positioning of the new zone within the current
-one. The first character is `B', `C' or `T' (standing for bottom, centre and 
+one. The first character is `B', `C' or `T' (standing for bottom, centre and
 top), and the second is `L', `C' or `R' (standing for left, centre and right).}
 \end{params}
 \item [OUTPUT PARAMETERS:]

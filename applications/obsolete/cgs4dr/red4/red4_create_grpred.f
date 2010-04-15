@@ -8,8 +8,8 @@
 *    Parameters :
 *     STATUS   = INTEGER( UPDATE )
 *           Global ADAM status. This must be ADAM__OK on entry, or the
-*           routine will not execute. It will be returned ADAM__OK if 
-*           the routine is successful. Otherwise it will contain an 
+*           routine will not execute. It will be returned ADAM__OK if
+*           the routine is successful. Otherwise it will contain an
 *           error status.
 *    Method :
 *    Deficiencies :
@@ -49,7 +49,7 @@
 *   Check for error on entry
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
-*   Obtain the name of a reduced observation which is to be used as a 
+*   Obtain the name of a reduced observation which is to be used as a
 *   template to construct the reduced group file, and convert it to
 *   upper case.
       CALL PAR_GET0C( 'OBSRED', OBSRED, STATUS )
@@ -62,14 +62,14 @@
       IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *      Convert the name of the reduced observation file into the name
-*      of the reduced group file, using the group number obtained 
+*      of the reduced group file, using the group number obtained
 *      above.
          CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS )
 
 *      Create a container file to hold the reduced group.
          CALL RED4_GET_PREFIX ('RO', LPREFIX, STATUS)
          CALL RED4_MAKE_GRPREDFILE( LPREFIX(:CHR_LEN(LPREFIX))//OBSRED,
-     :    GRPRED, STATUS ) 
+     :    GRPRED, STATUS )
       ELSE
 
          STATUS = SAI__ERROR

@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,7 +103,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
 
       IMPLICIT NONE              ! No implicit typing
@@ -146,7 +146,7 @@
 *  Local Constants:
       REAL
      :  ANCLP1, ANCLP2,          ! Fraction of the frame zone in which
-     :  ANCLP3, ANCLP4           ! the image will appear when there are 
+     :  ANCLP3, ANCLP4           ! the image will appear when there are
                                  ! axes. Note aspect ratio is preserved.
       PARAMETER ( ANCLP1 = 0.19, ANCLP2 = 0.95,
      :            ANCLP3 = 0.15, ANCLP4 = 0.91 )
@@ -177,14 +177,14 @@
 
       CALL SNX_AGWV
 
-*  Store the current NCAR grid values. 
+*  Store the current NCAR grid values.
 
       CALL AGGETF( 'GRID/LEFT.', GRID( 1 ) )
       CALL AGGETF( 'GRID/RIGHT.', GRID( 2 ) )
       CALL AGGETF( 'GRID/BOTTOM.', GRID( 3 ) )
       CALL AGGETF( 'GRID/TOP.', GRID( 4 ) )
 
-*  Store the current NCAR grid values. 
+*  Store the current NCAR grid values.
 
       CALL AGSETF( 'GRID/LEFT.', ANCLIP( 1 ) )
       CALL AGSETF( 'GRID/RIGHT.', ANCLIP( 2 ) )
@@ -208,7 +208,7 @@
       CALL SGS_SW( SNX_AGGUX( 0.0 ), SNX_AGGUX( 1.0 ),
      :             SNX_AGGUY( 0.0 ), SNX_AGGUY( 1.0 ), STATUS )
 
-*  Restore the input NCAR grid values. 
+*  Restore the input NCAR grid values.
 
       CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
       CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
@@ -229,7 +229,7 @@
 
 *  Save the grid window zone as a DATA picture in AGI.
 
-      CALL AGS_SZONE( 'DATA', COMMNT, PIC1, STATUS )      
+      CALL AGS_SZONE( 'DATA', COMMNT, PIC1, STATUS )
 
 
 *  Re-instate the original current picture.  Allow for a bad status

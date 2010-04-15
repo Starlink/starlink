@@ -23,7 +23,7 @@ C   Environment
 C   -----------
 C   FIGARO
 C
-C                              
+C
 C   Parameters (read or written)
 C   ----------------------------
 C   IMAGE   Name of the structure containing the input image. (character)
@@ -32,27 +32,27 @@ C
 C   ORDER   Order of the axes in the output image, in terms of the input
 C           axes. (integer, array)(prompted for).
 C
-C   OUTPUT  Name of the structure containing the output image. May be the 
+C   OUTPUT  Name of the structure containing the output image. May be the
 C           same as IMAGE. (character)(prompted for).
 C
 C   --------
 C   Keywords
-C   -------- 
+C   --------
 C   None.
 C
 C
 C   Propagation of data structure
 C   -----------------------------
-C   - All standard objects except the data array and axes are copied from 
+C   - All standard objects except the data array and axes are copied from
 C     IMAGE.
 C   - Data array and axes are modified and reshaped.
-C                    
+C
 C
 C   Method
 C   ------
 C   - The structure IMAGE is copied to OUTPUT, with the exception of the
-C     data array and axes. DSA_RESHAPE_ routines are called to modify the 
-C     dimensions of the OUTPUT axis and data arrays. 
+C     data array and axes. DSA_RESHAPE_ routines are called to modify the
+C     dimensions of the OUTPUT axis and data arrays.
 C   - The calibrations, label, and units of the IMAGE axes are copied to the
 C     appropriate OUTPUT axes.
 C   - A subroutine appropriate to the dimensionality and data type is
@@ -90,14 +90,14 @@ C
 C   Library ICH:
 C     ICH_ENCODE
 C     ICH_LEN
-C     
+C
 C   Library NDP:
 C     NDP_DISPLAY_PROGRESS
 C     NDP_GET_IMAGE_INFO
 C
 C   Library PAR:
 C     PAR_RDARY
-C     
+C
 C
 C   Internal subroutines called
 C   ---------------------------
@@ -110,13 +110,13 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                             
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
 C   DO WHILE / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
-C         
+C
 C   Possible future upgrades
 C   ------------------------
 C   - Only 3-D images are handled at present. Subroutines to be written:
@@ -125,7 +125,7 @@ C       TRANSPOSE_4D_<T>
 C       TRANSPOSE_5D_<T>
 C       TRANSPOSE_6D_<T>
 C   - More complex transposition strategies will be required for the higher
-C     dimensionalities, possibly including multiple passes, dimensional 
+C     dimensionalities, possibly including multiple passes, dimensional
 C     subsetting, and axis flipping. The AIPS program TRANS could be used as
 C     a guide.
 C
@@ -145,21 +145,21 @@ C                   banned by the v5.2 compiler.  (JRL)
 C   12-NOV-1990   - Fixed bug in TRANSPOSE_3D_R which caused access violations
 C                   when trying to transpose the whole array at once.  (JRL)
 C   18-OCT-1991   - Quality and error array handling added.
-C                   Subroutines written in GENERIC form. 
+C                   Subroutines written in GENERIC form.
 C                   Fixed horrible bug that crashes program on certain
 C                   permutations of indices when arrays aren't cubes.(GOLDJIL)
 C   10-DEC-1992   - Unix version. (GOLDJIL)
 C   06-OCT-1994   - Removed lots of unused variables. (GJP)
 C
-C                     
+C
 C+-----------------------------------------------------------------------------
 C
       IMPLICIT NONE
 C
 C     Functions used.
-C        
+C
       INTEGER  DSA_TYPESIZE,DYN_ELEMENT
-C   
+C
 C     Local variables.
 C
       INTEGER   ADDRESS       ! Address of dynamic memory element
@@ -195,11 +195,11 @@ C
       LOGICAL   QUAL          ! Flags presence of a quality array
       INTEGER   STATUS        ! Status code
       CHARACTER TYPE*8        ! Data array type
-      REAL      VMIN(6)       ! Minimum values of dimensions 
+      REAL      VMIN(6)       ! Minimum values of dimensions
       REAL      VMAX(6)       ! Maximum values of dimensions
 C
       INTEGER   NEW_FILE,NO_DATA
-      PARAMETER (NEW_FILE=1,NO_DATA=1)                           
+      PARAMETER (NEW_FILE=1,NO_DATA=1)
 C
       INCLUDE 'DYNAMIC_MEMORY'
       INCLUDE 'MAGIC_VALUES'
@@ -245,12 +245,12 @@ C
       DO I=1,NDIM
         VMAX(I)=REAL(NDIM)
       END DO
-C    
+C
 C     Get error/quality array information
 C
       CALL DSA_SEEK_ERRORS('IMAGE',ERR,STATUS)
       IF(STATUS.NE.0)GO TO 500
-      CALL DSA_SEEK_QUALITY('IMAGE',QUAL,STATUS)        
+      CALL DSA_SEEK_QUALITY('IMAGE',QUAL,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
 C     Get transposed axis order.
@@ -286,15 +286,15 @@ C     - check that a transposition has been specified.
 C
       DO I=1,6
         IF(ORDER(I).NE.I)GO TO 20
-      END DO   
+      END DO
       CALL DSA_WRUSER('No transposition specified.\\N')
       GO TO 500
 C
 C     Open file for OUTPUT.
 C
 20    CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
-      IF(STATUS.NE.0)GO TO 500        
-C          
+      IF(STATUS.NE.0)GO TO 500
+C
 C     Reshape OUTPUT data array.
 C
       CALL DSA_WRUSER('Reshaping data array...\\N')
@@ -303,7 +303,7 @@ C
 C
 C     Transpose the axes.
 C     - map IMAGE axes.
-C             
+C
       DO I=1,NDIM
         CALL DSA_MAP_AXIS_DATA
      &    ('IMAGE',I,'READ','FLOAT',ADDRESS,AXSLOT(I),STATUS)
@@ -314,7 +314,7 @@ C
       DO I=1,NDIM
 C
 C    - reshape OUTPUT axis.
-C                                    
+C
         CALL DSA_RESHAPE_AXIS('OUTPUT',I,'IMAGE',I,1,ODIMS(I),STATUS)
         IF(STATUS.NE.0)GO TO 500
 C
@@ -326,7 +326,7 @@ C
         OAXPTR(I)=DYN_ELEMENT(ADDRESS)
 C
 C     - copy values from appropriate IMAGE axis.
-C           
+C
         ELEM=DSA_TYPESIZE('FLOAT',STATUS)
         CALL GEN_MOVE
      &    (DIMS(ORDER(I))*ELEM,DYNAMIC_MEM(AXPTR(ORDER(I))),
@@ -351,7 +351,7 @@ C
 C
 C     Map IMAGE and OUTPUT arrays
 C
-      IF(TYPE.EQ.'SHORT')THEN                                 
+      IF(TYPE.EQ.'SHORT')THEN
         CALL DSA_MAP_DATA('IMAGE','READ','SHORT',ADDRESS,ISLOT,STATUS)
         IF(STATUS.NE.0)GO TO 500
         IMPTR=DYN_ELEMENT(ADDRESS)
@@ -360,7 +360,7 @@ c
         IF (STATUS.NE.0)GO TO 500
         OUTPTR=DYN_ELEMENT(ADDRESS)
 c
-        IF (ERR) THEN 
+        IF (ERR) THEN
           CALL DSA_MAP_ERRORS('IMAGE','READ','SHORT',ADDRESS,IESLOT,
      &                        STATUS)
           IF(STATUS.NE.0)GO TO 500
@@ -380,7 +380,7 @@ c
         IF (STATUS.NE.0)GO TO 500
         OUTPTR=DYN_ELEMENT(ADDRESS)
 c
-        IF (ERR) THEN 
+        IF (ERR) THEN
           CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',ADDRESS,IESLOT,
      &                        STATUS)
           IF(STATUS.NE.0)GO TO 500
@@ -450,7 +450,7 @@ C
 C  Make sure bad pixel flag is correct
 C
       CALL DSA_SET_FLAGGED_VALUES('OUTPUT',BADPIX,STATUS)
-C            
+C
 C     Tidy up and exit.
 C
 500   CONTINUE

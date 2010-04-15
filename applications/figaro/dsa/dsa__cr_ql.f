@@ -29,7 +29,7 @@ C
 C  External variables used:
 C     Only common variables internal to the DSA routines.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     ICH_LEN, DTA_CRVAR, DTA_ERROR, DTA_WRVARC, DTA_WRVARB
 C
 C  Prior requirements:
@@ -45,7 +45,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  Subroutine / function details:
@@ -63,7 +63,7 @@ C     29th Aug 1992     "INCLUDE" filenames now upper case. KS/AAO
 C
 C  Note:
 C     This version supports both the original Figaro data structures
-C     and Starlink's NDF format. 
+C     and Starlink's NDF format.
 C+
       SUBROUTINE DSA__CREATE_QUAL_ENV (REF_SLOT,STATUS)
 C
@@ -108,7 +108,7 @@ C
          IF (DTA_STATUS.NE.0) THEN
 C
 C           Since the DTA_STRUC call failed, we assume this is because
-C           the array doesn't exist, and create the structure.  We 
+C           the array doesn't exist, and create the structure.  We
 C           create all the structure components except the array itself,
 C           and set the BADBITS value explicitly to all ones.
 C
@@ -141,7 +141,7 @@ C
 C
 C        In DST format, .Z.QUALITY is a primitive quality array,
 C        and we don't need to create this since any calling routine
-C        will have failed before now if there was no .Z structure 
+C        will have failed before now if there was no .Z structure
 C        for it to find a main data array in.
 C
       END IF

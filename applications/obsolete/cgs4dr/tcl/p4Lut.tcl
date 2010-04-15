@@ -32,7 +32,7 @@ proc p4Lut {taskname} {
     pack $P4Widgets(SB) -in $frame -side right -fill y
 
 # Load the entry widget with the current lut name
-    set P4Widgets(LUT) [string trim [file tail [nbs get ${P4NoticeBoard}.port_$P4Widgets(PORT_NO).device_lut]]] 
+    set P4Widgets(LUT) [string trim [file tail [nbs get ${P4NoticeBoard}.port_$P4Widgets(PORT_NO).device_lut]]]
     set old_lut $P4Widgets(LUT)
 
 # Load the list box with values

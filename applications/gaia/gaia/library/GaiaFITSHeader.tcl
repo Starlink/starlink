@@ -242,7 +242,7 @@ itcl::class gaia::GaiaFITSHeader {
       }
 
       set length [string length [$listbox get 0]]
-      
+
       for { set n $start_index } { $n < $end_index } { incr n } {
          set row [string tolower [$listbox get $n]]
          if {[catch {regexp -indices $string $row indices} index] } {
@@ -252,7 +252,7 @@ itcl::class gaia::GaiaFITSHeader {
             $tbl select_row $n
             lassign $indices i1 i2
             set i1 [expr {double($i1) + ($i2 - $i1) / 2.}]
-            
+
             lassign [$listbox bbox $n] x0 y0 w h
             set offs [expr {double($length) / $w * [winfo width $w_] / 2.0}]
             set i1 [expr {$i1 - $offs}]
@@ -274,7 +274,7 @@ itcl::class gaia::GaiaFITSHeader {
    protected method update_headers_ {} {
       set search_index_ 0
       set w $itk_component(table)
-      
+
       set headers [$itk_option(-accessor) fitsheaders]
 
       #  TableList needs formatting...
@@ -285,7 +285,7 @@ itcl::class gaia::GaiaFITSHeader {
             lappend info [list END {} {}]
             break
          }
-         if { [lempty $l] } { 
+         if { [lempty $l] } {
             if { ! $lastblank } {
                lappend info [list {} {} {}]
             }
@@ -306,7 +306,7 @@ itcl::class gaia::GaiaFITSHeader {
       [$w component listbox] xview moveto 0.0
    }
 
-   #  Return a tcl list with keyword, value and comment (kvc). 
+   #  Return a tcl list with keyword, value and comment (kvc).
    #  Public proc for re-usability.
    public proc get_kvc { line } {
       #  Use utility parser to handle quoted strings.
@@ -319,7 +319,7 @@ itcl::class gaia::GaiaFITSHeader {
       }
       return [list $key $val $com]
    }
-   
+
    #  Configuration options: (public variables)
    #  ----------------------
 

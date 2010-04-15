@@ -22,7 +22,7 @@
 *           Variable containing a locator associated with a structured
 *           data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive 
+*           Expression specifying the component name of a primitive
 *           object contained in the structure.
 *     MAXVAL=INTEGER
 *           Expression specifying the maximum number of values that can
@@ -100,7 +100,7 @@
 *           Variable containing a locator associated with a structured
 *           data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive 
+*           Expression specifying the component name of a primitive
 *           object contained in the structure.
 *     MAXVAL=INTEGER
 *           Expression specifying the maximum number of values that can
@@ -178,7 +178,7 @@
 *           Variable containing a locator associated with a structured
 *           data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive 
+*           Expression specifying the component name of a primitive
 *           object contained in the structure.
 *     MAXVAL=INTEGER
 *           Expression specifying the maximum number of values that can
@@ -256,7 +256,7 @@
 *           Variable containing a locator associated with a structured
 *           data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive 
+*           Expression specifying the component name of a primitive
 *           object contained in the structure.
 *     MAXVAL=INTEGER
 *           Expression specifying the maximum number of values that can
@@ -334,7 +334,7 @@
 *           Variable containing a locator associated with a structured
 *           data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive 
+*           Expression specifying the component name of a primitive
 *           object contained in the structure.
 *     MAXVAL=INTEGER
 *           Expression specifying the maximum number of values that can

@@ -14,7 +14,7 @@
 
 *  Notes:
 *     - Given the size of the KAPLIBS library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use KAPLIBS from C extend this file (and
 *     kaplibs.h) to include any functions which they need but which are
 *     not already included.
@@ -28,12 +28,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 /* ============= */
 #include "sae_par.h"
 #include "ast.h"
-#include "f77.h"                 
+#include "f77.h"
 #include "star/grp.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
@@ -77,13 +77,13 @@
 /* Wrapper function implementations. */
 /* ================================= */
 
-F77_SUBROUTINE(kpg1_asget)( INTEGER(INDF), INTEGER(NDIM), LOGICAL(EXACT), 
+F77_SUBROUTINE(kpg1_asget)( INTEGER(INDF), INTEGER(NDIM), LOGICAL(EXACT),
                             LOGICAL(TRIM), LOGICAL(REQINV), INTEGER_ARRAY(SDIM),
                             INTEGER_ARRAY(SLBND), INTEGER_ARRAY(SUBND),
                             INTEGER(IWCS), INTEGER(STATUS) );
 
-void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv, 
-                int *sdim, int *slbnd, int *subnd, AstFrameSet **iwcs, 
+void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
+                int *sdim, int *slbnd, int *subnd, AstFrameSet **iwcs,
                 int *status ){
    DECLARE_INTEGER(INDF);
    DECLARE_INTEGER(NDIM);
@@ -243,7 +243,7 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
 F77_SUBROUTINE(kpg1_wrtab)( CHARACTER(PARAM), INTEGER(ARRDIM), INTEGER(NPOS),
                             INTEGER(NAX), DOUBLE_ARRAY(POS), INTEGER(IFRM),
                             INTEGER(IWCS), CHARACTER(TITLE), INTEGER(ID0),
-                            INTEGER_ARRAY(IDENTS), INTEGER(LABS), 
+                            INTEGER_ARRAY(IDENTS), INTEGER(LABS),
                             INTEGER(HIST), LOGICAL(PNULL),
                             INTEGER(STATUS) TRAIL(PARAM) TRAIL(TITLE) );
 
@@ -314,13 +314,13 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
 F77_SUBROUTINE(kpg1_wrcat)( CHARACTER(PARAM), INTEGER(ARRDIM), INTEGER(NPOS),
                             INTEGER(NAX), DOUBLE_ARRAY(POS), INTEGER(IFRM),
                             INTEGER(IWCS), CHARACTER(TITLE), INTEGER(ID0),
-                            INTEGER_ARRAY(IDENTS), INTEGER(KEYMAP), 
+                            INTEGER_ARRAY(IDENTS), INTEGER(KEYMAP),
                             INTEGER(LABS), INTEGER(HIST), LOGICAL(PNULL),
                             INTEGER(STATUS) TRAIL(PARAM) TRAIL(TITLE) );
 
 void kpg1Wrcat( const char *param, int arrdim, int npos, int nax, double *pos,
                 int ifrm, AstFrameSet *iwcs, const char *title, int id0,
-                int *idents, AstKeyMap *keymap, Grp *labs, Grp *hist, 
+                int *idents, AstKeyMap *keymap, Grp *labs, Grp *hist,
                 int pnull, int *status ){
 
    DECLARE_CHARACTER_DYN(PARAM);
@@ -387,16 +387,16 @@ void kpg1Wrcat( const char *param, int arrdim, int npos, int nax, double *pos,
 /* ----------------------------------------------- */
 
 F77_SUBROUTINE(kpg1_rgndf)( CHARACTER(PARAM), INTEGER(MAXSIZ), INTEGER(MINSIZ),
-                            CHARACTER(TEXT), INTEGER(IGRP), INTEGER(SIZE), 
+                            CHARACTER(TEXT), INTEGER(IGRP), INTEGER(SIZE),
                             INTEGER(STATUS) TRAIL(PARAM) TRAIL(TEXT) );
 
 void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
                  const char *text, Grp **grp, size_t *size, int *status ){
 
-   DECLARE_CHARACTER_DYN(PARAM);  
+   DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(MAXSIZ);
    DECLARE_INTEGER(MINSIZ);
-   DECLARE_CHARACTER_DYN(TEXT);  
+   DECLARE_CHARACTER_DYN(TEXT);
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
@@ -416,8 +416,8 @@ void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
                          CHARACTER_ARG(TEXT),
                          INTEGER_ARG(&IGRP),
                          INTEGER_ARG(&SIZE),
-                         INTEGER_ARG(&STATUS) 
-                         TRAIL_ARG(PARAM) 
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM)
                          TRAIL_ARG(TEXT) );
 
 
@@ -433,26 +433,26 @@ void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
 
 /* ----------------------------------------------- */
 
-F77_SUBROUTINE(kpg1_wgndf)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(MAXSIZ), 
-                            INTEGER(MINSIZ), CHARACTER(TEXT), INTEGER(IGRP), 
-                            INTEGER(SIZE), INTEGER(STATUS) TRAIL(PARAM) 
+F77_SUBROUTINE(kpg1_wgndf)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(MAXSIZ),
+                            INTEGER(MINSIZ), CHARACTER(TEXT), INTEGER(IGRP),
+                            INTEGER(SIZE), INTEGER(STATUS) TRAIL(PARAM)
                             TRAIL(TEXT) );
 
-void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz, 
+void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz,
                 size_t minsiz, const char *text, Grp **grp, size_t *size,
                 int *status ){
 
-   DECLARE_CHARACTER_DYN(PARAM);  
+   DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(IGRP0);
    DECLARE_INTEGER(MAXSIZ);
    DECLARE_INTEGER(MINSIZ);
-   DECLARE_CHARACTER_DYN(TEXT);  
+   DECLARE_CHARACTER_DYN(TEXT);
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( grpC2F( grp0, status ), IGRP0 );
- 
+
    F77_CREATE_EXPORT_CHARACTER( param, PARAM );
 
    F77_EXPORT_INTEGER( maxsiz, MAXSIZ );
@@ -469,8 +469,8 @@ void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz,
                          CHARACTER_ARG(TEXT),
                          INTEGER_ARG(&IGRP),
                          INTEGER_ARG(&SIZE),
-                         INTEGER_ARG(&STATUS) 
-                         TRAIL_ARG(PARAM) 
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM)
                          TRAIL_ARG(TEXT) );
 
 
@@ -485,7 +485,7 @@ void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_gtaxv)( CHARACTER(PARAM), 
+F77_SUBROUTINE(kpg1_gtaxv)( CHARACTER(PARAM),
                             INTEGER(MXVAL),
                             LOGICAL(EXACT),
                             INTEGER(FRAME),
@@ -540,7 +540,7 @@ void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
 F77_SUBROUTINE(kpg1_gilst)( INTEGER(LONUM),
                             INTEGER(UPNUM),
                             INTEGER(MAXLIN),
-                            CHARACTER(PARAM), 
+                            CHARACTER(PARAM),
                             INTEGER_ARRAY(FLAG),
                             INTEGER_ARRAY(NUMBER),
                             INTEGER(NDISP),
@@ -548,7 +548,7 @@ F77_SUBROUTINE(kpg1_gilst)( INTEGER(LONUM),
                             TRAIL(PARAM) );
 
 
-void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param, 
+void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param,
                 int *flag, int *number, int *ndisp, int *status ){
    DECLARE_INTEGER(LONUM);
    DECLARE_INTEGER(UPNUM);
@@ -593,14 +593,14 @@ void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_darad)( CHARACTER(PARAM), 
+F77_SUBROUTINE(kpg1_darad)( CHARACTER(PARAM),
                             INTEGER(EL),
-                            DOUBLE_ARRAY(ARRAY), 
-                            CHARACTER(METHDS), 
+                            DOUBLE_ARRAY(ARRAY),
+                            CHARACTER(METHDS),
                             LOGICAL(BAD),
-                            DOUBLE(LOWER), 
+                            DOUBLE(LOWER),
                             DOUBLE(UPPER),
-                            INTEGER(STATUS) 
+                            INTEGER(STATUS)
                             TRAIL(PARAM)
                             TRAIL(METHDS) );
 

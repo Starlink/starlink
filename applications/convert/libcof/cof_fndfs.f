@@ -20,12 +20,12 @@
 *     FC = INTEGER (Given)
 *        An AST pointer to the FitsChan.
 *     OBJ = INTEGER (Given)
-*        The AST pointer to the FrameSet. 
+*        The AST pointer to the FrameSet.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     -  The FitsChan is not rewound before reading. The first read starts at 
+*     -  The FitsChan is not rewound before reading. The first read starts at
 *     the current Card in the FitsChan.
 *     -  No value is set for the FitsChan Encoding attribute.
 *     -  OBJ is returned equal to AST__NULL if no FrameSet can be read

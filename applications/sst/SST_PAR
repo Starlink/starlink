@@ -41,7 +41,7 @@
       PARAMETER ( SST__MXLIN = 5000 )
 
 *  Printable backslash: some compilers need '\\' to get '\', which
-*  isn't a problem as Fortran will truncate the string '\\' to '\' 
+*  isn't a problem as Fortran will truncate the string '\\' to '\'
 *  on the occasions when that isn't needed.
       CHARACTER * ( 1 ) SST__BKSLH
       PARAMETER ( SST__BKSLH = '\\' )

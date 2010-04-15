@@ -10,7 +10,7 @@ C     Function:
 C        Apply flux calibration to an infrared polarization spectrum
 C
 C     Description:
-C        IRFLUX flux calibrates a polarization spectrum using a 
+C        IRFLUX flux calibrates a polarization spectrum using a
 C        calibration spectrum (normally a standard star observation)
 C        which is assumed to be a black body.
 C        The parameters of the black body are specified as a temperature,
@@ -41,7 +41,7 @@ C
 C-
 C
 C  History:
-C    20/9/1990   Original Version.   JAB/AAO 
+C    20/9/1990   Original Version.   JAB/AAO
 C
 
       IMPLICIT NONE
@@ -63,12 +63,12 @@ C
       CHARACTER*(DAT__SZLOC) CELOC,DELOC
       CHARACTER*64 LABEL,UNITS
       LOGICAL OK,QZ,UZ,VZ
-      INTEGER SIZE,NUM,STAT                                        
+      INTEGER SIZE,NUM,STAT
       REAL FLAM,WAVE,MAG,TEMP
       CHARACTER*1 CALTYPE
       INTEGER ICH_LEN
       LOGICAL ERROR1,ERROR2
-                         
+
 *  Get the Input data
 
       CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
@@ -76,7 +76,7 @@ C
 *  Access the calibration frame
 
       CALL DAT_ASSOC('CALSPECT','READ',CLOC,STATUS)
-      
+
 *  Get the data size
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -86,7 +86,7 @@ C
 *  Get Label and Units for data
 
          CALL TSP_RLU(CLOC,LABEL,UNITS,STATUS)
-            
+
 *  Map data array
 
          CALL TSP_MAP_DATA(CLOC,'READ',CPTR,CDLOC,STATUS)
@@ -94,7 +94,7 @@ C
              CALL MSG_OUT(' ','Error Mapping calibration data',STATUS)
              STATUS = USER__001
              GOTO 100
-         ENDIF        
+         ENDIF
 
 *  Map the variance array if there is one, otherwise map a dummy array
 
@@ -117,42 +117,42 @@ C
          CALL CHR_UCASE(CALTYPE)
 
 *  Is it one of the standard bands
-         IF (CALTYPE .EQ. 'J' .OR. CALTYPE .EQ. 'K' .OR.                   
-     :        CALTYPE .EQ. 'H' .OR. CALTYPE .EQ. 'L' .OR.                   
-     :        CALTYPE .EQ. 'M') THEN 
+         IF (CALTYPE .EQ. 'J' .OR. CALTYPE .EQ. 'K' .OR.
+     :        CALTYPE .EQ. 'H' .OR. CALTYPE .EQ. 'L' .OR.
+     :        CALTYPE .EQ. 'M') THEN
 
-*  Get the magnitude of the standard                                       
+*  Get the magnitude of the standard
               CALL PAR_GET0R('MAG',MAG,STATUS)
 
-*  and calculate the zero point and set the wavelength                  
-              IF (CALTYPE .EQ. 'J') THEN                                    
-                  FLAM = 1650000*10**(-0.4*MAG)                             
-                  WAVE = 1.25                                               
-              ELSE IF (CALTYPE .EQ. 'H') THEN                               
-                  FLAM = 1060000*10**(-0.4*MAG)                             
-                  WAVE = 1.64                                               
-              ELSE IF (CALTYPE .EQ. 'K') THEN                               
-                  FLAM = 650000*10**(-0.4*MAG)                              
-                  WAVE = 2.2                                                
-              ELSE IF (CALTYPE .EQ. 'L') THEN                               
-                  FLAM = 250000*10**(-0.4*MAG)                              
-                  WAVE = 3.8                                                
-              ELSE IF (CALTYPE .EQ. 'M') THEN                               
-                  FLAM = 150000*10**(-0.4*MAG)                              
-                  WAVE = 4.8                                                
-              ENDIF                                   
-    
+*  and calculate the zero point and set the wavelength
+              IF (CALTYPE .EQ. 'J') THEN
+                  FLAM = 1650000*10**(-0.4*MAG)
+                  WAVE = 1.25
+              ELSE IF (CALTYPE .EQ. 'H') THEN
+                  FLAM = 1060000*10**(-0.4*MAG)
+                  WAVE = 1.64
+              ELSE IF (CALTYPE .EQ. 'K') THEN
+                  FLAM = 650000*10**(-0.4*MAG)
+                  WAVE = 2.2
+              ELSE IF (CALTYPE .EQ. 'L') THEN
+                  FLAM = 250000*10**(-0.4*MAG)
+                  WAVE = 3.8
+              ELSE IF (CALTYPE .EQ. 'M') THEN
+                  FLAM = 150000*10**(-0.4*MAG)
+                  WAVE = 4.8
+              ENDIF
+
 *  If it is flux at agiven wvelength get the flux and wavelength
-          ELSE IF (CALTYPE .EQ. 'F') THEN                                   
-              CALL PAR_GET0R('FLUX',FLAM,STATUS)                  
-              CALL PAR_GET0R('WAVE',WAVE,STATUS)                  
-          ELSE                                                              
+          ELSE IF (CALTYPE .EQ. 'F') THEN
+              CALL PAR_GET0R('FLUX',FLAM,STATUS)
+              CALL PAR_GET0R('WAVE',WAVE,STATUS)
+          ELSE
 
 *  Otherwise CALTYPE is illegal
               CALL MSG_OUT(' ','CALTYPE must be J, H, K, L, M or F',
-     :              STATUS)  
-              GO TO 500                                                     
-          ENDIF                                                             
+     :              STATUS)
+              GO TO 500
+          ENDIF
 
 *  Get the output file
          CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -171,7 +171,7 @@ C
 
 *  Map axis array and data
          CALL TSP_MAP_LAMBDA(OLOC,'READ',XPTR,XLOC,STATUS)
-         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)
 
 *  Map the variance array if there is one, otherwise map a dummy array
          CALL TSP_MAP_VAR(OLOC,'UPDATE',DEPTR,DELOC,STATUS)
@@ -192,13 +192,13 @@ C
 
 *  Unmap the arrays
          CALL TSP_UNMAP(DELOC,STATUS)
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Write label and units for calibrated data
          LABEL = 'Flux'
          Units = 'mJy'
          CALL TSP_WLU(OLOC,LABEL,UNITS,STATUS)
-                                        
+
 *  Calibrate the Stokes parameters, and variances if present
          CALL TSP_STOKES(OLOC,NUM,QZ,UZ,VZ,STATUS)
          IF (QZ) THEN
@@ -206,7 +206,7 @@ C
 *   Q Stokes parameter
              CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
 
-*   Map the data and variance 
+*   Map the data and variance
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DEPTR,DELOC,STATUS)
              IF (STATUS .NE. SAI__OK) THEN
@@ -226,7 +226,7 @@ C
 
 *   Unmap arrays
              CALL TSP_UNMAP(DELOC,STATUS)
-             CALL TSP_UNMAP(DLOC,STATUS)        
+             CALL TSP_UNMAP(DLOC,STATUS)
              CALL DAT_ANNUL(SLOC,STATUS)
          ENDIF
          IF (UZ) THEN
@@ -255,7 +255,7 @@ C
 *  Unmap arrays
              CALL TSP_UNMAP(DELOC,STATUS)
              CALL TSP_UNMAP(DLOC,STATUS)
-             CALL DAT_ANNUL(SLOC,STATUS)        
+             CALL DAT_ANNUL(SLOC,STATUS)
          ENDIF
          IF (VZ) THEN
 
@@ -283,7 +283,7 @@ C
 *  Unmap arrays
              CALL TSP_UNMAP(DELOC,STATUS)
              CALL TSP_UNMAP(DLOC,STATUS)
-             CALL DAT_ANNUL(SLOC,STATUS)        
+             CALL DAT_ANNUL(SLOC,STATUS)
          ENDIF
 
 *  Unmap arrays and annul locators
@@ -300,7 +300,7 @@ C
 100   CONTINUE
       END
 
-      
+
       SUBROUTINE TSP_IRFLUX(ERROR1,ERROR2,N,FLAM,WAVE,TEMP,STAR,ESTAR,
      :     STAN,ESTAN,LAMBDA)
 C+
@@ -335,7 +335,7 @@ C
       REAL FLAM,WAVE,TEMP
       REAL STAR(N), ESTAR(N), STAN(N), ESTAN(N), LAMBDA(N)
 C
-C     Local variables      
+C     Local variables
 C
       INTEGER I
       REAL E1, E2, F
@@ -373,7 +373,7 @@ C
          ESTAR(I) = VAL__BADR
         ENDIF
       ENDDO
-      END       
+      END
 
 
 
@@ -390,7 +390,7 @@ C     (>)  FLAM     (Real)        Flux at wavelength WAVE
 C     (>)  WAVE     (Real)        Wavelength at which flux is FLAM
 C     (>)  TEMP     (Real)        Black body temperature
 C     (>)  L        (Real)        Wavelength to calculate result for
-C     
+C
 C     Returns   LFLUX   (Real)    Flux at wavelenght L
 C
 C     Jeremy Bailey    20/9/1990
@@ -408,6 +408,6 @@ C
 C
 C     Convert to mJy
 C
-      LFLUX=(F*FLAM)/F22                 
+      LFLUX=(F*FLAM)/F22
       END
 

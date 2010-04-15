@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
 *  Check inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the accumulators. 
+*  Initialise the accumulators.
       SX = 0.0
       SY = 0.0
       SX2 = 0.0
@@ -185,13 +185,13 @@
                NDGOOD = NDGOOD + 1
             END IF
  20      CONTINUE
-         
+
          SS = REAL( NDGOOD )
       ELSE IF ( MWT .EQ. 1 ) THEN
-         
+
 *  Weighted fit.
          SS = 0.0
-         
+
 *  Calculate the summations.
          DO 10 I = 1, NDATA
             IF ( REAL( X( I ) ) .GE. XMIN .AND.
@@ -244,21 +244,21 @@
       SIGB = SQRT( SS / DELTA )
       XMEAN = SX / SS
       YMEAN = SY / SS
-      XSIG = SQRT( ( SX2 - SX**2/SS ) * REAL( NDGOOD ) 
+      XSIG = SQRT( ( SX2 - SX**2/SS ) * REAL( NDGOOD )
      :             / ( SS * REAL( NDGOOD - 1 ) ) )
       YSIG = SQRT( ( SY2 - SY**2/SS ) * REAL( NDGOOD )
      :             / ( SS * REAL( NDGOOD - 1 ) ) )
-      
+
 *  Calculate chi-squared.
       CHI2 = 0.0
-      
+
       IF ( MWT .EQ. 0 ) THEN
          DO 50 I = 1, NDATA
-            IF ( REAL( X( I ) ) .GE. XMIN .AND. 
-     :           REAL( X( I ) ) .LE. XMAX .AND. 
-     :           REAL( Y( I ) ) .GE. YMIN .AND. 
+            IF ( REAL( X( I ) ) .GE. XMIN .AND.
+     :           REAL( X( I ) ) .LE. XMAX .AND.
+     :           REAL( Y( I ) ) .GE. YMIN .AND.
      :           REAL( Y( I ) ) .LE. YMAX ) THEN
-               CHI2 = CHI2 + 
+               CHI2 = CHI2 +
      :                ( REAL( Y( I ) ) - A - B * REAL( X( I ) ) )**2
             END IF
  50      CONTINUE
@@ -280,7 +280,7 @@
       END IF
 
 *  Calculate the product moment correlation coefficient.
-      R = ( SXY - SX*SY/SS ) / 
+      R = ( SXY - SX*SY/SS ) /
      :     SQRT( ( SX2 - SX**2/SS ) * ( SY2 - SY**2/SS ) )
 
 *  Return two dummy results for future use.

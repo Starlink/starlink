@@ -144,7 +144,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
           next.diff = diff;
           next.index = i;
         }
-      } 
+      }
     }
   }
 

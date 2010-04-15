@@ -160,7 +160,7 @@
       UBNDS( 3 ) = UBND( 3 )
       CALL NDF_SECT( IDIN, NDIM, LBNDS, UBNDS, IDSECT, STATUS )
 
-      CALL NDF_PROP( IDSECT, 'Quality,Units,Label,Axis,WCS', 'OUT', 
+      CALL NDF_PROP( IDSECT, 'Quality,Units,Label,Axis,WCS', 'OUT',
      :               IDOUT, STATUS )
 
 *  Map the data components.
@@ -168,7 +168,7 @@
       CALL NDF_MAP( IDOUT, 'DATA', TYPE, 'WRITE', IPOUT, EL, STATUS )
 
 *  Get workspace for storing mask.
-      CALL PSX_CALLOC( DIMS( 1 ) * DIMS( 2 ), '_INTEGER', IPMASK, 
+      CALL PSX_CALLOC( DIMS( 1 ) * DIMS( 2 ), '_INTEGER', IPMASK,
      :                 STATUS )
 
 *  See if we should ignore the origin information for the ARD
@@ -187,44 +187,44 @@
       REGVAL = 2
       TRCOEF( 1 ) = VAL__BADR
       CALL ARD_WORK( IGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI,
      :               LBNDE, UBNDE, STATUS )
 
 *  Now calculate the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL GAI1_ARDSPB( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
+         CALL GAI1_ARDSPB( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                     DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL GAI1_ARDSPUB( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                      %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
+         CALL GAI1_ARDSPUB( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                      %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                      DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL GAI1_ARDSPW( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
+         CALL GAI1_ARDSPW( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                     DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL GAI1_ARDSPUW( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                      %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
+         CALL GAI1_ARDSPUW( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                      %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                      DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL GAI1_ARDSPI( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
+         CALL GAI1_ARDSPI( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                     DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL GAI1_ARDSPR( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
+         CALL GAI1_ARDSPR( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                     DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL GAI1_ARDSPD( BAD, %VAL( CNF_PVAL( IPIN ) ), 
-     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ), 
-     :                     DIMS( 2 ), DIMS( 3 ), 
+         CALL GAI1_ARDSPD( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
+     :                     DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       END IF
 

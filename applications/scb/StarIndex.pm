@@ -14,13 +14,13 @@ package StarIndex;
 #     use StarIndex;
 
 #  Description:
-#     This module provides an object class for accessing a disk-based 
-#     set of entries indexed by keyname and Starlink package name, 
+#     This module provides an object class for accessing a disk-based
+#     set of entries indexed by keyname and Starlink package name,
 #     hence something like a hash of hashes.  The keyname is typically
-#     the name of a source file or of a function, and the value of each 
-#     entry is a file location, stored as a "logical pathname".  
+#     the name of a source file or of a function, and the value of each
+#     entry is a file location, stored as a "logical pathname".
 #
-#     Internally, this is implemented as a hash in which each key is 
+#     Internally, this is implemented as a hash in which each key is
 #     the keyname (file or function name), and each value is a space-
 #     separated list of locations, not more than one location per package.
 #     Thus flattened from a hash of hashes to a hash of strings, it
@@ -28,17 +28,17 @@ package StarIndex;
 #     The task of turning the space-separated list of locations into
 #     a hash is dealt with by routines in this module at such time as
 #     they are read or written.
-# 
+#
 #     Logical pathnames (location format):
 #        A logical pathname is a generalisation of a Unix pathname; most
-#        characters have their own literal meaning, but some metacharacters 
+#        characters have their own literal meaning, but some metacharacters
 #        are defined:
 #
 #           '/'  signifies inclusion in a directory (as in a Unix pathname)
 #           '>'  signifies inclusion in a (possibly compressed) tar archive
 #           '#'  signifies inclusion in a Starlink package
 #
-#        The sequence 'package#' may only appear at the start of the 
+#        The sequence 'package#' may only appear at the start of the
 #        logical path.  The others may be nested arbitrarily.  Example
 #        logical pathnames are thus:
 #
@@ -46,7 +46,7 @@ package StarIndex;
 #           figaro#figaro_applic.tar.Z>applic/bclean.f
 #
 #        The meaning of inclusion in a directory or in a tarfile should be
-#        obvious.  Inclusion in a Starlink package is normally interpreted 
+#        obvious.  Inclusion in a Starlink package is normally interpreted
 #        as inclusion in a directory, or in a (possibly compressed) tarfile
 #        under the Starlink source directory, so that:
 #
@@ -54,7 +54,7 @@ package StarIndex;
 #
 #        is equivalent to one of
 #
-#           $srcdir/package/ 
+#           $srcdir/package/
 #           $srcdir/package.tar>
 #           $srcdir/package.tar.Z>
 #           $srcdir/package.tar.gz>
@@ -63,28 +63,28 @@ package StarIndex;
 #        has a value of '/star/sources'.
 #
 #        As a special case however, partly to accomodate pseudo-packages
-#        (such as the include directory, which is likely to be at 
+#        (such as the include directory, which is likely to be at
 #        /star/include and not under $srcdir), if the string 'package#'
 #        is a key in the StarIndex object stored in $file_indexfile,
-#        then the value associated with it may be used as the meaning 
+#        then the value associated with it may be used as the meaning
 #        of the 'package#' prefix.  Thus if the $file_indexfile StarIndex
 #        object contains the (key => value) pair
 #
 #           'INCLUDE#'  =>  '/star/include'
 #
 #        then the logical pathname 'INCLUDE#f77.h' may be taken to mean
-#        '/star/include/f77.h'.  
-#        Although documented here, this mapping is not carried out in 
+#        '/star/include/f77.h'.
+#        Although documented here, this mapping is not carried out in
 #        this module.  It is up to the application to decide in which
-#        order these options should be used to find a meaning for the 
+#        order these options should be used to find a meaning for the
 #        'package#' prefix.
 
 #  Implementation:
 #     The hash is tied to a disk-based DBM file of some kind to implement
-#     the index.  Depending on the DBM library used, this sometimes 
+#     the index.  Depending on the DBM library used, this sometimes
 #     imposes some undesirable limits; in particular maximum size of
-#     key+value of one entry in the hash.  This module will use 
-#     GDBM_File or DB_File if they exist, which do not suffer from 
+#     key+value of one entry in the hash.  This module will use
+#     GDBM_File or DB_File if they exist, which do not suffer from
 #     these limits.  Otherwise it will fall back on one of the others
 #     (NDBM_File or SDBM_File - the latter guaranteed to exist), and
 #     large writes will fail.
@@ -120,9 +120,9 @@ use Scb qw/:DEFAULT error/;
 use Fcntl;
 
 #  Manipulate the AnyDBM_File preference list of what database access to
-#  use - by default NDBM_File is first preference.  We prefer GDBM_File 
-#  and DB_File because they have no limits on key+value size, while the 
-#  others tend to have a limit of around 1024 bytes, which can cause 
+#  use - by default NDBM_File is first preference.  We prefer GDBM_File
+#  and DB_File because they have no limits on key+value size, while the
+#  others tend to have a limit of around 1024 bytes, which can cause
 #  writes to fail.  Then set $Dbmtype to the type of access actually used.
 
 BEGIN { @AnyDBM_File::ISA = qw/DB_File GDBM_File NDBM_File SDBM_File/ }
@@ -187,11 +187,11 @@ sub new {
 #  to what type of DBM access we are using, the flags may be different.
 
    my %fmode = ($Dbmtype eq 'GDBM_File')
-      ?  
+      ?
          ( 'read'    => &GDBM_File::GDBM_READER(),
            'update'  => &GDBM_File::GDBM_WRCREAT(),
            'new'     => &GDBM_File::GDBM_NEWDB() )
-      :  
+      :
          ( 'read'    => O_RDONLY,
            'update'  => O_RDWR | O_CREAT,
            'new'     => O_RDWR | O_CREAT | O_TRUNC )
@@ -211,10 +211,10 @@ sub new {
 #     easy, since the name it is given will depend on the implementation
 #     of the DBM library (e.g. it might be called just plain $indexfile, or
 #     "$indexfile.db", or be a pair of files $indexfile.{dir,pag}, or ....
-#     We make a reasonably inclusive assumption about the form of the file 
+#     We make a reasonably inclusive assumption about the form of the file
 #     name(s).
 
-      my @indexfiles = 
+      my @indexfiles =
          grep /^$indexfile(\.(db\w*|dir|pag))?$/, glob ("$indexfile*");
       $indexfile =~ m%(.*)/%;
       my $indexdir = $1 || '.';
@@ -280,11 +280,11 @@ sub finish {
 #  Description:
 #     Tidies up after use of a StarIndex object, in particular ensuring
 #     that updates have been flushed from memory to disk.  This method
-#     does not need to be called if the program is exited normally, but 
+#     does not need to be called if the program is exited normally, but
 #     in the event of an abnormal exit, some DBM libraries (e.g. GDBM
 #     in GDBM_FAST mode, and NDBM on Linux, which is effectively the
-#     same thing) will leave the DBM file corrupted.  Thus it is a good 
-#     idea to call it.  After this call the StarIndex object can no 
+#     same thing) will leave the DBM file corrupted.  Thus it is a good
+#     idea to call it.  After this call the StarIndex object can no
 #     longer be used.
 
 #  Arguments:
@@ -340,10 +340,10 @@ sub get {
 #     Retrieves a value from a StarIndex object given the key and,
 #     optionally, a required or a hinted Starlink package name.
 #
-#     If only the name is supplied, then in array context a list of 
-#     the entries for that name in all packages is returned, and in 
-#     scalar context just one of them (effectively at random). 
-#     A null value (undef or an empty list according to context) is 
+#     If only the name is supplied, then in array context a list of
+#     the entries for that name in all packages is returned, and in
+#     scalar context just one of them (effectively at random).
+#     A null value (undef or an empty list according to context) is
 #     returned if the key does not exist.
 #
 #     If the 'packmust => $package' option is given, then if a value
@@ -351,7 +351,7 @@ sub get {
 #     returned, else undef is returned.
 #
 #     If the 'packpref => $package' option is given, then if a value
-#     in the specified package exists for the specified key it is 
+#     in the specified package exists for the specified key it is
 #     returned, if it only exists in some other package then that is
 #     returned, otherwise undef is returned.
 
@@ -505,18 +505,18 @@ sub put {
 #        Logical pathname of item's location.
 
 #  Return value:
-#     Returns true (1) if the write was a success or false (0) if it 
+#     Returns true (1) if the write was a success or false (0) if it
 #     failed.
 
 #  Notes:
-#     Depending on the implementation the of DBM library underlying 
+#     Depending on the implementation the of DBM library underlying
 #     the Perl tie() function, writing records can generate an error
-#     if the size of the key plus value exceeds a block size. 
-#     This limiting size is 1024 bytes for genuine NDBM (used on 
-#     Solaris and Digital Unix).  There is no limit for the GNU 
+#     if the size of the key plus value exceeds a block size.
+#     This limiting size is 1024 bytes for genuine NDBM (used on
+#     Solaris and Digital Unix).  There is no limit for the GNU
 #     implementation GDBM, which underlies the NDBM implementation on
 #     Linux.  If GDBM were used on the other platforms this would not
-#     be a problem, but it does not exist by default on Solaris and 
+#     be a problem, but it does not exist by default on Solaris and
 #     Digital Unix.
 
 #  Copyright:
@@ -572,7 +572,7 @@ sub put {
    }
    else {
 
-#     No value for given name exists, new entry simply becomes the given 
+#     No value for given name exists, new entry simply becomes the given
 #     location.
 
       $newloc = $location;
@@ -618,9 +618,9 @@ sub delete {
 #     $starindex->delete($name);
 
 #  Description:
-#     Removes an entry with a given name, and optionally a given package, 
+#     Removes an entry with a given name, and optionally a given package,
 #     from a StarIndex object.  If the package argument is not given,
-#     then the whole name entry is deleted.  It is not an error to 
+#     then the whole name entry is deleted.  It is not an error to
 #     call this method when the item specified does not exist.
 
 #  Arguments:
@@ -665,7 +665,7 @@ sub delete {
       return;
    }
 
-#  Otherwise delete only entries for the package in question; make a 
+#  Otherwise delete only entries for the package in question; make a
 #  list of all the entries that are to be retained, that is all except
 #  the one from the specified package.
 
@@ -738,14 +738,14 @@ sub each {
 #        Logical pathname of the item's location.
 
 #  Notes:
-#     The iterator is based on Perl's core 'each' function, and is 
+#     The iterator is based on Perl's core 'each' function, and is
 #     subject to the restrictions of that.  In particular the order in
-#     which the pairs are returned is undefined, only one iterator 
+#     which the pairs are returned is undefined, only one iterator
 #     can exist for each object, and new entries must not be added to
 #     the object while the iterator is running.  The Perl documentation
 #     suggests that it should be permissible to delete entries while
 #     the iterator is running, but at least with the tie implemented
-#     using NDBM_File, this seems to cause problems.  The 'delpack' 
+#     using NDBM_File, this seems to cause problems.  The 'delpack'
 #     method is supplied instead for this purpose.
 
 #  Copyright:
@@ -773,7 +773,7 @@ sub each {
 
    if ($package) {
 
-#     If package name has been given, go through hash record by record 
+#     If package name has been given, go through hash record by record
 #     until one is found with an entry for the requested package (there
 #     is never more than one entry per package per record).
 
@@ -831,11 +831,11 @@ sub delpack {
 #  Return value:
 
 #  Notes:
-#     The functionality of this routine could *in principle* be 
-#     obtained by using a short loop with StarIndex::each and 
+#     The functionality of this routine could *in principle* be
+#     obtained by using a short loop with StarIndex::each and
 #     StarIndex::delete; however, the NDBM_File hash tie implementation
-#     doesn't seem to like mixing the each() and delete() functions.  
-#     Thus it is implemented here by separately assembling the list of 
+#     doesn't seem to like mixing the each() and delete() functions.
+#     Thus it is implemented here by separately assembling the list of
 #     entries to delete and deleting them all at once.
 
 #  Copyright:

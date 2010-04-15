@@ -20,7 +20,7 @@
  *                                     line. Work based on the
  *                                     tkCanvSeg patch by Scott Schwartz
  *                                     <schwartz@cs.psu.edu>.
- *                     27 April  1999: 
+ *                     27 April  1999:
  *                                     Further modifications to
  *                                     improve efficiency when
  *                                     plotting large numbers of
@@ -35,7 +35,7 @@
  *                   19 February 2008: Add support for a line style.
  */
 #if HAVE_CONFIG_H
-#include <config.h> 
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -197,7 +197,7 @@ static Tk_ConfigSpec configSpecs[] = {
         TK_CONFIG_DONT_SET_DEFAULT, &arrowShapeOption},
     {TK_CONFIG_CAP_STYLE, "-capstyle", (char *) NULL, (char *) NULL,
         "butt", Tk_Offset(SegmentItem, capStyle), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_CUSTOM, "-dash", (char *) NULL, (char *) NULL, (char *) NULL, 
+    {TK_CONFIG_CUSTOM, "-dash", (char *) NULL, (char *) NULL, (char *) NULL,
      Tk_Offset(SegmentItem, dash), TK_CONFIG_NULL_OK, &dashOption},
     {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL,
         "black", Tk_Offset(SegmentItem, fg), TK_CONFIG_NULL_OK},
@@ -276,8 +276,8 @@ static char *dashes[] = { dot, dash, dotdash };
 /*  Definitions etc. for backdoor command which allows coordinates to
     be passed without conversion to string */
 
-void RtdSegmentSetCoords( Tcl_Interp *interp, int append, 
-                          const double *x, const double *y, 
+void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
+                          const double *x, const double *y,
                           int numPoints );
 static Tk_Canvas lastCanvas_;
 static Tk_Item *lastItem_ = NULL;
@@ -492,7 +492,7 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
         numCoords = 2*linePtr->numPoints;
         if (linePtr->firstArrowPtr != NULL) {
             coordPtr = linePtr->firstArrowPtr;
-        } 
+        }
         else {
             coordPtr = linePtr->coordPtr;
         }
@@ -508,8 +508,8 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
         }
         return TCL_OK;
     }
-    
-    /*  Check if first word is null, if so do nothing, this is just to 
+
+    /*  Check if first word is null, if so do nothing, this is just to
         make sure the lastCanvas_ and lastItem_ variables are correct
         for the coordinates that will use RtdSegmentSetCoords */
     if ( *argv[0] == 'n' ) {
@@ -531,13 +531,13 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
                        "too few coordinates for line: must have at least 4",
                        (char *) NULL);
       return TCL_ERROR;
-    } 
+    }
     else if (argcLocal & 3) {
       Tcl_AppendResult(interp,
                        "number of coordinates not a multiple of 4",
                        (char *) NULL);
       return TCL_ERROR;
-    } 
+    }
     else {
       numPoints = argcLocal/2;
       if ( adding ) {
@@ -554,7 +554,7 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
             return TCL_ERROR;
           }
         }
-      } 
+      }
       else {
         if (linePtr->numPoints != numPoints) {
           if (linePtr->coordPtr != NULL) {
@@ -640,7 +640,7 @@ ConfigureLine(interp, canvas, itemPtr, argc, argv, flags)
 
     if (linePtr->fg == NULL) {
         newGC = arrowGC = None;
-    } 
+    }
     else {
         gcValues.foreground = linePtr->fg->pixel;
         gcValues.join_style = linePtr->joinStyle;
@@ -691,7 +691,7 @@ ConfigureLine(interp, canvas, itemPtr, argc, argv, flags)
 
     if (linePtr->splineSteps < 1) {
         linePtr->splineSteps = 1;
-    } 
+    }
     else if (linePtr->splineSteps > 100) {
         linePtr->splineSteps = 100;
     }
@@ -943,7 +943,7 @@ RtdSegmentDisplay(canvas, itemPtr, display, drawable, x, y, width, height)
 
     if (numSegments <= MAX_STATIC_POINTS/2) {
         segmentPtr = staticSegments;
-    } 
+    }
     else {
         segmentPtr = (XSegment *)
           ckalloc((unsigned) (numSegments * sizeof(XSegment)));
@@ -970,11 +970,11 @@ RtdSegmentDisplay(canvas, itemPtr, display, drawable, x, y, width, height)
         Tk_CanvasSetStippleOrigin(canvas, linePtr->arrowGC);
     }
 
-    /* 
+    /*
      * Same for dashing.
      */
     if ( linePtr->dash[0] != '\0' ) {
-        XSetDashes( display, linePtr->gc, 0, linePtr->dash,  
+        XSetDashes( display, linePtr->gc, 0, linePtr->dash,
                     strlen( linePtr->dash ) );
     }
 
@@ -1032,7 +1032,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
         if (numPoints <= MAX_STATIC_POINTS) {
             linePoints = staticSpace;
-        } 
+        }
         else {
             linePoints = (double *) ckalloc((unsigned)
                     (2*numPoints*sizeof(double)));
@@ -1040,7 +1040,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
                 linePtr->numPoints, linePtr->splineSteps, (XPoint *) NULL,
                 linePoints);
-    } 
+    }
     else {
         numPoints = linePtr->numPoints;
         linePoints = linePtr->coordPtr;
@@ -1070,7 +1070,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } 
+            }
             else if (dist < bestDist) {
                 bestDist = dist;
             }
@@ -1085,13 +1085,13 @@ LineToPoint(canvas, itemPtr, pointPtr)
         if (count == numPoints) {
             TkGetButtPoints(coordPtr+2, coordPtr, (double) linePtr->width,
                     linePtr->capStyle == CapProjecting, poly, poly+2);
-        } 
+        }
         else if ((linePtr->joinStyle == JoinMiter) && !changedMiterToBevel) {
             poly[0] = poly[6];
             poly[1] = poly[7];
             poly[2] = poly[4];
             poly[3] = poly[5];
-        } 
+        }
         else {
             TkGetButtPoints(coordPtr+2, coordPtr, (double) linePtr->width, 0,
                     poly, poly+2);
@@ -1110,7 +1110,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
                 if (dist <= 0.0) {
                     bestDist = 0.0;
                     goto done;
-                } 
+                }
                 else if (dist < bestDist) {
                     bestDist = dist;
                 }
@@ -1120,7 +1120,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
         if (count == 2) {
             TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width,
                     linePtr->capStyle == CapProjecting, poly+4, poly+6);
-        } 
+        }
         else if (linePtr->joinStyle == JoinMiter) {
             if (TkGetMiterPoints(coordPtr, coordPtr+2, coordPtr+4,
                     (double) linePtr->width, poly+4, poly+6) == 0) {
@@ -1128,7 +1128,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
                 TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width,
                         0, poly+4, poly+6);
             }
-        } 
+        }
         else {
             TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width, 0,
                     poly+4, poly+6);
@@ -1139,7 +1139,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
         if (dist <= 0.0) {
             bestDist = 0.0;
             goto done;
-        } 
+        }
         else if (dist < bestDist) {
             bestDist = dist;
         }
@@ -1156,7 +1156,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
         if (dist <= 0.0) {
             bestDist = 0.0;
             goto done;
-        } 
+        }
         else if (dist < bestDist) {
             bestDist = dist;
         }
@@ -1173,7 +1173,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } 
+            }
             else if (dist < bestDist) {
                 bestDist = dist;
             }
@@ -1184,7 +1184,7 @@ LineToPoint(canvas, itemPtr, pointPtr)
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } 
+            }
             else if (dist < bestDist) {
                 bestDist = dist;
             }
@@ -1242,7 +1242,7 @@ LineToArea(canvas, itemPtr, rectPtr)
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
         if (numPoints <= MAX_STATIC_POINTS) {
             linePoints = staticSpace;
-        } 
+        }
         else {
             linePoints = (double *) ckalloc((unsigned)
                     (2*numPoints*sizeof(double)));
@@ -1250,7 +1250,7 @@ LineToArea(canvas, itemPtr, rectPtr)
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
                 linePtr->numPoints, linePtr->splineSteps, (XPoint *) NULL,
                 linePoints);
-    } 
+    }
     else {
         numPoints = linePtr->numPoints;
         linePoints = linePtr->coordPtr;
@@ -1589,7 +1589,7 @@ ConfigureArrows(canvas, linePtr)
         length = hypot(dx, dy);
         if (length == 0) {
             sinTheta = cosTheta = 0.0;
-        } 
+        }
         else {
             sinTheta = dy/length;
             cosTheta = dx/length;
@@ -1636,7 +1636,7 @@ ConfigureArrows(canvas, linePtr)
         length = hypot(dx, dy);
         if (length == 0) {
             sinTheta = cosTheta = 0.0;
-        } 
+        }
         else {
             sinTheta = dy/length;
             cosTheta = dx/length;
@@ -1719,12 +1719,12 @@ RtdSegmentToPostscript(interp, canvas, itemPtr, prepass)
                 Tk_CanvasPsY(canvas, coordPtr[3]));
         Tcl_AppendResult(interp, buffer, (char *) NULL);
       }
-    } 
+    }
     else {
         if (linePtr->fillStipple == None) {
             TkMakeBezierPostscript(interp, canvas, linePtr->coordPtr,
                     linePtr->numPoints);
-        } 
+        }
         else {
             /*
              * Special hack: Postscript printers don't appear to be able
@@ -1764,7 +1764,7 @@ RtdSegmentToPostscript(interp, canvas, itemPtr, prepass)
     style = "0 setlinecap\n";
     if (linePtr->capStyle == CapRound) {
         style = "1 setlinecap\n";
-    } 
+    }
     else if (linePtr->capStyle == CapProjecting) {
         style = "2 setlinecap\n";
     }
@@ -1772,7 +1772,7 @@ RtdSegmentToPostscript(interp, canvas, itemPtr, prepass)
     style = "0 setlinejoin\n";
     if (linePtr->joinStyle == JoinRound) {
         style = "1 setlinejoin\n";
-    } 
+    }
     else if (linePtr->joinStyle == JoinBevel) {
         style = "2 setlinejoin\n";
     }
@@ -1799,7 +1799,7 @@ RtdSegmentToPostscript(interp, canvas, itemPtr, prepass)
                 != TCL_OK) {
             return TCL_ERROR;
         }
-    } 
+    }
     else {
         Tcl_AppendResult(interp, "stroke\n", (char *) NULL);
     }
@@ -1872,7 +1872,7 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
                 != TCL_OK) {
             return TCL_ERROR;
         }
-    } 
+    }
     else {
         Tcl_AppendResult(interp, "fill\n", (char *) NULL);
     }
@@ -1900,8 +1900,8 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
  *--------------------------------------------------------------
  */
 
-void RtdSegmentSetCoords( Tcl_Interp *interp, int append, 
-                          const double *x, const double *y,  
+void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
+                          const double *x, const double *y,
                           int numPoints )
 {
     RtdSegmentQuickSetCoords( interp, lastCanvas_, (Tk_Item *) lastItem_,
@@ -1926,8 +1926,8 @@ void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
  *--------------------------------------------------------------
  */
 void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
-                               Tk_Item *itemPtr, int append, 
-                               const double *x, const double *y, 
+                               Tk_Item *itemPtr, int append,
+                               const double *x, const double *y,
                                int numPoints )
 {
     SegmentItem *linePtr = (SegmentItem *) itemPtr;
@@ -1936,7 +1936,7 @@ void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
     int npoints;
 
     if ( ! append ) {
-        
+
         /*  Use positions to replace the existing coodinates */
         if (linePtr->numPoints != numPoints) {
             if (linePtr->coordPtr != NULL) {
@@ -1950,16 +1950,16 @@ void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
             linePtr->coordPtr[i+1] = y[j];
         }
         linePtr->numPoints = numPoints;
-        
-    } 
+
+    }
     else {
-        
+
         /*  Append coordinates to existing ones. */
         npoints = numPoints + linePtr->numPoints;
-        linePtr->coordPtr = (double *) 
-            ckrealloc( (char *)linePtr->coordPtr, 
+        linePtr->coordPtr = (double *)
+            ckrealloc( (char *)linePtr->coordPtr,
                        (unsigned)(sizeof(double) * npoints * 2 ));
-        
+
         fflush( stdout );
         for ( i =  linePtr->numPoints * 2, j = 0; j < numPoints; j++, i+=2 ) {
             linePtr->coordPtr[i]   = x[j];
@@ -1967,12 +1967,12 @@ void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
         }
         linePtr->numPoints = npoints;
     }
-    
+
     /*
      * Update arrowheads by throwing away any existing arrow-head
      * information and calling ConfigureArrows to recompute it.
      */
-    
+
     if (linePtr->firstArrowPtr != NULL) {
         ckfree((char *) linePtr->firstArrowPtr);
         linePtr->firstArrowPtr = NULL;
@@ -1985,16 +1985,16 @@ void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
         ConfigureArrows(canvas, linePtr);
     }
     ComputeLineBbox(canvas, linePtr);
-    
+
     /* Request canvas redraw */
-    Tk_CanvasEventuallyRedraw( canvas, linePtr->header.x1, 
-                               linePtr->header.y1, linePtr->header.x2, 
+    Tk_CanvasEventuallyRedraw( canvas, linePtr->header.x1,
+                               linePtr->header.y1, linePtr->header.x2,
                                linePtr->header.y2 );
 }
 
 /*  Quick configuration routines. */
 
-EXTERN void RtdSegmentSetColour( Tk_Window tkwin, Display *display, 
+EXTERN void RtdSegmentSetColour( Tk_Window tkwin, Display *display,
                                  Tk_Item *itemPtr, XColor *colour )
 {
     XColor *tkColor;
@@ -2045,7 +2045,7 @@ DashParseProc( ClientData clientData, Tcl_Interp *interp, Tk_Window tkwin,
         Tcl_Panic( "ParseDashProc received bogus offset" );
     }
 
-    /* -dash is a list of integers which we code to encode into 
+    /* -dash is a list of integers which we code to encode into
      * a character array. Allow an empty string to clear value.
      */
     if ( value[0] == '\0' ) {
@@ -2097,7 +2097,7 @@ DashPrintProc( ClientData clientData, Tk_Window tkwin, char *recordPtr,
     char *buffer;
     char *ptr1;
     char *ptr2;
-    
+
     ptr1 = linePtr->dash;
     ptr2 = buffer = ckalloc( 120 );
     *ptr2 = '\0';

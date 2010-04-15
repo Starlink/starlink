@@ -6,9 +6,9 @@ C
 C     Creates a real data structure (ie one with just a real data array)
 C     as opposed to a complex data structure, (in the Figaro sense of a
 C     structure with both  real and imaginary data arrays)
-C     from a complex data structure.  
-C     In the case of CMPLX2R it is the real part of the complex data 
-C     that forms the data array in the resulting structure.  
+C     from a complex data structure.
+C     In the case of CMPLX2R it is the real part of the complex data
+C     that forms the data array in the resulting structure.
 C     For CMPLX2I, it is the imaginary part, and for CMPLX2M
 C     it is the modulus of the complex data.
 C
@@ -16,7 +16,7 @@ C     Command parameters -
 C
 C     CDATA    (Character) The name of the input complex structure.
 C     OUTPUT   (Character) The name of the resulting structure.  This
-C              may be the same as CDATA. In either case a new file 
+C              may be the same as CDATA. In either case a new file
 C              is created.
 C
 C     Command keywords - None
@@ -50,13 +50,13 @@ C+
 C
 C     Local variables
 C
-      CHARACTER COMMAND*8        ! Figaro command name 
+      CHARACTER COMMAND*8        ! Figaro command name
       INTEGER   DIMS(10)         ! Image dimensions
-      LOGICAL   FAULT            ! Input is not a valid complex 
+      LOGICAL   FAULT            ! Input is not a valid complex
                                  ! structure?
       INTEGER   IERR             ! Returned by VEC_
       INTEGER   IGNORE           ! Status for VEC_
-      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary 
+      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary
                                  ! data
       INTEGER   NBAD             ! Number of bad format conversions
       INTEGER   NDIM             ! Number of image dimensions
@@ -71,7 +71,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -115,7 +115,7 @@ C
       IF (COMMAND.EQ.'CMPLX2R') THEN
 C
 C       Output data is a copy of input data array
-C 
+C
          CALL DSA_MAP_DATA('CDATA','READ','DOUBLE',RPTR,SLOT,
      :                     STATUS)
          IF(STATUS.NE.0)GOTO 500
@@ -125,7 +125,7 @@ C
          IF (IGNORE.NE.0) CALL ERR_ANNUL(IGNORE)
 C        CALL CNV_FMTCNV('DOUBLE','FLOAT',%VAL(CNF_PVAL(RPTR)),
 C    :                    %VAL(CNF_PVAL(OPTR)),NELM,NBAD)
-         
+
       ELSE IF (COMMAND.EQ.'CMPLX2I') THEN
 C
 C       Output data is copied from input imaginary array
@@ -141,10 +141,10 @@ C    :                           STATUS)
          IF (IGNORE.NE.0) CALL ERR_ANNUL(IGNORE)
 C        CALL CNV_FMTCNV('DOUBLE','FLOAT',%VAL(CNF_PVAL(IPTR)),
 C    :                    %VAL(CNF_PVAL(OPTR)),NELM,NBAD)
-          
+
       ELSE IF (COMMAND.EQ.'CMPLX2M') THEN
 C
-C         Input real and imaginary data arrays are mapped and used to 
+C         Input real and imaginary data arrays are mapped and used to
 C         calculate the modulus array which is written to the output
 C         data array.
 C

@@ -88,7 +88,7 @@
 	CALL PAR_GET0I( 'BOX_YSIZE', BOX_YSIZE, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : PLOT_BOX : after PAR_GET BOX SIZE',
      :                  STATUS )
 	  RETURN
@@ -99,7 +99,7 @@
 	CALL PAR_GET0C( 'BOX_POSITION', BOX_POSITION, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : PLOT_BOX : after PAR_GET BOX POSITION',
      :                  STATUS )
 	  RETURN
@@ -111,7 +111,7 @@
 	CALL PAR_GET0I( 'BOX_YCEN', BOX_YPOS, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : PLOT_BOX : after PAR_GET BOX POSITION',
      :                  STATUS )
 	  RETURN
@@ -122,7 +122,7 @@
 	CALL PAR_GET0R( 'ARCSEC_PIXEL', ARCSEC_PIXEL, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : PLOT_BOX : after PAR_GET ARCSEC/PIXEL',
      :                  STATUS )
 	  RETURN
@@ -134,7 +134,7 @@
 	CALL PAR_GET0C( 'BOX_COLOUR', COLOUR_CODE, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : PLOT_BOX : after PAR_GET BOX COLOUR',
      :                  STATUS )
 	  RETURN

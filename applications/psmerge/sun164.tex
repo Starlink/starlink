@@ -79,7 +79,7 @@ independently to form the composite.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -148,7 +148,7 @@ independently to form the composite.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -238,12 +238,12 @@ independently to form the composite.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -302,8 +302,8 @@ to a printer. This allows:
 \section{\xlabel{using_psmerge}Using PSMERGE}
 \label{using_psmerge}
 
-The \texttt{psmerge} program writes its output to the standard output channel 
-(\texttt{stdout}).  This can be redirected to a file or piped straight to a 
+The \texttt{psmerge} program writes its output to the standard output channel
+(\texttt{stdout}).  This can be redirected to a file or piped straight to a
 printer queue; e.g.:
 
 \begin{quote}\begin{verbatim}
@@ -333,7 +333,7 @@ single picture.  For example:
 \end{verbatim}\end{quote}
 
 will overlay the two pictures with their origins at the same place on
-the paper.  
+the paper.
 
 For line graphics and text the order of the files does not make any
 difference but if either picture contains filled areas or grey scale
@@ -354,7 +354,7 @@ Pictures can be scaled, translated (shifted) and rotated. For example:
 \end{verbatim}\end{quote}
 
 will shrink the picture to half its normal size, move the origin 1 inch to the
-right and 2 inches upwards and rotate it 10 degrees anti-clockwise.  
+right and 2 inches upwards and rotate it 10 degrees anti-clockwise.
 
 Translations are in units of 1/72 of an inch\footnote{1/72 of an inch
 is sometimes referred to as a PostScript point and is the default unit

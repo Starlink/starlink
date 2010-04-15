@@ -3,30 +3,30 @@
 *+
 *  Name:
 *     SUBPAR_GET1L
- 
+
 *  Purpose:
 *     Read vector parameter values.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_GET1L ( NAMECODE, MAXVAL, LVALUES, ACTVAL, STATUS )
- 
+
 *  Description:
 *     Read the values from a vector (or scalar) primitive object associated
 *     with a Parameter.
 *     There is a routine for each access type, LOGICAL:
- 
+
 *        SUBPAR_GET1D    DOUBLE PRECISION
 *        SUBPAR_GET1R    REAL
 *        SUBPAR_GET1I    INTEGER
 *        SUBPAR_GET1L    LOGICAL
 *        SUBPAR_GET1C    CHARACTER[*n]
- 
+
 *     If the object data type differs from the access type, LOGICAL, then
 *     conversion is performed (if allowed).
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER ( given)
 *        pointer to the parameter
@@ -37,7 +37,7 @@
 *     ACTVAL=INTEGER
 *        number of values returned
 *     STATUS=INTEGER
- 
+
 *  Algorithm:
 *     The HDS locator associated with the parameter is obtained.
 *     If this is successful, the shape of the object is obtained
@@ -48,7 +48,7 @@
 *     another value obtained if possible by prompting up to a set number
 *     of times.
 *     If the locator was obtained it is annulled.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1986, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     06-NOV-1984 (BDK):
 *        Original version
@@ -105,74 +105,74 @@
 *     29-SEP-1994 (AJC):
 *        Use EMS_FACER not DAT_ERMSG to report errors
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! SAI Constants
       INCLUDE 'DAT_PAR'                 ! DAT Constants
       INCLUDE 'SUBPAR_PAR'              ! SUBPAR Constants
       INCLUDE 'SUBPAR_ERR'              ! SUBPAR errors
       INCLUDE 'SUBPAR_PARERR'           ! SUBPAR PAR errors
- 
+
 *  Local Constants:
       INTEGER MAXDIM                    ! Maximum number of dimensions
       PARAMETER ( MAXDIM = 7 )
       INTEGER MAXTRY                    ! Maximum attempts to get good value
       PARAMETER ( MAXTRY = 5 )
- 
+
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter number
- 
+
       INTEGER MAXVAL                    ! maximum number of values
- 
+
 *  Arguments Returned:
       LOGICAL LVALUES(*)               ! Array for values
- 
+
       INTEGER ACTVAL                    ! number of values
- 
+
 *    Status return :
       INTEGER STATUS                    ! Status Return
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *  Local Variables:
       INTEGER DIMS(MAXDIM)                     ! Object dimensions
       INTEGER ACTDIM                           ! Actual number of dimensions
       INTEGER TRIES                            ! Number of tries
       CHARACTER*(DAT__SZLOC) BOTLOC            ! HDS locator
       LOGICAL ACCEPTED                         ! If no re-prompt required
- 
+
 *.
       IF (STATUS .NE. SAI__OK) RETURN
- 
+
 *   Protect higher level tokens
       CALL EMS_MARK
- 
+
 *   Loop until ACCEPTED
       ACCEPTED = .FALSE.
       TRIES = 0
- 
+
       DOWHILE ( .NOT. ACCEPTED )
- 
+
 *      Get an HDS locator to the data for the parameter.
          IF ( PARWRITE(NAMECODE) ) THEN
             CALL SUBPAR_ASSOC ( NAMECODE, 'UPDATE', BOTLOC, STATUS )
          ELSE
             CALL SUBPAR_ASSOC ( NAMECODE, 'READ', BOTLOC, STATUS )
          ENDIF
- 
+
          IF (STATUS .EQ. SAI__OK) THEN
 *        Get shape of object
             CALL DAT_SHAPE ( BOTLOC, MAXDIM, DIMS, ACTDIM, STATUS )
- 
+
 *        If it is a 1-D object, read it as such provided that the size
 *        is OK.
             IF (ACTDIM .EQ. 1 ) THEN
@@ -183,20 +183,20 @@
                   CALL EMS_REP ( 'SUP_GET1_1', 'SUBPAR: '//
      :            'No more than ^MAXVAL elements are allowed '//
      :            'for parameter ^NAME', STATUS )
- 
+
                ELSE
 *              Get the data values and size
                   CALL DAT_GET1L( BOTLOC, MAXVAL, LVALUES,
      :            ACTVAL, STATUS )
                ENDIF
- 
+
 *        Else if it is a scalar object read it as such
             ELSEIF ( ACTDIM .EQ. 0 ) THEN
 *           Get the data value
                CALL DAT_GET0L( BOTLOC, LVALUES(1), STATUS )
 *           and set size = 1
                ACTVAL = 1
- 
+
 *        Else the object is invalid
             ELSE
                STATUS = SUBPAR__ARRDIM
@@ -204,16 +204,16 @@
                CALL EMS_REP ( 'SUP_GET1_2',
      :         'SUBPAR: N-D value supplied for 1-D parameter ^NAME',
      :          STATUS )
- 
+
             ENDIF
- 
+
 *        Annul the locator
             CALL DAT_ANNUL( BOTLOC, STATUS )
- 
+
 *        If OK, break the loop
             IF ( STATUS .EQ. SAI__OK ) THEN
                ACCEPTED = .TRUE.
- 
+
 *        Otherwise cancel the parameter - forcing reprompt,
 *        flush error messages and loop up to MAXTRY times
             ELSE
@@ -224,7 +224,7 @@
                CALL SUBPAR_CANCL ( NAMECODE, STATUS )
 *           Flush error and reset status
                CALL SUBPAR_EFLSH( STATUS )
- 
+
 *           Check for try limit
                TRIES = TRIES + 1
                IF ( TRIES .EQ. MAXTRY ) THEN
@@ -237,20 +237,20 @@
      :            '^TRIES prompts failed to get a good value for '//
      :            'parameter ^NAME - NULL assumed', STATUS )
                ENDIF
- 
+
             ENDIF
- 
- 
+
+
 *     Else if ASSOC failed exit
          ELSE
- 
+
             ACCEPTED = .TRUE.
- 
+
          ENDIF
- 
+
       ENDDO
- 
+
 *  Release the error context
       CALL EMS_RLSE
- 
+
       END

@@ -10,11 +10,11 @@
 *
        INTEGER ASIZE1, NPOINT, MAXBRK, NBREAK
        INTEGER BREAKS(NBREAK)
- 
+
        REAL WAVE(ASIZE1), FLUX(ASIZE1)
- 
+
        CHARACTER*(*) PARAMS
- 
+
        LOGICAL SUBCHK
        LOGICAL CSNIP
        LOGICAL OK
@@ -22,7 +22,7 @@
 *
 *
        INTEGER I, J, K, L, M, N, NSNIP
- 
+
        REAL X1, X2, Y1, Y2
        REAL XVS(2)
        REAL TSTVAL
@@ -34,11 +34,11 @@
        NSNIP = 0
        FIRSTCURSOR = .TRUE.
        TSTVAL = 161.054
- 
+
        CALL SSTRIP(PARAMS)
        CSNIP = .TRUE.
        IF (PARAMS.NE.' ') CSNIP = .FALSE.
- 
+
   100  CONTINUE
        IF (CSNIP) THEN
           CALL SGSCURSE(N,X1,Y1,FIRSTCURSOR)
@@ -60,7 +60,7 @@
              ENDIF
           ENDIF
        ENDIF
- 
+
        IF (X2.GT.X1) THEN
           WRITE (*,'(''   SNIP:  X1, X2 ='',1P2E12.4)') X1, X2
           M = 0
@@ -83,9 +83,9 @@
              GOTO 200
           ENDIF
        ENDIF
- 
+
        IF (.NOT.OK) SUBCHK = .FALSE.
- 
+
   200  CONTINUE
 
        END

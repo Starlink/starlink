@@ -2,14 +2,14 @@
 *+  WMOSAIC_ADD - adds an image to a new array and records the overlap
 *                 using weights
 
-      SUBROUTINE WMOSAIC_ADD ( IN, IDIMSX, IDIMSY, XOFFSET, YOFFSET, WT, 
-     :	                       OUT, MASK, ODIMSX, ODIMSY, OVERLAP, 
+      SUBROUTINE WMOSAIC_ADD ( IN, IDIMSX, IDIMSY, XOFFSET, YOFFSET, WT,
+     :	                       OUT, MASK, ODIMSX, ODIMSY, OVERLAP,
      :                         STATUS)
 
 *    Description :
 *
 *     This routine adds an image into a (usually larger) ouput image,
-*     and is used in mosaicing arrays together. The offset of the 
+*     and is used in mosaicing arrays together. The offset of the
 *     small array relative to the large one is given. For each pixel
 *     of the small array, the value of that pixel is added to the
 *     input value of the corresponding pixel in the big array, but
@@ -31,9 +31,9 @@
 *     IDIMS( 2 )  =  INTEGER( READ )
 *          Dimensions of input image
 *     XOFFSET  =  INTEGER( READ )
-*          x offset of image from bottom left 
+*          x offset of image from bottom left
 *     YOFFSET  =  INTEGER( READ )
-*          y offset of image from bottom left 
+*          y offset of image from bottom left
 *     WT  =  REAL( READ )
 *          weight for addition
 *     OUT( ODIMS( 1 ), ODIMS( 2 ) )  =  REAL( UPDATE )
@@ -85,7 +85,7 @@
       INTEGER
      :    IDIMSX,             ! dimensions of input image
      :    IDIMSY,             ! dimensions of input image
-     :    XOFFSET,                ! x offset of image 
+     :    XOFFSET,                ! x offset of image
      :    YOFFSET,                ! y    "    "   "
      :    ODIMSX,              ! dimensions of output image
      :    ODIMSY              ! dimensions of output image

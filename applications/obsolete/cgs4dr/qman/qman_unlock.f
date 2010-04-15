@@ -34,7 +34,7 @@
 
 *   Set the DB_UNLOCKED flag
       DB_LOCKED = .FALSE.
-      IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+      IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :      'Database unlocked', STATUS )
 
 *    Exit subroutine

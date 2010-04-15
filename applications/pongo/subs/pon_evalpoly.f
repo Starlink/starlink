@@ -14,7 +14,7 @@
 
 *  Description:
 *     Evaluate the given polynomial, defined by NPOLY and COEFF, at X.
-*     
+*
 *        PON_EVALPOLY = COEFF( 1 )
 *                       + COEFF( 2 ) * X
 *                       + COEFF( 3 ) * X**2
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -75,7 +75,7 @@
          Y = Y + XPOWER*COEFF( I )
          XPOWER = XPOWER*X
  10   CONTINUE
- 
+
       PON_EVALPOLY = REAL ( Y )
       END
 * $Id$

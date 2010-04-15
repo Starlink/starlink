@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_GET_SUB_BOLS (N_BOL_IN, N_POS, N_BEAM,
-     :  IN_DATA, IN_VARIANCE, IN_QUALITY, N_BOL_OUT, IN_POINTER, 
+     :  IN_DATA, IN_VARIANCE, IN_QUALITY, N_BOL_OUT, IN_POINTER,
      :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
 *+
 *  Name:
@@ -13,13 +13,13 @@
 *     This routine extracts data for bolometers belonging to a particular
 *     sub-instrument from an input data array which may contain data for
 *     several sub-instruments. The input array IN_POINTER points to the
-*     indices in the first dimension of the input data array that contain 
+*     indices in the first dimension of the input data array that contain
 *     the data of interest. IN_POINTER should have been calculated by an
-*     earlier call to SCULIB_CALC_SUB_BOLS. 
+*     earlier call to SCULIB_CALC_SUB_BOLS.
 
 *  Invocation:
-*     CALL SCULIB_GET_SUB_BOLS (N_BOL_IN, N_POS, N_BEAM, IN_DATA, 
-*    :  IN_VARIANCE, IN_QUALITY, N_BOL_OUT, IN_POINTER, OUT_DATA, 
+*     CALL SCULIB_GET_SUB_BOLS (N_BOL_IN, N_POS, N_BEAM, IN_DATA,
+*    :  IN_VARIANCE, IN_QUALITY, N_BOL_OUT, IN_POINTER, OUT_DATA,
 *    :  OUT_VARIANCE, OUT_QUALITY, STATUS)
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *           number of positions measured in input array
 *     N_BEAM                       = INTEGER (Given)
 *           the number of beams in the input array
-*     IN_DATA (N_BOL_IN,N_POS,N_BEAM) 
+*     IN_DATA (N_BOL_IN,N_POS,N_BEAM)
 *                                  = REAL (Given)
 *           input data array
 *     IN_VARIANCE (N_BOL_IN,N_POS,N_BEAM)
@@ -42,7 +42,7 @@
 *           number of bolometers in output array
 *     IN_POINTER (N_BOL_OUT)       = INTEGER (Given)
 *           pointers from bolometers in output array to their indices in input
-*     OUT_DATA (N_BOL_OUT,N_POS,N_BEAM) 
+*     OUT_DATA (N_BOL_OUT,N_POS,N_BEAM)
 *                                  = REAL (Returned)
 *           output data array
 *     OUT_VARIANCE (N_BOL_OUT,N_POS,N_BEAM)
@@ -130,7 +130,7 @@
 	 DO BEAM = 1, N_BEAM
             DO POS = 1, N_POS
                DO OUT_BOL = 1, N_BOL_OUT
-                  OUT_DATA (OUT_BOL,POS,BEAM) = 
+                  OUT_DATA (OUT_BOL,POS,BEAM) =
      :              IN_DATA (IN_POINTER(OUT_BOL),POS,BEAM)
                   OUT_VARIANCE (OUT_BOL,POS,BEAM) =
      :              IN_VARIANCE (IN_POINTER(OUT_BOL),POS,BEAM)

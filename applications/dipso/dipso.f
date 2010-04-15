@@ -11,9 +11,9 @@
 *   fortran module which does nothing except call this subroutine. On
 *   unix, run_dipso is a C function which sets up signal handling before
 *   calling this subroutine. If a floating point exception, segmentation
-*   violation, or an interupt (contol-C) occurs at any time, execution jumps 
-*   back to run_dipso, and this subroutine is called again with argument 
-*   IENTRY set to a value which indicates what sort of signal was detected. 
+*   violation, or an interupt (contol-C) occurs at any time, execution jumps
+*   back to run_dipso, and this subroutine is called again with argument
+*   IENTRY set to a value which indicates what sort of signal was detected.
 *   IENTRY is set to zero on the initial entry.
 *
 *   "D" lines (lines with D in column 1) are used to mark lines which
@@ -30,7 +30,7 @@
 
 *  Local Constants:
       CHARACTER*1 ESC          ! A "\" character is used by some
-      PARAMETER( ESC = '\\' )  ! compilers as an escape character and 
+      PARAMETER( ESC = '\\' )  ! compilers as an escape character and
                                ! therefore two are needed to be safe
 
 *  External References:
@@ -73,7 +73,7 @@
 *  Declare global variables and common blcoks used by elf.
       INCLUDE 'KARS_COM'   ! Declares common block KARS holding KAR
       INCLUDE 'KUSE_COM'   ! Declares common block KUSE holding K1 and K2
- 
+
 *  Initialise control-C handler
 C       EXTERNAL HANDLER
 C       EXTERNAL CTRLC_AST
@@ -503,7 +503,7 @@ C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
   200  CONTINUE
 
 *  Get the name of the operating system (VMS, UNIX, etc) in SYSNAME.
-      CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE, 
+      CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE,
      :                STATUS )
 
 *  Get the first command line argument. This can be a comma sperated list
@@ -515,7 +515,7 @@ C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
       CALL PSX_ISATTY( 0, ISATTY, STATUS )
 
 *  Get the path to the DIPSODIR directory. This is returned in a format
-*  such that a complete file specification can be formed just by 
+*  such that a complete file specification can be formed just by
 *  appending the file name (and file type on VMS) to the end of the path.
       CALL GETDIR( 'DIPSODIR', ARG1, PREFIX, PLEN, STATUS )
 
@@ -524,7 +524,7 @@ C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
       CALL GETDIR( 'SPECDAT', ARG1, PREFIX3, P3LEN, STATUS )
       CALL GETDIR( 'LDIPSODIR', ARG1, PREFIX4, P4LEN, STATUS )
 
-*  Do the same for the directory containing Starlink executable files, 
+*  Do the same for the directory containing Starlink executable files,
 *  and construct a string holding the default showme command used by
 *  the hypertext help system.
       CALL GETDIR( 'DIPSOSTARBIN', ARG1, SBDIR, SBLEN, STATUS )
@@ -538,7 +538,7 @@ C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
 *  Abort if an error has occured.
       IF( STATUS .NE. SAI__OK ) GO TO 6000
 
-*  Translate the DIPSOPROMPT environment variable to get the DIPSO command 
+*  Translate the DIPSOPROMPT environment variable to get the DIPSO command
 *  prompt string. Use ">" by default.
       CALL GTENV( "DIPSOPROMPT", ARG1, PRMPT, STATUS )
       IF( STATUS .NE. SAI__OK ) THEN
@@ -622,15 +622,15 @@ C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
        CLOSE (16)
 
 
-*  Comment the above lines and uncomment the following lines for 
+*  Comment the above lines and uncomment the following lines for
 *  test versions.
 
 c       WRITE(*,*)
-c       WRITE(*,*) 
+c       WRITE(*,*)
 c       WRITE(*,*) '  This is an unofficial test version of DIPSO '//
 c     :            'dated 15/3/95'
 c       WRITE(*,*)
-c       WRITE(*,*) 
+c       WRITE(*,*)
 
 *------------------------------------------------------------------------
 
@@ -647,7 +647,7 @@ c       WRITE(*,*)
        IF( IHX .EQ. 0 ) THEN
           COMTXT = .TRUE.
           COMSAV = 'startup.cmd'
-          IF( p2len .GT. 0 ) 
+          IF( p2len .GT. 0 )
      :       COMSAV = prefix2(1:p2len)//'startup.cmd'
           NCCAR = SLEN(COMSAV)
           DO 350 I = 1, 9
@@ -663,7 +663,7 @@ c       WRITE(*,*)
   400  CONTINUE
        IF( NOTEND ) THEN
          IXS = 0
-         IOS = 0 
+         IOS = 0
          OK = .TRUE.
 *
 *   READ COMMANDS FROM FILE OR TERMINAL
@@ -1364,7 +1364,7 @@ c       WRITE(*,*)
 *  ATLASRD: Read Kurucz model
           ELSE IF( SUBCMD .EQ. 'ATLASRD' ) THEN
              IF( USENDF ) THEN
-                CALL ATLASRD( 'ATLASRD', PREFIX3( : P3LEN ), PARAMS, 
+                CALL ATLASRD( 'ATLASRD', PREFIX3( : P3LEN ), PARAMS,
      :                        WORV, TITLE, STATUS )
              ELSE
 
@@ -1413,7 +1413,7 @@ c       WRITE(*,*)
                    WRITE (*,'(''   ATLASRD:  unable to open file'')')
                    WRITE (*,'(''   (Typing USENDF and then trying '//
      :                          'again may work)'')')
-      
+
                    GO TO 5000
                 ELSE
                    READ (7,IOSTAT=IHX) KREAD
@@ -1498,7 +1498,7 @@ c       WRITE(*,*)
                       WT1 = (W2-X)/(W2-W1)
                       WT2 = 1.0 - WT1
                       FX = FLUX(I-1)*WT1 + FLUX(I)*WT2
-                      YNORM = LOG10(MAX(Y,1e-30)) - 
+                      YNORM = LOG10(MAX(Y,1e-30)) -
      :                        LOG10(MAX(FX/3.141593,1e-30))
                       DO 682 J = 1, NPOINT
                          IF( FLUX(J).GT.0.0 ) THEN
@@ -1673,7 +1673,7 @@ c       WRITE(*,*)
 
                       BIGSTR = ' '
                       WRITE( BIGSTR, '(''EW ='',F5.3,''; O.K.'')') EW
-                      CALL GET0L( ' ', 1, .FALSE., SUBCMD, BIGSTR, 
+                      CALL GET0L( ' ', 1, .FALSE., SUBCMD, BIGSTR,
      :                            .TRUE., VAL_OK, STATUS )
                       BIGSTR = ' '
 
@@ -1691,7 +1691,7 @@ c       WRITE(*,*)
                       SIGEW = 0.0
                       WRITE (98,'(A/G12.4//A)',IOSTAT=IOS3) ',,,',
      :                BINST, ',,,'
-                   ELSE 
+                   ELSE
                       EWPSIG = EW + SIGEW/1000.0
                       EWMSIG = EW - SIGEW/1000.0
                       EWMSIG = MAX(0.0,EWMSIG)
@@ -1888,15 +1888,15 @@ c       WRITE(*,*)
 * CLR: Enable/disable command line recall
           ELSE IF( SUBCMD .EQ. 'CLR' ) THEN
              CALL GET0L( PARAMS, 1, .TRUE., SUBCMD, 'Do you want to '//
-     :                   'use Command Line Recall', .TRUE., CLR, 
+     :                   'use Command Line Recall', .TRUE., CLR,
      :                   STATUS )
 
              IF( CLR ) THEN
-                CALL MSGOUT( SUBCMD, 'Using command line recall', 
-     :                       .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'Using command line recall',
+     :                       .FALSE., STATUS )
              ELSE
-                CALL MSGOUT( SUBCMD, 'Disabling command line recall', 
-     :                       .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'Disabling command line recall',
+     :                       .FALSE., STATUS )
 
              END IF
 
@@ -2037,7 +2037,7 @@ c       WRITE(*,*)
              KLICK = 0
              ACRASH = 1.D30
              ICRASH = NINT(VARRAY(1))
-             IF( ICRASH .EQ. 0) THEN 
+             IF( ICRASH .EQ. 0) THEN
                 WRITE (*,'(''   CRASH:  divide by zero'')')
                 write(*,*) KLUNK/KLICK
 
@@ -2259,8 +2259,8 @@ c       WRITE(*,*)
      :                   'crop the display', .TRUE., CROPIT, STATUS )
 
              IF( CROPIT ) THEN
-                CALL MSGOUT( SUBCMD, 'The display will be cropped', 
-     :                       .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'The display will be cropped',
+     :                       .FALSE., STATUS )
              ELSE
                 CALL MSGOUT( SUBCMD, 'The display will not be cropped',
      :                       .FALSE., STATUS )
@@ -2517,7 +2517,7 @@ c       WRITE(*,*)
      :           CHR_SIMLR( PARAMS ,'HELP' ) ) GO TO 1360
 
 *   Null device
-    
+
              IF( PARAMS .EQ. '0' ) THEN
                 DEVTYP = 0
                 NPLOTS = 0
@@ -2619,7 +2619,7 @@ c       WRITE(*,*)
 
              IF( DVTST ) THEN
                 CALL GSLN(LNTYPE)
-                CALL GSLWSC (XLWIDTH) 
+                CALL GSLWSC (XLWIDTH)
              END IF
 
 *   Escape for null device selection
@@ -2698,7 +2698,7 @@ c       WRITE(*,*)
              CALL DECODE( 'ELFINP', PARAMS, 0, 1, VARRAY, ' ', OK )
              IF( .NOT .OK ) GO TO 5000
 
-             CALL ELFKEY( IFPS, ( NINT(VARRAY(1)) .NE. 0 ) .AND. COMTXT, 
+             CALL ELFKEY( IFPS, ( NINT(VARRAY(1)) .NE. 0 ) .AND. COMTXT,
      :                    COMSAV(1:NCCAR), STATUS )
              IF( STATUS .NE. SAI__OK ) THEN
                 OK = .FALSE.
@@ -2892,7 +2892,7 @@ c       WRITE(*,*)
              IF( EXISTS ) THEN
 
                 CALL GET0L( ' ', 1, .FALSE., SUBCMD, 'Output file '//
-     :                      'exists. Over-write it', .FALSE., OVERWR, 
+     :                      'exists. Over-write it', .FALSE., OVERWR,
      :                      STATUS )
                 IF( STATUS .NE. SAI__OK ) THEN
                    OK = .FALSE.
@@ -2901,7 +2901,7 @@ c       WRITE(*,*)
 
                 IF( .NOT. OVERWR ) GO TO 5000
 
-                OPEN( UNIT=34, STATUS='OLD', 
+                OPEN( UNIT=34, STATUS='OLD',
      :                FILE=PARAMS(1:SLEN(PARAMS)) )
                 CLOSE( 34, STATUS='DELETE' )
 
@@ -2927,7 +2927,7 @@ c       WRITE(*,*)
 *
 *   ELFRESTC:  restore fit coefficient stack after ELFSAVEC
 *
-          ELSE IF( SUBCMD .EQ. 'ELFRESTC' ) THEN 
+          ELSE IF( SUBCMD .EQ. 'ELFRESTC' ) THEN
              DO 1540 I = 1, 40
                 IF( PARAMS(I:I) .NE. ' ') GO TO 1560
  1540        CONTINUE
@@ -3014,8 +3014,8 @@ c       WRITE(*,*)
 *        DIPSO.
 *
           ELSE IF( SUBCMD .EQ. 'ENV' ) THEN
-             CALL GET0C( PARAMS, 1, .FALSE., SUBCMD, 'The environment ' 
-     :                   // 'variable to display', 'DIPSODIR', ENVNAM, 
+             CALL GET0C( PARAMS, 1, .FALSE., SUBCMD, 'The environment '
+     :                   // 'variable to display', 'DIPSODIR', ENVNAM,
      :                   STATUS )
              IF( STATUS .EQ. SAI__OK ) THEN
                 CALL GTENV( ENVNAM, ARG1, ENVVAL, STATUS )
@@ -3040,7 +3040,7 @@ c       WRITE(*,*)
              CALL DECODE('ERASE',PARAMS,0,1,VARRAY,' ',OK)
              IF( .NOT.OK) GO TO 5000
              IF( DEVTYP .EQ. 0 ) THEN
-                WRITE (*,'(''   ERASE:  no device assigned'',A)') 
+                WRITE (*,'(''   ERASE:  no device assigned'',A)')
      :          BLEEP
                 GO TO 5000
              END IF
@@ -3143,7 +3143,7 @@ c       WRITE(*,*)
 
                 IF( LOGFILE ) THEN
                    CALL MSG_SETC( 'FILE', EWLOGFILE )
-                   CALL MSGOUT( SUBCMD, '''^FILE'' is already open.', 
+                   CALL MSGOUT( SUBCMD, '''^FILE'' is already open.',
      :                          .TRUE., STATUS )
                    CALL GET0L( ' ', 1, .FALSE., SUBCMD, 'Close this '//
      :                         'and open a new log file', .TRUE.,
@@ -3734,10 +3734,10 @@ c       WRITE(*,*)
 
 *  HANDLER:  Turns condition handler on/off
           ELSE IF( SUBCMD .EQ. 'HANDLER' ) THEN
-             CALL GET0I( PARAMS, 1, .FALSE., 'HANDLER', 
+             CALL GET0I( PARAMS, 1, .FALSE., 'HANDLER',
      :                   'Signal handler level', 1, LEVEL, STATUS )
              CALL HANDLEV( LEVEL, STATUS )
-                           
+
 *  HCol:  Calculate theoretical Lyman-alpha profile
           ELSE IF( SUBCMD .EQ. 'HC' ) THEN
              VARRAY(2) = HCMXFC
@@ -3811,8 +3811,8 @@ C ----------------------------------------------------------------
                             END IF
                             IF( MOD(II,20) .EQ. 0 ) THEN
                                CALL MSG_BLANK( STATUS )
-                               CALL GET0L( ' ', 1, .FALSE., 'HELP', 
-     :                                     'Continue', .TRUE., VAL_OK, 
+                               CALL GET0L( ' ', 1, .FALSE., 'HELP',
+     :                                     'Continue', .TRUE., VAL_OK,
      :                                     STATUS )
                                CALL MSG_BLANK( STATUS )
                                IF( STATUS .NE. SAI__OK ) THEN
@@ -3867,8 +3867,8 @@ C ----------------------------------------------------------------
                             END IF
                             IF( MOD(II,20) .EQ. 0 ) THEN
 
-                               CALL GET0L( ' ', 1, .FALSE., 'HELP', 
-     :                                     'Continue', .TRUE., VAL_OK, 
+                               CALL GET0L( ' ', 1, .FALSE., 'HELP',
+     :                                     'Continue', .TRUE., VAL_OK,
      :                                     STATUS )
                                IF( STATUS .NE. SAI__OK ) THEN
                                   OK = .FALSE.
@@ -3936,7 +3936,7 @@ C ----------------------------------------------------------------
                 GO TO 500
              END IF
              VARRAY(4) = 3.0
-             CALL DECODE (SUBCMD, PARAMS, 3, 4, VARRAY, 
+             CALL DECODE (SUBCMD, PARAMS, 3, 4, VARRAY,
      :       'Camera Year Day ',OK)
              IF( OK ) THEN
                 IYR = NINT(VARRAY(2))
@@ -4526,7 +4526,7 @@ C ----------------------------------------------------------------
 
                 OK = .TRUE.
                 IF( VAL_OK ) THEN
-                   GO TO 2080       
+                   GO TO 2080
                 ELSE
                    GO TO 5000
                 END IF
@@ -4755,7 +4755,7 @@ C ----------------------------------------------------------------
                 IERR2 = 0
                 CALL PDA_DPOLFT( PDAPTS, DPWORK(1), DPWORK(MAXPTS+1),
      :                           DPWORK(2*MAXPTS+1), KPLUS1-1, NDEG,
-     :                           EPS, DPWORK(3*MAXPTS+1), IERR1, 
+     :                           EPS, DPWORK(3*MAXPTS+1), IERR1,
      :                           DPWORK(4*MAXPTS+1), IERR2 )
 
                 IF( IERR1 .NE. 1 ) THEN
@@ -4786,8 +4786,8 @@ C ----------------------------------------------------------------
                       NPOINT = NPOINT + 1
                       WAVE(NPOINT) = XSTACK(I)
 
-                      CALL PDA_DP1VLU( NDEG, 0, DBLE( XSTACK(I) ), 
-     :                                 DPYVAL, DPXBAR, 
+                      CALL PDA_DP1VLU( NDEG, 0, DBLE( XSTACK(I) ),
+     :                                 DPYVAL, DPXBAR,
      :                                 DPWORK(4*MAXPTS+1), IERR2 )
                       FLUX(NPOINT) = DPYVAL
 
@@ -4930,7 +4930,7 @@ C ----------------------------------------------------------------
                 ELSE
 
  2205              CONTINUE
-                   CALL RDSTR( SUBCMD, 'Entries', ' ', PARAMS, 
+                   CALL RDSTR( SUBCMD, 'Entries', ' ', PARAMS,
      :                         STATUS )
                    IF( STATUS .NE. SAI__OK ) THEN
                       OK = .FALSE.
@@ -4939,7 +4939,7 @@ C ----------------------------------------------------------------
 
                    IF( PARAMS .EQ. ' ' ) THEN
                       CALL MSGOUT( SUBCMD, ' You have set PPROMPT '//
-     :                             'true. Try again...', .TRUE., 
+     :                             'true. Try again...', .TRUE.,
      :                             STATUS )
                       GO TO 02205
                    END IF
@@ -5003,7 +5003,7 @@ C ----------------------------------------------------------------
                    INVR = NINT(VARRAY(NVR))
                    IF( INVR .GE. 1 .AND. INVR .LE. MAXSTK ) THEN
 
-                      IF( INVR .GT. NONSTK .OR. 
+                      IF( INVR .GT. NONSTK .OR.
      :                    STKNPT( INVR ) .LT. 1 ) THEN
 
                          WRITE (*,'(''   PM:  entry'',I3,'' is '//
@@ -5237,9 +5237,9 @@ C ----------------------------------------------------------------
              CALL GET0L( PARAMS, 1, .FALSE., SUBCMD, 'Should the PM '//
      :                   'command prompt', PPROMPT, PPROMPT, STATUS )
              IF( PPROMPT ) THEN
-                CALL MSGOUT( SUBCMD, 'On', .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'On', .FALSE., STATUS )
              ELSE
-                CALL MSGOUT( SUBCMD, 'Off', .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'Off', .FALSE., STATUS )
              END IF
 
 *  PS:  Plot Spectrum (for hires data)
@@ -5491,7 +5491,7 @@ C ----------------------------------------------------------------
           ELSE IF( SUBCMD .EQ. 'READ' ) THEN
              IF( USENDF ) THEN
                 CALL READ( 'READ', PARAMS, WORV, TITLE, STATUS )
-             ELSE 
+             ELSE
 
 *         ----------------------------------------------------------------
              DO 12460 I = 1, 40
@@ -5563,7 +5563,7 @@ C ----------------------------------------------------------------
 *  RECORD: Record a command string.
           ELSE IF( SUBCMD .EQ. 'RECORD' ) THEN
              CALL RECORD( 'RECORD '//PARAMS, RESTRING, OK )
- 
+
 *  REPLAY: Replay a REMEMBERed command string
           ELSE IF( SUBCMD .EQ. 'REPLAY' ) THEN
              CALL DECODE('REPLAY',PARAMS,0,0,VARRAY,' ',OK)
@@ -5816,14 +5816,14 @@ C ----------------------------------------------------------------
                    PARAMS(1:8) = 'SAVE.STK'
                 END IF
              END IF
-             DO 2680 I = 40,1,-1 
+             DO 2680 I = 40,1,-1
                 IF( PARAMS(I:I) .NE. ' ') GO TO 2700
  2680        CONTINUE
              PARAMS(1:8) = 'SAVE.STK'
              GO TO 2701
  2700        CONTINUE
              I=INDEX(PARAMS,' ')
-             params = params(1:i-1)//'.STK'//params(i:) 
+             params = params(1:i-1)//'.STK'//params(i:)
  2701        CONTINUE
 !!!             CALL DTOUPP(PARAMS)
              CALL SSTRIP(PARAMS)
@@ -6027,7 +6027,7 @@ C             CALL DECODE('SHELL',PARAMS,0,0,VARRAY,' ',OK)
 C             IHX = LIB$SPAWN(,,,,,,,,,,'shell>$ ',)
 C           ELSE
               CALL SYSEXE( PARAMS, 0, STATUS )
-C           END IF 
+C           END IF
 *
 *   SL(WR) List (or file) stack entries
 *
@@ -6066,7 +6066,7 @@ C             CLOSE (6)
              IF( SUBCMD .EQ. 'SLWR' ) THEN
                 OPEN (UNIT=lunit,FILE='stack.lis',STATUS='NEW',
      :                IOSTAT=IX)
-              
+
 C             ELSE
 C                OPEN (UNIT=6,FILE='TT:',STATUS='NEW',IOSTAT=IX)
              END IF
@@ -6093,7 +6093,7 @@ C                   CLOSE (6)
                 IF( NPOINT .NE. 0 ) THEN
 
                    WRITE (lunit,'('' Current'',I6,1X,G11.5,1X,G11.5,'//
-     :                    '1X,A)') NPOINT, WAVE(1), WAVE(NPOINT), 
+     :                    '1X,A)') NPOINT, WAVE(1), WAVE(NPOINT),
      :                    TITLE(1:IPMAX)
                     CONTINUE
                 ELSE
@@ -6249,7 +6249,7 @@ C                   CLOSE (6)
                 CALL MSGOUT(SUBCMD,'Command not available in NDF '//
      :                      'mode.', .TRUE., STATUS )
                 GO TO 5000
-             END IF                
+             END IF
 
              IF( NPOINT .EQ. 0 ) THEN
                 WRITE (*,'(''   SP2WR:  no data in current arrays'')')
@@ -6345,7 +6345,7 @@ C                   CLOSE (6)
                 CALL MSGOUT(SUBCMD,'Command not available in NDF '//
      :                      'mode.', .TRUE., STATUS )
                 GO TO 5000
-             END IF                
+             END IF
 
              DO 2980 I = 1, 80
                 IF( PARAMS(I:I) .NE. ' ') GO TO 3020
@@ -6385,7 +6385,7 @@ C                   CLOSE (6)
                 CALL MSGOUT(SUBCMD,'Command not available in NDF '//
      :                      'mode.', .TRUE., STATUS )
                 GO TO 5000
-             END IF                
+             END IF
              DO 3040 I = 1, 80
                 IF( PARAMS(I:I) .NE. ' ') GO TO 3080
  3040        CONTINUE
@@ -6733,9 +6733,9 @@ C                   CLOSE (6)
                       J = INDEX( PARAMS( I + 1 : ), '"' )
 
                       IF( J .EQ. 0 ) THEN
-                         J = SLEN( PARAMS ) 
+                         J = SLEN( PARAMS )
                          CALL CHR_APPND( '"', PARAMS, J )
-                         CALL MSGOUT( SUBCMD, 'Closing quotes added', 
+                         CALL MSGOUT( SUBCMD, 'Closing quotes added',
      :                                .TRUE., STATUS )
                          IF( STATUS .NE. SAI__OK ) GO TO 5000
 
@@ -6744,7 +6744,7 @@ C                   CLOSE (6)
                       END IF
 
                    END IF
- 
+
                    IF( COMTXT ) THEN
                       CALL CHR_PREFX( 'TITLE '//PARAMS( 1 : J ), COMND1,
      :                                I )
@@ -6827,7 +6827,7 @@ C                   CLOSE (6)
              TSTVAL = 654321.789
              NLOST = 0
              DO 3240 I = 1, NPOINT
-                FLUX(I) = LOG10(MAX(1e-30,FLUX(I))) + 
+                FLUX(I) = LOG10(MAX(1e-30,FLUX(I))) +
      :                   2.0*LOG10(max(1e-30,WAVE(I))) - CLLOG
                 IF( ABS(FLUX(I)).GT.36.0 ) THEN
                    FLUX(I) = TSTVAL
@@ -6863,7 +6863,7 @@ C                   CLOSE (6)
              TSTVAL = 654312.789
              DO 3260 I = 1, NPOINT
                 WAVE(I) = LOG10(max(1e-30,WAVE(I)))
-                FLUX(I) = LOG10(max(1e-30,FLUX(I))) + 
+                FLUX(I) = LOG10(max(1e-30,FLUX(I))) +
      :                     2.0*WAVE(I) - CLLOG
                 IF( ABS(FLUX(I)).GT.36.0 ) THEN
                    FLUX(I) = TSTVAL
@@ -7065,9 +7065,9 @@ C                   CLOSE (6)
              CALL GET0L( PARAMS, 1, .FALSE., SUBCMD, 'Should titles '//
      :                   ' be prompted for', TPROMPT, TPROMPT, STATUS )
              IF( TPROMPT ) THEN
-                CALL MSGOUT( SUBCMD, 'On', .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'On', .FALSE., STATUS )
              ELSE
-                CALL MSGOUT( SUBCMD, 'Off', .FALSE., STATUS )       
+                CALL MSGOUT( SUBCMD, 'Off', .FALSE., STATUS )
              END IF
 
 *  TROT:  Rotate line attributes
@@ -7167,21 +7167,21 @@ C                   CLOSE (6)
              CALL GET0L( PARAMS, 1, .TRUE., SUBCMD, 'Do you want to '//
      :                   'use hypertext help', .TRUE., USEHTX, STATUS )
              IF( USEHTX ) THEN
-                CALL MSGOUT( SUBCMD, 'Using hypertext help', .FALSE., 
-     :                       STATUS )       
+                CALL MSGOUT( SUBCMD, 'Using hypertext help', .FALSE.,
+     :                       STATUS )
              ELSE
-                CALL MSGOUT( SUBCMD, 'Using plain text help', .FALSE., 
+                CALL MSGOUT( SUBCMD, 'Using plain text help', .FALSE.,
      :                       STATUS )
              END IF
 
              CALL GET0C( PARAMS, 2, .TRUE., SUBCMD, 'Type the showme '//
-     :                   'command with full path', SHOWME, TSHOW, 
+     :                   'command with full path', SHOWME, TSHOW,
      :                   STATUS )
 
              IF( TSHOW .NE. SHOWME ) THEN
                 CALL MSG_SETC( 'SHOWME', TSHOW )
                 CALL MSGOUT( SUBCMD, 'Using ''^SHOWME'' for the '//
-     :                       'Starlink ''showme'' command.', .FALSE., 
+     :                       'Starlink ''showme'' command.', .FALSE.,
      :                       STATUS )
                 SHOWME = TSHOW
              END IF
@@ -7192,10 +7192,10 @@ C                   CLOSE (6)
              CALL GET0L( PARAMS, 1, .TRUE., SUBCMD, 'Do you want to '//
      :                   'use NDF data files', .TRUE., USENDF, STATUS )
              IF( USENDF ) THEN
-                CALL MSGOUT( SUBCMD, 'Using NDF data files', .FALSE., 
-     :                       STATUS )       
+                CALL MSGOUT( SUBCMD, 'Using NDF data files', .FALSE.,
+     :                       STATUS )
              ELSE
-                CALL MSGOUT( SUBCMD, 'Using native DIPSO data files', 
+                CALL MSGOUT( SUBCMD, 'Using native DIPSO data files',
      :                       .FALSE., STATUS )
              END IF
 
@@ -7205,7 +7205,7 @@ C                   CLOSE (6)
                 CALL MSGOUT(SUBCMD,'Command not available in NDF '//
      :                      'mode.', .TRUE., STATUS )
                 GO TO 5000
-             END IF                
+             END IF
 
  3420        CONTINUE
              CALL SSTRIP(PARAMS)
@@ -7523,10 +7523,10 @@ C                   CLOSE (6)
              END IF
              WRITE (18,IOSTAT=IOS) TITLE
              IF( IOS .EQ. 0 ) THEN
-                WRITE (18,IOSTAT=IOS) NBREAK, 
+                WRITE (18,IOSTAT=IOS) NBREAK,
      :                     (BREAK(I),I=1,NBREAK)
               IF( IOS .EQ. 0 ) THEN
-                   WRITE (18,IOSTAT=IOS) 
+                   WRITE (18,IOSTAT=IOS)
      :                     (WAVE(I),FLUX(I),I=1,NPOINT)
                    IF( IOS .EQ. 0 ) THEN
                       WRITE (18,IOSTAT=IOS) WORV
@@ -8179,7 +8179,7 @@ C                   CLOSE (6)
                 END IF
              END IF
           ELSE
-             WRITE (*,'(''   Illegal command:'',A20)') 
+             WRITE (*,'(''   Illegal command:'',A20)')
      :       SUBCMD(1:CMDLEN)
  5000        CONTINUE
              IF( .NOT.OK ) THEN
@@ -8222,7 +8222,7 @@ C                   CLOSE (6)
              CALL SAVE( 'EXIT', ' ', STATUS )
              GO TO 6000
 
-*  If any other error has been reported (other than PAR__ABORT), just flush 
+*  If any other error has been reported (other than PAR__ABORT), just flush
 *  it and continue.
           ELSE IF( STATUS .NE. SAI__OK ) THEN
              CALL ERR_FLUSH( STATUS )
@@ -8243,7 +8243,7 @@ c          WRITE(*,*)
 
  6000  CONTINUE
 
-*  Release the error stack. Any remaining deferred error messages will be 
+*  Release the error stack. Any remaining deferred error messages will be
 *  delivered to the user.
        CALL ERR_RLSE
 

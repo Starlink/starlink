@@ -86,7 +86,7 @@
 *   Plot the symbols.
          DO 380 I=1,N
             CALL GRTXY0(ABSXY,X(I),Y(I),XORG,YORG)
-   
+
             VISBLE = .FALSE.
             K = 4
             LXLAST = -64

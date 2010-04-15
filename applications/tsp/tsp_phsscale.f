@@ -1,5 +1,5 @@
 
-      SUBROUTINE TSP_PHSSCALE(SIZE,XB,Y,YE,IMIN,IMAX,STATUS) 
+      SUBROUTINE TSP_PHSSCALE(SIZE,XB,Y,YE,IMIN,IMAX,STATUS)
 *+
 *
 *  T S P _ P H S S C A L E
@@ -21,7 +21,7 @@
 *  Modified:
 *     11/12/1991
 *
-*+            
+*+
 
 
       IMPLICIT NONE
@@ -30,18 +30,18 @@
       INCLUDE 'PRM_PAR'
 
 *  Parameters
-      INTEGER SIZE                    
+      INTEGER SIZE
       REAL Y(SIZE), YE(SIZE)
       DOUBLE PRECISION XB(SIZE)
       REAL IMIN,IMAX
       INTEGER STATUS
 
 *  Local variables
-      INTEGER I   
-      LOGICAL ERRORS                 
+      INTEGER I
+      LOGICAL ERRORS
 
       IF (STATUS .EQ. SAI__OK) THEN
-   
+
 *  Get errors parameter
 
           CALL PAR_GET0L('ERRORS',ERRORS,STATUS)
@@ -51,10 +51,10 @@
 
           IMIN = VAL__MAXR
           IMAX = VAL__MINR
- 
+
 *  Find maximum and minimum ignoring points with no data
 
-          DO I=1,SIZE                
+          DO I=1,SIZE
               IF (Y(I) .NE. VAL__BADR) THEN
                   IF (ERRORS) THEN
                       IF (Y(I)+YE(I) .GT. IMAX) IMAX = Y(I)+YE(I)
@@ -65,7 +65,7 @@
                   ENDIF
               ENDIF
           ENDDO
-         
+
       ENDIF
       END
 

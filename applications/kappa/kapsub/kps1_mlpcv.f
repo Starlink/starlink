@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX, ABSAXS, 
+      SUBROUTINE KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX, ABSAXS,
      :                       YLOG, LINDAT, MN, MX, BAR, STATUS )
 *+
 *  Name:
@@ -11,20 +11,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX, ABSAXS, 
+*     CALL KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX, ABSAXS,
 *                      YLOG, LINDAT, MN, MX, BAR, STATUS )
 
 *  Description:
-*     This routine returns the limits of the vertical error bars for a 
+*     This routine returns the limits of the vertical error bars for a
 *     line of data.
 
 *  Arguments:
 *     NX = INTEGER (Given)
-*        The number of grid elements along the first axis of the data 
-*        array. 
+*        The number of grid elements along the first axis of the data
+*        array.
 *     NY = INTEGER (Given)
-*        The number of grid elements along the second axis of the data 
-*        array. 
+*        The number of grid elements along the second axis of the data
+*        array.
 *     VAR( NX, NY ) = DOUBLE PRECISION (Given)
 *        The 2D variance array.
 *     SIGMA = REAL (Given)
@@ -37,7 +37,7 @@
 *        The grid index of the line to be copied. This refers to the
 *        ordinate axis implied by ABSAXS.
 *     ABSAXS = INTEGER (Given)
-*        The index of the abscissa (horizontal) grid axis. This should be 1 
+*        The index of the abscissa (horizontal) grid axis. This should be 1
 *        or 2. The other axis is the ordinate (vertical) axis.
 *     YLOG = LOGICAL (Given)
 *        If .TRUE., then the log of the data value is to be copied.
@@ -48,7 +48,7 @@
 *     MX = DOUBLE PRECISION (Returned)
 *        The maximum value in the returned BAR array.
 *     BAR( ABSDIM, 2 ) = DOUBLE PRECISION (Returned)
-*        Row 1 contains the lower data value and row 2 contains the upper 
+*        Row 1 contains the lower data value and row 2 contains the upper
 *        data value for each error bar.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
@@ -85,12 +85,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER NX
@@ -142,7 +142,7 @@
                BAR( I, 2 ) = AST__BAD
 
 *  Check both the data value and variance are good.
-               VARVAL = VAR( I, INDX ) 
+               VARVAL = VAR( I, INDX )
                IF( LINDAT( I ) .NE. AST__BAD .AND.
      :             VARVAL .NE. VAL__BADD .AND. VARVAL .GT. 0.0 ) THEN
 
@@ -158,7 +158,7 @@
 
 *  Store the log data value at the two ends of the error bar, if possible.
                   IF( LO .GT. 0.0 .AND. HI .GT. 0.0 ) THEN
-                     BAR( I, 1 ) = LOG10( LO )                  
+                     BAR( I, 1 ) = LOG10( LO )
                      BAR( I, 2 ) = LOG10( HI )
 
 *  Update the max and min returned values.
@@ -172,11 +172,11 @@
             END DO
 
 *  Now do the linear case.
-         ELSE 
+         ELSE
 
             DO I = 1, ABSDIM
-               VARVAL = VAR( I, INDX ) 
-               DATVAL = LINDAT( I ) 
+               VARVAL = VAR( I, INDX )
+               DATVAL = LINDAT( I )
 
                IF( DATVAL .NE. AST__BAD .AND.
      :             VARVAL .NE. VAL__BADD .AND. VARVAL .GT. 0.0 ) THEN
@@ -211,7 +211,7 @@
                BAR( I, 2 ) = AST__BAD
 
 *  Check both the data value and variance are good.
-               VARVAL = VAR( INDX, I ) 
+               VARVAL = VAR( INDX, I )
                IF( LINDAT( I ) .NE. AST__BAD .AND.
      :             VARVAL .NE. VAL__BADD .AND. VARVAL .GT. 0.0 ) THEN
 
@@ -227,7 +227,7 @@
 
 *  Store the log data value at the two ends of the error bar, if possible.
                   IF( LO .GT. 0.0 .AND. HI .GT. 0.0 ) THEN
-                     BAR( I, 1 ) = LOG10( LO )                  
+                     BAR( I, 1 ) = LOG10( LO )
                      BAR( I, 2 ) = LOG10( HI )
 
 *  Update the max and min returned values.
@@ -241,11 +241,11 @@
             END DO
 
 *  Now do the linear case.
-         ELSE 
+         ELSE
 
             DO I = 1, ABSDIM
-               VARVAL = VAR( INDX, I ) 
-               DATVAL = LINDAT( I ) 
+               VARVAL = VAR( INDX, I )
+               DATVAL = LINDAT( I )
 
                IF( DATVAL .NE. AST__BAD .AND.
      :             VARVAL .NE. VAL__BADD .AND. VARVAL .GT. 0.0 ) THEN

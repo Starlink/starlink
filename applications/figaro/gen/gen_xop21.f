@@ -33,7 +33,7 @@ C     (>) XARRAY  (Real array XARRAY(NX)) The 1D array
 C     (>) XVAR    (Real array XVAR(NX)) The 1D array variances
 C     (<) RESULT  (Real array RESULT(NX,NY)) The 2D result.  Note that
 C                 RESULT and XYARRAY may be the same array.
-C     (<) RVAR    (Real array RVAR(NX,NY)) The 2D result variances.  
+C     (<) RVAR    (Real array RVAR(NX,NY)) The 2D result variances.
 C
 C                                       KS / CIT  18th Feb 1983
 C+
@@ -68,7 +68,7 @@ C
                IPTR=IPTR+1
             END DO
          END DO
-         IF (VEXIST) THEN        
+         IF (VEXIST) THEN
            DO IY=1,NY
               DO IX=1,NX
                  RVAR(VPTR)=XYVAR(VPTR)+XVAR(IX)
@@ -96,7 +96,7 @@ C
               DO IX=1,NX
                  IF (XARRAY(IX).EQ.0..OR.XYARRAY(VPTR).EQ.0.) THEN
                     RVAR(VPTR)=0.
-                 ELSE 
+                 ELSE
                     TEMP = XYVAR(VPTR)/(XYARRAY(VPTR)**2.)
                     TEMP = TEMP + (XVAR(IX)/(XARRAY(IX)**2.))
                     RVAR(VPTR)=TEMP
@@ -137,7 +137,7 @@ C
                IPTR=IPTR+1
             END DO
          END DO
-         IF (VEXIST) THEN        
+         IF (VEXIST) THEN
            DO IY=1,NY
               DO IX=1,NX
                  RVAR(VPTR)=XYVAR(VPTR)+XVAR(IX)

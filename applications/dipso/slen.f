@@ -3,7 +3,7 @@
 !
 !   INTEGER FUNCTION SLEN
 !
-!   IMPORTS:  
+!   IMPORTS:
 !     STRING   (CHARACTER)
 !
 !   RETURNS:

@@ -1,5 +1,5 @@
-	SUBROUTINE HOTSHOTSUB( NXI, NYI, IMAGE_IN, WHOLE, IXCEN, IYCEN, IXSZ, 
-     :	                       IYSZ, BINX, BINY, SIGMA, THRESH, SETWHAT, 
+	SUBROUTINE HOTSHOTSUB( NXI, NYI, IMAGE_IN, WHOLE, IXCEN, IYCEN, IXSZ,
+     :	                       IYSZ, BINX, BINY, SIGMA, THRESH, SETWHAT,
      :	                       BADVAL, IMAGE_OUT, MAXNUMHOT, STATUS)
 
 *       HISTORY
@@ -13,8 +13,8 @@
 	INTEGER IYSZ
 	INTEGER IXST
 	INTEGER IYST
-	INTEGER IXEN 
-	INTEGER IYEN 
+	INTEGER IXEN
+	INTEGER IYEN
 	INTEGER BINX
 	INTEGER BINY
 	INTEGER IEN1
@@ -82,7 +82,7 @@
 !	type *, 'Setwhat, badval = ', setwhat( 1:1), badval
 	MORE = .TRUE.
         OLDHOT = 1E5
-	DO WHILE ( MORE) 
+	DO WHILE ( MORE)
 	  IST2 = IYST
 	  IEN2 = IST2+BINY-1
 	  NITER = NITER + 1
@@ -156,13 +156,13 @@
 	  END DO
           CALL MSG_SETI( 'NITER', NITER )
           CALL MSG_SETI( 'NUMHOT', NUMHOT )
-          CALL MSG_OUT( 'MSG', 
-     :        'Iteration no. ^NITER, NUMHOT = ^NUMHOT', STATUS ) 
+          CALL MSG_OUT( 'MSG',
+     :        'Iteration no. ^NITER, NUMHOT = ^NUMHOT', STATUS )
 	  IF( NITER .EQ. 1) THEN
 	    TOLL = IFIX( NUMHOT/10.0)
             CALL MSG_SETI( 'TOLL', TOLL )
-            CALL MSG_OUT( 'MSG', 
-     :	  'terminate when NUMHOT<^TOLL, when = 0, or if diverge', 
+            CALL MSG_OUT( 'MSG',
+     :	  'terminate when NUMHOT<^TOLL, when = 0, or if diverge',
      :                    STATUS )
 	    MAXNUMHOT = NUMHOT
 	  END IF

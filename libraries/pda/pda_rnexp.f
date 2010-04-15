@@ -2,13 +2,13 @@
 *+
 *  Name:
 *     PDA_RNEXP
- 
+
 *  Purpose:
 *     Returns pseudo-random numbers from an exponential distribution.
-      
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     RESULT = PDA_RNEXP( X )
 
@@ -17,11 +17,11 @@
 *     from an exponential distribution, with a period of 2**26, and to
 *     6 or 7 digits accuracy.  It is based upon Ahrens, Dieter &
 *     Grube's TOMS599 routines.
- 
-*  Arguments:               
+
+*  Arguments:
 *     X = REAL (Given)
 *        This is a dummy variable required by the Fortran standard.
- 
+
 *  Returned Value:
 *     PDA_RNEXP = INTEGER
 *        The pseudo-random deviate.
@@ -51,19 +51,19 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 November 21 (MJC)
 *        Original version.
 *     1997 February 26 (DSB)
 *        Remove "      INCLUDE 'SAE_PAR'".
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

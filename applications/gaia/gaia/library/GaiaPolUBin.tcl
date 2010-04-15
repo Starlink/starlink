@@ -11,7 +11,7 @@
 #  Description:
 #     This class provides GUI controls for the various options which
 #     determine how vectors are binned.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolUBin object_name [configuration options]
@@ -78,7 +78,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -87,7 +87,7 @@ itcl::class gaia::GaiaPolUBin {
       set created_ 0
 
 #  Set defaults
-      reset 
+      reset
    }
 
 #  Destructor:
@@ -180,7 +180,7 @@ itcl::class gaia::GaiaPolUBin {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
       if { $values_($this,box) == "" } { set values_($this,box) 5 }
       if { $values_($this,method) == "" } { set values_($this,method) "median" }
@@ -223,7 +223,7 @@ itcl::class gaia::GaiaPolUBin {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -254,7 +254,7 @@ itcl::class gaia::GaiaPolUBin {
          set r -1
 
 #  Label parameters...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Binning Options:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -277,7 +277,7 @@ itcl::class gaia::GaiaPolUBin {
          add_short_help $itk_component(box) {The length of a side of each square bin, in pixels}
 
 #  Vertical space.
-         grid [frame $w_.space1 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -286,7 +286,7 @@ itcl::class gaia::GaiaPolUBin {
          itk_component add method {
             LabelMenu $w_.method -text "Method:" \
                                  -variable [scope values_($this,method)] \
-                                 -labelwidth $lwidth 
+                                 -labelwidth $lwidth
          }
          grid $itk_component(method) -row $r -columnspan $ncol -column 0 -sticky nw -padx $px
          add_short_help $itk_component(method) {Method used to combine values in each bin}
@@ -298,7 +298,7 @@ itcl::class gaia::GaiaPolUBin {
                                     -command "[code $this activ method]"
 
 #  Vertical space.
-         grid [frame $w_.space2 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space2 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -311,13 +311,13 @@ itcl::class gaia::GaiaPolUBin {
                                      -labelwidth $lwidth \
                                      -command [code $this activ debias] \
                                      -anchor nw \
-                                     -variable [scope values_($this,debias)] 
+                                     -variable [scope values_($this,debias)]
          }
          grid $itk_component(debias) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(debias) {Should the binned polarization values be debiassed if possible?}
 
 #  Vertical space.
-         grid [frame $w_.space3 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space3 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -336,7 +336,7 @@ itcl::class gaia::GaiaPolUBin {
          add_short_help $itk_component(minval) {The minimum number of good values in a bin}
 
 #  Vertical space.
-         grid [frame $w_.space4 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space4 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -355,7 +355,7 @@ itcl::class gaia::GaiaPolUBin {
          add_short_help $itk_component(sigmas) {The number of standard deviations at which to clip when using method 'sigma-clipped mean'}
 
 #  Vertical space.
-         grid [frame $w_.space5 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space5 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -372,7 +372,7 @@ itcl::class gaia::GaiaPolUBin {
          add_short_help $itk_component(binner) {Click to bin all currently displayed vectors using the current settings}
 
 #  Vertical space
-         grid [frame $w_.space6 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space6 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -384,7 +384,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
       }
    }
@@ -419,7 +419,7 @@ itcl::class gaia::GaiaPolUBin {
 #  A command to call when any control values are changed by the user.
    itk_option define -changecmd changecmd Changecmd {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -433,14 +433,14 @@ itcl::class gaia::GaiaPolUBin {
        variable attr_
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

@@ -137,7 +137,7 @@ LOCALPUBLIC void gk0xstackpush(sp,val)stack *sp;char *val;{
 	}
 	for(to = sp->s_top, len = sp->s_width; len--!=0 ;)
 		*to++ = *val++;
-}	
+}
 LOCALPUBLIC void gk0xstackpop(sp,val)stack *sp;char *val;{
 	char *from;
 	unsigned int len;
@@ -184,7 +184,7 @@ LOCALPUBLIC void enqueue(sp,val)stack *sp;char *val;{
 			sp->s_end = sp->s_memory + len;
 			if(oldmem==NULLPTR(char))
 				sp->s_top = sp->s_bottom = sp->s_memory;
-			else{	
+			else{
 				sp->s_bottom = sp->s_top += sp->s_memory-oldmem;	/* relocate ptr */
 				if(sp->s_bottom==sp->s_memory)	/* gap is at front, make it at end! */
 					sp->s_bottom = sp->s_end - sp->s_width;
@@ -198,7 +198,7 @@ LOCALPUBLIC void enqueue(sp,val)stack *sp;char *val;{
 	}
 	for(to = sp->s_bottom, len = sp->s_width; len--!=0 ;)
 		*to++ = *val++;
-}	
+}
 LOCALPUBLIC void dequeue(sp,val)stack *sp;char *val;{
 	char *from;
 	unsigned int len;
@@ -210,7 +210,7 @@ LOCALPUBLIC void dequeue(sp,val)stack *sp;char *val;{
 	else{
 		sp->s_top += sp->s_width;	/* next */
 		if(sp->s_top>=sp->s_end)sp->s_top = sp->s_memory;	/* wrap */
-	}	
+	}
 }
 #ifdef WANTUNDOQUEUE
 /*
@@ -228,7 +228,7 @@ LOCALPUBLIC void undoqueue(sp,val)stack *sp;char *val;{
 	else{
 		if(sp->s_bottom<=sp->s_memory)sp->s_bottom = sp->s_end;	/* wrap */
 		sp->s_bottom -= sp->s_width;	/* previous */
-	}	
+	}
 }
 #endif WANTUNDOQUEUE
 #endif defined(WWFORPERQ2) | defined(SUNQUEUE)

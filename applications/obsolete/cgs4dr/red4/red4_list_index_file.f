@@ -1,5 +1,5 @@
 *+  RED4_LIST_INDEX_FILE - List the contents of the CGS4 index file to file.
-      SUBROUTINE RED4_LIST_INDEX_FILE( INDEX_FILE, OUTPUT_FILE, 
+      SUBROUTINE RED4_LIST_INDEX_FILE( INDEX_FILE, OUTPUT_FILE,
      :  PRINTER, STATUS )
 *    Description :
 *     This subroutine reads the observation index file and lists its
@@ -25,7 +25,7 @@
 *    Method :
 *    Deficiencies :
 *     Some of the character items from the index file are truncated
-*     in order to display them on one line. 
+*     in order to display them on one line.
 *    Bugs :
 *    Authors :
 *     S.M.Beard    (REVAD::SMB)
@@ -74,7 +74,7 @@
       CHARACTER*132
      :  OUTPUT_TEXT                    ! Buffer for output string
 *
-      RECORD /OBSREC/ OBSREC           ! An observation record 
+      RECORD /OBSREC/ OBSREC           ! An observation record
 *                                      ! (structure defined in RED4_COMMON.INC)
 *
 *    Local data :
@@ -112,15 +112,15 @@
             CALL FIO_WRITE( OUTPUT_FD, ' ', STATUS)
 
 *          Display a heading.
-            CALL FIO_WRITE( OUTPUT_FD, 
-     :       'Observation    Qly Type     '/ 
+            CALL FIO_WRITE( OUTPUT_FD,
+     :       'Observation    Qly Type     '/
      :       /'Time  Exposure Grating Glambda Slit    '/
      :       /'CVF     '/
      :       /'Filters Mode      Grp Row,Col,Os '/
 *    :       /'Cfindx Airmass', STATUS)
      :       /'Cfindx', STATUS)
             CALL FIO_WRITE( OUTPUT_FD,
-     :       '-----------    --- ----     '/ 
+     :       '-----------    --- ----     '/
      :       /'----  -------- ------- ------- ----    '/
      :       /'---     '/
      :       /'------- ----      --- ---------- '/
@@ -137,27 +137,27 @@
             DO WHILE ( STATUS .EQ. SAI__OK )
 
 *             Only write if obs. quality is there
-               IF (OBSREC.QUALITY(1:1) .EQ. 'G' .OR. 
+               IF (OBSREC.QUALITY(1:1) .EQ. 'G' .OR.
      :          OBSREC.QUALITY(1:1) .EQ. 'B') THEN
 
 *                Write out the contents of the record (ignoring
 *                any format conversion errors).
                   WRITE( OUTPUT_TEXT, 1)
-     :             OBSREC.OBSERVATION(1:14), 
-     :             OBSREC.QUALITY(1:1), 
-     :             OBSREC.TYPE(1:6), 
-     :             OBSREC.START_TIME, 
-     :             OBSREC.EXPOSURE_TIME, 
+     :             OBSREC.OBSERVATION(1:14),
+     :             OBSREC.QUALITY(1:1),
+     :             OBSREC.TYPE(1:6),
+     :             OBSREC.START_TIME,
+     :             OBSREC.EXPOSURE_TIME,
      :             OBSREC.GRATING_NAME(1:7),
      :             OBSREC.GRATING_WVLNGTH,
-     :             OBSREC.SLIT_NAME(1:7), 
-     :             OBSREC.CVF_NAME(1:7), 
+     :             OBSREC.SLIT_NAME(1:7),
+     :             OBSREC.CVF_NAME(1:7),
      :             OBSREC.FILTERS(1:7),
      :             OBSREC.INTTYPE(1:9),
-     :             OBSREC.GRPNUM, 
-     :             OBSREC.DET_NROWS, 
-     :             OBSREC.DET_NCOLUMNS, 
-     :             OBSREC.DET_NINCR, 
+     :             OBSREC.GRPNUM,
+     :             OBSREC.DET_NROWS,
+     :             OBSREC.DET_NCOLUMNS,
+     :             OBSREC.DET_NINCR,
      :             OBSREC.CNFINDEX
 *    :             OBSREC.AIRMASS
  1                FORMAT( 1X, A14, 1X, A1, 3X, A6, 1X, F7.3, 1X,
@@ -180,7 +180,7 @@
                CALL RIO_READ( INDEX_FD, RECNUM, OBSRECSZ, OBSREC, STATUS)
             END DO
 
-*          Report if an error has occurred 
+*          Report if an error has occurred
             IF (STATUS .NE. SAI__OK) THEN
                IF (STATUS .EQ. FIO__EOF) THEN
                   CALL ERR_ANNUL (STATUS)
@@ -219,7 +219,7 @@
             IF ( STATUS .NE. SAI__OK ) THEN
 
                CALL MSG_SETC( 'OUTPUT_FILE', OUTPUT_FILE )
-               CALL MSG_OUT( ' ', 'WARNING: Error occurred '/ 
+               CALL MSG_OUT( ' ', 'WARNING: Error occurred '/
      :          /'while closing output file ^OUTPUT_FILE', STATUS )
 
             END IF

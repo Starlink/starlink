@@ -8,20 +8,20 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_EXTINCTION( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
-*     This application extracts from a demodulated-data file data for a 
-*     specified SCUBA sub-instrument and corrects it for the effect of 
+*     This application extracts from a demodulated-data file data for a
+*     specified SCUBA sub-instrument and corrects it for the effect of
 *     atmospheric extinction. The airmass at which each bolometer measurement
 *     was made is calculated, then multiplied by the zenith sky extinction at
 *     the time of the measurement to give the extinction optical depth along
@@ -68,9 +68,9 @@
 
 *  Examples:
 *     extinction flat long 0.24 '01 00 00' 0.3 '02 00 00' corr
-*        Process the LONG sub-instrument from flat.sdf using the 
+*        Process the LONG sub-instrument from flat.sdf using the
 *        knowledge that the 850 tau (assuming LONG refers to the 850
-*        micron filter) was 0.24 at 1h LST and 0.3 at 2h LST. The 
+*        micron filter) was 0.24 at 1h LST and 0.3 at 2h LST. The
 *        output is written to corr.sdf
 *     extinction test short 0.6 0 0.6 0 test2
 *        Process the SHORT sub-instrument from test.sdf assuming
@@ -91,7 +91,7 @@
 *     SCULIB_CALC_APPARENT is called to work out the apparent RA and Dec of the
 *     telescope centre.
 *       Next, the components of the main data array are mapped. All the
-*     component exposures making up the observation are butted end to end 
+*     component exposures making up the observation are butted end to end
 *     in this array, so the `pointer' array is also mapped, which contains
 *     the start and finish indices of each exposure in the main data array.
 *     The array holding the local sidereal times of the start of each exposure
@@ -103,25 +103,25 @@
 *     observation are read and reported, as are the names of the SCUBA
 *     sub-instruments used. The name of the sub-instrumnet whose data are
 *     required is read from parameter SUB_INSTRUMENT, and a check made that
-*     the file deos contain data for the one selected. Arrays holding the 
+*     the file deos contain data for the one selected. Arrays holding the
 *     Nasmyth coords of the bolometers and their types are read in.
-*       Next, the zenith sky opacities at times before and after the 
+*       Next, the zenith sky opacities at times before and after the
 *     observation are read in from parameters FIRST_TAU, FIRST_LST and
 *     SECOND_TAU, SECOND_LST. SLA_DAFIN is called to convert the LST strings
 *     to radians.
 *       The OUT file is opened and the dimensions of the data array reset
-*     to reflect that only data for those bolometers belonging to the 
+*     to reflect that only data for those bolometers belonging to the
 *     selected SUB_INSTRUMENT will be written out. Data for these bolometers
 *     is extracted from the input file and written to the output file by
-*     SCULIB_GET_SUB_BOLS. The subsidiary arrays .SCUBA.BOL_CHAN and 
-*     .SCUBA.BOL_ADC are reset to reflect the new set of bolometers in the 
+*     SCULIB_GET_SUB_BOLS. The subsidiary arrays .SCUBA.BOL_CHAN and
+*     .SCUBA.BOL_ADC are reset to reflect the new set of bolometers in the
 *     data array, as are other affected FITS items in the output file.
 *       Now the application cycles through the exposures, integrations and
 *     measurements in the observation. A mean LST is calculated for each
 *     exposure from the start LSTs of the component switches, SCULIB_FIND_
-*     SWITCH is called to get the location of the exposure data in the 
-*     data array. 
-*       Now, cycling through the measurements in the exposure, the 
+*     SWITCH is called to get the location of the exposure data in the
+*     data array.
+*       Now, cycling through the measurements in the exposure, the
 *     application estimates the LST at which each measurement was made and
 *     works out the zenith sky opacity for this time. For `jiggle' observations
 *     the jiggle offset of the measurement is calculated, for `raster' the
@@ -181,7 +181,7 @@
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10   TSKNAME          ! Name of task
-      PARAMETER (TSKNAME = 'EXTINCTION') 
+      PARAMETER (TSKNAME = 'EXTINCTION')
 
 *  Local variables:
       LOGICAL          ABORTED          ! .TRUE. if the observation was
@@ -233,7 +233,7 @@
                                         ! file
       INTEGER          IN_LST_STRT_PTR  ! pointer to input .SCUCD.LST_STRT
       INTEGER          IN_PHOT_BB (SCUBA__MAX_BEAM, SCUBA__MAX_SUB)
-                                        ! indices in input data array of 
+                                        ! indices in input data array of
                                         ! bolometers observing the source in
                                         ! PHOTOM mode
       INTEGER          IN_POINTER (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -263,17 +263,17 @@
       INTEGER          LAST_EXP         ! the number of the exposure being
                                         ! measured when the abort occurred
       INTEGER          LAST_INT         ! the number of the integration
-                                        ! being measured when the abort 
+                                        ! being measured when the abort
                                         ! occurred
       INTEGER          LAST_MEAS        ! the number of the measurement
-                                        ! being measured when the abort 
+                                        ! being measured when the abort
                                         ! occurred
       DOUBLE PRECISION LAT_OBS          ! Latitude of observatory (radians)
       DOUBLE PRECISION LAT_RAD          ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD         ! latitude of telescope centre at MJD2
                                         ! (radians)
       INTEGER          LBND (MAXDIM)    ! lower bounds of array
-      DOUBLE PRECISION LONG_RAD         ! longitude of telescope centre 
+      DOUBLE PRECISION LONG_RAD         ! longitude of telescope centre
                                         ! (radians)
       DOUBLE PRECISION LONG2_RAD        ! apparent RA of telescope centre at
                                         ! MJD2 (radians)
@@ -282,7 +282,7 @@
                                         ! centre (arcsec)
       REAL             MAP_Y            ! y offset of map centre from telescope
                                         ! centre (arcsec)
-      DOUBLE PRECISION MJD1             ! modified Julian day at which object 
+      DOUBLE PRECISION MJD1             ! modified Julian day at which object
                                         ! was at LAT,LONG for PLANET centre
                                         ! coordinate system
       DOUBLE PRECISION MJD2             ! modified Julian day at which object
@@ -292,7 +292,7 @@
       INTEGER          NREC             ! number of history records in file
       INTEGER          N_BEAM           ! number of beams for which data have
                                         ! been reduced
-      INTEGER          N_BOL_IN         ! number of bolometers measured in 
+      INTEGER          N_BOL_IN         ! number of bolometers measured in
                                         ! input file
       INTEGER          N_BOL_OUT        ! number of bolometers measured in
                                         ! output file
@@ -324,7 +324,7 @@
       CHARACTER*(DAT__SZLOC) OUT_SCUBAX_LOC
                                         ! locator to SCUBA extension in output
                                         ! file
-      INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
+      INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC ! Locator to REDS extension
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
@@ -336,9 +336,9 @@
                                         ! LST of pointing corrections (radians)
       DOUBLE PRECISION RA_CENTRE        ! apparent RA of map centre (radians)
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
-      DOUBLE PRECISION ROTATION         ! angle between apparent north and 
+      DOUBLE PRECISION ROTATION         ! angle between apparent north and
                                         ! north of input coord system (radians,
-                                        ! measured clockwise from input north) 
+                                        ! measured clockwise from input north)
       REAL             RTEMP            ! Scratch real
       INTEGER          RUN_NUMBER       ! run number of observation
       CHARACTER*15     SAMPLE_COORDS    ! coordinate system of sample offsets
@@ -349,7 +349,7 @@
       DOUBLE PRECISION SECOND_LST_RAD   ! SECOND_LST in radians
       REAL             SECOND_TAU       ! zenith sky opacity at SECOND_LST
       INTEGER          SLA_STATUS       ! status return from SLA routine
-      CHARACTER*80     STATE            ! the state of SCUCD when the 
+      CHARACTER*80     STATE            ! the state of SCUCD when the
                                         ! datafile was closed
       CHARACTER*80     STEMP            ! scratch string
       INTEGER          SUB_POINTER      ! index of SUB_REQUIRED in sub-
@@ -409,10 +409,10 @@
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
      :  STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
@@ -428,7 +428,7 @@
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation '//
      :     'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
@@ -609,7 +609,7 @@
 *  map the DEM_PNTR array and check its dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
 *  map the .SCUCD.LST_STRT array and check its dimensions
@@ -620,7 +620,7 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :                    UT1,
      :     RTEMP, RTEMP, STATUS)
 
@@ -642,7 +642,7 @@
 
       IF (.NOT. ABORTED) THEN
          CALL MSG_SETC ('PKG', PACKAGE)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integration(s) in '//
      :        '^N_M measurement(s)', STATUS)
@@ -659,14 +659,14 @@
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
          CALL MSG_SETC ('PKG', PACKAGE)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
      :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
@@ -677,7 +677,7 @@
 *  observation
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG_RAD, LAT_RAD, LONG2_RAD,
-     :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
+     :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS,
      :     %VAL(CNF_PVAL(IN_LST_STRT_PTR)), UT1,
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
 
@@ -688,7 +688,7 @@
       IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
 
          CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
-     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT,
      :        JIGGLE_P_SWITCH, RTEMP, SAMPLE_COORDS, JIGGLE_X,
      :        JIGGLE_Y, STATUS)
 
@@ -731,7 +731,7 @@
 
       CALL MSG_SETC ('END_LST', STEMP)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: observation started at sidereal '//
      :     'time ^START_LST and ended at ^END_LST', STATUS)
 
@@ -757,7 +757,7 @@
      :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          DIMX (1) = SCUBA__MAX_BEAM
          DIMX (2) = SCUBA__MAX_SUB
-         CALL CMP_GETNI (IN_SCUBAX_LOC, 'PHOT_BB', 2, DIMX, 
+         CALL CMP_GETNI (IN_SCUBAX_LOC, 'PHOT_BB', 2, DIMX,
      :     IN_PHOT_BB, DIM , STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
             IF ((DIM(1) .NE. SCUBA__MAX_BEAM) .OR.
@@ -912,10 +912,10 @@
 *     For convenience I shall add the first 3 letters of the sub_instrument
 *     This is the smallest unique name. Other options are wavelength (since
 *     this is really unique) or just a single number to id the sub.
-*     The 3 character option is probably okay since it is only possible 
+*     The 3 character option is probably okay since it is only possible
 *     to use one wavelength for each sub-instrument so this format will
 *     be unique for any given observation.
-*     Only problem is that the SHORT form of the default name probably 
+*     Only problem is that the SHORT form of the default name probably
 *     should not include a long description of the sub-instrument.
 *     Probably should use a single id for this case. Need to think
 *     about this.
@@ -930,10 +930,10 @@
 *     If we have one then we have to keep it at the start of the string
 
          IF (SUFFIX_STRINGS(I)(1:1) .EQ. '!') THEN
-            CALL CHR_PREFX(STEMP(1:CHR_LEN(STEMP)), 
+            CALL CHR_PREFX(STEMP(1:CHR_LEN(STEMP)),
      :           SUFFIX_STRINGS(I)(2:), ITEMP)
          ELSE
-            CALL CHR_PREFX(STEMP(1:CHR_LEN(STEMP)), 
+            CALL CHR_PREFX(STEMP(1:CHR_LEN(STEMP)),
      :           SUFFIX_STRINGS(I), ITEMP)
          END IF
 
@@ -963,7 +963,7 @@
 
       CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE',
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
@@ -978,7 +978,7 @@
          CALL SCULIB_GET_SUB_BOLS (N_BOL_IN, N_POS, N_BEAM,
      :     %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(IN_QUALITY_PTR)), N_BOL_OUT,
-     :     IN_POINTER, %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     IN_POINTER, %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), STATUS)
       END IF
@@ -990,7 +990,7 @@
 
       CALL CMP_MOD (OUT_SCUBAX_LOC, 'BOL_ADC', '_INTEGER', 1,
      :  N_BOL_OUT, STATUS)
-      CALL CMP_PUT1I (OUT_SCUBAX_LOC, 'BOL_ADC', N_BOL_OUT, 
+      CALL CMP_PUT1I (OUT_SCUBAX_LOC, 'BOL_ADC', N_BOL_OUT,
      :  OUT_BOL_ADC, STATUS)
 
       CALL CMP_MOD (OUT_SCUBAX_LOC, 'BOL_CHAN', '_INTEGER', 1,
@@ -1015,7 +1015,7 @@
       CALL NDF_XSTAT(OUTNDF, 'REDS', THERE, STATUS)
 
       IF (THERE) THEN
-         CALL NDF_XLOC(OUTNDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+         CALL NDF_XLOC(OUTNDF, 'REDS', 'UPDATE', OUT_REDSX_LOC,
      :        STATUS)
 
 *     Is the fast_Axis array there
@@ -1023,7 +1023,7 @@
 
          IF (THERE) THEN
 *     Read the array
-         CALL CMP_GET1R(OUT_REDSX_LOC, 'FAST_AXIS', SCUBA__MAX_SUB, 
+         CALL CMP_GET1R(OUT_REDSX_LOC, 'FAST_AXIS', SCUBA__MAX_SUB,
      :        FAST_AXIS, ITEMP, STATUS)
 
 *     Delete the component
@@ -1059,7 +1059,7 @@
                   END DO
                END IF
             END DO
-            
+
             DIM (1) = SCUBA__MAX_BEAM
             DIM (2) = 1
             CALL CMP_MOD (OUT_SCUBAX_LOC, 'PHOT_BB', '_INTEGER',
@@ -1075,18 +1075,18 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAM, N_BOL_OUT,
-     :        N_POS, 1, N_SWITCHES, N_EXPOSURES, 
-     :        N_INTEGRATIONS, N_MEASUREMENTS, 
+     :        N_POS, 1, N_SWITCHES, N_EXPOSURES,
+     :        N_INTEGRATIONS, N_MEASUREMENTS,
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1, N_MEASUREMENTS,
      :        1, N_FITS, FITS,
-     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :        %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :        ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :        FOCAL_STATION, RA_CENTRE, DEC_CENTRE,
      :        %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
-     :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)),
      :        UT1, UT1,
      :        MJD1, LONG_RAD, LAT_RAD, MJD2, LONG2_RAD, LAT2_RAD,
      :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
@@ -1094,7 +1094,7 @@
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC,OUT_BOL_ADC,OUT_BOL_CHAN,
      :        BOL_DU3, BOL_DU4, .FALSE., FIRST_LST_RAD, SECOND_LST_RAD,
      :        FIRST_TAU, SECOND_TAU, BOL_RA, BOL_DEC,
-     :        %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :        %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :        %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), .FALSE., 0,
      :        0,0,
      :        STATUS)
@@ -1103,7 +1103,7 @@
 * and a title
 
          CALL NDF_CPUT('Extinction corrected',OUTNDF, 'LAB', STATUS)
- 
+
 *  unmap the main data array
 
          CALL NDF_UNMAP (OUTNDF, '*', STATUS)

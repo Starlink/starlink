@@ -20,12 +20,12 @@
 *        The global status.
 
 *  Description:
-*     This application filters the supplied one- or two-dimensional 
-*     array using a Wiener filter.  It takes an array holding observed 
-*     data and another holding a Point-Spread Function as input and 
+*     This application filters the supplied one- or two-dimensional
+*     array using a Wiener filter.  It takes an array holding observed
+*     data and another holding a Point-Spread Function as input and
 *     produces an output restored array with potentially higher
-*     resolution and lower noise.  Generally superior results can be 
-*     obtained using applications MEM2D or LUCY, but at the cost of 
+*     resolution and lower noise.  Generally superior results can be
+*     obtained using applications MEM2D or LUCY, but at the cost of
 *     much more processing time.
 *
 *     The Wiener filter attempts to minimise the mean squared
@@ -68,7 +68,7 @@
 *          -------------
 *             2      Pn
 *          |H|   +  ----
-*                    Pg 
+*                    Pg
 *
 *     where H is the Fourier transform of the supplied Point-Spread
 *     Function, Pn is the noise power, Pg is the power in the model
@@ -99,7 +99,7 @@
 *     OUT = NDF (Write)
 *        The restored output array.  An extension named WIENER is added
 *        to the output NDF to indicate that the image was created by
-*        this application (see Parameter QUIET). 
+*        this application (see Parameter QUIET).
 *     PMODEL = _REAL (Read)
 *        The mean power per pixel in the model image.  This parameter
 *        is only accessed if a null value is supplied for parameter
@@ -109,9 +109,9 @@
 *        the mean power per pixel in the input image. [!]
 *     PNOISE = _REAL (Read)
 *        The mean noise power per pixel in the observed data.  For
-*        Gaussian noise this is equal to the variance.  If a null (!) 
-*        value is supplied, the value used is an estimate of the noise 
-*        variance based on the difference between adjacent pixel values in 
+*        Gaussian noise this is equal to the variance.  If a null (!)
+*        value is supplied, the value used is an estimate of the noise
+*        variance based on the difference between adjacent pixel values in
 *        the observed data. [!]
 *     PSF = NDF (Read)
 *        An NDF holding an estimate of the Point-Spread Function (PSF)
@@ -127,11 +127,11 @@
 *        MODEL (or the value given for Parameter PMODEL), includes
 *        noise.  If the model does not include any noise then a TRUE
 *        value should be supplied for QUIET.  If there is any noise in
-*        the model then QUIET should be supplied FALSE.  If a null (!) 
-*        value is supplied, the value used is FALSE, unless the image 
-*        given for Parameter MODEL was created by a previous run of WIENER 
-*        (as indicated by the presence of a WIENER extension in the NDF), 
-*        in which case the run time default is TRUE (i.e. the previous 
+*        the model then QUIET should be supplied FALSE.  If a null (!)
+*        value is supplied, the value used is FALSE, unless the image
+*        given for Parameter MODEL was created by a previous run of WIENER
+*        (as indicated by the presence of a WIENER extension in the NDF),
+*        in which case the run time default is TRUE (i.e. the previous
 *        run of WIENER is assumed to have removed the noise). [!]
 *     THRESH = _REAL (Read)
 *        The fraction of the PSF peak amplitude at which the extents of
@@ -256,7 +256,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -272,7 +272,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER NDIM               ! Dimensionality required
       PARAMETER( NDIM = 2 )
 
@@ -302,7 +302,7 @@
       REAL MEANM                 ! Mean value in model array
       REAL MEANM2                ! Mean squared value in model
       REAL MEANO                 ! Mean value in observed data array
-      REAL MEANO2                ! Mean squared value in observed data 
+      REAL MEANO2                ! Mean squared value in observed data
       INTEGER N                  ! No. of elements in an internal file
       INTEGER NDIMS              ! Total no. of dimensions in an NDF
       INTEGER NEL1               ! No. of elements in NDF1
@@ -319,9 +319,9 @@
       INTEGER SDIM1( NDIM )      ! Indices of significant axes in NDF1
       INTEGER SDIM2( NDIM )      ! Indices of significant axes in NDF2
       INTEGER SDIM3( NDIM )      ! Indices of significant axes in NDF3
-      INTEGER SLBND1( NDIM )     ! Low bounds of INDF1 significant axes 
-      INTEGER SLBND2( NDIM )     ! Low bounds of INDF2 significant axes 
-      INTEGER SLBND3( NDIM )     ! Low bounds of INDF3 significant axes 
+      INTEGER SLBND1( NDIM )     ! Low bounds of INDF1 significant axes
+      INTEGER SLBND2( NDIM )     ! Low bounds of INDF2 significant axes
+      INTEGER SLBND3( NDIM )     ! Low bounds of INDF3 significant axes
       REAL STDEV                 ! Approximate noise level in input
       INTEGER SUBND1( NDIM )     ! High bounds of INDF1 significant axes
       INTEGER SUBND2( NDIM )     ! High bounds of INDF2 significant axes
@@ -348,7 +348,7 @@
       CALL NDF_BEGIN
 
 *  Get the NDF containing the input data.
-      CALL KPG1_GTNDF( 'IN', NDIM, .FALSE., 'READ', INDF1, SDIM1, 
+      CALL KPG1_GTNDF( 'IN', NDIM, .FALSE., 'READ', INDF1, SDIM1,
      :                 SLBND1, SUBND1, STATUS )
 
 *  Find the dimensions of the input array.
@@ -356,7 +356,7 @@
       DIMS1( 2 ) = SUBND1( 2 ) - SLBND1( 2 ) + 1
 
 *  Get the NDF containing the PSF.
-      CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDF2, SDIM2, 
+      CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDF2, SDIM2,
      :                 SLBND2, SUBND2, STATUS )
 
 *  Map the PSF DATA array.
@@ -399,7 +399,7 @@
       WDIMS( 1 ) = MAX( DIMS2( 2 ), DIMS2( 1 ) )
       WDIMS( 2 ) = 2
       CALL PSX_CALLOC( WDIMS( 1 ) * WDIMS( 2 ), '_REAL', IPW0, STATUS )
-      
+
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -408,7 +408,7 @@
 *  reduce edge effects caused by wrap-around in the convolution
 *  routines.
       CALL KPG1_PSFSR( %VAL( CNF_PVAL( IPN2 ) ), DIMS2( 1 ), DIMS2( 2 ),
-     :                 %VAL( CNF_PVAL( IPW0 ) ), 
+     :                 %VAL( CNF_PVAL( IPW0 ) ),
      :                 WDIMS( 1 ), WDIMS( 2 ), THRESH,
      :                 4, PSFXSZ, PSFYSZ, STATUS )
 
@@ -428,7 +428,7 @@
 *  The 2-d Hermitian FFT routines (KPG1_FFTFR and KPG1_FFTBR) require
 *  a work array containing at least ( 3*MAX(M,N)+15 ) elements, where
 *  M and N are the dimensions of the array being FFTed.  Ensure that
-*  an internal file is large enough to provide at least this much work 
+*  an internal file is large enough to provide at least this much work
 *  space.
       NPIX = MAX( 6, NPIX )
       NLIN = MAX( 6, NLIN )
@@ -444,19 +444,19 @@
       CALL PSX_CALLOC( N, '_REAL', IP3, STATUS )
 
 *  Store the FFT of the PSF in the internal array <3>. Internal array
-*  <2> is used as work space. 
-      CALL KPS1_WIEFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( CNF_PVAL( IPN2 ) ), 
+*  <2> is used as work space.
+      CALL KPS1_WIEFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( CNF_PVAL( IPN2 ) ),
      :                 NPIX, NLIN,
      :                 XCEN - SLBND2( 1 ) + 1, YCEN - SLBND2( 2 ) + 1,
-     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ),
      :                 STATUS )
 
 *  Release the NDF holding the PSF array.
-      CALL NDF_ANNUL( INDF2, STATUS )      
+      CALL NDF_ANNUL( INDF2, STATUS )
 
 *  Report the array sizes.
 *  =======================
-*  Tell the user the size of the margins and the size of the internal 
+*  Tell the user the size of the margins and the size of the internal
 *  data files.
       CALL MSG_SETI( 'XMARG', XMARG )
       CALL MSG_OUTIF( MSG__NORM, 'WIENER_MSG1',
@@ -472,7 +472,7 @@
 
 *  Add margins to the input data array.
 *  ====================================
-*  
+*
 *  Map the DATA array of the input NDF.
       CALL KPG1_MAP( INDF1, 'Data', '_REAL', 'READ', IPN1, NEL1,
      :              STATUS )
@@ -485,7 +485,7 @@
 *  indicating if any bad values were found.
       CALL PSX_CALLOC( N, '_REAL', IP4, STATUS )
       CALL KPS1_WIECP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                 %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN, 
+     :                 %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN,
      :                 %VAL( CNF_PVAL( IP4 ) ), MEANO,
      :                 MEANO2, BAD1, STATUS )
 
@@ -501,15 +501,15 @@
 *  =================================
 
 *  Find a rough estimate of the standard deviation of the noise in the
-*  input array. 
-      CALL KPS1_WIECS( DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN1 ) ), 
+*  input array.
+      CALL KPS1_WIECS( DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN1 ) ),
      :                 STDEV,
      :                 STATUS )
 
 *  Unmap the DATA array.  This is done to keep the use of virtual
 *  memory to a minimum at any one time, in view of the large amount of
 *  VM needed for the internal files.
-      CALL NDF_UNMAP( INDF1, 'Data', STATUS )      
+      CALL NDF_UNMAP( INDF1, 'Data', STATUS )
 
 *  For Gaussian noise, the noise power is equal to the variance of the
 *  noise.  Get the constant noise power to use, using the squared of
@@ -527,13 +527,13 @@
 *  =================================
 
 *  Obtain space for the internal file which holds the model image.
-      CALL PSX_CALLOC( N, '_REAL', IP6, STATUS )      
-      
+      CALL PSX_CALLOC( N, '_REAL', IP6, STATUS )
+
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an NDF holding the model image to use.
-      CALL KPG1_GTNDF( 'MODEL', NDIM, .FALSE., 'READ', INDF3, SDIM3, 
+      CALL KPG1_GTNDF( 'MODEL', NDIM, .FALSE., 'READ', INDF3, SDIM3,
      :                 SLBND3, SUBND3, STATUS )
 
 *  If a null value was given, annul the error, and get a constant model
@@ -543,7 +543,7 @@
 
 *  Get the model power to use.  Use the mean power in the input image
 *  as a default.  Constrain it to be larger than zero.
-         CALL PAR_GDR0R( 'PMODEL', MEANO2, 10.0 * VAL__SMLR, VAL__MAXR, 
+         CALL PAR_GDR0R( 'PMODEL', MEANO2, 10.0 * VAL__SMLR, VAL__MAXR,
      :                   .TRUE., PG, STATUS )
 
 *  Warn the user.
@@ -557,7 +557,7 @@
 *  If an NDF model was supplied, get its bounds.
       ELSE
          CALL NDF_BOUND( INDF3, NDIM, LBND, UBND, NDIMS, STATUS )
-         
+
 *  Get a section of the model image which matches the bounds of the
 *  input data image, and map it.
          LBND( SDIM3( 1 ) ) = SLBND1( 1 )
@@ -566,7 +566,7 @@
          UBND( SDIM3( 2 ) ) = SUBND1( 2 )
 
          CALL NDF_SECT( INDF3, NDIM, LBND, UBND, INDF3S, STATUS )
-         CALL KPG1_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S, 
+         CALL KPG1_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S,
      :                 STATUS )
 
 *  Copy it to the centre of internal file 6 . The margins are filled by
@@ -574,7 +574,7 @@
 *  squared model value are returned, together with a flag indicating if
 *  any bad values were found.
          CALL KPS1_WIECP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( CNF_PVAL( IPN3S ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IPN3S ) ), NPIX, NLIN,
      :                    %VAL( CNF_PVAL( IP6 ) ),
      :                    MEANM, MEANM2, BAD3, STATUS )
 
@@ -593,24 +593,24 @@
          CALL NDF_XSTAT( INDF3, 'WIENER', QUIET, STATUS )
 
 *  Release the model NDF.
-         CALL NDF_ANNUL( INDF3, STATUS )         
+         CALL NDF_ANNUL( INDF3, STATUS )
 
 *  Replace the model image in file 6 with the power image in frequency
 *  space (this is taken to be equal to the square of the modulus of the
 *  complex Fourier transform value).  Any bad values are replaced by the
 *  mean model value before the operation begins.  File 2 is used as work
 *  space.
-         CALL PSX_CALLOC( N, '_REAL', IP5, STATUS )      
-         CALL KPS1_WIEPW( N, NPIX, NLIN, MEANM, BAD3, 
+         CALL PSX_CALLOC( N, '_REAL', IP5, STATUS )
+         CALL KPS1_WIEPW( N, NPIX, NLIN, MEANM, BAD3,
      :                    %VAL( CNF_PVAL( IP6 ) ),
-     :                    %VAL( CNF_PVAL( IP2 ) ), 
+     :                    %VAL( CNF_PVAL( IP2 ) ),
      :                    %VAL( CNF_PVAL( IP5 ) ), STATUS )
          CALL PSX_FREE( IP5, STATUS )
 
 *  If a constant model power was given, assume that the noise power has
 *  not yet been removed.
          QUIET = .FALSE.
-         
+
       END IF
 
 *  Obtain remaining parameters.
@@ -625,7 +625,7 @@
 
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-      
+
 *  Get the minimum fractional weight of good pixels required to produce
 *  a good output pixel.  Ensure it is not too small.
       CALL PAR_GDR0R( 'WLIM', 0.01, 0.0, 1.0, .TRUE., WLIM, STATUS )
@@ -635,16 +635,16 @@
 *  ===============================
 
 *  Construct the filter.  Its FFT is returned in file 3.
-      CALL KPS1_WIEFL( N, NPIX, NLIN, PN, QUIET, 
+      CALL KPS1_WIEFL( N, NPIX, NLIN, PN, QUIET,
      :                 %VAL( CNF_PVAL( IP6 ) ),
-     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ),
      :                 STATUS )
-      
+
 *  Apply the filter to the supplied input image.  The filtered image is
 *  returned in file 4.
-      CALL KPS1_WIEAP( BAD1, WLIM, N, NPIX, NLIN, 
+      CALL KPS1_WIEAP( BAD1, WLIM, N, NPIX, NLIN,
      :                 %VAL( CNF_PVAL( IP3 ) ),
-     :                 %VAL( CNF_PVAL( IP4 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 %VAL( CNF_PVAL( IP4 ) ), %VAL( CNF_PVAL( IP2 ) ),
      :                 %VAL( CNF_PVAL( IP6 ) ), STATUS )
 
 *  Create the output NDF containing the filter image.
@@ -658,9 +658,9 @@
      :              STATUS )
 
 *  Copy the reconstructed array to the output DATA array.
-      CALL KPS1_WIEOU( NPIX, NLIN, %VAL( CNF_PVAL( IP4 ) ), 
+      CALL KPS1_WIEOU( NPIX, NLIN, %VAL( CNF_PVAL( IP4 ) ),
      :                 XMARG, YMARG,
-     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN4 ) ), 
+     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN4 ) ),
      :                 BAD4,
      :                 STATUS )
 
@@ -688,8 +688,8 @@
       CALL PSX_FREE( IP3, STATUS )
       CALL PSX_FREE( IP4, STATUS )
       CALL PSX_FREE( IP6, STATUS )
-      
-*  If an error occurred, delete the output NDF.      
+
+*  If an error occurred, delete the output NDF.
       IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF4, STATUS )
 
 *  End the NDF context.
@@ -700,5 +700,5 @@
          CALL ERR_REP( 'WIENER_ERR', 'Error deconvolving an array ' /
      :                 /'using a Wiener filter.', STATUS )
       END IF
-      
+
       END

@@ -14,7 +14,7 @@
         lun2 = 143
 
 	type *, 'Give name of offset file to be rotated : '
-	read( 5, '(a)') infil 
+	read( 5, '(a)') infil
 	l1 = chr_len( infil)
 	open( unit=lun, file=infil( 1:l1), status='old')
 

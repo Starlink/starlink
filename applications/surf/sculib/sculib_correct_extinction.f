@@ -11,7 +11,7 @@
 *  Description:
 *     This routine corrects bolometer data for the effect of sky opacity.
 *     It does this by calculating the airmass of the point that each
-*     bolometer was looking at, then multiplying the data by 
+*     bolometer was looking at, then multiplying the data by
 *     exp (airmass * TAUZ). Bolometers with bad data quality will be
 *     ignored.
 
@@ -150,7 +150,7 @@
             CALL SCULIB_AIRMASS (Z, AIRMASS, STATUS)
 
 *  and the correction for the extinction
-            
+
             CORRECTION = EXP (REAL(AIRMASS)*TAUZ)
 
 *  correct the data

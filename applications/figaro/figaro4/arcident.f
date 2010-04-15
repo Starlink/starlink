@@ -182,7 +182,7 @@
 *        parameter if your arc spectra are very distorted (non-linear
 *        dispersion). [0.03]
 *     MAXLOC = _INTEGER (Read)
-*        This specifies the maximum number of features to be used when 
+*        This specifies the maximum number of features to be used when
 *        generating ratios for initial identification. In general, a
 *        good solution can be found using only the strongest 8 to 16
 *        features. The program slowly increases the number of features
@@ -236,7 +236,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -495,7 +495,7 @@
      :   STATUS )
       CALL SPD_WZKJ( NELM(6), NELM(7), %VAL( CNF_PVAL(OPNTR(5)) ),
      :               %VAL( CNF_PVAL(OPNTR(9)) ),
-     :               STATUS, %VAL(CNF_CVAL(XCLEN)), 
+     :               STATUS, %VAL(CNF_CVAL(XCLEN)),
      :               %VAL(CNF_CVAL(XCLEN)) )
       DO 2 I = 10, 16
          CALL DAT_ANNUL( LOC(I), STATUS )

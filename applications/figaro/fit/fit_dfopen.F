@@ -90,8 +90,8 @@ C   Calculate record length in local units, not enitrely sure about
 C   this. Have to check exactly what FC_RECL_UNIT returns on each OS,
 C   values should be as below;
 C
-C   ix86_linux =  2880    alpha_OSF1 = 720    sun4_Solaris = 2880       
-      RECL = 2880 / BYTEPRU           
+C   ix86_linux =  2880    alpha_OSF1 = 720    sun4_Solaris = 2880
+      RECL = 2880 / BYTEPRU
 
 C
 C     Set RINDEX in common to the initial value - being non-zero indicated
@@ -105,4 +105,4 @@ C
      :                   RECL=RECL,FORM='UNFORMATTED',IOSTAT=STATUS)
 C
       END
-         
+

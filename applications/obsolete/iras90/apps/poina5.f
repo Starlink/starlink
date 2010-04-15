@@ -1,5 +1,5 @@
-	SUBROUTINE POINA5( DETLBD, DETUBD, IDET, MAXDET, SMPLBD, SMPUBD, 
-     :                     INDATA, DETSMP, OUDATA, OUTSMP, STATUS ) 
+	SUBROUTINE POINA5( DETLBD, DETUBD, IDET, MAXDET, SMPLBD, SMPUBD,
+     :                     INDATA, DETSMP, OUDATA, OUTSMP, STATUS )
 *+
 *  Name:
 *     POINA5
@@ -12,13 +12,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA5( DETLBD, DETUBD, IDET, MAXDET, SMPLBD, SMPUBD, 
-*                  INDATA, DETSMP, OUDATA, OUTSMP, STATUS ) 
+*     CALL POINA5( DETLBD, DETUBD, IDET, MAXDET, SMPLBD, SMPUBD,
+*                  INDATA, DETSMP, OUDATA, OUTSMP, STATUS )
 
 *  Description:
 *     To copy the data for a single detector from a two dimensional
-*     array to a single dimension array. The subroutine also copies the 
-*     bounds of the length of the output array to be used to a one 
+*     array to a single dimension array. The subroutine also copies the
+*     bounds of the length of the output array to be used to a one
 *     dimensional array.
 
 *  Arguments:
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,11 +77,11 @@
       INTEGER SMPLBD
       INTEGER SMPUBD
       REAL INDATA( SMPLBD : SMPUBD , DETLBD : DETUBD )
-      INTEGER DETSMP( MAXDET, 2 )  
+      INTEGER DETSMP( MAXDET, 2 )
 
 *  Arguments Returned:
       REAL OUDATA( SMPLBD : SMPUBD )
-      INTEGER OUTSMP( 2 )  
+      INTEGER OUTSMP( 2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -96,8 +96,8 @@
 
 *  Copy the detector sample numbers marking the ends of the range to be
 *  considered into a single dimension array
-      OUTSMP( 1 ) = DETSMP( IDET, 1) 
-      OUTSMP( 2 ) = DETSMP( IDET, 2) 
+      OUTSMP( 1 ) = DETSMP( IDET, 1)
+      OUTSMP( 2 ) = DETSMP( IDET, 2)
 
 
 *  Copy the detector data for the current detector from the two dimensional

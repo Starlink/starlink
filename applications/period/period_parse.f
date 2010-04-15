@@ -1,6 +1,6 @@
- 
+
       FUNCTION PERIOD_PARSE(STRING, MASTER)
- 
+
 C=========================================================================
 C Command parser. Compares all non-blank characters between two strings
 C STRING and MASTER. PERIOD_PARSE = .TRUE. if they match. The strings
@@ -18,11 +18,11 @@ C Adapted for PERIOD by Vikram Singh Dhillon @Sussex 1-July-1992.
 C=========================================================================
 
       IMPLICIT NONE
- 
+
       INTEGER L1,M1,L2,M2,N
       LOGICAL PERIOD_PARSE
       CHARACTER*(*) STRING, MASTER
- 
+
       PERIOD_PARSE = .TRUE.
       L1 = LEN(STRING)
       M1 = LEN(MASTER)
@@ -30,11 +30,11 @@ C=========================================================================
       M2 = 1
       N = 0
       DO WHILE ( L2.LE.L1 .AND. M2.LE.M1 )
- 
+
 C--------------------------------------------------------------------------
 C Find non-blank characters.
 C--------------------------------------------------------------------------
- 
+
          N = N + 1
          DO WHILE ( L2.LE.L1 .AND. STRING(L2:L2).EQ.' ' )
             L2 = L2 + 1
@@ -44,7 +44,7 @@ C--------------------------------------------------------------------------
             M2 = M2 + 1
          END DO
          M2 = MIN(M1, M2)
-         IF ( STRING(L2:L2).NE.' ' .AND. MASTER(M2:M2).NE.' ' .AND. 
+         IF ( STRING(L2:L2).NE.' ' .AND. MASTER(M2:M2).NE.' ' .AND.
      :        STRING(L2:L2).NE.MASTER(M2:M2) ) THEN
             PERIOD_PARSE = .FALSE.
             RETURN
@@ -57,15 +57,15 @@ C--------------------------------------------------------------------------
             PERIOD_PARSE = .FALSE.
             RETURN
          END IF
- 
+
 C--------------------------------------------------------------------------
 C Move onto next character.
 C--------------------------------------------------------------------------
- 
+
          L2 = L2 + 1
          M2 = M2 + 1
       END DO
-      
+
       IF ( M2.GT.M1 .AND. L2.LE.L1 ) THEN
          DO WHILE ( L2.LE.L1 .AND. STRING(L2:L2).EQ.' ' )
             L2 = L2 + 1
@@ -73,6 +73,6 @@ C--------------------------------------------------------------------------
          L2 = MIN(L2, L1)
          IF ( STRING(L2:L2).NE.' ' ) PERIOD_PARSE = .FALSE.
       END IF
- 
+
       RETURN
       END

@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,13 +128,13 @@
 
 *  Attempt to read argument value from the current element until the
 *  end of the element, or the end of the argument list is encountered.
-      DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK )
 
 *  If another argument is obtained, which axis will it refer to?
          AXIS = MOD( NARG, NWCS ) + 1
 
 *  Read the next argument.
-         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
+         CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE,
      :                    STATUS )
 
 *  If an argument was obtained, store it on the operands stack.
@@ -146,8 +146,8 @@
 *  the number of arguments obtained is incorrect (i.e. if it not a
 *  multiple of NWCS or if it is less than 3).
          ELSE IF( .NOT. KEYW ) THEN
- 
-            IF( ( MOD( NARG, NWCS ) .NE. 0 .OR. NARG .LT. 3*NWCS ) .AND. 
+
+            IF( ( MOD( NARG, NWCS ) .NE. 0 .OR. NARG .LT. 3*NWCS ) .AND.
      :          STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
                CALL ERR_REP( 'ARD1_POLAR_ERR1', 'Incorrect number of '//

@@ -1,4 +1,4 @@
-      SUBROUTINE NDG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, 
+      SUBROUTINE NDG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG,
      :                       STATUS )
 *+
 *  Name:
@@ -14,36 +14,36 @@
 *     CALL NDG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, STATUS )
 
 *  Description:
-*     The supplied group expression is parsed (using the facilities of 
-*     the GRP routine GRP_GROUP, see SUN/150) to produce a list of 
-*     explicit names for existing NDFs which are appended to the end of 
-*     the supplied group (a new group is created if none is supplied). 
-*     NDF identifiers for particular members of the group can be obtained 
+*     The supplied group expression is parsed (using the facilities of
+*     the GRP routine GRP_GROUP, see SUN/150) to produce a list of
+*     explicit names for existing NDFs which are appended to the end of
+*     the supplied group (a new group is created if none is supplied).
+*     NDF identifiers for particular members of the group can be obtained
 *     using NDG_NDFAS.
 *
 *     If any of the NDFs specified by the group expression cannot be
-*     accessed, an error is reported and STATUS is returned equal to 
-*     NDG__NOFIL. If this happens strings holding the name of each 
-*     bad NDF are appended to the group identified by IGRP1 (so long 
+*     accessed, an error is reported and STATUS is returned equal to
+*     NDG__NOFIL. If this happens strings holding the name of each
+*     bad NDF are appended to the group identified by IGRP1 (so long
 *     as IGRP1 is not equal to GRP__NOID).
 
 *  Arguments:
 *     GRPEXP = CHARACTER * ( * ) (Given)
-*        The group expression specifying the NDF names to be stored 
+*        The group expression specifying the NDF names to be stored
 *        in the group.
 *     VERB = LOGICAL (Given)
 *        If TRUE then errors which occur whilst accessing supplied NDFs
 *        are flushed so that the user can see them before re-prompting for
-*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP1 = INTEGER (Given)
-*        The identifier of a group to which the names of any 
+*        The identifier of a group to which the names of any
 *        inaccessable NDFs will be appended. The group should already
 *        have been created by a call to GRP_NEW, and should be deleted
-*        when no longer needed by a call to GRP_DELET. If IGRP1 is 
-*        supplied equal to symbolic constant GRP__NOID, then no 
-*        information is stored describing the bad NDFs. 
+*        when no longer needed by a call to GRP_DELET. If IGRP1 is
+*        supplied equal to symbolic constant GRP__NOID, then no
+*        information is stored describing the bad NDFs.
 *     IGRP2 = INTEGER (Given and Returned)
 *        The identifier of the group in which the NDF names are to be
 *        stored. A new group is created if the supplied value is GRP__NOID.
@@ -58,7 +58,7 @@
 *        The global status.
 
 *  Notes:
-*     -  Any file names containing wildcards are expanded into a list of NDF 
+*     -  Any file names containing wildcards are expanded into a list of NDF
 *     names. The supplied strings are intepreted by a shell (/bin/tcsh if
 *     it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
 *     contain shell meta-characters (eg twiddle, $HOME, even command
@@ -74,11 +74,11 @@
 *     object will be searched for NDF components. This search is
 *     recursive, in that any components of the specified object are also
 *     searched. The supplied name will be expanded into a group of names,
-*     one for each NDF found within the specified HDS object. Note, NDFs 
+*     one for each NDF found within the specified HDS object. Note, NDFs
 *     are not themselves searched for other NDFs. That is, the expanded
-*     group of names will not include any NDF which is contained within 
+*     group of names will not include any NDF which is contained within
 *     another NDF (i.e. NDFs which are stored as an extension item of
-*     another NDF are not included in the group). For instance, if the 
+*     another NDF are not included in the group). For instance, if the
 *     string "fred" is given, the HDS file fred.sdf will be searched for
 *     NDFs and the returned group will contain references for all NDFs
 *     found within fred.sdf.
@@ -91,25 +91,25 @@
 *     "fred.sdf" also exists (and contains an NDF), then supplying the
 *     name "fred" will result in both being included in the returned
 *     group. If the file "fred.sdf" contains a component called ".fit",
-*     then this will be included in the returned group in place of 
+*     then this will be included in the returned group in place of
 *     "fred.sdf".
 *     -  NDFs contained within HDS files are opened in order to ensure
-*     that they are valid NDFs. The NDF name is returned in IGRP1 if there 
-*     are no valid NDFs matching a supplied name. No check is made that any 
-*     foreign data files contain valid NDFs since this would involve a 
-*     potentially expensive data conversion. So, for instance, "*.fit" could 
-*     pick up FITS catalogues as well as FITS images. If a foreign data file 
-*     does not contain a valid NDF, an error will be reported when the NDF 
+*     that they are valid NDFs. The NDF name is returned in IGRP1 if there
+*     are no valid NDFs matching a supplied name. No check is made that any
+*     foreign data files contain valid NDFs since this would involve a
+*     potentially expensive data conversion. So, for instance, "*.fit" could
+*     pick up FITS catalogues as well as FITS images. If a foreign data file
+*     does not contain a valid NDF, an error will be reported when the NDF
 *     is accessed using NDG_NDFAS.
-*     -  Each element in the returned group contains a full specification 
+*     -  Each element in the returned group contains a full specification
 *     for an NDF. Several other groups are created by this routine, and
 *     are associated with the returned group by means of a GRP "owner-slave"
 *     relationship. These supplemental groups are automatically deleted
 *     when the returned group is deleted using GRP_DELET. The returned
-*     group should not be altered using GRP directly because corresponding 
+*     group should not be altered using GRP directly because corresponding
 *     changes may need to be made to the supplemental groups. Routines
 *     NDG_SETSZ, NDG_GTSUP and NDG_PTSUP are provided to manipulate the
-*     entire chain of groups. The full chain (starting from the head) is 
+*     entire chain of groups. The full chain (starting from the head) is
 *     as follows:
 *
 *        - NDF slice specifications
@@ -130,12 +130,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -180,7 +180,7 @@
 
 *  Arguments Given and Returned:
       INTEGER   IGRP2
-      
+
 *  Arguments Returned:
       INTEGER   SIZE
       LOGICAL   FLAG
@@ -194,7 +194,7 @@
       INTEGER   SIZE0              ! Size of group on entry to this routine
 *.
 
-*  Ensure a .FALSE. value for FLAG is returned if an error has already 
+*  Ensure a .FALSE. value for FLAG is returned if an error has already
 *  occured.
       FLAG = .FALSE.
 
@@ -237,7 +237,7 @@
          FLAG = .FALSE.
       END IF
 
-*  Check the names added to the group as a result of the above call. 
+*  Check the names added to the group as a result of the above call.
 *  Each name may potentially be expanded into a list of names (eg because
 *  of wild-cards, etc). These are appended to the end of the group and the
 *  original name deleted. An error is reported if no accessable NDFs can
@@ -267,7 +267,7 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'P', GRPEXP )
          CALL ERR_REP( 'NDG1_ASEXP_ERR2', 'Error obtaining a group '//
-     :                 'of existing NDFs using group expression "^P"', 
+     :                 'of existing NDFs using group expression "^P"',
      :                 STATUS )
       END IF
 

@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -282,7 +282,7 @@ C
                   END IF
                END IF
             END IF
-         END DO         
+         END DO
   320    CONTINUE                     ! End of symbol search loop
          IF (.NOT.TRANS) IST=POSN+1
       END DO

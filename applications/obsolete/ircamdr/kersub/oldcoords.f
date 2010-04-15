@@ -18,11 +18,11 @@
 *    Method :
 *
 *     Just uses a standard rotation matrix approach to calculate the
-*     x and y distances ( XP,YP )of a point from the origin prior to 
-*     a rotation of ANGLE degrees clockwise from the x and y distances 
-*     ( X,Y ) of the transformed point from the origin. Obviously may 
-*     be considered as evaluating the transformed coordinates of a point 
-*     after an anticlockwise rotation of the same amount. Matrix used is 
+*     x and y distances ( XP,YP )of a point from the origin prior to
+*     a rotation of ANGLE degrees clockwise from the x and y distances
+*     ( X,Y ) of the transformed point from the origin. Obviously may
+*     be considered as evaluating the transformed coordinates of a point
+*     after an anticlockwise rotation of the same amount. Matrix used is
 *     inverse of one used in NEWCOORDS :
 *
 *         (  cos ANGLE  -sin ANGLE  ) ( X )     ( X' )
@@ -54,9 +54,9 @@
 *    Import :
 
       REAL
-     :    X,          ! real x distance of point from 
+     :    X,          ! real x distance of point from
                       ! origin in transformed array
-     :    Y,          ! real y distance of point from 
+     :    Y,          ! real y distance of point from
                       ! origin in transformed array
      :    CANGLE,     ! cosine of rotation angle applied
      :    SANGLE      ! sine of rotation angle applied
@@ -64,8 +64,8 @@
 *    Export :
 
       REAL
-     :    XP,         ! real x distance of point from origin in 
-                      ! original frame 
+     :    XP,         ! real x distance of point from origin in
+                      ! original frame
      :    YP          ! real y distance of point from origin in
                       ! original frame
 

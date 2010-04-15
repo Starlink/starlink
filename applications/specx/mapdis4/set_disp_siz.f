@@ -18,7 +18,7 @@
 *  Other variables
 
       REAL*4    XSIZED, YSIZED
-      REAL*4    XAXLEN, YAXLEN 
+      REAL*4    XAXLEN, YAXLEN
 
 *  Go...
 

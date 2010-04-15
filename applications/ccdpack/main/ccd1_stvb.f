@@ -90,25 +90,25 @@
 *  Call the appropriate version of CCG1_STV to set the pointed to array
 *  to BAD.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_STVB( VAL__BADB, EL, %VAL( CNF_PVAL( IPOINT ) ) , 
+         CALL CCG1_STVB( VAL__BADB, EL, %VAL( CNF_PVAL( IPOINT ) ) ,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_STVUB( VAL__BADUB, EL, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_STVUB( VAL__BADUB, EL, %VAL( CNF_PVAL( IPOINT ) ),
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_STVW( VAL__BADW, EL, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_STVW( VAL__BADW, EL, %VAL( CNF_PVAL( IPOINT ) ),
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_STVUW( VAL__BADUW, EL, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_STVUW( VAL__BADUW, EL, %VAL( CNF_PVAL( IPOINT ) ),
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_STVI( VAL__BADI, EL, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_STVI( VAL__BADI, EL, %VAL( CNF_PVAL( IPOINT ) ),
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_STVR( VAL__BADR, EL, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_STVR( VAL__BADR, EL, %VAL( CNF_PVAL( IPOINT ) ),
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_STVD( VAL__BADD, EL, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_STVD( VAL__BADD, EL, %VAL( CNF_PVAL( IPOINT ) ),
      :                   STATUS )
       ELSE
 

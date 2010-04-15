@@ -101,7 +101,7 @@
      :  NPAIR,
      :  PRMPR(NPAIR),
      :  SECPR(NPAIR),
-     :  PMULT(NPAIR), 
+     :  PMULT(NPAIR),
      :  SMULT(NPAIR),
      :  MAXPR
       DOUBLE PRECISION
@@ -116,7 +116,7 @@
      :  OPAIR,
      :  OPRMPR(MAXPR),
      :  OSECPR(MAXPR),
-     :  OPMULT(MAXPR),      
+     :  OPMULT(MAXPR),
      :  OSMULT(MAXPR)
       DOUBLE PRECISION
      :  OSEPN(MAXPR)

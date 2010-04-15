@@ -10,7 +10,7 @@ C
 C     Parameters -   (">" input, "<" output)
 C
 C     (>) NELM    (Integer) The number of elements in the arrays.
-C     (>) RDATA   (Double precision array RDATA(NELM)) The real part 
+C     (>) RDATA   (Double precision array RDATA(NELM)) The real part
 C                 of the complex FFT.
 C     (>) IDATA   (Double precision array IDATA(NELM)) The imaginary
 C                 part of the complex FFT.

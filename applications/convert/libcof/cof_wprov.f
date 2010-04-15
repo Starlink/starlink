@@ -16,15 +16,15 @@
 *     This creates headers in the current FITS header that record the
 *     provenance information stored in the supplied NDF.
 *
-*     The tabulated indexed headers below, all with string values, are 
-*     written for each ancestor NDF.  The keyword index n is the 
+*     The tabulated indexed headers below, all with string values, are
+*     written for each ancestor NDF.  The keyword index n is the
 *     provenanxce identifier for each NDF, starting at 0 corresponding
 *     to the current NDF.  All have value '<unknown>' if the information
 *     could not be found, except for MORE information; the PRVMn header
 *     is omitted if there is no MORE information to record.
 *
 *     Keyword   Comment
-*     -------   ------- 
+*     -------   -------
 *     PRVPn     Path of the <nth> parent
 *     PRVIn     Identifiers of direct parents for <nth> ancestor
 *     PRVDn     Creation date of <nth> parent
@@ -51,11 +51,11 @@
 *     -  Supports up to 9999 ancestors.
 *     -  The PRVPn, PRVIn, and PRVMn keywords may often need more than
 *     the maximum 68 characters allowed in a keyword character value.
-*     Therefore this routine uses the non-standard Long-string Keyword 
-*     Convention that permits long strings to continue over multiple 
+*     Therefore this routine uses the non-standard Long-string Keyword
+*     Convention that permits long strings to continue over multiple
 *     headers.  If any of the aforementioned keywords' values exceeds 68
 *     characters, this routine adds a warning in some COMMENT headers
-*     and writes a LONGSTRN header, whose value is the version of the 
+*     and writes a LONGSTRN header, whose value is the version of the
 *     convention being used.
 
 *  Prior Requirements:
@@ -96,7 +96,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,7 +158,7 @@
          CPOS = 31
          CALL CHR_APPND( '/ Provenance:', CARD, CPOS )
          CALL FTPREC( FUNIT, CARD, FSTAT )
-      
+
 *  Format the provenance information in the NDF.  The resulting strings
 *  are returned in an AST KeyMap.
         CALL NDG_READPROV( NDF, ' ', IPROV, STATUS )
@@ -173,11 +173,11 @@
 *  Loop round each NDF to be described.
 *  ====================================
          NCMAX = -1
-         DO IREC = 1, NROW 
+         DO IREC = 1, NROW
 
 *  Get the KeyMap holding details for this row.
             CALL CHR_ITOC( IREC - 1, KEY, NC )
-            IF ( .NOT. AST_MAPGET0A( KYMAP1, KEY( : NC ), KYMAP2, 
+            IF ( .NOT. AST_MAPGET0A( KYMAP1, KEY( : NC ), KYMAP2,
      :                               STATUS ) ) THEN
                STATUS = SAI__ERROR
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -192,7 +192,7 @@
 *  Obtain the identifier for the current row.  This is recorded
 *  through its use in the number of the indexed keywords.
             ID = ' '
-            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'ID', ID, NC, 
+            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'ID', ID, NC,
      :                               STATUS ) ) THEN
                IF ( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -210,7 +210,7 @@
 
 *  The first header records the NDF path.
             VALUE = ' '
-            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'PATH', VALUE, NC, 
+            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'PATH', VALUE, NC,
      :                               STATUS ) ) THEN
                VALUE = '<unknown>'
                NC = 9
@@ -232,17 +232,17 @@
 
 *  Write the PRVPn header.  Use the longstring convention as the PATH
 *  may well be longer than 68 characters.
-            CALL FTPKLS( FUNIT, KEYWRD, VALUE( :NC ), 
+            CALL FTPKLS( FUNIT, KEYWRD, VALUE( :NC ),
      :                   ANCCOM( :CPOS ), FSTAT )
 
 
 *  Write identifiers of the immediate-parent NDFs.
 *  ===============================================
 
-*  The next header records the list of identifiers for the 
+*  The next header records the list of identifiers for the
 *  immediate-parent NDFs.
             VALUE = ' '
-            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', VALUE, NC, 
+            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', VALUE, NC,
      :                               STATUS ) ) THEN
                VALUE = '<unknown>'
                NC = 9
@@ -263,7 +263,7 @@
 
 *  Write the PRVIn header.  Use the longstring convention as the list
 *  may well be longer than 68 characters.
-            CALL FTPKLS( FUNIT, KEYWRD, VALUE( :NC ), 
+            CALL FTPKLS( FUNIT, KEYWRD, VALUE( :NC ),
      :                   ANCCOM( :CPOS ), FSTAT )
 
 *  Write the provenance date.
@@ -272,7 +272,7 @@
 *  The next header records the date at which the provenance was stored
 *  in the NDF.
             VALUE = ' '
-            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'DATE', VALUE, NC, 
+            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'DATE', VALUE, NC,
      :                               STATUS ) ) THEN
                VALUE = '<unknown>'
                NC = 9
@@ -291,7 +291,7 @@
             CALL CHR_APPND( ' parent', ANCCOM, CPOS )
 
 *  Write the PRVDn header.
-            CALL FTPKYS( FUNIT, KEYWRD, VALUE( :NC ), 
+            CALL FTPKYS( FUNIT, KEYWRD, VALUE( :NC ),
      :                   ANCCOM( :CPOS ), FSTAT )
 
 *  Write the name of the software that created the NDF.
@@ -299,7 +299,7 @@
 
 *  The next header records the software that created the NDF.
             VALUE = ' '
-            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'CREATOR', VALUE, NC, 
+            IF ( .NOT. AST_MAPGET0C( KYMAP2, 'CREATOR', VALUE, NC,
      :                               STATUS ) ) THEN
                VALUE = '<unknown>'
                NC = 9
@@ -318,7 +318,7 @@
             CALL CHR_APPND( ' parent', ANCCOM, CPOS )
 
 *  Write the PRVCn header.
-            CALL FTPKYS( FUNIT, KEYWRD, VALUE( :NC ), 
+            CALL FTPKYS( FUNIT, KEYWRD, VALUE( :NC ),
      :                   ANCCOM( :CPOS ), FSTAT )
 
 *  Write summary of the contents of MORE.
@@ -327,7 +327,7 @@
 *  Next header recrds a summary of any extra information describing the
 *  NDF.
             VALUE = ' '
-            IF ( AST_MAPGET0C( KYMAP2, 'MORE', VALUE, NC, 
+            IF ( AST_MAPGET0C( KYMAP2, 'MORE', VALUE, NC,
      :                         STATUS ) ) THEN
                NCMAX = MAX( NC, NCMAX )
 
@@ -345,12 +345,12 @@
 
 *  Write the PRVMn header.  Use the longstring convention as there
 *  may well be several items totalling more than 68 characters.
-               CALL FTPKLS( FUNIT, KEYWRD, VALUE( :NC ), 
+               CALL FTPKLS( FUNIT, KEYWRD, VALUE( :NC ),
      :                      ANCCOM( :CPOS ), FSTAT )
 
             END IF
 
-*  Write a blank header.  The final blank card seems to be moved by 
+*  Write a blank header.  The final blank card seems to be moved by
 *  FITSIO to before the other provenance headers, hence there is
 *  no initial blank card written before the title comment card.
             CARD = ' '

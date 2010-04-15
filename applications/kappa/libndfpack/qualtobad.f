@@ -20,11 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This routine produces a copy of an input NDF in which selected 
-*     pixels are set bad. The selection is based on the values in the 
-*     QUALITY  component of the input NDF; any pixel which holds a set 
-*     of qualities  satisfying the quality expression given for 
-*     parameter QEXP is set bad in the output NDF. Named qualities can 
+*     This routine produces a copy of an input NDF in which selected
+*     pixels are set bad. The selection is based on the values in the
+*     QUALITY  component of the input NDF; any pixel which holds a set
+*     of qualities  satisfying the quality expression given for
+*     parameter QEXP is set bad in the output NDF. Named qualities can
 *     be associated with specified pixels using the SETQUAL task.
 
 *  Usage:
@@ -36,7 +36,7 @@
 *     OUT = NDF (Write)
 *        The output NDF.
 *     QEXP = LITERAL (Read)
-*        The quality expression. 
+*        The quality expression.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF. A null (!) value will cause the input
 *        title to be used.  [!]
@@ -91,7 +91,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,10 +111,10 @@
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
       CHARACTER LOCS(5)*(DAT__SZLOC)! Locators to quality information
       CHARACTER QEXP*(IRQ__SZQEX)! Quality expression
-      CHARACTER UNDEF(IRQ__QNREF)*(IRQ__SZQNM)! List of undefined 
-                                 ! quality names referenced in the 
+      CHARACTER UNDEF(IRQ__QNREF)*(IRQ__SZQNM)! List of undefined
+                                 ! quality names referenced in the
                                  ! quality expression
-      CHARACTER XNAME*(DAT__SZNAM)! Name of NDF extension containing 
+      CHARACTER XNAME*(DAT__SZNAM)! Name of NDF extension containing
                                  ! quality name information
       INTEGER ERRPNT             ! Offset to error within quality exprs.
       INTEGER IDQ                ! Identifier for compiled quality exprs
@@ -123,7 +123,7 @@
       INTEGER NDFIN              ! Identifier for the input NDF
       INTEGER NDFOUT             ! Identifier for the output NDF
       INTEGER NEL                ! No. of mapped elements
-      INTEGER NUNDEF             ! Number of undefined quality names 
+      INTEGER NUNDEF             ! Number of undefined quality names
                                  ! referenced in the quality expression
       LOGICAL ALLBAD             ! All output data pixels are bad?
       LOGICAL NOBAD              ! No output data pixels are bad?
@@ -140,8 +140,8 @@
 *  Get the input NDF.
       CALL LPG_ASSOC( 'IN', 'UPDATE', NDFIN, STATUS )
 
-*  Get the output NDF, propagating all components from the input to the 
-*  output (the HISTORY, LABEL, TITLE and all extensions are propagated 
+*  Get the output NDF, propagating all components from the input to the
+*  output (the HISTORY, LABEL, TITLE and all extensions are propagated
 *  by default).
       CALL LPG_PROP( NDFIN, 'UNITS,DATA,VARIANCE,QUALITY,AXIS,WCS',
      :               'OUT', NDFOUT, STATUS )
@@ -164,7 +164,7 @@
 
 *  Get the data type in which to map the DATA array.
       CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', 1, NDFIN, 'DATA', ITYPE, DTYPE, 
+     :                '_DOUBLE', 1, NDFIN, 'DATA', ITYPE, DTYPE,
      :                STATUS )
 
 *  Map the DATA array in the output NDF.
@@ -174,37 +174,37 @@
 *  Set bad all output DATA pixels which satisfy the given quality
 *  expression.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                    ALLBAD, NOBAD,
      :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                    ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+         CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                   ALLBAD, NOBAD,
      :                   STATUS )
 
@@ -231,46 +231,46 @@
 *  array was processed.
       IF( THERE ) THEN
          CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                   '_DOUBLE', 1, NDFIN, 'VARIANCE', ITYPE, DTYPE, 
+     :                   '_DOUBLE', 1, NDFIN, 'VARIANCE', ITYPE, DTYPE,
      :                   STATUS )
          CALL NDF_MAP( NDFOUT, 'VARIANCE', ITYPE, 'UPDATE', IPNT, NEL,
      :                 STATUS )
 
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                      ALLBAD,
      :                      NOBAD, STATUS )
-   
+
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                       ALLBAD,
      :                       NOBAD, STATUS )
-   
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                      ALLBAD,
      :                      NOBAD, STATUS )
-   
+
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                       ALLBAD,
      :                       NOBAD, STATUS )
-   
+
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                      ALLBAD,
      :                      NOBAD, STATUS )
-   
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                      ALLBAD,
      :                      NOBAD, STATUS )
-   
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                      ALLBAD,
      :                      NOBAD, STATUS )
-   
+
          END IF
 
          IF( ALLBAD ) THEN
@@ -301,17 +301,17 @@
       IF( STATUS .EQ. IRQ__NOQNM ) THEN
          CALL ERR_ANNUL( STATUS )
 
-         DO J = 1, NUNDEF 
+         DO J = 1, NUNDEF
             CALL MSG_SETC( 'C', ' ' )
             CALL MSG_SETC( 'C', UNDEF( J ) )
          END DO
          CALL NDF_MSG( 'NDF', NDFIN )
 
          CALL MSG_OUT( 'QUALTOBAD_MSG3', 'The following quality '//
-     :                 'names are undefined in ''^NDF'': ^C', 
+     :                 'names are undefined in ''^NDF'': ^C',
      :                 STATUS )
 
-*  Annul the error and give a more friendly report if no quality names 
+*  Annul the error and give a more friendly report if no quality names
 *  information was found.
       ELSE IF( STATUS .EQ. IRQ__NOQNI ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -323,7 +323,7 @@
       END IF
 
 *  If an error has occurred, delete the output NDF.
-      IF( STATUS .NE. SAI__OK ) CALL NDF_DELET( NDFOUT, STATUS ) 
+      IF( STATUS .NE. SAI__OK ) CALL NDF_DELET( NDFOUT, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
@@ -331,7 +331,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'QUALTOBAD_ERR1', 'QUALTOBAD: Unable to '//
-     :                 'convert quality information into bad pixels.', 
+     :                 'convert quality information into bad pixels.',
      :                 STATUS )
       END IF
 

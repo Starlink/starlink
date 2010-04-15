@@ -84,44 +84,44 @@
 *        prefix.
 *     ENCODINGS = LITERAL (Read)
 *        Determines which FITS keywords should be used to define the
-*        world co-ordinate systems to be stored in the NDF's WCS 
+*        world co-ordinate systems to be stored in the NDF's WCS
 *        component.  The allowed values (case-insensitive) are:
 *
 *        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and is the
 *           system commonly used by IRAF. It is described in the document
-*           "World Coordinate Systems Representations Within the FITS Format" 
+*           "World Coordinate Systems Representations Within the FITS Format"
 *           by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
-*           fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
+*           fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z.
 *
 *        "FITS-WCS" --- This is the proposed FITS standard WCS encoding scheme
-*           described in the paper "Representation of celestial coordinates 
+*           described in the paper "Representation of celestial coordinates
 *           in FITS" (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).
 *           It is very similar to FITS-IRAF but supports a wider range of
-*           projections and co-ordinate systems. Once the standard has been 
-*           agreed, this encoding should be understood by any FITS-WCS 
-*           compliant software and it is likely to be adopted widely for FITS 
-*           data in future. 
+*           projections and co-ordinate systems. Once the standard has been
+*           agreed, this encoding should be understood by any FITS-WCS
+*           compliant software and it is likely to be adopted widely for FITS
+*           data in future.
 *
-*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, PCiiijjj, 
-*           etc, as described in a previous (now superceded) draft of the 
-*           above FITS world co-ordinate system paper by E.W.Greisen and 
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, PCiiijjj,
+*           etc, as described in a previous (now superceded) draft of the
+*           above FITS world co-ordinate system paper by E.W.Greisen and
 *           M.Calabretta.
 *
 *        "FITS-AIPS" --- This uses conventions described in the document
-*           "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen 
-*           (revised 9th September, 1994), available by ftp from 
-*           fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is currently 
-*           employed by the AIPS data analysis facility, so its use will 
-*           facilitate data exchange with AIPS. This encoding uses CROTAi 
+*           "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen
+*           (revised 9th September, 1994), available by ftp from
+*           fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is currently
+*           employed by the AIPS data analysis facility, so its use will
+*           facilitate data exchange with AIPS. This encoding uses CROTAi
 *           and CDELTi keywords to describe axis rotation and scaling.
 *
-*        "DSS" --- This is the system used by the Digital Sky Survey, and 
+*        "DSS" --- This is the system used by the Digital Sky Survey, and
 *           uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *
 *        "NATIVE" --- This is the native system used by the AST library (see
 *           SUN/210) and provides a loss-free method for transferring WCS
 *           information between AST-based application. It allows more
-*           complicated WCS information to be stored and retrieved than any of 
+*           complicated WCS information to be stored and retrieved than any of
 *           the other encodings.
 *
 *        A comma-separated list of up to six values may be supplied,
@@ -184,7 +184,7 @@
 *        catalogue name in the FITS header.
 
 *  Examples:
-*     fitsdin files=*.fit auto nofmtcnv 
+*     fitsdin files=*.fit auto nofmtcnv
 *        This reads all the files with extension "fit" in the default
 *        directory.  If the files were sao.fit and moimp.fit and each
 *        contained just an image array, the output NDFs will be sao and
@@ -203,7 +203,7 @@
 *        conversion switch is on.
 
 *  Algorithm:
-*     -  Open a logfile if required. 
+*     -  Open a logfile if required.
 *     -  Determine whether or not automatic operation is wanted. If it
 *     is obtain the global format conversion, otherwise see whether or
 *     not a global format-conversion is required, and obtain its
@@ -242,7 +242,7 @@
 *     Apply a format conversion if needed and substitute blank values
 *     with bad-pixel values.  Make a dummy NDF data array if there is
 *     no FITS array.  Convert IEEE data to their Vax representations.
-*     Create axis structures and WCS component if there is suitable data 
+*     Create axis structures and WCS component if there is suitable data
 *     in the FITS header.  Create the TITLE and UNITS components.
 *     -  If there is an extension immediately following set the flag
 *     to indicate that the record has been read and loop back to
@@ -269,7 +269,7 @@
 *     it is a multiple of the number of bytes per data value.
 *     -  For simple or group format FITS:
 *        -  IEEE floating point is supported.
-*        -  If BUNIT is present its value will appear as the NDF's 
+*        -  If BUNIT is present its value will appear as the NDF's
 *        UNITS component.
 *        -  If OBJECT is present its value will appear as the NDF's
 *        TITLE component.
@@ -412,7 +412,7 @@
                                ! blocking factor of ten
      :  MAXCOD,                ! No. of known AST encodings.
      :  MAXHDR,                ! Maximum number of header sections in a
-                               ! sub-file, including dummy header 
+                               ! sub-file, including dummy header
                                ! sections before the extension *with*
                                ! data
      :  MXFILE,                ! Maximum size of input file list
@@ -440,7 +440,7 @@
                                ! block
      :  BFPNTR,                ! Pointer to FITS block buffer
      :  BFPNTD,                ! Descriptor for FITS block buffer
-     :  CONTEXT,               ! Used in expanding wildcard entries 
+     :  CONTEXT,               ! Used in expanding wildcard entries
      :  DIMS( MXAXIS ),        ! The size of each axis
      :  FD,                    ! File description of logfile
      :  FS,                    ! File sequence
@@ -451,7 +451,7 @@
                                ! section in the sub-file
      :  HPNTR( 1 ),            ! Pointer to array to store the header
                                ! cards for the sub-file
-     :  HSTART( MAXHDR ),      ! Start card number of each header 
+     :  HSTART( MAXHDR ),      ! Start card number of each header
                                ! section of the sub-file in the full
                                ! header
      :  IDUMMY,                ! Dummy variable
@@ -468,7 +468,7 @@
       INTEGER
      :  NENCOD,                ! No. of of WCS encodings supplied
      :  NFILE,                 ! Number of input files
-     :  NGLIST,                ! Number of entries in first group 
+     :  NGLIST,                ! Number of entries in first group
      :  NHEADS,                ! Number of header sections in the FITS
                                ! sub-file and including the
                                ! dummy header section
@@ -480,25 +480,25 @@
                                ! the block has been fully processed)
      :  OLDMAP,                ! The value of the HDS MAP tuning
                                ! parameter on entry to this routine
-     :  PARAMS( MXPARM ),      ! Numerical values of parameters 
-                               ! associated with a group-format array, 
+     :  PARAMS( MXPARM ),      ! Numerical values of parameters
+                               ! associated with a group-format array,
                                ! note this assumes a BITPIX of no more
                                ! 32 (4 bytes per value)
      :  PCOUNT,                ! The number of parameter values
                                ! preceeding each data array
-     :  RCPNTR,                ! Pointer to FITS record  
-     :  RCPNTD,              ! Descriptor for FITS record 
+     :  RCPNTR,                ! Pointer to FITS record
+     :  RCPNTD,              ! Descriptor for FITS record
      :  SIZE,                  ! Total size of the data array
      :  SUBFIL,                ! Number of the FITS sub file
      :  UDFITS,                ! I/O unit for input disc-FITS files
-     :  WHDIM( 1 )             ! Size of the structure to store the 
+     :  WHDIM( 1 )             ! Size of the structure to store the
                                ! header cards
       INTEGER
      :  LP,                    ! Loop variable
      :  ADDED,                 ! Number of items added to a group
      :  ENCGRP                 ! Group identifier of ENCODINGS
 
-      CHARACTER*(GRP__SZNAM)   ! 
+      CHARACTER*(GRP__SZNAM)   !
      :  ENCODS( MAXCOD ),      ! AST encodings for WCS component
      :  FSPEC                  ! Entry in the initial filenames group
 
@@ -548,7 +548,7 @@
      :  VALID,                 ! A locator/GRP identifier is valid
      :  VMS                    ! Operating system is VMS
 
-      LOGICAL 
+      LOGICAL
      :  CFLAG                  ! Group requires further input ?
 
       REAL
@@ -702,7 +702,7 @@
 *  Abort if there has been an error.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get a group from parameter ENCODINGS holding the AST encodings to use 
+*  Get a group from parameter ENCODINGS holding the AST encodings to use
 *  when creating the WCS component from the FITS header.
       CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
       CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
@@ -748,7 +748,7 @@
 
 *    Get the list of file names from the environment.
 
-      CALL GRP_GROUP( 'FILES', GRP__NOID, IGRP1, NGLIST, IDUMMY, 
+      CALL GRP_GROUP( 'FILES', GRP__NOID, IGRP1, NGLIST, IDUMMY,
      :                LFLAG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 980
 
@@ -766,7 +766,7 @@
 *       Get a file spec from the input group.
 
          CALL GRP_GET( IGRP1, LP, 1, FSPEC, STATUS )
-         
+
 *       Find the files which match this specification.
 
          CONTEXT=0
@@ -776,7 +776,7 @@
 
 *          Get a single file that matches this specification.
 
-            FOUND = ONE_FIND_FILE( FSPEC, .TRUE., INFILE, CONTEXT, 
+            FOUND = ONE_FIND_FILE( FSPEC, .TRUE., INFILE, CONTEXT,
      :           STATUS)
 
 *          Check if a file has been found.
@@ -786,7 +786,7 @@
 *          Add this file into the output group.  NFILE keeps a count of
 *          the number of files in the output group.
 
-               CALL GRP_GRPEX( INFILE, GRP__NOID, IGRP2, NFILE, 
+               CALL GRP_GRPEX( INFILE, GRP__NOID, IGRP2, NFILE,
      :                         IDUMMY, LFLAG, STATUS )
             ELSE
 
@@ -876,8 +876,8 @@
 
 *       On a VAX, inquire the record length (Only fixed-length records are
 *       supported on a VAX - we do not check for this since it involves
-*       using the non-standard RECORDTYPE option).  
-         ELSE 
+*       using the non-standard RECORDTYPE option).
+         ELSE
             INQUIRE ( FILE = INFILE, RECL = ACTSIZ )
          END IF
 
@@ -905,7 +905,7 @@
 *       If the operating system is VMS/RSX open the file sequentially.
 
          IF ( VMS ) THEN
-            OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD', 
+            OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD',
      :            FORM = 'UNFORMATTED', IOSTAT = IOERR )
 
 *       Otherwise open it as a random-access file.  DEC Fortran uses
@@ -914,17 +914,17 @@
          ELSE IF ( SYSNAM( 1:6 ) .EQ. 'ULTRIX' .OR.
      :             SYSNAM( 1:4 ) .EQ. 'OSF1' .OR.
      :             SYSNAM( 1:7 ) .EQ. 'DIGITAL' ) THEN
-            OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD', 
+            OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD',
      :            FORM = 'UNFORMATTED', ACCESS = 'DIRECT', RECL = 720,
      :            IOSTAT = IOERR )
 
          ELSE
-            OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD', 
+            OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD',
      :            FORM = 'UNFORMATTED', ACCESS = 'DIRECT', RECL = 2880,
      :            IOSTAT = IOERR )
          END IF
 
-*       Check for errors, setting a suitable STATUS value and reporting 
+*       Check for errors, setting a suitable STATUS value and reporting
 *       the error.  Note if there are further files to process, flush
 *       the error so that subsequent files may be processed.
 
@@ -949,7 +949,7 @@
             CALL MSG_OUT( 'CURRENT_INFILE',
      :        'Processing file number ^FS: ^FN.', STATUS )
          END IF
- 
+
 *       Release the new error context.
 
          CALL ERR_RLSE
@@ -1003,7 +1003,7 @@
          END IF
 
 *       Process the header blocks.  OFFSET is updated.
-         CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( CNF_PVAL( RCPNTD ) ), 
+         CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( CNF_PVAL( RCPNTD ) ),
      :                    'DISK',
      :                    UDFITS, TLOC, BLKSIZ, MAXHDR, .NOT. AUTO,
      :                    ACTSIZ, OFFSET, CURREC, HSTART, HDNUM, EXTEND,
@@ -1036,7 +1036,7 @@
          IF ( SUBFIL .EQ. 1 ) THEN
             CALL FTS1_GKEYL( WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       HSTART( 1 ), 'EXTEND', 1, THERE, GEXTND,
-     :                       COMENT, NKC, STATUS, 
+     :                       COMENT, NKC, STATUS,
      :                       %VAL( CNF_CVAL( 1 ) ) )
             GEXTND = GEXTND .AND. THERE
          END IF
@@ -1051,7 +1051,7 @@
 *       Check that the mandatory descriptors are present.
 
          CALL FTS1_MANDH( SUBFIL .EQ. 1, WHDIM( 1 ),
-     :                    %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                    HSTART( NHEADS ), BITPIX,
      :                    NDIM, DIMS, DARRAY, NONSDA, SIZE, STATUS,
      :                    %VAL( CNF_CVAL( 1 ) ) )
@@ -1103,7 +1103,7 @@
 
             CALL FTS1_HDLOG( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       FD, INFILE, SUBFIL,
-     :                       NHEADS, HDNUM, STATUS, 
+     :                       NHEADS, HDNUM, STATUS,
      :                       %VAL( CNF_CVAL( 1 ) ) )
 
             IF ( STATUS .NE. SAI__OK ) GOTO 970
@@ -1126,7 +1126,7 @@
 
             CALL FTS1_GKEYC( WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       HSTART( NHEADS ), 'XTENSION', 1, THERE,
-     :                       EXTNAM, COMENT, NKC, STATUS, 
+     :                       EXTNAM, COMENT, NKC, STATUS,
      :                       %VAL( CNF_CVAL( 1 ) ) )
 
 *          Report any errors.
@@ -1150,14 +1150,14 @@
 
 *             Create the SCAR description file and text table.
 
-               CALL FTS1_SCTAB( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+               CALL FTS1_SCTAB( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                          'DSCFTABLE',
-     :                         'TABLE', 'DISK', UDFITS, WHDIM( 1 ), 
+     :                         'TABLE', 'DISK', UDFITS, WHDIM( 1 ),
      :                         HSTART( NHEADS ), NDIM, DIMS, LOGHDR,
      :                         FD, INFILE, SUBFIL, PREFIX, AUTO,
      :                         BLKSIZ, ACTSIZ, BFPNTR, OFFSET, CURREC,
      :                         RCPNTR, STATUS, %VAL( CNF_CVAL( 1 ) ) )
-     
+
             END IF
 
             IF ( STATUS .EQ. PAR__ABORT ) THEN
@@ -1237,7 +1237,7 @@
 *       a dummy dimension.
 
          CALL FTS1_DTYPE( DARRAY, NONSDA, BITPIX, HSTART( NHEADS ),
-     :                    WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                    WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                    MXPARM,
      :                    NDIM, DIMS, BSCALE, BZERO, BLANK, BADPIX,
      :                    IEEE, GCOUNT, PCOUNT, PTYPE, PSCALE, PZERO,
@@ -1297,10 +1297,10 @@
 
 *          See if we wish to override the standard data TYPE.  The
 *          suggested default is .TRUE..
- 
+
             CALL PAR_GTD0L( 'FMTCNV', .TRUE., .TRUE., FMTCNV, STATUS )
             CALL PAR_CANCL( 'FMTCNV', STATUS )
-  
+
             IF ( STATUS .EQ. PAR__ABORT ) GOTO 970
          END IF
 
@@ -1333,15 +1333,15 @@
 *       data conversions and blank-pixel removal.
 *       =====================================================
 
-         CALL FTS1_NDF( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+         CALL FTS1_NDF( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                  BFPNTR, RCPNTR, AUTO, 'OUT',
      :                  'DISK', UDFITS, VMS, LENDIA, SIZE, NDIM, DIMS,
      :                  BPV, EFMTCV, FORMTI, FORMAT, IEEE, BADPIX,
      :                  BLANK, BSCALE, BZERO, DARRAY, NONSDA, GCOUNT,
      :                  PCOUNT, MXPARM, PTYPE, PSCALE, PZERO, FILROO,
      :                  LOGHDR, FD, INFILE, SUBFIL, GEXTND, WHDIM( 1 ),
-     :                  HSTART( NHEADS ), NENCOD, ENCODS, BLKSIZ, 
-     :                  ACTSIZ, OFFSET, CURREC, NEXT, PARAMS, STATUS, 
+     :                  HSTART( NHEADS ), NENCOD, ENCODS, BLKSIZ,
+     :                  ACTSIZ, OFFSET, CURREC, NEXT, PARAMS, STATUS,
      :                  %VAL( CNF_CVAL( 80 ) ) )
 
 *       Test for exit.
@@ -1362,7 +1362,7 @@
 *          Start a new error context.
 
             CALL ERR_MARK
-  
+
 *          Attempt to read the next record as if it were the first
 *          header whenever the next card (first in the next record)
 *          is the start of a sub-file header.  There is no sub file
@@ -1370,8 +1370,8 @@
 *          file is encountered.  On some platforms this may return
 *          an IOSTAT that's not the EOF, so check for a read error too.
 
-            CALL FTS1_DREAD( UDFITS, BLKSIZ, ACTSIZ, .FALSE., 
-     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET, 
+            CALL FTS1_DREAD( UDFITS, BLKSIZ, ACTSIZ, .FALSE.,
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
      :                       %VAL( CNF_PVAL( RCPNTR ) ),
      :                       STATUS )
 
@@ -1392,7 +1392,7 @@
                CALL ERR_RLSE
                GOTO 100
 
-*          Ignore the error.  
+*          Ignore the error.
 
             ELSE IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -1436,7 +1436,7 @@
 
       CALL DAT_VALID( TLOC, VALID, STATUS )
       IF ( VALID ) CALL AIF_ANTMP( TLOC, STATUS )
- 
+
 *    Close down the NDF system.
 
       CALL NDF_END( STATUS )

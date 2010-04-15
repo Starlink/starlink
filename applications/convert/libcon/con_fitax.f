@@ -98,7 +98,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,7 +158,7 @@
 
 *  Start a new NDF context.
       CALL NDF_BEGIN
-      
+
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDF, DAT__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -233,15 +233,15 @@
             IF ( RATIO .GT. DBLE( VAL__EPSR ) * PRECF ) THEN
 
 *  Map the centre array in the axis structure.
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR, 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR,
      :                        EL, STATUS )
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL KPG1_SSAZR( EL, DELT, OFFSET,
-     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
-               
+
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
                END IF
@@ -259,7 +259,7 @@
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL KPG1_SSAZD( EL, DELT, OFFSET,
-     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
 
 *  Unmap the axis array.
@@ -295,5 +295,5 @@
 
 *  Close the new NDF context.
       CALL NDF_END( STATUS )
-      
+
       END

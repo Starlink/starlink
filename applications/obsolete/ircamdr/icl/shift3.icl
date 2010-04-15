@@ -23,7 +23,7 @@ proc shift3 cur
     asknum (posy_2) "Y-Position in image 2 ? "
     asknum (posx_3) "X-Position in image 3 ? "
     asknum (posy_3) "Y-Position in image 3 ? "
-  else 
+  else
     obeyw plt2d clear
     send plt2d set cursor_image (polly_1)
     obeyw plt2d nsigma (polly_1)

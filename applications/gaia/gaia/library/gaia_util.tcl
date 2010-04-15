@@ -9,7 +9,7 @@
 #     Tcl/Tk script.
 
 #  Description:
-#     Utility procedures for GAIA. Includes procedure for 
+#     Utility procedures for GAIA. Includes procedure for
 #     parsing an NDF filename and a replacement for filename_dialog
 #     (in tclutil).
 

@@ -131,17 +131,17 @@ C  Find and read in the backend section connection array
       CSTART (2) = 1
       CEND (1) = NO_IF_PER_BES
       CEND (2) = NRC
-      CALL GSD_GET1I (IND_GSD, 2, CDIMVAL, CSTART, CEND, BES_CONN, 
+      CALL GSD_GET1I (IND_GSD, 2, CDIMVAL, CSTART, CEND, BES_CONN,
      :   ACTVALS, STATUS)
 
 C  Find and read in the backend section resolution array
 
-      CALL GSD_FIND (IFD, 'C12FR', 
+      CALL GSD_FIND (IFD, 'C12FR',
      :   NO, UNITS, TYPE, ARRAY, IND_FR, STATUS)
       CALL GSD_GET1D (IND_FR, 1, NRC, 1, NRC, FR_TEMP, LVAL, STATUS)
 
 
-C  Find how many different IF inputs / spectrum resolution (or combinations 
+C  Find how many different IF inputs / spectrum resolution (or combinations
 C  of IF inputs if NOBESIN = 2) combinations were used, and note the `input/
 C  resolution' s that were used in the IFIN and RESIN arrays.
 
@@ -151,7 +151,7 @@ C  resolution' s that were used in the IFIN and RESIN arrays.
          IFIN (1,NIF) = BES_CONN (1)
          IFIN (2,NIF) = 0
          RESIN (NIF) = FR_TEMP (1)
-       
+
          DO J = 2, NRC
             MATCH = .FALSE.
             DO I = 1, NIF
@@ -174,7 +174,7 @@ C  resolution' s that were used in the IFIN and RESIN arrays.
          IFIN (1,NIF) = BES_CONN (1)
          IFIN (2,NIF) = BES_CONN (2)
          RESIN (NIF) = FR_TEMP (1)
-       
+
          DO J = 2, NRC
             MATCH = .FALSE.
             JJ = 1 + 2*(J-1)
@@ -196,28 +196,28 @@ C  resolution' s that were used in the IFIN and RESIN arrays.
       END IF
 
 CD    write (ilout,*) 'no_if_per_bes, nrc ', no_if_per_bes, nrc
-CD    write (ilout,*) 'bes_conn ', (bes_conn(i), i = 1, 
+CD    write (ilout,*) 'bes_conn ', (bes_conn(i), i = 1,
 CD   :   no_if_per_bes*nrc)
 CD    write (ilout,*) 'fr_temp ', (fr_temp(i), i = 1, nrc)
 CD    write (ilout,*) 'nif ', nif
 CD    write (ilout,*) 'ifin, resin ', ((ifin(i,j), i=1,2),
 CD   :   resin(j), j=1,nif)
 
-C  Find indices to all other arrays 
+C  Find indices to all other arrays
 
-      CALL GSD_FIND (IFD, 'C13DAT', 
+      CALL GSD_FIND (IFD, 'C13DAT',
      &               NO, UNITS, TYPE, ARRAY, IND_DATA, STATUS)
       CALL GSD_FIND (IFD, 'C12SST',
      &               NO, UNITS, TYPE, ARRAY, IND_TSYS, STATUS)
-      CALL GSD_FIND (IFD, 'C12RT', 
+      CALL GSD_FIND (IFD, 'C12RT',
      &               NO, UNITS, TYPE, ARRAY, IND_TREC, STATUS)
-      CALL GSD_FIND (IFD, 'C12TTEL', 
+      CALL GSD_FIND (IFD, 'C12TTEL',
      &               NO, UNITS, TYPE, ARRAY, IND_TTEL, STATUS)
-      CALL GSD_FIND (IFD, 'C12TSKY', 
+      CALL GSD_FIND (IFD, 'C12TSKY',
      &               NO, UNITS, TYPE, ARRAY, IND_TSKY, STATUS)
-      CALL GSD_FIND (IFD, 'C12RF', 
+      CALL GSD_FIND (IFD, 'C12RF',
      &               NO, UNITS, TYPE, ARRAY, IND_RF, STATUS)
-      CALL GSD_FIND (IFD, 'C12CF', 
+      CALL GSD_FIND (IFD, 'C12CF',
      &               NO, UNITS, TYPE, ARRAY, IND_CF, STATUS)
 
 C  find and read in the number of points per section array
@@ -245,9 +245,9 @@ CD    WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
 C    ..then convert to R.A. and Dec. offsets
 
       V2Y_RAD = 1.74533e-2 * V2Y                               ! Radians
-      X2Y_RAD = 1.74533e-2 * X2Y 
+      X2Y_RAD = 1.74533e-2 * X2Y
 
-      DRA     =   SIN (V2Y_RAD - X2Y_RAD) * X_OFFSET 
+      DRA     =   SIN (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + SIN (V2Y_RAD)           * Y_OFFSET
       DDEC    =   COS (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + COS (V2Y_RAD)           * Y_OFFSET
@@ -306,8 +306,8 @@ C  Fix up integration time for last spectrum
 
 *  Now get appropriate array elements for this quadrant within each spectrum
 *  ( system temperatures etc are the same for all spectra )
-  
-               CALL GSD_GET1R (IND_TSYS, 1, NRC, QUAD, QUAD, 
+
+               CALL GSD_GET1R (IND_TSYS, 1, NRC, QUAD, QUAD,
      :           TSYS(NQUAD), LVAL, STATUS)
                CALL GSD_GET1I (IND_TREC, 1, NRC, QUAD, QUAD,
      :           ITREC(NQUAD), LVAL, STATUS)

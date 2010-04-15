@@ -6,7 +6,7 @@
 
 *  Purpose:
 *     Sets up image array to include only those pixels that have
-*     been selected. 
+*     been selected.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,10 +16,10 @@
 *                     ELEMS,ARRAY,STATUS)
 
 *  Description:
-*     Allows the user to define which parts of the image are 
+*     Allows the user to define which parts of the image are
 *     to be used by opting for the whole image or with parts selected
 *     using an ARD file missing.
-     
+
 *  Arguments:
 *     POINT1( 10 ) = INTEGER (Given)
 *        Memory pointer to the modified image array.
@@ -57,7 +57,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,14 +82,14 @@
                                  ! data component
 
 *  Arguments Returned.
-      REAL ARRAY( ELEMS )        ! An array containing a modified 
+      REAL ARRAY( ELEMS )        ! An array containing a modified
                                  ! version of the source array Only
                                  ! those points to be used are not
                                  ! assigned a bad value
-   
+
 *  Status:
       INTEGER STATUS             ! Global status
-     
+
 *  Local Variables:
       INTEGER POINT4             ! Pointer to the logical mask
       INTEGER P1(1)              ! Pointer
@@ -100,19 +100,19 @@
 
 *   Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-             
+
 *   Copy the whole image array.
       DO 10 I=1,ELEMS
          ARRAY(I)=OARRAY(I)
  10   CONTINUE
- 
+
 *   Handle extra stages needed if USE = 'A' i.e. an ARD file is in use.
-      IF (USE.EQ.'A') THEN     
+      IF (USE.EQ.'A') THEN
 
 *      Display the message saying the ARD file is being looked at.
          CALL MSG_OUT(' ','Examining the ARD file.',STATUS)
-         
-*      Allocate the memory needed for the logical mask array.         
+
+*      Allocate the memory needed for the logical mask array.
          CALL PSX_CALLOC(ELEMS,'_INTEGER',POINT4,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 

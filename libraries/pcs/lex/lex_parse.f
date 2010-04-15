@@ -49,7 +49,7 @@
 *     STACK, and optionally an ACTION. If an action is specified
 *     the routine returns to its caller with the action number and
 *     current token. Otherwise it advances to the next character
-*     (unless BACK is specified). It also returns to the caller in the 
+*     (unless BACK is specified). It also returns to the caller in the
 *     event of an invalid character for the state, or on reaching the
 *     end of the string.
 
@@ -132,7 +132,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
           IF (INIT) THEN
-		
+
 *  Initialize variables for first time through
              TOKEN = ' '
 
@@ -171,7 +171,7 @@
 
  1              NC = NC-1                                  ! BACK
                 GOTO 16
- 
+
  2              TOKEN(NI:NI) = STRING(NC:NC)               ! COPY
                 NI = NI+1
                 GOTO 16
@@ -222,7 +222,7 @@
 		GOTO 16
 
  13             STACK(SP) = OSTATE                    ! STACK, BACK, WRITE
-		SP = SP+1 
+		SP = SP+1
                 TOKEN(NI:NI) = CHAR(TABLE(3,NCHAR,OSTATE))
                 NI = NI+1
                 NC = NC-1
@@ -232,7 +232,7 @@
 *  CODE 15 (STACK, COPY, BACK, WRITE) is interpreted as STACK, BACK, WRITE
 
  16             CONTINUE
-	
+
              ELSE IF (CODE .LE. -1) THEN
 		STATUS = LEX__INVCHAR
                 CALL EMS_REP('LEX_PARSE1',

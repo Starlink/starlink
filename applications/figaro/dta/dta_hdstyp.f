@@ -15,7 +15,7 @@ C
 C     Parameters -   (">" input, "<" output)
 C
 C     (>) TYPE    (Character) The DTA type.  Should be in upper
-C                 case. 
+C                 case.
 C     (>) NCHAR   (Integer) If TYPE='CHAR' this should be the
 C                 string length to be used.  HDSTYPE will then
 C                 be returned as '_CHAR*n' where n=NCHAR.  If
@@ -35,8 +35,8 @@ C
 C                                         KS / AAO 12th March 1986
 C     Modified:
 C
-C     8th  Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     8th  Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C+
       IMPLICIT NONE

@@ -26,7 +26,7 @@
 *     pointers and is the only structure that contains pointers (thus only item
 *     descriptors need relocating). It has the following structure.
 *
-*            Pointer to parent item descriptor 
+*            Pointer to parent item descriptor
 *            Pointer to eldest child item descriptor
 *            Pointer to next sibling item descriptor
 *            Pointer to fixed information
@@ -122,7 +122,7 @@
 *  History:
 *     03-Feb-86 (WFL):
 *        Original version
-*     17-Jul-87 (WFL): 
+*     17-Jul-87 (WFL):
 *        Ensure that MODIFIED is word-aligned with respect to
 *             the rest of the structure. Also ensure that all structures
 *          are an integral number of words in length.
@@ -149,7 +149,7 @@
 *          o Add RESERVE fields to all data structures to minimise
 *            necessity for incrementing VERSION on all changes (and increment
 *            VERSION).
-*     20-May-88 (WFL): 
+*     20-May-88 (WFL):
 *        Add INT_ID type (type used for input integers - int
 *          for c_string, int* otherwise).
 *     01-Feb-90 (WFL):
@@ -163,7 +163,7 @@
 *     07-Feb-90 (WFL):
 *        Add variant ITEM_INFO GLOBAL_BASE/SHAPE, with
 *          GLOBAL_BASE used only for top-level items
-*     15-Feb-90 (WFL): 
+*     15-Feb-90 (WFL):
 *        Remove TIMEOUT_COUNT and TIMEOUT_DELAY from BOARD_INFO
 *     19-Nov-93 (DJA):
 *        string_id removed in favour of F77 usage.
@@ -201,7 +201,7 @@
 #define MAXFILE 80
 
 /*  Various data structure sizes */
-                                                                  
+
 #define _ALIGN_ITEM(_x) ((((_x)-1)/sizeof(double))*sizeof(double)+sizeof(double) )
 
 #define ITEM_SIZE      _ALIGN_ITEM(sizeof(struct item_descriptor))
@@ -221,7 +221,7 @@ typedef int *shape_id;
 
 typedef struct board_info *board_id;
 
-/*  Data_id is a pointer to a character array holding data associated with a 
+/*  Data_id is a pointer to a character array holding data associated with a
  *  primitive data item */
 
 typedef char *data_id;
@@ -243,13 +243,13 @@ typedef int *int_id;
 #endif
 
 /*  Fixed_info is the part of the information associated with a noticeboard item
- *  that contains no addresses and thus that does not have to be relocated. 
+ *  that contains no addresses and thus that does not have to be relocated.
  *  Fixed_id is a pointer to it. The MODIFIED field MUST be word-aligned,
  *  since it is incremented using the ADAWI instruection. MALLOC returns
  *  quadword-aligned addresses so it is necessary to ensure that MODIFIED is
  *  at an even byte offset from the start of FIXED_INFO and that all structures
  *  are of an even length.	*/
-       
+
 typedef struct fixed_info *fixed_id;
 
 struct fixed_info {
@@ -265,7 +265,7 @@ struct fixed_info {
    int reserve[2];
 };
 
-/*  Item_descriptor is the set of pointers defining a noticeboard item's 
+/*  Item_descriptor is the set of pointers defining a noticeboard item's
  *  position within a noticeboard and values pertaining to an item which are
  *  local to a given process. Item_id is a pointer to it. The VALID flag
  *  is only used in top-level items (and is thus the first four bytes of a

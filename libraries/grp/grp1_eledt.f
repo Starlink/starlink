@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -144,7 +144,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the output string to equal the input string.
-      OUT = IN      
+      OUT = IN
 
 *  Get the groups current SEPARATOR control character.
       CALL GRP1_CONC( SLOT, GRP__PMSPC, SEPCC, SEPOK, STATUS )
@@ -154,7 +154,7 @@
 
 *  Loop round until no more editing is required.
       MORE = .TRUE.
-      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Get the innermost kernel, and the associated editing strings.
          CALL GRP1_FKERN( SLOT, 1, OUT, NEXT, P1, P2, K1, K2, S1, S2,
@@ -162,7 +162,7 @@
 
 *  Store the prefix (if any) in the new string.
          IF( P2 .GE. P1 ) THEN
-            NEWEL = OUT( P1 : P2 )     
+            NEWEL = OUT( P1 : P2 )
             NLEN = P2 - P1 + 1
          ELSE
             NEWEL = ' '
@@ -172,9 +172,9 @@
 *  If a substitution is specified, get the string to be replaced, and
 *  the string with which to replace it.
          IF( T2 .GE. T1 ) THEN
-            SEP1 = GRP1_INDEX( OUT( T1 : T2 ), SEPCC, ESCCC, ESCOK ) 
+            SEP1 = GRP1_INDEX( OUT( T1 : T2 ), SEPCC, ESCCC, ESCOK )
      :             + T1 - 1
-            SEP2 = GRP1_INDEX( OUT( SEP1 + 1 : T2 ), SEPCC, ESCCC, 
+            SEP2 = GRP1_INDEX( OUT( SEP1 + 1 : T2 ), SEPCC, ESCCC,
      :                         ESCOK ) + SEP1
             SEP3 = GRP1_INDEX( OUT( SEP2 + 1 : T2 ), SEPCC, ESCCC,
      :                         ESCOK ) + SEP2
@@ -187,7 +187,7 @@
             IF( SEP3 .LE. SEP2 + 1 ) THEN
                NEWNUL = .TRUE.
                NEWLEN = 1
-   
+
 *  Otherwise, save the new string and its length.
             ELSE
                NEWNUL = .FALSE.
@@ -211,12 +211,12 @@
             IF( K2 .GE. K1 ) CALL CHR_APPND( OUT( K1 : K2 ), NEWEL,
      :                                       NLEN )
 
-         END IF            
+         END IF
 
 *  Now append any suffix to the new string.
          IF( S1 .LE. S2 ) CALL CHR_APPND( OUT( S1 : S2 ), NEWEL, NLEN )
 
-*  If any of the string has not yet been used, 
+*  If any of the string has not yet been used,
          LOUT = CHR_LEN( OUT )
          IF( F .GT. 1 .OR. L .LT. LOUT ) THEN
 
@@ -229,13 +229,13 @@
                TLEN = 0
             END IF
 
-            IF( NLEN .GT. 0 ) CALL CHR_APPND( NEWEL( : NLEN ), TEMP, 
+            IF( NLEN .GT. 0 ) CALL CHR_APPND( NEWEL( : NLEN ), TEMP,
      :                                        TLEN )
-            IF( L .GE. 0 .AND. L .LT. LOUT ) 
+            IF( L .GE. 0 .AND. L .LT. LOUT )
      :                      CALL CHR_APPND( OUT( L + 1 : ), TEMP, TLEN )
             OUT = TEMP
 
-*  If all the string was used, there is no need to do another pass 
+*  If all the string was used, there is no need to do another pass
 *  through this loop. Copy the new elementt to the returned variable.
          ELSE
             MORE = .FALSE.

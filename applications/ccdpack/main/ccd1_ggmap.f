@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_GGMAP( FORMAP, INVMAP, UNIPAR, NUMUNI, FORVAL,
-     :                       INVVAL, GOTINV, SIMPFI, SIMPIF, MAP, 
+     :                       INVVAL, GOTINV, SIMPFI, SIMPIF, MAP,
      :                       STATUS )
 *+
 *  Name:
@@ -21,7 +21,7 @@
 *     an AST MathMap from the resulting expression.  The process relies
 *     on the fact that the format for AST MathMap specifications is so
 *     similar to (is a superset of) that used for TRANSFORM structures.
-*     If no inverse transformation is supplied then a dummy one is 
+*     If no inverse transformation is supplied then a dummy one is
 *     supplied to the mapping.
 
 *  Arguments:
@@ -49,12 +49,12 @@
 *        If true then an inverse expression has been given and is to be
 *        included as part of the transform.
 *     SIMPFI = LOGICAL (Given)
-*        The value of the resulting mapping's 'SimpFI' attribute.  This 
-*        decides whether the mapping followed by its inverse can be 
+*        The value of the resulting mapping's 'SimpFI' attribute.  This
+*        decides whether the mapping followed by its inverse can be
 *        legitimately simplified to the unit mapping.
 *     SIMPIF = LOGICAL (Given)
 *        The value of the resulting mapping's 'SimpIF' attribute.  This
-*        decides whether the mapping preceded by its inverse can be 
+*        decides whether the mapping preceded by its inverse can be
 *        legitimately simplified to the unit mapping.
 *     MAP = INTEGER (Returned)
 *        An AST pointer to the mapping represented by the tranformations
@@ -103,7 +103,7 @@
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'PRM_PAR'          ! PRIMDAT standard constants
-      
+
 *  Arguments Given:
       INTEGER NUMUNI
       CHARACTER * ( * ) UNIPAR( NUMUNI )
@@ -119,7 +119,7 @@
 
 *  Arguments Returned:
       INTEGER MAP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

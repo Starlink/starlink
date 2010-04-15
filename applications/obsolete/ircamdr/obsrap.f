@@ -43,7 +43,7 @@
 *     20-03-1987 : Added ARGSAVE and ABCOM (UKTH::CAA)
 *     29-08-1987 : Removed POLCAL, POLSHOT, THETAFIX to POLRAP (JACH::CAA)
 *     27-Apr-1994  Deleted some routines with move to NDF (SKL@JACH)
-*     19-Aug-1994  Changed style to new UNIX/VMS Atask monolith style(SKL@JACH) 
+*     19-Aug-1994  Changed style to new UNIX/VMS Atask monolith style(SKL@JACH)
 *
 *    Type definitions :
 
@@ -53,8 +53,8 @@
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE  'PAR_PAR'          ! Necessary for non-VMS
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
       EXTERNAL INDEX              ! so as not to confuse with the intrinsic
 
@@ -184,7 +184,7 @@
 
       ELSE IF ( NAME .EQ. 'CREQUILT' ) THEN
 
-*       allows user to generate QUILT offset file for mosaicing 
+*       allows user to generate QUILT offset file for mosaicing
 
          CALL CREQUILT ( STATUS )
 
@@ -251,11 +251,11 @@
 
 
       ELSE IF ( NAME .EQ. 'INDEX' ) THEN
-   
+
 *       index's through an observation container file creating index list
-   
+
          CALL INDEX ( STATUS )
-   
+
       ELSE IF ( NAME .EQ. 'INSETB' ) THEN
 
 *       sets pixels inside box to new value
@@ -275,23 +275,23 @@
          CALL INTLK ( STATUS )
 
       ELSE IF ( NAME .EQ. 'LINCONT' ) THEN
-   
+
 *       linearity correction of whole container file
-   
+
          CALL LINCONT ( STATUS )
-   
+
       ELSE IF ( NAME .EQ. 'LINIMAG_NDR' ) THEN
-   
+
 *       linearity correction of single image NDR
-   
+
          CALL LINIMAG_NDR ( STATUS )
-   
+
       ELSE IF ( NAME .EQ. 'LOWCASE' ) THEN
-   
+
 *       convert string to lower case
-   
+
          CALL LOWCASE ( STATUS )
-   
+
       ELSE IF ( NAME .EQ. 'MAKEBAD' ) THEN
 
 *       makes bad pixel list from n-sigma cut on image
@@ -324,7 +324,7 @@
 
       ELSE IF ( NAME .EQ. 'MOSAIC2' ) THEN
 
-*       combines 2 images into one with offsets 
+*       combines 2 images into one with offsets
 
          CALL MOSAIC2 ( STATUS )
 
@@ -335,21 +335,21 @@
          CALL MOSCOR ( STATUS )
 
       ELSE IF ( NAME .EQ. 'OBSEXT' ) THEN
-    
+
 *       extracts an observation from a container file and creates image
-   
+
          CALL OBSEXT ( STATUS )
-   
+
       ELSE IF ( NAME .EQ. 'OBSLIST' ) THEN
 
 *       list out one parameter from observation file by number
 
          CALL OBSLIST ( STATUS )
-   
+
       ELSE IF ( NAME .EQ. 'OEFIX' ) THEN
-   
+
 *       fixes the difference between odd and even channel data in image
-   
+
          CALL OEFIX ( STATUS )
 
       ELSE IF ( NAME .EQ. 'OUTSETB' ) THEN
@@ -452,11 +452,11 @@
 
 *       no such option exists
 
-        CALL MSG_OUT( 'RAP_ERR', 
-     :                 'Thats quite impossible at the moment ...', 
+        CALL MSG_OUT( 'RAP_ERR',
+     :                 'Thats quite impossible at the moment ...',
      :                 STATUS )
         CALL MSG_SETC( 'NAME', NAME)
-        CALL MSG_OUT( 'MESSAGE', 'Action requested was ^NAME', 
+        CALL MSG_OUT( 'MESSAGE', 'Action requested was ^NAME',
      :                 STATUS)
 
       END IF

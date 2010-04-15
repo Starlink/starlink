@@ -1,7 +1,7 @@
       SUBROUTINE SURF_WRITE_PHOTOM_HEADER (ODF, OBS_DATE, OBS_TIME,
-     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
-     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
-     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
+     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER,
+     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2,
+     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA,
      :     SKY_SUBTRACTION, FD, STATUS)
 *+
 *  Name:
@@ -15,9 +15,9 @@
 
 *  Invocation:
 *      CALL SURF_WRITE_PHOTOM_HEADER (ODF, OBS_DATE, OBS_TIME,
-*     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
-*     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
-*     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
+*     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER,
+*     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2,
+*     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA,
 *     :     SKY_SUBTRACTION, FD, STATUS)
 
 *  Description:
@@ -53,12 +53,12 @@
 *      y offset              : <y offset of source>
 *      Sampe coords          : <coord system of jiggle offsets>
 *      Sample position angle : <angle that x axis of jiggle offsets is rotated
-*                              anticlockwise from the x axis of the sample 
+*                              anticlockwise from the x axis of the sample
 *                              coord system>
 *      Sky error removal     : <TRUE if the SURF REMSKY application has been
 *                              run on the data>
 *      Analysis mode         : AVERAGE or PARABOLA
-*    
+*
 
 *  Arguments:
 *     ODF                    = CHARACTER*(*) (Given)
@@ -107,7 +107,7 @@
 *           the maximum number of bolometers that can observe the source
 *           in a single observation
 *     PHOT_BB (MAX_BEAM)     = INTEGER (Given)
-*           the indices of the bolometers used to observe the source in 
+*           the indices of the bolometers used to observe the source in
 *           each beam in the BOL_CHAN and BOL_ADC arrays
 *     FD                     = INTEGER (Returned)
 *           File descriptor of output file
@@ -222,7 +222,7 @@
 
       LINE = 'Date of observation   : '//OBS_DATE
       CALL FIO_WRITE (FD, LINE, STATUS)
- 
+
       LINE = 'Time of observation   : '//OBS_TIME
       CALL FIO_WRITE (FD, LINE, STATUS)
 
@@ -241,7 +241,7 @@
 
       LINE = 'Centre coords         : '//CENTRE_COORDS
       CALL FIO_WRITE (FD, LINE, STATUS)
-     
+
       LINE = 'Latitude              : '//LAT
       CALL FIO_WRITE (FD, LINE, STATUS)
 

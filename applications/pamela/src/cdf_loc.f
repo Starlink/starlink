@@ -4,17 +4,17 @@
 *            This is useful for autoscaling.
 *
 * CDF_LOC returns the LEVEL for which FRAC pixels in the selected region of
-* a frame are below it. To avoid sorting the array completely it only does 
-* this approximately though for speed, so do not use the value in critical 
+* a frame are below it. To avoid sorting the array completely it only does
+* this approximately though for speed, so do not use the value in critical
 * applications.
 *
 * The method is to first compute the min and max values in the first pass
-* and then to narrow down LEVEL by binning into a histogram and identifying 
+* and then to narrow down LEVEL by binning into a histogram and identifying
 * values above and below it.  On each cycle the range straddling level
-* is cut down by a factor of NHIST. You can select the number of cycles 
+* is cut down by a factor of NHIST. You can select the number of cycles
 * to be carried out.
 *
-*      SUBROUTINE CDF_LOC(DATA, NX, NY, HIST, NHIST, FRAC, CYCLES, 
+*      SUBROUTINE CDF_LOC(DATA, NX, NY, HIST, NHIST, FRAC, CYCLES,
 *      LOW, HIGH, LEVEL)
 *
 *  Arguments:
@@ -28,17 +28,17 @@
 *    I*4   CYCLES             -- Number of refinement cycles. This should be
 *                                large enough for different values of FRAC to
 *                                give different values of LEVEL
-* 
+*
 *    R*4   LOW, HIGH          -- Range covering the value of LEVEL. Normally
 *                                they should just be the min and max. They are
 *                                supplied rather than calculated to save time.
-* 
+*
 *    R*4   LEVEL
 *
 *CDF_LOC
-      SUBROUTINE CDF_LOC(DATA, NX, NY, HIST, NHIST, FRAC, 
+      SUBROUTINE CDF_LOC(DATA, NX, NY, HIST, NHIST, FRAC,
      &     CYCLES, LOW, HIGH, LEVEL)
-C    
+C
       IMPLICIT NONE
       INCLUDE 'PRM_PAR'
       INTEGER NX, NY, NHIST, CYCLES
@@ -54,7 +54,7 @@ C
             LEVEL = HIGH
          END IF
          RETURN
-      END IF     
+      END IF
       D1 = LOW
       D2 = HIGH
       DO NCYC = 1, CYCLES
@@ -77,24 +77,24 @@ C
                END IF
             END DO
          END DO
-C     
+C
 C     Make into CDF
-C     
+C
          NSUM = NLO
          DO I = 1, NHIST
             NSUM = NSUM + NINT(HIST(I))
             HIST(I) = REAL(NSUM)/REAL(NOK)
          END DO
-C     
+C
 C     Identify where the search level is
-C     
+C
          L = 1
          DO WHILE(FRAC.GT.HIST(L))
             L = L + 1
          END DO
          NEWD1 = D1 + (D2-D1)*REAL(L-1)/REAL(NHIST)
-         NEWD2 = D1 + (D2-D1)*REAL(L  )/REAL(NHIST) 
-         D1    = NEWD1      
+         NEWD2 = D1 + (D2-D1)*REAL(L  )/REAL(NHIST)
+         D1    = NEWD1
          D2    = NEWD2
       END DO
       LEVEL = (D1+D2)/2.

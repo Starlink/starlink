@@ -30,12 +30,12 @@
 
 *  Global constants:
 
-*  The maximum number of the pixels for which values are 
+*  The maximum number of the pixels for which values are
 *  kept. These values are used to fill the histogram.
       INTEGER LOB__MXPIX
       PARAMETER ( LOB__MXPIX = 50000 )
 
-*  The maximum number of the locations for which mode values can be 
+*  The maximum number of the locations for which mode values can be
 *  calculated
       INTEGER LOB__NGALS
       PARAMETER ( LOB__NGALS = 10000 )

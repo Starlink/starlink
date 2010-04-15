@@ -12,17 +12,17 @@
 # code, scripts etc. In particular the need for documentation in
 # more than one format. The idea is to define a set of flags which
 # are recognised and then translated into html, Latex or whatever.
-# 
-# For example the line: 
+#
+# For example the line:
 #
 # %!!head1 Program definition
 #
 # will be picked up and the text following the %!!head1 will be
 # converted into an appropriate heading. In this manner only one
 # bit of documentation is needed to generate the different types.
-# 
+#
 #If you want to extend the argument over more than one line you need
-# to delimit it with braces as in 
+# to delimit it with braces as in
 #
 # %!!head1{This is a very long definition of an argument that
 # looks better if split}.
@@ -51,8 +51,8 @@
 #
 # !!table
 # !!arg{ $index{$item}->{file}}{ corresponding file within the directory $dir}
-# !!arg{ $index{$item}->{description}}{the description to be attached to the 
-# item.} 
+# !!arg{ $index{$item}->{description}}{the description to be attached to the
+# item.}
 # !!arg{$index{$item}->{source}}{the source file of the docmentation}
 # !!table
 #
@@ -68,7 +68,7 @@
 # Here follows a list of recognised flags:
 #
 # !!table
-# !!arg{%!!arg{arg1}{arg2}}{argument definition in a table, 
+# !!arg{%!!arg{arg1}{arg2}}{argument definition in a table,
 # arg1 is the argument and arg2 is the description, as in this table.}
 # !!arg{%!!author arg}{name of author of document}
 # !!arg{%!!begin}{beginning of documentation}
@@ -83,8 +83,8 @@
 # !!arg{%!!head2 arg}{Second level heading set to arg}
 # !!arg{%!!head3 arg}{Third level heading set to arg}
 # !!arg{%!!index arg}{Index entry name}
-# !!arg{ %!!ref{arg1}{arg2}}{Generates a reference to a file arg1 
-# called arg2. Mainly designed for hyper-links so that arg1 can be an 
+# !!arg{ %!!ref{arg1}{arg2}}{Generates a reference to a file arg1
+# called arg2. Mainly designed for hyper-links so that arg1 can be an
 # html file and arg2 what you want it to be called.}
 # !!arg{%!!revised arg}{Revision date}
 # !!arg{%!!root arg}{root name for file. An extension such a .html is added
@@ -93,7 +93,7 @@
 # !!arg{%!!stop}{suspends document input (see %!!start)}
 # !!arg{%!!table}{Start and end of a table.}
 # !!arg{%!!title arg}{gives a title to the document}
-# !!arg{%!!trow{arg1}{arg2} etc}{more generalised tables than arg 1 to 
+# !!arg{%!!trow{arg1}{arg2} etc}{more generalised tables than arg 1 to
 # 5 arguments}
 # !!table
 #
@@ -104,14 +104,14 @@
 sub document{
     my($file,$dir,$ext,$style,$cflag) = @_;
     my($author,$time,$print,$table,$fname);
-    
-    ($style =~ /html/ || $style =~ /ascii/) or 
+
+    ($style =~ /html/ || $style =~ /ascii/) or
 	die "$style is not recognised by document\n";
-    
-# Read in all text between begin/end, start/stop. 
+
+# Read in all text between begin/end, start/stop.
 # Comment flags stripped. Text loaded into a single
 # string $string
-    
+
     open(FILE, "$file") or die "Failed to open $file\n";
     $store  = 0;
     $string = "";
@@ -133,9 +133,9 @@ sub document{
     }
 
     close(FILE);
-    
+
     (!$store) or die "A !!begin without a matching !!end was encountered in $file\n";
-    
+
     ($string ne "") or die "$file contains no documentation!!\n";
 
     $time  = localtime;
@@ -168,10 +168,10 @@ sub document{
 	    $doc =~ s/!!ref\s*\{\s*(.*?)\s*\}\s*\{\s*(.*?)\s*\}/<a href=\"$1\">$2<\/a>/gs;
 	    $doc =~ s/!!break/<br>/g;
 	    $doc =~ s/!!emph\{\s*(.*?\s*)\}/<strong>$1<\/strong>/gs;
-	    $doc =~ s/!!table(.*?)!!table/\n<table>$1<\/table>/gs;	
+	    $doc =~ s/!!table(.*?)!!table/\n<table>$1<\/table>/gs;
 
 # deal with headings
-	
+
 	    $doc =~ s/!!head(\d)\s*\{\s*(.*?)\s*\}/\n<h$1>$2<\/h$1>\n\n/gs;
 	    $doc =~ s/!!head(\d)\s*(.*?)\s*\n/\n<h$1>$2<\/h$1>\n\n/g;
 
@@ -181,12 +181,12 @@ sub document{
 
 	    while($doc =~ s/(<table>.*?)\n\s*\n(.*?<\/table>)/$1ZzXzZ$2/gs){};
 	    $doc =~ s/\n\s*\n/\n<p>\n/g;
-	    $doc =~ s/ZzXzZ/\n\n/gs;	
+	    $doc =~ s/ZzXzZ/\n\n/gs;
 
-# pick up author, creation and revision dates, description, 
+# pick up author, creation and revision dates, description,
 # index reference, root file name, title
 # allow for one-liners and delimited arguments
-	    
+
 	    if($doc =~ s/!!author\s*\{(.*?)\}\s*\n?//s){$author = $1;}
 	    if($doc =~ s/!!author\s*(.*?)\s*\n//){$author = $1;}
 	    if($doc =~ s/!!created\s*\{(.*?)\}\s*\n?//s){$created = $1;}
@@ -213,7 +213,7 @@ sub document{
 	    }
 
 # argument lists
-	    
+
 	    $doc =~ s/
 		!!arg\s*\{\s*(.*?)\s*\}\s*\{\s*(.*?)\s*\}\s*\n?
 	    /<tr valign=\"top\"><td><i>$1<\/i><\/td><td>---<\/td><td>$2<\/td><\/tr>\n/xgs;
@@ -255,7 +255,7 @@ sub document{
 		\s*\{\s*([^{}]*?)\s*\}
                 [^{]\s*\n?
 		/<tr valign=\"top\"><td>$1<\/td><\/tr>\n/xgs;
-	    
+
 	 }elsif($style =~ /ascii/){
 
 	     $wrap  = 80;
@@ -300,7 +300,7 @@ sub document{
 	     while($doc =~ s/!!class\s*(.*?)\s*\n//){
 		 $class[$nclass++] = $1;
 	     }
-	     
+
 	     $doc =~ s/([^\n])\n([^\n])/$1 $2/gs;     # remove \n
 
 # Now deal with tables
@@ -323,8 +323,8 @@ sub document{
 	     $doc =~ s/$newl/\n/gs;                                     # put back newlines
 	     $doc =~ s/$dnewl/\n\n/gs;                                  # put back double newlines
 	     $doc =~ s/!!break/\n/g;                                    # put \n for line breaks
-	    
-	}	
+
+	}
 	if(defined $root){
 
 	    open(OUT, ">$dir/$root.$ext") or die "Could not open $dir/$root.$ext\n";
@@ -419,10 +419,10 @@ sub document{
 
 	    }
 	    close(OUT);
-	    
+
 # set the index hash entries, first changing any leading
 # uppercase letter to lower case
-	    
+
 	    if($descr =~ /^\s*([A-Z])/){
 		($first = $1) =~ tr/A-Z/a-z/;
 		$descr =~ s/^\s*([A-Z])/$first/;
@@ -473,7 +473,7 @@ sub wrap {
 }
 
 1;
-    
+
 
 
 

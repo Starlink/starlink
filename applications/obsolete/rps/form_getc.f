@@ -23,7 +23,7 @@
 
       CHARACTER*(*) DEFAULT	! Default answer.
      & ,            QUERY       ! Question.
- 
+
 *Global
       INTEGER KPID,PBID
       COMMON /SMG_PANDK/ PBID,KPID
@@ -46,13 +46,13 @@
       IERR = 1
       DLEN = MDH_ENDWORD( DEFAULT )
       LEN = MDH_ENDWORD( QUERY )
- 
- 
+
+
       I = 1
       DO WHILE (QUERY(I:I) .EQ. '/' )		! Leading blank lines
          I = I+1
       END DO
- 
+
       NBLANKS = 0
       DO WHILE ( LEN .GT. 0 .AND. QUERY( LEN:LEN ) .EQ. '/' )	! Trailing blank lines
 
@@ -62,7 +62,7 @@
       END DO
       LOC = INDEX(QUERY(I:LEN), '/' )				! Use / to put line-feed, can o/p longer string
 
- 
+
          DO WHILE ( IERR .NE. 0 )
 
             IF (LOC .NE. 0) THEN					! Write 1st line
@@ -71,16 +71,16 @@
             END IF
 
            IF ( DLEN .EQ. 0 ) THEN
-   
+
              WRITE( * , '( X,A,$ )' ) QUERY( I:LEN )//': '
 
            ELSE
 
              WRITE( * , '( X,A,$ )' )
      &           QUERY( I:LEN ) // '( Default is ' // DEFAULT(1:DLEN) // '): '
-   
+
            END IF
-   
+
            READ( * , '( A )' , IOSTAT = IERR ) FORM_GETC
 
          END DO
@@ -91,7 +91,7 @@
            WRITE( * , * )
 
          END DO
- 
+
       IF ( FORM_GETC .EQ. ' ' ) FORM_GETC = DEFAULT
 
       END

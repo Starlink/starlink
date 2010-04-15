@@ -37,7 +37,7 @@ C     FIT_MWRIT    (FIT_    "   ) Write FBUFF buffer to tape
 C
 C     Note: The byte array is written unchanged to the tape, but
 C     the user should note that under the FITS standard it will be
-C     interpreted as an UNsigned byte array, while in VAX Fortran 
+C     interpreted as an UNsigned byte array, while in VAX Fortran
 C     a byte array is normally regarded as signed.
 C
 C                                       KS / CIT 11th Oct 1983

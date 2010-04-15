@@ -28,7 +28,7 @@ Cbegin
 
 
       end
-      
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DEFAUL -- Set up defaults
@@ -149,7 +149,7 @@ C  Get and type list of options
       write ( 6, '(''   Choose which form to make:-'')' )
       write ( 6, '(''   Type                              Code '')' )
       write ( 6, '(''   ____                              ____ '')' )
-      write ( 6, '(''   None                              None '')' ) 
+      write ( 6, '(''   None                              None '')' )
       kn = 0
       idef = ' '
     1 continue
@@ -188,7 +188,7 @@ C  Get input option
 
       texta = 'Input code (Default - '//idef
       call charln ( texta, kl )
-      text  = texta(1:kl)//') ? ' 
+      text  = texta(1:kl)//') ? '
       call charln ( text, kl )
       call qwrite ( text(1:kl) )
       ctype = '     '
@@ -237,11 +237,11 @@ C  Bad input
          return
       endif
 
-C  Turn file name into lower case 
+C  Turn file name into lower case
 
       call lowerc ( ctype )
 
-C  Get template file name 
+C  Get template file name
 
       if ( KTYPE.eq.'OWN  ' ) then
 
@@ -290,7 +290,7 @@ C  Get template file name
          endif
 
       endif
-     
+
 C  Get default input file
 
       TIFILE = ' '
@@ -321,7 +321,7 @@ C  Return
 
       goto 996
   992 write ( 6, '(1x, ''ERROR: Code names more than 50'',
-     +                 '' characters long in list of options'')' ) 
+     +                 '' characters long in list of options'')' )
       call wrerrf ( optfil, nline )
       FAILED = .true.
 
@@ -347,7 +347,7 @@ C  Return
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C LOWERC -- Turn text into lower case
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine lowerc ( text )
 
@@ -375,7 +375,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TEMPLA -- Loads the .tex files needed for the LaTeX forms
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine templa ( )
 
@@ -406,7 +406,7 @@ Cbegin
       call messag
 
       call getscl
-   
+
       goto 999
   996 write ( 6, '('' ERROR: Cant open that template file'')' )
       call wrerrf ( TTFILE, 0 )
@@ -523,7 +523,7 @@ C  a j penny              ral                   1992 Oct
 C--
       character text*132, texta*132, offfil*132, ctype*50
       character*5 otype(100), ootype, idef
-      integer j, k, kk, kl, klo, kn, ktot, koff, ksi, kci, kti, 
+      integer j, k, kk, kl, klo, kn, ktot, koff, ksi, kci, kti,
      +        koi, kei, istat, nline
       real topa(100), evea(100), odda(100)
 Cbegin
@@ -585,7 +585,7 @@ C  Check that they are not all defaulted
 C  Get alternative options
 
       write ( 6, '(''  '')' )
-      write ( 6, 
+      write ( 6,
      +     '(''   Choose which page offsets to add in printing :-'')' )
       write ( 6, '(''   Type                              Code '')' )
       write ( 6, '(''   ____                              ____ '')' )
@@ -623,7 +623,7 @@ C  Get input option
 
       texta = 'Offset code (Default - '//idef
       call charln ( texta, kl )
-      text  = texta(1:kl)//') ? ' 
+      text  = texta(1:kl)//') ? '
       call charln ( text, kl )
       call qwrite ( text(1:kl) )
       ctype = '     '
@@ -651,15 +651,15 @@ C  Get 'permitted' offset option
          USEOFF = .false.
       elseif ( ctype(1:5).eq.'OWN ' ) then
          write ( 6, '(1x,'' Extra margin offsets in cm to add'')' )
-         text = 'To Top margin (Default - 00.00) ? ' 
+         text = 'To Top margin (Default - 00.00) ? '
          call charln ( text, kl )
          call qwrite ( text(1:kl) )
          read ( 5, '(f10.0)', err=993 ) ETOPOF
-         text = 'To Odd side margin (Default - 00.00) ? ' 
+         text = 'To Odd side margin (Default - 00.00) ? '
          call charln ( text, kl )
          call qwrite ( text(1:kl) )
          read ( 5, '(f10.0)', err=993 ) EODDOF
-         text = 'To Even side margin cm (Default - 00.00) ? ' 
+         text = 'To Even side margin cm (Default - 00.00) ? '
          call charln ( text, kl )
          call qwrite ( text(1:kl) )
          read ( 5, '(f10.0)', err=993 ) EEVEOF
@@ -731,7 +731,7 @@ Cbegin
 
       call charln  ( name, kl )
       if ( kl.lt.1 ) then
-         write ( 6, '(1x,''       File Name: - is blank'')' ) 
+         write ( 6, '(1x,''       File Name: - is blank'')' )
       else
          write ( 6, '(1x,''       File Name: '',a60)' ) name(1:60)
       endif
@@ -742,7 +742,7 @@ Cbegin
          write ( 6, '(1x,''                  '',a12)' ) name(121:132)
       endif
 
-      if ( nline.ne.0 ) write ( 6, '(1x,''       File line: '',i6)' ) 
+      if ( nline.ne.0 ) write ( 6, '(1x,''       File line: '',i6)' )
      +                                                      nline
 
 
@@ -915,7 +915,7 @@ C  Set blank entries
          TQUEST(k)  = '      '
       enddo
 
-C Get number and names of questions 
+C Get number and names of questions
 
       kl = 0
     4 kl = kl + 1
@@ -998,7 +998,7 @@ C Find questions section in template
       nline = nline + 1
       read ( 3, '(a)', err=997, end=996 ) text
 
-C Clear number and names of special questions 
+C Clear number and names of special questions
 
       do k = 1, MAXQSP
          QSPEC(k)  = '      '
@@ -1009,7 +1009,7 @@ C Clear number and names of special questions
          enddo
       enddo
 
-C Get number and names of special questions 
+C Get number and names of special questions
 
       bad1 = .false.
       bad2 = .false.
@@ -1034,7 +1034,7 @@ C  Check for repeated name
             enddo
          endif
 
-C  If new, add in, if not too many 
+C  If new, add in, if not too many
 
          if ( text(5:11).ne.' ' ) then
             NSPEC = NSPEC + 1
@@ -1103,7 +1103,7 @@ C  Store codes and answers
          read ( text(ks+1:ke-1), '(a)' ) ASPEC(NSPEC,kn)
          if ( index(text(ke+1:),'"').eq.0 ) goto 4
          goto 6
- 
+
 C  Error messages
 
     7 continue
@@ -1120,11 +1120,11 @@ C  Error messages
      +     '' wrong in the special questions in template file'')' )
       if ( bad6 ) write ( 6, '('' ERROR: Special question '',a7,
      +      '' not in question list in template file'')' ) QSPEC(NSPEC)
-      if ( bad1 .or. bad2. or. bad3 .or. bad4 .or. bad5 .or. bad6 )then 
+      if ( bad1 .or. bad2. or. bad3 .or. bad4 .or. bad5 .or. bad6 )then
          call wrerrf ( TTFILE, nline )
          FAILED = .true.
       endif
-  
+
 C  Error message
 
       goto 996
@@ -1170,7 +1170,7 @@ Cbegin
       read ( 3, '(a)', err=997, end=997 ) text
       first = .true.
     4 nline = nline + 1
-      read ( 3, '(2x,a1,1x,a65)', err=997, end=997 ) flag, text 
+      read ( 3, '(2x,a1,1x,a65)', err=997, end=997 ) flag, text
       if ( flag.eq.'x' ) goto 5
       if ( first ) write ( 6, '(''  '')' )
       first = .false.
@@ -1226,7 +1226,7 @@ C Get scale and offset
       k = index(text,'?#$&scale')
       if ( k.eq.0 ) goto 3
       atext = text(k+8:)
-      read ( atext, '(4(2x,f7.3))', err=997, end=997  ) PXSC, PYSC, 
+      read ( atext, '(4(2x,f7.3))', err=997, end=997  ) PXSC, PYSC,
      +                                                  PXZE, PYZE
 
       goto 999
@@ -1249,7 +1249,7 @@ C  Rewind
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C INPUT -- Loads the .tex files needed for the LaTeX forms
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine input ( )
 
@@ -1265,7 +1265,7 @@ Cbegin
       if ( FAILED ) return
 
       if ( TIFILE.ne.' ' ) then
-         write ( text, '(''Input file name (Default - '',a70)' ) 
+         write ( text, '(''Input file name (Default - '',a70)' )
      +                 TPFILE(1:70)
          call charln ( text, kl )
       else
@@ -1329,7 +1329,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DOPAGE -- Get which pages to do
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine dopage ( )
 
@@ -1375,7 +1375,7 @@ C  Get which pages
             JPAGE(k) = .false.
          enddo
 
-         if ( index(qtext,'none').ne.0 .or. 
+         if ( index(qtext,'none').ne.0 .or.
      +        index(qtext,'NONE').ne.0 ) then
             good = .true.
          elseif ( qtext.eq.' ' .or. index(qtext,'ALL').ne.0 .or.
@@ -1439,14 +1439,14 @@ Cbegin
 
       otext = INFILE
 
-C  !Remove VAX or UNIX directory prefix 
+C  !Remove VAX or UNIX directory prefix
 
       if ( ISVMS ) then
          k = index(otext,']')
          if ( k.ne.0 ) otext(1:k) = ' '
          k = index(otext,':')
          if ( k.ne.0 ) otext(1:k) = ' '
-      else 
+      else
     1    k = index(otext,TEXTXA)
          if ( k.ne.0 ) otext(1:k) = ' '
          if ( index(otext,TEXTXA).ne.0 ) goto 1
@@ -1503,7 +1503,7 @@ C  !Open output file
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C WORK -- Load the template and input to output
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine work ( )
 
@@ -1514,7 +1514,7 @@ C--
       integer k, kk, kl, ks, ke, nline
       character*132 text
       character texta*30
-      character nepage*11 
+      character nepage*11
 Cbegin
 
 
@@ -1621,7 +1621,7 @@ C  Load starter lines
 
          if ( index(text,'%?#$&endoffset').ne.0 ) gotoff = .false.
       goto 3
-    4 continue         
+    4 continue
 
 C  Do the work
 
@@ -1766,7 +1766,7 @@ Cbegin
 
       k = 0
     1 if ( k.eq.ncomm ) goto 2
-      k = k + 1       
+      k = k + 1
 
          if ( k.eq.9 .or. k.eq.14 .or. k.eq.17 .or. k.eq.23 ) then
             texta = utcomm(k)
@@ -1817,14 +1817,14 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C INSERT -- Insert question in output file
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine insert ( ftext )
 
       implicit none
 
 C   !i: question to insert
-      character*7 ftext     
+      character*7 ftext
 C--
       logical nend, more, blank, okfile
       character*132 itext, ntext, text, otext
@@ -1881,9 +1881,9 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C CHEKPR -- Warn if input file line has '%', if not '\%' 
+C CHEKPR -- Warn if input file line has '%', if not '\%'
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine chekpr ( text, ftext, nline )
 
@@ -1891,9 +1891,9 @@ C  a j penny              ral                   1992 Feb
       include 'formload.inc'
 
 C  !i: Input file line
-      character*132   text    
+      character*132   text
 C  !i: Question number
-      character*7     ftext    
+      character*7     ftext
 C  !i: line number
       integer         nline
 C--
@@ -1917,9 +1917,9 @@ Cbegin
       k = 1
       found = .false.
       flaga = .false.
-    1 continue 
+    1 continue
          flag = .false.
-         ka = index(text(k:kl),textp) 
+         ka = index(text(k:kl),textp)
          k = k + ka - 1
          if ( ka.eq.0 ) then
             more  = .false.
@@ -1962,7 +1962,7 @@ Cbegin
 
             if ( .not.PEROUT ) then
                write ( 6, '(1x,''          '',
-     +                   ''LaTeX ignores it, and rest of line.'')' ) 
+     +                   ''LaTeX ignores it, and rest of line.'')' )
                PEROUT = .true.
             endif
 
@@ -1982,7 +1982,7 @@ Cbegin
             write ( 6, '(1x,''           '',a)' ) text(51:kla)
          endif
       endif
-         
+
 
       end
 
@@ -1990,7 +1990,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C LBLANK -- Loads right blank, if a 1st blank line
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine lblank ( nend, ntext, ftext, otext )
 
@@ -1998,13 +1998,13 @@ C  a j penny              ral                   1992 Feb
       include 'formload.inc'
 
 C  !i: is next line, input file end?
-      logical         nend     
+      logical         nend
 C  !i: Input file next line
-      character*132   ntext    
+      character*132   ntext
 C  !i: output file signifier
-      character*7     ftext    
+      character*7     ftext
 C  !o: output line correct blank
-      character*132   otext    
+      character*132   otext
 C--
       logical nques
 Cbegin
@@ -2027,7 +2027,7 @@ C  Blank line in body of text
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ISQUES -- Is this line a new question ?
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine isques ( text, ok )
 
@@ -2035,13 +2035,13 @@ C  a j penny              ral                   1992 Feb
       include 'formload.inc'
 
 C  !i: Input line
-      character*132  text     
+      character*132  text
 C  !o: True, if a new file
-      logical        ok       
+      logical        ok
 C--
       integer k, kno
 Cbegin
-   
+
 
       ok = .false.
 
@@ -2049,7 +2049,7 @@ Cbegin
       kno = 0
    11 if ( .not. (kno.eq.0 .and. k.lt.NQUEST) ) goto 12
          k = k + 1
-         if ( text(8:11).eq.'#?$&' .and. 
+         if ( text(8:11).eq.'#?$&' .and.
      +        text(1:7).eq.TQUEST(k) ) kno = k
       goto 11
    12 continue
@@ -2063,18 +2063,18 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GLINE -- Gets a first line
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine gline ( text, blank, otext )
 
       implicit none
 
 C  !i: Input line
-      character*132  text     
+      character*132  text
 C  !o: True if line is blank
-      logical        blank    
+      logical        blank
 C  !o: Line after '!'
-      character*132  otext    
+      character*132  otext
 C--
       integer k, kex
 Cbegin
@@ -2086,8 +2086,8 @@ Cbegin
          if ( text(k:k).eq.'!' ) kex = k + 1
       goto 11
    12 continue
-      
-      otext = ' ' 
+
+      otext = ' '
       blank = .true.
       if ( kex.ne.0 .and. kex.ne.133 ) then
          do k = kex, 132
@@ -2103,17 +2103,17 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SPEC -- For certain forms, some questions have special forms
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine spec ( otext, ftext )
 
       implicit none
       include 'formload.inc'
 
-C  !i/o: input/output line 
-      character*132   otext    
+C  !i/o: input/output line
+      character*132   otext
 C  !i: question name
-      character*7     ftext    
+      character*7     ftext
 C--
       character*132 text
       integer k, kn, kl
@@ -2159,7 +2159,7 @@ C CPAGE -- Copies following lines into file, until 'end'
 C  'end' is shown by a non-null 1st character or end of input file
 C  Closes output.
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine cpage ( ftext, nline, text, nend )
 
@@ -2170,9 +2170,9 @@ C  !i: Question code
 C  !i: Line of input file reached already
       integer         nline
 C  !o: next Input line
-      character*132   text     
+      character*132   text
 C  !o: True if next line is input file end
-      logical         nend     
+      logical         nend
 C--
       logical fmore, ok
       integer nlinea
@@ -2207,14 +2207,14 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TWRITE -- Write a line to device 2
 C
-C  a j penny              ral                   1992 Feb   
+C  a j penny              ral                   1992 Feb
 
       subroutine twrite ( text )
 
       implicit none
 
 C  !i: Line to write
-      character*132    text    
+      character*132    text
 C--
       integer j, k
 Cbegin
@@ -2246,7 +2246,7 @@ C    a j penny          ral         1988 oct
       include 'formload.inc'
 
 C!i: question position and size
-      character*132 text     
+      character*132 text
 C!i: Line count
       integer nline
 C--
@@ -2258,7 +2258,7 @@ C--
 Cbegin
 
 
-      read ( text, '(f5.2,3(2x,f5.2),1x,a55)', err=999  ) x, y, xp, yp, 
+      read ( text, '(f5.2,3(2x,f5.2),1x,a55)', err=999  ) x, y, xp, yp,
      +                                                    tcform
 
 C  Turn numbers into full \ajpos line
@@ -2386,7 +2386,7 @@ C	!i/o: Input string, modified on output
 C--
       integer j, k, kl
 Cbegin
- 
+
 
 C  String length
 
@@ -2401,7 +2401,7 @@ C  Scan string, looking for first non-blank character
     2 continue
       k = k - 1
 
-C  If some non-blank and 1st non-blank not 1st character, shift 
+C  If some non-blank and 1st non-blank not 1st character, shift
 C  remaining characters to left by length of gap at start
 
       if ( k.ne.0 .and. k.ne.kl ) then
@@ -2410,6 +2410,6 @@ C  remaining characters to left by length of gap at start
          enddo
          str(j:) = ' '
       endif
- 
- 
+
+
       end

@@ -12,7 +12,7 @@
  *     Interface to the NDF functions that GAIA requires for all the various
  *     access modes. That's simple access to images, multiple images
  *     per container-file and the final evolution, proper NDF access
- *     which is mainly used in the GAIA3D extensions (which work in 
+ *     which is mainly used in the GAIA3D extensions (which work in
  *     parallel to the image access modes).
 
  *  Copyright:
@@ -157,12 +157,12 @@ static NDFinfo *traceMNDFExtensions( int ndfid, NDFinfo **headinfo,
                                      const char *slice );
 
 /*  Trace NDFs rooted at a given locator. */
-static void traceSiblings( HDSLoc *baseloc, int ndfid, int deepsearch, 
-                           Tcl_DString *dsPtr, const char *prefix, 
+static void traceSiblings( HDSLoc *baseloc, int ndfid, int deepsearch,
+                           Tcl_DString *dsPtr, const char *prefix,
                            int *nsiblings );
 
 /*  Trace NDFs stored in the extension of an NDF. */
-static void traceSiblingExtensions( int ndfid, Tcl_DString *dsPtr, 
+static void traceSiblingExtensions( int ndfid, Tcl_DString *dsPtr,
                                     const char *prefix, int *nsiblings );
 
 /**
@@ -462,7 +462,7 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
       strcpy( dtype, "_WORD" );
    }
 
-   /*  Take care to not pass back a random pointer if this fails 
+   /*  Take care to not pass back a random pointer if this fails
     *  (corrupt data component or invalid ERROR values). */
    *data = NULL;
    if ( status == SAI__OK ) {
@@ -2344,7 +2344,7 @@ void traceSiblings( HDSLoc *baseloc, int ndfid, int deepsearch,
                         strcat( namedprefix, "." );
                         strcat( namedprefix, name );
                         strcat( namedprefix, ".MORE." );
-                        traceSiblingExtensions( newid, dsPtr, namedprefix, 
+                        traceSiblingExtensions( newid, dsPtr, namedprefix,
                                                 nsiblings );
                     }
                 }

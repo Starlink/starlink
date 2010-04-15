@@ -18,7 +18,7 @@
 *     the information obtained from the FITS extension of the NDF file,
 *
 *        CPCRAW <_LOGICAL>
-*        
+*
 *     Where
 *        CPCRAW - specifies whether the image is CLEAN or RAW. It is
 *                 true if the image is a RAW CPC, otherwise it is flase.
@@ -49,21 +49,21 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                                 
+
 *  Arguments Given:
       INTEGER NCARD
       CHARACTER FITS( NCARD )*(*)
       CHARACTER LOC*(*)
-            
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       CHARACTER CMNT*72          ! A comment string from FITS head
       CHARACTER OBJECT*20        ! Value of keyword OBJECT

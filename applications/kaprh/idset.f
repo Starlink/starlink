@@ -33,7 +33,7 @@
 *        device.  The device must be in one of the following GNS
 *        categories: IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or
 *        WINDOW, and have at least 24 colour indices or greyscale
-*        intensities. 
+*        intensities.
 
 *  Examples:
 *     idset xwindows
@@ -41,7 +41,7 @@
 
 *  Related Applications:
 *     KAPPA: GDSET, IDSTATE, OVSET; Figaro: SOFT.
-                                    
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
@@ -93,7 +93,7 @@
 *  Check whether chosen device is an 'image display' with a suitable
 *  minimum number of colour indices.
       CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
-     :                 /'WINDOW,MATRIX_PRINTER', ' ', MINCOL, 
+     :                 /'WINDOW,MATRIX_PRINTER', ' ', MINCOL,
      :                 UP, STATUS )
 
 *  AGI closedown sequence.

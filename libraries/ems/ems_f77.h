@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Description:
- *     This include file contains the function prototypes for all 
+ *     This include file contains the function prototypes for all
  *     EMS C interface routines and defines EMS__VERSN to be the major
  *     version number
 
@@ -32,7 +32,7 @@
  *        V1.5 Added ems1_starf_c
  *     13-MAY-1999 (AJC):
  *        Added the emsXxx form of name
- *        and #define old_names = new_names 
+ *        and #define old_names = new_names
  *        Removed ems_tune/gtune/show/_c
  *        Added ems1_get_facility_error
  *     27-JUL-2001 (AJC):

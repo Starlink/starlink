@@ -6,24 +6,24 @@
 *     1993 Jun          P. Brisco               Removed SMG junque.
 *     1996 Mar          M Ricketts              Tidy filenames
 *************************************************************************
-      SUBROUTINE FORM_FILENAME 
- 
+      SUBROUTINE FORM_FILENAME
+
       IMPLICIT NONE
- 
+
 *  Global Variables
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_mtext.inc'			! Text for main menu
- 
+
 *  Functions
       INTEGER MDH_ENDWORD
       CHARACTER*128 FORM_GETC
- 
+
 *  Local Variables
       INTEGER DOT, BRAC, I, LOC, LENTARG
 
 *  _______________________Executable Code ______________________________________
-  
+
 
       FORM_FILE(1:1) = '?'
       DO WHILE (FORM_FILE(:1) .EQ. '?' )

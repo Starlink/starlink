@@ -7,7 +7,7 @@ C     SPIketrum EDitor.  Allows the values of a spiketrum to be
 C     edited interactively, until the user is satisfied with the
 C     data that results from interpolating between them.
 C
-C     Command Parameters -  
+C     Command Parameters -
 C
 C     SPIKETRUM    (Character) The name of the spiketrum to be
 C                  edited.
@@ -43,7 +43,7 @@ C     20th Mar 1988  KS / AAO. Conversion to DSA_ routines completed,
 C                    and modified for GKS version of PGPLOT.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
-C     3rd  Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Avoid 
+C     3rd  Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Avoid
 C                    GEN_SWOP.  PGASK is banned from ADAM, commented
 C                    out.  Changed case of file SPIKETRUM.
 C     25th Jan 1993  HME / UoE, Starlink.  Put PGASK back in.
@@ -66,7 +66,7 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions 
+C     Functions
 C
       LOGICAL PAR_ABORT
       INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY
@@ -105,7 +105,7 @@ C     Get name of SPIKETRUM and open the file
 C
       CALL DSA_INPUT('SPIKE','SPIKETRUM',STATUS)
 C
-C     Get size of data 
+C     Get size of data
 C
       CALL DSA_DATA_SIZE('SPIKE',1,NDIM,DIMS,NX,STATUS)
 C
@@ -156,7 +156,7 @@ C     necessary.
 C
       REV=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),1).GT.
      :    GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),NX)
-      IF (REV) THEN 
+      IF (REV) THEN
          CALL GEN_REV2D(%VAL(CNF_PVAL(XPTR)),NX,1,.TRUE.,
      :                  %VAL(CNF_PVAL(XPTR)))
          CALL GEN_REV2D(%VAL(CNF_PVAL(OPTR)),NX,1,.TRUE.,
@@ -210,7 +210,7 @@ C
 C
 C     Reverse back if necessary
 C
-      IF (REV) THEN 
+      IF (REV) THEN
          CALL GEN_REV2D(%VAL(CNF_PVAL(XPTR)),NX,1,.TRUE.,
      :                  %VAL(CNF_PVAL(XPTR)))
          CALL GEN_REV2D(%VAL(CNF_PVAL(OPTR)),NX,1,.TRUE.,
@@ -299,7 +299,7 @@ C     (!) ENDS      (Real array ENDS(4)) In case there are values known
 C                   to the left and right of the X values given in XDATA,
 C                   these may be specified in ENDS.  ENDS(1) gives an X
 C                   value that would precede XDATA(1), ENDS(3) an X value
-C                   that would follow XDATA(NX), and ENDS(2) and (4) are 
+C                   that would follow XDATA(NX), and ENDS(2) and (4) are
 C                   the corresponding data values.  If such values are
 C                   not available, the ENDS(1) and/or ENDS(3) should be
 C                   set to zero.
@@ -310,7 +310,7 @@ C     XDATA is in ascending order.
 C
 C     Common variables used -  None
 C
-C     Functions / subroutines used -  
+C     Functions / subroutines used -
 C
 C     FIG_ISPIKE   (FIG_ package)  Fit spline or polynomial to spiketrum
 C     FIG_SLFIND   ( "     "    )  Find nearest spiketrum point to value
@@ -651,7 +651,7 @@ C
                IF (CHR.EQ.'S') THEN
                   NORD=-1
                   CALL GKD_WRITE_LINE('Spline fit')
-               ELSE 
+               ELSE
                   CALL PAR_CNPAR('ORDER')
                   CALL PAR_RDVAL('ORDER',1.,10.,FLOAT(ORDER),' ',VALUE)
                   IF (PAR_ABORT()) GO TO 600
@@ -697,7 +697,7 @@ C
 C                                            KS / CIT 24th May 1984
 C     Modified:
 C
-C     26th March 1985.  KS / AAO.  'L' command added.  Minor mods to 
+C     26th March 1985.  KS / AAO.  'L' command added.  Minor mods to
 C                       text of some lines.
 C     20th March 1988.  KS / AAO.  Modified for GKS version of PGPLOT.
 C+
@@ -708,7 +708,7 @@ C
       INTEGER STATUS
       CHARACTER*16 STRING
 C
-C     Clear screen.  
+C     Clear screen.
 C
       CALL PGADVANCE
 C
@@ -766,17 +766,17 @@ C     (>) ENDS     (Real array ENDS(4)) In case there are values known
 C                  to the left and right of the X values given in XDATA,
 C                  these may be specified in ENDS.  ENDS(1) gives an X
 C                  value that would precede XDATA(1), ENDS(3) an X value
-C                  that would follow XDATA(NX), and ENDS(2) and (4) are 
+C                  that would follow XDATA(NX), and ENDS(2) and (4) are
 C                  the corresponding data values.  If such values are
 C                  not available, the ENDS(1) and/or ENDS(3) should be
 C                  set to zero.
 C     (>) DATA     (Real array DATA(NX)) The spiketrum data
 C     (<) NELM     (Integer) The number of the nearest element.  If the
-C                  nearest element is actually that given by ENDS(1), 
+C                  nearest element is actually that given by ENDS(1),
 C                  NELM is set to -1.  If it is that given by ENDS(3),
 C                  it is set to -2.  If for some reason no line can be
 C                  found, it is set to 0.
-C     
+C
 C     Common variables used -  None
 C
 C     Subroutines / functions used -

@@ -17,16 +17,16 @@ C     (>) IEND   (Integer) Last record number of data to be copied.
 C                (on Lufrom) IEND must be > IST.
 C     (>) ITO    (Integer) First record number to which data is to be
 C                copied. (On Luto).
-C     (W) IWORK  (Integer*2 array IWORK(IDIM)) Array to be used as 
-C                workspace.  Must be at least 256 bytes long - ie one 
+C     (W) IWORK  (Integer*2 array IWORK(IDIM)) Array to be used as
+C                workspace.  Must be at least 256 bytes long - ie one
 C                file record.
-C     (>) IDIM   (Integer) Number of halfwords in IWORK.  Ignored by 
+C     (>) IDIM   (Integer) Number of halfwords in IWORK.  Ignored by
 C                this version of FICOPY.
-C     (<) NOK    (Integer) Returned as 0 if no I/O errors, as 
+C     (<) NOK    (Integer) Returned as 0 if no I/O errors, as
 C                a VMS Fortran I/O error code otherwise.
-C     (<) IPU    (Integer) Set to 0 for a read error, to 1 for a 
+C     (<) IPU    (Integer) Set to 0 for a read error, to 1 for a
 C                write error.
-C     (<) LU     (Integer) Returned as the logical unit number on which 
+C     (<) LU     (Integer) Returned as the logical unit number on which
 C                the error occurred, if there was one.
 C
 C     Note - this is a VAX version of a routine that was very

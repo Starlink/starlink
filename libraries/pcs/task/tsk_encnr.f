@@ -80,40 +80,40 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       INTEGER NDIMS        ! number of dimensions of the given array
- 
+
       INTEGER DIMS(NDIMS)  ! the dimensions of the given array
- 
+
       REAL RVALS(1:*) ! the given array, treated as a vector
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING ! the returned string
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       CHARACTER*(40) CARRAY(20)  ! store for original type conversions
       INTEGER TOTNUM             ! number of items for conversion
       INTEGER J                  ! loop counter
       INTEGER NCHAR              ! size of encoded item
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       TOTNUM = 1
       DO J = 1, NDIMS
          TOTNUM = TOTNUM * DIMS(J)
       ENDDO
- 
+
       J = 0
       DO WHILE ( ( J .LT. TOTNUM ) .AND. ( STATUS .EQ. SAI__OK ) )
          J = J + 1
          CALL CHR_RTOC( RVALS(J), CARRAY(J), NCHAR )
       ENDDO
- 
+
       CALL STRING_BUILDARR ( NDIMS, DIMS, CARRAY, STRING, STATUS )
- 
+
       END

@@ -51,7 +51,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -216,12 +216,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -257,8 +257,8 @@
 \section{ISPELL in brief}
 
 For a simple operation like checking the spelling in a text document, this User
-Note may seem a bit long \sunspec{--}{-} however, this Section covers all the 
-basics. 
+Note may seem a bit long \sunspec{--}{-} however, this Section covers all the
+basics.
 Anyone familiar with the old VMS SPELL program will find ISPELL similar.
 
 ISPELL is a screen-oriented spelling checker that shows errors in the context
@@ -342,15 +342,15 @@ ctrl-Z      & Suspend ispell.\\
 ?         Display the help screen.
 0-n       Replace with one of the suggested words.
 A         Accept the word for the rest of this ISPELL session.
-I         Accept the word, capitalized as it is in the file, and 
+I         Accept the word, capitalized as it is in the file, and
           update the private dictionary.
 L         Look up words in system dictionary.
 Q         Exit immediately and leave the file unchanged.
 R         Replace the misspelled word completely.
 space     Accept the word this time only.
-U         Accept the word, and add an uncapitalised (actually, all  
+U         Accept the word, and add an uncapitalised (actually, all
           lower-case) version to the private dictionary.
-X         Write the rest of this file, ignoring misspellings, and 
+X         Write the rest of this file, ignoring misspellings, and
           start the next file.
 !         Shell escape.
 ctrl-L    Redraw screen.
@@ -419,16 +419,16 @@ Argument & Description \\ \hline
 -x        Don't create a backup file.
 -t        The input file is in TeX or LaTeX format.
 -n        The input file is in nroff/troff format.
--B        Report run-together words with missing blanks as 
+-B        Report run-together words with missing blanks as
           spelling errors.
 -C        Consider run-together words as legal compounds.
 -P        Don't generate extra root/affix combinations.
--m        Make possible root/affix combinations that aren't in 
+-m        Make possible root/affix combinations that aren't in
           the dictionary.
 -s        Sort the list of guesses by probable correctness.
 -d file   Specify an alternate dictionary <B>file</B>.
 -p file   Specify an alternate personal dictionary <B>file</B>.
--w chars  Specify additional characters <B>chars</B> that can be part of 
+-w chars  Specify additional characters <B>chars</B> that can be part of
           a word.
 -W n      Specify length <B>n</B> of words that are always legal.
 -T type   Assume a given formatter <B>type</B> for all files.

@@ -27,11 +27,11 @@
 *    ACTION = _CHAR (Read)
 *       The data column to transform. It should be one of the
 *       following:
-*       
+*
 *          - "X" -- XCOL
 *          - "Y" -- YCOL
 *          - "Z" -- ZCOL
-*          
+*
 *       [The value will be prompted for.]
 *    XOPT = _CHAR (Write)
 *       The PGPLOT X-axis options string.  The global parameter will be
@@ -74,7 +74,7 @@
 *     19-OCT-1992 (PCTR):
 *        Added contextual error report on exit.
 *     2-JUN-1994 (PDRAPER):
-*        Changed character prefixing to use CHR_PREFX. Removed 
+*        Changed character prefixing to use CHR_PREFX. Removed
 *        unnecessary double precision extension to constant (ZDATA).
 *        Removed reference to CHR_EQUAL (unused).
 *     6-JUN-1994 (PDRAPER):
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT global constants
-      
+
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! PONGO global variables
 
@@ -154,7 +154,7 @@
          ELSE
             STATUS = SAI__ERROR
             CALL ERR_REP( 'CLOG_UNDEF', 'All X values are negative.',
-     :                    STATUS ) 
+     :                    STATUS )
          END IF
       ELSE IF ( ACTION( : LENACT ) .EQ. 'Y' ) THEN
          CALL PAR_GET0C( 'YOPT', AOPT, STATUS )

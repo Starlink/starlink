@@ -1,5 +1,5 @@
-      SUBROUTINE SCULIB_REMOVE_OPACITY (N_BOLS, N_POS, 
-     :  BOL_SELECT_CHAN, BOL_SELECT_ADC, NUM_CHAN, NUM_ADC, BOL_TYPE, 
+      SUBROUTINE SCULIB_REMOVE_OPACITY (N_BOLS, N_POS,
+     :  BOL_SELECT_CHAN, BOL_SELECT_ADC, NUM_CHAN, NUM_ADC, BOL_TYPE,
      :  N_SUB, SUB_INSTRUMENT, TAUZ, AIRMASS, EXP_DATA, EXP_VARIANCE,
      :  EXP_QUALITY, STATUS)
 *+
@@ -23,12 +23,12 @@
 *     factor derived. The routine will then loop through the positions
 *     measured by this bolometer, correcting the fluxes and variances.
 *     If the bolometer data quality was bad, or if sky optical depth lay
-*     outside the above range, the data quality will be set bad and no 
+*     outside the above range, the data quality will be set bad and no
 *     correction applied.
 
 *  Invocation:
-*     CALL SCULIB_REMOVE_OPACITY (N_BOLS, N_POS, 
-*    :  BOL_SELECT_CHAN, BOL_SELECT_ADC, NUM_CHAN, NUM_ADC, BOL_TYPE, 
+*     CALL SCULIB_REMOVE_OPACITY (N_BOLS, N_POS,
+*    :  BOL_SELECT_CHAN, BOL_SELECT_ADC, NUM_CHAN, NUM_ADC, BOL_TYPE,
 *    :  N_SUB, SUB_INSTRUMENT, TAUZ, AIRMASS, EXP_DATA, EXP_VARIANCE,
 *    :  EXP_QUALITY, STATUS)
 
@@ -145,7 +145,7 @@
 *  get zenith opacity appropriate to type of bolometer, 0 if not
 *  one of recognised types
 
-         TYPE = BOL_TYPE (BOL_SELECT_CHAN(BOL), BOL_SELECT_ADC(BOL)) 
+         TYPE = BOL_TYPE (BOL_SELECT_CHAN(BOL), BOL_SELECT_ADC(BOL))
          TAU = 0.0
          DO SUB = 1, N_SUB
             IF (INDEX(TYPE,

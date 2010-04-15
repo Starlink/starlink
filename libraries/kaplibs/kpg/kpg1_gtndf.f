@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GTNDF( PARAM, NDIM, EXACT, MODE, INDF, SDIM, 
+      SUBROUTINE KPG1_GTNDF( PARAM, NDIM, EXACT, MODE, INDF, SDIM,
      :                       SLBND, SUBND, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GTNDF( PARAM, NDIM, EXACT, MODE, INDF, SDIM, SLBND, 
+*     CALL KPG1_GTNDF( PARAM, NDIM, EXACT, MODE, INDF, SDIM, SLBND,
 *                      SUBND, STATUS )
 
 *  Description:
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -98,19 +98,19 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER NDIM
       LOGICAL EXACT
       CHARACTER * ( * ) MODE
-      
+
 *  Arguments Returned:
       INTEGER INDF
       INTEGER SDIM( NDIM )
       INTEGER SLBND( NDIM )
       INTEGER SUBND( NDIM )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -118,12 +118,12 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
       INTEGER NDIMS              ! No. of dimensions in NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
-      
+
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get the NDF containing the input data.
       CALL LPG_ASSOC( PARAM, MODE, INDF, STATUS )
 
@@ -139,7 +139,7 @@
          CALL KPG1_SDIMP( INDF, NDIM, SDIM, STATUS )
       END IF
 
-*  Obtain the bounds of the NDF.  
+*  Obtain the bounds of the NDF.
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
 *  Return the dimensions and the bounds.
@@ -149,5 +149,5 @@
          SUBND( 1 ) = UBND( SDIM( 1 ) )
          SUBND( 2 ) = UBND( SDIM( 2 ) )
       END IF
-         
-      END  
+
+      END

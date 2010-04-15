@@ -7,7 +7,7 @@
 
 *     CODE FRAGMENT FROM PISAFIT - REMOVED TO MAKE INPUT ARRAY DYNAMIC
 *     Map the appropriate part of map array into our box and subtract the
-*     sky value. "Replace bad pixels by zero convert to use INTEGER*4 
+*     sky value. "Replace bad pixels by zero convert to use INTEGER*4
 *     (P.W.Draper: 14-July 1995)."
 
       INTEGER*4 MAP( * )
@@ -26,7 +26,7 @@
       INTEGER JJ
       INTEGER STATUS
       IF( STATUS .NE. SAI__OK ) RETURN
-      
+
       DO 1 I = IQL, IQH
          II = ( I - 1 ) * NYOUT
          JJ = ( I - IQL ) * SUBSID

@@ -79,9 +79,9 @@
       IZ   = LINK(3)
 
 *     Get integration range parameters - need to make a first call to
-*     MWINDO to establish the cell sizes for each axis for the chosen 
+*     MWINDO to establish the cell sizes for each axis for the chosen
 *     set of coordinates - these may have changed since PFAC last evaluated.
-*     We don't mind if it fails this time - we are only asking, not using 
+*     We don't mind if it fails this time - we are only asking, not using
 *     the answers for the plot yet.
 
       NPTS1 = NPTS(1)
@@ -137,7 +137,7 @@ CD    PRINT *,'Channel maps have size ',NAX(IX),NAX(IY)
       NMAP_CM  = ABS (NB+NE)
       NMAPS    = NMAP_CM               ! Copy in PLOT2D common block
 
-*     Initialize smoothing 
+*     Initialize smoothing
 
       LXPIX = 2
       LYPIX = 2
@@ -235,8 +235,8 @@ C     Check for existence of mapplane.tmp and delete it if it is there
 C     Write map to a file
 
       ISTAT = IGETLUN (IFILE, 'make_chan4', .TRUE.)
-      OPEN  (IFILE, 
-     &       FILE   = 'mapplane.tmp', 
+      OPEN  (IFILE,
+     &       FILE   = 'mapplane.tmp',
      &       STATUS = 'NEW',
      &       FORM   = 'UNFORMATTED',
      &       ACCESS = 'SEQUENTIAL',

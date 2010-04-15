@@ -1,7 +1,7 @@
       SUBROUTINE SORTM4(IA,IB,N)
 
 C     17-JUN-1995: P.W.Draper
-C        Code transformed by TOOLPACK. References to INTEGER*2 changed to 
+C        Code transformed by TOOLPACK. References to INTEGER*2 changed to
 C        INTEGER *4
 
 C     .. Scalar Arguments ..
@@ -47,4 +47,4 @@ C     ..
  30   CONTINUE
       IF (INT.GT.1) GOTO 20
       END
-      
+

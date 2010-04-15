@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_REDUCE_NOISE ( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine takes raw demodulated noise data and processes it.
 *     NDF and ASCII results files are generated.
@@ -32,8 +32,8 @@
 *        The name of the raw noise data file. A single number can be
 *        supplied if SCUBA_PREFIX is set. DATADIR is recognised.
 *     OUT = NDF (Write)
-*        Output NDF. This file is 2-dimensional. The first 
-*        dimension is bolometer number. The second dimension is 
+*        Output NDF. This file is 2-dimensional. The first
+*        dimension is bolometer number. The second dimension is
 *        chop signal and calibrator signal (along with variances
 *        and quality). If no output NDF is required a null value
 *        can be given.
@@ -101,7 +101,7 @@
 *     Initial revision
 *
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -249,7 +249,7 @@
 
 *     Retrieve some general info and write this to user
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
      :  OBSERVING_MODE, STATUS)
@@ -258,7 +258,7 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation ',
      :     STATUS)
 
@@ -326,7 +326,7 @@
 
 *     Annul the locator
       CALL DAT_ANNUL(IN_SCUBAX_LOC, STATUS)
- 
+
 *     Check the dimensions of the input data array
 
       CALL NDF_DIM (IN_NDF, MAXDIM, DIM, NDIM, STATUS)
@@ -376,13 +376,13 @@
       CALL CHR_APPND( STEMP, OUTFILE, ITEMP)
 
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
-      
+
 
 *     Propogate the section to the output
 
       IF (STATUS .EQ. SAI__OK) THEN
          USENDF = .TRUE.
-         CALL NDF_PROP (SECNDF, 'NOEXTENSION(SCUCD)', 'OUT', OUT_NDF, 
+         CALL NDF_PROP (SECNDF, 'NOEXTENSION(SCUCD)', 'OUT', OUT_NDF,
      :        STATUS)
 
 *     Allow for the possibility that an output NDF is not required
@@ -447,11 +447,11 @@
 
       CALL SCULIB_NOISE_MEAN( N_INTEGRATIONS, N_BOLS,
      :     %VAL(CNF_PVAL(IN_DATA_PTR)),
-     :     %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(OUT_DATA_PTR) + (N_BOLS * VAL__NBR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR) + (N_BOLS * VAL__NBR)),
-     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), %VAL(CNF_PVAL(SCRATCH_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), %VAL(CNF_PVAL(SCRATCH_PTR)),
      :     STATUS)
 
 *     Free the scratch space
@@ -542,13 +542,13 @@
          ELSE
 
 *     Gather the necessary information from the FITS header
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'UTSTART', UTSTART, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'OBSDEF', ODF_NAME, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'BOLOMS', BOLOMS, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'OBJ_TYPE', OBJ_TYPE, STATUS)
             CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'SAM_TIME', SAM_TIME, STATUS)
@@ -556,7 +556,7 @@
      :           'PRE_DSCD', PRE_DISCARD, STATUS)
             CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'PST_DSCD', POST_DISCARD, STATUS)
-            
+
 *     Some early data does not have the JIG_DSCD keyword in the header
             IF (STATUS .EQ. SAI__OK) THEN
                CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -575,15 +575,15 @@
      :           'CHOP_PD', CHOP_PERIOD, STATUS)
             CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'CALIB_PD', CAL_PERIOD, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'CENT_CRD', CENTRE_COORDS, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'CHOP_CRD', CHOP_COORDS, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'LOCL_CRD', LOCAL_COORDS, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'LAT', LAT, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'LONG', LONG, STATUS)
             CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'CHOP_THR', CHOP_THROW, STATUS)
@@ -607,7 +607,7 @@
 
             LINE = 'Date of observation   : '//UTDATE
             CALL FIO_WRITE (FD, LINE, STATUS)
-            
+
             LINE = 'Time of observation   : '//UTSTART
             CALL FIO_WRITE (FD, LINE, STATUS)
 
@@ -711,7 +711,7 @@
             DO I = 1, N_BOLS
                CALL SCULIB_BOLNAME (BOL_ADC(I), BOL_CHAN(I),
      :              BOLNAME, STATUS)
-    
+
 *     Copy the data out of the 'pointer'
                CALL VEC_RTOR(.FALSE., 1,
      :              %VAL(CNF_PVAL(OUT_DATA_PTR) + (I-1) * VAL__NBR ),
@@ -730,7 +730,7 @@
      :              DEMOD_QUALITY, IERR, NERR, STATUS)
 
 
-               WRITE (LINE, 10) BOLNAME, CHOP_DATA, 
+               WRITE (LINE, 10) BOLNAME, CHOP_DATA,
      :              SQRT(MAX(0.0,CHOP_VARIANCE)),
      :              CAL_DATA, SQRT(MAX(0.0,CAL_VARIANCE)),DEMOD_QUALITY
                CALL FIO_WRITE (FD, LINE, STATUS)
@@ -750,7 +750,7 @@
       CALL NDF_UNMAP(IN_NDF, '*', STATUS)
       CALL NDF_ANNUL(IN_NDF, STATUS)
 
-      IF (USENDF) THEN 
+      IF (USENDF) THEN
 
 *     Add the units
          CALL NDF_CPUT('nV',OUT_NDF, 'UNITS', STATUS)

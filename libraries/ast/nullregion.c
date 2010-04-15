@@ -13,8 +13,8 @@ f     AST_NULLREGION
 *  Description:
 *     The NullRegion class implements a Region with no bounds within a Frame.
 *     If the Negated attribute of a NullRegion is false, the NullRegion
-*     represents a Region containing no points. If the Negated attribute of 
-*     a NullRegion is true, the NullRegion represents an infinite Region 
+*     represents a Region containing no points. If the Negated attribute of
+*     a NullRegion is true, the NullRegion represents an infinite Region
 *     (that is, all points in the coordinate system are inside the NullRegion).
 
 *  Inheritance:
@@ -40,12 +40,12 @@ f     The NullRegion class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,9 +117,9 @@ static AstMapping *(* parent_simplify)( AstMapping *, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(NullRegion)
@@ -181,7 +181,7 @@ static AstRegion *GetDefUnc( AstRegion *this, int *status ) {
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstRegion *astGetDefUnc( AstRegion *this ) 
+*     AstRegion *astGetDefUnc( AstRegion *this )
 
 *  Class Membership:
 *     NullRegion member function (over-rides the astGetDefUnc protected
@@ -189,8 +189,8 @@ static AstRegion *GetDefUnc( AstRegion *this, int *status ) {
 
 *  Description:
 *     This function returns a pointer to a Region which represents the
-*     default uncertainty associated with a position on the boundary of the 
-*     given  Region. The returned Region refers to the base Frame within the 
+*     default uncertainty associated with a position on the boundary of the
+*     given  Region. The returned Region refers to the base Frame within the
 *     FrameSet encapsulated by the supplied Region.
 
 *  Parameters:
@@ -212,7 +212,7 @@ static AstRegion *GetDefUnc( AstRegion *this, int *status ) {
    AstRegion *result;
    double *cen;
    double rad;
-   int i;              
+   int i;
    int n;
 
 /* Initialise */
@@ -265,7 +265,7 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *st
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -522,7 +522,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          }
       }
 
-/* If this did not produced a merged Region, attempt to merge the NullRegion 
+/* If this did not produced a merged Region, attempt to merge the NullRegion
    with its upper neighbour (if any). */
       if( !new && where < *nmap - 1 ) {
          i1 = where;
@@ -536,13 +536,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If succesfull... */
       if( new ){
 
-/* Annul the first of the two Mappings, and replace it with the merged 
-   Region. Also clear the invert flag. */ 
+/* Annul the first of the two Mappings, and replace it with the merged
+   Region. Also clear the invert flag. */
          (void) astAnnul( ( *map_list )[ i1 ] );
          ( *map_list )[ i1 ] = new;
          ( *invert_list )[ i1 ] = 0;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
          (void) astAnnul( ( *map_list )[ i1 + 1 ] );
          for ( i = i1 + 2; i < *nmap; i++ ) {
@@ -568,14 +568,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg, 
+static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
                                    int intfirst, int *status ) {
 /*
 *  Name:
 *     MergeNullRegion
 
 *  Purpose:
-*     Attempt to merge a NullRegion with another Region to form a Region of 
+*     Attempt to merge a NullRegion with another Region to form a Region of
 *     higher dimensionality.
 
 *  Type:
@@ -583,15 +583,15 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg, 
-*                                 int intfirst, int *status ) 
+*     AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
+*                                 int intfirst, int *status )
 
 *  Class Membership:
 *     NullRegion member function.
 
 *  Description:
 *     This function attempts to combine the supplied Regions together
-*     into a Region of higher dimensionality. 
+*     into a Region of higher dimensionality.
 
 *  Parameters:
 *     this
@@ -641,9 +641,9 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 /* Check the local error status. */
    if ( !astOK ) return result;
 
-/* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. In addition, in order to 
-   merge, either both Regions must have a defined uncertainty, or neither 
+/* Get the Closed attributes of the two Regions. They must be the same in
+   each Region if we are to merge the Regions. In addition, in order to
+   merge, either both Regions must have a defined uncertainty, or neither
    Region must have a defined Uncertainty. */
    if( astGetClosed( this ) == astGetClosed( reg ) &&
        astTestUnc( this ) == astTestUnc( reg ) ) {
@@ -655,35 +655,35 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 /* Get the number of axes in the two supplied Regions. */
       nax_reg = astGetNaxes( reg );
       nax_this = astGetNaxes( this );
-   
+
 /* If the Regions can be combined, get the number of axes the
    combination will have. */
       nax = nax_reg + nax_this;
-   
+
 /* Get the base Frames from the two Region FrameSets, and combine them
    into a single CmpFrame that will be used to create any new Region. */
       frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
       frm_reg = astGetFrame( reg->frameset, AST__BASE );
-   
+
       if( intfirst ) {
          bfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
       } else {
          bfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
       }
-   
+
       frm_this = astAnnul( frm_this );
       frm_reg = astAnnul( frm_reg );
-   
+
 /* Indicate we do not yet have a merged Region. */
       new = NULL;
-   
+
 /* We only check for merging with another NullRegion (other classes such
-   as Box and Interval check for merging of NullRegions with other classes). 
-   The result will be an NullRegion. Both Regions must have the same value 
+   as Box and Interval check for merging of NullRegions with other classes).
+   The result will be an NullRegion. Both Regions must have the same value
    for the Negated flag. */
       if( astIsANullRegion( reg ) && neg_this == neg_reg ) {
          new = (AstRegion *) astNullRegion( bfrm, NULL, "", status );
-   
+
 /* Propagate remaining attributes of the supplied Region to it. */
          astRegOverlay( new, this, 1 );
 
@@ -694,7 +694,7 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
             astClearNegated( new );
          }
 
-/* If both the supplied Regions have uncertainty, assign the new Region an 
+/* If both the supplied Regions have uncertainty, assign the new Region an
    uncertainty. */
          if( astTestUnc( this ) && astTestUnc( reg ) ) {
 
@@ -726,27 +726,27 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
    into a single CmpFrame. */
          frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__CURRENT );
          frm_reg = astGetFrame( reg->frameset, AST__CURRENT );
-      
+
          if( intfirst ) {
             cfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
          } else {
             cfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
          }
-      
-/* Get the base -> current Mappings from the two Region FrameSets, and 
+
+/* Get the base -> current Mappings from the two Region FrameSets, and
    combine them into a single parallel CmpMap that connects bfrm and cfrm. */
-         map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE, 
+         map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE,
                                    AST__CURRENT );
          map_reg = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
-      
+
          if( intfirst ) {
-            bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "", 
+            bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "",
                                               status );
          } else {
-            bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "", 
+            bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "",
                                               status );
          }
-      
+
 /* Map the new Region into the new current Frame. */
          result = astMapRegion( new, bcmap, cfrm );
 
@@ -819,18 +819,18 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     int Overlap( AstRegion *this, AstRegion *that ) 
+*     int Overlap( AstRegion *this, AstRegion *that )
 
 *  Class Membership:
-*     NullRegion member function (over-rides the astOverlap method inherited 
+*     NullRegion member function (over-rides the astOverlap method inherited
 *     from the Region class).
 
 *  Description:
 *     This function returns an integer value indicating if the two
 *     supplied Regions overlap. The two Regions are converted to a commnon
-*     coordinate system before performing the check. If this conversion is 
+*     coordinate system before performing the check. If this conversion is
 *     not possible (for instance because the two Regions represent areas in
-*     different domains), then the check cannot be performed and a zero value 
+*     different domains), then the check cannot be performed and a zero value
 *     is returned to indicate this.
 
 *  Parameters:
@@ -845,7 +845,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 *        Possible values are:
 *
 *        0 - The check could not be performed because the second Region
-*            could not be mapped into the coordinate system of the first 
+*            could not be mapped into the coordinate system of the first
 *            Region.
 *
 *        1 - There is no overlap between the two Regions.
@@ -861,9 +861,9 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 *        6 - The second Region is the negation of the first Region.
 
 *  Notes:
-*     - The returned values 5 and 6 do not check the value of the Closed 
-*     attribute in the two Regions. 
-*     - A value of zero will be returned if this function is invoked with the 
+*     - The returned values 5 and 6 do not check the value of the Closed
+*     attribute in the two Regions.
+*     - A value of zero will be returned if this function is invoked with the
 *     AST error status set, or if it should fail for any reason.
 
 * Implementation Notes:
@@ -877,7 +877,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 /* Check the inherited status. */
    if ( !astOK ) return 0;
 
-/* Invoke the private "OverlapX" member function with the two arguments 
+/* Invoke the private "OverlapX" member function with the two arguments
    swapped. */
    return OverlapX( that, this, status );
 }
@@ -895,10 +895,10 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     int OverlapX( AstRegion *that, AstRegion *this ) 
+*     int OverlapX( AstRegion *that, AstRegion *this )
 
 *  Class Membership:
-*     NullRegion member function (over-rides the astOverlapX method inherited 
+*     NullRegion member function (over-rides the astOverlapX method inherited
 *     from the Region class).
 
 *  Description:
@@ -925,8 +925,8 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    if ( !astOK ) return result;
 
 /* Check that the Regions can be compared meaningfully. */
-   fs = astConvert( this, that, "" );   
-   if( fs ) { 
+   fs = astConvert( this, that, "" );
+   if( fs ) {
       fs = astAnnul( fs );
 
 /* If both the supplied Regions are NullRegion... */
@@ -939,13 +939,13 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
          } else {
             result = 6;
          }
-   
+
 /* If one of the supplied Region is a NullRegion containing no points,
    then there is no overlap. */
       } else if( ( astIsANullRegion( this ) && !astGetNegated( this ) ) ||
                  ( astIsANullRegion( that ) && !astGetNegated( that ) ) ) {
          result = 1;
-   
+
 /* If "that" is infinite and "this" is not infinite, then "this" is
    entirely inside "that". */
       } else if( astIsANullRegion( that ) && astGetNegated( that ) ) {
@@ -955,9 +955,9 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
    entirely inside "this". */
       } else if( astIsANullRegion( this ) && astGetNegated( this ) ){
          result = 3;
-   
+
 /* Otherwise there is partial overlap. */
-      } else {   
+      } else {
          result = 4;
       }
    }
@@ -975,7 +975,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     RegBaseBox
 
 *  Purpose:
-*     Returns the bounding box of an un-negated Region in the base Frame of 
+*     Returns the bounding box of an un-negated Region in the base Frame of
 *     the encapsulated FrameSet.
 
 *  Type:
@@ -990,7 +990,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     method inherited from the Region class).
 
 *  Description:
-*     This function returns the upper and lower axis bounds of a Region in 
+*     This function returns the upper and lower axis bounds of a Region in
 *     the base Frame of the encapsulated FrameSet, assuming the Region
 *     has not been negated. That is, the value of the Negated attribute
 *     is ignored.
@@ -1001,12 +1001,12 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     ubnd
 *        Pointer to an array in which to return the upper axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     status
 *        Pointer to the inherited status variable.
@@ -1042,7 +1042,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *     RegBaseMesh
 
 *  Purpose:
-*     Return a PointSet containing a mesh of points on the boundary of a 
+*     Return a PointSet containing a mesh of points on the boundary of a
 *     Region in its base Frame.
 
 *  Type:
@@ -1060,7 +1060,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *     This function returns a PointSet containing a mesh of points on the
 *     boundary of the Region. The points refer to the base Frame of
 *     the encapsulated FrameSet. Note, a NullRegion has no boundary. This
-*     is indicated by returned a PointSet containing a single point with a 
+*     is indicated by returned a PointSet containing a single point with a
 *     value of AST__BAD on every axis.
 
 *  Parameters:
@@ -1077,7 +1077,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 */
 
 /* Local Variables: */
-   AstPointSet *result; 
+   AstPointSet *result;
    double **ptr;
    int i;
    int nc;
@@ -1088,7 +1088,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /* Check the inherited status */
    if( !astOK ) return result;
 
-/* If the Region structure contains a pointer to a PointSet holding 
+/* If the Region structure contains a pointer to a PointSet holding
    a previously created mesh, return it. */
    if( this->basemesh ) {
       result = astClone( this->basemesh );
@@ -1118,7 +1118,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
    return result;
 }
 
-static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
                                const int *axes, int *status ){
 /*
 *  Name:
@@ -1133,7 +1133,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes,
 *                             int *status )
 
 *  Class Membership:
@@ -1141,8 +1141,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 *     method inherited from the Region class).
 
 *  Description:
-*     This function attempts to return a Region that is spanned by selected 
-*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     This function attempts to return a Region that is spanned by selected
+*     axes from the base Frame of the encapsulated FrameSet of the supplied
 *     Region. This may or may not be possible, depending on the class of
 *     Region. If it is not possible a NULL pointer is returned.
 
@@ -1187,7 +1187,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 
 /* Get the uncertainty Region (if any) within the base Frame of the supplied
    Region, and select the required axes from it. If the resulting Object
-   is not a Region, annul it so that the returned Region will have no 
+   is not a Region, annul it so that the returned Region will have no
    uncertainty. */
    if( astTestUnc( this_region ) ) {
       bunc = astGetUncFrm( this_region, AST__BASE );
@@ -1204,8 +1204,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    result = (AstRegion *) astNullRegion( frm, unc, "", status );
 
 /* Free resources */
-   frm = astAnnul( frm );      
-   bfrm = astAnnul( bfrm );      
+   frm = astAnnul( frm );
+   bfrm = astAnnul( bfrm );
    if( unc ) unc = astAnnul( unc );
 
 /* Return a NULL pointer if an error has occurred. */
@@ -1221,7 +1221,7 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd,
 *     GetRegionBounds
 
 *  Purpose:
-*     Returns the bounding box of an un-negated Region in the current Frame of 
+*     Returns the bounding box of an un-negated Region in the current Frame of
 *     the encapsulated FrameSet.
 
 *  Type:
@@ -1236,7 +1236,7 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd,
 *     method inherited from the Region class).
 
 *  Description:
-*     This function returns the upper and lower axis bounds of a Region in 
+*     This function returns the upper and lower axis bounds of a Region in
 *     the current Frame of the encapsulated FrameSet, assuming the Region
 *     has not been negated. That is, the value of the Negated attribute
 *     is ignored.
@@ -1247,12 +1247,12 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd,
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
 *        covered by the Region in the current Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the Region.
 *     ubnd
 *        Pointer to an array in which to return the upper axis bounds
 *        covered by the Region in the current Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the Region.
 *     status
 *        Pointer to the inherited status variable.
@@ -1288,7 +1288,7 @@ static AstPointSet *RegMesh( AstRegion *this, int *status ){
 *     RegMesh
 
 *  Purpose:
-*     Return a PointSet containing points spread over the boundary of a 
+*     Return a PointSet containing points spread over the boundary of a
 *     Region.
 
 *  Type:
@@ -1318,14 +1318,14 @@ static AstPointSet *RegMesh( AstRegion *this, int *status ){
 *     NULL pointer.
 
 *  Notes:
-*     - This implementation reports and error and returns NULL since a 
+*     - This implementation reports and error and returns NULL since a
 *     NullRegion has no boundary.
 *-
 */
 
    astError( AST__INTER, "astRegMesh(%s): The %s class does not implement "
              "the astRegMesh method inherited from the Region class "
-             "(internal AST programming error).", status, astGetClass( this ), 
+             "(internal AST programming error).", status, astGetClass( this ),
              astGetClass( this ) );
    return NULL;
 }
@@ -1407,13 +1407,13 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       result = (AstMapping *) astNullRegion( frm, astGetUnc( new, 0 ), "", status );
 
 /* Free resources. */
-      frm = astAnnul( frm );      
+      frm = astAnnul( frm );
 
    }
-   map = astAnnul( map );      
-   new = astAnnul( new );      
+   map = astAnnul( map );
+   new = astAnnul( new );
 
-/* If any simplification could be performed, copy Region attributes from 
+/* If any simplification could be performed, copy Region attributes from
    the supplied Region to the returned Region, and return a pointer to it.
    If the supplied Region had no uncertainty, ensure the returned Region
    has no uncertainty. Otherwise, return a clone of the supplied pointer. */
@@ -1510,16 +1510,16 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    calculations needed to generate the output coordinate values. */
 
 /* If the NullRegion has been inverted, it represents an infinite region
-   which includes all points, so just retain the copy of the supplied 
-   PointSet created by the parent Transform method above. If the NullRegion 
-   has not been inverted, it contains no points and so set all output points 
+   which includes all points, so just retain the copy of the supplied
+   PointSet created by the parent Transform method above. If the NullRegion
+   has not been inverted, it contains no points and so set all output points
    bad. */
    if( !astGetNegated( this ) ) {
       ncoord_out = astGetNcoord( result );
       npoint_out = astGetNpoint( result );
       ptr_out = astGetPoints( result );
       if ( astOK ) {
-         for ( coord = 0; coord < ncoord_out; coord++ ) {    
+         for ( coord = 0; coord < ncoord_out; coord++ ) {
             p = ptr_out[ coord ];
             for ( point = 0; point < npoint_out; point++ ) {
                *(p++) = AST__BAD;
@@ -1639,9 +1639,9 @@ f     RESULT = AST_NULLREGION( FRAME, UNC, OPTIONS, STATUS )
 *     This function creates a new NullRegion and optionally initialises its
 *     attributes.
 *
-*     A NullRegion is a Region with no bounds. If the Negated attribute of a 
-*     NullRegion is false, the NullRegion represents a Region containing no 
-*     points. If the Negated attribute of a NullRegion is true, the NullRegion 
+*     A NullRegion is a Region with no bounds. If the Negated attribute of a
+*     NullRegion is false, the NullRegion represents a Region containing no
+*     points. If the Negated attribute of a NullRegion is true, the NullRegion
 *     represents an infinite Region containing all points within the
 *     coordinate system.
 
@@ -1654,23 +1654,23 @@ f     FRAME = INTEGER (Given)
 *        will have no effect the Region.
 c     unc
 f     UNC = INTEGER (Given)
-*        An optional pointer to an existing Region which specifies the 
-*        uncertainties associated with positions in the supplied Frame. 
-*        The uncertainty in any point in the Frame is found by shifting the 
-*        supplied "uncertainty" Region so that it is centred at the point 
-*        being considered. The area covered by the shifted uncertainty 
-*        Region then represents the uncertainty in the position. The 
+*        An optional pointer to an existing Region which specifies the
+*        uncertainties associated with positions in the supplied Frame.
+*        The uncertainty in any point in the Frame is found by shifting the
+*        supplied "uncertainty" Region so that it is centred at the point
+*        being considered. The area covered by the shifted uncertainty
+*        Region then represents the uncertainty in the position. The
 *        uncertainty is assumed to be the same for all points.
 *
-*        If supplied, the uncertainty Region must be of a class for which 
-*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
-*        or be a Prism containing centro-symetric component Regions. A deep 
-*        copy of the supplied Region will be taken, so subsequent changes to 
-*        the uncertainty Region using the supplied pointer will have no 
-*        effect on the created Box. Alternatively, 
-f        a null Object pointer (AST__NULL) 
-c        a NULL Object pointer 
-*        may be supplied, in which case a default uncertainty of zero is 
+*        If supplied, the uncertainty Region must be of a class for which
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.)
+*        or be a Prism containing centro-symetric component Regions. A deep
+*        copy of the supplied Region will be taken, so subsequent changes to
+*        the uncertainty Region using the supplied pointer will have no
+*        effect on the created Box. Alternatively,
+f        a null Object pointer (AST__NULL)
+c        a NULL Object pointer
+*        may be supplied, in which case a default uncertainty of zero is
 *        used.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
@@ -1723,7 +1723,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the NullRegion, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitNullRegion( NULL, sizeof( AstNullRegion ), !class_init, 
+   new = astInitNullRegion( NULL, sizeof( AstNullRegion ), !class_init,
                             &class_vtab, "NullRegion", frame, unc );
 
 /* If successful, note that the virtual function table has been
@@ -1745,7 +1745,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void, 
+AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
                                  const char *options, ... ) {
 /*
 *  Name:
@@ -1812,7 +1812,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
 
 /* Initialise the NullRegion, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitNullRegion( NULL, sizeof( AstNullRegion ), !class_init, 
+   new = astInitNullRegion( NULL, sizeof( AstNullRegion ), !class_init,
                             &class_vtab, "NullRegion", frame, unc );
 
 /* If successful, note that the virtual function table has been
@@ -1834,8 +1834,8 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
    return astMakeId( new );
 }
 
-AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init, 
-                                   AstNullRegionVtab *vtab, const char *name, 
+AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
+                                   AstNullRegionVtab *vtab, const char *name,
                                    AstFrame *frame, AstRegion *unc, int *status ) {
 /*
 *+
@@ -1850,9 +1850,9 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init, 
-*                                        AstNullRegionVtab *vtab, const char *name, 
-*                                        AstFrame *frame, AstRegion *unc  ) 
+*     AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
+*                                        AstNullRegionVtab *vtab, const char *name,
+*                                        AstFrame *frame, AstRegion *unc  )
 
 *  Class Membership:
 *     NullRegion initialiser.
@@ -1894,15 +1894,15 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
 *     frame
 *        A pointer to the Frame in which the region is defined.
 *     unc
-*        A pointer to a Region which specifies the uncertainty of positions 
-*        within the supplied Frame. A NULL pointer can be supplied, in which 
-*        case default uncertainties of zero are used. If an uncertainty 
+*        A pointer to a Region which specifies the uncertainty of positions
+*        within the supplied Frame. A NULL pointer can be supplied, in which
+*        case default uncertainties of zero are used. If an uncertainty
 *        Region is supplied, it must be either a Box, a Circle or an Ellipse,
 *        and its encapsulated Frame must be related to the Frame supplied
-*        for parameter "frame" (i.e. astConvert should be able to find a 
-*        Mapping between them). The centre of the supplied uncertainty 
-*        Region is immaterial since it will be re-centred on the point 
-*        being tested before use. A deep copy is taken of the supplied 
+*        for parameter "frame" (i.e. astConvert should be able to find a
+*        Mapping between them). The centre of the supplied uncertainty
+*        Region is immaterial since it will be re-centred on the point
+*        being tested before use. A deep copy is taken of the supplied
 *        Region.
 
 *  Returned Value:
@@ -1935,7 +1935,7 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
    return new;
 }
 
-AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vtab, 
+AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vtab,
                                    const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -1950,7 +1950,7 @@ AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vt
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstNullRegion *astLoadNullRegion( void *mem, size_t size, AstNullRegionVtab *vtab, 
+*     AstNullRegion *astLoadNullRegion( void *mem, size_t size, AstNullRegionVtab *vtab,
 *                                       const char *name, AstChannel *channel )
 
 *  Class Membership:

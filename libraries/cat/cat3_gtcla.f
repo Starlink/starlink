@@ -1,15 +1,15 @@
-      SUBROUTINE CAT3_GTCLA (FITUNT, NXCOL, FNAME, FDTYPE, FCSIZE, 
+      SUBROUTINE CAT3_GTCLA (FITUNT, NXCOL, FNAME, FDTYPE, FCSIZE,
      :  FUNIT, FSCALE, FZERO, FXCEPT, FXFMT, FCOMM, FITYPE, SFLAG,
      :  STATUS)
 *+
 *  Name:
-*     CAT3_GTCLA 
+*     CAT3_GTCLA
 *  Purpose:
 *     Read details of a column from an ASCII FITS table.
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_GTCLA (FITUNT, NXCOL; FNAME, FDTYPE, FCSIZE, FUNIT, 
+*     CALL CAT3_GTCLA (FITUNT, NXCOL; FNAME, FDTYPE, FCSIZE, FUNIT,
 *       FSCALE, FZERO, FXCEPT, FXFMT, FCOMM, FITYPE, SFLAG; STATUS)
 *  Description:
 *     Read details of a column from an ASCII FITS table.
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -162,13 +162,13 @@
 *       Get the details of the column from the FITS table.
 
          FITSTT = FITOK
-         CALL FTGACL (FITUNT, NXCOL, TTYPE, TBCOL, TUNIT, TFORM, 
+         CALL FTGACL (FITUNT, NXCOL, TTYPE, TBCOL, TUNIT, TFORM,
      :     TSCALE, TZERO, TNULL, TDISP, FITSTT)
 
          IF (FITSTT .EQ. FITOK  .AND.  TTYPE .NE. ' ') THEN
 
 *
-*          Replace the default values for the column with those read 
+*          Replace the default values for the column with those read
 *          for the column.
 
 C           write(17, 3000) pcols, ttype
@@ -255,7 +255,7 @@ C3000       format(1x, 'pcols, ttype: ', I4, 1x, a15 )
 *          Check if the column is scaled and adjust the CAT data type
 *          if necessary.  The check is made by seeing if the scale
 *          factor is significantly different from 1.0D0 or the zero
-*          point is significantly different from 0.0D0.  CAT forces all 
+*          point is significantly different from 0.0D0.  CAT forces all
 *          scaled columns to have data type DOUBLE PRECISION.
 
             IF (ABS(FSCALE - 1.0D0) .LT. CAT3__MINVL  .AND.

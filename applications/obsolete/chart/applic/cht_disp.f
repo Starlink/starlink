@@ -22,7 +22,7 @@
 *     Opens file, outputs it and then closes it again.
 
 *  Usage:
-*     disp 
+*     disp
 
 
 *  ADAM Parameters:
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
          CALL MSG_OUT( ' ', LINE, STATUS )
  100  CONTINUE
 
-      CLOSE( UNIT = 1 )      
+      CLOSE( UNIT = 1 )
 
       END
-      
+

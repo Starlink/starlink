@@ -82,7 +82,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -189,7 +189,7 @@
             LBND( I ) = 1
             UBND( I ) = DIMS( I )
          END DO
-      
+
       ELSE
 
          DO I = 1, NDIM

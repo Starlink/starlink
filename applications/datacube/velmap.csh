@@ -12,36 +12,36 @@
 #     C-shell script.
 #
 #  Usage:
-#     velmap [-a] [-c number] [-ci index] [-f] [-i filename] [-l filename] 
+#     velmap [-a] [-c number] [-ci index] [-f] [-i filename] [-l filename]
 #            [-o filename] [-p] [-r number] [-s system] [-v] [-z/+z]
 #
 #  Description:
-#     This shell script reads a three-dimensional spectral-cube NDF and 
-#     presents you with a white-light image of the cube.  You can then select 
-#     an X-Y position using the cursor.  The script will extract and display 
+#     This shell script reads a three-dimensional spectral-cube NDF and
+#     presents you with a white-light image of the cube.  You can then select
+#     an X-Y position using the cursor.  The script will extract and display
 #     this reference spectrum.  You will then be prompted to specify various
-#     fitting parameters, such as the peak position, using the cursor.  The 
-#     script will then attempt to fit the emission line.  The fit will be 
+#     fitting parameters, such as the peak position, using the cursor.  The
+#     script will then attempt to fit the emission line.  The fit will be
 #     displayed and you are consulted regarding the goodness of fit.  If you
 #     consider the fit to be good enough, the script will attempt to perform
 #     similar fits to all spectra within the cube, building a two-dimensional
 #     NDF image of the velocity of the line.  These will use the same initial
 #     parameters as the reference spectrum, unless option -a is selected.
-#     You may view this image drawn with a key (option -d), and overlay a 
+#     You may view this image drawn with a key (option -d), and overlay a
 #     contour plot (with a key) of the white-light image (option -c).
 #
 #     If you do not force the fit to be considered "good" by using the -f
 #     command-line option, the script will offer the opportunity to manually
 #     refit the spectral feature for individual pixels, such as those that
 #     were unsuccessfully fitted by the automatic procedure.  In this case
-#     the velocity map will be plotted and replotted after the new fit, 
+#     the velocity map will be plotted and replotted after the new fit,
 #     regardless of the -p option.
 #
 #  Parameters:
 #     -a
-#       Requests that each fit may be inspected then approved or re-fit, not 
-#       just the initial reference fit.  A re-fit will change the initial 
-#       parameter guesses for subsequent fits, so it is recommended that you 
+#       Requests that each fit may be inspected then approved or re-fit, not
+#       just the initial reference fit.  A re-fit will change the initial
+#       parameter guesses for subsequent fits, so it is recommended that you
 #       note the co-ordinates of spectra to re-fit and tackle these
 #       individually in the final manual re-fit stage.  [FALSE]
 #     -c number
@@ -58,26 +58,26 @@
 #       Force the script to accept the first attempt to fit a Gaussian to
 #       the line. This is a dangerous option; if the fit is poor, or
 #       unobtainable the script may terminate abruptly if it is forced to
-#       accept the fit.  This will additionally suppress manual re-fitting 
+#       accept the fit.  This will additionally suppress manual re-fitting
 #       of bad pixels at the end of the run of the script.  [FALSE]
 #     -i filename
 #       The script will use this as its input file, the specified file should
-#       be a three-dimensional NDF.  By default the script will prompt for 
+#       be a three-dimensional NDF.  By default the script will prompt for
 #       the input file.
 #     -l filename
-#       The name of an text log file containing the fitted Gaussian 
+#       The name of an text log file containing the fitted Gaussian
 #       coefficients for each spatial pixel.  The file is written as a
-#       Starlink Small Text List (STL) described in SUN/190.  The STL file 
-#       comprises a schema to locate and describe the columns, and store 
-#       global properties; and a formatted table of the coefficients.  The 
-#       schema includes the units and a brief description of each column, and 
-#       the name of the input NDF used.  The table lists the Gaussian centre, 
+#       Starlink Small Text List (STL) described in SUN/190.  The STL file
+#       comprises a schema to locate and describe the columns, and store
+#       global properties; and a formatted table of the coefficients.  The
+#       schema includes the units and a brief description of each column, and
+#       the name of the input NDF used.  The table lists the Gaussian centre,
 #       peak height the FWHM, and integrated flux, each with its fitting error.
 #     -o filename
 #       The filename for the output NDF of the velocity map.
 #     -p
-#       The script will plot the final image map to the current display 
-#       as well as saving it to an NDF file.  It will additionally overplot 
+#       The script will plot the final image map to the current display
+#       as well as saving it to an NDF file.  It will additionally overplot
 #       the white-light image as a contour map for comparison.  [FALSE]
 #     -r number
 #       Rest-frame spectral unit of the line being fitted.
@@ -91,10 +91,10 @@
 #     -v
 #       The script will generate a variance array from the line fits and
 #       attach it to the velocity-map NDF.  [FALSE]
-#     -z 
+#     -z
 #       The script will automatically prompt to select a region to zoom
 #       before prompting for the region of interest.  [TRUE]
-#     +z 
+#     +z
 #       The script will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
 #
@@ -103,10 +103,10 @@
 #     The map uses a false-colour spectrum-like colour table so that
 #     low-velocity regions appear in blue and high-velocity regions
 #     appear in red.
-#     -  CURSA:CATCOPY may be used to convert the STL log file (see the -l 
-#     option) to FITS format for analysis with the likes of TOPCAT, provided 
+#     -  CURSA:CATCOPY may be used to convert the STL log file (see the -l
+#     option) to FITS format for analysis with the likes of TOPCAT, provided
 #     the STL has the ".txt" file extension.  If you want just the tabulated
-#     data for your own favourite tool, the schema can be easily removed 
+#     data for your own favourite tool, the schema can be easily removed
 #     manually, or with sed excluding the lines up to and including the line
 #     beginning "BEGINTABLE".
 #
@@ -187,7 +187,7 @@
 #     2005 September 7 (MJC):
 #       Convert the current WCS System into velocities.
 #     2005 October 11 (MJC):
-#       Added PARGET calls to access velocities and sent wcstran output to 
+#       Added PARGET calls to access velocities and sent wcstran output to
 #       dev/null.  Added -c option for contour levels.  Fixed bugs converting
 #       the cursor position into negative pixel indices.  Ensured that the
 #       plots of spectra use the axis co-ordinate system.  Called KAPPA:CALC
@@ -195,14 +195,14 @@
 #       a digit before a decimal point, unlike bc.  Plot spectra in histogram
 #       mode for clarity.  Added defaults to parameter descriptions.
 #       Appended data unit to reported peak values.  Inserted blank lines to
-#       structure the commentary better.  Correct some output and comments: 
+#       structure the commentary better.  Correct some output and comments:
 #       e.g. "spectra" singular to "spectrum".
 #     2005 October 21 (MJC):
 #       Test for existence of RestFreq, and use it where available instead
-#       of prompting the user.  Remove second prompt for Rest-frame 
-#       co-ordinate.  Ensure that the output velocities are in km/s.  
+#       of prompting the user.  Remove second prompt for Rest-frame
+#       co-ordinate.  Ensure that the output velocities are in km/s.
 #       Added -s option.  Align some commentary.  WCSTRAN calls for fixing
-#       individual pixels now uses the correct NDF.  Bug deriving the 
+#       individual pixels now uses the correct NDF.  Bug deriving the
 #       velocity of refitted point corrected, by resetting the WCS Frame,
 #       System and Unit before transforming.
 #     2005 November 1 (MJC):
@@ -225,7 +225,7 @@
 #       axis units for ripped file in the loop.
 #     2006 March 6 (MJC):
 #       Switched lower percentile for display from 15 to 2.  Allow -c
-#       to be zero to mean no contours overlaid.  
+#       to be zero to mean no contours overlaid.
 #     2006 March 9 (MJC):
 #       Added -ci option.  Corrected the NDF name extraction when both
 #       the file extension and an NDF section are supplied; this is via the
@@ -292,7 +292,7 @@ set plotspec = "FALSE"
 # The SPECDRE extension is used to store the Gaussian fit.
 set component = 1
 
-# Specify the default number of contours used to display the white-light 
+# Specify the default number of contours used to display the white-light
 # image.
 set numcont = 15
 
@@ -310,7 +310,7 @@ while ( $#args > 0 )
    case -a:    # approve each fit?
       set approve = "TRUE"
       shift args
-      breaksw                             
+      breaksw
    case -c:    # Number of contours
       shift args
       set numcont = $args[1]
@@ -330,7 +330,7 @@ while ( $#args > 0 )
    case -f:    # force fit?
       set forcefit = "TRUE"
       shift args
-      breaksw                             
+      breaksw
    case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
@@ -370,15 +370,15 @@ while ( $#args > 0 )
    case -v:    # generate variances?
       set dovar = "TRUE"
       shift args
-     breaksw 
+     breaksw
    case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
-      breaksw 
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
@@ -412,13 +412,13 @@ set variance = `parget variance ndftrace`
 # Collapse the white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Display the collapsed image.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2] reset" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2] reset" >&/dev/null
 
 # Determine if we need to create or select a SPECTRUM-domain WCS Frame.
 # =====================================================================
@@ -427,8 +427,8 @@ display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2] reset" >&/dev/nul
 set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
 set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 
-# First do we need to change WCS Frames?  Check that the current frame is 
-# spectral or sky-spectral.  We can re-use the last trace of the ripped 
+# First do we need to change WCS Frames?  Check that the current frame is
+# spectral or sky-spectral.  We can re-use the last trace of the ripped
 # spectrum.
 set change_frame = "FALSE"
 set curframe = `parget current ndftrace`
@@ -440,7 +440,7 @@ endif
 
 # Next question: is there a spectral frame to switch to in order to
 # permit velocity calculations?  Loop through all the WCS Frames, looking
-# for a SPECTRUM or a DSBSPECTRUM (or composite SKY-SPECTRUM or 
+# for a SPECTRUM or a DSBSPECTRUM (or composite SKY-SPECTRUM or
 # SKY-DSBSPECTRUM).
 set create_specframe = "TRUE"
 set nframe = `parget nframe ndftrace`
@@ -555,7 +555,7 @@ fitgauss \
     "in=${ripfile} mask1=${low_mask} mask2=${upp_mask} cont=${cont} " \
     "peak=${peak} fwhm=${fwhm} reguess=no remask=no ncomp=1 cf=0 " \
     "pf=0 wf=0 comp=${component} fitgood=${fitgood} dialog=f " \
-    "centre=${position} logfil=${fitfile} device=${plotdev}" >& /dev/null 
+    "centre=${position} logfil=${fitfile} device=${plotdev}" >& /dev/null
 
 # Check to see whether or not fitting was successful.
 if ( ! -e $fitfile ) then
@@ -565,10 +565,10 @@ if ( ! -e $fitfile ) then
    set refit = $<
    set refit = `echo ${refit} | awk '{print tolower($0)}'`
    echo " "
-  
+
    if ( ${refit} == "no" || ${refit} == "n" ) then
       rm -f ${fitfile} >& /dev/null
-      goto cleanup 
+      goto cleanup
 
 # Try again.
    else
@@ -692,13 +692,13 @@ if ( ${gotoutfile} == "FALSE" ) then
    echo " "
 endif
 
-date > ${tmpdir}/${user}/vmap_time.dat 
+date > ${tmpdir}/${user}/vmap_time.dat
 
 # Fit the cube in a similar fashion.
 echo "      Fitting:"
 while( $y <= ${ubnd[2]} )
    while ( $x <= ${ubnd[1]} )
-      
+
 # Label for repeated fitting of the Gaussian.
 approvefit:
 
@@ -779,7 +779,7 @@ approvefit:
                goto cleanup
             endif
 
-# Plot the ripped spectrum with zooming, and obtain new fit estimated 
+# Plot the ripped spectrum with zooming, and obtain new fit estimated
 # parameters.
          else
             if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
@@ -805,7 +805,7 @@ approvefit:
          set peak_height = $array[4]
          set peak_err = $array[5]
          set fwhm_fit = $array[6]
-         set fwhm_err = $array[7] 
+         set fwhm_err = $array[7]
          set integral = $array[8]
          set integral_err = $array[9]
 
@@ -820,13 +820,13 @@ approvefit:
          set condition = `echo "if ($peak_height < 0) 1" | bc`
          if ( $condition == 1 ) then
             echo "        Spectrum at ($x,$y)"
-            set line = "${line} -9999.99"  
+            set line = "${line} -9999.99"
             if ( ${dovar} == "TRUE" ) then
-               set vars = "${vars} -9999.99"  
+               set vars = "${vars} -9999.99"
             endif
 
          else
-            echo "        Spectrum at ($x,$y): $centre_fit +- $centre_err ${sunits}" 
+            echo "        Spectrum at ($x,$y): $centre_fit +- $centre_err ${sunits}"
 
 # Set the rest-frame value, if it's not already stored in the WCS
 # attributes.  For this to work the current WCS Frame must be a
@@ -836,7 +836,7 @@ approvefit:
                          "newval='${rest_coord} ${sunits}'" >& /dev/null
             endif
 
-# Reset the System of the current WCS Frame to velocities in the desired 
+# Reset the System of the current WCS Frame to velocities in the desired
 # system and units.
             wcsattrib "ndf=${specfile} mode=set name=System newval=${velsys}"
             wcsattrib "ndf=${specfile} mode=set name=Unit newval=${vunits}"
@@ -847,9 +847,9 @@ approvefit:
             set velocity = `parget posout wcstran`
 
             if ( ${dovar} == "TRUE" ) then
-               echo -n "                           $velocity" 
+               echo -n "                           $velocity"
             else
-               echo "                           $velocity $vunits" 
+               echo "                           $velocity $vunits"
             endif
 
             set line = "${line} ${velocity}"
@@ -870,7 +870,7 @@ approvefit:
                           "frameout=${new_wcsframe}" >& /dev/null
                   set upp_vel = `parget posout wcstran`
 
-                               
+
                   set low_err = \
                     `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
                   wcstran "ndf=${specfile} posin=${low_err} framein=AXIS " \
@@ -878,7 +878,7 @@ approvefit:
                   set low_vel = `parget posout wcstran`
 
                   set vel_err = \
-                    `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`  
+                    `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`
 
                   if ( `echo "if ( $vel_err < 0.0 ) 1" | bc` ) then
                      set vel_err = `calc exp="'-($vel_err)'" prec=_double`
@@ -896,8 +896,8 @@ approvefit:
 
 # No fit file.  Set dummy values.
       else
-         echo "        Spectrum at ($x,$y)" 
-         set line = "${line} -9999.99" 
+         echo "        Spectrum at ($x,$y)"
+         set line = "${line} -9999.99"
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
          endif
@@ -932,7 +932,7 @@ date >> ${tmpdir}/${user}/vmap_time.dat
 
 echo " "
 echo "      Output NDF:"
-echo "        Converting: Creating NDF from data." 
+echo "        Converting: Creating NDF from data."
 
 ascii2ndf "in=${mapfile} out=${outfile}_tmp shape=[${dims[1]},${dims[2]}] "\
           "maxlen=2048 type='_real'" >& /dev/null
@@ -947,14 +947,14 @@ else
 endif
 
 # Set the NDF origin.
-echo "        Origin: Attaching origin (${lbnd[1]},${lbnd[2]})." 
+echo "        Origin: Attaching origin (${lbnd[1]},${lbnd[2]})."
 setorigin "ndf=${colfile} origin=[${lbnd[1]},${lbnd[2]}]" >& /dev/null
 setorigin "ndf=${outfile} origin=[${lbnd[1]},${lbnd[2]}]" >& /dev/null
 
 # Attach the VARIANCE array.  Note that ASCII2NDF does not allow
 # COMP=Error so work in variances rather than error.
 if ( ${dovar} == "TRUE" ) then
-   echo "        Converting: Attaching VARIANCE array." 
+   echo "        Converting: Attaching VARIANCE array."
    ascii2ndf in=${varfile} comp="Variance" out=${outfile} \
              shape="[${dims[1]},${dims[2]}]" \
              maxlen=2048 type='_real'
@@ -974,7 +974,7 @@ endif
 
 # Use the white-light image to clone the axis AXIS and WCS co-ordinates.
 # The WCS information will be copied incorrectly if the AXIS structure does
-# not exist before the WCS component is cloned.  If one an AXIS structure 
+# not exist before the WCS component is cloned.  If one an AXIS structure
 # does not exist, create an array of axis centres, derived from the current
 # WCS Frame, along each axis.
 if ( ${axis} == "FALSE" ) then
@@ -983,13 +983,13 @@ if ( ${axis} == "FALSE" ) then
    setaxis "ndf=${colfile} dim=2 mode=wcs comp=Centre" >& /dev/null
 endif
 
-echo "        Axes: Attaching AXIS structures." 
+echo "        Axes: Attaching AXIS structures."
 setaxis "ndf=${outfile} like=${colfile}" >& /dev/null
 
-echo "        WCS: Attaching WCS information." 
+echo "        WCS: Attaching WCS information."
 wcscopy "ndf=${outfile} like=${colfile}" >& /dev/null
 
-echo "        Title: Setting title." 
+echo "        Title: Setting title."
 settitle "ndf=${outfile} title='Velocity Map'"
 echo " "
 
@@ -1013,13 +1013,13 @@ echo " "
 if ( ${plotspec} == "TRUE" ) then
    lutspec device=${plotdev}
    echo "      Plotting:"
-   echo "        Display: Velocity map using percentile scaling." 
+   echo "        Display: Velocity map using percentile scaling."
    display "${outfile} device=${plotdev} mode=per percentiles=[2,98]"\
            "axes=yes margin=! key keypos=0.12 " \
             keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
 
    if ( $drawcontours == "TRUE" ) then
-      echo "        Contour: White-light image with equally spaced contours." 
+      echo "        Contour: White-light image with equally spaced contours."
       contour "ndf=${colfile} device=${plotdev} clear=no mode=equa" \
               "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
               "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
@@ -1035,16 +1035,16 @@ if ( ${forcefit} == "FALSE" ) then
    if ( ${plotspec} == "FALSE" ) then
       lutspec device=${plotdev}
       echo "      Plotting:"
-      echo "        Display: Velocity map using percentile scaling." 
+      echo "        Display: Velocity map using percentile scaling."
       display "${outfile} device=${plotdev} mode=per percentiles=[2,98]"\
               "axes=yes margin=! key keypos=0.12 " \
               keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
 
       if ( $drawcontours == "TRUE" ) then
-         echo "        Contour: White-light image with equally spaced contours." 
+         echo "        Contour: White-light image with equally spaced contours."
          contour "ndf=${colfile} device=${plotdev} clear=no mode=equa"\
                  "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
-                 "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null 
+                 "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
       endif
    endif
 
@@ -1145,7 +1145,7 @@ manual_refit:
            "peak=${peak} fwhm=${fwhm} reguess=no remask=no ncomp=1 "\
            "cf=0 pf=0 wf=0 comp=${component} fitgood=${fitgood} "\
            "centre=${position} logfil=${fitfile} device=${plotdev}"\
-           "dialog=f" >& /dev/null 
+           "dialog=f" >& /dev/null
 
 # Check to see whether or not fitting was successful.
          if ( ! -e $fitfile ) then
@@ -1174,7 +1174,7 @@ manual_refit:
                goto manual_refit
             endif
          endif
- 
+
 # Get the fit from the temporary file.
          set results = `cat ${fitfile} | head -n 23 | tail -1`
          set array = \
@@ -1221,9 +1221,9 @@ manual_refit:
 
          else if ( ${fitok} == "quit" || ${fitok} == "q" ) then
             rm -f ${fitfile} >& /dev/null
-            goto dropout 
+            goto dropout
 
-         else    
+         else
             rm -f ${fitfile} >& /dev/null
          endif
 
@@ -1246,7 +1246,7 @@ manual_refit:
                       "newval='${rest_coord} ${sunits}'" >& /dev/null
          endif
 
-# Reset the System of the current WCS Frame to velocities in the desired 
+# Reset the System of the current WCS Frame to velocities in the desired
 # system and units.
          wcsattrib "ndf=${ripfile} mode=set name=System newval=${velsys}"
          wcsattrib "ndf=${ripfile} mode=set name=Unit newval=${vunits}"
@@ -1258,17 +1258,17 @@ manual_refit:
 
          if ( ${dovar} == "TRUE" ) then
             echo "        (X,Y) Pixel: ${xgrid}:${ygrid}"
-            echo -n "        Line Velocity: $velocity" 
+            echo -n "        Line Velocity: $velocity"
          else
             echo "        (X,Y) Pixel: ${xgrid},${ygrid}"
-            echo "        Line Velocity: $velocity ${vunits}" 
+            echo "        Line Velocity: $velocity ${vunits}"
          endif
          echo " "
 
 # Change the pixel value.
          set pixel = "${xgrid}:${xgrid},${ygrid}:${ygrid}"
          chpix in=${outfile}_tmp out=${outfile} comp="Data"\
-               newval=${velocity} section=\'${pixel}\' 
+               newval=${velocity} section=\'${pixel}\'
 
          if ( -e ${outfile}.sdf ) then
             rm -f ${outfile}_tmp.sdf >& /dev/null
@@ -1292,7 +1292,7 @@ manual_refit:
                wcstran "ndf=${ripfile} posin=${upp_err} framein=AXIS" \
                        "frameout=${new_wcsframe}" >& /dev/null
                set upp_vel = `parget posout wcstran`
-                               
+
                set low_err = \
                  `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
                wcstran "ndf=${ripfile} posin=${low_err} framein=AXIS " \
@@ -1300,7 +1300,7 @@ manual_refit:
                set low_vel = `parget posout wcstran`
 
                set vel_err = \
-                 `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`  
+                 `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`
 
                if ( `echo "if ( $vel_err < 0.0 ) 1" | bc` ) then
                   set vel_err = `calc exp="'-($vel_err)'" prec=_double`
@@ -1313,7 +1313,7 @@ manual_refit:
             endif
 
 # Move the output file to a temporary place holder.
-            mv -f ${outfile}.sdf ${outfile}_tmp.sdf 
+            mv -f ${outfile}.sdf ${outfile}_tmp.sdf
 
 # Change the pixel variance.
             set pixel = "${xgrid}:${xgrid},${ygrid}:${ygrid}"
@@ -1326,7 +1326,7 @@ manual_refit:
                echo "WARNING: Inserting new variance value failed."
                mv -f ${outfile}_tmp.sdf ${outfile}.sdf
             endif
-        
+
 # Set the null values to the bad value (VAL__BADR).
             mv -f ${outfile}.sdf ${outfile}_tmp.sdf >& /dev/null
             setmagic in=${outfile}_tmp out=${outfile} \
@@ -1344,12 +1344,12 @@ manual_refit:
          lutspec device=${plotdev}
          echo " "
          echo "      Plotting:"
-         echo "        Display: Velocity map using percentile scaling." 
+         echo "        Display: Velocity map using percentile scaling."
          display "${outfile} device=${plotdev} mode=per percentiles=[2,98]"\
                  "axes=yes margin=! key keypos=0.12 " \
                   keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
          if ( $drawcontours == "TRUE" ) then
-            echo "        Contour: White-light image with equally spaced contours." 
+            echo "        Contour: White-light image with equally spaced contours."
             contour "ndf=${colfile} device=${plotdev} clear=no mode=equa"\
                     "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
                    "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
@@ -1377,7 +1377,7 @@ endif
 
 # Dropout point for an aborted fitting, try and salvage already existing
 # velocity maps that may be lying around instead of throwing them away.
-dropout:     
+dropout:
 if ( -e ${outfile}_tmp.sdf ) then
    if ( -e ${outfile}.sdf ) then
       rm -f ${outfile}_tmp.sdf

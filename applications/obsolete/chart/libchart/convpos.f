@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       DO K = 1, 3
          PART( K ) = 0.0D0
       END DO
-      LENGTH = LEN( STRING ) 
+      LENGTH = LEN( STRING )
       NCHAR = 0
       NEGNUM = INDEX( STRING, '-' ) .NE. 0
 
@@ -134,7 +134,7 @@
      :         'Invalid sexagesimal number', STATUS )
          END IF
       END DO
- 
+
 800   CONTINUE
       ANGLE = PART( 1 ) + PART( 2 ) / 6.0D1 + PART( 3 ) / 3.6D3
       IF ( NEGNUM ) ANGLE = -ANGLE

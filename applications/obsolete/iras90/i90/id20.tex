@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ The I90 library contains modules which define many constant values describing
 the IRAS mission and satellite, and the IRAS90 package. The symbolic names set
 up by I90 which refer to these constants should always be used in preference to
 the actual numerical values. For instance, if looping round all survey wavebands
-(i.e. 12, 25, 60 and 100 $\mu$m bands), the following code should be used: 
+(i.e. 12, 25, 60 and 100 $\mu$m bands), the following code should be used:
 
 \small
 \begin{verbatim}
@@ -70,7 +70,7 @@ the actual numerical values. For instance, if looping round all survey wavebands
 \end{verbatim}
 \normalsize
 
-rather than 
+rather than
 
 \small
 \begin{verbatim}
@@ -88,18 +88,18 @@ would go undetected by the compiler, and may give rise to some very obscure bugs
 which may take a long time to track down. On the other hand, if the symbolic
 name is used and accidentally mis-spelled, the compiler will issue a warning
 \footnotemark saying that the mis-spelled name has not been defined, enabling
-the mistake to be quickly identified and fixed. 
+the mistake to be quickly identified and fixed.
 \footnotetext{ This assumes that an IMPLICIT NONE statement has been included
 in the code, which should, of course, always be done anyway.}
 
 Using symbolic names has the additional advantage that it indicates what the
 value means, whereas the literal ``4'' in the second example could be 4
-detectors, 4 scans, 4 carrots, etc, etc. 
+detectors, 4 scans, 4 carrots, etc, etc.
 
 \section{Declaring the Constants}
 
 The value defined by I90 may be made available by including the following line
-in all Fortran source code modules which refer to any of the constant values: 
+in all Fortran source code modules which refer to any of the constant values:
 
 \small
 \begin{verbatim}
@@ -121,7 +121,7 @@ All the constants defined by I90 have names which start with ``I90\_\_''
 (note the {\em double} underscore). Single valued constants are defined by
 Fortran PARAMETER statements, and multi-valued constants (i.e. arrays) are
 defined by a BLOCKDATA module which stores the relevant values in arrays held in
-a common block. \footnotemark 
+a common block. \footnotemark
 \footnotetext{ The use of common arrays {\em as well as} parameter statements to
 define these constants is why the include file is called I90\_DAT and not
 I90\_PAR as for other libraries.}
@@ -130,28 +130,28 @@ I90\_PAR as for other libraries.}
 
 This section lists the constants defined by I90, and their values.
 \subsection{Single Valued Constants}
-These constants are scalar values. Their values are shown in parenthesize at the 
+These constants are scalar values. Their values are shown in parenthesize at the
 end of the description.
 \begin{description}
 \item [I90\_\_BANDS] (INTEGER) The number of wavebands for survey array data (4).
 \item [I90\_\_CBNDS] (INTEGER) The number of wavebands for CPC data (2).
 \item [I90\_\_DETS]  (INTEGER) The total number of survey detectors (62).
 \item [I90\_\_FAC]   (INTEGER) The IRAS90 ADAM facility number, see SUN104 (1507).
-\item [I90\_\_MAXDT] (INTEGER) The maximum number of survey detectors per 
+\item [I90\_\_MAXDT] (INTEGER) The maximum number of survey detectors per
 waveband (16).
 \item [I90\_\_NDEAD] (INTEGER) The number of ``dead'' survey detectors (3).
-\item [I90\_\_NSMAL] (INTEGER) The number of detectors with cross-scan size less 
+\item [I90\_\_NSMAL] (INTEGER) The number of detectors with cross-scan size less
 than 4 arc-minutes (12).
 \item [I90\_\_SPEED] (REAL) The nominal survey scan speed in arc-minutes per
 second (3.85).
-\item [I90\_\_SMSIZ] (REAL) The cross scan size of the largest ``small'' 
+\item [I90\_\_SMSIZ] (REAL) The cross scan size of the largest ``small''
 detector (as specified by I90\_\_SMALL), in arc-minutes (3.47).
 \end{description}
 
 \newpage
 \subsection{Multi Valued Constants}
-These constants are arrays of values. The dimensions of these arrays are given 
-in terms of the scalar constants described above, and are shown in parenthesize 
+These constants are arrays of values. The dimensions of these arrays are given
+in terms of the scalar constants described above, and are shown in parenthesize
 after the name of each constant.
 
 \paragraph{INTEGER valued constants...}
@@ -159,8 +159,8 @@ after the name of each constant.
 \item {\bf I90\_\_BDETS} ( I90\_\_MAXDT, I90\_\_BANDS ) - Detector numbers in each band in
 cross scan order. The first array index is the cross scan position of the detector.
 Position 1 is at the highest focal plane Z coordinate value, and position
-I90\_\_MAXDT is at the lowest Z value. The second array index is the waveband 
-index. 
+I90\_\_MAXDT is at the lowest Z value. The second array index is the waveband
+index.
 
 \begin{minipage}[t]{\textwidth}
 \small
@@ -182,8 +182,8 @@ The first array index is the CPC waveband index.
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
-     CPC waveband index                           
-          1   2   
+     CPC waveband index
+          1   2
          50, 100
 \end{verbatim}
 \normalsize
@@ -216,7 +216,7 @@ The first array index is the detector number.
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
-            index                           
+            index
           1   2   3
           17, 20, 36
 \end{verbatim}
@@ -226,14 +226,14 @@ The first array index is the detector number.
 \item {\bf I90\_\_DETGP} ( I90\_\_DETS ) - A ``group number'' is assigned to
 each detector. The detectors within each waveband are divided into 3 groups
 according to their cross scan sizes. Detectors in group 1 are small size,
-detectors in group 2 are medium size and in 3 are full size. 
+detectors in group 2 are medium size and in 3 are full size.
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
                                  detector number
           1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
-          3   3   3   2   3   3   3   3   3   3   1   2   3   3   3   3 
+          3   3   3   2   3   3   3   3   3   3   1   2   3   3   3   3
 
          17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32
           3   3   2   3   3   2   3   3   3   1   2   3   3   3   1   3
@@ -247,7 +247,7 @@ detectors in group 2 are medium size and in 3 are full size.
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_NDETS} ( I90\_\_BANDS ) - The number of detectors in each survey 
+\item {\bf I90\_\_NDETS} ( I90\_\_BANDS ) - The number of detectors in each survey
 waveband. First array index is the survey waveband index.
 
 
@@ -261,27 +261,27 @@ waveband. First array index is the survey waveband index.
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_SMALL} ( I90\_\_NSMAL ) - Detector number of all detectors less than 4 
+\item {\bf I90\_\_SMALL} ( I90\_\_NSMAL ) - Detector number of all detectors less than 4
 arc-minutes cross scan size (in arbitrary order).
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
-                               index                           
-          1   2   3   4   5   6   7   8   9   10  11  12 
-          11, 12, 26, 27, 31, 38, 39, 46, 47, 54, 55, 62 
+                               index
+          1   2   3   4   5   6   7   8   9   10  11  12
+          11, 12, 26, 27, 31, 38, 39, 46, 47, 54, 55, 62
 \end{verbatim}
 \normalsize
 \end{minipage}
 
 \item {\bf I90\_\_SRATE} ( I90\_\_BANDS ) - Sampling frequency (in Hz) for
-each waveband. 
+each waveband.
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
               band
-          1   2   3   4   
+          1   2   3   4
           16, 16, 8,  4
 \end{verbatim}
 \normalsize
@@ -294,7 +294,7 @@ each survey band.
 \small
 \begin{verbatim}
               band
-          1   2   3   4   
+          1   2   3   4
           12, 25, 60, 100
 \end{verbatim}
 \normalsize
@@ -314,7 +314,7 @@ each survey band.
          48, 32, 40, 56, 28, 13, 20,  5, 52, 36, 44, 60, 24,  9, 17,  2,
 
          33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48
-         49, 33, 41, 57, 29, 14, 21,  6, 53, 37, 45, 61, 25, 10, 18,  3, 
+         49, 33, 41, 57, 29, 14, 21,  6, 53, 37, 45, 61, 25, 10, 18,  3,
 
          49  50  51  52  53  54  55  56  57  58  59  60  61  62
          50, 34, 42, 58, 30, 15,  7, 22, 54, 38, 62, 46, 11, 26
@@ -327,32 +327,32 @@ each survey band.
 \begin{itemize}
 \item {\bf I90\_\_BANDW} ( I90\_\_BANDS ) -  Effective detector band widths (in Hz) for
 each survey waveband. Taken from the IRAS Catalogues and Atlases Explanatory
-Supplement, 2nd edition (``{\em Exp. Supp}'') page X-13. 
+Supplement, 2nd edition (``{\em Exp. Supp}'') page X-13.
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
                           band
-              1        2        3        4   
-          13.48E12, 5.16E12, 2.58E12, 1.00E12 
+              1        2        3        4
+          13.48E12, 5.16E12, 2.58E12, 1.00E12
 \end{verbatim}
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_BNEFD} ( I90\_\_BANDS ) -  Mean Noise Equivalent Flux Density (in Jy) 
+\item {\bf I90\_\_BNEFD} ( I90\_\_BANDS ) -  Mean Noise Equivalent Flux Density (in Jy)
 for each survey waveband. Taken from {\em Exp. Supp.} Fig. IV.A.1.
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
                      band
-            1      2      3      4   
+            1      2      3      4
           0.105, 0.125, 0.170, 0.580
 \end{verbatim}
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_DETDY} ( I90\_\_DETS ) -   In-scan detector mask sizes in arc-minutes. 
+\item {\bf I90\_\_DETDY} ( I90\_\_DETS ) -   In-scan detector mask sizes in arc-minutes.
 Taken from {\em Exp. Supp.} table II.C.3. First array index is detector number.
 
 \begin{minipage}[t]{\textwidth}
@@ -360,19 +360,19 @@ Taken from {\em Exp. Supp.} table II.C.3. First array index is detector number.
 \begin{verbatim}
                                 detector number
            1      2      3      4      5      6      7      8      9
-         3.03,  3.03,  3.03,  3.03,  3.03,  3.03,  3.03,  1.51,  1.51,  
+         3.03,  3.03,  3.03,  3.03,  3.03,  3.03,  3.03,  1.51,  1.51,
 
           10     11     12     13     14     15     16     17     18
-         1.51,  1.51,  1.51,  1.51,  1.51,  1.51,  0.76,  0.76,  0.76,  
+         1.51,  1.51,  1.51,  1.51,  1.51,  1.51,  0.76,  0.76,  0.76,
 
           19     20     21     22     23     24     25     26     27
-         0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  
+         0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,
 
           28     29     30     31     32     33     34     35     36
-         0.76,  0.76,  0.76,  1.51,  1.51,  1.51,  1.51,  1.51,  1.51,  
+         0.76,  0.76,  0.76,  1.51,  1.51,  1.51,  1.51,  1.51,  1.51,
 
           37     38     39     40     41     42     43     44     45
-         1.51,  1.51,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  
+         1.51,  1.51,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,
 
           46     47     48     49     50     51     52     53     54
          0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,  0.76,
@@ -392,19 +392,19 @@ Taken from {\em Exp. Supp.}  table II.C.3. First array index is detector number.
 \begin{verbatim}
                                 detector number
            1      2      3      4      5      6      7      8      9
-         5.05,  5.05,  5.05,  4.68,  5.05,  5.05,  5.05,  4.75,  4.75,  
+         5.05,  5.05,  5.05,  4.68,  5.05,  5.05,  5.05,  4.75,  4.75,
 
           10     11     12     13     14     15     16     17     18
-         4.75,  1.30,  3.45,  4.75,  4.75,  4.75,  4.65,  4.65,  4.65,  
+         4.75,  1.30,  3.45,  4.75,  4.75,  4.75,  4.65,  4.65,  4.65,
 
           19     20     21     22     23     24     25     26     27
-         4.48,  4.65,  4.65,  4.48,  4.45,  4.45,  4.45,  1.20,  3.33,  
+         4.48,  4.65,  4.65,  4.48,  4.45,  4.45,  4.45,  1.20,  3.33,
 
           28     29     30     31     32     33     34     35     36
-         4.55,  4.55,  4.55,  1.28,  4.75,  4.75,  4.75,  4.75,  4.75,  
+         4.55,  4.55,  4.55,  1.28,  4.75,  4.75,  4.75,  4.75,  4.75,
 
           37     38     39     40     41     42     43     44     45
-         4.75,  3.47,  2.33,  4.65,  4.65,  4.65,  4.65,  4.65,  4.65,  
+         4.75,  3.47,  2.33,  4.65,  4.65,  4.65,  4.65,  4.65,  4.65,
 
           46     47     48     49     50     51     52     53     54
          2.33,  1.18,  4.55,  4.55,  4.55,  4.55,  4.55,  4.55,  3.36,
@@ -416,7 +416,7 @@ Taken from {\em Exp. Supp.}  table II.C.3. First array index is detector number.
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_DETY} ( I90\_\_DETS ) -    Focal plane Y value (in arc-minutes) at 
+\item {\bf I90\_\_DETY} ( I90\_\_DETS ) -    Focal plane Y value (in arc-minutes) at
 detector centres. Taken from {\em Exp. Supp.} table II.C.3. First array index is detector number.
 
 \begin{minipage}[t]{\textwidth}
@@ -424,19 +424,19 @@ detector centres. Taken from {\em Exp. Supp.} table II.C.3. First array index is
 \begin{verbatim}
                                 detector number
            1      2      3      4      5      6      7      8      9
-         27.87, 27.80, 27.86, 23.83, 24.04, 23.65, 23.78, 19.64, 19.72, 
+         27.87, 27.80, 27.86, 23.83, 24.04, 23.65, 23.78, 19.64, 19.72,
 
           10     11     12     13     14     15     16     17     18
-         19.74, 19.70, 17.20, 17.19, 17.20, 17.20, 14.01, 14.04, 14.04, 
+         19.74, 19.70, 17.20, 17.19, 17.20, 17.20, 14.01, 14.04, 14.04,
 
           19     20     21     22     23     24     25     26     27
-         12.24, 12.27, 12.26, 12.27,  9.47,  9.46,  9.47,  9.48,  7.71,  
+         12.24, 12.27, 12.26, 12.27,  9.47,  9.46,  9.47,  9.48,  7.71,
 
           28     29     30     31     32     33     34     35     36
-          7.71,  7.70,  7.71,  4.56,  4.59,  4.58,  4.59,  2.06,  2.06,  
+          7.71,  7.70,  7.71,  4.56,  4.59,  4.58,  4.59,  2.06,  2.06,
 
           37     38     39     40     41     42     43     44     45
-          2.11,  2.10, -1.16, -1.16, -1.16, -1.14, -2.92, -2.92, -2.93, 
+          2.11,  2.10, -1.16, -1.16, -1.16, -1.14, -2.92, -2.92, -2.93,
 
           46     47     48     49     50     51     52     53     54
          -2.92, -5.67, -5.67, -5.67, -5.66, -7.42, -7.43, -7.43, -7.42,
@@ -455,10 +455,10 @@ detector centres. Taken from {\em Exp.  Supp.} table II.C.3. First array index i
 \small
 \begin{verbatim}
                                 detector number
-           1       2       3       4       5       6       7       8      
+           1       2       3       4       5       6       7       8
          8.71,   0.04,  -8.62,  12.86,   4.37,  -4.29, -12.77,   9.80,
 
-           9      10      11      12      13      14      15      16      
+           9      10      11      12      13      14      15      16
          1.14,  -7.53, -14.46,  13.49,   5.47,  -3.20, -11.86,   8.71,
 
           17      18      19      20      21      22      23      24
@@ -491,19 +491,19 @@ for each detector. Taken from {\em Exp.  Supp.} Fig IV.A.1. First array index is
 \begin{verbatim}
                                 detector number
            1      2      3      4      5      6      7      8      9
-         0.75,  0.45,  0.45,  0.65,  0.75,  0.45,  0.65,  0.16,  0.19,  
+         0.75,  0.45,  0.45,  0.65,  0.75,  0.45,  0.65,  0.16,  0.19,
 
           10     11     12     13     14     15     16     17     18
-         0.16,  0.14,  0.19,  0.16,  0.16,  0.16,  0.14,  0.00,  0.14,  
+         0.16,  0.14,  0.19,  0.16,  0.16,  0.16,  0.14,  0.00,  0.14,
 
           19     20     21     22     23     24     25     26     27
-         0.12,  0.00,  0.12,  0.14,  0.12,  0.09,  0.29,  0.12,  0.12,  
+         0.12,  0.00,  0.12,  0.14,  0.12,  0.09,  0.29,  0.12,  0.12,
 
           28     29     30     31     32     33     34     35     36
-         0.16,  0.12,  0.12,  0.16,  0.16,  0.21,  0.19,  0.16,  0.00,  
+         0.16,  0.12,  0.12,  0.16,  0.16,  0.21,  0.19,  0.16,  0.00,
 
           37     38     39     40     41     42     43     44     45
-         0.16,  0.16,  0.09,  0.14,  0.12,  0.24,  0.14,  0.14,  0.12,  
+         0.16,  0.16,  0.09,  0.14,  0.12,  0.24,  0.14,  0.14,  0.12,
 
           46     47     48     49     50     51     52     53     54
          0.09,  0.09,  0.12,  0.09,  0.09,  0.09,  0.09,  0.09,  0.09,
@@ -516,39 +516,39 @@ for each detector. Taken from {\em Exp.  Supp.} Fig IV.A.1. First array index is
 \end{minipage}
 
 \item {\bf I90\_\_DY} ( I90\_\_BANDS ) -     In-scan size of detectors in each waveband, in
-arc-minutes. Taken from {\em Exp. Supp.} table II.C.3. 
+arc-minutes. Taken from {\em Exp. Supp.} table II.C.3.
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
                     band
-            1     2     3     4   
+            1     2     3     4
           0.76, 0.76, 1.51, 3.03
 \end{verbatim}
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_DZ} ( I90\_\_BANDS ) -     Maximum cross-scan size of detectors in each 
+\item {\bf I90\_\_DZ} ( I90\_\_BANDS ) -     Maximum cross-scan size of detectors in each
 band, in arc-minutes. Taken from {\em Exp. Supp.} table II.C.3.
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
                     band
-            1     2     3     4   
+            1     2     3     4
           4.55, 4.65, 4.75, 5.05
 \end{verbatim}
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_JY} ( I90\_\_BANDS ) -     Factors for converting flux values in units 
+\item {\bf I90\_\_JY} ( I90\_\_BANDS ) -     Factors for converting flux values in units
 of $pW.m^{-2}$ to flux density in Jy (based on I90\_\_BANDW).
 
 \begin{minipage}[t]{\textwidth}
 \small
 \begin{verbatim}
                     band
-            1     2      3      4   
+            1     2      3      4
           7.42, 19.38, 38.76, 100.00
 \end{verbatim}
 \normalsize
@@ -561,13 +561,13 @@ factors.
 \small
 \begin{verbatim}
                     band
-            1     2     3     4   
+            1     2     3     4
           0.97, 0.98, 0.93, 0.74
 \end{verbatim}
 \normalsize
 \end{minipage}
 
-\item {\bf I90\_\_SOLAN} ( I90\_\_DETS ) -   Effective solid angle of each detector in 
+\item {\bf I90\_\_SOLAN} ( I90\_\_DETS ) -   Effective solid angle of each detector in
 units of 1.0E-7 of a steradians. Calculated by M. Moshir (see IPAC memo
 701-88-54 (1)). Dead detectors have a value of zero. First array index is detector number.
 
@@ -576,19 +576,19 @@ units of 1.0E-7 of a steradians. Calculated by M. Moshir (see IPAC memo
 \begin{verbatim}
                                 detector number
            1      2      3      4      5      6      7      8      9
-         14.1,  13.7,  12.9,  13.1,  13.2,  13.2,  13.6,  6.10,  6.04,  
+         14.1,  13.7,  12.9,  13.1,  13.2,  13.2,  13.6,  6.10,  6.04,
 
           10     11     12     13     14     15     16     17     18
-         6.07,  1.92,  4.85,  6.10,  6.19,  6.56,  3.39,   0.0,  3.46,  
+         6.07,  1.92,  4.85,  6.10,  6.19,  6.56,  3.39,   0.0,  3.46,
 
           19     20     21     22     23     24     25     26     27
-         3.40,   0.0,  3.48,  3.38,  3.21,  3.22,  3.17,  0.92,  2.41,  
+         3.40,   0.0,  3.48,  3.38,  3.21,  3.22,  3.17,  0.92,  2.41,
 
           28     29     30     31     32     33     34     35     36
-         2.95,  3.25,  3.25,  1.97,  6.40,  6.32,  6.25,  6.36,   0.0,  
+         2.95,  3.25,  3.25,  1.97,  6.40,  6.32,  6.25,  6.36,   0.0,
 
           37     38     39     40     41     42     43     44     45
-         6.37,  4.84,  1.82,  3.50,  3.44,  3.48,  3.50,  3.45,  3.46,  
+         6.37,  4.84,  1.82,  3.50,  3.44,  3.48,  3.50,  3.45,  3.46,
 
           46     47     48     49     50     51     52     53     54
          1.78,  0.89,  3.31,  3.22,  3.29,  3.25,  3.19,  3.24,  2.45,
@@ -604,7 +604,7 @@ units of 1.0E-7 of a steradians. Calculated by M. Moshir (see IPAC memo
 
 Some of the constants are defined within a BLOCKDATA module which resides in an
 object library (or archive), and applications which include I90\_DAT must link
-with this library using the IRAS90\_LINK and IRAS90\_LINK\_ADAM options files on 
+with this library using the IRAS90\_LINK and IRAS90\_LINK\_ADAM options files on
 VMS and the {\bf iras90\_link} and {\bf iras90\_link\_adam} scripts on UNIX.
 \end{document}
 

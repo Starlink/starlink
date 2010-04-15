@@ -52,7 +52,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,11 +108,11 @@
       CHARACTER * ( 1 ) CHITYPES( CHI__NUMCOLS )
       CHARACTER * ( CHI__SZCUNIT) CHIUNITS( CHI__NUMCOLS )
       CHARACTER * ( CHI__SZCCMT) CHICOMMENTS( CHI__NUMCOLS )
-      LOGICAL CHIMDATAACC( CHI__NUMCOLS ) 
-      LOGICAL CHIDATAACC( CHI__NUMCOLS ) 
-       
+      LOGICAL CHIMDATAACC( CHI__NUMCOLS )
+      LOGICAL CHIDATAACC( CHI__NUMCOLS )
 
-*- 
+
+*-
 *
 *.
 
@@ -120,7 +120,7 @@
 *
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-      call chp_opensaddf(dir, input, 'READ', 'LIST', CHP__SZDREC, 
+      call chp_opensaddf(dir, input, 'READ', 'LIST', CHP__SZDREC,
      :                   fdd, status)
 *
 *    Abort if failed to open file okay
@@ -131,7 +131,7 @@
       CPname(cd) = input
 *
 *    Check through the file looking for the general catalogue
-*    information. This will tell us if this is an extension 
+*    information. This will tell us if this is an extension
 *    catalogue.
 *
       extnotfnd = .TRUE.
@@ -174,7 +174,7 @@
         call chi_gallcd(input,numchicols, chinames, chiformats,
      :          chitypes, chiunits, chicomments, chimdataacc,
      :          chidataacc, status)
-        CPnumcols(cd) = numchicols 
+        CPnumcols(cd) = numchicols
         do ed = 1, numchicols
           EPname(cd,ed) = chinames(ed)
           EPformat(cd,ed) = chiformats(ed)
@@ -208,12 +208,12 @@
 *    Non standard format flag.
 *    Non standard format.
 *    Column array type
-*            
+*
             if (Dbuf(CHP_S_KEY:CHP_E_KEY) .eq. 'A') then
                tempname = Dbuf(CHP_S_CNAME:CHP_E_CNAME)
                ednotfound = .TRUE.
                edcount = 1
-               do while (ednotfound .and. edcount .le. CPnumcols(cd)) 
+               do while (ednotfound .and. edcount .le. CPnumcols(cd))
                   if (EPname(cd,edcount) .eq. tempname) then
                     ted = edcount
                     ednotfound = .FALSE.
@@ -222,7 +222,7 @@
                   endif
                enddo
                if (ednotfound) then
-                 CPnumcols(cd) = CPnumcols(cd) + 1 
+                 CPnumcols(cd) = CPnumcols(cd) + 1
                  ed = ed + 1
                  ted = ed
                  EPname(cd,ed) = tempname
@@ -291,7 +291,7 @@
                tempname = Dbuf(CHP_S_CNAME:CHP_E_CNAME)
                ednotfound = .TRUE.
                edcount = 1
-               do while (ednotfound .and. edcount .le. CPnumcols(cd)) 
+               do while (ednotfound .and. edcount .le. CPnumcols(cd))
                   if (EPname(cd,edcount) .eq. tempname) then
                     ted = edcount
                     ednotfound = .FALSE.
@@ -300,7 +300,7 @@
                   endif
                enddo
                if (ednotfound) then
-                 CPnumcols(cd) = CPnumcols(cd) + 1 
+                 CPnumcols(cd) = CPnumcols(cd) + 1
                  ed = ed + 1
                  ted = ed
                  EPname(cd,ed) = tempname
@@ -331,7 +331,7 @@
                tempname = Dbuf(CHP_S_CNAME:CHP_E_CNAME)
                ednotfound = .TRUE.
                edcount = 1
-               do while (ednotfound .and. edcount .le. CPnumcols(cd)) 
+               do while (ednotfound .and. edcount .le. CPnumcols(cd))
                   if (EPname(cd,edcount) .eq. tempname) then
                     ted = edcount
                     ednotfound = .FALSE.
@@ -340,7 +340,7 @@
                   endif
                enddo
                if (ednotfound) then
-                 CPnumcols(cd) = CPnumcols(cd) + 1 
+                 CPnumcols(cd) = CPnumcols(cd) + 1
                  ed = ed + 1
                  ted = ed
                  EPname(cd,ed) = tempname
@@ -349,8 +349,8 @@
      :              partexpnum, status)
                startpos = partexpnum * 80 + 1
                endpos = startpos + 79
-               EPassexp(cd,ted)(startpos:endpos) = 
-     :            Dbuf(CHP_S_CASSEXP:CHP_E_CASSEXP) 
+               EPassexp(cd,ted)(startpos:endpos) =
+     :            Dbuf(CHP_S_CASSEXP:CHP_E_CASSEXP)
 *
 *   If the key is 'D' then this is additional column information
 *   virtual column expression information
@@ -363,7 +363,7 @@
                tempname = Dbuf(CHP_S_CNAME:CHP_E_CNAME)
                ednotfound = .TRUE.
                edcount = 1
-               do while (ednotfound .and. edcount .le. CPnumcols(cd)) 
+               do while (ednotfound .and. edcount .le. CPnumcols(cd))
                   if (EPname(cd,edcount) .eq. tempname) then
                     ted = edcount
                     ednotfound = .FALSE.
@@ -372,7 +372,7 @@
                   endif
                enddo
                if (ednotfound) then
-                 CPnumcols(cd) = CPnumcols(cd) + 1 
+                 CPnumcols(cd) = CPnumcols(cd) + 1
                  ed = ed + 1
                  ted = ed
                  EPname(cd,ed) = tempname
@@ -381,8 +381,8 @@
      :              partexpnum, status)
                startpos = partexpnum * 80 + 1
                endpos = startpos + 79
-               EPvcexp(cd,ted)(startpos:endpos) = 
-     :            Dbuf(CHP_S_CASSEXP:CHP_E_CASSEXP) 
+               EPvcexp(cd,ted)(startpos:endpos) =
+     :            Dbuf(CHP_S_CASSEXP:CHP_E_CASSEXP)
                EPvcflag(cd,ted) = .TRUE.
 *
 *   If the key is 'F' then this is parameter information.
@@ -398,7 +398,7 @@
                tempname = Dbuf(CHP_S_PNAME:CHP_E_PNAME)
                pdnotfound = .TRUE.
                pdcount = 1
-               do while (pdnotfound .and. pdcount .le. CPnumpars(cd)) 
+               do while (pdnotfound .and. pdcount .le. CPnumpars(cd))
                   if (PPname(cd,pdcount) .eq. tempname) then
                     tpd = pdcount
                     pdnotfound = .FALSE.
@@ -407,7 +407,7 @@
                   endif
                enddo
                if (pdnotfound) then
-                 CPnumpars(cd) = CPnumpars(cd) + 1 
+                 CPnumpars(cd) = CPnumpars(cd) + 1
                  tpd = CPnumpars(cd)
                  PPname(cd,tpd) = tempname
                endif
@@ -435,7 +435,7 @@
                tempname = Dbuf(CHP_S_PNAME:CHP_E_PNAME)
                pdnotfound = .TRUE.
                pdcount = 1
-               do while (pdnotfound .and. pdcount .le. CPnumpars(cd)) 
+               do while (pdnotfound .and. pdcount .le. CPnumpars(cd))
                   if (PPname(cd,pdcount) .eq. tempname) then
                     tpd = pdcount
                     pdnotfound = .FALSE.
@@ -444,7 +444,7 @@
                   endif
                enddo
                if (pdnotfound) then
-                 CPnumpars(cd) = CPnumpars(cd) + 1 
+                 CPnumpars(cd) = CPnumpars(cd) + 1
                  tpd = CPnumpars(cd)
                  PPname(cd,tpd) = tempname
                endif
@@ -490,7 +490,7 @@
                tempname = Dbuf(CHP_S_PNAME:CHP_E_PNAME)
                pdnotfound = .TRUE.
                pdcount = 1
-               do while (pdnotfound .and. pdcount .le. CPnumpars(cd)) 
+               do while (pdnotfound .and. pdcount .le. CPnumpars(cd))
                   if (PPname(cd,pdcount) .eq. tempname) then
                     tpd = pdcount
                     pdnotfound = .FALSE.
@@ -499,7 +499,7 @@
                   endif
                enddo
                if (pdnotfound) then
-                 CPnumpars(cd) = CPnumpars(cd) + 1 
+                 CPnumpars(cd) = CPnumpars(cd) + 1
                  tpd = CPnumpars(cd)
                  PPname(cd,tpd) = tempname
                endif
@@ -606,7 +606,7 @@
 *    Catalogue Delete Indicator.
 *    Catalogue Frequency Flag.
 *    Catalogue access Flag.
-*            
+*
            elseif (Dbuf(CHP_S_KEY:CHP_E_KEY) .eq. 'P') then
                Dbuf(CHP_S_CATNAME:CHP_E_CATNAME) = input
                if (Dbuf(CHP_S_CATDELIND:CHP_E_CATDELIND) .eq. 'T') then

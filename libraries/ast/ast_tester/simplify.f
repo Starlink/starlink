@@ -4,7 +4,7 @@
 *     simplify <in file> <out file>
 
 *  Description:
-*     Reads a Mapping from "in file" (as an AST dump), and writes out the 
+*     Reads a Mapping from "in file" (as an AST dump), and writes out the
 *     simplified Mapping to "out file".
 
 *  Parameters:
@@ -41,7 +41,7 @@
       CHAN = AST_CHANNEL( SOURCE, AST_NULL, ' ', STATUS )
       OBJECT = AST_READ( CHAN, STATUS )
       CALL AST_ANNUL( CHAN, STATUS )
-      CLOSE( 10 )          
+      CLOSE( 10 )
 
 *
 * Abort if no object was read.
@@ -52,7 +52,7 @@
          RETURN
 
 *
-* Otherwise write out the simplified Mapping 
+* Otherwise write out the simplified Mapping
 *
       ELSE
          CALL GETARG( 2, OFILE )
@@ -69,7 +69,7 @@
          END IF
          CALL AST_ANNUL( CHAN, STATUS )
          CALL AST_ANNUL( SMAP, STATUS )
-         CLOSE( 10 )          
+         CLOSE( 10 )
       END IF
 
 

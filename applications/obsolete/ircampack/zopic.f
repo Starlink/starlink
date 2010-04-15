@@ -38,7 +38,7 @@
 *        a FRAME picture. Only used if the current picture does not
 *        contain a DATA picture.
 *     COMMNT = CHARACTER * ( * ) (Given)
-*        A comment to store with the new FRAME picture. 
+*        A comment to store with the new FRAME picture.
 *     ASPKEY = REAL (Given)
 *        The aspect ratio required for the KEY zone.
 *     XLO = REAL (Given and Returned)
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -157,7 +157,7 @@
 
       REAL
      :        ASPDAT,          ! Aspect ratio required for the DATA zone
-     :        DX1, DX2, DY1, DY2,! DATA zone size 
+     :        DX1, DX2, DY1, DY2,! DATA zone size
      :        KX, KY,          ! A point on top edge of the DATA zone
      :        X1, X2, Y1, Y2   ! Zone size in world co-ordinates
 
@@ -175,7 +175,7 @@
       CALL ERR_MARK
 
 *  See if the current picture is a DATA picture or contains a DATA
-*  picture. 
+*  picture.
       CALL KPG1_AGFND( 'DATA', PICIDD, STATUS )
 
 *  If a DATA picture was found...
@@ -303,7 +303,7 @@
 
 * Create the DATA zone.
          CALL SGS_ZONE( DX1, DX2, DY1, DY2, ZONED, STATUS )
-            
+
 *  Set the world coordinates of the DATA zone to be pixel coordinates.
          CALL SGS_SW( XLO, XHI, YLO, YHI, STATUS )
 
@@ -318,7 +318,7 @@
 *  the data zone.
             CALL SGS_TPZ( ZONED, XLO, YHI, ZONEK, KX, KY, STATUS )
 
-*  If the KEY zone extends above the top of the DATA zone, truncate it 
+*  If the KEY zone extends above the top of the DATA zone, truncate it
 *  (preserving its aspect ratio).
             IF( KY .LT. Y2 ) THEN
                X2 = X1 + ( X2 - X1 )*( KY - Y1 )/( Y2 - Y1 )
@@ -346,7 +346,7 @@
 *  Obtain and return the world coordinate bounds of the DATA zone.
       CALL SGS_SELZ( ZONED, STATUS )
       CALL SGS_IZONE( XLO, XHI, YLO, YHI, XM, YM )
-                  
+
 *  Re-select the original picture and zone.
       CALL AGI_SELP( PICID0, STATUS )
       CALL SGS_SELZ( ZONE0, STATUS )

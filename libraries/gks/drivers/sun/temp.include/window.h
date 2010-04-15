@@ -52,7 +52,7 @@ typedef enum {
 
     WIN_ERROR_MSG		= WIN_ATTR(ATTR_STRING, 32),
 
-    /*                          POSITION and SIZE		            */ 
+    /*                          POSITION and SIZE		            */
 
     WIN_X			= WIN_ATTR(ATTR_X, 33),
     WIN_Y			= WIN_ATTR(ATTR_Y, 34),
@@ -190,27 +190,27 @@ typedef enum {
 
 
 typedef enum {
-    
-    WIN_CREATE, 
+
+    WIN_CREATE,
     WIN_INSTALL,
     WIN_INSERT,
     WIN_REMOVE,
     WIN_DESTROY,
 
-    WIN_ADJUST_X, 
-    WIN_ADJUST_RIGHT_OF, 
-    WIN_ADJUST_Y, 
-    WIN_ADJUST_BELOW, 
-    WIN_ADJUST_WIDTH, 
-    WIN_ADJUST_HEIGHT, 
-    WIN_ADJUST_RECT, 
-    WIN_ADJUSTED, 
+    WIN_ADJUST_X,
+    WIN_ADJUST_RIGHT_OF,
+    WIN_ADJUST_Y,
+    WIN_ADJUST_BELOW,
+    WIN_ADJUST_WIDTH,
+    WIN_ADJUST_HEIGHT,
+    WIN_ADJUST_RECT,
+    WIN_ADJUSTED,
 
-    WIN_GET_X, 
-    WIN_GET_Y, 
-    WIN_GET_WIDTH, 
+    WIN_GET_X,
+    WIN_GET_Y,
+    WIN_GET_WIDTH,
     WIN_GET_HEIGHT,
-    WIN_GET_RECT, 
+    WIN_GET_RECT,
 
     WIN_LAYOUT,
 

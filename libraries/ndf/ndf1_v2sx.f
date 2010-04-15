@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -199,7 +199,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SB',
      :                                            STATUS )
@@ -281,7 +281,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -386,7 +386,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SUB',
      :                                            STATUS )
@@ -468,7 +468,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -573,7 +573,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SD',
      :                                            STATUS )
@@ -655,7 +655,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -760,7 +760,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SI',
      :                                            STATUS )
@@ -842,7 +842,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -947,7 +947,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SR',
      :                                            STATUS )
@@ -1029,7 +1029,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1134,7 +1134,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SW',
      :                                            STATUS )
@@ -1216,7 +1216,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1321,7 +1321,7 @@
      :   '^NNEG illegal negative variance value(s) encountered ' //
      :   '(first offending value was ^ERRVAL).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2SUW',
      :                                            STATUS )

@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -188,7 +188,7 @@
       DO K = 1, NPTS
 
 *  Check that the x co-ordinate is in range.  Exit with a failure if any
-*  of the x co-ordinates lie out of the Chebyshev range. 
+*  of the x co-ordinates lie out of the Chebyshev range.
          IF ( ( X( K ) - XMAX ) * ( X( K ) - XMIN ) .GT. 0.0E0 ) THEN
             IFAIL = 7
             GOTO 999

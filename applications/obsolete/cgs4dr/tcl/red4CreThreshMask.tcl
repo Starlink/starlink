@@ -1,6 +1,6 @@
 proc red4CreThreshMask {taskname array} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global cgs4drBitmaps
@@ -42,7 +42,7 @@ proc red4CreThreshMask {taskname array} {
     set Red4Widgets(TM_ENT02) [entry $mid.e2 -width 60]
     pack $Red4Widgets(TM_LAB02) $Red4Widgets(TM_ENT02) -in $mid -side left
     $Red4Widgets(TM_ENT02) insert end $Red4Widgets(MBPM)
- 
+
     set Red4Widgets(TM_LAB03) [label $bot.l3 -text "Port"]
     set p0 [radiobutton $bot.p0 -bitmap @$cgs4drBitmaps/port0.xbm -variable Red4Widgets(TM_RDISP) -value 0]
     set p1 [radiobutton $bot.p1 -bitmap @$cgs4drBitmaps/port1.xbm -variable Red4Widgets(TM_RDISP) -value 1]
@@ -110,7 +110,7 @@ proc red4CreThreshMask {taskname array} {
       $P4Task obey cursor "port=$port" -inform "cgs4drInform $taskname %V" -endmsg {set done_cval 1}
       tkwait variable done_cval
       set cursor_status -1
-      $P4Task get cursor_status -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V" 
+      $P4Task get cursor_status -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V"
       tkwait variable cursor_status
       set x -1
       $P4Task get x -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V"
@@ -125,7 +125,7 @@ proc red4CreThreshMask {taskname array} {
         $P4Task obey cursor "port=$port" -inform "cgs4drInform $taskname %V" -endmsg {set done_cval 1}
         tkwait variable done_cval
         set cursor_status -1
-        $P4Task get cursor_status -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V" 
+        $P4Task get cursor_status -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V"
         tkwait variable cursor_status
         set x -1
         $P4Task get x -getresponse "red4GetResponse $taskname %N %V %S" -inform "cgs4drInform $taskname %V"

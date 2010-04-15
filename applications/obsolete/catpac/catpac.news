@@ -2,7 +2,7 @@
                                                       Expires: 94.**.**
 
  The CATPAC package of catalogue manipulation applications has been
- made available on Unix.   CATPAC provides some of the functionality 
+ made available on Unix.   CATPAC provides some of the functionality
  of SCAR, pending a Unix replacement for SCAR.
 
  To start CATPAC from the shell type:

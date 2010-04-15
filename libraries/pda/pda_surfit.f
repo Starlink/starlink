@@ -407,7 +407,7 @@ c  we partition the working space and determine the spline approximation
      * eps,tol,maxit,nest,km1,km2,ib1,ib3,ncest,nrint,nreg,nx,tx,
      * ny,ty,c,fp,wrk1(1),wrk1(lfp),wrk1(lco),wrk1(lf),wrk1(lff),
      * wrk1(la),wrk1(lq),wrk1(lbx),wrk1(lby),wrk1(lsx),wrk1(lsy),
-     * wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)  
+     * wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)
 
  70   CONTINUE
 

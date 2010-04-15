@@ -1,22 +1,22 @@
       SUBROUTINE BEGIN_PLOT(NPARAMS,PARAMS,CPARAM,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    B E G I N _ P L O T
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), CPARAM (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Interface with PGBEGIN subroutine
 C
 C

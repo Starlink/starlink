@@ -1,22 +1,22 @@
 /*
  * gk9sci_.c --- module containing routines for handling cursor input for
- * RAL GKS on the SUN workstations. 
+ * RAL GKS on the SUN workstations.
  *
- * Based on routine gk9srl_.c which was written by 
+ * Based on routine gk9srl_.c which was written by
  * A C Arnold, University of Manchester Computer Graphics Unit,
  * Computer Building, Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x
- * 5405. 
+ * 5405.
  *
  * The routines should really map to GKS's FORTRAN common blocks to pick up
  * everything, but until I know how to do that I'll pass things as
- * parameters. It's also a single WS version. 
+ * parameters. It's also a single WS version.
  *
- * Maintenance log: 
+ * Maintenance log:
  *
  * ??? - created by ACA 26-Jan-1987 : Modified to be callable from GKS Replaced
  * su_initlocator by call to gkilc in su_reqlocator Added conversion to NDC
  * at end of su_reqlocator Various to support the above. Changed name to
- * gk9rlc. 
+ * gk9rlc.
  *
  *  26/02/87  PJWR  Corrected #includes for integration.
  *  18/03/87  TAW   Changed name to gk9srl_.
@@ -81,7 +81,7 @@ static struct ecb locator[]={
 static box echoarea;			/* Box for echo area */
 static window* echowin;			/* Saved digital echo window */
 
-f77_integer gk9sci_(keyhit, fxdc, fydc, inta, reala)		/* request 
+f77_integer gk9sci_(keyhit, fxdc, fydc, inta, reala)		/* request
 locator input */
   f77_integer *keyhit;
   f77_real *fxdc, *fydc;
@@ -155,14 +155,14 @@ locator input */
   line(x, ddwin->w_bm->bm_box.b_top, LNDRAWABS);
 }
 
-  static rubberband(x,y,inix,iniy) int x,y,inix,iniy; /* Display rubberband line 
+  static rubberband(x,y,inix,iniy) int x,y,inix,iniy; /* Display rubberband line
 */
 {
 	line(inix,iniy,LNMOVEABS);
 	line(x,y,LNDRAWABS);
 }
 
-  static rubberrect(x,y,inix,iniy) int x,y,inix,iniy; /* Display rubber 
+  static rubberrect(x,y,inix,iniy) int x,y,inix,iniy; /* Display rubber
 rectangle */
 {
 	line(inix,iniy,LNMOVEABS);
@@ -194,7 +194,7 @@ rectangle */
 	gk9soe(echoarea,"Locator device");
 	echoarea = ddbm->bm_box;
 
-	/* 
+	/*
 	 * Now save echo area window for deletion by gk9sce() and pop the
 	 * workstation window so events come from the display surface.
 	 */
@@ -231,7 +231,7 @@ rectangle */
   static cu_off()		/* Blanks cursor for crosshair PETs */
 {
   static char			/* Blank, transparent cursor */
-    blank_cursor[41] = 
+    blank_cursor[41] =
     {
       WWOR, 0, 0, 0, 0,
       0, 16, 0, 16,

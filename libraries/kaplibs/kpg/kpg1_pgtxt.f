@@ -13,14 +13,14 @@
 *     CALL KPG1_PGTXT( ANGLE, TEXT, X, Y, STATUS )
 
 *  Description:
-*     This routine plots the supplied text at a given angle using 
-*     PGPLOT, putting the bottom left corner of the text at the 
+*     This routine plots the supplied text at a given angle using
+*     PGPLOT, putting the bottom left corner of the text at the
 *     supplied position. The position at which another string must be
 *     drawn to concatenate it with the string just drawn is returned.
 
 *  Arguments:
 *     ANGLE = INTEGER (Given)
-*        The angle, in degrees, that the baseline is to make with the 
+*        The angle, in degrees, that the baseline is to make with the
 *        horizontal, increasing anti-clockwise (0.0 is horizontal).
 *     TEXT = CHARACTER * ( * ) (Given)
 *        The text to draw. The returned values of X and Y leave room for
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

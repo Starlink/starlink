@@ -21,9 +21,9 @@
 	IF( NUMBAD .NE. 0) THEN
 
 	  CALL MSG_SETI( 'NUMBAD', NUMBAD)
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :	    'Number of bad pixels in this image was ^NUMBAD', STATUS)
 
 	END IF
 
-	END 
+	END

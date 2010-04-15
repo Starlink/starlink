@@ -49,7 +49,7 @@
       INCLUDE 'SAE_PAR'
 
 *  Local Constants:
-      INTEGER MAXDIM      
+      INTEGER MAXDIM
       PARAMETER (MAXDIM=10)
 
 *  Functions
@@ -64,7 +64,7 @@
       INTEGER DSTAT              ! DTA status
       INTEGER ADDRESS            ! DSA address
       INTEGER SLOT               ! DSA slot
-      INTEGER NDIM               ! number of dimensions to original map data 
+      INTEGER NDIM               ! number of dimensions to original map data
       INTEGER DIMS(MAXDIM)       ! dimensions of original map
       INTEGER NELM               ! size of data array
       INTEGER DATPTR             ! pointer to input data
@@ -82,7 +82,7 @@
       CHARACTER*32 X_INFO (2)    ! output x-axis info
       CHARACTER*32 Y_INFO (2)    !    "   y-axis   "
       CHARACTER*128 DTA_NAME     ! DTA item name
-      CHARACTER*128 TSDAT_DTA_NAME ! DTA name for TSDAT structure in JCMT 
+      CHARACTER*128 TSDAT_DTA_NAME ! DTA name for TSDAT structure in JCMT
                                  ! structure
       CHARACTER*80 ERROR         ! DTA error translation
       CHARACTER*80 OUTFILE       ! output file name
@@ -96,7 +96,7 @@
       STATUS = 0
       CALL DSA_OPEN (STATUS)
 
-*  open the input file 
+*  open the input file
 
       CALL DSA_INPUT ('INPUT', 'INPUT', STATUS)
 
@@ -133,7 +133,7 @@
          ERRPTR = DYN_ELEMENT(ADDRESS)
       ENDIF
 
-*  map arrays in TSDAT that hold original map axes, and time-spectrum -> map 
+*  map arrays in TSDAT that hold original map axes, and time-spectrum -> map
 *  index, read in original axis labels and units. Axes and index are stored
 *  in old Figaro format as no one will ever want to access them with
 *  applications other than this one.
@@ -154,7 +154,7 @@
 
       IF ((DSTAT .EQ. 0) .AND. (STATUS .EQ. SAI__OK)) THEN
 
-         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.DATA', 0, 0, DTA_NAME, 
+         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.DATA', 0, 0, DTA_NAME,
      :      DSTAT)
          CALL DTA_SZVAR (DTA_NAME, 1, NDIM, DIMS(2), DSTAT)
          IF (DSTAT .NE. 0) THEN
@@ -169,10 +169,10 @@
             NELM = DIMS(2)
             CALL DTA_MUVARF (DTA_NAME, NELM, ADDRESS, DSTAT)
             TS_YAXPTR = DYN_ELEMENT (ADDRESS)
-            CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.UNITS', 0, 0, DTA_NAME, 
+            CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.UNITS', 0, 0, DTA_NAME,
      :         DSTAT)
             CALL DTA_RDVARC (DTA_NAME, 32, Y_INFO(1), DSTAT)
-            CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.LABEL', 0, 0, DTA_NAME, 
+            CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.LABEL', 0, 0, DTA_NAME,
      :         DSTAT)
             CALL DTA_RDVARC (DTA_NAME, 32, Y_INFO(2), DSTAT)
          END IF
@@ -210,22 +210,22 @@
 *  create and map output data, error and axis arrays
 
       CALL DSA_RESHAPE_DATA ('OUTPUT', 'INPUT', NDIM, DIMS, STATUS)
-      CALL DSA_COERCE_AXIS_DATA ('OUTPUT', 1, 'FLOAT', 1, DIMS(1), 
+      CALL DSA_COERCE_AXIS_DATA ('OUTPUT', 1, 'FLOAT', 1, DIMS(1),
      :   STATUS)
-      CALL DSA_COERCE_AXIS_DATA ('OUTPUT', 2, 'FLOAT', 1, DIMS(2), 
+      CALL DSA_COERCE_AXIS_DATA ('OUTPUT', 2, 'FLOAT', 1, DIMS(2),
      :   STATUS)
-      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
      :   SLOT, STATUS)
       OUTDPTR = DYN_ELEMENT(ADDRESS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, 
+         CALL DSA_MAP_ERRORS ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
      :      SLOT, STATUS)
          OUTEPTR = DYN_ELEMENT(ADDRESS)
       ENDIF
-      CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'FLOAT', ADDRESS,
      :   SLOT, STATUS)
-      XAXPTR = DYN_ELEMENT(ADDRESS)         
-      CALL DSA_MAP_AXIS_DATA ('OUTPUT', 2, 'WRITE', 'FLOAT', ADDRESS, 
+      XAXPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('OUTPUT', 2, 'WRITE', 'FLOAT', ADDRESS,
      :   SLOT, STATUS)
       YAXPTR = DYN_ELEMENT(ADDRESS)
 
@@ -255,7 +255,7 @@
 
          CALL GEN_MOVE (FSIZE*NELM, DYNAMIC_MEM(DATPTR),
      :      DYNAMIC_MEM(FW_PTR))
-         CALL JCMT_FUNSORT (DYNAMIC_MEM(IND_PTR), NELM, 
+         CALL JCMT_FUNSORT (DYNAMIC_MEM(IND_PTR), NELM,
      :      DYNAMIC_MEM(FW_PTR), DYNAMIC_MEM(OUTDPTR))
 
 *  same for errors
@@ -278,7 +278,7 @@
 
       END IF
 
-*  delete the TSDAT structure in the output JCMT structure 
+*  delete the TSDAT structure in the output JCMT structure
 
       CALL DTA_CRNAM ('OUTPUT', 'MORE.JCMT.TSDAT', 0, 0, TSDAT_DTA_NAME,
      :   DSTAT)

@@ -1,5 +1,5 @@
       SUBROUTINE MWDATA(NAXIS1, NAXIS2, D_VM, Q_VM, STATUS)
- 
+
 *+
 *
 *   Name:
@@ -23,18 +23,18 @@
 *   Import:
       INTEGER NAXIS1     ! axis1 size
       INTEGER NAXIS2     ! axis2 size
- 
+
 *   Export:
       INTEGER*4 D_VM     ! DATA VM
       INTEGER*4 Q_VM     ! QUAL VM
       INTEGER STATUS     ! status return
- 
+
 *   Release existing DATA_VM
       IF (D_VM.GT.0) CALL DLADR(D_VM, STATUS)
- 
+
 *   Release existing QUAL_VM
       IF (Q_VM.GT.0) CALL DLADR(Q_VM, STATUS)
- 
+
 *   Get new DATA_VM
       CALL ALADR('short\\', NAXIS1*NAXIS2, D_VM, STATUS)
 
@@ -44,7 +44,7 @@
          RETURN
 
       END IF
- 
+
 *   Get new QUAL_VM
       CALL ALADR('byte\\', NAXIS1*NAXIS2, Q_VM, STATUS)
 

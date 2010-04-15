@@ -7,7 +7,7 @@ C   -----------------------
 C
 C   Description
 C   -----------
-C   Returns the number and coordinates relative to (0,0,...) of all pixels 
+C   Returns the number and coordinates relative to (0,0,...) of all pixels
 C   adjacent to any pixel (i.e. horizontal, vertical, diagonal neighbours)
 C   in a notional image of given dimensionality. The central pixel is also
 C   counted and its coordinates returned.
@@ -29,7 +29,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -67,7 +67,7 @@ C
 C
 C   Initialize.
 C
-      NADJ=3**NDIM       
+      NADJ=3**NDIM
       DO I=1,6
         COORDS(I,1)=1
         COORDS(I,2)=2
@@ -75,7 +75,7 @@ C
       END DO
 C
 C   Compute coordinates of all pixels in a 3x3x3... image.
-C      
+C
       DO N=1,3
         DO M=1,3
           DO L=1,3
@@ -94,6 +94,6 @@ C
             END DO
           END DO
         END DO
-      END DO                     
+      END DO
 C
       END

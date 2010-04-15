@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_plane( smfData *data, smfArray *array, 
-*                         const char *fittype, int *status ) 
+*     smf_subtract_plane( smfData *data, smfArray *array,
+*                         const char *fittype, int *status )
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
@@ -38,7 +38,7 @@
 *     as each one is self-contained.
 
 
-*  Notes: 
+*  Notes:
 *     - See also smf_subtract_plane1 and smf_subtract_plane2
 
 *  Authors:
@@ -96,7 +96,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_plane"
 
-void smf_subtract_plane( smfData *data, smfArray *array, const char *fittype, 
+void smf_subtract_plane( smfData *data, smfArray *array, const char *fittype,
 			 int *status ) {
 
   double meansky;

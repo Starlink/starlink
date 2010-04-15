@@ -1,9 +1,9 @@
 *PAMELA
 *
 * Pamela NDF-based monolith to bundle together pamela data
-* reduction routines. Started transfer in Jan 1998. 
+* reduction routines. Started transfer in Jan 1998.
 *
-* Routines transferred: 
+* Routines transferred:
 *
 * "Tested" implies the routine has been got to work at least once
 * without obvious problems, but should not be regarded as a guarantee

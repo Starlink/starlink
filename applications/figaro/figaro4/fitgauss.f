@@ -373,7 +373,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -578,7 +578,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Find out and apply mask.
-      CALL SPD_CAAGR( DIALOG, MSKINI, .TRUE., VARUSE, COVRSX, NELM, 
+      CALL SPD_CAAGR( DIALOG, MSKINI, .TRUE., VARUSE, COVRSX, NELM,
      :                MSKDIM, %VAL( CNF_PVAL(PNTR(1)) ),
      :                %VAL( CNF_PVAL(PNTR(2)) ),
      :                %VAL( CNF_PVAL(PNTR(3)) ),
@@ -646,7 +646,7 @@
 
 *     Get residuals as difference of masked data minus guess data. Also
 *     need the range of residuals for plotting purposes.
-         CALL VEC_SUBR( .FALSE., MSKELM, 
+         CALL VEC_SUBR( .FALSE., MSKELM,
      :                  %VAL( CNF_PVAL(PNTR(4))+REALSZ*MSKELM ),
      :                  %VAL( CNF_PVAL(PNTR(8)) ),
      :                  %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
@@ -655,7 +655,7 @@
 
 *     Get masked 1/error as square root of weights. Can skip guess data.
          CALL VEC_SQRTR( .FALSE., MSKELM,
-     :                   %VAL( CNF_PVAL(PNTR(4))+2*REALSZ*MSKELM ), 
+     :                   %VAL( CNF_PVAL(PNTR(4))+2*REALSZ*MSKELM ),
      :                   %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *     Multiply residuals with 1/error.
@@ -695,7 +695,7 @@
 *        Plot guess (the whole lot).
             CALL SPD_WAAL( .TRUE., .TRUE., VARUSE, ZONID, PLABEL,
      :                      RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
-     :                      %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE, 
+     :                      %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
      :                      MASK, PLTRES, FITX, FITY, MSKELM,
      :                      %VAL( CNF_PVAL(PNTR(4)) ),
      :                      %VAL( CNF_PVAL(PNTR(7)) ),

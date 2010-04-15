@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -14,7 +14,7 @@
 \renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
 \markright{\stardocname}
 \setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}     
+\setlength{\textheight}{240mm}
 \setlength{\topmargin}{-5mm}
 \setlength{\oddsidemargin}{0mm}
 \setlength{\evensidemargin}{0mm}
@@ -77,7 +77,7 @@ in that it submits a batch job to run on a remote computer with only a single
 input file and a single output file (the log file from the batch job). The
 contents of the batch job input file could range from the most trivial (just a
 {\tt SHOW SYSTEM} command) to a complex set of VMS commands, but that is not
-particularly important here. 
+particularly important here.
 
 JTMP tasks are controlled by a JTMP input file (with default file type of {\tt
 .JIN}), of which the following is an example.
@@ -115,7 +115,7 @@ $ SEND LEICESTER_BATCH
 \item The {\tt \%TO} command defines which site the job is being sent to. In
 order to provide examples that have been thoroughly tested, the local site will
 be UK.AC.MANCHESTER.ASTRONOMY.STARLINK throughout this document. The remote site
-will be either UK.AC.LEICESTER.STARLINK when the remote machine is a VAX or 
+will be either UK.AC.LEICESTER.STARLINK when the remote machine is a VAX or
 UK.AC.MANCHESTER--COMPUTING--CENTRE.CMS for non-VAX examples. The {\tt
 NODEFAULT} qualifier says that the task should not get default input from a
 skeleton file (see section~\ref{skeletons}).
@@ -142,7 +142,7 @@ you for the name of the file. This lets you use the same {\tt .JIN} file to
 send many different tasks, although they would have to be to the same remote
 site. In this case there is only one input file that will be run as a batch job
 on the remote machine. A trivial example would be for this file to just contain
-the line 
+the line
 
 \begin{verbatim}
 $ SHOW SYSTEM
@@ -222,7 +222,7 @@ security is provided by the need to specify a username and password on the {\tt
 
 To send a single file to a remote computer, you can use the {\tt TRANSFER}
 command. Unfortunately this does not accept wild cards so multiple files
-cannot be sent in one transfer. An example of sending a single file using 
+cannot be sent in one transfer. An example of sending a single file using
 JTMP follows.
 The job input file {\tt SEND\_FILE.JIN} contains the following JTMP commands:
 
@@ -339,14 +339,14 @@ like UK.AC.\-LEICESTER.\-STARLINK\_DEFAULT.
 \section{Common problems}
 
 There are a few problem that the author has found can easily catch out the
-unwary. 
+unwary.
 
 It is natural to want to use the short form for the NRS names of the sites that
 need to be specified in the JIN file. Unfortunately the target of the output
 proforma (specified on the BEGIN command in the first example) must be given by
 the long form of the NRS name when using the current version (5.2) of the
 software. It is easy to forget this, and if you do remember that a long name is
-needed somewhere, it is even easier to forget exactly where it is. Consequently 
+needed somewhere, it is even easier to forget exactly where it is. Consequently
 it is recommended that you always use the long form of names in JIN files.
 
 A related problem with skeleton files is that module names in the skeleton file
@@ -377,7 +377,7 @@ Manchester.
 \begin{verbatim}
 
 From:   JTMP_Manager 29-AUG-1990 11:53:22.53
-To:     OPER        
+To:     OPER
 CC:
 Subj:   JTMP Report for Task : 0000018403
 
@@ -387,7 +387,7 @@ Report from UK.AC.LEICESTER.STARLINK
 Task type : DOCUMENT DISPOSITION
 Task has been accepted.
 
-Report message : 
+Report message :
 JTMP task analysed and accepted
 
 \end{verbatim}
@@ -395,7 +395,7 @@ JTMP task analysed and accepted
 \begin{verbatim}
 
 From:   JTMP_Manager 29-AUG-1990 11:53:29.31
-To:     OPER        
+To:     OPER
 CC:
 Subj:   JTMP Report for Task : 0000018403
 
@@ -406,7 +406,7 @@ Task type : DOCUMENT DISPOSITION
 Task successfully created.
 Target site : UK.AC.MANCHESTER.ASTRONOMY.STARLINK
 
-Report message : 
+Report message :
 Task name "UNNAMED" spawned
 
 Report from UK.AC.LEICESTER.STARLINK
@@ -414,7 +414,7 @@ Task type : DOCUMENT DISPOSITION
 Task terminated normally.
 Number of descriptors spawned : 1
 
-Report message : 
+Report message :
 normal successful completion
 
 \end{verbatim}
@@ -422,7 +422,7 @@ normal successful completion
 \begin{verbatim}
 
 From:   JTMP_Manager 29-AUG-1990 11:53:44.56
-To:     OPER        
+To:     OPER
 CC:
 Subj:   JTMP Report for Task : 0000018403
 

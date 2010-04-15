@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,7 +72,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Do loop index
-      LOGICAL FOUND              ! flag of finding the begin or end 
+      LOGICAL FOUND              ! flag of finding the begin or end
 
 *.
 
@@ -86,7 +86,7 @@
 *  Enter a do loop until the begin of non-zero sample is found.
       I = 1
       FOUND = .FALSE.
-      DO WHILE ( .NOT.FOUND .AND. I .LE. NSMP ) 
+      DO WHILE ( .NOT.FOUND .AND. I .LE. NSMP )
 
 *  Consider only those valid samples.
          IF ( DATA( I, LINNO ) .NE. VAL__BADR ) THEN
@@ -94,15 +94,15 @@
 *  If absolute value of this sample is larger than smallest real value,
 *  it is the first non-zero sample. Note down its index and set the
 *  found flag.
-            IF ( ABS( DATA( I, LINNO ) ) .GT. VAL__SMLR ) THEN 
+            IF ( ABS( DATA( I, LINNO ) ) .GT. VAL__SMLR ) THEN
                BG = I
                FOUND = .TRUE.
             END IF
          END IF
 
 *  Search for next sample, if begin has not found yet.
-         I = I + 1      
-      END DO      
+         I = I + 1
+      END DO
 
 *  Enter a do loop search for last non-zero sample.
       I = NSMP
@@ -115,17 +115,17 @@
 *  If absolute value of this sample is larger than smallest real value,
 *  it is the last non-zero sample. Note down its index and set the
 *  found flag.
-            IF ( ABS( DATA( I, LINNO ) ) .GT. VAL__SMLR ) THEN 
+            IF ( ABS( DATA( I, LINNO ) ) .GT. VAL__SMLR ) THEN
                ED = I
                FOUND = .TRUE.
             END IF
          END IF
 
 *  Search for next sample, if end has not found yet.
-         I = I - 1      
-      END DO      
+         I = I - 1
+      END DO
 
-*  Modify the returned indices to include the zero valued samples 
+*  Modify the returned indices to include the zero valued samples
 *  adjacent to the non-zero section.
       IF( BG .GT. 1 ) BG = BG - 1
       IF( ED .LT. NSMP ) ED = ED + 1

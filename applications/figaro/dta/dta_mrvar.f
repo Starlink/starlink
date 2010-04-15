@@ -3,21 +3,21 @@ C+
 C
 C     D T A _ M R V A R
 C
-C     Generic routine for obtaining mapped read-only access to 
-C     an object in the data structure.  This routine returns a 
+C     Generic routine for obtaining mapped read-only access to
+C     an object in the data structure.  This routine returns a
 C     pointer to a range of virtual addresses which are mapped onto
 C     all or part of the specified data object.  The pointer
 C     may be to a range of addresses which have been mapped
 C     directly onto the data structure disk file itself, or
 C     if conversion or alignment changes were needed, will be to
 C     a range of addresses containing the converted or
-C     aligned data. 
+C     aligned data.
 C
 C     Parameters -   (">" input, "<" output )
 C
 C     (>) NAME     (Character) The object name, in the standard
 C                  data structure format.  Should end with a
-C                  blank or the string end, and is case 
+C                  blank or the string end, and is case
 C                  insignificant.
 C     (>) NITEM    (Integer) The number of elements to be
 C                  read from the data structure.

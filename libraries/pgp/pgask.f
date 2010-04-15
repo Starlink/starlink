@@ -7,8 +7,8 @@ C
 C Change the ``prompt state'' of PGPLOT. If the prompt state is
 C ON, PGPAGE will type ``Type RETURN for next page:'' and will wait
 C for the user to type a carriage-return before starting a new page.
-C The initial prompt state (after a call to PGBEG) is ON for 
-C interactive devices. Prompt state is always OFF for non-interactive 
+C The initial prompt state (after a call to PGBEG) is ON for
+C interactive devices. Prompt state is always OFF for non-interactive
 C devices.
 C
 C Arguments:

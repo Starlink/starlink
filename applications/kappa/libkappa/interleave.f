@@ -21,9 +21,9 @@
 
 *  Description:
 *     This routine performs interleaving, also known as interlacing,
-*     in order to restore resolution where the pixel dimension 
+*     in order to restore resolution where the pixel dimension
 *     undersamples data.  Resolution may be improved by integer
-*     factors along one or more dimensions.  For an N-fold increase in 
+*     factors along one or more dimensions.  For an N-fold increase in
 *     resolution along a dimension, INTERLEAVE demands N NDF
 *     structures that are displaced from each other by i/N pixels,
 *     where i is an integer from 1 to N-1.  It creates an NDF whose
@@ -50,13 +50,13 @@
 *        not the same, or have additional shifts of origin.  Allowed
 *        values are "Bad" or "Zero".  ["Bad"]
 *     IN = NDF (Read)
-*        A group of input NDFs to be interweaved.  They may have 
+*        A group of input NDFs to be interweaved.  They may have
 *        different shapes, but must all have the same number of
 *        dimensions.  This should be given as a comma-separated list,
 *        in which each list element can be:
 *
 *        - an NDF name, optionally containing wild-cards and/or regular
-*        expressions ("*", "?", "[a-z]" etc.). 
+*        expressions ("*", "?", "[a-z]" etc.).
 *
 *        - the name of a text file, preceded by an up-arrow character
 *        "^".  Each line in the text file should contain a
@@ -111,15 +111,15 @@
 
 *  Implementation Status:
 *     -  This routine processes the AXIS, DATA, QUALITY, and VARIANCE
-*     from the all input NDF data structures.  It also processes the 
+*     from the all input NDF data structures.  It also processes the
 *     WCS, LABEL, TITLE, UNITS, and HISTORY components of the primary
-*     NDF data structure, and propagates all of its extensions. 
+*     NDF data structure, and propagates all of its extensions.
 *     -  The AXIS centre values along each axis are formed by
 *     interleaving the corresponding centres from the first NDF, and
-*     linearly interpolating between those to complete the array.  
+*     linearly interpolating between those to complete the array.
 *     -  The AXIS width and variance values in the output are formed by
-*     interleaving the corresponding input AXIS values.  Each array 
-*     element is assigned from the first applicable NDF.  For example, 
+*     interleaving the corresponding input AXIS values.  Each array
+*     element is assigned from the first applicable NDF.  For example,
 *     for a two-dimensional array with expansion factors of 2 and 3
 *     respectively, the first two NDFs would be used to define the
 *     array elements for the first axis.  The second axis's elements
@@ -187,8 +187,8 @@
       INTEGER AEXPND( NDF__MXDIM ) ! Axis expansion factors
       INTEGER AFIRST( NDF__MXDIM )! Indices in output axis array of the
                                  ! first interleave-axis-array element
-      INTEGER AFLBND( NDF__MXDIM ) ! Minimum indices in output axis 
-                                 ! array of the first interleave-array 
+      INTEGER AFLBND( NDF__MXDIM ) ! Minimum indices in output axis
+                                 ! array of the first interleave-array
                                  ! axis element
       CHARACTER * ( 8 ) ALIST( 3 ) ! Names of array components
       INTEGER AIDIMS( NDF__MXDIM ) ! Axis expansion dimensions of input
@@ -214,7 +214,7 @@
       INTEGER IAXIS              ! Loop counter for the axis-array
                                  ! components
       INTEGER IDIMS( NDF__MXDIM )! Dimensions of input NDF
-      INTEGER IGRP               ! GRP identifier for the group of 
+      INTEGER IGRP               ! GRP identifier for the group of
                                  ! input NDFs
       INTEGER IPNDF( NDF__MXDIM )! Pointer to input NDF identifiers
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
@@ -234,7 +234,7 @@
       INTEGER NDIM               ! Dimensionality of the NDF
       INTEGER NNDF               ! Number of input NDFs
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
-      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of 
+      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of
                                  ! linear mapping
       INTEGER PNTRI( 1 )         ! Pointer to input array component(s)
       INTEGER PNTRO( 1 )         ! Pointer to output array component(s)
@@ -259,7 +259,7 @@
 *  Obtain the filling value.
       CALL PAR_CHOIC( 'FILL', 'Bad', 'Bad,Zero', .TRUE., FILL, STATUS )
 
-*  See whether the output NDF will be the union or intersection of the 
+*  See whether the output NDF will be the union or intersection of the
 *  inputs.
       CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
       IF ( TRIM ) THEN
@@ -276,7 +276,7 @@
 *
 *  Get a group containing the names of the NDFs to be processed.
       NNDF = 0
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', IGRP, 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', IGRP,
      :                 NNDF, STATUS )
 
 *  Allocate some work space for the NDF identifiers.
@@ -424,17 +424,17 @@
 
 *  Append to list of array components as needed.
          IF ( VAR ) THEN
-            NARR = NARR + 1 
+            NARR = NARR + 1
             ALIST( NARR ) = 'Variance'
          END IF
 
          IF ( QUAL ) THEN
-            NARR = NARR + 1 
+            NARR = NARR + 1
             ALIST( NARR ) = 'Quality'
          END IF
 
 *  Values and quality are merely duplicated, so there is no need to test
-*  for bad values.  Hence we can switch off automatic quality masking 
+*  for bad values.  Hence we can switch off automatic quality masking
 *  too.
          CALL NDF_SQMF( .FALSE., NDFI, STATUS )
 
@@ -445,7 +445,7 @@
             WACCES = 'WRITE'
          ELSE
             WACCES = 'UPDATE'
-         END IF 
+         END IF
 
 *  Determine the axis `origins' for the current NDF.
 *  =================================================
@@ -460,7 +460,7 @@
 
 *  Interleave each input array separately.
 *  =======================================
-  
+
 *  Normally it would be more efficient to map the variance at the same
 *  time as the data array as quality masking need only be applied once.
 *  However, masking has been switched off, and in this case a lack of
@@ -481,43 +481,43 @@
 *  type.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_INLER( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                CALL KPS1_INLEB( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_INLED( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_INLEI( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                CALL KPS1_INLEUB( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                CALL KPS1_INLEUW( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                CALL KPS1_INLEW( EXPAND, FIRST, IDIMS, EL,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
             END IF
@@ -526,7 +526,7 @@
             CALL NDF_UNMAP( NDFI, ALIST( LARR ), STATUS )
             CALL NDF_UNMAP( NDFO, ALIST( LARR ), STATUS )
          END DO
-      
+
 *  Expand the axis-centres array.
 *  ==============================
          IF ( AXIS ) THEN
@@ -542,12 +542,12 @@
 
 *  Append to list of array components as needed.
             IF ( AVAR ) THEN
-               NARR = NARR + 1 
+               NARR = NARR + 1
                ALIST( NARR ) = 'Variance'
             END IF
 
             IF ( WIDTH ) THEN
-               NARR = NARR + 1 
+               NARR = NARR + 1
                ALIST( NARR ) = 'Width'
             END IF
 
@@ -580,7 +580,7 @@
 *  with dimensions of the expansion factors, and corresponding
 *  to the current NDF.  Recall that the interleaving is in Fortran
 *  order.
-               CALL KPG1_VEC2N( 1, CNDF, NDIM, AFLBND, 
+               CALL KPG1_VEC2N( 1, CNDF, NDIM, AFLBND,
      :                          AEXPND, AENDF, STATUS )
 
 *  The axis arrays are filled by the first NDF that applies.
@@ -660,7 +660,7 @@
                         END IF
 
 * Just interleave the axis variances, although there is something to
-* be said for interpolating like the centres, and the widths. 
+* be said for interpolating like the centres, and the widths.
                      ELSE IF ( ALIST( LARR ) .EQ. 'Variance' .OR.
      :                         ALIST( LARR ) .EQ. 'Width' ) THEN
                         IF ( ITYPE .EQ. '_REAL' ) THEN
@@ -727,7 +727,7 @@
 
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel co-ordinates. This mapping is described by a matrix and an
-*  offset vector.  Set these up. 
+*  offset vector.  Set these up.
       DO I = 1, NDIM * NDIM
          MATRIX( I ) = 0.0
       END DO

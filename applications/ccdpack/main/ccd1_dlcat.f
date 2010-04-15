@@ -13,22 +13,22 @@
 *     CALL CCD1_DLCAT( WORDS, NWORD, DELIM, LIST, STATUS  )
 
 *  Description:
-*     This routine concatenates a list of strings in an array of 
-*     strings to form a list separated by the delimiter.  Trailing 
+*     This routine concatenates a list of strings in an array of
+*     strings to form a list separated by the delimiter.  Trailing
 *     blanks in the word (though not in the delimiter) are ignored.
 *
-*     If any of the words contains the delimiter, or is blank, then 
+*     If any of the words contains the delimiter, or is blank, then
 *     STATUS is set and an error is reported.
 
 *  Arguments:
 *     WORDS( NWORD ) = CHARACTER * ( * ) (Given)
 *        The array of strings to be concatenated.
-*     NWORD = INTEGER (Given) 
+*     NWORD = INTEGER (Given)
 *        The number of elements in WORDS.
 *     DELIM = CHARACTER * ( * ) (Given)
 *        The delimiter to separate the words.
 *     LIST = CHARACTER * ( * ) (Returned)
-*        A delimiter separated list formed by joining 
+*        A delimiter separated list formed by joining
 *        WORDS( 1 ) // DELIM // WORDS( 2 ) // DELIM // .. // WORDS( NWORD ).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -71,15 +71,15 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER NWORD
       CHARACTER * ( * ) WORDS( NWORD )
       CHARACTER * ( * ) DELIM
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) LIST
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -90,7 +90,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Initialise returned variables.
       LIST = ' '
 
@@ -105,7 +105,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'WORD', WORDS( I ) )
             CALL MSG_SETC( 'DELIM', DELIM )
-            CALL ERR_REP( 'CCD1_DLCAT_DELIM', 
+            CALL ERR_REP( 'CCD1_DLCAT_DELIM',
      :      'Word "^WORD" contains delimiter "^DELIM"', STATUS )
             GO TO 99
          ELSE IF ( WORDS( I ) .EQ. ' ' ) THEN

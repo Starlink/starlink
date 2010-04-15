@@ -108,7 +108,7 @@ C     Get some header information (assume equinox is same for all obs)
 C
 C     Output a heading
             HEAD1 = ' Obs  Object       UTstart    Exp    '/
-     :         /'Grating  Filter Airmass    RA       Dec    ' 
+     :         /'Grating  Filter Airmass    RA       Dec    '
             CALL FIO_WRITE ( FD, HEAD1, STATUS )
          ENDIF
 C
@@ -147,13 +147,13 @@ C     Get THE FITS items
                CEQNX = '?'
                C25 = C25 + 1
             ENDIF
-         ENDIF                     
+         ENDIF
 
 C
 C    Write results into observation record
-         WRITE(OBSREC,'(T1,I4,T7,A12,T20,A8,T28,F7.3,T38,A8,       
-     :      T47,A6,T55,F5.3,T62,I2.2,T64,A1,T65,I2.2,T67,A1,    
-     :      T68,I2.2,T72,A1,T73,I2.2,T75,A1,T76,I2.2,T79,A1)')    
+         WRITE(OBSREC,'(T1,I4,T7,A12,T20,A8,T28,F7.3,T38,A8,
+     :      T47,A6,T55,F5.3,T62,I2.2,T64,A1,T65,I2.2,T67,A1,
+     :      T68,I2.2,T72,A1,T73,I2.2,T75,A1,T76,I2.2,T79,A1)')
      :      OBS,OBJECT,RUT,EXP,GRAT,FIL,AIRMASS,
      :      IRA(1),':',IRA(2),':',IRA(3),SIGN,IDEC(1),
      :      ' ',IDEC(2),CEQNX

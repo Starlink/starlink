@@ -84,7 +84,7 @@
 *  Arguments Returned:
       REAL OUT( NPIX, NLIN )
 
-*  Global Status: 
+*  Global Status:
       INTEGER STATUS
 
 *.

@@ -13,9 +13,9 @@
 *     C extension to Tcl.
 
 *  Description:
-*     An NDG group expression is expanded to give a list of the NDF 
+*     An NDG group expression is expanded to give a list of the NDF
 *     structures to which it refers.  Either the NDF name alone or
-*     the full list of NDG supplementary data can be returned 
+*     the full list of NDG supplementary data can be returned
 *     according to the absence or presence of the -sup flag.
 
 *  Arguments:
@@ -34,18 +34,18 @@
 *        the NDG supplementary information is returned instead.
 *        This is the data returned from NDG_GTSUP; for each NDF the
 *        list contains six elements:
-*           0 - NDF slice specification (if any) 
-*           1 - HDS path (if any) 
-*           2 - File type 
-*           3 - Base file name 
-*           4 - Directory path 
-*           5 - Full NDF specification 
+*           0 - NDF slice specification (if any)
+*           1 - HDS path (if any)
+*           2 - File type
+*           3 - Base file name
+*           4 - Directory path
+*           5 - Full NDF specification
 *
-*        Note that the final element of this list is the same as the 
+*        Note that the final element of this list is the same as the
 *        single value returned with no -sup flag.
 
 *  Return Value:
-*     A list of strings, one per (possible) NDF structure in the 
+*     A list of strings, one per (possible) NDF structure in the
 *     NDG-expanded version of group.
 
 *  Copyright:
@@ -191,7 +191,7 @@
             )
             ob = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
             for ( j = 0; j < NFIELD; j++ ) {
-               Tcl_ListObjAppendElement( interp, ob, 
+               Tcl_ListObjAppendElement( interp, ob,
                                          Tcl_NewStringObj( ffields[ j ], -1 ) );
             }
          }

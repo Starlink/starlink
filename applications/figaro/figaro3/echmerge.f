@@ -100,7 +100,7 @@ C                  data.
 *
       INTEGER MAXBOX,MAXDIMS
       PARAMETER (MAXBOX=51,MAXDIMS=10)
-*                             
+*
 *     Local variable declarations
 *
       INTEGER STATUS,INDIM,IDIMS(MAXDIMS),I1NDIM,I1DIMS(MAXDIMS)
@@ -127,7 +127,7 @@ C                  data.
       CALL DSA_OPEN(STATUS)
 *
 *     Initialise all flags
-*                   
+*
       I1OPEN = .FALSE.
       OOPEN = .FALSE.
       IXMAP = .FALSE.

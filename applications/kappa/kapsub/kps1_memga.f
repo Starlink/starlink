@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_MEMGA( INDF, RATE, ALPHA, BETA, DEF, SIGMA, STDEV,
-*                      NITER, ITER, ILEVEL, METHOD, IMAGE, ISTAT, 
+*                      NITER, ITER, ILEVEL, METHOD, IMAGE, ISTAT,
 *                      STATUS )
 
 *  Description:
@@ -95,7 +95,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -139,25 +139,25 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get an HDS locator to the NDF extension holding the analysis 
+*  Get an HDS locator to the NDF extension holding the analysis
 *  information.
       CALL NDF_XLOC( INDF, 'MEM2D', 'READ', ALOC, STATUS )
 
 *  Now copy the data from the extension.............
 
 *  Arguments to this routine.
-      CALL CMP_GET0R( ALOC, 'RATE', RATE, STATUS )         
-      CALL CMP_GET0R( ALOC, 'ALPHA', ALPHA, STATUS )         
-      CALL CMP_GET0R( ALOC, 'BETA', BETA, STATUS )         
-      CALL CMP_GET0R( ALOC, 'SIGMA', SIGMA, STATUS )         
-      CALL CMP_GET0I( ALOC, 'NITER', NITER, STATUS )         
-      CALL CMP_GET0I( ALOC, 'ITER', ITER, STATUS )         
-      CALL CMP_GET0I( ALOC, 'ILEVEL', ILEVEL, STATUS )         
-      CALL CMP_GET0R( ALOC, 'DEF', DEF, STATUS )         
-      CALL CMP_GET0R( ALOC, 'STDEV', STDEV, STATUS )         
-      CALL CMP_GET0I( ALOC, 'METHOD', METHOD, STATUS )         
+      CALL CMP_GET0R( ALOC, 'RATE', RATE, STATUS )
+      CALL CMP_GET0R( ALOC, 'ALPHA', ALPHA, STATUS )
+      CALL CMP_GET0R( ALOC, 'BETA', BETA, STATUS )
+      CALL CMP_GET0R( ALOC, 'SIGMA', SIGMA, STATUS )
+      CALL CMP_GET0I( ALOC, 'NITER', NITER, STATUS )
+      CALL CMP_GET0I( ALOC, 'ITER', ITER, STATUS )
+      CALL CMP_GET0I( ALOC, 'ILEVEL', ILEVEL, STATUS )
+      CALL CMP_GET0R( ALOC, 'DEF', DEF, STATUS )
+      CALL CMP_GET0R( ALOC, 'STDEV', STDEV, STATUS )
+      CALL CMP_GET0I( ALOC, 'METHOD', METHOD, STATUS )
       CALL CMP_GET0C( ALOC, 'INPUT', IMAGE, STATUS )
-      CALL CMP_GET0I( ALOC, 'ISTAT', ISTAT, STATUS )         
+      CALL CMP_GET0I( ALOC, 'ISTAT', ISTAT, STATUS )
 
 *  Common block /C1_COM/
       CALL CMP_GET0I( ALOC, 'C1_NPX', C1_NPX, STATUS )
@@ -193,30 +193,30 @@
 *  being used.  Copy the data from the NDF extension to the work array
 *  allocated within KPS1_MEMCP.
       IF ( C1_WEXT ) THEN
-         CALL CMP_GET1R( ALOC, 'FILE1', SZAREA, 
+         CALL CMP_GET1R( ALOC, 'FILE1', SZAREA,
      :                   %VAL( CNF_PVAL( C1_IP( 1 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE3', SZAREA, 
+         CALL CMP_GET1R( ALOC, 'FILE3', SZAREA,
      :                   %VAL( CNF_PVAL( C1_IP( 3 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE21', SZAREA, 
+         CALL CMP_GET1R( ALOC, 'FILE21', SZAREA,
      :                   %VAL( CNF_PVAL( C1_IP( 21 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE22', SZAREA, 
+         CALL CMP_GET1R( ALOC, 'FILE22', SZAREA,
      :                   %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE23', SZAREA, 
+         CALL CMP_GET1R( ALOC, 'FILE23', SZAREA,
      :                   %VAL( CNF_PVAL( C1_IP( 23 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE24', SZAREA, 
+         CALL CMP_GET1R( ALOC, 'FILE24', SZAREA,
      :                   %VAL( CNF_PVAL( C1_IP( 24 ) ) ),
      :                   NEL, STATUS )
-         IF ( ME_M1 .EQ. 1 ) CALL CMP_GET1R( ALOC, 'FILE20', SZAREA, 
-     :                                       
+         IF ( ME_M1 .EQ. 1 ) CALL CMP_GET1R( ALOC, 'FILE20', SZAREA,
+     :
      :   %VAL( CNF_PVAL( C1_IP( 20 ) ) ), NEL,
      :                                       STATUS )
 
-*  If internal storage is being used, copy the areas from the NDF 
+*  If internal storage is being used, copy the areas from the NDF
 *  extension to the work array in common block /MECOMS/.
       ELSE
          CALL CMP_GET1R( ALOC, 'FILE1', SZAREA, ME_ST( ME_KB( 1 ) ),
@@ -231,8 +231,8 @@
      :                   NEL, STATUS )
          CALL CMP_GET1R( ALOC, 'FILE24', SZAREA, ME_ST( ME_KB( 24 ) ),
      :                   NEL, STATUS )
-         IF ( ME_M1 .EQ. 1 ) CALL CMP_GET1R( ALOC, 'FILE20', SZAREA, 
-     :                                       ME_ST( ME_KB( 20 ) ), NEL, 
+         IF ( ME_M1 .EQ. 1 ) CALL CMP_GET1R( ALOC, 'FILE20', SZAREA,
+     :                                       ME_ST( ME_KB( 20 ) ), NEL,
      :                                       STATUS )
       END IF
 

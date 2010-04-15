@@ -14,9 +14,9 @@
                         Astronomical Catalogues, Databases and Archives\\[2ex]
                         available through Starlink}
 \newcommand{\stardocabstract}  {
-This note is a guide to the astronomical catalogues, databases and 
-archives which are either available on Starlink computers or which can 
-be accessed from Starlink computers. It also describes the Starlink 
+This note is a guide to the astronomical catalogues, databases and
+archives which are either available on Starlink computers or which can
+be accessed from Starlink computers. It also describes the Starlink
 software for manipulating catalogues and tables.
 A brief description is given of each facility or software item.
 }
@@ -51,7 +51,7 @@ A brief description is given of each facility or software item.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -200,12 +200,12 @@ A brief description is given of each facility or software item.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -242,59 +242,59 @@ A brief description is given of each facility or software item.
 
 \section{Introduction\xlabel{introduction}}
 
-This note is a guide to the astronomical catalogues, databases and 
-archives which are either available on Starlink computers or which can 
-be accessed from Starlink computers. It also describes the Starlink 
-software for manipulating catalogues and tables. For each facility or 
-item of software only a brief description is given. However, where 
+This note is a guide to the astronomical catalogues, databases and
+archives which are either available on Starlink computers or which can
+be accessed from Starlink computers. It also describes the Starlink
+software for manipulating catalogues and tables. For each facility or
+item of software only a brief description is given. However, where
 appropriate, references to further information are included. Inevitably,
-a compendium like this one cannot be complete. I have tried to include 
-the more commonly used datasets and facilities, but, in particular, the 
-lists of CD-ROMs and facilities overseas are not exhaustive. Such 
+a compendium like this one cannot be complete. I have tried to include
+the more commonly used datasets and facilities, but, in particular, the
+lists of CD-ROMs and facilities overseas are not exhaustive. Such
 omissions are in no way pejorative of the facilities missed out. Also,
-the document describes only facilities that are currently available; it 
-does not mention facilities that are still being developed or planned 
+the document describes only facilities that are currently available; it
+does not mention facilities that are still being developed or planned
 enhancements to existing facilities.
 
-Because existing facilities evolve and new ones become available I 
+Because existing facilities evolve and new ones become available I
 anticipate that the document will be revised periodically. In order that
 it should remain useful and accurate I welcome corrections, comments and
-suggestions for additional databases to include. If you have any such 
+suggestions for additional databases to include. If you have any such
 comments please send them to: Clive Davenhall, Department of Physics and
 Astronomy, University of Leicester, University Road, Leicester, LE1 7RH.
-E-mail: LTVAD::ACD (Starlink DECNET), 19838::ACD (SPAN) or 
+E-mail: LTVAD::ACD (Starlink DECNET), 19838::ACD (SPAN) or
 acd@uk.ac.le.star (JANET).
 
 Finally, a note on lexicography is probably in order. Wherever possible
 I have tried to respect the choice of the original authors in spelling
-the titles of their catalogues and of institutions in spelling their 
-names. This approach is the reason for the apparently inconsistent 
+the titles of their catalogues and of institutions in spelling their
+names. This approach is the reason for the apparently inconsistent
 spelling of `catalogue' and `centre.'
 
 \section{Starlink catalogue manipulation software
 \xlabel{starlink_catalogue_manipulation_software}}
 
-The Starlink software collection includes a number of items for 
+The Starlink software collection includes a number of items for
 manipulating astronomical catalogues and similar tabular datasets. The
-software items available are described below. Mandatory items are 
+software items available are described below. Mandatory items are
 installed at every Starlink node; optional items are installed at the
 discretion of the local site manager.
 
 \subsection{SCAR\xlabel{scar}}
 
-The SCAR (Starlink Catalogue Access and Reporting) system is a 
+The SCAR (Starlink Catalogue Access and Reporting) system is a
 general-purpose relational database management system for manipulating
 astronomical catalogues and private tables. It was written by the FIIS
-group at the Rutherford Appleton Laboratory (RAL). It is a potentially 
-powerful system which provides virtually all the facilities needed to 
-manipulate astronomical catalogues. However, it is a complex piece of 
-software that is difficult to learn and which can be unfriendly and 
+group at the Rutherford Appleton Laboratory (RAL). It is a potentially
+powerful system which provides virtually all the facilities needed to
+manipulate astronomical catalogues. However, it is a complex piece of
+software that is difficult to learn and which can be unfriendly and
 unforgiving to use.
 
 SCAR is an optional Starlink software item, but if it is installed, it
-comes with a set of standard astronomical catalogues. A larger 
-collection of catalogues in SCAR format are maintained permanently 
-on-line on STADAT (see Section~\ref{STADAT}, below). Also, it is 
+comes with a set of standard astronomical catalogues. A larger
+collection of catalogues in SCAR format are maintained permanently
+on-line on STADAT (see Section~\ref{STADAT}, below). Also, it is
 possible to add private catalogues.
 
 {\it Starlink status:} optional
@@ -305,8 +305,8 @@ possible to add private catalogues.
 
 {\it Documentation:}
 
-{\it SCAR --- Beginner's Guide} 
-(SUN/106) by A.R. Wood, 19th October 
+{\it SCAR --- Beginner's Guide}
+(SUN/106) by A.R. Wood, 19th October
 1990.
 
 {\it SCAR --- Starlink Catalogue Access and Reporting}
@@ -319,10 +319,10 @@ Guide.}
 \subsection{CATPAC\xlabel{catpac}}
 
 CATPAC is a replacement for SCAR also developed by the FIIS group at
-RAL. It accesses catalogues held in the same format as SCAR, and, 
-indeed, uses some of the same low-level subroutine libraries. Thus, 
-CATPAC can access any SCAR catalogue. It is easier to use and more 
-robust than SCAR, but currently does not provide all the facilities 
+RAL. It accesses catalogues held in the same format as SCAR, and,
+indeed, uses some of the same low-level subroutine libraries. Thus,
+CATPAC can access any SCAR catalogue. It is easier to use and more
+robust than SCAR, but currently does not provide all the facilities
 available in SCAR.
 
 {\it Starlink status:} optional
@@ -339,36 +339,36 @@ available in SCAR.
 
 \subsection{R-EXEC\xlabel{rexec}}
 
-R-EXEC is a general-purpose scientific relational database management 
-system developed by the Scientific Databases Section at RAL. It is 
-primarily used by the geophysics and space physics communities and 
-contains no specifically astronomical functionality. It is robust, 
-reliable and reasonably well documented, but is limited by its lack of 
-astronomical functionality. R-EXEC does not come with a set of 
-astronomical catalogues. However, a facility to read FITS ASCII tables 
+R-EXEC is a general-purpose scientific relational database management
+system developed by the Scientific Databases Section at RAL. It is
+primarily used by the geophysics and space physics communities and
+contains no specifically astronomical functionality. It is robust,
+reliable and reasonably well documented, but is limited by its lack of
+astronomical functionality. R-EXEC does not come with a set of
+astronomical catalogues. However, a facility to read FITS ASCII tables
 has been added.
 
 {\it Starlink status:} optional
 
 {\it Starlink support:} best efforts
 
-{\it Availability: } currently only VAX/VMS and MS-DOS (though the 
+{\it Availability: } currently only VAX/VMS and MS-DOS (though the
 latter is not distributed by Starlink).
 
 {\it Documentation: }
 
-A user guide is available: {\it R-EXEC Guide and Reference}, version 
+A user guide is available: {\it R-EXEC Guide and Reference}, version
 2.4 (RAL-90-085) by B.J. Read, November 1990 (SERC, RAL). Starlink site
 managers should hold copies.
 
 \subsection{CHART\xlabel{chart}}
 
-CHART is a package for plotting finding charts. It was originally 
+CHART is a package for plotting finding charts. It was originally
 developed at the Royal Greenwich Observatory over twenty years ago and
-subsequently has been worked on by many people in different 
+subsequently has been worked on by many people in different
 institutions. It is solely concerned with plotting finding charts. CHART
 comes with a set of catalogues which are an integral part of the package
-and which are written in a very specific format. It is not easy to add 
+and which are written in a very specific format. It is not easy to add
 new catalogues into the system.
 
 {\it Starlink status:} standard
@@ -387,30 +387,30 @@ new catalogues into the system.
 \section{Databases available on CD-ROM
 \xlabel{databases_available_on_cdrom}}
 
-The CD-ROM is becoming an increasingly popular medium for distributing 
+The CD-ROM is becoming an increasingly popular medium for distributing
 astronomical catalogues and databases. CD-ROMs are a pre-recorded
-medium, the same size and shape as audio compact disks, with which they 
-are electronically and mechanically identical. They are particularly 
-suited to producing (and subsequently distributing) many copies of a 
-dataset from a single master, in a manner analogous to conventional 
-publication or the manufacture of audio disks. The disks are written 
-in a standard format, ISO 9660, which ensures that they are readable 
-on the products of a wide variety of manufacturers. Each disk can hold 
+medium, the same size and shape as audio compact disks, with which they
+are electronically and mechanically identical. They are particularly
+suited to producing (and subsequently distributing) many copies of a
+dataset from a single master, in a manner analogous to conventional
+publication or the manufacture of audio disks. The disks are written
+in a standard format, ISO 9660, which ensures that they are readable
+on the products of a wide variety of manufacturers. Each disk can hold
 up to approximately 650Mb of data.
 
-The data stored on the disks may be held in some standard astronomical 
+The data stored on the disks may be held in some standard astronomical
 format, such as FITS, or in a `one-off' format peculiar to the
 individual dataset. The disks sometimes contain software to access and
-display their contents. Starlink provides the CDCOPY utility for 
-accessing CD-ROMs. This utility is described in {\it CDCOPY - Reading 
+display their contents. Starlink provides the CDCOPY utility for
+accessing CD-ROMs. This utility is described in {\it CDCOPY - Reading
 CD-ROMs}
 (SUN/69) by C.G. Page, 24th April 1992.
 
 Many astronomical datasets are now available on CD-ROM. Some of the more
-generally useful ones are described below, though the list is by no 
+generally useful ones are described below, though the list is by no
 means comprehensive. In particular, the selection is biased in favour of
-sidereal astronomy and against solar system studies; several sets of 
-planetary images and other solar system data are also available. 
+sidereal astronomy and against solar system studies; several sets of
+planetary images and other solar system data are also available.
 Starlink has no policy to hold copies of CD-ROMs, but most sites will
 have copies of at least some of them. In the first instance you should
 consult your local site manager.
@@ -418,33 +418,33 @@ consult your local site manager.
 \subsection{The HST Guide Star Catalog version 1.1
 \xlabel{the_hst_guide_star_catalog_version_11}\label{GSC}}
 
-{\it authors:} B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell, 
-H. Jenkner and M.M. Shara, 
+{\it authors:} B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell,
+H. Jenkner and M.M. Shara,
 
 {\it issue date:} 1st August 1992 (version 1.1)
 
-{\it institution:} Space Telescope Science Institute. 3700 San Martin 
+{\it institution:} Space Telescope Science Institute. 3700 San Martin
 Drive, Baltimore, Maryland 21218, USA.
 
 {\it number of disks:} 2
 
 {\it format:} FITS ASCII tables
 
-The HST {\it Guide Star Catalog} (GSC) was produced by the Space 
-Telescope Science Institute to support the acquisition of off-axis 
-guide stars for the Hubble Space Telescope. However, because of its 
-general usefulness to the astronomical community, it has been made 
-widely available. The catalogue contains some twenty five million rows 
+The HST {\it Guide Star Catalog} (GSC) was produced by the Space
+Telescope Science Institute to support the acquisition of off-axis
+guide stars for the Hubble Space Telescope. However, because of its
+general usefulness to the astronomical community, it has been made
+widely available. The catalogue contains some twenty five million rows
 for nearly nineteen million separate astronomical objects brighter than
 sixteenth magnitude. It is primarily based on microdensitometer scans of
-an all-sky, single epoch collection of Schmidt plates. North of 
-6$^{\circ}$ the `Quick V' (epoch 1982) survey by the Palomar Schmidt 
-was used; for southern and equatorial fields the SERC-J (epoch 
-approximately 1975) and SERC-EJ (epoch approximately 1982) surveys by 
+an all-sky, single epoch collection of Schmidt plates. North of
+6$^{\circ}$ the `Quick V' (epoch 1982) survey by the Palomar Schmidt
+was used; for southern and equatorial fields the SERC-J (epoch
+approximately 1975) and SERC-EJ (epoch approximately 1982) surveys by
 the UK Schmidt respectively were used.
 
-The GSC is divided into 9537 zones, bounded by arcs of constant Right 
-Ascension and Declination. The data for each region are stored as a 
+The GSC is divided into 9537 zones, bounded by arcs of constant Right
+Ascension and Declination. The data for each region are stored as a
 separate FITS file.
 
 {\it History:}
@@ -459,13 +459,13 @@ overlapping objects and incorporation of a number of errata.
 Note that the following references describe version 1 of the GSC, not
 version 1.1.
 
-B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell, H. Jenkner and 
-M.M. Shara, 1990, {\it Astron J}, {\bf 99}, pp2019-2058. 
+B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell, H. Jenkner and
+M.M. Shara, 1990, {\it Astron J}, {\bf 99}, pp2019-2058.
 
-J.L. Russell, B.M. Lasker, B.J. McLean, C.R. Sturch and H. Jenkner, 
+J.L. Russell, B.M. Lasker, B.J. McLean, C.R. Sturch and H. Jenkner,
 1990, {\it Astron J}, {\bf 99}, pp2059-2081.
 
-H. Jenkner, B.M. Lasker, C.R. Sturch, B.J. McLean, M.M. Shara and 
+H. Jenkner, B.M. Lasker, C.R. Sturch, B.J. McLean, M.M. Shara and
 J.L. Russell, 1990, {\it Astron J}, {\bf 99}, pp2082-2154.
 
 \subsection{Selected Astronomical Catalogs volume 1
@@ -476,18 +476,18 @@ J.L. Russell, 1990, {\it Astron J}, {\bf 99}, pp2082-2154.
 {\it issue date:} 1992
 
 {\it institution:} Astronomical Data Center, National Space Science Data
-Center, NASA Goddard Space Flight Center, Greenbelt, Maryland 20771, 
+Center, NASA Goddard Space Flight Center, Greenbelt, Maryland 20771,
 USA.
 
 {\it number of disks:} 2
 
 {\it format:} FITS ASCII tables (1 disk), ASCII text (1 disk)
 
-This CD-ROM set issued by the American NSSDC contains 114 of the most 
-widely used astronomical catalogues. It is an extremely useful 
-compilation containing copies of most of the basic astronomical 
-catalogues, including astrometric, photometric, spectroscopic and 
-miscellaneous catalogues of both stellar and nonstellar objects. 
+This CD-ROM set issued by the American NSSDC contains 114 of the most
+widely used astronomical catalogues. It is an extremely useful
+compilation containing copies of most of the basic astronomical
+catalogues, including astrometric, photometric, spectroscopic and
+miscellaneous catalogues of both stellar and nonstellar objects.
 
 One disk contains copies of the catalogues in FITS format, the other has
 copies of the catalogues as simple text files. Documentation for each of
@@ -495,13 +495,13 @@ the catalogues is included on the disks.
 
 Errata for the catalogues on the disks are published in the {\it ADC
 Electronic News} (see Section~\ref{ADC}, below). To date errata have
-appeared in the following issues: July 1992, {\bf 1}, issue 2; 
+appeared in the following issues: July 1992, {\bf 1}, issue 2;
 October 1992, {\bf 1}, issue 3; January 1992, {\bf 2}, issue 1.
 
 \subsection{The Catalogue of Principal Galaxies
 \xlabel{the_catalogue_of_principal_galaxies}\label{PGC}}
 
-{\it authors:} G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L. 
+{\it authors:} G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L.
 Gouguenheim
 
 {\it issue date:} 1992
@@ -518,22 +518,22 @@ Extragalactic database (see Section~\ref{EDB}).
 
 {\it References:}
 
-The CD-ROM and accompanying documentation is available as {\it PGC-ROM 
-1992} by G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L. Gouguenheim, 
+The CD-ROM and accompanying documentation is available as {\it PGC-ROM
+1992} by G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L. Gouguenheim,
 1992, {\it Monographies de la Base de Donn\'{e}es Extragalactiques},
 No. {\bf 4} (Lyon: Observatoire de Lyon).
 
-A brief description is given by G. Paturel, L. Bottinelli and L. 
-Gouguenheim, 1993, {\it Bulletin d'Information du Centre de Donn\'{e}es 
+A brief description is given by G. Paturel, L. Bottinelli and L.
+Gouguenheim, 1993, {\it Bulletin d'Information du Centre de Donn\'{e}es
 Stellaires}, no. {\bf 42}, pp33-38.
 
 The paper version of the catalogue is available as {\it The Catalogue
-of Principal Galaxies} by G. Paturel, P. Fouqu\'{e}, L. Bottinelli and 
-L. Gouguenheim, 1989, {\it Monographies de la Base de Donn\'{e}es 
-Extragalactiques}, No. {\bf 1} (3 volumes), (Lyon: Observatoire de 
+of Principal Galaxies} by G. Paturel, P. Fouqu\'{e}, L. Bottinelli and
+L. Gouguenheim, 1989, {\it Monographies de la Base de Donn\'{e}es
+Extragalactiques}, No. {\bf 1} (3 volumes), (Lyon: Observatoire de
 Lyon).
 
-See also G. Paturel, P. Fouqu\'{e}, L. Bottinelli and L. Gouguenheim, 
+See also G. Paturel, P. Fouqu\'{e}, L. Bottinelli and L. Gouguenheim,
 1989, {\it Astr Astrophys Suppl}, {\bf 80}, pp299-315.
 
 \subsection{Images from the Radio Universe
@@ -543,7 +543,7 @@ See also G. Paturel, P. Fouqu\'{e}, L. Bottinelli and L. Gouguenheim,
 
 {\it issue date:} 1992
 
-{\it institution:} National Radio Astronomy Observatory, 520 Edgemont 
+{\it institution:} National Radio Astronomy Observatory, 520 Edgemont
 Road, Charlottesville, Virginia 22903, USA.
 
 {\it number of disks:} 1
@@ -552,10 +552,10 @@ Road, Charlottesville, Virginia 22903, USA.
 
 This CD-ROM contains a number of images of radio-astronomical sources
 (in FITS format) and a number of radio source catalogues (held as ASCII
-text files). The images and catalogues were drawn from all branches and 
-frequency ranges of radio astronomy and aim to present some of the 
+text files). The images and catalogues were drawn from all branches and
+frequency ranges of radio astronomy and aim to present some of the
 best data currently available. The observations were made with a variety
-of radio telescopes and were generously contributed by numerous 
+of radio telescopes and were generously contributed by numerous
 institutions in various countries.
 
 {\it References:}
@@ -571,84 +571,84 @@ C. Oken, T. Chester, J. Chillemi, J. White, D. Kester and D. Gregorich.
 
 {\it issue date:} November 1991
 
-{\it institution:} Infrared Processing and Analysis Center, Jet 
-Propulsion Laboratory, Mail Code 100-22, California Institute of 
+{\it institution:} Infrared Processing and Analysis Center, Jet
+Propulsion Laboratory, Mail Code 100-22, California Institute of
 Technology, Pasadena, California 91125, USA.
 
 {\it number of disks:} 4
 
 {\it format:} FITS
 
-The InfraRed Astronomical Satellite (IRAS) conducted an all-sky 
-survey at infrared wavelengths in 1983. This CD-ROM set is the first 
+The InfraRed Astronomical Satellite (IRAS) conducted an all-sky
+survey at infrared wavelengths in 1983. This CD-ROM set is the first
 release of the IRAS Sky Survey Atlas (ISSA). It covers high ecliptic
 latitudes, with complete coverage for absolute ecliptic latitude,
 $|b| > 50^{\circ}$ and some coverage down to $|b| > 40^{\circ}$. This
 coverage corresponds to approximately 38\% of the sky.
 
-The atlas comprises a set of images in FITS format. Each image is 
+The atlas comprises a set of images in FITS format. Each image is
 500 by 500 pixels square, corresponding to a 12.5$^{\circ}$ field
 on the sky. Hence the size of each pixel is 1.5'. The images give the
 sky surface brightness after removal of the emission from solar system
-dust in four wavebands centred on 12, 25, 60 and 100 micron. 
+dust in four wavebands centred on 12, 25, 60 and 100 micron.
 
 The following caveats apply to using the ISSA. It was designed to
 give {\it differential} photometry after subtraction of the zodiacal
-emission. It should not be used for measuring absolute sky surface 
-brightness. Furthermore, it is intended for the study of extended 
-structures. For structures detected in the survey with sizes less than 
-5' either the {\it IRAS Point Source Catalog}, the {\it IRAS Faint 
+emission. It should not be used for measuring absolute sky surface
+brightness. Furthermore, it is intended for the study of extended
+structures. For structures detected in the survey with sizes less than
+5' either the {\it IRAS Point Source Catalog}, the {\it IRAS Faint
 Source Survey} or the {\it IRAS Small Scale Structure Catalog} should
-be consulted. Some of these catalogues are included in {\it Selected 
+be consulted. Some of these catalogues are included in {\it Selected
 Astronomical Catalogs volume 1} (see Section~\ref{SAC}, above).
 
 {\it References:}
 
-Further information about the atlas, including important details about 
-the absolute calibration of IRAS can be found in the {\it ISSA 
+Further information about the atlas, including important details about
+the absolute calibration of IRAS can be found in the {\it ISSA
 Explanatory Supplement}, available from the National Space Science
 Data Center, NASA Goddard Space Flight Center, Code 933, Greenbelt,
 Maryland 20771, USA.
 
 See also {\it IRAS Catalogs and Atlases: Explanatory Supplement}, 1988,
-Joint IRAS Science Working Group, edited by C.A. Beichman, G. 
-Neugebauer, H.J. Habing, P.E. Clegg and T.J. Chester (Washington DC: 
+Joint IRAS Science Working Group, edited by C.A. Beichman, G.
+Neugebauer, H.J. Habing, P.E. Clegg and T.J. Chester (Washington DC:
 GPO).
 
 \subsection{Einstein Observatory Data
 \xlabel{einstein_observatory_data}\label{EINSTEIN}}
 
-The Einstein Data Center of the Smithsonian Institution Astrophysical 
-Observatory has produced a number of sets of CD-ROMs containing data 
+The Einstein Data Center of the Smithsonian Institution Astrophysical
+Observatory has produced a number of sets of CD-ROMs containing data
 from the {\it Einstein} Observatory X-ray astronomy satellite (HEAO-B).
-The {\it Einstein} satellite operated from November 1978 to April 1981. 
-It contained an X-ray imaging telescope which operated in the energy 
-band 0.2 to 3.5 keV. This telescope had two imaging detectors: the 
+The {\it Einstein} satellite operated from November 1978 to April 1981.
+It contained an X-ray imaging telescope which operated in the energy
+band 0.2 to 3.5 keV. This telescope had two imaging detectors: the
 Imaging Proportional Counter (IPC) and the High Resolution Imager (HRI).
-The satellite carried out a pointed, as distinct from scanning or 
+The satellite carried out a pointed, as distinct from scanning or
 survey, programme. The sets of disks listed below are available.
 
 \begin{description}
 
-  \item[The Einstein Observatory Catalog of IPC X-ray sources] (1st 
+  \item[The Einstein Observatory Catalog of IPC X-ray sources] (1st
    January 1990, FITS and FITS ASCII tables, 3 disks). A set of 3935
    images observed with the IPC and catalogues of the sources detected.
 
   \item[The Einstein Observatory Database of HRI X-ray Images] (1st June
-   1990, FITS, 
+   1990, FITS,
   \newline 2 disks). A set of 870 images observed with the HRI and a
    catalogue of all the sources detected.
 
   \item[The Einstein Observatory SLEW Survey] (1st January 1991, FITS
-   $n$-dimensional tables extension, 1 disk). A set of event lists 
-   (details of individual photons detected), and a catalogue of 
-   detected sources for the {\it Einstein} SLEW survey. The SLEW survey 
-   was constructed from data acquired while the IPC was slewing between 
+   $n$-dimensional tables extension, 1 disk). A set of event lists
+   (details of individual photons detected), and a catalogue of
+   detected sources for the {\it Einstein} SLEW survey. The SLEW survey
+   was constructed from data acquired while the IPC was slewing between
    pointed observations.
 
   \item[The Einstein Observatory Database of HRI Images in Event List
    Format] ~
-  \newline (1st January 1992, FITS binary tables, 2 disks). A set of 
+  \newline (1st January 1992, FITS binary tables, 2 disks). A set of
    event lists for observations made with the HRI and a list of sources
    detected.
 
@@ -672,7 +672,7 @@ E-mail: 6699::EDPO (SPAN), edpo@cfa.harvard.edu (INTERNET).
 
 {\it institution:} High Energy Astrophysics Archive Center, Code 668,
 NASA Goddard Space Flight Center, Greenbelt, Maryland 20771, USA.
-E-mail: 15735::HEASARC (SPAN), 
+E-mail: 15735::HEASARC (SPAN),
 \newline heasarc@heasrc.gsfc.nasa.gov (INTERNET)
 
 {\it number of disks:} 1
@@ -680,15 +680,15 @@ E-mail: 15735::HEASARC (SPAN),
 {\it format:} FITS binary tables
 
 This CD-ROM contains astronomical data files derived from observations
-made with the {\it Einstein} X-Ray Astronomy Satellite (HEAO-B) using 
-the Solid State Spectrometer (SSS), the Monitor Proportional Counter 
-(MPC) and the Focal Plane Crystal Spectrometer (FPCS). The SSS and MPC 
-data products contain summary spectra and light curves derived from the 
-Laboratory for High Energy Astrophysics at NASA Goddard Space Flight 
+made with the {\it Einstein} X-Ray Astronomy Satellite (HEAO-B) using
+the Solid State Spectrometer (SSS), the Monitor Proportional Counter
+(MPC) and the Focal Plane Crystal Spectrometer (FPCS). The SSS and MPC
+data products contain summary spectra and light curves derived from the
+Laboratory for High Energy Astrophysics at NASA Goddard Space Flight
 Center. The FPCS files were produced at the Center for Space Research
 and Department of Physics at the Massachusetts Institute of Technology
-and include lists of every detected photon during each observation as 
-well as summary spectra. This CD-ROM complements the CD-ROMs issued by 
+and include lists of every detected photon during each observation as
+well as summary spectra. This CD-ROM complements the CD-ROMs issued by
 the SAO Einstein Data Center which contain data from the {\it Einstein}
 IPC and HRI instruments (see Section~\ref{EINSTEIN}, above).
 
@@ -696,34 +696,34 @@ IPC and HRI instruments (see Section~\ref{EINSTEIN}, above).
 \section{On-line facilities in the UK
 \xlabel{online_facilities_in_the_uk}}
 
-This section describes the database facilities available on-line on 
+This section describes the database facilities available on-line on
 Starlink computers.
 
 \subsection{STADAT
 \xlabel{stadat}\label{STADAT}}
 
 STADAT is a microVAX II located at the Rutherford Appleton Laboratory
-(RAL) which is primarily used to store catalogues, archives and similar 
+(RAL) which is primarily used to store catalogues, archives and similar
 sorts of data. The facilities available include:
 
 \begin{itemize}
 
   \item a large collection of catalogues in SCAR format permanently
-   available on-line. A \verb-NEWS- item listing the catalogues 
+   available on-line. A \verb-NEWS- item listing the catalogues
    available is distributed to all Starlink sites bi-annually. A service
    is provided to convert, on request, catalogues distributed by the
    INADC (see Section~\ref{INADC}, below) and regions of the {\it
-   Guide Star Catalog} (see Section~\ref{GSC}, above) into SCAR 
+   Guide Star Catalog} (see Section~\ref{GSC}, above) into SCAR
    format. Copies of these catalogues may also be provided in their
    original format, if requested,
 
   \item some aspects of the IUE archive (see Section~\ref{IUE}, below),
 
-  \item the InfraRed Astronomical Satellite (IRAS) Low Resolution 
-   Spectrograph database, comprising a database of about 170,000 
-   low-resolution spectra in the wavelength range 7 - 24 micron for 
+  \item the InfraRed Astronomical Satellite (IRAS) Low Resolution
+   Spectrograph database, comprising a database of about 170,000
+   low-resolution spectra in the wavelength range 7 - 24 micron for
    approximately 40,000 separate sources and an atlas of averaged
-   spectra for 5425 sources. Access to this archive is described in 
+   spectra for 5425 sources. Access to this archive is described in
    {\it IRASLRS --- Obtaining Spectra from the IRAS LRS database}
    (SUN/14) by H. Walker and D. Giaretta, 18th July 1989,
 
@@ -733,8 +733,8 @@ sorts of data. The facilities available include:
 
 Every Starlink node has an account on STADAT and you will usually log on
 to STADAT using your node's account. Your site manager should be able to
-supply details of the username and password. Alternatively, frequent 
-users may be allocated their own usernames, and some archives, for 
+supply details of the username and password. Alternatively, frequent
+users may be allocated their own usernames, and some archives, for
 example IUE and IRAS, are accessed from captive accounts. To log on to
 STADAT type
 
@@ -757,45 +757,45 @@ the various spectral atlases type
 \end{verbatim}
 
 Comments, suggestions, requests for new catalogues etc. should be sent
-by E-mail to account STADAT::CATMAIL (Starlink DECNET), 
-19463::CATMAIL (SPAN) or catmail@uk.ac.rl.stadat (JANET). Because 
+by E-mail to account STADAT::CATMAIL (Starlink DECNET),
+19463::CATMAIL (SPAN) or catmail@uk.ac.rl.stadat (JANET). Because
 the STADAT accounts are not personal ones, it is probably less confusing
-if you send these mail messages from your personal account on your 
+if you send these mail messages from your personal account on your
 local machine.
 
 \subsection{IUE Data Archive
 \xlabel{iue_data_archive}\label{IUE}}
 
-The International Ultraviolet Explorer (IUE) satellite was launched in 
-January 1978 and continues in operation to the present day. It 
+The International Ultraviolet Explorer (IUE) satellite was launched in
+January 1978 and continues in operation to the present day. It
 carries a single telescope which performs ultraviolet spectroscopy in
-the wavelength range 1100 - 3300\AA. The satellite has carried out a 
+the wavelength range 1100 - 3300\AA. The satellite has carried out a
 pointed rather than survey programme and observing time is allocated to
 guest observers. Guest observers retain a right of sole access to their
 observations for a period of six months after they were acquired. After
 this period has elapsed the observations become publicly available.
 
-In the UK the IUE archives are maintained by the IUE Project in the 
-Space Science Department at the Rutherford Appleton Laboratory (RAL). 
-Two archives are available: a main archive which currently contains 
+In the UK the IUE archives are maintained by the IUE Project in the
+Space Science Department at the Rutherford Appleton Laboratory (RAL).
+Two archives are available: a main archive which currently contains
 approximately 80,000 images and the IULDA, a subsidiary archive of
 extracted low-resolution spectra. The main archive is partly maintained
-on STADAT (see Section~\ref{STADAT}, above) and partly on the RAL 
+on STADAT (see Section~\ref{STADAT}, above) and partly on the RAL
 central IBM machine. The IULDA is maintained on STADAT. To access either
-archive you must first log on to STADAT. From your local Starlink VAX 
+archive you must first log on to STADAT. From your local Starlink VAX
 type
 
 \begin{verbatim}
     SET  HOST  STADAT
 \end{verbatim}
 
-A captive account is available for the main archive: in response to the 
-`Username:' prompt type \verb-IUE-; no password is required. For the 
-IULDA you will usually use your node's STADAT account. See 
-Section~\ref{STADAT} for details. 
+A captive account is available for the main archive: in response to the
+`Username:' prompt type \verb-IUE-; no password is required. For the
+IULDA you will usually use your node's STADAT account. See
+Section~\ref{STADAT} for details.
 
-For further information contact Chris Lloyd, IUE Project, Space Science 
-Department, Rutherford Appleton Laboratory, Didcot, Oxfordshire, OX11 
+For further information contact Chris Lloyd, IUE Project, Space Science
+Department, Rutherford Appleton Laboratory, Didcot, Oxfordshire, OX11
 0QX. E-mail: RLSAC::CXL (Starlink DECNET), 19465::CXL (SPAN).
 
 {\it Documentation:}
@@ -810,96 +810,96 @@ Low-Dispersion Archive} (\xref{SUN/20}{sun20}{}) by Jo Murray,
 
 Additional information on extracting spectra from IUE data is given in
 {\it IUEDR --- IUE Data Reduction Package (2.0)}
-(\xref{SUN/37}{sun37}{}) by Jack 
+(\xref{SUN/37}{sun37}{}) by Jack
 Giddings and Paul Rees, 3rd January 1989.
 
 A more general overview of the IUE archives is given in {\it The many
-faces of the Archive of the International Ultraviolet Explorer 
-satellite} by W. Wamsteker, 1991, in {\it Databases and On-Line Data 
-in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: Kluwer) 
+faces of the Archive of the International Ultraviolet Explorer
+satellite} by W. Wamsteker, 1991, in {\it Databases and On-Line Data
+in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: Kluwer)
 pp35-46.
 
 \subsection{The Leicester Database System and ROSAT Archive
 \xlabel{the_leicester_database_system_and_rosat_archive}\label{LEICS}}
 
-The Leicester Database System (LDS) is maintained as a public facility 
-on the Leicester Starlink VAX cluster. It is based on the EXOSAT DBMS, 
-although the system contains many databases, not just those from the 
-EXOSAT satellite. Most, but not all, of these databases are concerned 
+The Leicester Database System (LDS) is maintained as a public facility
+on the Leicester Starlink VAX cluster. It is based on the EXOSAT DBMS,
+although the system contains many databases, not just those from the
+EXOSAT satellite. Most, but not all, of these databases are concerned
 with high-energy astronomy. This system was originally developed by ESA
-for the EXOSAT satellite data archive, but is now maintained by the 
-HEASARC at the Goddard Space Flight Center (see Section~\ref{HEASARC}, 
+for the EXOSAT satellite data archive, but is now maintained by the
+HEASARC at the Goddard Space Flight Center (see Section~\ref{HEASARC},
 below).
 
-The LDS currently contains some sixty publicly available databases 
-occupying 0.25Gb. Additionally, approximately 7.5 Gb of X-ray satellite 
-data products (images, spectra and light curves) are also available. 
-These data products can be analysed using software integral to the 
-system. The system runs on node LTXDB, a MicroVAX II in the Leicester 
+The LDS currently contains some sixty publicly available databases
+occupying 0.25Gb. Additionally, approximately 7.5 Gb of X-ray satellite
+data products (images, spectra and light curves) are also available.
+These data products can be analysed using software integral to the
+system. The system runs on node LTXDB, a MicroVAX II in the Leicester
 Starlink cluster. To log on to this node type
 
 \begin{verbatim}
     SET  HOST  LTXDB
 \end{verbatim}
 
-from your local Starlink VAX. A captive account is provided to 
-interrogate the LDS. To access it reply \verb-XRAY- in response to the 
+from your local Starlink VAX. A captive account is provided to
+interrogate the LDS. To access it reply \verb-XRAY- in response to the
 `Username:' prompt; no password is required. The first time that you log
-on you will be asked to supply a name to identify yourself to the 
+on you will be asked to supply a name to identify yourself to the
 system. On-line help can be obtained by typing \verb-HELP-.
 
-A brief introduction to the LDS is given in {\it The EXOSAT Database 
-Management System} 
+A brief introduction to the LDS is given in {\it The EXOSAT Database
+Management System}
 \newline
-(\xref{SUN/127}{sun127}{}), by J. Osborne, 2nd July 1991. This document refers 
-to additional manuals; these have been widely distributed and most 
+(\xref{SUN/127}{sun127}{}), by J. Osborne, 2nd July 1991. This document refers
+to additional manuals; these have been widely distributed and most
 Starlink site managers will hold copies.
 
 For further information, comments, suggestions etc. contact Julian
-Osborne, Department of Physics and Astronomy, University of Leicester, 
+Osborne, Department of Physics and Astronomy, University of Leicester,
 University Road, Leicester, LE1 7RH. E-mail: LTVAD::JULO (Starlink
 DECNET), 19838::JULO (SPAN) or julo@uk.ac.le.star (JANET).
 
-The LDS is also used to access the ROSAT data archive maintained at 
-Leicester. This archive stores and makes available all the data and 
-results from the pointed observation programme of the ROSAT satellite. 
+The LDS is also used to access the ROSAT data archive maintained at
+Leicester. This archive stores and makes available all the data and
+results from the pointed observation programme of the ROSAT satellite.
 ROSAT was launched on 1st June 1990 and currently is still in operation.
-The main instrument is an X-ray telescope with two alternative 
-instruments: the Position Sensitive Proportional Counter (PSPC) and the 
-High Resolution Imager (HRI). The PSPC operates in the energy range 
+The main instrument is an X-ray telescope with two alternative
+instruments: the Position Sensitive Proportional Counter (PSPC) and the
+High Resolution Imager (HRI). The PSPC operates in the energy range
 0.1 - 2.4 keV, has a spectral resolution of about 40\% at 0.1 keV and an
-angular resolution of approximately 25$"$. The HRI operates over a 
-similar energy range, has no spectral resolution and a smaller field of 
-view, but has an angular resolution of approximately 2$"$. An 
-additional, co-aligned telescope, the Wide Field Camera (WFC), operates 
-at extreme ultraviolet wavelengths (60 - 200 eV) with an angular 
+angular resolution of approximately 25$"$. The HRI operates over a
+similar energy range, has no spectral resolution and a smaller field of
+view, but has an angular resolution of approximately 2$"$. An
+additional, co-aligned telescope, the Wide Field Camera (WFC), operates
+at extreme ultraviolet wavelengths (60 - 200 eV) with an angular
 resolution of about 1.4$'$.
 
 Observing time on the satellite is allocated to individual observers.
 Observers have sole access to their observations for a proprietary
 period of one year and two weeks after the data were dispatched to them.
-After this period has elapsed the observations become publicly 
+After this period has elapsed the observations become publicly
 available.
 
 A brief description of the ROSAT archive appeared in {\it The ROSAT
-Data Archive} by S. Sembay and M.G. Watson, October 1992, {\it 
+Data Archive} by S. Sembay and M.G. Watson, October 1992, {\it
 Starlink Bulletin}, issue {\bf 10}, pp12-13. For further information
-contact Steve Sembay, Department of Physics and Astronomy, University 
+contact Steve Sembay, Department of Physics and Astronomy, University
 of Leicester, University Road, Leicester, LE1 7RH. E-mail: LTVAD::SSE
 (Starlink DECNET), 19838::SSE (SPAN) or sse@uk.ac.le.star (JANET).
 
 \subsection{UK Schmidt, ESO Schmidt and AAT Plate Catalogues
 \xlabel{uk_schmidt_eso_schmidt_and_aat_plate_catalogues}}
 
-An extensive photographic Plate Library is maintained at the Royal 
-Observatory Edinburgh (ROE) and is run as a national facility. This 
+An extensive photographic Plate Library is maintained at the Royal
+Observatory Edinburgh (ROE) and is run as a national facility. This
 library contains approximately 15,000 original plates taken with the
 UK Schmidt Telescope in Australia, about 6500 original plates taken
 using older telescopes operated by the ROE and copies of all the major
 photographic sky surveys.
 
 By prior arrangement, the collections may be used either by visiting the
-Plate Library at ROE or by obtaining a plate on loan. A complete 
+Plate Library at ROE or by obtaining a plate on loan. A complete
 catalogue of all the plates taken with the UK Schmidt Telescope is
 maintained on-line and a captive account is available to interrogate it.
 To access this catalogue from your local Starlink VAX type
@@ -909,7 +909,7 @@ To access this catalogue from your local Starlink VAX type
 \end{verbatim}
 
 In response to the `Username:' prompt reply \verb-UKSCAT-; no password
-is required. Then follow the instructions. A help file giving a brief 
+is required. Then follow the instructions. A help file giving a brief
 description of the catalogue format is available. To obtain a copy of
 this help file, type (from your local VAX)
 
@@ -917,45 +917,45 @@ this help file, type (from your local VAX)
     COPY  REVAD::DISK$USER3:[UKSCAT]UKSCAT.DOC  *
 \end{verbatim}
 
-and file \verb-UKSCAT.DOC- will be created in your file space. It 
-requires only eighteen blocks of disk space and is a simple text file 
+and file \verb-UKSCAT.DOC- will be created in your file space. It
+requires only eighteen blocks of disk space and is a simple text file
 suitable for printing.
 
-Plate catalogues for the Anglo-Australian Telescope (AAT) and ESO 
+Plate catalogues for the Anglo-Australian Telescope (AAT) and ESO
 Schmidt Telescope are also maintained, though they are less up-to-date
 than the UKST catalogue, and the ROE Plate Library does not have the
 original plates for inspection or loan. The AAT catalogue only lists the
 photographic plates taken with the AAT; observations recorded digitally
-are not included. To access either of these catalogues proceed as for 
-the UKST catalogue, but in response to the `Username:' prompt reply 
-either \verb-AATCAT- (for the AAT catalogue) or \verb-ESOCAT- (for the 
-ESO Schmidt catalogue); again no password is required. Then follow the 
-instructions. 
+are not included. To access either of these catalogues proceed as for
+the UKST catalogue, but in response to the `Username:' prompt reply
+either \verb-AATCAT- (for the AAT catalogue) or \verb-ESOCAT- (for the
+ESO Schmidt catalogue); again no password is required. Then follow the
+instructions.
 
-For further information contact the United Kingdom Schmidt Telescope 
-Unit, Royal Observatory, Blackford Hill, Edinburgh, EH9 3HJ. E-mail: 
-REVAD::UKSTU (Starlink DECNET), 19889::UKSTU (SPAN) or 
+For further information contact the United Kingdom Schmidt Telescope
+Unit, Royal Observatory, Blackford Hill, Edinburgh, EH9 3HJ. E-mail:
+REVAD::UKSTU (Starlink DECNET), 19889::UKSTU (SPAN) or
 ukstu@uk.ac.roe.star (JANET).
 
 
 \subsection{La Palma Data Archive
 \xlabel{la_palma_data_archive}\label{LAPALMA}}
 
-The Royal Greenwich Observatory (RGO) at Cambridge maintains a data 
+The Royal Greenwich Observatory (RGO) at Cambridge maintains a data
 archive of all the observations acquired with the Isaac Newton group
-of optical telescopes in La Palma. This group comprises the Jacobus 
-Kapteyn Telescope (JKT), the Isaac Newton Telescope (INT) and the 
+of optical telescopes in La Palma. This group comprises the Jacobus
+Kapteyn Telescope (JKT), the Isaac Newton Telescope (INT) and the
 William Herschel Telescope (WHT). The JKT and INT have been in
-operation since 1984 and the WHT since 1987; essentially all the 
-observations acquired with the telescopes have been stored in the 
+operation since 1984 and the WHT since 1987; essentially all the
+observations acquired with the telescopes have been stored in the
 archive.
 
 Access to observations is limited to the original observers who acquired
-them for a proprietary period of one year. After this period has 
-elapsed the observations become publicly available. A catalogue 
-containing summary details of all the observations in the archive is 
-maintained on-line. Software is available which allows you to 
-interrogate this archive to identify observations of interest and to 
+them for a proprietary period of one year. After this period has
+elapsed the observations become publicly available. A catalogue
+containing summary details of all the observations in the archive is
+maintained on-line. Software is available which allows you to
+interrogate this archive to identify observations of interest and to
 subsequently request copies of them. This software is run from a captive
 account on the Cambridge Starlink cluster. To access it from your local
 Starlink VAX type
@@ -964,43 +964,43 @@ Starlink VAX type
     SET  HOST  CAVAD
 \end{verbatim}
 
-Alternatively, the appropriate INTERNET address is camv0.ast.cam.ac.uk 
+Alternatively, the appropriate INTERNET address is camv0.ast.cam.ac.uk
 or 131.111.69.9. In either case the prompt `Username:' should appear.
-Simply reply \verb-ARCQUERY-; no password is required. On-line help 
-information is provided and a printed user guide is also available. 
-Copies of the user guide and further information about the archive can 
-be obtained from Eduard Zuiderwijk, Royal Greenwich Observatory, 
-Madingley Road, Cambridge, CB3 0EZ. E-mail: CAVAD::EZJ (Starlink 
+Simply reply \verb-ARCQUERY-; no password is required. On-line help
+information is provided and a printed user guide is also available.
+Copies of the user guide and further information about the archive can
+be obtained from Eduard Zuiderwijk, Royal Greenwich Observatory,
+Madingley Road, Cambridge, CB3 0EZ. E-mail: CAVAD::EZJ (Starlink
 DECNET), 20031::EJZ (SPAN), ezj@uk.ac.cam.ast-star (JANET).
 
 {\it Documentation:}
 
-{\it La Palma Data Archive User's Guide} by E. Raimond and G. van 
-Diepen, June 1989, version 1.0, Isaac Newton Group, La Palma, User 
+{\it La Palma Data Archive User's Guide} by E. Raimond and G. van
+Diepen, June 1989, version 1.0, Isaac Newton Group, La Palma, User
 Manual No. XIX.
 
-For a more general discussion, see also {\it Archives of the Isaac 
-Newton Group, La Palma and Westerbork Observatories} by E. Raimond, 
+For a more general discussion, see also {\it Archives of the Isaac
+Newton Group, La Palma and Westerbork Observatories} by E. Raimond,
 1991, in {\it Databases and On-Line Data in Astronomy}, eds. D. Egret
 and M. Albrecht (Dordrecht: Kluwer) pp115-124.
 
 \subsection{JCMT Data Archive\xlabel{jcmt_data_archive}}
 
-The Royal Observatory Edinburgh (ROE) maintains a data archive of 
-observations acquired with the millimetre-wave James Clerk Maxwell 
-Telescope (JCMT) in Hawaii. The archive contains essentially all the 
+The Royal Observatory Edinburgh (ROE) maintains a data archive of
+observations acquired with the millimetre-wave James Clerk Maxwell
+Telescope (JCMT) in Hawaii. The archive contains essentially all the
 observations made with the telescope since January 1992.
 
 Access to observations is limited to the original observers who acquired
-them for a proprietary period of one year. After this period has 
-elapsed the observations become publicly available. A catalogue 
-containing summary details of all the observations in the archive is 
-maintained on-line. Software is available which allows you to 
-interrogate this archive to identify observations of interest and to 
-subsequently request copies of them. The JCMT archive uses the same 
+them for a proprietary period of one year. After this period has
+elapsed the observations become publicly available. A catalogue
+containing summary details of all the observations in the archive is
+maintained on-line. Software is available which allows you to
+interrogate this archive to identify observations of interest and to
+subsequently request copies of them. The JCMT archive uses the same
 software as the La Palma archive (see Section~\ref{LAPALMA}, above),
-and the two systems are very similar. This software is run from a 
-captive account on the ROE Starlink cluster. To access it from your 
+and the two systems are very similar. This software is run from a
+captive account on the ROE Starlink cluster. To access it from your
 local Starlink VAX type
 
 \begin{verbatim}
@@ -1009,10 +1009,10 @@ local Starlink VAX type
 
 In response to the `Username:' prompt reply \verb-ARCQUERY-; no password
 is required. On-line help information is provided and a user guide and
-a quick reference sheet are available. Copies of these documents and 
+a quick reference sheet are available. Copies of these documents and
 further information about the archive can be obtained from Ko Hummel,
-Astronomy Division, Royal Observatory, Blackford Hill, Edinburgh, EH9 
-3HJ. E-mail: REVAD::KXH (Starlink DECNET), 19889::KXH (SPAN), 
+Astronomy Division, Royal Observatory, Blackford Hill, Edinburgh, EH9
+3HJ. E-mail: REVAD::KXH (Starlink DECNET), 19889::KXH (SPAN),
 kxh@uk.ac.roe.star (JANET).
 
 {\it Documentation:}
@@ -1020,47 +1020,47 @@ kxh@uk.ac.roe.star (JANET).
 {\it User's Guide to the Hawaii Telescopes Data Archive}, version 1.1
 by A.C. Davenhall, February 1993 (Royal Observatory Edinburgh).
 
-{\it Quick Reference Sheet for the Hawaii Telescopes Data Archive} by 
+{\it Quick Reference Sheet for the Hawaii Telescopes Data Archive} by
 A.C. Davenhall, June 1992 (Royal Observatory Edinburgh).
 
 Because the JCMT archive uses the same software as the La Palma archive,
-the user guide for the latter is also relevant (see 
+the user guide for the latter is also relevant (see
 Section~\ref{LAPALMA}, above).
 
 A brief introduction to the JCMT archive is given by K. Hummel and A.C.
-Davenhall, March 1993, {\it The JCMT - UKIRT Newsletter}, no. {\bf 5}, 
+Davenhall, March 1993, {\it The JCMT - UKIRT Newsletter}, no. {\bf 5},
 pp22-24.
 
 \subsection{Atomic Databases at Belfast
 \xlabel{atomic_databases_at_belfast}}
 
-Two collections of atomic data are available at the Queen's University, 
+Two collections of atomic data are available at the Queen's University,
 Belfast:
 
 \begin{itemize}
 
   \item electron impact excitation of atoms and ions,
 
-  \item photo-absorption data for atoms and ions; the so-called 
+  \item photo-absorption data for atoms and ions; the so-called
    `opacity project.'
 
 \end{itemize}
 
 The latter collection is more relevant to astronomy, containing, for
 example, oscillator strengths. It is a collaborative project involving
-institutions in the USA, France, Venezuela and Germany as well as the 
-UK. It comprises approximately 1 Gb of data held as ASCII text files. 
+institutions in the USA, France, Venezuela and Germany as well as the
+UK. It comprises approximately 1 Gb of data held as ASCII text files.
 
-For further information contact, in the first instance, Keith 
-Berrington, Department of Applied Mathematics, Queen's University of 
-Belfast, Belfast, BT7 1NN. E-mail: 
+For further information contact, in the first instance, Keith
+Berrington, Department of Applied Mathematics, Queen's University of
+Belfast, Belfast, BT7 1NN. E-mail:
 \newline amg0016@uk.ac.queens-belfast.app-maths.vax1 (JANET).
 
 {\it Documentation:}
 
 A description of some aspects of this project is given by W. Cunto,
-C. Mendoza, F. Ochsenbein and C.J. Zeippen, 1993, {\it Bulletin 
-d'Information du Centre de Donn\'{e}es Stellaires}, no. {\bf 42}, 
+C. Mendoza, F. Ochsenbein and C.J. Zeippen, 1993, {\it Bulletin
+d'Information du Centre de Donn\'{e}es Stellaires}, no. {\bf 42},
 pp39-43.
 
 \section{Facilities Overseas\xlabel{facilities_overseas}}
@@ -1068,15 +1068,15 @@ pp39-43.
 This section describes briefly the astronomical data centres which
 collect and distribute catalogues, and then lists some of the more
 specialized database facilities available on-line at institutions
-overseas. There are many such facilities, and though the selection 
-includes some of the commonly used ones, it is in some respects 
-necessarily idiosyncratic. Recently Heinz Andernach of the Instituto 
-Astrofisica de Canarias (IAC), Tenerife, and Bob Hanisch of the STScI 
-have compiled documents similar to the present one, though they are 
-perhaps somewhat more extensive.  These authors have kindly allowed 
-their documents to be made available on Starlink, and copies are held 
-in the Local Miscellaneous User Documentation directory (LMUDSDIR) on 
-node STADAT. To obtain copies you should log on to your local Starlink 
+overseas. There are many such facilities, and though the selection
+includes some of the commonly used ones, it is in some respects
+necessarily idiosyncratic. Recently Heinz Andernach of the Instituto
+Astrofisica de Canarias (IAC), Tenerife, and Bob Hanisch of the STScI
+have compiled documents similar to the present one, though they are
+perhaps somewhat more extensive.  These authors have kindly allowed
+their documents to be made available on Starlink, and copies are held
+in the Local Miscellaneous User Documentation directory (LMUDSDIR) on
+node STADAT. To obtain copies you should log on to your local Starlink
 VAX and type
 
 \begin{verbatim}
@@ -1084,18 +1084,18 @@ VAX and type
     COPY  STADAT::LMUDSDIR:MUD136.LIS  *
 \end{verbatim}
 
-The two documents require a total of about 220 blocks of disk space. 
-Both are simple text files suitable for printing. The IAC document 
+The two documents require a total of about 220 blocks of disk space.
+Both are simple text files suitable for printing. The IAC document
 contains some details which are specific to that institution.
 
-A good source of further information is {\it Databases and On-Line Data 
-in Astronomy}, eds. D. Egret and M. Albrecht, 1991 (Dordrecht: Kluwer). 
-A list of computer-readable space astronomy archives was compiled by 
-N.E. White (1987, in Appendix C of {\it Astrophysics Data Program}, 
-NRA-87-OSSA-11), though it is now a few years out of date. Much useful 
-background information is contained in {\it Data in Astronomy} by C. 
-Jaschek, 1989 (Cambridge University Press, Cambridge). Some general 
-information about accessing remote hosts across communication networks 
+A good source of further information is {\it Databases and On-Line Data
+in Astronomy}, eds. D. Egret and M. Albrecht, 1991 (Dordrecht: Kluwer).
+A list of computer-readable space astronomy archives was compiled by
+N.E. White (1987, in Appendix C of {\it Astrophysics Data Program},
+NRA-87-OSSA-11), though it is now a few years out of date. Much useful
+background information is contained in {\it Data in Astronomy} by C.
+Jaschek, 1989 (Cambridge University Press, Cambridge). Some general
+information about accessing remote hosts across communication networks
 is given in Section~\ref{REMOTE}.
 
 \subsection{Data Centres
@@ -1106,33 +1106,33 @@ collect, collate, preserve and disseminate astronomical data. They will
 accept most sorts of astronomical data, but are particularly oriented
 towards catalogues and similar sorts of reduced data. Inevitably, many
 of these data are now held in a computer readable form. The various data
-centres collaborate through the {\it International Network of 
-Astronomical Data Centres} (INADC) and swap datasets, operate a common 
-naming scheme for catalogues etc. Probably the two most important data 
-centres are the Centre de Donn\'{e}es Stellaires (CDS), in Strasbourg 
-and the US Astronomical Data Center in Maryland. Both of these 
+centres collaborate through the {\it International Network of
+Astronomical Data Centres} (INADC) and swap datasets, operate a common
+naming scheme for catalogues etc. Probably the two most important data
+centres are the Centre de Donn\'{e}es Stellaires (CDS), in Strasbourg
+and the US Astronomical Data Center in Maryland. Both of these
 institutions will provide a list of their collections on request. In the
-UK a copy of the machine-readable collection is maintained at the 
-Rutherford Appleton Laboratory and is available through STADAT (see 
+UK a copy of the machine-readable collection is maintained at the
+Rutherford Appleton Laboratory and is available through STADAT (see
 Section~\ref{STADAT}, above).
 
 \subsubsection{CDS
 \xlabel{cds}\label{CDS}}
 
 The Centre de Donn\'{e}es Stellaires (CDS) at the Strasbourg Observatory
-was the first astronomical data centre, set up in 1972. In addition to 
+was the first astronomical data centre, set up in 1972. In addition to
 maintaining a collection of astronomical catalogues and data, the CDS
-publishes the bi-annual {\it Bulletin d'Information du Centre de 
+publishes the bi-annual {\it Bulletin d'Information du Centre de
 Donn\'{e}es Stellaires}, which is the principal publication concerned
 with astronomical catalogues and data.
 
 A list of the catalogues currently available and copies of most of them
-can be obtained by anonymous ftp (File Transfer Protocol). The details 
+can be obtained by anonymous ftp (File Transfer Protocol). The details
 are as follows.
 
 {\it INTERNET address: } cdsarc.u-strasbg.fr or 130.79.128.5
 \newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your full name and the name of your 
+\newline {\it Password:} Type your full name and the name of your
 institute.
 
 In order to access this system, you should log on to a local Starlink
@@ -1143,27 +1143,27 @@ Unix system and type either
 \vspace{2.0 mm}
 
 Then simply supply the details for username and password as indicated
-above.  See Section~\ref{REMOTE} for more details of accessing remote 
-hosts. Once you have logged on, a restricted set of Unix commands 
-concerned with changing directories and copying files are available to 
-you. Initially you should set your current directory to the root 
-directory of the directory tree containing the catalogues, which is 
-directory \verb-pub/cats-. Note also that some of the larger catalogues 
-are held in {\it Unix compressed format}. Further details are given in 
-{\it The Archive of astronomical catalogues at CDS} by F. Ochsenbein, 
-July 1992, {\it Bulletin d'Information du Centre de Donn\'{e}es 
+above.  See Section~\ref{REMOTE} for more details of accessing remote
+hosts. Once you have logged on, a restricted set of Unix commands
+concerned with changing directories and copying files are available to
+you. Initially you should set your current directory to the root
+directory of the directory tree containing the catalogues, which is
+directory \verb-pub/cats-. Note also that some of the larger catalogues
+are held in {\it Unix compressed format}. Further details are given in
+{\it The Archive of astronomical catalogues at CDS} by F. Ochsenbein,
+July 1992, {\it Bulletin d'Information du Centre de Donn\'{e}es
 Stellaires}, no. {\bf 41}, pp65-70.
 
 Further information about the CDS can be requested by sending e-mail
-to 29588::QUESTION (SPAN), question@fr.u-strasbg.simbad (INTERNET), or 
-by writing to the Centre de Donn\'{e}es Stellaires, Observatoire 
+to 29588::QUESTION (SPAN), question@fr.u-strasbg.simbad (INTERNET), or
+by writing to the Centre de Donn\'{e}es Stellaires, Observatoire
 Astronomique, 11, rue de l'Universit\'{e}, 67000 Strasbourg, France.
 
 \subsubsection{US Astronomical Data Center
 \xlabel{us_astronomical_data_center}\label{ADC}}
 
 The Astronomical Data Center (ADC) is part of the National Space
-Science Data Center (NSSDC) / World Data Center A for Rockets and 
+Science Data Center (NSSDC) / World Data Center A for Rockets and
 Satellites at the NASA Goddard Space Flight Center. An on-line system
 is available which provides information on the catalogues held by the
 ADC and allows the interactive submission of requests for catalogues.
@@ -1177,17 +1177,17 @@ The details are as follows.
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. The first time that you log on you will
 be asked to supply your name and other details. You are logged on to a
-general service covering all the archives of the NSSDC; select option 
+general service covering all the archives of the NSSDC; select option
 ten from the main menu to see the holdings of the ADC.
 
 The ADC publishes {\it ADC Electronic News} which is distributed by
-e-mail. Subscription and back issues are also handled automatically by 
-e-mail. In order to invoke the various functions you should compose 
-standard messages (in the format described below) and send them to 
+e-mail. Subscription and back issues are also handled automatically by
+e-mail. In order to invoke the various functions you should compose
+standard messages (in the format described below) and send them to
 account listserver@hypatia.gsfc.nasa.gov (INTERNET). The system will
-decode your e-mail address and reply accordingly. This system is 
+decode your e-mail address and reply accordingly. This system is
 completely automatic, but nonetheless several days can elapse between
-dispatch of a message and receipt of a reply. The various messages are 
+dispatch of a message and receipt of a reply. The various messages are
 as follows.
 
 \begin{itemize}
@@ -1214,20 +1214,20 @@ as follows.
 \end{itemize}
 
 Further information about the ADC can be requested by sending e-mail
-to 15578::NCF (SPAN), or by writing to the Astronomical Data Center, 
+to 15578::NCF (SPAN), or by writing to the Astronomical Data Center,
 National Space Science Data Center, Code 633, NASA, Goddard Space Flight
 Center, Greenbelt, Maryland 20771, USA.
 
 \subsection{SIMBAD\xlabel{simbad}}
 
-SIMBAD (Set of Identifications Measurements and Bibliography for 
+SIMBAD (Set of Identifications Measurements and Bibliography for
 Astronomical Data) is a comprehensive, integrated database for objects
-outside the solar system. It is operated by the CDS (see 
-Section~\ref{CDS}, above). Currently it contains data for 
+outside the solar system. It is operated by the CDS (see
+Section~\ref{CDS}, above). Currently it contains data for
 approximately 650,000 stars and about 100,000 non-stellar objects and
-is believed to be substantially complete to a visual magnitude of about 
-fifteen. The type of information stored varies for different sorts of 
-objects, but includes basic parameters (such as positions and 
+is believed to be substantially complete to a visual magnitude of about
+fifteen. The type of information stored varies for different sorts of
+objects, but includes basic parameters (such as positions and
 magnitudes), cross-identifications and bibliographic data. Currently
 SIMBAD is the most comprehensive database of this type available.
 
@@ -1241,22 +1241,22 @@ The details are as follows.
 \newline {\it Password:} site specific; see below
 
 See Section~\ref{REMOTE} for details of establishing a connection to
-a remote host. However, before you can use SIMBAD you need to be 
-registered as either an individual or as a site (the latter 
-corresponding to your institution). Once you have registered you will 
-receive an account name, password and a copy of the user guide. Many 
-Starlink nodes will already have registered. In the first instance you 
-should consult your Starlink site manager. He will either be able to 
-tell you the account name and password for your site, or will arrange 
-registration. You apply for registration by contacting the director of 
-the CDS: Dr Michel Cr\'{e}z\'{e}, Director, Centre de Donn\'{e}es 
-Stellaires, Observatoire Astronomique, 11, rue de l'Universit\'{e}, 
-67000 Strasbourg, France. E-mail: or 29588::CREZE (SPAN), 
+a remote host. However, before you can use SIMBAD you need to be
+registered as either an individual or as a site (the latter
+corresponding to your institution). Once you have registered you will
+receive an account name, password and a copy of the user guide. Many
+Starlink nodes will already have registered. In the first instance you
+should consult your Starlink site manager. He will either be able to
+tell you the account name and password for your site, or will arrange
+registration. You apply for registration by contacting the director of
+the CDS: Dr Michel Cr\'{e}z\'{e}, Director, Centre de Donn\'{e}es
+Stellaires, Observatoire Astronomique, 11, rue de l'Universit\'{e},
+67000 Strasbourg, France. E-mail: or 29588::CREZE (SPAN),
 creze@fr.u-strasbg.simbad (INTERNET). You should note that a charge is
 made for the use of SIMBAD.
 
 Other inquiries, requests for help and comments can be sent by e-mail
-to account 
+to account
 \newline 29588::QUESTION (SPAN), question@fr.u-strasbg.simbad
 (INTERNET).
 
@@ -1265,20 +1265,20 @@ to account
 {\it SIMBAD User's Guide and Reference Manual} SIMBAD III, release 1.2,
 April 1992 (Strasbourg: Observatoire Astronomique de Strasbourg).
 
-For a more general description see {\it The SIMBAD Astronomical 
-database} by D. Egret, M. Wenger and P. Dubois, 1991, in {\it Databases 
-and On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht 
+For a more general description see {\it The SIMBAD Astronomical
+database} by D. Egret, M. Wenger and P. Dubois, 1991, in {\it Databases
+and On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht
 (Dordrecht: Kluwer) pp79-88.
 
 \subsection{NASA Extragalactic Database, NED
 \xlabel{nasa_extragalactic_database_ned}}
 
-The NASA/IPAC Extragalactic Database (NED) was established at the 
-Infrared Processing and Analysis Center, California Institute of 
-Technology in 1987. The purpose of the database is to maintain a 
-comprehensive archive of published data on galaxies and other 
-extragalactic objects. The data held for each object includes 
-designations, basic data, such as positions and magnitudes, and 
+The NASA/IPAC Extragalactic Database (NED) was established at the
+Infrared Processing and Analysis Center, California Institute of
+Technology in 1987. The purpose of the database is to maintain a
+comprehensive archive of published data on galaxies and other
+extragalactic objects. The data held for each object includes
+designations, basic data, such as positions and magnitudes, and
 bibliographic information including abstracts. Currently NED contains
 data for over 82,000 objects.
 
@@ -1297,24 +1297,24 @@ e-mail to account 15193::NED (SPAN), ned@ipac.caltech.edu (INTERNET).
 
 For further information, contact George Helou, Infrared Processing and
 Analysis Center, Jet Propulsion Laboratory, California Institute of
-Technology, Pasadena, California 91125, USA. E-mail: 15193::HELOU 
+Technology, Pasadena, California 91125, USA. E-mail: 15193::HELOU
 (SPAN), helou@ipac.caltech.edu (INTERNET).
 
 {\it Documentation:}
 
-A general description of NED is given in {\it The NASA/IPAC 
-Extragalactic Database} by G. Helou, B.F. Madore, M. Schmitz, M.D. 
+A general description of NED is given in {\it The NASA/IPAC
+Extragalactic Database} by G. Helou, B.F. Madore, M. Schmitz, M.D.
 Bicay, X. Wu and J. Bennett, 1991, in {\it Databases and On-Line Data in
 Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: Kluwer) pp89-106.
 
 \subsection{Extragalactic Database, EDB
 \xlabel{extragalactic_database_edb}\label{EDB}}
 
-The Lyon-Meudon Extragalactic Database (EDB) was created at the 
-Obsevatoire de Lyon in 1983. Since 1985 it has been managed jointly by 
+The Lyon-Meudon Extragalactic Database (EDB) was created at the
+Obsevatoire de Lyon in 1983. Since 1985 it has been managed jointly by
 the Observatoire de Lyon and the DERAD'N of the Observatoire de Meudon.
 The purpose of the database is to maintain a comprehensive collection
-of mean homogeneous data for extragalactic objects. The information 
+of mean homogeneous data for extragalactic objects. The information
 available for each object includes measured parameters, mean homogenized
 data and model-dependent parameters. Currently the EDB contains entries
 for more than 86,000 normal galaxies. The PGC (see Section~\ref{PGC},
@@ -1323,23 +1323,23 @@ above) was created from the EDB.
 On-line access to the EDB is available. The details are as follows.
 
 {\it INTERNET address:} 134.214.4.7
-\newline {\it Username:} \verb-base- (note: lower case is mandatory) 
+\newline {\it Username:} \verb-base- (note: lower case is mandatory)
 \newline {\it Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on follow the instructions (which are in
-English). Further information can be obtained from the Observatoire de 
+English). Further information can be obtained from the Observatoire de
 Lyon, 69561 Saint-Genis Laval Cedex, France.
 
 {\it Documentation:}
 
 General descriptions of the EDB are given in:
 
-G. Paturel, L. Bottinelli, P. Fouqu\'{e}, and L. Gouguenheim, 1988, in 
-{\it Astronomy from Large Databases} eds. F. Murtagh and A. Heck 
+G. Paturel, L. Bottinelli, P. Fouqu\'{e}, and L. Gouguenheim, 1988, in
+{\it Astronomy from Large Databases} eds. F. Murtagh and A. Heck
 (Garching: ESO conference and workshop proceedings no. 28) pp435-440.
 
-G. Paturel, L. Gouguenheim and L. Bottinelli, 1992, in 
+G. Paturel, L. Gouguenheim and L. Bottinelli, 1992, in
 {\it Astronomy from Large Databases II} eds. A. Heck and F. Murtagh
 (Garching: ESO conference and workshop proceedings no. 43) pp429-431.
 
@@ -1348,15 +1348,15 @@ G. Paturel, L. Gouguenheim and L. Bottinelli, 1992, in
 
 The High Energy Astrophysics Science Archive Research Center (HEASARC)
 at the Goddard Space Flight Center was created by NASA in 1990 as a site
-for X-ray and $\gamma$-ray astronomy archival research. The HEASARC 
+for X-ray and $\gamma$-ray astronomy archival research. The HEASARC
 maintains an archive from a number of high-energy astronomy satellites,
-including ones that have completed their missions, such as {\it 
-Einstein}, HEAO 1, HEAO 3, OSO 8, SAS 2 and 3, {\it Uhuru} and {\it 
-Vela} 5B, and others which are still in operation or construction, such 
-as ROSAT, GRO, BBXRT, {\it Astro}-D and XTE. It is anticipated that 
+including ones that have completed their missions, such as {\it
+Einstein}, HEAO 1, HEAO 3, OSO 8, SAS 2 and 3, {\it Uhuru} and {\it
+Vela} 5B, and others which are still in operation or construction, such
+as ROSAT, GRO, BBXRT, {\it Astro}-D and XTE. It is anticipated that
 approximately one terabyte of data will be held by 1995.
 
-On-line access to the HEASARC archives is supported. The details are as 
+On-line access to the HEASARC archives is supported. The details are as
 follows.
 
 {\it SPAN address: } 15761
@@ -1365,17 +1365,17 @@ follows.
 \newline {\it Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
-a remote host. The first time that you log on you will be asked to 
-supply a username to identify yourself to the HEASARC software; this 
-should consist of your first initial, followed by your surname, without 
-spaces. On-line help information is available, and can be accessed by 
+a remote host. The first time that you log on you will be asked to
+supply a username to identify yourself to the HEASARC software; this
+should consist of your first initial, followed by your surname, without
+spaces. On-line help information is available, and can be accessed by
 typing \verb-HELP-. Much of the HEASARC software is also available at
 Leicester (see Section~\ref{LEICS}, above).
 
 Requests for further information about HEASARC should be sent by e-mail
-to 
+to
 \newline 15761::REQUEST (SPAN), request@ndadsa.gsfc.nasa.gov (INTERNET).
-The postal address of the HEASARC is: HEASARC, Code 668, NASA, Goddard 
+The postal address of the HEASARC is: HEASARC, Code 668, NASA, Goddard
 Space Flight Center, Greenbelt, Maryland 20771, USA.
 
 {\it Documentation:}
@@ -1383,20 +1383,20 @@ Space Flight Center, Greenbelt, Maryland 20771, USA.
 A variety of documentation is available from the HEASARC.
 
 A useful introduction to the on-line service is {\it The HEASARC On-line
-Service - An Overview}, by K.L. Rhode, 1992, {\it Legacy}, no. {\bf 1}, 
+Service - An Overview}, by K.L. Rhode, 1992, {\it Legacy}, no. {\bf 1},
 pp21-28.
 
-{\it Legacy} is the HEASARC journal; copies of it and the other 
-documentation can be requested by e-mail sent to the account for 
+{\it Legacy} is the HEASARC journal; copies of it and the other
+documentation can be requested by e-mail sent to the account for
 requesting further information given above.
 
 \subsection{EINLINE\xlabel{einline}}
 
 The EINLINE on-line service is provided by the Einstein Data Center at
 the Smithsonian Astrophysical Observatory. It was originally set up to
-make the results of the {\it Einstein} Observatory catalogue of IPC 
+make the results of the {\it Einstein} Observatory catalogue of IPC
 X-ray sources available in a form suitable for preparing ROSAT observing
-proposals. Subsequently it has grown to include access to many other 
+proposals. Subsequently it has grown to include access to many other
 {\it Einstein} data products and tabular data from other wavebands,
 including an extensive collection of radio-astronomical catalogues
 compiled by Heinz Andernach.
@@ -1404,7 +1404,7 @@ compiled by Heinz Andernach.
 The details of access to this service are as follows.
 
 {\it SPAN address: } 6714
-\newline {\it INTERNET address:} cfa204.harvard.edu, or 
+\newline {\it INTERNET address:} cfa204.harvard.edu, or
 einline.harvard.edu, or 128.103.40.204
 \newline {\it Username:} \verb-einline- (note: lower case is mandatory)
 \newline {\it Password:} No password required; captive account.
@@ -1413,8 +1413,8 @@ See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on follow the instructions.
 
 Requests for further information should either be sent by e-mail to:
-6699::EINLINE (SPAN), einline@cfa.harvard.edu (INTERNET) or by post to: 
-Einstein Data Products Office, Smithsonian Astrophysical Observatory, 
+6699::EINLINE (SPAN), einline@cfa.harvard.edu (INTERNET) or by post to:
+Einstein Data Products Office, Smithsonian Astrophysical Observatory,
 60 Garden Street, MS 12 Cambridge, Massachusetts 01238, USA.
 
 {\it Documentation:}
@@ -1425,10 +1425,10 @@ down-loaded from the on-line service.
 \subsection{DIRA2\xlabel{dira2}}
 
 DIRA2 (Distributed Information Retrieval from Astronomical Data) is a
-database package produced by the Astronet Database Group based in 
+database package produced by the Astronet Database Group based in
 Bologna. It is in use at several Astronet nodes in Italy. The system
-comprises a collection of astronomical catalogues, including an 
-extensive collection of radio-astronomical ones compiled by Heinz 
+comprises a collection of astronomical catalogues, including an
+extensive collection of radio-astronomical ones compiled by Heinz
 Andernach, and software to query
 them.
 
@@ -1440,9 +1440,9 @@ The system can be accessed remotely; the details are as follows.
 \newline {\it Password:} \verb-DIRA2-
 
 See Section~\ref{REMOTE} for details of establishing a connection to
-a remote host. After logging on follow the instructions, which are in 
-English. Further information can be obtained from: M. Nanni, C.N.R. 
-Instituto di Radioastronomia, Via Irnerio, 46, 40126 Bologno, Italy. 
+a remote host. After logging on follow the instructions, which are in
+English. Further information can be obtained from: M. Nanni, C.N.R.
+Instituto di Radioastronomia, Via Irnerio, 46, 40126 Bologno, Italy.
 E-mail: 38057::NANNI (SPAN) or nanni@astbo1.bo.cnr.it (INTERNET).
 
 {\it Documentation:}
@@ -1458,8 +1458,8 @@ the above address.
 
 Archives of data from the Hubble Space Telescope (HST) are maintained at
 both the Space Telescope Science Institute (STScI) in the United States
-and at the Space Telescope European Coordinating Facility in Europe. 
-Currently both institutions run the same archive software, a system 
+and at the Space Telescope European Coordinating Facility in Europe.
+Currently both institutions run the same archive software, a system
 called STARCAT, though in the future they may run different systems.
 
 STARCAT (Space Telescope ARchive CATalogue) allows access to various
@@ -1468,7 +1468,7 @@ available includes: standard astronomical catalogues, observation logs
 from various satellites and ground-based observatories and spectra
 and images from some observation logs (including the HST).
 
-The details for accessing STARCAT at the Space Telescope European 
+The details for accessing STARCAT at the Space Telescope European
 Coordinating Facility are as follows.
 
 {\it SPAN address: } 28771
@@ -1477,14 +1477,14 @@ Coordinating Facility are as follows.
 \newline {\it Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
-a remote host. After logging on follow the instructions. In the first 
+a remote host. After logging on follow the instructions. In the first
 instance, questions, comments or requests for further information should
 be sent to Benoit Pirenne, ESA Space Telescope European Coordinating
 Facility, European Southern Observatory, Karl Schwarzschild Stra\ss e 2,
-D-W8046, Garching bei M\"{u}nchen, Germany. E-mail: 28760::bpirenne 
+D-W8046, Garching bei M\"{u}nchen, Germany. E-mail: 28760::bpirenne
 (SPAN), bpirenne@eso.org (INTERNET).
 
-The STScI provides copies of the archive on both VAX/VMS and Unix 
+The STScI provides copies of the archive on both VAX/VMS and Unix
 systems. The details of accessing these systems are as follows.
 
 {\bf VAX/VMS archive host}
@@ -1496,19 +1496,19 @@ systems. The details of accessing these systems are as follows.
 {\bf Unix archive host}
 
 {\it INTERNET address:} stdatu.stsci.edu or 130.167.1.148
-\newline {\it Username:} \verb-guest- (note: lower case is mandatory) 
-\newline {\it Password:} \verb-archive- (note: lower case is mandatory) 
+\newline {\it Username:} \verb-guest- (note: lower case is mandatory)
+\newline {\it Password:} \verb-archive- (note: lower case is mandatory)
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on, a subset of the normal operating system
 commands (VMS or Unix, as appropriate) are available for examining files
 and navigating directory trees. Additional commands available on both
 systems are: \verb-docs- to move to the documents directory, \verb-home-
-to return to the login directory and \verb-starcat- to start STARCAT 
+to return to the login directory and \verb-starcat- to start STARCAT
 (then follow the instructions).
 
 A manual and primer are available, though it should be possible to use
-STARCAT without them. Requests for copies of the manuals, further 
+STARCAT without them. Requests for copies of the manuals, further
 information and assistance should be sent by e-mail to archive@stsci.edu
 (INTERNET).
 
@@ -1524,22 +1524,22 @@ Space Telescope European Coordinating Facility).
 
 General descriptions are given in:
 
-{\it Data Archive Systems for the Hubble Space Telescope} by E. 
-Schreier, P. Benvenuti and F. Pasian, 1991, in {\it Databases and 
-On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: 
+{\it Data Archive Systems for the Hubble Space Telescope} by E.
+Schreier, P. Benvenuti and F. Pasian, 1991, in {\it Databases and
+On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht:
 Kluwer) pp47-58.
 
 {\it STARCAT: An Interface to Astronomical Databases} by B. Pirenne,
-M.A. Albrecht, D. Durand and S. Gaudet, 1992, in {\it Astronomy from 
-Large Databases II} eds. A. Heck and F. Murtagh (Garching: ESO 
+M.A. Albrecht, D. Durand and S. Gaudet, 1992, in {\it Astronomy from
+Large Databases II} eds. A. Heck and F. Murtagh (Garching: ESO
 conference and workshop proceedings no. 43) pp447-453.
 
-The future direction of the archive software at the STScI is described 
+The future direction of the archive software at the STScI is described
 in:
 
 {\it STARVIEW: The Astronomer's Interface to the Hubble Space Telescope
-Archive} by M.D. Johnson, 1992, in {\it Astronomy from Large Databases 
-II} eds. A. Heck and F. Murtagh (Garching: ESO conference and workshop 
+Archive} by M.D. Johnson, 1992, in {\it Astronomy from Large Databases
+II} eds. A. Heck and F. Murtagh (Garching: ESO conference and workshop
 proceedings no. 43) pp75-83.
 
 
@@ -1548,7 +1548,7 @@ proceedings no. 43) pp75-83.
 Traditionally each data archive exists as a separate, independent
 entity. Each has its own software, user interface and data formats.
 Combining data from separate archives is difficult if not impossible.
-Recently more ambitious systems have been attempted, which allow 
+Recently more ambitious systems have been attempted, which allow
 uniform access to a number of geographically distributed databases.
 Currently two such systems are available: ESIS in Europe and the ADS
 in the United States.
@@ -1576,9 +1576,9 @@ ESRIN, P.O. Box 64, 00044 Frascati (RM), Italy. E-mail: 29617::ISDHELP
 
 {\it Documentation:}
 
-A general introduction to ESIS is given in {\it ESIS A Science 
-Information System} by M.A. Albrecht, 1991, in {\it Databases and 
-On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: 
+A general introduction to ESIS is given in {\it ESIS A Science
+Information System} by M.A. Albrecht, 1991, in {\it Databases and
+On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht:
 Kluwer) pp127-138.
 
 \subsection{Astrophysics Data System, ADS
@@ -1586,29 +1586,29 @@ Kluwer) pp127-138.
 
 The NASA Astrophysics Data System (ADS) provides uniform access to data
 archives from various NASA astronomy satellites, as well as more general
-astronomical catalogues. Some of the data collections accessible through 
-the ADS include: X-ray astronomy (Center for Astrophysics, Smithsonian 
+astronomical catalogues. Some of the data collections accessible through
+the ADS include: X-ray astronomy (Center for Astrophysics, Smithsonian
 Astrophysical Observatory), Infrared astronomy (Infrared Processing and
-Analysis Center), Ultraviolet astronomy (IUE Regional Data Analysis 
-Facility, Boulder), Extreme ultraviolet astronomy (Center for EUV 
+Analysis Center), Ultraviolet astronomy (IUE Regional Data Analysis
+Facility, Boulder), Extreme ultraviolet astronomy (Center for EUV
 astrophysics), General astronomical catalogues (National Space Science
-Data Center), Ultraviolet astronomy (IUE Regional Data Analysis 
+Data Center), Ultraviolet astronomy (IUE Regional Data Analysis
 Facility, Maryland), High energy astronomy (HEASARC) Hubble Space
 Telescope (Space Telescope Science Institute) and HEAO-1 (Pennsylvania
 State University).
 
-Until recently the ADS could only be accessed from within the United 
+Until recently the ADS could only be accessed from within the United
 States, because of an export restriction on the data encryption software
-that it uses. However, this restriction has now (March 1993) been 
-relaxed and the ADS can be accessed from sites outside the United 
+that it uses. However, this restriction has now (March 1993) been
+relaxed and the ADS can be accessed from sites outside the United
 States. In order to access the ADS it is necessary to register as an ADS
-user and to install special software on your host computer. Versions of 
-this software are available for a variety of Unix workstations but not 
+user and to install special software on your host computer. Versions of
+this software are available for a variety of Unix workstations but not
 VAX/VMS.
 
 Details of the registration procedure, the configuration required to
 run the local ADS software, and general information about the ADS can be
-obtained from: ADS User Support, Center for Astrophysics and Space 
+obtained from: ADS User Support, Center for Astrophysics and Space
 Astronomy, University of Colorado, Boulder, Colorado 80309, USA. E-mail:
 ads@cuads.colorado.edu (INTERNET).
 
@@ -1616,25 +1616,25 @@ ads@cuads.colorado.edu (INTERNET).
 
 General introductions to the ADS are given in:
 
- {\it The NASA Astrophysics Data System} by J.R. Weiss and J.C. Good, 
-1991, in {\it Databases and On-Line Data in Astronomy}, eds. D. Egret 
+ {\it The NASA Astrophysics Data System} by J.R. Weiss and J.C. Good,
+1991, in {\it Databases and On-Line Data in Astronomy}, eds. D. Egret
 and M. Albrecht (Dordrecht: Kluwer) pp139-150.
 
-{\it Astrophysics Data System (ADS)} by S.S. Murray, E.W. Brugel, G. 
+{\it Astrophysics Data System (ADS)} by S.S. Murray, E.W. Brugel, G.
 Eichhorn, A. Ferris, J.C. Good, M.J. Kurtz, J.A. Nousek and J.L. Stoner,
-1992, in {\it Astronomy from Large Databases II} eds. A. Heck and F. 
-Murtagh (Garching: ESO conference and workshop proceedings no. 43) 
+1992, in {\it Astronomy from Large Databases II} eds. A. Heck and F.
+Murtagh (Garching: ESO conference and workshop proceedings no. 43)
 pp387-391.
 
 \section{Logging on to remote computers
 \xlabel{logging_on_to_remote_computers}\label{REMOTE}}
 
 This section attempts to give some general advice on how to log on to
-some of the overseas facilities listed in this document. Accessing 
-remote computers across communications networks is a notoriously 
-idiosyncratic business and only general suggestions can be given here; 
-they may not work in all instances and there may be better alternatives 
-from your site. If you encounter difficulties you should consult your 
+some of the overseas facilities listed in this document. Accessing
+remote computers across communications networks is a notoriously
+idiosyncratic business and only general suggestions can be given here;
+they may not work in all instances and there may be better alternatives
+from your site. If you encounter difficulties you should consult your
 site manager in the first instance.
 
 In order to access a remote computer you should first log on to a local
@@ -1668,7 +1668,7 @@ Log on to a VAX running VMS.
    The login prompt for the remote computer should appear.
 
   \item[INTERNET] In order to access a computer through INTERNET from a
-   Starlink VAX it is necessary to go through a SPAN to INTERNET 
+   Starlink VAX it is necessary to go through a SPAN to INTERNET
    gateway. For example, type
 
   \begin{verbatim}
@@ -1685,8 +1685,8 @@ Log on to a VAX running VMS.
   \end{verbatim}
 
    (note the exclamation mark at the end). The login prompt for the
-   remote computer should now appear. Note that the EAST gateway is 
-   located in the United States, so it is a somewhat eccentric route to 
+   remote computer should now appear. Note that the EAST gateway is
+   located in the United States, so it is a somewhat eccentric route to
    access sites in Europe.
 
 \end{description}
@@ -1699,7 +1699,7 @@ Log on to a Unix workstation.
 
   \item[SPAN] It is possible to access a computer through SPAN from a
    Starlink Unix workstation by going through the EAST gateway. However,
-   this gateway is located in the United States, making it an 
+   this gateway is located in the United States, making it an
    inefficient route and it should only be used as a last resort. There
    may be preferable alternatives at your site.
 
@@ -1737,16 +1737,16 @@ Log on to a Unix workstation.
 
 \subsection{SPAN numbers and names\xlabel{span_numbers_and_names}}
 
-SPAN numbers are usually quoted as simple decimal numbers, and this 
-format has been used throughout this document. This form is also 
-required in the \verb-SET HOST- command. However, SPAN numbers are 
-sometimes given in the hierarchical form $n.m$. In this case, the 
-simple decimal form can be computed using the expression 
+SPAN numbers are usually quoted as simple decimal numbers, and this
+format has been used throughout this document. This form is also
+required in the \verb-SET HOST- command. However, SPAN numbers are
+sometimes given in the hierarchical form $n.m$. In this case, the
+simple decimal form can be computed using the expression
 $(1024.n) + m$. For example, the hierarchical form of the HEASARC SPAN
 number is 15.401, corresponding to the simple number 15761.
 
 In addition to numbers, SPAN nodes may also have names. The names are
-simply synonyms for the numbers and may also be used in the 
+simply synonyms for the numbers and may also be used in the
 \verb-SET HOST- command. A given SPAN number should always be available,
 whereas the corresponding name may or may not have been set up at your
 site. In principle, the SPAN name for a site {\it should} be less likely
@@ -1756,20 +1756,20 @@ to change than its number, though in practice either or both can change.
 
 INTERNET sites may be identified by either a number or a name. The two
 forms are completely equivalent. For example, the corresponding INTERNET
-number and name for the HEASARC are 128.183.36.17 and 
-ndadsa.gsfc.nasa.gov respectively. Either the number or the name may 
-be used in the \verb-telnet- command. The INTERNET name will usually be 
-recognized, but the number is a fail-safe mechanism which should always 
+number and name for the HEASARC are 128.183.36.17 and
+ndadsa.gsfc.nasa.gov respectively. Either the number or the name may
+be used in the \verb-telnet- command. The INTERNET name will usually be
+recognized, but the number is a fail-safe mechanism which should always
 work.
 
 \section{Acknowlegments\xlabel{acknowlegments}}
 
-The descriptions of the various facilities were mostly abstracted from 
-the introductory sections of the corresponding documentation. However, 
+The descriptions of the various facilities were mostly abstracted from
+the introductory sections of the corresponding documentation. However,
 many people have also contributed to this document, either by supplying
-information or by offering advice and assistance. It is a pleasure to 
-thank (in alphabetical order): Heinz Andernach, Blaise Canzian, Jim 
-Condon, Ko Hummel, Ralph Martin, Brian McLean, Geoff Mellor, David 
+information or by offering advice and assistance. It is a pleasure to
+thank (in alphabetical order): Heinz Andernach, Blaise Canzian, Jim
+Condon, Ko Hummel, Ralph Martin, Brian McLean, Geoff Mellor, David
 Morgan, Julian Osborne, Clive Page, Steve Sembay and Alan Wood. Special
 thanks are due to Geoff Martin who checked all the network addresses,
 account names and passwords. Heinz Andernach and Bob Hanisch kindly

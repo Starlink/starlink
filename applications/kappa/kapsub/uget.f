@@ -17,9 +17,9 @@
 *     transfers N elements from external storage to the internal work
 *     arrays held in common block /MECOMS/.  The external storage is
 *     assumed to be in the form of a continuous 1-d vector.  The given
-*     argument J is the index within this external storage vector of 
-*     the first element to be transferred.  This element is copied to 
-*     element K of the internal work array ME_ST. 
+*     argument J is the index within this external storage vector of
+*     the first element to be transferred.  This element is copied to
+*     element K of the internal work array ME_ST.
 
 *  Arguments:
 *     J = INTEGER (Given)
@@ -73,7 +73,7 @@
       INCLUDE 'C1_COM'           ! Common blocks used to communicate
                                  ! with MEM2D.
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER J
       INTEGER K

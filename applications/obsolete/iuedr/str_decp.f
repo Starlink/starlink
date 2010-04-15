@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Decode position format into components.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -30,16 +30,16 @@
 
 *   Import:
       BYTE FORMAT(256)      ! edit format
- 
+
 *   Export:
       BYTE OFFSET           ! offset character
- 
+
       LOGICAL REL           ! whether relative position
- 
+
       INTEGER POS           ! position
- 
+
       LOGICAL TERM          ! whether terminator
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
       INTEGER str_LEN       ! string length
@@ -55,14 +55,14 @@
 *   String length
       FIRST = 1
       LAST = str_LEN(FORMAT)
- 
+
 *   Default values
       REL = .FALSE.
       OFFSET = 46
       POS = 0
       TERM = .TRUE.
       DIR = 0
- 
+
 *   Work through format end on the <edit> character
  100  CONTINUE
 
@@ -140,7 +140,7 @@
       END IF
 
  200  CONTINUE
- 
+
 *   Sort out defaults
       IF (REL) POS = DIR*POS
 

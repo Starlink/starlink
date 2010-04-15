@@ -1,4 +1,4 @@
-      SUBROUTINE DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
+      SUBROUTINE DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS, CONTEXT,
      :  ACTPTR, ANAME, AKEY, VALUE, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
+*     CALL DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS, CONTEXT,
 *     :  ACTPTR, ANAME, AKEY, VALUE, STATUS )
 
 *  Description:
@@ -40,8 +40,8 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Tell the TASK library to forget about this action. Tell the DTASK 
-*     library the action is no longer active. Flush the ERR and MSG 
+*     Tell the TASK library to forget about this action. Tell the DTASK
+*     library the action is no longer active. Flush the ERR and MSG
 *     systems. Send the final acknowledgment.
 
 *  Copyright:
@@ -89,11 +89,11 @@
 
 *  Arguments Given:
       INTEGER PATH               ! message path needed for reply
-      INTEGER MESSID             ! transaction number needed for reply 
+      INTEGER MESSID             ! transaction number needed for reply
       INTEGER MESSTATUS          ! status to be returned in completion
-                                 ! message 
+                                 ! message
       INTEGER CONTEXT            ! context to be returned in completion
-                                 ! message 
+                                 ! message
       INTEGER ACTPTR             ! action pointer
       CHARACTER*(*) ANAME        ! action name
       CHARACTER*(*) AKEY         ! keyword of action required
@@ -114,7 +114,7 @@
 *
 *   Close communications
 *
-      CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, AKEY, 
+      CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, AKEY,
      :  VALUE, STATUS )
 
       END

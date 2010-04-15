@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ PostScript laser printer using a Starlink-distributed PostScript print
 symbiont. Throughout the document it is assumed that your PostScript laser
 printer queue is called {\tt SYS\_PS}. This may not be the case at your site
 and you should consult your Site Manager it you are in any doubt as to which
-queue to use. 
+queue to use.
 
 \section{Printing Text}
 
@@ -115,7 +115,7 @@ true)\\
 \\
 \end{tabbing}
 
-For example, 
+For example,
 
 \begin{verbatim}
   $ PRINT/QUE=SYS_PS/FORM=HEADERS/PARAM=(NCOPIES=4,FSIZE=14) STUFF.TXT
@@ -130,7 +130,7 @@ PostScript files can be printed (executed) using the form POST. For example,
   $ PRINT/QUE=SYS_PS/FORM=POST SCREENDUMP.PS
 \end{verbatim}
 
-Those wishing to delve deeper into the workings of PostScript may want to 
+Those wishing to delve deeper into the workings of PostScript may want to
 make use of the /NOTE option. In the example below, the first line sent to
 the printer will be ``debug true def''. This will be executed before the
 user's PostScript file.
@@ -141,7 +141,7 @@ user's PostScript file.
 
 \section{Printing Starlink graphics}
 
-To print Starlink graphics on the PostScript printer, you must select 
+To print Starlink graphics on the PostScript printer, you must select
 one of the GKS devices from the following list when running
 the software that produces the plot.
 
@@ -171,8 +171,8 @@ PSCRIPT\_LTEX options.
 \TeX\/ and \LaTeX \/ output (.DVI files) are processed ready for printing on a
 Canon LBP II/III laser printer running in native Canon mode  using the command
 DVICAN. This produces files of the form .DVI-CAN. These files cannot be printed
-on a PostScript printer; the .DVI files must instead be processed using the 
-DVIPSA4 command which produces .DVI-PS PostScript files. This type of file can 
+on a PostScript printer; the .DVI files must instead be processed using the
+DVIPSA4 command which produces .DVI-PS PostScript files. This type of file can
 then be sent to the printer with the command:
 
 \begin{verbatim}
@@ -188,7 +188,7 @@ SUN/34.
 \section{Printing other types of file}
 
 The print symbiont has forms that allows several other popular format files to be
-printed on a PostScript laser printer. Note that not all of these forms have 
+printed on a PostScript laser printer. Note that not all of these forms have
 been tested by Starlink.
 
 \begin{tabbing}

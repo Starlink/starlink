@@ -18,7 +18,7 @@
 
 * Arguments:
 *    DIMS(2) = INTEGER ARRAY (Given)
-*       
+*
 *    RESPTR = INTEGER (Given)
 *        Pointer to results
 *    ERRPTR = INTEGER (Given)
@@ -26,31 +26,31 @@
 *    MISSPTR = INTEGER (Given)
 *        Pointer to missing values array
 *    VARPTR = INTEGER (Given)
-*       
+*
 *    EIDSPTR = INTEGER (Given)
-*       
+*
 *    SAMPTR = INTEGER (Given)
-*       
+*
 *    VMINPTR = INTEGER (Given)
-*       
+*
 *    VMAXPTR = INTEGER (Given)
-*       
+*
 *    STATUS = INTEGER (Given)
 *        Error status, 0=ok
 *    XPTR = INTEGER (Given)
-*       
+*
 *    YPTR = INTEGER (Given)
-*       
+*
 *    RESSLOT = INTEGER (Given)
-*       
+*
 *    ERRSLOT = INTEGER (Given)
-*       
+*
 *    XSLOT = INTEGER (Given)
-*       
+*
 *    YSLOT = INTEGER (Given)
-*       
+*
 *    UNITSPTR = INTEGER (Given)
-*       
+*
 * History:
 *   Use of DSA routines, addition of mapping .x.units TNW 27/1/89
 *   Change to map "write", rather than "update", TNW 23/7/90

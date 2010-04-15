@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ following categories:
 \item Manipulating data in catalogues.
 \end{itemize}
 
-Appendix~\ref{ap:summary} lists, in alphabetical order, the commands and 
+Appendix~\ref{ap:summary} lists, in alphabetical order, the commands and
 their functions.
 
 \section {Catalogue terms and ideas}
@@ -70,7 +70,7 @@ their functions.
 
 A catalogue has information that applies to the  whole catalogue. For an
 astronomical catalogue this may well include items such as:
- 
+
 \begin{description}
 \item[\mbox{}]\mbox{}
 \begin{description}
@@ -86,7 +86,7 @@ astronomical catalogue this may well include items such as:
 \end{description}
 \end{description}
 
-Traditionally these information items have been known as {\bf PARAMETERS} of 
+Traditionally these information items have been known as {\bf PARAMETERS} of
 the catalogue. These parameters should not be confused with the {\small ADAM}
 parameter system.
 
@@ -113,19 +113,19 @@ For example:
 \end{verbatim}
 \end{small}
 
-A catalogue is organised in rows and columns. In an astronomical  catalogue 
-columns are called 
-{\bf FIELDS} and rows are called {\bf ENTRIES}. Each field has information 
+A catalogue is organised in rows and columns. In an astronomical  catalogue
+columns are called
+{\bf FIELDS} and rows are called {\bf ENTRIES}. Each field has information
 associated with it.
 
 Each field requires :
- 
+
 \begin{description}
 \item[\mbox{}]\mbox{}
 \begin{description}
-\item [NAME] --- Field Name. 
+\item [NAME] --- Field Name.
 
-The name identifies a particular field (column) in the 
+The name identifies a particular field (column) in the
 catalogue and therefore must be unique in this catalogue.
 
 \item [FORMAT] --- Format of the field.
@@ -147,16 +147,16 @@ For example:
       NAME     FORMAT     UNITS      COMMENT
       ----     ------     -----      -------
 
-     FLUX       F8.4     JANSKY      Flux Density   
+     FLUX       F8.4     JANSKY      Flux Density
      RADIUS     I4       ARCSEC      Radius Vector
 \end{verbatim}
 \end{small}
 
 \subsection {Field Formats}
- 
+
 The field format determines how the values of that field are to be displayed.
-The report application CATREPORT supports all FORTRAN formats plus all the 
-common sexagesimal formats (SDD MM SS, SDD:MM:SS, DEGREES, HH MM SS 
+The report application CATREPORT supports all FORTRAN formats plus all the
+common sexagesimal formats (SDD MM SS, SDD:MM:SS, DEGREES, HH MM SS
 {\em etc.})
 
 \subsection {Restrictions in this implementation of CATPAC}
@@ -193,7 +193,7 @@ the default nor command-line recall is available.
 
 Parameter values are case insensitive except for graphics devices and
 filenames.  No file extension is assumed for ASCII files. (On VMS {\tt
-".DAT"} is assumed if no extension is given.) 
+".DAT"} is assumed if no extension is given.)
 
 On UNIX, {\sc CATPAC} is a monolith, but not in the traditional
 {\sc ADAM} sense. All the applications are soft links to this single
@@ -204,11 +204,11 @@ monolith appears to give a quicker load time (after the first
 invocation) than when there are individual applications. However, on a
 machine with a small memory ($\sim$8Mb) the monolith will not be
 retained in memory as you process your data, and so there can be some
-pregnant pauses, just like from {\sc DCL}. 
+pregnant pauses, just like from {\sc DCL}.
 
 \section{Demonstration}
 A demonstration script has been provided with this CATPAC release. You should
-run the demonstration from an empty directory. The demonstration is self 
+run the demonstration from an empty directory. The demonstration is self
 explainatory and is invoked by typing.
 
 \begin{verbatim}
@@ -218,10 +218,10 @@ explainatory and is invoked by typing.
 \section{Help}
 
 There is no {\bf help} command.  You must use {\bf cathelp} to
-obtain {\sc CATPAC} help.  For example, you should enter 
+obtain {\sc CATPAC} help.  For example, you should enter
 
 \begin{verbatim}
-     cathelp 
+     cathelp
 \end{verbatim}
 
 to enter the CATPAC help facility and return to start the facility.
@@ -229,7 +229,7 @@ to enter the CATPAC help facility and return to start the facility.
 
 So what applications are now available?  Appendix~\ref{ap:summary} lists
 in alphabetical order the commands and their functions, and
-Appendix~\ref{ap:classified} is a classified list of the same commands. 
+Appendix~\ref{ap:classified} is a classified list of the same commands.
 
 
 \section{Parameters}
@@ -265,7 +265,7 @@ gives details of all parameters in application CATREPORT. Applications show the
 defaults at the end of each  parameter description enclosed in square
 brackets---the same as in Appendix~\ref{ap:full}. If you want to override one
 of these defaults, then you must specify the parameter's value on the command
-line. 
+line.
 
 When you are prompted you will usually be given a suggested default value in
 {\tt / /} delimiters.  You can choose to accept the default by pressing
@@ -278,10 +278,10 @@ Alternatively, enter a different value
 \begin{verbatim}
       FREQUENCY - Sample frequency N. /5/ > 10
 \end{verbatim}
-to override the default. 
+to override the default.
 Some defaults begin with an {\tt @}.
 \begin{verbatim}
-      DATAFILE - Name of file containing the data /@TESTDATA.DAT/ > 
+      DATAFILE - Name of file containing the data /@TESTDATA.DAT/ >
 \end{verbatim}
 
 These are associated with files (ASCII, HDS) and devices (graphics,
@@ -299,7 +299,7 @@ Defaults may change as data are processed by {\small CATPAC}. Often the current
 suggested depending on the values of other parameters.  Current values of
 CATPAC parameters are stored in the HDS file {\tt ADAM\_USER:CATPAC.SDF}, and
 so they persist between {\small CATPAC} sessions. This file should not be
-deleted unless {\small CATPAC} parameters are to be completely reset. 
+deleted unless {\small CATPAC} parameters are to be completely reset.
 
 \subsection{Globals}
 
@@ -322,7 +322,7 @@ The full list is:
 \end{description}
 
 {\small CATPAC} uses the last INPUT catalogue as the
-suggested default value for the next prompt for an INPUT. 
+suggested default value for the next prompt for an INPUT.
 
 The values of of all global parameters may be inspected via the
 {\tt globals} command:
@@ -339,7 +339,7 @@ line quotes or double quotes are needed if the string contains spaces,
 otherwise the second and subsequent words could be treated as
 separate positional parameters.
 
-Responses to prompts are case insensitive. 
+Responses to prompts are case insensitive.
 
 \subsection{Arrays}
 If a parameter requires an array of values, the series
@@ -364,7 +364,7 @@ is to terminate the interactive loop in the ASCIITO application.
 Responding to a prompt with an abort request {\tt !!} will abort the
 application.  This process includes the various tidying operations
 such as the unmapping and closing of files.  Any other method of
-stopping an application prematurely can leave files mapped or corrupted. 
+stopping an application prematurely can leave files mapped or corrupted.
 
 \subsection{Help}
 \label{se:parhelp}
@@ -374,14 +374,14 @@ access to the help-library
 information for that parameter, for example:
 \begin{verbatim}
       DATAFILE - Name of the ASCII data file.
- 
+
       ASCIITO
- 
+
         Parameters
- 
+
           DATAFILE = _CHAR (Read)
              Name of the file containing the tabular ascii data.
- 
+
       DATAFILE - Name of the ASCII data file.
 \end{verbatim}
 
@@ -400,7 +400,7 @@ for running {\small CATPAC} in batch mode and in procedures, and for
 specifying the values of parameters that would otherwise be defaulted. A
 command-line parameter will prevent prompting for that parameter unless
 there is an error with the given value, say giving an alphabetic
-character string for a floating-point value. 
+character string for a floating-point value.
 
 There are two ways in which parameter values may be given on the
 command line: by keyword and by position. The two forms may be
@@ -409,7 +409,7 @@ keywords, so you can have some positional values followed by keyword
 values.  See some of the examples presented in Appendix~\ref{ap:full}.
 
 Keywords may appear in any order.
-Here is an example of command-line defaults using keywords: 
+Here is an example of command-line defaults using keywords:
 \begin{verbatim}
        catreport TEST ALLFLDS=F FLDNAMES=[RA,DEC]
 \end{verbatim}
@@ -421,7 +421,7 @@ you add a {\tt NO} prefix to keyword, for example:
 \end{verbatim}
 would be equivalent to {\tt ALLFLDS=F}.
 
-To obtain a true value for a logical parameter use just the keyword, 
+To obtain a true value for a logical parameter use just the keyword,
 for example:
 \begin{verbatim}
        catreport ALLFLDS
@@ -432,7 +432,7 @@ Alternatively, you can specify command-line values by position:
 \begin{verbatim}
       $ sample TEST SAMPTEST 5
 \end{verbatim}
-The application samples the catalogue {\tt TEST} at a frequency of 5 creating 
+The application samples the catalogue {\tt TEST} at a frequency of 5 creating
 a new catalogue {\tt SAMPTEST}. Note
 trailing parameters may missed but
 intermediate ones may not.  Some applications have many parameters and
@@ -443,7 +443,7 @@ in Appendix~\ref{ap:full} or the help for the application.
 
 Another consideration is that some parameters do not have defined positions
 because they are normally defaulted. Thus the keyword technique is
-recommended for most parameters. 
+recommended for most parameters.
 
 Sometimes specifying a parameter on the command line induces different
 behaviour, usually to inhibit a loop for procedures, or to eliminate
@@ -468,7 +468,7 @@ already specified before it on the command line) to be set to the original
 values specified by the application or its interface file.  In other words
 global and current values are ignored.
 
-The PROMPT keyword forces a prompt to appear for every application parameter. 
+The PROMPT keyword forces a prompt to appear for every application parameter.
 This can be useful if you cannot remember the name of a defaulted parameter or
 there would be too much to type on the command line.  However, it may prove
 tedious for certain {\small KAPPA} applications that have tens of parameters,
@@ -494,13 +494,13 @@ does not know where to write the output catalogue. However, if we run CATSEARCH
 like this:
 
 \begin{verbatim}
-       CATSEARCH OUTPUT=STARS 
+       CATSEARCH OUTPUT=STARS
 \end{verbatim}
 
 it would generate an output catalogue using default values for all the
 parameters except OUTPUT. Another point to be wary of is that some applications
 have loops, {\it e.g.}\ ASCIITO, and if you use the ACCEPT keyword
-it will only operate the first time the application gets a parameter value. 
+it will only operate the first time the application gets a parameter value.
 
 \newpage
 \appendix
@@ -743,7 +743,7 @@ functions as follows:
 
 \item [Layout]
 In this layout the specification of parameters has the following
-format. 
+format.
 
 \begin{verbatim}
      name  =  type (access)
@@ -752,7 +752,7 @@ format.
 
 This format also includes a {\em Usage} entry this shows how the
 application is invoked from the command line.   It lists the positional
-parameters in order followed by any prompted keyword parameters using 
+parameters in order followed by any prompted keyword parameters using
 a {\mbox ``KEYWORD=?''} syntax.  Defaulted
 keyword parameters do not appear.  Positional parameters
 that are normally defaulted are indicated by being enclosed in square
@@ -770,7 +770,7 @@ relevant when parameter REJECT is {\tt "TRUE"}.
 
 {\mantt \%name} means the value of parameter {\it name}.
 
-The description entry has a notation scheme to indicate 
+The description entry has a notation scheme to indicate
 normally defaulted parameters, {\it i.e.}\ those for which there will
 be no prompt.
 For such parameters a matching pair of square brackets ({\mantt []})
@@ -789,7 +789,7 @@ As above, but there are two default values that are created dynamically.
 \item[{\mantt [}{\rm default}{\mantt ]}]
 Occasionally, a description of the default is given in normal type,
 {\it e.g.}\ the size of the plotting region in a graphics application,
-where the exact default values depend on the device chosen. 
+where the exact default values depend on the device chosen.
 
 \item[{\mantt [default]}]
 If the brackets contain a value in teletype-fount, this is the explicit
@@ -1023,13 +1023,13 @@ the length of the commands. For example  {\small DELETECATALOGUE} becomes
 }{
    \sstdescription{
       Create a new catalogue that contains the data from an ASCII file.
-      Like ASCIITO ASCIICAT allows you to put your own data into a catalogue. 
+      Like ASCIITO ASCIICAT allows you to put your own data into a catalogue.
       The
       data must be tabular. Before running this application you should
       examine your data and create an information file. The information
-      file must contain the name, format, units, comments and start position 
+      file must contain the name, format, units, comments and start position
       for each field. Appendix~\ref{ap:example} shows part of a typical
-      information file. 
+      information file.
    }
    \sstusage{
       ASCIICAT INPUT DATAFILEi INFOFILE
@@ -1183,7 +1183,7 @@ the length of the commands. For example  {\small DELETECATALOGUE} becomes
       The expression should be a legal CATPAC Parser expression.
 
       Field names in the expression must be unique so append an {\tt '}\_{\tt '} followed
-      by the first four characters of the catalogue name. 
+      by the first four characters of the catalogue name.
       \newline
       Eg. IRPS\_RA, YALE\_DEC
       CAT1\_VALUE2.GT.300.AND.CAT2\_VALUE2.LT.500
@@ -2371,7 +2371,7 @@ the length of the commands. For example  {\small DELETECATALOGUE} becomes
    \sstdiytopic{
       Example
    }{
-      UPFIELD TEST VALUE1 COMFLG=T COMMENT={\tt "}Possible error 
+      UPFIELD TEST VALUE1 COMFLG=T COMMENT={\tt "}Possible error
       $+$ or $-$ 2{\tt "}
    }
    \sstbugs{
@@ -2488,7 +2488,7 @@ the length of the commands. For example  {\small DELETECATALOGUE} becomes
       This extract from an information file. identifies a field called STARNAME
       with format A8, units are 'none', its comment is 'Name of the star'
       and the start position of the data is 1.
- 
+
 \newpage
 \section{The CATPAC Parser}
 \label{ap:parser}
@@ -2518,7 +2518,7 @@ The CATPAC parser:
      .GT.   4
      .NE.   4
      //     6
-     +      7 
+     +      7
      -      7
      *      8
      /      8
@@ -2567,42 +2567,42 @@ Abbreviations used:
 
 \begin{small}
 \begin{verbatim}
-     <arop> arithmetic operators  
+     <arop> arithmetic operators
 
-     <unop> unary operators 
+     <unop> unary operators
 
-     <chrop> character operator  
+     <chrop> character operator
 
-     <reop> relational operators  
+     <reop> relational operators
 
-     <loop> logical operators 
+     <loop> logical operators
 
      <sloop> single logical operator
 
      <loexp> logical expression
-     
+
      <arexp> arithmetic expression
-     
+
      <chrexp> character expression
-     
+
      <loconst> logical constant
-     
+
      <numconst> numeric constant
-     
+
      <chrconst> character constant
-     
-     <logfname> field name of a logic field 
-     
+
+     <logfname> field name of a logic field
+
      <numfname> field name of a numeric field
-     
+
      <chrfname> field name of a character field
-     
+
      <logfunction> logical function
-     
+
      <numfunction> numeric function
-     
+
      <chrfunction> character function
-     
+
      <fldname> field name
 
      <numargs> numeric arguments
@@ -2630,7 +2630,7 @@ The definition:
 
 \begin{small}
 \begin{verbatim}
-     <loexp> :=   <arexp><reop><arexp> 
+     <loexp> :=   <arexp><reop><arexp>
                 | <loexp><loop><loexp>
                 | <chrexp><reop><chrexp>
                 | <sloop><loexp>
@@ -2647,7 +2647,7 @@ The definition:
                 | <chrconst>
                 | <chrfname>
 
-     
+
      <loop> :=   .OR.
                | .XOR.
                | .AND.
@@ -2665,8 +2665,8 @@ The definition:
                 | >
                 | #
 
-     Note: In character relational expressions "less then" means precedes 
-           in the ASCII collating sequence and "greater than" means follows 
+     Note: In character relational expressions "less then" means precedes
+           in the ASCII collating sequence and "greater than" means follows
            in the ASCII collating sequence.
 
      <unop> :=    +
@@ -2682,8 +2682,8 @@ The definition:
 
      <sloop> := .NOT.
 
-     <chrfname> :=  <fldname> 
-  
+     <chrfname> :=  <fldname>
+
      Note: The field must be of type character
 
      <logfname> :=  <fldname>
@@ -2731,10 +2731,10 @@ The definition:
 
      <chrarg> :=  <chrfname>
                 | <chrconst>
- 
+
      <unitarg> :=  "DEGREE"
                  | "ARCMIN"
-                 | "ARCSEC"     
+                 | "ARCSEC"
                  | "SDD MM SS.S"
                  | "SDD:MM:SS.S"
                  | "SDD MM SS"
@@ -2742,7 +2742,7 @@ The definition:
                  | "SDD MM"
                  | "SDD:MM"
                  | "MINUTE"
-                 | "SECOND"     
+                 | "SECOND"
                  | "HH MM SS.S"
                  | "HH:MM:SS.S"
                  | "HH MM SS"
@@ -2761,7 +2761,7 @@ The definition:
 
      <numconst> :=  <realconst>
                   | <intconst>
-              
+
      <realconst> :=  <intconst>
                    | <dpconst>
                    | <dpconst>E<expon>
@@ -2788,12 +2788,12 @@ The definition:
      <digits> :=  <digit><digits>
                 | <digit>
 
-     <character> :=    a | b | c | d | e | f | g | h | i | j | k | l 
-                     | m | n | o | p | q | r | s | t | u | v | w | x 
+     <character> :=    a | b | c | d | e | f | g | h | i | j | k | l
+                     | m | n | o | p | q | r | s | t | u | v | w | x
                      | y | z | A | B | C | D | E | F | G | H | I | J
-                     | K | L | M | N | O | P | Q | R | S | T | U | V 
+                     | K | L | M | N | O | P | Q | R | S | T | U | V
                      | W | X | Y | Z |
-   
+
      <digit> :=   0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 \end{verbatim}
 \end{small}
@@ -2804,14 +2804,14 @@ to perform these types of functions.
 
 \section{Available Catalogues}
 \label{ap:cats}
- 
-Personal catalogues are stored in your current directory and you are strongly 
+
+Personal catalogues are stored in your current directory and you are strongly
 advised to create a directory specifically for catalogue handling work. CATPAC
-also allows for system catalogues, these are usually large, unchanging 
-catalogues. If CATPAC cannot find the requested catalogue in the current 
+also allows for system catalogues, these are usually large, unchanging
+catalogues. If CATPAC cannot find the requested catalogue in the current
 directory, it's not the name of a personal catalogue, it checks the system
 catalogues. The system catalogues and any accompanying documentation available
-at any one site may vary but will be located using a environment variable 
+at any one site may vary but will be located using a environment variable
 CATPAC\_CATS.
 
 \end{document}

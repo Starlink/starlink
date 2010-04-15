@@ -165,7 +165,7 @@ proc red4DoSomething {taskname dowhat inputs} {
     deripple_spectrum
       {
        if {$dowhat=="action"} {
-         red4Derip $taskname 
+         red4Derip $taskname
        } elseif {$dowhat=="help"} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4DeripBox1.html
        }
@@ -427,7 +427,7 @@ proc red4DoSomething {taskname dowhat inputs} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox9.html
        }
       }
-    open_engineering_log 
+    open_engineering_log
       {
        if {$dowhat=="action"} {
          red4OpenLog $taskname

@@ -4,7 +4,7 @@ proc qmanEnterString {taskname} {
 #-
     global QmanAccess
     global QmanWidgets
- 
+
 # Disable all but the interrupt button
     cgs4drCursor pirate orange black
     grab $QmanWidgets(INTERRUPT)

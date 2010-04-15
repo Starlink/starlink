@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_DESPIKE( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine removes spikes from SCAN/MAP observations.
 *     The scan map differential despiking algorithm uses 2 criteria
@@ -29,7 +29,7 @@
 *
 *       diff(i) = point(i) - (point(i-1) + point(i+1))
 *                            -------------------------
-*                                       2.0 
+*                                       2.0
 *
 *
 *     Values of 'diff' for the first and last points in the scan are
@@ -47,7 +47,7 @@
 *     The first criterion for a spike is that it's 'diff' value
 *     should be further from the mean of 'diff' by NSIGMA times the
 *     sigma derived from the endpoints.
-*     
+*
 *     The problem with this simple approach is that bright sources
 *     in the scan themselves lead to excursions in 'diff' that can
 *     be wrongly identified as spikes. To prevent this happening a
@@ -57,7 +57,7 @@
 *     it. 'Box' is expected to increase faster for real sources than
 *     for spikes because in them the increase will be spread over
 *     all 3 averaged points rather than just 1.
-* 
+*
 *     The second criterion for a spike is met, therefore, if a
 *     point's 'diff' is further from the 'diff' mean than the value
 *     of 'box' at that point.
@@ -162,7 +162,7 @@
 *     Initial revision
 *
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -222,7 +222,7 @@
       REAL         NSIGMA               ! sigma cut-off for spike
                                         ! detection
       INTEGER      NSPIKES              ! Total number of spikes detected
-      INTEGER      N_BOL                ! number of bolometers measured 
+      INTEGER      N_BOL                ! number of bolometers measured
       INTEGER      N_EXPOSURES          ! number of exposures per integration
       INTEGER      N_FITS               ! number of FITS lines read from file
       INTEGER      N_INTEGRATIONS       ! number of integrations per measurement
@@ -233,7 +233,7 @@
       CHARACTER*132 OUTFILE             ! Output filename
       INTEGER      OUTNDF               ! NDF identifier of output file
       INTEGER      OUT_DATA_PTR         ! pointer to data array in output
-      INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output 
+      INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output
       INTEGER      OUT_VARIANCE_PTR     ! pointer to variance array in output
       LOGICAL      REDUCE_SWITCH        ! .TRUE. if REDUCE_SWITCH has been run
       INTEGER      RUN_NUMBER           ! run number of observation
@@ -285,21 +285,21 @@
      :  STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
      :  OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :  'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
 
 *  check that the observation was suitable for DESPIKE
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .NE. 'MAP' 
+         IF (OBSERVING_MODE .NE. 'MAP'
      :        .AND. OBSERVING_MODE .NE. 'POLMAP') THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
@@ -316,7 +316,7 @@
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a MAP observation '//
      :     'of object ^OBJECT', STATUS)
 
@@ -363,7 +363,7 @@
          ABORTED = .TRUE.
       END IF
 
-*     check the data dimensions 
+*     check the data dimensions
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
@@ -400,7 +400,7 @@
       N_INTEGRATIONS = 0
       N_MEASUREMENTS = 0
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
       CALL MSG_SETI ('N_E', N_EXPOSURES)
@@ -409,7 +409,7 @@
       CALL MSG_SETC ('PKG', PACKAGE)
 
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integration(s) in '//
      :        '^N_M measurement(s)', STATUS)
@@ -425,19 +425,19 @@
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
      :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM,' ', 
+         CALL MSG_OUTIF (MSG__NORM,' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
-      END IF         
- 
+      END IF
+
 *  read the NSIGMA for the spike cut-off
 
       CALL PAR_GET0R ('NSIGMA', NSIGMA, STATUS)
@@ -457,7 +457,7 @@
 
       CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE',
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
@@ -474,11 +474,11 @@
 *  despike the data
 
          CALL SURFLIB_DIFF_DESPIKE (N_EXPOSURES,
-     :     N_INTEGRATIONS, N_MEASUREMENTS, 
+     :     N_INTEGRATIONS, N_MEASUREMENTS,
      :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
      :     %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(IN_QUALITY_PTR)), BADBIT, NSIGMA,
-     :     %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), NSPIKES, STATUS)
 

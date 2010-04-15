@@ -16,11 +16,11 @@ package YyTag;
 #  Description:
 #     This module contains the routines for adding HTML-like tags to C
 #     and Fortran source code.  It is a harness for the external programs
-#     which do the work. 
+#     which do the work.
 #
 #     No names are exported, but the routines which are intended for use
 #     from outside this module are:
-#        - YyTag::ctag 
+#        - YyTag::ctag
 #        - YyTag::fortrantag.
 #
 #     Each of these takes a single argument, the filehandle providing
@@ -50,13 +50,13 @@ package YyTag;
 
 sub dotag;
 
-#  Determine the location of the tagging binaries.  
+#  Determine the location of the tagging binaries.
 #  The following assignment is edited by the install script.
 
 my( $scb_dir ) = "@bindir@";
 
 
-#  Define the functions to be used externally in terms of the generic 
+#  Define the functions to be used externally in terms of the generic
 #  dotag function.
 
 sub ctag { dotag "$scb_dir/ctag", @_; }
@@ -113,7 +113,7 @@ sub dotag {
       die "Process fork failed: $!\n";
    }
 
-#  Child process; because of the open() above the output is to the 
+#  Child process; because of the open() above the output is to the
 #  OUT file; now set it up so that its input is from the right place,
 #  the input filehandle, and exec() the tagging program.
 
@@ -130,7 +130,7 @@ sub dotag {
 #  If there should be some error in the tagging, then we return the untagged
 #  text instead.
 
-   if ( ! close OUT ) { 
+   if ( ! close OUT ) {
       print STDERR "Tagging routine failed.\n";
       $tagged = "";
       while ( <$fhin> ) {

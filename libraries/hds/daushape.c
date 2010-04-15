@@ -38,7 +38,7 @@ dau_get_shape(struct LCP_DATA *data, int *naxes, HDS_PTYPE *axis)
  *    the axis sizes.
  *
  * Routine value:
- *  
+ *
  *    DAT__OK    if successful.
  */
 

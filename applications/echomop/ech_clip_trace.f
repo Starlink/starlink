@@ -43,7 +43,7 @@
 *
 *     D(isable), is used when it is clear that the samples are not
 *     fittable.  Disables further processing ot the order effected.
-*     Orders may be automatically disabled if a small enough fraction 
+*     Orders may be automatically disabled if a small enough fraction
 *     of samples remain after auto-clipping has been done.
 *
 *     E(xit), will leave fitting for the current order and save the
@@ -51,7 +51,7 @@
 *
 *     G(o), is used to switch from interactive clipping to automatic
 *     mode.  Thus, after manually clipping a couple of orders it may be
-*     observed that the data are well modelled and that few points need 
+*     observed that the data are well modelled and that few points need
 *     be clipped, this can be left safely to auto-clipping.
 *     This option selects auto-clipping for the current, and any
 *     subsequent orders.
@@ -72,11 +72,11 @@
 *     the range to be clipped is the current cursor X-position; the
 *     end point is selected by moving the cursor and then hitting any key.
 *
-*     V(iew), the graph normally used for clipping shows the deviations 
+*     V(iew), the graph normally used for clipping shows the deviations
 *     from the fit of each sample.  The View option shows the actual
-*     samples, versus the fitted curve.  This provides a reference as to 
-*     the agreement of the fit with the data.  NOTE that View mode is 
-*     mutually exclusive with all other operations and must be lefted 
+*     samples, versus the fitted curve.  This provides a reference as to
+*     the agreement of the fit with the data.  NOTE that View mode is
+*     mutually exclusive with all other operations and must be lefted
 *     (type any key) before clipping can be resumed.
 *
 *     (Plus key), increments the degree of fit used to fit through
@@ -89,7 +89,7 @@
 *     is pressed.
 *
 *     (Exclamation mark key), leaves the fitter for this order
-*     and all subsequent orders.  Will either abort the task or return to 
+*     and all subsequent orders.  Will either abort the task or return to
 *     the ECHOMOP main menu, depending on the context.
 *
 *     NOTE after all clipping operations, the curve is re-fitted to

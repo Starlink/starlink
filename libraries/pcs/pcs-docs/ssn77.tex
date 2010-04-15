@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink System Note}
 \newcommand{\stardocinitials}  {SSN}
 \newcommand{\stardocsource}    {ssn\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -90,7 +90,7 @@ and
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -232,12 +232,12 @@ and
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -286,10 +286,10 @@ and
 \section{Introduction}
 ADAM tasks consist of user code wrapped up in the `ADAM fixed part'.
 The top level of the user's code is a subroutine with the same name as the
-task and a single argument \texttt{STATUS} conforming to 
+task and a single argument \texttt{STATUS} conforming to
 \xref{the normal Starlink inherited status strategy}
 {sun104}{inherited_status_checking}.
-The ADAM fixed part is provided by the task-building scripts, 
+The ADAM fixed part is provided by the task-building scripts,
 \xref{\texttt{alink} and \texttt{ilink}}{sun144}{adam_link_scripts},
 and handles the interface with the outside world. The two main parts of the
 ADAM fixed part are:
@@ -461,7 +461,7 @@ See
 These are handled by \texttt{DTASK\_GSOC()} in the first instance. In addition
 to the transaction identification, \texttt{PATH} and \texttt{MESSID}, the
 \texttt{CONTEXT}, \texttt{NAME} and \texttt{VALUE} components of the received
-message are passed. 
+message are passed.
 
 Firstly the \texttt{PATH} and \texttt{MESSID} from the message are set for
 SUBPAR (\texttt{SUBPAR\_PUTPATH()}) in case it wants to reply with a message or
@@ -470,9 +470,9 @@ appropriate to the \texttt{CONTEXT} is called.
 
 When the required action for the \texttt{CONTEXT} is complete, the transaction
 is ended by calling (\texttt{DTASK\_COMSHUT()}) which flushes any error
-messages on the stack to the master task (using 
+messages on the stack to the master task (using
 \xref{\texttt{ERR\_CLEAR()}}{ssn4}{ERR_CLEAR})
-before sending a final acknowledgment. 
+before sending a final acknowledgment.
 (The master task must therefore be prepared to handle any
 \texttt{MESSYS\_\_INFORM} messages prior to the final acknowledgement in any
 \texttt{CONTEXT}.)
@@ -481,7 +481,7 @@ message value will depend upon the status and the \texttt{CONTEXT}.
 
 \subsection{\label{get_context}\texttt{GET} Context}
 \texttt{GET} is handled by \texttt{DTASK\_GET()}.
-\texttt{NAME} contains the name of the required parameter. If the task is a 
+\texttt{NAME} contains the name of the required parameter. If the task is a
 \xref{monolith}{sun144}{introduction}, the parameter name must be of the form
 \texttt{ACTION:PARNAME} to specify the particular action within the monolith.
 
@@ -503,7 +503,7 @@ the parameter value as a character string.  In the event of an error, error
 messages are reported and the message status set appropriately.
 
 \subsection{\label{set_context}\texttt{SET} Context}
-\texttt{SET} is handled by \texttt{DTASK\_SET()}. 
+\texttt{SET} is handled by \texttt{DTASK\_SET()}.
 \texttt{NAME} contains the name of the required parameter as for
 \htmlref{\texttt{GET}}{get_context}.
 \texttt{VALUE} is a character string which the parameter subsystem can resolve
@@ -524,7 +524,7 @@ monolith) and \texttt{VALUE} is a string specifying parameter
 values in a format acceptable to the parameter system.
 
 For \texttt{OBEY} the action must not be active and for \texttt{CANCEL} the
-action must be active; otherwise the transaction is terminated (in 
+action must be active; otherwise the transaction is terminated (in
 \texttt{DTASK\_COMSHUT()}) by calling \texttt{AMS\_REPLY()} with a suitable
 bad message status.
 
@@ -548,7 +548,7 @@ OK, \texttt{DTASK\_OBEY()} is called.
 
 On return from \texttt{DTASK\_APPLIC()} if \texttt{STATUS} is not
 \texttt{SAI\_\_OK}, the message status, \texttt{MESSTATUS}, for the final
-acknowledgement message is set to the bad status value; 
+acknowledgement message is set to the bad status value;
 if \texttt{STATUS} is
 \texttt{SAI\_\_OK}, the \texttt{REQUEST} returned from the application is
 checked
@@ -598,9 +598,9 @@ for examples of how the user's code might handle a
 
 On return from \texttt{DTASK\_APPLIC} the status and \texttt{REQUEST} returned
 from the application are checked (\texttt{DTASK\_ACT\_SCHED()}) to see whether
-the action is to be terminated or is to continue rescheduling. 
+the action is to be terminated or is to continue rescheduling.
 In any case, an acknowledgement is sent to the task which requested the
-\texttt{CANCEL}. 
+\texttt{CANCEL}.
 If the action has ended, an acknowledgement is also sent to the task which
 issued the \texttt{OBEY}.
 
@@ -609,7 +609,7 @@ issued the \texttt{OBEY}.
 The message name component, passed as \texttt{ACTION} defines the particular
 control function required, \texttt{'DEFAULT'}, \texttt{'SETENV'} or
 \texttt{'PAR\_RESET'}.
-The required action is performed. 
+The required action is performed.
 
 If a problem occurs in the process, an appropriate bad status value is set
 and error report is made.
@@ -657,7 +657,7 @@ depending upon the \texttt{MSGSTATUS}.
 \texttt{SUBPAR\_WRITE()}).
 \item[\texttt{MESSYS\_\_PARAMREQ}] is handled by \texttt{TASK\_ASKPARAM()}.
 It relays the parameter request on to this task's parent (using
-\texttt{SUBPAR\_REQUEST()} which waits for the \texttt{MESSYS\_\_PARAMREP} 
+\texttt{SUBPAR\_REQUEST()} which waits for the \texttt{MESSYS\_\_PARAMREP}
 reply and returns the value).
 \texttt{TASK\_ASKPARAM()} then returns the value in a
 \texttt{MESSYS\_\_PARAMEREP} to the subsidiary task.
@@ -820,7 +820,7 @@ or:
 
 \begin{tabular}{|p{65mm}|c|p{75mm}|}
 \hline
-& $<$ & Reply with \texttt{MESSYS\_\_PARAMREQ} 
+& $<$ & Reply with \texttt{MESSYS\_\_PARAMREQ}
 (Request a prompt for a parameter value)\\
 Prompt User & & \\
 Reply with \texttt{MESSYS\_\_PARAMREP} & $>$ & \\

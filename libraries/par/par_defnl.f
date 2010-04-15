@@ -2,25 +2,25 @@
 *+
 *  Name:
 *     PAR_DEFNx
- 
+
 *  Purpose:
 *     Sets an array of values as the dynamic default for a parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_DEFNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )
- 
+
 *  Description:
 *     This routine sets an array of values as the dynamic default for
 *     a parameter. The dynamic default may be used as the parameter
 *     value by means of appropriate specifications in the interface
 *     file.
- 
+
 *     If the declared parameter type differs from the type of the
 *     array supplied, then conversion is performed.
- 
+
 *  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        The name of the parameter.
@@ -34,7 +34,7 @@
 *        The dimensions of the dynamic default object to be created.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types character,
 *     double precision, integer, logical, and real: replace "x" in the
@@ -46,10 +46,10 @@
 *     the object to be created.  If the dynamic default is used as the
 *     suggested value in a prompt, the name of this object, rather than
 *     its contents, is offered.
- 
+
 *  Algorithm:
 *     Call the underlying parameter system primitives.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1988, 1990, 1992 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     AJC: A J Chipperfield (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     10-DEC-1984 (BDK):
 *        Original version.
@@ -89,42 +89,42 @@
 *        Commented the code, and renamed the NAMECODE identifier.
 *        Re-tidied the prologue.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAE Constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER NDIM
       INTEGER MAXD( * )
       LOGICAL VALUES( * )
       INTEGER ACTD( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER NAMCOD             ! Parameter code-number
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Find the parameter-system pointer to the internal parameter space
 *  associated with the parameter.
       CALL SUBPAR_FINDPAR( PARAM, NAMCOD, STATUS )
- 
+
 *  Use the pointer to set the dynamic defaults of the n-dimensional
 *  array.
       CALL SUBPAR_DEFNL( NAMCOD, NDIM, MAXD, VALUES, ACTD, STATUS )
- 
+
       END

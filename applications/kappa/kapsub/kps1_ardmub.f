@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_ARDMUB( EL, MASK, ARRAY, STATUS )
- 
+
 *+
 *  Name:
 *     KPS1_ARDMx
@@ -66,36 +66,36 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE parameters
       INCLUDE 'PRM_PAR'          ! VAL_ constants
- 
+
 *  Status:
       INTEGER STATUS             ! Global status value
- 
+
 *  Arguments Given:
       INTEGER EL
       INTEGER MASK( EL )
- 
+
 *  Arguments Given and Returned:
       BYTE ARRAY( EL )
- 
+
 *  Local Variables:
        INTEGER I                 ! Loop counter
- 
+
 *.
- 
+
 *  Check the global inhertied status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Loop for each array element.  Replace the element with the bad value
 *  whenever the corresponding mask value is positive.
       DO I = 1, EL
          IF ( MASK( I ) .GT. 0 ) ARRAY( I ) = VAL__BADUB
       END DO
- 
+
       END

@@ -21,14 +21,14 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     7-MAY-1992 (JBVAD::PAH):                      
-*        Original version.                          
-*     25-NOV-1992 (PCTR):                            
-*        Convert to Starlink prologue.              
-*     {enter_further_changes_here}                          
-                                                    
-*  Bugs:                                            
-*     {note_any_bugs_here}                          
+*     7-MAY-1992 (JBVAD::PAH):
+*        Original version.
+*     25-NOV-1992 (PCTR):
+*        Convert to Starlink prologue.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 
@@ -68,7 +68,7 @@
 
 *  Seconds to years
       DOUBLE PRECISION DSEC2YR
-      PARAMETER ( DSEC2YR = 1.0D+00 / 
+      PARAMETER ( DSEC2YR = 1.0D+00 /
      :            ( 60.0D+00*60.0D+00*24.0D+00*365.25D+00 ) )
 
 *  Sidereal seconds to solar seconds
@@ -76,7 +76,7 @@
       PARAMETER ( DST2UT = 86400.0D+00 / 86636.55536D+00 )
 
 *  Conversion factor from mBar to mmHg
-      DOUBLE PRECISION MBAR2MMHG 
+      DOUBLE PRECISION MBAR2MMHG
       PARAMETER ( MBAR2MMHG = 1.333224D+00 )
 
 *  The speed of light

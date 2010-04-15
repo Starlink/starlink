@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,7 +171,7 @@
                IF ( NUM_EQB( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -184,7 +184,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDB( A, A )
             TEST = NUM_ADDB( A, ONE )
             IF ( NUM_EQB( NUM_SUBB( TEST, A ), ONE ) ) GO TO 3
@@ -297,7 +297,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VB',
      :                                            STATUS )
@@ -369,7 +369,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -456,7 +456,7 @@
                IF ( NUM_EQUB( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -469,7 +469,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDUB( A, A )
             TEST = NUM_ADDUB( A, ONE )
             IF ( NUM_EQUB( NUM_SUBUB( TEST, A ), ONE ) ) GO TO 3
@@ -582,7 +582,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VUB',
      :                                            STATUS )
@@ -654,7 +654,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -741,7 +741,7 @@
                IF ( NUM_EQD( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -754,7 +754,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDD( A, A )
             TEST = NUM_ADDD( A, ONE )
             IF ( NUM_EQD( NUM_SUBD( TEST, A ), ONE ) ) GO TO 3
@@ -867,7 +867,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VD',
      :                                            STATUS )
@@ -939,7 +939,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1026,7 +1026,7 @@
                IF ( NUM_EQI( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -1039,7 +1039,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDI( A, A )
             TEST = NUM_ADDI( A, ONE )
             IF ( NUM_EQI( NUM_SUBI( TEST, A ), ONE ) ) GO TO 3
@@ -1152,7 +1152,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VI',
      :                                            STATUS )
@@ -1224,7 +1224,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1311,7 +1311,7 @@
                IF ( NUM_EQR( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -1324,7 +1324,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDR( A, A )
             TEST = NUM_ADDR( A, ONE )
             IF ( NUM_EQR( NUM_SUBR( TEST, A ), ONE ) ) GO TO 3
@@ -1437,7 +1437,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VR',
      :                                            STATUS )
@@ -1509,7 +1509,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1596,7 +1596,7 @@
                IF ( NUM_EQW( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -1609,7 +1609,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDW( A, A )
             TEST = NUM_ADDW( A, ONE )
             IF ( NUM_EQW( NUM_SUBW( TEST, A ), ONE ) ) GO TO 3
@@ -1722,7 +1722,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VW',
      :                                            STATUS )
@@ -1794,7 +1794,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1881,7 +1881,7 @@
                IF ( NUM_EQUW( NEW, HI ) ) GO TO 2
                HI = NEW
  1          CONTINUE
- 2          CONTINUE           
+ 2          CONTINUE
 
 *  The current value of HI may still be too large (i.e. may overflow if
 *  squared) if the result has been rounded upwards. To test for this,
@@ -1894,7 +1894,7 @@
 *  Starting with unity, repeatedly double until a value A is found to
 *  which 1 cannot be added without losing precision.
             A = ONE
- 3          CONTINUE     
+ 3          CONTINUE
             A = NUM_ADDUW( A, A )
             TEST = NUM_ADDUW( A, ONE )
             IF ( NUM_EQUW( NUM_SUBUW( TEST, A ), ONE ) ) GO TO 3
@@ -2007,7 +2007,7 @@
      :   'encountered; first offending value was ^ERRVAL ' //
      :   '(possible programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2VUW',
      :                                            STATUS )

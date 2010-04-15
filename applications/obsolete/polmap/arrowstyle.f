@@ -1,20 +1,20 @@
       SUBROUTINE ARROWSTYLE(PARAMS,NPARAMS,ARROWSIZE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C        A R R O W S T Y L E
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C PARAMS (<), NPARAMS (<), ARROWSIZE (<), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C  Interface for PGSAH subroutine
 C

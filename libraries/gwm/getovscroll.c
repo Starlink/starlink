@@ -20,7 +20,7 @@ int GWM_GetOvScroll( Display *display, Window win_id, int *xoffset, int
 *
 *  Purpose:
 *     Get overlay scroll offset
-*     
+*
 *
 *  Language:
 *     C
@@ -51,12 +51,12 @@ int GWM_GetOvScroll( Display *display, Window win_id, int *xoffset, int
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,10 +81,10 @@ int GWM_GetOvScroll( Display *display, Window win_id, int *xoffset, int
     int actual_format;
     long *local_off;
     unsigned long nitems, bytes_after;
-        
-/*	  
+
+/*
 **  x Offset
-*/	  
+*/
     atom = XInternAtom(display, "GWM_x_ov_offset", False );
     if (!atom) return GWM_NO_OFFSET;
 
@@ -92,26 +92,26 @@ int GWM_GetOvScroll( Display *display, Window win_id, int *xoffset, int
 	XA_INTEGER, &actual_type, &actual_format, &nitems, &bytes_after,
 	(unsigned char**)(&local_off));
     if ( status != Success || nitems == 0) return GWM_NO_OVOFFSET;
-    
+
 /*
-**  Copy the scroll value and release the storage 
+**  Copy the scroll value and release the storage
 */
     *xoffset = (int)*local_off;
     XFree( (char*)local_off);
 
-/*	  
+/*
 **  y Offset
-*/	  
+*/
     atom = XInternAtom(display, "GWM_y_ov_offset", False );
     if (!atom) return GWM_NO_OFFSET;
-    
+
     status = XGetWindowProperty( display, win_id , atom, 0, 1, False,
 	XA_INTEGER, &actual_type, &actual_format, &nitems, &bytes_after,
 	(unsigned char**)(&local_off));
     if ( status != Success || nitems == 0) return GWM_NO_OVOFFSET;
-    
+
 /*
-**  Copy the scroll value and release the storage 
+**  Copy the scroll value and release the storage
 */
     *yoffset = (int)*local_off;
     XFree( (char*)local_off);

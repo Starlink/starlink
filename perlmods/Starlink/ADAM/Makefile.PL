@@ -21,16 +21,16 @@ ams_link_adam command is not in your path." if $amslibs !~ /./;
 
 # Firstly I need to remove the link directives from the library list
 # since MakeMaker doesn't understand them
- 
+
 undef $linkopts;
- 
+
 if ($osname eq 'dec_osf') {
- 
+
   print "This is a $osname machine\n";
   @temp = split /\s+/, $amslibs;
   undef $amslibs;
- 
- 
+
+
   foreach (@temp) {
     if (/^-Wl/) {
 #      $linkopts .= (split(/,/))[1] . " ";
@@ -40,13 +40,13 @@ if ($osname eq 'dec_osf') {
     }
   }
   print "Link options are $linkopts\n";
- 
+
 }
- 
+
 # This is a kludge but I need to pass the linker options through
-# to the compiler. The only way I can see to do this is via the 
+# to the compiler. The only way I can see to do this is via the
 # Optimize flag. Just append the link options to the optimize
- 
+
 $optimize = $Config{optimize} . " $linkopts";
 
 # This is the location of the Starlink NDF libraries
@@ -63,9 +63,9 @@ WriteMakefile(
     'VERSION_FROM' => 'ADAM.pm', # finds $VERSION
     'PREREQ_PM' => { 'Starlink::EMS' => 0 },
     'OPTIMIZE'  => $optimize,
-    'LIBS'	=> [ "$libs"],   # e.g., '-lm' 
-    'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
-    'INC'	=> "-I$StarConfig{Star_Inc}",     # e.g., '-I/usr/include/other' 
+    'LIBS'	=> [ "$libs"],   # e.g., '-lm'
+    'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING'
+    'INC'	=> "-I$StarConfig{Star_Inc}",     # e.g., '-I/usr/include/other'
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

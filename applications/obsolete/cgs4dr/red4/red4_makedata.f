@@ -11,7 +11,7 @@ C     (>) NX       (Integer) X-dimension of array
 C     (>) NY       (Integer) Y-dimension of array
 C     (<) DATA     (Real array) Data array
 C
-C     1989:        Original version.                            (JFL) 
+C     1989:        Original version.                            (JFL)
 C      9-Jul-1990: History added. Modified so that data with
 C                  stripes may be generated for test purposes.
 C                  Some obvious status checking deficiencies

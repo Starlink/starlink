@@ -1,6 +1,6 @@
 *+  RED4_COADD_PAIR - Coadd OBJECT/SKY pair of observations into current group
       SUBROUTINE RED4_COADD_PAIR( DIM1, DIM2, SKYWT,
-     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY, 
+     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY,
      :  COADDS, STATUS )
 *    Description :
 *     This subroutine coadds a pair of OBJECT and SKY observations into
@@ -9,7 +9,7 @@
 *     weighted by the factor supplied in SKYWT.
 *    Invocation :
 *      CALL RED4_COADD_PAIR( DIM1, DIM2, SKYWT,
-*     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY, 
+*     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY,
 *     :  COADDS, STATUS )
 *    Parameters :
 *     DIM1                             = INTEGER( READ )
@@ -75,7 +75,7 @@
 *      1-Feb-1991: Modified so that the number of PAIRS is now
 *                  written to the COADDS array.                   (SMB)
 *     18-Feb-1991: IPOS removed.                                  (SMB)
-*     12-Sep-1991: RED4_COMMON.INC common blocks added and 
+*     12-Sep-1991: RED4_COMMON.INC common blocks added and
 *                  POLYFIT option added                           (PND)
 *     18-Feb-1993: Conform to error strategy                      (PND)
 *    endhistory
@@ -178,14 +178,14 @@
                   MEAN = OBS
 
 *               At this stage the variance is meaningless.
-*               Initialise it to a bad value. 
+*               Initialise it to a bad value.
                   VAR = BAD_VARIANCE
                ELSE
 
 *               This is not the first observation pair to be applied.
 *               It will need to be co-added with the previous
 *               observation pairs.
-*               The method for obtaining the current sum and "sum of 
+*               The method for obtaining the current sum and "sum of
 *               squares" depends on whether this is the second or
 *               a subsequent observation pair.
                   IF ( NUM .EQ. 1 ) THEN
@@ -243,7 +243,7 @@
                DATA( I, J )     = REAL( MEAN )
                VARIANCE( I, J ) = REAL( VAR )
 
-*            As at least one good observation pair has been 
+*            As at least one good observation pair has been
 *            used, this element in the reduced group array is now good.
                QUALITY(I,J) = GOOD
             ELSE
@@ -256,7 +256,7 @@
 *   up before finally putting them in the reduced group.
       IF ( PF_POLYFIT .EQ. 'OBJ-SKY' ) THEN
 
-         CALL RED4_RPOLYFIT( DIM1, DIM2, 
+         CALL RED4_RPOLYFIT( DIM1, DIM2,
      :     DATA, VARIANCE, QUALITY, STATUS )
 
       END IF

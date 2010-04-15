@@ -2,13 +2,13 @@
 *+
 *  Name:
 *     SLIDER
-      
+
 *  Purpose:
 *     Produce or manipulate slider
-      
+
 *  Language:
 *     Starlink Fortran 77
-      
+
 *  Invocation:
 *     CALL SLIDER(TITLE,METHOD,COORDS,VALUE,OLDVAL)
 
@@ -33,7 +33,7 @@
 *  Authors:
 *     TNW: T.N.Wilkins (Durham)
 *     {enter_new_authors_here}
-      
+
 *  History:
 *     9-FEB-1994 (TNW):
 *        Original version.
@@ -61,7 +61,7 @@
       DELTA = 0.005 * (YUPPER - YLOWER) / (YDUPPER - YDLOWER)
 
       IF(UMETHD.EQ.'D') THEN
-         
+
 * Draw slider
 
          CALL PGVPORT(COORDS(1),COORDS(2),YDLOWER,YDUPPER)

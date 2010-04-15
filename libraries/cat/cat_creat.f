@@ -25,7 +25,7 @@
 *     disturb any pre-existing errors).
 *     Find the parameter index in the parameter tables.
 *     If ok then
-*       Do while (a valid catalogue has not been given and a 
+*       Do while (a valid catalogue has not been given and a
 *       non-recoverable error has not occurred)
 *         Obtain the name of the catalogue from the parameter system.
 *         If ok then
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -114,7 +114,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
 *
-*       Mark the error stack, so that flushing errors does not disturb 
+*       Mark the error stack, so that flushing errors does not disturb
 *       any pre-existing errors in the error stack.
 
          CALL ERR_MARK
@@ -147,9 +147,9 @@
                   CALL CAT1_TOPEN (CNAME, 'NEW', 'WRITE', CI, STATUS)
 
 *
-*                If the status is ok then the catalogue opened 
+*                If the status is ok then the catalogue opened
 *                successfully and the termination flag can be set.
-*                Otherwise an error must be reported and looping 
+*                Otherwise an error must be reported and looping
 *                continues.
 
                   IF (STATUS .EQ. SAI__OK) THEN
@@ -203,7 +203,7 @@
             CI = CAT__NOID
 
 *
-*          If an abort was requested, then annul any error messages and 
+*          If an abort was requested, then annul any error messages and
 *          substitute a more appropriate one.
 
             IF (STATUS .EQ. PAR__ABORT) THEN
@@ -215,7 +215,7 @@
      :           /'%^PCNAME aborted.', STATUS)
 
 *
-*          If a null value was specified, then annul any error messages 
+*          If a null value was specified, then annul any error messages
 *          and substitute a more appropriate one.
 
 
@@ -228,7 +228,7 @@
      :           /' %^PCNAME.', STATUS)
 
 *
-*          For all other errors, add context information and report the 
+*          For all other errors, add context information and report the
 *          error.
 
             ELSE

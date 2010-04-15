@@ -82,7 +82,7 @@ C----------------
 
       ENTRY SET_ZRANGE
 
-C  Read in range of binning in z-coordinate and whether average or 
+C  Read in range of binning in z-coordinate and whether average or
 C  integrated intensity
 
       PROMPT = ' '
@@ -336,7 +336,7 @@ C  FS: SET FREQUENCY SCALE
           IF (.NOT. ABS_FREQ) IREP = 'R'
           CALL GEN_GETSTR ('Absolute or relative frequencies? (A/R)',
      &                     IREP, 'A', IREP, JDEF)
-  
+
           IF (JDEF.LT.0 .OR. JDEF.GT.2) THEN
             IERR3 = 38
             RETURN
@@ -351,7 +351,7 @@ C  FS: SET FREQUENCY SCALE
             IERR3 = 21
             RETURN
           END IF
- 
+
           IF (.NOT. ABS_FREQ) THEN
             IREP = 'F'
             IF (REST_REL) IREP = 'R'

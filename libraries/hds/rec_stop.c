@@ -115,12 +115,12 @@
          }
 
 	 /* Deallocate the memory associated with the free page list */
-	 /* The malloced memory area may not even be reachable in the 
+	 /* The malloced memory area may not even be reachable in the
 	    linked list so we obtain the pointer from the global that exists
 	    for exactly this purpose */
 	 if (rec_ga_fpl_malloced != NULL)
 	   rec_deall_mem( hds_gl_maxwpl * sizeof( struct BCP ),
-			  (void **)&rec_ga_fpl_malloced ); 
+			  (void **)&rec_ga_fpl_malloced );
 
 	 /* Free the getcwd buffer */
 	 rec1_getcwd_free( );

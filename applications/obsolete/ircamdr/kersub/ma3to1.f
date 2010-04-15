@@ -1,5 +1,5 @@
 *+  MA3TO1 - Subroutine to extract a 1-D array from a 3-D array
-      SUBROUTINE MA3TO1( MODE, IDIMS1, IDIMS2, IDIMS3, ARRIN, ODIMS, 
+      SUBROUTINE MA3TO1( MODE, IDIMS1, IDIMS2, IDIMS3, ARRIN, ODIMS,
      :                   ARROUT, STATUS )
 *    Description :
 *     The 1-dimensional output array, ARROUT, is extracted from the
@@ -100,7 +100,7 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-      
+
 *    Local variables :
       INTEGER
      :  X,    ! index to input array elements, 1st dimension
@@ -118,11 +118,11 @@
 
 *          create output array by summation of all first dimension points over
 *          the other two dimensions
-            DO Z = 1, IDIMS3 
+            DO Z = 1, IDIMS3
 
-               DO Y = 1, IDIMS2 
+               DO Y = 1, IDIMS2
 
-                  DO X = 1, IDIMS1 
+                  DO X = 1, IDIMS1
 
                      ARROUT( X ) = ARROUT( X ) + ARRIN( X, Y, Z )
                   ENDDO
@@ -133,11 +133,11 @@
 
 *          create output array by summation of all second dimension points over
 *          the other two dimensions
-            DO Z = 1, IDIMS3 
+            DO Z = 1, IDIMS3
 
-               DO Y = 1, IDIMS2 
+               DO Y = 1, IDIMS2
 
-                  DO X = 1, IDIMS1 
+                  DO X = 1, IDIMS1
 
                      ARROUT( Y ) = ARROUT( Y ) + ARRIN( X, Y, Z )
                   ENDDO
@@ -148,11 +148,11 @@
 
 *          create output array by summation of all third dimension points over
 *          the other two dimensions
-            DO Z = 1, IDIMS3 
+            DO Z = 1, IDIMS3
 
-               DO Y = 1, IDIMS2 
+               DO Y = 1, IDIMS2
 
-                  DO X = 1, IDIMS1 
+                  DO X = 1, IDIMS1
 
                      ARROUT( Z ) = ARROUT( Z ) + ARRIN( X, Y, Z )
                   ENDDO

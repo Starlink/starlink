@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -127,7 +127,7 @@
      :.OR. (PARDYN(3,NAMECODE) .EQ. (20+MOD(PARTYPE(NAMECODE),10)) ) ) )
      : THEN
 *     Space is already reserved - set value and reset type
-         CHARLIST ( PARDYN(1,NAMECODE) ) = 
+         CHARLIST ( PARDYN(1,NAMECODE) ) =
      :    '"' // FILE(1:LENGTH) // '"' // PATH
          PARDYN(3,NAMECODE) = 20 + MOD ( PARTYPE(NAMECODE), 10 )
 
@@ -144,7 +144,7 @@
 *     Run out of space in the common blocks
          STATUS = SUBPAR__DYNFULL
          CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-         CALL EMS_REP ( 'SUP_DATDEF1', 
+         CALL EMS_REP ( 'SUP_DATDEF1',
      :   'SUBPAR: Parameter ^NAME - '//
      :   'Store for dynamic defaults is full', STATUS )
 

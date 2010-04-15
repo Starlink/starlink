@@ -14,7 +14,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -28,7 +28,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** A macro named "TestPoint" is defined which increments a counter
 ** whenever it is encountered.  This is very efficient, and should
 ** not impact performance of the system.  For delivery, the macro
-** can be nulled out by recompiling without the COVERAGE_TEST macro 
+** can be nulled out by recompiling without the COVERAGE_TEST macro
 ** defined.
 **
 ** See also the "renumber.c" program which can be used

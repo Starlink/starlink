@@ -6,18 +6,18 @@ C
 C     Figaro function to set large interactively selected regions
 C     of a spectrum to a constant value.  This is intended mainly
 C     for use in generating mask spectra, or modifying calibration
-C     spectra such as those used by BSMULT.  CSET assumes that a 
-C     spectrum has already been displayed by SPLOT, and will generate 
-C     a new data structure based on the spectrum displayed, with 
+C     spectra such as those used by BSMULT.  CSET assumes that a
+C     spectrum has already been displayed by SPLOT, and will generate
+C     a new data structure based on the spectrum displayed, with
 C     only the data changed.
-C       
+C
 C     Command parameters -
 C
 C     VALUE       (Numeric) The value to use for the selected regions
 C
 C     OUTPUT      (Character) The name of the output file to
 C                 be created.  If this is the same as the displayed
-C                 spectrum, the data in the displayed spectrum will 
+C                 spectrum, the data in the displayed spectrum will
 C                 be modified.
 C
 C     Command keywords -
@@ -37,7 +37,7 @@ C
 C                                              KS / CIT 11th April 1984
 C     Modified:
 C
-C     10th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs 
+C     10th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs
 C                    changed.
 C                    Now uses DYN_ routines for dynamic memory handling
 C     21st Mar 1988  KS/AAO.  Modified for GKS version of PGPLOT.
@@ -47,7 +47,7 @@ C     28th Aug 1992  HME / UoE, Starlink. Change INCLUDE, remove TABs.
 C     26th Jul 1993  HME / UoE, Starlink.  Disuse GKD_* and PAR_Q*, use
 C                    PAR_ABORT.
 C     23rd Jan 1995  HME / UoE, Starlink. Increase TVFILE to *132.
-C      1st May 1997  JJL / Soton, Starlink. Maps variances and sets 
+C      1st May 1997  JJL / Soton, Starlink. Maps variances and sets
 C                    their values to zero when a pixel value is set.
 C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -216,7 +216,7 @@ C
 C     F I G _ C S F I T
 C
 C     Allows the user to interactively set regions of a spectrum to
-C     a constant value.   Assumes the spectrum has already been 
+C     a constant value.   Assumes the spectrum has already been
 C     displayed.
 C
 C     Parameters -  (">" input, "<" output)
@@ -236,7 +236,7 @@ C     (>) SDATA     (Real array SDATA(NX)) The original spectrum data
 C                   - used if the spectrum has to be redrawn.
 C     (<) DATA      (Real array DATA(NX)) Receives the generated spectrum
 C     (>) XVAR      (Real array XVAR(NX)) The X-values for each of
-C                   the variances in the spectrum.      
+C                   the variances in the spectrum.
 C     (>) SVAR      (Real array SVAR(NX)) The original spectrum variances
 C                   - used if the spectrum has to be redrawn.
 C     (<) VAR       (Real array VAR(NX)) Receives the generated variances
@@ -536,7 +536,7 @@ C     Parameters -  None
 C
 C     Common variables - None
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C
 C                                              KS / CIT 12th April 1984

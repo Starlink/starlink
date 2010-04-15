@@ -72,14 +72,14 @@
 *     1981 (RFWS):
 *        Original version.
 *     1990 September 18 (MJC):
-*        Renamed from ELLIPS, re-ordered arguments, added status, 
+*        Renamed from ELLIPS, re-ordered arguments, added status,
 *        commented the variables, tidied, and converted the prologue.
 *     28-APR-2009 (DSB):
 *        Renamed from kps1_elgau to kpg1_elgau.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -185,7 +185,7 @@
          T( 3 ) = THETA - T90
          T( 4 ) = THETA - T135
 
-*       Make a correction to the data values which is the amount by 
+*       Make a correction to the data values which is the amount by
 *       which they would deviate from a pure elliptical variation given
 *       the current ellipse parameters.
 

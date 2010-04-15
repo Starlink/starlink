@@ -14,8 +14,8 @@
 
 *  Description:
 *     The routine sets new values for the scale and zero values
-*     associated with an NDF arraycomponent. If the array is stored 
-*     in simple or primitive form, then the storage form is changed 
+*     associated with an NDF arraycomponent. If the array is stored
+*     in simple or primitive form, then the storage form is changed
 *     to scaled.
 
 *  Arguments:
@@ -31,16 +31,16 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the standard Fortran numerical data 
-*     types: integer, real and double precision. Replace the (lower case) "x" 
+*     - There is a routine for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case) "x"
 *     in the routine name by I, R or D as appropriate.
 *     -  A comma-separated list of component names may also be
-*     supplied, in which case the same scale and zero values will be 
+*     supplied, in which case the same scale and zero values will be
 *     used for each component in turn.
 *     -  This routine may only be used to change the scaling of a base
 *     NDF. If it is called with an array which is not a base array,
 *     then it will return without action. No error will result.
-*     -  An error will result if the array component, or any part of it, 
+*     -  An error will result if the array component, or any part of it,
 *     is currently mapped for access (e.g. through another identifier).
 *     -  This routine has no effect on components which are in an
 *     undefined state.
@@ -74,12 +74,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,7 +98,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -187,7 +187,7 @@
 
 *  AXIS component:
 *  ==============
-*  Report an error, since this component has no scaling. 
+*  Report an error, since this component has no scaling.
                   IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS',
      :                             NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
@@ -213,7 +213,7 @@
 *  Otherwise, use the ARY_ system to set the scale and zero values for
 *  the data array.
                      ELSE
-                        CALL ARY_PTSZR( ACB_DID( IACB ), SCALE, ZERO, 
+                        CALL ARY_PTSZR( ACB_DID( IACB ), SCALE, ZERO,
      :                                   STATUS )
                      END IF
 
@@ -307,7 +307,7 @@
 
 *  If it exists, then set the scaling.
                            IF ( THERE ) THEN
-                              CALL ARY_PTSZR( ACB_VID( IACB ), SCALE, 
+                              CALL ARY_PTSZR( ACB_VID( IACB ), SCALE,
      :                                         ZERO, STATUS )
                            END IF
                         END IF
@@ -341,7 +341,7 @@
      :                    '(possible programming error).', STATUS )
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -368,7 +368,7 @@
 
 *  Description:
 *     The routine sets new values for the scale and zero values
-*     associated with an NDF arraycomponent. If the array is stored in 
+*     associated with an NDF arraycomponent. If the array is stored in
 *     simple form, then the storage form is changed to scaled.
 
 *  Arguments:
@@ -384,16 +384,16 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the standard Fortran numerical data 
-*     types: integer, real and double precision. Replace the (lower case) "x" 
+*     - There is a routine for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case) "x"
 *     in the routine name by I, R or D as appropriate.
 *     -  A comma-separated list of component names may also be
-*     supplied, in which case the same scale and zero values will be 
+*     supplied, in which case the same scale and zero values will be
 *     used for each component in turn.
 *     -  This routine may only be used to change the scaling of a base
 *     NDF. If it is called with an array which is not a base array,
 *     then it will return without action. No error will result.
-*     -  An error will result if the array component, or any part of it, 
+*     -  An error will result if the array component, or any part of it,
 *     is currently mapped for access (e.g. through another identifier).
 *     -  This routine has no effect on components which are in an
 *     undefined state.
@@ -427,12 +427,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -451,7 +451,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -540,7 +540,7 @@
 
 *  AXIS component:
 *  ==============
-*  Report an error, since this component has no scaling. 
+*  Report an error, since this component has no scaling.
                   IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS',
      :                             NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
@@ -566,7 +566,7 @@
 *  Otherwise, use the ARY_ system to set the scale and zero values for
 *  the data array.
                      ELSE
-                        CALL ARY_PTSZI( ACB_DID( IACB ), SCALE, ZERO, 
+                        CALL ARY_PTSZI( ACB_DID( IACB ), SCALE, ZERO,
      :                                   STATUS )
                      END IF
 
@@ -660,7 +660,7 @@
 
 *  If it exists, then set the scaling.
                            IF ( THERE ) THEN
-                              CALL ARY_PTSZI( ACB_VID( IACB ), SCALE, 
+                              CALL ARY_PTSZI( ACB_VID( IACB ), SCALE,
      :                                         ZERO, STATUS )
                            END IF
                         END IF
@@ -694,7 +694,7 @@
      :                    '(possible programming error).', STATUS )
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -721,7 +721,7 @@
 
 *  Description:
 *     The routine sets new values for the scale and zero values
-*     associated with an NDF arraycomponent. If the array is stored in 
+*     associated with an NDF arraycomponent. If the array is stored in
 *     simple form, then the storage form is changed to scaled.
 
 *  Arguments:
@@ -737,16 +737,16 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the standard Fortran numerical data 
-*     types: integer, real and double precision. Replace the (lower case) "x" 
+*     - There is a routine for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case) "x"
 *     in the routine name by I, R or D as appropriate.
 *     -  A comma-separated list of component names may also be
-*     supplied, in which case the same scale and zero values will be 
+*     supplied, in which case the same scale and zero values will be
 *     used for each component in turn.
 *     -  This routine may only be used to change the scaling of a base
 *     NDF. If it is called with an array which is not a base array,
 *     then it will return without action. No error will result.
-*     -  An error will result if the array component, or any part of it, 
+*     -  An error will result if the array component, or any part of it,
 *     is currently mapped for access (e.g. through another identifier).
 *     -  This routine has no effect on components which are in an
 *     undefined state.
@@ -780,12 +780,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -804,7 +804,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -893,7 +893,7 @@
 
 *  AXIS component:
 *  ==============
-*  Report an error, since this component has no scaling. 
+*  Report an error, since this component has no scaling.
                   IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS',
      :                             NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
@@ -919,7 +919,7 @@
 *  Otherwise, use the ARY_ system to set the scale and zero values for
 *  the data array.
                      ELSE
-                        CALL ARY_PTSZD( ACB_DID( IACB ), SCALE, ZERO, 
+                        CALL ARY_PTSZD( ACB_DID( IACB ), SCALE, ZERO,
      :                                   STATUS )
                      END IF
 
@@ -1013,7 +1013,7 @@
 
 *  If it exists, then set the scaling.
                            IF ( THERE ) THEN
-                              CALL ARY_PTSZD( ACB_VID( IACB ), SCALE, 
+                              CALL ARY_PTSZD( ACB_VID( IACB ), SCALE,
      :                                         ZERO, STATUS )
                            END IF
                         END IF
@@ -1047,7 +1047,7 @@
      :                    '(possible programming error).', STATUS )
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

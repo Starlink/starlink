@@ -147,7 +147,7 @@
 *  assumed to be constant throughout the scan.
          SOLONG = CCM_SLGRD( IDC )*UTCOFF + CCM_SLZER( IDC )
          PSI = CCM_CAGRD( IDC )*UTCOFF + CCM_CAZER( IDC )
-         THETA = CCM_THETA( IDC ) 
+         THETA = CCM_THETA( IDC )
 
       END IF
 

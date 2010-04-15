@@ -8,7 +8,7 @@
 
  v2.0-1 is a maintenance release of the JPL Ephemeris and library
  which provides a slightly updated SUN/87 which has been released
- in hypertext (`showme sun87' or `findme jpl').  There are only 
- minor changes to the text of the document, and the library code 
+ in hypertext (`showme sun87' or `findme jpl').  There are only
+ minor changes to the text of the document, and the library code
  and datasets have not changed.
 

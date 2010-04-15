@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,5 +125,5 @@
      :                    'specified; bad syntax.', STATUS )
          END IF
       END IF
-       
+
       END

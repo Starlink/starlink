@@ -1,5 +1,5 @@
       SUBROUTINE PAGE(IP,CATRUN,NONS,IDENTS,EQUOUT, STATUS )
-      
+
 *+
 *
 *   PAGE Writes out the Headings for the Star List
@@ -28,7 +28,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (IP.GE.1) WRITE (7,999) IP
 999   FORMAT('1',100X,'PAGE ',I3)
       IF (CATRUN) THEN
@@ -58,4 +58,4 @@
      : ')',14X,'(Secs)',28X,'From Centre'/85X,'"',6X,'"')
       ENDIF
       END
- 
+

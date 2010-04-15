@@ -28,7 +28,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     10 May 1995 (rpt): 
+*     10 May 1995 (rpt):
 *        Original version.
 *     21 Sep 2000 (ajc):
 *        Unused ISCAN, JDEF, LENGTH, NTICKS, TLOC
@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -16,12 +16,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -204,7 +204,7 @@ C        WRITE(*,*)'!ANT_XCOMP: unknown item ', ITEM(1:20), ITYPE
       CALL ANT_XSCANB(EXPRN, NEXT, ITEM, ITYPE)
 ***      PRINT *,' btype', ITYPE, ' ', ITEM(1:20)
       IF(ITYPE .EQ. 1) THEN
-*end-of-expression: 
+*end-of-expression:
          ITEM = '*END'
       ELSE IF(ITYPE .LE. 1 .OR. ITYPE .GT. 10) THEN
 *error of some sort
@@ -216,7 +216,7 @@ C        WRITE(*,*)'!ANT_XCOMP: unknown bin-op ', ITEM(1:20), ITYPE
          GO TO 999
       END IF
 *
-*Handle operator or function 
+*Handle operator or function
 *
 300   CONTINUE
       CALL ANT_XFIND(ITEM, CODE, STATUS)
@@ -225,7 +225,7 @@ C        WRITE(*,*)'!ANT_XCOMP: unknown bin-op ', ITEM(1:20), ITYPE
 350   CONTINUE
       TOPOP = OSTACK(NOS)
       IF( FPREC(TOPOP) .GT. FPREC(CODE) .OR.
-     $   (FPREC(TOPOP) .EQ. FPREC(CODE) .AND. 
+     $   (FPREC(TOPOP) .EQ. FPREC(CODE) .AND.
      $    FPREC(TOPOP) .LT. 28)) THEN
 *pop an operator off the stack
          NOS   = NOS - 1
@@ -324,7 +324,7 @@ C998     FORMAT('!', 2X, A / '!', 1X, 132A1)
       CHARACTER INCODE(-1:5)*1, SARGS*8
       DATA INCODE / 'C', 'L', 5*'N' /
 *
-*TSTACK contains argument stack data type codes: 
+*TSTACK contains argument stack data type codes:
 * -1=char, 0=logical, 1=byte, 2=half, 3=int, 4=real, 5=double.
       IF(STATUS .NE. 0) RETURN
       NARGS = INDEX(FARGS(NFUNC), ' ') - 2
@@ -349,7 +349,7 @@ C        WRITE(*,*)'!ANT_XGENOP: too few args for ', FNAME(NFUNC)
       OPCODE = NFUNC
 *Check that the actual args are same as permitted args
       IF(FARGS(NFUNC) .EQ. 'LXX') THEN
-*special case of relational operators: 
+*special case of relational operators:
 * two char args ==> even opcode,  two numeric args ==> next odd opcode
          IF(SARGS .EQ. 'CC') THEN
             OPCODE = (NFUNC/2) * 2
@@ -394,20 +394,20 @@ C        WRITE(*,*)'!ANT_XGENOP: invalid args for ', FNAME(NFUNC)
       ELSE IF(FARGS(NFUNC)(1:1) .EQ. 'F') THEN
 *'F' means must be floating-point output
          RTYPE = MAX(RTYPE,4)
-      END IF      
+      END IF
 *Output the OPCODE, push result data type back on TSTACK
-      TSTACK(NTS) = RTYPE      
+      TSTACK(NTS) = RTYPE
       CALL ANT_XPUTOP(XID, OPCODE, STATUS)
 999   CONTINUE
       END
-      
+
 *+ANT_XSCANB  Scans expression expecting binary operator
       SUBROUTINE ANT_XSCANB(EXPRN, NEXT, ITEM, ITYPE)
       CHARACTER*(*) EXPRN, ITEM
       INTEGER NEXT, ITYPE
 *EXPRN  input  Expression to be parsed.
-*NEXT   in/out On entry points to next char to be examined, 
-*              returns pointing to char after the end of the item.            
+*NEXT   in/out On entry points to next char to be examined,
+*              returns pointing to char after the end of the item.
 *ITEM   output Next lexical item in the expression.
 *ITYPE  output Item type code:
 *  1     end-of-expression (valid at this point)
@@ -429,14 +429,14 @@ C        WRITE(*,*)'!ANT_XGENOP: invalid args for ', FNAME(NFUNC)
 *BCLASS: character classes for binary operator
 *class:       0     1     2   3   4    5    6      7      8
 *          others space   ,   )   .   A-Z   +-   /*=<>&|  (
-      DATA BCLASS / 32*0, 
+      DATA BCLASS / 32*0,
 *char   sp !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /
      $  1, 0, 0, 0, 0, 0, 7, 0, 8, 3, 7, 6, 2, 6, 4, 7,
 *char   0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?
      $  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0,
      $  0, 26*5, 6*0, 26*5, 0, 7, 0, 0, 0, 128*0 /
 *BTABLE: state table for binary operator,
-*result: 1     2    3    4      5     6     7    8      9        10 
+*result: 1     2    3    4      5     6     7    8      9        10
 *      empty comma  )  ERROR  ERROR  .op.  oper  +=  1-charop  2-charop
 *CHAR  oth sp  ,  )  . AZ +- /*=><|&  (
 *        0  1  2  3  4  5  6    7     8
@@ -463,8 +463,8 @@ C        WRITE(*,*)'!ANT_XGENOP: invalid args for ', FNAME(NFUNC)
       CHARACTER*(*) EXPRN, ITEM
       INTEGER NEXT, ITYPE
 *EXPRN  input  Expression to be parsed.
-*NEXT   in/out On entry points to next char to be examined, 
-*              returns pointing to char after the end of the item.            
+*NEXT   in/out On entry points to next char to be examined,
+*              returns pointing to char after the end of the item.
 *ITEM   output Next lexical item in the expression.
 *KPOS   output Points to first char of item found.
 *ITYPE  output Item type code:
@@ -547,7 +547,7 @@ C        WRITE(*,*)'!ANT_XGENOP: invalid args for ', FNAME(NFUNC)
 *CLASS   input  Character class for each value of ICHAR in char set.
 *TABLE   input  State table, newstate=table(class,oldstate)
 *EXPRN   input  Text string containing expression.
-*NEXT    in/out Enters pointing to first character to check, 
+*NEXT    in/out Enters pointing to first character to check,
 *               returns pointing to first char after valid item.
 *ITEM    Output Next lexical item in the expression.
 *ITYPE   output Final state, i.e. type of lexical item found.
@@ -609,7 +609,7 @@ C        WRITE(*,*)'!ANT_XGENOP: invalid args for ', FNAME(NFUNC)
          CCONST(NCCHAR) = STRING
          LENCC(NCCHAR) = MIN(LEN(STRING), LEN(CCONST(1)))
          ID     = NCCHAR
-***         print *,'Stored ', STRING, ' as Cconst', ID, ' length', 
+***         print *,'Stored ', STRING, ' as Cconst', ID, ' length',
 ***     $        LENCC(NCCHAR)
       ELSE
          CALL ANT_ERRC ('ANT_XSTORC: too many constants to store',
@@ -829,7 +829,7 @@ C        WRITE(*,*)'!ANT_XEVALL warning - NS=', NS
       IF(NSTACK(1)) THEN
          NULL = .TRUE.
          VALUE = .FALSE.
-      ELSE 
+      ELSE
          NULL  = .FALSE.
          VALUE = LSTACK(1) .EQ. 1
       END IF
@@ -863,7 +863,7 @@ C        WRITE(*,*)'!ANT_XEVALL warning - NS=', NS
       INTEGER ANT_SLEN, IAND, IOR, IEOR
       DOUBLE PRECISION SLA_DSEP
 *3-valued logic functions (-1=false, 0=unknown, +1=true).
-      INTEGER LOGEQV(-1:1,-1:1), LOGXOR(-1:1,-1:1), LOGOR(-1:1,-1:1), 
+      INTEGER LOGEQV(-1:1,-1:1), LOGXOR(-1:1,-1:1), LOGOR(-1:1,-1:1),
      $   LOGAND(-1:1,-1:1),  LOGNOT(-1:1)
       DATA LOGEQV / 1, 0,-1,   0, 0, 0,  -1, 0, 1 /
       DATA LOGXOR /-1, 0, 1,   0, 0, 0,   1, 0,-1 /
@@ -918,9 +918,9 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 9     CONTINUE
       NS = NS + 1
       ID = ID + 1
-      CALL ANT_FGETC(OPLIST(ID,XID), NROW, NSTACK(NS), 
+      CALL ANT_FGETC(OPLIST(ID,XID), NROW, NSTACK(NS),
      $               CSTACK(NS), STATUS)
-*Set length to that declared for the variable, need explicit TRIM 
+*Set length to that declared for the variable, need explicit TRIM
 * function to trim off trailing spaces.
 *** needs improvement here***
       ISTACK(NS) = LEN(CSTACK(NS))
@@ -942,7 +942,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 11    CONTINUE
       NS = NS + 1
       ID = ID + 1
-      CALL ANT_FGETD(OPLIST(ID,XID), NROW, NSTACK(NS), DSTACK(NS), 
+      CALL ANT_FGETD(OPLIST(ID,XID), NROW, NSTACK(NS), DSTACK(NS),
      $                STATUS)
       GO TO 1000
 *store functions not yet implemented
@@ -983,7 +983,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 * == char
 38    CONTINUE
       NS = NS - 1
-      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .EQ. 
+      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .EQ.
      $         CSTACK(NS+1)(1:ISTACK(NS+1))
       GO TO 800
 * == numeric
@@ -994,7 +994,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 * >= char
 40    CONTINUE
       NS = NS - 1
-      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .GE. 
+      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .GE.
      $         CSTACK(NS+1)(1:ISTACK(NS+1))
       GO TO 800
 * >= numeric
@@ -1005,7 +1005,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 * > char
 42    CONTINUE
       NS = NS - 1
-      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .GT. 
+      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .GT.
      $         CSTACK(NS+1)(1:ISTACK(NS+1))
       GO TO 800
 * > numeric
@@ -1016,7 +1016,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 * <= char
 44    CONTINUE
       NS = NS - 1
-      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .LE. 
+      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .LE.
      $         CSTACK(NS+1)(1:ISTACK(NS+1))
       GO TO 800
 * <= numeric
@@ -1027,7 +1027,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 * < char
 46    CONTINUE
       NS = NS - 1
-      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .LT. 
+      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .LT.
      $         CSTACK(NS+1)(1:ISTACK(NS+1))
       GO TO 800
 * < numeric
@@ -1038,7 +1038,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 * /= (.NE.) char
 48    CONTINUE
       NS = NS - 1
-      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .NE. 
+      LVALUE = CSTACK(NS)(1:ISTACK(NS)) .NE.
      $         CSTACK(NS+1)(1:ISTACK(NS+1))
       GO TO 800
 * /= (.NE.) numeric
@@ -1058,9 +1058,9 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
 *   Test all three arguments for null-ness
       IF(NSTACK(NS) .OR. NSTACK(NS+1) .OR. NSTACK(NS+2)) THEN
          LSTACK(NS) = 0
-      ELSE IF(CSTACK(NS)(1:ISTACK(NS)) .GE. 
+      ELSE IF(CSTACK(NS)(1:ISTACK(NS)) .GE.
      $        CSTACK(NS+1)(1:ISTACK(NS+1)) .AND.
-     $        CSTACK(NS)(1:ISTACK(NS)) .LE. 
+     $        CSTACK(NS)(1:ISTACK(NS)) .LE.
      $        CSTACK(NS+2)(1:ISTACK(NS+2))) THEN
          LSTACK(NS) = +1
       ELSE
@@ -1086,7 +1086,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
       IF(NSTACK(NS) .OR. NSTACK(NS+1)) THEN
          NSTACK(NS) = .TRUE.
       ELSE
-         CTEMP = CSTACK(NS)(1:ISTACK(NS)) // 
+         CTEMP = CSTACK(NS)(1:ISTACK(NS)) //
      $           CSTACK(NS+1)(1:ISTACK(NS+1))
          ISTACK(NS) = MIN(MAXLC, ISTACK(NS) + ISTACK(NS+1))
          CSTACK(NS) = CTEMP
@@ -1310,7 +1310,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
          K = NINT(DSTACK(NS+2))
 *Ensure that 1  <=  J  <=  K  <=  MAXLC, i.e. resulting length at least one
          K = MAX(1,MIN(K,MAXLC))
-         J = MAX(1,MIN(J,K))         
+         J = MAX(1,MIN(J,K))
          CSTACK(NS) = CSTACK(NS)(J:K)
          ISTACK(NS) = K - J + 1
       END IF
@@ -1320,7 +1320,7 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
       NS = NS - 1
       IF(NSTACK(NS) .OR. NSTACK(NS+1)) THEN
          LSTACK(NS) = 0
-      ELSE IF(INDEX(CSTACK(NS)(1:ISTACK(NS)), 
+      ELSE IF(INDEX(CSTACK(NS)(1:ISTACK(NS)),
      $              CSTACK(NS+1)(1:ISTACK(NS+1))) .NE. 0) THEN
          LSTACK(NS) = +1
       ELSE
@@ -1343,9 +1343,9 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
          NSTACK(NS) = .TRUE.
       ELSE
 * check for a sign on any component, if so negate result
-         NEG = DSTACK(NS) .LT. 0.0D0 .OR. DSTACK(NS+1) .LT. 0.0D0 
-     $    .OR. DSTACK(NS+2) .LT. 0.0D0 
-         DSTACK(NS) = (ABS(DSTACK(NS)) + ABS(DSTACK(NS+1))/60.0D0 + 
+         NEG = DSTACK(NS) .LT. 0.0D0 .OR. DSTACK(NS+1) .LT. 0.0D0
+     $    .OR. DSTACK(NS+2) .LT. 0.0D0
+         DSTACK(NS) = (ABS(DSTACK(NS)) + ABS(DSTACK(NS+1))/60.0D0 +
      $                 ABS(DSTACK(NS+2))/3600.0D0) * HTOR
          IF(NEG) DSTACK(NS) = -DSTACK(NS)
       END IF
@@ -1358,10 +1358,10 @@ C     WRITE(*,*)'!ANT_XEVAL: invalid opcode', OPLIST(ID,XID)
          NSTACK(NS) = .TRUE.
       ELSE
 * check for a sign on any component or '-' at any point in the SIGN
-         NEG = DSTACK(NS+1) .LT. 0.0D0 .OR. DSTACK(NS+2) .LT. 0.0D0 
-     $    .OR. DSTACK(NS+3) .LT. 0.0D0 .OR. 
-     $         (INDEX(CSTACK(NS)(1:ISTACK(NS)),'-') .NE. 0) 
-         DSTACK(NS) = (ABS(DSTACK(NS+1)) + ABS(DSTACK(NS+2))/60.0D0 + 
+         NEG = DSTACK(NS+1) .LT. 0.0D0 .OR. DSTACK(NS+2) .LT. 0.0D0
+     $    .OR. DSTACK(NS+3) .LT. 0.0D0 .OR.
+     $         (INDEX(CSTACK(NS)(1:ISTACK(NS)),'-') .NE. 0)
+         DSTACK(NS) = (ABS(DSTACK(NS+1)) + ABS(DSTACK(NS+2))/60.0D0 +
      $                 ABS(DSTACK(NS+3))/3600.0D0) * DTOR
          IF(NEG) DSTACK(NS) = -DSTACK(NS)
       END IF

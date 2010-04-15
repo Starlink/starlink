@@ -1097,7 +1097,7 @@
 *     Standard open statement
 *     N.B. Record length is measured in words with some compilers, and
 *     bytes with others.
-      OPEN (LUNNEW, FILE=NEWFIL, STATUS=STATE, ACCESS='DIRECT', 
+      OPEN (LUNNEW, FILE=NEWFIL, STATUS=STATE, ACCESS='DIRECT',
      :             RECL=RECSIZ, FORM='UNFORMATTED',ERR=10)
       RETURN
    10 CONTINUE

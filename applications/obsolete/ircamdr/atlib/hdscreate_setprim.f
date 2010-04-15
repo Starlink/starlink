@@ -9,7 +9,7 @@
      *	                              TELESCOPE_NAME,
      *	                              HEIGHT_PRIM,
      *	                              LATITUDE_PRIM,
-     *	                              LONGITUDE_PRIM, 
+     *	                              LONGITUDE_PRIM,
      *	                              NUMBCOLS_PRIM,
      *	                              NUMBROWS_PRIM,
      *	                              SOFTWARE_PRIM,

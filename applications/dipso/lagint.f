@@ -53,12 +53,12 @@ C
           GOTO 10
         ENDIF
         NBIGAP = 0
-        IF (((X(Z)-X(Z-1)).GE.(3.0D+00*MNXSP)).AND.(ORDER.GE.4)) THEN 
+        IF (((X(Z)-X(Z-1)).GE.(3.0D+00*MNXSP)).AND.(ORDER.GE.4)) THEN
           ORDER = ORDER - 2
 *         WRITE(*,*) 'Gap in data abscissa spacing at least three times
 *    + mean spacing detected.'
           NBIGAP = NBIGAP + 1
-*         WRITE(*,*) '; switching to ',ORDER,' - point interpolation '  
+*         WRITE(*,*) '; switching to ',ORDER,' - point interpolation '
 *         WRITE(*,*) 'to evaluate interpolated point ',I
         ENDIF
         DO 100, I1 = (Z-ORDER/2), (Z-1+ORDER/2)
@@ -71,8 +71,8 @@ C
             ENDIF
   200     CONTINUE
           IF ( DABS(DEM) .GE. 1.0D-33 ) YIN(I) = YIN(I) + NUM/DEM*Y(I1)
-  100   CONTINUE  
- 1000 CONTINUE        
+  100   CONTINUE
+ 1000 CONTINUE
  1100 NIN = I
       IF (BS.NE.0) THEN
 *       WRITE (*,'(/'' CAUTION:- '')')

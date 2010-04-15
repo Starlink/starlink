@@ -21,7 +21,7 @@ void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
 *     Import a FORTRAN CHARACTER array into a C array of pointers to char,
 *     discarding trailing blanks. The pointers must each point to an area of
 *     allocated memory at least dest_len characters long.
-*     The null character is appended to each C string after the last non-blank 
+*     The null character is appended to each C string after the last non-blank
 *     character copied from the Fortran string if there is room.
 *     No more than 'dest_len' characters will be copied for each string.
 
@@ -29,7 +29,7 @@ void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
 *     char *source_f (Given)
 *        A pointer to the input FORTRAN array.
 *     int source_len (Given)
-*        The declared maximum number of characters in a element of the 
+*        The declared maximum number of characters in a element of the
 *        FORTRAN array.
 *     char *const *dest_c (Returned via pointer)
 *        A pointer to the output C array.
@@ -54,12 +54,12 @@ void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -106,7 +106,7 @@ void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
 
 /* Find the last non blank character in the input FORTRAN string.	    */
 
-      for( 
+      for(
       i = source_len - 1; ( i >= 0 ) && ( *(source_f+foffset+i) == ' ' ); i-- )
       ;
 

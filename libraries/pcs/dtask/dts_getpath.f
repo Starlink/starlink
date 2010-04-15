@@ -17,7 +17,7 @@
 
 *  Description:
 *     Obtains the ADAM message path to the task which started the
-*     action named along with the associated message number.  The action 
+*     action named along with the associated message number.  The action
 *     must be currently active.
 
 *  Arguments:

@@ -155,10 +155,10 @@
 *               Allocate workspace (PGGRAY has already checked that I1 etc
 *               are sensible)
             ISTAT = SAI__OK
-            CALL PSX_CALLOC( (I2 - I1 + 1) * (J2 - J1 + 1), 
+            CALL PSX_CALLOC( (I2 - I1 + 1) * (J2 - J1 + 1),
      :               '_INTEGER', PNTR, ISTAT)
             IF (ISTAT.NE.SAI__OK) THEN
-               CALL ERR_REP('GRDYNE', 
+               CALL ERR_REP('GRDYNE',
      :                  'GRGRA2 - Unable to allocate dynamic memory',
      :                  GRDYNE)
                GO TO 9999
@@ -174,7 +174,7 @@
                X1 = REAL(I1)-0.5
                Y1 = REAL(J1)-0.5
                X2 = REAL(I2)+0.5
-               Y2 = REAL(J2)+0.5 
+               Y2 = REAL(J2)+0.5
             ELSE
 
 *            For non rotated case transform corners to World Coordinates

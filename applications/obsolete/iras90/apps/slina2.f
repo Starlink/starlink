@@ -1,7 +1,7 @@
       SUBROUTINE SLINA2( PFILE, IRA, LBND, UBND, MXNSCT, MXVTCE, NMERD,
      :                   NPARL, NGCRL, NPOLY, NVTCE, MLON,MLAT, MSCT,
      :                   PLON, PLAT, PSCT, GLON, GLAT, GANG, GSCT,
-     :                   PLYLON, PLYLAT, STATUS ) 
+     :                   PLYLON, PLYLAT, STATUS )
 *+
 *  Name:
 *     SLINA2
@@ -87,17 +87,17 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
       INCLUDE 'GRP_ERR'          ! GRP_ error constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'IRA_ERR'          ! IRA_ error constants
-      
+
 *  Arguments Given:
       CHARACTER*( * ) PFILE
       INTEGER IRA
@@ -191,7 +191,7 @@
 
          ELSE IF( TYPE .EQ. 'GREAT CIRCLE' ) THEN
             CALL SLING3( IGRP, IRA, SCS, LBND, UBND, MXNSCT, NGCRL,
-     :                   GLON, GLAT, GANG, GSCT, INDEX, STATUS ) 
+     :                   GLON, GLAT, GANG, GSCT, INDEX, STATUS )
 
          ELSE IF( TYPE .EQ. 'POLYLINE' ) THEN
             CALL SLING4( IGRP, IRA, SCS, LBND, UBND, MXNSCT, MXVTCE,
@@ -213,7 +213,7 @@
       CALL PAR_CANCL( PFILE, STATUS )
 
 *  If the group did not contain sufficient information, add a context
-*  message.       
+*  message.
       IF( STATUS .EQ. GRP__OUTBN ) THEN
          CALL ERR_REP( 'SLINA2_ERR3',
      :                 'SLINA2:  File is incomplete',

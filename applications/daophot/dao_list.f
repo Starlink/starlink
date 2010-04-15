@@ -1,9 +1,9 @@
 **==list.spg  processed by SPAG 4.54K  at 14:22 on  4 Oct 1996
- 
+
 ************************************************************************
- 
+
       SUBROUTINE LIST(FILE)
- 
+
 *+
 *  Name :
 *     LIST
@@ -54,23 +54,23 @@
 *-
 *  Type Definitions :
       IMPLICIT NONE
- 
+
 *  Global constants :
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given :
       CHARACTER*(*) FILE
- 
+
 *  Local variables :
       INTEGER STATUS            ! HDS error status
 *.
- 
+
 *   Initialise the status variable.
       STATUS = SAI__OK
- 
+
 *   Print out the file name
       CALL TBLANK
       CALL MSG_OUT(' ','File = ',FILE,STATUS)
- 
+
 *   Exit routine.
       END

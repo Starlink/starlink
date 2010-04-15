@@ -23,12 +23,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -237,10 +237,10 @@
             OK = .FALSE.
          ELSE
             CALL ERR_ANNUL( STATUS )
-         END IF 
-   
+         END IF
+
          CALL ERR_END( STATUS )
-   
+
          IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'ART_TEST_SER4', 'No error on modifying a '//
@@ -274,7 +274,7 @@
       CALL HDS_STOP( STATUS )
 
 *  Report a context error.
-      IF( STATUS .NE. SAI__OK ) THEN 
+      IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ARY_TEST_ERR', 'ARY_TEST: ARY installation '//
      :                 'test failed.', STATUS )
       END IF
@@ -320,7 +320,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -391,7 +391,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -436,8 +436,8 @@
       INTEGER I, EL, STATUS
       INTEGER ARRAY( EL )
 
-      IF( STATUS .NE. SAI__OK ) RETURN      
-      
+      IF( STATUS .NE. SAI__OK ) RETURN
+
       DO I = 1, EL
          ARRAY( I ) = I
       END DO
@@ -453,10 +453,10 @@
       INTEGER I, EL, STATUS
       REAL ARRAY( EL ), VAL
 
-      IF( STATUS .NE. SAI__OK ) RETURN      
+      IF( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, 10
-         VAL = 2.0*I - 1.2 
+         VAL = 2.0*I - 1.2
          IF( ABS( ARRAY( I ) - VAL ) .GT. 1.0E-6 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETR( 'B', ARRAY( I ) )

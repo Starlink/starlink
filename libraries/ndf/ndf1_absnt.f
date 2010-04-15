@@ -28,7 +28,7 @@
 
 *  Algorithm:
 *     Currently, the routine tests for the status values: DAT__FILNF,
-*     DAT__OBJNF, DAT__NAMIN, NDF__CNMIN and NDF__FILNF. It returns .TRUE. 
+*     DAT__OBJNF, DAT__NAMIN, NDF__CNMIN and NDF__FILNF. It returns .TRUE.
 *     if any of these is matched.
 
 *  Copyright:
@@ -74,10 +74,10 @@
 *  Global Constants:
       INCLUDE 'DAT_ERR'          ! DAT_ error codes
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
-      
+
 *  Arguments Given:
       INTEGER ISTAT
-      
+
 *.
 
 *  Test the status value against those which indicate an absent data

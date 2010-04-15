@@ -121,7 +121,7 @@
 
       REAL
      :    WKARR( WKDIM1, WKDIM2, WKDIM3 )
-     
+
       LOGICAL
      :    GDDATA( ZNUMBR )
 
@@ -171,7 +171,7 @@
 
       DO  L  =  1, ZNUMBR
 
-*       Check to see if current entry is set true, i.e. that the 
+*       Check to see if current entry is set true, i.e. that the
 *       corresponding x,y plane of the 3-d array contains good data
 
          IF ( GDDATA( L ) ) THEN

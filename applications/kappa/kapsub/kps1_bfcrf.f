@@ -5,7 +5,7 @@
 *     KPS1_BFCRF
 
 *  Purpose:
-*     Converts the pixel coefficients of the fit into the reference 
+*     Converts the pixel coefficients of the fit into the reference
 *     Frame
 
 *  Language:
@@ -16,25 +16,25 @@
 *                      RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Description:
-*     This converts the spatial coefficients and their errors from 
+*     This converts the spatial coefficients and their errors from
 *     PIXEL co-ordinates into the reporting Frame for the fitted beam
 *     features.  In addition the standard deviation widths may be
 *     swapped so that the third coefficent is the major axis and the
 *     the fourth is the minor axis.  The orientation is made to lie
-*     the range of 0 to pi radians by adding or subtracting pi 
+*     the range of 0 to pi radians by adding or subtracting pi
 *     radians, and for SkyFrames it is measured from the North via East,
-*     converted from X-axis through Y.  Data-value coefficients (e.g. 
+*     converted from X-axis through Y.  Data-value coefficients (e.g.
 *     amplitude) are unchanged.
 *
 *     In addition it computes and returns the polar co-ordinates of the
-*     secondary beams with respect to the primary in the reporting 
-*     Frame.  The orientation is measured North through East for a 
+*     secondary beams with respect to the primary in the reporting
+*     Frame.  The orientation is measured North through East for a
 *     SkyFrame, and from the Y axis anticlockwise for other Frames.
 
 *     This routine makes it easier to write the results to a
 *     logfile or to output parameters and is more efficient
 *     avoiding duplication transformations caused by separate
-*     outputting routines and flushed message tokens. 
+*     outputting routines and flushed message tokens.
 
 *  Arguments:
 *     MAP = INTEGER (Given)
@@ -42,7 +42,7 @@
 *        reporting Frame.
 *     IWCS = INTEGER (Given)
 *        The FrameSet of two-dimensional frames associated with the NDF.
-*     NAXC = INTEGER (Given) 
+*     NAXC = INTEGER (Given)
 *        The number of axes in CFRM.
 *     NBEAM = INTEGER (Given)
 *        The number of beam features fitted.
@@ -63,18 +63,18 @@
 *         The polar co-ordinates of the beam features with respect to
 *         the primary beam measured in the current co-ordinate Frame.
 *         The orientation is a position angle in degrees, measured from
-*         North through East if the current Frame is a Skyframe, or 
+*         North through East if the current Frame is a Skyframe, or
 *         anticlockwise from the Y axis otherwise.  The POLAR(*,1)
 *         values of the primary beam are set to 0.0 and bad values.
 *     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Returned)
-*         The standard-deviation errors associated with the polar 
+*         The standard-deviation errors associated with the polar
 *          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
 *         values of the primary beam are set to 0.0 and bad values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
+*     Copyright (C) 2007 Particle Physics and Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -102,7 +102,7 @@
 *        Original version created from KPS1_BFLOG with the aim of
 *        avoiding code duplication.
 *     2007 May 25 (MJC):
-*        Fixed repeated typo's such that the PSIGMA values are now 
+*        Fixed repeated typo's such that the PSIGMA values are now
 *        assigned.
 *     2007 May 30 (MJC):
 *        Add POLAR and POLSIG arguments and calculate polar co-ordinates
@@ -132,7 +132,7 @@
       INCLUDE 'MSG_PAR'          ! Message-system public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER MAP
@@ -169,7 +169,7 @@
       DOUBLE PRECISION A( 2 )    ! Start of distance (A to B)
       DOUBLE PRECISION B( 2 )    ! End of distance (A to B)
       INTEGER CFRM               ! Current/reporting Frame
-      DOUBLE PRECISION DATAN     ! Differentiating atan factor 
+      DOUBLE PRECISION DATAN     ! Differentiating atan factor
       DOUBLE PRECISION DX        ! Increment along first axis
       DOUBLE PRECISION DY        ! Increment along second axis
       DOUBLE PRECISION GRAD      ! Gradient DY/DX
@@ -208,8 +208,8 @@
       PFRM = AST_GETFRAME( IWCS, IPIX, STATUS )
 
 *  Find the latitude and longitude axes needed for the origin of the
-*  orientation.  
-      ISSKY =  AST_ISASKYFRAME( CFRM, STATUS ) 
+*  orientation.
+      ISSKY =  AST_ISASKYFRAME( CFRM, STATUS )
       IF ( ISSKY ) THEN
          LAT = AST_GETI( CFRM, 'LatAxis', STATUS )
          LON = AST_GETI( CFRM, 'LonAxis', STATUS )
@@ -251,13 +251,13 @@
 
          RP( 1, IB ) = POS( 1, 1 )
          RP( 2, IB ) = POS( 1, 2 )
-         
+
          IF ( PSIGMA( 1, IB ) .NE. VAL__BADD ) THEN
 
 *  Centre errors
 *  -------------
 *  Need to determine the distance for the error bars.  For convenience
-*  we fudge it here if NAXC exceeds 2.  We're keeping higher axes 
+*  we fudge it here if NAXC exceeds 2.  We're keeping higher axes
 *  fixed anyway.
             DO I = 1, NAXC
                A( I ) = POS( 1, I )
@@ -291,17 +291,17 @@
 *  Widths
 *  ------
 
-*  Transform the fitted positions and widths from the PIXEL Frame 
+*  Transform the fitted positions and widths from the PIXEL Frame
 *  of the NDF to the reporting Frame.
          PIXPOS( 1, 1 ) = PP( 1, IB )
          PIXPOS( 1, 2 ) = PP( 2, IB )
-           
+
          PIXPOS( 2, 1 ) = PP( 1, IB )
          PIXPOS( 2, 2 ) = PP( 2, IB ) + PP( MINOR, IB )
 
          PIXPOS( 3, 1 ) = PP( 1, IB ) + PP( MAJOR, IB )
          PIXPOS( 3, 2 ) = PP( 2, IB )
-           
+
          CALL AST_TRANN( MAP, 3, 2, 3, PIXPOS, .TRUE., NAXC, 3, POS,
      :                   STATUS )
 
@@ -332,17 +332,17 @@
 *  Bad values for the errors in the FWHM indicate no value exists.
          IF ( PSIGMA( MAJOR, IB ) .NE. VAL__BADD ) THEN
 
-*  Transform the fitted positions and width errors from the PIXEL 
+*  Transform the fitted positions and width errors from the PIXEL
 *  Frame of the NDF to the reporting Frame.
             PIXPOS( 1, 1 ) = PP( 1, IB )
             PIXPOS( 1, 2 ) = PP( 2, IB )
-           
+
             PIXPOS( 2, 1 ) = PP( 1, IB )
             PIXPOS( 2, 2 ) = PP( 2, IB ) + PSIGMA( MINOR, IB )
 
             PIXPOS( 3, 1 ) = PP( 1, IB ) + PSIGMA( MAJOR, IB )
             PIXPOS( 3, 2 ) = PP( 2, IB )
-           
+
             CALL AST_TRANN( MAP, 3, 2, 3, PIXPOS, .TRUE., NAXC, 3, POS,
      :                      STATUS )
 
@@ -356,7 +356,7 @@
             POS( 1, 2 ) = SPOS( 2 )
 
 *  Need to determine the distance for the error bars.  For convenience
-*  we fudge it here if NAXC exceeds 2.  We're keeping higher axes 
+*  we fudge it here if NAXC exceeds 2.  We're keeping higher axes
 *  fixed anyway.
 *  Need to determine the distances for the beam widths.  Use the
 *  reporting axis.
@@ -430,7 +430,7 @@
 
 *  Radius
 *  ------
-*  Transform the primary-beam and secondary position centre measured in 
+*  Transform the primary-beam and secondary position centre measured in
 *  the PIXEL Frame of the NDF to the reporting Frame.
             PIXPOS( 1, 1 ) = PP( 1, 1 )
             PIXPOS( 1, 2 ) = PP( 2, 1 )
@@ -458,8 +458,8 @@
 
 *  Use the partial derivatives of the polar radius function against the
 *  four variables: (x,y) for the primary and secondary positions.  This
-*  Taylor-expansion is good to first order.  One should evaluate JCJ^T 
-*  matrices where J is the Jacobian and C is the covariance matrix to 
+*  Taylor-expansion is good to first order.  One should evaluate JCJ^T
+*  matrices where J is the Jacobian and C is the covariance matrix to
 *  propagate the errors.
 
 *  First assume that the primary beam position is exactly known.
@@ -475,7 +475,7 @@
                POLSIG( 1, IB ) = SQRT( VAR )
             ELSE
                POLSIG( 1, IB ) = VAL__BADD
-            END IF            
+            END IF
 
 *  Position angle
 *  --------------
@@ -540,15 +540,15 @@
                POLSIG( 2, IB ) = ATAN2( ABS( B( 2 ) - A( 2 ) ),
      :                                  SQRT( VARX ) ) * R2D
 
-*  Now deal with PA = 90 or 270. 
+*  Now deal with PA = 90 or 270.
             ELSE IF ( ABS( DY ) .LT. VAL__EPSD ) THEN
-               POLSIG( 2, IB ) = ATAN2( SQRT( VARY ), 
+               POLSIG( 2, IB ) = ATAN2( SQRT( VARY ),
      :                                  ABS( B( 1 ) - A( 1 ) ) ) * R2D
 
             ELSE
                GRAD = DY / DX
                DATAN = 1.0D0 / ( 1 + GRAD * GRAD ) / DX
-               VAR = DATAN * DATAN * ( GRAD * GRAD * VARX + VARY ) 
+               VAR = DATAN * DATAN * ( GRAD * GRAD * VARX + VARY )
 
                IF ( VAR .GT. 0.0D0 ) THEN
                   POLSIG( 2, IB ) = SQRT( VAR ) * R2D

@@ -63,7 +63,7 @@
 *       V1.8-0 Now use USI for user interface
 *    14-SEP-2001 (AJC):
 *       V3.0-0 Remove Asterix stuff
-*       Improve prologue 
+*       Improve prologue
 *-
 
 *    Type Definitions :
@@ -131,7 +131,7 @@
                      DO I=1,NDIM-1
                         IF (DIMSO(I) .NE. DIMSN(I)) SAME=.FALSE.
                      ENDDO
-                  
+
                   ELSE
                      SAME = .FALSE.
                   ENDIF

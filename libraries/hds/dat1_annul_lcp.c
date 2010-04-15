@@ -137,7 +137,7 @@ pointer (internal programming error).",
 /* file.                                                                    */
                   rec_close_file( &han );
                }
-            }      
+            }
          }
       }
 

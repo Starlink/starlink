@@ -14,12 +14,12 @@ foreach $file (split /\s+/, $files) {
       $state = 0;
       while( $line =<INFILE> ){
          chomp( $line );
-   
+
          if( $state == 0 ) {
             if( $line =~ /^\* +Name: *$/ ) {
                $state = 1;
             }
-   
+
          } elsif( $state == 1 ) {
             if( $line =~ /^\* +(\w.*\S) *$/ ) {
                $name = $1;
@@ -28,12 +28,12 @@ foreach $file (split /\s+/, $files) {
                printf "Cannot find the \"Name:\" prologue section in $ARGV[0]/$file !!!!\n";
                exit;
             }
-   
+
          } elsif( $state == 2 ) {
             if( $line =~ /^\* +Purpose: *$/ ) {
                $state = 3;
             }
-   
+
          } elsif( $state == 3 ) {
             if( $line =~ /^\* +(\w.*\S) *$/ ) {
                $purpose = "$purpose$1 ";
@@ -43,15 +43,15 @@ foreach $file (split /\s+/, $files) {
             }
          }
       }
-   
+
       if( $state != 4 ) {
          printf "Cannot find the \"Purpose:\" prologue section in $ARGV[0]/$file !!!!\n";
          exit;
       }
-   
+
       $name = uc( $name );
       $purps{$name} = $purpose;
-   
+
       close $INFILE;
    }
 }

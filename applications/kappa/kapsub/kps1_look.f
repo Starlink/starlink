@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_LOOK( FRM, XLO, XHI, YLO, YHI, ARRAY, QUIET, LOG,
-     :                      FD, LINE, IWCS, FORMAT, MAXLEN, VALUE, 
+     :                      FD, LINE, IWCS, FORMAT, MAXLEN, VALUE,
      :                      STATUS )
 *+
 *  Name:
@@ -16,12 +16,12 @@
 *                     IWCS, FORMAT, MAXLEN, LINE, VALUE, STATUS )
 
 *  Description:
-*     This routine writes out the contents of an array to a text file 
+*     This routine writes out the contents of an array to a text file
 *     and to the screen.
 
 *  Arguments:
 *     FRM = INTEGER (Given)
-*        An AST Frame. The AST_FORMAT method for axis 1 of this Frame is used 
+*        An AST Frame. The AST_FORMAT method for axis 1 of this Frame is used
 *        to format the data values.
 *     XLO = INTEGER (Given)
 *        The lower pixel bound of the array on the first axis.
@@ -40,7 +40,7 @@
 *     FD = INTEGER (Given)
 *        An FIO descriptor for the text file. Only accessed if LOG is .TRUE.
 *     LINE = CHARACTER * ( * ) (Given)
-*        Work space to use as a buffer for textual output. Should be at least 
+*        Work space to use as a buffer for textual output. Should be at least
 *        MAXLEN characters long.
 *     IWCS = INTEGER (Given)
 *        The WCS FrameSet from the NDF.
@@ -53,32 +53,32 @@
 *        X pixel index at the top of each column. The highest row is
 *        listed first in each strip.
 *
-*        - "CLIST" -- Each row of textual output consists of an X pixel 
+*        - "CLIST" -- Each row of textual output consists of an X pixel
 *        index, followed by a Y pixel index, followed by the pixel data
 *        value. No headers or blank lines are included. The pixels are
 *        listed in "fortran order" - the lower left pixel first, and the
-*        upper right pixel last. 
+*        upper right pixel last.
 *
 *        - "WLIST" -- Each row of textual output consists of the WCS
-*        co-ords of the pixel, followed by the pixel data value. No 
-*        headers or blank lines are included. The pixels are listed in 
-*        "fortran order" - the lower left pixel first, and the upper 
-*        right pixel last. 
+*        co-ords of the pixel, followed by the pixel data value. No
+*        headers or blank lines are included. The pixels are listed in
+*        "fortran order" - the lower left pixel first, and the upper
+*        right pixel last.
 *
 *        - "CGLIST" -- Like CLIST except bad pixels are omitted.
 *
 *        - "VLIST" -- Each row of textual output consists of just the
-*        pixel data value. No headers or blank lines are included. The 
-*        pixels are listed in "fortran order" - the lower left pixel first, 
+*        pixel data value. No headers or blank lines are included. The
+*        pixels are listed in "fortran order" - the lower left pixel first,
 *        and the upper right pixel last.
 *
 *        - "WLIST" -- Each row of textual output consists of just the
-*        pixel data value. No headers or blank lines are included. The 
-*        pixels are listed in "fortran order" - the lower left pixel first, 
+*        pixel data value. No headers or blank lines are included. The
+*        pixels are listed in "fortran order" - the lower left pixel first,
 *        and the upper right pixel last.
 *
 *        - "REGION" -- The pixel data values are listed as a 2 dimensional
-*        region. Each row of textual output contains a whole row of data 
+*        region. Each row of textual output contains a whole row of data
 *        values. The textual output may be truncated if it is too wide. The
 *        highest row is listed first.
 *
@@ -132,7 +132,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -164,7 +164,7 @@
       INTEGER CHR_LEN          ! Used length of a string
 
 *  Local Constants:
-      INTEGER MXSTOR           ! No. of WCS positions to transform 
+      INTEGER MXSTOR           ! No. of WCS positions to transform
       PARAMETER( MXSTOR = 100 )
 
       INTEGER BADLEN           ! Length of text for bad values
@@ -220,13 +220,13 @@
          MAP = AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, STATUS )
       END IF
 
-*  For WLIST, CLIST and CGLIST format, assume the maximum possible field 
+*  For WLIST, CLIST and CGLIST format, assume the maximum possible field
 *  width.
-      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'CLIST' .OR. 
+      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'CLIST' .OR.
      :    FORMAT .EQ. 'CGLIST' ) THEN
          VWID = VAL__SZD
 
-*  For other formats, format every value, using CHR to get the most compact 
+*  For other formats, format every value, using CHR to get the most compact
 *  format. Find the maximum field width needed to format any value.
       ELSE
          VWID = 0
@@ -237,7 +237,7 @@
                ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
                   JAT = OUTLEN
                ELSE
-                  CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+                  CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
      :                                       STATUS ), LINE, JAT )
                END IF
                VWID = MAX( VWID, JAT )
@@ -255,13 +255,13 @@
       ELSE
          CALL CHR_ITOC( XLO, LINE, IAT )
          XWID = IAT
-   
+
          CALL CHR_ITOC( XHI, LINE, IAT )
          XWID = MAX( XWID, IAT )
-   
+
          CALL CHR_ITOC( YLO, LINE, IAT )
          YWID = IAT
-   
+
          CALL CHR_ITOC( YHI, LINE, IAT )
          YWID = MAX( YWID, IAT )
       END IF
@@ -271,7 +271,7 @@
       XWID = XWID + 2
       YWID = YWID + 2
 
-*  Strips: Output consists of a set of rectangular blocks, displayed one after 
+*  Strips: Output consists of a set of rectangular blocks, displayed one after
 *  the other. Each block represents a vertical strip covering the entire
 *  height of the array. The width is chosen so that the maximum line
 *  length, MAXLEN, is not exceeded. Each column has a header giving its X
@@ -286,9 +286,9 @@
 
 *  If there is room left over, make the columns wider (but do not allow the
 *  extra space to be more than half the original column width).
-         COLWID = COLWID + 
-     :            MIN( COLWID/2, 
-     :                 MAX( 0, ( MAXLEN - YWID - XGAP - NV*COLWID )/NV ) 
+         COLWID = COLWID +
+     :            MIN( COLWID/2,
+     :                 MAX( 0, ( MAXLEN - YWID - XGAP - NV*COLWID )/NV )
      :               )
 
 *  Initialize the X pixel index of the first column in the next strip.
@@ -323,7 +323,7 @@
                JAT = IAT
                CALL CHR_PUTI( IY, LINE, JAT )
                CALL CHR_PUTC( ':', LINE, JAT )
-               IAT = IAT + YWID + XGAP 
+               IAT = IAT + YWID + XGAP
 
 *  Append the data values for each column.
                DO IX = IX0, MIN( IX0 + NV - 1, XHI )
@@ -335,7 +335,7 @@
                      CALL CHR_PUTC( OUTTXT, LINE, JAT )
 
                   ELSE
-                     CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+                     CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
      :                                          STATUS ), LINE, JAT )
                   END IF
                   IAT = IAT + COLWID
@@ -354,9 +354,9 @@
 *  A blank line.
          CALL KPG1_REPRT( ' ', QUIET, LOG, FD, STATUS )
 
-*  "CLIST": Each row of textual output consists of an X pixel index, followed 
-*  by a Y pixel index, followed by the pixel data value. No headers or blank 
-*  lines are included. The pixels are listed in "fortran order" - the lower 
+*  "CLIST": Each row of textual output consists of an X pixel index, followed
+*  by a Y pixel index, followed by the pixel data value. No headers or blank
+*  lines are included. The pixels are listed in "fortran order" - the lower
 *  left pixel first, and the upper right pixel last. All columns left
 *  justified.
       ELSE IF( FORMAT .EQ. 'CLIST' ) THEN
@@ -379,7 +379,7 @@
                   CALL CHR_PUTC( OUTTXT, LINE, IAT )
 
                ELSE
-                  CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+                  CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
      :                                       STATUS ), LINE, IAT )
                END IF
 
@@ -394,42 +394,42 @@
             DO IX = XLO, XHI
                IF( ARRAY( IX, IY ) .NE.VAL__BADD ) THEN
                   LINE = ' '
-         
+
                   IAT = 0
                   CALL CHR_PUTI( IX, LINE, IAT )
                   IAT = XWID
-         
+
                   JAT = IAT
                   CALL CHR_PUTI( IY, LINE, JAT )
                   IAT = IAT + YWID
-         
+
                   IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
                      CALL CHR_PUTC( BADTXT, LINE, IAT )
-         
+
                   ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
                      CALL CHR_PUTC( OUTTXT, LINE, IAT )
-         
+
                   ELSE
-                     CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+                     CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
      :                                          STATUS ), LINE, IAT )
                   END IF
-         
-                  CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, 
+
+                  CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD,
      :                             STATUS )
 
                END IF
             END DO
          END DO
 
-*  "WLIST": Each row of textual output consists of the WCS coords, followed 
-*  by the pixel data value. No headers or blank lines are included. The 
-*  pixels are listed in "fortran order" - the lower left pixel first, and 
+*  "WLIST": Each row of textual output consists of the WCS coords, followed
+*  by the pixel data value. No headers or blank lines are included. The
+*  pixels are listed in "fortran order" - the lower left pixel first, and
 *  the upper right pixel last. All columns left justified.
       ELSE IF( FORMAT .EQ. 'WLIST' ) THEN
 
 *  Transforming every pixel position into WCS using a separate call to
 *  AST_TRAN2 would be very inefficient. So we collect a group of
-*  positions together, and transform them all using a single call to 
+*  positions together, and transform them all using a single call to
 *  AST_TRAN2. Initialise the number of positions ready to transform.
          STORED = 0
 
@@ -437,7 +437,7 @@
          DO IY = YLO, YHI
             DO IX = XLO, XHI
 
-*  Add these pixel centre positions to the store of positions to be 
+*  Add these pixel centre positions to the store of positions to be
 *  transformed.
                STORED = STORED + 1
                XSTORE( STORED ) = DBLE( IX ) - 0.5D0
@@ -445,15 +445,15 @@
                VSTORE( STORED ) = ARRAY( IX, IY )
 
 *  If the store is now full, or if this is the last pixel, transform the
-*  stored pixel positions into WCS positions. 
-               IF( STORED .EQ. MXSTOR .OR. 
+*  stored pixel positions into WCS positions.
+               IF( STORED .EQ. MXSTOR .OR.
      :             ( IX .EQ. XHI .AND. IY .EQ. YHI ) ) THEN
                   CALL AST_TRAN2( MAP, STORED, XSTORE, YSTORE, .TRUE.,
      :                            ASTORE, BSTORE, STATUS )
 
 *  Loop round displaying each stored WCS position and the corresponding
 *  pixel value.
-                  DO I = 1, STORED 
+                  DO I = 1, STORED
                      LINE = ' '
                      IAT = 0
 
@@ -476,18 +476,18 @@
 
                      IF( VSTORE( I ) .EQ. VAL__BADD ) THEN
                         CALL CHR_PUTC( BADTXT, LINE, IAT )
-	             
+
                      ELSE IF( VSTORE( I ) .EQ. OUTVAL ) THEN
                         CALL CHR_PUTC( OUTTXT, LINE, IAT )
-	             
+
                      ELSE
-                        CALL CHR_PUTC( AST_FORMAT( FRM, 1, 
-     :                                             VSTORE( I ), 
-     :                                             STATUS ), 
+                        CALL CHR_PUTC( AST_FORMAT( FRM, 1,
+     :                                             VSTORE( I ),
+     :                                             STATUS ),
      :                                 LINE, IAT )
                      END IF
-	             
-                     CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, 
+
+                     CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD,
      :                                STATUS )
 
                   END DO
@@ -499,8 +499,8 @@
             END DO
          END DO
 
-*  "VLIST":  Each row of textual output consists of just the pixel data value. 
-*  No headers or blank lines are included. The pixels are listed in "fortran 
+*  "VLIST":  Each row of textual output consists of just the pixel data value.
+*  No headers or blank lines are included. The pixels are listed in "fortran
 *  order" - the lower left pixel first, and the upper right pixel last.
       ELSE IF( FORMAT .EQ. 'VLIST' ) THEN
          DO IY = YLO, YHI
@@ -512,16 +512,16 @@
                   CALL CHR_PUTC( OUTTXT, LINE, JAT )
 
                ELSE
-                  CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+                  CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
      :                                       STATUS ), LINE, JAT )
                END IF
                CALL KPG1_REPRT( LINE( : JAT ), QUIET, LOG, FD, STATUS )
             END DO
          END DO
 
-*  "REGION": The pixel data values are listed as a 2 dimensional region. 
-*  Each row of textual output contains a whole row of data values. The 
-*  textual output may be truncated if it is too wide. The highest row is 
+*  "REGION": The pixel data values are listed as a 2 dimensional region.
+*  Each row of textual output contains a whole row of data values. The
+*  textual output may be truncated if it is too wide. The highest row is
 *  listed first.
       ELSE IF( FORMAT .EQ. 'REGION' ) THEN
          DO IY = YLO, YHI
@@ -537,7 +537,7 @@
                   CALL CHR_PUTC( OUTTXT, LINE, JAT )
 
                ELSE
-                  CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+                  CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
      :                                       STATUS ), LINE, JAT )
                END IF
                IAT = IAT + VWID

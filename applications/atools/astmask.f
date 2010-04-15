@@ -21,8 +21,8 @@
 
 *  Description:
 *     This application masks out regions within an NDF. It creates a copy
-*     of the supplied input NDF and then modifies the copy by assigning a 
-*     specified value to all samples which are inside (or outside 
+*     of the supplied input NDF and then modifies the copy by assigning a
+*     specified value to all samples which are inside (or outside
 *     if INSIDE is FALSE) the specified Region.
 
 *  Usage:
@@ -32,15 +32,15 @@
 *     IN = NDF (Read)
 *        The input NDF that is to be masked.
 *     INSIDE = _LOGICAL (Read)
-*        Indicates which pixel of the input NDF are to be masked. If TRUE is 
-*        supplied, then all pixels with centres inside the supplied Region 
-*        are assigned the value given by parameter VAL, and all other pixels 
-*        are left unchanged. If FALSE is supplied, then all pixels with 
-*        centres not inside the supplied Region are assigned the value given 
+*        Indicates which pixel of the input NDF are to be masked. If TRUE is
+*        supplied, then all pixels with centres inside the supplied Region
+*        are assigned the value given by parameter VAL, and all other pixels
+*        are left unchanged. If FALSE is supplied, then all pixels with
+*        centres not inside the supplied Region are assigned the value given
 c        by VAL, and all other pixels are left unchanged. Note, the Negated
 *        attribute of the Region is used to determine which pixel are
-*        inside the Region and which are outside. So the inside of a Region 
-*        which has not been negated is the same as the outside of the 
+*        inside the Region and which are outside. So the inside of a Region
+*        which has not been negated is the same as the outside of the
 *        corresponding negated Region.
 *
 *        For types of Region such as PointList which have zero volume,
@@ -50,28 +50,28 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
 *        the Region passes through the pixel. For a PointList, this means
 *        that pixels are included (or excluded) if they contain at least
 *        one of the points listed in the PointList.
-*     MAP = LITERAL (Read) 
-*        An NDF or text file holding a Mapping (if an NDF is supplied, 
+*     MAP = LITERAL (Read)
+*        An NDF or text file holding a Mapping (if an NDF is supplied,
 *        the Mapping from PIXEL coordinates to the Current WCS Frame is
-*        used). The inverse (note, inverse) transformation is used to map 
+*        used). The inverse (note, inverse) transformation is used to map
 *        positions in the coordinate system of the supplied Region into
-*        PIXEL coordinates of the input NDF. A null (!) value can be supplied 
-*        if the coordinate system of the supplied Region corresponds to 
+*        PIXEL coordinates of the input NDF. A null (!) value can be supplied
+*        if the coordinate system of the supplied Region corresponds to
 *        PIXEL coordinates. This is equivalent to supplying a UnitMap.
 *
 *        The number of inputs for this Mapping (as given by its Nin
-*        attribute) should match the number of axes in the supplied Region 
-*        (as given by the Naxes attribute of the Region). The number of 
-*        outputs for the Mapping (as given by its Nout attribute) should 
+*        attribute) should match the number of axes in the supplied Region
+*        (as given by the Naxes attribute of the Region). The number of
+*        outputs for the Mapping (as given by its Nout attribute) should
 *        match the number of pixel axes in the input NDF.
 *
 *        Note, in this context "pixel coordinates" are standard NDF pixel
-*        coordinates. The AST_GRID function within the AST library uses a 
+*        coordinates. The AST_GRID function within the AST library uses a
 *        slightly different form of pixel coordinates (it assumes integral
-*        values are at the centre rather than the corners of each pixel) 
+*        values are at the centre rather than the corners of each pixel)
 *        and so requires a slightly different Mapping.
 *
-*        The suggested default is the input NDF. If accepted, this default 
+*        The suggested default is the input NDF. If accepted, this default
 *        means that he supplied Region is assumed to be defined in the
 *        current WCS Frame of the supplied NDF.
 *     OUT = NDF (Read)
@@ -145,7 +145,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       CHARACTER DTYPE*( NDF__SZFTP )
       CHARACTER ITYPE*( NDF__SZTYP )
       CHARACTER PATH*255
-      CHARACTER VTEXT*30        
+      CHARACTER VTEXT*30
       DOUBLE PRECISION DVAL
       DOUBLE PRECISION SHIFT( NDF__MXDIM )
       INTEGER EL
@@ -156,24 +156,24 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       INTEGER IPDATA
       INTEGER IVAL
       INTEGER LBND( NDF__MXDIM )
-      INTEGER MAP               
-      INTEGER NAXREG            
-      INTEGER NDIM              
-      INTEGER NMIN              
-      INTEGER NMOUT             
+      INTEGER MAP
+      INTEGER NAXREG
+      INTEGER NDIM
+      INTEGER NMIN
+      INTEGER NMOUT
       INTEGER RESULT
       INTEGER SIZE
-      INTEGER THIS              
+      INTEGER THIS
       INTEGER UBND( NDF__MXDIM )
       INTEGER*2 UWVAL
       INTEGER*2 WVAL
       LOGICAL BAD
       LOGICAL INSIDE
-      REAL RVAL            
+      REAL RVAL
 
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin AST and NDF contexts
@@ -185,11 +185,11 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       NAXREG = AST_GETI( THIS, 'NAXES', STATUS )
 
 *  Get the input NDF, and its path as supplied by the user (i.e. not its
-*  full path). 
-      CALL KPG1_RGNDF( 'IN', 1, 1, ' ', IGRP, SIZE, STATUS )  
-      CALL NDG_NDFAS( IGRP, 1, 'Read', INDF1, STATUS )  
-      CALL GRP_GET( IGRP, 1, 1, PATH, STATUS ) 
-      CALL GRP_DELET( IGRP, STATUS ) 
+*  full path).
+      CALL KPG1_RGNDF( 'IN', 1, 1, ' ', IGRP, SIZE, STATUS )
+      CALL NDG_NDFAS( IGRP, 1, 'Read', INDF1, STATUS )
+      CALL GRP_GET( IGRP, 1, 1, PATH, STATUS )
+      CALL GRP_DELET( IGRP, STATUS )
 
 *  Set the default for the MAP parameter to be the NDF path.
       CALL PAR_DEF0C( 'MAP', PATH, STATUS )
@@ -217,12 +217,12 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
             CALL MSG_SETI( 'N', NMIN )
             CALL MSG_SETI( 'M', NAXREG )
             CALL ERR_REP( ' ', 'Number of Mapping inputs (^N) is not '//
-     :                    'the same as the number of Region axes (^M).', 
+     :                    'the same as the number of Region axes (^M).',
      :                    STATUS )
          END IF
       END IF
 
-*  Get the NDF pixel bounds, and ensure it has the correct number of pixel 
+*  Get the NDF pixel bounds, and ensure it has the correct number of pixel
 *  axes.
       CALL NDF_BOUND( INDF1, NMOUT, LBND, UBND, NDIM, STATUS )
       IF( NDIM .NE. NMOUT .AND. STATUS .EQ. SAI__OK ) THEN
@@ -230,7 +230,7 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
          CALL MSG_SETI( 'N', NDIM )
          CALL MSG_SETI( 'M', NMOUT )
          CALL ERR_REP( ' ', 'Number of Mapping outputs (^M) is not '//
-     :                 'the same as the number of NDF pixel axes (^N).', 
+     :                 'the same as the number of NDF pixel axes (^N).',
      :                 STATUS )
       END IF
 
@@ -241,18 +241,18 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
       DO I = 1, NDIM
          SHIFT( I ) = LBND( I ) - 1.0D0
       END DO
-      MAP = AST_CMPMAP( MAP, AST_SHIFTMAP( NMOUT, SHIFT, ' ', STATUS ), 
+      MAP = AST_CMPMAP( MAP, AST_SHIFTMAP( NMOUT, SHIFT, ' ', STATUS ),
      :                  .TRUE., ' ', STATUS )
 
 *  Create the output by propagation of everything from the input.
       CALL NDF_PROP( INDF1, 'LABEL,UNITS,AXIS,WCS,HISTORY,LABEL,'//
-     :               'TITLE,DATA,QUALITY,VARIANCE', 'OUT', INDF2, 
-     :               STATUS ) 
+     :               'TITLE,DATA,QUALITY,VARIANCE', 'OUT', INDF2,
+     :               STATUS )
 
 *  Determine a data type which can be used for operations on the
 *  Data components of the NDF.
       CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', 1, INDF2, 'DATA', ITYPE, DTYPE, 
+     :                '_DOUBLE', 1, INDF2, 'DATA', ITYPE, DTYPE,
      :                STATUS )
 
 *  Get the value that defines the required Polygon as a string, and note
@@ -274,28 +274,28 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
             IF( BAD ) THEN
                BVAL = VAL__BADB
             ELSE
-               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINB ), 
-     :                         INT( VAL__MAXB ), 
-     :                         .FALSE., IVAL, STATUS ) 
+               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINB ),
+     :                         INT( VAL__MAXB ),
+     :                         .FALSE., IVAL, STATUS )
                BVAL = IVAL
-            END IF     
+            END IF
 
-            RESULT = AST_MASKB( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
-     :                          %VAL( CNF_PVAL( IPDATA )), BVAL, 
+            RESULT = AST_MASKB( THIS, MAP, INSIDE, NDIM, LBND, UBND,
+     :                          %VAL( CNF_PVAL( IPDATA )), BVAL,
      :                          STATUS )
-         
+
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
 
             IF( BAD ) THEN
                UBVAL = VAL__BADUB
             ELSE
-               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINUB ), 
-     :                         INT( VAL__MAXUB ), 
-     :                         .FALSE., IVAL, STATUS ) 
+               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINUB ),
+     :                         INT( VAL__MAXUB ),
+     :                         .FALSE., IVAL, STATUS )
                UBVAL = IVAL
-            END IF     
+            END IF
 
-            RESULT = AST_MASKUB( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
+            RESULT = AST_MASKUB( THIS, MAP, INSIDE, NDIM, LBND, UBND,
      :                           %VAL( CNF_PVAL( IPDATA )), UBVAL,
      :                           STATUS )
 
@@ -304,13 +304,13 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
             IF( BAD ) THEN
                WVAL = VAL__BADW
             ELSE
-               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINW ), 
-     :                         INT( VAL__MAXW ), 
-     :                         .FALSE., IVAL, STATUS ) 
+               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINW ),
+     :                         INT( VAL__MAXW ),
+     :                         .FALSE., IVAL, STATUS )
                WVAL = IVAL
-            END IF     
+            END IF
 
-            RESULT = AST_MASKW( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
+            RESULT = AST_MASKW( THIS, MAP, INSIDE, NDIM, LBND, UBND,
      :                          %VAL( CNF_PVAL( IPDATA )), WVAL,
      :                          STATUS )
 
@@ -319,13 +319,13 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
             IF( BAD ) THEN
                UWVAL = VAL__BADUW
             ELSE
-               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINUW ), 
-     :                         INT( VAL__MAXUW ), 
-     :                         .FALSE., IVAL, STATUS ) 
+               CALL PAR_GDR0I( 'VAL', 0, INT( VAL__MINUW ),
+     :                         INT( VAL__MAXUW ),
+     :                         .FALSE., IVAL, STATUS )
                UWVAL = IVAL
-            END IF     
+            END IF
 
-            RESULT = AST_MASKUW( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
+            RESULT = AST_MASKUW( THIS, MAP, INSIDE, NDIM, LBND, UBND,
      :                           %VAL( CNF_PVAL( IPDATA )), UWVAL,
      :                           STATUS )
 
@@ -335,9 +335,9 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
                IVAL = VAL__BADI
             ELSE
                CALL PAR_GET0I( 'VAL', IVAL, STATUS )
-            END IF     
+            END IF
 
-            RESULT = AST_MASKI( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
+            RESULT = AST_MASKI( THIS, MAP, INSIDE, NDIM, LBND, UBND,
      :                          %VAL( CNF_PVAL( IPDATA )), IVAL,
      :                          STATUS )
 
@@ -347,9 +347,9 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
                RVAL = VAL__BADR
             ELSE
                CALL PAR_GET0R( 'VAL', RVAL, STATUS )
-            END IF     
+            END IF
 
-            RESULT = AST_MASKR( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
+            RESULT = AST_MASKR( THIS, MAP, INSIDE, NDIM, LBND, UBND,
      :                          %VAL( CNF_PVAL( IPDATA )), RVAL,
      :                          STATUS )
 
@@ -359,12 +359,12 @@ c        by VAL, and all other pixels are left unchanged. Note, the Negated
                DVAL = VAL__BADD
             ELSE
                CALL PAR_GET0D( 'VAL', DVAL, STATUS )
-            END IF     
+            END IF
 
-            RESULT = AST_MASKD( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
+            RESULT = AST_MASKD( THIS, MAP, INSIDE, NDIM, LBND, UBND,
      :                          %VAL( CNF_PVAL( IPDATA )), DVAL,
      :                          STATUS )
-         
+
          END IF
 
 *  Report the number of masked pixels.

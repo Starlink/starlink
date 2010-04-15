@@ -27,7 +27,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     The forward transformation of the returned Mapping transforms 
+*     The forward transformation of the returned Mapping transforms
 *     cartesian tangent plane offsets in radians, into celestial longitude
 *     and latitude values, in radians. The reference point of the tangent
 *     plane is put at the supplied longitude and latitude position. It is
@@ -46,11 +46,11 @@
 
 *  History:
 *     2006-02-10 (dsb)
-*       Initial version 
-*     2006-07-17 (dsb) 
+*       Initial version
+*     2006-07-17 (dsb)
 *       Modified to remove Nasmyth rotation
-*     2008-09-1 (dsb) 
-*       Set the SphMap attribute "UnitRadius" so that SphMaps can be 
+*     2008-09-1 (dsb)
+*       Set the SphMap attribute "UnitRadius" so that SphMaps can be
 *       simplified.
 *     {enter_further_changes_here}
 
@@ -90,20 +90,20 @@
 /* SMURF includes */
 #include "smf.h"
 
-AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],   
+AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
                             int *status ) {
 
   /* Local Variables */
 
-  AstMapping *result;    
+  AstMapping *result;
   AstMatrixMap *matmap;
   AstCmpMap *m1;
   AstWcsMap *wcsmap;
   double t1, ct, cn, st, sn, mat[ 9 ];
-  
+
   /* Check the inherited status. */
   if ( *status != SAI__OK ) return NULL;
-  
+
   /* If required, create a SphMap for converting spherical cartesian
      (x,y,z) positions to (lon,lat) positions. */
   if( !cache[ 0 ] ) {
@@ -125,15 +125,15 @@ AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
 
   /* The required Mapping consists of the "cache[ 1 ]" Mapping, followed by
      a suitable MatrixMap which rotates the tangent point to the requested
-     spherical (az,el) coordinates, followed by the "cache[ 0 ]" Mapping. 
+     spherical (az,el) coordinates, followed by the "cache[ 0 ]" Mapping.
      The logic follows that of FITS-WCS paper II (which is what the WcsMap
-     class assumes). The reference point of the TAN projection is at the 
+     class assumes). The reference point of the TAN projection is at the
      north pole of the "native" spherical coordinate system. The matrix map
-     first rotates about the Y axis by (pi/2-lat) (to rotate the reference 
-     point from the native north pole to the celestial north pole), then 
-     rotates about the Z axis by -lon (to rotate the prime native meridian 
+     first rotates about the Y axis by (pi/2-lat) (to rotate the reference
+     point from the native north pole to the celestial north pole), then
+     rotates about the Z axis by -lon (to rotate the prime native meridian
      to the prime celestial meridian). Here the Z axis points to the north
-     pole, the X axis points to (lon,lat)=(0,0) and the Y axis points to 
+     pole, the X axis points to (lon,lat)=(0,0) and the Y axis points to
      (lon,lat) = (90 degs,0) (the slalib convention). */
 
   ct = cos( lat );

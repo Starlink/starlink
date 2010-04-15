@@ -104,7 +104,7 @@
 *  Strings will match if:
 *
 *      (1) Both STRING and MASTER are blank
-*      (2) STRING is same or shorter in length than MASTER and 
+*      (2) STRING is same or shorter in length than MASTER and
 *          all letters match
 *
 * Same is case sensitive
@@ -171,7 +171,7 @@
       LOGICAL FUNCTION SAMECI( STRING, MASTER )
 *
 * Case-insensitive version of SAME
-* 
+*
 *  Checks strings are the same.
 *  Compares all non-blank characters
 *  between two strings STRING and MASTER.
@@ -179,7 +179,7 @@
 *  Strings will match if:
 *
 *      (1) Both STRING and MASTER are blank
-*      (2) STRING is same or shorter in length than MASTER and 
+*      (2) STRING is same or shorter in length than MASTER and
 *          all letters match
 *
 *
@@ -250,7 +250,7 @@
       LOGICAL FUNCTION ESAME( STRING, MASTER )
 *
 * Same as SAME but also needs exact match of all non-blank letters.
-* 
+*
 *  Checks strings are the same.
 *  Compares all non-blank characters
 *  between two strings STRING and MASTER.
@@ -298,7 +298,7 @@
         END IF
       ELSE IF(STRING(L2:L2).EQ.' ' .AND. MASTER(M2:M2).EQ.' ') THEN
         RETURN
-      ELSE 
+      ELSE
         ESAME = .FALSE.
         RETURN
       END IF
@@ -333,7 +333,7 @@
 *
 * Case-insensitive version of SAME but also needs exact
 * match of letters.
-* 
+*
 *  Checks strings are the same.
 *  Compares all non-blank characters
 *  between two strings STRING and MASTER.
@@ -385,7 +385,7 @@
         END IF
       ELSE IF(STRING(L2:L2).EQ.' ' .AND. MASTER(M2:M2).EQ.' ') THEN
         RETURN
-      ELSE 
+      ELSE
         ESAMECI = .FALSE.
         RETURN
       END IF
@@ -420,9 +420,9 @@
 *
 * Searches for NAME amongst a list LIST(NLIST) of character
 * variables. Uses SAMECI (case independent, only checks letters
-* of NAME) to compare. If 1 match is found it returns the number 
-* of the item in the list, if more than 1 match is found it returns 
-* the negative of the first item, if none are found it returns 0. 
+* of NAME) to compare. If 1 match is found it returns the number
+* of the item in the list, if more than 1 match is found it returns
+* the negative of the first item, if none are found it returns 0.
 * No ordering or case assumed.
 *
       IMPLICIT NONE
@@ -457,10 +457,10 @@
       INTEGER FUNCTION ESEARC(LIST, NLIST, MXLIST, NAME)
 *
 * Searches for NAME amongst a list LIST(NLIST) of character
-* variables. Uses ESAMECI (case independent, exact match) to 
-* compare. If 1 match is found it returns the number 
-* of the item in the list, if more than 1 match is found it returns 
-* the negative of the first item, if none are found it returns 0. 
+* variables. Uses ESAMECI (case independent, exact match) to
+* compare. If 1 match is found it returns the number
+* of the item in the list, if more than 1 match is found it returns
+* the negative of the first item, if none are found it returns 0.
 * No ordering or case assumed.
 *
       IMPLICIT NONE
@@ -509,4 +509,4 @@
       END DO
       RETURN
       END
-        
+

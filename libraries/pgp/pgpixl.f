@@ -2,7 +2,7 @@ C*PGPIXL -- draw pixels
 C%void cpgpixl(const int *ia, int idim, int jdim, int i1, int i2, \
 C% int j1, int j2, float x1, float x2, float y1, float y2);
 C+
-      SUBROUTINE PGPIXL (IA, IDIM, JDIM, I1, I2, J1, J2, 
+      SUBROUTINE PGPIXL (IA, IDIM, JDIM, I1, I2, J1, J2,
      1                   X1, X2, Y1, Y2)
       INTEGER IDIM, JDIM, I1, I2, J1, J2
       INTEGER IA(IDIM,JDIM)
@@ -18,7 +18,7 @@ C The subsection of the array IA defined by indices (I1:I2, J1:J2)
 C is mapped onto world-coordinate rectangle defined by X1, X2, Y1
 C and Y2. This rectangle is divided into (I2 - I1 + 1) * (J2 - J1 + 1)
 C small rectangles. Each of these small rectangles is solid-filled
-C with the color index specified by the corresponding element of 
+C with the color index specified by the corresponding element of
 C IA.
 C
 C On most devices, the output region is "opaque", i.e., it obscures

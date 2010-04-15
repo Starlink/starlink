@@ -4,7 +4,7 @@
 *     SECTOR
 
 *  Purpose:
-*     May be used to display the average pixel values within a wedge 
+*     May be used to display the average pixel values within a wedge
 *     shaped sector/slice of the image.
 
 *  Language:
@@ -13,43 +13,43 @@
 *  Invocation:
 *     CALL SECTOR( STATUS )
 
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Description: 
-*     May be used to display the average pixel values within a wedge 
-*     shaped sector/slice of the image. The sector is in the form of a 
-*     wedge (of user defined size) drawn outward from the galaxy 
+*  Description:
+*     May be used to display the average pixel values within a wedge
+*     shaped sector/slice of the image. The sector is in the form of a
+*     wedge (of user defined size) drawn outward from the galaxy
 *     origin point.
 *
-*     The results are displayed as mean pixel value (in terms of level 
-*     relative to sky or surface brightness) versus distance from the 
-*     galaxy origin. Pixel count values are summed over all the pixels 
+*     The results are displayed as mean pixel value (in terms of level
+*     relative to sky or surface brightness) versus distance from the
+*     galaxy origin. Pixel count values are summed over all the pixels
 *     at a given distance from the origin.
 *
 *     Options include:
-*       - summing pixels taken  from two equal sized, but 
+*       - summing pixels taken  from two equal sized, but
 *         diametrically opposite, sectors.
-*       - displaying data using a number of possible radius 
-*         transformations. 
-*       - the use of a graphics cursor to select the image object 
+*       - displaying data using a number of possible radius
+*         transformations.
+*       - the use of a graphics cursor to select the image object
 *         to be examined.
-*       - refinement of approximate galaxy centre positions 
+*       - refinement of approximate galaxy centre positions
 *         if required.
-*       - automatic selection of the maximum radius out 
-*         from the origin to be considered. 
+*       - automatic selection of the maximum radius out
+*         from the origin to be considered.
 *
 *     The application is not intended to replace ELLPRO or ELLFOU
-*     profiling application, but merely to allow the user to obtain 
-*     quickly a first approximation to the brightness cross-section of 
+*     profiling application, but merely to allow the user to obtain
+*     quickly a first approximation to the brightness cross-section of
 *     an interactively selected galaxy.
 
 *  Usage:
-*     SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL 
-*            ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG] 
+*     SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL
+*            ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG]
 *            [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
- 
+
 *  ADAM Parameters:
 *     ABOBEL = _REAL (Write)
 *        Central brightness of the object relative to sky.
@@ -62,7 +62,7 @@
 *        The name of an ARD file to be used to mask out regions of the
 *        image that are not to be used.
 *     AUTOL = _LOGICAL
-*        Is a simple method to be applied to get a better 
+*        Is a simple method to be applied to get a better
 *        estimate of the galaxy centre position?
 *        The accuracy of the method used is no better than 1 pixel.
 *     BACK = _REAL (Read)
@@ -70,21 +70,21 @@
 *     COLOUR = _INTEGER (Read)
 *        Colour used when showing the galaxy centre and profiling radius.
 *     CURSOR = _LOGICAL (Read)
-*        Whether the galaxy location is to be identified using the 
+*        Whether the galaxy location is to be identified using the
 *        graphics cursor or the keyboard.
-*     DEVICE = _DEVICE (Read) 
+*     DEVICE = _DEVICE (Read)
 *        The name of the display device on which the results graphs
 *        should be displayed.
 *     FITLIM = _REAL (Read)
-*        The range of radius values over which the scale length 'fits' 
+*        The range of radius values over which the scale length 'fits'
 *        are to be calculated.  Units arc seconds.
 *     IMGDEV = _DEVICE (Read)
 *        Name of the graphics device displaying the image.
 *     IN = _NDF (Read)
 *        The name of the source NDF data structure/file.
 *     MIRROR = _LOGICAL (Read)
-*        Whether the summation is to be taken from two 
-*        sectors/wedges/slices of the same size, but on 
+*        Whether the summation is to be taken from two
+*        sectors/wedges/slices of the same size, but on
 *        diametrically opposite sides of the galaxy origin.
 *     ORIGIN = _CHAR (Read)
 *        Image indices for the origin point to be used. Given in the
@@ -98,53 +98,53 @@
 *     OCOUNT = _REAL (Write)
 *        Count value for the object centre chosen.
 *     OUT = _CHAR (Read)
-*        File name for the output text file containing the 
+*        File name for the output text file containing the
 *        profile data.
 *     POSANG = _REAL (Read)
-*        The position angle of the sector relative to the top of the 
+*        The position angle of the sector relative to the top of the
 *        image. Convention is clockwise increases angle and the image
 *        Y axis represents 0 degrees. Units degrees.
 *     PSIZE = _REAL (Read)
 *        The size of each pixel in arc seconds.  If the image contains
-*        a SKY co-ordinate frame this value will be determined 
+*        a SKY co-ordinate frame this value will be determined
 *        automatically.
 *     RADISP = _CHAR (Read)
 *        The display mode used for the radius axis of the graphs.
 *         - Q=quarter power
 *         - L=logarithmic
 *         - S=square root
-*         - R=linear 
+*         - R=linear
 *     RLIM = _INTEGER (Read)
 *        Distance out from the origin at which the sector stops. Values
 *        are input as arc seconds, but the program works in pixels.
 *        A value of 0 causes the application to automatically select
 *        the distance at which to stop.
 *     SAME = _LOGICAL (Read)
-*        Should the graphs be displayed on the same device as the 
+*        Should the graphs be displayed on the same device as the
 *        original image?
 *     SIGMA = _REAL (Read)
-*        The standard deviation of the background value. Units counts. 
+*        The standard deviation of the background value. Units counts.
 *     SLENE = _REAL (Write)
 *        The scale length of the object (elliptical model).
 *     SLENS = _REAL (Write)
 *        The scale length of the object (spiral model).
 *     SURF = _LOGICAL (Read)
-*        Are the pixel values to be expressed as surface brightness. 
+*        Are the pixel values to be expressed as surface brightness.
 *        If true then the output is surface brightness, otherwise the
-*        display shows brightness in terms of sigma above sky. 
+*        display shows brightness in terms of sigma above sky.
 *        i.e. (I-Back)/SIGMA
 *     XCO = _REAL (Write)
 *        The X co-ordinate of the object the user chose.
 *     YCO = _REAL (Write)
 *        The Y co-ordinate of the object the user chose.
 *     ZEROP = _REAL (Read)
-*        Zero point of the scale for surface brightness plots. Units 
+*        Zero point of the scale for surface brightness plots. Units
 *        magnitudes per square arc second.
- 
+
 *  Examples:
-*     sector cursor=true ardfil=^ardup.dat back=6200 sigma=390 
-*            psize=0.96 surf=true radisp=r mirror=true autol=true 
-*            zerop=27.5 out=x2windows device=x2windows 
+*     sector cursor=true ardfil=^ardup.dat back=6200 sigma=390
+*            psize=0.96 surf=true radisp=r mirror=true autol=true
+*            zerop=27.5 out=x2windows device=x2windows
 *            imgdev=xwindows same=false
 *
 *        Profiles an object identified on the currently displayed
@@ -153,26 +153,26 @@
 *        used to identify parts of the image that may not be used.
 *        The source image is currently displayed on device XWINDOW and
 *        the graphs will appear on device X2WINDOW. The galaxy centre
-*        co-ordinate identified is refined automatically. The radius 
-*        limits to be employed when calculating scale length are 
+*        co-ordinate identified is refined automatically. The radius
+*        limits to be employed when calculating scale length are
 *        defined using the cursor/mouse.
-*       
-*     sector cursor=false ardfil=^ardfile.dat back=760 sigma=23 
-*            surf=true radisp=q mirror=false autol=false 
-*            zerop=26.4 in=ic3374 out=ic3374.pro device=xwindows 
-*            fitlim=0,20 posang=25 angwid=5 
+*
+*     sector cursor=false ardfil=^ardfile.dat back=760 sigma=23
+*            surf=true radisp=q mirror=false autol=false
+*            zerop=26.4 in=ic3374 out=ic3374.pro device=xwindows
+*            fitlim=0,20 posang=25 angwid=5
 *            rlim=25 origin="12:36:53.42 62:12:21.8"
-* 
+*
 *        An object located at the co-ordinates indicated on image IC3374
 *        is profiled in the 25 degree direction out to a distance of 25
-*        arc seconds. The Current co-ordinate frame of IC3374 is in 
-*        the SKY domain. The pixel size in arcseconds is determined 
-*        automatically from the SKY coordinate frame. The wedge/sector 
+*        arc seconds. The Current co-ordinate frame of IC3374 is in
+*        the SKY domain. The pixel size in arcseconds is determined
+*        automatically from the SKY coordinate frame. The wedge/sector
 *        used will be 5 degrees wide and the scale length will be
 *        calculated using data obtained in the radius range 0-20 arc
 *        seconds. The user supplied estimate of the galaxy centre will
-*        not be refined. Output is to the text file ic3374.pro. The 
-*        graphs generated will be quarter power radius versus surface 
+*        not be refined. Output is to the text file ic3374.pro. The
+*        graphs generated will be quarter power radius versus surface
 *        brightness.
 
 *  Authors:
@@ -193,17 +193,17 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-         
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       LOGICAL CURSOR                  ! Keyboard or cursor origin selction
 
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Show that the application is running.
       CALL MSG_BLANK(STATUS)
@@ -232,7 +232,7 @@
 *   Exit AST context.
       CALL AST_END(STATUS)
 
-      END 
+      END
 
 
       SUBROUTINE SEC1_PIE(CLEAR,BACK,ELEMS,XCO,YCO,PRANGE,POSANG,
@@ -245,52 +245,52 @@
 *  Purpose:
 *     Looks at the image array stored and take the values it needs to
 *     create an array containing the sum of all the pixels within
-*     the required slice that are not bad valued. The index of the 
+*     the required slice that are not bad valued. The index of the
 *     array indicates the radial distance from the chosen origin.
 *     Each array element may be considered to be PSIZE in width and
 *     the radius corresponding to each element is (I-1)*PSIZE since
 *     FORTRAN does not allow a zeroth element for an array as default.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation:   
+*  Invocation:
 *     CALL SEC1_PIE(CLEAR,BACK,ELEMS,XCO,YCO,PRANGE,POSANG,ANGWID,NVP,
-*                   NUMBER,SUMMAT,RLIM,ARRAY,STATUS)   
+*                   NUMBER,SUMMAT,RLIM,ARRAY,STATUS)
 
 *  Description:
-*     The subroutine used to sum the values of all pixels at a given 
-*     radius in the results array (SUMMAT) and also keep a count 
-*     of how many data points contribute to that summation in 
+*     The subroutine used to sum the values of all pixels at a given
+*     radius in the results array (SUMMAT) and also keep a count
+*     of how many data points contribute to that summation in
 *     array NUMBER.
 *
 *     The method used to locate all the points is given below.
-*   
-*     Concentric arc of pixels about the origin are considered 
+*
+*     Concentric arc of pixels about the origin are considered
 *     in turn. Each arc differs from the previous arc in its radius
-*     by one pixel. To ensure that all pixels within an arc are found 
+*     by one pixel. To ensure that all pixels within an arc are found
 *     the arc is scanned from an angle equal to the position angle
 *     minus half the angular width to an angle equal to the
 *     position angle plus half the angular width of the section. The
 *     angular step between points on the arc is adjusted at each new
 *     radius value to ensure all pixels are found. The arbitrary steps
-*     used have been tested for radii up to 8000. 
-*    
+*     used have been tested for radii up to 8000.
+*
 *     When all the pixels within a given arc have been examined the
 *     radius used to generate the arc is increased. This increase
 *     continues until the requested arc radius has been exceeded or the
 *     application detects that the edge of the object has been reached.
-*     
-*     Automatic selection of the maximum required radius out from the 
+*
+*     Automatic selection of the maximum required radius out from the
 *     origin pixel may be selected by entering a length value of 0.
 
-*  Arguments:             
+*  Arguments:
 *     CLEAR = INTEGER (Given)
 *        Defines whether or not the SUMMAT and NUMBER arrays should
-*        be cleared. 0=No 1=Yes.                          
+*        be cleared. 0=No 1=Yes.
 *     BACK = REAL (Given)
 *        The background count value. Units counts.
-*     ELEMS = INTEGER (Given)               
+*     ELEMS = INTEGER (Given)
 *        Number of elements/pixels in the image array. Units pixels.
 *     XCO = REAL (Given)
 *        X index of the galaxy centre/origin supplied by the user.
@@ -306,20 +306,20 @@
 *     ANGWID = REAL (Given)
 *        Angular width of the slice. The width is distributed equally either
 *        side of the position angle (POSANG). Units degrees.
-*     NVP = INTEGER (Returned) 
+*     NVP = INTEGER (Returned)
 *        The number of valid data points found.
 *     NUMBER(SEC__RESUL) = REAL (Returned)
 *        The number of pixels that were found at a given radius outward
 *        form the galaxy origin/centre. Index is the distance in pixels.
 *     SUMMAT(SEC__RESUL) = REAL (Returned)
-*        The sum of all the pixels found at a given distance from the 
+*        The sum of all the pixels found at a given distance from the
 *        galaxy centre/origin. Units counts.
 *     ARRAY(ELEMS) = REAL (Given and Returned)
 *        The image array. Contains the count values for all the image pixels.
 *        Units counts.
 *     RLIM = INTEGER (Given and Returned)
 *        The radius out from the centre/origin of the galaxy at which
-*        the profile slice was stopped. Units pixels. 
+*        the profile slice was stopped. Units pixels.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -337,64 +337,64 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'SEC_PAR'               ! SECTOR constants  
+      INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Arguments Given:
       INTEGER CLEAR                   ! Clear the SUMMAT/NUMBER arrays?
-      INTEGER ELEMS                   ! Number of elements/pixels in the 
+      INTEGER ELEMS                   ! Number of elements/pixels in the
                                       ! image array
-      INTEGER PRANGE(2)               ! Length of the X and Y axes of the 
+      INTEGER PRANGE(2)               ! Length of the X and Y axes of the
                                       ! image
-      REAL ANGWID                     ! Angular width of the slice 
+      REAL ANGWID                     ! Angular width of the slice
       REAL BACK                       ! The background count value
-      REAL XCO                        ! X index of the galaxy centre/origin 
+      REAL XCO                        ! X index of the galaxy centre/origin
                                       ! supplied by the user
       REAL YCO                        ! Y index of the galaxy centre/origin
                                       ! supplied by the user
-      REAL POSANG                     ! Position angle of the slice outward 
+      REAL POSANG                     ! Position angle of the slice outward
                                       ! from the galaxy origin/centre
 
 *  Arguments Returned:
       INTEGER NVP                     ! Number of valid points found
-      REAL NUMBER(SEC__RESUL)         ! The number of pixels that were found 
-                                      ! at a given radius outward from the 
+      REAL NUMBER(SEC__RESUL)         ! The number of pixels that were found
+                                      ! at a given radius outward from the
                                       ! galaxy origin/centre
-      REAL SUMMAT(SEC__RESUL)         ! The sum of all the pixels found at 
-                                      ! a given distance from the 
-                                      ! galaxy centre/origin 
+      REAL SUMMAT(SEC__RESUL)         ! The sum of all the pixels found at
+                                      ! a given distance from the
+                                      ! galaxy centre/origin
 
 *  Arguments Given and Returned:
       INTEGER RLIM                    ! The radius out from the centre/origin
-                                      ! of the galaxy at which 
-                                      ! the profile slice was stopped 
-      REAL ARRAY(ELEMS)               ! The image array contains the count 
+                                      ! of the galaxy at which
+                                      ! the profile slice was stopped
+      REAL ARRAY(ELEMS)               ! The image array contains the count
                                       ! values for all the image pixels
 
 *  Local variables:
       LOGICAL FINISH                  ! The highest radius value permitted
                                       ! has been exceeded or some other
-                                      ! criteria for stopping the examination 
+                                      ! criteria for stopping the examination
                                       ! of pixels further from the galaxy
                                       ! origin has become true flag
       LOGICAL LTEST                   ! Is the length to be determined
                                       ! automatically?
       INTEGER ADDRES                  ! Array address of the element
-                                      ! corresponding to pixel indices X,Y 
+                                      ! corresponding to pixel indices X,Y
       INTEGER COUNT                   ! Current positional step (see NUMSEC)
       INTEGER I                       ! Loop variable
       INTEGER J                       ! Temporary counter
       INTEGER MAXRAD                  ! The maximum radius reasonable for
                                       ! the current image
-      INTEGER NUMSEC                  ! The total number of positional steps 
-                                      ! around an arc (of radius=RADIUS) that 
-                                      ! will be examined                       
+      INTEGER NUMSEC                  ! The total number of positional steps
+                                      ! around an arc (of radius=RADIUS) that
+                                      ! will be examined
       INTEGER RADIUS                  ! Radius from the galaxy origin (in
                                       ! pixels) at which pixels are being
                                       ! examined
@@ -422,19 +422,19 @@
       REAL PI2360                     ! 2 x pi / 360. defined outside a loop
                                       ! to improve performance
       REAL STAANG                     ! Starting angle for the routine to
-                                      ! look for unexamined pixels at a given  
+                                      ! look for unexamined pixels at a given
                                       ! distance from the galaxy origin
       REAL TOTAL                      ! Temporary summing variable
       REAL VALUE                      ! Current pixel count value
       REAL V1                         ! Temporary storage
       REAL V2                         ! Temporary storage
       REAL V3                         ! Temporary storage
-      
+
 *.
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-      
+
 *   Clear the number and summation arrays if required.
       IF (CLEAR.EQ.1) THEN
          DO 10 I=1,SEC__RESUL
@@ -482,19 +482,19 @@
 *      Calculate the amount by which the angular position in the wedge
 *      must change to ensure that all pixels are accounted for. Also
 *      calculate how many angular steps are required then to go from
-*      the initial angle STAANG (i.e. POSANG-ANGWID/2) to the other end of 
+*      the initial angle STAANG (i.e. POSANG-ANGWID/2) to the other end of
 *      the arc STAANG+ANGWID (i.e. POSANG+ANGWID/2).
          ANGINC=CONST/REAL(RADIUS)
          NUMSEC=NINT(ANGWID/ANGINC)
          COUNT=0
 
-*      Consider angles at a given distance from the object centre.  
+*      Consider angles at a given distance from the object centre.
          DO WHILE (COUNT.LE.NUMSEC-1)
 
 *         Calculate the current angle.
             ANGLE=STAANG+COUNT*ANGINC
 
-*         Generate the image co-ordinates of the next image pixel given 
+*         Generate the image co-ordinates of the next image pixel given
 *         the current radius and angle.
             X=NINT(XCO+SIN(ANGLE*PI2360)*(RADIUS-1))
             Y=NINT(YCO+COS(ANGLE*PI2360)*(RADIUS-1))
@@ -504,7 +504,7 @@
                IF ((Y.GE.YMIN).AND.(Y.LE.YMAX)) THEN
 
 *               Generate the number of the array element that contains
-*               the image pixel required and read its value. 
+*               the image pixel required and read its value.
                   ADDRES=(Y-1)*XMAX+X
                   VALUE=ARRAY(ADDRES)
 
@@ -517,7 +517,7 @@
                      SUMMAT(RADIUS)=SUMMAT(RADIUS)+VALUE
                      NUMBER(RADIUS)=NUMBER(RADIUS)+1
 
-*                  Set the image pixel bad so that it will not be 
+*                  Set the image pixel bad so that it will not be
 *                  used again.
                      ARRAY(ADDRES)=VAL__BADR
 
@@ -533,23 +533,23 @@
 
          END DO
 
-*      Check to see if the search should be stopped using a variety 
+*      Check to see if the search should be stopped using a variety
 *      criteria to achieve the option of stopping the calculations
 *      automatically when the results are too near to sky.
 
 *      Is the current radius value at the maximum permitted value?
-         IF ((RADIUS.EQ.SEC__RESUL-1).OR.(RADIUS.GT.MAXRAD)) THEN 
+         IF ((RADIUS.EQ.SEC__RESUL-1).OR.(RADIUS.GT.MAXRAD)) THEN
             FINISH=.TRUE.
 
 *         Ensure that the whole array is not displayed if the object
-*         was near the image edge and did not drop to threshold 
-*         within the image. i.e. object near edge and position angle 
+*         was near the image edge and did not drop to threshold
+*         within the image. i.e. object near edge and position angle
 *         facing off the image.
             RADIUS=1
             DO 20 I=1,SEC__RESUL
                IF (NUMBER(I).GT.0) RADIUS=I
  20         CONTINUE
-            
+
          END IF
 
 *      Check those tests that are only tested in automatic length mode.
@@ -561,7 +561,7 @@
      :             FINISH=.TRUE.
             END IF
 
-*         Has the value increased twice as much in the latest radius 
+*         Has the value increased twice as much in the latest radius
 *         than it dropped in the last but one radius?
             IF (RADIUS.GT.3) THEN
 
@@ -582,7 +582,7 @@
 *         a smaller radius.
             IF (RADIUS.GT.10) THEN
 
-*            Setup the counter and summation variable. 
+*            Setup the counter and summation variable.
                J=0
                TOTAL=0.0
 
@@ -607,7 +607,7 @@
                IF (J.GT.0) THEN
 
 *               Keep mean value for the earlier summation.
-                  MEAN1=TOTAL/REAL(J) 
+                  MEAN1=TOTAL/REAL(J)
 
 *               Clear the summation value and counter.
                   J=0
@@ -636,18 +636,18 @@
 *                  Calculate the mean value.
                      MEAN2=TOTAL/REAL(J)
 
-*                  If the current mean is smaller than that found 
+*                  If the current mean is smaller than that found
 *                  at a smaller radius then stop the study of larger
 *                  radii.
                      IF (MEAN2.GT.MEAN1) FINISH=.TRUE.
-           
+
                   END IF
 
                END IF
 
             END IF
 
-         END IF 
+         END IF
 
 *      Increment the radius currently being considered.
          RADIUS=RADIUS+1
@@ -666,7 +666,7 @@
 *      Any pixels at this radius?
          IF (NUMBER(I).GT.0.0) THEN
 *         On average, were they below sky?
-            IF ( SUMMAT(I)/NUMBER(I) - BACK.GT.0.0) THEN 
+            IF ( SUMMAT(I)/NUMBER(I) - BACK.GT.0.0) THEN
                NVP=NVP+1
                J=I
             END IF
@@ -720,13 +720,13 @@
 
 *  Purpose:
 *     Calculates the position angle and length of two points from the image.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *     CALL SEC1_POSAN(X1,Y1,X2,Y2,POSANG,RADIUS,FLAG,STATUS)
-   
+
 *  Description:
 *     The co-ordinates of two points on the image are used to calculate
 *     the distance between the two points (same units as those supplied).
@@ -734,14 +734,14 @@
 *     a line between the two points and the vertical image axis. The units
 *     for the angle are radians, vertically upward has a value 0 and the
 *     angle increases in a clockwise direction.
-*     
-*     FLAG is returned with a non-zero value if the angle between the 
-*     points could not be calculated due to the start and end locations 
+*
+*     FLAG is returned with a non-zero value if the angle between the
+*     points could not be calculated due to the start and end locations
 *     being the same.
 
-*  Arguments:         
+*  Arguments:
 *     X1 = REAL (Given)
-*        Image X co-ordinate for the centre of the sector. 
+*        Image X co-ordinate for the centre of the sector.
 *        Units of input must be consistent.
 *     Y1 = REAL (Given)
 *        Image Y co-ordinate for the centre of the sector.
@@ -777,26 +777,26 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'SEC_PAR'               ! SECTOR constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       REAL X1                         ! X co-ord of central point
       REAL Y1                         ! Y co-ord of central point
       REAL X2                         ! X co-ord of another point
       REAL Y2                         ! Y co-ord of another point
-      
-*  Arguments Given and Returned:        
+
+*  Arguments Given and Returned:
 
 *  Arguments Returned:
-      INTEGER FLAG                    ! Was it possible to determine the 
+      INTEGER FLAG                    ! Was it possible to determine the
                                       ! angle? FLAG <>0 is fail
       REAL POSANG                     ! Angle between X1,Y1 and X2,Y2
       REAL RADIUS                     ! Distance between X1,Y1 and X2,Y2
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -820,20 +820,20 @@
 *   Complete the radius calculation.
       RADIUS=SQRT(RADIUS)
 
-*   Calculate the angle in radians (vertical=0  and clockwise positive). 
+*   Calculate the angle in radians (vertical=0  and clockwise positive).
 *   Range of function is only -pi to +pi.
       POSANG=ASIN((X2-X1)/RADIUS)
 
 *   Determine in which hemisphere the angle is and correct to
 *   appropriate quadrant.
-      IF (Y2-Y1.LE.0.0) THEN 
-         IF (X2-X1.GE.0.0) THEN 
+      IF (Y2-Y1.LE.0.0) THEN
+         IF (X2-X1.GE.0.0) THEN
             POSANG=SEC__PIVAL-POSANG
          ELSE
             POSANG=-SEC__PIVAL-POSANG
          END IF
       END IF
-  
+
  9999 CONTINUE
 
-      END 
+      END

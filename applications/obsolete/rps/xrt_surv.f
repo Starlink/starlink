@@ -26,7 +26,7 @@
 
 *      Open file with exposure data
 	 CALL GETLUN(LUN)
-         OPEN(LUN, FILE=DSCFRPS_DATA(:len_dscfrps)//'rps_xrt_survexp', 
+         OPEN(LUN, FILE=DSCFRPS_DATA(:len_dscfrps)//'rps_xrt_survexp',
      &		STATUS='OLD', IOSTAT=STATUS)
 *	write(16,*) ' xrt open status ',status
 
@@ -36,7 +36,7 @@
          END IF
 
 *      Read in exposure for each ecl. lat.
-         
+
          DO I= -90, 90
             READ(LUN,'(9X,I3,F11.2)') ILAT, SURVEXP(I)
 *		if (abs(i).gt.80) write(16,*) ' x ',survexp(i)

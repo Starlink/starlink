@@ -192,7 +192,7 @@ extern struct BCP *rec_ga_fpl_malloced; /* memory address of malloced FPL */
       int rec1_pack_rcl( const struct RCL *rcl, unsigned char prcl[ 10 ] );
       void rec1_put_addr( unsigned char *start, unsigned char *end,
                           int *status );
-      int rec1_read_file( int slot, INT_BIG bloc, int size, 
+      int rec1_read_file( int slot, INT_BIG bloc, int size,
                           unsigned char *buffer );
       int rec1_scan_cbm( const unsigned char cbm[ 2 ], int nchip, int *pos );
       void rec1_set_cbm( unsigned char cbm[ 2 ], int nchip, int pos );
@@ -203,7 +203,7 @@ extern struct BCP *rec_ga_fpl_malloced; /* memory address of malloced FPL */
 #endif
       int rec1_test_cbm( const unsigned char cbm[ 2 ], int start, int nchip );
       int rec1_unlock_slot( int slot );
-      int rec1_unmap_frame( int slot, INT_BIG bloc, INT_BIG length, 
+      int rec1_unmap_frame( int slot, INT_BIG bloc, INT_BIG length,
                             INT_BIG offset, char mode, unsigned char **pntr );
       int rec1_unpack_chain( const unsigned char pchain[], int extended,
                              INT_BIG *chain );
@@ -211,7 +211,7 @@ extern struct BCP *rec_ga_fpl_malloced; /* memory address of malloced FPL */
                            struct HCB *hcb );
       int rec1_unpack_ncomp( const unsigned char pncomp[ 4 ], int *ncomp );
       int rec1_unpack_rcl( const unsigned char prcl[ 19 ], struct RCL *rcl );
-      int rec1_update_free( int slot, INT_BIG bloc, 
+      int rec1_update_free( int slot, INT_BIG bloc,
                             const unsigned char cbm[ 2 ] );
       int rec1_write_file( int slot, int size, const unsigned char *buffer,
                            INT_BIG bloc );

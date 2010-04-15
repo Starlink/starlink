@@ -1,7 +1,7 @@
 
 *+ THRESHSUB - sets pixels in array to defined new values outside limits
 
-      SUBROUTINE THRESHSUB( INARRAY, OUTARRAY, DIMS1, DIMS2, THRLO, 
+      SUBROUTINE THRESHSUB( INARRAY, OUTARRAY, DIMS1, DIMS2, THRLO,
      :                      THRHI, NEWLO, NEWHI, STATUS )
 
 *    Description :
@@ -36,7 +36,7 @@
 *
 *    Method :
 *
-*     Check for error on entry - return if not o.k. 
+*     Check for error on entry - return if not o.k.
 *     For all pixels of input array
 *        If value less than lower threshold THRLO
 *           Set new value to NEWLO
@@ -61,7 +61,7 @@
 *
 *     29-01-1982 : First implementation (ROE::BDK)
 *     04-06-1985 : Revised to take status parameter, to take different
-*                : new values for upper and lower thresholds, and 
+*                : new values for upper and lower thresholds, and
 *                : redocumented SSE / ADAM style (REVA::MJM)
 *                : (Also changed last section - seemed crazy)
 *     02-09-1985 : Renamed THRESHSUB (REVA::MJM)

@@ -56,7 +56,7 @@
       LOGICAL USED_LAST_TIME( MAX_REQUIRED_OBJECTS )
       LOGICAL FIRST_CALL
       COMMON / MODULE_TIDY / USED_LAST_TIME, FIRST_CALL
-      
+
 *  External Functions:
       INTEGER CHR_LEN
       LOGICAL MODULE_NEEDS
@@ -141,7 +141,7 @@
      :              REQUIRED_OBJECTS( OBJECT_SWITCH( I ) ),
      :              'LOGICAL', 0., SWITCHED_OFF,
      :              'SWITCH', 0, STAT2 )
-      
+
             ELSE IF ( OBJECT_SWITCH( I ) .LT. 0 ) THEN
                CALL ECH_GET_PARAMETER(
      :              REQUIRED_OBJECTS( -OBJECT_SWITCH( I ) ),

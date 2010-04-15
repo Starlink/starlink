@@ -182,90 +182,90 @@ sub do_cmd_ng {
 
 %iso_8859_2_character_map
      = (
-	'Aacute', '&#193;', 	# capital A, acute accent 
+	'Aacute', '&#193;', 	# capital A, acute accent
 	'Abreve', '&#195;', 	# capital A, breve accent
-	'Acirc', '&#194;', 	# capital A, circumflex accent 
+	'Acirc', '&#194;', 	# capital A, circumflex accent
 	'Aogon', '&#161;',	# capital A, ogonek accent
-	'Auml', '&#196;', 	# capital A, dieresis or umlaut mark   
+	'Auml', '&#196;', 	# capital A, dieresis or umlaut mark
 	'Cacute', '&#198;', 	# capital C, acute accent
-	'Ccaron', '&#200;', 	# capital C, caron accent 
-	'Ccedil', '&#199;', 	# capital C, cedilla 
+	'Ccaron', '&#200;', 	# capital C, caron accent
+	'Ccedil', '&#199;', 	# capital C, cedilla
 	'Dcaron', '&#207;', 	# capital D, caron accent
 	'Dstrok', '&#208;', 	# capital D, stroke
-	'ETH', '&#208;', 	# capital Eth, Icelandic 
-	'Eacute', '&#201;', 	# capital E, acute accent 
-	'Ecaron', '&#204;', 	# capital E, caron accent 
-	'Eogon', '&#202;', 	# capital E, ogonek accent 
-	'Euml', '&#203;', 	# capital E, dieresis or umlaut mark 
-	'Iacute', '&#205;', 	# capital I, acute accent 
-	'Icirc', '&#206;', 	# capital I, circumflex accent 
-	'Lacute', '&#197;', 	# capital L, acute accent 
-	'Lcaron', '&#165;', 	# capital L, caron accent 
+	'ETH', '&#208;', 	# capital Eth, Icelandic
+	'Eacute', '&#201;', 	# capital E, acute accent
+	'Ecaron', '&#204;', 	# capital E, caron accent
+	'Eogon', '&#202;', 	# capital E, ogonek accent
+	'Euml', '&#203;', 	# capital E, dieresis or umlaut mark
+	'Iacute', '&#205;', 	# capital I, acute accent
+	'Icirc', '&#206;', 	# capital I, circumflex accent
+	'Lacute', '&#197;', 	# capital L, acute accent
+	'Lcaron', '&#165;', 	# capital L, caron accent
 	'Lstrok', '&#163;',	# capital L, stroke
-	'Nacute', '&#209;', 	# capital N, acute accent 
-	'Ncaron', '&#210;', 	# capital N, caron accent 
-	'Oacute', '&#211;', 	# capital O, acute accent 
-	'Ocirc', '&#212;', 	# capital O, circumflex accent 
+	'Nacute', '&#209;', 	# capital N, acute accent
+	'Ncaron', '&#210;', 	# capital N, caron accent
+	'Oacute', '&#211;', 	# capital O, acute accent
+	'Ocirc', '&#212;', 	# capital O, circumflex accent
 	'Odblac', '&#213;', 	# capital O, double accute accent
 	'Ouml', '&#214;', 	# capital O, dieresis or umlaut mark
-	'Racute', '&#192;', 	# capital R, acute accent 
+	'Racute', '&#192;', 	# capital R, acute accent
 	'Rcaron', '&#216;', 	# capital R, caron accent
 	'Sacute', '&#166;',	# capital S, acute accent
 	'Scaron', '&#169;',	# capital S, caron accent
 	'Scedil', '&#170;',	# capital S, cedil accent
 	'Tcaron', '&#171;',	# capital T, caron accent
 	'Tcedil', '&#222;',	# capital T, cedil accent
-	'Uacute', '&#218;', 	# capital U, acute accent 
-	'Udblac', '&#219;', 	# capital U, double acute accent 
+	'Uacute', '&#218;', 	# capital U, acute accent
+	'Udblac', '&#219;', 	# capital U, double acute accent
 	'Uring', '&#217;', 	# capital U, ring
-	'Uuml', '&#220;', 	# capital U, dieresis or umlaut mark 
-	'Yacute', '&#221;', 	# capital Y, acute accent 
+	'Uuml', '&#220;', 	# capital U, dieresis or umlaut mark
+	'Yacute', '&#221;', 	# capital Y, acute accent
 	'Zacute', '&#172;',	# capital Z, acute accent
 	'Zdot', '&#175;',	# capital Z, dot above
 	'Zcaron', '&#174;',	# capital Z, caron accent
-	'aacute', '&#225;', 	# small a, acute accent 
+	'aacute', '&#225;', 	# small a, acute accent
 	'abreve', '&#227;', 	# small a, breve accent
-	'acirc', '&#226;', 	# small a, circumflex accent 
-	'amp', '&amp;', 	# ampersand 
+	'acirc', '&#226;', 	# small a, circumflex accent
+	'amp', '&amp;', 	# ampersand
 	'aogon', '&#177;',	# small a, ogonek accent
-	'auml', '&#228;', 	# small a, dieresis or umlaut mark   
+	'auml', '&#228;', 	# small a, dieresis or umlaut mark
 	'cacute', '&#230;', 	# small c, acute accent
-	'ccaron', '&#232;', 	# small c, caron accent 
-	'ccedil', '&#231;', 	# small c, cedilla 
+	'ccaron', '&#232;', 	# small c, caron accent
+	'ccedil', '&#231;', 	# small c, cedilla
 	'dcaron', '&#239;', 	# small d, caron accent
 	'dstrok', '&#240;', 	# small d, stroke
-	'eacute', '&#233;', 	# small e, acute accent 
-	'ecaron', '&#236;', 	# small e, caron accent 
-	'eogon', '&#234;', 	# small e, ogonek accent 
+	'eacute', '&#233;', 	# small e, acute accent
+	'ecaron', '&#236;', 	# small e, caron accent
+	'eogon', '&#234;', 	# small e, ogonek accent
 	'eth', '&#240;', 	# small eth, Icelandic
-	'euml', '&#235;', 	# small e, dieresis or umlaut mark 
-	'gt', '&#62;',		# greater than 
-	'iacute', '&#237;', 	# small i, acute accent 
-	'icirc', '&#238;', 	# small i, circumflex accent 
-	'lacute', '&#229;', 	# small l, acute accent 
-	'lcaron', '&#181;', 	# small l, caron accent 
+	'euml', '&#235;', 	# small e, dieresis or umlaut mark
+	'gt', '&#62;',		# greater than
+	'iacute', '&#237;', 	# small i, acute accent
+	'icirc', '&#238;', 	# small i, circumflex accent
+	'lacute', '&#229;', 	# small l, acute accent
+	'lcaron', '&#181;', 	# small l, caron accent
 	'lstrok', '&#179;',	# small l, stroke
-	'lt', '&lt;',		# less than 
-	'nacute', '&#241;', 	# small n, acute accent 
-	'ncaron', '&#242;', 	# small n, caron accent 
-	'oacute', '&#243;', 	# small o, acute accent 
-	'ocirc', '&#244;', 	# small o, circumflex accent 
+	'lt', '&lt;',		# less than
+	'nacute', '&#241;', 	# small n, acute accent
+	'ncaron', '&#242;', 	# small n, caron accent
+	'oacute', '&#243;', 	# small o, acute accent
+	'ocirc', '&#244;', 	# small o, circumflex accent
 	'odblac', '&#245;', 	# small o, double accute accent
 	'ouml', '&#246;', 	# small o, dieresis or umlaut mark
 	'quot', '&quot;',	# double quote
-	'racute', '&#224;', 	# small r, acute accent 
+	'racute', '&#224;', 	# small r, acute accent
 	'rcaron', '&#248;', 	# small r, caron accent
 	'sacute', '&#182;',	# small s, acute accent
 	'scaron', '&#185;',	# small s, caron accent
 	'scedil', '&#186;',	# small s, cedil accent
-	'szlig', '&#223;', 	# small sharp s, German (sz ligature) 
+	'szlig', '&#223;', 	# small sharp s, German (sz ligature)
 	'tcaron', '&#187;',	# small t, caron accent
 	'tcedil', '&#254;',	# small t, cedil accent
-	'uacute', '&#250;', 	# small u, acute accent 
-	'udblac', '&#251;', 	# small u, double acute accent 
+	'uacute', '&#250;', 	# small u, acute accent
+	'udblac', '&#251;', 	# small u, double acute accent
 	'uring', '&#249;', 	# small u, ring
-	'uuml', '&#252;', 	# small u, dieresis or umlaut mark 
-	'yacute', '&#253;', 	# small y, acute accent 
+	'uuml', '&#252;', 	# small u, dieresis or umlaut mark
+	'yacute', '&#253;', 	# small y, acute accent
 	'zacute', '&#188;',	# small z, acute accent
 	'zdot', '&#191;',	# small z, dot above
 	'zcaron', '&#190;',	# small z, caron accent

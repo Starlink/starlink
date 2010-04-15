@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- *	U T I L S . C  
+ *	U T I L S . C
  *
  * Character related and other utility functions for ICL
  *
@@ -15,9 +15,9 @@
  *	Modified :	B.K.McIlwrath 3/08/93
  *			Add expand_name()
  *      Modified:       A.J.Chipperfield 24/12/93
- *                      Generalise expand_name 
+ *                      Generalise expand_name
  *      Modified:       A.J.Chipperfield 28/11/96
- *                      Add restore_adamstring 
+ *                      Add restore_adamstring
  *                      Increase string enquoting buffer to 260 chars
  *
  ******************************************************************************
@@ -42,7 +42,7 @@ char ENDOFSTRING = '\0';
  *
  ******************************************************************************
  */
-void 
+void
 pad(char *string, int stringlen, char padchar)
 {
     int i;
@@ -71,7 +71,7 @@ pad(char *string, int stringlen, char padchar)
  *
  ******************************************************************************
  */
-int 
+int
 iclidentityequal(char *s, char *t, int n)
 {
     char ss, tt;
@@ -262,7 +262,7 @@ lowercase(char *st)
 		*s = tolower(*s);
     return st;
 }
-    
+
 /******************************************************************************
  *
  *	E X P A N D _ N A M E (char **absname, char *name)
@@ -302,7 +302,7 @@ expand_name(char **fullfilename, char *filename)
     		dup2(fd[1], 1);	/* stdout now the write pipe to icl */
 		dup2(fd[1], 2); /* stderr output also sent to pipe  */
 		close(fd[1]);
-		if (execlp("csh","csh", "-fc", strconcat("echo ", filename), 
+		if (execlp("csh","csh", "-fc", strconcat("echo ", filename),
 			    (char *) 0) < 0)
 			perror("expand_name() csh exec error");
 		exit(1);
@@ -317,7 +317,7 @@ expand_name(char **fullfilename, char *filename)
 		else
 		    buffer[nchars-1] = '\0';	/* Remove newline */
 	    }
-	}		
+	}
     } else {
 	strcpy(buffer, filename);
 	status = 0;
@@ -365,7 +365,7 @@ which_exec(char *filename)
     else
 	return buffer;
 }
-     
+
 /******************************************************************************
  *
  *	R E S T O R E _ I C L S T R I N G (char *iclstring)
@@ -416,7 +416,7 @@ restore_iclstring(char *iclstring)
 	sprintf(buff, "'%s'", iclstring);
     return strcopy(buff);	/* copy buff into malloc()ed storage */
 }
-     
+
 /******************************************************************************
  *
  *	R E S T O R E _ A D A M S T R I N G (char *iclstring)
@@ -513,7 +513,7 @@ make_width(char *buf, int bufwidth, int width)
 	char *prefix;
 	int i;
 
-	if ((prefix = (char *) malloc((unsigned) 
+	if ((prefix = (char *) malloc((unsigned)
 				      (width - bufwidth))) == CHARNIL)
 	    return CHARNIL;
 	else {
@@ -537,7 +537,7 @@ make_width(char *buf, int bufwidth, int width)
  *	S T R I P _ P A T H (char *str)
  *
  * Given a string possibly comprising a full pathname returns a pointer to the
- * start of the final component (or the whole string if no components) - this 
+ * start of the final component (or the whole string if no components) - this
  * enables this function to be used in string handling functions.
  *
  ******************************************************************************
@@ -601,7 +601,7 @@ strip_zeros(char *buf1, int m)
  *
  ******************************************************************************
  */
-int 
+int
 non_lead_zero_count(char *buf)
 {
     int j;

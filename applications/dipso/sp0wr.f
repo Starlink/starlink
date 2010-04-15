@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command SP0WR.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  DATA array at each break point. Use WORV = 1.0.
       CALL WRNDF( COMM, NDFNM, 1.0, TITLE, STATUS )
 
-*  Jump to here if an error occurs. 
+*  Jump to here if an error occurs.
  999  CONTINUE
 
 *  If an error has occurred, re-report it with less information if the

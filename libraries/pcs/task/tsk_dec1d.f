@@ -74,33 +74,33 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) STRING  ! the given character string
- 
+
       INTEGER MAXVALS       ! the maximum number of values in 1-D array
- 
+
 *  Arguments Returned:
       INTEGER NVALS         ! the number of values in the 1-D array
- 
+
       DOUBLE PRECISION DVALS(1:*)   ! the returned 1-D array
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER NMAXDIMS      ! max no of dimensions to return
       INTEGER NDIMS         ! no of dimensions in encoded string
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       NMAXDIMS = 1
       CALL TASK_DECND ( STRING, NMAXDIMS, MAXVALS, NDIMS, NVALS,
      :                    DVALS, STATUS )
- 
+
       END
- 
+
 !*+  TASK_DEC1 - decode a character string as a value
 !      SUBROUTINE TASK_DEC1
 !*    Description :

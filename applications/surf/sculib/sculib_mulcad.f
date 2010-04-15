@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_MULCAD (N, IN, DVAL, OUT, STATUS)
-*+  
+*+
 *  Name:
 *     SCULIB_MULCAD
 
@@ -7,10 +7,10 @@
 *     multiply double precision array by a constant double
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     SCULIB subroutine
- 
+
 *  Description:
 *     multiplies a double precision array by a double constant
 

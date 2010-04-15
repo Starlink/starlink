@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE MWSUBS
 *
-*   Description: 
+*   Description:
 *      Provide VM for subset.
 *
 *   History:
@@ -22,7 +22,7 @@
 
 *   Import:
       INTEGER NSUB       ! number of subset pixels
- 
+
 *   Export:
       INTEGER D_VM       ! address of DATA array
       INTEGER Q_VM       ! address of QUAL array
@@ -32,7 +32,7 @@
 
 *   Release existing D_VM
       IF (D_VM.GT.0) CALL DLADR(D_VM, STATUS)
- 
+
 *   Get new D_VM
       CALL ALADR('short\\', NSUB, D_VM, STATUS)
 
@@ -42,10 +42,10 @@
          RETURN
 
       END IF
- 
+
 *   Release existing Q_VM
       IF (Q_VM.GT.0) CALL DLADR(Q_VM, STATUS)
- 
+
 *   Get new Q_VM
       CALL ALADR('byte\\', NSUB, Q_VM, STATUS)
 
@@ -55,10 +55,10 @@
          RETURN
 
       END IF
- 
+
 *   Release existing R_VM
       IF (R_VM.GT.0) CALL DLADR(R_VM, STATUS)
- 
+
 *   Get new R_VM
       CALL ALADR('float\\', NSUB, R_VM, STATUS)
 
@@ -68,10 +68,10 @@
          RETURN
 
       END IF
- 
+
 *   Release existing W_VM
       IF (W_VM.GT.0) CALL DLADR(W_VM, STATUS)
- 
+
 *   Get new W_VM
       CALL ALADR('float\\', NSUB, W_VM, STATUS)
 

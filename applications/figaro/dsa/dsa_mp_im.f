@@ -12,7 +12,7 @@ C     This routine maps the imaginary part of a complex main data array
 C     in a structure, returning the address of the mapped array.  The whole
 C     array is mapped.  If there is in fact no such array, then an array
 C     of zeros is generated and its address is returned, unless the mapping
-C     is for write or update, in which case an array of zeros is created in 
+C     is for write or update, in which case an array of zeros is created in
 C     the data structure and mapped.  Note that some data formats, in
 C     particular Starlink's NDF, have requirements that mean that a new
 C     imaginary array cannot be created if the corresponding real array
@@ -30,13 +30,13 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
 C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.  
+C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.
 C                      If type conversion is needed, it will be performed
 C                      automatically.
 C     (<) ADDRESS      (Integer,ref) The address of the mapped array.
@@ -47,7 +47,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
@@ -129,7 +129,7 @@ C
       INTEGER   NDIM                        ! Number of data array dimensions
       INTEGER   NELM                        ! Number of data array elements
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Name of structure
       CHARACTER TYPE_UC*8                   ! Upper case version of TYPE
 C
@@ -144,7 +144,7 @@ C
 C
 C     Look up the reference name in the tables and get the name
 C     of the imaginary array.
-C          
+C
       CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500     ! Error exit
       CALL DSA__IMAGINARY_NAME (REF_SLOT,OBJ_NAME,LENGTH)
@@ -154,7 +154,7 @@ C     the imaginary array should match.
 C
       CALL DSA_DATA_SIZE (REF_NAME,MAX_AXES,NDIM,DIMS,NELM,STATUS)
 C
-C     See if there in in fact any imaginary data.  
+C     See if there in in fact any imaginary data.
 C
       CALL DSA_SEEK_IMAGINARY (REF_NAME,EXIST,STATUS)
 C

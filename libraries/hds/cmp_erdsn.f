@@ -6,7 +6,7 @@
 *        <structure name>.<component name> status
 *
 *     where <structure name> is the name of the object located by LOC.
-*           <component name> is CMP           
+*           <component name> is CMP
 *           status is the message text associated with the status value.
 *    Parameters :
 *     LOC=CHARACTER*(*)

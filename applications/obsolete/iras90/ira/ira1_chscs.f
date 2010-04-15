@@ -22,7 +22,7 @@
 *     a Julian epoch (eg "EQUAT(J2000.0)", "ECLIPT(B1983.3)" ). If the
 *     epoch is not preceded with either B or J, a Besselian epoch is
 *     assumed (unless the epoch is exactly 2000, in which case a Julian
-*     epoch is assumed).  If no equinox specifier is included in the input 
+*     epoch is assumed).  If no equinox specifier is included in the input
 *     SCS name, a value of B1950.0 is assumed (if required). If the SCS is
 *     not referred to the equinox, any equinox specifier is ignored.
 *
@@ -50,8 +50,8 @@
 *        "B" is returned (without the quotes) if the epoch in the
 *        equinox specifier represents a Besselian epoch, and "J"
 *        if it represents a Julian epoch. If no epoch is specified in
-*        argument SCS, then a value of B is returned (unless the epoch is 
-*        2000 in which case J is returned). If the SCS is not reference to 
+*        argument SCS, then a value of B is returned (unless the epoch is
+*        2000 in which case J is returned). If the SCS is not reference to
 *        the equinox (eg GALACTIC) then BJ is returned blank.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -149,7 +149,7 @@
 
 *  If a numeric character was found, assume a value of B and modify the
 *  start of the actual epoch string to take account of the absence of a
-*  BJ specifier in the input string. "J" is assumed if the epoch string 
+*  BJ specifier in the input string. "J" is assumed if the epoch string
 *  is "2000" (with no decimal point).
          IF( CHR_ISDIG( BJ ) ) THEN
             IF( TSCS( ESPECS + 1 : EEND ) .NE. '2000' ) THEN

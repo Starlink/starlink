@@ -34,7 +34,7 @@ int hlpHclose ( void )
 
 /* Close the file. */
    if ( fclose ( fphl ) ) return hlp_CLOSE_ERROR;
- 
+
 /* Resets. */
    jhelp = -1;
    *hlopen = '\0';

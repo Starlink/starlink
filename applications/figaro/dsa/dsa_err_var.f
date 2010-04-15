@@ -54,7 +54,7 @@ C     27th June 1989.   Original version.  KS / AAO.
 C     21st Aug 1992     Automatic portability modifications
 C                       ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992     "INCLUDE" filenames now upper case. KS/AAO
-C     2005 June 3       Replace DYNAMIC_MEMORY with 
+C     2005 June 3       Replace DYNAMIC_MEMORY with
 C                       %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
 C                       addressing.  MJC / Starlink
 C+

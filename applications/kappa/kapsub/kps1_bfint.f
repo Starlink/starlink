@@ -1,8 +1,8 @@
-      SUBROUTINE KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM, 
-     :                       VAR, NPOS, POLPAR, PARAM, CURSOR, MARK, 
-     :                       MARKER, NAXR, NAXIN, LOGF, FDL, FIXCON, 
-     *                       AMPRAT, SLBND, SUBND, FAREA, FITREG, 
-     :                       REFPOS, REFLAB, NPAR, FPAR, STATUS ) 
+      SUBROUTINE KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM,
+     :                       VAR, NPOS, POLPAR, PARAM, CURSOR, MARK,
+     :                       MARKER, NAXR, NAXIN, LOGF, FDL, FIXCON,
+     *                       AMPRAT, SLBND, SUBND, FAREA, FITREG,
+     :                       REFPOS, REFLAB, NPAR, FPAR, STATUS )
 *+
 *  Name:
 *     KPS1_BFINT
@@ -14,17 +14,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM, VAR, 
-*                      NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR, 
-*                      NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND, 
+*     CALL KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM, VAR,
+*                      NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR,
+*                      NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND,
 *                      FAREA, FITREG, REFPOS, REFLAB, NPAR, FPAR,
 *                      STATUS )
 
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image beam
-*     features given initial guesses at their positions with optional 
+*     features given initial guesses at their positions with optional
 *     constraints of some parameters.  The initial beam positions are
-*     identified interatively by the user, either with a cursor or 
+*     identified interatively by the user, either with a cursor or
 *     through an environment parameter.  These may also be interpreted
 *     as fixed positions or specify secondary-beam separations in axis
 *     or polar co-ordinates depending on the selected constraints.  The
@@ -37,29 +37,29 @@
 *     All the co-ordinates are converted to pixel co-ordinates before
 *     any fits are made and reported.  This enables the required AST
 *     transformations to be applied to all positions in a single call,
-*     minimising the time spent in the mapping routines.  
+*     minimising the time spent in the mapping routines.
 
 *     This routine should be used in non-interactive modes of BEAMFIT
 *     such as "Interface" or "Cursor".
 
 *  Arguments:
-*     INDF = INTEGER (Given) 
+*     INDF = INTEGER (Given)
 *        The input NDF.
 *     IWCS = INTEGER (Given)
 *        The FrameSet associated with the NDF.
 *     IPLOT = INTEGER (Given)
 *        The identfier of the plot obtained from graphics database.
 *        It is only accessed in Cursor mode when Mark='ELLIPSE'.
-*     MAP1 = INTEGER (Given) 
+*     MAP1 = INTEGER (Given)
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the PIXEL Frame of the NDF.
-*     MAP2 = INTEGER (Given) 
+*     MAP2 = INTEGER (Given)
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
-*     MAP3 = INTEGER (Given) 
+*     MAP3 = INTEGER (Given)
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the reporting Frame.
-*     RFRM = INTEGER (Given) 
+*     RFRM = INTEGER (Given)
 *        A pointer to the reporting Frame.
 *     VAR = LOGICAL (Given)
 *        If TRUE, use variance to weight the fit.
@@ -71,31 +71,31 @@
 *        a position angle with respecxt to the primary beam's position.
 *        If .FALSE., the values are regartded as spatial co-ordinates
 *        in the current Frame, RFRM.
-*     PARAM = CHARACTER * ( * ) (Given) 
-*        The root name of the parameter to use when acquiring initial 
+*     PARAM = CHARACTER * ( * ) (Given)
+*        The root name of the parameter to use when acquiring initial
 *        positions in Interface mode.  It is the parameter name for
-*        primary-beam position.  The parameter names for secondary 
+*        primary-beam position.  The parameter names for secondary
 *        beam positions have a numerical suffix equal to the number of
 *        beam positions supplied already.  Thus the the first secondary
-*        beam is %PARAM//1.  Multiple parameter names allows easier 
+*        beam is %PARAM//1.  Multiple parameter names allows easier
 *        command-line processing.
 *     CURSOR = LOGICAL (Given)
 *        Get initial positions using the cursor? If not, get them using
 *        the parameter given by PARAM.
-*     MARK = CHARACTER * ( * ) (Given) 
-*        What positions are to be marked?  Can be "INITIAL", "FIT", 
+*     MARK = CHARACTER * ( * ) (Given)
+*        What positions are to be marked?  Can be "INITIAL", "FIT",
 *        'ELLIPSE' or "NONE".
-*     MARKER = INTEGER (Given) 
+*     MARKER = INTEGER (Given)
 *        The PGPLOT number for the marker type to mark the positions
 *        specified by MARK.
-*     NAXR = INTEGER (Given) 
+*     NAXR = INTEGER (Given)
 *        The number of axes in the reporting Frame.
-*     NAXIN = INTEGER (Given) 
+*     NAXIN = INTEGER (Given)
 *        The number of axes in the Frame in which the initial guess
 *        positions are supplied.
-*     LOGF = LOGICAL (Given) 
+*     LOGF = LOGICAL (Given)
 *        Should the results be written to a log file?
-*     FDL = INTEGER (Given) 
+*     FDL = INTEGER (Given)
 *        The file descriptor for the log file. Ignored if LOGF is
 *        .FALSE.
 *     FIXCON( BF__NCON ) = LOGICAL (Given & Returned)
@@ -107,17 +107,17 @@
 *        4 -- Are the beam positions fixed at the supplied co-ordinates?
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
-*        
+*
 *        Options 3 and 6 will set to .FALSE. if either is .TRUE. on
 *        entry and if MAP2 does not have the inverse transformation.
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
-*        The ratios of the secondary beam 'sources' to the first beam.  
+*        The ratios of the secondary beam 'sources' to the first beam.
 *        These ratios constrain the fitting provided FIXCON(5) is .TRUE.
-*     SLBND( 2 ) = INTEGER (Given) 
-*        The lower pixel index bounds of the significant axes of the 
+*     SLBND( 2 ) = INTEGER (Given)
+*        The lower pixel index bounds of the significant axes of the
 *        NDF.
-*     SUBND( 2 ) = INTEGER (Given) 
-*        The upper pixel index bounds of the significant axes of the 
+*     SUBND( 2 ) = INTEGER (Given)
+*        The upper pixel index bounds of the significant axes of the
 *        NDF.
 *     FAREA = LOGICAL (Given)
 *        If .TRUE. then all pixels in the data array are used.  If
@@ -125,23 +125,23 @@
 *     FITREG( 2 ) = INTEGER (Given)
 *        The dimensions of the box to use when estimating the Gaussian
 *        in pixels.  The box is centred around each beam position.  Each
-*        value must be at least 9.  It is only accessed if FAREA is 
+*        value must be at least 9.  It is only accessed if FAREA is
 *        .FALSE.
 *     REFPOS( BF__NDIM ) = DOUBLE PRECISION (Given)
 *        The reference position measured in the current WCS Frame.  The
-*        offset of the primary beam with respect to this points is 
+*        offset of the primary beam with respect to this points is
 *        calculated, reported, and written to an output parameter.
 *     REFLAB = CHARACTER * (*) (Given)
-*        Label used to describe reference position in the output.   At 
+*        Label used to describe reference position in the output.   At
 *        present it should be either "map centre", if that was used in
 *        the absence of a reference position stored with the original
-*        dataset; or "sky reference position".  If another value is 
+*        dataset; or "sky reference position".  If another value is
 *        supplied, "reference position" will be used.
 *     NPAR = INTEGER (Given)
 *        The maximum number of fit parameters.
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
-*        On entry this is the fixed fit parameters.  Any free parameters 
-*        take the value VAL__BADD.  See KPS1_BFFN for a list of the 
+*        On entry this is the fixed fit parameters.  Any free parameters
+*        take the value VAL__BADD.  See KPS1_BFFN for a list of the
 *        parameters.
 *
 *        On exit it contains the coefficients of the fit in the PIXEL
@@ -158,7 +158,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -185,7 +185,7 @@
 *     2007 March 1 (MJC):
 *        Original version.
 *     2007 April 27 (MJC):
-*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of 
+*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of
 *        multiple Gaussians,
 *     2007 May 11 (MJC):
 *        Pass constraint flags as an array to shorten the API.
@@ -202,20 +202,20 @@
 *        Use new APIs for calculating and reporting polar co-ordinates
 *        of secondary features.  Added POLPAR argument.
 *     2007 June 4 (MJC):
-*        Second redesign: no longer are offsets supplied from BEAMFIT 
-*        itself through the OFFSET argument, and separate primary 
+*        Second redesign: no longer are offsets supplied from BEAMFIT
+*        itself through the OFFSET argument, and separate primary
 *        parameter from the secondary to help with the explanation and
-*        allowed values for the respective parameters.  Thus locations 
-*        defined by cursor or parameter can be an initial guess or a 
-*        fixed value, or in the case of secondary beams be separations 
+*        allowed values for the respective parameters.  Thus locations
+*        defined by cursor or parameter can be an initial guess or a
+*        fixed value, or in the case of secondary beams be separations
 *        from the primary.  More tidying.
 *     2007 June 8 (MJC):
-*        Moved NPAR and FPAR to the end of the non-STATUS arguments (as 
+*        Moved NPAR and FPAR to the end of the non-STATUS arguments (as
 *        FPAR is modified.
 *     2007 June 15 (MJC):
 *        Added REFPOS argument, propagated through to other routines.
 *     2007 June 18 (MJC):
-*        Added IPLOT argument and ellipse plotting.  Moved results 
+*        Added IPLOT argument and ellipse plotting.  Moved results
 *        graphics to new routine.
 *     2007 June 25 (MJC):
 *        Passed FrameSet identifier to KPS1_BFCRF.
@@ -226,7 +226,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -308,9 +308,9 @@
       INTEGER FUBND( BF__NDIM )  ! Fit region upper bounds
       INTEGER HBOX( BF__NDIM )   ! Half-sizes of the region
       INTEGER I                  ! Position index
-      INTEGER IMARK              ! Marker to use when marking initial 
+      INTEGER IMARK              ! Marker to use when marking initial
                                  ! positions
-      DOUBLE PRECISION INCEN( BF__MXPOS, NDF__MXDIM )! Beam graphics 
+      DOUBLE PRECISION INCEN( BF__MXPOS, NDF__MXDIM )! Beam graphics
                                  ! position
       LOGICAL INFO               ! Display instructions on cursor use?
       DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
@@ -350,9 +350,9 @@
       REAL XIN, YIN              ! Co-ords. of centre of picture
 
 *  Local Data:
-      DOUBLE PRECISION INCO( NDF__MXDIM ) ! Parameter-supplied position 
+      DOUBLE PRECISION INCO( NDF__MXDIM ) ! Parameter-supplied position
       DATA INCO / NDF__MXDIM * AST__BAD /
-      DOUBLE PRECISION INPOS( BF__MXPOS, NDF__MXDIM ) ! Supplied 
+      DOUBLE PRECISION INPOS( BF__MXPOS, NDF__MXDIM ) ! Supplied
       DATA INPOS / NUMCO * AST__BAD /                  ! positions
 
 *.
@@ -371,7 +371,7 @@
      :                 'pixel Frame of the NDF is not defined.',
      :                 STATUS )
 
-      ELSE IF ( CURSOR .AND. ( MARK( 1 : 1 ) .EQ. 'F' .OR. 
+      ELSE IF ( CURSOR .AND. ( MARK( 1 : 1 ) .EQ. 'F' .OR.
      :                         MARK( 1 : 1 ) .EQ. 'E' ) .AND.
      :          .NOT. AST_GETL( MAP1, 'TRANINVERSE', STATUS ) ) THEN
          CALL MSG_OUT( 'KPS1_BFINT_MSG1','The Mapping required '//
@@ -500,12 +500,12 @@
             END IF
 
 *  Get a position using the cursor, in PGPLOT world co-ordinates.  This
-*  corresponds to the Base (i.e. GRAPHICS) Frame of the Plot 
-*  (millimetres from the bottom-left corner of the view surface).  The 
+*  corresponds to the Base (i.e. GRAPHICS) Frame of the Plot
+*  (millimetres from the bottom-left corner of the view surface).  The
 *  positions that may be selected are restricted to the current picture.
-            CALL KPG1_PGCUR( INFO, MESS, 2, AMES, 
-     :                       ' .', X1, X2, Y1, Y2, 0, XIN, YIN, 1, 0, 
-     :                       0, 0, IMARK, AST__NULL, XIN, YIN, ACT, NP, 
+            CALL KPG1_PGCUR( INFO, MESS, 2, AMES,
+     :                       ' .', X1, X2, Y1, Y2, 0, XIN, YIN, 1, 0,
+     :                       0, 0, IMARK, AST__NULL, XIN, YIN, ACT, NP,
      :                       STATUS )
 
 *  Look out for the abort, i.e. the number of points is zero.
@@ -551,11 +551,11 @@
      :                          INCO, BC, STATUS )
 
             ELSE
-               CALL KPG1_GTPOS( PARNAM, RFRM, .FALSE., INCO, BC, 
+               CALL KPG1_GTPOS( PARNAM, RFRM, .FALSE., INCO, BC,
      :                          STATUS )
             END IF
 
-*  If an abort value was supplied, do not annul the error but indicate that 
+*  If an abort value was supplied, do not annul the error but indicate that
 *  the loop should be left.
             IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -572,9 +572,9 @@
          NBPS = NBPS + 1
 
 *  Transform the supplied position to the PIXEL Frame of the NDF.
-         CALL AST_TRANN( MAP1, 1, NAXIN, BF__MXPOS, INPOS( NBPS, 1 ), 
+         CALL AST_TRANN( MAP1, 1, NAXIN, BF__MXPOS, INPOS( NBPS, 1 ),
      :                   .TRUE., BF__NDIM, BF__MXPOS,
-     :                   PIXPOS( NBPS, 1 ), STATUS ) 
+     :                   PIXPOS( NBPS, 1 ), STATUS )
 
 *  Copy the initial PIXEL position into a single-precision array,
 *  checking for bad axis values.
@@ -602,7 +602,7 @@
                   CALL ERR_REP( 'KPS1_BFINT_ERR3A', 'Check that you '/
      :                           /'are using the correct chosen '/
      :                           /'system.', STATUS )
-               END IF            
+               END IF
                GO TO 999
 
             ELSE
@@ -620,7 +620,7 @@
      :                           /'system by entering : before you '/
      :                           /'try again.', STATUS )
                   CALL ERR_FLUSH( STATUS )
-               END IF            
+               END IF
 
 *  Reset allowing the using to have another attempt.
                CALL PAR_CANCL( PARNAM, STATUS )
@@ -655,17 +655,17 @@
       ELSE
          WAX = 1
       END IF
-                                    
+
 *  First convert the PIXEL co-ordinates of the primary beam centre to
 *  the reporting Frame.
-      CALL AST_TRANN( MAP2, 1, 2, BF__MXPOS, PIXPOS, .TRUE., BF__NDIM, 
+      CALL AST_TRANN( MAP2, 1, 2, BF__MXPOS, PIXPOS, .TRUE., BF__NDIM,
      :                2, FPOS, STATUS )
 
 *  The supplied fixed widths are in the current Frame's co-ordinates.
 *  For fitting we need these to be in pixels.
       IF ( FPAR( 3 ) .NE. VAL__BADD ) THEN
 
-*  Transform the centre and centre plus width from the PIXEL Frame 
+*  Transform the centre and centre plus width from the PIXEL Frame
 *  of the NDF to the reporting Frame.
          FPOS( 2, 1 ) = FPOS( 1, 1 )
          FPOS( 2, 2 ) = FPOS( 1, 2 )
@@ -712,9 +712,9 @@
          END DO
       ELSE
          DO J = 1, BF__NDIM
-            FLBND( J ) = MAX( NINT( PIXPOS( 1, J ) + 0.5D0 ) 
+            FLBND( J ) = MAX( NINT( PIXPOS( 1, J ) + 0.5D0 )
      :                        - HBOX( J ), SLBND( J ) )
-            FUBND( J ) = MIN( NINT( PIXPOS( 1, J ) + 0.5D0 ) 
+            FUBND( J ) = MIN( NINT( PIXPOS( 1, J ) + 0.5D0 )
      :                        + HBOX( J ), SUBND( J ) )
          END DO
 
@@ -727,7 +727,7 @@
 
 *  Map the variance array.  Otherwise create a valid pointer.
          IF ( VAR ) THEN
-            CALL NDF_MAP( NDFS, 'Variance', '_DOUBLE', 'READ', 
+            CALL NDF_MAP( NDFS, 'Variance', '_DOUBLE', 'READ',
      :                    IPWV, EL, STATUS )
          ELSE
             IPWV = IPWD
@@ -738,7 +738,7 @@
 *  ========================================================
 
 *  The fitted position is returned in pixel co-ordinates.
-      CALL KPS1_BFFT( PIXPOS, FLBND, FUBND, FIXCON, AMPRAT, 
+      CALL KPS1_BFFT( PIXPOS, FLBND, FUBND, FIXCON, AMPRAT,
      :                POFSET, NPAR, FPAR, SIGMA, RMS, STATUS )
 
 *  Free resources.
@@ -783,7 +783,7 @@
 
 *  Convert the pixel coefficients to the reporting Frame, also
 *  changing the widths from standard deviations to FWHMs.
-         CALL KPS1_BFCRF( MAP2, IWCS, NAXR, NPOS, BF__NCOEF, FPAR, 
+         CALL KPS1_BFCRF( MAP2, IWCS, NAXR, NPOS, BF__NCOEF, FPAR,
      :                    SIGMA, RP, RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Find the offset of the primary beam with respect to the reference
@@ -804,7 +804,7 @@
             REFOFF( 2 ) = SQRT( OFFVAR )
          ELSE
             REFOFF( 2 ) = VAL__BADD
-         END IF            
+         END IF
 
 *  Output
 *  ------

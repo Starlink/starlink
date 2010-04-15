@@ -17,27 +17,27 @@
 *     applications that process lists of NDFs.
 *
 *     On the first invocation of the application, a group of names for
-*     some new NDFs will be obtained from the environment using the 
-*     specified parameter. The first name will be used to create an NDF 
-*     with the requested attributes, and an identifier for the new NDF will 
-*     be returned. If more than one name was supplied for the parameter 
-*     then the application may be invoked again (see LPG_AGAIN), in which 
+*     some new NDFs will be obtained from the environment using the
+*     specified parameter. The first name will be used to create an NDF
+*     with the requested attributes, and an identifier for the new NDF will
+*     be returned. If more than one name was supplied for the parameter
+*     then the application may be invoked again (see LPG_AGAIN), in which
 *     case this routine will return an identifier for a new NDF with the
-*     next name in the group supplied on the first invocation. 
+*     next name in the group supplied on the first invocation.
 *
 *     If a modification element is included in the group expression
 *     supplied for the parameter on the first invocation of the
 *     application, the new NDF names are based on the names of the
-*     first group of existing data files (NDFs or catalogues) to be 
+*     first group of existing data files (NDFs or catalogues) to be
 *     accessed by the application.
 *
-*     If an application attempts to get a new NDF by cancelling the 
-*     parameter (PAR_CANCL), the name used to create the returned NDF is 
-*     NOT the next one in the group, but is obtained by prompting the 
+*     If an application attempts to get a new NDF by cancelling the
+*     parameter (PAR_CANCL), the name used to create the returned NDF is
+*     NOT the next one in the group, but is obtained by prompting the
 *     user for a single new NDF.
 *
-*     The monolith routine should arrange to invoke the application 
-*     repeatedly until one or more of its NDF parameters have been 
+*     The monolith routine should arrange to invoke the application
+*     repeatedly until one or more of its NDF parameters have been
 *     exhausted (i.e. all its values used). See LPG_AGAIN.
 
 *  Arguments:
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -107,7 +107,7 @@
 *        PNAME( LPG__MXPAR ) = CHARACTER * ( DAT__SZNAM ) (Read and Write)
 *           The names of the data file parameters used by the application.
 *        IGRP( LPG__MXPAR ) = INTEGER (Read and Write)
-*           The identifier for the GRP groups holding the data file names 
+*           The identifier for the GRP groups holding the data file names
 *           supplied for each data file parameter.
 *        SIZE( LPG__MXPAR ) = INTEGER (Read and Write)
 *           The number of data files supplied for each data file parameter.
@@ -116,15 +116,15 @@
 *        NRUN = INTEGER (Read)
 *           The number of times the application has been invoked so far.
 *        OLD( LPG__MXPAR ) = LOGICAL (Read and Write)
-*           A flag for each data file parameter indicating if the parameter is 
-*           used to access existing (i.e. old) data files. If not, the parameter 
+*           A flag for each data file parameter indicating if the parameter is
+*           used to access existing (i.e. old) data files. If not, the parameter
 *           is used to access new data files to be created by the application.
 *        REP( LPG__MXPAR ) = LOGICAL (Read and Write)
-*           A flag for each data file parameter indicating if the parameter value 
+*           A flag for each data file parameter indicating if the parameter value
 *           has been reported yet by the current invocation of the
 *           application.
 *        VERB = LOGICAL (Read)
-*           A flag indicating if the values used for each multi-valued 
+*           A flag indicating if the values used for each multi-valued
 *           parameter should be displayed each time the parameter is accessed.
 *        DISAB = (Read)
 *           A flag indicating if looping is currently disabled.
@@ -178,7 +178,7 @@
       DO I = 1, NPAR
          IF( PNAME( I ) .EQ. UPAR ) THEN
             IPAR = I
-            GO TO 10 
+            GO TO 10
          END IF
       END DO
  10   CONTINUE
@@ -201,11 +201,11 @@
          PNAME( NPAR ) = UPAR
          OLD( NPAR ) = .FALSE.
 
-*  Modification elements will use the first group of existing data files 
-*  (NDFs or catalogues) as the basis group. Find the index of the first 
+*  Modification elements will use the first group of existing data files
+*  (NDFs or catalogues) as the basis group. Find the index of the first
 *  parameter associated with existing data files.
          IGRP0 = GRP__NOID
-         DO I = 1, NPAR - 1  
+         DO I = 1, NPAR - 1
             IF( OLD( I ) .AND. IGRP( I ) .NE. GRP__NOID ) THEN
                IGRP0 = IGRP( I )
                GO TO 20
@@ -217,8 +217,8 @@
 *  Loop until a group expression is given which is not terminated by a
 *  flag character.
          FLAG = .TRUE.
-         DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK ) 
-            CALL NDG_CREAT( UPAR, IGRP0, IGRP( NPAR ), SIZE( NPAR ), 
+         DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK )
+            CALL NDG_CREAT( UPAR, IGRP0, IGRP( NPAR ), SIZE( NPAR ),
      :                      FLAG, STATUS )
             IF( FLAG ) THEN
                CALL PAR_CANCL( UPAR, STATUS )
@@ -235,13 +235,13 @@
             STATUS = PAR__NULL
             CALL MSG_SETC( 'PARAM', UPAR )
             CALL ERR_REP( 'LPG_CREP_ERR2', 'Null NDF structure '//
-     :                    'specified for the ''%^PARAM'' parameter.', 
+     :                    'specified for the ''%^PARAM'' parameter.',
      :                    STATUS )
          END IF
 
 *  If a PAR__NULL status exists, store a null group identifier in common
 *  for this parameter, and reset the size to zero.
-         IF( STATUS .EQ. PAR__NULL ) THEN 
+         IF( STATUS .EQ. PAR__NULL ) THEN
             IF( IGRP( NPAR ) .NE. GRP__NOID ) THEN
                CALL GRP_DELET( IGRP( NPAR ), STATUS )
             END IF
@@ -250,7 +250,7 @@
 
 *  Store the expanded list of names as the parameter's current value.
          IF( IGRP( NPAR ) .NE. GRP__NOID ) THEN
-            CALL LPG1_PTPAR( UPAR, IGRP( NPAR ), STATUS )         
+            CALL LPG1_PTPAR( UPAR, IGRP( NPAR ), STATUS )
          END IF
 
 *  Use this common block slot.
@@ -259,29 +259,29 @@
 *  If the parameter has been accessed before...
       ELSE
 
-*  See if the application has cancelled the parameter value. If so, 
+*  See if the application has cancelled the parameter value. If so,
 *  we get a new NDF using the parameter directly. This will probably
 *  result in the user being prompted for a new parameter value.
          CALL PAR_STATE( UPAR, STATE, STATUS )
          IF( STATE .EQ. SUBPAR__CANCEL ) THEN
-            CALL LPG_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, 
+            CALL LPG_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME,
      :                      STATUS )
 
 *  Store the new value in the group, replacing the old value, and store
 *  the new list of names as the parameter's current value.
             IF( SIZE( IPAR ) .GT. 1 ) THEN
                CALL GRP_PUT( IGRP( IPAR ), 1, NAME, NRUN, STATUS )
-               CALL LPG1_PTPAR( UPAR, IGRP( NPAR ), STATUS )         
+               CALL LPG1_PTPAR( UPAR, IGRP( NPAR ), STATUS )
             END IF
 
 *  Otherwise, report a PAR__NULL error if the parameter has no GRP group
 *  associated with it.
-         ELSE IF( IGRP( IPAR ) .EQ. GRP__NOID .AND. 
+         ELSE IF( IGRP( IPAR ) .EQ. GRP__NOID .AND.
      :            STATUS .EQ. SAI__OK ) THEN
             STATUS = PAR__NULL
             CALL MSG_SETC( 'PARAM', UPAR )
             CALL ERR_REP( 'LPG_CREP_ERR3', 'Null NDF structure '//
-     :                    'specified for the ''%^PARAM'' parameter.', 
+     :                    'specified for the ''%^PARAM'' parameter.',
      :                    STATUS )
          END IF
 
@@ -290,7 +290,7 @@
 *  Get the NDF identifier unless one was obtained above.
       IF( INDF .EQ. NDF__NOID .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  If the group only contains one NDF name, use it on all invocations of the 
+*  If the group only contains one NDF name, use it on all invocations of the
 *  application.
          IF( SIZE( IPAR ) .EQ. 1 ) THEN
             IRUN = 1
@@ -304,11 +304,11 @@
 *  the group  if necessary to refer to a temporary output NDF.
          CALL LPG1_ADDTM( IGRP( IPAR ), IRUN, STATUS )
 
-*  Get the NDF from the group. 
-         CALL NDG_NDFCP( IGRP( IPAR ), IRUN, FTYPE, NDIM, UBND, INDF, 
+*  Get the NDF from the group.
+         CALL NDG_NDFCP( IGRP( IPAR ), IRUN, FTYPE, NDIM, UBND, INDF,
      :                   STATUS )
 
-*  Tell the user which NDF is being used, if required, and if it has not 
+*  Tell the user which NDF is being used, if required, and if it has not
 *  already been reported.
          IF( VERB .AND. .NOT. REP( IPAR ) ) THEN
             CALL NDF_MSG( 'N', INDF )

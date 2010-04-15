@@ -20,7 +20,7 @@
 *
 *     This routine has only a STATUS argument, so it communicates with
 *     other KPG routines via global variables stored in the KPG_AST
-*     common blocks. These are described below under "Global Variables 
+*     common blocks. These are described below under "Global Variables
 *     used as Arguments".
 
 *  Arguments:
@@ -29,14 +29,14 @@
 
 *  Global Variables used as Arguments:
 *     ASTGRP = INTEGER (Given)
-*        A GRP identifier for the group which is to store the data. 
+*        A GRP identifier for the group which is to store the data.
 *     ASTTSZ = INTEGER (Given)
 *        The maximum length of text which should be stored in a single
 *        element of the group. This should be less than or equal to
 *        GRP__SZNAM.
 *     ASTLN = INTEGER (Given and Returned)
 *        This must initially be set to the value 1, to indicate that
-*        data will be written starting at the first element of the 
+*        data will be written starting at the first element of the
 *        group (note the routine will not operate correctly unless 1 is
 *        the initial value - you cannot start writing at another point
 *        in the group if you have previously written to a different
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,20 +84,20 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT constants (needed by KPG_AST)
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'KPG_PAR'          ! KPG_ constants      
-      
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'KPG_PAR'          ! KPG_ constants
+
 *  Global Variables:
-      INCLUDE 'KPG_AST'          ! KPG AST common blocks 
+      INCLUDE 'KPG_AST'          ! KPG AST common blocks
 *        ASTGRP = INTEGER (Read)
 *           GRP identifier for group holding AST_ data.
 *        ASTTSZ = INTEGER (Read)
-*           Maximum length of text to store in a group element. 
+*           Maximum length of text to store in a group element.
 *        ASTLN = INTEGER (Read and Write)
 *           Next element to use in the group holding AST_ data.
-      
+
 *  Global Status:
-      INTEGER STATUS             
+      INTEGER STATUS
 
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
@@ -144,8 +144,8 @@
          IF ( L .GT. 0 ) THEN
             FLAG = ' '
 
-*  Loop to write the text into the group as a sequence of lines of length 
-*  one less than the max. number of characters in each group element (the 
+*  Loop to write the text into the group as a sequence of lines of length
+*  one less than the max. number of characters in each group element (the
 *  first character of each line is reserved for use as a flag character).
             DO 1 I1 = 1, L, ASTTSZ - 1
 

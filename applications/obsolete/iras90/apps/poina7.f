@@ -26,7 +26,7 @@
 *        Scale factor used in translating units for this detector, is
 *        VAL__BADR for dead detectors
 *     IDET = INTEGER (Given)
-*        Detector index for the current detector 
+*        Detector index for the current detector
 *     LOGFID = INTEGER (Given)
 *        When logging is required, it gives the ID of the logfile.
 *     LOGREQ = LOGICAL (Given)
@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,7 +65,7 @@
 *  Arguments Given:
       INTEGER MAXDET
       INTEGER DETNUM( MAXDET )
-      REAL DETSCA( MAXDET )  
+      REAL DETSCA( MAXDET )
       INTEGER IDET
       INTEGER LOGFID
       LOGICAL LOGREQ
@@ -75,10 +75,10 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-				
+
 * External References:
       INTEGER CHR_LEN            ! Used length of a string
-				 
+
 *  Local Variables:
       CHARACTER*( 5 )DETST       ! Character string of detector number
       INTEGER DETLN	         ! Length of the DETST
@@ -114,7 +114,7 @@
 *  Report whole scan noise
          CALL MSG_BLANK( STATUS )
          CALL MSG_SETC('DETST', DETST)
-         CALL MSG_OUT( 'POINA7_MSG1', 'The Noise along the whole '/ 
+         CALL MSG_OUT( 'POINA7_MSG1', 'The Noise along the whole '/
      :              /'selected scan length for the trace of detector '/
      :              /'^DETST', STATUS )
          CALL MSG_SETC('UNITS', UNITS)
@@ -127,7 +127,7 @@
 *  Write to the logging file as well if requested.
          IF ( LOGREQ ) THEN
             CALL FIO_WRITE( LOGFID, ' ', STATUS )
-            CALL FIO_WRITE( LOGFID, 'The Noise along the whole '/ 
+            CALL FIO_WRITE( LOGFID, 'The Noise along the whole '/
      :              /'selected scan length for the trace of detector '/
      :              /DETST(  : DETLN ), STATUS )
             TEMPSTR = UNITS( : UNITLN )

@@ -8,9 +8,9 @@ C  Function:
 C     Sets a single axis width value.
 C
 C  Description:
-C     If a data structure contains, or is to contain, a single width 
+C     If a data structure contains, or is to contain, a single width
 C     value, as opposed to a width array, then this routine can be used
-C     to set such a value. 
+C     to set such a value.
 C
 C  Language:
 C     FORTRAN
@@ -28,12 +28,12 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ system.
 C
 C  External subroutines / functions used:
 C     ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_WRUSER, DSA_GET_ACTUAL_NAME,
-C     GEN_NTH, ICH_FOLD, DTA_SZVAR, DTA_STRUC, DTA_WRVARD, DTA_ERROR, 
+C     GEN_NTH, ICH_FOLD, DTA_SZVAR, DTA_STRUC, DTA_WRVARD, DTA_ERROR,
 C     DSA__AXIS_WIDTH_NAME
 C
 C  Prior requirements:
@@ -105,7 +105,7 @@ C
       CHARACTER NUMBER*12                   ! Formatted number
       CHARACTER OBJ_NAME*80                 ! DTA_ name of top level data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       LOGICAL   SINGLE                      ! True if width is single valued.
       LOGICAL   STRUCT                      ! Indicates object is a structure
       CHARACTER STRUCTURE_NAME*128          ! Full structure name from ref_name
@@ -133,7 +133,7 @@ C
       CALL DTA_STRUC (NAME(:LENGTH),STRUCT,DTA_STATUS)
       IF (DTA_STATUS.NE.0) THEN
          EXIST=.FALSE.
-      ELSE 
+      ELSE
          EXIST=.TRUE.
          IF (.NOT.STRUCT) THEN
             CALL DTA_SZVAR (NAME(:LENGTH),1,NDIM,DIMS,DTA_STATUS)
@@ -144,7 +144,7 @@ C
          END IF
       END IF
 C
-C     If it exists and is not a simple scalar value, we need to 
+C     If it exists and is not a simple scalar value, we need to
 C     delete it first.
 C
       IF (EXIST.AND.(.NOT.SINGLE)) THEN
@@ -172,7 +172,7 @@ C
          END IF
       END IF
 C
-C     If it didn't exist, (or doesn't now) we need to create it.  (We 
+C     If it didn't exist, (or doesn't now) we need to create it.  (We
 C     don't bother to check status here, since if the create fails, so will
 C     the subsequent write.)
 C

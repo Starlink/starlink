@@ -47,7 +47,7 @@ C     DTA_DLVAR         Deletes a data object.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -111,7 +111,7 @@ C
                CALL DTA_DLVAR (AXIS_STRUCT(:LENGTH-3),DTA_STATUS)
             ELSE
 C
-C              This is doing it the hard way.  It's not the only element 
+C              This is doing it the hard way.  It's not the only element
 C              of the structure, so we have to delete everything in it
 C              one by one in order to clear it out.
 C

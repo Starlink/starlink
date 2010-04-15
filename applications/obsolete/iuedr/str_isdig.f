@@ -28,10 +28,10 @@
 
 *   Import:
       BYTE C                ! character to be typed
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
- 
+
       str_ISDIG = str_INDEX('0123456789\\', C).GT.0
 
       END

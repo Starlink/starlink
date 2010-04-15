@@ -19,7 +19,7 @@
 *     specified lies within the NDF.
 *
 *     If either of the strings cannot be successfully converted to
-*     a number then XB and YB are not meaningful and STATUS is 
+*     a number then XB and YB are not meaningful and STATUS is
 *     set on exit.  If the point specified is not within the NDF then
 *     STATUS is set on exit.
 *
@@ -42,9 +42,9 @@
 *     keeps things tidy, but it means that the extraction of the WCS
 *     component from the NDF and of the mapping from the WCS component
 *     may have to be done multiple times, while if it were done in
-*     the calling routine it need only be done once.  However, the 
+*     the calling routine it need only be done once.  However, the
 *     time taken as a proportion of the overall running time for any
-*     current ESP application is always(?) going to be negligable, 
+*     current ESP application is always(?) going to be negligable,
 *     so this trade-off seems worthwhile.
 *
 *  Authors:
@@ -112,7 +112,7 @@
       CFRAME=AST_GETFRAME(IWCS,AST__CURRENT,STATUS)
 
 *   Get numeric values in the Current frame for the X coordinate
-*   according to the kind of coordinate it is.  Check for 
+*   according to the kind of coordinate it is.  Check for
 *   conversion errors.
       NCHR=AST_UNFORMAT(CFRAME,1,XSTR,X1,STATUS)
       IF (XSTR(NCHR+1:).NE.' '.OR.NCHR.EQ.0.OR.STATUS.NE.SAI__OK) THEN
@@ -133,13 +133,13 @@
 
 *   Get the mapping between the Current frame and the Base frame.
 *   The Base frame of a WCS component is the one in the GRID domain,
-*   which has values of unity in the centre of the first pixel 
+*   which has values of unity in the centre of the first pixel
 *   stored.
       CMAP=AST_GETMAPPING(IWCS,AST__CURRENT,AST__BASE,STATUS)
 
 *   Transform from Current frame to Base frame coordinates.
       CALL AST_TRAN2(CMAP,1,X1,Y1,.TRUE.,X2,Y2,STATUS)
-      
+
 
       IF (STATUS.EQ.SAI__OK) THEN
 *      If something went wrong with the conversion, then
@@ -147,10 +147,10 @@
 
 *      Check that the coordinates given fall within the bounds of the NDF.
 *      Note this check restricts the coordinates to be between the centre
-*      of the lowest pixel and the centre of the highest pixel in each 
+*      of the lowest pixel and the centre of the highest pixel in each
 *      dimension, i.e. not within half a pixel of the edge of the array.
 *      It's not clear to me (MBT) that this is correct, but I'm
-*      re-implementing the constraints in the same way that they have been 
+*      re-implementing the constraints in the same way that they have been
 *      previously operating within ESP.
          IF (X2.LT.XMIN.OR.X2.GT.XMAX.OR.Y2.LT.YMIN.OR.Y2.GT.YMAX) THEN
             STATUS=SAI__ERROR
@@ -170,7 +170,7 @@
          XB=REAL(X2)
          YB=REAL(Y2)
       ENDIF
- 
+
 *   Error exit label.
  99   CONTINUE
 

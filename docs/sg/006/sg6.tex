@@ -60,7 +60,7 @@ of programming documentation.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -133,7 +133,7 @@ of programming documentation.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -197,7 +197,7 @@ of programming documentation.
    \vbox{
       \begin{tabular}{p{18mm}p{112mm}p{70mm}} \hline\hline
       \multicolumn{1}{l}{\large \theheadcount -\thedoccount} &
-      {\large \bf #1} & 
+      {\large \bf #1} &
       \multicolumn{1}{r}{\large \bf #3} \\
       & {\large #2}\\ \hline
       & \multicolumn{2}{p90mm}{#4}
@@ -273,12 +273,12 @@ of programming documentation.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -339,7 +339,7 @@ of programming documentation.
 \latex{\footnotetext[1]{The documentation for these facilities has
 changed since the previous version of this guide (dated
 \previousdate). Please ensure that you have a copy of the most recent
-documents.}} 
+documents.}}
 \html{An asterisk indicates that the documentation for
 these facilities has changed since the previous version of this guide
 (dated \previousdate). Please ensure that you have a copy of the most
@@ -460,7 +460,7 @@ have a copy of the most recent documents.}
 
 \bighead{Introductory Documentation}
 
-\docitem{INTRO}{Introduction to ADAM Programming}{\xref{SUN/101.2}{sun101}{}}{ 
+\docitem{INTRO}{Introduction to ADAM Programming}{\xref{SUN/101.2}{sun101}{}}{
 A tutorial introduction to writing ADAM programs. This document is intended for
 newcomers to ADAM who already have a basic understanding of Fortran programming
 but are unfamiliar with ADAM conventions. The use of the most important
@@ -611,7 +611,7 @@ Provides arithmetic and mathematical functions for processing primitive
 numerical data (real, integer \& double precision values, {\em etc.}) including
 the non-standard data types ({\em e.g.}\ unsigned byte) which are used in ADAM
 but are not directly supported by Fortran~77. Routines are provided for both
-scalar values and arrays, with optional recognition of ``{\em undefined\/}'' 
+scalar values and arrays, with optional recognition of ``{\em undefined\/}''
 data and methods for handling numerical errors such as overflow. A set of
 include files is also provided to define machine-dependent constants, including
 the important ``{\em bad\/}'' values used to flag undefined data. The systematic
@@ -620,7 +620,7 @@ GENERIC pre-processor (see \xref{SUN/7}{sun7}{}).
 }
 \docitem{ICL}{ADAM Command Language}{\xref{SG/5.1}{sg5}{}}{
 Although ICL is really a command language from which applications are run, the
-writer of ADAM applications will still find it useful to refer to this 
+writer of ADAM applications will still find it useful to refer to this
 document. It describes the ICL language, which includes a number of special
 features for controlling and communicating with ADAM tasks.
 }
@@ -707,7 +707,7 @@ It is sometimes useful to use HDS to store pointers to other HDS objects. For
 instance, the {\em Applications Graphics Interface}, AGI, depends on this
 ability in order to associate HDS data objects with graphical displays (see
 \xref{SUN/48}{sun48}{}), without having to make a separate copy of the data object. The REF
-library is provided to facilitate this data-object ``{\em referencing\/}'' 
+library is provided to facilitate this data-object ``{\em referencing\/}''
 process and the subsequent accessing of objects which have been referenced in
 this way.
 }

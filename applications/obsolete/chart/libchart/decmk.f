@@ -29,7 +29,7 @@
       INTEGER STATUS             ! Global status
 
       CHARACTER*1 ISIGN
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -53,5 +53,5 @@
          CALL SGS_ATXI (IM,-1)
       ENDIF
       CALL SGS_OTEXT
- 
+
       END

@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LMKST( NAX, NPIN, INDIM, INPOS, ID0, INID, 
+      SUBROUTINE KPS1_LMKST( NAX, NPIN, INDIM, INPOS, ID0, INID,
      :                       START, NPOUT, OUTPOS, OUTID, STATUS )
 *+
 *  Name:
@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LMKST( NAX, NPIN, INDIM, INPOS, ID0, INID, START, NPOUT, 
+*     CALL KPS1_LMKST( NAX, NPIN, INDIM, INPOS, ID0, INID, START, NPOUT,
 *                      OUTPOS, OUTID, STATUS )
 
 *  Description:
-*     This routine copies positions and identifiers from the input 
+*     This routine copies positions and identifiers from the input
 *     arrays to the output arrays, starting at a given index within the
 *     output arrays.
 
@@ -37,7 +37,7 @@
 *        in array INID are used instead.
 *     INID( NPIN ) = INTEGER (Given)
 *        The individual integer identifiers to associate with each
-*        supplied position. Only accessed if ID0 is less than or equal to 
+*        supplied position. Only accessed if ID0 is less than or equal to
 *        zero.
 *     START = INTEGER (Given)
 *        The index within the output arrays at which to store the first
@@ -83,7 +83,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -121,7 +121,7 @@
 *  Check each input position.
       DO I = 1, MIN( NPIN, NPOUT - START + 1 )
 
-*  Find the index of the position in the output arrays. 
+*  Find the index of the position in the output arrays.
          J = J + 1
 
 *  Copy all axis values for this position from the input array to the

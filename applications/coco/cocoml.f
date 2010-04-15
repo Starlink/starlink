@@ -1,7 +1,7 @@
       SUBROUTINE COCOML (LUOUT,LUECH,LUREP,LUINP2,LUINP1,LUPRO,LUERR)
 *+
 *  - - - - - - -
-*   C O C O M L 
+*   C O C O M L
 *  - - - - - - -
 *
 *  Conversion of celestial coordinates - main routine.
@@ -279,7 +279,7 @@
             ELSE IF (KSYST.EQ.'A') THEN
                CALL DP(INREC,IPTR,
      :                 '!',0D0,JBEP(INOUT),EP(INOUT),J)
-            ELSE IF (KSYST.EQ.'E') THEN 
+            ELSE IF (KSYST.EQ.'E') THEN
                CALL DP(INREC,IPTR,
      :                 '!',0D0,JBEP(INOUT),EP(INOUT),J)
             ELSE
@@ -721,7 +721,7 @@
                ELSE
                   IF (COS(A)*ABS(DA)/AS2R.GE.15D0) GO TO 9000
                END IF
- 
+
             ELSE
 
 *           Decode ecliptic or galactic coordinates
@@ -1444,7 +1444,7 @@
 
 *                 Low resolution
                      WRITE (LUREP,
-     :  '(1X,''-> '',F6.2,F8.2,1X,2(2X,A,F6.1),''   FK4''/)') 
+     :  '(1X,''-> '',F6.2,F8.2,1X,2(2X,A,F6.1),''   FK4''/)')
      :                                       A/D2R,B/D2R,
      :                                       JBEQ(2),EQ(2),
      :                                       JBEP(2),EP(2)
@@ -1560,7 +1560,7 @@
 *                 Low resolution
                      WRITE (LUREP,
      :  '(1X,''-> '',F6.2,F8.2,1X,2(2X,A,F6.1),'//
-     :  '''   (no E-terms)''/)') 
+     :  '''   (no E-terms)''/)')
      :                                       A/D2R,B/D2R,
      :                                       JBEQ(2),EQ(2),
      :                                       JBEP(2),EP(2)
@@ -1669,7 +1669,7 @@
 
 *                 Low resolution
                      WRITE (LUREP,
-     :  '(1X,''-> '',F6.2,F8.2,1X,2(2X,A,F6.1),''   FK5''/)') 
+     :  '(1X,''-> '',F6.2,F8.2,1X,2(2X,A,F6.1),''   FK5''/)')
      :                                       A/D2R,B/D2R,
      :                                       JBEQ(2),EQ(2),
      :                                       JBEP(2),EP(2)

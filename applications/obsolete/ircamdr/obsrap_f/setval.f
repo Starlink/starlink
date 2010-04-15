@@ -42,8 +42,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'             ! SSE global definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'PRM_PAR'             ! PRIMDAT constants
 
 *    Status :
@@ -52,7 +52,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                     ! image dimensionality
 
       PARAMETER ( NDIMS  =  2 )     ! 2-d images only
@@ -65,7 +65,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI,                     ! locator for input data structure
      :    LOCO,                     ! locator for output data structure
      :    IDIMS( NDIMS ),           ! dimensions of input data array
@@ -74,7 +74,7 @@
      :    PNTRI,                    ! pointer to input data array component
      :    PNTRO                     !    "     " output  "    "       "
 
-      REAL 
+      REAL
      :    INVAL,                    ! value to be changed
      :    OUTVAL                    ! value to be changed to
 
@@ -100,24 +100,24 @@
          CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, ACTDIM, STATUS )
-      
+
 *       get the value to be changed
 
-         CALL AIF_GET0R( 'INVAL', 0.0, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'INVAL', 0.0, MINVAL, MAXVAL,
      :                    INVAL, STATUS )
 
 *       get the value to be changed to
 
-         CALL AIF_GET0R( 'OUTVAL', 0.0, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'OUTVAL', 0.0, MINVAL, MAXVAL,
      :                    OUTVAL, STATUS )
 
 *       check for error so far
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*          create output image type data structure 
+*          create output image type data structure
 
-            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, 
+            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS,
      :                    LOCO, STATUS )
 
 *          check for error
@@ -132,9 +132,9 @@
 *             if there have been no errors then perform the thresholding
 
                IF ( STATUS .EQ. SAI__OK ) THEN
-  
-                  CALL SETVALSUB( %VAL( PNTRI ), %VAL( PNTRO ), 
-     :                            IDIMS(1), IDIMS(2), INVAL, OUTVAL, 
+
+                  CALL SETVALSUB( %VAL( PNTRI ), %VAL( PNTRO ),
+     :                            IDIMS(1), IDIMS(2), INVAL, OUTVAL,
      :                            STATUS )
 
                END IF

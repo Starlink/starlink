@@ -76,7 +76,7 @@ namespace gaia {
         else {
             bigendian_ = true;
         }
-        
+
         //  Check for size of 64bit integer. XXX autoconf this.
         if ( sizeof( long ) == 4 ) {
             uselonglong_ = true;
@@ -100,8 +100,8 @@ namespace gaia {
      *  if the read fails. If an explicit null value is defined for this
      *  type then that should be given in the string form.
      */
-    bool VOTableStream::readPrint( datatype type, int quantity, 
-                                   bool havenull, string &nullstring, 
+    bool VOTableStream::readPrint( datatype type, int quantity,
+                                   bool havenull, string &nullstring,
                                    ostream *out )
     {
         switch ( type ) {
@@ -135,27 +135,27 @@ namespace gaia {
             break;
             case LONG: {
                 if ( uselonglong_ ) {
-                    return readValues<long long>( quantity, havenull, 
+                    return readValues<long long>( quantity, havenull,
                                                   nullstring, out );
                 }
                 else {
-                    return readValues<long>( quantity, havenull, 
+                    return readValues<long>( quantity, havenull,
                                              nullstring, out );
                 }
             }
             break;
             case FLOAT: {
-                return readFloatValues<float>( quantity, havenull, nullstring, 
+                return readFloatValues<float>( quantity, havenull, nullstring,
                                                out );
             }
             break;
             case DOUBLE: {
-                return readValues<double>( quantity, havenull, 
+                return readValues<double>( quantity, havenull,
                                            nullstring, out );
             }
             break;
             case FLOATCOMPLEX: {
-                return readValues<float>( quantity * 2, havenull, 
+                return readValues<float>( quantity * 2, havenull,
                                           nullstring, out );
             }
             break;
@@ -180,7 +180,7 @@ namespace gaia {
         bool result = true;
         bool value;
         int status;
-        
+
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
             readValue( quantity );
@@ -219,7 +219,7 @@ namespace gaia {
             }
             else {
                 value = false;
-            }        
+            }
             return 1;
         }
         return 0;
@@ -255,7 +255,7 @@ namespace gaia {
     /**
      *  Read a VOTable bit array byte from the stream and return the decoded
      *  string representation of the bits. The result is false if the read
-     *  fails. 
+     *  fails.
      */
     bool VOTableStream::readBitArray( string &value )
     {

@@ -16,13 +16,13 @@
 *     CALL TASK_DONE ( TIMEOUT, PATH, MESSID, OUTVAL, STATUS )
 
 *  Description:
-*     Wait for a final acknowledgement from a task executing a 
+*     Wait for a final acknowledgement from a task executing a
 *     GET/SET/OBEY/CANCEL.
-*     The routine will return when the required message arrives, or if 
-*     it times-out, or if there is an EXTINT event. Requests from the 
-*     task for parameter prompts or output of messages associated with 
-*     the action are automatically forwarded to the user interface. 
-*     Parameter values sent by the user interface are forwarded to the 
+*     The routine will return when the required message arrives, or if
+*     it times-out, or if there is an EXTINT event. Requests from the
+*     task for parameter prompts or output of messages associated with
+*     the action are automatically forwarded to the user interface.
+*     Parameter values sent by the user interface are forwarded to the
 *     task.
 
 *  Arguments:
@@ -33,11 +33,11 @@
 *     MESSID=INTEGER (given)
 *           messid for the action.
 *     OUTVAL=CHARACTER*(*) (returned)
-*           The value string from the task 
+*           The value string from the task
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Get replies from the task, handling parameter requests until the 
+*     Get replies from the task, handling parameter requests until the
 *     final completion message is received.
 
 *  Copyright:
@@ -102,7 +102,7 @@
       INCLUDE 'MESSYS_LEN'
 
 *  Arguments Given:
-      INTEGER TIMEOUT           ! timeout in millisecs. 
+      INTEGER TIMEOUT           ! timeout in millisecs.
                                 ! -1 gives infinite timeout.
 
       INTEGER PATH              ! path to the task
@@ -110,7 +110,7 @@
       INTEGER MESSID            ! messid for the action.
 
 *  Arguments Returned:
-      CHARACTER*(*) OUTVAL      ! The value string from the task 
+      CHARACTER*(*) OUTVAL      ! The value string from the task
 
 *  Status:
       INTEGER STATUS
@@ -127,7 +127,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *
-*    Loop picking up parameter requests until a completion status 
+*    Loop picking up parameter requests until a completion status
 *    is returned from the task.
 *
       FINISHED = .FALSE.

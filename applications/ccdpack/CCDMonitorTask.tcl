@@ -125,7 +125,7 @@
             {^\*\-$} {
                set TASK($task,progress) 100
             }
-            default { 
+            default {
                if {[regexp {Number\ +([0-9]+)\ +of\ +([0-9]+)} $output d n m]} {
                   set TASK($task,progress) [expr ($n*100)/$m]
                }

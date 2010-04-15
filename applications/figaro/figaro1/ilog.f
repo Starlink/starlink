@@ -24,11 +24,11 @@ C
 C     Modified:
 C
 C     24th Jul 1987  DJA/AAO . Revised DSA_ routines - some specs
-C                    changed. Also dynamic memory handling modified - 
+C                    changed. Also dynamic memory handling modified -
 C                    now uses the DYN_ set of routines.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
-C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs 
+C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     26th Jul 1997  MJCL / Starlink, UCL.  Initialise VEXIST to .FALSE.
 C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
@@ -44,7 +44,7 @@ C
       INTEGER   NDIM             ! Dimensionality of input structure
       INTEGER   NELM             ! Total number of elements in data
                                  ! array
-      INTEGER   OPTR             ! Dynamic memory pointer to output 
+      INTEGER   OPTR             ! Dynamic memory pointer to output
                                  ! array
       INTEGER   OSLOT            ! Map slot number for output data
       INTEGER   STATUS           ! Status return from DSA_xxx routines

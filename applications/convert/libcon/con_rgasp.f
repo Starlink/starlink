@@ -75,7 +75,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
       INTEGER LENGTH
 
       CHARACTER FNAME * ( * )
-      
+
 *  Arguments Returned:
       INTEGER*2 ARRAY( WIDTH, LENGTH )
 
@@ -151,5 +151,5 @@
       CALL RIO_CLOSE( FD, STATUS )
 
   999 CONTINUE
-      
+
       END

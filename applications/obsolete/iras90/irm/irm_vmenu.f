@@ -172,7 +172,7 @@
       IF ( MENULN .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'IRM_VMENU_ERR1',
-     :                 'IRM_VMENU: A blank menu has been supplied.', 
+     :                 'IRM_VMENU: A blank menu has been supplied.',
      :                 STATUS )
          GOTO 999
       END IF

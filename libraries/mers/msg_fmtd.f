@@ -13,11 +13,11 @@
 *     CALL MSG_FMTD( TOKEN, FORMAT, DVALUE )
 
 *  Description:
-*     A given DOUBLE PRECISION value is encoded using the supplied 
-*     Fortran 77 format field and the result assigned to the named 
-*     message token. If the token is already defined, the result is 
-*     appended to the existing token value. If this subroutine fails, 
-*     the token remains unmodified. This will be apparent in any 
+*     A given DOUBLE PRECISION value is encoded using the supplied
+*     Fortran 77 format field and the result assigned to the named
+*     message token. If the token is already defined, the result is
+*     appended to the existing token value. If this subroutine fails,
+*     the token remains unmodified. This will be apparent in any
 *     messages which refer to this token.
 
 *  Arguments:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -113,7 +113,7 @@
 *     Load FMT.
          FMT = FORMAT( 1 : ALLOW )
 
-*     Construct the message token string. 
+*     Construct the message token string.
          WRITE ( STR, '( '//FMT//' )', IOSTAT = IOSTAT ) DVALUE
 
 *     Check the Fortran I/O status.

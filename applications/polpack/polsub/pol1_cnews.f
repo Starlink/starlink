@@ -1,25 +1,25 @@
-      SUBROUTINE POL1_CNEWS( CI, FNAME, REPORT, DTYPE, CSIZE, UNITS, 
+      SUBROUTINE POL1_CNEWS( CI, FNAME, REPORT, DTYPE, CSIZE, UNITS,
      :                       EXTFMT, COMM, FI, STATUS)
 *+
 *  Name:
 *     POL1_CNEWS
 
 *  Purpose:
-*     Create a catalogue column, simultaneously setting some of its 
+*     Create a catalogue column, simultaneously setting some of its
 *     attributes.
 
 *  Language:
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL POL1_CNEWS( CI, FNAME, REPORT, DTYPE, CSIZE, UNITS, EXTFMT, 
+*     CALL POL1_CNEWS( CI, FNAME, REPORT, DTYPE, CSIZE, UNITS, EXTFMT,
 *                      COMM, FI, STATUS )
 
 *  Description:
-*     This is a wrapper for CAT_CNEWS which creates a column, simultaneously 
+*     This is a wrapper for CAT_CNEWS which creates a column, simultaneously
 *     setting some of its attributes. This wrapper translates the supplied
-*     standard polpack column name (FNAME) into the actual name which the 
-*     uses wants to use for the column, before calling CAT_CNEWS. 
+*     standard polpack column name (FNAME) into the actual name which the
+*     uses wants to use for the column, before calling CAT_CNEWS.
 
 *  Arguments:
 *     CI = INTEGER (Given)
@@ -108,11 +108,11 @@
             CALL ERR_REP( 'POL1_CNEWS_ERR1B', 'You could try deleting'//
      :                    ' or moving your polpack setup file and '//
      :                    'then re-running this application.', STATUS )
-         END IF     
+         END IF
 
 *  Otherwise, create the column.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         CALL CAT_CNEWS( CI, ENAME, DTYPE, CSIZE, UNITS, EXTFMT, COMM, 
+         CALL CAT_CNEWS( CI, ENAME, DTYPE, CSIZE, UNITS, EXTFMT, COMM,
      :                   FI, STATUS)
       END IF
 

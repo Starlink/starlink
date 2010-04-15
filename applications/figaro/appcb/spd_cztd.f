@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -569,7 +569,7 @@
      :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
      :                         RNELM(1), NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(1) ) ), 
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(1) ) ),
      :                         %VAL( CNF_PVAL( DPNTR2(1) ) ),
      :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
      :                         RNELM(1), NELM3, STATUS )

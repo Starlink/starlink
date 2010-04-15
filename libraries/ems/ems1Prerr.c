@@ -13,7 +13,7 @@
  *     ems1Prerr( text, status )
 
  *  Description:
- *     Send a message to the user using standard C I/O facilities. 
+ *     Send a message to the user using standard C I/O facilities.
  *     Trailing blanks are removed.
 
  *  Arguments:
@@ -134,7 +134,7 @@ void ems1Prerr( const char *text, int *status )
 
                 /*  Call ems1Rform to load the continuation line and write the
                  *  result. */
-                ems1Rform( text, (msgtab->msgwsz)-MAXTAB, &iposn, 
+                ems1Rform( text, (msgtab->msgwsz)-MAXTAB, &iposn,
                            &line[ MAXTAB ], &oplen );
                 iostat = fprintf( OP_STREAM, "%s\n", line );
             }

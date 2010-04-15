@@ -8,10 +8,10 @@
 /*+
  * Name:
  *    shadow
- 
+
  *  Purpose:
  *    Produces a false shadowing effect in an image.
- 
+
  *  Description:
  *     This routine is a demonstration module for IMG. It accesses an
  *     input image, an output image and a temporary image as
@@ -27,12 +27,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -44,19 +44,19 @@
  *  History:
  *     03-JUN-1998 (PWD):
  *         Original Version
- 
+
  *  Notes:
  *     This can be done without the requirement for workspace (with a
  *     little extra effort), but then it wouldn't be an example of how
  *     to get some. Note this workspace is disk based so may be mapped
  *     rather than just read into memory. This technique can be very
  *     useful when dealing with very large images.
- 
+
  *-
  */
 
 /* Prototypes: */
-void do_shift( float *arrin, int nx, int ny, int xshift, int yshift, 
+void do_shift( float *arrin, int nx, int ny, int xshift, int yshift,
                float *arrout, int *istat );
 
 /* Useful defines: */
@@ -94,7 +94,7 @@ F77_SUBROUTINE(shadow)(INTEGER(istat))
    *  putting the result in the output image. */
   /*  Form the difference. */
   for( i=0; i<ny*nx; i++ ) {
-    if ( iptemp[i] != 0.0f ) { 
+    if ( iptemp[i] != 0.0f ) {
       ipout[i] = ipin[i] - iptemp[i];
     } else {
       ipout[i] = 0.0f;
@@ -106,7 +106,7 @@ F77_SUBROUTINE(shadow)(INTEGER(istat))
 
   /*  If an error occurred add the routine name. */
   if( *istat !=  SAI__OK ) {
-    emsRep( "SHADOW_ERR", "SHADOW: failed to produce output image.", 
+    emsRep( "SHADOW_ERR", "SHADOW: failed to produce output image.",
                istat );
   }
 }
@@ -115,7 +115,7 @@ F77_SUBROUTINE(shadow)(INTEGER(istat))
 /*+
  *  Name:
  *    do_shift
- 
+
  *  Purpose:
  *     Shifts a data array writing result into another array.
 
@@ -128,7 +128,7 @@ F77_SUBROUTINE(shadow)(INTEGER(istat))
 
  *-
  */
-void do_shift( float *arrin, int nx, int ny, int xshift, int yshift, 
+void do_shift( float *arrin, int nx, int ny, int xshift, int yshift,
                float *arrout, int *istat )
 {
 
@@ -153,7 +153,7 @@ void do_shift( float *arrin, int nx, int ny, int xshift, int yshift,
   istart = xlow - xshift;
   for( j=ylow; j<yhigh; j++, jj++ ) {
     ii = istart;
-    for( i=xlow; i<xhigh; i++, ii++ ) { 
+    for( i=xlow; i<xhigh; i++, ii++ ) {
       arrout[jj*nx+ii] = arrin[j*nx+i];
     }
   }

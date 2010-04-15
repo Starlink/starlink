@@ -141,13 +141,13 @@ itcl::class gaia::StarArdCircle {
       setard "$desc"
       create_no_resize [code $this set_radius_ $cmd] $coords
    }
-   
+
    #  Set the radius after a static creation command and evaluate the
    #  creation command.
    method set_radius_ {args} {
       $canvas itemconfigure $canvas_id_ \
          -semimajor $rad -semiminor $rad -angle 0
-      if { [lindex $args 0] != {} } { 
+      if { [lindex $args 0] != {} } {
          eval $args
       }
    }
@@ -185,7 +185,7 @@ itcl::class gaia::StarArdCircle {
 
       #  Make sure record of canvas item values is up todate.
       update $canvas_id_ resize
-      lassign $coords x y 
+      lassign $coords x y
       lassign [image_coord $x $y] x y
       set rad [$canvas itemcget $canvas_id_ -semimajor]
       set rad [image_dist $rad]

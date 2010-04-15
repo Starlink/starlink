@@ -20,7 +20,7 @@ final class GSDItemLut {
     // Should this be a singleton class instantiated once
     // or should it be completely static and just create a static
     // map the first time it is called?
-    // It should clearly not redo the mapping each time we 
+    // It should clearly not redo the mapping each time we
     // instantiate an object!
     private final Map shortToLongName;
     private static GSDItemLut onlyOne;
@@ -28,7 +28,7 @@ final class GSDItemLut {
     /**
      * Returns a lookup table object able to translate simple item names
      * to longer more self-describing names and comments.
-     * 
+     *
      * @return The lookup table. Always returns the same object.
      */
     static GSDItemLut getLut() {
@@ -1291,7 +1291,7 @@ final class GSDItemLut {
     /**
      * Given an short item name, returns the corresponding JCMT
      * comment.
-     * 
+     *
      * @param itemName
      * @return The comment. Returns "" if no comment could be found.
       */
@@ -1306,7 +1306,7 @@ final class GSDItemLut {
     }
 
     /**
-     * 
+     *
      * @author timj
      *
      * To change the template for this generated type comment go to

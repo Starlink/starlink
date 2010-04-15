@@ -45,7 +45,7 @@
 *        points.
 *     ORDER = INTEGER (Given)
 *        Order of polynomial to be used for a global fit.  If negative,
-*        indicates that spline fitting is to be used. If positive, 
+*        indicates that spline fitting is to be used. If positive,
 *        ORDER must be less than NP. The maximum polynomial order is 10
 *        (even if ORDER is given greater than that).
 *     NP = INTEGER (Given)
@@ -116,7 +116,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -229,7 +229,7 @@
       IF ( STFLAG ) RPTS=RPTS-1
       IF ( ENFLAG ) RPTS=RPTS-1
 
-*  If the interpolation is performed on the log of the data, 
+*  If the interpolation is performed on the log of the data,
 *  first make sure none of it is negative.
       IF ( LOGFIT ) THEN
          AMIN = WORK(NP+1)
@@ -248,7 +248,7 @@
 *     Before we can perform the spline fit, we have to
 *     see if we need to generate the dummy end values.  We do this
 *     by performing a cubic fit to the end points of the data,
-*     giving (nearly) zero weight to the dummy points, then 
+*     giving (nearly) zero weight to the dummy points, then
 *     evaluating the fits at those points.
          DO I = 1, 5
             WTS(I) = 1D0
@@ -327,7 +327,7 @@
                DATA(IX) = CVAL
             END DO
 
-*     Else if two or more points are given, use a polynomial fit.  
+*     Else if two or more points are given, use a polynomial fit.
          ELSE IF ( RPTS .GT. 1 ) THEN
 
 *        Perform the polynomial fit.  If there are dummy
@@ -393,7 +393,7 @@
          Y2 = WORK(NP+IPTR-IOFF)
          IX = NX
          DO WHILE ( XDATA(IX) .GT. X2 )
-            DATA(IX) = Y1 
+            DATA(IX) = Y1
      :               + ( Y2 - Y1 ) * ( XDATA(IX) - X1 ) / ( X2 - X1 )
             IX = IX - 1
          END DO

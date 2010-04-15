@@ -19,13 +19,13 @@
 *    RC(M) = DOUBLE PRECISION ARRAY (Given)
 *        Residuals on fit?
 *    N = INTEGER (Given)
-*       
+*
 *    WEIGHT(M) = DOUBLE PRECISION ARRAY (Given)
 *        Weights on data points
 *    DATA(M) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    DENS(M) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    AJC(M,N) = DOUBLE PRECISION ARRAY (Returned)
 *        Derivatives
 * History:

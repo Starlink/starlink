@@ -22,12 +22,12 @@
 *  Description:
 *     This application creates a new Frame and optionally initialises its
 *     attributes. A Frame is used to represent a coordinate system. It does
-*     this in rather the same way that a frame around a graph describes the 
-*     coordinate space in which data are plotted. Consequently, a Frame has 
-*     a Title (string) attribute, which describes the coordinate space, and 
-*     contains axes which in turn hold information such as Label and Units 
+*     this in rather the same way that a frame around a graph describes the
+*     coordinate space in which data are plotted. Consequently, a Frame has
+*     a Title (string) attribute, which describes the coordinate space, and
+*     contains axes which in turn hold information such as Label and Units
 *     strings which are used for labelling (e.g.) graphical output. In
-*     general, however, the number of axes is not restricted to two. 
+*     general, however, the number of axes is not restricted to two.
 
 *  Usage:
 *     frame naxes options result
@@ -35,10 +35,10 @@
 *  ADAM Parameters:
 *     NAXES = _INTEGER (Read)
 *        The number of Frame axes (i.e. the number of dimensions of the
-*        coordinate space which the Frame describes). 
+*        coordinate space which the Frame describes).
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new Frame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new Frame.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new Frame.
 
@@ -91,14 +91,14 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the number of axes required.
-      CALL PAR_GDR0I( 'NAXES', 2, 1, NDF__MXDIM, .FALSE., NAX, STATUS ) 
+      CALL PAR_GDR0I( 'NAXES', 2, 1, NDF__MXDIM, .FALSE., NAX, STATUS )
 
 *  Create the required Frame.
       RESULT = AST_FRAME( NAX, ' ', STATUS )

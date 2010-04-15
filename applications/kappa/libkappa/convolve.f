@@ -21,16 +21,16 @@
 *        The global status.
 
 *  Description:
-*     This application smooths an NDF using a Point-Spread Function 
+*     This application smooths an NDF using a Point-Spread Function
 *     given by a second NDF.  The output NDF is normalised to the same
-*     mean data value as the input NDF, and is the same size as the 
+*     mean data value as the input NDF, and is the same size as the
 *     input NDF.
 
 *     The NDF being smoothed may have up to three dimensions.  If it
-*     has three significant dimensions, then the filter must be 
-*     two-dimensional, and it is applied in turn to each plane in the 
-*     cube and the result written to the corresponding plane in the 
-*     output cube.  The orientation of the smoothing plane can be 
+*     has three significant dimensions, then the filter must be
+*     two-dimensional, and it is applied in turn to each plane in the
+*     cube and the result written to the corresponding plane in the
+*     output cube.  The orientation of the smoothing plane can be
 *     specified using the AXES parameter.
 
 *  Usage:
@@ -38,12 +38,12 @@
 
 *  ADAM Parameters:
 *     AXES(2) = _INTEGER (Read)
-*        This parameter is only accessed if the NDF has exactly three 
+*        This parameter is only accessed if the NDF has exactly three
 *        significant pixel axes.  It should be set to the indices of the
 *        NDF pixel axes which span the plane in which smoothing is to
-*        be applied.  All pixel planes parallel to the specified plane 
-*        will be smoothed independently of each other.  The dynamic 
-*        default is the indices of the first two significant axes in 
+*        be applied.  All pixel planes parallel to the specified plane
+*        will be smoothed independently of each other.  The dynamic
+*        default is the indices of the first two significant axes in
 *        the NDF. []
 *     IN = NDF (Read)
 *        The input NDF containing the array to be smoothed.
@@ -234,10 +234,10 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
       INTEGER NLIN               ! Second dimension for internal arrays
       INTEGER NPIX               ! First dimension for internal arrays
-      INTEGER PAXHI              ! Upper pixel bound of perp. axis 
-      INTEGER PAXLO              ! Lower pixel bound of perp. axis 
-      INTEGER PAXVAL             ! Current pixel value on perp. axis 
-      INTEGER PERPAX             ! Index of axis perp. to smoothing 
+      INTEGER PAXHI              ! Upper pixel bound of perp. axis
+      INTEGER PAXLO              ! Lower pixel bound of perp. axis
+      INTEGER PAXVAL             ! Current pixel value on perp. axis
+      INTEGER PERPAX             ! Index of axis perp. to smoothing
                                  ! plane
       INTEGER PSFXSZ             ! Width of PSF on 1st axis
       INTEGER PSFYSZ             ! Width of PSF on 2nd axis
@@ -268,7 +268,7 @@
 *  Obtain the input NDF, its significant axes up to the maximum two
 *  dimensions for processing, and the NDF's bounds.  If the NDF
 *  possesses three significant dimensions, obtain an iteration axis
-*  through parameter AXES, so that planes along that axis can be 
+*  through parameter AXES, so that planes along that axis can be
 *  processed in sequence.
       CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', INDFI, SDIMI, LBND,
      :                 UBND, PERPAX, STATUS )
@@ -293,13 +293,13 @@
 
 *  Get the NDF containing the PSF, ensuring that it has no more than
 *  two significant dimensions, unless the input NDF has three
-*  significant dimensions, whereupon the PSF must be two-dimensional.  
+*  significant dimensions, whereupon the PSF must be two-dimensional.
 *  Also find the axes to use and their bounds.
       IF ( PERPAX .GT. 0 ) THEN
-         CALL KPG1_GTNDF( 'PSF', NDIM, .TRUE., 'READ', INDFP, SDIMP, 
+         CALL KPG1_GTNDF( 'PSF', NDIM, .TRUE., 'READ', INDFP, SDIMP,
      :                    SLBNDP, SUBNDP, STATUS )
       ELSE
-         CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDFP, SDIMP, 
+         CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDFP, SDIMP,
      :                    SLBNDP, SUBNDP, STATUS )
       END IF
 
@@ -325,13 +325,13 @@
 *  and set WLIM negative, annulling the error.
       CALL PAR_GDR0R( 'WLIM', 0.5, 0.0, 1.0, .FALSE., WLIM, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
-         WLIM = -1.0 
+         WLIM = -1.0
          CALL ERR_ANNUL( STATUS )
 
 *  If WLIM is exactly 1.0 reduce it slightly (rounding errors, etc. can
 *  mean that a pixel weight may be less than 1 even if all input pixels
 *  are good).
-      ELSE 
+      ELSE
          WLIM = MIN( WLIM, 0.9999 )
 
       END IF
@@ -351,7 +351,7 @@
 *  Get the approximate width of the PSF along both array axes.
 *  Internal arrays will be padded with a blank margin of this size to
 *  reduce edge effects caused by wrap-around in the convolution.
-      CALL KPG1_PSFSD( %VAL( CNF_PVAL( IPP ) ), DIMP( 1 ), DIMP( 2 ), 
+      CALL KPG1_PSFSD( %VAL( CNF_PVAL( IPP ) ), DIMP( 1 ), DIMP( 2 ),
      :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 W1DIM( 1 ), W1DIM( 2 ), PSFFRA, 1, PSFXSZ,
      :                 PSFYSZ, STATUS )
@@ -375,16 +375,16 @@
 *  ====================================
 
 *  Propagate the output NDF from the input array NDF, copying WCS,
-*  UNITS, AXIS, and QUALITY components (the default components HISTORY, 
+*  UNITS, AXIS, and QUALITY components (the default components HISTORY,
 *  TITLE, LABEL, and all extensions are also copied).
-      CALL LPG_PROP( INDFI, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDFO, 
+      CALL LPG_PROP( INDFI, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDFO,
      :               STATUS )
 
 *  Get the required workspace.
       CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW2, STATUS )
       CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW3, STATUS )
       CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW4, STATUS )
-      CALL PSX_CALLOC( 3 * MAX( NPIX, NLIN ) + 15, '_DOUBLE', IPW5, 
+      CALL PSX_CALLOC( 3 * MAX( NPIX, NLIN ) + 15, '_DOUBLE', IPW5,
      :                 STATUS )
 
 *  Abort if an error has occurred.
@@ -417,19 +417,19 @@
 
 *  Abort if an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  Call a lower level routine to do the work.
-         CALL KPS1_CNVLV( VAR, DIMI( 1 ), DIMI( 2 ), 
+         CALL KPS1_CNVLV( VAR, DIMI( 1 ), DIMI( 2 ),
      :                    %VAL( CNF_PVAL( IPI( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( IPI( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPI( 2 ) ) ),
      :                    DIMP( 1 ), DIMP( 2 ),
-     :                    %VAL( CNF_PVAL( IPP ) ), 
+     :                    %VAL( CNF_PVAL( IPP ) ),
      :                    XCEN - SLBNDP( 1 ) + 1,
-     :                    YCEN - SLBNDP( 2 ) + 1, NPIX, NLIN, WLIM, 
-     :                    %VAL( CNF_PVAL( IPO( 1 ) ) ), 
+     :                    YCEN - SLBNDP( 2 ) + 1, NPIX, NLIN, WLIM,
+     :                    %VAL( CNF_PVAL( IPO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPO( 2 ) ) ), BADOUT, ISTAT,
-     :                    %VAL( CNF_PVAL( IPW2 ) ), 
-     :                    %VAL( CNF_PVAL( IPW3 ) ), 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    %VAL( CNF_PVAL( IPW3 ) ),
      :                    %VAL( CNF_PVAL( IPW4 ) ),
      :                    %VAL( CNF_PVAL( IPW5 ) ), STATUS )
 
@@ -470,7 +470,7 @@
 *  Obtain a new title for the output NDF, with the default value
 *  being the input array title.
       CALL KPG1_CCPRO( 'TITLE', 'Title', INDFI, INDFO, STATUS )
-      
+
 *  Jump to here if an error has occurred.
  999  CONTINUE
 
@@ -480,7 +480,7 @@
       CALL PSX_FREE( IPW3, STATUS )
       CALL PSX_FREE( IPW4, STATUS )
       CALL PSX_FREE( IPW5, STATUS )
-      
+
 *  If an error occurred, delete the output NDF.
       IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDFO, STATUS )
 
@@ -492,5 +492,5 @@
          CALL ERR_REP( 'CONVOLVE_ERR2', 'CONVOLVE: Unable to '/
      :                 /'convolve two NDFs.', STATUS )
       END IF
-      
+
       END

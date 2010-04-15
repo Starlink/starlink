@@ -13,38 +13,38 @@
 *     CALL KPG1_ASPSY( SYNON, TRAN, STATUS )
 
 *  Description:
-*     This routine establishes synonyms for AST attribute names or 
-*     attribute qualifiers (qualifiers are strings in parenthesise following 
+*     This routine establishes synonyms for AST attribute names or
+*     attribute qualifiers (qualifiers are strings in parenthesise following
 *     the attribute name - the "graphical elements" used by some Plot
 *     attributes are examples of qualifiers). The routine KPG1_ASCHP is
-*     used to translated synonyms into values recognised by AST. 
+*     used to translated synonyms into values recognised by AST.
 *
 *     Note, substitutions for synonyms are performed in the order in
 *     which they are defined, with later substitutions potentially
-*     modifying the results of earlier substitutions. For this reason, 
-*     synonyms for specific name/qualifer pairs (eg "FORMAT(VEC*TOR)" ) 
-*     should be defined *before* synonyms for qualifiers alone (eg 
-*     "(VEC*TOR)" ). If these two examples were defined in the opposite 
-*     order, then the qualifier in FORMAT(VEC) (i.e. "VEC") would get 
-*     replaced by the translation supplied for synonym "(VEC*TOR)", so 
-*     that the resulting string would then fail to match the synonym 
+*     modifying the results of earlier substitutions. For this reason,
+*     synonyms for specific name/qualifer pairs (eg "FORMAT(VEC*TOR)" )
+*     should be defined *before* synonyms for qualifiers alone (eg
+*     "(VEC*TOR)" ). If these two examples were defined in the opposite
+*     order, then the qualifier in FORMAT(VEC) (i.e. "VEC") would get
+*     replaced by the translation supplied for synonym "(VEC*TOR)", so
+*     that the resulting string would then fail to match the synonym
 *     "FORMAT(VEC*TOR)" and so would not result in the correct translation.
 
 *  Arguments:
 *     SYNON = CHARACTER * ( * ) (Given)
 *        A synonym for an AST attribute name and/or qualifier. The
-*        supplied value is converted to upper case, and stripped of spaces. 
+*        supplied value is converted to upper case, and stripped of spaces.
 *        If the synonym contains just a qualifier (i.e. no attribute
-*        name), then KPG1_ASCHP will substitute the qualifier from the 
+*        name), then KPG1_ASCHP will substitute the qualifier from the
 *        translation irespective of the attribute name. Minimum
 *        abbreviations for attribute qualifiers may be given by including
-*        an asterisk in the qualifier to mark the end of the minimum 
-*        abbreviation. If a blank value is supplied, then the resources used 
-*        to store the synonyms and translations are released. 
+*        an asterisk in the qualifier to mark the end of the minimum
+*        abbreviation. If a blank value is supplied, then the resources used
+*        to store the synonyms and translations are released.
 *     TRAN = CHARACTER * ( * ) (Given)
-*        The translation for the supplied synonym. This should be a legal 
+*        The translation for the supplied synonym. This should be a legal
 *        AST attribute name/qualifier combination (but no check is made
-*        on this). The supplied value is converted to upper case, and 
+*        on this). The supplied value is converted to upper case, and
 *        stripped of spaces.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,8 +92,8 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Arguments Given:
-      CHARACTER SYNON*(*) 
-      CHARACTER TRAN*(*) 
+      CHARACTER SYNON*(*)
+      CHARACTER TRAN*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -140,8 +140,8 @@
          IF( .NOT. VALID ) THEN
             IF( VALID1 ) CALL GRP_DELET( ASTING, STATUS )
             IF( VALID2 ) CALL GRP_DELET( ASTOUG, STATUS )
-            CALL GRP_NEW( 'AST attribute names', ASTOUG, STATUS ) 
-            CALL GRP_NEW( 'AST attribute syonyms', ASTING, STATUS ) 
+            CALL GRP_NEW( 'AST attribute names', ASTOUG, STATUS )
+            CALL GRP_NEW( 'AST attribute syonyms', ASTING, STATUS )
             ASTNPS = 0
          END IF
 

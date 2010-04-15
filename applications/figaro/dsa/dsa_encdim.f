@@ -7,13 +7,13 @@ C     Encodes dimension information into a character string.
 C
 C     Parameters -   (">" input, "!" modified, "<" output)
 C
-C     (>) CHARS    (String) The string into which to encode the 
+C     (>) CHARS    (String) The string into which to encode the
 C                  dimensions.
 C     (>) NDIM     (Integer) The number of dimensions in the array.
 C     (>) DIMS     (Integer array DIMS(NDIM)) The dimensions of the
 C                  array.
 C     (!) IPT      (Integer) Character number. Passed as the character
-C                  at which to start the encoding (ie where the '[' 
+C                  at which to start the encoding (ie where the '['
 C                  goes) and returned as the number of the last character
 C                  used (the one where the ']' went).
 C

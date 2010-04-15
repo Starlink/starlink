@@ -226,10 +226,10 @@
 *     SKYFLUX images are processed in the same way as ISSA images,
 *     with the following exceptions:
 *
-*     1) It is assumed that the second axis of the input data array is 
-*     in the direction of decreasing DEC. The output data array is 
-*     flipped in the second dimension to make the second axis increase 
-*     in the direction of increasing DEC (i.e. so that north is upwards 
+*     1) It is assumed that the second axis of the input data array is
+*     in the direction of decreasing DEC. The output data array is
+*     flipped in the second dimension to make the second axis increase
+*     in the direction of increasing DEC (i.e. so that north is upwards
 *     when the image is displayed normally).
 *
 *     2) The following information is stored in the IRAS extension;
@@ -308,7 +308,7 @@
 *     with the following exceptions:
 *
 *     1) The images are assumed to be orthographic projections of the
-*     sky. The value of the keyword CROTA2 is assumed to be 360 degrees 
+*     sky. The value of the keyword CROTA2 is assumed to be 360 degrees
 *     minus the position angle of the second image axis.
 *
 *     2) The following information is stored in the IRAS extension;
@@ -330,7 +330,7 @@
 *
 *     2) The projection used to create the image is that given by
 *     parameter PROJTYPE.
-*     
+*
 *     3) The data comes from the survey array of detectors.
 *
 *     4) If non-zero, FITS keyword CROTA1 gives the position angle of
@@ -341,10 +341,10 @@
 *     5) The FITS keywords CRVAL1 and CRVAL2 give the coordinates of a
 *     reference point, in the sky coordinate system given by parameter
 *     COORDS.
-*     
+*
 *     The only extra information stored in the IRAS extension is the
 *     waveband, and a flag that the image is from an unknown source.
-*     
+*
 *     If the units of the input image are unusual then the user will be
 *     asked for the factor for converting input data values into the
 *     units specified by parameter UNITS. The parameter FACTOR is used
@@ -364,7 +364,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -415,15 +415,15 @@
 *  MSG_LEVEL.
       CALL MSG_IFGET( STATUS )
 
-*  Get a value for parameter COORDS. The system in which parameters 
-*  FIELDLON and FIELDLAT are specified. Also, if the input image if of 
+*  Get a value for parameter COORDS. The system in which parameters
+*  FIELDLON and FIELDLAT are specified. Also, if the input image if of
 *  an unrecognised type, FITS keywords CRVAL1 and CRVAL2 are assumed to
 *  be in the system specified by COORDS.
       CALL IRA_GTSCS( 'COORDS', .FALSE., SCS, STATUS )
 
-*  Get a value for parameter PROJTYPE. This is the default projection 
+*  Get a value for parameter PROJTYPE. This is the default projection
 *  type to be assumed for any unrecognised input images.
-      CALL IRA_IPROJ( PRJLS, STATUS )    
+      CALL IRA_IPROJ( PRJLS, STATUS )
       CALL PAR_CHOIC( 'PROJTYPE', ' ', PRJLS, .FALSE., PROJ, STATUS )
 
 *  Get a group containing the names of the input NDFs to be prepared.
@@ -447,7 +447,7 @@
 *  GRP__NOID is returned for IGRP5 if no labels are given.
       CALL PREPA0( 'LABEL', SIZE, '  Give more NDF labels...', IGRP(4),
      :              STATUS )
-  
+
 *  Get groups holding the field longitudes and latitudes for the output
 *  NDFs. IGRP6 and IGRP7 are both returned equal to GRP__NOID if either
 *  longitude or latitude are not supplied.
@@ -567,13 +567,13 @@
       CALL GRP_GRPSZ( IGRP(8), NOUT, STATUS )
 
 *  Assign a group expression to the output parameter NDFLIST which
-*  specifies all the output NDFs. NDFLIST should normally be associated 
-*  with a suitable global parameter to cause its value to be passed on 
-*  to the next application.  The output parameter NDFLIST is not 
-*  advertised as a user parameter since users will normally not be 
-*  aware of the existence of global parameter, and so will not know 
+*  specifies all the output NDFs. NDFLIST should normally be associated
+*  with a suitable global parameter to cause its value to be passed on
+*  to the next application.  The output parameter NDFLIST is not
+*  advertised as a user parameter since users will normally not be
+*  aware of the existence of global parameter, and so will not know
 *  how to assign a value to it.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP(8), 'PREPARE', 
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP(8), 'PREPARE',
      :                                   STATUS )
 
 *  End the NDF context.
@@ -592,7 +592,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

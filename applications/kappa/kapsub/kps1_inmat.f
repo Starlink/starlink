@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine matches NDF bounds and data types for a group of
-*     NDFs.  The NDF identifiers and the commom dimensionality of the 
+*     NDFs.  The NDF identifiers and the commom dimensionality of the
 *     NDFs are returned.
 
 *  Arguments:
@@ -23,8 +23,8 @@
 *     NNDF = INTEGER (Given)
 *        The number of NDFs in the group (size of IGRP).
 *     STRIM = CHARACTER * ( * ) (Given)
-*        Whether the common region should be the union ('PAD') or 
-*        intersection ('TRIM') of the input NDFs.  As presented to 
+*        Whether the common region should be the union ('PAD') or
+*        intersection ('TRIM') of the input NDFs.  As presented to
 *        NDF_MBNDN.
 *     INDFS( NNDF ) = INTEGER (Returned)
 *        NDF identifiers of matched NDF sections for the input NDFs.
@@ -107,7 +107,7 @@
 *  Find its dimensionality.
          CALL NDF_DIM( INDFS( I ), NDF__MXDIM, DIM, NDIMC, STATUS )
 
-*  Check that this has the same dimensionality as the first one in the 
+*  Check that this has the same dimensionality as the first one in the
 *  list, and bail out if not.
          IF ( I .EQ. 1 ) THEN
             NDIM = NDIMC

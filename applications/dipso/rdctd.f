@@ -13,11 +13,11 @@
 *     CALL RDCTD( COMM, CI, GX, GY, WORV, NAME, STATUS )
 
 *  Description:
-*     If the catalogue is too large to fit into the common data arrays, 
-*     a warning is given and as much as there is room for is copied to 
-*     the X and Y arrays. 
+*     If the catalogue is too large to fit into the common data arrays,
+*     a warning is given and as much as there is room for is copied to
+*     the X and Y arrays.
 *
-*     The BREAKS array is assumed to contain a single value equal to the 
+*     The BREAKS array is assumed to contain a single value equal to the
 *     number of rows in the catalogue, and WORV is assumed to be 1.0.
 
 *  Arguments:
@@ -32,7 +32,7 @@
 *     WORV = REAL (Returned)
 *        The WORV value.
 *     NAME = CHARACTER * ( * ) (Returned)
-*        The NAME obtained from the catalogue, or a blank if the catalogue 
+*        The NAME obtained from the catalogue, or a blank if the catalogue
 *        has no title.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -66,11 +66,11 @@
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
-*        ASIZE1 = INTEGER (Read)  
+*        ASIZE1 = INTEGER (Read)
 *           The declared size of the X and Y current arrays.
 
       INCLUDE 'DECLARE_DATA'     ! DIPSO current arrays
-*        MAXBRK = INTEGER (Read)  
+*        MAXBRK = INTEGER (Read)
 *           The declared size of the break current array.
 *        BREAK( MAXBRK ) = INTEGER (Write)
 *           The pixel indices at which breaks occur in the X and Y
@@ -115,7 +115,7 @@
 *  Get the number of rows in the catalogue.
       CALL CAT_TROWS( CI, NPOINT, STATUS )
 
-*  Issue a warning if the catalogue is too big, and restrict the 
+*  Issue a warning if the catalogue is too big, and restrict the
 *  number of elements transferred.
       IF( NPOINT .GT. ASIZE1 ) THEN
          CALL MSG_SETI( 'NP', NPOINT )
@@ -133,7 +133,7 @@
 
 *  Copy the data into the common array, storing VAL__BADR for missing
 *  values.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          DO ROW = 1, NPOINT
             CALL CAT_RGET( CI, ROW, STATUS )
 
@@ -156,8 +156,8 @@
       CALL MSGOUT( COMM, '^NP data values read.', .FALSE., STATUS )
 
 *  Call a routine which will remove any "missing" (i.e. bad) values,
-*  storing suitable breaks. 
-      CALL BADCHK( COMM, VAL__BADR, ASIZE1, MAXBRK, NPOINT, WAVE, FLUX, 
+*  storing suitable breaks.
+      CALL BADCHK( COMM, VAL__BADR, ASIZE1, MAXBRK, NPOINT, WAVE, FLUX,
      :             NBREAK, BREAK, WORKI, STATUS )
 
 *  Jump to here if an error occurs.
@@ -166,4 +166,4 @@
 *  If an error has occurred, set the current array size to zero.
       IF( STATUS .NE. SAI__OK ) NPOINT = 0
 
-      END 
+      END

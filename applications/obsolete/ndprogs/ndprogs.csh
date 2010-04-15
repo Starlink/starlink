@@ -49,13 +49,13 @@ else
    endif
 endif
 #
-#  If there is currently no definition of the environment variable 
+#  If there is currently no definition of the environment variable
 #  NDPROGS_DIR, set one up pointing to /star/bin/ndprogs.
 if !($?NDPROGS_DIR) then
    setenv NDPROGS_DIR INSTALL_BIN
 endif
 #
-#  If there is currently no definition of the environment variable 
+#  If there is currently no definition of the environment variable
 #  NDPROGS_HELP, set one up pointing to /star/help/ndprogs.
 if !($?NDPROGS_HELP) then
    setenv NDPROGS_HELP INSTALL_HELP/ndprogshelp

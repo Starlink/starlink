@@ -1,4 +1,4 @@
-      SUBROUTINE CHR_DCWRD( STRING, MXWRD, NWRD, START, STOP, WORDS, 
+      SUBROUTINE CHR_DCWRD( STRING, MXWRD, NWRD, START, STOP, WORDS,
      :                      LSTAT )
 *+
 *  Name:
@@ -14,26 +14,26 @@
 *     CALL CHR_DCWRD( STRING, MXWRD, NWRD, START, STOP, WORDS, LSTAT )
 
 *  Description:
-*     All the words in the given character string are detected and 
-*     returned as individual elements of a character array. In this 
-*     context, a word is defined as a continuous string of non-blank 
-*     characters. Hence words must be separated from each other by 
+*     All the words in the given character string are detected and
+*     returned as individual elements of a character array. In this
+*     context, a word is defined as a continuous string of non-blank
+*     characters. Hence words must be separated from each other by
 *     one or more blanks.
 
 *  Arguments:
 *     STRING = CHARACTER * ( * ) (Given)
 *        The string to be split into its constituent words.
 *     MXWRD = INTEGER (Given)
-*        The maximum number of words that can be extracted from the 
-*        given string: if there are more than MXWRD words in the 
+*        The maximum number of words that can be extracted from the
+*        given string: if there are more than MXWRD words in the
 *        string, only the first MXWRD will be returned.
 *     NWRD = INTEGER (Returned)
 *        The number of words located in the string.
 *     START( MXWRD ) = INTEGER (Returned)
-*        The Ith element contains the position of the first element 
+*        The Ith element contains the position of the first element
 *        of the Ith word in the given string.
 *     STOP( MXWRD ) = INTEGER (Returned)
-*        The Ith element contains the position of the last element of 
+*        The Ith element contains the position of the last element of
 *        the Ith word in the given string.
 *     WORDS( MXWRD ) = CHARACTER * ( * ) (Returned)
 *        The Ith element contains the Ith word located in the given
@@ -41,7 +41,7 @@
 *     LSTAT = INTEGER (Returned)
 *        The local status. This is a return status only: the routine
 *        is not affected by the value on input. It has the following
-*        values: SAI__OK for successful completion, SAI__ERROR if the 
+*        values: SAI__OK for successful completion, SAI__ERROR if the
 *        number of words exceeds MXWRD.
 
 *  Algorithm:
@@ -54,7 +54,7 @@
 *         Set the start position of the first word to 1.
 *       end if
 *       For all string elements from the second to the last:
-*         If the previous element is blank and this element is 
+*         If the previous element is blank and this element is
 *         non-blank then
 *           If there is still space for more words then
 *             increment the word counter.
@@ -91,12 +91,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -114,7 +114,7 @@
 *     30-JUN-1984 (ACD):
 *        Modified for inclusion in the CHR_ library.
 *     16-NOV-1984 (ACD):
-*        Name changed from CHR_STRDEC to CHR_DCWRD in order to meet 
+*        Name changed from CHR_STRDEC to CHR_DCWRD in order to meet
 *        the naming convention.
 *     3-OCT-1988 (AJC):
 *        Improved documentation.
@@ -201,7 +201,7 @@
                END IF
 
 *        Check for the end of a word.
-            ELSE IF ( ( CURCHR .EQ. ' ' ) 
+            ELSE IF ( ( CURCHR .EQ. ' ' )
      :                .AND. ( LSTCHR .NE. ' ' ) ) THEN
                STOP( NWRD ) = CINDEX - 1
             END IF
@@ -214,7 +214,7 @@
 *     Check whether the last element of 'STRING' is non-blank.
 *     If so this terminates the last word.
          IF ( LSTAT .EQ. SAI__OK ) THEN
-            IF ( STRING( STRGLN : STRGLN ) .NE. ' ' ) 
+            IF ( STRING( STRGLN : STRGLN ) .NE. ' ' )
      :      STOP( NWRD ) = STRGLN
          END IF
 

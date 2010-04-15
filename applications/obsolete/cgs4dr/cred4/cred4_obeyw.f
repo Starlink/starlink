@@ -15,7 +15,7 @@
 *           Character string value. This should contain an argument to
 *           be supplied to the action. Any output is returned here.
 *     STATUS   = INTEGER( UPDATE )
-*           Global status. 
+*           Global status.
 *    Authors :
 *     S M Beard  (UK.AC.ROE.STAR::SMB)
 *     P N Daly (JACH.HAWAII.EDU::PND)
@@ -58,7 +58,7 @@
 *   Check the action has started successfully.
       IF ( STATUS .EQ. DTASK__ACTSTART ) THEN
 
-*      Reset the status 
+*      Reset the status
          CALL ERR_ANNUL( STATUS )
 
 *      Wait indefinitely for completion of the action
@@ -82,7 +82,7 @@
             CALL ERR_REP( ' ', 'CRED4_OBEYW: '/
      :        /'Failure of ^NAME action '/
      :        /'reported by the ^TASK_NAME task '/
-     :        /'(Status = ^ES, message follows)', STATUS ) 
+     :        /'(Status = ^ES, message follows)', STATUS )
             CALL MSG_SETC( 'OUTVAL', OUTVAL )
             CALL ERR_REP( ' ', 'CRED4_OBEYW: '/
      :        /'^OUTVAL', STATUS )

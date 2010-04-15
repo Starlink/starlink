@@ -1,13 +1,13 @@
-      SUBROUTINE XCORRE (PMASK, LAGLO, LAGHI, WAVE1, F1, N1, 
+      SUBROUTINE XCORRE (PMASK, LAGLO, LAGHI, WAVE1, F1, N1,
      +                  WAVE2, F2, N2, LAG, XCOR, NXC, OK)
 C
-C  Program evaluates cross-correlation of two functions F1 and F2.  
+C  Program evaluates cross-correlation of two functions F1 and F2.
 C i.e routine evaluates XCOR(u) where
-C       XCOR(u) = 1/(RmsF1*RmsF2) . integral[F1(x).F2(x+u)]dx      
+C       XCOR(u) = 1/(RmsF1*RmsF2) . integral[F1(x).F2(x+u)]dx
 C
 C  NB: WAVE1 and WAVE2 are assumed to be in similar units.
 C      LAG, u,  is returned in the same units as WAVE1 and WAVE2.
-C 
+C
       IMPLICIT NONE
 C  Imports:-
       DOUBLE PRECISION PMASK               ! Fraction of data (either end) to be
@@ -67,12 +67,12 @@ C  Interpolate datapairs (WAVE1,F1) onto grid with evenly spaced abscissae:
 C (IWAVE1,IF1).
 C  Spacing between WAVE values will be SUM; there will be NI1 interpolated
 C datapairs.
-C  NI1 will be less than N1 since some points will be lost during the 
-C interpolation. 
+C  NI1 will be less than N1 since some points will be lost during the
+C interpolation.
 C
         WRITE (*,
      :  '(''   XCORR:  interpolating first function...'')')
-        CALL LAGINT (WAVE1, F1, N1, WAVE1(2), SUM, 
+        CALL LAGINT (WAVE1, F1, N1, WAVE1(2), SUM,
      +                     IWAVE1, IF1, NI1, 4, OK)
         IF ( .NOT.OK ) RETURN
 C
@@ -120,7 +120,7 @@ C
 C
       DO 200, I2 = 1, NXC
         I = I2 - 1 + XCLO
-        LAG(I2) = REAL( SUM * DBLE(I) ) 
+        LAG(I2) = REAL( SUM * DBLE(I) )
         XCOR(I2) = 0.0
         A1 = 0.0D+00
         A2 = 0.0D+00
@@ -129,7 +129,7 @@ C
             A1 = A1 + IF1(K)**2
             A2 = A2 + IF2(K+I+Z)**2
             XCOR(I2) = REAL( DBLE(XCOR(I2)) + (IF1(K) * IF2(K+I+Z)) )
-          ENDIF  
+          ENDIF
   100   CONTINUE
         A = DSQRT( A1 * A2 )
         IF ( A .LE. 1.0D-20 ) THEN
@@ -152,6 +152,6 @@ C
       DO 400, I=1,N2
         WAVE2(I) = IWAVE2(I)
         F2(I) = IF2(I)
-  400 CONTINUE 
+  400 CONTINUE
       RETURN
-      END      
+      END

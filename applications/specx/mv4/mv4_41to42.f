@@ -14,7 +14,7 @@
 
 * Description:
 *     Converts an old HDS format map to the new format.
-*      
+*
 
 *  Arguments:
 *     Old filename (changed to the new one on return) and STATUS
@@ -28,7 +28,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     11 Oct 1995 (timj): 
+*     11 Oct 1995 (timj):
 *         First attempt
 *     16 Aug 2004 (timj):
 *         Use CNF_PVAL
@@ -38,8 +38,8 @@
 *     {note_any_bugs_here}
 
 *-
-      
-      
+
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,14 +138,14 @@
 
 *  Need to open the new file for WRITE access
 
-      CALL NDF_OPEN( DAT__ROOT, NEWNAME, 'WRITE', 'NEW', NEWNDF, 
+      CALL NDF_OPEN( DAT__ROOT, NEWNAME, 'WRITE', 'NEW', NEWNDF,
      :               MPLACE, STATUS )
 
 *  Copy information into it from the old map
 
       PRINT *, '    Copying map structures to new format file...'
 
-      CALL NDF_SCOPY( OLDNDF, 'DATA,NOEXTENSION(POSN)', MPLACE, 
+      CALL NDF_SCOPY( OLDNDF, 'DATA,NOEXTENSION(POSN)', MPLACE,
      :     NEWNDF, STATUS )
 
 *  Modify the version number
@@ -210,7 +210,7 @@
          CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ',
      :        IPTR, DUMMY, STATUS )
 *  Copy the data through the pointers
-         CALL MV4_41COPY( %VAL(CNF_PVAL(PPTR)), %VAL(CNF_PVAL(IPTR)), 
+         CALL MV4_41COPY( %VAL(CNF_PVAL(PPTR)), %VAL(CNF_PVAL(IPTR)),
      :        CNT, NUMPTS, NUMSPEC )
          CALL NDF_UNMAP( INDF, 'DATA', STATUS )
          CALL NDF_ANNUL( INDF, STATUS )
@@ -230,9 +230,9 @@
 
 
       SUBROUTINE MV4_41COPY( NEWDAT, OLDDAT, IDXNUM, NUMPTS, NUMSPEC )
- 
+
       IMPLICIT NONE
- 
+
       INTEGER IDXNUM, NUMPTS, NUMSPEC
       REAL NEWDAT( NUMPTS, NUMSPEC )
       REAL OLDDAT( NUMPTS )

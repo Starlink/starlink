@@ -30,7 +30,7 @@
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -40,7 +40,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (N.LE.1) THEN
 *
 *   1.  Equatorial to Plate Co-ords.
@@ -54,7 +54,7 @@
          TN =  FL*CACD + FM*SACD + FN*SD
          X  = REAL( TL/TN )
          Y  = REAL( TM/TN )
- 
+
       ELSE
 *
 *   2.  Plate Co-ords to Equatorial
@@ -72,8 +72,8 @@
          RA  = DMOD(A,TWOPI)
          T   = SQRT(FL*FL + FM*FM)
          DEC = ATAN2(FN,T)
- 
+
       ENDIF
- 
+
       END
- 
+

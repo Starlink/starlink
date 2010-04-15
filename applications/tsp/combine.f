@@ -11,13 +11,13 @@ C        Combine two Polarization Datasets
 C
 C     Description:
 C        Two Polarization datasets are added to form a new one of
-C        higher signal to noise ratio. Any number of Stokes parameters 
-C        may be present in the data, but only Stokes parameters present 
+C        higher signal to noise ratio. Any number of Stokes parameters
+C        may be present in the data, but only Stokes parameters present
 C        in both spectra will appear in the output.
-C                 
+C
 C        COMBINE adds the intensity, Stokes parameters and variances
 C        and is therefore appropriate for combining data in the form
-C        of IPCS or CCD counts, but not for combining flux calibrated 
+C        of IPCS or CCD counts, but not for combining flux calibrated
 C        data.
 C
 C     Parameters:
@@ -32,7 +32,7 @@ C
 C-
 C
 C  History:
-C    27/4/1988   Original Version.   JAB/AAO  
+C    27/4/1988   Original Version.   JAB/AAO
 C    15/8/1988   Allow more than one stokes parameter in
 C                the input spectra.   JAB/AAO
 C    19/8/1988   Correct bug in above change.   JAB/AAO
@@ -46,7 +46,7 @@ C+
       INTEGER STATUS
       INTEGER PTR1,PTR2,SPTR1,SPTR2,VPTR1,VPTR2
       CHARACTER*(DAT__SZLOC) LOC1,LOC2,OLOC,DLOC1,DLOC2
-      CHARACTER*(DAT__SZLOC) SDLOC1,SDLOC2,VDLOC1,VDLOC2  
+      CHARACTER*(DAT__SZLOC) SDLOC1,SDLOC2,VDLOC1,VDLOC2
       CHARACTER*(DAT__SZLOC) QLOC1,QLOC2,ULOC1,ULOC2,VLOC1,VLOC2
       INTEGER NDIMS,DIMS(7)
       INTEGER SIZE,SIZE2
@@ -60,7 +60,7 @@ C+
       CALL DAT_ASSOC('INPUT2','READ',LOC2,STATUS)
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
- 
+
       CALL TSP_COPY(LOC1,OLOC,STATUS)
 
 *  Get the intensity data from both datasets and check dimensions
@@ -91,12 +91,12 @@ C+
          CALL MSG_OUT('MSG','Input 1 and 2 Dimensions are different',
      :          STATUS)
          STATUS = USER__001
-      ENDIF         
+      ENDIF
       CALL TSP_MAP_DATA(OLOC,'UPDATE',PTR1,DLOC1,STATUS)
       CALL TSP_MAP_DATA(LOC2,'READ',PTR2,DLOC2,STATUS)
 
 *  Get the Stokes data from output dataset
-                                  
+
       CALL TSP_STOKES(OLOC,NUM,QZ1,UZ1,VZ1,STATUS)
       IF (QZ1) THEN
           CALL TSP_GET_STOKES(OLOC,'Q',QLOC1,STATUS)
@@ -121,7 +121,7 @@ C+
       ENDIF
 
 *  Sum the Stokes arrays and variances
-      
+
       VARS = .TRUE.
       IF (QZ1) THEN
           CALL TSP_MAP_DATA(QLOC1,'UPDATE',SPTR1,SDLOC1,STATUS)
@@ -138,16 +138,16 @@ C+
                   VARS = .FALSE.
               ENDIF
               CALL TSP_COMBINE(SIZE,%VAL(SPTR1),%VAL(SPTR2))
-              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))  
+              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
               CALL TSP_UNMAP(SDLOC2,STATUS)
               IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(QLOC2,STATUS)
           ELSE
-              CALL MSG_OUT(' ','Q present in only one dataset',STATUS)        
+              CALL MSG_OUT(' ','Q present in only one dataset',STATUS)
               CALL TSP_DELETE_STOKES(LOC1,'Q',STATUS)
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
-          IF (VARS) CALL TSP_UNMAP(VDLOC1,STATUS)   
+          IF (VARS) CALL TSP_UNMAP(VDLOC1,STATUS)
           CALL DAT_ANNUL(QLOC1,STATUS)
       ENDIF
 
@@ -166,19 +166,19 @@ C+
                   VARS = .FALSE.
               ENDIF
               CALL TSP_COMBINE(SIZE,%VAL(SPTR1),%VAL(SPTR2))
-              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))  
+              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
               CALL TSP_UNMAP(SDLOC2,STATUS)
-              IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS) 
+              IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(ULOC2,STATUS)
           ELSE
-              CALL MSG_OUT(' ','U present in only one dataset',STATUS)        
+              CALL MSG_OUT(' ','U present in only one dataset',STATUS)
               CALL TSP_DELETE_STOKES(LOC1,'U',STATUS)
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
-          IF (VARS) CALL TSP_UNMAP(VDLOC1,STATUS)   
+          IF (VARS) CALL TSP_UNMAP(VDLOC1,STATUS)
           CALL DAT_ANNUL(ULOC1,STATUS)
       ENDIF
-                                 
+
       IF (VZ1) THEN
           CALL TSP_MAP_DATA(VLOC1,'UPDATE',SPTR1,SDLOC1,STATUS)
           CALL TSP_MAP_VAR(VLOC1,'UPDATE',VPTR1,VDLOC1,STATUS)
@@ -194,12 +194,12 @@ C+
                   VARS = .FALSE.
               ENDIF
               CALL TSP_COMBINE(SIZE,%VAL(SPTR1),%VAL(SPTR2))
-              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))  
+              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
               CALL TSP_UNMAP(SDLOC2,STATUS)
               IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(VLOC2,STATUS)
           ELSE
-              CALL MSG_OUT(' ','V present in only one dataset',STATUS)        
+              CALL MSG_OUT(' ','V present in only one dataset',STATUS)
               CALL TSP_DELETE_STOKES(LOC1,'V',STATUS)
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
@@ -207,13 +207,13 @@ C+
           CALL DAT_ANNUL(VLOC1,STATUS)
       ENDIF
 
-*  sum the intensities 
+*  sum the intensities
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_COMBINE(SIZE,%VAL(PTR1),%VAL(PTR2))
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(DLOC1,STATUS)
       CALL TSP_UNMAP(DLOC2,STATUS)
@@ -226,14 +226,14 @@ C+
       SUBROUTINE TSP_COMBINE(SIZE,I1,I2)
 
 *   Subroutine to add the data
-*       
+*
 
       IMPLICIT NONE
       INTEGER SIZE
       REAL I1(SIZE),I2(SIZE)
       INTEGER I
 
-      DO I=1,SIZE 
+      DO I=1,SIZE
           I1(I)=I1(I)+I2(I)
       ENDDO
       END

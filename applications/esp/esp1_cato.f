@@ -1,5 +1,5 @@
-      subroutine esp1_cato (phase, ndf1, validp, zerop, 
-     :     result, resnres, resnpoi, 
+      subroutine esp1_cato (phase, ndf1, validp, zerop,
+     :     result, resnres, resnpoi,
      :     xco, yco, back, sigma, psize, lbnd, isellpro,
      :     status)
 *+
@@ -10,8 +10,8 @@
 *     Output the galaxy fit results to a CAT file.
 *
 *   Invocation:
-*      call esp1_cato (phase, ndf1, validp, zerop, 
-*     :     result, resnres, resnpoi, 
+*      call esp1_cato (phase, ndf1, validp, zerop,
+*     :     result, resnres, resnpoi,
 *     :     xco, yco, back, sigma, psize, lbnd, isellpro,
 *     :     status)
 *
@@ -147,7 +147,7 @@
 
 *   Let us begin...
       if (status .ne. sai__ok) return
-      
+
 *   PHASE 1: open catalogue
       if (phase.eq.0 .or. phase.eq.1) then
 *      Create the catalogue, from the parameter OUTCAT
@@ -164,7 +164,7 @@
 *   PHASE 2: write data
       if (phase.eq.0 .or. phase.eq.2) then
 *      Begin writing out the data.  First define the columns and
-*      parameters.  These might be done more naturally in the 
+*      parameters.  These might be done more naturally in the
 *      `phase 1' section above, but that would break the simplifying
 *      assumption that the parameters other than phase and status need
 *      be valid only in phase 2.
@@ -178,82 +178,82 @@
             call cat_pnew0 (ci, cat__fityp, 'SourceN',
      :                      cat__typei, cols(1), status)
 
-            call cat_pnew0 (ci, cat__fityp, 'Number', 
+            call cat_pnew0 (ci, cat__fityp, 'Number',
      :                      cat__typei, cols(2), status)
 
-            call cat_pnew0 (ci, cat__fityp, 'X', 
+            call cat_pnew0 (ci, cat__fityp, 'X',
      :                      cat__typer, cols(3), status)
             call cat_tattc (cols(3), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, 'Y', 
+            call cat_pnew0 (ci, cat__fityp, 'Y',
      :                     cat__typer, cols(4), status)
             call cat_tattc (cols(4), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, 'SemiMajor', 
+            call cat_pnew0 (ci, cat__fityp, 'SemiMajor',
      :                      cat__typer, cols(5), status)
             call cat_tattc (cols(5), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '1/Ellipt', 
+            call cat_pnew0 (ci, cat__fityp, '1/Ellipt',
      :                      cat__typer, cols(6), status)
-            call cat_tattc (cols(6), 'COMM', 
+            call cat_tattc (cols(6), 'COMM',
      :                      'reciprocal of ellipticity',status)
             call cat_tattc (cols(6), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, 'PA', cat__typer, 
+            call cat_pnew0 (ci, cat__fityp, 'PA', cat__typer,
      :                      cols(7), status)
-            call cat_tattc (cols(7), 'UNITS', 'RADIANS{DEGREES}', 
+            call cat_tattc (cols(7), 'UNITS', 'RADIANS{DEGREES}',
      :                      status)
             call cat_tattc (cols(7), 'COMM', 'Position angle', status)
 
-            call cat_pnew0 (ci, cat__fityp, 'Count', 
+            call cat_pnew0 (ci, cat__fityp, 'Count',
      :                      cat__typer, cols(8), status)
 
-            call cat_pnew0 (ci, cat__fityp, 'Dev', 
+            call cat_pnew0 (ci, cat__fityp, 'Dev',
      :                      cat__typer, cols(9), status)
 
-            call cat_pnew0 (ci, cat__fityp, 'Points', 
+            call cat_pnew0 (ci, cat__fityp, 'Points',
      :                      cat__typei, cols(10), status)
 
-            call cat_pnew0 (ci, cat__fityp, 'PPU', 
+            call cat_pnew0 (ci, cat__fityp, 'PPU',
      :                      cat__typer, cols(11), status)
             call cat_tattc (cols(11), 'COMM', 'Percentage points used',
      :                      status)
 
-            call cat_pnew0 (ci, cat__fityp, 'Statistic', 
+            call cat_pnew0 (ci, cat__fityp, 'Statistic',
      :                      cat__typer, cols(12), status)
 
-            call cat_pnew0 (ci, cat__fityp, '1xSin', 
+            call cat_pnew0 (ci, cat__fityp, '1xSin',
      :                      cat__typer, cols(13), status)
             call cat_tattc (cols(13), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '1xCos', 
+            call cat_pnew0 (ci, cat__fityp, '1xCos',
      :                      cat__typer, cols(14), status)
             call cat_tattc (cols(14), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '2xSin', 
+            call cat_pnew0 (ci, cat__fityp, '2xSin',
      :                      cat__typer, cols(15), status)
             call cat_tattc (cols(15), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '2xCos', 
+            call cat_pnew0 (ci, cat__fityp, '2xCos',
      :                      cat__typer, cols(16), status)
             call cat_tattc (cols(16), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '3xSin', 
+            call cat_pnew0 (ci, cat__fityp, '3xSin',
      :                      cat__typer, cols(17), status)
             call cat_tattc (cols(17), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '3xCos', 
+            call cat_pnew0 (ci, cat__fityp, '3xCos',
      :                      cat__typer, cols(18), status)
             call cat_tattc (cols(18), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '4xSin', 
+            call cat_pnew0 (ci, cat__fityp, '4xSin',
      :                      cat__typer, cols(19), status)
             call cat_tattc (cols(19), 'EXFMT', 'G14.7', status)
 
-            call cat_pnew0 (ci, cat__fityp, '4xCos', 
+            call cat_pnew0 (ci, cat__fityp, '4xCos',
      :                      cat__typer, cols(20), status)
             call cat_tattc (cols(20), 'EXFMT', 'G14.7', status)
-            
+
 *         Create parameters, and set their values
             call cat_pnew0 (ci, cat__qityp, 'Filename',
      :           cat__typec, fnp, status)
@@ -262,7 +262,7 @@
             call msg_load (' ','^NAME',tstr,nchar,status)
             call cat_tatti (fnp, 'CSIZE', nchar, status)
             call cat_tattc (fnp, 'VALUE', tstr, status)
-            
+
             call cat_pnew0 (ci, cat__qityp, 'Back',
      :           cat__typer, backp, status)
             call cat_tattr (backp, 'VALUE', back, status)
@@ -270,19 +270,19 @@
             call cat_pnew0 (ci, cat__qityp, 'Sigma',
      :           cat__typer, sigmap, status)
             call cat_tattr (sigmap, 'VALUE', sigma, status)
-            
+
             call cat_pnew0 (ci, cat__qityp, 'Pixelsize',
      :           cat__typer, pixelp, status)
             call cat_tattr (pixelp, 'VALUE', psize, status)
-            
+
             call cat_pnew0 (ci, cat__qityp, 'Zeropoint',
      :           cat__typer, zeropp, status)
             call cat_tattr (zeropp, 'VALUE', zerop, status)
-            
+
             call cat_pnew0 (ci, cat__qityp, 'XBase',
      :           cat__typer, xbp, status)
             call cat_tattr (xbp, 'VALUE', xco, status)
-            
+
             call cat_pnew0 (ci, cat__qityp, 'YBase',
      :           cat__typer, ybp, status)
             call cat_tattr (ybp, 'VALUE', yco, status)
@@ -326,9 +326,9 @@
             tablerows = validp
             nullvalue = .false.
          endif
-      
+
 *      Now write the values to the catalogue
-      
+
          do i=1,tablerows
             call cat_put0i (cols(1), sourcen, nullvalue, status)
             call cat_put0i (cols(2), i, nullvalue, status)
@@ -339,7 +339,7 @@
             call cat_put0r (cols(7), result(5,i), nullvalue, status)
             call cat_put0r (cols(8), result(6,i), nullvalue, status)
             call cat_put0r (cols(9), result(7,i), nullvalue, status)
-            call cat_put0i (cols(10), int(result(8,i)), nullvalue, 
+            call cat_put0i (cols(10), int(result(8,i)), nullvalue,
      :           status)
             call cat_put0r (cols(11), result(9,i), nullvalue, status)
             if (isellpro) then
@@ -356,13 +356,13 @@
             call cat_put0r (cols(18), result(15,i), nullvalue, status)
             call cat_put0r (cols(19), result(16,i), nullvalue, status)
             call cat_put0r (cols(20), result(17,i), nullvalue, status)
-            
+
             call cat_rapnd (ci, status)
-         
+
          enddo
 
       endif
-      
+
 
 *   PHASE 3: close catalogue
       if (phase.eq.0 .or. phase.eq.3) then
@@ -378,5 +378,5 @@
       endif
 
  9999 continue
-      
+
       end

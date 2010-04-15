@@ -105,7 +105,7 @@ void qqfs( int first, int last, float data[] )
 ;       was coded in Macro.  PASCAL was used rather than FORTRAN
 ;       because you can't use Fortran recursively.  It may make the
 ;       operation  of the Macro a little clearer..
-;       
+;
 ;       PROCEDURE QFSORT
 ;          (VAR DATA : ARRAY[LOW_INDEX..HIGH_INDEX : INTEGER] OF REAL);
 ;
@@ -113,7 +113,7 @@ void qqfs( int first, int last, float data[] )
 ;
 ;       PROCEDURE QQFS(FIRST,LAST:INTEGER);
 ;
-;         { Sorts the partition DATA[FIRST..LAST] by splitting it 
+;         { Sorts the partition DATA[FIRST..LAST] by splitting it
 ;           into two partitions, one with all values above the initial
 ;           central value, one with all values below it, and then
 ;           calling itself to sort those partitions }
@@ -121,11 +121,11 @@ void qqfs( int first, int last, float data[] )
 ;         VAR
 ;            I,J       : INTEGER;
 ;            TEMP,VMID : REAL;
-;   
+;
 ;         BEGIN
 ;            I:=FIRST;
 ;            J:=LAST;
-;            VMID:=DATA[(I+J) DIV 2];        
+;            VMID:=DATA[(I+J) DIV 2];
 ;            REPEAT
 ;               WHILE DATA[I]<VMID DO I:=I+1;
 ;               WHILE VMID<DATA[J] DO J:=J-1;
@@ -136,7 +136,7 @@ void qqfs( int first, int last, float data[] )
 ;            UNTIL I>J;
 ;            IF FIRST<J THEN QQFS(FIRST,J);
 ;            IF I<LAST  THEN QQFS(I,LAST);
-;          END;  
+;          END;
 ;
 ;         { End of QQFS }
 ;
@@ -145,5 +145,5 @@ void qqfs( int first, int last, float data[] )
 ;         END;
 ;
 ;         { End of QFSORT }
-;       
+;
 */

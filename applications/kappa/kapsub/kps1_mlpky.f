@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_MLPKY( IPLOT, NDISP, OFFSET, IGRP, USE, FRMOFF, 
+      SUBROUTINE KPS1_MLPKY( IPLOT, NDISP, OFFSET, IGRP, USE, FRMOFF,
      :                       UNITS, STATUS )
 *+
 *  Name:
@@ -11,16 +11,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPKY( IPLOT, NDISP, OFFSET, IGRP, USE, FRMOFF, UNITS, 
+*     CALL KPS1_MLPKY( IPLOT, NDISP, OFFSET, IGRP, USE, FRMOFF, UNITS,
 *                      STATUS )
 
 *  Description:
-*     This routine plots an enumerated list of contour offsets, units and 
+*     This routine plots an enumerated list of contour offsets, units and
 *     a title.  The text is drawn using PGPLOT and it is located within
 *     the current PGPLOT viewport. The appearance of various components
 *     in the key can be controlled by setting suitable attributes in the
-*     supplied AST Plot. The vertical position of the top of the key may 
-*     be specified. 
+*     supplied AST Plot. The vertical position of the top of the key may
+*     be specified.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
@@ -38,7 +38,7 @@
 *     IGRP = INTEGER (Given)
 *        An identifier for a GRP group holding the curve labels.
 *     USE( NDISP ) = LOGICAL (Given)
-*        If true the corresponding curve has actually been drawn and so 
+*        If true the corresponding curve has actually been drawn and so
 *        should appear in the key.
 *     FRMOFF = REAL (Given)
 *        The fractional position in the y direction of the top of the
@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -136,7 +136,7 @@
       REAL YM                    ! Y extent of key picture, in metres
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the PGPLOT viewport and window to match the current AGI picture,
@@ -146,12 +146,12 @@
 *  Get the current PGPLOT character heights in world coordinates.
       CALL PGQCS( 4, XCH, HGT )
 
-*  Set the default character height. This will be over-ridden if an 
+*  Set the default character height. This will be over-ridden if an
 *  explicit character height has been set in the supplied Plot. HGT
-*  is a value in world coordinates. If the current pgplot value would 
-*  result in LINELN characters being wider than the available space 
-*  (i.e. X2-X1) - assuming an aspect ratio of ARAT for each character 
-*  - then the character height is reduced so that 20 characters would 
+*  is a value in world coordinates. If the current pgplot value would
+*  result in LINELN characters being wider than the available space
+*  (i.e. X2-X1) - assuming an aspect ratio of ARAT for each character
+*  - then the character height is reduced so that 20 characters would
 *  just fit in.
       HGT = MIN( HGT, ARAT*ABS( X2 - X1 )/LINELN )
       CALL KPG1_PGSHT( HGT, STATUS )
@@ -166,7 +166,7 @@
       CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .FALSE., ATTR, STATUS )
 
 *  Find the PGPLOT character height in world coordinates used by the
-*  supplied Plot when drawing textual labels. 
+*  supplied Plot when drawing textual labels.
       CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .TRUE., ATTR, STATUS )
       CALL PGQCS( 4, XCH, HGT2 )
       CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .FALSE., ATTR, STATUS )
@@ -185,7 +185,7 @@
 *  Determine the vertical position for the top line of text in the key.
       YC = FRMOFF*( Y2 - Y1 ) + Y1 - HGT
 
-*  If a title has been set in the Plot use it as the heading. 
+*  If a title has been set in the Plot use it as the heading.
       IF( AST_TEST( IPLOT, 'TITLE', STATUS ) ) THEN
          TEXT = AST_GETC( IPLOT, 'TITLE', STATUS )
 
@@ -199,14 +199,14 @@
 *  Produce the heading, splitting it up into lines of no more than LINELN
 *  characters.
       IAT = 0
-      DO WHILE( .TRUE. ) 
-         CALL CHR_LINBR( TEXT, IAT, LINE ) 
+      DO WHILE( .TRUE. )
+         CALL CHR_LINBR( TEXT, IAT, LINE )
          IF( IAT .EQ. 0 ) GO TO 10
 
-*  Display this line. Note, the X coordinate gets modified by the call to 
+*  Display this line. Note, the X coordinate gets modified by the call to
 *  KPG1_PGTXT so use a temporary copy (XL) in order not to loose the left
 *  hand X value.
-         XL = X1 
+         XL = X1
          CALL KPG1_PGTXT( 0.0, LINE, XL, YC, STATUS )
 
 *  Set the vertical position for the next line in the key.
@@ -245,7 +245,7 @@
 *  Set plotting style to mimic textual labels produced by the supplied Plot.
             CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .TRUE., ATTR, STATUS )
 
-*  Draw the string. 
+*  Draw the string.
             X = X1
             CALL KPG1_PGTXT( 0.0, TEXT( : TLEN ), X, YC, STATUS )
 
@@ -257,7 +257,7 @@
             TEXT = AST_FORMAT( IPLOT, 2, OFFSET( I ), STATUS )
             TLEN = CHR_LEN( TEXT )
 
-*  Draw the string using the style of the numerical labels produced by the 
+*  Draw the string using the style of the numerical labels produced by the
 *  supplied Plot. Using the X value returned by the previous call to
 *  KPG1_PGTXT causes the text to be appended to the previous text.
             CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .TRUE., ATTR, STATUS )

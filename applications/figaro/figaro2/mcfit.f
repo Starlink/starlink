@@ -29,7 +29,7 @@ C                    as on a 1D spectrum.  - But MASK is always a
 C                    1D spectrum.
 C     27th Mar 1985  KS / AAO. Workspace usage and call to FIG_
 C                    MCFIT modified for NAG version of FIG_MCFIT.
-C     11th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs 
+C     11th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs
 C                    changed. Now uses DYN_ routines for dynamic-memory
 C                    handling.
 C     31st Dec 1987  KS / AAO. RMS calculation added.  Check on match of
@@ -46,7 +46,7 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions used 
+C     Functions used
 C
       INTEGER ICH_ENCODE,ICH_LEN
 C
@@ -133,7 +133,7 @@ C
       CALL PAR_RDVAL('POINTS',4.,FLOAT(MAXSPL),10.,' ',VALUE)
       NSPL=NINT(VALUE)
 C
-C     Get name of OUTPUT file 
+C     Get name of OUTPUT file
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','SPECT',0,0,STATUS)
       IF (STATUS.NE.0) GO TO 500
@@ -205,7 +205,7 @@ C
 C     (>) NX      (Integer) The number of elements in the spectra.
 C     (>) SPECT   (Real array SPECT(NX)) The spectrum to be fitted.
 C     (>) MASK    (Real array MASK(NX)) The mask spectrum.
-C     (>) NSPL    (Integer) the number of splines to be used.  The 
+C     (>) NSPL    (Integer) the number of splines to be used.  The
 C                 actual number used may be less if some areas are
 C                 masked out.
 C     (W) X       (Double precision array X(NSPL+2)) Workspace.
@@ -214,7 +214,7 @@ C     (W) WORK    (Double precision array WORK(8*NSPL+40)) Workspace.
 C     (<) RESULT  (Real array RESULT(NX)) The resulting spectrum.
 C     (<) RMS     (Real) The RMS variation between the resulting
 C                 spectrum and the original spectrum, in the unmasked
-C                 regions.  
+C                 regions.
 C
 C     Common variables used - None
 C
@@ -257,7 +257,7 @@ C
       DOUBLE PRECISION EPS, RFIT(5), A2(3*5+3*4)
       DOUBLE PRECISION DVAL, WTS(5)
 C
-C     Offsets into WORK array 
+C     Offsets into WORK array
 C
       CPTR=1
       KPTR=CPTR+(NSPL+2)+4
@@ -303,9 +303,9 @@ C
 C
 C        This step is required because the NAG spline evaluator will
 C        reject any point outside the X-range originally supplied.  So
-C        we need to generate two extra points at the extreme ends of 
+C        we need to generate two extra points at the extreme ends of
 C        the spectrum.  We do this by fitting a cubic to the end points
-C        that we have, including one at zero weight at the actual end 
+C        that we have, including one at zero weight at the actual end
 C        point.  We then evaluate the fitted polynomial at that point,
 C        doing this once for each end of the spectrum.
 C

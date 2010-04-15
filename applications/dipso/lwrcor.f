@@ -15,32 +15,32 @@ C    No sensitivity loss values are available above 3275 A, so the longest
 C    wavelength fluxes are not corrected.
 C
        IMPLICIT NONE
-       INTEGER NPTS          
-       REAL YR               
-       INTEGER IIAPER         
+       INTEGER NPTS
+       REAL YR
+       INTEGER IIAPER
 
-       REAL WAVE(*)            
-       REAL FLUX(*)          
+       REAL WAVE(*)
+       REAL FLUX(*)
 
-       LOGICAL OK            
+       LOGICAL OK
        CHARACTER*1 BLEEP
        COMMON /BLEEP/ BLEEP
 
-       INTEGER I             
-       REAL SENLOS(58)       
-       INTEGER IND           
-       REAL FWAVE              
-       REAL SENLWAVE           
-       REAL YREP             
-       REAL YRFAC            
+       INTEGER I
+       REAL SENLOS(58)
+       INTEGER IND
+       REAL FWAVE
+       REAL SENLWAVE
+       REAL YREP
+       REAL YRFAC
 
 *  Local Data:
-       DATA (SENLOS(I),I=1,58)/3.79, 2.15, 1.79, 1.51, 1.56, 1.73, 1.62, 
-     :       1.51, 1.86, 2.17, 1.75, 1.41, 1.48, 2.02, 2.27, 2.24, 2.40, 
-     :       2.67, 2.85, 2.90, 2.88, 2.61, 1.68, 1.71, 1.51, 0.72, 0.98, 
-     :       1.40, 1.04, 0.88, 0.94, 0.82, 0.65, 1.14, 1.13, 0.74, 1.18, 
-     :       1.71, 1.60, 1.22, 1.42, 1.22, 0.98, 0.88, 0.94, 0.84, 0.83, 
-     :       1.32, 1.16, 0.59, 1.03, 1.22, 0.56, 1.29, 2.81, 1.32, 1.02, 
+       DATA (SENLOS(I),I=1,58)/3.79, 2.15, 1.79, 1.51, 1.56, 1.73, 1.62,
+     :       1.51, 1.86, 2.17, 1.75, 1.41, 1.48, 2.02, 2.27, 2.24, 2.40,
+     :       2.67, 2.85, 2.90, 2.88, 2.61, 1.68, 1.71, 1.51, 0.72, 0.98,
+     :       1.40, 1.04, 0.88, 0.94, 0.82, 0.65, 1.14, 1.13, 0.74, 1.18,
+     :       1.71, 1.60, 1.22, 1.42, 1.22, 0.98, 0.88, 0.94, 0.84, 0.83,
+     :       1.32, 1.16, 0.59, 1.03, 1.22, 0.56, 1.29, 2.81, 1.32, 1.02,
      :       3.01/
 
 C    Make sure wavelength ranges are consistent

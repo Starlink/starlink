@@ -9,7 +9,7 @@
 #     Describes a catalogue with an associated selection.
 
 #  Description:
-#     A GaiaPolCat object represents a selection of rows from a specific 
+#     A GaiaPolCat object represents a selection of rows from a specific
 #     Polpack catalogue. The selected rows may be changed, but the catalogue
 #     data itself cannot be changed. If the data has a Z column (e.g.
 #     spectropolarimetry data), then the zvals attribute can be used to
@@ -20,11 +20,11 @@
 
 #  Invocations:
 #
-#        GaiaPolCat object_name disk-file 
+#        GaiaPolCat object_name disk-file
 #
 #     This creates an instance of a GaiaPolCat object. The returned value
 #     is the name of the object. Disk-file is the full path for the disk
-#     file holding the Polpack catalogue. 
+#     file holding the Polpack catalogue.
 #
 #        object_name configure -configuration_options value
 #
@@ -91,9 +91,9 @@ itcl::class gaia::GaiaPolCat {
 
    constructor { file w pbar {data ""} } {
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolCat" } {
          init $file $w $pbar $data
@@ -121,19 +121,19 @@ itcl::class gaia::GaiaPolCat {
 
 #  Initialiser:
 #  ============
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolCat constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolCat constructor using a user-supplied
 #  argument list.
    protected method init { file w pbar data } {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class.
       set w_ $w
       set pbar_ $pbar
 
-#  If not supplied, create a GaiaPolData object to store an immutable 
+#  If not supplied, create a GaiaPolData object to store an immutable
 #  description of the catalogue, including the main data array.
       if { $data == "" } {
          set data_ [::gaia::GaiaPolData data#auto $file $w $pbar]
@@ -141,8 +141,8 @@ itcl::class gaia::GaiaPolCat {
          set data_ [$data clone]
       }
 
-#  Initialise an array of state flags (indexed by row number) indicating if 
-#  the corresponding row is selected (S), unselected (U), or marked for 
+#  Initialise an array of state flags (indexed by row number) indicating if
+#  the corresponding row is selected (S), unselected (U), or marked for
 #  deletion (D).
       set nrow [$data_ getNrow]
       for {set i 0} {$i < $nrow} {incr i} {
@@ -153,7 +153,7 @@ itcl::class gaia::GaiaPolCat {
 #  Public methods:
 #  ===============
 
-#  Returns a new GaiaPolCat holding a binned copy of $this. 
+#  Returns a new GaiaPolCat holding a binned copy of $this.
 #  -------------------------------------------------------
    public method bin { box method debias minval sigmas {integ 0} } {
       set ret ""
@@ -165,7 +165,7 @@ itcl::class gaia::GaiaPolCat {
          set data [purge 1]
       }
 
-#  Report an error if no data remains.    
+#  Report an error if no data remains.
       if { $data == "empty" } {
          error_dialog "No data to bin"
 
@@ -191,7 +191,7 @@ itcl::class gaia::GaiaPolCat {
       return $ret
    }
 
-#  Effectively remove all vectors with state equal to $remove from 
+#  Effectively remove all vectors with state equal to $remove from
 #  $this by marking them as deleted. Remove should be one of U or S.
 #  -----------------------------------------------------------------
    public method cut { {remove S} } {
@@ -214,14 +214,14 @@ itcl::class gaia::GaiaPolCat {
       if { $ok } {
          set inc 0
          set nrow [$data_ getNrow]
-   
+
          for {set i 0} {$i < $nrow} {incr i} {
             if { $states($i) == $remove } {
                set inc 1
                set states($i) "D"
             }
          }
-   
+
          if { $inc } {
             incr chid_
             set changed_ 1
@@ -245,7 +245,7 @@ itcl::class gaia::GaiaPolCat {
    }
 
 #  Save $this to a new disk file which can be read by polpack. If $all is
-#  non-zero both selected and unselected vectors are saved, otherwise only 
+#  non-zero both selected and unselected vectors are saved, otherwise only
 #  the selected vectors are saved.
 #  ----------------------------------------------------------------------
    public method save { file {all 1}} {
@@ -259,7 +259,7 @@ itcl::class gaia::GaiaPolCat {
 #  is zero) any unselected rows.
       set data [purge $all]
 
-#  Report an error if no data remains.    
+#  Report an error if no data remains.
       if { $data == "empty" } {
          error_dialog "No data to save"
          set changed_ 0
@@ -284,7 +284,7 @@ itcl::class gaia::GaiaPolCat {
 
    }
 
-#  Modifies the PolCat by marking a specified list of rows as "deleted". 
+#  Modifies the PolCat by marking a specified list of rows as "deleted".
 #  --------------------------------------------------------------------
    public method delete { rows } {
       set inc 0
@@ -292,14 +292,14 @@ itcl::class gaia::GaiaPolCat {
          set states_($row) "D"
          set inc 1
       }
-      if { $inc } {  
-         incr chid_ 
+      if { $inc } {
+         incr chid_
          set changed_ 1
       }
    }
 
-#  Modifies the PolCat by selecting a specified rows. $type indicates how 
-#  the rows are specified: 
+#  Modifies the PolCat by selecting a specified rows. $type indicates how
+#  the rows are specified:
 #     "rows" - select an explicit list of row indices supplied in $data
 #     "circle" - select all vectors within a circle (bounding box in $data)
 #     "box"  - select all vectors within a rectangle (bounding box in $data)
@@ -310,8 +310,8 @@ itcl::class gaia::GaiaPolCat {
       return [choose $type $data "S"]
    }
 
-#  Modifies the PolCat by deselecting a specified rows. $type indicates how 
-#  the rows are specified: 
+#  Modifies the PolCat by deselecting a specified rows. $type indicates how
+#  the rows are specified:
 #     "rows" - deselect an explicit list of row indices supplied in $data
 #     "circle" - deselect all vectors within a circle (bounding box in $data)
 #     "box"  - deselect all vectors within a rectangle (bounding box in $data)
@@ -330,7 +330,7 @@ itcl::class gaia::GaiaPolCat {
       set nrow [$data_ getNrow]
 
       for {set i 0} {$i < $nrow} {incr i} {
-         set state $states($i) 
+         set state $states($i)
          if { $state == "S" } {
             set inc 1
             set states_($i) "U"
@@ -385,8 +385,8 @@ itcl::class gaia::GaiaPolCat {
 
    }
 
-#  Given a reference to a PolCat to be displayed ($that), returns 
-#  an indication of how the currently displayed PolCat ($this) should 
+#  Given a reference to a PolCat to be displayed ($that), returns
+#  an indication of how the currently displayed PolCat ($this) should
 #  be updated to show $that.
 #
 #  A list of two elements is returned, the first is a string describing
@@ -396,8 +396,8 @@ itcl::class gaia::GaiaPolCat {
 #  returned in the second element.
 #
 #  If $that refers to a different selection from the same catalogue, a
-#  list is returned containing the row index for each row that needs to be 
-#  changed. 
+#  list is returned containing the row index for each row that needs to be
+#  changed.
 #
 #  If $this refers to the same catalogue and the same selection, a blank
 #  string is returned as the second element.
@@ -405,13 +405,13 @@ itcl::class gaia::GaiaPolCat {
    public method changes {that} {
       set des ""
 
-#  If we have already found the differences between $this and $that 
+#  If we have already found the differences between $this and $that
 #  then return the previously calculated results. A "change identifier"
 #  ("chid") is a unique number associated with each change of row states.
-      set thatchid [$that getChid] 
+      set thatchid [$that getChid]
 
       if { $that == $that_ && $thatchid == $thatchid_ && $chid_ == $thischid_ } {
-         set ret $changes_               
+         set ret $changes_
 
 #  Otherwise calculate new results.
       } else {
@@ -419,11 +419,11 @@ itcl::class gaia::GaiaPolCat {
          if { [$data_ getTclFile] != [$that getTclFile] } {
             set catch "redraw"
             set des [$that getDesc]
-   
+
          } elseif { [getZvals] != [$that getZvals] } {
             set catch "redraw"
             set des "change spectral channel"
-   
+
          } else {
 
             upvar 0 [$that getStatesR] thatstate
@@ -468,7 +468,7 @@ itcl::class gaia::GaiaPolCat {
          upvar 0 [$ret getStatesR] newstate
          set nrow [$data_ getNrow]
          for {set i 0} {$i < $nrow} {incr i} {
-            set newstate($i) $states_($i)         
+            set newstate($i) $states_($i)
          }
 
          $ret setSexp [getSexp]
@@ -477,11 +477,11 @@ itcl::class gaia::GaiaPolCat {
          set ret [code $ret]
       }
       return $ret
-   }   
+   }
 
-#  Return the fully qualified name of a protected data member holding the 
-#  current state flags including Z filtering (i.e. any row with 
-#  a Z column value different to the current value of attribute zvals_[0] 
+#  Return the fully qualified name of a protected data member holding the
+#  current state flags including Z filtering (i.e. any row with
+#  a Z column value different to the current value of attribute zvals_[0]
 #  is set to state "D"). This data member is an array indexed by
 #  catalogue row number (zero-based).
 #  -----------------------------------------------------------------------
@@ -505,12 +505,12 @@ itcl::class gaia::GaiaPolCat {
                set state $states_($i)
                if { $state == "S" } {
                   incr nsel_
-               } elseif { $state == "U" } { 
+               } elseif { $state == "U" } {
                   incr nuns_
                }
             }
 
-#  Otherwise, we use the Z filtered array, setting all states to "D" which 
+#  Otherwise, we use the Z filtered array, setting all states to "D" which
 #  have a "D" in the zmask (copy all other states).
          } else {
             set getStates_ zstates_
@@ -524,7 +524,7 @@ itcl::class gaia::GaiaPolCat {
                    set zstates_($i) $state
                    if { $state == "S" } {
                       incr nsel_
-                   } elseif { $state == "U" } { 
+                   } elseif { $state == "U" } {
                       incr nuns_
                    }
                }
@@ -541,7 +541,7 @@ itcl::class gaia::GaiaPolCat {
 
    }
 
-#  Accessor methods... 
+#  Accessor methods...
 #  -------------------
    public method getChanged {} {return $changed_}
    public method setChanged {s} {set changed_ $s}
@@ -589,8 +589,8 @@ itcl::class gaia::GaiaPolCat {
    public method zConv {z type} { return [$data_ zConv $z $type] }
    public method mkImage { rtdimage } { return [$data_ mkImage $rtdimage] }
 
-#  Return the fully qualified name of a protected data member holding the 
-#  current state flags without Z filtering. This data member is an array 
+#  Return the fully qualified name of a protected data member holding the
+#  current state flags without Z filtering. This data member is an array
 #  indexed by catalogue row number (zero-based).
 #  --------------------------------------------------------------------
    public method getStatesR {} {return [::itcl::scope states_]}
@@ -599,20 +599,20 @@ itcl::class gaia::GaiaPolCat {
 #  --------------------------------------------------------------------
    public method getNuns {} {
       getStates
-      return $nuns_  
+      return $nuns_
    }
 
 #  Return the number of selected rows.
 #  --------------------------------------------------------------------
    public method getNsel {} {
       getStates
-      return $nsel_  
+      return $nsel_
    }
 
 #  Indicate that the column with heading $c stores the quantity given by
-#  $q. 
+#  $q.
 #  ---------------------------------------------------------------------
-   public method setColNam {q c} { 
+   public method setColNam {q c} {
 
 #  Execute the parent setColNam method.
       $data_ setColNam $q $c
@@ -625,8 +625,8 @@ itcl::class gaia::GaiaPolCat {
 #  Protected methods:
 #  ==================
 
-#  Select or deselect specified rows. $type indicates how the rows are 
-#  specified: 
+#  Select or deselect specified rows. $type indicates how the rows are
+#  specified:
 #     "rows" - use an explicit list of row indices supplied in $data
 #     "circle" - use all vectors within a circle (bounding box in $data)
 #     "box"  - use all vectors within a rectangle (bounding box in $data)
@@ -635,7 +635,7 @@ itcl::class gaia::GaiaPolCat {
 #  --------------------------------------------------
    protected method choose { type sdata state } {
       set inc 0
-      set ret 1 
+      set ret 1
 
       setSexp ""
       upvar 0 [getStates] states
@@ -703,7 +703,7 @@ itcl::class gaia::GaiaPolCat {
                set dx [expr $x - $xc]
                set dy [expr $y - $yc]
                set d2 [expr $dx*$dx + $dy*$dy]
-   
+
                if { $d2 <= $r2 } {
                   set states_($i) $state
                   set inc 1
@@ -722,7 +722,7 @@ itcl::class gaia::GaiaPolCat {
 
       }
 
-      if { $inc } {  
+      if { $inc } {
          incr chid_
       }
 
@@ -730,7 +730,7 @@ itcl::class gaia::GaiaPolCat {
 
    }
 
-#  Select or deselect rows which satisfy the supplied expression. If some 
+#  Select or deselect rows which satisfy the supplied expression. If some
 #  rows changed state as a result of this, +1 is returned, if no rows
 #  changed state, 0 is returned. If there was an error in the expression -1
 #  is returned.
@@ -756,7 +756,7 @@ itcl::class gaia::GaiaPolCat {
          lassign $head head i
 
 #  Look for references to this column within the expression (i.e. the
-#  column name preceeded with a dollar), replacing them with a lindex 
+#  column name preceeded with a dollar), replacing them with a lindex
 #  command to extract the corresponding value from a row of data.
          regsub -nocase -all "\\$$head" $exp "\[lindex \$row $i\]" newexp
 
@@ -772,26 +772,26 @@ itcl::class gaia::GaiaPolCat {
 #  Get a list of the variable names left in temp.
       set nbad 0
       while { [regexp {\$([a-zA-Z1-9_ ]+)} $temp match var] } {
-         append badvars $var " " 
+         append badvars $var " "
          incr nbad
          regsub -all "\\$$var" $temp " " newexp
          set temp $newexp
       }
 
-#  Report an error and return if any undefined column names were included in 
+#  Report an error and return if any undefined column names were included in
 #  the expression.
       if { $nbad == 1 } {
          set msg "The supplied selection expression refers to the unknown column \"$badvars\"."
       } elseif { $nbad > 1 } {
-         set msg "The supplied selection expression refers to the following unknown columns \"$badvars\"." 
-      } 
+         set msg "The supplied selection expression refers to the following unknown columns \"$badvars\"."
+      }
       if { $nbad > 0 } {
          error_dialog "$msg. The following columns are available:\n\n [$data_ getHeadings]"
          return -1
       }
 
 #  Get access to the state of each row.
-      upvar 0 [getStates] states 
+      upvar 0 [getStates] states
 
 #  Note the state of rows which are to be changed.
       if { $state == "U" } {
@@ -814,7 +814,7 @@ itcl::class gaia::GaiaPolCat {
 #  Evaluate the expression.
             if { ![catch { set ans [expr $exp] } mess] } {
                set good 1
-               if { $ans } { 
+               if { $ans } {
                   set states_($i) $state
                   set ret 1
                }
@@ -865,10 +865,10 @@ itcl::class gaia::GaiaPolCat {
       incr chid_
    }
 
-#  Return a new data array from which all deleted rows have been 
-#  removed. If $all is zero, then only selected vectors are retained in the 
-#  returned data array. If $all is non-zero, all non-deleted vectors, whether 
-#  selected or not, are retained. Z filtering is included. If the returned 
+#  Return a new data array from which all deleted rows have been
+#  removed. If $all is zero, then only selected vectors are retained in the
+#  returned data array. If $all is non-zero, all non-deleted vectors, whether
+#  selected or not, are retained. Z filtering is included. If the returned
 #  data array would be exactly the same as the data array associated with
 #  $this, then a blank string is returned. If the returned data array
 #  would contain no data, the single word "empty" is returned.
@@ -925,7 +925,7 @@ itcl::class gaia::GaiaPolCat {
 #  Public data members:
 #  ====================
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -961,19 +961,19 @@ itcl::class gaia::GaiaPolCat {
 #  D=deleted. This array does not include any Z filtering.
       variable states_
 
-#  The "change identifier" (chid_) value associated with $this when the 
+#  The "change identifier" (chid_) value associated with $this when the
 #  getStates method was last invoked.
       variable statechid_ ""
 
-#  The GaiaPolCat associated with $that which was last used by the changes 
+#  The GaiaPolCat associated with $that which was last used by the changes
 #  method.
       variable that_ ""
 
-#  The "change identifier" (chid_) value associated with $that which was last 
+#  The "change identifier" (chid_) value associated with $that which was last
 #  used by the changes method.
       variable thatchid_ ""
 
-#  The "change identifier" (chid_) value associated with $this which was last 
+#  The "change identifier" (chid_) value associated with $this which was last
 #  used by the changes method.
       variable thischid_ ""
 
@@ -988,10 +988,10 @@ itcl::class gaia::GaiaPolCat {
 #  D=deleted. This array is a copy of states_ but with Z filtering applied.
       variable zstates_
 
-#  If not blank, this is a list of two values. The first is a Z column value. 
-#  All rows which do not have this Z column value are treated as if they 
-#  were deleted when public requests for data or states are made (i.e. the 
-#  PolCat looks to the outside world as if it only contains a single Z column 
+#  If not blank, this is a list of two values. The first is a Z column value.
+#  All rows which do not have this Z column value are treated as if they
+#  were deleted when public requests for data or states are made (i.e. the
+#  PolCat looks to the outside world as if it only contains a single Z column
 #  value). If $zvals_ is blank, then no such Z filtering occurs. The second
 #  element in the list is the corresponding Z axis value.
       variable zvals_ ""
@@ -1001,10 +1001,10 @@ itcl::class gaia::GaiaPolCat {
 
 #  Progress bar.
       variable pbar_ ""
-      
+
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 
 #  Common (i.e. static) data members:

@@ -62,7 +62,7 @@
      :  ROWS
 *  Arguments Returned:
       INTEGER
-     :  PTS, 
+     :  PTS,
      :  NUMNUL
       REAL
      :  VAL(ROWS)
@@ -80,7 +80,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
 *
-*       Read all the rows.  Points are accepted only if the value is 
+*       Read all the rows.  Points are accepted only if the value is
 *       not null.
 
          PTS = 0

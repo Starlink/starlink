@@ -109,7 +109,7 @@ itcl::class ::gaia3d::Gaia3dVtkRectPrism {
    #  Apply a shift to the corners.
    protected method apply_shift_ {sx sy} {
       configure -x0 [expr $x0+$sx] -x1 [expr $x1+$sx] \
-                -y0 [expr $y0+$sy] -y1 [expr $y1+$sy]      
+                -y0 [expr $y0+$sy] -y1 [expr $y1+$sy]
    }
 
    #  Configuration options: (public variables)

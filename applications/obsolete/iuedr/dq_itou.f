@@ -1,5 +1,5 @@
       SUBROUTINE dq_ITOU(IVALUE, BVALUE)
- 
+
 *+
 *
 *   Name:
@@ -30,7 +30,7 @@
 
 *   Import:
       INTEGER IVALUE     ! integer value
- 
+
 *   Export:
       BYTE BVALUE        ! byte value
 

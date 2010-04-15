@@ -33,7 +33,7 @@
 *     RESULT = LITERAL (Read)
 *        A text file to receive the negated Region.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Region. If an NDF is supplied, 
+*        An NDF or text file holding the Region. If an NDF is supplied,
 *        the current Frame of the WCS FrameSet will be used (if it is a
 *        Region).
 
@@ -88,7 +88,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

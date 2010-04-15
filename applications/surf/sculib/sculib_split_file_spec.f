@@ -8,14 +8,14 @@
 *     Splits a string into a filename and SCUBA section
 
 *  Invocation:
-*      CALL SCULIB_SPLIT_FILE_SPEC( NAME, MAX_SPEC, FILENAME, NSPEC, 
+*      CALL SCULIB_SPLIT_FILE_SPEC( NAME, MAX_SPEC, FILENAME, NSPEC,
 *     :     DATA_SPEC, STATUS)
 
 *  Description:
 *     This routine takes a string and returns the filename (ie text
 *     before a {) and the data specifications. Each specification
 *     is indicated by a {}. More than one spec can be returned.
-*     If the string contains a '!' then we will use the invers of the 
+*     If the string contains a '!' then we will use the invers of the
 *     specified section.
 
 *  Arguments:
@@ -30,9 +30,9 @@
 *     DATA_SPEC(NSPEC) = CHAR (Returned)
 *        The actual specification for the SCUBA section
 *     USE_SECTION = LOGICAL (Returned)
-*        Set to true by default and false if a '-' is found 
-*        at the end of the section (ie after last closing brace) -- 
-*        a '-' indicates that we are using the inverse of the section. 
+*        Set to true by default and false if a '-' is found
+*        at the end of the section (ie after last closing brace) --
+*        a '-' indicates that we are using the inverse of the section.
 *     STATUS = INTEGER (Given and Returned)
 *        Global Status value
 
@@ -42,7 +42,7 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -55,7 +55,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -131,7 +131,7 @@
 
 *     Extract the name
          FILENAME = NAME(:IPOSN - 1)
-         
+
       END IF
 
 *     Now I would like to look for a '-' in the string.
@@ -145,10 +145,10 @@
 *     Store the start position in the string
 
       NEGPOS = IPOSN
-      
+
 *     Try to find if we are not past the end of the string already
       IF (NEGPOS .LE. SLENGTH) THEN
-         
+
          CALL CHR_FIND(NAME, NEGCHAR, .TRUE., NEGPOS)
 
 *     Have I found the string
@@ -156,7 +156,7 @@
 
             USE_SECTION = .FALSE.   ! I have found a !
 
-*     Set the string NEGCHAR to a blank character so that it does 
+*     Set the string NEGCHAR to a blank character so that it does
 *     not confuse SCULIB_DECODE_SPEC
 
             NAME(NEGPOS:NEGPOS) = ' '
@@ -167,7 +167,7 @@
 
 *     Now loop through all the specifications
 
-      DO WHILE (IPOSN .LT. SLENGTH) 
+      DO WHILE (IPOSN .LT. SLENGTH)
 
 *     Find the start of the specification
          CALL CHR_FIND(NAME, OCURLY, .TRUE., IPOSN)
@@ -185,5 +185,5 @@
 
       END DO
 
-      END 
+      END
 

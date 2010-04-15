@@ -3,7 +3,7 @@ C+
 C
 C     F I G _ H E L P
 C
-C     Figaro utility.  Outputs the contents of a text file to 
+C     Figaro utility.  Outputs the contents of a text file to
 C     the terminal in order to provide help information.  The file
 C     is searched for in the normal figaro directory order - ie
 C     default, user, local and system Figaro directories.
@@ -49,7 +49,7 @@ C
 C     List file contents and close file.
 C
       FSTAT = 0
-      DO WHILE ( FSTAT .EQ. 0 ) 
+      DO WHILE ( FSTAT .EQ. 0 )
          READ( LU, '(A)', IOSTAT = FSTAT ) LINE
          IF ( FSTAT .EQ. 0 )
      :      CALL PAR_WRUSER( LINE(:ICH_LEN(LINE)), NSTAT )
@@ -61,4 +61,4 @@ C
       FSTAT = 0
       CALL DSA_FREE_LU( LU, FSTAT )
 C
-      END         
+      END

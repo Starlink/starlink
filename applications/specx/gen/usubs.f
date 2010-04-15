@@ -54,7 +54,7 @@
 *  Ok, go...
 
       STATUS = 0
-      
+
 *     Find a unit which is not in use:
 
       LUN     =  NUNITS + UOFFSET
@@ -164,7 +164,7 @@ C     PRINT *, '     input string  = ', string(:GEN_ILEN(STRING))
         ICH = ICHAR (STRING(I:I))
         IF (ICH.ge.097 .AND. ICH.le.122) STRING(I:I) = CHAR (ICH-32)
       END DO
- 
+
 C     PRINT *, '     output string = ', string(:GEN_ILEN(STRING))
 
 
@@ -198,7 +198,7 @@ C     PRINT *, '     input string  = ', string(:GEN_ILEN(STRING))
         ICH = ICHAR (STRING(I:I))
         IF (ICH.ge.065 .AND. ICH.le.90) STRING(I:I) = CHAR (ICH+32)
       END DO
- 
+
 C     PRINT *, '     output string = ', string(:GEN_ILEN(STRING))
 
 

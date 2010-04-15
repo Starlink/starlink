@@ -27,7 +27,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IX=NNINT(X)
       IY=NNINT(Y)
       WRITE (7,900) IX,IY

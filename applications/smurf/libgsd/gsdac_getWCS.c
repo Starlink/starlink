@@ -4,7 +4,7 @@
 *     gsdac_getWCS.c
 
 *  Purpose:
-*     Determines the time and pointing values for each 
+*     Determines the time and pointing values for each
 *     time step in the observation.
 
 *  Language:
@@ -16,7 +16,7 @@
 *  Invocation:
 *     gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 *                    const int subBandNum, const dasFlag dasFlag,
-*                    const double *lineFreqs, const double *IFFreqs, 
+*                    const double *lineFreqs, const double *IFFreqs,
 *                    gsdWCS *wcs, AstFrameSet **WCSFrame,
 *                    int *status )
 
@@ -38,10 +38,10 @@
 *     WCSFrame = AstFrameSet* (Given and Returned)
 *        WCS frameset of RA/Dec and frequency.
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
-*    This routine calculates the pointing, time, and airmass 
+*    This routine calculates the pointing, time, and airmass
 *    values to fill the JCMTState. NOTE: adequate memory for the
 *    arrays must be allocated prior to calling this function.
 
@@ -86,7 +86,7 @@
 *     2008-04-21 (JB):
 *        Check special configuration flag.
 *     2008-04-22 (JB):
-*        Set IFFREQ to default of -4 GHz. 
+*        Set IFFREQ to default of -4 GHz.
 *     2008-04-23 (JB):
 *        Use frequencies from matchFreqs for refchan/IF.
 *     2008-04-24 (JB):
@@ -140,8 +140,8 @@
 #define FUNC_NAME "gsdac_getWCS.c"
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
-                    const int subBandNum, const dasFlag dasFlag, 
-                    const double *lineFreqs, const double *IFFreqs, 
+                    const int subBandNum, const dasFlag dasFlag,
+                    const double *lineFreqs, const double *IFFreqs,
                     gsdWCS *wcs, AstFrameSet **WCSFrame,
                     int *status )
 
@@ -195,7 +195,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Set up the timeframe. */
   tFrame = astTimeFrame ( "TimeScale=UT1" );
 
-  astSet ( tFrame, "TimeOrigin=%04d-%02d-%02dT%02d:%02d:%f", 
+  astSet ( tFrame, "TimeOrigin=%04d-%02d-%02dT%02d:%02d:%f",
            year, month, day, hour, min, sec );
 
   /* Apply the UT1-UTC correction. */
@@ -206,11 +206,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( gsdVars->telLatitude > 0 )
     astSet ( tFrame, "obslat=N%f", gsdVars->telLatitude );
   else
-    astSet ( tFrame, "obslat=S%f", gsdVars->telLatitude ); 
-  if ( gsdVars->telLongitude > 0 )   
+    astSet ( tFrame, "obslat=S%f", gsdVars->telLatitude );
+  if ( gsdVars->telLongitude > 0 )
     astSet ( tFrame, "obslon=W%f", gsdVars->telLongitude );
   else
-    astSet ( tFrame, "obslon=E%f", gsdVars->telLongitude ); 
+    astSet ( tFrame, "obslon=E%f", gsdVars->telLongitude );
 
   /* Make a copy so that we don't mess with the original
      UTC-based TimeFrame (this is a kludge to avoid a current
@@ -225,13 +225,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Get the LST in hours. */
   LSTStart = ( LSTStart - (int)LSTStart ) * 24.0;
 
-  /* Figure out what coordinates we are tracking in.  Then 
+  /* Figure out what coordinates we are tracking in.  Then
      the base can be copied from the corresponding CENTRE_
      value in the GSD header.  Remember that the GSD file
      stored RA/Decs in degrees!  Do this check first in case
      we encounter EQ as the centreCode. */
   switch ( gsdVars->centreCode ) {
-    
+
     case COORD_AZ:
       wcs->baseTr1 = gsdVars->centreAz * AST__DD2R;
       wcs->baseTr2 = gsdVars->centreEl * AST__DD2R;
@@ -259,7 +259,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
       break;
     default:
       *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Error getting tracking coordinates of base", 
+      errRep ( FUNC_NAME, "Error getting tracking coordinates of base",
                status );
       return;
       break;
@@ -285,7 +285,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
     /* Add the integration times up to this scan point. */
     dLST = dLST + ( ( stepNum % gsdVars->nScanPts ) *
-                    ( gsdVars->scanTime / gsdVars->nScanPts ) / 
+                    ( gsdVars->scanTime / gsdVars->nScanPts ) /
                     SPD );
 
   } else {
@@ -301,12 +301,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( dLST < 0 ) dLST = dLST + 1.0;
 
   /* Get the start TAI. */
-  astSet ( tFrame, "TimeScale=TAI" );  
+  astSet ( tFrame, "TimeScale=TAI" );
 
   TAIStart = astGetD ( tFrame, "TimeOrigin" );
 
   /* Get the idate and itime.  We need to convert the time for this
-     step to UTC and get the correct formatting.  The time origin is 
+     step to UTC and get the correct formatting.  The time origin is
      the starting TAI time plus the LST offset (corrected for the
      difference between solar and sidereal time). */
   astSetD ( tFrame, "TimeOrigin", TAIStart + ( dLST / SOLSID ) );
@@ -328,9 +328,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;
-    errRep ( FUNC_NAME, "Error preparing values for atlWcspx", 
+    errRep ( FUNC_NAME, "Error preparing values for atlWcspx",
              status );
-    return; 
+    return;
   }
 
   /* Create the keymaps. */
@@ -347,15 +347,15 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astMapPut0I( datePointing, "DPOS(1)", 0.0, "" );
   astMapPut0I( datePointing, "DPOS(2)", 0.0, "" );
   astMapPut0C( datePointing, "IDATE", iDate, "" );
-  astMapPut0C( datePointing, "ITIME", iTime, "" ); 
+  astMapPut0C( datePointing, "ITIME", iTime, "" );
   astMapPut0I( datePointing, "LSRFLG", LSRFlg, "" );
   if ( dasFlag == DAS_CROSS_CORR || dasFlag == DAS_TP )
     astMapPut0D( datePointing, "V_SETL(4)", 0, "" );
   else
     astMapPut0D( datePointing, "V_SETL(4)", gsdVars->velocity, "" );
-  astMapPut0I( datePointing, "JFCEN(1)", 
-               gsdVars->centreFreqs[subBandNum]*1000000.0, "" ); 
-  astMapPut0I( datePointing, "JFINC(1)", 
+  astMapPut0I( datePointing, "JFCEN(1)",
+               gsdVars->centreFreqs[subBandNum]*1000000.0, "" );
+  astMapPut0I( datePointing, "JFINC(1)",
                gsdVars->freqRes[subBandNum]*1000000.0, "" );
   astMapPut0I ( datePointing, "IFFREQ(1)", IFFreqs[subBandNum], "" );
   astMapPut0I( datePointing, "CENTRECODE", gsdVars->centreCode, "" );
@@ -376,15 +376,15 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                ( fabs( gsdVars->freqRes[subBandNum] ) / 1000.0 ) );
 
   /* Get a frameset describing the mapping from cell to sky. */
-  atlWcspx ( datePointing, cellMap, crpix, 
-             gsdVars->telLongitude * -1.0 * AST__DD2R, 
+  atlWcspx ( datePointing, cellMap, crpix,
+             gsdVars->telLongitude * -1.0 * AST__DD2R,
              gsdVars->telLatitude * AST__DD2R, WCSFrame, status );
 
   /* Set DUT1 attribute (which will not have been set in the ATL call
      since it is not needed there but specwrite uses it) */
   astSet ( *WCSFrame, "DUT1(1)=%f,DUT1(3)=%f", dut1, dut1 );
 
-  if ( subBandNum == 0 && DEBUGON ) 
+  if ( subBandNum == 0 && DEBUGON )
     printf("Epoch = %s MJD=%f\n",astGetC(*WCSFrame,"Epoch"),
             slaEpj2d(astGetD(*WCSFrame,"Epoch")));
 
@@ -400,9 +400,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( *status != SAI__OK ) {
 
     *status = SAI__ERROR;
-    errRep ( FUNC_NAME, "Couldn't create FrameSet for grid map", 
+    errRep ( FUNC_NAME, "Couldn't create FrameSet for grid map",
              status );
-    return; 
+    return;
   }
 
   /* Calculate the centre in tracking. */
@@ -414,12 +414,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "GRID (base) coordinates  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "GRID (base) coordinates  : %f %f\n",
              coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n",
              coordOut[0], coordOut[1] );
 
   wcs->baseTr1 = coordOut[0];
@@ -433,12 +433,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "GRID (offset) coordinates  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "GRID (offset) coordinates  : %f %f\n",
              coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n",
              coordOut[0], coordOut[1] );
 
   wcs->acTr1 = coordOut[0];
@@ -454,12 +454,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "GRID (base) coordinates  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "GRID (base) coordinates  : %f %f\n",
              coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "AZEL (base) coordinates (radians)  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "AZEL (base) coordinates (radians)  : %f %f\n",
              coordOut[0], coordOut[1] );
 
   wcs->baseAz = coordOut[0];
@@ -473,12 +473,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "GRID (offset) coordinates  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "GRID (offset) coordinates  : %f %f\n",
              coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 && DEBUGON ) 
-    printf ( "AZEL (offset) coordinates (radians)  : %f %f\n", 
+  if ( subBandNum == 0 && DEBUGON )
+    printf ( "AZEL (offset) coordinates (radians)  : %f %f\n",
              coordOut[0], coordOut[1] );
 
   wcs->acAz = coordOut[0];
@@ -490,8 +490,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Focal plane is AZEL so AZ angle is 0. */
   wcs->azAng = 0.0;
 
-  /* The angle between the focal plane and PA=0 and PA=0 in the 
-     tracking coordinate frame is determined from the hour angle, 
+  /* The angle between the focal plane and PA=0 and PA=0 in the
+     tracking coordinate frame is determined from the hour angle,
      the declination, and the latitude. */
   astSet( frame, "System(1)=GAPPT" );
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );

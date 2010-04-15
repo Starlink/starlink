@@ -1,6 +1,6 @@
-      SUBROUTINE KPG1_GDPUT( IPIC, WDOM, DDOM, IPLOT, STATUS ) 
-*+ 
-*  Name: 
+      SUBROUTINE KPG1_GDPUT( IPIC, WDOM, DDOM, IPLOT, STATUS )
+*+
+*  Name:
 *     KPG1_GDPUT
 
 *  Purpose:
@@ -14,23 +14,23 @@
 
 *  Description:
 *     This routine saves the supplied AST Plot (see SUN/210) in the AGI
-*     database (see SUN/48) within the MORE structure of the specified 
-*     picture. It can be retrieved if necessary using KPG1_GDGET (see the 
-*     prologue of KPG1_GDGET for more information about using these two 
-*     routines). 
+*     database (see SUN/48) within the MORE structure of the specified
+*     picture. It can be retrieved if necessary using KPG1_GDGET (see the
+*     prologue of KPG1_GDGET for more information about using these two
+*     routines).
 *
 *     If the supplied Plot contains a "AGI Data" Frame with the
 *     Domain given by DDOM in which the axes are scaled and shifted
 *     versions of the axes of the AGI world co-ordinate Frame
-*     (specified by argument WDOM), then a TRANSFORM structure defining 
-*     AGI Data co-ordinates is stored with the DATA picture. This is purely 
-*     for the benefit of non-AST based applications which may use AGI Data 
-*     co-ordinates (AST-based applications should always use the Plot 
-*     stored with the picture in preference to the TRANSFORM structure 
+*     (specified by argument WDOM), then a TRANSFORM structure defining
+*     AGI Data co-ordinates is stored with the DATA picture. This is purely
+*     for the benefit of non-AST based applications which may use AGI Data
+*     co-ordinates (AST-based applications should always use the Plot
+*     stored with the picture in preference to the TRANSFORM structure
 *     stored in the AGI database).
 *
 *     Any Frames that are Regions and have a Domain beginning with "ROI"
-*     are deleted from the Plot before saving it. Also, any Frames that 
+*     are deleted from the Plot before saving it. Also, any Frames that
 *     have an Ident value beginning with "ROI" are also deleted from the
 *     Frame (these may be added by KPG1_ASGET).
 
@@ -39,11 +39,11 @@
 *        The AGI identifier for the picture. A value of -1 causes the
 *        Plot to be stored with the current picture.
 *     WDOM = CHARACTER * ( * ) (Given)
-*        Domain name of the co-ordinate Frame within IPLOT corresponding 
+*        Domain name of the co-ordinate Frame within IPLOT corresponding
 *        to AGI world co-ordinates. "AGI_WORLD" is used if a blank value
 *        is supplied.
 *     DDOM = CHARACTER * ( * ) (Given)
-*        Domain name of the co-ordinate Frame within IPLOT corresponding 
+*        Domain name of the co-ordinate Frame within IPLOT corresponding
 *        to AGI data co-ordinates. "AXIS" is used if a blank value
 *        is supplied.
 *     IPLOT = INTEGER (Given)
@@ -56,11 +56,11 @@
 *  Notes:
 *     -  The Base (GRAPHICS) Frame in the Plot should represent millimetres
 *     from the bottom left corner of the view surface.
-*     -  An error is reported if the Plot contains any Frames which have the 
+*     -  An error is reported if the Plot contains any Frames which have the
 *     Domain AGI_DATA.
 *     -  The PGPLOT interface to the AGI library should be opened before
-*     calling this routine.  
-*     -  The Plot is stored in a component of the MORE structure named 
+*     calling this routine.
+*     -  The Plot is stored in a component of the MORE structure named
 *     "AST_PLOT" and with type "WCS".
 
 *  Copyright:
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,7 +92,7 @@
 *        Original version.
 *     4-DEC-1998 (DSB):
 *        Added facilities for storing a TRANFORM structure with the DATA
-*        picture for the benefit of non-AST applications which require 
+*        picture for the benefit of non-AST applications which require
 *        access to AGI Data co-ordinates.
 *     26-MAY-2006 (DSB):
 *        Remove ROI-related Frames before saving the Plot.
@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,9 +143,9 @@
       INTEGER I                    ! Frame index/loop counter
       INTEGER IDATA                ! Index of AXIS Frame in IPLOT
       INTEGER IFRM                 ! Frame index
-      INTEGER IPIC0                ! Original current AGI picture identifier 
+      INTEGER IPIC0                ! Original current AGI picture identifier
       INTEGER IPICL                ! AGI identifier for picture to use
-      INTEGER IPLOT2               ! Copy of supplied Plot 
+      INTEGER IPLOT2               ! Copy of supplied Plot
       INTEGER IWORLD               ! Index of AGI world co-ord Frame in IPLOT
       INTEGER MAP                  ! AST pointer to WORLD->DATA Mapping
       INTEGER NFRM                 ! Number of Frames in Plot
@@ -156,14 +156,14 @@
       REAL WX1, WX2, WY1, WY2      ! Bounds of picture in AGI world coords
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that an AST Plot has been supplied.
-      IF( IPLOT .NE. AST__NULL ) THEN 
+      IF( IPLOT .NE. AST__NULL ) THEN
          IF( .NOT. AST_ISAPLOT( IPLOT, STATUS ) ) THEN
             IF( STATUS .EQ. SAI__OK ) THEN
-               CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS', 
+               CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS',
      :                                           STATUS ) )
                STATUS = SAI__ERROR
                CALL ERR_REP( 'KPG1_GDPUT_1', 'KPG1_GDPUT: Programming'//
@@ -183,7 +183,7 @@
 
 *  Set the access mode required for the MORE structure, depending on
 *  whether or not the picture already has a more structure.
-      CALL AGI_IMORE( IPICL, MORE, STATUS ) 
+      CALL AGI_IMORE( IPICL, MORE, STATUS )
       IF( MORE ) THEN
          MODE = 'UPDATE'
       ELSE
@@ -191,7 +191,7 @@
       END IF
 
 *  Get an HDS locator to the MORE structure.
-      CALL AGI_MORE( IPICL, MODE, MORLOC, STATUS ) 
+      CALL AGI_MORE( IPICL, MODE, MORLOC, STATUS )
 
 *  If supplied, see if the Plot contains any AGI_DATA frames. Component
 *  Frames within CmpFrames are also checked.
@@ -220,7 +220,7 @@
                   IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
                      CALL AST_REMOVEFRAME( IPLOT2, IFRM, STATUS )
                   END IF
-               ELSE 
+               ELSE
                   IDENT = AST_GETC( FRM, 'Ident', STATUS )
                   IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
                      CALL AST_REMOVEFRAME( IPLOT2, IFRM, STATUS )
@@ -237,7 +237,7 @@
 
          END IF
 
-*  If no Plot was supplied, delete the AST_PLOT component within MORE if it 
+*  If no Plot was supplied, delete the AST_PLOT component within MORE if it
 *  exists.
       ELSE
          CALL DAT_THERE( MORLOC, 'AST_PLOT', THERE, STATUS )
@@ -260,9 +260,9 @@
 
 *  If both Frames were found, get the mapping from World to Data, and
 *  simplify it.
-      IF( IWORLD .NE. AST__NOFRAME .AND. IDATA .NE. AST__NOFRAME 
+      IF( IWORLD .NE. AST__NOFRAME .AND. IDATA .NE. AST__NOFRAME
      :    .AND. STATUS .EQ. SAI__OK ) THEN
-         MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, IWORLD, IDATA, 
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, IWORLD, IDATA,
      :                                       STATUS ), STATUS )
 
 *  Cannot use the mapping unless it has 2 inputs and 2 outputs.
@@ -278,11 +278,11 @@
             END IF
 
 *  Get the AGI world co-odinate bounds of the requested picture.
-            CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS ) 
+            CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS )
 
 *  Form a list of NSAMP points evenly spread in world co-ordinates along
 *  each axis.
-            DX = DBLE( WX2 - WX1 )/( NSAMP - 1 ) 
+            DX = DBLE( WX2 - WX1 )/( NSAMP - 1 )
             DY = DBLE( WY2 - WY1 )/( NSAMP - 1 )
             DO I = 0, NSAMP - 1
                XW( I + 1 ) = DBLE( WX1 ) + DX*I
@@ -290,10 +290,10 @@
             END DO
 
 *  Transform these World Domain positions into the Data Domain.
-            CALL AST_TRAN2( MAP, NSAMP, XW, YW, .TRUE., XD, YD, STATUS ) 
+            CALL AST_TRAN2( MAP, NSAMP, XW, YW, .TRUE., XD, YD, STATUS )
 
 *  Attempt to fit a straight line through the XD and XW values.
-            CALL KPG1_FIT1D( 1, NSAMP, XD, XW, SCALE( 1 ), OFFSET( 1 ), 
+            CALL KPG1_FIT1D( 1, NSAMP, XD, XW, SCALE( 1 ), OFFSET( 1 ),
      :                       RMS, STATUS )
 
 *  Consider the fit good if the RMS error is less than 0.05 of the increment
@@ -301,14 +301,14 @@
             XDLIN = ( RMS .LT. ABS( 0.05D0*SCALE( 1 )*DX ) )
 
 *  Attempt to fit a straight line through the YD and YW values.
-            CALL KPG1_FIT1D( 1, NSAMP, YD, YW, SCALE( 2 ), OFFSET( 2 ), 
+            CALL KPG1_FIT1D( 1, NSAMP, YD, YW, SCALE( 2 ), OFFSET( 2 ),
      :                       RMS, STATUS )
 
 *  Consider the fit good if the RMS error is less than 0.05 of the increment
 *  in XD between samples.
             YDLIN = ( RMS .LT. ABS( 0.05D0*SCALE( 2 )*DY ) )
 
-*  If succesful, and both are linear, and the two co-ordinate systems are 
+*  If succesful, and both are linear, and the two co-ordinate systems are
 *  not identical...
             IF( STATUS .EQ. SAI__OK .AND. XDLIN .AND. YDLIN .AND.
      :          ABS( SCALE( 1 ) - 1.0D0 ) .GE. VAL__EPSD .OR.

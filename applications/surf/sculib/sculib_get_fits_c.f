@@ -11,7 +11,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 
 *  Invocation:
 *     CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, NAME,
@@ -51,7 +51,7 @@
 *     VALUE                = CHARACTER*(*) (Returned)
 *           the value of the FITS keyword
 *     STATUS               = INTEGER (Given and returned)
-*           global status 
+*           global status
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -145,7 +145,7 @@
          DO WHILE (LOOPING .AND. (STATUS .EQ. SAI__OK))
             I = I + 1
 
-*  the FITS keyword name should be in first part of the string, immediately 
+*  the FITS keyword name should be in first part of the string, immediately
 *  in front of the =
 
             IPOS = INDEX (FITS(I),'=')
@@ -157,7 +157,7 @@
                IF (CHR_LEN(KEYNAME) .EQ. 0) THEN
                   IF (STATUS .EQ. SAI__OK) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 
+                     CALL ERR_REP (' ',
      :                    'SCULIB_GET_FITS_C: error decoding -',
      :                    STATUS)
                      CALL MSG_SETC ('LINE', FITS(I))
@@ -173,7 +173,7 @@
 *  OK, we've found the FITS keyword, the value should be between the = and
 *  a /
 *  In fact the value should be inside some quotes
-*     Change logic so that we only extract a string between 
+*     Change logic so that we only extract a string between
 *     quotes and we do not care about a '/' (in case it is missing)
 
 *     Look for a quote
@@ -199,7 +199,7 @@
                            IF (JPOS - IPOS .LE. 1) THEN
 
                               VALUE = ' '
-                              
+
                            ELSE
 
                               STEMP = FITS(I)(IPOS+1:JPOS-1)
@@ -215,7 +215,7 @@
      :                          ' quote in FITS string', STATUS)
 
                         END IF
-                     
+
                      ELSE
 
                         STATUS = SAI__ERROR
@@ -228,16 +228,16 @@
                   END IF
                END IF
             END IF
-                              
+
 *  break out of loop if we've found a value, reached the end of the FITS
 *  array, or if an error has occured
-   
-            IF ((VALUE .NE. '%&')     .OR. 
+
+            IF ((VALUE .NE. '%&')     .OR.
      :          (STATUS .NE. SAI__OK) .OR.
      :          (I .EQ. N_FITS))      THEN
                LOOPING = .FALSE.
             END IF
-                      
+
          END DO
 
          IF (STATUS .NE. SAI__OK) THEN
@@ -247,7 +247,7 @@
             CALL ERR_REP (' ', '^LINE', STATUS)
          END IF
       END IF
- 
+
 *  check that a value for the parameter was found
 
       IF (VALUE .EQ. '%&') THEN

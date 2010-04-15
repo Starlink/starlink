@@ -24,9 +24,9 @@
 *     is tested to see if it is an overlay plane, if so the clear flag is
 *     set.
 *
-*     The cursor is initialised to use the mouse buttons if available. 
+*     The cursor is initialised to use the mouse buttons if available.
 *     The CHOICE values this gives us are:-
-* 
+*
 *         CHOICE     action
 *           5         Mouse button 1
 *           0         Mouse button 2
@@ -86,7 +86,7 @@
 *     5-JUN-1992 (NE):
 *        Allow for WINDOW_OVERLAY device.
 *     6-NOV-1996 (PWD):
-*        Now initialises ISTAT (Linux port). 
+*        Now initialises ISTAT (Linux port).
 *     8-NOV-1996 (PWD):
 *        Added cursor preparation to get mouse buttons to work
 *        on X-windows.
@@ -97,7 +97,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -228,7 +228,7 @@
             CALL GSPLR( WKID, PENO, 1, 1.0, 3 )
             CALL GSCR( WKID, PENP, 0.0, 0.0, 1.0 )
             CALL GSPLR( WKID, PENP, 1, 1.0, 4 )
-	    
+
 *   Otherwise use pen 1
          ELSE
             PENS = 1

@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
-      
+
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
 *        DCB_FORID( NDF__MXDCB ) = CHARACTER * ( NDF__SZFID ) (Read)
@@ -112,7 +112,7 @@
 *  Arguments Given:
       CHARACTER * ( * ) FILE
       INTEGER IFMT
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) EXPFIL
       INTEGER LEXP
@@ -140,12 +140,12 @@
       LOGICAL OK                 ! File access OK?
       LOGICAL OPENED             ! File open on unit?
       LOGICAL VERS               ! Version number field present?
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Initialise.
       VERS = .FALSE.
 
@@ -195,7 +195,7 @@
                   IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :                 ( NEXT .NE. 0 ) ) THEN
                      IDCB = NEXT
-                     
+
 *  Search for DCB entries with the same foreign file identification code
 *  (ignore blank identification codes, which indicate that
 *  identification information could not be obtained for the file).
@@ -206,7 +206,7 @@
                      END IF
                      GO TO 1
                   END IF
- 2                CONTINUE           
+ 2                CONTINUE
                END IF
 
 *  If necessary, also check the PCB in the same way, as it may also
@@ -220,7 +220,7 @@
                   IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :                 ( NEXT .NE. 0 ) ) THEN
                      IPCB = NEXT
-                     
+
 *  As before, search for non-blank PCB entries with the same foreign
 *  file identification code.
                      IF ( ( PCB_FORID( IPCB ) .EQ. FID ) .AND.
@@ -230,7 +230,7 @@
                      END IF
                      GO TO 3
                   END IF
- 4                CONTINUE           
+ 4                CONTINUE
                END IF
 
 *  If the file is already in use, then report an error.
@@ -294,7 +294,7 @@
 *  it, using the name supplied.
          IF ( STATUS .EQ. SAI__OK ) THEN
             OPEN ( UNIT = UNIT, FILE = FILE, STATUS = 'NEW',
-     :             IOSTAT = IOSTAT ) 
+     :             IOSTAT = IOSTAT )
 
 *  If a new file could not be created, then the file name is invalid
 *  (for instance there may be a file name syntax error, or the required

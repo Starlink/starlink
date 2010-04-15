@@ -1,5 +1,5 @@
 { PROCEDURE ROINDEX : index RO files
-proc roindex rost roen 
+proc roindex rost roen
   set precision 3
   get plt2d filetype (filetype)
   if filetype <> 1

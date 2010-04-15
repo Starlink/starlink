@@ -68,13 +68,13 @@
 *        Original version.
 *     2009 June 26 (MJC):
 *        UPDATE_MODE may now have leading blanks that must be trimmed to
-*        avoid an error from NDF when NDF accesses this component. 
+*        avoid an error from NDF when NDF accesses this component.
 *        Merged in most of the modifications made to its sister routine
 *        COF_CHISR.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -258,7 +258,7 @@
 *  Obtain the current record.  Validate that it's an integer.
             CRCOL = INDEX( CARD, 'Current record:' )
 
-            IF ( STATUS .EQ. SAI__OK ) THEN 
+            IF ( STATUS .EQ. SAI__OK ) THEN
                CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'C', CARD )
@@ -370,13 +370,13 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  The width is the seventh word.
-               IF ( STATUS .EQ. SAI__OK ) THEN 
+               IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETC( 'C', CARD )
                      CALL MSG_SETC( 'F', WORDS( 7 ) )
                      CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer '//
-     :                             'field ''^F'' in FITS card ''^C''.', 
+     :                             'field ''^F'' in FITS card ''^C''.',
      :                             STATUS )
                   END IF
                END IF
@@ -430,7 +430,7 @@
 
 *  Set PARSKP if end of paragraph within a history record
                   PARSKP = KEYWRD .EQ. 'HISTORY' .AND.
-     :                     CARD( 9 + ALIGN: ) .EQ. ' ' 
+     :                     CARD( 9 + ALIGN: ) .EQ. ' '
                   IF ( KEYWRD .NE. 'HISTORY' .OR. PARSKP ) THEN
 
 *  The END card is the last header card so end the search for further
@@ -439,7 +439,7 @@
 
 *  Is there any text to write?
                      IF ( PARCOL .GT. 0 ) THEN
- 
+
 *  Create the TEXT component and get a locator to it.  This should only
 *  be done for the first paragraph.
                         IF ( CRETEX ) THEN
@@ -495,11 +495,11 @@
                      END IF
 
 *  We can start a new paragraph.
-                     IF ( PARSKP ) PARCOL = 0 
-                  ELSE 
+                     IF ( PARSKP ) PARCOL = 0
+                  ELSE
 
 *  Append the current record to the paragraph buffer.
-                     CALL CHR_APPND( CARD( 9 + ALIGN: ), PARAGR, 
+                     CALL CHR_APPND( CARD( 9 + ALIGN: ), PARAGR,
      :                               PARCOL )
                      IF ( CARD( 80:80 ) .EQ. ' ' ) PARCOL = PARCOL + 1
                   END IF
@@ -536,17 +536,17 @@
 *  headers.  This should only fail if the headers have been tampered,
 *  i.e. divided.  In normal circumstances this loop shouldn't be
 *  required anyway.
-*  
+*
 *  Return to start of DO WHILE loop.
 *         GOTO 100
       END IF
 
-*  If an error has occurred, issue a warning and flush the error, so that 
+*  If an error has occurred, issue a warning and flush the error, so that
 *  we can continue to build the rest of the NDF.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', NDF )
          CALL ERR_REP( 'COI_CHISR_ERR', 'The history information in '/
-     :                 /'the output NDF ''^NDF'' may be corrupt.', 
+     :                 /'the output NDF ''^NDF'' may be corrupt.',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
       END IF

@@ -14,7 +14,7 @@
 *     YDIM = INTEGER
 *           This is the Y dimension of the image.
 *     X1 = INTEGER
-*           This is the lower X bound of the region 
+*           This is the lower X bound of the region
 *           of the image.
 *     Y1 = INTEGER
 *           This is the lower Y bound of the region
@@ -54,7 +54,7 @@
 *     chosen number of bins for the histogram of the
 *     region. If the number of bins (calculated
 *     or prompted) exceeds 5000 , then the value for
-*     the number of bins is set to 5000. The histogram       
+*     the number of bins is set to 5000. The histogram
 *     for the region is then determined.
 *    Authors :
 *     S.Chan (RGVAD::KFH)
@@ -66,8 +66,8 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 *    Status :
       INTEGER STATUS
 *    Local variables :
@@ -94,9 +94,9 @@
 *                                        ! the histogram.
       INTEGER TEMPX                      ! Temporary location.
       INTEGER TEMPY                      ! Temporary location.
-      INTEGER X1                         ! The lower X bound of the 
+      INTEGER X1                         ! The lower X bound of the
 *                                        ! region of the image.
-      INTEGER Y1                         ! The lower Y bound of the 
+      INTEGER Y1                         ! The lower Y bound of the
 *                                        ! region of the image.
       INTEGER X2                         ! The upper X bound of the
 *                                        ! region of the image.
@@ -169,7 +169,7 @@
          IF (.NOT.HIST) THEN
 
 *
-*          Calculate the number of bins for 
+*          Calculate the number of bins for
 *          the histogram.
 *
 

@@ -1,7 +1,7 @@
 
 *+  CHP_APREPAR - Pre parse CONVERT
       subroutine chi_aprepar(expr, status)
-*    Description : 
+*    Description :
 *     Part of the catalogue handling interface plus.  Preparse an expression
 *     converting CONVERT function into a radian value.
 *    Invocation
@@ -13,14 +13,14 @@
 *      Status variable
 *    Method :
 *           Apply conversion.
-*    Authors : 
+*    Authors :
 *     Alan Wood (STADAT::ARW)
-*    History : 
-*     5 Mar 1991:  Original 
-*    Type Definitions : 
-      implicit none 
-*    Global constants : 
-      include 'sae_par'                 ! SAI Symbolic Constants 
+*    History :
+*     5 Mar 1991:  Original
+*    Type Definitions :
+      implicit none
+*    Global constants :
+      include 'sae_par'                 ! SAI Symbolic Constants
       include 'chi_err'
       include 'chipar_err'
       include 'chi_par'
@@ -30,11 +30,11 @@
 *    Import :
       character*(*) expr
 *    Export :
-      integer status 
-*    External references : 
+      integer status
+*    External references :
       integer chr_len
       logical chr_simlr
-*    Local variables : 
+*    Local variables :
       integer explen
       integer l2
       integer i
@@ -65,7 +65,7 @@
       double precision dasec
       double precision dval
       logical simlr
-*- 
+*-
 *
 *    Begin:
 *
@@ -147,7 +147,7 @@
                   endi = index(expr(i:i+14),'"')
                   if (endi .ne. 0) then
                     w = endi - 1
-                    read (expr(i:endi), '(I2,1X,I2,1X,F4.1)', err=1) 
+                    read (expr(i:endi), '(I2,1X,I2,1X,F4.1)', err=1)
      :                    ihr, imin, rsec
                     dsec = rsec
                     call sla_dtf2r(ihr, imin, dsec, dval, jstat)
@@ -159,12 +159,12 @@
                   endif
 *
                elseif ((expr(i:i+13) .eq. '("SDD MM SS","') .or.
-     :                (expr(i:i+13) .eq. '("SDD MM SS","')) then 
+     :                (expr(i:i+13) .eq. '("SDD MM SS","')) then
                   i = i + 14
                   endi = index(expr(i:i+14),'"')
                   if (endi .ne. 0) then
                     w = endi - 1
-                    read (expr(i:endi), '(I2,1X,I2,1X,I2)', err=1) 
+                    read (expr(i:endi), '(I2,1X,I2,1X,I2)', err=1)
      :                    ihr, imin, isec
                     dsec = isec
                     call sla_dtf2r(ihr, imin, dsec, dval, jstat)
@@ -215,7 +215,7 @@
                   endi = index(expr(i:i+14),'"')
                   if (endi .ne. 0) then
                     w = endi - 1
-                    read (expr(i:endi), '(I2,1XI2,1X,I2)', err=1) 
+                    read (expr(i:endi), '(I2,1XI2,1X,I2)', err=1)
      :                    ihr, imin, isec
                     dsec = isec
                     call sla_dtf2r(ihr, imin, dsec, dval, jstat)
@@ -244,7 +244,7 @@
                   endif
                else
                  status = CHI__PRSER
-               endif                       
+               endif
            else
              tempexpr(newi:newi) = expr(i:i)
              i = i + 1

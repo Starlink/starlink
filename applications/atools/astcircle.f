@@ -21,16 +21,16 @@
 
 *  Description:
 *     This application creates a new Circle and optionally initialises
-*     its attributes. The Circle class implements a Region which represents 
+*     its attributes. The Circle class implements a Region which represents
 *     a circle or sphere within a Frame.
 
 *  Usage:
 *     astcircle frame form centre point unc options result
 
 *  ADAM Parameters:
-*     FRAME = LITERAL (Read) 
+*     FRAME = LITERAL (Read)
 *        An NDF or text file holding the Frame in which the region is defined.
-*        If an NDF is supplied, the current Frame in its WCS FrameSet will be 
+*        If an NDF is supplied, the current Frame in its WCS FrameSet will be
 *        used.
 *     FORM = _INTEGER (Read)
 *        Indicates how the circle is described by the remaining parameters.
@@ -39,21 +39,21 @@
 *        one indicates that the circle is specified by a centre position and
 *        a scalar radius.
 *     CENTRE() = _DOUBLE (Read)
-*        An array with one element for each Frame axis (Naxes attribute) 
+*        An array with one element for each Frame axis (Naxes attribute)
 *        containing the coordinates at the centre of the circle or sphere.
 *     POINT() = _DOUBLE (Read)
-*        If FORM is zero, then this array should have one element for each 
-*        Frame axis (Naxes attribute), and should be supplied holding the 
+*        If FORM is zero, then this array should have one element for each
+*        Frame axis (Naxes attribute), and should be supplied holding the
 *        coordinates at a point on the circumference of the circle or
-*        sphere. If FORM is one, then this array should have one element 
-*        only which should be supplied holding the scalar radius of the 
+*        sphere. If FORM is one, then this array should have one element
+*        only which should be supplied holding the scalar radius of the
 *        circle or sphere, as a geodesic distance within the Frame.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new Circle. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new Circle.
 *     RESULT = LITERAL (Read)
-*        An text file to receive the new Circle. 
-*     UNC = LITERAL (Read) 
+*        An text file to receive the new Circle.
+*     UNC = LITERAL (Read)
 *        An optional text file containing an existing Region which
 *        specifies the uncertainties associated with each point on the
 *        boundary of the Circle being created. The uncertainty at any
@@ -64,16 +64,16 @@
 *        is assumed to be the same for all points.
 *
 *        If supplied, the uncertainty Region must be either a Box, a Circle
-*        or an Circle. Alternatively, a null value (!) may be supplied, in 
-*        which case a default uncertainty is used equivalent to a box 
+*        or an Circle. Alternatively, a null value (!) may be supplied, in
+*        which case a default uncertainty is used equivalent to a box
 *        1.0E-6 of the size of the bounding box of the Circle being created.
 *
 *        The uncertainty Region has two uses: 1) when the astOverlap
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using astSimplify), the uncertainties are 
-*        used to determine if the transformed boundary can be accurately 
+*        subsequently simplified (using astSimplify), the uncertainties are
+*        used to determine if the transformed boundary can be accurately
 *        represented by a specific shape of Region.
 
 *  Copyright:
@@ -116,9 +116,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'CNF_PAR'          ! CNF constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! CNF constants
 
 *  Status:
       INTEGER STATUS
@@ -136,14 +136,14 @@
       DOUBLE PRECISION POINT( NDF__MXDIM )
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME,
      :                 STATUS )
 
 *  Get the number of axes in the Frame.
@@ -151,12 +151,12 @@
 
 *  Get the other parameter.
       CALL PAR_GDR0I( 'FORM', 0, 0, 1, .FALSE., FORM, STATUS )
-      CALL PAR_EXACD( 'CENTRE', NAX, CENTRE, STATUS )            
+      CALL PAR_EXACD( 'CENTRE', NAX, CENTRE, STATUS )
 
-      IF( FORM .EQ. 0 ) THEN 
-         CALL PAR_EXACD( 'POINT', NAX, POINT, STATUS )            
+      IF( FORM .EQ. 0 ) THEN
+         CALL PAR_EXACD( 'POINT', NAX, POINT, STATUS )
       ELSE
-         CALL PAR_EXACD( 'POINT', 1, POINT, STATUS )            
+         CALL PAR_EXACD( 'POINT', 1, POINT, STATUS )
       END IF
 
 *  Get the uncertainty Frame.
@@ -168,7 +168,7 @@
       END IF
 
 *  Create the required Circle.
-      RESULT = AST_CIRCLE( FRAME, FORM, CENTRE, POINT, UNC, ' ', 
+      RESULT = AST_CIRCLE( FRAME, FORM, CENTRE, POINT, UNC, ' ',
      :                     STATUS )
 
 *  Store the required attribute values.

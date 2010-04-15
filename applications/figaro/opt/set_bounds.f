@@ -19,11 +19,11 @@
 *    NPAR = INTEGER (Given)
 *        number of free parameters
 *    TIMES = INTEGER (Given)
-*       
+*
 *    MAX_CMP = INTEGER (Given)
-*       
+*
 *    MAX_TIMES = INTEGER (Given)
-*       
+*
 *    BOUNDS(MAX_PARS,MAX_CMP,MAX_TIMES,2) = REAL ARRAY (Returned)
 *        Bounds store ( absolute units)
 *    BL(NPAR) = DOUBLE PRECISION ARRAY (Returned)

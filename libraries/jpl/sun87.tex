@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -24,7 +24,7 @@
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
-The JPL library and data sets provide high-accuracy predictions for 
+The JPL library and data sets provide high-accuracy predictions for
 the positions and velocities of the Sun and planets.}
 
 % ? End of document identification
@@ -88,7 +88,7 @@ the positions and velocities of the Sun and planets.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -251,12 +251,12 @@ the positions and velocities of the Sun and planets.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -429,13 +429,13 @@ the unwary.  PLEPH and STATE accept times in the Barycentric Dynamical
 Time (TDB) timescale, which at the time of writing is displaced from
 UTC by about 1~minute.  For a given UTC you can get the offset to TDB
 by calling the SLALIB routines
-\xref{sla\_DTT}{sun67}{SLA_DTT} and 
+\xref{sla\_DTT}{sun67}{SLA_DTT} and
 \xref{sla\_RCC}{sun67}{SLA_RCC}
-(\xref{Starlink User Note~67}{sun67}{}).  
-The offset to Terrestrial Time TT returned by 
-\xref{sla\_DTT}{sun67}{SLA_DTT} 
-dominates, and in practice the call to 
-\xref{sla\_RCC}{sun67}{SLA_RCC} 
+(\xref{Starlink User Note~67}{sun67}{}).
+The offset to Terrestrial Time TT returned by
+\xref{sla\_DTT}{sun67}{SLA_DTT}
+dominates, and in practice the call to
+\xref{sla\_RCC}{sun67}{SLA_RCC}
 can be dispensed with.  In fact, the JPL documentation is vague
 about which of these dynamical timescales is the correct form to use.
 The difference between them never exceeds about 1.6~milliseconds.
@@ -474,12 +474,12 @@ with arguments as follows:
 
 \item[\texttt{TDB} = DOUBLE PRECISION (given)]\mbox{}
 
-The epoch:  the Barycentric Dynamical Time (TDB) expressed as a Modified 
+The epoch:  the Barycentric Dynamical Time (TDB) expressed as a Modified
 Julian Date (JD$-2400000.5$).
 
 \item[\texttt{NP} = INTEGER (given)]\mbox{}
 
-The body or reference point whose coordinates are required (see the list, 
+The body or reference point whose coordinates are required (see the list,
 below).
 
 \item[\texttt{NC} = INTEGER (given)]\mbox{}
@@ -488,12 +488,12 @@ The origin of the coordinate system -- the same scheme as for \texttt{NP}.
 
 \item[\texttt{R(6)} = DOUBLE PRECISION (returned)]\mbox{}
 
-An array to receive position and velocity: $x, y, z, \dot{x}, \dot{y}, 
+An array to receive position and velocity: $x, y, z, \dot{x}, \dot{y},
 \dot{z}$
 
 \item[\texttt{OK} = LOGICAL (returned)]\mbox{}
 
-Status:  .TRUE. indicates success.  .FALSE. indicates TDB out of range 
+Status:  .TRUE. indicates success.  .FALSE. indicates TDB out of range
 or illegal \texttt{NP}, \texttt{NC} value.
 
 \end{description}
@@ -591,7 +591,7 @@ prove convenient to set \texttt{JED(1)} to some fixed epoch and to set
 
 \item[\texttt{LIST(12)} = INTEGER (given)]\mbox{}
 
-An array specifying what interpolation is wanted for each of the bodies 
+An array specifying what interpolation is wanted for each of the bodies
 (or reference points) on the file:
 
 \begin{tabular}{rcll}
@@ -634,8 +634,8 @@ d\epsilon, d\dot{\psi}, d\dot{\epsilon}$.
 Status:  .TRUE. indicates success.
 
 \end{description}
-                     
-Other information is given in the labelled \texttt{COMMON} block 
+
+Other information is given in the labelled \texttt{COMMON} block
 \texttt{/STCOMM/}:
 
 \begin{description}
@@ -865,9 +865,9 @@ correspondence with C.\,Hohenkerk of HMNAO and E.\,M.\,Standish of JPL.
 
 Three example application programs are supplied: JPLPLEPH, JPLSTATE and
 JPLCONST.  On Unix systems, the source and executables for the example
-programs are in the directory \texttt{/star/etc/jpl}.  
+programs are in the directory \texttt{/star/etc/jpl}.
 
-\subsection{\xlabel{example_using_pleph}Example using PLEPH} 
+\subsection{\xlabel{example_using_pleph}Example using PLEPH}
 \label{example_using_pleph}
 
 The executable program JPLPLEPH interpolates the ephemeris for a
@@ -898,7 +898,7 @@ precision):
 \end{quote}
 
 The Fortran source of JPLPLEPH follows.
-   
+
 \begin{quote}
 \latexonlysmall
 \begin{verbatim}
@@ -951,11 +951,11 @@ The Fortran source of JPLPLEPH follows.
 
 The program JPLSTATE interpolates the ephemeris for a particular
 (hardwired) epoch, to demonstrate the use of the subroutine STATE.
-Under Unix, it can be run as follows: 
+Under Unix, it can be run as follows:
 
 \begin{quote}
 \begin{verbatim}
-% ln -s /star/etc/jpl/jpleph.dat JPLEPH 
+% ln -s /star/etc/jpl/jpleph.dat JPLEPH
 %/star/etc/jpl/jplstate
 \end{verbatim}
 \end{quote}
@@ -988,8 +988,8 @@ The Fortran source for JPLSTATE follows:
 *  - - - - - - - - -
 *
 *  Example program using the subroutine STATE, in the JPL Ephemeris
-*  package, to interpolate the planetary ephemeris.  The heliocentric 
-*  position and velocity of the Earth-Moon barycentre for a given 
+*  package, to interpolate the planetary ephemeris.  The heliocentric
+*  position and velocity of the Earth-Moon barycentre for a given
 *  epoch near the vernal equinox of 2000AD are determined.
 *
 *  Input is from the binary direct-access form of the JPL ephemeris
@@ -1155,14 +1155,14 @@ In an effort to fulfill these requests in as efficient and
 useful a fashion as possible, a machine-independent form of the
 ephemerides and supporting software has been prepared.
 This document describes its use.
- 
+
 The purpose of the export package is to provide users a convenient
 means of establishing a file of ephemeris data on direct-access
 mass storage and then, in subsequent programs,
 calling a subroutine to obtain cartesian
 coordinates of planetary position and velocity at any epoch covered
 by the file.
- 
+
 Many users have the earlier edition of the export ephemeris
 package. That set was created in 1976, before Fortran~77 was
 the available standard.
@@ -1178,14 +1178,14 @@ with the earlier formats and cannot be used with them.
 Anyone wishing to use future versions of the JPL ephemerides
 will have to adapt his software to use the routines described
 herein.
- 
+
 Although several users have had immediate success with the export
 package and subsequent application of the ephemerides, the complete
 absence of errors cannot be guaranteed. If you have difficulty
 or discover errors in either the software or ephemeris file,
 we would appreciate your notifying us at once. And any suggestions
 for the improvement of this document are most welcome.
- 
+
 \hdg{The Export Tape}
 
 The standard form of ephemeris-file transmittal is {\sl via\/}
@@ -1195,13 +1195,13 @@ on the user's computer. The card images are written on tape as a sequence
 of blocked 80-character \textsc{ascii} records. There are 24 records
 (1920 bytes)
 per block, unless requested otherwise by the user.
- 
+
 The second file on the tape contains the ephemeris information,
 also encoded as a series of 1920-byte \textsc{ascii} records.
 It is the function of one of the programs (\textsc{ephdsk}) in the software
 set to decode the images on this file and produce the direct-access
 file on mass storage.
- 
+
 This decoding of the export file can be
 time-consuming. Because of the frequency of requests for ephemerides
 on certain machines, binary-written tapes that avoid the
@@ -1239,14 +1239,14 @@ logical file \textsc{jpleph}. (These names are logical names, in that there
 are no terminal periods in the Fortran {\tt OPEN} statements; the user
 may wish to assign them \emph{via} operating system control
 statements to files whose actual names are different.)
- 
+
 Position the tape at the start of file~2.
 The density should be set to whatever is indicated
 on the tape reel. The record size you must specify to the
 executive language of your operating system is 80 bytes. The
 block size is 1920 bytes (unless stated otherwise in the export
 cover letter).
- 
+
 Run the program.  You will be prompted for two inputs.  The first is for
 a character specifying the format of file~2 ({\tt A} for \textsc{ascii}
 or {\tt B} for Binary). The format of your file is stated in the export
@@ -1264,17 +1264,17 @@ integer calendar date limits, in the form
         YYYYMMDD,YYYYMMDD
 \end{verbatim}
 % End of Starlink mods
- 
+
 If you wish to retain either the original starting or ending epoch,
 enter a 0 in the desired field. To retain the full span
 of the input file, enter only a {\tt <return>}.
- 
+
 On some smaller computers this file-creation
 step can be time-consuming, requiring possibly five minutes or
 more per decade of the ephemeris span. Bear in mind that this
 operation is done only once, after which the export tape
 can be set aside or archived.
- 
+
 \hdg{Testing the Ephemeris File}
 
 When \textsc{ephdsk} has completed execution, the direct-access file
@@ -1284,7 +1284,7 @@ and of the file on mass storage.
 One element of the software file is the main program \textsc{testeph}.
 That program should be compiled and linked with the elements
 \textsc{const, ephopn, interp, pleph, split, state}, and \textsc{comdat}.
- 
+
 When \textsc{testeph} is run, it calls for no keyboard inputs; however,
 it expects a set of input cards to be in the file \textsc{testephinput}.
 They are located in file~1 of the export tape following the last
@@ -1301,7 +1301,7 @@ comment cards of the form
         End of Test output from JPL PLANETARY EPHEMERIS: DE-xxx + LE-xxx
 \end{verbatim}
 % End of Starlink mods
- 
+
 There are approximately 600 cards in the test deck. The entire deck, {\it
 including the two comment cards}, must be copied to the  logical file
 \textsc{testephinput} before \textsc{testeph} is run. The program compares
@@ -1310,7 +1310,7 @@ corresponding quantities produced by the originating software at
 JPL and put in the test deck. It also interpolates the ephemeris
 at various points and compares the results with JPL-supplied values
 in the test deck.
- 
+
 Because the values in the test deck are encoded representations of
 double-precision numbers, comparison in some cases will
 not be exact but will match only to within a fractional tolerance.
@@ -1318,14 +1318,14 @@ That tolerance
 is pre-coded as $10~{-15}$ in the \textsc{testeph} variable
 {\tt CFRAC}. Any comparison exceeding this value will be
 printed on the output medium.
- 
+
 The interpolation times in the test deck are evenly spaced
 and cover the full range of the {\it original\/} export file sent from JPL.
 If you elected to shorten the ephemeris using the optional calendar
 date inputs described above, \textsc{testeph}
 will ignore points lying outside
 the range of your shortened file.
- 
+
 \hdg{Using the Ephemeris File}
 
 When the ephemeris file has been satisfactorily established
@@ -1338,7 +1338,7 @@ names and values of initial conditions and other astronomical
 constants employed in the creation of the ephemeris. The
 names and meanings of the quantities output by \textsc{const}
 are given in Table~1.
- 
+
 \textsc{pleph} is the most convenient subroutine for ephemeris access.
 It supplies the interpolated position and velocity ($x,\>y,\>z,
 \>\dot x,\>\dot y,\>\dot z$)
@@ -1348,7 +1348,7 @@ planets, the Sun, the Moon, the Earth-Moon barycenter, or the
 solar-system barycenter. It also provides interpolated nutations
 in longitude and obliquity ($\psi,\>\epsilon,\>\dot\psi,
 \>\dot\epsilon$), if requested.
- 
+
 \textsc{state}, one of the subroutines used by \textsc{pleph},
 may be used directly to obtain interpolated ephemeris quantities.
 It differs from \textsc{pleph} in that all planets, the Moon, and
@@ -1357,17 +1357,17 @@ is that only heliocentric or solar-system-barycentric states are output;
 users must do their own vector addition and scaling if other
 reference points are desired. For simplicity the use of \textsc{pleph}
 for the retrieval of ephemeris quantities is recommended.
- 
+
 All programs and subroutines are extensively documented in their
 listings; for completeness, the instructions for \textsc{pleph}
 and \textsc{const} are reproduced in Tables~2 and~3.
- 
+
 Any program using \textsc{pleph} will need to include
 \textsc{pleph, ephopn, interp, split, state}, and \textsc{comdat}
 in the linking process. The linking requirements for
 programs using \textsc{const} are \textsc{const, ephopn}, and
 \textsc{comdat}.
- 
+
 The output from \textsc{pleph} and \textsc{state}
 has default units of \textsc{au} and \textsc{au}/day. If km and km/sec
 are desired, the user must include the following statements
@@ -1422,12 +1422,12 @@ a range specified by the user. (\textsc{shorteph} is intended to
 extract and copy a portion of a file that is already on mass storage.
 It does not apply to the case of the original reading and
 conversion of the export tape.)
- 
+
 To use \textsc{shorteph}, first compile and link it with \textsc{ctoj,
  ephopn, jtoc}, and \textsc{comdat}. The input ephemeris
 file is expected on logical file \textsc{jpleph}; the shortened output file
 will be written into the logical name \textsc{jplephs}.
- 
+
 You will be asked for new starting and ending integer
 calendar date limits, in the form
 % Starlink mods
@@ -1439,7 +1439,7 @@ calendar date limits, in the form
 % End of Starlink mods
 If you wish to retain either the original starting or ending epoch,
 enter a 0 in the desired field.
- 
+
 \hdg{Ephemeris Coordinates}
 
 If the DE-\# of an ephemeris is less than 200 (except for DE-102),
@@ -1448,19 +1448,19 @@ system is with respect to the equator and equinox of 1950.0, as
 defined by the FK4 stellar catalog reference system. If the number
 is 200 or greater, the coordinates are with respect to the mean
 equator and equinox of J2000, coinciding with the origin of the FK5.
- 
+
 DE-102, the ``long ephemeris,'' has an origin which is closer
 to the B1950.0 dynamical equinox than to the FK4; however, the
 difference is only about $0.\kern-3pt''4$, negligible for
 most applications.
- 
+
 \hdg{Machine Particulars}
 
 There seems to be no uniform set of Input/Output standards in use by
 the computer industry, particularly with regard to reading
 binary tapes. Some observations and suggestions are given in Table~4 of
 this document.
- 
+
 \hdg{Ephemeris Information}
 
 Technical documentation for JPL ephemerides is given in
@@ -1799,7 +1799,7 @@ for the binary tape is:
 \end{verbatim}
 % End of Starlink mods
 Remove the {\tt C} as indicated in the listing.
- 
+
 The relevant statements used in conjunction with the program are:
 % Starlink mods
 % \vp

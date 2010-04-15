@@ -46,14 +46,14 @@
 *        leaving it at some NDF or HDS error code.
 *     16 Oct 2000 (ajc):
 *        NDF_OPEN may return DAT__FILNF OR NDF__FILNF depending upon
-*         whether or not on-the-fly NDF conversion is enabled 
+*         whether or not on-the-fly NDF conversion is enabled
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -1,5 +1,5 @@
-	SUBROUTINE CONTOUR_NUMBERS( NUMBER_XINTERVAL, 
-     :	                            NUMBER_YINTERVAL, CONTOUR_MAGNIF, 
+	SUBROUTINE CONTOUR_NUMBERS( NUMBER_XINTERVAL,
+     :	                            NUMBER_YINTERVAL, CONTOUR_MAGNIF,
      :                              CONTOUR_AXRAT, STATUS)
 
 * Description : Routine to write numbers on contour map. Numbers are either
@@ -136,7 +136,7 @@
 
 	CALL PAR_GET0C( 'NUMBER_TYPE', NUMBER_TYPE, STATUS)
 
-*      get zero position of ra and dec 
+*      get zero position of ra and dec
 
 	CALL PAR_GET0R( 'RA_ZERO', RA, STATUS)
 	CALL PAR_GET0R( 'DEC_ZERO', DEC, STATUS)
@@ -222,7 +222,7 @@
 
 	DO WHILE ( X1 .LE. XLIMIT)
 
-	  X1 = IM_XST + ( X_ZERO + 
+	  X1 = IM_XST + ( X_ZERO +
      :         NUMBER_XINTERVAL*(J-1))*CONTOUR_MAGNIF
 
 *        test if the user wants offsets or ra and dec positions
@@ -233,8 +233,8 @@
 
 *          numbers are ra/dec positions, calculate the values for this position
 
-	    CALL RADEC_STRING( J, RA, DEC, 'POSITIVE', 
-     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL, 
+	    CALL RADEC_STRING( J, RA, DEC, 'POSITIVE',
+     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL,
      :                         ARCSEC_PIXEL, NUMTYPE_RA,
      :	                       NUMTYPE_DEC, POS_RA, POS_DEC,
      :	                       STRING_RA, STRING_DEC)
@@ -253,9 +253,9 @@
 
 *          calculate HALF the length of the text string
 
-	    LENTEXT = L1*TEXT_HT/2.0 
+	    LENTEXT = L1*TEXT_HT/2.0
 
-*          calculate the start position of the text string 
+*          calculate the start position of the text string
 
 	    XSTTEXT = X1 - LENTEXT
 
@@ -390,8 +390,8 @@
 
 *          numbers are ra/dec positions, calculate the values for this position
 
-	    CALL RADEC_STRING( J, RA, DEC, 'NEGATIVE', 
-     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL, 
+	    CALL RADEC_STRING( J, RA, DEC, 'NEGATIVE',
+     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL,
      :                         ARCSEC_PIXEL, NUMTYPE_RA,
      :	                       NUMTYPE_DEC, POS_RA, POS_DEC,
      :	                       STRING_RA, STRING_DEC)
@@ -413,9 +413,9 @@
 
 *          calculate HALF the length of the text string
 
-	    LENTEXT = L1*TEXT_HT/2.0 
+	    LENTEXT = L1*TEXT_HT/2.0
 
-*          calculate the start position of the text string 
+*          calculate the start position of the text string
 
 	    XSTTEXT = X1 - LENTEXT
 
@@ -539,7 +539,7 @@
 
 *        set text positioning on centre in Y and centre in X
 
-	  CALL SGS_STXJ( 'CC') 
+	  CALL SGS_STXJ( 'CC')
 
 	ELSE
 
@@ -561,7 +561,7 @@
 	J = 1
 	Y1 = 0
 
-	YLIMIT = IM_YEN - 
+	YLIMIT = IM_YEN -
      :           NUMBER_YINTERVAL*CONTOUR_MAGNIF*CONTOUR_AXRAT
 
 	DO WHILE ( Y1 .LE. YLIMIT)
@@ -584,8 +584,8 @@
      :	         NUMBER_YINTERVAL*(J-1))*CONTOUR_MAGNIF*
      :           CONTOUR_AXRAT
 
-	    CALL RADEC_STRING( J, RA, DEC, 'POSITIVE', 
-     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL, 
+	    CALL RADEC_STRING( J, RA, DEC, 'POSITIVE',
+     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL,
      :                         ARCSEC_PIXEL, NUMTYPE_RA,
      :	                       NUMTYPE_DEC, POS_RA, POS_DEC,
      :	                       STRING_RA, STRING_DEC)
@@ -599,9 +599,9 @@
 
 *          calculate HALF the length of the text string
 
-	    LENTEXT = L1*TEXT_HT/2.0 
+	    LENTEXT = L1*TEXT_HT/2.0
 
-*          calculate the start position of the text string 
+*          calculate the start position of the text string
 
 	    YSTTEXT = Y1 - LENTEXT
 
@@ -708,7 +708,7 @@
 
 *            reset the text positioning to centre in X and centre in Y
 
-	      CALL SGS_STXJ( 'CC') 
+	      CALL SGS_STXJ( 'CC')
 
 	      X1 = IM_XST - 1.3*TEXT_HT
 
@@ -716,7 +716,7 @@
 
 *            reset the text positioning to centre in X and centre in Y
 
-	      CALL SGS_STXJ( 'CR') 
+	      CALL SGS_STXJ( 'CR')
 
 	      X1 = IM_XST - 0.5*TEXT_HT
 
@@ -732,17 +732,17 @@
 
 	      NUMPTY = -3
 
-	    ELSE IF( ABS( Y_NUMBER) .GT. 1.0E-5 .AND. 
+	    ELSE IF( ABS( Y_NUMBER) .GT. 1.0E-5 .AND.
      :	             ABS( Y_NUMBER) .LT. 10.0) THEN
 
 	      NUMPTY = -3
 
-	    ELSE IF( ABS( Y_NUMBER) .GE. 10.0 .AND. 
+	    ELSE IF( ABS( Y_NUMBER) .GE. 10.0 .AND.
      :	             ABS( Y_NUMBER) .LT. 100.0) THEN
 
 	      NUMPTY = -4
 
-	    ELSE IF( ABS( Y_NUMBER) .GE. 100.0 .AND. 
+	    ELSE IF( ABS( Y_NUMBER) .GE. 100.0 .AND.
      :	             ABS( Y_NUMBER) .LT. 1000.0) THEN
 
 	      NUMPTY = -5
@@ -777,7 +777,7 @@
 
 *        set text positioning to centre in X and centre in Y
 
-	  CALL SGS_STXJ( 'CC') 
+	  CALL SGS_STXJ( 'CC')
 
 	  CALL SGS_FLUSH
 
@@ -827,8 +827,8 @@
 
 *          numbers are ra/dec positions, calculate the values for this position
 
-	    CALL RADEC_STRING( J, RA, DEC, 'NEGATIVE', 
-     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL, 
+	    CALL RADEC_STRING( J, RA, DEC, 'NEGATIVE',
+     :	                       NUMBER_XINTERVAL, NUMBER_YINTERVAL,
      :                         ARCSEC_PIXEL, NUMTYPE_RA,
      :	                       NUMTYPE_DEC, POS_RA, POS_DEC,
      :	                       STRING_RA, STRING_DEC)
@@ -852,9 +852,9 @@
 
 *          calculate HALF the length of the text string
 
-	    LENTEXT = L1*TEXT_HT/2.0 
+	    LENTEXT = L1*TEXT_HT/2.0
 
-*          calculate the start position of the text string 
+*          calculate the start position of the text string
 
 	    YSTTEXT = Y1 - LENTEXT
 
@@ -883,7 +883,7 @@
 
 	        ELSE
 
-	          XOFF = ( POS_DEC( 1) - L1)*TEXT_HT 
+	          XOFF = ( POS_DEC( 1) - L1)*TEXT_HT
 
 	          X2 = X1 + XOFF
 	          Y2 = Y1 + 0.5*TEXT_HT
@@ -939,7 +939,7 @@
 
 	      ELSE
 
-	        XOFF = ( POS_DEC( 3) - L1)*TEXT_HT 
+	        XOFF = ( POS_DEC( 3) - L1)*TEXT_HT
 
 	        X2 = X1 + XOFF
 	        Y2 = Y1 + 0.3*TEXT_HT
@@ -967,7 +967,7 @@
 
 *            set text positioning on centre in Y and centre in X
 
-	      CALL SGS_STXJ( 'CC') 
+	      CALL SGS_STXJ( 'CC')
 
 	      X1 = IM_XST - 1.3*TEXT_HT
 
@@ -975,7 +975,7 @@
 
 *            set text positioning on centre in Y and centre in X
 
-	      CALL SGS_STXJ( 'CR') 
+	      CALL SGS_STXJ( 'CR')
 
 	      X1 = IM_XST - 0.5*TEXT_HT
 
@@ -991,17 +991,17 @@
 
 	      NUMPTY = -3
 
-	    ELSE IF( ABS( Y_NUMBER) .GT. 1.0E-5 .AND. 
+	    ELSE IF( ABS( Y_NUMBER) .GT. 1.0E-5 .AND.
      :	             ABS( Y_NUMBER) .LT. 10.0) THEN
 
 	      NUMPTY = -3
 
-	    ELSE IF( ABS( Y_NUMBER) .GE. 10.0 .AND. 
+	    ELSE IF( ABS( Y_NUMBER) .GE. 10.0 .AND.
      :	             ABS( Y_NUMBER) .LT. 100.0) THEN
 
 	      NUMPTY = -4
 
-	    ELSE IF( ABS( Y_NUMBER) .GE. 100.0 .AND. 
+	    ELSE IF( ABS( Y_NUMBER) .GE. 100.0 .AND.
      :	             ABS( Y_NUMBER) .LT. 1000.0) THEN
 
 	      NUMPTY = -5

@@ -55,7 +55,7 @@ C                     passed to it, this routine returns immediately.
 C
 C  External variables used:  None.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DTA_RDVARC
 C
 C  Prior requirements:
@@ -98,7 +98,7 @@ C
 C
 C     Treat the CSTRUCT type as if it were an SGP38 SCALED array (upper
 C     levels can still distinguish them by looking at TYPE).
-C     
+C
       KNOWN=.TRUE.
       IF (TYPE.EQ.'CSTRUCT') THEN
          ARRAY_NAME=NAME(:LENGTH)//'.DATA'
@@ -108,11 +108,11 @@ C
 C
 C        Check for the two SGP38 types we know about.  These do have
 C        variants, so we can try to read the variant object.
-C        
+C
          IF ((TYPE.EQ.'COMPLEX_ARRAY').OR.(TYPE.EQ.'ARRAY')) THEN
             IF (TYPE(1:1).EQ.'C') THEN
                ARRAY_NAME=NAME(:LENGTH)//'.REAL'
-            ELSE 
+            ELSE
                ARRAY_NAME=NAME(:LENGTH)//'.DATA'
             END IF
             LENAME=LENGTH+5

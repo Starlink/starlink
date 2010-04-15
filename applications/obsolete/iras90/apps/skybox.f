@@ -140,7 +140,7 @@
 *                                                          [current pen]
 *     PIC = LOGICAL (Read)
 *        If true, a picture is added to the graphics data base
-*        corresponding to the rectangular region. The new picture 
+*        corresponding to the rectangular region. The new picture
 *        becomes the current picture. See parameters PICNAM and PICLAB.
 *                                                                   [NO]
 *     PICLAB = LITERAL (Read)
@@ -156,9 +156,9 @@
 *        value is supplied for parameter BOXSIZE, and if parameter
 *        COSYS has one of the values WORLD, IMAGE or PIXEL.
 *     XY2 = REAL (Read)
-*        The image coordinates (X and Y) at the opposite corner of the 
-*        box. XY2 is only used if parameter CURSOR has a false value, 
-*        if a null value is supplied for parameter BOXSIZE, and if 
+*        The image coordinates (X and Y) at the opposite corner of the
+*        box. XY2 is only used if parameter CURSOR has a false value,
+*        if a null value is supplied for parameter BOXSIZE, and if
 *        parameter COSYS has one of the values WORLD, IMAGE or PIXEL.
 
 *  Examples:
@@ -198,7 +198,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -225,7 +225,7 @@
       DOUBLE PRECISION
      :        AC( 3 ),           ! Longitude at corners and centre
      :        BC( 3 )            ! Latitude at corners and centre
-      
+
       INTEGER
      :        ACTVAL,            ! Number of values supplied.
      :        IDA,               ! IRA identifier for astrometry info.
@@ -267,7 +267,7 @@
 *  See if the cursor is to be used.
       CALL PAR_GET0L( 'CURSOR', CURSOR, STATUS )
 
-*  See if an outline of the box is to be drawn.            
+*  See if an outline of the box is to be drawn.
       CALL PAR_DEF0L( 'OUTLINE', CURSOR, STATUS )
       CALL PAR_GET0L( 'OUTLINE', OUTLIN, STATUS )
 
@@ -317,13 +317,13 @@
             CALL MSG_SETC( 'COM', PICCOM )
             CALL MSG_SETC( 'LAB', PICLAB )
             CALL MSG_OUTIF( MSG__NORM, 'SKYBOX_MSG1',
-     :                   '  DATA picture ^LAB ("^COM") being used', 
+     :                   '  DATA picture ^LAB ("^COM") being used',
      :                      STATUS )
          ELSE
             CALL MSG_SETC( 'COM', PICCOM )
             CALL MSG_OUTIF( MSG__NORM, 'SKYBOX_MSG2',
      :                   '  DATA picture "^COM" being used', STATUS )
-         END IF   
+         END IF
 
 *  If an outline is to be drawn, set up the pen number.
          IF( OUTLIN ) THEN
@@ -370,10 +370,10 @@
             CALL NDF_ASSOC( 'IN', 'READ', INDF, STATUS )
          END IF
 
-*  Import the NDF into the IRA astrometry system, then annul the NDF 
+*  Import the NDF into the IRA astrometry system, then annul the NDF
 *  identifier.
          CALL IRA_IMPRT( INDF, IDA, STATUS )
-         CALL NDF_ANNUL( INDF, STATUS )            
+         CALL NDF_ANNUL( INDF, STATUS )
 
       END IF
 
@@ -434,7 +434,7 @@
 *  If a picture is to be stored in the AGI database...
       IF( PIC ) THEN
 
-*  Create a new zone covering the box, and set the world coordinate 
+*  Create a new zone covering the box, and set the world coordinate
 *  system for the new zone to be pixel coordinates.
          CALL SGS_ZONE( XC( 1 ), XC( 2 ), YC( 1 ), YC( 2 ), ZONE3,
      :                  ISTAT )
@@ -473,7 +473,7 @@
 
       CALL IRA_ANNUL( IDA, STATUS )
       CALL IRA_CLOSE( STATUS )
-      
+
 *  If required, close down the graphics package, data base and device.
 *  If a new picture has been created, leave it as the current picture.
       IF( PIC .OR. OUTLIN .OR. CURSOR ) THEN

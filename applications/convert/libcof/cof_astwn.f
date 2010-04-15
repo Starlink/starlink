@@ -58,7 +58,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,7 +68,7 @@
 
 *  Arguments Given:
       INTEGER FC
-      INTEGER INDF 
+      INTEGER INDF
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -91,10 +91,10 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Indicate no warnings have yet been issued. */
-      WARNED = .FALSE. 
+      WARNED = .FALSE.
 
 *  Indicate there is no message to report yet.
-      REPORT = .FALSE. 
+      REPORT = .FALSE.
       MESS = ' '
       IAT = 0
 
@@ -110,7 +110,7 @@
 
 *  Extract the keyword value from the header card (minus delimiting quotes).
          VALUE = ' '
-         START = INDEX( HEADER, '''' ) 
+         START = INDEX( HEADER, '''' )
          IF( START .NE. 0 ) THEN
             HLEN = CHR_LEN( HEADER )
             IF( HEADER( HLEN : HLEN ) .EQ. '''' ) THEN
@@ -131,14 +131,14 @@
             IAT = IAT + 1
             REPORT = .TRUE.
 
-*  Otherwise, display the current total message. Prepend the name of the 
+*  Otherwise, display the current total message. Prepend the name of the
 *  NDF to the first non-blank warning.
          ELSE
             CALL MSG_SETC( 'T', MESS )
 
             IF( .NOT. WARNED .AND. IAT .GT. 0 )  THEN
                CALL NDF_MSG( 'NDF', INDF )
-               CALL MSG_OUT( 'COF_ASTWN_MSG1', '''^NDF'' - ^T', 
+               CALL MSG_OUT( 'COF_ASTWN_MSG1', '''^NDF'' - ^T',
      :                       STATUS )
                WARNED = .TRUE.
 

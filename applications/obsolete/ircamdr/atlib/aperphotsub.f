@@ -1,14 +1,14 @@
-	SUBROUTINE APERPHOTSUB( NX, NY, INARR, X, Y, ECC, ANG, RAD1, 
-     :	                        RAD2, PLATSCAL, USEBAD, BADVAL, NPTS, 
-     :	                        BNPTS, SUM, MEAN, MEDIAN, MODE, 
+	SUBROUTINE APERPHOTSUB( NX, NY, INARR, X, Y, ECC, ANG, RAD1,
+     :	                        RAD2, PLATSCAL, USEBAD, BADVAL, NPTS,
+     :	                        BNPTS, SUM, MEAN, MEDIAN, MODE,
      :	                        VALMAX, VALMIN, STD)
 
 *      9-AUG-2004  Use COS/SIN rather than COSD/SIND (TIMJ@JACH)
 *                  Use FIO for open and close
 
-	IMPLICIT NONE           
+	IMPLICIT NONE
 
-	INCLUDE 'SAE_PAR'       
+	INCLUDE 'SAE_PAR'
 
 	INTEGER
      :    NX,
@@ -32,11 +32,11 @@
      :	  R,
      :	  RAD1,
      :	  RAD2,
-     :	  VALMAX, 
-     :	  VALMIN, 
-     :	  SUM, 
-     :	  MEAN, 
-     :	  MEDIAN, 
+     :	  VALMAX,
+     :	  VALMIN,
+     :	  SUM,
+     :	  MEAN,
+     :	  MEDIAN,
      :	  MODE,
      :	  BADVAL,
      :	  STD,
@@ -85,7 +85,7 @@
 	    IF( R .GE. RAD1 .AND. R .LT. RAD2) THEN
 
 *            Test to see if using bad pixels and pixel is not bad
-	      IF( USEBAD .AND. 
+	      IF( USEBAD .AND.
      :	          INARR( J, K) .NE. BADVAL) THEN
 
 *              Increment number of pixels found
@@ -95,13 +95,13 @@
 	        DATARR( NPTS) = DBLE( INARR( J, K))
 
 *            Test to see if using bad pixels and pixel is bad
-	      ELSE IF( USEBAD .AND. 
+	      ELSE IF( USEBAD .AND.
      :	               INARR( J, K) .EQ. BADVAL) THEN
 
 *              Increment number of bad pixel found
 	        BNPTS = BNPTS + 1
 
-*            Test to see if not using bad pixels 
+*            Test to see if not using bad pixels
 	      ELSE IF( .NOT. USEBAD ) THEN
 
 *              Increment number of good pixels found
@@ -123,7 +123,7 @@
 	  CALL PDA_QSAD( NPTS, DATARR )
 
 *        Call subroutine to find median for the input DATARR
-	  CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN, 
+	  CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN,
      :	                        MEDIAN, MODE)
 
 *        Scan through pixels in annulus and calculate standard deviation

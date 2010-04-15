@@ -1,8 +1,8 @@
 *+  LISTOUT - List values of named fields for objects in catalogue
       SUBROUTINE LISTOUT (STATUS)
 *    Description :
-*     Lists the values of named fields for all the objects in a 
-*     StarBase catalogue. The output is sent either to a user-defined 
+*     Lists the values of named fields for all the objects in a
+*     StarBase catalogue. The output is sent either to a user-defined
 *     formatted file or to the interim environment, or both.
 *
 *     Note that this application has been hacked together from the SCAR
@@ -16,12 +16,12 @@
 *     LISTMODE  =  CHARACTER (ENTRY)
 *           Output to be sent to the terminal screen, a file or both?
 *     SWIDTH  =  INTEGER (ENTRY)
-*           Required width of screen listing.  The permitted range is 
+*           Required width of screen listing.  The permitted range is
 *           32 to 75, inclusive.
 *     HEADER  =  LOGICAL (ENTRY)
 *           Should the output have a header giving column names etc?
 *     WIDTH  = INTEGER (ENTRY)
-*           Give required width of printed report.  The permitted range 
+*           Give required width of printed report.  The permitted range
 *           is 32 to 160, inclusive.
 *     NUMBER  =  LOGICAL (ENTRY)
 *           Include a running record count in the output?
@@ -35,16 +35,16 @@
 *     If (status ok) then
 *       attempt to get catalogue identifier
 *       if (status ok) then
-*         determine whether screen display, file or both 
+*         determine whether screen display, file or both
 *         if (screen only) then
 *           set flag; a header is to be produced.
-*           obtain maximum screen width (SWIDTH) 
+*           obtain maximum screen width (SWIDTH)
 *         else if (file only) then
 *           obtain the header flag
 *           obtain maximum width (FWIDTH)
 *         else if (both) then
 *           obtain the header flag
-*           obtain maximum screen width (SWIDTH) 
+*           obtain maximum screen width (SWIDTH)
 *         end if
 *         obtain images to be numbered flag
 *         if (.not. screen only) then
@@ -56,11 +56,11 @@
 *           end if
 *         end if
 *       end if
-*       if (status ok) then 
+*       if (status ok) then
 *         obtain spacing between columns
 *         if (number) then
-*           reduce width available 
-*         end if  
+*           reduce width available
+*         end if
 *         obtain required column names and identifiers
 *         if (status ok and the number of required columns .gt. 0) then
 *           produce the listing
@@ -118,44 +118,44 @@
       INTEGER
      :  FLUNIT,       ! Unit number for output file
      :  NUMLEN        ! Length of number string for output
-      PARAMETER (FLUNIT = 10) 
+      PARAMETER (FLUNIT = 10)
       PARAMETER (NUMLEN =  8)
 *    Local variables :
-      CHARACTER 
+      CHARACTER
      :  CNAME*(CAT__SZCNF),            ! Catalogue name
      :  FILOUT*80,                     ! Name of output file
      :  NAMEA(CAT__MXCOL)*(CAT__SZCMP),! Names of the required columns
      :  MODE*10,                       ! Screen, file or both?
      :  DESCR(3)*50,                   ! Description of mode responses
-     :  RESPS(3)*10,                   ! Possible responses  
+     :  RESPS(3)*10,                   ! Possible responses
      :  UNITS(CAT__MXCOL)*(CAT__SZUNI) ! Units of the required fields
       INTEGER
      :  CI,                ! Catalogue identifier
      :  WIDTH,             ! Maximum width for output
      :  OSTAT,             ! Status on file open
      :  CSTAT,             ! Status on file close
-     :  ACTWTH,            ! Actual available width for output 
+     :  ACTWTH,            ! Actual available width for output
      :  SPACE,             ! Column spacing
      :  NUMFLD,            ! Number of fields
      :  FIA(CAT__MXCOL),   ! Identifiers for the required columns
-     :  CWIDTH(CAT__MXCOL) !Column width for required fields     
+     :  CWIDTH(CAT__MXCOL) !Column width for required fields
       LOGICAL
      :  HEADER,            ! Is a header wanted for formatted file?
      :  HEAD,              ! Header flag for column width
      :  NUMBER             ! Is numbering wanted?
 *    Internal References :
 *    Local data :
-      DATA DESCR/'Screen display of catalogue contents', 
-     :       'Formatted file of catalogue contents', 
+      DATA DESCR/'Screen display of catalogue contents',
+     :       'Formatted file of catalogue contents',
      :       'Screen display and file of catalogue contents'/,
      :     RESPS/'S#CREEN', 'F#ILE', 'B#OTH'/
-      SAVE DESCR, RESPS 
+      SAVE DESCR, RESPS
 *-
 
       IF (STATUS .EQ. SAI__OK) THEN
 
 
-*       Attempt to get catalogue descriptor 
+*       Attempt to get catalogue descriptor
           CALL PAR_GET0C ('CNAME', CNAME, STATUS)
           CALL PAR_CANCL ('CNAME', STATUS)
 
@@ -163,16 +163,16 @@
 
           IF (STATUS .EQ. SAI__OK) THEN
 
-*           Ask user whether they want a screen display, file or both 
+*           Ask user whether they want a screen display, file or both
               CALL CAR_CHOIC ('LISTMODE', .TRUE.,
      :          'Do you want a screen display, '/
-     :          /'formatted file, or both?', 3, DESCR, RESPS, MODE, 
+     :          /'formatted file, or both?', 3, DESCR, RESPS, MODE,
      :          STATUS)
 
 
               IF (MODE .EQ. 'SCREEN') THEN
                   HEADER = .TRUE.
-                  CALL PAR_GET0I ('SWIDTH', WIDTH, STATUS)  
+                  CALL PAR_GET0I ('SWIDTH', WIDTH, STATUS)
                   CALL PAR_CANCL ('SWIDTH', STATUS)
 
               ELSE IF (MODE .EQ. 'FILE') THEN
@@ -205,9 +205,9 @@
                   OPEN (FLUNIT, FILE=FILOUT, STATUS='NEW', IOSTAT=OSTAT)
                   CALL FIO_SERR (OSTAT, STATUS)
                   IF (STATUS .NE. SAI__OK) THEN
-                      CALL ERR_REP (' ', 'ERROR opening output file', 
+                      CALL ERR_REP (' ', 'ERROR opening output file',
      :                  STATUS)
-                  END IF 
+                  END IF
 
               END IF
 
@@ -237,10 +237,10 @@
               CALL CAR_GTFLD (CI, CAT__MXCOL, NUMFLD, NAMEA, FIA, UNITS,
      :          CWIDTH, STATUS)
 
-              IF (STATUS .EQ. SAI__OK .AND. NUMFLD .GT. 0) THEN 
+              IF (STATUS .EQ. SAI__OK .AND. NUMFLD .GT. 0) THEN
 
                   CALL CAR_GTLST (CI, HEADER, NUMBER, NUMLEN, WIDTH,
-     :              NUMFLD, NAMEA, FIA, UNITS, MODE, FLUNIT, CWIDTH, 
+     :              NUMFLD, NAMEA, FIA, UNITS, MODE, FLUNIT, CWIDTH,
      :              SPACE, STATUS)
 
               ELSE
@@ -252,14 +252,14 @@
           END IF
 
 
-          IF (MODE .NE. 'SCREEN') THEN  
+          IF (MODE .NE. 'SCREEN') THEN
               CLOSE (FLUNIT, STATUS='KEEP', IOSTAT=CSTAT)
               CALL FIO_SERR (CSTAT, STATUS)
 
               IF (STATUS .NE. SAI__OK) THEN
                   CALL ERR_REP (' ', 'ERROR closing output file',
      :              STATUS)
-              END IF 
+              END IF
 
           END IF
 
@@ -267,6 +267,6 @@
 *       Release the catalogue identifier.
           CALL CAT_TRLSE (CI, STATUS)
 
-      END IF 
+      END IF
 
       END

@@ -7,19 +7,19 @@
 *     Block data to set function/operator names/characteristics
 
 *  Description:
-*     To add a new function:  
+*     To add a new function:
 *      (1) Edit ANTX1.INC to increase the value of MAXFUN
 *      (2) Add a statement below to define the values of FNAME, FPREC, FARGS
 *          and note the array index which is the same as the label used below.
 *      (3) Edit module ANT_XEVAL as follows:
-*          (a) add the new label to the computed GOTO at the top, 
+*          (a) add the new label to the computed GOTO at the top,
 *          (b) add a labelled section to execute the function at the bottom.
-*      (4) Recompile all modified subroutines and those which access the 
+*      (4) Recompile all modified subroutines and those which access the
 *          include file.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
-*     Copyright (C) 1995, 1996, 2000 Central Laboratory of the 
+*     Copyright (C) 1995, 1996, 2000 Central Laboratory of the
 *     Research Councils. All Rights Reserved.
 
 *  Licence:
@@ -27,12 +27,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,9 +63,9 @@
 
 * FNAME is the function or operator, must be upper-case up to 6 chars long.
 * FPREC is the operator/function precedence, =30 for all functions.
-* FARGS: is a string of (N+1) chars for a function with N arguments, coded 
+* FARGS: is a string of (N+1) chars for a function with N arguments, coded
 * as follows:
-* First char (output): 
+* First char (output):
 *   C=character, L=logical, N=numeric, F=floating (real/dble),
 *   B=byte, H=halfint, I=integer, R=real, D=double.
 * Subsequent chars (one for each input argument):

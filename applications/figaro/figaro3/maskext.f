@@ -7,9 +7,9 @@ C     Extracts spectra from an image using a mask image.  The mask
 C     pixel values should be the numbers of the spectra that fall
 C     in that pixel of the image.  This routine is intended for use
 C     with echelle data, and the numbers in the image are expected
-C     to be based on echelle order numbers.  The spectra are extracted 
+C     to be based on echelle order numbers.  The spectra are extracted
 C     into an image whose Y-axis is the order number of the spectra,
-C     and whose X-axis is that of the original data.  The actual 
+C     and whose X-axis is that of the original data.  The actual
 C     numbers in the image are expected to have the form
 C     (echelle order number)*10 + (sub order number), sub orders
 C     referring to separate spectra from the same order, as
@@ -19,7 +19,7 @@ C     order, or will add all the sub-orders together for each order.
 C
 C     Command parameters -
 C
-C     IMAGE      (Character) The name of the image containing the 
+C     IMAGE      (Character) The name of the image containing the
 C                spectra to be extracted
 C     MASK       (Character) The name of the mask image.
 C     MLOW       (Integer) The lowest order number to be extracted.
@@ -42,10 +42,10 @@ C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
 C-
 C     Note -
-C   
+C
 C     This version is an interim one - it really needs re-writing
 C     using DSA_RESHAPE_DATA and DSA_RESHAPE_AXIS.
-C+ 
+C+
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -131,7 +131,7 @@ C
 C
 C     Force data size in output - this is naughty - it should be
 C     done with DSA_RESHAPE_xxx routines, but they aren't ready yet.
-C     For one thing, this looses any x-axis data.  
+C     For one thing, this looses any x-axis data.
 C
       NYOUT=MEND-MSTART+1
       DIMS(2)=NYOUT
@@ -154,7 +154,7 @@ C
       CALL DSA_MAP_DATA ('MASK','READ','FLOAT',MPTR,SLOT,STATUS)
       CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',OPTR,SLOT,STATUS)
 C
-C     Get the workspace needed by FIG_EXTMSK 
+C     Get the workspace needed by FIG_EXTMSK
 C
       CALL DSA_GET_WORK_ARRAY (NYOUT,'FLOAT',WPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
@@ -197,7 +197,7 @@ C     (>) SUBORD    (Integer) The sub-order number to extract.
 C     (>) REVERSE   (Logical) True if spectra are to be appear in the
 C                   output image in reverse order of spectrum number.
 C     (W) WORK      (Real array WORK(NYOUT)) Workspace. Used to hold
-C                   The number of pixels used for each order.  
+C                   The number of pixels used for each order.
 C     (<) OUTPUT    (Real array OUTPUT(NX,NYOUT)) The resulting image,
 C                   with each cross-section a single extracted spectrum.
 C

@@ -23,7 +23,7 @@
 *     IGRP = INTEGER (Returned)
 *        A GRP identifier for a group holding the AST attribute settings
 *        defining each pen. The group contains one element for each
-*        curve. Each element holds a comma separated list of 
+*        curve. Each element holds a comma separated list of
 *        attribute settings for an AST Plot.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -61,7 +61,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -95,7 +95,7 @@
 *  Use a semicolon as the separator character because AST required
 *  the individual attribute settings within the pen definition to be
 *  separated by commas.
-      CALL GRP_SETCC( IGRP, 'DELIMITER', ';', STATUS ) 
+      CALL GRP_SETCC( IGRP, 'DELIMITER', ';', STATUS )
 
 *  Get a group of strings holding pen definitions from the environment.
       CALL KPG1_GTGRP( PARAM, IGRP, NPEN, STATUS )
@@ -108,7 +108,7 @@
 
 *  Delete the group holding pen definitions if an error has occurred, or
 *  if no pen defintions were supplied.
-      IF( IGRP .NE. GRP__NOID ) THEN 
+      IF( IGRP .NE. GRP__NOID ) THEN
          IF( NPEN .EQ. 0 .OR. STATUS .NE. SAI__OK ) THEN
             CALL GRP_DELET( IGRP, STATUS )
          END IF

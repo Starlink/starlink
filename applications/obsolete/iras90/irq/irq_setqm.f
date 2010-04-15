@@ -138,7 +138,7 @@
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, SLOT,
      :                 STATUS )
 
-*  If all pixels already have the quality, assign a value to SET and 
+*  If all pixels already have the quality, assign a value to SET and
 *  return without further action.
       IF( FIXED .AND. VALUE ) THEN
          CALL NDF_SIZE( INDF, SET, STATUS )

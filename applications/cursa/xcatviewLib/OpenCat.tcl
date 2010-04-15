@@ -66,7 +66,7 @@ proc OpenCat access {
 
 #
 #  Load catview and wait for loading to complete.  Proceed if loading
-#  completes before a time-out period elapses. 
+#  completes before a time-out period elapses.
 
     adamtask catview $catviewExe
     adamtask.locals               ;# get local versions of procedures.

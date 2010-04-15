@@ -43,7 +43,7 @@
 
 *  Algorithm:
 *     Check for error on entry - return if not o.k.
-*     For each point to be interpolated 
+*     For each point to be interpolated
 *        The four surrounding points in the data or image array are
 *        obtained. Find the nearest pixel to the point. If the nearest
 *        pixel or all the surrounding pixels are invalid, then set the
@@ -215,10 +215,10 @@
 
             SUM = 0.0
             WTSUM = 0.0
- 
+
 *          Form weighted mean of adjacent four pixels, checking that
 *          each lies within the input image and is not invalid
- 
+
             IF ( VAL1 .NE. VAL__BADR ) THEN
 
 *             Weight is calculated from the x,y shift from integer pixel
@@ -231,7 +231,7 @@
             END IF
 
 *          bottom right...
- 
+
             IF ( VAL2 .NE. VAL__BADR ) THEN
                WEIGHT = F * ( 1.0 - G )
                SUM = SUM + VAL2 * WEIGHT
@@ -239,7 +239,7 @@
             END IF
 
 *          top left...
- 
+
             IF ( VAL3 .NE. VAL__BADR ) THEN
                WEIGHT = ( 1.0 - F ) * G
                SUM = SUM + VAL3 * WEIGHT
@@ -247,13 +247,13 @@
             END IF
 
 *          top right...
- 
+
             IF ( VAL4 .NE. VAL__BADR ) THEN
                WEIGHT = F * G
                SUM = SUM + VAL4 * WEIGHT
                WTSUM = WTSUM + WEIGHT
             END IF
-  
+
 *          Assign weighted mean to output pixel (WTSUM cannot
 *          be zero, since at least 1 input pixel must be valid)
 
@@ -283,5 +283,5 @@
       END IF
 
  999  CONTINUE
-       
+
       END

@@ -9,29 +9,29 @@
       INCLUDE 'CHR_ERR'
       INCLUDE 'SAE_PAR'
 
-	integer 
+	integer
      :    STATUS,
      :	  timediff,
-     :	  year, 
-     :	  day, 
-     :	  hour, 
-     :	  minute, 
-     :	  second, 
+     :	  year,
+     :	  day,
+     :	  hour,
+     :	  minute,
+     :	  second,
      :	  msecond,
-     :    NCHAR 
+     :    NCHAR
 
-	character 
+	character
      :	  local_time*( *),
      :	  ut_time*( *),
-     :	  month*3, 
-     :	  cyear*4, 
-     :	  cday*2, 
-     :	  chour*2, 
-     :	  cminute*2, 
-     :	  csecond*2, 
+     :	  month*3,
+     :	  cyear*4,
+     :	  cday*2,
+     :	  chour*2,
+     :	  cminute*2,
+     :	  csecond*2,
      :	  cmsecond*2
 
-	logical 
+	logical
      :	  leap_year
 
 	month = local_time( 4:6)
@@ -132,12 +132,12 @@
 
 	end if
 
-        CALL CHR_ITOC( day, cday, NCHAR ) 
-        CALL CHR_ITOC( YEAR, CYEAR, NCHAR ) 
-        CALL CHR_ITOC( HOUR, CHOUR, NCHAR ) 
-        CALL CHR_ITOC( MINUTE, CMINUTE, NCHAR ) 
-        CALL CHR_ITOC( SECOND, CSECOND, NCHAR ) 
-        CALL CHR_ITOC( MSECOND, CMSECOND, NCHAR ) 
+        CALL CHR_ITOC( day, cday, NCHAR )
+        CALL CHR_ITOC( YEAR, CYEAR, NCHAR )
+        CALL CHR_ITOC( HOUR, CHOUR, NCHAR )
+        CALL CHR_ITOC( MINUTE, CMINUTE, NCHAR )
+        CALL CHR_ITOC( SECOND, CSECOND, NCHAR )
+        CALL CHR_ITOC( MSECOND, CMSECOND, NCHAR )
 
 	if( cyear( 4:4) .eq. ' ') then
 

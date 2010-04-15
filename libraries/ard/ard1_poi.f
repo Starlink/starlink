@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_POI( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D,
-     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
 *+
 *  Name:
@@ -65,7 +65,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -199,8 +199,8 @@
             IPAR = IPAR + NDIM
 
          END IF
-      
-      END DO 
+
+      END DO
 
 *  Report an error if the number of supplied parameters is not a
 *  multiple of NDIM.

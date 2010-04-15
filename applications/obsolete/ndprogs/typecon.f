@@ -54,7 +54,7 @@ C   - The IMAGE structure is tested for the bad data flag, quality and error
 C     arrays. If the bad data flag is found
 C     and non-zero, magic values are assumed to be present and are left in
 C     the data, unless a quality array is present.
-C   - The instruction to convert to either SHORT or FLOAT is either deduced 
+C   - The instruction to convert to either SHORT or FLOAT is either deduced
 C     from the data type of IMAGE, or prompted for.
 C   - An empty output structure is opened. A call to DSA_SIMPLE_OUTPUT then
 C     builds the output file of the required type.
@@ -158,7 +158,7 @@ C
       INTEGER   ELEM               ! Element size in bytes
       LOGICAL   ERR                ! Error array presence flag
       LOGICAL   FLOAT              ! Instruction to create FLOAT data array
-      INTEGER   I                  ! Loop counter   
+      INTEGER   I                  ! Loop counter
       INTEGER   IEPTR              ! Dyn. pointer to IMAGE error array
       INTEGER   IESLOT             ! Slot number for IMAGE error array
       INTEGER   IMPTR              ! Dynamic pointer to IMAGE array
@@ -183,20 +183,20 @@ C
 C
       INTEGER   NEW_FILE,NO_DATA
       PARAMETER (NEW_FILE=1,NO_DATA=1)
-C           
+C
       INCLUDE 'DYNAMIC_MEMORY'
       INCLUDE 'MAGIC_VALUES'
       INCLUDE 'NUMERIC_RANGES'
 C
 C  Initialize.
 C
-      STATUS=0     
+      STATUS=0
 C
 C  Open DSA system.
 C
       CALL DSA_OPEN(STATUS)
-      IF(STATUS.NE.0)GO TO 500 
-C  
+      IF(STATUS.NE.0)GO TO 500
+C
 C  Open file for IMAGE.
 C
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
@@ -222,14 +222,14 @@ C
       IF (STATUS.NE.0) GO TO 500
 C
 C  Get SHORT or FLOAT keyword.
-C                            
-      IF(PAR_GIVEN('SHORT'))THEN                          
+C
+      IF(PAR_GIVEN('SHORT'))THEN
         CALL PAR_RDKEY('SHORT',.TRUE.,SHORT)
         IF(PAR_GIVEN('FLOAT'))THEN
           CALL PAR_RDKEY('FLOAT',.FALSE.,FLOAT)
           IF(FLOAT.AND.SHORT)THEN
             CALL DSA_WRUSER
-     &              ('SHORT and FLOAT are mutually exclusive.\\N')       
+     &              ('SHORT and FLOAT are mutually exclusive.\\N')
             GO TO 500
           END IF
         END IF
@@ -242,12 +242,12 @@ C
       ELSE
         IF(TYPE.EQ.'SHORT')THEN
           FLOAT=.TRUE.
-          SHORT=.FALSE.              
+          SHORT=.FALSE.
         ELSE IF(TYPE.EQ.'FLOAT')THEN
           SHORT=.TRUE.
           FLOAT=.FALSE.
         ELSE
-          CALL DSA_WRUSER('Unable to determine required conversion.\\N')    
+          CALL DSA_WRUSER('Unable to determine required conversion.\\N')
         END IF
       END IF
 C
@@ -376,4 +376,4 @@ C
       CALL DSA_CLOSE(STATUS)
 C
       END
-                     
+

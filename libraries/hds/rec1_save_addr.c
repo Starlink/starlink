@@ -205,7 +205,7 @@
       int new;                   /* New size for address range array        */
 
 /*.                                                                         */
-      
+
 /* Check inherited global status.                                           */
       if ( !_ok( *status ) ) return;
 

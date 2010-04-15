@@ -309,5 +309,5 @@
          CALL MSG_SETC( 'NAME', NAME )
          CALL ERR_REP( ' ', 'RED4: Invalid action, ^NAME', STATUS )
       END IF
-    
+
       END

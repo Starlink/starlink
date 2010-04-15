@@ -17,17 +17,17 @@
 *     Starlink Fortran 77
 
 *  Description:
-*     This routine allows selection of  the major optional operations 
-*     during wavelength calibration. Options are presented in a menu 
-*     form and selected by typing a one- or two-character string, 
-*     followed by carriage return.  The following options are 
+*     This routine allows selection of  the major optional operations
+*     during wavelength calibration. Options are presented in a menu
+*     form and selected by typing a one- or two-character string,
+*     followed by carriage return.  The following options are
 *     supported:
 *
-*     AI (automatic identification), initiates a search and match of 
+*     AI (automatic identification), initiates a search and match of
 *     the feature database. Any preset limitations on the wavelength
-*     and dispersion range will be taken into account. When a solution 
-*     is found, a report to the user includes a probable status and the 
-*     user may then opt to investigate the solution further (I), or 
+*     and dispersion range will be taken into account. When a solution
+*     is found, a report to the user includes a probable status and the
+*     user may then opt to investigate the solution further (I), or
 *     search for further solutions by re-selecting the AI option.
 *
 *     AF ( automatic polynomial fitting), performs a cycle of fitting

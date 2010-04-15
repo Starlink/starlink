@@ -21,8 +21,8 @@
 *        The IRC identifier for the astrometry structure.
 *     ROUTNE = EXTERNAL (Given)
 *        A routine to which is passed each line of text for display.
-*        It should have the same argument list as MSG__OUTIF (see 
-*        SUN/104), and should be declared EXTERNAL in the calling 
+*        It should have the same argument list as MSG__OUTIF (see
+*        SUN/104), and should be declared EXTERNAL in the calling
 *        routine.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.

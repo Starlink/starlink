@@ -4,7 +4,7 @@
 *     MSP_PAR
 
 *  Purpose:
-*     .H - constants and declarations for msp 
+*     .H - constants and declarations for msp
 
 *  Language:
 *     {routine_language}

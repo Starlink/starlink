@@ -25,7 +25,7 @@
 
 *  Return Value:
 
-*  Description: 
+*  Description:
 *     Copy all the elements in source timeval struct to target.
 
 *  Notes:
@@ -82,7 +82,7 @@
 
 #define FUNC_NAME "smf_copytime"
 
-void smf_copytime( struct timeval *target, struct timeval *source, 
+void smf_copytime( struct timeval *target, struct timeval *source,
                      int *status) {
 
   if (*status != SAI__OK) return;

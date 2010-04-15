@@ -1,7 +1,7 @@
       SUBROUTINE
      : CHP_GONECD(INPUT, NAME, FORMAT, UNITS, COMMENT, PREFDIS,
-     : COLTYPE, COLDES, ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK, 
-     : MDATAACC, DATAACC, DATELM, VCFLAG, VCEXP, DELIND, FMATFLAG, 
+     : COLTYPE, COLDES, ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK,
+     : MDATAACC, DATAACC, DATELM, VCFLAG, VCEXP, DELIND, FMATFLAG,
      : STATUS)
 *+
 *  Name:
@@ -20,38 +20,38 @@
 
 *  Description :
 *     Get the information about a column in a catalogue. A column has associated
-*     with it a name, format, units, comment, preferred display flag, type, 
-*     column designator, array shape, array dimensions, assert flag, assert 
-*     expression, domain check flag, access information, date last modified, 
-*     virtual column flag, virtual column expression, delete indicator, 
+*     with it a name, format, units, comment, preferred display flag, type,
+*     column designator, array shape, array dimensions, assert flag, assert
+*     expression, domain check flag, access information, date last modified,
+*     virtual column flag, virtual column expression, delete indicator,
 *     standard format flag. For any column some of these will have no
 *     meaning.
 *
 *     COLDES is the column designator which allows the column to be interpreted
-*     correctly. 
+*     correctly.
 *
 *     COLDES = 1 This is a scalar column, if it is a character string it
-*     is CHP__SZCVAL long. VCEXP and ASSEXP may have no meaning. ARRSHP and 
+*     is CHP__SZCVAL long. VCEXP and ASSEXP may have no meaning. ARRSHP and
 *     ARRDIM have no meaning.
 *
-*     COLDES = 2 This is a structure column. FORMAT, 
+*     COLDES = 2 This is a structure column. FORMAT,
 *     UNITS, ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK, VCFLAG, VCEXP
 *     and FMATFLAG have no meaning.
 *
-*     COLDES = 3 This is an array column whose size is the same for all 
-*     entries. Character string are always CHP__SZCVAL long.  
+*     COLDES = 3 This is an array column whose size is the same for all
+*     entries. Character string are always CHP__SZCVAL long.
 *     ASSERT, ASSEXP, DOMCHK, VCFLAG, VCEXP and FMATFLAG have no meaning.
 *
 *     COLDES = 4 This is an array whose shape and dimensions may vary from
 *     entry to entry. Character string are always CHP__SZCVAL long.
-*     ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK, VCFLAG, VCEXP and FMATFLAG have 
+*     ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK, VCFLAG, VCEXP and FMATFLAG have
 *     no meaning.
 *
-*     COLDES = 5 This is a scalar column. It is a variable length character 
+*     COLDES = 5 This is a scalar column. It is a variable length character
 *     string. FORMAT, ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK, VCFLAG, VCEXP
 *     and FMATFLAG have no meaning.
 *
-*     COLDES = 6 This is an array column of character string whose shape, 
+*     COLDES = 6 This is an array column of character string whose shape,
 *     dimensions and string length may vary from entry to entry.
 *     FORMAT, ARRSHP, ARRDIM, ASSERT, ASSEXP, DOMCHK, VCFLAG, VCEXP
 *     and FMATFLAG have no meaning.
@@ -117,7 +117,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -179,31 +179,31 @@
 *
       numcols = CPnumcols(cd)
       do cc = 1, numcols
-        coltype = EPtype(cd,cc) 
-        format = EPformat(cd,cc) 
-        units = EPunits(cd,cc) 
+        coltype = EPtype(cd,cc)
+        format = EPformat(cd,cc)
+        units = EPunits(cd,cc)
         comment = EPcomment(cd,cc)
         mdataacc = EPmdataacc(cd,cc)
-        dataacc = EPdataacc(cd,cc) 
+        dataacc = EPdataacc(cd,cc)
         datelm = EPdatelm(cd,cc)
         vcflag = EPvcflag(cd,cc)
-        vcexp = EPvcexp(cd,cc) 
-        delind = EPdelind(cd,cc) 
-        prefdis = EPprefdis(cd,cc) 
-        arrshp = EParrshp(cd,cc) 
+        vcexp = EPvcexp(cd,cc)
+        delind = EPdelind(cd,cc)
+        prefdis = EPprefdis(cd,cc)
+        arrshp = EParrshp(cd,cc)
         if (arrshp .ge. 1) then
           do asc = 1, arrshp
             arrdim(asc) = EParrdim(cd,cc,asc)
           enddo
         endif
 *        arrtyp = EParrtype(cd,cc)
-        assert = EPassert(cd,cc) 
+        assert = EPassert(cd,cc)
         assexp = EPassexp(cd,cc)
-        domchk = EPdomchk(cd,cc) 
-*        cstruct = EPstruct(cd,cc) 
-        fmatflag = EPnsflag(cd,cc) 
+        domchk = EPdomchk(cd,cc)
+*        cstruct = EPstruct(cd,cc)
+        fmatflag = EPnsflag(cd,cc)
         if (fmatflag) then
-           format = EPformat(cd,cc) 
+           format = EPformat(cd,cc)
         endif
       enddo
 *

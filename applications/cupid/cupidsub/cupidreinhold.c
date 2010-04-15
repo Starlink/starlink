@@ -23,8 +23,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
-*                          void *ipd, double *ipv, double rms, 
+*     HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd,
+*                          void *ipd, double *ipv, double rms,
 *                          AstKeyMap *config, int velax,
 *                          double beamcorr[ 3 ], int *status )
 
@@ -32,12 +32,12 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
 *     array using the REINHOLD algorithm, developed by Kim Reinhold at
 *     JAC. This algorithm identifies the boundaries between clumps by
-*     looking for minima in 1D sections through the data. No a priori clump 
+*     looking for minima in 1D sections through the data. No a priori clump
 *     profile is assumed. In this algorithm, clumps never overlap.
 
 *  Parameters:
 *     type
-*        An integer identifying the data type of the array values pointed to 
+*        An integer identifying the data type of the array values pointed to
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
 *        cupid.h).
 *     ndim
@@ -53,7 +53,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Fortran order. The data type of this array is given by "itype".
 *     ipv
 *        Pointer to the input Variance array, or NULL if there is no Variance
-*        array. The elements should be stored in Fortran order. The data 
+*        array. The elements should be stored in Fortran order. The data
 *        type of this array is "double".
 *     rms
 *        The default value for the global RMS error in the data array.
@@ -61,7 +61,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
-*        used if "ndim" is 3. 
+*        used if "ndim" is 3.
 *     beamcorr
 *        An array in which is returned the FWHM (in pixels) describing the
 *        instrumental smoothing along each pixel axis. The clump widths
@@ -72,9 +72,9 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
-*     Each NDF will hold the data values associated with a single clump 
-*     and will be the smallest possible NDF that completely contains the 
-*     corresponding clump. Pixels not in the clump will be set bad. The 
+*     Each NDF will hold the data values associated with a single clump
+*     and will be the smallest possible NDF that completely contains the
+*     corresponding clump. Pixels not in the clump will be set bad. The
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Copyright:
@@ -170,14 +170,14 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "REINHOLD", (AstObject *) &rconfig ) ) {     
+   if( !astMapGet0A( config, "REINHOLD", (AstObject *) &rconfig ) ) {
       rconfig = astKeyMap( " " );
       astMapPut0A( config, "REINHOLD", rconfig, " " );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
    case the "config" KeyMap may contain values which should really be in
-   the "rconfig" KeyMap. Add a copy of the "config" KeyMap into "rconfig" 
+   the "rconfig" KeyMap. Add a copy of the "config" KeyMap into "rconfig"
    so that it can be searched for any value which cannot be found in the
    "rconfig" KeyMap. */
    astMapPut0A( rconfig, CUPID__CONFIG, astCopy( config ), NULL );
@@ -192,8 +192,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
-   move by pixel along an axis. We use the memory management functions of the 
-   AST library since they provide greater security and functionality than 
+   move by pixel along an axis. We use the memory management functions of the
+   AST library since they provide greater security and functionality than
    direct use of malloc, etc. */
    el = 1;
    for( i = 0; i < ndim; i++ ) {
@@ -227,37 +227,37 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( cathresh < 0 ) cathresh = 0.0;
    cathresh += 0.01;
 
-/* Get a mask which is the same size and shape as the data array and which 
-   holds CUPID__KEDGE at every pixel thought to be on the edge of a clump. 
+/* Get a mask which is the same size and shape as the data array and which
+   holds CUPID__KEDGE at every pixel thought to be on the edge of a clump.
    This is done by scanning the data cube using sets of parallel lines in
-   different directions. Peaks are searched for in each line, and then the 
+   different directions. Peaks are searched for in each line, and then the
    edges found by following the curve down from each peak until the
    gradient becomes zero or positive, or until the data value drops below a
    threshold value. Pixels which correspond to peaks in the data cube
-   are flagged with the value greater than or equal to the returned 
-   "*peakval" value. All other pixels are set to some other value (which 
-   will usually be CUPID__KBACK but will be something else at positions of 
+   are flagged with the value greater than or equal to the returned
+   "*peakval" value. All other pixels are set to some other value (which
+   will usually be CUPID__KBACK but will be something else at positions of
    peaks which were not peaks in all scan directions). */
    msgOutif( MSG__DEBUG, "", "Finding clump edges...", status );
-   mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minlen, thresh, 
+   mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minlen, thresh,
                            noise, rms, flatslope, &peakval, status );
 
 /* Dilate the edge regions using a cellular automata. This creates a new
    mask array in which a pixel is marked as an edge pixel if any of its
    neighbours are marked as edge pixels in the mask array created above. */
    msgOutif( MSG__DEBUG, "", "Dilating clump edges...", status );
-   mask2 = cupidRCA( mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE, 
+   mask2 = cupidRCA( mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE,
                      CUPID__KBACK, 0, status );
 
 /* Erode the edge regions using a second cellular automata. This over-writes
    the original mask array so that a pixel is marked as an edge pixel if a
-   fraction greater than "cathresh" of neighbouring pixels are marked as edge 
+   fraction greater than "cathresh" of neighbouring pixels are marked as edge
    pixels in "mask2". We loop doing this "CAiteration" times. */
    if( caiter > 0 ) msgOutif( MSG__DEBUG,"", "Eroding clump edges...", status );
    m1 = mask;
    m2 = mask2;
    for( i = 0; i < caiter; i++ ) {
-      m1 = cupidRCA( m2, m1, el, dims, skip, cathresh, peakval, CUPID__KEDGE, 
+      m1 = cupidRCA( m2, m1, el, dims, skip, cathresh, peakval, CUPID__KEDGE,
                      CUPID__KBACK, 0, status );
       m3 = m1;
       m1 = m2;
@@ -277,8 +277,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       goto L10;
    }
 
-/* Smooth the boundaries between the clumps. This cellular automata replaces 
-   each output pixel by the most commonly occuring value within a 3x3x3 
+/* Smooth the boundaries between the clumps. This cellular automata replaces
+   each output pixel by the most commonly occuring value within a 3x3x3
    cube of input pixels centred on the output pixel. Put the smoothed
    results back into the supplied "m1" array. */
    if( fixiter >0 ) msgOutif( MSG__DEBUG, "", "Smoothing clump boundaries...", status );
@@ -289,7 +289,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       m1 = m3;
    }
 
-/* Allocate an array used to store the number of pixels remaining in each 
+/* Allocate an array used to store the number of pixels remaining in each
    clump. */
    nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
 
@@ -382,10 +382,10 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( nrem[ i ] <= minpix ) {
             nsmall++;
 
-         } else if( clbnd[ j ] == cubnd[ j ] || 
-                  ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) || 
+         } else if( clbnd[ j ] == cubnd[ j ] ||
+                  ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) ||
                   ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) {
-            nthin++;           
+            nthin++;
 
          } else {
             igood[ ngood++ ] = i;
@@ -403,7 +403,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( nthin == 1 ) {
         msgOutif( MSG__NORM, "", "1 clump rejected because it spans only a single "
                   "pixel along one or more axes.", status );
-          
+
       } else if( nthin > 1 ) {
         msgSeti( "N", nthin );
         msgOutif( MSG__NORM, "", "^N clumps rejected because they spans only a single "
@@ -429,7 +429,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round creating an NDF describing each usable clump. */
       for( j = 0; j < ngood; j++ ) {
          i = igood[ j ];
-         ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd, 
+         ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd,
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
                               cupidConfigD( rconfig, "MAXBAD", 0.05, status ),
                               status );
@@ -446,9 +446,9 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 L10:;
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration 
-   parameters for this algorithm. This prevents the values in the secondary 
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is 
+/* Remove the secondary KeyMap added to the KeyMap containing configuration
+   parameters for this algorithm. This prevents the values in the secondary
+   KeyMap being written out to the CUPID extension when cupidStoreConfig is
    called. */
    astMapRemove( rconfig, CUPID__CONFIG );
 

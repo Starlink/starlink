@@ -2,16 +2,16 @@
  *+
  *  Name:
  *     ems1Gtoktab
- 
+
  *  Purpose:
  *     Return pointer to an internal token table.
- 
+
  *  Language:
  *     Starlink ANSI C
- 
+
  *  Invocation:
  *     ems_toktab_t *ems1Gtoktab()
- 
+
  *  Description:
  *     This routine returns a pointer to either the global message table
  *     or a local message table when invoked from within a thread or
@@ -22,7 +22,7 @@
  *     When working in a threaded application it is mandated that
  *     a pair of emsMark and emsRlse calls are made around any threaded
  *     sections.
- 
+
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
@@ -32,17 +32,17 @@
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PWD: Peter W. Draper (JAC, Durham University)
  *     {enter_new_authors_here}
@@ -51,10 +51,10 @@
  *     15-MAY-2008 (PWD):
  *        Original version.
  *     {enter_further_changes_here}
- 
+
  *  Bugs:
  *     {note_any_bugs_here}
- 
+
  *-
  */
 
@@ -74,7 +74,7 @@
 #include "ems_defs.h"                /* Token table struct */
 
 /* The global token table. */
-extern ems_toktab_t *ems_toktab;     
+extern ems_toktab_t *ems_toktab;
 
 #if USE_PTHREADS
 
@@ -98,7 +98,7 @@ ems_toktab_t *ems1Gtoktab( void )
     /*  If the thread ID doesn't match that of the initial thread then then
      *  look for a local table. If not found create one and associate it as
      *  thread-specific data. */
-    if ( ems_thread_initial_set == 0 || 
+    if ( ems_thread_initial_set == 0 ||
          pthread_equal( pthread_self(), ems_thread_initial_id ) ) {
 
         /* This is the initial thread, so we use the global table. */
@@ -120,7 +120,7 @@ ems_toktab_t *ems1Gtoktab( void )
 }
 #else
 
-ems_toktab_t *ems1Gtoktab( void ) 
+ems_toktab_t *ems1Gtoktab( void )
 {
     TRACE( "ems1Gtoktab" );
     /* No threads, so always return global table. */

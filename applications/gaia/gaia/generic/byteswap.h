@@ -1,4 +1,4 @@
-#ifndef _BYTESWAP_INCLUDED_ 
+#ifndef _BYTESWAP_INCLUDED_
 #define _BYTESWAP_INCLUDED_
 
 /*  Define the byteswap functions in C (from C++ Skycat define.h) */
@@ -29,10 +29,10 @@
 
 
 /* Float data: Prevent auto conversions.
- * No speed hits if this is compiled with gcc -O. 
+ * No speed hits if this is compiled with gcc -O.
  * Need static functions for C99 compliance (previously just used from C++).
  */
-static inline float SWAP_FLOAT( float x ) 
+static inline float SWAP_FLOAT( float x )
 {
     union {float f; unsigned int i;} u;
     u.f = x;
@@ -40,7 +40,7 @@ static inline float SWAP_FLOAT( float x )
     return u.f;
 }
 
-static inline double SWAP_DOUBLE( double x ) 
+static inline double SWAP_DOUBLE( double x )
 {
     union {double d; unsigned int l[2];} u;
     unsigned int tmp;
@@ -52,7 +52,7 @@ static inline double SWAP_DOUBLE( double x )
     return u.d;
 }
 
-static inline int SWAP_INT(int x) 
+static inline int SWAP_INT(int x)
 {
     union {int i; unsigned int ui;} u;
     u.i = x;
@@ -60,7 +60,7 @@ static inline int SWAP_INT(int x)
     return u.i;
 }
 
-static inline short SWAP_SHORT( short x ) 
+static inline short SWAP_SHORT( short x )
 {
     union {short i; unsigned short ui;} u;
     u.i = x;
@@ -68,7 +68,7 @@ static inline short SWAP_SHORT( short x )
     return u.i;
 }
 
-static inline unsigned short SWAP_USHORT( unsigned short x ) 
+static inline unsigned short SWAP_USHORT( unsigned short x )
 {
     return SWAP16( x );
 }

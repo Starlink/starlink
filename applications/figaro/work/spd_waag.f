@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
 *  Write to file.
       IF ( FILENO .GT. 0 ) THEN
          WRITE ( FILENO, '(A1)' ) ' '
-         STRNG = 
+         STRNG =
      :      ' Linear regression   y = A0 + A1 * x   from files'
          WRITE ( FILENO, '(A79)' ) STRNG
          STRNG = ' '//IN1

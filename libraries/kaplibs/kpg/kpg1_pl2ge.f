@@ -45,7 +45,7 @@
 *     be regarded as an error.  The returned parameter LIMITS will
 *     indicate if these items have been read successfully.
 *
-*     
+*
 
 *  Arguments:
 *     LOC = CHARACTER*( DAT__SZLOC ) (Given)
@@ -66,7 +66,7 @@
 *     LIMITS = LOGICAL (Returned)
 *        When VARNT='SIMPLE' this logical flag indicates whether any
 *        TMIN and TMAX limits have been read from the polynomial
-*        structure and returned in the next four arguments (in which 
+*        structure and returned in the next four arguments (in which
 *        case LIMITS will be .TRUE.).
 *     XMIN = DOUBLE PRECISION (Returned)
 *        Minimum value along x axis for which polynomial is valid.
@@ -87,7 +87,7 @@
 *        by NAG routines.  The values are only assigned when VARPRE is
 *        .TRUE..
 *     WORK( MXPAR, MXPAR ) = DOUBLE PRECISION (Returned)
-*        Work array containing the two-dimensional array of 
+*        Work array containing the two-dimensional array of
 *        coefficients as read from the POLYNOMIAL structure.
 *     STATUS =  INTEGER (Given and Returned)
 *        Global status value.
@@ -106,12 +106,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -182,7 +182,7 @@
 *  Local variables:
       INTEGER DIM( MAXDIM )      ! Actual dimensions of coefficients
                                  ! array
-      INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients 
+      INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients
                                  ! array
       INTEGER IX                 ! Loop counter
       INTEGER IY                 ! Loop counter

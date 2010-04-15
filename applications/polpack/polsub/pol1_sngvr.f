@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGVR( DIM1, DIM2, SQRES, EXDATA, WGT, DMAX, DMIN, 
+      SUBROUTINE POL1_SNGVR( DIM1, DIM2, SQRES, EXDATA, WGT, DMAX, DMIN,
      :                       VAR, WORK1, WORK2, NOISE, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGVR( DIM1, DIM2, SQRES, EXDATA, WGT, DMAX, DMIN, 
+*     CALL POL1_SNGVR( DIM1, DIM2, SQRES, EXDATA, WGT, DMAX, DMIN,
 *                      VAR, WORK1, WORK2, NOISE, STATUS )
 
 *  Description:
@@ -20,7 +20,7 @@
 *
 *     The supplied squared residuals are smoothed using a weighted 7x7
 *     pixel mean box filter. These mean squared residual values are used
-*     as the variance estimates. 
+*     as the variance estimates.
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
@@ -41,11 +41,11 @@
 *     DMIN = REAL (Given)
 *        The lowest value in EXDATA.
 *     VAR( DIM1, DIM2 ) = REAL (Returned)
-*        The variance estimate associated with each EXDATA value. 
+*        The variance estimate associated with each EXDATA value.
 *     WORK1( DIM1 ) = DOUBLE PRECISION (Returned)
-*        A work array. 
+*        A work array.
 *     WORK2( DIM1 ) = DOUBLE PRECISION (Returned)
-*        A work array. 
+*        A work array.
 *     NOISE = REAL (Returned)
 *        An estimate of the standard deviation of the noise in the
 *        background regions.
@@ -54,7 +54,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Smooth the squared residuals to get the variance estimates.
-      CALL POL1_BLKWR( DIM1, DIM2, SQRES, WGT, 3, 3, VAL__EPSR, 
+      CALL POL1_BLKWR( DIM1, DIM2, SQRES, WGT, 3, 3, VAL__EPSR,
      :                 VAR, WORK1, WORK2, STATUS )
 
 *  Form a histogram of variance against expected data value.

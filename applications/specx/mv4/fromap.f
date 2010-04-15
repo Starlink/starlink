@@ -3,7 +3,7 @@
 *        Remove TABs.
 C--------------------------------------------------------------
 
-      SUBROUTINE FROMAP (ICHAN, IPOS, IROFF2, IDOFF2, 
+      SUBROUTINE FROMAP (ICHAN, IPOS, IROFF2, IDOFF2,
      &                   DATA, LDATA, INDEX, IFAIL)
 
 C   Routine to remove spectrum from map at specified position

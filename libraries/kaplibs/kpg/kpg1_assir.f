@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,10 +93,10 @@
 *  Local Variables:
       CHARACTER BJ*1		 ! B for Besselian, or J for Julian equinox
       CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
-      CHARACTER TEXT*50          ! Text 
+      CHARACTER TEXT*50          ! Text
       DOUBLE PRECISION DEFEP     ! Epoch of observation
       DOUBLE PRECISION EPOCH     ! Epoch of observation
-      DOUBLE PRECISION EQU       ! Equinox 
+      DOUBLE PRECISION EQU       ! Equinox
       INTEGER IAT	         ! Current length of string
 *.
 
@@ -109,34 +109,34 @@
 *  Is the supplied string an IRAS90 SCS?
       IF( KPG1_ISSCS( SCS, EQU, BJ, SCSNAM, STATUS ) ) THEN
          KPG1_ASSIR = .TRUE.
-       
+
 *  Is the supplied Frame a SkyFrame?
          IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
 
 *  Set the attributes of the SkyFrame to match the values specified
-*  by the SCS. First deal with "EQUATORIAL" systems (AST equivalents are 
+*  by the SCS. First deal with "EQUATORIAL" systems (AST equivalents are
 *  "FK4" and "FK5").
             IF( SCSNAM .EQ. 'EQUATORIAL' ) THEN
 
 *  Assume FK4 if a Besselian equinox was included in the SCS.
-               IF( BJ .EQ. 'B' ) THEN   
+               IF( BJ .EQ. 'B' ) THEN
                   CALL AST_SETC( FRM, 'SYSTEM', 'FK4', STATUS )
 
 *  Assume FK5 if a Julian equinox was included in the SCS.
-               ELSE 
+               ELSE
                   CALL AST_SETC( FRM, 'SYSTEM', 'FK5', STATUS )
                END IF
-   
+
 *  Other IRAS90 SCS names match the corresponding AST names (GALACTIC and
 *  ECLIPTIC), so just set them.
             ELSE
-               CALL AST_SETC( FRM, 'SYSTEM', 
+               CALL AST_SETC( FRM, 'SYSTEM',
      :                        SCSNAM( : CHR_LEN( SCSNAM ) ), STATUS )
             END IF
 
 *  FK4 systems need a qualifying epoch value, and other systems may in
 *  the future (eg when ICRS is accept). To be on the safe side, we always
-*  get an EPOCH from the user, using the SkyFrame's current value as a 
+*  get an EPOCH from the user, using the SkyFrame's current value as a
 *  default.
             DEFEP = AST_GETD( FRM, 'EPOCH', STATUS )
             CALL PAR_DEF0D( PEP, DEFEP, STATUS )
@@ -152,7 +152,7 @@
             IF( EQU .NE. VAL__BADD ) THEN
                TEXT = BJ
                IAT = 1
-               CALL CHR_PUTD( EQU, TEXT, IAT )                        
+               CALL CHR_PUTD( EQU, TEXT, IAT )
                CALL AST_SETC( FRM, 'EQUINOX', TEXT( : IAT ), STATUS )
             END IF
 

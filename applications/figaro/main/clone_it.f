@@ -125,16 +125,16 @@
 
 
           call DAT_PAREN(dloc, chars1p, status)
- 
-          
+
+
           call dat_ncomp(cloc, ncomp, status)
           do 1 i=1, ncomp
              call dat_index(cloc, i, tloc, status)
              call dat_name(tloc, tname, status)
              call dat_copy(tloc, chars1p, 'results', status)
-             call dat_annul(tloc, status)             
+             call dat_annul(tloc, status)
  1        continue
-          
+
           call dat_annul(chars1p, status)
           call dat_annul(cloc, status)
           call dat_annul(dloc, status)

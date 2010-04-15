@@ -61,7 +61,7 @@
 *     25-MAY-1993 (PDRAPER):
 *        Original version.
 *     8-NOV-2001 (MBT):
-*        Added additional check that ID is not out of range (else 
+*        Added additional check that ID is not out of range (else
 *        uninitialized data can cause segmentation fault).
 *     {enter_changes_here}
 
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
       ELSE IF ( ID .LE. CCD1__MXPNT ) THEN
 
 *  Unmap data.
-         IF ( CCD1_TMPPO( ID ) .NE. -1 ) THEN 
+         IF ( CCD1_TMPPO( ID ) .NE. -1 ) THEN
             CALL DAT_UNMAP( CCD1_TMPLO( ID ), STATUS )
             CCD1_TMPPO( ID ) =  -1
          END IF

@@ -7,7 +7,7 @@
 *     2 non-congruent images may be input, along with their relative
 *     offsets from the first image, and these are then mosaiced together
 *     into one (usually larger) output frame. Where the frames overlap, a
-*     a mean value is inserted into the output image. Bad pixels are 
+*     a mean value is inserted into the output image. Bad pixels are
 *     optionally handled - bad data in one input may be replaced by good
 *     data from another.
 *
@@ -39,7 +39,7 @@
 *    Authors :
 *
 *     Mark McCaughrean UoE (REVA::MJM)
-*     COLIN ASPIN 
+*     COLIN ASPIN
 *
 *    History :
 *
@@ -55,8 +55,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'         ! SSE global variables
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -64,7 +64,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :  NDIMS,                  ! dimensionality of images
      :  MAXFRAMES               ! maximum number of frames allowed
 
@@ -73,7 +73,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI( MAXFRAMES ),           ! locator for input data structure
      :    LOCB,                        ! locator for bad pixel image structure
      :    LOCO,                        ! locator for output data structure
@@ -155,7 +155,7 @@
 
 *       tell user which number frame is required
          CALL MSG_SETI( 'NEXT', I )
-         CALL MSG_OUT( 'NEXT_FRAME', 
+         CALL MSG_OUT( 'NEXT_FRAME',
      :                 'Input frame number ^NEXT', STATUS )
 
 *       get a locator to an IMAGE type data structure
@@ -185,12 +185,12 @@
 *             for all but the first frame, get the offsets of the current
 *             frame from the first, setting first offsets to zero, and then
 *             cancel parameter
-               IF( I .NE. 1 ) THEN 
+               IF( I .NE. 1 ) THEN
                   CALL PAR_GET0I( 'XOFFSET', XOFFSET( I ), STATUS )
                   CALL PAR_GET0I( 'YOFFSET', YOFFSET( I ), STATUS )
 	          CALL MSG_SETI( 'XO', XOFFSET(I))
 	          CALL MSG_SETI( 'YO', YOFFSET(I))
-	          CALL MSG_OUT( 'TEXT', 
+	          CALL MSG_OUT( 'TEXT',
      :	            'Offset of image from 1st = ^XO, ^YO', STATUS)
                   CALL PAR_CANCL( 'XOFFSET', STATUS )
                   CALL PAR_CANCL( 'YOFFSET', STATUS )
@@ -269,7 +269,7 @@
           DO  J  =  1, NUMBER
 
 *          compare the current x offset with minimum found so far -
-*          if it is smaller, then make it the new minimum 
+*          if it is smaller, then make it the new minimum
             IF( XOFFSET( J ) .LT. MINX ) THEN
                MINX  =  XOFFSET( J )
             ENDIF
@@ -292,7 +292,7 @@
 *       calculate size of output frame from the extrema in the
 *       offset values
          ODIMS( 1 )  =  MAXX - MINX
-         ODIMS( 2 )  =  MAXY - MINY         
+         ODIMS( 2 )  =  MAXY - MINY
 
 *       inform user of output array dimensions
          CALL MSG_SETI( 'NEWXDIM', ODIMS( 1 ) )
@@ -308,7 +308,7 @@
          DO  K  =  1, NUMBER
             XOFFSET( K )  =  XOFFSET( K ) - MINX
             YOFFSET( K )  =  YOFFSET( K ) - MINY
-         END DO         
+         END DO
 
 *       now get the output array
          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO, STATUS )
@@ -326,7 +326,7 @@
 
 *             create some temporary workspace to hold the image mask
                CALL NDF_TEMP( PLACE, STATUS )
-               CALL NDF_NEW( '_REAL', NDIMS, LBND, ODIMS, PLACE, LOCT, 
+               CALL NDF_NEW( '_REAL', NDIMS, LBND, ODIMS, PLACE, LOCT,
      :                       STATUS )
 
 *             check status before continuing
@@ -339,11 +339,11 @@
 *                check status before accessing pointers
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
-*                   set all the pixels of both the output array and the 
+*                   set all the pixels of both the output array and the
 *                   image mask to be zero using ZERO2D from KERGEN
-                     CALL ZERO2D( ODIMS( 1), ODIMS( 2), 
+                     CALL ZERO2D( ODIMS( 1), ODIMS( 2),
      :                            %VAL( PNTRO ), STATUS )
-                     CALL ZERO2D( ODIMS( 1), ODIMS( 2), 
+                     CALL ZERO2D( ODIMS( 1), ODIMS( 2),
      :                            %VAL( PNTRT ), STATUS )
 
 *                   see if bad pixel replacement is wanted - we need to
@@ -353,7 +353,7 @@
 *                      see if it is by value
                         IF ( VORM .EQ. 'V' ) THEN
 
-*                         add each image into the (big) output image, updating 
+*                         add each image into the (big) output image, updating
 *                         the image mask at the same time, using MOSAIC_ADDBV,
 *                         which does bad pixel replacement also
                            DO  L  =  1, NUMBER
@@ -364,10 +364,10 @@
 
 *                            call the working subroutine
                               CALL MOSAIC_ADDBV( %VAL( PNTRI( L ) ),
-     :                         DIMS( 1), DIMS( 2), BADVAL, 
-     :                         XOFFSET( L ), YOFFSET( L ), 
-     :                         %VAL( PNTRO ), %VAL( PNTRT ), 
-     :                         ODIMS( 1), ODIMS( 2), OVERLAP, 
+     :                         DIMS( 1), DIMS( 2), BADVAL,
+     :                         XOFFSET( L ), YOFFSET( L ),
+     :                         %VAL( PNTRO ), %VAL( PNTRT ),
+     :                         ODIMS( 1), ODIMS( 2), OVERLAP,
      :	                       STATUS )
 
                            END DO
@@ -375,7 +375,7 @@
 *                      else it is to be done by mask
                         ELSE
 
-*                         add each image into the (big) output image, updating 
+*                         add each image into the (big) output image, updating
 *                         the image mask at the same time, using MOSAIC_ADDBM,
 *                         which does bad pixel replacement also
                            DO  L  =  1, NUMBER
@@ -386,10 +386,10 @@
 
 *                            call the working subroutine
                               CALL MOSAIC_ADDBM( %VAL( PNTRI( L ) ),
-     :                         %VAL( PNTRB ), DIMS( 1), DIMS( 2), 
-     :                         XOFFSET( L ), YOFFSET( L ), 
-     :                         %VAL( PNTRO ), %VAL( PNTRT ), 
-     :                         ODIMS( 1), ODIMS( 2), 
+     :                         %VAL( PNTRB ), DIMS( 1), DIMS( 2),
+     :                         XOFFSET( L ), YOFFSET( L ),
+     :                         %VAL( PNTRO ), %VAL( PNTRT ),
+     :                         ODIMS( 1), ODIMS( 2),
      :	                       OVERLAP, STATUS )
 
                            END DO
@@ -400,7 +400,7 @@
 *                   else bad pixel replacement is NOT wanted
                      ELSE
 
-*                      add each image into the (big) output image, updating 
+*                      add each image into the (big) output image, updating
 *                      the image mask at the same time, using MOSAIC_ADD
                         DO  L  =  1, NUMBER
 
@@ -409,11 +409,11 @@
                            DIMS( 2 )  =  IDIMS( 2, L )
 
 *                         call the working subroutine
-                           CALL MOSAIC_ADD( %VAL( PNTRI( L ) ), 
-     :                      DIMS( 1), DIMS( 2), XOFFSET( L ), 
-     :                      YOFFSET( L ), %VAL( PNTRO ), 
-     :                      %VAL( PNTRT ), ODIMS( 1), 
-     :                      ODIMS( 2), OVERLAP, 
+                           CALL MOSAIC_ADD( %VAL( PNTRI( L ) ),
+     :                      DIMS( 1), DIMS( 2), XOFFSET( L ),
+     :                      YOFFSET( L ), %VAL( PNTRO ),
+     :                      %VAL( PNTRT ), ODIMS( 1),
+     :                      ODIMS( 2), OVERLAP,
      :	                    STATUS)
 
                         END DO
@@ -421,12 +421,12 @@
 *                   end of if-bad-pixel-replacement-to-be-done check
                      END IF
 
-*                   now call MOSAIC_DIV to divide each value in the output 
-*                   array by the number in the corresponding pixel in the 
-*                   mask array i.e. by the number of images that were added 
+*                   now call MOSAIC_DIV to divide each value in the output
+*                   array by the number in the corresponding pixel in the
+*                   mask array i.e. by the number of images that were added
 *                   into that pixel
-                     CALL MOSAIC_DIV( %VAL( PNTRO ), ODIMS( 1), 
-     :                                ODIMS( 2), %VAL( PNTRT ), 
+                     CALL MOSAIC_DIV( %VAL( PNTRO ), ODIMS( 1),
+     :                                ODIMS( 2), %VAL( PNTRT ),
      :                                STATUS )
 
 *                end of if-no-error-before-accessing-pointers check

@@ -36,7 +36,7 @@ BEGPLOT (GDNAME)
 {  Reset PONGO.
 RESETPONGO
 
-{  Read in the data, selecting objects with proper motions 
+{  Read in the data, selecting objects with proper motions
 {  greater than 0.5 arcseconds in RA per year.
 READF DATA=(PONGO_EXAMPLES&'')/highppm.dat XCOL=2 YCOL=3 ~
       EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
@@ -88,7 +88,7 @@ READF DATA=(PONGO_EXAMPLES&'')/gridlabels.dat XCOL=5 YCOL=6 ~
       LABCOL=4 EXCOL=0 EYCOL=0 TO=9 ALL
 DEGTOR X
 DEGTOR Y
-ANNOTATE PROJECTION=(PROJ) YOFF=0.0 XOFF=0.0 JUSTIFICATION=1.0 
+ANNOTATE PROJECTION=(PROJ) YOFF=0.0 XOFF=0.0 JUSTIFICATION=1.0
 
 {  Do normal vector plot for bottom half.
 READF DATA=(PONGO_EXAMPLES&'')/highppm.dat XCOL=2 YCOL=3 ~

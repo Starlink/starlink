@@ -106,7 +106,7 @@
 
 *  Output enabled: write prompt, if any.
 
-            IF ( PROMPT .NE. '  ' ) 
+            IF ( PROMPT .NE. '  ' )
      :        WRITE ( IRC_LUTER, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.

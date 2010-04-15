@@ -16,7 +16,7 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
 *     C.
 
 *  Invocation:
-*     int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, 
+*     int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize,
 *                      int len, int *nval, char *buf, int *status )
 
 *  Description:
@@ -57,12 +57,12 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
 *+
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    char *iw;              /* Pointer to next character to be written */
    char *ptr;             /* Array holding all null terminated strings */
    const char *ir;        /* Pointer to next character to be read */
@@ -113,7 +113,7 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
       mxlen = astMapLenC( this, key );
 
 /* Allocate memory for an array of concatenated null-terminated strings.
-   Each string occupies "len+1" characters in this array. This  is the 
+   Each string occupies "len+1" characters in this array. This  is the
    form in which astMapGet1C returned the data. */
       ptr = astMalloc( sizeof( char )*mxval*( mxlen + 1 ) );
 
@@ -142,7 +142,7 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
                   *iw = ' ';
                   pad = 1;
                }
-            }         
+            }
 
             for( ; j < len; j++ ) *(iw++) = ' ';
 

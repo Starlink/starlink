@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -83,7 +83,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -259,12 +259,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -317,7 +317,7 @@ data, plot them, and measure some equivalent widths or fluxes, you can
 do that without much effort. First-time users with this type of modest
 goal can skim through the documentation to get a feel for what's going
 on, then check the command reference section to find the commands
-required. You could even go straight to the terminal, and type {\tt{DIPSO}}; 
+required. You could even go straight to the terminal, and type {\tt{DIPSO}};
 there's no substitute for hands-on experience. However, DO read the
 documentation fully at some time; DIPSO can do a lot of things, some
 of which you might not know that you needed until you read about
@@ -363,7 +363,7 @@ Type
 \begin{verbatim}
    g9.z?
 \end{verbatim}
-hit the return key. You will get an error message. Ignore this and 
+hit the return key. You will get an error message. Ignore this and
 read on. Type
 \begin{verbatim}
    Help, Q
@@ -382,17 +382,17 @@ You didn't do much, though; you'll need to know a few more commands. A
 alphabetically) is appended, but here we'll mention a few basic ones to
 get you going. (You should check the command descriptions for details of
 how they should be used.)
-Once in the program, you can use the \htmlref{{\tt{COMM}}}{COM:COMMANDS} 
+Once in the program, you can use the \htmlref{{\tt{COMM}}}{COM:COMMANDS}
 command to get lists of commands classified by function together with
 brief descriptions (for instance ``\verb+COMMANDS g+'' will list all the
 graphics-related commands), or use \htmlref{{\tt{HELP}}}{COM:HELP}  for
 more detailed information on individual commands.
 Data can be read in using the \htmlref{{\tt{READ}}}{COM:READ}  command, or
 in special cases one of the following commands: \htmlref{{\tt
-ALASRD}}{COM:ALASRD}, \htmlref{{\tt{SCREENRD}}}{COM:SCREENRD}, 
-\htmlref{{\tt{SP0RD}}}{COM:SP0RD},  \htmlref{{\tt{SP1RD}}}{COM:SP1RD}, 
-\htmlref{{\tt{SP2RD}}}{COM:SP2RD},  \htmlref{{\tt{ATLASRD}}}{COM:ATLASRD}, 
-or \htmlref{{\tt{RESTORE}}}{COM:RESTORE}. 
+ALASRD}}{COM:ALASRD}, \htmlref{{\tt{SCREENRD}}}{COM:SCREENRD},
+\htmlref{{\tt{SP0RD}}}{COM:SP0RD},  \htmlref{{\tt{SP1RD}}}{COM:SP1RD},
+\htmlref{{\tt{SP2RD}}}{COM:SP2RD},  \htmlref{{\tt{ATLASRD}}}{COM:ATLASRD},
+or \htmlref{{\tt{RESTORE}}}{COM:RESTORE}.
 
 For ``historical reasons'' many people use the ``Spectrum 0'' format
 for input and output of data (\htmlref{{\tt{SP0RD}}}{COM:SP0RD},  \htmlref{{\tt{SP0WR}}}{COM:SP0WR}).  However, the
@@ -402,16 +402,16 @@ DIPSO associates with a data set.
 
 To get a plotting surface, use the \htmlref{{\tt{DEV}}}{COM:DEV}  command. Plotting is
 usually done with \htmlref{{\tt{PM}}}{COM:PM};  unless you've provided X and Y ranges
-(with \htmlref{{\tt{XR}}}{COM:XR}  and \htmlref{{\tt{YR}}}{COM:YR},  or some combination of \htmlref{{\tt{XMAX}}}{COM:XMAX}, 
+(with \htmlref{{\tt{XR}}}{COM:XR}  and \htmlref{{\tt{YR}}}{COM:YR},  or some combination of \htmlref{{\tt{XMAX}}}{COM:XMAX},
 \htmlref{{\tt{XMIN}}}{COM:XMIN},  \htmlref{{\tt{YMAX}}}{COM:YMAX},  and \htmlref{{\tt{YMIN}}}{COM:YMIN})  the plot is auto-scaled to the
 minimum and maximum values in the arrays.
 
 Once you have managed to read in some data, and plot them, you will
 soon want to carry out measurements, change the style of the plots,
 and so on. To find out how to proceed, you should read the
-descriptions of commands like (\htmlref{{\tt{HIST}}}{COM:HIST},  \htmlref{{\tt{POLY}}}{COM:POLY},  \htmlref{{\tt{MARK}}}{COM:MARK}); 
-(\htmlref{{\tt{XV}}}{COM:XV},  \htmlref{{\tt{YV}}}{COM:YV},  \htmlref{{\tt{XYV}}}{COM:XYV});  (\htmlref{{\tt{CSET}}}{COM:CSET},  \htmlref{{\tt{CROT}}}{COM:CROT}); 
-and (\htmlref{{\tt{TPORT}}}{COM:TPORT},  \htmlref{{\tt{TZONE}}}{COM:TZONE}). 
+descriptions of commands like (\htmlref{{\tt{HIST}}}{COM:HIST},  \htmlref{{\tt{POLY}}}{COM:POLY},  \htmlref{{\tt{MARK}}}{COM:MARK});
+(\htmlref{{\tt{XV}}}{COM:XV},  \htmlref{{\tt{YV}}}{COM:YV},  \htmlref{{\tt{XYV}}}{COM:XYV});  (\htmlref{{\tt{CSET}}}{COM:CSET},  \htmlref{{\tt{CROT}}}{COM:CROT});
+and (\htmlref{{\tt{TPORT}}}{COM:TPORT},  \htmlref{{\tt{TZONE}}}{COM:TZONE}).
 
 Type {\tt{q}}  to leave the program. If in the middle of something long and
 tedious you despair, you can type control-C; this stops execution of the current
@@ -420,7 +420,7 @@ command, and returns you to the DIPSO command prompt.
 If you decide in the middle of a DIPSO session that you need to issue some
 operating system commands, then simply push the DIPSO task into the background
 by typing control-Z,
-issue your operating system commands, and then re-enter DIPSO by typing {\tt{fg}}. 
+issue your operating system commands, and then re-enter DIPSO by typing {\tt{fg}}.
 
 \section {Data Storage}
 
@@ -456,7 +456,7 @@ Use of NDF structures enables data files created by DIPSO to be used by
 other Starlink packages (and vice-versa). It also enables data files to
 be transferred freely from one operating system to another without
 needing to do a format conversion for each one. NDF structures are
-contained within disk files which have the file extension ``{\tt{.sdf}}''. 
+contained within disk files which have the file extension ``{\tt{.sdf}}''.
 When referring to an NDF, {\em do not include the file type or an error
 will result}. Think of it this way; an NDF is an object contained {\em
 within} a disk file. The NDF and the disk file in which it is contained
@@ -594,7 +594,7 @@ The commands in this file would be executed by typing:
    @TEST
 \end{verbatim}
 
-The unspecified mandatory parameters for \htmlref{{\tt{READ}}}{COM:READ} 
+The unspecified mandatory parameters for \htmlref{{\tt{READ}}}{COM:READ}
 and \htmlref{{\tt{DRED}}}{COM:DRED}  would be prompted for, and input, at
 the terminal. The Y values in the `current' array would be replaced by
 Log(10) Y (\htmlref{{\tt{LOGY}}}{COM:LOGY}),  then multiplied by -2.5
@@ -607,7 +607,7 @@ SL}}{COM:SL}).
 
 On completion of the commands in the file, control returns to the terminal.
 
-On startup, DIPSO looks for a command file called {\tt{startup.cmd}} 
+On startup, DIPSO looks for a command file called {\tt{startup.cmd}}
 in a directory which has been
 assigned the environment variable {\tt{OWNERDIR}}.  So, if
 you regularly want to change any default settings from those normally
@@ -649,10 +649,10 @@ below, generates a circle.)
 
 \subsection {Plotting options}
 
-Plotting can be done with a variety of symbols (\htmlref{{\tt{MARK}}}{COM:MARK},  \htmlref{{\tt{MROT}}}{COM:MROT}), 
+Plotting can be done with a variety of symbols (\htmlref{{\tt{MARK}}}{COM:MARK},  \htmlref{{\tt{MROT}}}{COM:MROT}),
 or line types (\htmlref{{\tt{TLINE}}}{COM:TLINE},  \htmlref{{\tt{TROT}}}{COM:TROT})  in \htmlref{{\tt{POLY}}}{COM:POLY}  ({\em i.e}
 join-the-dots) or \htmlref{{\tt{HIST}}}{COM:HIST}  (histogram) mode. If you have access to
-appropriate hardware, colour plotting is also possible (\htmlref{{\tt{CSET}}}{COM:CSET}, 
+appropriate hardware, colour plotting is also possible (\htmlref{{\tt{CSET}}}{COM:CSET},
 \htmlref{{\tt{CROT}}}{COM:CROT}).  Device changes can be made at any time, so that you can, for
 example, switch between an Ikon, Pericom, and laser printer at will.
 Alternatively, you can stick to a single device and display data in
@@ -668,7 +668,7 @@ If the functionality of the command requires only one cursor hit ({\em
 e.g.} \htmlref{{\tt{XV}}}{COM:XV}  to measure X values), then the command is exited by making
 two cursor hits at the same point. This method of exiting generalises
 to other cursor-driven commands which require multiple inputs ({\em
-e.g.} \htmlref{{\tt{CREGS}}}{COM:CREGS}). 
+e.g.} \htmlref{{\tt{CREGS}}}{COM:CREGS}).
 
 \subsection {Default plotting (and other) options}
 
@@ -694,7 +694,7 @@ The default options (all of which can be changed at will) are:
 These defaults are chosen as a compromise between aesthetic elegance and
 speed of plotting. For an ugly but fast plot, choose \htmlref{{\tt
 POLY}}{COM:POLY} and \htmlref{{\tt{GRIDSTYLE}}}{COM:GRIDSTYLE}{\tt  5}; for
-truth and beauty, choose \htmlref{{\tt{FONT}}}{COM:FONT}  {\tt{2}}. 
+truth and beauty, choose \htmlref{{\tt{FONT}}}{COM:FONT}  {\tt{2}}.
 
 This is as good a point as any to note some other default settings for
 DIPSO:
@@ -747,7 +747,7 @@ to annoy than enlighten DIPSO users!
 \subsection {The ``LOGICAL USER'' Function}
 
 To use the interface you will need to write a subprogram called
-{\tt{USER}}  which should follow the example given in {\tt{\$DIPSODIR/user.f}}. 
+{\tt{USER}}  which should follow the example given in {\tt{\$DIPSODIR/user.f}}.
 
 The example subroutine contains almost all the additional
 documentation needed to understand how to `do your own thing'. This
@@ -773,7 +773,7 @@ with, but the essential contents of the argument list are:
 Sometimes you will want to treat {\tt{PARAMS}}  as a character string (for
 example, it might be a filename); but more often you will want to
 read numbers from it. You can do this in exactly the same way as DIPSO
-does by calling the routine {\tt{DECODE}}: 
+does by calling the routine {\tt{DECODE}}:
 
 \begin{verbatim}
       CALL DECODE( CMD, PARAMS, NP1, NP2, VALUES, PROMPTS, OK )
@@ -797,16 +797,16 @@ are passed.
 
 The {\tt{`PROMPTS'}}  {\em must} be left justified, separated by blanks,
 and terminate with a blank. (Have a look at the
-{\tt{\$DIPSODIR/user.f}}  code for examples of how to use {\tt{DECODE}}. 
+{\tt{\$DIPSODIR/user.f}}  code for examples of how to use {\tt{DECODE}}.
 
 \subsection {\label{SEC:MY_DIPSO}Building your own binary}
 
-Having written your {\tt{USER}}  code, you can build your own {\tt{dipso}} 
+Having written your {\tt{USER}}  code, you can build your own {\tt{dipso}}
 binary.
 
 You must first set the environment variable {\tt{SYSTEM}}  appropriately
 for your system: {\tt{alpha\_OSF1}}  for AXP OSF/1, or {\tt{sun4\_Solaris}}  for
-Sparc Solaris~2.x. 
+Sparc Solaris~2.x.
 
 Then, you can compile and link a new binary by typing:
 
@@ -815,8 +815,8 @@ Then, you can compile and link a new binary by typing:
    % my_dipso
 \end{verbatim}
 
-If you wish to link in subroutines contained in object modules {\tt{sub1.o,} 
-sub2.o} etc, you should define an environment variable {\tt{MY\_OBJECTS}} 
+If you wish to link in subroutines contained in object modules {\tt{sub1.o,}
+sub2.o} etc, you should define an environment variable {\tt{MY\_OBJECTS}}
 specifying these object files:
 
 \begin{verbatim}
@@ -844,7 +844,7 @@ please report it, giving fullest details possible --- preferably a macro
 file which always results in the crash), but it may well do so in
 user-supplied code. In this case, you will normally want to disable the
 condition handler in order to get the system handler, which may tell you
-where the crash occurred. To turn the handler off, the \htmlref{{\tt{HANDLER}}}{COM:HANDLER} 
+where the crash occurred. To turn the handler off, the \htmlref{{\tt{HANDLER}}}{COM:HANDLER}
 command can be invoked (use {\tt{HANDLER}  0}). On some flavours of UNIX,
 this may result in the program appearing to freeze after a crash. If this
 happens, pressing control-C should return you normally to a system
@@ -857,7 +857,7 @@ several people, then it might be convenient to put the executable into a
 local public directory. In this case you should persuade your node
 manager to create such a directory, with appropriate protections, and
 give it the environment variable {\tt{LDIPSODIR}}.  The local version can
-then be run, of course, as {\tt{\$LDIPSODIR/dipso}}. 
+then be run, of course, as {\tt{\$LDIPSODIR/dipso}}.
 
 In response to the \htmlref{{\tt{COMM}}}{COM:COMMANDS}  command, DIPSO {\em
 first} looks for a file {\tt{\$LDIPSO\-DIR/command\-.hlp}},  which will be
@@ -866,7 +866,7 @@ used if found. It will then go on to look for a file {\tt
 
 So it's possible to put an appropriately modified version of
 {\tt{command.hlp}}  into {\tt{LDIPSODIR}}  to keep users informed of local
-additions to available commands. The local version of {\tt{command.lis}} 
+additions to available commands. The local version of {\tt{command.lis}}
 should contain only the extra local commands, not the standard commands,
 and should be formatted like the standard version.
 
@@ -878,7 +878,7 @@ any local {\tt{command.lis}}  files still existing be converted into
 of the format). If DIPSO finds a local old-style {\tt{command.lis}}  file
 it will simply display its contents (as in previous versions of DIPSO) in
 preference to using any new-style {\tt{command.hlp}}  files. Note, however,
-that the extended functionality of the \htmlref{{\tt{COMM}}}{COM:COMMANDS} 
+that the extended functionality of the \htmlref{{\tt{COMM}}}{COM:COMMANDS}
 command (i.e. word searches, command descriptions and classification) will not be available.
 
 It's possible to give \htmlref{{\tt{HELP}}}{COM:HELP} for local commands,
@@ -886,7 +886,7 @@ too, although it can only be accessed as plain text (see
 \htmlref{{\tt{USEHTX}}}{COM:USEHTX}). The {\tt{HELP}} command in plain
 text mode first
 runs through {\tt{\$DIPSO\-DIR/help\-.lis}}  but if it doesn't find a
-command name there, it will try to look for an {\tt{\$LDIPSODIR/lhelp.lis}}, 
+command name there, it will try to look for an {\tt{\$LDIPSODIR/lhelp.lis}},
 and search that for help information. This file should match the format
 of {\tt{\$DIPSODIR/help.lis}},  but need contain information only on local
 commands.
@@ -928,8 +928,8 @@ Note also that if DIPSO reads in a data set where a gap is padded out
 with a whole string of zeros ({\em e.g.} from IUEDR), then it throws
 away all but a couple of them, to save space. (Try \htmlref{{\tt{SP0RD}}}{COM:SP0RD}ing  a
 hi-res IUEDR spectrum, then \htmlref{{\tt{SP0WR}}}{COM:SP0WR}ing  it; the output is much
-smaller than the input). This behaviour does not apply to the \htmlref{{\tt{READ}}}{COM:READ}, 
-\htmlref{{\tt{WRITE}}}{COM:WRITE},  \htmlref{{\tt{SAVE}}}{COM:SAVE}  and \htmlref{{\tt{RESTORE}}}{COM:RESTORE}. 
+smaller than the input). This behaviour does not apply to the \htmlref{{\tt{READ}}}{COM:READ},
+\htmlref{{\tt{WRITE}}}{COM:WRITE},  \htmlref{{\tt{SAVE}}}{COM:SAVE}  and \htmlref{{\tt{RESTORE}}}{COM:RESTORE}.
 
 When using NDFs, there is another Y value which is also used (by {\em
 all} commands which access NDFs) to flag gaps in the data. This value is
@@ -978,10 +978,10 @@ appropriate values and names for all variables):
         INTEGER    NBRK           ! Number of points in `breaks` array.
         INTEGER    BREAKS( NBRK ) ! Breaks array.
         REAL       WORV           ! Wavelength of velocity parameter.
-        INTEGER    STATUS         ! Should be SAI__OK on entry. SAI__OK on 
+        INTEGER    STATUS         ! Should be SAI__OK on entry. SAI__OK on
                                   ! exit if successful.
 
-*  Create the output NDF.	
+*  Create the output NDF.
         CALL WRITE_NDF ( COMM, NDFNAM, NPOINT , XV , YV , XLAB, YLAB,
      :                   TITLE , NBRK , BREAKS , WORV , STATUS )
 
@@ -1023,7 +1023,7 @@ where:
 
 \item [INDEX - integer] The stack entry you want to access.
 
-\item [NPOINT - integer] On calling, the size of the arrays into which the 
+\item [NPOINT - integer] On calling, the size of the arrays into which the
 {\tt{XV}}  and {\tt{YV}}  data are to be loaded; and on exit is the
 number of elements of the arrays which are occupied ({\em i.e.} the
 number of points).
@@ -1057,7 +1057,7 @@ call to GETSTK is identified as unsuccessful.
 You can also push data onto the stack:
 
 \begin{verbatim}
-      CALL UPUSH( ASZE, XV, YV, NPOINT, BSZE, BREAKS, NBRK, TITLE, 
+      CALL UPUSH( ASZE, XV, YV, NPOINT, BSZE, BREAKS, NBRK, TITLE,
      :            WORV, OK)
 \end{verbatim}
 
@@ -1067,7 +1067,7 @@ is the size of your arrays holding the X and Y values, and BSZE
 
 To encourage you to look on DIPSO as a tool with which you can interface
 your own software, it is worth noting that the {\tt{ELF}}  package
-(described below), all the Fourier analysis software, the {\tt{IS}} 
+(described below), all the Fourier analysis software, the {\tt{IS}}
 routines, and the \htmlref{{\tt{NEBCONT}}}{COM:NEBCONT}  facility were added to DIPSO with very
 little more than the basic interface described above.
 
@@ -1104,7 +1104,7 @@ the fit parameters is done in a command language (invoked by the DIPSO
 command \htmlref{{\tt{ELFINP}}}{COM:ELFINP})  which is described below. After optimisation of
 parameters (DIPSO command \htmlref{{\tt{ELFOPT}}}{COM:ELFOPT}),  the full specification of the
 fit and the results may be stored. The resulting fit, in spectrum
-form, can be pushed on the DIPSO stack (\htmlref{{\tt{ELFPUSH}}}{COM:ELFPUSH}). 
+form, can be pushed on the DIPSO stack (\htmlref{{\tt{ELFPUSH}}}{COM:ELFPUSH}).
 
 \subsection {ELF commands}
 
@@ -1200,7 +1200,7 @@ expect.
 \item Later\ldots you can push a copy of the `best fit' model onto the
 DIPSO stack using \htmlref{{\tt{ELFPUSH}}}{COM:ELFPUSH}.  You can also save the fit
 coefficients on the separate fit coefficient stack, for later use or
-reference, with \htmlref{{\tt{ELFPUSHC}}}{COM:ELFPUSHC}. 
+reference, with \htmlref{{\tt{ELFPUSHC}}}{COM:ELFPUSHC}.
 
 \end{itemize}
 
@@ -1314,7 +1314,7 @@ At each X point, puts the smaller of the STACK (entry `n') and
 `current array' Y values into the current array. To do this the data
 in the current arrays are mapped onto the STACK X grid. The function
 returns Y values only at those X values where valid data occur in both
-data sets. (See also \htmlref{{\tt{AMAX}}}{COM:AMAX}). 
+data sets. (See also \htmlref{{\tt{AMAX}}}{COM:AMAX}).
 
 \dipcom{AMULT}{n}{Multiplies the Y values in two arrays}
 Multiply the Y values in STACK entry `n' by the values in the
@@ -1335,25 +1335,25 @@ both X arrays must be monotonic. Results are left stored in the
 Swaps the `top' ({\em i.e.} numerically largest) STACK entry with the
 contents of the `current' arrays.
 
-\dipcom{ALASCHK}{(no parameters)}{Checks the lines and columns to be used by {\tt{ALASRD}}} 
+\dipcom{ALASCHK}{(no parameters)}{Checks the lines and columns to be used by {\tt{ALASRD}}}
 Checks the current defaults for the lines and columns to be read in
-using \htmlref{{\tt{ALASRD}}}{COM:ALASRD}. 
+using \htmlref{{\tt{ALASRD}}}{COM:ALASRD}.
 
-\dipcom{ALASCOLS}{xcol ycol}{Sets the columns to be read by {\tt{ALASRD}}} 
+\dipcom{ALASCOLS}{xcol ycol}{Sets the columns to be read by {\tt{ALASRD}}}
 Tells \htmlref{{\tt{ALASRD}}}{COM:ALASRD}  to read X and Y data from the specified columns of a
 file. (A ``column'' is a string of alphanumeric characters separated
-from other columns by spaces; of course, the columns which \htmlref{{\tt{ALASRD}}}{COM:ALASRD} 
+from other columns by spaces; of course, the columns which \htmlref{{\tt{ALASRD}}}{COM:ALASRD}
 actually acquires must contain exclusively numeric values.) When DIPSO
 begins, these are set to 1 and 2 by default; they are {\em not} reset
-to these values after execution of \htmlref{{\tt{ALASRD}}}{COM:ALASRD}. 
+to these values after execution of \htmlref{{\tt{ALASRD}}}{COM:ALASRD}.
 
-\dipcom{ALASLINS}{line1 line2}{Sets the lines to be read by {\tt{ALASRD}}} 
+\dipcom{ALASLINS}{line1 line2}{Sets the lines to be read by {\tt{ALASRD}}}
 Tells \htmlref{{\tt{ALASRD}}}{COM:ALASRD}  to read only lines line1 to line2 (inclusive) of an input
 file. If line2 is specified as zero, this is interpreted to mean
 end-of-file.
 
 \dipcom{ALASRD}{filename[.typ] [brkval]}{Reads in data from a text file}
-Reads data from a formatted file. The simplest structure which \htmlref{{\tt{ALASRD}}}{COM:ALASRD} 
+Reads data from a formatted file. The simplest structure which \htmlref{{\tt{ALASRD}}}{COM:ALASRD}
 (and DIPSO) can read is one pair of X, Y values per record; this is
 the default file structure expected by \htmlref{{\tt{ALASRD}}}{COM:ALASRD}.  More elaborate files
 can be read in through prior use of the \htmlref{{\tt{ALASLINS}}}{COM:ALASLINS}  and \htmlref{{\tt{ALASCOLS}}}{COM:ALASCOLS}  commands
@@ -1388,7 +1388,7 @@ If MODE=0 (the default value) solar abundance models are acquired;
 otherwise the `low metal abundance' models (1/30 solar) are read in. A
 summary of the available solar abundance models can be obtained using
 \htmlref{{\tt{ATLIST}}}{COM:ATLIST},  and the models normalised to cursor-selectable X,Y values
-using \htmlref{{\tt{ATNORM}}}{COM:ATNORM}. 
+using \htmlref{{\tt{ATNORM}}}{COM:ATNORM}.
 
 Other files in the SPECDAT database, including extended atmosphere and
 Non-LTE models (see {\tt{\$SPECDAT/info.lis}}  for details), can be read in
@@ -1403,7 +1403,7 @@ SPECDAT database installed, in which case complain to your node manager.
 
 \dipcom{ATLIST}{(no parameters)}{Lists the available Karucz model atmosphere data }
 Lists the T(eff) and Log(g) values used to specify the Kurucz solar
-abundance model atmosphere fluxes that are accessible to \htmlref{{\tt{ATLASRD}}}{COM:ATLASRD}. 
+abundance model atmosphere fluxes that are accessible to \htmlref{{\tt{ATLASRD}}}{COM:ATLASRD}.
 
 \dipcom{ATNORM}{[mode]}{Normalises model atmosphere fluxes}
 Normalises model atmosphere fluxes stored in the `current' arrays to
@@ -1418,7 +1418,7 @@ Log10(FLUX). In this case, the Y values plotted (and left in the
 however, the unnormalised atmosphere data in the `current' arrays MUST
 be linear in Y to start off with ({\em i.e.} in the form resulting
 from an \htmlref{{\tt{ATLASRD}}}{COM:ATLASRD}).  \htmlref{{\tt{ATNORM}}}{COM:ATNORM}  can also be used to normalise black-body
-fluxes generated with \htmlref{{\tt{BBODY}}}{COM:BBODY}. 
+fluxes generated with \htmlref{{\tt{BBODY}}}{COM:BBODY}.
 
 \dipcom{BBODY}{temp}{Calculates black-body fluxes at the current X values}
 Calculates black-body fluxes [pi times B(nu)] at the x values of the
@@ -1449,7 +1449,7 @@ Y values in each bin, are left in the `current' arrays.
 
 \dipcom{BOX}{(no parameters)}{Causes the plotting surface to be cleared between plots}
 Automatic clearing of the plotting surface between plots. This is the
-default option on starting up. The inverse function is \htmlref{{\tt{NB}}}{COM:NB}. 
+default option on starting up. The inverse function is \htmlref{{\tt{NB}}}{COM:NB}.
 
 \dipcom{CDRAW}{[filename or mode]}{Draws a 'continuum' using the cursor or by fitting data in a file}
 Allows you to draw a `continuum' using the cursor; the input X values
@@ -1457,7 +1457,7 @@ must be in increasing order (CDRAW is terminated with an
 `X(N+1).LE.X(N)' type test). The result is stored in the `current'
 arrays (so you should first \htmlref{{\tt{PUSH}}}{COM:PUSH}  your spectrum so as not to lose it);
 subsequent rectification of data can be carried out using \htmlref{{\tt{ADIV}}}{COM:ADIV}.  (See
-also \htmlref{{\tt{CREGD}}}{COM:CREGD},  \htmlref{{\tt{CREGS}}}{COM:CREGS}  and \htmlref{{\tt{PF}}}{COM:PF}). 
+also \htmlref{{\tt{CREGD}}}{COM:CREGD},  \htmlref{{\tt{CREGS}}}{COM:CREGS}  and \htmlref{{\tt{PF}}}{COM:PF}).
 
 If MODE=0 (the default value), the data stored are just those input
 with the cursor, giving a `join-the-dots' spectrum. If MODE=1, a
@@ -1477,7 +1477,7 @@ routine.
 \dipcom{CLEAR}{(no parameters)}{Clears the command window}
 Clears the text surface. (Simply a PRINT *, ' ' loop; it will not,
 therefore, work on a 4010-type device, for which you should use
-\htmlref{{\tt{ERASE}}}{COM:ERASE}). 
+\htmlref{{\tt{ERASE}}}{COM:ERASE}).
 
 \dipcom{CLRBRK}{(no parameters)}{Removes breaks from an array}
 Clears all breaks ({\em i.e.} gaps in the data) from the current
@@ -1510,7 +1510,7 @@ by single lower-case letters as follows:
    f - Fitting.
    g - Graphics.
    h - Help information.
-   i - Reading, writing, moving and deleting data sets (including 
+   i - Reading, writing, moving and deleting data sets (including
        disk I/O).
    l - Filtering.
    m - Manipulation (arithmetic,calibration,corrections,etc).
@@ -1552,17 +1552,17 @@ corresponding condition:
 \dipitem{3}{ - Underflow.}
 \end{dipdesc}
 
-\dipcom{CREGD}{[h]}{plots the regions selected for 'continuum' fitting using {\tt{CREGS}}} 
+\dipcom{CREGD}{[h]}{plots the regions selected for 'continuum' fitting using {\tt{CREGS}}}
 `Continuum REGion Display': plots the regions selected for `continuum'
-fitting using \htmlref{{\tt{CREGS}}}{COM:CREGS}. 
+fitting using \htmlref{{\tt{CREGS}}}{COM:CREGS}.
 
 The continuum windows are indicated by horizontal bars, which are
 drawn a fraction `h' of the distance from the bottom to the top of the
 plot (0$<$h$<$1, default 0.8).
 
-\dipcom{CREGL}{(no parameters)}{Lists the current 'continuum' window selected with {\tt{CREGS}}} 
+\dipcom{CREGL}{(no parameters)}{Lists the current 'continuum' window selected with {\tt{CREGS}}}
 `Continuum REGion List': lists the current continuum windows selected
-with \htmlref{{\tt{CREGS}}}{COM:CREGS}. 
+with \htmlref{{\tt{CREGS}}}{COM:CREGS}.
 
 \dipcom{CREGS}{[X1 X2 X3 X4 X5 X6 ... X49 X50]}{Selects 'continuum' regions}
 `Continuum REGion Select': select `continuum' regions. These regions
@@ -1572,17 +1572,17 @@ When using the cursor, the input `X' values {\em must} be in
 increasing order.
 
 The selected regions can be checked using \htmlref{{\tt{CREGD}}}{COM:CREGD}.  This command will
-normally be used in conjunction with \htmlref{{\tt{PF}}}{COM:PF}.  (See also \htmlref{{\tt{CDRAW}}}{COM:CDRAW}). 
+normally be used in conjunction with \htmlref{{\tt{PF}}}{COM:PF}.  (See also \htmlref{{\tt{CDRAW}}}{COM:CDRAW}).
 
 \dipcom{CROT}{(no parameters)}{Causes automatic rotation of plotting colours}
 Implements automatic rotation of colours (when used with appropriate
 hardware). Each plot begins with the colour specified by the last call
 to \htmlref{{\tt{CSET}}}{COM:CSET}  (or colour 1, if \htmlref{{\tt{CSET}}}{COM:CSET}  hasn't been called).
 
-To cancel, use \htmlref{{\tt{NCROT}}}{COM:NCROT}. 
+To cancel, use \htmlref{{\tt{NCROT}}}{COM:NCROT}.
 
 \dipcom{CSET}{n}{Sets the plotting colour}
-Set colour for Ikon plotting; n = 1-12 (1 = white). (See also \htmlref{{\tt{CROT}}}{COM:CROT}). 
+Set colour for Ikon plotting; n = 1-12 (1 = white). (See also \htmlref{{\tt{CROT}}}{COM:CROT}).
 
 \dipcom{CXR}{(no parameters)}{Uses the cursor to define the X range to be plotted}
 `Cursor X range': define the X range for plotting using the cursor.
@@ -1791,18 +1791,18 @@ optionally, subsequent) iteration to give you the opportunity to exit
 The output from a completed fit consists of the optimised parameters
 and their errors (calculated in the linear approximation, from the
 error matrix). The results may be stored for later inspection, or
-output, using \htmlref{{\tt{ELFPUSHC}}}{COM:ELFPUSHC}. 
+output, using \htmlref{{\tt{ELFPUSHC}}}{COM:ELFPUSHC}.
 
 \dipcom{ELFPUSHC}{(no parameters)}{Pushes the current ELF co-efficients onto the co-efficient stack}
 ``ELFPUSH Coefficients''. Pushes the coefficients of the current ELF
 fit onto the stack of fit coefficients. These results may be
 inspected, printed out, or recovered to the status of current fit
-coefficients using \htmlref{{\tt{ELFCSL}}}{COM:ELFCSL},  \htmlref{{\tt{ELFVUC}}}{COM:ELFVUC},  \htmlref{{\tt{ELFWRC}}}{COM:ELFWRC},  and \htmlref{{\tt{ELFPOPC}}}{COM:ELFPOPC}. 
+coefficients using \htmlref{{\tt{ELFCSL}}}{COM:ELFCSL},  \htmlref{{\tt{ELFVUC}}}{COM:ELFVUC},  \htmlref{{\tt{ELFWRC}}}{COM:ELFWRC},  and \htmlref{{\tt{ELFPOPC}}}{COM:ELFPOPC}.
 
 \dipcom{ELFPOPC}{n}{Pops an entry from the ELF fit co-efficient stack}
 ``ELF \htmlref{{\tt{POP}}}{COM:POP}  Coefficients''. Pops a set of fit coefficients from the ELF
 fit coefficient stack into the `current' coefficient arrays (where
-they can be modified with \htmlref{{\tt{ELFINP}}}{COM:ELFINP}). 
+they can be modified with \htmlref{{\tt{ELFINP}}}{COM:ELFINP}).
 
 \dipcom{ELFRESTC}{[filename[.typ]]}{Restores an ELF fit co-efficient stack from a binary file }
 ``ELF RESTore Coefficient stack''. Restores an ELF fit coefficient
@@ -1825,12 +1825,12 @@ systems other than the one on which it was created.
 \dipcom{ELFCSL}{(no parameters)}{Summarises the entries in the ELF fit co-efficient stack}
 ``ELF Coefficient Stack List''. Gives a summary of entries in the fit
 coefficient stack. Individual entries can be inspected in more detail
-using \htmlref{{\tt{ELFVUC}}}{COM:ELFVUC}. 
+using \htmlref{{\tt{ELFVUC}}}{COM:ELFVUC}.
 
 \dipcom{ELFVUC}{n}{Lists a single entry of the ELF fit co-efficient stack}
 ``ELF View Coefficients''. Gives a listing, at the terminal, of entry
 'n' of the ELF fit coefficient stack. An overview of the stack can be
-obtained using \htmlref{{\tt{ELFCSL}}}{COM:ELFCSL}. 
+obtained using \htmlref{{\tt{ELFCSL}}}{COM:ELFCSL}.
 
 \dipcom{ELFWRC}{filename[.typ]}{Writes an ELF fit co-efficient stack to disk in a text file}
 ``ELF WRite Coefficients''. Writes the contents of the fit coefficient
@@ -1874,7 +1874,7 @@ n2 inclusive are pushed. If n1 is specified, the background polynomial
 (if any exists) is also pushed, before the line(s).
 
 \dipcom{ENV}{name}{Displays the value being used by DIPSO for a specified
-environment variable} 
+environment variable}
 The string value being used for the specified environment variable is
 displayed. An error is reported if the no value is available.
 
@@ -1883,9 +1883,9 @@ DIPSO uses environment variables to specify various directories (eg
 Default values for these environment variables can be supplied
 on the DIPSO command line in a comma separated list of ``name=value''
 pairs. These default values will be used if the corresponding environment
-variables are not defined. 
+variables are not defined.
 
-\dipcom{ERASE}{[n]}{Erases a plotting zone created by {\tt{TZONE}}} 
+\dipcom{ERASE}{[n]}{Erases a plotting zone created by {\tt{TZONE}}}
 Erases plotting zone ``n'' ({\it c.f} \htmlref{{\tt{TZONE}}}{COM:TZONE}).  This is done rather slowly
 unless n=0 (the default).
 
@@ -1946,7 +1946,7 @@ calculated value of \htmlref{{\tt{EW}}}{COM:EW}  is multiplied by the factor WOR
 Provides the program with estimates of the {\em systematic} errors in
 continuum and zero-level placement (expressed as percentages of the
 continuum level). These errors are then incorporated into subsequent
-error analysis when determining equivalent widths with \htmlref{{\tt{EW}}}{COM:EW}. 
+error analysis when determining equivalent widths with \htmlref{{\tt{EW}}}{COM:EW}.
 
 These systematic errors are assumed to propagate quadratically (see
 MNRAS 222, 809, 1986).
@@ -1979,7 +1979,7 @@ the corresponding letters are included in the {\tt{clist}}  parameter. The
 expansion factor for all other components is left unchanged.
 
 \dipcom{FILL}{(no parameters)}{Causes symbols created by {\tt{MARK}} to be filled in}
-Results in filled-in \htmlref{{\tt{MARK}}}{COM:MARK}  symbols ({\it c.f} \htmlref{{\tt{NOFILL}}}{COM:NOFILL}). 
+Results in filled-in \htmlref{{\tt{MARK}}}{COM:MARK}  symbols ({\it c.f} \htmlref{{\tt{NOFILL}}}{COM:NOFILL}).
 
 \dipcom{FLUX}{[filename[.typ]] }{Measures fluxes with respect to a linear 'continuum'}
 Measures fluxes with respect to (=above) a linear `continuum' defined
@@ -2010,12 +2010,12 @@ flux is multiplied by the factor WORV.
 Selects font quality. Permitted values of `n' are 0 (hardware
 characters), 1 (SGS characters), and 2 (NCAR characters). These are in
 increasing order of elegance, and execution time! The resulting fonts
-are used for all text on the plot ({\em i.e.} apply to \htmlref{{\tt{XLAB}}}{COM:XLAB},  \htmlref{{\tt{YLAB}}}{COM:YLAB}, 
+are used for all text on the plot ({\em i.e.} apply to \htmlref{{\tt{XLAB}}}{COM:XLAB},  \htmlref{{\tt{YLAB}}}{COM:YLAB},
 \htmlref{{\tt{PWRITE}}}{COM:PWRITE},  and \htmlref{{\tt{TITLE}}}{COM:TITLE}  when the title is plotted).
 
 \htmlref{{\tt{FONT}}}{COM:FONT}  0 (the default) is not always elegant, and because of problems
 with text rotation some devices will write the Y axis label ``upside
-down''. If this really worries you you can get round it with \htmlref{{\tt{YLAB}}}{COM:YLAB} 
+down''. If this really worries you you can get round it with \htmlref{{\tt{YLAB}}}{COM:YLAB}
 ({\em e.g.} use \htmlref{{\tt{YLAB}}}{COM:YLAB}  xulF).
 
 The elaborate \htmlref{{\tt{FONT}}}{COM:FONT}  2 style gives access to a wide range of special
@@ -2049,7 +2049,7 @@ line-printer!) copy of \xref{SUN/90}{sun90}{} for details.
 An angstrom symbol ({\AA}) is provided as a special character: `.A'
 (in `PRU' style). Other complex characters can be constructed (see
 \xref{SUN/90}{sun90}{}); for example, a mass-loss rate symbol (M surmounted by a dot)
-is obtained using {\tt{"'PRU'M'H:-85V105PRU'.'H:85V-105'"}}. 
+is obtained using {\tt{"'PRU'M'H:-85V105PRU'.'H:85V-105'"}}.
 
 Because the codes for special characters are flagged by apostrophes,
 life gets complicated if you want to include a normal apostrophe in a
@@ -2078,20 +2078,20 @@ Defines a plotting area in absolute (device-independent) terms. The
 xsize and ysize parameters are in cm; the locator index follows the
 numeric keypad, i.e. 1=bottom left, 9=top right {\em etc.} The
 locator index defaults to 5 (centre of plotting zone). To return to
-(device-dependent) plotting zones use \htmlref{{\tt{TZONE}}}{COM:TZONE}. 
+(device-dependent) plotting zones use \htmlref{{\tt{TZONE}}}{COM:TZONE}.
 
-Subzones within the specified \htmlref{{\tt{FRAME}}}{COM:FRAME}  can be set using \htmlref{{\tt{FRZONE}}}{COM:FRZONE}. 
+Subzones within the specified \htmlref{{\tt{FRAME}}}{COM:FRAME}  can be set using \htmlref{{\tt{FRZONE}}}{COM:FRZONE}.
 
 \dipcom{FRZONE}{x1 x2 y1 y2}{Divides a plotting area (set up by {\tt{FRAME}})  into several sub-frames}
 Defines subzones within a plotting area specified by \htmlref{{\tt{FRAME}}}{COM:FRAME}.  The
 parameters x1 {\em etc.} are in the range 0-1, and define the
 fractional position of the subzone within the frame. An example of the
-use of \htmlref{{\tt{FRAME}}}{COM:FRAME}  and \htmlref{{\tt{FRZONE}}}{COM:FRZONE}  can be found in {\tt{DIPSODIR:DEMO2.CMD}} 
-({\tt{\$DIPSODIR/demo2.cmd}}. 
+use of \htmlref{{\tt{FRAME}}}{COM:FRAME}  and \htmlref{{\tt{FRZONE}}}{COM:FRZONE}  can be found in {\tt{DIPSODIR:DEMO2.CMD}}
+({\tt{\$DIPSODIR/demo2.cmd}}.
 
 \dipcom{FTFILTER}{n1 [f1 f2 n2]}{Filters high frequency components from a Fourier transform}
 Filters high-frequency components (which you may identify with noise)
-from the real and imaginary parts of a Fourier Transform (see \htmlref{{\tt{FTRANS}}}{COM:FTRANS}). 
+from the real and imaginary parts of a Fourier Transform (see \htmlref{{\tt{FTRANS}}}{COM:FTRANS}).
 \htmlref{{\tt{FTFILTER}}}{COM:FTFILTER}  expects the real part of the FT to be in stack entry ``n1",
 and the imaginary part to be in entry ``n2" (which defaults to n1+1).
 
@@ -2140,7 +2140,7 @@ for Fourier analysis applications.
 The X values in any data set must be monotonically increasing.
 
 It is recommended that you familiarise yourself with ({\em e.g.})
-Brault \& White, A\&A 13, 169 (1971) before using \htmlref{{\tt{FTRANS}}}{COM:FTRANS}. 
+Brault \& White, A\&A 13, 169 (1971) before using \htmlref{{\tt{FTRANS}}}{COM:FTRANS}.
 
 \dipcom{GRID}{X1 X2 DX}{Creates an array of uniform wavelength values with zero Y values}
 Creates a grid of uniform wavelength points, starting at
@@ -2207,7 +2207,7 @@ If a browser of the requested variety has already been fired-up prior to
 starting DIPSO, it is ``hi-jacked'' to show the requested help
 information. Otherwise, a new browser is fired-up.
 
-If this command fails, saying that the ``showme'' command cannot be found, 
+If this command fails, saying that the ``showme'' command cannot be found,
 try defining the showme command explicitly using
 \htmlref{{\tt{USEHTX}}}{COM:USEHTX}.
 
@@ -2216,26 +2216,26 @@ In plain text mode, the information is taken from
 displayed in the DIPSO command window.
 
 By default, the plain text format is used, but this can be changed using the
-\htmlref{{\tt{USEHTX}}}{COM:USEHTX} command. 
+\htmlref{{\tt{USEHTX}}}{COM:USEHTX} command.
 
-Typing an interrogative (``?'' or ``?$<$command name$>$'') has the same effect 
+Typing an interrogative (``?'' or ``?$<$command name$>$'') has the same effect
 as typing {\tt{HELP}}.
 
 \dipcom{HIST}{(no parameters)}{Causes plots to be done in histogram-style}
-Plots to be done histogram-style (as opposed to \htmlref{{\tt{POLY}}}{COM:POLY}  or \htmlref{{\tt{MARK}}}{COM:MARK}). 
+Plots to be done histogram-style (as opposed to \htmlref{{\tt{POLY}}}{COM:POLY}  or \htmlref{{\tt{MARK}}}{COM:MARK}).
 
 
 \dipcom{HPROT}{[mode]}{Rotates between {\tt{HIST}} and {\tt{POLY}} plots on a given diagram}
 Rotates between Hist and Poly plots on a given diagram, starting with
-whichever style is currently in force (selected with \htmlref{{\tt{HIST}}}{COM:HIST}  or \htmlref{{\tt{POLY}}}{COM:POLY} 
+whichever style is currently in force (selected with \htmlref{{\tt{HIST}}}{COM:HIST}  or \htmlref{{\tt{POLY}}}{COM:POLY}
 command); can be useful when comparing ({\em e.g.}) observations and
 models. If mode is 1 (default is 0) then the first data set is plotted
 in the current style ({\em i.e.} histogram if \htmlref{{\tt{HIST}}}{COM:HIST}  is in force), and
 all subsequent data sets plotted on the given diagram will appear in
 the alternative style. The cycle can be re-initialised at any time
-with \htmlref{{\tt{HIST}}}{COM:HIST}  or \htmlref{{\tt{POLY}}}{COM:POLY}. 
+with \htmlref{{\tt{HIST}}}{COM:HIST}  or \htmlref{{\tt{POLY}}}{COM:POLY}.
 
-Negated with \htmlref{{\tt{NHPROT}}}{COM:NHPROT}. 
+Negated with \htmlref{{\tt{NHPROT}}}{COM:NHPROT}.
 
 \dipcom{INTEGRATE}{(no parameters)}{Estimates the area under the current arrays}
 Estimates the area under the current arrays using simple trapezoidal
@@ -2256,10 +2256,10 @@ values of `n' are not allowed.)
 
 The data must have monotonically increasing X values.
 
-Note that spline interpolation can also be executed, using the \htmlref{{\tt{CDRAW}}}{COM:CDRAW} 
+Note that spline interpolation can also be executed, using the \htmlref{{\tt{CDRAW}}}{COM:CDRAW}
 command.
 
-\dipcom{ISATM}{[wavelength]}{Reads atomic data from a disk file for use with {\tt{ISCALC}} and {\tt{ISCOG}}} 
+\dipcom{ISATM}{[wavelength]}{Reads atomic data from a disk file for use with {\tt{ISCALC}} and {\tt{ISCOG}}}
 Supplies atomic data for use with \htmlref{{\tt{ISCALC}}}{COM:ISCALC}  and \htmlref{{\tt{ISCOG}}}{COM:ISCOG}.  If a wavelength (in
 Angstroms) is provided, then DIPSO searches for a file called ATOMIC.DAT in the
 current directory; if it fails, it looks for one in a directory with the
@@ -2292,10 +2292,10 @@ for the absorbers), and pushes the result onto the stack.
 
 Before this command can successfully be invoked, the atomic data must
 already have been loaded (with \htmlref{{\tt{ISATM}}}{COM:ISATM}),  a cloud model defined (with
-\htmlref{{\tt{ISINP}}}{COM:ISINP}),  and a set of cloud `options' defined (with \htmlref{{\tt{ISOPT}}}{COM:ISOPT}). 
+\htmlref{{\tt{ISINP}}}{COM:ISINP}),  and a set of cloud `options' defined (with \htmlref{{\tt{ISOPT}}}{COM:ISOPT}).
 
 \dipcom{ISCOG}{(no parameters)}{Calculates a Curve-Of-Growth for an interstellar cloud model}
-Calculates a Curve-Of-Growth for a cloud model defined with \htmlref{{\tt{ISINP}}}{COM:ISINP}, 
+Calculates a Curve-Of-Growth for a cloud model defined with \htmlref{{\tt{ISINP}}}{COM:ISINP},
 using atomic data input via \htmlref{{\tt{ISATM}}}{COM:ISATM}.  The COG is pushed onto the stack,
 with X values (N.f.lambda) in units of (cm-2.dimensionless.Angstroms)
 and Y values (W[lambda]/lambda) assuming equivalent width and
@@ -2303,14 +2303,14 @@ wavelength to be measured in the same unit.
 
 \dipcom{ISINP}{(no parameters)}{Sets up an interstellar cloud model}
 Invokes a cloud ``editor'', which permits an interstellar cloud model
-to be defined prior to calculating theoretical profiles with \htmlref{{\tt{ISCALC}}}{COM:ISCALC}. 
+to be defined prior to calculating theoretical profiles with \htmlref{{\tt{ISCALC}}}{COM:ISCALC}.
 Up to 18 clouds are permitted; each is specified by a velocity
 dispersion parameter, ``b'' (see, {\em e.g.}, MNRAS 222, 809 [1986]
 for a definition), a central velocity, V, and a column density, N.
 
 Typing \htmlref{{\tt{HELP}}}{COM:HELP}  while in the cloud editor provides more information.
 
-\dipcom{ISOPT}{[filename[.typ]]}{Sets up options required by {\tt{ISCALC}}} 
+\dipcom{ISOPT}{[filename[.typ]]}{Sets up options required by {\tt{ISCALC}}}
 Loads a variety of options required before \htmlref{{\tt{ISCALC}}}{COM:ISCALC}  can be successfully
 executed. These include specifications for (optional) convolution with
 an instrumental resolution function, blending with other lines, {\em
@@ -2341,7 +2341,7 @@ spectra. \htmlref{{\tt{IUECOR}}}{COM:IUECOR}  works on data in the current array
 fluxes therein by their corrected values.
 
 \dipcom{LABON}{(no parameters)}{Turns axis labelling back on}
-Turns axis labelling back on (after use of \htmlref{{\tt{NLAB}}}{COM:NLAB}). 
+Turns axis labelling back on (after use of \htmlref{{\tt{NLAB}}}{COM:NLAB}).
 
 \dipcom{LOGAXX}{t/f}{Causes X axes to be plotted on a log10 scale}
 If set `True', the X axis will be plotted on a log10 scale.
@@ -2358,12 +2358,12 @@ Replaces Y values in the current arrays by their base 10 logarithms.
 \dipcom{LWEIGHT}{weight}{Sets the weight (heaviness) of all plotted lines}
 Alters the weight ({\em i.e.} `heaviness') of all plotted lines, on
 devices which support this feature. The weight must be 1-5 (initial
-setting is 1). See also \htmlref{{\tt{TWEIGHT}}}{COM:TWEIGHT}. 
+setting is 1). See also \htmlref{{\tt{TWEIGHT}}}{COM:TWEIGHT}.
 
 \dipcom{MARK}{(no parameters)}{Causes plots to be done using symbols}
 Plots to be done using symbols, as opposed to \htmlref{{\tt{HIST}}}{COM:HIST}  or \htmlref{{\tt{POLY}}}{COM:POLY}.  The
 symbols may be `designed' using \htmlref{{\tt{MSET}}}{COM:MSET},  and expanded and rotated using
-\htmlref{{\tt{EXPAND}}}{COM:EXPAND}  and \htmlref{{\tt{ANGLE}}}{COM:ANGLE}. 
+\htmlref{{\tt{EXPAND}}}{COM:EXPAND}  and \htmlref{{\tt{ANGLE}}}{COM:ANGLE}.
 
 \dipcom{MEAN}{(no parameters)}{Find the mean and standard deviation of the current Y values}
 Calculates the mean and standard deviation of the Y data stored in the
@@ -2395,7 +2395,7 @@ If MODE=zero (the default value) and the data look like IUE SWP and
 LWR spectra (on the grounds of the X ranges), a wavelength-dependent
 weighting is used which reflects the inverse sensitivity function of
 IUE. If you ARE dealing with IUE data, then inputting the exposure
-times as the WTs and using MODE=0 will result in (essentially) a \htmlref{{\tt{MERGE}}}{COM:MERGE} 
+times as the WTs and using MODE=0 will result in (essentially) a \htmlref{{\tt{MERGE}}}{COM:MERGE}
 at the 'FN' level, which is probably more correct than one at the
 `absolute flux' level. If MODE is positive, the additional IUE
 weighting is switched off. (Note that if you are NOT working with IUE
@@ -2431,7 +2431,7 @@ if \htmlref{{\tt{MARK}}}{COM:MARK}  hasn't been called).
 
 NOT IMPLEMENTED AT PRESENT.
 
-Turned off with \htmlref{{\tt{NMROT}}}{COM:NMROT}. 
+Turned off with \htmlref{{\tt{NMROT}}}{COM:NMROT}.
 
 \dipcom{MSET}{style nvert}{Selects the symbol to be used if {\tt{MARK}} plots are being created}
 Selects the \htmlref{{\tt{MARK}}}{COM:MARK}  plotting symbol. `NVERT' is the number of vertices
@@ -2442,12 +2442,12 @@ symbol, for plotting lower or (with \htmlref{{\tt{ANGLE}}}{COM:ANGLE})  upper li
 \dipcom{NB}{(no parameters)}{Stops automatic clearing of the plotting frame between plots}
 `No Box': switches off automatic clearing off the plotting frame
 between plots. (Inverse function is \htmlref{{\tt{BOX}}}{COM:BOX}).  On a device or zone change,
-the `box' is switched `on' for the first plot, regardless of any \htmlref{{\tt{NB}}}{COM:NB} 
+the `box' is switched `on' for the first plot, regardless of any \htmlref{{\tt{NB}}}{COM:NB}
 call.
 
 \dipcom{NCROT}{(no parameters)}{Stops automatic rotation of the colour table}
 Stops automatic rotation of the colour table when Ikon plotting and
-resets the colour index to 1 (white). (See \htmlref{{\tt{CROT}}}{COM:CROT}  and \htmlref{{\tt{CSET}}}{COM:CSET}). 
+resets the colour index to 1 (white). (See \htmlref{{\tt{CROT}}}{COM:CROT}  and \htmlref{{\tt{CSET}}}{COM:CSET}).
 
 \dipcom{NEBCONT}{filename[.typ] [mode1 mode2 mode3]}{Calculates a theoretical nebular re-combination continuum}
 Calculates a theoretical nebular recombination continuum. The
@@ -2488,7 +2488,7 @@ a standard extinction law];
 \end{description}
 \end{quote}
 
-A specimen file is given in {\tt{\$DIPSODIR/NEBCONT.DAT}}. 
+A specimen file is given in {\tt{\$DIPSODIR/NEBCONT.DAT}}.
 If \htmlref{{\tt{NEBCONT}}}{COM:NEBCONT}  fails to find the
 file in the current directory, it tries to look in a directory
 assigned the environment variable {\tt{OWNERDIR}}  (which
@@ -2505,7 +2505,7 @@ The results are calculated at the X co-ordinates of data in the
 `current' arrays, and pushed onto the stack. If you are not modelling
 real data, \htmlref{{\tt{GRID}}}{COM:GRID}  can be used to set up an X array.
 
-The default file type is {\tt{.DAT}}. 
+The default file type is {\tt{.DAT}}.
 
 \dipcom{NECHO}{(no parameters)}{Stops the echoing of commands read from a command file}
 Has the same effect as \htmlref{{\tt{ECHO}}}{COM:ECHO}  -1.
@@ -2515,44 +2515,44 @@ Selectively turns off axis labelling (modes not yet implemented;
 \htmlref{{\tt{NLAB}}}{COM:NLAB}  currently turns off X and Y axis labels, and title).
 
 \dipcom{NHPROT}{(no parameters)}{Stops rotating plots styles between {\tt{HIST}} and {\tt{POLY}}}
-Stops rotating plot style between Hist and Poly (after \htmlref{{\tt{HPROT}}}{COM:HPROT}). 
+Stops rotating plot style between Hist and Poly (after \htmlref{{\tt{HPROT}}}{COM:HPROT}).
 
 \dipcom{NMROT}{(no parameters)}{Stops automatic rotation of {\tt{MARK}} plotting symbols}
 Stops automatic rotation of plotting symbols and sets the \htmlref{{\tt{MARK}}}{COM:MARK}  index to 1.
-(See \htmlref{{\tt{MROT}}}{COM:MROT}  and \htmlref{{\tt{MARK}}}{COM:MARK}). 
+(See \htmlref{{\tt{MROT}}}{COM:MROT}  and \htmlref{{\tt{MARK}}}{COM:MARK}).
 
 \dipcom{NOBEEP}{(no parameters)}{Stops the terminal beeping after every error}
 Stops the terminal beeping every time you make a boo-boo.
 
 \dipcom{NOFILL}{(no parameters)}{Causes {\tt{MARK}} symbols to be plotted open (unfilled)}
 Results in \htmlref{{\tt{MARK}}}{COM:MARK}  symbols being plotted as open (unfilled) figures;
-{\it c.f.} \htmlref{{\tt{FILL}}}{COM:FILL}. 
+{\it c.f.} \htmlref{{\tt{FILL}}}{COM:FILL}.
 
 \dipcom{NTROT}{(no parameters)}{Stops automatic rotation of line attributes}
 Stops automatic rotation of line attributes and resets the \htmlref{{\tt{TLINE}}}{COM:TLINE}  index
-to 1 (continuous lines). (See \htmlref{{\tt{TROT}}}{COM:TROT}  and \htmlref{{\tt{TLINE}}}{COM:TLINE}). 
+to 1 (continuous lines). (See \htmlref{{\tt{TROT}}}{COM:TROT}  and \htmlref{{\tt{TLINE}}}{COM:TLINE}).
 
 \dipcom{NROT}{(no parameters)}{Stops rotating everything}
-Stops rotating everything, resetting the colour, \htmlref{{\tt{MARK}}}{COM:MARK}  and \htmlref{{\tt{TLINE}}}{COM:TLINE} 
+Stops rotating everything, resetting the colour, \htmlref{{\tt{MARK}}}{COM:MARK}  and \htmlref{{\tt{TLINE}}}{COM:TLINE}
 indexes to 1 (i.e. has the same effect as NCROT,NMROT,NTROT).
 
 \dipcom{NX}{(no parameters)}{Returns to auto-scaling of the X axis}
-Return to autoscaling of the X axis (after using \htmlref{{\tt{XR}}}{COM:XR},  \htmlref{{\tt{XMIN}}}{COM:XMIN},  \htmlref{{\tt{XMAX}}}{COM:XMAX},  \htmlref{{\tt{CXR}}}{COM:CXR} 
-and/or \htmlref{{\tt{CXYR}}}{COM:CXYR}). 
+Return to autoscaling of the X axis (after using \htmlref{{\tt{XR}}}{COM:XR},  \htmlref{{\tt{XMIN}}}{COM:XMIN},  \htmlref{{\tt{XMAX}}}{COM:XMAX},  \htmlref{{\tt{CXR}}}{COM:CXR}
+and/or \htmlref{{\tt{CXYR}}}{COM:CXYR}).
 
 \dipcom{NXY}{(no parameters)}{Returns to auto-scaling of the X and Y axis}
-Return to autoscaling of the X \& Y axes (after using \htmlref{{\tt{XR}}}{COM:XR},  \htmlref{{\tt{YR}}}{COM:YR},  \htmlref{{\tt{XMIN}}}{COM:XMIN}, 
-\htmlref{{\tt{XMAX}}}{COM:XMAX},  \htmlref{{\tt{YMIN}}}{COM:YMIN},  \htmlref{{\tt{YMAX}}}{COM:YMAX},  \htmlref{{\tt{CXR}}}{COM:CXR},  \htmlref{{\tt{CYR}}}{COM:CYR},  and/or \htmlref{{\tt{CXYR}}}{COM:CXYR}). 
+Return to autoscaling of the X \& Y axes (after using \htmlref{{\tt{XR}}}{COM:XR},  \htmlref{{\tt{YR}}}{COM:YR},  \htmlref{{\tt{XMIN}}}{COM:XMIN},
+\htmlref{{\tt{XMAX}}}{COM:XMAX},  \htmlref{{\tt{YMIN}}}{COM:YMIN},  \htmlref{{\tt{YMAX}}}{COM:YMAX},  \htmlref{{\tt{CXR}}}{COM:CXR},  \htmlref{{\tt{CYR}}}{COM:CYR},  and/or \htmlref{{\tt{CXYR}}}{COM:CXYR}).
 
 \dipcom{NY}{(no parameters)}{Returns to auto-scaling of the Y axis}
-Return to autoscaling of the Y axis (after using \htmlref{{\tt{YR}}}{COM:YR},  \htmlref{{\tt{CYR}}}{COM:CYR}  and/or \htmlref{{\tt{CXYR}}}{COM:CXYR}). 
+Return to autoscaling of the Y axis (after using \htmlref{{\tt{YR}}}{COM:YR},  \htmlref{{\tt{CYR}}}{COM:CYR}  and/or \htmlref{{\tt{CXYR}}}{COM:CXYR}).
 
 \dipcom{PAUSE}{(no parameters)}{Pauses until the <RETURN> key is hit}
 Gives a \htmlref{{\tt{BEEP}}}{COM:BEEP}  (unless you've specified \htmlref{{\tt{NOBEEP}}}{COM:NOBEEP}),  and causes nothing to
 happen until you hit the return key. (You might find a use for this
 command in command files.)
 
-\dipcom{PF}{n}{Fits a polynomial through the data in the windows defined by {\tt{CREGS}}} 
+\dipcom{PF}{n}{Fits a polynomial through the data in the windows defined by {\tt{CREGS}}}
 `Poly fit': fits a polynomial of degree `n' through data points in the
 HIGHEST ({\em i.e.} numerically largest) STACK entry, using continuum
 windows defined using \htmlref{{\tt{CREGS}}}{COM:CREGS}.  \htmlref{{\tt{PF}}}{COM:PF}  expects these data to be in order of
@@ -2629,7 +2629,7 @@ monotonically increasing X values) with their window function, as
 defined by Scargle (ApJ 263, 835, 1982). The parameters fl, fh, and df
 have the same meanings and default values as for the \htmlref{{\tt{PDGRAM}}}{COM:PDGRAM}  function,
 and the caution given for that function regarding lengthy evaluation
-times applies also to \htmlref{{\tt{PDGWINDOW}}}{COM:PDGWINDOW}. 
+times applies also to \htmlref{{\tt{PDGWINDOW}}}{COM:PDGWINDOW}.
 
 One would normally calculate a data set's window function in addition
 to its periodogram (PDGRAM) to ensure that any peaks in the latter are
@@ -2655,7 +2655,7 @@ both `current' and `STACK' data, the `current' arrays are awarded the
 stack entries may be specified using the ``-'' operator; {\em e.g} \htmlref{{\tt{PM}}}{COM:PM}  1 3-5
 will result in entries 1, 3, 4 and 5 being plotted.
 
-Even if the \htmlref{{\tt{BOX}}}{COM:BOX}  is switched `on', all the data associated with a single \htmlref{{\tt{PM}}}{COM:PM} 
+Even if the \htmlref{{\tt{BOX}}}{COM:BOX}  is switched `on', all the data associated with a single \htmlref{{\tt{PM}}}{COM:PM}
 command are plotted in a single frame; {\em i.e.} a command sequence like:
 
 \begin{verbatim}
@@ -2695,12 +2695,12 @@ may produce a different plot to:
 \end{itemize}
 
 \dipcom{POLY}{(no parameters)}{Causes plots to be done 'join-the-dots' style}
-Plotting to be done `join-the-dots' style (as opposed to \htmlref{{\tt{MARK}}}{COM:MARK}  or \htmlref{{\tt{HIST}}}{COM:HIST}). 
+Plotting to be done `join-the-dots' style (as opposed to \htmlref{{\tt{MARK}}}{COM:MARK}  or \htmlref{{\tt{HIST}}}{COM:HIST}).
 
 \dipcom{POP}{n}{Pops a stack entry into the current arrays}
 Pop STACK entry `n' into the `current' arrays.
 
-\dipcom{PPROMPT}{switch}{Controls which prompts are issued by {\tt{PM}}} 
+\dipcom{PPROMPT}{switch}{Controls which prompts are issued by {\tt{PM}}}
 \htmlref{{\tt{PPROMPT}}}{COM:PPROMPT}  governs the default action of \htmlref{{\tt{PM}}}{COM:PM}.  The value of the `switch'
 argument is T(rue) or F(alse), and on startup is set to F. If you set
 it to T, then the \htmlref{{\tt{PM}}}{COM:PM}  command will prompt for an argument list if none
@@ -2764,28 +2764,28 @@ available). See the \htmlref{{\tt{TPORT}}}{COM:TPORT}  command for details.
 Applies a `quick' Gaussian smoothing (FWHM of filter = 2.354*Sigma) to
 Y values in the `current' arrays. (Defines gaussian weights at a grid
 of delta(x) values, then linearly interpolates when smoothing). Much
-faster, and scarcely less accurate, than \htmlref{{\tt{SM}}}{COM:SM}. 
+faster, and scarcely less accurate, than \htmlref{{\tt{SM}}}{COM:SM}.
 
 \dipcom{QUIT}{(no parameters)}{Quit}
 Quit DIPSO, without saving the stack. Can be abbreviated to ``Q''.
 
-\dipcom{RDCAT}{file xcol ycol}{Reads X and Y values from a catalogue into 
+\dipcom{RDCAT}{file xcol ycol}{Reads X and Y values from a catalogue into
 the current arrays}
 Reads the values from two specified catalogue columns in the the current
 arrays. The file containing the catalogue is given by ``file''. This must
 be a full path name (no shell meta-characters such as \verb+~+, \verb+$+,
-etc can be used here). The file can be a FITS table (binary or formatted), 
-or an STL table (see \xref{SUN/190}{sun190}{} ). The names of the columns 
-holding the X and Y values are given by ``xcol'' and ``ycol''. A full list 
+etc can be used here). The file can be a FITS table (binary or formatted),
+or an STL table (see \xref{SUN/190}{sun190}{} ). The names of the columns
+holding the X and Y values are given by ``xcol'' and ``ycol''. A full list
 of available column names is displayed if an unknown column name is supplied.
 
-\dipcom{READ}{file [sys] [unit]}{Reads data from a disk file to the current arrays (see {\tt{WRITE}})} 
-Reads a disk file which has been written with 
-\htmlref{{\tt{WRITE}}}{COM:WRITE}.  This and \htmlref{{\tt{RESTORE}}}{COM:RESTORE}  
+\dipcom{READ}{file [sys] [unit]}{Reads data from a disk file to the current arrays (see {\tt{WRITE}})}
+Reads a disk file which has been written with
+\htmlref{{\tt{WRITE}}}{COM:WRITE}.  This and \htmlref{{\tt{RESTORE}}}{COM:RESTORE}
 are the
 only input modes that preserve ALL the information associated with a DIPSO
 data set, and are the recommended options. The disk data can be in either NDF or
-``native DIPSO'' format, depending on the flag established by the \htmlref{{\tt{USENDF}}}{COM:USENDF} 
+``native DIPSO'' format, depending on the flag established by the \htmlref{{\tt{USENDF}}}{COM:USENDF}
 command. When specifying an NDF, do not include any file type.
 
 If the specified NDF was not created by DIPSO, then an attempt will be
@@ -2794,13 +2794,13 @@ NDF (or the FITS header cards in the FITS extension if there is no WCS
 component). The second and third command parameters, ``sys'' and ``unit'',
 may be used to indicate the spectral system and units in use within the NDF
 (these are only used if the system and units are not clearly specified in
-the NDF). The system value supplied must be a standard FITS-WCS value such as 
+the NDF). The system value supplied must be a standard FITS-WCS value such as
 ``FREQ'', ``WAVE'', ``VRAD'', ``VOPT'', etc. Likewise, the unit should be
 a standard FITS-WCS such as ``m'', ``nm'', ``Angstrom'', ``Hz'', ``GHz'',
 ``m/s'', ``km/s'', etc. The spectral axis values within the NDF will be
-converted automatically from their original system to either wavelength in 
-Angstroms or optical velocity in km/s for storage in the DIPSO X array. The 
-original system and unit adopted for the NDF during this conversion are 
+converted automatically from their original system to either wavelength in
+Angstroms or optical velocity in km/s for storage in the DIPSO X array. The
+original system and unit adopted for the NDF during this conversion are
 reported. If the user does not specify a system and/or unit, then a
 default of ``wavelength in metres'' will be adopted unless the contents
 of the NDF suggest some other default.
@@ -2820,10 +2820,10 @@ last 20 strings given by the user is displayed, and the user is then
 re-prompted.
 
 \dipcom{RECALL}{(no parameters)}{Displays a previously RECORDed string (does not execute it)}
-Lists a \htmlref{{\tt{RECORD}}}{COM:RECORD}ed string at the terminal (as a 
+Lists a \htmlref{{\tt{RECORD}}}{COM:RECORD}ed string at the terminal (as a
 reminder!)
 
-\dipcom{RECORD}{``string''}{Records a string of commands for subsequent {\tt{REPLAY}}} 
+\dipcom{RECORD}{``string''}{Records a string of commands for subsequent {\tt{REPLAY}}}
 Records a string of commands for subsequent \htmlref{{\tt{REPLAY}}}{COM:REPLAY}.  The string must be
 enclose in double quotes; it can itself contain double quotes, but
 must then be delimited by pairs of double quotes. The string may not
@@ -2844,7 +2844,7 @@ being delivered to the screen. Level = 1 replaces all errors deriving from a
 single failed command with a single (less detailed) error message. Level = 0
 suppresses all error reports.
 
-\dipcom{RESTORE}{[file name or NDF name]}{Restores stack data previously saved to disk using {\tt{SAVE}}} 
+\dipcom{RESTORE}{[file name or NDF name]}{Restores stack data previously saved to disk using {\tt{SAVE}}}
 Restores STACK data previously dumped using \htmlref{{\tt{SAVE}}}{COM:SAVE}.  \htmlref{{\tt{RESTORE}}}{COM:RESTORE}  does not
 require the current stack to be empty; however, if it is not then
 retrieval may not be complete, depending on the available stack space.
@@ -2875,7 +2875,7 @@ operation is carried out only within that X range.
 \dipcom{SAVE}{[file name or NDF name [n1-n2]]}{Saves stack data in a binary disk file}
 Dumps the contents of the STACK in a form suitable for subsequent
 reacquisition using \htmlref{{\tt{RESTORE}}}{COM:RESTORE}.  The data can be in either NDF or ``native
-DIPSO'' format, depending on the flag established by the \htmlref{{\tt{USENDF}}}{COM:USENDF} 
+DIPSO'' format, depending on the flag established by the \htmlref{{\tt{USENDF}}}{COM:USENDF}
 command. When specifying an NDF, do not include any file type. The
 default NDF name is `SAVE\_STK'. If not using NDFs, the default file name
 is `SAVE.STK'.
@@ -3060,7 +3060,7 @@ input string if none is provided; if F or N (the default), it won't.
 
 \dipcom{TLINE}{line}{Changes the style of all plotted lines}
 Change line attributes (continuous, dot-dash {\em etc}). The index `line'
-must be in the range 1-5 (1 = continuous lines). (See also \htmlref{{\tt{TROT}}}{COM:TROT}). 
+must be in the range 1-5 (1 = continuous lines). (See also \htmlref{{\tt{TROT}}}{COM:TROT}).
 
 \dipcom{TOFLAMBDA}{(no parameters)}{Converts data to Angstroms and erg/cm2/s/A}
 If the X and Y data in the current arrays are in units of Hz and
@@ -3072,7 +3072,7 @@ If the X and Y data in the current arrays are in units of Angstroms
 and erg/cm2/s/A, \htmlref{{\tt{TOFNU}}}{COM:TOFNU}  will convert to Hz and erg/cm2/s/Hz.
 
 \dipcom{TOV}{wav0}{Converts X values from wavelength to velocity}
-Convert X values from wavelength to velocity (the inverse of \htmlref{{\tt{TOW}}}{COM:TOW}), 
+Convert X values from wavelength to velocity (the inverse of \htmlref{{\tt{TOW}}}{COM:TOW}),
 where Wav0 is the appropriate rest wavelength in Angstroms.
 
 {\em No} changes are made to the Y array. This would normally mean
@@ -3081,7 +3081,7 @@ strange units ({\em e.g.} km/s, or erg/cm2/s/[km/s]). To avoid this
 anomaly, an internal variable WORV (for Wavelength OR Velocity) is
 associated with each data set. This has the value 1.0 by default, but
 is reset to Wav0/c (where c is the speed of light in km/s) on using
-\htmlref{{\tt{TOV}}}{COM:TOV}. 
+\htmlref{{\tt{TOV}}}{COM:TOV}.
 
 (If you are reading in data sets with velocity as the X co-ordinate it
 is usually safest to convert to wavelength [TOW] then back to velocity
@@ -3090,7 +3090,7 @@ unnecessary if you use READ/WRITE or SAVE/RESTORE to move data in and
 out of DIPSO.)
 
 WARNING: If you have set the X range, you'll probably need to change
-it to get anything on the plotting surface after using \htmlref{{\tt{TOV}}}{COM:TOV}  or \htmlref{{\tt{TOW}}}{COM:TOW}! 
+it to get anything on the plotting surface after using \htmlref{{\tt{TOV}}}{COM:TOV}  or \htmlref{{\tt{TOW}}}{COM:TOW}!
 
 \dipcom{TOW}{wav0}{Converts X values from velocity to wavelength }
 Convert X values from velocity to wavelength (see \htmlref{{\tt{TOV}}}{COM:TOV}),  and resets
@@ -3101,14 +3101,14 @@ Implements automatic rotation of line attributes. Each plot begins
 with the line style defined by the last use of \htmlref{{\tt{TLINE}}}{COM:TLINE}  (or style 1, if
 \htmlref{{\tt{TLINE}}}{COM:TLINE}  hasn't been called).
 
-Switched off with \htmlref{{\tt{NTROT}}}{COM:NTROT}. 
+Switched off with \htmlref{{\tt{NTROT}}}{COM:NTROT}.
 
 \dipcom{TPORT}{Zn Xmin Xmax Ymin Ymax [WXmin WXmax WYmin WYmax]}{Defines a plotting sub-zone}
 Defines a plotting subzone (no.\ ``Zn'', where 100$>$Zn$>$8). The
 dimensions of the subzone (Xmin...Ymax) are normalised such that the
 total dimensions available (regardless of device) are 0 to 1 in both
 axes. (The corresponding physical dimensions can be discovered using
-\htmlref{{\tt{QAREA}}}{COM:QAREA}.) 
+\htmlref{{\tt{QAREA}}}{COM:QAREA}.)
 
 In general, a plot consists of axes, axis labels, and a header, as
 well as the data. Technically, the plotting subzone is a ``graph
@@ -3125,7 +3125,7 @@ fractions of the available graph window. Thus parameters WXmin {\em
 etc.} must also be in the range 0 to 1 (regardless of the graph window
 dimensions).
 
-To access a given subzone, use \htmlref{{\tt{TZONE}}}{COM:TZONE}. 
+To access a given subzone, use \htmlref{{\tt{TZONE}}}{COM:TZONE}.
 
 \dipcom{TSTRIP}{(no parameters)}{Removes leading blanks from the current array's title}
 Removes leading blanks from the title associated with the `current' arrays.
@@ -3137,7 +3137,7 @@ Copies the title from STACK entry `n' to the `current' arrays.
 Alters the weight ({\em i.e.} `heaviness') of data curves plotted with
 \htmlref{{\tt{PM}}}{COM:PM},  on devices which support this feature. No other lines (axes, {\em
 etc}) are effected. The weight must be 1-5 (initial setting is 1). See
-also \htmlref{{\tt{LWEIGHT}}}{COM:LWEIGHT}. 
+also \htmlref{{\tt{LWEIGHT}}}{COM:LWEIGHT}.
 
 \dipcom{TZONE}{zn}{Selects a particular zone for plotting}
 Selects zone ``zn'' for plotting. The zone numbers are:
@@ -3166,8 +3166,8 @@ Converts UBV magnitudes to fluxes, and stores the results in the
 `current' arrays. If the U, B and/or V magnitude is unknown, 0 should
 be entered. (Should you want to actually input a value of 0, I'm
 afraid that you'll have to use something like 0.0001, or put in a
-value of ({\em e.g.}) 5 and then carry out some arithmetic using \htmlref{{\tt{TENY}}}{COM:TENY}, 
-\htmlref{{\tt{YMULT}}}{COM:YMULT}  and \htmlref{{\tt{LOGY}}}{COM:LOGY}). 
+value of ({\em e.g.}) 5 and then carry out some arithmetic using \htmlref{{\tt{TENY}}}{COM:TENY},
+\htmlref{{\tt{YMULT}}}{COM:YMULT}  and \htmlref{{\tt{LOGY}}}{COM:LOGY}).
 
 The data are plotted at assumed wavelengths of 3600, 4400 and 5500
 Angstroms using lines 2*dx wide (default value of dx: 50 Angstroms).
@@ -3183,23 +3183,23 @@ al, Oke \& Schild, and Hayes \& Latham, for V; and a normalised Kurucz
 Vega model for U and B).
 
 \dipcom{USEHTX}{[logical] [showme]}{Selects hypertext or plain text format for help information}
-If `logical' is Y, YES, T or TRUE, the \htmlref{{\tt{HELP}}}{COM:HELP} 
+If `logical' is Y, YES, T or TRUE, the \htmlref{{\tt{HELP}}}{COM:HELP}
 command will display help information in hypertext format, using a
-World-Wide-Web browser. 
+World-Wide-Web browser.
 If N, NO, F or FALSE is supplied for `logical', help information will be
-displayed in plain text format in the DIPSO command window. If no value 
+displayed in plain text format in the DIPSO command window. If no value
 is supplied for `logical', YES is assumed.
 
 If supplied, `showme' should contain a string giving the unix command
 used to run the Starlink {\tt showme} utility. The supplied command
 string will be used to initiate hypertext help sessions until a new value
-is supplied. The command used initially is ``\verb+<dir>/showme+'', where 
+is supplied. The command used initially is ``\verb+<dir>/showme+'', where
 \verb+<dir>+ is the path to the directory containing Starlink executable
 files which was used when DIPSO was installed (typically {\tt /star/bin}).
 
 \dipcom{USENDF}{[logical]}{Selects NDF or 'native DIPSO' binary file format}
-If `logical' is Y, YES, T or TRUE, data accessing commands such as 
-\htmlref{{\tt{READ}}}{COM:READ}, \htmlref{{\tt{WRITE}}}{COM:WRITE},  
+If `logical' is Y, YES, T or TRUE, data accessing commands such as
+\htmlref{{\tt{READ}}}{COM:READ}, \htmlref{{\tt{WRITE}}}{COM:WRITE},
 \htmlref{{\tt{SAVE}}}{COM:SAVE},  \htmlref{{\tt{RESTORE}}}{COM:RESTORE},  etc,
 will use NDF structures (see \xref{SUN/33}{sun33}{}) to store data in. If
 N, NO, F or FALSE is supplied, they will use ``DIPSO native'' files as
@@ -3274,7 +3274,7 @@ e.g.} if mode=-1 then
 
 and similarly, {\it mutatis mutandis,} for mode=-2.
 
-\dipcom{WRITE}{output file name or NDF name [model NDF name]}{Write data to a disk file from the current arrays (see {\tt{READ}})} 
+\dipcom{WRITE}{output file name or NDF name [model NDF name]}{Write data to a disk file from the current arrays (see {\tt{READ}})}
 Writes the contents of the `current' arrays into a disk file suitable for
 subsequent re-reading using \htmlref{{\tt{READ}}}{COM:READ}.  The data can be in either NDF or ``native
 DIPSO'' format, depending on the flag established by the \htmlref{{\tt{USENDF}}}{COM:USENDF}  command.
@@ -3291,7 +3291,7 @@ use DIPSO to process the NDF ``{\tt{my\_dat}}''  originally created by the
 JCMTDR package, then you would use ``{\tt{read}  my\_dat}'' to read it in
 as normal, and then you could use ``{\tt{write}  new\_dat my\_dat}'' to
 write the processed data to NDF ``{\tt{new\_dat}}'',  copying all the
-JCMTDR extension information (etc) from the original ``{\tt{my\_dat}}'' 
+JCMTDR extension information (etc) from the original ``{\tt{my\_dat}}''
 NDF. The resulting NDF could then be put straight back into JCMTDR.
 
 \dipcom{XABS}{(no parameters)}{Replaces X values in the current arrays with their absolute value}
@@ -3345,7 +3345,7 @@ data sets, and at least partially overlapping if you want sensible
 results). This is for generality. However, a typical application would
 be to find velocity shifts between data sets in wavelength space ---
 but a velocity shift is a function of wavelength in wavelength space.
-The way to get round this is to take logs of both data sets 
+The way to get round this is to take logs of both data sets
 (\htmlref{{\tt{LOGX}}}{COM:LOGX}),
 then evaluate the correlation function. Then:
 
@@ -3355,7 +3355,7 @@ then evaluate the correlation function. Then:
 
 where C is the speed of light (making sure that your units all match
 up). The arithmetic can all be done in DIPSO
-(\htmlref{{\tt{TENX}}}{COM:TENX}, \htmlref{{\tt{XSUB}}}{COM:XSUB},  \htmlref{{\tt{XMULT}}}{COM:XMULT}). 
+(\htmlref{{\tt{TENX}}}{COM:TENX}, \htmlref{{\tt{XSUB}}}{COM:XSUB},  \htmlref{{\tt{XMULT}}}{COM:XMULT}).
 
 IMPORTANT: XCORR just does the cross-correlation; it is not a
 `black box'. I can't think of a situation in which you shouldn't first
@@ -3365,24 +3365,24 @@ minimise edge effects.
 
 \dipcom{XJ}{(no parameters)}{Sets X limits to match exactly the range of the data being plotted}
 ``Justifies'' the X range --- {\em i.e.} sets X limits to exactly
-match the range of the data being plotted (c.p.\ \htmlref{{\tt{XT}}}{COM:XT}). 
+match the range of the data being plotted (c.p.\ \htmlref{{\tt{XT}}}{COM:XT}).
 
 \dipcom{XLAB}{[string]}{Sets the label for the X axis}
 The label for the X axis; the default is `Wavelength'. If the string
 contains commas it {\em must} be enclosed in double quotes ({\it c.f}
-\htmlref{{\tt{TITLE}}}{COM:TITLE}). 
+\htmlref{{\tt{TITLE}}}{COM:TITLE}).
 
 \dipcom{XMAX}{x}{Sets the maximum X value to be plotted}
 Set the maximum X value for plotting to `x'.
-Negated with \htmlref{{\tt{NX}}}{COM:NX}. 
+Negated with \htmlref{{\tt{NX}}}{COM:NX}.
 
 \dipcom{XMIN}{x}{Sets the minimum X value to be plotted}
 Set the minimum X value for plotting to `x'.
-Negated with \htmlref{{\tt{NX}}}{COM:NX}. 
+Negated with \htmlref{{\tt{NX}}}{COM:NX}.
 
 \dipcom{XR}{x1 x2}{Sets the minimum and maximum X value to be plotted}
 Set the X range; x1 is the left-hand value for the plot, x2 the
-right-hand value. Negated using \htmlref{{\tt{NX}}}{COM:NX}. 
+right-hand value. Negated using \htmlref{{\tt{NX}}}{COM:NX}.
 
 \dipcom{XREV}{(no parameters)}{Reverses the ordering of data in the current arrays}
 Reverses the ordering of the data in the current X arrays, maintaining
@@ -3394,7 +3394,7 @@ maintaining X-Y pairing. Breaks in the data are lost.
 
 \dipcom{XT}{(no parameters)}{Trims the X range to the nearest tick marks}
 ``Trims'' the X range of a plot --- {\em i.e.} sets X limits which are
-some integer multiple of the distance between tickmarks (c.p.\ \htmlref{{\tt{XJ}}}{COM:XJ}). 
+some integer multiple of the distance between tickmarks (c.p.\ \htmlref{{\tt{XJ}}}{COM:XJ}).
 
 \dipcom{XV}{(no parameters)}{Obtains X values using the cursor}
 Obtain X values using the cursor. Do a cursor hit at the same place
@@ -3437,26 +3437,26 @@ Subtract a constant, `c', from the Y values stored in the `current' arrays.
 
 \dipcom{YJ}{(no parameters)}{Sets Y limits to match exactly the range of the data being plotted}
 ``Justifies'' the Y range --- {\em i.e.} sets the Y limits to exactly
-match the range of the data being plotted (c.p.\ \htmlref{{\tt{YT}}}{COM:YT}). 
+match the range of the data being plotted (c.p.\ \htmlref{{\tt{YT}}}{COM:YT}).
 
 \dipcom{YLAB}{[string]}{Sets the label for the Y axis}
 Replaces the label for the Y axis; the default is `Flux'. If the
 string contains commas it {\em must} be enclosed in double quotes
-({\it c.f} \htmlref{{\tt{TITLE}}}{COM:TITLE}). 
+({\it c.f} \htmlref{{\tt{TITLE}}}{COM:TITLE}).
 
 \dipcom{YMAX}{y}{Sets the maximum Y value to be plotted}
-Sets the maximum Y value for plotting; negated with \htmlref{{\tt{NY}}}{COM:NY}. 
+Sets the maximum Y value for plotting; negated with \htmlref{{\tt{NY}}}{COM:NY}.
 
 \dipcom{YMIN}{y}{Sets the minimum Y value to be plotted}
-Sets the minimum Y value for plotting; negated with \htmlref{{\tt{NY}}}{COM:NY}. 
+Sets the minimum Y value for plotting; negated with \htmlref{{\tt{NY}}}{COM:NY}.
 
 \dipcom{YR}{y1 y2}{Sets the minimum and maximum Y value to be plotted}
 Sets the Y range for plotting; y1 is the lower value for the plotting
-frame, y2 the upper. Return to autoscaling with \htmlref{{\tt{NY}}}{COM:NY}  or \htmlref{{\tt{NXY}}}{COM:NXY}. 
+frame, y2 the upper. Return to autoscaling with \htmlref{{\tt{NY}}}{COM:NY}  or \htmlref{{\tt{NXY}}}{COM:NXY}.
 
 \dipcom{YT}{(no parameters)}{Trims the Y range to the nearest tick marks}
 ``Trims'' the Y range of a plot --- {\em i.e.} sets Y limits which are
-some integer multiple of the distance between tickmarks (c.p.\ \htmlref{{\tt{YJ}}}{COM:YJ}). 
+some integer multiple of the distance between tickmarks (c.p.\ \htmlref{{\tt{YJ}}}{COM:YJ}).
 
 \dipcom{YV}{[Xvalue]}{Obtains Y values using the cursor}
 Obtain Y value. If an X value is supplied, then the corresponding Y
@@ -3547,8 +3547,8 @@ problems on Solaris.
 \item The {\tt READ} command has been modified so that it will attempt to
 read spectral axis information from the WCS component of an NDF if the NDF
 was not created by DIPSO. If the NDF has no WCS component, the spectral
-axis information will be read from the NDF AXIS structures, or the FITS header 
-cards in the NDF FITS extension (if any). Details of the spectral axis are 
+axis information will be read from the NDF AXIS structures, or the FITS header
+cards in the NDF FITS extension (if any). Details of the spectral axis are
 displayed.
 \item The {\tt WRITE} command has been modified so that it will add a WCS
 component to the output NDF describing the spectral axis. This allows it
@@ -3569,7 +3569,7 @@ find entries in the ATOMIC.DAT file when being run under Linux.
 
 \subsection{Changes introduced by DIPSO V3.5}
 \begin{itemize}
-\item The new command {tt RDCAT} has been added to enable data held in FITS 
+\item The new command {tt RDCAT} has been added to enable data held in FITS
 table format to be read.
 \item The maximum number of clouds which can be specified using ISINP has
 been increased from 9 to 18.
@@ -3580,10 +3580,10 @@ been increased from 9 to 18.
 \begin{itemize}
 
 \item The {\tt USEHTX} command has been modified to allow the path to the
-Starlink {\tt showme} utility to be given explicitly. This need only be done 
+Starlink {\tt showme} utility to be given explicitly. This need only be done
 if the {\tt HELP} command fails to find the {\tt showme} utility (for
 instance, if is not on the user's current PATH, or if it is
-executed by means of an alias). 
+executed by means of an alias).
 
 \item The contents of restored stacks held in NDF structures are now
 listed as they are restored.
@@ -3602,7 +3602,7 @@ now be supplied on the DIPSO command line. They should take the form of a
 comma separated list of ``name=value'' pairs. These values are only used
 if the corresponding environment variables are not defined.
 
-\item The command prompt used within DIPSO can now be specified using the 
+\item The command prompt used within DIPSO can now be specified using the
 environment variable \verb+DIPSOPROMPT+.
 
 \item Various changes to the Fortran code have been made to allow DIPSO
@@ -3615,17 +3615,17 @@ None of these changes should produce any noticable change in behaviour.
 \subsection{Changes introduced by DIPSO V3.3}
 \begin{itemize}
 
-\item The internal array sizes have been increased. The current arrays can 
-now hold 200,000 points, and the stack arrays can now hold 800,000 points in 
+\item The internal array sizes have been increased. The current arrays can
+now hold 200,000 points, and the stack arrays can now hold 800,000 points in
 up to 200 stack entries.
 
 \item Hypertext documentation and help have been included through the
 {\tt HELP} and {\tt USEHTX} commands, and a hypertext version of SUN/50.
 
-\item The {\tt SHELL} command has been re-instated, which allows system 
+\item The {\tt SHELL} command has been re-instated, which allows system
 commands to be run from within DIPSO without the need to press control-Z.
 
-\item The functionality of the {\tt COMMAND} command has been enhanced to 
+\item The functionality of the {\tt COMMAND} command has been enhanced to
 provide faciltities for listing commands which do particular jobs, and
 which contain specified keywords in their descriptions.
 
@@ -3711,7 +3711,7 @@ The \htmlref{{\tt{HANDLER}}}{COM:HANDLER}  and \htmlref{{\tt{CRASH}}}{COM:CRASH}
 \item The NDF accessing layer has been completely re-written to
 eliminate the many bugs related to the reading and writing of NDFs in
 the previous version DIPSO. The description of how to write a program
-which can create NDFs suitable for use with DIPSO (see 
+which can create NDFs suitable for use with DIPSO (see
 \hyperref{earlier}{section}{}{SEC:WRNDF}) has been re-written.
 
 \item Various other bugs have been cleared up.
@@ -3722,9 +3722,9 @@ Commands \htmlref{{\tt{READ}}}{COM:READ},  \htmlref{{\tt{WRITE}}}{COM:WRITE},  \
 format, and so the commands OREAD, OWRITE, OSAVE, {\em etc.}, are no
 longer needed and have been withdrawn.
 
-\item New commands added: \htmlref{{\tt{USENDF}}}{COM:USENDF},  \htmlref{{\tt{REPORTING}}}{COM:REPORTING},  \htmlref{{\tt{TSWAP}}}{COM:TSWAP},  \htmlref{{\tt{TSTRIP}}}{COM:TSTRIP} 
+\item New commands added: \htmlref{{\tt{USENDF}}}{COM:USENDF},  \htmlref{{\tt{REPORTING}}}{COM:REPORTING},  \htmlref{{\tt{TSWAP}}}{COM:TSWAP},  \htmlref{{\tt{TSTRIP}}}{COM:TSTRIP}
 
-\item Commands re-instated from previous versions: \htmlref{{\tt{RECORD}}}{COM:RECORD},  \htmlref{{\tt{REPLAY}}}{COM:REPLAY}, 
+\item Commands re-instated from previous versions: \htmlref{{\tt{RECORD}}}{COM:RECORD},  \htmlref{{\tt{REPLAY}}}{COM:REPLAY},
 \htmlref{{\tt{RECALL}}}{COM:RECALL},  SHELL (only on VMS),
 
 \item The \htmlref{{\tt{EXPAND}}}{COM:EXPAND}  command now takes an optional second string parameter
@@ -3776,8 +3776,8 @@ the following two filename specifications are equivalent and accepted
 by DIPSO on all platforms.
 
 \begin{itemize}
-\item{VAX logical name form --- {\tt{OWNERDIR:my\_data\_file}}} 
-\item{UNIX environment form --- {\tt{\$OWNERDIR/my\_data\_file}}} 
+\item{VAX logical name form --- {\tt{OWNERDIR:my\_data\_file}}}
+\item{UNIX environment form --- {\tt{\$OWNERDIR/my\_data\_file}}}
 \end{itemize}
 
 UNIX users should note that filenames are ALWAYS CaSe sensitive.
@@ -3793,7 +3793,7 @@ versions. In particular, the graphics have been converted to the GKS
 standard (mainly by JM), interstellar line analysis has been included
 ({\tt{IS...}}  commands), and various aspects of Fourier analysis are
 now possible. Because interstellar line profiles are now most easily
-computed from within DIPSO, the old {\tt{BACHRD}}  and {\tt{BACHWR}} 
+computed from within DIPSO, the old {\tt{BACHRD}}  and {\tt{BACHWR}}
 commands are no longer documented, and {\tt{DIPSODIR:ATOMIC.DAT}}  has
 been extensively revised ({\tt{\$DIPSODIR/ATOMIC.DAT}}  on UNIX
 machines). {\tt{ALASRD/ALASWR}}  have been preserved, however, as the
@@ -3802,7 +3802,7 @@ actually been updated to allow more general inputs.)
 
 In an attempt to (partially) rationalise the command names, and make it
 easier to locate groups of related commands in the reference section,
-some command names have been changed. In particular, the old {\tt{ELF}} 
+some command names have been changed. In particular, the old {\tt{ELF}}
 commands are now all prefixed by {\tt{``ELF''}}  (surprise!). (The minus
 side is that you'll have to learn the new command names; but the plus
 side is that {\tt{ELF}}  now carries out an error analysis for you.) The
@@ -3819,12 +3819,12 @@ have been made, and new functions added.
 
 The most important changes: you will probably find out quite quickly
 that the default file extension for command files has changed to
-{\tt{.CMD}}. 
+{\tt{.CMD}}.
 
 The following commands have {\em changed default functionality}, and
-you should therefore check them especially carefully: \htmlref{{\tt{ALASRD}}}{COM:ALASRD}, 
-\htmlref{{\tt{ALASWR}}}{COM:ALASWR},  \htmlref{{\tt{DRED}}}{COM:DRED}  \htmlref{{\tt{PWRITE}}}{COM:PWRITE},  \htmlref{{\tt{TPORT}}}{COM:TPORT},  \htmlref{{\tt{READ}}}{COM:READ}, 
-\htmlref{{\tt{WRITE}}}{COM:WRITE},  \htmlref{{\tt{SAVE}}}{COM:SAVE},  \htmlref{{\tt{RESTORE}}}{COM:RESTORE}. 
+you should therefore check them especially carefully: \htmlref{{\tt{ALASRD}}}{COM:ALASRD},
+\htmlref{{\tt{ALASWR}}}{COM:ALASWR},  \htmlref{{\tt{DRED}}}{COM:DRED}  \htmlref{{\tt{PWRITE}}}{COM:PWRITE},  \htmlref{{\tt{TPORT}}}{COM:TPORT},  \htmlref{{\tt{READ}}}{COM:READ},
+\htmlref{{\tt{WRITE}}}{COM:WRITE},  \htmlref{{\tt{SAVE}}}{COM:SAVE},  \htmlref{{\tt{RESTORE}}}{COM:RESTORE}.
 
 \end{document}
 

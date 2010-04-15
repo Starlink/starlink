@@ -30,23 +30,23 @@
 
 *  New Attributes Defined:
 *     Disco (double)
-*        This attribute holds the PcdMap distortion coefficient used by 
-*        the forward transformation. This coefficient is set when a 
-*        PcdMap is created, but may later be modified. The default value 
-*        is zero, which gives no distortion. For pincushion distortion, 
-*        the supplied value should be positive. For barrel distortion, it 
+*        This attribute holds the PcdMap distortion coefficient used by
+*        the forward transformation. This coefficient is set when a
+*        PcdMap is created, but may later be modified. The default value
+*        is zero, which gives no distortion. For pincushion distortion,
+*        the supplied value should be positive. For barrel distortion, it
 *        should be negative.
-*        
-*        Note that the forward transformation of a PcdMap applies the 
-*        distortion corresponding to this attribute, and the inverse 
-*        transformation removes this distortion. If a PcdMap is inverted 
-*        (e.g. by using astInvert), then the forward transformation will 
+*
+*        Note that the forward transformation of a PcdMap applies the
+*        distortion corresponding to this attribute, and the inverse
+*        transformation removes this distortion. If a PcdMap is inverted
+*        (e.g. by using astInvert), then the forward transformation will
 *        remove the distortion and the inverse transformation will apply
 *        it. The distortion itself will still be given by the same value of
 *        Disco.
 *     PcdCen(axis)
-*        This attribute specifies the centre of a pincushion distortion. 
-*        It takes a separate value for each axis of the PcdMap so that, for 
+*        This attribute specifies the centre of a pincushion distortion.
+*        It takes a separate value for each axis of the PcdMap so that, for
 *        instance, the settings "PcdCen(1)=345.0,PcdCen(2)=-104.4" specify
 *        that the pincushion distortion is centred at values of 345.0 and
 *        -104.4 on axes 1 and 2 of the PcdMap. The default for both axes is
@@ -136,12 +136,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -223,13 +223,13 @@ typedef struct AstPcdMapVtab {
    void (* SetPcdCen)( AstPcdMap *, int, double, int * );
 } AstPcdMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
 typedef struct AstPcdMapGlobals {
 
-/* Define the thread-specific globals. */ 
+/* Define the thread-specific globals. */
    char GetAttrib_Buff[ 101 ];
    AstPcdMapVtab Class_Vtab;
    int Class_Init;
@@ -267,7 +267,7 @@ AstPcdMap *astLoadPcdMap_( void *, size_t, AstPcdMapVtab *,
                            const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitPcdMapGlobals_( AstPcdMapGlobals * );
 #endif
 

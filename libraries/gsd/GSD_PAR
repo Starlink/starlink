@@ -10,7 +10,7 @@
 
 *  Type of Module:
 *     Global constants include file.
- 
+
 *  Description:
 *     This file contains definitions of the public global constants used
 *     by the GSD_ system. PRM_PAR must be included by the calling program
@@ -22,12 +22,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -44,7 +44,7 @@
 *     24-FEB-2009 (TIMJ):
 *        Remove local BAD definitions. Not used.
 
-*  Copyright: 
+*  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1994-1999,2004 Particle Physics and Astronomy
 *     Research Council.  All Rights Reserved.
@@ -53,18 +53,18 @@
 
 *  External Constants:
 
-* 
+*
 *  Parameter definitions for the GSD system
 *
 *
       INTEGER GSD__MAXFILE     ! Maximum number of GSD files open at any time
-      PARAMETER (GSD__MAXFILE=100) 
+      PARAMETER (GSD__MAXFILE=100)
 *
 *    Item descriptors
       INTEGER GSD__MAXDIM       ! Maximum number of dimensions
       PARAMETER (GSD__MAXDIM=5) ! 5 => 64 byte descr. to give proper alignment
       INTEGER GSD__MXDIM        ! Old name
-      PARAMETER (GSD__MXDIM=GSD__MAXDIM) 
+      PARAMETER (GSD__MXDIM=GSD__MAXDIM)
       INTEGER GSD__SZNAME       ! Size of name
       PARAMETER (GSD__SZNAME=15)
       INTEGER GSD__SZUNIT       ! Size of item unit
@@ -73,7 +73,7 @@
 *    Parameter codes
 *
 *    Data types and length of type in bytes...
-      INTEGER GSD__BYTE        ! Byte 
+      INTEGER GSD__BYTE        ! Byte
       PARAMETER (GSD__BYTE      = 1)
       INTEGER GSD__SZBYTE
       PARAMETER (GSD__SZBYTE    = 1)
@@ -84,7 +84,7 @@
       INTEGER GSD__WORD        ! Integer*2
       PARAMETER (GSD__WORD      = 3)
       INTEGER GSD__SZWORD
-      PARAMETER (GSD__SZWORD    = 2) 
+      PARAMETER (GSD__SZWORD    = 2)
       INTEGER GSD__INTEGER     ! Integer*4
       PARAMETER (GSD__INTEGER   = 4)
       INTEGER GSD__SZINTEGER
@@ -105,7 +105,7 @@
 *
 *  Index array
 *
-      INTEGER GSD__SZINDEX                 ! Size of INTEGER*4 array of item 
+      INTEGER GSD__SZINDEX                 ! Size of INTEGER*4 array of item
       PARAMETER (GSD__SZINDEX = 2)         ! indices
       INTEGER GSD__INDEX_FD		   ! Location of FD in the index
       PARAMETER (GSD__INDEX_FD = 1)

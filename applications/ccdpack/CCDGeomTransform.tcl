@@ -101,8 +101,8 @@ proc CCDGeomTransform { type args } {
          }
       }
       return "$newc"
-   } else { 
-      CCDIssueError "CCDGeomTransform invoked before initialization of 
+   } else {
+      CCDIssueError "CCDGeomTransform invoked before initialization of
 transforms (possible programming error)"
    }
 

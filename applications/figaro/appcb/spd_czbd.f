@@ -317,7 +317,7 @@
             J = J + 1
 
 *        If it has not been converted before, convert it.
-            IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS ) 
+            IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
      :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, I, BADVAL, IMIN, IMAX,
      :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
@@ -405,7 +405,7 @@
          IF ( T_FRAME.LT.LBND(AXIS) .OR. T_FRAME.GT.UBND(AXIS) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SPD_CZBD_E03',
-     :         'MOVIE: Frame is outside cube.', STATUS ) 
+     :         'MOVIE: Frame is outside cube.', STATUS )
             GO TO 500
          END IF
 
@@ -451,7 +451,7 @@
             STATUS = SAI__ERROR
             FRAME = FRAME + 1
             CALL ERR_REP( 'SPD_CZBD_E03',
-     :         'MOVIE: Frame is outside cube.', STATUS ) 
+     :         'MOVIE: Frame is outside cube.', STATUS )
             GO TO 500
          END IF
 
@@ -506,7 +506,7 @@
             FRAME = FRAME - 1
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SPD_CZBD_E03',
-     :         'MOVIE: Frame is outside cube.', STATUS ) 
+     :         'MOVIE: Frame is outside cube.', STATUS )
             GO TO 500
          END IF
 

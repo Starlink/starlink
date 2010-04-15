@@ -108,37 +108,37 @@
 
 *  Branch calling the correct version of CCG1_FRACx appropriate to the data.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_FRACB( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACB( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_FRACUB( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACUB( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                     NFRAC, FRAC, BAD, CLFRAC,
      :                     VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_FRACW( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACW( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_FRACUW( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACUW( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                     NFRAC, FRAC, BAD, CLFRAC,
      :                     VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_FRACI( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACI( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_FRACR( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACR( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_FRACD( EL, %VAL( CNF_PVAL( IPARR ) ), 
+         CALL CCG1_FRACD( EL, %VAL( CNF_PVAL( IPARR ) ),
      :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
@@ -147,8 +147,8 @@
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'TYPE', TYPE )
-         CALL ERR_REP( 'CCD1_FRA', 
-     :                 '  CCD1_FRA: Unsupported data type ^TYPE.', 
+         CALL ERR_REP( 'CCD1_FRA',
+     :                 '  CCD1_FRA: Unsupported data type ^TYPE.',
      :                 STATUS )
       END IF
 

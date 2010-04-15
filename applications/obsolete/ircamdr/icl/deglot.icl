@@ -1,5 +1,5 @@
 { PROCEDURE DEGLOT : deglitches a number of images
-proc deglot 
+proc deglot
   print "Do you want to enter IMAGE NAMES or PREFIX/RANGE OF NUMBER ?"
   askchoice (value1) "Names or Prefix,Numbers,Suffix (N,P) \P\ ? "
   if value1 = 2

@@ -28,7 +28,7 @@
 *
 *     If NDFS is false then it is assumed that the names accessed
 *     through the ADAM parameters PARAM using GRP are just the exact
-*     names of the files.  The names of all the files are returned 
+*     names of the files.  The names of all the files are returned
 *     in the group FIOGR.  If NDFS is true but some of the files do
 *     not have the requisite item in their extensions, then no error
 *     is generated and a blank string is returned as the corresponding
@@ -49,7 +49,7 @@
 *        The ADAM parameter name via which the list of file names is to
 *        be accessed.  Only used if NDFS is false.
 *     NFILES = INTEGER (Given)
-*        The number of filenames to be returned.  If NDFS is true 
+*        The number of filenames to be returned.  If NDFS is true
 *        this should be the same number as the size of the NDFGR group.
 *     FIOGR = INTEGER (Returned)
 *        A GRP group identifier for the names of the files which have
@@ -59,7 +59,7 @@
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
-*     before exit. 
+*     before exit.
 *     -  The calling routine must annul the group identifiers before exit.
 
 *  Copyright:
@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename 
+      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename
       INTEGER I                  ! Loop variable
       INTEGER NDFID              ! NDF identfier
       INTEGER NRET               ! Dummy argument
@@ -148,12 +148,12 @@
             CALL GRP_PUT( FIOGR, 1, FNAME, I, STATUS )
 
 *  Release the NDF.
-            CALL NDF_ANNUL( NDFID, STATUS ) 
+            CALL NDF_ANNUL( NDFID, STATUS )
          END DO
 
 *  If getting them directly, do that.
       ELSE
-         CALL CCD1_STRGR( PARAM, GRP__NOID, NFILES, NFILES, FIOGR, 
+         CALL CCD1_STRGR( PARAM, GRP__NOID, NFILES, NFILES, FIOGR,
      :                    NRET, STATUS )
       END IF
 

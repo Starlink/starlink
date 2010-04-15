@@ -20,11 +20,11 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     CALL KPG1_KYMAP( IGRP, KEYMAP, STATUS )
 
 *  Description:
-*     This function checks each non-comment, non-blank line in the supplied 
+*     This function checks each non-comment, non-blank line in the supplied
 *     GRP group. An error is reported if any such lines do not have the
 *     form "keyword = value", where the keyword name can be a hierarchical
 *     list of component names separated by dots. The returned KeyMap has
-*     an entry for each component name found at the start of any keyword 
+*     an entry for each component name found at the start of any keyword
 *     name. The value associated with the entry will either be a
 *     primitive value (if the keyword name contained no other components)
 *     or another KeyMap (if the keyword name contained other components).
@@ -41,10 +41,10 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     "clumpfind" and "method". The value associated with the "gaussclumps"
 *     entry will be another KeyMap containing keys "epsilon" (a primitive
 *     vector entry containing the values 0.001 and 0.002) and "contrast"
-*     (a primitive scalar entry with value "2.3"). The value associated with 
-*     the "clumpfind" entry will be another KeyMap containing keys "naxis" 
-*     and "deltat", which will have primitive scalar values "2" and "2.0". 
-*     The value associated with the "method" entry will be the primitive 
+*     (a primitive scalar entry with value "2.3"). The value associated with
+*     the "clumpfind" entry will be another KeyMap containing keys "naxis"
+*     and "deltat", which will have primitive scalar values "2" and "2.0".
+*     The value associated with the "method" entry will be the primitive
 *     scalar value "gaussclumps".
 *
 *     Assigning the value "<def>" (case insensitive) to a keyword has the
@@ -62,15 +62,15 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the group of text strings to be analysed.
 *     KEYMAP = INTEGER (Returned)
-*        An AST pointer to the new KeyMap, or AST__NULL if an error occurs. 
-*        A valid pointer to an empty KeyMap will be returned if the supplied 
+*        An AST pointer to the new KeyMap, or AST__NULL if an error occurs.
+*        A valid pointer to an empty KeyMap will be returned if the supplied
 *        group contains nothing but comments and blank lines.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     - Vector elements should be separated by commas and enclosed within
-*     parentheses (commas and closing parentheses can be included literally 
+*     parentheses (commas and closing parentheses can be included literally
 *     in a vector element by preceeding them with a backslash).
 *     - Component names must contain only alphanumerical characters,
 *     underscores, plus and minus signs [a-zA-Z0-9_+\-]. White space
@@ -91,12 +91,12 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

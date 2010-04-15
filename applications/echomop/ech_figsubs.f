@@ -1284,7 +1284,7 @@ C
 C (local version of Figaro routine...)
 C       G E N _ C E N T R O I D
 C
-C       Locates a peak in a data array by convolution with the 
+C       Locates a peak in a data array by convolution with the
 C       derivative of a Gaussian.
 C
 C       Parameters -    (">" input, "<" output, "!" modified)
@@ -1304,7 +1304,7 @@ C                     pixel number refers to the center of the
 C                     pixel.  ie if data is all zeros except for
 C                     elements 9,10,11 which contain say, 25,50,25
 C                     counts, LCENT will return as 10.0
-C       (<) LSTRENGTH (Real) Returned as a measure of the line 
+C       (<) LSTRENGTH (Real) Returned as a measure of the line
 C                     strength.  If an error occurs, LSTRENGTH
 C                     will be set to some negative number.
 C       (<) STATUS    (Integer) Returns a status code.
@@ -1413,10 +1413,10 @@ C     Ideally the VAX POLYD instruction should be used.
 C
 C     Parameters - (">" input, "<" output)
 C
-C     (>) VALUE   (Double precision) The value for which the 
+C     (>) VALUE   (Double precision) The value for which the
 C                 polynomial is to be evaluated.
-C     (>) COEFFS  (Double precision  array COEFFS(NCOEFF)) The 
-C                 coefficients of the polynomial, with the 
+C     (>) COEFFS  (Double precision  array COEFFS(NCOEFF)) The
+C                 coefficients of the polynomial, with the
 C                 constant term last.
 C     (>) NCOEFF  (Integer) The number of polynomial coefficients.
 C

@@ -24,7 +24,7 @@
 *     This routine applies two median filters (user sizable) to the input
 *     object image. It then divedes the filtered version into the original
 *     and histograms the result.  This histogram is then displayed and
-*     the user is allowed to select a clip point.  After clipping the 
+*     the user is allowed to select a clip point.  After clipping the
 *     rejected points are re-examined for possible sky lines.
 
 *  Invocation:
@@ -239,17 +239,17 @@
 *     whether ixbox is even or odd.
          CALL ECH_REPORT( 0, ' Calculating X-median image.' )
          CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
-     :        NX, NY, IMAGE, 
+     :        NX, NY, IMAGE,
      :        IXBOX/2, 0,       ! specifies half-width of smoothing box
      :        1,                ! need have only 1 good pixel in box
-     :        IMAGE2, BADOUT, 
-     :        WORK, WORKI, 
+     :        IMAGE2, BADOUT,
+     :        WORK, WORKI,
      :        STATUS )
          CALL ECH_REPORT( 0, ' Calculating Y-median image.' )
          CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
      :        NX, NY, IMAGE,
-     :        0, IYBOX/2, 
-     :        1, 
+     :        0, IYBOX/2,
+     :        1,
      :        IMAGE3, BADOUT,
      :        WORK, WORKI,
      :        STATUS )

@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,7 +135,7 @@
             STATUS=SAI__ERROR
             CALL ERR_REP( 'GETPNT_POUTR',
      :                    'Point number is out of range.', STATUS )
-         
+
          END IF
       ELSE IF ( ACTION.EQ.'C' ) THEN
          I=1

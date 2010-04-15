@@ -74,40 +74,40 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER EL
       INTEGER NEL
       DOUBLE PRECISION IN( NEL )
       LOGICAL USE
       DOUBLE PRECISION FILL
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION OUT( NEL )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  If the input array can be used, copy the pixel value to the output
 *  array.
       IF ( USE ) THEN
          OUT( EL ) = IN( EL )
- 
+
 *  Otherwise, copy the supplied fill value to the output array.
       ELSE
          OUT( EL ) = FILL
- 
+
       END IF
- 
+
       END

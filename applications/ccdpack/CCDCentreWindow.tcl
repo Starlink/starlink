@@ -15,9 +15,9 @@
 #  Description:
 #     This routine takes a window and moves it so that it is centred
 #     either over a given 'master' window (though it does not need to
-#     be its master in other senses) or on the whole screen.  It also 
-#     tries to register it as a transient window working on behalf of 
-#     its master, which the window manager will hopefully take as a 
+#     be its master in other senses) or on the whole screen.  It also
+#     tries to register it as a transient window working on behalf of
+#     its master, which the window manager will hopefully take as a
 #     hint to keep it on top.  The routine calls update idletasks since
 #     it uses winfo reqwidth, which may not be correct yet otherwise.
 
@@ -25,9 +25,9 @@
 #     Window = string
 #        Command name or path name of a window to centre.
 #     Master = string
-#        If supplied, this gives the command name or path name of a 
-#        window over which Window is to be centred.  If absent 
-#        (or the empty string) then Window will be positioned in the 
+#        If supplied, this gives the command name or path name of a
+#        window over which Window is to be centred.  If absent
+#        (or the empty string) then Window will be positioned in the
 #        centre of the screen.
 
 #  Copyright:

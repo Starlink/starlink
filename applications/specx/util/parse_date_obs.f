@@ -64,7 +64,7 @@
       CHARACTER * (*) DATE_OBS
 
 *  Arguments Returned:
-      LOGICAL READUT 
+      LOGICAL READUT
       CHARACTER * (*) ITIME
       CHARACTER * (*) IDATE
 
@@ -154,7 +154,7 @@
       IF ( READUT ) THEN
 
 *     Insert the hours, minutes and seconds into the string
-         WRITE (ITIME, '(I2.2,'':'',I2.2,'':'',I2.2)') 
+         WRITE (ITIME, '(I2.2,'':'',I2.2,'':'',I2.2)')
      &        HH, MIN, SS
 
       END IF
@@ -167,7 +167,7 @@
  2221 FORMAT(I2,'/',I2,'/',I2)  ! DD/MM/YY
  2222 FORMAT(I4,'-',I2,'-',I2)  ! CCYY-MM-DD
  2223 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2) ! CCYY-MM-DDTHH:MM:SS[Z]
- 2224 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2,'.',I3) ! CCYY-MM-DDTHH:MM:SS.SSS[Z] 
+ 2224 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2,'.',I3) ! CCYY-MM-DDTHH:MM:SS.SSS[Z]
  2225 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2) ! CCYY-MM-DDTHH:MM
 
       END

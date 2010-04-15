@@ -14,9 +14,9 @@
 *     CALL LPG1_PTPAR( PARAM, IGRP, STATUS )
 
 *  Description:
-*     This routine sets the current value of a specified parameter equal 
+*     This routine sets the current value of a specified parameter equal
 *     to a group expression which equates to the contents of a speified
-*     group. Since a new value is stored for the parameter, the parameter 
+*     group. Since a new value is stored for the parameter, the parameter
 *     should not be given an access mode of READ in the interface file.
 *
 *     The group expresion is, either:
@@ -32,7 +32,7 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use.
 *     IGRP = INTEGER (Given)
-*        The group to use. 
+*        The group to use.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,11 +111,11 @@
       LOGICAL FULL               ! Is GRPEXP too long?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the demimiter control character for the group.
-      CALL GRP_GETCC( IGRP, 'DELIMITER', DC, STATUS ) 
+      CALL GRP_GETCC( IGRP, 'DELIMITER', DC, STATUS )
 
 *  Initialise the total group expression given so far.
       GRPEXP = ' '
@@ -152,7 +152,7 @@
 *  expression, store them in a file in the user's adam directory.
       IF( FULL .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  First find the path to the ADAM user directory. Translate the environment 
+*  First find the path to the ADAM user directory. Translate the environment
 *  variable/logical name for ADAM_USER.
          CALL PSX_GETENV( 'ADAM_USER', PATH, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
@@ -218,10 +218,10 @@
 *  Get a SUBPAR pointer for the parameter.
       CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
 
-*  Store the group expression as the current value for the parameter. 
+*  Store the group expression as the current value for the parameter.
       CALL SUBPAR_PUTNAME( IPAR, GRPEXP( : IAT ), STATUS )
 
-*  For some reason it seems to be necesary to read the new parameter value 
+*  For some reason it seems to be necesary to read the new parameter value
 *  before it takes effect.
       CALL SUBPAR_GETNAME( IPAR, TEXT, STATUS )
 

@@ -1,16 +1,16 @@
-*+  LOOKER - read all entries from the ADAM log file since a particular 
+*+  LOOKER - read all entries from the ADAM log file since a particular
 *            date/time
 
 	SUBROUTINE LOOKER( STATUS)
 
-* Description : TASK to read records from the log file and send them to the 
+* Description : TASK to read records from the log file and send them to the
 *               user interface.
 
 * Invocation : CALL LOOKER ( STATUS )
 
 * Parameters : STATUS=INTEGER
 
-* Method : Loops, reading from the log file all records since time specified 
+* Method : Loops, reading from the log file all records since time specified
 
 * Deficiencies : <description of any deficiencies>
 

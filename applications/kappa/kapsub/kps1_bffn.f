@@ -32,7 +32,7 @@
 *     N = INTEGER (Given)
 *        The number of fit parameters which are allowed to vary.
 *     XC( N ) = DOUBLE PRECISION (Given)
-*        The parameters of the two-dimensional Gaussian fit for which 
+*        The parameters of the two-dimensional Gaussian fit for which
 *        the residuals are required.  The full list of elements for each
 *        Gaussian is as follows.
 *           1  --  X pixel centre
@@ -43,7 +43,7 @@
 *           6  --  Amplitude
 *           7  --  Background (assumed to be a constant level)
 *
-*        Where each fit parameter has been fixed by the user, the 
+*        Where each fit parameter has been fixed by the user, the
 *        remaining elements in XC are shuffled down to occupy the
 *        location which otherwise would have been used by the fixed
 *        projection parameter.  Fixed parameter values are supplied in
@@ -54,7 +54,7 @@
 *        Success flag.  0 is success.  Negative is failure.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
+*     Copyright (C) 2007 Particle Physics and Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -99,21 +99,21 @@
 *        ISTAT = INTEGER (Read & Write)
 *           Local status.
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
       DOUBLE PRECISION XC( N )
       INTEGER IFLAG
-      
+
 *  Arguments Returned:
-      DOUBLE PRECISION FVEC( M ) 
+      DOUBLE PRECISION FVEC( M )
 
 *.
 
 *  Call a lower level routine to do the work, passing the work arrays
 *  using %VAL so that their contents can be accessed.
-      CALL KPS1_BFFTG( M, N, XC, %VAL( CNF_PVAL( IPWD ) ), 
+      CALL KPS1_BFFTG( M, N, XC, %VAL( CNF_PVAL( IPWD ) ),
      :                 %VAL( CNF_PVAL( IPWV ) ), FVEC, ISTAT )
 
       END

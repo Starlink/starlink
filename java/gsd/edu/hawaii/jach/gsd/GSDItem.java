@@ -99,7 +99,7 @@ public final class GSDItem {
         this.start_byte = start_byte;
         this.nbytes = nbytes;
 
-        // could have a private setter for this? Only an issue if it 
+        // could have a private setter for this? Only an issue if it
         // is set somewhere else.
         if (ndims < 0) {
             ndims = 0;
@@ -187,7 +187,7 @@ public final class GSDItem {
 
     /**
      * The long (JCMT) name for the GSD Item.
-     * 
+     *
      * @return
      */
     public String longName() {
@@ -222,7 +222,7 @@ public final class GSDItem {
 
     /**
      * Indicates whether the item is scalar or an array of values.
-     * 
+     *
      */
     public boolean isArray() {
         boolean result = true;
@@ -304,7 +304,7 @@ public final class GSDItem {
      * yet been read from file, a read is forced if the GSD file is
      * still open. Returns null if the data can not be read. Scalar
      * data are stored as java.lang.Number objects. Array data
-     * are stored in int[], float[], String[] etc but stored 
+     * are stored in int[], float[], String[] etc but stored
      * as a single object.
      *
      * @return A single object that must be cast into the correct type.

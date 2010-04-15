@@ -12,14 +12,14 @@ EXTRA_DIST = cshrc.in notinst not_installed icl_login_sys.icl login.in adam_pack
 
 ## Root for the STARJAVA installation. Define like this so that it can
 ## be changed at make time, so some position that doesn't depend on
-## exec_prefix. 
+## exec_prefix.
 STARJAVADIR = $(exec_prefix)/starjava
 
 ## Arrange to edit the installation binary directory into script files
 ## which need it.  This cannot be done by autoconf because it needs to
-## be changable at make time - see the autoconf manual section on 
+## be changable at make time - see the autoconf manual section on
 ## Installation Directory Variables.
-## Since these ones haven't been modified by autoconf, we take the 
+## Since these ones haven't been modified by autoconf, we take the
 ## opportunity to do any non-make-sensitive substitutions here as well.
 
 LD_LIB_PATH = @LD_LIB_PATH@

@@ -66,7 +66,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,22 +90,22 @@
 
 *  If a floating point data type is required, use _DOUBLE for 32 bit
 *  integers, and _REAL for all other integer types.
-      IF( FMTCNV ) THEN      
+      IF( FMTCNV ) THEN
          IF ( BITPIX .EQ. 8 ) THEN
             TYPE = '_REAL'
-            
+
          ELSE IF ( BITPIX .EQ. 16 ) THEN
             TYPE = '_REAL'
-   
+
          ELSE IF ( BITPIX .EQ. 32 ) THEN
             TYPE = '_DOUBLE'
-   
+
          ELSE IF ( BITPIX .EQ. -32 ) THEN
             TYPE = '_REAL'
-   
+
          ELSE IF ( BITPIX .EQ. -64 ) THEN
             TYPE = '_DOUBLE'
-   
+
 *  Report that there is no equivalent HDS primitive type to the BITPIX.
          ELSE
             STATUS = SAI__ERROR
@@ -122,19 +122,19 @@
 *  HDS primitive data type.
          IF ( BITPIX .EQ. 8 ) THEN
             TYPE = '_UBYTE'
-            
+
          ELSE IF ( BITPIX .EQ. 16 ) THEN
             TYPE = '_WORD'
-   
+
          ELSE IF ( BITPIX .EQ. 32 ) THEN
             TYPE = '_INTEGER'
-   
+
          ELSE IF ( BITPIX .EQ. -32 ) THEN
             TYPE = '_REAL'
-   
+
          ELSE IF ( BITPIX .EQ. -64 ) THEN
             TYPE = '_DOUBLE'
-   
+
 *  Report that there is no equivalent HDS primitive type to the BITPIX.
          ELSE
             STATUS = SAI__ERROR

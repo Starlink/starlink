@@ -132,7 +132,7 @@
 *        in the range 0.0--1.0.  If INPAL is null (!) the default
 *        palette is loaded.
 *     LOW = _DOUBLE (Read)
-*        The array value that scales to the lowest pen in the colour 
+*        The array value that scales to the lowest pen in the colour
 *        table, and the minimum value to be included in the histogram.
 *        All smaller array values are set to the lowest colour
 *        index when LOW is less than HIGH, otherwise all array values
@@ -210,9 +210,9 @@
 *        parameter.  This palette is in an NDF called mypal.
 *     crelut inlut=! deluxe hh12 v low=100 high=400 \
 *        A greyscale lookup table is manipulated and the result
-*        is stored in NDF deluxe.  The variance array in NDF hh12 is 
+*        is stored in NDF deluxe.  The variance array in NDF hh12 is
 *        scaled between 100 and 400, and displayed in the top half of
-*        the current picture on the current image-display device.  Also 
+*        the current picture on the current image-display device.  Also
 *        drawn is an histogram of the intensities between those limits.
 *     crelut heat bizarre ndf=! device=xwindows \
 *        Reads a lookup table in an NDF called heat.  If resampling of
@@ -408,7 +408,7 @@
      :  COLRNG( 2 ),           ! Range of colours to be fitted to pens
      :  DEFPNM,                ! Default palette number
      :  DIMS( 2 ),             ! Dimensions of input array
-     :  EL,                    ! Number of elements in the input and 
+     :  EL,                    ! Number of elements in the input and
                                ! image array
      :  GSTAT                  ! Graphics status
 
@@ -429,7 +429,7 @@
                                ! of the image display
      :  LBND( NDF__MXDIM ),    ! Lower bounds of the image
      :  LDIMS( 2 ),            ! Dimensions of LUT arrays
-     :  LEL,                   ! Number of elements in the input and 
+     :  LEL,                   ! Number of elements in the input and
                                ! output LUT arrays
      :  LP,                    ! Lowest pen with which to display the
                                ! the image and histogram, or ramp
@@ -455,7 +455,7 @@
      :  PALNUM,                ! Palette number of the latest colour
                                ! supplied by the environment
      :  PDIMS( 2 ),            ! Dimensions of NDF palette arrays
-     :  PEL,                   ! Number of elements in the input and 
+     :  PEL,                   ! Number of elements in the input and
                                ! output palette NDF arrays
      :  PENRNG( 2 ),           ! Range of pens over which the
                                ! chosen colours to go
@@ -783,7 +783,7 @@
 *    Start an NDF context.
 
       CALL NDF_BEGIN
-      
+
 *    Obtain the NDF identifier and pointer of the input
 *    lookup table.  Validate the LUT.
 
@@ -875,7 +875,7 @@
 *    Start an NDF context.
 
       CALL NDF_BEGIN
-      
+
 *    Obtain the NDF identifier and pointer of the input palette.
 *    Validate the palette.  Actually this may not be good enough.
 *    If the NDF's second dimension is greater than 32 we can just use
@@ -1073,7 +1073,7 @@
          END IF
       END IF
 
-*    Check whether or not bad pixels may be present.      
+*    Check whether or not bad pixels may be present.
 
       CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
 
@@ -1946,7 +1946,7 @@
 
          CALL KPG1_GPCOL( 'COLOUR', GKSCOL, STATUS )
          CALL PAR_CANCL( 'COLOUR', STATUS )
-      
+
 *       If the colour is alright then try it out, and see if it is
 *       to be kept, otherwise leave the loop.
 
@@ -2307,7 +2307,7 @@
      :              RESPEN( 3, J ) )
       END DO
       CALL GKS_GSTAT( STATUS )
-      
+
 *    AGI closedown sequence.
 *    =======================
 

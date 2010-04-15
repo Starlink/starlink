@@ -1,4 +1,4 @@
-      SUBROUTINE POINA9( MAXSRC, FMEAN, FSTDEV, OUTSMP, SMPLBD, SMPUBD, 
+      SUBROUTINE POINA9( MAXSRC, FMEAN, FSTDEV, OUTSMP, SMPLBD, SMPUBD,
      :                   OUTWAV, THFILT, CANDSM, CANDN, STATUS )
 *+
 *  Name:
@@ -11,12 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA9( MAXSRC, FMEAN, FSTDEV, OUTSMP, SMPLBD, SMPUBD, 
+*     CALL POINA9( MAXSRC, FMEAN, FSTDEV, OUTSMP, SMPLBD, SMPUBD,
 *                  OUTWAV, THFILT, CANDSM, CANDN, STATUS )
 
 *  Description:
 *     Scan the Square wave filtered data for candidate point sources
-*     
+*
 *  Arguments:
 *     MAXSRC = INTEGER (Given)
 *        Maximum number of sources
@@ -40,8 +40,8 @@
 *        Threshold of the square wave filter signal to noise.
 *     CANDSM( MAXSRC ) = INTEGER (Returned)
 *        An array containing the sample numbers of each point source
-*        candidate - note this true position of the point source will be 
-*        centered 4 samples away from the position at which the filter 
+*        candidate - note this true position of the point source will be
+*        centered 4 samples away from the position at which the filter
 *        value was calculated.
 *     CANDN = INTEGER (Returned)
 *        Number of candidate point sources
@@ -55,13 +55,13 @@
 
 *  History:
 *     29-SEPT-1994 (DCP):
-*        Original version 
+*        Original version
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,14 +73,14 @@
       INTEGER MAXSRC
       REAL FMEAN
       REAL FSTDEV
-      INTEGER OUTSMP( 2 )  
+      INTEGER OUTSMP( 2 )
       INTEGER SMPLBD
       INTEGER SMPUBD
-      REAL OUTWAV( SMPLBD : SMPUBD ) 
+      REAL OUTWAV( SMPLBD : SMPUBD )
       REAL THFILT
 
 *  Arguments Returned:
-      INTEGER CANDSM( MAXSRC) 
+      INTEGER CANDSM( MAXSRC)
       INTEGER CANDN
 
 *  Status:
@@ -109,18 +109,18 @@
 *  Check whether it is a local maximum
             IF ( ( OUTWAV( ISAMP) .GE. OUTWAV( ISAMP - 1 ) ) .AND.
      :           ( OUTWAV( ISAMP) .GE. OUTWAV( ISAMP + 1 ) ) ) THEN
-      
+
 *  Candidate sample found, increment the count of candidates found, and enter
-*  the position in the list of candidates ( NB the peak of the candidate 
+*  the position in the list of candidates ( NB the peak of the candidate
 *  point source is 4.5 samples from the start of its associated square wave
 *  filter value, here we round it to 4)
                CANDN = CANDN + 1
                CANDSM( CANDN ) = ISAMP + 4
 
-            END IF      
+            END IF
          END IF
 
 * End of do loop for each sample
       END DO
-      
+
       END

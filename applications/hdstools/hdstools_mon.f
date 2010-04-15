@@ -141,7 +141,7 @@
 
       ELSE IF ( NAME .EQ. 'HWRITE' ) THEN
          CALL HWRITE( STATUS )
-         
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR

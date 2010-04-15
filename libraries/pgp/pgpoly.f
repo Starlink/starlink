@@ -64,9 +64,9 @@ C
          CALL PGHTCH(N, XPTS, YPTS, 0.0)
          CALL PGHTCH(N, XPTS, YPTS, 90.0)
       ELSE
-C     
+C
 C Test whether polygon lies completely in the window.
-C     
+C
          CLIP = .FALSE.
          XL = MIN(PGXBLC(PGID),PGXTRC(PGID))
          XH = MAX(PGXBLC(PGID),PGXTRC(PGID))
@@ -80,16 +80,16 @@ C
             END IF
  20      CONTINUE
  30      CONTINUE
-C     
+C
 C Filled style, no clipping required.
-C     
+C
          CALL PGBBUF
          IF (.NOT.CLIP) THEN
             CALL GRFA(N,XPTS,YPTS)
-C     
+C
 C Filled style, clipping required: the vertices of the clipped
 C polygon are put in temporary arrays QX,QY, RX, RY.
-C     
+C
          ELSE
             CALL GRPOCL(N,  XPTS, YPTS, 1, XL, MAXOUT, N1, QX, QY)
             IF (N1.GT.MAXOUT) GOTO 40

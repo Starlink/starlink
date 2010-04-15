@@ -110,42 +110,42 @@
       IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL CCG1_CMLTUB( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                     %VAL( CNF_PVAL( IPWORK ) ), NERR, STATUS )
-         CALL CCG1_COPAUB( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAUB( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                     %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_CMLTB( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+         CALL CCG1_CMLTB( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAB( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAB( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL CCG1_CMLTUW( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                     %VAL( CNF_PVAL( IPWORK ) ), NERR, STATUS )
-         CALL CCG1_COPAUW( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAUW( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                     %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_CMLTW( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+         CALL CCG1_CMLTW( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAW( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAW( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_CMLTI( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+         CALL CCG1_CMLTI( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAI( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAI( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_CMLTR( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+         CALL CCG1_CMLTR( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAR( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAR( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_CMLTD( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+         CALL CCG1_CMLTD( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAD( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+         CALL CCG1_COPAD( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE
 

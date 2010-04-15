@@ -22,7 +22,7 @@
 
  *  Description:
  *     This function populates a smfHead with AzTEC specific
- *     information. 
+ *     information.
 
  *  Authors:
  *     EC: Edward Chapin (UBC)

@@ -16,7 +16,7 @@
 *     This subroutine is used to sort the crossings (file indices,
 *     detector indices, X-distances, crossing samples and crossing
 *     directions ) into the absolute X-scan distance order from nearest
-*     to farest. 
+*     to farest.
 
 *  Arguments:
 *     NCROS = INTEGER (Given)
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
       INTEGER ITEMP              ! A temporary integer value
       REAL RTEMP                 ! A temporary real value
       LOGICAL SWAP               ! Swap flag
-     
+
 *.
 
 *  Check inherited global status.

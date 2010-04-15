@@ -18,13 +18,13 @@ C     (>) GAUSUM  (Real array) Y values of Gaussian fit to line
 C     (>) ERRUSE  (Logical) True if erros are available
 C     (>) NX      (Integer) Length of array ERRORS
 C     (>) ERRORS  (Real array) Z values of errors on data points
-C     (>) IGST    (Integer) First channel of line extent 
-C     (<) GZRESID (Real array) Residuals on observed - Gaussian fitted      
+C     (>) IGST    (Integer) First channel of line extent
+C     (<) GZRESID (Real array) Residuals on observed - Gaussian fitted
 C     (<) RMS     (Real) R.m.s. on Gaussian fit over line
 C     (<) MERR    (Real) Mean error in terms of error bars on line fit
 C     (=) LOWR    (Real) Largest negative residual
 C     (=) HIGHR   (Real) Largest positive residual
-C     (<) ERASE   (Logical) True if residuals are larger in extent than 
+C     (<) ERASE   (Logical) True if residuals are larger in extent than
 C                 previously, necessitating plot to be replotted
 C
 C                                                JRW / AAO  February 1987
@@ -65,7 +65,7 @@ C
         RMS=SQRT(RMST/REAL(GX-1))
       END IF
 C
-C     Find the maximum and minimum values of the resids to 
+C     Find the maximum and minimum values of the resids to
 C     determine of the upper resids box needs to be redrawn
 C
       MAXR=-1.E36
@@ -80,7 +80,7 @@ C
       END DO
       IF (MAXR.NE.HIGHR) THEN
         ERASE=.TRUE.
-        HIGHR=MAXR 
+        HIGHR=MAXR
       END IF
       IF (MINR.NE.LOWR) THEN
         ERASE=.TRUE.

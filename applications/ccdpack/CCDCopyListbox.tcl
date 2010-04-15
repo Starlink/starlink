@@ -91,7 +91,7 @@
       if { "$mode" == "range" } {
 
 #  Must have supplied a range.
-	 if { $nargs > 1 } { 
+	 if { $nargs > 1 } {
 
 #  Set the start index.
 	    set index [lindex $args 0]

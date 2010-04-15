@@ -45,11 +45,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER COMM*(*)
       INTEGER OKVAL
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -57,10 +57,10 @@
       INTEGER SYSTEM             ! Fortran RTL routine
       INTEGER CHR_LEN            ! Returns used length of a string
 
-      
+
 *  Local Variables:
       INTEGER SYSTAT             ! Status value from RTL routine
-      
+
 *.
 
 *  Check inherited global status.

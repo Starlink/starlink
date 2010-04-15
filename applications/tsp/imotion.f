@@ -9,7 +9,7 @@ C
 C     Function:
 C        Analyze the image motion in a time series image
 C
-C     Description:   
+C     Description:
 C        Given a time series image produce an output time series
 C        which is a measure of the image motion in the 2 axes.
 C        The first channel of the output time series is the image
@@ -25,16 +25,16 @@ C    (5) Y         (Real)      Y position of centre of star
 C    (6) RADIUS    (Real)      Radius of aperture (pixels)
 C    (7) BPIXEL    (Logical)   Use brightest pixel (rather than centroid)
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         4/5/1994
 C
 C-
 C
 C  History:
-C    16/11/1991   Original Version.   JAB/JAC 
+C    16/11/1991   Original Version.   JAB/JAC
 C    4/5/1994     Add BPIXEL option   JAB/AAO
 C
 
@@ -59,7 +59,7 @@ C
       INTEGER NDIMS,DIMS(3)
       INTEGER WPTR,ZEROPT
       REAL X,Y,RADIUS,LAMBDA
-      CHARACTER*64 LABEL,UNITS      
+      CHARACTER*64 LABEL,UNITS
       INTEGER PNDIMS,PDIMS(3)
       LOGICAL BPIXEL
 
@@ -149,8 +149,8 @@ C
       CALL DAT_ANNUL(OLOC,STATUS)
       END
 
-      
-      
+
+
       SUBROUTINE TSP_IMOTION(NX,NY,NZ,X,Y,RADIUS,BPIXEL,IN,
      :   TEMPLATE,OUT,STATUS)
 *+
@@ -220,7 +220,7 @@ C
                ENDIF
             ENDDO
          ENDDO
-      ELSE    
+      ELSE
          CENTY = 0.0
          CENTX = 0.0
          SUM = 0.0
@@ -230,7 +230,7 @@ C
               CENTX = CENTX + TEMPLATE(I1,I2) * REAL(I1)
               SUM = SUM+TEMPLATE(I1,I2)
             ENDDO
-         ENDDO  
+         ENDDO
          TX = CENTX/SUM
          TY = CENTY/SUM
       ENDIF
@@ -285,7 +285,7 @@ C
 *          SUM2=SUM2-SUM
 *          OUT(3,IZ)=SUM/SUM2
            OUT(3,IZ) = 0
-          
+
       IF (IZ/100*100 .EQ. IZ) THEN
           PRINT *,IZ,'Centroid = ',CENTX,CENTY,OUT(3,IZ)
       ENDIF

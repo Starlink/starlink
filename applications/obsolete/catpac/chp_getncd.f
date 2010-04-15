@@ -15,7 +15,7 @@
 *
 *  Description:
 *     Not part of the CHI interface definition. Only use CHI_GETCD if you
-*     are really sure about what is going on. 
+*     are really sure about what is going on.
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -41,7 +41,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

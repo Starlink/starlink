@@ -100,7 +100,7 @@ C      double precision xcap
       offset = (xmin+xmax)/xrange
 
 *      noweight(1)=-1
-      
+
       do i =1,npts
 *        xcap = x(i) * normal - offset
 *        ifail = 1

@@ -185,7 +185,7 @@
 
 * calculate start and end of contour box
 	  IM_XST = IMXCEN - ( NX+CONTOUR_XOFF)*CONTOUR_MAGNIF/2.0
-	  IM_YST = IMYCEN - 
+	  IM_YST = IMYCEN -
      :	             ( NY+CONTOUR_YOFF)*
      :                 CONTOUR_MAGNIF*CONTOUR_AXRAT/2.0
 	  IM_XEN = IM_XST + NX*CONTOUR_MAGNIF
@@ -220,8 +220,8 @@
 	  DIVISOR = 1.5
 	  DO J = 1, TICKSPA
 	    CALL CONTOUR_TICKSEC( DIVISOR,  TICK_XINTERVAL/(2**J),
-     :	                          TICK_YINTERVAL/(2**J), 
-     :	                          CONTOUR_MAGNIF, CONTOUR_AXRAT, 
+     :	                          TICK_YINTERVAL/(2**J),
+     :	                          CONTOUR_MAGNIF, CONTOUR_AXRAT,
      :                            STATUS)
 	  END DO
 
@@ -266,7 +266,7 @@
 	    POS = INDEX( CONLEVEL_STRING( ST:LEN1), ',') + ST - 1
 	    IF( POS-1 .GE. ST) THEN
 	      J = J + 1
-              CALL CHR_CTOR(CONLEVEL_STRING( ST:POS-1), 
+              CALL CHR_CTOR(CONLEVEL_STRING( ST:POS-1),
      :                      CONTOUR_LEVEL( J), STATUS )
 	      IF( STATUS .NE. SAI__OK) THEN
                 CALL ERR_REP('ERR','Contour draw error', STATUS)
@@ -293,9 +293,9 @@
 
 	  IF( CONTOUR_TYPE .EQ. 'T' .OR. CONTOUR_TYPE .EQ. '4') THEN
 	    CALL PAR_GET0R( 'CONTOUR_SPLIT', CONTOUR_SPLIT, STATUS)
-	    CONTOUR_NUMBER2 = 
+	    CONTOUR_NUMBER2 =
      :	      INT( ( CONTOUR_SPLIT - CONTOUR_BASE)/CONTOUR_INTERVAL)
-	    CONTOUR_NUMBER3 = 
+	    CONTOUR_NUMBER3 =
      :	      INT( ( ( CONTOUR_NUMBER*CONTOUR_INTERVAL+CONTOUR_BASE)-
      :	              CONTOUR_SPLIT)/CONTOUR_INTERVAL) + 1
 	  END IF
@@ -304,21 +304,21 @@
 	  IF( CONTOUR_TYPE .EQ. 'T' .OR. CONTOUR_TYPE .EQ. '4') THEN
 	    CALL SET_COLOUR( PEN_CON1, COL_CON1)
 	    CALL CONTOUR_MAP( IMAGE, CONTOUR_BASE, CONTOUR_INTERVAL,
-     :	                      CONTOUR_NUMBER2, CONTOUR_MAGNIF, 
+     :	                      CONTOUR_NUMBER2, CONTOUR_MAGNIF,
      :                        CONTOUR_AXRAT)
 	    CALL SET_COLOUR( PEN_CON2, COL_CON2)
 	    CALL CONTOUR_MAP( IMAGE, CONTOUR_SPLIT, CONTOUR_INTERVAL,
-     :	                      CONTOUR_NUMBER3, CONTOUR_MAGNIF, 
+     :	                      CONTOUR_NUMBER3, CONTOUR_MAGNIF,
      :                        CONTOUR_AXRAT)
 	  ELSE
 !	type *, 'contour pen,col = ', pen_con, col_con
 	    CALL SET_COLOUR( PEN_CON, COL_CON)
 	    CALL CONTOUR_MAP( IMAGE, CONTOUR_BASE, CONTOUR_INTERVAL,
-     :	                      CONTOUR_NUMBER, CONTOUR_MAGNIF, 
+     :	                      CONTOUR_NUMBER, CONTOUR_MAGNIF,
      :                        CONTOUR_AXRAT)
 	  END IF
 
-	ELSE IF( CONTOUR_TYPE .EQ. 'S' .OR. CONTOUR_TYPE .EQ. '2') 
+	ELSE IF( CONTOUR_TYPE .EQ. 'S' .OR. CONTOUR_TYPE .EQ. '2')
      :      THEN
 
 * plot contour map 2
@@ -350,7 +350,7 @@
 	    CALL SGS_FLUSH
 	  END DO
 
-	ELSE IF( CONTOUR_TYPE .EQ. 'C' .OR. CONTOUR_TYPE .EQ. '3') 
+	ELSE IF( CONTOUR_TYPE .EQ. 'C' .OR. CONTOUR_TYPE .EQ. '3')
      :   THEN
 
 * plot contour map 3
@@ -375,8 +375,8 @@
 	    ELSE
 	      CALL SET_COLOUR( PEN_CON, COL_CON)
 	    END IF
-	    CALL CONTOUR_MAP( IMAGE, CONTOUR_LEVEL( J), 
-     :	                      CONTOUR_INTERVAL, 1, CONTOUR_MAGNIF, 
+	    CALL CONTOUR_MAP( IMAGE, CONTOUR_LEVEL( J),
+     :	                      CONTOUR_INTERVAL, 1, CONTOUR_MAGNIF,
      :                        CONTOUR_AXRAT)
 
 * flush all output from graphics buffer to get all contour in same colour

@@ -54,14 +54,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER SHOWME*(*)
 
 *  Arguments Given and Returned:
       CHARACTER HLPSTR*(*)
       LOGICAL OK
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -71,7 +71,7 @@
 *  Local Variables:
       CHARACTER DISP*80          ! Value of $DISPLAY
       CHARACTER LTEXT*512        ! Local text buffer
-      
+
 *.
 
 *  Check inherited global status.
@@ -88,12 +88,12 @@
 *  are at an X-window. If this cannot be done, then no hypertext help
 *  is available
       CALL PSX_GETENV ( 'DISPLAY', DISP, STATUS )
-      
+
 *  If it was not defined, annul the error message and set OK .FALSE.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          OK = .FALSE.
-         
+
 *  Otherwise, set OK .FALSE. if the translation is blank.
       ELSE IF( DISP .EQ. ' ' ) THEN
          OK = .FALSE.
@@ -102,18 +102,18 @@
 
 *  If we are at an X-terminal...
       IF( OK ) THEN
-      
+
 *  Use the SHOWME command (see SUN/188) to create the hypertext help by
 *  displaying the relevant part of the installed hypertext version of
 *  sun50.
          LTEXT = SHOWME( : CHR_LEN( SHOWME ) )//' sun50 '//HLPSTR
          CALL SYSEXE( LTEXT, 0, STATUS )
-      
+
 *  If this is not an x-terminal, issue a warning.
       ELSE
          CALL MSG_OUT( 'XHELP_MSG1', 'WARNING: No translation for '//
      :                 '$DISPLAY, therefore hypertext help cannot be '//
      :                 'used.', STATUS )
       END IF
-         
+
       END

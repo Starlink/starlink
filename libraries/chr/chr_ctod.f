@@ -21,13 +21,13 @@
 *     DVALUE = DOUBLE PRECISION (Returned)
 *        The resulting DOUBLE PRECISION value.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value: if this value is not SAI__OK on input, 
-*        the routine returns without action; if the routine does 
-*        not complete successfully, STATUS is returned set to 
+*        The status value: if this value is not SAI__OK on input,
+*        the routine returns without action; if the routine does
+*        not complete successfully, STATUS is returned set to
 *        SAI__ERROR.
 
 *  Algorithm:
-*     Construct the G-format and decode the string using a Fortran 77 
+*     Construct the G-format and decode the string using a Fortran 77
 *     internal READ.
 
 *  Copyright:
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,7 +116,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Trap any commas in the given string or blank string.
-      IF ( ( INDEX( STRING, ',' ) .NE. 0 ) 
+      IF ( ( INDEX( STRING, ',' ) .NE. 0 )
      :.OR. ( STRING .EQ. ' ' ) ) THEN
          STATUS = SAI__ERROR
       ELSE

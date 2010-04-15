@@ -30,9 +30,9 @@
 *     NAG routines and defined in the NAG manual (see Chapter E02 on
 *     "Curve and Surface fitting").
 *
-*     This routine will convert the coefficient array to 
-*     two-dimensional, flip it around and store it in the POLYNOMIAL 
-*     structure so that DATA_ARRAY(IX,IY) contains the coefficient for 
+*     This routine will convert the coefficient array to
+*     two-dimensional, flip it around and store it in the POLYNOMIAL
+*     structure so that DATA_ARRAY(IX,IY) contains the coefficient for
 *     the (IX,IY)th term (see SGP/38).
 *
 *     The routine will also load the TMIN and TMAX arrays with XMIN,
@@ -95,12 +95,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA

@@ -11,7 +11,7 @@ C  Description:
 C     This routine reads in the data held in an order selection file
 C     as produced by ECHSELECT.   Essentially, all the file contains
 C     is a list of cross-sections associated either with sky or with
-C     object for various orders.  
+C     object for various orders.
 C
 C  Language:
 C     FORTRAN

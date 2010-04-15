@@ -1,23 +1,23 @@
       SUBROUTINE TPOLY(X,Y,NVERT,SIZE)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   T P O L Y
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C X (<), Y (<), NVERT (<), SIZE (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Interface for pgpoly
 C
 C
@@ -50,4 +50,4 @@ C
 C
       END
 
-       
+

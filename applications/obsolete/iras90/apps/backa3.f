@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -133,7 +133,7 @@
      :                 'WARNING: Quality name ^QN is already in use. '//
      :                 'Cannot flag un-used samples in output NDF.',
      :                 STATUS )
-         CALL IRQ_RLSE( LOCS, STATUS )      
+         CALL IRQ_RLSE( LOCS, STATUS )
          IF( STATUS .EQ. SAI__OK ) OK = .FALSE.
 
 *  If the quality name does not already exist, add a definition.

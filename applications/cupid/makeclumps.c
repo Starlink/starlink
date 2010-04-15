@@ -37,7 +37,7 @@ void makeclumps( int *status ) {
 *     ADAM A-task
 
 *  Description:
-*     This application creates a new 1-, 2- or 3-dimensional NDF containing 
+*     This application creates a new 1-, 2- or 3-dimensional NDF containing
 *     a collection of clumps with background noise. It also creates a
 *     catalogue containing the clump parameters.
 *
@@ -47,20 +47,20 @@ void makeclumps( int *status ) {
 *     distribution.
 
 *  Usage:
-*     makeclumps out outcat 
+*     makeclumps out outcat
 
 *  ADAM Parameters:
 *     ANGLE( 2 ) = _REAL (Read)
-*        Defines the distribution from which the spatial position angle of 
+*        Defines the distribution from which the spatial position angle of
 *        the major axis of the elliptical clump is chosen. Values should
-*        be supplied in units of degrees. See parameter  PARDIST for 
+*        be supplied in units of degrees. See parameter  PARDIST for
 *        additional information. Note, angles are always taken from a
-*        uniform distribution, irrespective of the setting of PARDIST. 
+*        uniform distribution, irrespective of the setting of PARDIST.
 *        [current value]
 *     BEAMFWHM = _REAL (Read)
-*        The spatial FHWM (Full Width at Half Max) of the instrumental beam, 
+*        The spatial FHWM (Full Width at Half Max) of the instrumental beam,
 *        in pixels. The generated clumps are smoothed with a Gaussian beam
-*        of this FWHM, before noise is added. No spatial smoothing is 
+*        of this FWHM, before noise is added. No spatial smoothing is
 *        performed if BEAMFWHM is zero. [current value]
 *     DECONV = _LOGICAL (Read)
 *        If TRUE, the clump properties stored in the output catalogue
@@ -69,29 +69,29 @@ void makeclumps( int *status ) {
 *     FWHM1( 2 ) = _REAL (Read)
 *        Defines the distribution from which the FWHM (Full Width at Half
 *        Max) for pixel axis 1 of each clump is chosen. Values should be
-*        supplied in units of pixel. See parameter PARDIST for additional 
+*        supplied in units of pixel. See parameter PARDIST for additional
 *        information. [current value]
 *     FWHM2( 2 ) = _REAL (Read)
 *        Defines the distribution from which the FWHM (Full Width at Half
 *        Max) for pixel axis 2 of each clump is chosen. Values should be
-*        supplied in units of pixel. See parameter PARDIST for additional 
+*        supplied in units of pixel. See parameter PARDIST for additional
 *        information. [current value]
 *     FWHM3( 2 ) = _REAL (Read)
 *        Defines the distribution from which the FWHM (Full Width at Half
 *        Max) for pixel axis 3 of each clump is chosen. Values should be
-*        supplied in units of pixel. See parameter PARDIST for additional 
+*        supplied in units of pixel. See parameter PARDIST for additional
 *        information. [current value]
 *     LBND() = _INTEGER (Read)
 *        The lower pixel bounds of the output NDF. The number of values
-*        supplied (1, 2 or 3) defines the number of pixel axes in the output 
-*        NDF (an error is reported if the number of values supplied for LBND 
-*        and UBND differ). If an NDF is supplied for parameter LIKE, the 
+*        supplied (1, 2 or 3) defines the number of pixel axes in the output
+*        NDF (an error is reported if the number of values supplied for LBND
+*        and UBND differ). If an NDF is supplied for parameter LIKE, the
 *        suggested defaults for this parameter will be the lower pixel
 *        bounds of the supplied NDF.
 *     LIKE = NDF (Read)
 *        An NDF from which to inherited WCS information. If a null (!)
 *        value is supplied, the output catalogue will hold values in
-*        pixel coordinates, and there will be no WCS in any of the output 
+*        pixel coordinates, and there will be no WCS in any of the output
 *        NDFs. [!]
 *     NCLUMP = _INTEGER (Read)
 *        The number of clumps to create.
@@ -100,8 +100,8 @@ void makeclumps( int *status ) {
 *        blurring and noise.
 *     MODEL = NDF (Write)
 *        The NDF to receive the simulated data, excluding noise. A CUPID
-*        extension is added to this NDF, containing information about each 
-*        clump in the same format as produced by the FINDCLUMPS command. This 
+*        extension is added to this NDF, containing information about each
+*        clump in the same format as produced by the FINDCLUMPS command. This
 *        includes an NDF holding an of the individual clump.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.
@@ -120,23 +120,23 @@ void makeclumps( int *status ) {
 *        - Peak: The peak value in the clump.
 *        - Volume: The total number of pixels falling within the clump.
 *
-*        There is also an optional column called "Shape" containing an 
-*        STC-S description of the spatial coverage of each clump. See 
+*        There is also an optional column called "Shape" containing an
+*        STC-S description of the spatial coverage of each clump. See
 *        parameter SHAPE.
 *
 *        The coordinate system used to describe the peak and centroid
-*        positions is determined by the value supplied for parameter 
+*        positions is determined by the value supplied for parameter
 *        LIKE. If LIKE is null (!), then positions are specified in the
-*        pixel coordinate system. In addition, the clump sizes are specified 
-*        in units of pixels, and the clump volume is specified in units of 
+*        pixel coordinate system. In addition, the clump sizes are specified
+*        in units of pixels, and the clump volume is specified in units of
 *        cubic pixels (square pixels for 2D data). If an NDF is supplied
-*        for LIKE, then positions are specified in the current coordinate 
-*        system of the specified NDF. In addition, the clump sizes and 
-*        volumes are specified in WCS units. Note, the sizes are still 
-*        measured parallel to the pixel axes, but are recorded in WCS units 
-*        rather than pixel units. Celestial coordinate positions are units 
-*        of degrees, sizes are in units are arc-seconds, and areas in square 
-*        arc-seconds. Spectral coordinates are in the units displayed by the 
+*        for LIKE, then positions are specified in the current coordinate
+*        system of the specified NDF. In addition, the clump sizes and
+*        volumes are specified in WCS units. Note, the sizes are still
+*        measured parallel to the pixel axes, but are recorded in WCS units
+*        rather than pixel units. Celestial coordinate positions are units
+*        of degrees, sizes are in units are arc-seconds, and areas in square
+*        arc-seconds. Spectral coordinates are in the units displayed by the
 *        KAPPA command "ndftrace".
 *
 *        If the data has less than 3 pixel axes, then the columns
@@ -145,33 +145,33 @@ void makeclumps( int *status ) {
 *        The catalogue inherits any WCS information from the NDF supplied
 *        for parameter LIKE
 *
-*        The "size" of the clump on an axis is the RMS deviation of each 
+*        The "size" of the clump on an axis is the RMS deviation of each
 *        pixel centre from the clump centroid, where each pixel is
 *        weighted by the correspinding pixel data value. This excludes
 *        the instrumental smoothing specified by BEAMFWHM and VELFWHM.
 *
-*        The KAPPA command "listshow" can be used to draw markers at the 
+*        The KAPPA command "listshow" can be used to draw markers at the
 *        central positions of the clumps described in a catalogue. For
 *        instance, the command "listshow fred plot=mark" will draw
-*        markers identifying the positions of the clumps described in 
+*        markers identifying the positions of the clumps described in
 *        file fred.FIT, overlaying the markers on top of the currently
 *        displayed image. Specifying "plot=STCS" instead of "plot=mark"
 *        will cause the spatial outline of the clump to be drawn if it is
 *        present in the catalogue (see parameter SHAPE).
 *     PARDIST = LITERAL (Read)
-*        The shape of the distribution from which clump parameter values are 
-*        chosen. Can be "Normal", "Uniform" or "Poisson". The distribution 
-*        for each clump parameter is specified by its own ADAM parameter 
-*        containing two values; the mean and the width of the distribution. 
-*        If PARDIST is "Normal", the width is the standard deviation. If 
-*        PARDIST is "Uniform", the width is half the range between the 
-*        maximum and minimum parameter values. In either of these two cases, 
-*        if a width of zero is supplied, the relevant parameter is given a 
+*        The shape of the distribution from which clump parameter values are
+*        chosen. Can be "Normal", "Uniform" or "Poisson". The distribution
+*        for each clump parameter is specified by its own ADAM parameter
+*        containing two values; the mean and the width of the distribution.
+*        If PARDIST is "Normal", the width is the standard deviation. If
+*        PARDIST is "Uniform", the width is half the range between the
+*        maximum and minimum parameter values. In either of these two cases,
+*        if a width of zero is supplied, the relevant parameter is given a
 *        constant value equal to the specified mean.  If PARDIST is
 *        "Poisson", the width is ignored. [current value]
 *     PEAK( 2 ) = _REAL (Read)
 *        Defines the distribution from which the peak value (above the
-*        local background) of each clump is chosen. See parameter PARDIST 
+*        local background) of each clump is chosen. See parameter PARDIST
 *        for additional information. [current value]
 *     RMS = _REAL (Read)
 *        The RMS (Gaussian) noise to be added to the output data. [current value]
@@ -180,64 +180,64 @@ void makeclumps( int *status ) {
 *        coverage of each clump in the output catalogue. It can be set to
 *        "None", "Polygon" or "Ellipse". If it is set to "None", the
 *        spatial shape of each clump is not recorded in the output
-*        catalogue. Otherwise, the catalogue will have an extra column 
-*        named "Shape" holding an STC-S description of the spatial coverage 
-*        of each clump. "STC-S" is a textual format developed by the IVOA 
+*        catalogue. Otherwise, the catalogue will have an extra column
+*        named "Shape" holding an STC-S description of the spatial coverage
+*        of each clump. "STC-S" is a textual format developed by the IVOA
 *        for describing regions within a WCS - see
 *        http://www.ivoa.net/Documents/latest/STC-S.html for details.
-*        These STC-S desriptions can be displayed by the KAPPA:LISTSHOW 
-*        command, or using GAIA. Since STC-S cannot describe regions within 
+*        These STC-S desriptions can be displayed by the KAPPA:LISTSHOW
+*        command, or using GAIA. Since STC-S cannot describe regions within
 *        a pixel array, it is necessary to provide an NDF to define the
-*        WCS (using parameter LIKE) if using this option. An error will be 
-*        reported if the WCS in the NDF does not contain a pair of celestial 
-*        sky axes. 
+*        WCS (using parameter LIKE) if using this option. An error will be
+*        reported if the WCS in the NDF does not contain a pair of celestial
+*        sky axes.
 *
-*        - Polygon: Each polygon will have, at most, 15 vertices. If the data 
+*        - Polygon: Each polygon will have, at most, 15 vertices. If the data
 *        is 2-dimensional, the polygon is a fit to the clump's outer boundary
-*        (the region containing all godo data values). If the data is 
+*        (the region containing all godo data values). If the data is
 *        3-dimensional, the spatial footprint of each clump is determined
-*        by rejecting the least significant 10% of spatial pixels, where 
-*        "significance" is measured by the number of spectral channels that 
+*        by rejecting the least significant 10% of spatial pixels, where
+*        "significance" is measured by the number of spectral channels that
 *        contribute to the spatial pixel. The polygon is then a fit to
 *        the outer boundary of the remaining spatial pixels.
 *
 *        - Ellipse: All data values in the clump are projected onto the
-*        spatial plane and "size" of the collapsed clump at four different 
-*        position angles - all separated by 45 degrees - is found (see the 
-*        OUTCAT parameter for a description of clump "size"). The ellipse 
-*        that generates the same sizes at the four position angles is then 
-*        found and used as the clump shape. 
+*        spatial plane and "size" of the collapsed clump at four different
+*        position angles - all separated by 45 degrees - is found (see the
+*        OUTCAT parameter for a description of clump "size"). The ellipse
+*        that generates the same sizes at the four position angles is then
+*        found and used as the clump shape.
 *
 *        In general, "Ellipse" will outline the brighter, inner regions
 *        of each clump, and "Polygon" will include the fainter outer
 *        regions. ["None"]
 *     TRUNC = _REAL (Read)
-*        The level (above the local background) at which clumps should be 
-*        truncated to zero, given as a fraction of the noise level specified 
+*        The level (above the local background) at which clumps should be
+*        truncated to zero, given as a fraction of the noise level specified
 *        by RMS. [current value]
 *     UBND() = _INTEGER (Read)
 *        The upper pixel bounds of the output NDF. The number of values
-*        supplied (1, 2 or 3) defines the number of pixel axes in the output 
-*        NDF (an error is reported if the number of values supplied for LBND 
-*        and UBND differ). If an NDF is supplied for parameter LIKE, the 
+*        supplied (1, 2 or 3) defines the number of pixel axes in the output
+*        NDF (an error is reported if the number of values supplied for LBND
+*        and UBND differ). If an NDF is supplied for parameter LIKE, the
 *        suggested defaults for this parameter will be the upper pixel
 *        bounds of the supplied NDF.
 *     VELFWHM = _REAL (Read)
-*        The FWHM of the Gaussian velocity resolution of the instrument, in 
-*        pixels. The generated clumps are smoothed on the velocity axis with 
+*        The FWHM of the Gaussian velocity resolution of the instrument, in
+*        pixels. The generated clumps are smoothed on the velocity axis with
 *        a Gaussian beam of this FWHM, before noise is added. No velocity
 *        smoothing is performed if VELFWHM is zero. [current value]
 *     VGRAD1( 2 ) = _REAL (Read)
-*        Defines the distribution from which the projection of the internal 
-*        velocity gradient vector onto pixel axis 1 of each clump is chosen. 
+*        Defines the distribution from which the projection of the internal
+*        velocity gradient vector onto pixel axis 1 of each clump is chosen.
 *        Values should be supplied in dimensionless units of "velocity
-*        pixels per spatial pixel". See parameter PARDIST for additional 
+*        pixels per spatial pixel". See parameter PARDIST for additional
 *        information. [current value]
 *     VGRAD2( 2 ) = _REAL (Read)
-*        Defines the distribution from which the projection of the internal 
-*        velocity gradient vector onto pixel axis 2 of each clump is chosen. 
+*        Defines the distribution from which the projection of the internal
+*        velocity gradient vector onto pixel axis 2 of each clump is chosen.
 *        Values should be supplied in dimensionless units of "velocity
-*        pixels per spatial pixel". See parameter PARDIST for additional 
+*        pixels per spatial pixel". See parameter PARDIST for additional
 *        information. [current value]
 
 *  Notes:
@@ -292,7 +292,7 @@ void makeclumps( int *status ) {
 *     {note_any_bugs_here}
 
 *-
-*/      
+*/
 
 /* Local Variables: */
    AstFrameSet *iwcs;            /* WCS FrameSet */
@@ -386,7 +386,7 @@ void makeclumps( int *status ) {
    ndfCreat( "OUT", "_REAL", ndim, lbnd, ubnd, &indf, status );
    ndfCreat( "MODEL", "_REAL", ndim, lbnd, ubnd, &indf2, status );
 
-/* If we have a WCS FrameSet, store it in the output NDFs and count the 
+/* If we have a WCS FrameSet, store it in the output NDFs and count the
    number of sky axes in the current Frame. */
    nskyax = 0;
    nspecax = 0;
@@ -420,7 +420,7 @@ void makeclumps( int *status ) {
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,  
+   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,
              status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
@@ -445,7 +445,7 @@ void makeclumps( int *status ) {
          msgSetc( "S", "s" );
          *status = SAI__ERROR;
          errRep( " ", "Cannot produce STC-S ^S: the current WCS frame in "
-                 "the input does not contain a pair of celestial sky axes.", 
+                 "the input does not contain a pair of celestial sky axes.",
                  status );
 
       }
@@ -457,8 +457,8 @@ void makeclumps( int *status ) {
 
 /* Get the other needed parameters. Which are needed depends on whether
    we are producing 1, 2 or 3 dimensional data. */
-   
-   parChoic( "PARDIST", "NORMAL", "NORMAL,UNIFORM,POISSON", 1, text, 8, 
+
+   parChoic( "PARDIST", "NORMAL", "NORMAL,UNIFORM,POISSON", 1, text, 8,
              status );
    if( !strcmp( text, "UNIFORM" ) ) {
       dist = 0;
@@ -605,12 +605,12 @@ void makeclumps( int *status ) {
          datSize( obj, &st, status );
          nc = (int) st;
       }
-      
+
    }
 
 /* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
-   cupidSumClumps( CUPID__FLOAT, NULL, ndim, lbnd, ubnd, nel, obj, 
+   cupidSumClumps( CUPID__FLOAT, NULL, ndim, lbnd, ubnd, nel, obj,
                    NULL, ipd2, "GAUSSCLUMPS", status );
 
 /* Add Gaussian noise to the data. */
@@ -635,7 +635,7 @@ void makeclumps( int *status ) {
    beamcorr[ 1 ] = beamfwhm;
    beamcorr[ 2 ] = velfwhm;
    cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, 1, ishape, 2,
-                     beamcorr, "Output from CUPID:MAKECLUMPS", 1, iwcs, 
+                     beamcorr, "Output from CUPID:MAKECLUMPS", 1, iwcs,
                      "", NULL, NULL, &nclumps, status );
 
 /* Relase the extension locator.*/
@@ -647,7 +647,7 @@ void makeclumps( int *status ) {
 /* End the AST context */
    astEnd;
 
-/* If an error has occurred, issue another error report identifying the 
+/* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
       errRep( "MAKECLUMPS_ERR", "MAKECLUMPS: Failed to create artifical "

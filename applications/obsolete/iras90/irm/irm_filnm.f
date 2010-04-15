@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
          END IF
 
       END DO
-      
+
  999  CONTINUE
 
       END

@@ -1,11 +1,11 @@
 *+CON_CHECK_WARN   Puts out warning message and gets reply
       CHARACTER*1 FUNCTION CON_CHECK_WARN(MESID,MESSAGE)
       IMPLICIT NONE
- 
+
 *  Input
       INTEGER MESID
       CHARACTER*(*) MESSAGE
- 
+
 *  Global Variables
       LOGICAL SMG
       COMMON /SMG_KEEP/ SMG
@@ -18,14 +18,14 @@
 *  Functions
       CHARACTER*1 MDH_GETC
       INTEGER MDH_ENDWORD
- 
+
       CHARACTER*29 MESE2/'R(eturn) to form, or A(ccept)'/
       INTEGER NCHAR
- 
+
 * _____________________________ Executable Code _______________________________
-  
+
       NCHAR = MDH_ENDWORD(MESSAGE)
- 
+
          CON_CHECK_WARN = MDH_GETC('Warning: '//MESSAGE(:NCHAR)//', R(eturn) to form, or A(ccept)','R')
 
       END

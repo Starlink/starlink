@@ -15,8 +15,8 @@
 *  Description:
 *     The first string is compared with the second using the ASCII
 *     character set, giving precedence to the left hand side of the
-*     string. If the first string is less than or equal to the second, 
-*     the value .TRUE. is returned; otherwise the value .FALSE. is 
+*     string. If the first string is less than or equal to the second,
+*     the value .TRUE. is returned; otherwise the value .FALSE. is
 *     returned.
 
 *  Arguments:
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,5 +117,5 @@
          IF ( SLEN1 .LE. SLEN2 ) CHR_SCOMP = .TRUE.
  20      CONTINUE
       END IF
-      
+
       END

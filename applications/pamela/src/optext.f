@@ -1,6 +1,6 @@
 *OPTEXT
 *
-* OPTEXT  -- Uses the fitted profile from PROFIT to optimally extract 
+* OPTEXT  -- Uses the fitted profile from PROFIT to optimally extract
 *            spectrum from the frame.
 *
 *
@@ -19,7 +19,7 @@
 *             profile. This will be subtracted off data before applying
 *             the balance factors.
 *
-*  REGION  -- Contains the sky/object region limits. 
+*  REGION  -- Contains the sky/object region limits.
 *
 *  SKY     -- Contains fits to the background sky in the region of
 *             the object.
@@ -51,7 +51,7 @@
 *            data you can get very close fits but still be several sigma out.
 *            EPS imposes a lower limit to the fractional deviation required
 *            for a point to be rejected.
-*  
+*
 *  IAVE   -- Number of sky pixels to average over in low count cases
 *
 *  PLOT   -- .TRUE. if you want to plot
@@ -82,12 +82,12 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE', 'READ',IMAGE, STATUS)
-C     
+C
 C     Open balance frame, identifier FLAT
-C     
+C
       CALL NDF_ASSOC('FLAT','READ',FLAT,STATUS)
 C
 C     Open dark frame
@@ -100,9 +100,9 @@ C
          CALL NDF_TEMP(PLACE, STATUS)
          CALL NDF_NEW('_REAL', NDIM, LBND, UBND, PLACE, DARK, STATUS)
       END IF
-C     
+C
 C     Get sky region input file, check its OK
-C     
+C
       CALL NDF_ASSOC('REGION','READ',REGION,STATUS)
       CALL NDF_ISBAS(REGION, BASE, STATUS)
       IF(STATUS.EQ.SAI__OK .AND. .NOT.BASE) THEN
@@ -110,17 +110,17 @@ C
          CALL ERR_REP(' ','Sky region file must be a base NDF'
      &        //' to allow computation of uncertainties.',STATUS)
       END IF
-C     
-      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.LEFT',LEFT,STATUS)      
-      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.RIGHT',RIGHT,STATUS)    
-      IF(STATUS.EQ.SAI__OK .AND. (LEFT.GT.RIGHT 
+C
+      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.LEFT',LEFT,STATUS)
+      CALL NDF_XGT0R(REGION,'PAMELA','REGPIC.RIGHT',RIGHT,STATUS)
+      IF(STATUS.EQ.SAI__OK .AND. (LEFT.GT.RIGHT
      &     .OR. LEFT.LE.0.)) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP(' ','Bad object limits', STATUS)
       END IF
       CALL NDF_BOUND(REGION, 1, SLO, SHI, NDIM, STATUS)
-      NS  = SHI - SLO + 1    
-C     
+      NS  = SHI - SLO + 1
+C
 C     Open sky file. Number of poly coefficients is used in
 C     uncertainty estimation.
 C
@@ -138,10 +138,10 @@ C
 C     Get track file
 C
       CALL GET_TRACK(YPOS, TOFF, STATUS)
-C     
+C
 C     There must be a reference Y position in the sky region file
-C     
-      CALL NDF_XGT0D(REGION,'PAMELA','REGPIC.YREF',YREF,STATUS)    
+C
+      CALL NDF_XGT0D(REGION,'PAMELA','REGPIC.YREF',YREF,STATUS)
 C
 C     Open fraction file
 C
@@ -153,7 +153,7 @@ C
       CALL NDF_PROP(SMALL,' ','SPECT',SPECT,STATUS)
       CALL NDF_RESET(SPECT,'Title',STATUS)
       CALL NDF_CPUT('OPTEXT output',SPECT,'Title',STATUS)
-C     
+C
 C     What region of frame
 C
       CALL NDF_ISBAS(IMAGE, IBASE, STATUS)
@@ -184,7 +184,7 @@ C
          YLO = LBND(2)
          YHI = UBND(2)
       END IF
-C 
+C
 C     compute minimal range in X to use
 C
       CALL XLIMS(.TRUE.,YREF,LEFT,RIGHT,YLO,YHI,XLO,XHI,STATUS)
@@ -192,7 +192,7 @@ C
       XHI = MIN(UBND(1), XHI)
 C
 C     Generate appropriate section NDFs
-C 
+C
       IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
      &     YLO.NE.LBND(2) .OR. YHI.NE.UBND(2)) THEN
          LBND(1) = XLO
@@ -226,10 +226,10 @@ C
       END IF
 C
 C     Section dimensions
-C     
+C
       NXS = UBND(1)-LBND(1)+1
       NYS = UBND(2)-LBND(2)+1
-C     
+C
 C     Noise characteristics
 C
       CALL PAR_GDR0R('READOUT',1.E-2,0.,1.E10,.FALSE.,READOUT,STATUS)
@@ -252,11 +252,11 @@ C
       CALL NDF_RESET(SPECT,'Data,Variance',STATUS)
       CALL NDF_SBND(1,YLO,YHI,SPECT,STATUS)
       CALL NDF_STYPE('_REAL',SPECT,'Data,Variance',STATUS)
-      CALL NDF_MAP(SPECT,'Data', '_REAL','WRITE',ODPTR,EL,STATUS)      
+      CALL NDF_MAP(SPECT,'Data', '_REAL','WRITE',ODPTR,EL,STATUS)
       CALL NDF_MAP(SPECT,'Variance','_REAL','WRITE',OVPTR,EL,STATUS)
       CALL NDF_CPUT('Counts',SPECT,'Units',STATUS)
 C
-C     Get space for variance matrix 
+C     Get space for variance matrix
 C
       CALL NDF_TEMP(PLACE, STATUS)
       NVARM   = NINT(RIGHT)-NINT(LEFT)+3
@@ -267,7 +267,7 @@ C
       CALL NDF_NEW('_REAL',2,LBND,UBND,PLACE,WORK,STATUS)
       CALL NDF_MAP(WORK,'Data','_REAL','WRITE',MPTR,EL,STATUS)
 C
-C     Map files 
+C     Map files
 C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
       CALL NDF_MAP(FLAT,'Data','_REAL','READ',FPTR,EL,STATUS)
@@ -278,11 +278,11 @@ C
 C
 C     Extract
 C
-      CALL OPT_EXT(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)), 
+      CALL OPT_EXT(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)),
      &     %VAL(CNF_PVAL(DPTR)), %VAL(CNF_PVAL(SPTR)),
-     &     %VAL(CNF_PVAL(FRPTR)), NXS, NYS, XLO, YLO, LEFT, RIGHT, 
-     &     YREF, READOUT, PHOTON, ZAPRATS, %VAL(CNF_PVAL(ODPTR)), 
-     &     %VAL(CNF_PVAL(OVPTR)), RATLO, RATHI,PLOT, SLO, NS, 
+     &     %VAL(CNF_PVAL(FRPTR)), NXS, NYS, XLO, YLO, LEFT, RIGHT,
+     &     YREF, READOUT, PHOTON, ZAPRATS, %VAL(CNF_PVAL(ODPTR)),
+     &     %VAL(CNF_PVAL(OVPTR)), RATLO, RATHI,PLOT, SLO, NS,
      &     %VAL(CNF_PVAL(RPTR)), NPOLY, %VAL(CNF_PVAL(MPTR)), NVARM,
      &     IAVE, CPOS, EPS, DEVICE, STATUS)
 C
@@ -298,14 +298,14 @@ C
 C
 C     Store position of centre of spectrum and extraction type
 C
-      CALL NDF_XPT0R(CPOS,SPECT,'PAMELA','CPOS',STATUS)      
+      CALL NDF_XPT0R(CPOS,SPECT,'PAMELA','CPOS',STATUS)
       CALL NDF_XPT0C('Tilted optimal',SPECT,'PAMELA','EXTRACTION',
      &     STATUS)
 C
 C     Copy components from sky and region files into output file
 C
       CALL NDF_XSTAT(SKY, 'PAMELA', THERE, STATUS)
-      IF(THERE) THEN 
+      IF(THERE) THEN
          CALL NDF_XLOC(SKY,'PAMELA', 'READ', LOCS, STATUS)
          CALL DAT_THERE(LOCS, 'SKYFIT', THERE, STATUS)
          IF(THERE) THEN
@@ -324,10 +324,10 @@ C
       CALL NDF_END(STATUS)
       RETURN
       END
-C      
+C
       SUBROUTINE OPT_EXT(DATA, FLAT, DARK, SKY, FRACT, NXS, NYS,
-     &     XLO, YLO, LEFT, RIGHT, YREF, READOUT, PHOTON, ZAPRATS, 
-     &     SPEC, SPECVAR, RATLO, RATHI, PLOT, SLO, NS, MASK, 
+     &     XLO, YLO, LEFT, RIGHT, YREF, READOUT, PHOTON, ZAPRATS,
+     &     SPEC, SPECVAR, RATLO, RATHI, PLOT, SLO, NS, MASK,
      &     NPSKY, VARMAT, NVARM, ISAVE, POS, EPS, DEVICE, STATUS)
 *
 * Written by T.R. Marsh, Feb 1989
@@ -377,15 +377,15 @@ C
 * I*4 XLO, YLO      -- Lower left corner of section
 *
 * R*4 LEFT, RIGHT   -- X-limits of extraction region as computed at Y = (1+NY)/2
-*                      at all other Y these will be shifted by an amount 
+*                      at all other Y these will be shifted by an amount
 *                      according to the fitted position of the spectrum given by
 *                      a track file
 *
 *
-* Noise model is readout noise plus photon noise with a scale factor 
+* Noise model is readout noise plus photon noise with a scale factor
 * to account for the number of photons per count. i.e.
 * Variance = READOUT**2 + DATA/PHOTON
-* 
+*
 *  R*4 READOUT      -- RMS readout noise (in data numbers)
 *
 *  R*4 PHOTON       -- Equivalent number of photons per data number
@@ -408,7 +408,7 @@ C
 *                      tell the program which pixels were used to estimate
 *                      the sky background.
 *
-*  I*4 NPSKY        -- Number of polynomial terms used for sky fit. 
+*  I*4 NPSKY        -- Number of polynomial terms used for sky fit.
 *
 *  R*4 VARMAT(NVARM, NVARM) where NVARM = INT(RIGHT)-NINT(LEFT)+3
 *                   -- Another workspace array.
@@ -425,11 +425,11 @@ C
 *  R*4 SPECVAR(NYS) variance estimates
 *  R*4 POS X position of trace at centre in dispersion direction
 *
-* The optimal extraction algorithm for CCD data is described 
-* in Horne(1986) PASP 98, 609.  
+* The optimal extraction algorithm for CCD data is described
+* in Horne(1986) PASP 98, 609.
 *
-* The optimal 1-D spectrum estimate is obtained by a weighted 
-* least squares fit of the seeing profile model to 2-D data 
+* The optimal 1-D spectrum estimate is obtained by a weighted
+* least squares fit of the seeing profile model to 2-D data
 * at each wavelength. For this routine, such a fit must already
 * have been done (e.g. see routine FRACFIT).
 *
@@ -438,7 +438,7 @@ C
 * estimates of variance may be incorrect.
 *
 * Cosmic ray hits and other detector defects near the spectrum
-* are eliminated by a sigma-clipping algorithm, or by approximate 
+* are eliminated by a sigma-clipping algorithm, or by approximate
 * poisson probability in case of low count rate.
 *
 *
@@ -448,7 +448,7 @@ C
       INTEGER NXS, NYS, STATUS, XLO, YLO, SLO, NS, MASK(NS), NPSKY
       INTEGER NVARM, ISAVE, IX, IY, IXLO, IXHI, NVAR, NRATS, NPLOT
       INTEGER IY2, NOK, IXMIN, IXMAX, ISUB, NLOOP, NREJT, ICYCLE
-      INTEGER I, J, K, I2, IREJL, IREJH, IX1, ID, IREJ 
+      INTEGER I, J, K, I2, IREJL, IREJH, IX1, ID, IREJ
       REAL RIGHT, LEFT, PFAC, CMIN, XSHIFT, VAL
       REAL SPEC(NYS), SPECVAR(NYS), SKAVE, X1, X2
       REAL DATA(NXS,NYS), SKY(NXS,NYS), FLAT(NXS,NYS)
@@ -469,7 +469,7 @@ C
       LOGICAL PLOT, MORE, ZAPRATS
       CHARACTER*8 WHAT
       CHARACTER*40 TITLE
-      CHARACTER*(*) DEVICE 
+      CHARACTER*(*) DEVICE
       INTEGER PGOPEN
       SAVE ALPHA, BETA
       DATA ALPHA,BETA/3.,2./
@@ -513,7 +513,7 @@ C
       CMIN = MAX(0., CMIN)
 C
 C     Compute sky fit covariance matrix
-C 
+C
       IXLO = NINT(LEFT)  - 1
       IXHI = NINT(RIGHT) + 1
       NVAR = IXHI - IXLO + 1
@@ -574,14 +574,14 @@ C
          END IF
          DO IY = 2, NYS
             IF(IY.GT.1+ISAVE/2) THEN
-               VAL = SSAVE(IY-ISAVE/2-1) 
+               VAL = SSAVE(IY-ISAVE/2-1)
                IF(VAL.NE.VAL__BADR) THEN
                   SUM = SUM - VAL
                   NOK = NOK - 1
                END IF
             END IF
             IF(IY.LE.NYS-ISAVE/2) THEN
-               VAL = SSAVE(IY+ISAVE/2) 
+               VAL = SSAVE(IY+ISAVE/2)
                IF(VAL.NE.VAL__BADR) THEN
                   SUM = SUM + SSAVE(IY+ISAVE/2)
                   NOK  = NOK + 1
@@ -619,8 +619,8 @@ C
             DO IX = IXMIN, IXMAX
                XPLOT(IX)  = REAL(IX+XLO-1)
                IF(DATA(IX,IY).NE.VAL__BADR .AND.
-     &              FLAT(IX,IY).NE.VAL__BADR .AND. 
-     &              DARK(IX,IY).NE.VAL__BADR .AND. 
+     &              FLAT(IX,IY).NE.VAL__BADR .AND.
+     &              DARK(IX,IY).NE.VAL__BADR .AND.
      &              SKY(IX,IY).NE.VAL__BADR) THEN
                   BAL  = FLAT(IX,IY)
                   SK   = SKY(IX,IY)+BAL*DARK(IX,IY)
@@ -644,25 +644,25 @@ C
                END IF
             END DO
             VNORM = VAR0+PFAC*MAX(0.,SKAVE)
-C     
+C
 C     initial estimate of the spectrum is a normal
 C     sum across the profile.
-C     
+C
             SPEC(IY) = REAL(SUM/WSUM)
-C     
+C
 C     loop to reject cosmic rays and saturated pixels
 C     Up to 8 pixels can be rejected, one at a time.
-C     
+C
             ISUB = NINT(REAL(IXLO-XLO+1)+XSHIFT) - 1
             IF(ZAPRATS) THEN
                NLOOP  = 8
                NREJT  = 0
                ICYCLE = 0
-C     
+C
 C     Initialise variables which will be used to correct
 C     for the correlation between the spectrum point and the
 C     particular data point (01/07/88)
-C     
+C
                WVSUM = 0.D0
                WSUM  = 0.D0
                SUMD2 = 0.D0
@@ -671,7 +671,7 @@ C
                      WSUM = WSUM + WEIGHT(IX)*PROF(IX)
                      STAR = SPEC(IY)*PROF(IX)
                      BAL  = BPLOT(IX)
-                     WVSUM = WVSUM + WEIGHT(IX)**2* 
+                     WVSUM = WVSUM + WEIGHT(IX)**2*
      &                    BAL*(BAL*VAR0+PFAC*ABS(STAR+SKAVE))
                      SUMD = 0.
                      IF(NPSKY.GT.0) THEN
@@ -686,9 +686,9 @@ C
                      END IF
                   END IF
                END DO
-C     
+C
                MORE = .TRUE.
-               DO WHILE(ICYCLE.LE.1 .OR. 
+               DO WHILE(ICYCLE.LE.1 .OR.
      &              (NREJT.LT.NLOOP.AND.MORE) )
                   ICYCLE = ICYCLE + 1
                   IREJL  = 0
@@ -696,12 +696,12 @@ C
                   IREJH  = 0
                   RMAXH  = -1.
                   DO IX = IXMIN, IXMAX
-C     
-C     Compute revised variance estimate using profile model 
+C
+C     Compute revised variance estimate using profile model
 C     Skip rejected pixels, find worst pixel. At least one
 C     extra run is forced to take advantage of the improved
 C     estimate of the spectrum, even if no pixel is rejected.
-C     
+C
                      IF(EPLOT(IX).GT.0.) THEN
                         STAR = SPEC(IY)*PROF(IX)
                         FPLOT(IX) = STAR
@@ -710,45 +710,45 @@ C
                         VAR = BAL*(BAL*VAR0
      &                       +MAX(ABS(SKAVE),ABS(STAR+SKAVE))/
      &                       PHOTON)
-C     
+C
                         VOLD = EPLOT(IX)**2
                         EPLOT(IX) = SQRT(VAR)
-C     
+C
 C     A correction is made before calling CHANCE to account for
 C     correlation between the estimated spectrum and the
 C     data value. This increases the chance of rejection on
-C     data points with high weights which was too low before. 
+C     data points with high weights which was too low before.
 C     Approximate decrease in VAR by (1-f*f/Sum of f*f) where f
 C     is the profile factor.
 C     (01/07/88 TRM)
-C     
+C
                         VAR = REAL(VOLD*(1.-2.*WEIGHT(IX)*PROF(IX)/
      &                       WSUM)+(WVSUM+SUMD2*VNORM)*
      &                       (PROF(IX)/WSUM)**2)
-C     
+C
 C     Avoid crashes in zero photon case by pretending that
 C     there is 0.2 of a photon. This will be a bad approximation
 C     if there are very many such instances since then the
-C     chance of even 0.1 photons may be small. 
-C     
+C     chance of even 0.1 photons may be small.
+C
                         VAR = SQRT(MAX(0.2, VAR))
-C     
+C
 C     A floor to var is added for the test on the assumption that
 C     the fractional flux is at best accurate to EPS
 C     This reduces the chances of silly rejections when the smooth
 C     model is imperfect as can happen due to imperfection of CCD
 C     Purely empirical
-C     
+C
                         VT = MAX(VAR, EPS*FPLOT(IX))
-C     
+C
 C     Now test point
 C
                         RATIO = CHANCE(YPLOT(IX),FPLOT(IX),VT,
      &                       RATLO, RATHI)
-C     
+C
 C     RATIO = -1 shows that the point is OK. >0 shows that
-C     it has -LOG(Prob) of being so bad. 
-C     
+C     it has -LOG(Prob) of being so bad.
+C
                         IF(RATIO.GT.-0.5) THEN
                            IF(YPLOT(IX).GT.FPLOT(IX)) THEN
                               IF(RATIO.GT.RMAXH) THEN
@@ -765,9 +765,9 @@ C
                            END IF
                         END IF
                      ELSE
-C     
+C
 C     Recompute values for plot purposes
-C     
+C
                         STAR = SPEC(IY)*PROF(IX)
                         FPLOT(IX) = STAR
                         STAR = MAX(PFAC*PROF(IX),STAR)
@@ -780,9 +780,9 @@ C
                         END IF
                      END IF
                   END DO
-C     
+C
 C     Reject worst outlier
-C     
+C
                   IF(IREJH.GT.0 .OR. IREJL.GT.0) THEN
                      NREJT = NREJT + 1
                      IF(IREJH.GT.0) THEN
@@ -803,15 +803,15 @@ C
                      CALL MSG_OUT(' ',
      &                    'Rejected ^OUT sigma outlier'//
      &                    ' at X = ^IREJ, Y = ^IY',STATUS)
-C     
+C
                      MORE = .TRUE.
                   ELSE
                      MORE = .FALSE.
                   END IF
-C     
+C
 C     Load optimal weights, with appropriate reduced weight for
 C     partial pixels to ensure smooth behaviour with wavelength
-C     
+C
                   DO IX = IXMIN, IXMAX
                      IF(EPLOT(IX).GT.0.) THEN
                         A1 = REAL(IX)+0.5-X1
@@ -820,7 +820,7 @@ C
                         WEIGHT(IX) = QF*PROF(IX)/EPLOT(IX)**2
                      END IF
                   END DO
-C     
+C
                   SUM   = 0.D0
                   WSUM  = 0.D0
                   SUMD2 = 0.D0
@@ -843,9 +843,9 @@ C
                         END IF
                      END IF
                   END DO
-C     
+C
 C     stow optimal spectrum and its standard deviation
-C     
+C
                   IF(WSUM.GT.0.) THEN
                      SPEC(IY)    = REAL(SUM/WSUM)
                      SPECVAR(IY) = REAL((WVSUM+SUMD2*VNORM)/WSUM**2)
@@ -859,15 +859,15 @@ C
                END DO
                NRATS = NRATS + NREJT
             ELSE
-C     
+C
 C     If not cosmic ray zapping, just give
 C     normal weighted estimate, with an
 C     extra loop to refine the variances.
-C     
+C
                DO J = 1, 2
-C     
-C     Load optimal weights 
-C     
+C
+C     Load optimal weights
+C
                   DO IX = IXMIN, IXMAX
                      IF(YPLOT(IX).NE.VAL__BADR) THEN
                         A1 = REAL(IX)+0.5-X1
@@ -877,7 +877,7 @@ C
                      END IF
                   END DO
                   VNORM = VAR0+PFAC*MAX(0.,SKAVE)
-C     
+C
                   SUM   = 0.D0
                   WSUM  = 0.D0
                   SUMD2 = 0.D0
@@ -900,9 +900,9 @@ C
                         END IF
                      END IF
                   END DO
-C     
+C
 C     stow optimal spectrum and its standard deviation
-C     
+C
                   IF(WSUM.GT.0.) THEN
                      SPEC(IY)    = REAL(SUM/WSUM)
                      SPECVAR(IY) = REAL((WVSUM+SUMD2*VNORM)/WSUM**2)
@@ -913,7 +913,7 @@ C
                      CALL MSG_OUT(' ',
      &                    'Rejected whole of row ^IY',STATUS)
                   END IF
-C     
+C
                   IF(J.LT.2) THEN
                      DO IX = IXMIN, IXMAX
                         IF(YPLOT(IX).NE.VAL__BADR) THEN
@@ -928,21 +928,21 @@ C
                   END IF
                END DO
             END IF
-C     
+C
 C     Code to plot seeing profile with cosmic rat
-C     
-            IF(SPEC(IY).NE.VAL__BADR .AND. PLOT .AND. 
+C
+            IF(SPEC(IY).NE.VAL__BADR .AND. PLOT .AND.
      &           NREJT.GT.0) THEN
  100           WRITE(*,'(A,$)') 'Plot rejected point profile ? [N] '
                READ(*,'(A)') WHAT
                CALL UPPER_CASE(WHAT)
                IF(WHAT.NE.' '.AND. WHAT.NE.'N'.AND.WHAT.NE.'Y') GOTO 100
                IF(WHAT.EQ.'Y') THEN
-C     
+C
                   WRITE(TITLE,'(''ROW'',I4,3X)') IY+YLO-1
                   ID = PGOPEN(DEVICE)
                   IF(ID.GT.0) THEN
-C     
+C
                      YMIN =  1.E20
                      YMAX = -1.E20
                      DO I = 1, NXS
@@ -960,32 +960,32 @@ C
                      CALL PGENV(XMN, XMX, YMIN, YMAX, 0, 1)
                      CALL PGSCI(7)
                      CALL PGLAB('X-column', 'Profile', TITLE)
-C     
+C
                      DO IX = IXMIN, IXMAX
                         IF(EPLOT(IX).GT.0.) THEN
                            CALL PGSCI(3)
                            CALL PGMOVE(XPLOT(IX),YPLOT(IX)-EPLOT(IX))
                            CALL PGDRAW(XPLOT(IX),YPLOT(IX)+EPLOT(IX))
-                           CALL PGSCI(1)   
+                           CALL PGSCI(1)
                            CALL PGPT(1,XPLOT(IX), YPLOT(IX), 5 )
                         ELSE IF(YPLOT(I).EQ.VAL__BADR) THEN
-                           CALL PGSCI(2)   
+                           CALL PGSCI(2)
                            CALL PGPT(1,XPLOT(I),0.,5)
                         ELSE
-                           CALL PGSCI(2)   
+                           CALL PGSCI(2)
                            CALL PGMOVE(XPLOT(IX),YPLOT(IX)-EPLOT(IX))
                            CALL PGDRAW(XPLOT(IX),YPLOT(IX)+EPLOT(IX))
                            CALL PGPT( 1, XPLOT(IX), YPLOT(IX), 4 )
                         END IF
                      END DO
-C     
+C
                      RSCALE = (SPEC(IY)+SQRT(SPECVAR(IY)))/SPEC(IY)
                      DO IX=IXMIN, IXMAX
                         FPLOT(IX) = RSCALE*FPLOT(IX)
                      END DO
                      CALL PGSCI(7)
                      CALL PGLINE(NPLOT,XPLOT(IXMIN),FPLOT(IXMIN))
-C     
+C
                      RSCALE = RSCALE*RSCALE
                      DO IX=IXMIN,IXMAX
                         FPLOT(IX) = FPLOT(IX)/RSCALE

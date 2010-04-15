@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAT_EGT0B (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -18,10 +18,10 @@
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -33,7 +33,7 @@
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -226,7 +226,7 @@ C2003 format(1x, 'EGT0B on exit: ', I10 )
 *  Invocation:
 *     CALL CAT_EGT0C (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -235,10 +235,10 @@ C2003 format(1x, 'EGT0B on exit: ', I10 )
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -250,7 +250,7 @@ C2003 format(1x, 'EGT0B on exit: ', I10 )
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.
@@ -427,7 +427,7 @@ C2003 format(1x, 'EGT0C on exit: ', I10 )
 *  Invocation:
 *     CALL CAT_EGT0D (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -436,10 +436,10 @@ C2003 format(1x, 'EGT0C on exit: ', I10 )
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -451,7 +451,7 @@ C2003 format(1x, 'EGT0C on exit: ', I10 )
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.
@@ -628,7 +628,7 @@ C2003 format(1x, 'EGT0D on exit: ', I10 )
 *  Invocation:
 *     CALL CAT_EGT0I (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -637,10 +637,10 @@ C2003 format(1x, 'EGT0D on exit: ', I10 )
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -652,7 +652,7 @@ C2003 format(1x, 'EGT0D on exit: ', I10 )
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.
@@ -829,7 +829,7 @@ C2003 format(1x, 'EGT0I on exit: ', I10 )
 *  Invocation:
 *     CALL CAT_EGT0L (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -838,10 +838,10 @@ C2003 format(1x, 'EGT0I on exit: ', I10 )
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -853,7 +853,7 @@ C2003 format(1x, 'EGT0I on exit: ', I10 )
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.
@@ -1030,7 +1030,7 @@ C2003 format(1x, 'EGT0L on exit: ', I10 )
 *  Invocation:
 *     CALL CAT_EGT0R (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1039,10 +1039,10 @@ C2003 format(1x, 'EGT0L on exit: ', I10 )
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -1054,7 +1054,7 @@ C2003 format(1x, 'EGT0L on exit: ', I10 )
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.
@@ -1231,7 +1231,7 @@ C2003 format(1x, 'EGT0R on exit: ', I10 )
 *  Invocation:
 *     CALL CAT_EGT0W (GI; VALUE, NULFLG; STATUS)
 *  Description:
-*     Get the value of a scalar expression, evaluated from the current 
+*     Get the value of a scalar expression, evaluated from the current
 *     row buffer, field or parameter.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1240,10 +1240,10 @@ C2003 format(1x, 'EGT0R on exit: ', I10 )
 *        Value to which the expression evaluates for the current row
 *        buffer.
 *     NULFLG  =  LOGICAL (Returned)
-*        A flag indicating whether or not the expression evaluates to 
+*        A flag indicating whether or not the expression evaluates to
 *        the null value or not:
 *        .TRUE.  - The expression is null,
-*        .FALSE. - The expression is not null; a genuine value is 
+*        .FALSE. - The expression is not null; a genuine value is
 *                  available.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -1255,7 +1255,7 @@ C2003 format(1x, 'EGT0R on exit: ', I10 )
 *       Attempt to get the value of the field for the column in the
 *       current row.
 *     else if the identifier is a vector column element then
-*       Attempt to get the value of the element for the vector column 
+*       Attempt to get the value of the element for the vector column
 *       in the current row.
 *     else if the identifier is an expression then
 *       Attempt to evaluate the expression for the current row.

@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2009 Science and Technology Facilities Council.}
 
 % Variable part - replace [xxx] as appropriate.
@@ -24,7 +24,7 @@
 \newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
-This document describes the routines provided within the LPG subroutine 
+This document describes the routines provided within the LPG subroutine
 library for looping of monolith tasks to process a group of catalogues or NDFs
 in sequence.
 }
@@ -86,7 +86,7 @@ in sequence.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -213,10 +213,10 @@ in sequence.
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -292,8 +292,8 @@ in sequence.
 % Frame attributes fount.  Need to find a way for these to stand out.
 % San serif doesn't work by default.  Also without the \rm the
 % san serif continues after \sstatt hyperlinks.  Extra braces
-% failed to prevent \sstattribute from using roman fount for its 
-% headings.  The current lash up appears to work, but needs further 
+% failed to prevent \sstattribute from using roman fount for its
+% headings.  The current lash up appears to work, but needs further
 % investigation or a TeX wizard.
 \newcommand{\sstatt}[1]{\sf #1}
 \begin{htmlonly}
@@ -360,7 +360,7 @@ in sequence.
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -624,12 +624,12 @@ in sequence.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -689,7 +689,7 @@ what LPG offers.  The group or list is supplied to the relevant ADAM
 parameter, possibly defined using wildcards.  Using LPG enhances your
 application package to users.
 
-Note the r\^{o}le of LPG is different from \xref{NDG}{sun2}{} or 
+Note the r\^{o}le of LPG is different from \xref{NDG}{sun2}{} or
 \xref{CTG}{sun262}{} libraries.  While these supply groups of NDFs and
 catalogues, again with wildcards (via the underlying
 \xref{GRP}{sun150}{} library) these are processed in the \emph{same
@@ -699,8 +699,8 @@ a flat field from a series of CCD image NDFs, and merging catalogues.
 \section {Interaction Between LPG and GRP}
 
 LPG uses the facilities of the \xref{GRP}{sun150}{} package and
-programmers incorporating LPG should be familiar with the content of 
-\xref{SUN/150}{sun150}{} which describes the GRP package.  
+programmers incorporating LPG should be familiar with the content of
+\xref{SUN/150}{sun150}{} which describes the GRP package.
 Examples of the GRP wildcards and indirection through text files
 are presented in \xref{SUN/95}{sun95}{se_multinvoc}, and in addition
 advice for users.
@@ -722,7 +722,7 @@ shown below.
 \begin{verbatim}
 *  External References:
       LOGICAL LPG_AGAIN           ! Invoke the application again?
-      
+
            :           :           :           :           :
 
 *  Obtain the command from the environment.  This returns uppercase
@@ -772,7 +772,7 @@ each invocation.  Single-valued parameters are not shown.  Set
 
 \item
 A pause of DELAY seconds occurs betwen invocations for each NDF or
-catalogue.  
+catalogue.
 
 \item
 DISAB set to {\tt .TRUE.} disables the looping.  Thus LPG\_AGAIN
@@ -826,19 +826,19 @@ value, any value for this switch to be enabled.
 
 The applications should use the routines \htmlref{LPG\_ASSOC}{LPG_ASSOC},
 \htmlref{LPG\_PROP}{LPG_PROP}, \htmlref{LPG\_CREAT}{LPG\_CREAT},
-and \latex{\linebreak}\htmlref{LPG\_CREP}{LPG_CREP} to get identifier for NDFs, in 
+and \latex{\linebreak}\htmlref{LPG\_CREP}{LPG_CREP} to get identifier for NDFs, in
 place of the corresponding routines (\emph{i.e.} replace LPG with NDF in
-the names) from the \xref{NDF library}{sun33}{}. 
+the names) from the \xref{NDF library}{sun33}{}.
 
-For catalogues, routines \htmlref{LPG\_CATASSOC}{LPG_CATASSOC} and 
+For catalogues, routines \htmlref{LPG\_CATASSOC}{LPG_CATASSOC} and
 \htmlref{LPG\_CATCREAT}{LPG_CATCREAT} should be
-used in place of \xref{CAT\_ASSOC}{sun181}{CAT_ASSOC} and 
+used in place of \xref{CAT\_ASSOC}{sun181}{CAT_ASSOC} and
 \xref{CAT\_CREAT}{sun181}{CAT_CREAT}.
 
-On the first invocation of the application, groups of data files are 
-obtained whenever one of the above LPG routines is used to get an NDF 
-or CAT identifier, and an identifier corresponding to the first name in 
-each group is returned to the application.  On subsequent invocations, 
+On the first invocation of the application, groups of data files are
+obtained whenever one of the above LPG routines is used to get an NDF
+or CAT identifier, and an identifier corresponding to the first name in
+each group is returned to the application.  On subsequent invocations,
 the names in the groups obtained during the first invocation are used
 without obtaining new parameter values from the environment.  The
 index of the returned data file within each group is incremented by 1
@@ -874,13 +874,13 @@ that was previously defaulted.
 Some applications test to see if a parameter was specified on the
 command line, and vary their behaviour accordingly.  This is achieved
 by checking the state of the parameter before accessing it, a state of
-{\tt PAR\_\_ACTIVE} (or {\tt SUBPAR\_\_ACTIVE}) indicating that the 
+{\tt PAR\_\_ACTIVE} (or {\tt SUBPAR\_\_ACTIVE}) indicating that the
 parameter already has a value.  This is correct on the first
-invocation, but not on subsequent invocations because the first 
+invocation, but not on subsequent invocations because the first
 invocation may have set a parameter value, resulting in subsequent
-invocations thinking that the parameter was given on the command 
+invocations thinking that the parameter was given on the command
 line.  To avoid this, applications should call
-\htmlref{LPG\_STATE}{LPG_STATE} in place of 
+\htmlref{LPG\_STATE}{LPG_STATE} in place of
 \xref{PAR\_STATE}{sun114}{PAR_STATE}.  LPG\_STATE remembers the state of
 the parameter on the first invocation, and returns that state, rather
 than the current parameter state, on subsequent invocations.  The
@@ -1006,13 +1006,13 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       }}
 
       The application corresponding to the required action will always be
-      invoked once.  The applications should use the routines 
-      \htmlref{LPG\_ASSOC}{LPG_ASSOC}, \htmlref{LPG\_PROP}{LPG_PROP}, 
-      \htmlref{LPG\_CREAT}{LPG_CREAT} and \htmlref{LPG\_CREP}{LPG_CREP} to get 
-      identifiers for NDFs, in place of their equivalent routines from the 
-      NDF library.  
-      
-      For catalogues, routines \htmlref{LPG\_CATASSOC}{LPG_CATASSOC} and 
+      invoked once.  The applications should use the routines
+      \htmlref{LPG\_ASSOC}{LPG_ASSOC}, \htmlref{LPG\_PROP}{LPG_PROP},
+      \htmlref{LPG\_CREAT}{LPG_CREAT} and \htmlref{LPG\_CREP}{LPG_CREP} to get
+      identifiers for NDFs, in place of their equivalent routines from the
+      NDF library.
+
+      For catalogues, routines \htmlref{LPG\_CATASSOC}{LPG_CATASSOC} and
       \htmlref{LPG\_CATCREAT}{LPG_CATCREAT} should be used in place of
       \xref{CAT\_ASSOC}{sun181}{CAT_ASSOC} and
       \xref{CAT\_CREAT}{sun181}{CAT_CREAT}.
@@ -1091,7 +1091,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Obtain an identifier for an existing NDF via the parameter system
 }{
    \sstdescription{
-      This routine should be called in place of \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} 
+      This routine should be called in place of \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC}
       within applications that process groups of NDFs.
 
       On the first invocation of the application, a group of names of
@@ -1099,13 +1099,13 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       specified parameter, and an NDF identifier for the first one
       will be returned. If more than one NDF was supplied for the
       parameter then the application may be invoked again (see
-      \htmlref{LPG\_AGAIN}{LPG_AGAIN}), in which case this routine will 
-      return an identifier for the next NDF in the group supplied on 
+      \htmlref{LPG\_AGAIN}{LPG_AGAIN}), in which case this routine will
+      return an identifier for the next NDF in the group supplied on
       the first invocation.
 
       If an application attempts to get a new NDF by cancelling the
-      parameter (\xref{PAR\_CANCL}{sun114}{PAR_CANCL}), the returned NDF 
-      is {\em NOT} the next one in the group, but is obtained by prompting 
+      parameter (\xref{PAR\_CANCL}{sun114}{PAR_CANCL}), the returned NDF
+      is {\em NOT} the next one in the group, but is obtained by prompting
       the user for a single NDF.
 
       The monolith routine should arrange to invoke the application
@@ -1144,7 +1144,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Obtain an identifier for an existing catalogue via the parameter system
 }{
    \sstdescription{
-      This routine should be called in place of \xref{CAT\_ASSOC}{sun181}{CAT_ASSOC} 
+      This routine should be called in place of \xref{CAT\_ASSOC}{sun181}{CAT_ASSOC}
       within applications that process groups of catalogues.
 
       On the first invocation of the application, a group of names of
@@ -1152,8 +1152,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       specified parameter, and a CAT identifier for the first one
       will be returned. If more than one catalogue was supplied for the
       parameter then the application may be invoked again (see
-      \htmlref{LPG\_AGAIN}{LPG\_AGAIN}), in which case this routine will 
-      return an identifier for the next catalogue in the group supplied 
+      \htmlref{LPG\_AGAIN}{LPG\_AGAIN}), in which case this routine will
+      return an identifier for the next catalogue in the group supplied
       on the first invocation.
 
       If an application attempts to get a new catalogue by cancelling the
@@ -1253,8 +1253,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
 }{
    \sstdescription{
       This routine is equivalent to \xref{NDF\_CREAT}{sun33}{NDF_CREAT}
-      except that it allows the NDF to be specified using a 
-      \xref{GRP}{sun150}{} group expression (for instance, its name may 
+      except that it allows the NDF to be specified using a
+      \xref{GRP}{sun150}{} group expression (for instance, its name may
       be given within a text file, \emph{etc.}). The first NDF in the
       group expression is returned. Any other names in the group
       expression are ignored. Any modification elements in the supplied
@@ -1313,8 +1313,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Create a new simple NDF via the parameter system
 }{
    \sstdescription{
-      This routine should be called in place of 
-      \xref{NDF\_CREAT}{sun33}{NDF_CREAT} within applications which 
+      This routine should be called in place of
+      \xref{NDF\_CREAT}{sun33}{NDF_CREAT} within applications which
       process lists of NDFs.
 
       On the first invocation of the application, a group of names for
@@ -1322,7 +1322,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       specified parameter. The first name will be used to create an NDF
       with the requested attributes, and an identifier for the new NDF
       will be returned. If more than one name was supplied for the
-      parameter then the application may be invoked again (see 
+      parameter then the application may be invoked again (see
       \htmlref{LPG\_AGAIN}{LPG_AGAIN}), in which case this routine will
       return an identifier for a new NDF with the next name in the group
       supplied on the first invocation.
@@ -1390,8 +1390,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Create a single new primitive NDF using a specified parameter
 }{
    \sstdescription{
-      This routine is equivalent to \xref{NDF\_CREP}{sun33}{NDF_CREP} except 
-      that it allows the NDF to be specified using a 
+      This routine is equivalent to \xref{NDF\_CREP}{sun33}{NDF_CREP} except
+      that it allows the NDF to be specified using a
       \xref{GRP}{sun150}{} group expression (for instance, its
       name may be given within a text file, \emph{etc.}). The first NDF in the
       group expression is returned. Any other names in the group
@@ -1542,9 +1542,9 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
          A comma-separated list of the NDF components which are to be
          propagated to the new data structure. By default, the HISTORY,
          LABEL and TITLE components and all extensions are propagated.
-         See \latex{the} \xref{{\tt "}Component 
-         Propagation{\tt "}}{sun33}{ndf_prop_component_propagation} 
-         \latex{section in the documentation for routine NDF\_PROP within 
+         See \latex{the} \xref{{\tt "}Component
+         Propagation{\tt "}}{sun33}{ndf_prop_component_propagation}
+         \latex{section in the documentation for routine NDF\_PROP within
          SUN/33} for further details.
       }
       \sstsubsection{
@@ -1621,9 +1621,9 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
          A comma-separated list of the NDF components which are to be
          propagated to the new data structure. By default, the HISTORY,
          LABEL and TITLE components and all extensions are propagated.
-         See \latex{the} \xref{{\tt "}Component 
-         Propagation{\tt "}}{sun33}{ndf_prop_component_propagation} 
-         \latex{section in the documentation for routine NDF\_PROP within 
+         See \latex{the} \xref{{\tt "}Component
+         Propagation{\tt "}}{sun33}{ndf_prop_component_propagation}
+         \latex{section in the documentation for routine NDF\_PROP within
          SUN/33} for further details.
       }
       \sstsubsection{
@@ -1680,7 +1680,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Initialise the contents of the LPG common blocks
 }{
    \sstdescription{
-      Initialises the global variables used by LPG. See 
+      Initialises the global variables used by LPG. See
       \htmlref{LPG\_AGAIN}{LPG_AGAIN}.
    }
    \sstinvocation{
@@ -1707,13 +1707,13 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       \sstsubsection{
          DISABO = LOGICAL (Given)
       }{
-         If {\tt .TRUE.}, the looping facilities are disabled. LPG\_AGAIN 
-         returns {\tt .TRUE.} only on the first invocation, and 
+         If {\tt .TRUE.}, the looping facilities are disabled. LPG\_AGAIN
+         returns {\tt .TRUE.} only on the first invocation, and
          \htmlref{LPG\_ASSOC}{LPG_ASSOC}, \htmlref{LPG\_CREAT}{LPG_CREAT},
-         \htmlref{LPG\_PROP}{LPG_PROP}, \htmlref{LPG\_CREP}{LPG_CREP}, 
-         \htmlref{LPG\_CATASSOC}{LPG_CATASSOC} and 
+         \htmlref{LPG\_PROP}{LPG_PROP}, \htmlref{LPG\_CREP}{LPG_CREP},
+         \htmlref{LPG\_CATASSOC}{LPG_CATASSOC} and
          \htmlref{LPG\_CATCREAT}{LPG_CATCREAT} make simple
-         calls to the corresponding \xref{NDF}{sun33}{} or 
+         calls to the corresponding \xref{NDF}{sun33}{} or
          \xref{CAT}{sun181}{} routine.
       }
       \sstsubsection{

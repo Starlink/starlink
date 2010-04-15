@@ -1,11 +1,11 @@
       SUBROUTINE CHI_HGETCOL( CATNO, FNAME, COLNO, TYPE, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR' 
+      INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
       INCLUDE 'CMP_ERR'
       INCLUDE 'CHI_PAR'          ! CHI constants
@@ -64,9 +64,9 @@
           ENDIF
 
           MODE = CHIH_MODE( 1, CATNO)
-          CALL DAT_NAME(CHIH_COLLOC( COLNO, CATNO), NAME, 
+          CALL DAT_NAME(CHIH_COLLOC( COLNO, CATNO), NAME,
      :                                               STATUS)
-          CALL DAT_TYPE(CHIH_COLLOC( COLNO, CATNO), HTYPE, 
+          CALL DAT_TYPE(CHIH_COLLOC( COLNO, CATNO), HTYPE,
      :                                               STATUS)
 
 *  Map other data types as INTEGER - HDS will convert
@@ -78,24 +78,24 @@
               HTYPE = '_INTEGER'
           ENDIF
 
-          CALL DAT_FIND( CHIH_COLLOC( COLNO, CATNO), 
+          CALL DAT_FIND( CHIH_COLLOC( COLNO, CATNO),
      :                   'DATA', CHIH_COLDLOC( COLNO, CATNO), STATUS)
-          CALL DAT_TYPE( CHIH_COLDLOC( COLNO, CATNO), 
+          CALL DAT_TYPE( CHIH_COLDLOC( COLNO, CATNO),
      :                                               HTYPE, STATUS)
-          CALL DAT_FIND( CHIH_COLLOC( COLNO, CATNO), 
+          CALL DAT_FIND( CHIH_COLLOC( COLNO, CATNO),
      :             'NULLFLAGS', CHIH_COLNLOC( COLNO, CATNO), STATUS)
 *
 *  Map the SLICE
 *
           CALL DAT_SLICE( CHIH_COLDLOC( COLNO, CATNO), 1,
-     :     CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO), 
+     :     CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO),
      :     CHIH_SLICELOC( COLNO, CATNO), STATUS)
           CALL DAT_MAP( CHIH_SLICELOC( COLNO, CATNO), HTYPE,
      :                               CHIH_CHNAM(MODE), 1,
      :     CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, DPT, STATUS)
 
           CALL DAT_SLICE( CHIH_COLNLOC( COLNO, CATNO), 1,
-     :     CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO), 
+     :     CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO),
      :     CHIH_SLICENLOC( COLNO, CATNO), STATUS)
           CALL DAT_MAP( CHIH_SLICENLOC( COLNO, CATNO), '_LOGICAL',
      :                               CHIH_CHNAM(MODE), 1,

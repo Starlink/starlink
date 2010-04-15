@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 /* Package definitions */
 
 # include    "device.dep"
-# include    "kwm.h"             
+# include    "kwm.h"
 # include    "idi.h"
 # include    "idi_err.h"
 # include    "idistruct_e.h"
@@ -296,7 +296,7 @@ iy = npixel / mem->x_wdim;         /* no. of rows to write */
 
 /* check input image dimension */
 
-if (y0 +iy > mem->y_size) 
+if (y0 +iy > mem->y_size)
    {
    iimerr = IMGTOOBIG;
    return(iimerr);
@@ -304,7 +304,7 @@ if (y0 +iy > mem->y_size)
 
 /* check data depth against memory depth */
 
-if (depth > mem->depth) 
+if (depth > mem->depth)
    {
    iimerr = DEPTHERR;
    dd = depth - mem->depth;        /* no. of bits to truncate */
@@ -312,7 +312,7 @@ if (depth > mem->depth)
 else
    dd = 0;
 
-wr_mem (display , memid , x0 , y0 , packf , iy , dd , depth , npixel , data); 
+wr_mem (display , memid , x0 , y0 , packf , iy , dd , depth , npixel , data);
 
 mem->mem_free = 0;
 
@@ -408,7 +408,7 @@ if (iy == 0)
 
 /* check image dimension */
 
-if (y0 + iy > mem->y_size) 
+if (y0 + iy > mem->y_size)
    {
    iimerr = IMGTOOBIG;
    return(iimerr);
@@ -416,7 +416,7 @@ if (y0 + iy > mem->y_size)
 
 /* check data depth against memory depth */
 
-if (depth > mem->depth) 
+if (depth > mem->depth)
    {
    iimerr = DEPTHERR;
    dd = depth - mem->depth;          /* no. of bits to truncate */
@@ -544,7 +544,7 @@ for (i = 0; i < nmem; i++)
             ival[2] = ival[1] + mem->x_scroll + device[display].x_scroll;
             ival[3] = ival[0] - mem->x_scroll - device[display].x_scroll;
             mem->x_v_size = idi__min (ival , 4);
-   
+
             ival[0] = device[display].dev_ysiz;
             ival[1] = mem->y_size;
             ival[2] = ival[1] + mem->y_scroll + device[display].y_scroll;
@@ -557,11 +557,11 @@ for (i = 0; i < nmem; i++)
                continue;
 
                                 /* Compute offsets of visible memory  */
-                                /* (relative to memory origin)        */ 
-   
+                                /* (relative to memory origin)        */
+
             mem->x_v_off = -(mem->x_scroll + device[display].x_scroll);
             mem->y_v_off = -(mem->y_scroll + device[display].y_scroll);
-   
+
 /* Refresh image into pixmap */
             if ((mem->type & II_IMAGE) > 0)
                imagrefr_p( display, curmem );
@@ -610,7 +610,7 @@ for (i = 0; i < nmem; i++)
                         /* ROI has priority over memory position */
 
             for (k = 0; k < device[display].n_roi; k++)
-               {            
+               {
                if (device[display].roi[k]->vis == 1)
                   {
                   roi = device[display].roi[k];
@@ -618,9 +618,9 @@ for (i = 0; i < nmem; i++)
                      {
                      /* ROI associated to display */
 
-                     dis_mem_conv (display , curmem , roi->x_min , 
+                     dis_mem_conv (display , curmem , roi->x_min ,
                                    roi->y_min , &x_min , &y_min);
-                     dis_mem_conv (display , curmem , roi->x_max , 
+                     dis_mem_conv (display , curmem , roi->x_max ,
                                    roi->y_max , &x_max , &y_max);
 
                      xc0 = (x_min + (x_max - x_min) / 2) * zoom;
@@ -634,9 +634,9 @@ for (i = 0; i < nmem; i++)
                      {
                      /* ROI associated to memory */
 
-                     mem_dis_conv (display , curmem , roi->x_min , roi->y_min , 
+                     mem_dis_conv (display , curmem , roi->x_min , roi->y_min ,
                                    &x_min , &y_min);
-                     mem_dis_conv (display , curmem , roi->x_max , roi->y_max , 
+                     mem_dis_conv (display , curmem , roi->x_max , roi->y_max ,
                                    &x_max , &y_max);
 
                      xc0 = (roi->x_min + (roi->x_max - roi->x_min) / 2) * zoom;
@@ -655,7 +655,7 @@ for (i = 0; i < nmem; i++)
               /* cursor has priority over ROI or memory position */
 
             for (k = 0; k < device[display].n_curs; k++)
-               {            
+               {
                if (device[display].cursor[k]->vis == 1)
                   {
                   curs = device[display].cursor[k];
@@ -663,7 +663,7 @@ for (i = 0; i < nmem; i++)
                      {
                      /* cursor associated to display */
 
-                     dis_mem_conv (display , curmem , curs->x_pos , 
+                     dis_mem_conv (display , curmem , curs->x_pos ,
                                    curs->y_pos , &x_mem , &y_mem);
 
                      xc0 = x_mem * zoom;
@@ -700,11 +700,11 @@ for (i = 0; i < nmem; i++)
                               /*   memory coordinates         */
 
             x1 = (dxc > 0) ? dxc : 0;
-            y1 = (dyc > 0) ? dyc : 0; 
+            y1 = (dyc > 0) ? dyc : 0;
 
 
             xs1 = ((mem->x_size * zoom + dxc) < device[display].dev_xsiz) ?
-                   (mem->x_size * zoom + dxc - x1) : 
+                   (mem->x_size * zoom + dxc - x1) :
                    (device[display].dev_xsiz - x1);
             ys1 = ((mem->y_size * zoom + dyc) < device[display].dev_ysiz) ?
                    (mem->y_size * zoom + dyc - y1) :
@@ -725,7 +725,7 @@ for (i = 0; i < nmem; i++)
             y0 /= zoom;
 
             xs0 /= zoom;
-            ys0 /= zoom;            
+            ys0 /= zoom;
 
             /* store visible memory parameters */
 
@@ -934,7 +934,7 @@ int   iimerr;
 
 CONF_DATA  *conf;
 MEM_DATA   *mem;
-LUT_DATA   *lut;        
+LUT_DATA   *lut;
 
 /* check if display has been opened */
 
@@ -1002,7 +1002,7 @@ if (curlut.nalloc == 0)
 
 lutoff = 0;
 lutlen = lut->lut_len;
-                                      /* Current LUT saved */ 
+                                      /* Current LUT saved */
 curlut.len = lutlen;
 curlut.id  = lutn;
 for (i = 0; i < lutlen; i++)

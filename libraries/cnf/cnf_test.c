@@ -19,7 +19,7 @@ int main()
 
    /* Make sure that we include trailing blanks to properly test cnf_lenc */
    string = cnfMalloc( strlen( input ) + 1 );
-   cnfImprt( input, strlen( input ), string ); 
+   cnfImprt( input, strlen( input ), string );
    clength = cnfLenc( input );
    flength = cnfLenf( input, strlen(input) );
    printf( "The string \"%s\" is %d [%d] characters long\n", string, clength,

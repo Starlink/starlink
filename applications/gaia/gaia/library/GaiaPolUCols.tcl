@@ -6,13 +6,13 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     A control panel for selecting the names of the catalogue column 
+#     A control panel for selecting the names of the catalogue column
 #     holding I, Q, U, etc.
 
 #  Description:
 #     This class allows the user to select the names of the columns
-#     holding each known physical quantity (eg I, Q, U, V, DI, DQ, DU 
-#     etc). 
+#     holding each known physical quantity (eg I, Q, U, V, DI, DQ, DU
+#     etc).
 #
 #     The columns we would *like* to use may not be available in every
 #     catalogue. Therefore, this class uses two groups of column names;
@@ -26,12 +26,12 @@
 #     a set of menu buttons which allow him to select from the currently
 #     available column names. If this is not done, then the wanted column
 #     name for a given quantity is read from the catalogue itself. If the
-#     catalogue does not contain this information, then the wanted column 
+#     catalogue does not contain this information, then the wanted column
 #     name defaults to the polpack column name.
 #
-#     Wanted column names which are explicitly selected by the user are 
+#     Wanted column names which are explicitly selected by the user are
 #     retained between invocations of the toolbox.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolUCols object_name [configuration options]
@@ -98,7 +98,7 @@ itcl::class gaia::GaiaPolUCols {
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -129,7 +129,7 @@ itcl::class gaia::GaiaPolUCols {
       set shelp_(ID) "ID (vector identifier)"
 
 #  Set defaults
-      reset 
+      reset
    }
 
 #  Destructor:
@@ -171,7 +171,7 @@ itcl::class gaia::GaiaPolUCols {
       set q [lindex $args 0]
       set lq [string tolower $q]
 
-#  Ensure the value for the changed control is up to date in the mvalues_ 
+#  Ensure the value for the changed control is up to date in the mvalues_
 #  array.
       set mvalues_($this,$q) [$itk_component($lq) get]
 
@@ -180,7 +180,7 @@ itcl::class gaia::GaiaPolUCols {
 #  column he wants is not available in the catalogue), but for the moment,
 #  since he has explicitly selected one of the available columns, what he
 #  wants and what he gets are in fact the same.
-      set values_($this,$q) $mvalues_($this,$q) 
+      set values_($this,$q) $mvalues_($this,$q)
 
 #  Use the command specified by the -actioncmd option to store a new
 #  undoable action in the actions list.
@@ -194,7 +194,7 @@ itcl::class gaia::GaiaPolUCols {
 #  ----------------------------------------------------------------------
    public method reset { {readopt 1} } {
 
-#  Store control descriptions, and attribute names (i.e. the name for the 
+#  Store control descriptions, and attribute names (i.e. the name for the
 #  corresponding get/set methods). Set the hard-wired defaults.
       foreach q $quantities_ {
          set desc_($q) "the column to use for $shelp_($q) values"
@@ -204,8 +204,8 @@ itcl::class gaia::GaiaPolUCols {
       }
 
 #  Over-write these with the values read from the options file created when
-#  the last used instance of this class was destroyed. These are the columns 
-#  names which the user *wants* to use, but which may or may not be available 
+#  the last used instance of this class was destroyed. These are the columns
+#  names which the user *wants* to use, but which may or may not be available
 #  in the catalogue.
       set optfile "$itk_option(-optdir)/GaiaPolUCols.opt"
       if { $readopt && [file readable $optfile] } {
@@ -244,7 +244,7 @@ itcl::class gaia::GaiaPolUCols {
    }
 
 #  Called when a new GaiaPolCat is opened.
-#  ---------------------------------------   
+#  ---------------------------------------
    public method newCat {cat} {
 
 #  Indicate that the user has not yet been warned about any unused columns
@@ -254,7 +254,7 @@ itcl::class gaia::GaiaPolUCols {
 #  Annul any existing catalogue reference.
       if { $cat_ != "" } { set cat_ [$cat_ annull] }
 
-#  If a catalogue has been supplied, store a clone of the suppllied catalogue 
+#  If a catalogue has been supplied, store a clone of the suppllied catalogue
 #  reference, and store the new headings.
       if { $cat != "" } {
          set cat_ [$cat clone]
@@ -291,7 +291,7 @@ itcl::class gaia::GaiaPolUCols {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the mvalues_ array so that hey can be reinstated later (the widget 
+#  Save the mvalues_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names mvalues_] {
             set temp($name) $mvalues_($name)
@@ -322,7 +322,7 @@ itcl::class gaia::GaiaPolUCols {
          set r -1
 
 #  Column names header...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Columns to use for:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -334,7 +334,7 @@ itcl::class gaia::GaiaPolUCols {
 #  Initialise space counter.
          set isp 1
 
-#  Do each quanity. 
+#  Do each quanity.
          set col 0
          foreach q $quantities_ {
             set lq [string tolower $q]
@@ -352,7 +352,7 @@ itcl::class gaia::GaiaPolUCols {
 #  produced.
             if { [incr col] == 2 } {
                set col 0
-               grid [frame $w_.space$isp -height $vspace2] -row [incr r] 
+               grid [frame $w_.space$isp -height $vspace2] -row [incr r]
                incr isp
                incr r
             }
@@ -360,7 +360,7 @@ itcl::class gaia::GaiaPolUCols {
          }
 
 #  Vertical space
-         grid [frame $w_.spaceend -height $vspace1] -row [incr r] 
+         grid [frame $w_.spaceend -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -372,7 +372,7 @@ itcl::class gaia::GaiaPolUCols {
 
 #  Re-instate the original values_ array.
          foreach name [array names mvalues_] {
-            set mvalues_($name) $temp($name) 
+            set mvalues_($name) $temp($name)
          }
 
 #  Populate the menu buttons with the currently available column names.
@@ -384,26 +384,26 @@ itcl::class gaia::GaiaPolUCols {
       }
    }
 
-#  Issue a warning and return zero if the catalogue contains any column names 
+#  Issue a warning and return zero if the catalogue contains any column names
 #  which are unwanted. Only do this once for each catalogue.
 #  --------------------------------------------------------------------
    public method colsOK {} {
       set ok 1
-      if { !$warned_ } { 
+      if { !$warned_ } {
          set unwanted ""
          foreach col $headings_ {
             set wanted 0
-   
+
             foreach q $quantities_ {
                set want [want_column $q]
                if { $want == $col } {
                   set wanted 1
                   break
                }
-            }            
+            }
             if { !$wanted } { lappend unwanted $col }
          }
-   
+
          if { $unwanted != "" } {
             info_dialog "This catalogue contains unused column names ($unwanted).\n\nPlease use the \"Column Names\" control panel to ensure that the correct column names are being used."
             set ok 0
@@ -442,7 +442,7 @@ itcl::class gaia::GaiaPolUCols {
 #  If any column headings are available...
          if { $headings_ != "" } {
 
-#  Add items for each column to the menu. 
+#  Add items for each column to the menu.
             foreach colnam $headings_ {
 
 #  Add this column name into all menus.
@@ -451,14 +451,14 @@ itcl::class gaia::GaiaPolUCols {
                   $itk_component($lq) add \
                      -command [code $this activ $q] \
                      -label $colnam \
-                     -value $colnam 
+                     -value $colnam
                }
             }
          }
-         
+
 #  Add a "not available" option to the end of each menu.
          foreach lq [string tolower $quantities_] {
-            $itk_component($lq) add -label "(not available)" -value "" 
+            $itk_component($lq) add -label "(not available)" -value ""
          }
       }
    }
@@ -480,19 +480,19 @@ itcl::class gaia::GaiaPolUCols {
       }
    }
 
-#  Returns the wanted column name (that is, the column name which we would 
+#  Returns the wanted column name (that is, the column name which we would
 #  like to use if it is available) for a given quantity.
 #  -----------------------------------------------------------------
    protected method want_column {q} {
-      
+
 #  If the user has explicitly requested that a particular column be used
 #  for this quantity, return it.
       if { $values_($this,$q) != "" } {
          return $values_($this,$q)
 
-#  Otherwise, if the catalogue includes an indication of which column should 
+#  Otherwise, if the catalogue includes an indication of which column should
 #  be used for this quantity, return it.
-      } elseif { $cat_ != "" } { 
+      } elseif { $cat_ != "" } {
          set col [$cat_ getColNam $q]
          if { $col != "" } {
             return $col
@@ -527,7 +527,7 @@ itcl::class gaia::GaiaPolUCols {
 #  A command to call when any control values are changed by the user.
    itk_option define -changecmd changecmd Changecmd {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -547,20 +547,20 @@ itcl::class gaia::GaiaPolUCols {
        variable attr_
 
 #  An array of the previous wanted column names
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
 
 #  An array of short help descriptions, indexed by quantity name.
-       variable shelp_ 
+       variable shelp_
 
 #  Has the user ben warned about unused columns in the current catalogue?
        variable warned_ 0
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

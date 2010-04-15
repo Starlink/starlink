@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MLPNG( ABSDIM, NDISP, LBND, LINDX, MAP, ABSAXS, 
-     :                       CFRM, IAXIS, IPNOM, LUTMAP, XL, XR, 
+      SUBROUTINE KPS1_MLPNG( ABSDIM, NDISP, LBND, LINDX, MAP, ABSAXS,
+     :                       CFRM, IAXIS, IPNOM, LUTMAP, XL, XR,
      :                       STATUS )
 *+
 *  Name:
@@ -13,23 +13,23 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPNG( ABSDIM, NDISP, LBND, LINDX, MAP, ABSAXS, CFRM, 
+*     CALL KPS1_MLPNG( ABSDIM, NDISP, LBND, LINDX, MAP, ABSAXS, CFRM,
 *                      IAXIS, IPNOM, LUTMAP, XL, XR, STATUS )
 
 *  Description:
 *     This routine finds the horizontal position of each sample to be
 *     displayed by MLINPLOT. These positions are chosen so that a
-*     vertical line on the screen corresponds to a constant value on the 
-*     chosen horizontal axis. The horizontal positions are returned in terms 
-*     of a "nominal GRID Frame". This is a 1D Frame which is later mapped 
-*     linearly onto the horizontal dimension of the screen. It corresponds 
-*     to the GRID axis used as the abscissa  for the middle data line (i.e. 
+*     vertical line on the screen corresponds to a constant value on the
+*     chosen horizontal axis. The horizontal positions are returned in terms
+*     of a "nominal GRID Frame". This is a 1D Frame which is later mapped
+*     linearly onto the horizontal dimension of the screen. It corresponds
+*     to the GRID axis used as the abscissa  for the middle data line (i.e.
 *     the line with index (NDISP + 1)/2 ).
 
 *  Arguments:
 *     ABSDIM = INTEGER (Given)
-*        The number of grid elements along the abscissa axis of the data 
-*        array to be displayed. The abscissa axis is specified by argument 
+*        The number of grid elements along the abscissa axis of the data
+*        array to be displayed. The abscissa axis is specified by argument
 *        ABSAXS.
 *     NDISP = INTEGER (Given)
 *        The number of lines of data to be displayed.
@@ -44,7 +44,7 @@
 *        A pointer to the Mapping from Base (GRID) to Current Frame in
 *        the DNFs WCS FrameSet.
 *     ABSAXS = INTEGER (Given)
-*        The index of the abscissa (horizontal) grid axis. This should be 1 
+*        The index of the abscissa (horizontal) grid axis. This should be 1
 *        or 2. The other axis is the ordinate (vertical) axis.
 *     CFRM = INTEGER (Given)
 *        An AST pointer to the Current Frame of the WCS FrameSet.
@@ -54,8 +54,8 @@
 *     IPNOM = INTEGER (Returned)
 *        A pointer to a 2D array of type DOUBLE PRECISION with bounds
 *        (ABSDIM, NDISP). Each row corresponds to the ABSDIM data
-*        values in the corresponding displayed line (1 to NDISP). Each 
-*        element in a row is the nominal GRID value at the centre of the 
+*        values in the corresponding displayed line (1 to NDISP). Each
+*        element in a row is the nominal GRID value at the centre of the
 *        data value. Returned equal to zero if an error occurrs.
 *     LUTMAP = INTEGER (Returned)
 *        The 1D Mapping from nominal GRID value, to the value used to
@@ -71,15 +71,15 @@
 *  Environment Parameters:
 *     XLEFT = LITERAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis. The dynamic default is the value for the first element in the 
-*        data being displayed. The value supplied may be greater than or 
-*        less than the value supplied for XRIGHT. A formatted value for the 
+*        axis. The dynamic default is the value for the first element in the
+*        data being displayed. The value supplied may be greater than or
+*        less than the value supplied for XRIGHT. A formatted value for the
 *        quantity specified by parameter USEAXIS should be supplied. []
 *     XRIGHT = LITERAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis. The dynamic default is the value for the last element in the 
-*        data being displayed. The value supplied may be greater than or 
-*        less than the value supplied for XLEFT. A formatted value for the 
+*        axis. The dynamic default is the value for the last element in the
+*        data being displayed. The value supplied may be greater than or
+*        less than the value supplied for XLEFT. A formatted value for the
 *        quantity specified by parameter USEAXIS should be supplied. []
 
 *  Copyright:
@@ -119,13 +119,13 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -209,7 +209,7 @@
 *  Find the bounds of the horizontal axis.
 *  =======================================
 *  This application requires the annotated axis value to increase or
-*  decrease monotonically along each of the displayed lines. Therefore, 
+*  decrease monotonically along each of the displayed lines. Therefore,
 *  extreme annotated axis values must be reached at the start or end of
 *  the lines. To find the default annotated axis range, we map the end
 *  points of each line to the required axis, and find the extreme values.
@@ -221,16 +221,16 @@
 
       DO I = 1, NDISP
 
-*  Store the GRID co-ordinates at the two ends of this line. 
+*  Store the GRID co-ordinates at the two ends of this line.
          G( 1, ABSAXS ) = 1.0D0
          G( 1, ORDAXS ) = DBLE( LINDX( I ) - LBND + 1 )
 
          G( 2, ABSAXS ) = DBLE( ABSDIM )
          G( 2, ORDAXS ) = G( 1, ORDAXS )
 
-*  Get the corresponding values in the WCS Current Frame using the supplied 
+*  Get the corresponding values in the WCS Current Frame using the supplied
 *  Mapping.
-         CALL AST_TRANN( MAP, 2, 2, 2, G, .TRUE., NAX, 2, C, STATUS ) 
+         CALL AST_TRANN( MAP, 2, 2, 2, G, .TRUE., NAX, 2, C, STATUS )
 
 *  Normalize each position.
          DO K = 1, 2
@@ -241,11 +241,11 @@
             CALL AST_NORM( CFRM, POS, STATUS )
 
             DO J = 1, NAX
-               C( K, J ) = POS( J ) 
+               C( K, J ) = POS( J )
             END DO
-         END DO         
+         END DO
 
-*  Find the min and max values on the required axis at the start and end of 
+*  Find the min and max values on the required axis at the start and end of
 *  any line.
          MAXL = MAX( MAXL, C( 1, IAXIS ) )
          MINL = MIN( MINL, C( 1, IAXIS ) )
@@ -266,22 +266,22 @@
 
 *  Get the annotated axis values for the left and right hand ends of the
 *  horizontal axis, using the above values as dynamic defaults.
-      CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., CFRM, IAXIS, XL, NVAL, 
+      CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., CFRM, IAXIS, XL, NVAL,
      :                 STATUS )
-      CALL KPG1_GTAXV( 'XRIGHT', 1, .TRUE., CFRM, IAXIS, XR, NVAL, 
+      CALL KPG1_GTAXV( 'XRIGHT', 1, .TRUE., CFRM, IAXIS, XR, NVAL,
      :                 STATUS )
 
-*  Find a 1D Mapping from "nominal GRID" value to the annotated axis values. 
-*  The nominal GRID axis is mapped linearly onto the horizontal axis of the 
-*  screen. 
+*  Find a 1D Mapping from "nominal GRID" value to the annotated axis values.
+*  The nominal GRID axis is mapped linearly onto the horizontal axis of the
+*  screen.
 *  =========================================================================
-*  Find the ordinate GRID value at the centre of the middle line. This line 
+*  Find the ordinate GRID value at the centre of the middle line. This line
 *  defines the 1D "nominal GRID" Frame.
       GVAL = DBLE( LINDX( ( NDISP + 1 ) / 2 ) - LBND + 1 )
 
-*  Modify the supplied Mapping so that it has a single input (i.e. GRID) axis 
-*  corresponding to the abscissa. The other GRID axis value is fixed at the 
-*  value corresponding to the middle line chosen above. First created the 
+*  Modify the supplied Mapping so that it has a single input (i.e. GRID) axis
+*  corresponding to the abscissa. The other GRID axis value is fixed at the
+*  value corresponding to the middle line chosen above. First created the
 *  required PermMap.
       OUTPRM( ABSAXS ) = 1
       OUTPRM( ORDAXS ) = -1
@@ -300,20 +300,20 @@
 *  evenly spaced nominal GRID values. This table can be found using only
 *  the forward transformation of the above Mapping, and is implemented as
 *  an AST LutMap. This LutMap will have an inverse Transformation so
-*  long as the look-up table is monotonic and has no missing (i.e. bad) 
+*  long as the look-up table is monotonic and has no missing (i.e. bad)
 *  values. One problem is that the LutMap is only defined over the range
 *  of nominal GRID values covered by the table. So we need to ensure that
-*  the table covers at least the entire range of nominal GRID values which 
-*  needs to be displayed. To do this we find an interval on the nominal 
-*  GRID axis which, when mapped into the annotated axis, encompasses the 
+*  the table covers at least the entire range of nominal GRID values which
+*  needs to be displayed. To do this we find an interval on the nominal
+*  GRID axis which, when mapped into the annotated axis, encompasses the
 *  required axis range given by XLEFT and XRIGHT.
 
 *  Set the initial GRID limits to the bounds of the supplied array.
       G1( 1 ) = 1.0D0
       G1( 2 ) = DBLE( ABSDIM )
 
-*  We make 10 checks, doubling the range covered by the GRID limits 
-*  each time. 
+*  We make 10 checks, doubling the range covered by the GRID limits
+*  each time.
       DO I = 1, 10
 
 *  Transform the current GRID limits into the required annotated axis,
@@ -323,7 +323,7 @@
 
 *  Check the annotated axis values are both good.
          IF( A( 1 ) .NE. AST__BAD .AND. A( 2 ) .NE. AST__BAD ) THEN
-           
+
 *  If both left and right X axis limits fall between the annotated axis
 *  values found above, leave the loop with the current GRID limits.
             IF( A( 1 ) .GT. A( 2 ) ) THEN
@@ -364,16 +364,16 @@
      :                 'parameter USEAXIS. A different value for '//
      :                 'USEAXIS may correct this.', STATUS )
          GO TO 999
-      END IF     
+      END IF
 
 *  Arrive here if we were able to find GRID limits which encompass the
-*  required left and right axis values. 
+*  required left and right axis values.
  10   CONTINUE
 
 *  We now find a LutMap which is equivalent to the MAP2 Mapping. That is, a
-*  Look-up-table which gives the annotated axis value at the centre of each 
+*  Look-up-table which gives the annotated axis value at the centre of each
 *  element of the middle line. First allocate memory to hold the look up
-*  table, and the corresponding nominal GRID values. The range of nominal 
+*  table, and the corresponding nominal GRID values. The range of nominal
 *  GRID value covered by the LUT is given by the bounds found above.
       LBNDL = NINT( G1( 1 ) )
       UBNDL = NINT( G1( 2 ) )
@@ -386,29 +386,29 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Find nominal GRID positions evenly spaced along the middle line. The 
+*  Find nominal GRID positions evenly spaced along the middle line. The
 *  positions are at the centre of each grid cell covered by the LUT.
       A( 1 ) = DBLE( LBNDL )
       A( 2 ) = DBLE( UBNDL )
-      CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, A, .FALSE., LUTLEN, 
+      CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, A, .FALSE., LUTLEN,
      :                 1.0D0, %VAL( CNF_PVAL( IPG ) ), STATUS )
 
 *  Transform these GRID positions into values for the required annotated
 *  axis.
-      CALL KPS1_MLPMP( NAX, CFRM, MAP2, LUTLEN, %VAL( CNF_PVAL( IPG ) ), 
+      CALL KPS1_MLPMP( NAX, CFRM, MAP2, LUTLEN, %VAL( CNF_PVAL( IPG ) ),
      :                 .TRUE.,
-     :                 IAXIS, %VAL( CNF_PVAL( IPLUT ) ), 
+     :                 IAXIS, %VAL( CNF_PVAL( IPLUT ) ),
      :                 %VAL( CNF_PVAL( IPWORK ) ), STATUS )
 
 *  Create the LutMap.
-      LUTMAP = AST_LUTMAP( LUTLEN, %VAL( CNF_PVAL( IPLUT ) ), 
+      LUTMAP = AST_LUTMAP( LUTLEN, %VAL( CNF_PVAL( IPLUT ) ),
      :                     1.0D0, 1.0D0, ' ',
      :                     STATUS )
 
 *  Report an error and abort if the inverse transformation is not defined
 *  (i.e. if the annotated axis does not increase or decrease monotonically
 *  along the middle line).
-      IF( .NOT. AST_GETL( LUTMAP, 'TranInverse', STATUS ) .AND. 
+      IF( .NOT. AST_GETL( LUTMAP, 'TranInverse', STATUS ) .AND.
      :    STATUS .EQ. SAI__OK ) THEN
 
          ATTR = 'LABEL('
@@ -419,7 +419,7 @@
          CALL MSG_SETC( 'LAB', AST_GETC( CFRM, ATTR( : IAT ), STATUS ) )
 
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_MLPNG_ERR1', 'The horizontal axis value '// 
+         CALL ERR_REP( 'KPS1_MLPNG_ERR1', 'The horizontal axis value '//
      :                 '(^LAB) does not increase or decrease '//
      :                 'monotonically along the data array, and '//
      :                 'so cannot be used.', STATUS )
@@ -427,7 +427,7 @@
          GO TO 999
       END IF
 
-*  Allocate memory to hold the GRID value and annotated axis value at the 
+*  Allocate memory to hold the GRID value and annotated axis value at the
 *  centre of each pixel in each line of displayed data.
       CALL PSX_CALLOC( ABSDIM, '_DOUBLE', IPGL, STATUS )
       CALL PSX_CALLOC( ABSDIM, '_DOUBLE', IPAXL, STATUS )
@@ -438,24 +438,24 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Find GRID positions evenly spaced along each line. The positions are 
+*  Find GRID positions evenly spaced along each line. The positions are
 *  at the centre of each grid cell.
       A( 1 ) = 1.0D0
       A( 2 ) = DBLE( ABSDIM )
-      CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, A, .FALSE., ABSDIM, 
+      CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, A, .FALSE., ABSDIM,
      :                 1.0D0, %VAL( CNF_PVAL( IPGL ) ), STATUS )
 
 *  Loop round each line.
       DO I = 1, NDISP
          INDX = LINDX( I ) - LBND + 1
 
-*  Find the ordinate GRID value at the centre of this line. 
+*  Find the ordinate GRID value at the centre of this line.
          GVAL = DBLE( INDX )
 
-*  Get the 1-D Mapping from the abscissa GRID value for this line to the 
-*  selected Current Frame axis. To do this we modify the supplied Mapping 
-*  so that it has a single input (i.e. GRID) axis corresponding to the 
-*  abscissa. The other GRID axis value is fixed at the value corresponding 
+*  Get the 1-D Mapping from the abscissa GRID value for this line to the
+*  selected Current Frame axis. To do this we modify the supplied Mapping
+*  so that it has a single input (i.e. GRID) axis corresponding to the
+*  abscissa. The other GRID axis value is fixed at the value corresponding
 *  to the current line. First created the required PermMap.
          OUTPRM( ABSAXS ) = 1
          OUTPRM( 3 - ABSAXS ) = -1
@@ -467,27 +467,27 @@
          MAP3 = AST_CMPMAP( PMAP, MAP, .TRUE., ' ', STATUS )
 
 *  Use this Mapping to get the annotated axis value at the centre of each
-*  pixel in this line. 
-         CALL KPS1_MLPMP( NAX, CFRM, MAP3, ABSDIM, 
+*  pixel in this line.
+         CALL KPS1_MLPMP( NAX, CFRM, MAP3, ABSDIM,
      :                    %VAL( CNF_PVAL( IPGL ) ), .TRUE.,
-     :                    IAXIS, %VAL( CNF_PVAL( IPAXL ) ), 
+     :                    IAXIS, %VAL( CNF_PVAL( IPAXL ) ),
      :                    %VAL( CNF_PVAL( IPWORK ) ), STATUS )
 
 *  Set bad any values which are outside the required range of the
 *  annotated axis given by XLEFT and XRIGHT.
-         CALL KPG1_THRSD( .TRUE., ABSDIM, %VAL( CNF_PVAL( IPAXL ) ), 
+         CALL KPG1_THRSD( .TRUE., ABSDIM, %VAL( CNF_PVAL( IPAXL ) ),
      :                    MIN( XL, XR ),
-     :                    MAX( XR, XL ), AST__BAD, AST__BAD, 
-     :                    %VAL( CNF_PVAL( IPAXL ) ), 
+     :                    MAX( XR, XL ), AST__BAD, AST__BAD,
+     :                    %VAL( CNF_PVAL( IPAXL ) ),
      :                    NREPLO, NREPHI, STATUS )
 
-*  Now use the inverse Transformation of the LutMap created earlier to 
-*  transform the annotated axis values into the nominal GRID value at 
-*  the centre of each pixel in this line. 
-         CALL AST_TRAN1( LUTMAP, ABSDIM, %VAL( CNF_PVAL( IPAXL ) ), 
+*  Now use the inverse Transformation of the LutMap created earlier to
+*  transform the annotated axis values into the nominal GRID value at
+*  the centre of each pixel in this line.
+         CALL AST_TRAN1( LUTMAP, ABSDIM, %VAL( CNF_PVAL( IPAXL ) ),
      :                   .FALSE.,
      :   %VAL( CNF_PVAL( IPNOM ) + ( I - 1 )*ABSDIM*VAL__NBD ),
-     :                   STATUS ) 
+     :                   STATUS )
 
 *  Annul the Mappings related to this line.
          CALL AST_ANNUL( PMAP, STATUS )
@@ -510,7 +510,7 @@
 
 *  If an error has occurred, free the returned memory.
       IF( STATUS .NE. SAI__OK .AND. IPNOM .NE. 0 ) THEN
-         CALL PSX_FREE( IPNOM, STATUS ) 
+         CALL PSX_FREE( IPNOM, STATUS )
          IPNOM = 0
       END IF
 

@@ -30,7 +30,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (NVALS.GT.25) NVALS=25
       DO I=1,NVALS
          WRITE (1,REC=I,FMT='(A70)') PARAMS(I)

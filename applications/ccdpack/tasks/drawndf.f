@@ -25,8 +25,8 @@
 *     will show their relative positions in their current coordinates,
 *     and so can, for instance, be used to check that alignment looks
 *     correct prior to resampling and combining into a mosaic.
-*     Depending on the CLEAR parameter it will either clear the 
-*     display device and set the plotting area to the right size to 
+*     Depending on the CLEAR parameter it will either clear the
+*     display device and set the plotting area to the right size to
 *     fit in all the images, or leave the display intact and plot those
 *     parts of images which fit on the existing area.
 *
@@ -39,8 +39,8 @@
 *     between pixel and Current coordinates is nonlinear.  The origin
 *     (minimum X,Y pixel value) of each boundary can be marked and
 *     the image labelled with its name and/or index number.
-*     Optionally (according to the TRIM parameter), the display may 
-*     be restricted to the useful extent of the image, enabling 
+*     Optionally (according to the TRIM parameter), the display may
+*     be restricted to the useful extent of the image, enabling
 *     overscan regions or bias strips to be ignored.
 *
 *     If the LINES parameter is true, the position of each NDF's
@@ -50,27 +50,27 @@
 *     The colour levels in this case are determined by the PERCENTILES
 *     argument applied separately to each plotted frame, and overlapping
 *     images will simply be drawn on top of each other - no averaging
-*     or scaling is performed.  If the IMAGES parameter is false, 
-*     the program does not need to examine the data pixels at all, 
+*     or scaling is performed.  If the IMAGES parameter is false,
+*     the program does not need to examine the data pixels at all,
 *     so it can run much faster.
 *
-*     The results are only likely to be sensible if the Current 
+*     The results are only likely to be sensible if the Current
 *     coordinate system of all the NDFs is one in which they are all
-*     (more or less) aligned.  If the Current attached coordinate 
-*     systems of all do not all have the same Domain (name), a 
+*     (more or less) aligned.  If the Current attached coordinate
+*     systems of all do not all have the same Domain (name), a
 *     warning will be issued, but plotting will proceed.
 *
-*     DRAWNDF uses the AGI graphics database in a way which is 
-*     compatible with KAPPA applications; if the CLEAR parameter is 
-*     set to false (only possible when IMAGE is also false) then it 
+*     DRAWNDF uses the AGI graphics database in a way which is
+*     compatible with KAPPA applications; if the CLEAR parameter is
+*     set to false (only possible when IMAGE is also false) then it
 *     will attempt to align the plotted outlines with suitably
-*     registered graphics which are already on the graphics 
-*     device; in this case outlines or parts of outlines lying 
-*     outside the existing graphics window remain unplotted.  
+*     registered graphics which are already on the graphics
+*     device; in this case outlines or parts of outlines lying
+*     outside the existing graphics window remain unplotted.
 *     So, for instance, it is easy to overlay the outlines
-*     of a set of NDFs on a mosaic image which has been constructed 
-*     using those NDFs, or to see how an undisplayed set of NDFs 
-*     would map onto one already displayed, either by a previous 
+*     of a set of NDFs on a mosaic image which has been constructed
+*     using those NDFs, or to see how an undisplayed set of NDFs
+*     would map onto one already displayed, either by a previous
 *     invocation of DRAWNDF or by a KAPPA program such as DISPLAY
 *     or CONTOUR.
 *
@@ -91,7 +91,7 @@
 *        [dynamic]
 *     CLEAR = _LOGICAL (Read)
 *        If CLEAR is set to true, the graphics device will be cleared
-*        before the plot is made.  
+*        before the plot is made.
 *
 *        If you want the outlines to be drawn over the top
 *        of an existing DATA picture, for instance one displayed with
@@ -118,10 +118,10 @@
 *        given in the order XMIN,XMAX,YMIN,YMAX.
 *
 *        If the TRIM parameter is set true, then only the area defined
-*        by these values is drawn.  If TRIM is false, this parameter 
+*        by these values is drawn.  If TRIM is false, this parameter
 *        is ignored.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.  If USESET is true
 *        then a value specific to the Set Index of each image will
 *        be sought.
@@ -154,33 +154,33 @@
 *        be plotted directly on the picture, which may be hard to read.
 *        [TRUE]
 *     LABPOS = LITERAL (Read)
-*        A two-character string identifying the positioning of the text 
-*        label (only used if at least one of LABNAME or LABNUM is 
+*        A two-character string identifying the positioning of the text
+*        label (only used if at least one of LABNAME or LABNUM is
 *        true).  The first letter indicates the side-to-side
 *        position and the second indicates the up-and-down position
 *        in the pixel coordinates of each NDF.  Each letter must be
 *        "N", "C" or "F", for Near to the origin, Central or Far from
-*        the origin.  Normally (unless LABUP is true) the text 
-*        will be written parallel or antiparallel to the X pixel 
-*        direction for each NDF, with one edge anchored as per the 
-*        value of LABPOS in such a way that the text sits inside the 
+*        the origin.  Normally (unless LABUP is true) the text
+*        will be written parallel or antiparallel to the X pixel
+*        direction for each NDF, with one edge anchored as per the
+*        value of LABPOS in such a way that the text sits inside the
 *        outline (if it will fit).
 *
 *        Only the first two characters are significant.
 *
 *        LABPOS normally defaults to "NN", indicating the label written
-*        next to the origin, but if LABUP is set TRUE, then it 
+*        next to the origin, but if LABUP is set TRUE, then it
 *        defaults to "CC".
 *        [NN]
 *     LABUP = _LOGICAL (Read)
 *        Normally this parameter is FALSE, and each text label (as
-*        determined by LABNAME and LABNUM) is written parallel or 
+*        determined by LABNAME and LABNUM) is written parallel or
 *        anti-parallel to the pixel X axis of the corresponding NDF.
-*        If this parameter is set TRUE however, text will be written 
-*        upright, that is, horizontal on the graphics device.  
-*        In this case the positioning algorithm may fail to place it 
+*        If this parameter is set TRUE however, text will be written
+*        upright, that is, horizontal on the graphics device.
+*        In this case the positioning algorithm may fail to place it
 *        inside the corresponding outline; it is generally not advisable
-*        to set LABUP to TRUE unless the label is positioned in the 
+*        to set LABUP to TRUE unless the label is positioned in the
 *        centre of the outline by setting LABPOS="CC".
 *        [FALSE]
 *     LINES = _LOGICAL (Read)
@@ -218,25 +218,25 @@
 *        which has the lowest X and Y pixel coordinates).
 *        [TRUE]
 *     PENROT = _LOGICAL (Read)
-*        If TRUE, each outline will be drawn with a different pen 
+*        If TRUE, each outline will be drawn with a different pen
 *        (colour).  Otherwise, they will all be drawn in the same pen.
 *        [FALSE]
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
 *        If IMAGE is true, this gives the percentile limits between
 *        which each image will be scaled when it is drawn.
 *        Any pixels with a value lower than the first element
-*        will have the same colour, and any with a value 
+*        will have the same colour, and any with a value
 *        higher than the second will have the same colour.
-*        Must be in the range 0 <= PERCENTILES( 1 ) <= 
+*        Must be in the range 0 <= PERCENTILES( 1 ) <=
 *        PERCENTILES( 2 ) <= 100.
 *
-*        Note that the percentile levels are calculated separately for 
+*        Note that the percentile levels are calculated separately for
 *        each of the NDFs in the IN list, so that the brightest
 *        pixel in each NDF will be plotted in the same colour, even
 *        though their absolute values may be quite different.
 *        [2,98]
 *     STYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style 
+*        A group of attribute settings describing the plotting style
 *        to use for the outlines and annotated axes.  This should be
 *        a string consisting of comma-separated `attribute=value'
 *        items; as explained in the `Plotting Styles and Attributes'
@@ -246,7 +246,7 @@
 *        Some attributes which it may be useful to set are the following
 *        (default values given in square brackets):
 *           - width(curves)   -- the thickness of outlines drawn [1]
-*           - colour(curves)  -- colour of the outlines (if PENROT is 
+*           - colour(curves)  -- colour of the outlines (if PENROT is
 *                                true, serves as starting value) [1]
 *           - size(strings)   -- font size of text labels [1]
 *           - colour(strings) -- colour of text labels [1]
@@ -271,20 +271,20 @@
 *        [TRUE]
 *     USESET = _LOGICAL (Read)
 *        If the pen colour is being rotated because PENROT is true,
-*        USESET determines whether a new colour is used for each 
-*        individual NDF or each Set.  If TRIM is true, it allows 
-*        Set-Index-specific values of the EXTENT parameter to be 
-*        used.  This parameter is ignored if PENROT and TRIM are 
-*        false, and has no effect if the input NDFs have no Set header 
+*        USESET determines whether a new colour is used for each
+*        individual NDF or each Set.  If TRIM is true, it allows
+*        Set-Index-specific values of the EXTENT parameter to be
+*        used.  This parameter is ignored if PENROT and TRIM are
+*        false, and has no effect if the input NDFs have no Set header
 *        information.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 
 *  Examples:
 *     drawndf reg-data* clear
-*        This will clear the current graphics device and plot on it 
+*        This will clear the current graphics device and plot on it
 *        labelled outlines of all the `reg-data*' NDFs, as well as
 *        axes showing the common coordinate system in which they
 *        all reside.  The plotting area will be made just large enough
@@ -293,8 +293,8 @@
 *        should be one in which they are all aligned.
 *
 *     drawndf ccd* noclear
-*        This will attempt to plot boundaries of all the `ccd*' NDFs 
-*        aligned with whatever is already plotted on the graphics 
+*        This will attempt to plot boundaries of all the `ccd*' NDFs
+*        aligned with whatever is already plotted on the graphics
 *        device, for instance the result of a KAPPA DISPLAY command
 *        or of a previous call of DRAWNDF.  Parts of the NDF outlines
 *        which fall outside the existing plot area will not be visible.
@@ -303,10 +303,10 @@
 *
 *     drawndf in="one,two,three" axes labname labnum penrot
 *             style="size(strings)=2,width(curves)=3"
-*        This will draw outlines of the NDFs `one', `two' and `three' 
-*        in the current directory with labelled axes, in triple-thick 
+*        This will draw outlines of the NDFs `one', `two' and `three'
+*        in the current directory with labelled axes, in triple-thick
 *        lines and with double-size text labels which read `1: one',
-*        `2: two' and `3: three' respectively.  The colour of each 
+*        `2: two' and `3: three' respectively.  The colour of each
 *        outline and its associated text label will be different from
 *        the others.
 *
@@ -329,7 +329,7 @@
 
 *  Implementation Status:
 *     DRAWNDF's communication with the AGI database is compatible with
-*     most of KAPPA's behaviour, but is slightly less capable; in 
+*     most of KAPPA's behaviour, but is slightly less capable; in
 *     particular it will fail to align with pictures whose alignment
 *     has been stored using TRANSFORM structures instead of MORE.AST
 *     extensions.  This affects only older applications.
@@ -339,7 +339,7 @@
 *        When the IMAGE parameter is true and image pixels are plotted,
 *        the image data has to be resampled into the Current coordinate
 *        system prior to being displayed on the graphics device.
-*        DRAWNDF currently does this using a nearest-neighbour 
+*        DRAWNDF currently does this using a nearest-neighbour
 *        resampling scheme if the display pixels are of comparable
 *        size or larger than the image pixels, and a block averaging
 *        scheme if they are much smaller (less than one third the size).
@@ -359,7 +359,7 @@
 *
 *     -  Display:
 *        The IMAGE display mode is not particularly sophisticated.
-*        If you wish to view a single image in its pixel coordinate 
+*        If you wish to view a single image in its pixel coordinate
 *        system, you may find KAPPA's DISPLAY program more versatile.
 
 *  Behaviour of Parameters:
@@ -378,7 +378,7 @@
 *     when an assignment is made on the command line, or in the case
 *     of EXTENT, if USEEXT is true.  If USESET is true, a global value
 *     for EXTENT corresponding to the Set Index of each image will be
-*     sought.  Global values may be set and reset using the CCDSETUP 
+*     sought.  Global values may be set and reset using the CCDSETUP
 *     and CCDCLEAR commands.
 *
 *     The DEVICE parameter also has a global association. This is not
@@ -540,7 +540,7 @@
       DOUBLE PRECISION INA( 2 )  ! Coordinates of input A point for winmap
       DOUBLE PRECISION INB( 2 )  ! Coordinates of input B point for winmap
       DOUBLE PRECISION INTPAR( 1 ) ! Parameters for AST_RESAMPLE
-      DOUBLE PRECISION IXUN( 4 ) ! Input X corners of the unit square 
+      DOUBLE PRECISION IXUN( 4 ) ! Input X corners of the unit square
       DOUBLE PRECISION IYUN( 4 ) ! Input Y corners of the unit square
       DOUBLE PRECISION LIMITS( 2 ) ! Values at percentile limits
       DOUBLE PRECISION LPOS( 2 ) ! Dummy low position
@@ -668,7 +668,7 @@
 *  Get the label positioning option.  If LABUP is TRUE,
 *  then just use positioning of 'CC' unless the parameter has been
 *  explicitly supplied on the command line.
-         IF ( LABUP ) THEN 
+         IF ( LABUP ) THEN
             CALL PAR_STATE( 'LABPOS', STATE, STATUS )
             IF ( STATE .EQ. PAR__ACTIVE ) THEN
                CALL PAR_GET0C( 'LABPOS', LABPOS, STATUS )
@@ -683,7 +683,7 @@
          CALL CHR_UCASE( LABPOS )
          IF ( STATUS .EQ. SAI__OK .AND. (
      :        LABPOS( 1:1 ) .NE. 'N' .AND. LABPOS( 1:1 ) .NE. 'C' .AND.
-     :        LABPOS( 1:1 ) .NE. 'F' .OR. 
+     :        LABPOS( 1:1 ) .NE. 'F' .OR.
      :        LABPOS( 2:2 ) .NE. 'N' .AND. LABPOS( 2:2 ) .NE. 'C' .AND.
      :        LABPOS( 2:2 ) .NE. 'F' ) ) THEN
             STATUS = SAI__ERROR
@@ -726,14 +726,14 @@
 
 *  Get the NDF identifier.
          CALL NDG_NDFAS( GID, I, 'READ', ID, STATUS )
-         IF ( TRIM ) THEN 
+         IF ( TRIM ) THEN
 
 *  Get the bounds of the NDF.
             CALL NDF_BOUND( ID, 2, LBND, UBND, NDIM, STATUS )
 
 *  If using Sets, we may have to set up the parameter system to retrieve
 *  the value of the EXTENT parameter keyed to the Set Index value of
-*  this NDF (using CCD1_KPLD).  Ensure however that we only do this 
+*  this NDF (using CCD1_KPLD).  Ensure however that we only do this
 *  the first time we try to get the value for each Set Index.
             IF ( USESET ) THEN
                CALL CCD1_SETRD( ID, AST__NULL, SNAME, SINDEX, JSET,
@@ -745,7 +745,7 @@
                NGOT = NGOT + 1
                IF ( NGOT .GT. CCD1__MXNDF ) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( 'DRAWNDF_MAXMEMB', 
+                  CALL ERR_REP( 'DRAWNDF_MAXMEMB',
      :'DRAWNDF: Too many distinct Set Index values', STATUS )
                   GO TO 99
                END IF
@@ -754,13 +754,13 @@
             END IF
 
 *  Get the value of the EXTENT.
-            CALL CCD1_GTSEC( USEEXT, ID, LBND, UBND, LBNDS, UBNDS, 
+            CALL CCD1_GTSEC( USEEXT, ID, LBND, UBND, LBNDS, UBNDS,
      :                       EXTSEC, STATUS )
 
 *  If this represents a non-complete subset of the NDF, then get an
 *  identifier for the indicated NDF Section, and discard the identifier
 *  for the complete NDF.
-            IF ( LBND( 1 ) .NE. LBNDS( 1 ) .OR. 
+            IF ( LBND( 1 ) .NE. LBNDS( 1 ) .OR.
      :           LBND( 2 ) .NE. LBNDS( 2 ) .OR.
      :           UBND( 1 ) .NE. UBNDS( 1 ) .OR.
      :           UBND( 2 ) .NE. UBNDS( 2 ) ) THEN
@@ -784,13 +784,13 @@
      :                  STATUS )
       END IF
 
-*  Initialise the global frameset with the Current frame of the 
+*  Initialise the global frameset with the Current frame of the
 *  reference (first) NDF.  First get its WCS component.
       CALL CCD1_GTWCS( INDFS( 1 ), IWCS, STATUS )
 
-*  Get the Current frame of the reference NDF, which we would like to 
+*  Get the Current frame of the reference NDF, which we would like to
 *  use to represent the common coordinate system.  Save its domain too.
-      FRM = AST_COPY( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ), 
+      FRM = AST_COPY( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                STATUS )
       COMDMN = AST_GETC( FRM, 'Domain', STATUS )
 
@@ -851,7 +851,7 @@
 *  Get the Base (GRID-domain) frame of the NDF.
          FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
 
-*  Check it has the right number of dimensions.  If it has too few, 
+*  Check it has the right number of dimensions.  If it has too few,
 *  then bail out.  If it has too many, then generate a new frame and
 *  mapping which just represents the first two.
          NAXES = AST_GETI( FRM, 'Naxes', STATUS )
@@ -870,7 +870,7 @@
             FRM = AST_PICKAXES( FRM, 2, PAXES, MAPICK, STATUS )
             JCUR = AST_GETI( IWCS, 'Current', STATUS )
             CALL AST_ADDFRAME( IWCS, AST__BASE, MAPICK, FRM, STATUS )
-            CALL AST_SETI( IWCS, 'Base', AST_GETI( IWCS, 'Current', 
+            CALL AST_SETI( IWCS, 'Base', AST_GETI( IWCS, 'Current',
      :                                             STATUS ), STATUS )
             CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
          END IF
@@ -896,7 +896,7 @@
          NFRM = AST_GETI( FSET, 'Nframe', STATUS )
          JGRID( I ) = NFRM + JBAS - JCOM
 
-*  Add the new frameset into the global one.  It will have a unit 
+*  Add the new frameset into the global one.  It will have a unit
 *  mapping from its Current frame to the common frame.
          CALL AST_ADDFRAME( FSET, JCOM, MAPU, IWCS, STATUS )
 
@@ -929,15 +929,15 @@
       END IF
 
 *  Set the Current frame of the frameset to the common coordinate system.
-      CALL AST_SETI( FSET, 'Current', JCOM, STATUS ) 
+      CALL AST_SETI( FSET, 'Current', JCOM, STATUS )
 
-*  We now have a global frameset containing one common frame and a frame 
+*  We now have a global frameset containing one common frame and a frame
 *  representing a two-dimensional GRID-frame-like coordinate system
 *  corresponding to each of the input NDFs.  We can use this to construct
 *  an AST Plot object with which to address the graphics device.
       PLOT = AST__NULL
 
-*  If we have been asked not to clear the graphics device, attempt to 
+*  If we have been asked not to clear the graphics device, attempt to
 *  construct a Plot object in conjunction with the current contents of
 *  the AGI database.
       IF ( .NOT. CLEAR ) THEN
@@ -952,7 +952,7 @@
          CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
       END IF
 
-*  If we have been asked to clear the device, we need to determine the 
+*  If we have been asked to clear the device, we need to determine the
 *  boundaries of the area in which to plot.
       IF ( PLOT .EQ. AST__NULL ) THEN
          XMIN = VAL__MAXD
@@ -965,14 +965,14 @@
 *  Loop for each NDF.
          DO I = 1, NNDF
 
-*  Find a bounding box which will contain the data array of this NDF in 
+*  Find a bounding box which will contain the data array of this NDF in
 *  the common frame.
             MAP = AST_GETMAPPING( FSET, JCOM + JGRID( I ), JCOM,
      :                            STATUS )
             GUBND( 1 ) = DBLE( DIMS( 1, I ) ) + 0.5D0
             GUBND( 2 ) = DBLE( DIMS( 2, I ) ) + 0.5D0
             DO J = 1, 2
-               CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, 
+               CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J,
      :                          OLBND( J, I ), OUBND( J, I ), LPOS,
      :                          UPOS, STATUS )
             END DO
@@ -995,7 +995,7 @@
 *  Open the graphics device using AGI unless we have already done so.
 *  Leave a gap round the outside only if we will be drawing axes.
          IF ( CLEAR ) THEN
-            CALL AGP_ASSOC( 'DEVICE', 'WRITE', ' ', AXES, PICID, 
+            CALL AGP_ASSOC( 'DEVICE', 'WRITE', ' ', AXES, PICID,
      :                      STATUS )
          ELSE
             IF ( AXES ) CALL AGP_NVIEW( .TRUE., STATUS )
@@ -1069,7 +1069,7 @@
          JPGP = AST_GETI( PLOT, 'Current', STATUS )
 
 *  Initialise the array with empty-coloured pixels.
-         CALL CCG1_STVI( BADCOL, XIM * YIM, %VAL( CNF_PVAL( IPIM ) ), 
+         CALL CCG1_STVI( BADCOL, XIM * YIM, %VAL( CNF_PVAL( IPIM ) ),
      :                   STATUS )
          DO I = 1, NNDF
 
@@ -1102,13 +1102,13 @@
 *  Resample the data array onto the pixel grid.
             CALL CCD1_MKIMG( IPDAT, TYPE, DIMS( 1, I ), DIMS( 2, I ),
      :                       MAP, XIM, YIM, LIMITS( 1 ), LIMITS( 2 ),
-     :                       LOCOL, HICOL, BADCOL, SCHEME, INTPAR, 
+     :                       LOCOL, HICOL, BADCOL, SCHEME, INTPAR,
      :                       %VAL( CNF_PVAL( IPIM ) ), STATUS )
          END DO
 
 *  Plot the array which now contains all the resampled images.
          CALL PGQWIN( X1, X2, Y1, Y2 )
-         CALL PGPIXL( %VAL( CNF_PVAL( IPIM ) ), 
+         CALL PGPIXL( %VAL( CNF_PVAL( IPIM ) ),
      :                XIM, YIM, 1, XIM, 1, YIM,
      :                X1, X2, Y1, Y2 )
 
@@ -1129,8 +1129,8 @@
       INIPEN = AST_GETI( PLOT, 'Colour(curves)', STATUS )
 
 *  If we are rotating pens between plots, generate a group of pen style
-*  attributes to cycle through.  Doing it like this is slightly more 
-*  involved than just calculating it within the plotting loop, but 
+*  attributes to cycle through.  Doing it like this is slightly more
+*  involved than just calculating it within the plotting loop, but
 *  makes it easier to customise if more complicated changes of style
 *  are required.
       PENGID = GRP__NOID
@@ -1139,7 +1139,7 @@
 *  Create a new group.
          CALL GRP_NEW( 'CCDPACK:PENS', PENGID, STATUS )
 
-*  Use a semicolon as the separator character since the comma is used 
+*  Use a semicolon as the separator character since the comma is used
 *  within the names themselves.
          CALL GRP_SETCC( PENGID, 'DELIMITER', ';', STATUS )
 
@@ -1193,7 +1193,7 @@
                CALL AST_SET( PLOT, STYEL, STATUS )
             END IF
 
-*  Set up an array giving the GRID-like coordinates of the corners of 
+*  Set up an array giving the GRID-like coordinates of the corners of
 *  the data array for this NDF.  The fifth point is a copy of the first
 *  one, which makes it easier for plotting a closed loop.
             XHI = DIMS( 1, I ) + 0.5D0
@@ -1203,7 +1203,7 @@
             VERTEX( 3, 2 ) = YHI
             VERTEX( 4, 2 ) = YHI
 
-*  Set the Current frame of the Plot object to the GRID-like coordinate 
+*  Set the Current frame of the Plot object to the GRID-like coordinate
 *  system of this NDF.
             CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
 
@@ -1226,9 +1226,9 @@
 *  it will not get overwritten by the outlines of other NDFS.
       IF ( LFMT .NE. ' ' ) THEN
 
-*  If so, loop over all the NDFs.  
+*  If so, loop over all the NDFs.
          DO I = 1, NNDF
-     
+
 *  Set pen colour if required.
             IF ( PENGID .NE. GRP__NOID ) THEN
                IF ( USESET ) THEN
@@ -1240,7 +1240,7 @@
                CALL AST_SET( PLOT, STYEL, STATUS )
             END IF
 
-*  Set the Current frame of the Plot object to the GRID-like coordinate 
+*  Set the Current frame of the Plot object to the GRID-like coordinate
 *  system of this NDF.
             CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
 
@@ -1303,13 +1303,13 @@
             END DO
 
 *  Find out whether the coordinate system has suffered a reflection, by
-*  testing the sense of the cross-product of the transformed unit X 
+*  testing the sense of the cross-product of the transformed unit X
 *  and Y vectors.
             NOINV = OXUN( 1 ) * OYUN( 2 ) - OYUN( 1 ) * OXUN( 2 )
      :              .GT. 0D0
 
 *  Get 'up' direction normal to which to write the text.  This is either
-*  the graphics up directions, or the direction of the transformed X 
+*  the graphics up directions, or the direction of the transformed X
 *  unit vector rotated by plus or minus 90 degrees.
             IF ( LABUP ) THEN
                UP( 1 ) = 0.0
@@ -1382,6 +1382,6 @@
 
 *  Close CCDPACK logging system.
       CALL CCD1_END( STATUS )
-      
+
       END
 * $Id$

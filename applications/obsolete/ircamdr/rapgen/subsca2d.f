@@ -1,7 +1,7 @@
 
 *+  SUBSCA2D - subtract scalar from every pixel of a 2-d array
 
-      SUBROUTINE SUBSCA2D ( INARRAY, DIMS1, DIMS2, SCALAR, OUTARRAY, 
+      SUBROUTINE SUBSCA2D ( INARRAY, DIMS1, DIMS2, SCALAR, OUTARRAY,
      :                      STATUS )
 
 *    Description :
@@ -64,7 +64,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J                     ! counter variables 
+     :   I, J                     ! counter variables
 
 *-
 *    check status on entry - return if not o.k.

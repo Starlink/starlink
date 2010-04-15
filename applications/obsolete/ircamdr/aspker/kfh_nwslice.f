@@ -1,4 +1,4 @@
-*+  KFH_NWSLICE - Calculates the slice between two points.  
+*+  KFH_NWSLICE - Calculates the slice between two points.
       SUBROUTINE KFH_NWSLICE(X1,Y1,X2,Y2,DATA,NX,NY,LINE,NPTS,
      :                       STATUS)
 *    Description :
@@ -54,7 +54,7 @@
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      INTEGER NX                         ! X-dimension of the image.  
+      INTEGER NX                         ! X-dimension of the image.
       INTEGER NY                         ! Y-dimension of the image.
       REAL DATA(0:NX-1,0:NY-1)           ! Array containing the image data.
       REAL LINDAT(0:1023,2)              ! Array containing the X,Y pairs

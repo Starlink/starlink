@@ -40,7 +40,7 @@
 *     The transformation is a trigonometric one
 *     which determines the world coordinates of
 *     each point in the slice. The slice is then
-*     plotted using SGS.     
+*     plotted using SGS.
 *    Authors :
 *     S.Chan
 *    History :
@@ -67,13 +67,13 @@
       REAL SX                            ! Variable in the transformation.
       REAL SY                            ! Variable in the transformation.
       REAL THETA                         ! The angle between the lower
-*                                        ! end of the slice and the 
+*                                        ! end of the slice and the
 *                                        ! horizontal.
       REAL WC(0:1023,2)                  ! The array holding the world
 *                                        ! coordinates of the plot.
       REAL XDIFF                         ! The difference between the
 *                                        ! X-coordinates.
-      REAL YDIFF                         ! The difference between the 
+      REAL YDIFF                         ! The difference between the
 *                                        ! Y-coordinates.
       REAL XC1                           ! The X-coordinate of the first
 *                                        ! point of the slice.

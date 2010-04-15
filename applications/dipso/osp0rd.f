@@ -37,7 +37,7 @@
        INTEGER ASIZE1, NPOINT, MAXBRK, NBREAK
        INTEGER IUNIT
        INTEGER BREAK(MAXBRK)
- 
+
        REAL WAVE(ASIZE1), FLUX(ASIZE1), WORV
        CHARACTER*(*) TITLE
        LOGICAL SUBCHK, LJACK
@@ -49,7 +49,7 @@
 *
        SUBCHK = .TRUE.
        WORV = 1.0
- 
+
        READ (IUNIT,IOSTAT=IX) TITLE(1:79)
        WRITE (*,'(''   OSP0RD - title:  '',A50)') TITLE(1:50)
        IF (IX.NE.0 .AND. IX.NE.67) THEN
@@ -75,7 +75,7 @@
        IF (NPOINT.GE.ASIZE1) THEN
           NPOINT = ASIZE1 - 1
           WRITE (*,
-     :    '(''   OSP0RD:  too many points, only'',I5,'' read in'')') 
+     :    '(''   OSP0RD:  too many points, only'',I5,'' read in'')')
      :    NPOINT
        ENDIF
        READ (IUNIT,ERR=200) (WAVE(I),FLUX(I),I=1,NPOINT)
@@ -118,7 +118,7 @@
        NPOINT = I
 *
        CLOSE (IUNIT)
- 
+
        GOTO 300
   200  CONTINUE
        WRITE (*,'(''   OSP0RD:  error reading from file'')')

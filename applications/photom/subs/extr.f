@@ -5,7 +5,7 @@
      :                 COMPAN, XCOMP, YCOMP, FLUX, ERROR,
      :                 XFIT, YFIT, XERR, YERR, PEAK, BESTN,
      :                 SKY, SIGMA, VSKY, CODE, STATUS)
-     
+
 *+
 *  Name :
 *     EXTR
@@ -62,42 +62,42 @@
 
 *  Global Constants :
       INCLUDE 'SAE_PAR'
-            
+
 *  Arguments Given :
 
       INTEGER NX, NY
       LOGICAL COMPAN
-      
-      REAL XCEN, YCEN, DCEN, SEE,CLIP, PADU, SATURE, 
+
+      REAL XCEN, YCEN, DCEN, SEE,CLIP, PADU, SATURE,
      :     OPTNRM, XCOMP, YCOMP, SKY, SIGMA, VSKY
-     
+
       REAL SHAPE(3)
-      REAL IMAGE(NX, NY) 
+      REAL IMAGE(NX, NY)
 
 *  Arguments Returned :
 
-      REAL  FLUX, ERROR, XFIT, YFIT, XERR, YERR, 
+      REAL  FLUX, ERROR, XFIT, YFIT, XERR, YERR,
      :      PEAK, BESTN
       CHARACTER * ( 2 ) CODE
 
 *  Status :
-      
+
       INTEGER STATUS
 
 *  Local Variables :
 
       REAL APAR(6)
       REAL ECEN(2)
-      
+
       INTEGER I
 
-            
+
 *.
 
 *   Check status on entry - return if not o.k.
 *      WRITE(*,*) ' DEBUG --- --- Entering EXTR()'
 
-      IF ( STATUS .NE. SAI__OK ) RETURN      
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Do initial check to see if the candidate PSF is on the frame
 
@@ -107,7 +107,7 @@
             CALL ERR_REP( 'ERR_EXTR_NOSTAR',
      :        'EXTR: Star not on frame', STATUS )
       ENDIF
-      
+
 *   Set up the parameters for the fit
 
 *   Right now APAR is defined as APAR(6) and is used this way
@@ -131,22 +131,22 @@
 
       APAR(5)=XCEN
       APAR(6)=YCEN
-      
+
 *   If the position is free set normalisation to 1, and hunt for
 *   best counts
 
       IF(DCEN .GT. 0.0 ) THEN
           APAR(4)=1.0
 *          WRITE(*,*) ' DEBUG --- --- calling FPEAK()'
-	  CALL FPEAK(IMAGE, CLIP, SKY, SIGMA, VSKY, APAR, PADU,  
+	  CALL FPEAK(IMAGE, CLIP, SKY, SIGMA, VSKY, APAR, PADU,
      :           NX, NY, CODE, STATUS)
-      
-            
-*   Set normalisation to the peak counts. 
+
+
+*   Set normalisation to the peak counts.
 
           IF( (IMAGE(NINT(APAR(5)),NINT(APAR(6))) - SKY )
      :	      .GT. SQRT(VSKY) ) THEN
-     
+
              APAR(4) = IMAGE(NINT(APAR(5)),NINT(APAR(6)))-SKY
           ELSE
              APAR(4) = SQRT(VSKY)
@@ -154,28 +154,28 @@
 
 *   Reset position
           APAR(5)=XCEN
-	  APAR(6)=YCEN      
-                      
+	  APAR(6)=YCEN
+
       ELSE
           IF( (IMAGE(NINT(APAR(5)),NINT(APAR(6))) - SKY )
      :	      .GT. SQRT(VSKY) ) THEN
-     
+
              APAR(4) = IMAGE(NINT(APAR(5)),NINT(APAR(6)))-SKY
           ELSE
              APAR(4) = SQRT(VSKY)
-          ENDIF  
+          ENDIF
       ENDIF
-      
-      IF(DCEN .GT. 0.0 ) THEN  
-     
+
+      IF(DCEN .GT. 0.0 ) THEN
+
 *          WRITE(*,*) ' DEBUG --- --- 1st call to GFIT()'
           CALL GFIT(IMAGE, .TRUE., 0.0, .FALSE., SKY, VSKY,
      :              PADU, SATURE, APAR, ECEN, NX, NY, CODE, STATUS)
 *          WRITE(*,*) ' DEBUG --- --- 2nd call to GFIT()'
           CALL GFIT(IMAGE, .TRUE., DCEN, .FALSE., SKY, VSKY,
-     :              PADU, SATURE, APAR, ECEN, NX, NY, CODE, STATUS) 
-     
-*   Update position  
+     :              PADU, SATURE, APAR, ECEN, NX, NY, CODE, STATUS)
+
+*   Update position
 
           XFIT = APAR(5)
 	  YFIT = APAR(6)
@@ -183,10 +183,10 @@
 	  YERR = ECEN(2)
       ELSE
           XFIT = XCEN
-	  YFIT = YCEN	
+	  YFIT = YCEN
       ENDIF
       PEAK = APAR(4)
- 
+
 *   And here is the one we've all been waiting for, the very final
 *   call to do the optimal photometry
 
@@ -196,10 +196,10 @@
      :            PADU, SATURE, NX, NY, ERROR, BESTN, FLUX,
      :            CODE, STATUS)
 
-         
+
 *   End of routine
 
   99  CONTINUE
 *      WRITE(*,*) ' DEBUG --- --- Leaving EXTR()'
 
-      END                                                      
+      END

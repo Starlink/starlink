@@ -1,52 +1,52 @@
-
-;;;### (autoloads (edstar-abs-file) "abs_file" "abs_file.el" (13525 61248))
-;;;### (autoloads (edstar-align-trailing) "align_tr" "align_tr.el" (13522 8677))
-;;;### (autoloads (starfort-breakline starfort-newline starfort-do-auto-fill starfort-break-line starfort-line-break-point starfort-backup-to-break starfort-line-break-context) "break" "break.el" (13540 24973))
-;;;### (autoloads (edstar-choose-from-menu) "choose_f" "choose_f.el" (13521 46034))
-;;;### (autoloads (edstar-insert-comment-line) "comment1" "comment1.el" (13535 14039))
-;;;### (autoloads (starfort-break-line starfort-line-break-context) "comment2" "comment2.el" (13539 13945))
-;;;### (autoloads (backward-error forward-error com) "compile" "compile.el" (13521 46034))
-;;;### (autoloads (edstar-cut-replace edstar-paste edstar-cut-append edstar-cut) "cut" "cut.el" (13521 46034))
-;;;### (autoloads (edstar-undelete-line edstar-delete-eol edstar-delete-line edstar-undelete-word edstar-delete-word edstar-undelete-char edstar-delete-char-reverse edstar-delete-char) "delete" "delete.el" (13521 46036))
-;;;### (autoloads (edstar-detach) "detach" "detach.el" (13521 46035))
-;;;### (autoloads (edstar-set-reverse edstar-set-forward) "directio" "directio.el" (13521 46034))
-;;;### (autoloads (starfort-rebuild-env starfort-save-env) "do_env" "do_env.el" (13529 45472))
-;;;### (autoloads (edstar-dump-symbol edstar-dump-tables) "dump_tab" "dump_tab.el" (13521 62885))
-;;;### (autoloads (quit exit) "exit" "exit.el" (13521 46034))
-;;;### (autoloads (edstar-find-file-buffer) "file_buff" "file_buff.el" (13525 63465))
-;;;### (autoloads (edstar-file-complete edstar-file-prompt) "file_pro" "file_pro.el" (13521 46034))
-;;;### (autoloads (edstar-find) "find" "find.el" (13525 61977))
-;;;### (autoloads (edstar-find-keyword-string) "find_key" "find_key.el" (13529 47955))
-;;;### (autoloads (edstar-get-desc-string) "get_desc" "get_desc.el" (13521 58842))
-;;;### (autoloads (edstar-handle-menu-motion) "handle_m" "handle_m.el" (13521 46034))
-;;;### (autoloads (edstar-find-helpkey edstar-help-on-this auto-help) "help" "help.el" (13529 57484))
-;;;### (autoloads (edstar-end-learn learn) "learn" "learn.el" (13521 46036))
-;;;### (autoloads (edstar-lookup-keyword) "lookup_k" "lookup_k.el" (13529 40957))
-;;;### (autoloads (edstar-lookup-place) "lookup_p" "lookup_p.el" (13526 692))
-;;;### (autoloads (edstar-make-virtual) "make_virtual" "make_virtual.el" (13540 12760))
-;;;### (autoloads (edstar-scroll edstar-scroll-reverse edstar-scroll-forward edstar-goto-bottom edstar-goto-top edstar-goto-word edstar-goto-word-reverse edstar-goto-word-forward edstar-goto-page edstar-goto-eol) "motion" "motion.el" (13521 46034))
-;;;### (autoloads (new-helpkey) "new_help" "new_help.el" (13529 38653))
-;;;### (autoloads (new-place) "new_plac" "new_plac.el" (13529 38577))
-;;;### (autoloads (new-routine) "new_rout" "new_rout.el" (13530 873))
-;;;### (autoloads (new-token) "new_toke" "new_toke.el" (13529 37284))
-;;;### (autoloads (edstar-override) "override" "override.el" (13540 8893))
-;;;### (autoloads (previous-placeholder next-placeholder erase-placeholder expand-indicated move-down move-up move-right move-left edstar-next-line edstar-expand-auto-place edstar-kill-place edstar-best-place edstar-in-place edstar-goto-place edstar-goto-place-string) "place" "place.el" (13540 24363))
-;;;### (autoloads (edstar-possible-files) "possible" "possible.el" (13525 52150))
-;;;### (autoloads (edstar-check-readonly-dir) "readonly" "readonly.el" (13525 62929))
-;;;### (autoloads (edstar-reserve) "reserve" "reserve.el" (13521 46035))
-;;;### (autoloads (edstar-save-buffers) "save_buf" "save_buf.el" (13521 46035))
-;;;### (autoloads (edstar-enable-screen-limiting) "screen_l" "screen_l.el" (13521 46036))
-;;;### (autoloads (repl res) "sdt" "sdt.el" (13525 63341))
-;;;### (autoloads (edstar-search-again edstar-search) "search" "search.el" (13521 46035))
-;;;### (autoloads (edstar-select-buffer edstar-list-buffers) "select_b" "select_b.el" (13521 46035))
-;;;### (autoloads (edstar-selection-isset edstar-selection-end edstar-selection-beginning edstar-unset-selection edstar-set-selection) "selection" "selection.el" (13521 46035))
-;;;### (autoloads (edstar-split-path) "split_pa" "split_pa.el" (13525 51647))
-;;;### (autoloads (starfort-self-insert starfort-mode) "starfort" "starfort.el" (13540 25231))
-;;;### (autoloads (edstar-toggle-case) "toggle_c" "toggle_c.el" (13521 46035))
-;;;### (autoloads (edstar-toggle-windows) "toggle_w" "toggle_w.el" (13521 46035))
-;;;### (autoloads (edstar-first-line-of-string edstar-insert-duplicate-place edstar-show-place-help edstar-expand-place edstar-expand-token edstar-expand-keyword edstar-expand edstar-insert-expansion-text edstar-find-keyword) "token" "token.el" (13540 24333))
-;;;### (autoloads (edstar-virtual) "virtual" "virtual.el" (13540 8893))
-;;;### (autoloads (edstar-visit goto-file) "visit" "visit.el" (13521 46035))
+
+;;;### (autoloads (edstar-abs-file) "abs_file" "abs_file.el" (13525 61248))
+;;;### (autoloads (edstar-align-trailing) "align_tr" "align_tr.el" (13522 8677))
+;;;### (autoloads (starfort-breakline starfort-newline starfort-do-auto-fill starfort-break-line starfort-line-break-point starfort-backup-to-break starfort-line-break-context) "break" "break.el" (13540 24973))
+;;;### (autoloads (edstar-choose-from-menu) "choose_f" "choose_f.el" (13521 46034))
+;;;### (autoloads (edstar-insert-comment-line) "comment1" "comment1.el" (13535 14039))
+;;;### (autoloads (starfort-break-line starfort-line-break-context) "comment2" "comment2.el" (13539 13945))
+;;;### (autoloads (backward-error forward-error com) "compile" "compile.el" (13521 46034))
+;;;### (autoloads (edstar-cut-replace edstar-paste edstar-cut-append edstar-cut) "cut" "cut.el" (13521 46034))
+;;;### (autoloads (edstar-undelete-line edstar-delete-eol edstar-delete-line edstar-undelete-word edstar-delete-word edstar-undelete-char edstar-delete-char-reverse edstar-delete-char) "delete" "delete.el" (13521 46036))
+;;;### (autoloads (edstar-detach) "detach" "detach.el" (13521 46035))
+;;;### (autoloads (edstar-set-reverse edstar-set-forward) "directio" "directio.el" (13521 46034))
+;;;### (autoloads (starfort-rebuild-env starfort-save-env) "do_env" "do_env.el" (13529 45472))
+;;;### (autoloads (edstar-dump-symbol edstar-dump-tables) "dump_tab" "dump_tab.el" (13521 62885))
+;;;### (autoloads (quit exit) "exit" "exit.el" (13521 46034))
+;;;### (autoloads (edstar-find-file-buffer) "file_buff" "file_buff.el" (13525 63465))
+;;;### (autoloads (edstar-file-complete edstar-file-prompt) "file_pro" "file_pro.el" (13521 46034))
+;;;### (autoloads (edstar-find) "find" "find.el" (13525 61977))
+;;;### (autoloads (edstar-find-keyword-string) "find_key" "find_key.el" (13529 47955))
+;;;### (autoloads (edstar-get-desc-string) "get_desc" "get_desc.el" (13521 58842))
+;;;### (autoloads (edstar-handle-menu-motion) "handle_m" "handle_m.el" (13521 46034))
+;;;### (autoloads (edstar-find-helpkey edstar-help-on-this auto-help) "help" "help.el" (13529 57484))
+;;;### (autoloads (edstar-end-learn learn) "learn" "learn.el" (13521 46036))
+;;;### (autoloads (edstar-lookup-keyword) "lookup_k" "lookup_k.el" (13529 40957))
+;;;### (autoloads (edstar-lookup-place) "lookup_p" "lookup_p.el" (13526 692))
+;;;### (autoloads (edstar-make-virtual) "make_virtual" "make_virtual.el" (13540 12760))
+;;;### (autoloads (edstar-scroll edstar-scroll-reverse edstar-scroll-forward edstar-goto-bottom edstar-goto-top edstar-goto-word edstar-goto-word-reverse edstar-goto-word-forward edstar-goto-page edstar-goto-eol) "motion" "motion.el" (13521 46034))
+;;;### (autoloads (new-helpkey) "new_help" "new_help.el" (13529 38653))
+;;;### (autoloads (new-place) "new_plac" "new_plac.el" (13529 38577))
+;;;### (autoloads (new-routine) "new_rout" "new_rout.el" (13530 873))
+;;;### (autoloads (new-token) "new_toke" "new_toke.el" (13529 37284))
+;;;### (autoloads (edstar-override) "override" "override.el" (13540 8893))
+;;;### (autoloads (previous-placeholder next-placeholder erase-placeholder expand-indicated move-down move-up move-right move-left edstar-next-line edstar-expand-auto-place edstar-kill-place edstar-best-place edstar-in-place edstar-goto-place edstar-goto-place-string) "place" "place.el" (13540 24363))
+;;;### (autoloads (edstar-possible-files) "possible" "possible.el" (13525 52150))
+;;;### (autoloads (edstar-check-readonly-dir) "readonly" "readonly.el" (13525 62929))
+;;;### (autoloads (edstar-reserve) "reserve" "reserve.el" (13521 46035))
+;;;### (autoloads (edstar-save-buffers) "save_buf" "save_buf.el" (13521 46035))
+;;;### (autoloads (edstar-enable-screen-limiting) "screen_l" "screen_l.el" (13521 46036))
+;;;### (autoloads (repl res) "sdt" "sdt.el" (13525 63341))
+;;;### (autoloads (edstar-search-again edstar-search) "search" "search.el" (13521 46035))
+;;;### (autoloads (edstar-select-buffer edstar-list-buffers) "select_b" "select_b.el" (13521 46035))
+;;;### (autoloads (edstar-selection-isset edstar-selection-end edstar-selection-beginning edstar-unset-selection edstar-set-selection) "selection" "selection.el" (13521 46035))
+;;;### (autoloads (edstar-split-path) "split_pa" "split_pa.el" (13525 51647))
+;;;### (autoloads (starfort-self-insert starfort-mode) "starfort" "starfort.el" (13540 25231))
+;;;### (autoloads (edstar-toggle-case) "toggle_c" "toggle_c.el" (13521 46035))
+;;;### (autoloads (edstar-toggle-windows) "toggle_w" "toggle_w.el" (13521 46035))
+;;;### (autoloads (edstar-first-line-of-string edstar-insert-duplicate-place edstar-show-place-help edstar-expand-place edstar-expand-token edstar-expand-keyword edstar-expand edstar-insert-expansion-text edstar-find-keyword) "token" "token.el" (13540 24333))
+;;;### (autoloads (edstar-virtual) "virtual" "virtual.el" (13540 8893))
+;;;### (autoloads (edstar-visit goto-file) "visit" "visit.el" (13521 46035))
 ;;;### (autoloads (edstar-current-line-in-window) "window" "window.el" (13521 46037))
 ;;; Generated autoloads from window.el
 
@@ -221,7 +221,7 @@ Notes:
 
 (autoload (quote starfort-mode) "starfort" "\
 Major mode for editing starfort code.
-Tab indents the current starfort line correctly. 
+Tab indents the current starfort line correctly.
 `do' statements must not share a common `continue'.
 
 Type `;?' or `;\\[help-command]' to display a list of built-in abbrevs for Starfort keywords.
@@ -261,15 +261,15 @@ Variables controlling indentation style and extra features:
     character to be inserted in column 5 of a continuation line.
     (default $)
  starfort-comment-region
-    String inserted by \\[starfort-comment-region] at start of each line in 
+    String inserted by \\[starfort-comment-region] at start of each line in
     region.  (default \"c$$$\")
  starfort-electric-line-number
-    Non-nil causes line number digits to be moved to the correct column 
+    Non-nil causes line number digits to be moved to the correct column
     as typed.  (default t)
  starfort-startup-message
     Set to nil to inhibit message first time starfort-mode is used.
 
-Turning on Starfort mode calls the value of the variable starfort-mode-hook 
+Turning on Starfort mode calls the value of the variable starfort-mode-hook
 with no args, if that value is non-nil.
 \\{starfort-mode-map}" t nil)
 
@@ -629,7 +629,7 @@ Synopsis:
 Description:
    This macro allows a virtual function created with edstar-virtual (q.v.) to
    be overridden by giving it a new implementation (the calling interface
-   remains the same). 
+   remains the same).
 
    The usual way of using this macro is first to create a local version of a
    variable with the same name as the virtual function (either using let or

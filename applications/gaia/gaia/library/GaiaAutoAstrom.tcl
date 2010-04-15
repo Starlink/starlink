@@ -328,7 +328,7 @@ itcl::class gaia::GaiaAutoAstrom {
       add_short_help $itk_component(positionguess) \
          {Make a guess about the position based on FITS headers}
 
-      if { $itk_option(-expert) } { 
+      if { $itk_option(-expert) } {
          itk_component add obsguess {
             button $observation_page.obsguess \
                -text "Guess" \
@@ -352,7 +352,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(invert) 0
 
       #  Whether to use match or findoff algorithms.
-      if { $itk_option(-expert) } { 
+      if { $itk_option(-expert) } {
          itk_component add usematch  {
             StarLabelCheck $tuning_page.usematch \
             -text "Use match algorithm:" \
@@ -367,9 +367,9 @@ itcl::class gaia::GaiaAutoAstrom {
       }
       set values_(usematch) 1
 
-      #  Attempt 6, 7 or 9 parameter fit. Non-experts just get 
+      #  Attempt 6, 7 or 9 parameter fit. Non-experts just get
       #  6 or 9 option.
-      if { $itk_option(-expert) } { 
+      if { $itk_option(-expert) } {
          itk_component add fitparams {
             util::LabelMenu $tuning_page.fitparams \
                -text "No. fit parameters:" \
@@ -529,7 +529,7 @@ itcl::class gaia::GaiaAutoAstrom {
          {Reset image to the original astrometric calibration}
 
       #  Pack widgets into place.
-      if { $itk_option(-expert) } { 
+      if { $itk_option(-expert) } {
          pack $itk_component(notebook) -side top -fill x -pady 5 -padx 5
       }
       pack $itk_component(wcssource) -side top -fill x -pady 5 -padx 5
@@ -581,7 +581,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  Do guesses.
       guess_position_
-      if { $itk_option(-expert) } { 
+      if { $itk_option(-expert) } {
          guess_observation_
       }
 
@@ -830,7 +830,7 @@ itcl::class gaia::GaiaAutoAstrom {
             puts "  $args $image"
          }
 
-         #  If the image is volatile (part of a cube), then we need to 
+         #  If the image is volatile (part of a cube), then we need to
          #  save the image to disk.
          $itk_option(-image) save_if_volatile
 
@@ -1266,7 +1266,7 @@ itcl::class gaia::GaiaAutoAstrom {
                set values_(date) [expr 2000.0+($value-2451545.0)/365.25]
             }
          }
-         
+
          #  Telescope. SLALIB value, then look for site values.
          set havetel 0
          set value [get_fits_value_ "SLATEL"]
@@ -1302,10 +1302,10 @@ itcl::class gaia::GaiaAutoAstrom {
                   set value1 [expr $value1*-1.0]
                   set value1i [expr int($value1)]
                   set value1 "$value1i:[expr abs(($value1-$value1i)*60.0)]"
-                  
+
                   set value1i [expr int($value2)]
                   set value1 "$value2i:[expr abs(($value2-$value2i)*60.0)]"
-                  
+
                   if { $value3 != {} } {
                      set values_(telescope) "$value1:$value2:$value3"
                   } else {
@@ -1315,7 +1315,7 @@ itcl::class gaia::GaiaAutoAstrom {
                }
             }
          }
-         
+
          #  Temperature
          set value [get_fits_value_ "TEMPTUBE"]
          if { $value != {} } {
@@ -1324,10 +1324,10 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Pressure.
          set value [get_fits_value_ "PRESSURE"]
-         if { $value != {} } { 
+         if { $value != {} } {
             set values_(pressure) [expr abs( $value * 1.0 )]
          }
-         
+
          #  Wavelength
          set value [get_fits_value_ "WFFBAND"]
          if { $value != {} } {

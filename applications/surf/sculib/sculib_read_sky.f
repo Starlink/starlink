@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB, 
+      SUBROUTINE SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB,
      :  FILTER, ETA_TEL, B, TAUZ, DATEM, DAY, RUN, STATUS)
 *+
 *  Name:
@@ -8,21 +8,21 @@
 *     read sky parameters from a named file
 
 *  Description:
-*     This routine reads sky and telescope parameters for each SCUBA 
-*     sub-instrument/filter combination from an ASCII file named in FILE. 
-*     The format of each line in the file that contains sky information is 
+*     This routine reads sky and telescope parameters for each SCUBA
+*     sub-instrument/filter combination from an ASCII file named in FILE.
+*     The format of each line in the file that contains sky information is
 *     assumed to be:-
 *
 *        FIT1 <qual> <sub> <filter> <eta_tel> <b> <tauz> <date> <day> <run>
-*       
-*     The values returned for a given filter/sub-instrument will be from the 
+*
+*     The values returned for a given filter/sub-instrument will be from the
 *     good quality entry (<qual> = 0) with the highest associated <day> number
 *     in the file.
 *
 *     Errors will be reported and bad status returned if;
 *
 *       - there is an error opening or reading from the file
-*       - <qual> does not convert to an integer 
+*       - <qual> does not convert to an integer
 *       - <sub> is not one of SHORT, LONG, P1100, P1300, P2000
 *       - <eta_tel> does not convert to a real
 *       - <b> does not convert to a real
@@ -41,7 +41,7 @@
 *
 
 *  Invocation:
-*     CALL SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB, 
+*     CALL SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB,
 *    :  FILTER, ETA_TEL, B, TAUZ, DATEM, DAY, RUN, STATUS)
 
 *  Arguments:
@@ -52,11 +52,11 @@
 *     N_SKY                             = INTEGER (Returned)
 *           the number of sub-instrument/filter combinations read
 *     SUB (MAX_SKY)                     = CHARACTER*(*) (Returned)
-*           the name of the sub-instrument 
+*           the name of the sub-instrument
 *     FILTER (MAX_SKY)                  = CHARACTER*(*) (Returned)
-*           the name of the filter 
+*           the name of the filter
 *     ETA_TEL (MAX_SKY)                 = REAL (Returned)
-*           telescope transmission 
+*           telescope transmission
 *     B (MAX_SKY)                       = REAL (Returned)
 *           atmospheric bandwidth b factor
 *     TAUZ (MAX_SKY)                    = REAL (Returned)
@@ -98,7 +98,7 @@
 
 *  Global constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PRM_PAR'               ! for VAL__BADx                        
+      INCLUDE 'PRM_PAR'               ! for VAL__BADx
 
 *  Arguments Given:
       CHARACTER*(*) FILE
@@ -140,7 +140,7 @@
       INTEGER          IOSTAT         ! Fortran I/O status
       INTEGER          I_SKY          ! array index for entry
       CHARACTER*132    LINE           ! buffer to hold line read from file
-      INTEGER          NWRD           ! number of words on bolometer definition 
+      INTEGER          NWRD           ! number of words on bolometer definition
                                       ! line
       INTEGER          START (MAX_WRD)! index of beginnings of words in LINE
       CHARACTER*20     STEMP          ! scratch string
@@ -197,13 +197,13 @@
                FINISHED = .TRUE.
             END IF
 
-*  loop through lines in file. 
+*  loop through lines in file.
 
             DO WHILE (.NOT. FINISHED)
 
 *  read a line. If an error occurs then terminate the loop. If the error is
 *  EOF then set status OK, otherwise output an error message and leave
-*  status bad. 
+*  status bad.
 
                READ (FUNIT, 10, IOSTAT = IOSTAT) LINE
   10           FORMAT (A)
@@ -233,12 +233,12 @@
 *  if there's anything on the line
 
                   IF (BUFLEN .GT. 0) THEN
-    
+
                      CALL CHR_UCASE (LINE)
 
 *  break the line up into its component words, check it's the right `shape'
 
-                     CALL CHR_DCWRD (LINE, MAX_WRD, NWRD, START, 
+                     CALL CHR_DCWRD (LINE, MAX_WRD, NWRD, START,
      :                 STOP, WORD, STATUS)
 
                      IF (STATUS .NE. SAI__OK) THEN
@@ -250,7 +250,7 @@
                         ERROR_INFO = 'too few words on line'
                      END IF
 
-*  if the first word is FIT1 
+*  if the first word is FIT1
 
                      IF (.NOT. ERROR .AND. (WORD(1).EQ.'FIT1')) THEN
 
@@ -375,7 +375,7 @@
                               END IF
                            END IF
                         END IF
-                     END IF     
+                     END IF
                   END IF
 
 *  exit loop if error has occured
@@ -387,8 +387,8 @@
                END IF
 
             END DO
-                     
-*  close the file 
+
+*  close the file
 
             CALL FIO_CLOSE (FD, STATUS)
 

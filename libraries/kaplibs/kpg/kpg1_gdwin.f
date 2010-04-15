@@ -4,7 +4,7 @@
 *     KPG1_GDWIN
 
 *  Purpose:
-*     Set PGPLOT world co-ordinates to be the world co-ordinates 
+*     Set PGPLOT world co-ordinates to be the world co-ordinates
 *     of the specified AGI picture.
 
 *  Language:
@@ -14,7 +14,7 @@
 *     CALL  KPG1_GDWIN( IPIC, STATUS )
 
 *  Description:
-*     This routine finds the bounds of the current PGPLOT viewport within 
+*     This routine finds the bounds of the current PGPLOT viewport within
 *     the world-coordinate system of a specified AGI picture, and sets the
 *     PGPLOT window accordingly.
 
@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -78,17 +78,17 @@
       REAL M                     ! Ratio of window and viewport scales
       REAL NWX1, NWX2, NWY1, NWY2! New window bounds for original viewport
       REAL PX1, PX2, PY1, PY2    ! Viewport bounds (NDC) of specified picture
-      REAL VX1, VX2, VY1, VY2    ! Original viewport bounds (NDC) 
+      REAL VX1, VX2, VY1, VY2    ! Original viewport bounds (NDC)
       REAL WX1, WX2, WY1, WY2    ! Window bounds of specified picture
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Save the NDC bounds of the current PGPLOT viewport.
       CALL PGQVP( 0, VX1, VX2, VY1, VY2 )
-      
-*  If a picture was given, save the current AGI picture, and make the 
+
+*  If a picture was given, save the current AGI picture, and make the
 *  specified AGI picture current.
       IF( IPIC .NE. -1 ) THEN
          CALL AGI_ICURP( IPIC0, STATUS )

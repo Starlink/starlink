@@ -1,4 +1,4 @@
-      SUBROUTINE MSC_CHEV(NDATA, NAXIS, AXIS, AXMIN, AXMAX, DEGREE, 
+      SUBROUTINE MSC_CHEV(NDATA, NAXIS, AXIS, AXMIN, AXMAX, DEGREE,
      :                    MCHEB, CHEB, DATA, STATUS)
 
 *+
@@ -13,7 +13,7 @@
 *      of size DEGREE(1)*DEGREE(2)* ...
 *      The AXIS(*,IAXIS) values are scaled using AXMIN(IAXIS)
 *      and AXMAX(IAXIS) so that they lie in the range (-1,+1).
-* 
+*
 *   History:
 *      Jack Giddings      31-DEC-81     IUEDR Vn. 1.0
 *      Paul Rees          20-OCT-88     IUEDR Vn. 2.0
@@ -33,21 +33,21 @@
 *   Import:
       INTEGER NDATA               ! number of data points
       INTEGER NAXIS               ! number of coordinate axes
- 
+
       REAL*8 AXIS(NAXIS, NDATA)     ! coordinates for data values
       REAL*8 AXMIN(NAXIS)           ! minimum coordinates for axes
       REAL*8 AXMAX(NAXIS)           ! maximum coordinates for axes
- 
+
       INTEGER DEGREE(NAXIS)       ! polynomial degree+1 for axes
       INTEGER MCHEB               ! maximum number of coefficients
- 
+
       REAL*8 CHEB(MCHEB)            ! Chebyshev coefficients
- 
+
 *   Export:
       REAL*8 DATA(NDATA)            ! data values
- 
+
       INTEGER STATUS              ! status return
- 
+
 *   Local variables:
       INTEGER IAXIS               ! loop index
       INTEGER IDATA               ! loop index
@@ -60,7 +60,7 @@
       REAL*8 T1(36)                 ! Tn(axis1) values
       REAL*8 T2(36)                 ! Tn(axis2) values
       REAL*8 VALUE                  ! temporary result
- 
+
 *   Check against NAXIS < 1 or NAXIS > MAXIS
       IF (NAXIS.LT.1 .OR. NAXIS.GT.2) THEN
 
@@ -68,7 +68,7 @@
          RETURN
 
       END IF
- 
+
 *   Determine number of coefficients, NQ, from DEGREE(NAXIS),
 *   also check againts illegal values of DEGREE, AXMIN and AXMAX
       NQ = 1
@@ -76,7 +76,7 @@
       DO 100 IAXIS = 1, NAXIS
 
          IF (DEGREE(IAXIS).LE.0) THEN
- 
+
             STATUS = -3
             RETURN
 
@@ -90,7 +90,7 @@
          NQ = NQ*DEGREE(IAXIS)
 
  100  CONTINUE
- 
+
 *   Check that the number of coefficients is not excessive
       IF (NQ.GT.36 .OR. NQ.GT.MCHEB) THEN
 
@@ -98,7 +98,7 @@
          RETURN
 
       END IF
- 
+
 *   Evaluate results
       DO 200 IDATA = 1, NDATA
 

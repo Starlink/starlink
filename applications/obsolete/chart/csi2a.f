@@ -6,18 +6,18 @@
 *
 * A program to convert star catalogs in CSI format from binary to
 * ASCII format, to enable them to be ported from one system to another.
-* There is, as you might expect, an equal and opposite program which 
+* There is, as you might expect, an equal and opposite program which
 * converts the ASCII format catalog back to binary format once it has
 * been ported, called CSI2B.
 *
 * The program will ask the user which machine it is running on, first,
-* to be able to select the right record length for the RECL specifier 
-* of the OPEN statement, as the VAX expects it in longwords for 
-* unformatted files. It will then prompt the user for the pathnames 
-* for both the existing CSI binary file and the text file which is 
+* to be able to select the right record length for the RECL specifier
+* of the OPEN statement, as the VAX expects it in longwords for
+* unformatted files. It will then prompt the user for the pathnames
+* for both the existing CSI binary file and the text file which is
 * to be output.
 * Warning: the text files get pretty big - about 42 Mbytes.
-* 
+*
 * It's all standard FORTRAN 77, and uses no external or internal
 * subroutines.
 *
@@ -51,14 +51,14 @@
          LEN = 36
       ENDIF
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname of CSI binary file ?'
       READ(*, '(A)') FILE
- 
-      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN, 
+
+      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN,
      :      FORM = 'UNFORMATTED', STATUS = 'OLD')
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname for CSI ASCII file ?'
       READ(*, '(A)') FILE
 
@@ -87,7 +87,7 @@
       COUNT = COUNT + 1
       READ(10, REC = COUNT, IOSTAT = IOSTAT) NHD, SPEC, MB, MV, IRA,
      +     IDEC, DM, DMSIGN, DMZ, DMN, DMSUPP, ID
-      IF (MOD(COUNT, 10000) .EQ. 0)  WRITE(*,*) 'Done ', COUNT 
+      IF (MOD(COUNT, 10000) .EQ. 0)  WRITE(*,*) 'Done ', COUNT
       IF (IOSTAT .EQ. 0) GOTO 300
       WRITE(*,*) 'Finished !'
 

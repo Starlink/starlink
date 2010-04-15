@@ -22,13 +22,13 @@
       IMPLICIT NONE
 
       INTEGER LUN
-      
+
 *  Maximum and minimum values for lun
       INTEGER MAXLUN, MINLUN
       PARAMETER (MAXLUN=48, MINLUN = 10)
       LOGICAL OPN
       INTEGER I
-      
+
       INTEGER LUNS
 *  Starting point for search
       DATA LUNS/10/

@@ -188,7 +188,7 @@
 
                         STATUS = SAI__ERROR
                         CALL ERR_REP( ' ', 'RED4_EDIT_MASK: '/
-     :                    /'Failed to get %AGAIN '/ 
+     :                    /'Failed to get %AGAIN '/
      :                    /'parameter', STATUS )
                      END IF
                   ELSE
@@ -199,8 +199,8 @@
                ELSE
 
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 'RED4_EDIT_MASK: '/ 
-     :              /'Failed to get %IPOS and '/ 
+                  CALL ERR_REP( ' ', 'RED4_EDIT_MASK: '/
+     :              /'Failed to get %IPOS and '/
      :              /'%JPOS parameters', STATUS )
                END IF
 
@@ -216,7 +216,7 @@
 *      Close DSA. It will create the new mask structure and will
 *      also unmap all the arrays mapped above.
 *      (The routine will attempt to work even if the status on entry
-*      is bad). 
+*      is bad).
          CALL DSA_CLOSE( STATUS )
       ELSE
 

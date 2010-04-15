@@ -1,8 +1,8 @@
-      SUBROUTINE POINB0( MAXSRC, BAND, CANDN, CANDSM, INTLBD, INTUBD, 
-     :                   INTDAT, NOISMP, PRFWID, PROF, SMPLBD, SMPUBD, 
+      SUBROUTINE POINB0( MAXSRC, BAND, CANDN, CANDSM, INTLBD, INTUBD,
+     :                   INTDAT, NOISMP, PRFWID, PROF, SMPLBD, SMPUBD,
      :                   SMPDAT, SPSQ, SIP, SP, SISQ, SI, S1, V,
-     :                   S2NREQ, THCORR, THS2N, THSD, MINSMP, 
-     :                   SRCAMP, SRCBAS, SRCCOR, SRCNON, 
+     :                   S2NREQ, THCORR, THS2N, THSD, MINSMP,
+     :                   SRCAMP, SRCBAS, SRCCOR, SRCNON,
      :                   SRCNOS, SRCSLP, SRCSMP, SRCN, STATUS )
 *+
 *  Name:
@@ -15,13 +15,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINB0( MAXSRC, BAND, CANDN, CANDSM, INTLBD, INTUBD, INTDAT, 
+*     CALL POINB0( MAXSRC, BAND, CANDN, CANDSM, INTLBD, INTUBD, INTDAT,
 *                  NOISMP, PRFWID, PROF, SMPLBD, SMPUBD, SMPDAT,
 *                  SPSQ, SIP, SP, SISQ, SI, S1, V,
 *                  S2NREQ, THCORR, THS2N, MXSRCN,
-*                  SRCAMP, SRCBAS, SRCCOR, SRCNON, SRCNOS, 
+*                  SRCAMP, SRCBAS, SRCCOR, SRCNON, SRCNOS,
 *                  SRCSLP, SRCSMP, SRCN, STATUS )
-      
+
 *  Description:
 *     This subroutine is used by POINTCRDD to select point sources from
 *     the given candidates. The selections are determined by the
@@ -41,15 +41,15 @@
 *     MAXSRC = INTEGER (Given)
 *        Maximum number of sources
 *     BAND = INTEGER (Given)
-*        Waveband number 
+*        Waveband number
 *     CANDN = INTEGER (Given)
 *        The number of candidate point sources
 *     CANDSM( MAXSRC) = INTEGER (Given)
 *        The sample indices of the candidate point sources
 *     INTLBD = INTEGER (Given)
-*        The begining sample index of the interpolated data 
+*        The begining sample index of the interpolated data
 *     INTUBD = INTEGER (Given)
-*        The end sample index of the interpolated data 
+*        The end sample index of the interpolated data
 *     INTDAT( INTLBD: INTUBD ) = INTEGER (Given)
 *        The interpolated data
 *     NOISMP = INTEGER (Returned)
@@ -86,7 +86,7 @@
 *        Determinant of the symmatric matrix formed by SPSQ, SIP, SP,
 *        SISQ, SI, S1.
 *     S2NREQ = LOGICAL (Given)
-*        TRUE if the signal to noise test is required else all sources 
+*        TRUE if the signal to noise test is required else all sources
 *        which pass the correlation test are reported
 *     THCORR = REAL (Given)
 *        The correlation threshold.
@@ -94,7 +94,7 @@
 *        The signal to noise ratio threshold.
 *     THSD = REAL (Given)
 *        Threshold of standard deviations above which sample is to be excluded
-*	 from noise calculations as an assumed source 
+*	 from noise calculations as an assumed source
 *     SRCAMP( MAXSRC ) = REAL (Returned)
 *        The amplitude of the detected point sources.
 *     SRCBAS( MAXSRC ) = REAL (Returned)
@@ -130,7 +130,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -151,14 +151,14 @@
       REAL PROF( PRFWID )
       INTEGER SMPLBD, SMPUBD
       REAL SMPDAT( SMPLBD: SMPUBD )
-      DOUBLE PRECISION SPSQ 
+      DOUBLE PRECISION SPSQ
       DOUBLE PRECISION SIP
       DOUBLE PRECISION SP
       DOUBLE PRECISION SISQ
       DOUBLE PRECISION SI
       DOUBLE PRECISION S1
       DOUBLE PRECISION V
-      LOGICAL S2NREQ 
+      LOGICAL S2NREQ
       REAL THCORR
       REAL THS2N
       REAL THSD
@@ -183,7 +183,7 @@
       REAL AMPI, AMI, AMLI       ! Amplitude at samples I-1, I, I+1 where I is
 				 ! the candidate sample number
       REAL BSPI, BSI, BSLI       ! Baseline height at I-1, I, I+1
-      REAL CC                    ! Max. CC 
+      REAL CC                    ! Max. CC
       REAL CCPI, CCI, CCLI       ! Correlations at I-1, I, I+1
       REAL CMEAN                 ! Mean value of the samples over which
 				 ! the noise is calculated
@@ -198,10 +198,10 @@
       INTEGER ICAN               ! Point source candidate index
       INTEGER INSMPL             ! Lower bound of region around candidate point
 				 ! source ommitted from noise calulations as
-				 ! being affected by source 
+				 ! being affected by source
       INTEGER INSMPU             ! Upper bound of region around candidate point
 				 ! source ommitted from noise calulations as
-				 ! being affected by source 
+				 ! being affected by source
       INTEGER LSRCSM             ! Sample number associated with the last source
 				 ! found valid
       REAL POSCOR                ! Position of the max. CC
@@ -234,8 +234,8 @@
       DO ICAN = 1, CANDN
 
 *  First of all the input data should have a peak around the candidate
-*  position. 
-         SMP = CANDSM( ICAN ) 
+*  position.
+         SMP = CANDSM( ICAN )
          IF ( ( INTDAT( SMP - 1 ) .GT. INTDAT( SMP - 2 ) .AND.
      :          INTDAT( SMP - 1 ) .GE. INTDAT( SMP ) ) .OR.
      :        ( INTDAT( SMP - 1 ) .GE. INTDAT( SMP - 2 ) .AND.
@@ -248,33 +248,33 @@
      :          INTDAT( SMP + 1 ) .GE. INTDAT( SMP + 2 ) ) .OR.
      :        ( INTDAT( SMP + 1 ) .GE. INTDAT( SMP ) .AND.
      :          INTDAT( SMP + 1 ) .GT. INTDAT( SMP + 2 ) ) ) THEN
-    
+
 *  Do least square fit of the point source profile at the candidate
 *  sample position, and calculate the correlation coefficient and
 *  mean, slope and point source amplitude for the data surrounding
 *  that position
             CALL POINC2( INTLBD, INTUBD, INTDAT, PRFWID, PROF, SMP,
-     :                   SPSQ, SIP, SP, SISQ, SI, S1, V, AMI, 
+     :                   SPSQ, SIP, SP, SISQ, SI, S1, V, AMI,
      :                   SLI, BSI, CCI, STATUS )
 
 *  Do the similar calculation at the candidate sample - 1 position.
             CALL POINC2( INTLBD, INTUBD, INTDAT, PRFWID, PROF, SMP - 1,
-     :                   SPSQ, SIP, SP, SISQ, SI, S1, V, AMPI, 
+     :                   SPSQ, SIP, SP, SISQ, SI, S1, V, AMPI,
      :                   SLPI, BSPI, CCPI, STATUS )
 
 *  Do the similar calculation at the candidate sample + 1 position.
             CALL POINC2( INTLBD, INTUBD, INTDAT, PRFWID, PROF, SMP + 1,
-     :                   SPSQ, SIP, SP, SISQ, SI, S1, V, AMLI, 
+     :                   SPSQ, SIP, SP, SISQ, SI, S1, V, AMLI,
      :                   SLLI, BSLI, CCLI, STATUS )
 
 *  Find the position correction needed to obtain the maximum correlation
 *  coefficient from the three points above by parabola interpolation.
-            CALL POINC3( CCPI, CCI, CCLI, CC, POSCOR, STATUS )  
+            CALL POINC3( CCPI, CCI, CCLI, CC, POSCOR, STATUS )
 
 *  Continue with those source candidates which have correlation coefficients
 *  above the correlation coefficient threshold.
             IF ( CC .GE. THCORR ) THEN
-      
+
 *  Get the amplitude of the point source by parabola interpolation.
                CALL POINC4( AMPI, AMI, AMLI, POSCOR, AMP, STATUS )
 
@@ -286,14 +286,14 @@
                HAFNOS      = INT( REAL( NOISMP ) / 2 )
                INSMPL      = CANDSM( ICAN ) -
      :                       INT( ( 0.5 * REAL( PRFWID)) + 1 )
-               INSMPU      = CANDSM( ICAN ) + 
+               INSMPU      = CANDSM( ICAN ) +
      :                       INT( ( 0.5 * REAL( PRFWID)) + 1 )
                OUTSMP( 1 ) = MAX( SMPLBD, INSMPL - HAFNOS )
                OUTSMP( 2 ) = MIN( SMPUBD, INSMPU + HAFNOS )
 
 *  Estimate the local noise at the candidate position.
                CALL POINA6( .TRUE., INSMPL, INSMPU, MINSMP, OUTSMP,
-     :                      .FALSE., SMPLBD, SMPUBD, THSD, SMPDAT, 
+     :                      .FALSE., SMPLBD, SMPUBD, THSD, SMPDAT,
      :                      ACTSMP, DETER2, CMEAN, CNOBAD,
      :                      CNOLRG, CNOSMP, CSTDEV, STATUS )
 
@@ -302,7 +302,7 @@
                THRESH = THS2N * CSTDEV
                IF ( .NOT. S2NREQ .OR. ( AMP .GT. THRESH) ) THEN
 
-*  First check whether the last source recorded was associated with the 
+*  First check whether the last source recorded was associated with the
 *  sample immediately preceeding this current sample
                   IF ( CANDSM( ICAN ) - ( LSRCSM + 1 ) .NE. 0 ) THEN
 
@@ -315,7 +315,7 @@
                      LSRCSM = CANDSM( ICAN )
 
 * Enter data required for current source
-                     SRCSMP( SRCN ) = REAL( CANDSM( ICAN ) ) + POSCOR 
+                     SRCSMP( SRCN ) = REAL( CANDSM( ICAN ) ) + POSCOR
                      SRCAMP( SRCN ) = AMP
                      SRCNOS( SRCN ) = CSTDEV
                      SRCNON( SRCN ) = CNOSMP
@@ -324,13 +324,13 @@
 *  Find the data slope value at the position of maximum correlation
 *  coefficient by using parabolic interpolation between the slope at
 *  the candidate and at the two adjacent points
-                     CALL POINC4( SLPI, SLI, SLLI, POSCOR, 
+                     CALL POINC4( SLPI, SLI, SLLI, POSCOR,
      :                            SRCSLP( SRCN ),STATUS )
 
 *  Find the mean value at the position of maximum correlation coefficient by
 *  using parabolic interpolation between the mean at the candidate and at the
 *  two adjacent points
-                     CALL POINC4( BSPI, BSI, BSLI, POSCOR, 
+                     CALL POINC4( BSPI, BSI, BSLI, POSCOR,
      :                            SRCBAS( SRCN ),STATUS )
 
 *  Calibrate the constant so that it stands for the constant at the centre of
@@ -357,7 +357,7 @@
 * Only if this source has a higher correlation than the previous one do we
 * OVERWRITE the previous source data with that for the current source
 * Enter data required for current source
-                        SRCSMP( SRCN ) = REAL( CANDSM( ICAN ) ) + POSCOR 
+                        SRCSMP( SRCN ) = REAL( CANDSM( ICAN ) ) + POSCOR
                         SRCAMP( SRCN ) = AMP
                         SRCNOS( SRCN ) = CSTDEV
                         SRCNON( SRCN ) = CNOSMP
@@ -366,13 +366,13 @@
 *  Find the data slope value at the position of maximum correlation
 *  coefficient by using parabolic interpolation between the slope at
 *  the candidate and at the two adjacent points
-                        CALL POINC4( SLPI, SLI, SLLI, POSCOR, 
+                        CALL POINC4( SLPI, SLI, SLLI, POSCOR,
      :                            SRCSLP( SRCN ),STATUS )
 
 *  Find the mean value at the position of maximum correlation coefficient by
 *  using parabolic interpolation between the mean at the candidate and at the
 *  two adjacent points
-                        CALL POINC4( BSPI, BSI, BSLI, POSCOR, 
+                        CALL POINC4( BSPI, BSI, BSLI, POSCOR,
      :                            SRCBAS( SRCN ),STATUS )
 
 *  Calibrate the constant so that it stands for the constant at the centre of
@@ -393,8 +393,8 @@
 * End if for check whether sources are consecutive
                   END IF
                END IF
-            END IF   
+            END IF
          END IF
       END DO
-      
+
       END

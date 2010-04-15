@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, 
-     :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, LBND, 
+      SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL,
+     :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, LBND,
      :                       UBND, WORK1, WORK2, WORK3, WORK4, STATUS )
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, NROW, 
-*                      IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, 
+*     CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, NROW,
+*                      IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2,
 *                      WORK3, WORK4, STATUS )
 
 *  Description:
-*     This routine writes out a Tcl list holding the column data in a 
+*     This routine writes out a Tcl list holding the column data in a
 *     catalogue.
 
 *  Arguments:
@@ -34,14 +34,14 @@
 *        CAT identifiers for the column on which MAP should operate to
 *        create new RA/DEC values. Only accessed if MAKERD is .TRUE.
 *     MAP = INTEGER (Given)
-*        A pointer to an AST Mapping from the columns given by GA to RA/DEC. 
+*        A pointer to an AST Mapping from the columns given by GA to RA/DEC.
 *        Only accessed if MAKERD is .TRUE.
 *     NCOL = INTEGER (Given)
 *        No. of columns to write. Should be at least 4.
 *     GCOL( NCOL ) = INTEGER (Given)
 *        The CAT identifiers for the columns within the input catalogue
 *        to be used for each output column. Columns 1 and 2 should be the
-*        X and Y columns. If GOTRD is .TRUE., columns 3 and 4 should be 
+*        X and Y columns. If GOTRD is .TRUE., columns 3 and 4 should be
 *        the RA and DEC columns.
 *     NROW = INTEGER (Given)
 *        No. of rows.
@@ -71,7 +71,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     PWD: Peter W. Draper (STARLINK)
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,7 +104,7 @@
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( CONTIN = '\\' )    
+      PARAMETER( CONTIN = '\\' )
 
 *  Arguments Given:
       INTEGER CI
@@ -120,13 +120,13 @@
       INTEGER ZCOL
       INTEGER FD
       INTEGER SZBAT
-      
+
 *  Arguments Returned:
       REAL LBND( 3 )
       REAL UBND( 3 )
-      DOUBLE PRECISION WORK1( SZBAT, NDIM ) 
-      DOUBLE PRECISION WORK2( SZBAT, 2 ) 
-      REAL WORK3( SZBAT, * ) 
+      DOUBLE PRECISION WORK1( SZBAT, NDIM )
+      DOUBLE PRECISION WORK2( SZBAT, 2 )
+      REAL WORK3( SZBAT, * )
       CHARACTER WORK4( SZBAT )*(*)
 
 *  Status:
@@ -190,7 +190,7 @@
       REAL RP2                   ! Squared distance in pixels**2
       REAL RP2MIN                ! Min value of RP2
       REAL X                     ! X column value
-      REAL XC                    ! Estimate of central X 
+      REAL XC                    ! Estimate of central X
       REAL XRAN( NRAN )          ! X values at saved rows
       REAL Y                     ! Y column value
       REAL YC                    ! Estimate of central Y
@@ -206,24 +206,24 @@
 
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  See if we need to construct ID values.
       MAKEID = ( GCOL( IDCOL ) .EQ. CAT__NOID )
 
 *  Store a flag indicating if existing ID values are stored as characters
-      IF( .NOT. MAKEID ) THEN 
+      IF( .NOT. MAKEID ) THEN
          CALL CAT_TIQAI( GCOL( IDCOL ), 'DTYPE', IDTYPE, STATUS )
-         CHARID = ( IDTYPE .EQ. CAT__TYPEC ) 
+         CHARID = ( IDTYPE .EQ. CAT__TYPEC )
       ELSE
          CHARID = .FALSE.
       END IF
 
 *  Store some random row numbers. The X/Y and RA/DEC values at these rows
-*  are saved in local arrays as the rows are accessed. The row which is 
-*  closest to the centre of the final bounding box is used to estimate a 
-*  central RA and DEC. This will not of course necessarily be the actual 
+*  are saved in local arrays as the rows are accessed. The row which is
+*  closest to the centre of the final bounding box is used to estimate a
+*  central RA and DEC. This will not of course necessarily be the actual
 *  field centre but it will usually be somewhere near, which is good enough.
 *  Ensure that no dupliate row numbers are included in the RANROW array.
       RANROW( 1 ) = MIN( NROW, MAX( 1, NINT( RAN( 1 ) * NROW ) ) )
@@ -235,7 +235,7 @@
             RANROW( MRAN ) = IROW
          END IF
       END DO
-   
+
 *  So far we have saved no random rows.
       SAVRAN = 0
 
@@ -269,21 +269,21 @@
          BATSZ = MIN( ( NROW - IROW ) + 1, SZBAT )
 
 *  If the output file is to contain RA/DEC values in columns 3 and 4...
-         IF( GOTRD ) THEN 
+         IF( GOTRD ) THEN
 
 *  If required, create RA/DEC values by transforming the X/Y values.
-            IF( MAKERD ) THEN 
+            IF( MAKERD ) THEN
 
 *  Read in the next batch of values to use as the basis of the RA and DEC
 *  values.
                DO IGA = 1, NDIM
-                  CALL CAT_GCOLD( CI, GA( IGA ), IROW, BATSZ, 
-     :                             WORK1( 1, IGA ), STATUS )     
+                  CALL CAT_GCOLD( CI, GA( IGA ), IROW, BATSZ,
+     :                             WORK1( 1, IGA ), STATUS )
                END DO
 
 *  Map these values into RA/DEC values.
                CALL AST_TRANN( MAP, BATSZ, NDIM, SZBAT, WORK1, .TRUE.,
-     :                         2, SZBAT, WORK2, STATUS ) 
+     :                         2, SZBAT, WORK2, STATUS )
 
 *  Indicate if we stll need to read X and Y columns.
                READX = ( GA( 1 ) .NE. GCOL( 1 ) )
@@ -291,10 +291,10 @@
 
 *  Otherwise, read the RA and DEC values in from the input catalogue.
             ELSE
-               CALL CAT_GCOLD( CI, GCOL( 3 ), IROW, BATSZ, 
-     :                          WORK2( 1, 1 ), STATUS )     
-               CALL CAT_GCOLD( CI, GCOL( 4 ), IROW, BATSZ, 
-     :                          WORK2( 1, 2 ), STATUS )     
+               CALL CAT_GCOLD( CI, GCOL( 3 ), IROW, BATSZ,
+     :                          WORK2( 1, 1 ), STATUS )
+               CALL CAT_GCOLD( CI, GCOL( 4 ), IROW, BATSZ,
+     :                          WORK2( 1, 2 ), STATUS )
 
 *  Indicate that we stll need to read X and Y columns.
                READX = .TRUE.
@@ -304,28 +304,28 @@
 
 *  Read in the next batch of X and Y values, if we do not already have
 *  them.
-            IF( READX ) CALL CAT_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, 
-     :                                   WORK1( 1, 1 ), STATUS )     
-            IF( READY ) CALL CAT_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, 
-     :                                   WORK1( 1, 2 ), STATUS )     
+            IF( READX ) CALL CAT_GCOLD( CI, GCOL( 1 ), IROW, BATSZ,
+     :                                   WORK1( 1, 1 ), STATUS )
+            IF( READY ) CALL CAT_GCOLD( CI, GCOL( 2 ), IROW, BATSZ,
+     :                                   WORK1( 1, 2 ), STATUS )
 
 *  Read the remaining columns.
             DO I = 5, NCOL
-               IF( I .EQ. IDCOL ) THEN 
-                  IF( MAKEID ) THEN 
+               IF( I .EQ. IDCOL ) THEN
+                  IF( MAKEID ) THEN
                      DO KK = 1, BATSZ
                         WORK3( KK, I - 4 ) = KK + IROW - 1
                      END DO
                   ELSE IF( CHARID ) THEN
-                     CALL CAT_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
-     :                                WORK4, STATUS )     
-                  ELSE 
-                     CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+                     CALL CAT_GCOLC( CI, GCOL( I ), IROW, BATSZ,
+     :                                WORK4, STATUS )
+                  ELSE
+                     CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ,
      :                                WORK3( 1, I - 4 ), STATUS )
-                  END IF      
+                  END IF
                ELSE
-                  CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
-     :                             WORK3( 1, I - 4 ), STATUS )     
+                  CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ,
+     :                             WORK3( 1, I - 4 ), STATUS )
                END IF
             END DO
 
@@ -371,7 +371,7 @@
                   DEC = DEC*RTOD
 
                END IF
-               
+
 *  Write out the values, appending a backslash at the end of each line to
 *  tell tcl to ignore the line break.
                WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
@@ -379,11 +379,11 @@
                DO J = 1, NCOL - 4, 4
                   DO K = 0, MIN( 3, NCOL - 4 - J )
                      IF( J + K + 4 .EQ. IDCOL ) THEN
-                        IF( CHARID ) THEN 
+                        IF( CHARID ) THEN
                            WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
      :                                                  WORK4( I ),'"'
                         ELSE
-                           WRITE( UNIT, '(1X,G13.6,$)' ) 
+                           WRITE( UNIT, '(1X,G13.6,$)' )
      :                                               WORK3( I, J + K )
                         END IF
                      ELSE
@@ -401,8 +401,8 @@
                IF( X .GT. UBND( 1 ) ) UBND( 1 ) = X
                IF( Y .GT. UBND( 2 ) ) UBND( 2 ) = Y
 
-*  Update the Z bounds if available.               
-               IF( ZCOL .GT. 0 ) THEN 
+*  Update the Z bounds if available.
+               IF( ZCOL .GT. 0 ) THEN
                   Z = REAL( WORK3( I, ZCOL - 4 ) )
                   IF( Z .LT. LBND( 3 ) ) LBND( 3 ) = Z
                   IF( Z .GT. UBND( 3 ) ) UBND( 3 ) = Z
@@ -416,27 +416,27 @@
 
 *  Read in the next batch of X and Y values.
             CALL CAT_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, WORK1( 1, 1 ),
-     :                       STATUS )     
+     :                       STATUS )
             CALL CAT_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, WORK1( 1, 2 ),
-     :                       STATUS )     
+     :                       STATUS )
 
 *  Read the remaining columns.
             DO I = 3, NCOL
-               IF( I .EQ. IDCOL ) THEN 
-                  IF( MAKEID ) THEN 
+               IF( I .EQ. IDCOL ) THEN
+                  IF( MAKEID ) THEN
                      DO KK = 1, BATSZ
                         WORK3( KK, I - 2 ) = KK + IROW - 1
                      END DO
                   ELSE IF( CHARID ) THEN
-                     CALL CAT_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
-     :                                WORK4, STATUS )     
+                     CALL CAT_GCOLC( CI, GCOL( I ), IROW, BATSZ,
+     :                                WORK4, STATUS )
                   ELSE
-                     CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
-     :                                WORK3( 1, I - 2 ), STATUS )     
-                  END IF      
+                     CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ,
+     :                                WORK3( 1, I - 2 ), STATUS )
+                  END IF
                ELSE
-                  CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
-     :                             WORK3( 1, I - 2 ), STATUS )     
+                  CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ,
+     :                             WORK3( 1, I - 2 ), STATUS )
                END IF
             END DO
 
@@ -453,11 +453,11 @@
                DO J = 1, NCOL - 2, 4
                   DO K = 0, MIN( 3, NCOL - 2 - J )
                      IF( J + K + 2 .EQ. IDCOL ) THEN
-                        IF( CHARID ) THEN 
+                        IF( CHARID ) THEN
                            WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
      :                                                  WORK4( I ),'" '
                         ELSE
-                           WRITE( UNIT, '(1X,G13.6,$)' ) 
+                           WRITE( UNIT, '(1X,G13.6,$)' )
      :                                                 WORK3( I, J + K )
                         END IF
                      ELSE
@@ -473,8 +473,8 @@
                IF( X .GT. UBND( 1 ) ) UBND( 1 ) = X
                IF( Y .GT. UBND( 2 ) ) UBND( 2 ) = Y
 
-*  Update the Z bounds if available.               
-               IF( ZCOL .GT. 0 ) THEN 
+*  Update the Z bounds if available.
+               IF( ZCOL .GT. 0 ) THEN
                   Z = REAL( WORK3( I, ZCOL - 2 ) )
                   IF( Z .LT. LBND( 3 ) ) LBND( 3 ) = Z
                   IF( Z .GT. UBND( 3 ) ) UBND( 3 ) = Z
@@ -487,7 +487,7 @@
 *  Increment the index of the next row to be read.
          IROW = IROW + BATSZ
 
-      END DO        
+      END DO
 
 *  Write out the final part of the Tcl assignment statement.
       WRITE( UNIT, * ) '}'
@@ -501,13 +501,13 @@
          IF( SAVRAN .GT. 1 ) THEN
 
 *  Initialise the minimum distance found so far.
-            RP2MIN = VAL__MAXR       
+            RP2MIN = VAL__MAXR
 
 *  Loop round the saved rows.
             DO I = 1, SAVRAN
 
 *  Find the squared distance from this row to the field centre in pixels.
-               RP2 = ( XRAN( I ) - XC )**2 + ( YRAN( I ) - YC )**2            
+               RP2 = ( XRAN( I ) - XC )**2 + ( YRAN( I ) - YC )**2
 
 *  If this is less than the current minimum, note the row index and
 *  update the minimum squared distance.
@@ -532,7 +532,7 @@
                IF( I .NE. IC ) THEN
 
 *  Find the distance in pixels from this row to the central row.
-                  RP = SQRT( ( XRAN( I ) - XC )**2 + 
+                  RP = SQRT( ( XRAN( I ) - XC )**2 +
      :                       ( YRAN( I ) - YC )**2 )
 
 *  Find the distance between the two points in radians.
@@ -545,18 +545,18 @@
                END IF
             END DO
 
-*  Write out the central X and Y values, relative to the bottom left corner 
+*  Write out the central X and Y values, relative to the bottom left corner
 *  of the bounding box.
             WRITE( UNIT, * ) 'set xrefpix_ ', NINT( XC - LBND( 1 ) + 1 )
             WRITE( UNIT, * ) 'set yrefpix_ ', NINT( YC - LBND( 2 ) + 1 )
 
 *  Write out the pixel size in arcseconds
-            WRITE( UNIT, * ) 'set secpix_ ', 
+            WRITE( UNIT, * ) 'set secpix_ ',
      :                        SS/( SAVRAN - 1 )*RTOD*3600.0
 
 *  If less than two rows were saved with good RA and DEC, use a guess
 *  based on any good RA DEC value found.
-         ELSE 
+         ELSE
             RAC = RAG
             DECC = DECG
             WRITE( UNIT, * ) 'set xrefpix_ 1.0'
@@ -565,7 +565,7 @@
          END IF
 
 *  Write out the central RA in "h:m:s" format
-         CALL SLA_DR2TF( 3, SLA_DRANRM( RAC ), SIGN, FIELDS ) 
+         CALL SLA_DR2TF( 3, SLA_DRANRM( RAC ), SIGN, FIELDS )
          IF( FIELDS( 1 ) .EQ. 24 ) THEN
             TEXT = 'set ra_ "0:0:0"'
             IAT = 15
@@ -581,11 +581,11 @@
             CALL CHR_PUTI( FIELDS( 4 ), TEXT, IAT )
             CALL CHR_PUTC( '"', TEXT, IAT )
          END IF
-         
+
          WRITE( UNIT, * ) TEXT( : IAT )
 
 *  Write out the central DEC in "d:m:s" format
-         CALL SLA_DR2AF( 3, SLA_DRANGE( DECC ), SIGN, FIELDS ) 
+         CALL SLA_DR2AF( 3, SLA_DRANGE( DECC ), SIGN, FIELDS )
          TEXT = 'set dec_ "'
          IAT = 10
          CALL CHR_PUTC( SIGN, TEXT, IAT )
@@ -605,4 +605,4 @@
       WRITE( UNIT, * ) 'set nxpix_ ', NINT( UBND( 1 ) - LBND( 1 ) + 1 )
       WRITE( UNIT, * ) 'set nypix_ ', NINT( UBND( 2 ) - LBND( 2 ) + 1 )
 
-      END 
+      END

@@ -1,24 +1,24 @@
       SUBROUTINE POLFIT(X,Y,SIGMAY,NPTS,NTERMS,MODE,A,CHISQR)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C      P O L F I T
 C
 C
 C Author: Bevington
 C
-C Parameters: 
+C Parameters:
 C
 C X (<), Y (<), SIGMAY (<), NPTS (<), NTERMS (<), MODE (<),A (>),
 C CHISQR (>)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C  Bevingtons polynomial least-sqaures fitting routine

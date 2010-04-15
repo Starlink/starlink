@@ -38,8 +38,8 @@
 *        extension.
 *     EDITS( NKEY ) = CHARACTER * ( * ) (Given)
 *        The editing commands.  These need only be one character per
-*        element.  Allowed values are 'Amend', 'Delete', 'Exist', 
-*        'Move', 'Null'', 'Rename', 'Print', 'Update', and 'Write', 
+*        element.  Allowed values are 'Amend', 'Delete', 'Exist',
+*        'Move', 'Null'', 'Rename', 'Print', 'Update', and 'Write',
 *        which can be abbreviated to the initial letter.
 *
 *        'Amend' acts as 'Update' if the keyword exists, but as 'Write'
@@ -55,7 +55,7 @@
 *        it defaults to the END card, and if the END card is absent,
 *        the new location is at the end of the headers.
 *
-*        'Null' nullifies the value of the named keyword.  Spaces 
+*        'Null' nullifies the value of the named keyword.  Spaces
 *        substitute the keyword's value.
 *
 *        'Print' causes the value of a named keyword to be displayed to
@@ -91,23 +91,23 @@
 *        The position keyword names.  A position name may be compound
 *        to handle hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of
-*        keywords per FITS card is twenty.  Each keyword must be no 
+*        keywords per FITS card is twenty.  Each keyword must be no
 *        longer than eight characters.  When locating the position card,
 *        comparisons are made in uppercase and with the blanks removed.
 
 *        The new keywords are inserted immediately before each
 *        corresponding position keyword.  If any name in it does not
 *        exist in FITS array, the consequences will be as follows.  In
-*        the Write, Amend (new keyword), and Move edits its 
+*        the Write, Amend (new keyword), and Move edits its
 *        corresponding keyword will be inserted just before the END
 *        card or appended to FITS array when the END card does not
-*        exist; however, the card is not relocated for an Update or 
-*        Amend (with an existing keyword) edit.  If two or more new 
-*        cards have the same position name, they will all be put just  
-*        before the position name in the same order as they are in 
+*        exist; however, the card is not relocated for an Update or
+*        Amend (with an existing keyword) edit.  If two or more new
+*        cards have the same position name, they will all be put just
+*        before the position name in the same order as they are in
 *        NAMES.
 *
-*        A positional keyword is used by the Move, Write, Amend, and 
+*        A positional keyword is used by the Move, Write, Amend, and
 *        Update editing commands.
 *     KOCCUR( NKEY ) = INTEGER (Given)
 *        The occurrences of the NAMES keywords to use.  Values less than
@@ -127,7 +127,7 @@
 *        edited.  This positional keyword must exist and have a value
 *        for a Write edit; whereas the FITS-header value is unchanged
 *        for Update if there are problems with this positional keyword.
-*        
+*
 *        For a Rename edit, VALUES has a different meaning; in this
 *        case it stores the replacement keyword name.
 *     COMNTS( NKEY ) = CHARACTER * ( * ) (Given)
@@ -170,12 +170,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -207,7 +207,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -313,21 +313,21 @@
 *  the lengths explicitly for the former as the compilers pass the
 *  lengths of the latter as appended arguments .
       CALL FTS1_EDKEY_C1( OLDSIZ, NKEY, NEWSIZ( 1 ),
-     :                    %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( FTSPNT( 1 ) ) ),
      :                    %VAL( CNF_PVAL( CPNTR( 1 ) ) ),
      :                    EDITS, NAMES, PSTNS, KOCCUR, POCCUR, VALUES,
-     :                    COMNTS, TYPES, ACTNUM, 
+     :                    COMNTS, TYPES, ACTNUM,
      :                    %VAL( CNF_PVAL( IPNTR1( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( IPNTR2( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPNTR2( 1 ) ) ),
      :                    THERE, STATUS,
-     :                    %VAL( CNF_CVAL( FITSLN ) ), 
+     :                    %VAL( CNF_CVAL( FITSLN ) ),
      :                    %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Unmap the FITS array.
       CALL DAT_UNMAP( FTSLOC, STATUS )
 
 *  Reduce the size of FITS array to the actual number of cards.
-      CALL DAT_ALTER( FTSLOC, 1, ACTNUM, STATUS )   
+      CALL DAT_ALTER( FTSLOC, 1, ACTNUM, STATUS )
 
  990  CONTINUE
 
@@ -338,7 +338,7 @@
       CALL AIF_ANTMP( WKLOC, STATUS )
 
  999  CONTINUE
-      
+
       END
 
 *  This is a dummy routine needed to pass the mapped character arrays
@@ -349,7 +349,7 @@
      :                          EDITS, NAMES, PSTNS, KOCCUR, POCCUR,
      :                          VALUES, COMNTS, TYPES, ACTNUM,
      :                          IARY1, IARY2, THERE, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -366,7 +366,7 @@
       CHARACTER * ( * ) COMNTS( NKEY )
       CHARACTER * ( * ) TYPES( NKEY )
       INTEGER ACTNUM
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) CARDS( NEWSIZ )
       INTEGER IARY1( NEWSIZ )
@@ -375,7 +375,7 @@
 *  Arguments Returned:
       CHARACTER * ( * ) CWORK( NEWSIZ )
       LOGICAL THERE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

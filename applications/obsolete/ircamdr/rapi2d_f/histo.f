@@ -78,8 +78,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'          ! global SSE definitions
-      INCLUDE 'NDF_PAR'          
-      INCLUDE 'NDF_ERR'          
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -94,7 +94,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI,                  ! locator for input data structure
      :    NELEMENTS,             ! number of elements mapped
      :    NDIM,                  ! dimensions from NDF_DIM
@@ -112,7 +112,7 @@
      :    MAXPOS( 2 ),           ! position of maximum value in sub-array
      :    MINPOS( 2 )            !     "     " minimum   "    "  "    "
 
-      REAL 
+      REAL
      :    MAXIMUM,               ! maximum intensity value in sub-array
      :    MINIMUM,               ! minimum     "       "   "   "    "
      :    SUM,                   ! total sum of pixels in sub-array
@@ -122,24 +122,24 @@
 
 
 *-
-*    check status on entry 
+*    check status on entry
       IF ( STATUS .NE. SAI__OK ) THEN
          RETURN
       END IF
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error so far then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS )
-      
+
 *       tell user dimensions of input array
          CALL MSG_SETI( 'XDIM', IDIMS(1) )
          CALL MSG_SETI( 'YDIM', IDIMS(2) )
@@ -151,9 +151,9 @@
          CALL AIF_GET0I( 'YSTART', 1, 1, IDIMS(2), YSTART, STATUS )
 
 *       get x and y sizes of sub-array to be processed
-         CALL AIF_GET0I( 'XSIZE', IDIMS(1)-XSTART+1, 1, 
+         CALL AIF_GET0I( 'XSIZE', IDIMS(1)-XSTART+1, 1,
      :                    IDIMS(1)-XSTART+1, XSIZE, STATUS )
-         CALL AIF_GET0I( 'YSIZE', IDIMS(2)-YSTART+1, 1, 
+         CALL AIF_GET0I( 'YSIZE', IDIMS(2)-YSTART+1, 1,
      :                    IDIMS(2)-YSTART+1, YSIZE, STATUS )
 
 *       calculate the box finish coordinates
@@ -168,13 +168,13 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          get maximum and minimum values in sub-array
-            CALL MAXMIN( IDIMS(1), IDIMS(2), %VAL( PNTRI ), XSTART, 
-     :                   YSTART, XFINISH, YFINISH, NUMPIX, MAXIMUM, 
+            CALL MAXMIN( IDIMS(1), IDIMS(2), %VAL( PNTRI ), XSTART,
+     :                   YSTART, XFINISH, YFINISH, NUMPIX, MAXIMUM,
      :                   MINIMUM, MAXPOS, MINPOS, STATUS )
 
-*          now call subroutine to generate histogram 
-            CALL GENHIS( IDIMS(1), IDIMS(2), %VAL( PNTRI ), XSTART, 
-     :                   YSTART, XFINISH, YFINISH, MAXIMUM, MINIMUM, 
+*          now call subroutine to generate histogram
+            CALL GENHIS( IDIMS(1), IDIMS(2), %VAL( PNTRI ), XSTART,
+     :                   YSTART, XFINISH, YFINISH, MAXIMUM, MINIMUM,
      :                   NUMBIN, HIST, STATUS )
 
 *          now call subroutine that calculates statistical parameters
@@ -196,7 +196,7 @@
             CALL MSG_SETI( 'MAXXPOS', MAXPOS( 1 ) )
             CALL MSG_SETI( 'MAXYPOS', MAXPOS( 2 ) )
             CALL MSG_OUT( 'HISTO_MAXPOS',
-     :    'Location of maximum               = ^MAXXPOS,^MAXYPOS', 
+     :    'Location of maximum               = ^MAXXPOS,^MAXYPOS',
      :     STATUS )
 	    CALL PAR_PUT0I( 'HISTO_XMAX', MAXPOS( 1), STATUS)
 	    CALL PAR_PUT0I( 'HISTO_YMAX', MAXPOS( 2), STATUS)
@@ -209,7 +209,7 @@
             CALL MSG_SETI( 'MINXPOS', MINPOS( 1 ) )
             CALL MSG_SETI( 'MINYPOS', MINPOS( 2 ) )
             CALL MSG_OUT( 'HISTO_MINPOS',
-     :    'Location of minimum               = ^MINXPOS,^MINYPOS', 
+     :    'Location of minimum               = ^MINXPOS,^MINYPOS',
      :     STATUS )
 	    CALL PAR_PUT0I( 'HISTO_XMIN', MINPOS( 1), STATUS)
 	    CALL PAR_PUT0I( 'HISTO_YMIN', MINPOS( 2), STATUS)
@@ -233,7 +233,7 @@
             CALL MSG_OUT( 'HISTO_MODE',
      :        'Mode of pixels in sub-array is    = ^MODE', STATUS )
 	    CALL PAR_PUT0R( 'HISTO_MODE', MODE, STATUS)
-  
+
 *       end of if-no-error-before-accessing-pointers check
          END IF
 

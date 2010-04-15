@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
       LOGICAL CURAVL             ! True if a cursor is available.
 
 
-      REAL MARGIN                ! Margin to place round the edge of 
+      REAL MARGIN                ! Margin to place round the edge of
                                  ! the picture.
       REAL XM                    ! X size of picture zone.
       REAL YM                    ! Y size of picture zone.
@@ -136,13 +136,13 @@
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_SETC( 'LAB', PICLAB )
          CALL MSG_OUTIF( MSG__NORM, 'SPHOB1_MSG1',
-     :                   '  DATA picture ^LAB ("^COM") being used', 
+     :                   '  DATA picture ^LAB ("^COM") being used',
      :                      STATUS )
       ELSE
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_OUTIF( MSG__NORM, 'SPHOB1_MSG2',
      :                   '  DATA picture "^COM" being used', STATUS )
-      END IF   
+      END IF
 
 *  Enquire the zone size of the DATA picture. Extend the returned
 *  bounds to give a "safety margin" round the edge of the picture, so
@@ -160,6 +160,6 @@
       Y2 = Y2 + MARGIN
 
 *  See if GKS/SGS has reported an error.
-      CALL GKS_GSTAT( STATUS )      
+      CALL GKS_GSTAT( STATUS )
 
       END

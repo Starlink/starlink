@@ -4,7 +4,7 @@
 *-----------------------------------------------------------------------
 
       SUBROUTINE GET_CUBE_DATA (J, K, LSPEC, BUF2, INTERP,
-     &                          I1, I2, BUF1, 
+     &                          I1, I2, BUF1,
      &                          INDEX, M, N, SUCCESS)
 
       IMPLICIT   NONE

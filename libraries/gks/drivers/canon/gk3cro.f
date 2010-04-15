@@ -62,7 +62,7 @@
       INTEGER NXB,NXC,NXR,I0,IX0,IX,IY0,IC,I,J,K,MASKY
       INTEGER IVAL,IBIT(0:7),NBYTE
       CHARACTER*10 CBYTE, WIDTH, CX0, CY0
-      INTEGER STCBY, STWID, NCX0, NCY0 
+      INTEGER STCBY, STWID, NCX0, NCY0
       INTEGER NLEFT
 *  Laserprinter codes
       CHARACTER*1 IS1, IS2, VDM, CSI
@@ -222,7 +222,7 @@ C      CALL GKFOCO(KIOPB,IS2,NLEFT)
 
 *        Initialise output byte to white
             IVAL = 0
- 
+
 *        Loop: bit by bit along byte setting bits as appropriate
             DO 2200 K = 0,7
                IF (KHP(I0+ICOLAR(IC+K,J)).LE.MASKL(IX+K))

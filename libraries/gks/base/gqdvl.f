@@ -24,7 +24,7 @@ C# IL>=b, OL>=0
 *     10/02/84  JL    Call to GKPRLG inserted (I89)
 *     10/02/84  JL    Change parameters to GKQXXD to make
 *                     NID & NRD distinct variables (I114)
-*     23/12/88  NMH   Change position of EAREA in parameters list for 
+*     23/12/88  NMH   Change position of EAREA in parameters list for
 *                     call to GKQXXD to correspond to order returned by
 *                     GKQXXD (S352).
 *

@@ -120,7 +120,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -190,7 +190,7 @@
       BXY = BX * BY
 
       SCALED = SCALE .GT. 0.0
-      
+
 *  Initialise sums to form the rms error of the fit.
       SUMSQ = 0.0
       NPT = 0
@@ -199,7 +199,7 @@
 *  co-ordinates for each bin.
       DO JMIN = 1, DIM2, IDY
          JMAX = MIN( JMIN + IDY - 1, DIM2 )
- 
+
 *  Find the y co-ordinates of the bin corners.
          Y( 1 ) = REAL( JMIN ) - 0.5
          Y( 2 ) = REAL( JMAX ) + 0.5
@@ -218,7 +218,7 @@
             CALL PDA_BISPEV( XKNOT, NXKNOT + 8, YKNOT, NYKNOT + 8,
      :                       COEFF, 3, 3, X, 2, Y, 2, F, WORK, 16,
      :                       IWORK, 4, IFAIL, STATUS )
- 
+
 *  Test for an error.
             IF ( IFAIL .NE. 0 ) THEN
                STATUS = SAI__ERROR
@@ -239,13 +239,13 @@
 
 *  Now scan all pixels in the bin, evaluating the bi-linear surface.
             DY = -0.5
- 
+
             DO J = JMIN, JMAX
                DY = DY + 1.0
                FA = ZA + ZC * DY
                FB = ZB + ZD * DY
                DX = -0.5
- 
+
                DO I = IMIN, IMAX
                   DX = DX + 1.0
                   FUN = FA + FB * DX
@@ -269,15 +269,15 @@
 *  End of the loops through the bins.
          END DO
       END DO
- 
+
 
 *  Calculate the rms error of the fit.
       IF ( NPT .GE. 1 ) THEN
-         RMS = SQRT( SUMSQ / REAL( NPT ) ) 
+         RMS = SQRT( SUMSQ / REAL( NPT ) )
       ELSE
          RMS = VAL__BADR
       END IF
 
   999 CONTINUE
- 
+
       END

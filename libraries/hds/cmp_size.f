@@ -9,7 +9,7 @@
 *           Variable containing a locator associated with a structured
 *           data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive 
+*           Expression specifying the component name of a primitive
 *           object contained in the structure.
 *     SIZE=INTEGER
 *           Variable to receive the total number values in the object.

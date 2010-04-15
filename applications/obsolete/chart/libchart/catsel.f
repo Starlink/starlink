@@ -32,11 +32,11 @@
 *-
 
       INCLUDE 'SAE_PAR'             ! Standard SAE constants
-                                
+
       INTEGER STATUS
       INTEGER NARR(*)
       CHARACTER IDNAM(*)*(*),STRING*(*)
-      
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -68,14 +68,14 @@
      :                     'SELECTION to ALL.', STATUS )
 
          ELSE
-      
+
             CALL ERR_REP( ' ', 'Catalogue selection ' //
      :                 'string not recognised, will select from all' //
      :                 ' catalogues.', STATUS )
 
          ENDIF
       ENDIF
-      
+
       END
 
- 
+

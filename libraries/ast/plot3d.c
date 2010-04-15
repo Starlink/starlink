@@ -11,48 +11,48 @@ c     astPlot3D
 f     AST_PLOT3D
 
 *  Description:
-*     A Plot3D is a specialised form of Plot that provides facilities 
-*     for producing 3D graphical output, including fully annotated 3D 
-*     coordinate grids. The base Frame in a Plot3D describes a 3-dimensional 
-*     "graphical" coordinate system. The axes of this coordinate system are 
-*     assumed to be right-handed (that is, if X appears horizontally to the 
-*     right and Y vertically upwards, then Z is out of the screen towards 
-*     the viewer), and are assumed to be equally scaled (that is, the same 
-*     units are used to measure positions on each of the 3 axes). The upper 
-*     and lower bounds of a volume within this graphical coordinate system 
-*     is specified when the Plot3D is created, and all subsequent graphics 
+*     A Plot3D is a specialised form of Plot that provides facilities
+*     for producing 3D graphical output, including fully annotated 3D
+*     coordinate grids. The base Frame in a Plot3D describes a 3-dimensional
+*     "graphical" coordinate system. The axes of this coordinate system are
+*     assumed to be right-handed (that is, if X appears horizontally to the
+*     right and Y vertically upwards, then Z is out of the screen towards
+*     the viewer), and are assumed to be equally scaled (that is, the same
+*     units are used to measure positions on each of the 3 axes). The upper
+*     and lower bounds of a volume within this graphical coordinate system
+*     is specified when the Plot3D is created, and all subsequent graphics
 *     are "drawn" in this volume.
 *
 *     The Plot3D class does not itself include any ability to draw on a
-*     graphics device. Instead it calls upon function in an externally 
+*     graphics device. Instead it calls upon function in an externally
 *     supplied module (the "grf3d" module) to do the required drawing.
-*     A module should be written that implements the functions of the 
+*     A module should be written that implements the functions of the
 *     grf3d interface using the facilities of a specific graphics system
-*     This module should then be linked into the application so that the 
+*     This module should then be linked into the application so that the
 *     Plot3D class can use its functions (see the description of the
-*     ast_link commands for details of how to do this). The grf3d interface 
-*     defines a few simple functions for drawing primitives such as straight 
-*     lines, markers and character strings. These functions all accept 
-*     positions in the 3D graphics coordinate system (the base Frame of the 
-*     Plot3D), and so the grf3d module must also manage the projection of 
-*     these 3D coordinates onto the 2D viewing surface, including the choice 
+*     ast_link commands for details of how to do this). The grf3d interface
+*     defines a few simple functions for drawing primitives such as straight
+*     lines, markers and character strings. These functions all accept
+*     positions in the 3D graphics coordinate system (the base Frame of the
+*     Plot3D), and so the grf3d module must also manage the projection of
+*     these 3D coordinates onto the 2D viewing surface, including the choice
 *     of "eye"/"camera" position, direction of viewing, etc. The AST
 *     library includes a sample implementation of the grf3d interface
 *     based on the PGPLOT graphics system (see file grf3d_pgplot.c). This
 *     implementation also serves to document the grf3d interface itself and
 *     should be consulted for details before writing a new implementation.
 *
-*     The current Frame of a Plot3D describes a "physical" 3-dimensional 
+*     The current Frame of a Plot3D describes a "physical" 3-dimensional
 *     coordinate system, which is the coordinate system in which plotting
 *     operations are specified when invoking the methods of the Plot3D
-*     class. The results of each plotting operation are automatically 
+*     class. The results of each plotting operation are automatically
 *     transformed into 3D graphical coordinates before being plotted
 *     using the facilities of the grf3d module linked into the application.
 *
 *     You may select different physical coordinate systems in which to
 *     plot (including the native graphical coordinate system itself)
 *     by selecting different Frames as the current Frame of a Plot3D,
-*     using its Current attribute.  
+*     using its Current attribute.
 *
 *     Like any FrameSet, a Plot3D may also be used as a Frame. In this
 *     case, it behaves like its current Frame, which describes the
@@ -60,13 +60,13 @@ f     AST_PLOT3D
 *
 *     When used as a Mapping, a Plot3D describes the inter-relation
 *     between 3D graphical coordinates (its base Frame) and 3D physical
-*     coordinates (its current Frame).  
+*     coordinates (its current Frame).
 *
 *     Although the Plot3D class inherits from the Plot class, several of
-*     the facilities of the Plot class are not available in the Plot3D 
+*     the facilities of the Plot class are not available in the Plot3D
 *     class, and an error will be reported if any attempt is made to use
 *     them. Specifically, the Plot3D class does not support clipping
-*     using the 
+*     using the
 *     astClip function.
 f     AST_CLIP routine.
 *     Nor does it support the specification of graphics primitive functions
@@ -86,11 +86,11 @@ f     AST_GRFSET, AST_GRFPOP, AST_GRFPUSH, and AST_GETGRFCONTEXT routines.
 *
 *     Some attributes of the Plot class refer to specific physical
 *     coordinate axes (e.g. Gap, LabelUp, DrawAxes, etc). For a basic
-*     Plot, the axis index must be 1 or 2, but for a Plot3D the axis index 
+*     Plot, the axis index must be 1 or 2, but for a Plot3D the axis index
 *     can be 1, 2 or 3.
 *
 *     Certain Plot attributes are ignored by the Plot3D class (e.g. Edge,
-*     DrawTitle, TitleGap, etc). Consult the Plot attribute documentation 
+*     DrawTitle, TitleGap, etc). Consult the Plot attribute documentation
 *     for details.
 
 *  Functions:
@@ -98,12 +98,12 @@ c     The Plot3D class does not define any new functions beyond those
 f     The Plot3D class does not define any new routines beyond those
 *     which are applicable to all Plots. Note, however, that the
 *     following methods inherited from the Plot class cannot be used with
-*     a Plot3D and will report an error if called: 
+*     a Plot3D and will report an error if called:
 c    - astBoundingBox, astClip, astCurve, astGenCurve,
-c    astGetGrfContext, astGrfPop, astGrfPush, astGrfSet, astGridLine, 
+c    astGetGrfContext, astGrfPop, astGrfPush, astGrfSet, astGridLine,
 c    astPolyCurve.
 f    - AST_BOUNDINGBOX, AST_CLIP, AST_CURVE, AST_GENCURVE,
-f    AST_GETGRFCONTEXT, AST_GRFPOP, AST_GRFPUSH, AST_GRFSET, 
+f    AST_GETGRFCONTEXT, AST_GRFPOP, AST_GRFPUSH, AST_GRFSET,
 f    AST_GRIDLINE, AST_POLYCURVE.
 
 *  Copyright:
@@ -115,12 +115,12 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -180,7 +180,7 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 #define GET_PLOT(plane) ( \
      ( plane == XY ) ? this->plotxy : ( \
      ( plane == XZ ) ? this->plotxz : ( \
-     ( plane == YZ ) ? this->plotyz : NULL ) ) ) 
+     ( plane == YZ ) ? this->plotyz : NULL ) ) )
 
 
 /*
@@ -211,7 +211,7 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *
 *        void astClear<Attribute>_( AstPlot *this, int axis )
 *
-*     which implement a method for clearing a single value in a specified 
+*     which implement a method for clearing a single value in a specified
 *     multi-valued attribute for an axis of a Plot3D.
 
 *  Parameters:
@@ -227,7 +227,7 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *     nval
 *        Specifies the number of values in the multi-valued attribute. The
 *        "axis" values supplied to the created function should be in the
-*        range zero to (nval - 1). 
+*        range zero to (nval - 1).
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -267,7 +267,7 @@ void astClear##attr##_( AstPlot3D *this, int axis, int *status ) { \
 \
 /* Invoke the required method via the virtual function table. */ \
    (**astMEMBER(this,Plot3D,Clear##attr))( this, axis, status ); \
-}   
+}
 
 
 /*
@@ -298,7 +298,7 @@ void astClear##attr##_( AstPlot3D *this, int axis, int *status ) { \
 *
 *        <Type> astGet<Attribute>_( AstPlot3D *this, int axis )
 *
-*     which implement a method for getting a single value from a specified 
+*     which implement a method for getting a single value from a specified
 *     multi-valued attribute for an axis of a Plot3D.
 
 *  Parameters:
@@ -316,7 +316,7 @@ void astClear##attr##_( AstPlot3D *this, int axis, int *status ) { \
 *     nval
 *        Specifies the number of values in the multi-valued attribute. The
 *        "axis" values supplied to the created function should be in the
-*        range zero to (nval - 1). 
+*        range zero to (nval - 1).
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -373,7 +373,7 @@ type astGet##attr##_( AstPlot3D *this, int axis, int *status ) { \
 *     MAKE_SET3
 
 *  Purpose:
-*     Implement a method to set a single value in a multi-valued attribute 
+*     Implement a method to set a single value in a multi-valued attribute
 *     for a Plot3D.
 
 *  Type:
@@ -463,7 +463,7 @@ void astSet##attr##_( AstPlot3D *this, int axis, type value, int *status ) { \
 *     MAKE_TEST3
 
 *  Purpose:
-*     Implement a method to test if a single value has been set in a 
+*     Implement a method to test if a single value has been set in a
 *     multi-valued attribute for a class.
 
 *  Type:
@@ -486,7 +486,7 @@ void astSet##attr##_( AstPlot3D *this, int axis, type value, int *status ) { \
 *
 *        int astTest<Attribute>_( AstPlot3D *this, int axis )
 *
-*     which implement a method for testing if a single value in a specified 
+*     which implement a method for testing if a single value in a specified
 *     multi-valued attribute has been set for a class.
 
 *  Parameters:
@@ -500,7 +500,7 @@ void astSet##attr##_( AstPlot3D *this, int axis, type value, int *status ) { \
 *      nval
 *        Specifies the number of values in the multi-valued attribute. The
 *        "axis" values supplied to the created function should be in the
-*        range zero to (nval - 1). 
+*        range zero to (nval - 1).
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -576,9 +576,9 @@ int astTest##attr##_( AstPlot3D *this, int axis, int *status ) { \
 *
 *        static void Clear<Attribute>( AstPlot *this, int element )
 *
-*     which implements a method for clearing one of the element-specific 
-*     attributes (e.g. Size, Colour, Width, etc) inherited from the 
-*     parent Plot class. 
+*     which implements a method for clearing one of the element-specific
+*     attributes (e.g. Size, Colour, Width, etc) inherited from the
+*     parent Plot class.
 
 *  Parameters:
 *     attr
@@ -634,7 +634,7 @@ static void Clear##attr( AstPlot *this_plot, int element, int *status ) { \
          astClear##attr( GET_PLOT(this->axis_plot2[ axis3d ]), elem2d2 ); \
       } \
    } \
-} 
+}
 
 /*
 *
@@ -661,9 +661,9 @@ static void Clear##attr( AstPlot *this_plot, int element, int *status ) { \
 *
 *        static void Set<Attribute>( AstPlot *this, int element, type value )
 *
-*     which implements a method for setting one of the element-specific 
-*     attributes (e.g. Size, Colour, Width, etc) inherited from the 
-*     parent Plot class. 
+*     which implements a method for setting one of the element-specific
+*     attributes (e.g. Size, Colour, Width, etc) inherited from the
+*     parent Plot class.
 
 *  Parameters:
 *     attr
@@ -721,7 +721,7 @@ static void Set##attr( AstPlot *this_plot, int element, type value, int *status 
          astSet##attr( GET_PLOT(this->axis_plot2[ axis3d ]), elem2d2, value ); \
       } \
    } \
-} 
+}
 
 
 /*
@@ -748,7 +748,7 @@ static void Set##attr( AstPlot *this_plot, int element, type value, int *status 
 *
 *        static void Clear<Attribute>( AstPlot *this )
 *
-*     which implements a method for clearing a Plot3D attribute inherited 
+*     which implements a method for clearing a Plot3D attribute inherited
 *     from the parent Plot class. It clears the attribute in all three
 *     plots encapsulated within the Plot3D.
 
@@ -786,7 +786,7 @@ static void Clear##attr( AstPlot *this_plot, int *status ) { \
       astClear##attr( this->plotxz ); \
       astClear##attr( this->plotyz ); \
    } \
-} 
+}
 
 /*
 *
@@ -812,7 +812,7 @@ static void Clear##attr( AstPlot *this_plot, int *status ) { \
 *
 *        static void Set<Attribute>( AstPlot *this, type value )
 *
-*     which implements a method for setting a Plot3D attribute inherited 
+*     which implements a method for setting a Plot3D attribute inherited
 *     from the parent Plot class. It sets the attribute in all three
 *     plots encapsulated within the Plot3D.
 
@@ -852,7 +852,7 @@ static void Set##attr( AstPlot *this_plot, type value, int *status ) { \
       astSet##attr( this->plotxz, value ); \
       astSet##attr( this->plotyz, value ); \
    } \
-} 
+}
 
 /*
 *
@@ -878,7 +878,7 @@ static void Set##attr( AstPlot *this_plot, type value, int *status ) { \
 *
 *        static void Clear<Attribute>( AstPlot *this, int axis )
 *
-*     which implements a method for clearing an axis specific Plot3D 
+*     which implements a method for clearing an axis specific Plot3D
 *     attribute inherited from the parent Plot class.
 
 *  Parameters:
@@ -886,8 +886,8 @@ static void Set##attr( AstPlot *this_plot, type value, int *status ) { \
 *        The name of the attribute to be cleared, as it appears in the function
 *        name (e.g. LabelAt in "astClearLabelAt").
 *     whichplots
-*        A value indicating which Plots should be affected. A negative value 
-*        means "all threee plots", a value of zero means "just the two plots 
+*        A value indicating which Plots should be affected. A negative value
+*        means "all threee plots", a value of zero means "just the two plots
 *        that touch at the specified axis in 3D space", a positive value
 *        means "just the Plot that is used to label th 3D axis."
 
@@ -953,7 +953,7 @@ static void Clear##attr( AstPlot *this_plot, int axis, int *status ) { \
          astClear##attr( plot, axis2d ); \
       } \
    } \
-} 
+}
 
 
 /*
@@ -962,7 +962,7 @@ static void Clear##attr( AstPlot *this_plot, int axis, int *status ) { \
 *     MAKE_GET
 
 *  Purpose:
-*     Implement a method to get the value of an attribute inherited from the 
+*     Implement a method to get the value of an attribute inherited from the
 *     Plot class.
 
 *  Type:
@@ -1036,7 +1036,7 @@ static type Get##attr( AstPlot *this_plot, int axis, int *status ) { \
 \
 /* Return the result. */ \
    return result; \
-} 
+}
 
 /*
 *
@@ -1044,7 +1044,7 @@ static type Get##attr( AstPlot *this_plot, int axis, int *status ) { \
 *     MAKE_SET
 
 *  Purpose:
-*     Implement a method to set a value for an attribute inherited from the 
+*     Implement a method to set a value for an attribute inherited from the
 *     Plot class.
 
 *  Type:
@@ -1073,8 +1073,8 @@ static type Get##attr( AstPlot *this_plot, int axis, int *status ) { \
 *      type
 *         The C type of the attribute.
 *     whichplots
-*        A value indicating which Plots should be affected. A negative value 
-*        means "all threee plots", a value of zero means "just the two plots 
+*        A value indicating which Plots should be affected. A negative value
+*        means "all threee plots", a value of zero means "just the two plots
 *        that touch at the specified axis in 3D space", a positive value
 *        means "just the Plot that is used to label the 3D axis."
 
@@ -1140,7 +1140,7 @@ static void Set##attr( AstPlot *this_plot, int axis, type value, int *status ) {
          astSet##attr( plot, axis2d, value ); \
       } \
    } \
-} 
+}
 
 
 /* Header files. */
@@ -1212,7 +1212,7 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0;
@@ -1226,15 +1226,15 @@ astMAKE_INITGLOBALS(Plot3D)
 #define getattrib_buff astGLOBAL(Plot3D,GetAttrib_Buff)
 
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
-#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 );
 
 static pthread_mutex_t mutex3 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 ); 
-#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 ); 
+#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 );
+#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 );
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 static char getattrib_buff[ 101 ];
@@ -1315,7 +1315,7 @@ static void SetAttrib( AstObject *, const char *, int * );
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
 #endif
 
-/* Declare private member functions that access Plot3D attributes. 
+/* Declare private member functions that access Plot3D attributes.
    --------------------------------------------------------------*/
 
 /* Axis independent... */
@@ -1324,7 +1324,7 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
    static type Get##attr(AstPlot3D *,int *); \
    static void Set##attr(AstPlot3D *,type,int *); \
    static void Clear##attr(AstPlot3D *,int *); \
-   static int Test##attr(AstPlot3D *,int *); 
+   static int Test##attr(AstPlot3D *,int *);
 
 DECLARE_PLOT3D_ACCESSORS(RootCorner,int)
 
@@ -1337,16 +1337,16 @@ DECLARE_PLOT3D_ACCESSORS(RootCorner,int)
    static type Get##attr(AstPlot3D *,int,int *); \
    static void Set##attr(AstPlot3D *,int,type,int *); \
    static void Clear##attr(AstPlot3D *,int,int *); \
-   static int Test##attr(AstPlot3D *,int,int *); 
+   static int Test##attr(AstPlot3D *,int,int *);
 
 DECLARE_PLOT3D_ACCESSORS(Norm,double)
 
 #undef DECLARE_PLOT3D_ACCESSORS
 
 
-/* Declare private member functions that access axis-specific attributes 
-   inherited from the Plot class. Also declare pointers to hold the parent 
-   function pointers. 
+/* Declare private member functions that access axis-specific attributes
+   inherited from the Plot class. Also declare pointers to hold the parent
+   function pointers.
    ----------------------------------------------------------------------*/
 
 #define DECLARE_PLOT_ACCESSORS(attr,type) \
@@ -1377,9 +1377,9 @@ DECLARE_PLOT_ACCESSORS(TextLabGap,double)
 #undef DECLARE_PLOT_ACCESSORS
 
 
-/* Declare private member functions that access element-specific attributes 
-   inherited from the Plot class. Also declare pointers to hold the parent 
-   function pointers. 
+/* Declare private member functions that access element-specific attributes
+   inherited from the Plot class. Also declare pointers to hold the parent
+   function pointers.
    ----------------------------------------------------------------------*/
 
 #define DECLARE_PLOT_ACCESSORS(attr,type) \
@@ -1397,11 +1397,11 @@ DECLARE_PLOT_ACCESSORS(Size,double)
 #undef DECLARE_PLOT_ACCESSORS
 
 
-/* Declare private member functions that access attributes inherited from 
+/* Declare private member functions that access attributes inherited from
    the Plot class that do not need to override the Get method. This
    includes attributes that are not axis-specific or that do not have
-   dynamic defaults. Also declare pointers to hold the parent function 
-   pointers. 
+   dynamic defaults. Also declare pointers to hold the parent function
+   pointers.
    ----------------------------------------------------------------------*/
 #define DECLARE_PLOT_ACCESSORS(attr,type) \
    static void Set##attr(AstPlot *,type,int *); \
@@ -1428,7 +1428,7 @@ DECLARE_PLOT_ACCESSORS(Labelling,int)
 /* Member functions. */
 /* ================= */
 
-static int Attr3D( AstKeyMap *grfconID, int attr, double value, 
+static int Attr3D( AstKeyMap *grfconID, int attr, double value,
                    double *old_value, int prim, int *status ){
 /*
 *  Name:
@@ -1442,38 +1442,38 @@ static int Attr3D( AstKeyMap *grfconID, int attr, double value,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     Attr3D( AstKeyMap *grfconID, int attr, double value, double *old_value, 
+*     Attr3D( AstKeyMap *grfconID, int attr, double value, double *old_value,
 *             int prim, int *status )
 
 *  Class Membership:
 *     Plot3D member function.
 
 *  Description:
-*     This function gets or sets the current value of a specified graphics 
-*     attribute in the parent Plot structure of a Plot3D. It forwards the 
-*     call to the grf3D module being used by this Plot3D. It should be 
+*     This function gets or sets the current value of a specified graphics
+*     attribute in the parent Plot structure of a Plot3D. It forwards the
+*     call to the grf3D module being used by this Plot3D. It should be
 *     registered with the parent Plot using astGrfSet.
 
 *  Parameters:
 *     grfconID
-*       The Plot's GrfContext KeyMap. 
-*     attr 
+*       The Plot's GrfContext KeyMap.
+*     attr
 *       An integer value identifying the required attribute. This should
 *       be one of the symbolic values defined in grf.h.
-*     value 
+*     value
 *       A new value to store for the attribute. If this is AST__BAD
 *       no value is stored.
-*     old_value 
+*     old_value
 *       A pointer to a double in which to return the attribute value.
 *       If this is NULL, no value is returned.
-*     prim 
+*     prim
 *       The sort of graphics primitive to be drawn with the new attribute.
 *       Identified by one of the values defined in grf.h.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -1488,7 +1488,7 @@ static int Attr3D( AstKeyMap *grfconID, int attr, double value,
    until the current thread has finished executing it. */
    LOCK_MUTEX2;
 
-/* Use the function in the external Grf3D module, selected at link-time 
+/* Use the function in the external Grf3D module, selected at link-time
    using ast_link options. */
    result = astG3DAttr( attr, value, old_value, prim );
 
@@ -1518,7 +1518,7 @@ static AstPlot *AxisPlot( AstPlot3D *this, int axis3d, int *axis2d, int *status 
 *     Plot method.
 
 *  Description:
-*     This function returns a pointer to the encapsulated 2D Plot that 
+*     This function returns a pointer to the encapsulated 2D Plot that
 *     is used to label the given 3D axis. It also returns the index
 *     of the labelled axis within the 2D Plot.
 
@@ -1618,8 +1618,8 @@ static int Border( AstPlot *this_plot, int *status ){
 
 /* Local Variables: */
    AstPlot3D *this;
-   const char *class;      
-   const char *method;     
+   const char *class;
+   const char *method;
    float x1;
    float y1;
    float z1;
@@ -1640,7 +1640,7 @@ static int Border( AstPlot *this_plot, int *status ){
 /* Get a pointer to the Plot3D structure. */
    this = (AstPlot3D *) this_plot;
 
-/* Store the current method, and the class of the supplied object for use 
+/* Store the current method, and the class of the supplied object for use
    in error messages.*/
    method = "astBorder";
    class = astGetClass( this );
@@ -1651,7 +1651,7 @@ static int Border( AstPlot *this_plot, int *status ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
                 "be 3.", status, method, class, naxes, class );
-   } 
+   }
 
 /* Check the current Frame of the Plot is 3-D. */
    naxes = astGetNout( this );
@@ -1659,25 +1659,25 @@ static int Border( AstPlot *this_plot, int *status ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the current "
                 "Frame of the supplied %s is invalid - this number should "
                 "be 3.", status, method, class, naxes, class );
-   } 
+   }
 
 /* Invoke the astBorder method on each of the three encapsulated Plots. */
-   flag1 = astBorder( this->plotxy );   
-   flag2 = astBorder( this->plotxz );   
-   flag3 = astBorder( this->plotyz );   
+   flag1 = astBorder( this->plotxy );
+   flag2 = astBorder( this->plotxz );
+   flag3 = astBorder( this->plotyz );
 
 /* If no bad values were encountered in any of the Plots, draw lines
    along the remaining plot edges. */
    result = ( flag1 || flag2 || flag3 );
-   if( !result ) { 
+   if( !result ) {
 
 /* The three remaining edges ot be drawn all meet at the corner
    diagonally opposite the root corner. Get the root corner. */
       root_corner = astGetRootCorner( this );
 
 /* The (x0,y0,z0) position is the graphics coords at the corner
-   diagonally opposite the root corner. The x1, y1 and z1 values 
-   are the graphics x, y and z values at the ends of the three 
+   diagonally opposite the root corner. The x1, y1 and z1 values
+   are the graphics x, y and z values at the ends of the three
    lines that remain to be drawn. */
       if( root_corner & 1 ) {
          x[ 0 ] = this->gbox[ 0 ];
@@ -1685,7 +1685,7 @@ static int Border( AstPlot *this_plot, int *status ){
       } else {
          x[ 0 ] = this->gbox[ 3 ];
          x1 = this->gbox[ 0 ];
-      }     
+      }
 
       if( root_corner & 2 ) {
          y[ 0 ] = this->gbox[ 1 ];
@@ -1693,7 +1693,7 @@ static int Border( AstPlot *this_plot, int *status ){
       } else {
          y[ 0 ] = this->gbox[ 4 ];
          y1 = this->gbox[ 1 ];
-      }     
+      }
 
       if( root_corner & 4 ) {
          z[ 0 ] = this->gbox[ 2 ];
@@ -1701,7 +1701,7 @@ static int Border( AstPlot *this_plot, int *status ){
       } else {
          z[ 0 ] = this->gbox[ 5 ];
          z1 = this->gbox[ 2 ];
-      }     
+      }
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -1738,7 +1738,7 @@ static int Border( AstPlot *this_plot, int *status ){
 
 /* Report an error if anything went wrong in the grf3d module. */
       if( !ok && astOK ) {
-         astError( AST__GRFER, "%s(%s): Graphics error in astG3DLine. ", status, 
+         astError( AST__GRFER, "%s(%s): Graphics error in astG3DLine. ", status,
                    method, class );
       }
    }
@@ -1764,7 +1764,7 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     AstObject *Cast( AstObject *this, AstObject *obj, int *status ) 
+*     AstObject *Cast( AstObject *this, AstObject *obj, int *status )
 
 *  Class Membership:
 *     Plot3D member function (over-rides the protected astCast
@@ -1773,21 +1773,21 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 *  Description:
 *     This function returns a deep copy of an ancestral component of the
 *     supplied object. The required class of the ancestral component is
-*     specified by another object. Specifically, if "this" and "new" are 
-*     of the same class, a copy of "this" is returned. If "this" is an 
+*     specified by another object. Specifically, if "this" and "new" are
+*     of the same class, a copy of "this" is returned. If "this" is an
 *     instance of a subclass of "obj", then a copy of the component
-*     of "this" that matches the class of "obj" is returned. Otherwise, 
+*     of "this" that matches the class of "obj" is returned. Otherwise,
 *     a NULL pointer is returned without error.
 
 *  Parameters:
 *     this
 *        Pointer to the Object to be cast.
 *     obj
-*        Pointer to an Object that defines the class of the returned Object. 
-*        The returned Object will be of the same class as "obj". 
+*        Pointer to an Object that defines the class of the returned Object.
+*        The returned Object will be of the same class as "obj".
 
 *  Returned Value:
-*     A pointer to the new Object. NULL if "this" is not a sub-class of 
+*     A pointer to the new Object. NULL if "this" is not a sub-class of
 *     "obj", or if an error occurs.
 
 *  Notes:
@@ -1798,7 +1798,7 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 
 /* Local Variables; */
    AstObject *new;
-   astDECLARE_GLOBALS       
+   astDECLARE_GLOBALS
    int generation_gap;
 
 /* Initialise */
@@ -1810,17 +1810,17 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
-/* See how many steps up the class inheritance ladder it is from "obj" 
+/* See how many steps up the class inheritance ladder it is from "obj"
    to this class (Plot3D). A positive value is returned if Plot3D
-   is a sub-class of "obj". A negative value is returned if "obj" is 
-   a sub-class of Plot3D. Zero is returned if "obj" is a Plot3D. 
-   AST__COUSIN is returned if "obj" is not on the same line of descent 
+   is a sub-class of "obj". A negative value is returned if "obj" is
+   a sub-class of Plot3D. Zero is returned if "obj" is a Plot3D.
+   AST__COUSIN is returned if "obj" is not on the same line of descent
    as Plot3D. */
-   generation_gap = astClassCompare( (AstObjectVtab *) &class_vtab, 
+   generation_gap = astClassCompare( (AstObjectVtab *) &class_vtab,
                                      astVTAB( obj ) );
 
-/* If "obj" is a Plot3D or a sub-class of Plot3D, we can cast by 
-   truncating the vtab for "this" so that it matches the vtab of "obJ", 
+/* If "obj" is a Plot3D or a sub-class of Plot3D, we can cast by
+   truncating the vtab for "this" so that it matches the vtab of "obJ",
    and then taking a deep copy of "this". */
    if( generation_gap <= 0 && generation_gap != AST__COUSIN ) {
       new = astCastCopy( this_object, obj );
@@ -1831,7 +1831,7 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
       new = astCopy( ( (AstPlot3D *) this_object)->plotxy );
 
 /* If "obj" is a FrameSet or higher, we attempt to use the implementation
-   inherited from the parent class to cast the FrameSet component into the 
+   inherited from the parent class to cast the FrameSet component into the
    class indicated by "obj". */
    } else {
       new = (*parent_cast)( this_object, obj, status );
@@ -1860,19 +1860,19 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
 *     Plot method.
 
 *  Description:
-*     This function sets the attributes of the encapsulated Plots so that 
+*     This function sets the attributes of the encapsulated Plots so that
 *     labels appear on the edges of the 3D graphics cube that join at the
 *     specified new root corner. It also reverses the graphics axes in
-*     the encapsulated Plots as required in order to ensure that the Plots 
+*     the encapsulated Plots as required in order to ensure that the Plots
 *     look "normal" when viewed from the outside of the 3D graphics cube.
-*     This happens if a the Plot used to label a specific axis moves from 
+*     This happens if a the Plot used to label a specific axis moves from
 *     one face the the 3D graphics cube to the opposite face.
 
 *  Parameters:
 *     this
 *        Pointer to a Plot3D.
 *     old
-*        The old RootCorner value. 
+*        The old RootCorner value.
 *     new
 *        The new RootCorner value.
 *     status
@@ -1880,10 +1880,10 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
 
 *  Notes:
 *     - Each RootCorner value is in the range 0 to 7 and is a 3 bit
-*     bit-mask. Bit 0 describes the 3D graphics X axis, bit 1 describes 
-*     the graphics Y axis and bit 2 describes the graphics Z axis. If a 
-*     bit is set it means that the corner is at the upper bound on the 
-*     corresponding axis. If a bit is unset it means that the corner is 
+*     bit-mask. Bit 0 describes the 3D graphics X axis, bit 1 describes
+*     the graphics Y axis and bit 2 describes the graphics Z axis. If a
+*     bit is set it means that the corner is at the upper bound on the
+*     corresponding axis. If a bit is unset it means that the corner is
 *     at the lower bound on the corresponding axis.
 
 *-
@@ -1905,11 +1905,11 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
 /* Check the global status. */
    if( !astOK ) return;
 
-/* If the corner has moved on the 3D X axis (from upper X bound to lower X 
-   bound or vice-versa), mirror the axis of the encapsulated Plot that is 
+/* If the corner has moved on the 3D X axis (from upper X bound to lower X
+   bound or vice-versa), mirror the axis of the encapsulated Plot that is
    perpendicular to the 3D X axis. This means that the Plot can be thought
    of as being viewed from the outside of the 3D graphics cube. Also,
-   update the constant X axis value at which the YZ plane is drawn. */ 
+   update the constant X axis value at which the YZ plane is drawn. */
    if( ( old & 1 ) != ( new & 1 ) ) astMirror( this->plotyz, 0 );
    grfcon = (AstKeyMap *) astGetGrfContext( this->plotyz );
    astMapPut0D( grfcon, "Gcon", this->gbox[ ( new & 1 ) ? 3 : 0 ], "Constant X value" );
@@ -1956,11 +1956,11 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
    be either this->plotxy or this->plotxz). */
    plot = AxisPlot( this, 0, &axis2d, status );
 
-/* See what edge of the Plot is used to annotate the first of the two WCS 
+/* See what edge of the Plot is used to annotate the first of the two WCS
    axis described by the 2D Plot. If the Edge(1) attribute has not been
    assigned a value, then a dynamic default will be used by the Plot class.
    We want to know what this dynamic default is, so we first cleared the
-   attribute above. Now we set the attribute value explicitly to the dynamic 
+   attribute above. Now we set the attribute value explicitly to the dynamic
    default returned by astGetC. Note, we use astGetC rather than astGetEdge
    because the dynamic default is not calculated when calling astGetEdge. */
    astSetC( plot, "Edge(1)", astGetC( plot, "Edge(1)" ));
@@ -1980,7 +1980,7 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
             axes[ np ] = 0;
             edges[ np++ ] = TOP;
 
-/* Otherwise ensure that the second WCS axis is labelled on the upper Y (top) 
+/* Otherwise ensure that the second WCS axis is labelled on the upper Y (top)
    edge. */
          } else {
             plots[ np ] = plot;
@@ -2020,7 +2020,7 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
             axes[ np ] = 0;
             edges[ np++ ] = TOP;
 
-/* Otherwise ensure that the second WCS axis is labelled on the upper Y (top) 
+/* Otherwise ensure that the second WCS axis is labelled on the upper Y (top)
    edge. */
          } else {
             plots[ np ] = plot;
@@ -2053,7 +2053,7 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
    graphics cube. Get the Plot used to produce Y axis labels. */
    plot = AxisPlot( this, 1, &axis2d, status );
 
-/* See what edge of the Plot is used to annotate the first of the two WCS 
+/* See what edge of the Plot is used to annotate the first of the two WCS
    axis described by the Plot. */
    astSetC( plot, "Edge(1)", astGetC( plot, "Edge(1)" ));
    edge = astGetEdge( plot, 0 );
@@ -2092,7 +2092,7 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
 /* If the 3D Y axis is labelled using the Plot that spans the YZ plane... */
    } else {
 
-/* ... and if the new root corner is at the upper Z limit, put Y labels on 
+/* ... and if the new root corner is at the upper Z limit, put Y labels on
    the top of the Plot.  */
       if( new & 4 ) {
          if( edge == 1 || edge == 3 ) {
@@ -2105,7 +2105,7 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
             edges[ np++ ] = TOP;
          }
 
-/* If the new root corner is at the lower Z limit, put Y labels on the 
+/* If the new root corner is at the lower Z limit, put Y labels on the
    bottom of the Plot.  */
       } else {
          if( edge == 1 || edge == 3 ) {
@@ -2125,7 +2125,7 @@ static void ChangeRootCorner( AstPlot3D *this, int old, int new, int *status ){
    graphics cube. Get the Plot used to produce Z axis labels. */
    plot = AxisPlot( this, 2, &axis2d, status );
 
-/* See what edge of the Plot is used to annotate the first of the two WCS 
+/* See what edge of the Plot is used to annotate the first of the two WCS
    axis described by the Plot. */
    astSetC( plot, "Edge(1)", astGetC( plot, "Edge(1)" ));
    edge = astGetEdge( plot, 0 );
@@ -2276,7 +2276,7 @@ static void Clear( AstObject *this_object, const char *attrib, int *status ) {
 /* Invoke the parent astClear method to clear the Plot3D's attribute values. */
    (*parent_clear)( this_object, attrib, status );
 
-/* Update the three 2D Plots stored in the Plot3D structure so that they 
+/* Update the three 2D Plots stored in the Plot3D structure so that they
    reflect this modified FrameSet. */
    UpdatePlots( (AstPlot3D *) this_object, status );
 
@@ -2389,7 +2389,7 @@ static void ClearCurrent( AstFrameSet *this_frameset, int *status ) {
 /* Invoke the parent astClearCurrent method. */
    (*parent_clearcurrent)( this_frameset, status );
 
-/* Update the three 2D Plots stored in the Plot3D structure so that they 
+/* Update the three 2D Plots stored in the Plot3D structure so that they
    reflect this modified FrameSet. */
    UpdatePlots( (AstPlot3D *) this_frameset, status );
 }
@@ -2434,7 +2434,7 @@ static void ClearRootCorner( AstPlot3D *this, int *status ){
    old = astGetRootCorner( this );
 
 /* Clear the RootCorner attribute. */
-   this->rootcorner = -1;      
+   this->rootcorner = -1;
 
 /* Get the new (default) rootcorner value. */
    new = astGetRootCorner( this );
@@ -2473,10 +2473,10 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
 *     It then uses these 2D FrameSets to create three Plots, one for each
 *     plane in the graphics plotting space, and stores them in the Plot3D.
 *
-*     Each of the three Plots is notionally pasted onto one face of the 
+*     Each of the three Plots is notionally pasted onto one face of the
 *     3D graphics cube (the RootCorner attribute is used to determine which
-*     of the two parallel faces a particular Plot is pasted onto). The 
-*     Plot is pasted in such a way that, when viewed from the outside of 
+*     of the two parallel faces a particular Plot is pasted onto). The
+*     Plot is pasted in such a way that, when viewed from the outside of
 *     the graphics cube, the first graphics axis increases left to right
 *     and the second increases bottom to top (this assumes that "up" is
 *     parallel to the 3D Z axis).
@@ -2491,25 +2491,25 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
 *     fset
 *        Pointer to the FrameSet.
 *     gbox
-*        A pointer to an array of 6 values giving the graphics coordinates 
-*        of the bottom left and top right corners of a box on the graphics 
-*        output device. The first triple of values should be the graphics 
+*        A pointer to an array of 6 values giving the graphics coordinates
+*        of the bottom left and top right corners of a box on the graphics
+*        output device. The first triple of values should be the graphics
 *        coordinates of the bottom left corner of the box and the second
 *        triple of values are the graphics coordinates of the top right corner.
 *     bbox
 *        A pointer to an array of 6 values giving the coordinates in the
-*        supplied Frame or base Frame of the supplied FrameSet at the bottom 
+*        supplied Frame or base Frame of the supplied FrameSet at the bottom
 *        left and top right corners of the box specified by parameter gbox.
 *        These should be supplied in the same order as for parameter "gbox".
 *     status
 *        Pointer to the inherited status variable.
 
-*  Notes: 
+*  Notes:
 *     - Each returned plot has 3 Frames: Frame 1 is the base (GRAPHICS)
 *     Frame; Frame 2 is spanned by 2 of the 3 axes in the base Frame of
 *     the supplied FrameSet; Frame 3 is the current Frame and is spanned
 *     by 2 of the 3 axes in the current Frame of the supplied FrameSet.
-*     Any future changes to this function that alter this structure should 
+*     Any future changes to this function that alter this structure should
 *     reflected in equivalent changes to function UpdatePlots.
 
 */
@@ -2531,13 +2531,13 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
 /* Check the inherited status. */
    if( !astOK ) return;
 
-/* Split the supplied FrameSet up into 3 FrameSets, each with a 2D base 
+/* Split the supplied FrameSet up into 3 FrameSets, each with a 2D base
    and current Frame. Each of these FrameSets describes one plane of
    the 3D cube. One of them will be spanned by two axes picked from the
    supplied 3D FrameSet. The other two FrameSets will each include a copy
-   of the remaining 3rd axis from the supplied FrameSet, plus an extra 
+   of the remaining 3rd axis from the supplied FrameSet, plus an extra
    dummy axis. These dummy axes will never be labelled. */
-   SplitFrameSet( fset, &fsetxy, labelxy, wcsxy, &fsetxz, labelxz, wcsxz, 
+   SplitFrameSet( fset, &fsetxy, labelxy, wcsxy, &fsetxz, labelxz, wcsxz,
                   &fsetyz, labelyz, wcsyz, &baseplane, status );
 
 /* If OK, annul any existing 2D plots. */
@@ -2546,13 +2546,13 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
       if( this->plotxz ) this->plotxz = astAnnul( this->plotxz );
       if( this->plotyz ) this->plotyz = astAnnul( this->plotyz );
 
-/* Create three Plots; one for each 2D plane in the graphics plotting 
+/* Create three Plots; one for each 2D plane in the graphics plotting
    space. Set the attributes of these plots so that the required axes are
-   labelled and other axes are left blank. The "graphbox2d" and "basebox2d" 
-   values used to create each Plot define the sense, as well as the extent, 
-   of each axis. The first pair of values in each give the lower left corner 
-   of the Plot and the second pair give the top right corner. We want each 
-   Plot to have X increasing left to right and Y increasing bottom to 
+   labelled and other axes are left blank. The "graphbox2d" and "basebox2d"
+   values used to create each Plot define the sense, as well as the extent,
+   of each axis. The first pair of values in each give the lower left corner
+   of the Plot and the second pair give the top right corner. We want each
+   Plot to have X increasing left to right and Y increasing bottom to
    top when viewed from the outside of the cube. We assume an initial
    RootCorner value of "LLL" (that is, the Plots are pasted onto the cube
    faces that meet at the lower limit on every axis). */
@@ -2560,12 +2560,12 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
       graphbox2d[ 1 ] = gbox[ 1 ];
       graphbox2d[ 2 ] = gbox[ 0 ];
       graphbox2d[ 3 ] = gbox[ 4 ];
-         
+
       basebox2d[ 0 ] = bbox[ 3 ];
       basebox2d[ 1 ] = bbox[ 1 ];
       basebox2d[ 2 ] = bbox[ 0 ];
       basebox2d[ 3 ] = bbox[ 4 ];
-   
+
       if( this->plotxy ) this->plotxy = astAnnul( this->plotxy );
       this->plotxy = astPlot( fsetxy, graphbox2d, basebox2d, "", status );
       SetPlotAttr( this->plotxy, XY, labelxy, status );
@@ -2574,12 +2574,12 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
       graphbox2d[ 1 ] = gbox[ 2 ];
       graphbox2d[ 2 ] = gbox[ 3 ];
       graphbox2d[ 3 ] = gbox[ 5 ];
-      
+
       basebox2d[ 0 ] = bbox[ 0 ];
       basebox2d[ 1 ] = bbox[ 2 ];
       basebox2d[ 2 ] = bbox[ 3 ];
       basebox2d[ 3 ] = bbox[ 5 ];
-   
+
       this->plotxz = astPlot( fsetxz, graphbox2d, basebox2d, "", status );
       SetPlotAttr( this->plotxz, XZ, labelxz, status );
 
@@ -2587,12 +2587,12 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
       graphbox2d[ 1 ] = gbox[ 2 ];
       graphbox2d[ 2 ] = gbox[ 1 ];
       graphbox2d[ 3 ] = gbox[ 5 ];
-      
+
       basebox2d[ 0 ] = bbox[ 4 ];
       basebox2d[ 1 ] = bbox[ 2 ];
       basebox2d[ 2 ] = bbox[ 1 ];
       basebox2d[ 3 ] = bbox[ 5 ];
-   
+
       this->plotyz = astPlot( fsetyz, graphbox2d, basebox2d, "", status );
       SetPlotAttr( this->plotyz, YZ, labelyz, status );
 
@@ -2612,7 +2612,7 @@ static void CreatePlots( AstPlot3D *this, AstFrameSet *fset, const float *gbox,
    }
 }
 
-static int Element2D( AstPlot3D *this, int element, int *elem2d1, 
+static int Element2D( AstPlot3D *this, int element, int *elem2d1,
                       int *elem2d2, int *status ){
 /*
 *  Name:
@@ -2627,7 +2627,7 @@ static int Element2D( AstPlot3D *this, int element, int *elem2d1,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Element2D( AstPlot3D *this, int element, int *elem2d1, 
+*     int Element2D( AstPlot3D *this, int element, int *elem2d1,
 *                    int *elem2d2, int *status )
 
 *  Class Membership:
@@ -2644,12 +2644,12 @@ static int Element2D( AstPlot3D *this, int element, int *elem2d1,
 *     element
 *        The 3D element identifier to convert.
 *     elem2d1
-*        Pointer to an int in which to return the 2D element identifier 
+*        Pointer to an int in which to return the 2D element identifier
 *        to use with the first of the two Plots that span the axis to
 *        which the 3D element identifier refers. Returned holding 0 if
 *        the given 3D element identifier is not axis specific.
 *     elem2d2
-*        Pointer to an int in which to return the 2D element identifier 
+*        Pointer to an int in which to return the 2D element identifier
 *        to use with the second of the two Plots that span the axis to
 *        which the 3D element identifier refers. Returned holding 0 if
 *        the given 3D element identifier is not axis specific.
@@ -2658,7 +2658,7 @@ static int Element2D( AstPlot3D *this, int element, int *elem2d1,
 
 *  Returned Value:
 *     The zero-based index of the 3D axis to which the given element
-*     identifier refers, or -1 if the element identifier is not axis 
+*     identifier refers, or -1 if the element identifier is not axis
 *     specific.
 
 */
@@ -2756,7 +2756,7 @@ static int Element2D( AstPlot3D *this, int element, int *elem2d1,
       axis3d = 2;
       SET_ELEM2D(AST__GRIDLINE1_ID,AST__GRIDLINE2_ID)
 
-   } else { 
+   } else {
       axis3d = 0;
       astError( AST__INTER, "Element2D(Plot3D): The MAKE_CLEAR2 macro "
                 "does not yet support element index %d (internal "
@@ -2767,7 +2767,7 @@ static int Element2D( AstPlot3D *this, int element, int *elem2d1,
 
    return axis3d;
 
-} 
+}
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
@@ -2782,7 +2782,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     Plot3D member function (over-rides the astEqual protected
@@ -2877,7 +2877,7 @@ static AstPointSet *ExtendTicks( AstPlot *plot, AstPointSet *ticks, int *status 
 *  Returned Value:
 *     A pointer to a new PointSet that has 2 more entries than the
 *     supplied PointSet. The first point is a new tick mark, then comes
-*     all the ticks mark positions supplied in "ticks", and finally there 
+*     all the ticks mark positions supplied in "ticks", and finally there
 *     is another new tick mark.
 
 */
@@ -2942,7 +2942,7 @@ static AstPointSet *ExtendTicks( AstPlot *plot, AstPointSet *ticks, int *status 
          }
       }
 
-      
+
 /* Get the index of the axis with the largest range (the other range
    should be zero). */
       axis = ( range[ 0 ] > range[ 1 ] ) ? 0 : 1;
@@ -2956,7 +2956,7 @@ static AstPointSet *ExtendTicks( AstPlot *plot, AstPointSet *ticks, int *status 
          b_in = ptr_in[ 1 ];
          a_out = ptr_out[ 0 ];
          b_out = ptr_out[ 1 ];
-   
+
       } else {
          lo = plot->ylo;
          hi = plot->yhi;
@@ -3015,15 +3015,15 @@ static AstFrameSet *Fset3D( AstFrameSet *fset, int ifrm, int *status ) {
 
 *  Description:
 *     This function checks a specified Frame in the supplied FrameSet.
-*     If the Frame has more than 3 dimensions, a new Frame is added to 
+*     If the Frame has more than 3 dimensions, a new Frame is added to
 *     the FrameSet containing just the first three axes of the specified
-*     Frame. A PermMap is used to connect this Frame to the specified 
+*     Frame. A PermMap is used to connect this Frame to the specified
 *     Frame, which supplied bad values for any missing axes. If the
 *     specified Frame is the base Frame in the supplied FrameSet, then the
 *     new Frame becomes the base Frame in the returned FrameSet. Like-wise,
 *     if the specified Frame is the current Frame, then the new Frame
 *     will be the current Frame in the returned FrameSet.
-*     
+*
 *     If the specified Frame does not have more than 3 axes, then a clone
 *     of the FrameSet pointer is returned, otherwise the returned pointer
 *     points to a copy of the supplied FrameSet with the new 3-D Frame
@@ -3065,11 +3065,11 @@ static AstFrameSet *Fset3D( AstFrameSet *fset, int ifrm, int *status ) {
 /* Get a pointer to the requested Frame in the supplied FrameSet. */
    frm = astGetFrame( fset, ifrm );
 
-/* See how many dimensions the specified Frame of the supplied FrameSet 
+/* See how many dimensions the specified Frame of the supplied FrameSet
    has. */
    nax = astGetNaxes( frm );
 
-/* If it is more than 3-dimensionbal, create a 3D Frame by picking 
+/* If it is more than 3-dimensionbal, create a 3D Frame by picking
    axes 1, 2 and 3 from the original Frame. */
    if( nax > 3 ) {
       axes[ 0 ] = 0;
@@ -3077,7 +3077,7 @@ static AstFrameSet *Fset3D( AstFrameSet *fset, int ifrm, int *status ) {
       axes[ 2 ] = 2;
       newfrm = astPickAxes( frm, 3, axes, NULL );
 
-/* Create a PermMap to describe the mapping between the two Frames. 
+/* Create a PermMap to describe the mapping between the two Frames.
    Use zero as the value for unknown axes (the optional mapping which
    can be returned by astPickAxes uses AST__BAD for unknown axes). */
       inperm = (int *) astMalloc( sizeof(int)*(size_t) nax );
@@ -3102,7 +3102,7 @@ static AstFrameSet *Fset3D( AstFrameSet *fset, int ifrm, int *status ) {
 /* If the new Frame was derived from the base frame, set the new base
    Frame, and re-instate the original current Frame */
       if( ifrm == AST__BASE ){
-         astSetBase( ret, astGetCurrent( ret ) );      
+         astSetBase( ret, astGetCurrent( ret ) );
          astSetCurrent( ret, ic );
       }
 
@@ -3140,7 +3140,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 *  Description:
 *     This function returns a pointer to the value of a specified
-*     attribute for a Plot3D, formatted as a character string. 
+*     attribute for a Plot3D, formatted as a character string.
 
 *  Parameters:
 *     this
@@ -3181,7 +3181,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -3243,7 +3243,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     Plot3D member function (over-rides the astGetObjSize protected
@@ -3302,7 +3302,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
 *     Grid
 
 *  Purpose:
-*     Draw a set of labelled coordinate axes. 
+*     Draw a set of labelled coordinate axes.
 
 *  Type:
 *     Private function.
@@ -3312,13 +3312,13 @@ static void Grid( AstPlot *this_plot, int *status ) {
 *     void Grid( AstPlot *this, int *status )
 
 *  Class Membership:
-*     Plot member function (over-rides the astGrid method inherited from 
+*     Plot member function (over-rides the astGrid method inherited from
 *     the Plot class).
 
 *  Description:
 *     This function draws a complete annotated set of 3-dimensional
 *     coordinate axes for a Plot3D with (optionally) a coordinate grid
-*     superimposed. 
+*     superimposed.
 
 *  Parameters:
 *     this
@@ -3359,13 +3359,13 @@ static void Grid( AstPlot *this_plot, int *status ) {
 
 /* Invoke the astGrid method on the 2D base Plot. Both WCS axes in this
    Plot are inherited from the 3D FrameSet that was supplied when the Plot3D
-   was constructed, and will be labelled. The other two Plots encapsulated 
+   was constructed, and will be labelled. The other two Plots encapsulated
    in the Plot3D only inherit a single axis from the original 3D FrameSet
    (a dummy axis is used for the second WCS axis in these Plots). */
    baseplot = GET_PLOT( this->baseplot );
    astGrid( baseplot );
 
-/* We next use astGrid to draw a grid on the 2D plane that shares the first 
+/* We next use astGrid to draw a grid on the 2D plane that shares the first
    base plot graphics axis. Get the identifier for this Plot and the 2D
    graphics axis index within the Plot that corresponds to the first base
    plot graphics axis. Also get the constant value on the 3rd graphics
@@ -3396,7 +3396,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
       base_wax2d = ( !strcmp( edge, "bottom" ) || !strcmp( edge, "top" ) ) ? 0 : 1;
    } else {
       base_wax2d = 0;
-   }   
+   }
 
 /* Get the 2D graphics coords within the base Plot at which the tick
    marks were drawn for this 2D WCS axis. Extend the PointSets holding
@@ -3415,7 +3415,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
    ptrmin = astGetPoints( minticks );
 
 /* All the tick marks will have a constant value for the 2D graphics axis
-   that is not being ticked (axis 1 at the moment). Change this constant 
+   that is not being ticked (axis 1 at the moment). Change this constant
    value to be the value appropriate to the new Plot. */
    if( ptrmaj && ptrmin ) {
       for( itick = 0; itick < nmaj; itick++ ) ptrmaj[ 1 ][ itick ] = gcon;
@@ -3423,14 +3423,14 @@ static void Grid( AstPlot *this_plot, int *status ) {
    }
 
 /* If required, permute the axes in the tick mark positions. */
-   if( new_gaxis != 0 ) {        
+   if( new_gaxis != 0 ) {
       perm[ 0 ] = 1;
       perm[ 1 ] = 0;
       astPermPoints( majticks, 1, perm );
       astPermPoints( minticks, 1, perm );
    }
 
-/* Transform the tick mark positions from 2D graphics coords to 2D WCS 
+/* Transform the tick mark positions from 2D graphics coords to 2D WCS
    coords. */
    wcsmajticks = astTransform( plot, majticks, 1, NULL );
    wcsminticks = astTransform( plot, minticks, 1, NULL );
@@ -3441,7 +3441,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
       new_wax2d = ( !strcmp( edge, "bottom" ) || !strcmp( edge, "top" ) ) ? 0 : 1;
    } else {
       new_wax2d = 0;
-   }   
+   }
 
 /* Use the other WCS axis if we are ticking the left or right edge (i.e.
    2D graphics axis one) of the new Plot. This gives us the index of the
@@ -3452,7 +3452,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
    ptrmaj = astGetPoints( wcsmajticks );
    ptrmin = astGetPoints( wcsminticks );
    if( ptrmaj && ptrmin ) {
-      astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ], 
+      astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ],
                                          nmin, ptrmin[ new_gaxis ] );
    }
 
@@ -3460,7 +3460,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
    astGrid( plot );
 
 /* Clear the stored tick values in the plot. */
-   astSetTickValues( plot, new_wax2d, 0, NULL, 0, NULL ); 
+   astSetTickValues( plot, new_wax2d, 0, NULL, 0, NULL );
 
 /* Free resources */
    if( wcsmajticks ) wcsmajticks = astAnnul( wcsmajticks );
@@ -3469,8 +3469,8 @@ static void Grid( AstPlot *this_plot, int *status ) {
    if( minticks ) minticks = astAnnul( minticks );
 
 /* We next use astGrid to draw a grid on the 2D plane that shares the
-   second base plot graphics axis. Get the identifier for this Plot and the 
-   2D graphics axis index within the Plot that corresponds to the first 
+   second base plot graphics axis. Get the identifier for this Plot and the
+   2D graphics axis index within the Plot that corresponds to the first
    base plot graphics axis. */
    if( this->baseplot == XY ) {
       new_plot = YZ;
@@ -3509,7 +3509,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
    ptrmin = astGetPoints( minticks );
 
 /* All the tick marks will have a constant value for the 2D graphics axis
-   that is not being ticked (axis 0 at the moment). Change this constant 
+   that is not being ticked (axis 0 at the moment). Change this constant
    value to be the value appropriate to the new Plot. */
    if( ptrmaj && ptrmin ) {
       for( itick = 0; itick < nmaj; itick++ ) ptrmaj[ 0 ][ itick ] = gcon;
@@ -3517,14 +3517,14 @@ static void Grid( AstPlot *this_plot, int *status ) {
    }
 
 /* If required, permute the axes in the tick mark positions. */
-   if( new_gaxis != 1 ) {        
+   if( new_gaxis != 1 ) {
       perm[ 0 ] = 1;
       perm[ 1 ] = 0;
       astPermPoints( majticks, 1, perm );
       astPermPoints( minticks, 1, perm );
    }
 
-/* Transform the tick mark positions from 2D graphics coords to 2D WCS 
+/* Transform the tick mark positions from 2D graphics coords to 2D WCS
    coords. */
    wcsmajticks = astTransform( plot, majticks, 1, NULL );
    wcsminticks = astTransform( plot, minticks, 1, NULL );
@@ -3535,7 +3535,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
       new_wax2d = ( !strcmp( edge, "bottom" ) || !strcmp( edge, "top" ) ) ? 0 : 1;
    } else {
       new_wax2d = 0;
-   }   
+   }
 
 /* Use the other WCS axis if we are ticking the left or right edge (i.e.
    2D graphics axis one) of the new Plot. This gives us the index of the
@@ -3546,7 +3546,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
    ptrmaj = astGetPoints( wcsmajticks );
    ptrmin = astGetPoints( wcsminticks );
    if( ptrmaj && ptrmin ) {
-      astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ], 
+      astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ],
                                          nmin, ptrmin[ new_gaxis ] );
    }
 
@@ -3554,7 +3554,7 @@ static void Grid( AstPlot *this_plot, int *status ) {
    astGrid( plot );
 
 /* Clear the stored tick values in the plot. */
-   astSetTickValues( plot, new_wax2d, 0, NULL, 0, NULL ); 
+   astSetTickValues( plot, new_wax2d, 0, NULL, 0, NULL );
 
 /* Free resources */
    if( wcsmajticks ) wcsmajticks = astAnnul( wcsmajticks );
@@ -3594,7 +3594,7 @@ void astInitPlot3DVtab_(  AstPlot3DVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -3692,7 +3692,7 @@ SET_PLOT3D_ACCESSORS(Norm)
    object->ManageLock = ManageLock;
 #endif
 
-/* Define a macro to override attribute accessors inherited from the 
+/* Define a macro to override attribute accessors inherited from the
    parent Plot class. First do axis specific attributes. */
 
 #define SET_PLOT_ACCESSORS(attr) \
@@ -3797,7 +3797,7 @@ SET_PLOT_ACCESSORS(Size)
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -3811,8 +3811,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the astManageLock protected
@@ -3820,7 +3820,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -3839,21 +3839,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -3892,7 +3892,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 }
 #endif
 
-static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim, 
+static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
                   const double *in, int type, int *status ){
 /*
 *  Name:
@@ -3940,7 +3940,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
 *        located if they do not entirely fill this array. The value
 *        given should not be less than "nmark".
 *     in
-*        The address of the first element of a 2-dimensional array of 
+*        The address of the first element of a 2-dimensional array of
 *        shape "[ncoord][indim]" giving the
 *        physical coordinates of the points where markers are to be
 *        drawn. These should be stored such that the value of
@@ -3974,15 +3974,15 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
    const char *method;     /* Current method */
    const double **ptr1;    /* Pointer to physical positions */
    double **ptr2;          /* Pointer to graphics positions */
-   double *xpd;            /* Pointer to next double precision x value */ 
-   double *ypd;            /* Pointer to next double precision y value */ 
-   double *zpd;            /* Pointer to next double precision z value */ 
-   float *x;               /* Pointer to single precision x values */ 
-   float *xpf;             /* Pointer to next single precision x value */ 
-   float *y;               /* Pointer to single precision y values */ 
-   float *ypf;             /* Pointer to next single precision y value */ 
-   float *z;               /* Pointer to single precision z values */ 
-   float *zpf;             /* Pointer to next single precision z value */ 
+   double *xpd;            /* Pointer to next double precision x value */
+   double *ypd;            /* Pointer to next double precision y value */
+   double *zpd;            /* Pointer to next double precision z value */
+   float *x;               /* Pointer to single precision x values */
+   float *xpf;             /* Pointer to next single precision x value */
+   float *y;               /* Pointer to single precision y values */
+   float *ypf;             /* Pointer to next single precision y value */
+   float *z;               /* Pointer to single precision z values */
+   float *zpf;             /* Pointer to next single precision z value */
    float norm[ 3 ];        /* Single precision normal vector */
    int axis;               /* Axis index */
    int i;                  /* Loop count */
@@ -4006,7 +4006,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
                 "be 3.", status, method, class, naxes, class );
-   } 
+   }
 
 /* Also validate the input array dimension argument. */
    if ( astOK && ( indim < nmark ) ) {
@@ -4038,8 +4038,8 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
 /* Store these pointers in the PointSet. */
    astSetPoints( pset1, (double **) ptr1 );
 
-/* Transform the supplied data from the current frame (i.e. physical 
-   coordinates) to the base frame (i.e. graphics coordinates) using 
+/* Transform the supplied data from the current frame (i.e. physical
+   coordinates) to the base frame (i.e. graphics coordinates) using
    the inverse Mapping defined by the Plot. */
    mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
    pset2 = astTransform( mapping, pset1, 0, NULL );
@@ -4065,7 +4065,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
       xpd = ptr2[ 0 ];
       ypd = ptr2[ 1 ];
       zpd = ptr2[ 2 ];
-   
+
 /* Convert the double precision values to single precision, rejecting
    any bad marker positions. */
       nn = 0;
@@ -4095,7 +4095,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
          LOCK_MUTEX2;
 
          if( !astG3DMark( nn, x, y, z, type, norm ) ) {
-            astError( AST__GRFER, "%s(%s): Graphics error in astG3DMark. ", status, 
+            astError( AST__GRFER, "%s(%s): Graphics error in astG3DMark. ", status,
                    method, class );
          }
 
@@ -4112,7 +4112,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
    x = (float *) astFree( (void *) x );
    y = (float *) astFree( (void *) y );
    z = (float *) astFree( (void *) z );
-   
+
 /* Annul the PointSets. */
    pset1 = astAnnul( pset1 );
    pset2 = astAnnul( pset2 );
@@ -4127,7 +4127,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
    return;
 }
 
-static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value, 
+static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
                        double *old_value, int prim ){
 /*
 *  Name:
@@ -4141,37 +4141,37 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DAttr( AstKeyMap *grfconID, int attr, double value, 
+*     int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
 *                     double *old_value, int prim )
 
 *  Class Membership:
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
+*     This function is called by one of the three encapsulated 2D Plots to
 *     get or set the current value of a specified graphics attribute. It
 *     forwards the call to the grf3D module being used by this Plot3D. It
 *     should be registered with each of the 2D Plots using astGrfSet.
 
 *  Parameters:
 *     grfconID
-*       The Plot's GrfContext KeyMap. This is used to identify which of 
+*       The Plot's GrfContext KeyMap. This is used to identify which of
 *       the three Plots is calling this function.
-*     attr 
+*     attr
 *       An integer value identifying the required attribute. This should
 *       be one of the symbolic values defined in grf.h.
-*     value 
+*     value
 *       A new value to store for the attribute. If this is AST__BAD
 *       no value is stored.
-*     old_value 
+*     old_value
 *       A pointer to a double in which to return the attribute value.
 *       If this is NULL, no value is returned.
-*     prim 
+*     prim
 *       The sort of graphics primitive to be drawn with the new attribute.
 *       Identified by one of the values defined in grf.h.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4190,7 +4190,7 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
    until the current thread has finished executing it. */
    LOCK_MUTEX2;
 
-/* Use the function in the external Grf3D module, selected at link-time 
+/* Use the function in the external Grf3D module, selected at link-time
    using ast_link options. Note, attribute values are the same for each
    of the three Plot. */
    result = astG3DAttr( attr, value, old_value, prim );
@@ -4221,9 +4221,9 @@ static int Plot3DCap( AstKeyMap *grfconID, int cap, int value ){
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     determine if a given graphics capability is available. It forwards 
-*     the call to the grf3D module being used by this Plot3D. It should be 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     determine if a given graphics capability is available. It forwards
+*     the call to the grf3D module being used by this Plot3D. It should be
 *     registered with each of the 2D Plots using astGrfSet.
 
 *  Parameters:
@@ -4234,14 +4234,14 @@ static int Plot3DCap( AstKeyMap *grfconID, int cap, int value ){
 *       The capability being inquired about. This will be one of the
 *       following constants defined in grf.h: GRF__SCALES, GRF__MJUST,
 *       GRF__ESC,
-*     value 
+*     value
 *       The use of this parameter depends on the value of "cap" as
 *       described in the documentation for the astGrfSet function in the
 *       Plot class.
 
-*  Returned Value: 
+*  Returned Value:
 *     The value returned by the function depends on the value of "cap"
-*     as described in the astGrfSet documentation. Zero is returned if 
+*     as described in the astGrfSet documentation. Zero is returned if
 *     the supplied capability is not recognised.
 
 */
@@ -4303,10 +4303,10 @@ static int Plot3DFlush( AstKeyMap *grfconID ){
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     ensure that the display device is up-to-date by flushing any pending 
-*     graphics to the output device. It forwards the call to the grf3D module 
-*     being used by this Plot3D. It should be registered with each of the 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     ensure that the display device is up-to-date by flushing any pending
+*     graphics to the output device. It forwards the call to the grf3D module
+*     being used by this Plot3D. It should be registered with each of the
 *     2D Plots using astGrfSet.
 
 *  Parameters:
@@ -4315,7 +4315,7 @@ static int Plot3DFlush( AstKeyMap *grfconID ){
 *       used to identify which of the three Plots is calling this function.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4334,7 +4334,7 @@ static int Plot3DFlush( AstKeyMap *grfconID ){
    until the current thread has finished executing it. */
    LOCK_MUTEX2;
 
-/* Use the function in the external Grf3D module, selected at link-time 
+/* Use the function in the external Grf3D module, selected at link-time
    using ast_link options. */
    result = astG3DFlush();
 
@@ -4358,31 +4358,31 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, 
+*     int Plot3DLine( AstKeyMap *grfconID, int n, const float *x,
 *                     const float *y )
 
 *  Class Membership:
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     draw a polyline. It forwards the call to the grf3D module being used 
-*     by this Plot3D. It should be registered with each of the 2D Plots 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     draw a polyline. It forwards the call to the grf3D module being used
+*     by this Plot3D. It should be registered with each of the 2D Plots
 *     using astGrfSet.
 
 *  Parameters:
 *     grfconID
 *       The Plot's GrfContext KeyMap. This is
 *       used to identify which of the three Plots is calling this function.
-*     n 
+*     n
 *       The number of positions to be joined together.
-*     x 
+*     x
 *       A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *       A pointer to an array holding the "n" y values.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4405,7 +4405,7 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
    if( !astOK ) return result;
 
 /* Get a genuine pointer from the supplied grfcon identifier. */
-   grfcon = astMakePointer( grfconID );   
+   grfcon = astMakePointer( grfconID );
 
 /* Report an error if no grfcon object was supplied. */
    if( !grfcon ) {
@@ -4436,7 +4436,7 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
          x3d = (float *) x;
          y3d = (float *) y;
          z3d = work;
-         
+
          for( i = 0; i < n; i++ ) z3d[ i ] = gcon;
 
       } else if( plane == XZ ) {
@@ -4480,7 +4480,7 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
    return result;
 }
 
-static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x, 
+static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
                        const float *y, int type ){
 /*
 *  Name:
@@ -4494,34 +4494,34 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DMark( AstKeyMap *grfconID, int n, const float *x, 
+*     int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
 *                     const float *y, int type )
 
 *  Class Membership:
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     draw a set of markers. It forwards the call to the grf3D module being 
-*     used by this Plot3D. It should be registered with each of the 2D Plots 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     draw a set of markers. It forwards the call to the grf3D module being
+*     used by this Plot3D. It should be registered with each of the 2D Plots
 *     using astGrfSet.
 
 *  Parameters:
 *     grfconID
 *       The Plot's GrfContext KeyMap. This is
 *       used to identify which of the three Plots is calling this function.
-*     n 
+*     n
 *       The number of markers to draw.
-*     x 
+*     x
 *       A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *       A pointer to an array holding the "n" y values.
-*     type 
-*       An integer which can be used to indicate the type of marker symbol 
+*     type
+*       An integer which can be used to indicate the type of marker symbol
 *       required.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4533,7 +4533,7 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
    float *y3d = NULL;
    float *z3d = NULL;
    float norm[ 3 ];
-   int i;          
+   int i;
    int plane;
    int rc;
    int result = 0;
@@ -4546,7 +4546,7 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
    if( !astOK ) return result;
 
 /* Get a genuine pointer from the supplied grfcon identifier. */
-   grfcon = astMakePointer( grfconID );   
+   grfcon = astMakePointer( grfconID );
 
 /* Report an error if no grfcon object was supplied. */
    if( !grfcon ) {
@@ -4655,12 +4655,12 @@ static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh ){
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     get the current text size. It forwards the call to the grf3D module 
-*     being used by this Plot3D. It should be registered with each of the 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     get the current text size. It forwards the call to the grf3D module
+*     being used by this Plot3D. It should be registered with each of the
 *     2D Plots using astGrfSet.
 *
-*     The grf3D module assumes that the 3D graphics axes are equally 
+*     The grf3D module assumes that the 3D graphics axes are equally
 *     scaled and therefore the text height does not depend on the text
 *     orientation. Therefore, "chv" and "chh" are returned holding the
 *     same value.
@@ -4669,17 +4669,17 @@ static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh ){
 *     grfconID
 *       The Plot's GrfContext KeyMap. This is
 *       used to identify which of the three Plots is calling this function.
-*     chv 
+*     chv
 *        A pointer to the float which is to receive the height of
-*        characters drawn with a vertical baseline in the 2D Plot. This 
+*        characters drawn with a vertical baseline in the 2D Plot. This
 *        will be an increment in the 2D X axis.
-*     chh 
+*     chh
 *       A pointer to the float which is to receive the height of
-*       characters drawn with a horizontal baseline in the 2D Plot. This 
+*       characters drawn with a horizontal baseline in the 2D Plot. This
 *       will be an increment in the 2D Y axis.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4699,7 +4699,7 @@ static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh ){
    until the current thread has finished executing it. */
    LOCK_MUTEX2;
 
-/* Use the function in the external Grf3D module, selected at link-time 
+/* Use the function in the external Grf3D module, selected at link-time
    using ast_link options. Note, text height is the same for each
    of the three Plot. */
    result = astG3DQch( &ch );
@@ -4734,7 +4734,7 @@ static int Plot3DScales( AstKeyMap *grfconID, float *alpha, float *beta ){
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
+*     This function is called by one of the three encapsulated 2D Plots to
 *     get the relative scales of the 2D axes. Since the grf3D module
 *     assumes that all graphics axes are equally scaled, it just returns 1.0
 *     for alpha and beta.
@@ -4743,15 +4743,15 @@ static int Plot3DScales( AstKeyMap *grfconID, float *alpha, float *beta ){
 *     grfconID
 *       The Plot's GrfContext KeyMap. This is
 *       used to identify which of the three Plots is calling this function.
-*     alpha 
-*       A pointer to the float which is to receive the scale for the X 
-*       axis 
-*     beta 
-*       A pointer to the float which is to receive the scale for the Y 
-*       axis 
+*     alpha
+*       A pointer to the float which is to receive the scale for the X
+*       axis
+*     beta
+*       A pointer to the float which is to receive the scale for the Y
+*       axis
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4774,39 +4774,39 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y, 
+*     int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
 *                     const char *just, float upx, float upy )
 
 *  Class Membership:
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     draw a text string. It forwards the call to the grf3D module being 
-*     used by this Plot3D. It should be registered with each of the 2D Plots 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     draw a text string. It forwards the call to the grf3D module being
+*     used by this Plot3D. It should be registered with each of the 2D Plots
 *     using astGrfSet.
 
 *  Parameters:
 *     grfconID
 *        The Plot's GrfContext KeyMap. This is
 *        used to identify which of the three Plots is calling this function.
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
-*     x 
+*     x
 *        The reference x coordinate.
-*     y 
+*     y
 *        The reference y coordinate.
-*     just 
+*     just
 *        A character string which specifies the location within the
 *        text string which is to be placed at the reference position
-*        given by x and y. 
-*     upx 
-*        The x component of the up-vector for the text. 
-*     upy 
+*        given by x and y.
+*     upx
+*        The x component of the up-vector for the text.
+*     upy
 *        The y component of the up-vector for the text.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4828,7 +4828,7 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
    if( !astOK ) return result;
 
 /* Get a genuine pointer from the supplied grfcon identifier. */
-   grfcon = astMakePointer( grfconID );   
+   grfcon = astMakePointer( grfconID );
 
 /* Report an error if no grfcon object was supplied. */
    if( !grfcon ) {
@@ -4913,8 +4913,8 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
    return result;
 }
 
-static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y, 
-                        const char *just, float upx, float upy, float *xb,  
+static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
+                        const char *just, float upx, float upy, float *xb,
                         float *yb ){
 /*
 *  Name:
@@ -4928,46 +4928,46 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, 
-*                      float y, const char *just, float upx, float upy, 
+*     int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x,
+*                      float y, const char *just, float upx, float upy,
 *                      float *xb, float *yb )
 
 *  Class Membership:
 *     Plot3D member function.
 
 *  Description:
-*     This function is called by one of the three encapsulated 2D Plots to 
-*     determine the extent a string would have if plotted using Plot3DText. 
-*     It forwards the call to the grf3D module being used by this Plot3D. It 
+*     This function is called by one of the three encapsulated 2D Plots to
+*     determine the extent a string would have if plotted using Plot3DText.
+*     It forwards the call to the grf3D module being used by this Plot3D. It
 *     should be registered with each of the 2D Plots using astGrfSet.
 
 *  Parameters:
 *     grfconID
 *        The Plot's GrfContext KeyMap. This is
 *        used to identify which of the three Plots is calling this function.
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
-*     x 
+*     x
 *        The reference x coordinate.
-*     y 
+*     y
 *        The reference y coordinate.
-*     just 
+*     just
 *        A character string which specifies the location within the
 *        text string which is to be placed at the reference position
-*        given by x and y. 
-*     upx 
-*        The x component of the up-vector for the text. 
-*     upy 
+*        given by x and y.
+*     upx
+*        The x component of the up-vector for the text.
+*     upy
 *        The y component of the up-vector for the text.
-*     xb 
+*     xb
 *        An array of 4 elements in which to return the x coordinate of
 *        each corner of the bounding box.
-*     yb 
+*     yb
 *        An array of 4 elements in which to return the y coordinate of
 *        each corner of the bounding box.
 
 *  Returned Value:
-*     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
+*     An integer value of 0 is returned if an error occurs, and 1 otherwise.
 
 */
 
@@ -4994,7 +4994,7 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
    if( !astOK ) return result;
 
 /* Get a genuine pointer from the supplied grfcon identifier. */
-   grfcon = astMakePointer( grfconID );   
+   grfcon = astMakePointer( grfconID );
 
 /* Report an error if no grfcon object was supplied. */
    if( !grfcon ) {
@@ -5078,7 +5078,7 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
       LOCK_MUTEX2;
 
 /* If ok, get the extent of the text. */
-      if( astOK ) result = astG3DTxExt( text, ref, just, up, norm, xb3d, yb3d, 
+      if( astOK ) result = astG3DTxExt( text, ref, just, up, norm, xb3d, yb3d,
                                         zb3d, bl );
 /* Allow the next thread to proceed. */
       UNLOCK_MUTEX2;
@@ -5088,7 +5088,7 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
    return result;
 }
 
-static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
+static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim,
                        const double *in, int *status ){
 /*
 *  Name:
@@ -5102,7 +5102,7 @@ static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
+*     void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim,
 *                     const double *in, int *status )
 
 *  Class Membership:
@@ -5137,7 +5137,7 @@ static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim,
 *        located if they do not entirely fill this array. The value
 *        given should not be less than "npoint".
 *     in
-*        The address of the first element in a 2-dimensional array of shape 
+*        The address of the first element in a 2-dimensional array of shape
 *        "[ncoord][indim]" giving the
 *        physical coordinates of the points which are to be joined in
 *        sequence by geodesic curves. These should be stored such that
@@ -5160,7 +5160,7 @@ static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim,
    if ( !astOK ) return;
 
    astError( AST__INTER, "astPolyCurve(%s): The astPolyCurve "
-             "method cannot be used with a %s (programming error).", status, 
+             "method cannot be used with a %s (programming error).", status,
              astGetClass( this ), astGetClass( this ) );
 }
 
@@ -5188,7 +5188,7 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe, int *status ) {
 *     in the Plot3D have their indices re-numbered from one (if
 *     necessary), but are otherwise unchanged.
 *
-*     If the index of the original base Frame is changed, the index value 
+*     If the index of the original base Frame is changed, the index value
 *     stored in the Plot3D is updated. If the base Frame itself is
 *     removed, an error is reported.
 
@@ -5232,7 +5232,7 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe, int *status ) {
       (*parent_removeframe)( this_fset, iframe, status );
 
 /* If the index of the removed Frame is smaller than the original base Frame
-   index, then decrement the original base Frame index so that the same Frame 
+   index, then decrement the original base Frame index so that the same Frame
    will be used in future. */
       if( astOK ){
          if( ifrm < this->pix_frame ) (this->pix_frame)--;
@@ -5309,7 +5309,7 @@ static int RootCornerInt( const char *rootcorner, int *status ){
    } else if( astChrMatch( rootcorner, "UUU" ) ) {
       result = UUU;
 
-   } 
+   }
 
 /* Return the result. */
    return result;
@@ -5383,7 +5383,7 @@ static const char *RootCornerString( int rootcorner, int *status ){
    } else if( rootcorner == UUU ) {
       result = "UUU";
 
-   } 
+   }
 
 /* Return the result. */
    return result;
@@ -5408,9 +5408,9 @@ static void Set3DGrf( AstPlot3D *this, AstPlot *plot, int plane, int *status ){
 *     Plot3D method.
 
 *  Description:
-*     This function registers grf functions defined in this class with 
-*     the supplied Plot, so that, whenever the Plot draws anything, the 
-*     plotting request is caught by this class and converted into an 
+*     This function registers grf functions defined in this class with
+*     the supplied Plot, so that, whenever the Plot draws anything, the
+*     plotting request is caught by this class and converted into an
 *     appropriate grf3D call.
 
 *  Parameters:
@@ -5445,8 +5445,8 @@ static void Set3DGrf( AstPlot3D *this, AstPlot *plot, int plane, int *status ){
    astGrfSet( plot, "TxExt", (AstGrfFun) Plot3DTxExt );
 
 /* When the above functions are called, they need to know which plane
-   they are drawing on. So we put this information into the GrfContext 
-   KeyMap stored in the Plot. This KeyMap will be passed to the above 
+   they are drawing on. So we put this information into the GrfContext
+   KeyMap stored in the Plot. This KeyMap will be passed to the above
    drawing functions when they are called from within the Plot class. */
    grfcon = astGetGrfContext( plot );
    astMapPut0I( grfcon, "Plane", plane, "The 2D plane being drawn on" );
@@ -5594,7 +5594,7 @@ static void SetCurrent( AstFrameSet *this_frameset, int iframe, int *status ) {
 /* Invoke the parent astSetCurrent method. */
    (*parent_setcurrent)( this_frameset, iframe, status );
 
-/* Update the three 2D Plots stored in the Plot3D structure so that they 
+/* Update the three 2D Plots stored in the Plot3D structure so that they
    reflect this modified FrameSet. */
    UpdatePlots( (AstPlot3D *) this_frameset, status );
 }
@@ -5640,12 +5640,12 @@ static void SetPlotAttr( AstPlot *plot, int plane, int label[ 2 ], int *status )
 
 /* Ensure that the Plot uses the grf interface registered using
    astGrfSet. */
-   astSetGrf( plot, 1 );   
+   astSetGrf( plot, 1 );
 
 /* Ensure that no title is drawn. */
    astSetDrawTitle( plot, 0 );
 
-/* For each axis, ensure that no axis labels or ticks are produced unless 
+/* For each axis, ensure that no axis labels or ticks are produced unless
    the axis is indicated as a labelled axis in the supplied array. */
    for( axis = 0; axis < 2; axis++ ) {
       if( !label[ axis ] ) {
@@ -5705,7 +5705,7 @@ static void SetRootCorner( AstPlot3D *this, int rootcorner, int *status ){
 
 /* Store the new value. */
       this->rootcorner = rootcorner;
-   }   
+   }
 }
 
 static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
@@ -5722,7 +5722,7 @@ static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     void SetTickValues( AstPlot *this, int axis, int nmajor, 
+*     void SetTickValues( AstPlot *this, int axis, int nmajor,
 *                         double *major, int nminor, double *minor, int *status )
 
 *  Class Membership:
@@ -5746,13 +5746,13 @@ static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
 *     major
 *        Pointer to an array holding "nmajor" values for axis "axis" in
 *        the current Frame of the suppled Plot. Major tick marks will be
-*        drawn at these values. 
+*        drawn at these values.
 *     nminor
 *        The number of minor tick mark values.
-*     minor 
+*     minor
 *        Pointer to an array holding "nminor" values for axis "axis" in
 *        the current Frame of the suppled Plot. Minor tick marks will be
-*        drawn at these values. 
+*        drawn at these values.
 *     status
 *        Pointer to the inherited status variable.
 */
@@ -5761,14 +5761,14 @@ static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
    if( !astOK ) return;
 
    astError( AST__INTER, "astSetTickValues(%s): The astSetTickValues "
-             "method cannot be used with a %s (programming error).", status, 
+             "method cannot be used with a %s (programming error).", status,
              astGetClass( this ), astGetClass( this ) );
 }
 
-static void SplitFrameSet( AstFrameSet *fset, 
-                           AstFrameSet **fsetxy, int labelxy[2], int wcsxy[2], 
-                           AstFrameSet **fsetxz, int labelxz[2], int wcsxz[2], 
-                           AstFrameSet **fsetyz, int labelyz[2], int wcsyz[2], 
+static void SplitFrameSet( AstFrameSet *fset,
+                           AstFrameSet **fsetxy, int labelxy[2], int wcsxy[2],
+                           AstFrameSet **fsetxz, int labelxz[2], int wcsxz[2],
+                           AstFrameSet **fsetyz, int labelyz[2], int wcsyz[2],
                            int *baseplane, int *status ){
 /*
 *  Name:
@@ -5782,75 +5782,75 @@ static void SplitFrameSet( AstFrameSet *fset,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     void SplitFrameSet( AstFrameSet *fset, 
-*                         AstFrameSet **fsetxy, int labelxy[2], int wcsxy[2], 
-*                         AstFrameSet **fsetxz, int labelxz[2], int wcsxz[2], 
-*                         AstFrameSet **fsetyz, int labelyz[2], int wcsyz[2], 
+*     void SplitFrameSet( AstFrameSet *fset,
+*                         AstFrameSet **fsetxy, int labelxy[2], int wcsxy[2],
+*                         AstFrameSet **fsetxz, int labelxz[2], int wcsxz[2],
+*                         AstFrameSet **fsetyz, int labelyz[2], int wcsyz[2],
 *                         int *baseplane, int *status )
 
 *  Class Membership:
-*     Plot3D member function 
+*     Plot3D member function
 
 *  Description:
-*     This function returns 3 FrameSets, each of which has 2-dimensional 
+*     This function returns 3 FrameSets, each of which has 2-dimensional
 *     base and current Frames. Each of the 2D base Frames span a single
-*     plane in the 3D base Frame of the supplied FrameSet. Likewise, each 
-*     of the 2D current Frames span a single plane in the 3D current Frame 
+*     plane in the 3D base Frame of the supplied FrameSet. Likewise, each
+*     of the 2D current Frames span a single plane in the 3D current Frame
 *     of the supplied FrameSet. An error is reported if there is no
-*     one-to-one association between the three planes in the supplied 
+*     one-to-one association between the three planes in the supplied
 *     current Frame and the 3 planes in the supplied base Frame.
 
 *  Parameters:
 *     fset
 *        Pointer to a FrameSet that has a 3D base Frame and a 3D current
-*        Frame. 
+*        Frame.
 *     fsetxy
-*        Pointer to a location at which to return a pointer to a new FrameSet 
+*        Pointer to a location at which to return a pointer to a new FrameSet
 *        that has a 2D base Frame and a 2D current. The base Frame spans
 *        axes 1 and 2 of the 3D base Frame in "fset".
 *     labelxy
-*        Returned holding flags indicating if the two axes of the current 
+*        Returned holding flags indicating if the two axes of the current
 *        Frame in *fsetxy should be labelled or not.
 *     wcsxy
-*        Returned holding the zero based axis index within the current Frame 
+*        Returned holding the zero based axis index within the current Frame
 *        of the supplied FrameSet that corresponds to each of the two
 *        current Frame axes in the "fsetxy" FrameSet.
 *     fsetxz
-*        Pointer to a location at which to return a pointer to a new FrameSet 
+*        Pointer to a location at which to return a pointer to a new FrameSet
 *        that has a 2D base Frame and a 2D current. The base Frame spans
 *        axes 1 and 3 of the 3D base Frame in "fset".
 *     labelxz
-*        Returned holding flags indicating if the two axes of the current 
+*        Returned holding flags indicating if the two axes of the current
 *        Frame in *fsetxz should be labelled or not.
 *     wcsxz
-*        Returned holding the zero based axis index within the current Frame 
+*        Returned holding the zero based axis index within the current Frame
 *        of the supplied FrameSet that corresponds to each of the two
 *        current Frame axes in the "fsetxz" FrameSet.
 *     fsetyz
-*        Pointer to a location at which to return a pointer to a new FrameSet 
+*        Pointer to a location at which to return a pointer to a new FrameSet
 *        that has a 2D base Frame and a 2D current. The base Frame spans
 *        axes 2 and 3 of the 3D base Frame in "fset".
 *     labelyz
-*        Returned holding flags indicating if the two axes of the current 
+*        Returned holding flags indicating if the two axes of the current
 *        Frame in *fsetyz should be labelled or not.
 *     wcsyz
-*        Returned holding the zero based axis index within the current Frame 
+*        Returned holding the zero based axis index within the current Frame
 *        of the supplied FrameSet that corresponds to each of the two
-*        current Frame axes in the "fsetxy" FrameSet. 
+*        current Frame axes in the "fsetxy" FrameSet.
 *     baseplane
 *        Index of the plane that is spanned by two connected 3D axes.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Notes:
-*     - Null pointers will be returned for the three new FrameSets if this 
-*     function is invoked with the global status set, or if it should fail 
+*     - Null pointers will be returned for the three new FrameSets if this
+*     function is invoked with the global status set, or if it should fail
 *     for any reason.
 *     - Each returned FrameSet has 2 Frames: Frame 1 is the base Frame
-*     and is spanned by 2 of the 3 axes in the base Frame of the supplied 
-*     FrameSet; Frame 2 is the current Frame and is spanned by 2 of the 3 
-*     axes in the current Frame of the supplied FrameSet. Any future changes 
-*     to this function that alter this structure should reflected in 
+*     and is spanned by 2 of the 3 axes in the base Frame of the supplied
+*     FrameSet; Frame 2 is the current Frame and is spanned by 2 of the 3
+*     axes in the current Frame of the supplied FrameSet. Any future changes
+*     to this function that alter this structure should reflected in
 *     equivalent changes to functions CreatePlots and UpdatePlots.
 */
 
@@ -5922,7 +5922,7 @@ static void SplitFrameSet( AstFrameSet *fset,
 /* Get the index of the other input axis (the one not included in the pair). */
             other_axin = 3 - axin[ 0 ] - axin[ 1 ];
 
-/* Try to get a Mapping that connects this remaining input to a distinct 
+/* Try to get a Mapping that connects this remaining input to a distinct
    subset of outputs. */
             other_axout = astMapSplit( smap, 1, &other_axin, &map1d );
 
@@ -5958,10 +5958,10 @@ static void SplitFrameSet( AstFrameSet *fset,
                   wcsax1[ 0 ] = axout[ 0 ];
                   wcsax1[ 1 ] = axout[ 1 ];
 
-/* Pick the two axes from the 3D base Frame that correspond to the first of 
-   the paired axes, and the unpaired axis. Order them so that we get the 
-   2 axes in the order xy, xz or yz. Also, store the index of the axis 
-   within the supplied  current Frame that corresponds to each axis in 
+/* Pick the two axes from the 3D base Frame that correspond to the first of
+   the paired axes, and the unpaired axis. Order them so that we get the
+   2 axes in the order xy, xz or yz. Also, store the index of the axis
+   within the supplied  current Frame that corresponds to each axis in
    the current Frame of the FrameSet created below. */
                   if( i < 2 ) {
                      axin2[ 0 ] = axin[ 0 ];
@@ -6004,8 +6004,8 @@ static void SplitFrameSet( AstFrameSet *fset,
                   bfrm2d = astAnnul( bfrm2d );
                   cfrm2d = astAnnul( cfrm2d );
                   map2d = astAnnul( map2d );
-                  
-/* Indicate that only one of the axes in the current Frame of this FrameSet 
+
+/* Indicate that only one of the axes in the current Frame of this FrameSet
    should be labelled. */
                   if( i < 2 ) {
                      label2[ 0 ] = 0;
@@ -6015,10 +6015,10 @@ static void SplitFrameSet( AstFrameSet *fset,
                      label2[ 1 ] = 0;
                   }
 
-/* Pick the two axes from the 3D base Frame that correspond to the second 
-   of the paired axes, and the unpaired axis. Order them so that we get the 
-   2 axes in the order xy, xz or yz. Also, store the index of the axis 
-   within the supplied  current Frame that corresponds to each axis in 
+/* Pick the two axes from the 3D base Frame that correspond to the second
+   of the paired axes, and the unpaired axis. Order them so that we get the
+   2 axes in the order xy, xz or yz. Also, store the index of the axis
+   within the supplied  current Frame that corresponds to each axis in
    the current Frame of the FrameSet created below. */
                   if( i == 0 ) {
                      axin2[ 0 ] = axin[ 1 ];
@@ -6062,7 +6062,7 @@ static void SplitFrameSet( AstFrameSet *fset,
                   cfrm2d = astAnnul( cfrm2d );
                   map2d = astAnnul( map2d );
 
-/* Indicate that neither axis in the current Frame of this FrameSet 
+/* Indicate that neither axis in the current Frame of this FrameSet
    should be labelled. */
                   label3[ 0 ] = 0;
                   label3[ 1 ] = 0;
@@ -6128,7 +6128,7 @@ static void SplitFrameSet( AstFrameSet *fset,
                      wcsyz[ 0 ] = wcsax1[ 0 ];
                      wcsyz[ 1 ] = wcsax1[ 1 ];
 
-                  }                  
+                  }
 
 /*  Free resources */
                   cfrm1d = astAnnul( cfrm1d );
@@ -6171,8 +6171,8 @@ static void SplitFrameSet( AstFrameSet *fset,
    }
 }
 
-static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2], 
-                           int labelxz[2], int wcsxz[2], int labelyz[2], 
+static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
+                           int labelxz[2], int wcsxz[2], int labelyz[2],
                            int wcsyz[2], int *status ) {
 /*
 *  Name:
@@ -6186,8 +6186,8 @@ static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2], 
-*                         int labelxz[2], int wcsxz[2], int labelyz[2], 
+*     void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
+*                         int labelxz[2], int wcsxz[2], int labelyz[2],
 *                         int wcsyz[2], int *status )
 
 *  Class Membership:
@@ -6205,25 +6205,25 @@ static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
 *        Flags indicating if the two axes of the current Frame in the XY
 *        Plot should be labelled or not.
 *     wcsxy
-*        The zero based axis index within the 3D current Frame that 
+*        The zero based axis index within the 3D current Frame that
 *        corresponds to each of the two current Frame axes in the XY Plot.
-*        A value of -1 should be used for 2D axes that do not correspond 
+*        A value of -1 should be used for 2D axes that do not correspond
 *        to any 3D axis.
 *     labelxz
 *        Flags indicating if the two axes of the current Frame in the XZ
 *        Plot should be labelled or not.
 *     wcsxz
-*        The zero based axis index within the 3D current Frame that 
+*        The zero based axis index within the 3D current Frame that
 *        corresponds to each of the two current Frame axes in the XZ Plot.
-*        A value of -1 should be used for 2D axes that do not correspond 
+*        A value of -1 should be used for 2D axes that do not correspond
 *        to any 3D axis.
 *     labelyz
 *        Flags indicating if the two axes of the current Frame in the YZ
 *        Plot should be labelled or not.
 *     wcsyz
-*        The zero based axis index within the 3D current Frame that 
+*        The zero based axis index within the 3D current Frame that
 *        corresponds to each of the two current Frame axes in the YZ Plot.
-*        A value of -1 should be used for 2D axes that do not correspond 
+*        A value of -1 should be used for 2D axes that do not correspond
 *        to any 3D axis.
 *     status
 *        Pointer to the inherited status variable.
@@ -6310,7 +6310,7 @@ static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
             temp = this->axis_plot1[ axis3d ];
             this->axis_plot1[ axis3d ] = this->axis_plot2[ axis3d ];
             this->axis_plot2[ axis3d ] = temp;
-   
+
             temp = this->axis_index1[ axis3d ];
             this->axis_index1[ axis3d ] = this->axis_index2[ axis3d ];
             this->axis_index1[ axis3d ] = temp;
@@ -6325,7 +6325,7 @@ static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
             temp = this->axis_plot1[ axis3d ];
             this->axis_plot1[ axis3d ] = this->axis_plot2[ axis3d ];
             this->axis_plot2[ axis3d ] = temp;
-   
+
             temp = this->axis_index1[ axis3d ];
             this->axis_index1[ axis3d ] = this->axis_index2[ axis3d ];
             this->axis_index1[ axis3d ] = temp;
@@ -6340,7 +6340,7 @@ static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
             temp = this->axis_plot1[ axis3d ];
             this->axis_plot1[ axis3d ] = this->axis_plot2[ axis3d ];
             this->axis_plot2[ axis3d ] = temp;
-   
+
             temp = this->axis_index1[ axis3d ];
             this->axis_index1[ axis3d ] = this->axis_index2[ axis3d ];
             this->axis_index1[ axis3d ] = temp;
@@ -6440,7 +6440,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    return result;
 }
 
-static void Text( AstPlot *this_plot, const char *text, const double pos[], 
+static void Text( AstPlot *this_plot, const char *text, const double pos[],
                   const float up[], const char *just, int *status ){
 /*
 *  Name:
@@ -6454,7 +6454,7 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     void Text( AstPlot *this, const char *text, const double pos[], 
+*     void Text( AstPlot *this, const char *text, const double pos[],
 *                const float up[], const char *just, int *status )
 
 *  Class Membership:
@@ -6485,14 +6485,14 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
 *        direction of the text (in graphical coordinates). For
 *        example, to get horizontal text, the vector {0.0f,1.0f} should
 *        be supplied. "Up" is taken to be the projection of the positive
-*        Z axis onto the plane specified by the current value of the 
+*        Z axis onto the plane specified by the current value of the
 *     just
 *        Pointer to a null-terminated character string identifying the
 *        reference point for the text being drawn. The first character in
 *        this string identifies the reference position in the "up" direction
-*        and may be "B" (baseline), "C" (centre), "T" (top) or "M" (bottom). 
-*        The second character identifies the side-to-side reference position 
-*        and may be "L" (left), "C" (centre) or "R" (right ). The string is 
+*        and may be "B" (baseline), "C" (centre), "T" (top) or "M" (bottom).
+*        The second character identifies the side-to-side reference position
+*        and may be "L" (left), "C" (centre) or "R" (right ). The string is
 *        case-insensitive, and only the first two characters are significant.
 *
 *        For example, a value of "BL" means that the left end of the
@@ -6539,7 +6539,7 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
                 "be 3.", status, method, class, naxes, class );
-   } 
+   }
 
 /* Ensure AST functions do not included graphical escape sequences in any
    returned text strings. This is because the Plot3D implementation of
@@ -6551,7 +6551,7 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
    astGrfAttrs( this, AST__TEXT_ID, 1, GRF__TEXT, method, class );
 
 /* Get the number of coordinates in the physical coordinate frame. */
-   ncoord = astGetNout( this );   
+   ncoord = astGetNout( this );
 
 /* Create a PointSet to hold the supplied physical coordinates. */
    pset1 = astPointSet( 1, ncoord, "", status );
@@ -6571,8 +6571,8 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
 /* Store these pointers in the PointSet. */
    astSetPoints( pset1, (double **) ptr1 );
 
-/* Transform the supplied data from the current frame (i.e. physical 
-   coordinates) to the base frame (i.e. graphics coordinates) using 
+/* Transform the supplied data from the current frame (i.e. physical
+   coordinates) to the base frame (i.e. graphics coordinates) using
    the inverse Mapping defined by the Plot. */
    mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
    pset2 = astTransform( mapping, pset1, 0, NULL );
@@ -6616,7 +6616,7 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
 
          if( norm[ 0 ] != 0.0 || norm[ 1 ] != 0.0 || norm[ 2 ] != 0.0 ){
             if( !astG3DText( ltext, ref, ljust, (float *) up, norm ) ) {
-               astError( AST__GRFER, "%s(%s): Graphics error in astG3DText. ", status, 
+               astError( AST__GRFER, "%s(%s): Graphics error in astG3DText. ", status,
                          method, class );
             }
          } else if( astOK ) {
@@ -6643,7 +6643,7 @@ static void Text( AstPlot *this_plot, const char *text, const double pos[],
 /* Re-establish the original graphical attributes. */
    astGrfAttrs( this, AST__TEXT_ID, 0, GRF__TEXT, method, class );
 
-/* Restore the original value of the flag which says whether graphical 
+/* Restore the original value of the flag which says whether graphical
    escape sequences should be incldued in any returned text strings. */
    astEscapes( escs );
 
@@ -6674,7 +6674,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 *  Description:
 *     This function takes a Plot3D and a set of points encapsulated in a
-*     PointSet and transforms the points from graphics coordinates to 
+*     PointSet and transforms the points from graphics coordinates to
 *     physical coordinates (in the forward direction). No clipping or
 *     normalisation is applied.
 
@@ -6684,8 +6684,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *     in
 *        Pointer to the PointSet holding the input coordinate data.
 *     forward
-*        A non-zero value indicates that the forward coordinate 
-*        transformation should be applied while a zero value requests the 
+*        A non-zero value indicates that the forward coordinate
+*        transformation should be applied while a zero value requests the
 *        inverse transformation.
 *     out
 *        Pointer to a PointSet which will hold the transformed (output)
@@ -6764,22 +6764,22 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
 *     this
 *        Pointer to the Plot3D.
 
-*  Notes: 
+*  Notes:
 *     - Each of the 3 plots has 3 Frames: Frame 1 is the base (GRAPHICS)
 *     Frame; Frame 2 is spanned by 2 of the 3 axes in the base Frame of
 *     the supplied FrameSet; Frame 3 is the current Frame and is spanned
 *     by 2 of the 3 axes in the current Frame of the supplied FrameSet.
-*     Any future changes to this function that alter this structure should 
+*     Any future changes to this function that alter this structure should
 *     reflected in equivalewnt changes to function CreatePlots.
 */
 
 /* Local Variables: */
-   AstFrame *frm; 
+   AstFrame *frm;
    AstFrameSet *fsetxy;
    AstFrameSet *fsetxz;
    AstFrameSet *fsetyz;
    AstFrameSet *fset;
-   AstMapping *map;    
+   AstMapping *map;
    int baseplane;
    int labelxy[ 2 ];
    int labelxz[ 2 ];
@@ -6799,15 +6799,15 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
 
 /* We need a FrameSet that is equivalent to the one that was used to
    construct the Plot3D (i.e. a FrameSet that does not have the GRAPHICS
-   Frame that was added by the Plot3D constructor). So take a copy of the 
-   parent FrameSet, remove the GRAPHICS Frame (Frame 1) and set the base 
-   Frame to be the Frame that was the base Frame when the Plot3D was 
+   Frame that was added by the Plot3D constructor). So take a copy of the
+   parent FrameSet, remove the GRAPHICS Frame (Frame 1) and set the base
+   Frame to be the Frame that was the base Frame when the Plot3D was
    constructed. */
       fset = (AstFrameSet *) astCast( this, dummy_frameset );
       astSetBase( fset, this->pix_frame );
-      astRemoveFrame( fset, 1 );   
+      astRemoveFrame( fset, 1 );
 
-/* Split the supplied FrameSet up into 3 FrameSets, each with a 2D base 
+/* Split the supplied FrameSet up into 3 FrameSets, each with a 2D base
    and current Frame. Each of these FrameSets describes one plane of
    the 3D cube. */
       SplitFrameSet( fset, &fsetxy, labelxy, wcsxy, &fsetxz, labelxz, wcsxz,
@@ -6817,12 +6817,12 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
    Mapping from the new FrameSet. It is assumed that he base Frame in the
    new FrameSet is equivalent to Frame 2 in the existing Plot. This
    assumption is based on the way the CreatePlots and SplitFrameSet
-   functions work, and should be reviewed if either of these functions 
+   functions work, and should be reviewed if either of these functions
    is changed. */
       frm = astGetFrame( fsetxy, 2 );
       map = astGetMapping( fsetxy, 1, 2 );
 
-/* Add the new Frame into the existing Plot using the Mapping to connect 
+/* Add the new Frame into the existing Plot using the Mapping to connect
    it to Frame 2 in the Plot. It becomes the current Frame in the Plot. */
       astAddFrame( this->plotxy, 2, map, frm );
 
@@ -6832,7 +6832,7 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
 
 /* Set the Plot attributes. */
       SetPlotAttr( this->plotxy, XY, labelxy, status );
- 
+
 /* Free resources */
       fsetxy = astAnnul( fsetxy );
       map = astAnnul( map );
@@ -6863,7 +6863,7 @@ static void UpdatePlots( AstPlot3D *this, int *status ) {
    corresponds to the 3D WCS axis. */
       StoreAxisInfo( this, labelxy, wcsxy, labelxz, wcsxz, labelyz, wcsyz, status );
 
-/* Set up the Edges attributes in the encapsulated Plots to produce labels 
+/* Set up the Edges attributes in the encapsulated Plots to produce labels
    on the required edges of the 3D graphics cube. */
       rootcorner = astGetRootCorner( this );
       ChangeRootCorner( this, rootcorner, rootcorner, status );
@@ -6890,7 +6890,7 @@ static void VSet( AstObject *this_object, const char *settings,
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void VSet( AstObject *this, const char *settings, char **text, 
+*     void VSet( AstObject *this, const char *settings, char **text,
 *                va_list args, int *status )
 
 *  Class Membership:
@@ -6906,7 +6906,7 @@ static void VSet( AstObject *this_object, const char *settings,
 *
 *     Here, "attribute" specifies an attribute name and the value to
 *     the right of each "=" sign should be a suitable textual
-*     representation of the value to be assigned to that attribute. This 
+*     representation of the value to be assigned to that attribute. This
 *     will be interpreted according to the attribute's data type.
 *
 *     The string supplied may also contain "printf"-style format
@@ -6923,7 +6923,7 @@ static void VSet( AstObject *this_object, const char *settings,
 *        comma-separated list of attribute settings.
 *     text
 *        Pointer to a location at which to return a pointer to dynamic
-*        memory holding a copy of the expanded setting string. This memory 
+*        memory holding a copy of the expanded setting string. This memory
 *        should be freed using astFree when no longer needed. If a NULL
 *        pointer is supplied, no string is created.
 *     args
@@ -6941,7 +6941,7 @@ static void VSet( AstObject *this_object, const char *settings,
 /* Invoke the parent astVSet method to set the Plot3D's attribute values. */
    (*parent_vset)( this_object, settings, text, args, status );
 
-/* Update the three 2D Plots stored in the Plot3D structure so that they 
+/* Update the three 2D Plots stored in the Plot3D structure so that they
    reflect this modified FrameSet. */
    UpdatePlots( (AstPlot3D *) this_object, status );
 }
@@ -6969,11 +6969,11 @@ static void VSet( AstObject *this_object, const char *settings,
 *     This attribute controls the appearance of an annotated
 c     coordinate grid (drawn with the astGrid function) by determining
 f     coordinate grid (drawn with the AST_GRID routine) by determining
-*     which edges of the cube enclosing the 3D graphics space are used 
+*     which edges of the cube enclosing the 3D graphics space are used
 *     for displaying numerical and descriptive axis labels. The attribute
 *     value identifies one of the eight corners of the cube within
 *     which graphics are being drawn (i.e. the cube specified by the
-c     "graphbox" parameter when astPlot3D 
+c     "graphbox" parameter when astPlot3D
 f     GRAPHBOX argument when AST_PLOT3D
 *     was called tp create the Plot3D). Axis labels and tick marks will
 *     be placed on the three cube edges that meet at the given corner.
@@ -6981,10 +6981,10 @@ f     GRAPHBOX argument when AST_PLOT3D
 *     The attribute value should consist of three character, each of
 *     which must be either "U" or "L". The first character in the string
 *     specifies the position of the corner on the first graphics axis.
-*     If the character is "U" then the corner is at the upper bound on the 
-*     first graphics axis. If it is "L", then the corner is at the lower 
-*     bound on the first axis. Likewise, the second and third characters 
-*     in the string specify the location of the corner on the second and 
+*     If the character is "U" then the corner is at the upper bound on the
+*     first graphics axis. If it is "L", then the corner is at the lower
+*     bound on the first axis. Likewise, the second and third characters
+*     in the string specify the location of the corner on the second and
 *     third graphics axes.
 *
 *     For instance, corner "LLL" is the corner that is at the lower bound
@@ -7027,22 +7027,22 @@ astMAKE_TEST(Plot3D,RootCorner,( this->rootcorner != -1 ))
 
 *  Description:
 *     This attribute controls the appearance of text and markers drawn
-*     by a Plot3D. It specifies the orientation of the plane upon which 
+*     by a Plot3D. It specifies the orientation of the plane upon which
 *     text and markers will be drawn by all subsequent invocations of the
 c     astText and astMark functions.
 f     AST_TEXT and AST_MARK functions.
 *
-*     When setting or getting the Norm attribute, the attribute name must 
-*     be qualified by an axis index in the range 1 to 3. The 3 elements of 
-*     the Norm attribute are together interpreted as a vector in 3D graphics 
-*     coordinates that is normal to the plane upon which text and marks 
+*     When setting or getting the Norm attribute, the attribute name must
+*     be qualified by an axis index in the range 1 to 3. The 3 elements of
+*     the Norm attribute are together interpreted as a vector in 3D graphics
+*     coordinates that is normal to the plane upon which text and marks
 *     should be drawn. When testing or clearing the attribute, the axis
 *     index is optional. If no index is supplied, then clearing the Norm
 *     attribute will clear all three elements, and testing the Norm attribute
 *     will return a non-zero value if any of the three elements are set.
 *
 *     The default value is 1.0 for each of the 3 elements. The length of
-*     the vector is insignificant, but an error will be reported when 
+*     the vector is insignificant, but an error will be reported when
 *     attempting to draw text or markers if the vector has zero length.
 
 *  Applicability:
@@ -7092,7 +7092,7 @@ MAKE_ALL(TextLabGap,double,AST__BAD,1)
 
 #define MAKE_ALL(attr,type) \
    MAKE_CLEAR1(attr) \
-   MAKE_SET1(attr,type) 
+   MAKE_SET1(attr,type)
 
 MAKE_ALL(Ink,int)
 MAKE_ALL(Tol,double)
@@ -7114,7 +7114,7 @@ MAKE_ALL(Labelling,int)
 
 #define MAKE_ALL(attr,type) \
    MAKE_CLEAR2(attr) \
-   MAKE_SET2(attr,type) 
+   MAKE_SET2(attr,type)
 
 MAKE_ALL(Style,int)
 MAKE_ALL(Font,int)
@@ -7218,7 +7218,7 @@ static void Delete( AstObject *obj, int *status ) {
 *     This function attempts to execute even if the global error status is
 *     set.
 */
-   
+
 /* Local Variables: */
    AstPlot3D *this;
 
@@ -7264,7 +7264,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   AstPlot3D *this;           
+   AstPlot3D *this;
    double dval;
    char key[ KEY_LEN + 1 ];
    int axis;
@@ -7314,55 +7314,55 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       astWriteString( channel, "RootCn", set, 1, text, "Corner where labelled axes meet" );
    } else if( astOK ) {
       astError( AST__INTER, "astDump(Plot3D): Illegal value %d found for "
-                "RootCorner attribute (interbal AST programming error).", status, 
+                "RootCorner attribute (interbal AST programming error).", status,
                 ival );
    }
 
 /* Labelled axes */
-   astWriteInt( channel, "AxPlX1", 1, 1, this->axis_plot1[0], 
+   astWriteInt( channel, "AxPlX1", 1, 1, this->axis_plot1[0],
                 "Plot used to label the 3D X axis" );
-   astWriteInt( channel, "AxPlY1", 1, 1, this->axis_plot1[1], 
+   astWriteInt( channel, "AxPlY1", 1, 1, this->axis_plot1[1],
                 "Plot used to label the 3D Y axis" );
-   astWriteInt( channel, "AxPlZ1", 1, 1, this->axis_plot1[2], 
+   astWriteInt( channel, "AxPlZ1", 1, 1, this->axis_plot1[2],
                 "Plot used to label the 3D Z axis" );
-   astWriteInt( channel, "AxInX1", 1, 1, this->axis_index1[0], 
+   astWriteInt( channel, "AxInX1", 1, 1, this->axis_index1[0],
                 "Plot axis index used to label the 3D X axis" );
-   astWriteInt( channel, "AxInY1", 1, 1, this->axis_index1[1], 
+   astWriteInt( channel, "AxInY1", 1, 1, this->axis_index1[1],
                 "Plot axis index used to label the 3D Y axis" );
-   astWriteInt( channel, "AxInZ1", 1, 1, this->axis_index1[2], 
+   astWriteInt( channel, "AxInZ1", 1, 1, this->axis_index1[2],
                 "Plot axis index used to label the 3D Z axis" );
 
 /* Unlabelled axes */
-   astWriteInt( channel, "AxPlX2", 1, 1, this->axis_plot2[0], 
+   astWriteInt( channel, "AxPlX2", 1, 1, this->axis_plot2[0],
                 "Other Plot touching the 3D X axis" );
-   astWriteInt( channel, "AxPlY2", 1, 1, this->axis_plot2[1], 
+   astWriteInt( channel, "AxPlY2", 1, 1, this->axis_plot2[1],
                 "Other Plot touching the 3D Y axis" );
-   astWriteInt( channel, "AxPlZ2", 1, 1, this->axis_plot2[2], 
+   astWriteInt( channel, "AxPlZ2", 1, 1, this->axis_plot2[2],
                 "Other Plot touching the 3D Z axis" );
-   astWriteInt( channel, "AxInX2", 1, 1, this->axis_index2[0], 
+   astWriteInt( channel, "AxInX2", 1, 1, this->axis_index2[0],
                 "Other Plot axis index touching the 3D X axis" );
-   astWriteInt( channel, "AxInY2", 1, 1, this->axis_index2[1], 
+   astWriteInt( channel, "AxInY2", 1, 1, this->axis_index2[1],
                 "Other Plot axis index touching the 3D Y axis" );
-   astWriteInt( channel, "AxInZ2", 1, 1, this->axis_index2[2], 
+   astWriteInt( channel, "AxInZ2", 1, 1, this->axis_index2[2],
                 "Other Plot axis index touching the 3D Z axis" );
 
 /* The Plot that spans the two connected axes. */
-   astWriteInt( channel, "BasePl", 1, 1, this->baseplot, 
+   astWriteInt( channel, "BasePl", 1, 1, this->baseplot,
                 "Plot spanning two connected 3D axes" );
 
-/* XY Plot */ 
-   astWriteObject( channel, "PlotXY", 1, 1, this->plotxy, 
+/* XY Plot */
+   astWriteObject( channel, "PlotXY", 1, 1, this->plotxy,
                    "Plot describing the XY plane" );
 
-/* XZ Plot */ 
-   astWriteObject( channel, "PlotXZ", 1, 1, this->plotxz, 
+/* XZ Plot */
+   astWriteObject( channel, "PlotXZ", 1, 1, this->plotxz,
                    "Plot describing the XZ plane" );
 
-/* YZ Plot */ 
-   astWriteObject( channel, "PlotYZ", 1, 1, this->plotyz, 
+/* YZ Plot */
+   astWriteObject( channel, "PlotYZ", 1, 1, this->plotyz,
                    "Plot describing the YZ plane" );
 
-/* The index within the Plot3D FrameSet, of the original base Frame in 
+/* The index within the Plot3D FrameSet, of the original base Frame in
    the FrameSet supplied when the Plot3D was constructed. */
    astWriteInt( channel, "PixFrm", 1, 0, this->pix_frame,
                 "Index of original base Frame" );
@@ -7373,13 +7373,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Standard class functions. */
 /* ========================= */
-/* Implement the astIsAPlot3D and astCheckPlot3D functions using the 
+/* Implement the astIsAPlot3D and astCheckPlot3D functions using the
    macros defined for this purpose in the "object.h" header file. */
 astMAKE_ISA(Plot3D,Plot)
 astMAKE_CHECK(Plot3D)
 
 
-AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox, 
+AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
                        const double *basebox, const char *options, int *status, ...) {
 /*
 *+
@@ -7394,8 +7394,8 @@ AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     AstPlot3D *astPlot3D( AstFrame *frame, const float *graphbox, 
-*                           const double *basebox, const char *options, ..., int *status ) 
+*     AstPlot3D *astPlot3D( AstFrame *frame, const float *graphbox,
+*                           const double *basebox, const char *options, ..., int *status )
 
 *  Class Membership:
 *     Plot3D constructor.
@@ -7404,13 +7404,13 @@ AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
 *     This function creates a new Plot3D and optionally initialises its
 *     attributes.
 *
-*     The supplied Frame (or the base frame if a FrameSet was supplied) is 
-*     assumed to be related to the graphics world coordinate system by a 
-*     simple shift and scale along each axis. The mapping between graphics 
-*     world coordinates and this Frame is specified by supplying the 
-*     coordinates in both systems at the lower bounds and upper bounds corners 
-*     of a box on the graphics device. By default, no graphics will be 
-*     produced outside the supplied box, but this default behaviour can be 
+*     The supplied Frame (or the base frame if a FrameSet was supplied) is
+*     assumed to be related to the graphics world coordinate system by a
+*     simple shift and scale along each axis. The mapping between graphics
+*     world coordinates and this Frame is specified by supplying the
+*     coordinates in both systems at the lower bounds and upper bounds corners
+*     of a box on the graphics device. By default, no graphics will be
+*     produced outside the supplied box, but this default behaviour can be
 *     changed by setting explicit values for the various clipping attributes.
 
 *  Parameters:
@@ -7419,16 +7419,16 @@ AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
 *        is supplied, then a default 3-D Frame will be created to which labels,
 *        etc, can be attached by setting the relevant Frame attributes.
 *     graphbox
-*        A pointer to an array of 6 values giving the graphics world 
-*        coordinates of the lower bounds and upper bound corners of a box on 
-*        the graphics output device. The first triple of values should be the 
+*        A pointer to an array of 6 values giving the graphics world
+*        coordinates of the lower bounds and upper bound corners of a box on
+*        the graphics output device. The first triple of values should be the
 *        coordinates of the lower bounds corner of the box and the second
 *        triple of values should be the coordinates of the upper bounds corner.
 *     basebox
 *        A pointer to an array of 6 values giving the coordinates in the
-*        supplied Frame, or base frame of the supplied FrameSet, at the 
-*        lower bounds corner and upper bounds corners of the box specified 
-*        by parameter graphbox. These should be supplied in the same order as 
+*        supplied Frame, or base frame of the supplied FrameSet, at the
+*        lower bounds corner and upper bounds corners of the box specified
+*        by parameter graphbox. These should be supplied in the same order as
 *        for parameter "graphbox".
 *     options
 *        Pointer to a null terminated string containing an optional
@@ -7488,7 +7488,7 @@ AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
 /* Initialise the Plot3D, allocating memory and initialising the
    virtual function table as well if necessary. */
       new = astInitPlot3D( NULL, sizeof( AstPlot3D ), !class_init,
-                           &class_vtab, "Plot3D", frame, graphbox, 
+                           &class_vtab, "Plot3D", frame, graphbox,
                            basebox );
 
 /* If successful, note that the virtual function table has been
@@ -7514,7 +7514,7 @@ AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
 
 AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
                            AstPlot3DVtab *vtab, const char *name,
-                           AstFrame *frame, const float *graphbox, 
+                           AstFrame *frame, const float *graphbox,
                            const double *basebox, int *status ) {
 /*
 *+
@@ -7531,8 +7531,8 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 *     #include "plot3d.h"
 *     AstPlot3D *astInitPlot3D( void *mem, size_t size, int init,
 *                               AstPlotVtab *vtab, const char *name,
-*                               AstFrame *frame, const float *graphbox, 
-*                               const double *basebox ) 
+*                               AstFrame *frame, const float *graphbox,
+*                               const double *basebox )
 
 *  Class Membership:
 *     Plot3D initialiser.
@@ -7576,14 +7576,14 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 *     fset
 *        A pointer to the Frame or Frameset to be annotated.
 *     graphbox
-*        A pointer to an array of 6 values giving the graphics coordinates 
-*        of the bottom left and top right corners of a box on the graphics 
-*        output device. The first triple of values should be the graphics 
+*        A pointer to an array of 6 values giving the graphics coordinates
+*        of the bottom left and top right corners of a box on the graphics
+*        output device. The first triple of values should be the graphics
 *        coordinates of the bottom left corner of the box and the second
 *        triple of values are the graphics coordinates of the top right corner.
 *     basebox
 *        A pointer to an array of 6 values giving the coordinates in the
-*        supplied Frame or base Frame of the supplied FrameSet at the bottom 
+*        supplied Frame or base Frame of the supplied FrameSet at the bottom
 *        left and top right corners of the box specified by parameter graphbox.
 *        These should be supplied in the same order as for parameter "graphbox".
 
@@ -7619,18 +7619,18 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 /* If necessary, initialise the virtual function table. */
    if ( init ) astInitPlot3DVtab( vtab, name );
 
-/* First of all we need to ensure that we have a FrameSet and a base 
-   Frame on which to base the new Plot3D. If a NULL Frame pointer was 
-   supplied, create a default 3-D Frame, and then create a FrameSet 
-   containing just this default Frame. Also store a pointer to a 
-   message which can be used to describe the object within error 
+/* First of all we need to ensure that we have a FrameSet and a base
+   Frame on which to base the new Plot3D. If a NULL Frame pointer was
+   supplied, create a default 3-D Frame, and then create a FrameSet
+   containing just this default Frame. Also store a pointer to a
+   message which can be used to describe the object within error
    messages. */
    if( !frame ){
       baseframe = astFrame( 3, "", status );
       fset = astFrameSet( baseframe, "", status );
       mess = "default 3-d Frame";
 
-/* If an object was supplied, report an error if it is not a Frame or 
+/* If an object was supplied, report an error if it is not a Frame or
    an object derived from a Frame (such as a FrameSet). */
    } else if( !astIsAFrame( frame ) ){
       if( astOK ){
@@ -7638,9 +7638,9 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
                    "is not a Frame.", status, name, astGetClass( frame ) );
       }
 
-/* If the supplied object is a Plot3D or an object derived from a Plot3D 
+/* If the supplied object is a Plot3D or an object derived from a Plot3D
    (a Plot3D is a sort of Frame and so will pass the above test), extract a
-   FrameSet from the Plot3D, and clear the Domain attribute for any existing 
+   FrameSet from the Plot3D, and clear the Domain attribute for any existing
    Frames which have Domain GRAPHICS. */
    } else if( astIsAPlot3D( frame ) ){
       fset0 = astFrameSet( frame, "", status );
@@ -7657,24 +7657,24 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 
       baseframe = astGetFrame( fset, astGetBase( fset ) );
       mess = "base Frame of the supplied Plot3D";
-   
-/* If the object is not a FrameSet, create a FrameSet holding the 
-   supplied Frame. If the Frame is not 3D, an extra 3D Frame is 
+
+/* If the object is not a FrameSet, create a FrameSet holding the
+   supplied Frame. If the Frame is not 3D, an extra 3D Frame is
    included in the FrameSet derived from axes 1, 2 and 3 of the supplied
    Frame. This new Frame becomes the base Frame. */
    } else if( !astIsAFrameSet( frame ) ){
       fset0 = astFrameSet( frame, "", status );
       mess = "supplied Frame";
-      fset = Fset3D( fset0, AST__BASE, status );      
+      fset = Fset3D( fset0, AST__BASE, status );
       fset0 = astAnnul( fset0 );
       baseframe = astGetFrame( fset, astGetBase( fset ) );
 
 /* If a FrameSet was supplied, ensure it has a 3D base Frame.
-   If the supplied FrameSet is not 3D, then a new base Frame is 
-   inserted into it which is derived from axes 1, 2 and 3 of the 
+   If the supplied FrameSet is not 3D, then a new base Frame is
+   inserted into it which is derived from axes 1, 2 and 3 of the
    original base Frame. */
    } else {
-      fset = Fset3D( (AstFrameSet *) frame, AST__BASE, status );      
+      fset = Fset3D( (AstFrameSet *) frame, AST__BASE, status );
       baseframe = astGetFrame( fset, astGetBase( fset ) );
       mess = "base Frame of the supplied FrameSet";
    }
@@ -7684,7 +7684,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
    if ( naxes != 3 && astOK ) {
       astError( AST__NAXIN, "astInitPlot3D(%s): Number of axes (%d) in the %s "
                 "is invalid - this number should be 3.", status, name, naxes, mess );
-   } 
+   }
 
 /* Check that no dimension of the graphbox is bad. */
    if( astISBAD(graphbox[0]) || astISBAD(graphbox[1]) ||
@@ -7720,7 +7720,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
    the Plot class will be used during the construction of the Plot3D. Once
    the Plot3D is fully constructed, we will use astSetVtab to establish
    the correct vtab. */
-   new = (AstPlot3D *) astInitPlot( mem, size, 0, NULL, name, NULL, fjunkbox, 
+   new = (AstPlot3D *) astInitPlot( mem, size, 0, NULL, name, NULL, fjunkbox,
                                     djunkbox );
    if ( astOK ) {
 
@@ -7729,9 +7729,9 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 
 /* Remove all Frames from the parent FrameSet except for the base (2D graphics)
    Frame (we leave this last Frame since an error is reported if the last
-   Frame is removed from a FrameSet). We do this by repeatedly removing the 
+   Frame is removed from a FrameSet). We do this by repeatedly removing the
    first Frame, causing all remaining Frames to have their index reduced by 1.
-   When the base Frame arrives at index 1, we skip it and start removing the 
+   When the base Frame arrives at index 1, we skip it and start removing the
    second frame instead. */
       nfrm = astGetNframe( new );
       i = 1;
@@ -7743,7 +7743,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
          }
       }
 
-/* Add in the 3D graphics Frame, using a PermMap to connect it to the 
+/* Add in the 3D graphics Frame, using a PermMap to connect it to the
    2D graphics Frame. */
       map = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, "", status );
       astAddFrame( new, 1, map, graphicsframe );
@@ -7753,7 +7753,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
    in the FrameSet, with index 1. */
       astRemoveFrame( new, 1 );
 
-/* Get the index of the current (physical) and base (pixel) Frames in 
+/* Get the index of the current (physical) and base (pixel) Frames in
    the supplied FrameSet. */
       bi = astGetBase( fset );
       ci = astGetCurrent( fset );
@@ -7770,19 +7770,19 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
       new->gbox[ 4 ] = (double) graphbox[ 4 ];
       new->gbox[ 5 ] = (double) graphbox[ 5 ];
 
-/* The base Frame of the supplied FrameSet is mapped linearly onto the 
-   graphics frame. Create a WinMap that maps the base box (within the 
+/* The base Frame of the supplied FrameSet is mapped linearly onto the
+   graphics frame. Create a WinMap that maps the base box (within the
    base Frame of the supplied FrameSet) onto the graphics box. */
-      map = (AstMapping *) astWinMap( 3, new->gbox, new->gbox + 3, basebox, 
+      map = (AstMapping *) astWinMap( 3, new->gbox, new->gbox + 3, basebox,
                                       basebox + 3, "", status );
 
-/* Add the supplied FrameSet into the Plot3D (i.e. FrameSet) created 
-   earlier. This leaves the graphics frame with index 1 in the 
+/* Add the supplied FrameSet into the Plot3D (i.e. FrameSet) created
+   earlier. This leaves the graphics frame with index 1 in the
    returned  Plot3D. */
       astAddFrame( (AstFrameSet *) new, 1, map, fset );
       map = astAnnul( map );
 
-/* Set the current Frame in the Plot to be the physical coordinate Frame 
+/* Set the current Frame in the Plot to be the physical coordinate Frame
    (with index incremented by one because the graphics Frame has been added). */
       astSetCurrent( (AstFrameSet *) new, ci + 1 );
 
@@ -7812,7 +7812,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
    Plot structure get forwarded to the relevant 3D routines defined in
    this class. */
       astGrfSet( new, "Attr", (AstGrfFun) Attr3D );
-      astSetGrf( new, 1 );   
+      astSetGrf( new, 1 );
 
 /* Change the virtual function table stored in the new Plot3D, from the Plot
    vtab (established when astINitPlot was called above), to the supplied
@@ -7821,7 +7821,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 
 /* Ensure that these Plots use the grf functions defined by this class
    (Plot3D). This means that whenever a Plot draws anything, it will use
-   the appropriate grf function defined in this class to do the drawing. 
+   the appropriate grf function defined in this class to do the drawing.
    The grf functions defined in this class, convert the grf call into a
    grf3D call apprpriate the plane spanned by the Plot. */
       Set3DGrf( new, new->plotxy, XY, status );
@@ -7849,7 +7849,7 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 }
 
 
-AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab, 
+AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
                            const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -7865,7 +7865,7 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
 *  Synopsis:
 *     #include "plot3d.h"
 *     AstPlot3D *astLoadPlot3D( void *mem, size_t size,
-*                               AstPlot3DVtab *vtab, 
+*                               AstPlot3DVtab *vtab,
 *                               const char *name, AstChannel *channel )
 
 *  Class Membership:
@@ -7923,7 +7923,7 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS       
+   astDECLARE_GLOBALS
    AstPlot3D *new;
    char key[ KEY_LEN + 1 ];
    char *text;
@@ -7965,7 +7965,7 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Plot3D. Pass a NULL vtab pointer so that the "new" object
-   will be loaded using Plot methods rather than than Plot3D methods.  
+   will be loaded using Plot methods rather than than Plot3D methods.
    This is important because the implementations provided by the Plot3D
    class for the Plot attribute accessors require the existence of the
    encapsulated Plots held within the Plot3D, but these have not yet been
@@ -8017,7 +8017,7 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
       new->axis_plot1[0] = astReadInt( channel, "axplx1", -1 );
       new->axis_plot1[1] = astReadInt( channel, "axply1", -1 );
       new->axis_plot1[2] = astReadInt( channel, "axplz1", -1 );
-   
+
       new->axis_index1[0] = astReadInt( channel, "axinx1", -1 );
       new->axis_index1[1] = astReadInt( channel, "axiny1", -1 );
       new->axis_index1[2] = astReadInt( channel, "axinz1", -1 );
@@ -8026,7 +8026,7 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
       new->axis_plot2[0] = astReadInt( channel, "axplx2", -1 );
       new->axis_plot2[1] = astReadInt( channel, "axply2", -1 );
       new->axis_plot2[2] = astReadInt( channel, "axplz2", -1 );
-   
+
       new->axis_index2[0] = astReadInt( channel, "axinx2", -1 );
       new->axis_index2[1] = astReadInt( channel, "axiny2", -1 );
       new->axis_index2[2] = astReadInt( channel, "axinz2", -1 );
@@ -8043,20 +8043,20 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
 /* YZ Plot */
       new->plotyz = astReadObject( channel, "plotyz", NULL );
 
-/* The index within the Plot3D FrameSet, of the original base Frame in 
+/* The index within the Plot3D FrameSet, of the original base Frame in
    the FrameSet supplied when the Plot3D was constructed. */
       new->pix_frame = astReadInt( channel, "pixfrm", AST__NOFRAME );
 
 /* Ensure that these Plots use the grf functions defined by this class
    (Plot3D). This means that whener a Plot draws anything, it will use
-   the appropriate grf function defined in this class to do the drawing. 
+   the appropriate grf function defined in this class to do the drawing.
    The grf functions defined in this class, convert the grf call into a
    grf3D call apprpriate the plane spanned by the Plot. */
       Set3DGrf( new, new->plotxy, XY, status );
       Set3DGrf( new, new->plotxz, XZ, status );
       Set3DGrf( new, new->plotyz, YZ, status );
 
-/* For attributes of the parent Plot class will have been loaded 
+/* For attributes of the parent Plot class will have been loaded
    each attribute that has a set value in the parent Plot structure,
    re-set the value so that it gets copied to the copy the  to the
    encapsulated Plots. First do axis specific attributes. */
@@ -8133,14 +8133,14 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-void astClearRootCorner_( AstPlot3D *this, int *status ) { 
-   if ( !astOK ) return; 
-   (**astMEMBER(this,Plot3D,ClearRootCorner))( this, status ); 
+void astClearRootCorner_( AstPlot3D *this, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Plot3D,ClearRootCorner))( this, status );
 }
 
-void astSetRootCorner_( AstPlot3D *this, int value, int *status ) { 
-   if ( !astOK ) return; 
-   (**astMEMBER(this,Plot3D,SetRootCorner))( this, value, status ); 
+void astSetRootCorner_( AstPlot3D *this, int value, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Plot3D,SetRootCorner))( this, value, status );
 }
 
 
@@ -8159,12 +8159,12 @@ void astSetRootCorner_( AstPlot3D *this, int value, int *status ) {
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstPlot3D *astPlot3DId_( void *frame_void, const float graphbox[6], 
+AstPlot3D *astPlot3DId_( void *frame_void, const float graphbox[6],
                          const double basebox[6], const char *, ... );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
-AstPlot3D *astPlot3DId_( void *frame_void, const float graphbox[6], 
+AstPlot3D *astPlot3DId_( void *frame_void, const float graphbox[6],
                          const double basebox[6], const char *options, ... ) {
 /*
 *++
@@ -8180,8 +8180,8 @@ f     AST_PLOT3D
 
 *  Synopsis:
 c     #include "plot3d.h"
-c     AstPlot3D *astPlot3D( AstFrame *frame, const float graphbox[ 6 ], 
-c                           const double basebox[ 6 ], const char *options, ... ) 
+c     AstPlot3D *astPlot3D( AstFrame *frame, const float graphbox[ 6 ],
+c                           const double basebox[ 6 ], const char *options, ... )
 f     RESULT = AST_PLOT3D( FRAME, GRAPHBOX, BASEBOX, OPTIONS, STATUS )
 
 *  Class Membership:
@@ -8191,7 +8191,7 @@ f     RESULT = AST_PLOT3D( FRAME, GRAPHBOX, BASEBOX, OPTIONS, STATUS )
 *     This function creates a new Plot3D and optionally initialises
 *     its attributes.
 *
-*     A Plot3D is a specialised form of Plot that provides facilities 
+*     A Plot3D is a specialised form of Plot that provides facilities
 *     for producing 3D graphical output.
 
 *  Parameters:
@@ -8273,7 +8273,7 @@ f     - If a Frame is supplied (via the FRAME pointer), then it
 *     becomes the current Frame of the new Plot3D and is given a Frame
 *     index of 2.
 c     - If a FrameSet is supplied (via the "frame" pointer), then
-f     - If a FrameSet is supplied (via the FRAME pointer), then 
+f     - If a FrameSet is supplied (via the FRAME pointer), then
 *     all the Frames within this FrameSet become part of the new Plot3D
 *     (where their Frame indices are increased by 1), with the
 *     FrameSet's current Frame becoming the current Frame of the Plot3D.
@@ -8345,7 +8345,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Initialise the Plot3D, allocating memory and initialising the
    virtual function table as well if necessary. */
       new = astInitPlot3D( NULL, sizeof( AstPlot3D ), !class_init,
-                           &class_vtab, "Plot3D", frame, graphbox, 
+                           &class_vtab, "Plot3D", frame, graphbox,
                            basebox );
 
 /* If successful, note that the virtual function table has been
@@ -8394,7 +8394,7 @@ static rettype name(ARGLIST,int *status){ \
 }
 
 
-#define ARGLIST AstPlot *this 
+#define ARGLIST AstPlot *this
 METHOD2(GetGrfContext,AstKeyMap *,NULL)
 #undef ARGLIST
 
@@ -8418,7 +8418,7 @@ METHOD1(GridLine)
 METHOD1(BoundingBox)
 #undef ARGLIST
 
-#define ARGLIST AstPlot *this, int iframe, const double lbnd[], const double ubnd[] 
+#define ARGLIST AstPlot *this, int iframe, const double lbnd[], const double ubnd[]
 METHOD1(Clip)
 #undef ARGLIST
 

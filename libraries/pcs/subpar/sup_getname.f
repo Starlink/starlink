@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -224,7 +224,7 @@
                   CALL DAT_GET0C ( LOC, STRUCTNAME, STATUS )
                ENDIF
                CALL DAT_ANNUL( LOC, STATUS )
-            ENDIF               
+            ENDIF
 
             IF ( STATUS .EQ. SAI__OK ) THEN
 *           Check and tidy the name
@@ -342,7 +342,7 @@
                   CALL EMS_REP ( 'SUP_GETNAME3',
      :            'SUBPAR: NOPROMPT on vpath for parameter ^NAME - '//
      :            'NULL assumed', STATUS )
-                 
+
                ENDIF
 
             ELSE IF ( PARVPATH(J,NAMECODE) .EQ. SUBPAR__INTERNAL )
@@ -368,7 +368,7 @@
      :              ( PARSTATE(NAMECODE) .EQ. SUBPAR__ACCEPT ) .OR.
      :              ( PARSTATE(NAMECODE) .EQ. SUBPAR__RESACC ) ) THEN
 
-                  IF ( ( PARDEF(3,NAMECODE) .GE. 20 ) 
+                  IF ( ( PARDEF(3,NAMECODE) .GE. 20 )
      :            .OR. ( PARDEF(3,NAMECODE) .EQ. SUBPAR__CHAR ) ) THEN
                      STRUCTNAME = CHARLIST(PARDEF(1,NAMECODE))
                      STRUCTURE = .FALSE.

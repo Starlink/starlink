@@ -1,8 +1,8 @@
-	SUBROUTINE VARGREY_SCALE( DATA_ARRAY, SCRATCH_ARRAY, XPC, YPC, 
+	SUBROUTINE VARGREY_SCALE( DATA_ARRAY, SCRATCH_ARRAY, XPC, YPC,
      :	                          STATUS)
 
-* Description : Routine to scale an image wrt the VARGREY value. Passes 
-*               temporary created SCRATCH_ARRAY back to subroutine 
+* Description : Routine to scale an image wrt the VARGREY value. Passes
+*               temporary created SCRATCH_ARRAY back to subroutine
 *               for plotting to workstation
 
 * ==========================================================================
@@ -86,7 +86,7 @@
 	CALL PAR_PUT0R( 'CALCULATED_MAX', XMAXIMUM, STATUS)
 	CALL PAR_PUT0R( 'CALCULATED_MIN', XMINIMUM, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :               'Error : VARGREY_SCALE : Illegal Max,Min values',
      :                   STATUS )
 	  RETURN
@@ -108,17 +108,17 @@
 	      VALUE_SCALED = MAXIMCOL
 	    ELSE
 	      IF( DATA_ARRAY( K, J) .LE. BREAKX) THEN
-	        VALUE_SCALED = MINIMCOL + 
+	        VALUE_SCALED = MINIMCOL +
      :	          ( ( DATA_ARRAY( K,J)-XMINIMUM)/(BREAKX-XMINIMUM))*(BREAKY-MINIMCOL)
 	      ELSE
-	        VALUE_SCALED = 
+	        VALUE_SCALED =
      :	          BREAKY + ( ( DATA_ARRAY( K, J) - BREAKX)/( XMAXIMUM -BREAKX))*( MAXIMCOL - BREAKY)
 	      END IF
 	      VALUE_SCALED = MAXIMCOL - VALUE_SCALED
 	    END IF
 
 * invert the canon and qms intensity scale
-	    IF( DEVICE_NAME .EQ. 'CANON'. OR. 
+	    IF( DEVICE_NAME .EQ. 'CANON'. OR.
      :	        DEVICE_NAME .EQ. 'QMS_LANDSCAPE' .OR.
      :	        DEVICE_NAME .EQ. 'QMS_PORTRAIT' .OR.
      :	        DEVICE_NAME .EQ. 'PS_PORTRAIT' .OR.

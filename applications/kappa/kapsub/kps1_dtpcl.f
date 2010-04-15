@@ -73,7 +73,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -150,14 +150,14 @@
       CALL NDF_BAD( INDFS, 'DATA', .FALSE., BAD, STATUS )
 
 *  Compute the statistics.
-      CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), 
+      CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( PNTR ) ),
      :                 4, CLIP, NGOOD, IMIN,
-     :                 DMIN, IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, 
+     :                 DMIN, IMAX, DMAX, SUM, MEAN, STDEV, NGOODC,
      :                 IMINC, DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
      :                 STATUS )
 
 *  Report an error if there are no good pixel values in the first
-*  NDF. 
+*  NDF.
       IF ( NGOOD .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDFS )
@@ -169,13 +169,13 @@
 *  Report an error if all data values are effectively zero.
       IF ( ABS( DMAX ) .LE. VAL__SMLR .AND.
      :     ABS( DMIN ) .LE. VAL__SMLR .AND.
-     :     STATUS .EQ. SAI__OK ) THEN 
+     :     STATUS .EQ. SAI__OK ) THEN
          STATUS  = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDFS )
          CALL ERR_REP( 'KPS1_DTPCL_ALLZERO', 'There are no '/
      :                 /'non-zero values in ^NDF', STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  Calculate the "typical value".
       IF ( MEANC .NE. VAL__BADD .AND. STDEVC .NE. VAL__BADD ) THEN

@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,15 +64,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
@@ -81,7 +81,7 @@
 *           Locator for NDF history component.
 *        DCB_HNREC( NDF__MXDCB ) = INTEGER (Read)
 *           Number of valid history records present.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
@@ -130,7 +130,7 @@
             END IF
          END IF
       END IF
- 
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

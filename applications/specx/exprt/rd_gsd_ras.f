@@ -62,7 +62,7 @@ C ALWAYS reopen the GSD file if we are dealing with rasters
 
       IF (GSD_OPEN) CALL SPECX_GSD_CLOSE (IERR)
 
-C  Open the GSD file 
+C  Open the GSD file
 
       CALL SPECX_GSD_OPEN   (GSD_SCAN, IERR)
       IF (IERR.NE.0) GO TO 99
@@ -78,7 +78,7 @@ C  Read file header according to version
          CALL SPECX_GSD_V4_HEADER (IERR)
          IF (IERR .NE. 0) GOTO 98
 
-      ELSE 
+      ELSE
 
          CALL SPECX_GSD_V5_HEADER (IERR)
          IF (IERR .NE. 0) GOTO 98
@@ -105,7 +105,7 @@ C Inform user that SET-LIST-FILE might save time
 C Ask for the file name
       IF(ICHECK(1,IFAIL).NE.1)   RETURN
       CALL GETFIL ('W', OUTFILE, IFAIL)
-      IF (IFAIL.NE.0) THEN 
+      IF (IFAIL.NE.0) THEN
          WRITE(ILOUT,*) 'File could not be accessed!'
          WRITE(ILOUT,*) 'Check that the file is open and has the'
          WRITE(ILOUT,*) 'correct file access'
@@ -115,7 +115,7 @@ C Ask for the file name
 
 C Write title into variable
       INDEX = 1
-      WRITE (ITITLE(:9),'(I4.4,''.'',I4.4)',IOSTAT=ISTAT) 
+      WRITE (ITITLE(:9),'(I4.4,''.'',I4.4)',IOSTAT=ISTAT)
      &     GSD_SCAN,INDEX
 
 C  Read data according to GSD version
@@ -158,7 +158,7 @@ C  Push existing data onto the stack to make room for the new scan
 
 
 C Write title into variable
-         WRITE (ITITLE(:9),'(I4.4,''.'',I4.4)',IOSTAT=ISTAT) 
+         WRITE (ITITLE(:9),'(I4.4,''.'',I4.4)',IOSTAT=ISTAT)
      &        GSD_SCAN,INDEX
 
 C  Read data according to GSD version
@@ -187,7 +187,7 @@ C Write spectrum to waiting Specx data-file
 
  98      CONTINUE
 
-      
+
 C     Don't close file -- leave open in case needed again.
 C     CALL SPECX_GSD_CLOSE (IERR)
 

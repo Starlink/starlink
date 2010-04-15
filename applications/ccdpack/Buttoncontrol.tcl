@@ -13,7 +13,7 @@
 #     [incr Tk] Mega-Widget
 
 #  Description:
-#     This class provides a very simple control which just contains a 
+#     This class provides a very simple control which just contains a
 #     button.  It just provides the -cmd and -text configuration
 #     options, along with the possiblity to specify a confirmation
 #     dialog, but it inherits from the Control class, and so inherits
@@ -28,7 +28,7 @@
 #
 #     cmd
 #        A command string to execute when the button is pressed.  Note
-#        this is not called -command becuase of a clash with the 
+#        this is not called -command becuase of a clash with the
 #        -command option inherited from the Control class.
 #
 #     confirmcmd
@@ -166,6 +166,6 @@
    proc buttoncontrol { pathname args } {
       uplevel Buttoncontrol $pathname $args
    }
-   
+
 
 # $Id$

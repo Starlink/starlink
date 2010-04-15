@@ -19,7 +19,7 @@
       INCLUDE 'zpidata.inc'
       REAL*8 DECLONG, DECLAT
       COMMON / ECL_COORD/ DECLONG, DECLAT	! Available from ROS_VIEW
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -44,7 +44,7 @@
       END IF
 
       FIELD_NO = DBS_FIELDNO(REF_FORM,'PROPOSAL.TITLE(1)' )
- 
+
       NTARGS = DBS_GETI(REF_FORM,FLD_NTARGETS)
       LINELOC = 198
       IF (MORE_SUMMARY) THEN								! on subsequent page
@@ -74,7 +74,7 @@
             END IF
             NS = NS + 1
          END DO
-       
+
          IF (LINELOC - NREM*6 .LT. 10) THEN						!end this page if not enough space
             NEXT_TARGET = ITARGET
             MORE_SUMMARY = .TRUE.

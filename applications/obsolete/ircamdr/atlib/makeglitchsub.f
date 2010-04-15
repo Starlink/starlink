@@ -10,9 +10,9 @@
         INCLUDE 'FIO_PAR'
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
      :	  STATUS,
      :	  LUN,
      :	  J,
@@ -21,7 +21,7 @@
      :	  NUMPIX,
      :	  BAD_NUMBER
 
-	REAL 
+	REAL
      :	  ARRIN( DIMSX, DIMSY)
 
 	CHARACTER*( *)
@@ -54,7 +54,7 @@
 
 *      tell user mean and sigma and maximum and minimum
 	CALL MSG_SETI( 'NUMBAD', BAD_NUMBER)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Number of bad pixels found = ^NUMBAD', STATUS)
 
 *      close output file and release lun

@@ -1,9 +1,9 @@
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AVERAGE --  Averages together MEASURE star magnitudes
 C        For details of this program see AVERAGE.HLP
 C
 C         a.j.penny                rgo                             84-7-31
- 
+
       subroutine average ( ierradam )
 
       implicit none
@@ -68,7 +68,7 @@ Cbegin
      +                 'found errors' )
          return
       endif
- 
+
       call gd_open ( istat )						!Open device
       if ( istat.ne.0 ) return
 
@@ -76,7 +76,7 @@ Cbegin
 
       call gd_dobox ( 0.0, xmax, 'Calculated errors', 0.0, ymax,	!Plot errors
      +              'Found errors', ' ', 0 )
-      call gd_opts ( ax(1,kfile), ay(1,kfile), bv, 12, .false., 
+      call gd_opts ( ax(1,kfile), ay(1,kfile), bv, 12, .false.,
      +               .false., 2 )
 
       call pgmove ( 0.0, 0.0 )						!Draw lines at unity slope
@@ -117,7 +117,7 @@ C--
       logical bv(1)
       external pgcurse
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
@@ -168,7 +168,7 @@ C   a j penny                 dao           1988-04-25
       real     dlim		!i/o: Difference limit from mean for acceptability
       integer  kf		!i: Magnitude range start
 C--
-      real x, y 
+      real x, y
       integer k, istat
       character texta*30, text*72
       integer pgcurse
@@ -177,16 +177,16 @@ Cbegin
 
 
       if ( ST_FAILED ) return
-		
+
       call gd_open ( istat )						!Open device
       if ( istat.ne.0 ) return
 
       write ( texta, '(1x,''Magnitude range:'',i3,'' to'',i3)' ) kf,	!Plot Box
      +                                                          (kf+1)
-      call gd_dobox ( ax(1), ax(2), 'Magnitude difference', 
+      call gd_dobox ( ax(1), ax(2), 'Magnitude difference',
      +                ay(1), ay(2), 'Number of star pairs', texta, 0 )
 
-      call pgbbuf		
+      call pgbbuf
       call pgmove ( 0.0, 0.0 )						!Plot histogram
       x = 0.0
       do k = 1, KNUMD
@@ -198,7 +198,7 @@ Cbegin
       call pgdraw ( x, 0.0 )
       call pgebuf
 
-      call pgqinf ( 'CURSOR', text, k )					!Use cursor to get a 
+      call pgqinf ( 'CURSOR', text, k )					!Use cursor to get a
       if ( text(1:1).eq.'Y' ) then					! better limit
          call printo ( 'Use cursor to refine limit' )
          x = dlim
@@ -230,8 +230,8 @@ C AV_SREFINE     Interactive cursor/keyboard estimate of 2 lists mean mag diff
 C AV_GTDATA      Move wanted data from input table row to storage areas
 C AV_CHOK        Check if a star is ok
 C AV_PTDATA      Load integer into a defined position of character string
-C AV_AVSTAR      Calc the best mean mag and other params for a star 
-C AV_CALDIFLIM   Calc difference limits for magnitudes from mean 
+C AV_AVSTAR      Calc the best mean mag and other params for a star
+C AV_CALDIFLIM   Calc difference limits for magnitudes from mean
 C AV_ACCLIM      Get acceptance limits for errors
 C AV_GTERRFAC    Get:- ratio true/calculated error; acceptance limit
 C AV_HISTCALC    Calculate histograms of the magnitude differences
@@ -259,7 +259,7 @@ C--
 Cbegin
 
 
-      call av_setup							!Setup and get conditions for taking a 
+      call av_setup							!Setup and get conditions for taking a
 									! star from a file
 
       call av_gtin							!Get the input MEASURE files
@@ -341,7 +341,7 @@ Cbegin
 
       call get1b ( 'USESIGMA', USESIGMA, .false. )			!Use Input errors to weight data?
       SIGMAMIN = 0.01
-      if ( USESIGMA ) call get1r ( 'SIGMAMIN', SIGMAMIN, 0.01, 1.0e-5, 
+      if ( USESIGMA ) call get1r ( 'SIGMAMIN', SIGMAMIN, 0.01, 1.0e-5,
      +                             100.0 )
 
       call get1b ( 'USECHI', USECHI, .true. )				!Use the chi-sq values to reject?
@@ -349,16 +349,16 @@ Cbegin
       if ( MODE.eq.'auto' ) then
          if ( .not.USESIGMA ) call get1r ( 'DIFMUL', DIFMUL, 2.5, 0.0, 	!Star has to be 'DIFMUL' std devs out
      +                                     1.0e9 )
-         call get_job ( 'ASCATTER', 'mag:error:default', KSCATREJ, 1, 
+         call get_job ( 'ASCATTER', 'mag:error:default', KSCATREJ, 1,
      +                             thelp, nthelp )
       endif
 
-      call printo ( ' ' )     
+      call printo ( ' ' )
       call get1b ( 'NAMES', NAMES, .false. )
 
       if ( ST_FAILED ) return
 
-      call printo ( ' ' )     
+      call printo ( ' ' )
       call get1c ( 'FPRINT', FPNAME, ' ', .true. )			!Output controls
       FPRINTING = .false.
       if ( FPNAME.ne.' ' ) then
@@ -431,7 +431,7 @@ Cbegin
 
          if ( ok ) call av_gtcolumn ( tin, k )				!Look at column order in file
 
-         if ( ok .and. COLPOS(7,k).ne.0 .and. USECHI ) then		!Get CHI data from any 
+         if ( ok .and. COLPOS(7,k).ne.0 .and. USECHI ) then		!Get CHI data from any
             loopa = .true. 						! wanted CHI file
             do while ( loopa )
                call optabr ( tinchi, ipchi, tbvxchi, tbychi, .true.,i)
@@ -444,9 +444,9 @@ Cbegin
                endif
             enddo
             call copr1  ( %val(ipchi), tbvxchi, tbychi, 6, 1, ALCHI(k) )
-            call copfrr ( %val(ipchi), tbvxchi, tbychi, 7, 1, 
+            call copfrr ( %val(ipchi), tbvxchi, tbychi, 7, 1,
      +                    CHIL(1,k), tbychi )
-            if ( tbychi.lt.KMAXCHI ) call amovkr ( CHIL(tbychi,k), 
+            if ( tbychi.lt.KMAXCHI ) call amovkr ( CHIL(tbychi,k),
      +                             CHIL(tbychi+1,k), (KMAXCHI-tbychi) )
          endif
 
@@ -485,15 +485,15 @@ C--
       logical more
       character*20 header(NUMCOLP), ahead
       data header / 'X', 'Y', 'MAG', 'DX', 'DY',
-     +              'ITERATIONS', 'CHI', 'NUMINVAL', 
-     +              'IMPORTANCE OF COMPS', 'ERROR', 
+     +              'ITERATIONS', 'CHI', 'NUMINVAL',
+     +              'IMPORTANCE OF COMPS', 'ERROR',
      +              'FAINTCORR', 'RX', 'RY' /
 Cbegin
 
 
       if ( ST_FAILED ) return
 
-      call azeroi ( COLPOS(1,kf), NUMCOLP )				!Set up default. 
+      call azeroi ( COLPOS(1,kf), NUMCOLP )				!Set up default.
 
       more = .true.
       do jj = 1, TBVXI(kf)-5						!Find columns for data
@@ -546,16 +546,16 @@ Cbegin
       call azeroi ( %val(IPNUMS), KTOT*MAXR )				!Set default to not found for all
 
       call printo ( ' ' )
-      if ( NAMES ) then							!Load names from file 1 and 
+      if ( NAMES ) then							!Load names from file 1 and
          call printo ('Making sorting tables for files to match names')	! add any extra names from other files
          TBYO = 0
          do k = 1, KTOT
-            call av_loadn1 ( %val(IPI(k)), TBVXI(k), TBYI(k), 
+            call av_loadn1 ( %val(IPI(k)), TBVXI(k), TBYI(k),
      +                       %val(IPNUMS), k )
          enddo
       else
          TBYO = TBYI(1)
-         call coprr ( %val(IPI(1)), TBVXI(1), TBYI(1), 1, 5, 1, 
+         call coprr ( %val(IPI(1)), TBVXI(1), TBYI(1), 1, 5, 1,
      +                TBYI(1), TBNAMES, 5, MAXR, 1, 1 )
          call av_loadn2 ( %val(IPNUMS) )
          call pargi ( TBYO )
@@ -600,13 +600,13 @@ Cbegin
             call namechr ( TBNAMES(1,kk), tb(1,k), kd )
             if ( kd.eq.0 ) found = .true.
          enddo
-     
+
          if ( found ) then
             nums(kf,kk) = k
          else
             if ( TBYO.eq.MAXR ) then
                call pargi ( TBYO )
-               call printd ( 
+               call printd (
      +              'ERROR: Too many star names: there are over %d' )
                ST_FAILED  = .true.
             else
@@ -652,7 +652,7 @@ C--
       integer j, k
 Cbegin
 
-    
+
       if ( ST_FAILED ) return
 
       do k = 1, TBYO
@@ -668,16 +668,16 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AV_FILAVS -- Calc for each file mean mag difference from file 1
 C
-C  Go through each file calculating for good stars:- 
+C  Go through each file calculating for good stars:-
 C    1) the star mag in file 1
 C    2) the difference from the star in File 1 (if star in file 1 is also good)
 C    3) the error of that difference (calc from the input errors)
-C  Store these in temporary arrays GODDMG, RDIFF and RVAR. 
+C  Store these in temporary arrays GODDMG, RDIFF and RVAR.
 C
-C  Calc mean difference and use interactive cursor refine it. Store mean 
+C  Calc mean difference and use interactive cursor refine it. Store mean
 C  differences in AVDIFF.
 C
-C  The distribution of good differences for each file is put into LDIFF and 
+C  The distribution of good differences for each file is put into LDIFF and
 C  the total no of good differences for each file into NUMG.
 C
 C  Also calc mean X and Y offset of files from first into XDIFFM and YDIFFM
@@ -700,17 +700,17 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call azeroi ( LDIFF,  20*KNUMF )					!Clear output LDIFF, 
+      call azeroi ( LDIFF,  20*KNUMF )					!Clear output LDIFF,
       call azeror ( AVDIFF, KNUMF )					! NUMG and AVDIFF
       call azeroi ( NUMG,   KNUMF )
       call azeror ( XDIFFM, KNUMF )
       call azeror ( YDIFFM, KNUMF )
 
-      do k = 1, TBYO							!Set first file as reference 
-         call av_gtdata ( %val(IPI(1)), TBVXI(1), TBYI(1), 		! level and store the number 
+      do k = 1, TBYO							!Set first file as reference
+         call av_gtdata ( %val(IPI(1)), TBVXI(1), TBYI(1), 		! level and store the number
      +                    %val(IPNUMS), 1, k )
          call av_chok ( 1, ok )						! of good stars in it and set
-         if ( ok ) NUMG(1) = NUMG(1) + 1				! difference distribution all 
+         if ( ok ) NUMG(1) = NUMG(1) + 1				! difference distribution all
       enddo								! at zero. Only allow max allowed
       NUMG(1) = min(NUMG(1),MAXR)
       LDIFF(10,1) = NUMG(1)
@@ -719,21 +719,21 @@ Cbegin
       if ( KTOT.eq.1 ) return						!If only one file, return
 
       do k = 2, KTOT							!Calc output for the other files
- 
+
          ngood = 0							!Go through all the stars, noting
-         do j = 1, TBYO							! good stars with good star in 
+         do j = 1, TBYO							! good stars with good star in
 									! file 1
- 
+
             call av_gtdata ( %val(IPI(1)), TBVXI(1), TBYI(1), 		!See if this is a good pair
      +                       %val(IPNUMS), 1, j )
             call av_chok ( 1, ok )
             if ( ok ) then
-               call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k), 
+               call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k),
      +                          %val(IPNUMS), k, j )
                call av_chok ( k, tok )
                if ( .not.tok ) ok = .false.
             endif
- 
+
             if ( ok .and. ngood.lt.MAXR ) then				!If OK, store that away, noting
                ngood = ngood + 1					! file 1 mag and magdiff
                RDIFF(ngood) = AMAG(k) - AMAG(1)
@@ -750,19 +750,19 @@ Cbegin
 
          enddo
          NUMG(k) = ngood
-     
+
          if ( ngood.eq.0 ) then
             call pargi ( k )
             call printd ( 'ERROR: No good matches for file no: %d ' )
          else
 
             call amovkb ( .true., tuse, ngood )				!Calculate raw mean
-            call meanstdr ( RDIFF, wt, tuse, ngood, .false., 0.0, 
+            call meanstdr ( RDIFF, wt, tuse, ngood, .false., 0.0,
      +                      .true., 0.2, AVDIFF(k), sd )
             if ( MODE.ne.'auto' ) call av_srefine ( ngood, k )				!Display, use cursor to refine mean
          endif
 
-         if ( ngood.ge.1 ) then						!Store the distribution of 
+         if ( ngood.ge.1 ) then						!Store the distribution of
             do j = 1, ngood						! good stars around mean
                kd = (RDIFF(j)-AVDIFF(k))*1000.0
                kd = (kd+525)/50
@@ -772,9 +772,9 @@ Cbegin
          endif
 
          if ( ngood.ne.0 ) then						!Calc mean X and Y offsets
-           call meanstdr ( xdiff, wt, tuse, ngood, .false., 0.0, 
+           call meanstdr ( xdiff, wt, tuse, ngood, .false., 0.0,
      +                      .true., 1.0e10, XDIFFM(k), sd )
-            call meanstdr ( ydiff, wt, tuse, ngood, .false., 0.0, 
+            call meanstdr ( ydiff, wt, tuse, ngood, .false., 0.0,
      +                      .true., 1.0e10, YDIFFM(k), sd )
          endif
 
@@ -793,8 +793,8 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AV_SREFINE --  Interactive cursor/keyboard estimate of 2 lists mean mag diff
 C
-C  Plots on graphics screen for all stars in a file:- the difference in 
-C  magnitude from the mag of the star in file 1. Does this only for stars 
+C  Plots on graphics screen for all stars in a file:- the difference in
+C  magnitude from the mag of the star in file 1. Does this only for stars
 C  which have good magnitudes in both files. Plots the diff against the
 C  mag. Plots estimated mean difference of stars in file from first file.
 C  User can use cursor and keyboard to refine this difference.
@@ -817,14 +817,14 @@ C--
       real trunc
       external trunc
 Cbegin
-      
+
 
       if ( ST_FAILED ) return
 
       am = AVDIFF(kf) 							!Default result
 
       call printo ( ' ' )
-      write ( text, '('' Mean diff from file 1 for file '', i3, 
+      write ( text, '('' Mean diff from file 1 for file '', i3,
      +              '' is '', f8.4)' ) kf, am
       call printo ( text )
 
@@ -1025,7 +1025,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AV_PTDATA -- Load integer into a defined position of character string
 C The position starts at LC and ends at LC+NW-1.
-C On output from the s/r, LC is put equal LC+NW-1, the 
+C On output from the s/r, LC is put equal LC+NW-1, the
 C end position of the integer.
 C
 C    a j penny             ral              1991 March
@@ -1100,8 +1100,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AV_AVSTAR -- Calc the best mean mag and other params for a star 
-C  Can have up to KNUMF estimates, uses various tests to reject 
+C AV_AVSTAR -- Calc the best mean mag and other params for a star
+C  Can have up to KNUMF estimates, uses various tests to reject
 C  some of the estimates.
 C
 C    a j penny                  ral                1991 March
@@ -1123,14 +1123,14 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      do k = 1, KTOT							!See which files have a 
+      do k = 1, KTOT							!See which files have a
          call av_chok ( k, FUSE(k) )					! good magnitude measure
       enddo
 
       call amovb ( FUSE, tuse, KTOT )					!Set up local use flags
 
-      num = 0								!Average the mag and 
-      dsm = 0.0d0							! position of the good 
+      num = 0								!Average the mag and
+      dsm = 0.0d0							! position of the good
       dsvar = 0.0d0							! measures for this star
       do k = 1, KTOT
          if ( tuse(k) )  then
@@ -1148,19 +1148,19 @@ Cbegin
       if ( dsvar.gt.1.0d-20 ) dam = dsm/dsvar
       am = dam
 
-      if ( num.gt.1 ) then						!Throw out mags too far 
-         loop = .true.							! from mean. Start with 
+      if ( num.gt.1 ) then						!Throw out mags too far
+         loop = .true.							! from mean. Start with
          do while ( loop )						! furthest, then recalc
 									! again, until none
 									! outside limits
 
-            call av_caldiflim ( tuse, am, tdiflim )			!Calc difference limits 
-									! for magnitudes from mean 
+            call av_caldiflim ( tuse, am, tdiflim )			!Calc difference limits
+									! for magnitudes from mean
 
             numfar = 0							!Find furthest out good star
             rdifmax = 0.0
             do k = 1, KTOT
-               if ( tuse(k) ) then		
+               if ( tuse(k) ) then
                   adiff = abs(am-(AMAG(k)-AVDIFF(k)))
                   if ( adiff.gt.tdiflim(k) ) then
                      rdiflim = adiff/tdiflim(k)
@@ -1172,7 +1172,7 @@ Cbegin
                endif
             enddo
 
-            loop = .false.				
+            loop = .false.
             if ( numfar.ne.0 ) then					!See if no more thrown out
                if ( num.le.2 ) then					! or not enough left
                   num = 0
@@ -1228,7 +1228,7 @@ Cbegin
 
       else
 
-         call amovkr ( 1.0, wt, KTOT )					!Calc means of other 
+         call amovkr ( 1.0, wt, KTOT )					!Calc means of other
          if ( USESIGMA ) then						! paramaters
             do k = 1, KTOT
                rv = max(SIGMA(k),SIGMAMIN)
@@ -1261,15 +1261,15 @@ Cbegin
          call meanstdr (     PY, wt, tuse, KTOT, .false., 0.0, .false.,
      +                      0.0,    AVPY, sd )
 
-         AVSIGMAD = 0.0							!Calculate mean 
+         AVSIGMAD = 0.0							!Calculate mean
          dss = 0.0d0							! theoretical error
-         dsn = 0.0d0							! from scatter in output 
+         dsn = 0.0d0							! from scatter in output
          dsv = 0.0d0							! mags
-         do k = 1, KTOT	
+         do k = 1, KTOT
             if ( tuse(k) ) then
                dvar = 1.0d0
                if ( USESIGMA ) then
-                  rv = max(SIGMA(k),SIGMAMIN)	
+                  rv = max(SIGMA(k),SIGMAMIN)
                   dvar = 1.0d0/(dble(rv)*dble(rv))
                endif
                dm = dble(AMAG(k)-AVDIFF(k)-AVM)
@@ -1287,8 +1287,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AV_CALDIFLIM -- Calc difference limits for magnitudes from mean 
-C This calculates the limit to the value of the difference from the mean, 
+C AV_CALDIFLIM -- Calc difference limits for magnitudes from mean
+C This calculates the limit to the value of the difference from the mean,
 C for each estimate, that triggers the rejection of the estimate. Thus if the
 C difference is less than this value, the estimate is accepted, if greater
 C rejected.
@@ -1303,7 +1303,7 @@ C   a j penny                 ral          1991 March
 
       logical tuse(KNUMF)		!i: Flags for which estimates are good
       real    am			!i: Mean magnitude of star
-      real    tdiflim(KNUMF)		!o: Difference limits for acceptability 
+      real    tdiflim(KNUMF)		!o: Difference limits for acceptability
 					!    for each estimate
 C--
       real sm, rva, errmean, rv
@@ -1438,7 +1438,7 @@ C--
       real    rv
       real ax(12,KNUMF), ay(12,KNUMF)
       double precision dsum, dnum, damerr, dyy, dyym, dadif, dv
-      double precision dnn(12,KNUMF),   dmerr(12,KNUMF), 
+      double precision dnn(12,KNUMF),   dmerr(12,KNUMF),
      +                 derr(12,KNUMF),  dssadif(12,KNUMF),
      +                 dnsum(12,KNUMF), dnssum(12,KNUMF),
      +                 dsadif(12,KNUMF)
@@ -1461,9 +1461,9 @@ Cbegin
       call azerod ( derr,    12*KNUMF )
       call azerod ( dnn,     12*KNUMF )
 
-      do ks = 1, TBYO							!Go through star list 
+      do ks = 1, TBYO							!Go through star list
 
-         do k = 1, KTOT							!Get the data on this 
+         do k = 1, KTOT							!Get the data on this
              call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k), 		! star from all the files
      +                        %val(IPNUMS), k, ks )
          enddo
@@ -1475,7 +1475,7 @@ Cbegin
          do k = 1, KTOT
             if ( FUSE(k) ) then
                dnum = dnum + 1.0d0
-               rv = max(SIGMA(k),SIGMAMIN)	
+               rv = max(SIGMA(k),SIGMAMIN)
                dsum = dsum + dble(rv)*dble(rv)
             endif
          enddo
@@ -1557,15 +1557,15 @@ Cbegin
       call amovkr ( 0.5, DIFLIM, KNX )
       call azeroi ( NDIFL, KNX*KNUMD )
 
-      do ks = 1, TBYO							!Get run of differences with magnitude, 
+      do ks = 1, TBYO							!Get run of differences with magnitude,
 									! and set new acceptance limits.
 
          do k = 1, KTOT							!Get the data on this star
-             call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k), 
+             call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k),
      +                        %val(IPNUMS), k, ks )
          enddo
 
-         call av_avstar 						!Calc best mean mag and posn and 
+         call av_avstar 						!Calc best mean mag and posn and
 									! number of good estimates
 
          kam = min(49,max(1,int(AVM)))					!Store the differences
@@ -1664,7 +1664,7 @@ Cbegin
                endif
                ka = k + 1
                rv = trunc(rv,3)
-               write ( text, '(3x,i2,'' - '',i2,4x,i7,7x,f6.3)' ) 
+               write ( text, '(3x,i2,'' - '',i2,4x,i7,7x,f6.3)' )
      +                       k, ka, lnum, rv
                call printo ( text )
             endif
@@ -1680,7 +1680,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AV_GTDIFLIM -- Interactive acceptance limits from difference histograms
-C  Uses cursor interaction with plots of the histogram of magnitude 
+C  Uses cursor interaction with plots of the histogram of magnitude
 C  differences at each magnitude level.
 C
 C    a j penny              ral              1991 March
@@ -1705,7 +1705,7 @@ Cbegin
          return
       endif
 
-      call printo ( ' ' )						!Do for each mag range with 
+      call printo ( ' ' )						!Do for each mag range with
       call printo ( 'Display and get difference limits' )		! points in it
 
       do k = 1, KNX-2
@@ -1717,13 +1717,13 @@ Cbegin
 
          loop = .true.							!Points and got good value?
          do while ( lnum.ne.0 .and. loop )
-          
+
             call printo ( ' ' )
             call pargi ( k )
             call pargi ( (k+1) )
             call printd ( 'Mag range: %d to %d ')
 
-            ax(1)  = 0.0		
+            ax(1)  = 0.0
             ax(2) = 0.5
             call get2r ( 'PLHISTX', ax(1), ax(2), .true., 0.0, 1.0e8 )	!Get ranges of X plot values
             if ( ST_FAILED ) return
@@ -1739,8 +1739,8 @@ Cbegin
             call get2r ( 'PLHISTY', ay(1), ay(2), .true., 0.0, 1.0e8 )
             if ( ST_FAILED ) return
 
-            dlim = ax(1) + 0.2*(ax(2)-ax(1))				!Plot histogram of differences 
-            if ( k.ne.1 ) dlim = DIFLIM(k-1)				! and use cursor to set 
+            dlim = ax(1) + 0.2*(ax(2)-ax(1))				!Plot histogram of differences
+            if ( k.ne.1 ) dlim = DIFLIM(k-1)				! and use cursor to set
             call av_plhis ( ax, ay, dlim, k )				! difference limit
             call amovkr ( dlim, DIFLIM(k), KNX-k+1 )
 
@@ -1776,10 +1776,10 @@ Cbegin
       call azeror ( DIFSTD, KNX )					! Default
 
       call azeror ( difss, KNX*3 )
-      do ks = 1, TBYO	
+      do ks = 1, TBYO
 
          do k = 1, KTOT							!Get the data on this star
-             call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k), 
+             call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k),
      +                        %val(IPNUMS), k, ks )
          enddo
 
@@ -1836,9 +1836,9 @@ C   a j penny                      ral              1991 March
 C--
       integer k, istat
       character*20 header(TBXO)
-      data header / 'X', 'Y', 'Mag', 'Number', 'Dx', 
-     +              'Dy', 'Iterations', 'Chi', 'Numinval', 
-     +              'Importance of comps', 
+      data header / 'X', 'Y', 'Mag', 'Number', 'Dx',
+     +              'Dy', 'Iterations', 'Chi', 'Numinval',
+     +              'Importance of comps',
      +              'Sigmatheory', 'Sigmadiff', 'Faintcorr' /
 Cbegin
 
@@ -1875,7 +1875,7 @@ C  a j penny                ral          1991 March
 C--
 Cbegin
 
-  
+
       if ( ST_FAILED ) return
 
       if ( FPRINTING ) open ( unit=1, file=FPNAME, status='NEW' )
@@ -1922,7 +1922,7 @@ Cbegin
      +        /'' '', '' ''/)' )
      +        DCEN, kifchi, kcen, NUMINVLIM, NUMITSLIM, SIGMALIM
 									!Scatter of mags
-      write ( 1, 
+      write ( 1,
      +        '( '' '', ''Run of mag differences with magnitude''/
      +           '' Mag   Limit   Std dev  No   .025 .050 .075 .100'',
      +           '' .125 .150 .175 .200 .225 .250 .275 .300 .325 .350'',
@@ -1933,14 +1933,14 @@ Cbegin
          do j = 1, KNUMD
             lnum = lnum + NDIFL(k,j)
          enddo
-         if ( lnum.ne.0 ) write ( 1, 
-     +      '(1x,i3,f8.2,f7.3,2x,i5,2x,20i5)' ) k, DIFLIM(k), 
+         if ( lnum.ne.0 ) write ( 1,
+     +      '(1x,i3,f8.2,f7.3,2x,i5,2x,20i5)' ) k, DIFLIM(k),
      +                        DIFSTD(k), lnum, (NDIFL(k,j),j=1,KNUMD)
       enddo
       write ( 1, '(1x,1x/)' )
 
       do k = 1, KTOT							!Do input files
-								
+
 									!Input file titles
          write ( 1, '('' Input file no '',i3,'' title is   '',
      +         a50 )' ) k, TITLEI(k)
@@ -1964,7 +1964,7 @@ Cbegin
          write ( 1, '('' No of good close matches used for diff ='',
      +           i6 )' ) NUMG(k)
          write ( 1, '('' Good diffs from file 1 (in 0.05mag '',
-     +           ''groups) = ''/ 1x, 10i5/1x, 10i5/ )' ) 
+     +           ''groups) = ''/ 1x, 10i5/1x, 10i5/ )' )
      +                   (LDIFF(j,k),j=1,20)
       enddo
 
@@ -2016,21 +2016,21 @@ C--
       integer j, k
 Cbegin
 
-     
+
       if ( ST_FAILED ) return
 
       do j = 1, TBYO							!Go through stars making the best
 									! estimate of mag and position
 
-         do k = 1, KTOT							!Get data on this star 
+         do k = 1, KTOT							!Get data on this star
              call av_gtdata ( %val(IPI(k)), TBVXI(k), TBYI(k), 		! from all the files
      +                        %val(IPNUMS), k, j )
          enddo
 
-         call av_avstar 						!Calc best mean mag, posn, 
+         call av_avstar 						!Calc best mean mag, posn,
 									! number of good estimates
 
-         call av_wrline ( %val(IPO), j )				!Store this result and the 
+         call av_wrline ( %val(IPO), j )				!Store this result and the
 									! parameters and print
 
       enddo
@@ -2086,7 +2086,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AV_PRINTSUM -- Print summary of no of good output 
+C AV_PRINTSUM -- Print summary of no of good output
 C
 C  a j penny              ral          1994 Dec
 
@@ -2154,7 +2154,7 @@ C  a j penny                ral          1991 March
 C--
       character*1000 aout
       byte asc(20)
-      integer iv, k, nchar, lc, lca, iva, kk, ks, ke, klines, 
+      integer iv, k, nchar, lc, lca, iva, kk, ks, ke, klines,
      +        lcst, kin
 Cbegin
 
@@ -2206,7 +2206,7 @@ Cbegin
          if ( kk.ne.1 ) aout = ' '
 
          do k = ks, ke							!Mag diffs
-            
+
             kin = nums(k,kl)						!Get location in file
             if ( kin.eq.0 ) then
                lc = lc + 4

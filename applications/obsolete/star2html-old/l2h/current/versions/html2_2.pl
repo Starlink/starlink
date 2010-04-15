@@ -161,7 +161,7 @@ sub translate_colspec {
 %frameoptions = ( "l", "LHS", "r", "RHS", "lr", "VSIDES",
 		  "t", "ABOVE", "b", "BELOW", "tb", "HSIDES",
 		  "lt", "BOX", "rt", "BOX", "lrt", "BOX",
-		  "lb", "BOX", "rb", "BOX", "lrb", "BOX", 
+		  "lb", "BOX", "rb", "BOX", "lrb", "BOX",
 		  "ltb", "BOX", "rtb", "BOX", "lrtb", "BOX");
 
 # tabularstar simply calls tabular but with an extra argument---the

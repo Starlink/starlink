@@ -34,11 +34,11 @@
 *        The NDF identifier of the output NDF.
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
-*        extension. 
+*        extension.
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -134,7 +134,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -315,7 +315,7 @@
          CALL FTGCNO( FUNIT, .FALSE., 'NPOINTS', COLNUM, FSTAT )
 
 *  Read the value for the current observation.  Note that there
-*  are no bad values.  Record the column as being used.  
+*  are no bad values.  Record the column as being used.
          CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, 1, 0, UBND, BAD,
      :                FSTAT )
          USED( COLNUM ) = .TRUE.
@@ -338,7 +338,7 @@
 *  Inquire where the data array is stored and its data type.
 *  =========================================================
 
-*  Find the column number of the calibrated flux values. 
+*  Find the column number of the calibrated flux values.
          CALL FTGCNO( FUNIT, .FALSE., 'FLUX', COLNUM, FSTAT )
 
 *  Record that this column is used.
@@ -387,15 +387,15 @@
          IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'IT', ITYPE )
@@ -461,9 +461,9 @@
             CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
      :                   %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
 
-            CALL KPG1_THRSI( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+            CALL KPG1_THRSI( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                       0, VAL__MAXI,
-     :                       VAL__BADI, VAL__MAXI, 
+     :                       VAL__BADI, VAL__MAXI,
      :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       NREP, NREPHI, STATUS )
 
@@ -471,19 +471,19 @@
             CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
      :                   %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
 
-            CALL KPG1_THRSR( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+            CALL KPG1_THRSR( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                       0.0, VAL__MAXR,
-     :                       VAL__BADR, VAL__MAXR, 
+     :                       VAL__BADR, VAL__MAXR,
      :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       NREP, NREPHI, STATUS )
-      
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
      :                   %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
-      
-            CALL KPG1_THRSD( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+
+            CALL KPG1_THRSD( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                       0.0D0, VAL__MAXD,
-     :                       VAL__BADD, VAL__MAXD, 
+     :                       VAL__BADD, VAL__MAXD,
      :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       NREP, NREPHI, STATUS )
 
@@ -542,8 +542,8 @@
      :                 STATUS )
 
 *  Transfer the most-significant IUE quality flags across to the NDF's
-*  QUALITY component.  
-         CALL COF_IUEQ( EL, %VAL( CNF_PVAL( WPNTR ) ), 
+*  QUALITY component.
+         CALL COF_IUEQ( EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *  Tidy up the workspace and quality.
@@ -665,7 +665,7 @@
      :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_SSAZD( UBND, DSTEPW, DSTARW, 
+            CALL KPG1_SSAZD( UBND, DSTEPW, DSTARW,
      :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          END IF
@@ -743,31 +743,31 @@
 *  let's be defensive in case there are revisions.
                      IF ( CTYPE .EQ. '_UBYTE' ) THEN
                         CALL FTGCVB( FUNIT, COLNUM, IOBS, 1, EL,
-     :                               VAL__BADUB, 
+     :                               VAL__BADUB,
      :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
 
                      ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                         CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, EL,
-     :                               VAL__BADW, 
+     :                               VAL__BADW,
      :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
-      
+
                      ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                         CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL,
-     :                               VAL__BADI, 
+     :                               VAL__BADI,
      :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
-      
+
                      ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                         CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL,
-     :                               VAL__BADR, 
+     :                               VAL__BADR,
      :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
-      
+
                      ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                         CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL,
-     :                               VAL__BADD, 
+     :                               VAL__BADD,
      :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
 
@@ -806,7 +806,7 @@
                         IF ( ATYPE .EQ. '_REAL' ) THEN
                            CALL KPG1_SSAZR( EL, DBLE( STEPW ),
      :                                      DBLE( STARTW ),
-     :                                %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                      STATUS )
 
                         ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
@@ -840,7 +840,7 @@
 
 *  Scalar components
 *  -----------------
-*  
+*
 *  Extract the scalar value and transfer it to the HDS component.  Only
 *  expect character scalar value spare, but let's be defensive in case
 *  there are revisions.
@@ -859,17 +859,17 @@
                         CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, 1,
      :                               VAL__BADW, WVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, WVAL, STATUS )
-      
+
                      ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                         CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, 1,
      :                               VAL__BADI, IVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, IVAL, STATUS )
-      
+
                      ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                         CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, 1,
      :                               VAL__BADR, RVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, RVAL, STATUS )
-      
+
                      ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                         CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, 1,
      :                               VAL__BADD, DVAL, BAD, FSTAT )

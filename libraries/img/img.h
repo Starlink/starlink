@@ -18,12 +18,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -46,7 +46,7 @@
  *    08-JUN-2004 (PDRAPER):
  *       Changed BAD values to use  PRIMDAT values.
  *    {enter_further_changes_here}
- *    
+ *
  *-
  */
 
@@ -584,9 +584,9 @@ void imgModS( char *param,
               short int **ip,
               int *status );
 
-void imgName( char *param, 
+void imgName( char *param,
               char *value,
-              int value_length, 
+              int value_length,
               int *status );
 
 void imgNew( char *param,

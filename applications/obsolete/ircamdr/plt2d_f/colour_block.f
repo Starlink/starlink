@@ -15,7 +15,7 @@
 
 * History :
 * 26-MAY-86 : REVA::CAA : added box around colour block and annotate option
-* 02-Mar-94   SKL@JACH    changed DAT calls to NDF 
+* 02-Mar-94   SKL@JACH    changed DAT calls to NDF
 * 20-Jul-1994 SKL@JACH    changed STR$ to CHR_, IFIX to INT
 * 25-Jul-1994 SKL@JACH    changed error reporting to ERR calls, removed VALUE
 * 02-Sep-1994 SKL@JACH   removed unused variables flagged by UNIX compiler
@@ -164,14 +164,14 @@
 	  RETURN
 	END IF
 
-*      reset pixel boundaries of scratch file      
+*      reset pixel boundaries of scratch file
         CALL NDF_SBND( 2, LBND, NAXIS, LOCSR, STATUS)
 
-	CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE', 
+	CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE',
      :	              SCRATCH_POINTER, NELEMENTS, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :               'Error : During NDF_MAP scratch image...WHOOPS',
      :                 STATUS )
 	  CALL NDF_ANNUL( LOCSR, STATUS )

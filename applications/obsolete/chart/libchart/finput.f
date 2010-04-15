@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -215,7 +215,7 @@
      :            STATUS )
                CALL ERR_FLUSH( STATUS )
                CALL PAR_CANCL( 'TYPE', STATUS )
-               GO TO 245               
+               GO TO 245
             ENDIF
 
   250       CONTINUE
@@ -324,7 +324,7 @@
      :   STATUS )
       EOI = .TRUE.
       GOTO 899
-      
+
 *  Come to here if an end-of-file was found in batch mode
   800 CONTINUE
       CALL MSG_OUT( ' ', 'Last field centre has been read',

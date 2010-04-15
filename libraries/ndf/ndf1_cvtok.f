@@ -53,7 +53,7 @@
 *           A cleaned version of the foreign extension specifier in which
 *           all non-alphanumeric characters have been replaced by
 *           underscore. This is useful when determining the name of
-*           temporary native NDFs in which to store the converted foreign 
+*           temporary native NDFs in which to store the converted foreign
 *           NDFs.
 *        FMT
 *           Name of the foreign file format (upper case).
@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -134,7 +134,7 @@
       INTEGER IFMT
       CHARACTER * ( * ) NDFLOC
       CHARACTER * ( * ) NDFNAM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -158,7 +158,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  If a foreign format is being accessed, we must define tokens for each
 *  of the fields in the foreign file name.
       IF ( IFMT .NE. 0 ) THEN
@@ -221,7 +221,7 @@
                      CALL MSG_SETC( 'FXSCL', FORFIL( I : I ) )
                   ELSE
                      CALL MSG_SETC( 'FXSCL', '_' )
-                  END IF        
+                  END IF
                END DO
 
             ELSE

@@ -75,7 +75,7 @@ proc CCDDoSetGlobals { Top type } {
 #        Recoded to check various things and removed CCDTaskWait.
 #     20-OCT-1995 (PDRAPER):
 #        Recoded again. This time to remove CCDSETUP as I task does
-#        not set the global parameters anyway. These must now be 
+#        not set the global parameters anyway. These must now be
 #        passed to the applications as used. Nearly missed this point.
 #     21-OCT-1995 (PDRAPER):
 #        Recoded again. Now doesn't run any applications. The globals
@@ -119,12 +119,12 @@ appropriate CCD characteristics field."
    }
 
 #  Check that LOGFILE and LOGTO are set as these are used everywhere.
-   if { ! [info exists CCDglobalpars(LOGTO) ] } { 
+   if { ! [info exists CCDglobalpars(LOGTO) ] } {
       set CCDglobalpars(LOGTO) BOTH
    }
-   if { ! [info exists CCDglobalpars(LOGFILE) ] } { 
+   if { ! [info exists CCDglobalpars(LOGFILE) ] } {
       set CCDglobalpars(LOGFILE) CCDPACK.LOG
-   } elseif { $CCDglobalpars(LOGFILE) == "" } { 
+   } elseif { $CCDglobalpars(LOGFILE) == "" } {
       set CCDglobalpars(LOGFILE) CCDPACK.LOG
    }
 

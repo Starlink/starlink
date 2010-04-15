@@ -3,7 +3,7 @@
 /*
  * Copyright (c) 1983 by Sun Microsystems, Inc.
  */
- 
+
 #ifndef tool_struct_DEFINED
 #define	tool_struct_DEFINED
 /*
@@ -40,7 +40,7 @@ typedef	struct	tool {
 	struct	rect tl_openrect;  /* saved open rect of tool while full */
 	caddr_t tl_menu;	/* Menu, Non zero if tool has a walking menu */
 	void	(*props_proc)();/* proc to call on props */
-	int	props_active; 
+	int	props_active;
 } Tool;
 #define	TOOL_NULL	((Tool *)0)
 
@@ -96,7 +96,7 @@ typedef	struct	toolsw {
 
 extern	struct tool *tool_begin();
 extern	struct toolsw *tool_createsubwindow();
-extern	short tool_stripeheight(), tool_borderwidth(), tool_subwindowspacing();	
+extern	short tool_stripeheight(), tool_borderwidth(), tool_subwindowspacing();
 extern	struct pixrect *tool_bkgrd;
 
 #define	tool_end(tool)	tool_destroy((tool))

@@ -1,23 +1,23 @@
       SUBROUTINE SSORT(NN,RA,RB,RC,RD,RE,RF)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C           S S O R T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NN (<), RA (><), RB (><), RC (><), RD (><), RE (><), RF (><)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Sort routine employing indexing routine (sindex).
 C

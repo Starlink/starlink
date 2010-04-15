@@ -101,7 +101,7 @@
 
 	IF( STATUS. NE. SAI__OK) THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                 'Error : PLOT_CURCOMMENT : after PAR_GETS',
      :                  STATUS )
 	  RETURN

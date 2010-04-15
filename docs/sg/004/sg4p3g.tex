@@ -16,7 +16,7 @@ make them clearer and to insulate them from possible future changes in their
 values.
 These symbolic names are defined by Fortran `include' files as shown in the
 examples below.
-The following include files are available: 
+The following include files are available:
 
 \begin{quote}
 \begin{description}
@@ -42,7 +42,7 @@ These should be used whenever the associated value is required (typically this
 is when program variables are defined)
 
 \item [DAT\_ERR] ---
-Defines symbolic names for the error status values returned by the DAT\_ 
+Defines symbolic names for the error status values returned by the DAT\_
 and HDS\_ routines.
 
 \item [CMP\_ERR] ---
@@ -76,7 +76,7 @@ machines running Unix.)
 
 If it is necessary to test for specific error conditions, the appropriate
 include file and symbolic names should be used in your program.
-Here is an example of how to use these symbols: 
+Here is an example of how to use these symbols:
 
 \begin{quote}
 
@@ -109,11 +109,11 @@ Here is an example of how to use these symbols:
 \subsection{Creating objects}
 \label{S_creating}
 
-To fix ideas, look at the example data structure in Fig~\ref{F_exndf}. 
+To fix ideas, look at the example data structure in Fig~\ref{F_exndf}.
 This is actually one form of NDF structure, but for the purposes of this chapter
 it will be treated as if it were simply an arbitrary HDS structure, i.e.\ we
 will use HDS routines rather than NDF routines to process it.
-The following notation is used to describe each object: 
+The following notation is used to describe each object:
 
 \begin{small}
 \begin{verbatim}
@@ -123,7 +123,7 @@ The following notation is used to describe each object:
 
 
 Note that scalar objects have no dimensions and that each level down the
-hierarchy is indented. 
+hierarchy is indented.
 
 \begin{figure}[htb]
 
@@ -223,21 +223,21 @@ be put into an NDF structure.
 In general, the NDF routines of Section \ref{S_progndf} should be used to
 manipulate NDFs.)
 
-\item No primitive values have been stored yet --- that will be done next. 
+\item No primitive values have been stored yet --- that will be done next.
 
 \end{itemize}
 
-Here are some notes on particular aspects of this example: 
+Here are some notes on particular aspects of this example:
 
 \begin{quote}
 \begin{description}
 
 \item [DAT\_\_SZLOC] ---
-This is one of the constants mentioned in Section \ref{S_usehds}, which is 
+This is one of the constants mentioned in Section \ref{S_usehds}, which is
 defined in the include file DAT\_PAR and specifies the length in characters of
 all HDS locators.
 Similar constants, DAT\_\_SZNAM and DAT\_\_SZTYP, specify the maximum lengths of
-object names and types. 
+object names and types.
 
 \item [STATUS] ---
 HDS routines conform to Starlink error handling conventions and use
@@ -262,16 +262,16 @@ However, DAT\_NEW may be used to create new objects of any type, including
 character objects.
 In this case the character string length would be provided via the type
 specification, {\em e.g.}\ `\_CHAR$*$15' (a character string length of one
-is assumed if `\_CHAR' is specified alone). 
+is assumed if `\_CHAR' is specified alone).
 
 \item [DAT\_FIND] ---
 After an object has been created, it is necessary to associate a locator with
-it before values can be inserted; this routine performs this function. 
+it before values can be inserted; this routine performs this function.
 
 \item [DAT\_CELL] ---
 There are several routines for accessing components of objects.
 This one obtains a locator to a scalar object (structure or primitive) within
-a non-scalar object like a vector. 
+a non-scalar object like a vector.
 
 \item [HDS\_CLOSE] ---
 This is used to close the container file and to annul the locator passed to
@@ -286,7 +286,7 @@ Having created a structure, the next step will usually be to put some values
 into it.
 This can be done by using the {\bf DAT\_PUT} and {\bf DAT\_PUTC} routines.
 For example, the main data array in the above example could be filled with
-values as follows: 
+values as follows:
 
 \begin{quote}
 
@@ -331,7 +331,7 @@ The terminology remains in use, however.}
 An important advantage is that it removes a size restriction imposed by having
 to declare fixed size program arrays to hold data.
 This simplifies software, so that a single routine can handle objects of
-arbitrary size without recourse to accessing subsets. 
+arbitrary size without recourse to accessing subsets.
 
 HDS provides mapped access to primitive objects via the {\bf DAT\_MAP} routines.
 Essentially, {\bf DAT\_MAP} will return a pointer to a region of the computer's
@@ -339,7 +339,7 @@ memory in which the object's values are stored.
 This pointer can then be passed to another routine using the VAX Fortran `\%VAL'
 facility.\footnote{This VAX extension to Fortran~77 is also supported by the
 other implementations of Fortran for which HDS is available.}
-An example will illustrate this: 
+An example will illustrate this:
 
 \begin{quote}
 
@@ -387,7 +387,7 @@ This example illustrates two features of HDS which we haven't yet mentioned:
 It is possible to force HDS to regard objects as vectors, irrespective of
 their true dimensionality.
 This facility was useful in the above example as it made the subroutine SUB
-much more general in that it could be applied to any numeric primitive object. 
+much more general in that it could be applied to any numeric primitive object.
 
 \item [Automatic type conversion] ---
 The program can specify the data type it wishes to work with and the program
@@ -397,7 +397,7 @@ the program.\footnote{This will work even if the object was originally created
 on a different computer which formats its numbers differently.}
 This useful feature can greatly simplify programming --- simple programs can
 handle all data types.
-Automatic conversion works on reading, writing and mapping. 
+Automatic conversion works on reading, writing and mapping.
 
 \end{description}
 \end{quote}
@@ -422,7 +422,7 @@ You may either specify the length you want explicitly, {\em e.g:}
 \end{small}
 
 
-(in which case HDS would map an array of character strings with each element 
+(in which case HDS would map an array of character strings with each element
 containing 30 characters) or you may leave HDS to decide on the length
 required by omitting the length specification, thus:
 
@@ -444,13 +444,13 @@ The routine {\bf DAT\_MAPC} also operates in this manner.
 You should consult \xref{SUN/92}{sun92}{} for details of how to use this
 facility on different machines.
 It is one of the areas where it is very difficult to produce a mechanism which
-works properly on all machines. 
+works properly on all machines.
 
 \subsection{Copying and deleting objects}
 
-HDS can also copy and delete objects. 
+HDS can also copy and delete objects.
 Routines {\bf DAT\_COPY} and {\bf DAT\_ERASE} will recursively copy and erase
-all levels of the hierarchy below that specified in the subroutine call: 
+all levels of the hierarchy below that specified in the subroutine call:
 
 \begin{quote}
 
@@ -518,7 +518,7 @@ This function is entirely dynamic, {\em i.e.}\, it can be done at any time,
 provided the object is not mapped for access.
 Note that {\bf DAT\_ALTER} works on both primitives and structures.
 It is important to realise that the number of dimensions cannot be changed by
-{\bf DAT\_ALTER}. 
+{\bf DAT\_ALTER}.
 
 \subsection{Temporary objects}
 
@@ -529,7 +529,7 @@ manipulated just as if it were an ordinary object (in fact a temporary
 container file is created with a unique name to hold all such objects, and this
 is deleted when {\bf HDS\_STOP} is executed at the end of the program).
 This is often useful for providing workspace for algorithms which may have to
-deal with large arrays. 
+deal with large arrays.
 
 \subsection{Enquiries}
 
@@ -578,7 +578,7 @@ Here, {\bf DAT\_INDEX} is used to get locators to objects about which (in
 principle) we know nothing.
 This is just like listing the files in a directory, except that the order in
 which the components are stored in an HDS structure is arbitrary (so they
-won't necessarily be accessed in alphabetical order). 
+won't necessarily be accessed in alphabetical order).
 
 \subsection{Packaged routines}
 \label{S_package}
@@ -591,11 +591,11 @@ Thus {\bf DAT\_PUT0I} will write a single INTEGER value to a scalar primitive,
 and {\bf DAT\_GET1R} will read the value of a vector primitive and store it in a
 REAL program array.
 There are no {\bf DAT\_GET2x} routines; all dimensionalities higher than one
-are handled by {\bf DAT\_GETNx} and {\bf DAT\_PUTNx}. 
+are handled by {\bf DAT\_GETNx} and {\bf DAT\_PUTNx}.
 
 Another family of routines are the CMP routines.
 These access components of the `current level'.
-This usually involves: 
+This usually involves:
 
 \begin{itemize}
 
@@ -610,7 +610,7 @@ This usually involves:
 The CMP routines package this sort of operation, replacing three or so
 subroutine calls with one.
 The naming scheme is based on the associated DAT routines.
-An example is shown below. 
+An example is shown below.
 
 \begin{quote}
 
@@ -684,7 +684,7 @@ DATA                DATA_SETS
      .DATA_ARRAY    _REAL(1024)
   .SET3             SPECTRUM
      .AXIS1         REFERENCE_OBJ        Reference to DATA.SET1.AXIS1
-     .DATA_ARRAY    _REAL(1024)  
+     .DATA_ARRAY    _REAL(1024)
 \end{verbatim}
 \end{small}
 
@@ -720,7 +720,7 @@ used instead of DAT\_FIND in cases where the component requested may be a
 reference object.
 
 When a locator which has been obtained in this way is finished with, it should
-be annulled using REF\_ANNUL rather than DAT\_ANNUL. 
+be annulled using REF\_ANNUL rather than DAT\_ANNUL.
 This is so that, if the locator was obtained via a reference, the HDS\_OPEN for
 the container file may be matched by an HDS\_CLOSE.
 {\em Note that this should only be done when any other locators derived from
@@ -744,7 +744,7 @@ The routines are listed in Section~\ref{R_NDF}.
 The NDF file format is based on HDS, and NDF data structures are stored in HDS
 container files.
 However, this does not necessarily mean that all applications which can read
-HDS files can also handle data stored in NDF format. 
+HDS files can also handle data stored in NDF format.
 
 To understand why, you must appreciate that HDS provides only a rather low-level
 set of facilities for storing and handling astronomical data.
@@ -752,7 +752,7 @@ These include the ability to store primitive data objects (such as arrays of
 numbers, character strings, {\em etc.}) in a convenient and self-describing
 way within {\em container files}.
 However, the most important aspect of HDS is its ability to group these
-primitive objects together to build larger, more complex structures. 
+primitive objects together to build larger, more complex structures.
 In this respect, HDS can be regarded as a construction kit which higher-level
 software can use to build even more sophisticated data formats.
 
@@ -761,28 +761,28 @@ the more primitive facilities provided by HDS.
 Thus, in HDS terms, an NDF is a data structure constructed according to a
 particular set of conventions to facilitate the storage of typical
 astronomical data (such as spectra, images, or similar objects of higher
-dimensionality). 
+dimensionality).
 
 While HDS can be used to access such structures, it does not contain any of
 the interpretive knowledge needed to assign astronomical meanings to the
-various components of an NDF, whose details can become quite complicated. 
+various components of an NDF, whose details can become quite complicated.
 In practice, therefore, it is cumbersome to process NDF data structures using
-HDS directly. 
+HDS directly.
 Instead, the NDF access routines are provided.
 These `know' how NDF data structures are built, so they can hide the details
 from writers of astronomical applications.
 This results in a subroutine library which deals in higher-level concepts
 more closely related to the work which typical astronomical applications
 need to perform, and which emphasises the data concepts which an NDF is
-designed to represent, rather than the details of its implementation. 
+designed to represent, rather than the details of its implementation.
 
 \subsection{Data format}
 
 The simplest way of regarding an NDF is to view it as a collection of those
-items which might typically be required in an astronomical image or spectrum. 
+items which might typically be required in an astronomical image or spectrum.
 The main part is an $N$-dimensional array of {\em data\/} (where $N$ is 1 for a
 spectrum, 2 for an image, {\em etc.}), but this may also be accompanied by a
-number of other items which are conveniently categorised as follows: 
+number of other items which are conveniently categorised as follows:
 
 \begin{quote}
 
@@ -796,7 +796,7 @@ number of other items which are conveniently categorised as follows:
                                 & {\bf VARIANCE} & Pixel variance estimates\\
                                 & {\bf QUALITY} & Pixel quality values\\[1ex]
 {\em Miscellaneous components:} & {\bf AXIS}  & Coordinate axes\\
-                                & {\bf HISTORY} & Processing 
+                                & {\bf HISTORY} & Processing
                                                   history\footnotemark\\[1ex]
               {\em Extensions:} & {\bf EXTENSION} & Provides extensibility
 \end{tabular}
@@ -805,14 +805,14 @@ number of other items which are conveniently categorised as follows:
 
 \end{quote}
 \footnotetext{The {\em history\/} component is not fully supported by the
-present version of the NDF access routines.} 
+present version of the NDF access routines.}
 
 The names of these components are significant, since they are used by the
 NDF access routines to identify the component(s) to which certain operations
 should be applied.\footnote{Note that the name `DATA' used by the NDF\_
 routines to refer to an NDF's {\em data\/} component differs from the actual
-name of the HDS object in which it is stored, which is `DATA\_ARRAY'.} 
-The following describes the purpose and interpretation of each component in 
+name of the HDS object in which it is stored, which is `DATA\_ARRAY'.}
+The following describes the purpose and interpretation of each component in
 slightly more detail.
 
 {\large \em Character components:}
@@ -822,15 +822,15 @@ slightly more detail.
 
 \item[{\bf TITLE}] --- This is a character string whose value is intended for
 general use as a heading for such things as graphical output;
-{\em e.g.}\ `M51 in good seeing'. 
+{\em e.g.}\ `M51 in good seeing'.
 
 \item[{\bf LABEL}] --- This is a character string whose value is intended to be
 used on the axis of graphs to describe the quantity in the NDF's {\em data\/}
-component; {\em e.g.}\ `Surface brightness'. 
+component; {\em e.g.}\ `Surface brightness'.
 
 \item[{\bf UNITS}] --- This is a character string whose value describes the
 physical units of the quantity stored in the NDF's {\em data\/} component;
-{\em e.g.}\ `J/(m$**$2$*$Ang$*$s)'. 
+{\em e.g.}\ `J/(m$**$2$*$Ang$*$s)'.
 
 \end{description}
 \end{quote}
@@ -841,23 +841,23 @@ physical units of the quantity stored in the NDF's {\em data\/} component;
 \begin{description}
 
 \item[{\bf DATA}] --- This is an $N$-dimensional array of pixel values
-representing the spectrum, image, {\em etc.}\ stored in the NDF. 
+representing the spectrum, image, {\em etc.}\ stored in the NDF.
 This is the only NDF component which must {\bf always} be present.
-All the others are optional. 
+All the others are optional.
 
 \item[{\bf VARIANCE}] --- This is an array of the same shape and size as the
 {\em data\/} array, and represents the measurement errors or uncertainties
-associated with the individual {\em data\/} values. 
+associated with the individual {\em data\/} values.
 If present, these are always stored as {\em variance\/} estimates for each
-pixel. 
+pixel.
 
 \item[{\bf QUALITY}] --- This is an array of the same shape and size as the
-{\em data\/} array which holds a set of unsigned byte values. 
+{\em data\/} array which holds a set of unsigned byte values.
 These are used to assign additional `quality' attributes to each pixel (for
-instance, whether it is part of the active area of a detector). 
+instance, whether it is part of the active area of a detector).
 Quality values may be used to influence the way in which the NDF's {\em data\/}
 and {\em variance\/} components are processed, both by general-purpose software
-and by specialised applications. 
+and by specialised applications.
 
 \end{description}
 \end{quote}
@@ -869,8 +869,8 @@ and by specialised applications.
 
 \item[{\bf AXIS}] --- This represents a group of {\em axis\/} components which
 may be used to describe the shape and position of the NDF's pixels in a
-rectangular coordinate system. 
-The physical units and a label for each axis of this coordinate system may 
+rectangular coordinate system.
+The physical units and a label for each axis of this coordinate system may
 also be stored.
 (Note that the ability to associate {\em extensions\/} with an NDF's {\em
 axis\/} coordinate system, although described in \xref{SGP/38}{sgp38}{}, is
@@ -879,7 +879,7 @@ not yet available via the NDF access routines.)
 \item[{\bf HISTORY}] --- This may be used to keep a record of the processing
 history.
 If present, this component should be updated by any applications which
-modify the data structure. 
+modify the data structure.
 Support for this component is not yet provided by the NDF access routines.
 
 \end{description}
@@ -892,10 +892,10 @@ Support for this component is not yet provided by the NDF access routines.
 
 \item[{\bf EXTENSIONs}] --- These are user-defined HDS structures associated
 with the NDF, and are used to give the data format flexibility by allowing it
-to be extended. 
+to be extended.
 Their formulation is not covered by the NDF definition, but a few simple
 routines are provided for accessing and manipulating named extensions, and
-for reading and writing the values of components stored within them. 
+for reading and writing the values of components stored within them.
 
 \end{description}
 \end{quote}
@@ -903,7 +903,7 @@ for reading and writing the values of components stored within them.
 \subsection{Routines}
 
 The NDF access routines are listed in Section~\ref{R_NDF}.
-They perform the following types of operation on NDF data structures: 
+They perform the following types of operation on NDF data structures:
 
 \begin{small}
 \begin{quote}
@@ -911,22 +911,22 @@ They perform the following types of operation on NDF data structures:
 \item Obtaining access, both input and output.
 \item Creating and deleting.
 \item Enquiring about attributes, including shape and size.
-\item Enquiring about attributes of components. 
+\item Enquiring about attributes of components.
 \item Reading, writing, and resetting component values.
 \item Enquiring about (and flagging) the presence of {\em bad\/} pixels in
  components.
 \item Accessing and handling {\em quality\/} information.
 \item Modifying attributes (including shape and size) and those of components
- (such as numeric type). 
+ (such as numeric type).
 \item Reading, writing, and resetting the values of {\em axis\/} arrays and
  other {\em axis\/} components.
 \item Modifying the attributes of {\em axis} components (such as the numeric
- type of {\em axis\/} arrays). 
+ type of {\em axis\/} arrays).
 \item Controlling the propagation of components to output data structures.
 \item Creating, deleting, and enquiring about extensions, and obtaining
- access to components stored within extensions. 
-\item Controlling the propagation of extensions to output data structures. 
-\item Selecting and managing {\em sections\/} which refer to subsets or 
+ access to components stored within extensions.
+\item Controlling the propagation of extensions to output data structures.
+\item Selecting and managing {\em sections\/} which refer to subsets or
  super-sets.
 \item Merging attributes to match the processing capabilities of specific
  applications.
@@ -974,7 +974,7 @@ shape and data type.
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN1 to be used instead.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1008,7 +1008,7 @@ shape and data type.
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain identifiers for the two input NDFs.  These involve calls to the 
+*  Obtain identifiers for the two input NDFs.  These involve calls to the
 *  parameter system and may be resolved from the interface file, the command
 *  line, or by prompting the user.
       CALL NDF_ASSOC('IN1', 'READ', NDF1, STATUS)
@@ -1121,7 +1121,7 @@ shape and data type.
 
 *  Obtain a new title for the output NDF, by way of the parameter system.
       CALL NDF_CINP('TITLE', NDF3, 'Title', STATUS)
-      
+
 *  End the NDF context.
       CALL NDF_END(STATUS)
 

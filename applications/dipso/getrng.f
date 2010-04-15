@@ -24,22 +24,22 @@
 *     limit value is supplied which is outside the range MINVAL,
 *     MAXVAL, then a warning is given and the user is re-prompted.
 *     The values supplied in TOP and BOT are used as default values.
-      
+
 *  Arguments:
 *     PARAMS = CHARACTER * ( * ) (Given)
 *        A string containing the list of command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
-*        supplied default value will be returned if no value has 
+*        supplied default value will be returned if no value has
 *        been supplied. Otherwise, the user is prompted if no value
 *        has been supplied.
 *     COMM = CHARACTER * ( * ) (Given)
 *        The command name.
 *     PROMPT = CHARACTER * ( * ) (Given)
-*        The prompt string. 
+*        The prompt string.
 *     MINVAL = INTEGER (Given)
 *        The minimum allowable value.
 *     MAXVAL = INTEGER (Given)
@@ -65,14 +65,14 @@
 
 *-
 
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -81,11 +81,11 @@
       CHARACTER * ( * ) PROMPT
       INTEGER MINVAL
       INTEGER MAXVAL
-      
+
 *  Arguments Given and Returned:
       INTEGER TOP
       INTEGER BOT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -94,7 +94,7 @@
      :        DEFVAL*40,         ! Default range specifier
      :        VALUE*40           ! Supplied range specifier
 
-      INTEGER 
+      INTEGER
      :        IP                 ! Index of last non-blank character
 *.
 
@@ -111,7 +111,7 @@
 *  Get the text string.
       CALL GET0C( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL( : IP ), VALUE,
      :            STATUS )
- 
+
 *  Try to decode it.
  10   CONTINUE
       CALL DECRNG( VALUE, MINVAL, MAXVAL, BOT, TOP, STATUS )
@@ -124,11 +124,11 @@
      :       STATUS .NE. PAR__ABORT ) THEN
 
             CALL ERR_FLUSH( STATUS )
-            CALL RDSTR( COMM, PROMPT, DEFVAL, VALUE, STATUS )             
+            CALL RDSTR( COMM, PROMPT, DEFVAL, VALUE, STATUS )
             GO TO 10
 
          END IF
 
       END IF
-      
+
       END

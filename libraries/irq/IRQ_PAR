@@ -26,12 +26,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,8 +63,8 @@
       CHARACTER IRQ__BTNAM*3
       PARAMETER ( IRQ__BTNAM = 'BIT' )
 
-*  The name of the component (of the temporary structure returned by 
-*  IRQ_FIND and IRQ_NEW) which holds a cloned NDF identifier for the 
+*  The name of the component (of the temporary structure returned by
+*  IRQ_FIND and IRQ_NEW) which holds a cloned NDF identifier for the
 *  NDF containing the quality names information.
       CHARACTER IRQ__CINAM*14
       PARAMETER ( IRQ__CINAM = 'IRQ_CLONED_NDF' )
@@ -77,12 +77,12 @@
       CHARACTER IRQ__RONAM*8
       PARAMETER ( IRQ__RONAM = 'READONLY' )
 
-*  The name of the QUAL component that holds a flag indicating if the 
+*  The name of the QUAL component that holds a flag indicating if the
 *  bit number is fixed.
       CHARACTER IRQ__FBNAM*9
       PARAMETER ( IRQ__FBNAM = 'FIXED_BIT' )
 
-*  The name of the QUAL component which indicates if the quality is 
+*  The name of the QUAL component which indicates if the quality is
 *  the same for all pixels, or varies from pixel to pixel.
       CHARACTER IRQ__FXNAM*5
       PARAMETER ( IRQ__FXNAM = 'FIXED' )
@@ -98,7 +98,7 @@
       CHARACTER IRQ__GOING*9
       PARAMETER ( IRQ__GOING = 'IRQ GOING' )
 
-*  The number of new slots introduced each time the QUALITY_NAMES 
+*  The number of new slots introduced each time the QUALITY_NAMES
 *  structure becomes full. Each slot can hold the definition of a single
 *  quality name.
       INTEGER IRQ__INCQ
@@ -110,12 +110,12 @@
       PARAMETER ( IRQ__LUNAM = 'LAST_USED' )
 
 *  The size of the common arrays. This is the limit on the number of
-*  compiled quality expressions which can be used by an application at 
+*  compiled quality expressions which can be used by an application at
 *  once.
       INTEGER IRQ__MAXQ
       PARAMETER ( IRQ__MAXQ = 10 )
 
-*  The highest integer representing an instruction in the IRQ logical 
+*  The highest integer representing an instruction in the IRQ logical
 *  instruction set.
       INTEGER IRQ__MXINS
       PARAMETER ( IRQ__MXINS = 17 )
@@ -135,16 +135,16 @@
       INTEGER IRQ__NOID
       PARAMETER ( IRQ__NOID = 0 )
 
-*  The maximum number of symbols that can be contained in a quality 
+*  The maximum number of symbols that can be contained in a quality
 *  expression.
       INTEGER IRQ__NSYMS
       PARAMETER ( IRQ__NSYMS = 40 )
 
-*  The name of the structure holding the quality names information. 
+*  The name of the structure holding the quality names information.
       CHARACTER IRQ__QINAM*13
       PARAMETER ( IRQ__QINAM = 'QUALITY_NAMES' )
 
-*  The type of the structure holding the quality names information. 
+*  The type of the structure holding the quality names information.
       CHARACTER IRQ__QITYP*13
       PARAMETER ( IRQ__QITYP = 'QUALITY_NAMES' )
 
@@ -153,12 +153,12 @@
       INTEGER IRQ__QNREF
       PARAMETER ( IRQ__QNREF = 10 )
 
-*  The name of the QUALITY_NAMES component holding the information 
+*  The name of the QUALITY_NAMES component holding the information
 *  about all the quality name.
       CHARACTER IRQ__QUNAM*4
       PARAMETER ( IRQ__QUNAM = 'QUAL' )
 
-*  The HDS type of the QUALITY_NAMES component holding the information 
+*  The HDS type of the QUALITY_NAMES component holding the information
 *  about all the quality name.
       CHARACTER IRQ__QUTYP*8
       PARAMETER ( IRQ__QUTYP = 'IRQ_QUAL' )
@@ -167,7 +167,7 @@
       CHARACTER IRQ__SBAD*12
       PARAMETER ( IRQ__SBAD = 'IRQ_BAD_SLOT' )
 
-*  A string used to replace a quality name when the name is removed 
+*  A string used to replace a quality name when the name is removed
 *  from the NDF.
       CHARACTER IRQ__SFREE*13
       PARAMETER ( IRQ__SFREE = 'IRQ_FREE_SLOT' )
@@ -188,23 +188,23 @@
       INTEGER IRQ__SZSTA
       PARAMETER ( IRQ__SZSTA = 9 )
 
-*  The HDS type of the temporary structure returned by IRQ_NEW and 
+*  The HDS type of the temporary structure returned by IRQ_NEW and
 *  IRQ_FIND.
       CHARACTER IRQ__TMPTY*13
       PARAMETER ( IRQ__TMPTY = 'IRQ_TEMP_TYPE' )
 
-*  The name of the component (of the temporary structure returned by 
-*  IRQ_FIND and IRQ_NEW) which holds a copy of the locator to the 
+*  The name of the component (of the temporary structure returned by
+*  IRQ_FIND and IRQ_NEW) which holds a copy of the locator to the
 *  QUALITY_NAMES structure.
       CHARACTER IRQ__TQNAM*11
       PARAMETER ( IRQ__TQNAM = 'IRQ_QNI_LOC' )
 
-*  The name of a component within the QUALITY_NAMES structure which 
+*  The name of a component within the QUALITY_NAMES structure which
 *  indicates that the QUALITY_NAMES structure is complete.
       CHARACTER IRQ__VANAM*5
       PARAMETER ( IRQ__VANAM = 'VALID' )
 
-*  The name of the QUAL component which indicates if the quality is 
+*  The name of the QUAL component which indicates if the quality is
 *  held by all or none of the pixels.
       CHARACTER IRQ__VLNAM*5
       PARAMETER ( IRQ__VLNAM = 'VALUE' )

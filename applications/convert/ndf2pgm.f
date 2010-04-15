@@ -28,7 +28,7 @@
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*        The name of the input NDF data structure (without the .sdf 
+*        The name of the input NDF data structure (without the .sdf
 *        extension).  The suggested default is the current NDF if one
 *        exists, otherwise it is the current value.
 *     OUT = _CHAR (Read)
@@ -41,7 +41,7 @@
 *        This converts the NDF called old (in file old.sdf) to the
 *        PGM file new.pgm.
 *     ndf2pgm in=spectre out=spectre.pgm
-*        This converts the NDF called spectre (in file spectre.sdf) 
+*        This converts the NDF called spectre (in file spectre.sdf)
 *        to the PGM file spectre.pgm.
 
 *  Implementation Status:
@@ -93,12 +93,12 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constant
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-               
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External references:
-      INTEGER CHR_LEN            ! Length of a string 
+      INTEGER CHR_LEN            ! Length of a string
       INTEGER CON_COPEN          ! C function
       INTEGER CON_CCLOS          ! C function
 
@@ -106,36 +106,36 @@
       INTEGER MDIM               ! Maximum array dimensionality
       PARAMETER ( MDIM = 2 )
 
-*  Local Variables:  
+*  Local Variables:
       INTEGER DIMS( MDIM )       ! Length of the x and y axes
       INTEGER ELEMS              ! Total number of pixels in the image
-      INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
+      INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index
       INTEGER NC                 ! String length
-      INTEGER NDF                ! Identifier for the source NDF  
+      INTEGER NDF                ! Identifier for the source NDF
       INTEGER NDIM               ! Number of dimensions in the image
-      CHARACTER * ( 255 ) OUT    ! Name of the output file     
-      INTEGER PD( 1 )            ! Pointer to the data component of 
+      CHARACTER * ( 255 ) OUT    ! Name of the output file
+      INTEGER PD( 1 )            ! Pointer to the data component of
                                  ! for the input NDF
       INTEGER PDO( 1 )           ! Pointer to the output image
       INTEGER STATC              ! Status of the C routine
       CHARACTER * ( 255 ) TEMP   ! Temporary file name
-      INTEGER UBND( NDF__MXDIM ) ! Upper limit for image index  
-                                                          
+      INTEGER UBND( NDF__MXDIM ) ! Upper limit for image index
+
 *.
 
 *  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN   
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Begin an NDF context.                               
+*  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain an identifier for the NDF structure to be examined.       
+*  Obtain an identifier for the NDF structure to be examined.
       CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Map the output NDF data array as double precision values for
 *  updating.
-      CALL NDF_MAP( NDF, 'DATA', '_DOUBLE', 'READ', 
+      CALL NDF_MAP( NDF, 'DATA', '_DOUBLE', 'READ',
      :              PD( 1 ), ELEMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -144,13 +144,13 @@
       IF ( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', NDF )
-         CALL ERR_REP( 'NDF2TIFF_DIMS', 
+         CALL ERR_REP( 'NDF2TIFF_DIMS',
      :     'NDF ^NDF has more than the maximum number (2) of '/
      :     /'dimensions.', STATUS )
          GOTO 999
       END IF
-     
-*  Determine size of axes.      
+
+*  Determine size of axes.
       DIMS( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
       DIMS( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
 
@@ -158,8 +158,8 @@
       IF ( NDIM .EQ. 1 ) THEN
          DIMS( 2 ) = 1
       END IF
-      
-*  Get the image name.         
+
+*  Get the image name.
       CALL PAR_GET0C( 'OUT', OUT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -173,32 +173,32 @@
       CALL PSX_CALLOC( ELEMS, '_CHAR', PDO( 1 ), STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Open the file.         
+*  Open the file.
       STATC = CON_COPEN( OUT, "w" )
-      IF ( STATC .EQ. 0 ) THEN 
+      IF ( STATC .EQ. 0 ) THEN
          CALL ERR_REP( ' ', 'Failed opening the output file.', STATUS )
          GOTO 999
       END IF
 
 *  Write the image.
-      CALL CON_WRPGM( ELEMS, %VAL( CNF_PVAL( PD( 1 ) ) ), DIMS, 
+      CALL CON_WRPGM( ELEMS, %VAL( CNF_PVAL( PD( 1 ) ) ), DIMS,
      :                %VAL( CNF_PVAL( PDO( 1 ) ) ),
      :                STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
- 
+
 *  Close the output file.
       STATC = CON_CCLOS( )
-      IF ( STATC .EQ. 0 ) THEN 
+      IF ( STATC .EQ. 0 ) THEN
          CALL ERR_REP( ' ', 'Failed closing the output file.', STATUS )
          GOTO 999
       END IF
- 
+
 *  Free the output image space.
       CALL PSX_FREE( PDO( 1 ), STATUS )
 
   999 CONTINUE
 
 *  End the NDF context.
-      CALL NDF_END( STATUS )                              
+      CALL NDF_END( STATUS )
 
       END

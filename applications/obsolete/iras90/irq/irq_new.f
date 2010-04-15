@@ -130,7 +130,7 @@
 *  See if the extension is a structure.
       CALL DAT_STRUC( XLOC, STRUC, STATUS )
 
-*  If so, check that the extension does not already contain a 
+*  If so, check that the extension does not already contain a
 *  QUALITY_NAMES component.
       IF( STRUC ) THEN
          CALL DAT_THERE( XLOC, IRQ__QINAM, THERE, STATUS )

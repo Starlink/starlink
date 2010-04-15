@@ -104,7 +104,7 @@
       STATUS = SAI__OK
       CALL PSX_GETENV('GNS_DIR', DIR, STATUS)
       IF (STATUS.EQ.SAI__OK) THEN
-         NAME = DIR(:CHR_LEN(DIR)) // '/gns_' // LPACK(:LEN(PACK)) // 
+         NAME = DIR(:CHR_LEN(DIR)) // '/gns_' // LPACK(:LEN(PACK)) //
      :          LFILE
          INQUIRE (FILE=NAME, EXIST=FOUND)
          IF (FOUND) GOTO 999
@@ -119,10 +119,10 @@
    10    CONTINUE
          I2 = INDEX(DIR(I1:),':')
          IF (I2.EQ.0) THEN
-            NAME = DIR(I1:CHR_LEN(DIR)) // '/../etc/gns_' // 
+            NAME = DIR(I1:CHR_LEN(DIR)) // '/../etc/gns_' //
      :             LPACK(:LEN(PACK)) // LFILE
          ELSE
-            NAME = DIR(I1:I1+I2-2) // '/../etc/gns_' // 
+            NAME = DIR(I1:I1+I2-2) // '/../etc/gns_' //
      :             LPACK(:LEN(PACK)) // LFILE
             I1 = I1 + I2
          ENDIF

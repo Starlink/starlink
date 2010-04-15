@@ -11,13 +11,13 @@ C     VMS system routines, both system services and run-time library routines,
 C     follow a particular VAX-specific convention in the status codes they
 C     return. The least significant bit of the integer code they return
 C     is set if the operation has completed successfully. The rest of the code
-C     conveys other information, but usually only the success bit is of 
+C     conveys other information, but usually only the success bit is of
 C     real interest. Traditionally, the integer status returned by such a
 C     routine is tested for success using the construct 'IF (STATUS) THEN'
 C     - a code construct that involves a logical test on an integer. This
 C     works perfectly on VMS Vaxes, and any other test is quite difficult
-C     to code, so it has become common practice.  However, the resulting 
-C     test is not-portable, and even if versions of the VMS routines in 
+C     to code, so it has become common practice.  However, the resulting
+C     test is not-portable, and even if versions of the VMS routines in
 C     question can be ported to other systems, the code used to test their
 C     values cannot. This routine provides a suitable replacement for
 C     the status test that can be used on other machines.
@@ -34,7 +34,7 @@ C                    indicate failure and odd numbers represent success.
 C
 C  Returns:
 C     (<) SUCCESS    (Logical) True if the status code represents success.
-C                    That is, SUCCESS is teturned true if the least 
+C                    That is, SUCCESS is teturned true if the least
 C                    significant bit of STATUS was set.
 C
 C  Version date: 2nd Sept 1992.

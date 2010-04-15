@@ -60,7 +60,7 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
 
 *  Initialise the function.
       KPS1_KSPRO = 0.0
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -110,7 +110,7 @@
          KPS1_KSPRO = KPS1_KSPRO + TERM
 
 *  Return if term is smaller than the precision.
-         IF ( ABS( TERM ) .LE. EPS1 * LAST .OR. 
+         IF ( ABS( TERM ) .LE. EPS1 * LAST .OR.
      :        ABS( TERM ) .LE. VAL__EPSR * KPS1_KSPRO ) THEN
             GOTO 999
          END IF

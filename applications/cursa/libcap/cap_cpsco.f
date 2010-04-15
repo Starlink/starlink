@@ -1,4 +1,4 @@
-      SUBROUTINE CAP_CPSCO (CIIN, CIOUT, FISOR, SORDER, MXCOL, NUMCOL, 
+      SUBROUTINE CAP_CPSCO (CIIN, CIOUT, FISOR, SORDER, MXCOL, NUMCOL,
      :  FIIN, FIOUT, STATUS)
 *+
 *  Name:
@@ -147,9 +147,9 @@
 *
 *             Inquire the values of all the attributes for this column.
 
-               CALL CAT_CINQ (FIINC, 10, FCI, FNAME, FGENUS, FEXPR, 
+               CALL CAT_CINQ (FIINC, 10, FCI, FNAME, FGENUS, FEXPR,
      :           FDTYPE, FCSIZE,FDIMS, FSIZEA, FNULL, FXCEPT, FSCALE,
-     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, 
+     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM,
      :           FDATE, STATUS)
 
 *
@@ -160,8 +160,8 @@
      :           FIOUTC, STATUS)
 
 *
-*             Set the mutable attributes of this column to correspond 
-*             to the input column.  The exception is the ORDER 
+*             Set the mutable attributes of this column to correspond
+*             to the input column.  The exception is the ORDER
 *             attribute.  This attribute is set to 'unordered' for all
 *             the columns in the output catalogue except the column
 *             on which it is sorted.  For this column it is set to

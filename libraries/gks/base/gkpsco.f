@@ -64,7 +64,7 @@ C# IL>=a, OL>=0
 *     JMIN     Identifier of crossing with minimum position
 *     XYCUR    Current position on edge
 *     XYMIN    Minimum position on edge
- 
+
       INTEGER ICROSS, IEDGE, JEDGE(4), NCEDGE(4), ISTEP, J1,J2,
      :        J1S,J1E, ISWAP, ICRMIN, JMIN, JOFF
       REAL    XYCUR, XYMIN
@@ -78,10 +78,10 @@ C# IL>=a, OL>=0
          IEDGE = (IEDGCL(ICROSS)+18)/6
          NCEDGE(IEDGE) = NCEDGE(IEDGE) + 1
   510 CONTINUE
- 
+
 *     Set number of top crossings
       NTOP = NCEDGE(4)
- 
+
 *     Set Edge offsets in IORDER
 *     (They are ordered so that all crossings will be ordered
 *      in the whole allocation anticlockwise.)
@@ -99,7 +99,7 @@ C# IL>=a, OL>=0
          IORDER(IPLACE(ICROSS)) = ICROSS
          NCEDGE(IEDGE) = NCEDGE(IEDGE) + 1
   530 CONTINUE
- 
+
 *     For each edge of clipping rectangle
 *     sort the crossings into order (anticlockwise)
 *     ie, BASE & RIGHT increasing coords (odd edge number)
@@ -142,5 +142,5 @@ C# IL>=a, OL>=0
 *        Change direction of ordering for next edge
          ISTEP = -ISTEP
   555 CONTINUE
- 
+
       END

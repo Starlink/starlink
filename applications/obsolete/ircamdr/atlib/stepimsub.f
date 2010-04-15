@@ -1,6 +1,6 @@
 
 
-	SUBROUTINE STEPIMSUB( DIMS1, DIMS2, ARRIN, ARROUT, SNUM, SBAS, 
+	SUBROUTINE STEPIMSUB( DIMS1, DIMS2, ARRIN, ARROUT, SNUM, SBAS,
      :	                      SINT, XMAX, XMIN, STATUS)
 
 *  HISTORY
@@ -54,7 +54,7 @@
 	        TOP = SBAS + L*SINT
 	        MIDDLE = ( TOP + BOTTOM)/2.0
 
-	        IF( ARRIN( K, J) .GE. BOTTOM .AND. 
+	        IF( ARRIN( K, J) .GE. BOTTOM .AND.
      :	            ARRIN( K, J) .LE. TOP) THEN
 
 	          ARROUT( K, J) = MIDDLE

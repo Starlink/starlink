@@ -64,7 +64,7 @@ C This routine plots a 3d surface projected onto a 2D plane.
 C The underside of the surface appears dotted or in blue, on
 C clour terminals. This routine does the projection for you,
 C you just need to specify the viewing direction in terms of
-C spherical polar angles.  As a result, this routine calls 
+C spherical polar angles.  As a result, this routine calls
 C pgwind for you.
 C
 C Arguments:

@@ -66,7 +66,7 @@
 *     -  If it is not compound loop for all cards until the last card,
 *     or the requested card is located.  Compare each card with the
 *     desired keyword.  Once the required card is found set flag to
-*     say keyword has been found, define search limits for the trailing 
+*     say keyword has been found, define search limits for the trailing
 *     quote and extract the character string from between the quotes
 *     in the buffer, otherwise go to the next card.
 *     -  For a compound name loop for all cards until the last card,
@@ -76,7 +76,7 @@
 *     the compound keyword with the desired name.  Once the required
 *     card is found set flag to say keyword has been found, find the
 *     extent of the value in the card by finding any comment delimeter,
-*     define search limits for the trailing 
+*     define search limits for the trailing
 *     quote and extract the character string from between the quotes
 *     in the buffer, otherwise go to the next card.
 *     -  Reset card number to zero if the keyword is not present
@@ -190,7 +190,7 @@
                                ! equals sign in the current card image
      :  I,                     ! Loop counter
      :  ISTAT,                 ! Local status
-     :  LQCOL,                 ! Column containing the leading quote of 
+     :  LQCOL,                 ! Column containing the leading quote of
                                ! the value
      :  NC,                    ! Number of characters
      :  NCK,                   ! Number of characters in the compound

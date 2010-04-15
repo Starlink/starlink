@@ -81,7 +81,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,15 +149,15 @@
      :     NTOP,                 ! Sorting index
      :     NTOT                  ! Total no. of pixels within polygon
 
-      LOGICAL                
+      LOGICAL
      :     EXIT                  ! Sorting complete?
 
       REAL
      :     DATVAL,               ! Input data value (minus background)
      :     DY,                   ! Difference in y between vertices
      :     PERT,                 ! Perturbation
-     :     SUM1,                 ! Sum of data values 
-     :     SUM2,                 ! Sum of squared data values 
+     :     SUM1,                 ! Sum of data values
+     :     SUM2,                 ! Sum of squared data values
      :     TEST,                 ! Line-polygon intersection test
      :     XCROSS( MXCRS ),      ! Line crossings
      :     XHI,                  ! Upper X limit for current row
@@ -196,14 +196,14 @@
       XMAX = VAL__MINR
       YMIN = VAL__MAXR
       YMAX = VAL__MINR
- 
+
       DO N = 1, NVERT
          XMIN = MIN( XVERT( N ), XMIN )
          XMAX = MAX( XVERT( N ), XMAX )
          YMIN = MIN( YVERT( N ), YMIN )
          YMAX = MAX( YVERT( N ), YMAX )
       END DO
- 
+
 *  Convert the ranges to pixel index limits restricted to the input
 *  array size.
       LIMIT( 1 ) = MAX( COLLO, MIN( COLHI, NINT( XMIN + 0.5 ) ) )
@@ -247,19 +247,19 @@
 *  intersection and store it.
             ELSE IF ( TEST .GT. 0.0 ) THEN
                NCROSS = NCROSS + 1
- 
+
                IF ( NCROSS .LE. MXCRS ) THEN
                   DY = YVERT( N2 ) - YVERT( N1 )
- 
+
                   IF ( ABS( DY ) .LT. VAL__SMLR )
      :              DY = SIGN( VAL__SMLR, DY )
 
                      XCROSS( NCROSS ) = XVERT( N1 ) +
      :                              ( (YL - YVERT( N1 ) ) *
      :                              ( XVERT( N2 ) - XVERT( N1 ) ) / DY )
- 
+
                ELSE
- 
+
 *  If the storage for intersections is exceeded, report an error.
                   STATUS = SAI__ERROR
                   CALL ERR_REP ( 'SPHOZ2_ERR1',
@@ -268,23 +268,23 @@
                   GO TO 999
 
                END IF
- 
+
 *  End of the check for line-polygon intersections.
             END IF
 
 *  End of the loop through the polygon vertices.
          END DO
- 
+
 *  If the line intersects the polygon, sort intersections into x order.
          IF( NCROSS .GT. 1 ) THEN
             EXIT = .FALSE.
             NTOP = NCROSS
- 
+
 *  Loop when an interchange was necessary.
             DO WHILE ( .NOT. EXIT )
                EXIT = .TRUE.
                NTOP = NTOP - 1
- 
+
                DO N = 1, NTOP
 
 *  Swap adjacent values if they are in the wrong order.
@@ -296,7 +296,7 @@
                   END IF
                END DO
             END DO
- 
+
 *  Scan through the ordered intersections in pairs.
             DO N = 2, NCROSS, 2
 
@@ -326,17 +326,17 @@
                      DATVAL = DATVAL - BACK
 
 *  Increment the statistics.
-                     SUM1 = SUM1 + DATVAL            
+                     SUM1 = SUM1 + DATVAL
                      SUM2 = SUM2 + DATVAL*DATVAL
                      NGOOD = NGOOD + 1
 
                   END IF
- 
+
                END DO
- 
+
             END DO
          END IF
- 
+
       END DO
 
 *  If the aperture has zero size, tell the user.
@@ -350,11 +350,11 @@
       ELSE
          XX = DBLE( ( ISUM/NTOT ) - 0.5 )
          YY = DBLE( ( JSUM/NTOT ) - 0.5 )
-         
+
          CALL IRA_TRANS( 1, XX, YY, .TRUE., SCS, IDA, A, B, STATUS )
          CALL IRA_DTOC( A, B, SCS, 0, ATEXT, BTEXT, STATUS )
 
-         TEXT = '    Mean position in polygon: '      
+         TEXT = '    Mean position in polygon: '
          IAT = 30
          CALL CHR_APPND( ATEXT, TEXT, IAT )
          CALL CHR_APPND( ', '//BTEXT, TEXT, IAT )
@@ -386,7 +386,7 @@
             CALL CHR_APPND( ' Jy', TEXT, IAT )
             CALL MSG_OUTIF( MSG__NORM, ' ', TEXT( : IAT ), STATUS )
             IF( LOGING ) CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-      
+
             TEXT = '    Mean surface brightness : '
             IAT = 30
             CALL CHR_PUTR( MEAN, TEXT, IAT )

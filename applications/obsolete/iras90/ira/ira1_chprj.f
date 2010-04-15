@@ -134,7 +134,7 @@
       END IF
 
 *  Set up the number of projection parameters. All currently defined
-*  projections need same number of parameters, but this may change in 
+*  projections need same number of parameters, but this may change in
 *  future.
       NP = IRA__MAXP
 

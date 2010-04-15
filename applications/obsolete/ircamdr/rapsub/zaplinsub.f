@@ -11,12 +11,12 @@
 *     deleted at a time. If any of the rows or columns to be
 *     replaced are edge rows or columns, interpolation is not
 *     possible, and duplication of the nearest good row or column
-*     is used. If NOISE is true on entry then pseudo Poisson 
+*     is used. If NOISE is true on entry then pseudo Poisson
 *     noise is added.
 *
 *    Method :
 *
-*     The routine takes as input a data array and its dimensions, 
+*     The routine takes as input a data array and its dimensions,
 *     and also the start and finish rows/columns that are to be
 *     modified. The logical ROW is set to true if rows are to be
 *     worked on, and false if it is to be columns. If either START
@@ -81,7 +81,7 @@
 
 *    Local variables :
 
-      INTEGER  
+      INTEGER
      :      DUMMY,          ! used to swap START and FINISH if needed
      :      STARTM,         ! START minus 1
      :      FINISHP,        ! FINISH plus 1
@@ -134,10 +134,10 @@
 
          IF( START .EQ. 1 ) THEN       ! bottom edge
 
-            DO  I  =  1, DIMS1 
+            DO  I  =  1, DIMS1
                DO  J  =  START, FINISH
                   ARRAY( I, J ) = ARRAY( I, FINISHP )  ! duplicate
-                  IF( NOISE ) THEN 
+                  IF( NOISE ) THEN
                      CALL POISSON( ARRAY( I, J ), VALUE, STATUS )
                      ARRAY( I, J )  =  VALUE
                   END IF
@@ -149,7 +149,7 @@
             DO  I  =  1, DIMS1
                DO  J  =  START, FINISH
                   ARRAY( I, J ) = ARRAY( I, STARTM )   ! duplicate
-                  IF( NOISE ) THEN 
+                  IF( NOISE ) THEN
                      CALL POISSON( ARRAY( I, J ), VALUE, STATUS )
                      ARRAY( I, J )  =  VALUE
                   END IF
@@ -180,7 +180,7 @@
 
                   ARRAY( I, J ) = ARRAY( I, STARTM ) + (DIFFINT * JJ )
 
-                  IF( NOISE ) THEN 
+                  IF( NOISE ) THEN
                      CALL POISSON( ARRAY( I, J ), VALUE, STATUS )
                      ARRAY( I, J )  =  VALUE
                   END IF
@@ -200,7 +200,7 @@
             DO  J  =  1, DIMS2
                DO  I  =  START, FINISH
                   ARRAY( I, J ) = ARRAY( FINISHP, J )  ! duplicate
-                  IF( NOISE ) THEN 
+                  IF( NOISE ) THEN
                      CALL POISSON( ARRAY( I, J ), VALUE, STATUS )
                      ARRAY( I, J )  =  VALUE
                   END IF
@@ -212,7 +212,7 @@
             DO  J  =  1, DIMS2
                DO  I  =  START, FINISH
                   ARRAY( I, J ) = ARRAY( STARTM, J )   ! duplicate
-                  IF( NOISE ) THEN 
+                  IF( NOISE ) THEN
                      CALL POISSON( ARRAY( I, J ), VALUE, STATUS )
                      ARRAY( I, J )  =  VALUE
                   END IF
@@ -243,7 +243,7 @@
 
                   ARRAY( I, J ) = ARRAY( STARTM, J ) + (DIFFINT * II )
 
-                  IF( NOISE ) THEN 
+                  IF( NOISE ) THEN
                      CALL POISSON( ARRAY( I, J ), VALUE, STATUS )
                      ARRAY( I, J )  =  VALUE
                   END IF

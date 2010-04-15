@@ -6,9 +6,9 @@
 #include <math.h>
 
 AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
-                             int space_axes[ 2 ], int ndim, int *lbnd, 
-                             int *ubnd, AstMapping *wcsmap, 
-                             AstFrame *space_frm, AstMapping *space_map, 
+                             int space_axes[ 2 ], int ndim, int *lbnd,
+                             int *ubnd, AstMapping *wcsmap,
+                             AstFrame *space_frm, AstMapping *space_map,
                              int *status ){
 /*
 *+
@@ -16,30 +16,30 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 *     cupidPolygonDesc
 
 *  Purpose:
-*     Create an AST Polygon describing the spatial extent of a clump. 
+*     Create an AST Polygon describing the spatial extent of a clump.
 
 *  Language:
 *     Starlink C
 
 *  Synopsis:
 *     AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
-*                                  int space_axes[ 2 ], int ndim, int *lbnd, 
-*                                  int *ubnd, AstMapping *wcsmap, 
-*                                  AstFrame *space_frm, AstMapping *space_map, 
+*                                  int space_axes[ 2 ], int ndim, int *lbnd,
+*                                  int *ubnd, AstMapping *wcsmap,
+*                                  AstFrame *space_frm, AstMapping *space_map,
 *                                  int *status )
 
 *  Description:
 *     This function returns an Polygon describing the spatial extent of the
 *     clump specified by the supplied statistics.
-*     
-*     The supplied statistics include the Polygon centre, and the distance 
-*     from the centre to the Polygon perimeter in four different directions, 
-*     all specified in pixels coords. These directions are the pixel X and Y 
-*     axes, plus the "U" and "V" axes, which are axes at 45 degrees to the X 
-*     and Y spatial axes. 
+*
+*     The supplied statistics include the Polygon centre, and the distance
+*     from the centre to the Polygon perimeter in four different directions,
+*     all specified in pixels coords. These directions are the pixel X and Y
+*     axes, plus the "U" and "V" axes, which are axes at 45 degrees to the X
+*     and Y spatial axes.
 
 *  Parameters:
-*     ipd 
+*     ipd
 *        Pointer to the 2D or 3D masked clump data array.
 *     velax
 *        The zero-based index of the velocity pixel axis. Should be -1 if
@@ -55,14 +55,14 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 *     ubnd
 *        Point to array holding upper pixel indices of array "ipd".
 *     wcsmap
-*        If the returned Polygon is to be defined in pixel coordinates, then 
-*        a NULL pointer should be supplied for "wcsmap". Otherwise, a pointer 
-*        to a Mapping from the input PIXEL Frame to the WCS Frame should be 
+*        If the returned Polygon is to be defined in pixel coordinates, then
+*        a NULL pointer should be supplied for "wcsmap". Otherwise, a pointer
+*        to a Mapping from the input PIXEL Frame to the WCS Frame should be
 *        supplied.
 *     space_frm
 *        A pointer to the 2D spatial WCS Frame. Ignored if "wcsmap" is NULL.
 *     space_map
-*        A pointer to the 2D spatial pixel->WCS Mapping. Ignored if "wcsmap" 
+*        A pointer to the 2D spatial pixel->WCS Mapping. Ignored if "wcsmap"
 *        is NULL.
 *     status
 *        Pointer to the inherited status value.
@@ -98,8 +98,8 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 *     25-MAY-2009 (DSB):
 *        Original version.
 *     7-AUG-2009 (DSB):
-*        For 3D data, use the largest pixel in the mask as the inside point, 
-*        not the peak (since the peak can get trimmed of if it is at the 
+*        For 3D data, use the largest pixel in the mask as the inside point,
+*        not the peak (since the peak can get trimmed of if it is at the
 *        edge of the clump, causing astOutline to fail).
 *     22-OCT-2009 (DSB):
 *        Correct conversion from 2D pixel coords to pixel indices.
@@ -113,7 +113,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 /* Local Variables: */
    AstPolygon *polygon;     /* Returned Polygon */
-   double *pd;              /* Point to next input mask value */ 
+   double *pd;              /* Point to next input mask value */
    double *px;              /* Pointer to next vertex X axis value */
    double *py;              /* Pointer to next vertex Y axis value */
    double *verts;           /* Pointer to memory holding vertex axis values */
@@ -177,7 +177,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
          inside[ 0 ] = (int)floor( peak[ space_axes[ 0 ] ] + 1.0 );
          inside[ 1 ] = (int)floor( peak[ space_axes[ 1 ] ] + 1.0 );
 
-/* If the data is 3D, we need to collapse the supplied 3D mask array along 
+/* If the data is 3D, we need to collapse the supplied 3D mask array along
    the spectral axis to get a 2D mask. */
       } else if( ndim == 3 ) {
 
@@ -224,7 +224,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 /* We need to trim the 2D mask to exclude pixels around the edge of the
    clump that are only present in a very small number of spectral channels.
    We exclude the pixel that contain the bottom 10% of the spectral
-   coverage. First, find the largest and smallest (non-zero) number of 3D 
+   coverage. First, find the largest and smallest (non-zero) number of 3D
    pixels that contribute to each spatial pixel */
          pm = ipm;
          for( i = 0; i < nel; i++, pm++ ) {
@@ -250,7 +250,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
          pm = ipm;
          for( i = 0; i < nel; i++, pm++ ) {
             if( *pm > 0 ) {
-               iph[ *pm - lo ]++;               
+               iph[ *pm - lo ]++;
                tot++;
             }
          }
@@ -259,11 +259,11 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
    histogram. This is the minimum number of contributions that must be
    made to a 2D mask pixel in order for that pixel to be included in the 2D
    mask. */
-         target = tot/10;                   
+         target = tot/10;
          i = 0;
          tot = iph[ 0 ];
          while( tot < target ) tot += iph[ ++i ];
-         if( tot > target ) i--; 
+         if( tot > target ) i--;
 
 /* Set values below this minimum value to zero in the 2D mask. */
          target = lo + i;
@@ -279,10 +279,10 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 /* Create a Polygon with up to 15 vertices, enclosing the non-zero pixels
    around the clump peak. */
       polygon = astOutlineI( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
-   
+
 /* If required, transform the polygon vertices into WCS. */
       if( wcsmap ) {
-         
+
 /* See how many vertices the Polygon has. */
          astGetRegionPoints( polygon, 0, 2, &nvert, NULL ) ;
 
@@ -310,7 +310,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 /* Create a new Polygon from these transformed and normalised positions.
    This polygon ins defined in the spatial coordinate Frame. */
-            (void) astAnnul( polygon );            
+            (void) astAnnul( polygon );
             polygon = astPolygon( space_frm, nvert, nvert, verts, NULL, " " );
          }
 

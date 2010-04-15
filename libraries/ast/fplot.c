@@ -25,7 +25,7 @@
 *     AST_MARK
 *     AST_PLOT
 *     AST_POLYCURVE
-*     AST_TEXT   
+*     AST_TEXT
 *     AST_GRFSET
 *     AST_GRFPUSH
 *     AST_GRFPOP
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     21-NOV-1996 (DSB):
 *        Method names changed, CLIP argument NBND removed.
 *     18-DEC-1996 (DSB):
-*        Argument UP changed to single precision and NCOORD removed 
+*        Argument UP changed to single precision and NCOORD removed
 *        in AST_TEXT.
 *     11-AUG-1998 (DSB):
 *        Added AST_POLYCURVE.
@@ -73,7 +73,7 @@
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Modified to add support for astGenCurve, astGrfSet, astGrfPop, 
+*        Modified to add support for astGenCurve, astGrfSet, astGrfPop,
 *        astGrfPush and EXTERNAL grf functions.
 *     14-AUG-2002 (DSB):
 *        Added AST_BOUNDINGBOX.
@@ -101,7 +101,7 @@
                                     within pgqtxt and pgptxt. */
 /* Header files. */
 /* ============= */
-#include "string.h"              
+#include "string.h"
 #include "ast_err.h"             /* AST error codes */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
@@ -162,7 +162,7 @@ F77_INTEGER_FUNCTION(ast_plot)( INTEGER(FRAME),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-      RESULT = astP2I( astPlot( astI2P( *FRAME ), GRAPHBOX, BASEBOX, 
+      RESULT = astP2I( astPlot( astI2P( *FRAME ), GRAPHBOX, BASEBOX,
                                 "%s", options ) );
       astFree( options );
    )
@@ -304,7 +304,7 @@ F77_SUBROUTINE(ast_gencurve)( INTEGER(THIS),
 }
 
 F77_SUBROUTINE(ast_text)( INTEGER(THIS),
-                          CHARACTER(TEXT), 
+                          CHARACTER(TEXT),
                           DOUBLE_ARRAY(POS),
                           REAL_ARRAY(UP),
                           CHARACTER(JUST),
@@ -315,7 +315,7 @@ F77_SUBROUTINE(ast_text)( INTEGER(THIS),
    GENPTR_CHARACTER(TEXT)
    GENPTR_DOUBLE_ARRAY(POS)
    GENPTR_REAL_ARRAY(UP)
-   GENPTR_CHARACTER(JUST) 
+   GENPTR_CHARACTER(JUST)
    char *text, *just;
 
    astAt( "AST_TEXT", NULL, 0 );
@@ -344,7 +344,7 @@ F77_SUBROUTINE(ast_grfpop)( INTEGER(THIS), INTEGER(STATUS) ) {
    )
 }
 
-F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME), 
+F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
                                AstGrfFun FUN, INTEGER(STATUS)
                                TRAIL(NAME) ) {
    GENPTR_INTEGER(THIS)
@@ -404,14 +404,14 @@ F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
       } else {
          wrapper = (AstGrfWrap) FGFlushWrapper;
          if( astOK ) astError( AST__INTER, "%s(%s): AST internal programming "
-                   "error - Grf function id %d not yet supported.", status, 
+                   "error - Grf function id %d not yet supported.", status,
                    method, class, ifun );
       }
       astGrfWrapper( astI2P( *THIS ), name, wrapper );
    )
 }
 
-static int FGAttrWrapper( AstPlot *this, int attr, double value, 
+static int FGAttrWrapper( AstPlot *this, int attr, double value,
                           double *old_value, int prim ) {
    DECLARE_DOUBLE(OLDVAL);
    int ret;
@@ -421,12 +421,12 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
    if ( !astOK ) return 0;
 
    GRFCON = astP2I( astGrfConID( this ) );
-   ret = ( *(int (*)( INTEGER(grfcon), INTEGER(attr), DOUBLE(value), 
+   ret = ( *(int (*)( INTEGER(grfcon), INTEGER(attr), DOUBLE(value),
                       DOUBLE(old_value), INTEGER(prim) ))
                   this->grffun[ AST__GATTR ])(  INTEGER_ARG(&GRFCON),
                                                 INTEGER_ARG(&attr),
-                                                DOUBLE_ARG(&value), 
-                                                DOUBLE_ARG(&OLDVAL),  
+                                                DOUBLE_ARG(&value),
+                                                DOUBLE_ARG(&OLDVAL),
                                                 INTEGER_ARG(&prim) );
    if( old_value ) *old_value = OLDVAL;
    return ret;
@@ -440,7 +440,7 @@ static int FGFlushWrapper( AstPlot *this ) {
    return ( *(int (*)(INTEGER(grfcon))) this->grffun[ AST__GFLUSH ])(INTEGER_ARG(&GRFCON));
 }
 
-static int FGLineWrapper( AstPlot *this, int n, const float *x, 
+static int FGLineWrapper( AstPlot *this, int n, const float *x,
                           const float *y ) {
    F77_INTEGER_TYPE(GRFCON);
    int *status = astGetStatusPtr;
@@ -449,11 +449,11 @@ static int FGLineWrapper( AstPlot *this, int n, const float *x,
    return ( *(int (*)( INTEGER(grfcon), INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) ))
                   this->grffun[ AST__GLINE ])(  INTEGER_ARG(&GRFCON),
                                                 INTEGER_ARG(&n),
-                                                REAL_ARRAY_ARG(x), 
+                                                REAL_ARRAY_ARG(x),
                                                 REAL_ARRAY_ARG(y) );
 }
 
-static int FGMarkWrapper( AstPlot *this, int n, const float *x, 
+static int FGMarkWrapper( AstPlot *this, int n, const float *x,
                           const float *y, int type ) {
    F77_INTEGER_TYPE(GRFCON);
    int *status = astGetStatusPtr;
@@ -463,7 +463,7 @@ static int FGMarkWrapper( AstPlot *this, int n, const float *x,
                        INTEGER(type) ))
                   this->grffun[ AST__GMARK ])(  INTEGER_ARG(&GRFCON),
                                                 INTEGER_ARG(&n),
-                                                REAL_ARRAY_ARG(x), 
+                                                REAL_ARRAY_ARG(x),
                                                 REAL_ARRAY_ARG(y),
                                                 INTEGER_ARG(&type) );
 }
@@ -492,15 +492,15 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
    return ( *(int (*)( INTEGER(grfcon), CHARACTER(LTEXT), REAL(x), REAL(y),
                        CHARACTER(LJUST), REAL(upx), REAL(upy)
                        TRAIL(ftext) TRAIL(fjust) ) )
-                  this->grffun[ AST__GTEXT ])( 
+                  this->grffun[ AST__GTEXT ])(
                                       INTEGER_ARG(&GRFCON),
                                       CHARACTER_ARG(LTEXT),
                                       REAL_ARG(&x),
-                                      REAL_ARG(&y), 
+                                      REAL_ARG(&y),
                                       CHARACTER_ARG(LJUST),
-                                      REAL_ARG(&upx), 
-                                      REAL_ARG(&upy) 
-                                      TRAIL_ARG(ftext) 
+                                      REAL_ARG(&upx),
+                                      REAL_ARG(&upy)
+                                      TRAIL_ARG(ftext)
                                       TRAIL_ARG(fjust) );
 }
 
@@ -510,14 +510,14 @@ static int FGCapWrapper( AstPlot *this, int cap, int value ) {
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)( INTEGER(grfcon), INTEGER(cap), INTEGER(value) ) )
-                  this->grffun[ AST__GCAP ])( 
+                  this->grffun[ AST__GCAP ])(
                                       INTEGER_ARG(&GRFCON),
                                       INTEGER_ARG(&cap),
                                       INTEGER_ARG(&value) );
 }
 
 static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
-                           const char *just, float upx, float upy, float *xb, 
+                           const char *just, float upx, float upy, float *xb,
                            float *yb ) {
    DECLARE_CHARACTER(LTEXT,MXSTRLEN);
    DECLARE_CHARACTER(LJUST,MXSTRLEN);
@@ -539,19 +539,19 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 
    return ( *(int (*)( INTEGER(grfcon), CHARACTER(LTEXT), REAL(x), REAL(y),
                        CHARACTER(LJUST), REAL(upx), REAL(upy),
-                       REAL_ARRAY(xb), REAL_ARRAY(yb) TRAIL(ftext) 
+                       REAL_ARRAY(xb), REAL_ARRAY(yb) TRAIL(ftext)
                        TRAIL(fjust) ) )
-                  this->grffun[ AST__GTXEXT ])( 
+                  this->grffun[ AST__GTXEXT ])(
                                                 INTEGER_ARG(&GRFCON),
                                                 CHARACTER_ARG(LTEXT),
                                                 REAL_ARG(&x),
-                                                REAL_ARG(&y), 
+                                                REAL_ARG(&y),
                                                 CHARACTER_ARG(LJUST),
-                                                REAL_ARG(&upx), 
+                                                REAL_ARG(&upx),
                                                 REAL_ARG(&upy),
                                                 REAL_ARRAY_ARG(xb),
                                                 REAL_ARRAY_ARG(yb)
-                                                TRAIL_ARG(ftext) 
+                                                TRAIL_ARG(ftext)
                                                 TRAIL_ARG(fjust) );
 }
 
@@ -592,7 +592,7 @@ F77_SUBROUTINE(ast_stripescapes)( CHARACTER_RETURN_VALUE(RESULT),
    GENPTR_CHARACTER(RESULT)
    GENPTR_CHARACTER(TEXT)
    char *text;
-   const char *result; 
+   const char *result;
    int i;
 
    astAt( "AST_STRIPESCAPES", NULL, 0 );

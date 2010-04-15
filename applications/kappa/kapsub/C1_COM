@@ -41,11 +41,11 @@
 
 *  Common block /C1COM/
 *
-*        C1_NLN = INTEGER 
+*        C1_NLN = INTEGER
 *           Y dimension of internal images (including margin).
-*        C1_NPX = INTEGER 
+*        C1_NPX = INTEGER
 *           X dimension of internal images (including margin).
-*        C1_DIM(2) = INTEGER 
+*        C1_DIM(2) = INTEGER
 *           The dimensions of the input image.
 *        C1_XMG = INTEGER
 *           The width of the margin along the x axis in pixels.

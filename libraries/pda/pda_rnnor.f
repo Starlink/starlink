@@ -2,13 +2,13 @@
 *+
 *  Name:
 *     PDA_RNNOR
- 
+
 *  Purpose:
 *     Returns pseudo-random numbers from a Gaussian distribution.
-      
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     RESULT = PDA_RNNOR( MEAN, SIGMA )
 
@@ -17,13 +17,13 @@
 *     from a Gaussian distribution, with a period of 2**26, and to 6 or
 *     7 digits accuracy.  It is based upon Ahrens, Dieter & Grube's
 *     TOMS599 routines.
- 
-*  Arguments:               
+
+*  Arguments:
 *     MEAN = REAL (Given)
 *        The mean value of the Gaussian distribution.
 *     SIGMA = REAL (Given)
 *        The standard deviation of the Gaussian distribution.
- 
+
 *  Returned Value:
 *     PDA_RNNOR = REAL
 *        The pseudo-random deviate.
@@ -53,7 +53,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 November 20 (MJC)
 *        Original version based on Grant Privett's partially tidied
@@ -63,12 +63,12 @@
 *     23-NOV-2005 (DSB)
 *        Guard against indexing the D array out of bounds.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,22 +110,22 @@
      :        0.1226109, 0.1201036, 0.1177417, 0.1155119, 0.1134023,
      :        0.1114027, 0.1095039 /
 
-      DATA H/ 0.3920617E-1, 0.3932705E-1, 0.3950999E-1, 0.3975703E-1, 
-     :        0.4007093E-1, 0.4045533E-1, 0.4091481E-1, 0.4145507E-1, 
-     :        0.4208311E-1, 0.4280748E-1, 0.4363863E-1, 0.4458932E-1, 
-     :        0.4567523E-1, 0.4691571E-1, 0.4833487E-1, 0.4996298E-1, 
-     :        0.5183859E-1, 0.5401138E-1, 0.5654656E-1, 0.5953130E-1, 
-     :        0.6308489E-1, 0.6737503E-1, 0.7264544E-1, 0.7926471E-1, 
+      DATA H/ 0.3920617E-1, 0.3932705E-1, 0.3950999E-1, 0.3975703E-1,
+     :        0.4007093E-1, 0.4045533E-1, 0.4091481E-1, 0.4145507E-1,
+     :        0.4208311E-1, 0.4280748E-1, 0.4363863E-1, 0.4458932E-1,
+     :        0.4567523E-1, 0.4691571E-1, 0.4833487E-1, 0.4996298E-1,
+     :        0.5183859E-1, 0.5401138E-1, 0.5654656E-1, 0.5953130E-1,
+     :        0.6308489E-1, 0.6737503E-1, 0.7264544E-1, 0.7926471E-1,
      :        0.8781922E-1, 0.9930398E-1, 0.1155599, 0.1404344,
      :        0.1836142, 0.2790016, 0.7010474 /
 
-      DATA T/ 0.7673828E-3, 0.2306870E-2, 0.3860618E-2, 0.5438454E-2, 
-     :        0.7050699E-2, 0.8708396E-2, 0.1042357E-1, 0.1220953E-1, 
-     :        0.1408125E-1, 0.1605579E-1, 0.1815290E-1, 0.2039573E-1, 
-     :        0.2281177E-1, 0.2543407E-1, 0.2830296E-1, 0.3146822E-1, 
-     :        0.3499233E-1, 0.3895483E-1, 0.4345878E-1, 0.4864035E-1, 
-     :        0.5468334E-1, 0.6184222E-1, 0.7047983E-1, 0.8113195E-1, 
-     :        0.9462444E-1, 0.1123001, 0.1364980, 0.1716886, 0.2276241, 
+      DATA T/ 0.7673828E-3, 0.2306870E-2, 0.3860618E-2, 0.5438454E-2,
+     :        0.7050699E-2, 0.8708396E-2, 0.1042357E-1, 0.1220953E-1,
+     :        0.1408125E-1, 0.1605579E-1, 0.1815290E-1, 0.2039573E-1,
+     :        0.2281177E-1, 0.2543407E-1, 0.2830296E-1, 0.3146822E-1,
+     :        0.3499233E-1, 0.3895483E-1, 0.4345878E-1, 0.4864035E-1,
+     :        0.5468334E-1, 0.6184222E-1, 0.7047983E-1, 0.8113195E-1,
+     :        0.9462444E-1, 0.1123001, 0.1364980, 0.1716886, 0.2276241,
      :        0.3304980, 0.5847031 /
 
 *.
@@ -153,7 +153,7 @@
       U = 32.0 * U
       I = INT( U )
       IF ( I .EQ. 0 ) THEN
- 
+
 *  Start at the tail.
 *  ==================
          I = 6
@@ -172,7 +172,7 @@
             U = U - 1.0
             GO TO 200
          END IF
- 
+
 *  Start in the centre.
 *  ====================
       ELSE
@@ -182,7 +182,7 @@
 *  Start of 'DO WHILE' loop.
  100     CONTINUE
          IF ( USTAR .LE. T( I ) ) THEN
- 
+
 *  Centre continued.  Get another random number.
             U = PDA_RAND( 0.0 )
             W = U * ( A( I+1 ) - AA )
@@ -215,15 +215,15 @@
       END IF
 
       GO TO 300
- 
+
  200  CONTINUE
       W = U * D( I )
       TT = ( 0.5 * W + AA ) * W
- 
+
  250  CONTINUE
       USTAR = PDA_RAND( 0.0 )
       IF ( USTAR .GT. TT ) GO TO 300
- 
+
       U = PDA_RAND( 0.0 )
       IF ( USTAR .GE. U ) THEN
          TT = U
@@ -232,17 +232,17 @@
       ELSE
          U = PDA_RAND( 0.0 )
          GO TO 200
- 
+
       END IF
 
 *  Exit (both cases).
   300 CONTINUE
- 
+
       Y = AA + W
       IF ( S .EQ. 1.0 ) THEN
          PDA_RNNOR = MEAN - Y * SIGMA
       ELSE
          PDA_RNNOR = MEAN + Y * SIGMA
       END IF
- 
+
       END

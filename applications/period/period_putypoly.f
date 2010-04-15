@@ -3,7 +3,7 @@ C===========================================================================
 
       SUBROUTINE PERIOD_PUTYPOLY(IPARRAY, NUMROWS, MXCOL, PFT,
      :                           MAXPOLY, NPOLY, OPARRAY)
- 
+
 C===========================================================================
 C Outputs poly/rms data from DETREND. All arrays can correspond to slices
 C of dynamically-allocated memory, provided that the appropriate "calling"
@@ -14,7 +14,7 @@ C Written by Kevin P Duffey @RAL, October 2001
 C===========================================================================
 
       IMPLICIT NONE
- 
+
       INTEGER NUMROWS, MXCOL, MAXPOLY, NPOLY, I
       DOUBLE PRECISION IPARRAY(NUMROWS,MXCOL), PFT(MAXPOLY)
       DOUBLE PRECISION OPARRAY(NUMROWS,MXCOL)

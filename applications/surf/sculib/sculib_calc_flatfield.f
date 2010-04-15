@@ -1,5 +1,5 @@
-      SUBROUTINE SCULIB_CALC_FLATFIELD (BOLNAME, BOL_TYPE, IDIM, JDIM, 
-     :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, X, Y, VOLUME, VOLUME_VAR, 
+      SUBROUTINE SCULIB_CALC_FLATFIELD (BOLNAME, BOL_TYPE, IDIM, JDIM,
+     :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, X, Y, VOLUME, VOLUME_VAR,
      :  X_CENTRE, Y_CENTRE, THETA, A, B, QUALITY, STATUS)
 *+
 *  Name:
@@ -9,8 +9,8 @@
 *     calculate flat-field results for a bolometer
 
 *  Description:
-*     This routine calculates the image parameters from data taken as a 
-*     flat-field measurement of a SCUBA bolometer. It takes as input data a 
+*     This routine calculates the image parameters from data taken as a
+*     flat-field measurement of a SCUBA bolometer. It takes as input data a
 *     map made of a point source with pixels on a square grid.
 *
 *        If status is good on entry, the routine will set default return values
@@ -18,12 +18,12 @@
 *     routine the various image quantities will be set to their derived values,
 *     and QUALITY will be set to 1 if any problem is encountered.
 *
-*        An attempt will then be made to estimate the 0 level of the image by 
-*     averaging valid data points in the corners of the map area. If there are 
+*        An attempt will then be made to estimate the 0 level of the image by
+*     averaging valid data points in the corners of the map area. If there are
 *     any such points then the 0 level will be subtracted from the map.
 *
-*        Next the routine will calculate the 0th and 1st order moments of the 
-*     image on the map. Map pixels with bad quality are ignored. 
+*        Next the routine will calculate the 0th and 1st order moments of the
+*     image on the map. Map pixels with bad quality are ignored.
 *
 *         0th order = sum [f(i,j)], where i,j are the pixel indices
 *
@@ -35,7 +35,7 @@
 *
 *     If the 0th order moment of the image was 0, i.e. there is no image on
 *     the map, then a warning message will be output and the routine will
-*     return with good status and QUALITY set to 1. Otherwise, the x,y centre 
+*     return with good status and QUALITY set to 1. Otherwise, the x,y centre
 *     of the image is calculated from:-
 *
 *         X_CENTRE = 1st order in x        Y_CENTRE = 1st order in y
@@ -43,7 +43,7 @@
 *                      0th order                        0th order
 *
 *     With this information the image can be analysed further by one of
-*     2 methods. The method used depends on the value of parameter 
+*     2 methods. The method used depends on the value of parameter
 *     FLAT_ANALYSIS. If there is an error reading this parameter, or
 *     its value is not either MOMENTS or FIT, then a warning message will
 *     be issued and a value of MOMENTS will be assumed.
@@ -78,17 +78,17 @@
 *     the angle between the x axis and A (THETA in radians, measured
 *     anti-clockwise).
 *
-*     If all is well still, the volume under the image and the variance on it 
+*     If all is well still, the volume under the image and the variance on it
 *     are calculated. The volume will be the sum of all map pixels under a
 *     circle of 12 arcsec radius for short-wave array bolometers, or 25
-*     arcsec for other types. If this area laps over the edges of the map, or 
-*     any pixels inside it have bad quality then a warning message will be 
+*     arcsec for other types. If this area laps over the edges of the map, or
+*     any pixels inside it have bad quality then a warning message will be
 *     output but QUALITY will stay good.
 *
 
 *  Invocation:
 *     CALL SCULIB_CALC_FLATFIELD (BOLNAME, BOL_TYPE, IDIM, JDIM, MAP_DATA,
-*    :  MAP_VARIANCE, MAP_QUALITY, X, Y, VOLUME, VOLUME_VAR, X_CENTRE, 
+*    :  MAP_VARIANCE, MAP_QUALITY, X, Y, VOLUME, VOLUME_VAR, X_CENTRE,
 *    :  Y_CENTRE, THETA, A, B, QUALITY, STATUS)
 
 *  Arguments:
@@ -158,7 +158,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                    ! for VAL__BADR
       INTEGER MAX_FIT_DATA                 ! maximum number of measurements
-      PARAMETER (MAX_FIT_DATA = 512)      
+      PARAMETER (MAX_FIT_DATA = 512)
 
 *  Arguments Given:
       CHARACTER*(*) BOLNAME
@@ -197,7 +197,7 @@
       REAL    DATA_FIT (MAX_FIT_DATA)      ! value of measurements
       REAL    VARIANCE_FIT (MAX_FIT_DATA)  ! variance on measurements
       INTEGER QUALITY_FIT (MAX_FIT_DATA)   ! quality on measurements
-      COMMON /SCULIB_GAUSSIAN_FIT_DATA/ NDATA_FIT, X_FIT, Y_FIT, 
+      COMMON /SCULIB_GAUSSIAN_FIT_DATA/ NDATA_FIT, X_FIT, Y_FIT,
      :  DATA_FIT, VARIANCE_FIT, QUALITY_FIT
 
 *  Local Constants:
@@ -221,7 +221,7 @@
                                            ! which measurements are to be
                                            ! integrated
       LOGICAL          LOOPING             ! T while iterating fit
-      LOGICAL          MISSING_POINTS      ! .TRUE. if some data points 
+      LOGICAL          MISSING_POINTS      ! .TRUE. if some data points
                                            ! required to calculate VOLUME
                                            ! are missing
       REAL             PEAK                ! peak value of fitted Gaussian
@@ -274,7 +274,7 @@
          CALL MSG_OUT (' ', 'a MOMENTS analysis will be performed',
      :     STATUS)
          ANALYSIS = 'MOMENTS'
-      ELSE IF ((ANALYSIS.NE.'MOMENTS') .AND. 
+      ELSE IF ((ANALYSIS.NE.'MOMENTS') .AND.
      :         (ANALYSIS.NE.'FIT'))    THEN
          STATUS = SAI__WARN
          CALL ERR_OUT (' ', 'SCULIB_CALC_FLATFIELD: FLAT_ANALYSIS '//
@@ -291,8 +291,8 @@
 
       DO J = 1, JDIM
          DO I = 1, IDIM
-            IF (SQRT ((REAL(I) - REAL(IDIM)/2.0)**2 + 
-     :        (REAL(J) - REAL(JDIM)/2.0)**2) .GT. 
+            IF (SQRT ((REAL(I) - REAL(IDIM)/2.0)**2 +
+     :        (REAL(J) - REAL(JDIM)/2.0)**2) .GT.
      :        MIN (REAL(IDIM)/2.0, REAL(JDIM)/2.0)) THEN
                IF (MAP_QUALITY(I,J) .EQ. 0) THEN
                   RTEMP = RTEMP + MAP_DATA(I,J)
@@ -311,7 +311,7 @@
          CALL MSG_SETR ('ZERO', RTEMP)
          CALL MSG_OUT (' ', 'SCULIB: subtracting ^ZERO from the '//
      :     'image for ^BOL', STATUS)
- 
+
          DO J = 1, JDIM
             DO I = 1, IDIM
                IF (MAP_QUALITY(I,J) .EQ. 0) THEN
@@ -337,10 +337,10 @@
          DO I = 1, IDIM
             IF (MAP_QUALITY(I,J) .EQ. 0) THEN
                SUM_XF = SUM_XF + X (I) * MAP_DATA (I,J)
-               SUM_XF_VAR = SUM_XF_VAR + X(I) * X(I) * 
+               SUM_XF_VAR = SUM_XF_VAR + X(I) * X(I) *
      :           MAP_VARIANCE(I,J)
                SUM_YF = SUM_YF + Y (J) * MAP_DATA (I,J)
-               SUM_YF_VAR = SUM_YF_VAR + Y(I) * Y(I) * 
+               SUM_YF_VAR = SUM_YF_VAR + Y(I) * Y(I) *
      :           MAP_VARIANCE(I,J)
                SUM_F = SUM_F + MAP_DATA (I,J)
                SUM_F_VAR = SUM_F_VAR + MAP_VARIANCE(I,J)
@@ -348,8 +348,8 @@
          END DO
       END DO
 
-      IF ((SUM_F .EQ. 0.0)   .OR. 
-     :    (SUM_XF .EQ. 0.0)  .OR. 
+      IF ((SUM_F .EQ. 0.0)   .OR.
+     :    (SUM_XF .EQ. 0.0)  .OR.
      :    (SUM_YF .EQ. 0.0)) THEN
          QUALITY = 1
          STATUS = SAI__WARN
@@ -380,7 +380,7 @@
          CALL MSG_SETC ('BOL', BOLNAME)
          CALL MSG_OUT (' ', 'SCULIB: bolometer ^BOL centroid at '//
      :     'X=^X_CENTRE+-^X_VAR, Y=^Y_CENTRE+-^Y_VAR', STATUS)
-      END IF    
+      END IF
 
 *  now calculate other parameters of image
 
@@ -389,15 +389,15 @@
          IF (ANALYSIS .EQ. 'MOMENTS') THEN
 
 *  calculate 2nd order moments
-         
+
             DO J = 1, JDIM
                DO I = 1, IDIM
                   IF (MAP_QUALITY(I,J) .EQ. 0) THEN
-                     SUM_XXF = SUM_XXF + (X(I)-X_CENTRE)**2 * 
+                     SUM_XXF = SUM_XXF + (X(I)-X_CENTRE)**2 *
      :                 MAP_DATA(I,J)
-                     SUM_XYF = SUM_XYF + (X(I)-X_CENTRE) * 
+                     SUM_XYF = SUM_XYF + (X(I)-X_CENTRE) *
      :                 (Y(J)-Y_CENTRE) * MAP_DATA(I,J)
-                     SUM_YYF = SUM_YYF + (Y(J)-Y_CENTRE)**2 * 
+                     SUM_YYF = SUM_YYF + (Y(J)-Y_CENTRE)**2 *
      :                 MAP_DATA(I,J)
                   END IF
                END DO
@@ -416,9 +416,9 @@
                RTEMP = ATAN (RTEMP)
                THETA = RTEMP / 2.0
 
-               RTEMP1 = 2.0 * SQRT((SUM_XXF-SUM_YYF)**2 + 4.0 * 
+               RTEMP1 = 2.0 * SQRT((SUM_XXF-SUM_YYF)**2 + 4.0 *
      :           SUM_XYF**2)
-               RTEMP = 2.0 * (SUM_XXF + SUM_YYF) - RTEMP1 
+               RTEMP = 2.0 * (SUM_XXF + SUM_YYF) - RTEMP1
 
                IF (RTEMP .LT. 0.0) THEN
                   QUALITY = 1
@@ -495,7 +495,7 @@
                   FIT (2) = 1.2011D0 * 5.0D0
                   FIT (3) = FIT (2) + 0.1D0
                END IF
- 
+
                FIT (4) = 0.0D0
                FIT (5) = DBLE (X_CENTRE)
                FIT (6) = DBLE (Y_CENTRE)
@@ -503,21 +503,21 @@
                LAMBDA = 0.001
                CALL SCULIB_GAUSSIAN_XISQ (XISQ, 6, FIT, STATUS)
                XICUT = MAX (0.01D0 * XISQ, 0.01D0)
-         
-*  now iterate 
+
+*  now iterate
 
                LOOPING = .TRUE.
                ITERATION = 0
- 
+
                DO WHILE (LOOPING)
-                  CALL SCULIB_FIT_FUNCTION (SCULIB_GAUSSIAN_XISQ, 
-     :              XICUT, 6, FIT, LAMBDA, ALPHA, BETA, IK, JK, DA, 
+                  CALL SCULIB_FIT_FUNCTION (SCULIB_GAUSSIAN_XISQ,
+     :              XICUT, 6, FIT, LAMBDA, ALPHA, BETA, IK, JK, DA,
      :              STATUS)
 
                   ITERATION = ITERATION + 1
 
 *  check for last iteration
- 
+
                   IF (STATUS .NE. SAI__OK) THEN
                      LOOPING =.FALSE.
                      QUALITY = 1
@@ -538,7 +538,7 @@
 *  report the iteration result
 
                   CALL MSG_SETI ('ITER', ITERATION)
-                  CALL MSG_SETR ('CHISQ', REAL(XISQ))         
+                  CALL MSG_SETR ('CHISQ', REAL(XISQ))
                   CALL MSG_OUT (' ', 'iter=^ITER chisq=^CHISQ', STATUS)
                END DO
 
@@ -560,7 +560,7 @@
                LAMBDA = 0.0D0
                CALL SCULIB_FIT_FUNCTION (SCULIB_GAUSSIAN_XISQ, XICUT,
      :           6, FIT, LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
-    
+
                CALL MSG_SETC ('BOL', BOLNAME)
 
                PEAK = REAL (FIT(1))
@@ -572,12 +572,12 @@
                RTEMP = REAL (SQRT(MAX(0.0D0,ALPHA(2,2))))
                CALL MSG_SETR ('A', A)
                CALL MSG_SETR ('A_ERR', RTEMP)
-            
+
                B = REAL (FIT(3)) * 0.833
                RTEMP = REAL (SQRT(MAX(0.0D0,ALPHA(3,3))))
                CALL MSG_SETR ('B', B)
                CALL MSG_SETR ('B_ERR', RTEMP)
-     
+
                THETA = REAL (FIT(4))
                RTEMP = REAL (SQRT(MAX(0.0D0,ALPHA(4,4))))
                CALL MSG_SETR ('THETA', THETA)
@@ -593,11 +593,11 @@
                CALL MSG_SETR ('YCEN', Y_CENTRE)
                CALL MSG_SETR ('YCEN_ERR', RTEMP)
 
-               CALL MSG_OUT (' ', 'SCULIB: fit results for ^BOL', 
+               CALL MSG_OUT (' ', 'SCULIB: fit results for ^BOL',
      :           STATUS)
                CALL MSG_OUT (' ', '- peak=^PEAK (^PEAK_ERR) a=^A '//
      :           '(^A_ERR) b=^B (^B_ERR) theta=^THETA (^THETA_ERR) '//
-     :           'xcen=^XCEN (^XCEN_ERR) ycen=^YCEN (^YCEN_ERR)', 
+     :           'xcen=^XCEN (^XCEN_ERR) ycen=^YCEN (^YCEN_ERR)',
      :           STATUS)
             END IF
          END IF
@@ -637,7 +637,7 @@
                END DO
             END DO
 
-*  see if integration circle extended beyond map boundary 
+*  see if integration circle extended beyond map boundary
 
             IF (IDIM .GT. 1) THEN
                DO J = 1, JDIM

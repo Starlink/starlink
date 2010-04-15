@@ -115,17 +115,17 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     DECLARE_INTEGER(ys2);                 /* Upper Y value */
     DECLARE_POINTER(image);               /* Pointer to image data. */
     DECLARE_LOGICAL(swap);                /* Data is byte swapped */
-    
+
     /* Local variables: */
     int result;
     char *ptr;
     char *atPtr;
     char *opStr;
-    
+
 #ifdef _DEBUG_
     printf( "Called writesliceCmd \n");
 #endif
-    
+
     /* Runtime initialisations. */
     opStr = (char *)NULL;
     xs1 = ys1 = xs2 = ys2 = 0;
@@ -133,13 +133,13 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     cnf_exprt( "unknown", (char *)name, MAXFILE );
     nelem = 512;
     result = 1;
-    
+
     /*  Parse the input arguments extracting the parameters which have
         been set. */
     atPtr = args;
     while ( ( ptr = strtok( atPtr, " " ) ) != NULL ) {
         atPtr = (char *) NULL;
-        
+
         if ( strcmp( ptr,  "-file" ) == 0 ) {
             ptr = strtok( atPtr, " " );
             cnf_exprt( ptr, (char *)file, MAXFILE );
@@ -157,7 +157,7 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
         else if ( strcmp( ptr,  "-nelem" ) == 0 ) {
             ptr = strtok( atPtr, " " );
             nelem = (F77_INTEGER_TYPE) atoi( ptr );
-        } 
+        }
         else if ( strcmp( ptr,  "-name" ) == 0 ) {
             ptr = strtok( atPtr, " " );
             cnf_exprt( ptr, (char *)name, MAXFILE );
@@ -187,21 +187,21 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
         cnf_exprt( "_DOUBLE", (char *)type, 10 );
         break;
     }
-    
+
     /*  Set up the image information. Need to register the image pointer with
      *  CNF so that it can be used in Fortran (when the storage used in
      *  Fortran is less than the size of a void pointer). */
     F77_EXPORT_POINTER( info->imageData, image );
-    
+
     nx = (F77_INTEGER_TYPE) info->nx;
     ny = (F77_INTEGER_TYPE) info->ny;
     if ( info->swap ) {
         swap = F77_TRUE;
-    } 
+    }
     else {
         swap = F77_FALSE;
     }
-    
+
     /*  Call Fortran routine to do the work. */
     emsMark();
     F77_CALL(rtd_slice)( CHARACTER_ARG(name), POINTER_ARG(&image),
@@ -216,7 +216,7 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
 
         /*  Get the error from EMS and return it as errStr. */
         *errStr = gaiaUtilsErrMessage()  ;
-        
+
         /*  Set success of routine to false. */
         result = 0;
     }

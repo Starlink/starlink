@@ -9,12 +9,12 @@
  *
  *  Description:
  *     This routine returns the full name of the directory containing
- *     the file that is being executed by the current process. This is 
- *     provided as a way of locating other files associated with the 
+ *     the file that is being executed by the current process. This is
+ *     provided as a way of locating other files associated with the
  *     program being run, which are often most conveniently held in the
  *     same directory. The string returned is such that a file called
  *     say, 'NAME.EXT' would have a full file name DIRECTORY(:NCH)//'NAME.EXT'
- *     So, for example, under VMS this routine returns a string of the form 
+ *     So, for example, under VMS this routine returns a string of the form
  *     'device:[directory.subdir]' and under UNIX returns a string of the
  *     form '/dir/subdir/subsubdir/' (the final '/' being needed under UNIX
  *     for the simple concatenation of directory name and file name to work).
@@ -43,11 +43,11 @@
  *  Version date: 11th Jan 1993.
  *-
  *  History:
- *     11th Jan 1993.   KS/AAO. Original version. Most of the work is done by 
- *                      the routine findx(), originally written by Greg Limes 
+ *     11th Jan 1993.   KS/AAO. Original version. Most of the work is done by
+ *                      the routine findx(), originally written by Greg Limes
  *                      (limes@eng.sun.com).
  *  Note:
- *     For this to work from Fortran, the routine getarg() has to be 
+ *     For this to work from Fortran, the routine getarg() has to be
  *     available. This is the case for SUNOS and for ULTRIX.
  *+
  */
@@ -223,7 +223,7 @@ void gen_exedir_ (Directory,Nch,LDir)
 {
    /*  Local variables  */
 
-   char Arg0[MAXPATHLEN];         /* Used to hold the 0th argument */   
+   char Arg0[MAXPATHLEN];         /* Used to hold the 0th argument */
    char *ArgPtr;                  /* Pointer used to work through Arg0 */
    int Back;                      /* Number of '/' chars to work back through */
    char Char;                     /* Character in directory name */
@@ -238,7 +238,7 @@ void gen_exedir_ (Directory,Nch,LDir)
    /*  We need to get the name of the zeroth command line argument. Perversely,
     *  since we are too deep down to have access to the argv array passed
     *  when the program is run, even though this is a C routine, we get it
-    *  by calling the Fortran library routine GETARG (getarg_ from C). This 
+    *  by calling the Fortran library routine GETARG (getarg_ from C). This
     *  will return a string that will be either nul-terminated or blank-filled.
     *  If the latter, we need to make sure it is nul-terminated before passing
     *  it on to findx().
@@ -260,8 +260,8 @@ void gen_exedir_ (Directory,Nch,LDir)
        *  combine the copying of it into the Directory string and the tidying
        *  up. We copy it character by character, keeping a count of the number
        *  of dots after each '/', clearing the count on any ordinary character.
-       *  If we come to a new '/' or the end of the string with a positive 
-       *  dot count, we skip back by a number of '/' chars equal to the 
+       *  If we come to a new '/' or the end of the string with a positive
+       *  dot count, we skip back by a number of '/' chars equal to the
        *  number of dots we found.  This has the effect of turning a '/./'
        *  sequence into a '/' and a 'xx/../yy' sequence into 'yy'.
        */

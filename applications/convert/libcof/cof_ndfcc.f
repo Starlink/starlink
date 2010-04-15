@@ -17,7 +17,7 @@
 *     of an NDF, by using the information stored in a FITS header.
 *     Specifically, the OBJECT keyword's value, if present, becomes the
 *     NDF title.  Similarly the value of the BUNIT keyword is mapped to
-*     the NDF units. 
+*     the NDF units.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)
@@ -72,7 +72,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

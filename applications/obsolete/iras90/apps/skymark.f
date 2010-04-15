@@ -21,9 +21,9 @@
 
 *  Description:
 *     This routine draws markers at a set of specified positions within
-*     the most recently created DATA picture, or alternatively draws a 
-*     polyline through them. The positions can be specified by using a 
-*     graphics cursor, or by reading them from a text file, or by 
+*     the most recently created DATA picture, or alternatively draws a
+*     polyline through them. The positions can be specified by using a
+*     graphics cursor, or by reading them from a text file, or by
 *     supplying them in response to parameter prompts.
 *
 *     There are 5 different markers available for selection: '.', '+',
@@ -35,12 +35,12 @@
 *     temporary markers will then be replaced by the selected marker,
 *     with sizes ranging between the limits specified by parameter
 *     SIZE.
-*     
+*
 *     The sky coordinates of the marked positions can be logged into
 *     a logging file, see parameter LOGFILE, which can be used in
 *     future by other IRAS90 applications as well as this application
 *     itself.
-         
+
 *  Usage:
 *     SKYMARK DEVICE IN
 
@@ -123,19 +123,19 @@
 *        The action to perform once all positions have been marked.
 *        This is only prompted for if parameter LOOP is TRUE (otherwise
 *        a value of EXIT is assumed). It can take the following values;
-*        
+*
 *         CLEAR - Clear the marks drawn in previous loops. This option
 *         is only available when the graphic device in use is the type
 *         of IMAGE-OVERLAY.
-*                 
+*
 *         TYPE - Select a new type of mark.
 *
 *         PEN - Select a new pen to draw the mark.
-*         
+*
 *         POLY - Toggle between polyline/marker mode.
-*         
+*
 *         SIZE - Select a new mark size.
-*         
+*
 *         MODE - Select a new working mode for the application.
 *
 *         MARK - Perform the marking task with newly selected parameters
@@ -196,7 +196,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -208,7 +208,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'AGI_PAR'          ! AGI_ constants
       INCLUDE 'AGI_ERR'          ! AGI_ error constants
-                               
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -227,7 +227,7 @@
       CHARACTER*( 40 ) OPTMOD    ! Option list for mode
       CHARACTER*( 6 )  OPT       ! Option
       CHARACTER*( 80 ) CMNT      ! Comment string in output file
-      CHARACTER*( DAT__SZLOC ) LOC  ! Locator to the NDF 
+      CHARACTER*( DAT__SZLOC ) LOC  ! Locator to the NDF
       CHARACTER*( 1 )  MTYPE     ! Marker to be used.
       CHARACTER*( AGI__CMAX ) PICCOM  ! Comment of the displayed image
       CHARACTER*( AGI__SZLAB ) PICLAB ! Label of the displayed image
@@ -251,8 +251,8 @@
       INTEGER NSIZE              ! Number of the sizes given by user
       INTEGER OUTFID             ! Logging file ID
       INTEGER PEN                ! SGS pen used to draw markers
-      INTEGER PICID1             ! Original AGI picture ID 
-      INTEGER PICID2             ! AGI DATA picture ID 
+      INTEGER PICID1             ! Original AGI picture ID
+      INTEGER PICID2             ! AGI DATA picture ID
       INTEGER TYPE               ! Type of the marks
       INTEGER ZONE1              ! SGS zone ID for initial picture
       INTEGER ZONE2              ! SGS zone ID for DATA picture
@@ -261,7 +261,7 @@
       LOGICAL CLEAR              ! Clear display surface flag
       LOGICAL CURSOR             ! Cursor flag
       LOGICAL EXIT               ! Exit application flag
-      LOGICAL FIRST              ! True if the first point is being 
+      LOGICAL FIRST              ! True if the first point is being
                                  ! processed.
       LOGICAL LOGING             ! Logging flag
       LOGICAL LOOP               ! True if looping is required.
@@ -319,13 +319,13 @@
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_SETC( 'LAB', PICLAB )
          CALL MSG_OUTIF( MSG__NORM, 'SKYMARK_MSG1',
-     :                   '  DATA picture ^LAB ("^COM") being used', 
+     :                   '  DATA picture ^LAB ("^COM") being used',
      :                      STATUS )
       ELSE
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_OUTIF( MSG__NORM, 'SKYMARK_MSG2',
      :                   '  DATA picture "^COM" being used', STATUS )
-      END IF   
+      END IF
 
 *  If the graphics device was not available, exit.
       IF ( STATUS .NE. SAI__OK ) GO TO 980
@@ -340,7 +340,7 @@
          CALL PAR_DEF0L( 'CLEAR', .TRUE., STATUS )
 
 *  If the device is anything else, unclear the picture zone by default.
-      ELSE 
+      ELSE
          CALL PAR_DEF0L( 'CLEAR', .FALSE., STATUS )
       END IF
 
@@ -359,11 +359,11 @@
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 940
-      
+
 *  If reference object exits, report it to the user and import it to
 *  the NDF system.
       IF ( REFOBJ ) CALL NDF_IMPRT( LOC, NDF, STATUS )
-      
+
 *  If reference object does not exit or the reference object is not
 *  a valid NDF, get the NDF file name from the user.
       IF ( .NOT.REFOBJ .OR. STATUS .NE. SAI__OK ) THEN
@@ -375,7 +375,7 @@
          CALL IRM_HMSG( 'OBJNM', LOC )
          CALL MSG_OUTIF( MSG__VERB, 'SKYMARK_MSG3',
      :                 '  NDF associated with image: ^OBJNM',
-     :                 STATUS )      
+     :                 STATUS )
       END IF
 
 *  Initialise the IRA astrometry package, and inpurt astrometry
@@ -387,7 +387,7 @@
 *  in IRA structure as default.
       CALL IRA_SCSEP( IRA, SCS, EPOCH, STATUS )
       CALL IRA_GTSCS( 'COORDS', .TRUE., SCS, STATUS )
-      
+
 *  Get the name of the file to log the output coordinates.
       CALL IRM_ASFIO( 'LOGFILE', 'WRITE', 'LIST', 80, OUTFID, LOGING,
      :                 STATUS )
@@ -410,13 +410,13 @@
 
 *  Get the pen number used to draw markers.
       CALL PAR_GET0I( 'PEN', PEN, STATUS )
-      
+
 *  Get the type of the marker to be drawn.
       CALL PAR_CHOIC( 'TYPE', '+', '.,+,*,o,x', .FALSE., MTYPE, STATUS )
       CALL PAR_CANCL( 'TYPE', STATUS )
       CALL CHR_UCASE( MTYPE )
       MARKTY = MAX( INDEX( '.+*OX', MTYPE ), 1 )
-      
+
 *  Get the max and min size of the marks.
       CALL PAR_GET1R( 'SIZE', 2, MXMNSZ, NSIZE, STATUS )
 
@@ -439,7 +439,7 @@
       ELSE
          OPTLOP = 'TYPE,PEN,POLY,SIZE,MODE,MARK,EXIT'
       END IF
-      
+
 *  Enter a loop to perform the marking until exit is requested.
       OPT = 'MARK'
       DO WHILE ( OPT( : 4 ) .NE. 'EXIT' .AND. STATUS .EQ. SAI__OK )
@@ -472,19 +472,19 @@
                POLY = .NOT. POLY
                IF( POLY ) THEN
                   CALL MSG_OUTIF( MSG__NORM, 'SKYMARK_MSG4',
-     :                            '  Ok. A polyline will be drawn.', 
-     :                            STATUS )         
+     :                            '  Ok. A polyline will be drawn.',
+     :                            STATUS )
                ELSE
                   CALL MSG_OUTIF( MSG__NORM, 'SKYMARK_MSG5',
-     :                            '  Ok. Markers will be drawn.', 
-     :                            STATUS )         
+     :                            '  Ok. Markers will be drawn.',
+     :                            STATUS )
                END IF
 
 *  If the mark size is to be changed, ...
             ELSE IF ( OPT( : 4 ) .EQ. 'SIZE' ) THEN
                CALL PAR_CANCL( 'SIZE', STATUS )
                CALL PAR_GET1R( 'SIZE', 2, MXMNSZ, NSIZE, STATUS )
-      
+
 *  If the working mode is to be changed, ...
             ELSE IF ( OPT( : 4 ) .EQ. 'MODE' ) THEN
                CALL PAR_CANCL( 'MODE', STATUS )
@@ -494,17 +494,17 @@
 *  If clear the previous marks is requested, ...
             ELSE IF ( OPT( : 5 ) .EQ. 'CLEAR' ) THEN
                CALL SGS_CLRZ
-      
+
             END IF
 
 *  Cancel OPTION's value for getting a new value.
-            CALL PAR_CANCL( 'OPTION', STATUS ) 
+            CALL PAR_CANCL( 'OPTION', STATUS )
          END DO
 
 
 *  Go on only If no error happened and no exit was requested.
          IF ( STATUS .EQ. SAI__OK .AND. OPT( : 4 ) .NE. 'EXIT' ) THEN
-         
+
 *  Set the pen number as selected.
             CALL SGS_SPEN( PEN )
 
@@ -513,7 +513,7 @@
             IF ( NSIZE .EQ. 1 ) THEN
                SIZCHG = .FALSE.
                TYPE = MARKTY
-      
+
 *  Otherwise, the size of the marks will change proportionally to the
 *  magnitude of the image. Make sure the max size is greater than the
 *  min. size.
@@ -524,12 +524,12 @@
                   MXMNSZ( 1 ) = MXMNSZ( 2 )
                   MXMNSZ( 2 ) = TEMP
                END IF
-      
+
 *  And a '.', instead of the selected type, will be draw immediately
 *  after a position is specifed.
-               TYPE = 1      
+               TYPE = 1
             END IF
-      
+
 *  If cursor mode is selected, enable the cursor and write message to
 *  the user.
             IF ( MODE( : 6 ) .EQ. 'CURSOR' ) THEN
@@ -563,7 +563,7 @@
 
 *  And draw the mark.
                   CALL SMARA0( 1, X( NPNT ), Y( NPNT ), TYPE, MKSIZ,
-     :                         X1, X2, Y1, Y2, POLY, .FALSE., FIRST, 
+     :                         X1, X2, Y1, Y2, POLY, .FALSE., FIRST,
      :                         STATUS )
 
 *  Get another cursor position.
@@ -575,7 +575,7 @@
                IF ( NPNT .GT. 0 .AND. LOGING )
      :            CALL IRA_TRANS( NPNT, X, Y, .TRUE., SCS, IRA,
      :                            LON, LAT, STATUS )
-      
+
 *  If keyboard mode is selected, enter a loop to get sky positions from
 *  the keyboard until a null response is obtained.
             ELSE IF ( MODE( : 8 ) .EQ. 'KEYBOARD' ) THEN
@@ -599,27 +599,27 @@
                      CALL IRA_TRANS( 1, LON( NPNT ), LAT( NPNT ),
      :                              .FALSE., SCS, IRA, X( NPNT ),
      :                               Y( NPNT ), STATUS )
-      
+
 *  And draw the mark.
                      MKSIZ( NPNT ) = MXMNSZ( 1 )
                      CALL SMARA0( 1, X( NPNT ), Y( NPNT ), TYPE,
-     :                            MKSIZ( NPNT ), X1, X2, Y1, Y2, 
+     :                            MKSIZ( NPNT ), X1, X2, Y1, Y2,
      :                            POLY, .FALSE., FIRST, STATUS )
 
 *  For any other case, exit the application.
                   ELSE
-                     GO TO 940  
+                     GO TO 940
                   END IF
 
 *  Cancel the values of the parameters to get new values.
                   CALL PAR_CANCL( 'LON', STATUS )
                   CALL PAR_CANCL( 'LAT', STATUS )
                END DO
-      
+
 *  If file mode is selected, get a input file from the user and find the
 *  sky and image coordinates.
             ELSE IF ( MODE( : 4 ) .EQ. 'FILE' ) THEN
-               CALL SMARA1( 'FILE', 'EPOCH', SCS, IRA, MAXPNT, X, Y, 
+               CALL SMARA1( 'FILE', 'EPOCH', SCS, IRA, MAXPNT, X, Y,
      :                      LON, LAT, NPNT, STATUS )
 
 *  If error happens, exit.
@@ -632,32 +632,32 @@
                   END DO
 
                   FIRST = .TRUE.
-                  CALL SMARA0( NPNT, X, Y, TYPE, MKSIZ, X1, X2, Y1, Y2, 
+                  CALL SMARA0( NPNT, X, Y, TYPE, MKSIZ, X1, X2, Y1, Y2,
      :                         POLY, .FALSE., FIRST, STATUS )
                END IF
 
 *  Cancel the value of the parameter for next use.
-               CALL PAR_CANCL( 'FILE', STATUS )      
+               CALL PAR_CANCL( 'FILE', STATUS )
             END IF
 
 *  If some position has been specified and the size of the marks on
-*  these position should change, calculate the size of the marks. 
+*  these position should change, calculate the size of the marks.
             IF ( NPNT .GT. 0 .AND. SIZCHG ) THEN
                CALL SMARA2( NPNT, X, Y, MXMNSZ, NDF, MKSIZ, STATUS )
 
 *  Overlay the selected mark type with proper size on the '.'s
 *  previous drawn.
                FIRST = .TRUE.
-               CALL SMARA0( NPNT, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2, 
+               CALL SMARA0( NPNT, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2,
      :                      POLY, .FALSE., FIRST, STATUS )
             END IF
-     
+
 *  If logging file was opened, write the sky coordinates of the marked
 *  position to the file and then close the file, cancel parameter and
 *  de-active FIO
             IF ( NPNT .GT. 0 .AND. LOGING ) THEN
                CALL SMARA3( NPNT, X, Y, LON, LAT, SCS, OUTFID, STATUS )
-            END IF  
+            END IF
 
 *  Delete the value of variable OPT and go be to get another value for
 *  it.
@@ -670,7 +670,7 @@
          END IF
 
 *  Complete any outstanding polyline.
-         CALL SMARA0( 1, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2, POLY, 
+         CALL SMARA0( 1, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2, POLY,
      :                .TRUE., FIRST, STATUS )
 
       END DO
@@ -683,7 +683,7 @@
 *   End the NDF context and release the locator to the ref. object.
       CALL NDF_END( STATUS )
       IF ( REFOBJ ) CALL REF_ANNUL( LOC, STATUS )
-      
+
  980  CONTINUE
 
 *  Set the current picture on entry as current and close down the AGI
@@ -704,5 +704,5 @@
      :         'SKYMARK: Error drawing markers at specified positions.',
      :                 STATUS )
       END IF
-      
+
       END

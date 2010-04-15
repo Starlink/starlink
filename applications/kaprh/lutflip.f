@@ -68,7 +68,7 @@
 
 *  Related Applications:
 *     KAPPA: CRELUT, LUTHILITE, LUTROT, LUTTWEAK.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       PARAMETER ( MXLUTE = 1024 )! Maximum number of LUT pens
       INTEGER NMEMAX             ! Maximum number of memories
       PARAMETER ( NMEMAX = 10 )
-     
+
 *  Local Variables:
 
       INTEGER
@@ -274,7 +274,7 @@
 *    Read the current LUT, only storing what is possible.
 *    ====================================================
 
-*    The buffer is generous as most devices have 256 levels. 
+*    The buffer is generous as most devices have 256 levels.
 *    Colour-table entries start at 0 if there were no reserved pens,
 *    therefore there is no plus-one term.
 
@@ -300,7 +300,7 @@
 *    start of the colour-table read from the device.
 
       DO  J = 1, NLUTE / 2
-         JF = NLUTE - J + 1 
+         JF = NLUTE - J + 1
          DO  I = 1, 3
             DUMMY( I ) = VLUT( I, J )
             VLUT( I, J ) = VLUT( I, JF )
@@ -325,14 +325,14 @@
 
 *    Closedown sequence.
 *    ===================
-      
+
 *    Errors, either obtaining the device or because the device does not
 *    support the required capabilities, fall to this point.
 
  999  CONTINUE
 
       IF ( DEVCAN ) THEN
-      
+
 *       Close down IDI using the parameter system.
 
          CALL IDI_CANCL( 'DEVICE', STATUS )

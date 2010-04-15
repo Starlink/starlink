@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_LINMP( MAP, FRM, DLBND, DUBND, LINEAR, WCSDAT, 
+      SUBROUTINE ARD1_LINMP( MAP, FRM, DLBND, DUBND, LINEAR, WCSDAT,
      :                       STATUS )
 *+
 *  Name:
@@ -16,15 +16,15 @@
 *  Description:
 *     This routine checks to see if the supplied Mapping is linear,
 *     except for an optional shift of origin.
-*   
-*     Unit vectors along each of the axes in the Mapping's input coordinate 
-*     system are transformed using the Mapping. If the Mapping is linear, 
-*     these transformed vectors form the columns of the required matrix. To 
-*     test for linearity, several test points are transformed using the 
-*     supplied Mapping, and then also transformed using the candidate 
-*     matrix formed by the above process. If the two resulting positions are 
-*     more or less equal to each other, then the Mapping is considered to 
-*     be linear. 
+*
+*     Unit vectors along each of the axes in the Mapping's input coordinate
+*     system are transformed using the Mapping. If the Mapping is linear,
+*     these transformed vectors form the columns of the required matrix. To
+*     test for linearity, several test points are transformed using the
+*     supplied Mapping, and then also transformed using the candidate
+*     matrix formed by the above process. If the two resulting positions are
+*     more or less equal to each other, then the Mapping is considered to
+*     be linear.
 *
 *     To account for a possible shift of origin, the origin of the Mappings
 *     input Frame is transformed using the supplied Mapping, and this
@@ -42,11 +42,11 @@
 *     LINEAR = LOGICAL (Returned)
 *        Returned .TRUE. if the Mapping is linear and .FALSE. otherwise.
 *     WCSDAT( * ) = DOUBLE PRECISION (Returned)
-*        If the Mapping is linear, then WCSDAT is returned holding the 
-*        coefficients of the linear mapping from pixel to user coords. 
-*        Otherwise, wcsdat(1) holds a lower limit on the distance (within 
-*        the user coords) per pixel, and the other elements in WCSDAT are 
-*        not used. The supplied array should have at least NDIM*(NDIM+1) 
+*        If the Mapping is linear, then WCSDAT is returned holding the
+*        coefficients of the linear mapping from pixel to user coords.
+*        Otherwise, wcsdat(1) holds a lower limit on the distance (within
+*        the user coords) per pixel, and the other elements in WCSDAT are
+*        not used. The supplied array should have at least NDIM*(NDIM+1)
 *        elements.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -155,7 +155,7 @@
 *  The Mapping is not considered to be linear if the number of inputs and
 *  outputs differ.
       IF( NIN .NE. NOUT ) GO TO 999
-      
+
 *  We only need to do the check if CMN_LINOK is supplied .TRUE.
       IF( CMN_LINOK ) THEN
 
@@ -168,7 +168,7 @@
          END DO
 
 *  Also store the test points to be used, in pairs; the first in each pair
-*  is a test point, the second is the same point but incremented by a small 
+*  is a test point, the second is the same point but incremented by a small
 *  amount on each axis. The first NIN test points are at the upper bound of
 *  each of the NIN axes. The next test point is the lower bounds on all
 *  axes. The next is the upper bounds on all axes. The next is the centre
@@ -179,23 +179,23 @@
             END DO
             IN( NIN + 2*ITEST, ITEST ) = DUBND( ITEST )
          END DO
-   
+
          DO I = 1, NIN
             IN( 3*NIN + 2, I ) = DLBND( I )
             IN( 3*NIN + 4, I ) = DUBND( I )
-            IN( 3*NIN + 6, I ) = 0.5*( DLBND( I ) + DUBND( I ) ) 
+            IN( 3*NIN + 6, I ) = 0.5*( DLBND( I ) + DUBND( I ) )
          END DO
-   
+
          DO ITEST = 1, NIN + 3
             DO I = 1, NIN
                IN( NIN + 2*ITEST + 1, I ) = IN( NIN + 2*ITEST, I ) + EPS
             END DO
          END DO
 
-*  Transform these vectors using the supplied Mapping. If the Mapping is 
+*  Transform these vectors using the supplied Mapping. If the Mapping is
 *  linear, the transformed data will define the required matrix, with three
 *  extra columns holding the transformed extra points.
-         CALL AST_TRANN( MAP, 3*NIN + 7, NIN, 3*ARD__MXDIM + 7, IN, 
+         CALL AST_TRANN( MAP, 3*NIN + 7, NIN, 3*ARD__MXDIM + 7, IN,
      :                   .TRUE., NOUT, 3*ARD__MXDIM + 7, OUT, STATUS )
 
 *  Normalize the positions.
@@ -209,43 +209,43 @@
             END DO
          END DO
 
-*  Find the minimum distance per pixel at any of the test points. If any 
-*  bad transformed points are encountered, the Mapping cannot be linear so 
+*  Find the minimum distance per pixel at any of the test points. If any
+*  bad transformed points are encountered, the Mapping cannot be linear so
 *  abort.
          DPP = AST__BAD
          DO ITEST = 1, NIN + 3
-   
+
             DO I = 1, NOUT
-               A( I ) = OUT( NIN + 2*ITEST, I ) 
-               B( I ) = OUT( NIN + 2*ITEST + 1, I ) 
+               A( I ) = OUT( NIN + 2*ITEST, I )
+               B( I ) = OUT( NIN + 2*ITEST + 1, I )
             END DO
-   
+
             DIST = AST_DISTANCE( FRM, A, B, STATUS )
             IF( DIST .EQ. AST__BAD ) GO TO 999
-   
-            IF( ITEST .EQ. 1 ) THEN 
+
+            IF( ITEST .EQ. 1 ) THEN
                DPP = DIST / ( EPS*SQRT( DBLE( NIN ) ) )
             ELSE
                DPP = MIN( DPP, DIST / ( EPS*SQRT( DBLE( NIN ) ) ) )
             END IF
-   
+
          END DO
 
-*  Subtract the transformed origin (the first extra position) from each of 
+*  Subtract the transformed origin (the first extra position) from each of
 *  the first NIN positions.
          DO I = 1, NOUT
             ORIG( I ) = OUT( NIN + 1, I )
-            DO J = 1, NIN 
+            DO J = 1, NIN
                OUT( J, I ) = OUT( J, I ) - ORIG( I )
             END DO
          END DO
 
-*  We now test the Mapping for linearity. The linearity test must be passed 
+*  We now test the Mapping for linearity. The linearity test must be passed
 *  at all test points. Assume success to begin with.
          LINEAR = .TRUE.
          DO ITEST = 1, NIN + 3
 
-*  The current test point is mapped using the candidate matrix. 
+*  The current test point is mapped using the candidate matrix.
             DO I = 1, NOUT
                A( I ) = ORIG( I )
                DO J = 1, NIN
@@ -253,7 +253,7 @@
                END DO
                B( I ) = A( I )
             END DO
-   
+
             CALL AST_NORM( FRM, A, STATUS )
             DO I = 1, NOUT
                IF( A( I ) .NE. B( I ) ) THEN
@@ -261,28 +261,28 @@
                   GO TO 999
                END IF
                B( I ) = OUT( NIN + 2*ITEST, I )
-            END DO         
+            END DO
 
 *  If the arc distance between the point found above, and the same
-*  point found using the Mapping directly, is greater than the maximum error 
-*  allowed, the Mapping is considered not to be linear. 
+*  point found using the Mapping directly, is greater than the maximum error
+*  allowed, the Mapping is considered not to be linear.
             IF( AST_DISTANCE( FRM, A, B, STATUS ) .GT. DPP*MAXERR ) THEN
                LINEAR = .FALSE.
                GO TO 999
             END IF
-   
+
          END DO
 
 *  If the linear mappings are not allowed, we do not yet have an estimate
 *  of the distance per pixel.
-      ELSE 
+      ELSE
          DPP = AST__BAD
       END IF
 
 *  Arrive here if an error occurs, or the Mapping is non-linear.
  999  CONTINUE
 
-*  If the mapping is linear, copy it to the returned array, row by row. 
+*  If the mapping is linear, copy it to the returned array, row by row.
       IF( LINEAR ) THEN
          K = 1
          DO I = 1, NOUT
@@ -292,22 +292,22 @@
                WCSDAT( K ) = OUT( J, I )
                K = K + 1
             END DO
-         END DO            
+         END DO
 
-*  If the Mapping is not linear, we need to return an estimate of the distance 
+*  If the Mapping is not linear, we need to return an estimate of the distance
 *  (within the user coords) per pixel.
       ELSE
 
-*  If we have not yet been able to estimate the maximum acceptable squared 
+*  If we have not yet been able to estimate the maximum acceptable squared
 *  error, we need to test some more points.
          NTEST = 0
-         DO WHILE( DPP .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( DPP .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK )
 
 *  Choose a test point at random. Abort if more than 100 test points fail.
             IF( NTEST .GT. 100 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__NOTST
                CALL ERR_REP( 'ARD1_LINMP_ERR1', 'Cannot find any '//
-     :                       'pixels with good user coordinates.', 
+     :                       'pixels with good user coordinates.',
      :                       STATUS )
             ELSE
                NTEST = NTEST + 1
@@ -325,8 +325,8 @@
 *  Find the distance per pixel between the transformed test point and its
 *  neighbour.
             DO I = 1, NOUT
-               A( I ) = OUT( 1, I ) 
-               B( I ) = OUT( 2, I ) 
+               A( I ) = OUT( 1, I )
+               B( I ) = OUT( 2, I )
             END DO
             DPP = AST_DISTANCE( FRM, A, B, STATUS )
 

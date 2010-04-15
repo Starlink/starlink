@@ -77,7 +77,7 @@
          call pgdraw(x1+del,y1+del*0.5)
          call pgsls(1)
       endif
-         
+
 
 * Draw arrow(s)
 

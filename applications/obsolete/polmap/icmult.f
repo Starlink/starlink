@@ -2,26 +2,26 @@
      &                  STOKES_QV,STOKES_U,STOKES_UV,SYMB,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    I C M U L T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<),PARAMS (<), NPTS (<), STOKES_I (><), STOKES_Q (><),
 C STOKES_QV (><), STOKES_U (><), STOKES_UV (><), SYMB (<), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
 C
-C  
 C
-C Multiplies the I, Q and U arrays by a constant. 
+C
+C
+C Multiplies the I, Q and U arrays by a constant.
 C
 C
 C-
@@ -36,7 +36,7 @@ C
       REAL STOKES_QV(*)
       REAL STOKES_U(*)
       REAL STOKES_UV(*)
-      REAL FAC 
+      REAL FAC
       CHARACTER*1 SYMB
       LOGICAL OK
 C
@@ -67,4 +67,4 @@ C
 C
  666  CONTINUE
       END
-       
+

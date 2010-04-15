@@ -17,7 +17,7 @@
 #     run POLMAP from the current directory.
 #
 #  Notes:
-#     The installation target is set outside of this script. 
+#     The installation target is set outside of this script.
 #
 #  Authors:
 #     BLY: M.J.Bly (Starlink, RAL)
@@ -35,7 +35,7 @@
 
 if !($?POLMAP_DIR) then
    echo ""
-   echo "   Environment Variable POLMAP_DIR is not set.  Setting" 
+   echo "   Environment Variable POLMAP_DIR is not set.  Setting"
    echo "   POLMAP_DIR to be INSTALL_BIN"
    echo ""
    setenv POLMAP_DIR INSTALL_BIN
@@ -52,7 +52,7 @@ alias polmap '$POLMAP_DIR/polmap'
 
 echo
 echo "   POLMAP is now available -- (Version PKG_VERS)"
-echo 
+echo
 echo "   type polmap to start POLMAP"
 
 #

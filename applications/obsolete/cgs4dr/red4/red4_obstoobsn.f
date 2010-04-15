@@ -90,7 +90,7 @@
 *       If the file counter is exceeded report an error (should never happen!)
           IF ( FILE_COUNTER .GT. MAX_FILE_CNT ) THEN
             OBS1_FILE = ' '
-            CALL MSG_OUT( ' ', 
+            CALL MSG_OUT( ' ',
      :        'There are no observations available', STATUS )
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_OBSTOOBSN: '/
@@ -120,7 +120,7 @@
 
       IF ( FILE_COUNTER .NE. 1 ) THEN
         CALL MSG_SETC( 'OBS1_FILE', OBS1_FILE )
-        CALL MSG_OUT( ' ', 
+        CALL MSG_OUT( ' ',
      :    'Using ^OBS1_FILE as a time reference', STATUS )
       END IF
 

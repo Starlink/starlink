@@ -35,11 +35,11 @@ C                           is held at all.
 C     (!) STATUS            (Integer,ref) Status code. If bad status is
 C                           passed, this routine returns immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common parameters internal to the DSA routines.
 C
 C  External subroutines / functions used:
-C     DSA_SEEK_ERRORS 
+C     DSA_SEEK_ERRORS
 C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system, and the
@@ -99,7 +99,7 @@ C
 C     First, see if there is any error inforamtion of any sort.  Either of
 C     DSA_SEEK_ERRORS or DSA_SEEK_VARIANCE will tell us that, but they
 C     try to hide the actual type from us.
-C    
+C
       CALL DSA_SEEK_ERRORS(REF_NAME,EXIST,STATUS)
       IF (EXIST) THEN
 C

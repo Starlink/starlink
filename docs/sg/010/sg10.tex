@@ -19,12 +19,12 @@
 \newcommand{\stardoctitle}     {Preparing to Observe}
 \newcommand{\stardocversion}   {Software and WWW-Based Resources}
 \newcommand{\stardocmanual}    { }
-\newcommand{\stardocabstract}  {This document identifies a number of software 
+\newcommand{\stardocabstract}  {This document identifies a number of software
 applications and packages that will prove useful to observers writing an
 observing application or preparing for an observing run.
-A brief description of the software is given. 
+A brief description of the software is given.
 
-WWW URLs are provided for WWW-based resources such a databases, catalogues and on-line atlases. 
+WWW URLs are provided for WWW-based resources such a databases, catalogues and on-line atlases.
 }
 
 % ? End of document identification
@@ -58,7 +58,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -131,7 +131,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -236,7 +236,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \newcommand{\HTTPWref}{\htmladdnormallink{\tt http://fits.cv.nrao.edu/www/astronomy.html}{http://fits.cv.nrao.edu/www/astronomy.html}}
 \newcommand{\HTTPXref}{\htmladdnormallink{\tt http://www.stsci.edu/astroweb/net-www.html}{http://www.stsci.edu/astroweb/net-www.html}}
 \newcommand{\HTTPYref}{\htmladdnormallink{\tt http://fits.cv.nrao.edu/www/yp\_{}software.html}{http://fits.cv.nrao.edu/www/yp\_{}software.html}}
-\newcommand{\HTTPZref}{\htmladdnormallink{\tt http://doright.stsci.edu/asds/}{http://doright.stsci.edu/asds/}}  
+\newcommand{\HTTPZref}{\htmladdnormallink{\tt http://doright.stsci.edu/asds/}{http://doright.stsci.edu/asds/}}
 \newcommand{\HTTPAAref}{\htmladdnormallink{\tt http://src.doc.ic.ac.uk:80/public/}{http://src.doc.ic.ac.uk:80/public/}}
 \newcommand{\HTTPABref}{\htmladdnormallink{\tt http://micros.hensa.ac.uk/}{http://micros.hensa.ac.uk/}}
 \newcommand{\HTTPACref}{\htmladdnormallink{\tt http://www.hensa.ac.uk/hensa.unix.html}{http://www.hensa.ac.uk/hensa.unix.html}}
@@ -247,8 +247,8 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \newcommand{\HTTPBCref}{\htmladdnormallink{\tt http://www.ast.cam.ac.uk:80/AAO/2df/2df.html}{http://http://www.ast.cam.ac.uk:80/AAO/2df/2df.html}}
 \newcommand{\HTTPBDref}{\htmladdnormallink{\tt http://www.roe.ac.uk/acdwww/cursa/home.html}{http://www.roe.ac.uk/acdwww/cursa/home.html}}
 \newcommand{\HTTPBEref}{\htmladdnormallink{\tt http://www.roe.ac.uk/acdwww/findchart/chart.html}{http://www.roe.ac.uk/acdwww/findchart/chart.html}}
-\newcommand{\HTTPBFref}{\htmladdnormallink{\tt http://www.eso.org/online-resources.html}{http://www.eso.org/online-resources.html}} 
-\newcommand{\HTTPBGref}{\htmladdnormallink{\tt http://ecf.hq.eso.org/astro-resources.html}{http://http://ecf.hq.eso.org/astro-resources.html}} 
+\newcommand{\HTTPBFref}{\htmladdnormallink{\tt http://www.eso.org/online-resources.html}{http://www.eso.org/online-resources.html}}
+\newcommand{\HTTPBGref}{\htmladdnormallink{\tt http://ecf.hq.eso.org/astro-resources.html}{http://http://ecf.hq.eso.org/astro-resources.html}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -328,12 +328,12 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -367,24 +367,24 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \renewcommand{\thepage}{\arabic{page}}
 
 \setcounter{page}{1}
- 
+
 \section{Introduction} \xlabel{INTRODUCTION}
 \label{sec:introduction}
 
 One of the big problems with astronomy is that there are just not enough
 telescopes go round. Most significant observatories and satellites are in use
 virtually continuously, which means that competition
-for observing time is very intense. 
+for observing time is very intense.
 
 Aware of the precious nature of telescope time, many observers (and would be
 observers) spend a lot of their time writing proposals requesting time, and
 planning observations in an attempt to squeeze the maximum possible
 information (and hence papers) out of a few brief nights atop some far flung
-mountain or a few precious orbits of satellite time. In addition, if  
-time is awarded the ground-based applicant must then embark on the equally 
+mountain or a few precious orbits of satellite time. In addition, if
+time is awarded the ground-based applicant must then embark on the equally
 intense effort required to obtain information (such as finder charts) that will
 ensure that the run is success. Consequently, an enormous amount of work
-must be undertaken to get to the stage where you have your 
+must be undertaken to get to the stage where you have your
 images/spectra/periodogram on a DAT or Exabyte tape. This time can be spent in a number of
 ways which will include some of the following:
 
@@ -393,20 +393,20 @@ While writing your application:
 \begin{itemize}
 \item Identifying potential target objects. See \S{\ref{sec:cataloguem}} and \S{\ref{sec:catalogue}}.
 
-\item Obtaining detailed up-to-date information on these objects. \S{\ref{sec:ads}} 
+\item Obtaining detailed up-to-date information on these objects. \S{\ref{sec:ads}}
 
 \item Identifying the time of year at which the targets are accessible
       from a given site. See \S{\ref{sec:airmass}}.
 
-\item Calculating the phase of the moon during the usable parts of the year. See 
+\item Calculating the phase of the moon during the usable parts of the year. See
       \S{\ref{sec:airmass}}.
 
-\item Determining if a specific observatory/satellite and its 
+\item Determining if a specific observatory/satellite and its
       equipment is suitable for your purpose. See \S{\ref{sec:observatories}}.
 
 \item Determining the exposures required to obtain
       a suitable signal/noise ratio for the proposed observation. See \S{\ref{sec:sn}}.
-	
+
 \end{itemize}
 
 Then later when preparing for your observing run:
@@ -422,16 +422,16 @@ Then later when preparing for your observing run:
 
 For the PhD student or the inexperienced potential observer this amount of
 work can be pretty daunting, requiring a steep learning curve between the
-moment you had your bright idea for some observations and acquiring 
+moment you had your bright idea for some observations and acquiring
 the desired observations.
 
-The aim of this document is to try to make life a little easier by 
-providing pointers to existing resources that are generally available 
-to users based at {\STARLINKref} nodes. It is anticipated that other 
-observers will also find some of the information useful. 
+The aim of this document is to try to make life a little easier by
+providing pointers to existing resources that are generally available
+to users based at {\STARLINKref} nodes. It is anticipated that other
+observers will also find some of the information useful.
 
 \section{Resources} \xlabel{RESOURCES}
-\label{sec:resources} 
+\label{sec:resources}
 
 Having mentioned one of the bad things about astronomy, it's good to know that
 there are nice things as well. One important thing to remember is that there
@@ -439,12 +439,12 @@ are an enormous number of resources available to the prospective observer and
 that the number is increasing rapidly. When you hear older observers saying
 ``In my day we used to have to write the reduction software ourselves and wind
 up the VAX every morning" they may not be exaggerating as much as you think.
-For example, the RGASP package, and a number of others, was a direct result of 
+For example, the RGASP package, and a number of others, was a direct result of
 someone's PhD research programme.
 
 The striking thing about this growth of resources is that they now appear in
 many forms, including: software, books, web pages, and information provided by
-the observatories. 
+the observatories.
 
 It should not be forgotten that much useful information can be gained by
 simply asking your colleagues what they use. This process will not always
@@ -453,41 +453,41 @@ least provide some sort of starting point from which you can look around for
 others. A useful adage to get started with is ``If it works and you like it --
 use it" but remember to keep your eyes open for better alternatives. It is
 very easy to stay with a piece of software you are familiar with even when it
-has long since been superseded by more modern, easier-to-use equivalents. 
+has long since been superseded by more modern, easier-to-use equivalents.
 
-The sections that follow will identify examples from some of the 
-resource types mentioned above. 
+The sections that follow will identify examples from some of the
+resource types mentioned above.
 
 
 \subsection{The STARLINK Software Collection} \xlabel{STARLINK}
 \label{sec:starlink}
- 
-One of the core activities of {\STARLINKref} is identifying 
-good software and making it available to the UK astronomical 
+
+One of the core activities of {\STARLINKref} is identifying
+good software and making it available to the UK astronomical
 community. The most visible manifestation of this
-effort is the Starlink Software Collection ({\SSCref}) which is managed, 
-distributed and supported by the Starlink Project. A large amount of the 
-software was written by members of the Project, but some of it comes from 
-outside sources. Briefly put, it exists to provide the UK astronomy 
-community with the tools they need to get the job done. 
+effort is the Starlink Software Collection ({\SSCref}) which is managed,
+distributed and supported by the Starlink Project. A large amount of the
+software was written by members of the Project, but some of it comes from
+outside sources. Briefly put, it exists to provide the UK astronomy
+community with the tools they need to get the job done.
 
 By providing the software within a stable computing environment,
-Starlink saves its users from the need to 
+Starlink saves its users from the need to
 acquire an in-depth knowledge of source code, compilers or linking. They
 just sit down at a terminal and everything is virtually ready to go.
 
 Clearly, at Starlink nodes the most important resource is the SSC
-and you will find that most nodes have a large proportion of it installed. 
+and you will find that most nodes have a large proportion of it installed.
 However, if you find an item that you need is missing from your system,
-just ask the system manager to add it. 
+just ask the system manager to add it.
 
-The SSC is extensive, providing packages for a wide variety of purposes 
+The SSC is extensive, providing packages for a wide variety of purposes
 including:
 
 \begin{htmlonly}
 \begin{itemize}
-\item Image processing - {\KAPPAref}, {\ESPref}, {\DAOPHOTref}, {\PHOTOMref}, {\PISAref} and {\CCDPACKref}.) 
-\item Spectroscopy - {\DIPSOref}, {\ECHOMOPref}, {\FIGAROref} and 
+\item Image processing - {\KAPPAref}, {\ESPref}, {\DAOPHOTref}, {\PHOTOMref}, {\PISAref} and {\CCDPACKref}.)
+\item Spectroscopy - {\DIPSOref}, {\ECHOMOPref}, {\FIGAROref} and
       {\SPECDREref}.
 \item Time series analysis - {\PERIODref}
 \item Polarimetry - {\POLMAPref} and {\TSPref}.
@@ -495,14 +495,14 @@ including:
 \item Millimetre wave band - {\SPECXref}.
 \item Specific instruments - {\IRASref}, {\JCMTDRref}, {\IUEDRref} and {\CGSDRref}.
 \item Image format conversion - {\CONVERTref}.
-\item Graphics - MONGO, SM, {\PONGOref}). 
+\item Graphics - MONGO, SM, {\PONGOref}).
 \item Catalogue manipulation - {\CATPACref} and {\CURSAref}.
 \end{itemize}
 \end{htmlonly}
 \begin{latexonly}
 \begin{itemize}
-\item Image processing -- KAPPA (SUN/95), ESP (SUN/180), DAOPHOT (SUN/42), 
-      PHOTOM (SUN/45), PISA (SUN/109) and CCDPACK (SUN/139). 
+\item Image processing -- KAPPA (SUN/95), ESP (SUN/180), DAOPHOT (SUN/42),
+      PHOTOM (SUN/45), PISA (SUN/109) and CCDPACK (SUN/139).
 \item Spectroscopy -- DIPSO (SUN/50), ECHOMOP (SUN/152), FIGARO (SUN/86) and SPECDRE (SUN/140).
 \item Time series analysis -- PERIOD (SUN/169).
 \item Polarimetry -- POLMAP (SUN/204) and TSP (SUN/66).
@@ -510,7 +510,7 @@ including:
 \item Millimetre wave band -- SPECX (SUN/17).
 \item Specific instruments -- IRAS90 (SUN/161), JCMTDR (SUN/132), IUEDR (SUN/37) and CGS4DR (SUN/27).
 \item Image format conversion -- CONVERT (SUN/55).
-\item Graphics -- MONGO (MUD/54), SM, PONGO (SUN/137). 
+\item Graphics -- MONGO (MUD/54), SM, PONGO (SUN/137).
 \item Catalogue manipulation -- CURSA (SUN/190) and CATPAC (SUN/120).
 \end{itemize}
 \end{latexonly}
@@ -521,13 +521,13 @@ including:
 {\STARLINKref} software is documented in over 200 Starlink User Notes, hypertext
 documents and the {\STARLINKWWWref} pages. Assistance is available
 via email to {\tt ussc@star.rl.ac.uk}.
-A comprehensive description of the Starlink Software 
-Collection is available in Starlink document {\SUNONEref}. It can be 
-browsed on Starlink supported systems by typing ``{\tt showme sun1}" or via the 
+A comprehensive description of the Starlink Software
+Collection is available in Starlink document {\SUNONEref}. It can be
+browsed on Starlink supported systems by typing ``{\tt showme sun1}" or via the
 Starlink WWW pages at URL {\HTTPAref}
 
-Getting information about a package is easy. If you want to find out the 
-name of Starlink documents relating to a piece of software (say 
+Getting information about a package is easy. If you want to find out the
+name of Starlink documents relating to a piece of software (say
 {\PISAref}) you need only type the following:
 
 \begin{quote}
@@ -536,13 +536,13 @@ name of Starlink documents relating to a piece of software (say
 \end{verbatim}
 \end{quote}
 
-(where \% denotes the UNIX prompt) and the name of the document 
+(where \% denotes the UNIX prompt) and the name of the document
 will be displayed thus:
 
 \begin{quote}
 \begin{verbatim}
    Searching for the keyword pisa in the titles of documents ...
- 
+
    SUN                    STARLINK USER NOTES                       SUN
    109.07  PISA - Position, intensity and shape analysis
 \end{verbatim}
@@ -566,18 +566,18 @@ and all the other Starlink documents in directory ``{\tt /star/docs}".
 \label{sec:iraf}
 
 As most of you are aware, the {\SSCref} (see \S{\ref{sec:ssc}}) is not a unique attempt to provide
-a complete set of astronomical utilities and some {\STARLINKref} sites also have the 
-{\NOAOref} (National Optical Astronomical Observatories) supported {\IRAFref} 
+a complete set of astronomical utilities and some {\STARLINKref} sites also have the
+{\NOAOref} (National Optical Astronomical Observatories) supported {\IRAFref}
 (Image Reduction and Analysis Facility) system installed alongside the home-grown SSC
 items. IRAF is available as an item in the SSC but is written and updated
 by NOAO. This is not true of the Starlink {\FIGAROref} which is directly maintained
-by the Project. 
+by the Project.
 
 The presence of both systems allows users to ``pick-and-mix" their
-software usage (Starlink provides the image format conversion utilities 
-{\CONVERTref} to convert between the data formats used by the systems) 
+software usage (Starlink provides the image format conversion utilities
+{\CONVERTref} to convert between the data formats used by the systems)
 thereby obtaining the best of both worlds. In the context
-of preparing to observe you will probably find the IRAF ASTUTIL (see \S{\ref{sec:astutil}}) 
+of preparing to observe you will probably find the IRAF ASTUTIL (see \S{\ref{sec:astutil}})
 and XEPHEM (see \S{\ref{sec:xephem}}) packages of most use.
 
 Other systems ({\AIPSref}, {\MIDASref}, {\XANADUref}) may be available
@@ -587,34 +587,34 @@ will be able to advise you on what is available at your site.
 
 \section{Software Packages and Utilities} \xlabel{PACKAGES}
 \label{sec:packages}
- 
+
 A list of software packages commonly used while writing proposals is given
-below under subject headings and then by program name. It is far from 
-exhaustive, but it does provide a basis from which to construct your own 
-set of favourite tools. 
+below under subject headings and then by program name. It is far from
+exhaustive, but it does provide a basis from which to construct your own
+set of favourite tools.
 
 \subsection{Air mass/altitude/hour angle/visibility} \xlabel{AIRMASS}
 \label{sec:airmass}
 
-Once you have determined what it is that you intend to observe, the 
-next consideration is its visibility. If you are trying to observe 
+Once you have determined what it is that you intend to observe, the
+next consideration is its visibility. If you are trying to observe
 a source near the galactic centre in Sagittarius from La Palma, there is
 little point in
-applying for ground-based visible light telescope time in December, since 
-it will only be above the horizon during the day time. Similar 
-considerations apply to satellites, with applications attempting to image 
+applying for ground-based visible light telescope time in December, since
+it will only be above the horizon during the day time. Similar
+considerations apply to satellites, with applications attempting to image
 within 50 or so degrees of the sun being dismissed. Consequently,
 there is a plethora of programs that tell you how high an object is
-(normally objects are only observed when less than 60 degrees from the 
+(normally objects are only observed when less than 60 degrees from the
 zenith) or when the object culminates.
 
-Perhaps the easiest of these programs to use is {\OBSERVEref} 
+Perhaps the easiest of these programs to use is {\OBSERVEref}
 (see \S{\ref{sec:observe}}) which generates graphs and/or tables showing object
-rise/set times. An example of the text and graphical output is shown in 
-the section describing OBSERVE. It is trivial to use and 
+rise/set times. An example of the text and graphical output is shown in
+the section describing OBSERVE. It is trivial to use and
 can generate data for most the world's major observatories.
 
-Those of you more familiar with IRAF may find you prefer to employ the 
+Those of you more familiar with IRAF may find you prefer to employ the
 tools provided by the IRAF ASTUTIL utilities (see \S{\ref{sec:astutil}}).
 
 If these do not provide exactly what you require, try SKYCAL (see \S{\ref{sec:skycal}}). While the
@@ -623,24 +623,24 @@ interface is rather clumsy, it does provide a lot of information.
 \subsection{Bright/grey/dark time} \xlabel{BRIGHT}
 \label{sec:bright}
 
-As observers of very faint objects quickly come to realise, 
+As observers of very faint objects quickly come to realise,
 the Moon is a real nuisance. If a bright Moon is present in the sky,
 even at remote clean air sites, it scatters light across the whole sky
 adding substantially to the sky background count and making really
 faint objects increasingly difficult to observe. Because of this,
 observations are broken up into targets requiring really dark skies,
-those only needing fairly dark skies, and those where the 
-sky background is not important at all. 
+those only needing fairly dark skies, and those where the
+sky background is not important at all.
 
-Those of you wanting to know about the Moon will find that the information is 
-available by using {\OBSERVEref} (see \S{\ref{sec:observe}}), with SKYCAL and 
+Those of you wanting to know about the Moon will find that the information is
+available by using {\OBSERVEref} (see \S{\ref{sec:observe}}), with SKYCAL and
 PREDICT (see \S{\ref{sec:skycal}} or \S{\ref{sec:predict}} respectively) offering
 other sources of information.
 
 \subsection{Binary-star predictions} \xlabel{BINARY}
 \label{sec:binary}
 
-Those of you interested in predictions of the phase of binary stars 
+Those of you interested in predictions of the phase of binary stars
 will probably find what you want supplied by  the PREDICT package (see \S{\ref{sec:predict}}).
 
 \subsection{Catalogue manipulation} \xlabel{CATALOGUEM}
@@ -651,20 +651,20 @@ objects and derive a subset with properties within range bounds you
 have specified. This can be easily achieved using {\CURSAref} (see
 SUN/190).
 
-Using software like {\SKYCATref} (see \S{\ref{sec:skycat}}) 
-it is also possible to view a FITS image 
-and overlay on the image the locations of objects identified from personal 
-catalogues.  
+Using software like {\SKYCATref} (see \S{\ref{sec:skycat}})
+it is also possible to view a FITS image
+and overlay on the image the locations of objects identified from personal
+catalogues.
 
 Information on Internet sources of catalogue information may be found in \S{\ref{sec:catalogue}}.
 
 \subsection{Co-ordinate system conversions} \xlabel{CORDS}
 \label{sec:cords}
 
-One of the perennial problems encountered in astronomy is the need to convert 
+One of the perennial problems encountered in astronomy is the need to convert
 between astronomical co-ordinate systems. The calculation of such transformations is tedious but
-requires care. Probably the simplest way to avoid this problem is to use the 
-{\COCOref} package (see \S{\ref{sec:coco}}) which combines 
+requires care. Probably the simplest way to avoid this problem is to use the
+{\COCOref} package (see \S{\ref{sec:coco}}) which combines
 a range of possibilities with a simple-to-use, no-nonsense interface.
 
 Alternatively, you may care to try the ASTUTIL program GALACTIC (see \S{\ref{sec:galactic}}).
@@ -674,22 +674,22 @@ Alternatively, you may care to try the ASTUTIL program GALACTIC (see \S{\ref{sec
 \label{sec:finderc}
 
 Finder charts are an important tool for ground-based observing since
-they give you the chance to examine the rest of the field and 
+they give you the chance to examine the rest of the field and
 identify nearby stars that may cause intrusive glare. This task can be performed
 in two obvious ways:
 
 \begin{itemize}
-\item Use packages like {\CHARTref}, 
+\item Use packages like {\CHARTref},
 {\SKYMAPPCref} or {\SKYMAPUNIXref} (see \S{\ref{sec:skymappc}} and \S{\ref{sec:skymapsao}} respectively).
 
-\item Download images of the region using on-line atlases 
-or finder charts created from the {\APMref} survey (see \S{\ref{sec:atlases}}). 
+\item Download images of the region using on-line atlases
+or finder charts created from the {\APMref} survey (see \S{\ref{sec:atlases}}).
 \end{itemize}
 
 The three packages named will all provide good finder charts.
 You will find that {\SKYMAPPCref} is an IBM PC/Windows based package.
-This has been included because it is very cheap, highly accurate and 
-self-installs. 
+This has been included because it is very cheap, highly accurate and
+self-installs.
 
 The on-line atlas approach is dealt with in \S{\ref{sec:atlases}}.
 
@@ -697,42 +697,42 @@ The on-line atlas approach is dealt with in \S{\ref{sec:atlases}}.
 \label{sec:sn}
 
 Calculating the time required to obtain a strong signal/noise detection
-for a given object using a specific instrument usually requires an 
-in-depth knowledge of the instrument characteristics and other 
-parameters such as the local sky brightness. This calculation is probably 
-best undertaken using software supplied by the observatory in question, but 
+for a given object using a specific instrument usually requires an
+in-depth knowledge of the instrument characteristics and other
+parameters such as the local sky brightness. This calculation is probably
+best undertaken using software supplied by the observatory in question, but
 if that is not available the ASTUTIL CCDTIME program (see \S{\ref{sec:ccdtime}})
-may be of some assistance. The 
-La Palma INT group supply two packages (see \S{\ref{sec:signal}}) dealing 
+may be of some assistance. The
+La Palma INT group supply two packages (see \S{\ref{sec:signal}}) dealing
 with this problem.
-  
+
 \subsection{Ephemeris calculation} \xlabel{EPH}
 \label{sec:eph}
 
-For most purposes (no more accurate than an arcsecond or two) a satisfactory 
+For most purposes (no more accurate than an arcsecond or two) a satisfactory
 planetary, lunar and solar ephemeris can be obtained using the FLUXES
 package from Starlink.
 However, if you wish to determine values more accurately you
 would be well advised to access the JPL ephemeris using a couple of
 simple SLALIB calls -- it really is very simple and is described fully
-in {\JPLref} and {\SLALIBref}. Alternatively, you might care to try the {\SKYMAPPCref} or 
+in {\JPLref} and {\SLALIBref}. Alternatively, you might care to try the {\SKYMAPPCref} or
 XEPHEM packages (see \S{\ref{sec:skymappc}} and \S{\ref{sec:xephem}} respectively).
 
 \section{Descriptions of Software Mentioned} \xlabel{DESOFT}
-\label{sec:desoft} 
+\label{sec:desoft}
 
 The descriptions that follow borrow unashamedly from those provided by
 the authors. This has been done to try to avoid inadvertently misrepresenting
 the capabilities of any of the packages.
 
 \subsection{ASTUTIL -- IRAF} \xlabel{ASTUTIL}
-\label{sec:astutil} 
+\label{sec:astutil}
 
-This is an astronomical utilities package supplied by {\IRAFref} 
+This is an astronomical utilities package supplied by {\IRAFref}
 as a layered package. It contains a number of useful programs of which the more
-relevant are: 
+relevant are:
 
-\subsubsection{AIR MASS} 
+\subsubsection{AIR MASS}
 
 Compute the air mass at a given elevation above horizon.
 
@@ -744,30 +744,30 @@ and printed for the given dates and times. The input dates and times may be
 taken from files containing the year, month, day, and local time in the
 specified time zone or, if no files are specified, then task parameters are
 used.  The output consists of a printed table with optional header, a copy of
-the input data, and derived astronomical data.  
+the input data, and derived astronomical data.
 
 \subsubsection{CCDTIME} \xlabel{CCDTIME}
-\label{sec:ccdtime} 
+\label{sec:ccdtime}
 
 A telescope, CCD detector, and list of filters is selected from a database to
 define the expected photon/electron count rates.  These rates, along with a
 specified seeing and air mass, are used to estimate the signal-to-noise ratio
 for a stellar observation in each filter.  The output provides three
-results per filter: the exposure time to achieve a desired signal-to-noise 
-ratio for a given magnitude, the magnitude to achieve a desired 
-signal-to-noise ratio in a given time, and the signal-to-noise ratio 
-at a specified magnitude and exposure time. 
-    
+results per filter: the exposure time to achieve a desired signal-to-noise
+ratio for a given magnitude, the magnitude to achieve a desired
+signal-to-noise ratio in a given time, and the signal-to-noise ratio
+at a specified magnitude and exposure time.
+
 \subsubsection{GALACTIC} \xlabel{GALACTIC}
-\label{sec:galactic} 
- 
+\label{sec:galactic}
+
 GALACTIC is used to convert between equatorial and galactic coordinates or
 vice versa. Co-ordinates are read from the input file as Right Ascension and Declination or
 galactic longitude and latitude pairs. Each co-ordinate pair may optionally be
 followed by the epoch of the equatorial co-ordinates, in which case the
 co-ordinates are precessed to 1950.0 before conversion for equatorial to
-galactic or to the specified epoch for galactic to equatorial. 
-    
+galactic or to the specified epoch for galactic to equatorial.
+
 \subsubsection{PRECESS}
 
 Co-ordinates are read from the input file as Right Ascension and Declination pairs, one pair per
@@ -775,25 +775,25 @@ input line.  Each co-ordinate pair may optionally be followed by the equinox
 of the input co-ordinates (if different from the default) and the epoch of the
 output co-ordinates.  Co-ordinates may be entered in either decimal or
 sexagesimal notation.  The given co-ordinates are rotated according to the
-precession rates to the requested year and printed on the standard output. 
-Basic data is taken from the Explanation to the American Ephemeris. 
-    
+precession rates to the requested year and printed on the standard output.
+Basic data is taken from the Explanation to the American Ephemeris.
+
 
 \subsection{{\CURSAref} -- {\STARLINKref}} \xlabel{CURSA}
 \label{sec:cursa}
-  
+
 
 {\CURSAref} is a set of {\STARLINKref} programs for manipulating astronomical
 catalogues and similar tabular datasets. It provides facilities for: browsing
 or examining catalogues, selecting subsets from a catalogue, sorting
 catalogues, copying catalogues and pairing two catalogues. Subsets can be
 extracted from a catalogue in a format suitable for plotting using other
-Starlink packages, such as {\PONGOref} (see {\PONGSUNref)}. CURSA can access 
-catalogues held in the popular FITS table format, as ASCII text, or in the 
-CHI/HDS format used by the {\CATPACref} catalogue manipulating programs. 
- 	
-CURSA will also handle small(ish) catalogues or private tables of the user's 
-favourite objects, selecting those objects which match the constraints of a given 
+Starlink packages, such as {\PONGOref} (see {\PONGSUNref)}. CURSA can access
+catalogues held in the popular FITS table format, as ASCII text, or in the
+CHI/HDS format used by the {\CATPACref} catalogue manipulating programs.
+
+CURSA will also handle small(ish) catalogues or private tables of the user's
+favourite objects, selecting those objects which match the constraints of a given
 observing programme.
 
 \subsection{{\CHARTref} -- {\STARLINKref}} \xlabel{CHART}
@@ -811,10 +811,10 @@ observing programme.
 The {\CHARTref} package extracts positions, magnitudes and other data from certain
 stellar and non-stellar astronomical catalogues. The results may be listed on
 a terminal or printer, or used to plot finding charts or perform astrometric
-reductions. 
- 
+reductions.
+
 An example of the graphical output is shown in Figure 1.
-The stars may be identified via 
+The stars may be identified via
 a text table supplied by the program. An example would be something like:
 
 {\scriptsize
@@ -822,22 +822,22 @@ a text table supplied by the program. An example would be something like:
 \begin{verbatim}
  Input Field Centre  10 18 18.000    + 41 24 58.00  Equinox 2000.00
     Equivalent to  10 15 18.554    + 41 40  0.14  Equinox 1950.00
- 
+
     Galactic Coordinates:            b  =  55.64      l  = 178.35
     Ecliptic Coordinates (1950.00):Lat. =  28.61   Long. = 139.79
- 
+
        Output positions for Equinox 1950.00    Epoch 1950.00
- 
+
        ******************************************************
-       * Approximate Field Centre Location on Sky Survey(s) * 
+       * Approximate Field Centre Location on Sky Survey(s) *
        ******************************************************
            Survey      Field Centre          X        Y
            Palomar     +42  10H  0M          82      187
- 
+
              Number of CSI Catalogue stars found =  25
     HD          DM       Spec   V      B         R.A.       Dec.        Offsets
                                Mag   Mag           (1950.00)           From Centre
-                                                                          "       "     Idents 
+                                                                          "       "     Idents
 1  88513   BD +42  2100   F2   8.2   8.6     10 10 27.1   +42  7 52    -3242   1695    AGK,SAO
 2  88577   BD +42  2102   G5   8.4   9.8     10 10 51.7   +42  3 45    -2972   1444    AGK,SAO
 3          BD +42  2103   K2 ( 9.5) 10.7     10 11 23.3   +42 20 31    -2609   2446    AGK,SAO
@@ -861,7 +861,7 @@ available for most of the stars. Used in this mode, the program can act as a
 stellar data retrieval system to find, for example, which stars are (or are
 not) in a particular catalogue, or what information is known about the stars
 in a particular field. This is also the normal mode of use when preparing
-overlays or finding charts. 
+overlays or finding charts.
 
 \subsubsection{Astrometric}
 
@@ -871,40 +871,40 @@ to Dec -3 degrees), the SAO stars south of the celestial equator, and the comple
 PERTH70 catalogue. This catalogue contains fewer stars than the CSI
 catalogue, but includes accurate positions and proper motions as well as
 magnitudes and spectral types. This mode is most useful when preparing to
-carry out astrometry. 
+carry out astrometry.
 
 \subsubsection{Non-Stellar}
 
 Nonstellar objects can be selected from the Dixon `Master List of Nonstellar
-Objects'. This was formed by a simple merging of many catalogues and lists. 
+Objects'. This was formed by a simple merging of many catalogues and lists.
 The total number is about 185,000. Approximate angular sizes and magnitudes
-are given for many objects. 
+are given for many objects.
 
 \subsubsection{Private}
 
 Stars can be selected from any catalogue that has been produced in the form
-that {\CHARTref} expects for `ASTROMETRIC' mode. 
+that {\CHARTref} expects for `ASTROMETRIC' mode.
 
 You can select which of these four modes to work in and specify a series of
 search areas. In CSI, ASTROMETRIC or PRIVATE modes you can also place
 magnitude or total number limits on the search and choose which source
 catalogues to include or exclude. A series of field centres may be input at
-the terminal or read from a previously prepared file. 
- 
+the terminal or read from a previously prepared file.
+
 After the search is made, you may list the results at a terminal or on the
-printer. Positional information may be precessed to a specified equinox. 
- 
+printer. Positional information may be precessed to a specified equinox.
+
 You may also plot the results in the form of an overlay or finding chart.
 
 
 \subsection{{\COCOref} -- {\STARLINKref}} \xlabel{COCO}
 \label{sec:coco}
- 
+
 
 The {\COCOref} program converts star co-ordinates from one system to another.  Both
 the improved IAU system, post-1976, and the old pre-1976 system are
 supported. COCO can perform accurate transformations between the following
-co-ordinate systems: 
+co-ordinate systems:
 
 \begin{itemize}
 \item mean RA and Dec., old system, with E-terms (loosely FK4, usually B1950)
@@ -917,15 +917,15 @@ co-ordinate systems:
 
 {\COCOref}'s user-interface is spartan but efficient.  The program offers control
 over report resolution, and has a simple online help facility. All
-input is free-format, and defaults are provided where this is meaningful. 
- 
+input is free-format, and defaults are provided where this is meaningful.
+
 The input/output arrangements of COCO are flexible, to allow a variety of
 operating styles -- interactive, input from a file, report to a file, batch,
 {\it etc}. Also, in addition to the report which is produced, the results of
 the conversions are also available in a raw form, to a fixed resolution and
 free from extraneous formatting.
-This file is intended to be read easily by other programs. 
- 
+This file is intended to be read easily by other programs.
+
 In order to comply with the IAU 1976 recommendations, all position data
 published from 1984 on should be given in the new system, using equinox
 J2000.0. However, positions are still frequently given in the old system,
@@ -934,26 +934,26 @@ using equinox B1950.0. COCO can perform the necessary conversion.
 
 \subsection{{\OBSERVEref} -- {\STARLINKref}} \xlabel{OBSERVE}
 \label{sec:observe}
- 
+
 The program {\OBSERVEref} is designed to allow you to get a quick overview
 of the observability of a star through the year from the geographical
-location selected. You will be prompted for the Right Ascension and Declination 
-of the star/object, the telescope employed, and the year. On the selected 
+location selected. You will be prompted for the Right Ascension and Declination
+of the star/object, the telescope employed, and the year. On the selected
 graphics device a
 plot will be drawn that tells you, for all dates of the year, the star rising
-and setting times and the times that it is 30 degrees above the horizon 
+and setting times and the times that it is 30 degrees above the horizon
 (air mass less than 2), the
 times of astronomical twilight, the phase and rising and setting times of the
-Moon as well as its distance from the star in question. 
- 
+Moon as well as its distance from the star in question.
+
 The algorithms used in calculating these times, positions and phases come
 from the book `Practical Astronomy with your calculator' by
 P.~Duffett-Smith (3$^{\rm rd}$ ed.~CUP 1988), and are used with permission.
 These algorithms are not designed for very high precision calculations, a
 fact which is to some extent conveyed by the program output. Nevertheless,
-it has been verified that the routines are good for their purpose. 
-As mentioned above, all standard Starlink graphics devices are supported. 
-The data generated by {\OBSERVEref} can also be output to a text file. 
+it has been verified that the routines are good for their purpose.
+As mentioned above, all standard Starlink graphics devices are supported.
+The data generated by {\OBSERVEref} can also be output to a text file.
 
 \begin{figure}[htbp]
 \leavevmode
@@ -966,15 +966,15 @@ The format of the text file is shown below:
 \begin{quote}
 \begin{verbatim}
 Object selected was: NGC3184
- 
+
 Located at RA:       10h18m18. 0
 Located at Dec:      +41d24m58. 0
- 
+
 From:                Mauna Kea 88 inch
 During:              1997
- 
-January                                                                   
- 
+
+January
+
 Day    Rise    Set      Above 30 Below 30  Twi. beg Twi end   Moon ris Moon set Moon dist  Moon %
 01   06:42:10 21:08:09  09:27:53 18:22:26  15:35:46 05:11:31  10:43:52 22:08:22 15:07:03     60
 02   06:38:14 21:04:13  09:23:57 18:18:30  15:36:08 05:12:05  11:34:52 22:47:07 15:42:22     51
@@ -987,7 +987,7 @@ Day    Rise    Set      Above 30 Below 30  Twi. beg Twi end   Moon ris Moon set 
 
 \subsection{PREDICT -- RGO} \xlabel{PREDICT}
 \label{sec:predict}
- 
+
 Predict was designed for those observers wishing to get data on binary stars
 in particular. It gives data for the Moon and programme stars in the form of
 a listing for every 15 minutes from the end of evening nautical twilight to
@@ -996,21 +996,21 @@ phase, given a time of minimum and period for the programme star, its
 altitude, azimuth, air mass and angular separation from the moon. Times of
 twilight are calculated as well as moonrise/set object rise/set. A simple
 phase diagram showing the observable phase can also be produced.  At the
-moment it runs on a VAX, but it is being ported to the Linux system and upgraded 
-with more accurate Sun/Moon algorithms. 
+moment it runs on a VAX, but it is being ported to the Linux system and upgraded
+with more accurate Sun/Moon algorithms.
 
 
 \subsection{SKYCAL -- John Thorstensen} \xlabel{SKYCAL}
 \label{sec:skycal}
- 
+
 This consists of two programs, SKYCALC and SKYCALENDAR.
 
 SKYCALC is an "Interactive Almanac." It helps you plan and execute observing
-runs, and allows easy calculation of air masses, twilight, lunar interference, 
-co-ordinate transformations and such -- nearly everything except the weather. 
+runs, and allows easy calculation of air masses, twilight, lunar interference,
+co-ordinate transformations and such -- nearly everything except the weather.
 
 SKYCALENDAR is a "Nighttime Astronomical Calendar" to calculate and
-print astronomical calendars. 
+print astronomical calendars.
 
 Both programs have several preset Observatory locations to choose from.
 You can also specify your own.
@@ -1020,35 +1020,35 @@ document {\SUNSKYref}.
 
 \subsection{{\SKYCATref} -- ESO}  \xlabel{SKYCAT}
 \label{sec:skycat}
- 
+
 {\SKYCATref} allows you to open and visualise a variety of FITS images including
 support for World Co-ordinate System (WCS), interactive measurement of offsets,
 and other standard visualization functions (SAOimage-like). It is possible to
 access and load an image from a network server of the Digitized Sky Survey
 scans and access catalogue information from a number of popular astronomical
-catalogues like the ``HST Guide Star Catalog" (GSC) and others. 
-      
+catalogues like the ``HST Guide Star Catalog" (GSC) and others.
+
 It is also possible to access the observations catalogue from the NTT, HST and
 CFHT Science Archives, and use {SIMBADref} or {\NEDref} both as name resolvers as well as
-for information on known objects. 
+for information on known objects.
 
 
 \subsection{SKYMAP -- SAO} \xlabel{SKYMAPSAO}
 \label{sec:skymapsao}
- 
+
 SKYMAP is a sophisticated interactive display program which can be used to
-create finder charts at any particular plate scale.  
+create finder charts at any particular plate scale.
 The package can plot any
 two catalogues from its list, plus stars from the {\GSCref}. The planetary positions
-are taken from the current JPL ephemeris. 
+are taken from the current JPL ephemeris.
 
 All-sky maps can also be produced to show large structures or
 the position of a catalogue in the big picture. All of the IRAS plate projections
  are included so objects can be plotted
-against contoured IR sky flux. Catalogue objects may be identified by 
+against contoured IR sky flux. Catalogue objects may be identified by
 plotting a catalogue over an image.
 
-The package runs on Tektronix-compatible devices and is fairly sophisticated. 
+The package runs on Tektronix-compatible devices and is fairly sophisticated.
 
 
 \subsection{{\SKYMAPPCref} -- Chris Marriott} \xlabel{SKYMAPPC}
@@ -1056,16 +1056,16 @@ The package runs on Tektronix-compatible devices and is fairly sophisticated.
 
 This versatile PC-based package allows you to create finder charts showing
 the area around your target object and all stars in the {\GSCref} and SAO
-catalogues together with objects from the NGC and IC catalogues overlaid. 
+catalogues together with objects from the NGC and IC catalogues overlaid.
 
-{\SKYMAPPCref} is available from it's own home page at 
-URL {\HTTPCref}. Versions exist for Windows, Windows NT and Windows 95. 
+{\SKYMAPPCref} is available from it's own home page at
+URL {\HTTPCref}. Versions exist for Windows, Windows NT and Windows 95.
 The software is inexpensive shareware (\pounds 30) at the time
 of writing. It runs best on 386s (or better CPUs) with more than 4Mb of RAM
-available. 
+available.
 
 
-\subsubsection{Stars} 
+\subsubsection{Stars}
 
 The 1990 machine-readable version of the SAO star catalogue is the source of
 star data. The evaluation version of {\SKYMAPPCref} comes with stars to magnitude 7;
@@ -1075,14 +1075,14 @@ catalogue of stars -- this is reasonably complete down to magnitude 9.5.
 The commercial version of {\SKYMAPPCref} can also display stars (and other objects)
 read from the {\GSCref} CD-ROM database.
 
-\subsubsection{Solar system} 
+\subsubsection{Solar system}
 
 The positions of the planets Mercury to Pluto plus the Sun and Moon are
 shown, with a mean error of less than an arcsecond. The Moon is drawn with
 the correct phase and orientation in the sky. Clicking on any planet displays
 extensive positional and physical information (position, distance, phase,
 visual magnitude, light time, etc). Planetary positions are rigorously
-reduced for the topocentric position of the observer. 
+reduced for the topocentric position of the observer.
 The program is supplied with a catalogue of asteroids and comets.
 
 \subsubsection{Galaxies etc}
@@ -1090,8 +1090,8 @@ The program is supplied with a catalogue of asteroids and comets.
 {\SKYMAPPCref} is supplied with the complete Saguaro Astronomy Club (SAC) v6 database
 of 10,700 deep sky objects. This contains the complete Messier, Revised NGC, and IC
 catalogues, together with the brighter objects from more than 80 other object
-catalogues. Extensive information about any object can be displayed. 
- 
+catalogues. Extensive information about any object can be displayed.
+
 \subsection{XEPHEM -- {\IRAFref}}   \xlabel{XEPHEM}
 \label{sec:xephem}
 
@@ -1101,7 +1101,7 @@ information for celestial objects. It has built-in support for all
 planets: the moons of Jupiter, Saturn and Earth, and Mars' central meridian
 longitude. Xephem supports objects in heliocentric or Earth orbit, given the
 appropriate elements. Sample databases of over 16000 objects are included in
-the release kit. 
+the release kit.
 
 XEPHEM generates data in configurable tabular forms and in several detailed
 graphical formats. It can plot and list all data fields and can be
@@ -1110,22 +1110,22 @@ programmed to search for arbitrary circumstances.
 
 \section{Observatories} \xlabel{OBSERVATORIES}
 \label{sec:observatories}
- 
+
 
 Usually, the best place to look for information on the capabilities of the
 instruments and telescopes at an observatory is in the Web pages of
-the observatory that operates it. The URLs of some the observatories 
+the observatory that operates it. The URLs of some the observatories
 used by British observers:
 
 \begin{itemize}
 \item Anglo-Australian Observatory -- {\HTTPGref}
 \item AAT 2DF -- {HTTPBCref}
 \item CFHT -- {\HTTPBZref}
-\item Royal Observatory Edinburgh -- {\HTTPHref}                                         
-\item Royal Greenwich Observatory -- {\HTTPIref} 
-\item ING La Palma (WHT/INT/JKT) -- {\HTTPJref} 
+\item Royal Observatory Edinburgh -- {\HTTPHref}
+\item Royal Greenwich Observatory -- {\HTTPIref}
+\item ING La Palma (WHT/INT/JKT) -- {\HTTPJref}
 \item ING Software -- {\HTTPJref}
-\item JAC Hawaii (UKIRT/JCMT) -- {\HTTPKref} 
+\item JAC Hawaii (UKIRT/JCMT) -- {\HTTPKref}
 \item JAC Software -- {\HTTPLref}
 \item SAAO -- {\HTTPBAref}
 \item MERLIN -- {\HTTPBBref}
@@ -1134,7 +1134,7 @@ used by British observers:
 \subsection{SIGNAL and LIGHT\_IN\_SLIT} \xlabel{SIGNAL}
 \label{sec:signal}
 Those of you interested in using instruments at La Palma will find the SIGNAL and
-LIGHT\_IN\_SLIT packages provided by Chris Benn particularly useful. 
+LIGHT\_IN\_SLIT packages provided by Chris Benn particularly useful.
 
 \subsubsection{SIGNAL}
 
@@ -1142,14 +1142,14 @@ SIGNAL is a Fortran program for predicting the number of object and sky
 photons detected during an exposure with one of the common-user instruments
 of the Isaac Newton Group telescopes. The predictions are based on a
 combination of measured and estimated efficiencies for the telescopes,
-cameras, gratings and detectors. 
+cameras, gratings and detectors.
 
 \subsubsection{LIGHT\_IN\_ SLIT}
 
 LIGHT\_IN\_SLIT calculates the refractive index at each wavelength for an
 arbitrary atmosphere, and uses this to calculate wavelength-dependent total of
 light entering slit (at arbitrary angle on sky) from a circularly symmetric
-Gaussian image at arbitrary zenith angle. 
+Gaussian image at arbitrary zenith angle.
 
 Copies of the current versions (for SUN workstations) are available
 from URL:
@@ -1165,22 +1165,22 @@ telescopes such as the AAT, INT or WHT must be submitted to the
 selection process in the proper format. The forms involved (such as PATT2)
 are quite complex and compactly laid out. They can be filled out by careful
 use of a typewriter (if you can still find such a thing) but are most
-conveniently filled out using a Starlink package named FORMLOAD, which was 
-designed for the purpose. 
+conveniently filled out using a Starlink package named FORMLOAD, which was
+designed for the purpose.
 
 The user of the package has to prepare a text file which provides the
-information that is embedded in the appropriate parts of the final 
-application form. To make this easier, template files are provided for each 
+information that is embedded in the appropriate parts of the final
+application form. To make this easier, template files are provided for each
 of the forms. The associated document {\SUNFORMref} provides information
-on the details of the process. 
+on the details of the process.
 
 Support is provided for:
 
 \begin{itemize}
 \item UK optical and infrared telescopes (PATT2).
-\item La Palma ING telescopes scheduling information. 
+\item La Palma ING telescopes scheduling information.
 \item UK millimetre and submillimetre telescopes (PATT3).
-\item AAT telescopes scheduling. 
+\item AAT telescopes scheduling.
 \end{itemize}
 
 The software runs under UNIX and VMS.
@@ -1190,40 +1190,40 @@ The software runs under UNIX and VMS.
 
 One of the best ways to make a finder chart is by the use of an on-line
 atlas, the most famous of which are those provided by NASA, ESO and the STScI.
-They are very simple to use. You supply the Right Ascension and Declination values for the region 
-of sky you are interested in, specify the dimensions of the chunk of 
-sky you wish to examine, and the WWW site sends you an appropriate FITS or GIF 
-file. The whole procedure takes about 3 minutes. 
+They are very simple to use. You supply the Right Ascension and Declination values for the region
+of sky you are interested in, specify the dimensions of the chunk of
+sky you wish to examine, and the WWW site sends you an appropriate FITS or GIF
+file. The whole procedure takes about 3 minutes.
 
 The image requested is supplied
-from a database containing the entire sky as generated by digitally sampling 
-scans of Palomar, UK or ESO Schmidt survey plates. The resolution and accuracy of the data may 
-vary slightly depending on the source of the plates employed and the scanner 
+from a database containing the entire sky as generated by digitally sampling
+scans of Palomar, UK or ESO Schmidt survey plates. The resolution and accuracy of the data may
+vary slightly depending on the source of the plates employed and the scanner
 they were sampled with.
 
 URLs for the four most popular on-line atlases are given below:
 
 \begin{itemize}
 \item CADC -- {\CADCref}
-\item ESO -- {\HTTPEref}   
+\item ESO -- {\HTTPEref}
 \item Skyview -- {\HTTPDref}
 \item STScI -- {\HTTPFref}
 \end{itemize}
 
 An example of the quality of output can be seen on the front cover of this document.
-The image of NGC3184 was supplied by Skyview in its default setting. 
+The image of NGC3184 was supplied by Skyview in its default setting.
 
 Some of the sites also allow catalogue overlays onto the images provided
 (so that nearby objects can be readily identified)
-and co-ordinate/name resolution. 
-You give the name (say) NGC4395 and 
-it gives back the co-ordinates  RA 12 25 53.0  Dec.\ 33 32 54 which it 
+and co-ordinate/name resolution.
+You give the name (say) NGC4395 and
+it gives back the co-ordinates  RA 12 25 53.0  Dec.\ 33 32 54 which it
 then employs as the target location.
 
-Alternatively, you may be at a site that possesses the ``Digitised 
+Alternatively, you may be at a site that possesses the ``Digitised
 Sky Survey" (supplied in the form of 102 CD-ROMs) or the more highly compressed
 ``RealSky" (9 CD-ROMs). You will find that these come with software which
-allows you to choose a chunk of sky to look at, tells you which CD to place in 
+allows you to choose a chunk of sky to look at, tells you which CD to place in
 the CD-ROM player, and then creates the image for you.
 
 The {\APMref} Sky Catalogue also contains information gained from scanned survey plates, but
@@ -1248,7 +1248,7 @@ http://www.ast.cam.ac.uk/~rgm/apm_catalogues.html
 
 In the rush to power-up your workstation and get a Web browser
 running, do not forget that other long established sources of information
-exist and can probably be found in your departmental library. 
+exist and can probably be found in your departmental library.
 For example:
 
 \begin{itemize}
@@ -1257,7 +1257,7 @@ A source of much information,
 particularly pertaining to objects in the solar system, with some useful tables and
 information about time and time signals.
 \item Norton's 2000 Star Atlas and Reference Handbook, Editor Ian Ridpath, Longman Scientific,
-ISBN 0-582-03163-X. A good entry-level guide to the sky and observing. 
+ISBN 0-582-03163-X. A good entry-level guide to the sky and observing.
 \item Uranometria, Will Tirion. A more complete atlas showing stars down to 10th
 magnitude and galaxies/nebulae considerably fainter.
 \item Nautical Almanac, HM Nautical Almanac Office, HMSO.
@@ -1268,43 +1268,43 @@ the digitised sky surveys are based.
 
 \section{Internet Sources for the Software Described} \xlabel{SOURCESSOFT}
 \label{sec:sourcessoft}
- 
+
 A list of useful URLs is provided below, but some links may (as seems to be
 the way on the Web) be subject to change without notice. If you find any
-failing please tell us. 
+failing please tell us.
 
 \begin{itemize}
-\item ASTUTIL -- {\HTTPBref} 
+\item ASTUTIL -- {\HTTPBref}
 \item CURSA --  {\HTTPBDref}
 \item CHART -- {\HTTPBEref}
 \item COCO -- {\HTTPAref}
-\item OBSERVE -- {\HTTPAref}             
-\item PREDICT -- Via Steve Bell. Email {\tt sab@ast.cam.ac.uk}          
-\item SKYCAL -- {\HTTPAref}         
-\item SKYCAT -- {\HTTPMref}   
-\item SKYMAP (PC) -- {\HTTPCref} 
-\item SKYMAP (UNIX) -- {\HTTPNref} 
-\item XEPHEM -- {\HTTPBref} 
+\item OBSERVE -- {\HTTPAref}
+\item PREDICT -- Via Steve Bell. Email {\tt sab@ast.cam.ac.uk}
+\item SKYCAL -- {\HTTPAref}
+\item SKYCAT -- {\HTTPMref}
+\item SKYMAP (PC) -- {\HTTPCref}
+\item SKYMAP (UNIX) -- {\HTTPNref}
+\item XEPHEM -- {\HTTPBref}
 \end{itemize}
 
-It is worth bearing in mind that the {\IRAFref} Web site is now mirrored 
+It is worth bearing in mind that the {\IRAFref} Web site is now mirrored
 in the UK at:
 \begin{quote}
 {\tt http://www.starlink.ac.uk/iraf/}
 \end{quote}
-allowing the complete binaries to be downloaded in just a few minutes. 
+allowing the complete binaries to be downloaded in just a few minutes.
 
 The STScI also maintain a very useful directory of astronomical software at:
 
 \begin{itemize}
-\item ASDS (STScI Astronomical Software Directory) -- {\HTTPOref} 
+\item ASDS (STScI Astronomical Software Directory) -- {\HTTPOref}
 \end{itemize}
 
 \section{Internet Catalogues and Databases} \xlabel{CATALOGUE}
 \label{sec:catalogue}
- 
+
 If you are interested in looking at on-line astronomical databases you
-will find that the Starlink documents {\SUNCATref} and {\SUNCATBref} provide a very full account. 
+will find that the Starlink documents {\SUNCATref} and {\SUNCATBref} provide a very full account.
 Some portions of SUN/162 are, inevitably, a little out-of-date, but much of the information
 it contains is still very useful. Another source of information is
 the ``Network Resources for Astronomers" site at URL
@@ -1314,80 +1314,80 @@ However, to allow you to quickly examine some of the most popular databases, som
 URL are given below:
 
 \begin{itemize}
-\item APS -- {\HTTPPref} 
+\item APS -- {\HTTPPref}
 \item CDS -- {\HTTPQref}
-\item CIO -- {\HTTPRref} 
-\item NASA ADS -- {\HTTPSref} 
-\item NASA NED -- {\HTTPTref} 
-\item SIMBAD (Europe) -- {\HTTPUref} 
-\item SIMBAD (USA) -- {\HTTPVref}  
+\item CIO -- {\HTTPRref}
+\item NASA ADS -- {\HTTPSref}
+\item NASA NED -- {\HTTPTref}
+\item SIMBAD (Europe) -- {\HTTPUref}
+\item SIMBAD (USA) -- {\HTTPVref}
 \end{itemize}
 
 Descriptions of the databases and catalogues are given in the next section.
 
 \subsubsection{APS image database} \xlabel{APS}
 \label{sec:aps}
- 
+
 The APS Catalogue of the POSS I is the result of scans of glass duplicates of
 the blue (O) and red (E) plates of the original Palomar Observatory Sky
 Survey (POSS I) for 664 fields.
 
 The object Catalogue entries include images, calibrated magnitudes in two
 colours, positions to 0.2 arcseconds and neural network image
-classifications. 
+classifications.
 
 \subsubsection{CDS} \xlabel{CDS}
 \label{sec:cds}
- 
+
 The ``Centre de Donnees astronomiques de Strasbourg" (CDS) collects and distributes
 astronomical data catalogues, related to observations of stars and galaxies,
 and other galactic and extragalactic objects. A few catalogues about the
-solar system bodies and atomic data are also included. 
+solar system bodies and atomic data are also included.
 
 Importantly, this site hold copies of three papers by Landolt describing standard
-stars in the UBVRI wavelength bands. 
+stars in the UBVRI wavelength bands.
 
-The catalogues and tables managed by CDS can be summarized as follows: 
+The catalogues and tables managed by CDS can be summarized as follows:
 
 \begin{itemize}
 \item  More than 1700 Catalogues available from CDS.
 \item  More than 1290 are available on-line (as full ASCII or FITS files).
-\item  More than 1090 are also available through the VizieR browser. 
+\item  More than 1090 are also available through the VizieR browser.
 \end{itemize}
 
 \subsubsection{CIO} \xlabel{CIO}
 \label{sec:cio}
- 
+
 The Catalogue of Infrared Observations is a database of over 200,000
 published infrared observations of more than 10,000 individual astronomical
 sources over the wavelength range from 1 to 1000 micron. The catalogue is
-available for downloading via ftp. 
+available for downloading via ftp.
 
 \subsubsection{NASA {\ADSref}} \xlabel{ADS}
 \label{sec:ads}
- 
+
 The Astrophysics Data System ({\ADSref}) is a resource that provides
 astronomical data to the scientific user community. At present the main
-emphasis is on the Abstract Service, which includes three sets of abstracts: 
+emphasis is on the Abstract Service, which includes three sets of abstracts:
 
 \begin{itemize}
-\item Astronomy and astrophysics, containing approximately 240,000 abstracts. 
+\item Astronomy and astrophysics, containing approximately 240,000 abstracts.
 \item Space instrumentation, containing approximately 410,000 abstracts.
-\item Physics and geophysics, containing approximately 220,000 abstracts. 
+\item Physics and geophysics, containing approximately 220,000 abstracts.
 \end{itemize}
 
 The abstracts contain information on papers published in a number of refereed
-scientific publications. This should not be confused with databases that contain 
+scientific publications. This should not be confused with databases that contain
 information derived from publications such as redshift or luminosity.
 Each dataset can be searched by author, object name, title, or abstract text
 words. In addition, the abstracts include links to scanned images of over
 20,000 journal articles appearing in `Astronomy and Astrophysics',
  `ApJL' and `AJ' since 1975, `ApJ'
-since 1990, and `PASP' since 1988. 
+since 1990, and `PASP' since 1988.
 
 In addition to the Abstract Service, the {\ADSref} provides access or pointers to
 NASA data catalogues and data archives, thereby making data collected by NASA
-missions available to astronomers. 
+missions available to astronomers.
 
 \subsubsection{NASA Extragalactic Database -- {\NEDref}/IPAC} \xlabel{NED}
 \label{sec:ned}
@@ -1397,7 +1397,7 @@ extragalactic objects for which cross-identifications of names have been
 established, accurate positions and redshifts entered to the extent possible,
 and some basic data collected. Bibliographic references relevant to
 individual objects have been compiled, and abstracts of extragalactic
-interest are kept on line. 
+interest are kept on line.
 
 The most recently updated version of the NED database contains positions,
 basic data, and over 710,000 names for 375,000 extragalactic objects, as well
@@ -1408,7 +1408,7 @@ abstracts of articles of extragalactic interest that have appeared in
 Astronomy and Astrophysics, AJ, ApJ, MNRAS, and PASP since 1988, and in
 Publications of the Astronomical Society of Japan, Astronomy Reports and
 Astronomy Letters (formerly Soviet Astronomy and Soviet Astronomy Letters)
-since 1992. 
+since 1992.
 
 Over 645,000 detailed photometric measurements, and 250,000 detailed position
 measurements, taken from catalogues and the published literature, are currently
@@ -1421,55 +1421,55 @@ in addition to the selection by name, by position, or by type.
 
 \subsubsection{{\SIMBADref}} \xlabel{SIMBAD}
 \label{sec:simbad}
- 
+
 The {\SIMBADref} astronomical database, created and maintained by the CDS,
 Strasbourg, brings together basic data, cross-identifications, observational
 measurements, and bibliography, for celestial objects outside the solar
 system: stars, galaxies, and nonstellar objects within our galaxy, or in
 external galaxies. In total, SIMBAD contains data for roughly
-1,000,000 objects. 
+1,000,000 objects.
 
-In some instances there is a charge for using SIMBAD, so a password may be needed. 
-However, the charge is paid by the ESA for institutions in member states. Most 
-{\STARLINKref} sites will probably already have a password. Your site manager 
+In some instances there is a charge for using SIMBAD, so a password may be needed.
+However, the charge is paid by the ESA for institutions in member states. Most
+{\STARLINKref} sites will probably already have a password. Your site manager
 should be able to advise you on this.
 
-A mirror site exists in the USA. 
+A mirror site exists in the USA.
 
 \section{Internet Links to Astronomical Resources} \xlabel{LINKS}
 \label{sec:links}
- 
+
 When it comes to searching for a variety of resources the URLs below
 are pretty hard to beat. They are well maintained and provide a huge amount
-of information. 
+of information.
 
 \begin{itemize}
-\item NRAO  Astronomy on the Web -- {\HTTPWref}               
+\item NRAO  Astronomy on the Web -- {\HTTPWref}
 \item NRAO Astronomy Software Servers -- {\HTTPYref}
-\item STScI Astronomical Resources -- {\HTTPXref}          
-\item STScI Astronomical Software Directory  -- {\HTTPZref} 
+\item STScI Astronomical Resources -- {\HTTPXref}
+\item STScI Astronomical Software Directory  -- {\HTTPZref}
 \item AstroWeb -- {\HTTPBGref}
 \end{itemize}
 
 \section{Internet Software Archives} \xlabel{GENERAL}
 \label{sec:general}
- 
+
 The sites listed below contain an enormous number of software packages (most
 of them non-astronomical). They are particularly well suited to finding
-planetarium software and databases. 
+planetarium software and databases.
 
 \begin{itemize}
 \item Imperial College Sunsite -- {\HTTPAAref}
-\item HENSA (PC) -- {\HTTPABref} 
-\item HENSA (UNIX) -- {\HTTPACref} 
-\item Oakland VSL -- {\HTTPADref} 
+\item HENSA (PC) -- {\HTTPABref}
+\item HENSA (UNIX) -- {\HTTPACref}
+\item Oakland VSL -- {\HTTPADref}
 \end{itemize}
 
 \section{Acknowledgments} \xlabel{ACK}
 \label{sec:ack}
 
-I would like to acknowledge the assistance of Mike Lawden, Peter Draper and 
-Clive Davenhall who pointed out most of the places I went wrong 
+I would like to acknowledge the assistance of Mike Lawden, Peter Draper and
+Clive Davenhall who pointed out most of the places I went wrong
 in the first draft of this document.
 
 \vspace{3cm}
@@ -1486,5 +1486,5 @@ in the first draft of this document.
 \end{enumerate}
 
 
-\end{document} 
+\end{document}
 

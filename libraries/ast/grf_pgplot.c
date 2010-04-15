@@ -22,12 +22,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -202,18 +202,18 @@ int astGCap( int cap, int value ){
 *     cap
 *        The capability being inquired about. This will be one of the
 *        following constants defined in grf.h:
-*        
-*        GRF__SCALES: This function should return a non-zero value if 
-*        it implements the astGScales function, and zero otherwise. The 
+*
+*        GRF__SCALES: This function should return a non-zero value if
+*        it implements the astGScales function, and zero otherwise. The
 *        supplied "value" argument should be ignored.
 *
-*        GRF__MJUST: This function should return a non-zero value if 
-*        the astGText and astGTxExt functions recognise "M" as a 
+*        GRF__MJUST: This function should return a non-zero value if
+*        the astGText and astGTxExt functions recognise "M" as a
 *        character in the justification string. If the first character of
 *        a justification string is "M", then the text should be justified
-*        with the given reference point at the bottom of the bounding box. 
+*        with the given reference point at the bottom of the bounding box.
 *        This is different to "B" justification, which requests that the
-*        reference point be put on the baseline of the text, since some 
+*        reference point be put on the baseline of the text, since some
 *        characters hang down below the baseline. If the astGText or
 *        astGTxExt function cannot differentiate between "M" and "B",
 *        then this function should return zero, in which case "M"
@@ -223,10 +223,10 @@ int astGCap( int cap, int value ){
 *        GRF__ESC: This function should return a non-zero value if the
 *        astGText and astGTxExt functions can recognise and interpret
 *        graphics escape sequences within the supplied string. These
-*        escape sequences are described below. Zero should be returned 
+*        escape sequences are described below. Zero should be returned
 *        if escape sequences cannot be interpreted (in which case the
 *        Plot class will interpret them itself if needed). The supplied
-*        "value" argument should be ignored only if escape sequences cannot 
+*        "value" argument should be ignored only if escape sequences cannot
 *        be interpreted by astGText and astGTxExt. Otherwise, "value"
 *        indicates whether astGText and astGTxExt should interpret escape
 *        sequences in subsequent calls. If "value" is non-zero then
@@ -238,48 +238,48 @@ int astGCap( int cap, int value ){
 *     the supplied capability is not recognised.
 
 *  Escape Sequences:
-*     Escape sequences are introduced into the text string by a percent 
-*     "%" character. The following escape sequences are currently recognised 
+*     Escape sequences are introduced into the text string by a percent
+*     "%" character. The following escape sequences are currently recognised
 *     ("..." represents a string of one or more decimal digits):
 *
 *       %%      - Print a literal "%" character (type GRF__ESPER ).
 *
 *       %^...+  - Draw subsequent characters as super-scripts. The digits
-*                 "..." give the distance from the base-line of "normal" 
-*                 text to the base-line of the super-script text, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 "..." give the distance from the base-line of "normal"
+*                 text to the base-line of the super-script text, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF__ESSUP ).
 *       %^+     - Draw subsequent characters with the normal base-line.
 *
 *       %v...+  - Draw subsequent characters as sub-scripts. The digits
-*                 "..." give the distance from the base-line of "normal" 
-*                 text to the base-line of the sub-script text, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 "..." give the distance from the base-line of "normal"
+*                 text to the base-line of the sub-script text, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF__ESSUB ).
 *
 *       %v+     - Draw subsequent characters with the normal base-line
 *                 (equivalent to %^+).
 *
 *       %>...+  - Leave a gap before drawing subsequent characters.
-*                 The digits "..." give the size of the gap, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 The digits "..." give the size of the gap, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF__ESGAP ).
 *
 *       %<...+  - Move backwards before drawing subsequent characters.
-*                 The digits "..." give the size of the movement, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 The digits "..." give the size of the movement, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF_ESBAC).
 *
 *       %s...+  - Change the Size attribute for subsequent characters. The
-*                 digits "..." give the new Size as a fraction of the 
-*                 "normal" Size, scaled so that a value of "100" corresponds 
+*                 digits "..." give the new Size as a fraction of the
+*                 "normal" Size, scaled so that a value of "100" corresponds
 *                 to 1.0  (type GRF__ESSIZ ).
 *
 *       %s+     - Reset the Size attribute to its "normal" value.
 *
 *       %w...+  - Change the Width attribute for subsequent characters. The
-*                 digits "..." give the new width as a fraction of the 
-*                 "normal" Width, scaled so that a value of "100" corresponds 
+*                 digits "..." give the new width as a fraction of the
+*                 "normal" Width, scaled so that a value of "100" corresponds
 *                 to 1.0  (type GRF__ESWID ).
 *
 *       %w+     - Reset the Size attribute to its "normal" value.
@@ -295,18 +295,18 @@ int astGCap( int cap, int value ){
 *       %c+     - Reset the Colour attribute to its "normal" value.
 *
 *       %t...+  - Change the Style attribute for subsequent characters. The
-*                 digits "..." give the new Style value  (type GRF__ESSTY ). 
+*                 digits "..." give the new Style value  (type GRF__ESSTY ).
 *
 *       %t+     - Reset the Style attribute to its "normal" value.
 *
-*       %-      - Push the current graphics attribute values onto the top of 
+*       %-      - Push the current graphics attribute values onto the top of
 *                 the stack - see "%+" (type GRF__ESPSH).
 *
 *       %+      - Pop attributes values of the top the stack - see "%-". If
 *                 the stack is empty, "normal" attribute values are restored
 *                 (type GRF__ESPOP).
-*     
-*     The astFindEscape function (in libast.a) can be used to locate escape 
+*
+*     The astFindEscape function (in libast.a) can be used to locate escape
 *     sequences within a text string. It has the following signature:
 *
 *     #include "plot.h"
@@ -318,25 +318,25 @@ int astGCap( int cap, int value ){
 *        type
 *           Pointer to a location at which to return the type of escape
 *           sequence. Each type is identified by a symbolic constant defined
-*           in grf.h and is indicated in the above section. The returned value 
-*           is undefined if the supplied text does not begin with an escape 
+*           in grf.h and is indicated in the above section. The returned value
+*           is undefined if the supplied text does not begin with an escape
 *           sequence.
 *        value
 *           Pointer to a lcation at which to return the integer value
 *           associated with the escape sequence. All usable values will be
 *           positive. Zero is returned if the escape sequence has no associated
-*           integer. A value of -1 indicates that the attribute identified by 
-*           "type" should be reset to its "normal" value (as established using 
-*           the astGAttr function, etc). The returned value is undefined if 
+*           integer. A value of -1 indicates that the attribute identified by
+*           "type" should be reset to its "normal" value (as established using
+*           the astGAttr function, etc). The returned value is undefined if
 *           the supplied text does not begin with an escape sequence.
 *        nc
 *           Pointer to a location at which to return the number of
 *           characters read by this call. If the text starts with an escape
 *           sequence, the returned value will be the number of characters in
 *           the escape sequence. Otherwise, the returned value will be the
-*           number of characters prior to the first escape sequence, or the 
+*           number of characters prior to the first escape sequence, or the
 *           length of the supplied text if no escape sequence is found.
-      
+
 *     Returned Value:
 *        A non-zero value is returned if the supplied text starts with a
 *        graphics escape sequence, and zero is returned otherwise.
@@ -368,9 +368,9 @@ int astGLine( int n, const float *x, const float *y ){
 *  Parameters:
 *     n
 *        The number of positions to be joined together.
-*     x 
+*     x
 *        A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *        A pointer to an array holding the "n" y values.
 
 *  Returned Value:
@@ -407,9 +407,9 @@ int astGMark( int n, const float *x, const float *y, int type ){
 *  Parameters:
 *     n
 *        The number of markers to draw.
-*     x 
+*     x
 *        A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *        A pointer to an array holding the "n" y values.
 *     type
 *        An integer which can be used to indicate the type of marker symbol
@@ -450,11 +450,11 @@ int astGText( const char *text, float x, float y, const char *just,
 *     using a specified justification and up-vector.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
-*     x 
+*     x
 *        The reference x coordinate.
-*     y 
+*     y
 *        The reference y coordinate.
 *     just
 *        A character string which specifies the location within the
@@ -462,21 +462,21 @@ int astGText( const char *text, float x, float y, const char *just,
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", or 'B' for "bottom", and specifies the
 *        vertical location of the reference position. Note, "bottom"
-*        corresponds to the base-line of normal text. Some characters 
-*        (eg "y", "g", "p", etc) descend below the base-line. The second 
-*        character may be 'L' for "left", 'C' for "centre", or 'R' 
-*        for "right", and specifies the horizontal location of the 
+*        corresponds to the base-line of normal text. Some characters
+*        (eg "y", "g", "p", etc) descend below the base-line. The second
+*        character may be 'L' for "left", 'C' for "centre", or 'R'
+*        for "right", and specifies the horizontal location of the
 *        reference position. If the string has less than 2 characters
-*        then 'C' is used for the missing characters. 
+*        then 'C' is used for the missing characters.
 *     upx
 *        The x component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        left to right on the screen.
 *     upy
 *        The y component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        bottom to top on the screen.
 
 *  Returned Value:
@@ -493,9 +493,9 @@ int astGText( const char *text, float x, float y, const char *just,
 
 /* Local Variables: */
    char lj[ 2 ];
-   float uplen, xbox[ 4 ], ybox[ 4 ];   
+   float uplen, xbox[ 4 ], ybox[ 4 ];
    float angle, fjust, hu, test, alpha, beta;
-   int i, tbg;   
+   int i, tbg;
 
 /* Check that there is something to draw. */
    if( text && text[ 0 ] != 0 ){
@@ -523,7 +523,7 @@ int astGText( const char *text, float x, float y, const char *just,
          lj[ 1 ] = 'C';
       }
 
-/* Find the conversion factors between increment in world coordinate axes, 
+/* Find the conversion factors between increment in world coordinate axes,
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
       if( !astGScales( &alpha, &beta ) ) return 0;
@@ -557,15 +557,15 @@ int astGText( const char *text, float x, float y, const char *just,
 
 /* Normalise the up-vector in world coordinates. */
          uplen = sqrt( (double) (upx*upx + upy*upy) );
-         if( uplen > 0.0 ){ 
+         if( uplen > 0.0 ){
             upx /= uplen;
             upy /= uplen;
          } else {
             astError( AST__GRFER, "astGText: Zero length up-vector supplied.");
             return 0;
          }
-      
-/* Find the height of the text above the base-line. Note, the PGPLOT  
+
+/* Find the height of the text above the base-line. Note, the PGPLOT
    manual is not clear about the order of the corners returned by
    pgqtxt, so we have to find the largest distance between
    the corners in the direction of the supplied up-vector. */
@@ -589,13 +589,13 @@ int astGText( const char *text, float x, float y, const char *just,
 /* Display the text, erasing any graphics. */
       ccpgqtbg( &tbg );
       ccpgstbg( 0 );
-      ccpgptxt( x, y, angle, fjust, (char *) text ); 
+      ccpgptxt( x, y, angle, fjust, (char *) text );
       ccpgstbg( tbg );
    }
-   
+
 /* Return. */
    return 1;
-}               
+}
 
 int astGScales( float *alpha, float *beta ){
 /*
@@ -636,15 +636,15 @@ int astGScales( float *alpha, float *beta ){
 
 /* Local Variables: */
    float nx1, nx2, ny1, ny2, wx1, wx2, wy1, wy2;
-   int ret;   
+   int ret;
 
-/* Find the conversion factors between increment in world coordinate axes, 
+/* Find the conversion factors between increment in world coordinate axes,
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
    ccpgqvp( 2, &nx1, &nx2, &ny1, &ny2 );
    ccpgqwin( &wx1, &wx2, &wy1, &wy2 );
-   
-   if( wx2 != wx1 && wy2 != wy1 && 
+
+   if( wx2 != wx1 && wy2 != wy1 &&
        nx2 != nx1 && ny2 != ny1 ) {
       *alpha= ( nx2 - nx1 ) / ( wx2 - wx1 );
       *beta = ( ny2 - ny1 ) / ( wy2 - wy1 );
@@ -673,17 +673,17 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *                   float upx, float upy, float *xb, float *yb )
 
 *  Description:
-*     This function returns the corners of a box which would enclose the 
+*     This function returns the corners of a box which would enclose the
 *     supplied character string if it were displayed using astGText.
 *
 *     The returned box INCLUDES any leading or trailing spaces.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
-*     x 
+*     x
 *        The reference x coordinate.
-*     y 
+*     y
 *        The reference y coordinate.
 *     just
 *        A character string which specifies the location within the
@@ -691,21 +691,21 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", or 'B' for "bottom", and specifies the
 *        vertical location of the reference position. Note, "bottom"
-*        corresponds to the base-line of normal text. Some characters 
-*        (eg "y", "g", "p", etc) descend below the base-line. The second 
-*        character may be 'L' for "left", 'C' for "centre", or 'R' 
-*        for "right", and specifies the horizontal location of the 
+*        corresponds to the base-line of normal text. Some characters
+*        (eg "y", "g", "p", etc) descend below the base-line. The second
+*        character may be 'L' for "left", 'C' for "centre", or 'R'
+*        for "right", and specifies the horizontal location of the
 *        reference position. If the string has less than 2 characters
-*        then 'C' is used for the missing characters. 
+*        then 'C' is used for the missing characters.
 *     upx
 *        The x component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        left to right on the screen.
 *     upy
 *        The y component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        bottom to top on the screen.
 *     xb
 *        An array of 4 elements in which to return the x coordinate of
@@ -731,11 +731,11 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 
 /* Local Variables: */
    char lj[ 2 ];
-   float udx, udy, vdx, vdy, vx, vy, uplen, xbox[ 4 ], 
-         ybox[ 4 ], uxu, uyu, uxd, uyd, ux, uy;   
+   float udx, udy, vdx, vdy, vx, vy, uplen, xbox[ 4 ],
+         ybox[ 4 ], uxu, uyu, uxd, uyd, ux, uy;
    float angle, width, test, xl, yl;
    float alpha, beta, xc, yc, hu, hd, a, b;
-   int i;   
+   int i;
 
 /* Initialise the returned values to indicate no box available. */
    for( i = 0; i < 4; i++ ){
@@ -769,7 +769,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
          lj[ 1 ] = 'C';
       }
 
-/* Find the conversion factors between increment in world coordinate axes, 
+/* Find the conversion factors between increment in world coordinate axes,
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
       if( !astGScales( &alpha, &beta ) ) return 0;
@@ -785,7 +785,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 
 /* Normalise the up-vector to a length of 1 millimetre. */
       uplen = sqrt( (double) (ux*ux + uy*uy) );
-      if( uplen > 0.0 ){ 
+      if( uplen > 0.0 ){
          ux /= uplen;
          uy /= uplen;
       } else {
@@ -793,7 +793,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
          return 0;
       }
 
-/* Form the base-line vector by rotating the up-vector by 90 degrees 
+/* Form the base-line vector by rotating the up-vector by 90 degrees
    clockwise. */
       vx = uy;
       vy = -ux;
@@ -811,8 +811,8 @@ int astGTxExt( const char *text, float x, float y, const char *just,
          ybox[ i ] *= beta;
       }
 
-/* Find the height of the bounding box, in millimetres. Note, 
-   the PGPLOT manual is not clear about the order of the corners 
+/* Find the height of the bounding box, in millimetres. Note,
+   the PGPLOT manual is not clear about the order of the corners
    returned by pgqtxt, so we have to find the largest distance between
    the corners in the direction of the supplied up-vector. The reference
    point is on the text base-line which is not usually at the bottom of
@@ -840,7 +840,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
    using pglen instead of using the bounding box returned by pgqtxt. */
       ccpglen( 2, (char *) text, &xl, &yl );
 
-/* The abolute width of the string in millimetres may depend on the   
+/* The abolute width of the string in millimetres may depend on the
    up-vector. The values returned by pglen are for horizontal and
    vertical text. Find the width using the supplied up-vector. */
       a = uy*xl;
@@ -911,10 +911,10 @@ int astGTxExt( const char *text, float x, float y, const char *just,
       yb[ 3 ] = yc - vdy + udy;
 
    }
-   
+
 /* Return. */
    return 1;
-}               
+}
 
 int astGQch( float *chv, float *chh ){
 /*
@@ -936,11 +936,11 @@ int astGQch( float *chv, float *chh ){
 *  Parameters:
 *     chv
 *        A pointer to the double which is to receive the height of
-*        characters drawn with a vertical baseline . This will be an 
+*        characters drawn with a vertical baseline . This will be an
 *        increment in the X axis.
 *     chh
 *        A pointer to the double which is to receive the height of
-*        characters drawn with a horizontal baseline. This will be an 
+*        characters drawn with a horizontal baseline. This will be an
 *        increment in the Y axis.
 
 *  Returned Value:
@@ -963,8 +963,8 @@ int astGQch( float *chv, float *chh ){
 /* Get the bounds of the PGPLOT window in world coordinates. */
    ccpgqwin( &wx1, &wx2, &wy1, &wy2 );
 
-/* Convert the text height from normalised device coordinates into world 
-   coordinates for vertical text. Print an error message if the viewport 
+/* Convert the text height from normalised device coordinates into world
+   coordinates for vertical text. Print an error message if the viewport
    has zero size. */
    if( vx1 != vx2 ){
       *chv *= ( wx2 - wx1 )/( vx2 - vx1 );
@@ -973,10 +973,10 @@ int astGQch( float *chv, float *chh ){
       astError( AST__GRFER, "astGQch: The graphics viewport has zero size "
                 "in the X direction.");
       return 0;
-   }   
+   }
 
-/* Convert the text height from normalised device coordinates into world 
-   coordinates for horizontal text. Print an error message if the viewport 
+/* Convert the text height from normalised device coordinates into world
+   coordinates for horizontal text. Print an error message if the viewport
    has zero size. */
    if( vy1 != vy2 ){
       *chh *= ( wy2 - wy1 )/( vy2 - vy1 );
@@ -984,11 +984,11 @@ int astGQch( float *chv, float *chh ){
       astError( AST__GRFER, "astGQch: The graphics viewport has zero size "
                 "in the Y direction.");
       return 0;
-   }   
+   }
 
 /* Return. */
    return 1;
-}               
+}
 
 int astGAttr( int attr, double value, double *old_value, int prim ){
 /*
@@ -1018,10 +1018,10 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 *           GRF__SIZE   - Character and marker size scale factor.
 *           GRF__FONT   - Character font.
 *           GRF__COLOUR - Colour index.
-*     value 
+*     value
 *        A new value to store for the attribute. If this is AST__BAD
 *        no value is stored.
-*     old_value 
+*     old_value
 *        A pointer to a double in which to return the attribute value.
 *        If this is NULL, no value is returned.
 *     prim
@@ -1058,9 +1058,9 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
          ccpgsls( ival );
       }
 
-/* If required retrieve the current line width, and set a new line width. 
+/* If required retrieve the current line width, and set a new line width.
    Line width is stored in Plot as a scale factor (1.0 for the default line
-   width which is a fixed fraction of the diagonal of the view surface), but 
+   width which is a fixed fraction of the diagonal of the view surface), but
    pgplot stores it in units of 0.005 of an inch. */
    } else if( attr == GRF__WIDTH ){
 
@@ -1088,11 +1088,11 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
             ival = 1;
          } else if( ival > 201 ){
             ival = 201;
-         } 
+         }
          ccpgslw( ival );
       }
 
-/* If required retrieve the current character size, and set a new size. 
+/* If required retrieve the current character size, and set a new size.
    The attribute value should be a factor by which to multiply the
    default character size. */
    } else if( attr == GRF__SIZE ){
@@ -1130,7 +1130,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
       }
 
 /* Give an error message for any other attribute value. */
-   } else {     
+   } else {
       astError( AST__GRFER, "astGAttr: Unknown graphics attribute '%d' "
                 "requested.", attr );
       return 0;
@@ -1201,10 +1201,10 @@ static void ccpgpt(int n, float xpts[], float ypts[], int symbol){
 }
 
 static void ccpgptxt(float x, float y, float angle, float fjust, char *text ){
-   F77_REAL_TYPE X;   
-   F77_REAL_TYPE Y;   
-   F77_REAL_TYPE ANGLE;   
-   F77_REAL_TYPE FJUST;   
+   F77_REAL_TYPE X;
+   F77_REAL_TYPE Y;
+   F77_REAL_TYPE ANGLE;
+   F77_REAL_TYPE FJUST;
    DECLARE_CHARACTER(LTEXT,MXSTRLEN);
    int ftext_length;
 
@@ -1217,17 +1217,17 @@ static void ccpgptxt(float x, float y, float angle, float fjust, char *text ){
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    astStringExport( text, LTEXT, ftext_length );
 
-   F77_CALL(pgptxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE), 
+   F77_CALL(pgptxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
                      REAL_ARG(&FJUST), CHARACTER_ARG(LTEXT)
                      TRAIL_ARG(ftext) );
 }
 
 static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
                      float xbox[], float ybox[]){
-   F77_REAL_TYPE X;   
-   F77_REAL_TYPE Y;   
-   F77_REAL_TYPE ANGLE;   
-   F77_REAL_TYPE FJUST;   
+   F77_REAL_TYPE X;
+   F77_REAL_TYPE Y;
+   F77_REAL_TYPE ANGLE;
+   F77_REAL_TYPE FJUST;
    DECLARE_CHARACTER(LTEXT,MXSTRLEN);
    F77_REAL_TYPE XBOX[ 4 ];
    F77_REAL_TYPE YBOX[ 4 ];
@@ -1243,7 +1243,7 @@ static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    astStringExport( text, LTEXT, ftext_length );
 
-   F77_CALL(pgqtxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE), 
+   F77_CALL(pgqtxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
                      REAL_ARG(&FJUST), CHARACTER_ARG(LTEXT),
                      REAL_ARRAY_ARG(XBOX), REAL_ARRAY_ARG(YBOX)
                      TRAIL_ARG(ftext) );
@@ -1293,7 +1293,7 @@ static void ccpglen(int units, char *text, float *xl, float *yl ){
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    astStringExport( text, LTEXT, ftext_length );
 
-   F77_CALL(pglen)( INTEGER_ARG(&UNITS), CHARACTER_ARG(LTEXT), 
+   F77_CALL(pglen)( INTEGER_ARG(&UNITS), CHARACTER_ARG(LTEXT),
                     REAL_ARG(&XL), REAL_ARG(&YL) TRAIL_ARG(ftext) );
 
    *xl = (float) XL;
@@ -1306,7 +1306,7 @@ static void ccpgqvp(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE X2;
    F77_REAL_TYPE Y1;
    F77_REAL_TYPE Y2;
-   
+
    UNITS = (F77_INTEGER_TYPE) units;
    F77_CALL(pgqvp)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
                     REAL_ARG(&Y1), REAL_ARG(&Y2) );
@@ -1322,7 +1322,7 @@ static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE X2;
    F77_REAL_TYPE Y1;
    F77_REAL_TYPE Y2;
-   
+
    UNITS = (F77_INTEGER_TYPE) units;
    F77_CALL(pgqvsz)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
                     REAL_ARG(&Y1), REAL_ARG(&Y2) );

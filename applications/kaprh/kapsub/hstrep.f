@@ -72,7 +72,7 @@
 *                   bug and expanded the "Method :" section
 *                   (RL.STAR::CUR).
 *
-*    Type Definitions :      
+*    Type Definitions :
 
       IMPLICIT NONE
 
@@ -98,7 +98,7 @@
 *    Local constants :
 
       INTEGER
-     :  BINMAX                  ! maximum number of compressed bins for 
+     :  BINMAX                  ! maximum number of compressed bins for
                                 ! histogram summary
       PARAMETER ( BINMAX = 30 )
 
@@ -115,7 +115,7 @@
                                 ! incremental capacity
      :    SZBIN                 ! Count of the summary bins
 
-      INTEGER 
+      INTEGER
      :    I, J, K,              ! general variables
      :    NHIST( BINMAX )       ! Array holding the histogram summary
 

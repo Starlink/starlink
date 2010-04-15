@@ -44,7 +44,7 @@ datMap(const HDSLoc    *locator,
    struct   LCP        *lcp;
    struct   LCP_DATA  *data;
    struct   LCP_STATE *state;
-   
+
    char       typbuf[DAT__SZTYP];
    HDS_PTYPE  axis[DAT__MXDIM];
    struct   RCL rcl;
@@ -129,7 +129,7 @@ datMap(const HDSLoc    *locator,
    _callnam(rec_get_rcl(&data->han, &rcl))
    if (reading && !rcl.active)
       _callnam(DAT__UNSET)
-                        
+
 /* If the mapping is character-type and an explicit character string length */
 /* was not supplied (i.e. there was no '*' character in the type            */
 /* specification), then modify the application data attributes descriptor   */
@@ -200,7 +200,7 @@ datMap(const HDSLoc    *locator,
       }
    }
 
-/* Otherwise, the application program gains direct access to the object 
+/* Otherwise, the application program gains direct access to the object
    data. */
 
    else
@@ -380,7 +380,7 @@ datMapV(const HDSLoc *locator,
   /* Initialise return values */
   *pntr = NULL;
   *actval = 0;
-  
+
   datSize( locator, actval, status );
   datShape( locator, DAT__MXDIM, dims, &ndim, status );
   datMap( locator, type_str, mode_str, ndim, dims,
@@ -415,7 +415,7 @@ datBasic(const HDSLoc *locator,
    struct RCL       rcl;
    struct PDD       *app;
    struct PDD       *obj;
-   
+
    unsigned char *dom;
    int reading;
    INT_BIG objlen;
@@ -509,7 +509,7 @@ datBasic(const HDSLoc *locator,
     *pntr = retpntr;
 
    _callnam(hds_gl_status)
-   
+
    return hds_gl_status;
 }
 

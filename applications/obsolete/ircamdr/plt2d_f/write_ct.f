@@ -15,7 +15,7 @@
 
 * History :
 *  21-Jul-1994 Changed STR$ to CHR_, IFIX to INT (SKL@JACH)
-*  26-JUL-1994 Changed error reporting to use ERR_, removed VALUE (SKL@JACH) 
+*  26-JUL-1994 Changed error reporting to use ERR_, removed VALUE (SKL@JACH)
 *  13-SEP-1994 Modified colour table values to be compatible with either
 *                old IRCAM format (0-255) or new portable_figaro format
 *                (0-1) (CAA@JACH)
@@ -131,9 +131,9 @@
 
 * test which way around user wants colour_table
 	  IF( CT_DIRECTION .EQ. 'INVERSE' .OR.
-     :	      DEVICE_NAME .EQ. 'EPSP' .OR. 
+     :	      DEVICE_NAME .EQ. 'EPSP' .OR.
      :	      DEVICE_NAME .EQ. 'EPSL' .OR.
-     :	      DEVICE_NAME .EQ. 'CPSP' .OR. 
+     :	      DEVICE_NAME .EQ. 'CPSP' .OR.
      :	      DEVICE_NAME .EQ. 'CPSL') THEN
 
 * define pens with HIGHEST values first
@@ -160,7 +160,7 @@
 	  CALL GSPLCI( PEN_NUMBER)
 	  CALL GSPMCI( PEN_NUMBER)
 	  CALL GSTXCI( PEN_NUMBER)
-	  CALL GSCR( 1, PEN_NUMBER, PEN_COLOUR( 1), PEN_COLOUR( 2), 
+	  CALL GSCR( 1, PEN_NUMBER, PEN_COLOUR( 1), PEN_COLOUR( 2),
      :	             PEN_COLOUR( 3))
 	END DO
 
@@ -206,7 +206,7 @@
 	    PEN_COLOUR( 2) = 0.0
 	    PEN_COLOUR( 3) = 0.0
 	  END IF
-	  CALL GSCR( 1, MAXIMCOL+1, PEN_COLOUR( 1), PEN_COLOUR( 2), 
+	  CALL GSCR( 1, MAXIMCOL+1, PEN_COLOUR( 1), PEN_COLOUR( 2),
      :	             PEN_COLOUR( 3))
 	END IF
 

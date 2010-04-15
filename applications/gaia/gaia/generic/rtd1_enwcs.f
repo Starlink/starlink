@@ -108,7 +108,7 @@
       IF ( AST_ISAFRAME( IWCS, STATUS ) ) THEN
 
 *  Create a FITS channel to use when writing the object out.
-         CHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 'Encoding=Native', 
+         CHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 'Encoding=Native',
      :                        STATUS )
 
 *  And write out the FrameSet to the channel.
@@ -120,8 +120,8 @@
          NOCCUR = 1
          THERE = .FALSE.
          ICARD = 0
-         CALL RTD1_GKEYC( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 0, 'END ', 
-     :                    NOCCUR, THERE, VALUE, ICARD, STATUS, 
+         CALL RTD1_GKEYC( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 0, 'END ',
+     :                    NOCCUR, THERE, VALUE, ICARD, STATUS,
      :                    %VAL( CNF_CVAL( 80 ) ) )
 
 *  Now read the channel until we have all the cards.

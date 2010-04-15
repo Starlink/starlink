@@ -54,7 +54,7 @@
       INCLUDE 'GNS_ERR'
       INCLUDE 'GNS_PAR'
       INCLUDE 'GKS_PAR'
-      
+
       INTEGER STATUS, ICNTX, LD, ITYPE, ICON, IERR, ISTATE, LDEV,
      : IUNIT, LX, LY, ASF(13), LTERM, LERTXT, IWKS
       REAL RX, RY, SCALE, XSIZE, YSIZE, XBOX(5), YBOX(5), X(2), Y(2)
@@ -71,7 +71,7 @@
       REAL XLEFT, XRIGHT, YBOT, YTOP
       PARAMETER (XLEFT = -10.0, XRIGHT = 45.0,
      :            YBOT = -10.0, YTOP = 25.0)
-      
+
       REAL XDUCK(43), YDUCK(43)
       DATA XDUCK / 0.0,2.0,4.0,6.0,8.0,10.0,12.0,14.0,16.4,17.0,17.3,
      1          17.8, 18.5, 20.0, 22.0, 24.0, 26.0, 28.0, 29.0,
@@ -83,7 +83,7 @@
      2          13.1, 13.2, 12.3, 11.5, 11.5, 11.5, 11.2, 10.5,
      3          9.0, 8.0, 7.0, 5.1, 3.6, 1.9, 1.1, 0.9, 0.7,
      4          0.8, 1.0, 1.0, 1.2, 1.8, 2.1, 2.9, 4.1, 6.0 /
-      
+
       DATA STATUS, ICNTX /0, 0/
       DATA XBOX /XLEFT,XRIGHT,XRIGHT,XLEFT,XLEFT/
       DATA YBOX /YBOT,YBOT,YTOP,YTOP,YBOT/
@@ -145,7 +145,7 @@
       ASF(11) = GINDIV
       ASF(12) = GINDIV
       CALL GSASF(ASF)
-      
+
 *   Open the selected workstation
       PRINT *
       WRITE(*,'(1X,A,I5,A,I3,A)') 'The GKS workstation type ', ITYPE,
@@ -172,7 +172,7 @@
          END IF
       END IF
 
-*   Get the name of the plotting device      
+*   Get the name of the plotting device
       CALL GNS_IDNG(1, DEVICE, LDEV, STATUS)
       IF (STATUS.NE.0) THEN
          PRINT *, 'Please see your system manager'
@@ -191,7 +191,7 @@
             IF (LERTXT.GT.0) PRINT *,ERTXT(:LERTXT)
          END IF
       END IF
-      
+
 *   Report the device or file name being used
       CALL GNS_IWCG(1, 'OUTPUT', OUTPUT, STATUS)
       IF (STATUS.NE.0) THEN
@@ -262,7 +262,7 @@
       CALL GSFAIS(GHATCH)
       CALL GSFAI(1)
       CALL GFA(43, XDUCK, YDUCK)
-      
+
 *   Close down
       CALL GDAWK(1)
       CALL GCLWK(1)

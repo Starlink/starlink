@@ -5,8 +5,8 @@ C     P O L E X T
 C
 C     Given an image containing Fibre data, and a polynomial file
 C     (produced, probably, by FINDSP) that gives the positions of the
-C     centres of the spectra, POLEXT extracts the spectra to produce 
-C     a new image in which each cross-section is one of the fibre 
+C     centres of the spectra, POLEXT extracts the spectra to produce
+C     a new image in which each cross-section is one of the fibre
 C     spectra.
 C
 C     Command parameters -
@@ -37,9 +37,9 @@ C
 C     16th Jan 1989  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic-memory handling changed to use
 C                    DYN_ routines.
-C     24th Jan 1991  JMS / AAO. Added PAR_ABORT to support user 
+C     24th Jan 1991  JMS / AAO. Added PAR_ABORT to support user
 C                    requested abort. In routine POLEXT_WORK, included
-C                    two further checks on the limits of the variables 
+C                    two further checks on the limits of the variables
 C                    FIBTOP and FIBLOW.
 C     8th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed. Lowercase
 C                    extension .dud. Call PAR_WRUSER rather than
@@ -68,8 +68,8 @@ C                    the fibre frame need no special extrapolation any
 C                    more. As a result the extracted spectra may differ
 C                    slightly at the end points from earlier versions
 C                    of this application.
-C     2nd  Apr 1996  BKM / RAL, Starlink. Correct bug due to 
-C                    uninitialised variable NDUD.    
+C     2nd  Apr 1996  BKM / RAL, Starlink. Correct bug due to
+C                    uninitialised variable NDUD.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage
 C                    of file names to 132 chars.
 C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
@@ -107,13 +107,13 @@ C
       INTEGER    ID1(10)         ! Dimensions of IMAGE
       INTEGER    ID2(2)          ! Dimensions of OUTPUT
       INTEGER    INVOKE          ! Used to format user messages
-      INTEGER    IPDP            ! Dynamic-memory pointer for poly. 
+      INTEGER    IPDP            ! Dynamic-memory pointer for poly.
                                  ! coeff.
       INTEGER    IPIN            ! Dynamic-memory pointer for IMAGE data
       INTEGER    IPOUT           ! Dynamic-memory pointer for OUTPUT
                                  ! data
       INTEGER    IPX             ! Dynamic-memory pointer for DP X(NPTS)
-      INTEGER    IPYL            ! Dynamic-memory pointer for 
+      INTEGER    IPYL            ! Dynamic-memory pointer for
                                  ! YLEVEL(NPTS)
       INTEGER    IPYR            ! Dynamic-memory pointer for YRUN(NX)
       INTEGER    LENGTH          ! Used to format user messages
@@ -126,7 +126,7 @@ C
       INTEGER    NORDER          ! Order of polynomial used
       INTEGER    NPLUS1          ! No. of coeff. in poly fit (NORDER+1)
       INTEGER    NPTS            ! No. of points used along spectra
-      INTEGER    NUMFIB          ! Number of fibres used 
+      INTEGER    NUMFIB          ! Number of fibres used
       INTEGER    NX              ! First dimension of image
       INTEGER    NY              ! Second dimension of image
       INTEGER    PLU             ! Logical unit number for polynomial
@@ -142,7 +142,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -220,7 +220,7 @@ C
       CALL PAR_WRUSER(TEXT,STATUS)
       WRITE(TEXT,'(''No. of fibres is '',I3)')NUMFIB
       CALL PAR_WRUSER(TEXT,STATUS)
-      WRITE(TEXT,'(''No. of points along spectra was '',I3)')NPTS 
+      WRITE(TEXT,'(''No. of points along spectra was '',I3)')NPTS
       CALL PAR_WRUSER(TEXT,STATUS)
       WRITE(TEXT,'(''Order of poly. used was '',I2)')NORDER
       CALL PAR_WRUSER(TEXT,STATUS)
@@ -317,8 +317,8 @@ C
          CALL DSA_AXIS_SIZE('IMAGE',1,5,NDIM,DIMS,NELM,STATUS)
          CALL DSA_RESHAPE_AXIS('OUTPUT',1,'IMAGE',1,NDIM,DIMS,STATUS)
       END IF
-C 
-C     Map the output data 
+C
+C     Map the output data
 C
       CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',IPOUT,SLOT,STATUS)
 C
@@ -414,7 +414,7 @@ C
       CALL PAR_WRUSER(' ',STATUS)
 C
       END
-     
+
 
       SUBROUTINE POLEXT_WORK(NX,NY,RAY,NY1,OUT,
      :        YRUN,YLEVEL,X,PLU,NPLUS1,DPCOEF,
@@ -424,7 +424,7 @@ C
 *
       CHARACTER TEXT*80
       INTEGER PLU, STATUS
-      REAL YRUN(NX),RAY(NX,NY),YLEVEL(NPTS) 
+      REAL YRUN(NX),RAY(NX,NY),YLEVEL(NPTS)
       REAL OUT(NX,NY1)
       LOGICAL FIBOK(NUMFIB)
       REAL VERSION
@@ -505,7 +505,7 @@ C
               DO IY=IYLOW+1,IYTOP-1
                  SUM=SUM+RAY(IX,IY)
               END DO
-              OUT(IX,IFIB)=SUM+(FIBTOP-REAL(IYTOP)+0.5)*RAY(IX,IYTOP) 
+              OUT(IX,IFIB)=SUM+(FIBTOP-REAL(IYTOP)+0.5)*RAY(IX,IYTOP)
             END DO
          ELSE
             IF (MOD(IFIBRE,10).EQ.0) THEN
@@ -520,5 +520,5 @@ C
       CALL PAR_WRUSER('Extracted image now created',STATUS)
 
   500 CONTINUE
-                 
+
       END

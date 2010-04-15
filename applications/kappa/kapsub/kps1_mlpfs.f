@@ -11,18 +11,18 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPFS( LUTMAP, INDF, CFRM, IAXIS, YLOG, MCOMP, DUNIT, FSET, 
+*     CALL KPS1_MLPFS( LUTMAP, INDF, CFRM, IAXIS, YLOG, MCOMP, DUNIT, FSET,
 *                      STATUS )
 
 *  Description:
-*     This routine returns a FrameSet containing 2 Frames. Each Frame has 
+*     This routine returns a FrameSet containing 2 Frames. Each Frame has
 *     2 axes:
 *
 *     Frame 1: Corresponds to "what we've got"
 *        Axis 1 - nominal GRID value (see KPS1_MLPNG).
 *        Axis 2 - nominal data value (see KPS1_MLPND).
 *
-*     Frame 2: Corresponds to "what we want to see" (i.e. the Frame describing 
+*     Frame 2: Corresponds to "what we want to see" (i.e. the Frame describing
 *              the quantities which are to be annotated on the displayed axes).
 *              It is given Domain DATAPLOT.
 *        Axis 1 - The quantity to be plotted on the horizontal axis of the
@@ -94,19 +94,19 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'AST_ERR'          ! AST error constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Local Constants:
       CHARACTER BCKSLH*1         ! A single backslash
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( BCKSLH = '\\' )    
+      PARAMETER( BCKSLH = '\\' )
 
 *  Arguments Given:
       INTEGER LUTMAP
@@ -130,7 +130,7 @@
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER LAB*80           ! Label text string
       CHARACTER TEXT*120         ! General text string
-      INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
+      INTEGER AXES( 2 )          ! Axes to pick from an existing Frame
       INTEGER FR1                ! Frame 1 in compound frame
       INTEGER FR2                ! Frame 2 in compound frame
       INTEGER IAT                ! No. of characters in a string
@@ -151,25 +151,25 @@
       CALL AST_BEGIN( STATUS )
 
 *  First create the Mapping from the "what we've got" Frame to the "what
-*  we want" Frame. This is a parallel CmpMap. The Mapping for axis 1 is 
+*  we want" Frame. This is a parallel CmpMap. The Mapping for axis 1 is
 *  the supplied LutMap which transforms nominal GRID value into the
 *  annotated axis value. The Mapping for axis 2 is a UnitMap.
-      MAP1 = AST_CMPMAP( LUTMAP,  AST_UNITMAP( 1, ' ', STATUS ), 
+      MAP1 = AST_CMPMAP( LUTMAP,  AST_UNITMAP( 1, ' ', STATUS ),
      :                   .FALSE., ' ', STATUS )
-     
+
 *  Now create the "What we've got" Frame. It is a simple 2D Frame.
       WWGOT = AST_FRAME( 2, ' ', STATUS )
 
-*  Now create the "What we want" Frame. Extract a copy of the specified axis 
+*  Now create the "What we want" Frame. Extract a copy of the specified axis
 *  from the Current Frame.
       AXES( 1 ) = IAXIS
-      FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
+      FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS )
 
-*  When a SkyAxis is extracted from a SkyFrame, its Format and Digits 
-*  attributes are set, even if they were not set in the SkyFrame. This means 
+*  When a SkyAxis is extracted from a SkyFrame, its Format and Digits
+*  attributes are set, even if they were not set in the SkyFrame. This means
 *  that Plot does not remove trailing zeros from the formatted axis values.
 *  To avoid this, explicitly clear the Format and Digits attributes for the
-*  extracted axis unless values have been set for them in the original 
+*  extracted axis unless values have been set for them in the original
 *  Current Frame.
       ATTR = 'FORMAT('
       IAT = 7
@@ -189,7 +189,7 @@
 *  will be a default 1-D Axis. We can use a FluxFrame if the units of the
 *  NDF data array can be used to describe any of the flux systems
 *  supported by the AST FluxFrame class. To test this create a new
-*  FluxFrame and set its units to the supplied data units. Note, the call 
+*  FluxFrame and set its units to the supplied data units. Note, the call
 *  to AST_SETC may generate an AST__BADUN error, so check the STATUS
 *  before invoking  AST_SETC.
       FR2 = AST_FLUXFRAME( AST__BAD, AST__NULL, ' ', STATUS )
@@ -202,21 +202,21 @@
 *  systems, then an error (AST__BADUN) will be reported. Check for this
 *  error and annul it if it occurs, create a default simple Frame to
 *  use instead of the FluxFrame, and combine it with the X axis Frame
-*  into a CmpFrame. 
+*  into a CmpFrame.
       TEXT = AST_GETC( FR2, 'System', STATUS )
       IF( STATUS .EQ. AST__BADUN ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL AST_ANNUL( FR2, STATUS )
-         FR2 = AST_FRAME( 1, ' ', STATUS ) 
+         FR2 = AST_FRAME( 1, ' ', STATUS )
          WWWANT = AST_CMPFRAME( FR1, FR2, ' ', STATUS )
 
-*  If the data units can be used with one of the flux systems supported by 
+*  If the data units can be used with one of the flux systems supported by
 *  the AST FluxFrame class...
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Fix the System value explicit to the value determined by the supplied
-*  data units, and then clear the units (they are re-instated below). 
-         CALL AST_SETC( FR2, 'System', AST_GETC( FR2, 'System', 
+*  data units, and then clear the units (they are re-instated below).
+         CALL AST_SETC( FR2, 'System', AST_GETC( FR2, 'System',
      :                                           STATUS ), STATUS )
          CALL AST_CLEAR( FR2, 'Unit(1)', STATUS )
 
@@ -238,7 +238,7 @@
       CALL AST_ANNUL( FR1, STATUS )
       CALL AST_ANNUL( FR2, STATUS )
 
-*  Get the Label component from the NDF, use a default equal to 
+*  Get the Label component from the NDF, use a default equal to
 *  "<MCOMP> value" where MCOMP is the name of the NDF component.
       LAB = MCOMP
       CALL NDF_CGET( INDF, 'LABEL', LAB, STATUS )
@@ -253,7 +253,7 @@
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
 
          IF( LAB .EQ. MCOMP ) THEN
-            TEXT( IAT : IAT ) = ' '   
+            TEXT( IAT : IAT ) = ' '
             CALL CHR_APPND( 'value)', TEXT, IAT )
          END IF
 
@@ -272,15 +272,15 @@
          IAT = 0
          CALL CHR_APPND( LAB, TEXT, IAT )
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
-   
+
          IF( LAB .EQ. MCOMP ) THEN
             IAT = IAT + 1
             CALL CHR_APPND( 'value', TEXT, IAT )
          END IF
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
+         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)',
+     :                                      DUNIT( : CHR_LEN( DUNIT ) ),
      :                                      STATUS )
 
       END IF
@@ -290,13 +290,13 @@
 *  independant axis).
       CALL AST_SETC( WWWANT, 'DOMAIN', 'DATAPLOT', STATUS )
 
-*  Now create the returned FrameSet, initially holding the "what we've got" 
+*  Now create the returned FrameSet, initially holding the "what we've got"
 *  Frame. This is Frame 1 and is initially both the Base and Current Frame.
       FSET = AST_FRAMESET( WWGOT, ' ', STATUS )
 
 *  Add the "what we want" Frame. This is Frame 2, and becomes the new Current
 *  Frame.
-      CALL AST_ADDFRAME( FSET, AST__BASE, MAP1, WWWANT, STATUS ) 
+      CALL AST_ADDFRAME( FSET, AST__BASE, MAP1, WWWANT, STATUS )
 
 *  Tidy up:
  999  CONTINUE

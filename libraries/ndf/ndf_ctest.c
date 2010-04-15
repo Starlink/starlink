@@ -18,7 +18,7 @@ void FC_MAIN () {}
 #endif
 
 int main( int argc, char *argv[] ) {
-/*                                                                         
+/*
 *+
 * Name:
 *    ndf_test (C version)
@@ -39,12 +39,12 @@ int main( int argc, char *argv[] ) {
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@ int main( int argc, char *argv[] ) {
 
 *-
 */
-      
+
 /* Status:                                                                  */
    int status;
 
@@ -132,15 +132,15 @@ int main( int argc, char *argv[] ) {
       status = SAI__ERROR;
       emsSetc( "F", form );
       emsRep( "NDF_TEST_ERR0", "Incorrect array form \"^F\".", &status );
-   }      
+   }
 
 /* Check the data type is now _DOUBLE (this is because we stored _DOUBLE
    scale and zero values above).                                            */
-   ndfType( indf, "Data", type, 30, &status ); 
+   ndfType( indf, "Data", type, 30, &status );
    if( status == SAI__OK ) {
       if( strcmp( type, "_DOUBLE" ) ) {
          status = SAI__ERROR;
-         emsRep( "NDF_TEST_ERR1", "Scaled array is not of type _DOUBLE.", 
+         emsRep( "NDF_TEST_ERR1", "Scaled array is not of type _DOUBLE.",
                     &status );
       }
    }
@@ -156,8 +156,8 @@ int main( int argc, char *argv[] ) {
    if( status == SAI__OK ) {
       emsMark();
       ndfMap( indf, "Data", "_integer", "update", &pntr, &el, &status );
-      if( status == ARY__ACDEN ) {  
-         emsAnnul( &status );   
+      if( status == ARY__ACDEN ) {
+         emsAnnul( &status );
 
       } else if( status == SAI__OK ) {
          status = SAI__ERROR;

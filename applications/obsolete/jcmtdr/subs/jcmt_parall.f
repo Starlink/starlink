@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_PARALLACTIC (NPIXEL, RA_POS, DEC_POS, RA_NEG, 
+      SUBROUTINE JCMT_PARALLACTIC (NPIXEL, RA_POS, DEC_POS, RA_NEG,
      :   DEC_NEG, LST, LAT, ETA, STATUS)
 *+
 *  Name:
@@ -12,14 +12,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_PARALLACTIC (NPIXEL, RA_POS, DEC_POS, RA_NEG, 
+*     CALL JCMT_PARALLACTIC (NPIXEL, RA_POS, DEC_POS, RA_NEG,
 *    :   DEC_NEG, LST, LAT, ETA, STATUS)
 
 *  Description:
 *
 *  Arguments:
 *     NPIXEL                         = INTEGER (Given)
-*        the size of the arrays 
+*        the size of the arrays
 *     RA_POS (NPIXEL)                = DOUBLE PRECISION (Given)
 *        the RA of the positive beam (radians)
 *     DEC_POS (NPIXEL)               = DOUBLE PRECISION (Given)
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -83,7 +83,7 @@
       DOUBLE PRECISION Z                   ! zenith distance
       DOUBLE PRECISION COSZ                ! cos (z)
       REAL SINETA                          ! sin (ETA)
-      
+
 *  Local data:
 *.
 

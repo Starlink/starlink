@@ -100,7 +100,7 @@ int true=TRUE;
 /* Only the last component spec can be a slice so set slice false here */
 /* and test initially and after each but the last                      */
       slice = FALSE;
-      while ( ( *status == SAI__OK ) && 
+      while ( ( *status == SAI__OK ) &&
            ( (comp=strtok( saveptr, "." )) != NULL ) ) {
 
          botloc=NULL;
@@ -144,7 +144,7 @@ int true=TRUE;
 /* Ensure that the object is not closed when loc is annulled */
 /* by making botloc a primary locator first.                  */
             if ( !file_opened ) {
-               file_opened = TRUE;                 
+               file_opened = TRUE;
             } else {
                datAnnul( loc, status );
             }

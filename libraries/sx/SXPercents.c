@@ -1,6 +1,6 @@
 #include "sx.h"
 
-Error doperc( int np, float *p, int nel, float *indata, int npos, 
+Error doperc( int np, float *p, int nel, float *indata, int npos,
               float *inposns, float *outvals );
 
 Error m_SXPercents( Object *in, Object *out ){
@@ -25,14 +25,14 @@ Error m_SXPercents( Object *in, Object *out ){
 *     The SXPercents module searches the histogram supplied by "input",
 *     for the data values corresponding to the requested percentiles.
 *     The "input" histogram should have been created using the "Histogram"
-*     module. 
-*    
+*     module.
+*
 *     Each value supplied in "percents" should be a value in the range 0.0 to
 *     100.0. For each value, P, the corresponding "output" value is the
-*     data value below which P percent of the data values in the histogram 
+*     data value below which P percent of the data values in the histogram
 *     lie. Linear interpolation is performed to find this value.
 *
-*     The "outputlist" parameter is a list containing all the individual 
+*     The "outputlist" parameter is a list containing all the individual
 *     "output" values.
 
 *  Parameters:
@@ -47,7 +47,7 @@ Error m_SXPercents( Object *in, Object *out ){
 
 *  Examples:
 *     This example displays the electron density field, with a colour
-*     table which ignores the lowest and highest 2 percent of the data 
+*     table which ignores the lowest and highest 2 percent of the data
 *     values.
 *
 *        electrondensity = Import("/usr/lpp/dx/samples/data/watermolecule");
@@ -73,12 +73,12 @@ Error m_SXPercents( Object *in, Object *out ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,20 +117,20 @@ Error m_SXPercents( Object *in, Object *out ){
       if( !in[0] ){
          DXSetError( ERROR_BAD_PARAMETER, "Missing parameter \"input\".");
          goto error;
-      } 
+      }
 
       if( DXGetObjectClass( in[0] ) != CLASS_FIELD ){
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "Parameter \"input\" should be a field." );
          goto error;
-      }      
+      }
 
 
 /*  Get the data component from the input field. */
 
       data  = (Array) DXGetComponentValue( (Field) in[0], "data" );
       if( !data ) {
-         DXSetError( ERROR_MISSING_DATA, 
+         DXSetError( ERROR_MISSING_DATA,
                      "Input field has no data component.");
          goto error;
       }
@@ -147,26 +147,26 @@ Error m_SXPercents( Object *in, Object *out ){
       if( rank == 1 && shape[0] == 1 ) rank = 0;
 
 
-/*  Check the input field contains real (i.e. non-complex), scalar, floating 
+/*  Check the input field contains real (i.e. non-complex), scalar, floating
  *  point data. */
 
       if( ( type != TYPE_FLOAT ) || ( cat !=CATEGORY_REAL ) ||
           ( rank != 0 ) ){
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "Input data should be 1-D array of real floating point values.");
          goto error;
       }
 
 
-/*  Check that the input field data component is dependant on connections. 
- *  NB; since the data is dependant on connections, there should be one 
+/*  Check that the input field data component is dependant on connections.
+ *  NB; since the data is dependant on connections, there should be one
  *  more position than the number of data values. */
 
-      attr = (char *) DXGetString( 
+      attr = (char *) DXGetString(
                       (String) DXGetComponentAttribute( (Field) in[0],
                                                         "data", "dep" ) );
       if( !attr ){
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "Missing data dependancy attribute in parameter \"input\".");
          goto error;
       }
@@ -175,7 +175,7 @@ Error m_SXPercents( Object *in, Object *out ){
          npos = nel + 1;
 
       } else {
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "Input data (%s) must be dependant on connections.",attr);
          goto error;
 
@@ -183,7 +183,7 @@ Error m_SXPercents( Object *in, Object *out ){
 
 
 /*  Get a pointer the data array. */
-      
+
       indata = (float *) DXGetArrayData( data );
 
 
@@ -191,7 +191,7 @@ Error m_SXPercents( Object *in, Object *out ){
 
       posns  = (Array) DXGetComponentValue( (Field) in[0], "positions" );
       if( !posns ) {
-         DXSetError( ERROR_MISSING_DATA, 
+         DXSetError( ERROR_MISSING_DATA,
                      "Input field has no positions component.");
          goto error;
       }
@@ -214,14 +214,14 @@ Error m_SXPercents( Object *in, Object *out ){
 
       if( ( type != TYPE_FLOAT ) || ( cat !=CATEGORY_REAL ) ||
           ( rank != 0 ) || ( pnel != npos ) ){
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "Input \"positions\" component does not match \"data\" component.");
          goto error;
       }
 
 
 /*  Get a pointer to the positions array. */
-      
+
       inposns = (float *) DXGetArrayData( posns );
 
 
@@ -233,7 +233,7 @@ Error m_SXPercents( Object *in, Object *out ){
          p = defp;
 
 
-/*  If the second parameter was supplied, get a pointer to an array of 
+/*  If the second parameter was supplied, get a pointer to an array of
  *  floating point values supplied by it. Local variable np is returned
  *  holding the number of values supplied. */
 
@@ -243,7 +243,7 @@ Error m_SXPercents( Object *in, Object *out ){
       }
 
 
-/*  Make a new scalar array structure to hold the list of all output data 
+/*  Make a new scalar array structure to hold the list of all output data
  *  values. This is assigned to output parameter "valuelist". A pointer
  *  to the array storage is returned. */
 
@@ -259,7 +259,7 @@ Error m_SXPercents( Object *in, Object *out ){
  *  parameters. */
 
       for( nsingle=0; nsingle<np; nsingle++ ){
-         if( out[ nsingle + 1 ] == NULL ){ 
+         if( out[ nsingle + 1 ] == NULL ){
             outval = SXPut1r( "value", 1, &out[ nsingle + 1 ] );
             if( !outval ) goto error;
             *outval = *(outvals + nsingle);
@@ -288,7 +288,7 @@ error:
 }
 
 
-Error doperc( int np, float *p, int nel, float *indata, int npos, 
+Error doperc( int np, float *p, int nel, float *indata, int npos,
               float *inposns, float *outvals ){
 /*
 *+
@@ -302,7 +302,7 @@ Error doperc( int np, float *p, int nel, float *indata, int npos,
 *     ANSI C
 
 *  Prototype:
-*     doperc( int np, float *p, int nel, float *indata, int npos, 
+*     doperc( int np, float *p, int nel, float *indata, int npos,
 *             float *inposns, float *outvals );
 
 *  Returned:
@@ -314,7 +314,7 @@ Error doperc( int np, float *p, int nel, float *indata, int npos,
 *     int np
 *        The number of percentiles required.
 *     float *p
-*        Pointer to an array containing the percentage values at which 
+*        Pointer to an array containing the percentage values at which
 *        the corresponding data values are required.
 *     int nel
 *        The number of bins in the histogram
@@ -363,7 +363,7 @@ Error doperc( int np, float *p, int nel, float *indata, int npos,
       }
 
 
-/*  Loop round each percentage value. This is not the fastest way of doing 
+/*  Loop round each percentage value. This is not the fastest way of doing
  *  this! */
 
       for( i=0; i<np; i++ ){
@@ -373,7 +373,7 @@ Error doperc( int np, float *p, int nel, float *indata, int npos,
 /*  Check the percentage is between 0 and 100. */
 
          if( pval < 0.0 || pval > 100.0 ) {
-            DXSetError( ERROR_UNEXPECTED, 
+            DXSetError( ERROR_UNEXPECTED,
                         "Bad percentage value (%f) given.", pval );
             return( ERROR );
          }
@@ -381,12 +381,12 @@ Error doperc( int np, float *p, int nel, float *indata, int npos,
 
 /*  Go through the histogram array until the accumulated data sum exceeds
  *  the target value (i.e. the current percentage of the total data sum),
- *  or the end of the histogram array is reached. */ 
+ *  or the end of the histogram array is reached. */
 
          target = 0.01*pval*sum;
 
          psum = indata[0];
-         lsum = psum*2;         
+         lsum = psum*2;
          j = 0;
 
          while( psum <= target && j < nel ){

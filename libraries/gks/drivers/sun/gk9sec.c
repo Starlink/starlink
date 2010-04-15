@@ -7,14 +7,14 @@
  * gk9soe - Open echo area
  *
  *	Various WW parameters are saved, viz., Line mode, font, current pos.
- *	A new window is created which is used for echoing. 
+ *	A new window is created which is used for echoing.
  *
  * gk9sce - Close echo area
  *
  *	The reverse of the above is performed.
  *
  * Written by: A C Arnold, University of Manchester Computer Graphics Unit,
- * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405 
+ * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405
  *
  * Modification History
  * --------------------
@@ -32,7 +32,7 @@
  *                     Adjustment of echoarea modified to allow for workstation
  *                     window position.
  */
- 
+
 #include "./varinc/wwinfo.h"
 #include "../../system/include/f77_type.h"
 #include "../../system/include/gkdt.h"
@@ -47,10 +47,10 @@ void gk9soe(echoarea, title)			/* Open echo area */
   char *title;
 {
   static char					/* Default cursor */
-    gks_cursor[] = 
+    gks_cursor[] =
     {
       WWXOR, 0, 0, 0, 0,
-      0, 16, 0, 16, 
+      0, 16, 0, 16,
       0377, 0200, 0377,    0, 0376,    0, 0374,    0,
       0376,    0, 0377,    0, 0357, 0200, 0307, 0300,
       0203, 0340,   01, 0360,    0, 0370,    0, 0174,
@@ -92,7 +92,7 @@ void gk9soe(echoarea, title)			/* Open echo area */
     gks_cursor[0] = WWOR;
   custack(cudecode(gks_cursor, ENWWSTYLE), WWSET);
 }
- 
+
 void gk9sce()					/* Close echo area */
 {
   dd->d_fore = fg_colour;			/* Restore foreground colour */

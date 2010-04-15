@@ -13,7 +13,7 @@
 *     CALL IRM_ANTSO( STATUS )
 
 *  Description:
-*     The routine sets the aspect source flag of the linetype of the 
+*     The routine sets the aspect source flag of the linetype of the
 *     current workstation to bundled.
 
 *  Arguments:
@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

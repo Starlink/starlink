@@ -21,7 +21,7 @@ C   if present, and to convert internal double delimiters to single ones.
       CHARACTER HD*1
 
       DATA HD /''''/
-      
+
 *     Functions:
 
       INTEGER*4 GEN_ILEN
@@ -49,6 +49,6 @@ C   if present, and to convert internal double delimiters to single ones.
       END DO
 
       IF (LITEM.LT.LEN(ITEM)) ITEM(LITEM+1:) = ' '
-      
+
       RETURN
       END

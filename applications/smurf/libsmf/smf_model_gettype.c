@@ -22,7 +22,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     
+*
 
 *  Notes:
 
@@ -87,7 +87,7 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
   /* Local Variables */
   dim_t i;
   char tempstring[4];
-  
+
   /* Main routine */
   if (*status != SAI__OK) return SMF__NUL;
 
@@ -127,7 +127,7 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);
-    errRep("", FUNC_NAME ": Invalid model name ^MNAME", status);        
+    errRep("", FUNC_NAME ": Invalid model name ^MNAME", status);
   }
 
   return SMF__NUL;

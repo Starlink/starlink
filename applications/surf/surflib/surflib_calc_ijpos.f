@@ -10,7 +10,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL SURFLIB_CALC_IJPOS (N_PTS, PIXEL_SZ,
 *     :     I_CENTRE, J_CENTRE, X_POS, Y_POS, IJ,
@@ -69,7 +69,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -98,7 +98,7 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  set x and y axis pixel increments, x increases to left hence -ve.
- 
+
       XINC = -PIXEL_SZ
       YINC = PIXEL_SZ
 

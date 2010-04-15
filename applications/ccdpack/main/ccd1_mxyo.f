@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_MXYO( X1, Y1, INDI1, N1, X2, Y2, INDI2, N2, 
-*                     XOFF, YOFF, ERROR, XO1, YO2, XO2, YO2, 
+*     CALL CCD1_MXYO( X1, Y1, INDI1, N1, X2, Y2, INDI2, N2,
+*                     XOFF, YOFF, ERROR, XO1, YO2, XO2, YO2,
 *                     NMATCH, INDO1, INDO2, STATUS )
 
 *  Description:
@@ -23,8 +23,8 @@
 *     XOFF,YOFF. Equality is determined by a position being within
 *     +/- ERROR of the other position. When two positions are matched
 *     their orginal values are written to the output lists XO1,YO1
-*     and XO2,YO2.  If the original positions in the lists are given 
-*     in arrays INDI1, INDI2, then the final ones are returned in 
+*     and XO2,YO2.  If the original positions in the lists are given
+*     in arrays INDI1, INDI2, then the final ones are returned in
 *     INDO1, INDO2.
 
 *  Arguments:

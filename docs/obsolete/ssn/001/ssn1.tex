@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 % Add any \newcommand or \newenvironment commands here
 
 % Make $ a character instead of the maths mode delimiter
-\catcode`\$=12 
+\catcode`\$=12
 
 % Use the real underscore character instead of a box
 \renewcommand{\_}{{\tt\char'137}}
@@ -120,7 +120,7 @@ ADD USER [] UK.AC.*
 You should now be able to send CBS mail from a satellite by sending mail to
 {\tt <boot node>::CBS\%<NRS node name>::<username>}, e.g.\ to send a mail
 message from a RAL satellite to Manchester, one can send to
-{\tt RLSTAR::CBS\%MAN.AST.STAR::DSB}. 
+{\tt RLSTAR::CBS\%MAN.AST.STAR::DSB}.
 
 \subsection{Problems with outgoing mail}
 
@@ -216,13 +216,13 @@ The file NOCBS\_MESSAGES.MSG contains the error text that is printed.
 The default error message is
 
 \begin{verbatim}
-     To use CBS mail on this system, send mail to 
+     To use CBS mail on this system, send mail to
      <boot node>::CBS%<NRS node name>::<username>
 \end{verbatim}
 
 If you wish to tailor this message to be more specific to your site, then edit
 the message source file NOCBS\_MESSAGES.MSG and run BUILD.COM to rebuild the
-shareable image NOCBS\_MAILSHR.EXE. 
+shareable image NOCBS\_MAILSHR.EXE.
 
 The file LOGICALS.COM defines the logical names used by this program. They
 should be defined at boot time on the machines on which this is run, i.e.\ those

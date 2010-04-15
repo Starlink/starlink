@@ -33,7 +33,7 @@
 *     constant term).
 *
 *  Language:
-*     FORTRAN             
+*     FORTRAN
 *
 *  Call:
 *      CALL FIG_READSDIST(COFILE,MAXTRACKS,NTRACKS,NX,NY,START,END,
@@ -102,7 +102,7 @@
       REAL*8  YAVE(MAXTRACKS)
       REAL    WIDTH(MAXTRACKS)
       REAL*8  COEFF(11,MAXTRACKS)
-      INTEGER STATUS   
+      INTEGER STATUS
 *
 *     Local variables
 *

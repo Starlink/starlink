@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_HDELCAT( INPUT, STATUS) 
+     : CHI_HDELCAT( INPUT, STATUS)
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -26,7 +26,7 @@
       INTEGER CATNO
       CHARACTER*(DAT__SZLOC) TBDSCR
 *.
-      
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -37,7 +37,7 @@
           STATUS = CHI__CATNOTFND
           CALL ERR_REP(' ', 'HDS error deleting table', STATUS)
       ENDIF
-                
+
 9999  RETURN
 
       END

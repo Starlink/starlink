@@ -1,13 +1,13 @@
 /*
 ;+
-;	B S W A P 
+;	B S W A P
 ;
 ;	SUBROUTINE BSWAP (ARRAY,WORDS)
 ;
 ;	Exchanges the byte order in an array of 16 bit words
 ;       so that it matches the convention used by non-DEC
 ;	machines.  This is based on an MTPCKG routine written
-;	by Bill Sebok. 
+;	by Bill Sebok.
 ;
 ;	Parameters -    (">" input, "!" modified, "<" output)
 ;

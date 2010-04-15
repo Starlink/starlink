@@ -14,10 +14,10 @@
                                 Starlink Facility Error Message Generation}
 \newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {}
-\newcommand{\stardocabstract}  {This document describes the Starlink 
+\newcommand{\stardocabstract}  {This document describes the Starlink
 MESSGEN program which creates files
 required for proper operation of the system for associating messages with
-Starlink facility status values on UNIX platforms. It should be read by 
+Starlink facility status values on UNIX platforms. It should be read by
 authors of Starlink subroutine libraries.
 
 The utility program CREMSG is also described. It can be used to produce
@@ -54,7 +54,7 @@ source files for MESSGEN.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -122,7 +122,7 @@ source files for MESSGEN.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -207,12 +207,12 @@ source files for MESSGEN.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -247,23 +247,23 @@ source files for MESSGEN.}
 \setcounter{page}{1}
 
 \section {\xlabel{introduction}Introduction}
-The Starlink MESSGEN facility is a system devised and written by Brian 
-McIlwrath to enable error messages to be associated with Starlink STATUS 
+The Starlink MESSGEN facility is a system devised and written by Brian
+McIlwrath to enable error messages to be associated with Starlink STATUS
 values on UNIX systems.
 This feature is available with the VAX/VMS error system and has proved useful.
 
 MESSGEN can create a Fortran INCLUDE file and a C header file defining
 symbolic names for the status values and a {\em facility message file}
 which is used by the
-\xref{Starlink Error Message Service (EMS)}{ssn4}{} to associate 
-messages with the status values. 
+\xref{Starlink Error Message Service (EMS)}{ssn4}{} to associate
+messages with the status values.
 
-A utility program CREMSG is also provided in the MESSGEN release. It may be 
+A utility program CREMSG is also provided in the MESSGEN release. It may be
 used to create a MESSGEN source file from an existing, standard-format Fortran
 error INCLUDE file.
 
 \section{\xlabel{messgen_source_files}MESSGEN Source Files}
-The starting point for the Starlink MESSGEN facility is a source file 
+The starting point for the Starlink MESSGEN facility is a source file
 conventionally named {\em facility}{\bf \_err.msg}. The format is very
 similar to that for the VAX/VMS MESSAGE facility. This is most easily
 described by an example:
@@ -292,41 +292,41 @@ Notes:
 next line.
 \item ! indicates that the remainder
 of the line is comment, except on a .TITLE line.
-\item The .TITLE directive is optional but recommended. The given text is 
+\item The .TITLE directive is optional but recommended. The given text is
 displayed as the file is read by MESSGEN.
 \item The .FACILITY directive specifies the facility name, the facility number
 (which is allocated by the Starlink Infrastructure Support Group) and the
-prefix to be used for symbolic constants for the status values. 
+prefix to be used for symbolic constants for the status values.
 In the example, the facility name is PAR, the facility number is 190 and the
 symbolic constant for the first error value will be PAR\_\_NOUSR.
 \item The .IDENT directive is optional and has no effect.
 \item The .SEVERITY directive defines the severity of the error. In addition
 to INFORMATIONAL, any of the values permitted by the VAX/VMS MESSAGE facility
 are allowed.
-The severity value has no meaning on UNIX, or in most cases on VAX/VMS, but 
-it does affect the error value generated for subsequent errors in the file. 
+The severity value has no meaning on UNIX, or in most cases on VAX/VMS, but
+it does affect the error value generated for subsequent errors in the file.
 There may be more than one .SEVERITY directive in the file or it may be omitted,
 in which case ERROR is assumed.
-\item The .BASE directive specifies a message number to be associated with 
-the next message and is optional. 
+\item The .BASE directive specifies a message number to be associated with
+the next message and is optional.
 In the absence of any .BASE directives, message numbering is sequential
 (from 1) within each facility.
-\item Message lines specify the ident of the message and the text 
+\item Message lines specify the ident of the message and the text
 (enclosed in \verb!<>!).
-\item 
-\xref{SUN/104}{sun104}{calculating_globally_unique_error_codes} 
+\item
+\xref{SUN/104}{sun104}{calculating_globally_unique_error_codes}
 gives a formula for calculating unique error numbers. This formula
-corresponds with .SEVERITY ERROR. 
+corresponds with .SEVERITY ERROR.
 \item The .END directive is optional and has no effect.
 \item If the VAX/VMS MESSAGE facility was used to generate facility INCLUDE
-files which were subsequently ported to UNIX, the original 
+files which were subsequently ported to UNIX, the original
 .MSG source files should be used to generate the error files for UNIX. This
 will ensure that the same error values are generated.
 \end{enumerate}
 
 \section{\xlabel{running_messgen}Running MESSGEN}
 To produce the required files from MESSGEN source files, on UNIX, type:
-\begin{quote} 
+\begin{quote}
 \verb!% messgen -[cfFev]! {\em files}
 \end{quote}
 where {\em files} may be any number of MESSGEN source files and the options
@@ -346,7 +346,7 @@ the facility number, {\em e.g.}\ 190 for PAR.
 \end{quote}
 
 \section{\xlabel{running_cremsg}Running CREMSG}
-If a MESSGEN source file is not available but there is an existing, 
+If a MESSGEN source file is not available but there is an existing,
 standard-format Fortran error INCLUDE file, program CREMSG can create a MESSGEN
 source file from it. Standard-format means that the error numbers are defined
 by statements of the form:
@@ -354,7 +354,7 @@ by statements of the form:
       INTEGER PAR__NOUSR
       PARAMETER ( PAR__NOUSR = 146703139 )
 *   No user available for input
- 
+
       INTEGER PAR__PARNF
       PARAMETER ( PAR__PARNF = 146703147 )
 *   Parameter does not exist
@@ -372,15 +372,15 @@ be used to obtain diagnostic information.
 
 Notes:
 \begin{enumerate}
-\item The file produced will be named {\em fac}{\bf \_err.msg} file, where 
-{\em fac} is the lower case of the facility name determined from the error 
+\item The file produced will be named {\em fac}{\bf \_err.msg} file, where
+{\em fac} is the lower case of the facility name determined from the error
 idents in the INCLUDE file ({\bf par} in the above example). This will not
 always give the correct name.
 \item The .TITLE directive produced will contain only the facility name. It
 may be desirable to add a short description by hand.
 \item CREMSG will ignore any initial heading comment lines in the INCLUDE file.
 \item CREMSG will accept the message comment line either first or last in each
-definition sequence in the INCLUDE file but a blank line must be present 
+definition sequence in the INCLUDE file but a blank line must be present
 between each sequence.
 \end{enumerate}
 
@@ -391,11 +391,11 @@ message file and error include files are included in the source tar file rather
 than building them from the MESSGEN source file during the {\bf make build}.
 This will avoid an unnecessary dependency.
 
-The internal EMS source file {\bf ems1\_fcerr.c} contains C code for obtaining 
-the message given the status value -- this may be copied by other systems 
+The internal EMS source file {\bf ems1\_fcerr.c} contains C code for obtaining
+the message given the status value -- this may be copied by other systems
 requiring to do the same job on UNIX platforms but note that the system is not
-fully portable and Starlink reserve the right to alter it. 
-See 
+fully portable and Starlink reserve the right to alter it.
+See
 \xref{SSN/4}{ssn4}{operating_system_specific_routines}
 (Appendix on Portability) for a description of how the routine operates on UNIX.
 
@@ -403,16 +403,16 @@ See
 \section{Changes in Version 1.1}
 \begin{itemize}
 \item The CREMSG utility is added (Section 4).
-\item The first issue of this document gave the wrong .SEVERITY value 
+\item The first issue of this document gave the wrong .SEVERITY value
 corresponding with the formula in SUN/104 -- this has been corrected
 (Section 2 Note 9).
 \end{itemize}
 
 \section{Changes in Version 1.1-1}
 \begin{itemize}
-\item Generated C header files now contains a conditional statement to prevent 
+\item Generated C header files now contains a conditional statement to prevent
 repeat definitions.
-\item A hypertext version of this document is released. Apart from the 
+\item A hypertext version of this document is released. Apart from the
 addition of this section, there are no changes to the text.
 \end{itemize}
 

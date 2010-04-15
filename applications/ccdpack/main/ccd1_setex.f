@@ -15,7 +15,7 @@
 *  Description:
 *     This routine returns, as a character string, the current symbol
 *     used as the NULL value. Currently this is set to "!" for all
-*     systems except IRAF, which uses the string "INDEF". 
+*     systems except IRAF, which uses the string "INDEF".
 *
 *     This routine is for use in constructing output messages which
 *     advise on the use of the NULL symbol.
@@ -68,7 +68,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard parameters
       INCLUDE 'PSX_ERR'         ! PSX error codes.
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) NULL
       INTEGER NL
@@ -77,7 +77,7 @@
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      CHARACTER * ( 132 ) VALUE ! Value of environment variable. 
+      CHARACTER * ( 132 ) VALUE ! Value of environment variable.
 *.
 
 *  Check inherited global status.
@@ -87,7 +87,7 @@
 *  the "ccdpack$" variable. This is defined as part of the setup.
       CALL ERR_MARK
       CALL PSX_GETENV( 'ccdpack', VALUE, STATUS )
-      IF ( STATUS .EQ. PSX__NOENV ) THEN 
+      IF ( STATUS .EQ. PSX__NOENV ) THEN
          CALL ERR_ANNUL( STATUS )
          NULL = '!'
          NL = 1

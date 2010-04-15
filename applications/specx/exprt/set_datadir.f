@@ -34,7 +34,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
 
 *     Length of string
             CURLEN = GEN_ILEN( CURDIR )
-            
+
 *     Format for displayed default
             WRITE( CURDIR_FMT, '(''A'',I2.2)') CURLEN
 

@@ -44,12 +44,12 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,14 +84,14 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 
    char *cmd = NULL;
    int ret;
-  
+
    if ( *status != SAI__OK ) return;
-  
+
    cmd = cnfCreim( command, command_length ); /* Import the FORTRAN string. */
    if (cmd == NULL) {
      *status = ONE__MALLOCERR;
-     emsRep( "ONE_EXEC_ERR0", 
-	     "Error allocating temp memory whilst executing command.", 
+     emsRep( "ONE_EXEC_ERR0",
+	     "Error allocating temp memory whilst executing command.",
 	     status );
    }
    ret = system( cmd );
@@ -113,7 +113,7 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 
       } else {
 	emsSeti( "STS", ret );
-	emsRep( "ONE_EXEC_ERR3", "Command '^COMND' returned an error status of ^STS", 
+	emsRep( "ONE_EXEC_ERR3", "Command '^COMND' returned an error status of ^STS",
 		status );
       }
    }

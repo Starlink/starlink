@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -160,7 +160,7 @@
                ENDDO
                CALL EMS_SETC( 'VALS', '''' )
             END IF
-            CALL EMS_REP( 'SUP_LIMIT2', '  Allowed set is: ^VALS', 
+            CALL EMS_REP( 'SUP_LIMIT2', '  Allowed set is: ^VALS',
      :       STATUS )
          ENDIF
 
@@ -174,8 +174,8 @@
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-         CALL EMS_REP( 'SUP_LIMIT3', 
-     :   'SUBPAR: Failed constraints check for parameter ^NAME', 
+         CALL EMS_REP( 'SUP_LIMIT3',
+     :   'SUBPAR: Failed constraints check for parameter ^NAME',
      :    STATUS )
       END IF
 

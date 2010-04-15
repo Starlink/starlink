@@ -36,20 +36,20 @@
 *  Algorithm:
 *     Two masks...
 *
-*     Vax-D floating-point representation. 
+*     Vax-D floating-point representation.
 *     ====================================
-* 
+*
 *     Vax D floating point is stored as the following arrangement.
-* 
+*
 *         15  14                7 6                 0
 *        ---------------------------------------------
 *        | s |     exponent      |      mantissa     | :A (byte address)
 *        |-------------------------------------------|
-*        |                mantissa                   | :A+2 
+*        |                mantissa                   | :A+2
 *        |-------------------------------------------|
 *        |                mantissa                   | :A+4
 *        |-------------------------------------------|
-*        |                mantissa                   | :A+6 
+*        |                mantissa                   | :A+6
 *        ---------------------------------------------
 *         63                                       48
 *
@@ -59,7 +59,7 @@
 *  References:
 *     -  "IEEE Standard for Binary Floating-Point Arithmetic",
 *     ANSI/IEEE 754, 1985.
-*     -  "Floating Point Agreement for FITS", D.C. Wells & P. Grosbol, 
+*     -  "Floating Point Agreement for FITS", D.C. Wells & P. Grosbol,
 *     1990.
 
 *  Copyright:
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE            ! No implicit typing
 
@@ -114,7 +114,7 @@
 *  Status:
       INTEGER STATUS           ! Global status
 
-*. 
+*.
 
 *  Do nothing.
 

@@ -5,7 +5,7 @@
 #include "ndf1.h"		 /* Internal NDF definitions		    */
 #include "ast.h"		 /* AST functions and constants 	    */
 
-   F77_SUBROUTINE(ndf1_mjd2t)( DOUBLE(MJD), 
+   F77_SUBROUTINE(ndf1_mjd2t)( DOUBLE(MJD),
                                INTEGER_ARRAY(YMDHM),
                                REAL(SEC),
 			       INTEGER(STATUS) )
@@ -25,7 +25,7 @@
 *     CALL NDF1_MJD2T( MJD, YMDHM, SEC, STATUS )
 
 *  Description:
-*     The routine converts the supplied MJD into separate year, month, 
+*     The routine converts the supplied MJD into separate year, month,
 *     day, hour, minute and second values.
 
 *  Arguments:

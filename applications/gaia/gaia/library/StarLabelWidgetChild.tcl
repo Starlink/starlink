@@ -41,7 +41,7 @@
 #    is_enabled (boolean)
 #        Returns true if the checkbox is ticked.
 #
-#    reset 
+#    reset
 #        Restore to initial state.
 #
 #  Inheritance:

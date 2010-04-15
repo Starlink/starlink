@@ -76,7 +76,7 @@ extern char *os;						/* unix.c */
  * cntlc_handler()
  ******************************************************************************
  */
-int sigint_flag; 
+int sigint_flag;
 /******************************************************************************
  *
  * Whether ICL is running interactively or not - can ONLY run interactively
@@ -106,7 +106,7 @@ char *prog_name;
 /******************************************************************************
  *
  * The process id number of the iosubsystem task and the file descriptor
- * of the pipe to send it commands. This is used to send IO requests to the 
+ * of the pipe to send it commands. This is used to send IO requests to the
  * subsystem.
  *
  ******************************************************************************
@@ -140,7 +140,7 @@ int jmp_float_setup = 0;
  *
  ******************************************************************************
  */
-static void 
+static void
 float_exception(int sig)
 {
     if (jmp_float_setup)
@@ -178,8 +178,8 @@ memory_violation(int sig)
     killiosubsystem();
     adam_stop();
 
-/* wait for all child processes to die */       
-    while( (pid = wait((int *) 0)) != -1) /* Null statement */; 
+/* wait for all child processes to die */
+    while( (pid = wait((int *) 0)) != -1) /* Null statement */;
 
     abort();	/* Terminate with core */
 }
@@ -203,23 +203,23 @@ cntlc_handler(int signo)
 
 /******************************************************************************
  *
- * ICL procedure calls are implemented by using a push down stack of 
- * procedure names which allows the system to keep track of the currently 
+ * ICL procedure calls are implemented by using a push down stack of
+ * procedure names which allows the system to keep track of the currently
  * active proccedures.
  *
  * This is pushed with the name of the currently active procedure or function
  * on entry by either proc_call_interpret() or function_call_interpret()
  * respectively.
- * It is normally popped on return unless an exception occured in execution.  
- * If an exception occured the stack is left until either we detect an 
+ * It is normally popped on return unless an exception occured in execution.
+ * If an exception occured the stack is left until either we detect an
  * exception handler (when we restore the stack to the level where the handler
- * was found) 
- * OR 
- * when we arrive at the top level when the stack is used to report the 
+ * was found)
+ * OR
+ * when we arrive at the top level when the stack is used to report the
  * exception and the call list.
  *
  * To permit the restore mentioned above we provide a further stack
- * calllevel_stack[ICL_BUFSIZE] with calllevel_stack_level which is pushed in 
+ * calllevel_stack[ICL_BUFSIZE] with calllevel_stack_level which is pushed in
  * procedure_interpret() with the current value of call_stack_level and popped
  * to restore that level when needed.
  *
@@ -239,7 +239,7 @@ static int calllevel_stack_level = 0;
  *
  ******************************************************************************
  */
-value 
+value
 checkcallstack(char *procname)
 {
     int i;
@@ -259,7 +259,7 @@ checkcallstack(char *procname)
  *
  ******************************************************************************
  */
-value 
+value
 pushcallstack(char *procname)
 {
     if (call_stack_level == ICL_BUFSIZE)
@@ -276,7 +276,7 @@ pushcallstack(char *procname)
  *
  ******************************************************************************
  */
-value 
+value
 pushcalllevel(void)
 {
     if (calllevel_stack_level == ICL_BUFSIZE)
@@ -293,7 +293,7 @@ pushcalllevel(void)
  *
  ******************************************************************************
  */
-value 
+value
 popcallstack(void)
 {
     if (call_stack_level <= 0)
@@ -310,7 +310,7 @@ popcallstack(void)
  *
  ******************************************************************************
  */
-value 
+value
 restorecalllevel(void)
 {
     if (calllevel_stack_level <= 0)
@@ -327,7 +327,7 @@ restorecalllevel(void)
  *
  ******************************************************************************
  */
-value 
+value
 popcalllevel(void)
 {
     if (calllevel_stack_level <= 0)
@@ -367,7 +367,7 @@ currentproc(void)
  *
  ******************************************************************************
  */
-int 
+int
 execute(void)
 {
     extern value interpret(node *n);			/* interp.c */
@@ -410,7 +410,7 @@ execute(void)
  *
  ******************************************************************************
  */
-void 
+void
 killiosubsystem(void)
 {
     struct iocommand iomessage;
@@ -427,7 +427,7 @@ killiosubsystem(void)
 /******************************************************************************
  *
  *	I O S U B S Y S T E M _H A N D L E R (void)
- * 
+ *
  * Signal handler used for SIGCHLD events during ICL iosubsystem loading.
  *
  ******************************************************************************
@@ -466,13 +466,13 @@ iosubsystem_handler(int sig)
  * line to the subsystem using the *argv[] mechanism - see below.
  *
  * We return (-1) if an error is detacted in loading the iosubsystem or it
- * fails to signon correctly. 
- * Otherwise the return value is the identifier of the io subsystems 
+ * fails to signon correctly.
+ * Otherwise the return value is the identifier of the io subsystems
  * MSP command_q.
  *
  ******************************************************************************
  */
-static int 
+static int
 startiosubsystem(char *filename, char *icl_argv[], int nargs)
 {
     int status, path, messid, message_context, message_status, value_len;
@@ -539,8 +539,8 @@ startiosubsystem(char *filename, char *icl_argv[], int nargs)
 	iocommand_fd = filedes[1];
     	signal(SIGCHLD, iosubsystem_handler);
         status = SAI__OK;
-	ams_receive(MESSYS__INFINITE, MSG_NAME_LEN, MSG_VAL_LEN, 
-		    &message_status, &message_context, message_name, 
+	ams_receive(MESSYS__INFINITE, MSG_NAME_LEN, MSG_VAL_LEN,
+		    &message_status, &message_context, message_name,
 		    &value_len, value, &path, &messid, &status);
         ams_reply(path, messid, MESSYS__MESSAGE, DTASK__ACTSTART,
 		  message_context, message_name, value_len, value, &status);
@@ -607,7 +607,7 @@ startiosubsystem(char *filename, char *icl_argv[], int nargs)
  *
  ******************************************************************************
  */
-int 
+int
 main(int argc, char *argv[])
 {
 /*
@@ -616,7 +616,7 @@ main(int argc, char *argv[])
     extern void  init_arith(void);			/* arith.c */
     extern value init_adam(void);			/* adam.c */
     extern value init_fileio(void);			/* fileio.c */
-    extern value init_functions(void);			/* functions.c */ 
+    extern value init_functions(void);			/* functions.c */
     extern value init_input(void);			/* input.c */
     extern value init_output(void);			/* output.c */
     extern value init_os(void);				/* unix.c */
@@ -686,11 +686,11 @@ main(int argc, char *argv[])
 		    }
 		}
 		else
-		    io_imagefile = &(*argv)[3];	
+		    io_imagefile = &(*argv)[3];
 	    break;
 	    }
 	  default:
-	    fprintf(stderr,"%s: unknown option %s\n", prog_name, *argv); 
+	    fprintf(stderr,"%s: unknown option %s\n", prog_name, *argv);
  	    abort = 1;
 	    break;
 	  } /* switch */
@@ -717,7 +717,7 @@ main(int argc, char *argv[])
 	return (0); /* for lint */
     }
 /*
- * Initialise the ADAM task control module - this also registers ICL with 
+ * Initialise the ADAM task control module - this also registers ICL with
  * messys and starts message system support processes
  */
     if (isexc(val = init_adam())) {
@@ -745,7 +745,7 @@ main(int argc, char *argv[])
 	    fprintf(stderr,
 		"SYSTEM FAIL :  Failed to start io subsystem\n");
 	else if (istat == -1)
-	    fprintf(stderr, 
+	    fprintf(stderr,
 		"SYSTEM FAIL :  iosubsystem failed to communicate\n");
 	else
 	    fprintf(stderr,
@@ -754,7 +754,7 @@ main(int argc, char *argv[])
 	return (0); /* for lint */
     }
 /*
- * We have a working message system and iosubsystem process - try and ensure 
+ * We have a working message system and iosubsystem process - try and ensure
  * the user does not exit ICL except by approved routes
  */
     act.sa_handler = cntlc_handler;
@@ -802,7 +802,7 @@ main(int argc, char *argv[])
 	    bufstring(string_part(val));
 	    bufnewline();
 	}
-    } 
+    }
     if ((s = getenv("ICL_LOGIN_LOCAL")) != CHARNIL) {
 	if (strcmp(&s[strlen(s) - 4], ".icl"))
 	    s = strconcat(s, ".icl");
@@ -811,7 +811,7 @@ main(int argc, char *argv[])
 	    bufstring(string_part(val));
 	    bufnewline();
 	}
-    } 
+    }
     if ((s = getenv("ICL_LOGIN")) != CHARNIL) {
 	if (strcmp(&s[strlen(s) - 4], ".icl"))
 	    s = strconcat(s, ".icl");
@@ -820,11 +820,11 @@ main(int argc, char *argv[])
 	    bufstring(string_part(val));
 	    bufnewline();
 	}
-    } 
+    }
     clear_promptstack();
 
 /*
- * We may have unprocessed command line arguments (not starting with '-') 
+ * We may have unprocessed command line arguments (not starting with '-')
  * which are the names of .icl files to load (.icl suffix optional)
  */
     while (*argv != 0) {
@@ -852,7 +852,7 @@ main(int argc, char *argv[])
 /*
  * ICL should exit by calling proc_exit (in procs.c) from the EXIT command.
  * - we only get here if we drop out of the yyparse() loop but, for neatness,
- * we can still perform the exit processing in proc_exit(node *n) directly as 
+ * we can still perform the exit processing in proc_exit(node *n) directly as
  * the node argument is not used.
  */
     proc_exit(NODENIL);
@@ -863,20 +863,20 @@ main(int argc, char *argv[])
  *
  *	Y Y W R A P (void)
  *
- * lex is used to tokenise the input line and allows the redefinition of its 
+ * lex is used to tokenise the input line and allows the redefinition of its
  * library routine yywrap() which is called at an end_of_file.
  *
  * If it returns 1, lex continues with the normal wrap_up of input.
  *
  * Sometimes, however, it is convenient to arrange for more input to
- * arrive from a new source.  In this case the programmer should provide a 
+ * arrive from a new source.  In this case the programmer should provide a
  * yywrap() which arranges for new input and returns 0.  This instructs
- * lex to continue processing.  The default yywrap returns 1 as does this 
+ * lex to continue processing.  The default yywrap returns 1 as does this
  * version which is present in case we need it later.
  *
  ******************************************************************************
  */
-int 
+int
 yywrap(void)
 {
     return 1;
@@ -891,7 +891,7 @@ yywrap(void)
  *
  ******************************************************************************
  */
-int 
+int
 yyerror(char *s)
 {
     flshbuf();

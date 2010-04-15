@@ -302,10 +302,10 @@ proc CCDDoReduce { Top } {
 logged in the file \"$logfile\".  "
 
 #  And start up the background process monitor.
-            if { [file executable $CCDdir/filemonitor] } { 
+            if { [file executable $CCDdir/filemonitor] } {
                if { [file dirname $logfile] == "." } {
                   exec $CCDdir/filemonitor "[pwd]/$logfile" &
-               } else { 
+               } else {
                   exec $CCDdir/filemonitor "$logfile" &
                }
             }

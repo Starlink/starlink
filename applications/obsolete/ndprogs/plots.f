@@ -265,21 +265,21 @@ C   01-FEB-1989   - Original program
 C   21-MAR-1989   - Corrected bug which produced hardcopy instead of screen
 C                   plot.
 C   14-JUN-1990   - Parameters in call to NDP_IMAGE_PLOT changed.  Also replaced
-C                   NDP_IMAGE_LUT with IMAGE_LUT as a temporary measure since 
-C                   the former no longer works.  Also fixed arguments in 
+C                   NDP_IMAGE_LUT with IMAGE_LUT as a temporary measure since
+C                   the former no longer works.  Also fixed arguments in
 C                   subroutine calls so that arrays aren't dimensioned with
 C                   elements of other array.
 C   29-AUG-1990   - New version of NDP_IMAGE_LUT added in. (JRL)
 C   18-SEP-1990   - The program now deals with magic values in the 2-d array by
 C                   replacing the flagged pixels with a value which is below
-C                   the lower threshold for the plot.  To do this a quality 
-C                   array is used so that it can be remembered which elements 
+C                   the lower threshold for the plot.  To do this a quality
+C                   array is used so that it can be remembered which elements
 C                   were magic if the user decides to change the plot limits.
-C                   Formerly the values were all replaced by zeros which won't 
-C                   do if there is data with a value less than zero (which 
-C                   is always possible). The data were also changed straight 
-C                   into the mapped array, which then changed the values in 
-C                   the disk file if the array was mapped and not type 
+C                   Formerly the values were all replaced by zeros which won't
+C                   do if there is data with a value less than zero (which
+C                   is always possible). The data were also changed straight
+C                   into the mapped array, which then changed the values in
+C                   the disk file if the array was mapped and not type
 C                   converted.  Using a copy of the data array in such a case
 C                   solves the problem.  (JRL)
 C   20-NOV-1991   - Now accepts polygonal regions to average spectra over.
@@ -626,7 +626,7 @@ c
       call par_rdval('low',vmin,vmax,0.0,' ',low)
       call par_rdval('high',vmin,vmax,0.0,' ',high)
 c
-c   Get name of LUT 
+c   Get name of LUT
 c
       call par_rdchar('table',' ',table)
 c
@@ -867,7 +867,7 @@ c
       call dsa_close(status)
       end
 
-      
+
       subroutine plots_select
      &  (xaxis,yaxis,nx,ny,stapix,endpix,start,end,mag,cursor,image,
      &   points,xpix,ypix,nx1,ny1,polygon,mask)
@@ -1063,7 +1063,7 @@ C
       IF (DTA_STATUS .NE. 0) THEN
         CALL DTA_ERROR(DTA_STATUS,ERRMSG)
         CALL DSA_WRUSER(ERRMSG(:ICH_LEN(ERRMSG))//'\\N')
-        GO TO 500                         
+        GO TO 500
       END IF
 C
 C     Map axis

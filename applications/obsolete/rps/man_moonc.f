@@ -1,5 +1,5 @@
 *+MAN_MOONC        Finds periods when moon constraint prevents viewing
-      SUBROUTINE MAN_MOONC(SOP,EOP,DRA,DDEC,MANG, 
+      SUBROUTINE MAN_MOONC(SOP,EOP,DRA,DDEC,MANG,
      &    MAX_NPERIODS,MJDINT,NPERIODS)
       IMPLICIT NONE
 
@@ -63,7 +63,7 @@
                BLOCK=.TRUE.
                NPERIODS = NPERIODS + 1
                MJDINT(1, NPERIODS)=MJD					!Set time at which Moon occultation starts
-            END IF 
+            END IF
          ELSE
             IF(BLOCK)THEN
                BLOCK=.FALSE.

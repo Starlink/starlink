@@ -10,7 +10,7 @@ C
 C  Description:
 C     This is the system-dependent part of the routine DSA_FNAME, which
 C     takes an object name and splits it up into a full unambiguous
-C     filename and, if specified, the hierarchical name of a data object 
+C     filename and, if specified, the hierarchical name of a data object
 C     held in that file.  This involves an intimate knowledge of the
 C     file name syntax of the machine in question, and ambiguities may
 C     need to be resolved by looking at the existence of actual files
@@ -27,12 +27,12 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) OBJECT       (Chcracter*(*)) The name of the data object.
 C     (>) NEW          (Logical)  True if it is intended that a new file
-C                      will eventually be created.  
-C     (>) DEFEXTS      (Character(NEXTS)*(*)) The possible default 
+C                      will eventually be created.
+C     (>) DEFEXTS      (Character(NEXTS)*(*)) The possible default
 C                      file extensions, in order of priority. Each array
-C                      element should be a character string giving the 
+C                      element should be a character string giving the
 C                      extension preceded by a '.'. The case of DEFEXTS
-C                      is left unchanged by this routine, and whether it 
+C                      is left unchanged by this routine, and whether it
 C                      is respected or not depends on the Operating system.
 C     (>) NEXTS        (Integer) The number of possible default extensions.
 C     (<) FILENAME     (Character*(*)) The full file specification.
@@ -46,7 +46,7 @@ C                      to generate a warning message). If STATUS is returned
 C                      indicating an error, ALTFILE is used to return a more
 C                      informative error message.
 C     (!) STATUS       (Integer) Status code.  If a bad status value
-C                      (non-zero) is passed to it, this routine will return 
+C                      (non-zero) is passed to it, this routine will return
 C                      immediately.
 C
 C  External variables used:  None.
@@ -69,14 +69,14 @@ C     if these are needed or even '..' type specifications. So any of the
 C     following are acceptable forms of specifying an object. Note that
 C     none of these specifications contain a file extension - the default
 C     Figaro extension will be assumed for these:
-C     
+C
 C     '/home/aaossg/ks/file.data_array'
 C     '../dir/subdir/file.x.data'
 C     'file'   (no object within the file is specified here)
-C     
+C
 C     Any string prefaced by a '$' in the object name is taken to be
-C     an environment variable and is translated. So if 'mydata' is an 
-C     environment variable set to '/data/ks' then the following are also 
+C     an environment variable and is translated. So if 'mydata' is an
+C     environment variable set to '/data/ks' then the following are also
 C     valid specifications:
 C
 C     '$mydata/file.x.data'
@@ -109,7 +109,7 @@ C     well, and 'file.dst,23.x.data' refers to the object '.x.data' in the
 C     file 'file.dst,23'.  The presence of the comma makes it quite clear
 C     that the '.dst' here is an extension, and in this case even an
 C     unexpected extension need not be placed in parentheses.
-C     
+C
 C  External subroutines / functions used:
 C     DSA_DEFEXTS, DTA_VERSNAME, EMS_ANNUL, EMS_BEGIN, EMS_END,
 C     ICH_DELIM, ICH_FOLD, ICH_LEN, GEN_GETCWD, PSX_GETENV
@@ -130,7 +130,7 @@ C
 C  History:
 C     28th Aug 1992  Original version. KS/AAO.
 C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
-C     31st Aug 1992  Environment variable syntax changed to match that 
+C     31st Aug 1992  Environment variable syntax changed to match that
 C                    used by a UNIX shell. KS/AAO.
 C     19th Oct 1992  HME / UoE, Starlink.  Changed DTAZ_VERSNAME to
 C                    DTA_*, is a dummy routine anyway.
@@ -174,7 +174,7 @@ C
       INTEGER   ICOMMA          ! Position of comma in structure name
       INTEGER   IDELIM          ! Position of environment variable delimiter
       INTEGER   IDOLLR          ! Position of next '$' in string
-      INTEGER   IDOT            ! Position of last '.' in string 
+      INTEGER   IDOT            ! Position of last '.' in string
       INTEGER   IDOTS           ! Position of '../' in string
       INTEGER   IEXEND          ! End of file extension in structure name
       INTEGER   IEXT            ! Index through default extensions
@@ -233,7 +233,7 @@ C
       END DO
 C
 C     Parse the filename. We start by assuming none of the various
-C     components are present, then pass through the string trying to 
+C     components are present, then pass through the string trying to
 C     identify them.  The VAX version used a table-driven parser for this,
 C     but the UNIX syntax is rather easier to deal with and a less subtle
 C     aproach should be OK.
@@ -323,7 +323,7 @@ C     the structure name in STRUCT_NAME, and any explicit extension in EXT.
 C     There is always the possibility that somewhere in all this there
 C     are constructs such as 'dir/subdir/../file' which need to be
 C     converted to 'dir/file'. We deal with that possibility here.
-C     
+C
       IDOTS=INDEX(FULL_NAME,'../')
       DO WHILE (IDOTS.GT.0)
          ISLASH=0
@@ -333,7 +333,7 @@ C
                PSLASH=ISLASH
                ISLASH=I
             END IF
-         END DO 
+         END DO
          IF (PSLASH.GT.0) FULL_NAME(PSLASH:)=FULL_NAME(IDOTS+2:)
          IDOTS=INDEX(FULL_NAME,'../')
       END DO
@@ -341,7 +341,7 @@ C
 C     If the apparent structure name starts with a structure name that is
 C     an allowed file extension, then the probability is that this is
 C     intended to be an extension and we treat it as such. Moreover, if
-C     the apparent extension includes a ',' followed by a number, then 
+C     the apparent extension includes a ',' followed by a number, then
 C     we are almost certainly seeing a file name that includes an explicit
 C     version number. We trap both these possibilities.
 C
@@ -381,9 +381,9 @@ C
          END IF
       END IF
 C
-C     Now, if EXT contained an explicit file extension, we append that 
+C     Now, if EXT contained an explicit file extension, we append that
 C     to the file name to get the final version of the file name as
-C     implied by OBJECT. 
+C     implied by OBJECT.
 C
       IF (EXT.NE.' ') THEN
          EXPEXT=.TRUE.
@@ -393,7 +393,7 @@ C
 C
 C     Having finished manipulating the structure name, we finally
 C     return it in STRUCT and set it into upper case. (Note that we've
-C     been using STRUCT_NAME rather than STRUCT to keep closer to the 
+C     been using STRUCT_NAME rather than STRUCT to keep closer to the
 C     letter of the Fortran 77 rule about manipulating passed-length
 C     character strings.)
 C
@@ -420,7 +420,7 @@ C
       ELSE
 C
 C        For an old file, it's trickier. If an explicit extension was
-C        specified, then we use that and all we have to do is call 
+C        specified, then we use that and all we have to do is call
 C        VERSNAME in case the latest version number has to be appended.
 C
          IF (EXPEXT) THEN
@@ -442,7 +442,7 @@ C              However, if two possible extensions are being used, we
 C              need to do the same for the second possible extension and
 C              then need to see if either (or both) of the two possible
 C              files actually exist. If both do, we return one in FILENAME
-C              and the other in ALTFILE. If only the second does, we use 
+C              and the other in ALTFILE. If only the second does, we use
 C              that.
 C
                FULL_NAME(FLEN+1:)=DEFEXTS(2)

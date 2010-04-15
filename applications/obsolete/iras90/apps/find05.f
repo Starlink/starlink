@@ -32,7 +32,7 @@
 *        FIND22
 *     ERR:
 *        ERR_ANNUL
-*        
+*
 *  Authors:
 *     GHS: George Spalding (Rutherford Appleton Laboratory)
 *     {enter_new_authors_here}
@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,14 +81,14 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 
 *  Call subroutine FIND22. This subroutine asks the user for the
 *  wavebands he requires and translates the waveband identifiers to
 *  give logical values to the four elements of SOWAB, so that SOWAB( 1)
 *  tells whether the first waveband is required etc.
          CALL FIND22( PBANDS, .FALSE., SOWAB, WAFOUN, STATUS)
-      
+
 *  Check whether the return status from FIND22 was abort
          IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -96,9 +96,9 @@
          IF ( STATUS .EQ. PAR__NULL ) THEN
 
 *  If there was an error message, annul the error, which sets the
-*  status to SAI__OK. 
+*  status to SAI__OK.
              CALL ERR_ANNUL( STATUS )
-      
+
          ELSE
 *  If the return status from FIND22 was O.K. then set the wavebands
 *  required logicals for each source to the values of the SOWAB array
@@ -110,7 +110,7 @@
                SOWAB4( IK ) = SOWAB(4)
  200        CONTINUE
          END IF
-      
+
 *  The menu choice is changed to M so that the user can select from the
 *  add size and wavebands menu in the FIND26 routine which called this
 *  subroutine

@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_CHGQUAL( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This application is used to set SCUBA data quality bad or good by
 *     using SCUBA sections to specify a subset of the full data.
@@ -26,7 +26,7 @@
 *       Once the data specification has been decoded the application will
 *     read from parameter BAD_QUALITY whether quality should be set good
 *     or bad. A `yes' answer will mark the area bad, a `no' answer will
-*     mark the area good (an area will only be good if no other QUALITY 
+*     mark the area good (an area will only be good if no other QUALITY
 *     bits are set - CHANGE_QUALITY only uses QUALITY bit 3). The section
 *     can be inverted by using the negation character at the end of the
 *     section.
@@ -43,7 +43,7 @@
 *         Name of data set and the specification of the data to be changed.
 *         Usually of the form `ndf{spec1}{spec2}' where ndf is the filename
 *         and spec1...n are the section specifications.
-*         The section can be read from the SECTION parameter if the 
+*         The section can be read from the SECTION parameter if the
 *         SCUBA section is omitted.
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
@@ -52,7 +52,7 @@
 *         Curly brackets must still be given. Since this is an array
 *         parameter square brackets must be used to specify more than
 *         one component:
-* 
+*
 *             SECTION > [ {b3} , {i2} ]
 *
 *         would supply two SECTIONS of {b3} and {i2}. Only {b3} will
@@ -64,8 +64,8 @@
 *             SECTION > [ "{b3,5}" , {i2} ]
 *
 *         If necessary the negation character should come after a
-*         section (ie after the closing curly bracket) and that 
-*         negation applies to the combined section and not just the string 
+*         section (ie after the closing curly bracket) and that
+*         negation applies to the combined section and not just the string
 *         containing the negation character:
 *
 *             SECTION > [ {b3}-, {i2} ]
@@ -99,11 +99,11 @@
 *         Set everything bad except bolometer 2 and integration 2.
 
 *  Notes:
-*     Samples are marked bad by setting bit 3 of the quality array. 
-*     The effects of CHANGE_QUALITY  can be removed by changing the 
-*     value of the bad bit mask (with the KAPPA task SETBB or by running 
-*     CHANGE_QUALITY on the entire array [section is {} for entire array] 
-*     but with BAD_QUALITY=false) so that bit 3 (decimal value of 8) is 
+*     Samples are marked bad by setting bit 3 of the quality array.
+*     The effects of CHANGE_QUALITY  can be removed by changing the
+*     value of the bad bit mask (with the KAPPA task SETBB or by running
+*     CHANGE_QUALITY on the entire array [section is {} for entire array]
+*     but with BAD_QUALITY=false) so that bit 3 (decimal value of 8) is
 *     no longer used as a masking bit.
 
 *  Related Application:
@@ -123,7 +123,7 @@
 *  History:
 *     $Id$
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -147,12 +147,12 @@
       INTEGER CHR_LEN                     ! Length of string
       EXTERNAL CHR_LEN
       BYTE SCULIB_BITON                   ! function to set a specified
-                                          ! bit in a byte 
+                                          ! bit in a byte
 *  Local Constants:
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
       CHARACTER * 1    NEGCHAR            ! Character used to negate a section
-      PARAMETER (NEGCHAR = '-')           ! 
+      PARAMETER (NEGCHAR = '-')           !
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_QUALITY')
       INTEGER          BITNUM             ! Bit affected by this task
@@ -281,7 +281,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETC('TASK',TSKNAME)
                CALL ERR_REP (' ', '^TASK: this file has not '//
-     :              'been through the REDUCE_SWITCH application', 
+     :              'been through the REDUCE_SWITCH application',
      :              STATUS)
             END IF
             IF (PHOTOM) THEN
@@ -305,7 +305,7 @@
       CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
 
 *     and read in some parameters describing the observation
-      
+
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
@@ -331,7 +331,7 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
@@ -378,7 +378,7 @@
 *     map the quality array and check its dimensions
 
       CALL NDF_DIM (IN_NDF, MAX__DIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'UPDATE', 
+      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'UPDATE',
      :  IN_QUALITY_PTR, ITEMP, STATUS)
 
       N_POS = DIM (2)
@@ -426,7 +426,7 @@
       CALL MSG_SETI ('NMEAS', N_MEASUREMENTS)
       CALL MSG_SETI ('NINT', N_INTEGRATIONS)
       CALL MSG_SETI ('NEXP', N_EXPOSURES)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     ' - there are data for ^NEXP exposure(s) '//
      :     'in ^NINT integration(s) in ^NMEAS measurements.', STATUS)
 
@@ -488,7 +488,7 @@
          SWITCH_EXPECTED = .FALSE.
 
          CALL SCULIB_MASK_DATA(USE_SECT, 'BIT', N_SPEC, DATA_SPEC,
-     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :        1, N_EXPOSURES, N_INTEGRATIONS,
      :        N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED,
      :        0.0, BTEMP, BITNUM, BAD_QUALITY, IN_QUALITY_PTR,

@@ -1,33 +1,33 @@
       SUBROUTINE SUBPAR_GETVR ( NAMECODE, MAXVAL, RVALUES, ACTVAL,
      :  STATUS )
- 
+
 *+
 *  Name:
 *     SUBPAR_GETVR
- 
+
 *  Purpose:
 *     Read parameter values as if object were a vector.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_GETVR ( NAMECODE, MAXVAL, RVALUES, ACTVAL, STATUS )
- 
+
 *  Description:
 *     Read the values from a primitive object associated with a Parameter
 *     as if it were vectorised (ie regardless of dimensionality)
 *     There is a routine for each access type, REAL:
- 
+
 *        SUBPAR_GETVD    DOUBLE PRECISION
 *        SUBPAR_GETVR    REAL
 *        SUBPAR_GETVI    INTEGER
 *        SUBPAR_GETVL    LOGICAL
 *        SUBPAR_GETVC    CHARACTER[*n]
- 
+
 *     If the object data type differs from the access type, REAL, then
 *     conversion is performed (if allowed).
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER ( given)
 *        pointer to the parameter
@@ -38,7 +38,7 @@
 *     ACTVAL=INTEGER
 *        number of values returned
 *     STATUS=INTEGER
- 
+
 *  Algorithm:
 *     The HDS locator associated with the parameter is obtained.
 *     If this is successful, the size of the object is obtained.
@@ -48,7 +48,7 @@
 *     If after ASSOC is OK, an error is detected, the value cancelled and
 *     another value obtained if possible by prompting.
 *     If the locator was obtained it is annulled.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1986, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     19.11.1984 (BDK):
 *        Original
@@ -99,59 +99,59 @@
 *     29-SEP-1994 (AJC):
 *        Use EMS_FACER not DAT_ERMSG to report errors
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! SAI Constants
       INCLUDE 'DAT_PAR'                 ! DAT Constants
       INCLUDE 'SUBPAR_PAR'              ! SUBPAR Constants
       INCLUDE 'SUBPAR_ERR'              ! SUBPAR errors
       INCLUDE 'SUBPAR_PARERR'           ! SUBPAR PAR errors
- 
+
 *  Local Constants:
       INTEGER MAXTRY                    ! Maximum attempts to get good value
       PARAMETER ( MAXTRY = 5 )
- 
+
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter number
       INTEGER MAXVAL                    ! maximum number of values
- 
+
 *  Arguments Returned:
       REAL RVALUES(*)               ! Array for values
       INTEGER ACTVAL                    ! number of values
- 
+
 *  Status return :
       INTEGER STATUS                    ! Status Return
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *  Local Variables:
       INTEGER SIZE                      ! Actual size of object
       INTEGER TRIES                     ! Number of tries
       CHARACTER*(DAT__SZLOC) BOTLOC     ! HDS locator
       LOGICAL ACCEPTED                  ! If no re-prompt required
- 
+
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
- 
+
 *   Protect higher level tokens
       CALL EMS_MARK
- 
+
 *   Loop until ACCEPTED
       ACCEPTED = .FALSE.
       TRIES = 0
- 
+
       DOWHILE ( .NOT. ACCEPTED )
- 
+
 *      Get an HDS locator to the data for the parameter, determine its
 *      type and ask for a vectorised locator to it.
 *
@@ -160,9 +160,9 @@
          ELSE
             CALL SUBPAR_ASSOC ( NAMECODE, 'READ', BOTLOC, STATUS )
          ENDIF
- 
+
          IF (STATUS .EQ. SAI__OK) THEN
- 
+
 *        Check the size
             CALL DAT_SIZE( BOTLOC, SIZE, STATUS )
             IF ( ( STATUS .EQ. SAI__OK )
@@ -173,21 +173,21 @@
                CALL EMS_REP( 'SUP_GETV1', 'SUBPAR: '//
      :         'No more than ^MAXVAL elements are allowed '//
      :         'for parameter ^NAME', STATUS )
- 
+
             ELSE
 *           Obtain the 'vectorised' data
                CALL DAT_GETVR ( BOTLOC, MAXVAL, RVALUES, ACTVAL,
      :         STATUS )
- 
+
             ENDIF
- 
+
 *        Annul the locator
             CALL DAT_ANNUL ( BOTLOC, STATUS )
- 
+
 *        If OK, break the loop
             IF ( STATUS .EQ. SAI__OK ) THEN
                ACCEPTED = .TRUE.
- 
+
 *        Otherwise cancel the parameter - forcing reprompt,
 *        flush error messages and loop
             ELSE
@@ -198,7 +198,7 @@
                CALL SUBPAR_CANCL ( NAMECODE, STATUS )
 *           Flush error and reset status
                CALL SUBPAR_EFLSH( STATUS )
- 
+
 *           Check for try limit
                TRIES = TRIES + 1
                IF ( TRIES .EQ. MAXTRY ) THEN
@@ -211,19 +211,19 @@
      :            '^TRIES prompts failed to get a good value for '//
      :            'parameter ^NAME - NULL assumed', STATUS )
                ENDIF
- 
+
             ENDIF
- 
- 
+
+
 *     Else if ASSOC failed - exit
          ELSE
             ACCEPTED = .TRUE.
- 
+
          ENDIF
- 
+
       ENDDO
- 
+
 *  Release the error context
       CALL EMS_RLSE
- 
+
       END

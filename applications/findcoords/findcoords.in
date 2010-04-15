@@ -62,7 +62,7 @@
 
 #
 #  Work out where cursa may be (let $CURSA_DIR override built location)
-    my $CURSA_DIR = (exists $ENV{CURSA_DIR} ? $ENV{CURSA_DIR} 
+    my $CURSA_DIR = (exists $ENV{CURSA_DIR} ? $ENV{CURSA_DIR}
                      : '@bindir@/cursa');
 
 #  Set the variable holding the location of the catremote script.
@@ -80,7 +80,7 @@
 #
 #  Check that there is at least one command line argument.
 
-    if ($#ARGV >= 0) 
+    if ($#ARGV >= 0)
     {
 
 #

@@ -14,7 +14,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -40,7 +40,7 @@ package surf {
 #        Change USE_INTS to USE_SECTION
 #	 Remove SELECT_INTS and INTEGRATIONS
 #     1997 April 9 (TimJ)
-#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#	 Add DUMMY to deal with GLOBAL defaults in REF
 #     1997 May 9 (TimJ)
 #	 Add PL to OUT_COORDS
 #     1997 May 21 (TimJ)
@@ -127,7 +127,7 @@ package surf {
 #	 IN      'BESSEL','LINEAR'
             helpkey *
           }
- 
+
          parameter weight {
             type _REAL
             prompt {Weight to be assigned to input dataset}
@@ -222,7 +222,7 @@ package surf {
             prompt {Name of container file to contain rebinned map}
             helpkey *
           }
-      
+
          parameter weights {
             type _LOGICAL
             default FALSE
@@ -230,7 +230,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
-         
+
          parameter times {
             type _LOGICAL
             default FALSE
@@ -271,7 +271,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -300,13 +300,13 @@ package surf {
 #        Change USE_INTS to USE_SECTION
 #	 Remove SELECT_INTS and INTEGRATIONS
 #     1997 April 9 (TimJ)
-#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#	 Add DUMMY to deal with GLOBAL defaults in REF
 #     1997 April 21 (TimJ)
 #        Add SFACTOR
 #     1997 May 9 (TimJ)
 #	 Add PL output coords
 #     1997 May 9 (TimJ)
-#	 Copy from REBIN.IFL 
+#	 Copy from REBIN.IFL
 #        Add FILE. Remove regridding parameters.
 #     1997 May 15 (TimJ)
 #        Add LOOP parameter
@@ -464,18 +464,18 @@ package surf {
 
       }
 ## CHANGE_DATA - Modify data values
- 
+
 #+
 #  Name:
 #     CHANGE_DATA.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -501,7 +501,7 @@ package surf {
 #     1997 June 19 (TIMJ)
 #        Remove USE_SECTION
 #     {enter_further_changes_here}
- 
+
 #-
 
       action change_data {
@@ -519,7 +519,7 @@ package surf {
             helpkey *
 #        IN          'DATA', 'ERROR', 'QUALITY', 'VARIANCE'
           }
- 
+
          parameter in {
             position 1
             type _CHAR
@@ -568,18 +568,18 @@ package surf {
       }
 
 ## CHANGE_FLAT - Modify flatfield
- 
+
 #+
 #  Name:
 #     CHANGE_FLAT.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -595,7 +595,7 @@ package surf {
 #     1997 April 30 (TIMJ)
 #	 Add MSG_FILTER
 #     {enter_further_changes_here}
- 
+
 #-
 
 
@@ -632,18 +632,18 @@ package surf {
       }
 
 ## CHANGE_POINTING - Modify pointing
- 
+
 #+
 #  Name:
 #     CHANGE_POINTING.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -663,7 +663,7 @@ package surf {
 #     1997 May 30 (TimJ)
 #	 Change default for POINT_LST to null
 #     {enter_further_changes_here}
- 
+
 #-
 
 
@@ -701,35 +701,35 @@ package surf {
             prompt {The azimuth pointing correction to be added (arcsec)}
             helpkey *
           }
- 
+
          parameter point_del {
             type _REAL
             prompt {The elevation pointing correction to be added (arcsec)}
             helpkey *
           }
- 
+
          parameter point_lst {
             type _CHAR
             prompt {The sidereal time of the pointing offset (hh mm ss.ss)}
             default !
             helpkey *
           }
- 
+
       }
 
 ## CHANGE_QUALITY - Modify data quality.
- 
+
 #+
 #  Name:
 #     CHANGE_QUALITY.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -755,7 +755,7 @@ package surf {
 #     1997 June 19 (TIMJ)
 #        Remove USE_SECTION
 #     {enter_further_changes_here}
- 
+
 #-
 
 
@@ -771,7 +771,7 @@ package surf {
             prompt {Set quality to bad? (No will set quality to good)}
             helpkey *
           }
- 
+
          parameter in {
             position 1
             type _CHAR
@@ -807,7 +807,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -836,13 +836,13 @@ package surf {
 #        Change USE_INTS to USE_SECTION
 #	 Remove SELECT_INTS and INTEGRATIONS
 #     1997 April 9 (TimJ)
-#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#	 Add DUMMY to deal with GLOBAL defaults in REF
 #     1997 April 21 (TimJ)
 #        Add SFACTOR
 #     1997 May 9 (TimJ)
 #	 Add PL output coords
 #     1997 May 9 (TimJ)
-#	 Copy from REBIN.IFL 
+#	 Copy from REBIN.IFL
 #        Add FILE. Remove regridding parameters.
 #     1997 May 15 (TimJ)
 #        Add LOOP parameter
@@ -1029,21 +1029,21 @@ package surf {
             ppath Current Default
             helpkey *
           }
-         
+
       }
 ## DESPIKE2 - Despike SCAN/MAP data.
- 
+
 #+
 #  Name:
 #     DESPIKE2.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -1053,7 +1053,7 @@ package surf {
 #     1997 July 22 (JFL)
 #        Original Version
 #     {enter_further_changes_here}
- 
+
 #-
 
 
@@ -1099,18 +1099,18 @@ package surf {
 
       }
 ## EXTINCTION - Correct scuba data for extinction
- 
+
 #+
 #  Name:
 #     EXTINCTION.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -1128,7 +1128,7 @@ package surf {
 #     1997 April 29 (TIMJ)
 #        Add MSG_FILTER
 #     {enter_further_changes_here}
- 
+
 #-
 
 
@@ -1178,7 +1178,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
- 
+
          parameter second_tau {
             position 5
             prompt {Second zenith sky opacity measured}
@@ -1214,7 +1214,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -1243,13 +1243,13 @@ package surf {
 #        Change USE_INTS to USE_SECTION
 #	 Remove SELECT_INTS and INTEGRATIONS
 #     1997 April 9 (TimJ)
-#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#	 Add DUMMY to deal with GLOBAL defaults in REF
 #     1997 April 21 (TimJ)
 #        Add SFACTOR
 #     1997 May 9 (TimJ)
 #	 Add PL output coords
 #     1997 May 9 (TimJ)
-#	 Copy from REBIN.IFL 
+#	 Copy from REBIN.IFL
 #        Add FILE. Remove regridding parameters.
 #     1997 May 15 (TimJ)
 #        Add LOOP parameter
@@ -1356,20 +1356,20 @@ package surf {
             prompt {Name of output ASCII file}
             helpkey *
           }
-         
+
       }
 ## EXTRACT_FLAT - Extract the flatfield of a file to ascii file
- 
+
 #+
 #  Name:
 #     EXTRACT_FLAT.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -1379,9 +1379,9 @@ package surf {
 #     1997 October 27 (TimJ)
 #      Original version
 #     {enter_further_changes_here}
- 
+
 #-
- 
+
       action extract_flat {
 
          helplib {$SURF_HELP}
@@ -1416,18 +1416,18 @@ package surf {
       }
 
 ## FLATFIELD - Divide data by SCUBA flatfield
- 
+
 #+
 #  Name:
 #     FLATFIELD.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -1443,9 +1443,9 @@ package surf {
 #     1997 April 29 (TIMJ)
 #        Add MSG_FILTER
 #     {enter_further_changes_here}
- 
+
 #-
- 
+
       action flatfield {
 
          helplib {$SURF_HELP}
@@ -1490,7 +1490,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -1517,7 +1517,7 @@ package surf {
 #        Change USE_INTS to USE_SECTION
 #	 Remove SELECT_INTS and INTEGRATIONS
 #     1997 April 9 (TimJ)
-#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#	 Add DUMMY to deal with GLOBAL defaults in REF
 #     1997 May 9 (TimJ)
 #	 Add PL output coords
 #     1997 May 21 (TimJ)
@@ -1624,7 +1624,7 @@ package surf {
             helpkey *
           }
 
- 
+
          parameter weight {
             type _REAL
             prompt {Weight to be assigned to input dataset}
@@ -1702,7 +1702,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
-         
+
          parameter times {
             type _LOGICAL
             default FALSE
@@ -1732,7 +1732,7 @@ package surf {
             default 0.0
             helpkey *
           }
-        
+
       }
 ## REBIN - Rebin the SCUBA data onto a rectangular grid
 
@@ -1742,7 +1742,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -1771,7 +1771,7 @@ package surf {
 #        Change USE_INTS to USE_SECTION
 #	 Remove SELECT_INTS and INTEGRATIONS
 #     1997 April 9 (TimJ)
-#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#	 Add DUMMY to deal with GLOBAL defaults in REF
 #     1997 April 21 (TimJ)
 #        Add SFACTOR
 #     1997 May 9 (TimJ)
@@ -1859,7 +1859,7 @@ package surf {
 #	 IN      'BESSEL','LINEAR'
             helpkey *
           }
- 
+
          parameter scale {
             type _REAL
             vpath DYNAMIC PROMPT
@@ -1976,7 +1976,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
-         
+
          parameter times {
             type _LOGICAL
             default FALSE
@@ -2003,7 +2003,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
@@ -2115,17 +2115,17 @@ package surf {
 
       }
 ## REMSKY - Remove sky noise and constant offset from data
- 
+
 #+
 #  Name:
 #     REMSKY.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -2166,7 +2166,7 @@ package surf {
             ppath CURRENT
             helpkey *
           }
- 
+
          parameter in {
             position 1
             type FILENAME
@@ -2210,22 +2210,22 @@ package surf {
             helpkey *
           }
 
- 
+
       }
 
 ## RESTORE - Remove dual beam response for SCAN/MAP data
- 
+
 #+
 #  Name:
 #     RESTORE.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -2239,7 +2239,7 @@ package surf {
 #     1997 April 29 (TIMJ)
 #        Add GLOBAL association to 'IN' and MSG_FILTER
 #     {enter_further_changes_here}
- 
+
 #-
 
 
@@ -2292,7 +2292,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 #     {enter_new_authors_here}
@@ -2359,7 +2359,7 @@ package surf {
             prompt {Concatenation method}
             helpkey *
           }
- 
+
          parameter in {
             type _CHAR
             access READ
@@ -2382,18 +2382,18 @@ package surf {
 
       }
 ## SCAN_RLB - Remove linear baseline from SCAN/MAP data
- 
+
 #+
 #  Name:
 #     SCAN_RLB.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -2416,7 +2416,7 @@ package surf {
 #        Add SECTION
 #     {enter_further_changes_here}
 
- 
+
 #-
 
 
@@ -2485,17 +2485,17 @@ package surf {
 
       }
 ## SCUCLIP - Simple despiking
- 
+
 #+
 #  Name:
 #     SCUCLIP.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -2558,7 +2558,7 @@ package surf {
             helpkey *
           }
 
- 
+
       }
 
 ## SCUHELP - Gives help about KAPPA.
@@ -2646,7 +2646,7 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 #     {enter_new_authors_here}
@@ -2759,7 +2759,7 @@ package surf {
           }
 
 
-         
+
       }
 
 
@@ -2770,14 +2770,14 @@ package surf {
 #+
 #  Name:
 #     SCUPHOT.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     JFL:  John Lightfoot (ROE)
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -2804,7 +2804,7 @@ package surf {
 #     1998 June 16 (TimJ)
 #        Add POSITION for OUT
 #     {enter_further_changes_here}
- 
+
 #-
 
       action scuphot {
@@ -2873,14 +2873,14 @@ package surf {
 #+
 #  Name:
 #     SKYDIP.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 #     {enter_new_authors_here}
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -2950,7 +2950,7 @@ package surf {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
           }
- 
+
          parameter eta_tel {
             position 4
             prompt {Telescope efficiency}
@@ -3037,7 +3037,7 @@ package surf {
 #         IN       'LONG', 'SHORT', 'P2000', 'P1300', 'P1100'
             helpkey *
           }
-        
+
          parameter out {
             position 6
             prompt {Name of output NDF for measured data}
@@ -3064,7 +3064,7 @@ package surf {
             vpath DEFAULT
             access WRITE
           }
-         
+
          parameter t_cold {
             position 3
             prompt {Temperature of cold load}
@@ -3109,10 +3109,10 @@ package surf {
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -3124,7 +3124,7 @@ package surf {
 #     1999 Jul 13 (TIMJ)
 #        Add LONG, LAT
 #     {enter_further_changes_here}
- 
+
 #-
 
       action scuba2mem {
@@ -3151,7 +3151,7 @@ package surf {
             prompt {Latitude of output map centre in dd mm ss.ss format}
             helpkey *
           }
- 
+
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
@@ -3168,7 +3168,7 @@ package surf {
             ppath CURRENT DEFAULT
             helpkey *
           }
- 
+
          parameter out {
             position 2
             type FILENAME
@@ -3193,19 +3193,19 @@ package surf {
             vpath PROMPT
             helpkey *
           }
- 
+
       }
 ## SCUMAKEWT - Make FT weights for REMDBM
- 
+
 #+
 #  Name:
-#     SCUMAKEWT 
+#     SCUMAKEWT
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
-#   Tim Jenness (JACH) 
+#   Tim Jenness (JACH)
 
 
 #  Copyright:
@@ -3216,11 +3216,11 @@ package surf {
 #    24-May-1999 (TIMJ)
 #      Add LIKE parameter and output parameters
 #     {enter_further_changes_here}
- 
+
 #-
- 
+
       action scumakewt {
- 
+
          parameter msg_filter {
             type _CHAR
             prompt {Messaging level}
@@ -3228,7 +3228,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
- 
+
          parameter chop {
             type _REAL
             position 1
@@ -3242,7 +3242,7 @@ package surf {
             ppath Current
             prompt {Chop position angle (degrees)}
           }
- 
+
 
          parameter like {
             type NDF
@@ -3251,7 +3251,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
-   
+
 
          parameter pixsize {
             type _REAL
@@ -3259,14 +3259,14 @@ package surf {
             ppath Current
             prompt {Pixel size in arcsec}
           }
- 
+
          parameter size {
             position 4
             type _INTEGER
             ppath Current
             prompt {Dimension of each axis}
           }
- 
+
          parameter ftchop {
             type NDF
             position 5
@@ -3277,7 +3277,7 @@ package surf {
             prompt {Name of file to contain deconvolution multiplier}
             helpkey *
           }
- 
+
          parameter wtchop {
             type NDF
             position 6
@@ -3321,13 +3321,13 @@ package surf {
 #+
 #  Name:
 #     SCUPHOT.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -3382,16 +3382,16 @@ package surf {
 
       }
 ## ADD_DBM - Create dual beam image from single beam input
- 
+
 #+
 #  Name:
 #     ADD_DBM
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
-#     Tim Jenness (JACH) 
+#     Tim Jenness (JACH)
 
 
 #  Copyright:
@@ -3402,9 +3402,9 @@ package surf {
 #     13-JUL-1999 (TIMJ)
 #       Add NBEAMS
 #     {enter_further_changes_here}
- 
+
 #-
- 
+
       action add_dbm {
 
          helplib {$SURF_HELP}
@@ -3416,7 +3416,7 @@ package surf {
             vpath DEFAULT
             helpkey *
           }
- 
+
          parameter chop {
             type _REAL
             position 2
@@ -3469,16 +3469,16 @@ package surf {
       }
 
 ## REMIP - remove instrumental polarisation from data file
- 
+
 #+
 #  Name:
 #     REMIP
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
-#     Tim Jenness (JACH) 
+#     Tim Jenness (JACH)
 
 
 #  Copyright:
@@ -3487,9 +3487,9 @@ package surf {
 
 #  History:
 #     {enter_further_changes_here}
- 
+
 #-
- 
+
       action remip {
 
          helplib {$SURF_HELP}
@@ -3534,17 +3534,17 @@ package surf {
 
       }
 ## SCUCLKERR - Determine clock error
- 
+
 #+
 #  Name:
 #     SCUCLKERR.IFL
- 
+
 #  Type of Module:
 #     ADAM A-task parameter interface.
- 
+
 #  Authors:
 #     TIMJ: Tim Jenness (JACH)
- 
+
 
 #  Copyright:
 #     Copyright (C) 2000 Particle Physics and Astronomy
@@ -3554,9 +3554,9 @@ package surf {
 #     2000 Jun 8
 #        Original Version
 #     {enter_further_changes_here}
- 
+
 #-
- 
+
       action scuclkerr {
 
          helplib {$SURF_HELP}

@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
-     :                       TITLE, ID0, IDENTS, KEYMAP, LABS, HIST, 
+     :                       TITLE, ID0, IDENTS, KEYMAP, LABS, HIST,
      :                       STATUS )
 *+
 *  Name:
@@ -12,24 +12,24 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE, 
+*     CALL KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE,
 *                      ID0, IDENTS, KEYMAP, LABS, HIST, STATUS )
 
 *  Description:
 *     This routine writes the supplied positions to a CAT catalogue
 *     (see SUN/181). A dump of the supplied FrameSet (if any) is included
 *     in the text file as a set of "text" lines. A column is created
-*     with name "PIDENT" to contain the integer identifiers. A column is 
-*     also created for each axis of the Base Frame, with a name equal to 
-*     the Symbol attribute of the Axis (AXIS_<n> is used if the Symbol is 
-*     blank). The catalogue can be read using KPG1_RDLST (and also XCATVIEW 
-*     etc). 
+*     with name "PIDENT" to contain the integer identifiers. A column is
+*     also created for each axis of the Base Frame, with a name equal to
+*     the Symbol attribute of the Axis (AXIS_<n> is used if the Symbol is
+*     blank). The catalogue can be read using KPG1_RDLST (and also XCATVIEW
+*     etc).
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use.
 *     ARRDIM = INTEGER (Given)
-*        The size of the first dimension of the positions array. This must 
+*        The size of the first dimension of the positions array. This must
 *        be larger than or equal to NPOS.
 *     NPOS = INTEGER (Given)
 *        The number of positions to store in the file.
@@ -40,9 +40,9 @@
 *        axis J value for position I. The positions should be in the Base
 *        Frame of the FrameSet supplied using argument IWCS.
 *     IWCS = INTEGER (Given)
-*        A pointer to an AST FrameSet to store with the positions. 
+*        A pointer to an AST FrameSet to store with the positions.
 *     TITLE = CHARACTER * ( * ) (Given)
-*        A title to store at the top of the text file. 
+*        A title to store at the top of the text file.
 *     ID0 = INTEGER (Given)
 *        The integer identifier value to associate with the first
 *        supplied position. Identifiers for subsequent positions increase
@@ -53,27 +53,27 @@
 *        The individual integer identifiers to associate with each
 *        position. Only accessed if ID0 is less than or equal to zero.
 *     KEYMAP = INTEGER (Given)
-*        An optional AST KeyMap containing data for extra columns to 
-*        add to the catalogue. It can be used (for instance) to add 
+*        An optional AST KeyMap containing data for extra columns to
+*        add to the catalogue. It can be used (for instance) to add
 *        character columns to the catalogue. If a value of AST__NULL
-*        is supplied, no extra columns are added to the catalogue. 
-*        Otherwise, the column names and values can be specified using 
-*        either of the following two schemes: 
+*        is supplied, no extra columns are added to the catalogue.
+*        Otherwise, the column names and values can be specified using
+*        either of the following two schemes:
 *
 *        - If the KeyMap contains an entry called "COLNAMES", it is
 *        assumed to be a vector entry holding the names of the columns.
 *        For each of these column names, the value to store in a
 *        particular row of the catalogue is assumed to be held in a
 *        scalar KeyMap entry with key "<colname>_<row number>" ( "_1"
-*        for the first row). If no such entry exists for a particular 
-*        row, then the value is marked as bad in the catalogue. The data 
-*        type of the column is determined from the first row value found 
+*        for the first row). If no such entry exists for a particular
+*        row, then the value is marked as bad in the catalogue. The data
+*        type of the column is determined from the first row value found
 *        for the column.
 *
-*        - If the KeyMap does not contain an entry called "COLNAMES", 
+*        - If the KeyMap does not contain an entry called "COLNAMES",
 *        it is assumed that each entry in the KeyMap contains a vector
 *        holding all the values for a single column, in row order. The
-*        entry key is used as the column name, and the column data type 
+*        entry key is used as the column name, and the column data type
 *        is determined from the entry data type.
 *     LABS = INTEGER (Given)
 *        A GRP group identifier containing the labels to be associated
@@ -97,12 +97,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *        Renamed from kpg1_wrls2.f to kpg1_wrta2.f, and added argument
 *        LABS.
 *     14-DEC-2006 (DSB):
-*        Mark columns of celestial longitude or latitude values as such even 
+*        Mark columns of celestial longitude or latitude values as such even
 *        if the supplied Frame also contains one or more non-celestial axes.
 *     25-JAN-2007 (DSB):
 *        Added parameter HIST.
@@ -136,7 +136,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -161,7 +161,7 @@
       INTEGER KEYMAP
       INTEGER LABS
       INTEGER HIST
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -236,13 +236,13 @@
 *  Create the output catalogue.
       CALL LPG_CATCREAT( PARAM, CI, STATUS )
 
-*  Store the supplied title as the catalogue's TITLE parameter. 
-      CALL CAT_PPTAC( CI, 'TITLE', MAX( 1, CHR_LEN( TITLE ) ), 
-     :                CAT__SCALR, 1, ' ', ' ', .TRUE., 'Title', TITLE, 
-     :                TI, STATUS) 
+*  Store the supplied title as the catalogue's TITLE parameter.
+      CALL CAT_PPTAC( CI, 'TITLE', MAX( 1, CHR_LEN( TITLE ) ),
+     :                CAT__SCALR, 1, ' ', ' ', .TRUE., 'Title', TITLE,
+     :                TI, STATUS)
 
 *  Create a column to hold integer identifiers for each position.
-      CALL CAT_CNEWS( CI, 'PIDENT', CAT__TYPEI, 0, ' ', ' ', 
+      CALL CAT_CNEWS( CI, 'PIDENT', CAT__TYPEI, 0, ' ', ' ',
      :                'Position identifier', COLID( 0 ), STATUS )
 
 *  Initialise a flag to indicate we have not yet found any columns holding
@@ -289,7 +289,7 @@
          AXFRM = AST_PICKAXES( FRM, 1, I, AXMAP, STATUS )
          SKYAX = ( AST_GETC( AXFRM, 'Domain', STATUS ) .EQ. 'SKY' )
 
-*  If this axis is a SkyAxis, use special Units strings which indicate to 
+*  If this axis is a SkyAxis, use special Units strings which indicate to
 *  the CAT_ library that the column represents a angle.
          IF( SKYAX ) THEN
             HASSKY = .TRUE.
@@ -304,21 +304,21 @@
          END IF
 
 *  Create the column.
-         CALL CAT_CNEWS( CI, SYM, CAT__TYPED, 0, UNT, ' ', LAB, 
+         CALL CAT_CNEWS( CI, SYM, CAT__TYPED, 0, UNT, ' ', LAB,
      :                   COLID( I ), STATUS )
 
       END DO
 
-*  If a SkyAxis was found in the Frame, store the epoch and equinox as 
+*  If a SkyAxis was found in the Frame, store the epoch and equinox as
 *  catalogue parameters.
       IF( HASSKY ) THEN
          CALL CAT_PPTSC( CI, 'EPOCH', AST_GETC( FRM, 'EPOCH', STATUS ),
-     :                   ' ', QI, STATUS ) 
-         CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS ) 
-         CALL CAT_PPTSC( CI, 'EQUINOX', AST_GETC( FRM, 'EQUINOX', 
+     :                   ' ', QI, STATUS )
+         CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS )
+         CALL CAT_PPTSC( CI, 'EQUINOX', AST_GETC( FRM, 'EQUINOX',
      :                                            STATUS ),
-     :                   ' ', QI, STATUS ) 
-         CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS ) 
+     :                   ' ', QI, STATUS )
+         CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS )
       END IF
 
 *  Create a column to hold labels, if required.
@@ -327,11 +327,11 @@
 
          LABLEN = 0
          DO I = 1, NLAB
-            CALL GRP_GET( LABS, I, 1, LABEL, STATUS )        
+            CALL GRP_GET( LABS, I, 1, LABEL, STATUS )
             LABLEN = MAX( LABLEN, CHR_LEN( LABEL ) )
          END DO
 
-         CALL CAT_CNEWS( CI, 'LABEL', CAT__TYPEC, LABLEN, ' ', ' ', 
+         CALL CAT_CNEWS( CI, 'LABEL', CAT__TYPEC, LABLEN, ' ', ' ',
      :                   'Position label', COLID( -1 ), STATUS )
       END IF
 
@@ -361,21 +361,21 @@
      :                       '(programming error).', STATUS )
                GO TO 999
             END IF
-   
+
 *  Read all the column names into a local array.
-            GOTVAL = AST_MAPGET1C( KEYMAP, 'COLNAMES', NKMCOL, NKMCOL, 
-     :                             COLNAM, STATUS ) 
+            GOTVAL = AST_MAPGET1C( KEYMAP, 'COLNAMES', NKMCOL, NKMCOL,
+     :                             COLNAM, STATUS )
 
 *  To create the catalogue column, we need to determine a data type for
 *  the column, and the maximum length of a formatted column value. The
 *  data type we get from the first value found in the KeyMap. The
 *  formatted length can also be taken from the first value unless the
-*  data type is string, in which case we meed to scan all column values 
-*  to find the longest string. Loop round all columns described by the 
+*  data type is string, in which case we meed to scan all column values
+*  to find the longest string. Loop round all columns described by the
 *  KeyMap.
             DO I = 1, NKMCOL
 
-*  Form the root key name for KeyMap entries holding values for this 
+*  Form the root key name for KeyMap entries holding values for this
 *  catalogue column. The row number needs to be appended to this root
 *  key to form the full key.
                KEY = COLNAM( I )
@@ -385,7 +385,7 @@
 *  Inidcate we do not yet know the column data type.
                TYPE = AST__BADTYPE
 
-*  Loop round the rows looking for the first row with a value for this 
+*  Loop round the rows looking for the first row with a value for this
 *  column.
                J = 1
                DONE = .FALSE.
@@ -396,13 +396,13 @@
                   CALL CHR_PUTI( J, KEY, IAT )
 
 *  If the entry exists in the KeyMap...
-                  IF( AST_MAPHASKEY( KEYMAP, KEY( : IAT ), 
+                  IF( AST_MAPHASKEY( KEYMAP, KEY( : IAT ),
      :                               STATUS ) ) THEN
 
 *  If this is the first value found, get its data type, and store the
 *  length of the formatted value
                      IF( TYPE .EQ. AST__BADTYPE ) THEN
-                        TYPE = AST_MAPTYPE( KEYMAP, KEY( : IAT ), 
+                        TYPE = AST_MAPTYPE( KEYMAP, KEY( : IAT ),
      :                                      STATUS )
                         LENC = AST_MAPLENC( KEYMAP, KEY( : IAT ),
      :                                      STATUS )
@@ -410,18 +410,18 @@
 *  If this is not the first value found, update the maximum length of
 *  a formatted column value.
                      ELSE
-                        LENC = MAX( LENC, AST_MAPLENC( KEYMAP, 
+                        LENC = MAX( LENC, AST_MAPLENC( KEYMAP,
      :                                                 KEY( : IAT ),
      :                                                 STATUS ) )
                      END IF
 
-*  If the column holds strings, we need to continue looping to find the 
+*  If the column holds strings, we need to continue looping to find the
 *  length of the longest string in the column. Otherwise, we can leave
 *  the loop now since all formatted values will be equal in length.
                      IF( TYPE .NE. AST__STRINGTYPE ) DONE = .TRUE.
                   END IF
 
-*  Find the index of the next row, or leave the loop if all rows have been 
+*  Find the index of the next row, or leave the loop if all rows have been
 *  done.
                   IF( J .LT. NPOS ) THEN
                      J = J + 1
@@ -443,16 +443,16 @@
 *  Otherwise, convert the data type from AST to CAT.
                ELSE IF( TYPE .EQ . AST__INTTYPE ) THEN
                   CATYPE = CAT__TYPEI
-   
+
                ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
                   CATYPE = CAT__TYPED
-   
+
                ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
                   CATYPE = CAT__TYPER
-   
+
                ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
                   CATYPE = CAT__TYPEC
-   
+
 *  Report an error for complex data types.
                ELSE IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -465,13 +465,13 @@
      :                          '(programming error).', STATUS )
                   GO TO 999
                END IF
-   
-*  If any values were supplied for the column, update the maximum 
+
+*  If any values were supplied for the column, update the maximum
 *  formatted length of any column, and create  the column, storing its
 *  CAT identifier in KMCOL.
                IF( KMLEN( I ) .GT. 0 ) THEN
                   MAXLEN = MAX( MAXLEN, LENC )
-                  CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', 
+                  CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ',
      :                            ' ', ' ', KMCOL( I ), STATUS )
                END IF
 
@@ -496,29 +496,29 @@
      :                       '(programming error).', STATUS )
                GO TO 999
             END IF
-   
+
 *  Loop round all columns described by the KeyMap.
             DO I = 1, NKMCOL
-   
+
 *  Get the entry key and store it as the column name.
-               KEY = AST_MAPKEY( KEYMAP, I, STATUS ) 
+               KEY = AST_MAPKEY( KEYMAP, I, STATUS )
                COLNAM( I ) = KEY
-   
+
 *  Get the column data type, and convert from AST to CAT.
                TYPE = AST_MAPTYPE( KEYMAP, KEY, STATUS )
-   
+
                IF( TYPE .EQ . AST__INTTYPE ) THEN
                   CATYPE = CAT__TYPEI
-   
+
                ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
                   CATYPE = CAT__TYPED
-   
+
                ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
                   CATYPE = CAT__TYPER
-   
+
                ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
                   CATYPE = CAT__TYPEC
-   
+
 *  Report an error for complex data types.
                ELSE IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -531,16 +531,16 @@
      :                          '(programming error).', STATUS )
                   GO TO 999
                END IF
-   
+
 *  Get the maximum formatted length of any element in this column, and
-*  update the maximum formatted length of any column. 
-               LENC = AST_MAPLENC( KEYMAP, KEY, STATUS ) 
+*  update the maximum formatted length of any column.
+               LENC = AST_MAPLENC( KEYMAP, KEY, STATUS )
                MAXLEN = MAX( MAXLEN, LENC )
-   
+
 *  Create the column, storing its CAT identifier in KMCOL.
-               CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', ' ', 
+               CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', ' ',
      :                         ' ', KMCOL( I ), STATUS )
-   
+
 *  Set the maximum number of values in the column.
                KMLEN( I ) = AST_MAPLENGTH( KEYMAP, KEY, STATUS )
 
@@ -550,7 +550,7 @@
 
 *  Allocate memory to hold a string that is large enough for the longest
 *  formatted value in the KeyMap.
-      IF( MAXLEN .GT. 0 ) CALL PSX_CALLOC( MAXLEN, '_CHAR', IPTEXT, 
+      IF( MAXLEN .GT. 0 ) CALL PSX_CALLOC( MAXLEN, '_CHAR', IPTEXT,
      :                                     STATUS )
 
 *  Ensure we can use the IPTEXT pointer safely.
@@ -571,11 +571,11 @@
 *  The label.
          IF( LABS .NE. GRP__NOID ) THEN
             IF( I .LE. NLAB ) THEN
-               CALL GRP_GET( LABS, I, 1, LABEL, STATUS )        
+               CALL GRP_GET( LABS, I, 1, LABEL, STATUS )
             ELSE
                LABEL = ' '
             END IF
-            CALL CAT_PUT0C( COLID( -1 ), LABEL, 
+            CALL CAT_PUT0C( COLID( -1 ), LABEL,
      :                      ( CHR_LEN( LABEL ) .EQ. 0 ), STATUS )
          END IF
 
@@ -587,7 +587,7 @@
 
 *  Put each normalised axis value into the current row buffer.
          DO J = 1, NAX
-            CALL CAT_PUT0D( COLID( J ), C( J ), 
+            CALL CAT_PUT0D( COLID( J ), C( J ),
      :                      ( C( J ) .EQ. AST__BAD ), STATUS )
          END DO
 
@@ -595,7 +595,7 @@
 *  columns.
          IF( MAXLEN .GT. 0 ) THEN
             DO J = 1, NKMCOL
-               IF( KMLEN( J ) .GT. 0 ) THEN         
+               IF( KMLEN( J ) .GT. 0 ) THEN
 
 *  If the KeyMap uses the scheme based on scalar-values...
                   IF( SCHEME .EQ. 1 ) THEN
@@ -607,35 +607,35 @@
                      CALL CHR_APPND( '_', KEY, IAT )
                      CALL CHR_PUTI( I, KEY, IAT )
 
-*  Atemmpt to get the formatted value from the KeyMap. 
-                     GOTVAL = AST_MAPGET0C( KEYMAP, KEY, 
-     :                                    %VAL( CNF_PVAL( IPTEXT ) ), 
+*  Atemmpt to get the formatted value from the KeyMap.
+                     GOTVAL = AST_MAPGET0C( KEYMAP, KEY,
+     :                                    %VAL( CNF_PVAL( IPTEXT ) ),
      :                                    VLEN, STATUS, %VAL(LEN(KEY)),
-     :                                    %VAL(MAXLEN) ) 
+     :                                    %VAL(MAXLEN) )
 
 *  If the KeyMap uses the scheme based on vector-values...
                   ELSE
 
 *  The key is just the column name.
                      KEY = COLNAM( J )
-               
+
 *  If the current row is within the bounds of the vector, get the
-*  formatted value of the vector element corresponding to the current 
+*  formatted value of the vector element corresponding to the current
 *  row.
                      IF( I .LE. KMLEN( J ) ) THEN
-                        GOTVAL = AST_MAPGETELEMC( KEYMAP, KEY, I, 
-     :                                       %VAL( CNF_PVAL( IPTEXT ) ), 
+                        GOTVAL = AST_MAPGETELEMC( KEYMAP, KEY, I,
+     :                                       %VAL( CNF_PVAL( IPTEXT ) ),
      :                                       STATUS, %VAL( LEN( KEY ) ),
-     :                                       %VAL( MAXLEN ) ) 
+     :                                       %VAL( MAXLEN ) )
                      ELSE
                         GOTVAL = .FALSE.
                      END IF
                   END IF
 
 *  If no value was obtained, fill the value with spaces.
-                  IF( .NOT. GOTVAL ) CALL CHR_FILL( ' ', 
-     :                                       %VAL( CNF_PVAL(IPTEXT) ), 
-     :                                       %VAL( 1 ), %VAL( MAXLEN ) ) 
+                  IF( .NOT. GOTVAL ) CALL CHR_FILL( ' ',
+     :                                       %VAL( CNF_PVAL(IPTEXT) ),
+     :                                       %VAL( 1 ), %VAL( MAXLEN ) )
 
 *  Store the value.
                   CALL CAT_PUT0C( KMCOL( J ), %VAL( CNF_PVAL(IPTEXT) ),
@@ -661,7 +661,7 @@
 
          IF( NAX .EQ. 1 ) THEN
             BUFFER = '      The axis value stored in column 2 '
-            IAT = 40 
+            IAT = 40
          ELSE
             BUFFER = '      The axis values stored in columns 2 to '
             IAT = 45
@@ -685,8 +685,8 @@
          CALL CAT_PUTXT( CI, 'HISTORY', ' ', STATUS )
          CALL GRP_GRPSZ( HIST, NHIST, STATUS )
          DO I = 1, NHIST
-            CALL GRP_GET( HIST, I, 1, HTEXT, STATUS )        
-            CALL CAT_PUTXT( CI, 'HISTORY', HTEXT( : CHR_LEN( HTEXT ) ), 
+            CALL GRP_GET( HIST, I, 1, HTEXT, STATUS )
+            CALL CAT_PUTXT( CI, 'HISTORY', HTEXT( : CHR_LEN( HTEXT ) ),
      :                      STATUS )
          END DO
          CALL CAT_PUTXT( CI, 'HISTORY', ' ', STATUS )

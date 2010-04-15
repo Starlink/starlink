@@ -30,7 +30,7 @@ C# IL>=a, OL>=0
 *     OUT  CROSS   True, if they cross
 *
 *  Note:  XLn,YLn define a whole line, not a line segment.
- 
+
       REAL    RECT(4), XL1,YL1, XL2,YL2
       LOGICAL CROSS
 *

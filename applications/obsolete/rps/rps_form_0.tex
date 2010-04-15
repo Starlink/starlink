@@ -11,12 +11,12 @@
 \newcounter{rxpage}
 \newcounter{subpage}
 \renewcommand{\thepage}{\Roman{page} \alph{subpage}}
- 
+
 \savebox{\yesno}(0,0)[tl]{
 \multiput(120,0)(30,0){2}{\framebox(6,4){}}
 \put(130,1){\makebox(0,0)[bl]{\large{Yes}}}
 \put(160,1){\makebox(0,0)[bl]{\large{No}}}  }
- 
+
 \begin{document}
 \pagestyle{empty}
 \sloppy

@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CURFM( FRM, MAP, XC, YC, NAX, ICOL, IAT, LINE, 
+      SUBROUTINE KPS1_CURFM( FRM, MAP, XC, YC, NAX, ICOL, IAT, LINE,
      :                       GOOD, CXY, STATUS )
 *+
 *  Name:
@@ -11,19 +11,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CURFM( FRM, MAP, XC, YC, NAX, ICOL, IAT, LINE, GOOD, 
+*     CALL KPS1_CURFM( FRM, MAP, XC, YC, NAX, ICOL, IAT, LINE, GOOD,
 *                      CXY, STATUS )
 
 *  Description:
 *     This routine formats a position for application CURSOR. The
-*     position is supplied in GRAPHICS co-ordinates. It is mapped into 
+*     position is supplied in GRAPHICS co-ordinates. It is mapped into
 *     the required Frame before being formatted.
 
 *  Arguments:
 *     FRM = INTEGER (Given)
 *        A pointer to the Frame to which the position refers.
 *     MAP = INTEGER (Given)
-*        A pointer to the Mapping from the supplied graphics position 
+*        A pointer to the Mapping from the supplied graphics position
 *        (XC, YC) to the Frame given by FRM.
 *     XC = REAL (Given)
 *        The X GRAPHICS co-ordinate.
@@ -32,7 +32,7 @@
 *     NAX = INTEGER (Given)
 *        The number of axes in FRM.
 *     ICOL( NAX ) = INTEGER (Given)
-*        The tab positions for each column of axis values. 
+*        The tab positions for each column of axis values.
 *     IAT = INTEGER (Given and Returned)
 *        The number of characters in LINE.
 *     LINE = CHARACTER * ( * ) (Given and Returned)
@@ -80,11 +80,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER FRM
@@ -101,10 +101,10 @@
 *  Arguments Returned:
       LOGICAL GOOD
       DOUBLE PRECISION CXY( NAX )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
-      
+
 *  Local Variables:
       CHARACTER FMT*30           ! Formatted axis value
       DOUBLE PRECISION GXY( 2 )  ! Graphics position

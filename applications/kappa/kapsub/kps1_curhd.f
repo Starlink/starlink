@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CURHD( FRM, MAP, XC, YC, NAX, IAT, LINE, ICOL, 
+      SUBROUTINE KPS1_CURHD( FRM, MAP, XC, YC, NAX, IAT, LINE, ICOL,
      :                       STATUS )
 *+
 *  Name:
@@ -15,14 +15,14 @@
 
 *  Description:
 *     This routine produces a line of column headers that include axis
-*     symbols and units. The tabs between columns are sufficient to 
+*     symbols and units. The tabs between columns are sufficient to
 *     encompass both headers and formatted axis values.
 
 *  Arguments:
 *     FRM = INTEGER (Given)
 *        A pointer to the Frame to which the position refers.
 *     MAP = INTEGER (Given)
-*        A pointer to the Mapping from the supplied graphics position 
+*        A pointer to the Mapping from the supplied graphics position
 *        (XC, YC) to the Frame given by FRM.
 *     XC = REAL (Given)
 *        The X GRAPHICS co-ordinate of a test point (used to determine
@@ -37,7 +37,7 @@
 *     LINE = CHARACTER * ( * ) (Given and Returned)
 *        The header text.
 *     ICOL( NAX ) = INTEGER (Returned)
-*        The tab positions for each column of axis values. 
+*        The tab positions for each column of axis values.
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
@@ -73,11 +73,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER FRM
@@ -95,7 +95,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-      
+
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
 
@@ -128,7 +128,7 @@
 *  Store the position of the start of this column.
          ICOL( I ) = IAT
 
-*  Append the axis symbol to the returned text. Form the name of the 
+*  Append the axis symbol to the returned text. Form the name of the
 *  Symbol attribute for this axis.
          ATTRIB = 'Symbol('
          JAT = 7
@@ -136,7 +136,7 @@
          CALL CHR_APPND( ')', ATTRIB, JAT )
 
 *  Get the symbol string.
-         SYM = AST_GETC( FRM, ATTRIB( : JAT ), STATUS) 
+         SYM = AST_GETC( FRM, ATTRIB( : JAT ), STATUS)
 
 *  Remove any PGPLOT escape sequences.
          CALL KPG1_PGESC( SYM, STATUS )
@@ -147,7 +147,7 @@
             IAT = IAT + 1
          END IF
 
-*  Append the axis units to the returned text. Form the name of the 
+*  Append the axis units to the returned text. Form the name of the
 *  Unit attribute for this axis.
          ATTRIB = 'Unit('
          JAT = 5
@@ -155,7 +155,7 @@
          CALL CHR_APPND( ')', ATTRIB, JAT )
 
 *  Get the unit string.
-         UNIT = AST_GETC( FRM, ATTRIB( : JAT ), STATUS) 
+         UNIT = AST_GETC( FRM, ATTRIB( : JAT ), STATUS)
 
 *  Remove any PGPLOT escape sequences.
          CALL KPG1_PGESC( UNIT, STATUS )
@@ -168,7 +168,7 @@
          END IF
 
 *  If we have another axis to do, format the test axis value.
-         IF( I .NE. NAX ) THEN 
+         IF( I .NE. NAX ) THEN
             FMT = AST_FORMAT( FRM, I, CXY( I ), STATUS )
 
 *  Increment the position so that this column has room for both a

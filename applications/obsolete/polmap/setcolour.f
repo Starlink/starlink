@@ -1,23 +1,23 @@
       SUBROUTINE SETCOLOUR(NPARAMS,PARAMS,LCOL,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    S E T C O L O U R
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), LCOL (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C sets lcol variable
 C

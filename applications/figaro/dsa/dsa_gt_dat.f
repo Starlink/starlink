@@ -10,7 +10,7 @@ C
 C  Description:
 C     Obtains a number of items from a data structure that relate directly
 C     to the data array itself.  If these items do not in fact exist, then
-C     character items are returned as blank, and numeric items are returned 
+C     character items are returned as blank, and numeric items are returned
 C     as zero.  At present, only a very limited number of items are supported.
 C
 C  Language:

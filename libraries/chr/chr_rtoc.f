@@ -32,7 +32,7 @@
 *     an F format.
 *        o  If the string is written successfully, replace any trailing
 *        zeros with blanks.
-*        o  If the attempt to write the string is unsuccessful, attempt 
+*        o  If the attempt to write the string is unsuccessful, attempt
 *        to use an E format.
 *        o  If the string is written successfully, replace any trailing
 *        or redundant zeros and any '+' signs with blanks.
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,10 +80,10 @@
 *        Improve speed and comments.
 *        Rely on WRITE to clear buffer.
 *        Remove + only from exponent when there is one.
-*        Use string size of FIELD rather than multiple finding used 
+*        Use string size of FIELD rather than multiple finding used
 *        length etc.
 *     24-MAY-1991 (PCTR):
-*        Rewrite to cure pathological problems with the previous 
+*        Rewrite to cure pathological problems with the previous
 *        algorithm.
 *      1-JUN-1994 (AJC):
 *        Check for rounding increasing the number of digits before
@@ -177,13 +177,13 @@
 
 *  Construct a suitable F format string.
       SIZE = LEN( STRING )
-              
+
 *  Treat zero as a special case
       IF ( RVALUE .NE. 0.0 ) THEN
 
 *     For non-zeroes, find the order of the given value.
          VALUE = ABS( RVALUE )
-   
+
 *     EXTRAS are decimal point and possible sign
 *     If the value is negative, we need the sign
          IF ( RVALUE .LT. 0.0 ) THEN
@@ -197,7 +197,7 @@
          POWER = LOG10( VALUE )
          IPOWER = INT( POWER )
          IF ( POWER-REAL( IPOWER ) .LT. 0.0 ) IPOWER = IPOWER - 1
-   
+
 *     Check if the given value is fractional.
 *     and calculate the number of digits required before and after
 *     the decimal point to give the required precision.
@@ -236,9 +236,9 @@
 *           Check if rounding causes any difference
                POWER = LOG10( VALUE + 0.5*10**(-REAL(AFTER)) )
                NPOWER = INT( POWER )
-               IF ( POWER-REAL( NPOWER ) .LT. 0.0 ) 
+               IF ( POWER-REAL( NPOWER ) .LT. 0.0 )
      :            NPOWER = NPOWER - 1
-   
+
                IF ( NPOWER .NE. IPOWER ) THEN
 *              Rounding has caused an additional digit before the point
 *              Adjust BEFORE and AFTER.
@@ -246,7 +246,7 @@
                   AFTER = AFTER - 1
                END IF
             END IF
-         END IF   
+         END IF
 
 *     If AFTER is -1, there is still room for the stripped number in STRING,
 *     but we will need to adjust FIELD and AFTER to get the WRITE into
@@ -256,30 +256,30 @@
             FIELD = FIELD + 1
          END IF
 
-*  Proceed with the F format only if the returned string can contain 
+*  Proceed with the F format only if the returned string can contain
 *  the encoded string. Note that this decision does not include the
 *  possible effects of rounding.
-         IF ( AFTER .GE. 0 ) THEN   
-   
+         IF ( AFTER .GE. 0 ) THEN
+
 *        Write the F format string.
             WRITE( FORMAT, '( ''(F'', I3, ''.'', I3,'')'' )',
      :          IOSTAT=IOSTAT ) FIELD, AFTER
-   
+
 *        Check if the format string was written successfully: if so,
 *        write the string buffer.
-            IF ( IOSTAT .EQ. 0 ) WRITE( STRBUF( 1 : FIELD ), FORMAT, 
+            IF ( IOSTAT .EQ. 0 ) WRITE( STRBUF( 1 : FIELD ), FORMAT,
      :                               IOSTAT=IOSTAT ) RVALUE
-  
+
 *     Check if the value was written into the string successfully.
-            IF ( ( IOSTAT .EQ. 0 ) 
+            IF ( ( IOSTAT .EQ. 0 )
      :      .AND.( STRBUF( 1 : 1 ) .NE. '*' ) ) THEN
                LSTAT = 0
- 
+
 *           Remove superfluous trailing zeros and decimal characters.
                DO 10 I = FIELD, 1, -1
                   STRCHR = STRBUF( I : I )
-   
-                  IF ( ( STRCHR .NE. '0' ) 
+
+                  IF ( ( STRCHR .NE. '0' )
      :            .AND. ( STRCHR .NE. '.' ) ) THEN
                      GO TO 20
                   ELSE IF ( STRCHR .EQ. '0' ) THEN
@@ -301,8 +301,8 @@
          STRBUF = '0'
          NCHAR = 1
       END IF
-   
-*  Check if LSTAT is set to a non-zero value: if so, then attempt 
+
+*  Check if LSTAT is set to a non-zero value: if so, then attempt
 *  to use an E format string to encode the given value.
       IF ( LSTAT .NE. 0 ) THEN
 
@@ -319,60 +319,60 @@
          ELSE
             IEXPON = 4
          END IF
-   
+
          IF ( ISFRAC ) IEXPON = IEXPON + 1
-   
+
 *     Find the allowed size for the string buffer.
          IF ( ISNEG ) THEN
             MNSIZE = IEXPON + 2
          ELSE
             MNSIZE = IEXPON + 1
          END IF
-   
-*     Proceed with the E format only if the returned string can contain 
+
+*     Proceed with the E format only if the returned string can contain
 *     the encoded string. Note that this decision does not include the
 *     possible effects of rounding.
          IF ( ( MNSIZE .LE. MXE ) .AND. ( MNSIZE .LE. SIZE ) ) THEN
- 
+
 *        Find the precision for the given value.
             IF ( ISNEG ) THEN
                EXTRAS = IEXPON + 3
             ELSE
                EXTRAS = IEXPON + 2
             END IF
-   
+
             AFTER = MIN( SIZE-EXTRAS, MXPREC )
             AFTER = MAX( AFTER, 0 )
-   
+
 *        Find the field width for the given value.
             IF ( ISNEG ) THEN
                FIELD = AFTER + 7
             ELSE
                FIELD = AFTER + 6
             END IF
-   
+
 *        Write the E format string.
             WRITE( FORMAT, '( ''(1PE'', I3, ''.'', I3,'')'' )',
      :             IOSTAT=IOSTAT ) FIELD, AFTER
-   
+
 *        Check if the format string was written successfully: if so,
 *        write the string buffer.
             IF ( IOSTAT .EQ. 0 ) THEN
-               WRITE( STRBUF( 1 : FIELD ), FORMAT, IOSTAT=IOSTAT 
+               WRITE( STRBUF( 1 : FIELD ), FORMAT, IOSTAT=IOSTAT
      :                ) RVALUE
-   
+
 *           Check if the value was written into the string successfully.
                IF ( IOSTAT .EQ. 0 ) THEN
 
 *              Find the beginning of the exponent.
                   I1 = INDEX( STRBUF( 1 : FIELD ), 'E' )
-   
+
 *              Remove superfluous trailing zeros and decimal characters
 *              from the fractional part.
                   DO 30 I = I1-1, 1, -1
                      STRCHR = STRBUF( I : I )
-   
-                     IF ( ( STRCHR .NE. '0' ) 
+
+                     IF ( ( STRCHR .NE. '0' )
      :                    .AND. ( STRCHR .NE. '.' ) ) THEN
                         GO TO 40
                      ELSE IF ( STRCHR .EQ. '0' ) THEN
@@ -383,16 +383,16 @@
                      END IF
  30               CONTINUE
  40               CONTINUE
-   
+
 *              Remove superfluous '+' signs and leading zeros from the
 *              exponent.
                   DO 50 I = I1+1, FIELD
                      STRCHR = STRBUF( I : I )
-   
+
                      IF ( ( STRCHR .NE. '+' ) .AND. ( STRCHR .NE. '-' )
      :                    .AND. ( STRCHR .NE. '0' ) ) THEN
                         GO TO 60
-                     ELSE IF ( ( STRCHR .EQ. '+' ) 
+                     ELSE IF ( ( STRCHR .EQ. '+' )
      :                         .OR. ( STRCHR .EQ. '0' ) ) THEN
                         STRBUF( I : I ) = ' '
                      END IF
@@ -417,8 +417,8 @@
          END IF
       END IF
 
-*  Assign the returned string and get its length, ignoring trailing 
+*  Assign the returned string and get its length, ignoring trailing
 *  blanks.
       STRING = STRBUF( 1 : NCHAR )
-         
+
       END

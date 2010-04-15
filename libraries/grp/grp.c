@@ -12,7 +12,7 @@
 
 *  Notes:
 *     - Given the size of the GRP library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use GRP from C extend this file (and
 *     grp.h) to include any functions which they need but which are
 *     not already included.
@@ -46,7 +46,7 @@
 *     28-FEB-2006 (DSB):
 *        Rationalised conversion between C pointers and Fortran integer
 *        identifiers. All Grp structures are now allocated dynamically
-*        within this module (i.e. addresses to Grp structures allocated 
+*        within this module (i.e. addresses to Grp structures allocated
 *        statically within application code are no longer allowed). Also,
 *        NULL pointers are used consistently in C to represent null
 *        groups (i.e. the F77 GRP__NOID value).
@@ -96,7 +96,7 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h"                 
+#include "f77.h"
 #include "grp1.h"
 #include "grp_err.h"
 #include "sae_par.h"
@@ -113,8 +113,8 @@ int grpSlot( int, int * );
 /* ================================= */
 
 /* An array which holds a pointer to a Grp structure for each possible
-   group. The elements in this array correspond to the common arrays 
-   used to store group information within the fortran implementation 
+   group. The elements in this array correspond to the common arrays
+   used to store group information within the fortran implementation
    (see GRP_COM). */
 Grp *Grp_Pointers[ GRP__MAXG ];
 
@@ -125,12 +125,12 @@ static int Grp_Init = 0;
 
 /* All the following functions attempt to execute even if status is set
    on entry. They use a NULL pointer to represent the Fortran GRP__NOID
-   value. They are not declared static so that they can be used within 
+   value. They are not declared static so that they can be used within
    wrapper implementations for other libraries which use GRP. */
 
 
 
-/* Free the Grp structure used to hold the Fortran ID of a group, and 
+/* Free the Grp structure used to hold the Fortran ID of a group, and
    return NULL. */
 /* ------------------------------------------------------------------- */
 Grp *grpFree ( Grp *grp, int *status ) {
@@ -147,7 +147,7 @@ Grp *grpFree ( Grp *grp, int *status ) {
 
 
 /* Return a pointer to a Grp structure holding a given Fortran group ID,
-   creating a new structure if necessary. Note that it takes a fortran 
+   creating a new structure if necessary. Note that it takes a fortran
    integer as arg */
 /* ------------------------------------------------------------------- */
 Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
@@ -170,8 +170,8 @@ Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
                errRep( "GRP_F2C_ERR", "Unable to allocate memory for Grp object",
                        status );
             }
-         }         
-      } 
+         }
+      }
    }
    return ret;
 }
@@ -301,12 +301,12 @@ void grpDelet( Grp **grp, int *status ){
 
 
 
-F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE), 
+F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE),
                          CHARACTER_ARRAY(NAMES), INTEGER(STATUS)
                          TRAIL(NAMES) );
 
 /* Note the addition of a "len" parameter following the "names" array.
-   This should be supplied equal to the allocated length of the shortest 
+   This should be supplied equal to the allocated length of the shortest
    string for which a pointer has been supplied in "names". This length
    should include room for the trailing null. */
 
@@ -329,7 +329,7 @@ void grpGet( const Grp *grp, size_t index, size_t size, char *const *names,
                       INTEGER_ARG(&INDEX),
                       INTEGER_ARG(&SIZE),
                       CHARACTER_ARRAY_ARG(NAMES),
-                      INTEGER_ARG(&STATUS) 
+                      INTEGER_ARG(&STATUS)
                       TRAIL_ARG(NAMES) );
 
    F77_IMPORT_CHARACTER_ARRAY_P(NAMES,NAMES_length,names,len,size);
@@ -342,7 +342,7 @@ void grpGet( const Grp *grp, size_t index, size_t size, char *const *names,
 
 
 
-F77_SUBROUTINE(grp_valid)( INTEGER(IGRP), 
+F77_SUBROUTINE(grp_valid)( INTEGER(IGRP),
                            LOGICAL(VALID),
                            INTEGER(STATUS) );
 
@@ -368,8 +368,8 @@ int grpValid( const Grp *grp, int *status ){
 
 
 
-F77_SUBROUTINE(grp_new)( CHARACTER(TYPE), 
-                         INTEGER(IGRP), 
+F77_SUBROUTINE(grp_new)( CHARACTER(TYPE),
+                         INTEGER(IGRP),
                          INTEGER(STATUS)
                          TRAIL(TYPE) );
 
@@ -386,7 +386,7 @@ Grp *grpNew( const char *type, int *status ){
 
    F77_CALL(grp_new)( CHARACTER_ARG(TYPE),
                       INTEGER_ARG(&IGRP),
-                      INTEGER_ARG(&STATUS) 
+                      INTEGER_ARG(&STATUS)
                       TRAIL_ARG(TYPE) );
 
    F77_FREE_CHARACTER( TYPE );
@@ -399,9 +399,9 @@ Grp *grpNew( const char *type, int *status ){
 
 
 
-F77_SUBROUTINE(grp_put1)( INTEGER(IGRP), 
-                          CHARACTER(NAME), 
-                          INTEGER(INDEX), 
+F77_SUBROUTINE(grp_put1)( INTEGER(IGRP),
+                          CHARACTER(NAME),
+                          INTEGER(INDEX),
                           INTEGER(STATUS)
                           TRAIL(NAME) );
 
@@ -422,7 +422,7 @@ void grpPut1( Grp *grp, const char *name, size_t index, int *status ){
    F77_CALL(grp_put1)( INTEGER_ARG(&IGRP),
                        CHARACTER_ARG(NAME),
                        INTEGER_ARG(&INDEX),
-                       INTEGER_ARG(&STATUS) 
+                       INTEGER_ARG(&STATUS)
                        TRAIL_ARG(NAME) );
 
    F77_FREE_CHARACTER( NAME );
@@ -437,7 +437,7 @@ F77_SUBROUTINE(grp_infoi)(INTEGER(IGRP),
 			  INTEGER(STATUS)
 			  TRAIL(ITEM));
 
-void grpInfoi( const Grp *grp, size_t index, const char *item, int *value, 
+void grpInfoi( const Grp *grp, size_t index, const char *item, int *value,
 	       int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
@@ -469,7 +469,7 @@ F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
                            CHARACTER(item), CHARACTER(value),
                            INTEGER(status) TRAIL(item) TRAIL(value) );
 
-void grpInfoc( const Grp *grp, size_t index, const char *item, char *value, 
+void grpInfoc( const Grp *grp, size_t index, const char *item, char *value,
 	       size_t value_len, int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
@@ -529,7 +529,7 @@ void grpGrpex( const char *grpexp, const Grp *grp1, Grp *grp2,
   F77_EXPORT_CHARACTER( grpexp, GRPEXP, GRPEXP_length );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  
+
   F77_CALL(grp_grpex)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP1),
                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&SIZE),
                        INTEGER_ARG(&ADDED), LOGICAL_ARG(&FLAG),
@@ -548,7 +548,7 @@ F77_SUBROUTINE(grp_index)( CHARACTER(NAME), INTEGER(IGRP),
                            INTEGER(START), INTEGER(INDEX),
                            INTEGER(STATUS) TRAIL(NAME) );
 
-size_t grpIndex( const char *name, const Grp *grp, size_t start, 
+size_t grpIndex( const char *name, const Grp *grp, size_t start,
                int *status ){
   DECLARE_CHARACTER_DYN(NAME);
   DECLARE_INTEGER(IGRP);
@@ -563,7 +563,7 @@ size_t grpIndex( const char *name, const Grp *grp, size_t start,
   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
   F77_EXPORT_INTEGER( start, START );
   F77_EXPORT_INTEGER( *status, STATUS );
-  
+
   F77_CALL(grp_index)( CHARACTER_ARG(NAME), INTEGER_ARG(&IGRP),
                        INTEGER_ARG(&START), INTEGER_ARG(&INDEX),
                        INTEGER_ARG(&STATUS) TRAIL_ARG(NAME) );
@@ -628,7 +628,7 @@ void grpSetcs( Grp *grp, int sensit, int *status ){
    return;
 }
 
-F77_SUBROUTINE(grp_remov)( INTEGER(IGRP1), CHARACTER(NAME), 
+F77_SUBROUTINE(grp_remov)( INTEGER(IGRP1), CHARACTER(NAME),
                            INTEGER(IGRP2), INTEGER(STATUS) TRAIL(NAME) );
 
 Grp *grpRemov( const Grp *grp, const char *name, int *status ) {
@@ -638,23 +638,23 @@ Grp *grpRemov( const Grp *grp, const char *name, int *status ) {
    DECLARE_INTEGER(IGRP2);
    DECLARE_INTEGER(STATUS);
    Grp *ret;
- 
+
    IGRP1 = grpC2F( (Grp *) grp, status );
- 
+
    F77_CREATE_CHARACTER( NAME, strlen(name) );
    F77_EXPORT_CHARACTER( name, NAME, NAME_length );
    F77_EXPORT_INTEGER( *status, STATUS );
- 
-   
-   F77_CALL(grp_remov)( INTEGER_ARG(&IGRP1), CHARACTER_ARG(NAME), 
-                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS) 
+
+
+   F77_CALL(grp_remov)( INTEGER_ARG(&IGRP1), CHARACTER_ARG(NAME),
+                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME) );
- 
+
    F77_FREE_CHARACTER( NAME );
    F77_IMPORT_INTEGER( STATUS, *status );
- 
+
    ret = grpF2C( IGRP2, status );
- 
+
    return ret;
 }
 

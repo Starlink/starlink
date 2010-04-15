@@ -121,9 +121,9 @@ int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_get0b
-( 
+(
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 char *value,         /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -132,35 +132,35 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0c
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
-char *value,         /* data value.  Should be declared with length 17 at 
+char *value,         /* data value.  Should be declared with length 17 at
                         least.  Returned string is null-terminated in value[16].                        (returned) */
 int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_get0d
 (
-const gsd *gsd,      /* GSD file access parameters (given) */ 
-const char *name,    /* name of the item (should be an array of 
+const gsd *gsd,      /* GSD file access parameters (given) */
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 double *value,       /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_get0i
-( 
+(
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 int *value,          /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_get0l
-( 
+(
 const gsd *gsd,      /* GSD file access parameters  (given)*/
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 char *value,         /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -168,17 +168,17 @@ int *status          /* pointer to global status (given and returned) */
 
 void gsdac_get0r
 (
-const gsd *gsd,      /* GSD file access parameters (given) */ 
-const char *name,    /* name of the item (should be an array of 
+const gsd *gsd,      /* GSD file access parameters (given) */
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 float *value,        /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_get0w
-( 
+(
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 short *value,        /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -187,71 +187,71 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get1b
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 char *values,        /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_get1c
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 char *values,        /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_get1d
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 double *values,      /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_get1i
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 int *values,         /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_get1l
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 char *values,        /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_get1r
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 float *values,       /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_get1w
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-const char *name,    /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of
                         16 characters) (given) */
 short *values,       /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *statuss         /* pointer to global status (given and returned) */
 );
 
 void gsdac_getDASFlag
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
 dasFlag *dasFlag,    /* DAS file type (given and returned) */
-int *status          /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_getDateVars
@@ -260,11 +260,11 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const char *backend, /* name of the backend (given) */
 const int obsNum,    /* observation number (given) */
 dateVars *dateVars,  /* date and time variables (given and returned) */
-int *status          /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_getGSDVars
-( 
+(
 const gsd *gsd,      /* GSD file access parameters (given) */
 const dasFlag dasFlag, /* DAS file type (given) */
 gsdVars *gsdVars,    /* GSD headers and arrays (given and returned) */
@@ -283,7 +283,7 @@ void gsdac_getRecepNames
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 char *recepNames[],  /* receptor names (given and returned) */
-int recepFlags[],    /* flags for which receptors were used 
+int recepFlags[],    /* flags for which receptors were used
                         (given and returned) */
 int *status          /* global status (given and returned) */
 );
@@ -306,7 +306,7 @@ int *status          /* global status (given and returned) */
 
 void gsdac_getTransition
 (
-const gsdVars *gsdVars, /* GSD headers and arrays (given) */ 
+const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 char *molecule,      /* name of molecule (given and returned) */
 char *transiti,      /* transition (given and returned) */
 int *status          /* global status (given and returned) */
@@ -366,7 +366,7 @@ const double *lineFreqs, /* line frequencies of each subband (given) */
 const double *IFFreqs, /* IF of each subband (given) */
 AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
-); 
+);
 
 void gsdac_putJCMTStateC
 (
@@ -399,7 +399,7 @@ const int recepFlags[], /* flags for which receptors were used (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const JCMTState *record,      /* JCMTState headers (given) */
 struct ACSISSpecHdr *specHdr, /* ACSIS Spec Headers (given and returned ) */
-int *status          /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_tranTime
@@ -410,7 +410,7 @@ char *iTime,         /* time as string (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 );
 
-void gsdac_velEncode 
+void gsdac_velEncode
 (
 const char *vframe,  /* velocity frame (given) */
 const char *vdef,    /* velocity definition (given) */

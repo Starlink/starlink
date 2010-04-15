@@ -1,5 +1,5 @@
 
-\documentstyle{article} 
+\documentstyle{article}
 
 \pagestyle{myheadings}
 %
@@ -82,22 +82,22 @@ two dimensional NDFs (see SUN/33 for information on the NDF data format). The
 library forms a sub-system of the IRAS90 package, but there should be nothing to
 prevent it being of use in other contexts. IRA provides astrometry facilities
 for images. There is nothing IRAS-specific in this package which deals with the
-relation between pixel and sky coordinates in an image. 
+relation between pixel and sky coordinates in an image.
 
 \subsection { The Relationship with the Starlink Astrometry Package}
 At the current time no standards exists within Starlink for storing or accessing
-astrometric information within NDFs. However, Starlink recognise the need for 
-such standards and intend to address them in the near future. When such 
-standards exist, software which uses other methods for handling astrometry will 
-in general not be able to share data with software which uses the Starlink 
-standards. The routines within IRA were designed bearing this in mind, with the 
-intention that when the Starlink standard is defined the IRA routines will be 
-re-written to use the new standards. It should be possible to do this in such a 
-way as to leave the argument lists of all the IRA routines un-altered. This 
-would mean that software which uses IRA will automatically be compatible with 
-the Starlink standard once IRA has been modified. This provides an interim 
-solution to the problem of handling astrometry information, while at the same 
-time minimising the amount of effort which will be needed to upgrade the 
+astrometric information within NDFs. However, Starlink recognise the need for
+such standards and intend to address them in the near future. When such
+standards exist, software which uses other methods for handling astrometry will
+in general not be able to share data with software which uses the Starlink
+standards. The routines within IRA were designed bearing this in mind, with the
+intention that when the Starlink standard is defined the IRA routines will be
+re-written to use the new standards. It should be possible to do this in such a
+way as to leave the argument lists of all the IRA routines un-altered. This
+would mean that software which uses IRA will automatically be compatible with
+the Starlink standard once IRA has been modified. This provides an interim
+solution to the problem of handling astrometry information, while at the same
+time minimising the amount of effort which will be needed to upgrade the
 software to use the Starlink standard, when such a standard is produced.
 
 \subsection {Facilities Available in the Current Implementation}
@@ -116,19 +116,19 @@ implementation of IRA is referred to in this document as the ``interim''
 implementation to distinguish it from the version based on the Starlink standard
 which will eventually be produced (the use of the word {\em interim} in this
 context should not be confused with the Starlink INTERIM environment). The next
-section contains more detail about the sort of information which IRA handles. 
+section contains more detail about the sort of information which IRA handles.
 
-Astrometric functions that are specific to the IRAS data, such as those 
-relating to the relative positions of the detectors in the IRAS focal plane are 
+Astrometric functions that are specific to the IRAS data, such as those
+relating to the relative positions of the detectors in the IRAS focal plane are
 {\em not} included in this package but in the IRAS90 IRC package (see ID/1).
 
 \section {Overview}
 
-The IRA system is restricted to two dimensional images, in which the centre of 
+The IRA system is restricted to two dimensional images, in which the centre of
 each image pixel represents a point on the sky. Routines exist to relate a pixel
 position to a position on the sky and vice-versa. This consists of a description
 of the {\em projection} used to map the sky onto the image, and vice-versa, and
-a description of the {\em coordinate system} produced by the projection. 
+a description of the {\em coordinate system} produced by the projection.
 
 The primary purpose of IRA is the storage of information within an image to
 enable later applications to transform between image pixel and sky position
@@ -142,11 +142,11 @@ same position with the same pixel size but at several different wavelengths in
 each of which the same pixels correspond to the same sky positions), then IRA
 could be used as it stands so long as corresponding pixels from each plane of
 the image stack have identical sky coordinates. In this sense, sky position is
-independent of the third axis and is thus essentially 2D. 
+independent of the third axis and is thus essentially 2D.
 
 \subsection {Image Coordinates}
 In what follows, I will refer to the two coordinate systems as ``image
-coordinates'' and ``sky coordinates''. 
+coordinates'' and ``sky coordinates''.
 A two dimensional image in which the
 integer pixel indices range from $i_{low}$ to $i_{high}$ on the first
 (``horizontal'' or ``X'') axis, and from $j_{low}$ to $j_{high}$ on the second
@@ -156,8 +156,8 @@ values in which the centre of the pixel with {\em indices }
 $(1,1)$ has {\em image coordinates} $(0.5,0.5)$. Thus in the above example, image
 coordinates $(i_{low}-1,j_{low}-1)$ refer to the bottom left corner of pixel
 $(i_{low},j_{low})$, and image coordinates $(i_{high},j_{high})$ refers to the
-top right corner of pixel $(i_{high},j_{high})$. See SSN/22 for another 
-description of image coordinates (referred to in that document as ``picture 
+top right corner of pixel $(i_{high},j_{high})$. See SSN/22 for another
+description of image coordinates (referred to in that document as ``picture
 coordinates'').
 
 \subsection {Sky Coordinates}
@@ -172,7 +172,7 @@ units of radians. No rules exist relating to the presence or absence of
 multiples of $2.\pi$ within sky coordinate values (e.g a value of $4.5.\pi$ will
 be accepted). A routine is provided (IRA\_NORM) to normalise longitude/latitude
 pairs such that longitude is in the range $0$ to $2.\pi$ and latitude is in the
-range $-\pi/2$ to $+\pi/2$. 
+range $-\pi/2$ to $+\pi/2$.
 
 The sky coordinate systems currently supported by IRA are:
 \begin {itemize}
@@ -188,11 +188,11 @@ of the sky coordinate system, in parentheses; for instance EQUATORIAL(1983.5)
 preceded by a single character, B or J, indicating if the epoch is a Besselian
 epoch (B) or a Julian epoch (J). If this character is missing (as in the above
 example), then the epoch is assumed to be a Besselian epoch. If no equinox is
-specified in this way, then a default of B1950.0 is used. 
+specified in this way, then a default of B1950.0 is used.
 
-If a Julian epoch is used to specify the reference equinox for an equatorial 
-coordinate system, then the equatorial coordinates are assumed to be in the 
-IAU 1976, FK5, Fricke system. If the equinox is specified using a Besselian 
+If a Julian epoch is used to specify the reference equinox for an equatorial
+coordinate system, then the equatorial coordinates are assumed to be in the
+IAU 1976, FK5, Fricke system. If the equinox is specified using a Besselian
 epoch, then the coordinates are assumed to be in the FK4, Bessel-Newcomb system.
 
 IRA provides routines to convert coordinates from one system to another,
@@ -210,7 +210,7 @@ abbreviation for such a name. A name in this sense implies nothing about any
 reference equinox, and so in general a name does not specify the sky coordinate
 system completely. An SCS value consists of a name with an optional equinox
 specifier appended to the end, as described above. If no equinox specifier is
-contained in an SCS value, the default of B1950.0 is used (if necessary). 
+contained in an SCS value, the default of B1950.0 is used (if necessary).
 
 \subsection {Projections}
 \label {SEC:PARS}
@@ -220,7 +220,7 @@ projections consist of two ``mappings''. The forward mapping converts image
 coordinates to sky coordinates, and the inverse mapping converts sky coordinates
 to image coordinates. Projection transformations are thus restricted to mappings
 which convert a single pair of numbers, into another single pair of numbers (eg
-$(X,Y)$ to $(RA,DEC)$ ). 
+$(X,Y)$ to $(RA,DEC)$ ).
 
 Currently, explicit support is restricted to the following four projections:
 \begin {itemize}
@@ -232,18 +232,18 @@ Currently, explicit support is restricted to the following four projections:
 The basic algorithms to implement the first three of these projections are
 described in the IRAS Catalogues and Atlases Explanatory Supplement, section
 D.2, but have been extended to incorporate any orientation and scale for the
-image axes, and an arbitrary reference point. The image axes are restricted to 
-be perpendicular to each other on the sky, with rotation from the first (X) to 
-the second (Y) image axes being in the sense of rotation from north to east 
-(i.e. rotation from north to east is anti-clockwise when the image is displayed 
+image axes, and an arbitrary reference point. The image axes are restricted to
+be perpendicular to each other on the sky, with rotation from the first (X) to
+the second (Y) image axes being in the sense of rotation from north to east
+(i.e. rotation from north to east is anti-clockwise when the image is displayed
 with X increasing left to right and Y increasing bottom to top).
 
-The four supported projection are parameterised by eight parameters, as 
-follows: 
+The four supported projection are parameterised by eight parameters, as
+follows:
 \begin {enumerate}
-\item The sky longitude (eg RA) of a ``reference'' point. This reference point 
+\item The sky longitude (eg RA) of a ``reference'' point. This reference point
 usually has some geometric significance for the projection (eg for the Gnomonic,
-or tangent plane projection, the reference point is the point on the sky at 
+or tangent plane projection, the reference point is the point on the sky at
 which the tangent plane touches the celestial sphere).
 \item The sky latitude (eg DEC) of the reference point.
 \item The position of the reference point along the first (X) image axis.
@@ -253,7 +253,7 @@ which the tangent plane touches the celestial sphere).
 \item The position angle of the second (Y) image axis on the sky with respect to
 north.
 \item An angle through which to rotate the celestial sphere before the
-projection is performed (see below). 
+projection is performed (see below).
 \end {enumerate}
 
 The rotation specified by the final parameter is about the radius vector from
@@ -281,20 +281,20 @@ of IRA handles most projections by storing the projection name and projection
 parameters in the NDF. Coordinate data are then transformed by calling an
 appropriate IRA routine which performs the required projection. This is a
 relatively fast way of doing things, but it restricts the projections which can
-be used to those for which explicit IRA transformation routines exist. 
+be used to those for which explicit IRA transformation routines exist.
 
 \section {Using IRA Subroutines}
-This section gives a brief outline of the IRA routines which are available to 
-perform some common tasks. The specific details required to use these routines 
-are not included here but can be found in the subroutine specifications 
+This section gives a brief outline of the IRA routines which are available to
+perform some common tasks. The specific details required to use these routines
+are not included here but can be found in the subroutine specifications
 contained in appendix \ref {SEC:FULLSPEC}.
 
 \subsection {Constants and Error Values}
 \label {SEC:CON}
-The IRA package has associated with it various symbolic constants defining such 
-things as the required length of various character variables, the Julian epoch 
-of the IRAS mission, etc. These values consist of a name of up to 5 characters 
-prefixed by ``IRA\_\_''  (note the {\em double} underscore), and can be made 
+The IRA package has associated with it various symbolic constants defining such
+things as the required length of various character variables, the Julian epoch
+of the IRAS mission, etc. These values consist of a name of up to 5 characters
+prefixed by ``IRA\_\_''  (note the {\em double} underscore), and can be made
 available to an application by including the following lines at the start of the
 routines which uses them:
 
@@ -304,16 +304,16 @@ routines which uses them:
 
 
 IRA\_PAR should be a logical name (on VMS) or symbolic links (on UNIX) pointing
-to the appropriate files. 
+to the appropriate files.
 
-Note, Fortran source files for use on UNIX systems can be automatically 
+Note, Fortran source files for use on UNIX systems can be automatically
 generated from those used on VMS systems, using the FORCONV program descibed
 in SUN/111. This avoids the need to store and maintain two separate systems of
 source files, and is highly recommended!
 
 The values thus defined are described in the following sections, and also in the
 subroutine specifications. Of particular use may be a set of multiplicative
-constants for converting between various forms of representing angular values: 
+constants for converting between various forms of representing angular values:
 
 \begin{description}
 \item [IRA\_\_RTOD] - Factor for converting radians to degrees.
@@ -348,7 +348,7 @@ These values have the same format of those contained in IRA\_PAR, put define
 various error conditions which can be generated within the IRA package.
 Applications can compare the $STATUS$ argument with these values to check for
 specific error conditions. These values are described in appendix \ref
-{APP:ERRORS}. 
+{APP:ERRORS}.
 
 \subsection{IRA Identifiers}
 IRA can store astrometry information for many different pixel grids
@@ -360,7 +360,7 @@ application, which can then pass them to other IRA routines to specify which
 astrometry information is to be used. When access is no longer needed by the
 application to the astrometry information, the related IRA identifier should be
 annulled using routine IRA\_ANNUL. This releases the resources used by the
-astrometry information, so that it can be re-used. 
+astrometry information, so that it can be re-used.
 
 Note, IRA stores astrometry information internally within common arrays. The
 identifiers used by IRA identify a particular set of values stored in common,
@@ -372,14 +372,14 @@ held values, {\em not} the values stored in the NDF. To effect permanent changes
 in the NDF values, the interbnally held astrometry information should be written
 out using IRA\_CREAT, IRA\_EXPRT or IRA\_WRITE. This approach means that NDF
 identifiers and HDS locators can be annulled by the calling application once the
-astrometry information has been copied into internal storage. 
+astrometry information has been copied into internal storage.
 
 \subsection {Starting Up and Shutting Down}
 The routine IRA\_INIT should be called before calling any IRA routines which has
 an IRA identifier as an argument. It initialises the IRA internal common blocks
 and annuls any currently active IRA identifiers. When all handling of
 astrometry information has been completed, IRA\_CLOSE should be called which
-ensures that all IRA identifiers have been annulled. IRA\_ACTIV can be used to 
+ensures that all IRA identifiers have been annulled. IRA\_ACTIV can be used to
 see if IRA is currently active.
 
 \subsection {Creation of New IRA Identifiers}
@@ -400,9 +400,9 @@ for suitable astrometry information. Such information is then copied into the
 IRA common blocks and an IRA identifier is returned for it. IRA\_READ is similar
 to IRA\_IMPRT except that the calling application supplies a locator to an HDS
 object rather than an NDF identifier. The astrometry information is read from
-the specified HDS object and an IRA identifier returned for it. 
+the specified HDS object and an IRA identifier returned for it.
 
-IRA identifiers should be annulled using IRA\_ANNUL when no longer needed. 
+IRA identifiers should be annulled using IRA\_ANNUL when no longer needed.
 
 \subsection {Storing Astrometry Information within an NDF}
 Astrometry information is stored within an NDF in an ``astrometry structure''.
@@ -417,13 +417,13 @@ assumed to have an HDS name of ``ASTROMETRY''. These names may be changed by
 calling the routine IRA\_LOCAT, making it possible for IRAS to be used for NDFs
 which don't contain an IRAS extension. The names set up by the call to
 IRA\_LOCAT remain in force until another call to IRA\_LOCAT or a call to
-IRA\_INIT. 
+IRA\_INIT.
 
 The NDF must be open with WRITE or UPDATE access in order to create a new
 astrometry structure. NB, the NDF extension which is to hold the astrometry
 structure must already exist. If IRA\_CREAT or IRA\_EXPRT cannot find the
 required NDF extension, it will return with $STATUS$ set to the value
-IRA\_\_NOEXT. 
+IRA\_\_NOEXT.
 
 \subsection {Reading Astrometry Information from an NDF}
 To handle astrometry information stored in an existing NDF, an identifier to the
@@ -435,20 +435,20 @@ the information from the astrometry structure into the IRA internal common
 blocks. It then returns an IRA identifier for the astrometry information which
 can be passed to other IRA routines to gain access to the information stored in
 common. The IRA identifier should be annulled using IRA\_ANNUL when it is no
-longer needed. 
+longer needed.
 
-IRA\_FIND will locate the astrometry structure in an NDF but does not read the 
+IRA\_FIND will locate the astrometry structure in an NDF but does not read the
 astrometry information into common. This routine can be used (for instance) to
 locate the astrometry structure prior to deleting it.
 
 IRA\_SCSEP can then be called to get the sky coordinate system (including an
 equinox specifier if required) generated by the projection, and the Julian epoch
-of the observations. 
+of the observations.
 
-IRA\_READ is like IRA\_IMPRT except that it reads the astrometry information 
+IRA\_READ is like IRA\_IMPRT except that it reads the astrometry information
 out of a specified HDS object.
 
-IRA\_TRACE can be used to display information about an existing astrometry 
+IRA\_TRACE can be used to display information about an existing astrometry
 information on the screen.
 
 \subsection {Modifying Astrometry Information}
@@ -458,18 +458,18 @@ image. The routines IRA\_MAG, IRA\_MOVE and IRA\_ROT can be used to modify
 astrometry information to take account of various linear geometric
 transformations which may be applied to the data. The transformations are
 restricted to ones which will not alter the basic properties of the projection.
-They are : 
+They are :
 
 \begin{itemize}
 \item Shift the reference position to a different location in image coordinates
 (see routine IRA\_MOVE).
-\item Magnify the image by reducing the pixel size. Separate magnification 
+\item Magnify the image by reducing the pixel size. Separate magnification
 factors can be specified for the X and Y axes (see routine IRA\_MAG).
 \item Rotate the image coordinate system (see routine IRA\_ROT).
 \end{itemize}
 
-Note, these routines do not write the modified astrometry information back to 
-any NDF or HDS object from which it may have been originally obtained. If the 
+Note, these routines do not write the modified astrometry information back to
+any NDF or HDS object from which it may have been originally obtained. If the
 values are to be stored back in an NDF or HDS object then a call must be made to
 IRA\_EXPRT or IRA\_WRITE.
 
@@ -480,29 +480,29 @@ a given IRA identifier (the actual {\em name} of the projection is not
 available to the application). If many data points are to be transformed, it is
 faster to put the data into two arrays, and make a single call to IRA\_TRANS to
 process them all, rather than making many calls to IRA\_TRANS to process a
-single point each call. 
+single point each call.
 
 \subsection {Handling Formatted Sky Coordinates}
 A formatted sky coordinate value consists of a character string holding a sky
 coordinate value in character form, in a format which is readily usable by a
 user. A single value can refer to either a longitude or a latitude value. A pair
-of formatted sky coordinate values consists of one of each. Routines exist to 
+of formatted sky coordinate values consists of one of each. Routines exist to
 convert from floating point values (in radians) to formatted strings, and
 vice-versa, which allow several different formats for the strings. IRA\_CTOD and
 IRA\_DTOC decode and encode a {\em pair} of floating point values, IRA\_CTOD1
 and IRA\_DTOC1 handle {\em single} values. The encoding routines always ensure
 that displayed longitude values are in the range zero to 360 degrees (or the
 equivalent time range, zero to 24 hours) and that the displayed latitude is in
-the range +90 degrees to -90 degrees. 
+the range +90 degrees to -90 degrees.
 
-IRA\_GETCO gets a pair of sky coordinate values from the ADAM environment 
+IRA\_GETCO gets a pair of sky coordinate values from the ADAM environment
 using the ADAM parameter system. Two parameters are used, one for each value.
 For each, the user gives a string in a format acceptable to IRA\_CTOD.
 
 \subsection {Mathematical Operations on Sky Coordinate Values}
 Sky coordinate positions can be converted from one supported sky coordinate
 system to another using IRA\_CONVT (which in turn calls various SLALIB routines,
-see SUN/67). IRA\_PACON converts both sky positions {\em and} position angles. 
+see SUN/67). IRA\_PACON converts both sky positions {\em and} position angles.
 Any required precession is performed by these routines, but nutation is ignored.
 
 The length of the arc joining two given sky positions can be found using
@@ -510,17 +510,17 @@ IRA\_DIST. Given two sky positions and a position angle (measured from north
 through east in the current sky coordinate system), IRA\_DIST2 returned two
 arc-distances, which are the distances which must be moved parallel and
 perpendicular to the given position angle in order to move from the first sky
-position to the second. 
+position to the second.
 
 Two routines exist for finding a sky position which is a given distance away
 from a reference sky position. They differ in how the direction of movement is
 defined. IRA\_OFFST moves away from the reference point, towards a specified
 second point. IRA\_SHIFT moves away from the reference point at a given position
-angle (measured north through east in the current sky coordinate system). 
+angle (measured north through east in the current sky coordinate system).
 
-Redundant multiple of $2.\pi$ can be removed from a pair of sky coordinate 
-values by calling IRA\_NORM. This routine ensures that longitude values are in 
-the range zero to $2.\pi$, and latitude values are in the range $+\pi/2$ to 
+Redundant multiple of $2.\pi$ can be removed from a pair of sky coordinate
+values by calling IRA\_NORM. This routine ensures that longitude values are in
+the range zero to $2.\pi$, and latitude values are in the range $+\pi/2$ to
 $-\pi/2$.
 
 \subsection {Encoding and Decoding Equinox Specifiers}
@@ -531,9 +531,9 @@ The routine IRA\_SETEQ can be used to do the character string manipulation
 required to do this. The routine IRA\_GETEQ will do the opposite of this; given
 an SCS string it will return the name of the sky coordinate system, the floating
 point epoch value, and a character indicating if the epoch is Besselian or
-Julian. 
+Julian.
 
-The routine IRA\_GTSCS will get a complete SCS string (including equinox 
+The routine IRA\_GTSCS will get a complete SCS string (including equinox
 specifier) from the ADAM environment, using a specified ADAM parameter.
 
 \subsection {Graphics}
@@ -544,7 +544,7 @@ formatted coordinate values, and for drawing a boundary around the region
 containing valid sky coordinates. A routine is provided which packages these in
 order to produce a labelled sky coordinate grid. The accuracy of plotted curves
 can be specified by the calling application to give the required play-off
-between accuracy and speed of execution. 
+between accuracy and speed of execution.
 
 \subsection {Calculating Pixel Bounds Required to Cover a Given Area of Sky}
 When creating an image from scratch, it is often necessary to determine the
@@ -553,14 +553,14 @@ area is usually specified by giving the sky coordinates of the centre of the
 image, and the size of the image (i.e. an arc-length in radians) along both
 axes. Since pixel size in general varies across an image it is not always
 sufficient to divide the required size of an image by the ``nominal'' pixel size
-to get the dimension of the image in pixels. The routine IRA\_XYLIM finds the 
+to get the dimension of the image in pixels. The routine IRA\_XYLIM finds the
 pixel bounds which result in the two image axes having the required arc-length.
 
 \subsection {Miscellaneous Routines}
 IRA\_SCNAM will return a description of each axis of the sky coordinate system,
 and an abbreviation of its name. For example, when using an equatorial sky
 coordinate system, the description of the first axis is ``Right Ascension'' and
-the abbreviation is ``RA''. 
+the abbreviation is ``RA''.
 
 \subsection {Demonstration Applications}
 Two demonstration applications are available in IRA\_DIR which give examples of
@@ -569,7 +569,7 @@ image of an artificial ``patchwork'' sky mapped using a requested projection,
 and an astrometry structure which describes this image. The image can be
 displayed etc, using KAPPA. IRA\_DEMO2 accepts an NDF as input, locates an
 astrometry structure within it and uses the information to convert user supplied
-coordinates from image to sky coordinates or vice-versa. 
+coordinates from image to sky coordinates or vice-versa.
 
 \section {Compiling and Linking with IRA}
 \label{SEC:LINK}
@@ -578,7 +578,7 @@ subroutines, on both VMS and UNIX systems. It is assumed that the IRAS90 package
 is installed as part of the Starlink Software Collection.
 
 \subsection{VMS}
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use the IRA package should start by issuing the commands:
 
 \begin{verbatim}
@@ -589,12 +589,12 @@ $ IRAS90_DEV
 \end{verbatim}
 
 These commands set up logical names related to all the IRAS90
-subsystems, including IRA. 
+subsystems, including IRA.
 
 To link a VMS ADAM application with the IRA package, the linker options file
 IRAS90\_LINK\_ADAM should be used. For example, to compile and link an ADAM
 application called PROG with the IRA library, the following commands should be
-used: 
+used:
 
 \begin{verbatim}
 $ ADAMSTART
@@ -602,30 +602,30 @@ $ ADAMDEV
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ ALINK PROG, IRAS90_LINK_ADAM/OPT 
+$ ALINK PROG, IRAS90_LINK_ADAM/OPT
 \end{verbatim}
 
 Stand-alone (i.e. non-ADAM) applications can be linked with the ``standalone''
 version of IRA. This version excludes the routines described in appendix
 \ref{APP:ADAM}. To do this the link options file IRAS90\_LINK should be used
 instead of IRAS90\_LINK\_ADAM. Thus to compile and link a stand-alone
-application with the IRA package, the following commands should be given: 
+application with the IRA package, the following commands should be given:
 
 \begin{verbatim}
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ LINK PROG, IRAS90_LINK/OPT 
+$ LINK PROG, IRAS90_LINK/OPT
 \end{verbatim}
 
 \subsection{UNIX}
 
 
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use any IRAS90 sub-package should do the following:
 
 \begin{enumerate}
-\item Execute the {\bf iras90} command. This sets up an alias for the 
+\item Execute the {\bf iras90} command. This sets up an alias for the
 {\bf iras90\_dev} command.
 
 \item Execute the {\bf iras90\_dev} command.  This creates soft links
@@ -633,26 +633,26 @@ within the current directory to
 all the iras90 include files, defines an environment variable IRAS90\_SRC
 pointing to the IRAS90 source directory, adds the {\bf bin}
 sub-directory of IRAS90\_SRC on to the end of the current value for the
-environment variable PATH, and adds the {\bf lib} sub-directory of 
-IRAS90\_SRC on to the end of the current value for the environment 
+environment variable PATH, and adds the {\bf lib} sub-directory of
+IRAS90\_SRC on to the end of the current value for the environment
 variable LD\_LIBRARY\_PATH. The command {\bf iras90\_dev star} will do
 the same but will also create soft links to all starlink include files
 (i.e. all files in the directory /star/include).
 
 \item If a UNIX application accesses any include files (such as
-IRA\_PAR) then they should be specified (within the source file) in upper case 
+IRA\_PAR) then they should be specified (within the source file) in upper case
 without any directory
 path. The I90\_PAR file (for instance) can be included using the statement
 
 \verb+      INCLUDE 'I90_PAR'+\\
 
-\item Soft links can be deleted (using the {\bf rm} command) when no longer 
+\item Soft links can be deleted (using the {\bf rm} command) when no longer
 needed.
 The command {\bf iras90\_dev remove} will remove all IRAS90 soft links from
 the current directory. The command {\bf iras90\_dev remove star} will
 remove all IRAS90 and Starlink soft links from the current directory.
-Note, soft links are only accessable in the directory from which the {bf ln} 
-or {\bf iras90\_dev} command was issued. 
+Note, soft links are only accessable in the directory from which the {bf ln}
+or {\bf iras90\_dev} command was issued.
 \item For ADAM applications the following {\bf alink} command should be used:
 
 \verb+% alink prog.f -L$IRAS90_SRC/lib `ira_link_adam`+\\
@@ -684,18 +684,18 @@ apostrophy (') in the above {\bf alink} command.
    {Close down the IRA and TRN packages.}
 \noteroutine{IRA\_CONVT(NVAL,AIN,BIN,SCSIN,SCSOUT,EPOCH,AOUT,BOUT,STATUS)}
    {Convert sky coordinates from one system to another.}
-\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)} 
+\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)}
    {Create an IRA identifier for specified astrometry information.}
 \noteroutine{IRA\_CTOD(ATEXT,BTEXT,SCS,A,B,STATUS)}
-   {Convert a pair of sky coordinate values held as formatted strings into 
+   {Convert a pair of sky coordinate values held as formatted strings into
    double precision, floating point values.}
-\noteroutine{IRA\_CTOD1(TEXT,SCS,NC,VALUE,STATUS)} 
-   {Convert a single sky coordinate value held in a formatted string into a 
+\noteroutine{IRA\_CTOD1(TEXT,SCS,NC,VALUE,STATUS)}
+   {Convert a single sky coordinate value held in a formatted string into a
    double precision floating point value.}
 \noteroutine{IRA\_DIST(A0,B0,A1,B1,DIST,STATUS)}
    {Find the arc distance between two sky positions.}
 \noteroutine{IRA\_DIST2(A0,B0,ANGLE,A1,B1,PARDST,PRPDST,STATUS)}
-   {Resolve the displacement between two sky positions into distances parallel 
+   {Resolve the displacement between two sky positions into distances parallel
     and perpendicular to a given position angle.}
 \noteroutine{IRA\_DRBND(IDA,LBND,UBND,STATUS)}
    {Draw a curve around the region containing valid sky coordinates.}
@@ -719,7 +719,7 @@ apostrophy (') in the above {\bf alink} command.
    {Return area covered by a coordinate value drawn by IRA\_DRVAL.}
 \noteroutine{IRA\_DTOC(A,B,SCS,STYLE,ATEXT,BTEXT,STATUS)}
    {Format a  pair of sky coordinate values into a pair of character strings.}
-\noteroutine{IRA\_DTOC1(VALUE.SCS,NC,STYLE,TEXT,STATUS)} 
+\noteroutine{IRA\_DTOC1(VALUE.SCS,NC,STYLE,TEXT,STATUS)}
    {Format a  single sky coordinate value into a character string.}
 \noteroutine{IRA\_FIND(INDF,THERE,XNAME,ASNAME,LOC,STATUS)}
    {Find an astrometry structure within an NDF.}
@@ -729,30 +729,30 @@ apostrophy (') in the above {\bf alink} command.
    {Read a pair of sky coordinates from the ADAM environment.}
 \noteroutine{IRA\_GETEQ(SCS,EQU,BJ,NAME,STATUS)}
    {Get the epoch of the reference equinox, and the name, from an SCS string.}
-\noteroutine{IRA\_GTCO1(PARAM,PROMPT,SCS,NC,DEFLT,VALUE,STATUS)} 
+\noteroutine{IRA\_GTCO1(PARAM,PROMPT,SCS,NC,DEFLT,VALUE,STATUS)}
    {Read a single sky coordinate from the ADAM environment.}
 \noteroutine{IRA\_GTSCS(PARAM,DEFLT,SCS,STATUS )}
-   {Get a complete SCS value (including equinox specifier) from the ADAM 
+   {Get a complete SCS value (including equinox specifier) from the ADAM
     environment.}
-\noteroutine{IRA\_IMPRT(INDF,IDA,STATUS)} 
+\noteroutine{IRA\_IMPRT(INDF,IDA,STATUS)}
    {Import astrometry information from an NDF into the IRA system.}
-\noteroutine{IRA\_INIT(STATUS)} 
+\noteroutine{IRA\_INIT(STATUS)}
    {Initialise the IRA identifier system.}
-\noteroutine{IRA\_IPROJ(LIST,STATUS)} 
+\noteroutine{IRA\_IPROJ(LIST,STATUS)}
    {Return a list containing the names of explicitly supported projections.}
-\noteroutine{IRA\_ISCS(LIST,STATUS)} 
+\noteroutine{IRA\_ISCS(LIST,STATUS)}
    {Return a list containing the names of supported sky coordinate systems.}
 \noteroutine{IRA\_LOCAT(XNAME,ASNAME,STATUS)}
-   {Set the names of the HDS object and NDF extension used to store the 
+   {Set the names of the HDS object and NDF extension used to store the
    astrometry information.}
-\noteroutine{IRA\_MAG(IDA,MAGX,MAGY,XC,YC,STATUS)} 
+\noteroutine{IRA\_MAG(IDA,MAGX,MAGY,XC,YC,STATUS)}
    {Modify astrometry information to take account of a magnification}
-\noteroutine{IRA\_MOVE(IDA,SHIFTX,SHIFTY,STATUS)} 
-   {Modify astrometry information to take account of a shift of image 
+\noteroutine{IRA\_MOVE(IDA,SHIFTX,SHIFTY,STATUS)}
+   {Modify astrometry information to take account of a shift of image
 coordinates}
-\noteroutine{IRA\_NORM(A,B,STATUS)} 
-   {Shift a pair of sky coordinate values into the ``first order ranges'' (e.g. 
-   longitude between zero and $2.\pi$ and latitude between $+\pi/2$ and 
+\noteroutine{IRA\_NORM(A,B,STATUS)}
+   {Shift a pair of sky coordinate values into the ``first order ranges'' (e.g.
+   longitude between zero and $2.\pi$ and latitude between $+\pi/2$ and
    $-\pi/2$ ).}
 \noteroutine{IRA\_OFFST(A0,B0,A1,B1,DIST,A2,B2,STATUS)}
    {Find a sky position which is offset from a given position by a given
@@ -761,31 +761,31 @@ coordinates}
    {Convert sky coordinates and position angles from one system to another.}
 \noteroutine{IRA\_PIXSZ(IDA,PIXSZ,STATUS)}
    {Get the nominal pixel dimensions.}
-\noteroutine{IRA\_READ(LOC,IDA,STATUS)} 
+\noteroutine{IRA\_READ(LOC,IDA,STATUS)}
    {Read astrometry information from an HDS object.}
-\noteroutine{IRA\_ROT(IDA,ROT,XC,YC,STATUS)} 
+\noteroutine{IRA\_ROT(IDA,ROT,XC,YC,STATUS)}
    {Modify astrometry information to take account of a rotation}
 \noteroutine{IRA\_SCNAM(SCS,NC,DESCR,LD,ABBREV,LA,STATUS)}
    {Return the name and abbreviation for an axis of a sky coordinate system.}
-\noteroutine{IRA\_SCSEP(IDA,SCS,EPOCH,STATUS)} 
-   {Return the sky coordinate system and epoch associated with an IRA 
+\noteroutine{IRA\_SCSEP(IDA,SCS,EPOCH,STATUS)}
+   {Return the sky coordinate system and epoch associated with an IRA
     identifier.}
 \noteroutine{IRA\_SETEQ(EQU,BJ,SCS,STATUS)}
    {Set the epoch of the reference equinox in an SCS string.}
-\noteroutine{IRA\_SHIFT(A0,B0,ANGLE,DIST,A1,B1,ENDANG,STATUS)} 
+\noteroutine{IRA\_SHIFT(A0,B0,ANGLE,DIST,A1,B1,ENDANG,STATUS)}
    {Find a sky position which is offset from a given position by a given
    amount along a given  bearing.}
 \noteroutine{IRA\_TRACE(IDA,ROUTNE,STATUS )}
    {Display astrometry information.}
-\noteroutine{IRA\_TRANS(NVAL,IN1,IN2,FORWRD,SCS,IDA,OUT1,OUT2,STATUS)} 
+\noteroutine{IRA\_TRANS(NVAL,IN1,IN2,FORWRD,SCS,IDA,OUT1,OUT2,STATUS)}
    {Transform coordinate data.}
 \noteroutine{IRA\_VALID(NVAL,FORWRD,SCS,IDA,IN1,IN2,OK,STATUS)}
    {Deterime if a given sky or image position corresponds to a valid position
     in the other system.}
-\noteroutine{IRA\_WRITE(IDA,LOC,STATUS)} 
+\noteroutine{IRA\_WRITE(IDA,LOC,STATUS)}
    {Write astrometry information to an HDS object.}
 \noteroutine{IRA\_XYLIM(IDA,ACEN,BCEN,XSIZE,YSIZE,LBND,UBND,STATUS)}
-   {Determine the pixel bounds required for an image to cover a given area of 
+   {Determine the pixel bounds required for an image to cover a given area of
     sky.}
 
 \section {Classified List of Routines}
@@ -793,42 +793,42 @@ coordinates}
 \subsection {Access to Existing Astrometry Information}
 \noteroutine{IRA\_FIND(INDF,THERE,XNAME,ASNAME,LOC,STATUS)}
    {Find an astrometry structure within an NDF.}
-\noteroutine{IRA\_IMPRT(INDF,IDA,STATUS)} 
+\noteroutine{IRA\_IMPRT(INDF,IDA,STATUS)}
    {Import astrometry information from an NDF into the IRA system.}
 \noteroutine{IRA\_LOCAT(XNAME,ASNAME,STATUS)}
-   {Set the names of the HDS object and NDF extension used to store the 
+   {Set the names of the HDS object and NDF extension used to store the
    astrometry information.}
-\noteroutine{IRA\_MAG(IDA,MAGX,MAGY,XC,YC,STATUS)} 
+\noteroutine{IRA\_MAG(IDA,MAGX,MAGY,XC,YC,STATUS)}
    {Modify astrometry information to take account of a magnification}
-\noteroutine{IRA\_MOVE(IDA,SHIFTX,SHIFTY,STATUS)} 
-   {Modify astrometry information to take account of a shift of image 
+\noteroutine{IRA\_MOVE(IDA,SHIFTX,SHIFTY,STATUS)}
+   {Modify astrometry information to take account of a shift of image
 coordinates}
-\noteroutine{IRA\_READ(LOC,IDA,STATUS)} 
+\noteroutine{IRA\_READ(LOC,IDA,STATUS)}
    {Read astrometry information from an HDS object.}
-\noteroutine{IRA\_ROT(IDA,ROT,XC,YC,STATUS)} 
+\noteroutine{IRA\_ROT(IDA,ROT,XC,YC,STATUS)}
    {Modify astrometry information to take account of a rotation}
-\noteroutine{IRA\_SCSEP(IDA,SCS,EPOCH,STATUS)} 
-   {Return the sky coordinate system and epoch associated with an IRA 
+\noteroutine{IRA\_SCSEP(IDA,SCS,EPOCH,STATUS)}
+   {Return the sky coordinate system and epoch associated with an IRA
     identifier.}
 \noteroutine{IRA\_TRACE(IDA,ROUTNE,STATUS )}
    {Display astrometry information.}
-\noteroutine{IRA\_TRANS(NVAL,IN1,IN2,FORWRD,SCS,IDA,OUT1,OUT2,STATUS)} 
+\noteroutine{IRA\_TRANS(NVAL,IN1,IN2,FORWRD,SCS,IDA,OUT1,OUT2,STATUS)}
    {Transform coordinate data.}
 \noteroutine{IRA\_VALID(NVAL,FORWRD,SCS,IDA,IN1,IN2,OK,STATUS)}
    {Deterime if a given sky or image position corresponds to a valid position
     in the other system.}
 \noteroutine{IRA\_XYLIM(IDA,ACEN,BCEN,XSIZE,YSIZE,LBND,UBND,STATUS)}
-   {Determine the pixel bounds required for an image to cover a given area of 
+   {Determine the pixel bounds required for an image to cover a given area of
     sky.}
 
 \subsection {Accessing ADAM Parameters}
 \label {APP:ADAM}
 \noteroutine{IRA\_GETCO(APAR,BPAR,PRMAPP,SCS,DEFLT,A,B,STATUS)}
    {Read a pair of sky coordinates from the ADAM environment.}
-\noteroutine{IRA\_GTCO1(PARAM,PROMPT,SCS,NC,DEFLT,VALUE,STATUS)} 
+\noteroutine{IRA\_GTCO1(PARAM,PROMPT,SCS,NC,DEFLT,VALUE,STATUS)}
    {Read a single sky coordinate from the ADAM environment.}
 \noteroutine{IRA\_GTSCS(PARAM,DEFLT,SCS,STATUS )}
-   {Get a complete SCS value (including equinox specifier) from the ADAM 
+   {Get a complete SCS value (including equinox specifier) from the ADAM
     environment.}
 
 \subsection {Control of IRA Identifier}
@@ -836,17 +836,17 @@ coordinates}
    {Annul an IRA identifier.}
 \noteroutine{IRA\_CLOSE(STATUS)}
    {Close down the IRA and TRN packages.}
-\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)} 
+\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)}
    {Create an IRA identifier for specified astrometry information.}
 \noteroutine{IRA\_EXPRT(IDA,INDF,STATUS)}
    {Store astrometry infromation in an NDF}
-\noteroutine{IRA\_IMPRT(INDF,IDA,STATUS)} 
+\noteroutine{IRA\_IMPRT(INDF,IDA,STATUS)}
    {Import astrometry information from an NDF into the IRA system.}
-\noteroutine{IRA\_INIT(STATUS)} 
+\noteroutine{IRA\_INIT(STATUS)}
    {Initialise the IRA identifier system.}
-\noteroutine{IRA\_READ(LOC,IDA,STATUS)} 
+\noteroutine{IRA\_READ(LOC,IDA,STATUS)}
    {Read astrometry information from an HDS object.}
-\noteroutine{IRA\_WRITE(IDA,LOC,STATUS)} 
+\noteroutine{IRA\_WRITE(IDA,LOC,STATUS)}
    {Write astrometry information to an HDS object.}
 
 \subsection {Control of the IRA Package}
@@ -854,24 +854,24 @@ coordinates}
    {Inquire if IRA is currently active.}
 \noteroutine{IRA\_CLOSE(STATUS)}
    {Close down the IRA and TRN packages.}
-\noteroutine{IRA\_INIT(STATUS)} 
+\noteroutine{IRA\_INIT(STATUS)}
    {Initialise the IRA identifier system.}
 \noteroutine{IRA\_LOCAT(XNAME,ASNAME,STATUS)}
-   {Set the names of the HDS object and NDF extension used to store the 
+   {Set the names of the HDS object and NDF extension used to store the
    astrometry information.}
 
 \subsection {Creation of Astrometry Information}
-\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)} 
+\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)}
    {Create an IRA identifier for specified astrometry information.}
-\noteroutine{IRA\_WRITE(IDA,LOC,STATUS)} 
+\noteroutine{IRA\_WRITE(IDA,LOC,STATUS)}
    {Write astrometry information to an HDS object.}
 
 \subsection {Handling Formatted Sky Coordinate Values}
 \noteroutine{IRA\_CTOD(ATEXT,BTEXT,SCS,A,B,STATUS)}
-   {Convert a pair of sky coordinate values held as formatted strings into 
+   {Convert a pair of sky coordinate values held as formatted strings into
    double precision, floating point values.}
-\noteroutine{IRA\_CTOD1(TEXT,SCS,NC,VALUE,STATUS)} 
-   {Convert a single sky coordinate value held in a formatted string into a 
+\noteroutine{IRA\_CTOD1(TEXT,SCS,NC,VALUE,STATUS)}
+   {Convert a single sky coordinate value held in a formatted string into a
    double precision floating point value.}
 \noteroutine{IRA\_DRVAL(VALUE,SCS,NC,XPOS,YPOS,STYLE,ACC,CONTXT,STATUS)}
    {Draw a formatted sky coordinate value.}
@@ -879,17 +879,17 @@ coordinates}
    {Return area covered by a coordinate value drawn by IRA\_DRVAL.}
 \noteroutine{IRA\_DTOC(A,B,SCS,STYLE,ATEXT,BTEXT,STATUS)}
    {Format a  pair of sky coordinate values into a pair of character strings.}
-\noteroutine{IRA\_DTOC1(VALUE.SCS,NC,STYLE,TEXT,STATUS)} 
+\noteroutine{IRA\_DTOC1(VALUE.SCS,NC,STYLE,TEXT,STATUS)}
    {Format a  single sky coordinate value into a character string.}
 \noteroutine{IRA\_GETCO(APAR,BPAR,PRMAPP,SCS,DEFLT,A,B,STATUS)}
    {Read a pair of sky coordinates from the ADAM environment.}
-\noteroutine{IRA\_GTCO1(PARAM,PROMPT,SCS,NC,DEFLT,VALUE,STATUS)} 
+\noteroutine{IRA\_GTCO1(PARAM,PROMPT,SCS,NC,DEFLT,VALUE,STATUS)}
    {Read a single sky coordinate from the ADAM environment.}
 
 \subsection {Handling Named Projections}
-\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)} 
+\noteroutine{IRA\_CREAT(PROJ,NP,P,SCS,EPOCH,INDF,IDA,STATUS)}
    {Create an IRA identifier for specified astrometry information.}
-\noteroutine{IRA\_IPROJ(LIST,STATUS)} 
+\noteroutine{IRA\_IPROJ(LIST,STATUS)}
    {Return a list containing the names of explicitly supported projections.}
 
 \subsection {Graphics}
@@ -924,14 +924,14 @@ coordinates}
 \noteroutine{IRA\_GETEQ(SCS,EQU,BJ,NAME,STATUS)}
    {Get the epoch of the reference equinox, and the name, from an SCS string.}
 \noteroutine{IRA\_GTSCS(PARAM,DEFLT,SCS,STATUS )}
-   {Get a complete SCS value (including equinox specifier) from the ADAM 
+   {Get a complete SCS value (including equinox specifier) from the ADAM
     environment.}
-\noteroutine{IRA\_ISCS(LIST,STATUS)} 
+\noteroutine{IRA\_ISCS(LIST,STATUS)}
    {Return a list containing the names of supported sky coordinate systems.}
 \noteroutine{IRA\_SCNAM(SCS,NC,DESCR,LD,ABBREV,LA,STATUS)}
    {Return the name and abbreviation for an axis of a sky coordinate system.}
-\noteroutine{IRA\_SCSEP(IDA,SCS,EPOCH,STATUS)} 
-   {Return the sky coordinate system and epoch associated with an IRA 
+\noteroutine{IRA\_SCSEP(IDA,SCS,EPOCH,STATUS)}
+   {Return the sky coordinate system and epoch associated with an IRA
     identifier.}
 \noteroutine{IRA\_SETEQ(EQU,BJ,SCS,STATUS)}
    {Set the epoch of the reference equinox in an SCS string.}
@@ -940,27 +940,27 @@ coordinates}
 \noteroutine{IRA\_DIST(A0,B0,A1,B1,DIST,STATUS)}
    {Find the arc distance between two sky positions.}
 \noteroutine{IRA\_DIST2(A0,B0,ANGLE,A1,B1,PARDST,PRPDST,STATUS)}
-   {Resolve the displacement between two sky positions into distances parallel 
+   {Resolve the displacement between two sky positions into distances parallel
     and perpendicular to a given position angle.}
-\noteroutine{IRA\_NORM(A,B,STATUS)} 
-   {Shift a pair of sky coordinate values into the ``first order ranges'' (e.g. 
-   longitude between zero and $2.\pi$ and latitude between $+\pi/2$ and 
+\noteroutine{IRA\_NORM(A,B,STATUS)}
+   {Shift a pair of sky coordinate values into the ``first order ranges'' (e.g.
+   longitude between zero and $2.\pi$ and latitude between $+\pi/2$ and
    $-\pi/2$ ).}
 \noteroutine{IRA\_OFFST(A0,B0,A1,B1,DIST,A2,B2,STATUS)}
    {Find a sky position which is offset from a given position by a given
    amount in the direction of another given position.}
-\noteroutine{IRA\_SHIFT(A0,B0,ANGLE,DIST,A1,B1,ENDANG,STATUS)} 
+\noteroutine{IRA\_SHIFT(A0,B0,ANGLE,DIST,A1,B1,ENDANG,STATUS)}
    {Find a sky position which is offset from a given position by a given
    amount along a given  bearing.}
 
 \subsection {Transformation Between Image and Sky Coordinates}
-\noteroutine{IRA\_TRANS(NVAL,IN1,IN2,FORWRD,SCS,IDA,OUT1,OUT2,STATUS)} 
-   {Transform coordinate data.} 
+\noteroutine{IRA\_TRANS(NVAL,IN1,IN2,FORWRD,SCS,IDA,OUT1,OUT2,STATUS)}
+   {Transform coordinate data.}
 \noteroutine{IRA\_VALID(NVAL,FORWRD,SCS,IDA,IN1,IN2,OK,STATUS)}
    {Deterime if a given sky or image position corresponds to a valid position
     in the other system.}
 \noteroutine{IRA\_XYLIM(IDA,ACEN,BCEN,XSIZE,YSIZE,LBND,UBND,STATUS)}
-   {Determine the pixel bounds required for an image to cover a given area of 
+   {Determine the pixel bounds required for an image to cover a given area of
     sky.}
 
 \section {Full Routine Specifications}
@@ -1029,7 +1029,7 @@ coordinates}
    \newline
    \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
    \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstbannerlength}{0.5em}
    \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
    \addtolength{\sstcaptionlength}{-4.45pt}
    \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
@@ -4232,17 +4232,17 @@ The STARLSE package (see SUN/105) provides facilities for initialising the VAX
 Language Sensitive Editor (LSE) to simplify the generation of Fortran
 code conforming to the Starlink programming standard (see SGP/16). One of the
 facilities provided by LSE is the automatic production of argument lists for
-subroutine calls. Templates for all the subroutines in the IRA package can be 
+subroutine calls. Templates for all the subroutines in the IRA package can be
 made available within LSE by performing the following steps (within LSE):
 \begin{enumerate}
 \item Issue the LSE command GOTO FILE/READ IRA\_DIR:IRA.LSE
 \item Issue the LSE command DO
 \item Issue the LSE command DELETE BUFFER
 \item Move to a buffer holding a .FOR of a .GEN file in the usual way.
-\item IRA subroutine templates are then available by typing in the name of an 
+\item IRA subroutine templates are then available by typing in the name of an
 IRA subroutine (or an abbreviation) and expanding it (CTRL-E).
 \item Help on the subroutine and its arguments can be obtained by placing the
-cursor at a point in the buffer at which the subroutine name has been entered 
+cursor at a point in the buffer at which the subroutine name has been entered
 and pressing GOLD-PF2.
 \end{enumerate}
 
@@ -4250,55 +4250,55 @@ and pressing GOLD-PF2.
 The interim implementation of IRA reads and writes externally held astrometry
 information to and from HDS objects of type IRAS\_ASTROMETRY. This will be
 replaced by a Starlink structure when such a structure is defined. The interim
-structure contains the following components: 
+structure contains the following components:
 \begin {description}
 
 \item [SCS] - A primitive value of type \_CHAR$*$(IRA\_\_SZSCS). This component
-is mandatory and must contain the name of the sky coordinate system (including 
-equinox specifier) created by the forward mapping of the projection. 
+is mandatory and must contain the name of the sky coordinate system (including
+equinox specifier) created by the forward mapping of the projection.
 
 \item [EPOCH] - A primitive value of type \_DOUBLE. This component
-is mandatory and must contain the Julian epoch of the observations described by 
+is mandatory and must contain the Julian epoch of the observations described by
 the astrometry structure.
 
 \item [STATE] - A primitive value of type \_CHAR$*$(IRA\_\_SZSTA). This
 component is mandatory and is used to confirm that the astrometry structure is
-valid. If this component has any value other than ``DEFINED'' the astrometry 
+valid. If this component has any value other than ``DEFINED'' the astrometry
 structure is considered to be invalid.
 
 \item [PROJ\_NAME] - A primitive value of type \_CHAR$*$(IRA\_\_SZPRJ). This
 component contains the name of the projection to be used when transforming
-coordinate data. 
+coordinate data.
 
 \item [PROJ\_PARS] - An array of primitive values of type \_DOUBLE. The array
 has a single dimension with size given by IRA\_\_MAXP, and contains values to
 use for the parameters needed to defined the projection given by component
-PROJ\_NAME. 
+PROJ\_NAME.
 
 \end {description}
 
 \section {Adding New Sky Coordinate Systems and Projections}
 To add new sky coordinate systems or projections to the interim implementation
-of IRA, the following procedures should be followed: 
+of IRA, the following procedures should be followed:
 
 \subsection {Sky Coordinate Systems}
 \begin {enumerate}
 
-\item Edit file IRA\_PAR.FOR to increase the value of IRA\_\_SZCLS by the 
+\item Edit file IRA\_PAR.FOR to increase the value of IRA\_\_SZCLS by the
 length of the new SCS name plus one. If necessary, also change the values of
 IRA\_\_SZSCS, IRA\_\_SZFSC, IRA\_\_SZSCA, IRA\_\_SZSCD to allow for the new
-name. 
+name.
 
 \item Explicit reference to the new SCS name should then be included in the
-following routines; IRA1\_CHSCS, IRA1\_ICONV, IRA1\_IDTC1, IRA1\_IPACO, 
+following routines; IRA1\_CHSCS, IRA1\_ICONV, IRA1\_IDTC1, IRA1\_IPACO,
 IRA1\_ISCNM, IRA\_DTOC, IRA\_ISCS, IRA\_SCNAM.
 
-\item New routines should be written to convert coordinates from each of the 
+\item New routines should be written to convert coordinates from each of the
 supported sky coordinates systems, to the new system, and vice-versa. Calls
 to these routines should be included in routines IRA1\_ICONV and IRA1\_IPACO.
 
 \item Every routine in IRA should then be recompiled, and stored in a new object
-library to replace the old object library. 
+library to replace the old object library.
 
 \item This document (ID2) should be edited to include the new SCS name. The
 SST command PROLAT should be used to regenerate the full routine specifications.
@@ -4308,39 +4308,39 @@ SST command PROLAT should be used to regenerate the full routine specifications.
 \subsection {Projections}
 \begin {enumerate}
 
-\item Edit file IRA\_PAR.FOR to increase the value of IRA\_\_SZPLS by the 
+\item Edit file IRA\_PAR.FOR to increase the value of IRA\_\_SZPLS by the
 length of the new projection name plus one. If necessary, also change the values
-of IRA\_\_SZPRJ and IRA\_\_MAXP to allow for the new projection. 
+of IRA\_\_SZPRJ and IRA\_\_MAXP to allow for the new projection.
 
 \item A subroutine should be written to perform the forward and inverse mappings
 on arrays of input coordinate data. The argument list for this routine should
 match that of IRA1\_GNOM, which should be studied as an example of how such
 routines should behave. It is important to make this routine as efficient as
-possible, and have an accuracy of a fraction of an arc-second. 
+possible, and have an accuracy of a fraction of an arc-second.
 
 \item Subroutine IRA1\_IPRJ should then be modified to include a
-call to the new subroutine. 
+call to the new subroutine.
 
-\item A subroutine should be written to which checks if the forward and inverse 
-mappings would produce valid results given some input positions. This is 
-different to the previous subroutine in that it doesn't actually evaluate the 
+\item A subroutine should be written to which checks if the forward and inverse
+mappings would produce valid results given some input positions. This is
+different to the previous subroutine in that it doesn't actually evaluate the
 results of the transformation. The argument list for this routine should
 match that of IRA1\_VGNOM, which should be studied as an example of how such
 routines should behave. It is important to make this routine as efficient as
 possible.
 
 \item Subroutine IRA\_VALID should then be modified to include a
-call to the new subroutine. 
+call to the new subroutine.
 
 \item Explicit reference to the new projection name should then be included in
 the routine IRA\_IPROJ.
 
 \item Every routine in IRA should then be recompiled, and stored in a new object
-library to replace the old object library. 
+library to replace the old object library.
 
 \item This document (ID2) should be edited to include the new projection name.
 The SST command PROLAT should be used to regenerate the full routine
-specifications. 
+specifications.
 
 \end {enumerate}
 
@@ -4353,57 +4353,57 @@ projections. The equations for the first three are derived from those contained
 in the IRAS Catalogs and Atlases Explanatory Supplement (Exp. Supp.), pages X-30
 to X-32, while the Orthographic projection is derived from those described in
 the IPAC Report ``A User's Guide to IRAS Pointed Observation Products'',
-Appendix B. 
+Appendix B.
 
 Throughout this appendix the following symbolic values will be used:
 
 \begin{description}
 
-\item [$(A,B)$] - the sky coordinates (longitude and latitude) of a general 
+\item [$(A,B)$] - the sky coordinates (longitude and latitude) of a general
 point on the celestial sphere, in radians.
 
-\item [$(X,Y)$] - the image coordinates corresponding to sky coordinates 
+\item [$(X,Y)$] - the image coordinates corresponding to sky coordinates
 $(A,B)$, in units of pixels.
 
 \item [$(A_{l},B_{l})$] - the local coordinates (longitude and latitude, see
-below) corresponding to sky coordinates $(A,B)$, in units of radians. 
+below) corresponding to sky coordinates $(A,B)$, in units of radians.
 
-\item [$(U,V)$] - the ``$(U,V)$'' coordinates (see below) corresponding to sky 
+\item [$(U,V)$] - the ``$(U,V)$'' coordinates (see below) corresponding to sky
 coordinates $(A,B)$, in units of radians.
 
-\item [$(A_{0},B_{0})$] - the sky coordinate of the reference point. 
-These are the same as projection parameters P(1) and P(2) (see section \ref 
+\item [$(A_{0},B_{0})$] - the sky coordinate of the reference point.
+These are the same as projection parameters P(1) and P(2) (see section \ref
 {SEC:PARS}).
 
-\item [$(X_{0},Y_{0})$] - the image coordinate of the reference point. 
-These are the same as projection parameters P(3) and P(4) (see section \ref 
+\item [$(X_{0},Y_{0})$] - the image coordinate of the reference point.
+These are the same as projection parameters P(3) and P(4) (see section \ref
 {SEC:PARS}).
 
 \item [$(\Delta_{x},\Delta_{y})$] - the nominal dimensions of an image pixel
 in the $X$ and $Y$ directions, as measured on the celestial sphere,in radians.
 In fact, due to the distorting effect of the projection, only pixels close to
 the reference point will actually have these dimensions. These are the same as
-the absolute values of projection parameters P(5) and P(6). 
+the absolute values of projection parameters P(5) and P(6).
 
 \item [$\theta$] - The position angle of the image $Y$ axis on the celestial
 sphere, measured in radians, from north through east. North is the direction of
 increasing sky latitude and east is the direction of increasing sky longitude,
 in the current sky coordinate system. This is the same as projection parameter
-P(7). The image $X$ axis is $\pi/2$ radians to the west of the $Y$ axis. 
+P(7). The image $X$ axis is $\pi/2$ radians to the west of the $Y$ axis.
 
-\item [$\phi$] - The tilt of the celestial sphere prior to projection, given by 
+\item [$\phi$] - The tilt of the celestial sphere prior to projection, given by
 projection parameter P(8), in radians. This is positive in an anti-clockwise
-direction when looking along the radius vector of the celestial sphere from the 
+direction when looking along the radius vector of the celestial sphere from the
 reference point to ther centre.
 
 \end{description}
 
-In addition to image and sky coordinates, the IRA projection routines use two 
-extra coordinate systems, called the ``$(U,V)$'' coordinate system and the 
-``local'' coordinate system. These systems are only used internally within 
-IRA. Non of the user-callable routines make any reference to them. All the 
-projection transformations described below transform between $(U,V)$ and local 
-coordinates, not directly between image and sky coordinates. Conversion to and 
+In addition to image and sky coordinates, the IRA projection routines use two
+extra coordinate systems, called the ``$(U,V)$'' coordinate system and the
+``local'' coordinate system. These systems are only used internally within
+IRA. Non of the user-callable routines make any reference to them. All the
+projection transformations described below transform between $(U,V)$ and local
+coordinates, not directly between image and sky coordinates. Conversion to and
 from the various coordinate systems is performed as follows:
 
 \begin{itemize}
@@ -4413,13 +4413,13 @@ coordinates $(A,B)$, the input image coordinates are first transformed into the
 corresponding $(U,V)$ values. The forward mapping for the required projection is
 then applied to these $(U,V)$ values to get the corresponding local coordinates.
 Finally, these local coordinates are transformed into the corresponding sky
-coordinates. 
+coordinates.
 
-\item When performing an inverse mapping from sky coordinates $(A,B)$ to image 
-coordinates $(X,Y)$, the input sky coordinates are first transformed into 
-the corresponding local coordinate values. The inverse mapping for the required 
-projection is then applied to these local coordinates to get the corresponding 
-$(U,V)$ values. Finally, these $(U,V)$ values are transformed into the 
+\item When performing an inverse mapping from sky coordinates $(A,B)$ to image
+coordinates $(X,Y)$, the input sky coordinates are first transformed into
+the corresponding local coordinate values. The inverse mapping for the required
+projection is then applied to these local coordinates to get the corresponding
+$(U,V)$ values. Finally, these $(U,V)$ values are transformed into the
 corresponding image coordinates $(X,Y)$.
 
 This use of local coordinates ensures that the properties of the projections are
@@ -4431,11 +4431,11 @@ if $\phi=0$) and if the reference point is on the equator (i.e. only if
 $B_{0}=0$). In order for such projections to be used for other values of $\phi$
 or $B_{0}$, the sky coordinates must be transformed to a system in which the
 equivalents of $\phi$ and $B_{0}$ {\em are} zero. Using the local coordinates
-described above achieves this. 
+described above achieves this.
 
 \end{itemize}
 
-\subsection {The $(U,V)$ Coordinate System} 
+\subsection {The $(U,V)$ Coordinate System}
 The $(U,V)$ system is a Cartesian coordinate system on the projection surface.
 The origin is located at the reference point. The $V$ axis is tangential (at the
 $(U,V)$ origin) to north in the local coordinate system, and the $U$ axis is
@@ -4446,12 +4446,12 @@ to put the reference point at the requested image coordinates, and a scaling to
 give pixels the correct dimensions. The transformation equations are:
 
 \begin{eqnarray*}
-U & = & cos( \theta - \phi )*(X - X_{0})*\Delta_{x} + 
+U & = & cos( \theta - \phi )*(X - X_{0})*\Delta_{x} +
         sin( \theta - \phi )*(Y - Y_{0})*\Delta_{y}\\
 V & = & cos( \theta - \phi )*(Y - Y_{0})*\Delta_{y} -
         sin( \theta - \phi )*(X - X_{0})*\Delta_{x}
 \end{eqnarray*}
-and 
+and
 \begin{eqnarray*}
 X & = & cos( \theta - \phi )*(U/\Delta_{x}) + X_{0} -
         sin( \theta - \phi )*(V/\Delta_{y}) + Y_{0}\\
@@ -4461,9 +4461,9 @@ Y & = & cos( \theta - \phi )*(V/\Delta_{y}) + Y_{0} +
 
 Note, the variables $SAMPLE$ and $LINE$ referred to in the Exp. Supp.
 are replaced in this appendix by $(U.scale.180/\pi)$ and $(-V.scale.180/\pi)$
-where $scale$ is defined in the Exp. Supp. 
+where $scale$ is defined in the Exp. Supp.
 
-\subsection {The ``Local'' Coordinate System} 
+\subsection {The ``Local'' Coordinate System}
 The ``local'' coordinate system is a spherical coordinate system on the
 celestial sphere. The local longitude is designated $A_{l}$ and the local
 latitude is designated $B_{l}$. A position on the celestial sphere can be
@@ -4473,7 +4473,7 @@ local longitude and latitude values of zero, and so that north (in the local
 system) at the reference point is at position angle $\psi$ in the sky coordinate
 system. Thus the $U$ axis is always at position angle $-\pi/2$ in local
 coordinates, and the $V$ axis is always at position angle zero. Also, the
-reference point ( $(U,V)=(0,0)$  ) is always at $(A_{l},B_{l})=(0,0)$. 
+reference point ( $(U,V)=(0,0)$  ) is always at $(A_{l},B_{l})=(0,0)$.
 
 It is useful to introduce a 3-D Cartesian coordinate system $(x,y,z)$ (see
 figure \ref {FIG:A}) to describe the mapping from sky coordinates to local
@@ -4483,26 +4483,26 @@ of the celestial sphere, the $x$ axis is towards the point on the celestial
 sphere with zero longitude and zero latitude, the $y$ axis is towards the point
 with longitude $+\pi/2$ and latitude zero, and the $z$ axis is the polar axis
 towards latitude $+\pi/2$. The mapping from sky coordinates to local coordinates
-is constructed as follows: 
+is constructed as follows:
 \begin{enumerate}
 
-\item Initially the sky $(x,y,z)$ axes coincides with the local $(x,y,z)$ 
+\item Initially the sky $(x,y,z)$ axes coincides with the local $(x,y,z)$
 axes.
 
 \item Rotate the local $(x,y,z)$ system about the local $z$ axis by an angle
 $A_{0}$ (see figure \ref {FIG:B}). This results in the $x$ and $y$ axes no
 longer being coincident for sky and local coordinates. The reference point then
 has zero longitude in the local system. Positive rotation is anti-clockwise when
-viewed from the positive end of the rotation axis. 
+viewed from the positive end of the rotation axis.
 
 \item Rotate the new local $(x,y,z)$ system about the local $y$ axis by an angle
 $-B_{0}$ (see figure \ref {FIG:C}). This results in the $z$ axis no longer being
 coincident for sky and local coordinates. The reference point now has zero
-longitude and latitude in the local system. 
+longitude and latitude in the local system.
 
 \item Rotate the new local $(x,y,z)$ system about the local $x$ axis by an angle
 $-\phi$ (see figure \ref {FIG:D}). Local north is then at a position angle
-$\phi$ in the original sky coordinate system. 
+$\phi$ in the original sky coordinate system.
 
 \end{enumerate}
 
@@ -4514,14 +4514,14 @@ $\phi$ in the original sky coordinate system.
 \end{picture}
 \caption[.]{
 {\small
-The $(x,y,z)$ coordinate system. The $x$ axis points towards zero longitude and 
-latitude, the $y$ axis towards longitude $\pi/2$ and latitude zero, and the $z$ 
-axis towards the north pole (latitude $\pi/2$). In this figure, longitude 
-and latitude are measured in the current sky coordinate system. The radial 
-vector shows the direction of the reference point, which is defined by the sky 
-longitude and latitude values $A_{0}$ and $B_{0}$. When transforming from sky 
+The $(x,y,z)$ coordinate system. The $x$ axis points towards zero longitude and
+latitude, the $y$ axis towards longitude $\pi/2$ and latitude zero, and the $z$
+axis towards the north pole (latitude $\pi/2$). In this figure, longitude
+and latitude are measured in the current sky coordinate system. The radial
+vector shows the direction of the reference point, which is defined by the sky
+longitude and latitude values $A_{0}$ and $B_{0}$. When transforming from sky
 coordinates to ``local'' coordinates, the $(x,y,z)$ axes defined in the two
-systems are initially considered to be coincident. This is indicated here by 
+systems are initially considered to be coincident. This is indicated here by
 the absence of the ``Sky'' or ``Local'' axis prefixes used in later figures.
 }}
 \label {FIG:A}
@@ -4538,7 +4538,7 @@ the absence of the ``Sky'' or ``Local'' axis prefixes used in later figures.
 The first step in transforming from sky to local coordinates is to rotate the
 local $(x,y,z)$ system (initially coincident with the sky $(x,y,z)$ system) about
 the local $z$ axis by an angle equal to the longitude, $A_{0}$, of the reference
-point in the sky coordinate system. This causes the ``Sky $x$'' and ``Local 
+point in the sky coordinate system. This causes the ``Sky $x$'' and ``Local
 $x$'' axes to separate, as do the ``Sky $y$'' and ``Local $y$'' axes.
 }}
 \label {FIG:B}
@@ -4557,7 +4557,7 @@ local $(x,y,z)$ system about the local $y$ axis by an angle equal to the
 latitude, $B_{0}$, of the reference point in the sky coordinate system. This
 causes the ``Sky $z$'' and ``Local $z$'' axes to separate. The local $x$ axis is
 now coincident with the reference point. Thus, the reference point has zero
-longitude and latitude in the local coordinate system. 
+longitude and latitude in the local coordinate system.
 }}
 \label {FIG:C}
 \end{figure}
@@ -4572,10 +4572,10 @@ longitude and latitude in the local coordinate system.
 {\small
 The final step in transforming from sky to local coordinates is to rotate the
 local $(x,y,z)$ system about the local $x$ axis by the angle $\psi$
-(supplied by the calling routine as projection parameter $P(8)$). This does not 
-effect the position of the reference point which still has longitude and 
-latitude of zero in the local system. However, local north at the reference 
-point (i.e. the direction of increasing local latitude, or of the great circle 
+(supplied by the calling routine as projection parameter $P(8)$). This does not
+effect the position of the reference point which still has longitude and
+latitude of zero in the local system. However, local north at the reference
+point (i.e. the direction of increasing local latitude, or of the great circle
 joining the reference point to the local $z$ axis) is now at position angle
 $\psi$ in the original sky coordinate system.
 }}
@@ -4585,20 +4585,20 @@ $\psi$ in the original sky coordinate system.
 \subsection {The Gnomonic Projection}
 The Gnomonic (or tangent plane) projection is a geometric projection from the
 centre of the celestial sphere onto a plane which is tangent to the celestial
-sphere at the reference point. The Gnomonic projection is used (for example) 
+sphere at the reference point. The Gnomonic projection is used (for example)
 for the IRAS 16.5 degree extended emission SKYPLATE images. Varying projection
-parameter P(8) has no effect on the projection because the projection surface 
+parameter P(8) has no effect on the projection because the projection surface
 is symetric about the radius vector of the celestial sphere passing through the
 reference point.
 
 Using local coordinates rather than sky coordinates means that the reference
 point has both longitude and latitude equal to zero. The equation in the Exp.
-Supp. are thus significantly simplified. 
+Supp. are thus significantly simplified.
 
 \subsubsection {The Inverse Mapping}
 The inverse mapping from local coordinates $(A_{l},B_{l})$ to $(U,V)$
 coordinates (called the {\em forward} transformation in the Exp. Supp.) is
-defined by the following equations: 
+defined by the following equations:
 
 \begin{eqnarray*}
 U & = & -\tan A_{l}\\
@@ -4608,11 +4608,11 @@ V & = & \frac{\tan B_{l}}{\cos A_{l}}
 \subsubsection {The Forward Mapping}
 The forward mapping from $(U,V)$ coordinates to local coordinates
 $(A_{l},B_{l})$ (called the {\em reverse} transformation in the Exp. Supp.) is
-defined by the following equations: 
+defined by the following equations:
 
 \begin{eqnarray*}
 A_{l} & = & \arctan \left( \frac{-U}{-V} \right)\\
-B_{l} & = & \arcsin \left(\frac{V}{\sqrt{U^{2}+V^{2}+1}} \right) 
+B_{l} & = & \arcsin \left(\frac{V}{\sqrt{U^{2}+V^{2}+1}} \right)
 \end{eqnarray*}
 
 \subsection {The Orthographic Projection}
@@ -4623,12 +4623,12 @@ from which the projection proceeds. The Gnomonic projection proceeds from the
 centre of the celestial sphere, whereas the Orthographic projection proceeds
 from a point at infinity, diametrically opposite the reference point (i.e. the
 projection lines are all normal to the tangent plane). The Orthographic
-projection is used (for example) for the IRAS Pointed Observation images. 
+projection is used (for example) for the IRAS Pointed Observation images.
 Varying projection parameter P(8) has no effect on the projection because the
 projection surface is symetric about the radius vector of the celestial sphere
-passing through the reference point. 
+passing through the reference point.
 
-Again, working in local coordinates means that the reference point is always at 
+Again, working in local coordinates means that the reference point is always at
 $(A_{l},B_{l})=(0,0)$ which results in great simplification of the equations.
 
 \subsubsection {The Inverse Mapping}
@@ -4641,7 +4641,7 @@ V & = & \sin B_{l}
 \end{eqnarray*}
 
 \subsubsection {The Forward Mapping}
-The forward mapping from $(U,V)$ coordinates to local coordinates 
+The forward mapping from $(U,V)$ coordinates to local coordinates
 $(A_{l},B_{l})$ is defined by the following equations:
 
 \begin{eqnarray*}
@@ -4658,16 +4658,16 @@ area projection (i.e. all image pixels are the same size on the sky, but have
 varying ``aspect ratio''). Varying projection parameter P(8) changes the nature
 of the projection because the cylindrical projection surface is not symetric
 about the radius vector of the celestial sphere passing through the reference
-point. 
+point.
 
-The cylinder is tangent at the equator of the local coordinate system. In sky 
-coordinates the cylinder is tangent at a great circle passing through the 
+The cylinder is tangent at the equator of the local coordinate system. In sky
+coordinates the cylinder is tangent at a great circle passing through the
 reference point at a position angle of $\theta+\pi/2$.
 
 \subsubsection {The Inverse Mapping}
 The inverse mapping from local coordinates $(A_{l},B_{l})$ to $(U,V)$
 coordinates (called the {\em forward} transformation in the Exp. Supp.) is
-defined by the following equations: 
+defined by the following equations:
 \begin{eqnarray*}
 U & = & -A_{l}\\
 V & = & \sin B_{l}
@@ -4676,14 +4676,14 @@ V & = & \sin B_{l}
 \subsubsection {The Forward Mapping}
 The forward mapping from $(U,V)$ coordinates to local coordinates
 $(A_{l},B_{l})$ (called the {\em reverse} transformation in the Exp. Supp.) is
-defined by the following equations: 
+defined by the following equations:
 
 \begin{eqnarray*}
 A_{l} & = & -U\\
 B_{l} & = & \arcsin V
 \end{eqnarray*}
 
-Note, if the absolute value of $U$ is greater than $\pi$ then A and B are 
+Note, if the absolute value of $U$ is greater than $\pi$ then A and B are
 returned bad (i.e. equal to the value VAL\_\_BADD).
 
 \subsection {The Aitoff Projection}
@@ -4693,14 +4693,14 @@ parameter P(8) changes the nature of the projection because the projection
 surface is not symetric about the radius vector of the celestial sphere passing
 through the reference point. Again, the use of local coordinates mean that
 Aitoff projections can be performed about any reference position and inclined at
-any angle on the sky. 
+any angle on the sky.
 
 \subsubsection {The Inverse Mapping}
-The inverse mapping from local coordinates $(A_{l},B_{l})$ to $(U,V)$ 
-coordinates 
+The inverse mapping from local coordinates $(A_{l},B_{l})$ to $(U,V)$
+coordinates
 (called the {\em forward} transformation in the Exp. Supp.) is defined by the
 following equations, in which $r$ and $h$ are intermediate quantities equivalent
-to the values labeled ``$\rho$'' and ``$\theta$'' in the Exp. Supp.: 
+to the values labeled ``$\rho$'' and ``$\theta$'' in the Exp. Supp.:
 \begin{eqnarray*}
 r & = & \arccos (\cos B_{l}.\cos (A_{l}/2) )\\
 h & = & \arcsin \left(\frac {\cos B_{l}.\sin(A_{l}/2)}{\sin r}\right)\\
@@ -4713,11 +4713,11 @@ V & = & \left\{ \begin{array}{ll}
 \end{eqnarray*}
 
 \subsubsection {The Forward Mapping}
-The forward mapping from $(U,V)$ coordinates to local coordinates 
+The forward mapping from $(U,V)$ coordinates to local coordinates
 $(A_{l},B_{l})$
 ( called the {\em reverse} transformation in the Exp. Supp.) is defined by
 the following equations in which $\alpha$ is an intermediate quantity equivalent
-to the value labeled ``$A$'' in the Exp. Supp.: 
+to the value labeled ``$A$'' in the Exp. Supp.:
 
 \begin{eqnarray*}
 \alpha & = & \sqrt{4-(U^{2}/4)-V^{2} }\\
@@ -4731,7 +4731,7 @@ It can be shown that the sky positions corresponding to such pixels are also
 mapped by other pixels closer to the reference point (for which
 $\alpha\geq\sqrt{2}$). To avoid the same part of the sky appearing twice on the
 same image, the local coordinates $A_{l}$ and $B_{l}$ are both returned with the
-Starlink ``BAD'' value (VAL\_\_BADD) in such cases. 
+Starlink ``BAD'' value (VAL\_\_BADD) in such cases.
 
 \section {Packages Called by IRA}
 IRA\_ makes calls to the following packages:
@@ -4748,12 +4748,12 @@ IRA\_ makes calls to the following packages:
 \item [SLA\_] - The SLA package; see SUN/67.
 \end{description}
 
-Access to these packages, together with packages called from within these 
-packages, is necessary to use IRA. 
+Access to these packages, together with packages called from within these
+packages, is necessary to use IRA.
 
 \section {IRA Error Codes}
 \label {APP:ERRORS}
-IRA routines can return any $STATUS$ value generated by the subroutine packages 
+IRA routines can return any $STATUS$ value generated by the subroutine packages
 which it calls. In addition it can return the following IRA-specific values:
 
 \begin{description}
@@ -4761,91 +4761,91 @@ which it calls. In addition it can return the following IRA-specific values:
 \item {\bf IRA\_\_AMBPR   }\\
 Ambiguous projection specified.
 
-\item {\bf IRA\_\_AMBSC   }\\  
+\item {\bf IRA\_\_AMBSC   }\\
 Ambiguous sky coordinate system specified.
 
-\item {\bf IRA\_\_BAD2V   }\\  
+\item {\bf IRA\_\_BAD2V   }\\
 Sky latitude value is outside the range $+\pi/2$ to $\pi/2$.
 
-\item {\bf IRA\_\_BADAS   }\\  
+\item {\bf IRA\_\_BADAS   }\\
 The astrometry structure does not have an HDS type of IRAS\_ASTROMETRY.
 
-\item {\bf IRA\_\_BADBJ   }\\  
+\item {\bf IRA\_\_BADBJ   }\\
 A character specifying a Besselian or Julian epoch had a value other than B or J.
 
-\item {\bf IRA\_\_BADEQ   }\\  
+\item {\bf IRA\_\_BADEQ   }\\
 An SCS string contained an illegal equinox specifier.
 
-\item {\bf IRA\_\_BADPA   }\\  
-At least one of the parameter values specified for a projection had the 
+\item {\bf IRA\_\_BADPA   }\\
+At least one of the parameter values specified for a projection had the
 Starlink ``BAD'' value.
 
-\item {\bf IRA\_\_BADNC   }\\  
+\item {\bf IRA\_\_BADNC   }\\
 A value other than 1 or 2 was given for a coordinate index.
 
-\item {\bf IRA\_\_BADPR   }\\  
+\item {\bf IRA\_\_BADPR   }\\
 Unsupported projection specified.
 
-\item {\bf IRA\_\_BADSC   }\\  
+\item {\bf IRA\_\_BADSC   }\\
 Unsupported sky coordinate system specified.
 
-\item {\bf IRA\_\_BADST   }\\  
+\item {\bf IRA\_\_BADST   }\\
 An illegal style value was specified for a formatted sky coordinate value.
 
-\item {\bf IRA\_\_EXFLD   }\\  
+\item {\bf IRA\_\_EXFLD   }\\
 Too many fields in a string holding a formatted sky coordinate value.
 
-\item {\bf IRA\_\_INVID   }\\  
+\item {\bf IRA\_\_INVID   }\\
 An invalid IRA identifier was specified.
 
-\item {\bf IRA\_\_MIXFL   }\\  
-The fields in a string holding a formatted sky coordinate were in the wrong 
+\item {\bf IRA\_\_MIXFL   }\\
+The fields in a string holding a formatted sky coordinate were in the wrong
 order.
 
-\item {\bf IRA\_\_NOAS    }\\  
+\item {\bf IRA\_\_NOAS    }\\
 No astrometry structure was found.
 
-\item {\bf IRA\_\_NOCNV   }\\  
+\item {\bf IRA\_\_NOCNV   }\\
 Image pixels are becoming very small, resulting in extremely large image dimensions.
 
-\item {\bf IRA\_\_NOEXT   }\\  
-The NDF extension in which IRA expects to find the astrometry structure does 
+\item {\bf IRA\_\_NOEXT   }\\
+The NDF extension in which IRA expects to find the astrometry structure does
 not exist.
 
-\item {\bf IRA\_\_NOMOR   }\\  
+\item {\bf IRA\_\_NOMOR   }\\
 No more free IRA identifiers are available.
 
-\item {\bf IRA\_\_NOPRO   }\\  
+\item {\bf IRA\_\_NOPRO   }\\
 No information was found in an astrometry structure describing the projection.
 
-\item {\bf IRA\_\_ORDER   }\\  
+\item {\bf IRA\_\_ORDER   }\\
 Supplied limits are in the wrong order (i.e. the upper limit is less than the
-lower limit). 
+lower limit).
 
-\item {\bf IRA\_\_RANGE   }\\  
+\item {\bf IRA\_\_RANGE   }\\
 One of the fields in a formatted sky coordinate string was outside the allowed
 limits for that field.
 
-\item {\bf IRA\_\_REDFL   }\\  
+\item {\bf IRA\_\_REDFL   }\\
 A redundant field was found in a string holding a formatted sky coordinate value.
 
-\item {\bf IRA\_\_SCTER   }\\  
-A field with an illegal terminator character was found in a string holding a 
+\item {\bf IRA\_\_SCTER   }\\
+A field with an illegal terminator character was found in a string holding a
 formatted sky coordinate value.
 
-\item {\bf IRA\_\_SING    }\\  
+\item {\bf IRA\_\_SING    }\\
 The projection is singular.
 
-\item {\bf IRA\_\_SMALL   }\\  
+\item {\bf IRA\_\_SMALL   }\\
 The specified area of image coordinates is too small.
 
-\item {\bf IRA\_\_TFEWP   }\\  
+\item {\bf IRA\_\_TFEWP   }\\
 An incorrect number of projection parameters was supplied.
 
-\item {\bf IRA\_\_TOOSH   }\\  
+\item {\bf IRA\_\_TOOSH   }\\
 A supplied character variable is too short.
 
-\item {\bf IRA\_\_UNDAS   }\\  
+\item {\bf IRA\_\_UNDAS   }\\
 The astrometry structure is in an undefined state.
 
 \end{description}
@@ -4863,8 +4863,8 @@ This section contains some example plots produced using the routine IRA\_DRGRD.
 \end{picture}
 \caption[.]{
 {\small
-An orthographic projection in equatorial (B1950) coordinates, centred on RA = 4 
-hours, DEC = +50 degrees, covering a complete hemisphere, at an inclination of 
+An orthographic projection in equatorial (B1950) coordinates, centred on RA = 4
+hours, DEC = +50 degrees, covering a complete hemisphere, at an inclination of
 30 degrees to vertical (P(8) is zero). Maximum accuracy (TOL=0) was used.
 }}
 \label {FIG:E}
@@ -4879,7 +4879,7 @@ hours, DEC = +50 degrees, covering a complete hemisphere, at an inclination of
 \caption[.]{
 {\small
 An all-sky Aitoff projection in galactic coordinates.
-Maximum accuracy (TOL=0) was used, and P(8) was zero. 
+Maximum accuracy (TOL=0) was used, and P(8) was zero.
 }}
 \label {FIG:F}
 \end{figure}
@@ -4929,7 +4929,7 @@ at DEC = +90 degrees, covering a 3 degree square region. Maximum accuracy
 complete lines. IRA\_DRGRD attempts to place longitude tick marks on the bottom
 edge and latitude tick marks on the left edge. If this is not possible then
 longitude or latitude labels and tick marks are placed along a central parallel
-or meridian. 
+or meridian.
 }}
 \label {FIG:I}
 \end{figure}
@@ -4949,12 +4949,12 @@ Significant changes have been made in order to remove connections between
 IRA identifiers and HDS. IRA identifiers now just refer to data stored
 internally within common blocks. No HDS locators are stored by IRA. Therefore,
 NDFs and HDS objects can be closed safely after the astrometry infromation has
-been imported without losing access to the astrometry information. These 
-changes have resulted in some routine being withdrawn, some new ones added, and 
-some old ones now have different argument lists. 
+been imported without losing access to the astrometry information. These
+changes have resulted in some routine being withdrawn, some new ones added, and
+some old ones now have different argument lists.
 
 Another significant change is that ``customised'' projections (previously
-created using IRA\_CRETR) are no longer supported. 
+created using IRA\_CRETR) are no longer supported.
 
 \begin{enumerate}
 \item New routines IRA\_EXPRT, IRA\_FIND, IRA\_PIXSZ and IRA\_DROPS, added.
@@ -4962,35 +4962,35 @@ created using IRA\_CRETR) are no longer supported.
 \item Argument lists have changed for IRA\_WRITE and IRA\_XYLIM.
 \item Routines IRA\_ROT, IRA\_MOVE and IRA\_MAG no longer have any effect on the
 NDF from which the astrometry information was read. A call to IRA\_EXPRT should
-be made in order to store the modified astrometry information back in the NDF. 
+be made in order to store the modified astrometry information back in the NDF.
 \item The package is no longer dependant on the TRANSFORM package.
 \end{enumerate}
 
 Changes introduced in version 9 of ID2:
 \begin {enumerate}
 \item An eigth projection parameter has been added.
-\item Routines IRA\_DROPT, IRA\_DRBRK, IRA\_DRVPO, IRA\_VALID, IRA\_MAG, 
+\item Routines IRA\_DROPT, IRA\_DRBRK, IRA\_DRVPO, IRA\_VALID, IRA\_MAG,
 IRA\_MOVE, IRA\_ROT, IRA\_READ and IRA\_WRITE added.
-\item Argument lists of all graphics routines changed (extra graphics options 
+\item Argument lists of all graphics routines changed (extra graphics options
 have been introduced through the new routine IRA\_DROPT).
 \item Abbreviations for GALACTIC and ECLIPTIC coordinate axes changed from
 ELONG, ELAT, GLONG and GLAT to Lambda, Beta, l and b.
 \item Description of the use of IRA on UNIX machines included.
 \item STARLSE templates and help available for IRA subroutines.
-\item The name IRA\_TRACE has been given to a new routine. There is no 
+\item The name IRA\_TRACE has been given to a new routine. There is no
 equivalent to the previous version of IRA\_TRACE.
 \item Routine IRA\_SKGRD has been removed.
 \item It is no longer necessary to include I90\_PAR before including
 IRA\_ERR.
-\item The names of symbolic constants (both errors and parameters) which previously 
+\item The names of symbolic constants (both errors and parameters) which previously
 were longer than five characters (excluding the IRA\_\_ prefix) have been
-truncated to five characters. The actual {\em values} associated with each name 
+truncated to five characters. The actual {\em values} associated with each name
 have not changed.
-\item The VMS version of IRA is now released in the form of a sharable image 
-rather than an object library. Applications linked with the sharable image have 
-the advantage that they will not need to be {\em re}-linked when IRA is upgraded 
+\item The VMS version of IRA is now released in the form of a sharable image
+rather than an object library. Applications linked with the sharable image have
+the advantage that they will not need to be {\em re}-linked when IRA is upgraded
 in future. Note, the object library has been removed from the IRA system.
-\item The linking and development procedures have been modified to bring them 
+\item The linking and development procedures have been modified to bring them
 into line with Starlink standards (see SSN/8).
 \item IRA is no longer directly dependant on the ARY\_ system (although it may
 still have {\em in}-direct dependencies on ARY\_, for example through the
@@ -5007,18 +5007,18 @@ Changes introduced in version 8 of ID2:
 
 Changes introduced in version 7 of ID2:
 \begin {enumerate}
-\item A description of useful constants has been included in section \ref 
+\item A description of useful constants has been included in section \ref
 {SEC:CON}.
 \item Sections \ref {SEC:DREX} and \ref {SEC:CHANGES} created.
-\item Dependency of the graphics routines on the AGI database has been removed, 
+\item Dependency of the graphics routines on the AGI database has been removed,
 by introducing the arguments LBND and UBND.
-\item The graphics routines now have a TOL argument which enables the 
-application to select the plotting accuracy (and consequently the plotting 
+\item The graphics routines now have a TOL argument which enables the
+application to select the plotting accuracy (and consequently the plotting
 speed).
 \item The forward mapping of the Lambert Equivalent Cylindrical projection has
 been modified to return bad sky coordinate values if the supplied image position
 is further than $\pi$ radians away from the reference point along the X axis
-(i.e. if local coordinate $U$ has an absolute value greater than $\pi$). 
+(i.e. if local coordinate $U$ has an absolute value greater than $\pi$).
 \end {enumerate}
 
 \end{document}

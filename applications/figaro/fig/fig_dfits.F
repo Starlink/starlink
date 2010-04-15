@@ -88,17 +88,17 @@ C
 C
 C     Global variables
 C
-      INTEGER   LU                   
-      INTEGER   RECNUM               
+      INTEGER   LU
+      INTEGER   RECNUM
       COMMON /FIG_DFITS/ LU,RECNUM
       SAVE /FIG_DFITS/
 C
 C     Local variables
 C
-      CHARACTER ERROR*64             
+      CHARACTER ERROR*64
       CHARACTER STRING*80
-      LOGICAL   EXIST                
-      CHARACTER FILE*132 
+      LOGICAL   EXIST
+      CHARACTER FILE*132
       INTEGER   IGNORE
       INTEGER   RECLEN
 
@@ -117,8 +117,8 @@ C   Calculate record length in local units, not enitrely sure about
 C   this. Have to check exactly what FC_RECL_UNIT returns on each OS,
 C   values should be as below;
 C
-C   ix86_linux =  2880    alpha_OSF1 = 720    sun4_Solaris = 2880       
-      RECLEN = 2880 / BYTEPRU           
+C   ix86_linux =  2880    alpha_OSF1 = 720    sun4_Solaris = 2880
+      RECLEN = 2880 / BYTEPRU
 
 C
 C     See if the file exists, either as specified or as a lower case
@@ -224,7 +224,7 @@ C
 C
 C     Local variables
 C
-      INTEGER I                      
+      INTEGER I
       INTEGER IGNORE
 C
 C     Check validity of buffer and check that file is open.
@@ -316,15 +316,15 @@ C
 C
 C     Global variables
 C
-      INTEGER   LU                   
-      INTEGER   RECNUM               
+      INTEGER   LU
+      INTEGER   RECNUM
       COMMON /FIG_DFITS/ LU,RECNUM
       SAVE /FIG_DFITS/
 C
 C     Local variables
 C
-      INTEGER   IGNORE               
-      CHARACTER ERROR*64             
+      INTEGER   IGNORE
+      CHARACTER ERROR*64
 C
 C     Check validity of buffer and check that file is open.
 C
@@ -342,7 +342,7 @@ C
             STATUS = 1
          END IF
          RECNUM = RECNUM + 1
-      END IF 
+      END IF
 C
 C     Log any error
 C
@@ -351,7 +351,7 @@ C
      :                                                          IGNORE)
          CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
       END IF
-C            
+C
       END
 C+
 C                      F I G _ D F I T S _ C L O S E
@@ -363,7 +363,7 @@ C  Function:
 C     Closes a disk FITS file opened by FIG_DFITS_OPEN.
 C
 C  Description:
-C     This routine closes any file opened by FIG_DFITS_OPEN. 
+C     This routine closes any file opened by FIG_DFITS_OPEN.
 C     If no file was open, this routine does nothing.
 C
 C  Language:
@@ -402,19 +402,19 @@ C
 C
 C     Global variables
 C
-      INTEGER   LU                   
-      INTEGER   RECNUM               
+      INTEGER   LU
+      INTEGER   RECNUM
       COMMON /FIG_DFITS/ LU,RECNUM
       SAVE /FIG_DFITS/
 C
 C     Local variables
 C
-      INTEGER   IGNORE               
+      INTEGER   IGNORE
 C
 C     If file is open, close it.  Always return good status.
 C
       IF (LU.NE.0) THEN
-         CLOSE (LU,IOSTAT=IGNORE) 
+         CLOSE (LU,IOSTAT=IGNORE)
          LU = 0
       END IF
       STATUS = 0

@@ -71,7 +71,7 @@
 /* disposition and access mode, and the reference count.		    */
             disp  = ( rec_ga_fcv[ slot ].dele ) ? "[D]" : "[K]";
             mode  = ( rec_ga_fcv[ slot ].write) ? "[U]" : "[R]";
-            bit64 = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 ) ? 
+            bit64 = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 ) ?
                     "[Y]" : "[N]";
             printf( "%s, disp=%s, mode=%s, refcnt=%-d, 64-bit=%s\n",
                     rec_ga_fcv[ slot ].name, disp, mode,

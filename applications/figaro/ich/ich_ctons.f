@@ -4,7 +4,7 @@ C
 C     I C H _ C T O N S
 C
 C     Character TO Numeric String.
-C    
+C
 C     Converts a character string into a numeric 'character string'
 C     at one byte per character.
 C
@@ -25,7 +25,7 @@ C                   the string.)
 C
 C     Note -
 C
-C     If the character string is longer than NBYTES it is 
+C     If the character string is longer than NBYTES it is
 C     truncated.  If shorter, ARRAY is blank filled on the
 C     right.
 C

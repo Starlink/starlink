@@ -27,7 +27,7 @@ void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 *        HDS locator for the structure to be copied. An error is reported
 *        if this is a primitive.
 *     loc2
-*        HDS locator for the structure to receive the copy of "loc1". An 
+*        HDS locator for the structure to receive the copy of "loc1". An
 *        error is reported if this is a primitive.
 *     status
 *        Pointer to the inherited status value.

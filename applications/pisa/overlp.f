@@ -54,7 +54,7 @@ c *** check no. of points above threshold and store
 	return
       endif
 c ***
-c *** main analysis loop at new thresholds 
+c *** main analysis loop at new thresholds
 c ***
       nbit=0
       lpt=0

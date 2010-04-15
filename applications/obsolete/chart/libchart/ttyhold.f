@@ -21,7 +21,7 @@
 *     5-MAR-1993 (AJJB):
 *       RESPONSE argument added and call to EXIT removed, so that if
 *       the user responds NO a logical value is returned to the calling
-*       routine rather than terminating execution.  
+*       routine rather than terminating execution.
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -32,7 +32,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       RESPONSE=.TRUE.
       CALL PAR_DEF0L( 'MORE', RESPONSE, STATUS )
       CALL PAR_GET0L( 'MORE', RESPONSE, STATUS )

@@ -53,7 +53,7 @@ C# IL>=a, OL>=0
 *                     entry points KSTXA=20 & KSTXR=25 (S309).
 *     29/10/90  KEVP  Made it call GKPXAD to return correct values for
 *                     inQuire PiXel Array Dimensions (C57).
-*     07/11/90  KEVP  Removed code in GK0BID, no longer needed, because of 
+*     07/11/90  KEVP  Removed code in GK0BID, no longer needed, because of
 *                     C18 fix.
 *
 *  ARGUMENTS

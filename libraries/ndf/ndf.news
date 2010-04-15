@@ -9,7 +9,7 @@ V1.10
    is contained within another NDF.
 
    - The NDF_SCOPY and NDF_PROP functions now allow an asterisk to be
-   used within the CLIST argument as a wild card to match all extension 
+   used within the CLIST argument as a wild card to match all extension
    names.
 
 V1.9
@@ -24,7 +24,7 @@ V1.9
    will create a section covering the central 50 percent of the NDF on
    the first pixel axis.
 
-   - A history component will now be added automatically to the NDFs 
+   - A history component will now be added automatically to the NDFs
    created by NDF_CREAT and NDF_NEW if the "NDF_AUTO_HISTORY" environment
    variable, or "AUTO_HISTORY" tuning parameter, is set to a non-zero integer.
 
@@ -40,11 +40,11 @@ V1.7
    NDF sections may now be given in terms of WCS coordinates.
 
    New tuning parameters ("PXT...") can be used to supress the default
-   propagation of named NDF extensions by NDF_PROP and NDF_SCOPY. See 
+   propagation of named NDF extensions by NDF_PROP and NDF_SCOPY. See
    NDF_TUNE.
 
 V1.6-2
-   Limited support for NDF array components stored in scaled form is now 
+   Limited support for NDF array components stored in scaled form is now
    available.
 
 V1.6-1

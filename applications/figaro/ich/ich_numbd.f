@@ -3,7 +3,7 @@ C+
 C
 C     I C H _ N U M B D
 C
-C     Evaluates a number encoded in a character string, using 
+C     Evaluates a number encoded in a character string, using
 C     double precision.  This is essentially just a double precision
 C     version of ICH_NUMBR, with the NSFIG parameter added.
 C
@@ -21,7 +21,7 @@ C                     indicate hex, octal or binary respectively.
 C
 C     (>) IST         (Integer) The position of the first character
 C                     in STRING (starting from 1) at which the
-C                     decoding is to start.  
+C                     decoding is to start.
 C
 C     (>) DELIMS      (Character) A string giving the set of
 C                     possible delimiters for the number.  The
@@ -49,7 +49,7 @@ C
 C     Returns -  (if called as a function)
 C
 C     (<) ICH_NUMBD   (Integer) Indicates the status of the
-C                     evaluation.  
+C                     evaluation.
 C                     0  => OK. Number was given, and was valid
 C                     -1 => Null.  There was a null string.
 C                     1  => Error.  The string was not null, but it
@@ -63,7 +63,7 @@ C     Some examples of accepted formats -
 C
 C     27.34567892  -345E-8  -'345'O  +'1010.101'B  'ABCXD'X  '101E101'B
 C
-C     -%O345   %B1010.101  12345.6789  %xabcxd      
+C     -%O345   %B1010.101  12345.6789  %xabcxd
 C
 C                                        KS / CIT  13th April 1984
 C     Modified:

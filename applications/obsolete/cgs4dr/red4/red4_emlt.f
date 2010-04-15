@@ -36,7 +36,7 @@ C     SYNTH       If specified, a synthetic spectrum is generated.
 C
 C                                                  KS / AAO  4th March 1988
 C     Modified:
-C  
+C
 C     16th Aug 1988   Some output formatting problems corrected.  KS/AAO.
 C     25th Jan 1989   Bug in dispersion calculation when only a subset of
 C                     the data used now corrected.  KS/AAO.
@@ -181,7 +181,7 @@ C
 C
 C     We have to be a little bit careful about the data array we pass
 C     to FIG_EMLT, since it modifies it in the course of its analysis.
-C     If we are creating a synthetic spectrum, this is fine, since we 
+C     If we are creating a synthetic spectrum, this is fine, since we
 C     can just pass it the original contents of the output array (which
 C     match the input), let it clobber it, and then let it write the
 C     synthetic spectrum into it.  If we just have an input spectrum
@@ -211,9 +211,9 @@ C
 C     Now we loop through all the spectra in the DATA.  If we are
 C     producing a synthetic spectrum, we can just pass FIG_EMLT the
 C     output array.  Otherwise, we copy the data into the work array
-C     first.  If the data is wavelength calibrated, we have to run 
+C     first.  If the data is wavelength calibrated, we have to run
 C     through the wavelength array as well as the data array.
-C     
+C
       CALL PAR_WRUSER(' ',STATUS)
       IXSPEC = 1
       XBASE = XPTR

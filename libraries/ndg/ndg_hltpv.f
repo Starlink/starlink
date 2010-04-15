@@ -13,26 +13,26 @@
 *     CALL NDG_HLTPV( NEW, OLD, STATUS )
 
 *  Description:
-*     This routine can be called to stop subseqently accessed NDFs 
+*     This routine can be called to stop subseqently accessed NDFs
 *     being added to the list of NDFs that will receive updated
-*     provenance information when NDG_ENDPV is called to end the 
+*     provenance information when NDG_ENDPV is called to end the
 *     current provenance block.
 
 *  Arguments:
 *     NEW = LOGICAL (Read)
-*        The new required provenance-recording state. 
+*        The new required provenance-recording state.
 *     OLD = LOGICAL (Returned)
 *        The provenance-recording state on entry to this routine.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     - A .FALSE. provenance-recording state means that any subseqently 
-*     accessed NDFs will not be added to the list of NDFs to receive 
-*     updated provenance information when NDG_ENDPV is called. 
-*     - A .TRUE. provenance-recording state means that any subseqently 
-*     accessed NDFs are added to the list of NDFs to receive updated 
-*     provenance information when NDG_ENDPV is called. 
+*     - A .FALSE. provenance-recording state means that any subseqently
+*     accessed NDFs will not be added to the list of NDFs to receive
+*     updated provenance information when NDG_ENDPV is called.
+*     - A .TRUE. provenance-recording state means that any subseqently
+*     accessed NDFs are added to the list of NDFs to receive updated
+*     provenance information when NDG_ENDPV is called.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,11 +102,11 @@
 *  Indicate that the routine NDG1_HNDLR should be called whenever an NDF
 *  is opened or closed, or has its data array mapped for read or update
 *  access
-         CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .TRUE., 
+         CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .TRUE.,
      :                   STATUS )
-         CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .TRUE., 
+         CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .TRUE.,
      :                   STATUS )
-         CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .TRUE., 
+         CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .TRUE.,
      :                   STATUS )
          CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .TRUE., STATUS )
          CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .TRUE., STATUS )
@@ -119,13 +119,13 @@
 *  If provenance recording is currently enabled and is to be disabled...
       ELSE IF( OLD .AND. .NOT. NEW ) THEN
 
-*  Indicate that the routine NDG1_HNDLR should no longer be called 
+*  Indicate that the routine NDG1_HNDLR should no longer be called
 *  whenever an NDF is opened or closed.
-         CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .FALSE., 
+         CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .FALSE.,
      :                   STATUS )
-         CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .FALSE., 
+         CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .FALSE.,
      :                   STATUS )
-         CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .FALSE., 
+         CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .FALSE.,
      :                   STATUS )
          CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .FALSE., STATUS )
          CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .FALSE., STATUS )

@@ -13,7 +13,7 @@
 *    A free GRPCKG device id is selected
 *
 *    If GKS is not open the workstation is opened
-*    
+*
 *    Aspect source flags are set
 *    Line and marker attributes are set
 *    Deferral and update modes set
@@ -137,7 +137,7 @@
 
       CALL GQOPS(ISTATE)
 
-      IF (ISTATE .NE. GGKCL .AND. ISTATE .NE. GGKOP) THEN    
+      IF (ISTATE .NE. GGKCL .AND. ISTATE .NE. GGKOP) THEN
          READ(UNIT=FILE,FMT='(BN,I64)',IOSTAT=IOSTAT) GRWKID(ID)
          IF (IOSTAT.EQ.0) THEN
             CALL GQWKC(GRWKID(ID),IERR,ICON,GRTYP(ID))
@@ -164,10 +164,10 @@
                   GO TO 9999
                END IF
 * Success!
-	       GO TO 111   
+	       GO TO 111
             END IF
          END IF
-      END IF   
+      END IF
 
 *   Open GKS and the workstation
       CALL GROPWK(FILE,ITYPE,GRWKID(ID),GRTYP(ID),ISTAT)
@@ -201,9 +201,9 @@
 *   Set line type and line width scale factor
       CALL GSLN(1)
       CALL GSLWSC(1.0)
-      
+
 *     Select interior style SOLID
-      CALL GSFAIS(GSOLID)    
+      CALL GSFAIS(GSOLID)
 
 *   Set buffering and implicit regeneration flags
       CALL GSDS(GRWKID(ID),GBNIG,GSUPPD)
@@ -256,12 +256,12 @@
      1   REAL(LX-1)/XM
       YNDC2P = (CVIEWP(4)-CVIEWP(3))/(CWINDO(4)-CWINDO(3)) *
      1   REAL(LY-1)/YM
-      
+
       GRWIND(1,ID) = 0.0
       GRWIND(2,ID) = (GRVIEW(2,ID) - GRVIEW(1,ID)) * XNDC2P
       GRWIND(3,ID) = 0.0
       GRWIND(4,ID) = (GRVIEW(4,ID) - GRVIEW(3,ID)) * YNDC2P
-      
+
 *   Save workstation size
       GRXMIN(ID) = GRVIEW(1,ID) * XNDC2P
       GRXMAX(ID) = GRVIEW(2,ID) * XNDC2P
@@ -275,14 +275,14 @@
          GRVIE2(I,ID) = GRVIEW(I,ID)
          GRWIN2(I,ID) = GRWIND(I,ID)
   100 CONTINUE
-      
+
 *   Viewport is visible (overlaps the display surface)
       GRVPVI(ID) = .TRUE.
 
 *   Grey scale not loaded yet
       GRGRLO(ID) = .FALSE.
 
-*  See if the workstation has a dynamic colour table 
+*  See if the workstation has a dynamic colour table
       CALL GQDWKA(GRTYP(ID),IERR,IPLBUN,IPMBUN,ITXBUN,IFABUN,IPAREP,
      :                             ICOLRE,IWKTR)
       IF (IERR.NE.0) THEN

@@ -13,7 +13,7 @@
 *     CALL PDA_DNFFTB( NDIM, DIM, X, Y, WORK, ISTAT )
 
 *  Description:
-*     The supplied Fourier co-efficients in X and Y are replaced by the 
+*     The supplied Fourier co-efficients in X and Y are replaced by the
 *     corresponding spatial data obtained by doing an inverse Fourier
 *     transform. See the forward FFT routine PDA_DNFFTF for more details.
 
@@ -24,11 +24,11 @@
 *        The size of each dimension.
 *     X( * ) = DOUBLE PRECISION (Given and Returned)
 *        Supplied holding the real parts of the Fourier co-efficients.
-*        Returned holding the real parts of the spatial data. The array 
+*        Returned holding the real parts of the spatial data. The array
 *        should have the number of elements implied by NDIM and DIM.
 *     Y( * ) = DOUBLE PRECISION (Given and Returned)
 *        Supplied holding the imaginary parts of the Fourier co-efficients.
-*        Returned holding the imaginary parts of the spatial data. The array 
+*        Returned holding the imaginary parts of the spatial data. The array
 *        should have the number of elements implied by NDIM and DIM.
 *     WORK( * ) = DOUBLE PRECISION (Given and Returned)
 *        A work array. This should have at least ( 6*DimMax + 15 )
@@ -38,7 +38,7 @@
 *        If the value of NDIM is greater than 20 or less than 1, then
 *        ISTAT is returned equal to 1, and the values in X and Y are
 *        left unchanged. Otherwise, ISTAT is returned equal to 0.
-      
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -59,7 +59,7 @@
 *  Arguments Given:
       INTEGER NDIM
       INTEGER DIM( NDIM )
-      
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION X( * )
       DOUBLE PRECISION Y( * )
@@ -67,11 +67,11 @@
 
 *  Arguments Returned:
       INTEGER ISTAT
-      
+
 *  Local Constants:
       INTEGER MXDIM              ! Max number of dimensions
       PARAMETER( MXDIM = 20 )
-      
+
 *  Local Variables:
       INTEGER
      :     CART( MXDIM + 1 ),    ! Current Cartesian pixel indices
@@ -140,7 +140,7 @@
             END DO
 
 *  Take the FFT of it.
-            CALL PDA_DCFFTB( M, WORK( IWN ), WORK )         
+            CALL PDA_DCFFTB( M, WORK( IWN ), WORK )
 
 *  Copy it back to the supplied arrays, normalising it in the process.
             IW = IWN
@@ -157,15 +157,15 @@
             V0 = V0 + M
 
          END DO
-         
+
 *  Now set up the increment between adjacent elements of "rows" parallel
 *  to the second dimension.
-         INC = DIM( 1 )         
+         INC = DIM( 1 )
 
 *  Process the remaining dimensions. Store the durrent dimensions.
          DO I = 2, NDIM
             M = DIM( I )
-            
+
 *  Initialise the co-ordinates (vector and Cartesian) of the first
 *  element of the first row.
             V0 = 1
@@ -175,13 +175,13 @@
             END DO
 
 *  Initialise the FFT work array for this dimension, and save the index
-*  of the next un-used element in the work array. 
+*  of the next un-used element in the work array.
             CALL PDA_DCFFTI( M, WORK )
             IWN = 4*M + 16
-            
+
 *  Store the step (in vector address) between the end of one "row" and
 *  the start of the next.
-            STEP = INC*( M - 1 )            
+            STEP = INC*( M - 1 )
 
 *  Loop round each "row" parallel to the current dimensions.
             DO J = 1, N/M
@@ -198,7 +198,7 @@
                END DO
 
 *  Take the FFT of the current "row".
-               CALL PDA_DCFFTB( M, WORK( IWN ), WORK )               
+               CALL PDA_DCFFTB( M, WORK( IWN ), WORK )
 
 *  Copy the FFT of the current "row" back into the supplied array.
                V = V0
@@ -210,7 +210,7 @@
                   V = V + INC
                   IW = IW + 2
                END DO
-   
+
 *  Increment the co-ordinates of the start of the current "row".
                V0 = V0 + 1
                K = 1
@@ -221,7 +221,7 @@
 *  dimension. If the next dimension is the dimension currently being
 *  transformed, skip over it so that it stays at 1 (but increment the
 *  vector address to account for the skip).
-               DO WHILE( CART( K ) .GT. DIM( K ) ) 
+               DO WHILE( CART( K ) .GT. DIM( K ) )
                   CART( K ) = 1
                   K = K + 1
 
@@ -233,15 +233,15 @@
                   CART( K ) = CART( K ) + 1
 
                END DO
-                  
+
             END DO
 
 *  Store the increment in vector address between adjacent elements of
 *  the next "row".
             INC = INC*M
-            
+
          END DO
 
       END IF
-         
+
       END

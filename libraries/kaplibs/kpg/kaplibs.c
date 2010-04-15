@@ -4,17 +4,17 @@
 *     kaplibs.c
 
 *  Purpose:
-*     Implement the C interface to the standalone routines in the KAPLIBS 
+*     Implement the C interface to the standalone routines in the KAPLIBS
 *     library.
 
 *  Description:
-*     This module implements C-callable wrappers for the public non-ADAM 
+*     This module implements C-callable wrappers for the public non-ADAM
 *     routines in the KAPLIBS library. The interface to these wrappers
 *     is defined in kaplibs.h.
 
 *  Notes:
 *     - Given the size of the KAPLIBS library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use KAPLIBS from C extend this file (and
 *     kaplibs.h) to include any functions which they need but which are
 *     not already included.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -98,9 +98,9 @@
 /* Wrapper function implementations. */
 /* ================================= */
 
-F77_SUBROUTINE(kpg1_fillr)( REAL(VALUE), 
-                            INTEGER(EL), 
-                            REAL_ARRAY(ARRAY), 
+F77_SUBROUTINE(kpg1_fillr)( REAL(VALUE),
+                            INTEGER(EL),
+                            REAL_ARRAY(ARRAY),
                             INTEGER(STATUS) );
 
 void kpg1Fillr( float value, int el, float *array, int *status ){
@@ -128,8 +128,8 @@ void kpg1Fillr( float value, int el, float *array, int *status ){
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_gausr)( REAL(SIGMA), 
-                            INTEGER(IBOX), 
+F77_SUBROUTINE(kpg1_gausr)( REAL(SIGMA),
+                            INTEGER(IBOX),
                             LOGICAL(SAMBAD),
                             REAL(WLIM),
                             INTEGER(NX),
@@ -145,7 +145,7 @@ F77_SUBROUTINE(kpg1_gausr)( REAL(SIGMA),
                             INTEGER(STATUS) );
 
 void kpg1Gausr( float sigma, int ibox, int sambad, float wlim, int nx,
-                int ny, int bad, int var, float *a, float *b, int *badout, 
+                int ny, int bad, int var, float *a, float *b, int *badout,
                 float *weight, float *amar, float *wmar, int *status ){
 
    DECLARE_REAL(SIGMA);
@@ -189,8 +189,8 @@ void kpg1Gausr( float sigma, int ibox, int sambad, float wlim, int nx,
    F77_ASSOC_REAL_ARRAY( WMAR, wmar );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_gausr)( REAL_ARG(&SIGMA), 
-                         INTEGER_ARG(&IBOX), 
+   F77_CALL(kpg1_gausr)( REAL_ARG(&SIGMA),
+                         INTEGER_ARG(&IBOX),
                          LOGICAL_ARG(&SAMBAD),
                          REAL_ARG(&WLIM),
                          INTEGER_ARG(&NX),
@@ -232,10 +232,10 @@ void kpg1Kymap( const Grp *igrp, AstKeyMap **keymap, int *status ){
 
 /* NB The supplied axis indices should be one based, not zero based. */
 
-F77_SUBROUTINE(kpg1_manir)( INTEGER(NDIMI), 
+F77_SUBROUTINE(kpg1_manir)( INTEGER(NDIMI),
                             INTEGER_ARRAY(DIMI),
                             REAL_ARRAY(IN),
-                            INTEGER(NDIMO), 
+                            INTEGER(NDIMO),
                             INTEGER_ARRAY(DIMO),
                             INTEGER_ARRAY(AXES),
                             INTEGER_ARRAY(COLOFF),
@@ -243,7 +243,7 @@ F77_SUBROUTINE(kpg1_manir)( INTEGER(NDIMI),
                             REAL_ARRAY(OUT),
                             INTEGER(STATUS) );
 
-void kpg1Manir( int ndimi, int *dimi, float *in, int ndimo, int *dimo, 
+void kpg1Manir( int ndimi, int *dimi, float *in, int ndimo, int *dimo,
                 int *axes, int *coloff, int *expoff, float *out, int *status ){
 
    DECLARE_INTEGER(NDIMI);
@@ -262,7 +262,7 @@ void kpg1Manir( int ndimi, int *dimi, float *in, int ndimo, int *dimo,
    nin = 1;
    ncoloff = 1;
    for( i = 0; i < ndimi; i++ ) {
-      use = 1;      
+      use = 1;
       for( j = 0; j < ndimo; j++ ) {
          if( axes[ j ] == i ) {
             use = 0;
@@ -299,10 +299,10 @@ void kpg1Manir( int ndimi, int *dimi, float *in, int ndimo, int *dimo,
    F77_ASSOC_REAL_ARRAY( OUT, out );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_manir)( INTEGER_ARG(&NDIMI), 
+   F77_CALL(kpg1_manir)( INTEGER_ARG(&NDIMI),
                          INTEGER_ARRAY_ARG(DIMI),
                          REAL_ARRAY_ARG(IN),
-                         INTEGER_ARG(&NDIMO), 
+                         INTEGER_ARG(&NDIMO),
                          INTEGER_ARRAY_ARG(DIMO),
                          INTEGER_ARRAY_ARG(AXES),
                          INTEGER_ARRAY_ARG(COLOFF),
@@ -527,13 +527,13 @@ void kpgStati( int bad, int el, const int data[], int nclip, const float clip[],
 /* ------------------------------- */
 
 F77_SUBROUTINE(kpg1_wwrt)( INTEGER(IAST),
-                           CHARACTER(NAME), 
-                           CHARACTER(LOC), 
+                           CHARACTER(NAME),
+                           CHARACTER(LOC),
                            INTEGER(STATUS)
                            TRAIL(NAME)
                            TRAIL(LOC) );
 
-void kpg1Wwrt( AstObject *obj, const char *name, const HDSLoc *loc, 
+void kpg1Wwrt( AstObject *obj, const char *name, const HDSLoc *loc,
                int *status ){
    DECLARE_INTEGER(IAST);
    DECLARE_CHARACTER_DYN(NAME);
@@ -567,14 +567,14 @@ void kpg1Wwrt( AstObject *obj, const char *name, const HDSLoc *loc,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_wread)( CHARACTER(LOC), 
-                            CHARACTER(NAME), 
+F77_SUBROUTINE(kpg1_wread)( CHARACTER(LOC),
+                            CHARACTER(NAME),
                             INTEGER(IAST),
                             INTEGER(STATUS)
                             TRAIL(LOC)
                             TRAIL(NAME) );
 
-void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj, 
+void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj,
                 int *status ){
    DECLARE_CHARACTER(LOC,DAT__SZLOC);
    DECLARE_CHARACTER_DYN(NAME);
@@ -610,17 +610,17 @@ void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_mxmnr)( LOGICAL(BAD), 
-                            INTEGER(EL), 
-                            REAL_ARRAY(ARRAY), 
-                            INTEGER(NINVAL), 
-                            REAL(MAXMUM), 
+F77_SUBROUTINE(kpg1_mxmnr)( LOGICAL(BAD),
+                            INTEGER(EL),
+                            REAL_ARRAY(ARRAY),
+                            INTEGER(NINVAL),
+                            REAL(MAXMUM),
                             REAL(MINMUM),
                             INTEGER(MAXPOS),
-                            INTEGER(MINPOS), 
+                            INTEGER(MINPOS),
                             INTEGER(STATUS) );
 
-void kpg1Mxmnr( int bad, int el, float *array, int *ninval, float *maxmum, 
+void kpg1Mxmnr( int bad, int el, float *array, int *ninval, float *maxmum,
                 float *minmum, int *maxpos, int *minpos, int *status ){
 
    DECLARE_LOGICAL(BAD);
@@ -663,17 +663,17 @@ void kpg1Mxmnr( int bad, int el, float *array, int *ninval, float *maxmum,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_mxmni)( LOGICAL(BAD), 
-                            INTEGER(EL), 
-                            INTEGER_ARRAY(ARRAY), 
-                            INTEGER(NINVAL), 
-                            INTEGER(MAXMUM), 
+F77_SUBROUTINE(kpg1_mxmni)( LOGICAL(BAD),
+                            INTEGER(EL),
+                            INTEGER_ARRAY(ARRAY),
+                            INTEGER(NINVAL),
+                            INTEGER(MAXMUM),
                             INTEGER(MINMUM),
                             INTEGER(MAXPOS),
-                            INTEGER(MINPOS), 
+                            INTEGER(MINPOS),
                             INTEGER(STATUS) );
 
-void kpg1Mxmni( int bad, int el, int *array, int *ninval, int *maxmum, 
+void kpg1Mxmni( int bad, int el, int *array, int *ninval, int *maxmum,
                 int *minmum, int *maxpos, int *minpos, int *status ){
 
    DECLARE_LOGICAL(BAD);
@@ -716,17 +716,17 @@ void kpg1Mxmni( int bad, int el, int *array, int *ninval, int *maxmum,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_mxmnd)( LOGICAL(BAD), 
-                            INTEGER(EL), 
-                            DOUBLE_ARRAY(ARRAY), 
-                            INTEGER(NINVAL), 
-                            DOUBLE(MAXMUM), 
+F77_SUBROUTINE(kpg1_mxmnd)( LOGICAL(BAD),
+                            INTEGER(EL),
+                            DOUBLE_ARRAY(ARRAY),
+                            INTEGER(NINVAL),
+                            DOUBLE(MAXMUM),
                             DOUBLE(MINMUM),
                             INTEGER(MAXPOS),
-                            INTEGER(MINPOS), 
+                            INTEGER(MINPOS),
                             INTEGER(STATUS) );
 
-void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum, 
+void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
                 double *minmum, int *maxpos, int *minpos, int *status ){
 
    DECLARE_LOGICAL(BAD);
@@ -769,14 +769,14 @@ void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_medud)( LOGICAL(BAD),  
-                            INTEGER(EL), 
+F77_SUBROUTINE(kpg1_medud)( LOGICAL(BAD),
+                            INTEGER(EL),
                             DOUBLE_ARRAY(ARRAY),
-                            DOUBLE(MEDIAN), 
+                            DOUBLE(MEDIAN),
                             INTEGER(NELUSE),
                             INTEGER(STATUS) );
 
-void kpg1Medud( int bad, int el, double *array, double *median, 
+void kpg1Medud( int bad, int el, double *array, double *median,
                 int *neluse, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(EL);
@@ -792,11 +792,11 @@ void kpg1Medud( int bad, int el, double *array, double *median,
    F77_ASSOC_DOUBLE_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_medud)( LOGICAL_ARG(&BAD), 
-                         INTEGER_ARG(&EL), 
+   F77_CALL(kpg1_medud)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&EL),
                          DOUBLE_ARRAY_ARG(ARRAY),
-                         DOUBLE_ARG(&MEDIAN), 
-                         INTEGER_ARG(&NELUSE), 
+                         DOUBLE_ARG(&MEDIAN),
+                         INTEGER_ARG(&NELUSE),
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -806,14 +806,14 @@ void kpg1Medud( int bad, int el, double *array, double *median,
    F77_FREE_REAL( ARRAY );
 }
 
-F77_SUBROUTINE(kpg1_medur)( LOGICAL(BAD),  
-                            INTEGER(EL), 
+F77_SUBROUTINE(kpg1_medur)( LOGICAL(BAD),
+                            INTEGER(EL),
                             REAL_ARRAY(ARRAY),
-                            REAL(MEDIAN), 
+                            REAL(MEDIAN),
                             INTEGER(NELUSE),
                             INTEGER(STATUS) );
 
-void kpg1Medur( int bad, int el, float *array, float *median, 
+void kpg1Medur( int bad, int el, float *array, float *median,
                 int *neluse, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(EL);
@@ -829,11 +829,11 @@ void kpg1Medur( int bad, int el, float *array, float *median,
    F77_ASSOC_REAL_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_medur)( LOGICAL_ARG(&BAD), 
-                         INTEGER_ARG(&EL), 
+   F77_CALL(kpg1_medur)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&EL),
                          REAL_ARRAY_ARG(ARRAY),
-                         REAL_ARG(&MEDIAN), 
-                         INTEGER_ARG(&NELUSE), 
+                         REAL_ARG(&MEDIAN),
+                         INTEGER_ARG(&NELUSE),
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -843,10 +843,10 @@ void kpg1Medur( int bad, int el, float *array, float *median,
    F77_FREE_REAL( ARRAY );
 }
 
-F77_SUBROUTINE(kpg1_opgrd)( INTEGER(NPOS), 
-                            DOUBLE_ARRAY(POS), 
-                            LOGICAL(WEST), 
-                            DOUBLE_ARRAY(PAR), 
+F77_SUBROUTINE(kpg1_opgrd)( INTEGER(NPOS),
+                            DOUBLE_ARRAY(POS),
+                            LOGICAL(WEST),
+                            DOUBLE_ARRAY(PAR),
                             DOUBLE(RDIAM),
                             INTEGER(STATUS) );
 
@@ -868,10 +868,10 @@ void kpg1Opgrd( int npos, const double pos[], int west, double *par, double *rdi
    F77_ASSOC_DOUBLE_ARRAY( PAR, par );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_opgrd)( INTEGER_ARG(&NPOS), 
+   F77_CALL(kpg1_opgrd)( INTEGER_ARG(&NPOS),
                          DOUBLE_ARRAY_ARG(POS),
-                         LOGICAL_ARG(&WEST), 
-                         DOUBLE_ARRAY_ARG(PAR), 
+                         LOGICAL_ARG(&WEST),
+                         DOUBLE_ARRAY_ARG(PAR),
                          DOUBLE_ARG(&RDIAM),
                          INTEGER_ARG(&STATUS) );
 
@@ -986,13 +986,13 @@ void kpg1Datcp( const HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status 
 /* ------------------------------- */
 
 F77_SUBROUTINE(kpg1_ghstd)( LOGICAL(BAD),
-                            INTEGER(DIM), 
-                            DOUBLE_ARRAY(ARRAY), 
-                            INTEGER(NUMBIN), 
-                            LOGICAL(CUMUL), 
+                            INTEGER(DIM),
+                            DOUBLE_ARRAY(ARRAY),
+                            INTEGER(NUMBIN),
+                            LOGICAL(CUMUL),
                             DOUBLE(VALMAX),
                             DOUBLE(VALMIN),
-                            INTEGER_ARRAY(HIST), 
+                            INTEGER_ARRAY(HIST),
                             INTEGER(STATUS) );
 
 void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
@@ -1020,13 +1020,13 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(kpg1_ghstd)( LOGICAL_ARG(&BAD),
-                         INTEGER_ARG(&DIM), 
-                         DOUBLE_ARRAY_ARG(ARRAY), 
-                         INTEGER_ARG(&NUMBIN), 
-                         LOGICAL_ARG(&CUMUL), 
+                         INTEGER_ARG(&DIM),
+                         DOUBLE_ARRAY_ARG(ARRAY),
+                         INTEGER_ARG(&NUMBIN),
+                         LOGICAL_ARG(&CUMUL),
                          DOUBLE_ARG(&VALMAX),
                          DOUBLE_ARG(&VALMIN),
-                         INTEGER_ARRAY_ARG(HIST), 
+                         INTEGER_ARRAY_ARG(HIST),
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_DOUBLE( VALMAX, *valmax );
@@ -1040,13 +1040,13 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
 /* ------------------------------- */
 
 F77_SUBROUTINE(kpg1_ghstr)( LOGICAL(BAD),
-                            INTEGER(DIM), 
-                            REAL_ARRAY(ARRAY), 
-                            INTEGER(NUMBIN), 
-                            LOGICAL(CUMUL), 
+                            INTEGER(DIM),
+                            REAL_ARRAY(ARRAY),
+                            INTEGER(NUMBIN),
+                            LOGICAL(CUMUL),
                             REAL(VALMAX),
                             REAL(VALMIN),
-                            INTEGER_ARRAY(HIST), 
+                            INTEGER_ARRAY(HIST),
                             INTEGER(STATUS) );
 
 void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
@@ -1074,13 +1074,13 @@ void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(kpg1_ghstr)( LOGICAL_ARG(&BAD),
-                         INTEGER_ARG(&DIM), 
-                         REAL_ARRAY_ARG(ARRAY), 
-                         INTEGER_ARG(&NUMBIN), 
-                         LOGICAL_ARG(&CUMUL), 
+                         INTEGER_ARG(&DIM),
+                         REAL_ARRAY_ARG(ARRAY),
+                         INTEGER_ARG(&NUMBIN),
+                         LOGICAL_ARG(&CUMUL),
                          REAL_ARG(&VALMAX),
                          REAL_ARG(&VALMIN),
-                         INTEGER_ARRAY_ARG(HIST), 
+                         INTEGER_ARRAY_ARG(HIST),
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_REAL( VALMAX, *valmax );
@@ -1093,8 +1093,8 @@ void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_hsstp)( INTEGER(NUMBIN), 
-                            INTEGER_ARRAY(HIST), 
+F77_SUBROUTINE(kpg1_hsstp)( INTEGER(NUMBIN),
+                            INTEGER_ARRAY(HIST),
                             DOUBLE(VALMAX),
                             DOUBLE(VALMIN),
                             DOUBLE(SUM),
@@ -1123,8 +1123,8 @@ void kpg1Hsstp( int numbin, const int *hist, double valmax, double valmin,
    F77_EXPORT_DOUBLE( valmin, VALMIN );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_hsstp)( INTEGER_ARG(&NUMBIN), 
-                         INTEGER_ARRAY_ARG(HIST), 
+   F77_CALL(kpg1_hsstp)( INTEGER_ARG(&NUMBIN),
+                         INTEGER_ARRAY_ARG(HIST),
                          DOUBLE_ARG(&VALMAX),
                          DOUBLE_ARG(&VALMIN),
                          DOUBLE_ARG(&SUM),
@@ -1162,13 +1162,13 @@ void fts1Astwn( AstFitsChan *fc, int indf, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
-F77_SUBROUTINE(kpg1_elgau)( REAL_ARRAY(SIG), 
+F77_SUBROUTINE(kpg1_elgau)( REAL_ARRAY(SIG),
                             REAL(SIG0),
                             REAL(AXIS),
                             REAL(THETA),
                             INTEGER(STATUS) );
 
-void kpg1Elgau( float *sig, float *sig0, float *axis, float *theta, 
+void kpg1Elgau( float *sig, float *sig0, float *axis, float *theta,
                 int *status ) {
 
    DECLARE_REAL_ARRAY_DYN(SIG);
@@ -1194,12 +1194,12 @@ void kpg1Elgau( float *sig, float *sig0, float *axis, float *theta,
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_loctd)( INTEGER(NDIM), 
-                            INTEGER_ARRAY(LBND), 
-                            INTEGER_ARRAY(UBND), 
-                            DOUBLE_ARRAY(ARRAY), 
-                            REAL_ARRAY(INIT), 
-                            INTEGER_ARRAY(SEARCH), 
+F77_SUBROUTINE(kpg1_loctd)( INTEGER(NDIM),
+                            INTEGER_ARRAY(LBND),
+                            INTEGER_ARRAY(UBND),
+                            DOUBLE_ARRAY(ARRAY),
+                            REAL_ARRAY(INIT),
+                            INTEGER_ARRAY(SEARCH),
                             LOGICAL(POSTIV),
                             REAL_ARRAY(MXSHFT),
                             INTEGER(MAXITE),
@@ -1209,18 +1209,18 @@ F77_SUBROUTINE(kpg1_loctd)( INTEGER(NDIM),
                             REAL_ARRAY(WORK1),
                             INTEGER(STATUS) );
 
-void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd, 
+void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
                 const double *array, const float *init, const int
 		*search, int postiv, const float *mxshft, int maxite,
 		float toler, int sel, float *final, float *work1, int
 		*status ){
 
-   DECLARE_INTEGER(NDIM); 
-   DECLARE_INTEGER_ARRAY_DYN(LBND); 
-   DECLARE_INTEGER_ARRAY_DYN(UBND); 
-   DECLARE_DOUBLE_ARRAY_DYN(ARRAY); 
-   DECLARE_REAL_ARRAY_DYN(INIT); 
-   DECLARE_INTEGER_ARRAY_DYN(SEARCH); 
+   DECLARE_INTEGER(NDIM);
+   DECLARE_INTEGER_ARRAY_DYN(LBND);
+   DECLARE_INTEGER_ARRAY_DYN(UBND);
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_REAL_ARRAY_DYN(INIT);
+   DECLARE_INTEGER_ARRAY_DYN(SEARCH);
    DECLARE_LOGICAL(POSTIV);
    DECLARE_REAL_ARRAY_DYN(MXSHFT);
    DECLARE_INTEGER(MAXITE);
@@ -1230,7 +1230,7 @@ void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
    DECLARE_REAL_ARRAY_DYN(WORK1);
    DECLARE_INTEGER(STATUS);
    int i, nel, nw;
-   
+
    nel = 1;
    for( i = 0; i < ndim; i++ ) nel *= ( ubnd[ i ] - lbnd [ i ] + 1 );
    nw = 51*sel*ndim;
@@ -1244,34 +1244,34 @@ void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
    F77_CREATE_REAL_ARRAY( FINAL, ndim );
    F77_CREATE_REAL_ARRAY( WORK1, nw );
 
-   F77_EXPORT_INTEGER( ndim, NDIM ); 
-   F77_EXPORT_INTEGER_ARRAY( lbnd, LBND, ndim ); 
-   F77_EXPORT_INTEGER_ARRAY( ubnd, UBND, ndim ); 
-   F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, nel ); 
-   F77_EXPORT_REAL_ARRAY( init, INIT, ndim ); 
-   F77_EXPORT_INTEGER_ARRAY( search, SEARCH, ndim ); 
+   F77_EXPORT_INTEGER( ndim, NDIM );
+   F77_EXPORT_INTEGER_ARRAY( lbnd, LBND, ndim );
+   F77_EXPORT_INTEGER_ARRAY( ubnd, UBND, ndim );
+   F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, nel );
+   F77_EXPORT_REAL_ARRAY( init, INIT, ndim );
+   F77_EXPORT_INTEGER_ARRAY( search, SEARCH, ndim );
    F77_EXPORT_LOGICAL( postiv, POSTIV );
    F77_EXPORT_REAL_ARRAY( mxshft, MXSHFT, ndim );
    F77_EXPORT_INTEGER( maxite, MAXITE );
    F77_EXPORT_REAL( toler, TOLER );
    F77_EXPORT_INTEGER( sel, SEL );
-   F77_EXPORT_REAL_ARRAY( final, FINAL, ndim ); 
-   F77_EXPORT_REAL_ARRAY( work1, WORK1, nw ); 
+   F77_EXPORT_REAL_ARRAY( final, FINAL, ndim );
+   F77_EXPORT_REAL_ARRAY( work1, WORK1, nw );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_loctd)( INTEGER_ARG(&NDIM), 
-                         INTEGER_ARRAY_ARG(LBND), 
-                         INTEGER_ARRAY_ARG(UBND), 
-                         DOUBLE_ARRAY_ARG(ARRAY), 
-                         REAL_ARRAY_ARG(INIT), 
-                         INTEGER_ARRAY_ARG(SEARCH), 
+   F77_CALL(kpg1_loctd)( INTEGER_ARG(&NDIM),
+                         INTEGER_ARRAY_ARG(LBND),
+                         INTEGER_ARRAY_ARG(UBND),
+                         DOUBLE_ARRAY_ARG(ARRAY),
+                         REAL_ARRAY_ARG(INIT),
+                         INTEGER_ARRAY_ARG(SEARCH),
                          LOGICAL_ARG(&POSTIV),
-                         REAL_ARRAY_ARG(MXSHFT), 
+                         REAL_ARRAY_ARG(MXSHFT),
                          INTEGER_ARG(&MAXITE),
                          REAL_ARG(&TOLER),
                          INTEGER_ARG(&SEL),
-                         REAL_ARRAY_ARG(FINAL), 
-                         REAL_ARRAY_ARG(WORK1), 
+                         REAL_ARRAY_ARG(FINAL),
+                         REAL_ARRAY_ARG(WORK1),
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( STATUS, *status );

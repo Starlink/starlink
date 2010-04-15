@@ -115,8 +115,8 @@ itcl::class ::gaia3d::Gaia3dVtkPrism {
    }
 
    #  Apply a shift to the shape. Clearly can depends on the actual shape
-   #  properties (parameterised shapes, like circles, will typically need 
-   #  regenerating), so must be implementation in a sub-class. 
+   #  properties (parameterised shapes, like circles, will typically need
+   #  regenerating), so must be implementation in a sub-class.
    protected method apply_shift_ {sx sy} {
       error "You need to implement a apply_shift_ method"
    }
@@ -240,7 +240,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrism {
       }
    }
 
-   #  Align prism to axis. Provided to meet the Gaia3dArdPrismProxy 
+   #  Align prism to axis. Provided to meet the Gaia3dArdPrismProxy
    #  interface. Has no effect as always aligned.
    public variable align_to_axis 1
 

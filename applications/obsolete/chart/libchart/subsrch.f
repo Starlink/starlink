@@ -49,7 +49,7 @@ C      times.
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statement, with a call to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the READONLY specifier is used which is 
+*        porting, as the READONLY specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -65,7 +65,7 @@ C      times.
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@ C
       IF (BATCH) THEN
 
 * This statement :
-* 
+*
 *        OPEN (UNIT=IFC,FILE=FILENAME,ERR=800,STATUS='OLD',READONLY)
 *
 * is replaced by this call ( see History ):
@@ -144,7 +144,7 @@ C
 C      Go ahead and search the catalogues.
 C
          CALL SELECT('NORMAL', STATUS)
-         IF (STATUS .EQ. CHT__NOCAT) GOTO 899 
+         IF (STATUS .EQ. CHT__NOCAT) GOTO 899
 C
 C      Set up plate constants to be stored with the data.
 C

@@ -18,14 +18,14 @@
 *   a DEREDDENED (stellar) continuum level
 *
 *
- 
+
        IMPLICIT NONE
- 
+
        INTEGER I, J, K
        INTEGER ARG1
        INTEGER INDIX, INDEX, NUMIT
        INTEGER STRL
- 
+
        REAL ARRAY(10)
        REAL LINE, FOBS, EB_V, TNEB
        REAL HKT, CC
@@ -33,15 +33,15 @@
        REAL TEMP, U1, EPU1, RATBB, GTS, GTSCAL, RTEST
        REAL DELTAT, FLUX, RATCOM, BBINT, X
        REAL WEDGE(5), IDEN(5)
- 
+
        CHARACTER*10 ID(5)
        CHARACTER*80 DUMMY
- 
+
        LOGICAL OK
        LOGICAL FIRSTCURSOR
- 
+
        PARAMETER (HKT=1.43883E+08,CC=2.997925E+18)
- 
+
 *  Local Data:
        DATA WEDGE/228., 228., 504., 504., 912./
        DATA IDEN/1640., 4686., 4471., 5876., 4861./
@@ -49,16 +49,16 @@
 *
 *   assign variables names
 *
- 
+
        LINE = ARRAY(1)
        FOBS = ARRAY(2)
        EB_V = ARRAY(3)
        TNEB = ARRAY(4)
- 
+
 *
 *   identify ion
 *
- 
+
        IF (NINT(LINE).EQ.1640) THEN
           INDIX = 1
        ELSEIF (NINT(LINE).EQ.4686) THEN
@@ -74,28 +74,28 @@
           WRITE (*,'(''   ZANSTRA:  line not identified'')')
           GOTO 200
        ENDIF
- 
+
 *
 *   determine 'continuum' point for normalisation
- 
+
        CALL SGS_REQCU(XVAL,YVAL,I)
 *
        FIRSTCURSOR = .TRUE.
        CALL SGSCURSE(I,XVAL,YVAL,FIRSTCURSOR)
        FIRSTCURSOR = .FALSE.
- 
+
 *
 *   convert to 'real' units as necessary
 *
- 
+
        IF (TNEB.LT.100.0) TNEB = TNEB*10000.0
        IF (YVAL.LT.0.0) YVAL = 10.0**YVAL
        IF (XVAL.LT.10.0) XVAL = 10.0**XVAL
- 
+
 *
 *   deredden fluxes, calculate ratio of recombination rates
 *
- 
+
        IF (INDIX.EQ.1) THEN
           FLUX = LOG10(FOBS) + 7.761*EB_V/2.5
           RATCOM = 2.0*(TNEB/10000.0)**0.1
@@ -113,22 +113,22 @@
           RATCOM = 8.49*(TNEB/10000.0)**0.06
        ENDIF
        FLUX = 10.0**FLUX
- 
+
 *
 *   observed value of G(Ts)
 *
- 
+
        GTS = (FLUX*IDEN(INDIX)*RATCOM)/(YVAL*XVAL**2)
- 
+
 *
 *   iterate to obtain black-body temperature which
 *   reproduces the observed G(Ts)
 *
- 
+
        TEMP = 50000.0
        DELTAT = 10000.0
        NUMIT = 0
- 
+
   100  CONTINUE
        IF (NUMIT.GT.500) THEN
           WRITE (*,'(''   ZANSTRA:  failed to converge'')')
@@ -160,11 +160,11 @@
           ENDIF
           GOTO 100
        ENDIF
- 
+
 *
 *   calculate normalisation constant at cursor point
 *
- 
+
        ARG1 = 1
        CALL BBODY(XVAL,YFLX,ARG1,ARG1,DUMMY,TEMP,OK)
        IF (OK) THEN
@@ -180,16 +180,16 @@
           WRITE(*,'(''              Error calculating normalisation'')')
           GOTO 200
        ENDIF
- 
+
 *
 *
 *
- 
+
        WRITE (*,'(''   ZANSTRA:  '',A,1X,F5.0)') ID(INDIX)
      :        (1:(INDEX(ID(INDIX),'X')-1)), IDEN(INDIX)
        WRITE (*,'(''             T(BB) ='', 1PE12.5)') TEMP
        WRITE (*,'(''          C(norm.) ='', 1PE12.5)') YVAL
- 
+
   200  CONTINUE
 
        END

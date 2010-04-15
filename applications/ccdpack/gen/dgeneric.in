@@ -13,7 +13,7 @@
 #     dgeneric filename [generic_types]
 
 #  Arguments:
-#     $1 = FILENAME 
+#     $1 = FILENAME
 #        The name of the doubly generic code file. This must contain
 #        the tokens T1,T2 etc. instead of T.
 #     $2 = GENERIC TYPES
@@ -21,7 +21,7 @@
 #     $3 = split
 #        If set to any value then the final output file is split using
 #        during the last generic pass. This results in files
-#           $1b $1B $1w $W $1i $1r $1d 
+#           $1b $1B $1w $W $1i $1r $1d
 #        if all the generic types are selected ($2=n).
 
 #  Notes:
@@ -37,7 +37,7 @@
 #     12-MAY-1993 (PDRAPER):
 #        Original version.
 #     28-JUN-1993 (PDRAPER):
-#        Added split option to cope with DECstation inability to 
+#        Added split option to cope with DECstation inability to
 #        compile large doubly generic files.
 #     30-JAN-1998 (PDRAPER):
 #        Added check for generic script location.
@@ -56,7 +56,7 @@
      else
         if ( ! ( -e $1 ) ) then
            set file = ${1}.gen
-           if ( ! ( -e $file ) ) then 
+           if ( ! ( -e $file ) ) then
               echo "$1 does not exist"
               exit
            endif
@@ -80,13 +80,13 @@
         -e s/COMM1/COMM/g
 
 #  Generic this.
-     if ( $2 == "" ) then 
+     if ( $2 == "" ) then
         @FGENERIC@ -t n dgeneric.gen
      else
         @FGENERIC@ -t $2 dgeneric.gen
      endif
 
-#  Second tokens. 
+#  Second tokens.
      if ( -e dgeneric2.gen ) then
         'rm' dgeneric2.gen
      endif
@@ -101,7 +101,7 @@
 #  Final generic process. If split is set then give generic the
 #  -s flag
      if ( $3 == "" ) then
-        if ( $2 == "" ) then 
+        if ( $2 == "" ) then
            @FGENERIC@ -t n dgeneric2.gen
         else
            @FGENERIC@ -t $2 dgeneric2.gen
@@ -115,12 +115,12 @@
 #  Splitting output into separate files. Need to rename the resultant files
 #  to the correct names.
         foreach part ( dgeneric2b.f dgeneric2B.f dgeneric2w.f dgeneric2W.f \
-                       dgeneric2i.f dgeneric2r.f dgeneric2d.f ) 
-           if ( -e $part ) then 
+                       dgeneric2i.f dgeneric2r.f dgeneric2d.f )
+           if ( -e $part ) then
               'rm' $part
            endif
         end
-        if ( $2 == "" ) then 
+        if ( $2 == "" ) then
            @FGENERIC@ -t n  -s dgeneric2.gen
         else
            @FGENERIC@ -t $2 -s dgeneric2.gen

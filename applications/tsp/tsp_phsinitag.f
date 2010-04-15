@@ -26,7 +26,7 @@
       INCLUDE 'SAE_PAR'
 
 *  Parameters
-      INTEGER STATUS     
+      INTEGER STATUS
       INTEGER ZONE
 
 *  Local variables
@@ -36,13 +36,13 @@
       REAL WIND(4),VIEWP(4)
       REAL HEAP(3000)
       CHARACTER*40 LABEL
-             
+
       DATA FIRST /.TRUE./
 
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Get the Graphics device
-                 
+
          CALL SGS_ASSOC('DEVICE','WRITE',ZONE,STATUS)
          CALL GQNT(1,IERR,WIND,VIEWP)
 
@@ -54,11 +54,11 @@
          ELSE
              CALL SNX_AGRES(HEAP)
          ENDIF
-       
+
 *  Set up for NCAR plot
 
          CALL AGSETP('GRAPH.',VIEWP,4)
 
-      ENDIF                                  
+      ENDIF
       END
 

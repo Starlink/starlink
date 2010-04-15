@@ -93,7 +93,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,7 +153,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  See if there is a FITS extension in this NDF.
       CALL NDF_XSTAT( INDF1, 'FITS', THERE, STATUS )
 
@@ -167,11 +167,11 @@
       END IF
 
 *  Obtain a locator to the FITS extension.
-      CALL NDF_XLOC( INDF1, 'FITS', 'READ', FTSLOC, STATUS )      
+      CALL NDF_XLOC( INDF1, 'FITS', 'READ', FTSLOC, STATUS )
 
 *  Map the FITS card images stored within the extension, and get the
 *  number of characters in each one.
-      CALL DAT_MAPV( FTSLOC, '_CHAR', 'READ', FTSPNT, NCARD, STATUS )  
+      CALL DAT_MAPV( FTSLOC, '_CHAR', 'READ', FTSPNT, NCARD, STATUS )
       CALL DAT_CLEN( FTSLOC, CLEN, STATUS )
 
 *  See what type of input image we are dealing with. This is derived
@@ -187,12 +187,12 @@
      :             %VAL( CLEN ) )
 
 *  If this is a CPC image, the single input NDF creates two output NDFs,
-*  one for the 50um band and one for the 100um band. 
+*  one for the 50um band and one for the 100um band.
       IF( TYPE .EQ. IRI__CPC ) THEN
 
 *  Create identifiers for NDF sections holding the two planes of the
 *  input NDF.
-         CALL PREPA6( INDF1, INDF3, INDF4, STATUS )  
+         CALL PREPA6( INDF1, INDF3, INDF4, STATUS )
 
 *  Save the used lengths of the output NDF name, title and label.
          NLEN = CHR_LEN( NDFOUT )
@@ -229,7 +229,7 @@
 *  Get the waveband index.
          CALL PREPA8( NCARD, %VAL( FTSPNT ), BAND, STATUS, %VAL( CLEN ))
 
-*  Create the output NDF.               
+*  Create the output NDF.
          CALL PREPA7( NCARD, %VAL( FTSPNT ), PFACT, TYPE, BAND, INDF1,
      :                INDF2, NDFOUT, TITLE, LABEL, FLDLON, FLDLAT, SCS,
      :                PROJ, UNITS, IGRP, PHIST, STATUS, %VAL( CLEN ) )

@@ -12,64 +12,64 @@ f     AST_SWITCHMAP
 
 *  Description:
 *     A SwitchMap is a Mapping which represents a set of alternate
-*     Mappings, each of which is used to transform positions within a 
-*     particular region of the input or output coordinate system of the 
+*     Mappings, each of which is used to transform positions within a
+*     particular region of the input or output coordinate system of the
 *     SwitchMap.
-*     
+*
 *     A SwitchMap can encapsulate any number of Mappings, but they must
-*     all have the same number of inputs (Nin attribute value) and the 
-*     same number of outputs (Nout attribute value). The SwitchMap itself 
+*     all have the same number of inputs (Nin attribute value) and the
+*     same number of outputs (Nout attribute value). The SwitchMap itself
 *     inherits these same values for its Nin and Nout attributes. Each of
 *     these Mappings represents a "route" through the switch, and are
-*     referred to as "route" Mappings below. Each route Mapping transforms 
-*     positions between the input and output coordinate space of the entire 
+*     referred to as "route" Mappings below. Each route Mapping transforms
+*     positions between the input and output coordinate space of the entire
 *     SwitchMap, but only one Mapping will be used to transform any given
-*     position. The selection of the appropriate route Mapping to use with 
+*     position. The selection of the appropriate route Mapping to use with
 *     any given input position is made by another Mapping, called the
 *     "selector" Mapping. Each SwitchMap encapsulates two selector
 *     Mappings in addition to its route Mappings; one for use with the
 *     SwitchMap's forward transformation (called the "forward selector
-*     Mapping"), and one for use with the SwitchMap's inverse transformation 
+*     Mapping"), and one for use with the SwitchMap's inverse transformation
 *     (called the "inverse selector Mapping"). The forward selector Mapping
 *     must have the same number of inputs as the route Mappings, but
 *     should have only one output. Likewise, the inverse selector Mapping
 *     must have the same number of outputs as the route Mappings, but
-*     should have only one input. 
+*     should have only one input.
 *
 *     When the SwitchMap is used to transform a position in the forward
 *     direction (from input to output), each supplied input position is
-*     first transformed by the forward transformation of the forward selector 
-*     Mapping. This produces a single output value for each input position 
-*     referred to as the selector value. The nearest integer to the selector 
-*     value is found, and is used to index the array of route Mappings (the 
-*     first supplied route Mapping has index 1, the second route Mapping has 
-*     index 2, etc). If the nearest integer to the selector value is less 
-*     than 1 or greater than the number of route Mappings, then the SwitchMap 
-*     output position is set to a value of AST__BAD on every axis. Otherwise, 
-*     the forward transformation of the selected route Mapping is used to 
-*     transform the supplied input position to produce the SwitchMap output 
-*     position. 
+*     first transformed by the forward transformation of the forward selector
+*     Mapping. This produces a single output value for each input position
+*     referred to as the selector value. The nearest integer to the selector
+*     value is found, and is used to index the array of route Mappings (the
+*     first supplied route Mapping has index 1, the second route Mapping has
+*     index 2, etc). If the nearest integer to the selector value is less
+*     than 1 or greater than the number of route Mappings, then the SwitchMap
+*     output position is set to a value of AST__BAD on every axis. Otherwise,
+*     the forward transformation of the selected route Mapping is used to
+*     transform the supplied input position to produce the SwitchMap output
+*     position.
 *
 *     When the SwitchMap is used to transform a position in the inverse
-*     direction (from "output" to "input"), each supplied "output" position 
-*     is first transformed by the inverse transformation of the inverse 
-*     selector Mapping. This produces a selector value for each "output" 
-*     position. Again, the nearest integer to the selector value is found, 
-*     and is used to index the array of route Mappings. If this selector 
-*     index value is within the bounds of the array of route Mappings, then 
-*     the inverse transformation of the selected route Mapping is used to 
-*     transform the supplied "output" position to produce the SwitchMap 
-*     "input" position. If the selector index value is outside the bounds 
-*     of the array of route Mappings, then the SwitchMap "input" position is 
-*     set to a value of AST__BAD on every axis. 
+*     direction (from "output" to "input"), each supplied "output" position
+*     is first transformed by the inverse transformation of the inverse
+*     selector Mapping. This produces a selector value for each "output"
+*     position. Again, the nearest integer to the selector value is found,
+*     and is used to index the array of route Mappings. If this selector
+*     index value is within the bounds of the array of route Mappings, then
+*     the inverse transformation of the selected route Mapping is used to
+*     transform the supplied "output" position to produce the SwitchMap
+*     "input" position. If the selector index value is outside the bounds
+*     of the array of route Mappings, then the SwitchMap "input" position is
+*     set to a value of AST__BAD on every axis.
 *
 *     In practice, appropriate selector Mappings should be chosen to
-*     associate a different route Mapping with each region of coordinate 
-*     space. Note that the SelectorMap class of Mapping is particularly 
+*     associate a different route Mapping with each region of coordinate
+*     space. Note that the SelectorMap class of Mapping is particularly
 *     appropriate for this purpose.
 *
 *     If a compound Mapping contains a SwitchMap in series with its own
-*     inverse, the combination of the two adjacent SwitchMaps will be 
+*     inverse, the combination of the two adjacent SwitchMaps will be
 *     replaced by a UnitMap when the compound Mapping is simplified using
 c     astSimplify.
 f     AST_SIMPLIFY.
@@ -94,12 +94,12 @@ f     The SwitchMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -171,9 +171,9 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(SwitchMap)
@@ -236,7 +236,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astEqual protected
@@ -269,17 +269,17 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    AstMapping *ismap2;
    AstMapping *rmap1;
    AstMapping *rmap2;
-   AstSwitchMap *that;        
-   AstSwitchMap *this;        
+   AstSwitchMap *that;
+   AstSwitchMap *this;
    int fsinv1;
    int fsinv2;
    int isinv1;
    int i;
    int isinv2;
    int nroute;
-   int result;                
+   int result;
    int rinv1;
-   int rinv2;         
+   int rinv2;
 
 /* Initialise. */
    result = 0;
@@ -299,23 +299,23 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 /* Check they have the same number of route mappings. */
       nroute = this->nroute;
       if( that->nroute == nroute ) {
-   
+
 /* Get the forward selector Mappings from the two SwitchMaps. */
          fsmap1 = GetSelector( this, 1, &fsinv1, status );
          fsmap2 = GetSelector( that, 1, &fsinv2, status );
-   
+
 /* Are they equal? */
-         if( ( !fsmap1 && !fsmap2 ) || 
+         if( ( !fsmap1 && !fsmap2 ) ||
              ( fsmap1 && fsmap2 && astEqual( fsmap1, fsmap2 ) ) ) {
-   
+
 /* Get the inverse selector Mappings from the two SwitchMaps. */
             ismap1 = GetSelector( this, 0, &isinv1, status );
             ismap2 = GetSelector( that, 0, &isinv2, status );
-   
+
 /* Are they equal? */
-            if( ( !ismap1 && !ismap2 ) || 
+            if( ( !ismap1 && !ismap2 ) ||
                 ( ismap1 && ismap2 && astEqual( ismap1, ismap2 ) ) ) {
-   
+
 /* Loop over the route mappings, breaking as soon as two unequal route
    Mappings are found. Re-instate the original values for the route
    Mapping Invert flag after testing the route Mappings for equality. */
@@ -328,14 +328,14 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   astSetInvert( rmap1, rinv1 );
                }
             }
-   
+
 /* Reinstate the invert flags for the inverse selector Mappings. Ensure
    this is done in the opposite order to which the selector Mappings were
    obtained (in case they are in fact the same Mapping). */
             if( ismap2 ) astSetInvert( ismap2, isinv2 );
             if( ismap1 ) astSetInvert( ismap1, isinv1 );
          }
-   
+
 /* Reinstate the invert flags for the forward selector Mappings. Ensure
    this is done in the oppsote order to which the selector Mappings were
    obtained (in case they are in fact the same Mapping). */
@@ -343,7 +343,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          if( fsmap1 ) astSetInvert( fsmap1, fsinv1 );
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -364,7 +364,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astGetObjSize protected
@@ -412,7 +412,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
    for( i = 0; i < this->nroute; i++ ) {
       result += astGetObjSize( this->routemap[ i ] );
-   }    
+   }
 
    result += astGetObjSize( this->routeinv );
 
@@ -443,7 +443,7 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv, int *stat
 
 *  Description:
 *     This function returns a pointer to a route Mapping (specified by a
-*     floating point selector value) for the given SwitchMap, taking account 
+*     floating point selector value) for the given SwitchMap, taking account
 *     of the state of the Invert flag of both the route Mapping and the
 *     SwitchMap.
 
@@ -457,15 +457,15 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv, int *stat
 *     inv
 *        Pointer to an int in which to return the original value of the
 *        Invert flag of the returned Mapping. The astSetInvert method
-*        should be used to re-instate this value once all use of the Mapping 
+*        should be used to re-instate this value once all use of the Mapping
 *        has been completed.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returns:
-*     A pointer to the route Mapping to use. Note, the returned pointer 
+*     A pointer to the route Mapping to use. Note, the returned pointer
 *     should NOT be annulled when no longer needed. NULL is returned
-*     (without error) if the SwitchMap does not have a route Mapping for the 
+*     (without error) if the SwitchMap does not have a route Mapping for the
 *     requested selector value. The forward transformation of the
 *     returned Mapping will implenment the forward transformation of the
 *     required route Mapping (and vice-versa).
@@ -503,8 +503,8 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv, int *stat
          astSetInvert( ret, this->routeinv[ rindex ] );
 
 /* If the SwitchMap has since been inverted, also invert the returned
-   route Mapping, so that the forward transformation of the returned 
-   Mapping implements the forward transformation of the supplied 
+   route Mapping, so that the forward transformation of the returned
+   Mapping implements the forward transformation of the supplied
    SwitchMap (and vice-versa). */
          if( astGetInvert( this ) ) astInvert( ret );
       }
@@ -548,15 +548,15 @@ static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv, int *stat
 *     inv
 *        Pointer to an int in which to return the original value of the
 *        Invert flag of the returned Mapping. The astSetInvert method
-*        should be used to re-instate this value once all use of the Mapping 
+*        should be used to re-instate this value once all use of the Mapping
 *        has been completed.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returns:
-*     A pointer to the selector Mapping to use. Note, the returned pointer 
+*     A pointer to the selector Mapping to use. Note, the returned pointer
 *     should NOT be annulled when no longer needed. NULL is returned
-*     (without error) if the SwitchMap does not have a Mapping for the 
+*     (without error) if the SwitchMap does not have a Mapping for the
 *     requested selector.
 
 */
@@ -628,7 +628,7 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *stat
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -700,7 +700,7 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *stat
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -714,8 +714,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astManageLock protected
@@ -723,7 +723,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -742,21 +742,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -790,7 +790,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
    if( !result ) result = astManageLock( this->fsmap, mode, extra, fail );
    if( !result ) result = astManageLock( this->ismap, mode, extra, fail );
    for( i = 0; i < this->nroute; i++ ) {
-      if( !result ) result = astManageLock( this->routemap[ i ], mode, 
+      if( !result ) result = astManageLock( this->routemap[ i ], mode,
                                             extra, fail );
    }
 
@@ -935,7 +935,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Local Variables: */
    AstSwitchMap *map;
    AstMapping *new;
-   int i; 
+   int i;
    int nroute;
    int result;
    int fsinv_old;
@@ -962,7 +962,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Temporarily put the Invert flag of all encapsulated Mappings (both
    route and selector) back to the values they had when the SwitchMap was
    created, noting their current values so that they can be re-instated
-   later. If the SwitchMap itself has been inverted, swap all the original 
+   later. If the SwitchMap itself has been inverted, swap all the original
    invert flags. */
    if( map->fsmap ) {
       fsinv_old = astGetInvert( map->fsmap );
@@ -993,14 +993,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Is the higher neighbour a SwitchMap? If so get a pointer to it, and
    note the index of the lower of the two adjacent SwitchMaps. */
-      if( where < ( *nmap - 1 ) && 
+      if( where < ( *nmap - 1 ) &&
           astIsASwitchMap( ( *map_list )[ where + 1 ] ) ){
          swneb = (AstSwitchMap *) ( *map_list )[ where + 1 ];
          ilo = where;
 
 /* If not, is the lower neighbour a SwitchMap? If so get a pointer to it, and
    note the index of the lower of the two adjacent SwitchMaps. */
-      } else if( where > 0 && 
+      } else if( where > 0 &&
                  astIsASwitchMap( ( *map_list )[ where - 1 ] ) ){
          swneb = (AstSwitchMap *) ( *map_list )[ where - 1 ];
          ilo =  where - 1;
@@ -1011,22 +1011,22 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If a neighbouring SwitchMap was found, we can replace the pair by a
    UnitMap if the two SwitchMaps are equal but have opposite values for
-   their Invert flags. Temporarily invert the neighbour, then compare 
+   their Invert flags. Temporarily invert the neighbour, then compare
    the two SwitchMaps for equality, then re-invert the neighbour. */
       if( swneb ) {
          astInvert( swneb );
          equal = astEqual( map, swneb );
          astInvert( swneb );
 
-/* If the two SwitchMaps are equal but opposite, annul the first of the two 
-   Mappings, and replace it with a UnitMap. Also set the invert flag. */ 
+/* If the two SwitchMaps are equal but opposite, annul the first of the two
+   Mappings, and replace it with a UnitMap. Also set the invert flag. */
          if( equal ) {
             new = (AstMapping *) astUnitMap( astGetNin( ( *map_list )[ ilo ] ), "", status );
             (void) astAnnul( ( *map_list )[ ilo ] );
             ( *map_list )[ ilo ] = new;
             ( *invert_list )[ ilo ] = 0;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
             (void) astAnnul( ( *map_list )[ ilo + 1 ] );
             for ( i = ilo + 2; i < *nmap; i++ ) {
@@ -1051,10 +1051,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Only do this if no change was made above. */
    if( result == -1 ) {
 
-/* If the SwitchMap is inverted, create an equal SwitchMap which is not 
+/* If the SwitchMap is inverted, create an equal SwitchMap which is not
    inverted. To do this, invert and swap the selector Mappings, and
-   invert all the route Mappings. We use astSetInvert rather than astInvert 
-   because two or more more stored pointers may point to the same Mapping 
+   invert all the route Mappings. We use astSetInvert rather than astInvert
+   because two or more more stored pointers may point to the same Mapping
    in which case that Mapping would be inverted more than once with
    unpredictable results. */
       if( ( *invert_list )[ where ] ) {
@@ -1063,9 +1063,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          for( i = 0; i < nroute; i++ ) {
             astSetInvert( map->routemap[ i ], !(map->routeinv[ i ]) );
          }
-   
+
          new = (AstMapping *) astSwitchMap( map->ismap, map->fsmap, nroute, (void **) map->routemap, "", status );
-   
+
          (void) astAnnul( ( *map_list )[ where ] );
          ( *map_list )[ where ] = (AstMapping *) new;
          ( *invert_list )[ where ] = 0;
@@ -1077,7 +1077,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          sfsmap = ( map->fsmap ) ? astSimplify( map->fsmap ) : NULL;
          sismap = ( map->ismap ) ? astSimplify( map->ismap ) : NULL;
          simp = ( sfsmap != map->fsmap ) || ( sismap != map->ismap );
-   
+
          srmap = astMalloc( sizeof( AstMapping * )*nroute );
          if( astOK ) {
             for( i = 0; i < nroute; i++ ) {
@@ -1086,9 +1086,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             }
          }
 
-/* If any simplification took place, construct a new SwitchMap from these 
+/* If any simplification took place, construct a new SwitchMap from these
     simplified Mappings. */
-         if( simp ) { 
+         if( simp ) {
             (void) astAnnul( ( *map_list )[ where ] );
             ( *map_list )[ where ] = (AstMapping *) astSwitchMap( sfsmap, sismap,
                                                     nroute, (void **) srmap, "", status );
@@ -1142,31 +1142,31 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 *     from the Mapping class ).
 
 *  Description:
-*     This function returns the rate of change of a specified output of 
-*     the supplied Mapping with respect to a specified input, at a 
+*     This function returns the rate of change of a specified output of
+*     the supplied Mapping with respect to a specified input, at a
 *     specified input position. Also evaluates the second derivative.
 
 *  Parameters:
 *     this
 *        Pointer to the Mapping to be applied.
 *     at
-*        The address of an array holding the axis values at the position 
-*        at which the rate of change is to be evaluated. The number of 
-*        elements in this array should equal the number of inputs to the 
+*        The address of an array holding the axis values at the position
+*        at which the rate of change is to be evaluated. The number of
+*        elements in this array should equal the number of inputs to the
 *        Mapping.
 *     ax1
-*        The index of the Mapping output for which the rate of change is to 
+*        The index of the Mapping output for which the rate of change is to
 *        be found (output numbering starts at 0 for the first output).
 *     ax2
 *        The index of the Mapping input which is to be varied in order to
-*        find the rate of change (input numbering starts at 0 for the first 
+*        find the rate of change (input numbering starts at 0 for the first
 *        input).
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The rate of change of Mapping output "ax1" with respect to input 
-*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     The rate of change of Mapping output "ax1" with respect to input
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be
 *     calculated.
 
 */
@@ -1190,9 +1190,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 /* Get a pointer to the SwitchMap structure. */
    map = (AstSwitchMap *) this;
 
-/* Get a pointer to the effective foward selector Mapping, and its current 
+/* Get a pointer to the effective foward selector Mapping, and its current
    invert flag (this takes account of whether the SwtichMap has been
-   inverted or not). This call resets the selector's invert flag temporarily 
+   inverted or not). This call resets the selector's invert flag temporarily
    back to the value it had when the SwitchMap was created. */
    smap = GetSelector( map, 1, &fsinv, status );
 
@@ -1219,7 +1219,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 /* Reset the Invert flag for the route Mapping. */
          astSetInvert( rmap, rinv );
       }
-   
+
 /* Reset the Invert flag for the selector Mapping. */
       astSetInvert( smap, fsinv );
    }
@@ -1248,12 +1248,12 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
 *     from the Mapping class).
 
 *  Description:
-*     This function searches the supplied Mapping (which may be a 
-*     compound Mapping such as a SwitchMap) for any component Mappings 
+*     This function searches the supplied Mapping (which may be a
+*     compound Mapping such as a SwitchMap) for any component Mappings
 *     that are instances of the AST Region class. It then creates a new
 *     Mapping from which all Regions have been removed. If a Region
 *     cannot simply be removed (for instance, if it is a component of a
-*     parallel SwitchMap), then it is replaced with an equivalent UnitMap 
+*     parallel SwitchMap), then it is replaced with an equivalent UnitMap
 *     in the returned Mapping.
 *
 *     The implementation provided by the SwitchMap class invokes the
@@ -1310,7 +1310,7 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
 
 /* The implementation of the astRemoveRegions method provided by the
    Region class returns a Frame rather than a UnitMap. But we need
-   Mappings here, not Frames. So if the new Mapping is a Frame, replace 
+   Mappings here, not Frames. So if the new Mapping is a Frame, replace
    it with an equivalent UnitMap. */
             if( astIsAFrame( temp[ i ] ) ) {
                nax = astGetNin( temp[ i ] );
@@ -1356,8 +1356,8 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
       if( ! changed ) {
          result = astClone( this );
 
-/* Otherwise, we need to create a new Mapping to return. We take a deep 
-   copy of the supplied SwitchMap and then modify the Mappings so that 
+/* Otherwise, we need to create a new Mapping to return. We take a deep
+   copy of the supplied SwitchMap and then modify the Mappings so that
    we retain any extra information in the supplied SwitchMap. */
       } else {
          new = astCopy( this );
@@ -1398,7 +1398,7 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
-int astSwitchList_( AstSwitchMap *this, int invert, int *nmap, 
+int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *+
@@ -1413,8 +1413,8 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     int astSwitchList( AstSwitchMap *this, int invert, int *nmap, 
-*                        AstMapping ***map_list, int **invert_list ) 
+*     int astSwitchList( AstSwitchMap *this, int invert, int *nmap,
+*                        AstMapping ***map_list, int **invert_list )
 
 *  Class Membership:
 *     SwitchMap member function.
@@ -1425,14 +1425,14 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 
 *  Parameters:
 *     this
-*        Pointer to the SwitchMap to be decomposed (it is not actually 
+*        Pointer to the SwitchMap to be decomposed (it is not actually
 *        modified by this function).
 *     invert
 *        The value to which the SwitchMap's Invert attribute is to be
-*        (notionally) set before performing the decomposition. Normally, 
-*        the value supplied here will be the actual Invert value obtained 
-*        from the SwitchMap (e.g. using astGetInvert).  Sometimes, however, 
-*        when a SwitchMap is encapsulated within another structure, that 
+*        (notionally) set before performing the decomposition. Normally,
+*        the value supplied here will be the actual Invert value obtained
+*        from the SwitchMap (e.g. using astGetInvert).  Sometimes, however,
+*        when a SwitchMap is encapsulated within another structure, that
 *        structure may retain an Invert value (in order to prevent external
 *        interference) which should be used instead.
 *
@@ -1444,15 +1444,15 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 *        ignored.
 *     map_list
 *        Address of a pointer to an array of Mapping pointers. The value
-*        supplied on entry is ignored. On exit, it points at a dynamically 
-*        allocated array containing Mapping pointers ("*nmap" in number) that 
-*        result from the decomposition requested. 
+*        supplied on entry is ignored. On exit, it points at a dynamically
+*        allocated array containing Mapping pointers ("*nmap" in number) that
+*        result from the decomposition requested.
 *
-*        The returned Mapping pointers returned will identify the following 
+*        The returned Mapping pointers returned will identify the following
 *        sequence of Mappings; forward selector mapping (or NULL if the
-*        SwitchMap has no forward selector Mapping), inverse selector 
+*        SwitchMap has no forward selector Mapping), inverse selector
 *        mapping (or NULL if the SwitchMap has no inverse selector Mapping),
-*        the route Mappings in the order they were supplied when the 
+*        the route Mappings in the order they were supplied when the
 *        SwitchMap was constructed.
 *
 *        All the Mapping pointers returned by this function should be
@@ -1460,10 +1460,10 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 *        required. The dynamic array holding these pointers should
 *        also be freed, using astFree.
 *     invert_list
-*        Address of a pointer to an array of int. The value supplied on 
-*        entry is ignored. On exit, it points at a dynamically allocated 
+*        Address of a pointer to an array of int. The value supplied on
+*        entry is ignored. On exit, it points at a dynamically allocated
 *        array containing Invert attribute values ("*nmap" in number) that
-*        result from the decomposition requested. 
+*        result from the decomposition requested.
 *
 *        The returned Invert values returned identify the values which must
 *        be assigned to the Invert attributes of the corresponding
@@ -1480,8 +1480,8 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 
 *  Notes:
 *     - It is unspecified to what extent the original SwitchMap and the
-*     individual (decomposed) Mappings are inter-dependent. Consequently, 
-*     the individual Mappings cannot be modified without risking 
+*     individual (decomposed) Mappings are inter-dependent. Consequently,
+*     the individual Mappings cannot be modified without risking
 *     modification of the original SwitchMap.
 *     - If this function is invoked with the global error status set,
 *     or if it should fail for any reason, then the *nmap value, the
@@ -1530,7 +1530,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 /* If the SwitchMap does not has a forward selector Mapping, return a
    NULL pointer. */
       } else {
-         ( *map_list )[ 0 ] = NULL;   
+         ( *map_list )[ 0 ] = NULL;
          ( *invert_list )[ 0 ] = 0;
       }
 
@@ -1541,7 +1541,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
          ( *invert_list )[ 1 ] = astGetInvert( map );
          astSetInvert( map, inv );
       } else {
-         ( *map_list )[ 1 ] = NULL;   
+         ( *map_list )[ 1 ] = NULL;
          ( *invert_list )[ 1 ] = 0;
       }
 
@@ -1551,9 +1551,9 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 /* Get the next route Mapping. */
          map = GetRoute( this, (double) i + 1.0, &inv, status );
 
-/* If the SwitchMap has a route Mapping for the current selector value, 
-   return a clone of the Mapping pointer, and the invert flag to be used 
-   with it, then re-instate the original invert flag value (which was 
+/* If the SwitchMap has a route Mapping for the current selector value,
+   return a clone of the Mapping pointer, and the invert flag to be used
+   with it, then re-instate the original invert flag value (which was
    modified by GetRoute). */
          if( map ) {
             ( *map_list )[ i + 2 ] = astClone( map );
@@ -1563,7 +1563,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 /* If the SwitchMap does not has a route Mapping for the current selector
    value, return a NULL pointer. */
          } else {
-            ( *map_list )[ i + 2 ] = NULL;   
+            ( *map_list )[ i + 2 ] = NULL;
             ( *invert_list )[ i + 2 ] = 0;
          }
 
@@ -1580,7 +1580,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
       *invert_list= astFree( *invert_list );
       result= 0;
       *nmap = 0;
-   } 
+   }
 
 /* Return the result */
    return result;
@@ -1643,7 +1643,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 */
 
 /* Local Variables: */
-   AstMapping *rmap;  
+   AstMapping *rmap;
    AstMapping *selmap;
    AstPointSet *ps1;
    AstPointSet *ps1a;
@@ -1651,7 +1651,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    AstPointSet *ps2a;
    AstPointSet *result;
    AstPointSet *selps;
-   AstSwitchMap *map;  
+   AstSwitchMap *map;
    double **in_ptr;
    double **out_ptr;
    double **ptr1;
@@ -1728,9 +1728,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             rindex = (int)( *sel + 0.5 ) - 1;
             if( rindex >= 0 && rindex < nroute ) ( popmap[ rindex ] )++;
          }
-      }   
+      }
 
-/* Find the number of points transformed by the most popular route Mapping. 
+/* Find the number of points transformed by the most popular route Mapping.
    Also find the total number of points transformed by any route Mapping. */
       totpop = 0;
       maxpop = 0;
@@ -1792,7 +1792,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         k++;
                      }
                   }
-               }   
+               }
 
 /* Use the route Mapping to transform this PointSet. */
                (void) astTransform( rmap, ps1a, forward, ps2a );
@@ -1810,7 +1810,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         }
                         k++;
                      }
-                  }   
+                  }
                }
 
 /* Free resources. */
@@ -1960,7 +1960,7 @@ static void Delete( AstObject *obj, int *status ) {
    if( this->ismap ) this->ismap = astAnnul( this->ismap );
    for( i = 0; i < this->nroute; i++ ) {
       this->routemap[ i ] = astAnnul( this->routemap[ i ] );
-   }   
+   }
    this->routemap = astFree( this->routemap );
    this->routeinv = astFree( this->routeinv );
 
@@ -2001,10 +2001,10 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Local Variables: */
    AstSwitchMap *this;
-   int ival;          
-   int set;           
+   int ival;
+   int set;
    int i;
-   char buf[ 20 ];    
+   char buf[ 20 ];
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2031,7 +2031,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Forward selector Mapping */
 /* ------------------------ */
    if( this->fsmap ) {
-      astWriteObject( channel, "FSMap", 1, 1, this->fsmap, 
+      astWriteObject( channel, "FSMap", 1, 1, this->fsmap,
                       "Forward selector Mapping" );
 
 /* Forward selector Invert flag. */
@@ -2047,7 +2047,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Inverse selector Mapping */
 /* ------------------------ */
    if( this->ismap ) {
-      astWriteObject( channel, "ISMap", 1, 1, this->ismap, 
+      astWriteObject( channel, "ISMap", 1, 1, this->ismap,
                       "Inverse selector Mapping" );
 
 /* Forward selector Invert flag. */
@@ -2063,9 +2063,9 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ---------------------------------------------------- */
    for( i = 0; i < this->nroute; i++ ) {
       sprintf( buf, "RMap%d", i + 1 );
-      astWriteObject( channel, buf, 1, 1, this->routemap[ i ], 
+      astWriteObject( channel, buf, 1, 1, this->routemap[ i ],
                       "Route Mapping" );
-     
+
       ival = this->routeinv[ i ];
       set = ( ival != 0 );
       sprintf( buf, "RInv%d", i + 1 );
@@ -2083,7 +2083,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(SwitchMap,Mapping)
 astMAKE_CHECK(SwitchMap)
 
-AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute, 
+AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
                              void **routemaps_void, const char *options, int *status, ...) {
 /*
 *+
@@ -2111,9 +2111,9 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
 
 *  Parameters:
 *     fsmap
-*        Pointer to the forward selector Mapping 
+*        Pointer to the forward selector Mapping
 *     ismap
-*        Pointer to the inverse selector Mapping 
+*        Pointer to the inverse selector Mapping
 *     nroute
 *        The number of route Mappings.
 *     routemaps
@@ -2172,7 +2172,7 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
 
 /* Report an error if no route Mappings have been supplied. */
    if( nroute <= 0 ) astError( AST__BDPAR, "astSwitchMap(SwitchMap): "
-                               "Bad number of route Mappings (%d) specified.", status, 
+                               "Bad number of route Mappings (%d) specified.", status,
                                nroute );
 
 /* Otherwise create an array to hold the route Mapping pointers. */
@@ -2218,7 +2218,7 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
    return new;
 }
 
-AstSwitchMap *astSwitchMapId_( void *fsmap_void, void *ismap_void, int nroute, 
+AstSwitchMap *astSwitchMapId_( void *fsmap_void, void *ismap_void, int nroute,
                                void **routemaps_void, const char *options, ... ) {
 /*
 *++
@@ -2237,7 +2237,7 @@ c     #include "switchmap.h"
 c     AstSwitchMap *astSwitchMap( AstMapping *fsmap, AstMapping *ismap,
 c                                 int nroute, AstMapping *routemaps[],
 c                                 const char *options, ... )
-f     RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, OPTIONS, 
+f     RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, OPTIONS,
 f                             STATUS )
 
 *  Class Membership:
@@ -2248,64 +2248,64 @@ f                             STATUS )
 *     its attributes.
 *
 *     A SwitchMap is a Mapping which represents a set of alternate
-*     Mappings, each of which is used to transform positions within a 
-*     particular region of the input or output coordinate system of the 
+*     Mappings, each of which is used to transform positions within a
+*     particular region of the input or output coordinate system of the
 *     SwitchMap.
-*     
+*
 *     A SwitchMap can encapsulate any number of Mappings, but they must
-*     all have the same number of inputs (Nin attribute value) and the 
-*     same number of outputs (Nout attribute value). The SwitchMap itself 
+*     all have the same number of inputs (Nin attribute value) and the
+*     same number of outputs (Nout attribute value). The SwitchMap itself
 *     inherits these same values for its Nin and Nout attributes. Each of
 *     these Mappings represents a "route" through the switch, and are
-*     referred to as "route" Mappings below. Each route Mapping transforms 
-*     positions between the input and output coordinate space of the entire 
+*     referred to as "route" Mappings below. Each route Mapping transforms
+*     positions between the input and output coordinate space of the entire
 *     SwitchMap, but only one Mapping will be used to transform any given
-*     position. The selection of the appropriate route Mapping to use with 
+*     position. The selection of the appropriate route Mapping to use with
 *     any given input position is made by another Mapping, called the
 *     "selector" Mapping. Each SwitchMap encapsulates two selector
 *     Mappings in addition to its route Mappings; one for use with the
 *     SwitchMap's forward transformation (called the "forward selector
-*     Mapping"), and one for use with the SwitchMap's inverse transformation 
+*     Mapping"), and one for use with the SwitchMap's inverse transformation
 *     (called the "inverse selector Mapping"). The forward selector Mapping
 *     must have the same number of inputs as the route Mappings, but
 *     should have only one output. Likewise, the inverse selector Mapping
 *     must have the same number of outputs as the route Mappings, but
-*     should have only one input. 
+*     should have only one input.
 *
 *     When the SwitchMap is used to transform a position in the forward
 *     direction (from input to output), each supplied input position is
-*     first transformed by the forward transformation of the forward selector 
-*     Mapping. This produces a single output value for each input position 
-*     referred to as the selector value. The nearest integer to the selector 
-*     value is found, and is used to index the array of route Mappings (the 
-*     first supplied route Mapping has index 1, the second route Mapping has 
-*     index 2, etc). If the nearest integer to the selector value is less 
-*     than 1 or greater than the number of route Mappings, then the SwitchMap 
-*     output position is set to a value of AST__BAD on every axis. Otherwise, 
-*     the forward transformation of the selected route Mapping is used to 
-*     transform the supplied input position to produce the SwitchMap output 
-*     position. 
+*     first transformed by the forward transformation of the forward selector
+*     Mapping. This produces a single output value for each input position
+*     referred to as the selector value. The nearest integer to the selector
+*     value is found, and is used to index the array of route Mappings (the
+*     first supplied route Mapping has index 1, the second route Mapping has
+*     index 2, etc). If the nearest integer to the selector value is less
+*     than 1 or greater than the number of route Mappings, then the SwitchMap
+*     output position is set to a value of AST__BAD on every axis. Otherwise,
+*     the forward transformation of the selected route Mapping is used to
+*     transform the supplied input position to produce the SwitchMap output
+*     position.
 *
 *     When the SwitchMap is used to transform a position in the inverse
-*     direction (from "output" to "input"), each supplied "output" position 
-*     is first transformed by the inverse transformation of the inverse 
-*     selector Mapping. This produces a selector value for each "output" 
-*     position. Again, the nearest integer to the selector value is found, 
-*     and is used to index the array of route Mappings. If this selector 
-*     index value is within the bounds of the array of route Mappings, then 
-*     the inverse transformation of the selected route Mapping is used to 
-*     transform the supplied "output" position to produce the SwitchMap 
-*     "input" position. If the selector index value is outside the bounds 
-*     of the array of route Mappings, then the SwitchMap "input" position is 
-*     set to a value of AST__BAD on every axis. 
+*     direction (from "output" to "input"), each supplied "output" position
+*     is first transformed by the inverse transformation of the inverse
+*     selector Mapping. This produces a selector value for each "output"
+*     position. Again, the nearest integer to the selector value is found,
+*     and is used to index the array of route Mappings. If this selector
+*     index value is within the bounds of the array of route Mappings, then
+*     the inverse transformation of the selected route Mapping is used to
+*     transform the supplied "output" position to produce the SwitchMap
+*     "input" position. If the selector index value is outside the bounds
+*     of the array of route Mappings, then the SwitchMap "input" position is
+*     set to a value of AST__BAD on every axis.
 *
 *     In practice, appropriate selector Mappings should be chosen to
-*     associate a different route Mapping with each region of coordinate 
-*     space. Note that the SelectorMap class of Mapping is particularly 
+*     associate a different route Mapping with each region of coordinate
+*     space. Note that the SelectorMap class of Mapping is particularly
 *     appropriate for this purpose.
 *
 *     If a compound Mapping contains a SwitchMap in series with its own
-*     inverse, the combination of the two adjacent SwitchMaps will be 
+*     inverse, the combination of the two adjacent SwitchMaps will be
 *     replaced by a UnitMap when the compound Mapping is simplified using
 c     astSimplify.
 f     AST_SIMPLIFY.
@@ -2316,22 +2316,22 @@ f     FSMAP = INTEGER (Given)
 *        Pointer to the forward selector Mapping. This must have a
 *        defined forward transformation, but need not have a defined
 *        inverse transformation. It must have one output, and the number of
-*        inputs must match the number of inputs of each of the supplied 
+*        inputs must match the number of inputs of each of the supplied
 *        route Mappings.
 c        NULL
 f        AST__NULL
-*        may be supplied, in which case the SwitchMap will have an undefined 
+*        may be supplied, in which case the SwitchMap will have an undefined
 *        forward Mapping.
 c     ismap
 f     ISMAP = INTEGER (Given)
 *        Pointer to the inverse selector Mapping. This must have a
 *        defined inverse transformation, but need not have a defined
 *        forward transformation. It must have one input, and the number of
-*        outputs must match the number of outputs of each of the supplied 
+*        outputs must match the number of outputs of each of the supplied
 *        route Mappings.
 c        NULL
 f        AST__NULL
-*        may be supplied, in which case the SwitchMap will have an undefined 
+*        may be supplied, in which case the SwitchMap will have an undefined
 *        inverse Mapping.
 c     nroute
 f     NROUTE = INTEGER (Given)
@@ -2339,7 +2339,7 @@ f     NROUTE = INTEGER (Given)
 c     routemaps
 f     ROUTEMAPS( NROUTE ) = INTEGER (Given)
 *        An array of pointers to the route Mappings. All the supplied
-*        route Mappings must have common values for the Nin and Nout 
+*        route Mappings must have common values for the Nin and Nout
 *        attributes, and these values define the number of inputs and
 *        outputs of the SwitchMap.
 c     options
@@ -2429,7 +2429,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Report an error if no route Mappings have been supplied. */
    if( nroute <= 0 ) astError( AST__BDPAR, "astSwitchMap(SwitchMap): "
-                               " Bad number of route Mappings (%d) specified.", status, 
+                               " Bad number of route Mappings (%d) specified.", status,
                                nroute );
 
 /* Otherwise create an array to hold the route Mapping pointers. */
@@ -2571,19 +2571,19 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
    nin = astGetNin( routemaps[ 0 ] );
    nout = astGetNout( routemaps[ 0 ] );
    for( i = 1; i < nroute; i++ ) {
-      if( nin != astGetNin( routemaps[ i ] ) ){ 
+      if( nin != astGetNin( routemaps[ i ] ) ){
          if( astOK ) {
             astError( AST__BADNI, "astInitSwitchMap(%s): Route Mapping "
                       "number %d has %d input(s) but the first route "
-                      "Mapping has %d input(s).", status, name, i + 1, 
+                      "Mapping has %d input(s).", status, name, i + 1,
                       astGetNin( routemaps[ i ] ), nin );
          }
 
-      } else if( nout != astGetNout( routemaps[ i ] ) ){ 
+      } else if( nout != astGetNout( routemaps[ i ] ) ){
          if( astOK ) {
             astError( AST__BADNO, "astInitSwitchMap(%s): Route Mapping "
                       "number %d has %d output(s) but the first route "
-                      "Mapping has %d output(s).", status, name, i + 1, 
+                      "Mapping has %d output(s).", status, name, i + 1,
                       astGetNin( routemaps[ i ] ), nin );
          }
       }
@@ -2597,14 +2597,14 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
               "is not able to transform coordinates in the forward direction.", status,
               name );
 
-      } else if( astGetNin( fsmap ) != nin ){ 
+      } else if( astGetNin( fsmap ) != nin ){
          astError( AST__BADNI, "astInitSwitchMap(%s): The forward selector "
                    "Mapping has %d input(s) but the SwitchMap has %d "
                    "input(s).", status, name, astGetNin( fsmap ), nin );
 
-      } else if( astGetNout( fsmap ) != 1 ){ 
+      } else if( astGetNout( fsmap ) != 1 ){
          astError( AST__BADNO, "astInitSwitchMap(%s): The forward selector "
-                   "Mapping has %d outputs but should only have 1.", status, name, 
+                   "Mapping has %d outputs but should only have 1.", status, name,
                    astGetNout( fsmap ) );
       }
    }
@@ -2616,14 +2616,14 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
          astError( AST__INTRD, "astInitSwitchMap(%s): The inverse selector Mapping "
               "is not able to transform coordinates in the inverse direction.", status,
               name );
-      } else if( nout != astGetNout( ismap ) ){ 
+      } else if( nout != astGetNout( ismap ) ){
          astError( AST__BADNO, "astInitSwitchMap(%s): The inverse selector "
                    "Mapping has %d output(s) but the SwitchMap has %d "
                    "output(s).", status, name, astGetNout( ismap ), nout );
 
-      } else if( astGetNin( ismap ) != 1 ){ 
+      } else if( astGetNin( ismap ) != 1 ){
          astError( AST__BADNI, "astInitSwitchMap(%s): The inverse selector "
-                   "Mapping has %d inputs but should only have 1.", status, name, 
+                   "Mapping has %d inputs but should only have 1.", status, name,
                    astGetNin( ismap ) );
 
       }
@@ -2640,9 +2640,9 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
    the number of input and output coordinates and in which directions the
    Mapping should be defined. */
    if ( astOK ) {
-      new = (AstSwitchMap *) astInitMapping( mem, size, 0, 
+      new = (AstSwitchMap *) astInitMapping( mem, size, 0,
                                              (AstMappingVtab *) vtab, name,
-                                             nin, nout, 
+                                             nin, nout,
                                              ( fsmap != NULL ),
                                              ( ismap != NULL ) );
       if ( astOK ) {
@@ -2759,7 +2759,7 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
-   AstSwitchMap *new;               
+   AstSwitchMap *new;
    AstMapping *rmap;
    int i;
    char buf[ 20 ];

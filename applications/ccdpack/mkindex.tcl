@@ -63,12 +63,12 @@
 
 #  Local constants:
       set exclude_files {
-         CCDMain.tcl 
+         CCDMain.tcl
          CCDGeometryMain.tcl
          CCDFileMonitorMain.tcl
          CCDBindings.tcl
          CCDOptions.tcl
-         mkindex.tcl 
+         mkindex.tcl
          ccdalign.tcl
          idicurs.tcl
          pairndf.tcl
@@ -79,7 +79,7 @@
          ccdpack_scr.tcl
       }
 
-#  Withdraw the top level window for tidiness.  A secondary purpose of 
+#  Withdraw the top level window for tidiness.  A secondary purpose of
 #  this is that if wish graphical initialisation fails (which will
 #  happen if $DISPLAY is not set properly, and which would cause the
 #  index file to be written in a deficient way), this call will fail
@@ -108,7 +108,7 @@
          lappend exclude_files itcl.tcl itk.tcl
       }
 
-#  Generate a list of the .tcl files to use; all of them apart from 
+#  Generate a list of the .tcl files to use; all of them apart from
 #  named exceptions.
       foreach file $files {
          if { [lsearch -exact $exclude_files $file] == -1 } {

@@ -75,7 +75,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-	
+
 *  External References:
       INTEGER CHR_LEN            ! Length of as character string
                                  ! excluding trailing blanks
@@ -119,7 +119,7 @@
       NAMLEN = CHR_LEN( FNAME )
       CALL CHR_MOVE( FNAME, DATFIL )
       CALL CHR_MOVE( '.dat', DATFIL( NAMLEN+1: ) )
-      
+
       CALL CHR_MOVE( FNAME, HDRFIL )
       CALL CHR_MOVE( '.hdr', HDRFIL( NAMLEN+1: ) )
 
@@ -185,7 +185,7 @@
 *  Write the array to the GASP image file.
          WRITE( UNIT, REC=J, IOSTAT=IOVAL ) ( ARRAY( I, J ),
      :                                        I = 1, EWIDTH )
-      
+
 *  Make a contextual error report.
          IF ( IOVAL .NE. 0 ) THEN
             STATUS = SAI__ERROR

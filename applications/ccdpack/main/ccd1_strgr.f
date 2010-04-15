@@ -41,7 +41,7 @@
 *        The global status.
 
 *  Notes:
-*     - the routine uses the default GRP flag character '-' for 
+*     - the routine uses the default GRP flag character '-' for
 *     continuation to force reprompting.
 
 *  Copyright:
@@ -132,7 +132,7 @@
 
 *  Get the user return.
          TERM = .FALSE.
-         CALL GRP_GROUP( NAME, INGRP, OUTGRP, NRET, ADDED, TERM, 
+         CALL GRP_GROUP( NAME, INGRP, OUTGRP, NRET, ADDED, TERM,
      :                   STATUS )
 
 *  Get out if a null return has been given or a PAR__ABORT. Also quit

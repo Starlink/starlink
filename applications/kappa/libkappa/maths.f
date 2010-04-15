@@ -124,7 +124,7 @@
 *     TYPE = LITERAL (Read)
 *        Data type for the new NDF, if LIKE=! and no input NDFs are
 *        referenced in the expression.  It must be one either
-*        "_DOUBLE" or "_REAL". 
+*        "_DOUBLE" or "_REAL".
 *     UBOUND( ) = _INTEGER (Read)
 *        Upper bounds of new NDF, if LIKE=! and there is no input NDF
 *        referenced in the expression.  These must not be smaller
@@ -365,7 +365,7 @@
 *        sub-expressions could not contain these array tokens.
 *     1999 May 4 (TDCA):
 *        Fixed bug in the way _DOUBLE variance arrays are copied into
-*        the work arrays: now behaves as for _REAL data. 
+*        the work arrays: now behaves as for _REAL data.
 *     24-SEP-2002 (DSB):
 *        Correct "variance supplied" flags passed to KPG1_METHE.
 *     2004 September 3 (TIMJ):
@@ -416,7 +416,7 @@
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Data type for output array(s)
       INTEGER EL                 ! Number of pixels to process
       CHARACTER * ( 2 * LEXP ) EXPRS ! Expression to evaluate
-      LOGICAL EXVAR              ! Expression has NDF variance token? 
+      LOGICAL EXVAR              ! Expression has NDF variance token?
       CHARACTER * ( 2 * LEXP + 4 ) FOR( 1 ) ! TRANSFORM forward function
       INTEGER I                  ! Loop counter for input NDFs/params
       INTEGER IMAP               ! Compiled mapping identifier
@@ -446,7 +446,7 @@
       LOGICAL QUICK              ! Estimate output variance quickly?
       INTEGER STRIDE             ! Number of array elements between
                                  ! increments of co-ordinates
-      CHARACTER * ( 2 ) TOKNAM( MXIN ) ! List of NDF-based tokens 
+      CHARACTER * ( 2 ) TOKNAM( MXIN ) ! List of NDF-based tokens
                                  ! referenced
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL UNITS              ! Propagate units component?
@@ -475,7 +475,7 @@
       CALL CHR_UCASE( EXPRS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Substitute any sub-expression (FA-FZ) tokens in the expression. 
+*  Substitute any sub-expression (FA-FZ) tokens in the expression.
 *  These may contain other tokens, such as those for data arrays,
 *  co-ordinates, and constants, hence FA-FZ tokens must be expanded
 *  before other tokens  are evaluated.
@@ -588,7 +588,7 @@
          CALL MSG_SETI( 'MAX', MAXNIN )
          CALL MSG_SETI( 'N', NINTOT )
          CALL ERR_REP( 'MATHS_ERR', 'Too many arrays (^N) referenced '//
-     :                 'in the expression. Maximum allowed is ^MAX.', 
+     :                 'in the expression. Maximum allowed is ^MAX.',
      :                 STATUS )
          GO TO 999
       END IF
@@ -610,7 +610,7 @@
      :     /'from which to obtain them.', STATUS )
          GOTO 999
       END IF
-         
+
 *  Form the forward transformation function and create a temporary
 *  transformation structure.
       FOR( 1 ) = 'OUT=' // EXPRS( : NC )
@@ -787,7 +787,7 @@
 *  Create an output NDF using the supplied template, propagating the
 *  data and axis arrays, the title, label, WCS and history.
             IF ( UNITS ) THEN
-               CALL LPG_PROP( LIKEID, 'Data,Units,Axis,WCS', 'OUT', 
+               CALL LPG_PROP( LIKEID, 'Data,Units,Axis,WCS', 'OUT',
      :                        NDFOUT, STATUS )
             ELSE
                CALL LPG_PROP( LIKEID, 'Data,Axis,WCS', 'OUT', NDFOUT,
@@ -875,9 +875,9 @@
 *  Copy the data array into work space when it is in the expression.
                IF ( INDEX( NDFCMP( I ), 'D' ) .NE. 0 ) THEN
                   J = J + 1
-                  CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+                  CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                             J,
-     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ),
      :                             STATUS )
                   VFLAG( J ) = VARI( I )
                END IF
@@ -885,9 +885,9 @@
 *  Copy the variance array into work space when it is in the expression.
                IF ( INDEX( NDFCMP( I ), 'V' ) .NE. 0 ) THEN
                   J = J + 1
-                  CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+                  CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                             J,
-     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ),
      :                             STATUS )
                   VFLAG( J ) = .FALSE.
                END IF
@@ -897,9 +897,9 @@
 *  account of input NDFs which may not have variance information.
                IF ( VARI( I ) ) THEN
                   IVAR = IVAR + 1
-                  CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+                  CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                             IVAR,
-     :                             %VAL( CNF_PVAL( PNTRW( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRW( 2 ) ) ),
      :                             STATUS )
                END IF
 
@@ -910,9 +910,9 @@
 *  Copy the data array into work space when it is in the expression.
                IF ( INDEX( NDFCMP( I ), 'D' ) .NE. 0 ) THEN
                   J = J + 1
-                  CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+                  CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                             J,
-     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ),
      :                             STATUS )
                   VFLAG( J ) = VARI( I )
                END IF
@@ -920,9 +920,9 @@
 *  Copy the variance array into work space when it is in the expression.
                IF ( INDEX( NDFCMP( I ), 'V' ) .NE. 0 ) THEN
                   J = J + 1
-                  CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+                  CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                             J,
-     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRW( 1 ) ) ),
      :                             STATUS )
                   VFLAG( J ) = .FALSE.
                END IF
@@ -932,9 +932,9 @@
 *  account of input NDFs which may not have variance information.
                IF ( VARI( I ) ) THEN
                   IVAR = IVAR + 1
-                  CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+                  CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                             IVAR,
-     :                             %VAL( CNF_PVAL( PNTRW( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRW( 2 ) ) ),
      :                             STATUS )
                END IF
 
@@ -975,12 +975,12 @@
 
 *  Create a vector of co-ordinates.
                CALL KPG1_SSAZR( AEL, 1.0D0, DBLE( LBND( I ) ) - 0.5D0,
-     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STATUS )
 
 *  Fill the full array with co-ordinates as appropriate for the
 *  dimension.
-               CALL KPS1_MTHCR( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+               CALL KPS1_MTHCR( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STRIDE, EL,
      :                          %VAL( CNF_PVAL( PNTRW( 3 ) ) ), STATUS )
 
@@ -1014,12 +1014,12 @@
 
 *  Create a vector of co-ordinates.
                CALL KPG1_SSAZD( AEL, 1.0D0, DBLE( LBND( I ) ) - 0.5D0,
-     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STATUS )
 
 *  Fill the full array with co-ordinates as appropriate for the
 *  dimension.
-               CALL KPS1_MTHCD( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+               CALL KPS1_MTHCD( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STRIDE, EL,
      :                          %VAL( CNF_PVAL( PNTRW( 3 ) ) ), STATUS )
 
@@ -1036,7 +1036,7 @@
 *  Release the full-sized co-ordinate workspace.
          CALL PSX_FREE( PNTRW( 3 ), STATUS )
 
-      END IF 
+      END IF
 
 *  Fill data co-ordinate arrays.
 *  =============================
@@ -1065,7 +1065,7 @@
 
 *  Fill the full array with co-ordinates as appropriate for the
 *  dimension.
-               CALL KPS1_MTHCR( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+               CALL KPS1_MTHCR( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STRIDE, EL,
      :                          %VAL( CNF_PVAL( PNTRW( 3 ) ) ), STATUS )
 
@@ -1098,7 +1098,7 @@
 
 *  Fill the full array with co-ordinates as appropriate for the
 *  dimension.
-               CALL KPS1_MTHCD( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+               CALL KPS1_MTHCD( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                          STRIDE, EL,
      :                          %VAL( CNF_PVAL( PNTRW( 3 ) ) ), STATUS )
 
@@ -1116,7 +1116,7 @@
 *  Release the full-sized co-ordinate workspace.
          CALL PSX_FREE( PNTRW( 3 ), STATUS )
 
-      END IF 
+      END IF
 
 *  Map the output arrays for writing.
       CALL KPG1_MAP( NDFOUT, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
@@ -1130,15 +1130,15 @@
 *  using the appropriate type of arithmetic.
       IF ( .NOT. VAR ) THEN
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL TRN_TRNR( BAD, EL, NINTOT, EL, 
+            CALL TRN_TRNR( BAD, EL, NINTOT, EL,
      :                     %VAL( CNF_PVAL( PNTRW( 1 ) ) ),
-     :                     IMAP, EL, 1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     IMAP, EL, 1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL TRN_TRND( BAD, EL, NINTOT, EL, 
+            CALL TRN_TRND( BAD, EL, NINTOT, EL,
      :                     %VAL( CNF_PVAL( PNTRW( 1 ) ) ),
-     :                     IMAP, EL, 1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     IMAP, EL, 1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     STATUS )
          END IF
 
@@ -1152,23 +1152,23 @@
 *  evaluate output variance estimates, depending on the type of
 *  arithmetic required.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_MTHER( BAD, EL, NINTOT, 
+            CALL KPG1_MTHER( BAD, EL, NINTOT,
      :                       %VAL( CNF_PVAL( PNTRW( 1 ) ) ), VFLAG,
-     :                       %VAL( CNF_PVAL( PNTRW( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRW( 2 ) ) ),
      :                       IMAP, QUICK, MXBAT,
-     :                       %VAL( CNF_PVAL( PNTRB ) ), 
+     :                       %VAL( CNF_PVAL( PNTRB ) ),
      :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       BADDR, BADVR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_MTHED( BAD, EL, NINTOT, 
+            CALL KPG1_MTHED( BAD, EL, NINTOT,
      :                       %VAL( CNF_PVAL( PNTRW( 1 ) ) ), VFLAG,
-     :                       %VAL( CNF_PVAL( PNTRW( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRW( 2 ) ) ),
      :                       IMAP, QUICK, MXBAT,
-     :                       %VAL( CNF_PVAL( PNTRB ) ), 
+     :                       %VAL( CNF_PVAL( PNTRB ) ),
      :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       BADDR, BADVR, STATUS )
          END IF
 

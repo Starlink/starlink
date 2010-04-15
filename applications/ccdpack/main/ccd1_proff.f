@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_PROFF( NN, USE, XOFF, YOFF, FRAMES, USEFRM, 
+      SUBROUTINE CCD1_PROFF( NN, USE, XOFF, YOFF, FRAMES, USEFRM,
      :                       STATUS )
 *+
 *  Name:
@@ -17,7 +17,7 @@
 *     This routine prints out a set of X and Y offsets.  Output is only
 *     made for the pairs for which the logical array USE is true.  If
 *     USEFRM is set TRUE then output will be in a format determined by
-*     frame in question (using AST_FORMAT, so determined by the 
+*     frame in question (using AST_FORMAT, so determined by the
 *     Format(axis) attributes of the frame).  If the USEFRM
 *     argument is .FALSE. then output will simply be in pixels.
 
@@ -31,10 +31,10 @@
 *     YOFF( NN ) = DOUBLE PRECISION (Given)
 *        The Y offsets to be output.
 *     FRAMES( NN ) = INTEGER (Given)
-*        AST pointers to the Frame in which the offsets are given (not 
+*        AST pointers to the Frame in which the offsets are given (not
 *        accessed if USEFRM is FALSE).
 *     USEFRM = LOGICAL (Given)
-*        If TRUE, output coordinates as per FRAMES, otherwise output in 
+*        If TRUE, output coordinates as per FRAMES, otherwise output in
 *        pixels.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,10 +118,10 @@
 *  Write a header about the units.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       IF ( USEFRM ) THEN
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :'  Approximate offsets in image Current coordinates:', STATUS )
       ELSE
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :'  Approximate offsets in pixels:', STATUS )
       END IF
 
@@ -154,7 +154,7 @@
             BUFFER( YS: ) = YSTR
             CALL CCD1_MSG( ' ', BUFFER, STATUS )
          END IF
-      END DO 
+      END DO
 
       END
 * $Id$

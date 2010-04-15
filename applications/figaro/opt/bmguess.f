@@ -68,9 +68,9 @@
 *    "  20/9/91 Made single precision almost completely
 *    " 2/12/91 All workspace passed as WORK array (PTR1 removed)
 *    " 9,12/6/92 Minor improvements
-*    " 31/7/92 Now handles all lines as emission, converting at start 
+*    " 31/7/92 Now handles all lines as emission, converting at start
 *              and end. This avoids large numbers of if statements.
-*    " 17/8/92 Accept funct as argument, so can deal with different 
+*    " 17/8/92 Accept funct as argument, so can deal with different
 *              models.
 *    " 21/8/92 Use opt_cmn/dynamic_mem
 *  TNW: 28th June 1993, reflect changes in opt_cmn

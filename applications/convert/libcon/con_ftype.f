@@ -95,7 +95,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,7 +169,7 @@
 
 *  Get the blank data value.
 *  =========================
-*       
+*
 *  Start new error context.
          CALL ERR_MARK
 
@@ -214,7 +214,7 @@
             END IF
          END IF
 
-*  Release the error context.      
+*  Release the error context.
          CALL ERR_RLSE
 
 *  By definition the BLANK card should be ignored for floating-point

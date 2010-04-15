@@ -1,15 +1,15 @@
-	SUBROUTINE MED3D_SCALING( WDIMSX, WDIMSY, WDIMSZ, WORK, 
-     :	                          DIMSX, DIMSY, COUNTER, XST, XSZ, 
+	SUBROUTINE MED3D_SCALING( WDIMSX, WDIMSY, WDIMSZ, WORK,
+     :	                          DIMSX, DIMSY, COUNTER, XST, XSZ,
      :	                          YST, YSZ)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER WDIMSX, WDIMSY, WDIMSZ, DIMSX, DIMSY, COUNTER, J, K, 
+	INTEGER WDIMSX, WDIMSY, WDIMSZ, DIMSX, DIMSY, COUNTER, J, K,
      :	        I, N, STATUS, XST, XSZ, YST, YSZ, NPIX, XEN, YEN
 
-	REAL WORK( WDIMSX, WDIMSY, WDIMSZ), VALMIN, VALMAX, SUM, 
+	REAL WORK( WDIMSX, WDIMSY, WDIMSZ), VALMIN, VALMAX, SUM,
      :	     MEAN, MEDIAN, MODE, TOLERANCE
 
 	REAL*8 ACTDATA( 65536), TEMP( 256), SCALVAL( 256)
@@ -19,7 +19,7 @@
 *      define tolerance on real comparisons
 	TOLERANCE = 1.0E-10
 
-*      calculate the x,y start,end pixels and number of pixels in the scaling 
+*      calculate the x,y start,end pixels and number of pixels in the scaling
 *      box
 	XEN = XST + XSZ - 1
 	YEN = YST + YSZ - 1
@@ -71,10 +71,10 @@
 	  CALL PDA_QSAD( N, ACTDATA )
 
 *        call subroutine to find median for the input ACTDATA
-	  CALL MED3D_CALMEDSUB( N, ACTDATA, VALMAX, VALMIN, SUM, MEAN, 
+	  CALL MED3D_CALMEDSUB( N, ACTDATA, VALMAX, VALMIN, SUM, MEAN,
      :	                        MEDIAN, MODE)
 
-*        store the median value for subsequent scaling 
+*        store the median value for subsequent scaling
 	  SCALVAL( I) = MEDIAN
 
 *        tell user the median value for current image
@@ -96,12 +96,12 @@
 *      calculate the median of the set of median values calculated above
 	CALL PDA_QSAD( COUNTER, SCALVAL )
 
-	CALL MED3D_CALMEDSUB( COUNTER, SCALVAL, VALMAX, VALMIN, SUM, MEAN, 
+	CALL MED3D_CALMEDSUB( COUNTER, SCALVAL, VALMAX, VALMIN, SUM, MEAN,
      :	                      MEDIAN, MODE)
 
 *      tell user the median of the median values
 	CALL MSG_SETR( 'MED', MEDIAN)
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :	  'Median of median values from scaling area = ^MED',
      :	  STATUS)
 
@@ -116,7 +116,7 @@
 
 	END IF
 
-*      scan thorugh all images and scale with respect to the median of the 
+*      scan thorugh all images and scale with respect to the median of the
 *      median values caluculated
 	DO I = 1, COUNTER
 
@@ -126,7 +126,7 @@
 	  IF( ABS( SCALVAL( I)) .LT. TOLERANCE) THEN
 
 	    CALL MSG_OUT( 'MESSAGE',
-     :	      '   SCALVAL < 1.0E-10 ... set it to 1.0E-10 ...', 
+     :	      '   SCALVAL < 1.0E-10 ... set it to 1.0E-10 ...',
      :	      STATUS)
 
 	    SCALVAL( I) = 1.0E-10

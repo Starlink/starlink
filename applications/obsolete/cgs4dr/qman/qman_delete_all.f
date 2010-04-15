@@ -23,9 +23,9 @@
 *   Return immediately if status bad.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Delete all records 
+*   Delete all records
       CALL MSG_OUT( ' ', 'Deleting all queue entries', STATUS )
-      CALL QMAN_INIT_POINTERS( STATUS ) 
+      CALL QMAN_INIT_POINTERS( STATUS )
 
 *    Exit subroutine
       END

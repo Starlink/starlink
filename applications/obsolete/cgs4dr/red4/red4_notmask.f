@@ -7,7 +7,7 @@
 *     GOOD, and vice versa.
 *    Invocation :
 *      CALL RED4_NOTMASK( DIM1, DIM2, INPUT, OUTPUT, STATUS )
-*    Parameters 
+*    Parameters
 *     DIM1                  = INTEGER( READ )
 *           First dimension of the arrays
 *     DIM2                  = INTEGER( READ )

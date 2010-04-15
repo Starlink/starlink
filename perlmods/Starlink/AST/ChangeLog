@@ -1,11 +1,11 @@
 2007-07-24  Light Of My Life  <tjenness@cpan.org>
 
-	* AST.pm: Add TimeFrame and TimeMap 
+	* AST.pm: Add TimeFrame and TimeMap
 	* AST.xs: Add TimeFrame and TimeMap
 
 2007-01-30  Tim Jenness  <tjenness@cpan.org>
 
-	* AST.xs: Fix region handling and add Polygon and Interval. 
+	* AST.xs: Fix region handling and add Polygon and Interval.
 
 2006-04-10  Tim Jenness  <tjenness@cpan.org>
 
@@ -22,14 +22,14 @@
 	* AST.xs: For older AST (pre v4.0) a fortran compiler is required
 	for linking against fortran SLA. Some compilers require a dummy
 	MAIN_ definition (g95 on OS X).
-	
+
 2005-09-07  Tim Jenness  <tjenness@cpan.org>
 
-	* AST.xs: Add astTranP support. 
+	* AST.xs: Add astTranP support.
 
 	* arrays.c: Add nelem1D function to easily count size of input array
 	regardless of ref to AV vs glob
-	
+
 2005-09-06  Tim Jenness  <tjenness@cpan.org>
 
 	* AST.pm (PickAxes): Now uses context to determine whether just
@@ -64,13 +64,13 @@
 	---- RELEASE v0.03 to CPAN ----
 
 	* AST.xs: Add Region support (including Box, Circle and Ellipse)
-	
+
 	* AST.xs: Support astPutCards if available
 
 	* AST.xs: Add astEscapes
 
 	* AST.xs: Add RateMap constructor
-	
+
 	* AST.xs: Add FluxFrame and SpecFluxFrame constructors
 
 2004-12-28  Tim Jenness  <tjenness@cpan.org>
@@ -80,7 +80,7 @@
 	* AST.xs: Add astKeyMap functions and constants
 
 	* t/keymap.t: Add tests for astKeyMap
-	
+
 	* AST.xs: Allow module to compile with both variants of astRate.
           Now only returns the second derivative if the version of astRate
           supports that.

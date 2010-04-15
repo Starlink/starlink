@@ -2,7 +2,7 @@
 *     19 Nov 1993 (hme):
 *        Remove TABs.
 C-----------------------------------------------------------------------
-      
+
       SUBROUTINE ADD (NQ, IFAIL)
 
 C   Routine to add spectra in X and Y stack positions

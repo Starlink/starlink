@@ -1,7 +1,7 @@
 2004-01-16  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* HDSPACK.pm (_split_path): Make sure that we only split on dots
-	**in the filename** and not in the directory name. 
+	**in the filename** and not in the directory name.
 
 2003-08-07  Tim Jenness  <timj@jach.hawaii.edu>
 

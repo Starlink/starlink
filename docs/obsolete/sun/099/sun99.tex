@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -309,11 +309,11 @@ The file-spec is the name of the file to be created.
 It is optional, and if not specified defaults to a file name
 derived either from the name of the module or,
 if a wild card has been specified for the module name, from the name of
-the library. 
+the library.
 
-{\bf NOTE:}~{\it If the wild card character ``*'' is given instead of a module 
+{\bf NOTE:}~{\it If the wild card character ``*'' is given instead of a module
 name, then ALL the modules will be extracted from the text library and appended
-together into ONE file whose name is specified in file-spec. If file-spec is 
+together into ONE file whose name is specified in file-spec. If file-spec is
 not specified, the file will be called {\tt library-name.file-type}.
 To extract modules into separate files, OLBCRE can be used with
 the COMPILING switch off.}
@@ -588,7 +588,7 @@ Compile all the modules in the library MYLIB, with qualifiers suitable
 for debugging, and insert the object modules produced into a new object
 library.
 
-\section{Using Text Libraries of Include Files} 
+\section{Using Text Libraries of Include Files}
 
 VMS allows Fortran INCLUDE files to be held in a text library.
 For instance, a Fortran routine may contain the statement;
@@ -598,16 +598,16 @@ For instance, a Fortran routine may contain the statement;
 where the string in brackets is actually the name of a module in
 a text library.
 Suppose the Fortran routine is called ROUTINE.FOR, and the module
-TEST.INC is in the text library TEST.TLB. 
+TEST.INC is in the text library TEST.TLB.
 When compiling the routine, the command;
 \begin{verbatim}
       $ FORTRAN ROUTINE+TEST/LIB
 \end{verbatim}
-tells the compiler to search the TEST.TLB library for the INCLUDE 
+tells the compiler to search the TEST.TLB library for the INCLUDE
 module.
 It is possible to maintain libraries of routines which include text
 modules in this way with LIBMAINT by clever use of the ``compiler
-qualifier'' mechanism described above. 
+qualifier'' mechanism described above.
 The name of the text library can be appended to a dummy compiler
 qualifier, such as /NOLIST.
 If the above routine is to be inserted in a text/object library pair,

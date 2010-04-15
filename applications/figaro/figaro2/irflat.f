@@ -12,14 +12,14 @@ C     spectrum using IDIV to flat field the data.
 C
 C     The program is used to remove two kinds of ripple from spectra.
 C     In instruments which interleave a number of scan positions to give
-C     a fully sampled spectrum (such as CGS3 and CGS4), the program 
+C     a fully sampled spectrum (such as CGS3 and CGS4), the program
 C     removes ripple which results from seeing or transparency
 C     fluctuations between scan positions. In an instrument such as
 C     CGS2 it can remove the ripple which results from the fact that the
-C     flatfield (i.e. relative detector responses) is different for 
-C     extended and point sources. In the case of CGS2 data it makes use 
-C     of a .MORE.PIXELS extension in the data which specifies the 
-C     detector and scan position corresponding to each pixel.  If this 
+C     flatfield (i.e. relative detector responses) is different for
+C     extended and point sources. In the case of CGS2 data it makes use
+C     of a .MORE.PIXELS extension in the data which specifies the
+C     detector and scan position corresponding to each pixel.  If this
 C     structure is not present it prompts for a period and assumes a
 C     periodic ripple. The period will normally be the oversampling
 C     factor, typically 2 or 3 for CGS4 or CGS3 data.
@@ -31,7 +31,7 @@ C     Command parameters -
 C
 C     SPECTRUM    (Character) The name of the file containing the
 C                 spectrum to be used.
-C     CGS2        (Logical) Flag indicating whether to operate in 
+C     CGS2        (Logical) Flag indicating whether to operate in
 C                 'CGS 2' mode.
 C     PERIOD      (Real) The period of the ripple (in pixels).
 C     OUTPUT      (Character) The name of the resulting ripple spectrum.
@@ -40,7 +40,7 @@ C     XEND        (Real) Second X value for region to be used.
 C
 C     Command keywords -
 C
-C     MORE        If TRUE the prompts for XSTART and XEND are repeated 
+C     MORE        If TRUE the prompts for XSTART and XEND are repeated
 C                 for another region.
 C
 C     10th Dec 1990 - JAB / JAC
@@ -49,7 +49,7 @@ C     Modified:
 C        15 May 1991  Add handling for seeing ripple in CGS4 data.
 C        04 Sep 1992  TAB removed, INCLUDE changed. HME/UoE.
 C        21 Jul 1993  HME / UoE, Starlink. Swap the statements that ask
-C                     for and cancel the MORE parameter: Now cancels 
+C                     for and cancel the MORE parameter: Now cancels
 C                     after asking, thus command-line argument is
 C                     actually used.
 C        28 Jun 1993  PND / JAC.  Output file not same as input file.
@@ -59,7 +59,7 @@ C                     DSA_WRUSER.
 C        13 Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                     Avoid _NAMED_ routines.  No map access with DTA.
 C                     Get work array and read/write instead.
-C        18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage 
+C        18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage
 C                     of file names to 132 chars.
 C        19 Jul 1996  MJC / Starlink.  Extend the number of scan
 C                     positions to ensure the scan-position array is
@@ -67,7 +67,7 @@ C                     filled.
 C        29 Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
 C        11 Jul 2001  ACD  / Starlink, UoE.  Suppressed the error
 C                     messages issued in the case where the CGS2
-C                     'PIXELS' structure could not be found in the input 
+C                     'PIXELS' structure could not be found in the input
 C                     data file.
 C        13 Jul 2001  ACD  / Starlink, UoE.  Made to check whether a
 C                     valid value for 'PERIOD' is available prior to
@@ -108,16 +108,16 @@ C
       INTEGER      NPTR          ! Dynamic-memory pointer to NUM array
       INTEGER      NS            ! Number of scan positions
       INTEGER      NX            ! Size of 1st dimension
-      INTEGER      OPTR          ! Dynamic-memory pointer to output 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output
                                  ! data array
       REAL         PERIOD        ! Ripple period
       CHARACTER*132 PIXNAME      ! Name of Pixels structure
       CHARACTER*132 PNAME        ! Name of .PIXEL array
       CHARACTER*132 PONAME       ! Name of .POSITION array
-      INTEGER      QPTR          ! Dynamic-memory pointer to quality 
+      INTEGER      QPTR          ! Dynamic-memory pointer to quality
                                  ! array
       INTEGER      SLOT          ! Map slot number outputdata array
-      INTEGER      SPTR          ! Dynamic-memory pointer to scan 
+      INTEGER      SPTR          ! Dynamic-memory pointer to scan
                                  ! positions
       INTEGER      STATUS        ! Running status for DSA_ routines
       INTEGER      SUMPTR        ! Dynamic-memory pointer to SUM array

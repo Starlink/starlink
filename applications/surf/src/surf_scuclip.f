@@ -8,25 +8,25 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_REMSKY( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
 *  Description :
-*     Each bolometer is analysed independently, the mean and standard 
-*     deviation are calculated, any points greater than NSIGMA sigma 
-*     from the mean are treated as spikes and removed. Note that for mapping 
+*     Each bolometer is analysed independently, the mean and standard
+*     deviation are calculated, any points greater than NSIGMA sigma
+*     from the mean are treated as spikes and removed. Note that for mapping
 *     this despiking algorithm is only useful for very weak
 *     sources; bright sources will be removed (since a bolometer
 *     jiggles on and off bright sources). Photometry observations
-*     do not suffer from this problem as the bolometers are always on 
+*     do not suffer from this problem as the bolometers are always on
 *     source.
 
 *  Usage:
@@ -58,17 +58,17 @@
 
 *  Implementation status:
 *     The despiking routine sets QUALITY bit 5 to bad. It does not affect
-*     the data. The effects of despiking can be removed by using the 
+*     the data. The effects of despiking can be removed by using the
 *     Kappa task SETBB to unset quality bit 5.
 
 *  Related Applications:
 *     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER, SIGCLIP, DESPIKE;
 *     KAPPA: SETBB
- 
+
 *  Authors:
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -102,10 +102,10 @@
 *     Initial revision
 *
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -185,7 +185,7 @@
       CHARACTER*132    OUTFILE          ! Default output filename
       INTEGER          OUTNDF           ! NDF identifier of output file
       INTEGER          OUT_DATA_PTR     ! pointer to data array in output file
-      INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
+      INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
       INTEGER          RUN_NUMBER       ! run number of observation
@@ -235,10 +235,10 @@
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
      :  STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
@@ -254,7 +254,7 @@
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG',PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation '//
      :     'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
@@ -308,7 +308,7 @@
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOLS, STATUS)
 
-*  map the various components of the data array and check the data dimensions 
+*  map the various components of the data array and check the data dimensions
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
@@ -364,7 +364,7 @@
 
 *  now open the output NDF, propagating it from the input file
 
-      CALL NDF_PROP (INDF, 'Data,Var,Qual,Axis,Units', 'OUT', OUTNDF, 
+      CALL NDF_PROP (INDF, 'Data,Var,Qual,Axis,Units', 'OUT', OUTNDF,
      :     STATUS)
 
 *  get the bad bit mask
@@ -406,7 +406,7 @@
 
          CALL NDF_MAP (SECNDF, 'QUALITY', '_UBYTE', 'UPDATE',
      :        OUT_QUALITY_PTR, ITEMP, STATUS)
-         CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'UPDATE', 
+         CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'UPDATE',
      :        OUT_DATA_PTR, ITEMP, STATUS)
          CALL NDF_MAP (SECNDF, 'VARIANCE', '_REAL', 'UPDATE',
      :        OUT_VARIANCE_PTR, ITEMP, STATUS)
@@ -427,15 +427,15 @@
 
          DO I = 1, N_BOLS
 
-            CALL SCULIB_EXTRACT_BOL(I, N_BOLS, N_POS, 
+            CALL SCULIB_EXTRACT_BOL(I, N_BOLS, N_POS,
      :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
-     :           %VAL(CNF_PVAL(BOL_PTR)), %VAL(CNF_PVAL(BOL_QPTR)), 
+     :           %VAL(CNF_PVAL(BOL_PTR)), %VAL(CNF_PVAL(BOL_QPTR)),
      :           STATUS)
 
 *  Despike
             CALL SCULIB_CLIP_BOL(N_POS, %VAL(CNF_PVAL(BOL_PTR)),
-     :           %VAL(CNF_PVAL(BOL_QPTR)), 
+     :           %VAL(CNF_PVAL(BOL_QPTR)),
      :           NSIGMA, BADBIT, NSPIKES, STATUS)
 
 *     I note that the system will find the same spike in each
@@ -446,15 +446,15 @@
 
 *     Keep track of the total number of spikes
                TOT_SPIKES = TOT_SPIKES + NSPIKES
-            
+
 *     Report the number of spikes
 
                IF (NSPIKES .GT. 0) THEN
                   CALL MSG_SETC('TSK', TSKNAME)
                   CALL MSG_SETI('NM', NSPIKES)
                   CALL MSG_SETI('BOL', I)
-                  
-                  CALL MSG_OUTIF(MSG__VERB, ' ', 
+
+                  CALL MSG_OUTIF(MSG__VERB, ' ',
      :                 '^TSK: ^NM points clipped from bolometer ^BOL',
      :                 STATUS)
 
@@ -463,7 +463,7 @@
             END IF
 
 
-            CALL SCULIB_INSERT_BOL(I, N_BOLS, N_POS, 
+            CALL SCULIB_INSERT_BOL(I, N_BOLS, N_POS,
      :                             %VAL(CNF_PVAL(BOL_PTR)),
      :           %VAL(CNF_PVAL(BOL_QPTR)), %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), STATUS)
@@ -474,7 +474,7 @@
          BADBIT = SCULIB_BITON(BADBIT, 4)
          CALL SCULIB_FREE('BOLDATA', BOL_PTR, BOL_PTR_END, STATUS)
          CALL SCULIB_FREE('BOLQDATA', BOL_QPTR, BOL_QPTR_END, STATUS)
-         
+
 *  unmap the main data array
 
          CALL NDF_UNMAP (SECNDF, '*', STATUS)

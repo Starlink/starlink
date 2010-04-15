@@ -1,13 +1,13 @@
 
 *+  PEEPSUB - displays part of an image on a terminal
 
-      SUBROUTINE PEEPSUB ( ARRAY, DIMS1, DIMS2, XLL, YLL, XSIZE, 
+      SUBROUTINE PEEPSUB ( ARRAY, DIMS1, DIMS2, XLL, YLL, XSIZE,
      :                     YSIZE, STATUS )
 
 *    Description :
 *
-*     This routine displays a formatted listing of an XSIZE x YSIZE section 
-*     of an images on the terminal. The data is is presented in a pleasing 
+*     This routine displays a formatted listing of an XSIZE x YSIZE section
+*     of an images on the terminal. The data is is presented in a pleasing
 *     format which depends on the value of the pixel, and the number of pixels
 *     in each row. The lower left pixel of the box and the box size are input
 *     parameters. The x size of the box is constrained to be 8 or less pixels.
@@ -31,8 +31,8 @@
 *     YSIZE  =  INTEGER( READ )
 *           The y size of the box to be output
 *     STATUS  =  INTEGER( READ, WRITE )
-*           Global status value 
-*           
+*           Global status value
+*
 *    Method :
 *
 *     Check for error on entry - return if not o.k.
@@ -170,7 +170,7 @@
 *    symbols - first round all the rows in reverse order
       DO  J  =  1, YSIZE
 
-*       clear the output string 
+*       clear the output string
          OUTLINE  =  ' '
 
 *       work out where the current row lies in the array - work down from
@@ -216,7 +216,7 @@
 *          put the current number into the current row string, padding
 *          with one additional space
             OUTLINE( POINT : POINT )  =  ' '
-            OUTLINE( POINT + 1 : POINT + STRLEN )  
+            OUTLINE( POINT + 1 : POINT + STRLEN )
      :                                      =  STRING ( 1 : STRLEN )
 
 *       end of loop round pixels in current row

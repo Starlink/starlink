@@ -1,5 +1,5 @@
 C+
-C                        D S A _ D E L E T E _ A X I S 
+C                        D S A _ D E L E T E _ A X I S
 C
 C  Routine name:
 C     DSA_DELETE_AXIS
@@ -23,7 +23,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) AXIS         (Integer,ref) The number of the axis in question.
 C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
@@ -52,7 +52,7 @@ C     ICH_CI             Returns an integer formatted into a string
 C     GEN_NTH            Returns 'st', 'nd', 'rd', 'th' etc
 C     DTA_ERROR          Convert DTA code into a character string
 C     DTA_TYVAR          Get type of data object
-C     DSA_VALIDATE_AXIS  Check that axis number is valid 
+C     DSA_VALIDATE_AXIS  Check that axis number is valid
 C     DSA_FIND_REF       Look up reference name in common tables
 C     DSA__AXIS_NAME     Get DTA name for axis structure
 C     DSA__DELETE_AXIS   Delete an axis structure
@@ -109,7 +109,7 @@ C
       INTEGER   LENGTH                      ! Object name length
       CHARACTER OBJ_NAME*64                 ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER TYPE*8                      ! Type of axis structure - ignored
 C
 C     Return immediately on bad status
@@ -122,7 +122,7 @@ C
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
 C     Look up the reference name in the tables.
-C          
+C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
       IF (STATUS.NE.0) GO TO 500             ! Error exit
 C
@@ -140,7 +140,7 @@ C
 C        It does exist, so we get to delete it.  First, however,
 C        some of the axis arrays may be mapped, in which case we have to
 C        see if they're still actively mapped and close them down if
-C        not.  
+C        not.
 C
          CALL DSA_CHECK_MAPPING (OBJ_NAME,LENGTH,
      :                           'delete the axis structure ',STATUS)
@@ -174,5 +174,5 @@ C
 C     Exit
 C
   500 CONTINUE
-C     
+C
       END

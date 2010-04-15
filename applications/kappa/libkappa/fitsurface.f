@@ -32,7 +32,7 @@
 *  Usage:
 *     fitsurface ndf [fittype] { nxpar nypar
 *                              { [knots]
-*                           fittype 
+*                           fittype
 
 *  ADAM Parameters:
 *     COSYS = LITERAL (Read)
@@ -51,9 +51,9 @@
 *        the image.  Both values must be in the range 0 to 11.  If you
 *        supply a single value, it applies to both axes.  Thus 1
 *        creates one interior knot, [5,4] gives five along the x axis
-*        and four along the y direction.  Increasing this parameter 
-*        values increases the flexibility of the surface.  Normally, 4 
-*        is a reasonable value.  The upper limit of acceptable values 
+*        and four along the y direction.  Increasing this parameter
+*        values increases the flexibility of the surface.  Normally, 4
+*        is a reasonable value.  The upper limit of acceptable values
 *        will be reduced along each axis when its binned array dimension
 *        is fewer than 29.  KNOTS is only accessed when FITTYPE="Spline".
 *        The default is the current value, which is 4 initially. []
@@ -63,16 +63,16 @@
 *        The number of fitting parameters to be used in the x
 *        direction.  It must be in the range 1 to 15 for a polynomial
 *        fit.  Thus 1 gives a constant, 2 a linear fit, 3 a quadratic etc.
-*        Increasing this parameter increases the flexibility of the 
-*        surface in the x direction.  The upper limit of acceptable values 
+*        Increasing this parameter increases the flexibility of the
+*        surface in the x direction.  The upper limit of acceptable values
 *        will be reduced for arrays with an x dimension less than 29.
 *        NXPAR is only accessed when FITTYPE="Polynomial".
 *     NYPAR = _INTEGER (Read)
 *        The number of fitting parameters to be used in the y
 *        direction.  It must be in the range 1 to 15 for a polynomial
-*        fit.  Thus 1 gives a constant, 2 a linear fit, 3 a quadratic 
+*        fit.  Thus 1 gives a constant, 2 a linear fit, 3 a quadratic
 *        etc.  Increasing this parameter increases the flexibility of the
-*        surface in the y direction.  The upper limit of acceptable values 
+*        surface in the y direction.  The upper limit of acceptable values
 *        will be reduced for arrays with a y dimension less than 29.
 *        NYPAR is only accessed when FITTYPE="Polynomial".
 *     OVERWRITE = _LOGICAL (Read)
@@ -114,7 +114,7 @@
 *        mechanism can be overridden by specifying YMAX on the command
 *        line.  The parameter is provided to allow the fit limits to be
 *        fine tuned for special purposes.  It should not normally be
-*        altered.  If a null (!) value is supplied, the value used is 
+*        altered.  If a null (!) value is supplied, the value used is
 *        the maximum y co-ordinate of the fitted data. [!]
 *     YMIN = _DOUBLE (Read)
 *        The minimum y value to be used in the fit.  This must be
@@ -124,7 +124,7 @@
 *        mechanism can be overridden by specifying YMIN on the command
 *        line.  The parameter is provided to allow the fit limits to be
 *        fine tuned for special purposes.  It should not normally be
-*        altered.  If a null (!) value is supplied, the value used is 
+*        altered.  If a null (!) value is supplied, the value used is
 *        the minimum y co-ordinate of the fitted data. [!]
 
 *  Examples:
@@ -140,7 +140,7 @@
 *        As the previous example except a B-spline fit is made using
 *        four interior knots along both axes.
 *     fitsurface virgo fittype=spl knots=[10,7]
-*        As the previous example except now there are ten interior knots 
+*        As the previous example except now there are ten interior knots
 *        along the x axis and seven along the y axis.
 *     fitsurface mkn231 nxpar=6 nypar=2 cosys=d xmin=-10.0 xmax=8.5
 *        This fits a polynomial surface to the data array in the NDF
@@ -156,7 +156,7 @@
 *     This is read by MAKESURFACE to create a NDF of the fitted surface.
 *
 *     For further details of the CHEBYSHEV variant see SGP/38.  The
-*     CHEBYSHEV variant includes the fitting variance for each 
+*     CHEBYSHEV variant includes the fitting variance for each
 *     coefficient.
 *
 *     The BSPLINE variant structure is provisional.  It contain the
@@ -165,9 +165,9 @@
 *     restore the original values after spline evaluation recorded in
 *     component SCALE.  All of these components have type _REAL.
 *
-*     Also stored in the SURFACEFIT extension are the r.m.s. deviation 
-*     to the fit (component RMS), the maximum absolute deviation 
-*     (component RSMAX), and the co-ordinate system (component COSYS) 
+*     Also stored in the SURFACEFIT extension are the r.m.s. deviation
+*     to the fit (component RMS), the maximum absolute deviation
+*     (component RSMAX), and the co-ordinate system (component COSYS)
 *     translated to AST Domain names AXIS (for parameter COSYS="Data")
 *     and PIXEL ("World").
 
@@ -247,7 +247,7 @@
 *        coefficients.
 *     27-AUG-2003 (DSB):
 *        Check that the values obtained for XMAX, XMIN, YMAX and YMIN
-*        are usable. 
+*        are usable.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     2007 June 28 (MJC):
@@ -257,7 +257,7 @@
 *     2007 July 3 (MJC):
 *        Added bi-cubic spline fitting and parameter KNOTS.
 *     2009 December 19 (MJC):
-*        Fix bug in the calculation of required workspace for splines 
+*        Fix bug in the calculation of required workspace for splines
 *        when the number of knots are different along the two axes.
 *     {enter_further_changes_here}
 
@@ -300,7 +300,7 @@
                                  ! can be handled in each direction.
       PARAMETER ( MTKNOT = MXKNOT + 8 )
 
-      INTEGER NDIM               ! Maximum number of dimensions---only 
+      INTEGER NDIM               ! Maximum number of dimensions---only
       PARAMETER ( NDIM = 2 )     ! two-dimensional arrays can be handled
 
 *  Local Variables:
@@ -439,7 +439,7 @@
 *  Obtain the type of the fit ('POLYNOMIAL' or 'SPLINE').
       CALL PAR_CHOIC( 'FITTYPE', 'Polynomial', 'Polynomial,Spline',
      :                .TRUE., FITYPE, STATUS )
-     
+
 *  Constrain the number of interior knots given the number of pixels.
 *  This is not perfect, as we really need to know the number of pixels
 *  in the bins rather than the minimum number within in a bin.
@@ -519,7 +519,7 @@
 *  Access the data and co-ordinates.
 *  =================================
 
-*  Obtain the processing type.  It is unfortunately controlled by the 
+*  Obtain the processing type.  It is unfortunately controlled by the
 *  demands of the fitting rouitnes, not the data.
       IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
 
@@ -572,8 +572,8 @@
       IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
 
 *  Calculate the number of free fitting parameters.
-         MPCOEF = ( MIN( NXPAR, NYPAR ) * 
-     :            ( MIN( NXPAR, NYPAR ) + 1 ) ) / 2 + 
+         MPCOEF = ( MIN( NXPAR, NYPAR ) *
+     :            ( MIN( NXPAR, NYPAR ) + 1 ) ) / 2 +
      :            ABS( NXPAR - NYPAR )
 
       ELSE
@@ -596,8 +596,8 @@
             S2 = S1 + NXPAR - 3
          END IF
 
-         NWS = NXPAR * NYPAR * ( 2 + S1 + S2 ) + 
-     :         2 * ( NXPAR + NYPAR + 4 * DSIZE + 
+         NWS = NXPAR * NYPAR * ( 2 + S1 + S2 ) +
+     :         2 * ( NXPAR + NYPAR + 4 * DSIZE +
      :         5 * ( MAX( NXKNOT, NYKNOT ) + 8 ) - 6 ) + S2 + 1
          NIWS = DSIZE + ( NXKNOT + 1 ) * ( NYKNOT + 1 )
          NLWS = NXPAR * NYPAR * ( S2 + 1 ) + S2
@@ -607,8 +607,8 @@
 *  Obtain workspace.
 *  =================
 
-*  Map some workspace to hold the x and y co-ordinates, z values and 
-*  weights.  The maximum number of values which may be required is 
+*  Map some workspace to hold the x and y co-ordinates, z values and
+*  weights.  The maximum number of values which may be required is
 *  DSIZE, though the presence of bad values may mean that not all this
 *  workspace is needed.
       CALL PSX_CALLOC( DSIZE, ITYPE, XPTR, STATUS )
@@ -667,47 +667,47 @@
       IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  The routine KPG1_XYZWR returns double-precision co-ordinates, values,
-*  and weights.  Rather than grab a second. potentially large, tranch of 
+*  and weights.  Rather than grab a second. potentially large, tranch of
 *  workspace and copying to it from the double-precision arrays, we use
 *  a modified version of KPG1_XYZWR.  KPS1_XYZWR (notice it is in
 *  KAPSUB) has output arrays that have the same data type as the routine
 *  type.  Ideally the spline fitting would use double precision too
 *  and we could then use the ITYPE for the data mapping not the fitting
-*  method. 
-         CALL KPS1_XYZWR( XDIM, YDIM, %VAL( CNF_PVAL( DPTR ) ), 
+*  method.
+         CALL KPS1_XYZWR( XDIM, YDIM, %VAL( CNF_PVAL( DPTR ) ),
      :                    %VAL( CNF_PVAL( AXPTR ) ),
      :                    %VAL( CNF_PVAL( AYPTR ) ), BAD, VARWTS,
-     :                    %VAL( CNF_PVAL( VPTR ) ), DSIZE, 
+     :                    %VAL( CNF_PVAL( VPTR ) ), DSIZE,
      :                    %VAL( CNF_PVAL( XPTR ) ),
-     :                    %VAL( CNF_PVAL( YPTR ) ), 
-     :                    %VAL( CNF_PVAL( ZPTR ) ), 
-     :                    %VAL( CNF_PVAL( WPTR ) ), 
+     :                    %VAL( CNF_PVAL( YPTR ) ),
+     :                    %VAL( CNF_PVAL( ZPTR ) ),
+     :                    %VAL( CNF_PVAL( WPTR ) ),
      :                    NGOOD, DXMIN, DXMAX, DYMIN, DYMAX, STATUS )
 
       ELSE
-         CALL KPG1_XYZWD( XDIM, YDIM, %VAL( CNF_PVAL( DPTR ) ), 
+         CALL KPG1_XYZWD( XDIM, YDIM, %VAL( CNF_PVAL( DPTR ) ),
      :                    %VAL( CNF_PVAL( AXPTR ) ),
      :                    %VAL( CNF_PVAL( AYPTR ) ), BAD, VARWTS,
-     :                    %VAL( CNF_PVAL( VPTR ) ), DSIZE, 
+     :                    %VAL( CNF_PVAL( VPTR ) ), DSIZE,
      :                    %VAL( CNF_PVAL( XPTR ) ),
-     :                    %VAL( CNF_PVAL( YPTR ) ), 
+     :                    %VAL( CNF_PVAL( YPTR ) ),
      :                    %VAL( CNF_PVAL( ZPTR ) ),
-     :                    %VAL( CNF_PVAL( WPTR ) ), 
+     :                    %VAL( CNF_PVAL( WPTR ) ),
      :                    NGOOD, DXMIN, DXMAX, DYMIN, DYMAX, STATUS )
       END IF
 
 *  Allow the x and y extrema returned by KPG1_XYZWx to be overridden by
 *  parameters. (These parameters will normally have a VPATH of DEFAULT,
-*  and DEFAULT = !, so the calculated value will be used unless 
+*  and DEFAULT = !, so the calculated value will be used unless
 *  otherwise specified).
-      CALL PAR_GDR0D( 'XMIN', DXMIN, VAL__MIND, XMIN, .TRUE., DXMIN,  
-     :                STATUS ) 
-      CALL PAR_GDR0D( 'XMAX', DXMAX, XMAX, VAL__MAXD, .TRUE., DXMAX, 
-     :                STATUS ) 
-      CALL PAR_GDR0D( 'YMIN', DYMIN, VAL__MIND, YMIN, .TRUE., DYMIN, 
-     :                STATUS ) 
-      CALL PAR_GDR0D( 'YMAX', DYMAX, YMAX, VAL__MAXD, .TRUE., DYMAX, 
-     :                STATUS ) 
+      CALL PAR_GDR0D( 'XMIN', DXMIN, VAL__MIND, XMIN, .TRUE., DXMIN,
+     :                STATUS )
+      CALL PAR_GDR0D( 'XMAX', DXMAX, XMAX, VAL__MAXD, .TRUE., DXMAX,
+     :                STATUS )
+      CALL PAR_GDR0D( 'YMIN', DYMIN, VAL__MIND, YMIN, .TRUE., DYMIN,
+     :                STATUS )
+      CALL PAR_GDR0D( 'YMAX', DYMAX, YMAX, VAL__MAXD, .TRUE., DYMAX,
+     :                STATUS )
 
 *  Polynomial fit
 *  ==============
@@ -716,29 +716,29 @@
       IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
 
 *  Fit a polynomial surface to the data.
-         CALL KPS1_FSPF2( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR, 
-     :                    .FALSE., NGOOD, MPCOEF, DSIZE, 
-     :                    %VAL( CNF_PVAL( XPTR ) ), 
-     :                    %VAL( CNF_PVAL( YPTR ) ), 
+         CALL KPS1_FSPF2( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
+     :                    .FALSE., NGOOD, MPCOEF, DSIZE,
+     :                    %VAL( CNF_PVAL( XPTR ) ),
+     :                    %VAL( CNF_PVAL( YPTR ) ),
      :                    %VAL( CNF_PVAL( ZPTR ) ),
-     :                    %VAL( CNF_PVAL( WPTR ) ), 
-     :                    %VAL( CNF_PVAL( APTR ) ), 
+     :                    %VAL( CNF_PVAL( WPTR ) ),
+     :                    %VAL( CNF_PVAL( APTR ) ),
      :                    %VAL( CNF_PVAL( MPTR ) ),
-     :                    %VAL( CNF_PVAL( CPTR ) ), 
+     :                    %VAL( CNF_PVAL( CPTR ) ),
      :                    CHCOEF, VARIAN, NCOEF, STATUS )
 
 *  Evaluate the surface at each pixel and obtain the RMS error and the
 *  residuals of the fit.
-         CALL KPS1_FSPE2( NGOOD, %VAL( CNF_PVAL( XPTR ) ), 
-     :                    %VAL( CNF_PVAL( YPTR ) ), 
-     :                    %VAL( CNF_PVAL( ZPTR ) ), DXMIN, DXMAX, DYMIN, 
+         CALL KPS1_FSPE2( NGOOD, %VAL( CNF_PVAL( XPTR ) ),
+     :                    %VAL( CNF_PVAL( YPTR ) ),
+     :                    %VAL( CNF_PVAL( ZPTR ) ), DXMIN, DXMAX, DYMIN,
      :                    DYMAX, NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF,
-     :                    %VAL( CNF_PVAL( FTPTR ) ), 
+     :                    %VAL( CNF_PVAL( FTPTR ) ),
      :                    %VAL( CNF_PVAL( RSPTR ) ), DRMS, STATUS )
          RMS = SNGL( DRMS )
 
 *  Determine the maximum absolute residual.
-         CALL KPG1_MXMND( BAD, NGOOD, %VAL( CNF_PVAL( RSPTR ) ), NINVAL, 
+         CALL KPG1_MXMND( BAD, NGOOD, %VAL( CNF_PVAL( RSPTR ) ), NINVAL,
      :                    MAXMUM, MINMUM, MAXPOS, MINPOS, STATUS )
          RSMAX = MAX( ABS( MAXMUM ), ABS( MINMUM ) )
 
@@ -766,33 +766,33 @@
 *  Fit the bi-cubic-spline surface to the binned array.
          CALL KPS1_SUSF( NXKNOT, NYKNOT, XMIN, XMAX, YMIN, YMAX,
      :                   MTKNOT, .TRUE., NWS, NLWS, NIWS, DSIZE,
-     :                   %VAL( CNF_PVAL( XPTR ) ), 
-     :                   %VAL( CNF_PVAL( YPTR ) ), 
+     :                   %VAL( CNF_PVAL( XPTR ) ),
+     :                   %VAL( CNF_PVAL( YPTR ) ),
      :                   %VAL( CNF_PVAL( ZPTR ) ),
-     :                   %VAL( CNF_PVAL( WPTR ) ), 
+     :                   %VAL( CNF_PVAL( WPTR ) ),
      :                   %VAL( CNF_PVAL( GPTR ) ), NGOOD,
-     :                   XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ), 
+     :                   XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ),
      :                   %VAL( CNF_PVAL( SLWPTR ) ),
-     :                   %VAL( CNF_PVAL( SIWPTR ) ), 
+     :                   %VAL( CNF_PVAL( SIWPTR ) ),
      :                   COEFF, NCOEF, SCALE, STATUS )
 
-*  Evaluate the surface at each pixel and obtain the RMS and the 
-*  residuals of the fit.  The two additional clamping bins are excluded 
+*  Evaluate the surface at each pixel and obtain the RMS and the
+*  residuals of the fit.  The two additional clamping bins are excluded
 *  from the evaluation.
          NGOOD = NGOOD - 2
 
 *  Evaluate the surface at each bin and obtain the rms error of the
 *  fit. -1 prevent re-scaling because clipping below needs to work with
 *  the scaled fit (if there has been any scaling).
-         CALL KPS1_SUSEB( %VAL( CNF_PVAL( XPTR ) ), 
-     :                    %VAL( CNF_PVAL( YPTR ) ), 
+         CALL KPS1_SUSEB( %VAL( CNF_PVAL( XPTR ) ),
+     :                    %VAL( CNF_PVAL( YPTR ) ),
      :                    %VAL( CNF_PVAL( ZPTR ) ),
      :                    NGOOD, NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF,
      :                    COEFF, SCALE, %VAL( CNF_PVAL( FTPTR ) ),
      :                    %VAL( CNF_PVAL( RSPTR ) ), RMS, STATUS )
 
 *  Determine the maximum absolute residual.
-         CALL KPG1_MXMNR( BAD, NGOOD, %VAL( CNF_PVAL( RSPTR ) ), NINVAL, 
+         CALL KPG1_MXMNR( BAD, NGOOD, %VAL( CNF_PVAL( RSPTR ) ), NINVAL,
      :                    RMAX, RMIN, MAXPOS, MINPOS, STATUS )
          RSMAX = DBLE( MAX( ABS( RMAX ), ABS( RMIN ) ) )
 
@@ -811,7 +811,7 @@
       CALL MSG_OUTIF( MSG__NORM, ' ', 'The maximum residual of the '/
      :                /'data from the fit is ^RSMAX.', STATUS )
       CALL MSG_SETR( 'RMS', RMS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', 'The r.m.s. error is ^RMS.', 
+      CALL MSG_OUTIF( MSG__NORM, ' ', 'The r.m.s. error is ^RMS.',
      :                STATUS )
 
 *  Store the fit.
@@ -822,8 +822,8 @@
 *  named SURFACEFIT.  The coefficients will be stored in a structure
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
-         CALL KPS1_FSWPE( NDFI, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, 
-     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, SNGL( RSMAX ), 
+         CALL KPS1_FSWPE( NDFI, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
+     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, SNGL( RSMAX ),
      :                    RMS, COSYS, STATUS )
 
       ELSE IF ( FITYPE( 1:3 ) .EQ. 'SPL' ) THEN
@@ -832,7 +832,7 @@
 *  named SURFACEFIT.  The coefficients will be stored in a structure
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
-         CALL KPS1_FSWSE( NDFI, NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF, 
+         CALL KPS1_FSWSE( NDFI, NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF,
      :                    COEFF, SCALE, SNGL( RSMAX ), RMS, 'GRID',
      :                    STATUS )
       END IF

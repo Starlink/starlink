@@ -9,13 +9,13 @@ C     Determines whether or not a data quality array exists.
 C
 C  Description:
 C     This routine looks to see if a data structure contains a data
-C     quality array. Although it is quite indifferent as to the existence 
-C     or non-existence of such a quality array, it will output a warning 
-C     message if it finds a quality array whose size does not match that 
-C     of the main data array.  It will treat such a non-matching quality 
-C     array as not existing.  Note that a meaningful quality array can be 
-C     generated from flagged pixel values held in the data array, but this 
-C     routine ignores that. DSA_SEEK_FLAGGED_VALUES should be used to test 
+C     quality array. Although it is quite indifferent as to the existence
+C     or non-existence of such a quality array, it will output a warning
+C     message if it finds a quality array whose size does not match that
+C     of the main data array.  It will treat such a non-matching quality
+C     array as not existing.  Note that a meaningful quality array can be
+C     generated from flagged pixel values held in the data array, but this
+C     routine ignores that. DSA_SEEK_FLAGGED_VALUES should be used to test
 C     for their presence.
 C
 C  Language:
@@ -33,7 +33,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
@@ -87,14 +87,14 @@ C
       INTEGER STATUS
 C
 C     Functions
-C  
+C
       INTEGER ICH_LEN
 C
 C     Local variables
 C
       INTEGER   DIMS(10)                    ! Dimensions of quality array
       INTEGER   DIMS2(10)                   ! Dimensions of main data array
-      CHARACTER ERROR*64                    ! Error string 
+      CHARACTER ERROR*64                    ! Error string
       INTEGER   I                           ! Loop index through dimensions
       INTEGER   IGNORE                      ! Dummy status argument
       INTEGER   LENGTH                      ! Object name length
@@ -102,7 +102,7 @@ C
       INTEGER   NDIM                        ! # of dimensions in quality array
       INTEGER   NDIM2                       ! # of dimensions in main array
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Full name of structure
 C
 C     DSA system common
@@ -126,7 +126,7 @@ C
          EXIST=(QUAL_EXIST(REF_SLOT).GT.0)
       ELSE
 C
-C        Not known, so generate the name of the quality array and 
+C        Not known, so generate the name of the quality array and
 C        see if it exists.
 C
          CALL DSA__QUAL_NAME (REF_SLOT,OBJ_NAME,LENGTH)

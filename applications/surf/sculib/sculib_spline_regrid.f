@@ -1,32 +1,32 @@
-      SUBROUTINE SCULIB_SPLINE_REGRID( METHOD, SFACTOR, MAX_MAPS, 
+      SUBROUTINE SCULIB_SPLINE_REGRID( METHOD, SFACTOR, MAX_MAPS,
      :     N_MAPS, N_BOLS, MAX_INTS, N_INTS, EFF_RADIUS,
-     :     PXSIZE, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, WEIGHT, 
-     :     INT_LIST, DATA_PTR, VAR_PTR, XPOS_PTR, YPOS_PTR, OUT_DATA, 
+     :     PXSIZE, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, WEIGHT,
+     :     INT_LIST, DATA_PTR, VAR_PTR, XPOS_PTR, YPOS_PTR, OUT_DATA,
      :     OUT_VARIANCE, OUT_QUALITY, OUT_WEIGHT, STATUS )
 *+
 *  Name:
 *     SCULIB_SPLINE_REGRID
- 
+
 *  Purpose:
 *     Regrid supplied data onto a rectangular grid using a spline
 
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SCULIB_SPLINE_REGRID( METHOD, SFACTOR, MAX_MAPS, N_MAPS,
-*    :     N_BOLS, N_INTS, EFF_RADIUS, PXSIZE, NX_OUT, NY_OUT, 
-*    :     I_CENTRE, J_CENTRE, WEIGHT, INT_PTR, DATA_PTR, VAR_PTR, 
-*    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
+*    :     N_BOLS, N_INTS, EFF_RADIUS, PXSIZE, NX_OUT, NY_OUT,
+*    :     I_CENTRE, J_CENTRE, WEIGHT, INT_PTR, DATA_PTR, VAR_PTR,
+*    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE,
 *    :     OUT_QUALITY, OUT_WEIGHT, STATUS )
- 
+
 *  Description:
 *     This routine takes data with a variance array and x y positions
 *     and regrids it onto a rectangular grid using a spline interpolation
 *     algorithm (from PDA). Each integration is regridded separately and
 *     added into a mean output image.
- 
+
 *  Arguments:
 *     METHOD = CHARACTER (Given)
 *        Spline method to use.
@@ -79,11 +79,11 @@
 *        Total weight of each pixel
 *     STATUS = _INTEGER (Given & Returned)
 *        Global status
- 
+
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -92,21 +92,21 @@
 *  History:
 *     1997 April 4 (TIMJ)
 *        Extract from main tasks
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
- 
+
 *  Arguments Given:
       INTEGER N_MAPS
       INTEGER MAX_INTS
@@ -147,7 +147,7 @@
       PARAMETER (MSG_LEV = MSG__NORM)
       CHARACTER * 15 TSKNAME     ! Name of subroutine
       PARAMETER (TSKNAME = 'SPLINE_REGRID')
- 
+
 *  Local Variables:
       INTEGER DATA_OFFSET        ! Position in data array
       INTEGER GOOD_DATA_END      ! End of good input data
@@ -211,22 +211,22 @@
 *     Start a timer
       T0 = SCULIB_SECNDS(0.0,STATUS)
       CALL MSG_SETC('PKG', TSKNAME)
-      CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Beginning regrid process', 
+      CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Beginning regrid process',
      :     STATUS)
 
 *     Allocate output storage array. This is used to store each integration
 *     before averaging into the output map.
 
-      CALL SCULIB_MALLOC(NX_OUT * NY_OUT * VAL__NBUB, INT_QUALITY_PTR, 
+      CALL SCULIB_MALLOC(NX_OUT * NY_OUT * VAL__NBUB, INT_QUALITY_PTR,
      :     INT_QUALITY_END, STATUS)
-      CALL SCULIB_MALLOC(VAL__NBR * NX_OUT * NY_OUT, OUT_PTR, OUT_END, 
-     :     STATUS) 
-      CALL SCULIB_MALLOC(VAL__NBI * NX_OUT * NY_OUT, NCOADD_PTR, 
-     :     NCOADD_END, STATUS) 
+      CALL SCULIB_MALLOC(VAL__NBR * NX_OUT * NY_OUT, OUT_PTR, OUT_END,
+     :     STATUS)
+      CALL SCULIB_MALLOC(VAL__NBI * NX_OUT * NY_OUT, NCOADD_PTR,
+     :     NCOADD_END, STATUS)
 
 *     Fill NCOADD with 0
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX_OUT*NY_OUT, 0, 
+         CALL SCULIB_CFILLI(NX_OUT*NY_OUT, 0,
      :                      %VAL(CNF_PVAL(NCOADD_PTR)))
       END IF
 
@@ -234,9 +234,9 @@
 *     data is already known) and so can be done outside the loop
 
 *     Allocate memory for the axis coordinates of output grid
-      CALL SCULIB_MALLOC(NX_OUT * NY_OUT * VAL__NBR, XI_PTR, XI_END, 
+      CALL SCULIB_MALLOC(NX_OUT * NY_OUT * VAL__NBR, XI_PTR, XI_END,
      :     STATUS)
-      CALL SCULIB_MALLOC(NX_OUT * NY_OUT * VAL__NBR, YI_PTR, YI_END, 
+      CALL SCULIB_MALLOC(NX_OUT * NY_OUT * VAL__NBR, YI_PTR, YI_END,
      :     STATUS)
       CALL SCULIB_MALLOC(NY_OUT * VAL__NBR, YIY_PTR, YIY_END, STATUS)
 
@@ -262,13 +262,13 @@
 
 *       Y axis
             CALL VEC_RTOR(.FALSE., 1, REAL(J - J_CENTRE) * PXSIZE,
-     :           %VAL(CNF_PVAL(YI_PTR) + DATA_OFFSET * VAL__NBR), 
+     :           %VAL(CNF_PVAL(YI_PTR) + DATA_OFFSET * VAL__NBR),
      :           IERR, NERR,
      :           STATUS)
 
 *       X axis
             CALL VEC_RTOR(.FALSE., 1, REAL(I_CENTRE - I) * PXSIZE,
-     :           %VAL(CNF_PVAL(XI_PTR) + DATA_OFFSET * VAL__NBR), 
+     :           %VAL(CNF_PVAL(XI_PTR) + DATA_OFFSET * VAL__NBR),
      :           IERR, NERR,
      :           STATUS)
 
@@ -298,35 +298,35 @@
 
 *     Allocate workspace for good data
 
-               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_DATA_PTR, 
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_DATA_PTR,
      :              GOOD_DATA_END, STATUS)
-               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_VAR_PTR, 
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_VAR_PTR,
      :              GOOD_VAR_END, STATUS)
-               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_X_PTR, 
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_X_PTR,
      :              GOOD_X_END, STATUS)
-               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_Y_PTR, 
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_Y_PTR,
      :              GOOD_Y_END, STATUS)
 
 *     Copy all data for this integration to a work array as long as
-*     the data are GOOD since the interpolation routine does not 
+*     the data are GOOD since the interpolation routine does not
 *     understand VAL__BADR.
 *     Note that the XY data are no longer DOUBLE on return.
 
                DATA_OFFSET = (INT_START - 1) * N_BOLS(NMAP)
-               
-               CALL SCULIB_COPY_GOOD(TOT_PTS, 
+
+               CALL SCULIB_COPY_GOOD(TOT_PTS,
      :                               %VAL(CNF_PVAL(DATA_PTR(NMAP)) +
      :              DATA_OFFSET * VAL__NBR),
      :   %VAL(CNF_PVAL(VAR_PTR(NMAP)) + DATA_OFFSET * VAL__NBR),
      :   %VAL(CNF_PVAL(XPOS_PTR(NMAP)) + DATA_OFFSET * VAL__NBD),
      :   %VAL(CNF_PVAL(YPOS_PTR(NMAP)) + DATA_OFFSET * VAL__NBD),NGOOD,
-     :              %VAL(CNF_PVAL(GOOD_DATA_PTR)), 
+     :              %VAL(CNF_PVAL(GOOD_DATA_PTR)),
      :              %VAL(CNF_PVAL(GOOD_VAR_PTR)),
-     :              %VAL(CNF_PVAL(GOOD_X_PTR)), 
+     :              %VAL(CNF_PVAL(GOOD_X_PTR)),
      :              %VAL(CNF_PVAL(GOOD_Y_PTR)), STATUS)
-               
+
             ELSE
-               
+
 *     Set NGOOD to zero so that the following logic can take
 *     care of deciding whether we wish to proceed with the regrid.
 *     This will stop the IF..THEN nesting getting out of hand.
@@ -344,7 +344,7 @@
                CALL MSG_SETI('NM',NMAP)
                CALL MSG_OUTIF(MSG__QUIET, ' ', '^TASK: Not enough '//
      :              'data for spline interpolation (^NP points for'//
-     :              ' integration ^NI from map ^NM)', 
+     :              ' integration ^NI from map ^NM)',
      :              STATUS)
             ELSE
 
@@ -353,10 +353,10 @@
 *     that are too far from an input grid (cf sculib_wtfn_regrid_1.f)
 
                CALL SCULIB_SPLINE_REGRID_1 ( EFF_RADIUS,
-     :              %val(cnf_pval(GOOD_DATA_PTR)), 
+     :              %val(cnf_pval(GOOD_DATA_PTR)),
      :              %VAL(CNF_PVAL(GOOD_X_PTR)),
      :              %VAL(CNF_PVAL(GOOD_Y_PTR)), NGOOD, PXSIZE, NX_OUT,
-     :              NY_OUT, I_CENTRE, J_CENTRE, 
+     :              NY_OUT, I_CENTRE, J_CENTRE,
      :              %VAL(CNF_PVAL(INT_QUALITY_PTR)),
      :              STATUS)
 
@@ -366,35 +366,35 @@
 
                   IF (METHOD .EQ. 'IDBVIP') THEN
 
-                     CALL SCULIB_SPLINE_PDA_IDBVIP(NGOOD, 
-     :                    %VAL(CNF_PVAL(GOOD_X_PTR)), 
+                     CALL SCULIB_SPLINE_PDA_IDBVIP(NGOOD,
+     :                    %VAL(CNF_PVAL(GOOD_X_PTR)),
      :                    %VAL(CNF_PVAL(GOOD_Y_PTR)),
      :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)),
      :                    NX_OUT * NY_OUT, %VAL(CNF_PVAL(XI_PTR)),
-     :                    %VAL(CNF_PVAL(YI_PTR)), 
+     :                    %VAL(CNF_PVAL(YI_PTR)),
      :                    %VAL(CNF_PVAL(OUT_PTR)), STATUS)
 
                   ELSE IF (METHOD .EQ. 'IDSFFT') THEN
 
-                     CALL SCULIB_SPLINE_PDA_IDSFFT(NGOOD, 
-     :                    %VAL(CNF_PVAL(GOOD_X_PTR)), 
+                     CALL SCULIB_SPLINE_PDA_IDSFFT(NGOOD,
+     :                    %VAL(CNF_PVAL(GOOD_X_PTR)),
      :                    %VAL(CNF_PVAL(GOOD_Y_PTR)),
      :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)), NX_OUT,
-     :                    NY_OUT, %VAL(CNF_PVAL(XI_PTR)), 
+     :                    NY_OUT, %VAL(CNF_PVAL(XI_PTR)),
      :                    %VAL(CNF_PVAL(YIY_PTR)),
      :                    %VAL(CNF_PVAL(OUT_PTR)), STATUS)
 
                   ELSE IF (METHOD .EQ. 'SURFIT') THEN
 
-                     CALL SCULIB_SPLINE_PDA_SURFIT(NGOOD, SFACTOR, 
-     :                    %VAL(CNF_PVAL(GOOD_X_PTR)), 
+                     CALL SCULIB_SPLINE_PDA_SURFIT(NGOOD, SFACTOR,
+     :                    %VAL(CNF_PVAL(GOOD_X_PTR)),
      :                    %VAL(CNF_PVAL(GOOD_Y_PTR)),
-     :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)), 
+     :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)),
      :                    %VAL(CNF_PVAL(GOOD_VAR_PTR)),
-     :                    NX_OUT, NY_OUT, %VAL(CNF_PVAL(XI_PTR)), 
+     :                    NX_OUT, NY_OUT, %VAL(CNF_PVAL(XI_PTR)),
      :                    %VAL(CNF_PVAL(YIY_PTR)),
      :                    %VAL(CNF_PVAL(OUT_PTR)), STATUS)
-                     
+
                   END IF
 
 *     Check the return status of the fit (ie fit has failed)
@@ -406,18 +406,18 @@
      :                    'calculating spline for integration '//
      :                    '^NI from map ^NM', STATUS)
                      CALL ERR_FLUSH(STATUS)
-                     
-                  ELSE 
+
+                  ELSE
 *     This data must be coadded into the output map
 *     using the quality mask for this data and the quality mask of the
 *     coadded data [output points are good if any of the points going in to
 *     the coadd are good] and scaling by weight of the input data set.
 
-                     CALL SCULIB_COADD_MAPS(NX_OUT * NY_OUT, 
-     :                    %VAL(CNF_PVAL(OUT_PTR)), 
+                     CALL SCULIB_COADD_MAPS(NX_OUT * NY_OUT,
+     :                    %VAL(CNF_PVAL(OUT_PTR)),
      :                    %VAL(CNF_PVAL(INT_QUALITY_PTR)),
      :                    WEIGHT(NMAP), %VAL(CNF_PVAL(NCOADD_PTR)),
-     :                    OUT_DATA, OUT_VARIANCE, OUT_QUALITY, 
+     :                    OUT_DATA, OUT_VARIANCE, OUT_QUALITY,
      :                    OUT_WEIGHT, STATUS)
 
 
@@ -428,13 +428,13 @@
             END IF
 
 *     Tidy up for this loop
-            CALL SCULIB_FREE ('SPLINE_GOODDATA', GOOD_DATA_PTR, 
+            CALL SCULIB_FREE ('SPLINE_GOODDATA', GOOD_DATA_PTR,
      :           GOOD_DATA_END, STATUS)
-            CALL SCULIB_FREE ('SPLINE_GOODVAR', GOOD_VAR_PTR, 
+            CALL SCULIB_FREE ('SPLINE_GOODVAR', GOOD_VAR_PTR,
      :           GOOD_VAR_END, STATUS)
-            CALL SCULIB_FREE ('SPLINE_GOODY', GOOD_Y_PTR, GOOD_Y_END, 
+            CALL SCULIB_FREE ('SPLINE_GOODY', GOOD_Y_PTR, GOOD_Y_END,
      :           STATUS)
-            CALL SCULIB_FREE ('SPLINE_GOODX', GOOD_X_PTR, GOOD_X_END, 
+            CALL SCULIB_FREE ('SPLINE_GOODX', GOOD_X_PTR, GOOD_X_END,
      :           STATUS)
 
          END DO
@@ -455,7 +455,7 @@
 
 *     Tidy up
       CALL SCULIB_FREE ('SPLINE_OUT_DATA', OUT_PTR, OUT_END, STATUS)
-      CALL SCULIB_FREE ('SPLINE_OUT_QUALITY', INT_QUALITY_PTR, 
+      CALL SCULIB_FREE ('SPLINE_OUT_QUALITY', INT_QUALITY_PTR,
      :     INT_QUALITY_END, STATUS)
       CALL SCULIB_FREE ('SPLINE_NCOADD', NCOADD_PTR, NCOADD_END,
      :     STATUS)

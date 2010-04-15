@@ -64,7 +64,7 @@ C
             IBXST=1
             IBXEN=NBX
             IDBXST=IX-NBX2
-            IDBXEN=IX+NBX2 
+            IDBXEN=IX+NBX2
             IF (IDBXST.LT.1) THEN
                IBXST=1+(1-IDBXST)
                IDBXST=1
@@ -75,7 +75,7 @@ C
             END IF
 C
 C           This is where we work out the convolved data value for the
-C           current pixel (IX,IY). This is obtained by imagining the 
+C           current pixel (IX,IY). This is obtained by imagining the
 C           convolution box centered on this pixel. Normally, all the box
 C           will be used, since it will all lie within the bounds of ARRAY.
 C           Box pixels from IBXST to IBXEN in X and between IBYST and IBYEN
@@ -98,6 +98,6 @@ C
       END DO
 C
       END
-               
 
-      
+
+

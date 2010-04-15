@@ -16,7 +16,7 @@
 
 *  Description:
 *     To delete one, or several, sources from the current list
-*     
+*
 *     The subroutine consists of two sections. The first marks sources
 *     for deletion as directed by the user. A flag is set in each source
 *     to mark those which are to be deleted. At this stage the user can
@@ -29,14 +29,14 @@
 *     The routine searches through the source list and presents to the
 *     user all sources whos name matches the one he has specified.
 *     Details of the source are displayed to the user and he is asked
-*     whether he wishes to delete this source. The subroutine will 
+*     whether he wishes to delete this source. The subroutine will
 *     find and offer the user all the sources in the source list whos
 *     name matches that he has specified. This is regardless of whether
 *     the. source has already been marked for deletion and offers the
 *     user the chance to reclaim any deleted by mistake.
 *
 *     If the source list is searched and no source with the name the
-*     user has specified is found the program will inform the user.     
+*     user has specified is found the program will inform the user.
 *     The process is repeated until the user enters a ! for the
 *     sourcename.
 *
@@ -45,7 +45,7 @@
 *     overwrite sources marked for deletion. Entries left at the end of
 *     the list are zeroised and the correct number of sources is
 *     calculated.
-*     
+*
 *     The program lists the last page of the source list (if ILEVEL = 2
 *     or 4) The routine returns to FIND25 and the user is then given
 *     the edit sources menu.
@@ -67,7 +67,7 @@
 *        be deleted
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*        
+*
 *  External Routines Used:
 *     FINDCRDD:
 *        FIND27, FIND39
@@ -79,7 +79,7 @@
 *        MSG_FMTC, MSG_OUT
 *     PAR:
 *        PAR_CANCL, PAR_GET0C, PAR_GET0L
-*     
+*
 *  Authors:
 *     DCP: Diana Parsons (IPMAF/RAL)
 *     {enter_new_authors_here}
@@ -110,7 +110,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
- 
+
 *  Arguments Given:
       INTEGER ILEVEL
       INTEGER MAXLEN
@@ -155,7 +155,7 @@
 
 *  Start of loop which checks that the users source name is a valid file
 *  name
- 200        CONTINUE 
+ 200        CONTINUE
 
 *  Ask user for name of source to delete
          CALL PAR_GET0C( PDENAM, DELNAM, STATUS )
@@ -170,7 +170,7 @@
 *  Check whether the parameter was entered as abort !!, if so exit from
 *  the subroutine
          IF ( STATUS .EQ. PAR__ABORT ) RETURN
-      
+
 *  Check whether the source name was ! indicating that the user wants to
 *  terminate the editing of sources
          IF ( STATUS .NE. PAR__NULL ) THEN
@@ -200,14 +200,14 @@
 *  to .TRUE. so that the source details can be displayed
                   TSOMAD = SOMADE( SOPOS )
                   SOMADE( SOPOS ) = .FALSE.
-      
+
 *  Call FIND39 to list source details of source to be deleted (with
 *  display mode = terminal (.true), and a dummy file descriptor (1))
                   CALL FIND39( .TRUE., 1, 1, MAXLEN, SOPOS, .FALSE.,
      :            STATUS )
-      
-*  Restore the true delete/not_delete flag 
-                  SOMADE( SOPOS ) = TSOMAD 
+
+*  Restore the true delete/not_delete flag
+                  SOMADE( SOPOS ) = TSOMAD
 
 *  Ask user to confirm that source is to be deleted
                   CALL PAR_GET0L( PCONDE, CONDEL, STATUS )
@@ -226,7 +226,7 @@
 *  If so reset the STATUS back to SAE__OK but do not change the source
 *  delete/not-delete flag
                      CALL ERR_ANNUL( STATUS )
-      
+
 *  If the parameter is O.K
                   ELSE
 
@@ -234,7 +234,7 @@
 *  confirm parameter value. This allows the user to delete the source
 *  or to recover a source he deleted by mistake provided he has not yet
 *  entered a ! to the delete sourc name request
-                     SOMADE(SOPOS) = CONDEL 
+                     SOMADE(SOPOS) = CONDEL
                   END IF
 
 *  Check whether a list of sources should be displayed
@@ -246,7 +246,7 @@
 
                END IF
  300        CONTINUE
-      
+
 *  *********************************************************************
 *  Check whether the source to be deleted has been found and if not
 *  display a warning message
@@ -256,14 +256,14 @@
                CALL MSG_OUT( ' ',
      :         'WARNING - source to deleted, ^c1, was not found',
      :         STATUS )
-            
+
             END IF
 
 *  Go to the begining of the next source to be deleted loop
             GO TO 100
 
          ELSE
-      
+
 *  *********************************************************************
 *  If the user enters ! to the source name prompt, meaning no more
 *  sources
@@ -276,7 +276,7 @@
 *  used to mark the position into which the next non deleted line shall
 *  be put
             SOPOS = 1
-      
+
 *  *********************************************************************
 *  Loop to delete marked sources
 *  *********************************************************************
@@ -285,25 +285,25 @@
 
 *  Copy source details to correct position after deleting the not
 *  required sources above it.
-                  SONAME( SOPOS ) = SONAME( IK ) 
-                  SOTITL( SOPOS ) = SOTITL( IK ) 
-                  SOCO1( SOPOS )  = SOCO1( IK )  
-                  SOCO2( SOPOS )  = SOCO2( IK )  
-                  SOCOSY( SOPOS ) = SOCOSY( IK ) 
-                  SORA( SOPOS )   = SORA( IK )   
-                  SODEC( SOPOS )  = SODEC( IK )  
-                  SOINSZ( SOPOS ) = SOINSZ( IK )  
-                  SOCRSZ( SOPOS ) = SOCRSZ( IK )  
-                  SOWAB1( SOPOS ) = SOWAB1( IK ) 
-                  SOWAB2( SOPOS ) = SOWAB2( IK ) 
-                  SOWAB3( SOPOS ) = SOWAB3( IK ) 
-                  SOWAB4( SOPOS ) = SOWAB4( IK ) 
-                  SOMADE( SOPOS ) = SOMADE( IK )   
+                  SONAME( SOPOS ) = SONAME( IK )
+                  SOTITL( SOPOS ) = SOTITL( IK )
+                  SOCO1( SOPOS )  = SOCO1( IK )
+                  SOCO2( SOPOS )  = SOCO2( IK )
+                  SOCOSY( SOPOS ) = SOCOSY( IK )
+                  SORA( SOPOS )   = SORA( IK )
+                  SODEC( SOPOS )  = SODEC( IK )
+                  SOINSZ( SOPOS ) = SOINSZ( IK )
+                  SOCRSZ( SOPOS ) = SOCRSZ( IK )
+                  SOWAB1( SOPOS ) = SOWAB1( IK )
+                  SOWAB2( SOPOS ) = SOWAB2( IK )
+                  SOWAB3( SOPOS ) = SOWAB3( IK )
+                  SOWAB4( SOPOS ) = SOWAB4( IK )
+                  SOMADE( SOPOS ) = SOMADE( IK )
 
 *  Add 1 to SOPOS to bring it to the next line in source common to be
 *  filled
                   SOPOS = SOPOS + 1
-              
+
                END IF
  400        CONTINUE
 

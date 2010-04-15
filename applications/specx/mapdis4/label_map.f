@@ -104,7 +104,7 @@ C  map itself.
         IPROC = ' averaged '
       END IF
 
-C  Write out information about map 
+C  Write out information about map
 
       MAPTITLE = MAP_NAME(:MIN(28,GEN_ILEN(MAP_NAME)))
 

@@ -22,7 +22,7 @@
 *     Modified:
 *     26-Oct-1993 :  Original (cloned from red4_extract)       KLK ( JAC )
 *     08-Nov-1993 :  Changed to red4_nodextract                KLK ( JAC )
-*     07-Dec-1993 :  Allow 2-D output (also significantly 
+*     07-Dec-1993 :  Allow 2-D output (also significantly
 *                    re-worked to avoid other problems)        PND ( JAC )
 *     24-May-1994 :  Add bright and faint source algorithm     PND ( JAC )
 *+
@@ -31,7 +31,7 @@
 *     Functions
       INTEGER GEN_BSEARCH
       INTEGER CHR_LEN
-* 
+*
 *     ADAM include files
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
@@ -198,7 +198,7 @@
       CALL PAR_GET0R( 'ROW2E', ROW2E, STATUS )
       CALL PAR_GET0R( 'ROW3S', ROW3S, STATUS )
       CALL PAR_GET0R( 'ROW3E', ROW3E, STATUS )
-      CALL DSA_MAP_AXIS_DATA( 'IMAGE', 2, 'READ', 'FLOAT', 
+      CALL DSA_MAP_AXIS_DATA( 'IMAGE', 2, 'READ', 'FLOAT',
      :  A1PTR, A1SLT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IYST1 = GEN_BSEARCH( %val( A1PTR ), NY, ROW1S )
@@ -278,7 +278,7 @@
       ENDIF
 
 *    Map the data, quality and variance arrays
-      CALL DSA_MAP_DATA( 'IMAGE', 'READ', 'FLOAT', 
+      CALL DSA_MAP_DATA( 'IMAGE', 'READ', 'FLOAT',
      :  IPTR, ISLT, STATUS )
       IF ( VARIANCE ) CALL DSA_MAP_VARIANCE( 'IMAGE', 'READ', 'FLOAT',
      :  IVPTR, IVSLT, STATUS )
@@ -286,10 +286,10 @@
      :  IQPTR, IQSLT, STATUS )
 
 *    Map the output spectrum and initialize it
-      CALL DSA_MAP_DATA( 'SPECT', 'UPDATE', 'FLOAT', 
+      CALL DSA_MAP_DATA( 'SPECT', 'UPDATE', 'FLOAT',
      :  SPTR, SSLT, STATUS )
       CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SPTR) )
-      CALL DSA_MAP_VARIANCE( 'SPECT', 'UPDATE', 'FLOAT', 
+      CALL DSA_MAP_VARIANCE( 'SPECT', 'UPDATE', 'FLOAT',
      :  SVPTR, SVSLT, STATUS )
       CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SVPTR) )
       IF ( QUALITY ) THEN
@@ -299,13 +299,13 @@
       END IF
 
 *    Map the output spectral image and initialize it
-      CALL DSA_MAP_DATA( 'ISPECT', 'UPDATE', 'FLOAT', 
+      CALL DSA_MAP_DATA( 'ISPECT', 'UPDATE', 'FLOAT',
      :  ISPTR, ISSLT, STATUS )
       CALL GEN_FILL( NX*NY*FLOATSIZE, 0.0, %val(ISPTR) )
-      CALL DSA_MAP_VARIANCE( 'ISPECT', 'UPDATE', 'FLOAT', 
+      CALL DSA_MAP_VARIANCE( 'ISPECT', 'UPDATE', 'FLOAT',
      :  ISVPTR, ISVSLT, STATUS )
       CALL GEN_FILL( NX*NY*FLOATSIZE, 0.0, %val(ISVPTR) )
-      IF ( QUALITY ) THEN 
+      IF ( QUALITY ) THEN
         CALL DSA_MAP_QUALITY( 'ISPECT', 'UPDATE', 'BYTE',
      :    ISQPTR,ISQSLT, STATUS )
         CALL GEN_FILL( NX*NY*BYTESIZE, 0.0, %val(ISQPTR) )
@@ -317,13 +317,13 @@
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NBEAMS .EQ. 1 ) ) THEN
 
 *       Get some work arrays and initialize them
-         CALL DSA_GET_WORK_ARRAY( NX, 'INT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'INT',
      :     NUM1PTR, NUM1SLT, STATUS )
          CALL GEN_FILL( NX*INTSIZE, 0, %val(NUM1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUM1PTR, SUM1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUM1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUMSQ1PTR, SUMSQ1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUMSQ1PTR) )
 
@@ -342,49 +342,49 @@
       ELSE IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NBEAMS .EQ. 2 ) ) THEN
 
 *       Get work arrays and initialize them
-         CALL DSA_GET_WORK_ARRAY( NX, 'INT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'INT',
      :     NUM1PTR, NUM1SLT, STATUS )
          CALL GEN_FILL( NX*INTSIZE, 0, %val(NUM1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUM1PTR, SUM1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUM1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUMSQ1PTR, SUMSQ1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUMSQ1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'INT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'INT',
      :     NUM2PTR, NUM2SLT, STATUS )
          CALL GEN_FILL( NX*INTSIZE, 0, %val(NUM2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUM2PTR, SUM2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUM2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUMSQ2PTR, SUMSQ2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUMSQ2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP1PTR, TSP1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP2PTR, TSP2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP3PTR, TSP3SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV1PTR, TSPV1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV2PTR, TSPV2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV3PTR, TSPV3SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ1PTR, TSPQ1SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ2PTR, TSPQ2SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ3PTR, TSPQ3SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ3PTR) )
 
@@ -401,14 +401,14 @@
      :     %val( NUM2PTR ), %val( SUM2PTR ), %val( SUMSQ2PTR ) )
 
 *       Subtract them propagating to TSP3
-         CALL GEN_SUBAFV( NX, %val( TSP1PTR ), %val( TSP2PTR ), 
-     :     %val( TSP3PTR ), %val( TSPQ1PTR ), %val( TSPQ2PTR ), 
+         CALL GEN_SUBAFV( NX, %val( TSP1PTR ), %val( TSP2PTR ),
+     :     %val( TSP3PTR ), %val( TSPQ1PTR ), %val( TSPQ2PTR ),
      :     %val( TSPQ3PTR ), %val( TSPV1PTR ), %val( TSPV2PTR ),
      :     %val( TSPV3PTR ), QUALITY, .FALSE., FBAD, VARIANCE )
 
 *       Divide by two propagating to SPTR
-         CALL GEN_MULCAFV( %val( TSP3PTR ), NX, 0.5, %val( SPTR ), 
-     :     %val( TSPQ3PTR ), %val( SQPTR ), %val( TSPV3PTR ), 
+         CALL GEN_MULCAFV( %val( TSP3PTR ), NX, 0.5, %val( SPTR ),
+     :     %val( TSPQ3PTR ), %val( SQPTR ), %val( TSPV3PTR ),
      :     %val( SVPTR ), QUALITY, .FALSE., FBAD, VARIANCE )
 
 *      Release work arrays
@@ -432,85 +432,85 @@
       ELSE IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NBEAMS .EQ. 3 ) ) THEN
 
 *       Get some(!) work arrays and initialize them
-         CALL DSA_GET_WORK_ARRAY( NX, 'INT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'INT',
      :     NUM1PTR, NUM1SLT, STATUS )
          CALL GEN_FILL( NX*INTSIZE, 0, %val(NUM1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'INT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'INT',
      :     NUM2PTR, NUM2SLT, STATUS )
          CALL GEN_FILL( NX*INTSIZE, 0, %val(NUM2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'INT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'INT',
      :     NUM3PTR, NUM3SLT, STATUS )
          CALL GEN_FILL( NX*INTSIZE, 0, %val(NUM3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUM1PTR, SUM1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUM1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUM2PTR, SUM2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUM2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUM3PTR, SUM3SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUM3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUMSQ1PTR, SUMSQ1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUMSQ1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUMSQ2PTR, SUMSQ2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUMSQ2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     SUMSQ3PTR, SUMSQ3SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(SUMSQ3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP1PTR, TSP1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP2PTR, TSP2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP3PTR, TSP3SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP4PTR, TSP4SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP4PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP5PTR, TSP5SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP5PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSP6PTR, TSP6SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSP6PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV1PTR, TSPV1SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV2PTR, TSPV2SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV3PTR, TSPV3SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV4PTR, TSPV4SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV4PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV5PTR, TSPV5SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV5PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'FLOAT',
      :     TSPV6PTR, TSPV6SLT, STATUS )
          CALL GEN_FILL( NX*FLOATSIZE, 0.0, %val(TSPV6PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ1PTR, TSPQ1SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ1PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ2PTR, TSPQ2SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ2PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ3PTR, TSPQ3SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ3PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ4PTR, TSPQ4SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ4PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ5PTR, TSPQ5SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ5PTR) )
-         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE', 
+         CALL DSA_GET_WORK_ARRAY( NX, 'BYTE',
      :     TSPQ6PTR, TSPQ6SLT, STATUS )
          CALL GEN_FILL( NX*BYTESIZE, 0, %val(TSPQ6PTR) )
 
@@ -535,7 +535,7 @@
 *       Add first and third beams propagating to TSP4
          CALL GEN_ADDAFV( NX, %val( TSP1PTR ), %val( TSP3PTR ),
      :     %val( TSP4PTR ), %val( TSPQ1PTR ), %val( TSPQ3PTR ),
-     :     %val( TSPQ4PTR ), %val( TSPV1PTR ), %val( TSPV3PTR ), 
+     :     %val( TSPQ4PTR ), %val( TSPV1PTR ), %val( TSPV3PTR ),
      :     %val( TSPV4PTR ), QUALITY, .FALSE., FBAD, VARIANCE )
 
 *       Result = ( MIDDLE - ( TOP+BOTTOM ) ) / 4
@@ -552,7 +552,7 @@
 
 *         Multiply TSP5 by 0.25 propagating to SPTR
            CALL GEN_MULCAFV( %val( TSP5PTR ), NX, 0.25, %val( SPTR ),
-     :       %val( TSPQ5PTR ), %val( SQPTR ), %val( TSPV5PTR ), 
+     :       %val( TSPQ5PTR ), %val( SQPTR ), %val( TSPV5PTR ),
      :       %val( SVPTR ), QUALITY, .FALSE., FBAD, VARIANCE )
 
 *    Result = ( MIDDLE - ( TOP+BOTTOM )/2 ) /3
@@ -562,7 +562,7 @@
 
 *         Multiply TSP4 by 0.5 propagating to TSP5
            CALL GEN_MULCAFV( %val( TSP4PTR ), NX, 0.5, %val( TSP5PTR ),
-     :       %val( TSPQ4PTR ), %val( TSPQ5PTR ), %val( TSPV4PTR ), 
+     :       %val( TSPQ4PTR ), %val( TSPQ5PTR ), %val( TSPV4PTR ),
      :       %val( TSPV5PTR ), QUALITY, .FALSE., FBAD, VARIANCE )
 
 *         Subtract TSP5 from TSP2 propagating to TSP6
@@ -572,9 +572,9 @@
      :       %val( TSPV6PTR ), QUALITY, .FALSE., FBAD, VARIANCE )
 
 *         Multiply TSP6 by 1.33333 propagating to SPTR
-           CALL GEN_MULCAFV( %val( TSP6PTR ), NX, 0.33333333, 
-     :       %val( SPTR ), %val( TSPQ6PTR ), %val( SQPTR ), 
-     :       %val( TSPV6PTR ), %val( SVPTR ), QUALITY, .FALSE., 
+           CALL GEN_MULCAFV( %val( TSP6PTR ), NX, 0.33333333,
+     :       %val( SPTR ), %val( TSPQ6PTR ), %val( SQPTR ),
+     :       %val( TSPV6PTR ), %val( SVPTR ), QUALITY, .FALSE.,
      :       FBAD, VARIANCE )
          ENDIF
 
@@ -616,7 +616,7 @@
       ENDIF
 
 *    Clean the data (clipping values below -65530.0)
-      CALL GEN_CLIPF( %val(SPTR), NX, -65530.0, VAL__MAXR, 
+      CALL GEN_CLIPF( %val(SPTR), NX, -65530.0, VAL__MAXR,
      :   NLOW, NHIGH, %val(SPTR) )
 
 *    Grow the data, variance and quality into the output image
@@ -625,7 +625,7 @@
      :     1, NY, %val( ISPTR )  )
          CALL GEN_GROWX(  %val( SVPTR ), NX, NY,
      :     1, NY, %val( ISVPTR )  )
-         CALL GEN_GROWXB(  %val( SQPTR ), NX, NY, 
+         CALL GEN_GROWXB(  %val( SQPTR ), NX, NY,
      :     1, NY, %val( ISQPTR )  )
       ENDIF
 

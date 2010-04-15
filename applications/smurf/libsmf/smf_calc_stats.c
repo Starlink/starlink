@@ -16,7 +16,7 @@
 *     smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
 *                      dim_t lo, dim_t hi, int nclip, const float clip[],
 *                      double *mean, double *stdev,
-*                      int *status ) 
+*                      int *status )
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -56,7 +56,7 @@
 *     zero then the entire range is used. On error a mean and std
 *     deviation of VAL__BADD are returned.
 
-*  Notes: 
+*  Notes:
 *     - The range lo to hi is INCLUSIVE.
 *     - Further API updates are likely in order to take fuller advantage
 *       of kpgStatx.
@@ -143,7 +143,7 @@
 
 void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
                       dim_t lo, dim_t hi, int nclip, const float clip[],
-                      double *mean, double *stdev, 
+                      double *mean, double *stdev,
                       int *status) {
 
   /* Local variables */
@@ -168,18 +168,18 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   /* Current list of variables for kpgStatd - move into API as appropriate */
   int bad = 1;                /* Do we check for bad pixels? Default to yes */
   int ngood;                  /* Number of valid pixels before clipping */
-  int imin;                   /* Index where the pixel with the lowest value was 
+  int imin;                   /* Index where the pixel with the lowest value was
 				 (first) found before clipping */
   double dmin;                /* Minimum pixel value in the array before clipping */
-  int imax;                   /* Index where the pixel with the highest value was 
+  int imax;                   /* Index where the pixel with the highest value was
 				 (first) found before clipping*/
   double dmax;                /* Maximum pixel value in the array before clipping */
   double sum;                 /* Sum of valid pixels before clipping */
   int ngoodc;                 /* Number of valid pixels in the array after clipping */
-  int iminc;                  /* Index where the pixel with the lowest value was 
+  int iminc;                  /* Index where the pixel with the lowest value was
 				 (first) found after clipping */
   double dminc;               /* Minimum pixel value in the array after clipping */
-  int imaxc;                  /* Index where the pixel with the highest value was 
+  int imaxc;                  /* Index where the pixel with the highest value was
 				 (first) found after clipping */
   double dmaxc;               /* Maximum pixel value in the array after clipping */
   double sumc;                /* Sum of valid pixels after clipping */
@@ -234,7 +234,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       msgSeti("I", index);
       msgSeti("N", nmax);
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).", 
+      errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).",
              status);
     }
     return;
@@ -267,9 +267,9 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
     temp = lo;
     lo = hi;
     hi = temp;
-    msgOutif(MSG__VERB," ", "Oops - lo > hi. Swapping them round.", 
+    msgOutif(MSG__VERB," ", "Oops - lo > hi. Swapping them round.",
              status);
-  }  
+  }
 
   /* If lo and hi are both zero then the whole range is assumed */
   if ( lo == 0 && hi == 0 ) {
@@ -280,8 +280,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   if ( lo == hi ) {
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, 
-             "Requested index range is zero (lo = hi). Unable to compute statistics.", 
+      errRep(FUNC_NAME,
+             "Requested index range is zero (lo = hi). Unable to compute statistics.",
              status);
     }
     return;
@@ -295,7 +295,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
 
   statsdata = smf_malloc( npts, nbperel, 0, status );
   if( statsdata == NULL ) {
-    errRep( FUNC_NAME, "Unable to allocate memory for statistics array", 
+    errRep( FUNC_NAME, "Unable to allocate memory for statistics array",
             status );
     return;
   }
@@ -346,13 +346,13 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   if ( *status == SAI__OK) {
     switch ( data->dtype ) {
     case SMF__DOUBLE:
-      kpgStatd( bad, npts, stats_d, nclip, clip, 
+      kpgStatd( bad, npts, stats_d, nclip, clip,
                 &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
                 &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
                 status);
       break;
     case SMF__INTEGER:
-      kpgStati( bad, npts, stats_i, nclip, clip, 
+      kpgStati( bad, npts, stats_i, nclip, clip,
                 &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
                 &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
                 status);

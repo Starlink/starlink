@@ -5,7 +5,7 @@ C-----------------------------------------------------------------
 C   Routine to select data for specified spectrum (# in file) and
 C   place in SPECX stack for processing. Works on data files in
 C   GSD version 5.1 format, where the stack position of each input
-C   quadrant is specified by the GSD array C3BESSPEC. 
+C   quadrant is specified by the GSD array C3BESSPEC.
 
 C   22-NOV-1991 REVAD::JFL Original version.
 C   18-NOV-1991 JCMT::RMP  Incorporate Rachael's latest mods (to IDRA)
@@ -140,23 +140,23 @@ C     Find the total number of output channels from the backend
      :               NO, UNITS, TYPE, ARRAY, IND_GSD, STATUS)
       CALL GSD_GET0I (IND_GSD, NO_BE_O_CH, STATUS)
 
-C     Find indices to all other arrays 
+C     Find indices to all other arrays
 
-      CALL GSD_FIND (IFD, 'C13DAT', 
+      CALL GSD_FIND (IFD, 'C13DAT',
      &               NO, UNITS, TYPE, ARRAY, IND_DATA, STATUS)
       CALL GSD_FIND (IFD, 'C12SST',
      &               NO, UNITS, TYPE, ARRAY, IND_TSYS, STATUS)
-      CALL GSD_FIND (IFD, 'C12RT', 
+      CALL GSD_FIND (IFD, 'C12RT',
      &               NO, UNITS, TYPE, ARRAY, IND_TREC, STATUS)
-      CALL GSD_FIND (IFD, 'C12TTEL', 
+      CALL GSD_FIND (IFD, 'C12TTEL',
      &               NO, UNITS, TYPE, ARRAY, IND_TTEL, STATUS)
-      CALL GSD_FIND (IFD, 'C12TSKY', 
+      CALL GSD_FIND (IFD, 'C12TSKY',
      &               NO, UNITS, TYPE, ARRAY, IND_TSKY, STATUS)
-      CALL GSD_FIND (IFD, 'C12RF', 
+      CALL GSD_FIND (IFD, 'C12RF',
      &               NO, UNITS, TYPE, ARRAY, IND_RF, STATUS)
-      CALL GSD_FIND (IFD, 'C12CF', 
+      CALL GSD_FIND (IFD, 'C12CF',
      &               NO, UNITS, TYPE, ARRAY, IND_CF, STATUS)
-      CALL GSD_FIND (IFD, 'C12FR', 
+      CALL GSD_FIND (IFD, 'C12FR',
      &               NO, UNITS, TYPE, ARRAY, IND_FR, STATUS)
       IF (STATUS.NE.ADAM__OK) THEN
         STATUS = ADAM__OK
@@ -187,9 +187,9 @@ CD    WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
 C    ..then convert to R.A. and Dec. offsets
 
       V2Y_RAD = 1.74533e-2 * V2Y                               ! Radians
-      X2Y_RAD = 1.74533e-2 * X2Y 
+      X2Y_RAD = 1.74533e-2 * X2Y
 
-      DRA     =   SIN (V2Y_RAD - X2Y_RAD) * X_OFFSET 
+      DRA     =   SIN (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + SIN (V2Y_RAD)           * Y_OFFSET
       DDEC    =   COS (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + COS (V2Y_RAD)           * Y_OFFSET
@@ -206,7 +206,7 @@ C  Fix up integration time for last spectrum
 C     Now get the data: loop through sub-bands/sectors/quadrants, which
 C     are assumed to be sequential starting at 0.
 
-      DO NS = 0, NSPEC-1  
+      DO NS = 0, NSPEC-1
 
 
         NQUAD = 0
@@ -232,8 +232,8 @@ C              check that 8 quadrants haven't already been read in
 C              Now get appropriate array elements for this quadrant within
 C              each spectrum  ( system temperatures etc are the same for
 C              all spectra )
-  
-               CALL GSD_GET1R (IND_TSYS, 1, NRC, QUAD, QUAD, 
+
+               CALL GSD_GET1R (IND_TSYS, 1, NRC, QUAD, QUAD,
      :           TSYS(NQUAD), LVAL, STATUS)
                CALL GSD_GET1I (IND_TREC, 1, NRC, QUAD, QUAD,
      :           ITREC(NQUAD), LVAL, STATUS)

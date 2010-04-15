@@ -14,7 +14,7 @@
 #define CNF_OLD_DEFINED          /* Prevent redefinition of old names */
 #include "f77.h"                 /* CNF macros and prototypes */
 
-void cnf_copyf( const char *source_f, int source_len, char *dest_f, 
+void cnf_copyf( const char *source_f, int source_len, char *dest_f,
                 int dest_len ) {
    cnfCopyf( source_f, source_len, dest_f, dest_len );
 }
@@ -65,7 +65,7 @@ void cnf_exprta( const char *source_c, int source_len, char *dest_f,
    cnfExprta( source_c, source_len, dest_f, dest_len, ndims, dims );
 }
 
-void cnf_exprtap( char *const *source_c, char *dest_f, int dest_len, 
+void cnf_exprtap( char *const *source_c, char *dest_f, int dest_len,
                   int ndims, const int *dims ) {
    cnfExprtap( source_c, dest_f, dest_len, ndims, dims );
 }

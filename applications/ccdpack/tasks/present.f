@@ -22,14 +22,14 @@
 *  Description:
 *     This routine enters reduction information into the CCDPACK
 *     extensions of a list of NDFs. This information is required if an
-*     automated reduction schedule is to be produced using SCHEDULE. 
+*     automated reduction schedule is to be produced using SCHEDULE.
 *     Before using this routine you should set up the CCDPACK global
 *     parameters, describing the CCD characteristics, using the CCDSETUP
 *     application.
 *
 *     If the input NDFs have not already been categorised then this
 *     routine performs this task for the "frame types" BIAS, TARGET,
-*     DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and 
+*     DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and
 *     MASTER_FLASH (these are input as different groups of NDFs).
 *
 *     Missing exposure times for DARK and FLASH counts can be entered
@@ -155,7 +155,7 @@
 *        X or Y.  A value of X indicates that the readout direction is
 *        along the first (horizontal) direction, an Y indicates that
 *        the readout direction is along the direction perpendicular to
-*        the X axis. 
+*        the X axis.
 *
 *        This parameter normally accesses the value of the related
 *        CCDPACK global association. This behaviour can only be
@@ -285,7 +285,7 @@
 *        [!]
 *     MASTERS = _LOGICAL (Read)
 *        If this parameter is TRUE then prompts will be made for all the
-*        master calibration types (MASTERBIAS, MASTERDARK, MASTERFLAT 
+*        master calibration types (MASTERBIAS, MASTERDARK, MASTERFLAT
 *        and MASTERFLASH).
 *        [FALSE]
 *     MODIFY = _LOGICAL (Read)
@@ -304,7 +304,7 @@
 *        them, otherwise these values will be entered into the NDF
 *        CCDPACK extensions.
 *
-*        The input record format is five fields separated by commas. These 
+*        The input record format is five fields separated by commas. These
 *        are:
 *
 *            - 1 NDF name
@@ -313,9 +313,9 @@
 *            - 4 Dark exposure time
 *            - 5 Flash exposure time
 *
-*        The latter three fields can be specified as "!" in which case 
+*        The latter three fields can be specified as "!" in which case
 *        they are not set (they may not be relevant). Multiple records
-*        can be entered and can be read in from a text file. So for 
+*        can be entered and can be read in from a text file. So for
 *        instance if the file "XREDUCE.NDFS" had the following as its
 *        contents:
 *
@@ -329,7 +329,7 @@
 *           BIAS2,bias,!,!,!
 *           BIAS3,bias,!,!,!
 *
-*        Then it would be invoked using parameters 
+*        Then it would be invoked using parameters
 *
 *           - SIMPLE MULTIENTRY IN=^XREDUCE.NDFS
 *
@@ -353,7 +353,7 @@
 *     ONEFILTER = _LOGICAL (Read)
 *        If the input data have only one filter type then this parameter
 *        may be set to inhibit repeated prompting for a filter name
-*        for every frame (that is filter dependent). This parameter 
+*        for every frame (that is filter dependent). This parameter
 *        is of particular use when running from scripts.
 *        [FALSE]
 *     ONEFLASHTIME = _LOGICAL (Read)
@@ -404,7 +404,7 @@
 *        [!]
 *     ZEROED = _LOGICAL (Read)
 *        If a master bias frame is given, then this parameter indicates
-*        whether or not it has a mean value of zero. If SIMPLE and 
+*        whether or not it has a mean value of zero. If SIMPLE and
 *        MULTIENTRY are TRUE then this value (TRUE or FALSE) can be entered
 *        as the fourth field to the IN parameter.
 *        [FALSE]
@@ -505,10 +505,10 @@
       PARAMETER ( NTYPES = 9 )  ! Number of frame types.
       INTEGER IBIAS, ITARG, IDARK, IFLASH, IFLAT,
      :     IMBIAS, IMFLAT, IMDARK, IMFLAS ! Possible FRAME TYPES
-      PARAMETER ( IBIAS = 1, ITARG = 2, IDARK = 3 , IFLASH = 4 , 
-     :            IFLAT = 5, IMBIAS = 6, IMFLAT = 7, IMDARK = 8, 
+      PARAMETER ( IBIAS = 1, ITARG = 2, IDARK = 3 , IFLASH = 4 ,
+     :            IFLAT = 5, IMBIAS = 6, IMFLAT = 7, IMDARK = 8,
      :            IMFLAS = 9 )
-      
+
 *  Local Variables:
       CHARACTER * ( GRP__SZNAM ) NAME ! Name of input NDF
       INTEGER DARK              ! Filter names if MULTI
@@ -554,11 +554,11 @@
       CALL PAR_GET0L( 'SIMPLE', SIMPLE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( SIMPLE ) THEN
-      
+
 *  All names supplied in one prompt. Are all the NDF types and factors
 *  given as well?
          CALL PAR_GET0L( 'MULTIENTRY', MULTI, STATUS )
-         IF ( .NOT. MULTI ) THEN 
+         IF ( .NOT. MULTI ) THEN
 
 *  Just a list of NDF names.
             CALL CCD1_NDFGU( GID( 1 ), NNDF( 1 ), 'IN', 1, CCD1__MXINS,
@@ -567,7 +567,7 @@
 
 *  Multiple inputs. The element are the NDF name its frame type followed
 *  by the filter type or exposure time as appropriate.
-            CALL CCD1_PRIN( 'IN', GID( 1 ), NNDF( 1 ), FTYPES, 
+            CALL CCD1_PRIN( 'IN', GID( 1 ), NNDF( 1 ), FTYPES,
      :                      FILT, DARK, FLASH, STATUS )
          END IF
       ELSE
@@ -575,7 +575,7 @@
 *  Access the name types individually. Creating a separate group for
 *  each set.
 *  First get the bias frames.
-         CALL CCD1_NDFGU( GID( IBIAS ), NNDF( IBIAS ), 'BIAS', 1, 
+         CALL CCD1_NDFGU( GID( IBIAS ), NNDF( IBIAS ), 'BIAS', 1,
      :                    CCD1__MXINS, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -585,7 +585,7 @@
          END IF
 
 *  The target frames (objects/astronomically interesting data).
-         CALL CCD1_NDFGU( GID( ITARG ), NNDF( ITARG ), 'TARGET', 1, 
+         CALL CCD1_NDFGU( GID( ITARG ), NNDF( ITARG ), 'TARGET', 1,
      :                    CCD1__MXINS, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -595,7 +595,7 @@
          END IF
 
 *  Any dark counts frames (essential for IR data).
-         CALL CCD1_NDFGU( GID( IDARK ), NNDF( IDARK ), 'DARK', 1, 
+         CALL CCD1_NDFGU( GID( IDARK ), NNDF( IDARK ), 'DARK', 1,
      :                    CCD1__MXINS, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -605,7 +605,7 @@
          END IF
 
 *  Any preflash frames (mostly not used any more).
-         CALL CCD1_NDFGU( GID( IFLASH ), NNDF( IFLASH ), 'FLASH', 1, 
+         CALL CCD1_NDFGU( GID( IFLASH ), NNDF( IFLASH ), 'FLASH', 1,
      :                    CCD1__MXINS, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -616,7 +616,7 @@
 
 *  And flatfields (only allowing one type as no support for others at
 *  present).
-         CALL CCD1_NDFGU( GID( IFLAT ), NNDF( IFLAT ), 'FLAT', 1, 
+         CALL CCD1_NDFGU( GID( IFLAT ), NNDF( IFLAT ), 'FLAT', 1,
      :                    CCD1__MXINS, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -627,10 +627,10 @@
 
 *  Does the user have some foreign masters to present?
          CALL PAR_GET0L( 'MASTERS', HAVMAS, STATUS )
-         IF ( HAVMAS ) THEN 
+         IF ( HAVMAS ) THEN
 
 *  A master_bias?.
-            CALL CCD1_NDFGU( GID( IMBIAS ), NNDF( IMBIAS ), 
+            CALL CCD1_NDFGU( GID( IMBIAS ), NNDF( IMBIAS ),
      :                       'MASTERBIAS', 1, 1, STATUS )
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -640,7 +640,7 @@
             END IF
 
 *  Any master_flats? (these could be spectral).
-            CALL CCD1_NDFGU( GID( IMFLAT ), NNDF( IMFLAT ), 
+            CALL CCD1_NDFGU( GID( IMFLAT ), NNDF( IMFLAT ),
      :                       'MASTERFLAT', 1, CCD1__MXINS, STATUS )
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -650,7 +650,7 @@
             END IF
 
 *  Master darks?
-            CALL CCD1_NDFGU( GID( IMDARK ), NNDF( IMDARK ), 
+            CALL CCD1_NDFGU( GID( IMDARK ), NNDF( IMDARK ),
      :                       'MASTERDARK', 1, 1, STATUS )
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -660,7 +660,7 @@
             END IF
 
 *  Or master flashes?
-            CALL CCD1_NDFGU( GID( IMFLAS ), NNDF( IMFLAS ), 
+            CALL CCD1_NDFGU( GID( IMFLAS ), NNDF( IMFLAS ),
      :                       'MASTERFLASH', 1, 1, STATUS )
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -670,7 +670,7 @@
             END IF
          END IF
       END IF
-      
+
 *  Does the user want global values to supercede those in place already?
       CALL PAR_GET0L( 'MODIFY', MODIFY, STATUS )
 
@@ -703,26 +703,26 @@
 *  Right have the input NDF groups, check each one in turn for all the
 *  information to perform a reduction using these files.
       CALL CCD1_NDFCK( SIMPLE, MULTI, MODIFY, NNDF, NTYPES, GID, FTYPES,
-     :                 FILT, DARK, FLASH, ADDDRK, ADDFLS, 
+     :                 FILT, DARK, FLASH, ADDDRK, ADDFLS,
      :                 ONEFIL, ONEDRK, ONEFLS, STATUS )
 
 *  Write an output list of the NDF names for other applications to use.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', GRP__SZNAM, FD,
      :                    OPEN, STATUS )
-         IF ( STATUS .EQ. SAI__OK .AND. OPEN ) THEN 
+         IF ( STATUS .EQ. SAI__OK .AND. OPEN ) THEN
 
 *  Write the title
-            CALL FIO_WRITE( FD, '# PRESENT - input NDF name list', 
+            CALL FIO_WRITE( FD, '# PRESENT - input NDF name list',
      :                      STATUS )
 
 *  Extract the NDF names and write then out.
             DO 2 I = 1, 5
-               IF ( NNDF( I ) .GT. 0 ) THEN 
+               IF ( NNDF( I ) .GT. 0 ) THEN
                   DO 3 J = 1, NNDF( I )
                      NAME = ' '
                      CALL GRP_GET( GID( I ), J, 1, NAME, STATUS )
-                     CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), 
+                     CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ),
      :                               STATUS)
  3                CONTINUE
                END IF
@@ -730,7 +730,7 @@
             CALL FIO_CLOSE( FD, STATUS )
          END IF
       END IF
-      
+
 *  Exit with error statement label. Perform orderly closedown.
  99   CONTINUE
 

@@ -32,7 +32,7 @@ C
 C-
 C
 C  History:
-C    29/4/1988   Original Version.   JAB/AAO 
+C    29/4/1988   Original Version.   JAB/AAO
 C    19/11/1991  Support bad values. JAB/AAO
 C
 
@@ -60,7 +60,7 @@ C
 *  Create the output file
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
-              
+
 *  Copy input to output
 
       CALL TSP_COPY(LOC1,OLOC,STATUS)
@@ -90,7 +90,7 @@ C
       IF (DIMS(1) .NE. SIZE) THEN
          CALL MSG_OUT('MSG','Dimensions are different',STATUS)
          STATUS = USER__001
-      ENDIF         
+      ENDIF
 
 *  Get Stokes Data from calibration dataset - whichever stokes
 *  parameter is the first to be found in the sequence Q,U,V
@@ -113,14 +113,14 @@ C
       CALL TSP_MAP_DATA(SLOC2,'READ',SPTR2,SDLOC2,STATUS)
 
 *  Get the Stokes data from output dataset and correct it
-                                  
+
       CALL TSP_STOKES(OLOC,NUM,QZ,UZ,VZ,STATUS)
       IF (QZ) THEN
 
 *  Map the Q stokes parameter and variance - if present
           CALL TSP_GET_STOKES(OLOC,'Q',SLOC1,STATUS)
           CALL TSP_MAP_DATA(SLOC1,'UPDATE',SPTR1,SDLOC1,STATUS)
-          CALL TSP_MAP_VAR(SLOC1,'UPDATE',VPTR1,VDLOC1,STATUS) 
+          CALL TSP_MAP_VAR(SLOC1,'UPDATE',VPTR1,VDLOC1,STATUS)
 
 *  Calibrate the Q data
           IF (STATUS .EQ. SAI__OK) THEN
@@ -136,7 +136,7 @@ C
 
           CALL TSP_GET_STOKES(OLOC,'U',SLOC1,STATUS)
           CALL TSP_MAP_DATA(SLOC1,'UPDATE',SPTR1,SDLOC1,STATUS)
-          CALL TSP_MAP_VAR(SLOC1,'UPDATE',VPTR1,VDLOC1,STATUS) 
+          CALL TSP_MAP_VAR(SLOC1,'UPDATE',VPTR1,VDLOC1,STATUS)
 
 *  Calibrate the U data
           IF (STATUS .EQ. SAI__OK) THEN
@@ -151,7 +151,7 @@ C
 *  Map the V stokes parameter and variance - if present
           CALL TSP_GET_STOKES(OLOC,'V',SLOC1,STATUS)
           CALL TSP_MAP_DATA(SLOC1,'UPDATE',SPTR1,SDLOC1,STATUS)
-          CALL TSP_MAP_VAR(SLOC1,'UPDATE',VPTR1,VDLOC1,STATUS) 
+          CALL TSP_MAP_VAR(SLOC1,'UPDATE',VPTR1,VDLOC1,STATUS)
 
 *  Calibrate the V data
           IF (STATUS .EQ. SAI__OK) THEN
@@ -162,7 +162,7 @@ C
           CALL DAT_ANNUL(SLOC1,STATUS)
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(SDLOC2,STATUS)
       CALL DAT_ANNUL(SLOC2,STATUS)
@@ -175,9 +175,9 @@ C
       SUBROUTINE TSP_CALIB(SIZE,S1,V1,C)
 *+
 *   Subroutine to apply the correction to the data. This is done simply by
-*   scaling the Stokes parameter by the efficiency factor for the 
+*   scaling the Stokes parameter by the efficiency factor for the
 *   corresponding wavelength in the calibration array
-*       
+*
 *   (>)  SIZE  (Integer)   Size of stokes and calibration arrays
 *   (!)  S1    (Real array (SIZE)  Stokes array to be calibrated
 *   (!)  V1    (Real array (SIZE)  Variance on Stokes array
@@ -203,9 +203,9 @@ C
       INTEGER I
 
 *  Loop over data points
-      DO I=1,SIZE       
+      DO I=1,SIZE
 
-*  Invert the calibration if the values are negative at the centre    
+*  Invert the calibration if the values are negative at the centre
           IF (C(SIZE/2) .LT. 0.0) THEN
               CC = -C(I)
           ELSE

@@ -59,8 +59,8 @@
       INTEGER STATUS
 
       LOGICAL OPEN
-      
+
       INQUIRE ( UNIT = LUNGNS, OPENED = OPEN)
       IF (OPEN) CLOSE (UNIT=LUNGNS)
-      
-      END 
+
+      END

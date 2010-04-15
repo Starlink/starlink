@@ -8,27 +8,27 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
 /*
 *+
 *  Name:
-*     atlMatchRegion 
+*     atlMatchRegion
 
 *  Purpose:
 *     Ensure the axes in a Region match those in a Frame.
 
 *  Invocation:
-*     AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, 
+*     AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm,
 *                                int *status )
 
 *  Description:
-*     This function checks for matching axes in a supplied Region and 
-*     Frame. If possible, a new region is created containing a set of 
+*     This function checks for matching axes in a supplied Region and
+*     Frame. If possible, a new region is created containing a set of
 *     axes that correspond in number and type (but not necessarily in
-*     specific attributes) to those in the supplied Frame. This means 
-*     that astConvert should be able to find a Mapping between the 
-*     supplied Frame and the returned Region. Note, the order of the 
-*     axes in the returned Region may not match those in the Frame, but 
-*     astConvert will be able to identify any required re-ordering. 
+*     specific attributes) to those in the supplied Frame. This means
+*     that astConvert should be able to find a Mapping between the
+*     supplied Frame and the returned Region. Note, the order of the
+*     axes in the returned Region may not match those in the Frame, but
+*     astConvert will be able to identify any required re-ordering.
 *
 *     If it is not possible to find a matching Region (for instance, if
-*     there are no axes in common between the supplied Region and Frame), 
+*     there are no axes in common between the supplied Region and Frame),
 *     an error is reported.
 
 *  Arguments:
@@ -58,12 +58,12 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
 *-
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    AstFrame *ureg;            /* Supplied Region with no non-Frame axes */
    AstFrame *frame;           /* Frame to be checked */
    AstFrameSet *fset;         /* Supplied FrameSet */
@@ -122,7 +122,7 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
       icurr = astGetI( fset, "Current" );
       ibase = astGetI( fset, "Base" );
 
-/* If a Frame was supplied, arrange for the following loop to be executed 
+/* If a Frame was supplied, arrange for the following loop to be executed
    only once. */
    } else {
       fset = NULL;
@@ -130,7 +130,7 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
    }
 
 /* Loop checking all Frames. If "frm" is not a FrameSet, this loop
-   executed only once, checking the supplied Frame. If "frm" is a FrameSet, 
+   executed only once, checking the supplied Frame. If "frm" is a FrameSet,
    the first pass round this loop checks the current Frame, the last pass
    checks the base Frame, and the other passes check the other Frames in
    order of increasing Frame index. */
@@ -142,9 +142,9 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
             iframe = icurr;
          } else if( j == nfrm + 1 && ibase != icurr ) {
             iframe = ibase;
-         } else if( j != ibase && j != icurr ) {              
+         } else if( j != ibase && j != icurr ) {
             iframe = j;
-         } else {            
+         } else {
             iframe = AST__NOFRAME;
          }
 
@@ -156,20 +156,20 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
 
       } else {
          frame = astClone( frm );
-      }         
+      }
 
 /* Skip if there is no Frame to be checked for this value of "j". */
       if( frame ) {
 
-/* Try to get a region in which the axes are the same in number and type 
-   (but not necessarily order - astConvert should be called to take 
-   account of any difference in axis order) as those spanned by the 
-   supplied Frame. First find which (if any) Region axis corresponds 
+/* Try to get a region in which the axes are the same in number and type
+   (but not necessarily order - astConvert should be called to take
+   account of any difference in axis order) as those spanned by the
+   supplied Frame. First find which (if any) Region axis corresponds
    to each axis in the Frame. */
          astMatchAxes( region, frame, axes );
 
-/* Get a list (WAXES) of the Frame axis indices that have no corresponding 
-   region axis. Also get a list (RAXES) of the Region axes indicies that 
+/* Get a list (WAXES) of the Frame axis indices that have no corresponding
+   region axis. Also get a list (RAXES) of the Region axes indicies that
    have corresponding axes in the Frame. */
          nax = astGetI( frame, "Naxes" );
          nwpick = 0;
@@ -193,22 +193,22 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
             if( astIsARegion( ureg ) ) {
 
 /* If any Frame axes have no corresponding axis in the region, get an
-   unbounded region (a negated NullRegion) in a Frame that spans the 
+   unbounded region (a negated NullRegion) in a Frame that spans the
    Frame axes that have no corresponding axes in the Region. */
                if( nwpick > 0 ) {
-                  ereg = astNullRegion( astPickAxes( frame, nwpick, waxes, 
-                                                     &junk ), 
+                  ereg = astNullRegion( astPickAxes( frame, nwpick, waxes,
+                                                     &junk ),
                                         NULL, "Negated=1" );
 
-/* Join this region in parallel with the region containing the Frame axes 
+/* Join this region in parallel with the region containing the Frame axes
    picked from the supplied region. */
-                  result = (AstRegion *) astPrism( (AstRegion *) ureg, ereg, 
+                  result = (AstRegion *) astPrism( (AstRegion *) ureg, ereg,
                                                    " " );
 
 /* If there are no extra Frame axes, just use the cut-down supplied region. */
                } else {
                   result = astClone( ureg );
-               }  
+               }
             }
 
 /* Free resources. */
@@ -268,17 +268,17 @@ F77_SUBROUTINE(atl_matchregion)( INTEGER(REGION), INTEGER(FRAME),
 *     CALL ATL_MATCHREGION( REGION, FRAME, NEWREG, STATUS )
 
 *  Description:
-*     This routine checks for matching axes in a supplied Region and 
-*     Frame. If possible, a new region is created containing a set of 
+*     This routine checks for matching axes in a supplied Region and
+*     Frame. If possible, a new region is created containing a set of
 *     axes that correspond in number and type (but not necessarily in
-*     specific attributes) to those in the supplied Frame. This means 
-*     that AST_CONVERT should be able to find a Mapping between the 
-*     supplied Frame and the returned Region. Note, the order of the 
-*     axes in the returned Region may not match those in the Frame, 
-*     but AST_CONVERT will be able to identify any required re-ordering. 
+*     specific attributes) to those in the supplied Frame. This means
+*     that AST_CONVERT should be able to find a Mapping between the
+*     supplied Frame and the returned Region. Note, the order of the
+*     axes in the returned Region may not match those in the Frame,
+*     but AST_CONVERT will be able to identify any required re-ordering.
 *
 *     If it is not possible to find a matching Region (for instance, if
-*     there are no axes in common between the supplied Region and Frame), 
+*     there are no axes in common between the supplied Region and Frame),
 *     an error is reported.
 
 *  Arguments:
@@ -298,6 +298,6 @@ F77_SUBROUTINE(atl_matchregion)( INTEGER(REGION), INTEGER(FRAME),
    GENPTR_INTEGER(NEWREG)
    GENPTR_INTEGER(STATUS)
 
-   *NEWREG = astP2I( atlMatchRegion( astI2P( *REGION ),  astI2P( *FRAME ), 
+   *NEWREG = astP2I( atlMatchRegion( astI2P( *REGION ),  astI2P( *FRAME ),
                                      STATUS ) );
 }

@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_READ_NUMBERS (FILENAME, NARRAY, SIZE, 
+      SUBROUTINE SCULIB_READ_NUMBERS (FILENAME, NARRAY, SIZE,
      :   ARRAY1, ARRAY2, ARRAY3, LENGTH, STATUS)
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     is specified by FILENAME, and the routine assumes that the numbers
 *     are in NARRAY columns each containing SIZE numbers. The maximum
 *     value for NARRAY is 3. The read operation itself is free format.
-*     An error will be returned if there is trouble reading from the 
-*     file. A warning will be given if there are more numbers in the 
+*     An error will be returned if there is trouble reading from the
+*     file. A warning will be given if there are more numbers in the
 *     file than can be read into the arrays.
 
 *  Invocation:
-*     CALL SCULIB_READ_NUMBERS (FILENAME, NARRAY, SIZE, 
+*     CALL SCULIB_READ_NUMBERS (FILENAME, NARRAY, SIZE,
 *    :   ARRAY1, ARRAY2, ARRAY3, LENGTH, STATUS)
 
 *  Arguments:
@@ -143,7 +143,7 @@
             IF (IOSTAT .LT. 0) THEN
 
 *  EOF encountered
- 
+
                FINISHED = .TRUE.
 
             ELSE IF (IOSTAT .GT. 0) THEN
@@ -179,7 +179,7 @@
 
 *  read the numbers
 
-                     READ (BUF, FMT=*, IOSTAT=IOSTAT, ERR=400) 
+                     READ (BUF, FMT=*, IOSTAT=IOSTAT, ERR=400)
      :                 (TEMP(I), I = 1, N_ITEMS)
 
                      ARRAY1 (LENGTH) = TEMP (1)
@@ -195,7 +195,7 @@
 *  normal completion
 
          GOTO 500
- 
+
 *  error reading numbers from line
 
  400     STATUS = SAI__ERROR
@@ -208,8 +208,8 @@
 
  500     CONTINUE
 
-*  close file 
-   
+*  close file
+
          CALL FIO_CLOSE (FD, STATUS)
 
       END IF

@@ -178,14 +178,14 @@
 *        Whether to use Set header information or not.  If USESET is
 *        false then any Set header information will be ignored.
 *        If USESET is true, then the CAL parameter is taken to
-*        refer to a group of files, and each IN file will be 
-*        processed using a calibration image with a Set Index 
+*        refer to a group of files, and each IN file will be
+*        processed using a calibration image with a Set Index
 *        attribute which matches its own.  An IN file with no Set
 *        header is considered to match a CAL file with no Set header,
-*        so USESET can safely be set true  when the 
+*        so USESET can safely be set true  when the
 *        input files contain no Set header information.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 
@@ -450,14 +450,14 @@
       END IF
 
 *  Ask for a calibration NDF, or a group of NDFs matching the Set Index
-*  attributes we have. 
+*  attributes we have.
       IF ( USESET ) THEN
          CALL CCD1_NDFMI( 'CAL', KEYGRP, CALGRP, STATUS )
       ELSE
          CALL CCD1_NDFGL( 'CAL', 1, 1, CALGRP, IVAL, STATUS )
       END IF
 
-*  Get the names of the output NDFs. Use the input names as a 
+*  Get the names of the output NDFs. Use the input names as a
 *  modification group for these.
       CALL CCD1_NDFPG( 'OUT', INGRP, NTOT, OUTGRP, STATUS )
 
@@ -466,7 +466,7 @@
 
 *  Write a header unless this is the only subgroup.
          IF ( NSUB .GT. 1 ) THEN
-            CALL CCD1_SETHD( KEYGRP, ISUB, 
+            CALL CCD1_SETHD( KEYGRP, ISUB,
      :                       'Applying calibration correction', 'Index',
      :                       STATUS )
          END IF

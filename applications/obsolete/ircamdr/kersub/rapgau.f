@@ -1,5 +1,5 @@
 *+  RAPGAU - performs a rapid 2-D gaussian smooth on a 2-D array
-      SUBROUTINE RAPGAU( SIGMA, NPIX, DIMS1, DIMS2, ARRAY, ROLL, RBUF, 
+      SUBROUTINE RAPGAU( SIGMA, NPIX, DIMS1, DIMS2, ARRAY, ROLL, RBUF,
      :  WEIGHT, RMARGE, STATUS )
 *    Description :
 *     Replaces each pixel of the 2-D array, ARRAY, by the weighted mean of
@@ -101,7 +101,7 @@
 
 *    check for error on entry
       IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       calculate half smoothing box size rounded down and up
          HNPIX = NPIX / 2
          HNPIX1 = ( NPIX + 1 ) / 2
@@ -140,7 +140,7 @@
                ROLL( X, Y ) = ARRAY( X, 1 )
             ENDDO
          ENDDO
- 
+
 *       for remaining rows of 2-D buffer copy in 2nd to HNPIXth rows of image
          DO Y = FIRST+1, NPIX
             DO X = 1, DIMS1
@@ -248,5 +248,5 @@
             ENDDO
          ENDDO
       ENDIF
- 
+
       END

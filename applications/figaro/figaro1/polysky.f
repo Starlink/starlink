@@ -7,7 +7,7 @@ C     POLYSKY is used to subtract sky from a long slit spectrum by
 C     polynomial fitting in the spatial direction to two regions of
 C     sky on either side of an object of interest.
 C
-C     Only the region of the image between the outer edges of the two 
+C     Only the region of the image between the outer edges of the two
 C     sky fields is sky subtracted. Data outside this region is
 C     unchanged. This enables POLYSKY to be used repeatedly to remove
 C     sky from more than one object spectrum on an image.
@@ -41,7 +41,7 @@ C
 C                                     JAB / JAC 7th Feb 1991
 C
 C     Modified:
-C     
+C
 C      7th Mar 1991  JAB / JAC. Only use error weighting if ALL errors
 C                    are known and non-zero.
 C      7th Mar 1991  JAB / JAC. Use Variance rather than error.
@@ -49,7 +49,7 @@ C      8th Mar 1991  JAB / JAC. Add WEIGHT keyword.
 C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C      6th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
 C                    DPOLFT requires 1/variance as weight.
-C     18th Mar 1997  JJL / Soton, Starlink. Error propagation included. 
+C     18th Mar 1997  JJL / Soton, Starlink. Error propagation included.
 C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
 C
@@ -90,7 +90,7 @@ C
       INTEGER   YE1              ! Final pixel number for field 1
       INTEGER   YS2              ! Initial pixel number for field 2
       INTEGER   YE2              ! Final pixel number for field 2
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -145,7 +145,7 @@ C     Check that regions don't overlap
 C
       IF (YS2 .LE. YE1) THEN
          IF (YE2 .LT. YS1) THEN
-C    
+C
 C     Swap the regions round - they are in the wrong order
 C
             TEMP = YS1
@@ -166,7 +166,7 @@ C
          END IF
       END IF
 C
-C     Get the polynomial degree and rejection parameters             
+C     Get the polynomial degree and rejection parameters
 C
       CALL PAR_RDVAL('DEGREE',1.0,10.0,3.0,' ',VALUE)
       DEGREE = NINT(VALUE)
@@ -178,7 +178,7 @@ C
       EXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE('IMAGE',EXIST,STATUS)
 C
-C     If there is error information, should it be used to weight the 
+C     If there is error information, should it be used to weight the
 C     fit?
 C
       IF (EXIST) THEN
@@ -265,8 +265,8 @@ C     Modified:
 C
 C      7th Mar 1991  JAB / JAC   Only use error weighting if ALL errors
 C                    for column are known and non-zero.
-C      7th Mar 1991  JAB / JAC   Use variance rather than error. 
-C      8th Mar 1991  JAB / JAC   Only weight fit if WEIGHT is true. 
+C      7th Mar 1991  JAB / JAC   Use variance rather than error.
+C      8th Mar 1991  JAB / JAC   Only weight fit if WEIGHT is true.
 C      6th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
 C                    DPOLFT requires 1/variance as weight.
 C      11th Dec 1997 ACD / UoE, Starlink.  Fixed a bug, so that
@@ -336,7 +336,7 @@ C
       DO IX = 1,NX
 C
 C     Build array of values to do polynomial fit to. These are
-C     used as the X,Y and W parameters in the PDA sunbroutines. 
+C     used as the X,Y and W parameters in the PDA sunbroutines.
 C     The X value is the Y index in the original array
 C     The Y value is the data value in the array.
 C     The W value (weight):  is 1 if the errors are zero or unknown
@@ -361,7 +361,7 @@ C
                    END IF
                 END IF
              END IF
-          END DO 
+          END DO
           DO IY = YS2,YE2
              IF (Q(IX,IY) .EQ. 0) THEN
                 NGOOD = NGOOD+1
@@ -371,7 +371,7 @@ C
                    END IF
                 END IF
              END IF
-          END DO 
+          END DO
 C
 C     First sky region
 C
@@ -385,7 +385,7 @@ C
                     ELSE
                       W(INDEX) = 1D0/V(IX,IY)
                     END IF
-                 ELSE  
+                 ELSE
                     W(INDEX) = 1D0
                  END IF
                  INDEX = INDEX+1
@@ -404,7 +404,7 @@ C
                     ELSE
                       W(INDEX) = 1D0/V(IX,IY)
                     END IF
-                 ELSE  
+                 ELSE
                     W(INDEX) = 1D0
                  END IF
                  INDEX = INDEX+1
@@ -417,21 +417,21 @@ C
 C
 C     Calculate mean
 C
-              MEAN = 0D0                             
-              DO INDEX = 1,NGOOD                         
-                  MEAN = MEAN + Y(INDEX)         
-              END DO                                  
-              MEAN = MEAN/NGOOD                         
+              MEAN = 0D0
+              DO INDEX = 1,NGOOD
+                  MEAN = MEAN + Y(INDEX)
+              END DO
+              MEAN = MEAN/NGOOD
 C
 C     Calculate deviation from mean and delete the worst point
 C
-              RMAX = -1D0                            
-              DO INDEX = 1,NGOOD                      
-                 R = ABS(Y(INDEX)-MEAN)         
-                 IF (R .GT. RMAX) THEN          
-                     RMAX = R                   
-                     IMAX = INDEX               
-                 END IF                          
+              RMAX = -1D0
+              DO INDEX = 1,NGOOD
+                 R = ABS(Y(INDEX)-MEAN)
+                 IF (R .GT. RMAX) THEN
+                     RMAX = R
+                     IMAX = INDEX
+                 END IF
               END DO
               DO INDEX = IMAX,NGOOD-1
                  Y(INDEX)=Y(INDEX+1)
@@ -439,7 +439,7 @@ C
                  X(INDEX)=X(INDEX+1)
               END DO
               NGOOD=NGOOD-1
-          END DO     
+          END DO
 C
 C     Now calculate the second moment of the skybackground if errors
 C     are being propogated.
@@ -460,7 +460,7 @@ C
           IF (ERRORS) THEN
              SVAR = 0D0
              DO INDEX = 1, NGOOD
-                SVAR = SVAR + V(IX,INDEX) 
+                SVAR = SVAR + V(IX,INDEX)
              END DO
              SVAR = SVAR / (NGOOD * NGOOD)
           END IF
@@ -475,7 +475,7 @@ C
                 Q(IX,IY) = 0
              END DO
           ELSE
-C 
+C
 C     Do the polynomial fit
 C
              EPS=0D0
@@ -484,8 +484,8 @@ C
      :          IFAIL,WRK(NGOOD+1),IFAIL2)
              IF (NDEG.NE.KPLUS1-1.OR.IFAIL.NE.1.OR.IFAIL2.NE.0) THEN
                  CALL PAR_WRUSER('Error in PDA_DPOLFT',IGNORE)
-                 GO TO 500                                            
-             END IF                                                    
+                 GO TO 500
+             END IF
 C
 C     Subtract sky values
 C

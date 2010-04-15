@@ -1,5 +1,5 @@
 1 NDPROGS_released_on_Unix
- 
+
   NDPROGS has been ported to Unix and released at v3.2.  It is available
   for the Unix shell and ICL.  To make the command set available, type:
 

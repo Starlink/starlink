@@ -15,7 +15,7 @@
 *  Description:
 *     Given a domain list, this routine searches a frameset for a frame
 *     with the given domain.  It returns the index of the frame within
-*     frame within the frameset.  If no domain of the given name 
+*     frame within the frameset.  If no domain of the given name
 *     exists in the frameset, an index of AST__NOFRAME is returned.
 *     If there is more than one frame of the given index it finds the
 *     one with the highest index.
@@ -74,14 +74,14 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Arguments Given:
       INTEGER FSET
       CHARACTER * ( * ) DMN
-      
+
 *  Arguments Returned:
       INTEGER JFRM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -90,7 +90,7 @@
       INTEGER I                  ! Loop variable
       INTEGER NFRM               ! Number of frames in frameset
       CHARACTER * ( AST__SZCHR ) NORDMN ! Normalised match domain
-      
+
 *.
 
 *  Initialise return value.

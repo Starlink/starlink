@@ -46,7 +46,7 @@
 *
 *    % htab vec1 vec2 vec3 dev=printer slice=1:10
 *       Tabulate the first ten elements of the given vectors on printer,
-*   
+*
 *    % htab vec1 vec2 vec3 vec4 vec5 vec6 width=132
 *       Tabulate six vectors to terminal in 132 column mode
 
@@ -58,12 +58,12 @@
 * History:
 *     ?-???-???? (RJV):
 *       Original Version
-*     5-DEC-1990 (DJA): 
+*     5-DEC-1990 (DJA):
 *       V1.0-0 Allows full 80 character device name
-*    15-APR-1991 (DJA): 
+*    15-APR-1991 (DJA):
 *       V1.4-0 6 digit array index rather than 5
-*    22-MAY-1992 (DJA): 
-*       V1.6-0 ERR_ANNULs inserted. 
+*    22-MAY-1992 (DJA):
+*       V1.6-0 ERR_ANNULs inserted.
 *       Uses PRS_GETSLICE for slice parsing.
 *       Use USI for object association
 *    24-NOV-1994 (DJA):
@@ -265,7 +265,7 @@
 !        CALL USI_TEXT( 1, OTXT, NLINE, STATUS )
         CALL HDS_TRACE( LOC(IOBJ), NLEV, PATH, FILE, STATUS )
         CALL MSG_SETC( 'FILE', FILE )
-        CALL MSG_LOAD( ' ', OTXT(1), OTXT(2), OPLEN, STATUS )        
+        CALL MSG_LOAD( ' ', OTXT(1), OTXT(2), OPLEN, STATUS )
         CALL AIO_WRITE( OCH, OTXT(2)(:OPLEN), STATUS )
       END DO
       CALL AIO_BLNK( OCH, STATUS )

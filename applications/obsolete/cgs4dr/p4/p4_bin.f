@@ -1,7 +1,7 @@
 *+  P4_BIN - Determine frequency distribution withing 2-D array subset
       SUBROUTINE P4_BIN( XDIM, YDIM, IN, QUAL, QUALITY, I1, I2, IINC,
      :  J1, J2, JINC, LOW, HIGH, SMOOTH, NBINS, XBIN, FREQ, WORK,
-     :  TOOSMALL, TOOLARGE, FMIN, FMAX, MODE, STATUS ) 
+     :  TOOSMALL, TOOLARGE, FMIN, FMAX, MODE, STATUS )
 *    Description :
 *     This routine takes a subset of a 2-D array, delimited by
 *     I1, I2, J1, and J2 in steps of IINC and JINC, and determines the
@@ -49,7 +49,7 @@
 *     NBINS                = INTEGER( READ )
 *        The number of bins between LOW and HIGH
 *     XBIN( NBINS )        = REAL( WRITE )
-*        The data value of the lower edge of each bin (i.e. the 
+*        The data value of the lower edge of each bin (i.e. the
 *        co-ordinate of the left edge of each bin on a histogram).
 *     FREQ( NBINS )        = REAL( WRITE )
 *        The frequency of data found within each bin. (Note that if
@@ -59,10 +59,10 @@
 *        A work array, which is only used if smoothing of the array
 *        is required.
 *     TOOSMALL             = INTEGER ( WRITE )
-*        The number of data values too small to be counted (i.e. to the 
+*        The number of data values too small to be counted (i.e. to the
 *        left of the left-most bin on a histogram).
 *     TOOLARGE             = INTEGER ( WRITE )
-*        The number of data values too large to be counted (i.e. to the 
+*        The number of data values too large to be counted (i.e. to the
 *        right of the right-most bin on a histogram).
 *     FMIN                 = REAL( WRITE )
 *        The minimum frequency found.
@@ -157,7 +157,7 @@
 *   Determine the bin co-ordinates and initialise the frequency counters
       IF ( ( HIGH .EQ. VAL__SMLR ) .AND. ( LOW .EQ. 0.0 ) ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'P4_BIN: '/ 
+         CALL ERR_REP( ' ', 'P4_BIN: '/
      :     /'Bin width would exceed machine precision', STATUS )
          RETURN
       ELSE
@@ -192,7 +192,7 @@
 
 *                  Determine the bin in which this data value lies
 *                  and increment it. (N.B. Ensure that a rounding error
-*                  will not make BIN exceed NBINS). 
+*                  will not make BIN exceed NBINS).
                      BIN = 1 + INT( (IN( I, J ) - LOW) / WIDTH )
                      BIN = MIN( BIN, NBINS )
                      FREQ( BIN ) = FREQ( BIN ) + 1.0
@@ -226,7 +226,7 @@
 
 *               Determine the bin in which this data value lies
 *               and increment it. (N.B. Ensure that a rounding error
-*               will not make BIN exceed NBINS). 
+*               will not make BIN exceed NBINS).
                   BIN = 1 + INT( (IN( I, J ) - LOW) / WIDTH )
                   BIN = MIN( BIN, NBINS )
                   FREQ( BIN ) = FREQ( BIN ) + 1.0

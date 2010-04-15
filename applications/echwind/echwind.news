@@ -1,10 +1,10 @@
-1 ECHWIND - Echelle reduction planning 
+1 ECHWIND - Echelle reduction planning
                                                      Expires: ??.??.??
 
  NEWS: Linux version v3.1-0 available.
 
  This the Starlink release of the Unix port of ECHWIND, provided by
- Marion Fisher et al at RGO Cambridge.  It uses a bundled in copy of 
+ Marion Fisher et al at RGO Cambridge.  It uses a bundled in copy of
  the native PGPLOT graphics system.
 
  To start ECHWIND, enable the Starlink Software, and type:
@@ -24,7 +24,7 @@
  v3.1-0 (07-Feb-1997)
     Linux port of Starlink version.  Minor modifications of makefile
     and build procedures.  The display device is defaulted to /XWIN unless
-    the PGPLOT_DEV environment variable is preset to something.  There is 
+    the PGPLOT_DEV environment variable is preset to something.  There is
     no other change to program functionality or documentation.
 
  v3.0-0 (16-Jul-1996)

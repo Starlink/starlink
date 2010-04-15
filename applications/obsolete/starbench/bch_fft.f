@@ -5,7 +5,7 @@
 
 *  Purpose:
 *    Run a forward FFT algorithm.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -48,7 +48,7 @@
 
 *  Global Status:
       INTEGER STATUS             ! global status
-      
+
 *  Local Constants:
       INTEGER MAXX               ! max x dimension of array
       PARAMETER ( MAXX = 1024 )
@@ -56,7 +56,7 @@
       PARAMETER ( MAXY = 1024 )
       INTEGER NTIMES             ! number of times to loop
       PARAMETER ( NTIMES = 1 )
-      
+
 *  Local Variables:
       INTEGER ILOOP              ! loop counter
       INTEGER NX, NY             ! image dimensions
@@ -64,9 +64,9 @@
       INTEGER MP_IN, MP_WK1      !\
       INTEGER MP_WK2, MP_WK3     !- workspace pointers
       INTEGER MP_WK4             !/
-  
+
       DOUBLE PRECISION DFILL     ! fill value
-      
+
 *.
 
 * Check the status.
@@ -100,9 +100,9 @@
         CALL KPS1_FOPRD( NX, NY, %VAL( CNF_PVAL( MP_IN ) ),NX,NY,DFILL,
      :                   .FALSE., %VAL( CNF_PVAL(MP_WK1) ), STATUS )
         CALL KPS1_FOFOD( NX, NY, .FALSE., %VAL( CNF_PVAL(MP_WK1) ),
-     :                   %VAL( CNF_PVAL(MP_WK2) ), 
+     :                   %VAL( CNF_PVAL(MP_WK2) ),
      :                   %VAL( CNF_PVAL(MP_WK4) ),
-     :                   %VAL( CNF_PVAL(MP_WK3) ), STATUS ) 
+     :                   %VAL( CNF_PVAL(MP_WK3) ), STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
  3    CONTINUE
 

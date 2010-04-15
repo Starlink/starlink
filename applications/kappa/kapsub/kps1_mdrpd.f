@@ -132,13 +132,13 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAE standard constants
- 
+
 *  Arguments Given:
       INTEGER STEP
       INTEGER IDIM1
@@ -146,13 +146,13 @@
       DOUBLE PRECISION ARRIN( IDIM1, IDIM2 )
       INTEGER ODIM1
       INTEGER ODIM2
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION ARROUT( ODIM1, ODIM2 )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER FIRST              ! Position in output array of first
                                  ! line/column of input array
@@ -164,71 +164,71 @@
       INTEGER XIN                ! X index to input array elements
       INTEGER Y                  ! Y index to output array elements
       INTEGER YIN                ! Y index to input array elements
- 
+
 *.
- 
- 
+
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  FIRST is position in output array of line or column corresponding to
 *  the first line or column of the input array.
       FIRST = STEP + 1
- 
+
 *  LASTX is position of column in output array corresponding to last
 *  column of input array which may be accommodated.
       LASTX = MIN( STEP + IDIM2, ODIM1 - STEP )
- 
+
 *  LASTY, position in output array of line corresponding to last
 *  line of THE input array which may be accommodated.
       LASTY = MIN( STEP + IDIM1, ODIM2 - STEP )
- 
+
 *  Copy the input array into the central section of the output array.
       DO Y = FIRST, LASTY
          YIN = Y - STEP
- 
+
          DO  X = FIRST, LASTX
             XIN = X - STEP
             ARROUT( X, Y ) = ARRIN( XIN, YIN )
          END DO
       END DO
- 
+
 *  For first STEP lines of the output array.
       DO Y = 1, STEP
- 
+
 *  Replicate section of line corresponding to the first line of the
 *  input array.
          DO X = FIRST, LASTX
             ARROUT( X, Y ) = ARROUT( X, FIRST )
          END DO
       END DO
- 
+
 *  For the last STEP lines of the output array.
       DO Y = LASTY+1, ODIM2
- 
+
 *  Replicate the section of the line corresponding to the last line of
 *  the input array.
          DO X = FIRST, LASTX
             ARROUT( X, Y ) = ARROUT( X, LASTY )
          END DO
       END DO
- 
+
 *  For all lines of the output array.
       DO Y = 1, ODIM2
- 
+
 *  For the first STEP points in the line.
          DO X = 1, STEP
- 
+
 *  Replicate point corresponding to first in the input array line.
             ARROUT( X, Y ) = ARROUT( FIRST, Y )
          END DO
- 
+
 *  For the last STEP points in the line.
          DO X = LASTX + 1, ODIM1
- 
+
 *  Replicate point corresponding to the last in the input array line.
             ARROUT( X, Y ) = ARROUT( LASTX, Y )
          END DO
       END DO
- 
+
       END

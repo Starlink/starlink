@@ -15,23 +15,23 @@ C        range in wavelength and time. The command works on
 C        either 1D or 2D data.
 C
 C     Parameters:
-C    (1) INPUT      (TSP, nD)  The input dataset. 
+C    (1) INPUT      (TSP, nD)  The input dataset.
 C    (2) LSTART     (Real)     Starting wavelength for subset.
 C    (3) LEND       (Real)     End wavelength for subset.
 C    (C) TSTART     (Double)   Starting Time for subset.
 C    (C) TEND       (Double)   End Time for subset.
 C    (4) OUTPUT     (TSP, nD)  The output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         30/4/1988
 C
 C-
 C
 C  History:
-C    30/4/1988   Original Version.   JAB/AAO 
+C    30/4/1988   Original Version.   JAB/AAO
 C
 
       IMPLICIT NONE
@@ -59,8 +59,8 @@ C
       INTEGER NUM
 
 *  Stokes parameter present flags
-      LOGICAL QZ,UZ,VZ                            
-      LOGICAL VARIANCE       
+      LOGICAL QZ,UZ,VZ
+      LOGICAL VARIANCE
       CHARACTER*64 LABEL,UNITS
       INTEGER UPPER(2),LOWER(2)
       INTEGER NLSIZE,NTSIZE
@@ -76,9 +76,9 @@ C
           CALL DAT_ANNUL(LOC,STATUS)
           RETURN
       ENDIF
-      LSIZE = DIMS(1)    
+      LSIZE = DIMS(1)
 
-*  Map the wavelength array         
+*  Map the wavelength array
       CALL TSP_MAP_LAMBDA(LOC,'READ',LPTR,LLOC,STATUS)
 
 *  Select range for subset in Lambda
@@ -87,22 +87,22 @@ C
       ENDIF
 
 *  Calculate new size in the wavelength axis
-      NLSIZE = XFIN-XSTART+1                
+      NLSIZE = XFIN-XSTART+1
 
-*  Set bounds for slice  
+*  Set bounds for slice
       LOWER(1)=XSTART
       UPPER(1)=XFIN
 
 *  If the data is 2 dimensional we have to subset in the time axis as well
       IF (ACTDIM .EQ. 2) THEN
-          TSIZE = DIMS(2)  
+          TSIZE = DIMS(2)
 
 *  Map the time axis
           CALL TSP_MAP_TIME(LOC,'READ',TPTR,TLOC,STATUS)
 
 *  Get limits for subset in time axis
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_SUBTRANGE(TSIZE,%VAL(TPTR),YSTART,YFIN,STATUS)          
+              CALL TSP_SUBTRANGE(TSIZE,%VAL(TPTR),YSTART,YFIN,STATUS)
           ENDIF
 
 *  Calculate new size for the time axis
@@ -113,19 +113,19 @@ C
           UPPER(2)=YFIN
       ELSE
           NTSIZE=1
-      ENDIF            
+      ENDIF
 
 *  Map the required slice of the data array
       CALL TSP_MAP_SLICE(LOC,ACTDIM,LOWER,UPPER,'READ',DPTR,
-     :        DLOC,STATUS)                       
-              
+     :        DLOC,STATUS)
+
 *  And of the variance array if present
       IF (STATUS .EQ. SAI__OK) THEN
           CALL TSP_MAP_VSLICE(LOC,ACTDIM,LOWER,UPPER,'READ',VPTR,
      :        VLOC,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               VARIANCE = .FALSE.
-              STATUS = SAI__OK     
+              STATUS = SAI__OK
           ELSE
               VARIANCE = .TRUE.
           ENDIF
@@ -134,7 +134,7 @@ C
 *  Create the output dataset
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
-                             
+
 *  The output structure is first created with no Stokes Parameters
 *  These are added later
 
@@ -142,7 +142,7 @@ C
           CALL TSP_CREATE_1D(OLOC,NLSIZE,' ',VARIANCE,.FALSE.,STATUS)
       ELSE
           CALL TSP_CREATE_2D(OLOC,NLSIZE,NTSIZE,' ',VARIANCE,.FALSE.,
-     :          STATUS)          
+     :          STATUS)
       ENDIF
 
 *  Copy the main data array
@@ -156,7 +156,7 @@ C
 
 *  Copy the Variance array if present
 
-      IF (VARIANCE) THEN             
+      IF (VARIANCE) THEN
           CALL TSP_MAP_VAR(OLOC,'WRITE',OPTR,ODLOC,STATUS)
           IF (STATUS .EQ. SAI__OK) THEN
               CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(VPTR),%VAL(OPTR))
@@ -164,7 +164,7 @@ C
           CALL TSP_UNMAP(ODLOC,STATUS)
           CALL TSP_UNMAP(VLOC,STATUS)
       ENDIF
-                                              
+
 *  Copy the Stokes Parameters
 
       CALL TSP_STOKES(LOC,NUM,QZ,UZ,VZ,STATUS)
@@ -177,10 +177,10 @@ C
 *  Map the required slice of the Q array
 
          CALL TSP_MAP_SLICE(SLOC,ACTDIM,LOWER,UPPER,'READ',DPTR,
-     :        DLOC,STATUS)                       
-              
+     :        DLOC,STATUS)
+
 *  And of the variance array if present
-                              
+
           IF (STATUS .EQ. SAI__OK) THEN
               CALL TSP_MAP_VSLICE(SLOC,ACTDIM,LOWER,UPPER,'READ',VPTR,
      :        VLOC,STATUS)
@@ -190,7 +190,7 @@ C
               ELSE
                   VARIANCE = .TRUE.
               ENDIF
-          ENDIF                    
+          ENDIF
 
 *  Create Stokes component on output file and copy to it
 
@@ -208,7 +208,7 @@ C
 *  Unmap arrays
           CALL TSP_UNMAP(ODLOC,STATUS)
           CALL TSP_UNMAP(DLOC,STATUS)
-          IF (VARIANCE) THEN             
+          IF (VARIANCE) THEN
 
 *  Map the Q variance array in the output dataset
               CALL TSP_MAP_VAR(OSLOC,'WRITE',OPTR,ODLOC,STATUS)
@@ -235,20 +235,20 @@ C
 *  Map the required slice of the U array
 
          CALL TSP_MAP_SLICE(SLOC,ACTDIM,LOWER,UPPER,'READ',DPTR,
-     :        DLOC,STATUS)                       
-              
+     :        DLOC,STATUS)
+
 *  And of the variance array if present
-                              
+
           IF (STATUS .EQ. SAI__OK) THEN
               CALL TSP_MAP_VSLICE(SLOC,ACTDIM,LOWER,UPPER,'READ',VPTR,
      :        VLOC,STATUS)
               IF (STATUS .NE. SAI__OK) THEN
                   VARIANCE = .FALSE.
-                  STATUS = SAI__OK 
+                  STATUS = SAI__OK
               ELSE
                   VARIANCE = .TRUE.
               ENDIF
-          ENDIF                    
+          ENDIF
 
 *  Create Stokes component on output file and copy to it
 
@@ -266,7 +266,7 @@ C
 *  Unmap arrays
           CALL TSP_UNMAP(ODLOC,STATUS)
           CALL TSP_UNMAP(DLOC,STATUS)
-          IF (VARIANCE) THEN             
+          IF (VARIANCE) THEN
 
 *  Map the U Stokes variance
               CALL TSP_MAP_VAR(OSLOC,'WRITE',OPTR,ODLOC,STATUS)
@@ -280,7 +280,7 @@ C
               CALL TSP_UNMAP(ODLOC,STATUS)
               CALL TSP_UNMAP(VLOC,STATUS)
           ENDIF
-          CALL DAT_ANNUL(OSLOC,STATUS)  
+          CALL DAT_ANNUL(OSLOC,STATUS)
           CALL DAT_ANNUL(SLOC,STATUS)
       ENDIF
 
@@ -293,10 +293,10 @@ C
 *  Map the required slice of the V array
 
          CALL TSP_MAP_SLICE(SLOC,ACTDIM,LOWER,UPPER,'READ',DPTR,
-     :        DLOC,STATUS)                       
-              
+     :        DLOC,STATUS)
+
 *  And of the variance array if present
-                              
+
           IF (STATUS .EQ. SAI__OK) THEN
               CALL TSP_MAP_VSLICE(SLOC,ACTDIM,LOWER,UPPER,'READ',VPTR,
      :        VLOC,STATUS)
@@ -306,7 +306,7 @@ C
               ELSE
                   VARIANCE = .TRUE.
               ENDIF
-          ENDIF                    
+          ENDIF
 
 *  Create Stokes component on output file and copy to it
 
@@ -324,7 +324,7 @@ C
 *  Unmap the arrays
           CALL TSP_UNMAP(ODLOC,STATUS)
           CALL TSP_UNMAP(DLOC,STATUS)
-          IF (VARIANCE) THEN             
+          IF (VARIANCE) THEN
 
 *  Map the V stokes variance
               CALL TSP_MAP_VAR(OSLOC,'WRITE',OPTR,ODLOC,STATUS)
@@ -351,7 +351,7 @@ C
 
       CALL TSP_MAP_LAMBDA(OLOC,'WRITE',OPTR,ODLOC,STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_GEN_MOVE(NLSIZE,%VAL(LPTR+4*(XSTART-1)),%VAL(OPTR)) 
+          CALL TSP_GEN_MOVE(NLSIZE,%VAL(LPTR+4*(XSTART-1)),%VAL(OPTR))
       ENDIF
 
 *  Unmap the arrays
@@ -363,7 +363,7 @@ C
       CALL TSP_WLU_LAMBDA(OLOC,LABEL,UNITS,STATUS)
 
 *  Copy Time Axis Data
-           
+
       IF (ACTDIM .GT. 1) THEN
           CALL TSP_MAP_TIME(OLOC,'WRITE',OPTR,ODLOC,STATUS)
           IF (STATUS .EQ. SAI__OK) THEN
@@ -384,7 +384,7 @@ C
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
 
       SUBROUTINE TSP_SUBLRANGE(SIZE,L,XSTART,XEND,STATUS)
 *+
@@ -415,7 +415,7 @@ C
 
 *  Parameters
       INTEGER SIZE,STATUS,XSTART,XEND
-      REAL L(SIZE) 
+      REAL L(SIZE)
 
 *  Local variables
       REAL LSTART,LEND,LL
@@ -424,7 +424,7 @@ C
       CALL PAR_GET0R('LSTART',LSTART,STATUS)
 
 *  Get LEND parameter
-      CALL PAR_GET0R('LEND',LEND,STATUS)       
+      CALL PAR_GET0R('LEND',LEND,STATUS)
 
       IF (L(SIZE) .GT. L(1)) THEN
 
@@ -432,7 +432,7 @@ C
           XSTART = 1
           DO WHILE (L(XSTART) .LT. LSTART .AND. XSTART .LT. SIZE)
               XSTART = XSTART+1
-          ENDDO            
+          ENDDO
 
 *  Search for XEND index corresponding to LEND
           XEND = SIZE
@@ -448,13 +448,13 @@ C
 *  Search for XSTART index corresponding to LEND
           DO WHILE (L(XSTART) .GT. LEND .AND. XSTART .LT. SIZE)
               XSTART = XSTART+1
-          ENDDO            
+          ENDDO
 
 *  Search for XEND index corresponding to LSTART
           XEND = SIZE
           DO WHILE (L(XEND) .LT. LSTART .AND. XEND .GT. XSTART)
               XEND = XEND-1
-          ENDDO                        
+          ENDDO
        ENDIF
       END
 
@@ -499,13 +499,13 @@ C
       CALL PAR_GET0D('TSTART',TSTART,STATUS)
 
 *  Get ending time value
-      CALL PAR_GET0D('TEND',TEND,STATUS)       
+      CALL PAR_GET0D('TEND',TEND,STATUS)
 
 *  Search time axis array for YSTART corresponding to TSTART
       YSTART = 1
       DO WHILE (T(YSTART) .LT. TSTART .AND. YSTART .LT. SIZE)
           YSTART = YSTART+1
-      ENDDO            
+      ENDDO
 
 *  Search time axis array for YEND corresponding to TEND
       YEND = SIZE

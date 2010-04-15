@@ -35,17 +35,17 @@
       IF ( VERBOSE ) THEN
         CALL MSG_SETC( 'STRING', STRING )
         CALL MSG_SETC( 'MODE', MODE )
-        CALL MSG_OUT( ' ', 
+        CALL MSG_OUT( ' ',
      :    'Searching for ^MODE string ^STRING', STATUS )
       ENDIF
 
 *   Get oldest record matching criteria
       IF ( MODE .EQ. 'OLDEST' ) THEN
-        CALL QMAN_READ_SOLD( STATUS ) 
+        CALL QMAN_READ_SOLD( STATUS )
 
 *   Get newest record matching criteria
       ELSE IF ( MODE .EQ. 'NEWEST' ) THEN
-        CALL QMAN_READ_SNEW( STATUS ) 
+        CALL QMAN_READ_SNEW( STATUS )
       ENDIF
 
 *   Read the record

@@ -145,7 +145,7 @@
                CALL CAP_CPTAB (SI, CIOUT, NUMCOL, FIIN, FIOUT, STATUS)
 
 *
-*             Add the mandatory comments and any additional comments to the 
+*             Add the mandatory comments and any additional comments to the
 *             header.
 
                CALL CAP_GANCT (CIOUT, COMM, STATUS)

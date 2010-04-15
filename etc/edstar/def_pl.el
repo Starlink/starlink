@@ -1,14 +1,14 @@
 (new-place "LSE$BLOCK_COMMENT"
-	   " 
+	   "
 *  [comment]")
 
 (new-place "LSE$LINE_COMMENT"
-	   " 
+	   "
 ! [comment]")
 
 (new-place "LSE$GENERIC"
 	   "\t{executable_statement}...")
-    
+
 (new-place "COMMENT"
 	   nil
 	   '((help .
@@ -195,7 +195,7 @@ Authors:
 
 (new-token "USAGE"
 	   '(("USAGE" nil place)))
-    
+
 (new-place "PARAMETER_USAGE"
 	   nil
 	   '((help .
@@ -216,7 +216,7 @@ which there are sometimes a great number) need not appear.")))
 
 (new-token "A_TASK"
 	   '(("A_TASK_PROGRAM_MODULE" nil place)))
-    
+
 (new-token "SUBROUTINE"
 	   '(("SUBROUTINE_PROGRAM_MODULE" nil place)))
 
@@ -228,7 +228,7 @@ which there are sometimes a great number) need not appear.")))
 
 (new-token "MONOLITH"
 	   '(("MONOLITH_PROGRAM_MODULE" nil place)))
-    
+
 (new-place "MONOLITH_PROGRAM_MODULE"
 	   "SUBROUTINE {routine_name}( STATUS )\t
 \\*+
@@ -276,7 +276,7 @@ CALL {action_name}( STATUS )
 
 (new-token "ADAM_ACTION"
 	   '(("ADAM_ACTION" nil place)))
-    
+
 (new-place "ACTION_NAME"
 	   nil
 	   '((help .
@@ -484,13 +484,13 @@ specify its default value in square brackets [...] if appropriate.")))
 	   nil
 	   '((help .
 "Enter the logical name of the global constants file you wish to include.")))
-    
+
 (new-place "GLOBAL_CONSTANTS_DESCRIPTION"
 	   nil
 	   '((help .
 "Give a brief description of the contents of the global constants file.")
 	     (head . "!")))
-    
+
 (new-place "GLOBAL_VARIABLES"
 	   "\\*\tGlobal Variables:
 \\\t{include_global_variables}...
@@ -641,7 +641,7 @@ specify its default value in square brackets [...] if appropriate.")))
 (new-place "LOCAL_VARIABLE_DECLARATION"
 	   "{data_type} {name}[dimensions]   ! [local_variable_description]\t"
 	   '((vert . t)))
-    
+
 (new-place "LOCAL_VARIABLE_DESCRIPTION"
 	   nil
 	   '((help .
@@ -831,7 +831,7 @@ Authors:
         '((desc . "FUNCTION prologue template")))
 
 (new-place "OPTIONAL_FUNCTION_ITEMS"
-	   '(("Function_Options" 
+	   '(("Function_Options"
 	      "Expands to a list of placeholders for all items below" token)
 	     ("Examples" nil token)
 	     ("Pitfalls" nil token)
@@ -955,7 +955,7 @@ Authors:
 				      (substring time 20 24)))
 		   (if (= (aref date 0) ? ) (setq date (substring date 1)))
 		   date)))
-  
+
 (new-place "ROUTINE_NAME"
 	   '(lambda ()
 	      (let (name i dot)

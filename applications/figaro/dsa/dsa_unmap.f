@@ -23,12 +23,12 @@ C     CALL DSA_UNMAP (SLOT,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) SLOT     (Integer,ref) The handle value allocated when the 
+C     (>) SLOT     (Integer,ref) The handle value allocated when the
 C                  array was originally mapped.
 C     (!) STATUS   (Integer,ref) Status value.  If bad status is passed,
 C                  this routine returns immediately.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     CNF_PVAL, ICH_CI, ICH_LEN, DSA_WRUSER, DSA_WRNAME, DSA_FMTCON, DSA_STRUCTC
 C     DSA_FREE_WORKSPACE, DSA_REFLAG_DATA, DSA_VARIANCE_TO_ERR,
 C     DSA_ERR_TO_VARIANCE, DSA_WRFLUSH
@@ -223,7 +223,7 @@ C
 C
 C        If the mapping was readonly, we don't have to do very much.
 C        There are some 'update' mappings which do not have a real
-C        (ie on disk) array associated with them - quality arrays 
+C        (ie on disk) array associated with them - quality arrays
 C        which are being handled using flagged data.  We don't
 C        update them either - how can we?
 C
@@ -233,8 +233,8 @@ C           However, if it was write/update, we update the main array
 C           from the workspace version.  This has two stages.  First,
 C           we may have to reflag data in the array, then we need to
 C           do the actual update.  However, the very first thing we
-C           have to do is to sort out the type code (for FMTCON) and 
-C           the number of elements involved.  (It might be an idea to 
+C           have to do is to sort out the type code (for FMTCON) and
+C           the number of elements involved.  (It might be an idea to
 C           have saved these in common, actually.)
 C
             DO I=1,MAX_TYPES

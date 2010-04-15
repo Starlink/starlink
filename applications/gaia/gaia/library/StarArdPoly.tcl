@@ -111,10 +111,10 @@ itcl::class gaia::StarArdPoly {
       foreach coord $vertices {
          append desc "$coord,"
          incr two
-         if { $two == 2 } { 
+         if { $two == 2 } {
             append desc "\n"
             set two 0
-         } 
+         }
       }
       set desc "[string trim $desc ",\n"])"
       return "$desc"

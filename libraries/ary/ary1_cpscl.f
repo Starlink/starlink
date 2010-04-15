@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,12 +108,12 @@
 *  Primitive arrays.
 *  ================
             IF( DCB_FRM( IDCB2 ) .EQ. 'PRIMITIVE' ) THEN
-               IF( STATUS .EQ. SAI__OK ) THEN 
+               IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = ARY__FATIN
                   CALL MSG_SETC( 'BADFORM', DCB_FRM( IDCB1 ) )
                   CALL ERR_REP( 'ARY1_CPSCL_FORM', 'Cannot convert '//
      :                          'a primitive array to a scaled array '//
-     :                          '(internal programming error).', 
+     :                          '(internal programming error).',
      :                          STATUS )
                END IF
 
@@ -141,20 +141,20 @@
 
 *  Get a locator to the input SCALE value and copy it to the temporary
 *  HDS structure created above, and to the data object. Then annul the locator.
-               CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'SCALE', LOC2, 
+               CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'SCALE', LOC2,
      :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'SCALE', 
+               CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'SCALE',
      :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'SCALE', 
+               CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'SCALE',
      :                        STATUS )
                CALL DAT_ANNUL( LOC2, STATUS )
 
 *  Do the same for the ZERO value.
-               CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'ZERO', LOC2, 
+               CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'ZERO', LOC2,
      :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'ZERO', 
+               CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'ZERO',
      :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'ZERO', 
+               CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'ZERO',
      :                        STATUS )
                CALL DAT_ANNUL( LOC2, STATUS )
 
@@ -165,7 +165,7 @@
 
 *  Ensure the storage form is now scaled in both the data object and the
 *  DCB.
-                  CALL CMP_MODC( DCB_LOC( IDCB2 ), 'VARIANT', 6, 0, 0, 
+                  CALL CMP_MODC( DCB_LOC( IDCB2 ), 'VARIANT', 6, 0, 0,
      :                           STATUS )
                   CALL CMP_PUT0C( DCB_LOC( IDCB2 ), 'VARIANT', 'SCALED',
      :                            STATUS )

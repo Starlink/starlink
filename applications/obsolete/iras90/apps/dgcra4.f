@@ -1,4 +1,4 @@
-      SUBROUTINE DGCRA4( LOCS, QNAME, NSMP, NDET, INDAT, CLDAT, 
+      SUBROUTINE DGCRA4( LOCS, QNAME, NSMP, NDET, INDAT, CLDAT,
      :                   NDIM, GLHWID, LIST, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL DGCRA4( LOCS, QNAME, NSMP, NDET, INDAT, CLDAT, 
+*     CALL DGCRA4( LOCS, QNAME, NSMP, NDET, INDAT, CLDAT,
 *                  NDIM, GLHWID, LIST, STATUS )
 
 *  Description:
@@ -32,8 +32,8 @@
 *        The input data array.
 *     CLDAT( NSMP, NDET ) = REAL (Given)
 *        The cleaned version of input data array.
-*     NDIM = INTEGER (Given) 
-*        The number of dimension to define samples in CRDD files. 
+*     NDIM = INTEGER (Given)
+*        The number of dimension to define samples in CRDD files.
 *        It must be 2.
 *     GLHWID = INTEGER (Given)
 *        The width of glitches in sample numbers.
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,7 +79,7 @@
       INTEGER I, J, K, L         ! Do loop indices
       INTEGER SET                ! The number of quality named samples
       LOGICAL FOUND              ! Found end of structure flag
- 
+
 *.
 
 *  Check inherited global status.
@@ -118,14 +118,14 @@
                   IF ( K .EQ. J ) THEN
                      LIST( 1, 1 ) = J
                      LIST( 2, L ) = I
-                     CALL IRQ_SETQL( LOCS, .TRUE., QNAME, 2, 1, LIST, 
-     :                               SET, STATUS )       
+                     CALL IRQ_SETQL( LOCS, .TRUE., QNAME, 2, 1, LIST,
+     :                               SET, STATUS )
                   ELSE
                      DO L = 1, K - J
                         LIST( 1, L ) = L + J - 1
                         LIST( 2, L ) = I
                      END DO
-                     CALL IRQ_SETQL( LOCS, .TRUE., QNAME, 2, K - J, 
+                     CALL IRQ_SETQL( LOCS, .TRUE., QNAME, 2, K - J,
      :                               LIST, SET, STATUS )
                   END IF
                END IF
@@ -142,6 +142,6 @@
                J = J + 1
             END IF
          END DO
-      END DO            
+      END DO
 
       END

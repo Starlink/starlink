@@ -29,7 +29,7 @@ void cupidDumpD( double *array, int ndim, int *dims, int *slbnd,
 
 *  Parameters:
 *     array
-*        Pointer to the array to be dumped. 
+*        Pointer to the array to be dumped.
 *     ndim
 *        The number of pixel axes.
 *     dims

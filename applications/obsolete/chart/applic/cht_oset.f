@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -177,7 +177,7 @@
                VALUE = TEMP
                GOTO 100
             ENDIF
-      
+
             PARAMS( NPOS )( 21:70 ) = VALUE
          END IF
       END IF
@@ -316,7 +316,7 @@
                ELSE IF ( VALUE( 1:4 ) .EQ. 'NUMB' ) THEN
                   VALUE = 'NUMBERS'
                ELSE IF ( VALUE( 1:5 ) .EQ. 'SCALE' ) THEN
-                  VALUE = 'SCALES'                  
+                  VALUE = 'SCALES'
                ELSE
                   VALUE = 'YES'
                END IF

@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_CHGPNT( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This application is used to change the pointing corrections to map
 *     data.
@@ -27,10 +27,10 @@
 *     application will search for pointing corrections in the file and, if it
 *     finds any, report them. You will be asked if you wish to change the
 *     pointing correction data in the file. `No' will result in the data
-*     remaining unaltered, `yes' will then ask you for the time of the 
-*     pointing offset (LST in hh mm ss.ss format) and the azimuth and 
-*     elevation correction (in arcseconds) that would have to be added to 
-*     the observation position to correct the pointing at that time. If 
+*     remaining unaltered, `yes' will then ask you for the time of the
+*     pointing offset (LST in hh mm ss.ss format) and the azimuth and
+*     elevation correction (in arcseconds) that would have to be added to
+*     the observation position to correct the pointing at that time. If
 *     you supply no data the existing pointing corrections will be removed.
 *     Corrections will be requested until a negative number is given
 *     for the local sidereal time.
@@ -41,7 +41,7 @@
 *  ADAM Parameters:
 *     CHANGE_POINT = CHAR (Read)
 *         If true you will be prompted for pointing corrections otherwise
-*         the program will exit after listing the current pointing 
+*         the program will exit after listing the current pointing
 *         corrections.
 *     IN = NDF (Read)
 *         Name of NDF to change.
@@ -53,7 +53,7 @@
 *         The elevation pointing correction (arcsec).
 *     POINT_LST = CHAR (Read)
 *         The sidereal time of the pointing correction. Pointing corrections
-*         are asked for repeatedly until a NULL (!) or negative value are 
+*         are asked for repeatedly until a NULL (!) or negative value are
 *         given for POINT_LST.
 
 *  Notes:
@@ -84,7 +84,7 @@
 *     2007 July 13 (TIMJ):
 *        Allow POLMAP observations to be adjusted.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -117,7 +117,7 @@
       INTEGER          MAX__DIM                  ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)                   ! array
       CHARACTER * 15   TSKNAME                   ! Name of task
-      PARAMETER (TSKNAME = 'CHANGE_POINTING')  
+      PARAMETER (TSKNAME = 'CHANGE_POINTING')
 
 *  Local variables:
       LOGICAL          CHANGE_POINT              ! .TRUE. if the user wants
@@ -144,7 +144,7 @@
                                                  ! in input file
       INTEGER          N_FITS                    ! number of items in FITS
                                                  ! array
-      INTEGER          N_POINT                   ! number of pointing 
+      INTEGER          N_POINT                   ! number of pointing
                                                  ! corrections
       CHARACTER*40     OBJECT                    ! name of observed object
       CHARACTER*40     OBSERVING_MODE            ! observing mode of file
@@ -253,9 +253,9 @@
             IN_REDSX_LOC = DAT__NOLOC
          END IF
       END IF
-      
+
 *     and read in some parameters describing the observation
-      
+
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
@@ -281,13 +281,13 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
 *     pointing corrections for MAP observations
 
-      IF (OBSERVING_MODE .EQ. 'MAP' 
+      IF (OBSERVING_MODE .EQ. 'MAP'
      :     .OR. OBSERVING_MODE .EQ. 'POLMAP'
      :     .OR. OBSERVING_MODE .EQ. 'FOCUS'
      :     .OR. OBSERVING_MODE .EQ. 'ALIGN'
@@ -308,7 +308,7 @@
          STEMP = STEMP(:ITEMP-1)
 
          CALL MSG_SETC ('START_LST', STEMP)
-         
+
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STEND',
      :        STEMP, STATUS)
          DO I = 1, 2
@@ -322,8 +322,8 @@
 
          CALL MSG_SETC ('END_LST', STEMP)
          CALL MSG_SETC('PKG', PACKAGE)
-         
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: observation started at LST '//
      :        '^START_LST and ended at ^END_LST', STATUS)
 
@@ -348,19 +348,19 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (N_POINT .EQ. 0) THEN
                CALL MSG_SETC('PKG', PACKAGE)
-               CALL MSG_OUTIF (MSG__NORM, ' ', 
+               CALL MSG_OUTIF (MSG__NORM, ' ',
      :              '^PKG: no pointing corrections found',
      :              STATUS)
             ELSE
                CALL MSG_SETC('PKG', PACKAGE)
-               CALL MSG_OUTIF (MSG__NORM, ' ', 
+               CALL MSG_OUTIF (MSG__NORM, ' ',
      :              '^PKG: the following pointing '//
-     :              'corrections currently apply (LST dAZ dEL):-', 
+     :              'corrections currently apply (LST dAZ dEL):-',
      :              STATUS)
 
                DO I = 1, N_POINT
                   CALL SLA_DR2TF (2, POINT_LST(I), SIGN, IHMSF)
-                  
+
                   STEMP = SIGN
                   WRITE (STEMP(2:3), '(I2.2)') IHMSF (1)
                   STEMP (4:4) = ' '
@@ -374,7 +374,7 @@
                   CALL MSG_SETR ('DAZ', POINT_DAZ(I))
                   CALL MSG_SETR ('DEL', POINT_DEL(I))
 
-                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+                  CALL MSG_OUTIF (MSG__NORM, ' ',
      :                 ' - ^LST    ^DAZ ^DEL', STATUS)
                END DO
 
@@ -414,7 +414,7 @@
                   ELSE
                      N_POINT = N_POINT + 1
                      POINT_LST (N_POINT) = DTEMP * 15.0D0
-                     
+
                      CALL PAR_GET0R ('POINT_DAZ', POINT_DAZ(N_POINT),
      :                    STATUS)
                      CALL PAR_CANCL ('POINT_DAZ', STATUS)
@@ -430,7 +430,7 @@
 
                   END IF
                END IF
-               
+
             END DO
 
 *     check that POINT_LST increases monotonically
@@ -465,10 +465,10 @@
                CALL DAT_ERASE(IN_REDSX_LOC, 'POINT_LST', STATUS)
                CALL DAT_ERASE(IN_REDSX_LOC, 'POINT_DAZ', STATUS)
                CALL DAT_ERASE(IN_REDSX_LOC, 'POINT_DEL', STATUS)
-               IF (STATUS .EQ. SAI__OK) THEN 
+               IF (STATUS .EQ. SAI__OK) THEN
                   CALL MSG_SETC('PKG', PACKAGE)
                   CALL MSG_OUTIF(MSG__NORM, 'POINT',
-     :                 '^PKG: Erasing pointing corrections', 
+     :                 '^PKG: Erasing pointing corrections',
      :                 STATUS)
                END IF
 
@@ -480,7 +480,7 @@
      :           STATUS)
             CALL CMP_MOD(IN_REDSX_LOC, 'POINT_DEL', '_REAL', 1, N_POINT,
      :           STATUS)
-            
+
             CALL CMP_PUT1D(IN_REDSX_LOC, 'POINT_LST', N_POINT,
      :           POINT_LST, STATUS)
             CALL CMP_PUT1R(IN_REDSX_LOC, 'POINT_DAZ', N_POINT,

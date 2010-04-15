@@ -17,7 +17,7 @@
 *     specifier in EXTN.
 *     The extension specifier may consist of one or more keyword=value pairs
 *     optionally enclosed in [].
-*     If all the keywords in the header match the given values, MATCH is 
+*     If all the keywords in the header match the given values, MATCH is
 *     returned .TRUE.; otherwise it is returned .FALSE.
 *     A required keyword missing from the header is a mismatch, not an error.
 
@@ -101,27 +101,27 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 *  Global Variables:
 
 *  Arguments Given:
       INTEGER FUNIT
       CHARACTER*(*) EXTN
-      
+
 *  Arguments Returned:
       LOGICAL MATCH
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      INTEGER CHR_LEN           ! Used length of string      
+      INTEGER CHR_LEN           ! Used length of string
       LOGICAL CHR_SIMLR         ! Caseles string comparison
 
 *  Local Constants:
       INTEGER   FITSOK           ! Value of good FITSIO status
       PARAMETER( FITSOK = 0 )
-      
+
 *  Local Variables:
       INTEGER LEN                    ! Length of EXTN
       INTEGER I1, I2, I3             ! Indexes
@@ -131,20 +131,20 @@
       CHARACTER*70 REQVAL            ! Required keyword value
       CHARACTER*70 ACTVAL            ! Actual keyword value
       CHARACTER*70 COMMENT           ! Keyword comment
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       LEN = CHR_LEN( EXTN )
       I1 = 1
 *  If EXTN starts [, skip it and remove any terminating ]
       IF( EXTN(I1:I1) .EQ. '[' ) THEN
          I1 = I1 + 1
-         IF ( EXTN( LEN:LEN ) .EQ. ']' ) LEN = LEN -1 
+         IF ( EXTN( LEN:LEN ) .EQ. ']' ) LEN = LEN -1
       END IF
- 
+
       IF ( I1 .GT. LEN ) THEN
          STATUS = SAI__ERROR
 
@@ -207,11 +207,11 @@
                      END IF
                   ELSE
 *  Keyword not found in this HDU
-*  Cancel FITS error message and 
-                     CALL FTCMSG            
+*  Cancel FITS error message and
+                     CALL FTCMSG
                      DONE = .TRUE.
                   END IF  ! Keyword got from header
-         
+
                END IF  ! keyword = value pair got from specifier
             END IF  ! Non-null specifier element
          END DO  ! for each specifier element

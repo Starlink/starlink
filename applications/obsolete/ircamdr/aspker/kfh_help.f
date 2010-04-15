@@ -12,7 +12,7 @@
 *     S.Chan (RGVAD::KFH)
 *    History :
 *     11 October 1983: Original (RGVAD::KFH)
-*-    
+*-
 
 *
 *    List the OPTIONS available.

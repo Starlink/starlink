@@ -10,7 +10,7 @@
 *     CALL CAP_LSTCL (CI, OFLAG, FLUNIT, BAR; STATUS)
 *  Description:
 *     List full details of all the columns in a catalogue.
-*     
+*
 *     The text is listed to the standard output stream (via MSG_OUT)
 *     and/or a text file.
 *  Arguments:
@@ -84,7 +84,7 @@
 *  Status:
       INTEGER STATUS        ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  LSTAT,    ! Local Fortran I/O status.
      :  FI,       ! Column (or field) identifier.
      :  FCOUNT    !   "    "   "     "    columns.
@@ -173,9 +173,9 @@
 *             Attempt to get the details for the column and proceed if
 *             ok.
 
-               CALL CAT_CINQ (FI, 10, FCI, FNAME, FGENUS, FEXPR, 
+               CALL CAT_CINQ (FI, 10, FCI, FNAME, FGENUS, FEXPR,
      :           FDTYPE, FCSIZE,FDIMS, FSIZEA, FNULL, FXCEPT, FSCALE,
-     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, 
+     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM,
      :           FDATE, STATUS)
 
                IF (STATUS .EQ. SAI__OK) THEN
@@ -282,7 +282,7 @@
 
                   IF (OFLAG .EQ. 1  .OR.  OFLAG .EQ. 3) THEN
                      CALL MSG_SETI ('FCOUNT', FCOUNT)
-                     CALL CAP_OUT (BAR, ' ', 'Column number: ^FCOUNT', 
+                     CALL CAP_OUT (BAR, ' ', 'Column number: ^FCOUNT',
      :                 STATUS)
 
                      CALL MSG_SETC ('FNAME', FNAME)
@@ -334,7 +334,7 @@
 
                   IF (OFLAG .EQ. 2  .OR.  OFLAG .EQ. 3) THEN
                      WRITE(FLUNIT, 2001, IOSTAT=LSTAT) FCOUNT,
-     :                 FNAME, FCTYPE, DIMS, NULTRT, FSCALE, FZEROP, 
+     :                 FNAME, FCTYPE, DIMS, NULTRT, FSCALE, FZEROP,
      :                 ORDER, FUNITS, FXTFMT, PRFDSP, FCOMM
  2001                FORMAT(
      :                 1X, 'Column number: ', I5, ':' /

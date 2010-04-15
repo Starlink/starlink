@@ -1,7 +1,7 @@
- 
-      SUBROUTINE PERIOD_PLT(YPTR, NPTSARRAY, MXCOL, 
+
+      SUBROUTINE PERIOD_PLT(YPTR, NPTSARRAY, MXCOL,
      :                      MXSLOT, INFILEARRAY, YERRORARRAY)
- 
+
 C=============================================================================
 C Routine to call PLT from within PERIOD.
 C
@@ -16,25 +16,25 @@ C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C=============================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
 
       INCLUDE 'CNF_PAR'
- 
+
 C-----------------------------------------------------------------------------
 C PLT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER NPTS, MXCOL
 
       INTEGER XRPTR, YRPTR, ER1PTR, ER2PTR
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_PLT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER MXSLOT, FIRSTSLOT, LASTSLOT, SLOT
       INTEGER YPTR(MXSLOT), NPTSARRAY(MXSLOT), YSLOT1
       LOGICAL YERRORARRAY(MXSLOT)
@@ -45,10 +45,10 @@ C-----------------------------------------------------------------------------
 C-----------------------------------------------------------------------------
 C Select slots to process.
 C-----------------------------------------------------------------------------
- 
+
       WRITE (*, *) ' '
  100  CONTINUE
-      WRITE (*, '(X,A,$)') 'Enter first and last slots for input ' // 
+      WRITE (*, '(X,A,$)') 'Enter first and last slots for input ' //
      :                     '(0,0 to quit) : '
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.NE.0 .AND. LASTSLOT.NE.0 ) THEN
@@ -80,11 +80,11 @@ C-----------------------------------------------------------------------------
             DMXY=DNMX38
             DMIY=DPMX38
 
-            CALL PERIOD_PLTXYERR(%VAL(CNF_PVAL(XRPTR)), 
+            CALL PERIOD_PLTXYERR(%VAL(CNF_PVAL(XRPTR)),
      :                           %VAL(CNF_PVAL(YRPTR)),
-     :                           %VAL(CNF_PVAL(ER1PTR)), 
+     :                           %VAL(CNF_PVAL(ER1PTR)),
      :                           %VAL(CNF_PVAL(ER2PTR)),
-     :                           %VAL(CNF_PVAL(YSLOT1)), 
+     :                           %VAL(CNF_PVAL(YSLOT1)),
      :                           NPTS, MXCOL,
      :                           YERRORARRAY(SLOT), DMIX, DMIY,
      :                           DMXX, DMXY)
@@ -110,7 +110,7 @@ C-----------------------------------------------------------------------------
                   DMIY=-1.0D0
                END IF
             END IF
-                        
+
 *         Handle near zero axis.
             IF(DABS(DMIX).LT.DPMN20) THEN
                DRNG=DMXX-DMXX
@@ -129,11 +129,11 @@ C-----------------------------------------------------------------------------
 C-----------------------------------------------------------------------------
 C Call PGPLOT.
 C-----------------------------------------------------------------------------
- 
+
             WRITE (*, *) ' '
             WRITE (*, *) '** OK: PGplotting slot number =', SLOT
             WRITE (*, *) ' '
-          
+
 *         Get the device name and open it.
             CALL PGBEGIN(0,'?',1,1)
 
@@ -147,13 +147,13 @@ C-----------------------------------------------------------------------------
 *         Label plot.
             CALL PGLABEL('Time',' ',INFILEARRAY(SLOT))
 
-*         Plot Y error bars. 
+*         Plot Y error bars.
             CALL PGSCI(2)
             IF (YERRORARRAY(SLOT)) THEN
                CALL PGERRY(NPTS,%VAL(CNF_PVAL(XRPTR)),
      :                     %VAL(CNF_PVAL(ER2PTR)),
      :                     %VAL(CNF_PVAL(ER1PTR)),.001)
-               CALL PGSCI(1)      
+               CALL PGSCI(1)
             END IF
 
 *         Plot data.
@@ -164,7 +164,7 @@ C-----------------------------------------------------------------------------
             CALL PGIDEN
 
 *         Turn off pgplot.
-            CALL PGEND         
+            CALL PGEND
 
          CALL PERIOD_DEALL(ER2PTR)
          CALL PERIOD_DEALL(ER1PTR)
@@ -174,7 +174,7 @@ C-----------------------------------------------------------------------------
  150     CONTINUE
 
       END IF
- 
+
  200  CONTINUE
       RETURN
       END

@@ -21,7 +21,7 @@ proc p4Set {taskname} {
     set middle   [frame $frame.middle -relief sunken -bd 2]
     set bottom   [frame $frame.bottom -relief sunken -bd 2]
     pack $top $middle $bottom -side top -fill both -expand yes
- 
+
 # Top frame consists of device name and plot title
     set top2    [frame $top.top]
     set middle2 [frame $top.middle]

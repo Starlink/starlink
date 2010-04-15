@@ -17,20 +17,20 @@ C
 C  Obtain odd and even parts of the function.
 C  If inverse of X value lies outside range of data, then obtain meaningful
 C Y value from an adjacent cycle. This is valid because the Fourier Theorem
-C assumes the data repeats cyclicly ad infinitum: our datastream is just 
+C assumes the data repeats cyclicly ad infinitum: our datastream is just
 C one period's sample of the underlying cyclic function.
 C
       PERIOD = X(NMAX) - X(-NNEG)
       DO 110, I=-NNEG,NMAX
         IF (-I.LT.-NNEG) THEN
-          EVEN(I) = (Y(I)+Y(NNEG+NMAX-I))*0.5D+00 
-          ODD(I)  = (Y(I)-Y(NNEG+NMAX-I))*0.5D+00 
+          EVEN(I) = (Y(I)+Y(NNEG+NMAX-I))*0.5D+00
+          ODD(I)  = (Y(I)-Y(NNEG+NMAX-I))*0.5D+00
         ELSEIF (-I.GT.NMAX) THEN
-          EVEN(I) = (Y(I)+Y(-(NNEG+NMAX)-I))*0.5D+00 
-          ODD(I)  = (Y(I)-Y(-(NNEG+NMAX)-I))*0.5D+00 
+          EVEN(I) = (Y(I)+Y(-(NNEG+NMAX)-I))*0.5D+00
+          ODD(I)  = (Y(I)-Y(-(NNEG+NMAX)-I))*0.5D+00
         ELSE
-          EVEN(I) = (Y(I)+Y(-I))*0.5D+00 
-          ODD(I)  = (Y(I)-Y(-I))*0.5D+00 
+          EVEN(I) = (Y(I)+Y(-I))*0.5D+00
+          ODD(I)  = (Y(I)-Y(-I))*0.5D+00
         ENDIF
   110 CONTINUE
 C

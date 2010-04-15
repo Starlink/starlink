@@ -90,7 +90,7 @@ EXPAND 0.7
 VIEWPORT NDC 0.6 0.95 0.6 0.95
 
 {  Read the unbinned data into the XCOL data area, but only if their values
-{  are greater than zero. Note that the XCOL column has been specified by 
+{  are greater than zero. Note that the XCOL column has been specified by
 {  its label which is case-sensitive.
 READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat ~
    XCOL='Age' SELCOND='Age > 0' NOALL NOQUICK
@@ -102,7 +102,7 @@ XLOGARITHM
 LIMITS 2.0 11.0 0.0 100.0
 
 {  Draw a box, but don't draw the right-hand edge. Reset the X-axis options
-{  so that they do not contain an "L" option (which has been automatically 
+{  so that they do not contain an "L" option (which has been automatically
 {  added by XLOGARITHM).
 BOX BCNST BNST
 
@@ -132,9 +132,9 @@ HISTOGRAM 2.0 11.0 18 NOAUTOSCALE
 
 {  Write a label describing the second histogram.
 CHANGE LINESTY=1
-MTEXT R 2.5 0.5 0.5 'Number of new pulsars (dotted)' 
+MTEXT R 2.5 0.5 0.5 'Number of new pulsars (dotted)'
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 
@@ -173,7 +173,7 @@ FITLINE NOWEIGHT COLOUR=1
 LTYPE 2
 FITCURVE POLY NPOLY=2 WEIGHT COLOUR=1
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 

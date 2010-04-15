@@ -68,30 +68,30 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) STRING  ! the character string to be decoded
- 
+
 *  Arguments Returned:
       CHARACTER*(*) CVAL         ! the returned value
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER ISTAT         ! local (CHR) status
- 
+
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   Copy with truncation check
       CALL CHR_COPY( STRING, .FALSE., CVAL, ISTAT )
- 
+
 *   If value not long enough for STRING - report error
       IF ( ISTAT .NE. 0 ) THEN
          STATUS = TASK__STRFL

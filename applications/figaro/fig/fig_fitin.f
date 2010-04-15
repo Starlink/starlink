@@ -24,9 +24,9 @@ C     (>) SWAP    (Logical) True if data is to be byte-swapped.
 C                 A genuine FITS tape will have byte-swapped data,
 C                 so if LU is 0, SWAP should always be true.  With
 C                 disk files either swap option is acceptable.
-C     (>) BLOCK   (Integer) A code for how blocked data is to be 
+C     (>) BLOCK   (Integer) A code for how blocked data is to be
 C                 handled.  0 => Data always starts in the actual
-C                 tape record following the last one used for header 
+C                 tape record following the last one used for header
 C                 information.  1 => Data starts in the 2880-byte
 C                 logical block following the header information, and
 C                 this will often be in the same physical record used
@@ -35,7 +35,7 @@ C                 FITS-like tape format, BLOCK=1 is needed by AIPS and
 C                 similar systems.  See below.
 C     (>) ENAME   (Character) The name of the structure to be
 C                 created.  A file called ENAME//'.ext' where 'ext' is
-C                 the default Figaro file extension will be created for 
+C                 the default Figaro file extension will be created for
 C                 the structure.
 C     (>) FLOAT   (Logical) False if data is to be maintained in
 C                 the integer form read from tape, as opposed to being
@@ -66,7 +66,7 @@ C     file until the data size was known - it dates from before the DTA
 C     package knew how to extend files!).  This means that although the
 C     mag tape or disk file must have been opened by the calling
 C     routine, DSA_OPEN should NOT have been called.
-C     
+C
 C     Input -
 C
 C     The tape must be FITS standard, and should begin 'SIMPLE=T'.
@@ -94,9 +94,9 @@ C     1) It is believed that this program can handle any valid FITS tape
 C     that conforms to the description in Wells et al.
 C     (Astron. Astrophys. Suppl. Ser. 44 (1981) 363-370), and it also
 C     supports the blocked FITS extension described in Grosbol et al.
-C     (Astron. Astrophys. Suppl. Ser. 73, (1988) 359-364).  It does not 
+C     (Astron. Astrophys. Suppl. Ser. 73, (1988) 359-364).  It does not
 C     support other extensions such as uv-FITS or tables.
-C     
+C
 C     2) This program can handle tapes with records whose sizes are
 C     multiples of 2880 bytes.  There are two ways you can block data
 C     in this way.  You can say that this is a FITS format with n*2880
@@ -113,10 +113,10 @@ C     may be in the same physical record as the header data.  BLOCK=0
 C     and BLOCK=1 correspond to these two cases.
 C
 C     3) Unsigned short data. Some FITS tape writers (like Figaro's
-C     WIFITS) treat the special case of unsigned 16-bit integer data - 
+C     WIFITS) treat the special case of unsigned 16-bit integer data -
 C     which is  quite common in astronomy - by writing it with a BZERO
 C     value of 32768.0 and a BSCALE of 1.0.  In this case, the signed
-C     16-bit data that is written to tape is just the original unsigned 
+C     16-bit data that is written to tape is just the original unsigned
 C     values with the sign bits flipped (a sneaky way of subtracting
 C     32768).  This is quite legal, and this routine can trap that case
 C     and reverse the operation (although it only does this in the
@@ -170,7 +170,7 @@ C                    produces an error message, but tries to read.
 C     17th Oct 1988  KS / AAO.  BLOCK parameter added.  BUFSIZ
 C                    increased.
 C     21st Mar 1989  KS / AAO.  PWH (ST-AND)'s mod to handle HISTORY and
-C                    COMMENT correctly added.  (Eventually, this will 
+C                    COMMENT correctly added.  (Eventually, this will
 C                    all use DSA, which will simplify things a lot.)
 C     4th  May 1990  KS / AAO.  Re-worked to use the DSA routines
 C                    instead of direct calls to DTA routines to create
@@ -189,10 +189,10 @@ C                    first physical record has been fixed.
 C     21st Aug 1990  KS/AAO. FIG_DFITS routines now used to read disk
 C                    FITS files.  This allows a greater range of file
 C                    types (including UNIX files) to be handled.
-C     22nd Mar 1991  KS/AAO. Amazingly, the previous mod removed the 
-C                    non-standard equivalence between HEADER and BUFFER 
-C                    and so managed to break the tape-reading version, 
-C                    and this remained unnoticed.  BUFFER is now copied 
+C     22nd Mar 1991  KS/AAO. Amazingly, the previous mod removed the
+C                    non-standard equivalence between HEADER and BUFFER
+C                    and so managed to break the tape-reading version,
+C                    and this remained unnoticed.  BUFFER is now copied
 C                    into HEADER.
 C     24th Feb 1993  KS/AAO (and BDC/UNSW). Replaced use of STL_FMTCON
 C                    with use of DSA_FMTCON.
@@ -243,7 +243,7 @@ C
       INTEGER   BITPIX           ! Value of BITPIX keyword
       DOUBLE PRECISION BSCALE    ! Value of BSCALE keyword
       BYTE      BUFFER(BUFSIZ)   ! Main input buffer
-      INTEGER   BYTES            ! Byte count - in all data,then in one 
+      INTEGER   BYTES            ! Byte count - in all data,then in one
                                  ! record
       INTEGER   BYTPIX           ! Number of bytes per image pixel
       DOUBLE PRECISION BZERO     ! Value of BZERO keyword
@@ -256,8 +256,8 @@ C
                                  ! header
       REAL      CRPIX(6)         ! Values of CRPIXn keywords
       REAL      CRVALS(6)        ! Values of CRVALn keywords
-      INTEGER   DIMS(9)          ! Value of NAXISn keywords 
-      INTEGER   DPTR             ! Dynamic-memory pointer for axis data 
+      INTEGER   DIMS(9)          ! Value of NAXISn keywords
+      INTEGER   DPTR             ! Dynamic-memory pointer for axis data
                                  ! array
       INTEGER   DSA_STATUS       ! Inherited status used by DSA routines
       DOUBLE PRECISION DVALUE    ! Temporary double precision value
@@ -267,7 +267,7 @@ C
       INTEGER   I                ! General loop index
       INTEGER   IAX              ! Index through axes
       INTEGER   ICMTST           ! Star character number for comment
-      LOGICAL   IEEE_FPT         ! Input data is IEEE floating point 
+      LOGICAL   IEEE_FPT         ! Input data is IEEE floating point
                                  ! format
       INTEGER   IEND             ! Number of header record with END
                                  ! keyword
@@ -318,8 +318,8 @@ C
 C
 C     Note that this is actually the first ever Figaro routine written!
 C     And it's been messed about quite a bit in its time.  As a result,
-C     it isn't quite as pristine a piece of code as one might like.  In 
-C     particular, the way it handles errors is a bit of a mess - some 
+C     it isn't quite as pristine a piece of code as one might like.  In
+C     particular, the way it handles errors is a bit of a mess - some
 C     causing messages to be output by this routine, some just setting
 C     STATUS and ERROR.  I'd like to tidy that up sometime.
 C
@@ -397,7 +397,7 @@ C
 *            END IF
             IF (VALUE.LT.0.0) THEN
                BITPIX=VALUE
-               WRITE (ERROR,'(A,I10)') 
+               WRITE (ERROR,'(A,I10)')
      :                'Cannot read data with BITPIX =',BITPIX
                GO TO 500            ! Error exit
             END IF
@@ -405,7 +405,7 @@ C
             BYTPIX=BITPIX/8
             IF ((BITPIX.NE.8).AND.(BITPIX.NE.16).AND.
      :                             (BITPIX.NE.32)) THEN
-               WRITE (ERROR,'(A,I10)') 
+               WRITE (ERROR,'(A,I10)')
      :                'Cannot read data with BITPIX =',BITPIX
                GO TO 500            ! Error exit
             END IF
@@ -458,7 +458,7 @@ C
   340 CONTINUE
       IF (NAXIS.LT.0) THEN
          BYTES=0
-      ELSE 
+      ELSE
          BYTES=BYTPIX
          DO IAX=1,NAXIS
             NAXISN='NAXIS'//CHAR(IAX+ICHAR('0'))
@@ -478,7 +478,7 @@ C
                      GO TO 360
                   END IF
                END IF
-               IPT=IPT+80                  
+               IPT=IPT+80
             END DO
             ERROR=NAXISN//' not specified in header'
             GO TO 500            ! Error exit
@@ -498,7 +498,7 @@ C
 C
 C     Now that it looks as if the tape has a valid header, create
 C     the output file.
-C     
+C
       CALL DSA_NAMED_OUTPUT('OUTPUT',ENAME,' ',0,0,DSA_STATUS)
       IF (DSA_STATUS.NE.0) GO TO 500     ! Error exit
 C
@@ -511,7 +511,7 @@ C
 
 C
 C     Zero out the axis delta values and label arrays, so we
-C     can see later if they get set by any keywords.  
+C     can see later if they get set by any keywords.
 C
       DO IAX=1,NAXIS
          CRVALS(IAX)=0.
@@ -573,7 +573,7 @@ C
                   ELSE IF (ONAME.EQ.'BZERO') THEN
                      BZERO=DVALUE
                      KNOWN=.TRUE.
-                  ELSE IF ((ONAME.EQ.'NAXIS').OR.(ONAME.EQ.'BITPIX')) 
+                  ELSE IF ((ONAME.EQ.'NAXIS').OR.(ONAME.EQ.'BITPIX'))
      :                                                            THEN
                      KNOWN=.TRUE.
                   ELSE
@@ -608,7 +608,7 @@ C
                      END IF
                      IF (DSA_STATUS.NE.0) GO TO 500   ! Error exit
                   END IF
-C                     
+C
                ELSE IF (HEADER(IST:IST).EQ.'''') THEN
 C
 C                 Object is a character string.  We handle this rather
@@ -644,7 +644,7 @@ C
                      CALL DSA_SET_OBJECT ('OUTPUT',HEADER(IST+1:IENSTR),
      :                                                      DSA_STATUS)
                      IF (DSA_STATUS.NE.0) GO TO 500   ! Error exit
-                  ELSE 
+                  ELSE
                      DO IAX=1,NAXIS
                         IF (ONAME.EQ.'CTYPE'//CHAR(IAX+ICHAR('0'))) THEN
                            LABELS(IAX)=HEADER(IST+1:IENSTR)
@@ -719,7 +719,7 @@ C
          GO TO 380
       END IF
 C
-C     Now we've dealt with the header, and know all we're going to know 
+C     Now we've dealt with the header, and know all we're going to know
 C     about the data array, we can decide what format to use for it.
 C     We set TYPE to the output type for the array.
 C
@@ -751,11 +751,11 @@ C
             CALL DSA_WRUSER (
      :        'such that floating point will have to be used for the ')
             CALL DSA_WRUSER ('output data.')
-            CALL DSA_WRFLUSH 
+            CALL DSA_WRFLUSH
          END IF
          IF (IEEE_FPT) THEN
             CALL DSA_WRUSER ('The input data is floating point data.')
-            CALL DSA_WRUSER 
+            CALL DSA_WRUSER
      :             ('Floating point will have to be used for the '//
      :                                               'output data')
             CALL DSA_WRFLUSH
@@ -766,7 +766,7 @@ C
 C     If we are going to use floating point data, then we will have
 C     to convert from the source format, so we need to work out
 C     what that is. (We treat IEEE floating point data separately.)
-C 
+C
       IF (TYPE.EQ.'FLOAT') THEN
          IF (BYTPIX.EQ.2) THEN
             SRCFMT=WORD
@@ -870,7 +870,7 @@ C
             END IF
          END IF
 C
-C        Byte swop buffer.  
+C        Byte swop buffer.
 C
          IF (SWAP) THEN
             IF (BITPIX.EQ.16) THEN

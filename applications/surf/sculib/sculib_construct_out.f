@@ -14,7 +14,7 @@
 *  Description:
 *     Appends an ID string to an input string given the contents
 *     of the environment variable specified by ENV_NAME
-*     Allowed values of ENV_NAME are stored in OPTIONS and the 
+*     Allowed values of ENV_NAME are stored in OPTIONS and the
 *     corresponding string stored in OPTION_STRINGS.
 *     Default is to go for the first entry in the IDSTRING array.
 *     if the value of ENV_NAME is either not set or unrecognized.
@@ -66,15 +66,15 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! SSE global definitions
- 
+
 *  Arguments Given:
       INTEGER N_OPTIONS
       CHARACTER * (*) ENV_NAME
@@ -129,7 +129,7 @@
 
 *     Variable existed
 
-         DO I = 1, N_OPTIONS            
+         DO I = 1, N_OPTIONS
 
             IF (ENV_VALUE .EQ. OPTIONS(I)) THEN
                SUFFIX = OPTION_STRINGS(I)
@@ -141,7 +141,7 @@
 *     No variable so just take the long form
 
          CALL ERR_ANNUL(STATUS)
-         
+
       END IF
 
 *     First copy the input string to the output
@@ -155,7 +155,7 @@
 *     Search from the end of the string for an underscore.
 
          IPOSN = CHR_LEN(OUT_STRING)
-         CALL CHR_FIND(OUT_STRING, '_', .FALSE., IPOSN) 
+         CALL CHR_FIND(OUT_STRING, '_', .FALSE., IPOSN)
 
 *     Okay so have we found something
          IF (IPOSN .GT. 1) OUT_STRING = OUT_STRING(1:IPOSN-1)

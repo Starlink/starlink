@@ -10,7 +10,7 @@
  * Copyright (C) SERC 1988
  *
  * Maintenance Log:
- *  
+ *
  *     20/09/88	TAW	Copied from ../sun/gk9sxc_.c and dummied.
  *     27/11/88 TAW     Fleshed out to work with X strings.
  *     16/02/89 TAW     Change gc function for colour from XOR to COPY.
@@ -54,7 +54,7 @@ f77_integer gk0xxc_(ifid, itxpr, nchars, ichstr, x, y)
   f77_real    x[],		/* Centre positions (X) / string origin (In) */
 	      y[];		/* Centre positions (Y) / string origin (In) */
 {
-  f77_integer 
+  f77_integer
     numchars = *nchars;		/* number of characters in string ichstr */
   extern char
     *malloc();			/* For getting memory for C copy of string */
@@ -106,7 +106,7 @@ f77_integer gk0xxc_(ifid, itxpr, nchars, ichstr, x, y)
     for(i = 0; i < numchars; i++)
       str[i] = (char)ichstr[i];
     str[numchars] = '\0';
-    
+
     /*
      * Get the display and font for use by X.
      */
@@ -123,13 +123,13 @@ f77_integer gk0xxc_(ifid, itxpr, nchars, ichstr, x, y)
      * Select output routine and rasterop.  Use Set rasterop
      * for monochrome,  COPY for colour.
      */
-    
+
     if(DefaultVisual(display,DefaultScreen(display))->class==PseudoColor)
        LGCValues.function= GXcopy;
     else LGCValues.function=GXset;
-    XSetFunction(display, LGC, LGCValues.function); 
+    XSetFunction(display, LGC, LGCValues.function);
     XSetForeground(display, LGC, dd->d_fore);
-    
+
     /*
      * If we're using character precision,  render each character individually
      * given its centre,  otherwise render the entire string given the origin
@@ -151,7 +151,7 @@ f77_integer gk0xxc_(ifid, itxpr, nchars, ichstr, x, y)
 	 * Calculate X output coordinates (left edge and baseline)
 	 * and update modified area.
 	 */
-	 
+
 	 if((xorig = (int)(x[i] - x_offset)) < b_left)
            b_left = xorig;
          else if (xorig > b_right)
@@ -169,7 +169,7 @@ f77_integer gk0xxc_(ifid, itxpr, nchars, ichstr, x, y)
       /* Modify right bound of changed area for character width */
 
       b_right += (int)gkywkd_.qwkdat[ws][ICHWD] - 1;
-    } 
+    }
     else				/* String precision */
     {
       /* Calculate X output coordinates of the first character */

@@ -10,7 +10,7 @@ C     ranges, into an output array in which the elements cover a
 C     continuous range.
 C
 C     Parameters -   (">" input, "W" workspace, "<" output)
-C 
+C
 C     (>) DATIN     (Real array, DATIN(NIN)) The data to be redistributed.
 C     (>) NIN       (Integer) The number of elements in the input arrays
 C     (>) NOUT      (Integer) The number of elements in the output arrays.
@@ -40,8 +40,8 @@ C     (>) FLUXDEN   (Logical) False if the data is to be treated as
 C                   being in flux units, true if it to be treated as
 C                   being in flux units per unit wavelength.
 C     (W) SUMOVER   (Real array SUMOVER(NOUT)) Workspace array, used
-C                   to hold the total wavelength range contributing to 
-C                   each output bin.  
+C                   to hold the total wavelength range contributing to
+C                   each output bin.
 C     (<) DATOUT    (Real array DATOUT(NOUT)) The output data array.
 C     (<) ERROUT    (Real array ERROUT(NOUT)) The absolute errors on
 C                   each of the elements of the output array.
@@ -53,7 +53,7 @@ C
 C     GEN_FILL      (GEN_ package) Set an array of bytes to a constant
 C     FIG_FINDFIRST (FIG_FREBIN utility) Find first overlapping element
 C     FIG_NEXT      (     "        "    ) See if next output bin overlaps
-C     FIG_OUTLIM    (     "        "    ) Get output bin wavelength range 
+C     FIG_OUTLIM    (     "        "    ) Get output bin wavelength range
 C
 C                                          KS / AAO  16th June 1986
 C     Modified:
@@ -62,7 +62,7 @@ C     22nd July 1986.  KS / AAO.  Now expects error values to be
 C                      absolute rather than percentage errors.
 C     24th April 1987. KS / AAO.  Bug fix.  Was trying to zero ERROUT
 C                      even if ESET was false.
-C                      
+C
 C+
       IMPLICIT NONE
 C
@@ -81,7 +81,7 @@ C
       INTEGER I                      ! Index variable through output data
       INTEGER NELM                   ! Index variable through input data
       INTEGER OUTELM                 ! Number of element in output data
-      REAL OVERLAP                   ! Overlap range in wavelength 
+      REAL OVERLAP                   ! Overlap range in wavelength
       DOUBLE PRECISION STOUT         ! Start wavelength of output bin
       REAL WID                       ! Width in wavelength of input bin
 C
@@ -91,8 +91,8 @@ C
       IF (ESET) CALL GEN_FILL(NOUT*4,0,ERROUT)
       CALL GEN_FILL(NOUT*4,0,SUMOVER)
 C
-C     This routine works by first calculating, for each element in 
-C     the output data array, the total flux in the input data over 
+C     This routine works by first calculating, for each element in
+C     the output data array, the total flux in the input data over
 C     the range of that output element, and the total wavelength range
 C     in the input data over which it was collected.
 C
@@ -133,7 +133,7 @@ C
       END DO
 C
 C     Now, for each element of the output array, calculate the
-C     final output value required, either the mean flux density 
+C     final output value required, either the mean flux density
 C     for the bin, or the total flux for it.
 C
       IF (FLUXDEN) THEN

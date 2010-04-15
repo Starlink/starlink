@@ -128,7 +128,7 @@
 *  Reduce the size of the characters.
          CALL SGS_SHTX( HT*SUPSIZ )
 
-*  If the symbolds are single or double quotes, lower the unit symbol 
+*  If the symbolds are single or double quotes, lower the unit symbol
 *  slightly because these characters are displayed unussually high.
          IF( UNIT .EQ. '''' .OR. UNIT .EQ. '"' ) THEN
             SUPCOR = 0.2

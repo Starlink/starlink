@@ -1,16 +1,16 @@
 /*
-                                                                  
-  File name: 
+
+  File name:
     wvmOpt.c
 
-  Description:  
+  Description:
 
   Functions:
 
   aFunction
-  wvmEst  
+  wvmEst
 
- History: 
+ History:
    $Log: wvmOpt.c,v $
    Revision 1.3  2006/07/14 18:50:32  rkackley
    Corrected format specifier and added val to list of quantities printed because it looked like val was intended to be printed bu was not in the argument list
@@ -50,21 +50,21 @@
       and effective temperature from the effective sky temperatures.
 
  *  Description:
-   This routine performs a simple optimisation, 1 parameter at a time, for 
-   the best fitting water, broadband opacity and effective temperature.   
+   This routine performs a simple optimisation, 1 parameter at a time, for
+   the best fitting water, broadband opacity and effective temperature.
    The latter are only fit if the data seem to require it.
    This version using function call aFunction for compatability with Num Rec.
-      
+
  *  Language:
       C
 
  *  Call:
-      wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens, 
+      wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
              float * tau0, float * tWat);
 
  *  Parameters:
       ("<" input, "!" modified, "W" workspace, ">" output)
-      (<) aMass      The air Mass 
+      (<) aMass      The air Mass
       (<) tAmb       The ambient temperature
       (<) tSky       The sky termperature of each receiver (3 data points)
       (>) waterDens  The line-of sight water density in mm
@@ -74,10 +74,10 @@
  *  Support: Craig Walther, {JAC}
 
 
- *- 
+ *-
 
  */
-void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens, 
+void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
             float * tau0, float * tWater)
 {
 
@@ -104,13 +104,13 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
       return;
     }
 
-  /* make a first guess at the water density (assumes channel 3 is 
+  /* make a first guess at the water density (assumes channel 3 is
      optically thin) */
 
   *waterDens = (tSky[2] - 3.0)/29.0;
 
   /* Set parameters */
- 
+
   p[0] = *waterDens;
   p[1] = *tWater;
   p[2] = *tau0;
@@ -128,7 +128,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
   VALP = val;
 
   /* The following was line 5 in the FORTRAN */
-  do        
+  do
     {
 
       if(DEBUG_OPT_FUNC)
@@ -138,7 +138,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
       X[1] = 0.0;
       Y[1] = 0.0;
 
-      /* No point in messing around for ever - just go through maximum 
+      /* No point in messing around for ever - just go through maximum
 	 of 20 times */
       for(j=0; j<20; j++)
 	{
@@ -153,7 +153,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 		    {
 		      p[K] = p[K] + q[K];
 
-		      /* apply limits - not very efficient but it 
+		      /* apply limits - not very efficient but it
 			 should work */
 
 		      if(p[K] > tp[K]) p[K] = tp[K];
@@ -174,7 +174,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 		      else if(val == Y[0])
 			{
 
-			  /* not likely but could happen  - take 
+			  /* not likely but could happen  - take
 			     midpoint and exit */
 
 			  p[K] = p[K] - q[K]/2.0;
@@ -183,8 +183,8 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 		      else if(i == 0)
 			{
 
-			  /* going wrong direction put these values one 
-			     down in the stack and leave initial ones 
+			  /* going wrong direction put these values one
+			     down in the stack and leave initial ones
 			     on top */
 			  X[1] = p[K];
 			  Y[1] = val;
@@ -217,7 +217,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 			}
 		    }
 
-		  /* This parameter OK.  Get final value (also serves as 
+		  /* This parameter OK.  Get final value (also serves as
 		     start of next iteration */
 		  val = aFunction(p, aMass, tSky); /* This was line 10 in FORTRAN */
 		  Y[0] = val;
@@ -227,7 +227,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 		}
 	    }
 
-	  /* Are we done?   val greater than 10 means rms error is 
+	  /* Are we done?   val greater than 10 means rms error is
 	     less than a tenth of a degree */
 
 	  /* This line was commented out in FORTRAN
@@ -263,16 +263,16 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 	}
       else if(q[2] == 0.0)
 	{
-	  
-	  /* Too dry to get good estimate of temperature but 
+
+	  /* Too dry to get good estimate of temperature but
 	     try offset */
 	  q[0] = 0.1 * *waterDens;
 	  q[1] = 0.0;
 	  q[2] = 0.003;
 	  continue;   /* GO TO 5 in FORTRAN */
 	}
-  
-	  *waterDens = p[0];   /* This was line 99 in FORTRAN */ 
+
+	  *waterDens = p[0];   /* This was line 99 in FORTRAN */
 	  *tWater = p[1];
 	  *tau0 = p[2];
 	  return;
@@ -291,14 +291,14 @@ float aFunction(float *p, float aMass, float *tSky)
   wvmEst(aMass, p[0], p[1], p[2], TBRI, TTAU, TEFF, AEFF);
 
   /* Floor on error */
-        
+
   SSQ = 0.01;
   for(j=0; j<3; j++)
     {
       ERR = tSky[j] - TBRI[j];
       SSQ = SSQ + ERR * ERR;
     }
-  
+
   temporary = SSQ/3.0;
   val = 1./sqrt(temporary);
 
@@ -307,7 +307,7 @@ float aFunction(float *p, float aMass, float *tSky)
       printf("In aFunction p= %6.3f %6.3f %6.3f tSky = %7.3f %7.3f %7.3f",
 	     p[0], p[1], p[2], tSky[0], tSky[1], tSky[2]);
       printf(" TBRI = %7.3f %7.3f %7.3f val = %9.3f\n",
-	     TBRI[0], TBRI[1], TBRI[2], val); 
+	     TBRI[0], TBRI[1], TBRI[2], val);
     }
 
   return(val);
@@ -316,10 +316,10 @@ float aFunction(float *p, float aMass, float *tSky)
 void wvmEst(float aMass, float WA, float TWAT, float TAUO,
 	    float *TBRI, float *TTAU, float *TEFF, float *AEFF)
 {
-  /* Given the water vapour in the line of sight, the effective temperature 
-     of the water and the excess broadband opacity (e.g. due to clouds), 
-     calculates the expected (Rayleigh Jeans) brightness temperatures for 
-     the three channels of the radiometer plus the total opacity and the 
+  /* Given the water vapour in the line of sight, the effective temperature
+     of the water and the excess broadband opacity (e.g. due to clouds),
+     calculates the expected (Rayleigh Jeans) brightness temperatures for
+     the three channels of the radiometer plus the total opacity and the
      effective temperature of the water.
      Uses a simple 2-slab model but with coefficients adjusted to match ATM
   */
@@ -354,17 +354,17 @@ void wvmEst(float aMass, float WA, float TWAT, float TAUO,
 
       /* Effective temperature (includes effect of opacity, crudely) */
       temporary = -1 * TAUW[j]/3.5;
-      TEFF[j] = TWAT - RJC - TOFF[j] 
+      TEFF[j] = TWAT - RJC - TOFF[j]
 	+ DELT[j]*(1. - exp(temporary));
 
       /* Radiative transfer */
-      temporary = -1 * TAUW[j]-TAUO; 
+      temporary = -1 * TAUW[j]-TAUO;
       ABSP = exp(temporary);
       TBRI[j] = TOUT[j]*ABSP + TEFF[j]*(1.-ABSP);
 
-      /* Total opacity */ 
+      /* Total opacity */
       TTAU[j] = TAUW[j] + TAUO + B[j] * aMass;
-      
+
     }
 }
 

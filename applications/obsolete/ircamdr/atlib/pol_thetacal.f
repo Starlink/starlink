@@ -58,7 +58,7 @@
 
 	  END IF
 
-*        Test if resultant position angle is greater that 180 and correct 
+*        Test if resultant position angle is greater that 180 and correct
 *        if necessary
 
 	  IF( THETA .GE. 180.0) THETA = THETA - 180.0

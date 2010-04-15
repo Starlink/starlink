@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -293,7 +293,7 @@
      :                       ( STATUS .NE. SAI__OK ) ) GO TO 2
                      END IF
  1                CONTINUE
- 2                CONTINUE                 
+ 2                CONTINUE
 
 *  If the file name extension was not recognised, then interpret the
 *  name supplied as the name of a native NDF object and create the
@@ -336,7 +336,7 @@
                         GO TO 4
                      END IF
  3                CONTINUE
- 4                CONTINUE                 
+ 4                CONTINUE
 
 *  If no foreign output format was found because a format specification
 *  of '.' was found (indicating native NDF format) without any previous
@@ -345,7 +345,7 @@
                   IF ( .NOT. FOUND ) THEN
                      IF ( .NOT. WILD ) THEN
                         CALL NDF1_NPLAC( LOC, NAME, IPCB, STATUS )
-      
+
 *  If a wild-card specification was found first, then set IFMT to zero,
 *  indicating that native NDF format should be used. Note that since
 *  wild-carding may yet override this format, the possibility of format
@@ -464,7 +464,7 @@
             END IF
          END IF
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PLFOR', STATUS )
 

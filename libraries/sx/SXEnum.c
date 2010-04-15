@@ -25,7 +25,7 @@ Error m_SXEnum( Object *in, Object*out){
 *     it to the "output" field. The values in the new component start at zero
 *     and increment by one for each position or connection in the field.
 *
-*     The new component is in one-to-one correspondance with either the 
+*     The new component is in one-to-one correspondance with either the
 *     "positions" or "connections" component, dependant on "dep".
 
 *  Parameters:
@@ -40,12 +40,12 @@ Error m_SXEnum( Object *in, Object*out){
 
 *  Components:
 *     Adds a component with the given "name", deleting any existing
-*     component. All other components are copied from the "input" field. 
+*     component. All other components are copied from the "input" field.
 
 *  Examples:
 *     In this example, the 17th frame is extracted from a data set
 *     containing scattered data, and a field created holding only those
-*     positions with offsets between 10 and 20. 
+*     positions with offsets between 10 and 20.
 *
 *        input = Import("/usr/lpp/dx/samples/data/CO2.general");
 *        frame17 = Select(input,17);
@@ -67,12 +67,12 @@ Error m_SXEnum( Object *in, Object*out){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,7 +98,7 @@ Error m_SXEnum( Object *in, Object*out){
       char   *dep;
       char   *name;
       Object  o=NULL;
-  
+
 
 /*  Check that the "input" object has been supplied. */
 
@@ -212,7 +212,7 @@ static Error DoSXEnum( Object o, char *name, char *dep ){
 
 /*  Indicate that the component values have changed, and complete the
  *  output field. */
-         
+
          DXChangedComponentValues( (Field) o, name );
          if( !DXEndField( (Field) o ) ) return( ERROR );
 

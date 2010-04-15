@@ -19,7 +19,7 @@ Starlink::AMS::Task - perl module to load and communicate with ADAM monoliths
 
 This module provides commands for communicating with ADAM tasks via
 the ADAM messaging system (AMS). The AMS communications themselves are
-handled via lower level modules (C<Starlink::AMS::Core> and 
+handled via lower level modules (C<Starlink::AMS::Core> and
 C<Starlink::ADAM>).
 
 It is presumed that the messaging system has already been initialised
@@ -110,7 +110,7 @@ sub new {
 
 The name used by the messaging system to contact the monolith.
 Can be used to set or retrieve the value of name (do not set
-this value from outside unless you know that a path to the 
+this value from outside unless you know that a path to the
 new name exists in the messaging system).
 
   $name = $obj->name;
@@ -222,7 +222,7 @@ sub adamdir {
 
 Destructor for this object. When the last reference to this
 object is removed the destructor is exectued automatically.
-In this case the monolith attached to object is killed 
+In this case the monolith attached to object is killed
 unless it is already dead(!) or it has been forgotten
 via the forget() method.
 
@@ -258,10 +258,10 @@ This task is called by the 'new' method.
   $status = $obj->load("name","monolith_binary",{ TASKTYPE => 'A' });
 
 If the second argument is omitted it is assumed that the binary
-is already running and can be called by "name".   
+is already running and can be called by "name".
 
 The last argument, if needed, is a reference to a hash containing
-the load options. 
+the load options.
 
 Options currently supported are:
 
@@ -271,8 +271,8 @@ Options currently supported are:
 Default is to launch an A-task. Default task type when no monolith
 or options are specified is 'I'.
 
-The MONOLITH option can be used to configure A-tasks such that 
-they can retrieve parameters from monoliths that were not started by this 
+The MONOLITH option can be used to configure A-tasks such that
+they can retrieve parameters from monoliths that were not started by this
 object. (It is identical to creating the object and then setting the
 monolith name via the monolith() method)
 
@@ -351,11 +351,11 @@ sub load {
 	    unless defined $self->monolith;
 
 	  # Store the monolith path and name on arg list
-	  unshift @args, $_[0];	
+	  unshift @args, $_[0];
 	}
 
 	# Launch the monolith
-	my ($process, $status) = adamtask($self->name(), @args ); 
+	my ($process, $status) = adamtask($self->name(), @args );
 
 	# Store the PID object (may be undefined if not spawned by us)
 	# if good status?
@@ -392,7 +392,7 @@ sub obeyw {
   my $action = shift;    # This is the action (eg stats)
 
   my $parameters = " ";
-  if (@_) { $parameters = shift; } 
+  if (@_) { $parameters = shift; }
 
   # Now do the obeyw
   my $status = adamtask_obeyw($self->name(), $action, $parameters);
@@ -405,7 +405,7 @@ sub obeyw {
 
 =item get
 
-Obtain the value of a parameter from a task. 
+Obtain the value of a parameter from a task.
 When called from an array context the status and values are returned
 (multiple values are returned in an array). When called from a scalar
 context the values are returned as a single string joined by commas.
@@ -469,7 +469,7 @@ sub get {
   } else {
     # This is for an A-task
 
-    # Use NDF - need to search in file $monolith for task 
+    # Use NDF - need to search in file $monolith for task
     my $monolith = $self->monolith;
 
     if (defined $monolith) {
@@ -493,7 +493,7 @@ sub get {
     } else {
       # Monolith name is not defined. Suggests that we did not
       # start the monolith.
-      carp 'Error determining name of monolith. ' . 
+      carp 'Error determining name of monolith. ' .
 	'Parameters cannot be retrieved from monoliths that were not started '.
 	  'by this object.';
       $status = &Starlink::ADAM::SAI__ERROR;
@@ -595,7 +595,7 @@ Remove the monolith name from the list of known monoliths.
 This method prevents the monolith from being killed when adam
 exits or when the object is destroyed.
 
-This routine has no input arguments. 
+This routine has no input arguments.
 
 =cut
 
@@ -686,7 +686,7 @@ from A-tasks.
 
 =head1 SEE ALSO
 
-L<perl>, 
+L<perl>,
 L<Starlink::AMS::Core>,
 L<Starlink::AMS::Init>,
 L<Starlink::ADAM>,

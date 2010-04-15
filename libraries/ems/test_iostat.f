@@ -1,4 +1,4 @@
-*   Test case for ems_fioer.c.in.  Create a IOSTAT error, and check 
+*   Test case for ems_fioer.c.in.  Create a IOSTAT error, and check
 *   that we get a reasonable message.  We can't check mechanically that
 *   the message is reasonable, but we can check that it does appear, and
 *   doesn't appear at the wrong times.
@@ -12,12 +12,12 @@
       integer retmsglen
 
       include 'SAE_PAR'
-     
+
 *   Should produce an IOSTAT error for `illegal unit number'
       open (unit=-10, file='wibble', status='OLD', iostat=ios)
 *   Initialise to success return
       rval = 0
-      
+
       if ( ios .lt. 0 ) then
          write (*,'("test_iostat: Unexpected EOF")')
          rval = 1

@@ -43,7 +43,7 @@ C--
       integer istat, iv, k
       character*50 title
       character*20 head(14)
-      data head / 'X', 'Y', 'Magnitude', 'Error', 'Peak', 'Dx', 'Dy', 
+      data head / 'X', 'Y', 'Magnitude', 'Error', 'Peak', 'Dx', 'Dy',
      +            'Flux', 'Number', 'Invalid', 'Sky', 'SKy Error',
      +            'Sky Number', 'Sky Invalid' /
 Cbegin
@@ -80,13 +80,13 @@ Cbegin
 
       TBXO = 14								!Open output table
       TBVXO = TBXO + 5
-      call optabw ( 'OUT', iptbo, TBVXO, TBY, .false., istat )	
+      call optabw ( 'OUT', iptbo, TBVXO, TBY, .false., istat )
       if ( istat.ne.0 ) then
          ST_FAILED = .true.
          return
       endif
 
-      call gtdesc ( 'INSTARS', 'TITLE', title, 'Output from Apermag',	! 
+      call gtdesc ( 'INSTARS', 'TITLE', title, 'Output from Apermag',	!
      +                 iv, istat )
       if ( istat.ne.0 ) title = 'Output from Apermag'
       call get1c ( 'TITLE', title, title, .true. )
@@ -117,7 +117,7 @@ C  alan penny                RAL                      1991 Nov
       real          tbout(TBVXO,TBY)	!o: Output results
 C--
       integer k, ninval, kninval, nbadb, ngoodb, iter, numpix, lxg, lyg
-      real    rv, stferr, stmerr, stfl, amag, amaga, aerr, 
+      real    rv, stferr, stmerr, stfl, amag, amaga, aerr,
      +        atop, top, skraw, sklev, skarea, skerr, topb, xa, ya, rx,
      +        ry, dx, dy, dxo, dyo, rms, av, starea, sterr, ht,
      +        base, straw, ax, ay, x, y
@@ -125,7 +125,7 @@ C--
       real trunc
       external trunc
 Cbegin
-     
+
 
       if ( ST_FAILED ) return
 
@@ -146,14 +146,14 @@ Cbegin
          dy = 0.0
          if ( CENTRE ) then
             if ( IMTYPE.eq.'SHORT' ) then
-               call gauss2sa ( %val(IPIM), NX, NY, x, y, lxg, lyg, 0, 
-     +                         2.0, 2.0, INVAL, 20, amag, ht, base, 
-     +                         dxo, dyo, xa, ya, rx, ry, rms, iter, 
+               call gauss2sa ( %val(IPIM), NX, NY, x, y, lxg, lyg, 0,
+     +                         2.0, 2.0, INVAL, 20, amag, ht, base,
+     +                         dxo, dyo, xa, ya, rx, ry, rms, iter,
      +                         ninval )
             else
-               call gauss2ra ( %val(IPIM), NX, NY, x, y, lxg, lyg, 0, 
-     +                         2.0, 2.0, RINVAL, 20, amag, ht, base, 
-     +                         dxo, dyo, xa, ya, rx, ry, rms, iter, 
+               call gauss2ra ( %val(IPIM), NX, NY, x, y, lxg, lyg, 0,
+     +                         2.0, 2.0, RINVAL, 20, amag, ht, base,
+     +                         dxo, dyo, xa, ya, rx, ry, rms, iter,
      +                         ninval )
             endif
             if ( amag.lt.49.0 ) then
@@ -165,20 +165,20 @@ Cbegin
          endif
 
          if ( IMTYPE.eq.'SHORT' ) then					!Measure
-            call smp_ap_doits ( %val(IPIM), x, y, .false., 0.0, APDIA, 
-     +                          POISV, NOISE, straw, av, starea, sterr, 
+            call smp_ap_doits ( %val(IPIM), x, y, .false., 0.0, APDIA,
+     +                          POISV, NOISE, straw, av, starea, sterr,
      +                          ninval, numpix, top)
 
             call smp_ap_doits ( %val(IPIM), x, y, .false., SKYDIAIN, 	!Measure Sky
-     +                          SKYDIAOUT, POISV, NOISE, skraw, sklev, 
+     +                          SKYDIAOUT, POISV, NOISE, skraw, sklev,
      +                          skarea, skerr, nbadb, ngoodb, topb )
          else
-            call smp_ap_doitr ( %val(IPIM), x, y, .false., 0.0, APDIA, 
-     +                          POISV, NOISE, straw, av, starea, sterr, 
+            call smp_ap_doitr ( %val(IPIM), x, y, .false., 0.0, APDIA,
+     +                          POISV, NOISE, straw, av, starea, sterr,
      +                          ninval, numpix, top)
 
-            call smp_ap_doitr ( %val(IPIM), x, y, .false., SKYDIAIN, 
-     +                          SKYDIAOUT, POISV, NOISE, skraw, sklev, 
+            call smp_ap_doitr ( %val(IPIM), x, y, .false., SKYDIAIN,
+     +                          SKYDIAOUT, POISV, NOISE, skraw, sklev,
      +                          skarea, skerr, nbadb, ngoodb, topb )
          endif
 
@@ -201,10 +201,10 @@ Cbegin
             ay = trunc(y,6)
             kninval = min(99999,ninval)
             atop = trunc(top,5)
-            textp = '(1x,i5,2f9.2,f8.3,f6.3,f8.1,2f10.1,i5)' 
+            textp = '(1x,i5,2f9.2,f8.3,f6.3,f8.1,2f10.1,i5)'
             if ( stfl.gt.9999999.9 .or. sklev.gt.9999999.9 ) textp =
      +         '(1x,i5,2f9.2,f8.3,f6.3,f8.1,2e10.7,i5)'
-            write ( text, textp ) k, ax, ay, amaga, aerr, atop, 
+            write ( text, textp ) k, ax, ay, amaga, aerr, atop,
      +                            stfl, sklev, kninval
             call printo ( text )
          endif
@@ -235,8 +235,8 @@ C SMP_AP_DOITR -- Calc flux through aperture (star/sky/annulus)
 C
 C  alan penny          ral          1991 Nov
 
-      subroutine smp_ap_doitr ( im, ax, ay, dome, xradi, xrado, poisv, 
-     +                       noise, flux, av, area, err, nbad, ngood, 
+      subroutine smp_ap_doitr ( im, ax, ay, dome, xradi, xrado, poisv,
+     +                       noise, flux, av, area, err, nbad, ngood,
      +                       top )
 
       implicit none
@@ -261,7 +261,7 @@ C--
       double precision tsum, tsumsq, tarea, esum, earea
       integer j, k, jj, kk, nf, kxs, kxe, kys, kye, km
       real rmax, rmin, dist1, dist2, dist3, dist4, xd, yd,
-     +     dmax, dmin, zdx, zdy, zd, rv, radi, rado 
+     +     dmax, dmin, zdx, zdy, zd, rv, radi, rado
       real rva(20000)
 Cbegin
 
@@ -373,10 +373,10 @@ Cbegin
          err = max(0.0,err)
          if ( err.gt.0.0 ) err = sqrt(err)/poisv
 
-      else	
+      else
 
          av = 0.0							! Use mean
-         if ( area.ne.0.0 ) av = flux/area	
+         if ( area.ne.0.0 ) av = flux/area
          err = 0.0
          if ( tarea.gt.2.5d0 ) then
             err = (tsumsq-(tsum*tsum/tarea))/
@@ -395,8 +395,8 @@ C SMP_AP_DOITS -- Calc flux through aperture (star/sky/annulus)
 C
 C  alan penny          ral          1991 Nov
 
-      subroutine smp_ap_doits ( im, ax, ay, dome, xradi, xrado, poisv, 
-     +                       noise, flux, av, area, err, nbad, ngood, 
+      subroutine smp_ap_doits ( im, ax, ay, dome, xradi, xrado, poisv,
+     +                       noise, flux, av, area, err, nbad, ngood,
      +                       top )
 
       implicit none
@@ -534,10 +534,10 @@ Cbegin
          err = max(0.0,err)
          if ( err.gt.0.0 ) err = sqrt(err)/poisv
 
-      else	
+      else
 
          av = 0.0							! Use mean
-         if ( area.ne.0.0 ) av = flux/area	
+         if ( area.ne.0.0 ) av = flux/area
          err = 0.0
          if ( tarea.gt.2.5d0 ) then
             err = (tsumsq-(tsum*tsum/tarea))/
@@ -556,7 +556,7 @@ C Contains:-
 C
 C SMP_GAUFIT     Perform the GAUFIT programme
 C SMP_GF_GCL     Get user input
-C SMP_GF_FIND    Fit stars 
+C SMP_GF_FIND    Fit stars
 C SMP_GF_STARRJ  Calc mean radius
 C SMP_GF_RMEAN   Calc mean radii
 C SMP_GF_FIT     Sum the data round the stars into a mean and fit it
@@ -598,7 +598,7 @@ Cbegin
       call smp_gf_rmean ( %val(ipres), rxm, rym )			!Calc mean radii
 
       call smp_gf_fit ( %val(ipres), rxm, rym, 0 )			!Make mean data fit
-	
+
       call smp_gf_fit ( %val(ipres), rxm, rym, 1 )			!Make mean interpolated data fit
 
 
@@ -648,7 +648,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SMP_GF_FIND -- Fit stars 
+C SMP_GF_FIND -- Fit stars
 C
 C  alan penny                  ral                  1991 Nov
 
@@ -698,11 +698,11 @@ Cbegin
 
          if ( IMTYPE.eq.'SHORT' ) then					!Fit
             call gauss2sa ( %val(IPIM), NX, NY, xa, ya, nbx, nby, 0,
-     +                      rnbx, rnby, INVAL, 20, amag, ht, base, dxo, 
+     +                      rnbx, rnby, INVAL, 20, amag, ht, base, dxo,
      +                      dyo, anx, any, rx, ry, rms, iter, ninval )
          else
             call gauss2ra ( %val(IPIM), NX, NY, xa, ya, nbx, nby, 0,
-     +                      rnbx, rnby, RINVAL, 20, amag, ht, base, dxo, 
+     +                      rnbx, rnby, RINVAL, 20, amag, ht, base, dxo,
      +                      dyo, anx, any, rx, ry, rms, iter, ninval )
          endif
 
@@ -718,7 +718,7 @@ Cbegin
          res(5,k) = iter
          res(6,k) = ninval
          res(8,k) = amag
-  
+
          if ( typing ) then
             ah = trunc(ht,4)
             adxo = trunc(dxo,2)
@@ -728,7 +728,7 @@ Cbegin
             ary = trunc(ry,2)
             nin = min(ninval,99)
             txt = '   '
-            if ( ninval.gt.0 .or. iter.gt.19 .or.amag.gt.49.0 ) 
+            if ( ninval.gt.0 .or. iter.gt.19 .or.amag.gt.49.0 )
      +         txt = 'rej'
             write ( text,
      +         '(1x,i4,f6.2,f7.1,2f5.1,f6.1,i3,i3,2f6.2,2x,a3)' ) k,
@@ -839,7 +839,7 @@ Cbegin
       if (abs(rym).gt.99.0) rym = sign(99.0,rym)
 
       call printo ( ' ' )
-      write ( text, '(1x,'' Mean radii are:- '',f6.2,'' : '',f6.2)' ) 
+      write ( text, '(1x,'' Mean radii are:- '',f6.2,'' : '',f6.2)' )
      +        rxm, rym
       call printo ( text )
       seeing = 1.65*((rxm+rym)/2.0)
@@ -855,7 +855,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SMP_GF_FIT -- Sum the data round the stars into a mean and fit it
-C   Sums the data from a number of stars in an image and fits a mean 
+C   Sums the data from a number of stars in an image and fits a mean
 C   Gaussian to them.
 C   Method of summing is either taking pixels and adding to nearest
 C   pixel, or interpolating to exact pixel posn.
@@ -880,7 +880,7 @@ C--
       integer kx, ky, ipwa, ipwb, ipwc, istat, k, kxs, kxe, kys, kye,
      +        iter, ipws, ipwd
       real xd, yd, amag, ht, base, xa, ya, rms, rxa, rya, seeing, a, b,
-     +     ah, arms, ab, arx, ary 
+     +     ah, arms, ab, arx, ary
       real trunc
       external trunc
 Cbegin
@@ -929,12 +929,12 @@ Cbegin
                if ( IMTYPE.eq.'SHORT' ) then
                   call copss ( %val(IPIM), NX, NY, kxs, kxe, kys, kye,
      +                         %val(ipws), kx, ky, 1, 1 )
-                  call copssr ( %val(ipws), kx, ky, BS, BZ, INVAL, 
+                  call copssr ( %val(ipws), kx, ky, BS, BZ, INVAL,
      +                          %val(ipwb) )
                else
                   call coprr ( %val(IPIM), NX, NY, kxs, kxe, kys, kye,
      +                         %val(ipws), kx, ky, 1, 1 )
-                  call coprrr ( %val(ipws), kx, ky, BS, BZ, RINVAL, 
+                  call coprrr ( %val(ipws), kx, ky, BS, BZ, RINVAL,
      +                          %val(ipwb) )
                endif
                call aaddr ( %val(ipwb), %val(ipwa), %val(ipwa), kx*ky )
@@ -992,7 +992,7 @@ C SMP_GF_RESID -- Calc residuals from the summed data; store
 C
 C  alan penny               RAL               1991 Nov
 
-      subroutine smp_gf_resid ( data, kx, ky, resid, wka, wkb, xa, 
+      subroutine smp_gf_resid ( data, kx, ky, resid, wka, wkb, xa,
      +                          ya, a, b, rx, ry, kt )
 
       implicit none
@@ -1002,7 +1002,7 @@ C  alan penny               RAL               1991 Nov
       integer    kx			!i: X size of box
       integer    ky			!i: Y size of box
       real       data(kx,ky)		!i: Mean data
-      real       resid(kx,ky)		!o: Residuals 
+      real       resid(kx,ky)		!o: Residuals
       real       wka(kx,ky)		!o: Work space
       real       wkb(kx,ky)		!o: Work space
       real       xa			!i: X posn of star
@@ -1049,7 +1049,7 @@ Cbegin
 
       call ptdesr ( outim, 'BSCALE', rv )				!Put scale to output image
       call ptdesr ( outim, 'BZERO', 1.5*rv )
-      iv = INT_INVALSI 
+      iv = INT_INVALSI
       call ptdesi ( outim, 'INVAL', iv )
       call ptdesr ( outim, 'RX', rx )
       call ptdesr ( outim, 'RY', ry )
@@ -1079,7 +1079,7 @@ C alan penny           RAL                 1991 Nov
       real        ry			!i: Y radius of star
       integer     kt			!i: Type of summing of data (0=simple;1=interpolated)
 C--
-      real xmax, xmaxa, ymax, ymaxa, drmax, anum, anumpt, dx, dy, 
+      real xmax, xmaxa, ymax, ymaxa, drmax, anum, anumpt, dx, dy,
      +     dr, pd
       integer  j, k, kd, next, kfound, kgap, iptbo, istat, ntot
       real dist(200), pdata(200), pfit(200)
@@ -1181,7 +1181,7 @@ C   straight over, not interpolated.
 C
 C   alan penny               RAL                     1991 Nov
 
-      subroutine smp_gf_addint ( knum, part, kx, ky, kxs, kys, xd, yd, 
+      subroutine smp_gf_addint ( knum, part, kx, ky, kxs, kys, xd, yd,
      +                           yy )
 
       implicit none
@@ -1221,10 +1221,10 @@ Cbegin
       kye = kys + ky - 1
       if ( IMTYPE.eq.'SHORT' ) then
          call copvsr ( %val(IPIM), NX, NY, yy, kx, ky, kxs, kxe, kys, 	!Copy section of
-     +                 kye, BS, BZ, INVAL, RINVAL, nin, 0 )		! input array into work area, 
+     +                 kye, BS, BZ, INVAL, RINVAL, nin, 0 )		! input array into work area,
       else
          call copvrr ( %val(IPIM), NX, NY, yy, kx, ky, kxs, kxe, kys, 	!Copy section of
-     +                 kye, BS, BZ, RINVAL, nin, 0 )			! input array into work area, 
+     +                 kye, BS, BZ, RINVAL, nin, 0 )			! input array into work area,
       endif
 
       if ( nin.ne.0 ) then
@@ -1284,7 +1284,7 @@ C GAUMAG.F
 C
 C Contains:-
 C
-C SMP_GAUMAG   
+C SMP_GAUMAG
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -1366,7 +1366,7 @@ Cbegin
          return
       endif
 
-      call gtdesc ( 'INSTARS', 'TITLE', title, 'Output from Gaumag',	! 
+      call gtdesc ( 'INSTARS', 'TITLE', title, 'Output from Gaumag',	!
      +                 iv, istat )
       if ( istat.ne.0 ) title = 'Output from Gaumag'
       call get1c ( 'TITLE', title, title, .true. )
@@ -1419,12 +1419,12 @@ Cbegin
          y = tbin(7,k)
 
          if ( IMTYPE.eq.'SHORT' ) then
-            call gauss2sa ( %val(IPIM), NX, NY, x, y, NBX, NBY, kw, 
-     +                      RXM, RYM, INVAL, 20, amag, ht, base, dx, 
+            call gauss2sa ( %val(IPIM), NX, NY, x, y, NBX, NBY, kw,
+     +                      RXM, RYM, INVAL, 20, amag, ht, base, dx,
      +                      dy, xa, ya, rx, ry, rms, iter, ninval )
          else
-            call gauss2ra ( %val(IPIM), NX, NY, x, y, NBX, NBY, kw, 
-     +                      RXM, RYM, RINVAL, 20, amag, ht, base, dx, 
+            call gauss2ra ( %val(IPIM), NX, NY, x, y, NBX, NBY, kw,
+     +                      RXM, RYM, RINVAL, 20, amag, ht, base, dx,
      +                      dy, xa, ya, rx, ry, rms, iter, ninval )
          endif
 
@@ -1443,7 +1443,7 @@ Cbegin
          kinval = min(ninval,999)
          write ( text, '(1x, i4,1x,f5.2,1x,i3,2x,i2,1x,f5.0,1x,
      +                     2(f4.0,1x),2f6.0,2(f6.1,1x),2(f6.2,1x))' )
-     +         k, amag, kinval, iter, arms, dx, dy, ah, ab, axa, 
+     +         k, amag, kinval, iter, arms, dx, dy, ah, ab, axa,
      +         aya, arx, ary
          call printo ( text )
 
@@ -1523,11 +1523,11 @@ Cbegin
 
       call get_job ( 'OPTION', topt, k, 1, thelp, nthelp )		!Choose program
 
-      if ( k.eq.1 ) call smp_apermag 
+      if ( k.eq.1 ) call smp_apermag
 
-      if ( k.eq.2 ) call smp_gaufit 
+      if ( k.eq.2 ) call smp_gaufit
 
-      if ( k.eq.3 ) call smp_gaumag 
+      if ( k.eq.3 ) call smp_gaumag
 
 
       end

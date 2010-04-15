@@ -98,7 +98,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialisation.
-      TAB = CHAR( 9 ) 
+      TAB = CHAR( 9 )
 
 *  First read the file header, until we get to the dash line. All
 *  information before this is discarded, except the column name line
@@ -148,15 +148,15 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Now convert data. This just consists of removing the <TAB> characters 
+*  Now convert data. This just consists of removing the <TAB> characters
 *  and replacing with spaces.
       OK = .TRUE.
  3    CONTINUE
       IF ( OK .AND. STATUS .EQ. SAI__OK ) THEN
          CALL FIO_READ( IFIN, LINE, NCHAR, STATUS )
-         IF ( STATUS .EQ. SAI__OK ) THEN 
+         IF ( STATUS .EQ. SAI__OK ) THEN
             DO 4 I = 1, NCHAR
-               IF ( LINE( I : I ) .EQ. TAB ) THEN 
+               IF ( LINE( I : I ) .EQ. TAB ) THEN
                   LINE( I : I ) = ' '
                END IF
  4          CONTINUE
@@ -164,10 +164,10 @@
          END IF
          GO TO 3
       END IF
-      IF ( STATUS .EQ. FIO__EOF ) THEN 
+      IF ( STATUS .EQ. FIO__EOF ) THEN
          CALL ERR_ANNUL( STATUS )
       END IF
-      
+
 *  Exit in error label.
  99   CONTINUE
       END

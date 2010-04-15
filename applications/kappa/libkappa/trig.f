@@ -21,8 +21,8 @@
 
 *  Description:
 *     This routine copies the supplied input NDF, performing a specified
-*     trigonometric operation ( sine, tangent, etc.) on each value in the 
-*     DATA array. The VARIANCE component, if present, is modified 
+*     trigonometric operation ( sine, tangent, etc.) on each value in the
+*     DATA array. The VARIANCE component, if present, is modified
 *     appropriately. Pixels for which the required value is undefined, or
 *     outside the numerical range of the NDFs data type, are set bad in
 *     the output.
@@ -44,12 +44,12 @@
 *       - ASIND:   arc-sine (degrees)
 *       - ATAN:   arc-tangent (radians)
 *       - ATAND:   arc-tangent (degrees)
-*       - COS:   cosine (radians)     
-*       - COSD:   cosine (degrees)     
-*       - SIN:   sine (radians)       
-*       - SIND:   sine (degrees)       
-*       - TAN:   tangent (radians)    
-*       - TAND:   tangent (degrees)    
+*       - COS:   cosine (radians)
+*       - COSD:   cosine (degrees)
+*       - SIN:   sine (radians)
+*       - SIND:   sine (degrees)
+*       - TAN:   tangent (radians)
+*       - TAND:   tangent (degrees)
 *
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
@@ -58,7 +58,7 @@
 
 *  Examples:
 *     trig sindata asind data
-*        Take the arc-sine of the data values in the NDF called sindata, and 
+*        Take the arc-sine of the data values in the NDF called sindata, and
 *        store the results (in degrees) in the NDF called data.
 *     trig sindata asin data
 *        As above, but the output values are stored in radians.
@@ -74,7 +74,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single-precision floating point, or double
-*     precision, if appropriate, but the numeric type of the input pixels 
+*     precision, if appropriate, but the numeric type of the input pixels
 *     is preserved in the output NDF.
 
 *  Copyright:
@@ -110,7 +110,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -150,12 +150,12 @@
 
 *  Obtain the function.
       CALL PAR_CHOIC( 'TRIGFUNC', 'SIN', 'SIN,COS,TAN,SIND,COSD,'//
-     :                'TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND', .FALSE., 
+     :                'TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND', .FALSE.,
      :                TRIGFN, STATUS )
 
 *  Create a new output NDF based on the input NDF.  Propagate the WCS, axis,
 *  quality and units components.
-      CALL LPG_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF2, 
+      CALL LPG_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF2,
      :               STATUS )
 
 *  See if the input NDF has a variance component and set the list of
@@ -169,7 +169,7 @@
 
 *  Determine the data type to use for processing and set the output data
 *  type accordingly.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF1, COMP, ITYPE, DTYPE, 
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF1, COMP, ITYPE, DTYPE,
      :                STATUS )
       CALL NDF_STYPE( DTYPE, INDF2, COMP, STATUS )
 
@@ -184,19 +184,19 @@
 *  Select the appropriate routine for the data type being processed and
 *  create the output values.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_TRIGD( BAD, VAR, TRIGFN, EL, 
+         CALL KPG1_TRIGD( BAD, VAR, TRIGFN, EL,
      :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ),
      :                   %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                   %VAL( CNF_PVAL( IPOUT( 2 ) ) ), NBAD, STATUS )
- 
-      ELSE 
-         CALL KPG1_TRIGR( BAD, VAR, TRIGFN, EL, 
+
+      ELSE
+         CALL KPG1_TRIGR( BAD, VAR, TRIGFN, EL,
      :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ),
      :                   %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                   %VAL( CNF_PVAL( IPOUT( 2 ) ) ), NBAD, STATUS )
- 
+
       END IF
 
 *  Set the output bad pixel flag value unless the NDF is primitive.
@@ -208,7 +208,7 @@
       IF( VAR ) THEN
          CALL NDF_FORM( INDF2, 'Variance', FORM, STATUS )
          IF ( FORM .NE. 'PRIMITIVE' ) THEN
-            CALL NDF_SBAD( ( NBAD( 2 ) .NE. 0 ), INDF2, 'Variance', 
+            CALL NDF_SBAD( ( NBAD( 2 ) .NE. 0 ), INDF2, 'Variance',
      :                     STATUS )
          END IF
       END IF
@@ -216,7 +216,7 @@
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

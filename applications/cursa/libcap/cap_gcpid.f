@@ -147,7 +147,7 @@
                IF (STATUS .EQ. SAI__OK) THEN
 
 *
-*                If the preferential display flag is true then check whether 
+*                If the preferential display flag is true then check whether
 *                it corresponds to a scalar or a vector.
 
                   CALL CAT_TIQAI (FI, 'DIMS', DIMS, STATUS)
@@ -205,8 +205,8 @@
             END IF
 
 *
-*          If the identifier is null (that is, all the columns have 
-*          already been obtained) or the status is bad then set the 
+*          If the identifier is null (that is, all the columns have
+*          already been obtained) or the status is bad then set the
 *          termination flag.
 
             IF (STATUS .NE. SAI__OK  .OR.  FI .EQ. CAT__NOID) THEN

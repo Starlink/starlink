@@ -36,7 +36,7 @@
  *            characters.
  *
  *            If VALUE is set to 0, no wrapping will occur (that is the
- *            length will be set to the maximum possible). Note that the 
+ *            length will be set to the maximum possible). Note that the
  *            minimum is 7, to allow for exclamation marks and indentation.
  *            Using a smaller value is an error.
  *
@@ -124,8 +124,8 @@
  *     13-MAY-2008 (PWD):
  *        Use struct to access message table.
  *     30-JUL-2008 (PWD):
- *        Limit SZOUT to EMS__SZMSG as this is the maximum size 
- *        EMS will output. Make sure SZOUT is greater than 6 to 
+ *        Limit SZOUT to EMS__SZMSG as this is the maximum size
+ *        EMS will output. Make sure SZOUT is greater than 6 to
  *        also match the documented behaviour.
  *     31-JUL-2008 (PWD):
  *        Renamed from emsTune and added a return value.

@@ -40,7 +40,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -70,11 +70,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the source name into the begining of the variable STNAME
-      STNAME(1:8) = SONAME(SOPOS) 
+      STNAME(1:8) = SONAME(SOPOS)
       STNAME(9:11) = '   '
-      
+
 *  Set up an appropriate coordinate system string
-*  
+*
 *  Equatorial
       IF      ( ( SOCOSY(SOPOS) .EQ. 'EQUATORIAL(B1950)        ')
      :   .OR.   ( SOCOSY(SOPOS) .EQ. 'EQUATORIAL(J1950)        ') ) THEN

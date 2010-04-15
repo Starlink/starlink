@@ -19,7 +19,7 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The WinMap class implements Mappings which maps one window onto 
+*     The WinMap class implements Mappings which maps one window onto
 *     another window by scaling and shifting the values on each axis.
 
 *  Inheritance:
@@ -103,12 +103,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -186,7 +186,7 @@ typedef struct AstWinMapVtab {
 
 } AstWinMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within the
    object.c file. */
@@ -223,7 +223,7 @@ AstWinMap *astWinMapId_( int, const double [], const double [], const double [],
 
 /* Initialiser. */
 AstWinMap *astInitWinMap_( void *, size_t, int, AstWinMapVtab *,
-                           const char *, int, const double *, const double *, 
+                           const char *, int, const double *, const double *,
                            const double *, const double *, int * );
 
 /* Vtab initialiser. */

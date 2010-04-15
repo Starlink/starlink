@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -144,7 +144,7 @@
      :        XX( 9 ),        ! X image coordinate of test points.
      :        YY( 9 )         ! Y image coordinate of test points.
 
-      INTEGER 
+      INTEGER
      :        COL,            ! Current column of test points.
      :        DX,             ! No. of columns between test points.
      :        DY,             ! No. of rows between test points.
@@ -203,8 +203,8 @@
 *  Increment the number of distinct test points, and store the X and Y
 *  indicies of the current test point.
                   NK = NK + 1
-                  I( NK ) = ICOL( COL )                  
-                  J( NK ) = JROW( ROW )                  
+                  I( NK ) = ICOL( COL )
+                  J( NK ) = JROW( ROW )
 
                END IF
 
@@ -231,8 +231,8 @@
 
 *  Store the image coordinates of this test point. These refer to the
 *  output pixel grid.
-         XB( K ) = REAL( II ) - 0.5      
-         YB( K ) = REAL( JJ ) - 0.5      
+         XB( K ) = REAL( II ) - 0.5
+         YB( K ) = REAL( JJ ) - 0.5
 
 *  If the X and Y maps contain good values at this test point, store the
 *  values as the input image coordinates of the test point.

@@ -7,7 +7,7 @@
 
 *   Input :
       LOGICAL DISPLAY			! True for Screen display
-					
+
       INTEGER LUN				! If SMG gives Vunit
 						! if .not. DISPLAY gives print unit
 
@@ -21,7 +21,7 @@
       COMMON / ECL_COORD/ DECLONG, DECLAT	! Available from ROS_VIEW
       LOGICAL SMG
       COMMON / SMG_KEEP / SMG
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -48,7 +48,7 @@
       INTEGER NCHAR						!Number of characters in a string.
       INTEGER LSTATUS
       DOUBLE PRECISION MJD_VIS(2,2)					! Possible dates visible
-      CHARACTER*9 DSTRING(2,2)					!	::	
+      CHARACTER*9 DSTRING(2,2)					!	::
       INTEGER NVIS_PERIODS
       REAL SURVEXP, SURVXRT
       LOGICAL ZOOM_ON
@@ -69,7 +69,7 @@
       DATA RULE /'--------------------------------------------------------------'/
 
 *  __________________________ Executable Code __________________________________
- 
+
       IF (REF_FORM .LE.0 ) THEN							! Open files if necessary
          CALL FORM_OPEN( 'R', IERR)
          IF (IERR .NE. 0) GOTO 90
@@ -96,7 +96,7 @@ C      END IF
          IF (REF_GECHEK .LT. 0) WRITE( LUN, '(A)' ) ' Error - Cover not correct: '
          WRITE(LUN,'(A/A)') RULE//RULE, TARG_HEAD							! Target heading
       END IF
- 
+
       NTARGS = DBS_GETI(REF_FORM,FLD_NTARGETS)
       DO ITARGET = 1,NTARGS
          CALL TARG_READ(ITARGET,IERR)
@@ -109,14 +109,14 @@ C      END IF
       FIELD_NO=DBS_FIELDNO(REF_TARGET,'TARGET.DEC')
       TARG_DEC =DBS_GETC(REF_TARGET,FIELD_NO)
       CALL DEC_CONVERT(TARG_DEC, DECRADS, LSTATUS)
- 
+
       CALL ROS_VIEW(RARADS, DECRADS, NVIS_PERIODS, MJD_VIS, DSTRING)
       SURVEXP =  WFC_SURV(DECLAT ) / 500.0					! want 2*
       SURVXRT =  XRT_SURV(DECLAT ) / 1000.0					! table has 2*
       WRITE(SENS,'(F5.1,1X,F5.1)') SURVXRT, SURVEXP
 
       FIELD_NO=DBS_FIELDNO(REF_TARGET,'TOTAL.OBS.TIME')
-      AKSEC = DBS_GETR(REF_TARGET,FIELD_NO) 
+      AKSEC = DBS_GETR(REF_TARGET,FIELD_NO)
       KSEC = INT( AKSEC)
       SSEC = AKSEC * 1000.
       WRITE(TOTOBS,'(I3)') KSEC
@@ -146,7 +146,7 @@ C      END IF
             CON_TYPE = 'Cntg'
          ELSE IF (LVAL4) THEN
             CON_TYPE = 'Phas'
-         ELSE 
+         ELSE
             CON_TYPE = ' ?  '
          END IF
       ELSE
@@ -175,7 +175,7 @@ C      END IF
       HRI_MIN = HRI_SENS(5.0, 0.000013, SSEC)
 
       WRITE(NUM ,'(I2)') TARG_NO(ITARGET)
-      IF (QUAL_TARGET(ITARGET)) THEN 
+      IF (QUAL_TARGET(ITARGET)) THEN
          WRITE(QAL,'(A)') 'OK'
       ELSE
          WRITE(QAL,'(A)') 'F'

@@ -40,7 +40,7 @@ typedef struct _node
 extern node *NODENIL;
 
 /*
- * Classes of symbol table entry. These are folded into one symbol table so 
+ * Classes of symbol table entry. These are folded into one symbol table so
  * that different symbol scopes can be referred to by one symbol table pointer
  *
  */
@@ -64,7 +64,7 @@ extern node *NODENIL;
 
 extern int iocommand_q;
 
-/* Needed for sys_nerr. We use strerror now so this is not 
+/* Needed for sys_nerr. We use strerror now so this is not
    a worry. If strerror is not found we may need to worry. */
 #ifdef vaxc
 #include <perror.h>

@@ -2,7 +2,7 @@
 *+
 *{subroutine_prologue}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -24,7 +24,7 @@
 
       DOUBLE PRECISION LASTLST   ! LAST LST
       INTEGER I
-                                 
+
 
 *.
 

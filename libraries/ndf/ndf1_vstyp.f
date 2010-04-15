@@ -4,7 +4,7 @@
 *     NDF1_VSTYP
 
 *  Purpose:
-*     Determine the numeric data type of the scaled variance component 
+*     Determine the numeric data type of the scaled variance component
 *     of an NDF.
 
 *  Language:
@@ -16,8 +16,8 @@
 *  Description:
 *     The routine returns the numeric data type of the scaled variance
 *     component of an NDF identified by its index in the ACB. The data
-*     type is returned as an upper case character string. The returned 
-*     type describes the values stored in the array, before they are 
+*     type is returned as an upper case character string. The returned
+*     type describes the values stored in the array, before they are
 *     unscaled using the associated scale and zero values. Use NDF1_VTYP
 *     if you need the data type of the array after it has been unscaled.
 
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,7 +119,7 @@
             CALL NDF1_CCPY( DCB_VTYP( IDCB ), TYPE, STATUS )
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_VSTYP', STATUS )
 

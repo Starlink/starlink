@@ -38,10 +38,10 @@
 *
 *-
 
-  
+
 *   Type Definitions:                   ! No implicit typing
       IMPLICIT NONE
- 
+
 *   Global Constants:
       INCLUDE 'SAE_PAR'                 ! Standard SAE constants
       INCLUDE 'GRP_PAR'                 ! GRP constants
@@ -49,7 +49,7 @@
       INCLUDE 'NDF_PAR'                 ! NDF constants
       INCLUDE 'PAR_ERR'			! Constants for the PAR system
       INCLUDE 'CNF_PAR'
-      
+
 *   Arguments Given:
       INTEGER ELEMS                     ! Number of pixels in the image
       INTEGER LBND(NDF__MXDIM)          ! Lower bound of the image
@@ -57,12 +57,12 @@
       INTEGER POINT1(1)                 ! Pointer to the mapped image
       INTEGER POINT4(1)                 ! Pointer to the mask image
       INTEGER UBND(NDF__MXDIM)          ! Upper bound of the image
- 
+
 *   Arguments Returned:
- 
+
 *   Status:
       INTEGER STATUS                    ! Global status
- 
+
 *   Local variables:
       CHARACTER *(256) ARDN             ! Temporary storage of ARDFIL
       LOGICAL ARDINP                    ! Was a sensible ARD file name returned
@@ -74,8 +74,8 @@
       INTEGER UBNDE(NDF__MXDIM)
       REAL TRCOEF(1)                    ! Transformation values
 *.
- 
- 
+
+
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
@@ -96,10 +96,10 @@
             CALL GRP_DELET(IGRP,STATUS)
             CALL ERR_ANNUL(STATUS)
             CALL MSG_OUT(' ','WARNING! - ARD file not used.',STATUS)
-         ENDIF  
+         ENDIF
       ENDIF
       CALL ERR_RLSE
-    
+
 *   Only process an ARD file if the name was sensible.
       IF (ARDINP) THEN
 
@@ -123,24 +123,24 @@
 
          END IF
          CALL ERR_RLSE
-       
+
 *      Correct the output image to show bad pixels where indicated on the mask.
          IF (ARDINP) THEN
-          
+
 *         Set the required pixels to bad.
             CALL ESP1_ARD_DRIVE2(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
      :                          %VAL(CNF_PVAL(POINT4(1))),STATUS)
 
 *          Close down the group used to hold the pixel mask.
             CALL GRP_DELET(IGRP,STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 9999 
+            IF (STATUS.NE.SAI__OK) GOTO 9999
 
-         END IF 
- 
+         END IF
+
       END IF
 
  9999 CONTINUE
- 
+
       END
- 
+
 

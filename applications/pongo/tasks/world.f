@@ -20,7 +20,7 @@
 *     recall the limits from a previous plot using AGI (SUN/48).
 
 *  Usage:
-*     world action 
+*     world action
 *        { [xmin] [xmax] [ymin] [ymax]
 *        { piclab=?
 *        action
@@ -443,7 +443,7 @@
             XMIN = XMINP
             XMAX = XMAXP
          END IF
-         IF ( YMINP .EQ. YMAXP ) THEN 
+         IF ( YMINP .EQ. YMAXP ) THEN
             YMIN = -1
             YMAX = 1
          ELSE

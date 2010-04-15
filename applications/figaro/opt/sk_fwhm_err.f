@@ -15,11 +15,11 @@
 *
 * Arguments:
 *    SG_PARM(N) = REAL ARRAY (Given)
-*       
+*
 *    SG_ERROR(N) = REAL ARRAY (Given)
-*       
+*
 *    N = INTEGER (Given)
-*       
+*
 *    ERROR = REAL (Returned)
 *        error on width
 *

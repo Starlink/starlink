@@ -21,7 +21,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the NDF
-C                       structure.     
+C                       structure.
 C     (>) MODE          (Fixed string,descr) The access mode,
 C                       'READ','WRITE' or 'UPDATE'.
 C     (<) PTR           (Integer,ref) Pointer to the mapped data.
@@ -49,7 +49,7 @@ C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC

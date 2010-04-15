@@ -7,23 +7,23 @@
       LOGICAL AUTOLIM,OK
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   S R A N G E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), RMIN (>), RMAX (>), AUTOLIM (><), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C Sets a minimum/maximum range for various plotting parameters.

@@ -21,7 +21,7 @@
      described here from Starlink computers. This document is
      complementary to SUN/162 which describes some of the observation
      and data archives available on-line.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

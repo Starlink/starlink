@@ -39,7 +39,7 @@ C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system, and the
 C     structure must have been opened using DSA_INPUT, DSA_OUTPUT or
-C     an equivalent routine.  Data and quality arrays must both have 
+C     an equivalent routine.  Data and quality arrays must both have
 C     been mapped.
 C
 C  Version date: 1st December 1995.
@@ -78,7 +78,7 @@ C
 C  History:
 C     21st July 1988 Original version.  KS / AAO.
 C     3rd  May  1990 Flagged value count added to DSA_UNFLAG_DATA call.
-C                    KS / AAO. 
+C                    KS / AAO.
 C     25th Aug  1992 Replace CNV_ calls with VEC_ calls. If the type
 C                    used internally is not recognised, STATUS is set
 C                    to DSA__INVTYP.  HME / UoE, Starlink.
@@ -118,7 +118,7 @@ C
 C     Local variables
 C
       INTEGER   DATA_ADDR      ! Virtual address of data array
-      CHARACTER DATA_TYPE*16   ! Type of mapped data array 
+      CHARACTER DATA_TYPE*16   ! Type of mapped data array
       INTEGER   I              ! Index through dimensions
       INTEGER   IGNORE         ! Dummy status value
       INTEGER   INVOKE         ! Dummy function value
@@ -129,9 +129,9 @@ C
       INTEGER   NFLAGGED       ! Number of flagged values - ignored
       CHARACTER OBJ_NAME*128   ! DTA_ name of data object
       INTEGER   QUAL_ADDR      ! Virtual address of quality array
-      CHARACTER QUAL_TYPE*16   ! Type of mapped quality array 
+      CHARACTER QUAL_TYPE*16   ! Type of mapped quality array
       CHARACTER REF_NAME_UC*32 ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT       ! Reference table slot # 
+      INTEGER   REF_SLOT       ! Reference table slot #
       CHARACTER STRUCTURE*128  ! Full structure name from ref_name
       INTEGER   TEMP_ADDR      ! Virtual address of work array
       INTEGER   TEMP_SLOT      ! Workspace slot for work array
@@ -150,12 +150,12 @@ C     Return immediately if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need an upper case version of REF_NAME 
+C     We need an upper case version of REF_NAME
 C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -196,14 +196,14 @@ C     program is not handling flagged data directly, in which case
 C     we have to process the flags out and into the quality array. Note
 C     that by this stage all the common table items such as DATA_FLAGGED
 C     will have been set. If the data is being mapped writeonly, then we
-C     don't need to do anything. 
+C     don't need to do anything.
 C
 C     (A moot point is the question of whether we really need to process
 C     the flagged values into the quality array in the case where both
 C     are present in the data. We ought to be able to assume that the
 C     contents of the quality array reflect the flagged values in the data
 C     - even though the reverse is not true, since doing that would loose
-C     the original data values, and that's silly, even if they are 
+C     the original data values, and that's silly, even if they are
 C     questionable. However, we don't, because someone might have produced
 C     this effect with a program that handled both flagged values and
 C     the quality array directly in the application - or by messing with LET!
@@ -263,7 +263,7 @@ C        of the same size as temporary workspace, and we need to fill
 C        it with the existing quality values. (This is a messy load of
 C        code that appears in reverse almost immediately and will probably
 C        never be used..)
-C        
+C
          IF (QUAL_TYPE.NE.'BYTE') THEN
             CALL DSA_GET_WORKSPACE(NELM,TEMP_ADDR,TEMP_SLOT,STATUS)
             IF (QUAL_TYPE.EQ.'DOUBLE') THEN

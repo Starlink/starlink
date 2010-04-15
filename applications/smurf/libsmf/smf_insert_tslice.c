@@ -22,7 +22,7 @@
 *        the updated FrameSet. In addition, if sc2head is non-null, the
 *        contents of hdr->sc2head will be updated for this time slice.
 *     tdata = smfData* (Given)
-*        Data structure containing the data for a given time slice 
+*        Data structure containing the data for a given time slice
 *     index = int (Given)
 *        Index of time slice
 *     status = int* (Given and Returned)
@@ -46,7 +46,7 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     
+*
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.

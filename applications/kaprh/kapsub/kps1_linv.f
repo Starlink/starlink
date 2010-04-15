@@ -33,7 +33,7 @@
 *        TRINV( 5 ) = -TR( 5 ) / DET
 *        TRINV( 6 ) = TR( 2 ) / DET
 *
-*     and DET is the determinant given by 
+*     and DET is the determinant given by
 *
 *         DET = TR( 2 ) * TR( 6 ) - TR( 3 ) * TR( 5 )
 
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

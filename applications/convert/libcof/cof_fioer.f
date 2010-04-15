@@ -89,13 +89,13 @@
 *     22-JAN-1998 (DSB):
 *        Supplied message is now expanded before being assigned to an MSG
 *        token. This allows the supplied message to contain references to
-*        other (pre-defined) message tokens. 
+*        other (pre-defined) message tokens.
 *     1-FEB-2000 (DSB):
 *        Enclose MSG_LOAD call in a new error reporting environment.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -191,6 +191,6 @@
          END IF
 
       END IF
-      
+
   999 CONTINUE
       END

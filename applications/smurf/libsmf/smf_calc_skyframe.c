@@ -13,35 +13,35 @@
 *     C function
 
 *  Invocation:
-*     void smf_calc_skyframe( const AstFrame *skyin, const char * system, 
-*                             const smfHead* hdr, int alignsys, 
-*                             AstSkyFrame ** skyframe, double skyref[2], 
-*                             int * moving, int * status ) 
+*     void smf_calc_skyframe( const AstFrame *skyin, const char * system,
+*                             const smfHead* hdr, int alignsys,
+*                             AstSkyFrame ** skyframe, double skyref[2],
+*                             int * moving, int * status )
 
 *  Arguments:
 *     skyin = const AstFrame * (Given)
 *        Input sky frame to use as reference.
 *     system = char* (Given)
 *        Specifies the celestial coordinate system which will be used to
-*        describe the spatial axes of the output cube. It should be a 
+*        describe the spatial axes of the output cube. It should be a
 *        valid value for the System attribute of an AST SkyFrame, or
-*        "TRACKING". 
+*        "TRACKING".
 *     hdr = const smfHead* (Given)
 *        Header to be used to calculate base position and tracking system.
 *     alignsys = int (Given)
-*        If non-zero, then the input data will be aligned in the coordinate 
+*        If non-zero, then the input data will be aligned in the coordinate
 *        system specified by "system" rather than in the default system
 *        (ICRS).
 *     skyframe = AstFrameSet ** (Returned)
-*        A pointer to a location at which to return a pointer to an AST 
+*        A pointer to a location at which to return a pointer to an AST
 *        SkyFrame describing the spatial axes of the output WCS FrameSet.
-*        If "moving" is non-zero, the spatial axes represent (lon,lat) 
-*        offsets (in the requested "system") from the base telescope position 
+*        If "moving" is non-zero, the spatial axes represent (lon,lat)
+*        offsets (in the requested "system") from the base telescope position
 *        associated with the first time slice.
 *     skyref = double[2] (Returned)
 *        Reference position to be used for this sky frame.
 *     moving = int* (Returned)
-*        Address of an int in which to return a flag indicating if the 
+*        Address of an int in which to return a flag indicating if the
 *        telescope is tracking a moving object. If so, the returned
 *        SkyFrame will describe offsets (in the system specified by "system")
 *        from the base pointing position for the first time slice.
@@ -64,14 +64,14 @@
 *        Initial version factored out of smf_cubegrid
 *     2009-08-25 (DSB):
 *        Added args "igrp" and "size" to allow returned "*moving" value to
-*        be based on the total distance moved by the tracking centre over 
+*        be based on the total distance moved by the tracking centre over
 *        all supplied observations rather than just one observation.
 *     2009-09-09 (EC):
 *        Add extra status checks
 *     2009-09-11 (DSB):
 *        Cater for SCUBA-2 file names in addition to ACSIS.
 *     2009-09-14 (DSB):
-*        Removed "igrp" and "size". Returned "moving" value is now determined 
+*        Removed "igrp" and "size". Returned "moving" value is now determined
 *        just from the supplied output coordinate system.
 *     {enter_further_changes_here}
 
@@ -119,9 +119,9 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 
-void smf_calc_skyframe( const AstFrame *skyin, const char * system, 
-                        const smfHead* hdr, int alignsys,     
-                        AstSkyFrame ** skyframe, double skyref[2], 
+void smf_calc_skyframe( const AstFrame *skyin, const char * system,
+                        const smfHead* hdr, int alignsys,
+                        AstSkyFrame ** skyframe, double skyref[2],
                         int * moving, int * status ) {
 
 /* Local Variables: */
@@ -132,7 +132,7 @@ void smf_calc_skyframe( const AstFrame *skyin, const char * system,
 /* Check inherited status */
   if (*status != SAI__OK) return;
 
-/* Determine the tracking system, and choose the celestial coordinate system 
+/* Determine the tracking system, and choose the celestial coordinate system
    for the output cube. */
   if( !strcmp( system, "TRACKING" ) ) {
     usesys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
@@ -150,8 +150,8 @@ void smf_calc_skyframe( const AstFrame *skyin, const char * system,
    coordinate system rather than the default (ICRS). */
   if( alignsys ) astSetC( *skyframe, "AlignSystem", usesys );
 
-/* We will later record the telescope base pointing position as the SkyRef 
-   attribute in the output SkyFrame. To do this, we need to convert the 
+/* We will later record the telescope base pointing position as the SkyRef
+   attribute in the output SkyFrame. To do this, we need to convert the
    stored telescope base pointing position from AZEL to the requested
    output system. Create a Mapping to do this using astConvert, and then
    use the Mapping to transform the stored position. */
@@ -165,8 +165,8 @@ void smf_calc_skyframe( const AstFrame *skyin, const char * system,
 /* Normalise these values. */
   astNorm( *skyframe, skyref );
 
-/* Determine if the telescope is tracking a moving target such as a planet 
-   or asteroid. We assume this is the case if the output cube is in AZEL 
+/* Determine if the telescope is tracking a moving target such as a planet
+   or asteroid. We assume this is the case if the output cube is in AZEL
    or GAPPT. */
   *moving = ( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) );
 }

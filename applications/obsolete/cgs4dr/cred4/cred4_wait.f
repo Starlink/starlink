@@ -54,7 +54,7 @@
 *      use a 600000 millisecond (=10 minutes) timeout
          CALL TASK_DONE( 600000, P4_PATH, P4_MESSID, OUTVAL, STATUS )
 
-         P4_ACTIVE = .FALSE. 
+         P4_ACTIVE = .FALSE.
 
          IF ( STATUS .NE. DTASK__ACTCOMPLETE ) THEN
             IF ( STATUS .EQ. DTASK__ACTINFORM ) THEN
@@ -81,7 +81,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'ES', ERR_STATUS )
                CALL ERR_REP( ' ', 'CRED4_WAIT: '/
-     :            /'Bad status from P4 wait '/ 
+     :            /'Bad status from P4 wait '/
      :            /'(Status = ^ES)', STATUS )
             ENDIF
          ELSE
@@ -90,13 +90,13 @@
          ENDIF
       ENDIF
 
-*    same for RED4 
+*    same for RED4
       IF ( RED4_ACTIVE ) THEN
 
 *      use a 600000 millisecond (=10 minutes) timeout
          CALL TASK_DONE (600000, RED4_PATH, RED4_MESSID, OUTVAL, STATUS)
 
-         RED4_ACTIVE = .FALSE. 
+         RED4_ACTIVE = .FALSE.
 
          IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
             IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -122,7 +122,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'ES', ERR_STATUS )
                CALL ERR_REP (' ', 'CRED4_WAIT: '/
-     :            /'Bad status from RED4 wait '/ 
+     :            /'Bad status from RED4 wait '/
      :            /'(Status = ^ES)', STATUS)
             ENDIF
          ELSE

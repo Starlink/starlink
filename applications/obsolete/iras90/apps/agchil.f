@@ -13,14 +13,14 @@
 *     CALL AGCHIL( IFLG, LBNM, LNNO )
 
 *  Description:
-*     This is a user version of AGCHIL to replace the one in NCAR 
+*     This is a user version of AGCHIL to replace the one in NCAR
 *     library. It is used, together with the routine IRM_STPEN, to set
-*     the pen number for the title and the axis labels of an NCAR 
+*     the pen number for the title and the axis labels of an NCAR
 *     (AUTOGRPH) display. It is not called directly by the user
-*     program, but by AUTOGRAPH  itself, just before and just after 
-*     each of the labels or title. This routine will set the pen number 
-*     for the title and the axis labels according to the values of the 
-*     NCAR pen setting variables in the common block IRM_NCAR which are 
+*     program, but by AUTOGRAPH  itself, just before and just after
+*     each of the labels or title. This routine will set the pen number
+*     for the title and the axis labels according to the values of the
+*     NCAR pen setting variables in the common block IRM_NCAR which are
 *     set by IRM_STPEN.
 *
 *     The title refered to is the title witten by NCAR (AUTOGRAPH)
@@ -33,7 +33,7 @@
 
 *  Arguments:
 *     See section 3.25.2 of AUTOGRAPH document.
-     
+
 *  Authors:
 *     WG: Wei Gong (IPMAF)
 *     {enter_new_authors_here}
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,9 +84,9 @@
                CALL GSTXCI( IVAL )
 
 *  If the label to be draw is other axis label,
-            ELSE IF ( ( LBNM( : 1 ) .EQ. 'T' .AND. LNNO .NE. 100 ) 
-     :               .OR. LBNM( : 1 ) .EQ. 'B' 
-     :               .OR. LBNM( : 1 ) .EQ. 'R'  
+            ELSE IF ( ( LBNM( : 1 ) .EQ. 'T' .AND. LNNO .NE. 100 )
+     :               .OR. LBNM( : 1 ) .EQ. 'B'
+     :               .OR. LBNM( : 1 ) .EQ. 'R'
      :               .OR. LBNM( : 1 ) .EQ. 'L' ) THEN
                CALL IRM_IATTR( 'ALBCL', 0, IVAL, LVAL, STATUS )
                CALL GSTXCI( IVAL )
@@ -99,7 +99,7 @@
            CALL GSTXCI( IVAL )
          END IF
 
-      END IF     
+      END IF
 
 *  If an error has occurred, flush it.
       IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )

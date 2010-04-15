@@ -13,11 +13,11 @@
 *     CALL MSG_FMTC( TOKEN, FORMAT, CVALUE )
 
 *  Description:
-*     A given CHARACTER value is encoded using the supplied Fortran 77 
-*     format field and the result assigned to the named message token. 
-*     If the token is already defined, the result is appended to the 
-*     existing token value. If this subroutine fails, the token remains 
-*     unmodified. This will be apparent in any messages which refer to 
+*     A given CHARACTER value is encoded using the supplied Fortran 77
+*     format field and the result assigned to the named message token.
+*     If the token is already defined, the result is appended to the
+*     existing token value. If this subroutine fails, the token remains
+*     unmodified. This will be apparent in any messages which refer to
 *     this token.
 
 *  Arguments:
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,7 +92,7 @@
 *        Since EMS_SETC does handle string truncation, allocate
 *        2 * EMS__SZTOK for local storage and let EMS handle truncation.
 *     11-FEB-2009 (TIMJ):
-*        Handle truncation properly even if the supplied message is very very large. 
+*        Handle truncation properly even if the supplied message is very very large.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,5 +152,5 @@
             CALL EMS_SETC( TOKEN, STR( 1 : NCHAR ) )
          END IF
       END IF
- 
+
       END

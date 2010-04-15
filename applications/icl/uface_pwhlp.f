@@ -123,7 +123,7 @@
                FLAGS = 1
             ENDIF
 
-*         Get width and height of screen 
+*         Get width and height of screen
 *         (the routine called is system dependent)
 !            CALL UFACE_SCRNSZ( SCREEN_WIDTH, UFACEPGSZ, STATUS )
              SCREEN_WIDTH = 80

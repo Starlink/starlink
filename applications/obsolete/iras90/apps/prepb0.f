@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -177,30 +177,30 @@
 *  If the value of keyword BUNIT corresponds to one of the standard IRI
 *  system of units except for differences of case, replace U with the
 *  corresponding standard system. This involves correcting the case of
-*  each character so that it conforms with one of the standards. 
+*  each character so that it conforms with one of the standards.
       CALL IRI_CHECK( U, OK, STATUS )
 
 *  If the input NDF is a PO image, see what type it is.
       IF( TYPE .EQ. IRI__DSCO ) THEN
          CALL PREPC7( NCARD, FITS, FLUX, NOISE, STATUS )
 
-*  If the input NDF is a PO intensity data map, get the value of the 
+*  If the input NDF is a PO intensity data map, get the value of the
 *  BIAS keyword.
          IF( .NOT. (FLUX .OR. NOISE ) ) THEN
             CALL IRM_GKEYR( NCARD, FITS, 1, 'BIAS', THERE, BIAS, CARD,
      :                      STATUS )
 
 *  If the keyword was not found, use zero.
-            IF( .NOT. THERE ) BIAS = 0.0      
+            IF( .NOT. THERE ) BIAS = 0.0
 
 *  If the input is of any other type, use a bias of zero.
          ELSE
             BIAS = 0.0
-         END IF      
+         END IF
 
       ELSE
          BIAS = 0.0
-      END IF      
+      END IF
 
 *  If the input has units of JY or PW/M**2, change them to JY/PIXEL and
 *  (PW/M**2)/PIXEL, respectively.
@@ -219,6 +219,6 @@
 *  Find the total scale and total zero to be applied to the input data
 *  to get the true data value.
       SCALE = FACTOR*BSCALE
-      ZERO = FACTOR*( BZERO + BIAS ) 
+      ZERO = FACTOR*( BZERO + BIAS )
 
       END

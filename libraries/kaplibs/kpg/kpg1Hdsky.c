@@ -5,7 +5,7 @@
 #include "mers.h"
 #include "sae_par.h"
 
-void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new, 
+void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
                 int *status ){
 /*
 *  Name:
@@ -18,21 +18,21 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 *     C.
 
 *  Invocation:
-*     void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new, 
+*     void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 *                     int *status )
 
 *  Description:
-*     This function stores the vectorised data values in the supplied HDS 
-*     object (which must be primitive) in the supplied KeyMap. The key for 
+*     This function stores the vectorised data values in the supplied HDS
+*     object (which must be primitive) in the supplied KeyMap. The key for
 *     the KeyMap entry is the name of the HDS object. If the KeyMap already
-*     contains an entry with this name, then what happens is specified 
-*     by "old", Likewise, if the KeyMap does not already contain an entry 
-*     with this name, then what happens is specified by "new". 
+*     contains an entry with this name, then what happens is specified
+*     by "old", Likewise, if the KeyMap does not already contain an entry
+*     with this name, then what happens is specified by "new".
 
 *  Arguments:
 *     loc
 *        An HDS locator for a primitive scalar or array object.
-*     keymap 
+*     keymap
 *        An AST pointer to an existing KeyMap.
 *     old
 *        Specifies what happens if the supplied KeyMap already contains
@@ -40,7 +40,7 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 *
 *        1 - Append the new vectorised array values read from the HDS
 *        object to the end of the values already in the KeyMap. The HDS
-*        values will be converted to the data type of the values already 
+*        values will be converted to the data type of the values already
 *        in the KeyMap (an error will be reported if this is not possible).
 *
 *        2 - Replace the existing KeyMap entry with a new entry holding
@@ -52,10 +52,10 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 *        4 - Report an error. The KeyMap is returned unchanged, and an error
 *        is reported.
 *     new
-*        Specifies what happens if the supplied KeyMap does not already 
+*        Specifies what happens if the supplied KeyMap does not already
 *        contain an entry with the name of the supplied HDS object.
 *
-*        1 - Create a new entry holding the vectorised array values read from 
+*        1 - Create a new entry holding the vectorised array values read from
 *        the HDS object.
 *
 *        2 - Do nothing. The KeyMap is returned unchanged, and no error
@@ -78,12 +78,12 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -115,7 +115,7 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
    int replace;
    size_t el;
    size_t elsize;
-   void *data;            
+   void *data;
    void *pntr;
 
 /* Check inherited status */
@@ -173,7 +173,7 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
       }
    }
 
-/* See if we are to append the HDS values to the end of values already in 
+/* See if we are to append the HDS values to the end of values already in
    the KeyMap. */
    append = ( haskey && old == 1 );
 
@@ -215,7 +215,7 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
          hdstype = "_REAL";
 
       } else if( !strcmp( type, "_DOUBLE" ) ) {
-         kmtype = AST__DOUBLETYPE; 
+         kmtype = AST__DOUBLETYPE;
          hdstype = "_DOUBLE";
 
       } else if( !strncmp( type, "_CHAR", 5 ) ) {
@@ -247,7 +247,7 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 /* Map the HDS object as a vector using the data type selected above. */
       datMapV( loc, hdstype, "READ", &pntr, &el, status );
 
-/* If we are appending the new values to the old values, get the number of 
+/* If we are appending the new values to the old values, get the number of
    old values. */
       oldlen = append ? astMapLength( keymap, name ) : 0;
 
@@ -262,7 +262,7 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
          if( kmtype == AST__INTTYPE ) {
 
 /* If required, store any existing data values at the start of this array. */
-            if( oldlen ) (void) astMapGet1I( keymap, name, oldlen, &oldlen, 
+            if( oldlen ) (void) astMapGet1I( keymap, name, oldlen, &oldlen,
                                              (int *) data );
 
 /* Copy any new values to the end of the array. */
@@ -274,29 +274,29 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 
 /* Do the same for the other numerical types. */
          } else if( kmtype == AST__FLOATTYPE ) {
-            if( oldlen ) (void) astMapGet1F( keymap, name, oldlen, &oldlen, 
+            if( oldlen ) (void) astMapGet1F( keymap, name, oldlen, &oldlen,
                                              (float *) data );
             memcpy( ( (float *) data ) + oldlen, pntr, el*elsize );
             astMapPut1F( keymap, name, newlen, (float *) data, NULL );
-   
+
          } else if( kmtype == AST__DOUBLETYPE ) {
-            if( oldlen ) (void) astMapGet1D( keymap, name, oldlen, &oldlen, 
+            if( oldlen ) (void) astMapGet1D( keymap, name, oldlen, &oldlen,
                                              (double *) data );
             memcpy( ( (double *) data ) + oldlen, pntr, el*elsize );
             astMapPut1D( keymap, name, newlen, (double *) data, NULL );
 
 /* For string types, datMapV returns a pointer to a concatenated list of
    fixed length strings. So we use wrappers in the ATL library that
-   convert to and fro between concatenated fixed length strings and 
+   convert to and fro between concatenated fixed length strings and
    null-terminated strings. */
          } else {
-            if( oldlen ) (void) atlMapGet1S( keymap, name, elsize*oldlen, 
+            if( oldlen ) (void) atlMapGet1S( keymap, name, elsize*oldlen,
                                              elsize, &oldlen, (char *) data,
                                              status );
             memcpy( ( (char *) data ) + elsize*oldlen, pntr, el*elsize );
             atlMapPut1S( keymap, name, (char *) data, elsize, newlen, NULL,
                          status );
-   
+
          }
       }
 

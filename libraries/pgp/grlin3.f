@@ -65,7 +65,7 @@
          XSP = 1.0
          YSP = PIXRAT
       END IF
-      
+
 *   Determine number of strokes and line thickness.
       LINEWT = GRWIDT(GRCIDE)
       STEP = MIN(XSP,YSP)

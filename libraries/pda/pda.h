@@ -13,12 +13,12 @@
 
 *  Description:
 *     This module defines the C interface to the functions of the PDA
-*     library. The file pda.c contains C wrappers for the Fortran 
+*     library. The file pda.c contains C wrappers for the Fortran
 *     PDA routines.
 
 *  Notes:
 *     - Given the size of the PDA library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use PDA from C extend this file (and
 *     pda.c) to include any functions which they need but which are
 *     not already included.
@@ -64,7 +64,7 @@
 *-
 */
 
-void pdaSumsl( int, double *, double *, 
+void pdaSumsl( int, double *, double *,
                void (*)( int, double *, int *, double * ),
                void (*)( int, double *, int *, double * ),
                int *, int, int, double * );

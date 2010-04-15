@@ -4,36 +4,36 @@ C
 C     O P T E X T R A C T
 C
 C     OPTEXTRACT performs optimal extraction of a star spectrum from a
-C     2D long slit spectrum using the algorithm of Horne 1986 
-C     (PASP 98,609). A spatial profile image should have previously been 
-C     determined using the PROFILE command, and the 2D spectrum to be 
+C     2D long slit spectrum using the algorithm of Horne 1986
+C     (PASP 98,609). A spatial profile image should have previously been
+C     determined using the PROFILE command, and the 2D spectrum to be
 C     extracted must be sky subtracted (e.g. using the POLYSKY command).
 C
 C     The input IMAGE array may have error and quality information. An
-C     error or variance array is required to perform true optimal 
+C     error or variance array is required to perform true optimal
 C     extraction as the points should be weighted using the errors on
-C     each point as well as the spatial profile information. If an error 
+C     each point as well as the spatial profile information. If an error
 C     array is not present (or not all the errors in a column are known)
-C     the extraction is performed assuming equal errors on every point 
-C     in the column. The output spectrum has an error array only if the 
-C     input image has an error array. The WEIGHT keyword may be set 
+C     the extraction is performed assuming equal errors on every point
+C     in the column. The output spectrum has an error array only if the
+C     input image has an error array. The WEIGHT keyword may be set
 C     false to suppress error weighting even when errors are available.
 C
-C     The spatial profile array used by OPTEXTRACT must satisfy the 
+C     The spatial profile array used by OPTEXTRACT must satisfy the
 C     following requirements.
 C      (i)  Its quality array must specify a window (of arbitrary shape)
 C           in which the extraction will be performed. Points inside the
-C           window must have zero-quality values, other points must 
+C           window must have zero-quality values, other points must
 C           have non-zero-quality values.
 C      (ii) The data must be normalized. i.e. the sum along each column
 C           must be one.
-C      (iii) The data values may not be negative. 
+C      (iii) The data values may not be negative.
 C
 C  Command parameters -
 C
-C     'IMAGE'    The name of the input 2D file. This should be a 
+C     'IMAGE'    The name of the input 2D file. This should be a
 C                sky subtracted 2D spectrum from which the spectrum
-C                of an object is to be extracted. It may have error 
+C                of an object is to be extracted. It may have error
 C                and quality arrays
 C     'PROFILE'  The normalized spatial profile image used to perform
 C                the extraction. The quality array should specify a
@@ -45,7 +45,7 @@ C                quality will be set to bad only if there is no data in
 C                the relevant column.
 C
 C  Command keywords -
-C    
+C
 C     'WEIGHT'   Use the error or variance array to weight the
 C                pixels during extraction.
 C
@@ -83,13 +83,13 @@ C
       INTEGER   QPTR             ! Dynamic-memory pointer for spectrum
                                  ! quality
       INTEGER   SLOT             ! Slot number for mapped data - ignored
-      INTEGER   SPTR             ! Dynamic-memory element for spectrum 
+      INTEGER   SPTR             ! Dynamic-memory element for spectrum
                                  ! data
       INTEGER   STATUS           ! Running status for DSA routines
-      INTEGER   VPTR             ! Dynamic-memory pointer for spectrum 
+      INTEGER   VPTR             ! Dynamic-memory pointer for spectrum
                                  ! variance
       LOGICAL   WEIGHT           ! True if errors are to be used
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -154,7 +154,7 @@ C
 C     Only map the variance arrays if we need them - if not no
 C     variance will be created for the output spectrum
 C
-      IF (WEIGHT) THEN      
+      IF (WEIGHT) THEN
           CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',IVPTR,
      :                          SLOT,STATUS)
           CALL DSA_MAP_VARIANCE('SPECT','WRITE','FLOAT',VPTR,
@@ -203,15 +203,15 @@ C                                to weight the data.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C
 C                                            JAB / JAC 8th Feb 1991
 C     Modified:
 C       1991 Feb 10th   Use Quality array of profile to specify window
 C                                                          JAB / JAC
-C       1991 Feb 10th   Include error calculation   JAB / JAC        
-C       1991 Mar 8th    Use variance rather than error. 
+C       1991 Feb 10th   Include error calculation   JAB / JAC
+C       1991 Mar 8th    Use variance rather than error.
 C                        Add WEIGHT parameter       JAB / JAC
 C+
       IMPLICIT NONE
@@ -227,7 +227,7 @@ C
 C     Local variables
 C
       INTEGER IY,IX
-      REAL SUM,SUM2,NUM,DENOM         
+      REAL SUM,SUM2,NUM,DENOM
       LOGICAL ERRUSE
       INTEGER STATUS
       REAL FUNKNOWN_IN,FUNKNOWN_OUT
@@ -284,7 +284,7 @@ C
 C
 C      Form the output spectrum estimate ...
 C
-              SPECT(IX)=SUM/SUM2 
+              SPECT(IX)=SUM/SUM2
               QUALITY(IX)=0
               IF (ERRUSE) THEN
 C

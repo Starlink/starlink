@@ -59,7 +59,7 @@
 *     routine are made up of one quadrant from each image. The bottom
 *     left quadrant is taken from AA, the bottom right quadrant is taken
 *     from AB, the top left quadrant is taken from BA and the top right
-*     quadrant is taken from BB. 
+*     quadrant is taken from BB.
 *
 *     The product of two hermitian FFTs is itself Hermitian and so can
 *     be described in a similar manner. If the first input FFT
@@ -100,14 +100,14 @@
 *     27-FEB-1991 (DSB):
 *        Change name from HMULT to KPG1_HMULT
 *     11-JAN-1993 (DSB):
-*        Converted to double precision and Included in IRM 
+*        Converted to double precision and Included in IRM
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -183,7 +183,7 @@
          JLIM = M/2 - 1
       ELSE
          MEVEN = .FALSE.
-         JLIM = M/2 
+         JLIM = M/2
       END IF
 
 *  Deal with the bottom left pixel, for which K=0 and J=0. All terms
@@ -196,7 +196,7 @@
       AALIN = 1
       BALIN = 1
 
-      DO K = 1, KLIM			
+      DO K = 1, KLIM
 
          AAPIX = K + 1
          BAPIX = N - K + 1
@@ -209,7 +209,7 @@
          OUT( AAPIX, AALIN ) = AA1*AA2 - BA1*BA2
          OUT( BAPIX, BALIN ) = BA1*AA2 + AA1*BA2
 
-      END DO         
+      END DO
 
       IF( NEVEN ) OUT( KLIM + 2, 1 ) = IN1( KLIM + 2, 1 )
      :                                *IN2( KLIM + 2, 1 )
@@ -232,7 +232,7 @@
          OUT( AAPIX, AALIN ) = AA1*AA2 - AB1*AB2
          OUT( ABPIX, ABLIN ) = AB1*AA2 + AA1*AB2
 
-      END DO         
+      END DO
 
       IF( MEVEN ) OUT( 1, JLIM + 2 ) = IN1( 1, JLIM + 2 )
      :                                *IN2( 1, JLIM + 2 )

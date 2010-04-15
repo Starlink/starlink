@@ -60,7 +60,7 @@
 	end do
   200	continue
 	nlines = nlines - lstart
-	type *, 'Number of photometry lines of data in file = ', 
+	type *, 'Number of photometry lines of data in file = ',
      :	  nlines
 	close( 142)
 
@@ -140,7 +140,7 @@
 	    end do
 	    mean = sum/numpix
 	    variance = ( sumsq - numpix*mean**2)
-            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
               variance  =  0.0d0
             else
               variance  =  variance/( numpix-1.0d0)
@@ -148,7 +148,7 @@
             std = dsqrt( variance)
 	    meanx = sumx/numpix
 	    variancex = ( sumsqx - numpix*meanx**2)
-            if( numpix .eq. 1 .or. variancex .lt. 0.0d0) THEN      
+            if( numpix .eq. 1 .or. variancex .lt. 0.0d0) THEN
               variancex  =  0.0d0
             else
               variancex  =  variancex/( numpix-1.0d0)
@@ -163,7 +163,7 @@
 	    if( m .lt. 12) m = 12
 	    call chr_fandl( filt( gstart( j)), n2, m2)
 	    if( m2 .lt. 6) m2 = 6
-	    write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f7.3)') 
+	    write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f7.3)')
      :	      objnam( gstart( j))( n:m),
      :	      filt( gstart( j))( n2:m2),'  ',itype,'  ',
      :	      am( gstart( j)), sngl( mean), '    ', sngl( std),'    ',

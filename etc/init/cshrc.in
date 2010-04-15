@@ -8,7 +8,7 @@
 #  This script contains alias definitions and hence must be sourced
 #  for each C-shell from which you wish to use Starlink software.
 #  This is most easily be done by adding the line:
-#   
+#
 #     source @staretc@/cshrc
 #
 #  to your .cshrc file.
@@ -61,7 +61,7 @@ alias sman "man -P ${mandir}"
 alias xdisplay 'setenv DISPLAY `\xdisplay \!\!`;echo DISPLAY set to $DISPLAY'
 
 #
-# Option Set items 
+# Option Set items
 #
 
 #
@@ -157,7 +157,7 @@ else
    alias cgs4dr_tcl  ${staretcdir}/notinst cgs4dr_tcl
    alias list_index  ${staretcdir}/notinst list_index
 endif
- 
+
 #
 #   Convert
 #
@@ -259,7 +259,7 @@ endif
 #
 #   Esp
 #
- 
+
 if ( -e ${bindir}/esp/esp.csh ) then
    alias espstart source ${bindir}/esp/esp.csh
    alias espsetup source ${bindir}/esp/esp.csh
@@ -274,7 +274,7 @@ endif
 #   Extractor
 #
 
-if ( -e ${bindir}/extractor/extractor.csh ) then 
+if ( -e ${bindir}/extractor/extractor.csh ) then
    alias extractorsetup source ${bindir}/extractor/extractor.csh
    alias extractsetup source ${bindir}/extractor/extractor.csh
    alias extractor source ${bindir}/extractor/extractor.csh
@@ -290,7 +290,7 @@ endif
 #   Extreme
 #
 
-if ( -e ${bindir}/extreme/extreme.csh ) then 
+if ( -e ${bindir}/extreme/extreme.csh ) then
    alias extreme source ${bindir}/extreme/extreme.csh
 else
    alias extreme ${staretcdir}/notinst extreme
@@ -403,7 +403,7 @@ endif
 #
 #   Jcmtdr
 #
- 
+
 if ( -e ${bindir}/jcmtdr/jcmtdr.csh ) then
    alias jcmtdr 'source $JCMTDR_DIR/jcmtdr.csh'
    alias jcmtdrsetup 'source $JCMTDR_DIR/jcmtdr.csh'
@@ -439,7 +439,7 @@ endif
 #
 #   Naos
 #
- 
+
 if ( -e ${bindir}/naos/naos.csh ) then
    alias naos source ${bindir}/naos/naos.csh
    alias naossetup source ${bindir}/naos/naos.csh
@@ -451,7 +451,7 @@ endif
 #
 #   Ndprogs
 #
- 
+
 if ( -e ${bindir}/ndprogs/ndprogs.csh ) then
    alias ndprogs 'source $NDPROGS_DIR/ndprogs.csh'
    alias ndprogssetup 'source $NDPROGS_DIR/ndprogs.csh'
@@ -459,7 +459,7 @@ else
    alias ndprogs ${staretcdir}/notinst ndprogs
    alias ndprogssetup ${staretcdir}/notinst ndprogssetup
 endif
- 
+
 #
 #   Orac-dr
 #     - New layout is $bindir/oracdr/src/etc

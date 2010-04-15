@@ -5,7 +5,7 @@
 *   Include graphics stuff
        INCLUDE 'DECLARE_PLTS'
 *
- 
+
        INTEGER SLEN
        REAL X(1), Y(1)
        REAL XP(1), YP(1)
@@ -41,19 +41,19 @@
 *
        REAL MAJTICKSD(2)
        LOGICAL QFILL
- 
+
 *  Local Data:
        DATA POLY/.FALSE./, HIST/.TRUE./
        DATA DRAXIS/.TRUE./
        DATA INCX/0/, INCY/0/
        DATA AXMIN, AXMAX, AYMIN, AYMAX/4*.TRUE./
        DATA XLIM/2*0.0/
- 
+
        PLTCAL = 0
        TITLEN = MAX(1,LENSTR(TITLE))
        MAXDGM = 79
        TITLEN = MIN(TITLEN,MAXDGM)
- 
+
        IF (DRAXIS) THEN
           CALL DBOUND(X,NPTS,XMIN,XMAX)
 *   XLIMITS (TAKING ACCOUNT OF POSSIBLE AUTOSCALING)
@@ -61,7 +61,7 @@
 *   Y RANGE OF DATA TO BE PLOTTED
           XLIM1 = MIN(XLIM(1),XLIM(2))
           XLIM2 = MAX(XLIM(1),XLIM(2))
- 
+
           YMIN = 1.0E+38
           YMAX = -1.0E+38
           J = 0
@@ -81,7 +81,7 @@
        XLIMITS(2) = XLIM2
        YLIMITS(1) = YMIN
        YLIMITS(2) = YMAX
- 
+
        IF (DRAXIS) THEN
           DIVX = 1.0
           DIVY = 1.0
@@ -153,12 +153,12 @@
                    KK1 = LL
                    NPLT1 = KK1 - JJ1 + 1
                 ENDIF
- 
+
                 YLIM1 = YLIM(1)
                 YLIM2 = YLIM(2)
 *   Define a variable to receive NCAR null/1 value
                 CALL AGGETF('NULL/1.',VNULL1)
- 
+
 *   First time
                 IF (FIRSTBREAK .AND. DRAXIS) THEN
                    CALL SGS_SELZ(IZBASE,ISTAT)
@@ -178,7 +178,7 @@
                          CALL SGS_CLRBL(GRID(5),GRID(6),GRID(7),GRID(8))
                       ENDIF
                    ENDIF
- 
+
 *   Select new working zone
                    IF (REALSIZE) THEN
                       CALL SGS_ZSIZE(XGSIZE,YGSIZE,GPOS,IZONID,ISTAT)
@@ -190,7 +190,7 @@
                    CALL SNX_AGWV
                    IF (FIRSTBREAK .AND. DRAXIS) THEN
 *   NCAR PLOT
- 
+
 *   Select character set
                       CALL SNX_CHSET(IPREC)
                       CALL SGS_SPREC(IPREC)
@@ -198,11 +198,11 @@
                       CALL AGSETI('SET.',-1)
 *   Declare the background type
                       CALL AGSETI('BACKGROUND.',IGRIDSTYLE)
- 
+
 *   Position graph window
 *   Uses values set up by call to TZONE
 *   Default values (0.1,0.9,0.1,0.9)
- 
+
                       GRAPHW(1) = GRID(5)*XS2NDC
                       GRAPHW(2) = GRID(6)*XS2NDC
                       GRAPHW(3) = GRID(7)*YS2NDC
@@ -212,7 +212,7 @@
                       GRIDW(3) = (GRID(3)-GRID(7))/(GRID(8)-GRID(7))
                       GRIDW(4) = (GRID(4)-GRID(7))/(GRID(8)-GRID(7))
                       GRIDW(5) = 0.0
- 
+
                       IF (REALSIZE) THEN
                          IF (FRZONE) THEN
                             CALL AGSETP('GRID.',GRIDP,5)
@@ -228,7 +228,7 @@
                          CALL AGSETP('GRAPH.',GRIDW1,4)
                          CALL AGSETP('GRID.',GRIDW,5)
                       ENDIF
- 
+
                       CALL SNX_AGCS
 *   Define the AUTOGRAPH coordinate system
                       CALL AGSETF('X/MINIMUM.',XLIM1/DIVX)
@@ -242,7 +242,7 @@
 *   Suppress rotation of axis numbering
                          CALL AGSETI('AXIS/BOTTOM/CONTROL.',2)
                          CALL AGSETI('AXIS/LEFT/CONTROL.',2)
- 
+
 *   Control major tick mark density
                          MAJTICKSD(1) = MAJTICKS(1)/DIVX
                          MAJTICKSD(2) = MAJTICKS(2)/DIVY
@@ -254,7 +254,7 @@
 *   Autotick
                             XTICK = VNULL1
                             MAJTICKSD(1) = VNULL1
- 
+
                          ELSEIF (ITICKS(1).EQ.2) THEN
 *   User tick spacing
                             XTICK = 1.
@@ -267,12 +267,12 @@
 *   Autotick
                             YTICK = VNULL1
                             MAJTICKSD(2) = VNULL1
- 
+
                          ELSEIF (ITICKS(2).EQ.2) THEN
 *   User tick spacing
                             YTICK = 1.
                          ENDIF
- 
+
                          CALL AGSETF
      :                   ('AXIS/BOTTOM/TICKS/MAJOR/SPACING/BASE.',
      :                   MAJTICKSD(1))
@@ -285,7 +285,7 @@
                          CALL AGSETF
      :                   ('AXIS/TOP/TICKS/MAJOR/SPACING/BASE.',
      :                   MAJTICKSD(1))
- 
+
                          CALL AGSETF
      :                   ('AXIS/BOTTOM/TICKS/MAJOR/SPACING/TYPE.',
      :                   XTICK)
@@ -298,7 +298,7 @@
                          CALL AGSETF
      :                   ('AXIS/TOP/TICKS/MAJOR/SPACING/TYPE.',
      :                   XTICK)
- 
+
 *   Tick length
                          TICKLENGTH = 0.015*HTFAC( MJTICK )
                          CALL AGSETF
@@ -313,7 +313,7 @@
                          CALL AGSETF
      :                   ('AXIS/TOP/TICKS/MAJOR/LENGTH/INWARD.',
      :                   TICKLENGTH)
- 
+
 *   Control minor tick marks
                          CALL AGSETF
      :                   ('AXIS/BOTTOM/TICKS/MINOR/SPACING.',
@@ -324,7 +324,7 @@
      :                   MINTICKS(2))
                          CALL AGSETF('AXIS/TOP/TICKS/MINOR/SPACING.',
      :                   MINTICKS(1))
- 
+
 *   Tick length
                          TICKLENGTH = 0.010*HTFAC( MNTICK )
                          CALL AGSETF
@@ -339,15 +339,15 @@
                          CALL AGSETF
      :                   ('AXIS/TOP/TICKS/MINOR/LENGTH/INWARD.',
      :                   TICKLENGTH)
- 
+
 *   Control presence of numeric labelling
 *   Stops labels being shrunk in response to overlap problems
- 
+
                          CALL AGSETI('LABEL/CONTROL.',1)
                          CALL AGSETI('AXIS/LEFT/CONTROL.',1)
                          CALL AGSETI('AXIS/BOTTOM/CONTROL.',1)
- 
- 
+
+
 *   Numeric label size
                          SIZEMANT = 0.015*HTFAC( NUMLAB )
                          SIZEEXP = 0.010*HTFAC( NUMLAB )
@@ -363,9 +363,9 @@
                          CALL AGSETF
      :                   ('AXIS/LEFT/NUMERIC/WIDTH/EXPONENT.',
      :                   SIZEEXP)
- 
- 
- 
+
+
+
 *   Controls presence of numeric labels
                          IF (NONUM) THEN
                             CALL AGSETF('AXIS/BOTTOM/NUMERIC/TYPE.',
@@ -379,24 +379,24 @@
                             CALL AGSETF('AXIS/LEFT/NUMERIC/TYPE.',
      :                      VNULL1)
                          ENDIF
- 
+
                       ENDIF
                       CALL SNX_CHSET(IPREC)
                       CALL SGS_SPREC(IPREC)
- 
+
 *   Logarthmic
                       IF (LOGAXX) THEN
                          CALL AGSETF('X/LOG.',-1.0)
                       ELSE
                          CALL AGSETF('X/LOG.',0.0)
                       ENDIF
- 
+
                       IF (LOGAXY) THEN
                          CALL AGSETF('Y/LOG.',-1.0)
                       ELSE
                          CALL AGSETF('Y/LOG.',0.0)
                       ENDIF
- 
+
 *   Reverse x-axis ?
                       IF (INCX.EQ.1) THEN
                          CALL AGSETF('X/ORDER.',1.0)
@@ -409,7 +409,7 @@
                       ELSE
                          CALL AGSETF('Y/ORDER.',0.0)
                       ENDIF
- 
+
 *   Justify or trim ?
                       IF (TRIMX) THEN
                          CALL AGSETF('X/NICE.',0.0)
@@ -422,7 +422,7 @@
                          CALL AGSETF('Y/NICE.',-1.0)
                       ENDIF
                    ENDIF
- 
+
                    DO 145 JJ = 1, 13
                       ASF(JJ) = 1
   145              CONTINUE
@@ -434,20 +434,20 @@
                    IF (FIRSTBREAK) THEN
                       DO 146 IZ = 0, 100
                          IF (ZONEDEF(IZ)) THEN
-                            IF ((GRIDS(6,IZ).GT.GRID(5)) .AND. 
-     :                      (GRIDS(5,IZ).LT.GRID(6)) .AND. 
-     :                      (GRIDS(8,IZ).GT.GRID(7)) .AND. 
+                            IF ((GRIDS(6,IZ).GT.GRID(5)) .AND.
+     :                      (GRIDS(5,IZ).LT.GRID(6)) .AND.
+     :                      (GRIDS(8,IZ).GT.GRID(7)) .AND.
      :                      (GRIDS(7,IZ).LT.GRID(8))) THEN
                                ZONECLEAR(IZ) = .FALSE.
                             ENDIF
                          ENDIF
   146                 CONTINUE
                    ENDIF
- 
+
 *   Allow character expansion in titles
                    IF (LABELFLAG) THEN
 *   Define labels
- 
+
                       ZLAB = ' '
                       IF (IFONT.EQ.0 .AND. DEVTYP.EQ.827) THEN
                          DO 148 IZ = 1, LABY
@@ -463,19 +463,19 @@
                       CALL AGSETI('LINE/NUMBER.',100)
                       CALL AGSETF('LINE/CHARACTER.',SIZE)
                       CALL AGSETC('LINE/TEXT.',ZLAB(1:LABY))
- 
+
                       CALL AGSETC('LABEL/NAME.','T')
                       CALL AGSETI('LINE/NUMBER.',100)
                       CALL AGSETF('LINE/CHARACTER.',SIZE*1.3)
                       CALL AGSETC('LINE/TEXT.',TITLE(1:TITLEN))
- 
+
                       CALL AGSETC('LABEL/NAME.','B')
                       CALL AGSETI('LINE/NUMBER.',-100)
                       CALL AGSETF('LINE/CHARACTER.',SIZE)
                       CALL AGSETC('LINE/TEXT.',XLAB(1:LABX))
                    ENDIF
- 
- 
+
+
                    CALL GSLN(1)
                    CALL GSLWSC(XLWIDTH)
                    IF (POLY) THEN
@@ -484,7 +484,7 @@
                          IF (COLOUR) CALL PPALET(1)
                          CALL GSLN(1)
                          CALL GSLWSC(XLWIDTH)
- 
+
                          IF (LABELFLAG) THEN
                             CALL SNX_EZRXY(X(JJ1),Y(JJ1),NPLT1,
      :                      XLAB(1:LABX),ZLAB(1:LABY),
@@ -503,7 +503,7 @@
                       IF (NPLT1.NE.0) CALL CURVE(X(JJ1),Y(JJ1),NPLT1)
                       CALL PLOTIT( 0, 0, 2 )
                       CALL SGS_FLUSH
- 
+
                    ELSEIF (HIST) THEN
 *   Read points into a double sized array to simulate histogram
                       IF (NPLT1.GT.1) THEN
@@ -518,19 +518,19 @@
                          L = NPLT1 + JJ1 - 1
                          XHIST(2*L) = (3.0*X(L)-X(L-1))*0.5
                          YHIST(2*L) = Y(L)
- 
+
                          NPOINTS = 2*NPLT1
                       ELSE
                          NPOINTS = 0
                       ENDIF
- 
+
                       NSTART = 2*JJ1 - 1
- 
+
                       IF (FIRSTBREAK .AND. DRAXIS) THEN
                          IF (COLOUR) CALL PPALET(1)
                          CALL GSLN(1)
                          CALL GSLWSC(XLWIDTH)
- 
+
                          IF (LABELFLAG) THEN
                             CALL SNX_EZRXY(XHIST(NSTART),YHIST(NSTART),
      :                      NPOINTS,XLAB(1:LABX),ZLAB(1:LABY),
@@ -539,19 +539,19 @@
                             CALL SNX_EZRXY(XHIST(NSTART),YHIST(NSTART),
      :                      NPOINTS,' ',' ',' ')
                          ENDIF
- 
+
                          FIRSTBREAK = .FALSE.
                          CALL PLOTIT( 0, 0, 2 )
                          CALL SGS_FLUSH
                       ENDIF
                       CALL GSLN(LNTYPE)
                       CALL GSLWSC(LNWIDTH)
- 
+
                       IF (COLOUR) CALL PPALET(IPAL)
                       IF (NPOINTS.NE.0) THEN
                          CALL CURVE(XHIST(NSTART),YHIST(NSTART),NPOINTS)
                       ENDIF
- 
+
                       CALL SGS_FLUSH
                       IF (COLOUR) CALL PPALET(IPAL)
                    ELSE
@@ -559,7 +559,7 @@
                          IF (COLOUR) CALL PPALET(1)
                          CALL GSLN(1)
                          CALL GSLWSC(XLWIDTH)
- 
+
                          IF (LABELFLAG) THEN
                             CALL SNX_EZRXY(X(JJ1),Y(JJ1),NPLT1,
      :                      XLAB(1:LABX),ZLAB(1:LABY),
@@ -574,7 +574,7 @@
                       ENDIF
                       CALL GSLN(LNTYPE)
                       CALL GSLWSC(LNWIDTH)
- 
+
                       IF (COLOUR) CALL PPALET(IPAL)
 *   Scale symbol heights (considered unnecessary ?)
                       CALL GQMKSC(IERROR,SYMHEIGHT)
@@ -586,38 +586,38 @@
                          DEVGRO = 1.0
                       ENDIF
                       CALL GSMKSC(SYMHEIGHT*HTFAC( MARKS )*DEVGRO)
- 
+
                       ANGLE = REAL(NDEGREES)*PI/180.
                       CALL GSLN(1)
                       CALL JSYMBOL(X(JJ1),Y(JJ1),NPLT1,NSIDES,MARKSTYLE,
      :                             IPAL,COLOUR,FILL,HTFAC( MARKS ),
      :                             ANGLE)
                       CALL GSMKSC(SYMHEIGHT)
- 
+
                    ENDIF
                 ENDIF
              ENDIF
           ENDIF
           J = K + 1
   200  CONTINUE
- 
- 
+
+
 *   End of plotting
        CALL PLOTIT( 0, 0, 2 )
        CALL SGS_FLUSH
        CALL GSLN(1)
        CALL GSLWSC(XLWIDTH)
 *   Fix for goof when data are not in bounds on first plot
-       IF ((DIVX.NE.1.0 .OR. DIVY.NE.1.0) .AND. 
+       IF ((DIVX.NE.1.0 .OR. DIVY.NE.1.0) .AND.
      : (DIVX.NE.0.0 .AND. DIVY.NE.0.0)) THEN
           DO 250 I = 1, NPTS
              X(I) = X(I)*DIVX
              Y(I) = Y(I)*DIVY
   250     CONTINUE
        ENDIF
- 
+
        GOTO 300
- 
+
 
        ENTRY JOBOX
        DRAXIS = .TRUE.

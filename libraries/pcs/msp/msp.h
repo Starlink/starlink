@@ -43,7 +43,7 @@ int *status              /* global status (given and returned) */
 /*+  MSP_EXIT - exit handler */
 
 void msp_exit
-( 
+(
 void
 );
 
@@ -97,7 +97,7 @@ void msp_send_message
 char msgbody[],        /* message to be sent (given) */
 int msglen,            /* length of message to be sent (given) */
 sendq_type sendq,      /* queue identifer to be used (given) */
-receiveq_type replyq,  /* reply queue to be associated with the message 
+receiveq_type replyq,  /* reply queue to be associated with the message
                           (given) */
 int *status            /* global status (given and returned) */
 );

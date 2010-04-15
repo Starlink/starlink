@@ -1,6 +1,6 @@
       SUBROUTINE SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS,
-     :     OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
-     :     BOL_DEC_PTR, DATA_PTR,  OUT_DATA, OUT_VAR, OUT_QUAL, 
+     :     OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR,
+     :     BOL_DEC_PTR, DATA_PTR,  OUT_DATA, OUT_VAR, OUT_QUAL,
      :     STATUS )
 *+
 *  Name:
@@ -11,10 +11,10 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS,
-*    :     OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
+*    :     OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR,
 *    :     BOL_DEC_PTR, DATA_PTR,  OUT_DATA, OUT_VAR, OUT_QUAL,
 *    :     STATUS )
 
@@ -23,19 +23,19 @@
 *
 *     1) Find the size of the output grid from the maximum extent of
 *        the input data.
-*     2) Loop through data. Find I,J coordinate of each point in the 
+*     2) Loop through data. Find I,J coordinate of each point in the
 *        output grid.
 *     3) Find out maximum number of points for an I,J position.
-*     4) Put data onto grid in array (I,J,N) [REALS]. 
+*     4) Put data onto grid in array (I,J,N) [REALS].
 *        We also need to store positions of these data.
 *        We can either do it by storing the file number, bolometer and
 *        position (time) index OR we can just store some index in a merged
-*        data array that goes from 1..TOT_PTS. 
-*         First method is easy but memory hungry. Second method is 
+*        data array that goes from 1..TOT_PTS.
+*         First method is easy but memory hungry. Second method is
 *         more efficient but does need some reconstruction to work
 *         out where the point was in the original data.
 *       Use the second method.
-*   
+*
 *     Once the data is gridded, it is first displayed and then
 *     despiked. Currently despiking is done on a simple sigma clipping
 *     basis for each bin.
@@ -52,7 +52,7 @@
 *       Number of bolometers per set (X positions)
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (X coords)
-*       Note that each data set has positions for N_POS * N_BOLS 
+*       Note that each data set has positions for N_POS * N_BOLS
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (Y coords)
 *     DATA_PTR( N_FILES ) = INTEGER (Given)
@@ -151,7 +151,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -159,7 +159,7 @@
       INCLUDE 'MSG_PAR'                          ! MSG__NORM
       INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
- 
+
 *  Arguments Given:
       REAL    OUT_PIXEL                     ! Pixel size in radians
       INTEGER N_FILES
@@ -171,7 +171,7 @@
       INTEGER NY
       INTEGER ICEN
       INTEGER JCEN
-      
+
 *  Arguments Returned:
       REAL    OUT_DATA ( NX, NY )
       REAL    OUT_VAR ( NX, NY )
@@ -181,7 +181,7 @@
       INTEGER STATUS                        ! Global status
 
 *  Local Constants:
- 
+
 *  Local Variables:
       BYTE    BADBIT                        ! Bad bits mask
       INTEGER BIN_PTR                       ! Binned data
@@ -227,7 +227,7 @@
 
 *  Local data
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Initialise pointers
@@ -271,7 +271,7 @@
 
 *     Fill with zeroes
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, 
+         CALL SCULIB_CFILLI(NX * NY, 0,
      :                      %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)))
       END IF
 
@@ -282,7 +282,7 @@
       DO I = 1, N_FILES
 
          CALL SCULIB_WTFN_REGRID_1 ( 1.0,
-     :        %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(DATA_PTR(I))),
      :        %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))), N_PTS(I), DBLE(OUT_PIXEL),
      :        NX, NY, ICEN, JCEN, 1, SCALE,
@@ -301,7 +301,7 @@
             OFFSET = (J-1)*NX + I - 1
 
 *     Retrieve current value in histogram
-            CALL VEC_ITOI(.FALSE., 1, 
+            CALL VEC_ITOI(.FALSE., 1,
      :           %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)+(OFFSET*VAL__NBI)),
      :           ITEMP, IERR, NERR, STATUS)
 
@@ -315,7 +315,7 @@
 *     Copy byte to quality array
             OUT_QUAL(I,J) = BTEMP
 
-         END DO 
+         END DO
       END DO
 
 *     Free the total weight
@@ -386,7 +386,7 @@
 *     Fill the array with data. (1 file at a time)
 
          CALL SURFLIB_CALC_IJPOS(N_PTS(I), DBLE(OUT_PIXEL), ICEN, JCEN,
-     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :        %VAL(CNF_PVAL(IJPOS_PTR)+ (2 * OFFSET * VAL__NBR)),
      :        STATUS)
@@ -403,7 +403,7 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SURFLIB_HISTOGRAM_GRID( N_PTS(I), NX, NY, .TRUE.,
-     :           %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(DATA_PTR(I))),
      :           %VAL(CNF_PVAL(QUALITY_PTR)), BADBIT,
      :           %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
      :           %VAL(CNF_PVAL(GRID_PTR)), IMAX, JMAX, NMAX, STATUS)
@@ -431,7 +431,7 @@
 
       CALL SCULIB_MALLOC(NX * NY * NMAX * VAL__NBR, BIN_PTR,
      :     BIN_PTR_END, STATUS)
-      
+
       CALL SCULIB_MALLOC(NX * NY * NMAX * VAL__NBI, BIN_POS_PTR,
      :     BIN_POS_END, STATUS)
 
@@ -447,25 +447,25 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
-         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, 
+         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR,
      :                      %VAL(CNF_PVAL(BIN_PTR)))
-         CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI, 
+         CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI,
      :        %VAL(CNF_PVAL(BIN_POS_PTR)))
       END IF
 
 *     Now we need to copy the data into BIN_PTR and the positions
-*     into BIN_POS_PTR. 
-      
+*     into BIN_POS_PTR.
+
       OFFSET = 0
 
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, N_FILES
 
             CALL SURFLIB_FILL_GRID(N_PTS(I), NX, NY, NMAX, OFFSET,
-     :           %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(DATA_PTR(I))),
      :           %VAL(CNF_PVAL(QUALITY_PTR)), BADBIT,
      :           %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
-     :           %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :           %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)),
      :           %VAL(CNF_PVAL(BIN_POS_PTR)),
      :           STATUS)
 
@@ -473,7 +473,7 @@
 *     are using a grid that is too small (which is okay)
             IF (STATUS .EQ. SAI__WARN) CALL ERR_ANNUL(STATUS)
 
-         
+
 *     Calculate the offset in the position array based on file number
 *     for the next time round the loop
             OFFSET = OFFSET + N_PTS(I)
@@ -494,7 +494,7 @@
 *     in each bin
 
       CALL SCULIB_MALLOC(NMAX * VAL__NBR, PNT_PTR, PNT_END, STATUS)
-      CALL SCULIB_MALLOC(NMAX * VAL__NBR, SCRATCH_PTR, SCRATCH_END, 
+      CALL SCULIB_MALLOC(NMAX * VAL__NBR, SCRATCH_PTR, SCRATCH_END,
      :     STATUS)
 
 
@@ -508,12 +508,12 @@
       JPOS_PTR = 0
       IPOS_END = 0
       JPOS_END = 0
-      
+
       CALL SCULIB_MALLOC(NX * NY * VAL__NBI, IPOS_PTR, IPOS_END,
      :     STATUS)
       CALL SCULIB_MALLOC(NX * NY * VAL__NBI, JPOS_PTR, JPOS_END,
      :     STATUS)
-      
+
 *     ...and calculate the new grid look up table
 
       UMODE = 'XLINEAR'
@@ -524,7 +524,7 @@
 *     Calculate the statistics of each bin and store in an array.
 *     Since this is generally useful for the plotting and the
 *     despiking itself.
-*     Have three measurements: 
+*     Have three measurements:
 *         Median and The mean + nsigma and the mean - nsigma
 *     Note that SURFLIB_PLOT_GRID still needs to work out the
 *     positions itself since it can not deal with bad pixels.
@@ -535,19 +535,19 @@
 
       STATS_PTR = 0
       STATS_END = 0
-      CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR,STATS_END, 
+      CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR,STATS_END,
      :     STATUS)
 
 *     Calculate stats using the specified smoothing mode
 
       SMODE = 'NONE'
       NSIGMA = 3.0  ! Cant use less than this because of iterative clipping
-      CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA, 
+      CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA,
      :     %VAL(CNF_PVAL(IPOS_PTR)),
-     :     %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :     %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)),
      :     %VAL(CNF_PVAL(PNT_PTR)),
      :     %VAL(CNF_PVAL(STATS_PTR)), STATUS)
-      
+
 *     Free memory
       CALL SCULIB_FREE('PNT_PTR', PNT_PTR, PNT_END, STATUS)
       CALL SCULIB_FREE('SCRATCH', SCRATCH_PTR, SCRATCH_END, STATUS)
@@ -557,7 +557,7 @@
       CALL SCULIB_FREE('JPOS_PTR', JPOS_PTR, JPOS_END, STATUS)
 
 
-*     Free BIN_PTR 
+*     Free BIN_PTR
       CALL SCULIB_FREE('BIN_PTR', BIN_PTR, BIN_PTR_END, STATUS)
       CALL SCULIB_FREE('BIN_POS', BIN_POS_PTR, BIN_POS_END, STATUS)
 
@@ -575,7 +575,7 @@
 *     Take difference and then square to get variance
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_SUBARE(NX*NY, 
+         CALL SCULIB_SUBARE(NX*NY,
      :                      %VAL(CNF_PVAL(STATS_PTR)+(NX*NY*VAL__NBR)),
      :        %VAL(CNF_PVAL(STATS_PTR)+(2*NX*NY*VAL__NBR)), OUT_VAR,
      :        ITEMP, ITEMP, ITEMP, ITEMP, ITEMP, ITEMP,
@@ -585,7 +585,7 @@
 *     Loop over OUT_VAR
 *     Divide by 2.0*NSIGMA and then
 *     Square the stdev to get variance
-*     
+*
       DO J = 1, NY
          DO I = 1, NX
             IF (OUT_VAR(I,J) .NE. VAL__BADR) THEN

@@ -8,7 +8,7 @@
  *				the node typedef, so that
  *				prototyping works in file
  *				'control.h'
- *				
+ *
  *
  ******************************************************************************
  */

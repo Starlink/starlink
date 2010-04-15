@@ -79,7 +79,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) LABEL
       LOGICAL GOTU
@@ -87,19 +87,19 @@
       INTEGER NK
       INTEGER KEYS( NK )
       CHARACTER * ( * ) KSTRS( NK )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN           ! Used length of string
-      
+
 *  Local Variables:
       CHARACTER * ( 80 ) BUFFER  ! Line buffer
       INTEGER I                  ! Loop variable
       LOGICAL KSAME              ! Are all the keyed values identical?
-      
+
 *.
 
 *  Check inherited global status.
@@ -116,7 +116,7 @@
       ELSE
          KSAME = .TRUE.
       END IF
-      
+
 *  Set up a message token controlling the unkeyed variable.
       IF ( GOTU ) THEN
          CALL MSG_SETC( 'UVAL', USTR )
@@ -131,14 +131,14 @@
       CALL MSG_SETC( 'BUFFER', BUFFER )
       CALL CCD1_MSG( ' ', '^BUFFER ^UVAL', STATUS )
 
-*  If there are keyed values and they are not all the same as the 
+*  If there are keyed values and they are not all the same as the
 *  unkeyed one, then write one line for each.
-      IF ( NK .GT. 0 .AND. 
+      IF ( NK .GT. 0 .AND.
      :     .NOT. ( GOTU .AND. KSAME .AND. USTR .EQ. KSTRS( 1 ) ) ) THEN
          DO I = 1, NK
             CALL MSG_SETI( 'SINDEX', KEYS( I ) )
             CALL MSG_SETC( 'KVAL', KSTRS( I ) )
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      :'                                       Set Index ^SINDEX : '//
      :                     '^KVAL', STATUS )
          END DO

@@ -1,4 +1,4 @@
-*+RE_EVSRCH event files touched by circle of arbitary centre and radius	
+*+RE_EVSRCH event files touched by circle of arbitary centre and radius
 	PROGRAM RE_EVSRCH
 	implicit none
 
@@ -16,8 +16,8 @@
           data nbins /12,2*24,4*48,8*96,60*192,8*96,4*48,2*24,12/
 
 * Local variables:
-	double precision delo_c, dela_c		
-	double precision dsra, dsdec	
+	double precision delo_c, dela_c
+	double precision dsra, dsdec
 *
 	real sra				! Search RA   (rads)
 	real sdec				! Search Dec  (rads)
@@ -25,14 +25,14 @@
 	real elo_c				! Ecliptic Long srch cent
 	real ela_c				! Ecliptic Lat  srch cent
 	real rlam_top, rlam_bot			! Top & bot lat. ec. maps
-	real rlom_lh, rlom_rh			! L & RH long. ec. maps 
+	real rlom_lh, rlom_rh			! L & RH long. ec. maps
 	real relom
 	real delta				! Ec. long steps
 *
 	integer elam				! Ec. lat. map #
-	integer elam_top, elam_bot		
+	integer elam_top, elam_bot
 	integer elom				! Ec. long. map #
-	integer elom_lh, elam_rh		
+	integer elom_lh, elam_rh
 	integer nmaps				! # maps affected
 	integer i
 	integer status
@@ -67,7 +67,7 @@
 * Work out Denby sky grid boundary extremities affected by search circle
 * Latitudes
 	rlam_bot = ela_c - rad + 90.0
-	if (rlam_bot .lt. 0.0) then 
+	if (rlam_bot .lt. 0.0) then
 	  rlam_bot = 1.0
 	else
 	  if (mod(2.0,(rlam_bot/2.0)) .eq. 0.0) then   ! On a grid boundary
@@ -77,7 +77,7 @@
 	  endif
 	endif
 	rlam_top = ela_c + rad + 90.0
-	if (rlam_top .gt. 180.0) then 
+	if (rlam_top .gt. 180.0) then
 	  rlam_top = 90
 	else
 	  if (mod(2.0,(rlam_top/2.0)) .eq. 0.0) then   ! On a grid boundary
@@ -87,8 +87,8 @@
 	  endif
 	endif
 
-	elam_bot = int(rlam_bot)	
-	elam_top = int(rlam_top)	
+	elam_bot = int(rlam_bot)
+	elam_top = int(rlam_top)
 
 * Longitudes
 	rlom_lh = elo_c - rad
@@ -113,12 +113,12 @@
 	      relom = relom + delta
 	    else
 	      search = .FALSE.
-	    endif	    
+	    endif
 	  enddo
 	enddo
 
 * Show which event files are needed to merge to cover area requested.
-* Open file to hold list of event files found. 
+* Open file to hold list of event files found.
 	open(10, file='re_evmrg.list', status='unknown')
 
 	write(*,*)

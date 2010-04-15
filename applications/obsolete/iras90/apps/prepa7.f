@@ -42,11 +42,11 @@
 *        equal to NDF__NOID then no variance array will be included in
 *        the output NDFs.
 *     NDFOUT = CHARACTER * ( * ) (Given)
-*        The name of the output NDF. 
+*        The name of the output NDF.
 *     TITLE = CHARACTER * ( * ) (Given)
-*        The title for the output NDF. 
+*        The title for the output NDF.
 *     LABEL = CHARACTER * ( * ) (Given)
-*        The label for the output NDF. 
+*        The label for the output NDF.
 *     FLDLON = CHARACTER * ( * ) (Given)
 *        The longitude value to be stored as the field position (as a
 *        formatted string). If a blank is supplied, then the value of
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -196,7 +196,7 @@
          CALL NDF_XNEW( INDF3, 'IRAS', 'IRAS', 0, 0, XLOC, STATUS )
 
 *  Otherwise get a locator to the existing extension.
-      ELSE 
+      ELSE
          CALL NDF_XLOC( INDF3, 'IRAS', 'UPDATE', XLOC, STATUS )
       END IF
 
@@ -238,7 +238,7 @@
       IF( STATUS .EQ. IRI__BADUN ) THEN
          CALL ERR_ANNUL( STATUS )
 
-*  If some units are specified, warn the use that non-standard units 
+*  If some units are specified, warn the use that non-standard units
 *  are being used.
          IF( U .NE. ' ' ) THEN
             CALL MSG_BLANKIF( MSG__QUIET, STATUS )
@@ -253,7 +253,7 @@
             CALL NDF_RESET( INDF3, 'UNITS', STATUS )
          END IF
 
-      END IF      
+      END IF
 
 *  Store the component FIELDLAT, FIELDLON and FIELD SCS in the
 *  IMAGE_INFO structure.

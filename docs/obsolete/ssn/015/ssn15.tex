@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ successful installation and full use of the Collection as a whole.
 \item [\bf Processor]: Any computer with the DEC VAX architecture should be
 suitable.
 
-\item [\bf Operating System]: VAX VMS (currently version 5.5), and 
+\item [\bf Operating System]: VAX VMS (currently version 5.5), and
 DECwindows-Motif. You may experience difficulties if your version of VMS
 differs from that at RAL.
 
@@ -158,11 +158,11 @@ continually changing; at the time of writing (revision level 598) they were:
 \end{itemize}
 
 Thus, the total disk space required is approximately 1400 Mbyte. This can be
-reduced by deleting unwanted items or files (see section \ref{ss:reduce}). 
+reduced by deleting unwanted items or files (see section \ref{ss:reduce}).
 
 New non-Starlink sites are normally sent only the Standard software, including
 GKS, plus any optional items specifically requested, so 200 Mbyte is often
-enough space. 
+enough space.
 
 \item [\bf Magnetic Tape]: Normally, software will be supplied as VMS Backup
 save-sets on Exabyte cassette. By request, DEC TK50 and TK70 cartridges can be
@@ -230,11 +230,11 @@ processing and display.
 separate items in the Standard and Option sets, and now only holds SST.
 
 \item {\tt [FIGARO...]} --- a large set of spectroscopy and related
-applications. 
+applications.
 
 \item {\tt [FIGPACK...]} --- some additional applications associated with
 FIGARO, and the applications in the main FIGARO tree that have had bugs fixed,
-or have been enhanced or altered for UK astronomical use. 
+or have been enhanced or altered for UK astronomical use.
 
 \end{itemize}
 
@@ -298,7 +298,7 @@ in order to run. Commercial items are indicated thus: {\tt *}.
 \item {\tt [SAM...]} --- SAM
 \item {\tt [SCAR53...]} --- SCAR
 \item {\tt [SCP...]} --- SCP
-\item {\tt [SPECDRE...]} --- SPECDRE 
+\item {\tt [SPECDRE...]} --- SPECDRE
 \item {\tt [SPECX...]} --- SPECX
 \item {\tt [STARMAN...]} --- STARMAN
 \item {\tt [TEX...]} --- TEX
@@ -448,20 +448,20 @@ installation.
 
 The tapes supplied should be accompanied by the following documentation:
 
-\begin{description} 
-\begin{description} 
-\item [\bf RELEASE]: Release note (describes what is on the tape) 
+\begin{description}
+\begin{description}
+\item [\bf RELEASE]: Release note (describes what is on the tape)
 \item [\bf ACKNOWLEDGEMENT]: Acknowledgement note (return to Software Librarian)
 \item [\bf GKS]: Copy of the GKS form (return to Software Librarian)
-\item [\bf SSN/15]: `Starlink Software Installation' (this document) 
-\item [\bf SGP/25]: `Starlink Site Manager's Guide --- major nodes' 
+\item [\bf SSN/15]: `Starlink Software Installation' (this document)
+\item [\bf SGP/25]: `Starlink Site Manager's Guide --- major nodes'
 \item [\bf SSN/39]: `GKS --- Installation and Modification'
-\item [\bf SUG]: `Starlink User Guide' 
-\item [\bf ONLINE]: On-line documentation index 
+\item [\bf SUG]: `Starlink User Guide'
+\item [\bf ONLINE]: On-line documentation index
 \item [\bf WHOSWHO]: Starlink Who's Who
 \item [\bf STARTUP]: System startup procedure ({\tt
-SYS\$STARTUP:SYSTARTUP\_V5.COM}) 
-\end{description} 
+SYS\$STARTUP:SYSTARTUP\_V5.COM})
+\end{description}
 \end{description}
 
 A large amount of documentation is stored in the Collection. This is indexed in
@@ -472,17 +472,17 @@ documents should normally be studied in the form of the paper documents
 supplied; however, you may be able to produce masters by running \LaTeX\ on the
 appropriate `{\tt .TEX}' file. The contents of the files should be obvious from
 their names, thus {\tt DOCSDIR:\-SUN33.\-TEX} holds the \LaTeX\ source for
-SUN/33. Of particular interest at the planning stage are: 
+SUN/33. Of particular interest at the planning stage are:
 
-\begin{description} 
 \begin{description}
-\item [\bf SUN/1]: `Starlink Software -- An Introduction' 
-\item [\bf SSN/33]: `Configuring Queues for Starlink Graphics' 
+\begin{description}
+\item [\bf SUN/1]: `Starlink Software -- An Introduction'
+\item [\bf SSN/33]: `Configuring Queues for Starlink Graphics'
 \item [\tt ADMINDIR:SSCLIS.TLB]: Modules contain Starlink Software
-Change notices describing the updates to the Collection (large). 
+Change notices describing the updates to the Collection (large).
 \item [\tt ADMINDIR:SSCCOM.TLB]: Modules contain command procedures associated
-with the updates (large). 
-\end{description} 
+with the updates (large).
+\end{description}
 \end{description}
 
 \subsection {Store Starlink Directories on Disk}
@@ -503,7 +503,7 @@ existing copies of the supplied directories.
       $ ALLOC Mxxx TAPE
 \end{verbatim}
 
-\item Load first tape onto allocated deck and copy {\tt [STARLINK]} from tape 
+\item Load first tape onto allocated deck and copy {\tt [STARLINK]} from tape
 to disk:
 
 \begin{verbatim}
@@ -548,7 +548,7 @@ of the other items depend:
 Other items are essentially systems software which may need to be integrated
 with the local system; at the time of writing, they are:
 
-\begin{quote} 
+\begin{quote}
 {\bf PSSMB} --- Print symbiont for non-DEC PostScript printer
 \end{quote}
 
@@ -596,7 +596,7 @@ in future.
 \subsection {List Key Documentation}
 \label{ss:listdocs}
 
-Starlink documentation is described in the Starlink User Guide ({\tt 
+Starlink documentation is described in the Starlink User Guide ({\tt
 DOCSDIR:SUG.TEX}). It is stored in directories {\tt DOCSDIR:} and {\tt
 LDOCSDIR:} and indexed by files {\tt LDOCSDIR:ONLINE}, {\tt DOCSDIR:DOCS}, {\tt
 DOCSDIR:MUD}, {\tt LDOCSDIR:DOCS} and {\tt DOCSDIR:SUBJECT}. Other
@@ -633,7 +633,7 @@ files for uninstalled items.
 source code.
 
 \item Delete the {\tt .LIS} forms of files in DOCSDIR. Generate readable
-versions of these files when required. 
+versions of these files when required.
 
 \end{itemize}
 We recommend that whenever the Collection is truncated, details of what has been
@@ -654,7 +654,7 @@ In particular, look for any release notes or installation instructions (see
 
 \item [Startup, Shutdown, Login files] --- We assume you want the Starlink
 logical names to be defined as system logical names at startup time and that
-you have command procedure {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM} called from 
+you have command procedure {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM} called from
 {\tt SYS\$\-SYSTEM:\-STARTUP.\-COM}.
 
 Study {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM} in the listing provided; this shows
@@ -672,7 +672,7 @@ system boot.
 
 \item Study {\tt SSC:STARTUP.COM} and make it compatible with your local system.
 You may wish to delete definitions which are associated with items or
-directories you will not use. 
+directories you will not use.
 
 You will need to add logical name definitions for optional items to {\tt
 SSC:STARTUP.COM} if {\tt LSSC:STARTUP.COM} is not provided. Many Option set
@@ -688,9 +688,9 @@ want them installed.
 \item Study {\tt SSC:\-LOGIN.\-COM} and (if provided) {\tt LSSC:\-LOGIN.\-COM}.
 
 Option set package startup commands are set to produce a `package not installed
-message' by default in {\tt SSC:LOGIN.COM}, and are overridden in 
+message' by default in {\tt SSC:LOGIN.COM}, and are overridden in
 {\tt LSSC:LOGIN.COM}. If you are not provided with this you will need to add
-the startup commands to  {\tt SSC:LOGIN.COM} --- many packages now have 
+the startup commands to  {\tt SSC:LOGIN.COM} --- many packages now have
 a {\tt package\_LSSC\-\_LOGIN.COM} file which should be used as a template.
 
 No modifications should be necessary, although you may wish to delete
@@ -700,7 +700,7 @@ definitions you think will not be used.
 
 Any user who wishes to use the Collection should include the command:
 \begin{verbatim}
-      $ @SSC:LOGIN			
+      $ @SSC:LOGIN
 \end{verbatim}
 in his own login command procedure; please inform them.
 
@@ -742,12 +742,12 @@ STARDISK:\-[STARLINK.\-SYSTEM.\-PSSMB.\-SOURCE]\-README\-.TXT}.
 
 \begin{enumerate}
 
-\item Copy the executable image {\tt PSSMB\_DIR:PSSMB.EXE} to 
-{\tt SYS\$COMMON:[SYSEXE]}. 
+\item Copy the executable image {\tt PSSMB\_DIR:PSSMB.EXE} to
+{\tt SYS\$COMMON:[SYSEXE]}.
 
 \item Edit your queue definition and startup command procedures so that the
 queue for the  PostScript printer  uses the PSSMB symbiont. The file {\tt
-PSSMB\_DIR:\-DEFINE\_QUEUES.\-TEMPLATE} may be used as a template. 
+PSSMB\_DIR:\-DEFINE\_QUEUES.\-TEMPLATE} may be used as a template.
 
 \item Redefine the queue using the new symbiont.
 
@@ -797,7 +797,7 @@ size (65203 blocks) and must be requested separately from the Librarian.
 Starlink software is concerned with manipulation large quantities of data in
 the form of images or data sets. In order to use the Starlink Software, a user
 must have process quotas adequate for the amount of data, and the machine must
-also have adequate quotas. 
+also have adequate quotas.
 
 A typical user at RAL has process quotas set thus:
 \begin{quote}\small
@@ -824,8 +824,8 @@ The system parameters that have been found to cause problems are:
 
 \subsection {Privileges}
 
-\begin{description} 
-\begin{description} 
+\begin{description}
+\begin{description}
 
 \item [Logical Names] --- Starlink recommends that the Starlink logical names
 are defined at {\tt /SYSTEM} level as in {\tt SSC:STARTUP.COM}.
@@ -833,21 +833,21 @@ are defined at {\tt /SYSTEM} level as in {\tt SSC:STARTUP.COM}.
 However, excepting the GWM logical names (see below), the Starlink software
 will run with the logical names set at {\tt /JOB} level. Some software will run
 with Starlink logical names at {\tt /PROCESS} level, but ADAM applications
-will not work when run from ICL. 
+will not work when run from ICL.
 
 For the GKS system to be able to use X-windows without the displayed image
 disappearing each time an executable image (application) runs down, a Graphics
 Window Manager (GWM) has been developed. The logical names associated with GWM
 ({\tt GWM\_DIR} and the image names) {\bf must} be defined at {\tt /GROUP} or
 {\tt /SYSTEM} level, otherwise the detached window manager process will not
-be able to see the software and will fail to generate a window. 
+be able to see the software and will fail to generate a window.
 
 \item [Installed Images] --- The standard AZUSS image for the ADAM system needs
 to be INSTALLed as a known image in order that ICL works. A dummy version of
 the AZUSS image is also available that need not be installed. Swapping between
 the two is archived by pointing the {\tt AZUSS} logical name appropriately.
 AZUSS is part of the real-time data acquisition capabilities of ADAM and is not
-needed for data-reduction. See SSN/44 for more details. 
+needed for data-reduction. See SSN/44 for more details.
 
 \end{description}
 \end{description}
@@ -905,8 +905,8 @@ $       set proc/name="Bamberg"
 $       allocate muc0
 %DCL-I-ALLOC, _RLSTAR$MUC0: allocated
 $! core
-$       backup/noassist/rewind/ignore=label/label="STAR" - 
-        /density=6250/block_size=64000 -         
+$       backup/noassist/rewind/ignore=label/label="STAR" -
+        /density=6250/block_size=64000 -
         disk$star:[starlink...]*.*;* muc0:star.bck/save
 %MOUNT-I-OPRQST, Please mount volume STAR   in device _RLSTAR$MUC0:
 BACKUP requests: Saveset STAR.BCK, Volume number 01, write ENABLED
@@ -914,31 +914,31 @@ BACKUP requests: Saveset STAR.BCK, Volume number 01, write ENABLED
 %MOUNT-I-RQSTDON, operator request canceled - mount completed successfully
 $!
 $! adam
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[adam.release...]*.*;* muc0:adam.bck/save
 $!
 $! adamapp
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[adamapp...]*.*;* muc0:adamapp.bck/save
 $!
 $! kappa
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[kappa...]*.*;* muc0:kappa.bck/save
 $!
 $! figaro
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[figaro...]*.*;* muc0:figaro.bck/save
 $!
 $! figpack
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[figpack...]*.*;* muc0:figpack.bck/save
 $!
 $! dipso
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[dipso...]*.*;* muc0:dipso.bck/save
 $!
 $! iuedr
-$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -
         disk$star:[iuedr...]*.*;* muc0:iuedr.bck/save
 $!
 $ exit:
@@ -947,7 +947,7 @@ $       deal muc0
 $       set proc/name="BATCH_714"
 $       exit
   STAR         job terminated at 24-OCT-1992 15:11:04.54
- 
+
    Accounting information:
   Buffered I/O count:           15162         Peak working set size:    1989
   Direct I/O count:             19467         Peak page file size:      4259
@@ -962,7 +962,7 @@ a density of 6250bpi. The software provided was:
 \item The Starlink Core
 \item The mini release of ADAM
 \item ADAMAPP suite
-\item KAPPA 
+\item KAPPA
 \item FIGARO
 \item FIGPACK
 \item DIPSO --- optional item
@@ -985,9 +985,9 @@ relevant are indicated as follows - (?).
 
 \begin{verbatim}
     $ ALLOC Mxxx TAPE
-    $ BACKUP/REWIND/NOASSIST TAPE:STAR.BCK - 
+    $ BACKUP/REWIND/NOASSIST TAPE:STAR.BCK -
             <device>:[*...]/OWNER_UIC=ORIGINAL
-    $ BACKUP/NOASSIST TAPE:STARLOCAL.BCK - 
+    $ BACKUP/NOASSIST TAPE:STARLOCAL.BCK -
             <device>:[*...]/OWNER_UIC=ORIGINAL
 \end{verbatim}
 
@@ -1029,7 +1029,7 @@ Reboot or explicitly enter commands added to SYS\$STARTUP:SYSTARTUP\_V5.COM.
 
 \item Customise the Graphics system (\ref{ss:fundamental}).
 
-\item (?) Install PSSMB (\ref{ss:systems}). 
+\item (?) Install PSSMB (\ref{ss:systems}).
 
 \item Files {\tt SSC:LOGIN.COM} and {\tt LSSC:LOGIN.COM}.
 

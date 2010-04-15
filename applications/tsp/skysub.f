@@ -9,7 +9,7 @@ C
 C     Function:
 C        Subtract Sky from a time series image dataset
 C
-C     Description:   
+C     Description:
 C        Sky subtraction from each frame of a time series image is
 C        performed by selecting two areas on each side of a star to
 C        be observed and linearly interpolating between the mean or
@@ -26,16 +26,16 @@ C    (7) XR1       (Integer)   Lowest X value for right sky region
 C    (8) XR2       (Integer)   Highest X value for right sky region
 C    (9) MEDIAN    (Logical)   Use median rather than mean
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         26/10/1989
 C
 C-
 C
 C  History:
-C    26/10/1989   Original Version.   JAB/JAC 
+C    26/10/1989   Original Version.   JAB/JAC
 C
 
 
@@ -56,7 +56,7 @@ C
       INTEGER Y1,Y2,XL1,XL2,XR1,XR2
       LOGICAL MEDIAN
       INTEGER DIMS(3),NDIMS
-        
+
 *  Get the input file
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
 
@@ -94,7 +94,7 @@ C
       CALL DAT_ANNUL(OLOC,STATUS)
       END
 
-      
+
       SUBROUTINE TSP_SKYSUB(N1,N2,N3,Y1,Y2,XL1,XL2,XR1,XR2,X,MEDIAN,
      :     NW,W)
 *+
@@ -141,7 +141,7 @@ C
 *  Local variables
       INTEGER I1,I2,I3,J
       REAL SUML,SUMR,POSL,POSR,FACTOR
-      
+
 *  Loop over frames
       DO I3=1,N3
           SUML=0.0
@@ -181,7 +181,7 @@ C
               ENDDO
 
 *  Divide by number of points
-              SUML = SUML/REAL((Y2-Y1+1)*(XL2-XL1+1))    
+              SUML = SUML/REAL((Y2-Y1+1)*(XL2-XL1+1))
           ENDIF
           POSL = 0.5*REAL(XL2+XL1)
 
@@ -219,11 +219,11 @@ C
               ENDDO
 
 *  Divide by number of points
-              SUMR = SUMR/REAL((Y2-Y1+1)*(XR2-XR1+1))  
+              SUMR = SUMR/REAL((Y2-Y1+1)*(XR2-XR1+1))
           ENDIF
           POSR = 0.5*REAL(XR2+XR1)
           PRINT *,'Frame ',I3,' Sum Left = ',SUML,' Sum Right = ',SUMR
-        
+
 *  Interpolate between sky areas and subtract - FUDGE TO DO 2 MORE ROWS THAN
 *  Y1 TO Y2  (27/10/89)
           FACTOR = (SUMR-SUML)/(POSR-POSL)
@@ -252,18 +252,18 @@ C        Sort a real array
 C
 C     Parameters
 C        (>)  SIZE       (Integer, ref) Size of the array
-C        (!)  ARRAY      (Real,ref) Array of values to sort 
+C        (!)  ARRAY      (Real,ref) Array of values to sort
 C
-C     Support: 
+C     Support:
 C          Jeremy Bailey, AAO
 C
-C     Version date 
+C     Version date
 C           26/10/1989
 C
 C
 C
 C  History:
-C    26/10/1989   Original Version.   JAB/JAC 
+C    26/10/1989   Original Version.   JAB/JAC
 C+
 
       IMPLICIT NONE
@@ -281,7 +281,7 @@ C+
       GAP = SIZE/2
 
 *  Loop until gap reaches zero
-      DO WHILE (GAP .GT. 0) 
+      DO WHILE (GAP .GT. 0)
           DO I = GAP+1,SIZE
               J = I-GAP
               DO WHILE (J .GT. 0)
@@ -301,4 +301,4 @@ C+
           GAP = GAP/2
       ENDDO
       END
-      
+

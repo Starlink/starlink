@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,7 +73,7 @@
      :                /'0 (possibly programming error ).', STATUS )
          GOTO 999
       END IF
-      
+
 *  If value at the first point is bad, assign the value of the second
 *  point to the output.
       IF ( VAL1 .EQ. VAL__BADR ) THEN
@@ -91,5 +91,5 @@
       END IF
 
  999  CONTINUE
-      
+
       END

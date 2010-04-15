@@ -1,4 +1,4 @@
-SCB -- Source Code Browser 
+SCB -- Source Code Browser
 --------------------------
 
 Indexer and extractor/HTML browser for source code comprising Starlink
@@ -15,10 +15,10 @@ v1.1-0 (December 1999):
 
    The source code parsing/tagging has been entirely rewritten using lex
    and yacc instead of the Perl/regular expression-based approach used in
-   previous versions.  This is significantly more efficient in execution 
-   time and memory for small and moderate-sized files and MUCH more 
-   efficient for large ones and certain pathological cases which the 
-   previous routines had trouble with.  It seems to be about as accurate - 
+   previous versions.  This is significantly more efficient in execution
+   time and memory for small and moderate-sized files and MUCH more
+   efficient for large ones and certain pathological cases which the
+   previous routines had trouble with.  It seems to be about as accurate -
    that is certain things which the previous parser got right the new one
    doesn't, and vice versa.
 
@@ -27,17 +27,17 @@ v1.1-0 (December 1999):
    up to date indexes already.
 
 v1.1-1 (November 2001):
-   Some modifications to the makefile (new private targets) to facilitate 
+   Some modifications to the makefile (new private targets) to facilitate
    CVS control of the source, and fixes to things which broke under perl/OS
    upgrades.
 
 v1.1-2 (February 2003):
-   Modified so that scb.pl can run without write access to the 
+   Modified so that scb.pl can run without write access to the
    SCB_BROWSER_TMP directory.  This will only work in cases where no
    untarring of source files needs to be done of course.
 
 v1.1-3 (July 2003):
-   Some minor changes to scbindex in response to issues that showed up 
+   Some minor changes to scbindex in response to issues that showed up
    with Perl 5.8.
 
 # $Id$

@@ -15,16 +15,16 @@
 *              int *status );
 
 *  Description:
-*     On the first call of this routine, the error table for the current 
+*     On the first call of this routine, the error table for the current
 *     context is copied into a holding area, the current error context
 *     is annulled and the first message in the holding area is returned.
-*     Thereafter, each time the routine is called, the next message from 
+*     Thereafter, each time the routine is called, the next message from
 *     the holding area is returned.
 *
 *     The status associated with the returned message is returned in STATUS
 *     until there are no more messages to return -- then STATUS is set to
 *     SAI__OK, PARAM and OPSTR are set to blanks and PARLEN and OPLEN to 1
-*     If there are no messages pending on the first call, a warning message 
+*     If there are no messages pending on the first call, a warning message
 *     is returned with STATUS set to EMS__NOMSG.
 *
 *     After STATUS has been returned SAI__OK, the whole process is repeated
@@ -44,7 +44,7 @@
 *     oplen = int * (Returned)
 *        The length of the error message.
 *     STATUS = INTEGER (Given and Returned)
-*        The status associated with the returned error message: 
+*        The status associated with the returned error message:
 *        it is set to SAI__OK when there are no more messages
 
 *  Notes:
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

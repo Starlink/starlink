@@ -65,7 +65,7 @@ C# IL>=a, OL>=0
       INTEGER IP1,IS1,IW1,IWL1,IR1, IP2,IS2,IW2,IWL2,IR2, ICOUNT
       REAL    XL1(2),YL1(2), XL2(2),YL2(2), XC(2),YC(2)
       LOGICAL CROSS, COLLIN
- 
+
 *  ERRORS
 *  ------
 *    -2004 Polygon has a non-existent section.
@@ -80,14 +80,14 @@ C# IL>=a, OL>=0
       NIN = 0
 *     Quit if less than 2 polygons
       IF(NPOLY .LT. 2)GOTO 999
- 
+
 *     Check start of first polygon
       IS1 = ISP(1)
       IF((IS1 .LT. 1) .OR. (IS1 .GT. NS))THEN
          CALL GKBUG (-2004,'GKPSNI')
          GOTO 999
       ENDIF
- 
+
       ICOUNT = 0
       DO 60 IP1 = 1,NPOLY-1
 *        Find last vertex of 1st polygon
@@ -159,6 +159,6 @@ C# IL>=a, OL>=0
    40       CONTINUE
    50    CONTINUE
    60 CONTINUE
- 
+
   999 CONTINUE
       END

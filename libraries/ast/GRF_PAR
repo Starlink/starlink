@@ -25,12 +25,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -45,40 +45,40 @@
 *-
 
 *  Values identifying different graphics attributes.
-      INTEGER GRF__STYLE  
+      INTEGER GRF__STYLE
       PARAMETER ( GRF__STYLE  = 0 )
 
-      INTEGER GRF__WIDTH  
+      INTEGER GRF__WIDTH
       PARAMETER ( GRF__WIDTH  = 1 )
 
-      INTEGER GRF__SIZE   
+      INTEGER GRF__SIZE
       PARAMETER ( GRF__SIZE   = 2 )
 
-      INTEGER GRF__FONT   
+      INTEGER GRF__FONT
       PARAMETER ( GRF__FONT   = 3 )
 
-      INTEGER GRF__COLOUR 
+      INTEGER GRF__COLOUR
       PARAMETER ( GRF__COLOUR = 4 )
 
 *  Values identifying different graphics primatives.
-      INTEGER GRF__TEXT 
+      INTEGER GRF__TEXT
       PARAMETER ( GRF__TEXT = 0 )
 
-      INTEGER GRF__LINE 
+      INTEGER GRF__LINE
       PARAMETER ( GRF__LINE = 1 )
 
-      INTEGER GRF__MARK 
+      INTEGER GRF__MARK
       PARAMETER ( GRF__MARK = 2 )
 
 *  The number of different graphics attributes.
-      INTEGER GRF__NATTR 
+      INTEGER GRF__NATTR
       PARAMETER ( GRF__NATTR = 5 )
 
 *  Values identifying capabilities.
-      INTEGER GRF__ESC 
+      INTEGER GRF__ESC
       PARAMETER ( GRF__ESC = 0 )
 
-      INTEGER GRF__MJUST 
+      INTEGER GRF__MJUST
       PARAMETER ( GRF__MJUST = 1 )
 
       INTEGER GRF__SCALES

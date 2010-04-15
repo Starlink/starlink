@@ -49,7 +49,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,22 +121,22 @@
            call msg_setc('fieldname',name)
            call msg_setc('fieldireq',freq)
            call msg_setc('fieldinfo',info)
-           call msg_out('message 1','The value of the ^fieldireq for field 
+           call msg_out('message 1','The value of the ^fieldireq for field
      : ^fieldname in catalogue ^catname is ^fieldinfo .', status)
          elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)
-           call err_rep('message 2','The catalogue ^catname could not 
+           call err_rep('message 2','The catalogue ^catname could not
      : be found.', status)
          elseif (status .eq. CHP__COLNOTFND) then
            call msg_setc('fieldname',name)
            call msg_setc('catname',incat)
-           call err_rep('message 3','The field ^fieldname was not found in 
+           call err_rep('message 3','The field ^fieldname was not found in
      : the catalogue ^catname.', status)
 *         elseif (status .eq. CHP__IVLDFREQ) then
 *           call msg_setc('fieldireq',freq)
 *           call err_rep('message 4','The field information required ^fieldireq
 *     : is not valid.', status)
-*           call msg_out('message 5','The valid options are FORMAT, UNITS, 
+*           call msg_out('message 5','The valid options are FORMAT, UNITS,
 *     : NULLVALUE or COMMENT.', status)
          else
            call err_rep('message 5','An unidentified error ocurred in

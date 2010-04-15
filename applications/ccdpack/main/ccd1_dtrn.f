@@ -307,7 +307,7 @@
                TR( 6 ) = COS( THETA )
             END IF
 
-*  Shift of origin and magnification. 
+*  Shift of origin and magnification.
 *  ----------------------------------
 *  Normal equations are: (rearranged to look like nxn)
 *           a.n  + b.Sx                     = Sx'

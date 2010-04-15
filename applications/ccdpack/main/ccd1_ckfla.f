@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,7 +82,7 @@
 *  Arguments Given:
       INTEGER NNDF
       INTEGER IDS( NNDF )
-       
+
 *  Arguments Returned:
       CHARACTER * ( * ) FILTER
 
@@ -106,7 +106,7 @@
       CHARACTER * ( CCD1__NMLEN ) STNFIL ! Name of standard filter
       CHARACTER * ( 30 ) DATE    ! Time and date of debiassing
       INTEGER I                  ! Loop variable
-      LOGICAL OK                 ! Found value 
+      LOGICAL OK                 ! Found value
       LOGICAL MATCH              ! Filters all match.
 
 *  Local Data:
@@ -125,7 +125,7 @@
       STNFIL = ' '
       DO 1 I = 1, NNDF
          CALL CCG1_FCH0C( IDS( I ), 'FTYPE', FTYPE, OK, STATUS )
-         IF ( OK ) THEN 
+         IF ( OK ) THEN
 
 *  Located an NDF type, check it out. If none is located then do
 *  nothing.
@@ -157,7 +157,7 @@
                CALL CCD1_MSG( ' ', ' Warning - NDF: ^NDF does not '//
      :'have a recognisable flatfield frame type (^FTYPE)', STATUS )
             END IF
-         ELSE 
+         ELSE
 
 *  No NDF type information so cannot match these.
             MATCH = .FALSE.
@@ -173,7 +173,7 @@
  1    CONTINUE
 
 *  See if the filter type has been found.
-      IF ( MATCH ) THEN 
+      IF ( MATCH ) THEN
          FILTER = STNFIL
       ELSE
          FILTER = ' '

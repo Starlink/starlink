@@ -82,13 +82,13 @@
      :  WLOC                 ! workspace array
       INTEGER
      :  DIMS( NDIM ), ! dimensions of the input/output DATA_ARRAYs
-     :  NDIMS,        ! number of dimensions from NDF_DIM 
+     :  NDIMS,        ! number of dimensions from NDF_DIM
      :  NELEMENTS,    ! number of elements mapped by NDF_MAP
      :  PNTRI,        ! pointer to : input DATA_ARRAY
      :  PNTRO,        !            : output DATA_ARRAY
      :  PLACE,        ! place holder for temporary array
      :  WPNTR,        !            : workspace array
-     :  LBND( 2 ),    ! lower bounds for temporary array  
+     :  LBND( 2 ),    ! lower bounds for temporary array
      :  INTXS, ! integer number of pixels for shift in X direction
      :  INTYS  !    "       "    "    "    "    "    " Y     "
 
@@ -105,7 +105,7 @@
      :  YSHIFT, !   "   "    "    " Y     "
      :  FRACX,  ! fractional part of shift in X direction
      :  FRACY   !      "       "   "   "    " Y     "
- 
+
       LOGICAL
      :  ABSOLUTE, ! will be .true. if shift is absolute
      :  XWHOLE,   ! will be .true. if shift in X is whole number of pixels
@@ -124,7 +124,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *       map input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :      PNTRI, NELEMENTS, STATUS)
 
          CALL NDF_DIM( LOCI, NDIM, DIMS, NDIMS, STATUS )
@@ -136,7 +136,7 @@
 
 *       now set logical accordingly
 
-         IF( STYPE .EQ. 'R' .OR. STYPE .EQ. 'r' ) THEN  
+         IF( STYPE .EQ. 'R' .OR. STYPE .EQ. 'r' ) THEN
             ABSOLUTE = .FALSE.
          ELSE
             ABSOLUTE = .TRUE.
@@ -191,12 +191,12 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 *          create and map the workspace array
             CALL NDF_TEMP( PLACE, STATUS )
-            CALL NDF_NEW( '_REAL', NDIM, LBND, DIMS, PLACE, WLOC, 
+            CALL NDF_NEW( '_REAL', NDIM, LBND, DIMS, PLACE, WLOC,
      :                    STATUS )
             CALL NDF_MAP( WLOC, 'DATA', '_REAL', 'WRITE', WPNTR,
      :                    NELEMENTS, STATUS )
@@ -204,11 +204,11 @@
             IF( STATUS .EQ. SAI__OK ) THEN
 
 *             shift input image into workspace in X direction
-               CALL SHIFTX( XNEG, XWHOLE, INTXS, FRACX, DIMS( 1), 
+               CALL SHIFTX( XNEG, XWHOLE, INTXS, FRACX, DIMS( 1),
      :           DIMS( 2), %VAL( PNTRI ), %VAL( WPNTR ), STATUS )
 
 *             shift workspace into output array in Y direction
-               CALL SHIFTY( YNEG, YWHOLE, INTYS, FRACY, DIMS( 1), 
+               CALL SHIFTY( YNEG, YWHOLE, INTYS, FRACY, DIMS( 1),
      :           DIMS( 2), %VAL( WPNTR ), %VAL( PNTRO ), STATUS )
             ENDIF
 

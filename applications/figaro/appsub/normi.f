@@ -7,9 +7,9 @@ C     Normalises the array RMS so that numbers in range 0. - 10.
 C     so can be printed in F format
 C
 C     Parameters -  (">" input, "<" output )
-C  
+C
 C     (>) ORD     (Integer) Dimension of arrays RMS and RMSN
-C     (>) RMS     (Real array) R.m.s. on continuum fit as 
+C     (>) RMS     (Real array) R.m.s. on continuum fit as
 C                 function of order
 C     (<) NFAC    (Real) Normalising factor for conversion
 C     (<) RMSN    (Real array) Normalised r.m.s. array
@@ -61,4 +61,4 @@ C
         RMSN(I)=RMS(I)/NFAC
       END DO
 
-      END       
+      END

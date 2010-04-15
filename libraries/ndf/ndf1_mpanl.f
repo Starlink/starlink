@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_MPANL( MAPIN, NMAP, MAPS, HASINV, INMAP, ININD, 
+      SUBROUTINE NDF1_MPANL( MAPIN, NMAP, MAPS, HASINV, INMAP, ININD,
      :                       OUTMAP, OUTIND, MAP, STATUS )
 *+
 *  Name:
@@ -11,14 +11,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_MPANL( MAPIN, NMAP, MAPS, HASINV, INMAP, ININD, 
+*     CALL NDF1_MPANL( MAPIN, NMAP, MAPS, HASINV, INMAP, ININD,
 *                      OUTMAP, OUTIND, MAP, STATUS )
 
 *  Description:
 *     This routine returns a set of Mappings that, when applied in
-*     parallel, are equivalent to the supplied Mapping. Each returned 
-*     Mapping has the fewest possible number of inputs. Thus, the supplied 
-*     Mapping will be split up into the largest possible number of Mappings. 
+*     parallel, are equivalent to the supplied Mapping. Each returned
+*     Mapping has the fewest possible number of inputs. Thus, the supplied
+*     Mapping will be split up into the largest possible number of Mappings.
 
 *  Arguments:
 *     MAPIN = INTEGER (Given)
@@ -27,10 +27,10 @@
 *        The number of Mappings returned.
 *     MAPS( NDF__MXDIM ) = INTEGER (Returned)
 *        An array of "NMAP" returned Mapping pointers. Each of these
-*        Mappings will have a defined inverse transformation. If the 
+*        Mappings will have a defined inverse transformation. If the
 *        supplied Mapping does not include an inverse for a particular
-*        input, then the Mapping for that input will be a TranMap that 
-*        encapsulated the supplied forward Mapping and an inverse Mapping 
+*        input, then the Mapping for that input will be a TranMap that
+*        encapsulated the supplied forward Mapping and an inverse Mapping
 *        that generates AST__BAD values.
 *     HASINV( NDF__MXDIM ) = LOGICAL (Returned)
 *        An array of "NMAP" returned flags. Each one is set TRUE if the
@@ -43,20 +43,20 @@
 *        supplied Mapping.
 *     ININD( NDF__MXDIM ) = INTEGER (Returned)
 *        Element "i" is returned holding the index of the input of the
-*        Mapping identified by "INMAP[i]" that corresponds to input 
+*        Mapping identified by "INMAP[i]" that corresponds to input
 *        "i" in the supplied Mapping.
 *     OUTMAP( NDF__MXDIM ) = INTEGER (Returned)
 *        Element "i" is returned holding the index into the "MAPS" array
-*        that holds the Mapping that generates values for output index "i" 
+*        that holds the Mapping that generates values for output index "i"
 *        in the supplied Mapping.
 *     OUTIND( NDF__MXDIM ) = INTEGER (Returned)
 *        Element "i" is returned holding the index of the output of the
-*        Mapping identified by "OUTMAP[i]" that corresponds to output 
+*        Mapping identified by "OUTMAP[i]" that corresponds to output
 *        "i" in the supplied Mapping.
 *     MAP = INTEGER (Returned)
-*        The full Mapping. This is constructed by joining all the parallel 
-*        Mappings back together again, and so should always have an inverse 
-*        transformation (so long as the supplied Mapping can be split 
+*        The full Mapping. This is constructed by joining all the parallel
+*        Mappings back together again, and so should always have an inverse
+*        transformation (so long as the supplied Mapping can be split
 *        succesfully). If the supplied Mapping cannot be split, a clone
 *        of the supplied Mapping is returned.
 *     STATUS = INTEGER (Given and Returned)
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,14 +103,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_ERR'          ! NDF_ error constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error constants
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Arguments Given:
@@ -169,8 +169,8 @@
          HASINV( J ) = .FALSE.
          INMAP( J ) = 0
          ININD( J ) = 0
-         OUTMAP( J ) = 0 
-         OUTIND( J ) = 0 
+         OUTMAP( J ) = 0
+         OUTIND( J ) = 0
          OUTPRM( J ) = 0
       END DO
       MAP = AST__NULL
@@ -183,7 +183,7 @@
       NOUT = AST_GETI( MAPIN, 'Nout', STATUS )
 
 *  We first try to split the Mapping up into a set of parallel Mappings
-*  each of which has only a single input (i.e. a separate Mapping for 
+*  each of which has only a single input (i.e. a separate Mapping for
 *  each input). If any inputs remain we then try splitting them up
 *  into a set of parallel Mappings that have two inputs. We continue like
 *  this, increasing the number of axes in each parallel Mapping, until all
@@ -196,9 +196,9 @@
             P( J ) = 1
          END DO
 
-*  We now loop through all possible combinations of "MPAX" inputs. 
+*  We now loop through all possible combinations of "MPAX" inputs.
          MORE = ( NDONE .LT. NIN )
-         DO WHILE( MORE ) 
+         DO WHILE( MORE )
 
 *  If the current input selection includes any axes that have
 *  already been assigned to a Mapping, or if it contains any duplicated
@@ -223,16 +223,16 @@
                IF( OMAP .NE. AST__NULL ) THEN
                   NMAP = NMAP + 1
 
-*  See if the Mapping has an inverse transformation. If not, replace the 
-*  Mapping with a TranMap that uses the original Mapping to define the 
-*  forward transformation, and a PermMap that generates bad values to 
+*  See if the Mapping has an inverse transformation. If not, replace the
+*  Mapping with a TranMap that uses the original Mapping to define the
+*  forward transformation, and a PermMap that generates bad values to
 *  define the inverse transformation.
                   TNOUT = AST_GETI( OMAP, 'Nout', STATUS )
 
-                  IF( .NOT. AST_GETL( OMAP, 'TranInverse', 
+                  IF( .NOT. AST_GETL( OMAP, 'TranInverse',
      :                                STATUS ) ) THEN
                      HASINV( NMAP ) = .FALSE.
-                     INVMAP = AST_PERMMAP( MPAX, PERM, TNOUT, PERM, 
+                     INVMAP = AST_PERMMAP( MPAX, PERM, TNOUT, PERM,
      :                                     0.0D0, ' ', STATUS )
                      TMAP = AST_TRANMAP( OMAP, INVMAP, ' ', STATUS )
                      CALL AST_ANNUL( OMAP, STATUS )
@@ -242,11 +242,11 @@
                      HASINV( NMAP ) = .TRUE.
                   END IF
 
-*  Store the Mapping and the values needed to associate each input 
+*  Store the Mapping and the values needed to associate each input
 *  with an input of the returned Mapping.
                   MAPS( NMAP ) = OMAP
 
-                  DO J = 1, MPAX 
+                  DO J = 1, MPAX
                      INMAP( P( J ) ) = NMAP
                      ININD( P( J ) ) = J
                   END DO
@@ -278,14 +278,14 @@
                   END IF
                ELSE
                   OVFLOW = .FALSE.
-               END IF               
+               END IF
             END DO
 
          END DO
 
       END DO
 
-*  See how many inputs have been used. 
+*  See how many inputs have been used.
       USED = 0
       DO J = 1, NIN
          IF( INMAP( J ) .NE. AST__NULL ) USED = USED + 1
@@ -317,13 +317,13 @@
 
 *  Ensure all outputs use the same Mapping.
          DO J = 1, NOUT
-            OUTMAP( J ) = 1 
-            OUTIND( J ) = J 
+            OUTMAP( J ) = 1
+            OUTIND( J ) = J
          END DO
 
 *  If the Mapping was split succesfully, join all the parallel Mappings
 *  back together again to create the complete Mapping. We do this to
-*  create a Mapping that we know will have an inverse transformation 
+*  create a Mapping that we know will have an inverse transformation
 *  (because each of the individual parallel Mappings has an inverse).
       ELSE
 
@@ -337,11 +337,11 @@
             IF( IMAP .EQ. 1 ) THEN
                MAP = AST_CLONE( MAPS( 1 ), STATUS )
             ELSE
-               TMAP = AST_CMPMAP( MAP, MAPS( IMAP ), .FALSE., ' ', 
+               TMAP = AST_CMPMAP( MAP, MAPS( IMAP ), .FALSE., ' ',
      :                            STATUS )
                CALL AST_ANNUL( MAP, STATUS )
-               MAP = TMAP                
-            END IF               
+               MAP = TMAP
+            END IF
 
 *  Update the array holding the input input that corresponds to each
 *  input of the current total Mapping. Loop round each input of the
@@ -353,7 +353,7 @@
 *  input "I" of Mapping "IMAP". When found, store its index in the INPRM
 *  array.
                DO J = 1, NIN
-                  IF( INMAP( J ) .EQ. IMAP .AND. 
+                  IF( INMAP( J ) .EQ. IMAP .AND.
      :                ININD( J ) .EQ. I ) THEN
                      INPRM( IIN ) = J
                      IIN = IIN + 1
@@ -368,11 +368,11 @@
             TNOUT = AST_GETI( MAPS( IMAP ), 'Nout', STATUS )
             DO I = 1, TNOUT
 
-*  Search through all the outputs of the supplied Mapping, looking for the 
-*  one that corresponds to output "I" of Mapping "IMAP". When found, store 
+*  Search through all the outputs of the supplied Mapping, looking for the
+*  one that corresponds to output "I" of Mapping "IMAP". When found, store
 *  its index in the OUTPRM array.
                DO J = 1, NOUT
-                  IF( OUTMAP( J ) .EQ. IMAP .AND. 
+                  IF( OUTMAP( J ) .EQ. IMAP .AND.
      :                OUTIND( J ) .EQ. I ) THEN
                      OUTPRM( IOUT ) = J
                      IOUT = IOUT + 1
@@ -384,7 +384,7 @@
          END DO
 
 *  Sanity check...
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
             IF( IIN .NE. NIN + 1 ) THEN
                STATUS = NDF__FATIN
                CALL MSG_SETI( 'IIN', IIN )
@@ -406,18 +406,18 @@
          END DO
 
          IF( NEEDPM ) THEN
-            PMAP = AST_PERMMAP( NIN, PERM, NIN, INPRM, 0.0D0, ' ', 
+            PMAP = AST_PERMMAP( NIN, PERM, NIN, INPRM, 0.0D0, ' ',
      :                          STATUS )
-	    
+
             TMAP = AST_CMPMAP( PMAP, MAP, .TRUE., ' ', STATUS )
-            CALL AST_ANNUL( PMAP, STATUS )         
-            CALL AST_ANNUL( MAP, STATUS )         
+            CALL AST_ANNUL( PMAP, STATUS )
+            CALL AST_ANNUL( MAP, STATUS )
             MAP = TMAP
          END IF
 
 *  If required, add a PermMap to the end of the total Mapping that
 *  permutes the output indices from the order produced by the total
-*  Mapping to the order in the supplied Mapping. Also, add in constants 
+*  Mapping to the order in the supplied Mapping. Also, add in constants
 *  values for any outputs which are not created by any of the returned
 *  Mappings. First check if the returned Mappings do not have the same
 *  number of outputs as the supplied Mapping...
@@ -431,7 +431,7 @@
                PERM( I ) = 0
             END DO
 
-*  Transform the input position (0,0,0,...) into the output using the 
+*  Transform the input position (0,0,0,...) into the output using the
 *  supplied Mapping. This gives us the constant values to use for the
 *  missing outputs (in CONOUT).
             DO I = 1, NIN
@@ -462,7 +462,7 @@
 *  Only proceed if we need to use the PermMap.
          IF( NEEDPM ) THEN
 
-*  Replace any zero axis indices with the (negated) index of the 
+*  Replace any zero axis indices with the (negated) index of the
 *  corresponding constant output value.
             DO I = 1, NOUT
                IF( PERM( I ) .EQ. 0 ) PERM( I ) = -I
@@ -471,11 +471,11 @@
 *  Create the PermMap.
             PMAP = AST_PERMMAP( IOUT - 1, OUTPRM, NOUT, PERM, CONOUT,
      :                          ' ', STATUS )
-	    
+
 *  Put in series with the returned Mapping.
             TMAP = AST_CMPMAP( MAP, PMAP, .TRUE., ' ', STATUS )
-            CALL AST_ANNUL( PMAP, STATUS )         
-            CALL AST_ANNUL( MAP, STATUS )         
+            CALL AST_ANNUL( PMAP, STATUS )
+            CALL AST_ANNUL( MAP, STATUS )
             MAP = TMAP
          END IF
 

@@ -18,9 +18,9 @@
 *     and LBND. It is assumed that the world coordinate system
 *     associated with the current zone correspond to image (or pixel)
 *     coordinates. A boundary line is drawn around the region
-*     containing valid sky coordinate data. 
-*    
-*     If the graphics option LINES (see routine IRA_DROPT) is set to a 
+*     containing valid sky coordinate data.
+*
+*     If the graphics option LINES (see routine IRA_DROPT) is set to a
 *     negative value, then lines of constant latitude and longitude are
 *     drawn across the plot. Otherwise, tick marks are used to indicate
 *     longitude and latitude.
@@ -33,7 +33,7 @@
 *        abbreviation will do. This need not be the same as the sky
 *        coordinate system stored in the astrometry structure
 *        identified by IDA. See ID/2 section "Sky Coordinates" for more
-*        information. A blank value will cause the system associated 
+*        information. A blank value will cause the system associated
 *        with IDA to be used.
 *     LBND( 2 ) = REAL (Given)
 *        Lower world coordinate bounds for each axis defining the
@@ -47,8 +47,8 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine is effected by the TOLERANCE, TEXT_SIZE, 
-*     COORD_SIZE, LONG_GAP, LAT_GAP, LINES, LAT_ACC, LONG_ACC, PEN1, 
+*     -  This routine is effected by the TOLERANCE, TEXT_SIZE,
+*     COORD_SIZE, LONG_GAP, LAT_GAP, LINES, LAT_ACC, LONG_ACC, PEN1,
 *     PEN2, PEN3 and PEN4 options set up by routine IRA_DROPT.
 
 *  Authors:
@@ -129,7 +129,7 @@
       INTEGER          IPLO
       INTEGER          LA        ! Used characters in ABBREV.
       LOGICAL          LABS
-      REAL             LAXMIN    ! Minimum X coordinates covered by 
+      REAL             LAXMIN    ! Minimum X coordinates covered by
                                  ! coordinate labels.
       INTEGER          LD        ! Used characters in DESCR.
       DOUBLE PRECISION LGPLAT    ! Gap in latitude between parallels.
@@ -186,14 +186,14 @@
       ELSE
          TXTLAB = .TRUE.
       END IF
-      
+
 *  Set up a flag indicating if coordinate labels are required.
       IF( ACM_DROPT( 2 ) .LE. 0.0D0 ) THEN
          COLAB = .FALSE.
       ELSE
          COLAB = .TRUE.
       END IF
-      
+
 *  Set up a flag indicating if lines or ticks are required.
       IF( ACM_DROPT( 4 ) .LE. 0.0D0 ) THEN
          LINES = .FALSE.
@@ -201,9 +201,9 @@
          LINES = .TRUE.
       END IF
 
-*  If a blank SCS was given, use the value associated with IDA.      
+*  If a blank SCS was given, use the value associated with IDA.
       IF( SCS .EQ. ' ' ) THEN
-         LSCS = ACM_SCS( IDA ) 
+         LSCS = ACM_SCS( IDA )
       ELSE
          LSCS = SCS
       END IF
@@ -231,7 +231,7 @@
 *  around the edge of the sky grid, at the end of each meridian.
       ALAX = ACEN
       CALL IRA1_DRMS( ACEN, BCEN, LGPLON, LGPLAT, LSCS, IDA, IMLO, IMHI,
-     :                IPLO, IPHI, LBND, UBND, MAXLAB, MAXTIC, ALAX, 
+     :                IPLO, IPHI, LBND, UBND, MAXLAB, MAXTIC, ALAX,
      :                ALABS, NALABS, ATICS, NATICS, STATUS )
 
 *  Draw the parallels and find where "end" labels and tick marks should
@@ -239,7 +239,7 @@
 *  the edge of the sky grid, at the end of each parallel.
       BLAX = BCEN
       CALL IRA1_DRPS( ACEN, BCEN, LGPLON, LGPLAT, LSCS, IDA, IMLO, IMHI,
-     :                IPLO, IPHI, LBND, UBND, MAXLAB, MAXTIC, BLAX, 
+     :                IPLO, IPHI, LBND, UBND, MAXLAB, MAXTIC, BLAX,
      :                BLABS, NBLABS, BTICS, NBTICS, STATUS )
 
 *  If no usable information about labels has been stored, ignore any
@@ -299,8 +299,8 @@
          IF( TICKS ) ACM_DROPT( 4 ) = 1.0D0
 
 *  Draw the lables and/or ticks.
-         CALL IRA1_AXLM( IDA, LSCS, ALAX, BLAX, ACEN, LGPLON, IMHI, 
-     :                   IMLO, LABS, DBLE( 1.2*TICKLE*LGPLAT ), LBND, 
+         CALL IRA1_AXLM( IDA, LSCS, ALAX, BLAX, ACEN, LGPLON, IMHI,
+     :                   IMLO, LABS, DBLE( 1.2*TICKLE*LGPLAT ), LBND,
      :                   UBND, ACCLON, LAXMIN, STATUS )
 
 *  If LINES were originally suppressed, reset the LINES option.
@@ -314,8 +314,8 @@
       LABS = NBLABS .EQ. 0 .AND. COLAB
       IF( TICKS .OR. LABS ) THEN
          IF( TICKS ) ACM_DROPT( 4 ) = 1.0D0
-         CALL IRA1_AXLP( IDA, LSCS, ALAX, BLAX, BCEN, LGPLAT, IPHI, 
-     :                   IPLO, LABS, DBLE( 1.2*TICKLE*LGPLAT ), LBND, 
+         CALL IRA1_AXLP( IDA, LSCS, ALAX, BLAX, BCEN, LGPLAT, IPHI,
+     :                   IPLO, LABS, DBLE( 1.2*TICKLE*LGPLAT ), LBND,
      :                   UBND, ACCLAT, LAXMIN, STATUS )
          IF( .NOT. LINES ) ACM_DROPT( 4 ) = -1.0D0
       END IF

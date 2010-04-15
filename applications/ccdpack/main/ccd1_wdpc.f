@@ -74,8 +74,8 @@
 *        will contain the indices of the frames selected.
 *     NFRAME = INTEGER (Returned)
 *        Number of frames of the given type located.
-*     TEMP = CHARACTER * ( * ) (Returned) 
-*        The name of the temporary file that is used to contain the 
+*     TEMP = CHARACTER * ( * ) (Returned)
+*        The name of the temporary file that is used to contain the
 *        NDF names. You should arrange to delete this.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -114,7 +114,7 @@
 *     31-JAN-1994 (PDRAPER):
 *        Added LIST argument.
 *     16-APR-1997 (PDRAPER):
-*        Changed to accomodate foreign file formats and slices. 
+*        Changed to accomodate foreign file formats and slices.
 *        Note this now uses IRG1_ routines!
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
@@ -260,14 +260,14 @@
             TMPNAM = ' '
             CALL CCD1_SLICE( NDFNAM( :IAT ), TMPNAM, START, STATUS )
             TMPNAM = ' '
-            CALL CCD1_FSPEC( NDFNAM( :START ), ' ', 'TYPE', TMPNAM, 
+            CALL CCD1_FSPEC( NDFNAM( :START ), ' ', 'TYPE', TMPNAM,
      :                       STATUS )
-            IF ( TMPNAM .NE. ' ' ) THEN 
-               START = INDEX( NDFNAM( :START ), 
+            IF ( TMPNAM .NE. ' ' ) THEN
+               START = INDEX( NDFNAM( :START ),
      :                        TMPNAM( : CHR_LEN( TMPNAM ) ) )
             END IF
             TMPNAM = ' '
-            CALL CCD1_INSER( TRAIL( :CHR_LEN( TRAIL ) ), NDFNAM( :IAT ), 
+            CALL CCD1_INSER( TRAIL( :CHR_LEN( TRAIL ) ), NDFNAM( :IAT ),
      :                       START, TMPNAM, STATUS )
             CALL GRP_PUT( GIDIN, 1, TMPNAM, POINT( I ), STATUS )
  3       CONTINUE
@@ -281,7 +281,7 @@
          MESS = PREFIX//PROG//CONTIN
          CALL FIO_WRITE( FD, MESS( :CHR_LEN( MESS ) ), STATUS )
          LCONT = CHR_LEN( CONTIN )
-         
+
 *  Now the input and output file specifiers.
          IAT = 3
          MESS = ' '

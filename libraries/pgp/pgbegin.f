@@ -5,7 +5,7 @@ C+
       CHARACTER*(*) FILE
       INTEGER       NXSUB, NYSUB
 C
-C See description of PGBEG.   
+C See description of PGBEG.
 C--
       INTEGER       PGBEG
       PGBEGIN = PGBEG (UNIT, FILE, NXSUB, NYSUB)

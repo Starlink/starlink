@@ -64,7 +64,7 @@ C# IL>=a, OL>=0
 *     IERROR  Copy of KERROR for use during cleanup.
 *     IDUMMY  Dummy integer array for use with GKQWDT.
 *     RDUMMY  Dummy reals array for use with GKQWDT.
-*     
+*
       INTEGER IOFFI, IOFFR, IOFFS, NID(6), NRD(6), IDATA(8), IERROR,
      :        IDUMMY(8)
 
@@ -129,7 +129,7 @@ C# IL>=a, OL>=0
       CALL GKSTAL(KINTGS,1,IOFFS)
       IF (KERROR.NE.0) GO TO 999
       END IF
-      
+
 *     Create the data record.
       CALL GKPREC(IDATA(2),KSTACK(IOFFI),IDATA(3),QSTACK(IOFFR),
      :            IDATA(4),KSTACK(IOFFS),NCD,LDR,DATREC)

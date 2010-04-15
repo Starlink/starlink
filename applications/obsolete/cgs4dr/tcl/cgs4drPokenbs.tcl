@@ -1,6 +1,6 @@
 proc cgs4drPokenbs {taskname} {
 #+
-# Puts value into nbs 
+# Puts value into nbs
 #-
     global Cred4NoticeBoard
     global C4UserNb
@@ -15,7 +15,7 @@ proc cgs4drPokenbs {taskname} {
       set noticeboard $C4UserNb
     } elseif {[string match $P4Task $taskname]} {
       set noticeboard $P4UserNb
-    } else { 
+    } else {
       set noticeboard ""
     }
 
@@ -55,7 +55,7 @@ proc cgs4drPokenbs {taskname} {
       bind $item <Button-2> "$item delete 0  end; $item insert 0 $P4NoticeBoard"
       bind $item <Double-Button-2> "$item delete 0  end"
       set noticeboard $P4UserNb
-    } else { 
+    } else {
       bind $ilab <Button-2> "$item delete 0 end; $valu delete 0 end"
       bind $vlab <Button-2> "$item delete 0 end; $valu delete 0 end"
       bind $valu <Button-2> "$valu delete 0 end"
@@ -84,7 +84,7 @@ proc cgs4drPokenbs {taskname} {
         if {[string match $Cred4Task $taskname]} {
           set C4UserNb $nb
         } elseif {[string match $P4Task $taskname]} {
-          set P4UserNb $nb 
+          set P4UserNb $nb
         }
 
         set status [catch {nbs put $nb $vb}]

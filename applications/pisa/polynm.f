@@ -63,5 +63,5 @@ C     *** solve linear equations
             POLYCF(I) = B(I)
  80      CONTINUE
       ENDIF
-      
+
       END

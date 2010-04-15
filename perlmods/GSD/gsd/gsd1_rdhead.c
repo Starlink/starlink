@@ -17,7 +17,7 @@
  *       struct item_descriptor *item_ptr );
 
  * Description:
- *    Routine to read header items and header from GSD file. It stores the 
+ *    Routine to read header items and header from GSD file. It stores the
  *    found items into the item descriptor item_ptr.
 
  * Arguments:

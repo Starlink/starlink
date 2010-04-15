@@ -99,7 +99,7 @@ extern node *node1(value (*interpreter)(), value val, node *n0); /* node.c   */
 
 /******************************************************************************
  *
- * The following data structure, defined in adam.h, is used to record 
+ * The following data structure, defined in adam.h, is used to record
  * information about tasks associated with LOADW, LOADD etc commands in ICL
  * This structure is specific to ICL's ADAM functions
  *
@@ -147,7 +147,7 @@ static struct nbslist {
  *
  ******************************************************************************
  */
-static int 
+static int
 int_context
 (
 char *s			/* string pointing to context type name (given) */
@@ -200,7 +200,7 @@ void
  *
  *	T A S K _ E X I T H A N D L E R
  *
- * This function is normally declared be the signal handler for SIGCHLD 
+ * This function is normally declared be the signal handler for SIGCHLD
  * signals (except when we wish to handle these differently).
  *
  * We determine the process id of the terminated task and, if an ADAM task, in
@@ -212,7 +212,7 @@ void
  * into an exit(0) and ensures exit handlers are called.
  * Other types of unexpected termination are reported to the user.
  *
- * The io_subsystem process failing by any means is a serious error and is 
+ * The io_subsystem process failing by any means is a serious error and is
  * reported directly to the user via stderr.
  *
  ******************************************************************************
@@ -223,7 +223,7 @@ task_exithandler
 int signo		/* system supplied integer signal number (given) */
 )
 {
-    int pid, status; 
+    int pid, status;
     extern int iopid;						/* main.c */
     char text[80], text1[80];
     struct task *task;
@@ -258,7 +258,7 @@ int signo		/* system supplied integer signal number (given) */
 #if HAVE_STRSIGNAL
 		strsignal(WTERMSIG(status))
 #else
-		sys_siglist[WTERMSIG(status)] 
+		sys_siglist[WTERMSIG(status)]
 #endif
 		);
     else if (WIFEXITED(status))
@@ -274,7 +274,7 @@ int signo		/* system supplied integer signal number (given) */
 	_exit(1);
     } else {
 	outstring(text);
-	outstring(text1);		
+	outstring(text1);
     }
 }
 
@@ -282,11 +282,11 @@ int signo		/* system supplied integer signal number (given) */
  *
  *	T A S K _ D E S T R O Y
  *
- * Unlinks and frees the memory associated with the given task table entry. 
+ * Unlinks and frees the memory associated with the given task table entry.
  *
  ******************************************************************************
  */
-static void 
+static void
 task_destroy
 (
 struct task * task
@@ -302,7 +302,7 @@ struct task * task
  *
  *	T A S K _ F R O M _ N A M E
  *
- * Returns a pointer to the task structure for the named task OR NULL if 
+ * Returns a pointer to the task structure for the named task OR NULL if
  * the task is not found.
  *
  * 'name' can be supplied in one of two forms depending on 'istask':-
@@ -366,7 +366,7 @@ int  istask	/* is name a taskname (boolean) (given) */
  *
  ******************************************************************************
  */
-void 
+void
 adam_stop
 (
 void
@@ -413,7 +413,7 @@ void
  *
  ******************************************************************************
  */
-static void 
+static void
 adam_path
 (
 char *taskname,		/* ADAM task name (given) */
@@ -434,7 +434,7 @@ int *status		/* global status (given and returned) */
  *	A D A M _ S E N D
  *
  * Sends a message to start a transaction on a given path and returns
- * the 'value' field of the reply in and the newly established transaction 
+ * the 'value' field of the reply in and the newly established transaction
  * identifier to allow the caller to continue with the transacton.
  *
  * This routine will only return when a reply is received from this transaction
@@ -476,11 +476,11 @@ int *status		/* global status (given and returned) */
  *
  *	A D A M _ S E N D T
  *
- * This routine functions like adam_send() (above) except that a timeout (in 
+ * This routine functions like adam_send() (above) except that a timeout (in
  * seconds) can be specified for the reply.
  *
- * Note that (after a timeout) a reply may subsequently arrive and will queue 
- * until a message system call which accepts messages from all transactions 
+ * Note that (after a timeout) a reply may subsequently arrive and will queue
+ * until a message system call which accepts messages from all transactions
  * (either adam_receive() or adam_getreply() ) is called.
  *
  ******************************************************************************
@@ -547,7 +547,7 @@ char *message			/* message to send (given) */
 	return exception("ADAMERR - Invalid CONTROL context action");
     else
 	strcpy(messname, action);
- 
+
     taskname[0] = '\0';
     if (strcmp(name, "CACHED") == 0) {
 	for (p=task_list->next; p != task_list; p = p->next)
@@ -555,7 +555,7 @@ char *message			/* message to send (given) */
 		strcpy(taskname, p->taskname);
 		break;
 	    }
-    } else 
+    } else
 	if (task_from_name(name, TRUE) == TASKNULL)
 /*
  * Task is not loaded. However user is also allowed to refer to a task via
@@ -594,8 +594,8 @@ char *message			/* message to send (given) */
 		uface_inform(path, rvalue, rvalue_len, &status);
 	    else
 		status = message_status;
-	    ams_getreply(MESSYS__INFINITE,path, messid, MSG_NAME_LEN, 
-			MSG_VAL_LEN, &message_status, &message_context, 
+	    ams_getreply(MESSYS__INFINITE,path, messid, MSG_NAME_LEN,
+			MSG_VAL_LEN, &message_status, &message_context,
 			messname, &rvalue_len, rvalue, &status);
 	}
 	if ( status == SAI__OK ) {
@@ -624,8 +624,8 @@ char *message			/* message to send (given) */
     flshbuf();
 
     return trueval;
-}		
-	
+}
+
 /******************************************************************************
  *
  * 	A D A M _ W A I T
@@ -664,7 +664,7 @@ static void adam_wait(int millisecs, int *status)
  * process from ICL by placing it in a new process group.
  *
  ******************************************************************************
- */ 
+ */
 static int		/* pid of loaded process or -1 on error */
 load_and_run_command
 (
@@ -678,7 +678,7 @@ int detached		/* Flag to inidicate 'detached' status (given) */
 
 /* Output loading message depending upon 'messages' flag (altered by SET) */
     if (messages) {
-       sprintf(buf,"Loading %s into %s ", filename, adam_taskname); 
+       sprintf(buf,"Loading %s into %s ", filename, adam_taskname);
        bufstring(buf);
        bufstring(detached == 0 ? "(attached)" : "(detached)");
        bufnewline();
@@ -743,8 +743,8 @@ int detached		/* Flag to inidicate 'detached' status (given) */
 
       default:				/* Still the parent process */
 	status = SAI__OK;
-	adam_wait(1000, &status); 	/* give child process a chance 
-					 * to get started and registered 
+	adam_wait(1000, &status); 	/* give child process a chance
+					 * to get started and registered
 					 * with the message system */
 	if (pid != -1) {
 	    lcount = 30;		/* 15 seconds */
@@ -756,7 +756,7 @@ int detached		/* Flag to inidicate 'detached' status (given) */
 #if HAVE_STRSIGNAL
 			      strsignal(WTERMSIG(status))
 #else
-			      sys_siglist[WTERMSIG(status)] 
+			      sys_siglist[WTERMSIG(status)]
 #endif
 				);
 		    else
@@ -803,11 +803,11 @@ int detached		/* Flag to inidicate 'detached' status (given) */
  *	T A S K _ F I N D _ O R _ L O A D
  *
  * This routine first checks the task structure to see if the given task has
- * already been loaded and if so returns a pointer to the associated data 
+ * already been loaded and if so returns a pointer to the associated data
  * structure.
  *
- * If it is not loaded and the global variable (see the SET command) 'autold' 
- * is true, we call load_and_run_command() to fork and run the command 
+ * If it is not loaded and the global variable (see the SET command) 'autold'
+ * is true, we call load_and_run_command() to fork and run the command
  * (possibly as a detached process dependent on the boolean 'detached').
  *
  * We then enter the taskname and process id in the internal task table.
@@ -863,7 +863,7 @@ int autold		/* Automatic load of task - boolean (given) */
 	return TASKNULL;
      } else
 	strcpy(adam_taskname, buf);
-    
+
     if (!expand_name(&filename, comname)) {
         bufstring("Unable to obtain filename from ");
         bufstring(comname);
@@ -903,7 +903,7 @@ int autold		/* Automatic load of task - boolean (given) */
     strcpy(taskptr->taskname, adam_taskname);
     taskptr->filename = comname;
     taskptr->detached = detached;
-    if ((taskptr->unix_pid = load_and_run_command(filename, adam_taskname, 
+    if ((taskptr->unix_pid = load_and_run_command(filename, adam_taskname,
 						  detached)) <= 0) {
 	task_destroy(taskptr);
 	return TASKNULL;
@@ -928,7 +928,7 @@ int autold		/* Automatic load of task - boolean (given) */
  *
  *	A L O A D _ H E L P E R
  *
- * Common code called to complete the processing of the ICL LOADW, ALOAD and 
+ * Common code called to complete the processing of the ICL LOADW, ALOAD and
  * LOADD commands.
  *
  * These ICL commands all have, as their first parameter, the name of the
@@ -954,7 +954,7 @@ int autold		/* Automatic load of task - boolean (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 aload_helper
 (
 struct task **ptask,		/* pointer to the task table entry to contain
@@ -967,7 +967,7 @@ int detached			/* Boolean to indicated if 'detached' (given) */
     char *command, *taskname;
     value val;
 
-/* Perform basic argument checking and obtain a string from the first 
+/* Perform basic argument checking and obtain a string from the first
  * ICL command parameter */
     if (nargs < 1)
 	return exception("TOOFEWPARS  Insufficient parameters for ALOAD");
@@ -991,9 +991,9 @@ int detached			/* Boolean to indicated if 'detached' (given) */
 	    return val;
 	taskname = string_part(val);
     }
-    if (strlen(taskname) >= (size_t)  MESSYS__TNAME) 
+    if (strlen(taskname) >= (size_t)  MESSYS__TNAME)
 	return exception("TASKERR task name too long");
-    else if ((task= task_find_or_load(command, taskname, detached, 1)) 
+    else if ((task= task_find_or_load(command, taskname, detached, 1))
 		== TASKNULL)
 	return exception("TASKERR failed to load task");
     else if (task->unix_pid == 0) {
@@ -1022,16 +1022,16 @@ int detached			/* Boolean to indicated if 'detached' (given) */
  * SEND taskname context [arguments] with the arguments of 'command'
  * forming the input value string sent to the task.
  *
- * The earlier proc_deftask() routine which processed the original DEFTASK 
- * command will have checked for abbreviations of the form COMM(AND) and 
- * will have set up 'PROC_HIDDEN' symbol table entries whose value components 
- * point to a node structure pointing to this function and having a 
+ * The earlier proc_deftask() routine which processed the original DEFTASK
+ * command will have checked for abbreviations of the form COMM(AND) and
+ * will have set up 'PROC_HIDDEN' symbol table entries whose value components
+ * point to a node structure pointing to this function and having a
  * value_string containing the taskname.
  *
  * Method:
  *
  * We first obtain the taskname from the value_string part of node 'n' and
- * either locate an existing task or set a new one running using 
+ * either locate an existing task or set a new one running using
  * task_find_or_load().
  *
  * The first parameter is the task context and we check it is one of
@@ -1040,8 +1040,8 @@ int detached			/* Boolean to indicated if 'detached' (given) */
  * Then we obtain the parameter to be SET/GET or the action to be OBEYed or
  * CANCELed plus any further parameters.
  *
- * We then establish a path to the task use adam_sendt() to send the message 
- * allowing a maximum delay of 20 seconds for a response. Depending on the 
+ * We then establish a path to the task use adam_sendt() to send the message
+ * allowing a maximum delay of 20 seconds for a response. Depending on the
  * context we either display the parameter value (for a GET), return trueval
  * or raise an exception (if the final status is not SAI__OK)
  *
@@ -1051,7 +1051,7 @@ int detached			/* Boolean to indicated if 'detached' (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 deftask_interpret
 (
 node * n,		/* ICL node structure (given) */
@@ -1105,13 +1105,13 @@ int op			/* op code for this function (given) */
 	    vtbslen = 1;
 	    valuetobesent[0] = '\0';
 	}
-	if ((task = task_find_or_load(taskname, taskname, 0, autoload)) 
+	if ((task = task_find_or_load(taskname, taskname, 0, autoload))
              == TASKNULL)
 	    return exception("TASKERR  could not load task");
 	status = SAI__OK;
 	adam_path(taskname, &path, &status);
 	if (status == SAI__OK) {
-	    adam_sendt( 20000, path, context, actionorparametername, 
+	    adam_sendt( 20000, path, context, actionorparametername,
 			valuetobesent, vtbslen, valuereceived, &vlen,
 			&messid, &status);
 	    if (status == SAI__OK) {
@@ -1143,24 +1143,24 @@ int op			/* op code for this function (given) */
  *   DEFTASK command [taskname]
  *
  * The builtin ICL DEFTASK command defines a temporary ICL command 'command'
- * which will (using defitask_interpret()) issue a SEND to an ADAM task 
+ * which will (using defitask_interpret()) issue a SEND to an ADAM task
  *
- * The first argument 'command' may specify allowable abbreviations if in the 
+ * The first argument 'command' may specify allowable abbreviations if in the
  * form COM(MAND) where COM, COMM, COMMA, COMMAN and COMMAND would be
  * subsequently recognised.
  *
- * The second (optional) parameter 'taskname' is the name of the task to 
+ * The second (optional) parameter 'taskname' is the name of the task to
  * receive the SEND and defaults to 'command' if absent.
  *
  * When 'command' is processed its own parameters must contain the context
- * (GET, SET, OBEY, CANCEL) and the parameters or action name to be sent to 
+ * (GET, SET, OBEY, CANCEL) and the parameters or action name to be sent to
  * the task.
  *
- * This routine creates a PROC_HIDDEN symbol table entry for COM(MAND) 
+ * This routine creates a PROC_HIDDEN symbol table entry for COM(MAND)
  * whose value component points to a deftask_interpret() node with a
  * value_string containing the taskname.
  *
- * Thus when 'command' is subsequently issued as an ICL command 
+ * Thus when 'command' is subsequently issued as an ICL command
  * deftask_interpret() will be executed.
  *
  * Method:
@@ -1184,7 +1184,7 @@ int op			/* op code for this function (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_deftask
 (
 node * n		/* ICL internal 'node' structure (given) */
@@ -1231,11 +1231,11 @@ node * n		/* ICL internal 'node' structure (given) */
  * where 'command' has previously been defined by a DEFINE command
  *
  * This routine interprets a temporary ICL command 'command' and is equivalent
- * to "OBEYW taskname action ..." with the arguments of 'command' being 
+ * to "OBEYW taskname action ..." with the arguments of 'command' being
  * appended to the OBEYW command forming the value string sent to the task.
  *
- * The earlier proc_define() routine which processed the DEFINE command will 
- * have checked for abbreviations of the form COMM(AND) and set up PROC_HIDDEN 
+ * The earlier proc_define() routine which processed the DEFINE command will
+ * have checked for abbreviations of the form COMM(AND) and set up PROC_HIDDEN
  * symbol table entries whose value components point to a define_interpret()
  * node with a value_string containing the taskname.
  *
@@ -1250,7 +1250,7 @@ node * n		/* ICL internal 'node' structure (given) */
  *
  * On execution, the PROC_HIDDEN symbol table entry for COM(MAND) set up by
  * proc_define() will be found. This is a 'node' structure pointing to this
- * routine having a 'value' component whose string part contains the 'taskname' 
+ * routine having a 'value' component whose string part contains the 'taskname'
  * and whose sub[0] member points to a node with a value holding the 'action'
  * name.
  *
@@ -1264,7 +1264,7 @@ node * n		/* ICL internal 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 define_interpret
 (
 node * n, 		/* ICL internal 'node' structure (given) */
@@ -1281,7 +1281,7 @@ int op			/* op code for this routine (given) */
 
       case OP_INTERPRET:
 	if ((task =
-             task_find_or_load(string_part(n->val), CHARNIL, 0, autoload)) 
+             task_find_or_load(string_part(n->val), CHARNIL, 0, autoload))
 	     == TASKNULL)
 	    return exception("TASKERR  could not load task");
 
@@ -1361,8 +1361,8 @@ int op			/* op code for this routine (given) */
  * which sets up a new temporary ICL command 'command' which, when issued, will
  * send an OBEYW to an ADAM task.
  *
- * 'command' is the new ICL command being defined, and may be an abbreviation 
- * in the form COM(MAND) where COM, COMM, COMMA, COMMAN and COMMAND would be 
+ * 'command' is the new ICL command being defined, and may be an abbreviation
+ * in the form COM(MAND) where COM, COMM, COMMA, COMMAN and COMMAND would be
  * acceptable.
  *
  * 'taskname' is the name of the task to receive the OBEYW.
@@ -1370,7 +1370,7 @@ int op			/* op code for this routine (given) */
  * 'action' (optional) is the action to be executed and defaults to the
  * same as 'command' if omitted.
  *
- * Once defined the ICL command "'command' ..." is equivalent to 
+ * Once defined the ICL command "'command' ..." is equivalent to
  * OBEYW taskname action ... with the parameters of 'command' being appended
  * to the OBEYW as the value string sent to the task.
  *
@@ -1384,8 +1384,8 @@ int op			/* op code for this routine (given) */
  *   'nargs' is the number of command arguments.
  *
  * We use interpret() to obtain the string value of 'command' (return an
- * exception on failure or if not a string) and also to obtain 'taskname' 
- * and the 'action' (which absent defaults to a parenthesis free copy of 
+ * exception on failure or if not a string) and also to obtain 'taskname'
+ * and the 'action' (which absent defaults to a parenthesis free copy of
  *'command').
  *
  * We then use install_abbrevs() to install the command (and all its
@@ -1401,7 +1401,7 @@ int op			/* op code for this routine (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_define
 (
 node * n		/* ICL 'node' structure (given) */
@@ -1441,7 +1441,7 @@ node * n		/* ICL 'node' structure (given) */
  * Build the nodes
  */
     if  ((nw1 = node_value(value_string(action))) == NODENIL ||
-	 (nw  = node1(define_interpret, value_string(taskname), nw1)) 
+	 (nw  = node1(define_interpret, value_string(taskname), nw1))
 	    == NODENIL)
 	return exception("SYSERR  Memory exhausted during DEFINE");
 
@@ -1458,7 +1458,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_aload
 (
 node * n		/* ICL 'node' structure (given) */
@@ -1476,7 +1476,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_loadw
 (
 node * n		/* ICL 'node' structure (given) */
@@ -1498,7 +1498,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_loadd
 (
 node * n		/* ICL 'node' structure (given) */
@@ -1518,7 +1518,7 @@ node * n		/* ICL 'node' structure (given) */
  * Interprets the builtin ICL command
  *   SEND taskname context ...
  *
- * which sends a control message to the ADAM task 'taskname'. 
+ * which sends a control message to the ADAM task 'taskname'.
  *
  * Method:
  * Prior to this routine being being called, the following global variables
@@ -1537,8 +1537,8 @@ node * n		/* ICL 'node' structure (given) */
  * The remaining command arguments are obtained and built into a string to
  * send to the task.
  *
- * We then establish a path to the task use adam_sendt() to send the message 
- * allowing a maximum delay of 20 seconds for a response. Depending on the 
+ * We then establish a path to the task use adam_sendt() to send the message
+ * allowing a maximum delay of 20 seconds for a response. Depending on the
  * context we either display the parameter value (for a GET), return trueval
  * or raise an exception (if the final status is not SAI__OK)
  *
@@ -1548,14 +1548,14 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_send
 (
 node * n		/* ICL 'node' structure (given) */
 )
 {
     value val;
-    char actionorparam[MSG_NAME_LEN], 
+    char actionorparam[MSG_NAME_LEN],
 	 svalue[MSG_VAL_LEN]=" ",
 	 rvalue[MSG_VAL_LEN]=" ";
     char *taskname, *vp;
@@ -1600,7 +1600,7 @@ node * n		/* ICL 'node' structure (given) */
 		    task = task_from_name(p->taskname, TRUE);
 		    break;
 		}
-	}	
+	}
     }
     if(task == TASKNULL)
 	return (exception("SEND - task is not loaded"));
@@ -1650,7 +1650,7 @@ node * n		/* ICL 'node' structure (given) */
 		    argp1->interpret = abbut_qstring_interpret;
 		if (isexc(val = interpret(argp)) )
 		    return val;
-	    }	
+	    }
 	}
 	vp = string_part(val);
 	vpl = strlen(vp) + 1;
@@ -1679,7 +1679,7 @@ node * n		/* ICL 'node' structure (given) */
 	    uface_askparam(path, rvalue, messid, &status);
 	else
 	    status = message_status;
-        rvalue[0] = 0; 
+        rvalue[0] = 0;
 	ams_getreply(MESSYS__INFINITE,path, messid, MSG_NAME_LEN, MSG_VAL_LEN,
 		     &message_status, &message_context, actionorparam,
 		     &rvalue_len, rvalue, &status);
@@ -1687,9 +1687,9 @@ node * n		/* ICL 'node' structure (given) */
 
 /* Now for GET context or CONTROL DEFAULT "" display the return value */
    strtrim(svalue,svalue_len);
-   if ((message_context == GET) || 
-       ((message_context == CONTROL) && 
-       !strcmp(actionorparam,"DEFAULT") && 
+   if ((message_context == GET) ||
+       ((message_context == CONTROL) &&
+       !strcmp(actionorparam,"DEFAULT") &&
        (svalue[0]=='\0')) )
 	if (status == SAI__OK) {
 /*
@@ -1734,7 +1734,7 @@ node * n		/* ICL 'node' structure (given) */
  * to obtain a task parameter of an ADAM I-task and to then put the value of
  * this parameter into an ICL variable
  *
- * Method: 
+ * Method:
  * similar to proc_send() - see above
  *
  * Bugs:
@@ -1742,18 +1742,18 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_get
 (
 node * n		/* ICL 'node' structure (given) */
 )
 {
     value val;
-    char parname[MSG_NAME_LEN], 
+    char parname[MSG_NAME_LEN],
 	 rvalue[MSG_VAL_LEN];
     char *taskname, *vp;
     int status, path, messid, message_context, message_status;
-    int	rvalue_len, vpl; 
+    int	rvalue_len, vpl;
     struct task *task,
 		*p;
     node *lookup_node;
@@ -1792,7 +1792,7 @@ node * n		/* ICL 'node' structure (given) */
 		    task = task_from_name(p->taskname, TRUE);
 		    break;
 		}
-	}	
+	}
     }
     if(task == TASKNULL)
 	return exception("ADAMERR  GET - task is not loaded");
@@ -1825,9 +1825,9 @@ node * n		/* ICL 'node' structure (given) */
 	status = SAI__OK;
 	while(status == SAI__OK && message_status == MESSYS__INFORM) {
 	    uface_inform(path, rvalue, rvalue_len, &status);
-	    ams_getreply(MESSYS__INFINITE,path, messid, 
+	    ams_getreply(MESSYS__INFINITE,path, messid,
 			 MSG_NAME_LEN, MSG_VAL_LEN,
-			 &message_status, &message_context, 
+			 &message_status, &message_context,
 			 parname, &rvalue_len, rvalue, &status);
 	}
 	if( message_status == SAI__OK) {
@@ -1840,8 +1840,8 @@ node * n		/* ICL 'node' structure (given) */
             if(isexc(val = assign_helper(arglist[2]->sub[0],
 					 value_string(rvalue))))
 		return val;
-	    
-	} else if (message_status == DTASK__ACTCANCEL || 
+
+	} else if (message_status == DTASK__ACTCANCEL ||
 		   message_status == DTASK__ACTSTART)
 	    status = SAI__OK;
     } else
@@ -1873,7 +1873,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  *   'nargs' is the number of command arguments.
  *
- * We evaluate the parameters as strings and use uface_obeyw() to send to 
+ * We evaluate the parameters as strings and use uface_obeyw() to send to
  * OBEY message and to handle and requests from the task. Either an error
  * or the final DTASK__ACTCOMPLETE message from the task will return to here.
  * If uface_obeyw() returns with an error code output informative messages
@@ -1883,7 +1883,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_obeyw
 (
 node * n		/* ICL 'node' structure (given) */
@@ -1914,7 +1914,7 @@ node * n		/* ICL 'node' structure (given) */
 	taskname = CHARNIL;
     } else
 	command = taskname;
-    if ((task = task_find_or_load(command, taskname, 0, autoload )) 
+    if ((task = task_find_or_load(command, taskname, 0, autoload ))
          == TASKNULL)
 	return exception("TASKERR  could not load task");
 
@@ -1949,7 +1949,7 @@ node * n		/* ICL 'node' structure (given) */
 	    }
 	    if (isexc(val = interpret(argp)) )
 		return val;
-	}	
+	}
 	vp = string_part(val);
 	vpl = strlen(vp) + 1;
 	memcpy(svalue, vp, (vallen = (vpl > MSG_VAL_LEN ? MSG_VAL_LEN : vpl)));
@@ -1979,7 +1979,7 @@ node * n		/* ICL 'node' structure (given) */
 	bufnewline();
 	flshbuf();
 	return adam_exception("ADAMERR",  status);
-    } 
+    }
 
     return trueval;
 }
@@ -1991,7 +1991,7 @@ node * n		/* ICL 'node' structure (given) */
  * Interprets the builtin ICL command
  *   STARTOBEY (path) (messid) task action value...
  *
- * which sends an OBEY control message to an ADAM task and then stores the 
+ * which sends an OBEY control message to an ADAM task and then stores the
  * path and transaction end index into ICL variables. When used in conjunction
  * with ENDOBEY this command can be used to set up multiple concurrent actions
  * in an ADAM I-task.
@@ -2016,7 +2016,7 @@ node * n		/* ICL 'node' structure (given) */
  * We then get actionname and value (if any) and check they are strings.
  *
  * Using adam_path() we establish a path to the task and then adam_send() is
- * used to send the message.  If the returned status is DTASK__ACTSTART the 
+ * used to send the message.  If the returned status is DTASK__ACTSTART the
  * action statrt has succeeded and we assign the ICL variables.  Otherwise we
  * return an exception.
  *
@@ -2025,7 +2025,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_startobey
 (
 node * n		/* ICL 'node' structure (given) */
@@ -2064,7 +2064,7 @@ error_return:
     taskname = string_part(val);
     if( strlen(taskname) >= (size_t) MESSYS__TNAME)
 	return exception("STARTOBEY: Taskname too long");
-    if ((task = task_find_or_load(taskname, taskname, 0, autoload)) 
+    if ((task = task_find_or_load(taskname, taskname, 0, autoload))
          == TASKNULL)
 	return exception("TASKERR  could not load task for STARTOBEY");
 
@@ -2113,16 +2113,16 @@ error_return:
  * Interprets the builtin ICL command
  *   ENDOBEY  (path)  (messid)
  *
- * which is used to wait for completion of an ADAM I-task initiated by 
+ * which is used to wait for completion of an ADAM I-task initiated by
  * STARTOBEY
  *
  *	path	The path associated with the action
  *	messid	The transaction end index associated with the action
  *
  * Method:
- * We obtain the path and messid values as integers then call uface_endobey() 
- * to handle the remainer of the transaction with the task.  uface_endobey() 
- * should return with SAI__OK status. If not we report this and return an 
+ * We obtain the path and messid values as integers then call uface_endobey()
+ * to handle the remainer of the transaction with the task.  uface_endobey()
+ * should return with SAI__OK status. If not we report this and return an
  * exception
  *
  * Bugs:
@@ -2130,7 +2130,7 @@ error_return:
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_endobey
 (
 node * n		/* ICL 'node' structure (given) */
@@ -2177,7 +2177,7 @@ node * n		/* ICL 'node' structure (given) */
  * thing!
  *
  * Tasks are terminated by sending them a SIGHUP signal which will cause exit
- * handlers to be obeyed which will properly clear down the path, transaction 
+ * handlers to be obeyed which will properly clear down the path, transaction
  * tables and the message system associated with that task.
  *
  * NB SIGHUP is now used instead of SIGTERM (310795) bu we probably should
@@ -2189,7 +2189,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_kill
 (
 node * n		/* ICL 'node' structure (given) */
@@ -2234,7 +2234,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  * This function contains common code for proc_getnbs() and proc_putnbs()
  *
- * Given a notice board component specification of the form 
+ * Given a notice board component specification of the form
  * nbsname.{level1...}.component_name this routine accesses the NBS (and adds
  * it to a ICL internal list) and works down to the last specified component.
  *
@@ -2289,7 +2289,7 @@ char *name	/* NBS specification (given) */
     if( (comp_name = strtok(CHARNIL, ".")) == NULL ||
 	(int)strlen(comp_name) > NBS_K_MAXNAME)
 	return exception1("NBSERR Incorrect Noticeboard Item Name %s",
-			  comp_name); 
+			  comp_name);
     else
 	do {
 	    nbc_find_item(nbs_id, comp_name, &new_id, &status);
@@ -2383,7 +2383,7 @@ node * n		/* ICL 'node' structure (given) */
 	sval = string_part(string_val(newval));
         buff[0] = '\0';
 	if ( (slen = strlen(sval)) > nbslen)
-	    sprintf(buff, 
+	    sprintf(buff,
 		    "NBSERR string \"%s\" too long - NBS size %d bytes",
 		    sval, nbslen);
         else if (slen > 200)
@@ -2508,7 +2508,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_tasks
 (
 node * n		/* ICL 'node' structure (given) */
@@ -2539,7 +2539,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_checktask
 (
 node * n		/* ICL 'node' structure (given) */
@@ -2580,7 +2580,7 @@ node * n		/* ICL 'node' structure (given) */
 
 /******************************************************************************
  *
- *	P R O C _ W A I T 
+ *	P R O C _ W A I T
  *
  * Interprets the builtin ICL command
  *   WAIT
@@ -2593,7 +2593,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_wait
 (
 node * n		/* ICL 'node' structure (given) */
@@ -2621,7 +2621,7 @@ node * n		/* ICL 'node' structure (given) */
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_unimpl
 (
 void
@@ -2638,7 +2638,7 @@ void
  *
  ******************************************************************************
  */
-value 
+value
 init_adam
 (
 void

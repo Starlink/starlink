@@ -9,14 +9,14 @@ C   Description
 C   -----------
 C   This routine services the following commands:
 C
-C     ARITH1 - Arithmetic operations between an image and a scalar. The 
+C     ARITH1 - Arithmetic operations between an image and a scalar. The
 C              operations supported are: +, -, *, /, **.
 C
 C     LOGIC1 - Bitwise logical operations between an image and a scalar. The
 C              operations supported are: AND, OR, XOR, NAND, NOR, NXOR.
 C
-C     MASK1  - Masking operations between an image and a scalar. The 
-C              operations supported are: MAX, MIN, replace where IMAGE is 
+C     MASK1  - Masking operations between an image and a scalar. The
+C              operations supported are: MAX, MIN, replace where IMAGE is
 C              non-magic (or good quality), replace where IMAGE is magic
 C              (or bad quality).
 C
@@ -36,7 +36,7 @@ C   Environment
 C   -----------
 C   FIGARO
 C
-C                                               
+C
 C   Parameters (read or written)
 C   ----------------------------
 C   IMAGE    Name of the structure containing the input image. (character)
@@ -52,8 +52,8 @@ C   OPER     Operation to be performed. (character)(prompted for).
 C
 C   VALUE    Scalar to be combined with IMAGE. (real)(prompted for).
 C
-C   OUTPUT   Name of the structure containing the output image. May be the 
-C            same as IMAGE. (character)(prompted for).     
+C   OUTPUT   Name of the structure containing the output image. May be the
+C            same as IMAGE. (character)(prompted for).
 C
 C   ERR_ACT  Action to be taken with a void error array (character,prompted)
 C
@@ -75,7 +75,7 @@ C
 C
 C   Method
 C   ------
-C   - The IMAGE structure is tested for the bad data flag. If it is found 
+C   - The IMAGE structure is tested for the bad data flag. If it is found
 C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
 C   - The structure IMAGE is copied to OUTPUT.
@@ -99,7 +99,7 @@ C      DSA_INPUT
 C      DSA_MAP_DATA
 C      DSA_MAP_ERRORS
 C      DSA_MAP_QUALITY
-C      DSA_OPEN          
+C      DSA_OPEN
 C      DSA_OUTPUT
 C      DSA_USE_FLAGGED_VALUES
 C      DSA_WRUSER
@@ -132,7 +132,7 @@ C   COMB1_B_W
 C   COMB1_B_WQ
 C   REPLACE_ERRORS_R1
 C   REPLACE_ERRORS_W1
-C      
+C
 C
 C   INCLUDE statements
 C   ------------------
@@ -150,7 +150,7 @@ C
 C
 C   Possible future upgrades
 C   ------------------------
-C   - Allow a fractional offset between images before combination, with 
+C   - Allow a fractional offset between images before combination, with
 C     linear interpolation of pixel values.
 C
 C
@@ -171,12 +171,12 @@ C                  (only applicable when quality arrays exist). (GOLDJIL)
 C   20-AUG-1991  - Why oh why did the author compare COMMAND with 'ACOMB1'
 C                  etc when the command names are 'LOGIC1' etc ? Fixed now.
 C                  Sigh...
-C   30-NOV-1992  - Unix version. Changed REP1 to REPG, REP4 to REPB which 
+C   30-NOV-1992  - Unix version. Changed REP1 to REPG, REP4 to REPB which
 C                  are a tad less cryptic. (GOLDJIL)
 C   06-OCT-1994  - Removed a Trojan Horse message. Also ensured that an
 C                  infinite loop does not occur when an improper operation is
-C                  requested. Removed unused variables. (GJP) 
-C   13-OCT-1994  - Modified code to avoid an eternal loop 
+C                  requested. Removed unused variables. (GJP)
+C   13-OCT-1994  - Modified code to avoid an eternal loop
 C                  when attempting to divide by zero in ARITH1. (GJP)
 C
 C+-----------------------------------------------------------------------------
@@ -248,7 +248,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get command name
-C   
+C
       CALL PAR_COMMAND(COMMAND)
 C
 C   Open file for IMAGE
@@ -257,7 +257,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Display information on IMAGE
-C                               
+C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.TRUE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
@@ -277,11 +277,11 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get IMAGE axis range
-C                              
+C
       CALL NDP_AXIS_RANGE
      &  ('IMAGE',DIMS,NDIM,START,END,STAPIX,ENDPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
-C       
+C
 C   Get operation name
 C
    20 CONTINUE
@@ -315,12 +315,12 @@ C
           CALL DSA_WRUSER('Unrecognized option.\\N')
           GO TO 20
         END IF
-      END IF                                         
+      END IF
 C
 C   Get value of scalar if applicable
 C
       IF(OPER.NE.'LO' .AND. OPER.NE.'EX')THEN
-   30   CONTINUE                           
+   30   CONTINUE
         IF(COMMAND.EQ.'LOGIC1')THEN
           PMIN=REAL(MIN_SHORT)
           PMAX=REAL(MAX_SHORT)
@@ -341,7 +341,7 @@ C
         END IF
       END IF
 C
-C   Open file for OUTPUT                                  
+C   Open file for OUTPUT
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -376,7 +376,7 @@ C
       END IF
       IF(STATUS.NE.0)GO TO 500
       OUTPTR=DYN_ELEMENT(ADDRESS)
-      
+
 C
 C   Find quality/error information (if any)
 C
@@ -410,10 +410,10 @@ C
       END IF
       IF (STATUS.NE.0) GO TO 500
 C
-C   Perform the required combination     
+C   Perform the required combination
 C
       CALL DSA_WRUSER('Performing combination...\\N')
-C       
+C
 C   Bitwise logical operations
 C
       IF(COMMAND.EQ.'LOGIC1')THEN
@@ -436,7 +436,7 @@ C
      &                      STAPIX,ENDPIX,OPER,VAL_FLOAT,DUMINT,
      &                      DYNAMIC_MEM(OQPTR),QUAL,
      &                      DYNAMIC_MEM(OEPTR),ERR,BADERR)
-          ELSE 
+          ELSE
             CALL COMB1_AC_WQ(DYNAMIC_MEM(OUTPTR),DIMS,NDIM,NELM,
      &                       STAPIX,ENDPIX,OPER,VAL_FLOAT,MAGIC_SHORT,
 C*   &                       DYNAMIC_MEM(OQPTR),QUAL,
@@ -447,8 +447,8 @@ C*   &                       DYNAMIC_MEM(OQPTR),QUAL,
             CALL COMB1_AC_R(DYNAMIC_MEM(OUTPTR),DIMS,NDIM,NELM,
      &                      STAPIX,ENDPIX,OPER,VAL_FLOAT,DUMREAL,
      &                      DYNAMIC_MEM(OQPTR),QUAL,
-     &                      DYNAMIC_MEM(OEPTR),ERR,BADERR)    
-          ELSE 
+     &                      DYNAMIC_MEM(OEPTR),ERR,BADERR)
+          ELSE
             CALL COMB1_AC_RQ(DYNAMIC_MEM(OUTPTR),DIMS,NDIM,NELM,
      &                       STAPIX,ENDPIX,OPER,VAL_FLOAT,MAGIC_FLOAT,
 C*   &                       DYNAMIC_MEM(OQPTR),QUAL,
@@ -456,19 +456,19 @@ C*   &                       DYNAMIC_MEM(OQPTR),QUAL,
           END IF
         END IF
       END IF
-C   
+C
 C   Update bad pixel flag
 C
       IF (.NOT.QUAL) THEN
         CALL NDP_SET_BAD_PIXEL('OUTPUT',.FALSE.,BADPIX,STATUS)
       END IF
 C
-C   Now we make sure that the user is happy with the error array 
+C   Now we make sure that the user is happy with the error array
 C
       IF (ERR.AND.BADERR) THEN
         CALL PAR_RDCHAR('ERR_ACT','REPLACE',ACTION)
         CALL ICH_FOLD(ACTION)
-        IF (ACTION(1:1).EQ.'R') THEN ! Replace duff values 
+        IF (ACTION(1:1).EQ.'R') THEN ! Replace duff values
           CALL PAR_RDVAL('ERR_VAL',MIN_FLOAT,MAX_FLOAT,0.0,
      &                                          ' ',DUMREAL)
           IF (TYPE.EQ.'SHORT') THEN
@@ -477,14 +477,14 @@ C
           ELSE
             CALL REPLACE_ERRORS_R1(DYNAMIC_MEM(OEPTR),NELM,DUMREAL)
           END IF ! TYPE
-        ELSE 
+        ELSE
           CALL DSA_WRUSER('\\n*** The error array may ')
           CALL DSA_WRUSER('now contain void values ***\\n')
         END IF ! ACTION
-      END IF ! ERR       
+      END IF ! ERR
 C
 C   Tidy up and exit
-C                  
+C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
 C
@@ -499,7 +499,7 @@ C
       IMPLICIT NONE
 C
 C     Parameters
-C                                                       
+C
       CHARACTER*(*) OPER
       INTEGER       DIMS(10),NDIM,NELM,STAPIX(6),ENDPIX(6)
       INTEGER*2     OARRAY(NELM),VALUE,MAGICVAL
@@ -507,256 +507,7 @@ C
       BYTE          QARRAY(NELM)
 C
 C     Local variables
-C                     
-      INTEGER   I            ! Loop counter
-      INTEGER   II           ! Loop counter  
-      INTEGER   INC(6)       ! 1-D increments for dimensions of OARRAY
-      INTEGER   IND1         ! OARRAY axis 1 index
-      INTEGER   IND2         ! OARRAY axis 2 index
-      INTEGER   IND3         ! OARRAY axis 3 index
-      INTEGER   IND4         ! OARRAY axis 4 index
-      INTEGER   IND5         ! OARRAY axis 5 index
-      INTEGER   IND6         ! OARRAY axis 6 index
-      INTEGER   OOFF         ! Total 1-D offset in OARRAY
-      INTEGER   OOFF1        ! 1-D offset for axis 1
-      INTEGER   OOFF2        ! 1-D offset for axis 2
-      INTEGER   OOFF3        ! 1-D offset for axis 3
-      INTEGER   OOFF4        ! 1-D offset for axis 4
-      INTEGER   OOFF5        ! 1-D offset for axis 5
-      INTEGER   OOFF6        ! 1-D offset for axis 6
 C
-C     Compute offset in OARRAY needed to increment each dimension
-C
-      DO I=1,NDIM
-        INC(I)=1
-        DO II=1,I-1
-          INC(I)=INC(I)*DIMS(II)
-        END DO
-      END DO   
-C
-C     Bitwise AND
-C
-      IF(OPER.EQ.'AND')THEN
-        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
-          OOFF6=(IND6-1)*INC(6)
-          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
-            OOFF5=(IND5-1)*INC(5)
-            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
-              OOFF4=(IND4-1)*INC(4)
-              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
-                OOFF3=(IND3-1)*INC(3)
-                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
-                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
-                    OOFF1=IND1-1
-                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
-                    IF (QUAL) THEN
-                      IF (QARRAY(OOFF).EQ.0)
-     &                  OARRAY(OOFF)=OARRAY(OOFF).AND.VALUE
-                    ELSE
-                      OARRAY(OOFF) = OARRAY(OOFF).AND.VALUE
-                    END IF
-                  END DO
-                END DO
-                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
-              END DO
-              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
-            END DO
-            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
-          END DO
-          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
-C
-C     Bitwise OR
-C
-      ELSE IF(OPER.EQ.'OR')THEN
-        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
-          OOFF6=(IND6-1)*INC(6)
-          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
-            OOFF5=(IND5-1)*INC(5)
-            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
-              OOFF4=(IND4-1)*INC(4)
-              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
-                OOFF3=(IND3-1)*INC(3)
-                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
-                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
-                    OOFF1=IND1-1
-                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
-                    IF (QUAL) THEN
-                      IF (QARRAY(OOFF).EQ.0)
-     &                  OARRAY(OOFF)=OARRAY(OOFF).OR.VALUE
-                    ELSE
-                      OARRAY(OOFF) = OARRAY(OOFF).OR.VALUE
-                    END IF
-                  END DO
-                END DO
-                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
-              END DO
-              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
-            END DO
-            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
-          END DO
-          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
-C
-C     Bitwise XOR
-C
-      ELSE IF(OPER.EQ.'XOR')THEN
-        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
-          OOFF6=(IND6-1)*INC(6)
-          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
-            OOFF5=(IND5-1)*INC(5)
-            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
-              OOFF4=(IND4-1)*INC(4)
-              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
-                OOFF3=(IND3-1)*INC(3)
-                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
-                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
-                    OOFF1=IND1-1
-                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
-                    IF (QUAL) THEN
-                      IF (QARRAY(OOFF).EQ.0)
-     &                  OARRAY(OOFF)=OARRAY(OOFF).XOR.VALUE
-                    ELSE
-                      OARRAY(OOFF) = OARRAY(OOFF).XOR.VALUE
-                    END IF
-                  END DO
-                END DO
-                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
-              END DO
-              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
-            END DO
-            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
-          END DO
-          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
-C
-C     Bitwise NAND
-C
-      ELSE IF(OPER.EQ.'NAND')THEN
-        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
-          OOFF6=(IND6-1)*INC(6)
-          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
-            OOFF5=(IND5-1)*INC(5)
-            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
-              OOFF4=(IND4-1)*INC(4)
-              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
-                OOFF3=(IND3-1)*INC(3)
-                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
-                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
-                    OOFF1=IND1-1
-                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
-                    IF (QUAL) THEN
-                      IF (QARRAY(OOFF).EQ.0) 
-     &                    OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.VALUE
-                    ELSE
-                      OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.VALUE
-                    END IF
-                  END DO
-                END DO
-                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
-              END DO
-              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
-            END DO
-            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
-          END DO
-          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
-C
-C     Bitwise NOR
-C
-      ELSE IF(OPER.EQ.'NOR')THEN
-        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
-          OOFF6=(IND6-1)*INC(6)
-          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
-            OOFF5=(IND5-1)*INC(5)
-            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
-              OOFF4=(IND4-1)*INC(4)
-              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
-                OOFF3=(IND3-1)*INC(3)
-                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
-                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
-                    OOFF1=IND1-1
-                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
-                    IF (QUAL) THEN
-                      IF (QARRAY(OOFF).EQ.0)
-     &                  OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).OR.VALUE
-                      ELSE
-                        OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).OR.VALUE
-                    END IF
-                  END DO
-                END DO
-                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
-              END DO
-              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
-            END DO
-            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
-          END DO
-          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
-C
-C     Bitwise NXOR
-C
-      ELSE IF(OPER.EQ.'NXOR')THEN
-        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
-          OOFF6=(IND6-1)*INC(6)
-          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
-            OOFF5=(IND5-1)*INC(5)
-            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
-              OOFF4=(IND4-1)*INC(4)
-              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
-                OOFF3=(IND3-1)*INC(3)
-                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
-                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
-                    OOFF1=IND1-1
-                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
-                    IF (QUAL) THEN
-                      IF (QARRAY(OOFF).EQ.0)
-     &                  OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.VALUE
-                    ELSE
-                      OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.VALUE
-                    END IF
-                  END DO
-                END DO
-                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
-              END DO
-              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
-            END DO
-            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
-          END DO
-          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
-      END IF
-C         
-      END
-
-
-
-
-
-      SUBROUTINE COMB1_B_WQ
-     &  (OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,OPER,VALUE,MAGICVAL
-C*   &   ,QARRAY,QUAL
-     &  )
-C
-      IMPLICIT NONE
-C
-C     Parameters
-C                                                       
-      CHARACTER*(*) OPER
-      INTEGER       DIMS(10),NDIM,NELM,STAPIX(6),ENDPIX(6)
-      INTEGER*2     OARRAY(NELM),VALUE,MAGICVAL
-C*    LOGICAL       QUAL
-C*    BYTE          QARRAY(NELM)
-
-C
-C     Local variables
-C                     
       INTEGER   I            ! Loop counter
       INTEGER   II           ! Loop counter
       INTEGER   INC(6)       ! 1-D increments for dimensions of OARRAY
@@ -781,7 +532,7 @@ C
         DO II=1,I-1
           INC(I)=INC(I)*DIMS(II)
         END DO
-      END DO   
+      END DO
 C
 C     Bitwise AND
 C
@@ -795,7 +546,256 @@ C
               DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
                 OOFF3=(IND3-1)*INC(3)
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
+                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    IF (QUAL) THEN
+                      IF (QARRAY(OOFF).EQ.0)
+     &                  OARRAY(OOFF)=OARRAY(OOFF).AND.VALUE
+                    ELSE
+                      OARRAY(OOFF) = OARRAY(OOFF).AND.VALUE
+                    END IF
+                  END DO
+                END DO
+                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+              END DO
+              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+            END DO
+            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+          END DO
+          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+        END DO
+C
+C     Bitwise OR
+C
+      ELSE IF(OPER.EQ.'OR')THEN
+        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+          OOFF6=(IND6-1)*INC(6)
+          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+            OOFF5=(IND5-1)*INC(5)
+            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+              OOFF4=(IND4-1)*INC(4)
+              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+                OOFF3=(IND3-1)*INC(3)
+                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                  OOFF2=(IND2-1)*INC(2)
+                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    IF (QUAL) THEN
+                      IF (QARRAY(OOFF).EQ.0)
+     &                  OARRAY(OOFF)=OARRAY(OOFF).OR.VALUE
+                    ELSE
+                      OARRAY(OOFF) = OARRAY(OOFF).OR.VALUE
+                    END IF
+                  END DO
+                END DO
+                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+              END DO
+              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+            END DO
+            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+          END DO
+          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+        END DO
+C
+C     Bitwise XOR
+C
+      ELSE IF(OPER.EQ.'XOR')THEN
+        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+          OOFF6=(IND6-1)*INC(6)
+          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+            OOFF5=(IND5-1)*INC(5)
+            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+              OOFF4=(IND4-1)*INC(4)
+              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+                OOFF3=(IND3-1)*INC(3)
+                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                  OOFF2=(IND2-1)*INC(2)
+                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    IF (QUAL) THEN
+                      IF (QARRAY(OOFF).EQ.0)
+     &                  OARRAY(OOFF)=OARRAY(OOFF).XOR.VALUE
+                    ELSE
+                      OARRAY(OOFF) = OARRAY(OOFF).XOR.VALUE
+                    END IF
+                  END DO
+                END DO
+                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+              END DO
+              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+            END DO
+            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+          END DO
+          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+        END DO
+C
+C     Bitwise NAND
+C
+      ELSE IF(OPER.EQ.'NAND')THEN
+        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+          OOFF6=(IND6-1)*INC(6)
+          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+            OOFF5=(IND5-1)*INC(5)
+            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+              OOFF4=(IND4-1)*INC(4)
+              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+                OOFF3=(IND3-1)*INC(3)
+                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                  OOFF2=(IND2-1)*INC(2)
+                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    IF (QUAL) THEN
+                      IF (QARRAY(OOFF).EQ.0)
+     &                    OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.VALUE
+                    ELSE
+                      OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.VALUE
+                    END IF
+                  END DO
+                END DO
+                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+              END DO
+              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+            END DO
+            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+          END DO
+          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+        END DO
+C
+C     Bitwise NOR
+C
+      ELSE IF(OPER.EQ.'NOR')THEN
+        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+          OOFF6=(IND6-1)*INC(6)
+          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+            OOFF5=(IND5-1)*INC(5)
+            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+              OOFF4=(IND4-1)*INC(4)
+              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+                OOFF3=(IND3-1)*INC(3)
+                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                  OOFF2=(IND2-1)*INC(2)
+                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    IF (QUAL) THEN
+                      IF (QARRAY(OOFF).EQ.0)
+     &                  OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).OR.VALUE
+                      ELSE
+                        OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).OR.VALUE
+                    END IF
+                  END DO
+                END DO
+                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+              END DO
+              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+            END DO
+            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+          END DO
+          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+        END DO
+C
+C     Bitwise NXOR
+C
+      ELSE IF(OPER.EQ.'NXOR')THEN
+        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+          OOFF6=(IND6-1)*INC(6)
+          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+            OOFF5=(IND5-1)*INC(5)
+            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+              OOFF4=(IND4-1)*INC(4)
+              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+                OOFF3=(IND3-1)*INC(3)
+                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                  OOFF2=(IND2-1)*INC(2)
+                  DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    IF (QUAL) THEN
+                      IF (QARRAY(OOFF).EQ.0)
+     &                  OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.VALUE
+                    ELSE
+                      OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.VALUE
+                    END IF
+                  END DO
+                END DO
+                IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+              END DO
+              IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+            END DO
+            IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+          END DO
+          IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+        END DO
+      END IF
+C
+      END
+
+
+
+
+
+      SUBROUTINE COMB1_B_WQ
+     &  (OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,OPER,VALUE,MAGICVAL
+C*   &   ,QARRAY,QUAL
+     &  )
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      CHARACTER*(*) OPER
+      INTEGER       DIMS(10),NDIM,NELM,STAPIX(6),ENDPIX(6)
+      INTEGER*2     OARRAY(NELM),VALUE,MAGICVAL
+C*    LOGICAL       QUAL
+C*    BYTE          QARRAY(NELM)
+
+C
+C     Local variables
+C
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for dimensions of OARRAY
+      INTEGER   IND1         ! OARRAY axis 1 index
+      INTEGER   IND2         ! OARRAY axis 2 index
+      INTEGER   IND3         ! OARRAY axis 3 index
+      INTEGER   IND4         ! OARRAY axis 4 index
+      INTEGER   IND5         ! OARRAY axis 5 index
+      INTEGER   IND6         ! OARRAY axis 6 index
+      INTEGER   OOFF         ! Total 1-D offset in OARRAY
+      INTEGER   OOFF1        ! 1-D offset for axis 1
+      INTEGER   OOFF2        ! 1-D offset for axis 2
+      INTEGER   OOFF3        ! 1-D offset for axis 3
+      INTEGER   OOFF4        ! 1-D offset for axis 4
+      INTEGER   OOFF5        ! 1-D offset for axis 5
+      INTEGER   OOFF6        ! 1-D offset for axis 6
+C
+C     Compute offset in OARRAY needed to increment each dimension
+C
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Bitwise AND
+C
+      IF(OPER.EQ.'AND')THEN
+        DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+          OOFF6=(IND6-1)*INC(6)
+          DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+            OOFF5=(IND5-1)*INC(5)
+            DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+              OOFF4=(IND4-1)*INC(4)
+              DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+                OOFF3=(IND3-1)*INC(3)
+                DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                  OOFF2=(IND2-1)*INC(2)
                   DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
                     OOFF1=IND1-1
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
@@ -804,7 +804,7 @@ C*                    IF (QUAL) THEN
 C*                      IF (QARRAY(OOFF).EQ.0) THEN
 C*
                           OARRAY(OOFF)=OARRAY(OOFF).AND.VALUE
-C*                      
+C*
 C*                      END IF
 C*                    ELSE
 C*                      OARRAY(OOFF) = OARRAY(OOFF).AND.VALUE
@@ -820,7 +820,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise OR
 C
@@ -834,7 +834,7 @@ C
               DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
                 OOFF3=(IND3-1)*INC(3)
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
                     OOFF1=IND1-1
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
@@ -843,7 +843,7 @@ C*                    IF (QUAL) THEN
 C*                      IF (QARRAY(OOFF).EQ.0) THEN
 C*
                           OARRAY(OOFF)=OARRAY(OOFF).OR.VALUE
-C*                      
+C*
 C*                      END IF
 C*                    ELSE
 C*                      OARRAY(OOFF) = OARRAY(OOFF).OR.VALUE
@@ -858,7 +858,7 @@ C*                    END IF
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise XOR
 C
@@ -872,7 +872,7 @@ C
               DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
                 OOFF3=(IND3-1)*INC(3)
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
                     OOFF1=IND1-1
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
@@ -881,7 +881,7 @@ C*                    IF (QUAL) THEN
 C*                      IF (QARRAY(OOFF).EQ.0) THEN
 C*
                           OARRAY(OOFF)=OARRAY(OOFF).XOR.VALUE
-C*                      
+C*
 C*                      END IF
 C*                    ELSE
 C*                      OARRAY(OOFF) = OARRAY(OOFF).XOR.VALUE
@@ -896,7 +896,7 @@ C*                    END IF
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NAND
 C
@@ -910,7 +910,7 @@ C
               DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
                 OOFF3=(IND3-1)*INC(3)
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
                     OOFF1=IND1-1
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
@@ -919,7 +919,7 @@ C*                    IF (QUAL) THEN
 C*                      IF (QARRAY(OOFF).EQ.0) THEN
 C*
                           OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.VALUE
-C*                      
+C*
 C*                      END IF
 C*                    ELSE
 C*                      OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).AND.VALUE
@@ -934,7 +934,7 @@ C*                    END IF
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NOR
 C
@@ -948,7 +948,7 @@ C
               DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
                 OOFF3=(IND3-1)*INC(3)
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
                     OOFF1=IND1-1
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
@@ -957,7 +957,7 @@ C*                    IF (QUAL) THEN
 C*                      IF (QARRAY(OOFF).EQ.0) THEN
 C*
                           OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).OR.VALUE
-C*                      
+C*
 C*                      END IF
 C*                    ELSE
 C*                      OARRAY(OOFF) = (.NOT.OARRAY(OOFF)).OR.VALUE
@@ -972,7 +972,7 @@ C*                    END IF
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
 C
 C     Bitwise NXOR
 C
@@ -986,7 +986,7 @@ C
               DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
                 OOFF3=(IND3-1)*INC(3)
                 DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
-                  OOFF2=(IND2-1)*INC(2)   
+                  OOFF2=(IND2-1)*INC(2)
                   DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
                     OOFF1=IND1-1
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
@@ -995,7 +995,7 @@ C*                    IF (QUAL) THEN
 C*                      IF (QARRAY(OOFF).EQ.0) THEN
 C*
                           OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.VALUE
-C*                      
+C*
 C*                      END IF
 C*                    ELSE
 C*                      OARRAY(OOFF)=(.NOT.OARRAY(OOFF)).XOR.VALUE
@@ -1011,7 +1011,7 @@ C
             IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
           END DO
           IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
-        END DO   
+        END DO
       END IF
-C         
+C
       END

@@ -16,7 +16,7 @@
 *INPUT:
 
       CHARACTER*(*) FILE	! Library file.
-     & ,            FIRST       ! First required help command.               
+     & ,            FIRST       ! First required help command.
 
       INCLUDE 'com_form_files.inc'
 

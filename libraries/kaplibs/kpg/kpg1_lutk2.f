@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_LUTK2( FORM, CAXIS, LBND1, UBND1, LBND2, UBND2, 
+      SUBROUTINE KPG1_LUTK2( FORM, CAXIS, LBND1, UBND1, LBND2, UBND2,
      :                       HSTDAT, MAXPOP, LOG, COLS, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_LUTK2( FORM, CAXIS, LBND1, UBND1, LBND2, UBND2, 
+*     CALL KPG1_LUTK2( FORM, CAXIS, LBND1, UBND1, LBND2, UBND2,
 *                      HSTDAT, MAXPOP, LOG, COLS, STATUS )
 
 *  Description:
@@ -33,7 +33,7 @@
 *     UBND2 = INTEGER (Given)
 *        The upper bound on axis 2.
 *     HSTDAT( * ) = INTEGER (Given)
-*        A histogram of colour index counts. The length of this vector 
+*        A histogram of colour index counts. The length of this vector
 *        should be equal to the length of axis CAXIS.
 *     MAXPOP = INTEGER (Given)
 *        The maximum population in any cell of the histogram.
@@ -46,18 +46,18 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,9 +120,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  For histogram keys...
-      IF( FORM .EQ. HIST ) THEN 
+      IF( FORM .EQ. HIST ) THEN
 
-*  Save the upper limit on the count or log(count) axis. 
+*  Save the upper limit on the count or log(count) axis.
          IF( LOG .AND. MAXPOP .GT. 0 ) THEN
             MXPOP = LOG10( REAL( MAXPOP ) )
          ELSE
@@ -143,7 +143,7 @@
                IF( LOG ) THEN
                   IF( POP .GT. 1 ) THEN
                      POP = LOG10( POP )
-                  ELSE 
+                  ELSE
                      POP = 0.0
                   END IF
                END IF
@@ -185,7 +185,7 @@
                IF( LOG ) THEN
                   IF( POP .GT. 1 ) THEN
                      POP = LOG10( POP )
-                  ELSE 
+                  ELSE
                      POP = 0.0
                   END IF
                END IF

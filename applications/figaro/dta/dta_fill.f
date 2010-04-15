@@ -35,9 +35,9 @@ C  Date: 17th Jan 1992
 C
 C  Note:
 C     The original DTA package on the VAX used a VAX MACRO routine called
-C     DTA_FILL that did a fast fill of an array of bytes. This more portable 
-C     version can be used on any machine where the compiler supports the BYTE 
-C     data type, but is not going to be the byte filler available.  
+C     DTA_FILL that did a fast fill of an array of bytes. This more portable
+C     version can be used on any machine where the compiler supports the BYTE
+C     data type, but is not going to be the byte filler available.
 C+
       SUBROUTINE DTA_FILL(BYTES,VALUE,ARRAY)
 C

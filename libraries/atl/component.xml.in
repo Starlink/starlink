@@ -6,7 +6,7 @@
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/atl</path>
   <description>ATL - A Library of AST Utility Routines</description>
-  <abstract><p>ATL provides routines that perform high-level AST-related 
+  <abstract><p>ATL provides routines that perform high-level AST-related
             functions.</p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@

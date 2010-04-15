@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -146,9 +146,9 @@
 *        locator in PAR tables was the correct thing to copy to GLOBAL.)
 *     20-MAR-2008 (DSB):
 *        When copying a parameter value from the application parameter
-*        file to the global parameter file, check that he application 
+*        file to the global parameter file, check that he application
 *        parameter exists before accesing it. If a parameter (such as an
-*        output NDF) is specified on the command line, it becomes active. 
+*        output NDF) is specified on the command line, it becomes active.
 *        But if the application never accesses the parameter (because it
 *        decided not to create the output NDF), no value for it will
 *        exist in the application parameter file. The old system was to
@@ -233,7 +233,7 @@
 
 *     For each action parameter
          DO J = PROGADD(1,K), PROGADD(2,K)
-            IF ( ( STATUS .EQ. SAI__OK ) 
+            IF ( ( STATUS .EQ. SAI__OK )
      :         .AND. ( TTYPE .NE. 'R' ) ) THEN
 
 *         Copy global associations if STATUS OK and not running as 'Realtime'
@@ -250,7 +250,7 @@
                      CALL SUBPAR_ADMUS ( ADMUSR, AULEN, STATUS )
 
 *                  Now translate the filename ( may be redundant now )
-                     CALL SUBPAR_FNAME 
+                     CALL SUBPAR_FNAME
      :                        ( ADMUSR(1:AULEN)//'GLOBAL',FILENAME,
      :                       NAMLEN, STATUS )
 
@@ -261,8 +261,8 @@
 *                  If the file was not found, create it.
                      IF ( STATUS .EQ. DAT__FILNF ) THEN
                         CALL EMS_ANNUL ( STATUS )
-                        CALL HDS_NEW 
-     :                          ( FILENAME(1:NAMLEN), 'GLOBAL', 
+                        CALL HDS_NEW
+     :                          ( FILENAME(1:NAMLEN), 'GLOBAL',
      :                          'STRUC', 0, 0, GLOBLOC, STATUS )
                      ENDIF
 
@@ -273,7 +273,7 @@
 
 *               Get the global association and split it into its components
                   GLOBNAME = CHARLIST(PARASSOC(1,J))
-                  CALL SUBPAR_SPLIT ( GLOBNAME, 16, NUMLEVS, 
+                  CALL SUBPAR_SPLIT ( GLOBNAME, 16, NUMLEVS,
      :                    COMPONENT, FILENAME, STATUS )
 
                   IF ( ( COMPONENT(1) .EQ. 'GLOBAL' ) .AND.
@@ -284,7 +284,7 @@
      :                       THERE, STATUS )
 
                      IF ( THERE ) THEN
-                        CALL DAT_ERASE ( GLOBLOC, COMPONENT(2), 
+                        CALL DAT_ERASE ( GLOBLOC, COMPONENT(2),
      :                          STATUS )
                      ENDIF
 
@@ -296,7 +296,7 @@
 *                     parameter file.
                         IF ( .NOT. ACTGOT ) THEN
                            IF (MONOLITH ) THEN
-                              CALL DAT_FIND ( 
+                              CALL DAT_FIND (
      :                          EXTTOP, ACTNAMES(K), ACTLOC, STATUS )
                            ELSE
                               CALL DAT_CLONE( EXTTOP, ACTLOC,
@@ -318,7 +318,7 @@
                         IF( THERE ) THEN
                            CALL DAT_FIND ( ACTLOC, PARNAMES(J), LOC,
      :                       STATUS )
-                           CALL DAT_COPY ( 
+                           CALL DAT_COPY (
      :                       LOC, GLOBLOC, COMPONENT(2), STATUS )
                            CALL DAT_ANNUL ( LOC, STATUS )
                         ENDIF
@@ -330,7 +330,7 @@
                            IF ( VALID ) THEN
 
 *                        copy component to GLOBAL
-                              CALL DAT_COPY ( 
+                              CALL DAT_COPY (
      :                          LOC, GLOBLOC, COMPONENT(2), STATUS )
 
                            ELSE
@@ -341,7 +341,7 @@
      :                                'Invalid locator for parameter '//
      :                                '^PARAM', STATUS )
                            ENDIF
- 
+
                         ELSE
                            CALL EMS_SETC( 'PARAM', PARNAMES(J) )
                            CALL EMS_REP( 'SUP_DEACT2', 'SUBPAR: '//
@@ -355,7 +355,7 @@
 *                     relevant for d-tasks.
                         CALL DAT_NEW ( GLOBLOC, COMPONENT(2),
      :                    STRINGTYPE(PARTYPE(J)), 0, 0, STATUS )
-                        CALL DAT_FIND ( GLOBLOC, COMPONENT(2), 
+                        CALL DAT_FIND ( GLOBLOC, COMPONENT(2),
      :                    BOTLOC, STATUS )
                         IF ( PARTYPE(J) .EQ. SUBPAR__REAL ) THEN
                            CALL DAT_PUTR ( BOTLOC, 0, 0, PARREAL(J),
@@ -366,7 +366,7 @@
      :                       STATUS )
                         ELSE IF ( PARTYPE(J) .EQ. SUBPAR__DOUBLE )
      :                  THEN
-                           CALL DAT_PUTD ( BOTLOC, 0, 0, 
+                           CALL DAT_PUTD ( BOTLOC, 0, 0,
      :                       PARDOUBLE(J), STATUS )
                         ELSE IF ( PARTYPE(J) .EQ. SUBPAR__CHAR )
      :                  THEN
@@ -428,7 +428,7 @@
                CALL SUBPAR_GETFLOC ( J, VALID, FILOC, ISTAT )
                IF ( VALID ) THEN
                   CALL HDS_FREE ( FILOC, ISTAT )
-               ENDIF         
+               ENDIF
             ENDIF
 
 *         and re-initialise the dynamic defaults and min and max pointers
@@ -463,7 +463,7 @@
          ISTAT = SAI__OK
          CALL HDS_FLUSH( 'PROGRAM', ISTAT )
       ENDIF
-      
+
 *   Force the parameter SDF file to be updated on disk
       ISTAT = SAI__OK
       CALL HDS_FREE ( EXTTOP, ISTAT )

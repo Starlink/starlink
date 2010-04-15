@@ -4,7 +4,7 @@
 *     GTENV
 
 *  Purpose:
-*     Get a variable value either from a supplied list of values or from 
+*     Get a variable value either from a supplied list of values or from
 *     the environment.
 
 *  Language:
@@ -15,7 +15,7 @@
 
 *  Description:
 *     An attempt is made to translate the supplied NAME as an environemtn
-*     variable. If this fails, the supplied list of variable names and 
+*     variable. If this fails, the supplied list of variable names and
 *     values is searched for a "name=value" pair refering to the supplied
 *     NAME. IF one is found, the associated value is returned, otherwise
 *     an error is reported.
@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
       CALL PSX_GETENV( NAME, TRANS, STATUS )
 
 *  If it was not defined, annul the error message, and search the
-*  supplied list. 
+*  supplied list.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
 
@@ -103,14 +103,14 @@
             COMMA = 0
 
 *  Loop until the list has been exhausted or the supplied variable has
-*  been found. 
+*  been found.
             DO WHILE( .NOT. FOUND .AND. COMMA .LT. ENVLEN )
 
 *  Store the index of the first character after the previously found comma.
                NAMSTA = COMMA + 1
 
 *  Find the index of the next comma in the list (or use the end of the list
-*  if there are no more comma). 
+*  if there are no more comma).
                TEMP = INDEX( ENV( COMMA + 1 : ), ',' )
                IF( TEMP .EQ. 0 ) THEN
                   COMMA = ENVLEN + 1
@@ -144,20 +144,20 @@
                      IF( CHR_EQUAL( ENV( F : L ), NAME ) ) THEN
 
 *  If it matches, set the flag indicating that we have found the variable.
-                        FOUND = .TRUE.                  
+                        FOUND = .TRUE.
 
 *  Extract the value.
                         IF( VALSTA .LE. VALEND ) THEN
-                           CALL CHR_COPY( ENV( VALSTA : VALEND ), 
+                           CALL CHR_COPY( ENV( VALSTA : VALEND ),
      :                                    .FALSE., TRANS, LSTAT )
                         ELSE
                            TRANS = ' '
                         END IF
-   
+
                      END IF
 
                   END IF
-   
+
                END IF
 
             END DO
@@ -174,4 +174,4 @@
 
       END IF
 
-      END 
+      END

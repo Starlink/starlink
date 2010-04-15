@@ -24,13 +24,13 @@
 *        first element indicates an infinite sized box, and a value of
 *        VAL__MINI indicates a zero sized box.
 *     UBND1( NDIM ) = INTEGER (Given)
-*        The upper bounds of the first box. 
+*        The upper bounds of the first box.
 *     LBND2( NDIM ) = INTEGER (Given)
 *        The lower bounds of the second box. A value of VAL__MAXI for
 *        the first element indicates an infinite sized box, and a value
-*        of VAL__MINI indicates a zero sized box. 
+*        of VAL__MINI indicates a zero sized box.
 *     UBND2( NDIM ) = INTEGER (Given)
-*        The upper bounds of the first box. 
+*        The upper bounds of the first box.
 *     LB( NDIM ) = INTEGER (Returned)
 *        The lower bounds of the union of the two supplied boxes.
 *     UB( NDIM ) = INTEGER (Returned)
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,9 +121,9 @@
             LB( I ) = LBND2( I )
             UB( I ) = UBND2( I )
          END DO
-         
+
 *  If neither box is of zero or infinite extent...
-      ELSE 
+      ELSE
 
 *  Loop round each dimension.
          DO I = 1, NDIM
@@ -135,5 +135,5 @@
          END DO
 
       END IF
-      
+
       END

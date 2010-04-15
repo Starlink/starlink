@@ -173,12 +173,12 @@ static int gaiaSlaDateObs2Je( ClientData clientData, Tcl_Interp *interp,
         Tcl_WrongNumArgs( interp, 1, objv, "FITS-keyword FITS-card" );
         return TCL_ERROR;
     }
-    result = hgetdate( Tcl_GetString( objv[2] ), Tcl_GetString( objv[1] ), 
+    result = hgetdate( Tcl_GetString( objv[2] ), Tcl_GetString( objv[1] ),
                        &value );
     if ( result == 0 ) {
         resultObj = Tcl_GetObjResult( interp );
         Tcl_SetStringObj( resultObj, Tcl_GetString( objv[2] ), -1 );
-        Tcl_AppendStringsToObj( resultObj, " : not a valid date", 
+        Tcl_AppendStringsToObj( resultObj, " : not a valid date",
                                 (char *) NULL );
         return TCL_ERROR;
     }
@@ -188,7 +188,7 @@ static int gaiaSlaDateObs2Je( ClientData clientData, Tcl_Interp *interp,
 
 
 /**
- * Convert a Julian epoch into a DATE-OBS FITS string. 
+ * Convert a Julian epoch into a DATE-OBS FITS string.
  * One argument is needed, the Julian epoch.
  *
  * The result is the DATE-OBS value.
@@ -223,14 +223,14 @@ static int gaiaSlaDateJe2Obs( ClientData clientData, Tcl_Interp *interp,
 
     sprintf( date, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
              iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
-             ihmsf[2], ihmsf[3] ); 
+             ihmsf[2], ihmsf[3] );
 
     Tcl_SetResult( interp, date, TCL_VOLATILE );
     return TCL_OK;
 }
 
 /**
- * Convert a modified Julian date into a DATE-OBS FITS string. 
+ * Convert a modified Julian date into a DATE-OBS FITS string.
  * One argument is needed, the MJD.
  *
  * The result is the DATE-OBS value.
@@ -261,7 +261,7 @@ static int gaiaSlaDateMjd2Obs( ClientData clientData, Tcl_Interp *interp,
     slaDd2tf( 3, fd, sign, ihmsf );
     sprintf( date, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
              iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
-             ihmsf[2], ihmsf[3] ); 
+             ihmsf[2], ihmsf[3] );
 
     Tcl_SetResult( interp, date, TCL_VOLATILE );
     return TCL_OK;

@@ -29,7 +29,7 @@
 *        The element of DYNAMIC_MEM that corresponds to a specific
 *        element of a dynamically allocated memory array.
 *     TYPE = CHARACTER * ( * ) (Given)
-*        The type of the dynamically allocated memory array.  This 
+*        The type of the dynamically allocated memory array.  This
 *        should be one of 'FLOAT ', 'INT', 'DOUBLE', 'SHORT', 'CHAR',
 *        'BYTE', or'USHORT'. Case is not significant.  If TYPE is none
 *        of these, the result will quietly be set equal to OLD.
@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

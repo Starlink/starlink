@@ -154,7 +154,7 @@
 *        the estimated variances.  If USESET is true and multiple Sets
 *        are represented in the IN list, then this name will be used
 *        as the name of an HDS container file containing one NDF for
-*        each Set Index value.  
+*        each Set Index value.
 *        This name may be specified using indirection through a file.
 *     PRESERVE = _LOGICAL (Read)
 *        If TRUE then this indicates that the input data type is to be
@@ -223,7 +223,7 @@
 *        input files are combined together to form the master bias,
 *        so USESET can usually be safely set to TRUE.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 *     ZERO = _LOGICAL (Read)
@@ -659,12 +659,12 @@
 
 *  Create the output NDF to contain the result. Propagating axis,
 *  label, history, units from the first NDF. Do NOT propagate
-*  the CCDPACK extension (most of the information in this only 
+*  the CCDPACK extension (most of the information in this only
 *  applies to the input NDF) or the QUALITY component.
          CALL NDF_SCOPY( STACK( 1 ), 'Axis,Units,WCS,Noext(CCDPACK)',
      :                   OPLACE( ISUB ), NDFOUT, STATUS )
 
-*  If we can sensibly do so, create a Set header in the output.  
+*  If we can sensibly do so, create a Set header in the output.
 *  if all the input NDFs in this subgroup have the same (non-zero)
 *  Set Index, then use that as the Set Index of the output NDF.
 *  In that case, use the name of the output NDF itself as the Set
@@ -807,7 +807,7 @@
             CALL CCD1_MKBC( ITYPE, GENVAR, IPWORK, EL, NNDF, VARS,
      :                      IMETH, MINPIX, NITER, NSIGMA, ALPHA,
      :                      RMIN, RMAX, IPOINT, IPVAR, WRK1, WRK2,
-     :                      WRK3, %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :                      WRK3, %VAL( CNF_PVAL( IPWRK4 ) ),
      :                      NWRK4, NCON, POINT,
      :                      USED, STATUS )
 

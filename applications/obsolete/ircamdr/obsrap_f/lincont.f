@@ -2,7 +2,7 @@
 
 	SUBROUTINE LINCONT( STATUS)
 
-* Description : This routine linearizes the images in an IRCAM container file 
+* Description : This routine linearizes the images in an IRCAM container file
 *               by subtracting a bias image then applying a 5th order poly-
 *               nomial correction to the data.
 *
@@ -58,7 +58,7 @@
 
 * Local variables :
 
-	INTEGER DIMS( 2)		! dimensions array 
+	INTEGER DIMS( 2)		! dimensions array
 	INTEGER DIMS_BIAS( 2)		! dimensions array for bias image
 	INTEGER DIMS_IMAGE( 2)		! dimensions array for data image
 	INTEGER INCODE			! code for input container file
@@ -123,7 +123,7 @@
 
 	CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :'This routine LINEARIZES IRCAM observation files, by subtracting',
      :	              STATUS)
 
@@ -203,8 +203,8 @@
 
 	  CALL MSG_SETI( 'NUM', J)
 	  CALL MSG_SETR( 'C', COEFFICIENT( J))
-	  CALL MSG_OUT( 'MESSAGE', 
-     :                  'Linearization coefficient ^NUM = ^C', 
+	  CALL MSG_OUT( 'MESSAGE',
+     :                  'Linearization coefficient ^NUM = ^C',
      :	                STATUS)
 
 	END DO
@@ -234,7 +234,7 @@
 
 	CALL SUBPAR_PUTNAME ( INCODE, INNAME( 1:LEN1), STATUS)
 
-*      associate container file 
+*      associate container file
 
 	CALL DAT_ASSOC( 'CONTAINER', 'READ', LOCTOP_O, STATUS )
 
@@ -262,7 +262,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
+	  CALL ERR_REP( 'ERROR',
      :                  'Error, after find LOCGEN_O ...', STATUS)
 
 	  RETURN
@@ -273,7 +273,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
+	  CALL ERR_REP( 'ERROR',
      :                   'Error, after find LOCINST_O ...', STATUS)
 
 	  RETURN
@@ -284,7 +284,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
+	  CALL ERR_REP( 'ERROR',
      :                  'Error, after find LOCID_O ...', STATUS)
 
 	  RETURN
@@ -295,7 +295,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 'Error, after find LOCTELE_O ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after find LOCTELE_O ...',
      :                  STATUS)
 
 	  RETURN
@@ -306,7 +306,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 'Error, after find LOCOBS_O ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after find LOCOBS_O ...',
      :                  STATUS)
 
 	  RETURN
@@ -323,7 +323,7 @@
 
 	CALL MSG_SETI( 'OBSELE', NUMBER_ELEMENTS)
 
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :                'Observation structure has ^OBSELE elements',
      :	              STATUS)
 
@@ -335,7 +335,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
+	  CALL ERR_REP( 'ERROR',
      :             'Error, after DAT_CREAT new container ...', STATUS)
 
 	  RETURN
@@ -352,7 +352,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
+	  CALL ERR_REP( 'ERROR',
      :           'Error, after DAT_ASSOC new container ...', STATUS)
 
 	  RETURN
@@ -364,15 +364,15 @@
 	DIMS( 1) = 0
 	DIMS( 2) = 0
 
-	CALL DAT_NEW( LOCTOP_N, 'GENERAL', 'STRUCTURE', 0, DIMS, 
+	CALL DAT_NEW( LOCTOP_N, 'GENERAL', 'STRUCTURE', 0, DIMS,
      :                STATUS)
 
 	CALL DAT_FIND( LOCTOP_N, 'GENERAL', LOCGEN_N, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
-     :            'Error, after DAT_NEW/DAT_FIND LOCGEN_N ...', 
+	  CALL ERR_REP( 'ERROR',
+     :            'Error, after DAT_NEW/DAT_FIND LOCGEN_N ...',
      :             STATUS)
 
 	  RETURN
@@ -381,7 +381,7 @@
 
 *      tell user whats happening man ...
 
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :	  'Copying input images to output data file ... please wait',
      :	  STATUS)
 
@@ -399,7 +399,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 'Error, after DAT_RCOPYs ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after DAT_RCOPYs ...',
      :                   STATUS)
 
 	  RETURN
@@ -423,7 +423,7 @@
 
 *      tell user whats happening man ... AGAIN
 
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      : 'Finished copying images to output file ... now linearizing',
      :	  STATUS)
 
@@ -440,7 +440,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
+	  CALL ERR_REP( 'ERROR',
      :                  'Error, after DAT_FIND LOCOBS_N ...', STATUS)
 
 	  RETURN
@@ -453,8 +453,8 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 
-     :                   'Error, after REDCONT_CHECKDATA ...', 
+	  CALL ERR_REP( 'ERROR',
+     :                   'Error, after REDCONT_CHECKDATA ...',
      :                    STATUS)
 
 	  RETURN
@@ -472,29 +472,29 @@
 
 	  CALL DAT_CELL( LOCOBS_N, 1, SUBS, LOCCELL_BIAS, STATUS)
 
-	  CALL DAT_FIND( LOCCELL_BIAS, 'NUMBER_COADDS', LOCPRIM_BIAS, 
+	  CALL DAT_FIND( LOCCELL_BIAS, 'NUMBER_COADDS', LOCPRIM_BIAS,
      :                   STATUS)
 
-	  CALL DAT_GETI( LOCPRIM_BIAS, 0, DIMS, NUMBER_COADDS_BIAS, 
+	  CALL DAT_GETI( LOCPRIM_BIAS, 0, DIMS, NUMBER_COADDS_BIAS,
      :                   STATUS)
 
 	  CALL DAT_ANNUL( LOCPRIM_BIAS, STATUS)
 
 	  CALL DAT_FIND( LOCCELL_BIAS, 'PHASEA', LOCTMP_BIAS, STATUS)
 
-	  CALL DAT_FIND( LOCTMP_BIAS, 'DATA_ARRAY', LOCPRIM_BIAS, 
+	  CALL DAT_FIND( LOCTMP_BIAS, 'DATA_ARRAY', LOCPRIM_BIAS,
      :                   STATUS)
 
 	  CALL DAT_SHAPE( LOCPRIM_BIAS, 2, DIMS_BIAS, NDIMS, STATUS)
 
-	  CALL DAT_MAPR( LOCPRIM_BIAS, 'UPDATE', NDIMS, DIMS_BIAS, 
+	  CALL DAT_MAPR( LOCPRIM_BIAS, 'UPDATE', NDIMS, DIMS_BIAS,
      :	                 PNTR_BIAS, STATUS)
 
 *        tell user how many coadds in specified bias image
 
 	  CALL MSG_SETI( 'BI', BIAS_IMAGE)
 	  CALL MSG_SETI( 'NCB', NUMBER_COADDS_BIAS)
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :	  'Number of coadds in BIAS IMAGE OBS(^BI) = ^NCB', STATUS)
 
 	  CALL MSG_OUT( 'BLANK', ' ', STATUS)
@@ -518,8 +518,8 @@
 
 	  IF( STATUS .NE. SAI__OK) THEN
 
-	    CALL ERR_REP( 'ERROR', 
-     :                    'Error, after DAT_CELL LOCCELL_N ...', 
+	    CALL ERR_REP( 'ERROR',
+     :                    'Error, after DAT_CELL LOCCELL_N ...',
      :                    STATUS)
 
 	    RETURN
@@ -535,8 +535,8 @@
             CALL ERR_ANNUL( STATUS )
 
 	    CALL MSG_SETI( 'J', J)
-	    CALL MSG_OUT( 'ERROR', 
-     :        'Error, observation ^J not defined ...', 
+	    CALL MSG_OUT( 'ERROR',
+     :        'Error, observation ^J not defined ...',
      :	      STATUS)
 
 	    FILLED = .FALSE.
@@ -556,10 +556,10 @@
 
 *          get NUMBER_COADDS in image
 
-	    CALL DAT_FIND( LOCCELL_N, 'NUMBER_COADDS', LOCPRIM_COADDS, 
+	    CALL DAT_FIND( LOCCELL_N, 'NUMBER_COADDS', LOCPRIM_COADDS,
      :                     STATUS)
 
-	    CALL DAT_GETI( LOCPRIM_COADDS, 0, DIMS, 
+	    CALL DAT_GETI( LOCPRIM_COADDS, 0, DIMS,
      :                     NUMBER_COADDS_IMAGE, STATUS)
 
 	    CALL DAT_ANNUL( LOCPRIM_COADDS, STATUS)
@@ -570,8 +570,8 @@
 
 	    IF( STATUS .NE. SAI__OK) THEN
 
-	      CALL ERR_REP( 'ERROR', 
-     :                      'Error, after REDCONT_WHATSET ...', 
+	      CALL ERR_REP( 'ERROR',
+     :                      'Error, after REDCONT_WHATSET ...',
      :                       STATUS)
 
 	      RETURN
@@ -587,7 +587,7 @@
 *          message to user about what filled
 
 	    CALL MSG_SETC( 'CETI', WHAT_FILLED( 1:LEN1))
-	    CALL MSG_OUT( 'MESSAGE', '   Data defined = ^CETI', 
+	    CALL MSG_OUT( 'MESSAGE', '   Data defined = ^CETI',
      :                     STATUS)
 
 *          linearize the DATA_ARRAY components that are defined
@@ -595,24 +595,24 @@
 	    IF( WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA' .OR.
      :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+KTCA' .OR.
      :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB' .OR.
-     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB') 
+     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB')
      :      THEN
 
-*            find the DATA_ARRAY component, get it's shape and map it 
+*            find the DATA_ARRAY component, get it's shape and map it
 
 	      CALL DAT_FIND( LOCCELL_N, 'PHASEA', LOCTMP_N, STATUS)
-	      CALL DAT_FIND( LOCTMP_N, 'DATA_ARRAY', LOCPRIM_N, 
+	      CALL DAT_FIND( LOCTMP_N, 'DATA_ARRAY', LOCPRIM_N,
      :                                  STATUS)
 
 	      CALL DAT_SHAPE( LOCPRIM_N, 2, DIMS_IMAGE, NDIMS, STATUS)
 
-	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE, 
+	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE,
      :	                     PNTR_IMAGE, STATUS)
 
 	      IF( STATUS .NE. SAI__OK) THEN
 
-	        CALL ERR_REP( 'ERROR', 
-     :                     'Error, after MAPR PHASEA image ...', 
+	        CALL ERR_REP( 'ERROR',
+     :                     'Error, after MAPR PHASEA image ...',
      :                      STATUS)
 
 	        RETURN
@@ -622,9 +622,9 @@
 *            call subroutine to scale bias/image, subtract bias, linearize
 *            re-scale bias/image, add bias back in and store in output image
 
-	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2), 
-     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS, 
-     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2), 
+	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2),
+     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS,
+     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2),
      :                          %VAL( PNTR_IMAGE), NUMBER_COADDS_IMAGE,
      :	                        NUMCOEFF, COEFFICIENT)
 
@@ -638,23 +638,23 @@
 	    IF( WHAT_FILLED( 1:LEN1) .EQ. 'PHASEB' .OR.
      :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEB+KTCB' .OR.
      :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB' .OR.
-     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB') 
+     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB')
      :      THEN
 
-*            find the DATA_ARRAY component, get it's shape and map it 
+*            find the DATA_ARRAY component, get it's shape and map it
 
 	      CALL DAT_FIND( LOCCELL_N, 'PHASEB', LOCTMP_N, STATUS)
 	      CALL DAT_FIND( LOCTMP_N, 'DATA_ARRAY', LOCPRIM_N, STATUS)
 
 	      CALL DAT_SHAPE( LOCPRIM_N, 2, DIMS_IMAGE, NDIMS, STATUS)
 
-	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE, 
+	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE,
      :	                     PNTR_IMAGE, STATUS)
 
 	      IF( STATUS .NE. SAI__OK) THEN
 
-	        CALL ERR_REP( 'ERROR', 
-     :                      'Error, after MAPR PHASEB image ...', 
+	        CALL ERR_REP( 'ERROR',
+     :                      'Error, after MAPR PHASEB image ...',
      :                       STATUS)
 
 	        RETURN
@@ -664,9 +664,9 @@
 *            call subroutine to scale bias/image, subtract bias, linearize
 *            re-scale bias/image, add bias back in and store in output image
 
-	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2), 
-     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS, 
-     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2), 
+	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2),
+     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS,
+     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2),
      :                          %VAL( PNTR_IMAGE), NUMBER_COADDS_IMAGE,
      :	                        NUMCOEFF, COEFFICIENT)
 
@@ -678,23 +678,23 @@
 	    END IF
 
 	    IF( WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+KTCA' .OR.
-     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB') 
+     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB')
      :      THEN
 
-*            find the DATA_ARRAY component, get it's shape and map it 
+*            find the DATA_ARRAY component, get it's shape and map it
 
 	      CALL DAT_FIND( LOCCELL_N, 'KTCA', LOCTMP_N, STATUS)
 	      CALL DAT_FIND( LOCTMP_N, 'DATA_ARRAY', LOCPRIM_N, STATUS)
 
 	      CALL DAT_SHAPE( LOCPRIM_N, 2, DIMS_IMAGE, NDIMS, STATUS)
 
-	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE, 
+	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE,
      :	                     PNTR_IMAGE, STATUS)
 
 	      IF( STATUS .NE. SAI__OK) THEN
 
-	        CALL ERR_REP( 'ERROR', 
-     :                        'Error, after MAPR KTCA image ...', 
+	        CALL ERR_REP( 'ERROR',
+     :                        'Error, after MAPR KTCA image ...',
      :                         STATUS)
 
 	        RETURN
@@ -704,9 +704,9 @@
 *            call subroutine to scale bias/image, subtract bias, linearize
 *            re-scale bias/image, add bias back in and store in output image
 
-	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2), 
-     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS, 
-     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2), 
+	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2),
+     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS,
+     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2),
      :                          %VAL( PNTR_IMAGE), NUMBER_COADDS_IMAGE,
      :	                        NUMCOEFF, COEFFICIENT)
 
@@ -718,23 +718,23 @@
 	    END IF
 
 	    IF( WHAT_FILLED( 1:LEN1) .EQ. 'PHASEB+KTCB' .OR.
-     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB') 
+     :	        WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB')
      :      THEN
 
-*            find the DATA_ARRAY component, get it's shape and map it 
+*            find the DATA_ARRAY component, get it's shape and map it
 
 	      CALL DAT_FIND( LOCCELL_N, 'KTCB', LOCTMP_N, STATUS)
 	      CALL DAT_FIND( LOCTMP_N, 'DATA_ARRAY', LOCPRIM_N, STATUS)
 
 	      CALL DAT_SHAPE( LOCPRIM_N, 2, DIMS_IMAGE, NDIMS, STATUS)
 
-	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE, 
+	      CALL DAT_MAPR( LOCPRIM_N, 'UPDATE', NDIMS, DIMS_IMAGE,
      :	                     PNTR_IMAGE, STATUS)
 
 	      IF( STATUS .NE. SAI__OK) THEN
 
-	        CALL ERR_REP( 'ERROR', 
-     :                         'Error, after MAPR KTCB image ...', 
+	        CALL ERR_REP( 'ERROR',
+     :                         'Error, after MAPR KTCB image ...',
      :                         STATUS)
 
 	        RETURN
@@ -744,9 +744,9 @@
 *            call subroutine to scale bias/image, subtract bias, linearize
 *            re-scale bias/image, add bias back in and store in output image
 
-	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2), 
-     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS, 
-     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2), 
+	      CALL LINCONT_LIN( DIMS_BIAS(1), DIMS_BIAS(2),
+     :	                        %VAL( PNTR_BIAS), NUMBER_COADDS_BIAS,
+     :	                        DIMS_IMAGE(1), DIMS_IMAGE(2),
      :                          %VAL( PNTR_IMAGE), NUMBER_COADDS_IMAGE,
      :	                        NUMCOEFF, COEFFICIENT)
 
@@ -776,14 +776,14 @@
 
 *      tell user that that is it ... all finished ... pau
 
-	CALL MSG_OUT( 'MESSAGE', 
+	CALL MSG_OUT( 'MESSAGE',
      :                'All finished ... IRCAM file linearized',
      :	              STATUS)
 
 	GOTO 888
 
   999	CALL MSG_SETC( 'C', COEFFICIENT_FILENAME)
-	CALL ERR_REP( 'MESSAGE', 
+	CALL ERR_REP( 'MESSAGE',
      :	  'Error, cannot find coefficient file ^C', STATUS)
 
   888	END

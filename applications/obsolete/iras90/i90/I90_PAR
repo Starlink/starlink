@@ -29,7 +29,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Constant declarations:
 
       INTEGER I90__BANDS    ! No. of wavebands.
@@ -39,7 +39,7 @@
       INTEGER I90__MAXDT    ! Max. no. of detectors per waveband.
       INTEGER I90__NDEAD    ! No. of dead detectors.
       INTEGER I90__NSMAL    ! No. of small detectors.
-      REAL    I90__SMSIZ    ! Cross scan size of largest "small" 
+      REAL    I90__SMSIZ    ! Cross scan size of largest "small"
                             ! detector, in arc-mins.
       REAL    I90__SPEED    ! Nominal survey scan speed (arcmins per
                             ! second).

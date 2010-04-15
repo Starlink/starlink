@@ -14,8 +14,8 @@ C  Routine to amend velocity/frequency information in header to reflect
 C  shift in data. Exact changes depend on whether or not frequency is
 C  in frame of rest or in lsr frame
 C
-C  Sense is such that a shift of CHAN_SHIFT channels refers to the 
-C  viewing window, not the DATA, so that for a shift of the data to 
+C  Sense is such that a shift of CHAN_SHIFT channels refers to the
+C  viewing window, not the DATA, so that for a shift of the data to
 C  the right call is with -ve CHAN_SHIFT.
 C
 C  With V2 headers that *do* have LO and IF information, then need to
@@ -95,7 +95,7 @@ CD    PRINT *, '    Telluric centre frequency = ', FCEN_T, ' GHz'
 CD    PRINT *, '    Telluric frequency shift of scan centre = ',
 CD   &             DF, ' MHz'
 
-*     Correct to offset frequency in *source* frame using appropriate 
+*     Correct to offset frequency in *source* frame using appropriate
 *     velocity scaling law (RADIO, OPTICAL or RELATIVISTIC).
 
       CALL SETXDOPP   (DF, 1, VFRAME, VDEF,

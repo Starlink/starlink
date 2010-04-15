@@ -10,12 +10,12 @@
      & ,      REF_NO 	! 	Reference number of files.
       INTEGER IERROR	! Out	Error indicator.
       REAL rectmp
- 
+
 *  Global Variables
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_iof.inc'
       INCLUDE 'com_dbs_rec.inc'
- 
+
 *  Local Variables
       INTEGER I,J
       CHARACTER*80 BLANKSP

@@ -15,16 +15,16 @@
 \newcommand{\stardocversion}   {Version 0.11-4}	%%VERSION%%
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {%
-ESP (\textbf{E}xtended {\bf S}urface {\bf P}hotometry) is a package 
-of application programs developed to allow you to determine the photometric 
-properties of galaxies and other extended objects. 
+ESP (\textbf{E}xtended {\bf S}urface {\bf P}hotometry) is a package
+of application programs developed to allow you to determine the photometric
+properties of galaxies and other extended objects.
 
 It has applications that:
 detect flatfielding faults, remove cosmic rays, median filter images,
 determine image statistics, determine local background values,
-perform galaxy profiling, fit 2-D Gaussian profiles to galaxies, 
-generate  pie slice cross-sections of galaxies and display 
-profiling results.   
+perform galaxy profiling, fit 2-D Gaussian profiles to galaxies,
+generate  pie slice cross-sections of galaxies and display
+profiling results.
 }
 
 % ? End of document identification
@@ -149,7 +149,7 @@ profiling results.
 
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
- 
+
 % in-line verbatims
 \newcommand{\myverb}[1]{{\small \verb+{#1}+}}
 
@@ -416,7 +416,7 @@ profiling results.
 %.
 
 
- 
+
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -552,8 +552,8 @@ profiling results.
 
 \subsection{An overview}
 
-ESP ({\bf E}xtended {\bf S}urface {\bf P}hotometry) is a package 
-of application programs developed to allow you to determine the photometric 
+ESP ({\bf E}xtended {\bf S}urface {\bf P}hotometry) is a package
+of application programs developed to allow you to determine the photometric
 properties of galaxies and other extended objects. It has applications that:
 \begin{itemize}
 \item Detect/identify flatfielding faults -- SKEW
@@ -572,19 +572,19 @@ of an image -- LOBACK
 \end{itemize}
 
 ESP processes images stored as NDFs, and therefore you can use it in
-conjunction with other packages like; 
+conjunction with other packages like;
 \xref{KAPPA}{sun95}{},
 \xref{CCDPACK}{sun139}{},
 \xref{Figaro}{sun86}{},
 \xref{PHOTOM}{sun45}{},
 \xref{JCMTDR}{sun132}{}
  and
-\xref{PISA}{sun109}{}. 
+\xref{PISA}{sun109}{}.
 
 It allows you to define areas to exclude in the analysis
 using keyword descriptions in text ARD files.
 
-There is now an interface to ESP within 
+There is now an interface to ESP within
 \xref{GAIA}{sun214}{}.  This supports all the ESP applications except
 GRAPHS and HISTPEAK: GRAPHS is purely concerned with the display of
 ESP output, and all the non-graphical functionality of HISTPEAK is
@@ -596,25 +596,25 @@ The ESP web page is at
 \subsection{What's new in this release}
 \xlabel{WHATSNEW}
 
-ESP has been modified to be aware of the World Coordinate 
+ESP has been modified to be aware of the World Coordinate
 System (WCS) components of NDFs.
 
-The COSYS parameter has been removed from all ESP applications, 
-so that all user input and output is now in the Current 
-co-ordinate system of the NDF.  The Current co-ordinate system 
-is a characteristic of the WCS component of the NDF.  
+The COSYS parameter has been removed from all ESP applications,
+so that all user input and output is now in the Current
+co-ordinate system of the NDF.  The Current co-ordinate system
+is a characteristic of the WCS component of the NDF.
 Thus, instead of setting COSYS to use either 'Data' or 'World'
-co-ordinate sytems, you should now set the Current frame of the 
-NDF's WCS component (e.g. using KAPPA's WCSFRAME apllication) 
-to the desired co-ordinate system before running the ESP 
+co-ordinate sytems, you should now set the Current frame of the
+NDF's WCS component (e.g. using KAPPA's WCSFRAME apllication)
+to the desired co-ordinate system before running the ESP
 application.
 
-Output to data files is however in Base (WCS GRID frame) 
-co-ordinates, which are pixel co-ordinates guaranteed to start 
+Output to data files is however in Base (WCS GRID frame)
+co-ordinates, which are pixel co-ordinates guaranteed to start
 at (1,1).
 
 For NDFs which have a WCS component with a SKY frame in it, the
-PSIZE parameter (pixel size in arc seconds) is now determined 
+PSIZE parameter (pixel size in arc seconds) is now determined
 automatically rather than being solicited from the user.
 This can be overridded by specifying it on the command line.
 
@@ -641,35 +641,35 @@ propagate the WCS component where appropriate.
 %\xlabel{WHATSNEW}
 %This release of ESP contains the new application GAUFIT
 %which may be used to analyse sources/galaxies in terms of a 2-D Gaussian
-%distribution and will be particularly useful for JCMT users (see also 
+%distribution and will be particularly useful for JCMT users (see also
 %\xref{JCMTDR}{sun132}{}).
 %
-%This version is also the first to be free of NAG library code. This 
-%has been done to ensure that the ESP code may be freely distributed 
+%This version is also the first to be free of NAG library code. This
+%has been done to ensure that the ESP code may be freely distributed
 %as executables and can be made available as part of the Linux port of the
 %software. Experienced users may note a speed increase compared to the
 %previous version (0.7-2) for the applications ELLPRO and ELLFOU.
 %
-%In addition, a small number of bugs and idiosyncracies have also been 
+%In addition, a small number of bugs and idiosyncracies have also been
 %corrected.
 
 \subsection{A little more detail}
 \xlabel{ALITTLEMOREDETAIL}
 
 ESP contains four major applications for its prime purpose: ELLFOU,
-ELLPRO, GAUFIT and SECTOR. These allow for the galaxy to be ellipse `fitted' 
+ELLPRO, GAUFIT and SECTOR. These allow for the galaxy to be ellipse `fitted'
 using contour analysis, ellipse `fitted' using intensity analysis,
-profiled as a 2-D Gaussian distribution or pie slice cross-sectioned, 
-respectively. In addition to these core 
-applications, a number of other applications are available to make the 
+profiled as a 2-D Gaussian distribution or pie slice cross-sectioned,
+respectively. In addition to these core
+applications, a number of other applications are available to make the
 task easier and more reliable.
 
-In the real world, any image of a galaxy is likely to contain other 
+In the real world, any image of a galaxy is likely to contain other
 objects either in the foreground or the background. This `contamination'
 may lead to bumps in, or distortions to, the generated galaxy profiles and
-are best removed in some way. This may be easily done by 
-using \xref{KAPPA}{sun95}{}'s ARDGEN to create a text file (ARD) that can be read by 
-ELLPRO, ELLFOU and SECTOR to define the duff areas. Alternatively, you can 
+are best removed in some way. This may be easily done by
+using \xref{KAPPA}{sun95}{}'s ARDGEN to create a text file (ARD) that can be read by
+ELLPRO, ELLFOU and SECTOR to define the duff areas. Alternatively, you can
 use ARDGEN and ARDMASK in combination so that thereafter all Starlink
 packages view the pixels described as bad.
 
@@ -697,8 +697,8 @@ If you are interested in the background value for several galaxies on a
 given frame, then you may use the ESP application LOBACK which
 determines the modal pixel values at image locations specified in a
 simple text file. Such a text file might be easily generated using
-\xref{PISA}{sun109}{}, \xref{KAPPA}{sun95}{}'s CURSOR, RGASP's IMAGES, or 
-\xref{IRAF}{sun179}{}'s 
+\xref{PISA}{sun109}{}, \xref{KAPPA}{sun95}{}'s CURSOR, RGASP's IMAGES, or
+\xref{IRAF}{sun179}{}'s
 FOCAS. The background
 values determined are placed in an output text file and may be easily
 used in conjunction with the profiling applications ELLPRO and ELLFOU.
@@ -713,27 +713,27 @@ number of galaxies (image co-ordinates supplied by you in a text file)
 and generates profiles for each of them.  The profile information
 generated includes position angle, ellipticity, brightness and Fourier
 descriptors (up to fourth order). GAUFIT by comparison, generates
-values for the location, brightness, orientation and widths of several 
-galaxies/sources on an image in terms of 2-D Gaussian functions. It will prove 
-especially useful for JCMT users (see also \xref{JCMTDR}{sun132}{}).  
+values for the location, brightness, orientation and widths of several
+galaxies/sources on an image in terms of 2-D Gaussian functions. It will prove
+especially useful for JCMT users (see also \xref{JCMTDR}{sun132}{}).
 
 If ELLPRO, ELLFOU or SECTOR have been used to examine a galaxy image,
-the results, stored by the application in a text file, may be examined 
-using the application GRAPHS. This displays the profile information 
-generated in a variety of forms (i.e. intensity versus radius, 
+the results, stored by the application in a text file, may be examined
+using the application GRAPHS. This displays the profile information
+generated in a variety of forms (i.e. intensity versus radius,
 position angle versus logarithmic radius etc.) The scale length of the
-galaxy profile can be determined simply by choosing the radius range 
+galaxy profile can be determined simply by choosing the radius range
 of the data points to be considered.
 
 As an aid to identifying faint diffuse galaxies in an image, the applications
-CORR and SELFCW may be used to correlate the image with a template 
+CORR and SELFCW may be used to correlate the image with a template
 galaxy of a given scale length. The significance of the detection can
 be estimated using the application MIXUP to generate a noise equivalent
-image. 
+image.
 
 The application TOPPED may be employed to remove bright pixels and their
 immediate neighbours from an image. This can reduce the influence of cosmic
-rays and also saturated regions on CCD frames. The neighbouring pixels are 
+rays and also saturated regions on CCD frames. The neighbouring pixels are
 considered to be those within a defined radius of the bright pixel.
 
 Most of you will be content to use the application HISTPEAK as it stands,
@@ -746,10 +746,10 @@ applications as required.
 \section{Installing ESP}
 \label{sec:installing}
 
-Most of what follows is likely to be of interest to site system managers only 
+Most of what follows is likely to be of interest to site system managers only
 and may be skipped by the normal user.
 
-ESP is supplied as a compressed tar file: {\tt esp.tar.Z}. To install ESP 
+ESP is supplied as a compressed tar file: {\tt esp.tar.Z}. To install ESP
 the file must be must be uncompressed and the contents extracted to a
 suitable directory.  On Starlink systems, this would be {\tt /star/sources/esp}.
 
@@ -790,7 +790,7 @@ On Starlink systems, the necessary environment files and aliases will
 be automatically set up by the {\tt /star/etc/login} and {\tt /star/etc/cshrc}
 files on login, if ESP is detected as being installed in {\tt /star/bin/esp}.
 
-If it isn't, you should set ESP\_DIR and ESP\_HELP as follows in your own 
+If it isn't, you should set ESP\_DIR and ESP\_HELP as follows in your own
 {\verb+ ~/.login+} file:
 
 \begin{myquote}
@@ -829,19 +829,19 @@ the following:
 ICL> load $ESP_DIR/esp
 \end{verbatim}
 \end{myquote}
- 
+
 \section{Simple ESP Sessions}
 \label{sec:session}
 
-In this section a few example sessions are described as `blow-by-blow' 
-accounts. 
+In this section a few example sessions are described as `blow-by-blow'
+accounts.
 
 
 \subsection{Getting Help}
 
 The ESP help system is available from the UNIX shell like any other ESP
 command. To get help type:
- 
+
 \begin{myquote}
 \begin{verbatim}
 % esphelp
@@ -851,66 +851,66 @@ command. To get help type:
 If this does not generate a screen similar to:
 
 \begin{myquote}
-\begin{verbatim}    
+\begin{verbatim}
  ESP
- 
+
      ESP (standing for Extended Surface Photometry) is a package of
      routines that deal with various aspects of obtaining galaxy profiles.
      They may be subdivided thus:
- 
- 
+
+
      ELLPRO, ELLFOU, GAUFIT, SECTOR -  Profile generation.
- 
+
      HISTPEAK, LOBACK and HSUB      -  Background determination.
- 
+
      FASTMED, MASK, SKEW and TOPPED -  Image preparation.
- 
+
      GRAPHS                         -  Presentation of results.
- 
+
      CORR, SELFC, SELFCW and MIXUP  -  Object detection/enhancement.
- 
+
    Additional information available:
- 
-   CORR       ELLFOU     ELLPRO     FASTMED    GAUFIT     GRAPHS     HISTPEAK   
-   HSUB       LOBACK     MASK       MIXUP      SECTOR     SELFC      SELFCW     
+
+   CORR       ELLFOU     ELLPRO     FASTMED    GAUFIT     GRAPHS     HISTPEAK
+   HSUB       LOBACK     MASK       MIXUP      SECTOR     SELFC      SELFCW
    SKEW       TOPPED
- 
- Topic? 
+
+ Topic?
  \end{verbatim}
 \end{myquote}
 
 then contact your system manager.
 
 The help system is functionally  similar to that found on DEC VAX machines.
-So replying to the query `Topic?' with, for example, `loback' generates 
+So replying to the query `Topic?' with, for example, `loback' generates
 another level of help:
 
 \begin{myquote}
 \begin{verbatim}
  LOBACK
- 
+
    Establishes the local mode values for parts of an image.
- 
+
    Usage:
- 
+
       LOBACK IN INFILE SFACT THIRD OUT WIDE
- 
+
    Description:
- 
+
       Establishes the local mode values for parts of an image
       immediately surrounding a set of image co-ordinates supplied by
       the user.
- 
+
       The user may also supply some indication of the number of pixels
       that must be used to create the pixel value histogram. This
       value may be supplied as the width of the square area around the
       co-ordinates that will be used, or alternatively the number of
       contiguous data points believed to be present in the object at
       the image location specified.
- 
+
       The latter method is intended specifically for use with RGASP's
       IMAGES or IRAF's FOCAS output files.
- 
+
       All co-ordinates are read from a two or three columns
       ASCII text file. If two columns are present then these are
       taken as representing the image co-ordinates required for the
@@ -919,16 +919,16 @@ another level of help:
       present the third column respresents the width of the area
       to be sampled or the number of contiguous pixels detected there
       by FOCAS or IMAGES.
- 
+
       The selection of the number of pixels to used in the histogram is
       defined by the user subject to a lower limit of 1024 pixels
       (32x32).
- 
+
    Additional information available:
- 
+
    Parameters            Examples   Notes      Authors    History
- 
- LOBACK Subtopic? 
+
+ LOBACK Subtopic?
 \end{verbatim}
 \end{myquote}
 
@@ -951,20 +951,20 @@ IN - Image NDF filename /@galaxy/ > p2
 \end{verbatim}
 \end{myquote}
 
-At this point type in the file name, p2. The .SDF part of the name is 
+At this point type in the file name, p2. The .SDF part of the name is
 not required. The application, in common with most ESP applications
 then gives you some useful information about the image in question.
-In particular, the image shape will give you some idea how long you will 
-need to wait for you answers to appear. 
+In particular, the image shape will give you some idea how long you will
+need to wait for you answers to appear.
 
 You will find, as you use ESP applications more, that ESP applications will
-often volunteer a name for the IN file to be used. This name is shown at the 
+often volunteer a name for the IN file to be used. This name is shown at the
 end of the IN  prompt between two `/'s. In this instance the suggested file
 name is galaxy. This name may be input
 immediately (if it is what you want) by pressing the Return/Enter
 key. On VAX systems, the current suggestion may be edited by pressing the tab
 key. You will find that many of the ESP applications will suggest answers to
-other prompts as well. 
+other prompts as well.
 
 \begin{myquote}
 \begin{verbatim}
@@ -978,23 +978,23 @@ USE - Use the whole image or an ARD file /`w'/ > w
 \end{myquote}
 
 The application now prompts you for an indication of which image pixels are
-to be used in assessing the image pixel statistics. Frequently, you 
+to be used in assessing the image pixel statistics. Frequently, you
 will want to use all of
 them, in which case your input should be `w' or `W'. This application,
-and all other ESP applications, 
+and all other ESP applications,
 are not case sensitive so both responses are treated similarly.
 
-If you are employing ARD files (see Appendix~\ref{app:bad} ) to mask out bad 
+If you are employing ARD files (see Appendix~\ref{app:bad} ) to mask out bad
 pixels you should input `A' or `a'.
 You will then be
-prompted for the name of the ARD file in question, in addition to those 
-inputs shown below. It must be remembered that the name of the ARD file 
-must be preceeded by '\^{ }' or the input will be interpreted as a single 
-ARD instruction and 
+prompted for the name of the ARD file in question, in addition to those
+inputs shown below. It must be remembered that the name of the ARD file
+must be preceeded by '\^{ }' or the input will be interpreted as a single
+ARD instruction and
 not a file name as intended.
 
-If, instead you opt to use all the pixels, you enter `w' in response to the 
-USE prompt you will then be prompted as shown below with an appropriate 
+If, instead you opt to use all the pixels, you enter `w' in response to the
+USE prompt you will then be prompted as shown below with an appropriate
 response:
 
 \begin{myquote}
@@ -1004,12 +1004,12 @@ DEVICE - Display device code or name /@xw/ > ikon
 \end{verbatim}
 \end{myquote}
 
-This simple set of instruction will then cause HISTPEAK to examine the 
-NDF image p2 (a plate scan), using all its non-bad pixels. When a smoothed 
-histogram is created by the application for determining a modal value (an 
+This simple set of instruction will then cause HISTPEAK to examine the
+NDF image p2 (a plate scan), using all its non-bad pixels. When a smoothed
+histogram is created by the application for determining a modal value (an
 unsmoothed histogram is always
-created as well) a Gaussian filter of radius 2 counts will be used. The 
-histogram generated is displayed on device IKON. An example output display 
+created as well) a Gaussian filter of radius 2 counts will be used. The
+histogram generated is displayed on device IKON. An example output display
 is shown as Figure 1 and the output to the screen is shown below.
 
 \begin{myquote}
@@ -1043,7 +1043,7 @@ Unsmoothed:                60.000     Smoothed:               52.479
 Interpolated:              39.416
 \end{verbatim}
 \end{myquote}
-     
+
 \begin{latexonly}
 \begin{figure}[htlb]
 \centering
@@ -1059,11 +1059,11 @@ Interpolated:              39.416
 \end{figure}
 \end{htmlonly}
 
-If you re-run HISTPEAK but this time input an SFACT value of 4 you will find 
-that the results for some quantities are different. This is as you would 
-expect when histograms are smoothed. As you can see from the excerpt below, 
-the values affected are those relating to values extracted from the 
-smoothed histogram. Figure 2 shows the histogram and the effect 
+If you re-run HISTPEAK but this time input an SFACT value of 4 you will find
+that the results for some quantities are different. This is as you would
+expect when histograms are smoothed. As you can see from the excerpt below,
+the values affected are those relating to values extracted from the
+smoothed histogram. Figure 2 shows the histogram and the effect
 of smoothing upon the shape of the pixel count distribution - smoothed
 points are plotted bold.
 
@@ -1088,14 +1088,14 @@ Interpolated:              39.609
 
 \begin{latexonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics[height=100mm,width=150mm]{sun180_diag2.eps}
 \caption{The smoothed pixel count histogram generated by HISTPEAK.}
 \end{figure}
 \end{latexonly}
 \begin{htmlonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics{sun180_diag2.eps}
 \caption{The smoothed pixel count histogram generated by HISTPEAK.}
 \end{figure}
@@ -1107,24 +1107,24 @@ Interpolated:              39.609
 One of the key uses of ESP is for profiling images of galaxies.
 The ESP application for doing this is ELLPRO. If we again assume we
 are logged on and that the {\tt esp} command has been issued,
-then the following is a simple session using it. The example 
+then the following is a simple session using it. The example
 assumes also, that the {\tt kappa} command has been issued allowing use of the
 \xref{DISPLAY}{sun95}{DISPLAY} routine. For the simplest use of ELLPRO, the image containing
 the galaxy to be profiled needs to be displayed.
 
 \begin{myquote}
 \begin{verbatim}
-% display in=ic3374c mode=faint device=xw 
+% display in=ic3374c mode=faint device=xw
 % lutgrey device=xw
 \end{verbatim}
 \end{myquote}
 
-The first instruction clears the X window and displays the NDF image file 
-ic3374c. The second instruction defines 
-the colour table to be employed for that window. 
+The first instruction clears the X window and displays the NDF image file
+ic3374c. The second instruction defines
+the colour table to be employed for that window.
 
 The next step is to start up ELLPRO and give it information about how
-you wish to work. 
+you wish to work.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1135,7 +1135,7 @@ MODE - Use the application interactively? /TRUE/ > Y
 CURSOR - Use the cursor to identify the galaxy centre? /TRUE/ > Y
 \end{verbatim}
 \end{myquote}
- 
+
 Choosing a value of TRUE for MODE tells the program that you will
 either be typing in a value for the location of the galaxy centre on the image
 or using a cursor to indicate where it is. The alternative is for the program to
@@ -1143,13 +1143,13 @@ read in a list of co-ordinates from a text file. Specifying a value of TRUE
 for CURSOR then tells the program that you will be inputting the location by
 using a cursor. This is only possible if you have previously displayed an
 image on a device and it is still visible. If several images are currently
-displayed on a device then the most recently added image displayed 
+displayed on a device then the most recently added image displayed
 (containing a DATA component) is examined. This information is obtained from
 the AGI database.
 
 The next information required is the
 name of the display device on which your galaxy is currently displayed --
-in this case Xwindows. It then looks at the AGI database to determine 
+in this case Xwindows. It then looks at the AGI database to determine
 what image you used to create the displayed image and displays its name
 to allow you to check that it is the right one. After a brief pause
 (duration depends on your hardware) the cursor may be used to identify the
@@ -1172,33 +1172,33 @@ Keyboard "1" key:   Show the cursor co-ordinates.
 \end{myquote}
 
 When you identify the location you want,
-the program reports that location in the Current co-ordinate 
+the program reports that location in the Current co-ordinate
 system of the image, which in this case is SKY,
 with co-ordinates of RA and Dec.
 Information about co-ordinate systems associated with an NDF file is held
-in its WCS (World Co-oordinate System) component. 
+in its WCS (World Co-oordinate System) component.
 Briefly, the WCS component contains several co-ordinate {\em frames},
 allowing positions within the data array to be addressed in different ways.
 Each frame has a label, called its {\em Domain}, which usually describes
-the co-ordinate system; two important ones are GRID (which is 
+the co-ordinate system; two important ones are GRID (which is
 always present) and SKY (which may or may not be).
 At any given time one of these frames is designated the {\em Current\/} one,
 and this determines the co-ordinates used when positions are requested
 or reported by ESP or other Starlink packages like \xref{KAPPA}{sun95}{}.
 You can change between frames using KAPPA's
 \xref{WCSFRAME}{sun95}{WCSFRAME} command.
-For instance the following would cause all positions to 
+For instance the following would cause all positions to
 be reported in PIXEL co-ordinates instead:
 \begin{myquote}
 \begin{verbatim}
 % wcsframe ic3374 pixel
 \end{verbatim}
-\end{myquote}'s 
+\end{myquote}'s
 To find out more about WCS components see \xref{SUN/95}{sun95}{se_wcsuse}.
 
 Once the galaxy centre is identified, it is necessary to describe how far out
 from the centre you want the profiling to continue (if possible). This is again
-achieved via the cursor. 
+achieved via the cursor.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1212,7 +1212,7 @@ Keyboard "1" key:   Show the cursor co-ordinates.
 
 When this has been done, a circle is drawn around the galaxy showing the extent
 of the profiling requested. This may, or may not, be visible depending on the
-colour of the image background. However, this can be overcome by use of the 
+colour of the image background. However, this can be overcome by use of the
 command line parameter COLOUR when starting ELLPRO, i.e.:
 
 \begin{myquote}
@@ -1236,9 +1236,9 @@ Using info from SKY frame - pixels are  0.961 arcseconds square.
 The first parameter, FRZORI,
 asks if the galaxy position you proposed (and refined with
 AUTOL if required) should be held to
-be the galaxy centre throughout the profiling operation or, 
-is it allowed to vary slightly 
-from ellipse to ellipse if that provides a better fit? 
+be the galaxy centre throughout the profiling operation or,
+is it allowed to vary slightly
+from ellipse to ellipse if that provides a better fit?
 BACK and SIGMA are the modal pixel value in the image and its
 associated standard deviation.
 Since the image in this example has a SKY co-ordinate frame
@@ -1249,7 +1249,7 @@ be prompted to enter this as the value of a parameter PSIZE.
 The final group of configuration parameters is as follows:
 \begin{myquote}
 \begin{verbatim}
-ZEROP - Surface brightness zerop point (in magnitudes per arcsec) /27.5/ > 
+ZEROP - Surface brightness zerop point (in magnitudes per arcsec) /27.5/ >
 AUTOL - Automatically search for better origin? /YES/ > yes
 AUTOLT - Use a centroid? /NO/ > yes
 ARDFIL - Masking ARD file /@ardfile.dat/ > !
@@ -1257,27 +1257,27 @@ ARDFIL - Masking ARD file /@ardfile.dat/ > !
 WARNING! - ARD file not used.
 \end{verbatim}
 \end{myquote}
-ZEROP is the base of the scale for the surface brightness plot 
+ZEROP is the base of the scale for the surface brightness plot
 which will be made.
-AUTOL will refine 
+AUTOL will refine
 the estimate of the galaxy centre position you have proposed with the cursor
 if set to TRUE. In the case shown it has been requested and the method
-chosen was a centroid. 
+chosen was a centroid.
 The last information required is to name an ARD file if one is to be used to
 define the good parts of the image. In this case `!' is entered because no
 ARD file will be used. Instead, the whole image will be used. To make sure
-you're aware of this, the program issues a warning. 
+you're aware of this, the program issues a warning.
 
-It should be noted that for those required inputs which match the 
+It should be noted that for those required inputs which match the
 values suggested by the program, it is sufficient just to press
 the Return/Enter key to accept the proposed value.
 
-The program then starts to work on the profiles. It first makes a guess at 
-the crude shape of the galaxy at some smallish radius and (hopefully) 
+The program then starts to work on the profiles. It first makes a guess at
+the crude shape of the galaxy at some smallish radius and (hopefully)
 sensible S/N ratio and displays this.
 Next, it makes a full estimate of the profile at that radius before dropping
 down to smaller radii and then increasing upward again until
-one of the profiling limits (see LIM1, LIM2 and RLIM in Appendix 
+one of the profiling limits (see LIM1, LIM2 and RLIM in Appendix
 \ref{des:ELLPRO})
 is exceeded. Results of the
 profiling activity are displayed as they are calculated. This is done to allow
@@ -1300,7 +1300,7 @@ Residual calculation: weighted SD
   ----    ----    ---     ----       ---    ----  -----    ---  ----
   ----    ----    ---     ----       ---    ----  -----    ---  ----
   93.5    95.8   332     19.93        1.9   -2.9  0.602    0.5   92.  0.76E+03
- 
+
 Mean count below threshold LIM2.
 \end{verbatim}
 \end{myquote}
@@ -1323,29 +1323,29 @@ of the screen will, subsequently, be obscured, as may be seen in Figure 3.
 \begin{myquote}
 \begin{verbatim}
 SAME - Use the same graphics device for the results graph? /TRUE/ > f
-DEVICE - Which device/type to display the graph /@x2windows/ > 
- 
+DEVICE - Which device/type to display the graph /@x2windows/ >
+
 OUT - Text file for profile output /@elp/ > testprof.dat
-AGAIN - Profile again? /FALSE/ > 
+AGAIN - Profile again? /FALSE/ >
 \end{verbatim}
 \end{myquote}
 
 \begin{latexonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics[height=125mm,width=125mm]{sun180_diag3.eps}
 \caption{The galaxy image and profile when displayed on the same device.}
 \end{figure}
 \end{latexonly}
 \begin{htmlonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics{sun180_diag3.eps}
 \caption{The galaxy image and profile when displayed on the same device.}
 \end{figure}
 \end{htmlonly}
 
-You are also prompted for the name of an output file into which the 
+You are also prompted for the name of an output file into which the
 profiling results are to be placed. If it is found that the name you provide is
 not allowable (e.g.\ there are illegal characters in the name or the file named
 already exists) you will be reprompted. A `!' may be used to avoid creating a
@@ -1358,23 +1358,23 @@ reprompted for input you have already provided.
 
 You will find that the ESP ELLFOU application works in a very similar manner.
 Consequently, you are now in a position to profile galaxies
-interactively and to generate profiles using either intensity (ELLPRO) or 
+interactively and to generate profiles using either intensity (ELLPRO) or
 contour analysis (ELLFOU).
 
 
 \subsection{Session 3 --- File based profiling by intensity analysis}
 \xlabel{SESSION3}
 
-Session 2 showed how one or more galaxies on an image might be 
+Session 2 showed how one or more galaxies on an image might be
 processed interactively to yield their profiles. However, there are
 times when you want to profile virtually every object in an image.
 This can be done using ELLPRO or ELLFOU in essentially the same manner.
 The only difference is that you supply the image co-ordinates of the galaxies
-you want profiled in a text file. Such a file may be easily created 
-using the LOGFILE option of \xref{KAPPA}{sun95}{}'s CURSOR or by taking 
-information from a file generated by object identification software such as 
+you want profiled in a text file. Such a file may be easily created
+using the LOGFILE option of \xref{KAPPA}{sun95}{}'s CURSOR or by taking
+information from a file generated by object identification software such as
 \xref{PISA}{sun109}{}.
- 
+
 The file used in the example below, contains the following:
 
 \begin{myquote}
@@ -1386,12 +1386,12 @@ The file used in the example below, contains the following:
 \end{myquote}
 
 The columns represent the $x$ and $y$ co-ordinates respectively. A third column
-might also have been included, giving a value for the background to be 
+might also have been included, giving a value for the background to be
 used for each of the galaxies. In the absence of a third column, the image's
 global value is employed. Local background values for different points may be
-easily determined using the ESP LOBACK application. 
+easily determined using the ESP LOBACK application.
 
-The co-ordinates given in this file should be in the 
+The co-ordinates given in this file should be in the
 Current co-ordinate system of the image (which can be selected by
 \xref{WCSFRAME}{sun95}{WCSFRAME} as described in the previous section),
 so that for instance if the image had the SKY frame as Current,
@@ -1410,26 +1410,26 @@ An example of the sort of input required is shown below.
 \begin{myquote}
 \begin{verbatim}
 % ellpro
- 
+
 ESP ELLPRO running.
 MODE - Use the application interactively? /TRUE/ > f
 INFILE - Text file containing co-ordinates /@coords.dat/ > f5coords.dat
 IN - Image NDF filename /@ic3374c/ > f5flat
-FRZORI - Is the galaxy origin to be frozen? /FALSE/ > 
+FRZORI - Is the galaxy origin to be frozen? /FALSE/ >
 BACK - Background value /760/ > 22712
 SIGMA - Standard deviation of the background /12/ > 57
 PSIZE - Size of the pixels (in arcsec) /1/ > 1
 RLIM - Maximum ellipse radius (in pixels) /10/ > 40
-ZEROP - Surface brightness zerop point (in magnitudes per arcsec) /27.5/ > 
-AUTOL - Automatically search for better origin? /TRUE/ > 
+ZEROP - Surface brightness zerop point (in magnitudes per arcsec) /27.5/ >
+AUTOL - Automatically search for better origin? /TRUE/ >
 AUTOLT - Use a centroid? /TRUE/ > f
-Default background used for object at  426.9,  155.3 
-Default background used for object at  278.7,  300.0 
-Default background used for object at  206.6,  350.2 
+Default background used for object at  426.9,  155.3
+Default background used for object at  278.7,  300.0
+Default background used for object at  206.6,  350.2
 ARDFIL - Masking ARD file /@ardfile.dat/ > !
 WARNING! - ARD file not used.
 OUT - Text file for profile output /@testprof.dat/ > f5results.dat
- 
+
 Working on PIXEL co-ordinates: 426.9  155.3
   19 ellipses determined.
 Working on PIXEL co-ordinates: 278.7  300.0
@@ -1439,28 +1439,28 @@ Working on PIXEL co-ordinates: 206.6  350.2
 \end{verbatim}
 \end{myquote}
 
-Note that since the image in this example does not have a SKY 
+Note that since the image in this example does not have a SKY
 frame in its World Coordinate System component,
 you have to enter the PSIZE parameter by hand.
 
 In the example given, the co-ordinates file coords.dat identified the
-locations of 3 galaxies, but it could just as 
-easily have contained information on many more. The current 
-upper limit imposed by ESP is 10000. 
+locations of 3 galaxies, but it could just as
+easily have contained information on many more. The current
+upper limit imposed by ESP is 10000.
 
 
 \subsection{Session 4 --- Obtaining galaxy pieslice cross-section}
 \xlabel{SESSION4}
 
 The ESP application SECTOR may be used to interactively derive a
-pieslice cross-section of a galaxy. Before it may be used the 
+pieslice cross-section of a galaxy. Before it may be used the
 NDF image containing the galaxy must be displayed on a suitable
 display device. This may be done in a manner similar to
-that described in Session 2. Once the image is displayed, SECTOR 
+that described in Session 2. Once the image is displayed, SECTOR
 may be run.
 
 The first prompt you are faced with asks if you are going to use a cursor
-to define the position of the galaxy centre and to describe the 
+to define the position of the galaxy centre and to describe the
 direction, size and length of the pieslice. If you answer FALSE to this query,
 you will have to input all your values via the keyboard. However, it is much
 simpler to use a cursor, as in the example below.
@@ -1468,10 +1468,10 @@ simpler to use a cursor, as in the example below.
 \begin{myquote}
 \begin{verbatim}
 % sector
- 
+
 ESP SECTOR running.
-CURSOR - Use the cursor to identify the galaxy centre? /TRUE/ > 
-IMGDEV - Which device is displaying the image /@xwindows/ > 
+CURSOR - Use the cursor to identify the galaxy centre? /TRUE/ >
+IMGDEV - Which device is displaying the image /@xwindows/ >
 \end{verbatim}
 \end{myquote}
 
@@ -1508,7 +1508,7 @@ Keyboard "1" key:   Show the cursor co-ordinates.
 \end{verbatim}
 \end{myquote}
 
-The application then asks 
+The application then asks
 for information about the image (BACK, SIGMA and, if necessary, PSIZE),
 how the results are to be displayed (SURF, RADISP, ZEROP)
 and where the results are to be displayed (SAME, DEVICE).
@@ -1516,42 +1516,42 @@ and where the results are to be displayed (SAME, DEVICE).
 \begin{myquote}
 \begin{verbatim}
 MIRROR - Use two diametrically opposite slices? /TRUE/ > TRUE
-BACK - Background count value /760.5/ > 
-SIGMA - Standard deviation of the background /12/ > 
+BACK - Background count value /760.5/ >
+SIGMA - Standard deviation of the background /12/ >
 Using info from SKY frame - pixels are  0.961 arcseconds square.
 
 SURF - Display counts as surface brightness? /TRUE/ > TRUE
 RADISP - Radius display mode /'r'/ > r
-ZEROP - Surface brightness zerop point /27.5/ > 
-AUTOL - Automatically search for better origin? /TRUE/ > 
+ZEROP - Surface brightness zerop point /27.5/ >
+AUTOL - Automatically search for better origin? /TRUE/ >
 ARDFIL - Masking ARD file /@ardfile.dat/ > !
 !! SUBPAR: Null (!) response to prompt for parameter ARDFIL
 WARNING! - ARD file not used.
 SAME - Use the same graphics device for the results graph? /TRUE/ > f
-DEVICE - Which device/type to display the graph /@x2windows/ > 
+DEVICE - Which device/type to display the graph /@x2windows/ >
 \end{verbatim}
 \end{myquote}
- 
+
 The RADISP and SURF options above specify that the `profile' will be displayed
 in the form of surface brightness versus linear radius. Other options exist for
 displaying the mean pixel count versus radius transformed into its
 logarithm, square root or quarter power.
 
 AUTOL set to TRUE means that the application will look at the parts of the
-image immediately surrounding the galaxy centre suggested 
-and, if possible, will identify a better candidate. In the instance given 
+image immediately surrounding the galaxy centre suggested
+and, if possible, will identify a better candidate. In the instance given
 AUTOL has been used.
-  
+
 The option MIRROR allows for the pieslice
 defined to be duplicated on the other side of the galaxy
 origin. This effectively increases the signal since more of the image will be
-sampled, but is only really applicable when the image is roughly 
+sampled, but is only really applicable when the image is roughly
 symmetrical. Figure 4 shows the selected sector displayed on the galaxy. It
 also shows the mirror image sector generated by the MIRROR parameter being
 set to TRUE.
-                    
-The graph is then displayed and you are asked to indicate (using the cursor) 
-the radius range of the profile points to be used to calculate the scale 
+
+The graph is then displayed and you are asked to indicate (using the cursor)
+the radius range of the profile points to be used to calculate the scale
 lengths.
 
 \begin{myquote}
@@ -1565,22 +1565,22 @@ Keyboard "2" key:   Quit the program.
 Keyboard "." key:   Select upper radius limit.
 \end{verbatim}
 \end{myquote}
- 
-The graph then displays the galaxy profile `fits' and the 
+
+The graph then displays the galaxy profile `fits' and the
 results of the scale length calculations are printed, showing
-values for the central surface brightness of the galaxy for both elliptical 
+values for the central surface brightness of the galaxy for both elliptical
 and spiral galaxy models.
 
 \begin{latexonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics[height=125mm,width=125mm]{sun180_diag4.eps}
 \caption{The galaxy image, showing the sector area sampled and profile.}
 \end{figure}
 \end{latexonly}
 \begin{htmlonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics{sun180_diag4.eps}
 \caption{The galaxy image, showing the sector area sampled and profile.}
 \end{figure}
@@ -1617,8 +1617,8 @@ part of the image.
 
 \begin{myquote}
 \begin{verbatim}
-OUT - Text file for profile output /@sectout.dat/ >  
-AGAIN - Profile again? /FALSE/ > 
+OUT - Text file for profile output /@sectout.dat/ >
+AGAIN - Profile again? /FALSE/ >
 \end{verbatim}
 \end{myquote}
 
@@ -1636,56 +1636,56 @@ The input file used ({\tt prof.dat}) was generated by ELLPRO.
 \begin{myquote}
 \begin{verbatim}
 % graphs
- 
+
 ESP GRAPHS running.
 MODE - Use the application interactively? /TRUE/ > true
 CURSOR - Use the cursor? /FALSE/ > false
 INFILE - Name of ESP data file /@test.dat/ > prof.dat
- 
-OUT - Text file for profile output /@graphs.out/ > 
+
+OUT - Text file for profile output /@graphs.out/ >
 \end{verbatim}
 \end{myquote}
 
-By opting for MODE to be TRUE, you have opted to interactively examine 
+By opting for MODE to be TRUE, you have opted to interactively examine
 each of the profiles from the input file in turn. In this mode, the profiles are
 displayed (if required) on a graphics device and you must
 identify the radius range of the data points to be used to determine the
 galaxy scale length. CURSOR set to FALSE means that the radius range will
 either be typed in or GRAPHS will automatically guess at an
-appropriate range to use. The inputs INFILE and OUT identify the input and 
-output text files respectively. The graphical output is shown in 
+appropriate range to use. The inputs INFILE and OUT identify the input and
+output text files respectively. The graphical output is shown in
 Figure 5.
- 
+
 \begin{myquote}
 \begin{verbatim}
 ELLPRO Header found.
 Source image was: f5flat
 End of filename report.
- 
+
 WHATD - Parameter to display /'s'/ > s
 RADISP - Radius display mode /'q'/ > r
 DEVICE - Which device/type to display the graph /@xw/ > xw
 RRANGE - Automatic radius limit selection? /TRUE/ > f
-FITLIM - Limit of the radius range to be fitted (in arcsec) > 2.5,15 
+FITLIM - Limit of the radius range to be fitted (in arcsec) > 2.5,15
 \end{verbatim}
 \end{myquote}
 
 \begin{latexonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics[height=100mm,width=150mm]{sun180_diag5.eps}
 \caption{The galaxy profile with elliptical and spiral models shown.}
 \end{figure}
 \end{latexonly}
 \begin{htmlonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics{sun180_diag5.eps}
 \caption{The galaxy profile with elliptical and spiral models shown.}
 \end{figure}
 \end{htmlonly}
 
-GRAPHS shows you the name of the application that generated the 
+GRAPHS shows you the name of the application that generated the
 profile you are examining and the name of the image from which
 it was derived. It then asks you to define what is to be displayed.
 WHATD set to `s' means surface brightness will be displayed against
@@ -1703,14 +1703,14 @@ X and Y co-ordinates (Current):  1787.8, 698.3
 \end{myquote}
 
 Two sets of co-ordinates are displayed here to identify the point
-in question: those of the Base frame (GRID co-ordinates, which 
+in question: those of the Base frame (GRID co-ordinates, which
 always start at (1,1) for the bottom left pixel in the image)
 and those of whatever was the Current frame when the
 file being plotted by GRAPHS was generated.
 If the Current co-ordinate frame of the image has been changed
 using \xref{WCSFRAME}{sun95}{WCSFRAME} then the Current co-ordinates
 will no longer be correct, but the Base frame ones always will.
-You can set the Base frame to be Current, 
+You can set the Base frame to be Current,
 and so used for display etc.,
 at any time by doing
 \begin{myquote}
@@ -1720,12 +1720,12 @@ at any time by doing
 \end{myquote}
 
 More information is then given;
-values for central surface brightness (CSB), scale length and 
+values for central surface brightness (CSB), scale length and
 range of data points used are displayed. The LCC (linear correlation
-coefficient) values give an idea of how good the fit was. Finally, you are 
-given the option to try fitting the profile again. If there is only one 
-object in the input file, the application will then stop, otherwise the 
-next profile from the file will be read and you will be allowed to profile 
+coefficient) values give an idea of how good the fit was. Finally, you are
+given the option to try fitting the profile again. If there is only one
+object in the input file, the application will then stop, otherwise the
+next profile from the file will be read and you will be allowed to profile
 that.
 
 \begin{myquote}
@@ -1736,23 +1736,23 @@ Points used for elliptical calculation.:   12
 Scale length elliptical:              0.00183
 Extrapolated CSB spiral:              16.6
 Extrapolated CSB elliptical:           4.6
-Spiral LCC squared:                    .92            
+Spiral LCC squared:                    .92
 Ellip. LCC squared:                    .95
- 
+
 AGAIN - Display again? /TRUE/ > f
- 
+
 End of file found.
 \end{verbatim}
 \end{myquote}
 
 One detail of this example needs a little more explanation. In one
 of its modes, GRAPHS can work automatically on input files
-containing information on lots of galaxies without further 
+containing information on lots of galaxies without further
 input. This means that GRAPHS can take the file generated in Session
 3 (containing the profiles of three galaxies) and determine from them,
 values for the central surface brightness and scale length.
-This method of working is selected by setting MODE to FALSE, but otherwise 
-differs only slightly from the example above. 
+This method of working is selected by setting MODE to FALSE, but otherwise
+differs only slightly from the example above.
 
 
 
@@ -1768,7 +1768,7 @@ Then, the session will go something like this:
 \begin{myquote}
 \begin{verbatim}
 % skew
- 
+
 ESP SKEW running.
 
 IN - Image NDF filename /@skew/ > cnt4141c
@@ -1778,20 +1778,20 @@ Shape:      525 x 520 pixels
 Bounds:     x= 1:525  y= 1:520
 Image size: 273000 pixels
 OUT - Output NDF filename /@skew/ > skew
-WIDTH - Template width (in arcsec) /8/ > 
+WIDTH - Template width (in arcsec) /8/ >
 PSIZE - Pixel size /1/ > .88
-MODET - Use a global mode value (y/n)? /YES/ > 
+MODET - Use a global mode value (y/n)? /YES/ >
 BACK - Background sky value /6200/ > 22716
-USEALL - Include very bright pixels (y/n)? /NO/ > 
+USEALL - Include very bright pixels (y/n)? /NO/ >
 SIGMA - Standard deviation of the image pixels /390/ > 56
-NSIGMA - Level of the cutout in SIGMA /10/ > 
-MULT - Output skewness multiplying factor /1000/ > 
+NSIGMA - Level of the cutout in SIGMA /10/ >
+MULT - Output skewness multiplying factor /1000/ >
 \end{verbatim}
 \end{myquote}
 
 The parameters IN and OUT refer to the source image and the output image
-respectively. BACK, SIGMA and PSIZE all relate to the image 
-cnt4141c. 
+respectively. BACK, SIGMA and PSIZE all relate to the image
+cnt4141c.
 
 When the MODET option is set to FALSE, SKEW calculates a local background
 value when determining the skewness of each part of the image. In this
@@ -1799,7 +1799,7 @@ example it is set to TRUE, so the image's global background value is used
 instead. This is the faster option.
 
 USEALL and NSIGMA are used to define a pixel count cutoff value. If one of the
-image pixels is brighter than the global background (BACK) plus a certain 
+image pixels is brighter than the global background (BACK) plus a certain
 number (NSIGMA) of background value standard deviations (SIGMA) it is excluded from the
 calculations. This may be used to reduce the influence of cosmic rays and
 other bright image features which might otherwise dominate the output.
@@ -1812,7 +1812,7 @@ far it has got. This is because, for large images, it can
 take a considerable time to run, especially, if the template size is large.
 
 Figure 6 shows a source image and the image generated by SKEW when it was sampled
-over boxes approximately 10x10 pixels in size. Note how the previously 
+over boxes approximately 10x10 pixels in size. Note how the previously
 unnoticed bad column (slightly left of centre near the top) is easily spotted
 and how large the full extent of the poor flatfielding is.
 
@@ -1822,7 +1822,7 @@ Applying SKEW to file: cnt4141c
 Results file will be:  skew
 Global background value used.
 High count cutoff was used.
- 
+
 Percentage done so far: 10
 Percentage done so far: 20
 Percentage done so far: 29
@@ -1834,14 +1834,14 @@ Percentage done so far: 98
 
 \begin{latexonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics[height=75mm,width=150mm]{sun180_diag6.eps}
 \caption{A poorly flatfielded source image and the output generated by SKEW.}
 \end{figure}
 \end{latexonly}
 \begin{htmlonly}
 \begin{figure}[htlb]
-\centering 
+\centering
 \includegraphics{sun180_diag6.eps}
 \caption{A poorly flatfielded source image and the output generated by SKEW.}
 \end{figure}
@@ -1851,14 +1851,14 @@ Percentage done so far: 98
 \xlabel{SESSION7}
 In some of the earlier sessions you saw how to profile a galaxy in
 terms of an ellipse using ELLPRO and ELLFOU. Sometimes in astronomy
-it is useful to profile a source (or sources) in terms of 2-D Gaussian 
+it is useful to profile a source (or sources) in terms of 2-D Gaussian
 functions, this is especially useful for users of JCMT data (see also
 \xref{JCMTDR}{sun132}{}). In ESP this operation is performed by the
-application GAUFIT. 
+application GAUFIT.
 
 GAUFIT is similar to ELLPRO, SECTOR and ELLFOU in that it may be operated
-using a cursor or a simple text file to select the source position(s) that 
-must be examined. 
+using a cursor or a simple text file to select the source position(s) that
+must be examined.
 
 GAUFIT now contains two distinct fitting algorithms: the original one,
 which obtained the fit parameters by hunting through a region of
@@ -1877,8 +1877,8 @@ but I will show two complete examples below.
 
 \subsubsection{GAUFIT: original fitting algorithm}
 
-Once the image to be analysed has been examined using 
-HISTPEAK and displayed using \xref{KAPPA}{sun95}{}'s DISPLAY, an interactive 
+Once the image to be analysed has been examined using
+HISTPEAK and displayed using \xref{KAPPA}{sun95}{}'s DISPLAY, an interactive
 session might proceed as follows:
 
 \begin{myquote}
@@ -1887,11 +1887,11 @@ session might proceed as follows:
 
 ESP GAUFIT running.
 
-MODE - Use the application interactively? /TRUE/ > 
-COLOUR - Pen colour? /1/ > 
-ANGCON - Use clockwise positive rotation convention? /FALSE/ > 
-ANGOFF - Position angle offset /0/ > 
-IMGDEV - Which device is displaying the image? /@xwindows/ > 
+MODE - Use the application interactively? /TRUE/ >
+COLOUR - Pen colour? /1/ >
+ANGCON - Use clockwise positive rotation convention? /FALSE/ >
+ANGOFF - Position angle offset /0/ >
+IMGDEV - Which device is displaying the image? /@xwindows/ >
 
 Using /local1/export/home/norman/s/src/esp/ic3374c as the input NDF.
 
@@ -1925,25 +1925,25 @@ Using info from SKY frame - pixels are  0.961 arcseconds square.
 \end{verbatim}
 \end{myquote}
 
-This is very similar to the way in which ELLPRO, ELLFOU and SECTOR works. 
-After first defining the colour (COLOUR) of the ink to be used to mark the 
-image locations specified, the angle convention to be used is 
-defined (via ANGCON and ANGOFF) and then the device displaying the 
+This is very similar to the way in which ELLPRO, ELLFOU and SECTOR works.
+After first defining the colour (COLOUR) of the ink to be used to mark the
+image locations specified, the angle convention to be used is
+defined (via ANGCON and ANGOFF) and then the device displaying the
 source image chosen (IMGDEV).
 
 
 \begin{myquote}
 \begin{verbatim}
-FWHM - Work in FWHM, rather than sigmas? /TRUE/ > 
-LSQFIT - Use the non-linear least-squares method? /FALSE/ > 
+FWHM - Work in FWHM, rather than sigmas? /TRUE/ >
+LSQFIT - Use the non-linear least-squares method? /FALSE/ >
 BACK - Background count value /6196.5/ > 760
 SIGMA - Std. dev. of the background /400.4/ > 12
-NSIGMA - Number of sigma above sky /5/ > 
+NSIGMA - Number of sigma above sky /5/ >
 NITER - Number of iterations /5/ > 3
 
 
-MODEL - Output NDF filename /@ic3374c-out/ > 
-MODTYP - Whole image model (W) or residuals (R) /'w'/ > 
+MODEL - Output NDF filename /@ic3374c-out/ >
+MODTYP - Whole image model (W) or residuals (R) /'w'/ >
 \end{verbatim}
 \end{myquote}
 If you set FWHM to be
@@ -1955,39 +1955,39 @@ If you set the parameter LSQFIT to be false, you get the original
 GAUFIT algorithm.
 
 It is then necessary to provide information on the image background value
-(BACK) and its standard deviation (SDEV). These are most easily found 
+(BACK) and its standard deviation (SDEV). These are most easily found
 using ESP's HISTPEAK. For most purposes the interpolated standard deviation is
 best.
 
-The parameter NSIGMA defines a count value (NSIGMA times the SDEV value 
+The parameter NSIGMA defines a count value (NSIGMA times the SDEV value
 plus BACK value supplied)
 above which a pixel must be
 for it to be included during the minimisation process. This is to reduce
-the number of pixels considered and avoid `noisy' pixels contributing. 
-Using too low a value will slow the application down a lot. 
-ITER merely tells it how many minimisation loops must occur before the 
-processing stops. As with all minimisation processes the application can 
-reach the `point of vanishing returns' if too many iteration loops are 
+the number of pixels considered and avoid `noisy' pixels contributing.
+Using too low a value will slow the application down a lot.
+ITER merely tells it how many minimisation loops must occur before the
+processing stops. As with all minimisation processes the application can
+reach the `point of vanishing returns' if too many iteration loops are
 specified. The arbitrary residual indicator will be a useful help. See below.
 
-The parameter MODEL is the name you wish to give to the output image while 
+The parameter MODEL is the name you wish to give to the output image while
 MODTYP defines what sort of image it should be. There are two options: the
 first is a whole image (MODTYP=W) where the model value for every pixel of the
 image is calculated, the second (MODTYP=R) where only the areas of the image
-immediately surrounding the sources are shown as non-bad. In these regions the 
+immediately surrounding the sources are shown as non-bad. In these regions the
 residual value is given (ie the source image value for a given pixel
 minus the model value for the same pixel).
 
 \begin{myquote}
 \begin{verbatim}
-XINC - Source origin movement in X /0.001/ > 
-YINC - Source origin movement in Y /0.001/ > 
-SAINC - Source std dev factor in Sa /1/ > 
-SBINC - Source std dev factor in Sb /1/ > 
-PINC - Source peak variation /1/ > 
-ANGINC - Source origin variation in angle /1/ > 
+XINC - Source origin movement in X /0.001/ >
+YINC - Source origin movement in Y /0.001/ >
+SAINC - Source std dev factor in Sa /1/ >
+SBINC - Source std dev factor in Sb /1/ >
+PINC - Source peak variation /1/ >
+ANGINC - Source origin variation in angle /1/ >
 
-AUTOL - Search for a better origin? /TRUE/ > 
+AUTOL - Search for a better origin? /TRUE/ >
 \end{verbatim}
 \end{myquote}
 
@@ -1996,18 +1996,18 @@ These parameters define how tightly constrained the minimisation routine
 is when it tries to walk through variable space. That is, if any of these
 values is very small (say .001) the minimisation can only adjust that
 aspect of the source model very slightly. The other extreme, a lot of freedom
-to vary source parameters, is specified if the value supplied is 1. So in the 
-case shown above, the centres of the source cannot be varied 
-much (XINC and YINC), while the breadths of the sources, peak height and 
+to vary source parameters, is specified if the value supplied is 1. So in the
+case shown above, the centres of the source cannot be varied
+much (XINC and YINC), while the breadths of the sources, peak height and
 position angle (SAINC, SBINC, PINC and ANGINC respectively) are allowed
 a lot of freedom to vary. The ability to constrain an aspect for the
-source model is essential for merged sources. 
+source model is essential for merged sources.
 
-Setting AUTOL true means that the application will try to improve slightly 
+Setting AUTOL true means that the application will try to improve slightly
 on the source positions you have suggested using a centroiding routine.
 This is particularly useful with very large images where the display
-window you  
-are using may not be able to provide a 1:1 relationship between the 
+window you
+are using may not be able to provide a 1:1 relationship between the
 pixels in the image and the pixels on the screen.
 
 
@@ -2046,11 +2046,11 @@ OUT - Text file for parameter /'GaiaEsp-outputtext'/ > ic3374c-txt
 
 As you can see, the source positions remained unchanged during the minimisation
 (as requested by the small values we assigned for XINC and YINC) while
-the other parameters varied considerably -- note that even at the last 
+the other parameters varied considerably -- note that even at the last
 iteration the position angle of the source is still varying and the
-residual is dropping. 
+residual is dropping.
 The X and Y co-ordinates reported here,
-and those written to the output file {\tt ic3374c-txt}, 
+and those written to the output file {\tt ic3374c-txt},
 are in the Base co-ordinate system of the image.
 
 An example output file is shown in Section \ref{sec:output}
@@ -2075,14 +2075,14 @@ choose to use the new algorithm.
 
 \begin{myquote}
 \begin{verbatim}
-FWHM - Work in FWHM, rather than sigmas? /TRUE/ > 
+FWHM - Work in FWHM, rather than sigmas? /TRUE/ >
 LSQFIT - Use the non-linear least-squares method? /FALSE/ > y
-CALCSD - Calculate and display uncertainties? /TRUE/ > 
+CALCSD - Calculate and display uncertainties? /TRUE/ >
 BACK - Background count value ( < 0 to have it fitted) /760/ > -1
-MAXITER - Maximum number of iterations (-1 for default) /-1/ > 
+MAXITER - Maximum number of iterations (-1 for default) /-1/ >
 
-MODEL - Output NDF filename /@ic3374c-out/ > 
-MODTYP - Whole image model (W)/Residuals (R)/reGression diag. (G) /'w'/ > 
+MODEL - Output NDF filename /@ic3374c-out/ >
+MODTYP - Whole image model (W)/Residuals (R)/reGression diag. (G) /'w'/ >
 \end{verbatim}
 \end{myquote}
 
@@ -2108,7 +2108,7 @@ gives a `regression diagnostic', which is an image in which the value
 at each point is the change in the residual function if the
 corresponding point in the data were deleted.  The residual function
 is half the sum of the squares of the differences between the model
-and the data.  This is expensive to create, so you should not 
+and the data.  This is expensive to create, so you should not
 select it unless you actually wish to examine it.
 
 \begin{myquote}
@@ -2152,7 +2152,7 @@ Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
 
 Background (fitted) = 769.0236
 
-OUT - Text file for parameter /@ic3374c-txt6/ > 
+OUT - Text file for parameter /@ic3374c-txt6/ >
 \end{verbatim}
 \end{myquote}
 
@@ -2199,7 +2199,7 @@ you have a non-pathological case which gives negative values here, I'd
 like to hear about it.
 
 Finally, the routine reports that it has converged successfully (if it
-hasn't, it should give a more-or-less useful explanation here).  
+hasn't, it should give a more-or-less useful explanation here).
 % The number indicates which of several internal convergence tests was satisfied.
 
 The routine displays its results, then their corresponding
@@ -2240,9 +2240,9 @@ The application can be used with the following syntax:
 \end{verbatim}
 \end{myquote}
 
-This leads to the NDF p2 being examined, using the whole image, smoothing 
+This leads to the NDF p2 being examined, using the whole image, smoothing
 the histogram with a filter of radius 4 counts and displaying the histogram on
-device x2windows. Full details of the parameters may be found in Appendix 
+device x2windows. Full details of the parameters may be found in Appendix
 \ref{des:HISTPEAK}.
 
 The alternative to using the whole image is to use an ARD file to define the
@@ -2254,11 +2254,11 @@ parts of the image to be ignored. In that case the syntax is:
 \end{verbatim}
 \end{myquote}
 
-In this example the source image p2 is used together with the 
-ARD file definition areas.dat (note the use of the `\^{ }' character). 
-The histogram generated to 
-calculate the modal value is smoothed using a Gaussian filter 
-of radius 4 counts. The histogram generated is displayed on 
+In this example the source image p2 is used together with the
+ARD file definition areas.dat (note the use of the `\^{ }' character).
+The histogram generated to
+calculate the modal value is smoothed using a Gaussian filter
+of radius 4 counts. The histogram generated is displayed on
 device x2w. Other examples are shown in Appendix \ref{des:HISTPEAK}.
 
 Full details of ARD files may be found in Appendix \ref{app:bad}.
@@ -2304,7 +2304,7 @@ at an early stage if the wrong file has been requested.
 
 The later sections are data derived either directly from the pixel values
 in the file or are determined following the construction of a histogram
-containing the pixel values. Each of the histogram bins has a default 
+containing the pixel values. Each of the histogram bins has a default
 width of 1 count (or larger if the count range present in the image is large).
 The peak in the histogram is used to determine the modal
 value by a number of routes. The methods are as follows:
@@ -2319,36 +2319,36 @@ value by a number of routes. The methods are as follows:
 \item[Projected:]
                A number of chords through the histogram peak at different
                heights are taken. The length and midpoint of each of these is
-               calculated and an extrapolation used to determine the 
-               location of the midpoint of a zero length chord. 
+               calculated and an extrapolation used to determine the
+               location of the midpoint of a zero length chord.
 \item[Interpolated:]
-               The part of the smoothed histogram near to its peak is 
-               identified and data from that region `fitted' with a 
+               The part of the smoothed histogram near to its peak is
+               identified and data from that region `fitted' with a
                Gaussian curve. The location of the fitted peak is
                calculated. Under normal conditions this should be
                the most accurate estimate of the modal pixel value.
 \end{description}
 
 The standard deviation of the pixel values in the image is
-calculated using the standard equations for a Normal distribution. 
-A value (SIGMA) is also derived, evaluating the standard deviation of the 
-pixel value distribution in the region of the histogram immediately 
-surrounding the 
+calculated using the standard equations for a Normal distribution.
+A value (SIGMA) is also derived, evaluating the standard deviation of the
+pixel value distribution in the region of the histogram immediately
+surrounding the
 modal value. For a pure noise image these two values would be expected
 to be the same, but the presence of any objects or image flaws acts to
 skew the distribution, generating `outliers' which quickly causes the
-standard deviation of the image as a whole to become large compared to 
+standard deviation of the image as a whole to become large compared to
 the value obtained for parts of the image where no objects are imaged.
 
 A crude estimate of the influence of the outliers may be obtained by
-considering the ratio of the normal standard deviation to the absolute 
-deviation of the image. Alternatively, the skewness and kurtosis (third 
+considering the ratio of the normal standard deviation to the absolute
+deviation of the image. Alternatively, the skewness and kurtosis (third
 and fourth moments of deviation from a Gaussian distribution) may also be
-considered. It should be noted that the kurtosis value provided 
-has had its base value of three subtracted to allow more digits to be 
+considered. It should be noted that the kurtosis value provided
+has had its base value of three subtracted to allow more digits to be
 displayed.
 
-As a result of the default bin width used (1), images with a pixel count range 
+As a result of the default bin width used (1), images with a pixel count range
 less than 3 will not be examined by HISTPEAK. To overcome this, images may be
 manipulated using \xref{KAPPA}{sun95}{}'s CMULT to increase their range by a suitable factor.
 
@@ -2356,35 +2356,35 @@ manipulated using \xref{KAPPA}{sun95}{}'s CMULT to increase their range by a sui
 \subsection{Local background value determination}
 \xlabel{LOCALBACKGROUNDS}
 
-If you are intending to determine profiles for a large number of 
+If you are intending to determine profiles for a large number of
 galaxies on an image and the image is not perfectly flatfielded
 then the background values in the image region surrounding
 each of the galaxies may be determined using LOBACK.
 
-The first requirement for this is a text file containing a list of the 
-coordinates of the objects on the image. This may be derived 
+The first requirement for this is a text file containing a list of the
+coordinates of the objects on the image. This may be derived
 in a number of ways. The most obvious is to use the \xref{KAPPA}{sun95}{} application
 CURSOR (with LOGFILE assigned a value). This method is convenient
 when only a small number of galaxies are required from each image.
 However, if all the galaxies/objects on an image are to be examined then
-the text files generated by \xref{PISA}{sun109}{}, RGASP's IMAGES or 
+the text files generated by \xref{PISA}{sun109}{}, RGASP's IMAGES or
 \xref{IRAF}{sun109}{}'s FOCAS might
 form the the basis of an input file to LOBACK.
 
 The input file for LOBACK should (in the simplest case) contain two
-columns, they represent the $x$ and $y$ co-ordinates respectively 
+columns, they represent the $x$ and $y$ co-ordinates respectively
 in the Current co-ordinate system of the NDF.
 LOBACK then determines modal pixel values, pixel value standard deviation
-and background standard deviation  
+and background standard deviation
 values at each of the image locations described in the text file. Optionally
 (parameter THIRD=FALSE),
-you may define a third column representing the minimum number 
+you may define a third column representing the minimum number
 of pixels to be used in determining the modal pixel value or alternatively
-(parameter THIRD=TRUE) the number of pixels believed to be in the object found 
-at that location. In the latter case the number of pixels used, and the 
+(parameter THIRD=TRUE) the number of pixels believed to be in the object found
+at that location. In the latter case the number of pixels used, and the
 size of the image area they are taken from is adjusted to ensure the sample
 contains a significant number of non-object pixels - hopefully sky.
-In either case, the software imposes a lower limit on the number of pixels 
+In either case, the software imposes a lower limit on the number of pixels
 to be used, thereby reducing the effect of a sparse pixel value histogram.
 
 The application can be used with the following syntax:
@@ -2395,26 +2395,26 @@ The application can be used with the following syntax:
 \end{verbatim}
 \end{myquote}
 
-This reads the galaxy co-ordinates from a file called coords.dat. The 
-information in the third column of the text file is assumed to be the 
-number of contiguous pixels found in the galaxy by \xref{PISA}{sun109}{}, 
-IMAGES or FOCAS. The 
-pixels used to make up the histogram required will be taken from an 
+This reads the galaxy co-ordinates from a file called coords.dat. The
+information in the third column of the text file is assumed to be the
+number of contiguous pixels found in the galaxy by \xref{PISA}{sun109}{},
+IMAGES or FOCAS. The
+pixels used to make up the histogram required will be taken from an
 area of the image 64x64 pixels in size. In the unlikely event
 of an image being smaller than the requested number of pixels required,
 all the non-bad image pixels will be employed. Other examples are given in
 Appendix \ref{des:LOBACK}
 
-If an object location 
+If an object location
 is not within the bounds of the image requested then an
 error message is generated for that object, but the program continues
 reading the object list working on each in turn. The modal pixel values
 generated use the same methods as HISTPEAK, i.e. (un)smoothed histogram,
 projection and interpolation (see HISTPEAK).
 
-An example output file is shown in 
+An example output file is shown in
 Appendix \ref{app:outputfiles}
-and described in 
+and described in
 Section \ref{sec:output}.
 
 
@@ -2422,32 +2422,32 @@ Section \ref{sec:output}.
 \label{sec:removi}
 
 It is usually the case that any image containing a galaxy of interest will
-also contain a number of other objects such as galaxies, stars, cosmic rays 
+also contain a number of other objects such as galaxies, stars, cosmic rays
 or even image flaws.
-Those that fall on the image far beyond the apparent limits of the 
-galaxy may be ignored, but those lying close 
+Those that fall on the image far beyond the apparent limits of the
+galaxy may be ignored, but those lying close
 to the galaxy of interest must be
 removed. The is because the profiling applications have been
 written under the assumption that the only sources of pixel count
 on the image are the one galaxy of interest and the image background noise.
 If an extraneous object lies within the outer, fainter, isophotes of a galaxy
-the software is unaware that the contaminated pixels contain 
+the software is unaware that the contaminated pixels contain
 contributions from an additional source and the profile generated is incorrect.
 For the purposes of ESP the contaminated pixels may be removed from the
-analysis by setting their values to bad.  
+analysis by setting their values to bad.
 
 \subsection{Removing consistent image faults}
 
 It is well known that few, if any, CCD type detectors are perfect. Normally,
-it will be found that several pixels are either `hot' or `cold' (contain very 
-high or very low values) no matter what is being imaged. In the case of 
-cheaper, or older, CCDs it may be found that whole columns or rows of pixels 
+it will be found that several pixels are either `hot' or `cold' (contain very
+high or very low values) no matter what is being imaged. In the case of
+cheaper, or older, CCDs it may be found that whole columns or rows of pixels
 are similiarly useless. Efforts should be made to ensure the values in these
 pixels are disregarded during all stages of image analysis; this may
-be done by identifying the pixels in question (they remain the same for 
+be done by identifying the pixels in question (they remain the same for
 a given CCD and a list is usually available at the observatory for
 each CCD they employ) and inserting that information into an ARD file
-which can be examined by the ESP application MASK. This looks at the 
+which can be examined by the ESP application MASK. This looks at the
 ARD file supplied to find out which pixels are suspect and then sets them
 to bad in the output image thus ensuring they play no role in future analysis.
 
@@ -2459,59 +2459,59 @@ The application can be used with the following syntax:
 \end{verbatim}
 \end{myquote}
 
-This looks at the ARD text file areas.dat (note the use of the 
-`\^{ }' character) and then sets the pixels defined 
+This looks at the ARD text file areas.dat (note the use of the
+`\^{ }' character) and then sets the pixels defined
 in p2 to be bad. The image so generated is output as the NDF masked.
 Other examples may be found in Appendix \ref{des:MASK}.
 
 
 \subsection{Removing other image contamination}
 
-Often, it will be found that an image of a galaxy will contain, within its 
-isophotes, brighter areas due to satellite galaxies or other foreground and 
+Often, it will be found that an image of a galaxy will contain, within its
+isophotes, brighter areas due to satellite galaxies or other foreground and
 background objects. Since these do not arise at predictable sites (due to faults
-in the CCD or optics), it is not possible to remove 
-these objects without a visual inspection. The simplest way to remove these 
-is to display the image using \xref{KAPPA}{sun95}{}'s DISPLAY and to then set the offending 
-areas of the frame to the bad value 
-by interactive use of the \xref{KAPPA}{sun95}{}'s ARDGEN and ARDMASK applications. 
-Unfortunately, it is usually necessary to carry out this process with all the 
-images that are to be profiled. 
+in the CCD or optics), it is not possible to remove
+these objects without a visual inspection. The simplest way to remove these
+is to display the image using \xref{KAPPA}{sun95}{}'s DISPLAY and to then set the offending
+areas of the frame to the bad value
+by interactive use of the \xref{KAPPA}{sun95}{}'s ARDGEN and ARDMASK applications.
+Unfortunately, it is usually necessary to carry out this process with all the
+images that are to be profiled.
 
 \section{Removing cosmic rays and bright regions}
 \label{sec:removc}
 
-It is often found that images contain small bright dots scattered throughout 
-the image. These arise because the detector has been struck by a cosmic ray, 
-generating a pixel value corresponding to a large influx of light. Commonly, 
-these bright dots consist of 1--6 reasonably bright pixels surrounding one 
-very bright one (frequently 10--20 SIGMA above sky count), but 
-the exact shape depends on the structure of the detector, the energy of 
-the cosmic ray and its angle of incidence. Some of these events may be 
-simply removed using the ESP TOPPED application. This searches 
-through an image and find all those pixels above a defined threshold and 
-sets to bad all the pixels in a circular area surrounding it. 
+It is often found that images contain small bright dots scattered throughout
+the image. These arise because the detector has been struck by a cosmic ray,
+generating a pixel value corresponding to a large influx of light. Commonly,
+these bright dots consist of 1--6 reasonably bright pixels surrounding one
+very bright one (frequently 10--20 SIGMA above sky count), but
+the exact shape depends on the structure of the detector, the energy of
+the cosmic ray and its angle of incidence. Some of these events may be
+simply removed using the ESP TOPPED application. This searches
+through an image and find all those pixels above a defined threshold and
+sets to bad all the pixels in a circular area surrounding it.
 
 You are first
-prompted to enter the name of the image from which the cosmic ray events are 
-to be removed. Information is then requested which defines how bright pixels 
+prompted to enter the name of the image from which the cosmic ray events are
+to be removed. Information is then requested which defines how bright pixels
 must be before they can be attributed to cosmic ray events. Finally, you are
-asked to define 
-the size of the area surrounding a cosmic ray detection that will be 
-assumed to be contaminated and will be set to the bad value. 
+asked to define
+the size of the area surrounding a cosmic ray detection that will be
+assumed to be contaminated and will be set to the bad value.
 
-Clearly, some experimentation should be employed to determine 
-suitable values for the threshold pixel value and the likely size of the 
-events. One possible method of operation for TOPPED is to run it twice for 
-each image. Once to detect saturated pixels and remove pixels in a 
-large area surrounding these (saturated pixels tend to spill count into 
+Clearly, some experimentation should be employed to determine
+suitable values for the threshold pixel value and the likely size of the
+events. One possible method of operation for TOPPED is to run it twice for
+each image. Once to detect saturated pixels and remove pixels in a
+large area surrounding these (saturated pixels tend to spill count into
 their neighbours) and then run it again for a lower threshold with a small area
-being set to bad. 
+being set to bad.
 
-The use of TOPPED will always be a compromise. If a cosmic ray falls 
-within a bright object its detection and removal becomes much more 
-difficult and requires a more sophisticated approach involving 
-interactive removal of contaminating pixels (see Appendix \ref{app:bad}). 
+The use of TOPPED will always be a compromise. If a cosmic ray falls
+within a bright object its detection and removal becomes much more
+difficult and requires a more sophisticated approach involving
+interactive removal of contaminating pixels (see Appendix \ref{app:bad}).
 
 The application can be used with the following syntax:
 
@@ -2523,31 +2523,31 @@ The application can be used with the following syntax:
 
 As usual, if there is no SKY frame in the NDF {\tt galaxy}
 then pixel size must also be supplied via the PSIZE parameter.
-In this example all pixels in the image galaxy with a pixel value 
-greater than BACK$+$10$\times$SIGMA are identified. Then, all the pixels 
-within a radius of 1.5 arc second of the bright pixels are set to the 
+In this example all pixels in the image galaxy with a pixel value
+greater than BACK$+$10$\times$SIGMA are identified. Then, all the pixels
+within a radius of 1.5 arc second of the bright pixels are set to the
 bad value. Other examples may be found in Appendix \ref{des:MASK}.
 
 
 \section{Examining image flatness}
 \label{sec:examining}
 
-One of the major problems encountered when using astronomical images 
+One of the major problems encountered when using astronomical images
 obtained from CCDs or plate scans is that of poor flatfielding. Very often
 we are forced to deal with images that have been pre-processed by
 someone else and yet still retain variations in the background value.
-These are most commonly caused either by hardware faults such as vignetting, 
-poor flatfielding software or by simple human error. 
+These are most commonly caused either by hardware faults such as vignetting,
+poor flatfielding software or by simple human error.
 
 Whilst such variations may be small compared to the brighter
 objects on an image, they can make analysis of faint and/or diffuse objects
-very difficult and, in addition, they will spoil any low level display of the 
+very difficult and, in addition, they will spoil any low level display of the
 image by appearing as brighter or darker regions rather than a uniform
-background continuum. 
+background continuum.
 
 The more serious quantitative influence of these variations is in
-the consequent inaccuracy of any global background value estimate fed into a 
-profiling application. If a galaxy being profiled is in a part of the image for 
+the consequent inaccuracy of any global background value estimate fed into a
+profiling application. If a galaxy being profiled is in a part of the image for
 which the global background value is significantly inaccurate the profile
 generated will also be inaccurate. Any subsequent scale length analysis
 will also be wrong, particularly at lower isophotes.
@@ -2555,30 +2555,30 @@ will also be wrong, particularly at lower isophotes.
 The ESP application SKEW allows you to generate an image which highlights
 where the flatfielding has been poorly accomplished.
 It operates by considering how the skewness of the pixel brightness distribution
-varies over the image. It does this by, for each pixel of the image in turn, 
-considering the values of all pixels within a given radius and using those to 
-calculate a skewness value. You must define the size of the image region 
-sampled and hence the scale size over which fluctuations in the background 
+varies over the image. It does this by, for each pixel of the image in turn,
+considering the values of all pixels within a given radius and using those to
+calculate a skewness value. You must define the size of the image region
+sampled and hence the scale size over which fluctuations in the background
 may be detected. Any areas of the image where the pixel brightness distribution
 is not similiar to the expected Normal distribution are shown up strongly.
-The values for the expected distribution are taken from the modal value 
+The values for the expected distribution are taken from the modal value
 and background value standard deviation of the image. These may be derived easily
 using HISTPEAK.
 
-For images containing very bright galaxies it may be necessary to reduce the 
-contribution of real objects in the image by use of the TOPPED application. 
-This then allows the variations in the background to be 
+For images containing very bright galaxies it may be necessary to reduce the
+contribution of real objects in the image by use of the TOPPED application.
+This then allows the variations in the background to be
 more easily seen.
 
-It should be noted that SKEW is not a quick application since a large image and 
+It should be noted that SKEW is not a quick application since a large image and
 sampling area can easily combine to cause the application to make {\em billions}
-of calculations per run. However, it is a good idea to run the application at 
-least once for every new data set unless you are entirely confident of the 
-flatfielding techniques that were employed during reduction. Execution time 
-may be reduced by reducing the size of an image using \xref{KAPPA}{sun95}{}'s COMPADD prior 
+of calculations per run. However, it is a good idea to run the application at
+least once for every new data set unless you are entirely confident of the
+flatfielding techniques that were employed during reduction. Execution time
+may be reduced by reducing the size of an image using \xref{KAPPA}{sun95}{}'s COMPADD prior
 to using SKEW.
-                           
-The Starlink package \xref{CCDPACK}{sun139}{} is particularly useful for flatfielding data 
+
+The Starlink package \xref{CCDPACK}{sun139}{} is particularly useful for flatfielding data
 even when no flat frames are available.
 
 The SKEW application can be used with the following syntax:
@@ -2586,29 +2586,29 @@ The SKEW application can be used with the following syntax:
 \begin{myquote}
 \begin{verbatim}
 % skew in=jet out=skewim modet=true psize=0.5 width=10. mult=1000.
-             back=949 useall=true 
+             back=949 useall=true
 \end{verbatim}
 \end{myquote}
 
-This example leads to a skew type image named skewim being generated. 
-The image's global modal pixel value (949) is employed and all the image 
-pixels are allowed to contribute to the skewness calculations (best used 
-only if no bright objects are present). The sampling area used for the 
+This example leads to a skew type image named skewim being generated.
+The image's global modal pixel value (949) is employed and all the image
+pixels are allowed to contribute to the skewness calculations (best used
+only if no bright objects are present). The sampling area used for the
 calculation will be WIDTH arc seconds (=WIDTH/PSIZE pixels) square.
-The final skewness values calculated are multiplied by the factor 
-1000 (making them more acceptable to HISTPEAK). 
+The final skewness values calculated are multiplied by the factor
+1000 (making them more acceptable to HISTPEAK).
 As usual, if the image contains a SKY co-ordinate frame then PSIZE
 need not be speficied.
-Other examples may be 
+Other examples may be
 found in Appendix \ref{des:SKEW}.
 
 \section{Highlighting faint diffuse objects}
 \label{sec:highlighting}
 
 Three small applications are included in ESP for the purposes of detecting faint
-diffuse objects in an image. The algorithms employed are used to generate 
+diffuse objects in an image. The algorithms employed are used to generate
 versions of the source image in which the contrast has been heightened for
-an object of a given scale length. They are described in the sections that 
+an object of a given scale length. They are described in the sections that
 follow.
 For all the commands given here, if the image IN has a SKY co-ordinate
 frame in its WCS component, the PSIZE parameter will be calculated
@@ -2616,30 +2616,30 @@ automatically and need not be given explicitly.
 
 \subsection{Self-correlation}
 
-The ESP application SELFC generates an image on which areas 
-displaying a degree of symmetry are more easily identified. The algorithm 
-employed examines the position of all the pixels within a given radius of 
-the pixel currently being considered and from that creates a set of pairs 
-consisting of pixels equidistant from, and on opposite sides of it. A 
-sum is then made which is maximised if the pixels pairs are both above 
-the sky value and also of similar brightness. The sum derived is 
-normalised and inserted into the pixel on the output image corresponding 
-to the current pixel. 
+The ESP application SELFC generates an image on which areas
+displaying a degree of symmetry are more easily identified. The algorithm
+employed examines the position of all the pixels within a given radius of
+the pixel currently being considered and from that creates a set of pairs
+consisting of pixels equidistant from, and on opposite sides of it. A
+sum is then made which is maximised if the pixels pairs are both above
+the sky value and also of similar brightness. The sum derived is
+normalised and inserted into the pixel on the output image corresponding
+to the current pixel.
 
-The normalisation is not to the 0--1 range but instead supplies a value above 
-or below zero. Any object with a value below zero on the output image 
+The normalisation is not to the 0--1 range but instead supplies a value above
+or below zero. Any object with a value below zero on the output image
 must be a statistical fluke or arises from poor flat field, whilst
-objects with values above zero may be real. Given the simple normalisation 
-employed it is difficult to determine exactly what is real statistically. 
-However, a good guess may be made in the following way. Generate a 
-self-correlated image (IMAGE1) from the source image using SELFC. Then, 
-scramble the source image using the ESP application MIXUP to generate 
-a noise equivalent image (IMAGE2). Apply SELFC to IMAGE2 and then find 
-the modal pixel value (BACK) and its associated standard deviation (SIGMA) using 
-HISTPEAK. The rule is then that any object brighter than BACK$+$3$\times$SIGMA 
-in IMAGE1 is probably real. For the highest possible accuracy the values 
-of BACK and SIGMA should be derived from examination of 10 scrambled versions 
-of IMAGE1, but the calculation time involved may be substantial. 
+objects with values above zero may be real. Given the simple normalisation
+employed it is difficult to determine exactly what is real statistically.
+However, a good guess may be made in the following way. Generate a
+self-correlated image (IMAGE1) from the source image using SELFC. Then,
+scramble the source image using the ESP application MIXUP to generate
+a noise equivalent image (IMAGE2). Apply SELFC to IMAGE2 and then find
+the modal pixel value (BACK) and its associated standard deviation (SIGMA) using
+HISTPEAK. The rule is then that any object brighter than BACK$+$3$\times$SIGMA
+in IMAGE1 is probably real. For the highest possible accuracy the values
+of BACK and SIGMA should be derived from examination of 10 scrambled versions
+of IMAGE1, but the calculation time involved may be substantial.
 
 The application can be used with the following syntax:
 
@@ -2650,21 +2650,21 @@ The application can be used with the following syntax:
 \end{myquote}
 
 The above examples perform the self-correlation on image ic3374 using a local
-modal pixel value for the image of 727 counts. The sampling area used is 
-a circle of 10 arc second width and all correlation values generated 
+modal pixel value for the image of 727 counts. The sampling area used is
+a circle of 10 arc second width and all correlation values generated
 will be placed in the output NDF image ic3374s.
 
 The correlation is performed in such a way that objects of
-bigger or smaller than the size requested are improperly sampled. However, 
+bigger or smaller than the size requested are improperly sampled. However,
 they will still generate a response, as the detection method does not depend
-critically on the size of the template. Consequently, a compromise is 
-involved in selecting the object size. If a large object size is requested 
-the calculations take longer and the resolution of the output image drops, 
-but if a small object size is requested noise quickly 
+critically on the size of the template. Consequently, a compromise is
+involved in selecting the object size. If a large object size is requested
+the calculations take longer and the resolution of the output image drops,
+but if a small object size is requested noise quickly
 becomes a problem and offsets the increased speed and resolution.
 
 It might be supposed that symmetry would not be a very good basis for correlation,
-given the wide range of possible galaxy shapes known. Despite this, 
+given the wide range of possible galaxy shapes known. Despite this,
 trials suggest that the method works well with a wide range of galaxy
 types. The only disadvantage is that two bright objects close together can
 give rise to spurious objects between them. This effect can be minimised by
@@ -2674,18 +2674,18 @@ such bright pixels will already have made its presence very obvious!
 \subsection{Cross-correlation}
 
 The ESP application CORR generates a cross-correlation image by correlating
-a mask with the input image. As with SELFC, you again input a size but in 
-this case it defines the scale length of the galaxy for which the correlation 
-should be optimised. The radius of the circular exponential mask used 
-(simulating a face on galaxy) with which the image will be correlated 
-is varied accordingly. It should be noted that this optimisation is such that 
-the correlation will still be sensitive to objects of scale lengths in the 
+a mask with the input image. As with SELFC, you again input a size but in
+this case it defines the scale length of the galaxy for which the correlation
+should be optimised. The radius of the circular exponential mask used
+(simulating a face on galaxy) with which the image will be correlated
+is varied accordingly. It should be noted that this optimisation is such that
+the correlation will still be sensitive to objects of scale lengths in the
 approximate range 0.25 to 4 times the scale length requested.
 
-The correlation results placed in the output image generated are 
-normalised to the range 0--1. If no arbitrary value 
+The correlation results placed in the output image generated are
+normalised to the range 0--1. If no arbitrary value
 of correlation coefficient is being employed to define the reality of a detection,
-a suitable value may be derived using the method described for SELFC. 
+a suitable value may be derived using the method described for SELFC.
 
 The application can be used with the following syntax:
 
@@ -2695,21 +2695,21 @@ The application can be used with the following syntax:
 \end{verbatim}
 \end{myquote}
 
-Correlates image hh1826 with a mask-template optimised for galaxies of 
-8 arc second scale length. The image pixel size is .3 arc seconds 
-per pixel and the background value is 3265. The 
+Correlates image hh1826 with a mask-template optimised for galaxies of
+8 arc second scale length. The image pixel size is .3 arc seconds
+per pixel and the background value is 3265. The
 output cross-correlation image will be called correl.
 
 \subsection{Hybrid cross/self-correlation}
 
-The SELFCW application performs a calculation that is essentially the same 
-as that of CORR but where the raw pixel values used are replaced by RMS 
-(sign maintained) values derived from a list of diameterically opposed 
-equidistant pixel pairs found within the mask region. It thus 
-represents a mixture of the symmetry based SELFC and the template 
-cross-correlation CORR. This hybrid self/cross-correlation appears 
-to produce fewer spurious objects than the two previous methods and 
-appears to be less sensitive to noise. It is again normalised to the 
+The SELFCW application performs a calculation that is essentially the same
+as that of CORR but where the raw pixel values used are replaced by RMS
+(sign maintained) values derived from a list of diameterically opposed
+equidistant pixel pairs found within the mask region. It thus
+represents a mixture of the symmetry based SELFC and the template
+cross-correlation CORR. This hybrid self/cross-correlation appears
+to produce fewer spurious objects than the two previous methods and
+appears to be less sensitive to noise. It is again normalised to the
 0--1 range and significance testing may be performed as
 before.
 
@@ -2721,9 +2721,9 @@ The application can be used with the following syntax:
 \end{verbatim}
 \end{myquote}
 
-Using this example a hybrid correlation image is generated which has been 
-optimised to detect galaxies of 15 arc second scale length on the 
-image p2. No pixels have been excluded from the calculations. 
+Using this example a hybrid correlation image is generated which has been
+optimised to detect galaxies of 15 arc second scale length on the
+image p2. No pixels have been excluded from the calculations.
 Other examples of the syntax required to use this application are given
 Appendix \ref{des:SELFCW}.
 
@@ -2732,41 +2732,41 @@ Appendix \ref{des:SELFCW}.
 \xlabel{SECTOR}
 \label{sec:obtaining}
 
-The ESP application SECTOR may be used to examine, in a quick 
-interactive manner, the intensity profile of a galaxy. Unlike the 
-other profiling routines, ELLPRO and ELLFOU (see the following sections), 
-SECTOR may only be used with the image required displayed on a graphics 
-device, and a keyboard and cursor available to identify various input 
-parameters. It is possible to use SECTOR with only a keyboard but in 
+The ESP application SECTOR may be used to examine, in a quick
+interactive manner, the intensity profile of a galaxy. Unlike the
+other profiling routines, ELLPRO and ELLFOU (see the following sections),
+SECTOR may only be used with the image required displayed on a graphics
+device, and a keyboard and cursor available to identify various input
+parameters. It is possible to use SECTOR with only a keyboard but in
 such a mode its ease of use is reduced.
 
 In the mode allowing a mouse/cursor (parameter CURSOR=TRUE), you are
-asked to identify the centre of the galaxy on the image, the direction 
-and distance outward from the centre to which the pieslice should 
+asked to identify the centre of the galaxy on the image, the direction
+and distance outward from the centre to which the pieslice should
 extend and also its angular width. The application displays on the image
-the values entered, drawing the sector/slice defined. You are asked 
-(via the keyboard in all modes) for various information about the image 
-(magnitude scale zero point, background value, pixel size etc.) and a graph 
-is displayed, either on the current graphics device (in one of its quadrants) 
-or on another device, showing how its brightness varies as a 
-function of distance outward from the galaxy centre. The graphs displayed 
+the values entered, drawing the sector/slice defined. You are asked
+(via the keyboard in all modes) for various information about the image
+(magnitude scale zero point, background value, pixel size etc.) and a graph
+is displayed, either on the current graphics device (in one of its quadrants)
+or on another device, showing how its brightness varies as a
+function of distance outward from the galaxy centre. The graphs displayed
 can show the brightness in terms of brightness above sky (expressed in SIGMA)
-or magnitudes versus one of four transformations for the radius 
-(see Appendix \ref{des:SECTOR}). Once this is done, you are prompted to 
-indicate, from the graph, 
-the radius range for the data points to be used to calculate the scale 
+or magnitudes versus one of four transformations for the radius
+(see Appendix \ref{des:SECTOR}). Once this is done, you are prompted to
+indicate, from the graph,
+the radius range for the data points to be used to calculate the scale
 length of the galaxy. Finally, the scale length is calculated,
-and some information about the data derived is displayed. 
+and some information about the data derived is displayed.
 
-Various parameters exist (see Appendix \ref{des:SECTOR}) which allow it 
+Various parameters exist (see Appendix \ref{des:SECTOR}) which allow it
 to be used more
-efficiently, in particular, it can output the results to a text 
+efficiently, in particular, it can output the results to a text
 file for later examination (possibly using MONGO or some similar package) or,
-alternatively, the ESP application GRAPHS. Another, important parameter, AUTOL 
-refines your estimate of the galaxy's centre position, whilst parameter 
+alternatively, the ESP application GRAPHS. Another, important parameter, AUTOL
+refines your estimate of the galaxy's centre position, whilst parameter
 MIRROR assumes that the results for two diametrically opposite slices may
-be used and the mean pixel values for each radii considered, thereby reducing 
-the influence of noise. 
+be used and the mean pixel values for each radii considered, thereby reducing
+the influence of noise.
 
 An example output file for SECTOR is shown in Appendix \ref{app:outputfiles}
 and described in Section \ref{sec:output}.
@@ -2776,102 +2776,102 @@ and described in Section \ref{sec:output}.
 \xlabel{ELLPRO}
 \label{sec:profi}
 
-ELLPRO is intended to be the main ellipse profiling application within the 
-ESP suite. It has been created as a robust application which attempts to 
-generate ellipse profiles by placing a trial ellipse profile on a 
-galaxy and then adjusting the ellipse characteristics to ensure the 
+ELLPRO is intended to be the main ellipse profiling application within the
+ESP suite. It has been created as a robust application which attempts to
+generate ellipse profiles by placing a trial ellipse profile on a
+galaxy and then adjusting the ellipse characteristics to ensure the
 minimum possible variation in intensity around the ellipse.
-To do this it employs minimisation routines that are  
+To do this it employs minimisation routines that are
 tuned for normal galaxies. With barred spiral galaxies, ELLFOU may be the
-better application to use. 
+better application to use.
 
-For the examination of a few galaxies on an image it is best used in 
-interactive mode. This requires that the cursor (a mouse or cursor 
-control device) is used in conjunction with the keyboard and that, 
-before starting, the image containing the galaxy to be profiled is 
+For the examination of a few galaxies on an image it is best used in
+interactive mode. This requires that the cursor (a mouse or cursor
+control device) is used in conjunction with the keyboard and that,
+before starting, the image containing the galaxy to be profiled is
 displayed. The cursor is then used to indicate roughly where the
-galaxy centre is (a mistake of a few pixels is rarely important) 
-and to indicate how far out from the centre the profiling action 
-should cease. Thereafter information about the image (its background 
-value, magnitude scale zero point, pixel size, etc.) is entered 
-before profiling begins. Two additional parameters that must be set 
-are AUTOL and FRZORI. AUTOL will (if set to TRUE) cause the software 
-to look at your estimated position for the galaxy centre and will 
-refine it using a distance weighted mean method or a centroid (via AUTOLT). 
-FRZORI set to TRUE forces the application to accept your estimate of 
-the galaxy centre as the value to be used throughout. In such a case it 
+galaxy centre is (a mistake of a few pixels is rarely important)
+and to indicate how far out from the centre the profiling action
+should cease. Thereafter information about the image (its background
+value, magnitude scale zero point, pixel size, etc.) is entered
+before profiling begins. Two additional parameters that must be set
+are AUTOL and FRZORI. AUTOL will (if set to TRUE) cause the software
+to look at your estimated position for the galaxy centre and will
+refine it using a distance weighted mean method or a centroid (via AUTOLT).
+FRZORI set to TRUE forces the application to accept your estimate of
+the galaxy centre as the value to be used throughout. In such a case it
 is usually best used in conjunction with AUTOL set to TRUE.
 
-A number of other fine control `tuning' parameters are available 
-and are adjusted via the command line if the default value 
+A number of other fine control `tuning' parameters are available
+and are adjusted via the command line if the default value
 is not to be employed.
 
-LIM1 may be used to adjust the threshold employed to stop profiling when 
-the brightness results seem to have become scattered. Whenever the 
-application finishes a new isophote it compares the brightness it 
-found (B1) with the average found for the two previous isophotes (B2). 
-If the value of  B1/B2 is greater than LIM1 then the isophote is 
-assumed to be low into image noise or possibly the ellipse has 
-encountered contamination. These assumptions are for most galaxies 
-perfectly reasonable and the main use of LIM1 is to force the profiling 
-action to take place to lower isophotes than normally required. You 
-may care to compare the results obtained when using the default value and 
-(say) 5 or 10. LIM1 may prove particularly useful if you are examining 
+LIM1 may be used to adjust the threshold employed to stop profiling when
+the brightness results seem to have become scattered. Whenever the
+application finishes a new isophote it compares the brightness it
+found (B1) with the average found for the two previous isophotes (B2).
+If the value of  B1/B2 is greater than LIM1 then the isophote is
+assumed to be low into image noise or possibly the ellipse has
+encountered contamination. These assumptions are for most galaxies
+perfectly reasonable and the main use of LIM1 is to force the profiling
+action to take place to lower isophotes than normally required. You
+may care to compare the results obtained when using the default value and
+(say) 5 or 10. LIM1 may prove particularly useful if you are examining
 the profiles of shell galaxies.
 
-LIM2 provides another method of limiting the radius of the largest profile 
-generated by ELLPRO. If it is found that the value of a newly 
-generated isophote is below LIM2xSIGMA then the profiling action immediately 
-ceases. 
+LIM2 provides another method of limiting the radius of the largest profile
+generated by ELLPRO. If it is found that the value of a newly
+generated isophote is below LIM2xSIGMA then the profiling action immediately
+ceases.
 
-LIM3 is used to define an ellipse semi-major radius value at which 
-the `fitting' operation ceases to allow changes to the ellipticity or 
-position angle. Consequently these remain fixed at their previous values 
-while the mean value for the isophote drops for each succesive 
-isophote until profiling ceases. This parameter can only sensibly be used 
+LIM3 is used to define an ellipse semi-major radius value at which
+the `fitting' operation ceases to allow changes to the ellipticity or
+position angle. Consequently these remain fixed at their previous values
+while the mean value for the isophote drops for each succesive
+isophote until profiling ceases. This parameter can only sensibly be used
 when profiling very well behaved galaxies and is not generally recommended.
 
-The FAST parameter is provided for those users particularly interested in the 
-inner regions of galaxies. When normally estimating the brightness of 
-pixels around the isophotal ellipses (FAST set to TRUE) a bi-linear 
-interpolation method is used. At very small radii this will not be 
-particularly accurate. To overcome this you may opt for an 
-interpolated value based upon a 8x8 surface created using a 
-bi-cubic spline. This involves considerable additional calculation. 
-At present the 8x8 surface generation ceases at radii greater than 
-5 pixels, as computers become faster it may be possible to extend this 
+The FAST parameter is provided for those users particularly interested in the
+inner regions of galaxies. When normally estimating the brightness of
+pixels around the isophotal ellipses (FAST set to TRUE) a bi-linear
+interpolation method is used. At very small radii this will not be
+particularly accurate. To overcome this you may opt for an
+interpolated value based upon a 8x8 surface created using a
+bi-cubic spline. This involves considerable additional calculation.
+At present the 8x8 surface generation ceases at radii greater than
+5 pixels, as computers become faster it may be possible to extend this
 to a greater radius.
 
-The final additional tuning parameter is FINE. The default value is 1. 
-If this is decreased then more profiles are generated 
-(or at least attempted)  while if it is increased the number of 
-profiles generated drops. It is not recommended that values greater 
-than 2 or less than .02 be used. The former will produce few ellipses 
+The final additional tuning parameter is FINE. The default value is 1.
+If this is decreased then more profiles are generated
+(or at least attempted)  while if it is increased the number of
+profiles generated drops. It is not recommended that values greater
+than 2 or less than .02 be used. The former will produce few ellipses
 and the latter might take some time.
 
-The number of inputs required for ELLPRO can be quite large, but the 
+The number of inputs required for ELLPRO can be quite large, but the
 following examples can get you started :
 
 \begin{description}
 \item[{\tt
-   \% ellpro mode=true cursor=true in=img001 autol=true frzori=true}] 
+   \% ellpro mode=true cursor=true in=img001 autol=true frzori=true}]
    \mbox{}\\
-  Allows you to use the keyboard and cursor for input. The initial 
-  cursor generated guess for the galaxy centre will be refined and 
+  Allows you to use the keyboard and cursor for input. The initial
+  cursor generated guess for the galaxy centre will be refined and
   not allowed to move from isophote to isophote.
 \item[{\tt
    \% ellpro mode=true cursor=false in=img001 origin='"96 92"' rlim=10}]
    \mbox{}\\
-  Permits interactive use of ELLPRO but only via the keyboard. The origin 
-  to be used is at Current co-ordinates 96,92 and the profiling will extend 
+  Permits interactive use of ELLPRO but only via the keyboard. The origin
+  to be used is at Current co-ordinates 96,92 and the profiling will extend
   out to a radius of 10 arc seconds.
-  (A quirk of the ADAM parameter system means that the ORIGIN value has 
+  (A quirk of the ADAM parameter system means that the ORIGIN value has
   to be quoted like this).
 \item[{\tt
    \% ellpro mode=false in=hh10 infile=objs out=profs autol=true autolt=true}]
    \mbox{}\\
-  A list of galaxy co-ordinates on image HH10 will be read from text 
-  file OBJS. Each object will be profiled in turn and the results placed 
+  A list of galaxy co-ordinates on image HH10 will be read from text
+  file OBJS. Each object will be profiled in turn and the results placed
   in text output file PROFS. All galaxy centre values will be refined
   using a centroid method.
 \end{description}
@@ -2886,46 +2886,46 @@ and described in Section \ref{sec:output}
 ELLFOU is a profiling application providing contour analysis generated profiles.
 This application takes longer to run and so is only really suitable if you
 really do not want an intensity analysis method, such as if you are
-examining barred spiral galaxies. It attempts to profile galaxies by identifying 
-the pixels in a given contour and fitting an ellipse to that shape. This is 
-done by minimising the pixel to ellipse distance sum. Care has been taken 
-to try to make the application robust. As a consequence of this the algorithm 
+examining barred spiral galaxies. It attempts to profile galaxies by identifying
+the pixels in a given contour and fitting an ellipse to that shape. This is
+done by minimising the pixel to ellipse distance sum. Care has been taken
+to try to make the application robust. As a consequence of this the algorithm
 used is not quick and for simple galaxies ELLPRO may be the better application.
 
-It will be found that ELLFOU can be fine tuned in the same way as ELLPRO 
-by use of additional parameters such as LIM1 and LIM2 (see above). However, 
-due to the nature of the modelling technique employed, parameters LIM3 
-and FAST are no longer applicable. 
+It will be found that ELLFOU can be fine tuned in the same way as ELLPRO
+by use of additional parameters such as LIM1 and LIM2 (see above). However,
+due to the nature of the modelling technique employed, parameters LIM3
+and FAST are no longer applicable.
 
-Another consequence of the modelling technique utilised is that the profile 
-radii values generated by ELLFOU may sometimes be clumped slightly. 
-This arises as a direct result of a combination of the value for FINE 
+Another consequence of the modelling technique utilised is that the profile
+radii values generated by ELLFOU may sometimes be clumped slightly.
+This arises as a direct result of a combination of the value for FINE
 employed and the actual physical distribution of the pixels contributing
-to a given contour. The clumping can usually be overcome by reducing FINE 
+to a given contour. The clumping can usually be overcome by reducing FINE
 somewhat.
 
-As for ELLPRO, the number of inputs required for ELLFOU can be quite large, 
+As for ELLPRO, the number of inputs required for ELLFOU can be quite large,
 but the following examples can get you started :
 
 \begin{description}
 \item[{\tt
    \% ellfou mode=true cursor=true in=img001 autol=true device=xw zerop=29}]
    \mbox{}\\
-  Allows you to use the keyboard and cursor for input. The initial cursor 
-  generated guess for the galaxy centre will be refined and the profile 
-  displayed on device XW.  The magnitude sacle zero point is at 29 
+  Allows you to use the keyboard and cursor for input. The initial cursor
+  generated guess for the galaxy centre will be refined and the profile
+  displayed on device XW.  The magnitude sacle zero point is at 29
   magnitudes per arc second.
 \item[{\tt
    \% ellfou mode=true cursor=false in=img001 origin='"8:36:50.2 31:17:22"'}]
   \mbox{}\\
-  Permits interactive use of ELLPRO but only via the keyboard. The origin 
-  to be used is at Current co-ordinates (here in the SKY domain) 
+  Permits interactive use of ELLPRO but only via the keyboard. The origin
+  to be used is at Current co-ordinates (here in the SKY domain)
   RA=8:36:50.2, Dec=31:17:22.
 \item[{\tt
    \% ellfou mode=false in=hh10 infile=objs out=profs autol=true}]
    \mbox{}\\
-  A list of galaxy co-ordinates on image HH10 will be read from text 
-  file OBJS. Each object will be profiled in turn and the results placed in 
+  A list of galaxy co-ordinates on image HH10 will be read from text
+  file OBJS. Each object will be profiled in turn and the results placed in
   text output file PROFS. All galaxy centre values will be refined.
 \end{description}
 
@@ -2938,63 +2938,63 @@ and described in Section \ref{sec:output}.
 
 ELLFOU and ELLPRO work in very different ways. ELLPRO works by creating
 trial ellipses which it places on the galaxy. It then carefully adjusts the
-shape and position of the ellipses until the brightness variation around 
-the ellipse is minimised. ELLFOU identifies the locations of all the 
-pixels in a given isophotal range, takes a subset of those and then trys to 
-fit an ellipse through the pixels that minimises the pixel/ellipse distance 
-sum. These approaches are known as intensity and contour analysis respectively. 
+shape and position of the ellipses until the brightness variation around
+the ellipse is minimised. ELLFOU identifies the locations of all the
+pixels in a given isophotal range, takes a subset of those and then trys to
+fit an ellipse through the pixels that minimises the pixel/ellipse distance
+sum. These approaches are known as intensity and contour analysis respectively.
 
 You might well ask then why two routines are provided. The reason is simply that
 galaxies vary enormously. If these routines are used with a normal galaxy
-of approximately elliptical shape they will normally both behave well. But 
-this is not always the case. Limits to this sensible behaviour are 
-outlined below. 
+of approximately elliptical shape they will normally both behave well. But
+this is not always the case. Limits to this sensible behaviour are
+outlined below.
 
 \subsection{Limitations of ELLPRO and ELLFOU}
 
 The major difficulty with ELLFOU is its speed. With current machines (circa
 1993 - SUN Classic) analysis of a large galaxy can take some time, clearly
-this will become less important in time as machine speed increases, but at 
-present it is a serious problem. The problem is caused by the fact that 
+this will become less important in time as machine speed increases, but at
+present it is a serious problem. The problem is caused by the fact that
 many pixels can fall within a given isophotal range. If the image contains
-too many pixels within the defined isophotal range then the software has to 
-select a subset and try to ensure that they are both representative and 
-evenly distributed. This is time consuming. The minimisation routines 
+too many pixels within the defined isophotal range then the software has to
+select a subset and try to ensure that they are both representative and
+evenly distributed. This is time consuming. The minimisation routines
 then applied have been
-designed to be not only robust but (most importantly) to avoid false minima as 
-far as possible. An algorithm inclined to allow false minima would have 
-disasterous results, consequently, the software design implemented has 
+designed to be not only robust but (most importantly) to avoid false minima as
+far as possible. An algorithm inclined to allow false minima would have
+disasterous results, consequently, the software design implemented has
 verged on the side of caution and unashamedly sacrifices speed for accuracy.
 
-A second problem with ELLFOU is that at the higher isophotes where the radius 
-is small there will be very few pixels within a given isophote, this can make 
+A second problem with ELLFOU is that at the higher isophotes where the radius
+is small there will be very few pixels within a given isophote, this can make
 the shape of any resultant isophotal profile
 uncertain and limits the low radius limit.
 
-ELLPRO is the faster of the two profiling application beings 3--4 times 
-faster than ELLFOU in trials. This is because it does not have to sample 
-all the image pixels and can instead sample the image as required 
-using bi-linear (or bi-cubic spline if parameter FAST=FALSE) 
-interpolation to provide it with the data it needs. As a result it can work 
-well at both small and large radii. To help the application work at lower 
-isophotes, where the signal to noise ratio is lowest, the number of  
+ELLPRO is the faster of the two profiling application beings 3--4 times
+faster than ELLFOU in trials. This is because it does not have to sample
+all the image pixels and can instead sample the image as required
+using bi-linear (or bi-cubic spline if parameter FAST=FALSE)
+interpolation to provide it with the data it needs. As a result it can work
+well at both small and large radii. To help the application work at lower
+isophotes, where the signal to noise ratio is lowest, the number of
 points on the trial ellipses increases as the isophotal
-radius increases. This is subject to an upper limit defined in the ELLPRO 
-INCLUDE file which may be adjusted by users with faster machines. 
-Comparative trials showed that the results generated using ELLPRO, ELLFOU 
+radius increases. This is subject to an upper limit defined in the ELLPRO
+INCLUDE file which may be adjusted by users with faster machines.
+Comparative trials showed that the results generated using ELLPRO, ELLFOU
 and RGASP on three different galaxies were consistent. Information on
 RGASP (VAX and UNIX versions) may be found in \xref{SUN/52}{sun52}{}.
 
-Consequently, for most applications, particularly where the galaxy is 
-reasonably small (in terms of pixels) ELLPRO is the better choice. 
-However, it has been found that some types of barred spiral galaxy, 
+Consequently, for most applications, particularly where the galaxy is
+reasonably small (in terms of pixels) ELLPRO is the better choice.
+However, it has been found that some types of barred spiral galaxy,
 can cause it difficulties. These occur mainly where the brightness of
-the profile and its orientation change drastically at the same time. 
-The situation is exacerbated if the transition occurs at a low signal to 
-noise ratio. You should be cautious in such cases and set FRZORI to FALSE 
+the profile and its orientation change drastically at the same time.
+The situation is exacerbated if the transition occurs at a low signal to
+noise ratio. You should be cautious in such cases and set FRZORI to FALSE
 and experiment with the LIM1, LIM2 and FINE parameter values. Alternatively,
-they can use ELLFOU. Such objects deviate greatly from elliptical form, 
-particularly in their lower isophotes and SECTOR may also provide useful 
+they can use ELLFOU. Such objects deviate greatly from elliptical form,
+particularly in their lower isophotes and SECTOR may also provide useful
 information.
 
 
@@ -3014,7 +3014,7 @@ The application operates in one of three ways:
 \item via use of keyboard only (for automatic scale length determinations).
 \end{itemize}
 
-The mode of operation is defined by the parameters  MODE and CURSOR. 
+The mode of operation is defined by the parameters  MODE and CURSOR.
 The settings required for each mode are, respectively:
 
 \begin{itemize}
@@ -3023,30 +3023,30 @@ The settings required for each mode are, respectively:
 \item MODE=FALSE (A value for CURSOR will not be requested)
 \end{itemize}
 
-For the simplest case, files generated by SECTOR, the data 
-to be displayed is brightness (either in the form of magnitudes or relative 
-to sky) versus the distance (transformed using logarithmic, square root 
-or quarter power functions if required) from the galaxy centres. Once this 
-is displayed, you are asked to define (using the keyboard or 
-cursor as appropriate) the part of the profile that is to be employed in 
+For the simplest case, files generated by SECTOR, the data
+to be displayed is brightness (either in the form of magnitudes or relative
+to sky) versus the distance (transformed using logarithmic, square root
+or quarter power functions if required) from the galaxy centres. Once this
+is displayed, you are asked to define (using the keyboard or
+cursor as appropriate) the part of the profile that is to be employed in
 calculating the scale length of the galaxy being examined.
 
-The other two applications, ELLPRO amd ELLFOU, generate a great deal more 
-information since they also derive the shape and orientation of the ellipses 
-used to `fit' the galaxy. In addition, they calculate Fourier descriptor 
-values for each isophote out to the fourth order terms.  Consequently, 
+The other two applications, ELLPRO amd ELLFOU, generate a great deal more
+information since they also derive the shape and orientation of the ellipses
+used to `fit' the galaxy. In addition, they calculate Fourier descriptor
+values for each isophote out to the fourth order terms.  Consequently,
 they have bigger output files with a slightly different format. The
-differences in the format are normally unimportant since GRAPHS 
+differences in the format are normally unimportant since GRAPHS
 automatically adjusts to the type of file it is asked to
-read, but they are described in Section \ref{sec:output}. The majority of data 
-stored in the output files can be shown in graphs. The data that may be 
-displayed includes any of the following quantities (specify which using 
+read, but they are described in Section \ref{sec:output}. The majority of data
+stored in the output files can be shown in graphs. The data that may be
+displayed includes any of the following quantities (specify which using
 parameter WHATD) versus radius:
 
 \begin{itemize}
 \item[] E --- ellipticity of the isophote ellipse
 \item[] P --- position angle of the isophotal ellipses (units degrees)
-\item[] S --- surface brightness of the isophotes 
+\item[] S --- surface brightness of the isophotes
 \item[] X --- $x$ co-ordinate of the isophote centres (Base frame)
 \item[] Y --- $y$ co-ordinate of the isophote centres (Base frame)
 \item[] FC1/4 --- Fourier cosine descriptors
@@ -3055,7 +3055,7 @@ parameter WHATD) versus radius:
 
 Note that the X and Y co-ordinates are always stored in output files
 in the co-ordinates of the Base frame, not that of the Current frame.
-The Base (GRID) frame co-ordinates are in units of pixels and 
+The Base (GRID) frame co-ordinates are in units of pixels and
 always start at (1,1); they remain the same for a given image NDF,
 whereas Current co-ordinates may change according to which frame is
 selected as the Current one.
@@ -3070,19 +3070,19 @@ The radius value (in arc seconds) used for the graphs may be transformed by:
 
 The transformation required is chosen using the RADISP parameter.
 
-The radius values employed are the semi-major radius size for an isophote 
-when reading an ELLPRO or ELLFOU file, but are the mean distance to the 
-chosen galaxy origin when reading from a file created using SECTOR. The 
-units are arc seconds. 
+The radius values employed are the semi-major radius size for an isophote
+when reading an ELLPRO or ELLFOU file, but are the mean distance to the
+chosen galaxy origin when reading from a file created using SECTOR. The
+units are arc seconds.
 
 The keyboard only mode of use for GRAPHS asks for a few simple inputs and then
-reads data from the named text file. It also calculates the scale length 
-(using the radius range requested) and outputs the results to another text 
-file. This automatic mode is particularly useful with ELLPRO and ELLFOU 
-output files that can contain the profiling results for hundreds of galaxies. 
-The output file contains the image co-ordinates read from the ELLPRO/ELLFOU 
-file and then columns containing the scale length (both for spiral and 
-elliptical models) and the resultant extrapolated central surface 
+reads data from the named text file. It also calculates the scale length
+(using the radius range requested) and outputs the results to another text
+file. This automatic mode is particularly useful with ELLPRO and ELLFOU
+output files that can contain the profiling results for hundreds of galaxies.
+The output file contains the image co-ordinates read from the ELLPRO/ELLFOU
+file and then columns containing the scale length (both for spiral and
+elliptical models) and the resultant extrapolated central surface
 brightness values.
 
 One useful consequence of the way GRAPHS works is that output files from
@@ -3094,7 +3094,7 @@ radius for the profile conatine in text file RESULTS:
 
 \begin{myquote}
 \begin{verbatim}
-% graphs mode=true infile=result whatd=p radisp=r cursor=true 
+% graphs mode=true infile=result whatd=p radisp=r cursor=true
 \end{verbatim}
 \end{myquote}
 
@@ -3103,42 +3103,42 @@ radius for the profile conatine in text file RESULTS:
 \label{sec:output}
 
 The output files generated by the applications SECTOR, ELLFOU,
-ELLPRO, GAUFIT and GRAPHS are created in a simple ASCII text format. 
-Examples of the output from each of the applications are shown as 
+ELLPRO, GAUFIT and GRAPHS are created in a simple ASCII text format.
+Examples of the output from each of the applications are shown as
 Appendix \ref{app:outputfiles}
 
-The structure of ELLPRO and ELLFOU output files are very similar. 
-Each has as its first line a title identifying the format version 
-of the rest of the file together with the name of the application 
+The structure of ELLPRO and ELLFOU output files are very similar.
+Each has as its first line a title identifying the format version
+of the rest of the file together with the name of the application
 that generated it. This is then followed by lines of text
-that define the source image that was used, its background 
-value (and its associated standard deviation), the pixel size in arc seconds, 
-the galaxy co-ordinates in both Current and Base frames, 
+that define the source image that was used, its background
+value (and its associated standard deviation), the pixel size in arc seconds,
+the galaxy co-ordinates in both Current and Base frames,
 the zero point of the surface brightness
-magnitude scale (magnitudes per arc seconds) and the number of points 
+magnitude scale (magnitudes per arc seconds) and the number of points
 present. Essentially every piece of data required for subsequent
 calculation of scale length, display of results or reconstruction of
 a synthetic galaxy are retained for later use.
 Below all this comes the ellipse parameter data arranged in columns preceeded
-by a heading. The ellipse parameter data is followed by the associated 
+by a heading. The ellipse parameter data is followed by the associated
 Fourier descriptor values for each profile.
 
-The SECTOR output file format is slightly different. It again identifies 
+The SECTOR output file format is slightly different. It again identifies
 values such as pixel size on the original image but includes
 also the estimates of the scale length determined when SECTOR was run.
 These are not employed by GRAPHS but are retained for your
 convenience and later reference.
 Unsurprisingly, the file does not contain
-any ellipse parameters or Fourier descriptors since SECTOR does not derive 
-these. It instead contains columns of radii and mean pixel values together 
-with estimates of surface brightness.     
+any ellipse parameters or Fourier descriptors since SECTOR does not derive
+these. It instead contains columns of radii and mean pixel values together
+with estimates of surface brightness.
 
 The GRAPHS output file is (unless ELLPRO or ELLFOU has been used
 to examine examined several
-galaxies found on a given image in one go) a much smaller affair. 
+galaxies found on a given image in one go) a much smaller affair.
 It again has
-an identifying format header but this is followed simply by 
-the name of the image and information on the galaxy image co-ordinates, 
+an identifying format header but this is followed simply by
+the name of the image and information on the galaxy image co-ordinates,
 scale lengths
 calculated and the estimates for the central surface brightness.
 
@@ -3149,22 +3149,22 @@ give a table showing the local background estimates. Clearly, the
 number of rows in this table is defined by the number of entries
 that were in the co-ordinate text file input to LOBACK.
 
-It can be seen that all the lines beginning `\#\#' describe what is on the 
-next line (or subsequent lines) of text. If the program GRAPHS 
+It can be seen that all the lines beginning `\#\#' describe what is on the
+next line (or subsequent lines) of text. If the program GRAPHS
 encounters such a start to a line, it then examines the remainder of the line
-to determine exactly what type follows. 
+to determine exactly what type follows.
 
 You can easily construct your own files for analysis or display by
 GRAPHS. The important
 considerations are that the file must contain all the data and that each
 piece of data must be preceeded by a line beginning with `\#\#'
-that correctly identifies it. The actual position of these 
+that correctly identifies it. The actual position of these
 within the file is otherwise unimportant, thereby making things
 easier. It is hoped that you will find the file reading parts of
 GRAPHS fairly robust and tolerant.
 
 Lines beginning with the `!' character are ignored by the software
-and are merely contain helpful comments.  
+and are merely contain helpful comments.
 
 The GAUFIT output file is a very simple affair and only a slight
 variation on those seen above. As before the file contains a header to
@@ -3185,26 +3185,26 @@ GAUFIT writes the parameter uncertainties after the parameter values.
 wish to use this GAUFIT output file as a later GAUFIT input file -- if
 you do not, the uncertainties will be interpreted as specifying new
 sources, to your (and GAUFIT's) considerable confusion.
-  
+
 
 \section{Incorporating HISTPEAK into your own ADAM applications}
 \label{sec:incorporating}
 
-The software written for the HISTPEAK application contains routines that generate 
+The software written for the HISTPEAK application contains routines that generate
 a wide range of statistical quantities concerning the pixel values in
-an image. Clearly then, some users writing their own software might want to 
-incorporate such routines into their own code. To make this easier to acheive 
+an image. Clearly then, some users writing their own software might want to
+incorporate such routines into their own code. To make this easier to acheive
 the salient parts of HISTPEAK have been made into an application HSUB wherein
 HISTPEAK (in a slightly modified form) is called from the main subroutine.
-The subroutine called HISTPEAK2 should obtain values for all the 
-quantities displayed by HISTPEAK (various modal pixel values, standard 
-deviation, kurtosis, absolute deviation, number of bad pixels etc.) and these 
-can be passed to the the main routine if required. HSUB as it stands allows you 
+The subroutine called HISTPEAK2 should obtain values for all the
+quantities displayed by HISTPEAK (various modal pixel values, standard
+deviation, kurtosis, absolute deviation, number of bad pixels etc.) and these
+can be passed to the the main routine if required. HSUB as it stands allows you
 you to define which type of modal pixel value should be estimated
 (there are four to choose from --- see HISTPEAK) and displayed, but this
 is merely intended to show how the routine HISTPEAK2 might be used.
 
-The code is fully commented to make its use easier. 
+The code is fully commented to make its use easier.
 
 
 \section{Acknowledgements}
@@ -3212,12 +3212,12 @@ The code is fully commented to make its use easier.
 
 I owe thanks to Rodney Warren-Smith, Martin Shaw and numerous others for
 contributing their comments, suggestions and/or pointing out the bugs that had
-eluded me. Thanks also go to Rhys Morris for knowing about obscure Starlink 
-applications and UNIX commands, while Peter Draper  and David Berry gave 
+eluded me. Thanks also go to Rhys Morris for knowing about obscure Starlink
+applications and UNIX commands, while Peter Draper  and David Berry gave
 much valuable assistance with LATEX and ARD files.
 
-Finally, thanks to Malcolm Currie for the \xref{KAPPA}{sun95}{} CURSOR routines I purloined, 
-Rodney Smith for his patience and to Steve Phillipps for his encouragement 
+Finally, thanks to Malcolm Currie for the \xref{KAPPA}{sun95}{} CURSOR routines I purloined,
+Rodney Smith for his patience and to Steve Phillipps for his encouragement
 along the way.
 
 \newpage
@@ -3286,9 +3286,9 @@ of an image.}
 \label{app:description}
 
 In this Appendix a more exhaustive catalogue of the capabilities and parameters
-of the ESP routines are given. 
+of the ESP routines are given.
 
-It should be remembered that help is available at any time by returning a 
+It should be remembered that help is available at any time by returning a
 `?' in response to a prompt.
 
 \subsection{Complete routine descriptions}
@@ -6004,26 +6004,26 @@ The ESP routine descriptions are contained in the following pages.
 \label{app:bad}
 
 A number of the ESP application allows image regions to be defined as being of
-poor quality by two basic methods; by use of an NDF whose data component      
+poor quality by two basic methods; by use of an NDF whose data component
 values are set bad (either explicitly or by use of the quality component
 and the badbits flag --- see \xref{SUN/33}{sun33}{}) or by interpreting bad-region
 commands contained within an ordinary text file (an ASCII Region Definition file
 --- ARD file --- see \xref{SUN/183}{sun183}{})
 
-An NDF, with the appropriate pixels set to the bad value, can be produced 
-interactively using the \xref{KAPPA}{sun95}{} applications ARDGEN and ARDMASK 
-(\xref{SUN/95}{sun95}{}). 
+An NDF, with the appropriate pixels set to the bad value, can be produced
+interactively using the \xref{KAPPA}{sun95}{} applications ARDGEN and ARDMASK
+(\xref{SUN/95}{sun95}{}).
 
 The capabilities of the ARD option (which uses little disk
-and could form part of a `database' of data masking information) 
-are described below. 
+and could form part of a `database' of data masking information)
+are described below.
 
-As things stand, with images generated using a known CCD, the bad or hot 
+As things stand, with images generated using a known CCD, the bad or hot
 pixels, rows or columns might be
-defined by ARDGEN so that they are always set to bad and excluded from all 
-subsequent processing. The information required is often supplied by the 
-observatory operating the CCD and can placed in a text file using 
-any text editor. 
+defined by ARDGEN so that they are always set to bad and excluded from all
+subsequent processing. The information required is often supplied by the
+observatory operating the CCD and can placed in a text file using
+any text editor.
 
 \subsection{Detailed description of ARD files}
 
@@ -6053,21 +6053,21 @@ Regions are specified using the keywords suffixed by the following information.
 \item [BOX] - the coordinates of the centre of the box (pixel indices or
               pixel coordinates) followed by the lengths of the two sides
               in pixels (may be a fraction).
-\item [POLYGON] - a list of coordinates (pixel indices or pixel coordinates) of 
+\item [POLYGON] - a list of coordinates (pixel indices or pixel coordinates) of
                  the polygon vertices.
 \item [CIRCLE] - the coordinates of the centre (pixel indices or pixel
                  coordinates) followed by the radius in pixels
                  (may be a fraction).
-\item [ELLIPSE] - the coordinates of the centre (pixel indices or pixel 
-                  coordinates) followed by the lengths of the semi-major and 
+\item [ELLIPSE] - the coordinates of the centre (pixel indices or pixel
+                  coordinates) followed by the lengths of the semi-major and
                   semi-minor axes in pixels (may be a fraction) and the position
-                  angle of the semi-major axis (measured $+$X through $-$Y in 
+                  angle of the semi-major axis (measured $+$X through $-$Y in
                   degrees).
 \end{description}
 \end{quote}
 
 Only one KEYWORD is allowed per line and the parameters must be enclosed in parentheses. The parameters must be separated by commas. Any amount of white space (blanks)
-is allowed between keywords and numerics. Tabs are not allowed. 
+is allowed between keywords and numerics. Tabs are not allowed.
 
 Comments are indicated by the characters `\#' and may be in-line
 or whole line at any place within the file. The presence of a comment
@@ -6085,7 +6085,7 @@ Thus an ARD file might contain the following information:
 #
 COLUMN (41, 177, 212)   # Three bad columns
 #
-PIXEL (201, 143)  
+PIXEL (201, 143)
 PIXEL (153, 167)   # Two Bad pixels
 #
 BOX (188, 313, 5, 5)   # One Hot spot
@@ -6105,12 +6105,12 @@ POLYGON (6.2, 294.3, 27.9, 321.0, 52.6, 348.7, 74.4, 371.5, -
 \end{myquote}
 
 The co-ordinates used by ARD by default refer to the co-ordinate system
-defined by the image bounds for the current NDF. Further details are available from 
+defined by the image bounds for the current NDF. Further details are available from
 \xref{SUN/183}{sun183}{}.
 
 \newpage
 \section{Supported HDS Data Types}
-ESP applications can process NDFs stored in any of the 
+ESP applications can process NDFs stored in any of the
 following HDS data types.
 The correspondence between Fortran types and HDS data types is as follows:
 
@@ -6142,15 +6142,15 @@ double precision variables when that increased degree of accuracy is required.
 
 \section{Position angle convention}
 
-The position angle convention adopted is that the top of the image is 
+The position angle convention adopted is that the top of the image is
 defined to be 0 degrees with rotation clockwise considered to
-be positive. 
+be positive.
 
 However, to provide greater flexibility, the packages ELLPRO, ELLFOU and
 GRAPHS can adopt a user specified convention if you set values for the
 hidden parameters ANGCON (which defines the direction of rotation
 in which angle increases) and ANGOFF (which defines the position angle offset)
-from the command line.   
+from the command line.
 
 \newpage
 \section{Examples of output file formats and glossary}
@@ -6164,7 +6164,7 @@ are shown below:
 \begin{description}
 \item[Angle]The angle of the major axis of a source (degrees).
 \item[Count]Mean ellipse brightness above the background (counts).
-This is the mean of the image value along the ellipse, as interpolated 
+This is the mean of the image value along the ellipse, as interpolated
 by the scheme implied by ELLPRO parameter FAST.
 %\item[Dev]Standard deviation of the ellipse brightness variation.
 \item[Dev]Estimated standard deviation of the mean ellipse brightness.
@@ -6183,7 +6183,7 @@ circle with the same area as the ellipse (arcsecs).
 \item[Peak]Maximum count of the model source.
 \item[Points]ELLPRO. The number of points in the trial ellipse employed.
 \item[Points]ELLFOU. The number of image pixel employed.
-\item[PPU]Percentage of trial ellipse pixels that were available.  
+\item[PPU]Percentage of trial ellipse pixels that were available.
 \item[Proj.]Modal value of smoothed histogram by taking chords.
 \item[Rad(a)]The semi-major axis of the ellipse
 \item[Raw]Modal value of unsmoothed count histogram.
@@ -6209,17 +6209,17 @@ The output file examples are shown on the following pages.
 \begin{verbatim}
 ## ESP ELLPRO V1.1 OUTPUT FILE
 ##
-## Filename: 
+## Filename:
 /local2/data/esp/ic3374c
-## Sigma (counts): 
+## Sigma (counts):
 12.07
-## Pixel size (arc secs): 
+## Pixel size (arc secs):
 0.9605179
 ## X/Y co-ordinates (Base):
 93.0503 95.97249
 ## X/Y co-ordinates (SKY):
 -11:23:21.6 62:13:08
-## Background (counts): 
+## Background (counts):
 760.5
 ## Zero point of magnitude:
 27.5
@@ -6253,7 +6253,7 @@ The output file examples are shown on the following pages.
     26.75   -0.113  -0.219  -0.070   0.136   0.183   0.224  -0.417  -0.650
 !! NOTE: Radii values are stored on file as semi-major axis length
 !!       measured in pixels but on screen as equivalent radii in arc secs.
-!! NOTE: Position angles are stored on file with origin upward and clockwise 
+!! NOTE: Position angles are stored on file with origin upward and clockwise
 !!       rotation positive.
 ## END
 \end{verbatim}
@@ -6269,51 +6269,51 @@ one sheet of paper.
 \begin{verbatim}
 ## ESP ELLFOU V1.1 OUTPUT FILE
 ##
-## Filename: 
-ic3374c                                                   
-## Sigma (counts): 
+## Filename:
+ic3374c
+## Sigma (counts):
 12
-## Pixel size (arc secs): 
+## Pixel size (arc secs):
 0.9605179
 ## X/Y co-ordinates (Base):
 93.09997 96.09995
 ## X/Y co-ordinates (PIXEL):
 92.59997 95.59995
-## Background (counts): 
+## Background (counts):
 760
 ## Zero point of magnitude:
 27.5
 ## Number of points:
 10
 ## Ellipse Parameters:
-!! X       Y     Points  Rad(a)     Count     PA     Ellipt     Dev   PPU       
-  93.1    96.1     15     2.40       189.2   -37.0   0.609       2.8  100.      
-  93.2    96.3     15     4.22       155.5   -25.5   0.544       4.6  100.      
-  93.2    96.4     14     4.52       150.5   -21.3   0.561       4.4  100.      
-  93.2    96.3     25     5.77       128.6   -23.1   0.502       5.3  100.      
-  93.1    96.2     24     6.20       114.3   -19.3   0.604       4.9  100.      
-  93.1    96.2     46     8.46        75.9   -18.3   0.579       4.0  100.      
-  93.2    96.3     61     8.99        65.9   -18.2   0.621       3.1  100.      
-  93.1    96.2     84    10.12        52.2   -20.1   0.647       2.6  100.      
-  93.3    96.6    137    13.65        36.1   -19.0   0.528       2.3  100.      
-  92.5    95.8    144    17.03        13.3   -60.1   0.712       1.4  100.      
+!! X       Y     Points  Rad(a)     Count     PA     Ellipt     Dev   PPU
+  93.1    96.1     15     2.40       189.2   -37.0   0.609       2.8  100.
+  93.2    96.3     15     4.22       155.5   -25.5   0.544       4.6  100.
+  93.2    96.4     14     4.52       150.5   -21.3   0.561       4.4  100.
+  93.2    96.3     25     5.77       128.6   -23.1   0.502       5.3  100.
+  93.1    96.2     24     6.20       114.3   -19.3   0.604       4.9  100.
+  93.1    96.2     46     8.46        75.9   -18.3   0.579       4.0  100.
+  93.2    96.3     61     8.99        65.9   -18.2   0.621       3.1  100.
+  93.1    96.2     84    10.12        52.2   -20.1   0.647       2.6  100.
+  93.3    96.6    137    13.65        36.1   -19.0   0.528       2.3  100.
+  92.5    95.8    144    17.03        13.3   -60.1   0.712       1.4  100.
 ## Fourier Descriptors:
-!! Rad(a)   1xSin   1xCos   2xSin   2xCos   3xSin   3xCos   4xSin   4xCos       
-     2.40  -0.019  -0.048  -0.053  -0.105  -0.022   0.007  -0.015   0.012       
-     4.22  -0.017   0.003  -0.135  -0.235  -0.018   0.001   0.014   0.063       
-     4.52  -0.019  -0.046  -0.168  -0.179  -0.019   0.014   0.031   0.040       
-     5.77  -0.002   0.012  -0.216  -0.282  -0.027   0.013   0.051   0.042       
-     6.20   0.024   0.070  -0.284  -0.207  -0.037   0.002   0.064   0.010       
-     8.46   0.047   0.032  -0.379  -0.321  -0.031  -0.021   0.113  -0.028       
-     8.99   0.054  -0.053  -0.385  -0.240  -0.017   0.000   0.111  -0.040       
-    10.12   0.102  -0.070  -0.428  -0.247  -0.001  -0.036   0.120  -0.039       
-    13.65   0.022  -0.090  -0.495  -0.523  -0.081   0.006   0.219  -0.042       
-    17.03   0.063   0.258  -0.272  -1.155  -0.077  -0.113   0.146   0.499       
-!! NOTE: Radii values are stored on file as semi-major axes length              
-!!       measured in pixels but on screen as effective radii in arc secs.       
+!! Rad(a)   1xSin   1xCos   2xSin   2xCos   3xSin   3xCos   4xSin   4xCos
+     2.40  -0.019  -0.048  -0.053  -0.105  -0.022   0.007  -0.015   0.012
+     4.22  -0.017   0.003  -0.135  -0.235  -0.018   0.001   0.014   0.063
+     4.52  -0.019  -0.046  -0.168  -0.179  -0.019   0.014   0.031   0.040
+     5.77  -0.002   0.012  -0.216  -0.282  -0.027   0.013   0.051   0.042
+     6.20   0.024   0.070  -0.284  -0.207  -0.037   0.002   0.064   0.010
+     8.46   0.047   0.032  -0.379  -0.321  -0.031  -0.021   0.113  -0.028
+     8.99   0.054  -0.053  -0.385  -0.240  -0.017   0.000   0.111  -0.040
+    10.12   0.102  -0.070  -0.428  -0.247  -0.001  -0.036   0.120  -0.039
+    13.65   0.022  -0.090  -0.495  -0.523  -0.081   0.006   0.219  -0.042
+    17.03   0.063   0.258  -0.272  -1.155  -0.077  -0.113   0.146   0.499
+!! NOTE: Radii values are stored on file as semi-major axes length
+!!       measured in pixels but on screen as effective radii in arc secs.
 !! NOTE: Position angles are stored on file with origin upward and clockwise
 !!       rotation positive.
-## END                                                                          
+## END
 \end{verbatim}
 \end{myquote}
 
@@ -6325,10 +6325,10 @@ one sheet of paper.
 
 \begin{myquote}
 \begin{verbatim}
-## ESP SECTOR V1.1 OUTPUT FILE 
+## ESP SECTOR V1.1 OUTPUT FILE
 ##
-## Filename: 
-ic3374c                                                   
+## Filename:
+ic3374c
 ## Background (counts):
 760
 ## Sigma (counts):
@@ -6343,37 +6343,37 @@ ic3374c
 24
 ## Zero point for magnitude:
 27.5
-## Spiral and elliptical scale lengths 
+## Spiral and elliptical scale lengths
 6.351797 2.3095597E-02
 ## Spiral and elliptical central brightness:
 21.42383 13.98312
 ## Profile data:
-!! Radius      Count     Above/Below Sky    Relative Magnitude 
-      0.0       220.0       18.333             21.6                             
-      1.0       210.2       17.521             21.7                             
-      2.0       205.0       17.083             21.7                             
-      3.0       181.1       15.094             21.9                             
-      4.0       159.6       13.302             22.0                             
-      5.0       134.4       11.200             22.2                             
-      6.0       115.4        9.617             22.3                             
-      7.0        90.6        7.554             22.6                             
-      8.0        75.2        6.266             22.8                             
-      9.0        66.1        5.506             22.9                             
-     10.0        52.2        4.352             23.2                             
-     12.0        38.5        3.212             23.5                             
-     14.0        31.2        2.601             23.8                             
-     16.0        21.7        1.810             24.2                             
-     18.0        16.8        1.396             24.4                             
-     20.0         8.3        0.691             25.2                             
-     22.0        10.0        0.830             25.0                             
-     24.0         9.0        0.748             25.1                             
-     26.0         2.2        0.188             26.6                             
-     28.0         3.3        0.276             26.2                             
-     30.0         1.6        0.131             27.0                             
-     32.0         4.3        0.361             25.9                             
-     34.0         4.5        0.376             25.9                             
-     36.0         4.3        0.358             25.9                             
-## END 
+!! Radius      Count     Above/Below Sky    Relative Magnitude
+      0.0       220.0       18.333             21.6
+      1.0       210.2       17.521             21.7
+      2.0       205.0       17.083             21.7
+      3.0       181.1       15.094             21.9
+      4.0       159.6       13.302             22.0
+      5.0       134.4       11.200             22.2
+      6.0       115.4        9.617             22.3
+      7.0        90.6        7.554             22.6
+      8.0        75.2        6.266             22.8
+      9.0        66.1        5.506             22.9
+     10.0        52.2        4.352             23.2
+     12.0        38.5        3.212             23.5
+     14.0        31.2        2.601             23.8
+     16.0        21.7        1.810             24.2
+     18.0        16.8        1.396             24.4
+     20.0         8.3        0.691             25.2
+     22.0        10.0        0.830             25.0
+     24.0         9.0        0.748             25.1
+     26.0         2.2        0.188             26.6
+     28.0         3.3        0.276             26.2
+     30.0         1.6        0.131             27.0
+     32.0         4.3        0.361             25.9
+     34.0         4.5        0.376             25.9
+     36.0         4.3        0.358             25.9
+## END
 \end{verbatim}
 \end{myquote}
 
@@ -6382,10 +6382,10 @@ ic3374c
 
 \begin{myquote}
 \begin{verbatim}
-## ESP GRAPHS V1.1 OUTPUT FILE 
+## ESP GRAPHS V1.1 OUTPUT FILE
 ##
-## Filename: 
-ic3374c                                                   
+## Filename:
+ic3374c
 ##  X       Y         Xc        Yc      SLenS    SLenE   SCSB  ECSB   LCCS  LCCE
    93.05   95.97 -11:23:21.6 62:13:08   5.0984   0.4906  21.5  19.4 0.991 0.827
 \end{verbatim}
@@ -6398,12 +6398,12 @@ ic3374c
 \begin{verbatim}
 ## ESP LOBACK V1.1 OUTPUT FILE
 ##
-## Filename: 
-ic3374c                                                    
-##  X         Y        Raw   Smoothed   Proj.    Interp.    Sdev.    Sigma.    
-   100.2      99.8     784.0    774.0    780.4    772.6     46.3     17.1       
-   160.7     158.0     756.0    757.0    755.0    757.5     11.1      7.1       
-   162.2      31.8     765.0    762.0    764.8    762.1     10.9     13.7       
+## Filename:
+ic3374c
+##  X         Y        Raw   Smoothed   Proj.    Interp.    Sdev.    Sigma.
+   100.2      99.8     784.0    774.0    780.4    772.6     46.3     17.1
+   160.7     158.0     756.0    757.0    755.0    757.5     11.1      7.1
+   162.2      31.8     765.0    762.0    764.8    762.1     10.9     13.7
 \end{verbatim}
 \end{myquote}
 
@@ -6414,17 +6414,17 @@ ic3374c
 \begin{verbatim}
 ## ESP GAUFIT V1.1 OUTPUT FILE
 ##
-## Filename: 
-/local2/data/esp/hdf3                                                           
+## Filename:
+/local2/data/esp/hdf3
 !! Algorithm: least-squares
-## Sigma: 
+## Sigma:
 !! fitted
 15.98624
-## Background: 
+## Background:
 !! given
 39
 ## Source Parameters:
-!!  X           Y         Angle       FWHMa/as     FWHMb/as      Peak 
+!!  X           Y         Angle       FWHMa/as     FWHMb/as      Peak
       306.2        57.2        12.7   0.268E+00    0.130E+00    0.264E+03
       168.1        46.2        50.8   0.206E+00    0.180E+00    0.158E+03
       182.9        85.4       115.0   0.185E+00    0.100E+00    0.114E+03
@@ -6434,10 +6434,10 @@ ic3374c
   0.917E-01   0.869E-01   0.200E+00   0.809E-02    0.692E-02   -0.100E+01
   0.111E+00   0.179E+00   0.819E-01   0.152E-01    0.885E-02   -0.100E+01
   0.130E+00   0.438E+00   0.378E-01   0.710E-01    0.103E-01   -0.100E+01
-## END                                     
+## END
 \end{verbatim}
 \end{myquote}
- 
+
 
 \newpage
 \section{Backpage alphabetical listing}

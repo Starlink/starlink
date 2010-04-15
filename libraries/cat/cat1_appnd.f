@@ -11,9 +11,9 @@
 *  Description:
 *     Append an additional string to a given position in a string.
 *     The value is appended to the string beginning at position POSN+1.
-*     POSN is updated to indicate the last element of STRING after the 
-*     insertion.  If no copying is done, POSN is returned unchanged. The 
-*     size of both STRING and the additional string are based on the 
+*     POSN is updated to indicate the last element of STRING after the
+*     insertion.  If no copying is done, POSN is returned unchanged. The
+*     size of both STRING and the additional string are based on the
 *     declared Fortran 77 size given by the intrinsic function LEN.
 
 *     Maintenance note: in the future it may be possible to replace
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@
 *       Determine the number of characters to be added.  If possible
 *       all the characters in the additional string (including any
 *       trailing blanks) are added.  However, if there is insufficient
-*       space in the returned string for all the characters then the 
+*       space in the returned string for all the characters then the
 *       maximum number which can be accommodated are copied.
 
          ADDSTS = LEN(ADDSTR)

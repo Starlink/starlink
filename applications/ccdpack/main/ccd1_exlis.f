@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_EXLIS( INRAN, INID, INX, INY, NIN, LOW, HIGH, 
+      SUBROUTINE CCD1_EXLIS( INRAN, INID, INX, INY, NIN, LOW, HIGH,
      :                       OUTRAN, OUTID, OUTX, OUTY, NOUT, STATUS )
 *+
 *  Name:
@@ -19,7 +19,7 @@
 *     writes it into a second list.  Each point for input and output
 *     consists of two integer values (rank and ID) and two double
 *     precision values (X and Y coordinates).  Points are selected
-*     for copying only if their rank value is within the range 
+*     for copying only if their rank value is within the range
 *     LOW..HIGH inclusive.
 
 *  Arguments:
@@ -49,7 +49,7 @@
 *     OUTY( * ) = DOUBLE PRECISION (Returned)
 *        Y coordinate values of output list.
 *     NOUT = INTEGER (Returned)
-*        Number of members written into output list (size of arrays 
+*        Number of members written into output list (size of arrays
 *        OUTRAN, OUTID, OUTX and OUTY).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -92,7 +92,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER INRAN( * )
       INTEGER INID( * )
@@ -108,7 +108,7 @@
       DOUBLE PRECISION OUTX( * )
       DOUBLE PRECISION OUTY( * )
       INTEGER NOUT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -118,7 +118,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       NOUT = 0
       DO I = 1, NIN
          IF ( INRAN( I ) .GE. LOW .AND. INRAN( I ) .LE. HIGH ) THEN

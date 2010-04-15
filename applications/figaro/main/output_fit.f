@@ -47,11 +47,11 @@
 *      MXPARS = INTEGER (Given)
 *        1st dimension of results
 *      NYP = INTEGER (Given)
-*       
+*
 *      NXP = INTEGER (Given)
-*       
+*
 *      SPDIM2 = INTEGER (Given)
-*       
+*
 *    Subroutines/functions referenced:
 *      GET_PARNUM = INTEGER FUNCTION
 *        Convert parameter name to array position

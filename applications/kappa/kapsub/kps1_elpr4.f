@@ -76,36 +76,36 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       INTEGER EL
       INTEGER MASK( EL )
       INTEGER NBIN
       REAL AXCEN( NBIN )
-      
+
 *  Arguments Returned:
       REAL MOUT( EL )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Pixel count
       INTEGER IBIN               ! Bin index
-      
+
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Loop round every pixel in the mask, storing the new value.
       DO I = 1, EL
          IBIN = MASK( I )
          IF ( IBIN .GT. 0 ) THEN
-            MOUT( I ) = AXCEN( IBIN )         
+            MOUT( I ) = AXCEN( IBIN )
          ELSE
             MOUT( I ) = VAL__BADR
          END IF
       END DO
-      
+
       END

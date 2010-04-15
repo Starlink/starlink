@@ -78,7 +78,7 @@ SV * Perl_getPlotAttr ( char * attr ) {
   if (!astOK) return NULL;
 
   if (CurrentPlot == NULL ) {
-    astError( AST__GRFER, 
+    astError( AST__GRFER,
 	      "Massive internal inconsistency in AstPlot Grf infrastructure");
     return NULL;
   }
@@ -99,7 +99,7 @@ int astGFlush( void ){
   }
 
   cb = Perl_getPlotAttr( "_gflush" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -131,7 +131,7 @@ int astGFlush( void ){
 
       if (astOK) {
 	if (count != 1) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Returned more than 1 arg from GFlush callback");
 	  retval = 0;
 	} else {
@@ -172,7 +172,7 @@ int astGLine( int n, const float *x, const float *y ){
   }
 
   cb = Perl_getPlotAttr( "_gline" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -187,16 +187,16 @@ int astGLine( int n, const float *x, const float *y ){
       if ( external != NULL ) {
 	XPUSHs( external );
       }
-    
+
       /* unpack is now reverse to XS norm */
       XX = newAV();
       unpack1D( newRV_noinc((SV*) XX), (float *)x, 'f', n);
       YY = newAV();
       unpack1D( newRV_noinc((SV*) YY), (float *)y, 'f', n);
-    
+
       XPUSHs( sv_2mortal(newRV_noinc((SV*) XX )));
       XPUSHs( sv_2mortal(newRV_noinc((SV*) YY )));
-    
+
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL );
@@ -206,7 +206,7 @@ int astGLine( int n, const float *x, const float *y ){
 
       if (astOK) {
 	if (count != 1) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Returned more than 1 arg from GLine callback");
 	  retval = 0;
 	} else {
@@ -243,7 +243,7 @@ int astGQch( float *chv, float *chh ){
   }
 
   cb = Perl_getPlotAttr( "_gqch" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -273,7 +273,7 @@ int astGQch( float *chv, float *chh ){
 
       if (astOK) {
 	if (count != 3) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Must return 3 args from GQch callback");
 	  retval = 0;
 	} else {
@@ -317,7 +317,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
   }
 
   cb = Perl_getPlotAttr( "_gmark" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -332,17 +332,17 @@ int astGMark( int n, const float *x, const float *y, int type ){
       if ( external != NULL ) {
 	XPUSHs( external );
       }
-    
+
       /* unpack is now reverse to XS norm */
       XX = newAV();
       unpack1D( newRV_noinc((SV*) XX), (float *)x, 'f', n);
       YY = newAV();
       unpack1D( newRV_noinc((SV*) YY), (float *)y, 'f', n);
-    
+
       XPUSHs( sv_2mortal(newRV_noinc((SV*) XX )));
       XPUSHs( sv_2mortal(newRV_noinc((SV*) YY )));
       XPUSHs( sv_2mortal(newSViv(type) ) );
-    
+
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL );
@@ -352,7 +352,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
 
       if (astOK) {
 	if (count != 1) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Returned more than 1 arg from GMark callback");
 	  retval = 0;
 	} else {
@@ -392,7 +392,7 @@ int astGText( const char *text, float x, float y, const char *just,
   }
 
   cb = Perl_getPlotAttr( "_gtext" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -423,7 +423,7 @@ int astGText( const char *text, float x, float y, const char *just,
 
       if (astOK) {
 	if (count != 1) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Returned more than 1 arg from GText callback");
 	  retval = 0;
 	} else {
@@ -445,7 +445,7 @@ int astGText( const char *text, float x, float y, const char *just,
     retval = 0;
   }
   return retval;
-}               
+}
 
 int astGTxExt( const char *text, float x, float y, const char *just,
                float upx, float upy, float *xb, float *yb ){
@@ -467,7 +467,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
   }
 
   cb = Perl_getPlotAttr( "_gtxext" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -482,7 +482,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
       if ( external != NULL ) {
 	XPUSHs( external );
       }
-    
+
       XPUSHs( sv_2mortal(newSVpv(text, 0) ) );
       XPUSHs( sv_2mortal(newSVnv(x) ) );
       XPUSHs( sv_2mortal(newSVnv(y) ) );
@@ -502,10 +502,10 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 		    "Must return 3 args from GTxExt callback not %d",count);
 	  retval = 0;
 	} else {
-	  /* The status will be on the stack furthest back so we 
+	  /* The status will be on the stack furthest back so we
 	     need to read off yb, then xb then status  */
 
-	  /* yb. Read and copy into output array which was 
+	  /* yb. Read and copy into output array which was
 	     allocated by the caller.
 	     We can do this because we know there are always 4 numbers.
 	  */
@@ -580,7 +580,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
     retval = 0;
   }
   return retval;
-}               
+}
 
 int astGAttr( int attr, double value, double *old_value, int prim ){
   dSP;
@@ -601,7 +601,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
   }
 
   cb = Perl_getPlotAttr( "_gattr" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -616,11 +616,11 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
       if ( external != NULL ) {
 	XPUSHs( external );
       }
-    
+
       XPUSHs( sv_2mortal(newSViv(attr) ) );
       XPUSHs( sv_2mortal(newSVnv(value) ) );
       XPUSHs( sv_2mortal(newSViv(prim) ) );
-    
+
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_ARRAY | G_EVAL );
@@ -634,7 +634,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 		    "Must return 2 args from GAttr callback not %d",count);
 	  retval = 0;
 	} else {
-	  /* The status will be on the stack furthest back so we 
+	  /* The status will be on the stack furthest back so we
 	     need to read off old_val first */
 	  cache = POPn;
 	  if (old_value != NULL) *old_value = cache;
@@ -671,7 +671,7 @@ int astGScales( float *chv, float *chh ){
   }
 
   cb = Perl_getPlotAttr( "_gscales" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -701,7 +701,7 @@ int astGScales( float *chv, float *chh ){
 
       if (astOK) {
 	if (count != 3) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Must return 3 args from GScales callback");
 	  retval = 0;
 	} else {
@@ -744,7 +744,7 @@ int astGCap( int cap, int value ) {
   }
 
   cb = Perl_getPlotAttr( "_gcap" );
- 
+
   if (astOK) {
     if ( cb != NULL ) {
       int count;
@@ -759,7 +759,7 @@ int astGCap( int cap, int value ) {
       if ( external != NULL ) {
 	XPUSHs( external );
       }
-    
+
       XPUSHs( sv_2mortal(newSViv(cap) ) );
       XPUSHs( sv_2mortal(newSViv(value) ) );
       PUTBACK;
@@ -771,7 +771,7 @@ int astGCap( int cap, int value ) {
 
       if (astOK) {
 	if (count != 1) {
-	  astError( AST__GRFER, 
+	  astError( AST__GRFER,
 		    "Returned more than 1 arg from GCap callback");
 	  retval = 0;
 	} else {
@@ -793,7 +793,7 @@ int astGCap( int cap, int value ) {
     retval = 0;
   }
   return retval;
-}               
+}
 
 
 static void Report( const char *name ){

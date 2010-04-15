@@ -4,7 +4,7 @@
 *     KPG1_GDFND
 
 *  Purpose:
-*     Selects the highest picture of a given name with WCS within the 
+*     Selects the highest picture of a given name with WCS within the
 *     current AGI picture.
 
 *  Language:
@@ -18,7 +18,7 @@
 *     picture of a given name that lies within the current picture and
 *     has an associated AST Plot structure. The the current picture
 *     itself is included in the search.  If such a picture is found it
-*     becomes the new current picture.  Otherwise, a bad status will be 
+*     becomes the new current picture.  Otherwise, a bad status will be
 *     returned, and the current picture is unchanged.
 *
 *     This routine is like KPG1_AGFND except that KPG1_AGFDN does not
@@ -33,7 +33,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Copyright:	
+*  Copyright:
 *     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -101,22 +101,22 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get an identifier for the original current picture.
-      CALL AGI_ICURP( IPICC, STATUS )  
+      CALL AGI_ICURP( IPICC, STATUS )
 
 *  Get its name and convert to upper case.
       CALL AGI_INAME( CNAME, STATUS )
       CALL CHR_UCASE( CNAME )
 
-*  Find the last (most recent) picture in the database that has the requested 
+*  Find the last (most recent) picture in the database that has the requested
 *  name, and lies within the current picture.
-      CALL AGI_RCL( NAME, IPICT, STATUS )  
+      CALL AGI_RCL( NAME, IPICT, STATUS )
 
 *  Loop until we have found a suitable position, or the database has been
 *  exhausted.
       MORE = .TRUE.
-      DO WHILE( MORE ) 
+      DO WHILE( MORE )
 
-*  If no picture with the requested name was found, annul the error and 
+*  If no picture with the requested name was found, annul the error and
 *  see if the current picture itself has the required name. If not, leave
 *  the loop.
          IF( STATUS .NE. SAI__OK ) THEN
@@ -124,7 +124,7 @@
 
             IF( CNAME .EQ. NAME ) THEN
                IPICT = IPICC
-            ELSE 
+            ELSE
                IPIC = -1
                MORE = .FALSE.
             END IF
@@ -135,13 +135,13 @@
             CALL AGI_SELP( IPICC, STATUS )
          END IF
 
-*  If a picture with the required name was found, see if it has a WCS Plot 
+*  If a picture with the required name was found, see if it has a WCS Plot
 *  in its MORE component.
          IF( MORE ) THEN
 
-            CALL AGI_IMORE( IPICT, HASMOR, STATUS )  
-            IF( HASMOR ) THEN  
-               CALL AGI_MORE( IPICT, 'READ', MORLOC, STATUS ) 
+            CALL AGI_IMORE( IPICT, HASMOR, STATUS )
+            IF( HASMOR ) THEN
+               CALL AGI_MORE( IPICT, 'READ', MORLOC, STATUS )
                CALL DAT_THERE( MORLOC, 'AST_PLOT', HASWCS, STATUS )
                CALL DAT_ANNUL( MORLOC, STATUS )
             ELSE
@@ -155,7 +155,7 @@
 
 *  If not, find the preceeding picture with the required name.
             ELSE
-               CALL AGI_RCP( NAME, IPIC, IPICT, STATUS )  
+               CALL AGI_RCP( NAME, IPIC, IPICT, STATUS )
 
 *  We have now finished with the IPIC picture identifier, so we can annul
 *  it. We do not do this if IPIC identifiers the current picture since we
@@ -178,7 +178,7 @@
 
 *  Otherwise, select the picture of the chosen name to be the current
 *  database picture.
-      ELSE 
+      ELSE
          CALL AGI_SELP( IPIC, STATUS )
       END IF
 

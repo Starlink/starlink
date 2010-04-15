@@ -21,19 +21,19 @@
          GAUSS1 = A
          RETURN
       END IF
-      
+
 *     Two random variables are produced with each pair obtained
 *     from 'RAN2'. Thus calls to 'RAN2' made every other call to
 *     'GAUSS2'.
-      
+
       IF (SW) THEN
          GAUSS1=S*RB*R+A
          SW=.FALSE.
          RETURN
       END IF
-      
+
 *     CALL 'RAN1' TWICE AND USE BOX-MULLER TRANSFORM.
-      
+
       RR = 2.0
       DO WHILE(RR.GE.1.)
          RA = -1.+2.*RAN1(NX)
@@ -45,9 +45,9 @@
       SW=.TRUE.
       RETURN
       END
-      
+
       REAL FUNCTION GAUSS2(A,S,NX)
-*     
+*
 *   Normal distribution random variable generator. uses
 *   Box-Muller transform on 2 independent random variables
 *   on [-1,1]. These variables are generated with Numerical

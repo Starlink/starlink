@@ -4,7 +4,7 @@
 *     SelectorMap
 
 *  Purpose:
-*     A Mapping that locates positions within one of a set of alternate 
+*     A Mapping that locates positions within one of a set of alternate
 *     Regions.
 
 *  Constructor Function:
@@ -12,27 +12,27 @@ c     astSelectorMap
 f     AST_SELECTORMAP
 
 *  Description:
-*     A SelectorMap is a Mapping that identifies which Region contains 
+*     A SelectorMap is a Mapping that identifies which Region contains
 *     a given input position.
-*     
-*     A SelectorMap encapsulates a number of Regions that all have the same 
-*     number of axes and represent the same coordinate Frame. The number of 
-*     inputs (Nin attribute) of the SelectorMap equals the number of axes 
-*     spanned by one of the encapsulated Region. All SelectorMaps have only 
+*
+*     A SelectorMap encapsulates a number of Regions that all have the same
+*     number of axes and represent the same coordinate Frame. The number of
+*     inputs (Nin attribute) of the SelectorMap equals the number of axes
+*     spanned by one of the encapsulated Region. All SelectorMaps have only
 *     a single output. SelectorMaps do not define an inverse transformation.
 *
-*     For each input position, the forward transformation of a SelectorMap 
-*     searches through the encapsulated Regions (in the order supplied when 
+*     For each input position, the forward transformation of a SelectorMap
+*     searches through the encapsulated Regions (in the order supplied when
 *     the SelectorMap was created) until a Region is found which contains
 *     the input position. The index associated with this Region is
 *     returned as the SelectorMap output value (the index value is the
-*     position of the Region within the list of Regions supplied when the 
+*     position of the Region within the list of Regions supplied when the
 *     SelectorMap was created, starting at 1 for the first Region). If an
-*     input position is not contained within any Region, a value of zero is 
+*     input position is not contained within any Region, a value of zero is
 *     returned by the forward transformation.
 *
 *     If a compound Mapping contains a SelectorMap in series with its own
-*     inverse, the combination of the two adjacent SelectorMaps will be 
+*     inverse, the combination of the two adjacent SelectorMaps will be
 *     replaced by a UnitMap when the compound Mapping is simplified using
 c     astSimplify.
 f     AST_SIMPLIFY.
@@ -60,12 +60,12 @@ f     The SelectorMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -133,9 +133,9 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(SelectorMap)
@@ -194,7 +194,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "selectormap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     SelectorMap member function (over-rides the astEqual protected
@@ -221,12 +221,12 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstSelectorMap *that;        
-   AstSelectorMap *this;        
+   AstSelectorMap *that;
+   AstSelectorMap *this;
    int i;
    int nin;
    int nreg;
-   int result;                
+   int result;
 
 /* Initialise. */
    result = 0;
@@ -246,12 +246,12 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 /* Check they have the same number of inputs. */
       nin = astGetNin( this );
       if( astGetNin( that ) == nin ) {
-   
+
 /* Check they contain the same number of Regions, and have the same badval. */
          nreg = this->nreg;
          if( that->nreg == nreg ||
              astEQUAL( that->badval, this->badval) ) {
-   
+
 /* Loop over the Regions, breaking as soon as two unequal Regions are
    found. */
             result = 1;
@@ -264,7 +264,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -285,7 +285,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "selectormap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SelectorMap member function (over-rides the astGetObjSize protected
@@ -330,7 +330,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
    for( i = 0; i < this->nreg; i++ ) {
       result += astGetObjSize( this->reg[ i ] );
-   }    
+   }
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
@@ -369,7 +369,7 @@ void astInitSelectorMapVtab_(  AstSelectorMapVtab *vtab, const char *name, int *
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -439,7 +439,7 @@ void astInitSelectorMapVtab_(  AstSelectorMapVtab *vtab, const char *name, int *
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -453,8 +453,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     SelectorMap member function (over-rides the astManageLock protected
@@ -462,7 +462,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -481,21 +481,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -673,8 +673,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstRegion **sreg;
    AstSelectorMap *map;
    AstSelectorMap *slneb;
-   int equal;            
-   int i; 
+   int equal;
+   int i;
    int ilo;
    int nreg;
    int result;
@@ -693,7 +693,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Attempt to simplify the SelectorMap on its own. */
 /* ============================================= */
 
-/* Try to simplify each of the encapsulated Regions, noting if any 
+/* Try to simplify each of the encapsulated Regions, noting if any
    simplification takes place. */
    simp = 0;
    sreg = astMalloc( sizeof( AstRegion * )*nreg );
@@ -703,12 +703,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          simp = simp || ( sreg[ i ] != map->reg[ i ] );
       }
 
-/* If any simplification took place, construct a new SelectorMap from these 
+/* If any simplification took place, construct a new SelectorMap from these
    simplified Mappings. */
-      if( simp ) { 
+      if( simp ) {
          (void) astAnnul( ( *map_list )[ where ] );
-         ( *map_list )[ where ] = (AstMapping *) astSelectorMap( nreg, 
-                                                          (void **) sreg, 
+         ( *map_list )[ where ] = (AstMapping *) astSelectorMap( nreg,
+                                                          (void **) sreg,
                                                           map->badval, "", status );
          result = where;
       }
@@ -728,14 +728,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Is the higher neighbour a SelectorMap? If so get a pointer to it, and
    note the index of the lower of the two adjacent SelectorMaps. */
-      if( where < ( *nmap - 1 ) && 
+      if( where < ( *nmap - 1 ) &&
           astIsASelectorMap( ( *map_list )[ where + 1 ] ) ){
          slneb = (AstSelectorMap *) ( *map_list )[ where + 1 ];
          ilo = where;
 
 /* If not, is the lower neighbour a SelectorMap? If so get a pointer to it, and
    note the index of the lower of the two adjacent SelectorMaps. */
-      } else if( where > 0 && 
+      } else if( where > 0 &&
                  astIsASelectorMap( ( *map_list )[ where - 1 ] ) ){
          slneb = (AstSelectorMap *) ( *map_list )[ where - 1 ];
          ilo =  where - 1;
@@ -746,22 +746,22 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If a neighbouring SelectorMap was found, we can replace the pair by a
    UnitMap if the two SelectorMaps are equal but have opposite values for
-   their Invert flags. Temporarily invert the neighbour, then compare 
+   their Invert flags. Temporarily invert the neighbour, then compare
    the two SelectorMaps for equality, then re-invert the neighbour. */
       if( slneb ) {
          astInvert( slneb );
          equal = astEqual( map, slneb );
          astInvert( slneb );
 
-/* If the two SelectorMaps are equal but opposite, annul the first of the two 
-   Mappings, and replace it with a UnitMap. Also set the invert flag. */ 
+/* If the two SelectorMaps are equal but opposite, annul the first of the two
+   Mappings, and replace it with a UnitMap. Also set the invert flag. */
          if( equal ) {
             new = (AstMapping *) astUnitMap( astGetNin( ( *map_list )[ ilo ] ), "", status );
             (void) astAnnul( ( *map_list )[ ilo ] );
             ( *map_list )[ ilo ] = new;
             ( *invert_list )[ ilo ] = 0;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
             (void) astAnnul( ( *map_list )[ ilo + 1 ] );
             for ( i = ilo + 2; i < *nmap; i++ ) {
@@ -850,12 +850,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    AstPointSet *result;
    AstPointSet *tps;
    AstRegion *reg;
-   AstSelectorMap *map;  
+   AstSelectorMap *map;
    double **ptr_out;
    double **ptr1;
    double **ptr2;
    double **tptr;
-   double *p2;             
+   double *p2;
    double *pout;
    double badval;
    int bad;
@@ -921,7 +921,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             astNegate( reg );
             closed = astGetClosed( reg );
             astSetClosed( reg, !closed );
- 
+
 /* Transform the remaining input positions. Good input positions which
    are within the Region will be bad in the output. */
             ps2 = astTransform( reg, ps1, 1, ps2 );
@@ -931,8 +931,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             pout = ptr_out[ 0 ];
             for( ipoint = 0; ipoint < npoint; ipoint++, p2++, pout++ ) {
 
-/* Any position that has not already been assigned to a Region and is bad 
-   in the output PointSet must be contained within the current Region, so 
+/* Any position that has not already been assigned to a Region and is bad
+   in the output PointSet must be contained within the current Region, so
    assign the (one-based) index of the current Region to the output element. */
                if( *pout == 0 && *p2 == AST__BAD ) *pout = ireg;
             }
@@ -1006,7 +1006,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 *     void
 
 *  Notes:
-*     -  This constructor makes a deep copy, including a copy of the 
+*     -  This constructor makes a deep copy, including a copy of the
 *     Regions within the SelectorMap.
 */
 
@@ -1081,7 +1081,7 @@ static void Delete( AstObject *obj, int *status ) {
 /* Free dynamically allocated resources. */
    for( i = 0; i < this->nreg; i++ ) {
       this->reg[ i ] = astAnnul( this->reg[ i ] );
-   }   
+   }
    this->reg = astFree( this->reg );
 
 /* Clear the remaining SelectorMap variables. */
@@ -1120,7 +1120,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Local Variables: */
    AstSelectorMap *this;
    int i;
-   char buf[ 20 ];    
+   char buf[ 20 ];
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1147,12 +1147,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Loop to dump each Region. */
 /* ------------------------- */
 /* The coordinate Frame of the Regions is defined by the first Region.
-   The Frame information is omitted from the second and subsequent 
+   The Frame information is omitted from the second and subsequent
    Regions by setting the protected RegionFS attribute to zero. */
    for( i = 0; i < this->nreg; i++ ) {
       sprintf( buf, "Reg%d", i + 1 );
       if( i > 0 ) astSetRegionFS( this->reg[ i ], 0 );
-      astWriteObject( channel, buf, 1, 1, this->reg[ i ], 
+      astWriteObject( channel, buf, 1, 1, this->reg[ i ],
                       "Region of input space" );
       if( i > 0 ) astClearRegionFS( this->reg[ i ] );
    }
@@ -1160,7 +1160,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* BadVal. */
 /* ------- */
    if( this->badval != AST__BAD ) {
-      astWriteDouble( channel, "BadVal", 1, 1, this->badval, 
+      astWriteDouble( channel, "BadVal", 1, 1, this->badval,
                       "Output value for bad input positions" );
    }
 
@@ -1206,7 +1206,7 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, double badval,
 *        Regions are taken.
 *     badval
 *        The value to be returned by the forward transformation of the
-*        SelectorMap for any input positions that have a bad (AST__BAD) 
+*        SelectorMap for any input positions that have a bad (AST__BAD)
 *        value on any axis.
 *     options
 *        Pointer to a null terminated string containing an optional
@@ -1303,7 +1303,7 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, double badval,
    return new;
 }
 
-AstSelectorMap *astSelectorMapId_( int nreg, void **regs_void, double badval, 
+AstSelectorMap *astSelectorMapId_( int nreg, void **regs_void, double badval,
                                    const char *options, ... ) {
 /*
 *++
@@ -1330,27 +1330,27 @@ f     RESULT = AST_SELECTORMAP( NREG, REGS, BADVAL, OPTIONS, STATUS )
 *     This function creates a new SelectorMap and optionally initialises
 *     its attributes.
 *
-*     A SelectorMap is a Mapping that identifies which Region contains 
+*     A SelectorMap is a Mapping that identifies which Region contains
 *     a given input position.
-*     
-*     A SelectorMap encapsulates a number of Regions that all have the same 
-*     number of axes and represent the same coordinate Frame. The number of 
-*     inputs (Nin attribute) of the SelectorMap equals the number of axes 
-*     spanned by one of the encapsulated Region. All SelectorMaps have only 
+*
+*     A SelectorMap encapsulates a number of Regions that all have the same
+*     number of axes and represent the same coordinate Frame. The number of
+*     inputs (Nin attribute) of the SelectorMap equals the number of axes
+*     spanned by one of the encapsulated Region. All SelectorMaps have only
 *     a single output. SelectorMaps do not define an inverse transformation.
 *
-*     For each input position, the forward transformation of a SelectorMap 
-*     searches through the encapsulated Regions (in the order supplied when 
+*     For each input position, the forward transformation of a SelectorMap
+*     searches through the encapsulated Regions (in the order supplied when
 *     the SelectorMap was created) until a Region is found which contains
 *     the input position. The index associated with this Region is
 *     returned as the SelectorMap output value (the index value is the
-*     position of the Region within the list of Regions supplied when the 
+*     position of the Region within the list of Regions supplied when the
 *     SelectorMap was created, starting at 1 for the first Region). If an
-*     input position is not contained within any Region, a value of zero is 
+*     input position is not contained within any Region, a value of zero is
 *     returned by the forward transformation.
 *
 *     If a compound Mapping contains a SelectorMap in series with its own
-*     inverse, the combination of the two adjacent SelectorMaps will be 
+*     inverse, the combination of the two adjacent SelectorMaps will be
 *     replaced by a UnitMap when the compound Mapping is simplified using
 c     astSimplify.
 f     AST_SIMPLIFY.
@@ -1363,13 +1363,13 @@ f     NREG = INTEGER (Given)
 *        The number of supplied Regions.
 c     regs
 f     REGS( NREG ) = INTEGER (Given)
-*        An array of pointers to the Regions. All the supplied Regions must 
+*        An array of pointers to the Regions. All the supplied Regions must
 *        relate to the same coordinate Frame. The number of axes in this
 *        coordinate Frame defines the number of inputs for the SelectorMap.
 c     badval
 f     BADVAL = DOUBLE PRECISION (Given)
 *        The value to be returned by the forward transformation of the
-*        SelectorMap for any input positions that have a bad (AST__BAD) 
+*        SelectorMap for any input positions that have a bad (AST__BAD)
 *        value on any axis.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
@@ -1399,7 +1399,7 @@ f     AST_SELECTORMAP = INTEGER
 
 *  Notes:
 *     - Deep copies are taken of the supplied Regions. This means that
-*     any subsequent changes made to the component Regions using the 
+*     any subsequent changes made to the component Regions using the
 *     supplied pointers will have no effect on the SelectorMap.
 *     - A null Object pointer (AST__NULL) will be returned if this
 c     function is invoked with the AST error status set, or if it
@@ -1463,7 +1463,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the SelectorMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-      new = astInitSelectorMap( NULL, sizeof( AstSelectorMap ), !class_init, 
+      new = astInitSelectorMap( NULL, sizeof( AstSelectorMap ), !class_init,
                                 &class_vtab, "SelectorMap", nreg, regs,
                                 badval );
 
@@ -1509,7 +1509,7 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
 *     #include "selectormap.h"
 *     AstSelectorMap *astInitSelectorMap( void *mem, size_t size, int init,
 *                                         AstSelectorMapVtab *vtab, const char *name,
-*                                         int nreg, AstRegion **regs, double badval ) 
+*                                         int nreg, AstRegion **regs, double badval )
 
 *  Class Membership:
 *     SelectorMap initialiser.
@@ -1555,7 +1555,7 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
 *        of these Regions.
 *     badval
 *        The value to be returned by the forward transformation of the
-*        SelectorMap for any input positions that have a bad (AST__BAD) 
+*        SelectorMap for any input positions that have a bad (AST__BAD)
 *        value on any axis.
 
 *  Returned Value:
@@ -1571,7 +1571,7 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
    AstFrame *f0;                 /* Frame from first Region */
    AstFrame *f1;                 /* Frame from current Region */
    AstSelectorMap *new;          /* Pointer to new SelectorMap */
-   int equal;                    /* Are Frames equal? */                      
+   int equal;                    /* Are Frames equal? */
    int i;                        /* Loop count */
    int nin;                      /* No. input coordinates for SelectorMap */
 
@@ -1608,7 +1608,7 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
    the number of input and output coordinates and in which directions the
    Mapping should be defined. */
    if ( astOK ) {
-      new = (AstSelectorMap *) astInitMapping( mem, size, 0, 
+      new = (AstSelectorMap *) astInitMapping( mem, size, 0,
                                              (AstMappingVtab *) vtab, name,
                                              nin, 1, 1, 0 );
       if ( astOK ) {
@@ -1719,7 +1719,7 @@ AstSelectorMap *astLoadSelectorMap_( void *mem, size_t size,
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
-   AstSelectorMap *new;               
+   AstSelectorMap *new;
    AstFrameSet *fs;
    AstRegion *reg;
    int i;
@@ -1785,8 +1785,8 @@ AstSelectorMap *astLoadSelectorMap_( void *mem, size_t size,
             if( astOK ) {
                new->reg[ i ] = reg;
 
-/* All but the first Region may have a dummy FrameSet rather than the 
-   correct FrameSet. The correct FrameSet will be a copy of the FrameSet 
+/* All but the first Region may have a dummy FrameSet rather than the
+   correct FrameSet. The correct FrameSet will be a copy of the FrameSet
    from the first Region. */
                if( i == 0 ) {
                   fs = astGetRegFS( reg );

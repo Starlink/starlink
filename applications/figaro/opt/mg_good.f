@@ -9,10 +9,10 @@
 *          OPT_LU,KEEP_ITT,ISTATE,NFREE)
 
 * Purpose:
-*  Goodness of fit analysis 
+*  Goodness of fit analysis
 
 * Description:
-*  Goodness of fit analysis 
+*  Goodness of fit analysis
 
 * Arguments:
 *    M = INTEGER (Given)
@@ -117,7 +117,7 @@
                end do
             end do
          end if
-         
+
 * invert matrix
 
          ifail=SOFT_FAIL
@@ -144,7 +144,7 @@
          end if
          factor = 2.0d0 * fc / dble(idf)
 
-* now sort out which parameters are free and copy over the 
+* now sort out which parameters are free and copy over the
 *correct variances for them. Start by assuming that all
 *parameters are bound. If we have NFree parameters
 * then only the 1st Nfree elements of B are valid.
@@ -152,7 +152,7 @@
 * one that is free look up the element of B which corresponds
 * to that parameter in XC.
 
-         
+
          do  i = 1, n
             var(i) = 0.0
             if(istate(i).gt.ON_BOUND) then

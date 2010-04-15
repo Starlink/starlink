@@ -12,23 +12,23 @@ C
 C     Description:
 C        RHSP3 reads tapes produced by the HSP3 high speed photometry
 C        software at the AAT. The current version is limited to 16 bit
-C        single channel data, and handles a maximum of 200000 time bins. 
+C        single channel data, and handles a maximum of 200000 time bins.
 C
 C     Parameters:
 C        DRIVE      (Device)   The tape drive to read from.
 C        MJDZERO    (Double)   The MJD at 0h U.T. on the night of observation.
 C        OUTPUT     (TSP, 2D)  The output time series dataset.
 C
-C     Support: 
+C     Support:
 C        Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C        27/2/1988
 C
 C-
 C
 C  History:
-C    27/11/1987   Original Version.   JAB/AAO 
+C    27/11/1987   Original Version.   JAB/AAO
 C    27/2/1988   TSP Monolith version.  JAB/AAO
 C
 
@@ -45,7 +45,7 @@ C
       CHARACTER*(DAT__SZLOC) LOC1,LOC2
       INTEGER P1,P2
 
-                                             
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Mount the tape and get a tape descriptor
@@ -59,23 +59,23 @@ C
          CALL TSP_TEMP(200000,'_DOUBLE',P2,LOC2,STATUS)
 
 *  If OK read tape
-                              
+
          IF (STATUS .EQ. SAI__OK) THEN
             CALL TSP_RHSP3_MAIN(TD,%VAL(P1),%VAL(P2),STATUS)
             CALL MAG_ANNUL(TD,STATUS)
          ELSE
             CALL ERR_REP('MSG','Unable to mount tape ^STATUS',
      :          STATUS)
-         ENDIF                                    
+         ENDIF
 
 *  Unmap data arrays
-   
+
          CALL TSP_UNMAP(LOC1,STATUS)
          CALL TSP_UNMAP(LOC2,STATUS)
-      ELSE       
+      ELSE
          CALL ERR_REP('MSG',
      :    'Unable to Allocate Tape Drive ^STATUS',STATUS)
-      ENDIF                 
+      ENDIF
       END
 
 
@@ -119,7 +119,7 @@ C
       LOGICAL BIT16                        ! 16 Bit Flag
       INTEGER ACTVAL                       ! Actual number of values read
       REAL DATA(200000)                    ! Data array
-      DOUBLE PRECISION TIMES(200000)       ! Times array    
+      DOUBLE PRECISION TIMES(200000)       ! Times array
       LOGICAL END_OF_EXP                   ! End of Experiment flag
       INTEGER HOURS                        ! UT Hours
       INTEGER MINUTES                      ! UT Minutes
@@ -127,7 +127,7 @@ C
       INTEGER MILLISEC                     ! UT Millisec
       DOUBLE PRECISION T                   ! Time
       DOUBLE PRECISION JDZ                 ! JD Zero point
-      INTEGER BIN                          ! Bin number                      
+      INTEGER BIN                          ! Bin number
       INTEGER I                            ! Loop counter
       INTEGER DIMS(2)                      ! Dimensions of array
       CHARACTER*(DAT__SZLOC) LOC,DLOC      ! HDS Locators
@@ -135,7 +135,7 @@ C
       REAL LAMBDA                          ! Wavelength
       INTEGER DPTR                         ! Data pointer
 
-      IF (STATUS .EQ. SAI__OK) THEN                     
+      IF (STATUS .EQ. SAI__OK) THEN
 
 *  Read a block
 
@@ -143,7 +143,7 @@ C
          IF (STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('MSG','Error Reading Tape ^STATUS',STATUS)
             RETURN
-         ELSE  
+         ELSE
 
 *  Check block size
 
@@ -151,17 +151,17 @@ C
                CALL MSG_OUT('MSG',
      :            'Not an HSP3 Tape - Incorrect Block Size',STATUS)
                RETURN
-            ENDIF  
+            ENDIF
 
 *  Check that it is an HSP3 tape header
 
-            IF (CBUF(1:27) .NE. 'TAPE  HIGH SPEED PHOTOMETRY') THEN 
+            IF (CBUF(1:27) .NE. 'TAPE  HIGH SPEED PHOTOMETRY') THEN
                CALL MSG_OUT('MSG',
      :              'Not an HSP3 Tape - Incorrect Header',STATUS)
                RETURN
-            ENDIF                                      
+            ENDIF
             CALL MSG_OUT('MSG',CBUF(1:64),STATUS)
-                                       
+
 *  Loop until end of session
 
             END_OF_SESSION = .FALSE.
@@ -179,44 +179,44 @@ C
 *  Check for end of session
 
                 BUF1 = ISHFTC(BUF(1),8,16)
-                IF (BUF1 .EQ. -2) THEN                               
-                    CALL MSG_OUT('MSG','End of Session',STATUS)      
+                IF (BUF1 .EQ. -2) THEN
+                    CALL MSG_OUT('MSG','End of Session',STATUS)
                     END_OF_SESSION = .TRUE.
 
 *  Otherwise should be an experiment header
-                          
-                ELSE IF(BUF1 .EQ. 0) THEN  
+
+                ELSE IF(BUF1 .EQ. 0) THEN
 
 *  Get experiment number
-                          
-                    EXP = ISHFTC(BUF(5),8,16)                        
-                    CALL MSG_SETI('EXP',EXP)                         
-                    CALL MSG_OUT('MSG', 'EXPERIMENT ^EXP',STATUS)    
+
+                    EXP = ISHFTC(BUF(5),8,16)
+                    CALL MSG_SETI('EXP',EXP)
+                    CALL MSG_OUT('MSG', 'EXPERIMENT ^EXP',STATUS)
 
 *  Get integration time
 
-                    INT = ISHFTC(BUF(6),8,16)                        
-                    CALL MSG_SETI('INT',INT)                         
-                    CALL MSG_OUT('MSG',                              
-     :               'Integration Time ^INT milliseconds',STATUS)    
+                    INT = ISHFTC(BUF(6),8,16)
+                    CALL MSG_SETI('INT',INT)
+                    CALL MSG_OUT('MSG',
+     :               'Integration Time ^INT milliseconds',STATUS)
 
 *  Get number of channels
 
-                    NCHANS = ISHFTC(BUF(7),8,16)                     
-                    CALL MSG_SETI('NCHANS',NCHANS)                   
-                    CALL MSG_OUT('MSG', '^NCHANS Channels',STATUS)   
+                    NCHANS = ISHFTC(BUF(7),8,16)
+                    CALL MSG_SETI('NCHANS',NCHANS)
+                    CALL MSG_OUT('MSG', '^NCHANS Channels',STATUS)
 
 *  Get word size (16 or 32 bits)
 
-                    BIT16 = ISHFTC(BUF(8),8,16) .EQ. 1               
-                    IF (BIT16) THEN                                  
-                        CALL MSG_OUT('MSG', '16 Bits ',STATUS)       
-                    ELSE                                             
-                        CALL MSG_OUT('MSG', '32 Bits ',STATUS)       
-                    ENDIF      
+                    BIT16 = ISHFTC(BUF(8),8,16) .EQ. 1
+                    IF (BIT16) THEN
+                        CALL MSG_OUT('MSG', '16 Bits ',STATUS)
+                    ELSE
+                        CALL MSG_OUT('MSG', '32 Bits ',STATUS)
+                    ENDIF
 
 *  Get User comment record
-                                      
+
                     CALL MSG_OUT('MSG',CBUF(17:76),STATUS)
                     BIN = 1
                     END_OF_EXP = .FALSE.
@@ -238,7 +238,7 @@ C
                           HOURS = ISHFTC(BUF(5),8,16)
                           MINUTES = ISHFTC(BUF(6),8,16)
                           SECONDS = ISHFTC(BUF(7),8,16)
-                          MILLISEC = ISHFTC(BUF(8),8,16)     
+                          MILLISEC = ISHFTC(BUF(8),8,16)
                           WRITE (LINE,'(I2.2,'':'',I2.2,'':''
      :                      ,I2.2,''.'',I3.3)')
      :                    HOURS,MINUTES,SECONDS,MILLISEC
@@ -249,7 +249,7 @@ C
                           T = REAL(SECONDS) + REAL(MILLISEC)/1000.0
                           T = REAL(MINUTES) + T/60.0
                           T = REAL(HOURS) + T/60.0
-                          T = T/24.0                   
+                          T = T/24.0
                           T = T+JDZ
                           T = T+0.5D0*DBLE(INT)/86400.0D3
 
@@ -266,25 +266,25 @@ C
                         ELSE
 
 *  If experiment header found, the run has aborted
-*  Skip back 1 block 
-                          
+*  Skip back 1 block
+
                           IF (ISHFTC(BUF(1),8,16) .EQ. 0) THEN
                               CALL MSG_OUT('MSG','Aborted Run',STATUS)
                               CALL MAG_JUMP(TD,-1,STATUS)
-                          ENDIF 
+                          ENDIF
                           END_OF_EXP = .TRUE.
                           BIN=BIN-1
 
 *  Create output file and get locator
 
                           CALL DAT_CREAT('OUTPUT','NDF',
-     :                     0,0,STATUS)      
-                          CALL DAT_ASSOC('OUTPUT','WRITE',LOC,STATUS) 
+     :                     0,0,STATUS)
+                          CALL DAT_ASSOC('OUTPUT','WRITE',LOC,STATUS)
                           DIMS(1)=1
                           DIMS(2)=BIN
 
 *  Build the data array and write data
-                                                     
+
                           CALL TSP_CREATE_2D(LOC,1,BIN,' ',
      :                        .FALSE.,.FALSE.,STATUS)
                           CALL TSP_MAP_DATA(LOC,'WRITE',DPTR,DLOC,
@@ -298,7 +298,7 @@ C
 *  Build the axis array and write times
 
                           CALL TSP_MAP_LAMBDA(LOC,'WRITE',DPTR,DLOC,
-     :                        STATUS)                       
+     :                        STATUS)
                           LAMBDA = 5000.0
                           IF (STATUS .EQ. SAI__OK) THEN
                              CALL TSP_GEN_MOVE(1,LAMBDA,%VAL(DPTR))
@@ -309,24 +309,24 @@ C
                           IF (STATUS .EQ. SAI__OK) THEN
                              CALL TSP_GEN_MOVE(2*BIN,TIMES,%VAL(DPTR))
                           ENDIF
-                          CALL TSP_UNMAP(DLOC,STATUS)          
+                          CALL TSP_UNMAP(DLOC,STATUS)
                           CALL TSP_WLU_TIME(LOC,'MJD(UTC)','Days',
      :                        STATUS)
 
 *  Annul locator and cancel parameter
 
                           CALL DAT_ANNUL(LOC,STATUS)
-                          CALL DAT_CANCL('OUTPUT',STATUS)     
+                          CALL DAT_CANCL('OUTPUT',STATUS)
                           IF (STATUS .NE. SAI__OK) THEN
                              RETURN
                           ENDIF
                         ENDIF
                     ENDDO
-                ENDIF                                                
+                ENDIF
             ENDDO
          ENDIF
       ENDIF
       END
-                    
+
 
 

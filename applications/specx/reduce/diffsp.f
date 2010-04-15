@@ -23,7 +23,7 @@
 *     Functions
 
       INTEGER   NTOT
-      LOGICAL   DOQUAD 
+      LOGICAL   DOQUAD
 
 *  Ok, go...
 

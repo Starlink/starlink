@@ -14,11 +14,11 @@
 
 *  Description:
 *     This routine returns the current value of the read-only flag
-*     associated with a quality name, and optionally assigns a new 
+*     associated with a quality name, and optionally assigns a new
 *     value to the flag.
 *
 *     If the read-only flag is set for a quality name, any attempt to
-*     remove the quality name using IRQ_REMQN will result in an error 
+*     remove the quality name using IRQ_REMQN will result in an error
 *     being reported.
 
 *  Arguments:
@@ -40,7 +40,7 @@
 *        true.
 *     OLDVAL = LOGICAL (Returned)
 *        The value of the read-only flag on entry to this routine. If the
-*        old value is of no interest, it is safe to supply the same 
+*        old value is of no interest, it is safe to supply the same
 *        variable for OLDVAL as for NEWVAL since OLDVAL is updated after
 *        NEWVAL is used.
 *     STATUS = INTEGER (Given and Returned)
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -135,9 +135,9 @@
       CALL IRQ1_SEARC( LOCS, LQNAME( : LAST - FIRST + 1 ), FIXED, VALUE,
      :                 BIT, COMMNT, RDONLY, FIXBIT, SLOT, STATUS )
 
-*  If required, set the new value. 
+*  If required, set the new value.
       IF( SET ) THEN
-         CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, NEWVAL, 
+         CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, NEWVAL,
      :                  FIXBIT, STATUS )
       END IF
 

@@ -73,7 +73,7 @@ proc CCDExit {} {
 
    set Main $MAIN(window)
    set main [CCDPathOf $Main]
-   if { [winfo exists $main] } { 
+   if { [winfo exists $main] } {
 
 #  Widget creation.
       CCDCcdWidget Top top Ccd::toplevel .exit -title "Exit from $MAIN(name)"
@@ -85,7 +85,7 @@ proc CCDExit {} {
       CCDTkWidget Bitmap bitmap label $top.bitmap -bitmap questhead
       CCDTkWidget Line2 line2 frame $top.f2 -height 3
       CCDCcdWidget Choice choice Ccd::choice $Top.button -standard 0
-               
+
 #  Configure widgets.
       $Choice addbutton Yes "$Top kill $Top;$Main kill $Main; destroy ."
       $Choice addbutton No  "$Top kill $Top"
@@ -96,8 +96,8 @@ proc CCDExit {} {
       pack $message -side left -fill both -expand true
       pack $bitmap -side right
       pack $line2 -side top -fill x
-      
-#  Make sure this window is on top and reasonable prominent 
+
+#  Make sure this window is on top and reasonable prominent
 #  (centre of screen of parent top-level).
       wm withdraw $top
       CCDCentreWindow $Top
@@ -108,7 +108,7 @@ proc CCDExit {} {
 
 #  Yes is default.
       $Choice focus Yes
-      
+
 #  Wait for the acknowledgement.
       CCDWindowWait $Top
    }

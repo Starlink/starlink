@@ -1,6 +1,6 @@
 #!/bin/csh
 #
-# !!begin 
+# !!begin
 # !!title  Lists all formats of files without repetition
 # !!author T.R. Marsh
 # !!created   14 January  2005
@@ -11,13 +11,13 @@
 # !!head1  Script for listing unique formats of files
 #
 # !!emph{uniqformat} lists the formats of all sdf CCD data files within
-# a given directory tree. It uses 'find' to look for all files of type 
-# r*[0-9].sdf starting from the current directory. It only lists different 
-# formats. i.e. if it finds files of the same format as an earlier one, 
+# a given directory tree. It uses 'find' to look for all files of type
+# r*[0-9].sdf starting from the current directory. It only lists different
+# formats. i.e. if it finds files of the same format as an earlier one,
 # it skips it. Thus the file listed with the format is the first one found
 # to have it.
 #
-# !!end 
+# !!end
 
 source $STARLINK_DIR/etc/cshrc
 source $STARLINK_DIR/etc/login
@@ -62,7 +62,7 @@ foreach file (`find . -name "r*[0-9].sdf"`)
   set diff = 1
   set n    = 0
   while ( $n < $#warray )
-    @ n++ 
+    @ n++
     if( $window == $warray[$n] && \
         $xbin   == $xarray[$n] && \
         $ybin   == $yarray[$n] && \
@@ -71,11 +71,11 @@ foreach file (`find . -name "r*[0-9].sdf"`)
       break
     endif
   end
- 
+
 # append new format
 
   if($diff) then
-  
+
     set farray = ($farray $file:r)
     set warray = ($warray $window)
     set xarray = ($xarray $xbin)

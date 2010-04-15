@@ -46,12 +46,12 @@
 *  Notes:
 *     -  The special keywords and how they are obtained is as follows:
 *        -  BITPIX is derived from the type of the NDF data array.
-*        -  NAXIS, and NAXISn are derived from the dimensions of 
+*        -  NAXIS, and NAXISn are derived from the dimensions of
 *           the NDF data array.
 *        -  The TITLE, LABEL, and BUNIT descriptors are derived from
 *           the TITLE, LABEL, and UNITS NDF components respectively.
 *        -  The CDELTn, CRVALn, CTYPEn and CUNITn descriptors are
-*           derived from a set of linear NDF AXIS structures. 
+*           derived from a set of linear NDF AXIS structures.
 *        -  The standard order of the FITS keywords is preserved.
 *           No FITS comments are written following the values of the
 *           above exceptions.
@@ -106,7 +106,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -285,7 +285,7 @@
 *  Handle axis headers.
 *  ====================
 *  ====================
-*      
+*
 *  For any axis structure present, the routine checks to see if each
 *  axis data array is linear.  If it is, the start value and
 *  incremental value are written to the appropriate CRVALn and CDELTn
@@ -294,7 +294,7 @@
 *  CUNITn respectively.  This is rather crude, as it deals with the
 *  axis system as a whole, and that the flags to indicate presence of
 *  components are for any of the axes.
-      DO I = 1, NDIM 
+      DO I = 1, NDIM
          CALL NDF_ASTAT( NDF, 'Centre', I, THERE, STATUS )
 
          IF ( THERE ) THEN
@@ -306,10 +306,10 @@
 *  type.  Use _REAL for all but double-precision centres.  See if the
 *  axis is linear.  Derive the increment between values.
             IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+               CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
      :                          DSTART, DEND, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
@@ -318,10 +318,10 @@
 
 *  Repeat for all other axis-centre data types mapped as real.
             ELSE
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+               CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
      :                          START, END, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
@@ -340,7 +340,7 @@
 
 *  Form a FITS-like card image for the ASCII file.  Right justify the
 *  value.
-               CALL CHR_RTOC( START, CVALUE, NCHAR ) 
+               CALL CHR_RTOC( START, CVALUE, NCHAR )
                VALUE = ' '
                VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
                DESCR = ' '
@@ -367,7 +367,7 @@
 
 *  Form a FITS-like card image for the ASCII file.  Right justify the
 *  value.
-               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )      
+               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )
                VALUE = ' '
                VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
                DESCR = ' '
@@ -394,7 +394,7 @@
 
 *  Form a FITS-like card image for the ASCII file.  Right justify the
 *  value.
-               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )      
+               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )
                VALUE = ' '
                VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
                DESCR = ' '
@@ -452,7 +452,7 @@
                            DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS/
      :                                   /' / Axis '//C( 1:NCD )/
      :                                   /' label'
-      
+
                         ELSE IF ( NCT .LE. 68 ) THEN
                            DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS
 
@@ -516,7 +516,7 @@
                            DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS/
      :                                   /' / Axis '//C( 1:NCD )/
      :                                   /' units'
-      
+
                         ELSE IF ( NCT .LE. 68 ) THEN
                            DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS
 
@@ -553,7 +553,7 @@
 
 *  Process the title.
 *  ==================
-*   
+*
 *  If an NDF title is found, this is copied to the ASCII file's title
 *  header.  Note that the header must be at least 8 characters long.
       CALL NDF_STATE( NDF, 'TITLE', THERE, STATUS )
@@ -581,7 +581,7 @@
                IF ( NCT .LE. 60 ) THEN
                   DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS/
      :                          /' / Title'
-      
+
                ELSE IF ( NCT .LE. 68 ) THEN
                   DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS
 
@@ -612,7 +612,7 @@
 
 *  Process the label.
 *  ==================
-*   
+*
 *  If an NDF label is found, this is copied to the FITS-like label
 *  header.
       CALL NDF_STATE( NDF, 'LABEL', THERE, STATUS )
@@ -640,7 +640,7 @@
                IF ( NCT .LE. 60 ) THEN
                   DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS/
      :                          /' / Label'
-      
+
                ELSE IF ( NCT .LE. 68 ) THEN
                   DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS
 
@@ -671,7 +671,7 @@
 
 *  Process the units.
 *  ==================
-*   
+*
 *  If an NDF units component is found, this is copied to the FITS
 *  BUNIT header.
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )
@@ -699,7 +699,7 @@
                IF ( NCT .LE. 60 ) THEN
                   DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS/
      :                          /' / Units'
-      
+
                ELSE IF ( NCT .LE. 68 ) THEN
                   DESCR( 9: ) = '= '//APS//VALUE( :NCT )//APS
 

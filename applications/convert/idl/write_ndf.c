@@ -36,7 +36,7 @@
 *              The optional bad value
 
 *  Description:
-*     If the given component name is 'DATA', an NDF of the given type and 
+*     If the given component name is 'DATA', an NDF of the given type and
 *     with the given dimensions is created.  The Given data array is then
 *     copied into the NDF's DATA component.  For other component names,
 *     the specified NDF is expected to already exist. For component 'QUALITY'
@@ -87,7 +87,7 @@
 *        ndfSbad
 *     PRIMDAT
 *        prm_par.h
-*     
+*
 *     {name_of_facility_or_package}:
 *        {routine_used}...
 *     [facility_or_package]...
@@ -195,7 +195,7 @@ int oplen;              /* Length of error message */
    ** Extract the arguments to comprehensible names
    */
       arr = argv[0];
-      n_dims = *(int *)argv[1]; 
+      n_dims = *(int *)argv[1];
       arr_bnds = (int *)argv[2];
       ndf_name = (IDL_STRING *)argv[3];
       comp = (IDL_STRING *)argv[4];
@@ -225,7 +225,7 @@ int oplen;              /* Length of error message */
       */
          ndfOpen( NULL, ndf_name->s, "UPDATE", "OLD", &ndf, &place, &status );
       }
-       
+
    /*
    **  Check the number of pixels is same in given array and NDF for QUALITY
    **  and VARIANCE.
@@ -238,7 +238,7 @@ int oplen;              /* Length of error message */
          **  Array size and NDF size do not agree
          */
             status = SAI__ERROR;
-            errRep( " ", 
+            errRep( " ",
               "write_ndf: Incorrect number elements supplied", &status );
          }
       }
@@ -260,7 +260,7 @@ int oplen;              /* Length of error message */
          **  Fortran to C pointer conversion failed
          */
             status = SAI__ERROR;
-            errRep( " ", 
+            errRep( " ",
               "write_ndf: Fortran to C pointer conversion failed", &status );
 
          } else {
@@ -320,9 +320,9 @@ int oplen;              /* Length of error message */
 */
    fstat = status;
    while ( status != SAI__OK ) {
-      errLoad( 
+      errLoad(
         param, ERR__SZPAR, &parlen, opstr, ERR__SZMSG, &oplen, &status );
-      if ( status != SAI__OK ) 
+      if ( status != SAI__OK )
          printf( "%s %s\r\n", errn++?"! ":"!!", opstr );
    }
    errRlse();
@@ -331,7 +331,7 @@ int oplen;              /* Length of error message */
 **  That's it, return to the calling routine
 */
    return( fstat == SAI__OK );
-   
+
 }
 
 int copybadout( void *dest, void *source, int npix, int type, void *badval ) {
@@ -381,7 +381,7 @@ int nbad=0;   /* if bad values found */
    case 1: /* Byte */
       pbs = (char *)source;
       pbd = (char *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pbs, badval, sizeof(val__badub) ) )
             *pbd++ = *pbs++;
          else {
@@ -393,7 +393,7 @@ int nbad=0;   /* if bad values found */
    case 2: /* Short int */
       pss = (short int *)source;
       psd = (short int *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pss, badval, sizeof(val__badw) ) )
             *psd++ = *pss++;
          else {
@@ -405,7 +405,7 @@ int nbad=0;   /* if bad values found */
    case 3: /* Integer */
       pis = (int *)source;
       pid = (int *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pis, badval, sizeof(val__badi) ) )
             *pid++ = *pis++;
          else {
@@ -430,7 +430,7 @@ int nbad=0;   /* if bad values found */
    case 5: /* Double */
       pds = (double *)source;
       pdd = (double *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( (void *)pds, (void *)badval, sizeof(val__badd) ) )
             *pdd++ = *pds++;
          else {

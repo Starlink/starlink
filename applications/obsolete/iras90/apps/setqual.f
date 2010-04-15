@@ -61,7 +61,7 @@
 *     of dimensions).
 
 *  Usage:
-*     SETQUAL NDF QNAME COMMENT MASK 
+*     SETQUAL NDF QNAME COMMENT MASK
 
 *  ADAM Parameters:
 *     ARD = LITERAL (Read)
@@ -139,7 +139,7 @@
 *     NDF = NDF (Update)
 *        A group of NDFs in which the quality information is to be
 *        stored. This should be in the form of a group expression (see
-*        help on "Group_expresssions"). 
+*        help on "Group_expresssions").
 *     QNAME = LITERAL (Read)
 *        The quality name. If the supplied name is not already defined
 *        within any of the input NDFs, then a definition of the name is
@@ -205,7 +205,7 @@
 *     -  Only the QUALITY and (optionally) HISTORY components, and the
 *     extension specified by parameter XNAME are altered by this
 *     application. All other NDF components remain unaltered.
-      
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -221,7 +221,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -244,7 +244,7 @@
 
 *  Local Variables:
       INTEGER ADDED              ! No. of pixels added to the group as a
-                                 ! result of the current call to 
+                                 ! result of the current call to
                                  ! GRP_GROUP.
       INTEGER ALBNDE( NDF__MXDIM )! Lower bounds of excluded area (ARD)
       INTEGER ALBNDI( NDF__MXDIM )! Lower bounds of included area (ARD)
@@ -256,7 +256,7 @@
                                  ! the supplied quality name.
       INTEGER ELMASK             ! No. of elements in mapped DATA
                                  ! component of the used mask.
-      LOGICAL FIXED              ! True if the quality is the same at 
+      LOGICAL FIXED              ! True if the quality is the same at
                                  ! every pixel.
       LOGICAL FLAG               ! True if a group expression was
                                  ! terminated with a minus sign.
@@ -290,19 +290,19 @@
       INTEGER NDIMI              ! No. of dimensions in first input NDF.
       INTEGER NIN                ! The total number of NDFs to be
                                  ! processed.
-      INTEGER NINDEX             ! The total number of pixel indices 
+      INTEGER NINDEX             ! The total number of pixel indices
                                  ! obtained.
       CHARACTER QNAME*(IRQ__SZQNM)! Supplied quality name.
       INTEGER REGVAL             ! Highest value in ARD mask
       CHARACTER SELECT*4         ! Value of parameter SELECT.
-      INTEGER SET                ! The number of pixels which hold the 
+      INTEGER SET                ! The number of pixels which hold the
                                  ! quality.
-      LOGICAL THERE              ! True if quality name is already 
+      LOGICAL THERE              ! True if quality name is already
                                  ! defined within the input NDF.
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds for input NDF.
       INTEGER UBNDI( NDF__MXDIM )! Upper bounds for first input NDF.
       LOGICAL VALUE              ! If FIXED is true, then VALUE is true
-                                 ! if all pixel shold the quality, and 
+                                 ! if all pixel shold the quality, and
                                  ! false if no pixels hold the quality.
       CHARACTER XLOC*(DAT__SZLOC) ! Locator for the NDF extension
                                  ! containing quality name information
@@ -328,7 +328,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'NDF',  0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'NDF',  0, 1, '  Give more NDF names...',
      :                IGRP2, NIN, STATUS )
 
 *  Get the number of dimensions in the first NDF in the list. All NDFs
@@ -342,11 +342,11 @@
       LQNAME = CHR_LEN( QNAME )
 
 *  Get a value for parameter SELECT.
-      CALL PAR_CHOIC( 'SELECT', 'MASK', 'MASK,LIST,ARD', .FALSE., 
+      CALL PAR_CHOIC( 'SELECT', 'MASK', 'MASK,LIST,ARD', .FALSE.,
      :                 SELECT, STATUS )
 
 *  Get a value for parameter FUNCTION.
-      CALL PAR_CHOIC( 'FUNCTION', 'HS', 'HS,HU,NS,NU,HS+NU,HU+NS', 
+      CALL PAR_CHOIC( 'FUNCTION', 'HS', 'HS,HU,NS,NU,HS+NU,HU+NS',
      :                 .FALSE., FUNC, STATUS )
 
 *  Abort if an error has occured.
@@ -364,7 +364,7 @@
 *  If the pixels which are to have their quality modified are specified
 *  by means of a mask image, get a group of mask NDFs.
       ELSE IF( SELECT .EQ. 'MASK' ) THEN
-         CALL IRM_RDNDF( 'MASK',  NIN, NIN, '  Give more mask NDFs...', 
+         CALL IRM_RDNDF( 'MASK',  NIN, NIN, '  Give more mask NDFs...',
      :                   IGRP3, NIN, STATUS )
 
 *  Pixels may alternatively be specified by a list of pixel indicies
@@ -468,16 +468,16 @@
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL IRQ_FIND( NDFIN, LOCS, XNAME, STATUS )
 
-*  If existing quality information was found, tell the user which 
+*  If existing quality information was found, tell the user which
 *  extension it came from.
             IF( STATUS .EQ. SAI__OK ) THEN
                CALL MSG_SETC( 'X', XNAME )
-               CALL MSG_OUTIF( MSG__VERB, 'SETQUAL_MSG3', 
+               CALL MSG_OUTIF( MSG__VERB, 'SETQUAL_MSG3',
      :         '    Using quality names defined in NDF extension "^X"',
      :                         STATUS )
-   
-*  If no quality name information was found, annul the error and 
-*  determine the name of the NDF extension which is to hold such 
+
+*  If no quality name information was found, annul the error and
+*  determine the name of the NDF extension which is to hold such
 *  information.
             ELSE
                CALL ERR_ANNUL( STATUS )
@@ -490,7 +490,7 @@
                IF( .NOT. FOUND ) THEN
                   CALL PAR_DEF0C( 'XTYPE', XNAME, STATUS )
                   CALL PAR_GET0C( 'XTYPE', XTYPE, STATUS )
-                  CALL NDF_XNEW( NDFIN, XNAME, XTYPE, 0, 0, XLOC, 
+                  CALL NDF_XNEW( NDFIN, XNAME, XTYPE, 0, 0, XLOC,
      :                           STATUS )
                   CALL DAT_ANNUL( XLOC, STATUS )
                END IF
@@ -503,7 +503,7 @@
 
          END IF
 
-*  Attempt to find the quality name within the NDF. 
+*  Attempt to find the quality name within the NDF.
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL IRQ_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT,
      :                      STATUS )
@@ -521,7 +521,7 @@
 
                CALL MSG_SETC( 'QN', QNAME )
                CALL NDF_MSG( 'NDF', NDFIN )
-               CALL MSG_OUTIF( MSG__NORM, 'SETQUAL_MSG4', 
+               CALL MSG_OUTIF( MSG__NORM, 'SETQUAL_MSG4',
      :             '    Definition of quality name "^QN" added to ^NDF',
      :                         STATUS )
 
@@ -531,7 +531,7 @@
 
                CALL MSG_SETC( 'QN', QNAME )
                CALL MSG_SETC( 'COM', COMMNT )
-               CALL MSG_OUTIF( MSG__NORM, 'SETQUAL_MSG5', 
+               CALL MSG_OUTIF( MSG__NORM, 'SETQUAL_MSG5',
      :      '    Using pre-existing definition of quality "^QN" - ^COM',
      :                        STATUS )
 
@@ -557,16 +557,16 @@
          IF( SELECT .EQ. 'ARD' ) THEN
 
 *  Get an _INTEGER work array to hold the pixel mask corresponding to
-*  the ARD description. 
+*  the ARD description.
             CALL NDF_SIZE( NDFIN, ELMASK, STATUS )
             CALL PSX_CALLOC( ELMASK, '_INTEGER', IPARD, STATUS )
 
-*  Fill the array with zeros at all pixels not selected by the supplied 
-*  ARD description, and positive values (2 or greater) at all selected 
+*  Fill the array with zeros at all pixels not selected by the supplied
+*  ARD description, and positive values (2 or greater) at all selected
 *  pixels.
             REGVAL = 2
             CALL ARD_WORK( IGRP4, NDIM, LBND, UBND, VAL__BADR, .FALSE.,
-     :                     REGVAL, %VAL( IPARD ), ALBNDI, AUBNDI, 
+     :                     REGVAL, %VAL( IPARD ), ALBNDI, AUBNDI,
      :                     ALBNDE, AUBNDE, STATUS )
 
 *  Now produce a _REAL work array in which selected pixels hold bad
@@ -582,7 +582,7 @@
             IF( STATUS .EQ. SAI__OK ) THEN
 
                IF( FUNC .EQ. 'HS' ) THEN
-                  CALL IRQ_SETQM( LOCS, .TRUE., QNAME, ELMASK, 
+                  CALL IRQ_SETQM( LOCS, .TRUE., QNAME, ELMASK,
      :                            %VAL( IPMASK ), SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'HU' ) THEN
@@ -590,7 +590,7 @@
      :                            %VAL( IPMASK ), SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NS' ) THEN
-                  CALL IRQ_RESQM( LOCS, .TRUE., QNAME, ELMASK, 
+                  CALL IRQ_RESQM( LOCS, .TRUE., QNAME, ELMASK,
      :                            %VAL( IPMASK ), SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NU' ) THEN
@@ -612,7 +612,7 @@
 
 *  Create sections from the mask and input NDFs which have matching
 *  bounds. This is done by trimming away the areas not covered by both
-*  NDFs. 
+*  NDFs.
             CALL NDF_MBND( 'TRIM', NDFIN, NDFMSK, STATUS )
 
 *  Map the DATA component of the mask section.
@@ -624,7 +624,7 @@
             IF( STATUS .EQ. SAI__OK ) THEN
 
                IF( FUNC .EQ. 'HS' ) THEN
-                  CALL IRQ_SETQM( LOCS, .TRUE., QNAME, ELMASK, 
+                  CALL IRQ_SETQM( LOCS, .TRUE., QNAME, ELMASK,
      :                            %VAL( IPMASK ), SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'HU' ) THEN
@@ -632,7 +632,7 @@
      :                            %VAL( IPMASK ), SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NS' ) THEN
-                  CALL IRQ_RESQM( LOCS, .TRUE., QNAME, ELMASK, 
+                  CALL IRQ_RESQM( LOCS, .TRUE., QNAME, ELMASK,
      :                            %VAL( IPMASK ), SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NU' ) THEN
@@ -648,7 +648,7 @@
 
 *  If the selected pixels were specified by a list, modify the QUALITY
 *  component of the input NDF, to perform the requested function.
-         ELSE 
+         ELSE
 
             IF( STATUS .EQ. SAI__OK ) THEN
 
@@ -679,11 +679,11 @@
 
          IF( THERE ) THEN
             CALL MSG_OUTIF( MSG__NORM, 'SETQUAL_MSG6',
-     :                    '    ^SET pixels now hold the quality "^QN"', 
+     :                    '    ^SET pixels now hold the quality "^QN"',
      :                    STATUS )
          ELSE
             CALL MSG_OUTIF( MSG__NORM, 'SETQUAL_MSG7',
-     :                    '    ^SET pixels hold the quality "^QN"', 
+     :                    '    ^SET pixels hold the quality "^QN"',
      :                    STATUS )
          END IF
 
@@ -694,9 +694,9 @@
          CALL IRM_HIST( 'HISTORY', NDFIN, 'IRAS90:SETQUAL', 1, HSTORY,
      :                  STATUS )
 
-*  If an error has occured, attempt to remove the quality name if it 
+*  If an error has occured, attempt to remove the quality name if it
 *  was not defined in the NDF on entry.
-         IF( .NOT. THERE .AND. STATUS .NE. SAI__OK ) THEN      
+         IF( .NOT. THERE .AND. STATUS .NE. SAI__OK ) THEN
             CALL ERR_BEGIN( STATUS )
             CALL IRQ_REMQN( LOCS, QNAME, STATUS )
             CALL ERR_END( STATUS )
@@ -727,7 +727,7 @@
 
 *   Store a list of the processed files for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP2, 'SETQUAL', STATUS )
- 
+
 *  Delete the group used to hold the NDF names.
       CALL GRP_DELET( IGRP2, STATUS )
 
@@ -747,7 +747,7 @@
 *  If an error has occured, clear up.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

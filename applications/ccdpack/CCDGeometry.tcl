@@ -104,10 +104,10 @@ proc CCDGeometry { Top {surekill 1} } {
    if { ! [info exists CCDprefs(outline)] } {
       set CCDprefs(outline) blue
    }
-   if { ![info exists PERCENTILES(low)] } { 
+   if { ![info exists PERCENTILES(low)] } {
       set PERCENTILES(low) 5
    }
-   if { ![info exists PERCENTILES(high)] } { 
+   if { ![info exists PERCENTILES(high)] } {
       set PERCENTILES(high) 95
    }
 
@@ -124,10 +124,10 @@ proc CCDGeometry { Top {surekill 1} } {
    CCDCcdWidget Canvas canvas \
       Ccd::gwm $Topwin.canvas -tags Gwm -redraw 0 -gwmname $GWMDEVICE \
                   -drawcommand "CCDGeomDrawCommand $Topwin $Topwin.canvas"
-   if { ! [winfo exists $canvas] } { 
+   if { ! [winfo exists $canvas] } {
 
 #  Creation failed (probably lack of colours).
-      CCDIssueInfo "Cannot inspect CCD geometries. Release some display       
+      CCDIssueInfo "Cannot inspect CCD geometries. Release some display
 colours (by closing any colour hogging applications) then try again."
       $Topwin kill $Topwin
       return
@@ -159,11 +159,11 @@ colours (by closing any colour hogging applications) then try again."
 #  Configure widgets.
 #-----------------------------------------------------------------------------
 
-#  File items to cancel or accept window and exit interface (note 
+#  File items to cancel or accept window and exit interface (note
 #  interface exit may nit actually kill . if surekill is false).
       $Menu addcommand File {Close Window} "$Choice invoke Cancel"
       $Menu addcommand File {Accept Window} "$Choice invoke OK"
-      if { $surekill } { 
+      if { $surekill } {
          $Menu addcommand File {Exit} CCDExit
       } else {
          $Menu addcommand File {Exit} "$Choice invoke OK"
@@ -206,7 +206,7 @@ colours (by closing any colour hogging applications) then try again."
       CCDGetFileName $Topwin.restore {Select an image} 1
       if { \$CCDimportexists } {
          set NDF \"\$CCDimportfile\"
-         CCDGeomDrawCommand $Topwin $Canvas 
+         CCDGeomDrawCommand $Topwin $Canvas
       } else {
          if { \[info exists DISPLAYED\] } {
             set NDF \$DISPLAYED
@@ -359,8 +359,8 @@ colours (by closing any colour hogging applications) then try again."
 
 #  Check CCDprefs defining bias strips and useful area already.
    if { [info exists CCDglobalpars(${CCDgloprefix}EXTENT)] } {
-      if { $CCDglobalpars(${CCDgloprefix}EXTENT) != "UNKNOWN" && 
-           $CCDglobalpars(${CCDgloprefix}EXTENT) != "" } { 
+      if { $CCDglobalpars(${CCDgloprefix}EXTENT) != "UNKNOWN" &&
+           $CCDglobalpars(${CCDgloprefix}EXTENT) != "" } {
          set l [split $CCDglobalpars(${CCDgloprefix}EXTENT) ","]
          set x1 [expr [lindex $l 0] -0.5]
          set x2 [expr [lindex $l 1] -0.5]
@@ -370,8 +370,8 @@ colours (by closing any colour hogging applications) then try again."
       }
    }
    if { [info exists CCDglobalpars(${CCDgloprefix}BOUNDS)] } {
-      if { $CCDglobalpars(${CCDgloprefix}BOUNDS) != "UNKNOWN" && 
-           $CCDglobalpars(${CCDgloprefix}BOUNDS) != "" } { 
+      if { $CCDglobalpars(${CCDgloprefix}BOUNDS) != "UNKNOWN" &&
+           $CCDglobalpars(${CCDgloprefix}BOUNDS) != "" } {
          set l [split $CCDglobalpars(${CCDgloprefix}BOUNDS) ","]
          set b1 [expr [lindex $l 0] -0.5]
          set b2 [expr [lindex $l 1] -0.5]

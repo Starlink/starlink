@@ -30,12 +30,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,12 +72,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Add formatting options to omit degrees/hours field and change
 *        all affected functions.
 *     10-AUG-2000 (DSB):
-*        Fixed bug in DHmsFormat which could cause (for instance) a formatted 
+*        Fixed bug in DHmsFormat which could cause (for instance) a formatted
 *        galactic longitude value of zero to be formated as "-0.-0".
 *     29-AUG-2001 (DSB):
 *        Added AxisDistance and AxisOffset.
 *     10-OCT-2002 (DSB):
-*        Over-ride the astGetAxisTop and astGetAxisBottom methods so that a 
+*        Over-ride the astGetAxisTop and astGetAxisBottom methods so that a
 *        SkyAxis with the IsLatitude attribute set is legal between plus
 *        and minus 90 degrees.
 *     8-JAN-2003 (DSB):
@@ -87,8 +87,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        like "0.0 0.4 0.8 1.2 1.6 2.0" ("4" replaced by "5").
 *     24-JAN-2004 (DSB):
 *        o  Added AxisFields.
-*        o  Added 'g' format character which produces graphical separators. 
-*        o  Modified AxisAbbrev to use AxisFields so that delimiters which 
+*        o  Added 'g' format character which produces graphical separators.
+*        o  Modified AxisAbbrev to use AxisFields so that delimiters which
 *           include digits can be recognised.
 *     13-SEP-20904 (DSB):
 *        Modify AxisFields to correct usage of the "p" pointer in the
@@ -107,7 +107,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *     7-AUG-2007 (DSB):
 *        Added CentreZero attribute.
 *     1-FEB-2008 (DSB):
-*        Modified AxisUnformat to allow the final numerical field to include 
+*        Modified AxisUnformat to allow the final numerical field to include
 *        an exponent.
 *class--
 */
@@ -190,7 +190,7 @@ static char *gas_delim = "%-%^20+%s85+\"%+";   /* Arc-sec.s separator */
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->DHmsFormat_Buff[ 0 ] = 0; \
@@ -212,15 +212,15 @@ astMAKE_INITGLOBALS(SkyAxis)
 
 
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
-#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 );
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
-static char dhmsformat_buff[ AST__SKYAXIS_DHMSFORMAT_BUFF_LEN + 1 ]; 
-static char dhmsunit_buff[ AST__SKYAXIS_DHMSUNIT_BUFF_LEN + 1 ]; 
+static char dhmsformat_buff[ AST__SKYAXIS_DHMSFORMAT_BUFF_LEN + 1 ];
+static char dhmsunit_buff[ AST__SKYAXIS_DHMSUNIT_BUFF_LEN + 1 ];
 static char getattrib_buff[ AST__SKYAXIS_GETATTRIB_BUFF_LEN + 1 ];
 static char getaxisformat_buff[ AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN + 1 ];
 
@@ -315,9 +315,9 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
 
 *  Description:
 *     This function compares two SkyAxis values that have been
-*     formatted with the supplied format specifier (using astAxisFormat) 
-*     and determines if they have any redundant leading fields (i.e. 
-*     leading fields in common which can be suppressed when tabulating 
+*     formatted with the supplied format specifier (using astAxisFormat)
+*     and determines if they have any redundant leading fields (i.e.
+*     leading fields in common which can be suppressed when tabulating
 *     the values or plotting them on the axis of a graph).
 
 *  Parameters:
@@ -382,7 +382,7 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
       for ( i = 0; i < nf1 && i < nf2; i++ ) {
 
 /* If the fields are different, break out of the loop. */
-         if ( nc1[ i ] != nc2[ i ] || 
+         if ( nc1[ i ] != nc2[ i ] ||
               strncmp( fld1[ i ], fld2[ i ], nc1[ i ] ) ) {
             break;
 
@@ -423,10 +423,10 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2, int *statu
 *     method inherited from the Axis class).
 
 *  Description:
-*     This function returns a signed value representing the axis increment 
+*     This function returns a signed value representing the axis increment
 *     from axis value v1 to axis value v2.
 *
-*     For a SkyAxis, the angular difference between the two supplied axis 
+*     For a SkyAxis, the angular difference between the two supplied axis
 *     values is normalized into the range +PI to -PI.
 
 *  Parameters:
@@ -464,7 +464,7 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2, int *statu
    return result;
 }
 
-static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str, 
+static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
                        int maxfld, char **fields, int *nc, double *val, int *status ) {
 /*
 *  Name:
@@ -478,8 +478,8 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int AxisFields( AstAxis *this_axis, const char *fmt, const char *str, 
-*                     int maxfld, char **fields, int *nc, double *val ) 
+*     int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
+*                     int maxfld, char **fields, int *nc, double *val )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the protected astAxisFields
@@ -503,10 +503,10 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 *     maxfld
 *        The maximum number of fields to identify within "str".
 *     fields
-*        A pointer to an array of at least "maxfld" character pointers. 
-*        Each element is returned holding a pointer to the start of the 
-*        corresponding field  in "str" (in the order in which they occur 
-*        within "str"), or NULL if no corresponding field can be found. 
+*        A pointer to an array of at least "maxfld" character pointers.
+*        Each element is returned holding a pointer to the start of the
+*        corresponding field  in "str" (in the order in which they occur
+*        within "str"), or NULL if no corresponding field can be found.
 *     nc
 *        A pointer to an array of at least "maxfld" integers. Each
 *        element is returned holding the number of characters in the
@@ -514,7 +514,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 *        found.
 *     val
 *        Pointer to a location at which to store the radians value
-*        equivalent to the returned field values. If this is NULL, 
+*        equivalent to the returned field values. If this is NULL,
 *        it is ignored.
 
 *  Returned Value:
@@ -529,9 +529,9 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 *     - Fields are counted from the start of the formatted string. If the
 *     string contains more than "maxfld" fields, then trailing fields are
 *     ignored.
-*     - If this function is invoked with the global error status set, or 
-*     if it should fail for any reason, then a value of zero will be returned 
-*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     - If this function is invoked with the global error status set, or
+*     if it should fail for any reason, then a value of zero will be returned
+*     as the function value, and "fields", "nc" and "val"  will be returned
 *     holding their supplied values
 
 */
@@ -562,9 +562,9 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 /* If the format string starts with a "%" call the method inherited from
    the parent Axis class. */
    if( fmt[ 0 ] == '%' ) {
-      return (*parent_axisfields)( this_axis, fmt, str, maxfld, fields, nc, 
+      return (*parent_axisfields)( this_axis, fmt, str, maxfld, fields, nc,
                                    val, status );
-   }   
+   }
 
 /* Initialise. */
    result = 0;
@@ -578,11 +578,11 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
    ParseDHmsFormat( fmt, astGetAxisDigits( this_axis ), &sep, &plus, &lead_zero,
                     &as_time, &dh, &min, &sec, &ndp, status );
 
-/* Only proceed if the format was parsed succesfully, and the supplied arrays 
+/* Only proceed if the format was parsed succesfully, and the supplied arrays
    are not of zero size. */
    if( astOK && maxfld > 0 ) {
 
-/* Indicate that we have not yet found any inconsistency between the 
+/* Indicate that we have not yet found any inconsistency between the
    formatted value and the forat string. */
       ok = 1;
 
@@ -603,27 +603,27 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
          p++;
       } else if( *p == '+' ) {
          p++;
-      }     
+      }
 
 /* Initialise the equivalent radian value. */
       value = 0.0;
 
-/* If the format string specifies a degrees or hours field, it should be 
+/* If the format string specifies a degrees or hours field, it should be
    the first field. */
       if( dh ) {
 
 /* If the format indicates that fields are separated by characters, or if
-   there is a minutes or seconds field, then the first field should end with 
+   there is a minutes or seconds field, then the first field should end with
    the appropriate separator. In these cases locate the terminator,and
    store the length of the first field. */
          if( sep == 'l' || sep == 'g' || min || sec ) {
 
             if( sep == 'l' ) {
                term = as_time ? "h" : "d";
-      
+
             } else if( sep == 'g' ) {
                term = as_time ? gh_delim : gd_delim;
-   
+
             } else {
                tbuf[ 0 ] = sep;
                tbuf[ 1 ] = '\0';
@@ -670,8 +670,8 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
          fields[ result ] = p;
 
 /* If the format indicates that fields are separated by characters, or if
-   there is a seconds field, then this field should end with the appropriate 
-   separator. In these cases locate the terminator,and store the length of 
+   there is a seconds field, then this field should end with the appropriate
+   separator. In these cases locate the terminator,and store the length of
    this field. */
          if( sep == 'l' || sep == 'g' || sec ) {
             if( sep == 'l' ) {
@@ -696,7 +696,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 /* Move on to the first character following the terminator. */
             p = t + strlen( term );
 
-/* In all other cases, this field is not terminated. Note its length 
+/* In all other cases, this field is not terminated. Note its length
    (ignoring trailing spaces). */
          } else {
             nc[ result ] = astChrLen( fields[ result ] );
@@ -722,8 +722,8 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 /* Note the start of the next field. */
          fields[ result ] = p;
 
-/* If the format indicates that fields are separated by characters, then this 
-   field should end with the appropriate separator. In this case locate the 
+/* If the format indicates that fields are separated by characters, then this
+   field should end with the appropriate separator. In this case locate the
    terminator,and store the length of this field. */
          if( sep == 'l' || sep == 'g' ) {
             if( sep == 'l' ) {
@@ -742,7 +742,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 /* Move on to the first character following the terminator. */
             p = t + strlen( term );
 
-/* In all other cases, this field is not terminated. Note its length 
+/* In all other cases, this field is not terminated. Note its length
    (ignoring trailing spaces). */
          } else {
             nc[ result ] = astChrLen( fields[ result ] );
@@ -856,7 +856,7 @@ static const char *AxisFormat( AstAxis *this_axis, double value, int *status ) {
    if ( astOK ) {
       if( fmt[ 0 ] == '%' ) {
          result = (*parent_axisformat)( this_axis, value, status );
-      } else { 
+      } else {
          result = DHmsFormat( fmt, astGetAxisDigits( this ), value, status );
       }
    }
@@ -878,7 +878,7 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick, int *status )
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) 
+*     double AxisGap( AstAxis *this, double gap, int *ntick, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the protected astAxisGap
@@ -945,7 +945,7 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick, int *status )
    if ( astOK ) {
       if( fmt[ 0 ] == '%' ) {
          result = (*parent_axisgap)( this_axis, gap, ntick, status );
-      } else { 
+      } else {
          result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick, status );
       }
    }
@@ -978,11 +978,11 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, 
 *     given axis interval.
 *
 *     The SkyAxis implementation of this method treats the supplied
-*     numerical values as non-cyclic (e.g. lo=10, hi = 350 implies that 
-*     val = 180 is inside and zero is outside: lo = 10, hi = 400 would imply 
-*     that all angles are inside: lo = -10, hi = 10 would imply that 180 is 
+*     numerical values as non-cyclic (e.g. lo=10, hi = 350 implies that
+*     val = 180 is inside and zero is outside: lo = 10, hi = 400 would imply
+*     that all angles are inside: lo = -10, hi = 10 would imply that 180 is
 *     outside and zero is inside). But when testing a supplied value, adding
-*     or subtracting multiples of 2.PI from the supplied value will make no 
+*     or subtracting multiples of 2.PI from the supplied value will make no
 *     difference to whether the point is inside or outside).
 
 *  Parameters:
@@ -1001,7 +1001,7 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, 
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Non-zero if the test value is inside the interval. 
+*     Non-zero if the test value is inside the interval.
 
 */
 
@@ -1010,7 +1010,7 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, 
 /* Deal with closed intervals. */
    if( closed ) {
 
-/* If the supplied value is greater than the upper limit, subtract 2.PI until 
+/* If the supplied value is greater than the upper limit, subtract 2.PI until
    it is not. */
       while( val > hi ) val -= 2*pi;
 
@@ -1024,11 +1024,11 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, 
 /* Now deal with open intervals. */
    } else {
 
-/* If the supplied value is greater than or equal to the upper limit, subtract 
+/* If the supplied value is greater than or equal to the upper limit, subtract
    2.PI until it is not. */
       while( val >= hi ) val -= 2*pi;
 
-/* If the value is now less than or equal to the lower limit, add 2.PI until 
+/* If the value is now less than or equal to the lower limit, add 2.PI until
    it is not. */
       while( val <= lo ) val += 2*pi;
 
@@ -1088,7 +1088,7 @@ static void AxisNorm( AstAxis *this_axis, double *value, int *status ) {
 /* Obtain a pointer to the SkyAxis structure. */
    this = (AstSkyAxis *) this_axis;
 
-/* If the coordinate value is bad, then return it unchanged. Otherwise, 
+/* If the coordinate value is bad, then return it unchanged. Otherwise,
    determine if the SkyAxis range is centred on zero or PI. */
    if ( *value != AST__BAD ) {
       centrezero = astGetAxisCentreZero( this );
@@ -1113,7 +1113,7 @@ static double AxisOffset( AstAxis *this_axis, double v1, double dist, int *statu
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     AxisOffset( AstSkyAxis *this, double v1, double dist ) 
+*     AxisOffset( AstSkyAxis *this, double v1, double dist )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the protected astAxisOffset
@@ -1123,7 +1123,7 @@ static double AxisOffset( AstAxis *this_axis, double v1, double dist, int *statu
 *     This function returns an axis value formed by adding a signed axis
 *     increment onto a supplied axis value.
 *
-*     For a SkyFrame, the result is normalized into the correct angular 
+*     For a SkyFrame, the result is normalized into the correct angular
 *     range (+PI to -PI for latitude axes, and 0 to 2*PI for longitude axes).
 
 *  Parameters:
@@ -1388,12 +1388,12 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
 *     fmt
 *        Pointer to a null terminated string containing the format
 *        specifier.
-*     digs 
+*     digs
 *        The default number of digits of precision to use. This is used
 *        if the given format specifier indicates the number of decimal
 *        places to use with the string ".*". In this case, the number of
-*        decimal places produced will be chosen so that the total number 
-*        of digits of precision is equal to "digs". 
+*        decimal places produced will be chosen so that the total number
+*        of digits of precision is equal to "digs".
 *     double
 *        The value to be formatted (in radians).
 *     status
@@ -1460,8 +1460,8 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
 *        field in the formatted string (whichever field this is). The
 *        '.' should be followed immediately by a zero or positive integer
 *        which gives the number of decimal places required. The '.' may
-*        also be followed by asterisk (i.e. '.*') which causes the number 
-*        of decimal places to be chosen so that the total number of digits 
+*        also be followed by asterisk (i.e. '.*') which causes the number
+*        of decimal places to be chosen so that the total number of digits
 *        is equal to the value of Digits.
 *
 *     Format specifiers are not case sensitive. If several characters
@@ -1508,7 +1508,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
    int pos;                      /* Position to add next character */
    int positive;                 /* Value is positive (or zero)? */
    int sec;                      /* Seconds field required? */
- 
+
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
@@ -1527,7 +1527,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
    } else {
 
 /* Parse the format specifier. */
-      ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, 
+      ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero,
                        &as_time, &dh, &min, &sec, &ndp, status );
 
 /* Break the value into fields. */
@@ -1538,7 +1538,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
       if ( astOK ) {
          if ( ( ndp + 11 ) > AST__SKYAXIS_DHMSFORMAT_BUFF_LEN ) ndp = AST__SKYAXIS_DHMSFORMAT_BUFF_LEN - 11;
 
-/* Some operating systems have a "minus zero" value (for instance 
+/* Some operating systems have a "minus zero" value (for instance
    "-1.2*0" would give "-0"). This value is numerically equivalent to
    zero, but is formated as "-0" instead of "0". The leading minus sign
    confuses the following code, and so ensure now that all zero values
@@ -1695,7 +1695,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
                   dhmsformat_buff[ pos++ ] = ( as_time ? 'h' : 'd' );
                } else if( sep == 'g' ) {
                   pos += sprintf( dhmsformat_buff + pos, "%s", as_time ? gh_delim : gd_delim );
-               } 
+               }
             }
          }
 
@@ -1745,8 +1745,8 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
             dhmsformat_buff[ pos++ ] = ( sec ? 's' : ( min ? 'm' :
                                                   ( as_time ? 'h' : 'd' ) ) );
          } else if ( sep == 'g' ) {
-            pos += sprintf( dhmsformat_buff + pos, "%s", 
-                as_time ? ( sec ? gs_delim : ( min ? gm_delim : gh_delim ) ) : 
+            pos += sprintf( dhmsformat_buff + pos, "%s",
+                as_time ? ( sec ? gs_delim : ( min ? gm_delim : gh_delim ) ) :
                           ( sec ? gas_delim : ( min ? gam_delim : gd_delim ) ) );
          }
 
@@ -1790,12 +1790,12 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick, int *s
 *        Pointer to a constant null-terminated string containing the
 *        format specifier which will be used to format the SkyAxis
 *        values.
-*     digs 
+*     digs
 *        The default number of digits of precision to use. This is used
 *        if the given format specifier indicates the number of decimal
 *        places to use with the string ".*". In this case, the number of
-*        decimal places produced will be chosen so that the total number 
-*        of digits of precision is equal to "digs". 
+*        decimal places produced will be chosen so that the total number
+*        of digits of precision is equal to "digs".
 *     gap
 *        The target gap size.
 *     ntick
@@ -1865,7 +1865,7 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick, int *s
 
 /* Check that the supplied gap size is not zero. */
    if ( gap != 0.0 ) {
-   
+
 /* Parse the format specifier. */
       ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min,
                        &sec, &ndp, status );
@@ -2057,7 +2057,7 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick, int *s
          if ( !positive ) gap = -gap;
       }
    }
-   
+
 /* If an error occurred, clear the returned value. */
    if ( !astOK ) gap = 0.0;
 
@@ -2098,12 +2098,12 @@ static const char *DHmsUnit( const char *fmt, int digs, int output, int *status 
 *        Pointer to a null terminated string containing the format
 *        specifier used to format coordinate values. For details of
 *        the syntax of this string, see the DHmsFormat function.
-*     digs 
+*     digs
 *        The default number of digits of precision to use. This is used
 *        if the given format specifier indicates the number of decimal
 *        places to use with the string ".*". In this case, the number of
-*        decimal places produced will be chosen so that the total number 
-*        of digits of precision is equal to "digs". 
+*        decimal places produced will be chosen so that the total number
+*        of digits of precision is equal to "digs".
 *     output
 *        If non-zero, the returned string will be in a form suitable
 *        for describing the units/format of output produced using
@@ -2154,7 +2154,7 @@ static const char *DHmsUnit( const char *fmt, int digs, int output, int *status 
    astGET_GLOBALS(NULL);
 
 /* Parse the format specifier. */
-   ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min, 
+   ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min,
                     &sec, &ndp, status );
 
 /* If the units string is required to describe formatted output and
@@ -2257,7 +2257,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetObjSize protected
@@ -2367,7 +2367,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -2451,7 +2451,7 @@ static double GetAxisBottom( AstAxis *this_axis, int *status ) {
 *     The atribute value. A suitable default value is supplied if necessary.
 
 *  Notes:
-*     -  A value of -DBL_MAX will be returned if this function is invoked 
+*     -  A value of -DBL_MAX will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any reason.
 */
 
@@ -2473,7 +2473,7 @@ static double GetAxisBottom( AstAxis *this_axis, int *status ) {
 /* Otherwise, supply a default of -pi/2 for latitude axes, and -DBL_MAX
    for longitude axes. */
    } else {
-      result = astGetAxisIsLatitude( this ) ? -piby2 : -DBL_MAX; 
+      result = astGetAxisIsLatitude( this ) ? -piby2 : -DBL_MAX;
    }
 
 /* If an error occurred, clear the result value. */
@@ -2516,7 +2516,7 @@ static double GetAxisTop( AstAxis *this_axis, int *status ) {
 *     The atribute value. A suitable default value is supplied if necessary.
 
 *  Notes:
-*     -  A value of DBL_MAX will be returned if this function is invoked 
+*     -  A value of DBL_MAX will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any reason.
 */
 
@@ -2547,7 +2547,7 @@ static double GetAxisTop( AstAxis *this_axis, int *status ) {
 /* Return the result. */
    return result;
 }
- 
+
 static int GetAxisDirection( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
@@ -2737,7 +2737,7 @@ static const char *GetAxisFormat( AstAxis *this_axis, int *status ) {
    }
 
 /* Return the result. */
-   return result;   
+   return result;
 }
 
 static const char *GetAxisLabel( AstAxis *this_axis, int *status ) {
@@ -2935,7 +2935,7 @@ static const char *GetAxisUnit( AstAxis *this_axis, int *status ) {
 *     This function returns a pointer to the Unit attribute associated with
 *     a SkyAxis and provides a suitable default if necessary. This string
 *     attribute describes the unit used to represent formatted coordinate
-*     values on the SkyAxis. 
+*     values on the SkyAxis.
 
 *  Parameters:
 *     this
@@ -2983,13 +2983,13 @@ static const char *GetAxisUnit( AstAxis *this_axis, int *status ) {
    } else {
       fmt = GetAxisFormat( this_axis, status );
 
-/* If the format string starts with a percent, use "rad" as the default units 
+/* If the format string starts with a percent, use "rad" as the default units
    string. Otherwise, use the format specifier to generate a matching
    default Unit string and obtain a pointer to it. */
       if ( astOK ) {
          if( fmt[ 0 ] == '%' ) {
             result = "rad";
-         } else { 
+         } else {
             result = DHmsUnit( fmt, astGetAxisDigits( this_axis ), 1, status );
          }
       }
@@ -3029,7 +3029,7 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -3186,12 +3186,12 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
 *        Pointer to a null terminated string containing the format
 *        specifier.  For details of the syntax of this string, see the
 *        DHmsFormat function.
-*     digs 
+*     digs
 *        The default number of digits of precision to use. This is used
 *        if the given format specifier indicates the number of decimal
 *        places to use with the string ".*". In this case, the returned
 *        value for "ndp" will be set to produce the number of digits of
-*        precision given by "digs". 
+*        precision given by "digs".
 *     sep
 *        Pointer to a location in which a single character will be
 *        returned to indicate which separator should be used to
@@ -3334,13 +3334,13 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
    the minutes field is not. */
    if ( *dh && !*min ) *sec = 0;
 
-/* Determine the default number of decimal places following the final field. 
-   This is the number which will be used if the format specifier does not 
+/* Determine the default number of decimal places following the final field.
+   This is the number which will be used if the format specifier does not
    indicate how many decimal places should be produced. It is shosen to
    produce the requested total number of digits of precision. */
 
 /* If decimal places are required, attempt to read the integer value
-   following the decimal point which specifies how many. If successful, 
+   following the decimal point which specifies how many. If successful,
    and a valid (positive or zero) result was obtained, note its value. If
    an asterisk follows the decimal point, use a value determined by the
    supplied "digs" value. */
@@ -3774,13 +3774,13 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    if ( !astOK ) return nc;
 
 /* Obtain the SkyAxis Format string. If its starts with a "%" sign, use
-   the parent AxisUnformat method inherited from the Axis class. Use 
-   a private method to obtain the Format string, in case the syntax has been 
+   the parent AxisUnformat method inherited from the Axis class. Use
+   a private method to obtain the Format string, in case the syntax has been
    over-ridden by a derived class. */
    fmt = GetAxisFormat( this_axis, status );
    if( fmt && fmt[0] == '%' ) {
       nc = (*parent_axisunformat)( this_axis, string, value, status );
-   
+
 /* Otherwise, parse it to determine the default choice of input format. */
    } else if( astOK ){
       digs = astGetAxisDigits( this_axis );
@@ -3834,9 +3834,9 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 /* Each field must consist of a string of digits, possibly surrounded
    by white space, except that an optional decimal point may also be
    present (in which case it indicates the final field). Since we want
-   to exclude signs, etc. from these fields, we must first identify a 
-   valid sequence of digits, before attempting to read them as a number. 
-   Start by assuming that we will find a decimal point but not an 
+   to exclude signs, etc. from these fields, we must first identify a
+   valid sequence of digits, before attempting to read them as a number.
+   Start by assuming that we will find a decimal point but not an
    exponent. */
          decimal = 1;
          exponent = 0;
@@ -3878,17 +3878,17 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    character. If so, increment the number of characters in the numerical
    string prefix. */
             m = 0;
-            if( ( 0 == astSscanf( s + n, "%*1[Ee]%*1[+-]%*[0123456789]%n", &m ) ) 
+            if( ( 0 == astSscanf( s + n, "%*1[Ee]%*1[+-]%*[0123456789]%n", &m ) )
                 && m ) {
                n += m;
                exponent = 1;
 
-/* If the above check failed, see if the numbers are followed by an exponent 
-   without an explicit sign character. If so, increment the number of 
+/* If the above check failed, see if the numbers are followed by an exponent
+   without an explicit sign character. If so, increment the number of
    characters in the numerical string prefix. */
             } else {
                m = 0;
-               if( ( 0 == astSscanf( s + n, "%*1[Ee]%*[0123456789]%n", &m ) ) 
+               if( ( 0 == astSscanf( s + n, "%*1[Ee]%*[0123456789]%n", &m ) )
                    && m ) {
                   n += m;
                   exponent = 1;
@@ -3917,7 +3917,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    numerical value in this field (including any following white
    space). */
          nc = s - string;
-      
+
 /* Identify the following separator. */
 /* --------------------------------- */
 /* We will now attempt to identify the field separator (if any) which
@@ -4038,8 +4038,8 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
          }
 
 /* We have also read all the fields if: (a) the last one contained a
-   decimal point, or (b) the last one ended with an exponent, or (c) 
-   the next character is not a valid field separator, or (d) we have 
+   decimal point, or (b) the last one ended with an exponent, or (c)
+   the next character is not a valid field separator, or (d) we have
    read the seconds field so the next field ID would exceed 3. */
          final = final || decimal || exponent || !good_sep || ( next_id > 3 );
 

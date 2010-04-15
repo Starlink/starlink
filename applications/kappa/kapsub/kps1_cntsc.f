@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CNTSC( INDF, IPLOT, IGRID, SDIM, SLBND, SUBND, 
+      SUBROUTINE KPS1_CNTSC( INDF, IPLOT, IGRID, SDIM, SLBND, SUBND,
      :                       INDFS, STATUS )
 *+
 *  Name:
@@ -33,13 +33,13 @@
 *        The indices of the two significant axes in the supplied NDF>
 *     SLBND( 2 ) = INTEGER (Given and Returned)
 *        Supplied holding the lower pixel index bounds on the two
-*        significant axes in the supplied NDF. Returned holding the 
-*        lower pixel index bounds on the two significant axes in the 
+*        significant axes in the supplied NDF. Returned holding the
+*        lower pixel index bounds on the two significant axes in the
 *        returned NDF section.
 *     SUBND( 2 ) = INTEGER (Given and Returned)
 *        Supplied holding the upper pixel index bounds on the two
-*        significant axes in the supplied NDF. Returned holding the 
-*        upper pixel index bounds on the two significant axes in the 
+*        significant axes in the supplied NDF. Returned holding the
+*        upper pixel index bounds on the two significant axes in the
 *        returned NDF section.
 *     INDFS = INTEGER (Returned)
 *        An NDF identifier for the visible section of the supplied NDF.
@@ -80,12 +80,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER INDF
@@ -106,7 +106,7 @@
 *  External References:
       INTEGER KPG1_CEIL          ! Smallest integer .GE. a given floating value
       INTEGER KPG1_FLOOR         ! Largest integer .LE. a given floating value
-      
+
 *  Local Variables:
       DOUBLE PRECISION GLBND( 2 )! Lower bounds of section in GRID Frame
       DOUBLE PRECISION GUBND( 2 )! Upper bounds of section in GRID Frame
@@ -151,19 +151,19 @@
 
 *  Get the Mapping from the Base (GRAPHICS) Frame in the Plot to the GRID
 *  Frame.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, IGRID, 
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, IGRID,
      :                                    STATUS ), STATUS )
 
 *  Use this Mapping to determine the bounds of the PGPLOT window in
 *  GRID coordinates on axis 1.
-      CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., 1, GLBND( 1 ), 
-     :                 GUBND( 1 ), XL, XU, STATUS ) 
+      CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., 1, GLBND( 1 ),
+     :                 GUBND( 1 ), XL, XU, STATUS )
 
 *  Convert these into pixel co-ordinate bounds.
       PCLBND = REAL( GLBND( 1 ) ) - 1.5 + REAL( SLBND( 1 ) )
       PCUBND = REAL( GUBND( 1 ) ) - 1.5 + REAL( SLBND( 1 ) )
 
-*  Find the pixel index bounds of the NDF section, limit the bounds to the 
+*  Find the pixel index bounds of the NDF section, limit the bounds to the
 *  dimensions of the supplied NDF. If the limits returned by AST_MAPBOX
 *  look bad (e.g. if they are the wrong way round), retain the original
 *  bounds.
@@ -173,8 +173,8 @@
       END IF
 
 *  Do the same for axis 2.
-      CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., 2, GLBND( 2 ), 
-     :                 GUBND( 2 ), XL, XU, STATUS ) 
+      CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., 2, GLBND( 2 ),
+     :                 GUBND( 2 ), XL, XU, STATUS )
 
       PCLBND = REAL( GLBND( 2 ) ) - 1.5 + REAL( SLBND( 2 ) )
       PCUBND = REAL( GUBND( 2 ) ) - 1.5 + REAL( SLBND( 2 ) )
@@ -198,7 +198,7 @@
       END DO
 
 *  Extract the required section from the NDF.
-      CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS ) 
+      CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS )
 
 *  Create a WinMap which maps GRID co-ordinates in the supplied NDF into
 *  GRID coordinates in the NDF section. Point "A" is the centre of the
@@ -214,10 +214,10 @@
       OUTB( 1 ) = 1.5D0
       OUTB( 2 ) = 1.5D0
 
-      WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+      WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Re-map the GRID Frame in the supplied Plot using this WinMap.
-      CALL AST_REMAPFRAME( IPLOT, IGRID, WMAP, STATUS ) 
+      CALL AST_REMAPFRAME( IPLOT, IGRID, WMAP, STATUS )
 
 *  Return the bounds of the section.
       SLBND( 1 ) = LBND( SDIM( 1 ) )

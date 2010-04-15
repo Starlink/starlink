@@ -50,9 +50,9 @@
 *        be appended.
 *     SIZE = INTEGER (Returned)
 *        The number of names in the returned group. It is returned equal
-*        to 1 if an error status exists on entry. If an error occurs 
+*        to 1 if an error status exists on entry. If an error occurs
 *        during execution of this routine, then SIZE is returned equal
-*        to the size of the group on entry (unless the group has zero 
+*        to the size of the group on entry (unless the group has zero
 *        size on entry, in which case it is returned equal to 1).
 *     ADDED = INTEGER (Returned)
 *        The number of names added to the group by this routine.
@@ -61,7 +61,7 @@
 *        to the current flag character for group IGRP2. Note, if this
 *        is the case, then the flag character itself is not included
 *        in the returned group. FLAG is returned .FALSE. if the last
-*        character is not a flag character. Returned .FALSE. if an 
+*        character is not a flag character. Returned .FALSE. if an
 *        error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,11 +94,11 @@
 *     18-AUG-1992 (DSB):
 *        Original version
 *     10-SEP-1992 (DSB):
-*        FLAG set to .FALSE. before checking inherited status, and 
+*        FLAG set to .FALSE. before checking inherited status, and
 *        before reporting any context message.
 *     19-FEB-1993 (DSB):
-*        SIZE set to 1 before checking inherited status. SIZE returned 
-*        equal to the size of the group on entry if any error occurs, 
+*        SIZE set to 1 before checking inherited status. SIZE returned
+*        equal to the size of the group on entry if any error occurs,
 *        unless the group had zero size on entry, in which case it is
 *        returned equal to 1.
 *     {enter_further_changes_here}
@@ -146,7 +146,7 @@
 
 *.
 
-*  Ensure FLAG is returned .FALSE. and SIZE returned equal to 1 if an 
+*  Ensure FLAG is returned .FALSE. and SIZE returned equal to 1 if an
 *  error has already occured.
       FLAG = .FALSE.
       SIZE = 1

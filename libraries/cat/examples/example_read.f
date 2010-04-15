@@ -41,12 +41,12 @@
 *  Status:
       INTEGER STATUS             ! Global status
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CI,       ! Catalogue identifier.
      :  GI1,      ! Identifier to the first  column.
      :  GI2,      !     "      "   "  second   "   .
      :  GI3       !     "      "   "  third    "   .
-      INTEGER 
+      INTEGER
      :  LOOP,     ! Loop index.
      :  ROWS,     ! Number of rows in the catalogue.
      :  VAL1      ! Value obtained for first (integer) column.
@@ -98,7 +98,7 @@
             CALL CAT_EGT0C (GI3, VAL3, NUL3, STATUS)
             IF (NUL3) VAL3 = ' '
 
-            WRITE(*, 2001) LOOP, VAL1, NUL1, VAL2, NUL2, VAL3, NUL3, 
+            WRITE(*, 2001) LOOP, VAL1, NUL1, VAL2, NUL2, VAL3, NUL3,
      :        STATUS
  2001       FORMAT(1X, I4,   3X, I6,  L2,   3X, 1PE12.3, L2,
      :        3X, A15, L2,   1X, I12  )

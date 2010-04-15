@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command SAVE.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -20,7 +20,7 @@
 *  Arguments:
 *     COMM = CHARACTER * ( * ) (Given)
 *        The name of the command which invoked this routine. This will
-*        usually be "SAVE", but could conceivably be something else ("EXIT" 
+*        usually be "SAVE", but could conceivably be something else ("EXIT"
 *        for instance).
 *     PARAMS = CHARACTER * ( * ) (Given)
 *        Any text supplied by the user on the command line following the
@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -51,28 +51,28 @@
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! Common blocks holding the DIPSO stack
-*        STKSZE = INTEGER (Read)  
+*        STKSZE = INTEGER (Read)
 *           The size of the XSTACK and YSTACK arrays.
-*        BSTSZE = INTEGER (Read)  
+*        BSTSZE = INTEGER (Read)
 *           The size of the BSTACK array.
 *        MAXSTK = INTEGER (Read)
 *           The maximum number of stack entries.
-*        NONSTK = INTEGER (Read)  
+*        NONSTK = INTEGER (Read)
 *           The current number of stack entries.
-*        XSTACK( STKSZE ) = REAL (Read) 
+*        XSTACK( STKSZE ) = REAL (Read)
 *           An array holding the X values for all the stack entries.
-*        YSTACK( STKSZE ) = REAL (Read) 
+*        YSTACK( STKSZE ) = REAL (Read)
 *           An array holding the Y values for all the stack entries.
-*        BSTACK( BSTSZE ) = REAL (Read) 
+*        BSTACK( BSTSZE ) = REAL (Read)
 *           An array holding the break points for all the stack entries.
 *        BSTNPT( MAXSTK ) = INTEGER (Read)
 *           The number of breaks in each stack entry.
-*        POINTR( MAXSTK ) = INTEGER (Read)  
+*        POINTR( MAXSTK ) = INTEGER (Read)
 *           The XSTACK indices corresponding to the start of each stack
 *           entry.
-*        STKNPT( MAXSTK ) = INTEGER (Read)  
+*        STKNPT( MAXSTK ) = INTEGER (Read)
 *           The numbers of points in each stack entry.
-*        BPOINT( MAXSTK ) = INTEGER (Read)  
+*        BPOINT( MAXSTK ) = INTEGER (Read)
 *           The BSTACK indices corresponding to the first break for each
 *           stack entry.
 *        STITLE( MAXSTK ) = CHARACTER* ( * ) (Read)
@@ -81,7 +81,7 @@
 *           The WORV value for each stack entry.
 *        STKLST = INTEGER (Read)
 *           The index of the last used element in XSTACK.
-*        BSTLST = INTEGER (Read) 
+*        BSTLST = INTEGER (Read)
 *           The index of the last used element in BSTACK.
 
 *  Arguments Given:
@@ -106,7 +106,7 @@
 
 *  If the stack is empty, issue a warning and return.
       IF( NONSTK .EQ. 0 ) THEN
-         CALL MSGOUT( COMM, 'Stack is empty - not saved.', .TRUE., 
+         CALL MSGOUT( COMM, 'Stack is empty - not saved.', .TRUE.,
      :                STATUS )
          GO TO 999
       END IF
@@ -149,10 +149,10 @@
 
 *  Save the stack contents.
       CALL SAVSTK( NDFNM, BOT, TOP, STKSZE, BSTSZE, MAXSTK, NONSTK,
-     :             XSTACK, YSTACK, BSTACK, BSTNPT, POINTR, STKNPT, 
+     :             XSTACK, YSTACK, BSTACK, BSTNPT, POINTR, STKNPT,
      :             BPOINT, STITLE, WORVST, STKLST, BSTLST, STATUS  )
 
-*  Jump to here if an error occurs. 
+*  Jump to here if an error occurs.
  999  CONTINUE
 
 *  If an error has occurred, re-report it with less information if the

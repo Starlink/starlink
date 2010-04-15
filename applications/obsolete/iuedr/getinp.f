@@ -3,7 +3,7 @@
 *PURPOSE
 *       Gets a string of text from the users keyboard. The users is
 *       given the specified prompt. DCL-like multiple command line
-*       recall and command line editing is available using cursor 
+*       recall and command line editing is available using cursor
 *       keys, etc.
 *
 *METHOD
@@ -60,7 +60,7 @@
 
 *
 *  SEE IF STANDARD INPUT OUT IS A TERMINAL. IF IT ISN'T (EG IF IT IS A
-*  FILE) OR IF THE USER HAS CHOSEN NOT TO USE COMMAND LINE RECALL, 
+*  FILE) OR IF THE USER HAS CHOSEN NOT TO USE COMMAND LINE RECALL,
 *  JUST DO A NORMAL FORTRAN READ FROM UNIT 5.
 *
       call psx_isatty(0, isatty, istat)

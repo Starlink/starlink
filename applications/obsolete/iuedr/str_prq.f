@@ -1,6 +1,6 @@
       SUBROUTINE STR_PRQ(STR, MAXC, FIRST, SVALUE, STATUS)
 
-*+ 
+*+
 *
 *   Name:
 *      SUBROUTINE STR_PRQ
@@ -25,29 +25,29 @@
 
 *   Import:
       BYTE STR(100)         ! string to be scanned
- 
+
       INTEGER MAXC          ! maximum size of returned string
- 
+
 *   Import/Export:
       BYTE FIRST            ! first character position containing float
- 
+
 *   Export:
       BYTE SVALUE(MAXC)     ! returned string
- 
+
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       INTEGER STR_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL NOUSED        ! no characters used yet
 
       BYTE DELIM            ! quote delimiter character
- 
+
       INTEGER FUSED         ! position of first used character
       INTEGER LAST          ! last character position in string
       INTEGER POS           ! character position
- 
+
 *   Length of string
       LAST = STR_LEN(STR)
       NOUSED = .TRUE.
@@ -82,7 +82,7 @@
          GO TO 100
 
       END IF
- 
+
  200  CONTINUE
 
 *   Update FIRST based of number of characters used, field size and

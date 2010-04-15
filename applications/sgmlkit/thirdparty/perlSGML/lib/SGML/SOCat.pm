@@ -13,7 +13,7 @@
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation; either version 2 of the License, or
 ##  (at your option) any later version.
-## 
+##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -166,7 +166,7 @@ sub read_handle {
 	    if (!$Entries{$token}) {
 		$this->_errMsg("Line ", $fref->{_line_num},
 			       ": Unrecognized entry '$token'");
-		
+
 		## Skip passed any arguments to unrecognized entry
 		while (1) {
 		    ($token, $islit) = $this->_get_next_token(1);
@@ -271,7 +271,7 @@ sub get_public {
     $pubid =~ s/\s+/ /g;
 
     wantarray
-    ? 
+    ?
 	($this->{PUBLIC}{$pubid}{sysid},
 	 $this->{PUBLIC}{$pubid}{base},
 	 $this->{PUBLIC}{$pubid}{override})
@@ -649,7 +649,7 @@ sub _get_next_token {
 	    }
 	    last GETTOKEN;
 
-	} 
+	}
 
 	# Name token
 	$buf =~ s/(\S+)\s*//;

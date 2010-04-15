@@ -42,10 +42,10 @@ my $formatted = 0;
 my $pdl = 0;
 
 # Parse options
-GetOptions('help|?' => \$help, man => \$man, noread => \$noread, 
+GetOptions('help|?' => \$help, man => \$man, noread => \$noread,
 	   'data' => \$printdata, 'version' => \$version,
 	   'noarray' => \$noarray, 'list' => \$list,
-	   'formatted' => \$formatted, 'pdl' => \$pdl ) 
+	   'formatted' => \$formatted, 'pdl' => \$pdl )
   or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -100,12 +100,12 @@ if (@ARGV) {
 
 # Explicitly test for the existence of the filename
 # before trying to open it. This is not really necessary apart
-# from allowing us to distinguish error states 
+# from allowing us to distinguish error states
 
-die "$!: $filename does not exist\n" 
+die "$!: $filename does not exist\n"
   unless ((-e "$filename") ||
 	  (-e "$filename.dat") ||
-	  (-e "$filename.gsd") || 
+	  (-e "$filename.gsd") ||
 	  (-e $ENV{'DATADIR'}."/$filename") ||
 	  (-e $ENV{'DATADIR'}."/$filename.dat") ||
 	  (-e $ENV{'DATADIR'}."/$filename.gsd"));
@@ -154,9 +154,9 @@ for my $i (1.. $gsd->nitems) {
   $JCMTNAME = ( exists $jcmtname{$name} ? $jcmtname{$name} : $name);
   $JCMTCMT  = ( exists $jcmtcomment{$name} ? $jcmtcomment{$name} : '');
 
-  
-  print "-"x78,"\n" if ($array);    
-  printf "%-16s%-16s$type\t$array\t", $name, $UNIT 
+
+  print "-"x78,"\n" if ($array);
+  printf "%-16s%-16s$type\t$array\t", $name, $UNIT
     unless $formatted;
 
   if ($array) {
@@ -171,7 +171,7 @@ for my $i (1.. $gsd->nitems) {
     } else {
       print $NEWDATA,"\n";
     }
-	
+
     # Now get the data
     my @values = $gsd->GetByNum($i);
 
@@ -219,7 +219,7 @@ for my $i (1.. $gsd->nitems) {
 	}
 	write STDOUT;
       } else {
-	print "$NEWDATA\n";	
+	print "$NEWDATA\n";
       }
 
     }
@@ -290,7 +290,7 @@ sub todeg {
 
 # Scalar format since we would rather Perl did the word wrapping for us
 
-format STDOUT = 
+format STDOUT =
  @<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>>>>>>  @<<<<<<<<<<< ^<<<<<<<<<<<<<<<<<<<<<<<
 $JCMTNAME, $NEWDATA, $UNIT,                            $JCMTCMT
 ~~                                                     ^<<<<<<<<<<<<<<<<<<<<<<<
@@ -343,7 +343,7 @@ Prints the manual page and exits.
 
 =item B<-data>
 
-Print the C<C13DAT> field as well as the header fields. 
+Print the C<C13DAT> field as well as the header fields.
 By default the C<C13DAT> field is omitted since it can be
 very long and is usually of little interest.
 
@@ -353,14 +353,14 @@ Only list scalar items.
 
 =item B<-noread>
 
-Turn off readline support. Sometimes this is necessary 
+Turn off readline support. Sometimes this is necessary
 if the command is run from a script or web page. Readline
 support is only required when the user is prompted for input
-(ie no filename supplied at the command-line). 
+(ie no filename supplied at the command-line).
 
 =item B<-list>
 
-Print out the list of known GSD item names along with the 
+Print out the list of known GSD item names along with the
 translation to JCMT name and a short description of the
 item. Program exits immediately afterwards.
 
@@ -375,7 +375,7 @@ large arrays.
 
 Print out a formatted list of items where the JCMT name
 and a short description of the item are displayed. By default
-the actual GSD item name is displayed along with the item data 
+the actual GSD item name is displayed along with the item data
 type. This option is invoked automatically if the program is
 called C<gsdformat>.
 

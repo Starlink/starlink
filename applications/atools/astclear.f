@@ -25,22 +25,22 @@
 *     previously been explicitly set for it, so that the standard default
 *     attribute value will subsequently be used instead. This also
 *     causes the ASTTEST application to return the value FALSE for the
-*     attribute, indicating that no value has been set. 
+*     attribute, indicating that no value has been set.
 
 *  Usage:
 *     astclear this attrib result
 
 *  ADAM Parameters:
 *     ATTRIB = LITERAL (Read)
-*        A string containing a comma-separated list of the names of the 
-*        attributes to be cleared. 
+*        A string containing a comma-separated list of the names of the
+*        attributes to be cleared.
 *     RESULT = LITERAL (Read)
 *        An NDF or text file to receive the modified Object. If an NDF
-*        is supplied, the WCS FrameSet within the NDF will be replaced by 
-*        the new Object if possible (if it is a FrameSet in which the base 
+*        is supplied, the WCS FrameSet within the NDF will be replaced by
+*        the new Object if possible (if it is a FrameSet in which the base
 *        Frame has Domain GRID and has 1 axis for each NDF dimension).
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original Object. If an NDF is 
+*        An NDF or text file holding the original Object. If an NDF is
 *        supplied, the WCS FrameSet will be used.
 
 *  Copyright:
@@ -91,7 +91,7 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

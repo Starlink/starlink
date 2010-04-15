@@ -156,17 +156,17 @@ static sendq_type sigext_q;
 static sendq_type sigtimeout_q;
 static sendq_type sigkick_q;
 
-/*   The currently active paths are held in an array of A_T_PATH 
+/*   The currently active paths are held in an array of A_T_PATH
      structures, indexed by THIS_TASK_T_PATH_NUM */
 
 static struct a_t_path t_paths[MESSYS__MXPATH];
 
-/*   The currently active transactions are held in an array of A_T_TRANS 
+/*   The currently active transactions are held in an array of A_T_TRANS
      structures, indexed by T_TRANS_NUM  */
 
 static struct a_t_trans t_trans[MESSYS__MXTRANS];
 
-/*   Arrays of flags indicate which path and transaction numbers are 
+/*   Arrays of flags indicate which path and transaction numbers are
      unused. */
 
 static BOOL pathfree[MESSYS__MXPATH];
@@ -174,12 +174,12 @@ static BOOL pathfree[MESSYS__MXPATH];
 static BOOL transfree[MESSYS__MXTRANS];
             /* relects corresponding element in  t_trans[] */
 
-/*   The names of machines which are being accessed are held in an array 
+/*   The names of machines which are being accessed are held in an array
      indexed by T_PATHS(N).MACHINE_NUM. */
 
 static char machine_names[MESSYS__MXMACH][MESSYS__MNAME];
 
-/*   The command queues for the ADAMNET processes are obtained when the first 
+/*   The command queues for the ADAMNET processes are obtained when the first
      network call is requested to the corresponding network. */
 
 static char messys_netsep[MESSYS__MAXNET][MESSYS__SEPLEN];
@@ -212,7 +212,7 @@ int *status                          /* global status (given and
 *     AMS_ACCEPT
 
 *  Purpose:
-*     Accept a request to open a path 
+*     Accept a request to open a path
 
 *  Language:
 *     Starlink C
@@ -223,7 +223,7 @@ int *status                          /* global status (given and
 *     and return an acceptance message.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -276,12 +276,12 @@ int *status                          /* global status (given and
    if ( *status != SAI__OK )
    {
       istat = SAI__OK;
-      ams_senddeinit ( 1, MESSYS__NULL_P, ackq, 
+      ams_senddeinit ( 1, MESSYS__NULL_P, ackq,
         otherpathno, &istat );
    }
-   else 
+   else
    {
-      strcpy ( t_paths[j].other_taskname, 
+      strcpy ( t_paths[j].other_taskname,
         loc_init_in->other_taskname );
       msp_mkcomq ( ackq, &t_paths[j].other_com_q, status );
       t_paths[j].other_pathnum = otherpathno;
@@ -318,7 +318,7 @@ int *status                        /* global status (given and returned) */
 *     path.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -367,8 +367,8 @@ int *status                        /* global status (given and returned) */
       t_paths[path].other_pathnum = otherpathno;
       t_paths[path].path_state = MESSYS__FULL_P;
       ams_freetrans ( messid, status );
-   } 
-   else 
+   }
+   else
    {
       ams_senddeinit ( 1, MESSYS__NULL_P, reply_q, otherpathno, status );
       *status = MESSYS__IVACKINIT;
@@ -462,14 +462,14 @@ int *status       /* global status (given and returned) */
       {
           (*netind)++;
       }
-      else 
+      else
       {
          taskstart = machend + strlen(messys_netsep[*netind]);
-         if ( (taskstart - name) >= MESSYS__MNAME ) 
+         if ( (taskstart - name) >= MESSYS__MNAME )
          {
             *status = MESSYS__TOOLONG;
          }
-         else if ( (taskstart - name) == 0 ) 
+         else if ( (taskstart - name) == 0 )
          {
             *status = MESSYS__TOOLONG;
          }
@@ -528,7 +528,7 @@ int *status         /* global status (given and returned) */
 *     AMS_ASTINT
 
 *  Purpose:
-*     Send an ASTINT message from a signal handler 
+*     Send an ASTINT message from a signal handler
 
 *  Language:
 *     Starlink C
@@ -583,7 +583,7 @@ int *status       /* global status (given and returned) */
 *     AMS_ASTMSG
 
 *  Purpose:
-*     Send an ASTMSG from a signal handler 
+*     Send an ASTMSG from a signal handler
 
 *  Language:
 *     Starlink C
@@ -625,8 +625,8 @@ int *status       /* global status (given and returned) */
 }
 
 
-static void ams_call_out 
-( 
+static void ams_call_out
+(
 char *machname,    /* name of remote machine (given) */
 int netind,        /* index to network parameters (given) */
 int *machnum,      /* number allocated to machine in MESSYS common blocks
@@ -650,7 +650,7 @@ int *status        /* global status (given and returned) */
 *     machine
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -704,7 +704,7 @@ int *status        /* global status (given and returned) */
 
    timer_set = false;
    ams_getmachnum ( machname, machnum, &added, status );
-   if ( *status != SAI__OK ) 
+   if ( *status != SAI__OK )
    {
       return;
    }
@@ -717,19 +717,19 @@ int *status        /* global status (given and returned) */
       msp_get_task_queue ( messys_netname[netind],
         &messys_netqueue[netind], status );
 
-      if ( *status != SAI__OK ) 
+      if ( *status != SAI__OK )
       {
          *status = MESSYS__NONET;
          machine_names[*machnum][0] = '\0';
          *machnum = MESSYS__NULL_M;
-      } 
-      else 
+      }
+      else
       {
          mess_out.mess_out_type = C_REM_CALL_OUT;
          strcpy ( mess_out.u.rem_call_out.remote_machine_name,
            machname );
          msp_create_receiveq ( &accept_queue, status );
-         if ( *status == SAI__OK ) 
+         if ( *status == SAI__OK )
          {
             msp_send_message ( (char *) &mess_out, C_REM_CALL_OUT_LEN,
               messys_netqueue[netind], accept_queue, status );
@@ -742,25 +742,25 @@ int *status        /* global status (given and returned) */
             queues[1] = timeout_q;
             queues[2] = extint_q;
             msp_receive_message ( queues, 3, true, C_REM_ACCEPT_IN_LEN,
-              (char *) &mess_in, &actual_length, &queue_id, &reply_queue, 
+              (char *) &mess_in, &actual_length, &queue_id, &reply_queue,
               status );
-            if ( *status == SAI__OK ) 
+            if ( *status == SAI__OK )
             {
-               if ( queue_id == timeout_q ) 
+               if ( queue_id == timeout_q )
                {
                   timer_set = false;
                   *status = MESSYS__NETTIME;
-               } 
-               else if ( mess_in.mess_in_type == C_REM_ACCEPT_IN ) 
+               }
+               else if ( mess_in.mess_in_type == C_REM_ACCEPT_IN )
                {
-                  if ( mess_in.u.rem_accept_in.accept_status != SAI__OK ) 
+                  if ( mess_in.u.rem_accept_in.accept_status != SAI__OK )
                   {
                      machine_names[*machnum][0] = '\0';
                      *machnum = MESSYS__NULL_M;
                      *status = mess_in.u.rem_accept_in.accept_status;
                   }
-               } 
-               else 
+               }
+               else
                {
                   machine_names[*machnum][0] = '\0';
                   *machnum = MESSYS__NULL_M;
@@ -769,24 +769,24 @@ int *status        /* global status (given and returned) */
             }
             istat = SAI__OK;
             msp_delete_queue ( accept_queue, &istat );
-         } 
-         else 
+         }
+         else
          {
             machine_names[*machnum][0] = '\0';
             *machnum = MESSYS__NULL_M;
-         } 
+         }
       }
-      if (timer_set) 
+      if (timer_set)
       {
          istat = SAI__OK;
-         atimer_cantim ( MESSYS__TIMEOUTID, &istat ); 
+         atimer_cantim ( MESSYS__TIMEOUTID, &istat );
       }
    }
 }
 
 
 static void ams_endtrans
-( 
+(
 struct a_loc_msg_in * loc_msg_in,  /* the end-transaction message in
                                       internal format (given) */
 int *path,                         /* the communications path to the
@@ -820,7 +820,7 @@ int *status                        /* global status (given and returned) */
 *     free the relevent transaction.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -867,8 +867,8 @@ int *status                        /* global status (given and returned) */
    if ( *status == SAI__OK )
    {
       *path = t_trans[*messid].t_path_num;
-      ams_unpacklocmsg ( loc_msg_in, message_name_s, message_value_s, 
-        message_status, message_context, message_name, 
+      ams_unpacklocmsg ( loc_msg_in, message_name_s, message_value_s,
+        message_status, message_context, message_name,
         message_length, message_value, status );
       ams_freetrans ( *messid, status );
    }
@@ -884,7 +884,7 @@ int *status                        /* global status (given and returned) */
 *     AMS_EXIT1
 
 *  Purpose:
-*     SunOS on_exit handler 
+*     SunOS on_exit handler
 
 *  Language:
 *     Starlink C
@@ -893,7 +893,7 @@ int *status                        /* global status (given and returned) */
 *     Send a DE_INIT message to each open path.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -937,7 +937,7 @@ int *status                        /* global status (given and returned) */
 */
 
 static void ams_exit1
-( 
+(
  int iarg,		/* exit() value  - not used */
  void * arg,            /* Argument to on_exit - not used */
 )
@@ -946,8 +946,8 @@ static void ams_exit1
 }
 #endif
 
-void ams_exit 
-( 
+void ams_exit
+(
 void
 )
 
@@ -957,7 +957,7 @@ void
 *     AMS_EXIT
 
 *  Purpose:
-*     Ams exit handler 
+*     Ams exit handler
 
 *  Language:
 *     Starlink C
@@ -997,7 +997,7 @@ void
 /* Close path connections */
    for (j = 0; j < MESSYS__MXPATH; j++)
    {
-      if ( pathfree[j] == false ) 
+      if ( pathfree[j] == false )
       {
          istat = SAI__OK;
          ams_senddeinit ( (t_paths[j].machine_num == MESSYS__NULL_M),
@@ -1020,7 +1020,7 @@ int *status         /* global status (given and returned) */
 *     AMS_EXTINT
 
 *  Purpose:
-*     Send an EXTINT message from a signal handler 
+*     Send an EXTINT message from a signal handler
 
 *  Language:
 *     Starlink C
@@ -1059,7 +1059,7 @@ int *status         /* global status (given and returned) */
    ams_sendobey ( sigext_q, MSG_EMPTYNAME, 1, MSG_EMPTYVAL, status );
 }
 
-          
+
 
 static void ams_freepath
 (
@@ -1076,7 +1076,7 @@ int j              /* path number (given) */
 
 *  Algorithm:
 *     Free the path whose index into pathfree[] and t_paths[] is j.
-*     Free all transactions associated with the path, then close msp 
+*     Free all transactions associated with the path, then close msp
 *     communications on this path, then null the path entry.
 
 *  Copyright:
@@ -1117,12 +1117,12 @@ int j              /* path number (given) */
    int istat;            /* local status */
 
 
-   if ( ( j >= 0 ) && ( j < MESSYS__MXPATH ) ) 
+   if ( ( j >= 0 ) && ( j < MESSYS__MXPATH ) )
    {
       for ( jj=0; jj<MESSYS__MXTRANS; jj++ )
       {
-         if ( ( transfree[jj] == false ) && 
-           ( t_trans[jj].t_path_num == j ) ) 
+         if ( ( transfree[jj] == false ) &&
+           ( t_trans[jj].t_path_num == j ) )
          {
             istat = SAI__OK;
             ams_freetrans ( jj, &istat );
@@ -1217,7 +1217,7 @@ int *status       /* global status (given and received) */
 {
    if ( *status != SAI__OK ) return;
 
-   if ( messid >= 0 && messid < MESSYS__MXTRANS ) 
+   if ( messid >= 0 && messid < MESSYS__MXTRANS )
    {
       if ( t_trans[messid].this_task_ack_q != MSP__NULL_RECEIVEQ )
       {
@@ -1299,7 +1299,7 @@ int *status        /* global status (given and returned) */
    {
       ++wpath;
    }
-   if ( wpath == MESSYS__MXPATH ) 
+   if ( wpath == MESSYS__MXPATH )
    {
       *status = MESSYS__COMFULL;
    }
@@ -1396,7 +1396,7 @@ int *status        /* global status (given and returned) */
    {
       wm++;
    }
-   if ( wm == MESSYS__MXTRANS ) 
+   if ( wm == MESSYS__MXTRANS )
    {
       *status = MESSYS__COMFULL;
       return;
@@ -1436,7 +1436,7 @@ int *status             /* global status (given and returned) */
 *     AMS_GETMACHNUM
 
 *  Purpose:
-*     Return the index to the named machine 
+*     Return the index to the named machine
 
 *  Language:
 *     Starlink C
@@ -1453,7 +1453,7 @@ int *status             /* global status (given and returned) */
 *     for the machine 'machinename' but failing this tries to create a
 *     new entry.  If either of these succeed it sets *machinenumber to
 *     the relevant machine_names[] index, otherwise it returns a bad status.
-*     If it does add a new entry then *added is set to 1 otherwise added 
+*     If it does add a new entry then *added is set to 1 otherwise added
 *     will be 0 on return
 
 *  Copyright:
@@ -1507,13 +1507,13 @@ int *status             /* global status (given and returned) */
          *machinenumber = machnum;
       }
    }
-   if ( *machinenumber == MESSYS__NULL_M ) 
+   if ( *machinenumber == MESSYS__NULL_M )
    {
       machnum = -1;
       while ( ( *machinenumber == MESSYS__NULL_M ) &&
         ( (machnum += 1) < MESSYS__MXMACH) )
       {
-         if ( machine_names[machnum][0] == '\0' ) 
+         if ( machine_names[machnum][0] == '\0' )
          {
             strcpy ( machine_names[machnum], machinename );
             *added = 1;
@@ -1549,7 +1549,7 @@ int *status               /* global status (given and returned) */
 *     AMS_GETREPLY
 
 *  Purpose:
-*     Receive a message on a specified path, messid 
+*     Receive a message on a specified path, messid
 
 *  Language:
 *     Starlink C
@@ -1587,7 +1587,7 @@ int *status               /* global status (given and returned) */
 *     it off.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -1628,7 +1628,7 @@ int *status               /* global status (given and returned) */
 
 
 {
-   struct a_mess_in mess_in;            /* message structure in internal 
+   struct a_mess_in mess_in;            /* message structure in internal
                                            format */
    BOOL timer_set;                      /* flag for timer set */
    receiveq_type queues[AMS__MXQUEUE];  /* list of active queues */
@@ -1647,7 +1647,7 @@ int *status               /* global status (given and returned) */
    AMS_checktransactive(locmessid, status);
    if ( *status != SAI__OK ) return;
 
-   if ( timeout != MESSYS__INFINITE ) 
+   if ( timeout != MESSYS__INFINITE )
    {
       ams_settimeout ( timeout, status );
       if ( *status == SAI__OK )
@@ -1663,18 +1663,18 @@ int *status               /* global status (given and returned) */
 
    if ( *status == SAI__OK )
    {
-      switch ( mess_in.mess_in_type ) 
+      switch ( mess_in.mess_in_type )
       {
          case C_LOC_MSG_IN:
             ams_translate ( &(mess_in.u.loc_msg_in), reply_q, &locpath,
-              &locmessid, message_name_s, message_value_s, 
-              message_status, message_context, message_name, 
+              &locmessid, message_name_s, message_value_s,
+              message_status, message_context, message_name,
               message_length, message_value, status );
             if (queue_id == extint_q)
             {
                *status = MESSYS__EXTINT;
             }
-            else if (queue_id == timeout_q) 
+            else if (queue_id == timeout_q)
             {
                timer_set = false;
                *status = MESSYS__TIMEOUT;
@@ -1682,20 +1682,20 @@ int *status               /* global status (given and returned) */
             break;
          case C_REM_MSG_IN:
             ams_rtranslate ( &(mess_in.u.rem_msg_in), reply_q, &locpath,
-              &locmessid, message_name_s, message_value_s, 
-              message_status, message_context, message_name, 
+              &locmessid, message_name_s, message_value_s,
+              message_status, message_context, message_name,
               message_length, message_value, status );
             break;
          case C_LOC_GSOC_END_IN:
             ams_endtrans ( &(mess_in.u.loc_msg_in), &locpath,
-              &locmessid, message_name_s, message_value_s, 
-              message_status, message_context, message_name, 
+              &locmessid, message_name_s, message_value_s,
+              message_status, message_context, message_name,
               message_length, message_value, status );
             break;
          case C_REM_GSOC_END_IN:
             ams_rendtrans ( &(mess_in.u.rem_msg_in), &locpath,
-              &locmessid, message_name_s, message_value_s, 
-              message_status, message_context, message_name, 
+              &locmessid, message_name_s, message_value_s,
+              message_status, message_context, message_name,
               message_length, message_value, status );
             break;
          case C_LOC_DEINIT_IN:
@@ -1719,7 +1719,7 @@ int *status               /* global status (given and returned) */
             break;
       }
    }
-   if ( timer_set == true ) 
+   if ( timer_set == true )
    {
       istat = SAI__OK;
       atimer_cantim ( MESSYS__TIMEOUTID, &istat );
@@ -1738,7 +1738,7 @@ int *status
 *     AMS_INIT
 
 *  Purpose:
-*     Initialise ams 
+*     Initialise ams
 
 *  Language:
 *     Starlink C
@@ -1791,13 +1791,13 @@ int *status
 *     AMS_INITEH
 
 *  Purpose:
-*     Initialise ams 
+*     Initialise ams
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Initialise the internal data structures. 
+*     Initialise the internal data structures.
 *
 *     Register with msp, obtain the command queue for incoming messages,
 *     then create the queues used for this task sending messages to
@@ -1848,7 +1848,7 @@ int *status
    if (*status != SAI__OK) return;
 
 
-   for (i = 0; i < MESSYS__MXTRANS; i++) 
+   for (i = 0; i < MESSYS__MXTRANS; i++)
    {
       t_trans[i].this_task_ack_q = MSP__NULL_RECEIVEQ;
       ams_freetrans ( i, status );
@@ -1909,7 +1909,7 @@ int *status
    }
 }
 
-void ams_kick 
+void ams_kick
 (
 char *name,       /* name of the action to be rescheduled (given) */
 int length,       /* number of significant bytes in value (given) */
@@ -1922,7 +1922,7 @@ int *status       /* global status (given and returned) */
 *     AMS_KICK
 
 *  Purpose:
-*     Send a message to this task's kick queue 
+*     Send a message to this task's kick queue
 
 *  Language:
 *     Starlink C
@@ -1965,8 +1965,8 @@ int *status       /* global status (given and returned) */
 
 
 
-static void ams_nalookup 
-( 
+static void ams_nalookup
+(
 char *name,        /* full machine/task name (given) */
 int *path,         /* path number for communication to task (returned) */
 int *netind,       /* index to network type (returned) */
@@ -2057,7 +2057,7 @@ int *status        /* global status (given and returned) */
    if ( *status == SAI__OK )
    {
       n = 0;
-      do 
+      do
       {
          if ( strcmp ( t_paths[n].other_taskname, task ) == 0)
          {
@@ -2065,12 +2065,12 @@ int *status        /* global status (given and returned) */
             if ( ( !(*remote) && mno == MESSYS__NULL_M ) ||
               ( (*remote) &&
                mno != MESSYS__NULL_M &&
-               strcmp ( machine_names[mno], mach ) == 0) ) 
+               strcmp ( machine_names[mno], mach ) == 0) )
             {
                *path = n;
                return;
             }
-         } 
+         }
       }
       while ((n = n + 1) < MESSYS__MXPATH);
       *status = MESSYS__NOTFOUND;
@@ -2080,13 +2080,13 @@ int *status        /* global status (given and returned) */
 
 static void ams_newtrans
 (
-struct a_loc_gsoc_start_in *loc_gsoc_start_in, 
+struct a_loc_gsoc_start_in *loc_gsoc_start_in,
                                    /* start-transaction message in internal
                                       format (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
-int *path,                         /* the communications path to the other 
+int *path,                         /* the communications path to the other
                                       task (returned) */
-int *messid,                       /* the message identifier for this 
+int *messid,                       /* the message identifier for this
                                       transaction (returned) */
 int message_name_s,                /* space for name (given) */
 int message_value_s,               /* space for value (given) */
@@ -2120,7 +2120,7 @@ int *status                        /* global status (given and returned) */
 *     the caller (using ams_unpacklocgsoc()).
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -2176,7 +2176,7 @@ int *status                        /* global status (given and returned) */
 
    if ( *status != SAI__OK )
    {
-      ams_sendgsocend ( 1, reply_q, 
+      ams_sendgsocend ( 1, reply_q,
         MESSYS__NULL_T,
         loc_gsoc_start_in->other_task_t_trans_num,
         loc_gsoc_start_in->gsoc_flag,
@@ -2186,11 +2186,11 @@ int *status                        /* global status (given and returned) */
         loc_gsoc_start_in->gsoc_value,
         &istat );
    }
-   else 
+   else
    {
       *path = t_trans[*messid].t_path_num;
-      ams_unpacklocgsoc ( loc_gsoc_start_in, message_name_s, message_value_s, 
-        message_status, message_context, message_name, 
+      ams_unpacklocgsoc ( loc_gsoc_start_in, message_name_s, message_value_s,
+        message_status, message_context, message_name,
         message_length, message_value, status );
    }
 }
@@ -2216,7 +2216,7 @@ int *status       /* global status (given and returned) */
 *     set path to reflect this.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -2275,7 +2275,7 @@ int *status             /* global status (given and returned) */
 *     AMS_PATH
 
 *  Purpose:
-*     Get a communications path to another task 
+*     Get a communications path to another task
 
 *  Language:
 *     Starlink C
@@ -2295,7 +2295,7 @@ int *status             /* global status (given and returned) */
 *     t_paths[].machine_num to NULL_M and
 *     t_paths[].path_state to PART_P (nearly opened)
 *
-*      remote: 
+*      remote:
 *               using messys_call_out() (that also exchanges a
 *     C_REM_CALL_OUT message with the remote server) we obtain
 *     the remote machine's machine number (an index into
@@ -2361,11 +2361,11 @@ int *status             /* global status (given and returned) */
    int wpath;                        /* local version of path */
    int idmess;                       /* messid for init handshake */
    int machnum;                      /* machine number */
-   int remote;                       /* flag to hold if other_task_name is 
+   int remote;                       /* flag to hold if other_task_name is
                                         remote */
    char otaskname[MESSYS__TNAME];    /* task name implicit in
                                         other_task_name */
-   char machname[MESSYS__MNAME];     /* name of remote machine implicit in 
+   char machname[MESSYS__MNAME];     /* name of remote machine implicit in
                                         other_task_name */
 
    if ( *status != SAI__OK ) return;
@@ -2385,16 +2385,16 @@ int *status             /* global status (given and returned) */
    }
    wpath = (*path);
    strcpy ( t_paths[wpath].other_taskname, otaskname );
-   if ( !remote ) 
+   if ( !remote )
    {
-      if ( *status == SAI__OK ) 
+      if ( *status == SAI__OK )
       {
          msp_get_task_queue ( other_task_name, &(t_paths[wpath].other_com_q),
            status );
          t_paths[wpath].machine_num = MESSYS__NULL_M;
       }
-   } 
-   else 
+   }
+   else
    {
       ams_call_out ( machname, netind, &machnum, status );
       t_paths[wpath].other_com_q = messys_netqueue[netind];
@@ -2402,14 +2402,14 @@ int *status             /* global status (given and returned) */
    }
 
    t_paths[wpath].path_state = MESSYS__PART_P;
-   ams_getfreetrans ( 1, wpath, MSP__NULL_SENDQ, MESSYS__NULL_T, &idmess, 
+   ams_getfreetrans ( 1, wpath, MSP__NULL_SENDQ, MESSYS__NULL_T, &idmess,
      status );
    ams_sendinit ( wpath, idmess, status );
-   ams_getreply ( MESSYS__INIT_WAIT_TIME, wpath, idmess, 32, MSG_VAL_LEN, 
-     &message_status, &message_context, message_name, &message_length, 
+   ams_getreply ( MESSYS__INIT_WAIT_TIME, wpath, idmess, 32, MSG_VAL_LEN,
+     &message_status, &message_context, message_name, &message_length,
      message_value, status );
 
-   if ( (*status != SAI__OK) && (*path != MESSYS__NULL_P) ) 
+   if ( (*status != SAI__OK) && (*path != MESSYS__NULL_P) )
    {
       ams_remove ( wpath );
       *path = MESSYS__NULL_P;
@@ -2417,8 +2417,8 @@ int *status             /* global status (given and returned) */
 }
 
 
-void ams_plookup 
-( 
+void ams_plookup
+(
 int path,             /* the path number (given) */
 char *name,           /* the task name (returned) */
 int *status           /* global status (given and returned) */
@@ -2430,7 +2430,7 @@ int *status           /* global status (given and returned) */
 *     AMS_PLOOKUP
 
 *  Purpose:
-*     Look up a taskname given a path to it 
+*     Look up a taskname given a path to it
 
 *  Language:
 *     Starlink C
@@ -2497,15 +2497,15 @@ int *status           /* global status (given and returned) */
       {
          *status = MESSYS__NOTFOUND;
       }
-      else 
+      else
       {
          if ( t_paths[path].machine_num != MESSYS__NULL_M )
          {
-            sprintf ( name, "%s%s", 
+            sprintf ( name, "%s%s",
               machine_names[t_paths[path].machine_num],
               t_paths[path].other_taskname );
          }
-         else 
+         else
          {
             strcpy ( name, t_paths[path].other_taskname );
          }
@@ -2531,13 +2531,13 @@ int *status                        /* global status (given and returned) */
 *     Starlink C
 
 *  Algorithm:
-*     An "init" message has been received from a task on another machine 
-*     requesting a connecting path to be set up. Allocate a data structure 
+*     An "init" message has been received from a task on another machine
+*     requesting a connecting path to be set up. Allocate a data structure
 *     to the path and return an acceptance message.
 
 *  Copyright:
 *     Copyright (C) 1992, 1994 Science & Engineering Research Council.
-*     Copyright (C) 1996 Central Laboratory of the Research Councils. 
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -2596,7 +2596,7 @@ int *status                        /* global status (given and returned) */
       ams_senddeinit ( 0, j, ackq, rem_init_in->local_nettask_n_path_num,
         &istat );
    }
-   else 
+   else
    {
       strcpy ( t_paths[j].other_taskname, rem_init_in->remote_taskname );
       t_paths[j].other_pathnum = rem_init_in->local_nettask_n_path_num;
@@ -2633,7 +2633,7 @@ int *status                       /* global status (given and returned) */
 *     structure for the path.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -2674,13 +2674,13 @@ int *status                       /* global status (given and returned) */
    if ( *status != SAI__OK ) return;
 
    if ( ( path == rem_ack_in->local_task_t_path_num ) &&
-     ( t_paths[path].path_state == MESSYS__PART_P ) ) 
+     ( t_paths[path].path_state == MESSYS__PART_P ) )
    {
       t_paths[path].other_pathnum = rem_ack_in->local_nettask_n_path_num;
       t_paths[path].path_state = MESSYS__FULL_P;
       ams_freetrans ( messid, status );
-   } 
-   else 
+   }
+   else
    {
       ams_senddeinit ( 0, MESSYS__NULL_P, replyq,
         rem_ack_in->local_nettask_n_path_num, status );
@@ -2689,8 +2689,8 @@ int *status                       /* global status (given and returned) */
 }
 
 
-void ams_receive 
-( 
+void ams_receive
+(
 int timeout,              /* timeout time in milliseconds (given) */
 int message_name_s,       /* space for name (given) */
 int message_value_s,      /* space for value (given) */
@@ -2710,14 +2710,14 @@ int *status               /* global status (given and returned) */
 *     AMS_RECEIVE
 
 *  Purpose:
-*     Receive any incoming message 
+*     Receive any incoming message
 
 *  Language:
 *     Starlink C
 
 *  Copyright:
 *     Copyright (C) 1992, 1994 Science & Engineering Research Council.
-*     Copyright (C) 1996 Central Laboratory of the Research Councils. 
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -2783,7 +2783,7 @@ int *status               /* global status (given and returned) */
    message_found = false;
    timer_set = false;
 
-   if ( timeout != MESSYS__INFINITE ) 
+   if ( timeout != MESSYS__INFINITE )
    {
       ams_settimeout ( timeout, status );
       if ( *status == SAI__OK )
@@ -2798,55 +2798,55 @@ int *status               /* global status (given and returned) */
    queues[4] = kick_q;
    queues[5] = command_q;
 
-   while ( ( message_found == false ) && ( *status == SAI__OK) ) 
+   while ( ( message_found == false ) && ( *status == SAI__OK) )
    {
       numq = 6;
-      for ( j = 0; j < MESSYS__MXTRANS; j++ ) 
+      for ( j = 0; j < MESSYS__MXTRANS; j++ )
       {
-         if ( t_trans[j].this_task_ack_q != MSP__NULL_RECEIVEQ ) 
+         if ( t_trans[j].this_task_ack_q != MSP__NULL_RECEIVEQ )
          {
             queues[numq] = t_trans[j].this_task_ack_q;
             numq++;
-         } 
-      } 
+         }
+      }
 
       msp_receive_message ( queues, numq, true, C_MAXMSG_LEN,
         (char *) &mess_in, &actual_length, &queue_id, &reply_q, status );
-      if ( *status == SAI__OK ) 
+      if ( *status == SAI__OK )
       {
-         switch ( mess_in.mess_in_type ) 
+         switch ( mess_in.mess_in_type )
          {
             case C_LOC_MSG_IN:
-               ams_translate ( &(mess_in.u.loc_msg_in), reply_q, path, 
-                 messid, message_name_s, message_value_s, 
-                 message_status, message_context, message_name, 
+               ams_translate ( &(mess_in.u.loc_msg_in), reply_q, path,
+                 messid, message_name_s, message_value_s,
+                 message_status, message_context, message_name,
                  message_length, message_value, status );
                message_found = true;
                if (queue_id == extint_q)
                {
                   *message_status = MESSYS__EXTINT;
-		  *status = SAI__OK; 
+		  *status = SAI__OK;
                }
                else if (queue_id == astint_q)
                {
                   *message_status = MESSYS__ASTINT;
-		  *status = SAI__OK; 
+		  *status = SAI__OK;
                }
                else if (queue_id == resched_q)
                {
                   *message_status = MESSYS__RESCHED;
-		  *status = SAI__OK; 
+		  *status = SAI__OK;
                }
-               else if (queue_id == timeout_q) 
+               else if (queue_id == timeout_q)
                {
                   *message_status = MESSYS__TIMEOUT;
-		  *status = SAI__OK; 
+		  *status = SAI__OK;
                   timer_set = false;
-               } 
+               }
                else if (queue_id == kick_q)
                {
                   *message_status = MESSYS__KICK;
-		  *status = SAI__OK; 
+		  *status = SAI__OK;
                }
                else if (queue_id == command_q)
                {
@@ -2854,9 +2854,9 @@ int *status               /* global status (given and returned) */
                }
                break;
             case C_REM_MSG_IN:
-               ams_rtranslate ( &(mess_in.u.rem_msg_in), reply_q, path, 
-                 messid, message_name_s, message_value_s, 
-                 message_status, message_context, message_name, 
+               ams_rtranslate ( &(mess_in.u.rem_msg_in), reply_q, path,
+                 messid, message_name_s, message_value_s,
+                 message_status, message_context, message_name,
                  message_length, message_value, status );
                message_found = true;
                if (queue_id == command_q)
@@ -2865,30 +2865,30 @@ int *status               /* global status (given and returned) */
                }
                break;
             case C_LOC_GSOC_START_IN:
-               ams_newtrans ( &(mess_in.u.loc_gsoc_start_in), reply_q, 
-                 path, messid, message_name_s, message_value_s, 
-                 message_status, message_context, message_name, 
+               ams_newtrans ( &(mess_in.u.loc_gsoc_start_in), reply_q,
+                 path, messid, message_name_s, message_value_s,
+                 message_status, message_context, message_name,
                  message_length, message_value, status );
                message_found = true;
                break;
             case C_REM_GSOC_START_IN:
                ams_rnewtrans ( &(mess_in.u.rem_gsoc_start_in), reply_q,
-                 path, messid, message_name_s, message_value_s, 
-                 message_status, message_context, message_name, 
+                 path, messid, message_name_s, message_value_s,
+                 message_status, message_context, message_name,
                  message_length, message_value, status );
                message_found = true;
                break;
             case C_LOC_GSOC_END_IN:
                ams_endtrans ( &(mess_in.u.loc_msg_in), path, messid,
-                 message_name_s, message_value_s, 
-                 message_status, message_context, message_name, 
+                 message_name_s, message_value_s,
+                 message_status, message_context, message_name,
                  message_length, message_value, status );
                message_found = true;
                break;
             case C_REM_GSOC_END_IN:
                ams_rendtrans ( &(mess_in.u.rem_msg_in), path, messid,
-                 message_name_s, message_value_s, 
-                 message_status, message_context, message_name, 
+                 message_name_s, message_value_s,
+                 message_status, message_context, message_name,
                  message_length, message_value, status );
                message_found = true;
                break;
@@ -2917,11 +2917,11 @@ int *status               /* global status (given and returned) */
                break;
          }
       }
-   } 
-   if ( timer_set ) 
+   }
+   if ( timer_set )
    {
       istat = SAI__OK;
-      atimer_cantim ( MESSYS__TIMEOUTID, &istat ); 
+      atimer_cantim ( MESSYS__TIMEOUTID, &istat );
    }
 }
 
@@ -2948,7 +2948,7 @@ int *status                        /* global status (given and returned) */
 *     acknowledgement. We use ams_senddeinit() to actually send the message.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -2988,7 +2988,7 @@ int *status                        /* global status (given and returned) */
 {
    if ( *status != SAI__OK ) return;
 
-   ams_senddeinit ( 1, MESSYS__NULL_P, reply_q, 
+   ams_senddeinit ( 1, MESSYS__NULL_P, reply_q,
      loc_ack_in->other_task_t_path_num, status );
    *status = SAI__OK;
 }
@@ -3017,7 +3017,7 @@ int pathnum              /* path number (given) */
 *     transaction entry t_trans[].
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -3100,7 +3100,7 @@ int *status                       /* global status (given and returned) */
 *     free the relevant transaction.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -3144,8 +3144,8 @@ int *status                       /* global status (given and returned) */
 
    *messid = rem_msg_in->local_task_t_trans_num;
    *path = t_trans[*messid].t_path_num;
-   ams_unpackremmsg ( rem_msg_in, message_name_s, message_value_s, 
-     message_status, message_context, message_name, 
+   ams_unpackremmsg ( rem_msg_in, message_name_s, message_value_s,
+     message_status, message_context, message_name,
      message_length, message_value, status );
    ams_freetrans ( *messid, status );
 }
@@ -3153,7 +3153,7 @@ int *status                       /* global status (given and returned) */
 
 void ams_reply
 (
-int path,               /* the path number for communicating with the other 
+int path,               /* the path number for communicating with the other
                            task (given) */
 int messid,             /* the number identifying the transaction (given) */
 int message_function,   /* message function (given) */
@@ -3171,7 +3171,7 @@ int *status             /* global status (given and returned) */
 *     AMS_REPLY
 
 *  Purpose:
-*     Send a message on a given path, messid 
+*     Send a message on a given path, messid
 
 *  Language:
 *     Starlink C
@@ -3188,7 +3188,7 @@ int *status             /* global status (given and returned) */
 *     check the 'function' part of the external form and check exactly
 
 *  Copyright:
-*     Copyright (C) 1992-1993 Science & Engineering Research Council.  
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -3229,7 +3229,7 @@ int *status             /* global status (given and returned) */
 *       messsy_remove() to remove the path and free any
 *       transactions using the path.
 *
-*      MESSYS__MESSAGE 
+*      MESSYS__MESSAGE
 *
 *              then we use ams_sendmessage() to send the message.  It is
 *       inside ams_sendmessage() that an end of transaction
@@ -3254,7 +3254,7 @@ int *status             /* global status (given and returned) */
    }
    if ( *status == SAI__OK)
    {
-      switch ( message_function ) 
+      switch ( message_function )
       {
          case MESSYS__DE_INIT:
             ams_senddeinit ( (t_paths[path].machine_num == MESSYS__NULL_M ),
@@ -3265,7 +3265,7 @@ int *status             /* global status (given and returned) */
             break;
          case MESSYS__MESSAGE:
             ams_sendmessage ( path, messid, message_status,
-              message_context, message_name, message_length, 
+              message_context, message_name, message_length,
               message_value, status );
             break;
          default:
@@ -3289,7 +3289,7 @@ int *status        /* global status (given and returned) */
 *     AMS_RESMSG
 
 *  Purpose:
-*     Send a message to this task's  reschedule queue 
+*     Send a message to this task's  reschedule queue
 
 *  Language:
 *     Starlink C
@@ -3333,13 +3333,13 @@ int *status        /* global status (given and returned) */
 
 static void ams_rnewtrans
 (
-struct a_rem_gsoc_start_in *rem_gsoc_start_in, 
-                                   /* the initialize-transaction message in 
+struct a_rem_gsoc_start_in *rem_gsoc_start_in,
+                                   /* the initialize-transaction message in
                                       internal format (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
-int *path,                         /* the communications path to the other 
+int *path,                         /* the communications path to the other
                                       task (returned) */
-int *messid,                       /* the message identifier for this 
+int *messid,                       /* the message identifier for this
                                       transaction (returned) */
 int message_name_s,                /* space for name (given) */
 int message_value_s,               /* space for value (given) */
@@ -3376,7 +3376,7 @@ int *status                        /* global status (given and returned) */
 *     message for the caller (using) ams_unpackremgsoc()).
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -3428,7 +3428,7 @@ int *status                        /* global status (given and returned) */
      rem_gsoc_start_in->local_nettask_n_trans_num, messid, status );
    if ( *status != SAI__OK )
    {
-      ams_sendgsocend ( 0, reply_q, 
+      ams_sendgsocend ( 0, reply_q,
         MESSYS__NULL_T,
         rem_gsoc_start_in->local_nettask_n_trans_num,
         rem_gsoc_start_in->gsoc_flag,
@@ -3438,18 +3438,18 @@ int *status                        /* global status (given and returned) */
         rem_gsoc_start_in->gsoc_value,
         &istat );
    }
-   else 
+   else
    {
       *path = t_trans[*messid].t_path_num;
-      ams_unpackremgsoc ( rem_gsoc_start_in, message_name_s, message_value_s, 
-        message_status, message_context, message_name, 
+      ams_unpackremgsoc ( rem_gsoc_start_in, message_name_s, message_value_s,
+        message_status, message_context, message_name,
         message_length, message_value, status );
    }
 }
 
 
-static void ams_rreject 
-( 
+static void ams_rreject
+(
 struct a_rem_ack_in *rem_ack_in,   /* received ack_in structure (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
 int *status                        /* global status (given and returned) */
@@ -3469,7 +3469,7 @@ int *status                        /* global status (given and returned) */
 *     ams_senddeinit() message.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -3509,7 +3509,7 @@ int *status                        /* global status (given and returned) */
 {
    if ( *status != SAI__OK ) return;
 
-   ams_senddeinit ( 0, MESSYS__NULL_P, reply_q, 
+   ams_senddeinit ( 0, MESSYS__NULL_P, reply_q,
      rem_ack_in->local_nettask_n_path_num, status );
    *status = SAI__OK;
 }
@@ -3558,7 +3558,7 @@ int *status                       /* global status (given and returned) */
 *     this but the message will still be unpacked.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -3614,21 +3614,21 @@ int *status                       /* global status (given and returned) */
    }
    if (*status == SAI__OK)
    {
-      if ( (*path = t_trans[locmessid].t_path_num) != MESSYS__NULL_P ) 
+      if ( (*path = t_trans[locmessid].t_path_num) != MESSYS__NULL_P )
       {
          t_trans[locmessid].other_task_ack_q =
            reply_q;
          t_trans[locmessid].other_transnum =
            rem_msg_in->local_nettask_n_trans_num;
-      } 
+      }
       else
       {
          *status = MESSYS__BADPATH;
       }
    }
    istat = SAI__OK;
-   ams_unpackremmsg ( rem_msg_in, message_name_s, message_value_s, 
-     message_status, message_context, message_name, 
+   ams_unpackremmsg ( rem_msg_in, message_name_s, message_value_s,
+     message_status, message_context, message_name,
      message_length, message_value, status );
 }
 
@@ -3652,7 +3652,7 @@ int *status             /* global status (given and returned) */
 *     AMS_SEND
 
 *  Purpose:
-*     Send a message on a given path 
+*     Send a message on a given path
 
 *  Language:
 *     Starlink C
@@ -3677,7 +3677,7 @@ int *status             /* global status (given and returned) */
 *     MESSYS_DE_INIT message to the other task's command queue.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -3723,11 +3723,11 @@ int *status             /* global status (given and returned) */
 
    if ( *status == SAI__OK )
    {
-      switch (message_function) 
+      switch (message_function)
       {
          case MESSYS__INIT:
          case MESSYS__MESSAGE:
-            ams_getfreetrans ( 1, path, MSP__NULL_SENDQ, 
+            ams_getfreetrans ( 1, path, MSP__NULL_SENDQ,
               MESSYS__NULL_T, messid, status );
             if ( *status != SAI__OK )
             {
@@ -3740,7 +3740,7 @@ int *status             /* global status (given and returned) */
             else
             {
                ams_sendgsocstart ( path, *messid, message_status,
-                 message_context, message_name, message_length, 
+                 message_context, message_name, message_length,
                  message_value, status );
             }
             break;
@@ -3830,14 +3830,14 @@ int *status            /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   if (local) 
+   if (local)
    {
       mess_out.mess_out_type = C_LOC_DEINIT_OUT;
       mess_out.u.loc_deinit_out.other_task_t_path_num = otherpathno;
       msp_send_message ( (char *) (&mess_out), C_LOC_DEINIT_OUT_LEN,
         targetq, command_q, status );
-   } 
-   else 
+   }
+   else
    {
       mess_out.mess_out_type = C_REM_DEINIT_OUT;
       mess_out.u.rem_deinit_out.local_nettask_n_path_num = otherpathno;
@@ -3945,7 +3945,7 @@ int *status             /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   if (local) 
+   if (local)
    {
       mess_out.mess_out_type = C_LOC_GSOC_END_OUT;
       mess_out.u.loc_msg_out.this_task_t_trans_num = tttn;
@@ -3958,8 +3958,8 @@ int *status             /* global status (given and returned) */
       msp_send_message ( (char *) &mess_out,
                    C_LOC_MSG_OUT_LEN - MSG_VAL_LEN + glen,
                    targetq, command_q, status );
-   } 
-   else 
+   }
+   else
    {
       mess_out.mess_out_type = C_REM_GSOC_END_OUT;
       mess_out.u.rem_msg_out.local_nettask_n_trans_num = ottn;
@@ -3973,7 +3973,7 @@ int *status             /* global status (given and returned) */
                    C_REM_MSG_OUT_LEN - MSG_VAL_LEN + glen,
                    targetq, command_q, status );
    }
-   if (tttn != MESSYS__NULL_T) 
+   if (tttn != MESSYS__NULL_T)
    {
       istat = SAI__OK;
       ams_freetrans ( tttn, &istat );
@@ -4085,7 +4085,7 @@ int *status             /* global status (given and returned) */
 
    local = (t_paths[path].machine_num == MESSYS__NULL_M);
 
-   if (local) 
+   if (local)
    {
       mess_out.mess_out_type = C_LOC_GSOC_START_OUT;
       mess_out.u.loc_gsoc_start_out.other_task_t_path_num =
@@ -4094,11 +4094,11 @@ int *status             /* global status (given and returned) */
       mess_out.u.loc_gsoc_start_out.gsoc_flag = message_context;
       strcpy ( mess_out.u.loc_gsoc_start_out.gsoc_name, message_name );
       mess_out.u.loc_gsoc_start_out.gsoc_len = message_length;
-      memcpy ( mess_out.u.loc_gsoc_start_out.gsoc_value, message_value, 
+      memcpy ( mess_out.u.loc_gsoc_start_out.gsoc_value, message_value,
             message_length);
       nbytes = C_LOC_GSOC_START_OUT_LEN - MSG_VAL_LEN + message_length;
-   } 
-   else 
+   }
+   else
    {
       mess_out.mess_out_type = C_REM_GSOC_START_OUT;
       mess_out.u.rem_gsoc_start_out.local_nettask_n_path_num =
@@ -4121,9 +4121,9 @@ int *status             /* global status (given and returned) */
 }
 
 
-static void ams_sendinit 
-( 
-int path,           /* path for init (given) */ 
+static void ams_sendinit
+(
+int path,           /* path for init (given) */
 int messid,         /* temporary transaction (given) */
 int *status         /* global status (given and returned) */
 )
@@ -4212,7 +4212,7 @@ int *status         /* global status (given and returned) */
    if ( *status != SAI__OK ) return;
 
 
-   if ( t_paths[path].machine_num == MESSYS__NULL_M ) 
+   if ( t_paths[path].machine_num == MESSYS__NULL_M )
    {
       mess_out.mess_out_type = C_LOC_INIT_OUT;
       strcpy ( mess_out.u.loc_init_out.this_taskname, taskname );
@@ -4220,19 +4220,19 @@ int *status         /* global status (given and returned) */
         t_paths[path].other_taskname );
       mess_out.u.loc_init_out.this_task_t_path_num = path;
       nbytes = C_LOC_INIT_OUT_LEN;
-   } 
-   else 
+   }
+   else
    {
       mess_out.mess_out_type = C_REM_INIT_OUT;
       strcpy ( mess_out.u.rem_init_out.local_taskname, taskname );
-      strcpy ( mess_out.u.rem_init_out.remote_taskname, 
+      strcpy ( mess_out.u.rem_init_out.remote_taskname,
         t_paths[path].other_taskname );
       strcpy ( mess_out.u.rem_init_out.remote_machine_name,
             machine_names[t_paths[path].machine_num] );
       mess_out.u.rem_init_out.local_task_t_path_num = path;
       nbytes = C_REM_INIT_OUT_LEN;
    }
-   msp_send_message ( (char *) &mess_out, nbytes, 
+   msp_send_message ( (char *) &mess_out, nbytes,
      t_paths[path].other_com_q, t_trans[messid].this_task_ack_q, status);
    if ( *status != SAI__OK )
    {
@@ -4241,8 +4241,8 @@ int *status         /* global status (given and returned) */
 }
 
 
-static void ams_sendinitack 
-( 
+static void ams_sendinitack
+(
 int local,            /* flag for local or remote (given) */
 sendq_type ackq,      /* the other task's init acknowldege queue (given) */
 int otherpathno,      /* other task's path number (given) */
@@ -4325,14 +4325,14 @@ int *status           /* global status (give and returned) */
    if ( *status != SAI__OK ) return;
 
 
-   if (local) 
+   if (local)
    {
       mess_out.mess_out_type = C_LOC_ACK_OUT;
       mess_out.u.loc_ack_out.other_task_t_path_num = otherpathno;
       mess_out.u.loc_ack_out.this_task_t_path_num = thispathno;
       nbytes = C_LOC_ACK_OUT_LEN;
-   } 
-   else 
+   }
+   else
    {
       mess_out.mess_out_type = C_REM_ACK_OUT;
       mess_out.u.rem_ack_out.local_nettask_n_path_num = otherpathno;
@@ -4415,7 +4415,7 @@ int *status              /* global status (given and returned) */
 *     the message's value                  from message_value
 *
 *
-*     to the target queue targetq using msp_send_message(). 
+*     to the target queue targetq using msp_send_message().
 *
 *     Note : If the code ends up sending a GSOC_END message using
 *     ams_sendgsocend() then within ams_sendgsocend() ams_freetrans() is
@@ -4479,9 +4479,9 @@ int *status              /* global status (given and returned) */
      ( sourcestatus == MESSYS__SYNC )     ||
      ( sourcestatus == MESSYS__SYNCREP )  ||
      ( sourcestatus == MESSYS__TRIGGER )  ||
-     ( sourcestatus == DTASK__ACTSTART ) ) 
+     ( sourcestatus == DTASK__ACTSTART ) )
    {
-      if (local) 
+      if (local)
       {
           mess_out.mess_out_type = C_LOC_MSG_OUT;
           mess_out.u.loc_msg_out.other_task_t_trans_num =
@@ -4494,8 +4494,8 @@ int *status              /* global status (given and returned) */
           memcpy ( mess_out.u.loc_msg_out.gsoc_value, message_value,
               message_length );
           nbytes = C_LOC_MSG_OUT_LEN - MSG_VAL_LEN + message_length;
-      } 
-      else 
+      }
+      else
       {
           mess_out.mess_out_type = C_REM_MSG_OUT;
           mess_out.u.rem_msg_out.local_nettask_n_trans_num =
@@ -4511,10 +4511,10 @@ int *status              /* global status (given and returned) */
       }
       msp_send_message ( (char *) &mess_out, nbytes, targetq,
         t_trans[messid].this_task_ack_q, status );
-   } 
+   }
    else
    {
-      ams_sendgsocend(local, targetq, 
+      ams_sendgsocend(local, targetq,
                 messid, t_trans[messid].other_transnum, message_context,
                 message_name, message_length, sourcestatus,
                 message_value, status);
@@ -4681,7 +4681,7 @@ int parm                          /* the timeout parameter (given) */
 *     AMS_TIMEOUT
 
 *  Purpose:
-*     Cause AMS_RECEIVE or GETREPLY to timeout 
+*     Cause AMS_RECEIVE or GETREPLY to timeout
 
 *  Language:
 *     Starlink C
@@ -4750,7 +4750,7 @@ int parm                          /* the timeout parameter (given) */
 /*   and send it to the timeout queue */
 
    istat = SAI__OK;
-   msp_send_message ( (char *) &mess_out, numbytes, sigtimeout_q, mcq, 
+   msp_send_message ( (char *) &mess_out, numbytes, sigtimeout_q, mcq,
      &istat );
 
 }
@@ -4758,7 +4758,7 @@ int parm                          /* the timeout parameter (given) */
 
 
 static void ams_translate
-( 
+(
 struct a_loc_msg_in *loc_msg_in,  /* the message in internal format
                                      (given) */
 sendq_type reply_q,               /* reply queue (given) */
@@ -4800,7 +4800,7 @@ int *status                       /* global status (given and returned) */
 *     unpacks the message.
 
 *  Copyright:
-*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *      All Rights Reserved.
 
 *  Licence:
@@ -4858,21 +4858,21 @@ int *status                       /* global status (given and returned) */
    }
    if ( *status == SAI__OK )
    {
-      if ( (*path = t_trans[*messid].t_path_num) != MESSYS__NULL_P ) 
+      if ( (*path = t_trans[*messid].t_path_num) != MESSYS__NULL_P )
       {
          t_trans[*messid].other_task_ack_q =
            reply_q;
          t_trans[*messid].other_transnum =
            loc_msg_in->other_task_t_trans_num;
-      } 
+      }
       else
       {
           *status = MESSYS__BADPATH;
       }
    }
    istat = SAI__OK;
-   ams_unpacklocmsg ( loc_msg_in, message_name_s, message_value_s, 
-     message_status, message_context, message_name, 
+   ams_unpacklocmsg ( loc_msg_in, message_name_s, message_value_s,
+     message_status, message_context, message_name,
      message_length, message_value, &istat );
 }
 
@@ -4888,7 +4888,7 @@ char *message_name,                    /* message name (returned) */
 int *message_length,                   /* length of value (returned) */
 char *message_value,                   /* message value (returned) */
 int *status                            /* global status (given and returned) */
-)       
+)
 
 /*
 *+
@@ -5138,7 +5138,7 @@ int *status                            /* global status (given and returned) */
       *message_length = remotemess->gsoc_len;
       if ( *message_length <= message_value_s )
       {
-         memcpy ( message_value, remotemess->gsoc_value, 
+         memcpy ( message_value, remotemess->gsoc_value,
            remotemess->gsoc_len );
       }
       else
@@ -5231,7 +5231,7 @@ int *status                            /* global status (given and returned) */
       *message_length = remotemess->gsoc_len;
       if ( *message_length <= message_value_s )
       {
-         memcpy ( message_value, remotemess->gsoc_value, 
+         memcpy ( message_value, remotemess->gsoc_value,
            remotemess->gsoc_len );
       }
       else

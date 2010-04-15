@@ -2,7 +2,7 @@
 
 	SUBROUTINE STCOADD ( STATUS)
 
-* Description : 
+* Description :
 *
 * Invocation :
 *
@@ -33,8 +33,8 @@
 * Global constants :
 
 	INCLUDE 'SAE_PAR'		! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 * Status :
 
@@ -121,7 +121,7 @@
 
 *          read the latest image number to be coadded
 
-	    CALL PAR_GET0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES), 
+	    CALL PAR_GET0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES),
      :                       STATUS)
 
 *          cancel the current association with this parameter
@@ -130,7 +130,7 @@
 
 *          suggest a new default of the one after the last input obs number
 
-	    CALL PAR_DEF0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES)+1, 
+	    CALL PAR_DEF0I( 'NUMBER', NUMBER_IMAGE( NUMBER_IMAGES)+1,
      :                       STATUS)
 
 *          test if number of input images greater than image number array size
@@ -159,7 +159,7 @@
 	    END IF
 
 	    if( status .ne. sai__ok) then
-              CALL ERR_REP('ERR', 'Error end of input loop ...', 
+              CALL ERR_REP('ERR', 'Error end of input loop ...',
      :                      STATUS )
 	      return
 	    end if
@@ -208,7 +208,7 @@
 
 *          get the name of the output image to contain coadded data
 
-	    CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMSO, LOCO, 
+	    CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMSO, LOCO,
      :                    STATUS )
 	    if( status .ne. sai__ok) then
               CALL ERR_REP('ERR', 'Error after creout ...', STATUS )
@@ -222,7 +222,7 @@
 
 	    if( status .ne. sai__ok) then
               CALL ERR_REP('ERR',
-     :                     'Error after ndf_map output image ...', 
+     :                     'Error after ndf_map output image ...',
      :                      STATUS )
 	      return
 	    end if
@@ -246,15 +246,15 @@
      :                  PNTRDA, NELEMENTS, STATUS )
 
 	  if( status .ne. sai__ok) then
-            CALL ERR_REP('ERR', 
-     :                    'Error after ndf_map input image ...', 
+            CALL ERR_REP('ERR',
+     :                    'Error after ndf_map input image ...',
      :                    STATUS )
 	    return
 	  end if
 
 *        call subroutine to coadd the data into the output image
 
-	  CALL STCOADD_IMAGE( DIMS( 1), DIMS( 2), %VAL( PNTRDA), 
+	  CALL STCOADD_IMAGE( DIMS( 1), DIMS( 2), %VAL( PNTRDA),
      :                        %VAL( PNTRO))
 
 	END DO
@@ -264,7 +264,7 @@
 
 	CALL NDF_ANNUL( LOCO, STATUS)
 	if( status .ne. sai__ok) then
-          CALL ERR_REP('ERR', 'Error after ndf_annul output ...', 
+          CALL ERR_REP('ERR', 'Error after ndf_annul output ...',
      :                  STATUS )
 	  return
 	end if
@@ -273,7 +273,7 @@
 
 	CALL NDF_ANNUL( LOCINP, STATUS)
 	if( status .ne. sai__ok) then
-          CALL ERR_REP('ERR', 'Error after ndf_annul input ...', 
+          CALL ERR_REP('ERR', 'Error after ndf_annul input ...',
      :                  STATUS )
 	  return
 	end if

@@ -34,7 +34,7 @@
 *  Algorithm:
 *     The PARAM string is looked up in the GKS_PA Common block. .
 *     If it is found, then the graphics descriptor corresponding to
-*     its position in the table is returned and STATUS set to 
+*     its position in the table is returned and STATUS set to
 *     GKS__ISACT; otherwise a new parameter descriptor is returned.
 
 *  Copyright:
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -107,7 +107,7 @@
       INTEGER I                         ! loop index
       LOGICAL DONE                      ! loop controller
 *.
-    
+
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Get the Graphics descriptor

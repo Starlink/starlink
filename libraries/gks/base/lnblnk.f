@@ -16,7 +16,7 @@
 *   Now clip trailing blanks
 
         DO  20  I = K,1,-1
-           IF (STRING(I:I) .NE. ' ') THEN 
+           IF (STRING(I:I) .NE. ' ') THEN
 		LNBLNK = I
                 RETURN
            ENDIF

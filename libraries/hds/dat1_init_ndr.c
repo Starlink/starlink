@@ -166,7 +166,7 @@
       dig_DOUBLE = 0;
       eps_REAL = 0.0;
       eps_DOUBLE = 0.0;
-      
+
 
 /* Set up the name of each primitive data type.                             */
 /* ===========================================                              */
@@ -1104,7 +1104,7 @@ may require modification for use on this machine.",\
          {\
             (format) = DAT__UNKNOWN;\
          }\
-      }      
+      }
 
 /* Invoke this macro to determine the data format of the integer primitive  */
 /* data types.                                                              */

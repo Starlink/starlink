@@ -17,8 +17,8 @@
 *     default vector scaling in VECPLOT. It first estimates the mean and
 *     standard deviation of the data in th sub-array, and then rejects
 *     values further than 4 sigma from the mean. It then recomputes the
-*     mean and standard deviation. This is done 4 times, and the 
-*     returned "typical data value" is then the sum of the final mean 
+*     mean and standard deviation. This is done 4 times, and the
+*     returned "typical data value" is then the sum of the final mean
 *     value and standard deviation.
 
 *  Arguments:
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,13 +132,13 @@
       CALL NDF_BAD( INDFS, 'DATA', .FALSE., BAD, STATUS )
 
 *  Compute the statistics.
-      CALL KPG1_STATR( BAD, EL, %VAL( PNTR ), 4, CLIP, NGOOD, IMIN, 
-     :                 DMIN, IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, 
+      CALL KPG1_STATR( BAD, EL, %VAL( PNTR ), 4, CLIP, NGOOD, IMIN,
+     :                 DMIN, IMAX, DMAX, SUM, MEAN, STDEV, NGOODC,
      :                 IMINC, DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
      :                 STATUS )
 
 *  Report an error if there are no good pixel values in the first
-*  NDF. 
+*  NDF.
       IF( NGOOD .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDFS )
@@ -150,13 +150,13 @@
 *  Report an error if all data values are effectively zero.
       IF( ABS( DMAX ) .LE. VAL__SMLR .AND.
      :    ABS( DMIN ) .LE. VAL__SMLR .AND.
-     :    STATUS .EQ. SAI__OK ) THEN 
+     :    STATUS .EQ. SAI__OK ) THEN
          STATUS  = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDFS )
          CALL ERR_REP( 'DTPCL_ALLZERO', 'There are no '//
      :                 'non-zero values in ^NDF', STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  Calculate the "typical value".
       IF( MEANC .NE. VAL__BADD .AND. STDEVC .NE. VAL__BADD ) THEN

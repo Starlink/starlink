@@ -6,7 +6,7 @@ proc qmanUpdate {item value} {
     $QmanWidgets(END_RANGE_FIRST) insert 0 1
     $QmanWidgets(END_RANGE_LAST) delete 0 end
     $QmanWidgets(END_RANGE_LAST) insert 0 1
- 
+
   } elseif {[string trim ${item}] == "qmanIRange"} {
     $QmanWidgets(OBS_NUMBER) delete 0 end
     $QmanWidgets(OBS_NUMBER) insert 0 1

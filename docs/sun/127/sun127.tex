@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -41,71 +41,71 @@ University of Leicester\\
 \end{center}
 \vspace{5mm}
 
-The purpose of this note is to alert users to the existence of the EXOSAT 
-database system, to point them in the direction of the manuals and to 
-provide a very quick guide to accessing the system. It is not intended to be 
-a complete guide to all the facilities available, the on-line 
+The purpose of this note is to alert users to the existence of the EXOSAT
+database system, to point them in the direction of the manuals and to
+provide a very quick guide to accessing the system. It is not intended to be
+a complete guide to all the facilities available, the on-line
 and paper documentation fill these needs.
 
-The EXOSAT database system is a relational database management system 
-originally written by the EXOSAT observatory team and now being developed 
-at the HEASARC in the Goddard Space Flight Centre. The database system has 
-many associated 
-astronomical databases. Some of these databases have data 
-products associated with them, these may be plotted and analysed using 
-software within the EXOSAT database system. 
+The EXOSAT database system is a relational database management system
+originally written by the EXOSAT observatory team and now being developed
+at the HEASARC in the Goddard Space Flight Centre. The database system has
+many associated
+astronomical databases. Some of these databases have data
+products associated with them, these may be plotted and analysed using
+software within the EXOSAT database system.
 
-The EXOSAT database system is installed at Leicester University to provide 
-UK astronomers with easy access to the databases. It is also installed for 
-public use at 
-ESTEC and at the HEASARC in GSFC. The core databases are those resulting 
-from an automatic analysis of the data from the European X-ray astronomy 
+The EXOSAT database system is installed at Leicester University to provide
+UK astronomers with easy access to the databases. It is also installed for
+public use at
+ESTEC and at the HEASARC in GSFC. The core databases are those resulting
+from an automatic analysis of the data from the European X-ray astronomy
 satellite EXOSAT. This data, together with the associated data products, is
-installed at each site. Other databases may be installed worldwide or only 
-locally. 
+installed at each site. Other databases may be installed worldwide or only
+locally.
 
-At Leicester there are currently 24 databases available. Apart from the 
-EXOSAT databases, there are a number of EINSTEIN databases and many 
-astronomical catalogues, {\it e.g.}~SAO, 
-IRAS point source catalogue, HD, Variable Star Catalogue, etc. 
-An increasing number of ROSAT-related 
-databases will be made available as the mission progresses. An important 
-ROSAT database currently available is {\tt ROSSTL}, 
-the ROSAT short term timeline. 
-This database allows users to see the exact planned times of ROSAT 
-observations and is updated every week or so. Individual SCAR catalogues can 
-be incorporated into the EXOSAT database system on demand, subject to disc 
+At Leicester there are currently 24 databases available. Apart from the
+EXOSAT databases, there are a number of EINSTEIN databases and many
+astronomical catalogues, {\it e.g.}~SAO,
+IRAS point source catalogue, HD, Variable Star Catalogue, etc.
+An increasing number of ROSAT-related
+databases will be made available as the mission progresses. An important
+ROSAT database currently available is {\tt ROSSTL},
+the ROSAT short term timeline.
+This database allows users to see the exact planned times of ROSAT
+observations and is updated every week or so. Individual SCAR catalogues can
+be incorporated into the EXOSAT database system on demand, subject to disc
 space limitations.
 
-Extensive help is available to guide users of the system. Three ESA 
-technical memos (TM-11, TM-12, TM-13) have been distributed by ESA and 
+Extensive help is available to guide users of the system. Three ESA
+technical memos (TM-11, TM-12, TM-13) have been distributed by ESA and
 Starlink. These are:
 \begin{itemize}
 \item The EXOSAT Database System: Browse User's Guide
 \item The EXOSAT Database System: On-line User's Guide
 \item The EXOSAT Database System: Available Databases
 \end{itemize}
-Inevitably, given the significant development effort at the HEASARC, these 
-documents will become more or less dated. For this reason, substantial 
-on-line help is also available within the EXOSAT database system. Users 
+Inevitably, given the significant development effort at the HEASARC, these
+documents will become more or less dated. For this reason, substantial
+on-line help is also available within the EXOSAT database system. Users
 experiencing difficulties can e-mail me (LTVAD::JULO) for guidance.
 
-To use the EXOSAT database system at Leicester, users must login to the  
-captive account XRAY on the database machine LTXDB. No login password is 
-required, but users will asked for a password if the system does not recognise 
-them. 
+To use the EXOSAT database system at Leicester, users must login to the
+captive account XRAY on the database machine LTXDB. No login password is
+required, but users will asked for a password if the system does not recognise
+them.
 
-The main database programme is called {\tt browse}. 
-Enter {\tt browse} {\it dbname}, 
+The main database programme is called {\tt browse}.
+Enter {\tt browse} {\it dbname},
 where {\it dbname} is the database name, to access a database, or {\tt browse ?}
-to list the available databases. Within {\tt browse}, 
-enter {\tt ?} to get a list 
-of commands, and {\tt help} {\it command} to get help on that command. 
+to list the available databases. Within {\tt browse},
+enter {\tt ?} to get a list
+of commands, and {\tt help} {\it command} to get help on that command.
 
-A trivial sample login session is illustrated below. On login the user is 
+A trivial sample login session is illustrated below. On login the user is
 alerted to new bulletins. The command {\tt bulletin} is used to read these.
-In this sesion the following 
-{\tt browse} commands are used: {\tt sn} -- search by name; 
+In this sesion the following
+{\tt browse} commands are used: {\tt sn} -- search by name;
 {\tt lpa} -- list parameters; {\tt cdb} -- change database; {\tt ex} -- exit.
 
 \begin{verbatim}
@@ -163,7 +163,7 @@ ME_TOTAL_NAM 2> lpa
  #16  - PROCESS DATE                       SHF KEY OF MACRO RUN
  #17  - COUNT RATE                         CTS/SEC/4D     (CH:6:34)
  #18  - COUNT RATE ERROR                   ERR/SEC/4D
- <CR> continues, to exit type any character <CR> or Ctrlz 
+ <CR> continues, to exit type any character <CR> or Ctrlz
 ME_TOTAL_NAM 2> cdb ?
 The following SYSTEM databases are available:
 
@@ -185,7 +185,7 @@ The following SYSTEM databases are available:
     ROSSTL      ROSAT short term timeline
     RITTER      Ritter X-ray binary catalogue
     SAO         SAO catalog
- <CR> continues, to exit type any character <CR> or Ctrlz 
+ <CR> continues, to exit type any character <CR> or Ctrlz
 
 Database name: sao
 Loading SAO database sample TOTAL indexed on DEC

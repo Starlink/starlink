@@ -31,7 +31,7 @@ proc cgs4drLoadTask {task} {
      set fid2 [open $env(P4_CONFIG)/standard.p4 w]
      while {[gets $fid line] >=0 } {
        regsub -nocase "xwindows" ${line} "xwindows;$env(PID)xwin" line
-       puts $fid2 $line  
+       puts $fid2 $line
      }
      close $fid
      close $fid2

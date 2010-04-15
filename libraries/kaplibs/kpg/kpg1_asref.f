@@ -50,7 +50,7 @@
 *  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 1996, 1999 Central Laboratory of the Research 
+*     Copyright (C) 1996, 1999 Central Laboratory of the Research
 *                   Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research
 *                   Council.
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -96,7 +96,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,7 +121,7 @@
 
 *  Local Variables:
       CHARACTER * ( 6 ) CMODE    ! Uppercase copy of the access mode
-      INTEGER STATE              ! The state of the parameter 
+      INTEGER STATE              ! The state of the parameter
       LOGICAL VALID              ! Supplied reference is a locator?
 
 *.
@@ -145,11 +145,11 @@
 
 *  Obtain the NDF.
 *  ===============
-*         
+*
 *  There is a choice from where to obtain the NDF.  In order try the
 *  a) command line, b) graphics database, c) prompting.
 
-*  If a parameter was supplied, see if the NDF is pre-supplied on the 
+*  If a parameter was supplied, see if the NDF is pre-supplied on the
 *  command line.
       IF( PNNDF .NE. ' ' ) THEN
          CALL LPG_STATE( PNNDF, STATE, STATUS )
@@ -158,7 +158,7 @@
 *  Get an identifier to the input NDF if it has not already been
 *  obtained on the command line, using a supplied reference.  See if the
 *  reference is by locator or name.
-      IF ( (PNNDF .EQ. ' ' .OR. STATE .NE. PAR__ACTIVE ) .AND. 
+      IF ( (PNNDF .EQ. ' ' .OR. STATE .NE. PAR__ACTIVE ) .AND.
      :     GOTNAM ) THEN
 
          CALL DAT_VALID( NAME( :DAT__SZLOC ), VALID, STATUS )
@@ -174,12 +174,12 @@
             CALL MSG_OUT( 'REFNDF',
      :        'Using ^NDF as the input NDF.', STATUS )
 
-*  Flush the error and then tell the user that the displayed NDF cannot 
+*  Flush the error and then tell the user that the displayed NDF cannot
 *  be used. Then obtain an alternative NDF by association.
-         ELSE 
+         ELSE
             CALL ERR_FLUSH( STATUS )
             CALL MSG_BLANK( STATUS )
-            IF( PNNDF .NE. ' ' ) THEN 
+            IF( PNNDF .NE. ' ' ) THEN
                CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
      :                       'cannot be accessed. Please supply an '//
      :                       'alternative NDF.', STATUS )
@@ -196,5 +196,5 @@
       END IF
 
   999 CONTINUE
-      
+
       END

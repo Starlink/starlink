@@ -78,7 +78,7 @@ C
       CHARACTER NAME*80                     ! DTA_ name for object name
       INTEGER   NCH                         ! Characters in object name
       INTEGER   NDIM                        ! # of dimensions in error array
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     Return immediately on bad status
 C

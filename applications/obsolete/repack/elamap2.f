@@ -7,7 +7,7 @@
 * P McGale Apr 95
 *-
 	INCLUDE 'CONSTANTS.INC'
- 
+
 	ELAMAP2=((DBLE(ILA)*2.D0)-92.D0)*DTOR
- 
+
 	END

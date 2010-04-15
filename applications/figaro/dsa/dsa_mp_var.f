@@ -26,14 +26,14 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
 C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
 C     (<) ADDRESS      (Integer,ref) The address of the mapped array.
 C     (<) SLOT         (Integer,ref) A handle value associated with this
@@ -43,11 +43,11 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     ICH_FOLD, ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_SEEK_VARIANCE, 
+C     ICH_FOLD, ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_SEEK_VARIANCE,
 C     DSA_DATA_SIZE, DSA_MAP_ARRAY, DSA_MAP_DUMMY, DSA_NFILL_ARRAY
 C     DSA_GET_ACTUAL_NAME, DSA__VARIANCE_NAME, DSA__CREATE_ARRAY,
 C     DSA_ERR_TO_VARIANCE, DSA_GET_WORK_ARRAY
@@ -61,10 +61,10 @@ C
 C  Version date: 26th October 1994
 C-
 C     (>) MAX_AXES  (Integer parameter) Maximum number of axes in data.
-C     (>) ERROR_UPDATE (Logical array) Indicates that the error array has 
+C     (>) ERROR_UPDATE (Logical array) Indicates that the error array has
 C                   been updated (or at least, mapped for update).
 C     (<) MAP_CALL_VSLOT(Integer array) Work entry used for err<->variance
-C                       array conversions.  
+C                       array conversions.
 C     (>) VARIANCE_CODE (Integer parameter) Error type is `variance'
 C
 C  Subroutine / function details:
@@ -139,10 +139,10 @@ C
       CHARACTER NUMBER*16                   ! Used to format numbers
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Name of structure
       CHARACTER TYPE_UC*8                   ! Upper case version of TYPE
-      INTEGER   WORK_ADDRESS                ! Address of work array used 
+      INTEGER   WORK_ADDRESS                ! Address of work array used
       INTEGER   WORK_SLOT                   ! Slot number of work array used
 C
 C     Return immediately on bad status.  Note, by the way, that this routine
@@ -162,7 +162,7 @@ C     the error array should match.
 C
       CALL DSA_DATA_SIZE (REF_NAME,MAX_AXES,NDIM,DIMS,NELM,STATUS)
 C
-C     See if there in in fact any variance data.  
+C     See if there in in fact any variance data.
 C
       CALL DSA_SEEK_VARIANCE (REF_NAME,EXIST,STATUS)
 C
@@ -179,7 +179,7 @@ C        array.
 C
 C        Look up the reference name in the tables and get the name
 C        of the main structure object, then get the name of the variance array.
-C          
+C
          CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
          CALL DSA__VARIANCE_NAME (REF_SLOT,OBJ_NAME,LENGTH,ERR_TYPE)
 C
@@ -220,12 +220,12 @@ C
          END IF
 C
 C        Now, allow for the possibility that the array we just mapped
-C        was actually an uncertainty array.  
+C        was actually an uncertainty array.
 C
          IF (ERR_TYPE.EQ.UNCERTAINTY_CODE) THEN
 C
-C           It was, so we need to get a workspace array to serve as the actual 
-C           variance array, and need to convert the data into it.  First get 
+C           It was, so we need to get a workspace array to serve as the actual
+C           variance array, and need to convert the data into it.  First get
 C           the work array.
 C
             CALL DSA_GET_WORK_ARRAY (NELM,TYPE,WORK_ADDRESS,
@@ -236,7 +236,7 @@ C           Now we flag the map call slot to indicate that it represents
 C           the mapping of an error array tied to a variance work array.
 C           Not that the use of the +ve slot # indicates the way round the
 C           conversion has been done.
-C     
+C
             MAP_CALL_VSLOT(SLOT)=WORK_SLOT
 C
 C           And now we have to process the error array into a variance
@@ -265,7 +265,7 @@ C
             END IF
             ADDRESS=WORK_ADDRESS
          END IF
-C        
+C
       ELSE
 C
 C        There is no variance array, so we need to generate a dummy one.

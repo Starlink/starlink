@@ -1,4 +1,4 @@
-      SUBROUTINE COF_TYPSZ( TYPE, NBYTES, STATUS )         
+      SUBROUTINE COF_TYPSZ( TYPE, NBYTES, STATUS )
 *+
 *  Name:
 *     COF_TYPSZ
@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_TYPSZ( TYPE, NBYTES, STATUS )         
+*     CALL COF_TYPSZ( TYPE, NBYTES, STATUS )
 
 *  Description:
 *     If the input TYPE is one of the HDS primitive numeric data types,
-*     i.e. one of _REAL, _DOUBLE, _INTEGER, _WORD, _UWORD, _BYTE or 
+*     i.e. one of _REAL, _DOUBLE, _INTEGER, _WORD, _UWORD, _BYTE or
 *      _UBYTE, then the number of bytes used by that data type is
 *     returned as NBYTES. The values are those stored as the symbolic
 *     constants VAL__NBx in the PRM_PAR include file. (See SUN/39.)
@@ -91,7 +91,7 @@
 *  the PRIMDAT constants.
       IF ( CHR_SIMLR( TYPE, '_REAL' ) ) THEN
          NBYTES = VAL__NBR
-      
+
       ELSE IF ( CHR_SIMLR( TYPE, '_DOUBLE' ) ) THEN
          NBYTES = VAL__NBD
 

@@ -1,26 +1,26 @@
       SUBROUTINE SORT(NPTS,ARRAY)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    S O R T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPTS (<), ARRAY (><)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
-C
-C  
 C
 C
-C Heapsort algorithm 
+C
+C
+C
+C Heapsort algorithm
 C
 C
 C

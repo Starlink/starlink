@@ -14,22 +14,22 @@
 
 *  Description:
 *     This routine reads formatted positions from a GRP group. The
-*     positions are assumed to be in the supplied Frame. Each element 
-*     in the group should contain 1 position per line. Each position is 
-*     given by a set of strings delimited by comma, space or tab (the 
-*     first gives the value for axis 1, the second for axis 2, etc). The 
-*     number of strings per element in the group should equal the number 
+*     positions are assumed to be in the supplied Frame. Each element
+*     in the group should contain 1 position per line. Each position is
+*     given by a set of strings delimited by comma, space or tab (the
+*     first gives the value for axis 1, the second for axis 2, etc). The
+*     number of strings per element in the group should equal the number
 *     of axes in the Base Frame of the supplied FrameSet.
 *
 *     An error is reported if any unreadable elements are found.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of an environment parameter to use to get the indices of 
-*        the columns within the text file which are to be used. If blank, 
+*        The name of an environment parameter to use to get the indices of
+*        the columns within the text file which are to be used. If blank,
 *        the file must contain exactly NAX columns, all of which are used.
 *        If a null value is supplied, the dynamic default values will be
-*        used which is [1,2,3... NAX]. 
+*        used which is [1,2,3... NAX].
 *     FRM = INTEGER (Given)
 *        A pointer to an AST Frame.
 *     IGRP = INTEGER (Given)
@@ -39,7 +39,7 @@
 *     NAX = INTEGER (Given)
 *        The number of axes in the supplied Frame.
 *     OUT( NP, NAX ) = DOUBLE PRECISION (Returned)
-*        The array to hold the returned co-ordinates. 
+*        The array to hold the returned co-ordinates.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -150,7 +150,7 @@
          POSDUP = .TRUE.
          DO WHILE ( POSDUP .AND. STATUS .EQ. SAI__OK )
 
-*  Get the co-ordinates.  
+*  Get the co-ordinates.
             CALL PAR_GDR1I( PARAM, NAX, POSDEF, 1, VAL__MAXI, .TRUE.,
      :                      POSCOD, STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
@@ -161,7 +161,7 @@
 *  Check for duplication of the  co-ordinate columns.
                DO I = 1, NAX - 1
                   DO J = I + 1, NAX
-                     IF( POSCOD( I ) .EQ. POSCOD( J ) .AND. 
+                     IF( POSCOD( I ) .EQ. POSCOD( J ) .AND.
      :                   STATUS .EQ. SAI__OK ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'I', I )
@@ -172,8 +172,8 @@
                         CALL ERR_REP( 'KPG1_ASGRP_ERR1', '^I and ^J '//
      :                           'columns specified by parameter %^P '//
      :                           'are equal.', STATUS )
-                     END IF   
-                  END DO   
+                     END IF
+                  END DO
                END DO
 
 *  Report the error immediately, and reset the status to OK.
@@ -207,18 +207,18 @@
 
 *  Loop round each element in the group.
       DO I = 1, MIN( SIZE, NP )
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
+         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
 
 *  Assume the element cannot be read.
          OK = .FALSE.
 
 *  Replace commas and tabs by spaces.
          LSTAT = SAI__OK
-         CALL CHR_TRCHR( ',	', '  ', TEXT, LSTAT ) 
+         CALL CHR_TRCHR( ',	', '  ', TEXT, LSTAT )
 
 *  Split the element up in to words delimited by spaces.
-         CALL CHR_DCWRD( TEXT, MXCOL, NWRD, WSTART, WSTOP, WORDS, 
-     :                   LSTAT ) 
+         CALL CHR_DCWRD( TEXT, MXCOL, NWRD, WSTART, WSTOP, WORDS,
+     :                   LSTAT )
 
 *  If this element has too many or too few fields, store a message.
          IF( NWRD .LT. POSMAX ) THEN
@@ -228,11 +228,11 @@
             MESS = 'too many fields'
 
 *  Otherwise...
-         ELSE 
+         ELSE
 
 *  Assume the element can be read OK.
             OK = .TRUE.
- 
+
 *  Loop round each required column.
             DO K = 1, NAX
 
@@ -243,8 +243,8 @@
                NCW = WSTOP( J ) - WSTART( J ) + 1
 
 *  Attempt to read an axis value from the current word.
-               NC = AST_UNFORMAT( FRM, J, WORDS( J )( : NCW ), 
-     :                            OUT( I, J ), STATUS ) 
+               NC = AST_UNFORMAT( FRM, J, WORDS( J )( : NCW ),
+     :                            OUT( I, J ), STATUS )
 
 *  If the word could not be decoded, or if not all of the word was used,
 *  we cannot use this group element.
@@ -270,7 +270,7 @@
             IF( MESS .EQ. ' ' ) THEN
                CALL ERR_REP( 'KPG1_ASGRP_1', 'The following string '//
      :                       'could not  be interpreted as a ^N '//
-     :                       'dimensional ^D position: ''^TEXT''.', 
+     :                       'dimensional ^D position: ''^TEXT''.',
      :                       STATUS )
             ELSE
                CALL MSG_SETC( 'M', MESS )

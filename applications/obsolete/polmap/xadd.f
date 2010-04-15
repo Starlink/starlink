@@ -1,23 +1,23 @@
       SUBROUTINE XADD(NPARAMS,PARAMS,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     X A D D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), LAMBDA (><), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C
@@ -56,5 +56,5 @@ C
       DO I=1,NPTS
        LAMBDA(I)=LAMBDA(I)+DX
       ENDDO
-666   CONTINUE  
+666   CONTINUE
       END

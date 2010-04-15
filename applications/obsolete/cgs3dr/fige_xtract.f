@@ -3,7 +3,7 @@ C+
      :   NX,NY,IYST,IYEN,VARIANCE,QUALITY,FLAGGED,FBAD,SPECT,
      :   SPECT_VARIANCE,SPECT_QUALITY,NUMBER,SUM,SUMSQ)
 C
-C     F I G E _ X T R A C T 
+C     F I G E _ X T R A C T
 C
 C     Averages consecutive rows of an image to form a 1-dimensional spectrum,
 C     and calculates the error on the mean.
@@ -78,7 +78,7 @@ C
          END IF
 
       ELSE IF (I2 .GT. I1) THEN
- 
+
          DO I=1,NX
             NUMBER(I) = 0
             SUM(I) = 0.0
@@ -94,7 +94,7 @@ C
                   SUMSQ(I) = SUMSQ(I) + IMAGE(I,J)**2
                   NUMBER(I) = NUMBER(I) + 1
                END DO
- 
+
             END DO
 
          ELSE IF (QUALITY) THEN

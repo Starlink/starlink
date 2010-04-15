@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_BFPRE( IPLOT, MAP, NPOS, NAXIN, MARK, MARKER, 
-     :                       NPAR, FPAR, STATUS ) 
+      SUBROUTINE KPS1_BFPRE( IPLOT, MAP, NPOS, NAXIN, MARK, MARKER,
+     :                       NPAR, FPAR, STATUS )
 *+
 *  Name:
 *     KPS1_BFPRE
@@ -15,7 +15,7 @@
 *                      NPAR, FPAR, STATUS )
 
 *  Description:
-*     This routine indicates graphically the location of the beam and 
+*     This routine indicates graphically the location of the beam and
 *     optionally the beam's size and orientation as an ellipse,
 *     depending on argument MARK.
 
@@ -25,16 +25,16 @@
 *     IPLOT = INTEGER (Given)
 *        The identfier of the plot obtained from graphics database.
 *        It is only accessed in Cursor mode when Mark='ELLIPSE'.
-*     MAP = INTEGER (Given) 
+*     MAP = INTEGER (Given)
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the PIXEL Frame of the NDF.
-*     MARK = CHARACTER * ( * ) (Given) 
-*        What positions are to be marked?  Can be "INITIAL", "FIT", 
+*     MARK = CHARACTER * ( * ) (Given)
+*        What positions are to be marked?  Can be "INITIAL", "FIT",
 *        'ELLIPSE' or "NONE".
-*     NAXIN = INTEGER (Given) 
+*     NAXIN = INTEGER (Given)
 *        The number of axes in the Frame in which the initial guess
 *        positions are supplied.
-*     MARKER = INTEGER (Given) 
+*     MARKER = INTEGER (Given)
 *        The PGPLOT number for the marker type to mark the positions
 *        specified by MARK.
 *     NPAR = INTEGER (Given)
@@ -81,7 +81,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +124,7 @@
       INTEGER ELL                ! Ellipse identifier
       INTEGER I                  ! Position index
       INTEGER ICURR              ! Current PLOT Frame
-      INTEGER IMARK              ! Marker to use when marking initial 
+      INTEGER IMARK              ! Marker to use when marking initial
                                  ! positions
       DOUBLE PRECISION INCEN( BF__MXPOS, 2 )! Beam graphics positions
       INTEGER J                  ! Axis index
@@ -152,7 +152,7 @@
      :                 'pixel Frame of the NDF is not defined.',
      :                 STATUS )
 
-      ELSE IF ( ( MARK( 1 : 1 ) .EQ. 'F' .OR. 
+      ELSE IF ( ( MARK( 1 : 1 ) .EQ. 'F' .OR.
      :            MARK( 1 : 1 ) .EQ. 'E' ) .AND.
      :          .NOT. AST_GETL( MAP, 'TRANINVERSE', STATUS ) ) THEN
          CALL MSG_OUT( 'KPS1_BFPRE_MSG1','The Mapping required '//
@@ -167,7 +167,7 @@
 
 *  Store the marker to use.
       CMARK = -999
-      IF ( MARK( 1 : 1 ) .EQ. 'F' .OR. 
+      IF ( MARK( 1 : 1 ) .EQ. 'F' .OR.
      :     MARK( 1 : 1 ) .EQ. 'E' ) CMARK = MARKER
 
       IF ( MARK( 1 : 1 ) .EQ. 'E' ) THEN
@@ -208,9 +208,9 @@
             CENTRE( 2 ) = INCEN( I, 2 )
 
 *  Mark it.
-            IF ( CENTRE( 1 ) .NE. AST__BAD .AND. 
+            IF ( CENTRE( 1 ) .NE. AST__BAD .AND.
      :           CENTRE( 2 ) .NE. AST__BAD ) THEN
-               CALL PGPT( 1, REAL( CENTRE( 1 ) ), REAL( CENTRE( 2 ) ), 
+               CALL PGPT( 1, REAL( CENTRE( 1 ) ), REAL( CENTRE( 2 ) ),
      :                    CMARK )
             END IF
 
@@ -219,8 +219,8 @@
             IF ( MARK( 1 : 1 ) .EQ. 'E' ) THEN
 
 *  Assemble the relevant parameters in the required data types.
-*  Sky position angles are already correct.  However, for Cartesian 
-*  systems the position angle is measured from positive Y through 
+*  Sky position angles are already correct.  However, for Cartesian
+*  systems the position angle is measured from positive Y through
 *  negative X and KPS1_ELMAP wants the opposite polarity.
                K = ( I - 1 ) * BF__NCOEF
                WIDIN = REAL( MIN( FPAR( 3 + K ), FPAR( K + 4 ) ) )
@@ -242,14 +242,14 @@
                ORIENT( 2 ) = ORIENT( 1 )
 
 *  Define an Ellipse in the current Frame of the Plot.
-               ELL = AST_ELLIPSE( BASFRM, 1, CENTRE, SEMIAX, ORIENT, 
+               ELL = AST_ELLIPSE( BASFRM, 1, CENTRE, SEMIAX, ORIENT,
      :                            AST__NULL, ' ', STATUS )
 
 *  Add the Ellipse into the Plot, first remembering the current Frame.
 *  The Ellipse becomes the new current Frame in the Plot.  Since it is
-*  defined in the original current Frame of the Plot, we can use a 
+*  defined in the original current Frame of the Plot, we can use a
 *  UnitMap to connect the Ellipse to the current Frame of the Plot.
-               CALL AST_ADDFRAME( IPLOT, AST__BASE,  
+               CALL AST_ADDFRAME( IPLOT, AST__BASE,
      :                            AST_UNITMAP( 2, '', STATUS ), ELL,
      :                            STATUS )
 

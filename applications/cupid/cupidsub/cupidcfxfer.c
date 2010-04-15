@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include <string.h>
 
-void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
+void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
                   int skip[3], int *status ){
 /*
 *+
@@ -16,7 +16,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
+*     void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *                       int skip[3], int *status )
 
 *  Description:
@@ -31,14 +31,14 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *        Pointer to the source PixelSet structure containing the pixels to
 *        be moved.
 *     ps2
-*        Pointer to the destination PixelSet structure to receive the pixels 
+*        Pointer to the destination PixelSet structure to receive the pixels
 *        moved from "ps1".
 *     ipa
 *        Pointer to the start of the array holding the integer index
 *        (if any) associated with each pixel in the data array. This
 *        array should be the same shape and size as the data array.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords.
 *        Unused trailing elements should be filled with zero.
@@ -101,10 +101,10 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 /* Get the index value of the destination PixelSet. */
    new_index = ps2->index;
 
-/* Get a pointer to the first pixel in the source PixelSet bounding box. If 
-   the data  has less than 3 axes, the unused upper and lower bounds will be 
-   set to [1,1] and so we can always pretend there are 3 axes. */ 
-   v = ipa + ( ps1->lbnd[ 0 ] - 1 ) + ( ps1->lbnd[ 1 ] - 1 )*skip[ 1 ] + 
+/* Get a pointer to the first pixel in the source PixelSet bounding box. If
+   the data  has less than 3 axes, the unused upper and lower bounds will be
+   set to [1,1] and so we can always pretend there are 3 axes. */
+   v = ipa + ( ps1->lbnd[ 0 ] - 1 ) + ( ps1->lbnd[ 1 ] - 1 )*skip[ 1 ] +
              ( ps1->lbnd[ 2 ] - 1 )*skip[ 2 ];
 
 /* Loop round the pixels in the source PixelSet bounding box. */
@@ -114,7 +114,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
          v1 = v;
          for( i = ps1->lbnd[ 0 ]; i <= ps1->ubnd[ 0 ]; i++ ) {
 
-/* Assign the new index to the pixel, if the pixel was originally a member 
+/* Assign the new index to the pixel, if the pixel was originally a member
    of the source PixelSet.  */
             if( *v == old_index ) *v = new_index;
 
@@ -140,7 +140,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    ps2->pop += ps1->pop;
    ps1->pop = 0;
 
-/* If the source PixelSet touches the edge, then so does the destination 
+/* If the source PixelSet touches the edge, then so does the destination
    PixelSet. */
    if( ps1->edge ) ps2->edge = 1;
 

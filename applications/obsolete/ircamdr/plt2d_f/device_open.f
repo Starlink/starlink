@@ -82,7 +82,7 @@
 	END IF
 
 * get workstation extent
-	CALL GQDSP( WKSTN_SEQ, ERROR, UDVCRD, SCREEN_X, SCREEN_Y, 
+	CALL GQDSP( WKSTN_SEQ, ERROR, UDVCRD, SCREEN_X, SCREEN_Y,
      :              MAX_X, MAX_Y)
 
 * subtract one unit from workstation size in both dimensions ????
@@ -150,11 +150,11 @@
 * setup maximum and minimum color indices for image display
 	CALL PAR_GET0I( 'NUM_LINECOL', NLINECOL, STATUS)
 
-*      Test if device is QMS or PS and therefore cause max/min colors are 
+*      Test if device is QMS or PS and therefore cause max/min colors are
 *      wrong from GKS driver (1,1 instead of 31,0???) set'um
-	IF( DEVICE_NAME .EQ. 'QMS_LANDSCAPE' .OR. 
+	IF( DEVICE_NAME .EQ. 'QMS_LANDSCAPE' .OR.
      :	    DEVICE_NAME .EQ. 'QMS_PORTRAIT' .OR.
-     :	    DEVICE_NAME .EQ. 'PS_LANDSCAPE' .OR. 
+     :	    DEVICE_NAME .EQ. 'PS_LANDSCAPE' .OR.
      :	    DEVICE_NAME .EQ. 'PS_PORTRAIT' .OR.
      :	    DEVICE_NAME .EQ. 'EPSP' .OR.
      :	    DEVICE_NAME .EQ. 'EPSL' .OR.
@@ -176,8 +176,8 @@
 	END IF
 	CALL MSG_BLANK ( STATUS )
 	CALL MSG_SETI( 'AVAIL', MAXIMCOL-MINIMCOL+1)
-	CALL MSG_OUT('NCELL', 
-     :          'Maximum number of colour cells available = ^AVAIL', 
+	CALL MSG_OUT('NCELL',
+     :          'Maximum number of colour cells available = ^AVAIL',
      :	        STATUS)
 
 * store range of pens used for line graphics in parameter system
@@ -185,9 +185,9 @@
 	CALL PAR_PUT0I( 'LPENMAX', NCOLI, STATUS)
 
 * put calculated pen numbers into the parameter system variables
-	IF( DEVICE_NAME .NE. 'QMS_LANDSCAPE' .AND. 
+	IF( DEVICE_NAME .NE. 'QMS_LANDSCAPE' .AND.
      :	    DEVICE_NAME .NE. 'QMS_PORTRAIT' .AND.
-     :	    DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND. 
+     :	    DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND.
      :	    DEVICE_NAME .NE. 'PS_PORTRAIT' .AND.
      :	    DEVICE_NAME .NE. 'EPSP' .AND.
      :	    DEVICE_NAME .NE. 'EPSL' .AND.

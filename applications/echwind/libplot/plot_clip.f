@@ -24,7 +24,7 @@ c
       rxr=float(clipxr)
       ryb=float(clipyb)
       ryt=float(clipyt)
-     
+
       call plot_clipr(rx1, ry1, rx2, ry2, rxl, ryb, rxr, ryt, visible)
 
       x1=nint(rx1)

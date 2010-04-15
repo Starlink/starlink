@@ -20,22 +20,22 @@
 *     should include suitable COFRAME or WCS statements to indicate which
 *     coordinate system is being used. If no COFRAME or WCS statements
 *     are included in the ARD description, then it is assumed that
-*     positions within the ARD description are given in the current Frame 
+*     positions within the ARD description are given in the current Frame
 *     of the supplied FrameSet, IWCS.
-*   
+*
 *     If this routine is not called prior to ARD_WORK (or if it is
 *     called with IWCS set AST__NULL), then the ARD description must
-*     provide (either directly or through a WCS statement) positions in 
+*     provide (either directly or through a WCS statement) positions in
 *     pixel coordinates.
 *
 *     The FrameSet pointer supplied is simply stored by this routine.
-*     If any changes are subsequently made to the FrameSet by the calling 
-*     routine, then these changes will be visible within ARD_WORK. In 
-*     particular, if the calling routine annulls the FrameSet pointer, 
+*     If any changes are subsequently made to the FrameSet by the calling
+*     routine, then these changes will be visible within ARD_WORK. In
+*     particular, if the calling routine annulls the FrameSet pointer,
 *     then ARD_WORK will fail.
 *
-*     The supplied FrameSet will be used by all subsequent calls to ARD_WORK 
-*     until a new FrameSet is specified by calling ARD_WCS again. 
+*     The supplied FrameSet will be used by all subsequent calls to ARD_WORK
+*     until a new FrameSet is specified by calling ARD_WCS again.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
@@ -43,9 +43,9 @@
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        The Domain name corresponding to pixel co-ordinates within the
 *        mask array passed to routine ARD_WORK. If a blank value is
-*        supplied, "PIXEL" will be used. The IWCS FrameSet (if supplied) 
-*        must contain a Frame with this Domain. If the supplied string is 
-*        longer than 40 characters, the trailing characters are ignored. 
+*        supplied, "PIXEL" will be used. The IWCS FrameSet (if supplied)
+*        must contain a Frame with this Domain. If the supplied string is
+*        longer than 40 characters, the trailing characters are ignored.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,11 +119,11 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Start an new error reporting context.
-      CALL ERR_MARK     
+      CALL ERR_MARK
 
 *  If the supplied value is not AST__NULL or a FrameSet, set a flag.
-      IF( IWCS .NE. AST__NULL ) THEN 
-         OK = AST_ISAFRAMESET( IWCS, STATUS ) 
+      IF( IWCS .NE. AST__NULL ) THEN
+         OK = AST_ISAFRAMESET( IWCS, STATUS )
       ELSE
          OK = .TRUE.
       END IF
@@ -136,7 +136,7 @@
 
 *  If a valid FrameSet pointer (or AST__NULL) was supplied, store it,
 *  together with the pixel Domain name.
-      IF( OK ) THEN 
+      IF( OK ) THEN
          CMN_AWCS = IWCS
          IF( CHR_LEN( DOMAIN ) .GT. 0 ) THEN
             CMN_ADOM = DOMAIN

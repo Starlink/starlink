@@ -1,14 +1,14 @@
 
 *+  MOSCORSUB - calculates d.c. sky offset between an image mosaic pair
 
-      SUBROUTINE MOSCORSUB ( ARRAYA, DIMSAX, DIMSAY, ARRAYB, 
+      SUBROUTINE MOSCORSUB ( ARRAYA, DIMSAX, DIMSAY, ARRAYB,
      :	                     DIMSBX, DIMSBY, XOFF, YOFF,
-     :                       USEWHAT, VALUEA, VALUEB, DCOFF, 
+     :                       USEWHAT, VALUEA, VALUEB, DCOFF,
      :	                     STATUS )
 
 *    Description :
 *
-*     This routine calculates the d.c. sky offset between the two images of 
+*     This routine calculates the d.c. sky offset between the two images of
 *     a mosaic pair. The value returned is the offset from the first to
 *     second frame i.e. if the first frame has a mean level of 100 in the
 *     overlap region, and the second has a mean level of 200 in the overlap
@@ -16,13 +16,13 @@
 *
 *    Invocation :
 *
-*     CALL MOSCORSUB ( ARRAYA, DIMSAX, DIMSAY, ARRAYB, DIMSBX, DIMSBY, 
+*     CALL MOSCORSUB ( ARRAYA, DIMSAX, DIMSAY, ARRAYB, DIMSBX, DIMSBY,
 *                      XOFF, YOFF, DCOFF, STATUS )
 *
 *    Parameters :
 *
 *     ARRAYA( DIMSAX, DIMSAY )  =  REAL( READ )
-*         First input image 
+*         First input image
 *     DIMSAX  =  INTEGER( READ )
 *     DIMSAY  =  INTEGER( READ )
 *         Dimensions of first input image
@@ -83,11 +83,11 @@
      :	  BYST,
      :	  BYEN
 
-      INTEGER 
+      INTEGER
      :  ANUMPIX,         ! number of pixels in sub-array
      :  BNUMPIX          ! number of pixels in sub-array
 
-      REAL 
+      REAL
      :  ATOTAL,          ! total of pixels in sub-array
      :  AMEAN,           ! mean of pixels in sub-array
      :  ASTDDEV,         ! standard deviation of pixels in sub-array
@@ -120,7 +120,7 @@
 
 *    Local variables :
 
-      CHARACTER*(*) 
+      CHARACTER*(*)
      :    USEWHAT
 
 *-
@@ -130,8 +130,8 @@
       ENDIF
 
 *    method of looping around overlap pixels depends upon the relative
-*    orientation of the mosaic images 
-      IF ( XOFF .GE. 0 .AND. YOFF .GE. 0 ) THEN 
+*    orientation of the mosaic images
+      IF ( XOFF .GE. 0 .AND. YOFF .GE. 0 ) THEN
 
 *       define x,y start and end for both images
          AXST = ABS( XOFF)+1
@@ -143,7 +143,7 @@
 	 BXEN = MIN( ( DIMSAX-ABS( XOFF)), DIMSBX)
 	 BYEN = MIN( ( DIMSAY-ABS( YOFF)), DIMSBY)
 
-      ELSE IF ( XOFF .GE. 0 .AND. YOFF .LT. 0 ) THEN  
+      ELSE IF ( XOFF .GE. 0 .AND. YOFF .LT. 0 ) THEN
 
 *       define x,y start and end for both images
          AXST = ABS( XOFF)+1
@@ -155,7 +155,7 @@
 	 BXEN = MIN( ( DIMSAX-ABS( XOFF)), DIMSBX)
 	 BYEN = MIN( ( DIMSAY+ABS( YOFF)), DIMSBY)
 
-      ELSE IF ( XOFF .LT. 0 .AND. YOFF .LT. 0 ) THEN 
+      ELSE IF ( XOFF .LT. 0 .AND. YOFF .LT. 0 ) THEN
 
 *       define x,y start and end for both images
          AXST = 1
@@ -167,7 +167,7 @@
 	 BXEN = MIN( ( ABS( XOFF)+DIMSAX), DIMSBX)
 	 BYEN = MIN( ( ABS( YOFF)+DIMSAY), DIMSBY)
 
-      ELSE   
+      ELSE
 
 *       define x,y start and end for both images
          AXST = 1
@@ -200,11 +200,11 @@
      :          /' and is ^BXSZ by ^BYSZ pixels',
      :	STATUS)
 
-      IF( AXST .LE. 0.0 .OR. 
+      IF( AXST .LE. 0.0 .OR.
      :    AYST .LE. 0.0 .OR.
      :    ( AXEN-AXST+1) .LE. 0.0 .OR.
      :    ( AYEN-AYST+1) .LE. 0.0 .OR.
-     :	  BXST .LE. 0.0 .OR. 
+     :	  BXST .LE. 0.0 .OR.
      :    BYST .LE. 0.0 .OR.
      :    ( BXEN-BXST+1) .LE. 0.0 .OR.
      :    ( BYEN-BYST+1) .LE. 0.0) THEN
@@ -213,7 +213,7 @@
 	CALL MSG_OUT( 'ERR', 'ERROR, Images do not overlap!!', STATUS)
 	CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-	ANUMPIX = 0 
+	ANUMPIX = 0
 	AMAXIMUM = -999
         AMINIMUM = -999
 	ATOTAL = -999
@@ -221,7 +221,7 @@
 	ASTDDEV = -999
 	AMEDIAN = -999
 	AMODE = -999
-	BNUMPIX = 0 
+	BNUMPIX = 0
 	BMAXIMUM = -999
         BMINIMUM = -999
 	BTOTAL = -999
@@ -233,21 +233,21 @@
       ELSE
 
         CALL MOSSTATSSUB( ARRAYA, DIMSAX, DIMSAY, AXST, AYST,
-     :                    ( AXEN-AXST+1), ( AYEN-AYST+1), 
+     :                    ( AXEN-AXST+1), ( AYEN-AYST+1),
      : 	                  ANUMPIX, AMAXIMUM, AMINIMUM,
      :                    ATOTAL, AMEAN, ASTDDEV, STATUS )
 
         CALL MOSSTATSSUB2( ARRAYA, DIMSAX, DIMSAY, AXST, AYST,
-     :	                   ( AXEN-AXST+1), ( AYEN-AYST+1), 
+     :	                   ( AXEN-AXST+1), ( AYEN-AYST+1),
      :	                   AMEDIAN, AMODE)
 
         CALL MOSSTATSSUB( ARRAYB, DIMSBX, DIMSBY, BXST, BYST,
-     :                    ( BXEN-BXST+1), ( BYEN-BYST+1), 
+     :                    ( BXEN-BXST+1), ( BYEN-BYST+1),
      :	                  BNUMPIX, BMAXIMUM, BMINIMUM,
      :                    BTOTAL, BMEAN, BSTDDEV, STATUS )
 
         CALL MOSSTATSSUB2( ARRAYB, DIMSBX, DIMSBY, BXST, BYST,
-     : 	                   ( BXEN-BXST+1), ( BYEN-BYST+1), 
+     : 	                   ( BXEN-BXST+1), ( BYEN-BYST+1),
      :	                   BMEDIAN, BMODE)
 
         IF( USEWHAT .EQ. 'MEAN') THEN

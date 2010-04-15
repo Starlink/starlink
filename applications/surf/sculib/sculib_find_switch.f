@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_FIND_SWITCH (DEMOD_POINTER, N_SWITCHES, 
+      SUBROUTINE SCULIB_FIND_SWITCH (DEMOD_POINTER, N_SWITCHES,
      :  N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS, SWITCH, EXP,
      :  INT, MEAS, S_START, S_END, STATUS)
 *+
@@ -16,7 +16,7 @@
 *     than the start index of the next, or the index of the last position
 *     measured if the specified switch is the last in the observation. This
 *     makes things a little complicated because consecutive switches within
-*     an exposure need not have been taken and stored consecutively, 
+*     an exposure need not have been taken and stored consecutively,
 *     though exposures, integrations and measurements are ordered as one
 *     would expect.
 
@@ -116,7 +116,7 @@
 *  Local variables:
       INTEGER E                        ! exposure index in DO loop
       INTEGER I                        ! integer index in DO loop
-      INTEGER M                        ! measurement index in DO loop 
+      INTEGER M                        ! measurement index in DO loop
       INTEGER S                        ! switch index in DO loop
 
 *  Internal References:
@@ -142,7 +142,7 @@
       DO M = 1, N_MEASUREMENTS
          DO I = 1, N_INTEGRATIONS
             DO E = 1, N_EXPOSURES
-               DO S = 1, N_SWITCHES 
+               DO S = 1, N_SWITCHES
 
                   IF ((DEMOD_POINTER(S,E,I,M) .GT. S_START) .AND.
      :                 (DEMOD_POINTER(S,E,I,M) .LT. S_END)) THEN

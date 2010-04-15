@@ -2,11 +2,11 @@
 C
 C
 C
- 
+
 ************************************************************************
- 
+
       SUBROUTINE OUTFIL(IFILE,FILE,ISTAT)
- 
+
 *+
 *  Name :
 *     OUTFIL
@@ -45,46 +45,46 @@ C
 *        Corrected argument list by adding status argument.
 *        Unix does not allow multiple versions of a file.
 *-
- 
+
 *  Type Definitions :
       IMPLICIT NONE
- 
+
 *  Arguments Given :
       INTEGER IFILE
       CHARACTER*(30) FILE
- 
+
 *  Status :
       INTEGER ISTAT
- 
+
 *  Local Variables :
       LOGICAL EXIST
- 
+
       CHARACTER*30 ANSWER
 *.
- 
+
 *   See if the file already exists
  100  CONTINUE
       INQUIRE (FILE=FILE,EXIST=EXIST)
- 
+
 *   If the file exists ask for another name ( default OVERWRITE )
       IF ( EXIST ) THEN
          CALL STUPID('This file already exists: ' // FILE)
          ANSWER = 'OVERWRITE'
          CALL GETNAM('New output file name:',ANSWER)
- 
+
 *   Delete the existing file if OVERWRITE is chosen
          IF ( ANSWER.EQ.'OVERWRITE' ) THEN
             OPEN (IFILE,FILE=FILE,STATUS='OLD')
             CLOSE (IFILE,STATUS='DELETE')
- 
+
 *   Otherwise use the one given
          ELSE
             FILE = ANSWER
             GO TO 100
          END IF
       END IF
- 
+
 *   Open the file
       OPEN (IFILE,FILE=FILE,STATUS='NEW',IOSTAT=ISTAT)
- 
+
       END

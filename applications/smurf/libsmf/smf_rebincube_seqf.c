@@ -14,30 +14,30 @@
 
 *  Invocation:
 *     void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
-*                              double *blk_bot, AstMapping *this, double wlim, 
-*                              int ndim_in, const int lbnd_in[], 
-*                              const int ubnd_in[], const float in[], 
-*                              const float in_var[], int spread, 
-*                              const double params[], int flags, 
-*                              double tol, int maxpix, float badval, 
-*                              int ndim_out, const int lbnd_out[], 
-*                              const int ubnd_out[], const int lbnd[], 
-*                              const int ubnd[], float out[], float out_var[], 
+*                              double *blk_bot, AstMapping *this, double wlim,
+*                              int ndim_in, const int lbnd_in[],
+*                              const int ubnd_in[], const float in[],
+*                              const float in_var[], int spread,
+*                              const double params[], int flags,
+*                              double tol, int maxpix, float badval,
+*                              int ndim_out, const int lbnd_out[],
+*                              const int ubnd_out[], const int lbnd[],
+*                              const int ubnd[], float out[], float out_var[],
 *                              double weights[], int *nused, int *status );
 
 *  Arguments:
 *     workforce = smfWorkForce * (Given)
-*        Pointer to a pool of threads, between which the requested rebinning 
-*        can be divided. 
+*        Pointer to a pool of threads, between which the requested rebinning
+*        can be divided.
 *     njobs = int (Given)
 *        The number of jobs into which to divide each re-binning.
 *     blk_bot = double * (Given)
 *        An array that holds the first input channel number within each
 *        block of the input spectrum (plus the first channel number
 *        beyond the last block). See "Description" below for an
-*        explanation of how these blocks are used. If "njobs" is 1, 
-*        the array should contain 2 elements (enclosing the whole portion 
-*        of the input spectrum that is mapped into the output cube). 
+*        explanation of how these blocks are used. If "njobs" is 1,
+*        the array should contain 2 elements (enclosing the whole portion
+*        of the input spectrum that is mapped into the output cube).
 *        Otherwise, the array should contain ( 2*njobs + 1 ) elements.
 *
 *     <see docs for astRebinSeq for a description of the other arguments>
@@ -47,18 +47,18 @@
 
 *  Description:
 *     This function uses several threads to re-bin the supplied cube
-*     using the supplied Mapping. Each thread invokes astRebinSeq to 
+*     using the supplied Mapping. Each thread invokes astRebinSeq to
 *     re-bin a block of input spectral channels into the output. These
 *     blocks are chosen so that the corresponding blocks of output channels
 *     never overlap (in general, adjacent input channels will be pasted
 *     into overlapping blocks of output channels due to the blurring
-*     produced by the requested spreading scheme). This is achieved by 
-*     splitting the input spectral range processed by each thread up into 
-*     two adjacent blocks, and processing these blocks in two passes. On 
-*     the first pass, each thread processes the first of its two adjacent 
-*     spectral blocks. Once all threads have completed the first pass, the 
-*     second pass commences. In the second pass, each thread processes the 
-*     second of its two adjacent spectral blocks. 
+*     produced by the requested spreading scheme). This is achieved by
+*     splitting the input spectral range processed by each thread up into
+*     two adjacent blocks, and processing these blocks in two passes. On
+*     the first pass, each thread processes the first of its two adjacent
+*     spectral blocks. Once all threads have completed the first pass, the
+*     second pass commences. In the second pass, each thread processes the
+*     second of its two adjacent spectral blocks.
 *
 *     It is assumed that the spectral axis is axis 1 in the input and
 *     axis 3 in the output.
@@ -113,15 +113,15 @@
 #include "smf_threads.h"
 
 void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
-                         double *blk_bot, AstMapping *this, double wlim, 
-                         int ndim_in, const int lbnd_in[], 
-                         const int ubnd_in[], const float in[], 
-                         const float in_var[], int spread, 
-                         const double params[], int flags, 
-                         double tol, int maxpix, float badval, 
-                         int ndim_out, const int lbnd_out[], 
-                         const int ubnd_out[], const int lbnd[], 
-                         const int ubnd[], float out[], float out_var[], 
+                         double *blk_bot, AstMapping *this, double wlim,
+                         int ndim_in, const int lbnd_in[],
+                         const int ubnd_in[], const float in[],
+                         const float in_var[], int spread,
+                         const double params[], int flags,
+                         double tol, int maxpix, float badval,
+                         int ndim_out, const int lbnd_out[],
+                         const int ubnd_out[], const int lbnd[],
+                         const int ubnd[], float out[], float out_var[],
                          double weights[], int *nused, int *status ){
 
 /* Local Variables */
@@ -149,8 +149,8 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
          ubndt[ j ] = ubnd[ j ];
       }
 
-      astRebinSeqF( this, wlim, ndim_in, lbnd_in, ubnd_in, in, in_var, spread, 
-                    params, flags, tol, maxpix, badval, ndim_out, lbnd_out, 
+      astRebinSeqF( this, wlim, ndim_in, lbnd_in, ubnd_in, in, in_var, spread,
+                    params, flags, tol, maxpix, badval, ndim_out, lbnd_out,
                     ubnd_out, lbndt, ubndt, out, out_var, weights, nused );
 
 /* If handling multiple threads... */
@@ -159,12 +159,12 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
 /* Begin an AST context. */
       astBegin;
 
-/* Ensure we have memory to hold the data describing each job. This memory 
-   is retained between invocations of this function and grows as necessary 
-   to accomodate changing numbers of jobs (but in practice the number of 
+/* Ensure we have memory to hold the data describing each job. This memory
+   is retained between invocations of this function and grows as necessary
+   to accomodate changing numbers of jobs (but in practice the number of
    jobs per spectrum will probably not change between invocations). This
    is done to avoid the over-head of allocating and deallocting the memory
-   in every invocation. Likewise allocate memory to hold the bounds of the 
+   in every invocation. Likewise allocate memory to hold the bounds of the
    spectral block being processed. */
       job_data = astGrow( job_data, sizeof( smfRebinSeqArgs ), njobs );
 
@@ -182,41 +182,41 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
             data = job_data + i;
 
             data->is_double = 0;
-            data->wlim = wlim;       
-            data->ndim_in = ndim_in;    
-            data->lbnd_in = lbnd_in;    
-            data->ubnd_in = ubnd_in;    
-            data->in = (void *) in;         
-            data->in_var = (void *) in_var;     
-            data->spread = spread;     
-            data->params = params;     
-            data->flags = flags;      
-            data->tol = tol;        
-            data->maxpix = maxpix;     
-            data->badval_f = badval;     
-            data->ndim_out = ndim_out;   
-            data->lbnd_out = lbnd_out;   
-            data->ubnd_out = ubnd_out;   
-            data->out = out;        
-            data->out_var = out_var;    
-            data->weights = weights;    
+            data->wlim = wlim;
+            data->ndim_in = ndim_in;
+            data->lbnd_in = lbnd_in;
+            data->ubnd_in = ubnd_in;
+            data->in = (void *) in;
+            data->in_var = (void *) in_var;
+            data->spread = spread;
+            data->params = params;
+            data->flags = flags;
+            data->tol = tol;
+            data->maxpix = maxpix;
+            data->badval_f = badval;
+            data->ndim_out = ndim_out;
+            data->lbnd_out = lbnd_out;
+            data->ubnd_out = ubnd_out;
+            data->out = out;
+            data->out_var = out_var;
+            data->weights = weights;
             data->nused = 0;
 
-/* A thread can only access AST Objects if they are locked for its own 
-   exclusive use (an error is reported by AST if an Object is used that 
+/* A thread can only access AST Objects if they are locked for its own
+   exclusive use (an error is reported by AST if an Object is used that
    is not currently locked by the calling thread). Since each thread
-   running astRebinSeqF will need to access the supplied Mapping 
+   running astRebinSeqF will need to access the supplied Mapping
    simultaneously, we get round this by taking a deep copy of the
    supplied Mapping for each thread. Each copy is then unlocked so that
    the new thread can lock it succesfully. */
-            data->this = astCopy( this );        
+            data->this = astCopy( this );
             astUnlock( data->this, 1 );
 
-/* Set the bounds on the first (i.e. spectral) axis of the input block to be 
-   processed by each thread so that it covers the first of the two adjacent 
+/* Set the bounds on the first (i.e. spectral) axis of the input block to be
+   processed by each thread so that it covers the first of the two adjacent
    spectral blocks. */
-            data->lbnd = block_lbnd + i*ndim_in;       
-            data->ubnd = block_ubnd + i*ndim_in;       
+            data->lbnd = block_lbnd + i*ndim_in;
+            data->ubnd = block_ubnd + i*ndim_in;
             (data->lbnd)[ 0 ] = (int)( blk_bot[ 2*i ] + 0.5 );
             (data->ubnd)[ 0 ] = (int)( blk_bot[ 2*i + 1 ] - 0.5 );
 
@@ -229,22 +229,22 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
 
 /* Add this job to the workforce. It may start immediately if a worker
    thread is available, otherwise it will start as soon as a worker
-   becomes available. The worker thread does its work by invoking the 
-   smf_rebinseq_thread function, passing it the data structure 
+   becomes available. The worker thread does its work by invoking the
+   smf_rebinseq_thread function, passing it the data structure
    created above. */
             smf_add_job( workforce, 0, data, smf_rebinseq_thread,
                          NULL, status );
          }
 
-/* Wait until the work force has done all the re-binning. This call blocks 
+/* Wait until the work force has done all the re-binning. This call blocks
    until all worker threads have completed. */
          smf_wait( workforce, status );
-  
+
 /* Loop round all the jobs. */
          for( i = 0; i < njobs; i++ ) {
             data = job_data + i;
 
-/* Increment the total number of input pixels pasted into the output, and 
+/* Increment the total number of input pixels pasted into the output, and
    reset ready for pass 2. */
             *nused += data->nused;
             data->nused = 0;
@@ -253,7 +253,7 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
 /* Tell EMS we have finished the first batch of multi-threaded work. */
          emsRlse();
 
-/* Pass one is complete. If no error has ocurred, start pass two to do 
+/* Pass one is complete. If no error has ocurred, start pass two to do
    the intervening spectral blocks. */
          if( *status == SAI__OK ) {
 
@@ -261,12 +261,12 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
             emsMark();
 
 /* Loop round each job. We re-use the data structures created in pass 1,
-   modifying any necessary fields so that they are appropriate for pass 2. */ 
-            for( i = 0; i < njobs && *status == SAI__OK; i++ ) { 
+   modifying any necessary fields so that they are appropriate for pass 2. */
+            for( i = 0; i < njobs && *status == SAI__OK; i++ ) {
                data = job_data + i;
 
-/* Set the bounds on the first (i.e. spectral) axis of the input block to be 
-   processed by each job so that it covers the second of the two adjacent 
+/* Set the bounds on the first (i.e. spectral) axis of the input block to be
+   processed by each job so that it covers the second of the two adjacent
    spectral blocks. */
                (data->lbnd)[ 0 ] = (int)( blk_bot[ 2*i + 1 ] + 0.5 );
                (data->ubnd)[ 0 ] = (int)( blk_bot[ 2*i + 2 ] - 0.5 );
@@ -279,21 +279,21 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
 /* Wait for the work force to complete the re-binning. This call blocks until
    all worker threads have completed. */
             smf_wait( workforce, status );
-  
+
 /* All jobs are now complete. */
             for( i = 0; i < njobs; i++ ) {
                data = job_data + i;
 
 /* Increment the total number of input pixels pasted into the output. */
                *nused += data->nused;
-            }            
+            }
 
 /* Tell EMS that we have finished multi-threaded work. */
             emsRlse();
          }
 
 /* The Mappings used in the threads should have been left in an unlocked
-   state when the threads completed. Lock them now for use by this thread 
+   state when the threads completed. Lock them now for use by this thread
    so that they can be annulled by the final astEnd. */
          for( i = 0; i < njobs; i++ ) {
             data = job_data + i;

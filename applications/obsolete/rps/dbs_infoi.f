@@ -20,16 +20,16 @@
 *  FUNCTIONS AND SUBROUTINES REFERENCED
 *  ------------------------------------
 
-      INTEGER  FIND_FIRST	 !  Finds first example of one character 
+      INTEGER  FIND_FIRST	 !  Finds first example of one character
 *                                    !  from one string in another.
- 
+
 *  Global Variables
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_field.inc'
       INCLUDE 'com_dbs_bytes.inc'
       INCLUDE 'com_dbs_iof.inc'
 
-                                                             
+
       IF ( REF_NO .LE. 0 .OR. ARRAY( REF_NO ) .LE. 0 ) THEN			! If reference number not OK then.
 
         DBS_INFOI = -11								!  Return error number.
@@ -57,7 +57,7 @@
           PL2 = FIND_FIRST						!   Get position of last integer character in -
      &           (NULFORMAT(NUMBER,REF_NO),' .',SUBINDEX )			!   substring.
           PL2 = PL2  -1							!   Get actual position of last integer character.
-          READ ( NULFORMAT( NUMBER , REF_NO )( PL1:PL2 ) , 
+          READ ( NULFORMAT( NUMBER , REF_NO )( PL1:PL2 ) ,
      &  	'( I )' ) DBS_INFOI
 
         ELSE IF ( UPPER .EQ. 'CONDITIONAL') THEN				!  Whether read dependant on a previous entry
@@ -72,7 +72,7 @@
 
           DBS_INFOI = NRECORDS( REF_NO )					!   to be returned.
 
-        ELSE IF ( UPPER .EQ. 'RECORDSIZE' .OR. 
+        ELSE IF ( UPPER .EQ. 'RECORDSIZE' .OR.
      &            UPPER .EQ. 'RECSIZE' ) THEN					!  Number of bytes in each record -
 
           DBS_INFOI = RECSIZE( REF_NO )						!   to be returned.
@@ -94,4 +94,4 @@
       END IF									!  End if.
 
       END									! End.
-                                              
+

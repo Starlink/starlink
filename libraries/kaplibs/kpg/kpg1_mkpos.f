@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER, GEO, DONE, 
+*     CALL KPG1_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER, GEO, DONE,
 *                      CLOSE, TEXT, JUST, REGION, STATUS )
 
 *  Description:
@@ -42,18 +42,18 @@
 *        - "MARK" -- Each position is marked by the symbol specified
 *        by argument MARKER.
 *
-*        - "POLY" -- Causes each position to be joined by a line to the 
+*        - "POLY" -- Causes each position to be joined by a line to the
 *        previous position marked.  These lines may be geodesic (in the
-*        Current Frame of the Plot) or straight (on the screen), as specified 
-*        by argument GEO. 
+*        Current Frame of the Plot) or straight (on the screen), as specified
+*        by argument GEO.
 *
-*        - "CHAIN" -- This is a combination of "Mark" and "Poly". Each 
-*        position is marked by a symbol and joined by a line to the previous 
-*        position. Arguments MARKER, GEO, and CLOSE are used to specify 
+*        - "CHAIN" -- This is a combination of "Mark" and "Poly". Each
+*        position is marked by a symbol and joined by a line to the previous
+*        position. Arguments MARKER, GEO, and CLOSE are used to specify
 *        the symbols and lines to use.
 *
-*        -  "BOX" -- An empty rectangle with edges parallel to the axes is 
-*        drawn extending between the supplied position and the previous 
+*        -  "BOX" -- An empty rectangle with edges parallel to the axes is
+*        drawn extending between the supplied position and the previous
 *        position.
 *
 *        -  "VLINE" -- A vertical line is drawn through the position
@@ -61,8 +61,8 @@
 *
 *        -  "HLINE" -- A horizontal line is drawn through the position
 *        covering the entire height of the Plot.
-*        
-*        -  "CROSS" -- A full-screen cross-hair is drawn at the position, i.e. 
+*
+*        -  "CROSS" -- A full-screen cross-hair is drawn at the position, i.e.
 *        a combination of Vline and Hline.
 *
 *        -  "TEXT" -- The text string specified by argument TEXT is
@@ -75,22 +75,22 @@
 *     MARKER = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is "MARKER" or "CHAIN".
 *     GEO = LOGICAL (Given)
-*        Should polygon and chain line segments be drawn as geodesic curves 
-*        within the Current Frame of the Plot? If not they are drawn as simple 
-*        straight lines within the Base Frame (GRAPHICS). The same value 
+*        Should polygon and chain line segments be drawn as geodesic curves
+*        within the Current Frame of the Plot? If not they are drawn as simple
+*        straight lines within the Base Frame (GRAPHICS). The same value
 *        should be supplied for all points in a polygon or chain.
 *     DONE = LOGICAL (Given)
-*        Should be supplied .TRUE. when a polygon, chain or set of boxes has 
+*        Should be supplied .TRUE. when a polygon, chain or set of boxes has
 *        been completed. The contents of POS will be ignored in this case.
 *        DONE is ignored if MODE is not "PLOT", "CHAIN" or "BOX".
 *     CLOSE = LOGICAL (Given)
-*        If .TRUE., polygons and chains are closed by joining the first 
+*        If .TRUE., polygons and chains are closed by joining the first
 *        position to the last position (when DONE is supplied .TRUE.).
 *     TEXT = CHARACTER * ( * ) (Given)
 *        The text to display if MODE is "TEXT". Trailing spaces are
-*        ignored. 
+*        ignored.
 *     JUST = CHARACTER * ( * ) (Given)
-*        A string specifying the justification to be used when displaying 
+*        A string specifying the justification to be used when displaying
 *        the text supplied in TEXT (ignored if MODE is not "Text"). This
 *        should be a string of two characters; the first should be "B",
 *        "C" or "T", meaning bottom, centre or top. The second should be
@@ -99,13 +99,13 @@
 *        specified point within the displayed text string.
 *     REGION = INTEGER (Given)
 *        A 2-dimensional AST Region pointer. Only used if PLOT is "REGION".
-*        In order to save time calling AST_CONVERT for every Region, the 
-*        first Region to be plotted using this routine defines the 
-*        co-ordinate frame for all subsequent Regions draw by later 
+*        In order to save time calling AST_CONVERT for every Region, the
+*        first Region to be plotted using this routine defines the
+*        co-ordinate frame for all subsequent Regions draw by later
 *        invocations of this routine. If in fact, later Regions may have a
 *        different coordinate frame, then this routine should be called
 *        with MODE=REGION and REGION=AST__NULL. This will cause the
-*        current Region coordinate frame to be forgotten so that the next 
+*        current Region coordinate frame to be forgotten so that the next
 *        non-NULL Region to be draw will define a new current coordinate
 *        frame for subsequent Regions.
 *     STATUS = INTEGER (Given and Returned)
@@ -120,12 +120,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -150,7 +150,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -196,7 +196,7 @@
       REAL X1, X2, Y1, Y2        ! Bounds of PGPLOT window
 
 *  Data Initialisation:
-      DATA LPOS /NDF__MXDIM*AST__BAD/, 
+      DATA LPOS /NDF__MXDIM*AST__BAD/,
      :     FPOS /NDF__MXDIM*AST__BAD/,
      :     DOING /.FALSE./,
      :     MAP2 /AST__NULL/
@@ -219,7 +219,7 @@
 *  ==================
       IF( MODE .EQ. 'MARK' ) THEN
 
-*  If the supplied position is a Base Frame position, temporarily make the 
+*  If the supplied position is a Base Frame position, temporarily make the
 *  Base Frame the Current Frame.
          IF( .NOT. CURR ) THEN
             CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
@@ -231,7 +231,7 @@
          CALL AST_MARK( IPLOT, 1, NAX, 1, POS, MARKER, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
-         IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
+         IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR,
      :                                   STATUS )
 
 *  Deal with polygons.
@@ -254,7 +254,7 @@
 *  been started).
             IF( CLOSE .AND. DOING ) THEN
 
-*  See if both first and last positions are defined. 
+*  See if both first and last positions are defined.
                GOTPOS = .TRUE.
                DO I = 1, RNAX
                   IF( LPOS( I ) .EQ. AST__BAD ) GOTPOS = .FALSE.
@@ -264,27 +264,27 @@
 *  If both positions are defined, draw the line joining them.
                IF( GOTPOS ) THEN
 
-*  If we are drawing straight lines (not geodesics), temporarily make the 
+*  If we are drawing straight lines (not geodesics), temporarily make the
 *  Base Frame the Current Frame in the Plot.
                   IF( .NOT. GEO ) THEN
-                     CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 
+                     CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT,
      :                                                 'BASE', STATUS ),
      :                              STATUS )
                   END IF
 
 *  Draw the curve.
-                  CALL AST_CURVE( IPLOT, LPOS, FPOS, STATUS )         
+                  CALL AST_CURVE( IPLOT, LPOS, FPOS, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
-                  IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT', 
+                  IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT',
      :                                           ICURR, STATUS )
                END IF
 
             END IF
 
 *  If we are starting or continuing a polygon.
-         ELSE 
- 
+         ELSE
+
 *  If straight lines are required, we require positions in the Base
 *  Frame of the Plot. For geodesics, we need positions in the Current Frame.
 *  Ensure the supplied position is in the correct Frame. If not, transform
@@ -297,8 +297,8 @@
                   DO I = 1, RNAX
                      RPOS( I ) = POS( I )
                   END DO
-               END IF           
-   
+               END IF
+
             ELSE
                IF( CURR ) THEN
                   CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., RNAX,
@@ -307,10 +307,10 @@
                   DO I = 1, RNAX
                      RPOS( I ) = POS( I )
                   END DO
-               END IF           
+               END IF
             END IF
 
-*  See if both previous and current positions are defined. 
+*  See if both previous and current positions are defined.
             IF( DOING ) THEN
 
                GOTPOS = .TRUE.
@@ -326,7 +326,7 @@
 *  If both positions are defined, draw the line joining them.
             IF( GOTPOS ) THEN
 
-*  If we are drawing straight lines (not geodesics), temporarily make the 
+*  If we are drawing straight lines (not geodesics), temporarily make the
 *  Base Frame the Current Frame in the Plot.
                IF( .NOT. GEO ) THEN
                   CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT,
@@ -335,25 +335,25 @@
                END IF
 
 *  Draw the curve.
-               CALL AST_CURVE( IPLOT, LPOS, RPOS, STATUS )         
+               CALL AST_CURVE( IPLOT, LPOS, RPOS, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
-               IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
+               IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR,
      :                                        STATUS )
             END IF
 
 *  Store the new position for use next time.
             DO I = 1, RNAX
-               LPOS( I ) = RPOS( I ) 
+               LPOS( I ) = RPOS( I )
             END DO
 
 *  If this is the first point in a new polygon, save it as such.
             IF( .NOT. DOING ) THEN
                DO I = 1, RNAX
-                  FPOS( I ) = RPOS( I ) 
+                  FPOS( I ) = RPOS( I )
                END DO
                DOING = .TRUE.
-            END IF            
+            END IF
 
          END IF
 
@@ -377,7 +377,7 @@
 *  been started).
             IF( CLOSE .AND. DOING ) THEN
 
-*  See if both first and last positions are defined. 
+*  See if both first and last positions are defined.
                GOTPOS = .TRUE.
                DO I = 1, RNAX
                   IF( LPOS( I ) .EQ. AST__BAD ) GOTPOS = .FALSE.
@@ -387,27 +387,27 @@
 *  If both positions are defined, draw the line joining them.
                IF( GOTPOS ) THEN
 
-*  If we are drawing straight lines (not geodesics), temporarily make the 
+*  If we are drawing straight lines (not geodesics), temporarily make the
 *  Base Frame the Current Frame in the Plot.
                   IF( .NOT. GEO ) THEN
-                     CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 
+                     CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT,
      :                                                 'BASE', STATUS ),
      :                              STATUS )
                   END IF
 
 *  Draw the curve.
-                  CALL AST_CURVE( IPLOT, LPOS, FPOS, STATUS )         
+                  CALL AST_CURVE( IPLOT, LPOS, FPOS, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
-                  IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT', 
+                  IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT',
      :                                           ICURR, STATUS )
                END IF
 
             END IF
 
 *  If we are starting or continuing a chain.
-         ELSE 
- 
+         ELSE
+
 *  If straight lines are required, we require positions in the Base
 *  Frame of the Plot. For geodesics, we need positions in the Current Frame.
 *  Ensure the supplied position is in the currect Frame. If not, transform
@@ -420,8 +420,8 @@
                   DO I = 1, RNAX
                      RPOS( I ) = POS( I )
                   END DO
-               END IF           
-   
+               END IF
+
             ELSE
                IF( CURR ) THEN
                   CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., RNAX,
@@ -430,9 +430,9 @@
                   DO I = 1, RNAX
                      RPOS( I ) = POS( I )
                   END DO
-               END IF           
+               END IF
 
-*  If we are drawing straight lines (not geodesics), temporarily make the 
+*  If we are drawing straight lines (not geodesics), temporarily make the
 *  Base Frame the Current Frame in the Plot.
                CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT,
      :                                                 'BASE', STATUS ),
@@ -443,7 +443,7 @@
 *  Mark the position.
             CALL AST_MARK( IPLOT, 1, RNAX, 1, RPOS, MARKER, STATUS )
 
-*  See if both previous and current positions are defined. 
+*  See if both previous and current positions are defined.
             IF( DOING ) THEN
 
                GOTPOS = .TRUE.
@@ -457,24 +457,24 @@
             END IF
 
 *  If both positions are defined, draw the line joining them.
-            IF( GOTPOS ) CALL AST_CURVE( IPLOT, LPOS, RPOS, STATUS )         
+            IF( GOTPOS ) CALL AST_CURVE( IPLOT, LPOS, RPOS, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
-            IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
+            IF( .NOT. GEO ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR,
      :                                     STATUS )
 
 *  Store the new position for use next time.
             DO I = 1, RNAX
-               LPOS( I ) = RPOS( I ) 
+               LPOS( I ) = RPOS( I )
             END DO
 
 *  If this is the first point in a new polygon, save it as such.
             IF( .NOT. DOING ) THEN
                DO I = 1, RNAX
-                  FPOS( I ) = RPOS( I ) 
+                  FPOS( I ) = RPOS( I )
                END DO
                DOING = .TRUE.
-            END IF            
+            END IF
 
          END IF
 
@@ -484,20 +484,20 @@
 
 *  If we are starting or continuing a set of boxes.
          IF( .NOT. DONE ) THEN
- 
-*  Ensure the supplied position is in the Base Frame. If not, transform it 
+
+*  Ensure the supplied position is in the Base Frame. If not, transform it
 *  into the Base Frame.
             RNAX = 2
             IF( CURR ) THEN
-               CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., RNAX, 1, 
+               CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., RNAX, 1,
      :                         RPOS, STATUS )
             ELSE
                DO I = 1, RNAX
                   RPOS( I ) = POS( I )
                END DO
-            END IF           
+            END IF
 
-*  See if both previous and current positions are defined. 
+*  See if both previous and current positions are defined.
             IF( DOING ) THEN
 
                GOTPOS = .TRUE.
@@ -526,7 +526,7 @@
                BOX( 5, 2 ) = LPOS( 2 )
 
 *  Temporarily make the Base Frame the Current Frame in the Plot.
-               CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE', 
+               CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
      :                                                    STATUS ),
      :                        STATUS )
 
@@ -541,7 +541,7 @@
 *  Store the new position for use next time, and indicate we have started
 *  a set of boxes.
             DO I = 1, RNAX
-               LPOS( I ) = RPOS( I ) 
+               LPOS( I ) = RPOS( I )
             END DO
 
             DOING = .TRUE.
@@ -552,22 +552,22 @@
 *  =========================
       ELSE IF( MODE .EQ. 'VLINE' ) THEN
 
-*  Find the bounds of the PGPLOT window. 
+*  Find the bounds of the PGPLOT window.
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Ensure the supplied position is in the Base Frame. If not, transform it 
+*  Ensure the supplied position is in the Base Frame. If not, transform it
 *  into the Base Frame.
          RNAX = 2
          IF( CURR ) THEN
-            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., RNAX, 1, 
+            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., RNAX, 1,
      :                      RPOS, STATUS )
          ELSE
             DO I = 1, RNAX
                RPOS( I ) = POS( I )
             END DO
-         END IF           
+         END IF
 
-*  See if the position is defined. 
+*  See if the position is defined.
          GOTPOS = .TRUE.
          DO I = 1, RNAX
             IF( RPOS( I ) .EQ. AST__BAD ) GOTPOS = .FALSE.
@@ -584,7 +584,7 @@
             BOX( 2, 2 ) = DBLE( Y2 )
 
 *  Temporarily make the Base Frame the Current Frame in the Plot.
-            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE', 
+            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
      :                                                 STATUS ),
      :                     STATUS )
 
@@ -600,22 +600,22 @@
 *  ===========================
       ELSE IF( MODE .EQ. 'HLINE' ) THEN
 
-*  Find the bounds of the PGPLOT window. 
+*  Find the bounds of the PGPLOT window.
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Ensure the supplied position is in the Base Frame. If not, transform it 
+*  Ensure the supplied position is in the Base Frame. If not, transform it
 *  into the Base Frame.
          RNAX = 2
          IF( CURR ) THEN
-            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1, 
+            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1,
      :                      RPOS, STATUS )
          ELSE
             DO I = 1, RNAX
                RPOS( I ) = POS( I )
             END DO
-         END IF           
+         END IF
 
-*  See if the position is defined. 
+*  See if the position is defined.
          GOTPOS = .TRUE.
          DO I = 1, RNAX
             IF( RPOS( I ) .EQ. AST__BAD ) GOTPOS = .FALSE.
@@ -632,7 +632,7 @@
             BOX( 2, 2 ) = RPOS( 2 )
 
 *  Temporarily make the Base Frame the Current Frame in the Plot.
-            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE', 
+            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
      :                                                 STATUS ),
      :                     STATUS )
 
@@ -648,22 +648,22 @@
 *  ========================
       ELSE IF( MODE .EQ. 'CROSS' ) THEN
 
-*  Find the bounds of the PGPLOT window. 
+*  Find the bounds of the PGPLOT window.
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Ensure the supplied position is in the Base Frame. If not, transform it 
+*  Ensure the supplied position is in the Base Frame. If not, transform it
 *  into the Base Frame.
          RNAX = 2
          IF( CURR ) THEN
-            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1, 
+            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1,
      :                      RPOS, STATUS )
          ELSE
             DO I = 1, RNAX
                RPOS( I ) = POS( I )
             END DO
-         END IF           
+         END IF
 
-*  See if the position is defined. 
+*  See if the position is defined.
          GOTPOS = .TRUE.
          DO I = 1, RNAX
             IF( RPOS( I ) .EQ. AST__BAD ) GOTPOS = .FALSE.
@@ -673,11 +673,11 @@
          IF( GOTPOS ) THEN
 
 *  Temporarily make the Base Frame the Current Frame in the Plot.
-            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE', 
+            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
      :                                                 STATUS ),
      :                     STATUS )
 
-*  Store the co-ordinates of the ends of the vertical line. The line extends 
+*  Store the co-ordinates of the ends of the vertical line. The line extends
 *  over the entire PGPLOT viewport, but will be clipped by the Plot.
             BOX( 1, 1 ) = RPOS( 1 )
             BOX( 1, 2 ) = DBLE( Y1 )
@@ -687,7 +687,7 @@
 *  Draw the vertical line.
             CALL AST_POLYCURVE( IPLOT, 2, 2, 5, BOX, STATUS )
 
-*  Store the co-ordinates of the ends of the horizontal line. The line extends 
+*  Store the co-ordinates of the ends of the horizontal line. The line extends
 *  over the entire PGPLOT viewport, but will be clipped by the Plot.
             BOX( 1, 1 ) = DBLE( X1 )
             BOX( 1, 2 ) = RPOS( 2 )
@@ -702,11 +702,11 @@
 
          END IF
 
-*  Deal with text. 
+*  Deal with text.
 *  ===============
       ELSE IF( MODE .EQ. 'TEXT' ) THEN
 
-*  If the supplied position is a Base Frame position, temporarily make the 
+*  If the supplied position is a Base Frame position, temporarily make the
 *  Base Frame the Current Frame.
          IF( .NOT. CURR ) THEN
             CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
@@ -722,7 +722,7 @@
          CALL AST_TEXT( IPLOT, TEXT, POS, UP, JUST, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
-         IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
+         IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR,
      :                                   STATUS )
 
 
@@ -736,7 +736,7 @@ c*  If the supplied position is a Current Frame position, map it into a
 c*  (2D GRAPHICS) Base Frame position. Otherwise, just use the 2D GRAPHICS
 c*  position supplied.
 c         IF( CURR ) THEN
-c            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1, RPOS, 
+c            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1, RPOS,
 c     :                      STATUS )
 c         ELSE
 c            DO I = 1, 2
@@ -753,15 +753,15 @@ c*  If TextLabGap values have been set in the Plot, use them as the offset
 c*  between the supplied position and the reference position for the text.
 c         IF( AST_TEST( IPLOT, 'TEXTLABGAP(1)', STATUS ) ) THEN
 c            RPOS( 1 ) = RPOS( 1 ) - MINDIM*
-c     :                  AST_GETD( IPLOT, 'TEXTLABGAP(1)', STATUS ) 
+c     :                  AST_GETD( IPLOT, 'TEXTLABGAP(1)', STATUS )
 c         END IF
 c
 c         IF( AST_TEST( IPLOT, 'TEXTLABGAP(2)', STATUS ) ) THEN
 c            RPOS( 2 ) = RPOS( 2 ) - MINDIM*
-c     :                  AST_GETD( IPLOT, 'TEXTLABGAP(2)', STATUS ) 
+c     :                  AST_GETD( IPLOT, 'TEXTLABGAP(2)', STATUS )
 c         END IF
 c
-c*  Make the GRAPHICS (Base) Frame the Current Frame. 
+c*  Make the GRAPHICS (Base) Frame the Current Frame.
 c         CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
 c     :                                              STATUS ),
 c     :                  STATUS )
@@ -773,7 +773,7 @@ c
 c*  Draw the text.
 c         CALL AST_TEXT( IPLOT, TEXT, RPOS, UP, JUST, STATUS )
 c
-c*  Re-instate the original Current Frame 
+c*  Re-instate the original Current Frame
 c         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 c
 *  ------------------------------------------------------------
@@ -800,8 +800,8 @@ c
 *  save it for use in subsequent invocations of this routine.
             IF( MAP2 .EQ. AST__NULL ) THEN
 
-*  Save the index of the original base Frame within the Plot so it 
-*  can be re-instated later. 
+*  Save the index of the original base Frame within the Plot so it
+*  can be re-instated later.
                IBASE = AST_GETI( IPLOT, 'BASE', STATUS )
 
 *  Attempt to get a Mapping from the current Frame in the Plot to the Frame
@@ -816,7 +816,7 @@ c
                IF( FS .NE. AST__NULL ) THEN
 
 *  Get the Mapping from current plot Frame to Region.
-                  MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, 
+                  MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
      :                                  STATUS )
 
 *  Remove all Region effects from the Mapping.
@@ -832,13 +832,13 @@ c
 *  Check the Mapping was obtained.
             IF( MAP2 .NE. AST__NULL ) THEN
 
-*  Save the index of the original current Frame within the Plot so it 
-*  can be re-instated later. 
+*  Save the index of the original current Frame within the Plot so it
+*  can be re-instated later.
                ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Add the Region into the Plot, making it the current Frame. 
-               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, MAP2, REGION, 
-     :                            STATUS )    
+*  Add the Region into the Plot, making it the current Frame.
+               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, MAP2, REGION,
+     :                            STATUS )
 
 *  Draw the boundary of the Region.
                JUNK = AST_BORDER( IPLOT, STATUS )
@@ -849,7 +849,7 @@ c
 *  Re-instate original current Frame in the Plot.
                CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
-            END IF                           
+            END IF
 
          END IF
 

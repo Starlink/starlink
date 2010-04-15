@@ -36,7 +36,7 @@ C                          passed as zero, then NAME is used instead.
 C     (!) KEYWORD          (Fixed string,descr) The name - A FITS keyword -
 C                          for the object in question.  If NTH is zero,
 C                          then this is an input-only argument (>), and
-C                          should be in upper case.  If NTH is non-zero, 
+C                          should be in upper case.  If NTH is non-zero,
 C                          then this is an output-only argument (<).
 C     (<) EXIST            (Logical,ref) Returned true if such an item
 C                          exists, false otherwise.
@@ -94,7 +94,7 @@ C
 C  Common variable details:
 C     (<) DTA_CODE    (Integer) Last DTA system error code
 C     (>) OBJ_LEN     (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data
 C                     object corresponding to reference name.
 C     (>) NDF_FORMAT  (Logical array) Indicates structure format is Starlink's
 C                     NDF format (described in SGP38).  If false, format is
@@ -172,7 +172,7 @@ C
       LOGICAL   STRUCT            ! True if object is a structure
       CHARACTER TYPE*16           ! Type of data object
 C
-      DATA TYPES/ 
+      DATA TYPES/
      :  'DOUBLE', 'FLOAT', 'INT', 'CHAR', 'SHORT', 'BYTE', 'USHORT'/
       DATA CHARS/
      :  'D',      'F',     'I',   'C',    'S',     'L',    'I'/
@@ -227,7 +227,7 @@ C              have already got the answer for us.
 C
                IF (NTH.EQ.0) THEN
                   ELEMENTS=1
-                  DO WHILE (ISTR.NE.0) 
+                  DO WHILE (ISTR.NE.0)
                      CALL DSA__FIND_NDF_FITS (REF_SLOT,KEYWORD,
      :                                  ELEMENTS+1,.FALSE.,ISTR,STATUS)
                      IF (ISTR.NE.0) ELEMENTS=ELEMENTS+1
@@ -237,9 +237,9 @@ C
                STRLEN=80
             ELSE
 C
-C              If it exists, and is not a multi-valued comment, get the 
-C              value string for it.  The on the basis of what we find there, 
-C              we can decide what type of access is appropriate. 
+C              If it exists, and is not a multi-valued comment, get the
+C              value string for it.  The on the basis of what we find there,
+C              we can decide what type of access is appropriate.
 C
                ELEMENTS=1
                CALL DSA__PARSE_FITS_ITEM (ISTR,CHRSTR,STRING,COMMENT,
@@ -250,7 +250,7 @@ C
                   STRLEN=80
                ELSE
 C
-C                 It might be a bit heavy handed, but the best way to see 
+C                 It might be a bit heavy handed, but the best way to see
 C                 if a string is a valid number is to attempt to decode it.
 C
                   NUM_STATUS=ICH_NUMBD (STRING,1,' ',DVALUE,NSFIG,NEXT)
@@ -278,10 +278,10 @@ C
 C                    At this point, it wasn't a valid number, it wasn't
 C                    a quoted string, and it wasn't a comment-type item.
 C                    It probably isn't valid, but it could be logical.
-C                    If it isn't logical, we'll suggest treating it as 
+C                    If it isn't logical, we'll suggest treating it as
 C                    a character string, which will at least work.
 C
-                     IF ((STRING(1:1).EQ.'T').OR.(STRING(1:1).EQ.'F')) 
+                     IF ((STRING(1:1).EQ.'T').OR.(STRING(1:1).EQ.'F'))
      :                                                              THEN
                         ACCESS='L'
                      ELSE
@@ -296,14 +296,14 @@ C
 C
 C        Original Figaro format.  We have to generate the DTA name of the
 C        structure object holding the item in question.
-C                
+C
          IF (NTH.NE.0) THEN
 C
 C           It has been specified by number, so we have to get the name
 C           of the nth item and trying to do this tells us if it exists
 C           or not.  We trap the special name used for blank items.  Then
 C           we get the type of the keyword.
-C            
+C
             CALL DTA_NMVAR (OBJ_NAMES(REF_SLOT)(:OBJ_LEN(REF_SLOT))//
      :                                '.FITS',NTH,KEYWORD,DTA_STATUS)
             IF (DTA_STATUS.NE.0) THEN
@@ -377,7 +377,7 @@ C
             END DO
   320       CONTINUE
 C
-C           If we didn't recognise the type, we fall back on suggesting 
+C           If we didn't recognise the type, we fall back on suggesting
 C           `double' as an access type.
 C
             IF (ACCESS.EQ.' ') ACCESS='D'

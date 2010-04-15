@@ -36,7 +36,7 @@
 *        information on history.               [current history setting]
 *     IN = NDF (Read)
 *        A group of input NDFs. This should be in the form of a group
-*        expression (see help on "Group_expressions"). 
+*        expression (see help on "Group_expressions").
 *     MSG_FILTER = LITERAL (Read)
 *        The level of information displayed on the users screen. This
 *        should take one of the values QUIET, NORMAL or VERBOSE (see
@@ -50,7 +50,7 @@
 *        character with each input NDF in turn.
 *     UNITS = LITERAL (Read)
 *        The units in which the output values are required.  See
-*        help on "Data_units" for a list of the available units.  
+*        help on "Data_units" for a list of the available units.
 
 *  Examples:
 *     NEWUNITS M51* *_SB MJy/sr
@@ -59,7 +59,7 @@
 *        NDF is formed by extending the name of the input NDF with the
 *        string "_SB". The data values are converted into Mega-Janskys
 *        per steradian. If any of the inputs contain variance values,
-*        they are converted into units of (MJy/sr)**2. 
+*        they are converted into units of (MJy/sr)**2.
 
 *  Notes:
 *     -  If the conversion requires the solid angle of an image pixel
@@ -74,7 +74,7 @@
 *     detectors to be used (eg from pW/(M**2) to Jy), the values listed
 *     in help topic "Detector_bandwidths" are used. This includes no
 *     colour correction.
-      
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -178,7 +178,7 @@
       CALL MSG_IFGET( STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...',
      :                IGRP1, SIZE, STATUS )
 
 *  Similarly, get a group containing the names of the output NDFs.
@@ -187,7 +187,7 @@
      :                '  Give more NDF names...',
      :                 IGRP2, SIZEO, STATUS )
 
-*  Get the new units required for the output NDFs, and store its used 
+*  Get the new units required for the output NDFs, and store its used
 *  length.
       CALL NEWUA0( 'UNITS', UNITS, STATUS )
       LUNIT = CHR_LEN( UNITS )
@@ -203,7 +203,7 @@
       CALL IRA_INIT( STATUS )
       CALL IRC_INIT( STATUS )
 
-*  Get a list of legal CRDD units. Append commas to the start and end 
+*  Get a list of legal CRDD units. Append commas to the start and end
 *  of the list.
       CALL IRC_IUNIT( CULIST( 2: ), STATUS )
       CULIST( 1 : 1 ) = ','
@@ -242,7 +242,7 @@
 *  See if it contains a component called CRDD_INFO.
          CALL DAT_THERE( XLOC, 'CRDD_INFO', THERE, STATUS )
 
-*  If it does, assume it is a CRDD file. Report an error if the 
+*  If it does, assume it is a CRDD file. Report an error if the
 *  suplied units are not legal CRDD units.
          IF( THERE ) THEN
             CRDD = .TRUE.
@@ -257,11 +257,11 @@
             END IF
 
 *  If it is not a CRDD file, see if the IRAS extension contains a
-*  component called IMAGE_INFO. 
+*  component called IMAGE_INFO.
          ELSE
             CALL DAT_THERE( XLOC, 'IMAGE_INFO', THERE, STATUS )
 
-*  If it does assume it is an IRAS90 image. Report an error if the 
+*  If it does assume it is an IRAS90 image. Report an error if the
 *  suplied units are not legal image units.
             IF( THERE ) THEN
                CRDD = .FALSE.
@@ -294,7 +294,7 @@
             CLIST = 'DATA,VAR'
          ELSE
             CLIST = 'DATA'
-         END IF         
+         END IF
 
 *  Map the required arrays from from the input and output NDFs.
          CALL NDF_MAP( INDF1, CLIST, '_REAL', 'READ', IPIN, EL, STATUS )
@@ -304,7 +304,7 @@
 *  If the input is a CRDD file, attempt to import it into the IRC
 *  system.
          IF( CRDD ) THEN
-            CALL IRC_IMPRT( INDF1, IDC, STATUS )      
+            CALL IRC_IMPRT( INDF1, IDC, STATUS )
 
 *  Get the units of the data array.
             CALL NDF_CGET( INDF1, 'UNITS', OLDUN, STATUS )
@@ -377,7 +377,7 @@
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDF_DELET( INDF2, STATUS )
@@ -390,7 +390,7 @@
          IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
 
-*  Give a warning telling the user that no output NDF will be created 
+*  Give a warning telling the user that no output NDF will be created
 *  for the current input NDF.
             CALL GRP_GET( IGRP2, I, 1, OUTNDF, STATUS )
             CALL MSG_SETC( 'NDF', OUTNDF )
@@ -416,13 +416,13 @@
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Assign a group expression to the output parameter NDFLIST which
-*  specifies all the output NDFs. NDFLIST should normally be associated 
-*  with a suitable global parameter to cause its value to be passed on 
-*  to the next application.  The output parameter NDFLIST is not 
-*  advertised as a user parameter since users will normally not be 
-*  aware of the existence of global parameter, and so will not know 
+*  specifies all the output NDFs. NDFLIST should normally be associated
+*  with a suitable global parameter to cause its value to be passed on
+*  to the next application.  The output parameter NDFLIST is not
+*  advertised as a user parameter since users will normally not be
+*  aware of the existence of global parameter, and so will not know
 *  how to assign a value to it.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'NEWUNITS', 
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'NEWUNITS',
      :                                   STATUS )
 
 *  Delete all groups.
@@ -440,7 +440,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

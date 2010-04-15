@@ -21,7 +21,7 @@
 *        If no error so far then
 *           Map an output DATA_ARRAY component
 *           If no errors then
-*              Median filter across each row and put resutant number into 
+*              Median filter across each row and put resutant number into
 *              output
 *           Endif
 *           Tidy up output structure
@@ -32,7 +32,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -46,8 +46,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -66,7 +66,7 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :	XST,                  ! X-start of exclusion region
      :	YST,                  ! Y-start of exclusion region
      :	XSZ,                  ! X-size of exclusion region
@@ -76,8 +76,8 @@
      :  LOCI,                 ! locator for input IMAGE structure
      :  LOCO                  ! locator for output IMAGE structure
 
-      LOGICAL 
-     :	EXCLREG               ! whether user wants to define an exclusion 
+      LOGICAL
+     :	EXCLREG               ! whether user wants to define an exclusion
                               ! region
 
 *-
@@ -102,7 +102,7 @@
 
 *       set the output image dimensions
 
-	ODIMS( 1) = 1 
+	ODIMS( 1) = 1
 	ODIMS( 2) = DIMS( 2)
 
 *       create the output image and get a title for it
@@ -118,7 +118,7 @@
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                    PNTRO, NELEMENTS, STATUS )
 
-*          check for error before getting exclusion region and 
+*          check for error before getting exclusion region and
 *          accessing pointers
 
             IF( STATUS .EQ. SAI__OK ) THEN
@@ -156,9 +156,9 @@
 
 *            pass everything to the rapid median calculation routine
 
-              CALL ROWMEDSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :	                      ODIMS( 1), ODIMS( 2), %VAL( PNTRO), 
-     :                        EXCLREG, XST, YST, 
+              CALL ROWMEDSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :	                      ODIMS( 1), ODIMS( 2), %VAL( PNTRO),
+     :                        EXCLREG, XST, YST,
      :	                      XEN, YEN, STATUS)
 
             END IF

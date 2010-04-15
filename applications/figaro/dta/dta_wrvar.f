@@ -5,7 +5,7 @@ C     D T A _ W R V A R
 C
 C     Generic routine for writing to an object in the data
 C     structure.  The number of items specified are copied
-C     into the data structure starting at the location 
+C     into the data structure starting at the location
 C     specified by the object name (which can also include
 C     an array element specification).  If necessary, the
 C     data will be converted from the format required by the
@@ -17,7 +17,7 @@ C     Parameters -   (">" input, "<" output )
 C
 C     (>) NAME     (Character) The object name, in the standard
 C                  data structure format.  Should end with a
-C                  blank or the string end, and is case 
+C                  blank or the string end, and is case
 C                  insignificant.
 C     (>) NITEM    (Integer) The number of elements to be
 C                  read from the data structure.
@@ -27,13 +27,13 @@ C                  codes (not a conversion code).
 C     (>) BUFFER   (Any numeric type) Contains the date to be written to
 C                  the object.  Note that because of the variations in
 C                  the way different compilers pass CHARACTER strings,
-C                  this cannot be used for CHARACTER variables. 
+C                  this cannot be used for CHARACTER variables.
 C     (<) STATUS   (Integer) Returns a status code.
 C                  0 => OK
 C                  Lower level routines may return other error codes
 C-
 C     Subroutines / functions used -
-C 
+C
 C     DTA_PRETR    (DTA_ package) Preliminary set up for data transfer
 C     DTA_HDSERC   ( "      "   ) Convert HDS error code to DTA code
 C     DAT_PUT      (HDS     "   ) Write data into structure component
@@ -48,10 +48,10 @@ C                                         KS / CIT 26th Oct 1982
 C     Modified:
 C
 C     17th March 1986 KS / AAO. New version based on the new HDS
-C                     version of DTA_RDVAR. Call for character transfer 
+C                     version of DTA_RDVAR. Call for character transfer
 C                     now requires descriptor, not actual data.
-C     10th Jan 1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     10th Jan 1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN.  (Outdated comment about
 C                     similarity to DTA_RDVAR removed.) Can no longer be used
 C                     when BUFFER is a character string, because of the
@@ -63,7 +63,7 @@ C
 C     Machine dependence:
 C
 C     Apart form the obvious use of VAX/VMS compiler syntax in places
-C     (IMPLICIT NONE, etc), this routine makes the more subtle assumption 
+C     (IMPLICIT NONE, etc), this routine makes the more subtle assumption
 C     that numeric arrays and scalars are passed by reference .
 C+
       IMPLICIT NONE
@@ -95,7 +95,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Perform preliminary processing - check NAME, locate it
 C     in structures, get suitable locator for transfer.

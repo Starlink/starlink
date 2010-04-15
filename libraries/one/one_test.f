@@ -46,13 +46,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'ONE_ERR'         ! Local constants
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
       LOGICAL ONE_FIND_FILE
-      
+
 *  Local Variables:
       INTEGER CONTEXT
       INTEGER COLUMNS, ROWS
@@ -68,7 +68,7 @@
 *.
 
 *  Set STATUS OK and report start of test.
-      STATUS = SAI__OK      
+      STATUS = SAI__OK
       CALL EMS_BEGIN( STATUS )
 
       WRITE(*,*) 'Test of libone routines ...'
@@ -76,11 +76,11 @@
 
 *  First test: one_exec routine.
 
-      WRITE(*,*) '... one_exec: ', COMMAND 
+      WRITE(*,*) '... one_exec: ', COMMAND
       WRITE(*,*) ' '
 
-      CALL ONE_EXEC( COMMAND, STATUS )   
-      
+      CALL ONE_EXEC( COMMAND, STATUS )
+
       WRITE(*,*) ' '
       IF ( STATUS .NE. SAI__OK ) THEN
          WRITE(*,*) '... test of one_exec failed ... aborting'
@@ -92,13 +92,13 @@
 *  Second test: one_find_file routine.
 
       WRITE(*,*) ' '
-      WRITE(*,*) '... one_find_file: ', FILES     
+      WRITE(*,*) '... one_find_file: ', FILES
       WRITE(*,*) ' '
 
-      CONTEXT = 0  
+      CONTEXT = 0
 
       NFOUND = 0
-      DO WHILE ( STATUS .EQ. SAI__OK) 
+      DO WHILE ( STATUS .EQ. SAI__OK)
          FOUND = ONE_FIND_FILE( FILES, .FALSE., FILENAME, CONTEXT,
      :        STATUS)
          IF ( FOUND ) THEN
@@ -106,7 +106,7 @@
             WRITE(*,*) '   ... found file: ', FILENAME
          ELSE
             WRITE(*,*) '   ... no more files match search mask: ', FILES
-         ENDIF 
+         ENDIF
       END DO
 
 *  Reset status and close find file system.
@@ -129,7 +129,7 @@
       WRITE(*,*) '... one_scrsz: '
       WRITE(*,*) ' '
 
-      CALL ONE_SCRSZ( COLUMNS, ROWS, STATUS )    
+      CALL ONE_SCRSZ( COLUMNS, ROWS, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          WRITE(*,*) '... test of one_scrsz failed ... aborting'
          GOTO 9999

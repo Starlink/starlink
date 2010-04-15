@@ -95,7 +95,7 @@
 #define FUNC_NAME "smf_filter_edge"
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
-  size_t base;          /* Index to start of memory to be zero'd */    
+  size_t base;          /* Index to start of memory to be zero'd */
   size_t iedge;         /* Index corresponding to the edge frequency */
   size_t len;           /* Length of memory to be zero'd */
 
@@ -120,16 +120,16 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
 
   if( lowpass ) { /* Zero frequencies beyond edge */
     base = iedge;
-    len = filt->dim - iedge;  
+    len = filt->dim - iedge;
   } else {        /* Zero frequencies from 0 to edge */
-    base = 0;                      
+    base = 0;
     len = iedge + 1;
   }
 
-  memset( ((unsigned char *) filt->real) + base*sizeof(*filt->real), 0, 
+  memset( ((unsigned char *) filt->real) + base*sizeof(*filt->real), 0,
           len*sizeof(*filt->real) );
   if( filt->isComplex ) {
-    memset( ((unsigned char *) filt->imag) + base*sizeof(*filt->imag), 0, 
+    memset( ((unsigned char *) filt->imag) + base*sizeof(*filt->imag), 0,
             len*sizeof(*filt->imag) );
   }
 }

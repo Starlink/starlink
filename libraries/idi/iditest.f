@@ -15,12 +15,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -109,7 +109,7 @@
       MAXCOL = (2**DEPTH) -1
       DO 40 I=0,MXI-1
           DO 30 J=1,MXJ
-              IDATA(I*MXI+J) = (F(I*MXI+J)-FMIN) / (FMAX - FMIN) 
+              IDATA(I*MXI+J) = (F(I*MXI+J)-FMIN) / (FMAX - FMIN)
      :                         * MAXCOL
    30     CONTINUE
    40 CONTINUE
@@ -178,7 +178,7 @@
       DITHER = 1.0/(2**DDEPTH)
       DO 80 J = 1, 2**DDEPTH
          DO 70 I = 1, 3
-           IF (ABS(VLUT(I,J)-VLUT2(I,J)).GT.DITHER) 
+           IF (ABS(VLUT(I,J)-VLUT2(I,J)).GT.DITHER)
      :          PRINT *, 'VLUT mismatch'
   70     CONTINUE
   80  CONTINUE
@@ -207,7 +207,7 @@
       DO 100 I = 1, NDATA
          JDATA(I) = ABS(JDATA(I) - IDATA(I))
   100 CONTINUE
-      PRINT *, 
+      PRINT *,
      :   'Displaying difference between the snapshot and the data...'
       CALL IIMWMY( ID, MEM0, JDATA, NDATA, DEPTH, PACK,
      :             XSTART, YSTART, STATUS )
@@ -251,7 +251,7 @@
       CALL IIDSNP( ID, MEM0, NDATA, 0, 0, DEPTH, PACK, JDATA, STATUS)
       IF ( STATUS .NE. IDI__OK ) GOTO 98
 
-      IF (JDATA(1).NE.255) PRINT *, 
+      IF (JDATA(1).NE.255) PRINT *,
      :                  'Snapshot of white does not give 255', JDATA(1)
 
 *   Repeat for black
@@ -263,7 +263,7 @@
       CALL IIDSNP( ID, 0, NDATA, 0, 0, DEPTH, PACK, JDATA, STATUS)
       IF ( STATUS .NE. IDI__OK ) GOTO 98
 
-      IF (JDATA(1).NE.0) PRINT *, 
+      IF (JDATA(1).NE.0) PRINT *,
      :                  'Snapshot of black does not give 0'
 
 *   Change load direction and plot the image again
@@ -313,7 +313,7 @@
       CALL IIMSTW( ID, MEM0, UP, DSIZE(1), DSIZE(2), DEPTH, 0, 0,
      :             STATUS )
       IF ( STATUS .NE. IDI__OK ) GOTO 98
-      CALL IIDSNP( ID, MEM0, DSIZE(1)*DSIZE(2), 0, 0, DEPTH, PACK, 
+      CALL IIDSNP( ID, MEM0, DSIZE(1)*DSIZE(2), 0, 0, DEPTH, PACK,
      :             JDATA, STATUS)
       IF ( STATUS .NE. IDI__OK ) GOTO 98
 
@@ -357,7 +357,7 @@
       CALL IIMSTW( ID, MEM0, UP, DSIZE(1), DSIZE(2), DEPTH, 0, 0,
      :             STATUS )
       IF ( STATUS .NE. IDI__OK ) GOTO 98
-      CALL IIDSNP( ID, MEM0, DSIZE(1)*DSIZE(2), 0, 0, DEPTH, PACK, 
+      CALL IIDSNP( ID, MEM0, DSIZE(1)*DSIZE(2), 0, 0, DEPTH, PACK,
      :             JDATA, STATUS)
       IF ( STATUS .NE. IDI__OK ) GOTO 98
 
@@ -489,5 +489,5 @@
       CALL IIDUPD( ID, STATUS )
       CALL SLEEP(2)
       UPDATE = STATUS
-      RETURN 
+      RETURN
       END

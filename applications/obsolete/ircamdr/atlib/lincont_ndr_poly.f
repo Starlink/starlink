@@ -1,11 +1,11 @@
-	SUBROUTINE LINCONT_NDR_POLY( NUMCOEFFS, COEFFS, RAT, VALMPMK, 
+	SUBROUTINE LINCONT_NDR_POLY( NUMCOEFFS, COEFFS, RAT, VALMPMK,
      :	                             VALLIN)
 
 * Description : Applies linearization polynomial correction to a pixel value
 
 	IMPLICIT NONE
 
-	INTEGER 
+	INTEGER
      :	  NUMCOEFFS             ! number of coefficients
 
 	REAL
@@ -17,8 +17,8 @@
 
 *      caluclate correction factor for this pixel
 
-	FACTOR = 1.0 + 
-     :	         COEFFS( 1)*(( 1+RAT)**2 - RAT**2)*VALMPMK + 
+	FACTOR = 1.0 +
+     :	         COEFFS( 1)*(( 1+RAT)**2 - RAT**2)*VALMPMK +
      :	         COEFFS( 2)*(( 1+RAT)**3 - RAT**3)*VALMPMK**2 +
      :           COEFFS( 3)*(( 1+RAT)**4 - RAT**4)*VALMPMK**3
 

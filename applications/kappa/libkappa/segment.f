@@ -20,14 +20,14 @@
 *        The global status.
 
 *  Description:
-*     This routine copies one or more polygonal segments from the first 
-*     input NDF (parameter IN1), and pastes them into the second input 
+*     This routine copies one or more polygonal segments from the first
+*     input NDF (parameter IN1), and pastes them into the second input
 *     NDF (parameter IN2) at the same pixel co-ordinates.  The resulting
-*     mosaic is stored in the output NDF (see OUT).  Either input NDF 
-*     may be supplied as null ("!") in which case the corresponding 
+*     mosaic is stored in the output NDF (see OUT).  Either input NDF
+*     may be supplied as null ("!") in which case the corresponding
 *     areas of the output NDF are filled with bad values.  For instance,
 *     supplying a null value for IN2 allows segments to be cut from IN1
-*     and pasted on to a background of bad values.  Supplying a null 
+*     and pasted on to a background of bad values.  Supplying a null
 *     value for IN1 allows "holes" to be cut out of IN2 and filled with
 *     bad values.
 *
@@ -37,9 +37,9 @@
 *     supplying the positions in response to a parameter prompt. The
 *     choice is made by parameter MODE.
 *
-*     This application may also be used to cut and paste cylinders with 
-*     polygonal cross-sections from NDFs with more than two dimensions. 
-*     See the Notes section below for further details. 
+*     This application may also be used to cut and paste cylinders with
+*     polygonal cross-sections from NDFs with more than two dimensions.
+*     See the Notes section below for further details.
 
 *  Usage:
 *     segment in1 in2 out { coords=?
@@ -50,21 +50,21 @@
 *  ADAM Parameters:
 *     COORDS = LITERAL (Read)
 *        The co-ordinates of a single vertex for the current polygon.
-*        If parameter MODE is set to "Interface", this parameter is 
+*        If parameter MODE is set to "Interface", this parameter is
 *        accessed repeatedly to obtain the co-ordinates of all vertices
 *        in the polygon.  A null value should be given when the final
-*        vertex has been specified.  Each position should be supplied 
+*        vertex has been specified.  Each position should be supplied
 *        within the current co-ordinate Frame of the output NDF (see
 *        parameter OUT).  Supplying a colon ":" will display details of
-*        the required co-ordinate Frame.  No more than two formatted 
-*        axis values (separated by a comma or space) may be supplied. 
+*        the required co-ordinate Frame.  No more than two formatted
+*        axis values (separated by a comma or space) may be supplied.
 *        If the co-ordinate Frame being used has more than two axes,
-*        then the two axes to use must be specified using parameter 
+*        then the two axes to use must be specified using parameter
 *        USEAXIS.
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device on which an image is displayed.
-*        Only used if parameter MODE is given the value "Cursor".  Any 
-*        graphics specified by parameter PLOT will be produced on this 
+*        Only used if parameter MODE is given the value "Cursor".  Any
+*        graphics specified by parameter PLOT will be produced on this
 *        device.  This device must support cursor interaction.  [Current
 *        graphics device]
 *     IN1 = NDF (Read)
@@ -78,14 +78,14 @@
 *        supplied, the outside of the polygonal segments will be filled
 *        with bad values.
 *     INCAT1-INCAT20 = FILENAME (Read)
-*        If MODE is "Catalogue", each of the parameters INCAT1 to 
-*        INCAT20 are used to access catalogues containing the 
-*        co-ordinates of the vertices of a single polygon.  Suitable 
+*        If MODE is "Catalogue", each of the parameters INCAT1 to
+*        INCAT20 are used to access catalogues containing the
+*        co-ordinates of the vertices of a single polygon.  Suitable
 *        catalogues may be created using CURSOR, LISTMAKE, etc.  If a
-*        value is assigned to INCAT1 on the command line, you are not 
+*        value is assigned to INCAT1 on the command line, you are not
 *        prompted for any of the remaining parameters in this group;
-*        additional polygon catalogues must also be supplied on the 
-*        command line.  Otherwise, you are prompted for INCAT1, then 
+*        additional polygon catalogues must also be supplied on the
+*        command line.  Otherwise, you are prompted for INCAT1, then
 *        INCAT2, etc. until a null value is given or INCAT20 is reached.
 *
 *        The positions in each catalogue are mapped into the pixel
@@ -99,15 +99,15 @@
 *        no file is created.  [!]
 *     MARKER = INTEGER (Read)
 *        This parameter is only accessed if parameter PLOT is set to
-*        "Chain" or "Mark". It specifies the type of marker with which 
-*        each cursor position should be marked, and should be given as 
-*        an integer PGPLOT marker type. For instance, 0 gives a box, 1 
-*        gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a 
-*        triangle. The value must be larger than or equal to -31. 
+*        "Chain" or "Mark". It specifies the type of marker with which
+*        each cursor position should be marked, and should be given as
+*        an integer PGPLOT marker type. For instance, 0 gives a box, 1
+*        gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
+*        triangle. The value must be larger than or equal to -31.
 *        [current value]
 *     MODE = LITERAL (Read)
-*        The mode in which the co-ordinates of each polygon vertex are 
-*        to be obtained.  The supplied string can be one of the 
+*        The mode in which the co-ordinates of each polygon vertex are
+*        to be obtained.  The supplied string can be one of the
 *        following selection.
 *
 *        - "Interface" -- positions are obtained using parameter COORDS.
@@ -115,23 +115,23 @@
 *        Frame of the output NDF (see parameter OUT).
 *
 *        - "Cursor" -- positions are obtained using the graphics cursor
-*        of the device specified by parameter DEVICE.  The WCS 
+*        of the device specified by parameter DEVICE.  The WCS
 *        information stored with the picture in the graphics database is
-*        used to map the supplied cursor positions into the pixel 
-*        co-ordinate Frame of the output NDF.  A message is displayed 
+*        used to map the supplied cursor positions into the pixel
+*        co-ordinate Frame of the output NDF.  A message is displayed
 *        indicating the co-ordinate Frame in which the picture and the
 *        output NDF were aligned.
 *
 *        - "Catalogue" -- positions are obtained from positions lists
 *        using parameters INCAT1 to INCAT20. Each catalogue defines a
 *        single polygon. The WCS information in each catalogue is used
-*        to map the positions in the catalogue into the pixel 
-*        co-ordinate Frame of the output NDF.  A message is displayed 
-*        for each catalogue indicating the co-ordinate Frame in which 
+*        to map the positions in the catalogue into the pixel
+*        co-ordinate Frame of the output NDF.  A message is displayed
+*        for each catalogue indicating the co-ordinate Frame in which
 *        the catalogue and the output NDF were aligned.
 *
-*        - "File" -- positions are obtained from text files using 
-*        parameters POLY1 to POLY20.  Each file defines a single 
+*        - "File" -- positions are obtained from text files using
+*        parameters POLY1 to POLY20.  Each file defines a single
 *        polygon.  Each line in a file must contain two formatted axis
 *        values in the current co-ordinate Frame of the output NDF (see
 *        parameter OUT), separated by white space or a comma.
@@ -153,51 +153,51 @@
 *     OUT = NDF (Write)
 *        The output NDF.  If only one input NDF is supplied (that is, if
 *        one of IN1 and IN2 is assigned a null value), then the output
-*        NDF has the same shape and size as the supplied input NDF. 
-*        Also ancillary data such as WCS information is propagated from 
-*        the supplied input NDF.  In particular, this means that the 
-*        current co-ordinate Frame of the output NDF (in which vertex 
+*        NDF has the same shape and size as the supplied input NDF.
+*        Also ancillary data such as WCS information is propagated from
+*        the supplied input NDF.  In particular, this means that the
+*        current co-ordinate Frame of the output NDF (in which vertex
 *        positions should be supplied if MODE is "File" or "Interface")
-*        is inherited from the input NDF.  If two input NDFs are 
-*        supplied, then the shape and size of the output NDF 
-*        corresponds to the area of overlap between the two input NDFs 
-*        (in pixel space), and the WCS information and current Frame 
+*        is inherited from the input NDF.  If two input NDFs are
+*        supplied, then the shape and size of the output NDF
+*        corresponds to the area of overlap between the two input NDFs
+*        (in pixel space), and the WCS information and current Frame
 *        are inherited from the NDF associated with parameter IN1.
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the position of each
 *        selected vertex.  It is only used if parameter MODE is given
-*        the value "Cursor".  The appearance of these graphics (colour, 
-*        size, etc ) is controlled by the STYLE parameter.  PLOT can 
+*        the value "Cursor".  The appearance of these graphics (colour,
+*        size, etc ) is controlled by the STYLE parameter.  PLOT can
 *        take any of the following values.
 *
 *        - "None" -- No graphics are produced.
 *
-*        - "Mark" -- Each position is marked with a marker of type 
+*        - "Mark" -- Each position is marked with a marker of type
 *        specified by parameter MARKER.
 *
-*        - "Poly" -- Causes each position to be joined by a line to the 
-*        previous position.  Each polygon is closed by joining the last 
+*        - "Poly" -- Causes each position to be joined by a line to the
+*        previous position.  Each polygon is closed by joining the last
 *        position to the first.
 *
-*        - "Chain" -- This is a combination of "Mark" and "Poly".  Each 
-*        position is marked by a marker and joined by a line to the 
-*        previous position.  Parameter MARKER is used to specify the 
+*        - "Chain" -- This is a combination of "Mark" and "Poly".  Each
+*        position is marked by a marker and joined by a line to the
+*        previous position.  Parameter MARKER is used to specify the
 *        marker  to use.  [current value]
 *     POLY1-POLY20 = FILENAME (Read)
-*        If MODE is "File", each of the parameters POLY1 to POLY20 are 
-*        used to access text files containing the co-ordinates of the 
+*        If MODE is "File", each of the parameters POLY1 to POLY20 are
+*        used to access text files containing the co-ordinates of the
 *        vertices of a single polygon.  If a value is assigned to POLY1
-*        on the command line, you are not prompted for any of the 
-*        remaining parameters in this group; additional polygon files 
-*        must also be supplied on the command line.  Otherwise, you are 
-*        prompted for POLY1, then POLY2, etc. until a null value is 
+*        on the command line, you are not prompted for any of the
+*        remaining parameters in this group; additional polygon files
+*        must also be supplied on the command line.  Otherwise, you are
+*        prompted for POLY1, then POLY2, etc. until a null value is
 *        given or POLY20 is reached.
 *
-*        Each position should be supplied within the current 
-*        co-ordinate Frame of the output NDF (see parameter OUT).  No 
-*        more than two formatted axis values (separated by a comma or 
+*        Each position should be supplied within the current
+*        co-ordinate Frame of the output NDF (see parameter OUT).  No
+*        more than two formatted axis values (separated by a comma or
 *        space) may be supplied on each line.  If the co-ordinate Frame
-*        being used has more than two axes, then the two axes to use 
+*        being used has more than two axes, then the two axes to use
 *        must be specified using parameter USEAXIS.
 *     QUALITY = _LOGICAL (Read)
 *        If a TRUE value is supplied for parameter QUALITY then quality
@@ -213,12 +213,12 @@
 *        drawing the graphics specified by parameter PLOT.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
-*        file preceded by an up-arrow character "^".  Such text files 
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
 *        should contain further comma-separated lists which will be read
-*        and interpreted in the same manner.  Attribute settings are 
+*        and interpreted in the same manner.  Attribute settings are
 *        applied in the order in which they occur within the list, with
-*        later settings overriding any earlier settings given for the 
+*        later settings overriding any earlier settings given for the
 *        same attribute.
 *
 *        Each individual attribute setting should be of the form:
@@ -228,41 +228,41 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section 
-*        "Plotting Attributes" in SUN/95 for a description of the 
+*        defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported). 
+*        (no error is reported).
 *
-*        The appearance of the lines forming the edges of each polygon 
+*        The appearance of the lines forming the edges of each polygon
 *        is controlled by the attributes Colour(Curves), Width(Curves),
-*        etc. (either of the synonyms Lines and Edges may be used in 
-*        place of Curves).  The appearance of the vertex markers is 
-*        controlled by the attributes Colour(Markers), Size(Markers), 
-*        etc. (the synonyms Vertices may be used in place of Markers).  
+*        etc. (either of the synonyms Lines and Edges may be used in
+*        place of Curves).  The appearance of the vertex markers is
+*        controlled by the attributes Colour(Markers), Size(Markers),
+*        etc. (the synonyms Vertices may be used in place of Markers).
 *        [current value]
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the output NDF has more than two axes.  A group of two strings
-*        should be supplied specifying the two axes spanning the plane 
+*        should be supplied specifying the two axes spanning the plane
 *        in which the supplied polygons are defined.  Each axis can be
 *        specified using one of the following options.
 *
-*        - An integer index of an axis within the current Frame of the 
+*        - An integer index of an axis within the current Frame of the
 *        output NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *
 *        - An axis symbol string such as "RA" or "VRAD".
 *
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
-*        sky longitude and latitude axes respectively.  Only those axis 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
-*        A list of acceptable values is displayed if an illegal value is 
-*        supplied.  If a null (!) value is supplied, the axes with the 
-*        same indices as the first two significant NDF pixel axes are 
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the first two significant NDF pixel axes are
 *        used.  [!]
-*     VARIANCE = _LOGICAL (Read) 
+*     VARIANCE = _LOGICAL (Read)
 *        If a TRUE value is supplied for parameter VARIANCE then
 *        variance information is copied from the input NDFs to the
 *        output NDFs.  Otherwise, the variance information is not
@@ -296,15 +296,15 @@
 *     this application.
 *     -  The routine can handle NDFs of arbitrary dimensionality.  If
 *     either input has three or more dimensions then all planes in the
-*     NDF pixel arrays are processed in the same way, that is the same 
+*     NDF pixel arrays are processed in the same way, that is the same
 *     polygonal regions are extracted from each plane and copied to the
 *     corresponding plane of the output NDF.  The plane containing the
 *     polygons must be defined using parameter USEAXIS.  This plane is a
-*     plane within the current co-ordinate Frame of the output NDF 
+*     plane within the current co-ordinate Frame of the output NDF
 *     (which is inherited from the first supplied input NDF).  This
-*     scheme will only work correctly if the selected plane in the 
-*     current co-ordinate Frame is parallel to one of the planes of the 
-*     pixel array. 
+*     scheme will only work correctly if the selected plane in the
+*     current co-ordinate Frame is parallel to one of the planes of the
+*     pixel array.
 
 *  Related Applications:
 *     KAPPA: ARDMASK, ERRCLIP, FILLBAD, FFCLEAN, PASTE, REGIONMASK,
@@ -379,7 +379,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -399,7 +399,7 @@
       INTEGER MXPOLY             ! Max. no. of polygon files
       PARAMETER ( MXPOLY = 20 )
 
-      INTEGER MXVERT             ! Max. no. of vertices in any polygon 
+      INTEGER MXVERT             ! Max. no. of vertices in any polygon
       PARAMETER ( MXVERT = 1000 )
 
 *  Local Variables:
@@ -507,7 +507,7 @@
       IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Set a flag indicating if an NDF was obtained.
-      GOT1 = INDF1 .NE. NDF__NOID .AND. STATUS .EQ. SAI__OK 
+      GOT1 = INDF1 .NE. NDF__NOID .AND. STATUS .EQ. SAI__OK
 
 *  If an NDF was obtained, get the state of the VARIANCE and QUALITY
 *  components.
@@ -579,8 +579,8 @@
 
 *  Find the PIXEL Frame.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
-  
-*  Get the Mapping from Current Frame to PIXEL Frame. 
+
+*  Get the Mapping from Current Frame to PIXEL Frame.
       MAP = AST_GETMAPPING( IWCS, AST__CURRENT, IPIX, STATUS )
 
 *  Simplify the Mapping.
@@ -601,13 +601,13 @@
 *  ====================================================
 *  In this section we obtain a FrameSet (pointed to by variable IWCS)
 *  in which the current Frame is the Frame in which the user will supply
-*  vertex co-ordinates. If the Current Frame in the output NDFs WCS 
+*  vertex co-ordinates. If the Current Frame in the output NDFs WCS
 *  FrameSet has 1 or 2 axes, then this FrameSet will be used "as is".
 *  Otherwise it will be modified by adding a new current Frame containing
 *  exactly 2 axes, selected by the user form all the axes available in the
 *  original current Frame).
 
-*  If the Current WS Frame has only 1 axis, then the user specifies 
+*  If the Current WS Frame has only 1 axis, then the user specifies
 *  1-dimensional positions.
       IF( NAXC .EQ. 1 ) THEN
          NAX = 1
@@ -642,7 +642,7 @@
          IF( AXES( 1 ) .EQ. 0 ) AXES( 1 ) = 1
          IF( AXES( 2 ) .EQ. 0 ) THEN
             IF( AXES( 1 ) .GT. 1 ) THEN
-               AXES( 2 ) = AXES( 1 ) 
+               AXES( 2 ) = AXES( 1 )
                AXES( 1 ) = 1
             ELSE
                AXES( 2 ) = 2
@@ -650,7 +650,7 @@
          END IF
 
 *  If the Current Frame does not have sufficient axes to use these
-*  defaults, use 1 and 2 as the default axes.  
+*  defaults, use 1 and 2 as the default axes.
          IF( AXES( 1 ) .GT. NAXC .OR. AXES( 2 ) .GT. NAXC ) THEN
             AXES( 1 ) = 1
             AXES( 2 ) = 2
@@ -666,10 +666,10 @@
          NEWFRM = AST_PICKAXES( IWCS, 2, AXES, PMAP, STATUS )
 
 *  Now add this new Frame into the FrameSet.
-         CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NEWFRM, STATUS ) 
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NEWFRM, STATUS )
 
-*  We now add the inverted PermMap to the begining of the Mapping from 
-*  the original Current Frame to the PIXEL Frame. 
+*  We now add the inverted PermMap to the begining of the Mapping from
+*  the original Current Frame to the PIXEL Frame.
          CALL AST_INVERT( PMAP, STATUS )
          NEWMAP = AST_CMPMAP( PMAP, SMAP, .TRUE., ' ', STATUS )
          CALL AST_ANNUL( SMAP, STATUS )
@@ -683,7 +683,7 @@
 *  Prepare the graphics device if required.
 *  ========================================
 *  See whether the co-ordinates of the polygon vertices are to be
-*  specified using the parameter system, graphics cursor, positions list, 
+*  specified using the parameter system, graphics cursor, positions list,
 *  or a text file.
       CALL PAR_CHOIC( 'MODE', 'Interface', 'Interface,Cursor,'//
      :                'Catalogue,File', .TRUE., MODE, STATUS )
@@ -704,13 +704,13 @@
 *  Find the most recent DATA picture.
          CALL KPG1_AGFND( 'DATA', IPIC, STATUS )
 
-*  Report the name, comment, and label, if one exists, for the current 
+*  Report the name, comment, and label, if one exists, for the current
 *  picture.
          CALL KPG1_AGATC( STATUS )
 
-*  Set the PGPLOT viewport and AST Plot for this DATA picture. The PGPLOT 
-*  viewport is set equal to the selected picture, with world co-ordinates 
-*  giving millimetres from the bottom left corner of the view surface. 
+*  Set the PGPLOT viewport and AST Plot for this DATA picture. The PGPLOT
+*  viewport is set equal to the selected picture, with world co-ordinates
+*  giving millimetres from the bottom left corner of the view surface.
          CALL KPG1_GDGET( IPIC, AST__NULL, .FALSE., IPLOT, STATUS )
 
 *  Save the bounds of the DATA picture.
@@ -720,9 +720,9 @@
 *  FrameSet, aligning them in some suitable Frame.
          CALL KPG1_ASMRG( IPLOT, IWCS, ' ', .FALSE., 0, STATUS )
 
-*  Get the simplified Mapping from the GRAPHICS Frame to the Current Frame 
+*  Get the simplified Mapping from the GRAPHICS Frame to the Current Frame
 *  of the output NDF.
-         GMAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, 
+         GMAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE,
      :                                        AST__CURRENT, STATUS ),
      :                        STATUS )
 
@@ -737,11 +737,11 @@
             GO TO 999
          END IF
 
-*  See what type of graphics are required. 
-         CALL PAR_CHOIC( 'PLOT', 'Poly', 'Poly,Mark,Chain,None', .TRUE., 
+*  See what type of graphics are required.
+         CALL PAR_CHOIC( 'PLOT', 'Poly', 'Poly,Mark,Chain,None', .TRUE.,
      :                   PLOT, STATUS )
 
-*  Set the rubber band mode to use (none, unless "Poly" or "Chain" graphics 
+*  Set the rubber band mode to use (none, unless "Poly" or "Chain" graphics
 *  are being produced, in which case use a straight line rubber band).
          IF( PLOT .EQ. 'POLY' .OR. PLOT .EQ. 'CHAIN' ) THEN
             RBMODE = 1
@@ -751,7 +751,7 @@
 
 *  Get the PGPLOT marker type for CHAIN and MARKER graphics.
          IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN
-            CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK, 
+            CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK,
      :                      STATUS )
          ELSE
             IMARK = -1000
@@ -781,11 +781,11 @@
 
 *  Do other preparation.
 *  =====================
-*  Indicate information explaining how to supply vertices should be 
+*  Indicate information explaining how to supply vertices should be
 *  displayed before getting the first polygon.
       INFO = .TRUE.
 
-*  If file or catalogue mode has been selected, see if a command-line value 
+*  If file or catalogue mode has been selected, see if a command-line value
 *  has been supplied for the first polygon co-ordinate file.  If so, set a
 *  flag to suppress prompting for extra polygons (i.e. only the polygons
 *  supplied on the command line will be used).
@@ -803,7 +803,7 @@
 
 *  The polygons defined by the user are initially stored in a
 *  2-dimensional mask image which indicates which pixels are inside a
-*  polygon and which are not. As yet we do not know which pixel axes will 
+*  polygon and which are not. As yet we do not know which pixel axes will
 *  be spanned by the supplied current Frame positions, and so we cannot
 *  determine the required size for this mask. Set the pointer to the mask
 *  to zero to indicate that memory for the mask has not yet been allocated.
@@ -817,14 +817,14 @@
 
 *  Get the maximum number of polygons which may be given. There are only
 *  a limited number of parameters for accessing input text files, so if
-*  MODE=FILE or CATALOGUE, an absolute limit of MXPOLY has to be imposed.  
-      IF( FILE .OR. CAT ) THEN 
+*  MODE=FILE or CATALOGUE, an absolute limit of MXPOLY has to be imposed.
+      IF( FILE .OR. CAT ) THEN
          CALL PAR_GDR0I( 'MAXPOLY', MXPOLY, 1, MXPOLY, .TRUE., MAXPOL,
      :                    STATUS )
       ELSE
          CALL PAR_GDR0I( 'MAXPOLY', VAL__MAXI, 1, VAL__MAXI, .TRUE.,
      :                   MAXPOL, STATUS )
-      END IF      
+      END IF
 
 *  Now get the minimum number of polygons which must be processed.
       CALL PAR_GDR0I( 'MINPOLY', 1, 1, MAXPOL, .FALSE., MINPOL, STATUS )
@@ -835,7 +835,7 @@
 *  Initialise the number of the next parameter to use.
       NPARAM = 1
 
-*  Attempt to open a log file to store the results for human readers. 
+*  Attempt to open a log file to store the results for human readers.
       CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 80, FDL, STATUS )
 
 *  Annul the error if a null value was given, and indicate that a log
@@ -846,7 +846,7 @@
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          LOGPOS = .TRUE.
-         CALL FIO_WRITE( FDL, '# Log file created by SEGMENT', STATUS ) 
+         CALL FIO_WRITE( FDL, '# Log file created by SEGMENT', STATUS )
       END IF
 
 *  Now loop round, obtaining polygons and adding them into a pixel mask.
@@ -869,7 +869,7 @@
 
 *  First, deal with cursor mode.
 *  -----------------------------
-         IF( CURSOR ) THEN    
+         IF( CURSOR ) THEN
 
 *  On the second and subsequent passes, give an abbreviated set of
 *  instructions.
@@ -881,11 +881,11 @@
                CALL MSG_BLANK( STATUS )
             END IF
 
-*  Get the vertex positions in GRAPHICS co-ordinates, using the graphics 
+*  Get the vertex positions in GRAPHICS co-ordinates, using the graphics
 *  cursor.
-            CALL KPG1_PGCUR( INFO, 'define a polygon', 2, ACTDES, 'AX', 
-     :                       X1, X2, Y1, Y2, 0, 0.5*( X1 + X2 ), 
-     :                       0.5*( Y1 + Y2 ), MXVERT, RBMODE, LINES, 0, 
+            CALL KPG1_PGCUR( INFO, 'define a polygon', 2, ACTDES, 'AX',
+     :                       X1, X2, Y1, Y2, 0, 0.5*( X1 + X2 ),
+     :                       0.5*( Y1 + Y2 ), MXVERT, RBMODE, LINES, 0,
      :                       IMARK, IPLOT, X, Y, ACT, NVERT, STATUS )
 
 *  Copy any GRAPHICS positions to a DOUBLE PRECISION ARRAY and transform
@@ -904,21 +904,21 @@
                INFO = .FALSE.
 
 *  If this polygon is null, and the previous one was null, indicate that
-*  no more are to be obtained. 
+*  no more are to be obtained.
             ELSE IF( NBAD .EQ. 1 ) THEN
-               PROMPT = .FALSE.            
+               PROMPT = .FALSE.
 
             END IF
 
 *  Now, deal with interface mode.
 *  ------------------------------
-         ELSE IF( INTERF ) THEN    
+         ELSE IF( INTERF ) THEN
 
 *  Give appropriate instructions.
             CALL MSG_BLANK( STATUS )
             IF( INFO ) THEN
                CALL MSG_OUT( 'SEGMENT_MSG2', 'Supply the positions '//
-     :                       'of the vertices for the first polygon:', 
+     :                       'of the vertices for the first polygon:',
      :                       STATUS )
             ELSE
                CALL MSG_OUT( 'SEGMENT_MSG3', 'Supply the positions '//
@@ -929,21 +929,21 @@
 
 *  Loop round until no more points are given.
             AGAIN = .TRUE.
-            DO WHILE( AGAIN .AND. STATUS .EQ. SAI__OK ) 
+            DO WHILE( AGAIN .AND. STATUS .EQ. SAI__OK )
 
 *  Get another position, expressed in the current Frame of the FrameSet.
 *  Do not use a dynamic default.
                CC( 1 ) = AST__BAD
-               CALL KPG1_GTPOS( 'COORDS', IFRM, .FALSE., CC, BC, 
+               CALL KPG1_GTPOS( 'COORDS', IFRM, .FALSE., CC, BC,
      :                          STATUS )
 
-*  If a null value was supplied, annul the error, and indicate that the 
+*  If a null value was supplied, annul the error, and indicate that the
 *  loop should be left.
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
-                  AGAIN = .FALSE.               
+                  AGAIN = .FALSE.
 
-*  Otherwise, increment the number of supplied positions and store the 
+*  Otherwise, increment the number of supplied positions and store the
 *  position in the work array.
                ELSE
                   NVERT = NVERT + 1
@@ -955,7 +955,7 @@
                      CALL MSG_SETI( 'MX', MXVERT )
                      CALL MSG_OUT( 'SEGMENT_MSG4', 'Maximum number of'//
      :                             ' vertices (^MX) reached.', STATUS )
-                     AGAIN = .FALSE.                  
+                     AGAIN = .FALSE.
                   END IF
 
                END IF
@@ -970,7 +970,7 @@
 
 *  Now, deal with catalogue mode.
 *  ------------------------------
-         ELSE IF( CAT ) THEN    
+         ELSE IF( CAT ) THEN
 
 *  Construct the parameter name for the next catalogue.
             PNAME = 'INCAT '
@@ -982,23 +982,23 @@
             IF( .NOT. PROMPT ) THEN
                CALL LPG_STATE( PNAME( : LPNAME ), PSTATE, STATUS )
                MORE = PSTATE .EQ. PAR__ACTIVE
-            END IF               
+            END IF
 
 *  Process the next catalogue if appropriate.
             IF( MORE .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Open a positions list catalogue and read its contents. A pointer to a 
-*  FrameSet is returned, together with pointers to positions and identifiers, 
+*  Open a positions list catalogue and read its contents. A pointer to a
+*  FrameSet is returned, together with pointers to positions and identifiers,
 *  and a title. The positions are returned in the Base Frame of this FrameSet.
                IWCSC = AST__NULL
-               CALL KPG1_RDLST( PNAME( : LPNAME ), .FALSE., IWCSC, 
-     :                          NVERT, CATNAX, IPIN, IPID, TITLE, ' ', 
+               CALL KPG1_RDLST( PNAME( : LPNAME ), .FALSE., IWCSC,
+     :                          NVERT, CATNAX, IPIN, IPID, TITLE, ' ',
      :                          STATUS )
 
 *  If a null parameter value was supplied, annul the error.
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
-               
+
 *  Otherwise, use the positions read from the catalogue.
                ELSE
 
@@ -1016,19 +1016,19 @@
 
 *  Align the FrameSet read from the catalogue with the FrameSet for the
 *  output NDF.
-                  CALL KPG1_ASMRG( IWCSC, IWCS, ' ', .FALSE., 0, 
+                  CALL KPG1_ASMRG( IWCSC, IWCS, ' ', .FALSE., 0,
      :                             STATUS )
 
-*  Get the simplified Mapping from the catalogue Base Frame to the 
+*  Get the simplified Mapping from the catalogue Base Frame to the
 *  Current Frame of the output NDF.
-                  CMAP = AST_SIMPLIFY( AST_GETMAPPING( IWCSC, AST__BASE, 
+                  CMAP = AST_SIMPLIFY( AST_GETMAPPING( IWCSC, AST__BASE,
      :                                           AST__CURRENT, STATUS ),
      :                                 STATUS )
 
 *  Transform the supplied positions into the current Frame of the output
 *  NDF.
                   CALL AST_TRANN( CMAP, NVERT, CATNAX, NVERT,
-     :                            %VAL( CNF_PVAL( IPIN ) ), 
+     :                            %VAL( CNF_PVAL( IPIN ) ),
      :                            .TRUE., NAX, MXVERT,
      :                            CVERT, STATUS )
 
@@ -1045,29 +1045,29 @@
 
 *  Now, deal with file mode.
 *  -------------------------
-         ELSE 
+         ELSE
 
 *  Construct the parameter name for the next file.
             PNAME = 'POLY  '
             LPNAME = 4
             CALL CHR_PUTI( NPARAM, PNAME, LPNAME )
 
-*  If prompting for files is disabled, only use the next file if it was 
+*  If prompting for files is disabled, only use the next file if it was
 *  supplied on the command line (otherwise, leave the polygon loop).
             IF( .NOT. PROMPT ) THEN
                CALL LPG_STATE( PNAME( : LPNAME ), PSTATE, STATUS )
                MORE = PSTATE .EQ. PAR__ACTIVE
-            END IF               
+            END IF
 
 *  Process the next file if appropriate.
             IF( MORE ) THEN
-               CALL KPG1_ASFIL( PNAME( : LPNAME ), ' ', IFRM, NVERT, 
+               CALL KPG1_ASFIL( PNAME( : LPNAME ), ' ', IFRM, NVERT,
      :                          IPIN, ' ', STATUS )
 
 *  If a null parameter value was supplied, annul the error.
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
-               
+
 *  Otherwise, use the positions read from the file.
                ELSE
 
@@ -1084,8 +1084,8 @@
                   END IF
 
 *  Copy the supplied positions into the work array.
-                  CALL AST_TRANN( AST_UNITMAP( NAX, ' ', STATUS ), 
-     :                            NVERT, NAX, NVERT, 
+                  CALL AST_TRANN( AST_UNITMAP( NAX, ' ', STATUS ),
+     :                            NVERT, NAX, NVERT,
      :                            %VAL( CNF_PVAL( IPIN ) ),
      :                            .TRUE., NAX, MXVERT, CVERT, STATUS )
 
@@ -1121,9 +1121,9 @@
 
 *  Store the indices of the first two axes which have good axis values.
                IAX = 0
-               DO IDIM = 1, NDIM               
+               DO IDIM = 1, NDIM
                   IF( PVERT( I, IDIM ) .NE. AST__BAD ) THEN
-                     IAX = IAX + 1                  
+                     IAX = IAX + 1
                      IF( IAX .LE. 2 ) THEN
                         PAX( IAX ) = IDIM
                      END IF
@@ -1156,7 +1156,7 @@
                GO TO 999
             END IF
 
-*  Copy the transformed points which are good on the two pixel axes 
+*  Copy the transformed points which are good on the two pixel axes
 *  being used into separate X and Y arrays. Log them to the text file at
 *  the same time.
             IF( LOGPOS ) THEN
@@ -1165,7 +1165,7 @@
             END IF
 
             NGOOD = 0
-            DO I = 1, NVERT             
+            DO I = 1, NVERT
                IF( PVERT( I, PAX( 1 ) ) .NE. AST__BAD .AND.
      :             PVERT( I, PAX( 2 ) ) .NE. AST__BAD ) THEN
                   NGOOD = NGOOD + 1
@@ -1175,11 +1175,11 @@
                   IF( LOGPOS ) THEN
                      BUFOUT = ' '
                      IAT = 0
-                     CALL CHR_APPND( AST_FORMAT( IFRM, PAX( 1 ), 
+                     CALL CHR_APPND( AST_FORMAT( IFRM, PAX( 1 ),
      :                                   PVERT( I, PAX( 1 ) ), STATUS ),
      :                               BUFOUT, IAT )
                      IAT = IAT + 1
-                     CALL CHR_APPND( AST_FORMAT( IFRM, PAX( 2 ), 
+                     CALL CHR_APPND( AST_FORMAT( IFRM, PAX( 2 ),
      :                                   PVERT( I, PAX( 2 ) ), STATUS ),
      :                               BUFOUT, IAT )
                      CALL FIO_WRITE( FDL, BUFOUT( : IAT ), STATUS )
@@ -1197,7 +1197,7 @@
                CALL MSG_BLANK( STATUS )
 
             ELSE IF( NGOOD .LT. NVERT ) THEN
-               CALL MSG_SETI( 'N', NVERT - NGOOD ) 
+               CALL MSG_SETI( 'N', NVERT - NGOOD )
                CALL MSG_OUT( 'SEGMENT_MSG6', '^N of the supplied '//
      :                       'vertices could not be transformed into '//
      :                       'pixel co-ordinates and so will be '//
@@ -1212,13 +1212,13 @@
 *  done.
                IF( IPMASK .EQ. 0 ) THEN
                   CALL PSX_CALLOC( ( SUBND( 1 ) - SLBND( 1 ) + 1 )*
-     :                             ( SUBND( 2 ) - SLBND( 2 ) + 1 ), 
+     :                             ( SUBND( 2 ) - SLBND( 2 ) + 1 ),
      :                               '_LOGICAL', IPMASK, STATUS )
                END IF
 
 *  Now insert this polygon into the mask.
-               CALL KPS1_PLMSK( NPOLY, SLBND( 1 ), SUBND( 1 ), 
-     :                          SLBND( 2 ), SUBND( 2 ), NGOOD, X, Y, 
+               CALL KPS1_PLMSK( NPOLY, SLBND( 1 ), SUBND( 1 ),
+     :                          SLBND( 2 ), SUBND( 2 ), NGOOD, X, Y,
      :                          %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  Increment the number of polygons accessed so far.
@@ -1293,7 +1293,7 @@
 *  DATA component should be stored in.  The choice is made to avoid
 *  unnecessary loss of precision.
          IF ( GOT1 .AND. GOT2 ) THEN
-            CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', INDF1, 
+            CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', INDF1,
      :                      INDF2, 'DATA', IDTYPE, DTYPE, STATUS )
 
 *  If only one input NDF was supplied, we still need to find out which
@@ -1302,13 +1302,13 @@
             IF ( GOT1 ) THEN
                CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', INDF1,
      :                         INDF1, 'DATA', IDTYPE, DTYPE, STATUS )
-   
+
             ELSE
                CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', INDF2,
      :                         INDF2, 'DATA', IDTYPE, DTYPE, STATUS )
-   
+
             END IF
-   
+
          END IF
 
 *  Set the numeric type of the output DATA array.
@@ -1328,15 +1328,15 @@
          IF ( VAR3 ) THEN
             IF ( VAR1 .AND. VAR2 ) THEN
                CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', INDF1,
-     :                          INDF2, 'VARIANCE', IVTYPE, DTYPE, 
+     :                          INDF2, 'VARIANCE', IVTYPE, DTYPE,
      :                          STATUS )
 
 *  If only one input NDF has defined variances, we still need to find
 *  out which is the best data type to use from the ones available.
             ELSE
                IF ( VAR1 ) THEN
-                  CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', 
-     :                            INDF1, INDF1, 'VARIANCE', IVTYPE, 
+                  CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE',
+     :                            INDF1, INDF1, 'VARIANCE', IVTYPE,
      :                            DTYPE, STATUS )
                ELSE
                   CALL NDF_MTYPE( '_WORD,_INTEGER,_REAL,_DOUBLE', INDF2,
@@ -1369,7 +1369,7 @@
 *  dimensions.
          CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'DATA', IDTYPE, GOT1,
      :                    GOT2, PAX, SLBND( 1 ), SUBND( 1 ),
-     :                    SLBND( 2 ), SUBND( 2 ), 
+     :                    SLBND( 2 ), SUBND( 2 ),
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    VAL__BADD, STATUS )
 
@@ -1378,7 +1378,7 @@
          IF ( VAR3 ) THEN
             CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'VARIANCE', IVTYPE,
      :                       VAR1, VAR2, PAX, SLBND( 1 ), SUBND( 1 ),
-     :                       SLBND( 2 ), SUBND( 2 ), 
+     :                       SLBND( 2 ), SUBND( 2 ),
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       VAL__BADD, STATUS )
          END IF
@@ -1388,7 +1388,7 @@
          IF ( QUAL3 ) THEN
             CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'QUALITY', '_UBYTE',
      :                       QUAL1, QUAL2, PAX, SLBND( 1 ), SUBND( 1 ),
-     :                       SLBND( 2 ), SUBND( 2 ), 
+     :                       SLBND( 2 ), SUBND( 2 ),
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       0.0D0, STATUS )
          END IF

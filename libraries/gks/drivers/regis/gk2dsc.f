@@ -51,14 +51,14 @@
       INTEGER IH,IL,IS,NLEFT
 *
       CHARACTER*20 BUFFER
- 
+
 *
 *  COMMENTS
 *  --------
 *	RGB values are converted to HLS for ReGIS
 *
 * --------------------------------------------------------------
- 
+
       R=QHP(KHPXR(KCTBPT(1,KWKIX))+INDEC)
       G=QHP(KHPXR(KCTBPT(2,KWKIX))+INDEC)
       B=QHP(KHPXR(KCTBPT(3,KWKIX))+INDEC)

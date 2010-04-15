@@ -28,7 +28,7 @@ C                         built. This is used to determine the format
 C                         being used.
 C     (>) STRUCTURE_ID    (Fixed string,descr) The name used to
 C                         refer to the structure in the definition file.
-C     (>) MUST_EXIST      (Logical, ref) If true, the structure must have 
+C     (>) MUST_EXIST      (Logical, ref) If true, the structure must have
 C                         been defined and an error is reported if it does
 C                         not.  If false, no error messages are output and
 C                         non-existence is signalled just by setting
@@ -82,7 +82,7 @@ C     DSA_ error codes
 C
       INCLUDE 'DSA_ERRORS'
 C
-C     DSA_ common definition 
+C     DSA_ common definition
 C
       INCLUDE 'DSA_COMMON'
 C

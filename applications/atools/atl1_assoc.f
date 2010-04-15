@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,7 +89,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Open a file and get an FIO identifier for it.
-      CALL FIO_ASSOC( PARAM, 'READ', 'LIST', 0, FD, STATUS ) 
+      CALL FIO_ASSOC( PARAM, 'READ', 'LIST', 0, FD, STATUS )
 
 *  Create an AST Channel to read the file.
       CHAN = AST_CHANNEL( ATL1_SRC, AST_NULL, ' ', STATUS )
@@ -97,7 +97,7 @@
 *  Read an Object from the Channel.
       IAST = AST_READ( CHAN, STATUS )
 
-*  Report an error if no Object was read.      
+*  Report an error if no Object was read.
       IF( STATUS .EQ. SAI__OK .AND. IAST .EQ. AST__NULL ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'P', PARAM )
@@ -121,7 +121,7 @@
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'FIO_ERR'
-      
+
 *  Arguments:
       INTEGER STATUS
 
@@ -137,13 +137,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Read a line from the file.
-      CALL FIO_READ( FD, BUF, NC, STATUS ) 
+      CALL FIO_READ( FD, BUF, NC, STATUS )
 
 *  If succesful, add it to the Channel.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          CALL AST_PUTLINE( BUF, NC, STATUS )
 
-*  Otherwise, if end of file has been reached, annul the error and return a 
+*  Otherwise, if end of file has been reached, annul the error and return a
 *  length of -1.
       ELSE IF( STATUS .EQ. FIO__EOF ) THEN
          CALL ERR_ANNUL( STATUS )

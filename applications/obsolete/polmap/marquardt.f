@@ -2,32 +2,32 @@
      &     SETP,MFIT,COV,ALP,NALP,CHI2,FUNC,FUNCD,SIGMAA)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     M A R Q U A R D T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C XDATA (<), X2 (<), X3 (<), YDATA (<), YSIG (<), NPTS (<), APARAM (>)
 C NA (<), SETP (<), MFIT (<), COV (<), ALP (<), NALP (<), CHI2 (>),
 C FUNC (<), FUNCD (<), SIGMAA (>)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Performs a weighted non-linear least-squares fit of a function to
 C the given data.
 C
 C-
 
-C     
+C
       IMPLICIT NONE
       INCLUDE 'array_size.inc'
       DOUBLE PRECISION XDATA(*),YDATA(*),YSIG(*)
@@ -46,7 +46,7 @@ C
       DOUBLE PRECISION PLIST(10)
       EXTERNAL SOLVE
       EXTERNAL FUNC,FUNCD
-C     
+C
       NITER = 0
       LAMBDA = -1.
       DO I=1,NPTS
@@ -64,7 +64,7 @@ C
        CHI1 = 99.9d0
        NCALLS = 1
   500  CONTINUE
-          WRITE (*,'('' '',0PI3,8F9.3)') 
+          WRITE (*,'('' '',0PI3,8F9.3)')
      :            NCALLS, (SP(J), J=1,MFIT),CHI1
           CALL SOLVE
      :    (XDATA, X2, X3, SETP, MFIT, YDATA, WT, YCALC,
@@ -73,7 +73,7 @@ C
            CHITST = ABS((CHI1-CHI2)/CHI1)
            CHI1 = CHI2
            IF (CHITST.GT.1.D-05) GOTO 500
-    
+
 
        DO I=1,MFIT
           APARAM(SETP(I))=SP(I)
@@ -82,7 +82,7 @@ C
        DO I = 1,NA
           PSIGMAA(I)=0.D0
        ENDDO
-       
+
        DO I=1,MFIT
           PSIGMAA(SETP(I))=SIGMAA(I)
        ENDDO
@@ -94,7 +94,7 @@ C
 !
 !
 !       SUBROUTINE SOLVE
-!       (X, Y, WEIGHT, YCALC, 
+!       (X, Y, WEIGHT, YCALC,
 !        NPTS, NTERMS, NCALLS,
 !        A, SIGMAA, CHISQ, FUNCTN, SDERIV)
 !
@@ -275,7 +275,7 @@ C
        DO J = 1, MFIT
            ALFAJJ = ALPHA(J,J)
            DO K = 1, MFIT
-               ARRAY(J,K) = 
+               ARRAY(J,K) =
      +         ALPHA(J,K) / SQRT(ALFAJJ*ALPHA(K,K))
            ENDDO
            ARRAY(J,J) = 1.D0 + FLAMDA
@@ -291,7 +291,7 @@ C
            BJ = A(J)
            ALFAJJ = ALPHA(J,J)
            DO K = 1, MFIT
-               BJ = 
+               BJ =
      +         BJ + BETA(K)*ARRAY(J,K) / SQRT(ALFAJJ*ALPHA(K,K))
            ENDDO
            B(J) = BJ
@@ -333,7 +333,7 @@ C
            AJ = A(J)
            ALFAJJ = ALPHA(J,J)
            DO K = 1, MFIT
-               AJ = 
+               AJ =
      +         AJ + BETA(K)*ARRAY(J,K) / SQRT(ALFAJJ*ALPHA(K,K))
            ENDDO
            A(J) = AJ
@@ -362,7 +362,7 @@ C
 !
        NCALLS = NCALLS + 1
 !
-!  
+!
        RETURN
        END
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -429,19 +429,19 @@ C
       SUBROUTINE LSFUND(LAMBDA,HQ,HU,SETP,MFIT,PARAMS,NPTS,NA,DYDA)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   L S F U N D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  Routine to return derivatives for ISFIT2 
+C   May 1994 Created
+C
+C
+C  Routine to return derivatives for ISFIT2
 C
 C
 C
@@ -457,14 +457,14 @@ C
       DOUBLE PRECISION DYDA(2*MAXPTS,*)
       DOUBLE PRECISION D(4)
 C
-C     
-C     
+C
+C
 
       QMAX = PARAMS(1)
       UMAX = PARAMS(2)
       LAMMAX = PARAMS(3)
       K = PARAMS(4)
-C     
+C
 
 
        DO I = 1 , NPTS
@@ -474,7 +474,7 @@ C
      &         EXP(-K*(LOG(LAMMAX/LAMBDA(I))**2))/LAMMAX) +
      &         HU(I)*(-2.0*K*UMAX*LOG(LAMMAX/LAMBDA(I))*
      &         EXP(-K*(LOG(LAMMAX/LAMBDA(I))**2))/LAMMAX)))
-     &           
+     &
          D(4) = ((-(LOG(LAMMAX/LAMBDA(I))**2)*QMAX*HQ(I)*
      &           EXP(-K*(LOG(LAMMAX/LAMBDA(I))**2))
      &           -(LOG(LAMMAX/LAMBDA(I))**2)*UMAX*HU(I)*
@@ -504,4 +504,4 @@ C
      &       UMAX*HU(I)*EXP(-K*(LOG(LAMMAX/LAMBDA(I))**2)))
       ENDDO
       END
-      
+

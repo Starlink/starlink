@@ -97,7 +97,7 @@
 *  Find library file extension
       LIBLEN = LEN( LIBRARY )
       STNM = STRING_IANYR( LIBRARY, '/' ) + 1
-      ENDNM = STRING_IANYR( LIBRARY(STNM:), '.') - 1       
+      ENDNM = STRING_IANYR( LIBRARY(STNM:), '.') - 1
       IF ( ENDNM .LE. 0 ) THEN
          ENDNM = LIBLEN
       ELSE

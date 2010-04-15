@@ -13,8 +13,8 @@
 *     RESULT = ARD1_GLINE( GRFCON, N, X, Y )
 
 *  Description:
-*     A polyline is drawn into the 2-dimensional B array joining the 
-*     supplied pixel positions.  Details of the B array are passed in 
+*     A polyline is drawn into the 2-dimensional B array joining the
+*     supplied pixel positions.  Details of the B array are passed in
 *     common from ARD1_KDRAW.
 
 *  Arguments:
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,10 +84,10 @@
 *        CMN_IPBC = INTEGER (Read)
 *           Pointer to the B array passed to the ARD "drawing" routines.
 *        CMN_LBNDC( 2 ) = INTEGER (Read)
-*           The lower bounds of the B array passed to the ARD "drawing" 
+*           The lower bounds of the B array passed to the ARD "drawing"
 *           routines.
 *        CMN_UBNDC( 2 ) = INTEGER (Read)
-*           The upper bounds of the B array passed to the ARD "drawing" 
+*           The upper bounds of the B array passed to the ARD "drawing"
 *           routines.
 *        CMN_LBIBC( 2 ) = INTEGER (Read)
 *           The lower bounds of the interior bounding box passed to the
@@ -104,14 +104,14 @@
 
 *  Local Variables:
       INTEGER I, STATUS
-      DOUBLE PRECISION PC( 4 )      
+      DOUBLE PRECISION PC( 4 )
 
 *  Initialize the returned value to indicate success.
       ARD1_GLINE = 1
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
 
 *  Loop round each line segment in the supplied polycurve, drawing each
-*  one. 
+*  one.
       DO I = 2, N
 
          PC( 1 ) = X( I - 1 )
@@ -119,8 +119,8 @@
          PC( 3 ) = X( I )
          PC( 4 ) = Y( I )
 
-         CALL ARD1_LINFL( CMN_RNDXC, 2, CMN_LBNDC, CMN_UBNDC, CMN_MSKSC, 
-     :                    4, PC, %VAL( CNF_PVAL( CMN_IPBC ) ), 
+         CALL ARD1_LINFL( CMN_RNDXC, 2, CMN_LBNDC, CMN_UBNDC, CMN_MSKSC,
+     :                    4, PC, %VAL( CNF_PVAL( CMN_IPBC ) ),
      :                    CMN_LBIBC, CMN_UBIBC,
      :                    STATUS )
 

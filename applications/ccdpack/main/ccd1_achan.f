@@ -13,10 +13,10 @@
 *     CALL CCD1_ACHAN( FD, OPTIONS, CHAN, STATUS )
 
 *  Description:
-*     This routine creates an AST channel for use within CCDPACK using 
-*     a given valid FIO file descriptor.  It is a wrapper for AST_CHANNEL 
-*     whose purpose is to shield the calling routine from knowledge of 
-*     the source and sink routines and global variables required to 
+*     This routine creates an AST channel for use within CCDPACK using
+*     a given valid FIO file descriptor.  It is a wrapper for AST_CHANNEL
+*     whose purpose is to shield the calling routine from knowledge of
+*     the source and sink routines and global variables required to
 *     make this work.
 
 *  Arguments:
@@ -26,14 +26,14 @@
 *        A character string containing an optional comma-separated list
 *        of attribute assignments for passing to AST_CHANNEL.
 *     CHAN = INTEGER (Returned)
-*        AST pointer to a new channel reading/writing from the file 
+*        AST pointer to a new channel reading/writing from the file
 *        referred to by FD.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Restrictions:
-*     As currently implemented, only one AST channel created by this 
-*     routine may be in use at once.  No check is performed that the 
+*     As currently implemented, only one AST channel created by this
+*     routine may be in use at once.  No check is performed that the
 *     channel is not already in use.
 
 *  Copyright:
@@ -75,24 +75,24 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Global Variables:
       INCLUDE 'CCD1_FDCM'        ! File descriptor for AST channel CCD1_ASTFD
-      
+
 *  Arguments Given:
       INTEGER FD
       CHARACTER * ( * ) OPTIONS
-      
+
 *  Arguments Returned:
       INTEGER CHAN
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL CCD1_ASRC         ! Source routine for AST channel
       EXTERNAL CCD1_ASNK         ! Sink routine for AST channel
-      
+
 *.
 
 *  Check inherited global status.

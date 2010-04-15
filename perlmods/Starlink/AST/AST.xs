@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /* for some reason ppport.h does not currently have CopFILE defined */
-#ifndef CopFILE 
+#ifndef CopFILE
 #define CopFILE(s)  "<unknown>"
 #endif
 #ifndef CopLINE
@@ -213,7 +213,7 @@ void astThrowException ( int status, AV* errorstack ) {
   PUSHMARK(sp);
 
   /* Push the status and array onto the arg stack */
-  XPUSHs(sv_2mortal(newSViv(status))); 
+  XPUSHs(sv_2mortal(newSViv(status)));
   XPUSHs(newRV_noinc((SV*) errorstack));
 
   PUTBACK;
@@ -229,7 +229,7 @@ void astThrowException ( int status, AV* errorstack ) {
 /* Callbacks */
 
 /* sourceWrap is called by the fitschan constructor immediately and not
-   by the Read method. This means that there are no worries about 
+   by the Read method. This means that there are no worries about
    reference counting or keeping copies of the function around.
  */
 
@@ -417,7 +417,7 @@ void My_astCopyErrMsg ( AV ** newbuff, int status ) {
   for (i = 0; i <= av_len( ErrBuff ) ; i++ ) {
     elem = av_fetch( ErrBuff, i, 0);
     if (elem != NULL ) {
-      av_push( *newbuff, sv_mortalcopy( *elem )); 
+      av_push( *newbuff, sv_mortalcopy( *elem ));
     }
   }
 
@@ -425,7 +425,7 @@ void My_astCopyErrMsg ( AV ** newbuff, int status ) {
 
 /* Since you can not put CPP code within CPP code inside XS we need
    to provide a special wrapper routine for astRate */
-void myAstRate ( AstMapping * this, double * cat, int ax1, int ax2, 
+void myAstRate ( AstMapping * this, double * cat, int ax1, int ax2,
 		 double * d2) {
   double RETVAL;
   dXSARGS;
@@ -579,7 +579,7 @@ ast_Error( status, message)
   StatusType status
   char * message
  CODE:
-  astError( status, message); 
+  astError( status, message);
 
 
 # Call only from within an AST callback
@@ -751,9 +751,9 @@ _new( class, sourcefunc, sinkfunc, options )
      behaviour of the channel. */
 
   /* First see whether we were given valid callbacks */
-  if (SvOK(sourcefunc) && SvROK(sourcefunc) && 
+  if (SvOK(sourcefunc) && SvROK(sourcefunc) &&
         SvTYPE(SvRV(sourcefunc)) == SVt_PVCV) has_source = 1;
-  if (SvOK(sinkfunc) && SvROK(sinkfunc) && 
+  if (SvOK(sinkfunc) && SvROK(sinkfunc) &&
         SvTYPE(SvRV(sinkfunc)) == SVt_PVCV) has_sink = 1;
 
   if ( has_source || has_sink) {
@@ -761,7 +761,7 @@ _new( class, sourcefunc, sinkfunc, options )
        Want this to be freed when the perl object disappears. */
     /* only take one reference */
 
-    /* For sink functions we have to keep them around in the object 
+    /* For sink functions we have to keep them around in the object
        since they are called when the object is annulled. */
     SV * rv = newRV_noinc( SvRV( RETVAL ));
     if (has_sink) {
@@ -798,7 +798,7 @@ _new( class, sourcefunc, sinkfunc, options )
    )
    if (astOK) setPerlAstObject( RETVAL, (AstObject*)fitschan );
   } else if (strstr( class, "XmlChan") != NULL ) {
-#ifndef HASXMLCHAN   
+#ifndef HASXMLCHAN
    Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.1 or greater");
 #else
    ASTCALL(
@@ -822,7 +822,7 @@ new( class, options )
   char * class
   char * options
  CODE:
-#ifndef HASGRISMMAP 
+#ifndef HASGRISMMAP
    Perl_croak(aTHX_ "GrismMap: Please upgrade to AST V3.x or greater");
 #else
   ASTCALL(
@@ -894,7 +894,7 @@ new( class, nin, nout, fwd, inv, options )
   ninv = av_len( inv ) + 1;
   cfwd = pack1Dchar( fwd );
   cinv = pack1Dchar( inv );
-  RETVAL = astMathMap( nin, nout, nfwd, (const char **)cfwd, 
+  RETVAL = astMathMap( nin, nout, nfwd, (const char **)cfwd,
                        ninv, (const char**)cinv, options );
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1035,10 +1035,10 @@ MODULE = Starlink::AST   PACKAGE = Starlink::AST::PolyMap
 
 AstPolyMap *
 new( class )
- CODE: 
-#ifndef HASPOLYMAP  
+ CODE:
+#ifndef HASPOLYMAP
    Perl_croak(aTHX_ "PolyMap: Please upgrade to AST V3.x or greater");
-#else 
+#else
   Perl_croak(aTHX_ "PolyMap not yet implemented");
 #endif
 
@@ -1053,9 +1053,9 @@ new( class, shift, options )
   int ncoord;
   double * cshift;
  CODE:
-#ifndef HASSHIFTMAP  
+#ifndef HASSHIFTMAP
    Perl_croak(aTHX_ "ShiftMap: Please upgrade to AST V3.x or greater");
-#else 
+#else
   ncoord = av_len( shift ) + 1;
   cshift = pack1D(newRV_noinc((SV*)shift), 'd');
   ASTCALL(
@@ -1268,7 +1268,7 @@ new( class, ina, inb, outa, outb, options )
   char * options
  CODE:
   /* minimal arg checking - lazy XXXX */
-  RETVAL = astWinMap( av_len(ina)+1, pack1D(newRV_noinc((SV*)ina),'d'), 
+  RETVAL = astWinMap( av_len(ina)+1, pack1D(newRV_noinc((SV*)ina),'d'),
                       pack1D(newRV_noinc((SV*)inb),'d'),
                       pack1D(newRV_noinc((SV*)outa),'d'),
                       pack1D(newRV_noinc((SV*)outb),'d'),options );
@@ -1383,7 +1383,7 @@ astGetD( this, attrib )
   AstObject * this
   char * attrib
  ALIAS:
-  astGetF = 1 
+  astGetF = 1
  CODE:
   ASTCALL(
    RETVAL = astGetD( this, attrib );
@@ -1438,7 +1438,7 @@ astSetD( this, attrib, value )
   char * attrib
   double value
  ALIAS:
-  astSetF = 1 
+  astSetF = 1
  CODE:
   ASTCALL(
    astSetD( this, attrib, value );
@@ -1527,7 +1527,7 @@ astDESTROY( obj )
         }
       }
       if (!s) s = "(none)";
-      PerlIO_printf( PerlIO_stderr(),  
+      PerlIO_printf( PerlIO_stderr(),
                      "!  (in cleanup from file %s:%" IVdf ")\n",
                      s, (IV) CopLINE(PL_curcop));
     }
@@ -1811,7 +1811,7 @@ astMapGet0C( this, key )
   }
 #endif
 
-# Note the underscore in the name because currently we return 
+# Note the underscore in the name because currently we return
 # a Starlink::AST object rather than a real object and there is
 # a perl layer to rebless. We should probably do this in the C
 # layer
@@ -2271,7 +2271,7 @@ astNorm( this, ... )
   /* Create C arrays of the correct dimensions */
   naxes = astGetI( this, "Naxes" );
   ncoord_in = items - argoff;
-  
+
   /* Copy from the perl array to the C array */
   if (naxes != ncoord_in )
      Perl_croak(aTHX_ "Number of elements in first coord array must be %d",
@@ -2845,7 +2845,7 @@ astTranP( this, forward, ... )
           Perl_croak(aTHX_ "Input array %d has differing number of elements to first array (%d != %d)",
                      count, n, npoint);
 
-    }                    
+    }
     /* Allocate memory for the output coordinates */
     for (i = 0; i < ncoord_out; i++) {
        ptr_out[i] = get_mortalspace( npoint, 'd' );
@@ -3203,7 +3203,7 @@ new( class, frame, xpoints, ypoints, unc, options )
    if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
-  RETVAL  
+  RETVAL
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::NullRegion
 
@@ -3364,7 +3364,7 @@ astFindFits( this, name, card, inc )
    RETVAL = astFindFits( this, name, card, inc );
   )
  OUTPUT:
-  RETVAL 
+  RETVAL
   card
 
 void
@@ -3528,7 +3528,7 @@ astGetRefPos( this, frm )
   )
   XPUSHs(sv_2mortal(newSVnv(lon)));
   XPUSHs(sv_2mortal(newSVnv(lat)));
-#endif 
+#endif
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::SlaMap PREFIX = astSla
 
@@ -3712,7 +3712,7 @@ astMark(this, type, ...)
     /* and this should equal the number of axes in the frame */
     naxes = astGetI( this, "Naxes" );
 
-    if ( naxes != ncoords )     
+    if ( naxes != ncoords )
          Perl_croak(aTHX_ "Number of supplied coordinate sets must equal number of axes in frame [%d != %d]",naxes,ncoords);
 
     /* Now go through each finding out how long each array is */
@@ -3737,7 +3737,7 @@ astMark(this, type, ...)
 
     /* Get some memory for the array */
     total = nmarks * ncoords;
-    cin = get_mortalspace( total, 'd');    
+    cin = get_mortalspace( total, 'd');
 
     /* and go through the arrays again (but less checking now) */
     for (i = 0; i < ncoords; i++ ) {
@@ -3759,7 +3759,7 @@ astMark(this, type, ...)
           *(cin + (i * nmarks) + j) = dtmp;
         }
     }
-    
+
     /* Now call the AST routine */
     PLOTCALL( arg,
        astMark( this, nmarks, ncoords, nmarks, cin, type );
@@ -3796,7 +3796,7 @@ astPolyCurve(this, ...)
     /* and this should equal the number of axes in the frame */
     naxes = astGetI( this, "Naxes" );
 
-    if ( naxes != ncoords )     
+    if ( naxes != ncoords )
          Perl_croak(aTHX_ "Number of supplied coordinate sets must equal number of axes in frame [%d != %d]",naxes,ncoords);
 
     /* Now go through each finding out how long each array is */
@@ -3821,7 +3821,7 @@ astPolyCurve(this, ...)
 
     /* Get some memory for the array */
     total = npoints * ncoords;
-    cin = get_mortalspace( total, 'd');    
+    cin = get_mortalspace( total, 'd');
 
     /* and go through the arrays again (but less checking now) */
     for (i = 0; i < ncoords; i++ ) {
@@ -3843,7 +3843,7 @@ astPolyCurve(this, ...)
           *(cin + (i * npoints) + j) = dtmp;
         }
     }
-    
+
     /* Now call the AST routine */
     PLOTCALL( arg,
        astPolyCurve( this, npoints, ncoords, npoints, cin );

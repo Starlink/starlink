@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ RUTHERFORD APPLETON LABORATORY\\
 
 \section {Introduction}
 
-This paper describes the procedure for submission of a piece of 
+This paper describes the procedure for submission of a piece of
 software for inclusion in the Unix Starlink Software Collection (USSC).
 
 The organization of the USSC is described
@@ -87,9 +87,9 @@ section numbers on  the form.
 
 \begin{enumerate}
 
-\item Full title and Acronym for the Software. 
+\item Full title and Acronym for the Software.
 Every item should have a short single word descriptive name associated
-with it; this is the `acronym'. 
+with it; this is the `acronym'.
 For example, ``Hierarchical Data System'' is a full title and ``HDS'' is
 an acronym.
 
@@ -97,7 +97,7 @@ an acronym.
 The five support levels that Starlink recognizes are listed in SGP/2.
 The names of those individuals providing the support should also be included.
 
-\item An indication of which Starlink Staff (if any) you have been 
+\item An indication of which Starlink Staff (if any) you have been
 coordinating the development of this software with.
 
 \item If this is a modification to a previous release of the software, a list
@@ -109,7 +109,7 @@ DECstations/DECsystems.  The versions of the operating systems that the software
 has been tested against must also be given (e.g. SunOS 4.1.1,  Ultrix 4.2).
 
 \item A list of which compilers the software can be built with. At present
-Starlink will accept software built with SUN Fortran, DEC Fortran for RISC, 
+Starlink will accept software built with SUN Fortran, DEC Fortran for RISC,
 GNU C and
 DEC C. Version numbers of the compilers used should be stated (e.g. SUN FORTRAN
 1.4, GNU C 1.35).
@@ -133,11 +133,11 @@ A list of actions that might need to take place before the
 built software can be run. These should be listed on the form under
 ``Any other unusual requirements''. For example, the package may require a
 set--up file to be run first or some environment variables may need to
-be set. 
+be set.
 
 It should be noted that the USSC is in an early stage of evolution and it
 is likely that the mechanisms with which we support multiple architectures
-may have to change. 
+may have to change.
 
 \item The source code of the files to be released and the expected location
 of each source file in the {\tt /star} tree. This location may be changed by
@@ -147,7 +147,7 @@ makefile will usually  be stored in the same directory as the source code.
 Executables are not required. In general, the UNIX Starlink software
 distribution  service only distributes source code and executables appropriate
 for the local machines are built at each target site. This allows Starlink to
-support multiple architectures with minimal overheads. 
+support multiple architectures with minimal overheads.
 
 A make file that will build the software from the source files and
 install it in the appropriate Starlink directories must be supplied.
@@ -157,11 +157,11 @@ The make file should have three standard targets that do the following:
 
 \item {\bf build} --- Builds the package from its source files but does not
 install it. The {\bf build} target, should be the first target
-in the make file. This is useful for developing software and testing it 
+in the make file. This is useful for developing software and testing it
 in a local directory.
 
 \item {\bf install} --- Installs the files created with the {\bf build}
-target into {\tt /star/bin} etc. 
+target into {\tt /star/bin} etc.
 
 \item {\bf clean} --- Deletes intermediate files created during the build
 operation.
@@ -175,7 +175,7 @@ You may also wish to have a test target:
 
 \item {\bf test} --- Tests that the installation of the package has been
 successful. The nature of this test will vary from package to package but as
-an example, the {\bf test} target might build a piece of software that is 
+an example, the {\bf test} target might build a piece of software that is
 dependent on the software that has just been installed and display a
 message of the form ``{\bf Installation of xyz successful}'' when run
 (see item 12).
@@ -186,7 +186,7 @@ Full details of the usage and structure of Starlink make files (including an
 annotated example make file for packages) can be found in SSN/66.
 
 \item A list of dependencies on any software that is not a part
-of the USSC. 
+of the USSC.
 If your software depends on other software that is not in the Collection it
 may not work when installed.
 If it does use such software, consider releasing it for the Collection.
@@ -218,7 +218,7 @@ documentation.
 
 \item A description of some sort of test that can be carried out to ensure
 that the software has successfully been installed. For example, you could
-use the test target in the make file to perform the test. An example 
+use the test target in the make file to perform the test. An example
 test target is illustrated below:
 
 \begin{verbatim}
@@ -250,7 +250,7 @@ data that might be needed.
 
 \item Relevant documentation. At present, this is not sent out with the
 UNIX software but instead is still distributed via the VMS software
-distribution mechanism. Advice on preparing documentation can be found in 
+distribution mechanism. Advice on preparing documentation can be found in
 SGP/20. A Starlink User Note (SUN) is the preferred type of documentation.
 A news item may also be submitted, if appropriate.
 
@@ -262,7 +262,7 @@ If possible, your documentation should exist in one or more computer files in
 These are the easiest forms to change and edit.
 The Librarian will normally generate a master copy and distribute copies of this
 as part of the release process.
-Do not submit files which depend on private libraries of macros (for instance). 
+Do not submit files which depend on private libraries of macros (for instance).
 Your file should be usable by the Librarian without knowledge of any other of
 your files.
 If your documentation cannot be prepared in this way (e.g. it needs diagrams or
@@ -273,12 +273,12 @@ with software items being released.
 
 
 \item If applicable, a recipe for a demonstration of the package would be
-useful. There are two types of demonstration that would be useful. 
+useful. There are two types of demonstration that would be useful.
 
 \begin{itemize}
 
 \item Demonstration for astronomers --- This type of demonstration should
-show off the capabilities of the package to would--be users. 
+show off the capabilities of the package to would--be users.
 
 \item Demonstration for visitors ---
 Visitors sometimes turn up and ask to be given a demonstration of
@@ -286,7 +286,7 @@ Visitors sometimes turn up and ask to be given a demonstration of
 graphs or pictures. The people who are caught on the spot on these occasions
 may have very little practical experience in actually running this kind of
 thing and the visitors are likely to go away wondering why such an expensive
-and powerful system doesn't seem able to do that much. An easy--to--run 
+and powerful system doesn't seem able to do that much. An easy--to--run
 demonstration of your software would help avoid this situation.
 
 \end{itemize}

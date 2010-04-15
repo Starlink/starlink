@@ -1,5 +1,5 @@
-	SUBROUTINE POLAX_MAP( IDIMSX, IDIMSY, QUORPT, QP, UT, POLMAG, 
-     :	                      POLDEN, VECSLEN, THETACORR, COLTYPE, 
+	SUBROUTINE POLAX_MAP( IDIMSX, IDIMSY, QUORPT, QP, UT, POLMAG,
+     :	                      POLDEN, VECSLEN, THETACORR, COLTYPE,
      :	                      COLCH, COLST, COLINT)
 
 * Description : Routine to calculate the vector start and end points and draw
@@ -8,7 +8,7 @@
 * History
 *  22-July-1994 Changed STR$ calls to CHR_ (skl@jach)
 * 26-oct-1994 Changed MAGNIF from INT to REAL (SKL@JACH)
-* 
+*
 
 	IMPLICIT NONE
 

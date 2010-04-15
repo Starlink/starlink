@@ -9,13 +9,13 @@ C     Creates data arrays with modified dimensions in a structure.
 C
 C  Description:
 C     This routine produces data arrays with specified dimensions.  With
-C     the exception of the dimensions, the data structure will be the 
-C     same as that for an existing specified structure.  This routine 
+C     the exception of the dimensions, the data structure will be the
+C     same as that for an existing specified structure.  This routine
 C     does not modify the axis data for the structure - DSA_RESHAPE_AXIS
 C     must be used for that.  This routine will modify the shapes of any
 C     arrays in the model structure whose function it understands; if it
 C     finds other arrays it will reshape them if they are the same shape
-C     as the main data array, but will issue warning messages.  The 
+C     as the main data array, but will issue warning messages.  The
 C     contents of the resulting data arrays are undefined if the array's
 C     dimensions were changed.  If the dimensions of an array are left
 C     unchanged, the array will just be copied.  The structure
@@ -47,9 +47,9 @@ C  External variables used:
 C    Only common variables used internally by the DSA routines.
 C
 C  External subroutines / functions used:
-C     ICH_FOLD, ICH_LEN, DSA_ARRAY_SIZE, DSA_DATA_SIZE, DSA_FIND_REF, 
+C     ICH_FOLD, ICH_LEN, DSA_ARRAY_SIZE, DSA_DATA_SIZE, DSA_FIND_REF,
 C     DSA_COERCE_DATA_ARRAY, DSA_CORECE_ARRAY, DSA_MAIN_SIZE, DSA_WRUSER,
-C     DSA_WRNAME, DSA__DATA_ENV_NAME, DSA__CLEAR_DATA_ENV, DSA__ARRAY, 
+C     DSA_WRNAME, DSA__DATA_ENV_NAME, DSA__CLEAR_DATA_ENV, DSA__ARRAY,
 C     DSA__NTH_DATA_ITEM, DTA_CYVAR, DTA_CRVAR, DTA_CRNAM, DTA_DLVAR,
 C     DTA_ERROR, DTA_STRUC, DTA_TYVAR
 C
@@ -251,7 +251,7 @@ C
 C
 C        The model object is a data array.  This means that all we have
 C        to do is create a single output array, modeled on the input
-C        array.  
+C        array.
 C
          IF (DSA__ARRAY(OBJ_NAME(:LENOBJ))) THEN
 C
@@ -269,7 +269,7 @@ C
          END IF
       ELSE
 C
-C        The model is a structure.  So we do this by looking through 
+C        The model is a structure.  So we do this by looking through
 C        its data structure, reshaping any arrays we find.  We
 C        only do this to one level, unless we find any contracted
 C        structures.
@@ -317,7 +317,7 @@ C
 C
 C                 Some quality structures (NDF for example, in some cases)
 C                 can have the real quality array one level down in the
-C                 structure, in .QUALITY.QUALITY. We check for this 
+C                 structure, in .QUALITY.QUALITY. We check for this
 C                 one exceptional case.
 C
                   AR_STATUS=0
@@ -427,7 +427,7 @@ C
          END DO
       END IF
 C
-C     On the way out, set the new data size in the common tables, and 
+C     On the way out, set the new data size in the common tables, and
 C     flag that the it has been modified.
 C
       CALL DSA_MAIN_SIZE(REF_SLOT,.TRUE.,10,NDIM,DIMS,ERROR,STATUS)

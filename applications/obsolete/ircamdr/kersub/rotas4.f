@@ -42,7 +42,7 @@
 *          longer side of the input array
 *        ENDS is the position of the start of the last rotation box along the
 *          shorter side of the input array
-*        INDEXL is a pointer to the position of the start of the rotation 
+*        INDEXL is a pointer to the position of the start of the rotation
 *          box along the longer side of the input array
 *        INDEXS is a pointer to the position of the start of the rotation
 *          box along the shorter side of the input array
@@ -132,7 +132,7 @@
             DO INDEXS = 1, ENDS, ROTSIZ
 
                CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :           WORK, STATUS )
 
             ENDDO
@@ -144,7 +144,7 @@
                INDEXS = ENDS
 
                CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :           WORK, STATUS )
 
             ENDIF
@@ -160,7 +160,7 @@
             DO INDEXS = 1, ENDS, ROTSIZ
 
                CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, 
+     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2,
      :           ARROUT, WORK, STATUS )
 
             ENDDO
@@ -172,7 +172,7 @@
                INDEXS = ENDS
 
                CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+     :           INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :           WORK, STATUS )
             ENDIF
          ENDIF

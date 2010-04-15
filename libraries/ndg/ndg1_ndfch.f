@@ -16,7 +16,7 @@
 *     Names stored in the supplied group with indices greater than or
 *     equal to START are expanded into a list of explicit file names
 *     which can be accessed as NDFs, either directly or using the
-*     NDF on-the-fly conversion system. The expanded set of names are 
+*     NDF on-the-fly conversion system. The expanded set of names are
 *     appended to the end of the group, and the original names are deleted.
 *
 *     If any of the files in the group cannot be accessed, an error is
@@ -27,8 +27,8 @@
 *     VERB = LOGICAL (Given)
 *        If TRUE then errors which occur whilst accessing supplied NDFs
 *        are flushed so that the user can see them before re-prompting for
-*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP1 = INTEGER (Given)
 *        An identifier for the group containing the NDF names
@@ -38,14 +38,14 @@
 *        files.
 *     IGRP2 = INTEGER (Given)
 *        An identifier for a group in which to store any supplied names
-*        for which no corresponding NDFs could be found. This may be 
+*        for which no corresponding NDFs could be found. This may be
 *        GRP__NOID in which case the names of bad NDFs are discarded.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*    -  The order of the names is preserved. 
-*    -  If an input name contained an NDF slice specification, it is 
+*    -  The order of the names is preserved.
+*    -  If an input name contained an NDF slice specification, it is
 *    copied to all related output file names.
 *    -  Native (.sdf) files are returned without a file type.
 
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -131,9 +131,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First get an array holding all the recognised foreign file format file
-*  types, extracted from the NDF_FORMATS_IN environment variable. Get the 
-*  current value of environment variable NDF_FORMATS_IN. Annul the 
-*  error and indicate that there are no known foreign data formats if it 
+*  types, extracted from the NDF_FORMATS_IN environment variable. Get the
+*  current value of environment variable NDF_FORMATS_IN. Annul the
+*  error and indicate that there are no known foreign data formats if it
 *  is not defined.
       CALL PSX_GETENV( 'NDF_FORMATS_IN', FMTIN, STATUS )
       IF( STATUS .EQ. PSX__NOENV ) THEN
@@ -170,9 +170,9 @@
 *  Skip blank names.
          IF( NAME .NE. ' ' ) THEN
 
-*  Expand the name into separate file names, appending them to the 
+*  Expand the name into separate file names, appending them to the
 *  truncated input group.
-            CALL NDG1_EXPAN( NAME, VERB, IGRP1, NFMT, FMT, FOUND, 
+            CALL NDG1_EXPAN( NAME, VERB, IGRP1, NFMT, FMT, FOUND,
      :                       STATUS )
 
 *  If no files were found matching the name, add the name to the group

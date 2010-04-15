@@ -16,7 +16,7 @@
 *     A data type is determined for all the fields in the current row.
 *     The current data type is compared with the accumulating one and
 *     if appropriate substituted (in descending order the preferences
-*     are: INTEGER, DOUBLE PRECISION, CHARACTER).  The width of 
+*     are: INTEGER, DOUBLE PRECISION, CHARACTER).  The width of
 *     character columns is also calculated; a wider field replaces the
 *     existing column width.
 *  Arguments:
@@ -68,12 +68,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -152,7 +152,7 @@
 *
 *                Attempt to decode a DOUBLE PRECISION.
 
-                  LSTAT = CAT__OK  
+                  LSTAT = CAT__OK
                   CALL CHR_CTOD (FIELDS(LOOP), DVAL, LSTAT)
                   IF (LSTAT .EQ. CAT__OK) THEN
                      CTYPE = CAT__TYPED

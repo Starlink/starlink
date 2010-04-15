@@ -12,15 +12,15 @@
 *  Invocation:
 *     CALL MASK( STATUS )
 
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Description: 
-*     Allows the user to input the name of an NDF image file and 
-*     and ARD file. The ARD file is used to specify which parts of the 
-*     image will NOT be used. An output NDF is then created which is 
-*     the same as the input file except that all pixels specified by 
+*  Description:
+*     Allows the user to input the name of an NDF image file and
+*     and ARD file. The ARD file is used to specify which parts of the
+*     image will NOT be used. An output NDF is then created which is
+*     the same as the input file except that all pixels specified by
 *     the ARD file have been assigned the value Bad.
 
 *  Usage:
@@ -47,8 +47,8 @@
 *     Modified for use with WCS components.
 
 *  Examples:
-*     
-*     mask in=ic3374 ardfil=^ardfile.txt out=ic3374a 
+*
+*     mask in=ic3374 ardfil=^ardfile.txt out=ic3374a
 *
 *        This example uses as the source image IC3374 and sets
 *        the pixels specified by the ARD description contained in
@@ -64,38 +64,38 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
-               
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       INTEGER ELEMS                   ! Total number of pixels in the image
-      INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index  
-      INTEGER NDF1                    ! Identifier for the source NDF  
+      INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
+      INTEGER NDF1                    ! Identifier for the source NDF
       INTEGER NDF2                    ! Identifier for the output NDF
-      INTEGER NDIM                    ! Number of dimensions in the 
+      INTEGER NDIM                    ! Number of dimensions in the
                                       ! image
-      INTEGER POINT1(1)               ! Pointer to the data component of 
+      INTEGER POINT1(1)               ! Pointer to the data component of
                                       ! for the output NDF
       INTEGER POINT2(1)               ! Pointer to the ARD logical mask
       INTEGER PRANGE(2)               ! Length of the x and y axes
       INTEGER UBND(NDF__MXDIM)        ! Upper limit for image index
-                                                          
+
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Show that the application is running.
       CALL MSG_BLANK(STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
       CALL MSG_OUT(' ','ESP MASK running.',STATUS)
 
-*   Begin an NDF context.                               
+*   Begin an NDF context.
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Obtain an identifier for the NDF structure to be examined.       
+*   Obtain an identifier for the NDF structure to be examined.
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
@@ -124,7 +124,7 @@
 *   Allocate the memory needed for the logical mask array.
       CALL PSX_CALLOC(ELEMS,'_INTEGER',POINT2(1),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      
+
 *   Transfer to the ARD driver control routine.
       CALL ESP1_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -132,12 +132,12 @@
 *   Free the dynamic array space of the logical mask.
       CALL PSX_FREE(POINT2(1),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
- 
+
  9999 CONTINUE
 
 *   End the NDF context.
-      CALL NDF_END(STATUS)                              
+      CALL NDF_END(STATUS)
 
       END
- 
+
 

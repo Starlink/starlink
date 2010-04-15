@@ -36,7 +36,7 @@
 *   NSTAR(2,N) = Phot. Magnitude (ditto)
 *   NSTAR(3,N) = Catalogue Number
 *   NSTAR(4,N) = DM Number (=0 if CATRUN true )
-*   
+*
 *  Arguments:
 *    STYPE = CHARACTER *(*) (Given)
 *        {argument_description}
@@ -47,7 +47,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     ANO: Someone (Somewhere)
-*     
+*
 
 *  History:
 *     15-FEB-1993 (AJJB):
@@ -65,7 +65,7 @@
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statement, with call to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the READONLY specifier is used which is 
+*        porting, as the READONLY specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,10 +89,10 @@
       INCLUDE 'CATINF_CMN'       ! CATINF common
       INCLUDE 'SPT_CMN'          ! SPT common
       INCLUDE 'FILENAMES'        ! Assign filenames to string constants
-                                 
-*  Global variables used:      
+
+*  Global variables used:
 *  Globals used from /CONTROL/ common in file 'MAIN.FOR':
-*  
+*
 *        CATRUN = LOGICAL (Read)
 *           IF '.TRUE.' THEN SELECT STARS FROM PARTICULAR CATALOGUES
 *        SUPP = LOGICAL (Read)
@@ -143,7 +143,7 @@
 *           CHAR. VAR. HOLDING NONS. OBJ. DESCRIPTIONS
 
 * Globals used from /CONVF/ common in CONVF.FOR:
-* 
+*
 *        TWOPI = DOUBLE PRECISION (Read)
 *        HALFPI = DOUBLE PRECISION (Read)
 *        RDSA = DOUBLE PRECISION (Read)
@@ -170,9 +170,9 @@
 *        DIAMET = INTEGER (Read)
 *           [global_variable_purpose]
 *        [descriptions_of_global_variables_referenced]...
-*        
+*
 *     Globals used from /SPT/ common in SPT.FOR:
-*     
+*
 *        SPEC = CHARACTER * ( 2 ) (Read)
 *        NAM = CHARACTER * ( 14 ) (Read)
 *        DES = CHARACTER * ( 24 ) (Read)
@@ -203,7 +203,7 @@
       CALL GETPARAMS(PARAMS,NVAL, STATUS )
       CALL GETDEFLT(PARAMS,NVAL,'MODE',VALUE,NPOS, STATUS )
       IF (VALUE(1:3).EQ.'PRI') THEN
-         CALL GETDEFLT(PARAMS,NVAL,'INPUT',FILE,NPOS, STATUS) 
+         CALL GETDEFLT(PARAMS,NVAL,'INPUT',FILE,NPOS, STATUS)
          UNIT = 12
          RECL = 6
       ELSEIF (CATRUN) THEN
@@ -219,9 +219,9 @@
          UNIT = 13
          RECL = 13
       ENDIF
-      
+
 * This statement :
-* 
+*
 *     OPEN(UNIT=UNIT,FILE=FILE,ACCESS='DIRECT',
 *    :  STATUS='OLD',ERR=700,RECL=RECL,READONLY)
 *
@@ -230,7 +230,7 @@
       CALL FILEOPEN( UNIT, FILE, 'OLD', 'DIRECT', ' ', .FALSE., RECL,
      :              .TRUE., STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 700
-      
+
       CALL CONST(AP,DP, STATUS )
       DG = REAL( DP/RDDG )
       MINB = 90 - INT(DG+SIZE)
@@ -367,7 +367,7 @@
             IF (MINAV.LT.MAXAV) GO TO 400
             NAV = ISTA
             LASTAV = MAXAV
- 
+
 145         CONTINUE
             IF (NAV.GT.LASTAV) GO TO 400
             CALL CATREC(UNIT,NAV, STATUS )
@@ -385,7 +385,7 @@
          ENDIF
 146      CONTINUE
          IF (CHOOSE.AND.(.NOT.FOUND(IDLIST))) GOTO 144
- 
+
          IF(ABS(DEC-D).GT.SIZE) GO TO 144
          IF (MAGV.EQ.9999) THEN
             MAG = MAGP
@@ -465,7 +465,7 @@
 *
 153      CONTINUE
          CALL PRECES(RA,DEC,STAR(1,N),STAR(2,N),1950.0,EQUOUT, STATUS )
- 
+
          IF (CATRUN) THEN
             NSTAR(1,N) = MAG
             NSTAR(2,N) = 9999
@@ -494,9 +494,9 @@
                ID(K,N)=IDLIST(K)
             ENDDO
          ENDIF
- 
+
          GO TO 144
- 
+
 400   CONTINUE
 *
 *   End of Main Catalogue Search Loop
@@ -504,7 +504,7 @@
       CALL MSG_OUT (' ', ' ', STATUS)
       CALL MSG_OUT (' ', ' ', STATUS)
       CALL MSG_OUT (' ', ' ', STATUS)
-      
+
       WRITE (CHARNUM,'(I4)') N
       IF (.NOT.NONS) THEN
          CALL MSG_OUT (' ', '        NUMBER OF CATALOGUE STARS IN AREA'
@@ -546,6 +546,6 @@
          CALL ERR_FLUSH( STATUS )
       ENDIF
       END
- 
- 
- 
+
+
+

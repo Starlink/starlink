@@ -7,32 +7,32 @@ C         #       #    #  #       #    #  #    #  #
 C         #        ####   ######  #    #  #    #  #
 C
 C+
-C                            P O L M A P 
-C 
+C                            P O L M A P
+C
 C                      by T. J. Harries 1994
-C                        tjh@st-and.uk.ac 
+C                        tjh@st-and.uk.ac
 C
-C POLMAP is an interactive linear spectropolarimetry analysis package.  
-C 
+C POLMAP is an interactive linear spectropolarimetry analysis package.
 C
-C- 
-      IMPLICIT NONE 
+C
+C-
+      IMPLICIT NONE
       INCLUDE 'PSX_ERR'
-C 
-C First, define the variables.... 
-C 
-C The array sizes are parameters... 
-C 
-      INCLUDE 'array_size.inc' 
+C
+C First, define the variables....
+C
+C The array sizes are parameters...
+C
+      INCLUDE 'array_size.inc'
 C
 C Declare various EXTERNALs so as not to confuse compilers when
 C INTRINSICs have the same name.
 C
       EXTERNAL MERGE
-C 
+C
 C Logical unit numbers. The comfile unit number is the starting value.
-C If nested comfiles are used then the the unit number is 
-C incremented. A maximum of 10 can be open at once hence the comfile 
+C If nested comfiles are used then the the unit number is
+C incremented. A maximum of 10 can be open at once hence the comfile
 C logical units cover comfile_lu_st -> comfile_lu+9
 C
       INTEGER COMFILE_LU_ST,IO_LU,OUT_LU,IN_LU
@@ -47,7 +47,7 @@ C
 C
 C
 C The Stokes parameters stack variables...
-C 
+C
       REAL STK_LAMBDA(MAXPTS,MAXSPEC)
       REAL STK_STOKES_I(MAXPTS,MAXSPEC)
       REAL STK_STOKES_Q(MAXPTS,MAXSPEC)
@@ -94,7 +94,7 @@ C
 C
 C The plotting ranges...
 C
-      DOUBLE PRECISION ACOEFF(20) 
+      DOUBLE PRECISION ACOEFF(20)
       INTEGER NCOEFF
 C
       REAL TMAX,TMIN
@@ -229,7 +229,7 @@ C
 
 
 C
-C The main loop. The command is input, parsed and the appropriate 
+C The main loop. The command is input, parsed and the appropriate
 C routine is called. The loop finishes when the quit command is called.
 C
       DO WHILE(CMD.NE.'quit')
@@ -355,7 +355,7 @@ C
          CALL WR_ERROR('Comfile must have own command line',OUT_LU)
         ENDIF
         ENDIF
-C        
+C
 C Now go through all known commands and see if we find a match, call the
 C appropriate command. Easy to add additional commands from here.
 C
@@ -754,35 +754,35 @@ C
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,NZONES,
      &   CONT_ST,CONT_EN,OUT_LU)
 C
-         ELSE IF (CMD.EQ.'subtract') THEN 
+         ELSE IF (CMD.EQ.'subtract') THEN
          CALL PMATH(NPARAMS,PARAMS,TOP_STK,
      &   STK_STOKES_I,STK_STOKES_Q,STK_STOKES_QV,
      &   STK_STOKES_U,STK_STOKES_UV,STK_LAMBDA,
      &   STK_NPTS,STOKES_I,STOKES_Q,
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,'-',OUT_LU)
 C
-         ELSE IF (CMD.EQ.'add') THEN 
+         ELSE IF (CMD.EQ.'add') THEN
          CALL PMATH(NPARAMS,PARAMS,TOP_STK,
      &   STK_STOKES_I,STK_STOKES_Q,STK_STOKES_QV,
      &   STK_STOKES_U,STK_STOKES_UV,STK_LAMBDA,
      &   STK_NPTS,STOKES_I,STOKES_Q,
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,'+',OUT_LU)
 C
-         ELSE IF (CMD.EQ.'idiv') THEN 
+         ELSE IF (CMD.EQ.'idiv') THEN
          CALL PMATH(NPARAMS,PARAMS,TOP_STK,
      &   STK_STOKES_I,STK_STOKES_Q,STK_STOKES_QV,
      &   STK_STOKES_U,STK_STOKES_UV,STK_LAMBDA,
      &   STK_NPTS,STOKES_I,STOKES_Q,
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,'I',OUT_LU)
 C
-         ELSE IF (CMD.EQ.'contsub') THEN 
+         ELSE IF (CMD.EQ.'contsub') THEN
          CALL PMATH(NPARAMS,PARAMS,TOP_STK,
      &   STK_STOKES_I,STK_STOKES_Q,STK_STOKES_QV,
      &   STK_STOKES_U,STK_STOKES_UV,STK_LAMBDA,
      &   STK_NPTS,STOKES_I,STOKES_Q,
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,'C',OUT_LU)
 C
-         ELSE IF (CMD.EQ.'contadd') THEN 
+         ELSE IF (CMD.EQ.'contadd') THEN
          CALL PMATH(NPARAMS,PARAMS,TOP_STK,
      &   STK_STOKES_I,STK_STOKES_Q,STK_STOKES_QV,
      &   STK_STOKES_U,STK_STOKES_UV,STK_LAMBDA,
@@ -885,7 +885,7 @@ C
 C
 C The following are the crash-out points...
 C
-66     CONTINUE 
+66     CONTINUE
        CALL WR_ERROR('Cannot open comfile',OUT_LU)
        COMFILE=.FALSE.
        DO I = COMFILE_LU,COMFILE_LU_ST,-1

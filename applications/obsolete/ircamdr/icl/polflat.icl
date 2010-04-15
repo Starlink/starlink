@@ -1,5 +1,5 @@
 { PROCEDURE POLFLAT : flat fields four polarization images
-proc polflat 
+proc polflat
   askname (obj0)  "Enter name of    0 deg OBJECT image ? "
   askname (sky0)  "Enter name of    0 deg SKY    image ? "
   askname (obj45) "Enter name of   45 deg OBJECT image ? "
@@ -22,7 +22,7 @@ proc polflat
   print "  normalizing flatfield image " (sky0)
   obeyw rapi2d CDIV (sky0) (medscal) (sky0n)
   print "  flat-fielding image " (obj0) " with " (sky0n)
-  out = obj0&"f" 
+  out = obj0&"f"
   obeyw rapi2d DIV (obj0) (sky0n) (out)
   print " flat-fielded image output to : " (out)
   d1 = sky0n&".sdf"
@@ -37,7 +37,7 @@ proc polflat
   print "  normalizing flatfield image " (sky45)
   obeyw rapi2d CDIV (sky45) (medscal) (sky45n)
   print "  flat-fielding image " (obj45) " with " (sky45n)
-  out = obj45&"f" 
+  out = obj45&"f"
   obeyw rapi2d DIV (obj45) (sky45n) (out)
   print " flat-fielded image output to : " (out)
   d1 = sky45n&".sdf"
@@ -52,7 +52,7 @@ proc polflat
   print "  normalizing flatfield image " (sky22)
   obeyw rapi2d CDIV (sky22) (medscal) (sky22n)
   print "  flat-fielding image " (obj22) " with " (sky22n)
-  out = obj22&"f" 
+  out = obj22&"f"
   obeyw rapi2d DIV (obj22) (sky22n) (out)
   print " flat-fielded image output to : " (out)
   d1 = sky22n&".sdf"
@@ -67,7 +67,7 @@ proc polflat
   print "  normalizing flatfield image " (sky67)
   obeyw rapi2d CDIV (sky67) (medscal) (sky67n)
   print "  flat-fielding image " (obj67) " with " (sky67n)
-  out = obj67&"f" 
+  out = obj67&"f"
   obeyw rapi2d DIV (obj67) (sky67n) (out)
   print " flat-fielded image output to : " (out)
   d1 = sky67n&".sdf"

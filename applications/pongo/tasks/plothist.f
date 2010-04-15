@@ -27,7 +27,7 @@
 *  ADAM Parameters:
 *     ACTION = _CHAR (Read)
 *        The mode of PLOTHIST as described above:
-*        
+*
 *        - "H" -- If the data in the XCOL data area are not binned, they
 *        can be binned and then plotted.  It is possible to plot
 *        several histograms with different bin sizes from the same data
@@ -41,14 +41,14 @@
 *     BINMIN = _REAL (Read and Write)
 *        When ACTION is "H", this parameter specifies the lower limit
 *        of the binning.
-*        
+*
 *        If no value is specified on the command line, the current
 *        value is used. If there is no current value, the value of the
 *        global parameter PONGO_XMIN is used.
 *     BINMAX = _REAL (Read and Write)
 *        When ACTION is "H", this parameter specifies the upper limit of
 *        the binning.
-*        
+*
 *        If no value is specified on the command line, the current
 *        value is used. If there is no current value, the value of the
 *        global parameter PONGO_XMAX.
@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,7 +123,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       CHARACTER * ( 1 ) ACTION   ! Action to be taken
 
@@ -144,7 +144,7 @@
 
 *  Check that device is ready for plotting.
       IF ( .NOT. PON_DEVOP( .TRUE., STATUS ) ) GO TO 99
-      
+
 *  Find which type of histogram is required.
       CALL PAR_GET0C( 'ACTION', ACTION, STATUS )
 
@@ -170,11 +170,11 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
                IF ( AUTOSCALE .AND. FILL ) THEN
                   FLAG = 2
-               ELSE IF ( FILL ) THEN 
+               ELSE IF ( FILL ) THEN
                   FLAG = 3
-               ELSE IF ( AUTOSCALE ) THEN 
+               ELSE IF ( AUTOSCALE ) THEN
                   FLAG = 0
-               ELSE 
+               ELSE
                   FLAG = 1
                END IF
 

@@ -4,7 +4,7 @@
 *     MESSYS_LEN
 
 *  Purpose:
-*     .H - Data definitions for message structure 
+*     .H - Data definitions for message structure
 
 *  Language:
 *     {routine_language}
@@ -56,7 +56,7 @@
 				/* changed */
 #define MSG_NAME_LEN	32
 #ifndef MSG_FIX_LEN
-#  define MSG_FIX_LEN	(6*INT_BYTE_SIZE+MSG_NAME_LEN)	
+#  define MSG_FIX_LEN	(6*INT_BYTE_SIZE+MSG_NAME_LEN)
 				/* length of non-value part of non-path part */
 #endif /* #ifndef MSG_FIX_LEN */
 

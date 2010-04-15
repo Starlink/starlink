@@ -11,6 +11,6 @@
       INCLUDE 'CLI_STACK.INC'
 
       GEN_LINENO = ICLI(4,ISP)
-      
+
       RETURN
       END

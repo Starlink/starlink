@@ -47,10 +47,10 @@
 *      this NDF, and using the function esp1_s2pr.
 *    maxrow = integer (given)
 *      Row dimension of the A array, and maximum number of rows to
-*      be read. 
+*      be read.
 *    maxcol = integer (given)
 *      Column dimension of the A array, and maximum number of columns to
-*      be read. 
+*      be read.
 *    a(maxrow,maxcol) = real (returned)
 *      Array to be filled with read numbers.
 *    al(maxrow) = integer (returned)
@@ -91,7 +91,7 @@
       real a(maxrow,maxcol)     ! array to be filled
       integer al(maxrow)        ! Array of row lengths
       integer ncolmin, ncolmax, nrow ! Actual number of elements read
-      
+
 *   Status
       integer status            ! global status
 
@@ -107,8 +107,8 @@
       logical nonblankstring    ! flag
       logical gridcoords        ! are input coordinates in WCS grid domain?
       integer lstatus           ! local status for chr_dcwrd
-      
-      
+
+
 *   Check inherited status
       if (status.ne.sai__ok) return
 
@@ -120,29 +120,29 @@
 
 *   Start error context
       call err_mark
-      
+
 *   Run through the rows.  Jump out of this loop if we have any errors,
 *   or when we run out of file.
       row = 0
       do while ((row.lt.maxrow) .and. .not.finishedrows)
-         
+
 *      Read a line
          call fio_read (fioid,buffer,nchar,status)
          if (status .ne. sai__ok) then
 *         End of file
             finishedrows = .true.
             call err_annul(status)
-            
+
          else
-         
+
 
 *         Find the first non-blank character, indexs(1) will be returned
 *         greater than indexs(2) if the string is blank.
             call chr_fandl (buffer, indexs(1), indexs(2))
             nonblankstring = (indexs(1).lt.indexs(2))
-            
+
 *         Check for structured comment: a line beginning `##'
-            if (nonblankstring .and. 
+            if (nonblankstring .and.
      :           buffer(1:1).eq.'#' .and. buffer(2:2).eq.'#') then
                call chr_rmblk (buffer)
                call chr_lcase (buffer)
@@ -155,26 +155,26 @@
                endif
                nonblankstring = .false.
             endif
-         
+
 *         Check for comment lines (starting # or !) or blank line
             if (nonblankstring
      :           .and. (buffer(1:1).ne.'#')
      :           .and. (buffer(1:1).ne.'!')) then
 
-               call chr_dcwrd (buffer, maxrow, col, 
+               call chr_dcwrd (buffer, maxrow, col,
      :              indexs, indexe, words, lstatus)
 
 *            We've split up the line, now convert the `words' to numbers
                i = 1
                do while (i.le.col .and. status.eq.sai__ok)
 
-                  if (i.eq.1 .and. .not.gridcoords 
+                  if (i.eq.1 .and. .not.gridcoords
      :                 .and. indf.ne.0 .and. col.ge.2) then
 
 *                  Convert coordinates using esp1_s2pr
                      call esp1_s2pr(indf,words(1),words(2),
      :                    a(row+1,1),a(row+1,2),status)
-                     
+
                      i = i + 2
 
                   else
@@ -183,8 +183,8 @@
                      i = i + 1
 
                   endif
-                  
-*               If there was an error, stop 
+
+*               If there was an error, stop
                   if (status.ne.sai__ok) then
                      finishedcols = .true.
                      finishedrows = .true.
@@ -207,20 +207,20 @@
 
  100  continue
       nrow = row
-      
+
 *   Display error messages, and tidy up the error system
       if (status .ne. sai__ok) then
          if (status .eq. fio__eof) then
-            call err_annul(status) ! No problem 
+            call err_annul(status) ! No problem
          else
             call msg_out (' ','Errors found reading the data file.',
      :           status)
          endif
       endif
-      
+
 *   end the error context
       call err_rlse
-      
+
       end
 
 * $Id$

@@ -29,7 +29,7 @@
 *
 *  Usage:
 *     OBSERVE NUMBER STAR RA DEC YEAR DEVICE TEXTF OUT AGAIN
-* 
+*
 *  ADAM Parameters:
 *     NUMBER = _INTEGER (Read)
 *        Observatory reference number.
@@ -40,10 +40,10 @@
 *     DEC = _CHAR (Read)
 *        Declination of the object.
 *     YEAR = _INTEGER (Read)
-*        The year for which the data should be calculated.  
+*        The year for which the data should be calculated.
 *     TEXTF = _LOGICAL (Read)
 *        Is a text file output required?
-*     OUT = _CHAR (Read)                     
+*     OUT = _CHAR (Read)
 *        The output file name for the text.
 *     AGAIN = _CHAR (Read)
 *        Repeat the run?
@@ -51,7 +51,7 @@
 *  Authors:
 *     MG: Manfred Gottwald (EXOSAT)
 *     JO: Julian Osborne (Leicester)
-*     JKA: ? 
+*     JKA: ?
 *     GJP: Grant Privett (Starlink, CAR)
 *     BLY: Martin Bly (Starlink, RAL)
 *
@@ -83,33 +83,33 @@
 *     23-MAY-1996 (GJP):
 *        Added text output option via TEXTF.
 *     29-MAY-1996 (GJP):
-*        Modified to calculate rise/set times for every day but still 
+*        Modified to calculate rise/set times for every day but still
 *           display moon results for every two days.
 *     26-SEP-2000 (BLY): Version 2.3
 *        Added new observatory data to obsinfo() to match SLA_OBS.
 *
-*  Notes 
+*  Notes
 *     The parameters are calculated for every day of the year but the
-*     lunar phase information is only displayed every two days to avoid 
+*     lunar phase information is only displayed every two days to avoid
 *     huge black areas on the printout. However, the full dataset
 *     is provided in the optional output file.
 
 *-
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  External reference:
       INTEGER CHR_LEN                 ! Length of string
       EXTERNAL RANGE
 
-*  Local variables: 
-      CHARACTER*2   DYS               ! 2 char representatoin of the day 
+*  Local variables:
+      CHARACTER*2   DYS               ! 2 char representatoin of the day
       CHARACTER*128 JUNK              ! Temporary string
       CHARACTER*10  MONS(12)          ! Months of the year
       CHARACTER *1  SPACE             ! The space character
@@ -118,11 +118,11 @@
       INTEGER FIOD                    ! File output identifier
       INTEGER LMONTH                  ! Previous month
       INTEGER MONTH                   ! Current month month
-      INTEGER NCHAR                   ! Number of chars in a string        
+      INTEGER NCHAR                   ! Number of chars in a string
       LOGICAL TEXTF                   ! Is a text file required
       LOGICAL EXCLAIM                 ! Was a ! found as a file name
       LOGICAL OPENF                   ! Did the file open okay
-      REAL RVALUE                     ! Real value 
+      REAL RVALUE                     ! Real value
       REAL TIMO                       ! Y axis time offset
 
       INTEGER LYEAR(14),MDAY(12),NDAY(12),ENDYR,DELTA
@@ -171,7 +171,7 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-                                                                 
+
 C   Opening credits.
       CALL MSG_BLANK(STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
@@ -328,13 +328,13 @@ C
 C  GST TO GMT
         CALL GGMT (T0(j),GSTR,GSTS,GMTR,GMTS)
         YPL3(K)=GMTR
-        YPL4(K)=GMTS                    
+        YPL4(K)=GMTS
 C
   603   CONTINUE
 C
         XPL1(K)=DYNO
         K=K+1
-        
+
       END DO
       NP=K-1
       GO TO 503
@@ -445,7 +445,7 @@ C calculate validity of twilight points+add extra points for start/stop
 	ENDIF
 	IF (.not.TWILGHT_FLG(L).and.TWILGHT) THEN
 	  TWILGHT_FLG(L) = .TRUE.
-	  TWILGHT = .FALSE. 
+	  TWILGHT = .FALSE.
 	ENDIF
 	L=L+1
 
@@ -517,7 +517,7 @@ c Lst to gst
 	CALL LGST(ALONG,LSTR2,LSTS2,GSTR2,GSTS2)
 	IF(GSTR1.GT.GSTR2)GSTR2=GSTR2+24.D0
 	IF(GSTS1.GT.GSTS2)GSTS2=GSTS2+24.D0
-c 
+c
 	T00PR=T0(J)-1.002738D0*ALONG
 	IF(T00PR.LT.0.D0)T00PR=T00PR+24.D0
 	IF(GSTR1.LT.T00PR)THEN
@@ -527,7 +527,7 @@ c
 	IF(GSTS1.LT.T00PR)THEN
 	  GSTS1=GSTS1+24.D0
 	  GSTS2=GSTS2+24.D0
-	ENDIF	  
+	ENDIF
 	GSTR=(12.03D0*GSTR1-T0(J)*(GSTR2-GSTR1))/(12.03D0+GSTR1-GSTR2)
 	GSTS=(12.03D0*GSTS1-T0(J)*(GSTS2-GSTS1))/(12.03D0+GSTS1-GSTS2)
 c calculate corrections
@@ -724,17 +724,17 @@ C  LABEL Y-AXIS
       XDELT = 365.0+3.0
       DO I=1,13
 	LTIME = ((I-1)*2) + 12
-	IF (LTIME.GT.24.0) THEN 
+	IF (LTIME.GT.24.0) THEN
 	  LTIME = LTIME - 24
 	ENDIF
 	WRITE(YLAB,'(I3)') LTIME
 	CALL PGTEXT(XDELT,-0.15+(I-1)*2.0,YLAB)
       ENDDO
-      
+
       XDELT = -16.5
       DO I=1,13
 	LTIME = ((I-1)*2) + 12 - DELTA
-	IF (LTIME.gt.24.0) THEN 
+	IF (LTIME.gt.24.0) THEN
 	  LTIME = LTIME - 24
 	ENDIF
 	WRITE(YLAB,'(I3)') LTIME
@@ -815,17 +815,17 @@ C
       CALL PGSLS(1)
 C
 C---  ASK IF A TEXT FILE IS TO BE CREATED.
-     
+
       CALL PAR_GET0L('TEXTF',TEXTF,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
-      
+
 C   Create an output text file as required.
       IF (TEXTF) THEN
-      
-*      Determine the output text file name. If the file name chosen fails, 
+
+*      Determine the output text file name. If the file name chosen fails,
 *      the user is reprompted
-         OPENF=.FALSE.             
-         EXCLAIM=.FALSE.   
+         OPENF=.FALSE.
+         EXCLAIM=.FALSE.
          CALL ERR_MARK
          DO WHILE((.NOT.OPENF).AND.(.NOT.EXCLAIM)
      :             .AND.(STATUS.EQ.SAI__OK))
@@ -839,8 +839,8 @@ C   Create an output text file as required.
          END DO
          CALL ERR_RLSE
          IF (STATUS.NE.SAI__OK) GOTO 999
-       
-C      Headings.        
+
+C      Headings.
          CALL FIO_WRITE(FIOD,SPACE,STATUS)
          JUNK='TEXT OUTPUT FROM OBSERVE'
          IF (STATUS.NE.SAI__OK) GOTO 999
@@ -852,7 +852,7 @@ C      Headings.
          CALL FIO_WRITE(FIOD,SPACE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
-C      Object name. 
+C      Object name.
          JUNK='Object selected was: '//name
          NCHAR=CHR_LEN(JUNK)
          CALL FIO_WRITE(FIOD,JUNK(1:NCHAR),STATUS)
@@ -869,20 +869,20 @@ C      Object position.
          CALL FIO_WRITE(FIOD,SPACE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
-C      Observatory name. 
+C      Observatory name.
          JUNK='From:                '//obsnam
          NCHAR=CHR_LEN(JUNK)
          CALL FIO_WRITE(FIOD,JUNK(1:NCHAR),STATUS)
          CALL FIO_WRITE(FIOD,SPACE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
-C      Year. 
+C      Year.
          CALL CHR_ITOC(JR,C4,I)
          JUNK='During:              '//C4
          NCHAR=CHR_LEN(JUNK)
          CALL FIO_WRITE(FIOD,JUNK(1:NCHAR),STATUS)
          CALL FIO_WRITE(FIOD,SPACE,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999      
+         IF (STATUS.NE.SAI__OK) GOTO 999
 
 C      Times + date.
          LMONTH=0
@@ -919,7 +919,7 @@ C         Get value for moon illumination.
             J=NINT(F(K)*100.)
             CALL CHR_ITOC(J,STRA(10),I)
 
-C         Create time strings.  
+C         Create time strings.
             CALL CONTIM(TIMO,YPL1(K),STRA(1),STATUS)
             CALL CONTIM(TIMO,YPL2(K),STRA(2),STATUS)
             CALL CONTIM(TIMO,YPL3(K),STRA(3),STATUS)
@@ -929,26 +929,26 @@ C         Create time strings.
             CALL CONTIM(TIMO,YPL7(K),STRA(7),STATUS)
             CALL CONTIM(TIMO,YPL8(K),STRA(8),STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 999
-           
+
 C         Get value for moon-object distance.
             RVALUE=0.0E0
             CALL CONTIM(RVALUE,DIST(K),STRA(9),STATUS)
 
-C         Create output string. 
+C         Create output string.
             JUNK=' '//DYS//'   '//STRA(1)//STRA(2)//'  '
      :           //STRA(3)//STRA(4)//'  '
      :           //STRA(5)//STRA(6)//'  '
      :           //STRA(7)//STRA(8)//'  '
      :           //STRA(9)//'    '//STRA(10)
- 
+
 C         Output the string.
             NCHAR=CHR_LEN(JUNK)
             CALL FIO_WRITE(FIOD,JUNK(1:NCHAR),STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 999
-           
+
   201    CONTINUE
-          
-C      Close the file down. 
+
+C      Close the file down.
          CALL FIO_WRITE(FIOD,SPACE,STATUS)
          CALL FIO_CLOSE(FIOD,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
@@ -1056,7 +1056,7 @@ c
 	  z=z-iy*r
 	elseif(y.lt.0.)then
 	  z=z+(-iy+1)*r
-	endif  
+	endif
 	if(z.eq.r)z=0.d0
 	return
 	end
@@ -1131,7 +1131,7 @@ c
 	function cy(delta,Ycoord)
 	real*4 Ycoord,CYcoord
 	integer*4 delta
-	
+
 C
 C CONVERT UT INTO LOCAL TIME
 	Ycoord = Ycoord + delta
@@ -1144,7 +1144,7 @@ C
 C CONVERT (24-12-24) TO (12-24-12)
 	if ((Ycoord.le.24.0).and.(Ycoord.gt.12.0)) then
 	   CYcoord = Ycoord - 12.0
-	else 
+	else
 	   CYcoord = Ycoord + 12.0
 	endif
 	cy = CYcoord
@@ -1176,7 +1176,7 @@ c
 	    ENDIF
 	  ENDIF
 	  tx(1) = tx(2)
-	  ty(1) = ty(2) 
+	  ty(1) = ty(2)
 	enddo
 	return
 	end
@@ -1298,7 +1298,7 @@ C--------------------------------------------------------------------
       SUBROUTINE GETCOORDS(IDENT,DVAL,STATUS)
 
       INCLUDE 'SAE_PAR'
-      
+
       CHARACTER*(*) IDENT
       DOUBLE PRECISION DVAL
       INTEGER STATUS
@@ -1307,7 +1307,7 @@ C--------------------------------------------------------------------
 
       IF (STATUS.NE.SAI__OK) RETURN
 
-      DO WHILE (.TRUE.) 
+      DO WHILE (.TRUE.)
 	  START = 1
 	  STATUS = SAI__OK
 
@@ -1482,23 +1482,23 @@ C
       SUBROUTINE CONTIM(OFFS,VALUE,STRING,STATUS)
 
 *+
-*  Name: 
+*  Name:
 *     CONTIM
- 
+
 *  Purpose:
 *     Create an hours:minutes:seconds string containing the time.
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL CONTIM(OFFS,VALUE,STRING,STATUS)
-      
+
 *  Description:
 *     Given the fractional part of a day the routine calculates the number
-*     of hours minutes and seconds that represents. It then creates a 2 
-*     character string of each and puts them together to make a string 
-*     formatted as HH:MM:SS 
+*     of hours minutes and seconds that represents. It then creates a 2
+*     character string of each and puts them together to make a string
+*     formatted as HH:MM:SS
 
 *  Arguments:
 *     OFFS = REAL (Given)
@@ -1507,19 +1507,19 @@ C
 *        The fractional part of a day.
 *     STRING = CHARACTER*10 (Returned)
 *        The output string.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status.     
- 
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+
 *  History:
 *     29-MAY-1996
 *     (Original version)
- 
+
 *  Bugs:
 *     None known.
- 
+
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -1536,17 +1536,17 @@ C
       CHARACTER *10 STRING            ! Output time string
 
 *  Local variables:
-      CHARACTER *2 P1                 ! First part of string 
+      CHARACTER *2 P1                 ! First part of string
       CHARACTER *2 P2                 ! Second part of string
       CHARACTER *2 P3                 ! Third part of string
       INTEGER HRS                     ! Hours
       INTEGER I                       ! String length
-      INTEGER MIN                     ! Minutes 
+      INTEGER MIN                     ! Minutes
       INTEGER SEC                     ! seconds
 
 *.
       INTEGER STATUS
-  
+
 *    Check global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -1572,7 +1572,7 @@ C   Convert the numbers to strings.
       CALL CHR_ITOC(SEC,P3,I)
       IF (I.EQ.0) P3='00'
       IF (I.EQ.1) P3='0'//P3
-     
+
 C   Create output string.
       STRING=P1//':'//P2//':'//P3//'  '
 
@@ -1583,21 +1583,21 @@ C   Convert a fractional day value to 10 character string representation.
 C
       SUBROUTINE DATEC(MDAY,DAYS,DAY,MONTH,DYS,STATUS)
 *+
-*  Name: 
+*  Name:
 *     DATE
- 
+
 *  Purpose:
 *     Identify the day and month from the number of days into the year.
 *     Also return the day of the month as a 2 char string.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL DATEC(MDAY,DAYS,DAY,MONTH,DYS,STATUS)
-      
+
 *  Description:
-*     Given a certain day of the year calculates what month it is in 
+*     Given a certain day of the year calculates what month it is in
 *     and then what day of the month it must be. Then converts that
 *     day into a 2 character string form.
 
@@ -1612,19 +1612,19 @@ C
 *        Current month.
 *     DYS = CHARACTER *2 (Returned)
 *        Which day of the month as a string.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status.     
- 
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+
 *  History:
 *     27-MAY-1996
 *     (Original version)
- 
+
 *  Bugs:
 *     None known.
- 
+
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -1633,7 +1633,7 @@ C
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Arguments Given:
@@ -1641,7 +1641,7 @@ C
       INTEGER MDAY(12)                ! DAys in each month
 
 *  Arguments Returned:
-      CHARACTER *2 DYS                ! Day of month 
+      CHARACTER *2 DYS                ! Day of month
       INTEGER DAY                     ! Day of month
       INTEGER MONTH                   ! Year of month
 
@@ -1670,18 +1670,18 @@ C   Find which month.
 
 C   Find which day of month.
       IF (MONTH.NE.1) THEN
-         DAY=DAYS-DAYT(MONTH-1)      
+         DAY=DAYS-DAYT(MONTH-1)
       ELSE
-         DAY=DAYS      
+         DAY=DAYS
       END IF
-      
+
 C   Convert the numbers to strings.
       CALL CHR_ITOC(DAY,P1,I)
       IF (I.EQ.0) DYS='00'
       IF (I.EQ.1) DYS='0'//P1
       IF (I.EQ.2) DYS=P1
 
-      END 
+      END
 
 
 C
@@ -1700,9 +1700,9 @@ C
 *
 *    Invocation :
 *
-*      CALL OBS_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN, 
+*      CALL OBS_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
 *                      EXCLAIM,STATUS)
- 
+
 *
 *    Arguments :
 *
@@ -1774,64 +1774,64 @@ C
 *     1994 mar 1: Modified to return EXCLAIM (CARDIFF::GJP).
 *
 *    Type definitions :
- 
+
       IMPLICIT  NONE           ! no implicit typing allowed
- 
+
 *    Global constants :
       INCLUDE  'SAE_PAR'       ! SSE global definitions
       INCLUDE  'PAR_ERR'       ! parameter-system errors
- 
+
 *    Import :
       CHARACTER*(*) PNFILE     ! File Parameter Name
       CHARACTER*(*) ACMODE     ! File access mode
       CHARACTER*(*) FORM       ! Required form of carriagecontrol
       INTEGER RECSZ            ! File record size
- 
+
 *    Export :
       LOGICAL OPEN             ! File opened successfully
       LOGICAL EXCLAIM          ! File name was exclaimation
       INTEGER FD               ! File descriptor
- 
+
 *    Status :
       INTEGER STATUS
- 
+
 *    Local Constants :
       INTEGER MXLOOP           ! Maximum number of attempts at
                                ! opening a data file
       PARAMETER ( MXLOOP=4 )
- 
+
       INTEGER LOOP             ! Number of attempts to open the file
- 
+
       LOGICAL LOOPAG           ! Loop again to open output file
- 
+
 *.
 
 *    check status on entry - return if not o.k.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       LOOP=0
       LOOPAG=.TRUE.
       OPEN=.FALSE.
       DO WHILE ( LOOPAG )
- 
+
 *       attempt to obtain and open a file to output listing
- 
+
          CALL FIO_ASSOC( PNFILE, ACMODE, FORM, RECSZ, FD, STATUS )
- 
+
          IF ( STATUS .EQ. PAR__NULL ) THEN
             OPEN=.FALSE.
             LOOPAG=.FALSE.
             EXCLAIM=.TRUE.
             CALL ERR_ANNUL( STATUS )
          ELSE IF ( STATUS .NE. SAI__OK ) THEN
- 
+
             IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
- 
+
 *         Here if filename is not allowed or file is not opened
 *         - try again
 *         Need to flush error here, as not quitting routine
- 
+
             LOOP=LOOP + 1
             IF ( LOOP .LE. MXLOOP ) THEN
                CALL MSG_SETC( 'FILNAM', PNFILE )
@@ -1840,36 +1840,36 @@ C
      :           STATUS )
                CALL ERR_FLUSH( STATUS )
             ELSE
- 
+
 *             end looping as user is having serious problems
- 
+
                LOOPAG=.FALSE.
             END IF
- 
+
             CALL PAR_CANCL( PNFILE, STATUS )
- 
+
          ELSE
- 
+
 *          no problem, so exit loop
- 
+
             LOOPAG=.FALSE.
             OPEN=.TRUE.
- 
+
 *       end of file-opened-successfully check
- 
+
          END IF
       END DO
- 
+
 *    abort for repeated error
- 
+
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ERR_AIF_ASFIO_NOOPEN',
      :     'AIF_ASFIO: Repeatedly unable to open a file.', STATUS )
       END IF
- 
+
  999  CONTINUE
- 
+
       END
- 
- 
- 
+
+
+

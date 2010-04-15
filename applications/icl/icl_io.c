@@ -34,11 +34,11 @@
  * waiting for either terminal input or the arrival of a control message sent
  * as a C structure from icl over a pipe.
  *
- * ICL itself is waiting for  a messys format message to appear on one of its 
+ * ICL itself is waiting for  a messys format message to appear on one of its
  * queues (fixed queues or transaction queues created to communicate with ADAM
- * tasks). Unlike in VMS PASCAL ICL where the request is sent to the fixed 
- * "ASTINT" queue we start and OBEY transaction with ICL and icl_io generates 
- * an appropriate message containing the user input in its "value" component 
+ * tasks). Unlike in VMS PASCAL ICL where the request is sent to the fixed
+ * "ASTINT" queue we start and OBEY transaction with ICL and icl_io generates
+ * an appropriate message containing the user input in its "value" component
  * and sends this to ICL as part of a MESSYS_TRIGGER message.
  *
  * Terminal input is placed in a buffer to allow for command recall and various
@@ -126,16 +126,16 @@ int icl_path, icl_messid;
 struct termios init_tty,
 	       linemode_tty;
 /*
- * tty input is first read into a dynamic memory buffer 'readbuff' and is 
- * the processed into a cyclical buffer 'inbuff'. This provides type-ahead 
- * and allows some pre-processing of certain characters even when not in 
+ * tty input is first read into a dynamic memory buffer 'readbuff' and is
+ * the processed into a cyclical buffer 'inbuff'. This provides type-ahead
+ * and allows some pre-processing of certain characters even when not in
  * explicit input mode.
  *
  * Eventually the line to be passed to ICL is assembled from 'inbuff' into
  * 'inputline' allowin for line editing operations.
  */
 
-char 
+char
     inbuff   [INPUTBUFFERLENGTH], /* Cyclic input buffer for characters read */
     inputline[INPUTLINELENGTH+1], /* Constructed input line for ICL */
     saveinput[INPUTBUFFERLENGTH+1], /* Save input when recalling lines */
@@ -196,7 +196,7 @@ int interrupted;
  *
  * This process can handle normal ICL line orientated input (LINEMODE) or,
  * using the curses routines, the ICL "SCREENMODE" defined in SG/5.
- * 
+ *
  ******************************************************************************
  */
 
@@ -236,7 +236,7 @@ int recall_p;			/* processing position in recall buffer */
  *
  ******************************************************************************
  */
-void 
+void
 initrecall(void)
 {
     int i;
@@ -255,7 +255,7 @@ initrecall(void)
  *
  ******************************************************************************
  */
-void 
+void
 addtorecall(char *line)
 {
     char *txt;
@@ -365,7 +365,7 @@ nextline(void)
 
 #define NUMKEYS 26
 
-char *keyseq[NUMKEYS+4] = 
+char *keyseq[NUMKEYS+4] =
 {"\033[A",    /* up-history */
  "\033[B",    /* down-history */
  "\033[C",    /* forward-char */
@@ -434,7 +434,7 @@ int controlcodes[26] =
 /* codespecialkey() returns one of the integers defined above or one
  * of the codes below (must be negative)
  */
-            
+
 #define SUBSTRING (-1)		/* Input so far is a partial match */
 #define NOMATCH   (-2)		/* No match on special characters  */
 
@@ -446,12 +446,12 @@ int controlcodes[26] =
  * matching a special operation defined above. Also processes control keys
  * and DELETE .
  *
- * Can also return SUBSTRING (partial match - await more characters arriving) 
+ * Can also return SUBSTRING (partial match - await more characters arriving)
  * or NOMATCH.
  *
  ******************************************************************************
  */
-int 
+int
 codespecialkey(void)
 {
     char *w, wch;
@@ -514,7 +514,7 @@ codespecialkey(void)
  * we position at the start of the current display line.
  *
  ******************************************************************************
-*/ 
+*/
 void
 posbol( int del, int prlen, int cpos, int epos )
 {
@@ -529,7 +529,7 @@ int nlines,cline;
    if ( del ) {
       if (delete_line != CHARNIL) {
          for (;nlines--;)putp(delete_line);
-        
+
       } else {
          putchar('\r');
          if (clr_eos != CHARNIL)
@@ -546,7 +546,7 @@ int nlines,cline;
  *  R E D O L I N E ( int complete, int prlen, int cpos, int epos, int forwd )
  *
  * Re-display a line leaving the cursor in position cpos.
- * We assume that the static variables prompt and inputline are set up 
+ * We assume that the static variables prompt and inputline are set up
  * correctly and the cursor is at the start of the line. (This is the complete
  * prompt and reply display on most terminals but only the current display
  * line on dumb terminals ie where we cannot move the cursor up.)
@@ -572,7 +572,7 @@ int cline,  /* line number which cursor is on (start at 0) */
 
 /* Calculate line numbers and remainders */
    cline =  ( prlen + cpos ) / COLS;
-   ll_len = (prlen + epos) % COLS; 
+   ll_len = (prlen + epos) % COLS;
    cl_len = (prlen + cpos) % COLS;
 
 /* For dumb terminals (ie where cursor cannot be moved up) we have to work with
@@ -621,7 +621,7 @@ int cline,  /* line number which cursor is on (start at 0) */
  * is at end of line. */
    if ( !(complete && (cpos==epos)) ) {
    /* Re-position at start if we have just displayed the complete line */
-      if ( complete ) 
+      if ( complete )
          posbol(0, prlen, epos, epos);
 
    /* If first line, start with prompt */
@@ -639,10 +639,10 @@ int cline,  /* line number which cursor is on (start at 0) */
             putchar('\n');
          } else
             if ( forwd ) putchar('\n');
-            
-   /* and, for dumb terminals, if there is more on the line, print it, 
+
+   /* and, for dumb terminals, if there is more on the line, print it,
     *    restoring cursor to SOL */
-         if ( cursor_up == CHARNIL ) 
+         if ( cursor_up == CHARNIL )
             if ( epos > cpos ) printf( "%s\r", inputline+cpos );
       }
    }
@@ -656,7 +656,7 @@ int cline,  /* line number which cursor is on (start at 0) */
  *
  * tty input can be requested to be non-interuptable (used, for example, to
  * prompt for a parameter) or interuptable (eg. the ICL> prompt) when task
- * output messages will be sent as they appear. 
+ * output messages will be sent as they appear.
  *
  * These routines handle the buffering of I/O requests in situations where they
  * cannot be immediately acted upon.
@@ -682,7 +682,7 @@ struct queueout {
  *
  ******************************************************************************
  */
-void 
+void
 addtoqueue
 (
 int type,		/* request type code (input) */
@@ -733,7 +733,7 @@ int seqno		/* sequence number of input request (input) */
  *
  ******************************************************************************
  */
-void 
+void
 mywnewline(WINDOW * win, int wrows)
 {
     int xcoord, ycoord;
@@ -760,7 +760,7 @@ mywnewline(WINDOW * win, int wrows)
  *
  ******************************************************************************
  */
-void 
+void
 mywmovebackone(WINDOW * win)
 {
     int xcoord, ycoord;
@@ -782,7 +782,7 @@ mywmovebackone(WINDOW * win)
  *
  ******************************************************************************
  */
-void 
+void
 mywmoveforwardone(WINDOW * win, int wrows)
 {
     int xcoord, ycoord;
@@ -852,7 +852,7 @@ clearqueue(void)
  *
  ******************************************************************************
  */
-void 
+void
 processqueue(void)
 {
     struct queueout *w;
@@ -870,7 +870,7 @@ processqueue(void)
 	    if (headqueue->sofar != CHARNIL)
 		free(headqueue->sofar);
 	    expectinginput = FALSE;
-	} else if (headqueue->type == IO_COMMAND_GETINTINPUT || 
+	} else if (headqueue->type == IO_COMMAND_GETINTINPUT ||
 		   headqueue->type == IO_COMMAND_GETINPUT) {
 	    strcpy(prompt, headqueue->txt);
             prompt_len = strlen(prompt);
@@ -924,7 +924,7 @@ processqueue(void)
  *
  ******************************************************************************
  */
-int 
+int
 noisechar(char ch)
 {
     if ( isalnum( ch ) || (strchr("_.-=*[]?~",ch) != NULL) )
@@ -941,7 +941,7 @@ noisechar(char ch)
  *
  ******************************************************************************
  */
-int 
+int
 spacechar(char ch)
 {
     if (ch == ' ' || ch == '\t' )
@@ -955,7 +955,7 @@ spacechar(char ch)
  *
  ******************************************************************************
  */
-int 
+int
 normalcharacter(char ch)
 {
     if ((ch >= 'a' && ch <= 'z') ||
@@ -973,7 +973,7 @@ normalcharacter(char ch)
  *
  ******************************************************************************
  */
-void 
+void
 ringbell(void)
 {
     if (bell != CHARNIL)
@@ -1011,7 +1011,7 @@ clearline(void)
  *  Redisplay the input line, including prompt. Leave cursor at end
  ******************************************************************************
  */
-void 
+void
 redisplay(char *w)
 {
 int nlines;
@@ -1035,7 +1035,7 @@ int nlines;
  *  Redisplay the input line, including prompt, and reposition cursor within it
  ******************************************************************************
  */
-void 
+void
 positionredisplay(char *w)
 {
     int posy, posx, back;
@@ -1107,7 +1107,7 @@ int nomatch = 0;
 /*   Get expanded if necessary filename into tbuff */
          if ( strpbrk(tbuff,"~$") != NULL ) {
             sprintf(combuff, "echo %s", tbuff);
-            result = shell_command( combuff );      
+            result = shell_command( combuff );
 /*   If there was no expansion, tbuff remains as original */
             if (result != NULL) {
                if (strcmp(result, "")) {
@@ -1131,7 +1131,7 @@ int nomatch = 0;
                      wrefresh(bottomwin);
                   } else {
                      printf("\nMultiple matches.\n");
-                  }                   
+                  }
                   ringbell();
                   nmatch = strlen( tbuff ) - 1;
                   while (  filelist.gl_pathc == nfiles ) {
@@ -1144,7 +1144,7 @@ int nomatch = 0;
                            nfiles++; /* stops the while */
                            ringbell();
                         }
-            
+
                      } else {
 /*         combuff is exact match for 1st name
  *         so all future matches will be same */
@@ -1178,7 +1178,7 @@ int nomatch = 0;
                   i = 0;
                   while( (extns[i] != NULL) ) {
                      lenext = (int)strlen( extns[i] );
-                     if ( 
+                     if (
                        !strcmp( *filelist.gl_pathv+nmatch-lenext, extns[i] ) ) {
                         *(*filelist.gl_pathv + nmatch - lenext ) = '\0';
                         if ( nmatch - lenext < expanded_len ) {
@@ -1196,13 +1196,13 @@ int nomatch = 0;
 /*   Restore any environment variables */
 /*   and copy to inputline */
                strcpy( combuff, &inputline[inpl_cpos] );
-               strcpy( &inputline[inpl_cpos-trunc], 
+               strcpy( &inputline[inpl_cpos-trunc],
                        *filelist.gl_pathv+expanded_len );
                if ( nfiles == 1 )
                   strcat(inputline," ");
                inpl_cpos = strlen( inputline );
                strcat( inputline, combuff );
-               inpl_epos = strlen(inputline);          
+               inpl_epos = strlen(inputline);
 
             } else {
 /*   No matches */
@@ -1212,11 +1212,11 @@ int nomatch = 0;
                   wrefresh(bottomwin);
                } else {
                   printf("\nNo match.\n");
-               }                   
+               }
                ringbell();
             }
 
-         } else {  
+         } else {
 /*               Failed getting filenames */
 #ifdef GLOB_NOMATCH
 	   if ( status == GLOB_NOMATCH ) nomatch = 1;
@@ -1233,9 +1233,9 @@ int nomatch = 0;
                   wrefresh(bottomwin);
                } else {
                   printf("\nNo match.\n");
-               }                   
+               }
             ringbell();
-         } 
+         }
          globfree( &filelist );
 
       } else {
@@ -1259,7 +1259,7 @@ int nomatch = 0;
  *
  ******************************************************************************
  */
-void 
+void
 keyboard_input(void)
 {
     int status, ams_value_len, readret, inputavailable, worker, worker1;
@@ -1291,8 +1291,8 @@ keyboard_input(void)
 	    break;
 	if(FD_ISSET(fileno(stdin), &infds)) {
 	    readret = read(fileno(stdin), readbuff,
-			   ((inbuf_rpos >= inbuf_cpos) ? 
-                           (INPUTBUFFERLENGTH - (inbuf_rpos-inbuf_cpos)) : 
+			   ((inbuf_rpos >= inbuf_cpos) ?
+                           (INPUTBUFFERLENGTH - (inbuf_rpos-inbuf_cpos)) :
                            (inbuf_cpos-inbuf_rpos-2)));
 	    w = readbuff;
 	    while (readret > 0) {
@@ -1301,7 +1301,7 @@ keyboard_input(void)
 		else {
 		    inbuff[inbuf_rpos] = *w;
 		    incinbuf_rpos();
-		}	
+		}
 		w++;
 		readret--;
 	    } /* while readret */
@@ -1333,12 +1333,12 @@ keyboard_input(void)
 /*              Calculate the column number */
                     colno = (prompt_len + inpl_epos) % COLS;
 		    if (screenstate == SCREENMODE) {
-/*                In screenmode, add the character to the screen */  
+/*                In screenmode, add the character to the screen */
 			waddch(bottomwin, inbuff[inbuf_cpos]);
 			wrefresh(bottomwin);
 /*                and if we go on to a new line, move instarty up one */
                         if ( !colno )
-                           if ( (bwlines - instarty ) < 
+                           if ( (bwlines - instarty ) <
                               (prompt_len+inpl_epos)/COLS + 1) {
                               instarty--;
                            }
@@ -1407,7 +1407,7 @@ keyboard_input(void)
 		message.iarg = inputarg;
 		strcpy(message.buff, inputline);
 		strcat(message.buff, "\n");
-/*    if (screenstate==SCREENMODE){ 
+/*    if (screenstate==SCREENMODE){
        waddstr(bottomwin,"MESSAGEOUT:");
        waddstr(bottomwin,message.buff);
        mywnewline(bottomwin,bwlines);
@@ -1415,7 +1415,7 @@ keyboard_input(void)
 */		message.buflen = strlen(message.buff) + 1;
 		ams_value_len = message.buflen + 4*sizeof(int);
 		status = SAI__OK;
-		ams_reply(icl_path, icl_messid, MESSYS__MESSAGE, 
+		ams_reply(icl_path, icl_messid, MESSYS__MESSAGE,
 			  MESSYS__TRIGGER, OBEY, "IOCOMMAND",
 			  ams_value_len, (char *) &message, &status);
 		expectinginput = FALSE;
@@ -1520,8 +1520,8 @@ keyboard_input(void)
                        strcpy(inputline,saveinput);
                        saveinput_p = CHARNIL;
                     } else
-                       ringbell();                       
-		} else 
+                       ringbell();
+		} else
 		    strcpy(inputline, w);
 		if (screenstate == SCREENMODE)
 		    redisplay(inputline);
@@ -1631,7 +1631,7 @@ keyboard_input(void)
 		} else {
                    posbol( cursor_up==CHARNIL, prompt_len, inpl_cpos, inpl_epos );
   		   inpl_cpos = 0;
-                   redoline( cursor_up==CHARNIL, prompt_len, inpl_cpos, inpl_epos, 
+                   redoline( cursor_up==CHARNIL, prompt_len, inpl_cpos, inpl_epos,
                    1 );
                 }
 		break;
@@ -1641,10 +1641,10 @@ keyboard_input(void)
 		    inpl_cpos = inpl_epos;
 		    positionredisplay(CHARNIL);
 		} else {
-                    posbol( cursor_up==CHARNIL, prompt_len, inpl_cpos, 
+                    posbol( cursor_up==CHARNIL, prompt_len, inpl_cpos,
                      inpl_epos );
    		    inpl_cpos = inpl_epos;
-                    redoline( cursor_up==CHARNIL, prompt_len, inpl_cpos, 
+                    redoline( cursor_up==CHARNIL, prompt_len, inpl_cpos,
                      inpl_epos, 0 );
                 }
 		break;
@@ -1683,7 +1683,7 @@ keyboard_input(void)
                        worker--;
                  if ( spacechar(inputline[worker]) ) worker++;
 
-                 sprintf(combuff, 
+                 sprintf(combuff,
                     "ls -Cd %.*s*",inpl_cpos-worker, &inputline[worker]);
                  result = shell_command( combuff );
                  if (screenstate == SCREENMODE) {
@@ -1785,7 +1785,7 @@ keyboard_input(void)
 			break;
 		     else
 			worker1--;
-                   
+
                    if ( !noisechar(inputline[worker1]) ) {
 /* Find beginning of word (or line) */
                       while (!noisechar(inputline[worker1]))
@@ -1889,7 +1889,7 @@ keyboard_input(void)
     } /* of while inputavailable */
 
     return;
-} 
+}
 
 /******************************************************************************
  *
@@ -1907,7 +1907,7 @@ keyboard_input(void)
 char
 *shell_command( char *command )
 {
-    int pid, fd[2], fde[2], status; 
+    int pid, fd[2], fde[2], status;
     size_t resultsize, resp;
     ssize_t nchars;
     char *result;
@@ -1944,7 +1944,7 @@ char
                          resultsize+=256;
                          result = (char *)realloc((void *)result,resultsize);
                       }
-                      if ( (nchars = 
+                      if ( (nchars =
                          read(fd[0], (void *)(result+resp), resultsize-resp-1))
                          < 0 )
                          perror("shell_command()");
@@ -1959,7 +1959,7 @@ char
                 close(fde[0]);
 		waitpid(pid, &status, 0);
 	    }
-	}		
+	}
     if (status == 0)
 	return result; /* TRUE */
     else
@@ -1978,7 +1978,7 @@ char
  *
  ******************************************************************************
  */
-void 
+void
 command_input(void)
 {
     int row, column, start_row, end_row;
@@ -2087,7 +2087,7 @@ command_input(void)
 	    if (screenstate > 0 && interuptableinput)
 /*
  * Interuptable input is in progress. Process output request and reprompt
- */ 
+ */
 		if (screenstate == SCREENMODE) {
 		    getyx(bottomwin, y1, x1);
 		    mywnewline(bottomwin, bwlines);
@@ -2106,7 +2106,7 @@ command_input(void)
 			printf("\r%s%.*s", prompt, inpl_cpos, inputline);
 		}
 	    else	/* Queue output request */
-		addtoqueue(message.fcode, message.buff, 
+		addtoqueue(message.fcode, message.buff,
 			   (message.dindex == 0 ?
 				CHARNIL : &message.buff[message.dindex]),
 			    CHARNIL, message.iarg);
@@ -2197,13 +2197,13 @@ command_input(void)
 
     return;
 }
-    
+
 /******************************************************************************
  *
  *	R E S I Z E _ H A N D L E R ( int signo )
  *
  * This function is called when we get a window resize event (n.b. only on
- * local windows and remotely connected ones using rlogin - NOT telnet!) and 
+ * local windows and remotely connected ones using rlogin - NOT telnet!) and
  * resets the variables 'COLS' and 'LINES' (declared in curses.h) accordingly.
  *
  ******************************************************************************
@@ -2230,7 +2230,7 @@ resize_handler(int signo)
         posbol( 1, prompt_len, inpl_cpos, inpl_epos );
         redoline( 1, prompt_len, inpl_cpos, inpl_epos, 1 );
     }
-    return;     
+    return;
 }
 
 /******************************************************************************
@@ -2258,7 +2258,7 @@ cntlc_handler(int signo)
 	wclrtobot(bottomwin);
 	waddstr(bottomwin, prompt);
 	wrefresh(bottomwin);
-    } 
+    }
     fprintf(stderr,"*** Interrupt ***\n");
 /*
  * Get back to the icl_io idle state (ie waiting for either a keyboard key
@@ -2271,7 +2271,7 @@ cntlc_handler(int signo)
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT);
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    siglongjmp(goback, 0); 
+    siglongjmp(goback, 0);
 }
 
 /******************************************************************************
@@ -2375,7 +2375,7 @@ sig_handler( int signo )
 * Initially ICL starts in screen state 'INITIAL' and we arrange to move from
 * this to 'LINEMODE'.
 *
-* Further ICL SET (NO)SCREEN commands can change between LINEMODE and 
+* Further ICL SET (NO)SCREEN commands can change between LINEMODE and
 * SCREENMODE and, further, when in SCREENMODE the "fixed" portion of the
 * screen can be set to be 'nolines' in size.
 *
@@ -2423,7 +2423,7 @@ struct sigaction act;
 	    keyboard_input();             /* Read type-ahead into buffer */
 	    decinbuf_rpos(); /* Forget forced \n */
 	}
-#endif 
+#endif
 /*
  * Any typeahead input will have had '\r' converted to '\n' as the tty
  * is still in normal buffered mode. Undo this conversion before we process
@@ -2577,7 +2577,7 @@ struct sigaction act;
  *
  ******************************************************************************
  */
-int 
+int
 main(int argc, char *argv[])
 {
     char mytaskname[64];
@@ -2623,7 +2623,7 @@ main(int argc, char *argv[])
 	     message_context, message_name, 10, ams_value,
 	     &icl_messid, &status);
     /* Initial acknowledgement */
-    ams_getreply(MESSYS__INFINITE, icl_path, icl_messid, 
+    ams_getreply(MESSYS__INFINITE, icl_path, icl_messid,
 		 MSG_NAME_LEN, 10, &message_status, &message_context,
 		 message_name, &i, ams_value, &status);
     if( status != SAI__OK) {
@@ -2649,7 +2649,7 @@ main(int argc, char *argv[])
 		keyboard_input();
             else if( FD_ISSET(ICLPIPE, &infds) )
 		command_input();
-	} 
+	}
 	if( interrupted )
 	    do_cntlz();
     }

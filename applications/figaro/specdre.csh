@@ -12,7 +12,7 @@
 #     source specdre.csh
 #
 #  Description:
-#     This procedure used to start the Specdre package for use from the 
+#     This procedure used to start the Specdre package for use from the
 #     C shell by defining the aliases needed to execute each application.
 #     Since Specdre has been merged with Figaro, this procedure now tells
 #     the user to invoke Figaro.

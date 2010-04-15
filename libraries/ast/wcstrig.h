@@ -30,11 +30,11 @@
 *=============================================================================
 *
 *  This version of wcstrig.h is based on the version in wcslib-2.9, but has
-*  been modified in the following ways by the Starlink project (e-mail: 
+*  been modified in the following ways by the Starlink project (e-mail:
 *  ussc@star.rl.ac.uk):
 *     -  Support for non-ANSI C prototypes removed
 *     -  Changed the name of the WCSLIB_TRIG macro to WCSLIB_TRIG_INCLUDED
-*     -  Changed names of degrees trig functions to avoid clashes with 
+*     -  Changed names of degrees trig functions to avoid clashes with
 *        wcslib.
 *===========================================================================*/
 

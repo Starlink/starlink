@@ -22,8 +22,8 @@
 *        If no error so far then
 *           Map an output DATA_ARRAY component
 *           If no errors then
-*              Median filter down columns/across rows and put resutant 
-*              number into output then interpolate across all other 
+*              Median filter down columns/across rows and put resutant
+*              number into output then interpolate across all other
 *              columns/rows
 *           Endif
 *           Tidy up output structure
@@ -34,7 +34,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -49,8 +49,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'CHR_ERR'
 
 *    Status :
@@ -72,7 +72,7 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :	NUMCOL                ! number of columns at start and end
 
       REAL
@@ -122,12 +122,12 @@
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                    PNTRO, NELEMENTS, STATUS )
 
-*          check for error before getting other values region and accessing 
+*          check for error before getting other values region and accessing
 *          pointers
 
             IF( STATUS .EQ. SAI__OK ) THEN
 
-*            ask user whether want to use columns or rows for gradient 
+*            ask user whether want to use columns or rows for gradient
 *            definition
 
 	      CALL PAR_GET0C( 'COLROW', COLROW, STATUS)
@@ -139,9 +139,9 @@
 
 *            pass everything to the median calculation routine
 
-              CALL DEFGRADSUB( 
-     :              DIMS( 1), DIMS( 2), %VAL( PNTRI), ODIMS( 1), 
-     :	            ODIMS( 2), %VAL( PNTRO), COLROW, NUMCOL, 
+              CALL DEFGRADSUB(
+     :              DIMS( 1), DIMS( 2), %VAL( PNTRI), ODIMS( 1),
+     :	            ODIMS( 2), %VAL( PNTRO), COLROW, NUMCOL,
      :	            MEDIAN1, MEDIAN2, STATUS)
 
             END IF
@@ -154,9 +154,9 @@
 
 	    CALL MSG_SETR( 'MED1', MEDIAN1)
 	    CALL MSG_SETR( 'MED2', MEDIAN2)
-	    CALL MSG_OUT( 'MESS', 
+	    CALL MSG_OUT( 'MESS',
      :	     'Median at start = ^MED1, Median at end = ^MED2', STATUS)
-	 
+
 *           release the ouput image
 
             CALL NDF_ANNUL( LOCO, STATUS )

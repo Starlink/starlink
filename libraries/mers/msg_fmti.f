@@ -13,16 +13,16 @@
 *     CALL MSG_FMTI( TOKEN, FORMAT, IVALUE )
 
 *  Description:
-*     A given INTEGER value is encoded using the supplied Fortran 77 
-*     format field and the result assigned to the named message token. 
-*     If the token is already defined, the result is appended to the 
-*     existing token value. If this subroutine fails, the token remains 
-*     unmodified. This will be apparent in any messages which refer to 
+*     A given INTEGER value is encoded using the supplied Fortran 77
+*     format field and the result assigned to the named message token.
+*     If the token is already defined, the result is appended to the
+*     existing token value. If this subroutine fails, the token remains
+*     unmodified. This will be apparent in any messages which refer to
 *     this token.
 
 *  Arguments:
 *     TOKEN = CHARACTER * ( * ) (Given)
-*        The message token name. 
+*        The message token name.
 *     FORMAT = CHARACTER * ( * ) (Given)
 *        The Fortran 77 FORMAT field used to encode the supplied value.
 *     IVALUE = INTEGER (Given)
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -113,7 +113,7 @@
 *     Load FMT.
          FMT = FORMAT( 1 : ALLOW )
 
-*     Construct the message token string. 
+*     Construct the message token string.
          WRITE ( STR, '( '//FMT//' )', IOSTAT = IOSTAT ) IVALUE
 
 *     Check the Fortran I/O status.
@@ -122,5 +122,5 @@
             CALL EMS_SETC( TOKEN, STR( 1 : NCHAR ) )
          END IF
       END IF
- 
+
       END

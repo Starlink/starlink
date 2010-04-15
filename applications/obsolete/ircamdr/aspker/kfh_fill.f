@@ -54,7 +54,7 @@
 *     are improvements on the last).
 *     The patch is scaled and displayed on the ARGs for the user
 *     to see. If he does not want to retain the patch he can
-*     reject it when the original data is replaced, but if he 
+*     reject it when the original data is replaced, but if he
 *     accepts the patch then the calculated data is transferred
 *     to the output image.
 *    Authors :
@@ -68,8 +68,8 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 *    Status :
       INTEGER STATUS
 *    Local constants :
@@ -98,7 +98,7 @@
 *                                        ! the new fitted value.
       INTEGER PLACE                      ! temporary placeholder
       INTEGER DIMS(2)                    ! The dimensions of the patch.
-      INTEGER LBND(2)                    ! dimensions lower bounds 
+      INTEGER LBND(2)                    ! dimensions lower bounds
       DATA LBND / 1, 1 /
 
       REAL E(0:512)                      ! The array containing the
@@ -560,7 +560,7 @@
 *          patch.
 *
 
-            ELSE IF(BUTTON.EQ.1) THEN 
+            ELSE IF(BUTTON.EQ.1) THEN
 
                DO J = 2,RYDIM+1
 
@@ -569,7 +569,7 @@
                      P = XLO-2+I
                      Q = YLO-2+J
                      IMAGE(P,Q) = A(I,J)
-                     SCRTCH(XLO-2+I,YDIM-YLO-J+3) = 
+                     SCRTCH(XLO-2+I,YDIM-YLO-J+3) =
      :                NINT((A(I,J)-IMLO)/(IMHI-IMLO)*255.0)
 
                   END DO

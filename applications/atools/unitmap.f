@@ -30,10 +30,10 @@
 *  ADAM Parameters:
 *     NCOORD = _INTEGER (Read)
 *        The number of input and output coordinates (these numbers are
-*        necessarily the same). 
+*        necessarily the same).
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new UnitMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new UnitMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new UnitMap.
 
@@ -86,14 +86,14 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the number of axes required.
-      CALL PAR_GDR0I( 'NCOORD', 2, 1, NDF__MXDIM, .FALSE., NAX, STATUS ) 
+      CALL PAR_GDR0I( 'NCOORD', 2, 1, NDF__MXDIM, .FALSE., NAX, STATUS )
 
 *  Create the required UnitMap.
       RESULT = AST_UNITMAP( NAX, ' ', STATUS )

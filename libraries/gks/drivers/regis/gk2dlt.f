@@ -4,7 +4,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-*  
+*
       INCLUDE '../../include/gkio.par'
 *
 *         Selects appropriate linestyle

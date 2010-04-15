@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_updateprov( int ondf, const smfData *data, int indf, 
+*     void smf_updateprov( int ondf, const smfData *data, int indf,
 *                          const char *creator, int *status )
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *     creator = const char * (Given)
 *        A string such as "SMURF:MAKECUBE" indicating the calling app.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
 *     This function records the current input NDF as a parent of the
@@ -50,11 +50,11 @@
 *        Initial version.
 *     15-APR-2008 (DSB):
 *        Use smf_getobsidss to get the OBSIDSS value from the FitsChan.
-*        This means that an OBSIDSS value can be formed from OBSID and 
+*        This means that an OBSIDSS value can be formed from OBSID and
 *        SUBSYSNR headers if OBSIDSS is not present in the FitsChan.
 *     25-APR-2008 (DSB):
 *        Added "indf" and "creator" arguments. Changed to retain
-*        information about ancestors if one of the ancestors refers to 
+*        information about ancestors if one of the ancestors refers to
 *        the OBSIDSS value of the input NDF.
 *     31-JUL-2008 (TIMJ):
 *        Use thread-safe obsidss API.
@@ -100,7 +100,7 @@
 
 #include <string.h>
 
-void smf_updateprov( int ondf, const smfData *data, int indf, 
+void smf_updateprov( int ondf, const smfData *data, int indf,
                      const char *creator, int *status ){
 
 /* Local Variables */
@@ -127,7 +127,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    }
 
 /* Get the input NDF identifier. */
-   if( data && data->file && 
+   if( data && data->file &&
        data->file->ndfid != NDF__NOID) indf = data->file->ndfid;
 
 /* Get a structure holding provenance information from indf. */
@@ -146,7 +146,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 /* Search through all the ancestors of the input NDF (including the input
    NDF itself) to see if any of them refer to the same OBSIDSS value. */
       found = 0;
-      ianc = 0; 
+      ianc = 0;
       anc = ndgGetProv( prov, ianc, NULL, status );
       while( anc ) {
          if( astMapGet0A( anc, "MORE", &tkm ) ) {
@@ -160,7 +160,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
       }
 
 /* If the OBSIDSS value was not found in any ancestor, then we add it
-   now. So put the OBSIDSS keyword value in an AST KeyMap that will be 
+   now. So put the OBSIDSS keyword value in an AST KeyMap that will be
    stored with the output provenance information. */
       if( ! found ) {
          tkm = astKeyMap( " " );
@@ -168,11 +168,11 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
 
 /* Ignore ancestor NDFs if none of them referred to the correct OBSIDSS. */
          isroot = 1;
-      } 
+      }
    }
 
 /* Update the provenance for the output NDF to include the input NDF as
-   an ancestor. Indicate that each input NDF is a root NDF (i.e. has no 
+   an ancestor. Indicate that each input NDF is a root NDF (i.e. has no
    parents). Do nothing if we have no provenance to propagate, unless
    we have root information and are propagating that. */
    if ( ndgCountProv( prov, status ) > 0 || tkm) {

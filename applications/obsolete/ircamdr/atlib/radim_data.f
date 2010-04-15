@@ -13,7 +13,7 @@
 	CT = 0.0
 	ST = 0.0
 
-	IF( ( ABS( Y2-Y1) .LT. 1.0E-19) .AND. 
+	IF( ( ABS( Y2-Y1) .LT. 1.0E-19) .AND.
      :	    ( ABS( X2-X1) .LT. 1.0E-19)) THEN
 
 	   N = 1
@@ -84,4 +84,4 @@ C
 
 	END DO
 
-	END 
+	END

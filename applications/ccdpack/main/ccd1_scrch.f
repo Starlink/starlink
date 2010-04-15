@@ -197,7 +197,7 @@
      :                        LSTAT )
             END IF
             IF ( LSTAT .EQ. 0 ) THEN
-               CALL CHR_COPY( '$delete/nolog/noconfirm ', .FALSE., 
+               CALL CHR_COPY( '$delete/nolog/noconfirm ', .FALSE.,
      :                        DEL, LSTAT )
             ENDIF
          END IF

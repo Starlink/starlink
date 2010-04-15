@@ -22,7 +22,7 @@
 *     ogrp = Grp* (Given)
 *        the group of output files
 *     parKeymap = AstKeyMap* (Given)
-*        the parameter Keymap for this operation. Currently, there is one 
+*        the parameter Keymap for this operation. Currently, there is one
 *        parameter in parKeymap:
 *        THETA:  the THETA data file name.
 *     status = int* (Given and Returned)
@@ -100,7 +100,7 @@ End of Trace.
 
 #define FUNC_NAME "sc2fts_freqcorr"
 
-void sc2fts_freqcorr 
+void sc2fts_freqcorr
 (
 Grp *igrp,
 Grp* ogrp,
@@ -117,7 +117,7 @@ int *status          /* global status (given and returned) */
    smfData *data;                     /* Pointer to in/output SCUBA2 data struct */
    float *tstream = NULL;             /* Pointer to input data stream */
    int nwn;                           /* number of spectral wavenumber in input data */
-   float *spectrum_orig;              /* original spectrum */   
+   float *spectrum_orig;              /* original spectrum */
    float *spectrum_corr;              /* corrected spectrum */
    double *wn_corr;                   /* new wavenumber */
 
@@ -151,7 +151,7 @@ int *status          /* global status (given and returned) */
    /* open spectrumcube file */
    smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_QUALITY, &data, status );
 
-   if(data->ndims != 3 || 
+   if(data->ndims != 3 ||
       (data->dims)[0] != theta_dims[0] ||
       (data->dims)[1] != theta_dims[1])
    {
@@ -159,7 +159,7 @@ int *status          /* global status (given and returned) */
        *status = SAI__ERROR;
        errRep( " ",  "structure of data array is wrong!!!", status);
      }
-   } 
+   }
    else
    {
      size_t nbolx = theta_dims[0];
@@ -198,7 +198,7 @@ int *status          /* global status (given and returned) */
      smf_free(spectrum_corr, status);
      smf_free(spectrum_orig, status);
    }
-  
+
    /* close NDF file */
    smf_close_file(&data, status);
    ndfAnnul( &theta_indf, status );

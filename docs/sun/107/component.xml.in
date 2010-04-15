@@ -13,7 +13,7 @@
     the central Unix service at RAL. MAPLE has facilities for symbolic
     algebra mathematical manipulation and provides a powerful facility
     for solving many types of mathematical problem.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

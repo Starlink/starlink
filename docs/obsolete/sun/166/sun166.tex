@@ -44,7 +44,7 @@ RUTHERFORD APPLETON LABORATORY\\
 \end{center}
 \vspace{5mm}
 
-\section{Introduction} 
+\section{Introduction}
 
 SAOimage is an astronomical image display program which works on
 computers with X-window displays. It allows you to manipulate images
@@ -73,7 +73,7 @@ all. SAOimage can deal with a number of file formats and can now read
 Starlink NDF image files. The routines required to do this were added
 by Rhys Morris for Starlink.
 
-\section{Documentation} 
+\section{Documentation}
 
 There is a comprehensive manual describing SAOimage (MUD/140),
 which is also distributed in \LaTeX\ form with the SAOimage source
@@ -82,19 +82,19 @@ which can be examined using {\tt sman saoimage}.
 
 \section{Supported File Formats}
 
-\begin{itemize} 
+\begin{itemize}
 \item{Starlink NDF images.}
-\item{IRAF .imh images.} 
-\item{Disk FITS files.} 
-\item{Disk files containing 1/2/4 byte signed/unsigned integers or 4/8~byte 
-floating point numbers.} 
+\item{IRAF .imh images.}
+\item{Disk FITS files.}
+\item{Disk files containing 1/2/4 byte signed/unsigned integers or 4/8~byte
+floating point numbers.}
 \end {itemize}
 
-\subsection{Notes on File Formats} 
+\subsection{Notes on File Formats}
 
 Both primitive and simple NDFs are supported. The `{\tt -ndf}' flag may
 be used to denote that the image is a Starlink NDF, but SAOimage will
-assume this if the file has a {\tt .sdf} suffix (file extension). 
+assume this if the file has a {\tt .sdf} suffix (file extension).
 STSDAS (Space Telescope Science Data Analysis System) {\tt .hhh} images
 are not supported, but these can be converted into {\tt .imh} files
 within IRAF. As with all disk FITS reading programs --- SAOimage is not
@@ -106,7 +106,7 @@ machine which stores its numbers in a different format can be
 displayed without conversion by instructing SAOimage to swap bytes
 using the `{\tt -bswap}' option.
 
-\section{Using SAOimage} 
+\section{Using SAOimage}
 
 Using SAOimage is fairly intuitive. The program is started up by
 typing `{\tt saoimage}' in a window followed by any appropriate flags
@@ -180,7 +180,7 @@ below. You can:
 
 \begin{itemize}
 
-\item{Scale between limits using `-min $\langle$value$\rangle$' and 
+\item{Scale between limits using `-min $\langle$value$\rangle$' and
 `-max $\langle$value$\rangle$' switches.}
 
 \item{Magnify, zoom and pan around the image.}
@@ -233,8 +233,8 @@ toggle these on and off.}
 \item{IRAF image display --- SAOimage can also be used as a display for IRAF
 --- you need to use the `{\tt -imtool}' flag to put it into the right mode}
 
-\item{Hard copy output can be saved to a file by setting the environment 
-variable R\_DISPOSE to ``mv \%s piccy.ps''. This stores SAOimage's 
+\item{Hard copy output can be saved to a file by setting the environment
+variable R\_DISPOSE to ``mv \%s piccy.ps''. This stores SAOimage's
 output in the file ``piccy.ps''.}
 
 \end{itemize}
@@ -255,7 +255,7 @@ for example, if you type enough letters to uniquely specify the file, then
 pressing the `tab' key will complete the filename for you.}
 
 \item{Numbers as filenames --- If your filename is a number, then you have to
-use the `{\tt -name}' switch to  inform SAOimage that it is a filename not a 
+use the `{\tt -name}' switch to  inform SAOimage that it is a filename not a
 parameter.}
 
 \item{Start-up errors --- If you do not have IRAF installed, then the error
@@ -263,7 +263,7 @@ messages ``{\tt ERROR: unable to open /dev/imt1o}'' and ``{\tt Error:
 No remote input possible}'' will appear on starting SAOimage --- this
 is nothing to worry about.}
 
-\item{Portability --- This version of SAOimage requires some Starlink 
+\item{Portability --- This version of SAOimage requires some Starlink
 libraries, so there may be problems on a non---Starlink machine. It may
 be necessary to recompile without the {\tt -DNDF} preprocessor directive
 flag to remove all mention of Starlink.}
@@ -276,7 +276,7 @@ possible in SAOimage.}
 
 \item{Black and White output --- if you want a hardcopy of your carefully
 coloured image you will have to use another X-window utility to
-produce colour hardcopies.}  
+produce colour hardcopies.}
 
 \item{Hardcopies on VMS --- a Postscript file is produced with a name
 of the form {\tt \_PS$\langle$number$\rangle$.TMP} which can be printed on a
@@ -298,7 +298,7 @@ keywords {\tt BZERO} and {\tt BSCALE} and erroneously uses them
 for all subsequent arrays of whatever format. Quit SAOimage and reload
 the image if this problem occurs.}
 
-\end{itemize} 
+\end{itemize}
 
 \section{Internal Workings}
 
@@ -315,14 +315,14 @@ to return the actual data for display. The routines to do this for NDF
 images are called {\tt init\_ndf()} and {\tt load\_ndf()} respectively
 and are contained in the file {\tt readndf.c}.
 
-These C routines call FORTRAN routines {\tt openndf()} and {\tt mapndf()} 
+These C routines call FORTRAN routines {\tt openndf()} and {\tt mapndf()}
 via the CnF
 library. The FORTRAN routines use the HDS library to get at the data in the
 NDFs.  NDF routines could not be used at the time of writing as they would
 require going through the ADAM parameter system --- this would make it
 difficult to use SAOimage on other file formats. The FORTRAN routines
 mentioned are in files with the same names as the subroutines. At present,
-{\tt mapndf()} always maps the NDF to an array of 4 byte REALs regardless 
+{\tt mapndf()} always maps the NDF to an array of 4 byte REALs regardless
 of the
 the original NDF data type.  This is also true on 64bit machines as this is
 a FORTRAN array.
@@ -331,7 +331,7 @@ SAOimage carries information about the image being displayed in a global
 structure called img, the template for which is defined in the file
 hfiles/image.h as imageRec. The routine {\tt init\_ndf()} has the job of
 inserting various values into this structure so that this information can
-be propagated around the program. The file hfiles/constant.h contains an 
+be propagated around the program. The file hfiles/constant.h contains an
 entry for
 each kind of image format supported, the following line was added.
 \begin{quote}
@@ -340,15 +340,15 @@ each kind of image format supported, the following line was added.
 There are similar entries for FITS, IRAF and the array formats. This
 entry and the entries regarding NDFs in imgread.c are not in the original
 source code, so these will have to be added should a superior version of
-SAOimage come along with new source code. Also, the code in {\tt openndf()} 
+SAOimage come along with new source code. Also, the code in {\tt openndf()}
 and
-{\tt mapndf()} could be greatly simplified using the {\tt ndf\_open()} 
+{\tt mapndf()} could be greatly simplified using the {\tt ndf\_open()}
 routine instead of
 the numerous HDS calls.
 
-The routine {\tt parse\_filetype()} in {\tt cmdimage.c} and 
+The routine {\tt parse\_filetype()} in {\tt cmdimage.c} and
 {\tt check\_image()} in
-{\tt imgcheck.c} were altered so that the {\tt -ndf} flag and the {\tt .sdf} 
+{\tt imgcheck.c} were altered so that the {\tt -ndf} flag and the {\tt .sdf}
 file
 suffix were added to the list of recognized file types. C
 pre---processor ``\#ifdef NDF'' directives surround all the optional file

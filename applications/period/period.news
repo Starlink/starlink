@@ -1,5 +1,5 @@
  PERIOD 5.0-4        04-OCT-2007
- ============ 
+ ============
 
  A bug in the "clean" procedure has been fixed.
 
@@ -8,7 +8,7 @@
 
  PERIOD has been imported into the Starlink CVS repository. A memory
  allocation bug has been fixed and the code updated to work on 64 bit
- machines. 
+ machines.
 
 
  PERIOD 5.0-2
@@ -17,7 +17,7 @@
  Fixes a bug in the sine fitting subroutine, apparent with the CHISQ command
 
  Fixes a bug which caused OGIP to crash
-  
+
  PERIOD - Time-series analysis package
  =====================================
 
@@ -30,7 +30,7 @@
  reconfigured to utilise dynamic array allocation/deallocation for the
  majority of its input, output and work arrays.
 
- Some potential for problems associated with array-bounds violation 
+ Some potential for problems associated with array-bounds violation
  within version 4.2, identified during the source-code preparation for
  5.0, have been avoided with the exact calculation within PERIOD 5.0 of
  storage required by its various processing elements. The ability to

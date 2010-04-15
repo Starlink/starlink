@@ -15,12 +15,12 @@
 *                     NENCOD, ENCODS, WCSATT, STATUS )
 
 *  Description:
-*     This converts a SMURF multi-extension  FITS file created by 
+*     This converts a SMURF multi-extension  FITS file created by
 *     NDF2FITS into an NDF.  It creates the SMURF extension and
-*     its constituent NDFs.  In addition the variance, axes, and 
+*     its constituent NDFs.  In addition the variance, axes, and
 *     HISTORY and PROVENANCE records are converted for the primary NDF.
 *     However, for the SMURF-extension NDFs do not have the
-*     HISTORY, PROVENANCE and axes created.  It can also cope with 
+*     HISTORY, PROVENANCE and axes created.  It can also cope with
 *     non-standard extensions using the same rules as COF_F2NDF.
 
 *  Arguments:
@@ -37,7 +37,7 @@
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -63,7 +63,7 @@
 *        The number of encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
 *        The preferred AST encodings to use when creating the NDF WCS
-*        component, in order of preference (most preferable first). 
+*        component, in order of preference (most preferable first).
 *        It is ignored if NENCOD is zero.
 *     WCSATT = CHARACTER * ( * ) (Given)
 *        Attribute settings for the WCS FitsChan.
@@ -75,7 +75,7 @@
 *        -  The primary data array becomes the NDF's data array.  Any
 *        NaN values present become bad values in the NDF.
 *        -  The keywords CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn are
-*        used to create the NDF axis structure. 
+*        used to create the NDF axis structure.
 *        -  The OBJECT, LABEL, BUNITS keywords define the NDF's title,
 *        label, and units components respectively, if they are defined.
 *        -  HISTORY cards in a special format created by NDF2FITS are
@@ -132,7 +132,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -240,7 +240,7 @@
 
 *  Continue looping when there are more extensions that are requested to
 *  be converted into the NDF, and nothing has gone wrong thus far.
-      DO WHILE ( LOOP .AND. FSTAT .EQ. FITSOK .AND. 
+      DO WHILE ( LOOP .AND. FSTAT .EQ. FITSOK .AND.
      :           STATUS .EQ. SAI__OK )
 
 *  Increment the count of the header-and-data units.
@@ -291,7 +291,7 @@
 *  =============
 
 *  Check that if the current HDU is the primary, or that it is an
-*  IMAGE, and thus can be processed by the following routine.  
+*  IMAGE, and thus can be processed by the following routine.
          IF ( FIRST. OR. XTENS .EQ. 'IMAGE' ) THEN
 
 *  The FMTCNV flag decides whether or not the data scaling is required.
@@ -386,10 +386,10 @@
 *
 *  There is support for basic FITS, which creates a typical NDF; the
 *  IMAGE extension, which creates an NDF within an extension of the
-*  original NDF; arbitrary BINTABLE and TABLE create <TABLE> type 
-*  extension within the NDF, unless they were produced by NDF2FITS, 
-*  whereupon they recreate the original NDF structures (includes 
-*  PROVENANCE), 
+*  original NDF; arbitrary BINTABLE and TABLE create <TABLE> type
+*  extension within the NDF, unless they were produced by NDF2FITS,
+*  whereupon they recreate the original NDF structures (includes
+*  PROVENANCE),
 
 *  Test for a primary HDU or an IMAGE extension.  Note that this
 *  includes random groups as these must be defined in the primary HDU.
@@ -494,7 +494,7 @@
 
 *  Create the mask and assign .TRUE. to all of its elements.
                CALL PSX_CALLOC( NHEAD, '_LOGICAL', REPNTR, STATUS )
-               CALL CON_CONSL( .TRUE., NHEAD, 
+               CALL CON_CONSL( .TRUE., NHEAD,
      :                         %VAL( CNF_PVAL( REPNTR ) ), STATUS )
             END IF
 
@@ -505,7 +505,7 @@
 *  This is to avoid growing duplication of potentially bulky text, if
 *  using FITS files with Starlink tasks.
             IF ( FIRST. AND. EXNDF .AND. COMP .EQ. 'Data' ) THEN
-               CALL COF_CHISR( FUNIT, NDFE, NHEAD, 
+               CALL COF_CHISR( FUNIT, NDFE, NHEAD,
      :                         %VAL( CNF_PVAL( REPNTR ) ),
      :                         STATUS )
             END IF
@@ -532,7 +532,7 @@
 *  is a simple array and is merely filled with dummy data, so test for
 *  this.
             IF ( DARRAY .AND. .NOT. NONSDA ) THEN
-               CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, ITYPE, 
+               CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, ITYPE,
      :                         STATUS )
 
 *  Specify the bounds of the NDF array component.
@@ -554,27 +554,27 @@
 *  have bad pixels.
                IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL FTGPVB( FUNIT, 0, 1, EL, VAL__BADUB,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL FTGPVI( FUNIT, 0, 1, EL, VAL__BADW,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGPVJ( FUNIT, 0, 1, EL, VAL__BADI,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL FTGPVE( FUNIT, 0, 1, EL, VAL__BADR,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGPVD( FUNIT, 0, 1, EL, VAL__BADD,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                END IF
@@ -619,8 +619,8 @@
                CALL COF_NDFCC( FUNIT, NDFE, STATUS )
 
 *  Create the AST World Coordinate information from the FITS headers.
-               IF ( NDIM .GT. 0 ) 
-     :            CALL COF_FTWCS( FUNIT, NDFE, NENCOD, ENCODS, 
+               IF ( NDIM .GT. 0 )
+     :            CALL COF_FTWCS( FUNIT, NDFE, NENCOD, ENCODS,
      :                            FILE, WCSATT, STATUS )
 
 *  Create the NDF AXIS structure from the FITS headers.  Do not
@@ -671,7 +671,7 @@
      :                        STATUS )
 
 *  Call routine to create the <TABLE> structure from the FITS binary
-*  or ASCII table.  Header and Data FUNITs are the same (no 
+*  or ASCII table.  Header and Data FUNITs are the same (no
 *  inheritance).
                CALL COF_WRTAB( FUNIT, FUNIT, XLOC, STATUS )
 

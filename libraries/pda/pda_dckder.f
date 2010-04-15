@@ -1,4 +1,4 @@
-      SUBROUTINE PDA_DCKDER (M, N, X, FVEC, FJAC, LDFJAC, XP, FVECP, 
+      SUBROUTINE PDA_DCKDER (M, N, X, FVEC, FJAC, LDFJAC, XP, FVECP,
      +                       MODE, ERR)
 C***BEGIN PROLOGUE  DCKDER
 C***PURPOSE  Check the gradients of M nonlinear functions in N

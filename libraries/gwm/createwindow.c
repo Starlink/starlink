@@ -51,7 +51,7 @@
 **
 **--
 */
-int GWM_VMSexecvp( char *name, char *argv[], Display **display, 
+int GWM_VMSexecvp( char *name, char *argv[], Display **display,
     char *win_name)
 {
     int status, i;
@@ -63,27 +63,27 @@ int GWM_VMSexecvp( char *name, char *argv[], Display **display,
     $DESCRIPTOR(out_descr, out);
     $DESCRIPTOR(name_descr, "");
     $DESCRIPTOR(prname_descr, prname);
-/*	  
+/*
 **  Create mailbox for sending arguments to the child
-*/	  
+*/
     status = sys$crembx( 0, &iochan1, 0, 0, 0xff0f, 0, 0);
     if (status != SS$_NORMAL) return GWM_SS_ERR;
 
-/*	  
+/*
 **  Create mailbox for reading replies from the child
-*/	  
+*/
     status = sys$crembx( 0, &iochan2, 0, 0, 0xff0f, 0, 0);
     if (status != SS$_NORMAL) return GWM_SS_ERR;
 
-/*	  
+/*
 **  Get the physical names of the mail boxes.
 */
-    status = lib$getdvi( &DVI$_DEVNAM, &iochan1, 0, 0, &inp_descr, &l); 
+    status = lib$getdvi( &DVI$_DEVNAM, &iochan1, 0, 0, &inp_descr, &l);
     if (status != SS$_NORMAL) return GWM_SS_ERR;
-    status = lib$getdvi( &DVI$_DEVNAM, &iochan2, 0, 0, &out_descr, &l); 
+    status = lib$getdvi( &DVI$_DEVNAM, &iochan2, 0, 0, &out_descr, &l);
     if (status != SS$_NORMAL) return GWM_SS_ERR;
 
-/*	  
+/*
 **  Create the subprocess
 */
     name_descr.dsc$a_pointer = name;
@@ -98,9 +98,9 @@ int GWM_VMSexecvp( char *name, char *argv[], Display **display,
     }
     if (status != SS$_NORMAL) return GWM_SS_ERR;
 
-/*	  
+/*
 **  Copy the arguments to the mailbox
-*/	  
+*/
     for (i = 0; argv[i]; i++)
     {
 	strcpy(buf, argv[i]);
@@ -108,16 +108,16 @@ int GWM_VMSexecvp( char *name, char *argv[], Display **display,
 	buf[strlen(argv[i]) + 1] = '\0';
 
 	status = sys$qiow( 0, iochan1, IO$_WRITEVBLK,
-	    &iosb, 0, 0, buf, strlen(buf), 0, 0, 0, 0); 
+	    &iosb, 0, 0, buf, strlen(buf), 0, 0, 0, 0);
 	if (status != SS$_NORMAL) return GWM_SS_ERR;
 	if (iosb[0] != SS$_NORMAL) return GWM_SS_ERR;
     }
 
-/*	  
+/*
 **  Write an EOF to the mail box to finish the dialogue
-*/	  
+*/
     status = sys$qiow( 0, iochan1, IO$_WRITEOF,
-	&iosb, 0, 0, 0, 0, 0, 0, 0, 0); 
+	&iosb, 0, 0, 0, 0, 0, 0, 0, 0);
     if (status != SS$_NORMAL) return GWM_SS_ERR;
 
 /*
@@ -126,7 +126,7 @@ int GWM_VMSexecvp( char *name, char *argv[], Display **display,
     for (;;)
     {
 	status = sys$qiow( 0, iochan2, IO$_READVBLK,
-	    &iosb, 0, 0, buf, sizeof(buf), 0, 0, 0, 0); 
+	    &iosb, 0, 0, buf, sizeof(buf), 0, 0, 0, 0);
 	if (status != SS$_NORMAL) return GWM_SS_ERR;
 	if (iosb[0] != SS$_NORMAL) return GWM_CHILD_DEAD;
 
@@ -152,7 +152,7 @@ int GWM_VMSexecvp( char *name, char *argv[], Display **display,
     }
 }
 #endif
-
+
 int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 	name[])
 /*
@@ -161,7 +161,7 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 *     GWM_CreateWindow
 *
 *  Purpose:
-*     Create a window     
+*     Create a window
 *
 *  Language:
 *     C
@@ -171,7 +171,7 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 *
 *  Description:
 *     A GWM window is created according to the specification in the
-*     argument list and the display id of the X connection and the name 
+*     argument list and the display id of the X connection and the name
 *     of the window returned.
 *
 *  Arguments:
@@ -187,7 +187,7 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 *  Algorithm:
 *     A connection to the X server is opened and -display added to the argument
 *     list. A "refresh" process is created and the argument list passed to it.
-*     A reply is read from the refresh process and if the window is created 
+*     A reply is read from the refresh process and if the window is created
 *     sucessfully, a display id and window name are returned.
 *
 *  Copyright:
@@ -199,12 +199,12 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -260,10 +260,10 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
     for ( argc1 = 0 ; argc1 <= argc; argc1++) argv1[argc1] = argv[argc1];
     argc1--;
 
-/*	  
+/*
 **  Use XtInitialize to parse the command arguments using the standard Xt
 **  options. The one we are interested in is -display.
-*/	  
+*/
     top = XtInitialize("main", "Xrefresh", NULL, 0, &argc, argv);
 
 /*
@@ -293,7 +293,7 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
     if (pid == 0)	/* We are the child				    */
     {
 /*
-**      Remap the standard error channel to the write end of the pipe 
+**      Remap the standard error channel to the write end of the pipe
 **      and close the read end
 */
 	close(fd[0]);

@@ -44,8 +44,8 @@ C
 C     Returns -  (if called as a function)
 C
 C     (<) ICH_FOLD  (Integer) The number - starting from 1 -
-C                   of the last non-blank character in the 
-C                   string.  In some cases this can be the 
+C                   of the last non-blank character in the
+C                   string.  In some cases this can be the
 C                   logical length of the string.
 C
 C                                 KS / UCL  17th June 1982
@@ -94,7 +94,7 @@ C                     indicate hex, octal or binary respectively.
 C
 C     (>) IST         (Integer) The position of the first character
 C                     in STRING (starting from 1) at which the
-C                     decoding is to start.  
+C                     decoding is to start.
 C
 C     (>) DELIMS      (Character) A string giving the set of
 C                     possible delimiters for the number.  The
@@ -116,7 +116,7 @@ C
 C     Returns -  (if called as a function)
 C
 C     (<) ICH_NUMBR   (Integer) Indicates the status of the
-C                     evaluation.  
+C                     evaluation.
 C                     0  => OK. Number was given, and was valid
 C                     -1 => Null.  There was a null string.
 C                     1  => Error.  The string was not null, but it
@@ -130,7 +130,7 @@ C     Some examples of accepted formats -
 C
 C     27.3  -345E-8  -'345'O  +'1010.101'B  'ABCXD'X  '101E101'B
 C
-C     -%O345   %B1010.101  12345.6789  %xabcxd      
+C     -%O345   %B1010.101  12345.6789  %xabcxd
 C
 C     Original version:                  KS / UCL  25th June 1982
 C
@@ -139,7 +139,7 @@ C
 C     14th Feb 1984  KS / CIT  Extended to allow different bases.
 C     29th Dec 1987  KS / AAO  Now accepts 'D' as well as 'E' for
 C                    decimal exponents.
-C                                        
+C
 C+
       IMPLICIT NONE
 C
@@ -297,7 +297,7 @@ C
       ICH=STRING(IA:IA)
       IF (HEX) THEN
          IFR = ICH_FOLD(ICH)
-      END IF  
+      END IF
       N=ICHAR(ICH)-IZERO
       IF (N.LT.0.OR.N.GT.LIMN)   GO TO 470
       IF (HEX.AND.(N.GT.9)) THEN
@@ -514,37 +514,37 @@ C
       END
 C+
 C                           I C H _ E N C O D E
-C      
+C
 C     Routine name:
 C           ICH_ENCODE
-C     
+C
 C     Function:
 C           Formats a REAL number into a character string
-C      
+C
 C     Decription:
-C           This routine formats a real variable into a character string 
-C           in a nice way; that is, if the number is an integer (within 
+C           This routine formats a real variable into a character string
+C           in a nice way; that is, if the number is an integer (within
 C           the integer 16 bit range), it will be printed as such, and
 C           'E' format will only be used if the number is particularly
-C           large or small.  Generally, an ordinary floating point format 
+C           large or small.  Generally, an ordinary floating point format
 C           will be used.
-C      
+C
 C     Language:
 C           FORTRAN:
-C      
+C
 C     Call:
 C           STATUS=ICH_ENCODE(FIELD,VALUE,IPTR,IDECC,NPTR)
-C      
+C
 C     Parameters:      (">" input, "<" output)
-C      
-C          (>) FIELD   (Fixed string, descr) The character string into 
+C
+C          (>) FIELD   (Fixed string, descr) The character string into
 C                      which VALUE is to be encoded.
 C          (>) VALUE   (Real, ref) The number to be encoded
 C          (>) IPTR    (Integer, ref) quantity giving the number of
 C                      the first byte in FIELD (starting at 1) into
 C                      which the ASCII encoded value is to be written.
 C          (>) IDDEC   (Integer, ref) One less than the number of
-C                      significant figures to be aimed at if a floating 
+C                      significant figures to be aimed at if a floating
 C                      point output format is used.  This is the number of
 C                      decimal places used in an E format (although the
 C                      routine tries to avoid E format, and will print eg
@@ -553,21 +553,21 @@ C                      than 5).
 C          (<) NPTR    (Integer, ref) Variable in which ENCODE
 C                      returns the number of the next available character
 C                      in FIELD.
-C      
+C
 C     Returns:         (if called as a function)
-C      
+C
 C          (<) STATUS  (Integer, function value) Return code.
 C                      0 => OK,
 C                      1 => Not enough character positions left in FIELD.
-C      
+C
 C     External variables used: None
-C      
+C
 C     External routines used: None
-C      
+C
 C     Author: K. Shortridge.
-C          
+C
 C     Date: 24th July 1986
-C      
+C
 C     Note:
 C           This routine is not intended to give precise control over
 C           formats.  The intention is that it will always produce a
@@ -580,7 +580,7 @@ C           INTEGER FUNCTION ICH_ENCODE(FIELD,VALUE,IPTR,IDECC,NPTR)
 C           CHARACTER*(*) FIELD
 C           INTEGER IPTR,NPTR,IDECC
 C           REAL VALUE
-C      
+C
 C     Keywords:
 C           Strings, free-format, encode
 C-
@@ -588,7 +588,7 @@ C     Modifications:
 C           19th July 1983.  Original VAX version.  KS / UCL, based on
 C                            an Interdata program by Tony Hewer, UCL.
 C           24th July 1986.  Complete re-write to use Fortran internal
-C                            I/O.  Use of IDECC changed slightly - it 
+C                            I/O.  Use of IDECC changed slightly - it
 C                            used to be the number of decimal places,
 C                            meaning that with IDECC=3 a number such as
 C                            0.02345 would output as 0.023, whereas it
@@ -605,32 +605,32 @@ C
 C
 C     Local variables
 C
-      INTEGER   I                         
+      INTEGER   I
 *       Loop variable
-      INTEGER   IGNORE                    
+      INTEGER   IGNORE
 *       Dummy status value for write
-      INTEGER   IST                       
+      INTEGER   IST
 *       First non-blank character
-      INTEGER   ISTDIG                    
+      INTEGER   ISTDIG
 *       First digit of fractional part
-      INTEGER   LASTCH                    
+      INTEGER   LASTCH
 *       Last non-blank character
-      INTEGER   LSTDIG                    
+      INTEGER   LSTDIG
 *       Last digit of fractional part
-      INTEGER   LSTSIG                    
+      INTEGER   LSTSIG
 *       Last significant fract. digit
-      INTEGER   NDEC                      
+      INTEGER   NDEC
 *       Formatted # of decimal places
-      INTEGER   NLOG                      
+      INTEGER   NLOG
 *       Integer log of value
-      CHARACTER WORK*13                   
-*       Work string 
-      LOGICAL   USE_FLOAT                 
+      CHARACTER WORK*13
+*       Work string
+      LOGICAL   USE_FLOAT
 *       Floating point format needed
-      REAL      VLOG                      
+      REAL      VLOG
 *       Log of value
 C
-C     See if we can get away with using an integer format.  
+C     See if we can get away with using an integer format.
 C
       LASTCH=LEN(WORK)
       USE_FLOAT=.TRUE.
@@ -643,7 +643,7 @@ C
       END IF
       IF (USE_FLOAT) THEN
 C
-C        We need a floating point format.  See if we will need to 
+C        We need a floating point format.  See if we will need to
 C        use an 'E' type format.
 C
          IF (VALUE.EQ.0.0) THEN

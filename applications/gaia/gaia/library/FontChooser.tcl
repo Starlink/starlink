@@ -237,14 +237,14 @@ itcl::class gaia::FontChooser {
       set listname [$itk_component(fontlist) listname]
       bind $listname <<ListboxSelect>> [code $this update_font_]
 
-      set listname [$itk_component(stylelist) listname] 
+      set listname [$itk_component(stylelist) listname]
       bind $listname <<ListboxSelect>> [code $this update_style_]
 
       set listname [$itk_component(sizelist) listname]
       bind $listname <<ListboxSelect>> [code $this update_size_]
 
       #  Sample of our current font. Use label within label to avoid
-      #  resizing as font changes and add padding to allow the view 
+      #  resizing as font changes and add padding to allow the view
       #  to show bigger fonts.
       itk_component add sampleframe {
          labelframe $itk_component(midf).sampleframe -text "Sample"
@@ -312,7 +312,7 @@ itcl::class gaia::FontChooser {
          update_
       }
    }
-   
+
    #  Change the display of the font sample to reflect the current
    #  values.
    protected method update_ {} {
@@ -357,7 +357,7 @@ itcl::class gaia::FontChooser {
          set font TkDefaultFont
       }
       array set default_font [font actual $font]
-      
+
       set font_ $default_font(-family)
       set size_ $default_font(-size)
 

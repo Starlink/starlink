@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,10 +129,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the returned flags.         
+*  Initialise the returned flags.
       OPER = .FALSE.
       KEYW = .FALSE.
-      STAT = .FALSE.      
+      STAT = .FALSE.
 
 *  Compare the start of the specified section of the current element
 *  against each keyword in turn.
@@ -171,7 +171,7 @@
       END DO
 
 *  Compare the start of the specified section of the current element
-*  against each operator symbol in turn. 
+*  against each operator symbol in turn.
       DO I = 1, ARD__NOPSY
          CALL ARD1_MATCH( ELEM, START, L,
      :                    CMN_OPSYM( I )( : CMN_OPLEN( I ) ),

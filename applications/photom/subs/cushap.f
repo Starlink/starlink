@@ -15,7 +15,7 @@
 *     FORTRAN
 *
 *  Invocation :
-*     CALL CUSHAP( BZONE, IZONE, CLEAR, NE, ELLIPS, A, E, THETA, 
+*     CALL CUSHAP( BZONE, IZONE, CLEAR, NE, ELLIPS, A, E, THETA,
 *                  IMGDIS, STATUS )
 *
 *  Description :
@@ -74,7 +74,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -207,7 +207,7 @@
          IF ( CHOICE .EQ. 5 ) CHOICE = 1
 
 *   0 and . mean exit as well as mouse button 3.
-         IF ( CHOICE .EQ. 3 .OR. CHOICE .EQ. 4 ) THEN 
+         IF ( CHOICE .EQ. 3 .OR. CHOICE .EQ. 4 ) THEN
             CHOICE = -1
          END IF
 

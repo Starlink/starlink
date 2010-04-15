@@ -4,7 +4,7 @@
 *     15 Jan 1994 (rp):
 *        Replace CHR_UCASE with UUCASE
 *-----------------------------------------------------------------------
- 
+
       SUBROUTINE ASK_VEL (IFAIL)
 
       IMPLICIT  NONE

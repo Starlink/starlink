@@ -121,7 +121,7 @@
                CSEL = CSEL + 1
 
 *
-*            Get the details of the selection and assemble an output 
+*            Get the details of the selection and assemble an output
 *            line.
 
               BUFFER = ' '
@@ -135,7 +135,7 @@
               WRITE(BUFFER(2 : 4), '(I3)', IOSTAT=LSTAT) CSEL
 
               IF (CSEL .NE. 1) THEN
-                 WRITE(BUFFER(6 : 9), '(I4)', IOSTAT=LSTAT) 
+                 WRITE(BUFFER(6 : 9), '(I4)', IOSTAT=LSTAT)
      :             SELBS__SGZ(CSEL)
               ELSE
                  BUFFER(9 : 9) = '-'
@@ -165,7 +165,7 @@
               CALL CAP_OUT (GUI__SGZ, ' ', BUFFER(1 : BUFPOS), STATUS)
 
 *
-*            If all the selections have been output then set the 
+*            If all the selections have been output then set the
 *            termination flag.
 
               IF (CSEL .GE. SELS__SGZ) THEN

@@ -42,10 +42,10 @@ C
 C     19th March 1986  KS / AAO.  Modified to use HDS routines.
 C     2nd  June  1988  KS / AAO.  Modified to support arrays of structures.
 C                      (This mod is actually null.  It was inserted and
-C                      then removed after it was decided to modify 
+C                      then removed after it was decided to modify
 C                      DTA_LOCATE instead.)
-C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.  Unused variables removed.
 C     22nd Jan  1992.  KS / AAO. Add EMS calls to prevent storing of bad
 C                      status if the object doesn't exist.
@@ -71,7 +71,7 @@ C     Data structure parameters -  used are -
 C
 C     DST_MAXLEV    Maximum number of components in a name
 C     DST_MAXDIM    Maximum number of dimensions
-C     
+C
       INCLUDE 'DTASDEF'
       INCLUDE 'DAT_PAR'
       INCLUDE 'SAE_PAR'
@@ -87,7 +87,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Flags indicating use of temporary locators
 C
@@ -129,7 +129,7 @@ C
       END IF
       GOTLOC=.TRUE.
 C
-C     Get the name of the object.  
+C     Get the name of the object.
 C
       CALL DAT_NAME(LOC,NAME,STATUS)
       IF (STATUS.NE.0) THEN
@@ -146,7 +146,7 @@ C
       IF (GOTLOC) CALL DAT_ANNUL(LOC,ASTAT)
       EMSTAT=0
       CALL EMS_ANNUL(EMSTAT)
-      CALL EMS_END(EMSTAT) 
+      CALL EMS_END(EMSTAT)
 C
       END
 

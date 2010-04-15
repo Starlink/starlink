@@ -15,7 +15,7 @@
 *  Description:
 *     The colour corrected surface brightness is the product of the
 *     optical depth (assumed very small) and the Planck function, and
-*     the supplied constant CC. 
+*     the supplied constant CC.
 
 *  Arguments:
 *     EL = INTEGER (Given)
@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

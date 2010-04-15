@@ -14,12 +14,12 @@
 
 *  Invocation:
 *     CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
-*                      BIN, ANGRT, WORK, NOUT, PHI, NDIMO, LBND, UBND, 
+*                      BIN, ANGRT, WORK, NOUT, PHI, NDIMO, LBND, UBND,
 *                      STATUS )
 
 *  Description:
-*     This routine identifies the analysis angle bin to which each 
-*     supplied NDF belongs, and returns lists of the input NDFs to 
+*     This routine identifies the analysis angle bin to which each
+*     supplied NDF belongs, and returns lists of the input NDFs to
 *     include in each output NDF.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *        The minimum number of input NDFs required to produce an output
 *        NDF.
 *     IGRP1 = INTEGER (Given)
-*        A GRP identifier for the group containing the input NDF names. 
+*        A GRP identifier for the group containing the input NDF names.
 *        These should be aligned pixel-for-pixel.
 *     NNDF = INTEGER (Given)
 *        The number of NDFs in the supplied group.
@@ -44,16 +44,16 @@
 *        output reference direction, in degrees.
 *     WORK( NBIN, -6 : NNDF ) = INTEGER (Returned)
 *        An array containing a column for each analysis angle bin.
-*        The row 0 contains the number of input NDFs in the bin. If 
-*        this value is N, then rows 1 to N contain a list of the N 
-*        input NDFs in the bin. Each NDF is identified by its index 
-*        within the supplied group. Rows -1 to -6 contains the pixel 
+*        The row 0 contains the number of input NDFs in the bin. If
+*        this value is N, then rows 1 to N contain a list of the N
+*        input NDFs in the bin. Each NDF is identified by its index
+*        within the supplied group. Rows -1 to -6 contains the pixel
 *        bounds which span just the corresponding input NDFs, in the order
 *        LBND1, LBND2, UBND1, UBND2, (LBND3, UBND3).
 *     NOUT = INTEGER (Returned)
 *        The number of analysis angle bins containing MININ or more input NDFs.
 *     PHI( NNDF ) = INTEGER (Returned)
-*        The acw angle from output ref. direction (see ANGRT) to the 
+*        The acw angle from output ref. direction (see ANGRT) to the
 *        effective analyser position in each input NDF, in degrees.
 *     NDIMO = INTEGER (Returned)
 *        The number of axes in the output stack; 3 if the inputs are 2d, and 4
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,7 +128,7 @@
 
 *  Local Variables:
       CHARACTER NDFNAM*(GRP__SZFNM)! NDF name from supplied group
-      CHARACTER RAY*1            ! Dual beam ray identification 
+      CHARACTER RAY*1            ! Dual beam ray identification
       CHARACTER XLOC*(DAT__SZLOC)! Locator to POLPACK extension
       INTEGER I                  ! Index of current input NDF
       INTEGER IBIN               ! Current bin index
@@ -152,7 +152,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the number of NDFs in each bin to zero, and set the 
+*  Initialise the number of NDFs in each bin to zero, and set the
 *  pixel bounds for all bins.
       DO I = 1, NBIN
          WORK( I, 0 ) = 0
@@ -191,17 +191,17 @@
 *  Get the NDF bounds and check it is 2 or 3-dimensional.
          CALL NDF_BOUND( INDF, 3, LBNDI, UBNDI, NDIM, STATUS )
 
-*  If this is not the first NDF, check it has the same number of axes. 
+*  If this is not the first NDF, check it has the same number of axes.
          IF( I .EQ. 1 ) THEN
 	    NAX = NDIM
 	    NDIMO = NDIM + 1
 	 END IF
-	 
+
 	 IF( NDIM .NE. NAX .AND. STATUS .EQ. SAI__OK ) THEN
 	    STATUS = SAI__ERROR
 	    CALL MSG_SETI( 'N', NDIM )
 	    CALL MSG_SETI( 'M', NAX )
-	    CALL NDF_MSG( 'NDF', INDF ) 
+	    CALL NDF_MSG( 'NDF', INDF )
 	    CALL ERR_REP( 'POL1_SRTIM_ERR1', 'NDF ''^NDF'' is ^N '//
      :                    'dimensional, but the first NDF was ^M '//
      :                    'dimensional.', STATUS )
@@ -225,12 +225,12 @@
 *  Get the WCS FrameSet from the NDF.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  Get the ANGROT value which defines the reference direction. Use 0.0 if it 
+*  Get the ANGROT value which defines the reference direction. Use 0.0 if it
 *  is missing. This is the ACW angle from +X to the zero analyser position.
          ANGROT = 0.0
          CALL POL1_GTANG( INDF, 0, IWCS, ANGROT, STATUS )
 
-*  If this is the first input NDF, use the reference direction from this 
+*  If this is the first input NDF, use the reference direction from this
 *  input NDF for all output NDFs.
          IF( I .EQ. 1 ) ANGRT = ANGROT
 
@@ -241,7 +241,7 @@
 
 *  Store the effective analyser angle for this NDF. This is the ACW angle
 *  between the o/p ref. direction and a pretend analyser (with no
-*  half-wave plate), which would have the same effect as the fixed 
+*  half-wave plate), which would have the same effect as the fixed
 *  analyser/have-wave plate combination.
             PHI( I ) = 2*H + ANGROT - ANGRT
 
@@ -260,7 +260,7 @@
             END IF
 
 *  Get the analyser angle, in degrees.
-            CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS ) 
+            CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS )
 
 *  Store the effective analyser angle for this NDF (ACW angle from the
 *  o/p ref. direction to the analyser).
@@ -272,19 +272,19 @@
 *  effective analyser angle.
          CALL DAT_THERE( XLOC, 'RAY', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0C( XLOC, 'RAY', RAY, STATUS ) 
+            CALL CMP_GET0C( XLOC, 'RAY', RAY, STATUS )
             IF( RAY .EQ. 'E' ) PHI( I ) = PHI( I ) + 90.0
-         END IF           
+         END IF
 
 *  Map the analysis angle into the range ORIGIN to RANGE+ORIGIN.
          PHI( I ) = PHI( I ) - RANGE*INT( ( PHI( I ) - ORIGIN )/RANGE )
-         IF( PHI( I ) .LT. ORIGIN ) PHI( I ) = PHI( I ) + RANGE 
+         IF( PHI( I ) .LT. ORIGIN ) PHI( I ) = PHI( I ) + RANGE
 
 *  Find the index of the bin which encompasses this analysis angle.
          IBIN = 1 + INT( ( PHI( I ) - ORIGIN ) / BIN )
 
 *  Ignore illegal bin numbers.
-         IF( IBIN .GT. 0 .AND. IBIN .LE. NBIN .AND. 
+         IF( IBIN .GT. 0 .AND. IBIN .LE. NBIN .AND.
      :       STATUS .EQ. SAI__OK ) THEN
 
 *  Display details of this input NDF if required.
@@ -320,7 +320,7 @@
                WORK( IBIN, -6 ) = MAX( UBNDI( 3 ), WORK( IBIN, -6 ) )
                LBND( 3 ) = MIN( LBNDI( 3 ), LBND( 3 ) )
                UBND( 3 ) = MAX( UBNDI( 3 ), UBND( 3 ) )
-	    END IF  
+	    END IF
 
 *  Increment the number of illegal bin numbers.
          ELSE
@@ -344,7 +344,7 @@
          CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Annul the current NDF identifier.
-         CALL NDF_ANNUL( INDF, STATUS ) 
+         CALL NDF_ANNUL( INDF, STATUS )
 
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999

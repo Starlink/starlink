@@ -12,7 +12,7 @@
  *     a file specification that can contain wild card characters such as
  *     '*', eg '*.*'. On the first call the Context variable should be set
  *     to zero, and the routine will return the name of the first file that
- *     matches the file specification. On subsequent calls the calling 
+ *     matches the file specification. On subsequent calls the calling
  *     routine should continue to call using the value of Context returned
  *     by the previous call, and each call will return the name of the next
  *     file that matches the specification. When the last file that matches
@@ -32,12 +32,12 @@
  *  Parameters:
  *     (>) FILESPEC   (Character string) The file specification to be
  *                    matched.  May contain wildcards.  Case sensitive.
- *     (<) FILENAME   (Character string) The name of a file that matches 
+ *     (<) FILENAME   (Character string) The name of a file that matches
  *                    FILESPEC.
  *     (!) CONTEXT    (Integer, ref) A variable used to remember the context of
  *                    a series of calls for the same file specification.
  *                    Should be set to zero by the caller for the first call
- *                    for a new specification and the value then returned 
+ *                    for a new specification and the value then returned
  *                    by this routine should be used in subsequent calls.
  *  Returns:
  *     (<) STATUS     (Integer, function value) A status code. These have been
@@ -57,8 +57,8 @@
  *      '[ks]*.*' is not. Note that '*' and '*.*' will give quite different
  *      results under UNIX, whereas under VMS they would be the same. There
  *      is no way of specifying recursion; '/usr/user/ks/...' for example
- *      is meaningless. Nevertheless, it is hoped that it is close enough in 
- *      functionality to the VMS original to act as a useable substitute in 
+ *      is meaningless. Nevertheless, it is hoped that it is close enough in
+ *      functionality to the VMS original to act as a useable substitute in
  *      most cases. It cannot handle specifications that the standard shell
  *      (sh) cannot handle in an 'ls' command - there are some variations of
  *      the 'ls' command involving complex wildcarding that will cause sh
@@ -94,7 +94,7 @@
  *         length used as consequence).
  *      DLT: FEB 1993:
  *         Void ** to int * as Alpha returns addresses as 64 bits (casting
- *         to int * avoids this as compiler options are 32 bit. Fixed \0 
+ *         to int * avoids this as compiler options are 32 bit. Fixed \0
  *         appending to wrong part of string. (Comments added by PDRAPER).
  *      PDRAPER: 16-MAR-1993:
  *         Changed to use Starlink CNF macros for enhanced portabilility
@@ -149,7 +149,7 @@
 /*  Structures used:
  *
  *  A ContextStruct is used to maintain the context of a given series of
- *  calls to this routine.  It contains the two file descriptors used 
+ *  calls to this routine.  It contains the two file descriptors used
  *  for the pipe that reads from the 'ls' process, and the string used
  *  to remember any directory specification output by the 'ls' process,
  *  when a number of directories are being listed.  One of these is
@@ -159,7 +159,7 @@
 
 typedef struct ContextStruct {
   int Fds[2];          /* Input and output file descriptors for the pipe */
-  char Directory[DIRECTORY_LEN]; 
+  char Directory[DIRECTORY_LEN];
   /* Last directory spec output by 'ls' process */
 } ContextStruct;
 
@@ -172,8 +172,8 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
   GENPTR_CHARACTER(FileName) /* Pointer to string to return file name in
                                 Length is FileName_length */
   GENPTR_POINTER(Context)    /* Used to remember context of search */
-        
-        
+
+
   /*  Local variables  */
   int SpecLength;                /* Number of bytes in FileSpec - FileSpec_length*/
   int NameLength;                /* Number of bytes in FileName - FileName_length*/
@@ -194,23 +194,23 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
   char *PointFSpec;     /* Local copy of FileSpec          */
 
   /*  Start off with good status  */
-  
+
   Status = OK;
-  
+
   /*
-     Set input string lengths to those returned by CNF.  
+     Set input string lengths to those returned by CNF.
      */
-  
+
   SpecLength = FileSpec_length;
   NameLength = FileName_length;
   PointFSpec = FileSpec;
-  
+
   /*  The first time through for a new file specification, Context will
    *  be zero.  In this case we allocate ourselves enough space for the
    *  context structure we will use and use Context to hold its address.
    *  We initialise the directory specification in the context to null.
    */
-  
+
   if (*Context == 0) {
     ContextPtr = (ContextStruct *) malloc(2 * sizeof(ContextStruct));
     if ((int) ContextPtr == 0) {
@@ -218,20 +218,20 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
     } else {
       Fdptr = ContextPtr->Fds;
       ContextPtr->Directory[0] = '\0';
-      
+
       /*  Fdptr now points to an array of two ints, which we will use
        *  as the two file descriptors of a pipe which we now create.
        */
       if (pipe(Fdptr) < 0) {
         Status = PIPE_ERROR;
       } else {
-        
+
         /*  Fdptr[0] can now be used as the reading end of the pipe,
          *  and Fdptr[1] as the writing end.  Having that, we now
          *  fork off a new process to do the 'ls' command that we
-         *  will use to give us the filenames we want. 
+         *  will use to give us the filenames we want.
          */
-        
+
         int STATUS;
         if ((STATUS = fork()) == 0) {
 
@@ -239,23 +239,23 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
            *  for us.  We construct the command using the filespec
            *  we have been passed, remembering that this is a string
            *  from a Fortran program, and so is blank padded rather than
-           *  null terminated. 
+           *  null terminated.
            */
-          
+
           Command[0] = '\0';
           (void) strcpy(Command,"ls ");
           Nchars = sizeof(Command) - 3;
-          if (Nchars > SpecLength) Nchars = SpecLength; 
+          if (Nchars > SpecLength) Nchars = SpecLength;
           (void) strncat( Command, FileSpec, Nchars );
-          
+
           /*  Now we arrange things so that the 'ls' command will
            *  send its output back down our pipe.  We want to redirect
            *  our current standard output to the writing end of the
-           *  pipe.  This is a standard UNIX technique.  
+           *  pipe.  This is a standard UNIX technique.
            */
           (void) close(Fdptr[0]);  /* Don't need to read from pipe */
           (void) close(1);         /* Close fd 1 (standard output) so that
-                                    * the dup call will find fd 1 as the 
+                                    * the dup call will find fd 1 as the
                                     * first available fd. */
           (void) dup(Fdptr[1]);    /* Duplicate pipe write fd as first
                                     * available fd, ie standard output */
@@ -265,47 +265,47 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
            *  a file descriptor opened on the null device. This has the
            *  effect of nulling any error messages.
            */
-          
+
           NullFd = open("/dev/null",O_WRONLY,0);
-          (void) close(2); 
+          (void) close(2);
           (void) dup(NullFd);
           (void) close(NullFd);
-          
+
           /*  And now we run execute the "ls filespec" command.  This
            *  will write the set of files to our pipe, and the process
            *  will close down when all the files are listed.
            */
-          
+
           execl( "/bin/sh", "sh", "-c", Command, NULL);
-          
+
           /* This part should never be reached unless there are
            * problems with the "/bin/sh" execution. Exit using
            * _exit in this unlikely case. This terminates the
            * child correctly without invoking any exit handlers.
            */
           (void) _exit(127);
-          
+
         } else {
           /* Wait for forked process to terminate			    */
-          
+
           (void) wait( &STATUS );
           /* .... and continue					    */
-          
-          /*  This is the parent process, continuing after forking off 
+
+          /*  This is the parent process, continuing after forking off
            *  the 'ls' command. Here we set Context to be the address
            *  of the pair of file descriptors being used for the pipe.
            *  and carry on. We don't need the output fd for the pipe,
            *  so we close that.
            */
-          
+
           (void) close (Fdptr[1]);
           *Context = (F77_POINTER_TYPE) ContextPtr;
         }
       }
     }
   }
-  
-  /*  At this point, if Status still indicates OK, Context points to 
+
+  /*  At this point, if Status still indicates OK, Context points to
    *  a context structure containing a directory specification and two
    *  file descriptors, the first of which is that of the reading end of
    *  the pipe to which our forked 'ls' process is writing a set of file
@@ -314,25 +314,25 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
    *  that we have a complete filename. A read of zero bytes indicates
    *  that all the filenames have been listed.
    */
-  
+
   ContextPtr = (ContextStruct *) *Context;
   Fdptr = ContextPtr->Fds;
   if (NameLength < 1) {
     Status = LENGTH_ERROR;
   } else {
-    
+
     /*  The following loop continues until we have a filename read from the
      *  pipe or until the pipe is empty.  'ls' can produce lines that are not
      *  simple filenames; if multiple directories are being listed, it will
      *  separate them with blank lines and will precede each with the
      *  directory name, ending with a colon.  These have to be trapped.
      */
-    
+
     GotFileName = FALSE;
     while (!GotFileName) {
-      
+
       /*  This loop reads a line of characters from the pipe. */
-      
+
       Ichar = 0;
       LastChar = ' ';
       for (;;) {
@@ -351,39 +351,39 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
           if (Ichar < sizeof(Line)) Line[Ichar++] = Char;
         }
       }
-      
+
       /*  At the end of the loop, LastChar contains the last non-blank
        *  character in the line.  If this is blank, we have a blank line
        *  which we ignore.  If it was ':' we have a directory name that
        *  we should remember, but we still need a filename.  If Status is
        *  bad, we have reached the end of the 'ls' output.
        */
-      
+
       if (Status != OK) break;
       if (LastChar != ' ') {
         if (LastChar == ':') {
-          
+
           /*  It was a directory spec, so save it in the currrent
            *  context -  replacing the ':' with a '/' and terminating
            *  it at that point with a null. ColonIndex will tell us
            *  where the last colon was.
            */
-          
+
           if (ColonIndex < (sizeof(Line) - 1)) {
             Line[ColonIndex] = '/';
             Line[ColonIndex + 1] = '\0';
           }
           (void) strncpy(ContextPtr->Directory,Line,DIRECTORY_LEN);
           ContextPtr->Directory[DIRECTORY_LEN - 1] = '\0';
-          
+
         } else {
-          
+
           /*  It was an ordinary file name, so combine it with any
            *  directory spec we may have in the context, and return it
            *  in FileName, making sure it's properly terminated and being
            *  very careful not to excede its length.
            */
-          
+
           GotFileName = TRUE;
           (void) strncpy(FileName,ContextPtr->Directory,NameLength);
           FileName[NameLength - 1] = '\0';
@@ -392,18 +392,18 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
           /*	as third argument   */
           /*	in this list	    */
           FileName[NameLength - 1] = '\0';
-          
+
           /*  And, remembering that this is a Fortran character string,
            *  blank pad it properly.
            */
-          
+
           for (I = strlen(FileName); I < NameLength; FileName[I++] = ' ');
         }
       }
     }
-    
+
   }
-  
+
   return (Status);
 }
 
@@ -419,9 +419,9 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
  *  Description:
  *     This routine should be called after a sequence of calls to FIND_FILE
  *     in order to release any resources used by FIND_FILE.  It should be
- *     passed in its Context argument the value of the Context argument 
+ *     passed in its Context argument the value of the Context argument
  *     as returned by the FIND_FILE in the last call in the sequence that
- *     is to be closed down.  
+ *     is to be closed down.
  *
  *  Language:
  *     C   (Intended to be called from Fortran)
@@ -429,7 +429,7 @@ F77_INTEGER_FUNCTION(find_file)( CHARACTER(FileSpec), CHARACTER(FileName),
  *  Call:
  *    (from Fortran)
  *    STATUS = LIB$FIND_FILE_END (CONTEXT)
- * 
+ *
  *  Parameters:
  *
  *    (>) CONTEXT   (Integer, ref) The context argument returned by the last
@@ -456,20 +456,20 @@ F77_INTEGER_FUNCTION(find_file_end)( POINTER(Context) )
   GENPTR_POINTER(Context)
     char Char;                        /* Character read from pipe */
   ContextStruct *ContextPtr;        /* Pointer to context structure */
-  
+
   /*  If the Context passed to us is a non-null pointer, attempt to
    *  close the input fd for the pipe it should contain, and to release
    *  the memory used for it. Also empty the pipe so that the writing
    *  process is closed down neatly.
    */
-  
+
   if (*Context != 0) {
     ContextPtr = (ContextStruct *) *Context;
     while (read(ContextPtr->Fds[0],&Char,1) > 0);
     (void) close (ContextPtr->Fds[0]);
     (void) free ((char *) ContextPtr);
   }
-  
+
   return (OK);
 }
 /* @(#)find_file.c   2.4   95/08/18 15:09:31   97/02/17 14:42:08 */

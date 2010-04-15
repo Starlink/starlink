@@ -7,7 +7,7 @@
 *
 *   Description:
 *      The CMCUT contents are read.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     AT4 version
 *      Paul Rees          06-OCT-88     IUEDR Vn. 2.0
@@ -33,7 +33,7 @@
 
 *   Import:
       INTEGER FD         ! file descriptor
- 
+
 *   Export:
       INTEGER STATUS     ! status return
 
@@ -45,8 +45,8 @@
 
       NOCUT = TRUE
       CALL STR_MOVE('IUE_CUT\\', MAXNAME, CUTTP)
-      READ (FD, *, IOSTAT = STATUS) NCUT, 
-     :                              (CUTORD(I), CUTW1(I), CUTW2(I), 
+      READ (FD, *, IOSTAT = STATUS) NCUT,
+     :                              (CUTORD(I), CUTW1(I), CUTW2(I),
      :                              I = 1, MIN(NCUT, MAXORD))
 
       IF (STATUS.NE.OK) THEN

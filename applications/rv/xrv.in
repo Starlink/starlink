@@ -1,15 +1,15 @@
-#!@EXPECTK@ 
+#!@EXPECTK@
 #  @edited_input@
 #+
 #  Name:
 #     xrv
 #
 #  Purpose:
-#     This is a Tcl/TK/Expect interface to RV - the radial velocity 
+#     This is a Tcl/TK/Expect interface to RV - the radial velocity
 #     utility supplied by Starlink.
-# 
+#
 #  Copyright:
-#     Copyright (C) 1995 
+#     Copyright (C) 1995
 #
 #  Authors:
 #     CAC: C.A.Clayton (Starlink, RAL)
@@ -39,7 +39,7 @@
 # --------------------------------------------------------------
 #
 # These will normally be modified by the makefile during installation.
-#   
+#
 # define absolute path to the RV startup script
 
   set rv @bindir@/rv
@@ -57,7 +57,7 @@
 proc Entry_bindings { } {
 
 # Key movement - allow cursor keys to move input cursor left and right
- 
+
   bind Entry <Key-Left>  {Entry_movecursor %W -1}
   bind Entry <Key-Right> {Entry_movecursor %W 1}
 }
@@ -80,31 +80,31 @@ Entry_bindings
 ############################################################################
 
 # Create widgets : entries for user input and command buttons on a bar
-                 
+
 # Frame widget containing:
- 
+
 # bar		bar with command buttons
 # obs 		observatories entry box
 # file		Output file entry box
 # date		date entry box
 # pos		RA & DEC positon entry box
- 
+
   frame .xrv
   pack append .xrv \
      [frame .xrv.bar ] {top fillx } \
      [frame .xrv.obs ] {top fillx } \
      [frame .xrv.file] {top fillx } \
      [frame .xrv.date] {top fillx } \
-     [frame .xrv.pos ] {top fillx } 
+     [frame .xrv.pos ] {top fillx }
 
 # Command bar buttons:
- 
+
 # Observatories	.xrv.mobs 	runs procedure rv_obs  (menu of obervatories)
-# Output file   .xrv.out        runs procedure rv_browser 
+# Output file   .xrv.out        runs procedure rv_browser
 # Run		.xrv.run	runs procedure rv_run  (sends input to rv program)
 # Help		.xrv.help	runs procedure rv_help (pops up help box)
 # Exit		.xrv.exit	runs procedure rv_exit (exits program)
- 
+
   pack append .xrv.bar \
      [button .xrv.mobs -text "Observatory (by name)" -command rv_obs \
                           -height 2 -width 24] {left frame w padx 1m pady 1m} \
@@ -115,7 +115,7 @@ Entry_bindings
      [button .xrv.exit -text Exit -command rv_exit  \
                           -height 2 -width 8]  {right frame w padx 1m pady 1m} \
      [button .xrv.help -text Help -command rv_help  \
-                          -height 2 -width 8]  {right frame w padx 1m pady 1m} 
+                          -height 2 -width 8]  {right frame w padx 1m pady 1m}
 
 # Entry boxes:
 
@@ -133,7 +133,7 @@ Entry_bindings
      [label .xrv.file.lout -text \
         "  Output file" \
         -width 13 -anchor w -pady 14] {left frame w} \
-     [entry .xrv.file.out   -width 40 -relief sunken] {left frame w padx 3m} 
+     [entry .xrv.file.out   -width 40 -relief sunken] {left frame w padx 3m}
 
 # .xrv.date		Date entry box
 
@@ -145,7 +145,7 @@ Entry_bindings
      [menubutton  .xrv.date.ldays -text " Days (n) " -menu \
           .xrv.date.ldays.menu -relief raised -width 9 -anchor w ] \
           {left frame w padx 2m} \
-     [entry .xrv.date.days -width 10 -relief sunken] {left frame w fillx} 
+     [entry .xrv.date.days -width 10 -relief sunken] {left frame w fillx}
 
 # .xrv.pos		RA & DEC positon entry box
 
@@ -155,16 +155,16 @@ Entry_bindings
      [entry .xrv.pos.ra    -width 10 -relief sunken] {left frame w fillx} \
      [label .xrv.pos.ldec -text \
       "       Dec. (d m s)" -width 15 -anchor w -pady 14] {left frame w fillx} \
-     [entry .xrv.pos.dec   -width 10 -relief sunken] {left frame w } 
+     [entry .xrv.pos.dec   -width 10 -relief sunken] {left frame w }
 
   pack append .xrv.pos \
      [label .xrv.pos.space -text " " -width 3] {left} \
      [menubutton  .xrv.pos.lepoch -text " Equinox" -menu \
           .xrv.pos.lepoch.menu -relief raised -width 8 -anchor w ] \
           {left frame w padx 2m} \
-     [entry .xrv.pos.epoch -width 7 -relief sunken] {left frame w padx 3m} 
+     [entry .xrv.pos.epoch -width 7 -relief sunken] {left frame w padx 3m}
 
-  menu .xrv.date.ldays.menu 
+  menu .xrv.date.ldays.menu
    .xrv.date.ldays.menu add command -label 1 \
      -command { .xrv.date.days delete 0 end; .xrv.date.days insert end 1}
    .xrv.date.ldays.menu add command -label 2 \
@@ -182,9 +182,9 @@ Entry_bindings
   .xrv.pos.lepoch.menu add command -label B1950 \
      -command { .xrv.pos.epoch delete 0 end; .xrv.pos.epoch insert end B1950}
   .xrv.pos.lepoch.menu add command -label J2000 \
-     -command { .xrv.pos.epoch delete 0 end; .xrv.pos.epoch insert end J2000} 
+     -command { .xrv.pos.epoch delete 0 end; .xrv.pos.epoch insert end J2000}
   .xrv.pos.lepoch.menu add command -label "Other (please specify)" \
-     -command { .xrv.pos.epoch delete 0 end} 
+     -command { .xrv.pos.epoch delete 0 end}
 
 # Set titles
 
@@ -193,7 +193,7 @@ Entry_bindings
   pack append . .xrv {expand fill}
 
 # Set up the defaults for entry boxes
- 
+
   .xrv.obs.obs   insert end "AAT"
   .xrv.file.out  insert end "rv.lis"
   .xrv.date.date insert end "1985 10 21"
@@ -207,10 +207,10 @@ Entry_bindings
   global tmpfile
   set tmpfile [pid]
   exec touch /tmp/xrv_$tmpfile
-  spawn $rv 
+  spawn $rv
 
 # Create the observatory database
- 
+
   expect ">"
   exp_send "?\r"
 
@@ -219,13 +219,13 @@ Entry_bindings
 
 # Record the list of observatories
 
-# Stop recording list of supported observatories when end of listing 
+# Stop recording list of supported observatories when end of listing
 # is detected. Marked by the string "Observatory?" This does not
 # work well since expect buffers input.
 
   log_file -a /tmp/xrv_$tmpfile
 
-  expect "Observatory\\?"  
+  expect "Observatory\\?"
   log_file
   exec sort /tmp/xrv_$tmpfile -o /tmp/xrv_$tmpfile >& /dev/null
 #
@@ -241,16 +241,16 @@ Entry_bindings
 
 # rv_run - sends parameters to rv program
 # Triggered by "run" button on command bar
-  
+
 proc rv_run {rv} {
 
-# restart the application 
+# restart the application
 
   spawn $rv . [.xrv.file.out get]
   expect ">"
 
 # send observatory
- 
+
   set wobs .xrv.obs.obs
 
 # The blank space before [$obs get] is vital to ensure that
@@ -261,7 +261,7 @@ proc rv_run {rv} {
   exp_send "$text \r"
 
 # send date and days
- 
+
   set wdate .xrv.date.date
   set wdays .xrv.date.days
   set text "[$wdate get] [$wdays get]"
@@ -275,7 +275,7 @@ proc rv_run {rv} {
   set text "[$wra get] [$wdec get] [$wepoch get]"
   exp_send "$text \r"
 
-# Pop up a dialog box to tell user that you have written the file. 
+# Pop up a dialog box to tell user that you have written the file.
   toplevel .panel -class dialog
   wm title .panel "Output Written"
 
@@ -312,17 +312,17 @@ proc rv_obs { } {
   frame .obs_scroller -relief raised -bd 1
   pack .obs_scroller -expand 1 -fill x
 
-  label .obs_scroller.label -relief ridge -text "O b s e r v a t o r i e s" 
+  label .obs_scroller.label -relief ridge -text "O b s e r v a t o r i e s"
   pack .obs_scroller.label -in .obs_scroller -side top -fill x
 
-  frame .obs_scroller.buttons  
+  frame .obs_scroller.buttons
   pack .obs_scroller.buttons -in .obs_scroller -side right -fill both
 
   button .obs_scroller.buttons.ok -text "O K" -command {
 
-# Do not copy from selection when "O K" button is pressed if an observatory 
+# Do not copy from selection when "O K" button is pressed if an observatory
 # has not yet been selected
- 
+
         if {[selection own] != ""} {
   	   .xrv.obs.obs delete 0 end
 	   .xrv.obs.obs insert end [string range [selection get] 3 16]
@@ -338,11 +338,11 @@ proc rv_obs { } {
   pack .obs_scroller.buttons.cancel -in .obs_scroller.buttons -side bottom \
       -padx 1m -pady 1m -ipadx 7m -ipady 4m -fill both
 
-  scrollbar .obs_scroller.scroll -command ".obs_scroller.names yview" 
+  scrollbar .obs_scroller.scroll -command ".obs_scroller.names yview"
   pack .obs_scroller.scroll -in .obs_scroller -side left -fill y
 
   listbox .obs_scroller.names  -width 65 -height 7 \
-	-font "fixed" -bd 1 -yscrollcommand ".obs_scroller.scroll set" 
+	-font "fixed" -bd 1 -yscrollcommand ".obs_scroller.scroll set"
   pack .obs_scroller.names  -in .obs_scroller -side left -fill both
 
   global tmpfile
@@ -354,7 +354,7 @@ proc rv_obs { } {
 	.obs_scroller.names insert end [lrange $line 0 end]
   }
   close $tele
-  
+
   bind .obs_scroller.names <Double-Button-1>  {
 	.xrv.obs.obs delete 0 end
 	.xrv.obs.obs insert end [string range [selection get] 3 16]
@@ -371,7 +371,7 @@ proc rv_obs { } {
 
 ############################################################################
 
-# Pop up a dialog box to tell user about xrv. 
+# Pop up a dialog box to tell user about xrv.
 # Triggered by "Help" button on command bar
 
 proc rv_help { } {
@@ -403,7 +403,7 @@ Valid observatory identifiers can be browsed using the \"Observatories (by name)
 
 
 O U T P U T   F I L E
-Enter a file name or use \"Output file\" button to call up a file browser. 
+Enter a file name or use \"Output file\" button to call up a file browser.
 
 
 D A T E   A N D   D A Y S
@@ -472,10 +472,10 @@ pack [frame .rv.browse.dir ] [frame .rv.browse.ndf ] -side left \
     -expand yes -fill both
 
 pack [scrollbar .rv.browse.dir.sy -relief sunken -command \
-        {.rv.browse.dir.l yview} -orient vertical] -side right -fill y 
+        {.rv.browse.dir.l yview} -orient vertical] -side right -fill y
 
 pack [scrollbar .rv.browse.dir.sx -relief sunken -command \
-        {.rv.browse.dir.l xview} -orient horizontal] -side bottom -fill x 
+        {.rv.browse.dir.l xview} -orient horizontal] -side bottom -fill x
 
 pack [listbox .rv.browse.dir.l -selectmode .rv.browse.dir.l\
 	-relief sunken \
@@ -497,12 +497,12 @@ pack [listbox .rv.browse.ndf.l -selectmode .rv.browse.ndf.l \
 
 # Pack OK and Cancel buttons
 
-frame .rv.browse.bot 
+frame .rv.browse.bot
 pack .rv.browse.bot -side right -fill both
 
 button .rv.browse.bot.button_ok -text "O K" -command {
       .xrv.file.out delete 0 end
-      .xrv.file.out insert end [selection get]  
+      .xrv.file.out insert end [selection get]
       destroy .rv
       }
 
@@ -519,7 +519,7 @@ pack .rv.browse.bot.button_cancel -in .rv.browse.bot -side bottom \
 
 bind .rv.browse.ndf.l <Double-Button-1> {
       .xrv.file.out delete 0 end
-      .xrv.file.out insert end [selection get]  
+      .xrv.file.out insert end [selection get]
       destroy .rv
       break
       }

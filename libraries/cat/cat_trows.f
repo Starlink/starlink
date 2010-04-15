@@ -1,7 +1,7 @@
       SUBROUTINE CAT_TROWS (CI, NUMROW, STATUS)
 *+
 *  Name:
-*     CAT_TROWS 
+*     CAT_TROWS
 *  Purpose:
 *     Get the number of rows in a catalogue, selection or index.
 *  Language:
@@ -20,7 +20,7 @@
 *  Algorithm:
 *     Determine the type of the identifier.
 *     If the identifier corresponds to a catalogue then
-*       Attempt to find the array element corresponding to the 
+*       Attempt to find the array element corresponding to the
 *       catalogue.
 *       If ok then
 *         Extract the number of rows from the catalogue arrays.
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,9 +99,9 @@
          IF (IDTYP .EQ. CAT__CITYP) THEN
 
 *
-*          The identifier corresponds to a catalogue: attempt to find 
-*          the array element corresponding to the catalogue.  If 
-*          successful then proceed to extract the number of rows from 
+*          The identifier corresponds to a catalogue: attempt to find
+*          the array element corresponding to the catalogue.  If
+*          successful then proceed to extract the number of rows from
 *          the catalogue arrays.
 
             CALL CAT1_CIELM (CI, CIELM, STATUS)

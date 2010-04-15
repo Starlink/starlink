@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -123,16 +123,16 @@ run on the current STARLINK database (ADC) and any future STARLINK database
 systems.
 \begin{itemize}
    \item The CHI routines provide low level access to the underlying databases.
-   \item The CHP routines (CHI Plus) are an extension to the CHI routines. 
+   \item The CHP routines (CHI Plus) are an extension to the CHI routines.
 They include
 functionality not found in the CHI routines.
-This new functionality falls into two areas. 
+This new functionality falls into two areas.
 \begin{enumerate}
-  \item A CHP routine may add general functionality applicable 
+  \item A CHP routine may add general functionality applicable
 to all catalogues ( {\em e.g.} CHP\_SAMPLE Select every Nth row from a catalogue)
-  \item A CHP routine may add specialist functionality dealing with the 
-manipulation of catalogue data in a domain specific way 
-( {\em e.g.} Astronomical catalogues with sexagesimal 
+  \item A CHP routine may add specialist functionality dealing with the
+manipulation of catalogue data in a domain specific way
+( {\em e.g.} Astronomical catalogues with sexagesimal
 field formats ).
 \end{enumerate}
 \end{itemize}
@@ -144,7 +144,7 @@ so CHI and CHP routines can be freely mixed.
 \subsection{Routine Names}
 
 Catalogues are created, accessed, modified and deleted in programs by means of
-calls to CHI and CHP routines. The routine names have the following structure: 
+calls to CHI and CHP routines. The routine names have the following structure:
 
 \begin{verbatim}
       <pck>_<func><qual>
@@ -152,12 +152,12 @@ calls to CHI and CHP routines. The routine names have the following structure:
 
 where \verb+<pck>+ is the package name, \verb+<func>+ represents the
 function performed by the routine and \verb+<qual>+ is a qualifier which is
-used to identify different versions of the {\bf GETSVAL}, {\bf GETVAL}, 
-and {\bf NEWFLD} routines. 
+used to identify different versions of the {\bf GETSVAL}, {\bf GETVAL},
+and {\bf NEWFLD} routines.
 
 \subsection{Program Structure}
 
-Catalogue handling applications must have the following structure: 
+Catalogue handling applications must have the following structure:
 
 \begin{verbatim}
          <declarations>
@@ -173,7 +173,7 @@ Catalogue handling applications must have the following structure:
 Various symbolic names should be used for important constant values in CHI
 programs to make the programs clearer and to insulate them from possible future
 changes. These symbolic names are defined by several Fortran ``include'' files.
-The following include files are available: 
+The following include files are available:
 
 \begin{description}
 
@@ -214,7 +214,7 @@ These values are subject to change in subsequent releases.
 If it is required to test for specific error conditions, the appropriate
 include file should be used and the symbolic names (listed in
 Appendix~\ref{appendix:errors}) used in the test. Here is an example of how to
-use these symbols: 
+use these symbols:
 
 \begin{quote}
 \begin{verbatim}
@@ -245,24 +245,24 @@ use these symbols:
 
 \section {Using CHI and CHP}
 
-In general any new catalogue handling application will fall into two parts 
+In general any new catalogue handling application will fall into two parts
 \begin{enumerate}
 
  \item Interacting with the user via the ADAM environment. Applications make
-a small number of calls to CHP routines to perform the required catalogue 
+a small number of calls to CHP routines to perform the required catalogue
 manipulation.
 
- \item Performing the required catalogue manipulation. New CHP routines that 
+ \item Performing the required catalogue manipulation. New CHP routines that
 perform the required catalogue manipulation will be added to the CHP library.
 These CHP routines are
-independent of the ADAM environment 
+independent of the ADAM environment
 and so can be reused by other applications.
 
 \end{enumerate}
 
 By adopting this approach the library of CHP Routines will be extended
-providing a wealth of catalogue manipulation functionality that future 
-applications can draw on. Any new CHP routines should be submitted, with 
+providing a wealth of catalogue manipulation functionality that future
+applications can draw on. Any new CHP routines should be submitted, with
 documentation, for inclusion in this library.
 
 \section{Efficiency Consideration when JOINing or SEARCHing}
@@ -277,25 +277,25 @@ alphabetically the join can be done efficiently. If only one of the dictionaries
 is sorted the join is still managable. If neither of the dictionaries are
 sorted the join will be highly inefficient.
 
-The CHI\_TURBOSEARCH and CHI\_TURBOJOIN routines try to perform an efficient 
+The CHI\_TURBOSEARCH and CHI\_TURBOJOIN routines try to perform an efficient
 search or join. If this is not possible an error and diagnostic information
 is reported. Searching an unsorted dictionary for WORD equals `CAT' will
 fail with a diagnostic message `Catalogue not sorted on field WORD.'
-The catalogue can either be sorted on field WORD, using CHI\_SORT or 
-CHI\_ADDIND, and CHI\_TURBOSEARCH recalled or an inefficient search can be 
+The catalogue can either be sorted on field WORD, using CHI\_SORT or
+CHI\_ADDIND, and CHI\_TURBOSEARCH recalled or an inefficient search can be
 made using CHI\_SEARCH. In most cases it is better to sort the catalogue. A
-dictionary is more useful when sorted on field WORD. The sort takes more 
+dictionary is more useful when sorted on field WORD. The sort takes more
 time than an inefficient search but subsequent searches will be efficient.
 There are cases where an inefficient search is more appropriate. Consider
-a telephone directory sorted in the normal way. Searching for numbers given a 
-name and initial will be efficient. Searching for a number given an address, 
-because the name has been lost, will be inefficient but resorting the 
+a telephone directory sorted in the normal way. Searching for numbers given a
+name and initial will be efficient. Searching for a number given an address,
+because the name has been lost, will be inefficient but resorting the
 directory is not required.
 
 CHI\_SEARCH and CHI\_JOIN always try to perform an efficient search or join
 but if this fails the error is cancelled and the routines go no to perform
 inefficient searches or joins.
-  
+
 \section{Compiling and Linking}
 
 \subsection{VAX/VMS Systems}
@@ -320,13 +320,13 @@ thus:
 \subsection {The CHP Routines}
 
 The CHP routines can conveniently classified according to their functionality.
- 
+
 \begin{itemize}
 
 \item Routines that analyze data in the catalogue.
 
  \begin{enumerate}
-  
+
   \item CHP\_CATCORR Non parametric correlation handling null values.
 
   \item CHP\_CATLINCOR Linear correlation handling null values.
@@ -349,7 +349,7 @@ The CHP routines can conveniently classified according to their functionality.
 
   \item CHP\_LISTIN Input a catalogue from free format data.
 
-  \item CHP\_LITTLEBIG Extract the rows with the largest or smallest values in 
+  \item CHP\_LITTLEBIG Extract the rows with the largest or smallest values in
 a given column.
 
   \item CHP\_NOENT Create a new table with no entries.
@@ -370,10 +370,10 @@ a given column.
 
   \item CHP\_CHKNAMES Check a list of fieldnames against a catalogue.
 
-\item CHP\_GETFINF Get a particular piece of information associated with this 
+\item CHP\_GETFINF Get a particular piece of information associated with this
 field. ({\em e.g.} get the FORMAT associated with this field NAME). If this
 routine is used to find the FORMAT the fields sexagesimal format will be found.
-An equivalent call to CHI\_GETFINF would return the FORMAT of the underlying 
+An equivalent call to CHI\_GETFINF would return the FORMAT of the underlying
 radian value. The NULLVALUE is also converted to sexagesimal format when this
 is appropriate.
 
@@ -385,7 +385,7 @@ is appropriate.
  \begin{enumerate}
 
 
-  \item CHP\_PUTENT Put a set of values that constitute an entry into a 
+  \item CHP\_PUTENT Put a set of values that constitute an entry into a
       catalogue allowing sexagesimal formats.
 
  \end{enumerate}
@@ -413,9 +413,9 @@ is appropriate.
  \begin{enumerate}
 
   \item  CHP\_CONVFMAT   Convert general sexagesimal format value.
- 
+
   \item  CHP\_RECFMAT Convert a general sexagesimal format.
- 
+
  \end{enumerate}
 
 \end{itemize}
@@ -423,14 +423,14 @@ is appropriate.
 \subsection {The CHI Routines}
 
 The CHI routines can conveniently classified according to their functionality.
- 
+
 \begin{itemize}
 \item Routines that list available catalogues.
 
  \begin{enumerate}
 
   \item CHI\_AVAILCATS Get a list of the currently available catalogues.
- 
+
  \end {enumerate}
 
 \item Routines to open and close the system.
@@ -440,7 +440,7 @@ The CHI routines can conveniently classified according to their functionality.
   \item CHI\_OPEN Activate the interface.
 
   \item CHI\_CLOSE Deactivate the interface.
- 
+
 \end{enumerate}
 
 \item Routines that manipulate data about the catalogue.
@@ -448,8 +448,8 @@ The CHI routines can conveniently classified according to their functionality.
  \begin{enumerate}
 
   \item CHI\_ADDIND Add a new sort index to a sorted catalogue.
- 
-  \item CHI\_ADDP Add a parameter to a catalogue. Add this FORMAT, VALUE and 
+
+  \item CHI\_ADDP Add a parameter to a catalogue. Add this FORMAT, VALUE and
   COMMENT to the list of parameters
   for this catalogue and associate it with this NAME.
 
@@ -466,7 +466,7 @@ The CHI routines can conveniently classified according to their functionality.
 
   \item CHI\_GETF Get all the field names and the number of fields.
 
-  \item CHI\_GETFINF Get a particular piece of information associated with this 
+  \item CHI\_GETFINF Get a particular piece of information associated with this
   field. ({\em e.g.} get the FORMAT associated with this field NAME)
 
   \item CHI\_GETNOTES Get the notes or part of the notes associated with this
@@ -479,8 +479,8 @@ The CHI routines can conveniently classified according to their functionality.
   \item CHI\_GETONEP Get all the information associated with this parameter.
 
   \item CHI\_GETP Get all the parameter names and the number of parameters.
- 
-  \item CHI\_GETPINF Get a particular piece of information associated with this 
+
+  \item CHI\_GETPINF Get a particular piece of information associated with this
   parameter. ({\em e.g.} get the VALUE associated with this parameter NAME)
 
   \item CHI\_PUTNOTES Adds a line to the notes associated with this catalogue.
@@ -506,21 +506,21 @@ The CHI routines can conveniently classified according to their functionality.
 
   \item CHI\_CREATDUP Create a duplicate catalogue with no entries.
 
-  \item CHI\_JOIN Create a new catalogue by joining two existing catalogues 
+  \item CHI\_JOIN Create a new catalogue by joining two existing catalogues
   according to some join criteria.
 
   \item CHI\_MERGE Create a new catalogue by merging two existing catalogues.
 
-  \item CHI\_NEWFLDx Create a new catalogue by adding a new field to an 
+  \item CHI\_NEWFLDx Create a new catalogue by adding a new field to an
   existing catalogue. The new
   catalogue has all the fields in the original catalogue plus the extra field.
 
   \item CHI\_NOENT Create a new catalogue with no entries.
 
-  \item CHI\_REJECT Similar to CHI\_SEARCH but the new catalogue contains only 
+  \item CHI\_REJECT Similar to CHI\_SEARCH but the new catalogue contains only
   those entries that fail the selection criteria.
 
-  \item CHI\_SEARCH Create a new catalogue from an existing catalogue. All 
+  \item CHI\_SEARCH Create a new catalogue from an existing catalogue. All
       entries in the new catalogue obey some selection criteria. ({\em e.g.}
   `MAG .GT. 8')
 
@@ -529,16 +529,16 @@ The CHI routines can conveniently classified according to their functionality.
 
   \item CHI\_SELFLDS Create a new catalogue from an existing catalogue. Only
       those fields selected are carried into the new catalogue.
- 
+
   \item CHI\_SORT Create a new catalogue that is sorted on given fields.
 
-  \item CHI\_TURBOJOIN Efficiently create a new catalogue by joining two 
+  \item CHI\_TURBOJOIN Efficiently create a new catalogue by joining two
   existing catalogues according to some join criteria.
 
-  \item CHI\_TURBOSEARCH Efficiently create a new catalogue from an existing 
+  \item CHI\_TURBOSEARCH Efficiently create a new catalogue from an existing
    catalogue. All in the new catalogue obey some selection criteria. ({\em e.g.}
   `MAG .GT. 8')
- 
+
  \end{enumerate}
 
 \item Routine that deletes catalogues.
@@ -553,7 +553,7 @@ The CHI routines can conveniently classified according to their functionality.
 
  \begin{enumerate}
 
-  \item CHI\_PUTENT Put a set of values that constitute an entry into a 
+  \item CHI\_PUTENT Put a set of values that constitute an entry into a
       catalogue.
 
   \item CHI\_UPDATE Update a field.
@@ -570,7 +570,7 @@ The CHI routines can conveniently classified according to their functionality.
   \item  CHI\_GETVALALL Get values for fields of different types
   from the next entry in the catalogue.
 
-  \item  CHI\_RESET Reset a catalogue to the start after getting data 
+  \item  CHI\_RESET Reset a catalogue to the start after getting data
   entry by entry from a catalogue.
 
  \end{enumerate}
@@ -580,31 +580,31 @@ The CHI routines can conveniently classified according to their functionality.
  \begin{enumerate}
 
   \item  CHI\_GETSVALx Get an array or arrays of values for a field or fields,
-  of the same type, from the catalogue taking values from the given start 
-  position to the given start position plus the number of entries required. 
+  of the same type, from the catalogue taking values from the given start
+  position to the given start position plus the number of entries required.
 
-  \item  CHI\_GETSVALALL Get an array or arrays of values for a field or 
-  fields, of different types, from the catalogue taking values from the given 
-  start position to the given start position plus the number of entries 
-  required. 
- 
+  \item  CHI\_GETSVALALL Get an array or arrays of values for a field or
+  fields, of different types, from the catalogue taking values from the given
+  start position to the given start position plus the number of entries
+  required.
+
  \end{enumerate}
 
 \item Routines that allow direct access to the parser.
 
  \begin{enumerate}
 
-  \item  CHI\_1PAR Parse an expression that contains field names from one 
+  \item  CHI\_1PAR Parse an expression that contains field names from one
   catalogue.
 
-  \item  CHI\_2PAR Parse an expression that contains field names from two 
+  \item  CHI\_2PAR Parse an expression that contains field names from two
   catalogues.
 
   \item  CHI\_APPLY Apply the expression to the given data.
- 
+
   \item  CHI\_EVAL Evaluate the expression using the values from the next
   entry in the catalogue.
- 
+
  \end{enumerate}
 
 \item Routines that allow direct access to the database.
@@ -614,7 +614,7 @@ The CHI routines can conveniently classified according to their functionality.
   \item  CHI\_GETCD Get an ADC Catalogue Descriptor.
 
   \item  CHI\_SPLITNAME Split a name into a database part and a catalogue part.
- 
+
  \end{enumerate}
 
 \end{itemize}
@@ -639,24 +639,24 @@ The CHI routines can conveniently classified according to their functionality.
 \item [CHP\_GETVALALL] ---  Get a set of values for fields of different types.
 \item [CHP\_INCAT] ---  Input a catalogue from data in an ASCII file.
 \item [CHP\_LISTIN] ---  Input a catalogue from free format data.
-\item [CHP\_LITTLEBIG] ---  Extract the rows with the largest or smallest 
+\item [CHP\_LITTLEBIG] ---  Extract the rows with the largest or smallest
 values in a given column.
 \item [CHP\_NOENT] ---  Create a new table with no entries.
 \item [CHP\_PM] ---  Apply the SLALIB SLA\_PM function (See SUN/67).
-\item [CHP\_PUTENT] ---  Put a set of values that constitute an entry into a 
+\item [CHP\_PUTENT] ---  Put a set of values that constitute an entry into a
 catalogue.
 \item [CHP\_RECFMAT] ---  Convert general sexagesimal format.
 \item [CHP\_SAMPLE] ---  Select every Nth row from a table.
 \item [CHP\_WITHIN] ---  Select entries within a polygon.
-\item [CHI\_1PAR] ---  Parse an expression that contains field names from one 
+\item [CHI\_1PAR] ---  Parse an expression that contains field names from one
 catalogue.
-\item [CHI\_2PAR] ---  Parse an expression that contains field names from two 
+\item [CHI\_2PAR] ---  Parse an expression that contains field names from two
 catalogues.
 \item [CHI\_ADDIND] ---  Add a new sort index to a sorted catalogue.
 \item [CHI\_ADDP] ---  Add a parameter to a catalogue.
 \item [CHI\_APPLY] ---  Apply the expression to the given data.
 \item [CHI\_AVAILCATS] ---  Get a list of the currently available catalogues.
-\item [CHI\_CALCFLD] ---  Create a new catalogue by adding a new field, 
+\item [CHI\_CALCFLD] ---  Create a new catalogue by adding a new field,
 calculated by evaluating an expression, to an existing catalogue.
 \item [CHI\_GETCD] ---  Get an ADC Catalogue Descriptor.
 \item [CHI\_CLOSE] ---  Deactivate the interface.
@@ -668,46 +668,46 @@ catalogue.
 \item [CHI\_DELP] ---  Delete the parameter associated with a parameter NAME.
 \item [CHI\_DELSORT] ---  Delete the sort information from a catalogue.
 \item [CHI\_EVAL] ---  Evaluate an expression.
-\item [CHI\_GETALLF] ---  Get all the information associated with all the 
+\item [CHI\_GETALLF] ---  Get all the information associated with all the
 fields.
-\item [CHI\_GETALLP] ---  Get all the information associated with all 
+\item [CHI\_GETALLP] ---  Get all the information associated with all
 parameters.
 \item [CHI\_GETF] ---  Get all the field names and the number of fields.
 \item [CHI\_GETFINF] ---  Get a particular information associated with a field.
-\item [CHI\_GETNOTES] ---  Get the notes or part of the notes associated with 
+\item [CHI\_GETNOTES] ---  Get the notes or part of the notes associated with
 this catalogue.
 \item [CHI\_GETNUMENTS] ---  Get the number of entries in a catalogue.
 \item [CHI\_GETONEF] ---  Get all the information associated with this field.
-\item [CHI\_GETONEP] ---  Get all the information associated with this 
+\item [CHI\_GETONEP] ---  Get all the information associated with this
 parameter.
 \item [CHI\_GETP] ---  Get all the parameter names and the number of parameters.
-\item [CHI\_GETPINF] ---  Get information associated with this parameter. 
-\item [CHI\_GETSVALx] ---  Get an array or arrays of values for a field or 
+\item [CHI\_GETPINF] ---  Get information associated with this parameter.
+\item [CHI\_GETSVALx] ---  Get an array or arrays of values for a field or
 fields.
 \item [CHI\_GETSVALALL] ---  Get an array or arrays of values for a field or
 fields of different types.
 \item [CHI\_GETVALx] ---  Get the value or values for a field or fields.
 \item [CHI\_GETVALALL] ---  Get values for fields of different types.
-\item [CHI\_JOIN] ---  Create a new catalogue by joining two existing 
+\item [CHI\_JOIN] ---  Create a new catalogue by joining two existing
 catalogues.
-\item [CHI\_MERGE] ---  Create a new catalogue by merging two existing 
+\item [CHI\_MERGE] ---  Create a new catalogue by merging two existing
 catalogues.
-\item [CHI\_NEWFLDx] ---  Create a new catalogue by adding a new field to an 
+\item [CHI\_NEWFLDx] ---  Create a new catalogue by adding a new field to an
 existing catalogue.
 \item [CHI\_NOENT] ---  Create a new catalogue with no entries.
 \item [CHI\_OPEN] ---  Activate the interface.
 \item [CHI\_PUTENT] ---  Put an entry into a catalogue.
-\item [CHI\_PUTNOTES] ---  Adds a line to the notes associated with this 
+\item [CHI\_PUTNOTES] ---  Adds a line to the notes associated with this
 catalogue.
-\item [CHI\_REJECT] ---  Similar to CHI\_SEARCH but the new catalogue contains 
+\item [CHI\_REJECT] ---  Similar to CHI\_SEARCH but the new catalogue contains
 only those entries that fail the selection criteria.
 \item [CHI\_RENAME] ---  Rename a catalogue.
 \item [CHI\_RESET] ---  Reset a catalogue to the start.
-\item [CHI\_SEARCH] ---  Create a new catalogue by searching an existing 
+\item [CHI\_SEARCH] ---  Create a new catalogue by searching an existing
 catalogue.
 \item [CHI\_SELENTS] --- Select entries from a catalogue.
-\item [CHI\_SELFLDS] --- Select fields from a catalogue. 
-\item [CHI\_SPLITNAME] --- Split a name into a database part and a catalogue 
+\item [CHI\_SELFLDS] --- Select fields from a catalogue.
+\item [CHI\_SPLITNAME] --- Split a name into a database part and a catalogue
 part.
 \item [CHI\_SORT] ---  Create a new catalogue that is sorted on given fields.
 \item [CHI\_SORTFLDS] ---  Get the sort information from a catalogue.
@@ -724,7 +724,7 @@ part.
 
 \label{appendix:routines}
 
-This appendix gives specifications for all the CHP and CHI routines. 
+This appendix gives specifications for all the CHP and CHI routines.
 A detailed description of the CHP Interface routines, in
 alphabetical order, is followed by a description of the CHI routines.
 Variables chi\_\_szfcmnt etc. are defined
@@ -1536,9 +1536,9 @@ and Error Handling Section of this document.
          Name of the catalogue from which the data is required.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)} 
+         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields whose data is required.
       }
@@ -1568,7 +1568,7 @@ and Error Handling Section of this document.
          Array to receive the data from logical fields.
       }
       \sstsubsection{
-         CHARVALS( CHI\_\_NUMFLDS ) = 
+         CHARVALS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
@@ -1636,7 +1636,7 @@ and Error Handling Section of this document.
          Names of the parameters.
       }
       \sstsubsection{
-         PFORMATS( CHI\_\_NUMPARS ) = 
+         PFORMATS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given)}
       }{ \\
@@ -1648,7 +1648,7 @@ and Error Handling Section of this document.
          Values of the parameters.
       }
       \sstsubsection{
-         PCOMMENTS( CHI\_\_NUMPARS ) = 
+         PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
       }{ \\
@@ -1665,14 +1665,14 @@ and Error Handling Section of this document.
          Names of the fields.
       }
       \sstsubsection{
-         INFFORMATS( CHI\_\_NUMFLDS ) = 
+         INFFORMATS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given)}
       }{ \\
          Formats of the fields being read.
       }
       \sstsubsection{
-         OUTFFORMATS( CHI\_\_NUMFLDS ) = 
+         OUTFFORMATS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given)}
       }{ \\
@@ -1689,7 +1689,7 @@ and Error Handling Section of this document.
          Null values of the fields.
       }
       \sstsubsection{
-         FCOMMENTS( CHI\_\_NUMFLDS ) = 
+         FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
       }{ \\
@@ -1847,7 +1847,7 @@ and Error Handling Section of this document.
          Number of parameters in the catalogue.
       }
       \sstsubsection{
-         PNAMES( CHI\_\_NUMPARS ) = 
+         PNAMES( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Given and Returned)}
       }{ \\
@@ -1861,14 +1861,14 @@ and Error Handling Section of this document.
          Formats of the parameters in the catalogue.
       }
       \sstsubsection{
-         PVALUE( CHI\_\_NUMPARS ) = 
+         PVALUE( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPVAL ) (Given and Returned)}
       }{ \\
          Values of the parameters in the catalogue.
       }
       \sstsubsection{
-         PCOMMENTS( CHI\_\_NUMPARS ) = 
+         PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
       }{ \\
@@ -1880,14 +1880,14 @@ and Error Handling Section of this document.
          Number of fields in the catalogue.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
       \sstsubsection{
-         FFORMATS( CHI\_\_NUMFLDS ) = 
+         FFORMATS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
       }{ \\
@@ -1904,7 +1904,7 @@ and Error Handling Section of this document.
          Null values of the fields in the catalogue.
       }
       \sstsubsection{
-         FCOMMENTS( CHI\_\_NUMFLDS ) = 
+         FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
       }{ \\
@@ -2102,7 +2102,7 @@ and Error Handling Section of this document.
          Name of the catalogue into which the data is to be put.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
@@ -2139,7 +2139,7 @@ and Error Handling Section of this document.
          Array containing the data for logical fields.
       }
       \sstsubsection{
-         CHARVALS( CHI\_\_NUMFLDS ) = 
+         CHARVALS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
@@ -2666,7 +2666,7 @@ and Error Handling Section of this document.
          returned and .FALSE. for only catalogues created by this user.
       }
       \sstsubsection{
-         CATNAMES( CHI\_\_NUMCATS) = 
+         CATNAMES( CHI\_\_NUMCATS) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZNAME ) (Returned)}
       }{ \\
@@ -2903,9 +2903,9 @@ and Error Handling Section of this document.
    \sstdescription{
       Delete the notes, or part of the notes, associated with a catalogue. The
       notes are removed from the line starting at the position indicated
-      by STARTPOS and finishing at the entry 
-      STARTPOS$+$NUMLINES-1. 
-      If you try to delete lines off the end of the note no error will be 
+      by STARTPOS and finishing at the entry
+      STARTPOS$+$NUMLINES-1.
+      If you try to delete lines off the end of the note no error will be
       reported.
    }
    \sstinvocation{
@@ -3128,35 +3128,35 @@ and Error Handling Section of this document.
          Number of fields in the catalogue.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
       \sstsubsection{
-         FFORMATS( CHI\_\_NUMFLDS ) = 
+         FFORMATS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Returned)}
       }{ \\
          Formats of the fields in the catalogue.
       }
       \sstsubsection{
-         FUNITS( CHI\_\_NUMFLDS ) = 
+         FUNITS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFUNIT ) (Returned)}
       }{ \\
          Units of the fields in the catalogue.
       }
       \sstsubsection{
-         FNULLS( CHI\_\_NUMFLDS ) = 
+         FNULLS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNVAL ) (Returned)}
       }{ \\
          Null values of the fields in the catalogue.
       }
       \sstsubsection{
-         FCOMMENTS( CHI\_\_NUMFLDS ) = 
+         FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Returned)}
       }{ \\
@@ -3207,14 +3207,14 @@ and Error Handling Section of this document.
          Number of parameters in the catalogue.
       }
       \sstsubsection{
-         PNAMES( CHI\_\_NUMPARS ) = 
+         PNAMES( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Returned)}
       }{ \\
          Names of the parameters in the catalogue.
       }
       \sstsubsection{
-         PFORMATS( CHI\_\_NUMPARS ) = 
+         PFORMATS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPFMT ) (Returned)}
       }{ \\
@@ -3226,7 +3226,7 @@ and Error Handling Section of this document.
          Values of the parameters in the catalogue.
       }
       \sstsubsection{
-         PCOMMENTS( CHI\_\_NUMPARS ) = 
+         PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Returned)}
       }{ \\
@@ -3305,7 +3305,7 @@ and Error Handling Section of this document.
          Name of the catalogue from which the field names are required.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
@@ -3602,7 +3602,7 @@ and Error Handling Section of this document.
          required.
       }
       \sstsubsection{
-         PNAMES( CHI\_\_NUMPARS ) = 
+         PNAMES( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Returned)}
       }{ \\
@@ -3712,7 +3712,7 @@ and Error Handling Section of this document.
          Name of the catalogue from which the field names are required.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
@@ -3735,13 +3735,13 @@ and Error Handling Section of this document.
       }
       \sstsubsection{
          CHARVALS(NUMENTS,CHI\_\_NUMFLDS) =
-      }{         
+      }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the character data.
       }
       \sstsubsection{
-         DOUBVALS(NUMENTS,CHI\_\_NUMFLDS) = 
+         DOUBVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
          {\bf DOUBLE PRECISION (Returned)}
       }{ \\
@@ -3815,7 +3815,7 @@ and Error Handling Section of this document.
          Name of the catalogue from which the data is required.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = CHARACTER $*$ ( CHI\_\_SZFNAME ) 
+         FNAMES( CHI\_\_NUMFLDS ) = CHARACTER $*$ ( CHI\_\_SZFNAME )
       }{
         (Given and Returned)
       }{
@@ -3837,8 +3837,8 @@ and Error Handling Section of this document.
          Number of entries from which data is required.
       }
       \sstsubsection{
-         CHARVALS(NUMENTS,CHI\_\_NUMFLDS) = 
-      }{ 
+         CHARVALS(NUMENTS,CHI\_\_NUMFLDS) =
+      }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the data.
@@ -3900,7 +3900,7 @@ and Error Handling Section of this document.
          Name of the catalogue from which the field names are required.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
@@ -3922,14 +3922,14 @@ and Error Handling Section of this document.
          Number of entries from which data is required.
       }
       \sstsubsection{
-         CHARVALS(NUMENTS,CHI\_\_NUMFLDS) = 
+         CHARVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the character data.
       }
       \sstsubsection{
-         DOUBVALS(NUMENTS,CHI\_\_NUMFLDS) = 
+         DOUBVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
          {\bf DOUBLE PRECISION (Returned)}
       }{ \\
@@ -3980,8 +3980,8 @@ and Error Handling Section of this document.
       catalogue  but see Notes if you are mixing different CHI\_GET calls.
       Data is returned in the appropriate element of the appropriate
       array. FNAMES will contain the names of the fields and FLDTYPES the
-      type of field. So if FLDTYPES(3) is an {\tt '}I{\tt '} the array 
-      INTVALS(3) will contain the data from the field whose name is given in 
+      type of field. So if FLDTYPES(3) is an {\tt '}I{\tt '} the array
+      INTVALS(3) will contain the data from the field whose name is given in
       FNAMES(3).
    }
    \sstinvocation{
@@ -3996,7 +3996,7 @@ and Error Handling Section of this document.
          Name of the catalogue from which the data is required.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
@@ -4028,7 +4028,7 @@ and Error Handling Section of this document.
          Array to receive the data from logical fields.
       }
       \sstsubsection{
-         CHARVALS( CHI\_\_NUMFLDS ) = 
+         CHARVALS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
@@ -4124,7 +4124,7 @@ and Error Handling Section of this document.
          Set to 1 or 2 according to the level of checking you require.
       }
       \sstsubsection{
-         CHARVALS( CHI\_\_NUMFLDS ) = 
+         CHARVALS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
@@ -4159,10 +4159,10 @@ and Error Handling Section of this document.
    \sstdescription{
       Gets data from the next entry in a catalogue. Only get data from the
       fields given in FNAMES. The data is taken from the next entry in the
-      catalogue but see Notes if you are mixing different CHI\_GET and 
-      CHI\_EVAL calls. Data is returned in the appropriate element of the 
-      appropriate array. So if FNAMES(1) is the name of an integer field then 
-      FLDTYPES(1) will be {\tt '}I{\tt '} and the array INTVALS(1) will 
+      catalogue but see Notes if you are mixing different CHI\_GET and
+      CHI\_EVAL calls. Data is returned in the appropriate element of the
+      appropriate array. So if FNAMES(1) is the name of an integer field then
+      FLDTYPES(1) will be {\tt '}I{\tt '} and the array INTVALS(1) will
       contain the data from the field.
 
       There are two levels of checking which are selected using the argument
@@ -4236,7 +4236,7 @@ and Error Handling Section of this document.
          Array to receive the data from logical fields.
       }
       \sstsubsection{
-         CHARVALS( CHI\_\_NUMFLDS ) = 
+         CHARVALS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
@@ -4417,7 +4417,7 @@ and Error Handling Section of this document.
          Name of the new catalogue.
       }
       \sstsubsection{
-         MERGEFLDS( 3, NUMMFLDS ) = 
+         MERGEFLDS( 3, NUMMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
       }{ \\
@@ -4435,7 +4435,7 @@ and Error Handling Section of this document.
          value of FFORMAT.
       }
       \sstsubsection{
-         FFORMATS( NUMMFLDS ) = 
+         FFORMATS( NUMMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
       }{ \\
@@ -4628,28 +4628,28 @@ and Error Handling Section of this document.
          Number of parameters in the catalogue.
       }
       \sstsubsection{
-         PNAMES( CHI\_\_NUMPARS ) = 
+         PNAMES( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Given and Returned)}
       }{ \\
          Names of the parameters in the catalogue.
       }
       \sstsubsection{
-         PFORMATS( CHI\_\_NUMPARS ) = 
+         PFORMATS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given and Returned)}
       }{ \\
          Formats of the parameters in the catalogue.
       }
       \sstsubsection{
-         PVALUE( CHI\_\_NUMPARS ) = 
+         PVALUE( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPVAL ) (Given and Returned)}
       }{ \\
          Values of the parameters in the catalogue.
       }
       \sstsubsection{
-         PCOMMENTS( CHI\_\_NUMPARS ) = 
+         PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
       }{ \\
@@ -4661,14 +4661,14 @@ and Error Handling Section of this document.
          Number of fields in the catalogue.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
       \sstsubsection{
-         FFORMATS( CHI\_\_NUMFLDS ) = 
+         FFORMATS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
       }{ \\
@@ -4685,7 +4685,7 @@ and Error Handling Section of this document.
          Null values of the fields in the catalogue.
       }
       \sstsubsection{
-         FCOMMENTS( CHI\_\_NUMFLDS ) = 
+         FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
       }{ \\
@@ -4820,7 +4820,7 @@ and Error Handling Section of this document.
          Name of the catalogue into which the data is to be put.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)
       }{
@@ -4857,7 +4857,7 @@ and Error Handling Section of this document.
          Array containing the data for logical fields.
       }
       \sstsubsection{
-         CHARVALS( CHI\_\_NUMFLDS ) = 
+         CHARVALS( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
@@ -5174,7 +5174,7 @@ and Error Handling Section of this document.
          Name of the new catalogue containing only the selected fields.
       }
       \sstsubsection{
-         FNAMES( CHI\_\_NUMFLDS ) = 
+         FNAMES( CHI\_\_NUMFLDS ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
@@ -5265,7 +5265,7 @@ and Error Handling Section of this document.
          Name of the new sorted catalogue.
       }
       \sstsubsection{
-         SORTFLDS( CHI\_\_NUMFLDS, 3 ) = 
+         SORTFLDS( CHI\_\_NUMFLDS, 3 ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
       }{ \\
@@ -5312,7 +5312,7 @@ and Error Handling Section of this document.
          Name of the catalogue to be sorted.
       }
       \sstsubsection{
-         SORTFLDS( CHI\_\_NUMFLDS, 3 ) = 
+         SORTFLDS( CHI\_\_NUMFLDS, 3 ) =
       }{
          {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
@@ -5837,7 +5837,7 @@ which detects an error condition. If a program is to perform specific tests on
 these status values, then the CHI-supplied symbolic names described below
 should be used rather than explicit numerical values. These symbolic status
 names are prefixed with `CHI'. The appropriate symbol definitions are contained
-in the include files CHI\_ERR (for general CHI errors) and CHIPAR\_ERR (for 
+in the include files CHI\_ERR (for general CHI errors) and CHIPAR\_ERR (for
 CHI parser errors).
 The symbols defined in these two files are shown in the
 following table and described in more detail below.
@@ -5856,7 +5856,7 @@ following table and described in more detail below.
 {\bf CHI\_\_EOF} & End of file.\\
 {\bf CHI\_\_INDCAT} & Indexed catalogue.\\
 {\bf CHI\_\_INVLDFMT} & Invalid format.\\
-{\bf CHI\_\_CONVERR} &  Conversion error.\\ 
+{\bf CHI\_\_CONVERR} &  Conversion error.\\
 {\bf CHI\_\_IVLDFFMT} & Invalid field format.\\
 {\bf CHI\_\_IVLDPFMT} & Invalid parameter format.\\
 {\bf CHI\_\_IVLDSRCH} & Invalid search expression.\\
@@ -5871,7 +5871,7 @@ following table and described in more detail below.
 {\bf CHI\_\_NTSUP} & Option not supported.\\
 {\bf CHI\_\_IVOPR} & Invalid operator.\\
 {\bf CHI\_\_TOORX} & Too many relations in expression.\\
-{\bf CHI\_\_NOREL} & Too many relational sub-expressions.\\ 
+{\bf CHI\_\_NOREL} & Too many relational sub-expressions.\\
 {\bf CHI\_\_DECOD} & Operand decode error.\\
 {\bf CHI\_\_MISMA} & Mismatche quotes or parentheses.\\
 {\bf CHI\_\_IVFUN} & Invalid function.\\
@@ -5886,7 +5886,7 @@ Catalogue not found. The catalogue required was
 not found. Check spelling of catalogue name.
 \item [PAREXISTS:]
 Parameters already exists. The parameter that you
-are trying to add to this catalogue already exists. Delete the existing 
+are trying to add to this catalogue already exists. Delete the existing
 parameter using CHI\_DELP, or think of a new name.
 \item [IVLDFREQ:]
 Invalid value required. The value required must
@@ -5906,7 +5906,7 @@ CHI\_GETNUMENTS to find the number of entries that are required.
 \item [IVLDEXP:]
 Invalid expression. The expression was invalid.
 \item [IVLDFLDTYP:]
-Invalid field type. The field type must be one 
+Invalid field type. The field type must be one
 from I (integer), R (real), L (logical), D (double precision), C (character)
 \item [EOF:]
 End of file. You have tried to read off the end
@@ -5915,19 +5915,19 @@ of the catalogue. The number of entries can be found using CHI\_GETNUMENTS.
 Indexed catalogue. This error is a special case
 and is a hangover from ADC. The catalogue is indexed and so the entry can not
 be added. SCAR users can use CAR\_CONVERT to create a master binary catalogue,
-other users contact STADAT::ARW. This error should be eliminated in a 
+other users contact STADAT::ARW. This error should be eliminated in a
 subsequent release.
 \item [INVLDFMT:]
-Invalid format. An invalid format has been 
+Invalid format. An invalid format has been
 detected. If the format is of unusual sexagesimal type it may not be supported.
 \item [CONVERR:]
-Conversion error. An error occured when 
+Conversion error. An error occured when
 converting to or from a sexagesimal format
 \item [IVLDFFMT:]
-Invalid field format. The null value of the 
+Invalid field format. The null value of the
 field is inconsistent with the format.
 \item [IVLDPFMT:]
-Invalid parameter format. The value of the 
+Invalid parameter format. The value of the
 parameter is inconsistent with the format.
 \item [IVLDSRCH:]
 Invalid search expression for a turbosearch.
@@ -5937,8 +5937,8 @@ Invalid join expression for a turbojoin.
 Further diagnostics information is available.
 \end{description}
 
-And the possible CHI parser errors are 
- 
+And the possible CHI parser errors are
+
 \begin{description}
 \item [WSOFL:]
 Work stack overflow. Check expression.
@@ -5961,7 +5961,7 @@ Invalid operator. Check expression.
 \item [TOORX:]
 Too many relations in expression. Check expression.
 \item [NOREL:]
-Too many relational sub-expressions. Check 
+Too many relational sub-expressions. Check
 expression.
 \item [DECOD:]
 Operand decode error. Check expression.
@@ -5975,36 +5975,36 @@ Invalid function. Check expression.
 \section {Examples}
 \label{appendix:examples}
 No explicit examples of catalogue handling applications are included in this
-document. All the CATPAC applications can be considered as examples of using 
-the CHI and CHP routines. The CATPAC applications source files can be found in 
+document. All the CATPAC applications can be considered as examples of using
+the CHI and CHP routines. The CATPAC applications source files can be found in
 the library CATPAC\_DIR:CATPAC.TLB.
 
-Applications can be classified according to their function. There are five 
+Applications can be classified according to their function. There are five
 common types of application.
 
 \begin{description}
 \item[\mbox{}]\mbox{}
 \begin{enumerate}
 
-\item 
+\item
 Applications that read entries from one catalogue and write selected,
-unchanged, entries to a new catalogue. SAMPLE is an example of this type of 
+unchanged, entries to a new catalogue. SAMPLE is an example of this type of
 application.
 
-\item 
+\item
 Applications that reads entries from one catalogue, perform
 some analysis and write updated or extended entries to a new catalogue.
 The new catalogue may contain fewer or more fields than the original catalogue.
 FK425 for example.
 
-\item 
+\item
 Applications that obtain information about a catalogue. ENTRIES for example.
 
-\item 
+\item
 Applications that update information about a catalogue. ADDPARAM for example.
 
-\item 
-Applications that read data from a catalogue and performs some analysis on 
+\item
+Applications that read data from a catalogue and performs some analysis on
 that data. CORRELATE for example.
 
 \end{enumerate}
@@ -6014,15 +6014,15 @@ that data. CORRELATE for example.
 \newpage
 \section {Background and Design Philosophy of CHI and CHP}
 
-It is not necessary for the reader to appreciate why CHI was developed or 
+It is not necessary for the reader to appreciate why CHI was developed or
 how it works but it may be of interest. STARLINK's existing database
 system SCAR is based on an underlying system called ADC. Unfortunately ADC
-is very poorly documented and in the past has been found to contain a great 
+is very poorly documented and in the past has been found to contain a great
 number of bugs. It also includes a large number of common variables as well
-as a large number of routines. These difficulties have lead to the situation 
-where very few people 
-were able or willing to develop new applications using ADC. 
-A replacement for ADC was clearly required. The requirements for 
+as a large number of routines. These difficulties have lead to the situation
+where very few people
+were able or willing to develop new applications using ADC.
+A replacement for ADC was clearly required. The requirements for
 CHI are
 \begin{itemize}
 
@@ -6037,23 +6037,23 @@ data?
 \item There should be no special cases. ADC includes cases such as `If the
 function is GREAT\_\-CIRCLE then expect the constant to be ARCSECONDS.'
 
-\item It should be independent of the underlying database system. Making the 
-interface independent of the underlying database means that the underlying 
+\item It should be independent of the underlying database system. Making the
+interface independent of the underlying database means that the underlying
 system or systems can be changed without affecting the applications. This
 provides a migration path from the discredited ADC to other more powerful
 systems and, importantly, to future systems that are not yet available.
 
-\item It should be able to deal automatically with several underlying 
+\item It should be able to deal automatically with several underlying
 database systems presenting them as if they were a single system. The user
-is unaware of where the data is actually stored. The data may not even be 
-available locally but may be made available via network access to remote 
+is unaware of where the data is actually stored. The data may not even be
+available locally but may be made available via network access to remote
 database systems. (We expect that most catalogue handling will be done
-locally on the prefered underlying database system where it can be done most 
+locally on the prefered underlying database system where it can be done most
 efficiently.)
 
 \item It should be portable.
 
-\item CHI (and CHP) routines should be efficient. Any powerful features 
+\item CHI (and CHP) routines should be efficient. Any powerful features
 available on any of the underlying systems should be fully exploited.
 A discussion of how the CHI and CHP routines should achieve maximum efficiency
 is outside the scope of this document but the performance of any application
@@ -6066,12 +6066,12 @@ directly using the underlying database.
 
 \section{CHI and SQL}
 
-SQL or the Structured Query Language is widely accepted ANSI/ISO standard 
+SQL or the Structured Query Language is widely accepted ANSI/ISO standard
 relational database language. Almost all the major commercial relational
-database suppliers support SQL. At the present time the only available 
-underlying system supporting CHI is ADC but work is already progressing 
-to implement CHI on an SQL based system. When this is completed any database 
-that supports SQL will also support CHI and CHP and all the applications built 
+database suppliers support SQL. At the present time the only available
+underlying system supporting CHI is ADC but work is already progressing
+to implement CHI on an SQL based system. When this is completed any database
+that supports SQL will also support CHI and CHP and all the applications built
 using CHI and CHP.
 
 \end{document}

@@ -1,6 +1,6 @@
-      SUBROUTINE TRACA9( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT, 
-     :                   NDISP, OFFSET, DTINDX, SCALE, XLMT, 
-     :                   YLMT, IDC, PDET, PVAL, PSCN, PSKY, COORDS, 
+      SUBROUTINE TRACA9( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT,
+     :                   NDISP, OFFSET, DTINDX, SCALE, XLMT,
+     :                   YLMT, IDC, PDET, PVAL, PSCN, PSKY, COORDS,
      :                   UNITS, FID, CURSOR, CLRBLK, LOG, STATUS )
 *+
 *  Name:
@@ -13,9 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACA9( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT, 
-*                  NDISP, OFFSET, DTINDX, SCALE, XLMT, YLMT, 
-*                  IDC, PDET, PVAL, PSCN, PSKY, COORD, UNITS, FID, 
+*     CALL TRACA9( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT,
+*                  NDISP, OFFSET, DTINDX, SCALE, XLMT, YLMT,
+*                  IDC, PDET, PVAL, PSCN, PSKY, COORD, UNITS, FID,
 *                  CURSOR, CLRBLK, STATUS )
 
 *  Description:
@@ -43,7 +43,7 @@
 *     BDET = INTEGER (Given)
 *        Begin index of the detector of the input CRDD data array.
 *     EDET = INTEGER (Given)
-*        End index of the detector of the input CRDD data array.  
+*        End index of the detector of the input CRDD data array.
 *     INSCN( BSMP : ESMP, BDET : EDET ) = REAL (Given)
 *        The in-scan distance of each sample of each CRDD data trace.
 *     XSCN( BDET : EDET ) = REAL (Given)
@@ -107,7 +107,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,12 +132,12 @@
       REAL XLMT( 2 )
       REAL YLMT( 2 )
       INTEGER IDC
-      CHARACTER PDET*(*) 
-      CHARACTER PVAL*(*) 
-      CHARACTER PSCN*(*) 
-      CHARACTER PSKY*(*) 
-      CHARACTER COORDS*(*) 
-      CHARACTER UNITS*(*) 
+      CHARACTER PDET*(*)
+      CHARACTER PVAL*(*)
+      CHARACTER PSCN*(*)
+      CHARACTER PSKY*(*)
+      CHARACTER COORDS*(*)
+      CHARACTER UNITS*(*)
       INTEGER FID
       LOGICAL CURSOR
       LOGICAL CLRBLK
@@ -243,8 +243,8 @@
       CALL SGS_SHTX( TEXTHT )
       CALL SGS_SARTX( ASPCT )
       CALL SGS_STXJ( 'BC' )
-      CALL SGS_TX( 0.5, -0.17, 'Position cursor and press any key' ) 
-      CALL SGS_TX( 0.5, -0.17 - 1.5 * TEXTHT, 
+      CALL SGS_TX( 0.5, -0.17, 'Position cursor and press any key' )
+      CALL SGS_TX( 0.5, -0.17 - 1.5 * TEXTHT,
      :             '(Position cursor outside the data area to quit)' )
 
 *  Write the title of the output items.
@@ -270,20 +270,20 @@
 
 *  Flush out the messages.
       CALL SGS_FLUSH
-      
+
 *  Get the used length of UNITS and COORDS for writing log file
       UNTLN = CHR_LEN( UNITS )
       CODSLN = CHR_LEN( COORDS )
-  
+
 *  Enable the cursor.
       CALL SGS_CUVIS( .TRUE. )
 
 *  Initially put the cursor at the centre of the grid window
       UX = 0.5 * ( XLMT( 1 ) + XLMT( 2 ) )
       UY = 0.5 * ( YLMT( 1 ) + YLMT( 2 ) )
-            
+
 *  Enter a loop to get cursor position until cursor is outside grid
-*  window. 
+*  window.
       EXIT = .FALSE.
       DO WHILE( .NOT.EXIT .AND. STATUS .EQ. SAI__OK )
 
@@ -298,16 +298,16 @@
 *  Otherwise, find the trace index and sample index which is cloest to
 *  the cursor.
          ELSE
-            CALL TRACB3( BSMP, ESMP, BDET, EDET, INSCN, DETDAT, 
+            CALL TRACB3( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
      :                   NDISP, OFFSET, DTINDX, SCALE, IDC,
-     :                   UX, UY, NERTRC, NERSMP, FOUND, STATUS ) 
+     :                   UX, UY, NERTRC, NERSMP, FOUND, STATUS )
 
-*  If the trace and sample are found, get the detector number of the 
+*  If the trace and sample are found, get the detector number of the
 *  trace and the scaled data value of the sample.
             IF ( FOUND ) THEN
                DETNO = IRC_DETNO( IDC, DTINDX( NERTRC ), STATUS )
                VALUE = SCALE( NERTRC ) *
-     :                 DETDAT( NERSMP, DTINDX( NERTRC ) ) 
+     :                 DETDAT( NERSMP, DTINDX( NERTRC ) )
 
 *  Encoding them into character strings.
                CALL CHR_ITOC( DETNO, DTST( 2 : ), DTSTLN )
@@ -315,26 +315,26 @@
                DTST( 1 : 1 ) = '#'
                DTSTLN = DTSTLN + 1
 
-*  Encode the sample number and NDF row number into character 
+*  Encode the sample number and NDF row number into character
 *  strings.
                CALL CHR_ITOC( NERSMP, SAMPST, SAMPLN )
                CALL CHR_ITOC( DTINDX( NERTRC ), NDFRST, NDFRLN )
 
 *  Get the in-scan and cross-scan distances of the sample.
                SCAN( 1 ) = INSCN( NERSMP, DTINDX( NERTRC ) )
-               SCAN( 2 ) = XSCN( DTINDX( NERTRC ) )     
+               SCAN( 2 ) = XSCN( DTINDX( NERTRC ) )
 
 *  Encoding them into character strings.
                CALL CHR_RTOC( SCAN( 1 ), INST, INSTLN )
                CALL CHR_RTOC( SCAN( 2 ), XST, XSTLN )
 
 *  Get the sky coordinate ( B1950 FK4 ) of the sample.
-               CALL IRC_DPOS( IDC, 1, REAL( NERSMP ), 
-     :                        DTINDX( NERTRC ), SMPRA, SMPDEC, ANGLE, 
+               CALL IRC_DPOS( IDC, 1, REAL( NERSMP ),
+     :                        DTINDX( NERTRC ), SMPRA, SMPDEC, ANGLE,
      :                        SPEED, STATUS )
 
 *  Convert it to specified sky coordinate.
-               CALL IRA_CONVT( 1, SMPRA, SMPDEC, 'EQUATORIAL(1950)', 
+               CALL IRA_CONVT( 1, SMPRA, SMPDEC, 'EQUATORIAL(1950)',
      :                         COORDS, IRA__IRJEP, XOUT, YOUT,  STATUS )
                SKY( 1 ) = XOUT
                SKY( 2 ) = YOUT
@@ -351,7 +351,7 @@
 *  Clear the region on the graphic device to write the new obtained
 *  data.
                IF ( CLRBLK ) THEN
-                  CALL SGS_CLRBL( -0.23, 0.1, YDET + TEXTHT, 
+                  CALL SGS_CLRBL( -0.23, 0.1, YDET + TEXTHT,
      :                            YSCO - 4.0 * TEXTHT )
                   CALL SGS_CLRBL( -0.23, -0.1, YSAMP + TEXTHT,
      :                            YROW - TEXTHT )
@@ -377,15 +377,15 @@
      :                           'Sample number   : '//SAMPST, STATUS )
                   CALL FIO_WRITE( FID,
      :                           'NDF row number  : '//NDFRST, STATUS )
-                  CALL FIO_WRITE( FID, 
+                  CALL FIO_WRITE( FID,
      :                           'Detector number : '//DTST, STATUS )
-      
+
                   DVST = 'Data value      : '//VLST( : VLSTLN )//' ('/
      :                    /UNITS( : UNTLN )//')'
                   DVSTLN = MIN( 80, CHR_LEN( DVST ) )
                   CALL FIO_WRITE( FID, DVST( : DVSTLN ), STATUS )
 
-                  CALL FIO_WRITE( FID, 
+                  CALL FIO_WRITE( FID,
      :                           'In-scan distance: '/
      :                           /INST( : INSTLN )//' (arc-minutes)',
      :                            STATUS )
@@ -394,7 +394,7 @@
      :                           'X-scan distance : '/
      :                           /XST( : XSTLN )//' (arc-minutes)',
      :                            STATUS )
-      
+
                   SPST = 'Sky position    : '//XSKY( : XSKYLN )//' ('/
      :                   /COORDS( : CODSLN )//')'
                   SPSTLN = MIN( 80, CHR_LEN( SPST ) )
@@ -417,7 +417,7 @@
                IF ( .NOT.CLRBLK ) EXIT = .TRUE.
             END IF
          END IF
-       
+
 *  Go back to get more data values until cursor is outside the grid
 *  window.
       END DO

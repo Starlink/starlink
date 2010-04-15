@@ -1,4 +1,4 @@
-1 COCO - Celestial Coordinate Conversion utility 
+1 COCO - Celestial Coordinate Conversion utility
                                                          Expires: 96.**.**
  Version 2.2-5
 
@@ -10,7 +10,7 @@
  The COCO v2.2-4 release provides a hypertext version of the document
  (SUN/56), which may be viewed using `showme sun56' or `findme coco'.
  The makefile and mk script have been updated to the latest specification.
- 
+
  Version 2.2-3
 
  Release 2.2-3 corrects a minor formatting error (an extraneous
@@ -35,4 +35,4 @@
  The above improvements were made at the suggestion of, respectively,
  Phil Hill (St Andrews) and L.V.Morrison (RGO).  The answers which COCO
  returns have not been affected by the changes.
- 
+

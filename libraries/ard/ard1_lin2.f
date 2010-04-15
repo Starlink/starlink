@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ,
-     :                      NPAR, PAR, NLP, IWCS, B, LBEXTB, UBEXTB, 
+     :                      NPAR, PAR, NLP, IWCS, B, LBEXTB, UBEXTB,
      :                      LBINTB, UBINTB, WORK, STATUS )
 *+
 *  Name:
@@ -13,14 +13,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ, NPAR, PAR, 
-*                     NLP, IWCS, B, LBEXTB, UBEXTB, LBINTB, UBINTB, WORK, 
+*     CALL ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ, NPAR, PAR,
+*                     NLP, IWCS, B, LBEXTB, UBEXTB, LBINTB, UBINTB, WORK,
 *                     STATUS )
 
 *  Description:
 *     Interior values are assigned to the points specified by the
 *     supplied parameters. The supplied parameters are the pixel
-*     co-ordinates of the two end points of the line. 
+*     co-ordinates of the two end points of the line.
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -38,12 +38,12 @@
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        A list of pixel co-ordinates, in groups of NDIM. 
+*        A list of pixel co-ordinates, in groups of NDIM.
 *     NLP = INTEGER (Given)
 *        The number of points along the line to be transformed.
 *     IWCS = INTEGER (Given)
-*        An identifer for an AST FrameSet. The Base Frame should be 
-*        PIXEL coordinates within the B array. The Current Frame should 
+*        An identifer for an AST FrameSet. The Base Frame should be
+*        PIXEL coordinates within the B array. The Current Frame should
 *        be user coordinates.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
@@ -63,7 +63,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     WORK( NLP, * ) = DOUBLE PRECISION (Given and Returned)
 *        Work array. The size of the second axis should be the maximum of
 *        NDIM and NWCS.
@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -144,14 +144,14 @@
       INTEGER
      :        I,                 ! Position index
      :        J,                 ! Axis index
-     :        MAP,               ! AST identifier for user->pixel Mapping     
+     :        MAP,               ! AST identifier for user->pixel Mapping
      :        NPREQ              ! No of axis value to define a line
 
       DOUBLE PRECISION
      :        DELTA( ARD__MXDIM ),! Steps on all axes between points
      :        PC( 2*ARD__MXDIM )  ! Pixel coords at line ends
 
-      LOGICAL 
+      LOGICAL
      :        GOOD,              ! Is this position good?
      :        LGOOD              ! Was the previous position good?
 
@@ -196,7 +196,7 @@
       CALL AST_TRANN( MAP, NLP, NWCS, NLP, WORK, .TRUE., NDIM, NLP,
      :                WORK, STATUS )
 
-*  Initialise the interior bounding box. At the same time, store the first 
+*  Initialise the interior bounding box. At the same time, store the first
 *  position at the upper end of the PC array, and see if it is good.
       GOOD = .TRUE.
       DO J = 1, NDIM
@@ -204,7 +204,7 @@
          UBINTB( J ) = VAL__MINI
          IF( WORK( 1, J ) .EQ. AST__BAD ) THEN
             GOOD = .FALSE.
-         ELSE 
+         ELSE
             PC( NDIM + J ) = WORK( 1, J )
          END IF
       END DO
@@ -223,7 +223,7 @@
 
             IF( WORK( I, J ) .EQ. AST__BAD ) THEN
                GOOD = .FALSE.
-            ELSE 
+            ELSE
                PC( NDIM + J ) = WORK( I, J )
             END IF
 

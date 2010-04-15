@@ -1,5 +1,5 @@
-      SUBROUTINE TASK_GET_CURRINFO ( SEQ, VALUE, DELAY, REQUEST, 
-     :  STATUS ) 
+      SUBROUTINE TASK_GET_CURRINFO ( SEQ, VALUE, DELAY, REQUEST,
+     :  STATUS )
 *+
 *  Name:
 *     TASK_GET_CURRINFO
@@ -18,7 +18,7 @@
 
 *  Description:
 *     Gets details of the current action that may have been set as a result
-*     of user calls in ACT. This simply involves copying information 
+*     of user calls in ACT. This simply involves copying information
 *     from COMMON variables.
 
 *  Arguments:

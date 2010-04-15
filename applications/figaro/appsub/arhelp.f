@@ -20,7 +20,7 @@ C                      help, thus disuse PAR_Q*. Disuse GKD_CLEAR_ALPHA.
 C+
       IMPLICIT NONE
 C
-C     Clear screen 
+C     Clear screen
 C
       CALL PGADVANCE
 C

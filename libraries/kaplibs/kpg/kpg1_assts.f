@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASSTS( SETTNG, REPORT, OVER, IPLOT, BADAT, 
+      SUBROUTINE KPG1_ASSTS( SETTNG, REPORT, OVER, IPLOT, BADAT,
      :                       STATUS )
 *+
 *  Name:
@@ -37,7 +37,7 @@
 *     OVER = LOGICAL (Given)
 *        Over-write existing attribute values in the Plot?
 *     IPLOT = INTEGER (Given)
-*        An AST pointer to the Plot to be modified. 
+*        An AST pointer to the Plot to be modified.
 *     BADAT = LOGICAL (Returned)
 *        Was the setting string invalid? If so, an appropriate error
 *        message will have been reported (unless REPORT is .FALSE.).
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'AST_ERR'          ! AST error constants 
+      INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
       CHARACTER SETTNG*(*)
@@ -121,13 +121,13 @@
 *  Initialise.
       BADAT = .FALSE.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Return if the setting is blank.
       IF( SETTNG .NE. ' ' ) THEN
 
-*  Extract the attribute name and value, replacing any synonyms 
+*  Extract the attribute name and value, replacing any synonyms
 *  or any colour names.
          CALL KPG1_ASSTY( SETTNG, NAME, VALUE, STATUS )
 
@@ -147,7 +147,7 @@
 *  For any other value attempt to extract a colour index. Colour names
 *  will have been converted to colour indices by KPG1_ASSTY.
             ELSE
-               ISTAT = STATUS 
+               ISTAT = STATUS
                CALL CHR_CTOI( VALUE, IVAL, ISTAT )
 
 *  If a valid integer value was supplied, set it as the colour index.
@@ -162,7 +162,7 @@
          ELSE IF( CHR_SIMLR( NAME, 'DRAWDSB' ) ) THEN
 
 *  Zero means no, any other integer means yes.
-            ISTAT = STATUS 
+            ISTAT = STATUS
             CALL CHR_CTOI( VALUE, IVAL, ISTAT )
             IF( ISTAT .EQ. SAI__OK ) THEN
                CALL KPG1_SETASTDSB( IVAL .NE. 0 )
@@ -173,7 +173,7 @@
          ELSE IF( CHR_SIMLR( NAME, 'FileInTitle' ) ) THEN
 
 *  Zero means no, any other integer means yes.
-            ISTAT = STATUS 
+            ISTAT = STATUS
             CALL CHR_CTOI( VALUE, IVAL, ISTAT )
             IF( ISTAT .EQ. SAI__OK ) THEN
                CALL KPG1_SETASTFIT( IVAL .NE. 0 )
@@ -183,16 +183,16 @@
 *  genuine AST attribute.
          ELSE
 
-*  Set the attribute in the Plot. If required, check that the attribute 
+*  Set the attribute in the Plot. If required, check that the attribute
 *  is not already set in the Plot.
             IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME, STATUS ) ) THEN
-               CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ), 
+               CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ),
      :                        VALUE( : CHR_LEN( VALUE ) ), STATUS )
             END IF
 
          END IF
 
-*  If AST_SETC or AST_TESTC returned an error indicating that the setting 
+*  If AST_SETC or AST_TESTC returned an error indicating that the setting
 *  string was invalid, return a flag to indicate this.
          BADAT = ( STATUS .EQ. AST__BADAT .OR.
      :             STATUS .EQ. AST__ATSER .OR.
@@ -201,7 +201,7 @@
      :             STATUS .EQ. AST__OPT .OR.
      :             STATUS .EQ. AST__NOWRT )
 
-*  If no report is wanted, annul "bad attribute" error. 
+*  If no report is wanted, annul "bad attribute" error.
          IF( .NOT. REPORT .AND. BADAT ) CALL ERR_ANNUL( STATUS )
 
       END IF

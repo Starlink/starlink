@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -232,12 +232,12 @@
 *  Obtain the current parameter in double precision.
             CALL FTGGPD( FUNIT, GROUP, I, 1, GPARAM, FSTAT )
 
-*  Abort if something went wrong, but write the 
+*  Abort if something went wrong, but write the
             IF ( FSTAT .NE. FITSOK ) THEN
                CALL MSG_SETI( 'PC', PCOUNT )
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETC( 'FILE', FILE( :NCF ) )
-      
+
                CALL COF_FIOER( FSTAT, 'COF_WFEXT_GHEAD', 'FTGGPD',
      :           'Error obtaining a random-group parameter (^I of '/
      :           /'^PC) from FITS file ^FILE.', STATUS )

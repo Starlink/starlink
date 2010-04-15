@@ -1,27 +1,27 @@
 //  This file is part of moggy.
-//  
+//
 //  Copyright 2001, Council for the Central Laboratory of the Research Councils
-//  
+//
 //  This program is part of the Starlink Software Distribution: see
-//  http://www.starlink.ac.uk 
-//  
+//  http://www.starlink.ac.uk
+//
 //  moggy is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  moggy is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with moggy; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//  
+//
 //  The General Public License is distributed along with this
 //  program in the file LICENCE.
-//  
+//
 //  Author: Norman Gray <norman@astro.gla.ac.uk>
 //  $Id$
 
@@ -83,7 +83,7 @@ CommandParse::CommandParse (string cmd)
 	Util::logstream() << "CommandParse::CommandParse: args_.size()="
 	     << args_.size() << ':' << endl;
 	for (vector<string>::const_iterator p = args_.begin();
-	     p != args_.end(); 
+	     p != args_.end();
 	     p++)
 	{
 	    Util::logstream() << "    " << i << ':' << *p << endl;
@@ -130,7 +130,7 @@ CommandParse::CommandParse (string cmd)
     {
 	int i=0;
 	for (vector<string>::const_iterator p = args_.begin();
-	     p != args_.end(); 
+	     p != args_.end();
 	     p++)
 	{
 	    Util::logstream() << "Arg ["<<i<<"]=["<<*p<<"]"<<endl;

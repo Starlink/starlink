@@ -104,8 +104,8 @@ CD    PRINT *, '                    dxlim,  dylim  = ',
 CD   &                      abs(xlim(2)-xlim(1)), abs(ylim(2)-ylim(1))
 CD    PRINT *, 'Axis lengths reset: axlenx, axleny = ', axlenx, axleny
 CD    CALL SXGTTGRAPH
-      
-      CHANGE_PLOT = .TRUE. 
+
+      CHANGE_PLOT = .TRUE.
 
       RETURN
       END

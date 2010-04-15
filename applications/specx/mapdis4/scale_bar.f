@@ -91,7 +91,7 @@
         CALL SXGTICKSIZE (2., 2., 0., 0.)
         CALL SXGEXPAND   (2./MAX(2, NY))
         CALL SXGBOX      (0, 2)
-        CALL SXGGREY     (SCALE, 2, 256, 0., 1., 
+        CALL SXGGREY     (SCALE, 2, 256, 0., 1.,
      &                    GREYLIMS(1), GREYLIMS(2), GREYLIMS)
         CALL SXGEXPAND   (0.)
         CALL SXGBOX      (0, 0)

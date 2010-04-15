@@ -406,12 +406,12 @@ int Contour::drawContours()
       switch ( type ) {
          case BYTE_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImageNDF( (unsigned char *) image, nx, ny, 
-                                       lplot, cval, xlower, ylower, 
+               ndrawn = scanSwapImageNDF( (unsigned char *) image, nx, ny,
+                                       lplot, cval, xlower, ylower,
                                        xsize, ysize, done );
             } else {
-               ndrawn = scanNativeImageNDF( (unsigned char *) image, nx, ny, 
-                                         lplot, cval, xlower, ylower, 
+               ndrawn = scanNativeImageNDF( (unsigned char *) image, nx, ny,
+                                         lplot, cval, xlower, ylower,
                                          xsize, ysize, done );
             }
             break;
@@ -419,33 +419,33 @@ int Contour::drawContours()
             if ( swap_ ) {
                ndrawn = scanSwapImageNDF( (char *) image, nx, ny,
                                        lplot, cval, xlower, ylower, xsize,
-                                       ysize, done ); 
+                                       ysize, done );
             } else {
                ndrawn = scanNativeImageNDF( (char *) image, nx, ny,
                                          lplot, cval, xlower, ylower, xsize,
-                                         ysize, done ); 
+                                         ysize, done );
             }
             break;
          case USHORT_IMAGE:
             if ( swap_ ) {
                ndrawn = scanSwapImageNDF( (ushort *) image, nx, ny,
                                        lplot, cval, xlower, ylower,
-                                       xsize, ysize, done ); 
+                                       xsize, ysize, done );
             } else {
                ndrawn = scanNativeImageNDF( (ushort *) image, nx, ny,
                                          lplot, cval, xlower, ylower,
-                                         xsize, ysize, done ); 
+                                         xsize, ysize, done );
             }
             break;
          case SHORT_IMAGE:
             if ( swap_ ) {
                ndrawn = scanSwapImageNDF( (short *) image, nx, ny, lplot,
                                        cval, xlower, ylower, xsize,
-                                       ysize, done ); 
+                                       ysize, done );
             } else {
                ndrawn = scanNativeImageNDF( (short *) image, nx, ny, lplot,
                                          cval, xlower, ylower, xsize,
-                                         ysize, done ); 
+                                         ysize, done );
             }
             break;
          case LONG_IMAGE:
@@ -462,45 +462,45 @@ int Contour::drawContours()
          case FLOAT_IMAGE:
              if ( isfits_ ) {
                  if ( swap_ ) {
-                     ndrawn = scanSwapImageFITS( (float *) image, nx, ny, 
-                                                 lplot, cval, xlower, ylower, 
-                                                 xsize, ysize, done ); 
+                     ndrawn = scanSwapImageFITS( (float *) image, nx, ny,
+                                                 lplot, cval, xlower, ylower,
+                                                 xsize, ysize, done );
                  } else {
-                     ndrawn = scanNativeImageFITS( (float *) image, nx, ny, 
-                                                   lplot, cval, xlower, 
+                     ndrawn = scanNativeImageFITS( (float *) image, nx, ny,
+                                                   lplot, cval, xlower,
                                                    ylower, xsize,
-                                                   ysize, done ); 
+                                                   ysize, done );
                  }
             }
             else if ( swap_ ) {
                 ndrawn = scanSwapImageNDF( (float *) image, nx, ny, lplot,
                                            cval, xlower, ylower, xsize,
-                                           ysize, done ); 
+                                           ysize, done );
             } else {
                 ndrawn = scanNativeImageNDF( (float *) image, nx, ny, lplot,
                                              cval, xlower, ylower, xsize,
-                                             ysize, done ); 
+                                             ysize, done );
             }
             break;
          case DOUBLE_IMAGE:
             if ( isfits_ ) {
                 if ( swap_ ) {
-                    ndrawn = scanSwapImageFITS( (double *) image, nx, ny, 
-                                                lplot, cval, xlower, ylower, 
-                                                xsize, ysize, done ); 
+                    ndrawn = scanSwapImageFITS( (double *) image, nx, ny,
+                                                lplot, cval, xlower, ylower,
+                                                xsize, ysize, done );
                 } else {
-                    ndrawn = scanNativeImageFITS( (double *) image, nx, ny, 
+                    ndrawn = scanNativeImageFITS( (double *) image, nx, ny,
                                                   lplot, cval, xlower, ylower,
-                                                  xsize, ysize, done ); 
+                                                  xsize, ysize, done );
                 }
             } else if ( swap_ ) {
                 ndrawn = scanSwapImageNDF( (double *) image, nx, ny, lplot,
                                            cval, xlower, ylower, xsize,
-                                           ysize, done ); 
+                                           ysize, done );
             } else {
                 ndrawn = scanNativeImageNDF( (double *) image, nx, ny, lplot,
                                              cval, xlower, ylower, xsize,
-                                             ysize, done ); 
+                                             ysize, done );
             }
             break;
          default:
@@ -520,7 +520,7 @@ int Contour::drawContours()
 
    //  Free the workspace.
    delete [] done;
-   
+
    //  Return number of points drawn.
    return totaldrawn;
 }
@@ -533,17 +533,17 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
 {
    if ( careful_ ) {
       //  Carefully draw geodesics.
-      
+
       //  Copy each point into a correctly formatted buffer.
       double xydata[2][MAXPTS];
       for ( int i = 0; i < npts; i++ ) {
          xydata[0][i] = x[i];
          xydata[1][i] = y[i];
       }
-      
+
       //  Draw the geodesic.
       astPolyCurve( plot, npts, 2, MAXPTS, (const double *) xydata );
-   } 
+   }
    else {
       //  Draw straight-lines (graphics surface wise) at the resolution
       //  of the contoured image for speed. Note that line attributes
@@ -552,7 +552,7 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
       //  First transform positions to graphics coordinates.
       double xgraph[MAXPTS], ygraph[MAXPTS];
       astTran2( plot, npts, x, y, 0, xgraph, ygraph );
-      
+
       //  Now go positions breaking for BAD values.
       float xfloat[MAXPTS], yfloat[MAXPTS];
       int igood = 0;
@@ -561,11 +561,11 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
             xfloat[igood] = (float) xgraph[i];
             yfloat[igood] = (float) ygraph[i];
             igood++;
-            
+
             //  Skip to next position.
             continue;
          }
-         
+
          //  BAD point, so plot what we have and break line.
          if ( igood > 0 ) {
             astGLine( igood, xfloat, yfloat );

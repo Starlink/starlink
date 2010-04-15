@@ -32,7 +32,7 @@ proc GetDirCat { } {
 #   6/10/94  (ACD): Original version.
 #   10/5/95  (ACD): Added handling of HST GSC FITS tables, which have
 #      file type '.gsc' or '.GSC'.
-#   27/2/96  (ACD): Modified to handle file types '.FITS' and '.fits' 
+#   27/2/96  (ACD): Modified to handle file types '.FITS' and '.fits'
 #      for FITS tables.
 #   30/7/96  (ACD): Added types '.TXT' and '.txt' for small text lists.
 #   11/11/97 (ACD): Added sorting of the lists of catalogues and

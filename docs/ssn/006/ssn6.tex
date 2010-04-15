@@ -43,11 +43,11 @@ RUTHERFORD APPLETON LABORATORY\\
 
 Starlink uses a variety of 1600/6250 bpi tape drives at its various sites.
 These include the SI 9621, the CDC Keystone 3, the Cipher M990 and one or two
-other drives. 
+other drives.
 Starlink currently has Cipher M990 tape drives at Manchester, Leicester, ROE,
 Cambridge, Birmingham, Armagh, Belfast, Oxford, UCL, Southampton, St. Andrews,
 Sussex, Cardiff and QMW. The majority of these are controlled by Dilog DQ153
-and DQ3153 controllers. Managers as 
+and DQ3153 controllers. Managers as
 sites which do not have one of these controllers and who
 are unhappy with the functionality of their present controller should contact
 the author.
@@ -58,9 +58,9 @@ engineers and some simple tuning may improve performance dramatically.
 Any corrections, improvements or suggestions for this document will be most
 gratefully received by the author. This document does not attempt to explain
 to users how to use the drive since this is almost impossible to do this
-without complex diagrams and it is far more effective for a Site Manager to 
-actually demonstrate the procedures to new users. 
-              
+without complex diagrams and it is far more effective for a Site Manager to
+actually demonstrate the procedures to new users.
+
 
 \section{Loading and Unloading tapes}
 
@@ -72,7 +72,7 @@ how to use the Cipher.
 To load a tape you simply insert the tape into the drive and onto the hub,
 close the door and press the load button and then the on-line button.  However,
 it is worth noting that you can increase the chance of the drive successfully
-loading your tape first time and more quickly by leaving about 30cm of tape 
+loading your tape first time and more quickly by leaving about 30cm of tape
 hanging out of the drive when you close the door. This is known  as the
 Dragon's tongue method of loading a tape, since as the tape starts to  rotate
 the ``tongue'' of tape flicks around as it is pulled into the  interior of the
@@ -85,10 +85,10 @@ tape path.
 \subsection {Manually loading a tape}
 
 In cases of dire emergency, it is also possible to load a tape manually but
-this is generally not recommended since there is potential to damage both the 
+this is generally not recommended since there is potential to damage both the
 user and the drive. In addition, it is very time consuming. The first time the
 author tried this, it took him over 10 minutes to succeed in loading a tape
-manually. The difficult parts are getting the feet to lock onto the tape 
+manually. The difficult parts are getting the feet to lock onto the tape
 reel properly and
 ensuring that the correct amount of tape is wound onto the rear hub.
 
@@ -107,12 +107,12 @@ front-panel door on the bottom left-hand side of the tape reel opening,
 while simultaneously rotating the front hub clockwise until the front hub is locked
 in place.
 
-\item Manually thread the tape leader around the tape guides. {\bf Take care} 
+\item Manually thread the tape leader around the tape guides. {\bf Take care}
 when moving the spring-loaded tachometer (the arm with the rubber wheel which
 rests against the rear hub) towards the rear hub. {\bf Do not} let the
 tachometer strike sharply against the hub.
 
-\item Move the tachometer away from the rear hub and thread the tape 
+\item Move the tachometer away from the rear hub and thread the tape
 leader around the hub in a clockwise direction. Gently rest the tachometer on
 the rear hub.
 {\bf Never} to try to operate the
@@ -132,7 +132,7 @@ tape. Very spectacular, but not recommended.
 \item Release both switches, stand well back and wait for the tape to load.
 There is some degree of danger at this stage since there
 is nothing to protect you against the tape end as it whips around.
-                                                                     
+
 
 \end{enumerate}
 
@@ -146,8 +146,8 @@ will damage the feet and render the drive useless. The correct procedure to
 release the tape is to open the door, press and hold in the white button below
 and left of the tape and then slowly rotate the tape anti-clockwise. The feet will retract into
 the body of the hub and you will be able to remove the tape without damaging
-the drive. The last part of the rotation before the feet retract requires a 
-{\bf slight} amount of additional force. 
+the drive. The last part of the rotation before the feet retract requires a
+{\bf slight} amount of additional force.
 
 
 \section{Configuring your Cipher M990 for efficient operation}
@@ -158,18 +158,18 @@ adjusted using diagnostic test 142 (Edit NOVRAM).
 
 \subsection{Using test 142}
 
-Take the drive off-line and unload tape (if any). 
+Take the drive off-line and unload tape (if any).
 
 The front panel of the drive appears as follows
 
 \begin{verbatim}
        load       unload      online      wrt test    density
       -------     -------     -------     -------     -------
-         1           2           3           4           5 
+         1           2           3           4           5
       -------     -------     -------     -------     -------
 \end{verbatim}
 
-Key in 451425 and the display will display the current value of the serial 
+Key in 451425 and the display will display the current value of the serial
 port baud rate parameter (Parameter 1). The values of the configuration
 parameters can be displayed in the same order as the following list:
 
@@ -211,7 +211,7 @@ Number 	& Description				& Recommended value \\
 28	& 6250/3200 select BPI as 6250            & NO \\
 29	& Display ft                              & YES \\
 30	& Write error override                    & NO \\
-31	& Load/online                            &  NO 
+31	& Load/online                            &  NO
 
 \end{tabular}\end{center}
 
@@ -269,8 +269,8 @@ used where necessary, because performance degradation near EOT will occur.
 forward prior to any reverse operations in order to overcome static friction.
 
 {\bf Parameter 9.  Interface Transfer Rate (ITR)} - sets the burst rate at
-which data are transferred between the Cipher and the VAX. The 
-optimum setting is VAX-type dependent and 
+which data are transferred between the Cipher and the VAX. The
+optimum setting is VAX-type dependent and
 can be determined as follows:
 
 \begin{enumerate}
@@ -282,7 +282,7 @@ Start with 90.4 kHz.
 time to BACKUP 20,000 blocks on an unloaded system as a reference.
 %Calculate the throughput using the following formula:
 
-%Total number of bytes written / 
+%Total number of bytes written /
 %		1000 * Total seconds required to complete write = ITR (kHz)
 
 \item Select the next highest transfer rate using test 142.
@@ -292,7 +292,7 @@ the data rate capability of the VAX, as evidenced by a substantial increase
 in re-positioning activity in the Cipher (caused by write retries
 due to incomplete data transfers).
 
-\item Select the next lowest transfer rate using test 142 to complete 
+\item Select the next lowest transfer rate using test 142 to complete
 the configuration.
 
 \end{enumerate}
@@ -302,10 +302,10 @@ the configuration.
 Increasing it will improve performance. However, beware of setting it to 64K
 since it will use the whole cache for even a 1K transfer. The optimal setting
 can be found by starting with a low maximum block size and increasing it
-step-by-step using test 142 until the performance degrades. 
+step-by-step using test 142 until the performance degrades.
 
 
-{\bf Parameter 12. Interface Ramp Delay} -  is a command 
+{\bf Parameter 12. Interface Ramp Delay} -  is a command
 response time which, in a start/stop drive, would be the ramp time (delay while
 the drive spins up to speed).  If you set the ramp time low then the CPU is not
 waiting for the tape to get up speed and so it can get on with the transfer of
@@ -317,9 +317,9 @@ verify pass it goes flat out all the time.
 
 {\bf Parameter 14.  Read error retries.} The default is 3. One might  expect that this should be
 set high to give yourself the maximum chance of recovering  data. However, this
-parameter is the number of times the controller tries to read each time 
+parameter is the number of times the controller tries to read each time
 VMS requests a retry (up to 15 times, I believe) so the default of 3 actually
-results in 45 read retries, which should be sufficient. 
+results in 45 read retries, which should be sufficient.
 
 {\bf Parameter 15.  Write error retries.}  This is set at 15 by default. The author believes that
 it should be set lower (e.g. 8). If the drive requires excessive tries at
@@ -327,40 +327,40 @@ writing to  a tape, then the user should be warned since it may mean that the me
 is bad which in turn may lead to problems reading the data back at a later
 date.
 
-{\bf Parameter 18. Lock out 3200-bpi Write} - prevents the selection of the 
+{\bf Parameter 18. Lock out 3200-bpi Write} - prevents the selection of the
 3200-bpi density. However, the drive can still {\bf read} a 3200-bpi tape.
 
 {\bf Parameter 21.  Allow One track Down on Writes.} These drives are nine-track; eight for data
 and one for parity. This parameter should always be set to NO. If a track goes down,
 it is important that it be fixed rather than continue running with one
-track down without anyone realising. Once the fact that the head is 
+track down without anyone realising. Once the fact that the head is
 defective has been discovered, this option could be enabled to allow
 usage of the drive for {\bf read only} until an engineer arrives to fix it. This is
 possible since the error correction system will allow recovery of the missing data track
-by  using the information in the parity track. 
+by  using the information in the parity track.
 
 {\bf Parameter 29. Display ft.} Displays number of feet to end of tape. This is very useful
 even if just to tell users that  the tape is going around.
 The display sometimes shows a negative number of feet remaining.
 This is normal since the method used to judge the number of remaining feet is
 very approximate. The relative rotation rate of the tachometer wheel compared
-with that of the rear hub indicates the thickness, 
+with that of the rear hub indicates the thickness,
 and hence length of tape wrapped around the rear hub.
 
 {\bf Parameter 31. Load/on-line.} Determines if the device automatically goes on-line when
 loaded. I recommend leaving this disabled in order to be consistent with other
 tape drives. Even with this disabled, one can press the on-line button
-before the drive has finished loading the tape so there is no need to 
+before the drive has finished loading the tape so there is no need to
 wait by the drive while it load before you press the on-line button
 (unlike some drives).
 
 
 \section{Checking your Cipher's read/write performance}
 
-If your users complain that your Cipher seems to be 
-reading/writing very slowly, then it may either be due to 
-very heavy use of system or the drive failing and retrying to read/write 
-many times (perhaps due to a defective head). Using test 255 will 
+If your users complain that your Cipher seems to be
+reading/writing very slowly, then it may either be due to
+very heavy use of system or the drive failing and retrying to read/write
+many times (perhaps due to a defective head). Using test 255 will
 determine which.
 
 During a BACKUP operation, CTRL/Y and then take the Cipher off-line.
@@ -369,7 +369,7 @@ The front panel of the drive appears as follows
 \begin{verbatim}
        load       unload      online      wrt test    density
       -------     -------     -------     -------     -------
-         1           2           3           4           5 
+         1           2           3           4           5
       -------     -------     -------     -------     -------
 \end{verbatim}
 
@@ -404,7 +404,7 @@ Press on-line and type
 
 in order to resume the BACKUP.
 
-Note that if you dismount a tape, the error history is cleared, and 
+Note that if you dismount a tape, the error history is cleared, and
 hence the need to CTRL/Y out of a BACKUP.
 
 Also if you wish to monitor the streaming progress of a tape,
@@ -416,7 +416,7 @@ have a sticker on the side of the head (left side in the case of the Cambridge
 drive) with the optimum read and write currents written on it as determined by
 the manufacturer. Do not attempt changing the currents yourself.
 
-The author once had trouble reading some recently written tapes. 
+The author once had trouble reading some recently written tapes.
 An engineer informed him that they were written with the write current set
 10\% too high and hence the tape was saturated. Our current was set to the
 factory recommendation i.e. these recommendations are not always correct.
@@ -497,39 +497,39 @@ to use test 133 while trying to manually load a tape (see Section 2.2).
 
 \section{Tape caching}
 
-The area of tape caching is quite confusing, partly because caches may 
-exist on both the drive itself and the controller. Also, it is not 
-obvious under what conditions the cache is of use. 
+The area of tape caching is quite confusing, partly because caches may
+exist on both the drive itself and the controller. Also, it is not
+obvious under what conditions the cache is of use.
 
-In a system where the I/O rate of the CPU/disk combination is greater than 
+In a system where the I/O rate of the CPU/disk combination is greater than
 that of the tape drive, the system will always be limited by the tape drive I/O
 rate. This situation does not occur in Starlink systems.
 
-In a system where the I/O rate of the CPU/disk combination is less than 
+In a system where the I/O rate of the CPU/disk combination is less than
 that of the tape drive, the system will always be limited by the CPU/disk
 combination I/O rate. This is the normal situation at Starlink sites
 where we use relatively slow Q-buses and microVAXes (compared with big
 VAXes, such as the VAX 6000).
 
-On a lightly loaded microVAX, the realised tape I/O rate will be slightly below that 
-of the CPU/disk combination. As the load on the VAX increases (i.e. more 
+On a lightly loaded microVAX, the realised tape I/O rate will be slightly below that
+of the CPU/disk combination. As the load on the VAX increases (i.e. more
 processes are making demands on the CPU), the realised tape I/O rate on a non-cached
-system will fall. However, on a cached system, the cache is able to keep 
+system will fall. However, on a cached system, the cache is able to keep
 data flowing to the drive during the short periods while the CPU is servicing
 other processes and avoids the drive running out of data and re-positioning,
 leading to a drop in performance.
 Hence, the cache is of most use on a heavily loaded system.
 
-It is important to note that re-positioning does not necessarily mean that 
+It is important to note that re-positioning does not necessarily mean that
 your drive is not running at full capacity. There is no loss of performance if
 the drive re-positions while the cache is filling up with data from the CPU
 since this indicates that the CPU has been unable to supply data fast
 enough and the re-positioning is not preventing writing taking place. If
-the cache is full while the drive is re-positioning, then the realised I/O 
+the cache is full while the drive is re-positioning, then the realised I/O
 rate will fall and the system will be limited by the drive re-positioning
 speed. Matching of the drive transfer rate with the data rate capability
 of the host VAX can be achieved using the procedure described in Section 3.2.
- 
+
 The Cipher M990 has a built-in 64K cache. As I understand it, this is in use
 all of the time. The DQ153/3153 controllers also contain a 64K cache. By
 default, the controller cache is disabled. To enable write caching for the tape
@@ -544,7 +544,7 @@ controller you must mount your tape with the qualifier
 %The DQ153/3153 controllers emulate TU81s (MU devices) which support tape
 %caching. The advantage of tape caching is that it should allow the drive to
 %stream and cope with hiccups in the flow of data to the drive (likely on a
-%multi-user machine). 
+%multi-user machine).
 
 However, timing tests have shown no performance improvement when mounting tapes
 with the /CACHE qualifier and running BACKUP.
@@ -556,13 +556,13 @@ Most Starlink Cipher M990 tape drives are controlled by either a DQ153
 exactly the same except for minor physical differences that reflect the
 different cabinets in which they are installed. Your tape drive should be set up
 for remote density select; i.e. if you initialize a tape with the /DENSITY=XXXX,
-the controller will put the tape drive into this  density mode. 
+the controller will put the tape drive into this  density mode.
 
 Manual (or local) density selection is done by a button
 on the tape drive. Density selection, both manual and remote is
 usually done only at BOT for write-type operations and is then stored in the
 drive until changed. For read operations, density is automatically selected at
-BOT by testing the ``ID burst'' on the tape. 
+BOT by testing the ``ID burst'' on the tape.
 In any case, remote density selection can be
 done only if the tape drive is in the REMOTE DENSITY  select mode (see Section
 3.1). On
@@ -572,7 +572,7 @@ controllers should be at revision level G or later. If not, then they should be
 upgraded free of charge under maintenance.
 
 It is worth noting that with these controllers, the density of the drive as
-shown with 
+shown with
 
 \begin{quote}
 
@@ -584,7 +584,7 @@ is correct. This is not the case for multi-density drives emulating a TS11
 drive (MSxx:), which was a single density drive. In this case, the density shown
 with the above command will always show 1600 bpi, regardless of what density
 the drive is actually working at.  Drives on a controller emulating a TS11 can
-only have the density set on the front panel. 
+only have the density set on the front panel.
 
 \end{document}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

@@ -33,7 +33,7 @@ f     AST_FRAME
 *  Attributes:
 *     In addition to those attributes common to all Mappings, every
 *     Frame also has the following attributes (if the Frame has only one
-*     axis, the axis specifier can be omited from the following attribute 
+*     axis, the axis specifier can be omited from the following attribute
 *     names):
 *
 *     - AlignSystem: Coordinate system used to align Frames
@@ -174,7 +174,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        - Added astResolvePoints.
 *        - Override astEqual.
 *     29-NOV-2004 (DSB):
-*        - Set/Get/Test/ClearAttrib: Allow axis specifier to be omitted from 
+*        - Set/Get/Test/ClearAttrib: Allow axis specifier to be omitted from
 *        axis attribute names if the Frame only has one axis.
 *class--
 */
@@ -757,7 +757,7 @@ static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 
 /* Member functions. */
 /* ================= */
-static const char *Abbrev( AstFrame *this, int axis,  const char *fmt, 
+static const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
                            const char *str1, const char *str2 ) {
 /*
 *+
@@ -772,7 +772,7 @@ static const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
 
 *  Synopsis:
 *     #include "frame.h"
-*     const char *astAbbrev( AstFrame *this, int axis, const char *fmt, 
+*     const char *astAbbrev( AstFrame *this, int axis, const char *fmt,
 *                            const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -1263,7 +1263,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
 *  Implementation Deficiencies;
 *     - The protected interface for this function uses 1-based axis
 *     numbering (like the public interface), rather than the more usual
-*     zero-based system used by all other protected interfaces. There is 
+*     zero-based system used by all other protected interfaces. There is
 *     no real reason for this, and it should be changed at some time.
 
 */
@@ -1610,11 +1610,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* A flag indicating that we do not need to free the axis_attrib memory. */
    free_axis_attrib = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_attrib = NULL;
    old_attrib = NULL;
 
-/* Jump back to here if we are trying the same attribute but with an explicit 
+/* Jump back to here if we are trying the same attribute but with an explicit
    axis "(1)" added to the end of the name. */
 L1:
 
@@ -1757,7 +1757,7 @@ L1:
    (which has additional attributes not recognised here). */
    } else if( !free_axis_attrib && ( nc = 0,
                  ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
-                                      &axis_nc, &axis, &nc ) ) 
+                                      &axis_nc, &axis, &nc ) )
                && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
@@ -1770,7 +1770,7 @@ L1:
 /* Assume that we will be able to use the attribute name. */
       used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -1781,8 +1781,8 @@ L1:
       astClearAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
       if( astStatus == AST__BADAT ) {
          astClearStatus;
@@ -1793,7 +1793,7 @@ L1:
 /* Attempt to clear the attribute as an attribute of the primary Frame. */
          astClearAttrib( pfrm, axis_attrib );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute name. */
          if( !astOK ) {
             astClearStatus;
@@ -1807,8 +1807,8 @@ L1:
 /* Re-instate the original error reporting state. */
       astReporting( oldrep );
 
-/* If we could not use the attribute name, attempt to clear the axis 
-   attribute again, this time retaining the error report. This is done 
+/* If we could not use the attribute name, attempt to clear the axis
+   attribute again, this time retaining the error report. This is done
    to ensure the user gets an appropriate error message. */
       if( !used ) astClearAttrib( ax, axis_attrib );
 
@@ -1820,7 +1820,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 ) {
 
@@ -1847,7 +1847,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute name is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original attrib 
+   method for further interpretation. First re-instate the original attrib
    name string if it was changed above. */
    } else {
       if( free_axis_attrib ) {
@@ -2204,7 +2204,7 @@ f        AST_TRAN2), then it provides a means of converting coordinates
 *  Applicability:
 *     DSBSpecFrame
 *        Alignment occurs in the upper sideband expressed within the
-*        spectral system and standard of rest given by attributes AlignSystem 
+*        spectral system and standard of rest given by attributes AlignSystem
 *        and AlignStdOfRest.
 *     Frame
 *        This function applies to all Frames. Alignment occurs within the
@@ -2275,7 +2275,7 @@ f        it by specifying its domain in the DOMAINLIST string, or (b)
 *        making it the base Frame, since this is always considered
 *        first.
 *     SpecFrame
-*        Alignment occurs within the spectral system and standard of rest 
+*        Alignment occurs within the spectral system and standard of rest
 *        given by attributes AlignSystem and AlignStdOfRest.
 
 *  Examples:
@@ -2850,7 +2850,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "frame.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that )
 
 *  Class Membership:
 *     Frame member function (over-rides the astEqual protected
@@ -2870,7 +2870,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *     One if the Frames are equivalent, zero otherwise.
 
 *  Notes:
-*     - The two Frames are considered equivalent if the Mapping between 
+*     - The two Frames are considered equivalent if the Mapping between
 *     them is a UnitMap.
 *     - A value of zero will be returned if this function is invoked
 *     with the global status set, or if it should fail for any reason.
@@ -2916,8 +2916,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int Fields( AstFrame *this, int axis, const char *fmt, 
-                   const char *str, int maxfld, char **fields, 
+static int Fields( AstFrame *this, int axis, const char *fmt,
+                   const char *str, int maxfld, char **fields,
                    int *nc, double *val ) {
 /*
 *+
@@ -2932,16 +2932,16 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 
 *  Synopsis:
 *     #include "frame.h"
-*     int astFields( AstFrame *this, int axis, const char *fmt, 
-*                    const char *str, int maxfld, char **fields, 
-*                    int *nc, double *val ) 
+*     int astFields( AstFrame *this, int axis, const char *fmt,
+*                    const char *str, int maxfld, char **fields,
+*                    int *nc, double *val )
 
 *  Class Membership:
 *     Frame method.
 
 *  Description:
-*     This function identifies the numerical fields within a Frame axis 
-*     value that has been formatted using astAxisFormat. It assumes that 
+*     This function identifies the numerical fields within a Frame axis
+*     value that has been formatted using astAxisFormat. It assumes that
 *     the value was formatted using the supplied format string. It also
 *     returns the equivalent floating point value.
 
@@ -2960,10 +2960,10 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 *     maxfld
 *        The maximum number of fields to identify within "str".
 *     fields
-*        A pointer to an array of at least "maxfld" character pointers. 
-*        Each element is returned holding a pointer to the start of the 
-*        corresponding field  in "str" (in the order in which they occur 
-*        within "str"), or NULL if no corresponding field can be found. 
+*        A pointer to an array of at least "maxfld" character pointers.
+*        Each element is returned holding a pointer to the start of the
+*        corresponding field  in "str" (in the order in which they occur
+*        within "str"), or NULL if no corresponding field can be found.
 *     nc
 *        A pointer to an array of at least "maxfld" integers. Each
 *        element is returned holding the number of characters in the
@@ -2971,7 +2971,7 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 *        found.
 *     val
 *        Pointer to a location at which to store the value
-*        equivalent to the returned field values. If this is NULL, 
+*        equivalent to the returned field values. If this is NULL,
 *        it is ignored.
 
 *  Returned Value:
@@ -2986,9 +2986,9 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 *     - Fields are counted from the start of the formatted string. If the
 *     string contains more than "maxfld" fields, then trailing fields are
 *     ignored.
-*     - If this function is invoked with the global error status set, or 
-*     if it should fail for any reason, then a value of zero will be returned 
-*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     - If this function is invoked with the global error status set, or
+*     if it should fail for any reason, then a value of zero will be returned
+*     as the function value, and "fields", "nc" and "val"  will be returned
 *     holding their supplied values
 *-
 */
@@ -3845,7 +3845,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Obtain a pointer to the Frame structure. */
@@ -3858,11 +3858,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* A flag indicating that we do not need to free the axis_attrib memory. */
    free_axis_attrib = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_attrib = NULL;
    old_attrib = NULL;
 
-/* Jump back to here if we are trying the same attribute but with an explicit 
+/* Jump back to here if we are trying the same attribute but with an explicit
    axis "(1)" added to the end of the name. */
 L1:
 
@@ -4046,7 +4046,7 @@ L1:
                      "astGetAttrib(%s): Corrupt %s contains invalid "
                      "AlignSystem identification code (%d).",
                      astGetClass( this ), astGetClass( this ), (int) system );
-         }   
+         }
       }
 
 /* System. */
@@ -4063,7 +4063,7 @@ L1:
                      "astGetAttrib(%s): Corrupt %s contains invalid "
                      "System identification code (%d).",
                      astGetClass( this ), astGetClass( this ), (int) system );
-         }   
+         }
       }
 
 /* Title. */
@@ -4098,7 +4098,7 @@ L1:
 /* Assume that we will be able to use the attribute name. */
       used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -4109,8 +4109,8 @@ L1:
       result = astGetAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
       if( astStatus == AST__BADAT ) {
          astClearStatus;
@@ -4121,7 +4121,7 @@ L1:
 /* Attempt to use the Axis astGetAttrib method to obtain the result. */
          result = astGetAttrib( pfrm, axis_attrib );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute name. */
          if( !astOK ) {
             astClearStatus;
@@ -4135,8 +4135,8 @@ L1:
 /* Re-instate the original error reporting state. */
       astReporting( oldrep );
 
-/* If we could not use the attribute name, attempt to get the axis 
-   attribute again, this time retaining the error report. This is done 
+/* If we could not use the attribute name, attempt to get the axis
+   attribute again, this time retaining the error report. This is done
    to ensure the user gets an appropriate error message. */
       if( !used ) result = astGetAttrib( ax, axis_attrib );
 
@@ -4148,7 +4148,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 ) {
 
@@ -4175,7 +4175,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute name is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original attrib 
+   method for further interpretation. First re-instate the original attrib
    name string if it was changed above. */
    } else {
       if( free_axis_attrib ) {
@@ -4736,7 +4736,7 @@ static int IsUnitFrame( AstFrame *this ){
 *     class inherits from Mapping and therefore every Frame is also a Mapping).
 
 *  Parameters:
-*     this 
+*     this
 *        Pointer to the Frame.
 
 *  Returned Value:
@@ -4774,7 +4774,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 *     inherited from the Mapping class).
 
 *  Description:
-*     This function creates a new Mapping by picking specified inputs from 
+*     This function creates a new Mapping by picking specified inputs from
 *     an existing Frame. This is only possible if the specified inputs
 *     correspond to some subset of the Frame outputs. That is, there
 *     must exist a subset of the Frame outputs for which each output
@@ -4784,25 +4784,25 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 *  Parameters:
 *     this
-*        Pointer to the Frame to be split (the Frame is not actually 
+*        Pointer to the Frame to be split (the Frame is not actually
 *        modified by this function).
 *     nin
 *        The number of inputs to pick from "this".
 *     in
 *        Pointer to an array of indices (zero based) for the inputs which
 *        are to be picked. This array should have "nin" elements. If "Nin"
-*        is the number of inputs of the supplied Frame, then each element 
+*        is the number of inputs of the supplied Frame, then each element
 *        should have a value in the range zero to Nin-1.
 *     map
 *        Address of a location at which to return a pointer to the new
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be different to "nin"). A NULL pointer will be
-*        returned if the supplied Frame has no subset of outputs which 
+*        returned if the supplied Frame has no subset of outputs which
 *        depend only on the selected inputs.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
-*     elements in this array will equal the number of outputs for the 
+*     elements in this array will equal the number of outputs for the
 *     returned Mapping. Each element will hold the index of the
 *     corresponding output in the supplied Frame. The array should be
 *     freed using astFree when no longer needed. A NULL pointer will
@@ -6615,7 +6615,7 @@ f     AST_DISTANCE function.
 
 }
 
-static AstPointSet *ResolvePoints( AstFrame *this, const double point1[], 
+static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
                                    const double point2[], AstPointSet *in,
                                    AstPointSet *out ) {
 /*
@@ -6631,7 +6631,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 
 *  Synopsis:
 *     #include "frame.h"
-*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[], 
+*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[],
 *                                    const double point2[], AstPointSet *in,
 *                                    AstPointSet *out )
 
@@ -6663,14 +6663,14 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 *        resolved.
 *     out
 *        Pointer to a PointSet which will hold the length of the two
-*        resolved components. A NULL value may also be given, in which 
+*        resolved components. A NULL value may also be given, in which
 *        case a new PointSet will be created by this function.
 
 *  Returned Value:
-*     Pointer to the output (possibly new) PointSet. The first axis will 
-*     hold the lengths of the vector components parallel to the basis vector. 
-*     These values will be signed (positive values are in the same sense as 
-*     movement from point 1 to point 2. The second axis will hold the lengths 
+*     Pointer to the output (possibly new) PointSet. The first axis will
+*     hold the lengths of the vector components parallel to the basis vector.
+*     These values will be signed (positive values are in the same sense as
+*     movement from point 1 to point 2. The second axis will hold the lengths
 *     of the vector components perpendicular to the basis vector. These
 *     values will always be positive.
 
@@ -6682,9 +6682,9 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 *     - A null pointer will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
-*     - We assume flat geometry throughout this function. Other classes,  
-*     (e.g. SkyFrame) will override this method using more appropriate 
-*     geometry. 
+*     - We assume flat geometry throughout this function. Other classes,
+*     (e.g. SkyFrame) will override this method using more appropriate
+*     geometry.
 *-
 */
 
@@ -6786,7 +6786,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 
 /* If the Frame has only one axis, then the supplied basic vector is
    irrelevant - the returned perpendicular distances are always zero and
-   the returned parallel distances are just the distances from point1 
+   the returned parallel distances are just the distances from point1
    to each input point. */
    if( nax < 2 && astOK ) {
       ip = ptr_in[ 0 ];
@@ -6848,16 +6848,16 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 /* If this input position is good... */
             if( ok ) {
 
-/* The dot product is the required parallel component length multiplied by the 
+/* The dot product is the required parallel component length multiplied by the
    length of the basis vector. Form the distance d1. */
                *d1 = dp/bv;
 
-/* Offset away from point 1 towards point 2 by a distance of d1, and form the 
+/* Offset away from point 1 towards point 2 by a distance of d1, and form the
    required length d2. */
                *d2 = 0.0;
                c = *d1/bv;
                for( axis = 0; axis < nax; axis++ ){
-                  d = ptr_in[ axis ][ ipoint ] - 
+                  d = ptr_in[ axis ][ ipoint ] -
                       ( point1[ axis ] + c*basisv[ axis ] );
                   *d2 += d*d;
                }
@@ -7091,7 +7091,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int title;                    /* Offset of Title string */
    int unit;                     /* Offset of axis Unit string */
    int used;                     /* Could the setting string be used? */
-  
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -7109,7 +7109,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* A flag indicating that we do not need to free the axis_setting memory. */
    free_axis_setting = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_setting = NULL;
    old_setting = NULL;
 
@@ -7274,7 +7274,7 @@ L1:
                    "astSetAttrib(%s): Invalid AlignSystem description \"%s\".",
                    astGetClass( this ), system + setting );
       }
-   
+
 /* System. */
 /* ------- */
    } else if ( nc = 0,
@@ -7292,7 +7292,7 @@ L1:
                    "astSetAttrib(%s): Invalid System description \"%s\".",
                    astGetClass( this ), system + setting );
       }
-   
+
 /* Title. */
 /* ------ */
    } else if ( nc = 0,
@@ -7349,7 +7349,7 @@ L1:
 /* Assume that we will be able to use the setting. */
          used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -7361,8 +7361,8 @@ L1:
          astSetAttrib( ax, axis_setting );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
          if( astStatus == AST__BADAT ) {
             astClearStatus;
@@ -7373,7 +7373,7 @@ L1:
 /* Attempt to set the attribute within the primary Frame. */
             astSetAttrib( pfrm, axis_setting );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute setting. */
             if( !astOK ) {
                astClearStatus;
@@ -7401,7 +7401,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 && equals ) {
 
@@ -7431,7 +7431,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original setting 
+   method for further interpretation. First re-instate the original setting
    string if it was changed above. */
    } else {
       if( free_axis_setting ) {
@@ -8156,11 +8156,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* A flag indicating that we do not need to free the axis_attrib memory. */
    free_axis_attrib = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_attrib = NULL;
    old_attrib = NULL;
 
-/* Jump back to here if we are trying the same attribute but with an explicit 
+/* Jump back to here if we are trying the same attribute but with an explicit
    axis "(1)" added to the end of the name. */
 L1:
 
@@ -8314,7 +8314,7 @@ L1:
 /* Assume that we will be able to use the attribute name. */
       used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -8325,8 +8325,8 @@ L1:
       result = astTestAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
       if( astStatus == AST__BADAT ) {
          astClearStatus;
@@ -8337,7 +8337,7 @@ L1:
 /* Attempt to test the attribute as an attribute of the primary Frame. */
          result = astTestAttrib( pfrm, axis_attrib );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute name. */
          if( !astOK ) {
             astClearStatus;
@@ -8351,8 +8351,8 @@ L1:
 /* Re-instate the original error reporting state. */
       astReporting( oldrep );
 
-/* If we could not use the attribute name, attempt to test the axis 
-   attribute again, this time retaining the error report. This is done 
+/* If we could not use the attribute name, attempt to test the axis
+   attribute again, this time retaining the error report. This is done
    to ensure the user gets an appropriate error message. */
       if( !used ) result = astTestAttrib( ax, axis_attrib );
 
@@ -8364,7 +8364,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 ) {
 
@@ -8391,7 +8391,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute name is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original attrib 
+   method for further interpretation. First re-instate the original attrib
    name string if it was changed above. */
    } else {
       if( free_axis_attrib ) {
@@ -9238,7 +9238,7 @@ c        this.
 *     separate fields.
 *
 *     - "g": Use a letter and symbols to separate fields ("h"/"d", "m" or "s",
-*     etc, as appropriate), but include escape sequences in the formatted 
+*     etc, as appropriate), but include escape sequences in the formatted
 *     value so that the Plot class will draw the separators as small
 *     super-scripts.
 *
@@ -9269,8 +9269,8 @@ c        this.
 *     is). The "." should be followed immediately by an unsigned
 *     integer which gives the number of decimal places required, or by an
 *     asterisk. If an asterisk is supplied, a default number of decimal
-*     places is used which is based on the value of the Digits 
-*     attribute. 
+*     places is used which is based on the value of the Digits
+*     attribute.
 *
 *     All of the above format specifiers are case-insensitive. If
 *     several characters make conflicting requests (e.g. if both "i"
@@ -9508,7 +9508,7 @@ f     Frame axis (e.g. using AST_FORMAT). Its value may be set either
 *        Current attribute).
 *     Plot
 *        The default Digits value used by the Plot class when drawing
-*        annotated axis labels is the smallest value which results in all 
+*        annotated axis labels is the smallest value which results in all
 *        adjacent labels being distinct.
 *att--
 */
@@ -10035,7 +10035,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        dynamical equator and equinox of the J2000 epoch. The dynamical
 *        equator and equinox differ slightly from those used by the FK5
 *        model, and so a "J2000" SkyFrame will differ slightly from an
-*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be 
+*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be
 *        qualified by an Equinox value
 *
 *        - "GAPPT", "GEOCENTRIC" or "APPARENT": The geocentric apparent
@@ -10065,9 +10065,9 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *
 *        - "HELIOECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
 *        ecliptic and mean equinox of J2000.0, in which an offset is added to
-*        the longitude value which results in the centre of the sun being at 
-*        zero longitude at the date given by the Epoch attribute. Attempts to 
-*        set a value for the Equinox attribute will be ignored, since this 
+*        the longitude value which results in the centre of the sun being at
+*        zero longitude at the date given by the Epoch attribute. Attempts to
+*        set a value for the Equinox attribute will be ignored, since this
 *        system is always referred to J2000.0.
 *
 *        - "GALACTIC": Galactic coordinates (IAU 1958).
@@ -10119,11 +10119,11 @@ f        (see AST_SETACTIVEUNIT routine for further information).
 *        - "SFCBR": Surface brightness in frequency units (W/m^2/Hz/arcmin**2)
 *        - "SFCBRW": Surface brightness in wavelength units (W/m^2/Angstrom/arcmin**2)
 *
-*        The above lists specified the default units for each System. If an 
-*        explicit value is set for the Unit attribute but no value is set 
-*        for System, then the default System value is determined by the Unit 
-*        string (if the units are not appropriate for describing any of the 
-*        supported Systems then an error will be reported when an attempt is 
+*        The above lists specified the default units for each System. If an
+*        explicit value is set for the Unit attribute but no value is set
+*        for System, then the default System value is determined by the Unit
+*        string (if the units are not appropriate for describing any of the
+*        supported Systems then an error will be reported when an attempt is
 *        made to access the System value). If no value has been specified for
 *        either Unit or System, then System=FLXDN and Unit=W/m^2/Hz are
 *        used.
@@ -11431,8 +11431,8 @@ const char *astAbbrev_( AstFrame *this, int axis, const char *fmt,
    if ( !astOK ) return str2;
    return (**astMEMBER(this,Frame,Abbrev))( this, axis, fmt, str1, str2 );
 }
-int astFields_( AstFrame *this, int axis, const char *fmt, 
-                const char *str, int maxfld, char **fields, 
+int astFields_( AstFrame *this, int axis, const char *fmt,
+                const char *str, int maxfld, char **fields,
                 int *nc, double *val ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,Fields))( this, axis, fmt, str, maxfld, fields, nc, val );
@@ -11442,7 +11442,7 @@ void astCheckPerm_( AstFrame *this, const int *perm, const char *method ) {
    (**astMEMBER(this,Frame,CheckPerm))( this, perm, method );
 }
 
-AstPointSet *astResolvePoints_( AstFrame *this, const double point1[], 
+AstPointSet *astResolvePoints_( AstFrame *this, const double point1[],
                                 const double point2[], AstPointSet *in,
                                 AstPointSet *out ) {
    if ( !astOK ) return NULL;

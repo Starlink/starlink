@@ -9,9 +9,9 @@ C
 C     Function:
 C        Merge two polarization spectra.
 C
-C     Description:                     
+C     Description:
 C        LMERGE merges two polarization spectra covering different wavelength
-C        ranges, to form a single dataset. 
+C        ranges, to form a single dataset.
 C
 C        LMERGE simply appends the data from the second dataset to the first.
 C        There is no guarantee that the output data will thus be in order
@@ -33,16 +33,16 @@ C
 C-
 C
 C  History:
-C    15/8/1990   Original Version.   JAB/AAO 
+C    15/8/1990   Original Version.   JAB/AAO
 C
-     
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
 *  Status argument
-      INTEGER STATUS              
+      INTEGER STATUS
       INTEGER STAT1
 
 *  Data pointers
@@ -68,9 +68,9 @@ C
 
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
- 
+
 *  Copy dataset1 to output
-                                 
+
       CALL TSP_COPY(LOC1,OLOC,STATUS)
 
 *  Get size of first dataset
@@ -99,10 +99,10 @@ C
 
 *  Output size is sum of two input sizes
 
-      NEWSIZE = SIZE1 + SIZE2   
+      NEWSIZE = SIZE1 + SIZE2
 
 *  Resize the output dataset
-                          
+
       DIMS(1)=NEWSIZE
       CALL TSP_RESIZE(OLOC,1,DIMS,STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
@@ -113,13 +113,13 @@ C
         CALL TSP_MAP_LAMBDA(LOC2,'READ',PTR2,ILOC2,STATUS)
 
 *  Copy the wavelength axis data
-  
+
         IF (STATUS .EQ. SAI__OK) THEN
           CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
-        ENDIF             
+        ENDIF
 
 *  Unmap arrays
-          
+
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
 
@@ -132,10 +132,10 @@ C
 
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
-        ENDIF            
+        ENDIF
 
 *  Unmap the arrays
-           
+
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
 
@@ -148,10 +148,10 @@ C
 
         IF (STATUS .EQ. SAI__OK) THEN
           CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
-        ENDIF                 
+        ENDIF
 
 *  Unmap the arrays
-      
+
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
 
@@ -162,34 +162,34 @@ C
 *  Copy the Q Stokes data - With all Stokes parameters, if only the first
 *  array contains the Stokes parameter the second part of the array is
 *  filled with zeros
-                     
-        CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)    
+
+        CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
         CALL TSP_MAP_DATA(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS                
+        STAT1 = STATUS
         CALL TSP_GET_STOKES(LOC2,'Q',SLOC2,STATUS)
         CALL TSP_MAP_DATA(SLOC2,'READ',PTR2,ILOC2,STATUS)
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE IF (STAT1 .EQ. SAI__OK) THEN
          CALL TSP_LMERGEZERO(SIZE2,NEWSIZE,%VAL(PTR1))
-        ENDIF                       
+        ENDIF
 
 *  Unmap arrays
 
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         STATUS = SAI__OK
-                   
+
 *  Copy the Q Stokes Variance
-                                 
+
         CALL TSP_MAP_VAR(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS                           
+        STAT1 = STATUS
         CALL TSP_MAP_VAR(SLOC2,'READ',PTR2,ILOC2,STATUS)
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE IF (STAT1 .EQ. SAI__OK) THEN
          CALL TSP_LMERGEZERO(SIZE2,NEWSIZE,%VAL(PTR1))
-        ENDIF                       
+        ENDIF
 
 *  Unmap arrays
 
@@ -198,87 +198,87 @@ C
         CALL DAT_ANNUL(SLOC,STATUS)
         CALL DAT_ANNUL(SLOC2,STATUS)
         STATUS = SAI__OK
-                   
+
 *  Copy the U Stokes data
-                         
+
         CALL TSP_GET_STOKES(OLOC,'U',SLOC,STATUS)
         CALL TSP_MAP_DATA(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS                
+        STAT1 = STATUS
         CALL TSP_GET_STOKES(LOC2,'U',SLOC2,STATUS)
         CALL TSP_MAP_DATA(SLOC2,'READ',PTR2,ILOC2,STATUS)
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE IF (STAT1 .EQ. SAI__OK) THEN
          CALL TSP_LMERGEZERO(SIZE2,NEWSIZE,%VAL(PTR1))
-        ENDIF  
+        ENDIF
 
 *  Unmap arrays
-                     
+
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         STATUS = SAI__OK
-                   
+
 *  Copy the U Stokes Variance
-                         
+
         CALL TSP_MAP_VAR(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS              
+        STAT1 = STATUS
         CALL TSP_MAP_VAR(SLOC2,'READ',PTR2,ILOC2,STATUS)
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE IF (STAT1 .EQ. SAI__OK) THEN
          CALL TSP_LMERGEZERO(SIZE2,NEWSIZE,%VAL(PTR1))
-        ENDIF  
+        ENDIF
 
 *  Unmap arrays
-                     
+
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         CALL DAT_ANNUL(SLOC,STATUS)
         CALL DAT_ANNUL(SLOC2,STATUS)
         STATUS = SAI__OK
-                   
+
 *  Copy the V Stokes data
-                         
+
         CALL TSP_GET_STOKES(OLOC,'V',SLOC,STATUS)
         CALL TSP_MAP_DATA(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS               
+        STAT1 = STATUS
         CALL TSP_GET_STOKES(LOC2,'V',SLOC2,STATUS)
         CALL TSP_MAP_DATA(SLOC2,'READ',PTR2,ILOC2,STATUS)
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE IF (STAT1 .EQ. SAI__OK) THEN
          CALL TSP_LMERGEZERO(SIZE2,NEWSIZE,%VAL(PTR1))
-        ENDIF                       
+        ENDIF
 
 *  Unmap arrays
 
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         STATUS = SAI__OK
-                   
+
 *  Copy the V Stokes Variance
-                         
+
         CALL TSP_MAP_VAR(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS              
+        STAT1 = STATUS
         CALL TSP_MAP_VAR(SLOC2,'READ',PTR2,ILOC2,STATUS)
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_LMERGECPY(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE IF (STAT1 .EQ. SAI__OK) THEN
          CALL TSP_LMERGEZERO(SIZE2,NEWSIZE,%VAL(PTR1))
-        ENDIF  
+        ENDIF
 
 *  Unmap arrays
-                     
+
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         CALL DAT_ANNUL(SLOC,STATUS)
         CALL DAT_ANNUL(SLOC2,STATUS)
         STATUS = SAI__OK
-           
+
       ENDIF
       CALL DAT_ANNUL(LOC1,STATUS)
       CALL DAT_ANNUL(LOC2,STATUS)
-      CALL DAT_ANNUL(OLOC,STATUS)        
+      CALL DAT_ANNUL(OLOC,STATUS)
 
 
       END
@@ -301,9 +301,9 @@ C
 *   Jeremy Bailey   15/8/1990
 *
 *   Modified:
-*       10/12/1991       
+*       10/12/1991
 *
-*+    
+*+
 
       IMPLICIT NONE
 
@@ -313,7 +313,7 @@ C
 
 *  Local variables
       INTEGER I,IS
-                        
+
       IS = DS-D2
 
 *  Fill last D2 elements with zero
@@ -340,8 +340,8 @@ C
 *   Jeremy Bailey   15/8/1990
 *
 *   Modified:
-*       10/12/1991       
-*+    
+*       10/12/1991
+*+
 
       IMPLICIT NONE
 
@@ -351,7 +351,7 @@ C
 
 *  Local variables
       INTEGER I,IS
-                        
+
       IS = DS-D2
 
 *  Copy input into last D2 elements of output

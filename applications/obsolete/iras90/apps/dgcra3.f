@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
 *  Local Variables:
       INTEGER BIT                ! Bit used to storing quality
       CHARACTER*( IRQ__SZCOM ) COMNT ! Comment of quality name
-      LOGICAL FIXED              ! True if quality is fixed for all 
+      LOGICAL FIXED              ! True if quality is fixed for all
       LOGICAL FOUND              ! Found the extension flag
       LOGICAL VALUE              ! Value of a fixed quality
       CHARACTER*( DAT__SZLOC ) XLOC  ! Locator to the extension
@@ -141,7 +141,7 @@
 
 *  Obtain a quality name from the user.
       CALL PAR_GET0C( PQNAME, QNAME, STATUS )
-      
+
 *  See if it has been there in the quality information extension of the
 *  input NDF.
       CALL IRQ_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMNT, STATUS )
@@ -163,7 +163,7 @@
 
 *  Set flag to show quality name is added to the NDF.
          QADD = .TRUE.
-      
+
 *  If the name was there. report to the user.
       ELSE
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
@@ -175,9 +175,9 @@
 
 *  Set the flag show no new quality name is added to the NDF.
          QADD = .FALSE.
-      
+
       END IF
-      
+
  999  CONTINUE
 
       END

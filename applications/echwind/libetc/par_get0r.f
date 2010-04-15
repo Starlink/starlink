@@ -28,9 +28,9 @@
          do i = 1,MAXTOKS
             toks(i)(1:40) = '                                       '
          end do
-         if ((found) .and. index(upline,'ENDPARAMETER') .eq. 1) 
+         if ((found) .and. index(upline,'ENDPARAMETER') .eq. 1)
      +     found = .false.
-         if ((index(upline,'PARAMETER') .eq. 1) .and. 
+         if ((index(upline,'PARAMETER') .eq. 1) .and.
      +       (index(upline,param) .ne. 0)) found = .true.
          if (found) then
             do while (start.le.len(line) .and. line(start:start).eq.' ')
@@ -59,7 +59,7 @@
                default = toks(2)
                lendefault = end2 - end1 - 1
             end if
-         end if 
+         end if
 
          read(lun, '(a)', iostat=ios) line
       end do

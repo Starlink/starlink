@@ -151,7 +151,7 @@
 *  If the extension does not exist then issue a warning and flag this
 *  NDF as not valid if REPORT is TRUE.
          IF ( .NOT. THERE ) THEN
-            IF ( REPORT ) THEN 
+            IF ( REPORT ) THEN
                CALL NDF_MSG( 'NDF', IDS( I ) )
                CALL CCD1_MSG( ' ', ' Warning - NDF : ^NDF ', STATUS )
                CALL CCD1_MSG( ' ',
@@ -192,7 +192,7 @@
                IF ( .NOT. OK ) THEN
 
 *  Again may be fatal for this NDF - issue a warning and flag it.
-                  IF ( REPORT ) THEN 
+                  IF ( REPORT ) THEN
                      CALL NDF_MSG( 'NDF', IDS( I ) )
                      CALL CCD1_MSG( ' ', ' Warning - NDF : ^NDF',
      :                             STATUS )
@@ -226,7 +226,7 @@
 
 *  All done check that we have not excluded all NDFs. If REPORT is true
 *  then this is a serious condition.
-      IF ( REPORT ) THEN 
+      IF ( REPORT ) THEN
          IF ( NVALID .LT. 1 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'CCD1_FTYPL1',

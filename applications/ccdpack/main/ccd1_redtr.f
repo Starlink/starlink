@@ -16,7 +16,7 @@
 
 *  Description:
 *     This routine writes a report about the transformation options
-*     used by CCDEDIT mode=transform. 
+*     used by CCDEDIT mode=transform.
 
 *  Arguments:
 *     TRTYPE = CHARACTER * ( * ) (Given)
@@ -80,10 +80,10 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-  
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message system parameters
@@ -177,7 +177,7 @@
          END IF
 
 *  Transformation given as a expression.
-      ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN 
+      ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN
 
 *  Inform user of the mappings they have selected.
          CALL CCD1_MSG( ' ',
@@ -192,7 +192,7 @@
          CALL CCD1_MSG( ' ', '  ^INV2', STATUS )
 
 *  Inform user of classification.
-         IF ( HAVCLS ) THEN 
+         IF ( HAVCLS ) THEN
             CALL CCD1_MSG( ' ', ' ', STATUS )
             CALL CCD1_MSG( ' ', '    Transformation classified as:',
      :                     STATUS )
@@ -203,13 +203,13 @@
          END IF
       ELSE
 
-*  Transformation given as a TRN_TRANSFORM structure. 
+*  Transformation given as a TRN_TRANSFORM structure.
          CALL CCD1_MSG( ' ',
      : '  Transformation to be copied from:', STATUS )
 
 *  Get the name of the object which has the TRN_TRANSFORM structure.
          CALL DAT_MSG( 'OBJ', LOCTR )
          CALL CCD1_MSG( ' ', '    ^OBJ', STATUS )
-      END IF 
+      END IF
       END
 * $Id$

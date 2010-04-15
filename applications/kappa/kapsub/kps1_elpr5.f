@@ -82,7 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      
+
 *  Arguments Given:
       INTEGER INDF1
       INTEGER INDF2
@@ -93,7 +93,7 @@
       REAL RMAX
       REAL XC
       REAL YC
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -146,7 +146,7 @@
 *  Use this Mapping to convert the supplied PIXEL centre into GRID coords.
       PX = DBLE( XC )
       PY = DBLE( YC )
-      CALL AST_TRAN2( MAP1, 1, PX, PY, .TRUE., GX, GY, STATUS ) 
+      CALL AST_TRAN2( MAP1, 1, PX, PY, .TRUE., GX, GY, STATUS )
       CALL AST_ANNUL( MAP1, STATUS )
 
 *  We construct a Mapping from the 2D GRID coordinate Frame in INDF1 to the
@@ -167,9 +167,9 @@
       MAP2 = AST_MATRIXMAP( 2, 2, 0, MATRIX, ' ', STATUS )
 
 *  The next Mapping goes from (U,V) to "R", the distance from (XC,YC)
-*  in pixels along the major axis, at which an ellipse through (U,V) 
-*  cuts the major axis. We implement this using a MathMap. The inverse 
-*  transformation results in U=R, and V=0, that is,  the (U,V) coords of 
+*  in pixels along the major axis, at which an ellipse through (U,V)
+*  cuts the major axis. We implement this using a MathMap. The inverse
+*  transformation results in U=R, and V=0, that is,  the (U,V) coords of
 *  a point a distance R out along the major axis.
       FOREXP = ' '
       IAT = 0
@@ -179,8 +179,8 @@
 
       INVEXP( 1 ) = 'U=R'
       INVEXP( 2 ) = 'V=0.0'
-      
-      MAP3 = AST_MATHMAP( 2, 1, 1, FOREXP, 2, INVEXP, 
+
+      MAP3 = AST_MATHMAP( 2, 1, 1, FOREXP, 2, INVEXP,
      :                    'SIMPFI=1,SIMPIF=1', STATUS )
 
 *  The final Map is a WinMap which maps R values onto GRID coords in the
@@ -191,7 +191,7 @@
       OUTB = NSTEP + 0.5
       MAP4 = AST_WINMAP( 1, INA, INB, OUTA, OUTB, ' ', STATUS )
 
-*  Combine these Mapping in series. 
+*  Combine these Mapping in series.
       MAP5 = AST_CMPMAP( MAP1, MAP2, .TRUE., ' ', STATUS )
       MAP6 = AST_CMPMAP( MAP3, MAP4, .TRUE., ' ', STATUS )
       MAP7 = AST_CMPMAP( MAP5, MAP6, .TRUE., ' ', STATUS )
@@ -216,10 +216,10 @@
       NFRM = AST_GETI( IWCS2, 'NFrame', STATUS )
 
 *  Add the FrameSet from the image NDF into the FrameSet from the profile
-*  NDF, using the Mapping found above to connect the 2D GRID Frame (the 
+*  NDF, using the Mapping found above to connect the 2D GRID Frame (the
 *  Base Frame in IWCS1) to the 1D Grid Frame (the Base Frame in IWCS2).
       CALL AST_INVERT( MAP7, STATUS )
-      CALL AST_SETI( IWCS1, 'Current', 
+      CALL AST_SETI( IWCS1, 'Current',
      :               AST_GETI( IWCS1, 'Base', STATUS ), STATUS )
       CALL AST_ADDFRAME( IWCS2, AST__BASE, MAP7, IWCS1, STATUS )
 

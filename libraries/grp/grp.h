@@ -10,12 +10,12 @@
 
 *  Description:
 *     This module defines the C interface to the functions of the GRP
-*     library. The file grp.c contains C wrappers for the Fortran 
+*     library. The file grp.c contains C wrappers for the Fortran
 *     GRP routines.
 
 *  Notes:
 *     - Given the size of the GRP library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use GRP from C extend this file (and
 *     grp.c) to include any functions which they need but which are
 *     not already included.

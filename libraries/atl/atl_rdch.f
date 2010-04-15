@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Store the group identifer in common so that the source function can
-*  get at it. 
+*  get at it.
       IGRPC = IGRP
 
 *  Initialise the next group element to be read.
@@ -106,8 +106,8 @@
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
 *  Create a Channel through which to read the Objects stored in the
-*  group. 
-      CHAN = AST_CHANNEL( ATL_SRC1, AST_NULL, ' ', STATUS ) 
+*  group.
+      CHAN = AST_CHANNEL( ATL_SRC1, AST_NULL, ' ', STATUS )
 
 *  Attempt to read an object from the current channel.
       IAST = AST_READ( CHAN, STATUS )
@@ -171,7 +171,7 @@
 *-
       INCLUDE 'SAE_PAR'
       INCLUDE 'GRP_PAR'
-      
+
 *  Arguments:
       INTEGER STATUS
 
@@ -197,7 +197,7 @@
 *  Otherwise, get the element from the group, store it in the channel,
 *  and increment the index of the next element to be read from the group.
       ELSE
-         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS ) 
+         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
          CALL AST_PUTLINE( BUF, CHR_LEN( BUF ), STATUS )
          NEXT = NEXT + 1
       END IF

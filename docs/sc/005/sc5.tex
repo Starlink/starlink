@@ -110,7 +110,7 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -264,12 +264,12 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -506,10 +506,10 @@ or xreduce, are shown in a sans serif font like this.}
 Before the introduction of photography to astronomy the only way of
 recording images of extended objects seen through a telescope was to
 sketch them.  This approach worked moderately well for the planets, which
-are illuminated by reflected light, but was much less successful for 
+are illuminated by reflected light, but was much less successful for
 nebul\ae~ and other objects beyond the solar system, both because they
 are much fainter and because of the inherent difficulty in reproducing
-the gradations in brightness of an extended luminous object using 
+the gradations in brightness of an extended luminous object using
 drawing techniques.  Photographic plates were first used to record images
 of regions of the sky around the middle of the nineteenth century.  The
 techniques proved successful and photographic plates were ubiquitous in
@@ -558,7 +558,7 @@ the most popular and widespread imaging devices used at optical and
 near infrared wavelengths.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=4in]{sc5_ccdlup.ps}
    \begin{quote}
    \caption{Examples of various CCD chips
@@ -575,7 +575,7 @@ light-sensitive surface is illuminated and an image of the field of sky
 being viewed forms on it.  The arrival of a photon on a pixel generates a
 small electrical charge which is stored for later read-out.  The size of
 the charge increases cumulatively as more photons strike the surface: the
-brighter the illumination the greater the charge. 
+brighter the illumination the greater the charge.
 This description is the merest outline of a complicated and involved
 subject.  For further details see some of the references in
 Section~\ref{FURTHER} or the \htmladdnormallink{web pages on CCD construction}
@@ -632,7 +632,7 @@ photometers (see Figure~\ref{SENSITIVITY}).  However, they have a poor
 response to blue and ultra-violet light.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=3in]{sc5_sensitivity.ps}
    \begin{quote}
    \caption[The wavelength sensitivity of various types of detectors]{The
@@ -686,12 +686,12 @@ of the CCD then it is trivial to use Equation~\ref{PSCALE} to work out
 either the angle on the sky subtended by a single pixel or the field of
 view of the CCD respectively.  For example, the sample data used in Part~II
 of the cookbook were obtained with the Jacobus Kapteyn Telescope (JKT) on
-La Palma.  The CCD detector used has pixels which are 
+La Palma.  The CCD detector used has pixels which are
 \latex{24$\times$24}
 \html{24x24}
 micron in size.
 The plate scale of the JKT is 13.8 seconds of arc / mm.  Thus, each
-pixel subtends an angle of 
+pixel subtends an angle of
 \latex{0.331$\times$0.331 }
 \html{0.331x0.331 }
 seconds of arc on the sky.
@@ -745,12 +745,12 @@ target images} or {\bf target frames}.
 
 \subsection{Bad pixels}
 
-Some of the pixels making up the light sensitive grid may be faulty and 
+Some of the pixels making up the light sensitive grid may be faulty and
 return signals which are grossly inaccurate.  Such pixels are often
 referred to as being `hot', `cold' or `{\bf bad}'.  Because of the way that
 CCDs are read-out, in some circumstances a bad pixel will contaminate
 all the pixels in its row or column in the grid, leading to entire
-bad rows or columns.  Fabrication techniques have improved markedly in 
+bad rows or columns.  Fabrication techniques have improved markedly in
 recent years, though bad pixels are still regularly encountered.
 
 The software to process CCD images must contain facilities to
@@ -787,7 +787,7 @@ and correcting the bias.
   \item[Bias frames] Here the entire CCD array is read-out without sampling
    any stored charge (that is, no light is incident on the detector) so
    that any small scale structure in the noise is detected and can
-   subsequently be corrected for.  Such frames are called {\bf bias frames}.  
+   subsequently be corrected for.  Such frames are called {\bf bias frames}.
    In practice bias frames are acquired by taking short exposures with
    the shutter closed before or after each night of observing.  Typically
    in order to reduce read-out noise several frames are taken and averaged.
@@ -797,7 +797,7 @@ and correcting the bias.
 \end{description}
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=3.5in]{sc5_biasstrips.ps}
    \begin{quote}
    \caption[Typical CCD geometries]{Typical CCD geometries.
@@ -846,13 +846,13 @@ over which the response is linear.
 
 \subsection{Thermal noise; dark current}
 
-Another effect which is sometimes present is an offset from zero that is 
+Another effect which is sometimes present is an offset from zero that is
 generated thermally within the CCD, even when no light is present.  This
 offset is termed the {\bf dark current} because it is present whether the
 shutter is open or closed.  It varies somewhat from pixel to pixel and
 slowly with time (as long as the chip is kept at a constant temperature).
 It is usually minimised by cooling the CCD to the temperature of liquid
-nitrogen. 
+nitrogen.
 
 If necessary, the dark current can be measured by taking long exposures with
 the shutter closed, removing the bias, correcting for cosmic-ray events (see
@@ -970,8 +970,8 @@ In the case of observations made through a narrow filter, or where the
 incident light contains a strong component at a single wavelength,
 multiple reflections within the CCD chip, or the filters in front of it,
 can cause wave-like patterns across the image.  These patterns are
-called {\bf fringes}.  The precise pattern depends strongly on the 
-exact wavelength of the illuminating light.  Consequently, correcting for 
+called {\bf fringes}.  The precise pattern depends strongly on the
+exact wavelength of the illuminating light.  Consequently, correcting for
 fringing requires a flat field whose wavelength corresponds closely to that
 of the image.
 
@@ -1134,7 +1134,7 @@ Howsoever the data were originally written when they were acquired at the
 telescope they will almost invariably be exported from the observatory in
 the FITS format.  That is, the magnetic tape cartridge with which you return
 from your observing run will almost always contain FITS files.  Similarly,
-observations extracted from 
+observations extracted from
 \htmladdnormallink{data archives}{http://www.starlink.ac.uk/archives/}
 are likely to be in FITS format.  All the major packages for reducing
 astronomical data can import files in the FITS format.
@@ -1209,15 +1209,15 @@ of FITS header records: keywords and comments.
 \begin{figure}[htbp]
 
 \begin{verbatim}
-SIMPLE  =                    T / file does conform to FITS standard    
-BITPIX  =                    8 / number of bits per data pixel    
-NAXIS   =                    0 / number of data axes    
-EXTEND  =                    T / FITS dataset may contain extensions    
+SIMPLE  =                    T / file does conform to FITS standard
+BITPIX  =                    8 / number of bits per data pixel
+NAXIS   =                    0 / number of data axes
+EXTEND  =                    T / FITS dataset may contain extensions
 COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
 COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
-COMMENT   Contact the NASA Science Office of Standards and Technology for the   
-COMMENT   FITS Definition document #100 and other FITS information.    
-END                                                                       
+COMMENT   Contact the NASA Science Office of Standards and Technology for the
+COMMENT   FITS Definition document #100 and other FITS information.
+END
 \end{verbatim}
 
 \begin{quote}
@@ -1257,7 +1257,7 @@ and its companion NGC 5194.  Several hundred images were taken and they were
 all reduced, aligned and stacked using CCDPACK.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=3.5in]{sc5_m51_raw.ps}
    \begin{quote}
    \caption{A raw WIRO {\it K}\/ band image of part of M51
@@ -1272,12 +1272,12 @@ signature.
 
 Figures~\ref{M51_BIAS} and \ref{M51_FLAT} are respectively a bias and a
 flat field frame.  They clearly show the origin of the instrumental effects
-seen in Figure~\ref{M51_RAW}.  For the sake of clarity the contrast of the 
+seen in Figure~\ref{M51_RAW}.  For the sake of clarity the contrast of the
 flat field frame has been enhanced using a histogram-equalisation
 technique in order to make subtle changes in intensity easier to see.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=3.5in]{sc5_m51_bias.ps}
    \begin{quote}
    \caption{The bias frame associated with the WIRO CCD
@@ -1286,7 +1286,7 @@ technique in order to make subtle changes in intensity easier to see.
 \end{figure}
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=3.5in]{sc5_m51_flat.ps}
    \begin{quote}
    \caption{The WIRO CCD flat field (contrast enhanced)
@@ -1300,7 +1300,7 @@ in Figure~\ref{M51_RAW} contributed.  Over 2Gb of raw images, darks,
 flats and biases were used to construct this mosaic.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=4in]{sc5_m51_mosaic.ps}
    \begin{quote}
    \caption{The final WIRO {\it K}\/ band mosaic of M51 and NGC 5194
@@ -1428,12 +1428,12 @@ subtract the sky background before making the flat field and dark
 correction:
 
 \begin{equation}
-{\rm Final~target~frame} = 
+{\rm Final~target~frame} =
 \frac {{\rm Raw~target~frame} - {\rm Sky~frame}}
 {{\rm Flat~frame} - {\rm Dark~frame}}
 \end{equation}
 
-The flat field will usually be normalised.  The sky frame should have 
+The flat field will usually be normalised.  The sky frame should have
 been acquired at a similar time to the target frame, have the same co-adds
 and be an average of several frames taken before and after the target
 observation.  Median filtering and pixel masking can be used to remove
@@ -1446,7 +1446,7 @@ combine exposures of different duration by scaling, there may be subtle
 effects which do not scale, so it is better to ensure that the exposures
 are of the same duration.
 
-For some further details see 
+For some further details see
 \xref{Section 6.3, {\it IR data reduction}}{sun139}{IRreduction},
 of \xref{SUN/139}{sun139}{}\/\cite{SUN139}.
 
@@ -1526,7 +1526,7 @@ The final two recipes, {\it Reading FITS Files from Tape}\/
 (Section~\ref{READING}) and {\it Handling Large Images}\/
 (Section~\ref{LARGE}) are rather different.  They contain material
 which could not be presented conveniently as a set of numbered steps
-which you can follow, but rather are given as a set of hints and tips.  
+which you can follow, but rather are given as a set of hints and tips.
 
 The packages used in the recipes in this cookbook are
 GAIA (see \xref{SUN/214}{sun214}{}\/\cite{SUN214}),
@@ -1598,7 +1598,7 @@ copy of the example data provided with the cookbook.  Proceed as follows.
 
 As an alternative to using the data supplied with the cookbook you could
 use data of your own.  Suitable data are available on the CD-ROM {\it
-Astronomical Images}\/\cite{JAFFE98} or from the 
+Astronomical Images}\/\cite{JAFFE98} or from the
 \htmladdnormallink{ING data archive}{http://archive.ast.cam.ac.uk/}.
 However, if you substitute your own data you will need to ensure that you
 know the extent of any bias strips on the CCD frames and similar
@@ -1658,29 +1658,29 @@ proceed as follows.
   \begin{figure}[htbp]
 
 \begin{verbatim}
-SIMPLE  =                    T    
-BITPIX  =                   16    
-NAXIS   =                    2    
-NAXIS1  =                 1124    
-NAXIS2  =                 1124    
-DATE    = '13/02/96'                    /Date tape file created    
-    
-PACKTYPE= 'OBSVATON'                    /Packet type    
-PACKVERS=                    2          /Packet Version Number    
-PACKDATE= '96/02/13'                    /Date of packet creation    
-PACKTIME= '22:57:02'                    /Time of packet creation    
-PACKNAME= 'JOB44209'                    /Packet name    
-PACKPDAT= '96/02/13'                    /Date of previous packet of this type   
-PACKPTIM= '22:51:54'                    /Time of previous packet of this type   
-PACKPNAM= 'JOB44208'                    /Name of previous packet of this type   
-ORIGIN  = 'ING La Palma'                /Tape writing institution    
-OBSERVER= 'WJJ     '                    /Name of the Observer    
-TELESCOP= 'JKT     '                    /Name of the Telescope    
-INSTRUME= 'AGBX    '                    /Instrument configuration    
-OBSTYP  =                   40          /Observation type    
-OBJECT  = 'N2366 R '                    /Name of the Object    
-RA      = '07:18:22.50'                 /RA of the source    
-DEC     = '+80:16:26.0'                 /Declination of the source   
+SIMPLE  =                    T
+BITPIX  =                   16
+NAXIS   =                    2
+NAXIS1  =                 1124
+NAXIS2  =                 1124
+DATE    = '13/02/96'                    /Date tape file created
+
+PACKTYPE= 'OBSVATON'                    /Packet type
+PACKVERS=                    2          /Packet Version Number
+PACKDATE= '96/02/13'                    /Date of packet creation
+PACKTIME= '22:57:02'                    /Time of packet creation
+PACKNAME= 'JOB44209'                    /Packet name
+PACKPDAT= '96/02/13'                    /Date of previous packet of this type
+PACKPTIM= '22:51:54'                    /Time of previous packet of this type
+PACKPNAM= 'JOB44208'                    /Name of previous packet of this type
+ORIGIN  = 'ING La Palma'                /Tape writing institution
+OBSERVER= 'WJJ     '                    /Name of the Observer
+TELESCOP= 'JKT     '                    /Name of the Telescope
+INSTRUME= 'AGBX    '                    /Instrument configuration
+OBSTYP  =                   40          /Observation type
+OBJECT  = 'N2366 R '                    /Name of the Object
+RA      = '07:18:22.50'                 /RA of the source
+DEC     = '+80:16:26.0'                 /Declination of the source
         .
         .
         .
@@ -1795,7 +1795,7 @@ recipe.  Proceed as follows.
    The display should now look something like Figure~\ref{GAIA}.
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
      \includegraphics[totalheight=6in]{sc5_gaia.ps}
      \begin{quote}
      \caption[An unprocessed image of NGC 2336 displayed with GAIA]{An
@@ -1908,9 +1908,9 @@ Shape:      1124 x 1124  pixels
 Bounds:     x = 1:1124  y = 1:1124
 Image size: 1263376 pixels
 
-USE - Use the whole image or an ARD file /'w'/ > 
+USE - Use the whole image or an ARD file /'w'/ >
 
-SFACT - Smoothing width you wish to use /0/ > 
+SFACT - Smoothing width you wish to use /0/ >
 
 DEVICE - Display device code or name /@xwindows/ >
 \end{verbatim}
@@ -1951,7 +1951,7 @@ Interpolated:           12126.075
 \end{enumerate}
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=4in]{sc5_histpeak.ps}
    \begin{quote}
    \caption{Example of histogram produced by {\tt histpeak}
@@ -2021,7 +2021,7 @@ Then proceed as follows.
    a Web browser (Netscape by default).
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
       \includegraphics[totalheight=5in]{sc5_xreduce.ps}
       \begin{quote}
       \caption{Main window for the {\tt xreduce} GUI
@@ -2039,7 +2039,7 @@ Then proceed as follows.
    xreduce} has a list of commonly-used chips which you can choose from.
    If the instrument that you used is not included in this list then you
    can enter the requisite details manually.
-   
+
   \item Click on the {\sf Options} menu (rightmost of the two options in
    the top left corner of the window: see Figure~\ref{XREDUCE}) and
    choose the {\sf Set detector\ldots} option.  A window similar to
@@ -2049,7 +2049,7 @@ Then proceed as follows.
    example data.
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
       \includegraphics[totalheight=3in]{sc5_setdetector.ps}
       \begin{quote}
       \caption{CCD detectors known to {\tt xreduce}
@@ -2091,7 +2091,7 @@ Then proceed as follows.
    of the window.  Simply click the {\sf OK} button.
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
       \includegraphics[totalheight=5in]{sc5_organisendfs.ps}
       \begin{quote}
       \caption{{\tt xreduce} window to specify the types of file present
@@ -2126,7 +2126,7 @@ Then proceed as follows.
    bias}.
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
       \includegraphics[totalheight=3in]{sc5_organisendftypes.ps}
       \begin{quote}
       \caption{{\tt xreduce} window to specify the files to be reduced
@@ -2155,7 +2155,7 @@ Then proceed as follows.
    {\sf OK} button.
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
       \includegraphics[totalheight=3in]{sc5_performreduction.ps}
       \begin{quote}
       \caption{{\tt xreduce} window to specify the reduction options
@@ -2224,7 +2224,7 @@ Then proceed as follows.
    something like Figure~\ref{GAIAREDUCE}.
 
   \begin{figure}[htbp]
-     \centering 
+     \centering
       \includegraphics[totalheight=6in]{sc5_gaiareduce.ps}
       \begin{quote}
       \caption[GAIA displaying a fully reduced image of NGC 2336]{GAIA
@@ -2446,7 +2446,7 @@ delete\_xreduce\_files.csh}.  Then proceed as follows.
   \end{quote}
 
    After setting the {\sf Auto Cut} level, {\sf Magnification} and colour
-   table (see the recipe in Section~\ref{DISPLAY}) the reduced image should 
+   table (see the recipe in Section~\ref{DISPLAY}) the reduced image should
    appear similar to the ones in the previous recipe (see
    Figure~\ref{GAIAREDUCE}).
 
@@ -2471,7 +2471,7 @@ of what is available.  For full details see
 
 \subsubsection{Specifying bad pixels; ARD files}
 
-You can use ARD (ASCII Region Description) files to specify the location 
+You can use ARD (ASCII Region Description) files to specify the location
 of any bad pixels, rows or columns in your images.  ARD files are simple
 text files which contain a series of directives defining the defective
 parts of the CCD.  Their syntax is very simple and is fully documented
@@ -2550,14 +2550,14 @@ bias frame.  Various other options are available.
 
    {\tt debias} has a number of additional features which are beyond the
    scope of this cookbook, including:
- 
+
   \begin{itemize}
 
     \item error estimation,
 
     \item deferred charge correction,
 
-    \item saturated pixel correction. 
+    \item saturated pixel correction.
 
   \end{itemize}
 
@@ -2587,7 +2587,7 @@ Correcting the data for the dark current is performed by the application
 target frames:
 
 \begin{quote}
-{\tt calcor in='targets/ngc2336' out='*\_dark' cal=master\_dark 
+{\tt calcor in='targets/ngc2336' out='*\_dark' cal=master\_dark
 expose=1}
 \end{quote}
 
@@ -2834,7 +2834,7 @@ You need to start KAPPA prior to running {\tt fitsin}.  Simply type:
     \item only files 2, 3, 4, and 9 will be read (files occur sequentially
      on the tape, the first file is numbered 1, the second 2 \emph{etc}),
 
-    \item NDF files will be created called `{\tt ccd2.sdf}', 
+    \item NDF files will be created called `{\tt ccd2.sdf}',
      `{\tt ccd3.sdf}', `{\tt ccd4.sdf}' and `{\tt ccd9.sdf}',
 
     \item the {\tt nofmtcnv} option specifies that data type conversion
@@ -2877,7 +2877,7 @@ You need to start KAPPA prior to running {\tt fitsin}.  Simply type:
 
 \end{description}
 
-If you experience problems reading FITS tapes then Section 17.10, 
+If you experience problems reading FITS tapes then Section 17.10,
 \xref{{\it I've Got This FITS Tape}}{sun95}{se_fitsunixtape},
 of \xref{SUN/95}{sun95}{}\/\cite{SUN95} may contain some useful hints.
 
@@ -2891,14 +2891,14 @@ This recipe gives some hints about reducing large images with CCDPACK
 (see \xref{SUN/139}{sun139}{}\/\cite{SUN139}).
 Starlink data reduction applications, such as CCDPACK, do not on the whole
 have formal limits on image size.  However,
-reducing very large sets of data can make heavy demands 
+reducing very large sets of data can make heavy demands
 on system resources, which
 can lead to long run times, degradation of the performance
 (especially interactive response time)
 of the machine being used,
 failure of the applications,
 or in extreme cases system crashes.
-Even if you are of a patient disposition, 
+Even if you are of a patient disposition,
 these effects could make you unpopular with other users,
 so it is worth giving some additional thought to this sort of work.
 
@@ -2909,7 +2909,7 @@ will depend on what is being done and on
 the computer being used.
 As a very rough indication, images smaller than 1000x1000
 in most cases do not
-count as large, and ones larger than 
+count as large, and ones larger than
 \latex{5000$\times$5000 }
 \html{5000x5000 }
 in most cases (at the time of writing) do;
@@ -2943,7 +2943,7 @@ a data reduction process are as follows.
   \item[Memory:] a computer has a fixed amount of real memory (RAM;
    Random Access Memory),
    and also a part of the disk called {\bf swap space}
-   which serves as an overflow if running processes need 
+   which serves as an overflow if running processes need
    more memory than the available RAM.
    If there is insufficient real memory + swap space to run the
    program, it will fail.
@@ -2953,7 +2953,7 @@ a data reduction process are as follows.
    RAM and disk, and the program
    (as well as other processes on the same machine)
    will run painfully slowly.
-   Depending on the operating system and the way the machine is 
+   Depending on the operating system and the way the machine is
    set up, either of these eventualities can lead to
    termination of other processes on the machine, or system crashes.
 
@@ -2962,9 +2962,9 @@ a data reduction process are as follows.
    too.
 
   \item[Input/Output:] Input/Output (I/O) time, that is the time spent
-   waiting for data to be read from and written to disk, 
+   waiting for data to be read from and written to disk,
    will inevitably increase with large data sets.
-   I/O speed is likely to be fairly similar between different 
+   I/O speed is likely to be fairly similar between different
    low- or mid-range workstations
    and servers, except in the case where a resource is being used
    heavily by other processes at the same time;
@@ -2974,7 +2974,7 @@ a data reduction process are as follows.
    Processor Unit) time for small
    problems may become inefficient for large ones.
    Speed of execution varies quite a lot between different machines.
-   Some guide is given by the nominal processor speed (in MHz or megaflops), 
+   Some guide is given by the nominal processor speed (in MHz or megaflops),
    but when processing large data sets on a modern workstation or server,
    the CPU time spent will normally be limited by memory bandwidth.
    Bandwidth is not usually quoted as prominently as processor speed,
@@ -2983,16 +2983,16 @@ a data reduction process are as follows.
 
 \end{description}
 
-Normally the statistic which will actually concern you is 
+Normally the statistic which will actually concern you is
 elapsed, or `wall clock' time, that is the number of minutes
 or hours between starting a job off, and the results being available.
-For a large data reduction job most of this time will typically be 
+For a large data reduction job most of this time will typically be
 spent in I/O, which may or may not include moving data between
 real memory and swap space.
 In a multi-user environment however it is important to consider
 how your use of the machine is affecting the elapsed times
 of other people's jobs, or other jobs of your own.
-As a general rule then, 
+As a general rule then,
 if your data reduction runs fast enough that it does not inconvenience
 you or other people then you do not have a `large' problem.
 Otherwise, the rest of this recipe may provide some useful tips.
@@ -3003,8 +3003,8 @@ The Starlink NDF format is a special case of the HDS (Hierarchical Data
 System; see \xref{SUN/92}{sun92}{}\cite{SUN92}) format.
 There is currently a fundamental limitation of HDS which will be corrected
 in a future release.
-Until then, there is a problem with HDS files longer than 512\,Mbyte. 
-Such files can result either from a user NDF file which is very long 
+Until then, there is a problem with HDS files longer than 512\,Mbyte.
+Such files can result either from a user NDF file which is very long
 (for example, a \latex{9000$\times$9000}
 \html{9000x9000 }
 type \_REAL frame with variances) or, more likely,
@@ -3014,13 +3014,13 @@ This problem may not be reported as such by the software,
 but often manifests itself as an `Object not found' error,
 which will cause the application to terminate.
 In this case there is not much which can be done apart from
-discussing the matter with the programmer 
+discussing the matter with the programmer
 responsible for supporting the package.
 
 \subsection{\xlabel{LARGE-GENERAL}General tips}
 
-A full discussion of maximising performance for large jobs 
-is beyond the scope of this document, 
+A full discussion of maximising performance for large jobs
+is beyond the scope of this document,
 but the following are good common-sense rules of thumb.
 
 \begin{description}
@@ -3031,7 +3031,7 @@ but the following are good common-sense rules of thumb.
   \item[Use local disks:] disks attached to the machine running the job will
    be much faster than disks attached to another machine which are accessed
    remotely via the local network.
-   It can also make a big difference to use a disk which 
+   It can also make a big difference to use a disk which
    no other process is making heavy use of at the time.
    Your system manager may be able to advise on choice of disk.
 
@@ -3043,7 +3043,7 @@ but the following are good common-sense rules of thumb.
    or appropriate options of the applications can be used
    (for example, {\tt keepin=false} in CCDPACK's {\tt debias} and {\tt
    flatcor}).
-   When thinking about disk space requirements, 
+   When thinking about disk space requirements,
    remember that large temporary files can be created by
    some of the applications.
    These files have names like {\tt t123.sdf} and are created in the
@@ -3076,7 +3076,7 @@ but the following are good common-sense rules of thumb.
    other processes (presumably ones with more moderate requirements).
    The higher the niceness, the less demanding the job is, with 18 often a
    sensible maximum.
-   Ask your system manager for more details; there may be locally 
+   Ask your system manager for more details; there may be locally
    recommended values for certain kinds of job.
    Note however that the only resource usage this affects is CPU time,
    so that even a maximally {\tt nice}d job can cause major disruption.
@@ -3084,24 +3084,24 @@ but the following are good common-sense rules of thumb.
   \item[Keep an eye on the job:] if your job might push the system to its
    limits, especially if you have not run one of similar size before,
    it is a good idea to monitor its progress, for instance to check that
-   the system's swap space or file system is not filling up 
+   the system's swap space or file system is not filling up
    (using, for example, {\tt top} and {\tt df} respectively).
 
 \end{description}
 
 \subsection{\xlabel{LARGE-APPS}Bottleneck applications in CCDPACK}
 
-Some parts of the data reduction process are much 
+Some parts of the data reduction process are much
 more expensive than others,
-and these are not always the same for large images as for small ones. 
+and these are not always the same for large images as for small ones.
 
-The maximum frame size which can be treated is 
+The maximum frame size which can be treated is
 determined mainly by the memory required.
 Exactly how this limitation manifests itself is quite
 dependent on the system, but if the size of the process is
-much bigger than available real memory it is likely to run very slowly.  
+much bigger than available real memory it is likely to run very slowly.
 There may also be local guidelines about the largest processes
-which may be run on given machines. 
+which may be run on given machines.
 Table~\ref{MEMORY_USE} gives a guide to how memory use of the most demanding
 CCDPACK applications scales with frame size.
 
@@ -3114,20 +3114,20 @@ CCDPACK applications scales with frame size.
 \cline{2-5}
  & \multicolumn{2}{c|}{Variance} & \multicolumn{2}{c|}{No variance} \\
 \cline{2-5}
-         & \multicolumn{1}{p{4.5em}|}{\centering Mask} 
+         & \multicolumn{1}{p{4.5em}|}{\centering Mask}
          & \multicolumn{1}{p{4.5em}|}{\centering No mask}
          & \multicolumn{1}{p{4.5em}|}{\centering Mask}
          & \multicolumn{1}{p{4.5em}|}{\centering No mask} \\
 \hline
  \multicolumn{1}{|l|}{{\tt debias} (with bias frame)}
     & 8.25     &  6.0\zsp  &  7.25    &  5.0\zsp    \\
- \multicolumn{1}{|l|}{\tt flatcor} 
+ \multicolumn{1}{|l|}{\tt flatcor}
     & 5.5\zsp  &  5.5\zsp  &  2.75    &  2.75   \\
  \multicolumn{1}{|l|}{\tt makeflat}
     & 4.5\zsp  &  4.5\zsp  &  2.75    &  2.75   \\
  \multicolumn{1}{|l|}{\tt makebias}
     & 3.0\zsp  &  3.0\zsp  &  3.0\zsp & 3.0\zsp \\
- \multicolumn{1}{|l|}{\tt tranndf} 
+ \multicolumn{1}{|l|}{\tt tranndf}
     & 2.75     &  2.75     &   2.75   &  2.75   \\
  \multicolumn{1}{|l|}{{\tt ardmask} (KAPPA)}
     &          &  4.0\zsp  &          &  4.0\zsp  \\
@@ -3139,11 +3139,11 @@ CCDPACK applications scales with frame size.
 \caption[Words required per pixel for the largest CCDPACK applications]
 {Words required per pixel for the largest CCDPACK applications.
 The memory usage of most CCDPACK applications scales with the number
-of pixels per image.  
-This table gives the number of (4 byte) words required per pixel when 
+of pixels per image.
+This table gives the number of (4 byte) words required per pixel when
 the calculations are being done at \_REAL (4 byte) precision.
 So, for example, {\tt debias}sing a 4000$\times$4000 frame with variances
-and a bad pixel mask at \_REAL precision requires around 
+and a bad pixel mask at \_REAL precision requires around
 $4000 \times 4000 \times 8.25 \times 4$ bytes $\approx$ 500\,Mbyte.
 The values in this table are meant only as a rough indication;
 for some of the applications memory use is a more complex
@@ -3176,11 +3176,11 @@ More detail is given for some of these in the next section.
 \subsection{\xlabel{LARGE-SPECIFIC}Specific tips}
 
 The following tricks are applicable when using several of the
-Starlink applications.  
+Starlink applications.
 To use some of the commands in the examples you will need to start KAPPA
 (see \xref{SUN/95}{sun95}{}\/\cite{SUN95}) by typing {\tt kappa} at the
 C shell prompt.
-These commands 
+These commands
 (\xref{{\tt erase}}{sun95}{ERASE},
 \xref{{\tt ndftrace}}{sun95}{NDFTRACE},
 \xref{{\tt parget}}{sun95}{PARGET},
@@ -3190,7 +3190,7 @@ These commands
 \xref{{\tt ardmask}}{sun95}{ARDMASK},
 \xref{{\tt compave}}{sun95}{COMPAVE},
 \xref{{\tt compadd}}{sun95}{COMPADD} and
-\xref{{\tt compick}}{sun95}{COMPICK}) 
+\xref{{\tt compick}}{sun95}{COMPICK})
 are described fully in \xref{SUN/95}{sun95}{}; but by way of a quick
 explanation, the {\tt ndftrace}, {\tt parget} pair tells you one thing
 about the NDF being queried.
@@ -3199,13 +3199,13 @@ about the NDF being queried.
 
   \item[Omit variances:] variance information doubles the size of NDFs on
    disk and for many of the applications substantially increases the CPU and
-   memory usage.  
-   Often it is not required, or if it is can be satisfactorily estimated 
+   memory usage.
+   Often it is not required, or if it is can be satisfactorily estimated
    from the data themselves.
    If you do not need it, then do not generate and/or propagate it.
    To omit the variance set parameter {\tt genvar=false} either in
    {\tt ccdsetup} or in {\tt debias} and {\tt makebias}.
-   If you wish to remove the VARIANCE component from a frame which 
+   If you wish to remove the VARIANCE component from a frame which
    already contains it, you can use the KAPPA command {\tt erase}:
 
   \begin{quote}
@@ -3234,7 +3234,7 @@ FALSE
   \end{tabular}
   \end{center}
 
-   The type \_WORD is usually sufficient for storage of most 
+   The type \_WORD is usually sufficient for storage of most
    of the intermediate NDFs required in a data reduction sequence
    (the exception is {\tt makeflat} which always generates a master flat
    field of type \_REAL or \_DOUBLE).
@@ -3296,7 +3296,7 @@ paste bottom top out=huge_flatcor
 
   \item[Reduce image resolution:] in the event that image resolution is
    better than required, the size of the frames can be reduced by using one
-   of the KAPPA applications 
+   of the KAPPA applications
   \xref{{\tt compave}}{sun95}{COMPAVE},
   \xref{{\tt compadd}}{sun95}{COMPADD} or
   \xref{{\tt compick}}{sun95}{COMPICK}.
@@ -3327,9 +3327,9 @@ notes about each one.
 
     \begin{quote}
     \begin{verbatim}
-ardmask in=master_bias out=masked_bias ardfile=mask.dat 
+ardmask in=master_bias out=masked_bias ardfile=mask.dat
 debias in="data?" out="debias_*" bias=masked_bias \
-         getmask=FALSE 
+         getmask=FALSE
 \end{verbatim}
     \end{quote}
 
@@ -3346,7 +3346,7 @@ debias in="data?" out="debias_*" bias=master_bias \
      requirements of {\tt debias}, and so should be avoided (using {\tt
      genvar=false}) if possible.
 
-    \item[Bias frames:] de-biassing using the bias strips rather than 
+    \item[Bias frames:] de-biassing using the bias strips rather than
      a master bias frame (see Sections~\ref{BIAS_1} and \ref{ADDOPT})
      reduces the work done by {\tt debias} and also makes it unnecessary
      to process the bias frames at all.
@@ -3394,16 +3394,16 @@ debias in="data?" out="debias_*" bias=master_bias \
    slow indeed and come to dominate the whole reduction process.
    Failure of the fast algorithm is also more likely when there are
    very many objects.
-   For both these reasons it can be a good idea to limit the number of 
+   For both these reasons it can be a good idea to limit the number of
    objects found by {\tt findobj} -- a few tens of objects in the overlap
    region is about right.
-   You can control the number of objects found by by modifying the {\tt 
-   minpix} parameter: the higher this threshold is set the fewer 
+   You can control the number of objects found by by modifying the {\tt
+   minpix} parameter: the higher this threshold is set the fewer
    objects {\tt findobj} will identify in the image.
 
 \end{description}
 
-More detailed information on each of these applications can be found in 
+More detailed information on each of these applications can be found in
 \xref{SUN/139}{sun139}{}\/\cite{SUN139}.
 
 
@@ -3477,7 +3477,7 @@ format conversion is carried out by \xref{KAPPA}{sun95}{} application
 \xref{{\tt ndfcopy}}{sun95}{NDFCOPY} and most of the rest of the script is
 concerned with checking that the file names are valid and generating
 suitable input and output names.  You give the script a list of one or more
-input files and the output file type required.  
+input files and the output file type required.
 
 \subsection*{Example}
 
@@ -3543,7 +3543,7 @@ Script {\tt doapp.csh} allows you to apply an application to a series
 of compressed files.  It is useful if disk space is scarce.  The files
 are assumed to have been compressed with the Unix utility {\tt compress}.
 Each file is, in turn, decompressed, processed and recompressed.  In the
-script provided application \xref{{\tt histpeak}}{sun180}{SESSION1} in 
+script provided application \xref{{\tt histpeak}}{sun180}{SESSION1} in
 \xref{ESP}{sun180}{} is used to determine the median value of the image and
 this value is output to a text file.  This effect is achieved by writing
 {\tt histpeak}'s output to a temporary file and then using the Unix
@@ -3645,7 +3645,7 @@ this line is appended to the output file.
 
 You give the script a list of input files (wild-cards are permitted),
 the required keyword (which must be in upper case) and the name of the
-output file in which the results are to be written.  
+output file in which the results are to be written.
 
 \subsection*{Example}
 
@@ -3695,7 +3695,7 @@ The input for either script consists of the name of the image to be
 displayed and the minimum and maximum intensities to be displayed.  The
 minimum intensity is specified as the number of $\alpha$ below the sky
 background and the maximum as the number of $\alpha$ above the sky
-background.  
+background.
 
 \subsection*{Example}
 
@@ -3752,7 +3752,7 @@ author and publisher.  Karen Moran kindly unearthed the contact details
 for Twin Press.
 
 Any mistakes, of course, are our own.
-  
+
 
 % References ----------------------------------------------------------
 
@@ -3791,7 +3791,7 @@ Any mistakes, of course, are our own.
    D.S.~Berry and A.C.~Davenhall, 2000, \xref{SUN/55.14}{sun55}{}: {\it
    CONVERT --- A Format-conversion Package}\, (Starlink).
 
-  \bibitem{DAVENHALL98} A.C.~Davenhall, 1998, 
+  \bibitem{DAVENHALL98} A.C.~Davenhall, 1998,
   \htmladdnormallink{{\it Starlink Bulletin}}
    {http://www.starlink.ac.uk//bulletin.html},
    No. {\bf 20}, pp17-19.  In the first instance see your site manager
@@ -3801,7 +3801,7 @@ Any mistakes, of course, are our own.
    /pub/acd/misc}, file {\tt roadmap.ps}.  The file is in PostScript
    format.
 
-  \bibitem{DRAPER95} P.W.~Draper, 1995, 
+  \bibitem{DRAPER95} P.W.~Draper, 1995,
   \htmladdnormallink{{\it Starlink Bulletin}}
    {http://www.starlink.ac.uk//bulletin.html},
    No. {\bf 16}, pp6-7.  In the first instance see your site manager

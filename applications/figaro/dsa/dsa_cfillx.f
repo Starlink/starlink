@@ -20,7 +20,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) NELM      (Integer,ref) The number of elements in the array.
-C     (>) VALUE     (Scalar of appropriate type,ref) The constant value to 
+C     (>) VALUE     (Scalar of appropriate type,ref) The constant value to
 C                   be used.
 C     (<) ARRAY     (Array of appropriate type,ref) The array to be filled.
 C

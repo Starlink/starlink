@@ -61,7 +61,7 @@
 
 proc iraf_text {text} {
 #+
-# Send some text to be written by the cl. 
+# Send some text to be written by the cl.
 #-
     ipc_write "xmit(4,[expr [string length $text]+1])\n"
     ipc_write $text\n
@@ -143,9 +143,9 @@ proc do_action {action comline} {
                     }
 
 #                  If required request the parameter from the cl.
-                    if { $prompt } {                     
+                    if { $prompt } {
 #iraf_text "Getting IRAF value"
-#                   If the parameter has been obtained once already, 
+#                   If the parameter has been obtained once already,
 #                   force a prompt
    		      if {[lsearch -exact $par_got_already $param] != -1} {
 #iraf_text "forcing prompt"
@@ -168,7 +168,7 @@ proc do_action {action comline} {
                        }
                        set value $default
                     }
-                      
+
 #                Force a prompt if the value is blank (include a
 #                blank filename, '@', in this)
 #iraf_text "value is: $value"
@@ -463,7 +463,7 @@ proc adam_load {taskname exe} {
 #-
 # Loads an adam task and waits for it to attach to the message system.
 # ADAM_TASK_TYPE is set to I so parameters are not cancelled automatically
-# at the end of the task. One can then `get' values of output parameters 
+# at the end of the task. One can then `get' values of output parameters
 # in order to update the IRAF parameters before sending a PAR_RESET message.
 #-
     global env
@@ -548,13 +548,13 @@ proc forceprompt { param } {
     }
 
 # The environment for the task is now set so we can load the adam task and
-# get hooked into the adam message system. argv0 contains the name used to 
-# run this script; the name of the adam task is obtained by removing the 
+# get hooked into the adam message system. argv0 contains the name used to
+# run this script; the name of the adam task is obtained by removing the
 # trailing ".e".
     set adam_root [file rootname $argv0]
     if {[string range $adam_root 0 0] != "/"} {
 	set adam_root ./$adam_root
-    } 
+    }
     set adam_taskname [file tail $adam_root]_[pid]
     adam_start ${adam_taskname}_cl
     set adam_pid [adam_load  $adam_taskname $adam_root]

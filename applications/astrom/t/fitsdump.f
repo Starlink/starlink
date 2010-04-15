@@ -1,13 +1,13 @@
       program fitsdump
-      
+
       implicit none
       integer ftstat,ftunit,blocksize,i
       character*(80) s
       logical keepreading
       logical printline
-      
+
       integer iargc
-      
+
       if (iargc().ne.1) then
          write (*,'("Usage: fitsdump fitsfile")')
          goto 999
@@ -17,7 +17,7 @@
       ftstat = 0
       call ftgiou (ftunit, ftstat)
       call ftopen (ftunit, s, 0, blocksize, ftstat)
-      
+
       if (ftstat.gt.0) then
          write (*,'("Can''t open file ",a)') s
          goto 998

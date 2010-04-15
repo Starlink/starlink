@@ -220,7 +220,7 @@
 	  IMXCEN = REAL( TEMP_XCEN)
 	  IMYCEN = REAL( TEMP_YCEN)
 
-* get offset for x and y 
+* get offset for x and y
 
 	  CALL PAR_GET0R( 'POL_XOFF', POL_XOFF, STATUS)
 	  CALL PAR_GET0R( 'POL_YOFF', POL_YOFF, STATUS)

@@ -1,10 +1,10 @@
 *+  RED4_GET_STATS - Obtain stats on a sub-set of a 2-D array.
-      SUBROUTINE RED4_GET_STATS( DIM1, DIM2, DATA, WORK, QUALITY, 
-     :  QUAL, WHOLE, IST, IEN, IINCR, JST, JEN, JINCR, AUTOSCALE, 
+      SUBROUTINE RED4_GET_STATS( DIM1, DIM2, DATA, WORK, QUALITY,
+     :  QUAL, WHOLE, IST, IEN, IINCR, JST, JEN, JINCR, AUTOSCALE,
      :  HIGH, LOW, MEAN, SIGMA, MEDIAN, MODE, STATUS )
 *   Invocation :
-*     CALL RED4_GET_STATS( DIM1, DIM2, DATA, WORK, QUALITY, QUAL, WHOLE, 
-*        IST, IEN, IINCR, JST, JEN, JINCR, AUTOSCALE, HIGH, LOW, MEAN, 
+*     CALL RED4_GET_STATS( DIM1, DIM2, DATA, WORK, QUALITY, QUAL, WHOLE,
+*        IST, IEN, IINCR, JST, JEN, JINCR, AUTOSCALE, HIGH, LOW, MEAN,
 *        SIGMA, MEDIAN, MODE, STATUS )
 *    Parameters :
 *     DIM1               = INTEGER( READ )
@@ -103,7 +103,7 @@
      :  NGOOD,                            ! Number of good points
      :  NPOINTS                           ! Nunber of  points in array
       REAL RATIO                          ! %age number of goof points
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      : TOTALDP,                           ! Total values (ie Sum(X) )
      : TOTSQ,                             ! Total square values ( ie Sum(X**2) )
      : RSIZE,
@@ -179,7 +179,7 @@
                   HIY = J
                 ENDIF
               ELSE
-                IF ( DATA(I,J).GE.LOW .AND. DATA(I,J).LE.HIGH )  THEN 
+                IF ( DATA(I,J).GE.LOW .AND. DATA(I,J).LE.HIGH )  THEN
                   ISIZE = ISIZE + 1
                   NGOOD = NGOOD + 1
                   WORK(ISIZE) = DBLE( DATA(I,J) )
@@ -214,7 +214,7 @@
                 HIY = J
               ENDIF
             ELSE
-              IF ( DATA(I,J).GE.LOW .AND. DATA(I,J).LE.HIGH )  THEN 
+              IF ( DATA(I,J).GE.LOW .AND. DATA(I,J).LE.HIGH )  THEN
                 ISIZE = ISIZE + 1
                 WORK(ISIZE) = DBLE( DATA(I,J) )
                 TOTALDP = TOTALDP + DATA(I,J)
@@ -271,7 +271,7 @@
            MEDIAN = 0.5 * REAL( WORK(ISIZE2) + WORK(ISIZE2+1) )
          ELSE
            MEDIAN = REAL( WORK(ISIZE2+1) )
-         ENDIF         
+         ENDIF
 
 *       Calculate (approximate) the mode
          MODE = 3*MEDIAN - 2*MEAN
@@ -289,7 +289,7 @@
          CALL MSG_SETI( 'NP', NPOINTS )
          CALL MSG_SETI( 'NG', NGOOD )
          CALL MSG_SETR( 'RA', REAL(NGOOD*100)/REAL(NPOINTS) )
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :     'Number of data values = ^NP, Used ^NG (^RA %)', STATUS )
       ENDIF
       END

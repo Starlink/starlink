@@ -24,27 +24,27 @@
 *     made to get an NDF from the environment.
 *
 *     If the conditional message filter level is not set to MSG__QUIET
-*     then an informational message is displayed if the astrometry 
-*     information is obtained from the MORE structure or from the 
+*     then an informational message is displayed if the astrometry
+*     information is obtained from the MORE structure or from the
 *     reference object.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter to use.
 *     PICID = INTEGER (Given)
-*        The AGI identifier for the picture for which the associated 
+*        The AGI identifier for the picture for which the associated
 *        astrometry structure is required.
 *     LBND( 2 ) = INTEGER (Returned)
-*        The lower pixel bounds of the NDF given by parameter PARAM or 
+*        The lower pixel bounds of the NDF given by parameter PARAM or
 *        stored as the reference object. If the astrometry structure is
-*        obtained from the MORE structure of the picture, then LBND is 
-*        returned holding the pixel indices corresponding to the lower 
-*        bounds of the picture (assuming the pictures world coordinates 
+*        obtained from the MORE structure of the picture, then LBND is
+*        returned holding the pixel indices corresponding to the lower
+*        bounds of the picture (assuming the pictures world coordinates
 *        are pixel coordinates).
 *     UBND( 2 ) = INTEGER (Returned)
-*        The upper pixel bounds of the NDF given by parameter PARAM or 
+*        The upper pixel bounds of the NDF given by parameter PARAM or
 *        stored as the reference object. If the astrometry structure is
-*        obtained from the MORE structure of the picture, then UBND is 
+*        obtained from the MORE structure of the picture, then UBND is
 *        returned holding the pixel indices corresponding to the upper
 *        bounds of the picture (assuming the pictures world coordinates
 *        are pixel coordinates).
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,7 +86,7 @@
       INTEGER LBND( 2 )
       INTEGER UBND( 2 )
       INTEGER IDA
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -119,7 +119,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an NDF context.
-      CALL NDF_BEGIN  
+      CALL NDF_BEGIN
 
 *  See if the user has specified an NDF to use.
       CALL NDF_ASSOC( PARAM, 'READ', INDF, STATUS )
@@ -192,7 +192,7 @@
                   IF( I .LT. NCOMP ) then
                      I = I + 1
                   ELSE
-                     AGAIN = .FALSE.      
+                     AGAIN = .FALSE.
                   END IF
 
                END IF

@@ -27,11 +27,11 @@
 *     N = INTEGER (Given)
 *         "  last   "      "     "    "
 *     SDENS(*) = REAL ARRAY (Given)
-*       
+*
 *     PROMPT = LOGICAL (Given)
 *        If to prompt for value of "FRAC"
 *     FACTOR = CHARACTER*(*) (Given)
-*       
+*
 *     GMODE = REAL (Given)
 *        Mode, if less than 0 on entry then to evaluate,
 *                   otherwise done here (if >0 then assumed already

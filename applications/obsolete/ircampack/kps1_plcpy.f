@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,10 +120,10 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      BYTE VAL_DTOUB             ! _DOUBLE to _UBYTE conversion  
-      INTEGER*2 VAL_DTOW         ! _DOUBLE to _WORD conversion  
-      INTEGER VAL_DTOI           ! _DOUBLE to _INTEGER conversion  
-      REAL VAL_DTOR              ! _DOUBLE to _REAL conversion  
+      BYTE VAL_DTOUB             ! _DOUBLE to _UBYTE conversion
+      INTEGER*2 VAL_DTOW         ! _DOUBLE to _WORD conversion
+      INTEGER VAL_DTOI           ! _DOUBLE to _INTEGER conversion
+      REAL VAL_DTOR              ! _DOUBLE to _REAL conversion
 
 *  Local Variables:
       BYTE
@@ -133,7 +133,7 @@
      :        FILLW              ! _WORD fill value
 
       INTEGER
-     :        DIM( NDF__MXDIM ), ! Size of each dimension 
+     :        DIM( NDF__MXDIM ), ! Size of each dimension
      :        EL,                ! Element counter
      :        FILLI,             ! _INTEGER fill value
      :        I,                 ! Dimension counter
@@ -166,7 +166,7 @@
      :                         STATUS )
       CALL NDF_MAP( INDF3, COMP, ITYPE, 'WRITE', IPOUT, NEL, STATUS )
 
-*  Get the bounds of the output NDF. 
+*  Get the bounds of the output NDF.
       CALL NDF_BOUND( INDF3, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Store the size of each dimension.

@@ -2,12 +2,12 @@
 C+
 C
 C   -------
-C   P E E K 
+C   P E E K
 C   -------
 C
 C   Description
 C   -----------
-C   Displays individual pixel values in an n-D image. If n = 1, 2 or 3, 
+C   Displays individual pixel values in an n-D image. If n = 1, 2 or 3,
 C   the values of adjacent pixels are also displayed.
 C
 C
@@ -47,19 +47,19 @@ C
 C
 C   Method
 C   ------
-C   - The IMAGE structure is tested for the bad pixel flag. If it is found 
-C     and non-zero, magic values are assumed to be present and are left in 
+C   - The IMAGE structure is tested for the bad pixel flag. If it is found
+C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
 C   - An image subset is computed, consisting of the required pixel plus
 C     its two neighbours in each dimension.
-C   - The minimum and maximum values in the selected image subset are 
+C   - The minimum and maximum values in the selected image subset are
 C     obtained by calling the appropriate NDP_STATS routine. These are used
-C     to determine the maximum string length required to write out a data 
+C     to determine the maximum string length required to write out a data
 C     value.
-C   - A subroutine appropriate to the data type is called to display the 
+C   - A subroutine appropriate to the data type is called to display the
 C     pixel value. For dimensionalities of 1, 2, and 3 the neighbouring
-C     values are also displayed. In such cases, dimensions above 1 are 
-C     accessed in reverse so that the display appears with the correct 
+C     values are also displayed. In such cases, dimensions above 1 are
+C     accessed in reverse so that the display appears with the correct
 C     orientation.
 C
 C
@@ -119,7 +119,7 @@ C
 C   Extensions to FORTRAN 77
 C   ------------------------
 C   DO WHILE / END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
-C                       
+C
 C
 C   Possible future upgrades
 C   ------------------------
@@ -131,7 +131,7 @@ C   --------
 C   Nick Fuller  RGO  (RGVAD::NMJF or NMJF@UK.AC.RGO.STAR)
 C   Chris Benn   RGO  (RGVAD::CRB or CRB@UK.AC.RGO.STAR)
 C   Julian Gold  RGO  (CAVAD::GOLDJIL or GOLDJIL@UK.AC.CAM.AST-STAR)
-C      
+C
 C   History
 C   -------
 C   01-FEB-1989  - Original program
@@ -195,13 +195,13 @@ C   Open DSA system
 C
       CALL DSA_OPEN(STATUS)
       IF(STATUS.NE.0)GO TO 500
-C                
+C
 C   Open file for IMAGE
 C
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
-C   Get information about IMAGE             
+C   Get information about IMAGE
 C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -239,7 +239,7 @@ c
       END IF
       IF (STATUS.NE.0) GO TO 500
 C
-C   Perform loop for a set of pixel coordinates 
+C   Perform loop for a set of pixel coordinates
 C
       DO WHILE (AGAIN)
 C

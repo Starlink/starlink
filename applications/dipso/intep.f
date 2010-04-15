@@ -42,30 +42,30 @@
        INTEGER IO, IUP, N1, I
        LOGICAL EINTEP
 
-       LP1 = 0 
-       LP2 = 0 
-       L1 = 0 
-       L2 = 0 
-       FP1 = 0 
-       FP2 = 0 
-       XPI = 0 
+       LP1 = 0
+       LP2 = 0
+       L1 = 0
+       L2 = 0
+       FP1 = 0
+       FP2 = 0
+       XPI = 0
        XPI1 = 0
-       IO = 0 
-       IUP = 0 
-       N1 = 0 
- 
+       IO = 0
+       IUP = 0
+       N1 = 0
+
        IER = 1
        IO = 1
        IUP = 0
- 
+
        IF (X(2).LT.X(1)) IUP = 1
        N1 = N - 1
- 
+
        IF ((XP.GE.X(N) .AND. IUP.EQ.0) .OR. (XP.LE.X(N) .AND. IUP.EQ.1))
      : THEN
           P = F(N)
           GOTO 50
-       ELSEIF ((XP.LE.X(1) .AND. IUP.EQ.0) .OR. 
+       ELSEIF ((XP.LE.X(1) .AND. IUP.EQ.0) .OR.
      : (XP.GE.X(1) .AND. IUP.EQ.1)) THEN
           P = F(1)
    50     CONTINUE
@@ -74,8 +74,8 @@
        ENDIF
 
 C     ENTRY EINTEP(XP,P,X,F,N,IER)
-    1 CONTINUE 
- 
+    1 CONTINUE
+
        DO 100 I = IO, N
           IF (XP.LT.X(I) .AND. IUP.EQ.0) GOTO 200
           IF (XP.GT.X(I) .AND. IUP.EQ.1) GOTO 200
@@ -103,7 +103,7 @@ C     ENTRY EINTEP(XP,P,X,F,N,IER)
        L2 = XPI*LP2
        P = F(I)*(1.0-2.0*LP1*XPI)*L1**2 + F(I+1)*(1.0-2.0*LP2*XPI1)
      :     *L2**2 + FP2*XPI1*L2**2 + FP1*XPI*L1**2
- 
+
   300  CONTINUE
 
        END

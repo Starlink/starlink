@@ -60,7 +60,7 @@
 *     10-FEB-1988 (AJC):
 *        Rationalize include files.
 *     29-OCT-1991 (PMA):
-*        Changed references to FIO_$xxxxx to FIO1_xxxxx 
+*        Changed references to FIO_$xxxxx to FIO1_xxxxx
 *     10-JAN-1992 (PMA):
 *        Remove machine specific features and hide them in INCLUDE
 *        statements.

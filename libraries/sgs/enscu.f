@@ -67,7 +67,7 @@
 
 
 *   Inquire echo switch setting
-      CALL sgs_1ILCMO(MODE,IESW,JSTAT)                       
+      CALL sgs_1ILCMO(MODE,IESW,JSTAT)
 
 *   Enable for sample
       IF (JSTAT.EQ.0) CALL GSLCM(IWTID(ABS(IZTW(ISZID))),1,GSAMPL,IESW)

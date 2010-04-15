@@ -14,16 +14,16 @@
 
 *  Description:
 *     This routine extracts the version number from the VERSION parameter
-*     of the supplied POLPACK catalogue. It then compares this version 
+*     of the supplied POLPACK catalogue. It then compares this version
 *     with the version supplied in VTEST. If the catalogue was created
-*     by an earlier version of POLPACK than that indicated by VTEST, then 
+*     by an earlier version of POLPACK than that indicated by VTEST, then
 *     OK is returned false. Otherwise OK is returned true.
 
 *  Arguments:
 *     CI = INTEGER (Given)
 *        A CAT identifier for the catalogue.
 *     VTEST = CHARACTER*(*) (Given)
-*        The earliest version of of POLPACK which created catalogues which 
+*        The earliest version of of POLPACK which created catalogues which
 *        can be processed by the calling application. This should be in the
 *        form "m.n-r" where m, n and r are integers. Missing trailing
 *        fields default to zero.
@@ -34,7 +34,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -56,7 +56,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER CI 
+      INTEGER CI
       CHARACTER VTEST*(*)
 
 *  Arguments Returned:
@@ -69,11 +69,11 @@
       CHARACTER VERS*20          ! Version string
       INTEGER GI                 ! CAT identifier for VERSION parameter
       INTEGER M                  ! Major version number from NDF
-      INTEGER MT                 ! Smallest acceptable major version number 
+      INTEGER MT                 ! Smallest acceptable major version number
       INTEGER N                  ! Minor version number from NDF
-      INTEGER NT                 ! Smallest acceptable minor version number 
+      INTEGER NT                 ! Smallest acceptable minor version number
       INTEGER R                  ! Revision number from NDF
-      INTEGER RT                 ! Smallest acceptable revision number 
+      INTEGER RT                 ! Smallest acceptable revision number
 *.
 
 *  Initialise.
@@ -114,7 +114,7 @@
 
          IF( N .GT. NT ) THEN
             OK = .TRUE.
-   
+
          ELSE IF( N .EQ. NT ) THEN
             IF( R .GE. RT ) OK = .TRUE.
          END IF

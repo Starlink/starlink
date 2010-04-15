@@ -1,4 +1,4 @@
-*+  P4_PLOTBAR - Plot a colour scale bar alongside an image 
+*+  P4_PLOTBAR - Plot a colour scale bar alongside an image
       SUBROUTINE P4_PLOTBAR( PORT, STATUS )
 *    Description :
 *     Plots a colour scale bar alongside an IMAGE plot.
@@ -75,8 +75,8 @@
 
 *    Define Y dimension of viewport for bar
       IF ( ABS( VYEND( PORT ) - VYSTART( PORT ) ) .LT. 0.1 ) THEN
-        VBY1 = VYSTART( PORT ) - 0.2 
-        VBY2 = VYEND( PORT ) + 0.2 
+        VBY1 = VYSTART( PORT ) - 0.2
+        VBY2 = VYEND( PORT ) + 0.2
       ELSE
         VBY1 = VYSTART( PORT ) + 0.2 * ( VYEND( PORT ) - VYSTART( PORT ) )
         VBY2 = VYSTART( PORT ) + 0.8 * ( VYEND( PORT ) - VYSTART( PORT ) )
@@ -109,7 +109,7 @@
         DO J = 1, LEVELS
            SCALE( 1, J ) = LOW( PORT ) + REAL( J - 1 ) * INCR
         END DO
-        CALL P4_SCALE_REAL( WIDTH, LEVELS, SCALE, LOW( PORT ), 
+        CALL P4_SCALE_REAL( WIDTH, LEVELS, SCALE, LOW( PORT ),
      :    HIGH( PORT ), 2, CI2, IDATA, STATUS )
 
 *      Reset the FG/BG levels
@@ -117,8 +117,8 @@
         CALL PGSCR( 1, FG_RD, FG_GR, FG_BL )
 
 *      Plot the image
-        CALL PGPIXL( IDATA, WIDTH, LEVELS, 1, WIDTH, 1, 
-     :    LEVELS, 0.5, 1.5, 1.0, REAL( LEVELS ) ) 
+        CALL PGPIXL( IDATA, WIDTH, LEVELS, 1, WIDTH, 1,
+     :    LEVELS, 0.5, 1.5, 1.0, REAL( LEVELS ) )
 
 *      Finally, annotate it
         XLAB = 1.5 + OFFSET

@@ -38,7 +38,7 @@
 *   Constants from GRECOM.INC
 *       TRN       i     Transformation number for viewport
 *       TRN2      i     Transformation number for full workstation
-*       
+*
 *   D.L.Terrett (after T.J.Pearson) Jul 1987
 *+
       IMPLICIT NONE
@@ -46,7 +46,7 @@
 
       INCLUDE 'PGP_ERR'
 
-      
+
       LOGICAL ABSXY, UNUSED, VISBLE, CENTER
       INTEGER XYGRID(300)
       INTEGER   LIST(256)

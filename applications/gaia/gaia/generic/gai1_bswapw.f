@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Byte swap an integer*2 (word) data value (assumes wrong endianness
-*     of data). 
+*     of data).
 
 *  Language:
 *     Starlink Fortran 77
@@ -69,7 +69,7 @@
       INTEGER*2 VALUE
 
 *  Local Variables:
-      CHARACTER * ( 1 ) CVAL( 2 )           
+      CHARACTER * ( 1 ) CVAL( 2 )
       CHARACTER * ( 1 ) TMP
       INTEGER*2 RVAL
 

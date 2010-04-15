@@ -8,8 +8,8 @@ C  Function:
 C     Sets the initial values in the common tables for a new file.
 C
 C  Description:
-C     This is an internal routine used by routines that need to 
-C     allocate a new reference slot for a file and initialise the 
+C     This is an internal routine used by routines that need to
+C     allocate a new reference slot for a file and initialise the
 C     values in it.  It sets the various flags to their initialised
 C     state.  Having all this in one place makes it easier to add
 C     new entries to the reference tables.
@@ -51,7 +51,7 @@ C     (<) DATA_SLOT   (Integer array) Map call slot for data mapping.
 C     (<) QUALITY_SLOT (Integer array) Map call slot for quality mapping.
 C     (<) PRE_QUAL    (Logical array) Indicates quality pre-processing done.
 C     (<) PRE_FLAG    (Logical array) Indicates flag values pre-processed.
-C     (<) USE_FLAGS   (Logical array) Indicates application will use 
+C     (<) USE_FLAGS   (Logical array) Indicates application will use
 C                     flagged data values for this structure.
 C     (<) USE_QUALITY (Logical array) Indicates application will use
 C                     quality information for this structure.
@@ -59,11 +59,11 @@ C     (<) QF_HANDLING (Integer array) Flags that record the use the program
 C                     is making of the quality and flag information.
 C     (<) FITS_OPEN   (Logical array) Indicates FITS processing begun for
 C                     this structure.
-C     (<) ERROR_UPDATE (Logical array) Indicates that the error array has 
+C     (<) ERROR_UPDATE (Logical array) Indicates that the error array has
 C                     been updated (or at least, mapped for update).
-C     (<) DATA_UPDATE (Logical array) Indicates that the data array has 
+C     (<) DATA_UPDATE (Logical array) Indicates that the data array has
 C                     been updated (or at least, mapped for update).
-C     (<) RANGE_UPDATE (Logical array) Indicates that the data range values 
+C     (<) RANGE_UPDATE (Logical array) Indicates that the data range values
 C                     have been updated.
 C     (<) QUAL_UPDATE (Logical array) Indicates that the quality array
 C                     has been updated (or at least, mapped for update).

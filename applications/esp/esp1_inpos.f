@@ -35,9 +35,9 @@
 *     keeps things tidy, but it means that the extraction of the WCS
 *     component from the NDF and of the mapping from the WCS component
 *     may have to be done multiple times, while if it were done in
-*     the calling routine it need only be done once.  However, the 
+*     the calling routine it need only be done once.  However, the
 *     time taken as a proportion of the overall running time for any
-*     current ESP application is always(?) going to be negligable, 
+*     current ESP application is always(?) going to be negligable,
 *     so this trade-off seems worthwhile.
 *
 *  Authors:
@@ -101,10 +101,10 @@
 
 *   Check that the coordinates given fall within the bounds of the NDF.
 *   Note this check restricts the coordinates to be between the centre
-*   of the lowest pixel and the centre of the highest pixel in each 
+*   of the lowest pixel and the centre of the highest pixel in each
 *   dimension, i.e. not within half a pixel of the edge of the array.
 *   It's not clear to me (MBT) that this is correct, but I'm
-*   re-implementing the constraints in the same way that they have been 
+*   re-implementing the constraints in the same way that they have been
 *   previously operating within ESP.
       IF (BC(1).LT.XMIN.OR.BC(1).GT.XMAX.OR.
      :    BC(2).LT.YMIN.OR.BC(2).GT.YMAX) THEN
@@ -124,7 +124,7 @@
 *   Convert from Base coordinates to pixel coordinates.
       XB=REAL(BC(1))
       YB=REAL(BC(2))
- 
+
 *   Error exit label.
  99   CONTINUE
 

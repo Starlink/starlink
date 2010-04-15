@@ -16,12 +16,12 @@
 *     CALL VERSION( STATUS )
 
 *  Usage:
-*     version [compare] 
+*     version [compare]
 
 *  Description:
 *     This application will display the installed package version number,
-*     or compare the version number of the installed package against a 
-*     specified version number, reporting whether the installed package 
+*     or compare the version number of the installed package against a
+*     specified version number, reporting whether the installed package
 *     is older, or younger, or equal to the specified version.
 
 *  ADAM Parameters:
@@ -29,10 +29,10 @@
 *        A string specifying the version number to be compared to the
 *        version of the installed package. If a null (!) value is supplied,
 *        the version string of the installed package is displayed, but no
-*        comparison takes place. If a non-null value is supplied, the 
-*        version of the installed package is not displayed. 
+*        comparison takes place. If a non-null value is supplied, the
+*        version of the installed package is not displayed.
 *
-*        The supplied string should be in the format "V<ddd>.<ddd>-<ddd>, 
+*        The supplied string should be in the format "V<ddd>.<ddd>-<ddd>,
 *        where "<ddd>" represents a set of digits. The leading "V" can be
 *        omitted, as can any number of trailing fields (missing trailing
 *        fields default to zero). [!]
@@ -40,13 +40,13 @@
 *        If a value is given for the COMPARE parameter, then RESULT is
 *        set to one of the following values:
 *
-*        - 1 -- The installed package is older than the version number 
+*        - 1 -- The installed package is older than the version number
 *        specified by the COMPARE parameter.
 *
-*        - 0 -- The version of the installed package is equal to the 
+*        - 0 -- The version of the installed package is equal to the
 *        version specified by the COMPARE parameter.
 *
-*        - -1 -- The installed package is younger than the version number 
+*        - -1 -- The installed package is younger than the version number
 *        specified by the COMPARE parameter.
 *
 *        The same value is also written to standard output.
@@ -56,7 +56,7 @@
 *        The global status.
 
 *  Examples:
-*     version 
+*     version
 *        Displays the version number of the installed package.
 *     version compare="V0.14-1"
 *        Compares the version of the installed package with the version
@@ -79,7 +79,7 @@
 
 *  History:
 *     3-NOV-1999 (DSB):
-*        Original version. 
+*        Original version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,13 +102,13 @@
       CHARACTER PATH*255       ! Path for version file
       CHARACTER VCOMP*15       ! Supplied version string
       INTEGER FD               ! File descriptor
-      INTEGER MJC              ! Supplied major version number 
+      INTEGER MJC              ! Supplied major version number
       INTEGER MJI              ! Major version number of installed package
-      INTEGER MNC              ! Supplied minor version number 
+      INTEGER MNC              ! Supplied minor version number
       INTEGER MNI              ! Minor version number of installed package
       INTEGER NC               ! Number of characters in string
       INTEGER RESULT           ! The result of the comparison
-      INTEGER REVC             ! Supplied revision number 
+      INTEGER REVC             ! Supplied revision number
       INTEGER REVI             ! Revision number of installed package
 *.
 
@@ -127,14 +127,14 @@
 *  Add a context error if the file could not be opened.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'VERSION_ERR1', 'Cannot access the file '//
-     :                 'containing the package version number.', 
+     :                 'containing the package version number.',
      :                 STATUS )
          GO TO 999
       END IF
 
 *  Read one record from the file.
-      CALL FIO_READ( FD, BUF, NC, STATUS ) 
-      
+      CALL FIO_READ( FD, BUF, NC, STATUS )
+
 *  Add a context error if the file could not be opened.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'VERSION_ERR2', 'Failed to read the package '//
@@ -169,7 +169,7 @@
 *  Otherwise...
       ELSE
 
-*  Parse the supplied version string, obtaining the major and minor version 
+*  Parse the supplied version string, obtaining the major and minor version
 *  numbers, and the revision number.
          CALL KPG1_PVERS( VCOMP, MJC, MNC, REVC, STATUS )
 
@@ -184,7 +184,7 @@
 
 *  Compare the major version numbers.
          IF( MJC .GT. MJI ) THEN
-            RESULT = 1                    
+            RESULT = 1
 
          ELSE IF( MJC .LT. MJI ) THEN
             RESULT = -1
@@ -193,7 +193,7 @@
 *  numbers.
          ELSE
             IF( MNC .GT. MNI ) THEN
-               RESULT = 1                    
+               RESULT = 1
 
             ELSE IF( MNC .LT. MNI ) THEN
                RESULT = -1
@@ -202,12 +202,12 @@
             ELSE
 
                IF( REVC .GT. REVI ) THEN
-                  RESULT = 1                    
+                  RESULT = 1
 
                ELSE IF( REVC .LT. REVI ) THEN
                   RESULT = -1
 
-               ELSE                
+               ELSE
                   RESULT = 0
 
                END IF

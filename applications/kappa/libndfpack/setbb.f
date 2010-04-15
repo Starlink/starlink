@@ -89,9 +89,9 @@
 *        pixels.
 *     setbb myframe "SKY,BACK"
 *        Sets the bad-bits mask value for the quality component of the
-*        NDF called myframe so that any pixel that is flagged with 
-*        either of the two qualities "SKY" or "BACK" will be set bad. 
-*        The NDF should contain information that associates each of 
+*        NDF called myframe so that any pixel that is flagged with
+*        either of the two qualities "SKY" or "BACK" will be set bad.
+*        The NDF should contain information that associates each of
 *        these quality names with a specific bit in the quality array.
 *        Such information can for instance be created using the SETQUAL
 *        command.
@@ -160,7 +160,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -281,10 +281,10 @@
 *  Clear all bits in the bad bits mask.
             BBI = 0
 
-*  Loop round every word in the BB parameter value that ends with a 
+*  Loop round every word in the BB parameter value that ends with a
 *  comma.
             START = 1
-            COMMA = INDEX( BBC, ',' ) 
+            COMMA = INDEX( BBC, ',' )
             DO WHILE ( COMMA .GT. 0 .AND. STATUS == SAI__OK )
                COMMA = COMMA + START - 1
 
@@ -301,12 +301,12 @@
 
 *  Find the comma at the end of the next word.
                START = COMMA + 1
-               COMMA = INDEX( BBC( START: ), ',' ) 
+               COMMA = INDEX( BBC( START: ), ',' )
             END DO
 
 *  Handle any quality name following the final comma.
-            IF ( START .LE. LEN( BBC ) ) THEN 
-               CALL IRQ_GETQN( LOCS, BBC( START : ), FIXED, VALUE, BIT, 
+            IF ( START .LE. LEN( BBC ) ) THEN
+               CALL IRQ_GETQN( LOCS, BBC( START : ), FIXED, VALUE, BIT,
      :                         COMMNT, STATUS )
                BBI = BBI + 2**( BIT - 1 )
             END IF

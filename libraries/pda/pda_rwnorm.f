@@ -11,7 +11,7 @@ c      arguments :      v - array (mdim,mdim) containing the covariance
 c                           matrix approximation.
 c                       n - sample size.
 c                    mdim - row dimension of v in the calling program.
-c                      id - 
+c                      id -
 c
       implicit none
       integer n,mdim,id

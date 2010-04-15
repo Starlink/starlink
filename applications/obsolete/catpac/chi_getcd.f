@@ -16,10 +16,10 @@
 *  Description:
 *     Not part of the CHI interface definition. Only use CHI_GETCD if you
 *     are really sure about what is going on. CHI_GETCD allows you direct
-*     access to the underlying database. The database must be of a type that 
-*     allows you to open a catalogue, and identify it with a catalogue 
+*     access to the underlying database. The database must be of a type that
+*     allows you to open a catalogue, and identify it with a catalogue
 *     descriptor (CD), manipulate it using the descriptor and close it. ADC and
-*     binary are this type of database. CHI_GETCD gets you the CD. If the 
+*     binary are this type of database. CHI_GETCD gets you the CD. If the
 *     catalogue was not already open it is opened for you.
 
 *  Arguments:
@@ -50,7 +50,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,10 +97,10 @@
 *
         if (accmode) then
           access = 'WRITE'
-        else 
+        else
           access = 'READ'
         endif
-        icount = 1     
+        icount = 1
         openflg = .false.
         do while (icount .le. chi__mxass .and. .not. openflg)
           if (opcatnames(icount) .eq. input .and.

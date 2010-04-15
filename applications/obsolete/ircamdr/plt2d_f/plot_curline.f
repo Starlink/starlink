@@ -94,7 +94,7 @@
 	CALL PAR_GET0R( 'Y_CUR_REAL', Y1, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :        'Error : PLOT_CURLINE : after PAR_GETs cursor 1 values',
      :                  STATUS )
 	  RETURN
@@ -114,7 +114,7 @@
 	CALL PAR_GET0R( 'Y_CUR_REAL', Y2, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :        'Error : PLOT_CURLINE : after PAR_GETs cursor 2 values',
      :                  STATUS )
 	  RETURN

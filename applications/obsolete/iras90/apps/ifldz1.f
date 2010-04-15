@@ -1,4 +1,4 @@
-      SUBROUTINE IFLDZ1 (PLATE, DEC, BETA, HCON, DISK, REJECT, 
+      SUBROUTINE IFLDZ1 (PLATE, DEC, BETA, HCON, DISK, REJECT,
      *                   STATUS)
 
 *+
@@ -32,7 +32,7 @@
 *       The plate number of the desired plate
 *
 *     DEC = DOUBLE (Read)
-*       The latitude in equatorial degrees of the co-ordinate 
+*       The latitude in equatorial degrees of the co-ordinate
 *       used to determine the plate
 *
 *     BETA = DOUBLE (Read)
@@ -65,12 +65,12 @@
 *-
 
 *  No implicit typing
-      IMPLICIT NONE  
+      IMPLICIT NONE
 
 *  Include various constants used by ISFIELD
       INCLUDE 'IRA_PAR'
       INCLUDE 'IRA_ERR'
-      INCLUDE 'SAE_PAR' 
+      INCLUDE 'SAE_PAR'
 
 
 c  Parameters
@@ -88,7 +88,7 @@ c  Parameters
 c  Check global status
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-                                  
+
       DISK(1) = -1
       DISK(2) = -1
 
@@ -116,7 +116,7 @@ c  Calculate the disk number
         ENDIF
 
       ELSE
-     
+
         REJECT = .FALSE.
 
         IF (BETA .LT. -20.0 .AND. BETA .GT. -50.0) THEN
@@ -148,7 +148,7 @@ c  Calculate the disk number
 
         IF (PLATE .LE. 197) THEN
 c  Southern sky
-          DISK(2) = 0 
+          DISK(2) = 0
         ELSE
 c  Northern sky
           DISK(2) = 1

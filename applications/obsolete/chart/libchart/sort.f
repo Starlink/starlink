@@ -14,7 +14,7 @@
 
 *   History:
 *
-*     8-DEC-1988  
+*     8-DEC-1988
 *       Modified by Peter Allan (MAVAD::PMA) to replace the call to the
 *       NAG routine M01ALF as it was withdrawn at Mark 13.
 *     3-MAR-1993 (AJJB):
@@ -36,7 +36,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *   Always initialise the array IP to be in Ascending
 *   Order ; even if NO SORTING to be done

@@ -14,7 +14,7 @@
 
 *  Description:
 *     If there is an HDS object associated with the parameter, force
-*     its container file to be freed so that its memory cache coincides 
+*     its container file to be freed so that its memory cache coincides
 *     with the data on disk and the file is available for other programs
 *     to use.
 

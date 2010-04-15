@@ -25,8 +25,8 @@
 *     occurs.
 
 *  Description:
-*     This function returns the number of worker threads to use when 
-*     dividing a task up between multiple threads. Note, a value of "1" 
+*     This function returns the number of worker threads to use when
+*     dividing a task up between multiple threads. Note, a value of "1"
 *     means one worker thread in addition to the required manager thread
 *     that co-ordinates the workers (i.e. the main thread in which the
 *     application is started). The default value is the number
@@ -91,7 +91,7 @@ int smf_get_nthread( int *status ){
 /* Local Variables */
    const char *env_text = NULL;
    int result = 1;    /* Number of threads selected */
-   
+
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
 
@@ -104,7 +104,7 @@ int smf_get_nthread( int *status ){
          msgSetc( "S", env_text );
          errRep( "", "Illegal value for environment variable "
                  "SMURF_THREADS: '^S'.", status );
-      } 
+      }
       msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment variable",
                  status, result );
 

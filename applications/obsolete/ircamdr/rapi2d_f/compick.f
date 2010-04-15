@@ -66,7 +66,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'
 
 *    Status :
@@ -80,7 +80,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  IDIMS( NDIMS ),       ! dimensions of input DATA_ARRAY
      :  NELEMENTS,            ! Number of elements mapped
      :  NDIM,                 ! Number of dimensions from NDF_DIM
@@ -105,9 +105,9 @@
 
 *    if no error getting input structure then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get array dimensions
@@ -130,7 +130,7 @@
 *       Also, initialise the compress variable in case a null parameter
 *       is input, which could lead to a divide by zero error.
          COMPRESS  =  1
-         CALL AIF_GET0I( 'COMPRESS', 2, 2, MAXCOM, COMPRESS, STATUS ) 
+         CALL AIF_GET0I( 'COMPRESS', 2, 2, MAXCOM, COMPRESS, STATUS )
 
 *       now work out the size of the output array from the input image
 *       dimensions and the compression factor - relies on integer
@@ -154,15 +154,15 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :               PNTRO, NELEMENTS, STATUS )
 
 *          check for error before calling working subroutine
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *             now call the subroutine that does the actual work
-               CALL COMPICKSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
-     :                 %VAL( PNTRO ), ODIMS(1), ODIMS(2), COMPRESS, 
+               CALL COMPICKSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
+     :                 %VAL( PNTRO ), ODIMS(1), ODIMS(2), COMPRESS,
      :                 STATUS )
 
             END IF

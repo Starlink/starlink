@@ -45,14 +45,14 @@
 *  S       - Character variable, via which chunks of PostScript are sent for
 *            buffering.
 *
- 
+
 *     Parameters
       INTEGER    ICUT
       PARAMETER (ICUT = 5)
 *
       INTEGER IREM, I, J, LC, LFC, LC1, LC2, LFC1, LFC2
       CHARACTER S*25, DUMMY, FC*7, FC1*7, FC2*7
- 
+
 *  ALGORITHM
 *  ---------
 *     Depending on number of Polyline points call appropriate PS procedure.
@@ -62,7 +62,7 @@
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Treat short polylines separately
 *
@@ -80,12 +80,12 @@
          WRITE(S,120) N
   120    FORMAT(I3, ' pls')
          CALL GKFOCO(KIOPB, S(1:7), IREM)
- 
+
       ELSE
- 
+
 *        Long - send the coordinates in selected format as arrays:
          CALL GKFOCO(KIOPB, ' s[', IREM)
- 
+
          CALL GK1ASF(N,X,LC,LFC,FC)
          DO 100 I=1, N
             WRITE(S,FC(1:LFC)) X(I)
@@ -101,7 +101,7 @@
   200    CONTINUE
 *        Now call the plong procedure
          CALL GKFOCO(KIOPB, ']plong', IREM)
- 
+
       END IF
- 
+
       END

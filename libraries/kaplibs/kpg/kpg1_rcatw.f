@@ -25,7 +25,7 @@
 *     CI = INTEGER (Given)
 *        A CAT identifier (see SUN/181) for the supplied catalogue.
 *     IAST = INTEGER (Returned)
-*        An AST pointer to the returned Object. AST__NULL is returned if 
+*        An AST pointer to the returned Object. AST__NULL is returned if
 *        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,8 +82,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants (needed by KPG_AST)
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT constants 
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'CAT_PAR'          ! CAT constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -97,7 +97,7 @@
 
 *  External References:
       EXTERNAL KPG1_SRCTA
-      INTEGER CHR_LEN          
+      INTEGER CHR_LEN
 
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks.
@@ -125,10 +125,10 @@
 *  Initialise returned pointer.
       IAST = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Transfer all remaining textual information of class COMMENT to a 
+*  Transfer all remaining textual information of class COMMENT to a
 *  GRP group in order that we can have random access to it.
 *  ================================================================
 
@@ -149,14 +149,14 @@
 
 *  Loop until the ned of the textual information has been reached.
       DONE = .FALSE.
-      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
 *  Read the next line of textual information. Add extra trailing
 *  arguments which pass (by value, not reference) the length of the
 *  character arguments. These are needed by Unix compilers because
 *  we are using a pointer (IPBUF) instead of a genuine CHARACTER
-*  variable. 
-         CALL CAT_GETXT( CI, DONE, CLASS, %VAL( CNF_PVAL( IPBUF ) ), 
+*  variable.
+         CALL CAT_GETXT( CI, DONE, CLASS, %VAL( CNF_PVAL( IPBUF ) ),
      :                   STATUS, %VAL( CNF_CVAL( LEN( CLASS ) ) ),
      :                   %VAL( CNF_CVAL( LINESZ ) ) )
 
@@ -172,7 +172,7 @@
             CALL CHR_FIND( %VAL( CNF_PVAL( IPBUF ) ), '!!', .TRUE., IAT,
      :                     %VAL( CNF_CVAL( LINESZ ) ) )
 
-*  Shift the string to the left in order to remove everything upto the final 
+*  Shift the string to the left in order to remove everything upto the final
 *  character in "!!".
             CALL KPG1_CSHFT( -( IAT + 1 ), %VAL( CNF_PVAL( IPBUF ) ),
      :                          %VAL( CNF_CVAL( LINESZ ) ) )
@@ -183,9 +183,9 @@
 
 *  Report an error if the used length of the text is too long to be
 *  stored in a GRP group without truncation.
-            TLEN = CHR_LEN( %VAL( CNF_PVAL( IPBUF ) ), 
+            TLEN = CHR_LEN( %VAL( CNF_PVAL( IPBUF ) ),
      :                      %VAL( CNF_CVAL( LINESZ ) ) )
-            IF( TLEN .GT. GRP__SZNAM .AND. STATUS .EQ. SAI__OK ) THEN 
+            IF( TLEN .GT. GRP__SZNAM .AND. STATUS .EQ. SAI__OK ) THEN
                CALL CAT_TIQAC( CI, 'NAME', NAME, STATUS )
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'CAT', NAME )
@@ -196,16 +196,16 @@
      :                       'process. The following line has ^TLEN '//
      :                       'characters but only ^GLEN can be '//
      :                       'processed:',STATUS )
-               CALL CHR_COPY( %VAL( CNF_PVAL( IPBUF ) ), 
-     :                        .FALSE., TXT, LSTAT, 
+               CALL CHR_COPY( %VAL( CNF_PVAL( IPBUF ) ),
+     :                        .FALSE., TXT, LSTAT,
      :                        %VAL( CNF_CVAL( LINESZ ) ) )
                CALL MSG_SETC( 'TXT', TXT )
                CALL ERR_REP( 'KPG1_RCATW_2', '   ^TXT...', STATUS )
 
-*  If the text is not too long, but is not of zero length, append it to the 
+*  If the text is not too long, but is not of zero length, append it to the
 *  end of the group.
             ELSE IF( TLEN .GT. 0 ) THEN
-               CALL GRP_PUT( ASTGRP, 1, %VAL( CNF_PVAL( IPBUF ) ), 
+               CALL GRP_PUT( ASTGRP, 1, %VAL( CNF_PVAL( IPBUF ) ),
      :                       0, STATUS, %VAL( CNF_CVAL( LINESZ ) ) )
             END IF
          END IF
@@ -213,18 +213,18 @@
       END DO
 
 *  The length to read from each line should not exceed the length of a
-*  GRP element. STL catalogues have a maximum of 1500 characters per line 
+*  GRP element. STL catalogues have a maximum of 1500 characters per line
 *  of textual information.
       ASTTSZ = MIN( ASTTSZ, GRP__SZNAM )
 
 *  Now read an AST Object from the text in the GRP group.
 *  ======================================================
 
-*  Create an AST Channel through which the text stored in the group can be 
-*  read, and converted into an AST Object. The subroutine KPG1_SRCTA 
-*  extracts the text from the group, concatenates continuation lines, and 
-*  supplies the total line to the AST library. Textual information not 
-*  related to AST is skipped over without reporting errors. 
+*  Create an AST Channel through which the text stored in the group can be
+*  read, and converted into an AST Object. The subroutine KPG1_SRCTA
+*  extracts the text from the group, concatenates continuation lines, and
+*  supplies the total line to the AST library. Textual information not
+*  related to AST is skipped over without reporting errors.
       CHAN = AST_CHANNEL( KPG1_SRCTA, AST_NULL, 'SKIP=1', STATUS )
 
 *  Initialise the index of the first element to be read from the group.
@@ -240,7 +240,7 @@
       CALL PSX_FREE( IPBUF, STATUS )
 
 *  Annul the Channel.
-      CALL AST_ANNUL( CHAN, STATUS )      
+      CALL AST_ANNUL( CHAN, STATUS )
 
 *  Delete the GRP group.
       CALL GRP_DELET( ASTGRP, STATUS )

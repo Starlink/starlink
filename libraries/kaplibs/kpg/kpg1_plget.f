@@ -4,7 +4,7 @@
 *     KPG1_PLGET
 
 *  Purpose:
-*     Get the colour palette for the currently open graphics device from 
+*     Get the colour palette for the currently open graphics device from
 *     a supplied array.
 
 *  Language:
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,18 +80,18 @@
 
 *  Local Variables:
       INTEGER I                  ! Colour index
-  
+
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop round each colour index.
       DO I = CI1, CI2
 
 *  Ignore this entry if any of the values are negative.
-         IF( ARRAY( 1, I ) .GE. 0.0 .AND. 
-     :       ARRAY( 2, I ) .GE. 0.0 .AND. 
+         IF( ARRAY( 1, I ) .GE. 0.0 .AND.
+     :       ARRAY( 2, I ) .GE. 0.0 .AND.
      :       ARRAY( 3, I ) .GE. 0.0 ) THEN
 
 *  Store the new pen representation.

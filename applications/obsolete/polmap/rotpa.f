@@ -1,24 +1,24 @@
       SUBROUTINE ROTPA(NPARAMS,PARAMS,NPTS,Q,U,QV,UV,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C
 C    R O T P A
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), NPTS (<), Q (><), U (><), QV (><), UV (><)
 C OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Rotates the position angle of the current polarization spectrum
 C
@@ -73,7 +73,7 @@ C
       QC  =  COS(2.0*THETA)
       UC  =  SIN(2.0*THETA)
 C
-      DO I = 1,NPTS  
+      DO I = 1,NPTS
 C
 C Apply the rotation
 C

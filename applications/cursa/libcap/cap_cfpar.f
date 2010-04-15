@@ -132,7 +132,7 @@
 *       Decode the list of parameters to be filtered out.
 
          IF (PFILT .NE. ' ') THEN
-            
+
             UPFILT = PFILT
             CALL CHR_UCASE (UPFILT)
 
@@ -175,11 +175,11 @@
             IF (STATUS .EQ. CAT__OK  .AND.  QIINC .NE. CAT__NOID) THEN
 
 *
-*             Inquire the values of all the attributes for this 
+*             Inquire the values of all the attributes for this
 *             parameter.
 
-               CALL CAT_PINQ (QIINC, 10, QCI, QNAME, QDTYPE, QCSIZE, 
-     :           QDIMS, QSIZEA, QUNITS, QXTFMT, QPRFDS, QCOMM, QVALUE, 
+               CALL CAT_PINQ (QIINC, 10, QCI, QNAME, QDTYPE, QCSIZE,
+     :           QDIMS, QSIZEA, QUNITS, QXTFMT, QPRFDS, QCOMM, QVALUE,
      :           QDATE, STATUS)
 
 *
@@ -268,7 +268,7 @@
             ELSE
 
 *
-*             Either an error has occurred or the last parameter has 
+*             Either an error has occurred or the last parameter has
 *             been accessed from the input catalogue; set the termination
 *             status.
 

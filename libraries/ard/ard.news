@@ -5,7 +5,7 @@
  ---
 
     A new routine ARD_GTWCS has been added that returns a FrameSet
-    connecting PIXEL coordinates and user coordinates within a specified 
+    connecting PIXEL coordinates and user coordinates within a specified
     ARD description.
 
 
@@ -34,12 +34,12 @@
     A major upgrade to the ARD library has been made. The current release
     (V2.0) introduces new features which enable positions within ARD
     expressions to be supplied in a much wider range of coordinate systems
-    than prevously. For instance, if there is an RA/DEC calibration 
+    than prevously. For instance, if there is an RA/DEC calibration
     associated with the pixel array, then the ARD description can contain
-    positions in any of the common celestial coordinate systems. 
+    positions in any of the common celestial coordinate systems.
 
     A new routine ARD_PLOT has been added which will draw a curve on a
-    graphics device around the boundary of a supplied 2-dimensional ARD 
+    graphics device around the boundary of a supplied 2-dimensional ARD
     description.
 
     ARD is now released under the GPL.

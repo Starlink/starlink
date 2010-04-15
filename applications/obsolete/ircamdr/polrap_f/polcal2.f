@@ -34,8 +34,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 * Status :
 
@@ -48,7 +48,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI_1,  ! locator for 1st input data structure
      :    LOCI_2,  ! locator for 2nd input data structure
      :    LOCI_3,  ! locator for 3rd input data structure
@@ -88,15 +88,15 @@
      :    PNTRI_8 	   ! pointer to 4th input DATA_ARRAY component
 
       INTEGER
-     :    PNTROI,	   ! pointer to output intensity DATA_ARRAY 
-     :    PNTROPE,	   ! pointer to output polarization error DATA_ARRAY 
-     :    PNTROP,	   ! pointer to output polarization DATA_ARRAY 
-     :    PNTROPI,	   ! pointer to output polarized intensity DATA_ARRAY 
-     :    PNTROQ,	   ! pointer to output Q Stokes parameter DATA_ARRAY 
-     :    PNTROTE,	   ! pointer to output position angle error DATA_ARRAY 
-     :    PNTROT,	   ! pointer to output position angle DATA_ARRAY 
-     :    PNTROU,	   ! pointer to output U Stokes parameter DATA_ARRAY 
-     :    PNTROUPI	   ! pointer to output unpolarized intensity DATA_ARRAY 
+     :    PNTROI,	   ! pointer to output intensity DATA_ARRAY
+     :    PNTROPE,	   ! pointer to output polarization error DATA_ARRAY
+     :    PNTROP,	   ! pointer to output polarization DATA_ARRAY
+     :    PNTROPI,	   ! pointer to output polarized intensity DATA_ARRAY
+     :    PNTROQ,	   ! pointer to output Q Stokes parameter DATA_ARRAY
+     :    PNTROTE,	   ! pointer to output position angle error DATA_ARRAY
+     :    PNTROT,	   ! pointer to output position angle DATA_ARRAY
+     :    PNTROU,	   ! pointer to output U Stokes parameter DATA_ARRAY
+     :    PNTROUPI	   ! pointer to output unpolarized intensity DATA_ARRAY
 
 	REAL
      :	  ELDN			! electron/dn in data set
@@ -222,7 +222,7 @@
      :	    IDIMS_1( 2) .NE. IDIMS_7( 2) .OR.
      :	    IDIMS_1( 2) .NE. IDIMS_8( 2)) THEN
 
-	  CALL MSG_OUT( 'MESSAGE', 
+	  CALL MSG_OUT( 'MESSAGE',
      :                  'Error, input images are of DIFFERENT SIZES',
      :	                STATUS)
 
@@ -242,7 +242,7 @@
 	CALL MSG_SETI( 'XDIM', IDIMS_1( 1))
 	CALL MSG_SETI( 'YDIM', IDIMS_1( 2))
 
-	CALL MSG_OUT( 'INPUT_DIMS', 
+	CALL MSG_OUT( 'INPUT_DIMS',
      :                'Images are of size ^XDIM by ^YDIM pixels',
      :	              STATUS)
 *
@@ -258,13 +258,13 @@
 	CALL CREOUT( 'OUTPICP', 'OTITLE', NDIMS, ODIMS, LOCOP, STATUS)
 	CALL CREOUT( 'OUTPICT', 'OTITLE', NDIMS, ODIMS, LOCOT, STATUS)
 	CALL CREOUT( 'OUTPICI', 'OTITLE', NDIMS, ODIMS, LOCOI, STATUS)
-	CALL CREOUT( 'OUTPICPI', 'OTITLE', NDIMS, ODIMS, LOCOPI, 
+	CALL CREOUT( 'OUTPICPI', 'OTITLE', NDIMS, ODIMS, LOCOPI,
      :                STATUS)
-	CALL CREOUT( 'OUTPICUPI', 'OTITLE', NDIMS, ODIMS, LOCOUPI, 
+	CALL CREOUT( 'OUTPICUPI', 'OTITLE', NDIMS, ODIMS, LOCOUPI,
      :                STATUS)
-	CALL CREOUT( 'OUTPICPE', 'OTITLE', NDIMS, ODIMS, LOCOPE, 
+	CALL CREOUT( 'OUTPICPE', 'OTITLE', NDIMS, ODIMS, LOCOPE,
      :                STATUS)
-	CALL CREOUT( 'OUTPICTE', 'OTITLE', NDIMS, ODIMS, LOCOTE, 
+	CALL CREOUT( 'OUTPICTE', 'OTITLE', NDIMS, ODIMS, LOCOTE,
      :                STATUS)
 
 	IF ( STATUS .NE. SAI__OK) THEN
@@ -338,16 +338,16 @@
 	  RETURN
 	END IF
 *
-*      call subroutine to take the input images and calculate the polarization 
+*      call subroutine to take the input images and calculate the polarization
 *      and position angle
 *
-	CALL POL_CALPT2( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRI_1), 
-     :	                 %VAL( PNTRI_2), %VAL( PNTRI_3), %VAL( PNTRI_4), 
-     :	                 %VAL( PNTRI_5), %VAL( PNTRI_6), %VAL( PNTRI_7), 
-     :	                 %VAL( PNTRI_8), ELDN, ODIMS(1), ODIMS(2), 
-     :	                 %VAL( PNTROQ), %VAL( PNTROU), %VAL( PNTROP), 
-     :	                 %VAL( PNTROT), %VAL( PNTROI), %VAL( PNTROPI), 
-     :	                 %VAL( PNTROUPI), %VAL( PNTROPE), %VAL( PNTROTE), 
+	CALL POL_CALPT2( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRI_1),
+     :	                 %VAL( PNTRI_2), %VAL( PNTRI_3), %VAL( PNTRI_4),
+     :	                 %VAL( PNTRI_5), %VAL( PNTRI_6), %VAL( PNTRI_7),
+     :	                 %VAL( PNTRI_8), ELDN, ODIMS(1), ODIMS(2),
+     :	                 %VAL( PNTROQ), %VAL( PNTROU), %VAL( PNTROP),
+     :	                 %VAL( PNTROT), %VAL( PNTROI), %VAL( PNTROPI),
+     :	                 %VAL( PNTROUPI), %VAL( PNTROPE), %VAL( PNTROTE),
      :	                 STATUS)
 *
 *      tidy up the input/output structures

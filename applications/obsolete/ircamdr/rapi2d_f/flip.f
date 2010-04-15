@@ -10,7 +10,7 @@
 *     The image after reversal is written to %OUTPIC with the title %OTITLE.
 *
 *    Invocation :
-*   
+*
 *     CALL FLIP( STATUS )
 *
 *    Parameters :
@@ -28,7 +28,7 @@
 *    Method :
 *
 *     Check for error on entry - return if not o.k.
-*     Get input image type data structure 
+*     Get input image type data structure
 *     If no error so far then
 *        Map its DATA_ARRAY component
 *        Get a value for FTYPE which is either 'H' or 'V'
@@ -66,7 +66,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'         ! global SSE definitions
-      INCLUDE 'NDF_PAR'        
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'
 
 *    Status :
@@ -108,11 +108,11 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *       map input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :      PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions of array
-         CALL NDF_DIM( LOCI, NDIMS, DIMS, NDIM, STATUS)  
+         CALL NDF_DIM( LOCI, NDIMS, DIMS, NDIM, STATUS)
 
 *       get the direction of flip to be done
          CALL AIF_CHOIC( 'FTYPE', 'H,V', FTYPE, STATUS )
@@ -124,14 +124,14 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 *          check for error before calling working subroutine
             IF( STATUS .EQ. SAI__OK ) THEN
 
 *             call FLIPS to perform the flipping
-               CALL FLIPS( FTYPE, DIMS(1), DIMS(2), %VAL(PNTRI), 
+               CALL FLIPS( FTYPE, DIMS(1), DIMS(2), %VAL(PNTRI),
      :           %VAL(PNTRO), STATUS )
 
             ENDIF

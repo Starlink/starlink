@@ -1,32 +1,32 @@
-      SUBROUTINE KPG1_GDOLD( MARGIN, COMMNT, NP, PNAME, PSIDE, PSIZE, 
+      SUBROUTINE KPG1_GDOLD( MARGIN, COMMNT, NP, PNAME, PSIDE, PSIZE,
      :                       IPICD, IPICD0, IPICF, IPIC, STATUS )
 *+
 *  Name:
 *     KPG1_GDOLD
 
 *  Purpose:
-*     Create a new DATA picture with ancillary pictures aligned with 
+*     Create a new DATA picture with ancillary pictures aligned with
 *     an existing DATA picture.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GDOLD( MARGIN, COMMNT, NP, PNAME, PSIDE, PSIZE, 
+*     CALL KPG1_GDOLD( MARGIN, COMMNT, NP, PNAME, PSIDE, PSIZE,
 *                      IPICD, IPICD0, IPICF, IPIC, STATUS )
 
 *  Description:
-*     This routine creates a new DATA picture aligned with an existing 
+*     This routine creates a new DATA picture aligned with an existing
 *     DATA picture, together with any requested ancillary pictures. On
-*     exit, the new DATA picture is the current picture, and the current 
+*     exit, the new DATA picture is the current picture, and the current
 *     PGPLOT viewport corresponds to this picture.
 *
 *     A FRAME picture is only created if it would contain something other
 *     than the DATA picture (this is assumed to be the case if any
 *     ancillary pictures are requested, or if non-zero margins are requested
-*     around the DATA picture). Ancillary pictures are given their 
-*     requested sizes except that they are clipped at the bounds of the 
-*     original current picture. The FRAME picture is also clipped at the 
+*     around the DATA picture). Ancillary pictures are given their
+*     requested sizes except that they are clipped at the bounds of the
+*     original current picture. The FRAME picture is also clipped at the
 *     bounds of the original current picture.
 
 *  Arguments:
@@ -41,26 +41,26 @@
 *        being run (eg KAPPA_DISPLAY).
 *     NP = INTEGER (Given)
 *        The number of extra pictures to be included in the FRAME picture
-*        (the DATA picture itself is not included in this list). Margins are 
-*        left round the DATA picture with widths given by MARGIN. Any extra 
-*        pictures are placed outside these margins, in positions described by 
-*        PSIDE and PSIZE. 
+*        (the DATA picture itself is not included in this list). Margins are
+*        left round the DATA picture with widths given by MARGIN. Any extra
+*        pictures are placed outside these margins, in positions described by
+*        PSIDE and PSIZE.
 *     PNAME( NP ) = CHARACTER * ( * ) (Given)
 *        The names to store in the AGI database with the NP extra pictures.
 *     PSIDE( NP ) = CHARACTER * 1 (Given)
 *        Each element of this array should be one of L, R, T or B. It
 *        indicates which side of the FRAME picture an extra picture is to be
 *        placed. For Left and Right, the extra picture occupies the full
-*        height of the DATA picture, margins, and any previously created 
-*        extra pictures. The picture is placed at the far Left or Right of 
-*        all previously created pictures. For Top or Bottom, the extra picture 
-*        occupies the full width of the DATA picture, margins, and any 
+*        height of the DATA picture, margins, and any previously created
+*        extra pictures. The picture is placed at the far Left or Right of
+*        all previously created pictures. For Top or Bottom, the extra picture
+*        occupies the full width of the DATA picture, margins, and any
 *        previously created extra pictures. The picture is placed at the top or
 *        bottom of all previously created pictures. Ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
 *        The size of each extra picture. For Left and Right pictures, this is
-*        the width of the picture, and the value is given as a fraction of 
-*        the width of the current picture. For Top and Bottom pictures, it 
+*        the width of the picture, and the value is given as a fraction of
+*        the width of the current picture. For Top and Bottom pictures, it
 *        is the height of the picture, and it is given as a fraction of the
 *        height of the current picture. Ignored if NP is zero.
 *     IPICD = INTEGER (Given)
@@ -69,17 +69,17 @@
 *        An AGI identifier for the new DATA picture.
 *     IPICF = INTEGER (Returned)
 *        An AGI identifier for the FRAME picture. Thw world cooridnate
-*        system is inherited form the current picture on entry. If no 
-*        FRAME picture was created, then an AGI identifier for the current 
+*        system is inherited form the current picture on entry. If no
+*        FRAME picture was created, then an AGI identifier for the current
 *        picture is returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
 *        requested in ZSIDE and PSIZE. The world coordinate system for each
-*        picture is inherited from the FRAME picture. The actual size of a 
-*        picture may be less than the requested size if there is insufficient 
-*        room left in the FRAME picture to give it its requested size. 
-*        Identifiers for pictures which would have zero size (i.e. fall 
-*        completely outside the FRAME picture) are returned equal to -1, 
+*        picture is inherited from the FRAME picture. The actual size of a
+*        picture may be less than the requested size if there is insufficient
+*        room left in the FRAME picture to give it its requested size.
+*        Identifiers for pictures which would have zero size (i.e. fall
+*        completely outside the FRAME picture) are returned equal to -1,
 *        but no error is reported.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -97,12 +97,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -129,7 +129,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -195,7 +195,7 @@
          IPIC( I ) = -1
       END DO
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get an identifier for the current picture.
@@ -204,7 +204,7 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Find the bounds of the current viewport (i.e. the current picture). The 
+*  Find the bounds of the current viewport (i.e. the current picture). The
 *  values returned are inches from the bottom left corner of the screen.
       CALL PGQVP( 1, CXL, CXR, CYB, CYT )
 
@@ -215,14 +215,14 @@
 *  Make the existing DATA picture current.
       CALL AGI_SELP( IPICD, STATUS )
 
-*  Create a PGPLOT viewport from the DATA picture. The viewport covers the 
+*  Create a PGPLOT viewport from the DATA picture. The viewport covers the
 *  entire picture (no border is left).
       CALL AGP_NVIEW( .FALSE., STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Find the bounds of the viewport (i.e. the DATA picture). The values 
+*  Find the bounds of the viewport (i.e. the DATA picture). The values
 *  returned are inches from the bottom left corner of the screen.
       CALL PGQVP( 1, DXL, DXR, DYB, DYT )
 
@@ -236,10 +236,10 @@
       SYT = DYT + CYI * MARGIN( 3 )
       SXL = DXL - CXI * MARGIN( 4 )
 
-*  Loop round each required extra picture, extending the above bounds to 
+*  Loop round each required extra picture, extending the above bounds to
 *  enclose it. Note, the pictures are not actually created yet since
 *  we do not yet have a FRAME picture to contain them. This pass through
-*  the list of extra pictures is done in order to determine the size of 
+*  the list of extra pictures is done in order to determine the size of
 *  the required FRAME picture. The extra pictures will be created once
 *  the FRAME picture has been created.
       DO I = 1, NP
@@ -279,7 +279,7 @@
             GO TO 999
          END IF
 
-*  Clip the bounds of the new picture so that it does not extend outside the 
+*  Clip the bounds of the new picture so that it does not extend outside the
 *  original current picture.
          PXL = MAX( CXL, MIN( CXR, PXL ) )
          PXR = MAX( CXL, MIN( CXR, PXR ) )
@@ -294,7 +294,7 @@
 
       END DO
 
-*  Clip the bounds so that the box does not extend outside the original 
+*  Clip the bounds so that the box does not extend outside the original
 *  current picture.
       SXL = MAX( CXL, MIN( CXR, SXL ) )
       SXR = MAX( CXL, MIN( CXR, SXR ) )
@@ -309,11 +309,11 @@
       FYB = MIN( SYB, DYB )
       FYT = MIN( SYT, DYT )
 
-*  Create a PGPLOT viewport with these bounds and save it as a FRAME picture 
+*  Create a PGPLOT viewport with these bounds and save it as a FRAME picture
 *  within the original current picture (but only if some ancillary pictures
 *  or non-zero margins were requested). World co-ordinates in the FRAME
 *  picture are inherited from the current picture on entry.
-      IF( ( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR. 
+      IF( ( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR.
      :    MARGIN( 2 ) .GT. 0.0 .OR. MARGIN( 3 ) .GT. 0.0 .OR.
      :    MARGIN( 4 ) .GT. 0.0 ) .AND. STATUS .EQ. SAI__OK ) THEN
 
@@ -338,7 +338,7 @@
       END IF
 
 *  We now go back and create any extra required pictures within the FRAME
-*  picture just created. Restore the bounds of the area containing the 
+*  picture just created. Restore the bounds of the area containing the
 *  DATA picture and the margin.
       SYB = DYB - CYI * MARGIN( 1 )
       SXR = DXR + CXI * MARGIN( 2 )
@@ -367,7 +367,7 @@
             PYB = SYT
             PYT = SYT + ABS( PSIZE( I )*CYI )
 
-         ELSE 
+         ELSE
             PXL = SXL
             PXR = SXR
             PYB = SYB - ABS( PSIZE( I )*CYI )
@@ -375,14 +375,14 @@
 
          END IF
 
-*  Clip the bounds of the new picture so that it does not extend outside the 
+*  Clip the bounds of the new picture so that it does not extend outside the
 *  FRAME picture.
          PXL = MAX( FXL, MIN( FXR, PXL ) )
          PXR = MAX( FXL, MIN( FXR, PXR ) )
          PYB = MAX( FYB, MIN( FYT, PYB ) )
          PYT = MAX( FYB, MIN( FYT, PYT ) )
 
-*  Create a PGPLOT viewport with these bounds and save it as a picture 
+*  Create a PGPLOT viewport with these bounds and save it as a picture
 *  within the FRAME picture (but only if it has non-zero size). The world
 *  coordinate system is inherited from the FRAME picture.
          PXI = PXR - PXL

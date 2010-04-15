@@ -1,7 +1,7 @@
       SUBROUTINE TBL_OPEN( TBNAME, MODE, TBDSCR, STATUS )
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
@@ -11,7 +11,7 @@
       INCLUDE 'TBL_PAR'
 
 *  Arguments Given and Returned:
-      CHARACTER*(*) TBDSCR 
+      CHARACTER*(*) TBDSCR
       CHARACTER*(*) MODE
       CHARACTER*(*) TBNAME
 

@@ -7,7 +7,7 @@
 *    CALL TOL_BOUNDS(BOUNDS,DECCNTR)
 
 * Description:
-* This is the routine that sets the bounds from the global 
+* This is the routine that sets the bounds from the global
 * TOLERANCE[] array.
 *
 * Arguments:
@@ -17,11 +17,11 @@
 *        Fitting details
 * In OPT_CMN
 *    MAX_TIMES = INTEGER (Given)
-*       
+*
 *    TIMES = INTEGER (Given)
-*       
+*
 *    MAX_CMP = INTEGER (Given)
-*       
+*
 
 * Authors:
 *  JWP: Manchester Nov 1995 - based on find_bounds.f

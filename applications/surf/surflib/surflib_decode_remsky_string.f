@@ -1,23 +1,23 @@
-      SUBROUTINE SURFLIB_DECODE_REMSKY_STRING( SUB_INSTRUMENT, 
+      SUBROUTINE SURFLIB_DECODE_REMSKY_STRING( SUB_INSTRUMENT,
      :     N_ELEMENTS, BOL_DESC, N_BOLS, BOL_ADC, BOL_CHAN,
-     :     BOL_LIST, N_BOLS_OUT, 
+     :     BOL_LIST, N_BOLS_OUT,
      :     STATUS )
 *+
 *  Name:
 *     SURFLIB_DECODE_REMSKY_STRING
- 
+
 *  Purpose:
 *     Calculate bolometer list from remsky input
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
-*     CALL SURFLIB_DECODE_REMSKY_STRING( SUB_INSTRUMENT, 
+*     CALL SURFLIB_DECODE_REMSKY_STRING( SUB_INSTRUMENT,
 *    :     N_ELEMENTS, BOL_DESC, N_BOLS, BOL_ADC, BOL_CHAN,
-*    :     BOL_LIST, N_BOLS_OUT, 
+*    :     BOL_LIST, N_BOLS_OUT,
 *    :     STATUS )
- 
+
 *  Description:
 *     Given an array of bolometer descriptions, return an array
 *     of bolometer numbers.
@@ -66,7 +66,7 @@
 *    [h7,r1]                               - inner ring and h7
 *    [r1,-h8]                              - inner ring without h8
 *    [r1,-18]                              - inner ring without bolometer 18
-*    [all,-r1,-h7]                         - all pixels except the inner 
+*    [all,-r1,-h7]                         - all pixels except the inner
 *                                             ring/h7
 *    [all,-r3,g1]                          - all pixels except ring 3 but with
 *                                             g1 (which happens to be in r3)
@@ -115,15 +115,15 @@
 *
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
- 
+
 *  Arguments Given:
       INTEGER N_ELEMENTS
       CHARACTER*(*) BOL_DESC ( N_ELEMENTS )
@@ -149,7 +149,7 @@
       INTEGER N_SUBS                  ! Number of sub_instruments
       PARAMETER ( N_SUBS = 3 )        ! with different arrays
       INTEGER N_RINGS                 ! Max number of rings of all subs_insts
-      PARAMETER ( N_RINGS = 5 )      
+      PARAMETER ( N_RINGS = 5 )
       INTEGER N_BPR                   ! Max number of bols per ring
       PARAMETER (N_BPR = 30 )         ! Determined by SHORT array
 
@@ -182,24 +182,24 @@
 
       DATA (RINGS(I,0,1),I=1,N_BPR) /19, 29*0/    ! LONG array
       DATA (RINGS(I,1,1),I=1,N_BPR) / 12,13,20,26,25,18, 24*0 /
-      DATA (RINGS(I,2,1),I=1,N_BPR) 
-     :     /  6, 7, 8,14,21,27,32,31,30,24,17,11, 18*0/ 
-      DATA (RINGS(I,3,1),I=1,N_BPR) 
-     :     /  1, 2, 3, 4, 9,15,22,28,33,37,36,35,34,29,23,16,10, 5, 
+      DATA (RINGS(I,2,1),I=1,N_BPR)
+     :     /  6, 7, 8,14,21,27,32,31,30,24,17,11, 18*0/
+      DATA (RINGS(I,3,1),I=1,N_BPR)
+     :     /  1, 2, 3, 4, 9,15,22,28,33,37,36,35,34,29,23,16,10, 5,
      :     12*0/
       DATA (RINGS(I,4,1),I=1,N_BPR) /30*0/
       DATA (RINGS(I,5,1),I=1,N_BPR) /30*0/
 
       DATA (RINGS(I,0,2),I=1,N_BPR) /46, 29*0/    ! SHORT array
       DATA (RINGS(I,1,2),I=1,N_BPR) /35,36,47,57,56,45, 24*0/
-      DATA (RINGS(I,2,2),I=1,N_BPR) 
+      DATA (RINGS(I,2,2),I=1,N_BPR)
      :     /25,26,27,37,48,58,67,66,65,55,44,34, 18*0/
-      DATA (RINGS(I,3,2),I=1,N_BPR) 
+      DATA (RINGS(I,3,2),I=1,N_BPR)
      :     /16,17,18,19,28,38,49,59,68,76,75,74,73,64,54,43,33,24,12*0/
-      DATA (RINGS(I,4,2),I=1,N_BPR) 
+      DATA (RINGS(I,4,2),I=1,N_BPR)
      :     /8,9,10,11,12,20,29,39,50,60,69,77,84,83,82,81,
      :     80,72,63,53,42,32,23,15, 6*0/
-      DATA (RINGS(I,5,2),I=1,N_BPR) 
+      DATA (RINGS(I,5,2),I=1,N_BPR)
      :     /1,2,3,4,5,6,13,21,30,40,51,61,70,78,85,91,90,
      :     89,88,87,86,79,71,62,52,41,31,22,14,7/
 
@@ -243,7 +243,7 @@
 
 *     Set the outermost ring number
       RMAX = RING_MAX_SUB( SUB_INDEX )
-      
+
 *     Loop through each element
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -265,7 +265,7 @@
 *     We did have a number. Check it for range.
 
                   IF ((ABS(BOL) .LE. N_BOLS) .AND. (BOL .NE. 0)) THEN
-                  
+
 *     Check the sign
                      IF (BOL .LT. 0) THEN
                         MINUS = .TRUE.
@@ -279,11 +279,11 @@
                         BOLS_TEMP(N_THISTIME) = ABS(BOL)
                      END IF
 
-                  ELSE 
+                  ELSE
                      CALL MSG_SETI('BOL',BOL)
                      CALL MSG_SETI('NB',N_BOLS)
                      CALL MSG_OUTIF(MSG__NORM, ' ',
-     :                    'DECODE_STRING: ^BOL is out of range (1:^NB)', 
+     :                    'DECODE_STRING: ^BOL is out of range (1:^NB)',
      :                    STATUS)
 
                   END IF
@@ -299,7 +299,7 @@
 *     Remove any blanks from the string
                   CALL CHR_RMBLK(BOL_DESC(I))
 
-*     First decide whether this is to be a positive bolometer 
+*     First decide whether this is to be a positive bolometer
 *     or a negative. Search for a minus sign in the first character.
 *     Remove the minus sign if we do find one.
 
@@ -315,7 +315,7 @@
                   CALL CHR_UCASE(STEMP)
 
 *     Now go through and look at the string.
-            
+
                   IF (STEMP .EQ. 'ALL') THEN
 *     This is all the bolometers. Get them by simply copying all the
 *     indices. Note that the '-all' option is irrelevant since it
@@ -326,7 +326,7 @@
      :                       'WARNING: The  -all option will remove '//
      :                       'all bolometers from the input list to '//
      :                       'that point', STATUS)
-                        
+
                      END IF
 
                      DO N = 1, N_BOLS
@@ -341,7 +341,7 @@
 
 *     Now I must convert the second character onwards to an integer
 *     and get the ring number
-                  
+
                      CALL CHR_CTOI(STEMP(2:), RNUM, STATUS)
 
                      IF (STATUS .EQ. SAI__OK) THEN
@@ -349,8 +349,8 @@
 *     We have a number. Now check the range
 *     If we have a negative number we assume the user is counting
 *     from the outside in. Valid range therefore includes -1 (the
-*     outermost ring) to -(RMAX+1) 
-                        IF (RNUM .LT. 0 .AND. 
+*     outermost ring) to -(RMAX+1)
+                        IF (RNUM .LT. 0 .AND.
      :                       RNUM .GE. -1 * (RMAX + 1) ) THEN
 
 *     Recalculate RNUM
@@ -366,7 +366,7 @@
                            CALL MSG_SETI('RN', RNUM)
                            CALL MSG_OUTIF(MSG__QUIET, ' ',
      :                          'DECODE_STRING: Ring ^RN is not '//
-     :                          'available for this sub instrument', 
+     :                          'available for this sub instrument',
      :                          STATUS)
 
                         ELSE
@@ -377,10 +377,10 @@
                               IF (RINGS(N, RNUM, SUB_INDEX) .NE. 0) THEN
                                  N_THISTIME = N_THISTIME + 1
                                  IF (N_THISTIME .LE. MAX_N_BOLS) THEN
-                                    BOLS_TEMP(N_THISTIME) = 
+                                    BOLS_TEMP(N_THISTIME) =
      :                                   RINGS(N, RNUM, SUB_INDEX)
                                  END IF
-                                 
+
                               END IF
 
                            END DO
@@ -392,7 +392,7 @@
      :                             'DECODE_STRING: Ring ^RNG'//
      :                             ' is not available.',
      :                             STATUS)
-                              
+
                            END IF
 
 
@@ -410,7 +410,7 @@
 
 *     Else it may be an explicit bolometer name
                   ELSE
-                     
+
                      CALL SCULIB_BOLDECODE (STEMP, ADC, CHAN, STATUS)
 
                      IF (STATUS .EQ. SAI__OK) THEN
@@ -422,10 +422,10 @@
                         FOUND = .FALSE.
                         N = 1
                         DO WHILE ((.NOT.FOUND) .AND. (N .LE. N_BOLS))
-                           
+
                            IF ((ADC .EQ. BOL_ADC(N)) .AND.
      :                          (CHAN .EQ. BOL_CHAN(N))) THEN
-                              
+
                               FOUND = .TRUE.
 *     found it. Now I can put it into the array
                               N_THISTIME = N_THISTIME + 1
@@ -445,7 +445,7 @@
                            CALL MSG_SETC('SUB', SUB_INSTRUMENT)
                            CALL MSG_OUTIF(MSG__QUIET, ' ',
      :                          'DECODE_STRING: ^BOL could not be '//
-     :                          'found in the ^SUB sub instrument', 
+     :                          'found in the ^SUB sub instrument',
      :                          STATUS)
                         END IF
 
@@ -467,7 +467,7 @@
 *               print *,'THIS:',(BOLS_TEMP(N),N=1,N_THISTIME)
 *               print *,'SOFAR:',(BOLS_SOFAR(N),N=1,N_SOFAR)
 
-*     We now have a list of the bolometers specified in this 
+*     We now have a list of the bolometers specified in this
 *     element and we know whether they are to be added to the list
 *     or removed from it.
 
@@ -495,18 +495,18 @@
 *     Set initial conditions
                      CURRENT = -1 ! To compare with
                      COUNTER = 0
-                     
+
                      DO N = 1, N_SOFAR
-            
+
                         IF (BOLS_SOFAR(N) .NE. CURRENT) THEN
 *     Not the same as the previous entry so we can copy this one
 
                            COUNTER = COUNTER + 1
                            CURRENT = BOLS_SOFAR(N)
                            BOLS_SOFAR(COUNTER) = BOLS_SOFAR(N)
-                           
+
                         END IF
-                     
+
                      END DO
 
 *     Change N_SOFAR to the actual number of unique bolometers
@@ -530,9 +530,9 @@
 
                      DO N = 1, N_SOFAR
 
-                        DO WHILE ( POS .LT. N_THISTIME .AND. 
+                        DO WHILE ( POS .LT. N_THISTIME .AND.
      :                       BOLS_TEMP(POS) .LT. BOLS_SOFAR(N))
-                           
+
                            POS = POS + 1
 
                         END DO
@@ -542,10 +542,10 @@
 *     Note that I copy it back to itself
 
                         IF (BOLS_SOFAR(N) .NE. BOLS_TEMP(POS)) THEN
-                        
+
                            COUNTER = COUNTER + 1
                            BOLS_SOFAR(COUNTER) = BOLS_SOFAR(N)
-                        
+
                         END IF
 
                      END DO
@@ -569,7 +569,7 @@
                END IF
 
 *     End of STATUS check for each time round loop
-            END IF 
+            END IF
 
 *       End of main DO loop
          END DO

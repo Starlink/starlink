@@ -47,7 +47,7 @@
 *        The selection of auxiliary components to export to the FITS
 *        extension, their keyword names, locations, and comments
 *        are under the control of a keyword translation table held in
-*        the file fitstable.txt. 
+*        the file fitstable.txt.
 
 *  Notes:
 *     -  Requests to assign values to the following reserved keywords
@@ -171,14 +171,14 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'FIO_ERR'          ! FIO_ error codes
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -221,9 +221,9 @@
                                  ! component
       CHARACTER * ( DAT__SZLOC ) CLOC2 ! Locator to a component
       CHARACTER * ( DAT__SZLOC ) CLOCS( MXWRIT ) ! Stored locators
-      CHARACTER * ( COMLN ) COMENT ! Current inline comments 
+      CHARACTER * ( COMLN ) COMENT ! Current inline comments
       CHARACTER * ( COMLN ) COMNTS( MXWRIT ) ! Stored comments
-      CHARACTER * ( DAT__SZNAM ) COMP ! Component name in NDF extension 
+      CHARACTER * ( DAT__SZNAM ) COMP ! Component name in NDF extension
       CHARACTER * ( CVALLN ) CVAL ! Character FITS value
       DOUBLE PRECISION DVAL      ! Double precision FITS value
       INTEGER EL                 ! Number of FITS header records mapped
@@ -276,13 +276,13 @@
 
 *  Obtain the NDF to be updated.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
-      
+
 *  See whether or not there is a FITS extension.
       CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
       IF ( .NOT. THERE ) THEN
 
 *  Create the FITS extension.  Use an arbitrary size.  It will be
-*  increased, if required, as new keywords are created. 
+*  increased, if required, as new keywords are created.
          FDIM( 1 ) = 1
          CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, FDIM, LOC, STATUS )
 
@@ -383,9 +383,9 @@
             CALL CHR_TOCHR( '.', LINE( I1( 1 ):I2( 1 ) ), .TRUE.,
      :                      CDELIM )
 
-*  See whether or not this is the last component. 
+*  See whether or not this is the last component.
             LAST = CDELIM .GE. L( 1 )
-               
+
 *  The first name is the extension.  Check that there is a component
 *  to copy.  If not report the error but continue on to the next
 *  line of the translation table.
@@ -627,7 +627,7 @@
             CALL DAT_TYPE( CLOCS( ICOMP ), TYPE, STATUS )
 
 *  Handle each data type separately....
-               
+
 *  Character:
 *  =========
 
@@ -648,7 +648,7 @@
      :                          KEYWDS( ICOMP ), CVAL, '/',
      :                          COMNTS( ICOMP ), .FALSE., FOUND, CARD,
      :                          STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
- 
+
 *  Double precision:
 *  ================
 *  Obtain a value for the keyword from the NDF-extension component and
@@ -726,7 +726,7 @@
                CALL MSG_SETC( 'LINE', LINE )
                CALL ERR_REP( 'FITSEXP_LINE',
      :           'Line read was: ''^LINE''.', STATUS )
-               
+
 *  Flush the error to let processing continue.
                CALL ERR_FLUSH( STATUS )
                CALL MSG_BLANK( STATUS )

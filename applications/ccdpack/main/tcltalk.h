@@ -13,9 +13,9 @@
 *     C header file.
 
 *  Description:
-*     This include file declares the routines which can be used by 
+*     This include file declares the routines which can be used by
 *     calling C code to communicate with a ccdwish Tcl interpreter.
-*     These routines should be used rather than directly using the Tcl 
+*     These routines should be used rather than directly using the Tcl
 *     library routines declared in tcl.h and the Tcl documentation.
 
 *  Copyright:
@@ -72,17 +72,17 @@
    void ccdTclStop( ccdTcl_Interp *cinterp, int *status );
    void ccdTclRun( ccdTcl_Interp *cinterp, char *filename, int *status );
    void ccdTclDo( ccdTcl_Interp *cinterp, char *script, int *status );
-   void ccdTclAppC( ccdTcl_Interp *cinterp, char *name, char *value, 
+   void ccdTclAppC( ccdTcl_Interp *cinterp, char *name, char *value,
                     int *status );
-   void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value, 
+   void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value,
                     int *status );
-   void ccdTclSetD( ccdTcl_Interp *cinterp, char *name, double value, 
+   void ccdTclSetD( ccdTcl_Interp *cinterp, char *name, double value,
                     int *status );
-   void ccdTclSetC( ccdTcl_Interp *cinterp, char *name, char *value, 
+   void ccdTclSetC( ccdTcl_Interp *cinterp, char *name, char *value,
                     int *status );
-   void ccdTclGetI( ccdTcl_Interp *cinterp, char *script, int *value, 
+   void ccdTclGetI( ccdTcl_Interp *cinterp, char *script, int *value,
                     int *status );
-   void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value, 
+   void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value,
                     int *status );
    char *ccdTclGetC( ccdTcl_Interp *cinterp, char *script, int *status );
 

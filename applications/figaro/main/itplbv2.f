@@ -59,7 +59,7 @@
 *    EQUIVALENCE) variable zxy44.
 *    ** Health warning ** I am not convinced that this routine is
 *    working correctly.
-*    
+*
 *
 *-
       implicit none

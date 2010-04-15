@@ -30,11 +30,11 @@
 #     Performs the given method on this object.
 
 #  Configuration options:
-#  
+#
 #        -scale factor
 #
 #     The factor by which the annulus is larger than the ordinary ARD
-#     RotBox. 
+#     RotBox.
 
 #  Configuration options:
 #     See public variable defintions.
@@ -82,10 +82,10 @@
 #.
 
 itcl::class gaia::StarArdAnnRotBox {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit gaia::StarArdRotBox
 
    #  Constructor:
@@ -95,11 +95,11 @@ itcl::class gaia::StarArdAnnRotBox {
       set notify_update_cmd_  [code $this redraw_annulus_]
       eval configure $args
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
-      if { $annulus_id_ != {} } { 
+      if { $annulus_id_ != {} } {
          $canvas delete $annulus_id_
       }
    }
@@ -115,9 +115,9 @@ itcl::class gaia::StarArdAnnRotBox {
    }
 
    #  Create the annulus.
-   private method create_annulus_ {args} { 
-      if { $show_annulus } { 
-         
+   private method create_annulus_ {args} {
+      if { $show_annulus } {
+
          set annulus_id_ [eval $canvas create rtd_rotbox $coords \
                              -outline $deselected_colour]
          $canvas addtag $annulus_tag withtag $annulus_id_
@@ -126,8 +126,8 @@ itcl::class gaia::StarArdAnnRotBox {
    }
 
    #  Redraw the annulus.
-   private method redraw_annulus_ {} { 
-      if { $annulus_id_ != {} } { 
+   private method redraw_annulus_ {} {
+      if { $annulus_id_ != {} } {
          lassign $coords x y
          set maj [$canvas itemcget $canvas_id_ -semimajor]
          set min [$canvas itemcget $canvas_id_ -semiminor]
@@ -141,7 +141,7 @@ itcl::class gaia::StarArdAnnRotBox {
 
    #  Return ARD description of annulus.
    public method getann {} {
-      if { $annulus_id_ != {} } { 
+      if { $annulus_id_ != {} } {
          lassign $coords xs ys
          set maj [$canvas itemcget $annulus_id_ -semimajor]
          set min [$canvas itemcget $annulus_id_ -semiminor]
@@ -158,8 +158,8 @@ itcl::class gaia::StarArdAnnRotBox {
    #  ----------------------
 
    #  The annulus scaling factor.
-   public variable scale {1.5} { 
-      if { $annulus_id_ != {} } { 
+   public variable scale {1.5} {
+      if { $annulus_id_ != {} } {
          redraw_annulus_
       }
    }
@@ -185,7 +185,7 @@ itcl::class gaia::StarArdAnnRotBox {
 
    #  Protected variables: (available to instance)
    #  --------------------
-   
+
    #  Canvas id of annulus.
    protected variable annulus_id_ {}
 

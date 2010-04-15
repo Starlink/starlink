@@ -65,7 +65,7 @@ C-----------------------------------------------------------------------
       REAL      ZMIN1, ZMAX1
       REAL      ZC(32)
 
-      REAL       XMARGIN 
+      REAL       XMARGIN
       PARAMETER (XMARGIN = 25.)
       REAL       YMARGIN
       PARAMETER (YMARGIN = 40.)
@@ -190,7 +190,7 @@ CD    PRINT *,'Windows are ',DX,' by',DY,' mm'
       END DO
 
 *     Put a label to the screen
-      
+
       MAP_NAME = MAP_ID
 
       CALL SXGLTYPE      (0)
@@ -213,7 +213,7 @@ CD    PRINT *,'Windows are ',DX,' by',DY,' mm'
       DO J = 1,NYMAP
         DO I = 1,NXMAP
 
-          IMAP     = NXMAP*(J-1) + I          
+          IMAP     = NXMAP*(J-1) + I
           IF (IMAP.GT.NMAPS) GO TO 997
           LOCATION = IPTR (IPLP(IMAP))
 

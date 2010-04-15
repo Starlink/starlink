@@ -99,12 +99,12 @@ itcl::class gaia3d::LabelCubeFileChooser {
             -menu $menu
       } {
          keep -indicatoron -borderwidth -state
-         rename -relief -buttonrelief buttonRelief ButtonRelief 
+         rename -relief -buttonrelief buttonRelief ButtonRelief
          rename -width -buttonwidth buttonWidth ButtonWidth
          rename -anchor -buttonanchor buttonAnchor ButtonAnchor
          ignore -disabledforeground -font
       }
-      
+
       itk_component add menu {
          menu $menu \
             -postcommand [code $history_ update_history_menu $menu]
@@ -127,12 +127,12 @@ itcl::class gaia3d::LabelCubeFileChooser {
    #  --------
 
    #  Add a cube to the history. Should be called after a cube has been
-   #  accepted. 
+   #  accepted.
    public method add_to_history {name} {
       $history_ add_history $name
       $history_ record_last_cube
    }
-   
+
    #  GaiaCube implementation.
    public method get_spec_coords {} {
       return $this

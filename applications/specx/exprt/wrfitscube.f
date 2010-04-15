@@ -71,7 +71,7 @@
       CHARACTER           ORIGIN*32
 
 *     variables used to interface FIT_ routines.
-  
+
       LOGICAL   CHECK
       REAL      DMIN
       REAL      DMAX
@@ -127,7 +127,7 @@
 
       IF (NSPEC .le. 0) THEN
         IFAIL = 60
-        RETURN 
+        RETURN
       END IF
 
 *     Check FITS output file open
@@ -142,7 +142,7 @@
 
       IF (MSTEP .GT. 1024) THEN
          PRINT *, 'X-size map exceeds max. dim. Contact prog. staff'
-         STATUS = 1 
+         STATUS = 1
          GO TO 99
       ENDIF
 
@@ -151,9 +151,9 @@
       IPTR  = CURRENT_CUBE_ADDRESS
 
 *     Substitute BAD values with RBLANK (returned). Scale RBLANK to
-*     BLANK after call to FIT_SCALC. 
+*     BLANK after call to FIT_SCALC.
 
-      CALL BAD2BLANK (3, %VAL(IPTR), NPTS1*MSTEP*NSTEP, RBLANK, 
+      CALL BAD2BLANK (3, %VAL(IPTR), NPTS1*MSTEP*NSTEP, RBLANK,
      &                NBLANK, IFAIL)
 
 *     Find scaling for data using FIT_SCALC
@@ -171,8 +171,8 @@
 
       NAXES(1) = MSTEP
       NAXES(2) = NSTEP
-      NAXES(3) = NPTS1    
-      NAXES(4) = 1    
+      NAXES(3) = NPTS1
+      NAXES(4) = 1
 
       CALL FIT_HSTAN (BITPIX, NAXIS, NAXES, BSCALE, BZERO, STATUS)
       IF (STATUS.NE.0) GO TO 99
@@ -210,7 +210,7 @@
 
 *     Increment (in arcseconds) of X & Y associated with each
 *     pixel (L->R, T->B).
-*     
+*
 
       DXC  = -CELL_XSIZE         ! RA increment negative for astron data
       DYC  = +CELL_YSIZE         ! NOTE: Dec is inverted upon writeout
@@ -418,7 +418,7 @@
 
       CALL FIT_WDBLE ('OBSTIME ', DFLOAT(INTT)/1000.,
      &                'Integration time (sec)',              STATUS)
-      CALL FIT_WDBLE ('SCAN-NUM', DFLOAT(LSCAN), 
+      CALL FIT_WDBLE ('SCAN-NUM', DFLOAT(LSCAN),
      &                'Scan number ',                        STATUS)
 
       CALL FIT_WDBLE ('TAU-ATM ', TAUATM,

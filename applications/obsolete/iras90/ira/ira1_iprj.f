@@ -24,10 +24,10 @@
 *     local longitude and latitude values of zero. The local coordinate
 *     system is also arranged so that local "north" (i.e. increasing
 *     local latitude) is rotated by the angle specified by p(8) from
-*     sky coordinate north. The (U,V) system is a cartesian coordinate 
-*     system on the projection surface similar to the image (X,Y) 
-*     coordinate system. The differences are that the U and V axes are 
-*     always parallel to local north and west, the (U,V) origin is 
+*     sky coordinate north. The (U,V) system is a cartesian coordinate
+*     system on the projection surface similar to the image (X,Y)
+*     coordinate system. The differences are that the U and V axes are
+*     always parallel to local north and west, the (U,V) origin is
 *     placed at the reference point, and U and V are measured in radians
 *     rather than pixels.
 
@@ -118,11 +118,11 @@
 
 *  Local Variables:
       INTEGER          I         ! Loop count.
-      DOUBLE PRECISION COSROT    ! Cos of the rotation from (U,V) to 
+      DOUBLE PRECISION COSROT    ! Cos of the rotation from (U,V) to
                                  ! image coordinates.
       DOUBLE PRECISION RMAT(3,3) ! Matrix which rotates sky coordinates
                                  ! to local coordinates.
-      DOUBLE PRECISION SINROT    ! Sin of the rotation from (U,V) to 
+      DOUBLE PRECISION SINROT    ! Sin of the rotation from (U,V) to
                                  ! image coordinates.
       DOUBLE PRECISION VLOC(3)   ! A 3-vector giving the Cartesain
                                  ! form of a local coordinate position.
@@ -150,9 +150,9 @@
 *  coordinates to a longitude/latitude system in which the requested
 *  reference point has a longitude and latitude of zero. This
 *  coordinate system is referred to here as the "local" coordinate
-*  system. The matrix also includes the required rotation (about a 
-*  radius through the reference point) of the celestial sphere so that 
-*  "north" in the local coordinate system is at the position angle 
+*  system. The matrix also includes the required rotation (about a
+*  radius through the reference point) of the celestial sphere so that
+*  "north" in the local coordinate system is at the position angle
 *  specified by projection parameter P(8).
       CALL SLA_DEULER( 'ZYX', P(1), -P(2), -P(8), RMAT )
 
@@ -180,15 +180,15 @@
 *  (U,V) coordinates are like image (X,Y) coordinates, except that they
 *  are in units of radians rather than pixels, they are relative to
 *  an origin at the reference point, and they are rotated by an angle
-*  which puts the Y axis at the position angle specified by p(7). The 
+*  which puts the Y axis at the position angle specified by p(7). The
 *  rotation of the celestial sphere specified by p(8) will result in the
-*  V axis being at a position angle of p(8) in sky coordinates, 
-*  therefore, rotating the image coordinates by an angle of P(7)-P(8) 
-*  with respect to (U,V) will put the Y axis at a position angle of 
+*  V axis being at a position angle of p(8) in sky coordinates,
+*  therefore, rotating the image coordinates by an angle of P(7)-P(8)
+*  with respect to (U,V) will put the Y axis at a position angle of
 *  P(7). U is stored in OUT1 and V is stored in OUT2.
       ELSE
 
-*  Calculate COS and SIN of the rotation to be applied to the image 
+*  Calculate COS and SIN of the rotation to be applied to the image
 *  co-ordinates to convert them to (U,V) coordinates.
          COSROT = COS( P( 7 ) - P( 8 ) )
          SINROT = SIN( P( 7 ) - P( 8 ) )
@@ -241,10 +241,10 @@
 
 *  If performing an inverse projection (from sky to image coordinates),
 *  convert all the (U,V) coordinates just calculated, to image (X,Y)
-*  coordinates. 
+*  coordinates.
       IF( .NOT. FORWRD ) THEN
 
-*  Calculate COS and SIN of the rotation applied to image co-ordinates 
+*  Calculate COS and SIN of the rotation applied to image co-ordinates
 *  which converts them to (U,V) coordinates.
          COSROT = COS( P( 7 ) - P( 8 ) )
          SINROT = SIN( P( 7 ) - P( 8 ) )
@@ -253,8 +253,8 @@
          DO I = 1, NVAL
             IF( OUT1( I ) .NE. VAL__BADD ) THEN
 
-*  Rotate the (U,V) coordinates to get normalised image coordinates 
-*  (origin at the reference point and measured in radians instead of 
+*  Rotate the (U,V) coordinates to get normalised image coordinates
+*  (origin at the reference point and measured in radians instead of
 *  pixels).
                XNORM = OUT1( I )*COSROT + OUT2( I )*SINROT
                YNORM = OUT2( I )*COSROT - OUT1( I )*SINROT

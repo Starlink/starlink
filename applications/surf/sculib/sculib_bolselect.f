@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_BOLSELECT (BOLOMETERS, BOL_TYPE, BOL_CALIB,
      :  BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC,
-     :  ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4, BOL_SELECT_CHAN, 
-     :  BOL_SELECT_ADC, N_BOL_SELECT, MAX_SUB, SUB_INSTRMNT, N_SUB, 
+     :  ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4, BOL_SELECT_CHAN,
+     :  BOL_SELECT_ADC, N_BOL_SELECT, MAX_SUB, SUB_INSTRMNT, N_SUB,
      :  CENTRE_DU3, CENTRE_DU4, STATUS)
 *+
 *  Name:
@@ -11,24 +11,24 @@
 *     interpret a list of selected bolometers
 
 *  Description:
-*     Interpret a character string containing a list of bolometers, 
+*     Interpret a character string containing a list of bolometers,
 *     put number of bolometers to be used in N_BOL_SELECT, channel
 *     and ADC of selected bolometers in BOL_SELECT_CHAN and BOL_SELECT_ADC
 *     respectively. BOL_ENABLED entries will also be set .TRUE. for bolometers
-*     that have been selected. The number of sub-instruments involved 
-*     is returned in N_SUB, and the names of the sub-instruments are given 
-*     in SUB_INSTRMNT. The Nasmyth coords of the point on the focal plane 
+*     that have been selected. The number of sub-instruments involved
+*     is returned in N_SUB, and the names of the sub-instruments are given
+*     in SUB_INSTRMNT. The Nasmyth coords of the point on the focal plane
 *     to be treated as the axis of the instrument will be returned in
 *     CENTRE_DU3, CENTRE_DU4.
 *
 *     The given string can either be ALL, in which case all bolometer channels
 *     will be selected, or be a list of words specifying parts of the 144
 *     channel array. Each word in such a list must be separated from the others
-*     by ',', and the words can select bolometers by type - SHORT, LONG, 
+*     by ',', and the words can select bolometers by type - SHORT, LONG,
 *     P1100, P1300, P2000, SHORT_DC, LONG_DC, P1100_DC, P1300_DC, P2000_DC,
-*     or by channel number, either individually or as a range, specified by 
-*     ADC letter and channel number e.g. a3. Allowed ADCs are A-I and channels 
-*     1-16. 
+*     or by channel number, either individually or as a range, specified by
+*     ADC letter and channel number e.g. a3. Allowed ADCs are A-I and channels
+*     1-16.
 *
 *     Repeated words in the list will be ignored, as will repeated selections
 *     of the same bolometer by different routes.
@@ -43,7 +43,7 @@
 *     or a bolometer name like A7. If either of the coordinates ends up
 *     being set to the 'bad' value, they will be reset to zero and a
 *     warning message output.
-* 
+*
 *     Errors will be reported and bad status returned if -
 *
 *      - there are too many words in BOLOMETERS
@@ -53,17 +53,17 @@
 *      - if when bolometers are selected by type
 *          no detectors of the desired type are found in the database
 *
-*      - if the type selected refers to a single bolometer (P1100, P1300, 
+*      - if the type selected refers to a single bolometer (P1100, P1300,
 *       P2000, SHORT_DC, LONG_DC, P1100_DC, P1300_DC, P2000_DC)
 *          more than bolometer of the required type is found in the database
 *
 *      - if bolometers are selected by ID, e.g. a15,
 *          the ID or range of IDs is bad
 *
-*          
+*
 *     Warnings will be reported but good status returned if -
-*        
-*      - any selected bolometer has undefined attributes (type, calib, dU3, or 
+*
+*      - any selected bolometer has undefined attributes (type, calib, dU3, or
 *       dU4)
 *
 *      - CENTRE_DU3, CENTRE_DU4 are set to 'bad' values (they will be reset
@@ -71,15 +71,15 @@
 *
 
 *  Notes:
-*     The routine will not work properly if the input BOLOMETERS string 
+*     The routine will not work properly if the input BOLOMETERS string
 *     is more than 400 characters long.
 *
 
 *  Invocation:
 *     CALL SCULIB_BOLSELECT (BOLOMETERS, BOL_TYPE, BOL_CALIB,
 *    :  BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC,
-*    :  ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4, BOL_SELECT_CHAN, 
-*    :  BOL_SELECT_ADC, N_BOL_SELECT, MAX_SUB, SUB_INSTRMNT, N_SUB, 
+*    :  ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4, BOL_SELECT_CHAN,
+*    :  BOL_SELECT_ADC, N_BOL_SELECT, MAX_SUB, SUB_INSTRMNT, N_SUB,
 *    :  CENTRE_DU3, CENTRE_DU4, STATUS)
 
 *  Arguments:
@@ -98,7 +98,7 @@
 *     BOL_QUAL (NUM_CHAN, NUM_ADC)
 *                                 = INTEGER (Given)
 *           quality of bolometers
-*     BOL_ENABLED (NUM_CHAN, NUM_ADC) 
+*     BOL_ENABLED (NUM_CHAN, NUM_ADC)
 *                                 = LOGICAL (Returned)
 *           .TRUE. if bolometer was selected
 *     NUM_CHAN                    = INTEGER (Given)
@@ -109,7 +109,7 @@
 *           the DU3 offset of the centre to be used for either array
 *     ARRAY_CENTRE_DU4            = REAL (Given)
 *           the DU4 offset of the centre to be used for either array
-*     BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)   
+*     BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)
 *                                 = INTEGER (Returned)
 *           channel numbers of selected bolometers
 *     BOL_SELECT_ADC (NUM_CHAN * NUM_ADC)
@@ -218,7 +218,7 @@
       INTEGER RSTOP (2)            !       "
       INTEGER N_SELECTED           ! number of bolometers of selected of a
                                    !   specific type
-      CHARACTER*16 INDICES (MAX_WORDS)  
+      CHARACTER*16 INDICES (MAX_WORDS)
                                    ! bolometer IDs parsed from BOLOMETERS
                                    !    string by CHR_DCWRD
       CHARACTER*8 RANGE (2)        ! strings containing a range
@@ -248,11 +248,11 @@
          END IF
       END DO
 
-   
+
       IF (INDEX(COPY,'ALL') .NE. 0) THEN
-       
+
 *  all bolometers have been selected
-  
+
          N_BOL_SELECT = NUM_ADC * NUM_CHAN
          DO J = 1, NUM_ADC
             DO I = 1, NUM_CHAN
@@ -280,7 +280,7 @@
 
 *  Split the given string into a set of index specifications
 
-         CALL CHR_DCWRD (COPY, MAX_WORDS, COUNT, START, STOP, 
+         CALL CHR_DCWRD (COPY, MAX_WORDS, COUNT, START, STOP,
      :     INDICES, STATUS)
 
          IF (STATUS .NE. SAI__OK) THEN
@@ -289,7 +289,7 @@
             CALL ERR_REP (' ', 'SCULIB_BOLSELECT: too many words '//
      :        'in BOLOMETERS string - ^STRING', STATUS)
          ELSE
-  
+
             IF (COUNT .EQ. 0) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP (' ', 'SCULIB_BOLSELECT: BOLOMETERS '//
@@ -307,9 +307,9 @@
                         END IF
                      END DO
                   END DO
-               END IF   
-         
- 
+               END IF
+
+
 *  Inspect each index spec.
 *  An index spec is either a letter + integer, or a pair of such items
 *  separated by a minus sign specifying a range, or a string such as
@@ -323,14 +323,14 @@
 
                    IF (INDICES(K) .EQ. 'SHORT') THEN
 
-*  search the bolometer definition arrays for all ones in short-wave array 
+*  search the bolometer definition arrays for all ones in short-wave array
 
                      N_SELECTED = 0
 
                      DO J = 1, NUM_ADC
                        DO I = 1, NUM_CHAN
 
-*  add bolometers that belong to short-wave array and have not been selected 
+*  add bolometers that belong to short-wave array and have not been selected
 *  already
 
                          TYPE = BOL_TYPE(I,J)
@@ -361,7 +361,7 @@
                      IF (N_SELECTED .LE. 0) THEN
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: no '//
-     :                   'short-wave detectors found in database', 
+     :                   'short-wave detectors found in database',
      :                   STATUS)
                      END IF
 
@@ -370,7 +370,7 @@
 
                    ELSE IF (INDICES(K) .EQ. 'LONG') THEN
 
-*  search the bolometer definition arrays for all ones in long-wave array 
+*  search the bolometer definition arrays for all ones in long-wave array
 
                      N_SELECTED = 0
 
@@ -403,7 +403,7 @@
                      IF (N_SELECTED .LE. 0) THEN
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: no '//
-     :                   'long-wave detectors found in database', 
+     :                   'long-wave detectors found in database',
      :                   STATUS)
                      END IF
 
@@ -448,7 +448,7 @@
                      IF (N_SELECTED .EQ. 0) THEN
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: 1100 '//
-     :                   'micron photometer not found in database', 
+     :                   'micron photometer not found in database',
      :                   STATUS)
                      ELSE IF (N_SELECTED .GT. 1) THEN
                        STATUS = SAI__ERROR
@@ -501,7 +501,7 @@
                      IF (N_SELECTED .EQ. 0) THEN
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: 1300 '//
-     :                   'micron photometer not found in database', 
+     :                   'micron photometer not found in database',
      :                   STATUS)
                      ELSE IF (N_SELECTED .GT. 1) THEN
                        STATUS = SAI__ERROR
@@ -554,7 +554,7 @@
                      IF (N_SELECTED .EQ. 0) THEN
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: 2000 '//
-     :                   'micron photometer not found in database', 
+     :                   'micron photometer not found in database',
      :                   STATUS)
                      ELSE IF (N_SELECTED .GT. 1) THEN
                        STATUS = SAI__ERROR
@@ -610,7 +610,7 @@
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: '//
      :                   'DC-coupled short-wave array photometer '//
      :                   'not found in database', STATUS)
-                     ELSE 
+                     ELSE
                        CENTRE_DU3 = ARRAY_CENTRE_DU3
                        CENTRE_DU4 = ARRAY_CENTRE_DU4
                      END IF
@@ -655,7 +655,7 @@
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: '//
      :                   'DC-coupled long-wave array photometer '//
      :                   'not found in database', STATUS)
-                     ELSE 
+                     ELSE
                        CENTRE_DU3 = ARRAY_CENTRE_DU3
                        CENTRE_DU4 = ARRAY_CENTRE_DU4
                      END IF
@@ -704,7 +704,7 @@
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: '//
      :                   'duplicate entries in database for '//
-     :                   'DC-coupled P1100 photometer', 
+     :                   'DC-coupled P1100 photometer',
      :                   STATUS)
                      ELSE
                        CENTRE_DU3 = BOL_DU3 (BOL_SELECT_CHAN(1),
@@ -757,7 +757,7 @@
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: '//
      :                   'duplicate entries in database for '//
-     :                   'DC-coupled P1300 photometer', 
+     :                   'DC-coupled P1300 photometer',
      :                   STATUS)
                      ELSE
                        CENTRE_DU3 = BOL_DU3 (BOL_SELECT_CHAN(1),
@@ -810,7 +810,7 @@
                        STATUS = SAI__ERROR
                        CALL ERR_REP (' ', 'SCULIB_BOLSELECT: '//
      :                   'duplicate entries in database for '//
-     :                   'DC-coupled P2000 photometer', 
+     :                   'DC-coupled P2000 photometer',
      :                   STATUS)
                      ELSE
                        CENTRE_DU3 = BOL_DU3 (BOL_SELECT_CHAN(1),
@@ -821,7 +821,7 @@
 
 
                    ELSE
-                  
+
 
 *  now look for bolometers specified by channel ID, search first for -
 *  which would imply that a range of channels is to be specified rather
@@ -831,7 +831,7 @@
 
                      IF (MINPOS .EQ. 0) THEN
 
-*  get the ADC and channel numbers, set N_BOL_SELECT and selection arrays if 
+*  get the ADC and channel numbers, set N_BOL_SELECT and selection arrays if
 *  status good, ADC not 0 and channel not already selected
 
                        CALL SCULIB_BOLDECODE (INDICES(K), ADC, CHANNEL,
@@ -880,12 +880,12 @@
 
 *  get ADC and CHANNEL of beginning of range
 
-                         CALL SCULIB_BOLDECODE (RANGE(1), ADC1, 
+                         CALL SCULIB_BOLDECODE (RANGE(1), ADC1,
      :                     CHANNEL1, STATUS)
 
 *  and of end of range
 
-                         CALL SCULIB_BOLDECODE (RANGE(2), ADC2, 
+                         CALL SCULIB_BOLDECODE (RANGE(2), ADC2,
      :                     CHANNEL2, STATUS)
 
                          IF (STATUS .EQ. SAI__OK) THEN
@@ -1071,12 +1071,12 @@
                CALL MSG_SETC ('WARN', WARNING)
                STATUS = SAI__WARN
                CALL ERR_OUT (' ', 'SCULIB_BOLSELECT: undefined '//
-     :           'attributes for chan = ^CHAN, ADC = ^ADC - ^WARN', 
+     :           'attributes for chan = ^CHAN, ADC = ^ADC - ^WARN',
      :           STATUS)
             END IF
 
          END DO
- 
+
       END IF
 
 *  check that CENTRE_DU3, CENTRE_DU4 haven't been set to bad values

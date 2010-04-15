@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_INPLY( VERTX, VERTY, NVERT, INPX, INPY, NINP, 
+      SUBROUTINE CCD1_INPLY( VERTX, VERTY, NVERT, INPX, INPY, NINP,
      :                       INSIDE, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_INPLY( VERTX, VERTY, NVERT, INPX, INPY, NINP, 
+*     CALL CCD1_INPLY( VERTX, VERTY, NVERT, INPX, INPY, NINP,
 *                      INSIDE, STATUS )
 
 *  Description:
@@ -21,7 +21,7 @@
 *     corresponding element of an array of flags.  It does not touch
 *     elements corresponding to points which do not fall inside the
 *     polygon, so that successive calls of the routine result in a
-*     boolean OR-like semantics, allowing inclusion in any one of a 
+*     boolean OR-like semantics, allowing inclusion in any one of a
 *     group of polygons to be tested.
 *
 *     The vertices of the polygon must be supplied in clockwise or
@@ -39,10 +39,10 @@
 *        X coordinates of input list of points.
 *     INPY( NINP ) = DOUBLE PRECISION (Given)
 *        Y coordinates of input list of points.
-*     NINP = INTEGER (Given) 
+*     NINP = INTEGER (Given)
 *        Number of points in input list.
 *     INSIDE( NINP ) = LOGICAL (Given and Returned)
-*        An array of flags; if the point ( INPX( I ), INPY( I ) ) is 
+*        An array of flags; if the point ( INPX( I ), INPY( I ) ) is
 *        within the polygon specified by VERTX and VERTY then INSIDE( I )
 *        will be set TRUE.
 *     STATUS = INTEGER (Given and returned)
@@ -89,7 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER NVERT
       DOUBLE PRECISION VERTX( NVERT )
@@ -100,14 +100,14 @@
 
 *  Arguments Given and Returned:
       LOGICAL INSIDE( NINP )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Loop variable
       INTEGER INOUT              ! Inclusion status of a point in polygon
-      
+
 *.
 
 *  Check inherited global status.

@@ -344,7 +344,7 @@ proc stdpho objim skyim exp filt std am pn
     print "  Actual magnitude in filter      = " (actmag2)
   end if
   print " "
-  print "  Zeropoint (=1DN/sec) at airmass " (am2) " = " (zerop) 
+  print "  Zeropoint (=1DN/sec) at airmass " (am2) " = " (zerop)
   print "  Zeropoint (=1DN/sec) at unit airmass = " (zeropc)
   print " "
   zpj = -99.99

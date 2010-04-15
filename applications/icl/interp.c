@@ -89,12 +89,12 @@ node **arglistp;
  *
  ******************************************************************************
  */
-void 
+void
 get_args(node *n)
 {
     if (n == NODENIL) {
 	return;
-    } else if (n->interpret == explist_interpret || 
+    } else if (n->interpret == explist_interpret ||
 	       n->interpret == abbut_interpret) {
 	get_args(n->sub[0]);
 	get_args(n->sub[1]);
@@ -114,8 +114,8 @@ get_args(node *n)
  * The parser cannot tell whether a command argument list will be passed to an
  * ADAM task or, for example, an ICL procedure. This function is called when
  * the agument list WILL be passed to an ADAM task and adjusts the precompiled
- * node tree such that, when the argument list is interpreted, a suitable 
- * text "value string" is generated to be passed to the task. 
+ * node tree such that, when the argument list is interpreted, a suitable
+ * text "value string" is generated to be passed to the task.
  *
  * The adjustments made in the parse tree are:
  *
@@ -128,7 +128,7 @@ get_args(node *n)
  *	to alter these ICL variables. (cf setup_task_nohds() when the task
  *	runs asynchronously from ICL).
  *
- * To restore the quotes in strings passed to ADAM tasks (were removed by 
+ * To restore the quotes in strings passed to ADAM tasks (were removed by
  * fixup_quotes() in lex.c) we replace any calls to string_interpret() to call
  * quoted_string_interpret().
  *
@@ -137,7 +137,7 @@ get_args(node *n)
  *	node->interpret == paren_interpret();
  * 	node->sub[0]->interpret = name_interpret();
  *
- * This will generate the current value of the ICL variable. In this one case 
+ * This will generate the current value of the ICL variable. In this one case
  * we replace the call to the name_interpret() function by name_interpret_hds()
  *
  * The function argument 'hdsvars' is returned as a count of the total number
@@ -145,7 +145,7 @@ get_args(node *n)
  *
  ******************************************************************************
  */
-void 
+void
 setup_task_hds(node *n, int *hdsvars)
 {
     extern value name_interpret_hds(node *n, int op);		/* hds.c */
@@ -158,7 +158,7 @@ setup_task_hds(node *n, int *hdsvars)
 	    n->interpret == abbut_interpret ) {
 	setup_task_hds(n->sub[0], hdsvars);
 	setup_task_hds(n->sub[1], hdsvars);
-    } 
+    }
 /*
  * String variables
  */
@@ -221,7 +221,7 @@ setup_task_hds(node *n, int *hdsvars)
  *
  ******************************************************************************
  */
-value 
+value
 nargs_should_be(int n)
 {
     char buf[ICL_BUFSIZE];
@@ -246,7 +246,7 @@ nargs_should_be(int n)
  *
  ******************************************************************************
  */
-value 
+value
 nargs_in_range(int low, int high)
 {
     char buf[ICL_BUFSIZE];
@@ -278,7 +278,7 @@ nargs_in_range(int low, int high)
  *
  ******************************************************************************
  */
-value 
+value
 concat_args(int from)
 {
     node *argp = all_args;
@@ -396,7 +396,7 @@ concat_args(int from)
  *
  ******************************************************************************
  */
-static value 
+static value
 install_args(node *n, node *procn)
 {
     value val;
@@ -426,21 +426,21 @@ install_args(node *n, node *procn)
 	    if (arg->interpret == name_interpret) {
 		node *v;
 		if( (v = lookup_symbol(string_part(arg->val),
-				   SYM_PARAMETER)) != NODENIL && 
+				   SYM_PARAMETER)) != NODENIL &&
 		    (v->interpret == parameter_interpret ||
 		     v->interpret == string_interpret) ) {
 		    arg = v;
 		} else {
 		    node *nw;
 		    if( (nw = node0(name_interpret,
-				    value_string(string_part(arg->val)))) 
+				    value_string(string_part(arg->val))))
 			== NODENIL ||
-			(arg = node1(parameter_interpret,value_symbols(), nw)) 
+			(arg = node1(parameter_interpret,value_symbols(), nw))
 			== NODENIL) {
 			return exception(
 				"SYSERR  memory exhausted in install_args()");
 		    }
-		} 
+		}
 	    } else {
 		if (isexc(val = interpret(arg)))
 		    return val;
@@ -484,10 +484,10 @@ install_args(node *n, node *procn)
  *
  ******************************************************************************
  */
-value 
+value
 interpret(node *n)
 {
-    if (n != NODENIL && 
+    if (n != NODENIL &&
 	n->interpret != INTERPRETNIL)
 
 	return (*n->interpret) (n, OP_INTERPRET);
@@ -500,7 +500,7 @@ interpret(node *n)
  *
  ******************************************************************************
  */
-void 
+void
 destroy(node *n)
 {
     if (n == NODENIL)
@@ -532,7 +532,7 @@ destroy(node *n)
  *
  ******************************************************************************
  */
-void 
+void
 print(node *n)
 {
     if (n != NODENIL && n->interpret != INTERPRETNIL) {
@@ -554,7 +554,7 @@ print(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 interpret_to_real(node *n)
 {
     if (n != NODENIL && n->interpret != INTERPRETNIL)
@@ -573,7 +573,7 @@ interpret_to_real(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 interpret_to_numeric(node *n)
 {
     value val;
@@ -601,7 +601,7 @@ interpret_to_numeric(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 interpret_to_integer(node *n)
 {
     if (n != NODENIL && n->interpret != INTERPRETNIL)
@@ -621,7 +621,7 @@ interpret_to_integer(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 interpret_to_string(node *n)
 {
     if (n != NODENIL && n->interpret != INTERPRETNIL)
@@ -640,7 +640,7 @@ interpret_to_string(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 explist_interpret(node *n, int op)
 {
     switch (op) {
@@ -678,14 +678,14 @@ explist_interpret(node *n, int op)
  * used. TRUE will cause a space to be inserted between the strings while
  * FALSE implies that the strings are concatonated.
  *
- * When interpreted abbut_interpret evaluates any evaluable actual arguments 
+ * When interpreted abbut_interpret evaluates any evaluable actual arguments
  * a strings (the paren_interpret() nodes) and then concatenates these with
  * those obtained from string_interpret/open_string_interpret() into a
  * string value.
  *
  ******************************************************************************
  */
-value 
+value
 abbut_interpret(node *n, int op)
 {
     value val1, val2;
@@ -735,17 +735,17 @@ abbut_interpret(node *n, int op)
  *	A B B U T _ Q S T R I N G _ I N T E R P R E T  (node *n, int op)
  *
  * This function is similar to abbut_interpret() but, rather than just
- * concatonating strings it will restore the quotes which were stripped by 
+ * concatonating strings it will restore the quotes which were stripped by
  * fixup_quotes() in lex.
  *
  * Used to pass "value strings" to ADAM tasks when ICL and the task are
  * non-interlocked. For example SEND <task> OBEY <action> <parameters>
  * (cf setup_task_hds() )
- * 
+ *
  *
  ******************************************************************************
  */
-value 
+value
 abbut_qstring_interpret(node *n, int op)
 {
     value val1, val2;
@@ -780,7 +780,7 @@ abbut_qstring_interpret(node *n, int op)
     else
 	return value_string(vs);
 }
-	 
+
 /******************************************************************************
  *
  *	P A R A M E T E R _ I N T E R P R E T (node *n, int op)
@@ -807,7 +807,7 @@ abbut_qstring_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 parameter_interpret(node *n, int op)
 {
     switch (op) {
@@ -842,16 +842,16 @@ parameter_interpret(node *n, int op)
  * 		E X C E P T I O N S
  *
  * When a PROC or HIDDEN_PROC is parsed successfully it sets up an entry in
- * the "world" symbol table.  This entry points to a procedure_interpret() 
+ * the "world" symbol table.  This entry points to a procedure_interpret()
  * node whose sub[3] member is either NODENIL or points to linked list of
- * exception entries.  
+ * exception entries.
  *
  * exception_list_interpret() nodes have the following format:
  *
  * sub[0] points to the next node in the list.
- * sub[1] points to either an exception_interpret() node  directly or a 
+ * sub[1] points to either an exception_interpret() node  directly or a
  *        comment_interpret() node whose sub[0] component points to the
- *        exception_interpret() node.  
+ *        exception_interpret() node.
  *
  * Each exception_interpret node has the following structure:
  *
@@ -861,7 +861,7 @@ parameter_interpret(node *n, int op)
  * sub[1] is the body of the exception
  * sub[2] is NODENIL or a comment_interpret() node containing the END EXCEPTION
  *        line comment
- * sub[3] is NODENIL or points to a node structure for the comment lines AFTER 
+ * sub[3] is NODENIL or points to a node structure for the comment lines AFTER
  *        the "endexception" but before the next exception (or ENDPROC)
  *
  ******************************************************************************
@@ -871,8 +871,8 @@ parameter_interpret(node *n, int op)
  *
  *	F I N D _ H A N D L E R (node *n, value exc)
  *
- * This routine searches the exception list for the current procedure for an 
- * exception handler which matches the given exception name 'exc'. An 
+ * This routine searches the exception list for the current procedure for an
+ * exception handler which matches the given exception name 'exc'. An
  * exception value is a string, the first characters of which
  * contain the name of the exception terminated by a space.
  *
@@ -918,7 +918,7 @@ find_handler(node *n, value exc)
  *
  ******************************************************************************
  */
-value 
+value
 exception_interpret(node *n, int op)
 {
     int status;
@@ -974,7 +974,7 @@ exception_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 exception_list_interpret(node *n, int op)
 {
     switch (op) {
@@ -1005,15 +1005,15 @@ exception_list_interpret(node *n, int op)
  *		P R O C E D U R E   E X E C U T I O N
  *
  * On encountering a PROC definition yacc sets up a SYM_PROC/SYM_HIDDEN_PROC
- * entry in the world symbol table.  This entry points to a 
+ * entry in the world symbol table.  This entry points to a
  * procedure_interpret() node with the following structure:
  *
- * The node value is of TYPE_SYMTAB and is created pointing to a 
- * symbol table dummy header. This table is used to hold local variables and 
+ * The node value is of TYPE_SYMTAB and is created pointing to a
+ * symbol table dummy header. This table is used to hold local variables and
  * parameters when the procedure is called.
  *
- * sub[0] points to the formal parameter list. This is a explist_interpret() 
- * node structure linked together using their sub[0] entries. The sub[1] 
+ * sub[0] points to the formal parameter list. This is a explist_interpret()
+ * node structure linked together using their sub[0] entries. The sub[1]
  * entries point to name_interpret() nodes recording the names of the formal
  * parameters in their value.string components. The formal parameters are
  * in reverse order.Any comment_interpret() nodes are ignored during
@@ -1025,7 +1025,7 @@ exception_list_interpret(node *n, int op)
  * The sub[3] entry points to execptions list
  *
  * When we interpret a proc or function node we must set up the formal
- * paramters in the procedures symbol table with their actual values and then 
+ * paramters in the procedures symbol table with their actual values and then
  * execute the body.  On encountering a procedure or function call,
  * the actual parameter nodes are linearised into the array arglist[], and
  * the count 'nargs' is set to the number of arguments (see get_args() and
@@ -1043,14 +1043,14 @@ exception_list_interpret(node *n, int op)
  * The value part of a procedure node points to a permanent symbol table.
  * In this way VARS can interrogate a procedure about values of variables
  * at any time. It also means, however,  that procedures cannot be recursive,
- * since symbol tables would have to be stacked. 
+ * since symbol tables would have to be stacked.
  *
  * The actual parameters are entered into the procedure's symbol table by
- * install_args() and the currently active ICL symbol table is saved so we 
+ * install_args() and the currently active ICL symbol table is saved so we
  * can restore it on completion.
  *
  * We execute the procedure body which, when it returns, may have generated
- * an exception. If so, we look for a handler and execute it. 
+ * an exception. If so, we look for a handler and execute it.
  * If an exception occurs during the handler, we trap that too.
  *
  * There is a potential here for infinite looping, but as we need to trap
@@ -1064,12 +1064,12 @@ exception_list_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 procedure_interpret(node *n, int op)
 {
     extern int uface_interrupt(void);				/* uface.c */
     extern value pushcalllevel(void),
-		 restorecalllevel(void), 
+		 restorecalllevel(void),
 		 popcalllevel(void);				/* main.c */
     value val, val1;
     node *handler;
@@ -1185,7 +1185,7 @@ procedure_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 builtin_interpret(node *n, int op)
 {
     switch (op) {
@@ -1234,7 +1234,7 @@ builtin_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 defstring_interpret(node *n, int op)
 {
     extern int stack_string_input(char *s, int length);		/* input.c */
@@ -1322,7 +1322,7 @@ defstring_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 defproc_interpret(node *n, int op)
 {
     extern value do_load (char *whofor, char *filenametobeloaded); /* input.c */
@@ -1385,15 +1385,15 @@ defproc_interpret(node *n, int op)
  * A help_interpret node is set up by the DEFHELP command
  * or by the HELP command.
  *
- * Interpreting a help_interpret node results in the required help 
+ * Interpreting a help_interpret node results in the required help
  * information being output.
- * 
+ *
  * The arguments of the HELP command are added to the topic string set
  * in the node.
  *
  ******************************************************************************
  */
-value 
+value
 help_interpret(node *n, int op)
 {
     extern F77_SUBROUTINE(uface_pwhlp) (CHARACTER(helplib), CHARACTER(topic),

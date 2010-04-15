@@ -4,7 +4,7 @@
 *     smf_kmmerge
 
 *  Purpose:
-*     Merge the contents of adjacent time slices in an AST KeyMap holding 
+*     Merge the contents of adjacent time slices in an AST KeyMap holding
 *     time-indexed extension items in an NDF.
 
 *  Language:
@@ -23,20 +23,20 @@
 *        The name of the NDF extension to use.
 *     keymap = AstKeyMap * (Given)
 *        An AST keyMap holding the primitive array values copied from the
-*        NDF extension (see smf_ext2km). Only time-indexed extension items 
+*        NDF extension (see smf_ext2km). Only time-indexed extension items
 *        are stored in this KeyMap.
 *     index = int * (Given)
 *        A pointer to an  array of integers with "nts" element (i.e. an
-*        element for each input time slice). The value held in an element 
-*        of this array is an index into the "rts" array. Traversing this 
-*        array from start to end, and using each element as an index into 
-*        the "rts" array, causes the "rts" array to be traversed in order 
+*        element for each input time slice). The value held in an element
+*        of this array is an index into the "rts" array. Traversing this
+*        array from start to end, and using each element as an index into
+*        the "rts" array, causes the "rts" array to be traversed in order
 *        of increasing RTS_NUM value.
 *     ndet = int (Given)
-*        The number of detectors. 
+*        The number of detectors.
 *     mask = int * (Given)
 *        Pointer to an array with "nts" elements. Each element is a bit
-*        mask in which each bit is set if there are any good data values in 
+*        mask in which each bit is set if there are any good data values in
 *        the data from the corresponding detector.
 *     nts = int (Given)
 *        The total number of input time slices described by the keyMap.
@@ -49,21 +49,21 @@
 *     j1 = int (Given)
 *        The index of the last time slice to use.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
-*     This function merges the extension values stored for an input 
-*     time slice with the extension values for all subsequent time slices 
+*     This function merges the extension values stored for an input
+*     time slice with the extension values for all subsequent time slices
 *     that have the same RTS_NUM value.
 *
-*     If an extension item contains only a scalar value for each time 
+*     If an extension item contains only a scalar value for each time
 *     slice, then an error is reported if there is any difference between
-*     the scalar value within each group of merged time slices. If an 
-*     extension item contains a vector (indexed by detector number) for each 
-*     time slice, then any good detector values in subsequent time slices 
+*     the scalar value within each group of merged time slices. If an
+*     extension item contains a vector (indexed by detector number) for each
+*     time slice, then any good detector values in subsequent time slices
 *     are used to over-write any corresponding bad values in earlier time
-*     slices (an error is reported if a detector has good - but different - 
-*     values in two time slices). For any time slice, detectors are 
+*     slices (an error is reported if a detector has good - but different -
+*     values in two time slices). For any time slice, detectors are
 *     skipped if they have a zero bit in the element of the "mask" array
 *     corresponding to the time slice.
 *
@@ -86,8 +86,8 @@
 *     16-MAY-2008 (DSB):
 *        Ignore discrepancies in ENVIRO_ items.
 *     30-JUN-2009 (DSB):
-*        Re-written to process all time slices in a single call. Processing 
-*        each time slice in a separate call was hugely expensive in terms 
+*        Re-written to process all time slices in a single call. Processing
+*        each time slice in a separate call was hugely expensive in terms
 *        of time spent accessing elements of KeyMap vector entries.
 *     {enter_further_changes_here}
 
@@ -302,7 +302,7 @@
    } \
 \
 /* If the KeyMap entry has changed, save its new values. */ \
-   if( changed ) astMapPut1##Sym1( keymap, key, veclen, values##Sym3, NULL ); 
+   if( changed ) astMapPut1##Sym1( keymap, key, veclen, values##Sym3, NULL );
 
 
 
@@ -344,7 +344,7 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
    int seclen;
    int type;
    int veclen;
-   int vpd;           
+   int vpd;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -375,7 +375,7 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
       } else if( type == AST__DOUBLETYPE ){
          DOTYPE(double,D,d,D);
 
-      } 
+      }
    }
 
 /* Free resources. */

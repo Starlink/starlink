@@ -12,7 +12,7 @@
 *  point is used.
 *
 *  (>)  SIZE  (Integer)   Number of data points
-*  (!)  Y     (Real)      Array of data to be converted 
+*  (!)  Y     (Real)      Array of data to be converted
 *  (!)  YE    (Real)      Array of error values
 *  (>)  WAVES (Real)      Array of channel wavelengths
 *  (>)  CHAN  (Integer)   Current channel
@@ -36,10 +36,10 @@
       INTEGER STATUS
 
 *  Local variables
-      REAL ZEROPT          
-      REAL M,M2                
+      REAL ZEROPT
+      REAL M,M2
       INTEGER I
-                 
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Find magnitude zero point for wavelength
@@ -47,41 +47,41 @@
 *   Allen and Cragg, 1983, MN 203,777 for JHKL)
 
 
-         IF (WAVES(CHAN) .EQ. 3600.0) THEN                     
+         IF (WAVES(CHAN) .EQ. 3600.0) THEN
 
 *  U band
-             ZEROPT = 1810                                     
-         ELSE IF (WAVES(CHAN) .EQ. 4400.0) THEN                
+             ZEROPT = 1810
+         ELSE IF (WAVES(CHAN) .EQ. 4400.0) THEN
 
 *  B band
-             ZEROPT = 4260                                     
-         ELSE IF (WAVES(CHAN) .EQ. 5500.0) THEN                
+             ZEROPT = 4260
+         ELSE IF (WAVES(CHAN) .EQ. 5500.0) THEN
 
 *  V band
-             ZEROPT = 3640                                     
-         ELSE IF (WAVES(CHAN) .EQ. 6400.0) THEN                
+             ZEROPT = 3640
+         ELSE IF (WAVES(CHAN) .EQ. 6400.0) THEN
 
 *  R band
-             ZEROPT = 3080                                     
-         ELSE IF (WAVES(CHAN) .EQ. 7900.0) THEN                
+             ZEROPT = 3080
+         ELSE IF (WAVES(CHAN) .EQ. 7900.0) THEN
 
 *  I band
-             ZEROPT = 2250                                     
-         ELSE IF (WAVES(CHAN) .EQ. 12000.0) THEN               
+             ZEROPT = 2250
+         ELSE IF (WAVES(CHAN) .EQ. 12000.0) THEN
 
 *  J band
-             ZEROPT = 1640                                     
-         ELSE IF (WAVES(CHAN) .EQ. 16400.0) THEN               
+             ZEROPT = 1640
+         ELSE IF (WAVES(CHAN) .EQ. 16400.0) THEN
 
 *  H band
-             ZEROPT = 1030                                     
-         ELSE IF (WAVES(CHAN) .EQ. 22000.0) THEN               
+             ZEROPT = 1030
+         ELSE IF (WAVES(CHAN) .EQ. 22000.0) THEN
 
 *  K band
-             ZEROPT = 650                                      
-         ELSE                                                  
-             ZEROPT = 2000                                     
-         ENDIF                                                 
+             ZEROPT = 650
+         ELSE
+             ZEROPT = 2000
+         ENDIF
 
 *  Convert the data
 
@@ -105,7 +105,7 @@
 
 
 
-      SUBROUTINE TSP_PHSFLUX(SIZE,Y,YE,STATUS) 
+      SUBROUTINE TSP_PHSFLUX(SIZE,Y,YE,STATUS)
 *+
 *
 *  T S P _ P H S F L U X
@@ -139,7 +139,7 @@
 
 *  Local variable
       INTEGER I
-                 
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Loop over points multiplying data and error by 1000
@@ -192,11 +192,11 @@
 *  Local variables
       REAL X,XX,ST
       INTEGER I
-                 
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Loop over points
-         DO I=1,SIZE 
+         DO I=1,SIZE
               IF (Y(I) .EQ. 0.0 .OR. Y(I) .EQ. VAL__BADR) THEN
                   YE(I)=0.0
               ELSE
@@ -209,7 +209,7 @@
                   IF (S(I) .NE. 0.0) THEN
                       XX = X+SE(I)*SE(I)/S(I)/S(I)
                   ELSE
-                      XX = 0.0 
+                      XX = 0.0
                   ENDIF
                   IF (XX .GT. 0.0) THEN
                       YE(I) = ABS(ST * SQRT(XX))
@@ -219,7 +219,7 @@
 
 *  Return percentage Stokes in original data array
                   Y(I) = ST
-              ENDIF    
+              ENDIF
          ENDDO
       ENDIF
       END
@@ -238,7 +238,7 @@
 *  parameter arrays and their errors are used to calculate percentage
 *  polarization, and errors on percentage polarization. These replace
 *  the input intensity and intensity error arrays for return to the
-*  calling program. 
+*  calling program.
 *
 *  (>) SIZE  (Integer)  Number of data points
 *  (!) Y     (Real)     On input - Array of Intensity data
@@ -270,9 +270,9 @@
 *  Local variables
       REAL X,XX,QS,US,QSE,USE
       INTEGER I
-                 
+
       IF (STATUS .EQ. SAI__OK) THEN
-         DO I=1,SIZE 
+         DO I=1,SIZE
 
 *  Calculate percentage Stokes parameters and errors
 
@@ -296,7 +296,7 @@
                   IF (Q(I) .NE. 0.0) THEN
                       XX = X+QE(I)*QE(I)/Q(I)/Q(I)
                   ELSE
-                      XX = 0.0 
+                      XX = 0.0
                   ENDIF
                   IF (XX .GT. 0.0) THEN
                       QSE = ABS(QS * SQRT(XX))
@@ -314,14 +314,14 @@
                   IF (U(I) .NE. 0.0) THEN
                       XX = X+UE(I)*UE(I)/U(I)/U(I)
                   ELSE
-                      XX = 0.0 
+                      XX = 0.0
                   ENDIF
                   IF (XX .GT. 0.0) THEN
                       USE = ABS(US * SQRT(XX))
                   ELSE
                       USE = 0.0
                   ENDIF
-              ENDIF    
+              ENDIF
 
 *  Calculate polarization from Stokes parameters
 
@@ -349,12 +349,12 @@
 *
 *  PHASEPLOT command
 *
-*  Convert data to position angle 
+*  Convert data to position angle
 *  Convert data to position angle in degrees. The intensity and stokes
 *  parameter arrays and their errors are used to calculate position
 *  angle, and errors on position angle. These replace
 *  the input intensity and intensity error arrays for return to the
-*  calling program. 
+*  calling program.
 *
 *
 *  (>) SIZE  (Integer)  Number of data points
@@ -392,7 +392,7 @@
 
       DEGRAD = 45.0/ATAN(1.0)
       IF (STATUS .EQ. SAI__OK) THEN
-         DO I=1,SIZE                 
+         DO I=1,SIZE
 
 *  calculate percentage Stokes parameters and errors
 
@@ -416,7 +416,7 @@
                   IF (Q(I) .NE. 0.0) THEN
                       XX = X+QE(I)*QE(I)/Q(I)/Q(I)
                   ELSE
-                      XX = 0.0 
+                      XX = 0.0
                   ENDIF
                   IF (XX .GT. 0.0) THEN
                       QSE = ABS(QS * SQRT(XX))
@@ -434,14 +434,14 @@
                   IF (U(I) .NE. 0.0) THEN
                       XX = X+UE(I)*UE(I)/U(I)/U(I)
                   ELSE
-                      XX = 0.0 
+                      XX = 0.0
                   ENDIF
                   IF (XX .GT. 0.0) THEN
                       USE = ABS(US * SQRT(XX))
                   ELSE
                       USE = 0.0
                   ENDIF
-              ENDIF                                 
+              ENDIF
 
 *  Calculate position  angle and error from Stokes parameters
 

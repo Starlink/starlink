@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,7 +81,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -127,12 +127,12 @@
      :     CHR_SIMLR( MODE, 'UPDATE' ) ) THEN
          CALL ARY1_CHACC( IACB, 'WRITE', STATUS )
 
-*  If WRITE access is available, further check that the array is not stored 
-*  in scaled format. First ensure that form information is available in the 
+*  If WRITE access is available, further check that the array is not stored
+*  in scaled format. First ensure that form information is available in the
 *  DCB. Then report an error if the form is SCALED.
          IDCB = ACB_IDCB( IACB )
          CALL ARY1_DFRM( IDCB, STATUS )
-         IF ( STATUS .EQ. SAI__OK .AND. 
+         IF ( STATUS .EQ. SAI__OK .AND.
      :        DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
             STATUS = ARY__ACDEN
             CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )

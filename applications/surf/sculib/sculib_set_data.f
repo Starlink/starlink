@@ -5,7 +5,7 @@
 *     SCULIB_SET_DATA
 
 *  Purpose:
-*     set data to a real value given a byte mask 
+*     set data to a real value given a byte mask
 
 *  Language:
 *     Starlink Fortran 77
@@ -75,7 +75,7 @@
       INTEGER N_BOLS
       INTEGER N_POS
       INTEGER N_BEAM
-      BYTE    MASK (N_BOLS, N_POS) 
+      BYTE    MASK (N_BOLS, N_POS)
       LOGICAL USE_THIS
       REAL    VALUE
 
@@ -112,7 +112,7 @@
                IF (MASK(BOL,POS) .NE. 0) THEN
 
                   DO BEAM = 1, N_BEAM
-*       Dont set BAD pixels                        
+*       Dont set BAD pixels
                      IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
                         IN_DATA(BOL, POS, BEAM) = VALUE
                      END IF
@@ -130,7 +130,7 @@
                IF (MASK(BOL, POS) .EQ. 0) THEN
 
                   DO BEAM = 1, N_BEAM
-*     Dont set BAD pixels                        
+*     Dont set BAD pixels
                      IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
                         IN_DATA(BOL, POS, BEAM) = VALUE
                      END IF

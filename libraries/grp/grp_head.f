@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine climbs the chain of owners starting at the group
-*     identified by IGRP1, until a group is found which has no owner. 
+*     identified by IGRP1, until a group is found which has no owner.
 *     The identifier issued for this group is returned in IGRP2. If
 *     the group identified by IGRP1 has no owner, then IGRP2 is returned
 *     equal to IGRP1.
@@ -24,7 +24,7 @@
 *        A group identifier.
 *     IGRP2 = INTEGER (Given)
 *        The identifier for the group which is at the head of the
-*        owner-slave chain. Returned equal to GRP__NOID if an error 
+*        owner-slave chain. Returned equal to GRP__NOID if an error
 *        occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
 *  stored.
       CALL GRP1_IMPID( IGRP1, SLOT, STATUS )
 
-*  Find the identifier issued for the group which is at the 
+*  Find the identifier issued for the group which is at the
 *  head of the owner-slave chain.
       CALL GRP1_IHEAD( SLOT, IGRP2, STATUS )
 

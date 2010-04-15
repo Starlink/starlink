@@ -25,16 +25,16 @@
 \newcommand{\stardocabstract}  {
 The general data reduction system,
 \xref{Figaro}{sun86}{},
-may now be run from the 
+may now be run from the
 \htmladdnormallink{IRAF}{\IRAFURL}
 CL. The IRAFFIG package
-contains the required IRAF-specific files for Figaro and must be installed in 
+contains the required IRAF-specific files for Figaro and must be installed in
 addition to Figaro itself for the system to work.
 \par
 The main sources of documentation for users of Figaro from IRAF are
 \xref{SUN/217}{sun217}{},
 which gives some general guidance on running Starlink applications from IRAF
-CL, and 
+CL, and
 \xref{SUN/86}{sun86}{}
 which gives more specific information about the Figaro applications.}
 % ? End of document identification
@@ -89,7 +89,7 @@ which gives more specific information about the Figaro applications.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -157,7 +157,7 @@ which gives more specific information about the Figaro applications.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -253,12 +253,12 @@ which gives more specific information about the Figaro applications.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -297,27 +297,27 @@ which gives more specific information about the Figaro applications.}
 \section{Introduction}
 The general data reduction system,
 \xref{FIGARO}{sun86}{},
-which is written for the 
+which is written for the
 \xref{Starlink software environment}{sg5}{},
-may now be run from the 
+may now be run from the
 \htmladdnormallink{IRAF}{\IRAFURL}
-CL. 
-IRAFFIG contains the IRAF-specific files for Figaro and must be installed in 
+CL.
+IRAFFIG contains the IRAF-specific files for Figaro and must be installed in
 addition to Figaro itself for the system to work. IRAFFIG Version 1.1 is
 suitable for use with FIGARO V5.2-0.
 
-IRAFFIG will eventually be incorporated into the standard Starlink Figaro 
+IRAFFIG will eventually be incorporated into the standard Starlink Figaro
 release.
 
 \section{Documentation}
 This document is not intended as the main reference for users of Figaro from
-IRAF \dash\ some general guidance on running Starlink applications from IRAF 
+IRAF \dash\ some general guidance on running Starlink applications from IRAF
 CL is given in
 \xref{SUN/217}{sun217}{},
 and more specific information about the Figaro applications in
 \xref{SUN/86}{sun86}{}
 
-A description, intended for programmers, of the way Starlink packages are set 
+A description, intended for programmers, of the way Starlink packages are set
 up for use with IRAF, and some technical detail about how the system works is in
 \xref{SSN/35}{ssn35}{}.
 
@@ -327,17 +327,17 @@ software items:
 \begin{description}
 \item[\xref{FIGARO}{sun86}{}] The main Figaro package.
 \item[IRAFFIG] The IRAF-specific components of Figaro.
-\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability 
+\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability
 infrastructure.
-\item[\xref{TCLSYS}{sun200}{}] The Starlink distribution of 
-\htmladdnormallink{Tcl}{\TCLURL} and associated items. 
+\item[\xref{TCLSYS}{sun200}{}] The Starlink distribution of
+\htmladdnormallink{Tcl}{\TCLURL} and associated items.
 \item[\xref{STARTCL}{sun186}{}] Starlink extensions to Tcl \dash\ including
 the TCL/GWM Xdisplay Widget.
 \item[RUNTIME] Miscellaneous items of software required by most applications
 at runtime.
-\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the 
+\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the
 automatic data-conversion facilities are to be used.
-\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during 
+\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during
 installation of Starlink software.
 \end{description}
 More details on this, and full instructions for obtaining the software are in

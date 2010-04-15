@@ -15,10 +15,10 @@
 
 #  Description:
 #     This shell script reads a three-dimensional IFU NDF as input and
-#     presents you with a white-light image of the cube.   You can then 
-#     select and X-Y position using the cursor.  The script will extract 
-#     and display this spectrum next to the white-light image.   You can 
-#     then select another X-Y position using the cursor and the script 
+#     presents you with a white-light image of the cube.   You can then
+#     select and X-Y position using the cursor.  The script will extract
+#     and display this spectrum next to the white-light image.   You can
+#     then select another X-Y position using the cursor and the script
 #     will display this spectrum as well, allowing comparison of the two.
 
 #  Parameters
@@ -186,7 +186,7 @@ set ndf_section = `echo $infile | \
       awk '{if (index($0,"(") > 0) print substr($0,index($0,"(")); else print ""}'`
 
 # This must occur after stripping the section, as the section
-# specification must come after the file extension in file names 
+# specification must come after the file extension in file names
 # presented to the NDF library (cf. SSN/20).  Also this step is
 # necessary when the version of KAPPA does not support the .sdf file
 # extension being supplied in the name.
@@ -194,12 +194,12 @@ set infile = ${inname:r}
 
 # Check that the file exists.
 if ( ! -e ${infile}.sdf ) then
-    
+
    Xdialog --no-cancel \
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${infile}.sdf does not exist." 0 0 
+	   --msgbox "${infile}.sdf does not exist." 0 0
    switch ($?)
       case 0:
          exit
@@ -219,10 +219,10 @@ if ( $ndim != 3 ) then
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${infile}.sdf is not a datacube." 0 0 
+	   --msgbox "${infile}.sdf is not a datacube." 0 0
    switch ($?)
       case 0:
-         exit  
+         exit
          breaksw
    endsw
 
@@ -232,10 +232,10 @@ else if ( $dims[3] == 1 ) then
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${infile}.sdf${ndf_section} is not a datacube." 0 0 
+	   --msgbox "${infile}.sdf${ndf_section} is not a datacube." 0 0
    switch ($?)
       case 0:
-         exit  
+         exit
          breaksw
    endsw
 endif
@@ -254,7 +254,7 @@ Xdialog --left --buttons-style text \
 # ===========================
 
 # Collapse the white-light image.
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Setup the graphics window.
 gdclear device=${plotdev}
@@ -266,14 +266,14 @@ picdef "mode=cl fraction=[0.4,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="whitelight"
 
 picdef "mode=tr fraction=[0.6,0.5] device=${plotdev} nooutline"
-piclabel device=${plotdev} label="specone" 
+piclabel device=${plotdev} label="specone"
 
 picdef "mode=br fraction=[0.6,0.5] device=${plotdev} nooutline"
-piclabel device=${plotdev} label="spectwo" 
+piclabel device=${plotdev} label="spectwo"
 
 # Display the collapsed image.
 picsel label="whitelight" device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null
 
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================

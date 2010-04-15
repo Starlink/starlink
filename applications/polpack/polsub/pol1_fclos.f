@@ -30,7 +30,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -71,7 +71,7 @@
 *  Initialise.
       USE = WANT
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initially, the first point in the array is the closest to the wanted
@@ -92,11 +92,11 @@
             MINERR = ERR
 
 *  If the error for this point is equal to the previous best, choose the
-*  lower of the two values (e.g. this will cause an erroneously supplied 
-*  integer index of (say) 1 to be rounded to the pixel coordinate of 0.5 
+*  lower of the two values (e.g. this will cause an erroneously supplied
+*  integer index of (say) 1 to be rounded to the pixel coordinate of 0.5
 *  instead of 1.5)
          ELSE IF( ERR .EQ. MINERR ) THEN
-            IF( VALS( I ) .LT. USE ) THEN          
+            IF( VALS( I ) .LT. USE ) THEN
                USE = VALS( I )
                MINERR = ERR
             END IF

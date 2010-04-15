@@ -1,4 +1,4 @@
-      SUBROUTINE IRA_XYLIM( IDA, ACEN, BCEN, XSIZE, YSIZE, LBND, UBND, 
+      SUBROUTINE IRA_XYLIM( IDA, ACEN, BCEN, XSIZE, YSIZE, LBND, UBND,
      :                      STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRA_XYLIM( IDA, ACEN, BCEN, XSIZE, YSIZE, LBND, UBND, 
+*     CALL IRA_XYLIM( IDA, ACEN, BCEN, XSIZE, YSIZE, LBND, UBND,
 *                     STATUS )
 
 *  Description:
@@ -97,7 +97,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        MARGIN,            ! Width of safety margin added to
                                  ! image.
      :        XXSIZE,            ! XSIZE in range 0 to 2*PI
@@ -114,7 +114,7 @@
       CALL IRA1_CHECK( IDA, STATUS )
 
 *  Check that input arguments are not BAD.
-      IF( XSIZE .EQ. VAL__BADD .OR. YSIZE .EQ. VAL__BADD .AND. 
+      IF( XSIZE .EQ. VAL__BADD .OR. YSIZE .EQ. VAL__BADD .AND.
      :    STATUS .EQ. SAI__OK ) THEN
 
          STATUS = SAI__ERROR
@@ -141,22 +141,22 @@
 
 *  Find the upper pixel bound on the X axis.
       CALL IRA1_LIMIT( ACM_PROJN( IDA ), NP, ACM_PROJP( 1, IDA ),
-     :                 ACEN, BCEN, .TRUE., 1, XXSIZE*0.5, 
+     :                 ACEN, BCEN, .TRUE., 1, XXSIZE*0.5,
      :                 0.5*ACM_PROJP( 5, IDA ), 1.0D0, UBND(1), STATUS )
 
 *  Find the lower pixel bound on the X axis.
       CALL IRA1_LIMIT( ACM_PROJN( IDA ), NP, ACM_PROJP( 1, IDA ),
-     :                 ACEN, BCEN, .TRUE., -1, XXSIZE*0.5, 
+     :                 ACEN, BCEN, .TRUE., -1, XXSIZE*0.5,
      :                 0.5*ACM_PROJP( 5, IDA ), 1.0D0, LBND(1), STATUS )
 
 *  Find the upper pixel bound on the Y axis.
       CALL IRA1_LIMIT( ACM_PROJN( IDA ), NP, ACM_PROJP( 1, IDA ),
-     :                 ACEN, BCEN, .FALSE., 1, YYSIZE*0.5, 
+     :                 ACEN, BCEN, .FALSE., 1, YYSIZE*0.5,
      :                 0.5*ACM_PROJP( 6, IDA), 1.0D0, UBND(2), STATUS )
 
 *  Find the lower pixel bound on the Y axis.
       CALL IRA1_LIMIT( ACM_PROJN( IDA ), NP, ACM_PROJP( 1, IDA ),
-     :                 ACEN, BCEN, .FALSE., -1, YYSIZE*0.5, 
+     :                 ACEN, BCEN, .FALSE., -1, YYSIZE*0.5,
      :                 0.5*ACM_PROJP( 6, IDA ), 1.0D0, LBND(2), STATUS )
 
 *  Make the image 1% bigger for safety.

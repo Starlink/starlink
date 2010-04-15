@@ -1,4 +1,4 @@
-C+                             
+C+
       SUBROUTINE TCV_S2MJD(STRING,MJD,STATUS)
 C
 C            T C V _ S 2 M J D
@@ -17,28 +17,28 @@ C     Call:
 C        CALL TCV_S2MJD(STRING,MJD,STATUS)
 C
 C     Parameters:
-C    (>) STRING      (Fixed string, descr) - The string to be converted. 
+C    (>) STRING      (Fixed string, descr) - The string to be converted.
 C    (<) MJD         (Double) - The resulting MJD.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
 C         SLA_INTIN,
-C         SLA_CALDJ                                        
+C         SLA_CALDJ
 C
 C     Support: Jeremy Bailey, AAO
 C
-C     Version date: 28/6/1988            
+C     Version date: 28/6/1988
 C
 C-
 C
 C  History:
-C    28/6/1988   Original Version.   JAB/AAO 
+C    28/6/1988   Original Version.   JAB/AAO
 C+
-      IMPLICIT NONE 
+      IMPLICIT NONE
       CHARACTER*(*) STRING
       DOUBLE PRECISION MJD
-      INTEGER STATUS      
-                                                  
+      INTEGER STATUS
+
       INTEGER NSTRT,IYEAR, IMONTH, IDAY, JFLAG
 
       IF (STATUS .EQ. 0) THEN
@@ -48,8 +48,8 @@ C+
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF    
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           CALL SLA_INTIN(STRING,NSTRT,IMONTH,JFLAG)
           IF (JFLAG .GE. 1) THEN
@@ -74,32 +74,32 @@ C+
               ELSE IF (STRING(NSTRT:NSTRT+2) .EQ. 'OCT') THEN
                   IMONTH = 10
               ELSE IF (STRING(NSTRT:NSTRT+2) .EQ. 'NOV') THEN
-                  IMONTH = 11 
+                  IMONTH = 11
               ELSE IF (STRING(NSTRT:NSTRT+2) .EQ. 'DEC') THEN
                   IMONTH = 12
               ELSE
                   STATUS = JFLAG
                   RETURN
               ENDIF
-              DO WHILE (STRING(NSTRT:NSTRT) .GE. 'A' 
+              DO WHILE (STRING(NSTRT:NSTRT) .GE. 'A'
      :            .AND. STRING(NSTRT:NSTRT) .LE. 'Z')
                   NSTRT = NSTRT+1
               ENDDO
-          ENDIF        
+          ENDIF
           IDAY = 0
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           CALL SLA_INTIN(STRING,NSTRT,IDAY,JFLAG)
           IF (JFLAG .EQ. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF         
-          CALL SLA_CALDJ(IYEAR,IMONTH,IDAY,MJD,JFLAG) 
+          ENDIF
+          CALL SLA_CALDJ(IYEAR,IMONTH,IDAY,MJD,JFLAG)
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
           ENDIF
-      ENDIF    
+      ENDIF
       END
 
 
@@ -112,7 +112,7 @@ C     Routine Name:
 C        TCV_MJD2S
 C
 C     Function:
-C        Convert a modified Julian Date to a string 
+C        Convert a modified Julian Date to a string
 C
 C     Description:
 C        Given a modified Julian Date, derive a string containing
@@ -123,11 +123,11 @@ C        CALL TCV_MJD2S(MJD,STRING,STATUS)
 C
 C     Parameters:
 C    (>) MJD         (Double) - The MJD to be converted.
-C    (<) STRING      (Fixed string, descr) - The resulting string. 
+C    (<) STRING      (Fixed string, descr) - The resulting string.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
-C        SLA_DJCL                                                 
+C        SLA_DJCL
 C
 C     Support: Jeremy Bailey, AAO
 C
@@ -136,29 +136,29 @@ C
 C-
 C
 C  History:
-C    29/6/1988   Original Version.   JAB/AAO 
+C    29/6/1988   Original Version.   JAB/AAO
 C+
-      IMPLICIT NONE 
+      IMPLICIT NONE
       DOUBLE PRECISION MJD
       CHARACTER*(*) STRING
-      INTEGER STATUS      
-                                                  
+      INTEGER STATUS
+
       INTEGER IYEAR, IMONTH, IDAY, JFLAG
-      DOUBLE PRECISION FD              
+      DOUBLE PRECISION FD
       CHARACTER*3 CMONTH(12)
 
       DATA CMONTH /'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug',
      :    'Sep','Oct','Nov','Dec'/
 
       IF (STATUS .EQ. 0) THEN
-          CALL SLA_DJCL(MJD,IYEAR,IMONTH,IDAY,FD,JFLAG)           
+          CALL SLA_DJCL(MJD,IYEAR,IMONTH,IDAY,FD,JFLAG)
           IF (JFLAG .GE. 1) THEN
                STATUS = JFLAG
                RETURN
           ENDIF
           WRITE(STRING,'(I5,'' '',A3,'' '',I2)',ERR=100) IYEAR,
      :         CMONTH(IMONTH),IDAY
-      ENDIF   
+      ENDIF
 100   CONTINUE
       END
 
@@ -177,36 +177,36 @@ C        Convert a string containing a time in HMS to days
 C
 C     Description:
 C        Decode a string containing a time in hours, minutes and seconds
-C        and derive the corresponding time in days.              
+C        and derive the corresponding time in days.
 C
 C     Call:
 C        CALL TCV_S2TIME(STRING,D,STATUS)
 C
 C     Parameters:
-C    (>) STRING      (Fixed string, descr) - The string to be converted. 
+C    (>) STRING      (Fixed string, descr) - The string to be converted.
 C    (<) D           (Double) - The resulting time in days.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
 C         SLA_INTIN,
 C         SLA_DFLTIN,
-C         SLA_DTF2D                                        
+C         SLA_DTF2D
 C
 C     Support: Jeremy Bailey, AAO
 C
-C     Version date: 27/7/1988            
+C     Version date: 27/7/1988
 C
 C-
 C
 C  History:
-C    27/7/1988   Original Version.   JAB/AAO 
-C+       
-                  
-      IMPLICIT NONE 
+C    27/7/1988   Original Version.   JAB/AAO
+C+
+
+      IMPLICIT NONE
       CHARACTER*(*) STRING
       DOUBLE PRECISION D
-      INTEGER STATUS      
-                                                  
+      INTEGER STATUS
+
       INTEGER NSTRT,IHOUR, IMIN, JFLAG
       DOUBLE PRECISION SEC
 
@@ -216,29 +216,29 @@ C+
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF           
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           IMIN = 0
           CALL SLA_INTIN(STRING,NSTRT,IMIN,JFLAG)
           IF (JFLAG .EQ. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF        
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           SEC = 0.0D0
           CALL SLA_DFLTIN(STRING,NSTRT,SEC,JFLAG)
           IF (JFLAG .GE. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF         
-          CALL SLA_DTF2D(IHOUR,IMIN,SEC,D,JFLAG) 
+          ENDIF
+          CALL SLA_DTF2D(IHOUR,IMIN,SEC,D,JFLAG)
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
           ENDIF
-      ENDIF    
+      ENDIF
       END
 
 
@@ -252,24 +252,24 @@ C     Routine Name:
 C        TCV_TIME2S
 C
 C     Function:
-C        Convert a time as a fraction of a day to a string in HMS 
+C        Convert a time as a fraction of a day to a string in HMS
 C
 C     Description:
 C        Given a time expressed as a fraction of a day derive a string
-C        in Hours, minutes and seconds.  
+C        in Hours, minutes and seconds.
 C
 C     Call:
 C        CALL TCV_TIME2S(D,NDP,SEP,STRING,STATUS)
 C
 C     Parameters:
-C    (>) MJD         (Double) - The time to be converted.    
+C    (>) MJD         (Double) - The time to be converted.
 C    (>) NDP         (Integer) - Number of decimal places on seconds.
 C    (>) SEP         (Character)  -  Seperator character
-C    (<) STRING      (Fixed string, descr) - The resulting string. 
+C    (<) STRING      (Fixed string, descr) - The resulting string.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
-C        SLA_DD2TF                                                 
+C        SLA_DD2TF
 C
 C     Support: Jeremy Bailey, AAO
 C
@@ -278,15 +278,15 @@ C
 C-
 C
 C  History:
-C    27/7/1988   Original Version.   JAB/AAO 
+C    27/7/1988   Original Version.   JAB/AAO
 C+
-      IMPLICIT NONE 
+      IMPLICIT NONE
       DOUBLE PRECISION D
-      INTEGER NDP                  
+      INTEGER NDP
       CHARACTER*1 SEP
       CHARACTER*(*) STRING
-      INTEGER STATUS      
-      CHARACTER*1 SIGN                                       
+      INTEGER STATUS
+      CHARACTER*1 SIGN
       CHARACTER*20 SECFORMAT
       INTEGER IHMSF(4)
 
@@ -297,10 +297,10 @@ C+
         ELSE
           SECFORMAT = ' '
         ENDIF
-        CALL SLA_DD2TF(NDP,D,SIGN,IHMSF)           
+        CALL SLA_DD2TF(NDP,D,SIGN,IHMSF)
         WRITE(STRING,'(I2.2,A1,I2.2,A1,I2.2'//SECFORMAT,ERR=100)
      :         IHMSF(1),SEP,IHMSF(2),SEP,IHMSF(3),IHMSF(4)
-      ENDIF   
+      ENDIF
 100   CONTINUE
       END
 
@@ -317,37 +317,37 @@ C     Function:
 C        Convert a string containing an RA in HMS to radians
 C
 C     Description:
-C        Decode a string containing a Right Ascension in hours, minutes and 
-C        seconds and derive the corresponding angle in radians.              
+C        Decode a string containing a Right Ascension in hours, minutes and
+C        seconds and derive the corresponding angle in radians.
 C
 C     Call:
 C        CALL TCV_S2RA(STRING,RA,STATUS)
 C
 C     Parameters:
-C    (>) STRING      (Fixed string, descr) - The string to be converted. 
+C    (>) STRING      (Fixed string, descr) - The string to be converted.
 C    (<) RA          (Double) - The resulting RA in radians.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
 C         SLA_INTIN,
 C         SLA_DFLTIN,
-C         SLA_DTF2R                                        
+C         SLA_DTF2R
 C
 C     Support: Jeremy Bailey, AAO
 C
-C     Version date: 27/7/1988            
+C     Version date: 27/7/1988
 C
 C-
 C
 C  History:
-C    27/7/1988   Original Version.   JAB/AAO 
-C+       
-                  
-      IMPLICIT NONE 
+C    27/7/1988   Original Version.   JAB/AAO
+C+
+
+      IMPLICIT NONE
       CHARACTER*(*) STRING
       DOUBLE PRECISION RA
-      INTEGER STATUS      
-                                                  
+      INTEGER STATUS
+
       INTEGER NSTRT,IHOUR, IMIN, JFLAG
       DOUBLE PRECISION SEC
 
@@ -357,29 +357,29 @@ C+
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF        
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           IMIN = 0
           CALL SLA_INTIN(STRING,NSTRT,IMIN,JFLAG)
           IF (JFLAG .EQ. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF           
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           SEC = 0.0D0
           CALL SLA_DFLTIN(STRING,NSTRT,SEC,JFLAG)
           IF (JFLAG .GE. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF         
-          CALL SLA_DTF2R(IHOUR,IMIN,SEC,RA,JFLAG) 
+          ENDIF
+          CALL SLA_DTF2R(IHOUR,IMIN,SEC,RA,JFLAG)
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
           ENDIF
-      ENDIF    
+      ENDIF
       END
 
 
@@ -393,25 +393,25 @@ C     Routine Name:
 C        TCV_RA2S
 C
 C     Function:
-C        Convert an RA in radians to a string in HMS 
+C        Convert an RA in radians to a string in HMS
 C
 C     Description:
 C        Given an angle in radians derive a string
-C        in Hours, minutes and seconds.  
+C        in Hours, minutes and seconds.
 C
 C     Call:
 C        CALL TCV_RA2S(RA,NDP,SEP,STRING,STATUS)
 C
 C     Parameters:
-C    (>) RA          (Double) - The angle to be converted. 
+C    (>) RA          (Double) - The angle to be converted.
 C    (>) NDP         (Integer) - Number of decimal places on seconds.
 C    (>) SEP         (Character) - Seperator character
-C    (<) STRING      (Fixed string, descr) - The resulting string. 
+C    (<) STRING      (Fixed string, descr) - The resulting string.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
 C        SLA_DRANRM,
-C        SLA_DR2TF                                                 
+C        SLA_DR2TF
 C
 C     Support: Jeremy Bailey, AAO
 C
@@ -420,14 +420,14 @@ C
 C-
 C
 C  History:
-C    27/7/1988   Original Version.   JAB/AAO 
+C    27/7/1988   Original Version.   JAB/AAO
 C+
-      IMPLICIT NONE 
+      IMPLICIT NONE
       DOUBLE PRECISION RA
-      INTEGER NDP                                     
+      INTEGER NDP
       CHARACTER*1 SEP
       CHARACTER*(*) STRING
-      INTEGER STATUS      
+      INTEGER STATUS
       CHARACTER*1 SIGN
       INTEGER IHMSF(4)
       CHARACTER*20 SECFORMAT
@@ -441,10 +441,10 @@ C+
         ELSE
           SECFORMAT = ' '
         ENDIF
-        CALL SLA_DR2TF(NDP,D,SIGN,IHMSF)           
+        CALL SLA_DR2TF(NDP,D,SIGN,IHMSF)
         WRITE(STRING,'(I2.2,A1,I2.2,A1,I2.2'//SECFORMAT,ERR=100)
      :         IHMSF(1),SEP,IHMSF(2),SEP,IHMSF(3),IHMSF(4)
-      ENDIF   
+      ENDIF
 100   CONTINUE
       END
 
@@ -462,37 +462,37 @@ C     Function:
 C        Convert a string containing a Dec in DMS to radians
 C
 C     Description:
-C        Decode a string containing a Declination in degrees, minutes and 
-C        seconds and derive the corresponding angle in radians.              
+C        Decode a string containing a Declination in degrees, minutes and
+C        seconds and derive the corresponding angle in radians.
 C
 C     Call:
 C        CALL TCV_S2DEC(STRING,DEC,STATUS)
 C
 C     Parameters:
-C    (>) STRING      (Fixed string, descr) - The string to be converted. 
+C    (>) STRING      (Fixed string, descr) - The string to be converted.
 C    (<) RA          (Double) - The resulting Dec in radians.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
 C         SLA_INTIN,
 C         SLA_DFLTIN,
-C         SLA_DAF2R                                        
+C         SLA_DAF2R
 C
 C     Support: Jeremy Bailey, AAO
 C
-C     Version date: 27/7/1988            
+C     Version date: 27/7/1988
 C
 C-
 C
 C  History:
-C    27/7/1988   Original Version.   JAB/AAO 
-C+       
-                  
-      IMPLICIT NONE 
+C    27/7/1988   Original Version.   JAB/AAO
+C+
+
+      IMPLICIT NONE
       CHARACTER*(*) STRING
       DOUBLE PRECISION DEC
-      INTEGER STATUS      
-                                                  
+      INTEGER STATUS
+
       INTEGER NSTRT,IDEG, IMIN, JFLAG
       DOUBLE PRECISION SEC
       LOGICAL NEGATIVE
@@ -505,30 +505,30 @@ C+
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF      
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           IMIN = 0
           CALL SLA_INTIN(STRING,NSTRT,IMIN,JFLAG)
           IF (JFLAG .EQ. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF           
-          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR. 
+          ENDIF
+          IF (STRING(NSTRT:NSTRT) .EQ. ':' .OR.
      :        STRING(NSTRT:NSTRT) .EQ. '/') NSTRT = NSTRT + 1
           SEC = 0.0
           CALL SLA_DFLTIN(STRING,NSTRT,SEC,JFLAG)
           IF (JFLAG .GE. 2) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF         
-          CALL SLA_DAF2R(IDEG,IMIN,SEC,DEC,JFLAG) 
+          ENDIF
+          CALL SLA_DAF2R(IDEG,IMIN,SEC,DEC,JFLAG)
           IF (JFLAG .GE. 1) THEN
               STATUS = JFLAG
               RETURN
-          ENDIF              
+          ENDIF
           IF (NEGATIVE) DEC = -DEC
-      ENDIF    
+      ENDIF
       END
 
 
@@ -542,24 +542,24 @@ C     Routine Name:
 C        TCV_DEC2S
 C
 C     Function:
-C        Convert a Dec in radians to a string in DMS 
+C        Convert a Dec in radians to a string in DMS
 C
 C     Description:
 C        Given an angle in radians derive a string
-C        in Degrees, minutes and seconds.  
+C        in Degrees, minutes and seconds.
 C
 C     Call:
 C        CALL TCV_DEC2S(DEC,NDP,SEP,STRING,STATUS)
 C
 C     Parameters:
 C    (>) DEC         (Double) - The angle to be converted.
-C    (>) NDP         (Integer) - Number of decimal places for seconds. 
+C    (>) NDP         (Integer) - Number of decimal places for seconds.
 C    (>) SEP         (Character) - Seperator character.
-C    (<) STRING      (Fixed string, descr) - The resulting string. 
+C    (<) STRING      (Fixed string, descr) - The resulting string.
 C    (!) STATUS      (Integer) - Status value.
 C
 C     External Routines called:
-C        SLA_DR2AF                                                 
+C        SLA_DR2AF
 C
 C     Support: Jeremy Bailey, AAO
 C
@@ -568,30 +568,30 @@ C
 C-
 C
 C  History:
-C    27/7/1988   Original Version.   JAB/AAO 
+C    27/7/1988   Original Version.   JAB/AAO
 C+
-      IMPLICIT NONE 
+      IMPLICIT NONE
       DOUBLE PRECISION DEC
-      INTEGER NDP                                      
+      INTEGER NDP
       CHARACTER*1 SEP
       CHARACTER*(*) STRING
-      INTEGER STATUS      
+      INTEGER STATUS
       CHARACTER*1 SIGN
       CHARACTER*20 SECFORMAT
       INTEGER IDMSF(4)
 
-      IF (STATUS .EQ. 0) THEN                                        
+      IF (STATUS .EQ. 0) THEN
         IF (NDP .GE. 1 .AND. NDP .LT. 10) THEN
           WRITE(SECFORMAT,'('',''''.'''',I'',I1,''.'',I1,'')'')')
      :        ,NDP,NDP
         ELSE
           SECFORMAT = ' '
         ENDIF
-        CALL SLA_DR2AF(NDP,DEC,SIGN,IDMSF)           
+        CALL SLA_DR2AF(NDP,DEC,SIGN,IDMSF)
         WRITE(STRING,'(A1,I2.2,A1,I2.2,A1,I2.2'//SECFORMAT,
      :         ERR=100)
      :         SIGN,IDMSF(1),SEP,IDMSF(2),SEP,IDMSF(3),IDMSF(4)
-      ENDIF   
+      ENDIF
 100   CONTINUE
       END
 

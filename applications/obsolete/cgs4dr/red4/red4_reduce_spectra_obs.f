@@ -1,10 +1,10 @@
 *+  RED4_REDUCE_SPECTRA_OBS - Reduce a complete SPECTRA observation
       SUBROUTINE RED4_REDUCE_SPECTRA_OBS (OBS_NAME, TYPE, STATUS)
 *    Description :
-*     This routine takes a SPECTRA observation of name Oyymmdd_oooo in ODIR, 
-*     searches IDIR (the raw integration directory) for the integrations that 
-*     belong to it (Iyymmdd_oooo_iiii) and reduces them all at once into a reduced 
-*     observation file ROyymmdd_oooo in RODIR. Individual files containing 
+*     This routine takes a SPECTRA observation of name Oyymmdd_oooo in ODIR,
+*     searches IDIR (the raw integration directory) for the integrations that
+*     belong to it (Iyymmdd_oooo_iiii) and reduces them all at once into a reduced
+*     observation file ROyymmdd_oooo in RODIR. Individual files containing
 *     reduced integrations are not produced.
 *
 *     If the integration was a STARE the reduction of each integration
@@ -20,12 +20,12 @@
 *     consists of:-
 *                if non-destructive reads are not being used
 *                   subtract suitable BIAS (any) from phase A and phase B
-*                linearise phase A and phase B 
+*                linearise phase A and phase B
 *                subtract phase A from phase B
 *                divide by suitable FLAT (same chip exposure time
 *                   and optical configuration), if required.
 *
-*     Quality is propagated from all the reduced observations used in the 
+*     Quality is propagated from all the reduced observations used in the
 *     reduction, but not variances.
 *
 *     The result of each integration is coadded into the result for the
@@ -33,7 +33,7 @@
 *     about the mean.
 *
 *     Weighted coadds are not treated properly yet.
-*    
+*
 *     When this routine is entered the parent observation file has already been
 *     opened by the DSA system, and a file to hold the reduced observation
 *     has been created and opened.
@@ -72,7 +72,7 @@
 *     Phil Daly      (JACH::PND)
 *    History :
 *     26-Feb-1990: Original                                       (JFL)
-*      2-Mar-1990: Status check added before call to 
+*      2-Mar-1990: Status check added before call to
 *                  RED4_INDEX_ARITHMETIC, to prevent an adjustable
 *                  array bounds violation.                        (SMB)
 *      4-Mar-1990: VARIANCE_MAP added to ensure that variance array is checked
@@ -241,7 +241,7 @@
 *    Status :
       INTEGER STATUS
 *    Input :
-      CHARACTER*(*) OBS_NAME             ! the basic name of the observation 
+      CHARACTER*(*) OBS_NAME             ! the basic name of the observation
 *                                             file to be reduced, e.g.O890816_1
       CHARACTER*(*) TYPE                 ! the particular type of 'SPECTRA'
 *                                             this is; 'CALIBRATION', 'SKY',
@@ -253,7 +253,7 @@
       CHARACTER*2 GEN_NTH                ! Figaro "Nth" determination function
 *                                            (i.e. 1st, 2nd, 3rd, 4th ...)
 *    Global variables :
-      INCLUDE 'RED4_COMMON.INC'          ! 'Virtual common' block, holding 
+      INCLUDE 'RED4_COMMON.INC'          ! 'Virtual common' block, holding
 *                                             reduced observations required
 *                                             for this reduction.
 *    Local variables :
@@ -274,7 +274,7 @@
       INTEGER INTEGRATION                ! number of integration currently being
 *                                            added to the observation
       INTEGER TOTAL_INTS                 ! total number of integrations
-      INTEGER NDIM                       ! the dimensions of the integration 
+      INTEGER NDIM                       ! the dimensions of the integration
 *                                             array
       INTEGER DIMS( MAXDIM )             !                "
       INTEGER N_EXPOSURES                ! the number of exposures that were
@@ -301,7 +301,7 @@
 *                                              the index array points each
 *                                              column of an integration at a
 *                                              particular detector position to
-*                                              its place in the reduced data 
+*                                              its place in the reduced data
       INTEGER INDEX_PTR                  !        "
       INTEGER WORK_SLOT                  !  temporary work area
       INTEGER WORK_DATA                  !        "
@@ -319,9 +319,9 @@
 *                                             observation data array
       INTEGER NPLANE                     ! number of elements in one plane of
 *                                             the integration array
-      INTEGER OBSDIMS( RMAXDIM )         ! dimensions of reduced observation 
+      INTEGER OBSDIMS( RMAXDIM )         ! dimensions of reduced observation
 *                                             data
-      INTEGER INTDIMS( RMAXDIM )         ! dimensions of reduced integration 
+      INTEGER INTDIMS( RMAXDIM )         ! dimensions of reduced integration
 *                                             data
       INTEGER INDEX_DIMS( RMAXDIM )      ! dimensions of index array in
 *                                             reduced observation data.
@@ -340,13 +340,13 @@
 *                                             columns in reduced observation
       DOUBLE PRECISION
      :  LCOEFFS( MAXCOEFFS )             ! Linearisation coefficients array
-      CHARACTER*4 DIVIDE_BY_FF           ! Controls whether the 
+      CHARACTER*4 DIVIDE_BY_FF           ! Controls whether the
 *                                        !    observation is to be divided by
 *                                        !    a flat-field (YES, NO or ASK)
       CHARACTER*4 SUBTRACT_BIAS          ! Controls whether the
 *                                        !    observation is to be BIAS
 *                                        !    subtracted (YES, NO or ASK)
-      CHARACTER*4 SUBTRACT_DARK          ! Controls whether the 
+      CHARACTER*4 SUBTRACT_DARK          ! Controls whether the
 *                                        !    observation is to be DARK
 *                                        !    subtracted (YES, NO or ASK)
       CHARACTER*20 LPREFIX               ! Local prefix
@@ -356,7 +356,7 @@
       CHARACTER*80 DARK_NAME           ! the name of the file containing the
 *                                             reduced DARK observation used
       CHARACTER*80 FLAT_NAME             ! the name of the file containing the
-*                                             reduced FLAT observation 
+*                                             reduced FLAT observation
 *                                             used
       CHARACTER*80 MASK                  ! the name of the file containing
 *                                             the bad pixel mask
@@ -389,7 +389,7 @@
 *    Return if entry status bad
       IF ( STATUS.NE.SAI__OK ) RETURN
 
-*    The observation file has already been opened as 'OBS_IN', and a file 
+*    The observation file has already been opened as 'OBS_IN', and a file
 *    created to contain the reduced observation and opened as 'OBS_RED',
 *    before this routine is called. Get the INT_TYPE and uppercase it.
       CALL DSA_GET_FITS_C( 'OBS_IN', 'INTTYPE', 0, INT_TYPE, COMMENT, STATUS )
@@ -430,7 +430,7 @@
 *    Get the detector oversampling factor.
       CALL DSA_GET_FITS_I( 'OBS_IN', 'DETNINCR', 0, DET_NINCR, COMMENT, STATUS )
 
-*    Map in the data array of the reduced observation file, and the variance and quality arrays. 
+*    Map in the data array of the reduced observation file, and the variance and quality arrays.
       CALL DSA_USE_QUALITY( 'OBS_RED', STATUS )
       CALL DSA_MAP_DATA( 'OBS_RED', 'WRITE', 'FLOAT', RED_DATA, DATA_SLOT, STATUS )
       CALL DSA_MAP_QUALITY( 'OBS_RED', 'WRITE', 'BYTE', RED_QUAL, QUAL_SLOT, STATUS )
@@ -451,22 +451,22 @@
       CALL DSA_DATA_SIZE( 'OBS_RED', RMAXDIM, NDIM, OBSDIMS, NELM_OBS, STATUS )
 
 *    Open the COADDS structure of the reduced observation file. This will
-*    hold info on how many coadds have gone into the result array. Map in 
+*    hold info on how many coadds have gone into the result array. Map in
 *    its data array, and get the DTA name of the associated .COADDED_INTS
 *    structure that will hold the (compressed) names of those
-*    integrations that are added 
+*    integrations that are added
       CALL DSA_GET_ACTUAL_NAME( 'OBS_RED', OBSREDFILE, STATUS )
-      CALL DSA_NAMED_INPUT( 'COADDS', 
+      CALL DSA_NAMED_INPUT( 'COADDS',
      :   OBSREDFILE(1:CHR_LEN(OBSREDFILE))//'.MORE.CGS4_COADDS', STATUS )
       CALL DSA_MAP_DATA ('COADDS', 'UPDATE', 'SHORT', COADDS_PTR, COADDS_SLOT, STATUS )
       CALL DSA_SPECIFIC_STRUCTURE( 'COADDS', 'COADDED_INTS', 'UPDATE', COADDED_INTS, STATUS )
 
 *    Map in the index array of the reduced observation file
-      CALL DSA_NAMED_INPUT ( 'INDEX', 
+      CALL DSA_NAMED_INPUT ( 'INDEX',
      :   OBSREDFILE(1:CHR_LEN(OBSREDFILE))//'.MORE.CGS4_INDEX', STATUS )
       CALL DSA_MAP_DATA( 'INDEX', 'READ', 'SHORT', INDEX_PTR, INDEX_SLOT, STATUS )
       CALL DSA_DATA_SIZE( 'INDEX', RMAXDIM, NDIM, INDEX_DIMS, NELM, STATUS )
-       
+
 *    Trap errors so far
       IF ( STATUS.NE.SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -539,7 +539,7 @@
       OBSERVATION_TIME = 0.0
 
       DO WHILE ( LOOPING )
-        
+
 *       Construct integration file name
          INTEGRATION = INTEGRATION + 1
          INTNAME  = ROOT(1:CHR_LEN(ROOT))//ICH_CI(INTEGRATION)
@@ -567,7 +567,7 @@
            ELSE IF ( MOD(TOTAL_INTS,DET_NINCR).NE.0 ) THEN
              STATUS = SAI__ERROR
              CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_OBS: '/
-     :         /'This observation does not contain '/ 
+     :         /'This observation does not contain '/
      :         /'a whole number of scans', STATUS )
              GOTO 500
            ELSE IF ( TOTAL_INTS.EQ.1 ) THEN
@@ -735,17 +735,17 @@
                      CALL MSG_OUT( ' ', 'Using the bad pixel mask ^MASK', STATUS )
                   ENDIF
                   CALL DSA_NAMED_INPUT( 'MASK', MASK, STATUS )
-                  CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, STATUS ) 
+                  CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, STATUS )
                   CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, STATUS )
                   CALL DSA_MAP_DATA( 'MASK', 'READ', 'BYTE', MASK_DATA, MASK_SLOT, STATUS )
                   IF ( STATUS.EQ.SAI__OK .AND. VERBOSE ) CALL MSG_OUT( ' ', 'Mapped MASK data OK', STATUS )
                ENDIF
 
-*             In addition ..... find the size of the input integration array and create 3 2-d 
+*             In addition ..... find the size of the input integration array and create 3 2-d
 *             work arrays to match, to hold the data, variances and quality
-*             of the reduced integrations. The variance array is only used to 
+*             of the reduced integrations. The variance array is only used to
 *             fill up subroutine calls so fill it with zeros (the errors on
-*             individual integrations are ignored in the observation coadd). 
+*             individual integrations are ignored in the observation coadd).
 *             All the integrations will be the same size so the work arrays need
 *             only be created once.
                CALL DSA_DATA_SIZE( 'INT_IN', MAXDIM, NDIM, DIMS, NELM, STATUS )
@@ -772,7 +772,7 @@
                ENDIF
             ENDIF                  ! end of special setup for first integration
 
-*          Map in the integration data array 
+*          Map in the integration data array
             CALL DSA_MAP_DATA( 'INT_IN', 'READ', 'FLOAT', INT_DATA, INT_SLOT, STATUS )
 
 *          Do the reduction ...
@@ -796,7 +796,7 @@
 *            STARE: Flag as "bad" any values which the ADP has set to -50.0.
               CALL RED4_FLAG_BAD( NPLANE, -50.0, %val(WORK_DATA), %val(WORK_QUAL), STATUS )
 
-*             STARE: If non-destructive reads are not being used, subtract the BIAS observation from the result. 
+*             STARE: If non-destructive reads are not being used, subtract the BIAS observation from the result.
                IF ( PROCEED_BIAS .AND. (INDEX(INT_TYPE,'NDR').EQ.0) .AND. (STATUS.EQ.SAI__OK) ) THEN
                  IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Subtracting BIAS', STATUS )
                  CALL GEN_SUBAFV( NPLANE, %val(WORK_DATA), %val(BIAS_DATA), %val(WORK_DATA),
@@ -809,13 +809,13 @@
                    CALL MSG_SETI( 'NCOEFFS', N_COEFFS )
                    CALL MSG_SETC( 'NTH', GEN_NTH(N_COEFFS) )
                    CALL MSG_SETC( 'LINCOEFFS', LINCOEFFS )
-                   CALL MSG_OUT( ' ', 'Linearising using ^NCOEFFS^NTH order polynomial in ^LINCOEFFS', STATUS ) 
+                   CALL MSG_OUT( ' ', 'Linearising using ^NCOEFFS^NTH order polynomial in ^LINCOEFFS', STATUS )
                  ENDIF
                  CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, %val(WORK_DATA), %val(WORK_VAR), %val(WORK_QUAL), STATUS )
                ENDIF
 
 *             STARE: Now subtract the DARK observation, propagating quality but not variances.
-               IF ( PROCEED_DARK .AND. (STATUS.EQ.SAI__OK) ) THEN 
+               IF ( PROCEED_DARK .AND. (STATUS.EQ.SAI__OK) ) THEN
                  IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Subtracting DARK', STATUS )
                  CALL GEN_SUBAFV( NPLANE, %val(WORK_DATA), %val(DARK_DATA), %val(WORK_DATA),
      :              %val(WORK_QUAL), %val(DARK_QUAL), %val(WORK_QUAL), 0, 0, 0, .TRUE., .FALSE., 0, .FALSE. )
@@ -887,7 +887,7 @@
 *             the BIAS observation from the two phases. The quality of
 *             the BIAS is propagated into the the work area that will
 *             hold the result of the integration during the subtraction
-*             of the BIAS from the phase A. 
+*             of the BIAS from the phase A.
                IF ( PROCEED_BIAS .AND. (INDEX(INT_TYPE,'NDR').EQ.0) .AND. (STATUS.EQ.SAI__OK) ) THEN
                  IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Subtracting BIAS from Phase A', STATUS )
                  CALL GEN_SUBAFV( NPLANE, %val(PHASEA_DATA), %val(BIAS_DATA), %val(PHASEA_DATA),
@@ -903,7 +903,7 @@
                    CALL MSG_SETI( 'NCOEFFS', N_COEFFS )
                    CALL MSG_SETC( 'NTH', GEN_NTH(N_COEFFS) )
                    CALL MSG_SETC( 'LINCOEFFS', LINCOEFFS )
-                   CALL MSG_OUT( ' ', 'Linearising both phases using ^NCOEFFS^NTH order polynomial in ^LINCOEFFS', STATUS ) 
+                   CALL MSG_OUT( ' ', 'Linearising both phases using ^NCOEFFS^NTH order polynomial in ^LINCOEFFS', STATUS )
                  ENDIF
                  IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Linearising DATA Phase A', STATUS )
                  CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, %val(PHASEA_DATA), %val(WORK_VAR), %val(WORK_QUAL), STATUS )
@@ -940,14 +940,14 @@
 *          Coadd the work array into the observation result. External
 *          status check is to prevent adjustable array errors if any
 *          of the arrays aren't mapped.
-            CALL RED4_DO_COADD( %val(WORK_DATA), %val(WORK_QUAL), INTDIMS(1), INTDIMS(2), %val(INDEX_PTR), 
-     :        INDEX_DIMS(1), INDEX_DIMS(2), DET_INDEX, %val(RED_DATA), %val(RED_VAR), %val(RED_QUAL), 
+            CALL RED4_DO_COADD( %val(WORK_DATA), %val(WORK_QUAL), INTDIMS(1), INTDIMS(2), %val(INDEX_PTR),
+     :        INDEX_DIMS(1), INDEX_DIMS(2), DET_INDEX, %val(RED_DATA), %val(RED_VAR), %val(RED_QUAL),
      :        %val(COADDS_PTR), OBSDIMS(1), OBSDIMS(2), STATUS )
 
 *          End of integration reduction -
 *          Copy the FITS structure from the raw integration
 *          file into a structure corresponding to the integration just
-*          added in the COADDED_INTS structure. This is to record the fact 
+*          added in the COADDED_INTS structure. This is to record the fact
 *          that this integration has been coadded into the result.
             CALL RED4_INTTOCOADD( INTNAME, COADD_NAME, STATUS )
             RECORD = COADDED_INTS(1:CHR_LEN(COADDED_INTS)) // '.' // COADD_NAME
@@ -990,7 +990,7 @@
 
 *      If the flat-field has been normalised, then the units will
 *      be the same as the original spectrum. Otherwise they will
-*      just be an arbitrary ratio. 
+*      just be an arbitrary ratio.
          IF ( FLAT_NORMALISED ) THEN
             CHAR_ARRAY (1) = 'A/D numbers per exposure'
          ELSE
@@ -1031,12 +1031,12 @@
 
       CALL DSA_SET_DATA_INFO( 'OBS_RED', 2, CHAR_ARRAY, 0, 0.0D0, STATUS )
 
-*    Obtain the name of the object and write it to the reduced 
+*    Obtain the name of the object and write it to the reduced
 *    observation structure in the standard Figaro way.
       CALL DSA_GET_FITS_C( 'OBS_IN', 'OBJECT', 0, OBJECT_NAME, COMMENT, STATUS )
       CALL DSA_SET_OBJECT( 'OBS_RED', OBJECT_NAME, STATUS )
 
-*    Record how the reduction went in the FITS structure of the reduced 
+*    Record how the reduction went in the FITS structure of the reduced
 *    observation.
 *    date&time
       CALL GEN_TIME (6, DAY, LDAY, DATE, LDATE, HOUR, LHOUR)

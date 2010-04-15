@@ -42,7 +42,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -185,12 +185,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -221,17 +221,17 @@ most successful, versatile and productive astronomical satellites, providing
 ultraviolet spectra of a wide range of sources for the whole astronomical
 community.
 The UK hosts one of the three full archives of IUE data
-which is supported and maintained by members of the UK IUE 
-Project in the Space Science Department at RAL. 
+which is supported and maintained by members of the UK IUE
+Project in the Space Science Department at RAL.
 The archive comprises some 100\,000 images,
-and a catalogue which gives details of the exposures. 
-The aim is to provide UK astronomers with quick and painless 
+and a catalogue which gives details of the exposures.
+The aim is to provide UK astronomers with quick and painless
 access to IUE data.
 This document describes how to interrogate the catalogue and extract data from
-the archive. 
-There is also a subsidiary archive of extracted low-resolution spectra, the 
+the archive.
+There is also a subsidiary archive of extracted low-resolution spectra, the
 Uniform Low Dispersion Archive,
-which is described in 
+which is described in
 \xref{SUN/20}{sun20}{}: ULDA/USSP - Accessing the IUE ULDA.
 
 \subsection {IUE satellite}
@@ -244,8 +244,8 @@ outside Madrid (Vilspa).
 Observing time on IUE is divided into 8-hour shifts, two NASA, US1
 and US2, and one combined ESA-UK shift.
 The US2 shift usually suffers from the highest particle background.
-IUE is run as an observatory where guest observers make decisions 
-about their observing programme in real time; a style of operation 
+IUE is run as an observatory where guest observers make decisions
+about their observing programme in real time; a style of operation
 that has been often praised but seldom emulated.
 
 IUE was launched in 1978 and despite the failure of most of the gyros continues to
@@ -256,13 +256,13 @@ IUE carries two echelle spectrographs which cover the wavelength ranges
 1100 - 2100\AA, (the short wavelength, SW)
 and 1900 - 3300\AA, (the long wavelength, LW).
 The spectrographs may be used in two resolution modes.
-At high resolution (HIRES) $\Delta\lambda\sim$ 0.1\AA\ the spectrograph is 
-used in full echelle mode and $\sim$60 spectral orders fill the camera 
+At high resolution (HIRES) $\Delta\lambda\sim$ 0.1\AA\ the spectrograph is
+used in full echelle mode and $\sim$60 spectral orders fill the camera
 faceplate.
-In low resolution (LORES) mode $\Delta\lambda\sim$ 6\AA\ the echelle cross 
+In low resolution (LORES) mode $\Delta\lambda\sim$ 6\AA\ the echelle cross
 disperser is used alone to produce a single spectral order covering the full
 wavelength range.
-The spectrographs have two apertures. 
+The spectrographs have two apertures.
 The large aperture (LAP) is 10$\times$20 arcsec and at LORES
 may be used like a long slit
 for single, multiple, trailed or extended images with spatial information
@@ -273,7 +273,7 @@ At LORES both apertures may be used to record two spectra on a single image.
 LORES images through the LAP are absolutely calibrated but HIRES images are
 not.
 The small aperture (SAP) is $\sim$ 3 arcsec in diameter and vignettes the beam.
-Imprecision in centring the star make the transmission of the SAP 
+Imprecision in centring the star make the transmission of the SAP
 unpredictable so these spectra lose their absolute photometry.
 Both spectrographs have a prime (P) and redundant (R) camera. The SWP camera
 has been used throughout the mission while the LWR was used until 1984 and
@@ -287,37 +287,37 @@ IUE images are referred to by the camera name and a running image number,
 eg. SWP22861.
 Each image is held as a number of files which contain the {\it raw\/} image,
 some intermediate partly processed images and the final extracted 1-d spectra.
-The data in the archive is in what is known as Guest Observer (GO) format. 
-The raw IUE image is a 2-d scan of the camera target. 
+The data in the archive is in what is known as Guest Observer (GO) format.
+The raw IUE image is a 2-d scan of the camera target.
 The intensity in each pixel is given as a Data Number (DN) in the
-range 0 -- 255. 
+range 0 -- 255.
 The image is superimposed on a `pedestal' of $\sim$ 20 DN and
-overexposed ({\it saturated}) parts of the spectrum are set to 255 DN. 
+overexposed ({\it saturated}) parts of the spectrum are set to 255 DN.
 
 In the photometric image the
 DN values for each pixel are converted to fluxes via an Intensity Transfer
 Function (ITF) and are given in terms of a Flux Number (FN).
 Two types of photometric image have been used.
 Until about 1981 the raw image was geometrically as well as photometrically
-corrected to produce a {\it gphot\/} image. 
-The geometric correction removes the distortion in the camera and 
-the read process. 
+corrected to produce a {\it gphot\/} image.
+The geometric correction removes the distortion in the camera and
+the read process.
 More recently the raw image has been photometrically
-corrected in raw space, to yield a {\it phot\/} image, and the geometric 
-correction left to a later part of the processing. 
+corrected in raw space, to yield a {\it phot\/} image, and the geometric
+correction left to a later part of the processing.
 The timing of the change over of from gphot to phot was different for
 the two ground stations and different dispersions (see Table
 \ref{change}).
 It should also be remembered that some early images may have been
 reprocessed at a later date and have a different set of output files.
-The type of the photometric file is usually given at the end of the image 
+The type of the photometric file is usually given at the end of the image
 header, see Section \ref{readiue}.
 
 \begin{table}[htb]
 \caption{Change over from gphot to phot}
 \label{change}
 \begin{center}
-\begin{tabular}{rcc} 
+\begin{tabular}{rcc}
 	& Goddard & Vilspa \\ \hline
 LORES	& ~3 Nov 1980 & 10 Mar 1981 \\
 HIRES	& 10 Nov 1981 & 11 Mar 1981 \\
@@ -337,9 +337,9 @@ time-integrated flux in erg/cm$^{2}$/\AA, one file for each aperture.
 
 Low resolution images
 usually have in addition an (extended) line-by-line file ((E)LBL)
-which is a re-sampled photometric image with a number of scan lines parallel 
+which is a re-sampled photometric image with a number of scan lines parallel
 to the dispersion direction.
-Later versions of this file are extended, they 
+Later versions of this file are extended, they
 contain more lines than the earlier files.
 The LBL file may be used for extracting spectra of extended sources or
 multiple exposures of a single source made in different parts of the LAP.
@@ -348,15 +348,15 @@ practical use.
 LORES images may contain spectra taken through both apertures and a very small
 number of images intentionally contain spectra taken at both resolutions.
 Over the lifetime of the satellite the standard image processing (IUESIPS)
-has evolved and although the extracted spectra at LORES 
-are absolutely calibrated they are not uniformly processed. 
+has evolved and although the extracted spectra at LORES
+are absolutely calibrated they are not uniformly processed.
 Some early images have been reprocessed with more recent, but not necessarily
 the most recent, processing scheme.
 
 The dynamic range of IUE's detectors limits the signal to noise ratio of the
 spectra to $\sim$ 20, in the optimally exposed parts of the spectrum.
 In general it will be rather less than this but may be improved by co-adding
-spectra, with a small loss of resolution. 
+spectra, with a small loss of resolution.
 Limitations in the image processing (fixed pattern noise)
 restricts the improvement, which falls off
 rapidly with increasing number of spectra
@@ -365,19 +365,19 @@ There are a variety of marks and blemishes on the detectors that may interfere
 with the spectra.
 Embedded in the camera faceplate is a grid of fiducial marks which is used in
 the geometric correction.
-Each reseau creates an essentially black spot about 2$\times$2 pixels on the 
+Each reseau creates an essentially black spot about 2$\times$2 pixels on the
 raw image and some of these marks inevitably appear in the spectrum.
 The processing usually recognises them and they are flagged accordingly.
 There are also some other permanent blemishes, hot spots and other features and
 these are described in detail in Section \ref{blemish}.
 
-Cosmic-ray hits produce bright features on the image but these range from the 
-obvious spots to diffuse comet-like structures, the effects of which are not 
+Cosmic-ray hits produce bright features on the image but these range from the
+obvious spots to diffuse comet-like structures, the effects of which are not
 easily seen in the spectrum. These problems may be identified by viewing the
 whole raw or photometric image.
 
 Some images, particularly those from the LWR, may be affected by microphonic
-noise, which introduces a spurious varying signal of over 20 DN on a few scan 
+noise, which introduces a spurious varying signal of over 20 DN on a few scan
 lines, almost anywhere on the raw image.
 Depending on the resolution and where it occurs the microphonic noise may or
 may not interfere with the spectrum.
@@ -391,8 +391,8 @@ by the processing and are comparatively rare.
 The archive contains all the files for each IUE image and a catalogue.
 New images are continually
 added to the archive and the catalogue is updated every month.
-IUE observations are made as part of a Guest Observer programme and 
-are formally 
+IUE observations are made as part of a Guest Observer programme and
+are formally
 available to the whole astronomical community about six months after
 they are made.
 Details of new observations appear in the catalogue shortly before release.
@@ -401,7 +401,7 @@ Access to the IUE archive is simply through e-mailed de-archiving requests.
 The procedure is described in detail in Section \ref{dearch}.
 The IUE catalogue is accessed through the captive IUE account on the VMS
 database machine at RAL.
-The captive account may also be used to perform other 
+The captive account may also be used to perform other
 IUE related tasks as given in Section \ref{captive}.
 
 \subsection {IUE analysis}
@@ -409,11 +409,11 @@ IUE related tasks as given in Section \ref{captive}.
 In the UK it is common practice to extract the spectra from the photometric
 image using the \xref{IUEDR}{sun37}{} package (SUN/37)
 which offers significant advantages over IUESIPS.
-IUEDR may also be used to create LBL spectra and merge IUESIPS extracted 
+IUEDR may also be used to create LBL spectra and merge IUESIPS extracted
 spectra.
 The \$IUEDR directory contains tables to correct for the camera sensitivity
 degredation.
-A helpful introduction to using IUEDR may be found in 
+A helpful introduction to using IUEDR may be found in
 \xref{SG/7: {\em IUE Analysis - A
 Tutorial}}{sg7}{} and in the more comprehensive but rather old MUD/45: IUEDR User
 Guide.
@@ -421,10 +421,10 @@ The \xref{DIPSO}{sun50}{} package (SUN/50) has many features specifically design
 spectra and is widely used for the analysis.
 
 For some work the Uniform Low Dispersion Archive \xref{SUN/20}{sun20}{} may be appropriate.
-The ULDA is an on-line archive of LORES extracted spectra which have had the 
-details of the targets and exposures verified. 
-However it should be remembered that 
-these spectra are {\it not} uniformly processed, and are identical to the 
+The ULDA is an on-line archive of LORES extracted spectra which have had the
+details of the targets and exposures verified.
+However it should be remembered that
+these spectra are {\it not} uniformly processed, and are identical to the
 extracted spectra in the full archive.
 The ULDA may still be accessed from the various STARLINK site accounts on
 stadat.
@@ -443,18 +443,18 @@ probably take a further two years to complete.
 \section {The IUE captive account
 \xlabel{the_iue_captive_account}\label{captive}}
 
-The IUE captive account is on the (VMS) database machine at RAL 
+The IUE captive account is on the (VMS) database machine at RAL
 (stadat.rl.ac.uk).
 It is principally used to access the IUE catalogue but also enables IUE
 observing details, beta angles, to be calculated.
-To use the captive account 
+To use the captive account
 
 {\tt \% telnet stadat.rl.ac.uk}
 
 and login to username IUE (no password is required).
-You will be asked for a name, which is used for a subdirectory to contain your 
-files, and then the system displays a list of options. These give access to the 
-iue catalogue and other 
+You will be asked for a name, which is used for a subdirectory to contain your
+files, and then the system displays a list of options. These give access to the
+iue catalogue and other
 facilities, and enable a few DCL commands to be issued.
 These options are:
 
@@ -469,7 +469,7 @@ CLASSKEY - Displays a list of the various classification codes used in the
 IUE catalogue.
 
 TYPE - Same as the DCL command 'TYPE'.
-It can be used to view any of the files in the IUE directory. 
+It can be used to view any of the files in the IUE directory.
 Wild card characters can not be used in the TYPE command.
 
 DIR - Displays the contents of the IUE directory.
@@ -484,13 +484,13 @@ stadat.
 
 LOG - End the session and log-out.
 
-It is possible to run an interactive version of the registration process and 
-de-archiving program, IUEDA, from the captive account, but there is no real 
-need to do so. 
+It is possible to run an interactive version of the registration process and
+de-archiving program, IUEDA, from the captive account, but there is no real
+need to do so.
 
 \subsection {Consulting the catalogue}
 
-To consult the catalogue select the IUELOG option. 
+To consult the catalogue select the IUELOG option.
 There is usually a page of information about the latest log update and then
 you are prompted for a {\it label} which will be used to identify any files you
 want to keep.
@@ -503,7 +503,7 @@ which may be any of the following.
 
 {\tt HIRES} selects high resolution images
 
-{\tt LORES} selects low resolution images, these two are mutually exclusive. 
+{\tt LORES} selects low resolution images, these two are mutually exclusive.
 If you do not select either then by default both resolutions are selected.
 
 \smallskip
@@ -515,12 +515,12 @@ If you do not select either then by default both resolutions are selected.
 
 {\tt SWR n, m} where both n and m are optional image numbers specifying a range
 of required images. If no range is given then all images are selected.
-Only one camera may be specifically selected at a time but by default all 
-cameras are selected. 
+Only one camera may be specifically selected at a time but by default all
+cameras are selected.
 
 \smallskip
 {\tt OC n, m} where n and m (optional) specify a range of object classes
-otherwise 
+otherwise
 all object classes are selected. A single object class may be specified.
 
 \smallskip
@@ -529,21 +529,21 @@ right ascension.
 The RA's may be truncated to any level. Single digit hours, minutes or seconds
 may be given as a single digit or with a preceding zero. Hours, minutes and
 seconds {\it must} be separated by spaces and the two limits {\it must} be
-separated by a comma. The limits are in the sense, from and increasing to, 
+separated by a comma. The limits are in the sense, from and increasing to,
 and it is possible to search across the boundary from 24 to 0 hours, although
 a warning will be issued.
 A single RA may be given which defines the centre of
 a search area the size of which is determined by the BOX keyword (see below).
 
 \smallskip
-{\tt DEC $\pm$dd mm ss, $\pm$dd mm ss} where the Dec's specify the limits of 
+{\tt DEC $\pm$dd mm ss, $\pm$dd mm ss} where the Dec's specify the limits of
 a range in
 declination. The general comments for RA also apply. Positive Dec's do not
 require a sign.
 The RA and DEC keywords may be used completely independently.
 
 \smallskip
-{\tt BOX n} where n 
+{\tt BOX n} where n
 specifies the size of the search box in arc minutes around a central
 RA and Dec. If RA and Dec {\it limits} are given then the value of BOX is
 irrelevant. There is no Dec dependence of the dimension of the box in RA.
@@ -562,7 +562,7 @@ The string may include wildcard (*) characters.
 {\tt DATE year day, year day} where the dates define the limits of the search.
 The year may be given with or without the preceding 19.
 The year and day are separated by spaces and the two limits by a comma.
-The year only may be given and a single year may also be selected. 
+The year only may be given and a single year may also be selected.
 
 \smallskip
 {\tt CLEAR} clears all the search criteria to their default values
@@ -578,29 +578,29 @@ The year only may be given and a single year may also be selected.
 
 \smallskip
 The search keys are entered one per line in response to the prompt.
-Any combination, order and number of search keys may be used. 
+Any combination, order and number of search keys may be used.
 If an error is made simply re-enter the search key at any time.
 
 The results of the search are stored in a workfile which you may name as
 appropriate.
 The workfiles may be searched (using the old system) but with multiple search
-keys this should not be necessary and the new system alone should provide the 
-list you want. 
+keys this should not be necessary and the new system alone should provide the
+list you want.
 Any of the workfiles may be kept with the KEEP option
 and will be saved as {\it label}.IUE.
 Initially the workfiles are
-in RA order but it is possible to sort them using the ORDER option 
+in RA order but it is possible to sort them using the ORDER option
 by either date or camera and image number. Enter DATE or CIM as appropriate, or
 Q to quit the order option.
 All the KEEPed and ORDERed files are saved as different
-generations of [IUE]{\it label}.IUE. 
+generations of [IUE]{\it label}.IUE.
 Note that the label and not the workfile name is used.
 The {\it label}.IUE files may be transferred or MAILed to your own account.
 
 
 Any files you create in the IUE directory will be deleted automatically after
 two weeks.
-If you wish to keep a files they must be transferred to 
+If you wish to keep a files they must be transferred to
 one of your own directories using FTP or MAIL.
 
 
@@ -619,11 +619,11 @@ To use IUEDA a file containing some control information and a list of
 images to be de-archived is e-mailed to iues (NOT IUE) @stadat.rl.ac.uk.
 This request is automatically processed and a summary of the request
 and outcome of
-the de-archiving job will be e-mailed back to the requestor. 
+the de-archiving job will be e-mailed back to the requestor.
 The files are
 copied directly from the archive tapes to the scratch disk on stadat and
-will be held for about two weeks. They may be retrieved by ftp. 
-At present the automatic procedure is run every hour so there will not be 
+will be held for about two weeks. They may be retrieved by ftp.
+At present the automatic procedure is run every hour so there will not be
 an immediate response.
 
 \subsection{Registration}
@@ -641,7 +641,7 @@ The first line should contain
 {\tt start}
 
 Then give a short string to identify yourself (eg. your initials).
-This will be used as a unique prefix to {it all\/} your de-archiving requests. 
+This will be used as a unique prefix to {it all\/} your de-archiving requests.
 
 {\tt cl}
 
@@ -659,7 +659,7 @@ case sensitive.
 {\tt RAL}
 
 Then give your IP e-mail address.
-This will be used for all communication with you. 
+This will be used for all communication with you.
 
 {\tt cl@ast.star.rl.ac.uk}
 
@@ -683,8 +683,8 @@ So the text of the mail message will be
 \newline
 {\tt end}
 
-After the mail message has been processed you will be sent confirmation 
-of the registration or some diagnostics if there were any problems, eg. if your 
+After the mail message has been processed you will be sent confirmation
+of the registration or some diagnostics if there were any problems, eg. if your
 identifier is already in use.
 
 \subsection{To run IUEDA}
@@ -703,7 +703,7 @@ Then give the identifier you have registered under
 {\tt cl}
 
 Then give the request name. This can be anything relatively brief but
-descriptive to identify this request. Don't add anything to identify 
+descriptive to identify this request. Don't add anything to identify
 yourself as all your requests will be prefixed by your identifier.
 The request name may be the same as one used previously, for example to keep
 all the images of one target or programme together.
@@ -711,10 +711,10 @@ all the images of one target or programme together.
 {\tt tausco}
 
 Then give the image codes for the images you want, which may be any combination
-of the following. 
+of the following.
 \label{codes}
 \begin{center}
-\begin{tabular}{cl} 
+\begin{tabular}{cl}
 R & Raw image file (.raw file extension) \\
 G & Photometric image file gphot or phot (.phot file extension) \\
 E & Extracted spectrum file (.ext file extension) \\
@@ -774,7 +774,7 @@ When the de-archiving request is processed you will be e-mailed a file giving
 details of the images (target name, resolution etc.) and any problems that may
 have been found, for example if the image is not yet releasable.
 Also when the request has finished you will
-receive an e-mail containing a summary of the copying process. 
+receive an e-mail containing a summary of the copying process.
 You should go through these carefully to make sure that all your images have
 been copied. If any images are not copied then send an e-mail message to
 iues@star.rl.ac.uk.
@@ -799,23 +799,23 @@ To ftp the files to your host machine...
 
 {\tt ftp> bye}
 
-If there are multiple versions, for example when both apertures have been 
+If there are multiple versions, for example when both apertures have been
 used, then they will appear with the suffix .1, .2 etc.
-In some cases the information in the index is ambiguous and this also 
+In some cases the information in the index is ambiguous and this also
 results in two images being dearchived, but one will be incorrect.
 
 \subsection{Index errors}
 
-If there is an error in the index then the file copied may not contain the 
+If there is an error in the index then the file copied may not contain the
 image you requested, so {\it always\/} check that the header contains what you
-expect. 
+expect.
 If you discover an index error then please contact
 iues@star.rl.ac.uk.
 
 \subsection{Output request file}
 When a de-archiving request is received the procedure checks the image number
 against the catalogue and outputs a summary of the target and processing
-information. 
+information.
 On receiving the output request file you should check that the targets
 correspond to what you expect.
 \tt
@@ -831,7 +831,7 @@ period and if not you will be told when the image will be released.
 \tt
 \begin{verbatim}
  --------
- LWP27383  RA 11 07 56.9  Dec -60 42 27  Station G  Object    97152            
+ LWP27383  RA 11 07 56.9  Dec -60 42 27  Station G  Object    97152
  LWP27383 * This image will be released in  87 days
  --------
 \end{verbatim}
@@ -865,7 +865,7 @@ SWP51660  RA 16 32 45.9  Dec -28 06 51  Station G  Object 00149438
 SWP51660 * Image not available
 \end{verbatim}
 \rm
-Finally if there is an error in the camera name or the image number is outside 
+Finally if there is an error in the camera name or the image number is outside
 a permitted range then an error message will be generated.
 \tt
 \begin{verbatim}
@@ -906,20 +906,20 @@ When reading an IUE image file check that it contains
 the image you expect.
 As well as the obvious the header contains much more information essential to
 the correct running of IUEDR.
-To inspect the header use the {\tt listiue}, {\tt readiue} or {\tt readsips} 
+To inspect the header use the {\tt listiue}, {\tt readiue} or {\tt readsips}
 command with the
 parameter {\tt nline=-1}, which will list the whole header of perhaps 100 lines.
 With X-terminals it is a simple matter to scroll back through the listing to
 find the relevant information.
-At the {\tt DRIVE} prompt give the name of the file, a photometric image for 
-{\tt readiue}, an extracted file for {\tt readsips} or any file type 
+At the {\tt DRIVE} prompt give the name of the file, a photometric image for
+{\tt readiue}, an extracted file for {\tt readsips} or any file type
 for {\tt listiue}.
-The image number and target name, resolution, aperture and exposure time 
+The image number and target name, resolution, aperture and exposure time
 appear at the start of the header in line 3. In some early images this
 information may be more scattered or even missing.
 The THDA, which is required for temperature corrections, appears as the fourth
 item on line 5, 10.2 in this case, but this helpful format has only been used
-at Vilspa in recent years. 
+at Vilspa in recent years.
 The THDA may also be found amongst the processing information
 in the header of the extracted file.
 \tt
@@ -938,7 +938,7 @@ DRIVE - Tape Drive or File Name. /'swp7471.phot'/ > swp45203.phot
 \rm
 
 The next section of the header contains the event round robin, only part of
-which is shown here. 
+which is shown here.
 
 \tt
 \begin{verbatim}
@@ -963,7 +963,7 @@ is required by IUEDR.
 The gphot images are usually clearly identified but phot
 images are not always, and
 recourse may have to be made to the Table (\ref{change}).
-\tt                                                                             
+\tt
 \begin{verbatim}
 
  92072120345203L HO 0920722930201000000000000201239002000540V        1APC
@@ -977,13 +977,13 @@ Immediately following is the ITF table which identifies the ITF used in the
 processing.
 Use the table in the IUEDR Reference Manual under
 ITFMAX to match the first line of the ITF table
-\tt                                                                             
+\tt
 \begin{verbatim}
            0       1684       3374       6873       9091      10586   1PC
 \end{verbatim}
 \rm
 to the value of ITFMAX.
-\tt                                                                             
+\tt
 \begin{verbatim}
  PCF C/** DATA REC. 11 1   1   1 768 8448 5 3  6.1  5.0 2536   .00000 1PC
            0       1684       3374       6873       9091      10586   1PC
@@ -999,7 +999,7 @@ to the value of ITFMAX.
 >
 \end{verbatim}
 \rm
-The header for the extracted file contains additional information about the 
+The header for the extracted file contains additional information about the
 processing and the spacecraft velocity data.
 Use either of the commands {\tt listiue} or {\tt readsips} to see this header.
 The THDA which is used by IUEDR for
@@ -1029,16 +1029,16 @@ If the values are different the one for RESEAU MOTION is used.
 \section{Permanent features
 \xlabel{permanent_features}\label{blemish}}
 
-Tables \ref{low} and \ref{high} 
+Tables \ref{low} and \ref{high}
 give a list of permanent features in IUE images. Some of
-these fall on the spectra or background. 
+these fall on the spectra or background.
 Most are weak and appear only on long exposures.
 
 \begin{table}[ht]
 \caption{LORES hot spots}
 \label{low}
 \begin{center}
-\begin{tabular}{cccccl} 
+\begin{tabular}{cccccl}
 Camera	& \AA\	& LAP 	& SAP 	& Background \\
 LWP	& None  &  \\ \hline
 LWR  	& 1775	&	&$\bullet$&$\bullet$\\

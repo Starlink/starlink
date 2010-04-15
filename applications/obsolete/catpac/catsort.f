@@ -27,25 +27,25 @@
 *     for presentation.
 *
 *     Consider sorting the data in a telephone directory. For presentation
-*     purposes sort the data by field SURNAME (Primary field) if several 
-*     entries are found with the same surname order these by ordering on the 
-*     field FIRSTINITIAL (Secondary field) and if entries are found with the 
-*     same surname and first initial order these by ordering on the field 
-*     SECONDINITIAL (Tertiary field). This catalogue would now be presented in 
-*     a useful way. More importantly the system has created an 
+*     purposes sort the data by field SURNAME (Primary field) if several
+*     entries are found with the same surname order these by ordering on the
+*     field FIRSTINITIAL (Secondary field) and if entries are found with the
+*     same surname and first initial order these by ordering on the field
+*     SECONDINITIAL (Tertiary field). This catalogue would now be presented in
+*     a useful way. More importantly the system has created an
 *     index that allows it to perform an efficient search and join in certain
-*     cases. For example, a request for entries where the SURNAME is BROWN and 
-*     the FIRSTINITIAL is J. 
+*     cases. For example, a request for entries where the SURNAME is BROWN and
+*     the FIRSTINITIAL is J.
 *
-*     The order of field names in the SORTFLDS parameter is significant. 
-*     SORTFLDS(1) must contain the primary field, SORTFLDS(2) and 
+*     The order of field names in the SORTFLDS parameter is significant.
+*     SORTFLDS(1) must contain the primary field, SORTFLDS(2) and
 *     SORTFLDS(3) contain the secondary and tertiary fields.
-*     Omitting either the secondary or tertiary position simply indicates 
+*     Omitting either the secondary or tertiary position simply indicates
 *     that there should be no secondary or tertiary ordering.
 *
 *     The direction of the sort for each field in given in the corresponding
 *     position of the SORTDIR parameter. TRUE for ascending.
- 
+
 *  Usage:
 *     CATSORT INPUT OUTPUT SORTFLDS SORTDIR
 
@@ -76,7 +76,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

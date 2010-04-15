@@ -1,6 +1,6 @@
 *+  ROTAS1 - rotate square secton of input image into output image
       SUBROUTINE ROTAS1( NUMRA, ROTSIZ, XLARGE, OFSETL, OFSETS, INDEXL,
-     :  INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, WORK, 
+     :  INDEXS, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, WORK,
      :  STATUS )
 *    Description :
 *     Rotates a ROTSIZ by ROTSIZ square section of ARRIN, pointed at by INDEXL
@@ -173,7 +173,7 @@
                ENDDO
             ENDDO
          ELSE
-         
+
 *          here if number of right-angles for rotation is not 1 or 3
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'NUMRA', NUMRA )

@@ -92,14 +92,14 @@ C  Set range of integration for Z-coordinate and evaluate all limits
       INDEX_PTR = CURRENT_INDEX_ADDRESS
       CALL PLOT2D_RANGE (QBEG, QEND, PBEG, PEND, IX, IY, IZ)
 
-      
+
 *     PRINT '('' initial axis limits: ''/ 3(1X, I1, 2(2X,F10.4)/))',
 *    &     (I, QBEG(I),  QEND(I),I=1,3)
 *     PRINT '('' final axis limits:   ''/ 3(1X, I1, 2(2X,F10.4)/))',
 *    &     (I, PBEG(I),  PEND(I),I=1,3)
 
-C  Given the final ranges of each axis, find windowing function 
-C  (map and prototype headers and index block are maintained in memory, 
+C  Given the final ranges of each axis, find windowing function
+C  (map and prototype headers and index block are maintained in memory,
 C  so don't now need to get them explicitly).
 
       CALL MAP_WINDOW (XSCALE, NPTS1, IFAIL)
@@ -127,7 +127,7 @@ C  Get virtual memory for map: Note change to ADAM type status return
 
 C  Extract appropriate plane from data
 
-      CALL GETMAP2 (BUF, XSCALE, INTERP_WAIT, 
+      CALL GETMAP2 (BUF, XSCALE, INTERP_WAIT,
      &              %VAL(IPTR), IFAIL)
       IF (IFAIL.NE.0) GO TO 999
 
@@ -185,8 +185,8 @@ C     Check for existence of mapplane.tmp and delete it if it is there
 C     Write map to a file
 
       ISTAT = IGETLUN (IFILE, 'make_map', .TRUE.)
-      OPEN  (IFILE, 
-     &       FILE   = 'mapplane.tmp', 
+      OPEN  (IFILE,
+     &       FILE   = 'mapplane.tmp',
      &       STATUS = 'NEW',
      &       FORM   = 'UNFORMATTED',
      &       ACCESS = 'SEQUENTIAL',

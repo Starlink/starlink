@@ -4,24 +4,24 @@ C+
 C
 C     F I T _ S C A L D
 C
-C     Given a double precision array, this routine calculates 
+C     Given a double precision array, this routine calculates
 C     the scale and zero values needed to write it out as a) 8 bit
 C     unsigned integers, b) 16 bit signed integers, c) 32 bit
 C     signed integers.  The user has to choose which of these
 C     representations should be used, trading off precision
-C     against compactness of data.  
+C     against compactness of data.
 C
 C     This is a double precision version of FIT_SCALC
 C
 C     Parameters -   (">" input, "<" output)
 C
-C     (>) DATA     (Double precision array DATA(NELM)) The data 
-C                  array.  This can have any number of dimensions, 
+C     (>) DATA     (Double precision array DATA(NELM)) The data
+C                  array.  This can have any number of dimensions,
 C                  but is treated here as 1-dimensional for generality.
 C     (>) NELM     (Integer) The number of elements in DATA.
 C     (>) CHECK    (Logical) If true, the routine will pass through
 C                  the data applying the scaling for each integer
-C                  representaion and then applying the inverse 
+C                  representaion and then applying the inverse
 C                  operation to the result.  The maximum errors
 C                  found will be returned in ERRORS.
 C     (<) VMIN     (Double precision) Minimum value in DATA.
@@ -30,11 +30,11 @@ C     (<) SCALES   (Double precision array SCALES(3)) Gives the
 C                  scale factors for the three integer types.
 C                  SCALES(1) is for 8 bit, (2) for 16 bit, and
 C                  (3) for 32 bit.
-C     (<) ZEROS    (Double precision array ZEROS(3)) Gives the zero 
+C     (<) ZEROS    (Double precision array ZEROS(3)) Gives the zero
 C                  values for the three integer types.
-C     (<) ERRORS   (Double precision array ERRORS(3)) If CHECK is 
-C                  specified, ERRORS will be returned with the maximum 
-C                  errors for each of the three representaions.  This 
+C     (<) ERRORS   (Double precision array ERRORS(3)) If CHECK is
+C                  specified, ERRORS will be returned with the maximum
+C                  errors for each of the three representaions.  This
 C                  may help in deciding that the loss in precision that
 C                  results from an 8 or 16 bit representation will
 C                  be acceptable.
@@ -72,9 +72,9 @@ C
          IF (DATA(I).LT.VMIN) VMIN=DATA(I)
       END DO
 C
-C     Now get the three scales and zeros.  Note that we don't 
+C     Now get the three scales and zeros.  Note that we don't
 C     try to make use of the VERY ends of the integer ranges, to
-C     allow a little slop for rounding errors etc.  
+C     allow a little slop for rounding errors etc.
 C
       RANGE=VMAX-VMIN
       IF (RANGE.LT.1.E-35) THEN

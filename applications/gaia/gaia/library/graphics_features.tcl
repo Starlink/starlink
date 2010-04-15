@@ -21,11 +21,11 @@
 # reloaded later. You can save the graphics using world or image
 # coordinates and specify when reloading, whether or not the graphics
 # should be "sticky" and remain after a new image is loaded.
-# 
+#
 # $w is the name of the top level window.
 
 proc add_graphics_features {w} {
-    # get the path name of the Graphics menu 
+    # get the path name of the Graphics menu
     # (see TopLevelWidget in tclutil)
     set m [$w get_menu Graphics]
 
@@ -66,14 +66,14 @@ proc save_graphics {w} {
    if {"$filename" == ""} {
       return
    }
-   
+
    # check if file exists and, if so, ask for confirmation
    if {[file exists $filename]} {
       if {! [confirm_dialog "File `[file tail $filename]' exists. Overwrite it?"]} {
          return
       }
    }
-   
+
    # ask if we should save the graphics in world or image coords
    set choice [choice_dialog \
                   "Please select the type of coordinates to save the graphics in:" \
@@ -85,32 +85,32 @@ proc save_graphics {w} {
    } else {
       set units image
    }
-   
+
    # create the file
    if {[catch {set fd [open $filename w]} msg]} {
       error_dialog $msg
       return
    }
-   
+
    # get the handle of the canvas window for the image
    set canvas [$w component image component canvas]
-   
+
    # get the handle for the rtdimage item (for converting coordinates)
    set image [$w component image get_image]
-   
-   # get the handle for the image' graphic editor (class CanvasDraw) 
+
+   # get the handle for the image' graphic editor (class CanvasDraw)
    # so that we can deselect any selected graphic objects
    set draw [$w component image component draw]
    $draw deselect_objects
-   
+
    # save the coordinate type: degrees J2000 or image pixel coords
    puts $fd "set units \"$units\""
-   
+
    # use full precision so that we do not loose any
    set old_tcl_precision $::tcl_precision
    set ::tcl_precision 17
    catch {
-      
+
       # loop through the canvas items
       foreach item [$canvas find all] {
          set type [$canvas type $item]
@@ -119,10 +119,10 @@ proc save_graphics {w} {
          }
          # get item coords and convert from canvas coords to $units
          set coords [convert_coords [$canvas coords $item] canvas $units $image]
-         
+
          # add a special tag to this item so we can delete it before reloading it
          $canvas addtag $filename withtag $item
-         
+
          # get list of configuration options for the item
          set config {}
          foreach cfg [$canvas itemconfigure $item] {
@@ -155,14 +155,14 @@ proc load_graphics {w} {
 	error_dialog $msg
 	return
     }
-    
+
     # get the handle of the canvas window for the image
     set canvas [$w component image component canvas]
 
     # get the handle for the rtdimage item (for converting coordinates)
     set image [$w component image get_image]
 
-    # get the handle for the image' graphic editor (class CanvasDraw) 
+    # get the handle for the image' graphic editor (class CanvasDraw)
     # so that we can set bindings for editing objects
     set draw [$w component image component draw]
 
@@ -186,7 +186,7 @@ proc load_graphics {w} {
 	}
     }
 
-    # if using image coords, ask if the graphics should be "sticky" 
+    # if using image coords, ask if the graphics should be "sticky"
     # (i.e.: stay after new image is loaded)
     set sticky 0
     if {"$units" == "image"} {
@@ -240,7 +240,7 @@ proc load_graphics {w} {
 	# add bindings so that the items may be edited and saved again
 	$draw add_object_bindings $id
     }
-    
+
     close $fd
 }
 

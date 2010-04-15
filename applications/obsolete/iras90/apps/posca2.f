@@ -1,4 +1,4 @@
-      SUBROUTINE POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM, 
+      SUBROUTINE POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM,
      :                   WORK, NUSED, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM, WORK, 
+*     CALL POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM, WORK,
 *                  NUSED, STATUS )
 
 *  Description:
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
       CALL POSCA3( ' ', LOGPOS, FD, STATUS )
 
       TEXT = ' '
-      TEXT( 3 : ) = 'CRDD file'      
+      TEXT( 3 : ) = 'CRDD file'
       TEXT( 37 : ) = 'SOP'
       TEXT( 42 : ) = 'OBS'
       TEXT( 48 : ) = 'Cross'
@@ -159,32 +159,32 @@
 *  Find the position of the last character in the directory
 *  specification. The directory ends with the first (and only) ']'
 *  character on VMS and with the final '/' character on UNIX.
-         DEND = INDEX( CRDDF, ']' )            
+         DEND = INDEX( CRDDF, ']' )
          IF( DEND .EQ. 0 ) THEN
             NEXT = INDEX( CRDDF, '/' )
 
-            DO WHILE( NEXT .NE. 0 ) 
-               DEND = NEXT 
+            DO WHILE( NEXT .NE. 0 )
+               DEND = NEXT
                NEXT = INDEX( CRDDF, '/' )
-            END DO     
+            END DO
 
          END IF
 
 *  Put the CRDD file name into the start of the output buffer.
          TEXT( 3 : ) = CRDDF( DEND + 1 : )
 
-*  Put the SOP number into the output buffer finishing finishing at 
+*  Put the SOP number into the output buffer finishing finishing at
 *  column 39
          WRITE( TEXT( 37 : 39 ), '(I3)', IOSTAT = ISTAT )
      :                                          NINT( WORK( INDX, 7 ) )
 
-*  Put the OBS number into the output buffer finishing finishing at 
+*  Put the OBS number into the output buffer finishing finishing at
 *  column 44
          WRITE( TEXT( 41 : 44 ), '(I4)', IOSTAT = ISTAT )
      :                                          NINT( WORK( INDX, 8 ) )
 
 *  Put the cross-scan distance into the output buffer finishing at
-*  column 52. 
+*  column 52.
          WRITE( TEXT( 46 : 52 ), '(F7.1)', IOSTAT = ISTAT )
      :                                           REAL( WORK( INDX, 2 ) )
 
@@ -200,7 +200,7 @@
          IF( ISTAT .NE. 0 ) TEXT( 54 : 59 ) = '******'
 
 *  If the detector number is zero, the sample and detector numbers are
-*  not displayed.  
+*  not displayed.
          IF( WORK( INDX, 5 ) .GT. 0.0D0 ) THEN
 
 *  Put the sample number into the output buffer ending at column 65.
@@ -229,7 +229,7 @@
 *  Display the output buffer.
          CALL POSCA3( TEXT, LOGPOS, FD, STATUS )
 
-*  Don't display any more information if the user has supressed screen 
+*  Don't display any more information if the user has supressed screen
 *  output.
          CALL IRM_SPAGE( ON )
          IF( .NOT. ON ) GO TO 999

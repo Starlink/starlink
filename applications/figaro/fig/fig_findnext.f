@@ -5,13 +5,13 @@ C
 C     F I G _ F I N D N E X T
 C
 C     Given an element in the output wavelength array that
-C     overlaps a target element in the input array, sees if the 
-C     next element also overlaps that target element, and returns 
-C     the overlap range and the total flux in the overlap region 
+C     overlaps a target element in the input array, sees if the
+C     next element also overlaps that target element, and returns
+C     the overlap range and the total flux in the overlap region
 C     if it does.
 C
 C     Parameters -   (">" input, "!" modified, "W" workspace, "<" output)
-C 
+C
 C     (>) NIN       (Integer) The number of elements in the input arrays
 C     (>) DATIN     (Real array, DATIN(NIN)) The data to be redistributed.
 C     (>) XIN       (Double precision array XIN(NIN)) The wavelength
@@ -49,7 +49,7 @@ C     Common variables used: None
 C
 C     External subroutines / functions used:
 C
-C     FIG_OUTLIM    (FIG_FREBIN utility) Get output bin wavelength range 
+C     FIG_OUTLIM    (FIG_FREBIN utility) Get output bin wavelength range
 C     FIG_CALCFLUX  ( "    "       "   ) Calculate flux in overlap region
 C
 C                                           KS / AAO 17th June 1986

@@ -24,10 +24,10 @@
 *     Axis values are considered to match if the fractional difference
 *     between them is no more than the machine precision for single
 *     precision floating point values.
-*     
+*
 *     Elements of the DATA array which do not correspond to any element
 *     in the internal arrays are set bad (i.e. equal to VAL__BADR).
-      
+
 *  Arguments:
 *     N = INTEGER (Given)
 *        The size of the DATA and AXIS arrays.
@@ -62,7 +62,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
- 
+
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
 *        ASIZE1 = INTEGER (Read)
@@ -77,15 +77,15 @@
 *        WAVE( ASIZE1 ) = REAL (Read)
 *           The X value (usually wavelength or velocity) at the
 *           corresponding element in the FLUX array.
-     
+
 *  Arguments Given:
       INTEGER N
       REAL AXIS( N )
-      
+
 *  Arguments Returned:
       REAL DATA( N )
       INTEGER NGOOD
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -97,7 +97,7 @@
      :     JHI,                  ! Upper bound of current section
      :     JLO,                  ! Lower bound of current section
      :     SECT                  ! Section count
-      
+
 *.
 
 *  Check inherited global status.
@@ -110,7 +110,7 @@
 
 *  Initialise the count of good values stored in the returned data
 *  array.
-      NGOOD = 0      
+      NGOOD = 0
 
 *Initialise the index of the element of the output array which is
 *  most likely to have the same axis value as the current element from
@@ -129,7 +129,7 @@
 *  (i.e. index J0). If this guess turns out to be wrong, then the rest
 *  of the high end section is searched until a matching axis value is
 *  found. If no match is found, then the low end section is searched.
-*  
+*
 *  Set up the upper and lower bounds of the high end section of the
 *  output data array.
          JHI = N
@@ -140,13 +140,13 @@
 
 *  Check each axis value in this section. If one is found which is the
 *  same as the axis value of the current element of the internal arrays
-*  (to within a relative error given by the machine precision, VAL__EPSR), 
+*  (to within a relative error given by the machine precision, VAL__EPSR),
 *  then increment the count of good values in the data array (so long as
 *  a value has not already been stored in theis output pixel), store the
 *  current internal flux value in the output data array, indicate that
 *  the most likely place for the next match is the next pixel (this
 *  assumes the axis values are monotonic increasing), and jump out of
-*  the loop to do the next element of the internal arrays. Ignore bad 
+*  the loop to do the next element of the internal arrays. Ignore bad
 *  axis values.
             DO J = JLO, JHI
                IF( AXIS( J ) .NE. VAL__BADR ) THEN
@@ -158,7 +158,7 @@
                      DATA( J ) = FLUX( I )
                      J0 = J + 1
                      GO TO 10
-                   
+
                   END IF
 
                END IF

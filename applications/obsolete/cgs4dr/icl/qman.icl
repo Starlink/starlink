@@ -185,7 +185,7 @@ proc enter_varwt p1 p2
     varwt = 'false'
   else
     varwt = p1
-  endif 
+  endif
   if UNDEFINED(p2)
     qpos = 'OLDEST'
   else

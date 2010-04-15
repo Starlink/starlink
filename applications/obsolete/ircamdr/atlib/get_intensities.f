@@ -15,9 +15,9 @@
 
 * initialize the intensities to 0
 
-	INTENSITIES( 1) = 0.0 
-	INTENSITIES( 2) = 0.0 
-	INTENSITIES( 3) = 0.0 
+	INTENSITIES( 1) = 0.0
+	INTENSITIES( 2) = 0.0
+	INTENSITIES( 3) = 0.0
 
 * test which colour chosen
 
@@ -47,25 +47,25 @@
 	  INTENSITIES( 2) = 1.0
 	END IF
 	IF( PEN_COLOUR. EQ. 8) THEN
-	  INTENSITIES( 2) = 0.5 
+	  INTENSITIES( 2) = 0.5
 	END IF
 
 * set the green gun intensities
 
 	IF( PEN_COLOUR. EQ. 1. OR. PEN_COLOUR. EQ. 4 .OR.
      *	    PEN_COLOUR. EQ. 6. OR. PEN_COLOUR. EQ. 7) THEN
-	  INTENSITIES( 3) = 1.0 
+	  INTENSITIES( 3) = 1.0
 	END IF
 	IF( PEN_COLOUR .EQ. 8) THEN
-	  INTENSITIES( 3) = 0.5 
+	  INTENSITIES( 3) = 0.5
 	END IF
 
 * setup a black pen intensity
 
 	IF( PEN_COLOUR .EQ. 9) THEN
-	  INTENSITIES( 1) = 0.0 
-	  INTENSITIES( 2) = 0.0 
-	  INTENSITIES( 3) = 0.0 
+	  INTENSITIES( 1) = 0.0
+	  INTENSITIES( 2) = 0.0
+	  INTENSITIES( 3) = 0.0
 	END IF
 
 	END

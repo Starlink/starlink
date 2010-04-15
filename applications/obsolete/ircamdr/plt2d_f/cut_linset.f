@@ -5,17 +5,17 @@
 
 	IMPLICIT NONE
 
-	INTEGER 
-     :	  NPTS, 
-     :	  X1, 
-     :	  X2, 
-     :	  Y1, 
+	INTEGER
+     :	  NPTS,
+     :	  X1,
+     :	  X2,
+     :	  Y1,
      :	  Y2,
      :	  I,
      :	  MAXP,
      :	  STATUS
 
-	REAL 
+	REAL
      :	  RX1,
      :	  RY1,
      :	  RX2,
@@ -38,10 +38,10 @@
 	RX2 = FLOAT( X2)
 	RY2 = FLOAT( Y2)
 
-* calculate the x,y positions of points at radii of integral pixel spacings 
+* calculate the x,y positions of points at radii of integral pixel spacings
 * from the first point
 
-	IF( ( ABS( RY2-RY1) .LT. TOLERANCE) .AND. 
+	IF( ( ABS( RY2-RY1) .LT. TOLERANCE) .AND.
      :	    ( ABS( RX2-RX1) .LT. TOLERANCE)) THEN
 
 	   NPTS = 1

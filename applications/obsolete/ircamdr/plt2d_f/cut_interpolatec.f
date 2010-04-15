@@ -1,21 +1,21 @@
-	SUBROUTINE CUT_INTERPOLATEC( NPTS, MAXP, LINDAT, LINE, NX, NY, 
+	SUBROUTINE CUT_INTERPOLATEC( NPTS, MAXP, LINDAT, LINE, NX, NY,
      :	                             DATAARRAY, STATUS)
 
 * Description : Gets the data values from the image
 
 	IMPLICIT NONE
 
-	INTEGER 
-     :	  NPTS, 
-     :	  NX, 
-     :	  NY, 
+	INTEGER
+     :	  NPTS,
+     :	  NX,
+     :	  NY,
      :	  MAXP,
-     :	  STATUS, 
-     :	  I, 
-     :	  J, 
+     :	  STATUS,
+     :	  I,
+     :	  J,
      :	  K
 
-	REAL 
+	REAL
      :	  LINDAT( MAXP, 2),
      :	  LINE( MAXP),
      :	  DATAARRAY( NX, NY)

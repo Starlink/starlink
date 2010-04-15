@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine modifies a FITS-header card by replacing the value
-*     with blank characters, leaving the keyword, value indicator and 
-*     any comment in situ.  If the header has no value, the header is 
+*     with blank characters, leaving the keyword, value indicator and
+*     any comment in situ.  If the header has no value, the header is
 *     returned unchanged.
 *
 *  Arguments:
@@ -33,12 +33,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       IF ( HEADER( 1:8 ) .NE. 'COMMENT' .AND.
      :     HEADER( 1:8 ) .NE. 'HISTORY' ) THEN
 
-*  A further type of comment has a blank keyword, but this can also be 
+*  A further type of comment has a blank keyword, but this can also be
 *  an hierarchical keyword.
 
 *  Does the current card have a value, i.e. is there an equals sign
@@ -128,8 +128,8 @@
      :                      NWORD, STARTW, ENDW, WORDS, ISTAT )
 
 *  For a keyword, there must only be one word before the equals sign.
-*  This test excludes a comment unless the equals sign is the first 
-*  character after a blank keyword, so we add a further check that the 
+*  This test excludes a comment unless the equals sign is the first
+*  character after a blank keyword, so we add a further check that the
 *  first word contains a fullstop needed in a compound keyword.
 *  Further check for a hierarchical-keyword convention.
             IF ( ( NWORD .EQ. 1 .AND. ( EQUALS .EQ. 9 .OR.
@@ -159,7 +159,7 @@
 *  For normal headers the end position is 30, but for hierarchical
 *  keywords it is shifted rightwards.  Since the normal value
 *  numeric (ignoring complex) or boolean comprises a single word, find
-*  the column where the first word in the remainder of the header lies 
+*  the column where the first word in the remainder of the header lies
 *  to derive the rightmost column of the value.
                   CALL CHR_DCWRD( HEADER( EQUALS + 1: ), MXWORD,
      :                            NWORD, STARTW, ENDW, WORDS, ISTAT )

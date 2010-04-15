@@ -23,9 +23,9 @@ extern "C" {
 
  *  Copyright (c) Anglo-Australian Telescope Board, 1995.
     Not to be used for commercial purposes without AATB permission.
-  
+
  *     @(#) $Id: Ers.h,v 1.3 2005/05/17 22:21:19 rkackley Exp $
-  
+
 
  *  History:
       04-Aug-1992 - TJF - Original version
@@ -43,8 +43,8 @@ extern "C" {
       30-May-2001 - TJF - Add ErsSetLogRoutine.
       15-Jun-2001 - TJF - Add ErsGetTaskId.
       {@change entry@}
- 
- 
+
+
  */
 
 #ifdef ERS_STANDALONE
@@ -66,7 +66,7 @@ typedef long int StatusType;
 #define StatusOkP(_value_)  (*(_value_) == STATUS__OK)
 #else
 /*
- *  Include the drama.h file for configuration macros. 
+ *  Include the drama.h file for configuration macros.
  */
 
 #include "drama.h"
@@ -106,7 +106,7 @@ typedef long int StatusType;
 #define ERS_M_BROADCAST (1<<4)
 
 
-/* 
+/*
  *  This structure is used to store details of a message
  */
 typedef struct {
@@ -119,10 +119,10 @@ typedef struct {
 typedef DVOIDP ErsTaskIdType;
 
 #ifdef DPROTOTYPES_OK
-/* 
- *  This type is that required for log routines - called on each call to 
+/*
+ *  This type is that required for log routines - called on each call to
  *  ErsRep with details of a single message.
- * 
+ *
  *  The argument "logArg" is a user value supplied when ErsStart is called.
  *  It enables the user to pass any appropriate value to the log routine.
  */
@@ -131,7 +131,7 @@ typedef DVOID (*ErsLogRoutineType)(
 		    DCONSTV ErsMessageType * message,/* The message  */
 		    StatusType * status);
 /*
- *  The type is that requried for the output routine - called to output 
+ *  The type is that requried for the output routine - called to output
  *  the messages to the user.  An array of message may be output by one
  *  call, with count being the number of message to output.
  *
@@ -148,25 +148,25 @@ typedef DVOID (*ErsOutRoutineType)(
 /*
  *  Function prototypes.
  *
- * 
+ *
  *  We can't define these prorotype in the Ers main module unless we have
  *  stdarg.h.
  */
 #if !defined(ERS_MAIN) || defined(DSTDARG__OK)
-    DPUBLIC DVOID ErsRep(DCONSTV int flags, StatusType * status, 
+    DPUBLIC DVOID ErsRep(DCONSTV int flags, StatusType * status,
 		       DCONSTV char * string , ...)
 #ifdef __GNUC__
 	__attribute__ ((format (printf, 3, 4)))
 #endif
 		;
-    DPUBLIC DVOID ErsOut(DCONSTV int flags, StatusType * status, 
+    DPUBLIC DVOID ErsOut(DCONSTV int flags, StatusType * status,
 		          DCONSTV char * string, ...)
 #ifdef __GNUC__
 	__attribute__ ((format (printf, 3, 4)))
 #endif
 		;
-    DPUBLIC int  ErsSPrintf(DCONSTV int maxLength, 
-			char *string, 
+    DPUBLIC int  ErsSPrintf(DCONSTV int maxLength,
+			char *string,
 			DCONSTV char * fmt,...)
 #ifdef __GNUC__
 	__attribute__ ((format (printf, 3, 4)))
@@ -206,9 +206,9 @@ DPUBLIC DVOID ErsRestoreTask(ErsTaskIdType TaskId);
 #   include <varargs.h>
 #endif
 DPUBLIC int ErsVSPrintf(
-		 int maxLength, 
-		 char *string , 
-		 DCONSTV char * fmt0, 
+		 int maxLength,
+		 char *string ,
+		 DCONSTV char * fmt0,
 		 va_list ap);
 #else
 /* Don't use prorotypes */
@@ -235,7 +235,7 @@ DPUBLIC DVOID ErsEnableTask();
 DPUBLIC DVOID ErsRestoreTask();
 
 
-#endif	
+#endif
 
 
 #ifdef __cplusplus

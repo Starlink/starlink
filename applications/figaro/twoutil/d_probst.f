@@ -10,10 +10,10 @@
 * Description:
 *     Calculates Student T probability (lower Tail)
 *     Algorithm AS 3  APPL. STATIST. (1968) VOL.17, P.189
-*  
+*
 * Purpose:
 *     Calculates Student T probability (lower Tail)
-  
+
 *
 
 * Arguments:
@@ -26,7 +26,7 @@
 
 * Author:
 *     JWP: Manchester, March 1997
-*     
+*
 
 
 

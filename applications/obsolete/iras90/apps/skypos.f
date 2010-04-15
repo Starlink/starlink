@@ -30,7 +30,7 @@
 *     from a text file (see parameter MODE).
 
 *  Usage:
-*     SKYPOS 
+*     SKYPOS
 
 *  ADAM Parameters:
 *     COORDS = LITERAL (Read)
@@ -75,8 +75,8 @@
 *        A latitude of a position to be transformed, in the coordinate
 *        system specified by COORDS (eg if COORDS was EQUATORIAL, LAT
 *        should be given a Declination value). LAT is only prompted
-*        for if parameter MODE has the value KEYBOARD. See help on 
-*        "Sky_coordinates" for more information on available sky 
+*        for if parameter MODE has the value KEYBOARD. See help on
+*        "Sky_coordinates" for more information on available sky
 *        coordinate systems.
 *     LATOUT = LITERAL (Write)
 *        An output parameter to which is written the final displayed
@@ -90,8 +90,8 @@
 *        A longitude of a position to be transformed, in the coordinate
 *        system specified by COORDS (eg if COORDS was EQUATORIAL, LON
 *        should be given a Right Ascension value). LON is only prompted
-*        for if parameter MODE has the value KEYBOARD. See help on 
-*        "Sky_coordinates" for more information on available sky 
+*        for if parameter MODE has the value KEYBOARD. See help on
+*        "Sky_coordinates" for more information on available sky
 *        coordinate systems.
 *     LONOUT = LITERAL (Write)
 *        An output parameter to which is written the final displayed
@@ -152,7 +152,7 @@
 *        the Y axis (in degrees) at the last displayed position. This
 *        may vary across an image due to projection effects.
 *     PEN = INTEGER (Read)
-*        The SGS pen number used to draw the graphics specified by 
+*        The SGS pen number used to draw the graphics specified by
 *        parameter PLOT.                                             [3]
 *     PIXSIZE = REAL (Write)
 *        An output parameter to which is written a pair of values
@@ -161,11 +161,11 @@
 *        projection effects.
 *     PLOT = LITERAL (Read)
 *        Specifies the sort of graphics which are to be used to mark the
-*        positions selected in cursor mode. PLOT can take any of the 
+*        positions selected in cursor mode. PLOT can take any of the
 *        values POLY,MARK,NONE. POLY causes a polygonal line to be drawn
 *        between the selected points, MARK causes a cross to be drawn at
-*        each point, NONE causes no graphics to be produced. The 
-*        graphics are produced on the device specified by parameter 
+*        each point, NONE causes no graphics to be produced. The
+*        graphics are produced on the device specified by parameter
 *        DEVICE, using the pen specified by parameter PEN.        [MARK]
 *     SINGLE = LOGICAL (Read)
 *        If TRUE, then the application normally exits after the user
@@ -173,13 +173,13 @@
 *        then the user may continue to give further single positions.
 *                                                                   [NO]
 *     X = REAL (Read)
-*        An X image coordinate of a position to be transformed. X is 
+*        An X image coordinate of a position to be transformed. X is
 *        only prompted for if parameter MODE has the value KEYBOARD.
 *     XOUT = REAL (Write)
 *        An output parameter to which is written the final displayed
 *        X image coordinate.
 *     Y = REAL (Read)
-*        A Y image coordinate of a position to be transformed. Y is 
+*        A Y image coordinate of a position to be transformed. Y is
 *        only prompted for if parameter MODE has the value KEYBOARD.
 *     YOUT = REAL (Write)
 *        An output parameter to which is written the final displayed
@@ -210,7 +210,7 @@
 *        LATOUT for use by subsequent applications.
 
 *  Notes:
-*     -  When converting from image to sky coordinates, the displayed 
+*     -  When converting from image to sky coordinates, the displayed
 *     sky coordinates correspond to the displayed image coordinates
 *     which have been rounded to one decimal place, not to the original
 *     supplied image coordinates before rounding.
@@ -242,7 +242,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -254,19 +254,19 @@
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-                               
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER COORDS*(IRA__SZSCS)! Input coordinate system; sky or 
+      CHARACTER COORDS*(IRA__SZSCS)! Input coordinate system; sky or
                                   ! image.
       CHARACTER FILE*(GRP__SZFNM) ! Name of input text file.
       CHARACTER LSCS*(IRA__SZSCS) ! Value of SCS on previous operation.
       CHARACTER MODE*8            ! Source of input coordinates.
       CHARACTER OPTION*11         ! Option for next operation.
       CHARACTER PLOT*4            ! Type of graphics to produce.
-      CHARACTER SCS*(IRA__SZSCS)  ! Sky coordinates system in which 
+      CHARACTER SCS*(IRA__SZSCS)  ! Sky coordinates system in which
                                   ! keyboard input is expected, and in
                                   ! which output values are displayed.
       CHARACTER TEXT( 2 )*(GRP__SZNAM)! Text strings representing
@@ -317,10 +317,10 @@
                                  ! started.
       LOGICAL SINGLE             ! True if each operation is to be
                                  ! terminated after a single position.
-      LOGICAL TITLE              ! True if titles for the output 
+      LOGICAL TITLE              ! True if titles for the output
                                  ! columns are required.
 
-      REAL ANGLE                 ! Position angle of Y axis 
+      REAL ANGLE                 ! Position angle of Y axis
       REAL FIRSTX                ! X coord. of first selected point.
       REAL FIRSTY                ! Y coord. of first selected point.
       REAL LASTX                 ! X coord. of previous selected point.
@@ -353,11 +353,11 @@
      :                .FALSE., MODE, STATUS )
       CALL CHR_UCASE( MODE )
 
-*  If cursor mode is selected, see what sort of graphics are to be 
-*  produced, and what pen is to be used. Initialise the positions of 
+*  If cursor mode is selected, see what sort of graphics are to be
+*  produced, and what pen is to be used. Initialise the positions of
 *  the first and last points to be bad.
       IF( MODE .EQ. 'CURSOR' ) THEN
-         CALL PAR_CHOIC( 'PLOT', 'Mark', 'Mark,Poly,None', .FALSE., 
+         CALL PAR_CHOIC( 'PLOT', 'Mark', 'Mark,Poly,None', .FALSE.,
      :                   PLOT, STATUS )
          CALL CHR_UCASE( PLOT )
 
@@ -406,7 +406,7 @@
 
 *  Initialise the IRA system.
       CALL IRA_INIT( STATUS )
-                  
+
 *  Loop round until all requested operations have been performed.
       EXIT = .FALSE.
       DO WHILE( .NOT. EXIT .AND. STATUS .EQ. SAI__OK )
@@ -434,14 +434,14 @@
 
 *  If cursor mode is selected...
             IF( MODE .EQ. 'CURSOR' ) THEN
-         
+
 *  Initialise a flag to say that the next point is not inside the bounds
 *  of the NDF or AGI picture.
                INSIDE = .FALSE.
 
 *  If a graphics device has already been set up, use it. Otherwise,
 *  open the AGI database and set up the specified device.
-               IF( .NOT. DEVOPN ) THEN 
+               IF( .NOT. DEVOPN ) THEN
                   CALL SPOSB1( 'DEVICE', PICID, X1, X2, Y1, Y2, STATUS )
 
 *  If the source of astrometry information is not yet defined, try to
@@ -505,18 +505,18 @@
                CALL SGS_REQCU( X, Y, NKEY )
 
 *  If the cursor position is outside the area including the picture and
-*  the safety margin, flag that the current operation is complete, 
-*  switch off the cursor, complete any polyline, and set the first and 
+*  the safety margin, flag that the current operation is complete,
+*  switch off the cursor, complete any polyline, and set the first and
 *  last points bad.
                IF( X .LT. X1 .OR. X .GT. X2 .OR.
      :             Y .LT. Y1 .OR. Y .GT. Y2 ) THEN
                   MORE = .FALSE.
                   CALL SGS_CUVIS( .FALSE. )
-                  
+
                   IF( FIRSTX .NE. VAL__BADR .AND.
      :                FIRSTY .NE. VAL__BADR .AND.
      :                LASTX .NE. VAL__BADR .AND.
-     :                LASTY .NE. VAL__BADR .AND. 
+     :                LASTY .NE. VAL__BADR .AND.
      :                PLOT .EQ. 'POLY' ) THEN
 
                      CALL SGS_LINE( FIRSTX, FIRSTY, LASTX, LASTY )
@@ -526,12 +526,12 @@
                      FIRSTY = VAL__BADR
                      LASTX = VAL__BADR
                      LASTY = VAL__BADR
-                  
+
                   END IF
 
 *  If the position is within the usable area, see if any graphics are
 *  to be produced.
-               ELSE 
+               ELSE
 
 *  If a marker is to be produced, display a "+" at the cursor position.
                   IF( PLOT .EQ. 'MARK' ) THEN
@@ -540,8 +540,8 @@
 *  If a polyline is being produced...
                   ELSE IF( PLOT .EQ. 'POLY' ) THEN
 
-*  If this is the first position, draw a dot, and store the starting 
-*  coordinates.                     
+*  If this is the first position, draw a dot, and store the starting
+*  coordinates.
                      IF( NEWOP ) THEN
                         CALL SGS_MARK( X, Y, 1 )
                         FIRSTX = X
@@ -570,8 +570,8 @@
 *  If no file contents are available...
                IF( .NOT. GOTFIL ) THEN
 
-*  Get the name of a file from the environment, read its contents into 
-*  a GRP group, and close the file. The name of the coordinate system 
+*  Get the name of a file from the environment, read its contents into
+*  a GRP group, and close the file. The name of the coordinate system
 *  used by the data in the file is returned in COORDS.
                   CALL SPOSA0( 'FILE', IGRP, COORDS, GOTSKY, SIZE,
      :                         FILE, LFILE, STATUS )
@@ -579,17 +579,17 @@
 *  Cancel the parameter.
                   CALL PAR_CANCL( 'FILE', STATUS )
 
-*  If the input coordinates system is different to the requested output 
+*  If the input coordinates system is different to the requested output
 *  coordinate system, get the epoch of the obvservations. This need only
 *  be done if the input coordinates are sky coordinates.
                   IF( COORDS .NE. SCS .AND. GOTSKY ) THEN
-                     CALL PAR_DEF0D( 'EPOCH', IRA__IRJEP, STATUS ) 
+                     CALL PAR_DEF0D( 'EPOCH', IRA__IRJEP, STATUS )
                      CALL PAR_GET0D( 'EPOCH', EPOCH, STATUS )
                      CALL PAR_CANCL( 'EPOCH', STATUS )
                   END IF
 
 *  If all has gone well, indicate that the contents of a file are now
-*  available, and initialise the pointer to the first coordinate. 
+*  available, and initialise the pointer to the first coordinate.
 *  Record the source of coordinates in the log file.
                   IF( STATUS .EQ. SAI__OK ) THEN
                      GOTFIL = .TRUE.
@@ -606,7 +606,7 @@
                   ELSE
                      CALL GRP_DELET( IGRP, STATUS )
 
-                  END IF               
+                  END IF
 
                END IF
 
@@ -625,7 +625,7 @@
                ELSE
                   CALL GRP_GET( IGRP, INDEX, 2, TEXT, STATUS )
 
-*  Increment the index of the next pair of coordinates.               
+*  Increment the index of the next pair of coordinates.
                   INDEX = INDEX + 2
 
 *  If the file contains sky coordinates, convert the text strings into
@@ -634,7 +634,7 @@
                      CALL IRA_CTOD( TEXT( 1 ), TEXT( 2 ), COORDS, A, B,
      :                              STATUS )
 
-*  Convert the input sky coordinates to the requested output 
+*  Convert the input sky coordinates to the requested output
 *  coordinate system.
                      CALL IRA_CONVT( 1, A, B, COORDS, SCS, EPOCH, A, B,
      :                               STATUS )
@@ -658,7 +658,7 @@
 *  If this is a new operation...
                IF( NEWOP ) THEN
 
-*  If the source of astrometry information is not yet defined, use 
+*  If the source of astrometry information is not yet defined, use
 *  astrometry information stored in the NDF specified by parameter IN.
                   CALL SPOSB2( 'IN', ASTAVL, LBND, UBND, IDA, STATUS )
 
@@ -674,7 +674,7 @@
                   END IF
 
                END IF
- 
+
 *  If the inverse mapping is required, get a pair of sky coordinates
 *  from the environment and then cancel the parameter values.
                CALL MSG_BLANKIF( MSG__NORM, STATUS )
@@ -717,7 +717,7 @@
 
 *  Now tranform and display the supplied coordinates. if necessary.
             IF( MORE ) THEN
-               CALL SPOSB3( GOTSKY, INVER, SCS, IDA, LOGING, FD, TITLE, 
+               CALL SPOSB3( GOTSKY, INVER, SCS, IDA, LOGING, FD, TITLE,
      :                      A, B, X, Y, STATUS )
                XLAST = X
                YLAST = Y
@@ -759,7 +759,7 @@
 *  requested or an error occurs.
             OPTION = ' '
             DO WHILE( OPTION .NE. 'CONTINUE' .AND. .NOT. EXIT .AND.
-     :                STATUS .EQ. SAI__OK ) 
+     :                STATUS .EQ. SAI__OK )
 
 *  Get the next operation to perform, and then cancel the parameter.
                CALL PAR_CHOIC( 'OPTION', 'Continue', 'Continue,Exit,'//
@@ -769,7 +769,7 @@
                CALL PAR_CANCL( 'OPTION', STATUS )
 
 *  If an exit has been requested, flag it.
-               IF( OPTION .EQ. 'EXIT' ) THEN      
+               IF( OPTION .EQ. 'EXIT' ) THEN
                   EXIT = .TRUE.
 
 *  If the user has requested a change of mode, cancel the old value and
@@ -788,30 +788,30 @@
 
                   IF( INVER ) THEN
                      CALL MSG_OUTIF( MSG__NORM, 'SKYPOS_MSG5',
-     :                  '  OK. Sky to image mapping now being used...', 
+     :                  '  OK. Sky to image mapping now being used...',
      :                               STATUS )
                   ELSE
                      CALL MSG_OUTIF( MSG__NORM, 'SKYPOS_MSG6',
-     :                  '  OK. Image to sky mapping now being used...', 
+     :                  '  OK. Image to sky mapping now being used...',
      :                               STATUS )
 
                   END IF
 
-*  If the user has requested a change of sky coordinates, cancel the 
+*  If the user has requested a change of sky coordinates, cancel the
 *  old value and get a new value.
                ELSE IF( OPTION .EQ. 'COORDINATES' ) THEN
                   CALL PAR_CANCL( 'COORDS', STATUS )
                   CALL IRA_GTSCS( 'COORDS', .TRUE., SCS, STATUS )
 
-*  If the user has requested a change of graphics type, cancel the 
+*  If the user has requested a change of graphics type, cancel the
 *  old value and get a new value.
                ELSE IF( OPTION .EQ. 'PLOT' ) THEN
                   CALL PAR_CANCL( 'PLOT', STATUS )
-                  CALL PAR_CHOIC( 'PLOT', PLOT, 'Mark,Poly,None', 
+                  CALL PAR_CHOIC( 'PLOT', PLOT, 'Mark,Poly,None',
      :                            .FALSE., PLOT, STATUS )
                   CALL CHR_UCASE( PLOT )
 
-*  If the user has requested a change of graphics pen, cancel the 
+*  If the user has requested a change of graphics pen, cancel the
 *  old value and get a new value.
                ELSE IF( OPTION .EQ. 'PEN' ) THEN
                   CALL PAR_CANCL( 'PEN', STATUS )
@@ -829,12 +829,12 @@
 
             END DO
 
-*  If the coordinate system or mapping has changed a new log file will 
-*  be required.             
+*  If the coordinate system or mapping has changed a new log file will
+*  be required.
             IF( LOGING .AND. .NOT. EXIT. AND.
      :        ( INVER .NEQV. LINVER .OR. LSCS .NE. SCS ) ) THEN
 
-*  Tell the user what is happening.      
+*  Tell the user what is happening.
                CALL MSG_OUTIF( MSG__NORM, 'SKYPOS_MSG7',
      :   '  A new log file is required because the output coordinate '//
      :   'system has changed', STATUS )
@@ -849,20 +849,20 @@
 
 *  If looping is not required, indicate an immediate exit.
          ELSE
-            EXIT = .TRUE.            
+            EXIT = .TRUE.
 
          ENDIF
 
 *  Do the next operation.
       END DO
 
-*  Write the final longitude and latitude values to the output 
+*  Write the final longitude and latitude values to the output
 *  parameters.
       CALL IRA_DTOC( A, B, SCS, 0, TEXT( 1 ), TEXT( 2 ), STATUS )
       CALL PAR_PUT0C( 'LONOUT', TEXT( 1 ), STATUS )
       CALL PAR_PUT0C( 'LATOUT', TEXT( 2 ), STATUS )
 
-*  Write the final (used) image coordinate values to the output 
+*  Write the final (used) image coordinate values to the output
 *  parameters.
       CALL PAR_PUT0R( 'XOUT', XLAST, STATUS )
       CALL PAR_PUT0R( 'YOUT', YLAST, STATUS )
@@ -880,10 +880,10 @@
 *  Tidy up.
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
-*  Tidy up (including saving the astrometry information associated with 
+*  Tidy up (including saving the astrometry information associated with
 *  the DATA picture).
  999  CONTINUE
-      
+
       IF( ASTAVL ) THEN
          IF( DEVOPN ) CALL IRM_PTAST( PICID, IDA, STATUS )
          CALL IRA_ANNUL( IDA, STATUS )
@@ -906,5 +906,5 @@
      :             'SKYPOS: Error displaying sky or image coordinates.',
      :                 STATUS )
       END IF
-      
+
       END

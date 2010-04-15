@@ -17,7 +17,7 @@
 *  Description:
 *     The routine splits a full foreign format file name into a
 *     directory field, a name field, a type field (which contains a
-*     leading '.'), a version field and a foreign extension field and 
+*     leading '.'), a version field and a foreign extension field and
 *     returns the character positions of the start and end of each field.
 
 *  Arguments:
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -108,7 +108,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
       INCLUDE 'NDF_FCB'          ! NDF_ Format Conversion Block
@@ -145,7 +145,7 @@
       INTEGER F2                 ! Last character of file extension
       INTEGER TMIN               ! Anticipated start of type field
       LOGICAL FOUND              ! Expected file extension present?
-      
+
 *.
 
 *  Check inherited global status.
@@ -156,9 +156,9 @@
 *  is present.
       CALL NDF1_FORXT( FNAME, X1, X2, STATUS )
 
-*  Split the preceeding file name into its directory, name, type and 
+*  Split the preceeding file name into its directory, name, type and
 *  version fields, using the file name syntax rules for the host machine.
-      CALL NDF1_FSPLT( FNAME( : X1 - 1 ), D1, D2, N1, N2, T1, T2, V1, 
+      CALL NDF1_FSPLT( FNAME( : X1 - 1 ), D1, D2, N1, N2, T1, T2, V1,
      :                 V2, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -168,7 +168,7 @@
          IF ( T2 .GE. T1 ) THEN
             F1 = FCB_FEX1( IFMT )
             F2 = FCB_FEX2( IFMT )
-            
+
 *  Since the file extension may contain a '.' character, it may actually
 *  be longer than identified above (i.e. the end of the name field may
 *  still contain the first part of the file extension). Find the first

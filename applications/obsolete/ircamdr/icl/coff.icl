@@ -49,7 +49,7 @@ proc coff
     print "Plotting image " (im)
     send plt2d set magnification (disp_mag)
     send plt2d set cursor_image (im)
-    obeyw plt2d nsigma (im) 
+    obeyw plt2d nsigma (im)
     if iflag = 0
       iflag = 1
       print "Select reference point (star) with cursor"

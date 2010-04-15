@@ -13,7 +13,7 @@
 *  Description:
 *     Convert a star position from mean position for one equinox and
 *     epoch to mean position for another equinox and epoch.
-*     
+*
 *     n.b.  All epochs and equinoxes are in the form of either Besselian
 *           (prefix 'B') or Julian (prefix 'J') epochs.  Two common
 *           examples are:    K        E
@@ -147,7 +147,7 @@
 *
 *        Position and results both FK5
 *        -----------------------------
- 
+
 *        FK5 precession from given to results equinox
                CALL sla_PRECES('FK5',EQ0,EQ1,RA,DC)
             ELSE

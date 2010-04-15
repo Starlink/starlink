@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_LKR( INDEX1, NDIM, LBND, UBND, MSKSIZ, MASK,
-     :                     OPNSIZ, IOPND, LEX0, UEX0, LIN0, UIN0, 
+     :                     OPNSIZ, IOPND, LEX0, UEX0, LIN0, UIN0,
      :                     OPRNDS, IPB, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     LOADED, RINDEX, STATUS )
 *+
@@ -23,27 +23,27 @@
 *     the type of region (CIRCLE, BOX, etc) required. The next element
 *     contains an integer which gives the position of the keyword
 *     within the ARD description (1 for the first keyword, 2 for the
-*     second, etc, excluding INPUT keywords). 
+*     second, etc, excluding INPUT keywords).
 *
 *     The next (third) element contains an integer which gives the number of
-*     parameters following. These parameters described the size, position, 
+*     parameters following. These parameters described the size, position,
 *     etc, of the region. These are exactly as supplied in the ARD
 *     expression (just converted from text to floating poitn).
 *
-*     The next element after the parameters (index 4+NPAR) indicates the 
-*     nature of the Mapping from pixel coords (in the B array) to user coords. 
-*     If it is zero, then the Mapping is non-linear, and the following element 
-*     contains the DOUBLE PRECISION equivalence of an INTEGER value 
-*     representing an AST FrameSet pointer. The Base Frame of this FrameSet 
+*     The next element after the parameters (index 4+NPAR) indicates the
+*     nature of the Mapping from pixel coords (in the B array) to user coords.
+*     If it is zero, then the Mapping is non-linear, and the following element
+*     contains the DOUBLE PRECISION equivalence of an INTEGER value
+*     representing an AST FrameSet pointer. The Base Frame of this FrameSet
 *     should be pixel coords and the Current Frame should be user coords.
 *     The next element contains a lower limit on the distance in
 *     user coords per pixel. This may vary across the array, and may
 *     depend on direction, but a lower limit is all that is needed.
 *
-*     If the element with index 4+NPAR is non-zero, then the pixel -> user 
-*     Mapping is linear. The following element contains the DOUBLE PRECISION 
+*     If the element with index 4+NPAR is non-zero, then the pixel -> user
+*     Mapping is linear. The following element contains the DOUBLE PRECISION
 *     equivalence of an INTEGER value representing an AST Frame pointer.
-*     This is the user coordinate Frame. The following NDIM*(NDIM+1) elements 
+*     This is the user coordinate Frame. The following NDIM*(NDIM+1) elements
 *     give the coefficients of the pixel->user linear mapping:
 *
 *        U1 = C0 + C1*P1 + C2*P2 + ...  + Cn*Pn
@@ -102,7 +102,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBEXTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        exterior points in B. 
+*        exterior points in B.
 *     LBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The lower pixel bounds of the smallest box which contains all
 *        interior points in B. A value of VAL__MAXI for element 1 is
@@ -110,7 +110,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     LOADED = LOGICAL (Given and Returned)
 *        Have the contents of the supplied mask already been loaded onto
 *        the stack? Always returned .TRUE. if the keyword is an INPUT
@@ -130,12 +130,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -158,7 +158,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -203,7 +203,7 @@
      :        I,                 ! Dimension counter
      :        IAST(2),           ! AST Frame or FrameSet pointer
      :        ICOEFF,            ! Index of first linear coefficient
-     :        IPAR,              ! Index of first region parameters 
+     :        IPAR,              ! Index of first region parameters
      :        LASTOP,            ! Index of last used operand value
      :        NPAR,              ! No. of region parameters
      :        TYPE               ! Integer code for region type
@@ -212,7 +212,7 @@
      :        LINEAR,            ! Is the pixel->user Mapping linear?
      :        INF                ! Is int. bounding box infinite?
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        DPP,               ! Distance per pixel
      :        DAST,              ! DOUBLE equivalence to variable IAST.
      :        PAR( 16 )          ! Array to use if fewer than 16 parameters
@@ -250,13 +250,13 @@
          LASTOP = IOPND + 5 + NPAR
 
 *  If the mapping is linear, extract the AST Frame pointer (the user
-*  coord Frame), and note the starting index of the coefficients of the 
+*  coord Frame), and note the starting index of the coefficients of the
 *  mapping.
       ELSE
          LINEAR = .TRUE.
          DAST = OPRNDS( IOPND + 4 + NPAR )
          ICOEFF = IOPND + 5 + NPAR
-         LASTOP = IOPND + 4 + NPAR +  NDIM*( NDIM + 1 ) 
+         LASTOP = IOPND + 4 + NPAR +  NDIM*( NDIM + 1 )
       END IF
 
 *  Report an error if there are insufficient values in OPRNDS.
@@ -284,7 +284,7 @@
 
 *  WHOLE keywords...
       IF( TYPE .EQ. ARD__WHO ) THEN
-         CALL ARD1_WHO( RINDEX, NDIM, MSKSIZ, %VAL( CNF_PVAL( IPB ) ), 
+         CALL ARD1_WHO( RINDEX, NDIM, MSKSIZ, %VAL( CNF_PVAL( IPB ) ),
      :                  LBEXTB,
      :                  UBEXTB, LBINTB, UBINTB, STATUS )
 
@@ -294,7 +294,7 @@
 *  Copy the mask values and find the mask bounding boxes if they have
 *  not already been found.
          CALL ARD1_LSM( NDIM, LBND, UBND, MSKSIZ, MASK, LOADED,
-     :                  %VAL( CNF_PVAL( IPB ) ), 
+     :                  %VAL( CNF_PVAL( IPB ) ),
      :                  LEX0, UEX0, LIN0, UIN0, STATUS )
 
 *  Copy the mask bounding boxes.
@@ -303,33 +303,33 @@
             UBEXTB( I ) = UEX0( I )
             LBINTB( I ) = LIN0( I )
             UBINTB( I ) = UIN0( I )
-         END DO      
+         END DO
 
 *  Return zero for the region index.
          RINDEX = 0
 
-*  To speed things up, the processing of other keywords depends on whether 
+*  To speed things up, the processing of other keywords depends on whether
 *  the mapping is linear or not. First deal with linear Mappings.
-      ELSE IF( LINEAR ) THEN 
-         CALL ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
+      ELSE IF( LINEAR ) THEN
+         CALL ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
      :                  OPRNDS( IPAR ), OPRNDS( ICOEFF ), IAST( 1 ),
-     :                  %VAL( CNF_PVAL( IPB ) ), 
+     :                  %VAL( CNF_PVAL( IPB ) ),
      :                  LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                  STATUS )
 
-*  Now deal with non-linear Mappings. Ensure we have room for at least 
+*  Now deal with non-linear Mappings. Ensure we have room for at least
 *  16 parameters.
       ELSE IF( NPAR .GE. 16 ) THEN
-         CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                   OPRNDS( IPAR ), IAST(1), DPP, IPB, 
+         CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
+     :                   OPRNDS( IPAR ), IAST(1), DPP, IPB,
      :                   LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
       ELSE
          DO I = 1, NPAR
             PAR( I ) = OPRNDS( IPAR + I - 1 )
          END DO
-         CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                   PAR, IAST(1), DPP, IPB, LBEXTB, UBEXTB, 
+         CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
+     :                   PAR, IAST(1), DPP, IPB, LBEXTB, UBEXTB,
      :                   LBINTB, UBINTB, STATUS )
 
       END IF
@@ -341,12 +341,12 @@
       ELSE IF( LBINTB( 1 ) .EQ. VAL__MAXI ) THEN
          INF = .TRUE.
 
-      ELSE      
+      ELSE
          INF = .TRUE.
          I = 1
 
          DO WHILE( INF .AND. I .LE. NDIM )
-            IF( LBINTB( I ) .GT. LBND( I )  .OR. 
+            IF( LBINTB( I ) .GT. LBND( I )  .OR.
      :          UBINTB( I ) .LT. UBND( I ) ) INF = .FALSE.
             I = I + 1
          END DO

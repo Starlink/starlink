@@ -13,7 +13,7 @@ C
 C     Parameters -   (">" input, "<" output)
 C
 C     (>) HDSTYPE (Character) The HDS type.  Should be in upper
-C                 case. 
+C                 case.
 C     (<) TYPE    (Character) The DTA type corresponding to HDSTYPE,
 C                 if HDSTYPE represents a primitive data type.  If
 C                 HDSTYPE represents a structure, TYPE will be
@@ -30,7 +30,7 @@ C     Subroutines / functions used - None
 C
 C                                         KS / AAO 13th March 1986
 C     Modified:
-C     
+C
 C     7th Jan 1992  KS/AAO. Include files no longer specified using a logical
 C                   name, and now specified in lower case.  Routine will now
 C                   compile on a SUN.

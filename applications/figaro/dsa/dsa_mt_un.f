@@ -25,7 +25,7 @@ C                       refer to the first data structure.
 C     (>) REF_NAME2     (Fixed string,descr) The reference name used to
 C                       refer to the second data structure.
 C     (!) STATUS        (Integer,ref) Status value.  If bad status is
-C                       passed, this routine returns immediately. 
+C                       passed, this routine returns immediately.
 C
 C  External variables used:  None.
 C

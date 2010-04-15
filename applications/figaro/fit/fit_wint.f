@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ W I N T
 C
-C     Writes an integer keyword into a FITS header.  Assumes 
+C     Writes an integer keyword into a FITS header.  Assumes
 C     FIT_INIT has been called to initialise the header routines.
 C
 C     Parameters -  (">" input, "<" output)

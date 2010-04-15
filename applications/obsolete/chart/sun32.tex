@@ -1,4 +1,4 @@
-\documentclass{article} 
+\documentclass{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ This was formed by a simple merging of many catalogues and lists (a number of
 stellar objects also appear).
 The total number is about 185,000.
 Approximate angular sizes and magnitudes are given for many objects.
-Full details of these three groups of catalogues are given in section 
+Full details of these three groups of catalogues are given in section
 \ref{catalogues}.
 \item[{\bf PRIVATE}]
 Stars can be selected from any catalogue that has been produced in the form that
@@ -194,7 +194,7 @@ The plot may be made on any GKS device, and a number of different plot options
 are available, such as scale and area, an RA and Dec coordinate grid and various
 forms of error box.
 
-This version of CHART allows you to choose between having hard copy 
+This version of CHART allows you to choose between having hard copy
 output plotted automatically, or being in complete control yourself.
 This should help CHART users over the network.
 
@@ -236,11 +236,11 @@ One exception to the rule that $<$CR$>$ means `take the default value' occurs
 when you are being prompted for a list of entries, for example a series of
 several field centres. In general, hitting $<$CR$>$ in response to the first
 prompt will cause an exit from the loop (see for example sections \ref{create}
-and \ref{search}). 
+and \ref{search}).
 
 \subsection{Search and output parameters}
 The available search and output options are represented by a set of parameters
-(listed in section~\ref{defpar}), to which a sensible set of default values 
+(listed in section~\ref{defpar}), to which a sensible set of default values
 is assigned when the program is started up.
 The values of the parameters may be reviewed at any time by the commands DISPLAY
 or DISP.
@@ -257,7 +257,7 @@ When satisfied with the S parameters, you should issue the command SEARCH to run
 the search phase of the program.
 The program will prompt for the coordinates of the field centres.
 Remember to respond $<$CR$>$ to the prompt `RA:=' when the input of field
-centres is complete. 
+centres is complete.
 \subsection{Output options}
 The results of the search phase may be presented at the terminal by issuing the
 command TYPEO.
@@ -313,9 +313,9 @@ follows:
         O CROSS             YES
 
 \end{verbatim}
-These parameters are explained below (section~\ref{setpar}), and the on-line 
+These parameters are explained below (section~\ref{setpar}), and the on-line
 HELP system is available to define the meaning of each parameter as it occurs
-within a program. 
+within a program.
 
 \section{An Advanced User Guide}
 \subsection{The CHART environment}
@@ -336,7 +336,7 @@ current directory.
 When you type CHART a connection is made between this file and the CHART
 programs, as follows.
 If the file name.DAT (or CHARTPAR.DAT) exists in the current directory then that
-file is used and {\em all the parameters are exactly as they were when last 
+file is used and {\em all the parameters are exactly as they were when last
 set up.}
 If the file does not exist then a copy is made of a standard set and given the
 name requested.
@@ -408,7 +408,7 @@ The parameters are:
 }
 \item[{\bf LABEL}] gives a label to this set of parameters.
 \item[{\bf SAREA}] the length (in degrees) of the side of the square area of sky
-which is to be searched. 
+which is to be searched.
 \item[{\bf EQUINOX}]  the required equinox for the output positions.
 \item[{\bf EPOCH}]   the required epoch for the output positions.
 This is only relevant in ASTROMETRIC mode, because it is the only one which
@@ -417,9 +417,9 @@ gives proper motions.
 The choices are CSI (for the CSI catalogue), AST (for ASTROMETRIC mode), PRI
 (for a private catalogue) and NSO (for the Nonstellar Object catalogue).
 \item[{\bf INPUT}]  specifies the catalogue to be used if PRI has been set as
-the mode. The file name of the catalogue is specified. 
+the mode. The file name of the catalogue is specified.
 \item[{\bf SELECT}]   offers further ways of selecting objects from those found
-in the specified area. 
+in the specified area.
 A response of ALL ensures that all stars are stored.
 Other possible responses are
 N for number (when only a fixed number of stars will be stored),
@@ -430,18 +430,18 @@ catalogues will be stored).
 If the response is not recognised ALL stars are stored.
 SELECT is not available in NONSTELLAR mode.
 \item[{\bf NUMBER}]  specifies (if SELECT is set to N) the maximum number of
-stars (up to 2000) to be stored. The brightest N will be stored. 
+stars (up to 2000) to be stored. The brightest N will be stored.
 \item[{\bf MAGNITUD}]   is the faint magnitude limit for the stars to be stored
 (if SELECT is set to N). Stars in the CSI catalogue with no magnitudes given
-will be selected regardless of the magnitude limit. 
+will be selected regardless of the magnitude limit.
 \item[{\bf CATALOGU}]   restricts the choice of stars to specified source
 catalogues (if SELECT is set to C). This requires different responses in AST and
 CSI modes. The on-line information summarises the choices, and examples of the
-more complicated possibilities are given in section~\ref{catalogues}. 
+more complicated possibilities are given in section~\ref{catalogues}.
 \item[{\bf FIELDS}]   where the response should be TERMINAL if the fields are to
 be specified at the terminal, or the name of a file which contains a list of
 positions. No filetype should be specified as it must be .DAT. If a filename is
-given, a suitable file may be created by using the program FCREATE. 
+given, a suitable file may be created by using the program FCREATE.
 \end{list}
 
 * OSET
@@ -462,7 +462,7 @@ different ways.
 In particular, CHART sets up a list of names for all devices; individual users
 or site managers may set up other names for their devices.
 Appending an `\_A' to the name will allow the aspect ratio and scale factor to
-be changed for some hard-copy devices. 
+be changed for some hard-copy devices.
 Further information on device specification will be found in HELP DEVICE; the
 maximum size of the actual chart which can be plotted on any device can be found
 under HELP SIZES.
@@ -483,7 +483,7 @@ be plotted.
 In general, it will be the same as SAREA, but need not be.
 
 \item[{\bf SCALE}]   specifies the plot scale in arcsec/mm.
-PAREA (when multiplied by 3600 to convert it to arcseconds) divided by SCALE 
+PAREA (when multiplied by 3600 to convert it to arcseconds) divided by SCALE
 ought to be less than the size given for the selected DEVICE under HELP SIZES.
 
 \item[{\bf SYMBOL}]
@@ -590,7 +590,7 @@ The program loops around prompting for:-
 After each set of values has been entered, you are asked if they are `OK?'.
 Responses are $<$CR$>$, T, TRUE, Y, YES for yes and most other things for no.
 This program does {\em not\/} set the parameter which would ensure that this
-file is used; this is done by program SSET described above. 
+file is used; this is done by program SSET described above.
 
 * ECREATE
 
@@ -602,7 +602,7 @@ be added to the file or whether a new file is to be created.
 You are then prompted for RA and Dec in turn.
 A null response to RA terminates input.
 This program does {\em not\/} set the parameter which would ensure that this
-file is used; this is done by the program OSET as described above. 
+file is used; this is done by the program OSET as described above.
 
 * QCREATE
 
@@ -610,7 +610,7 @@ This may be used to set up the coordinates of the four vertices of a
 quadrilateral error box, together with an equinox, and store them in a named
 file.
 This program does {\em not\/} set the parameter which would ensure that this
-file is used; this is done by program OSET as described above. 
+file is used; this is done by program OSET as described above.
 \subsection{Files of co-ordinates}
 The three programs described in the previous section all create files.
 You may find it useful to understand the formats used, so you can write programs
@@ -627,7 +627,7 @@ FCREATE, ECREATE and QCREATE create files whose records are in order:
 \hline
 FCREATE   &  ECREATE  &  QCREATE \\ \hline
 RA        &  EQUINOX  &  EQUINOX \\
-DEC       &  RA       &  RA \\      
+DEC       &  RA       &  RA \\
 EQUINOX   &  DEC      &  DEC \\
 TITLE     &  RA       &  RA \\
 RA        &  ....etc. &  ....etc. \\
@@ -681,7 +681,7 @@ very flexible way that was used in the earlier CHART program.
 It is described in the prompt information on RA and DEC.
 
 This program must have been run before trying to print or plot the output, but
-once it has been run the output may be plotted as many times as required, 
+once it has been run the output may be plotted as many times as required,
 e.g.\ changing the output device (or any other O parameter).
 However, it must be rerun after a change has been made to any S parameter.
 
@@ -809,10 +809,10 @@ This might include transferring the files over the network.
 No graphical output files are deleted or purged.
 When the specified device is a graphics terminal, a $<$CR$>$ is
 required at the end of each plot to clear the screen; this input is not prompted
-for. 
+for.
 
 If the output device can plot in colour, the program asks you if you actually
-want to use colour. This option is intended for use with pen plotters as it 
+want to use colour. This option is intended for use with pen plotters as it
 may be inappropriate to have a coloured plot, for example, if the plot is to be
 reproduced.
 
@@ -867,14 +867,14 @@ The responses are AAT2, AAT3, ASTROGRAPH and SCHMIDT.
 \item[{\bf RACEN/DECEN}] the position (RA, Dec) of the centre of the plate.
 \item[{\bf EQCENTRE}] the equinox of that position.
 \item[{\bf EPPLATE}] the epoch when the plate was taken.
-\item[{\bf NUMBER}] the sequence number (in the list from LISTO) of one of 
+\item[{\bf NUMBER}] the sequence number (in the list from LISTO) of one of
 the reference stars.
 After receiving a valid sequence number, ASTRO prompts for an X and Y for that
 star.
 Exit by hitting $<$CR$>$.
 \item[{\bf XorR}] indicates whether the next series of entries will be X,Y
 positions for conversion to RA, Dec (X) or vice versa (R). Exit from ASTRO by
-hitting $<$CR$>$. 
+hitting $<$CR$>$.
 If X is selected, ASTRO loops round prompting for an X coordinate, a Y
 coordinate and a name.
 If R is selected, ASTRO loops round prompting for an RA, a Dec, an equinox and
@@ -925,7 +925,7 @@ About 6000 stars in the catalogue have no magnitudes given for B and V. The
 search and output programs now pick these stars up and display/plot them.
 
 \begin{tabular}{rl}
-\multicolumn{2}{c}{\bf Catalogues indexed in the catalogue of stellar 
+\multicolumn{2}{c}{\bf Catalogues indexed in the catalogue of stellar
 identifications} \\
 & \\
 Abbrev & \multicolumn{1}{c}{Catalogue} \\
@@ -1041,7 +1041,7 @@ This was formed by a simple merging of many catalogues and lists of
 `nonstellar objects'; the total number is about 185,000.
 Some catalogues used are largely stellar, e.g.\ Luyten's Faint Blue Star
 surveys. The precision of the positions in the list is variable, being
-transcribed directly from the source catalogue. 
+transcribed directly from the source catalogue.
 Approximate angular size and magnitude are given for many objects.
 No cross identification was attempted, therefore many objects will have more
 than one entry in the list.
@@ -1080,7 +1080,7 @@ resulting in the present modular structure and the use of SGS/GKS graphics.
 This specification was mainly implemented by Ken Hartley (the `CHART
 environment') and Joe Vickerstaff (graphical output).
 
-Tim Wilkins (Manchester) did most of the work to convert CHART to use GKS~7.2. 
+Tim Wilkins (Manchester) did most of the work to convert CHART to use GKS~7.2.
 \end{document}
 
 

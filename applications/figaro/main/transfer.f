@@ -73,7 +73,7 @@
 *   Changes to allow variable base and weighting, TNW/CAVAD 21/12/90
 *   TNW Cambridge, 25/3/91 Check for new fits by checking for first
 *                 xsect equal to current xsect
-*    "      "     7/91 Changes for new results structure, it_plus1 
+*    "      "     7/91 Changes for new results structure, it_plus1
 *                      removed
 *   ACD: 28/9/00 Remove character strings continued across continuation
 *     lines.
@@ -244,7 +244,7 @@
      :                          fit_error,dummy,aic,status)
 
                   call opt_release(status)
-                  if(deccntr(FIT_WEIGH).eq.1) 
+                  if(deccntr(FIT_WEIGH).eq.1)
      :              call dsa_free_workspace(slot3,status)
                   call dsa_free_workspace(slot2,status)
 

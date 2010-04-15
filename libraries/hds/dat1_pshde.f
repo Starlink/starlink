@@ -113,7 +113,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -231,7 +231,7 @@
 *  process it.
          I1 = I2 + 2
          GO TO 1
-      END IF     
+      END IF
 
 *  If the number of dimension bounds obtained is less than expected,
 *  then report an error.
@@ -244,5 +244,5 @@
      :                 'expression ''(^SUBSET)''; the associated ' //
      :                 'object is ^NDIM-dimensional.', STATUS )
       END IF
-       
+
       END

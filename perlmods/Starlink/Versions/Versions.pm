@@ -29,7 +29,7 @@ it is sometimes necessary to check the relevant version number
 before attempting specific tasks. This module attempts to determine
 the version number and returns it to the caller. It is not guaranteed
 to be successful in all cases (since in some cases it is not
-clear where to look for the version string) but does try a number of different 
+clear where to look for the version string) but does try a number of different
 techniques before giving up.
 
 The answer is cached such that a subsequent call will return the
@@ -56,7 +56,7 @@ use Starlink::Config qw/ :override /; # For location of root starlink dir
 use File::Spec;                       # For catfile()
 use version;
 
-@EXPORT_OK = qw/ 
+@EXPORT_OK = qw/
                  starversion starversion_string starversion_minor
                  starversion_major starversion_patchlevel starversion_global
                  starversion_cmp starversion_eq starversion_gt starversion_lt
@@ -70,7 +70,7 @@ use version;
 $VERSION = '1.05';
 $DEBUG = 0;
 
-# This is the cache used to store the version numbers 
+# This is the cache used to store the version numbers
 # so that we can be fast with repeat calls
 
 # Is a hash with lower-case keys for each Starlink application.
@@ -91,8 +91,8 @@ version number for an application called "prog".
 =item 1
 
 Determine the installed directory by looking in the directory pointed
-to by the environment variable C<PROG_DIR> for a file called 
-C<version.dat>. Some applications such as POLPACK or KAPPA write 
+to by the environment variable C<PROG_DIR> for a file called
+C<version.dat>. Some applications such as POLPACK or KAPPA write
 version numbers in this file. This allows the version number to be determined
 directly from the C<PROG_DIR> rather than trying to determine it from
 related directories (which relies on the application being properly
@@ -130,7 +130,7 @@ or
   $STARLINK/dates/prog_datestamp
 
 for a version string. The Starlink directory will not be searched
-if a C<PROG_DIR> is found since there is no guarantee that we are running 
+if a C<PROG_DIR> is found since there is no guarantee that we are running
 an application from the standard Starlink tree (e.g. C</star> might
 contain a version of C<PROG> but we are using a version in a different
 tree).
@@ -193,7 +193,7 @@ patchlevel version numbers.
 
   ($major, $minor, $patchlevel) = starversion( 'prog' );
 
-In scalar context a perl "version" object is returned. This allows 
+In scalar context a perl "version" object is returned. This allows
 versions to be compared directly using Perl.
 
   $version = starversion( 'prog' );
@@ -216,7 +216,7 @@ sub starversion {
 
 Returns the global Starlink version for the system.
 
-In list context returns the string representation, the 
+In list context returns the string representation, the
 commit ID and the date of that commit.
 
  ($string, $commit, $commitdate) = starversion_global();
@@ -331,7 +331,7 @@ The version string format should be one of:
   1.2-3
 
 C<undef> is returned if a comparison could not be made due to
-either the application having no version number or if the 
+either the application having no version number or if the
 supplied version string could not be parsed.
 
 In modern perls version objects (as returned by C<starversion>)
@@ -372,7 +372,7 @@ sub starversion_cmp ($$) {
 
 =item B<starversion_lt>
 
-Test whether the version of the installed package is less than 
+Test whether the version of the installed package is less than
 a supplied version number. In other words, whether the installed
 package is older than the requested version.
 
@@ -383,7 +383,7 @@ package is older than the requested version.
 The version string format is described in the description of
 C<starversion_cmp>
 
-In perl 5.6.0 this command can be implemented directly using a 
+In perl 5.6.0 this command can be implemented directly using a
 string literal:
 
   if ( starversion('prog') lt v0.15.2 ) {
@@ -434,7 +434,7 @@ sub starversion_le ($$) {
 
 =item B<starversion_eq>
 
-Test whether the version of the installed package is equal to 
+Test whether the version of the installed package is equal to
 a supplied version number. In other words, whether the installed
 package is older the same version as that specified.
 
@@ -445,7 +445,7 @@ package is older the same version as that specified.
 The version string format is described in the description of
 C<starversion_cmp>
 
-In perl 5.6.0 this command can be implemented directly using a 
+In perl 5.6.0 this command can be implemented directly using a
 string literal:
 
   if ( starversion('prog') eq v0.15.2 ) {
@@ -465,7 +465,7 @@ sub starversion_eq ($$) {
 
 =item B<starversion_gt>
 
-Test whether the version of the installed package is greater than 
+Test whether the version of the installed package is greater than
 a supplied version number. In other words, whether the installed
 package is newer than the requested version.
 
@@ -476,7 +476,7 @@ package is newer than the requested version.
 The version string format is described in the description of
 C<starversion_cmp>
 
-In perl 5.6.0 this command can be implemented directly using a 
+In perl 5.6.0 this command can be implemented directly using a
 string literal:
 
   if ( starversion('prog') gt v0.15.2 ) {
@@ -531,7 +531,7 @@ sub starversion_ge ($$) {
 
 =head1 INTERNAL FUNCTIONS
 
-This section describes the internal functions. They are 
+This section describes the internal functions. They are
 not part of the published interface.
 
 =over 4
@@ -539,7 +539,7 @@ not part of the published interface.
 =item B<_get_app_dir>
 
 Given a Starlink application name, returns the directory
-where the application resides. 
+where the application resides.
 
   $dir = _get_app_dir( 'prog' );
 
@@ -585,7 +585,7 @@ sub _get_app_datestamp_dir ($) {
       return File::Spec->catdir($appdir,
                                 File::Spec->updir, 'dates');
     } else {
-      return File::Spec->catdir($appdir, File::Spec->updir, 
+      return File::Spec->catdir($appdir, File::Spec->updir,
                                 File::Spec->updir, 'dates');
     }
   }
@@ -617,7 +617,7 @@ sub _get_app_manifest_dir ($) {
       return File::Spec->catdir($appdir,
                                 File::Spec->updir, 'manifests');
     } else {
-      return File::Spec->catdir($appdir, File::Spec->updir, 
+      return File::Spec->catdir($appdir, File::Spec->updir,
                                 File::Spec->updir, 'manifests');
     }
   }
@@ -627,13 +627,13 @@ sub _get_app_manifest_dir ($) {
 =item B<_get_standard_datestamp_dir>
 
 Return the standard location of the date stamp directory.
-This will use the location of the actual Starlink system (as 
+This will use the location of the actual Starlink system (as
 supplied by C<Starlink::Config>) rather than the location
 of the application that is currently specified by C<PROG_DIR>.
 
  $dir = _get_standard_datestamp_dir;
 
-This should be used as a last resort. Usually this would 
+This should be used as a last resort. Usually this would
 be C</star/dates>.
 
 =cut
@@ -645,13 +645,13 @@ sub _get_standard_datestamp_dir () {
 =item B<_get_standard_manifest_dir>
 
 Return the standard location of the manifest directory.
-This will use the location of the actual Starlink system (as 
+This will use the location of the actual Starlink system (as
 supplied by C<Starlink::Config>) rather than the location
 of the application that is currently specified by C<PROG_DIR>.
 
  $dir = _get_standard_manifest_dir;
 
-This should be used as a last resort. Usually this would 
+This should be used as a last resort. Usually this would
 be C</star/manifests>.
 
 =cut
@@ -880,7 +880,7 @@ sub _read_manifest_file ($) {
 
 Retrieve a version number from a datestamp file.
 
- ($major, $minor, $patchlevel) = 
+ ($major, $minor, $patchlevel) =
         _get_version_from_datestamp($useenv, 'prog');
 
 The first argument is a flag describing which datestamp
@@ -912,7 +912,7 @@ sub _get_version_from_datestamp ($$) {
 
 Retrieve a version number from a manifest file.
 
- ($major, $minor, $patchlevel) = 
+ ($major, $minor, $patchlevel) =
         _get_version_from_manifest($useenv, 'prog');
 
 The first argument is a flag describing which datestamp
@@ -1079,7 +1079,7 @@ sub _get_version ($) {
                     STRING => "V$version[0].$version[1]-$version[2]",
                     OBJECT => version->new(join(".",@version[0..2])),
                    };
-    
+
     if ($] >= 5.006) {
       # Create a perl-style version 'string' if perl 5.6.0 or newer
       $CACHE{$app}{VERSION} = eval "v$version[0].$version[1].$version[2]";

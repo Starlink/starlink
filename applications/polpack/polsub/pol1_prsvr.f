@@ -13,7 +13,7 @@
 *     CALL POL1_PRSVR( SVERS, M, N, R, STATUS )
 
 *  Description:
-*     This routine extracts the fields from a version number string of 
+*     This routine extracts the fields from a version number string of
 *     the form "m.n-r" where m, n and r are integers. An error is
 *     reported if the string is not of this form, except that trailing
 *     fields may be omitted if they are zero. The string must not be
@@ -33,7 +33,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,13 +88,13 @@
       CALL CHR_FANDL( SVERS, F, L )
       IF( F + 1 .LE. L - 1 ) THEN
 
-         IF( SVERS( F : F ) .EQ. '(' .AND. 
+         IF( SVERS( F : F ) .EQ. '(' .AND.
      :       SVERS( L : L ) .EQ. ')' ) VERS = SVERS( F + 1 : L - 1 )
 
       END IF
 
 *  Find the used length of the version string.
-      LV = CHR_LEN( VERS ) 
+      LV = CHR_LEN( VERS )
 
 *  Find the first dot. If no dot use the end of the string.
       DOT = INDEX( VERS, '.' )
@@ -105,7 +105,7 @@
       IF( HYP .EQ. 0 ) HYP = LV + 1
 
 *  Find the length of each field.
-      LM = DOT - 1 
+      LM = DOT - 1
       LN = HYP - DOT - 1
       IF( HYP .GT. 0 ) THEN
          LR = CHR_LEN( VERS ) - HYP
@@ -139,7 +139,7 @@
          STATUS = SAI__ERROR
       ELSE IF( N .EQ. -999 .AND. R .NE. -999 ) THEN
          STATUS = SAI__ERROR
-      END IF    
+      END IF
 
 *  Report an error if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN

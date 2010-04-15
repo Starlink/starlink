@@ -1,7 +1,7 @@
 *+  MOSCORSUB3 - mosaics 2 images together with dc correction
 
-      SUBROUTINE MOSCORSUB3 ( IDIMSX1, IDIMSY1, ARRIN1, IDIMSX2, 
-     :	                      IDIMSY2, ARRIN2, ODIMSX, ODIMSY, ARROUT,  
+      SUBROUTINE MOSCORSUB3 ( IDIMSX1, IDIMSY1, ARRIN1, IDIMSX2,
+     :	                      IDIMSY2, ARRIN2, ODIMSX, ODIMSY, ARROUT,
      :	                      NXOFF, NYOFF, DCOFF, STATUS )
 
 *    Description :
@@ -84,7 +84,7 @@
       REAL
      :    ARRIN1( IDIMSX1, IDIMSY1 ),   ! input image
      :    ARRIN2( IDIMSX2, IDIMSY2 ),   ! input image
-     :    ARROUT( ODIMSX, ODIMSY ),  ! output image 
+     :    ARROUT( ODIMSX, ODIMSY ),  ! output image
      :    DCOFF                      ! calculated  d.c. sky offset
 
 *    Status :
@@ -131,14 +131,14 @@
 
       END DO
 
-*    loop around 2nd image adding it into output image + subtracting dc 
+*    loop around 2nd image adding it into output image + subtracting dc
 *    offset
       DO J = 1, IDIMSY2
 
         DO K = 1, IDIMSX2
 
 	  IF( NXOFF .GE. 0 .AND. NYOFF .GE. 0) THEN
-	    XPIX = K+ABS( NXOFF) 
+	    XPIX = K+ABS( NXOFF)
 	    YPIX = J+ABS( NYOFF)
 	  ELSE IF( NXOFF .GE. 0 .AND. NYOFF .LT. 0) THEN
 	    XPIX = K+ABS( NXOFF)
@@ -157,7 +157,7 @@
 	    NPIX = 2
 	  END IF
 
-	  ARROUT( XPIX, YPIX) = 
+	  ARROUT( XPIX, YPIX) =
      :	   ( ARROUT( XPIX, YPIX)+( ARRIN2( K, J)-DCOFF))/NPIX
 
 	END DO

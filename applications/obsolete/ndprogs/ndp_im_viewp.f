@@ -8,9 +8,9 @@ C   -----------------------------------
 C
 C   Description
 C   -----------
-C   Sets the PGPLOT viewport for image display. The image size may be 
-C   selected as a fraction of the whole display durface. The location on the 
-C   surface may be any combination of Top/Centre/Bottom paired with 
+C   Sets the PGPLOT viewport for image display. The image size may be
+C   selected as a fraction of the whole display durface. The location on the
+C   surface may be any combination of Top/Centre/Bottom paired with
 C   Left/Centre/Right, e.g. 'TL' is top left. A central position is always
 C   returned unless otherwise specified, e.g. 'L' gives left of screen,
 C   vertically centred.
@@ -43,7 +43,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -74,7 +74,7 @@ c
       character*(*) control
       integer       stapix(2),endpix(2)
       real          mag,ximv(2),yimv(2),square
-c                   
+c
       logical       bottom
       logical       left
       integer       ncol
@@ -99,8 +99,8 @@ c
 c
 c   Default is right-left and top-bottom centering.
 c
-      rlcent=.true.      
-      tbcent=.true.      
+      rlcent=.true.
+      tbcent=.true.
 c
 c   Interpret control instructions.
 c
@@ -122,8 +122,8 @@ c   Compute device aspect ratio.
 c
       call pgvstand
       call pgqvp(1,xmin,xmax,ymin,ymax)
-      ratio=(ymax-ymin)/(xmax-xmin)            
-c       
+      ratio=(ymax-ymin)/(xmax-xmin)
+c
 c   Compute location of largest possible square.
 c
       xmin1=xmin
@@ -204,7 +204,7 @@ c
       ximv(2)=xmax2
       yimv(1)=ymin2
       yimv(2)=ymax2
-c      
+c
       if(right)then
         ximv(1)=xmin2+(xmax2-xmin2)*(1.0-mag)
         ximv(2)=xmax2

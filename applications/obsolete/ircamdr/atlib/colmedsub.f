@@ -1,15 +1,15 @@
-	SUBROUTINE COLMEDSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT, 
+	SUBROUTINE COLMEDSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT,
      :	                      EXCLREG, XST, YST, XEN, YEN, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
-     :	  ODIMSX, 
-     :	  ODIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
+     :	  ODIMSX,
+     :	  ODIMSY,
      :	  STATUS,
      :	  J,
      :	  K,
@@ -19,8 +19,8 @@
      :	  YEN,
      :	  NUMPIX
 
-	REAL 
-     :	  ARROUT( ODIMSX, ODIMSY), 
+	REAL
+     :	  ARROUT( ODIMSX, ODIMSY),
      :	  ARRIN( DIMSX, DIMSY),
      :	  MEAN,
      :	  MEDIAN,
@@ -29,7 +29,7 @@
      :	  VALMIN,
      :	  VALMAX
 
-	REAL*8 
+	REAL*8
      :	  DATA( 3000)
 
 	LOGICAL
@@ -81,12 +81,12 @@
 
 	  END DO
 
-*        Call subroutine to order the column values 
+*        Call subroutine to order the column values
 	  CALL PDA_QSAD( NUMPIX, DATA )
 
 *        call subroutine to find median for the input data
 
-	  CALL MED3D_CALMEDSUB( NUMPIX, DATA, VALMAX, VALMIN, SUM, MEAN, 
+	  CALL MED3D_CALMEDSUB( NUMPIX, DATA, VALMAX, VALMIN, SUM, MEAN,
      :	                        MEDIAN, MODE)
 
 *        set the output pixel with the median value

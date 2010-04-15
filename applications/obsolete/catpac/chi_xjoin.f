@@ -17,14 +17,14 @@
 *     Create a new catalogue by joining two catalogues. The effect of the join
 *     is as follows. Consider a large catalogue that contains all the fields
 *     from the INPUT1 catalogue and all the fields from the INPUT2 catalogue.
-*     Into this catalogue put an entry for each combination of entries in 
-*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M 
+*     Into this catalogue put an entry for each combination of entries in
+*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M
 *     entries where N is the number of entries in the INPUT1 catalogue and
 *     M the number in the INPUT2 catalogue. Now search this catalogue for
 *     those entries that satisfy the given expression.
 *
 *     Another way of looking at join is to say. Take every entry in turn
-*     from catalogue INPUT1. Match this entry against every entry in 
+*     from catalogue INPUT1. Match this entry against every entry in
 *     catalogue INPUT2 and if the EXPRESSion in satisfied combine both entries
 *     to write to a new catalogue.
 
@@ -57,7 +57,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,28 +164,28 @@
 *
 *    Parse the expression.
 *
-      CALL CHI_2PAR( INPUT1, INPUT2, EXPRESS, FTEMPNAMES, 
+      CALL CHI_2PAR( INPUT1, INPUT2, EXPRESS, FTEMPNAMES,
      : FTEMPTYPES, STATUS )
 *
 *    If the criteria parsed without errors create the output catalogue
-*     
+*
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *   Get all the information about the fields in the input catalogue 1.
 *
-      CALL CHI_GALLCD(INPUT1, NUM1FLDS, 
+      CALL CHI_GALLCD(INPUT1, NUM1FLDS,
      :   F1NAMES, F1FORMATS, F1TYPES,
      :   F1UNITS, F1COMMENTS, F1MDATAACC, F1DATAACC, STATUS)
 *
 *   Get all the information about the fields in the input catalogue 2.
 *
-      CALL CHI_GALLCD(INPUT2, NUM2FLDS, 
+      CALL CHI_GALLCD(INPUT2, NUM2FLDS,
      :   F2NAMES, F2FORMATS, F2TYPES,
      :   F2UNITS, F2COMMENTS, F2MDATAACC, F2DATAACC, STATUS)
 *
 *  Form the fields in the new catalogue.
 *
-      DO COUNT = 1, NUM1FLDS   
+      DO COUNT = 1, NUM1FLDS
         CALL CHI_ACNAME( INPUT1, F1NAMES(COUNT), F3NAMES(COUNT),
      :    STATUS)
         F3FORMATS(COUNT) = F1FORMATS(COUNT)
@@ -213,7 +213,7 @@
 *  Create a catalogue with no entries.
 *
 
-      CALL CHI_CRECAT(OUTPUT, 100, NUM3FLDS, F3NAMES, F3FORMATS, 
+      CALL CHI_CRECAT(OUTPUT, 100, NUM3FLDS, F3NAMES, F3FORMATS,
      :    F3UNITS, F3COMMENTS, STATUS)
 *
 *  Now perform the join trying ever entry in catalogue 1 against every entry
@@ -276,10 +276,10 @@
 *        print *,'realvals = ',real3vals(i)
 *       enddo
 
-          CALL CHI_APPLY( CHAR3VALS, DOUB3VALS, INT3VALS, LOG3VALS, 
-     : REAL3VALS, NUM3FLDS, CHARVAL, DOUBVAL, INTVAL, LOGVAL, REALVAL, 
+          CALL CHI_APPLY( CHAR3VALS, DOUB3VALS, INT3VALS, LOG3VALS,
+     : REAL3VALS, NUM3FLDS, CHARVAL, DOUBVAL, INTVAL, LOGVAL, REALVAL,
      : RESTYPE, STATUS )
- 
+
           IF (LOGVAL) THEN
 *
 *   Write the new entry.

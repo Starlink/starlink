@@ -46,7 +46,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -60,7 +60,7 @@
 *        Removed removal of '=' in input and added suppression of
 *        comma removal in ().
 *     13-SEP-1995 (PDRAPER):
-*        Removed fold to upper case. This is necessary when reading 
+*        Removed fold to upper case. This is necessary when reading
 *        file names on UNIX.
 *     {enter_further_changes_here}
 
@@ -68,7 +68,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
                   CALL MSG_SETC( 'FILNAM', BUFFER( : STRLEN ) )
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'RDLIN_ERROR',
-     :            '  ^FILNAM - contains no entries', STATUS ) 
+     :            '  ^FILNAM - contains no entries', STATUS )
                   GO TO 99
                END IF
             ELSE
@@ -161,7 +161,7 @@
 *  Is the line a comment or blank line ?
             IF ( CCD1_ISCOM( BUFFER, STATUS ) ) THEN
 
-*  Have a comment line skip this 
+*  Have a comment line skip this
                NEWLIN =.TRUE.
             ELSE
 
@@ -179,7 +179,7 @@
                END IF
 
 *  Add the rest to the real line. Increment the character counter.
-               IF ( NCHAR + NBUFF .LT. LENGTH ) THEN 
+               IF ( NCHAR + NBUFF .LT. LENGTH ) THEN
                   LINE( NCHAR: )  = BUFFER( :NBUFF )
                   NCHAR = NCHAR + NBUFF
                ELSE
@@ -201,7 +201,7 @@
 
 *  Go for next loop.
             GO TO 1
-         END IF     
+         END IF
 
 *  Now that we have the whole line remove commas. Leave any within
 *  parentheses untouched.
@@ -228,7 +228,7 @@
          CALL MSG_OUT( 'RDLIN_WARN_PAR',
      :   '  Warning - line ^LINNUM  of file ^FILNAM contains '//
      :   'unbalanced parentheses', STATUS )
-      END IF      
+      END IF
 
 99    CONTINUE
       END

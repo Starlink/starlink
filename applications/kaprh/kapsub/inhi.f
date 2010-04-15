@@ -1,4 +1,4 @@
-* +  INHI - calculates, plots and stores the histogram of a subregion 
+* +  INHI - calculates, plots and stores the histogram of a subregion
 *           of a 2-d array
 
       SUBROUTINE INHI( GRAPHS, ZONEG, NDFI, LBND, DIM1, DIM2, ARRAY,
@@ -22,7 +22,7 @@
 *
 *    Invocation :
 *
-*      CALL INHI( GRAPHS, ZONEG, NDFI, LBND, DIM1, DIM2, ARRAY, 
+*      CALL INHI( GRAPHS, ZONEG, NDFI, LBND, DIM1, DIM2, ARRAY,
 *     :           PNNUMB, PNHINA, PNTITL, PNHIRE, NULL, PLTITL,
 *     :           ABSLAB, ORDLAB, MINTIC, MAJTIC, XLOG, YLOG, OUTTIC,
 *     :           THICK, RNUMB, HSTGRM, STATUS )
@@ -117,7 +117,7 @@
 *                    Set Autograph to plot in the graphics zone
 *                    Create work space for histogram plotting
 *                    If status is ok then
-*                       Compute locus of the histogram and store in 
+*                       Compute locus of the histogram and store in
 *                         workspace
 *                       Find plot limits --- for a logarithmic
 *                         abscissa with negative or zero limits, set
@@ -315,7 +315,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       CALL ERR_MARK
-      
+
 *    Compute the number of pixels in the array.
 
       EL = DIM1 * DIM2
@@ -332,7 +332,7 @@
       CALL PAR_CANCL( PNNUMB, STATUS )
 
       IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
-   
+
 *    Compute the histogram.
 
       CALL KPG1_GHSTR( BAD, EL, ARRAY, NUMBIN, MAXIM, MINIM, HIST,
@@ -521,7 +521,7 @@
 
       CALL KPG1_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,
      :              DUMMY, STATUS )
-      
+
 *    Get the title for the NDF.
 
       CALL NDF_CINP( PNTITL, NDFO, 'TITLE', STATUS )

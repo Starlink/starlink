@@ -1,4 +1,4 @@
-*+  WELCOME_OBSRAP - write up welcome information got from interface 
+*+  WELCOME_OBSRAP - write up welcome information got from interface
 
 	SUBROUTINE WELCOME_OBSRAP ( STATUS )
 
@@ -56,7 +56,7 @@
 
 	CALL PAR_GET0C( 'INFO', INFO, STATUS)
 
-*      write the welcome info to the user 
+*      write the welcome info to the user
 
 	CALL MSG_SETC( 'INF', INFO)
 	CALL MSG_OUT( 'MESSAGE', '^INF', STATUS)

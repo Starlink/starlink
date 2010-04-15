@@ -96,7 +96,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -183,7 +183,7 @@
       CALL MSG_SETI( 'NHISTL', NHISTL )
       CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of IRAF history '/
      :     /'lines is ^NHISTL', STATUS )
-     
+
 *  Calculate the size of the FITS extension.
 *  =========================================
 
@@ -229,7 +229,7 @@
 *  Set the first member of an array to the dimensionality of the
 *  80-character array required.
       XDIMS( 1 ) = XLINES
-      
+
 *  Create the NDF extension.
       CALL NDF_XNEW( NDF, 'FITS', '_CHAR*80', 1, XDIMS, FITLOC, STATUS )
 
@@ -254,11 +254,11 @@
 *  be passed for this to work under UNIX.  It has no effect under VMS.
       IF ( ADFITS ) THEN
          CALL CON_WFMAN( XLINES, MDIM, DIMS, BITPIX,
-     :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS, 
+     :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                   %VAL( CNF_CVAL( FITSLN ) ) )
 
          IF ( STATUS .NE. SAI__OK) GOTO 999
-      
+
 *  If the FITS stuff has been written, then next line is (4+MDIM).
          LINENO = 4 + MDIM
       ELSE
@@ -337,12 +337,12 @@
          IF ( NCHARS .GT. FITSLN-10 ) CARD( 78: ) = '...'
 
 *  Report the FITS HISTORY line in verbose-message mode.
-         CALL MSG_SETC( 'CARD', CARD )      
+         CALL MSG_SETC( 'CARD', CARD )
          CALL MSG_OUTIF( MSG__VERB, ' ', '^CARD', STATUS )
 
 *  Put it into the FITS extension.  Note again that the length of the
 *  mapped character array is passed by value for UNIX.
-         CALL CON_PCARD( CARD, LINENO, XLINES, 
+         CALL CON_PCARD( CARD, LINENO, XLINES,
      :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ),
      :                   STATUS, %VAL( CNF_CVAL( FITSLN ) ) )
          LINENO = LINENO + 1
@@ -360,16 +360,16 @@
      :        /' from the IRAF image'
 
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, 
+      CALL CON_PCARD( CARD, LINENO, XLINES,
      :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
-      
+
 *  Increment the position in the FITS header.
       LINENO =  LINENO + 1
-      
+
 *  Find the current time count.
       CALL PSX_TIME( NTICKS, STATUS )
       CALL MSG_SETC( 'IRAFIL', IRAFIL )
@@ -386,26 +386,26 @@
          CALL MSG_LOAD( ' ', 'HISTORY ^IRAF_NAME.', CARD, NAMLEN,
      :                  STATUS )
       END IF
-      
+
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, 
+      CALL CON_PCARD( CARD, LINENO, XLINES,
      :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
-      
+
 *  Increment the position in the FITS header.
       LINENO =  LINENO + 1
 
 *  Write the termination card image in the FITS extension.
-*  =======================================================      
+*  =======================================================
 
-*  Write the card.      
+*  Write the card.
       CARD = 'END'
 
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, 
+      CALL CON_PCARD( CARD, LINENO, XLINES,
      :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                %VAL( CNF_CVAL( FITSLN ) ) )
 

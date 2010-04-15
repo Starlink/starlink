@@ -52,7 +52,7 @@
 #        Added CYGWIN environment variable.
 #     04-OCT-2006 (PWD):
 #        Make sure installation lib directories are first on the library
-#        path. Now that we have shareable libraries for Tcl/Tk this is 
+#        path. Now that we have shareable libraries for Tcl/Tk this is
 #        safer.
 #     08-MAY-2007 (PWD):
 #        Updated for Skycat 3.0.1. Now works without GAIA_DIR pre-defined
@@ -127,14 +127,14 @@ if test "$DYLD_LIBRARY_PATH" = ""; then
    else
       LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$LD_LIBRARY_PATH"
    fi
-else 
+else
    export DYLD_LIBRARY_PATH
    if test "$DYLD_LIBRARY_PATH" = ""; then
       DYLD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@"
    else
       DYLD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$LD_LIBRARY_PATH"
    fi
-fi  
+fi
 
 #  Run up GAIA, trap nasty -help output and show something useful.
 if test "${1}" = "-help" -o "${1}" = "-h"; then

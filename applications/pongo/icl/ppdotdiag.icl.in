@@ -93,7 +93,7 @@ CHANGE LINESTY=1 CHEIGHT=0.7
 PTEXT      -0.7082780     -18.0945511        0 0.0 '0655+64'
 PTEXT      -1.2338796     -17.0440712        0 0.0 '1913+16'
 
-{  Note the use of the command line continuation character "~", used 
+{  Note the use of the command line continuation character "~", used
 {  gratuitously here for for illustration.
 PTEXT      -0.2164239E+01  -0.1934648E+02    0 0.0 ~
    '1953+29'
@@ -107,7 +107,7 @@ PTEXT      -1.0945635     -20.1498394       37 0.0 'Death Line'
 PTEXT      -1.4808489     -16.7852573       19 0.0 'Spin-up Line'
 
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 

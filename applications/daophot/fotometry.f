@@ -2,15 +2,15 @@
 C
 C=======================================================================
 C
-C This subroutine derives the concentric aperture photometry.  At 
-C present, this is the only place in all of DAOPHOT where sky values 
+C This subroutine derives the concentric aperture photometry.  At
+C present, this is the only place in all of DAOPHOT where sky values
 C are derived for the individual stars.
 C
 C               OFFICIAL DAO VERSION:  1991 April 18
 C
 C Argument
 C
-C    WATCH (INPUT) governs whether information relating to the progress 
+C    WATCH (INPUT) governs whether information relating to the progress
 C          of the reductions is to be typed on the terminal screen
 C          during execution.
 C
@@ -24,7 +24,7 @@ C Parameters:
 C
 C MINSKY is the smallest number of pixels from which the sky may be
 C        determined.  If for some star the number of sky pixels
-C        is less than MINSKY, an error code will result and 
+C        is less than MINSKY, an error code will result and
 C        control will return to the main program.
 C
 C MAXSKY the maximum number of pixels allowed in the sky annulus.
@@ -54,7 +54,7 @@ C
 C
       COMMON /FILNAM/ COOFIL, MAGFIL, PSFFIL, PROFIL, GRPFIL
 C
-      DATA PAR /MAXAP*0., 2*0./, PMIN /1.E-30, MAXAP*0., 1./, 
+      DATA PAR /MAXAP*0., 2*0./, PMIN /1.E-30, MAXAP*0., 1./,
      .     PMAX/MAXAP*1.E30, 2*1.E30/
       DATA TABLE / 'photo.opt                     ' /
       DATA LBL/' A1  RADIUS OF APERTURE  1',
@@ -105,23 +105,23 @@ C
  1020 NAPER=I-1
  1030 CONTINUE
 C
-C NAPER   is the number of apertures, whose radii are stored in 
-C         elements 1 through NAPER of the array PAR.  
+C NAPER   is the number of apertures, whose radii are stored in
+C         elements 1 through NAPER of the array PAR.
 C
-C APMXSQ  is the outermost edge of the largest aperture-- if the 
+C APMXSQ  is the outermost edge of the largest aperture-- if the
 C         distance squared of the center of a pixel from the centroid of
-C         the star is greater than APMXSQ, then we know that no part 
+C         the star is greater than APMXSQ, then we know that no part
 C         of the pixel is to be included in any aperture.
 C
 C Now define the other variables whose values are in the table.
 C
-      RINSQ=AMAX1(PAR(MAXAP+1), 0.)**2      ! Inner sky radius squared 
+      RINSQ=AMAX1(PAR(MAXAP+1), 0.)**2      ! Inner sky radius squared
       ROUTSQ = REAL(MAXSKY)/3.142 + RINSQ
       DUM = PAR(MAXAP+2)**2
       IF (DUM .GT. ROUTSQ) THEN
          CALL TBLANK
          CALL TBLANK
-         CALL STUPID 
+         CALL STUPID
      .        ('   *** You have specified too big a sky annulus. ***')
          WRITE (6,6) SQRT(ROUTSQ)
     6    FORMAT (F10.2, ' pixels is the largest outer sky radius ',
@@ -129,7 +129,7 @@ C
          RETURN
       ELSE IF (DUM .LE. RINSQ) THEN
          CALL TBLANK
-         CALL STUPID 
+         CALL STUPID
      .   ('Your outer sky radius is no bigger than the inner radius.')
          WRITE (6,8)
     8    FORMAT ('Please try again.')
@@ -144,7 +144,7 @@ C and open it.
 C
       CALL TBLANK
   900 CALL GETNAM ('File with the positions:', COOFIL)
-      IF ((COOFIL .EQ. 'END OF FILE') .OR. 
+      IF ((COOFIL .EQ. 'END OF FILE') .OR.
      .     (COOFIL .EQ. 'GIVE UP')) THEN
          COOFIL = ' '
          RETURN
@@ -155,7 +155,7 @@ C
          COOFIL = 'GIVE UP'
          GO TO 900
       END IF
-      CALL RDHEAD(2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, DUM, 
+      CALL RDHEAD(2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, DUM,
      .     PHPADU, READNS, DUM)
       IF (NL .LT. 1) NL=1
 C
@@ -164,7 +164,7 @@ C the new file.
 C
       MAGFIL=SWITCH(COOFIL, CASE('.ap'))
   950 CALL GETNAM ('File for the magnitudes:', MAGFIL)
-      IF ((MAGFIL .EQ. 'END OF FILE') .OR. 
+      IF ((MAGFIL .EQ. 'END OF FILE') .OR.
      .     (MAGFIL .EQ. 'GIVE UP')) THEN
          CALL CLFILE (2)
          MAGFIL = ' '
@@ -177,7 +177,7 @@ C
          MAGFIL = 'GIVE UP'
          GO TO 950
       END IF
-      CALL WRHEAD (3, 2, NCOL, NROW, 6, LOBAD, HIBAD, THRESH, 
+      CALL WRHEAD (3, 2, NCOL, NROW, 6, LOBAD, HIBAD, THRESH,
      .     PAR(1), PHPADU, READNS, 0.)
       READNS=READNS**2
 C
@@ -225,7 +225,7 @@ C Initialize star counts and aperture area.
 C
       DO 2010 I=1,NAPER
       APMAG(I) = 0.D0
-C 
+C
 C If this star aperture extends outside the array, the magnitude
 C in this aperture will be no good.
 C
@@ -245,15 +245,15 @@ C
 C
 C Is this pixel within the sky annulus?
 C
-            IF ((RSQ .LT. RINSQ) .OR. (RSQ .GT. ROUTSQ) .OR. 
-     .           (NSKY .GT. MAXSKY) .OR. (DATUM .LT. LOBAD) .OR. 
+            IF ((RSQ .LT. RINSQ) .OR. (RSQ .GT. ROUTSQ) .OR.
+     .           (NSKY .GT. MAXSKY) .OR. (DATUM .LT. LOBAD) .OR.
      .           (DATUM .GT. HIBAD)) GO TO 2110
             NSKY=NSKY+1
             SKY(NSKY)=DATUM
 C
-C The inclusion of partial pixels inside the aperture is done as 
+C The inclusion of partial pixels inside the aperture is done as
 C follows:  if the distance of the center of the current pixel from the
-C centroid of the star [radius vector r(i,j)] is exactly equal to the 
+C centroid of the star [radius vector r(i,j)] is exactly equal to the
 C radius of the aperture [R(k)], then one-half of the counts in the
 C pixel are included.  If r(i,j) < R(k)-0.5, then the entire pixel is
 C included, while if r(i,j) > R(k)+0.5, the pixel is wholly excluded.
@@ -277,7 +277,7 @@ C
                IF (R .GT. PAR(K)) GO TO 2120
                FRACTN=AMAX1(0.0, AMIN1(1.0,PAR(K)-R))
 C
-C FRACTN is the fraction of the pixel that falls inside the 
+C FRACTN is the fraction of the pixel that falls inside the
 C (irregular) aperture.
 C
 C If the pixel is bad, set the total counts in this aperture to a number
@@ -293,8 +293,8 @@ C
  2130 CONTINUE
 C
 C We have accumulated the brightnesses of individual sky pixels in the
-C one-dimensional array SKY.  Pixels falling above or below the BAD 
-C limits have already been eliminated.  Now sort SKY to place the 
+C one-dimensional array SKY.  Pixels falling above or below the BAD
+C limits have already been eliminated.  Now sort SKY to place the
 C pixels in order of increasing brightness.
 C
       IF (NSKY .LT. MINSKY)  THEN
@@ -320,7 +320,7 @@ C
 C SKYMOD has units of (ADU/pixel), and SKYSIG is the pixel-to-pixel
 C scatter of SKYMOD, in units of (ADU/pixel).  SKYVAR is the
 C variance (square of the standard deviation) of the sky brightness,
-C (ADU/pixel)**2, and SIGSQ is the square of the standard error of the 
+C (ADU/pixel)**2, and SIGSQ is the square of the standard error of the
 C mean sky brightness.
 C
 C Subtract the sky from the integrated brightnesses in the apertures,
@@ -328,14 +328,14 @@ C convert the results to magnitudes, and compute standard errors.
 C
       DO 2220 I=1,NAPER
 C
-C If the modal sky value could not be determined, set the magnitude 
-C to 99.999.  
+C If the modal sky value could not be determined, set the magnitude
+C to 99.999.
 C
       IF (SKYSIG .LT. -0.5) GO TO 2210
       APMAG(I)=APMAG(I)-DBLE(SKYMOD)*AREA(I)
 C
-C If the star + sky is fainter than the sky, or if the star aperture 
-C extends beyond the limits of the picture, or if there is a bad pixel 
+C If the star + sky is fainter than the sky, or if the star aperture
+C extends beyond the limits of the picture, or if there is a bad pixel
 C in the star aperture, set the magnitude to 99.999.
 C
       IF (APMAG(I) .LE. 0.0D0) GO TO 2210
@@ -347,12 +347,12 @@ C These variables ERRORn are the respective variances (squares of the
 C mean errors) for: (1) random noise inside the star aperture, including
 C readout noise and the degree of contamination by other stars in the
 C neighborhood, as estimated by the scatter in the sky values (this
-C standard error increases as the square root of the area of the 
+C standard error increases as the square root of the area of the
 C aperture); (2) the Poisson statistics of the observed star brightness;
-C (3) the uncertainty of the mean sky brightness (this standard error 
+C (3) the uncertainty of the mean sky brightness (this standard error
 C increases directly with the area of the aperture).
 C
-      MAGERR(I)=AMIN1(9.999, 
+      MAGERR(I)=AMIN1(9.999,
      .     1.0857*SQRT(ERROR(1)+ERROR(2)+ERROR(3))/SNGL(APMAG(I)))
       APMAG(I)=25.D0-2.5D0*DLOG10(APMAG(I))
       IF (APMAG(I) .GT. 99.999D0) GO TO 2210
@@ -362,13 +362,13 @@ C
  2220 CONTINUE
 C
 C Write out the answers.
-C      
+C
       IF (WATCH .GT. 0.5) WRITE (6,620)ISTAR, XC, YC, APMAG(1),
      .     MAGERR(1), SKYMOD
   620 FORMAT (12X, I5, 2F8.2, F9.3, ' +-', F6.3, F8.1)
       WRITE (3,320) ISTAR, XC, YC, (APMAG(I), I=1,NAPER)
   320 FORMAT (/1X, I5, 14F9.3)
-      WRITE (3,321) SKYMOD, AMIN1(999.99,SKYSIG), 
+      WRITE (3,321) SKYMOD, AMIN1(999.99,SKYSIG),
      .     AMIN1(999.99, AMAX1(-99.99,SKYSKW)),
      .     (MAGERR(I), I=1,NAPER)
   321 FORMAT (4X, F9.3, 2F6.2, F8.3, 11F9.3)
@@ -383,7 +383,7 @@ C
 C
 C-----------------------------------------------------------------------
 C
-C Normal return.  
+C Normal return.
 C
 C Estimate magnitude limit, close files, and return.
 C

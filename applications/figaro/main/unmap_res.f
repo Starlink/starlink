@@ -55,7 +55,7 @@
 *changed work ' ' to 0
       call accres(' ','more.params','wc',mxpars*10,0,parval(:mxpars*10),
      :            status)
-      
+
 
 
 * Write iteration and tolerances to file

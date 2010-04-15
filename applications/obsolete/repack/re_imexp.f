@@ -63,9 +63,9 @@
       CALL PAR_GETLC ('INP Uncorrected image', INF, STATUS)
       CALL HDS_OPEN (INF, 'READ', ILOC, STATUS)
       CALL DAT_TYPE (ILOC, TYPE, STATUS)
-      
+
       call par_put0l('EFFCOR', .TRUE., status)
-      call par_get0l('EFFCOR correct for detector degredation', 
+      call par_get0l('EFFCOR correct for detector degredation',
      &                                               effcor, status)
 
       call mx_root(inf, ouf)
@@ -135,7 +135,7 @@
       ENDIF
       call ftgiou(lunit, status)
       call ftopen(lunit, ximag, 0, blksz, status)
-      call ftg2de(lunit, 1, -1, xdim1, xdim1, xdim2, 
+      call ftg2de(lunit, 1, -1, xdim1, xdim1, xdim2,
      &                                   expmap, anyf, status)
       IF (STATUS .NE. 0) THEN
 	STOP '   Error in RE_IMEXP - Opening the exposure image'

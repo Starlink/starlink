@@ -211,7 +211,7 @@
       CALL IRA_CREAT( PROJ, 8, P, SCS, 1991D0, NDF__NOID, IDA, STATUS )
 
 *  Find the bounds of the image using these projection parameters.
-      CALL IRA_XYLIM( IDA, ACEN, BCEN, SIZE(1), SIZE(2), LBND, UBND, 
+      CALL IRA_XYLIM( IDA, ACEN, BCEN, SIZE(1), SIZE(2), LBND, UBND,
      :                STATUS )
 
 *  Annull the IRA identifier.

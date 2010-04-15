@@ -3,7 +3,7 @@ C+
      :                         GRATSP,DETSP,LENGTH,WIDTH,WAVES,STATUS)
 C
 C     F I G _ F I G W A V E S
-C                     
+C
 C     Calculates the wavelength values for a FIGS exposure, given
 C     the grating details.  This is a utility routine for FIGS32N,
 C     based closely on the Pascal routine FDR_WAVES used by the FIGS
@@ -27,12 +27,12 @@ C     (<) WIDTH     (Real) The width of a detector in wavelength terms.
 C     (<) WAVES     (Real array) Returned with the wavelength values
 C                   for each grating position and detector.  First are
 C                   all the values for the detectors at grating step 1,
-C                   then the values for grating step 2, etc.  
+C                   then the values for grating step 2, etc.
 C     (<) STATUS    (Integer) Status return code.  0 => OK.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used -  
+C     Subroutines / functions used -
 C
 C     PAR_WRUSER    (PAR_ routine) Send string to user.
 C
@@ -67,13 +67,13 @@ C
 C     Check any parameters that could blow up this routine - this check
 C     is to prevent crashes rather than an exhaustive validation
 
-      IF (GRTA2S.LE.0.0) THEN 
+      IF (GRTA2S.LE.0.0) THEN
          CALL PAR_WRUSER(
      :         'Invalid grating parameter; GRTA2S is negative',STATUS)
          STATUS=1
          GO TO 500
       END IF
-      IF (GRATORD.LE.0.0) THEN 
+      IF (GRATORD.LE.0.0) THEN
          CALL PAR_WRUSER(
      :         'Invalid grating parameter; GRATORD is negative',STATUS)
          STATUS=1
@@ -103,7 +103,7 @@ C
 C     Calculate WIDTH as one sixth of the detector spacing.
 C
       WIDTH=(WAVES(2)-WAVES(1))/6.0
-C      
+C
       STATUS=0
 C
   500 CONTINUE

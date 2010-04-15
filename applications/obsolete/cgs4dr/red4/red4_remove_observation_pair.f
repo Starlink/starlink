@@ -8,7 +8,7 @@
 *     a particular group from a reduced group file. The routine is called
 *     after all the checks on the suitability of the reduced observations
 *     and the existence of the reduced group have been made. It is assumed
-*     the OBJECT reduced observation has been opened with a DSA reference of 
+*     the OBJECT reduced observation has been opened with a DSA reference of
 *     'OBJRED', the SKY reduced observation has been opened with a DSA
 *     reference of 'SKYRED', the reduced group has been opened with a DSA
 *     reference of 'GRPRED', and the .MORE.CGS4_COADDS structure within the
@@ -16,7 +16,7 @@
 *     routine is called non of the data arrays have been mapped.
 *
 *     SKY observations may have been optionally multiplied by a weighting factor
-*     indicated by the SKY_WT parameter. 
+*     indicated by the SKY_WT parameter.
 *     Observations may also have been weighted according to their variance
 *     if observing conditions dictate.
 *     Observation types other than OBJECT and SKY are not allowed.
@@ -140,28 +140,28 @@
      :  NELM,                      ! Number of elements in data array.
      :  ADDRESS,                   ! Address returned when mapping.
      :  OBJDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    OBJECT reduced observation file 
+*                                  !    OBJECT reduced observation file
      :  OBJDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    OBJECT reduced observation file
      :  OBJVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    OBJECT reduced observation file 
+*                                  !    OBJECT reduced observation file
      :  OBJVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    OBJECT reduced observation file
      :  OBJQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    OBJECT reduced observation file 
+*                                  !    OBJECT reduced observation file
      :  OBJQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    OBJECT reduced observation file
      :  SKYDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    SKY reduced observation file 
+*                                  !    SKY reduced observation file
      :  SKYDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    SKY reduced observation file
      :  SKYVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    SKY reduced observation file 
+*                                  !    SKY reduced observation file
      :  SKYVAR_PTR                 ! Pointer to variance array mapped from
-*                                  !    SKY reduced observation file 
-      INTEGER        
+*                                  !    SKY reduced observation file
+      INTEGER
      :  SKYQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    SKY reduced observation file 
+*                                  !    SKY reduced observation file
      :  SKYQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    SKY reduced observation file
      :  WDATA_SLOT,                ! Mapping slot for work data array for
@@ -177,15 +177,15 @@
      :  WQUAL_PTR,                 ! Pointer to work quality array for
 *                                  !    sky-subtracted data
      :  GRPDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    reduced group file
      :  GRPVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    reduced group file
      :  GRPQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    reduced group file
      :  COADDS_SLOT,               ! Mapping slot for data array in COADDS
@@ -204,13 +204,13 @@
 *   observation files).
       CALL DSA_DATA_SIZE( 'GRPRED', MAXDIM, NDIM, DIMS, NELM, STATUS )
 
-*   Indicate to DSA that a data quality array will be used to 
+*   Indicate to DSA that a data quality array will be used to
 *   indicate bad values in all the structures.
       CALL DSA_USE_QUALITY( 'OBJRED', STATUS )
       CALL DSA_USE_QUALITY( 'SKYRED', STATUS )
       CALL DSA_USE_QUALITY( 'GRPRED', STATUS )
 
-*   Map the data, variance and quality arrays from the OBJECT reduced 
+*   Map the data, variance and quality arrays from the OBJECT reduced
 *   observation file.
       CALL DSA_MAP_DATA( 'OBJRED', 'READ', 'FLOAT', ADDRESS,
      :  OBJDATA_SLOT, STATUS )
@@ -222,7 +222,7 @@
      :  OBJQUAL_SLOT, STATUS )
       OBJQUAL_PTR = ADDRESS
 
-*   Map the data, variance and quality arrays from the SKY reduced 
+*   Map the data, variance and quality arrays from the SKY reduced
 *   observation file.
       CALL DSA_MAP_DATA( 'SKYRED', 'READ', 'FLOAT', ADDRESS,
      :  SKYDATA_SLOT, STATUS )
@@ -238,11 +238,11 @@
 *   variance and quality.
       IF ( ERRORS .EQ. 'FROM_INT' ) THEN
 
-         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WDATA_PTR, 
+         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WDATA_PTR,
      :     WDATA_SLOT, STATUS )
-         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WVAR_PTR, 
+         CALL DSA_GET_WORK_ARRAY( NELM, 'FLOAT', WVAR_PTR,
      :     WVAR_SLOT, STATUS )
-         CALL DSA_GET_WORK_ARRAY( NELM, 'BYTE', WQUAL_PTR, 
+         CALL DSA_GET_WORK_ARRAY( NELM, 'BYTE', WQUAL_PTR,
      :     WQUAL_SLOT, STATUS )
       END IF
 
@@ -276,7 +276,7 @@
 *         and quality, and write the result into the work array.
             IF ( ABS( SKY_WT - 1.0 ) .GT. 0.0001 ) THEN
 
-               CALL GEN_MULCAFV( %val(SKYDATA_PTR), NELM, SKY_WT, 
+               CALL GEN_MULCAFV( %val(SKYDATA_PTR), NELM, SKY_WT,
      :           %val(WDATA_PTR), %val(SKYQUAL_PTR), %val(WQUAL_PTR),
      :           %val(SKYVAR_PTR), %val(WVAR_PTR), .TRUE., .FALSE.,
      :           0.0, .TRUE. )
@@ -302,7 +302,7 @@
             IF ( VARIANCE_WT ) THEN
 
 *            Clean up the observation pair before checking it. (THIS IS A FUDGE!!).
-               CALL GEN_CLEANV( NELM, %val(WDATA_PTR), 
+               CALL GEN_CLEANV( NELM, %val(WDATA_PTR),
      :           %val(WVAR_PTR), %val(WQUAL_PTR), SNCUT, TLOW,
      :           .TRUE., .FALSE., 0.0 )
 
@@ -326,7 +326,7 @@
 *         Subtract this sky-subtracted pair into the reduced group,
 *         propagating the variance and quality.
             CALL RED4_SUBTRACT_OBS( DIMS(1), DIMS(2), 1.0,
-     :        VARIANCE_WT,   
+     :        VARIANCE_WT,
      :        %val(WDATA_PTR), %val(WVAR_PTR), %val(WQUAL_PTR),
      :        %val(GRPDATA_PTR), %val(GRPVAR_PTR), %val(GRPQUAL_PTR),
      :        %val(COADDS_PTR), STATUS )

@@ -340,10 +340,10 @@
             IF ( PROFILING_MODE .EQ. 'D' ) THEN
                DEK_BELOW( IORD ) = DEKKER_BELOW_AT
                DEK_ABOVE( IORD ) = DEKKER_ABOVE_AT
-         
+
             ELSE IF ( PROFILING_MODE .EQ. 'O' .OR.
      :                PROFILING_MODE .EQ. 'S' ) THEN
-         
+
 *           Set non zero values in the mask arrays to denote object/sky
 *           attributes. The mask arrays consist of a profile mask per
 *           order with a spatial resolution of 1 pixel

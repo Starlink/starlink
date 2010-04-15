@@ -64,8 +64,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'           ! global SSE definitions
-      INCLUDE 'NDF_PAR'           
-      INCLUDE 'NDF_ERR'           
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -78,7 +78,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    IDIMS( NDIMS ),         ! dimensions of input image
      :    ODIMS( NDIMS ),         !      "      " output  "
      :    NELEMENTS,              ! number elements mapped by NDF_MAP
@@ -106,16 +106,16 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error so far then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS)
-      
+
 *       if no error so far then continue
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -139,7 +139,7 @@
      :     'Output image will be ^XDIM by ^YDIM pixels', STATUS )
                CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
-*             now create output IMAGE type data structure 
+*             now create output IMAGE type data structure
                CALL CREOUT( 'OUTPIC1', 'OTITLE', NDIMS, ODIMS, LOCO1,
      :                       STATUS )
                CALL CREOUT( 'OUTPIC2', 'OTITLE', NDIMS, ODIMS, LOCO2,
@@ -174,9 +174,9 @@
 
 *                   copy the requested subset of the input image into
 *                   the output image
-                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1), 
-     :                       IDIMS(2), XSTART, XFINISH, YSTART, 
-     :                       YFINISH, %VAL( PNTRO1 ), ODIMS(1), 
+                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1),
+     :                       IDIMS(2), XSTART, XFINISH, YSTART,
+     :                       YFINISH, %VAL( PNTRO1 ), ODIMS(1),
      :                       ODIMS(2), STATUS )
 
 *                  calculate the x and y finish pixels
@@ -188,9 +188,9 @@
 
 *                   copy the requested subset of the input image into
 *                   the output image
-                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1), 
-     :                       IDIMS(2), XSTART, XFINISH, YSTART, 
-     :                       YFINISH, %VAL( PNTRO2 ), ODIMS(1), 
+                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1),
+     :                       IDIMS(2), XSTART, XFINISH, YSTART,
+     :                       YFINISH, %VAL( PNTRO2 ), ODIMS(1),
      :                       ODIMS(2), STATUS )
 
 *                  calculate the x and y finish pixels
@@ -202,9 +202,9 @@
 
 *                   copy the requested subset of the input image into
 *                   the output image
-                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1), 
-     :                       IDIMS(2), XSTART, XFINISH, YSTART, 
-     :                       YFINISH, %VAL( PNTRO3 ), ODIMS(1), 
+                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1),
+     :                       IDIMS(2), XSTART, XFINISH, YSTART,
+     :                       YFINISH, %VAL( PNTRO3 ), ODIMS(1),
      :                       ODIMS(2), STATUS )
 
 *                  calculate the x and y finish pixels
@@ -216,14 +216,14 @@
 
 *                   copy the requested subset of the input image into
 *                   the output image
-                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1), 
-     :                       IDIMS(2), XSTART, XFINISH, YSTART, 
-     :                       YFINISH, %VAL( PNTRO4 ), ODIMS(1), 
+                     CALL PICKIMSUB( %VAL( PNTRI ), IDIMS(1),
+     :                       IDIMS(2), XSTART, XFINISH, YSTART,
+     :                       YFINISH, %VAL( PNTRO4 ), ODIMS(1),
      :                       ODIMS(2), STATUS )
 
                   END IF
 
-  
+
 *             end of if-no-error-before-mapping-output check
                END IF
 

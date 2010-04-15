@@ -60,7 +60,7 @@
 *        { vaind=?
 *        { xycont=? xyfile=? xytitle=?
 *        option
-*  
+*
 *  ADAM Parameters:
 *     ABSLAB  =  LITERAL (Read)
 *        Label for the line-plot abscissa, in which NCAR fancy founts
@@ -149,7 +149,7 @@
 *        negative value forces the graphics package to compute
 *        appropriate values.  The number of minor tick marks per major
 *        tick is fixed (8) for a logarithmic axis.
-*        
+*
 *        By default, it is [-1.,-1.].  For the first plot MINTIC is
 *        defaulted, and subsequently will only be obtained whenever
 *        PLOTSTYLE is TRUE.  []
@@ -396,7 +396,7 @@
 *     in data value of the bin centre.  The NDF LABEL is "Number".
 *     -  The Slice NDF has an AXIS component whose LABEL is "Pixel" and
 *     centres are pixel co-ordinates from 0.5; its LABEL and UNITS are
-*     propagated from the input NDF. 
+*     propagated from the input NDF.
 *     -  The current palette entries 1 to 4 associated with the OVERLAY
 *     are used as follows in the cursor mode for IMAGE_OVERLAY devices.
 *     A sample slice or region, and the associated button, are drawn
@@ -487,7 +487,7 @@
 *     of the ordinate.  The same applies to zero or negative data
 *     values if the plot is to have a logarithmic ordinate.  Similarly,
 *     for the histogram abscissa.
-*  
+*
 *  Implementation Deficiencies:
 *     -  Only pixel indices may be used---data co-ordinates are not
 *     supported, though the statistics option will report the position
@@ -818,9 +818,9 @@
 
 *       Create some commentary describing how the functions displayed
 *       in boxes on the screen relate to keyboard when the device
-*       is a graphics terminal, or to mouse keys when the device is an 
+*       is a graphics terminal, or to mouse keys when the device is an
 *       image display.
-      
+
          TERMES( 1 ) = 'For certain options, boxes will appear...'
          TERMES( 2 ) = '   Press keyboard "1" or the space bar to '/
      :                 /'select the operation shown to the left.'
@@ -911,7 +911,7 @@
 
       CALL NDF_BEGIN
       VALID = .FALSE.
-  
+
 *    Obtain the NDF.  If the name is given on the command line
 *    it will be used.  If not, the database data reference is used,
 *    if there is one.  Otherwise, the user is prompted.
@@ -926,11 +926,11 @@
 *    NDF are intertwined so we can't have different closedown sequences.
 
       CALL NDF_VALID( NDF, VALID, STATUS )
-      
+
 *    This application supports only the real type directly.  Therefore
 *    for the given type of the image find in which type it should be
 *    processed.  It may still be possible to handle d.p. data provided
-*    the dynamic range is not too small. 
+*    the dynamic range is not too small.
 
       CALL ERR_MARK
       CALL NDF_MTYPE( '_REAL', NDF, NDF, 'Data', ITYPE, DTYPE, STATUS )
@@ -1089,7 +1089,7 @@
 
       HSTGRM = .FALSE.
       STACAL = .FALSE.
-      
+
       RNUMB = 100
 
 *    Number of line plots.
@@ -1404,7 +1404,7 @@
          CALL NDF_BEGIN
 
 *       Create a new section with the bounds of the region.
- 
+
          CALL NDF_SECT( NDF, NDIMS, RELBND, REUBND, NDFR, STATUS )
 
 *       Create a new NDF of the section, propagating all other
@@ -1594,7 +1594,7 @@
 *          routine expects to be given the whole array to process.
 
             CALL NDF_BEGIN
- 
+
 *          Create a new section.
 
             CALL NDF_SECT( NDF, NDIMS, RELBND, REUBND, NDFR, STATUS )
@@ -1624,7 +1624,7 @@
      :                          STATUS )
                CALL KPG1_PX2AX( NDIMS, MINPC, NDFR, MINCC, STATUS )
                CALL KPG1_PX2AX( NDIMS, MAXPC, NDFR, MAXCC, STATUS )
-  
+
                DO  I = 1, NDIMS
                   MINP( I ) = MINPC( I )
                   MAXP( I ) = MAXPC( I )
@@ -1648,7 +1648,7 @@
 
          CALL KPG1_STDSR( NDIMS, REL, NGOOD, DMIN, MINP, MINC, DMAX,
      :                    MAXP, MAXC, SUM, MEAN, STDEV, VAL__BADD,
-     :                    VAL__BADD, 1, VAL__BADR, VAL__BADD, 
+     :                    VAL__BADD, 1, VAL__BADR, VAL__BADD,
      :                    MAXWCS, MINWCS, STATUS )
 
 *    HIST option.
@@ -1660,7 +1660,7 @@
 *       routine expects to be given the whole array to process.
 
          CALL NDF_BEGIN
- 
+
 *       Create a new section.
 
          CALL NDF_SECT( NDF, NDIMS, RELBND, REUBND, NDFR, STATUS )
@@ -1720,7 +1720,7 @@
 *       the parameter for the filename in order to loop.
 
          CALL INXY( ZONEOV, ZONEO, XCEN, YCEN, SLBND, DIMS( 1 ),
-     :              DIMS( 2 ), %VAL( PNTRI( 1 ) ), XLOW, XHIGH, 
+     :              DIMS( 2 ), %VAL( PNTRI( 1 ) ), XLOW, XHIGH,
      :              YLOW, YHIGH, 'XYCONT', 'XYFILE', 'XYTITLE', STATUS )
 
          CALL PAR_CANCL( 'XYFILE', STATUS )

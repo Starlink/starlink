@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -70,8 +70,8 @@ swift group when it came to realising the potentials afforded by
 $20^{\rm th}$ century progress in statistics. However, this is now
 changing and an increasing number of astronomical papers are
 turning to modern statistical analysis techniques to assist in data exploration
-and description ({\it e.g.}\ see Murtagh \& Heck 1987, for a list of 
-references). 
+and description ({\it e.g.}\ see Murtagh \& Heck 1987, for a list of
+references).
 
 A very convincing case highlighting the need for a proper statistical
 methodology in astronomy has been given by Heck {\it et al.}\ (1985),
@@ -82,7 +82,7 @@ multivariate methods such as principal-components analysis (PCA) and
 cluster analysis. Astronomers are now realising that ways are urgently
 needed to adequately handle, condense and interpret the huge and growing
 quantities of data currently being produced from our telescopes,
-instruments, satellites and measuring machines. 
+instruments, satellites and measuring machines.
 
 To assist UK astronomers working at the forefront in these areas
 Starlink has purchased an integrated commercial package {\small
@@ -92,7 +92,7 @@ Birmingham, Cambridge, Durham, Leicester, Manchester, Preston, Queen
 Mary and Westfield College, RAL, ROE, and Southampton.  Users at other
 Starlink sites can access {\small CLUSTAN} on STADAT.  They will need to
 ask their site manager to obtain a manual for their site from the
-Starlink Software Librarian. 
+Starlink Software Librarian.
 
 \section{What is Cluster Analysis?}
 Cluster analysis is a modern statistical means of separating
@@ -105,7 +105,7 @@ objects or cases under consideration into groups such that the degree of
 association is high between members of the same group and low between
 members of different groups. The way in which this is carried out
 depends on the particular choice of clustering option (of which there
-are a great many). 
+are a great many).
 
 From the beginning it is important that the philosophy behind cluster
 analysis be understood (see the book by Anderberg for an excellent
@@ -114,37 +114,37 @@ collect the data, put it through a clustering analysis
 and then accept what comes out as `the answer'.
 The context of the data must be known and properly laid out in terms of
 the properties, parameters and attributes of each object. The choice of
-variables is crucial and has the greatest influence on the results. 
+variables is crucial and has the greatest influence on the results.
 A proper research objective should exist and an understanding of the
 principles of clustering analysis is required so that the most
-appropriate strategy for analysis can be adopted. 
+appropriate strategy for analysis can be adopted.
 
-Having said this, cluster analysis is a tool of discovery which can reveal 
+Having said this, cluster analysis is a tool of discovery which can reveal
 associations and structure in data which may not have been previously perceived
-but are nevertheless meaningful, sensible and useful when found. More 
+but are nevertheless meaningful, sensible and useful when found. More
 specifically it can:
 \begin{itemize}
-\item help in developing a classification scheme against which new 
+\item help in developing a classification scheme against which new
 objects can then be tested,
 \item identify peculiar objects and outliers in $M$-dimensional space,
 \item predict the future behaviour of population types,
 \item formulate hypotheses concerning the origin of the sample,
-\item measure the different effects of treatments on classes within the 
-population, 
-\item  suggest ideas and insights to the analyst concerning the structure 
+\item measure the different effects of treatments on classes within the
+population,
+\item  suggest ideas and insights to the analyst concerning the structure
 of the data.
 \end{itemize}
-Prior to a clustering analysis another important preliminary analysis can be 
+Prior to a clustering analysis another important preliminary analysis can be
 performed. This is a principal-components analysis (PCA) to create a number of
-variables $m^{\prime}$, which contain the most power, from a larger original 
-set of variables $m$. Hence the dimensionality of the problem is reduced. 
-This is especially important where a large number of variables are associated 
+variables $m^{\prime}$, which contain the most power, from a larger original
+set of variables $m$. Hence the dimensionality of the problem is reduced.
+This is especially important where a large number of variables are associated
 with each object. More specifically, performing a PCA can:
 \begin{itemize}
 \item enhance feature selection and help in choosing the most useful variables,
 \item help in the visualisation of multi-dimensional space data,
 \item assist in identification of underlying variables,
-\item enable early identification of groups of objects or of outliers, 
+\item enable early identification of groups of objects or of outliers,
 \item reduce the dimensionality of a clustering problem to a more-manageable
 size by eliminating those variables which contribute nothing or little to the
 inherent properties of a data set.
@@ -177,13 +177,13 @@ techniques have already been applied.
 A more comprehensive list of published papers in this area is given by
 Murtagh \& Heck (1987). It is not difficult to see that the range and
 applicability of these multivariate techniques is limited largely by the
-imagination of the astronomer. 
+imagination of the astronomer.
 
 \section{CLUSTAN}
 Full documentation for {\small CLUSTAN} is provided in the {\it Clustan
 User Manual} by David Wishart.  Your site manager should have a
 reference copy and at least one for loan.  It is easily recognisable by
-the Pleiades photograph on the cover. 
+the Pleiades photograph on the cover.
 
 In this document we just describe the Starlink-specific implementation.
 
@@ -195,7 +195,7 @@ and command-correction facilities. {\small CLUSTAN} can equally well be
 run interactively or in batch and has self-explanatory error reporting.
 Many thousands of objects can be hierarchically clustered whilst
 hundreds of variables can be specified. Applications are only limited by
-the size of the data matrix that can be held in computer memory. 
+the size of the data matrix that can be held in computer memory.
 
 \subsection{Getting Started}
 To define the {\small CLUSTAN} command enter
@@ -208,12 +208,12 @@ To start {\small CLUSTAN} enter
     $ CLUSTAN
 \end{verbatim}
 You will be presented with two lists of graphics devices available at
-your site.  The first covers non-hardcopy devices  {\it i.e.}\ mostly 
+your site.  The first covers non-hardcopy devices  {\it i.e.}\ mostly
 terminals and image displays whilst the second comprises plotters. After each
 list you will be prompted to select a choice from the list {\em even
 if you do not intend to create any graphics}.  This is because of
 the way {\small CLUSTAN} is designed, in particular how you select a graphics
-device within {\small CLUSTAN}.  {\small CLUSTAN} has four graphics devices 
+device within {\small CLUSTAN}.  {\small CLUSTAN} has four graphics devices
 described:
 VDU, PLOTTER, CAMA and CAMB ({\it c.f.}\ the {\tt SELECT GRAPHICS DEVICE}
 command in the user manual).  CAMA and CAMB are not available in the
@@ -235,7 +235,7 @@ manual.
 in a file.  Therefore, you can execute the same commands for a series
 datasets with the minimum of effort.  To obtain batch mode you prepare
 a text file of {\small CLUSTAN} commands {\em preceded by the names of the
-VDU and PLOTTER graphics devices required}.  For example, if you type the 
+VDU and PLOTTER graphics devices required}.  For example, if you type the
 following into {\tt MYFILE.DAT}
 \begin{verbatim}
     GRAPHON
@@ -246,12 +246,12 @@ following into {\tt MYFILE.DAT}
     272    33   115   670
     300   213   431   692
 
-    COMMENT Cluster the data using Ward's method with the squared 
+    COMMENT Cluster the data using Ward's method with the squared
     COMMENT Euclidean similarity measure.
     CLUSTER, METHOD WARDS, MEASURE SEUCLID
     COMMENT  Select plotting to the 'VDU' device alias the Graphon.
     SELECT GRAPHICS DEVICE VDU
-    COMMENT  Plot the dendrogram.  
+    COMMENT  Plot the dendrogram.
     PLINK
     STOP
 \end{verbatim}
@@ -262,7 +262,7 @@ and then enter
 {\small CLUSTAN} will read {\tt MYFILE.DAT} instead of obeying commands from the
 terminal.
 
-Should you require a permanent record of {\small CLUSTAN}'s analysis you can 
+Should you require a permanent record of {\small CLUSTAN}'s analysis you can
 redirect the output from the terminal to a file.  So for example:-
 \begin{verbatim}
     $ CLUSTAN/OUTPUT=RESULTS.LIS  MYFILE.DAT
@@ -286,34 +286,34 @@ for clarity) you want to analyse fields VALUE1,
 VALUE2, VALUE3 and VALUE4.  In {\small CLUSTAN} terminology these are
 the {\em variables} whose names are limited to eight characters.
 \begin{verbatim}
- P TITLE                                               A17    TEST              
- P FILENAME                                            A17    TEST              
- P MEDIUM                                              A17    DISK              
- P ACCESSMODE                                          A17    SEQUENTIAL        
- P RECORDSIZE                               BYTE       I5        51             
- F NAME                  1     5 A5       0            A5                       
- F RA                    8     8 A8       0 TIME       A8                       
- F DEC                  19     9 A9       0 ANGLE      A9                       
- F VALUE1               31    10 F10.5    0            F10.5     0.00000        
- F VALUE2               41    10 F10.5    0            F10.5     0.00000        
- F VALUE3               51     4 I4       0            I4        0              
- F VALUE4               56     6 I6       0            I6        0              
- E                                                                              
+ P TITLE                                               A17    TEST
+ P FILENAME                                            A17    TEST
+ P MEDIUM                                              A17    DISK
+ P ACCESSMODE                                          A17    SEQUENTIAL
+ P RECORDSIZE                               BYTE       I5        51
+ F NAME                  1     5 A5       0            A5
+ F RA                    8     8 A8       0 TIME       A8
+ F DEC                  19     9 A9       0 ANGLE      A9
+ F VALUE1               31    10 F10.5    0            F10.5     0.00000
+ F VALUE2               41    10 F10.5    0            F10.5     0.00000
+ F VALUE3               51     4 I4       0            I4        0
+ F VALUE4               56     6 I6       0            I6        0
+ E
  C No catnotes
- A No ADC notes                                                                 
+ A No ADC notes
 \end{verbatim}
-The corresponding (ASCII) catalogue is 
+The corresponding (ASCII) catalogue is
 \begin{verbatim}
-STAR1  12 00 00   +45 00 00   1058.63122 421.34    578    372   
-STAR2  12 30 00   +44 30 00    271.78    -33.76   -115  21670 
-STAR3  12 35 00   +43 45 00    300.16      3.456781431    692 
+STAR1  12 00 00   +45 00 00   1058.63122 421.34    578    372
+STAR2  12 30 00   +44 30 00    271.78    -33.76   -115  21670
+STAR3  12 35 00   +43 45 00    300.16      3.456781431    692
 \end{verbatim}
 To read the file you first must assign a {\small CLUSTAN} internal
 file to the actual file.  Then read in the data, specifying the number
 of records or {\em cases} and the format.  Note you can only read
 formatted catalogues. {\small CLUSTAN} does not process integer data
-other than binary masks.  Therefore, the format specifier for integers must be 
-{\tt Fx.0}. The {\tt READ LABELS} commands are optional.  Note the 
+other than binary masks.  Therefore, the format specifier for integers must be
+{\tt Fx.0}. The {\tt READ LABELS} commands are optional.  Note the
 limitation to {\em exactly} eight characters for LABELS, left justified and
 padded out with blanks if necessary (see page 132 of the manual).
 
@@ -324,9 +324,9 @@ READ DATA, Infile=TRIAD, Title "TEST DATA", Cases 3 Variables Continuous 1-4,
 READ LABELS Variables
 VALUE1  VALUE2  VALUE3  VALUE4
 READ LABELS Cases
-STAR1   STAR2   STAR3   
+STAR1   STAR2   STAR3
 \end{verbatim}
-Now you are ready to perform cluster analysis on your data. 
+Now you are ready to perform cluster analysis on your data.
 
 If you do not want to omit any field from the analysis you can omit
 the format qualifier from the {\tt READ DATA} command and read in
@@ -335,7 +335,7 @@ and is numeric}. If you are only interested in analysing certain numeric
 fields in the catalogue you can generate an ASCII output file containing
 just the required fields by using the SCAR application CAR\_LIST.
 Alternatively, you can create a new SCAR catalogue just containing the
-fields of interest using CAR\_CONVERT. 
+fields of interest using CAR\_CONVERT.
 
 {\small CLUSTAN} supports missing values in a limited way.  See pp.128--129
 of the Manual for details.
@@ -343,15 +343,15 @@ of the Manual for details.
 \subsection{Graphics}
 The Starlink version of {\small CLUSTAN} uses GKS graphics.  However, it
 does not access the graphics database. The HEIGHT qualifier in
-procedures PLINK (for plotting dendrograms or tree-diagrams) and SCATTER 
+procedures PLINK (for plotting dendrograms or tree-diagrams) and SCATTER
 (for plotting cluster diagrams) refers to the height of characters as
 fractions of the plot height rather than in absolute units. GKS error
 messages are routed to channel 22.
 \subsection{Help}
-{\small CLUSTAN} has an on-line help system, which looks similar to the 
-familiar VMS help library.  However, the effect of entering {\tt CTRL/Z} is 
-not the same. In VMS you just exit the help system; in {\small CLUSTAN} you 
-exit {\small CLUSTAN} itself, perhaps losing many calculations. Hence you must 
+{\small CLUSTAN} has an on-line help system, which looks similar to the
+familiar VMS help library.  However, the effect of entering {\tt CTRL/Z} is
+not the same. In VMS you just exit the help system; in {\small CLUSTAN} you
+exit {\small CLUSTAN} itself, perhaps losing many calculations. Hence you must
 press {\tt <CR>} repeatedly until you reach the {\small CLUSTAN} command prompt.
 \subsection{Error reporting}
 {\small CLUSTAN} has comprehensive error reporting which is intended to be
@@ -379,15 +379,15 @@ If you wish to run an example you will need to copy one of the above
 files to your directory and then edit appropriate VDU and PLOTTER device
 names into the first two lines of that file.
 
-Any bugs when using {\small CLUSTAN} should be reported in the normal way.  
+Any bugs when using {\small CLUSTAN} should be reported in the normal way.
 Starlink will pass on bug reports to the authors of the software.
 
 \section{Quotas} {\small CLUSTAN} has been linked with large buffers so
-that most problems can be solved without re-compilation and re-linking. 
+that most problems can be solved without re-compilation and re-linking.
 This has the side effect that a moderate page file limit (PGFLQUO) is
 required, {\it viz.} 27000.  This will permit storage of up to 10Mb of
 catalogue data.  If you require yet more capacity, you should consult
-your site manager. 
+your site manager.
 
 \section{Acknowledgement}
 Thanks to Clive Davenhall who wrote the GKS interface.
@@ -395,13 +395,13 @@ Thanks to Clive Davenhall who wrote the GKS interface.
 \begin{refs}
 \item Anderberg, M.R., 1973, {\it Cluster Analysis for Applications},
   Academic Press, New York.
-\item Evritt, B., 1980, {\it Cluster Analysis}, Heinemann Educational Books, 
+\item Evritt, B., 1980, {\it Cluster Analysis}, Heinemann Educational Books,
   London.
 \item Gordon, A.D., 1981, {\it Classification}, Chapman and Hall, London.
 \item Hartigan, J.A., 1975, {\it Clustering Algorithms}, Wiley, New York.
 \item Heck, A., Murtagh, F., and Ponz, D., 1985, {\it The Messenger},
   No. 41, 22.
-\item Kendall, M., 1980, {\it Multivariate Analysis}, Charles Griffin \& 
+\item Kendall, M., 1980, {\it Multivariate Analysis}, Charles Griffin \&
   Co.Ltd., London.
 \item Murtagh, F., 1986, {\it Data Analysis and Astronomy}, Plenum Press,
   New York.

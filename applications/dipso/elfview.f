@@ -38,7 +38,7 @@
         IF(NFS.GT.NUMFIT) THEN
           SUBCHK = 2
           WRITE (*,
-     :    '(''   '',A,'':  only'',I3,'' fits stored'')') 
+     :    '(''   '',A,'':  only'',I3,'' fits stored'')')
      :    SUBCMD(1:SLEN(SUBCMD)), NUMFIT
           RETURN
         ENDIF

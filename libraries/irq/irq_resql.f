@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -214,7 +214,7 @@
 *  the quality on entry to this routine.
       IF( BIT .EQ. 0 ) THEN
          CALL IRQ1_RBIT( LOCS, BIT, STATUS )
-         CALL IRQ1_QSET( BIT, .TRUE., NEL, %VAL( CNF_PVAL( PNT ) ), 
+         CALL IRQ1_QSET( BIT, .TRUE., NEL, %VAL( CNF_PVAL( PNT ) ),
      :                   STATUS )
       END IF
 
@@ -224,7 +224,7 @@
      :                UBND, NEL, %VAL( CNF_PVAL( PNT ) ), STATUS )
 
 *  Count the number of pixels for which the bit is set or clear.
-      CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ), 
+      CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ),
      :                SET, CLEAR, STATUS )
 
 *  Unmap the QUALITY array.

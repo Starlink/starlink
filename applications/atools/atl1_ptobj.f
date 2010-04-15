@@ -4,7 +4,7 @@
 *     ATL1_PTOBJ
 
 *  Purpose:
-*     Put an AST Object into an NDF or text file using an environment 
+*     Put an AST Object into an NDF or text file using an environment
 *     parameter.
 
 *  Language:
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,8 +90,8 @@
       INTEGER INDF
       INTEGER NAX
       INTEGER NDIM
-      INTEGER PLACE           
-      INTEGER IPAR               
+      INTEGER PLACE
+      INTEGER IPAR
 *.
 
 *  Check the inherited global status.
@@ -109,23 +109,23 @@
       CALL PAR_GET0C( PARAM, FILE, STATUS )
 
 *  If the object is a FrameSet, it can be stored in an NDF.
-      IF( AST_ISAFRAMESET( IAST, STATUS ) ) THEN 
- 
+      IF( AST_ISAFRAMESET( IAST, STATUS ) ) THEN
+
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to access the file as an NDF.
-         CALL NDF_OPEN( DAT__ROOT, FILE, 'UPDATE', 'OLD', INDF, PLACE, 
-     :                  STATUS ) 
+         CALL NDF_OPEN( DAT__ROOT, FILE, 'UPDATE', 'OLD', INDF, PLACE,
+     :                  STATUS )
 
 *  If successfull..
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Check that the Base Frame in the FrameSet has Domain GRID.
-            DOM = AST_GETC( AST_GETFRAME( IAST, AST__BASE, STATUS ), 
+            DOM = AST_GETC( AST_GETFRAME( IAST, AST__BASE, STATUS ),
      :                      'Domain', STATUS )
 
-            IF( .NOT. CHR_SIMLR( DOM, 'GRID' ) .AND. 
+            IF( .NOT. CHR_SIMLR( DOM, 'GRID' ) .AND.
      :          STATUS .EQ. SAI__OK ) THEN
 
                CALL NDF_ANNUL( INDF, STATUS )
@@ -141,7 +141,7 @@
 *  Check the Base Frame in the FrameSet has the correct number of axes.
             CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
             NAX = AST_GETI( IAST, 'Nin', STATUS )
-   
+
             IF( NAX .NE. NDIM .AND. STATUS .EQ. SAI__OK ) THEN
                CALL NDF_ANNUL( INDF, STATUS )
                STATUS = SAI__ERROR
@@ -157,15 +157,15 @@
 *  Store the FrameSet in the NDF, and annul the identifier.
             CALL NDF_PTWCS( IAST, INDF, STATUS )
             CALL NDF_MSG( 'NDF', INDF )
-            CALL ATL_NOTIF( '   AST data written to NDF ''^NDF''.', 
+            CALL ATL_NOTIF( '   AST data written to NDF ''^NDF''.',
      :                       STATUS )
             CALL NDF_ANNUL( INDF, STATUS )
 
-*  If no NDF was found, annul the error and store the AST Object in a text 
+*  If no NDF was found, annul the error and store the AST Object in a text
 *  file.
          ELSE IF( STATUS .EQ. NDF__FILNF .OR.
      :            STATUS .EQ. DAT__OBJNF .OR.
-     :            STATUS .EQ. DAT__FILNF ) THEN 
+     :            STATUS .EQ. DAT__FILNF ) THEN
             CALL ERR_ANNUL( STATUS )
             CALL ATL_CREAT( PARAM, IAST, STATUS )
          END IF

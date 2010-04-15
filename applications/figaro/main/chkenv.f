@@ -65,7 +65,7 @@
 
              call dta_loc(string(:len1),nloc,dta_status)
              call dat_type(nloc,stype,dta_status)
-             call dta_annul(nloc,dta_status) 
+             call dta_annul(nloc,dta_status)
 
 *      If it doesn't exist we will have to create it
 

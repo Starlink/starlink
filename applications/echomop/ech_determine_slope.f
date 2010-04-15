@@ -372,7 +372,7 @@
          CALL ECH_SET_CONTEXT( 'PROBLEM', 'Bad diagonals' )
          IF ( IAND( report_mode, rpm_full +
      :        rpm_info + rpm_error ) .GT. 0 ) THEN
-            REPORT_STRING = 
+            REPORT_STRING =
      :            ' Could not locate diagonal peaks to determine slope.'
              CALL ECH_REPORT( 0, report_string )
          ENDIF

@@ -13,30 +13,30 @@
 *     CALL KPG1_ASGRD( IPLOT, IPIC, GRID, STATUS )
 
 *  Description:
-*     This routine call AST_BORDER to draw a border, or AST_GRID to draw an 
-*     annotated coordinate Grid over the supplied Plot. The current pgplot 
-*     viewport can optionally be extended prior to drawing the grid so that 
-*     it covers a specified AGI picture. If the pgplot viewport is left 
-*     matching the plotting area supplied when the Plot was created, then 
-*     certain component of the grid (i.e. exterior tick marks), are clipped 
-*     by pgplot. To avoid this, IPIC should normally be given as the AGI 
+*     This routine call AST_BORDER to draw a border, or AST_GRID to draw an
+*     annotated coordinate Grid over the supplied Plot. The current pgplot
+*     viewport can optionally be extended prior to drawing the grid so that
+*     it covers a specified AGI picture. If the pgplot viewport is left
+*     matching the plotting area supplied when the Plot was created, then
+*     certain component of the grid (i.e. exterior tick marks), are clipped
+*     by pgplot. To avoid this, IPIC should normally be given as the AGI
 *     identifier for the FRAME picture containing the plot.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
-*        An AST pointer to the Plot. 
+*        An AST pointer to the Plot.
 *     IPIC = INTEGER (Given)
 *        An AGI identifier for the FRAME picture. Supply this as -1 if the
 *        current pgplot viewport is not to be changed.
 *     GRID = LOGICAL (Read)
-*        Draw a grid using AST_GRID? If .FALSE. then a border only is drawn 
+*        Draw a grid using AST_GRID? If .FALSE. then a border only is drawn
 *        (using AST_BORDER).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  The PGPLOT interface to the AGI library should be opened before
-*     calling this routine.  
+*     calling this routine.
 
 *  Copyright:
 *     Copyright (C) 1998, 2000 Central Laboratory of the Research Councils.
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *        Allow user to prevent annotation of unused DSBSpecFrame axis
 *        using the pseudo-attribute "DrawDSB".
 *     20-JUL-2006 (DSB):
-*        Do not annotate the "other" sideband if the current sideband is 
+*        Do not annotate the "other" sideband if the current sideband is
 *        LO (offset from local oscillator).
 *     20-JUL-2006 (TIMJ):
 *        Can not obtain the SideBand in the same IF clause that checks
@@ -90,14 +90,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'AST_ERR'          ! AST error constants 
+      INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -112,11 +112,11 @@
 
 *  Local Variables:
       CHARACTER AEDGE*8            ! Name of Edge attribute to use
-      CHARACTER AGAP*15            ! Value of TextGap attribute 
+      CHARACTER AGAP*15            ! Value of TextGap attribute
       CHARACTER ASB*8              ! Name of SideBand attribute to use
       CHARACTER TEXT*250           ! Attribute settings for second plot
-      CHARACTER VEDGE*10           ! Value of Edge attribute 
-      CHARACTER VSB*10             ! Value of SideBand attribute 
+      CHARACTER VEDGE*10           ! Value of Edge attribute
+      CHARACTER VSB*10             ! Value of SideBand attribute
       DOUBLE PRECISION VGAP        ! Value for TitleGap
       INTEGER AX                   ! Pointer to an axis of Plot's current Frame
       INTEGER IAT                  ! Used length of TEXT
@@ -145,7 +145,7 @@
       REAL Y2                      ! Y NDC coord at top of original viewport
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin as AST context.
@@ -166,7 +166,7 @@
          CALL AGI_ICURP( IPIC0, STATUS )
          CALL AGI_SELP( IPIC, STATUS )
 
-*  Set the pgplot viewport and window so that they correspond to the 
+*  Set the pgplot viewport and window so that they correspond to the
 *  supplied picture.
          CALL AGP_NVIEW( .FALSE., STATUS )
 
@@ -177,7 +177,7 @@
          CALL PGQVP( 0, AX1, AX2, AY1, AY2 )
 
 *  Determine the size of the PGPLOT window covering the supplied picture.
-         IF( X2 .NE. X1 .AND. Y2 .NE. Y1 .AND. 
+         IF( X2 .NE. X1 .AND. Y2 .NE. Y1 .AND.
      :       STATUS .EQ. SAI__OK ) THEN
 
             A = ( PXR - PXL )/( X2 - X1 )
@@ -196,24 +196,24 @@
       END IF
 
 *  Simplify the Plot. This adds a new Current Frame into the Plot, so
-*  take a deep copy of it first. This can help to speed up the drawing, 
-*  and also avoids the possibility of the Mapping going via a Frame in 
+*  take a deep copy of it first. This can help to speed up the drawing,
+*  and also avoids the possibility of the Mapping going via a Frame in
 *  which the positions are undefined.
       IPLOT2 = AST_COPY( IPLOT, STATUS )
       CALL KPG1_ASSIM( IPLOT2, STATUS )
 
 *  Draw the grid or border within a PGPLOT buffering context.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          CALL PGBBUF
 
-*  See if the current Frame of the Plot contains a DSBSpecFrame, noting the 
+*  See if the current Frame of the Plot contains a DSBSpecFrame, noting the
 *  names of the relevant attributes is a DSBSpecFrame is found. If the
 *  horizontal axis is represented by a DSBSpecFrame, then the title gap
 *  needs to be increased in order to make room for the axis annotation on
 *  the upper edge.
          TEXT = ' '
          IAT = 0
-         CALL CHR_APPND( 'Grid=0,Tickall=0,DrawTitle=0,DrawAxes=0,', 
+         CALL CHR_APPND( 'Grid=0,Tickall=0,DrawTitle=0,DrawAxes=0,',
      :                   TEXT, IAT )
 
          AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
@@ -236,20 +236,20 @@
             ASB = 'SideBand(1)'
             AGAP = 'TextLabGap(1)'
             CALL CHR_APPND( 'NumLab(2)=0,TextLab(2)=0', TEXT, IAT )
-         
+
             VGAP = AST_GETD( IPLOT2, AGAP, status )
             CALL AST_SETD( IPLOT2, 'TitleGap', 2.5*VGAP, STATUS )
             CALL AST_SET( IPLOT2, 'TickAll=0', STATUS )
 
          ELSE
             AX = AST_PICKAXES( IPLOT2, 1, 2, MAP, STATUS )
-            IF( KPG1_GETASTDSB() .AND. 
+            IF( KPG1_GETASTDSB() .AND.
      :          AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
                AEDGE = 'Edge(2)'
                ASB = 'SideBand(2)'
                AGAP = 'TextLabGap(2)'
                CALL CHR_APPND( 'NumLab(1)=0,TextLab(1)=0', TEXT, IAT)
-   
+
                VGAP = AST_GETD( IPLOT2, AGAP, status )
                CALL AST_SETD( IPLOT2, 'TitleGap', 2.5*VGAP, STATUS )
                CALL AST_SET( IPLOT2, 'TickAll=0', STATUS )
@@ -265,10 +265,10 @@
             CALL AST_GRID( IPLOT2, STATUS )
 
 *  If a DSBSpecFrame was found, and the labelling is exterior, we will
-*  draw a second grid annotating the other side band. Take a copy 
+*  draw a second grid annotating the other side band. Take a copy
 *  of the plot so that we do not change it.
-            IF( AEDGE .NE. ' ' .AND. AST_GETC( IPLOT2, 'Labelling', 
-     :                                         STATUS ) 
+            IF( AEDGE .NE. ' ' .AND. AST_GETC( IPLOT2, 'Labelling',
+     :                                         STATUS )
      :                               .EQ. 'exterior' ) THEN
 
 *  Switch off drawing off everything to do with the other axis.
@@ -289,7 +289,7 @@
                ELSE IF( VEDGE .EQ. 'top' ) THEN
                   VEDGE = 'bottom'
 
-               ELSE 
+               ELSE
                   VEDGE = 'top'
                END IF
 
@@ -300,7 +300,7 @@
                CALL CHR_LCASE( VSB )
                IF( VSB .EQ. 'usb' ) THEN
                   VSB = 'lsb'
-               ELSE 
+               ELSE
                   VSB = 'usb'
                END IF
 
@@ -320,9 +320,9 @@
             CALL ERR_REP( 'KPG1_ASGRD_ERR1', 'This problem may '//
      :         'possibly be overcome by using WCSFRAME to change '//
      :         'the current WCS co-ordinate Frame in the data, or by '//
-     :         ' changing the program parameter values being used.', 
+     :         ' changing the program parameter values being used.',
      :         STATUS )
-         END IF 
+         END IF
          CALL PGEBUF
       END IF
 

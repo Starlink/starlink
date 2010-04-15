@@ -27,7 +27,7 @@ if ($^O eq 'solaris') {
 # Locate the GSD library list
 my $gsdlibs = `gsd_link`;
 
-die "No GSD libraries were found.\n This may imply that the gsd_link command is not in your path." 
+die "No GSD libraries were found.\n This may imply that the gsd_link command is not in your path."
    if $gsdlibs !~ /./;
 
 my $arrays = "";

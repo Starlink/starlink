@@ -20,40 +20,40 @@
 *        The global status.
 
 *  Description:
-*     This application creates a new CmpMap and optionally initialises its 
-*     attributes. A CmpMap is a compound Mapping which allows two component 
-*     Mappings (of any class) to be connected together to form a more complex 
-*     Mapping. This connection may either be "in series" (where the first 
+*     This application creates a new CmpMap and optionally initialises its
+*     attributes. A CmpMap is a compound Mapping which allows two component
+*     Mappings (of any class) to be connected together to form a more complex
+*     Mapping. This connection may either be "in series" (where the first
 *     Mapping is used to transform the coordinates of each point and the
 *     second mapping is then applied to the result), or "in parallel" where
-*     one Mapping transforms the earlier coordinates for each point and the 
-*     second Mapping simultaneously transforms the later coordinates). 
+*     one Mapping transforms the earlier coordinates for each point and the
+*     second Mapping simultaneously transforms the later coordinates).
 *
 *     Since a CmpMap is itself a Mapping, it can be used as a component in
-*     forming further CmpMaps. Mappings of arbitrary complexity may be built 
-*     from simple individual Mappings in this way. 
+*     forming further CmpMaps. Mappings of arbitrary complexity may be built
+*     from simple individual Mappings in this way.
 
 *  Usage:
 *     cmpmap map1 map2 series options result
 
 *  ADAM Parameters:
-*     MAP1 = LITERAL (Read) 
-*        An NDF or text file holding the first component Mapping If an NDF 
-*        is supplied, the Mapping from the Base Frame to the Current Frame 
+*     MAP1 = LITERAL (Read)
+*        An NDF or text file holding the first component Mapping If an NDF
+*        is supplied, the Mapping from the Base Frame to the Current Frame
 *        of its WCS FrameSet will be used.
-*     MAP2 = LITERAL (Read) 
-*        An NDF or text file holding the second component Mapping If an NDF 
-*        is supplied, the Mapping from the Base Frame to the Current Frame 
+*     MAP2 = LITERAL (Read)
+*        An NDF or text file holding the second component Mapping If an NDF
+*        is supplied, the Mapping from the Base Frame to the Current Frame
 *        of its WCS FrameSet will be used.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new CmpMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new CmpMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new CmpMap.
 *     SERIES = _LOGICAL (Read)
 *        If a true value is given for this parameter, the two component
-*        Mappings will be connected in series. A false value requests that 
-*        they are connected in parallel. 
+*        Mappings will be connected in series. A false value requests that
+*        they are connected in parallel.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
@@ -108,7 +108,7 @@
       LOGICAL SERIES
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

@@ -65,7 +65,7 @@ namespace eval ::gaia3d {
            [string match "Alt*" $keysym] } {
          return
       }
-      
+
       #  A 7 is really a 3 (rebound in GAIA), that's switch to stereo mode.
       if { $keysym == "7" } {
          set keysym 3

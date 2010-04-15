@@ -6,8 +6,8 @@
 *   X S Y M B O L
 *  - - - - - -
 *
-*  Plots input array (X,Y) using one of a range of symbols 
-*  A symbol's co-ords are generated, and then drawn by GKS/SGS and 
+*  Plots input array (X,Y) using one of a range of symbols
+*  A symbol's co-ords are generated, and then drawn by GKS/SGS and
 *  optionally filled.
 *
 *  Given:
@@ -15,7 +15,7 @@
 *    NPTS      i      No. of points in array
 *    N         i      Symbol sides (see below)
 *    STYLE     i      Symbol style (see below)
-*    FILL      l      True if symbols are required to be filled. 
+*    FILL      l      True if symbols are required to be filled.
 *                     False for empty symbols
 *    EXPAND    r      Factor by which symbol size is multiplied
 *    ANGLE     r      Angle in radians by which symbols are rotated
@@ -32,9 +32,9 @@
 
 *  STYLE is     1 -- polygons (large N generates a circle)
 *               2 -- Star
-*               3 -- Asterix 
+*               3 -- Asterix
 *               4 -- Arrow (For this option NSIDES is irrelevant)
-*  
+*
 ** The symbols will be filled or empty (if appropriate) according to whether
 *  FILL is true or false
 
@@ -51,7 +51,7 @@
       REAL EXPAND,ANGLE
       INTEGER NS1
 
-*    IPAL           Colour index 
+*    IPAL           Colour index
 *    COLOUR         True if device supports colour, false otherwise
       LOGICAL COLOUR
       INTEGER IPAL
@@ -64,10 +64,10 @@
       INTEGER GSOLID
 
 
-*  ASPRATIO is  Aspect ratio of current device 
+*  ASPRATIO is  Aspect ratio of current device
 *  (This is used to ensure symbols have same appearance regardless of device)
 *  GRIDRATIO is Aspect ratio of current grid window
-*  (This is used to ensure symbols have same appearance regardless of shape 
+*  (This is used to ensure symbols have same appearance regardless of shape
 *   of grid window)
 
       REAL ASPRATIO,GRIDRATIO,XYRATIO
@@ -82,7 +82,7 @@
 
 
 *****************************************************************************
-*    
+*
 *   Inquire polymarker colour index
       CALL GQPMCI(IERROR,IPAL)
       IF(IERROR.NE.0)GOTO 999
@@ -109,7 +109,7 @@
         CALL SNX_TO('SGS')
 
 ** Draw the symbols
-  
+
          DO I=1,NPTS
             XX=SNX_AGUGX(X(I))
             YY=SNX_AGUGY(Y(I))

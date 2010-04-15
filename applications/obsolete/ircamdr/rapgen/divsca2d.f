@@ -1,7 +1,7 @@
 
 *+  DIVSCA2D - divide every pixel of a 2-d array by a scalar
 
-      SUBROUTINE DIVSCA2D ( INARRAY, DIMS1, DIMS2, SCALAR, OUTARRAY, 
+      SUBROUTINE DIVSCA2D ( INARRAY, DIMS1, DIMS2, SCALAR, OUTARRAY,
      :                      STATUS )
 
 *    Description :
@@ -77,7 +77,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J             ! counter variables 
+     :   I, J             ! counter variables
 
 *-
 *    check status on entry - return if not o.k.
@@ -119,12 +119,12 @@
                OUTARRAY( I, J )  =  INARRAY( I, J ) / SCALAR
 
             END DO
-  
+
          END DO
 
-*    end of if-scalar-is-too-small check 
+*    end of if-scalar-is-too-small check
       END IF
 
-         
+
 *    return
       END

@@ -40,7 +40,7 @@ C
 C  External variables used:
 C     Only common variables internal to the DSA routines.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DTA_RNVAR, DTA_CVYAR, DTA_DLVAR, DSA__CREATE_EXTRA, DSA__CREATE_AXIS,
 C     DSA__DELETE_AXIS
 C
@@ -64,7 +64,7 @@ C     DSA__DELETE_AXIS  Delete everything in a given axis structure.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -107,7 +107,7 @@ C     Operation is different for the two formats.
 C
       IF (NDF_FORMAT(REF_SLOT)) THEN
 C
-C        NDF format.  Axis information is held in an element of a 
+C        NDF format.  Axis information is held in an element of a
 C        structure array, so this can't be handled by a rename operation,
 C        is has to be by an actual copy and delete.  We use structures
 C        called `file.MORE.FIGARO.SAVE_AXISn' to save the data - these are
@@ -136,7 +136,7 @@ C
             CALL DTA_DLVAR (FROM,DTA_STATUS)
          END IF
       ELSE
-C        
+C
 C        Original Figaro format.  Axis structures are individual sub-
 C        structures, and the whole save or restore operation is just a
 C        rename.  First generate 'FROM' and 'TO', using MODE.

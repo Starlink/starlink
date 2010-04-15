@@ -14,7 +14,7 @@
 *                   of the string supplied is shorter.
 *
 *   This routine only works correctly between 1970 and 2070 because the posix
-*   time routine does not return a century number.      
+*   time routine does not return a century number.
 *
 *   D.L.Terrett  Starlink  Apr 1991
 *+
@@ -30,11 +30,11 @@
       INTEGER HOUR, MINS, SEC, DAY, MONTH, YEAR, WDAY, YDAY, IDST
       INTEGER ISTRCT
       CHARACTER*17 LOCAL
-      
+
       CHARACTER*3 MON(0:11)
       DATA MON/ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
      :          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'/
-      
+
       STRING = ' '
       L = MIN(17,LEN(STRING))
 
@@ -43,7 +43,7 @@
       CALL PSX_TIME(TICKS, ISTAT)
 
 *   Convert to calander date
-      CALL PSX_LOCALTIME(  TICKS, SEC, MINS, HOUR, DAY, MONTH, YEAR, 
+      CALL PSX_LOCALTIME(  TICKS, SEC, MINS, HOUR, DAY, MONTH, YEAR,
      :                     WDAY, YDAY, IDST, ISTRCT, ISTAT)
 
 *   Add the appropriate century to the year
@@ -51,10 +51,10 @@
       IF (YEAR.LT.1970) YEAR = YEAR + 100
 
 *   Construct character string
-      WRITE( LOCAL, '(I2,''-'',A3,''-'',I4,1X,I2,'':'',I2)' ) 
+      WRITE( LOCAL, '(I2,''-'',A3,''-'',I4,1X,I2,'':'',I2)' )
      :  DAY, MON(MONTH), YEAR, HOUR, MINS
 
 *   Copy to output string
       STRING = LOCAL
-      
+
       END

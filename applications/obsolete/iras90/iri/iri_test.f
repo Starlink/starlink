@@ -18,7 +18,7 @@
 *  Description:
 *     This program tests the installation of the IRAS90 image handling
 *     package (IRI_). Note, it is not an exhaustive test of the
-*     IRI_ system itself. The default diretory at the time this test 
+*     IRI_ system itself. The default diretory at the time this test
 *     program is run must contain the file IRI_TEST.SDF.
 
 *  Authors:
@@ -81,7 +81,7 @@
       CALL NDF_NEW( '_REAL', 2, LBND, UBND, PLACE, INDF, STATUS )
 
 *  Create an IRAS extension, specifying the image as a SKYFLUX map.
-      CALL IRI_NEW( INDF, 'SURVEY', 3, IRI__SKYFL, IRI__FPP, LOC, 
+      CALL IRI_NEW( INDF, 'SURVEY', 3, IRI__SKYFL, IRI__FPP, LOC,
      :              STATUS )
 
 *  Add an astrometry structure.

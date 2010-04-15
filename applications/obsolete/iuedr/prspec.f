@@ -3,7 +3,7 @@
 *+
 *  Name:
 *     SUBROUTINE PRSPEC
- 
+
 *  Purpose:
 *     Print spectrum information.
 
@@ -43,7 +43,7 @@
 
 *  Status:
       INTEGER STATUS        ! Global status.
- 
+
 *  External References:
       LOGICAL STR_SIMLR     ! caseless string equality
 
@@ -54,7 +54,7 @@
 *  Local Variables:
       REAL*8 W1S(100)       ! calibrated start wavelengths
       REAL*8 W2S(100)       ! calibrated end wavelengths
- 
+
       INTEGER I             ! loop index
       INTEGER I1            ! loop index
       INTEGER I2            ! loop limit
@@ -67,17 +67,17 @@
 
 *   Avoid saying nothing
       IF (NOSPEC .OR. NORDER.LE.0) RETURN
- 
+
 *   Banner
       CALL LINE_WCONT('%p%2w Uncalibrated Spectrum:\\')
       CALL PRTBUF( STATUS )
- 
+
 *   Create wavelength ranges
       DO I = 1, NORDER
          W1S(I) = WAV1S(I)
          W2S(I) = WAV2S(I)
       END DO
- 
+
 *   Calibrate wavelength ranges
       IF (STR_SIMLR('HIRES\\', RESOL)) THEN
          DO I = 1, NORDER
@@ -90,7 +90,7 @@
             CALL CAWAV(ORDERS(I), 0, 1, W2S(I))
          END DO
       END IF
- 
+
 *   Print list
       IF (STR_SIMLR('HIRES\\', RESOL)) THEN
          CALL LINE_WCONT('%p%4w Orders and Wavelengths:\\')
@@ -128,7 +128,7 @@
 
       CALL LINE_WCONT('%p%4w end.\\')
       CALL PRTBUF( STATUS )
- 
+
 *   End
       CALL LINE_WCONT('%p%2w end.\\')
       CALL PRTBUF( STATUS )

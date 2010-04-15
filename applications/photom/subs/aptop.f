@@ -127,7 +127,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -171,7 +171,7 @@
 *  Local Variables :
       LOGICAL CENTRO, CLEAR, CONCEN, MORE, POSTVE, SGSOFF, MAGS,
      :        IMGDIS, OPTIMA
-     
+
       INTEGER BZONE, FIN, FMSK, FOUT, GSIZE, I, IDIMS( 2 ), IG, INDEX,
      :        IZONE, J, MXITER, NC, PENO, PENS, PENP, PHOTON, SEARCH,
      :        SKYEST, X1, X2, Y1, Y2
@@ -340,15 +340,15 @@
 *   Parameters to do with optimal extraction, note that we set the
 *   centroiding parameter _on_ if we're using optimal extraction
 *   and it is not already set as such
-      
-      CALL PAR_GET0L( 'OPTIMA', OPTIMA, STATUS ) 
+
+      CALL PAR_GET0L( 'OPTIMA', OPTIMA, STATUS )
       IF (OPTIMA .AND. (.NOT. CENTRO)) THEN
       	  CENTRO = .NOT. CENTRO
           CALL PAR_PUT0L( 'CENTRO', CENTRO, STATUS )
       ENDIF
       CALL PAR_GET0R( 'CLIP', CLIP, STATUS )
       CALL PAR_GET0R( 'SEE', SEE, STATUS )
-      
+
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Get the inner and outer radii of the concentric sky aperture
@@ -371,8 +371,8 @@
       CALL PAR_GET0R( 'MAXSHIFT', MXSHFT, STATUS )
       CALL PAR_GET0I( 'MAXITER', MXITER, STATUS )
       CALL PAR_GET0R( 'TOLER', TOLER, STATUS )
-     
-      
+
+
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Print out the help message to begin with
@@ -388,7 +388,7 @@
   30  CONTINUE
 
 *   Get the command from the parameter system
-      
+
          CALL PAR_GET0C( 'COMMAND', TEXT, STATUS )
          COMMAND = TEXT( 1:1 )
          IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -423,7 +423,7 @@
 *   Find the centroid of the chosen object before doing the photometry
 *   This is a toggle switch.
          ELSEIF ( ( COMMAND .EQ. 'C' ) .OR. ( COMMAND .EQ. 'c' ) ) THEN
-	 
+
 *   Optimal extraction really does require centroiding if selecting
 *   star positions using a cursor, PSF is rather critical to the proceedure
 	    IF( OPTIMA .AND. CENTRO) THEN
@@ -448,7 +448,7 @@
 *   Report the change to the parameter system
                CALL PAR_PUT0L( 'CENTRO', CENTRO, STATUS )
 	    ENDIF
-	       
+
 
 ***************
 * COMMAND = E *
@@ -506,7 +506,7 @@
      :                        INSL, INSR, POLY, CENTRO, SEARCH, POSTVE,
      :                        MXSHFT, MXITER, TOLER, PADU, MAGS, SKYMAG,
      :                        SKYEST, SKY, SKYSIG, PHOTON, BIASLE,
-     :                        SATURE, ETIME, FIN, FOUT, 
+     :                        SATURE, ETIME, FIN, FOUT,
      :                        OPTIMA, CLIP, SEE, STATUS )
 
 *   Otherwise get some temporary workspace for an aperture of this size
@@ -518,16 +518,16 @@
                   IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Clear the workspace array and pass it to the photometry routine
-                  CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1, 
+                  CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1,
      :                         GSIZE, 1, GSIZE )
                   CALL AUTOM( NE, ELLIPS, A, A2, A3, E, THETA, NX, NY,
-     :                        ORIGIN, IMAGE, ISVAR, IMVAR, 
-     :                        %VAL( CNF_PVAL( IG ) ), GSIZE, MASK, 
-     :                        USEMSK, L, R, YLIST, LYLIST, RYLIST, 
-     :                        INSL, INSR, POLY, CENTRO, SEARCH, POSTVE, 
-     :                        MXSHFT, MXITER, TOLER, PADU, MAGS, 
-     :                        SKYMAG, SKYEST, SKY, SKYSIG, PHOTON, 
-     :                        BIASLE, SATURE, ETIME, FIN, FOUT, 
+     :                        ORIGIN, IMAGE, ISVAR, IMVAR,
+     :                        %VAL( CNF_PVAL( IG ) ), GSIZE, MASK,
+     :                        USEMSK, L, R, YLIST, LYLIST, RYLIST,
+     :                        INSL, INSR, POLY, CENTRO, SEARCH, POSTVE,
+     :                        MXSHFT, MXITER, TOLER, PADU, MAGS,
+     :                        SKYMAG, SKYEST, SKY, SKYSIG, PHOTON,
+     :                        BIASLE, SATURE, ETIME, FIN, FOUT,
      :                        OPTIMA, CLIP, SEE, STATUS )
 
 *   Annul the workspace
@@ -579,20 +579,20 @@
             TEXT = 'Xtraction - Toggle between doing optimal and '//
      :             'aperture photometry'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-     
+
 ***************
 * COMMAND = I *
 ***************
 *   Alter the size and shape of the cursor
          ELSEIF ( ( COMMAND .EQ. 'I' ) .OR. ( COMMAND .EQ. 'i' ) ) THEN
-	 
+
 	    IF( OPTIMA ) THEN
 	       TEXT = 'Using optimal extraction, you need to change '//
      :                'the clipping radius'
-               CALL MSG_OUT( ' ', TEXT, STATUS )	    
+               CALL MSG_OUT( ' ', TEXT, STATUS )
 	    ELSE
                IF ( SGSOFF ) THEN
-                  CALL SETSGS ( ORIGIN, BZONE, IZONE, CLEAR, PENO, 
+                  CALL SETSGS ( ORIGIN, BZONE, IZONE, CLEAR, PENO,
      :                          PENS, PENP, IMGDIS, STATUS )
                   SGSOFF = .FALSE.
                ENDIF
@@ -604,7 +604,7 @@
                ELSEIF ( STATUS .NE. SAI__OK ) THEN
                   GOTO 99
                ELSE
-                  CALL CUSHAP ( BZONE, IZONE, CLEAR, NE, ELLIPS, 
+                  CALL CUSHAP ( BZONE, IZONE, CLEAR, NE, ELLIPS,
      :                          A, E, THETA, IMGDIS, STATUS )
                ENDIF
 	    ENDIF
@@ -644,14 +644,14 @@
 
 *   Do the photometry
                   CALL MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP,
-     :                          NE, ELLIPS, A, A2, A3, E, THETA, NX, 
-     :                          NY, ORIGIN, IMAGE, ISVAR, IMVAR, GRID, 
+     :                          NE, ELLIPS, A, A2, A3, E, THETA, NX,
+     :                          NY, ORIGIN, IMAGE, ISVAR, IMVAR, GRID,
      :                          GS, MASK, USEMSK, L, R, YLIST, LYLIST,
      :                          RYLIST, INSL, INSR, POLY, CENTRO,
      :                          CONCEN, SEARCH, POSTVE, MXSHFT, MXITER,
      :                          TOLER, PADU, MAGS, SKYMAG, SKYEST, SKY,
      :                          SKYSIG, PHOTON, BIASLE, SATURE, ETIME,
-     :                          FOUT, IMGDIS, OPTIMA, CLIP, SEE, 
+     :                          FOUT, IMGDIS, OPTIMA, CLIP, SEE,
      :                          STATUS )
 
 *   Otherwise get some temporary workspace for an aperture of this size
@@ -663,17 +663,17 @@
                   IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Clear the workspace array and pass it to the photometry routine
-                  CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 
+                  CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ),
      :                         1, GSIZE, 1, GSIZE )
                   CALL MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP,
-     :                          NE, ELLIPS, A, A2, A3, E, THETA, NX, 
-     :                          NY, ORIGIN, IMAGE, ISVAR, IMVAR, GRID, 
+     :                          NE, ELLIPS, A, A2, A3, E, THETA, NX,
+     :                          NY, ORIGIN, IMAGE, ISVAR, IMVAR, GRID,
      :                          GS, MASK, USEMSK, L, R, YLIST, LYLIST,
      :                          RYLIST, INSL, INSR, POLY, CENTRO,
      :                          CONCEN, SEARCH, POSTVE, MXSHFT, MXITER,
      :                          TOLER, PADU, MAGS, SKYMAG, SKYEST, SKY,
      :                          SKYSIG, PHOTON, BIASLE, SATURE, ETIME,
-     :                          FOUT, IMGDIS, OPTIMA, CLIP, SEE, 
+     :                          FOUT, IMGDIS, OPTIMA, CLIP, SEE,
      :                          STATUS )
 
 *   Annul the workspace
@@ -693,7 +693,7 @@
 	    IF( OPTIMA ) THEN
 	       TEXT = 'Using optimal extraction, you need to change '//
      :                'the clipping radius'
-               CALL MSG_OUT( ' ', TEXT, STATUS )	    
+               CALL MSG_OUT( ' ', TEXT, STATUS )
 	    ELSE
 	       CALL PAR_CANCL( 'SEMIM', STATUS )
                CALL PAR_CANCL( 'ECCEN', STATUS )
@@ -838,9 +838,9 @@
 ***************
 *   Output current values of parameters
          ELSEIF ( ( COMMAND .EQ. 'V' ) .OR. ( COMMAND .EQ. 'v' ) ) THEN
-            CALL OUTVAL( A, E, THETA, CENTRO, CONCEN, PADU, MAGS, 
-     :                   SKYMAG, SKYEST, SKY, SKYSIG, INNER, OUTER, 
-     :                   PHOTON, BIASLE, SATURE, ETIME, USEMSK, 
+            CALL OUTVAL( A, E, THETA, CENTRO, CONCEN, PADU, MAGS,
+     :                   SKYMAG, SKYEST, SKY, SKYSIG, INNER, OUTER,
+     :                   PHOTON, BIASLE, SATURE, ETIME, USEMSK,
      :                   OPTIMA, CLIP, SEE, STATUS )
 
 ***************
@@ -855,8 +855,8 @@
             IF ( OPTIMA ) THEN
                TEXT = 'Using optimal extraction'
                CALL MSG_OUT( ' ', TEXT, STATUS )
-	       
-*   If selecting positions via the cursor, centroiding should be on 
+
+*   If selecting positions via the cursor, centroiding should be on
 *   for optimal extraction, otherwise the program will do bad things.
 
                IF( .NOT. CENTRO ) THEN
@@ -872,7 +872,7 @@
 *   Report the change to the parameter system
             CALL PAR_PUT0L( 'OPTIMA', OPTIMA, STATUS )
             CALL PAR_PUT0L( 'CENTRO', CONCEN, STATUS )
-	    
+
 ***************
 * COMMAND =   *
 ***************

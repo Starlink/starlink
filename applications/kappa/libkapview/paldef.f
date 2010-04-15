@@ -27,7 +27,7 @@
 *     graphs etc. that are unaffected by changes to the lookup table
 *     used for images.
 *
-*     Pen 0 (the background colour) and pen 1 (the foreground colour) are 
+*     Pen 0 (the background colour) and pen 1 (the foreground colour) are
 *     set to the default values for the specified graphics device. Thus
 *     they may be white on black for an X window, but black on white for
 *     a printer. The other colours in the standard palette are:
@@ -35,7 +35,7 @@
 *     - 2: Red
 *     - 3: Green
 *     - 4: Blue
-*     - 5: Yellow 
+*     - 5: Yellow
 *     - 6: Magenta
 *     - 7: Cyan
 *     - 8 to 15: Black
@@ -48,7 +48,7 @@
 *        Name of the image display to be used.  [Current image-display device]
 
 *  Examples:
-*     paldef 
+*     paldef
 *        This loads the standard palette into the reserved portion of
 *        the colour table of the current image display.
 *     paldef xwindows
@@ -57,9 +57,9 @@
 
 *  Notes:
 *     - The effects of this command will only be immediately apparent
-*     when run on X windows which have 256 colours (or other similar 
+*     when run on X windows which have 256 colours (or other similar
 *     pseudocolour devices). On other devices (for instance, X windows
-*     with more than 256 colours) the effects will only become apparent 
+*     with more than 256 colours) the effects will only become apparent
 *     when subsequent graphics applications are run.
 
 *  Related Applications:
@@ -109,7 +109,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -127,7 +127,7 @@
 *  Local Variables:
       INTEGER I                  ! Loop counter
       INTEGER IPIC1              ! Current picture identifier
-      INTEGER UP                 ! Highest available colour index. 
+      INTEGER UP                 ! Highest available colour index.
       REAL PALETT( NPRICL, 0:CTM__RSVPN - 1 ) ! Reserved palette colours
 
 *.
@@ -135,7 +135,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Open up workstation in update mode as only some colours 
+*  Open up workstation in update mode as only some colours
 *  are to be changed.
       CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC1, STATUS )
 
@@ -143,11 +143,11 @@
 *  a suitable minimum number of colour indices, and will not reset
 *  when opened.
       CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
-     :                /'WINDOW,MATRIX_PRINTER', 'RESET', 
+     :                /'WINDOW,MATRIX_PRINTER', 'RESET',
      :                8 + CTM__RSVPN, UP, STATUS )
 
-*  Create the pre-defined palette colours. There are only CTM__RSVPN 
-*  standard colour indices that form a palette. 
+*  Create the pre-defined palette colours. There are only CTM__RSVPN
+*  standard colour indices that form a palette.
       CALL KPS1_CLPAL( CTM__RSVPN, 1, PALETT, STATUS )
 
 *  Install the palette into image-display colour table.
@@ -161,9 +161,9 @@
 *  Save the palette in the adam directory so that it can be read back
 *  again by subsequent applications (PGPLOT resets the colour palette
 *  when it opens a device, so the palette then needs to be re-instated).
-*  The first two pens ( 0 and 1, the background and foreground colours) 
+*  The first two pens ( 0 and 1, the background and foreground colours)
 *  are not saved, but reset to their default (unspecified) values. This
-*  means (for instance), that foreground text will be white on black 
+*  means (for instance), that foreground text will be white on black
 *  on an xwindow, but black on white on a printer.
       CALL KPG1_PLSAV( 2, 0, .TRUE., STATUS )
 

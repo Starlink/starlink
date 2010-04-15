@@ -89,7 +89,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
 *  Local Variables:
       LOGICAL BAD                ! Column array contains bad values?
       CHARACTER * ( 10 ) BTYPE   ! Column TFORM data type
-      CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a COLUMN structure 
+      CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a COLUMN structure
       CHARACTER * ( 3 ) CNUM     ! Column number (1-999)
       CHARACTER * ( DAT__SZNAM ) COLNAM ! Column name
       CHARACTER * ( DAT__SZLOC ) COLLOC ! Locator to the COLUMNS
@@ -143,7 +143,7 @@
       INTEGER REPEAT             ! Number of values in a field
       CHARACTER * ( 8 ) SCAKEY   ! TSCALn keyword name
       LOGICAL THERE              ! Header keyword is present?
-      CHARACTER * ( DAT__SZTYP ) TYPE ! Type of a string component 
+      CHARACTER * ( DAT__SZTYP ) TYPE ! Type of a string component
       CHARACTER * ( 70 ) UNITS   ! Units of the column
       INTEGER WIDTH              ! Width of a character field
       CHARACTER * ( 70 ) VALUE   ! Keyword value
@@ -354,25 +354,25 @@
          ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
             CALL FTGCVI( FUNITD, COLNUM, 1, 1, NV, VAL__BADW,
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
          ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
             CALL FTGCVJ( FUNITD, COLNUM, 1, 1, NV, VAL__BADI,
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
          ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNITD, COLNUM, 1, 1, NV, VAL__BADR,
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
          ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNITD, COLNUM, 1, 1, NV, VAL__BADD,
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
-      
+
          ELSE IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
             CALL FTGCVS( FUNITD, COLNUM, 1, 1, NV, ' ',
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT,
-     :                   %VAL( CNF_CVAL( 1 ) ), 
+     :                   %VAL( CNF_CVAL( 1 ) ),
      :                   %VAL( CNF_CVAL( WIDTH ) ) )
-      
+
          END IF
 
 *  Tidy the locator to the DATA component.

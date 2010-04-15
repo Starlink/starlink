@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     To open the log file system and write out the task introduction.
-*     This routine must be the first call in any geniune CCDPACK 
+*     This routine must be the first call in any geniune CCDPACK
 *     application.
 
 *  Language:
@@ -23,7 +23,7 @@
 *     using these routines. The TASK name is also output.
 *
 *     An additional function of this routine is also to initialise any
-*     CCDPACK common blocks (note these are initialised here may also 
+*     CCDPACK common blocks (note these are initialised here may also
 *     be initialised during the the first call of the the appropriate
 *     routines. In these cases the initialisation here is to ensure
 *     that close down routines do not act inappropriately).
@@ -87,7 +87,7 @@
 *  Global Variables:
       INCLUDE 'CCD1_MEMCM'       ! Dynamic memory common block
 *        CCD1_MEMCM( CCD1__MXPNT ) = INTEGER (Write)
-*           Array of pointers to any data which is allocated by the 
+*           Array of pointers to any data which is allocated by the
 *           virtual memory allocation routines. These are initialised
 *           to -1.
 
@@ -96,7 +96,7 @@
 *           Array of pointers to any data which is allocated by the disk
 *           resident and mapping routines. Initialised to -1
 *        CCD1_TMPLO( CCD1__MXPNT ) = CHARACTER (Write)
-*           Array of locators to any data objects created by the disk 
+*           Array of locators to any data objects created by the disk
 *           resident memory allocation routines. Initialised to DAT__NOLOC.
 
 *  Arguments Given:
@@ -142,7 +142,7 @@
 
 *  Intialise the memory allocation routines common blocks. These
 *  initialisations are optional as they are repeated in the first
-*  call of the allocation routine. Initialisation here stops 
+*  call of the allocation routine. Initialisation here stops
 *  inappropriate actions on -1 returns to the closure mechanisms
 *  when the exit status is good but no allocation have actually been
 *  made.
@@ -151,7 +151,7 @@
       DO 1 I = 1, CCD1__MXPNT
          CCD1_MEMCM( I ) = -1
  1    CONTINUE
-     
+
 *  Disk resident - mapped memory.
       DO 2 I = 1, CCD1__MXPNT
          CCD1_TMPPO( I ) = -1

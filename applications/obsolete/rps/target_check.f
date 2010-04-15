@@ -1,21 +1,21 @@
-*+TARGET_CHECK     Gives a few details on a potential target 
+*+TARGET_CHECK     Gives a few details on a potential target
 *     1993 June         P. Brisco       Recompile with new com_form_files.inc
 *					for the help file where the logical is
 *					defined.
 *---------------------------------------------------------------------------
       SUBROUTINE TARGET_CHECK
- 
+
       IMPLICIT NONE
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'
       INCLUDE 'zpidata.inc'
- 
+
       LOGICAL SMG			! True if smg mode
       COMMON /SMG_KEEP/ SMG
       INTEGER PBID			! Pasteboard Ident
       COMMON / SMG_PANDK / PBID
- 
+
       CHARACTER*8 HELPLIB
       COMMON / HELP_LIB_NAME / HELPLIB
       DOUBLE PRECISION DECLONG, DECLAT
@@ -24,7 +24,7 @@
 *  Functions
       INTEGER MDH_ENDWORD
       REAL WFC_SENS, WFC_SURV, XRT_SURV
- 
+
 *  Local Variables
       INTEGER WIDTH /80/
       INTEGER NCHAR, NVIS_PERIODS, NTEXT, ITEXT, STATUS
@@ -63,7 +63,7 @@
             GOTO 90
          END IF
 
-         IF (NCHAR .EQ. 0) THEN 
+         IF (NCHAR .EQ. 0) THEN
             GOTO 90
          ELSE
             CALL RA_CONVERT(TARG_RA, RA, LSTATUS )
@@ -93,7 +93,7 @@
          END IF
 
          NCHAR = MDH_ENDWORD(TARG_DEC)
-         IF (NCHAR .EQ. 0) THEN 
+         IF (NCHAR .EQ. 0) THEN
             GOTO 90
          ELSE
             CALL DEC_CONVERT(TARG_DEC, DEC, LSTATUS )
@@ -133,7 +133,7 @@
          NTEXT = NTEXT + 1
          WRITE( CTEXT(NTEXT), '(A,F6.4,A)') '    ::         ::   detectable    ', DETCTS , ' cps'
       END IF
-  
+
       DO ITEXT = 1,NTEXT
          WRITE( *, '(A)' ) ' '//CTEXT(ITEXT)
       END DO
@@ -142,5 +142,5 @@
 
 
 90    CONTINUE
-  
+
       END

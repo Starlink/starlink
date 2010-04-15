@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,19 +61,19 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
-      INCLUDE 'ARD_CONST'        ! ARD private constants 
-      
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'ARD_CONST'        ! ARD private constants
+
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
 *        CMN_AGRP = INTEGER (Read)
 *           GRP identifier for group holding AST_ data.
 *        CMN_ASTLN = INTEGER (Read and Write)
 *           Next element to use in the group holding AST_ data.
-      
+
 *  Global Status:
-      INTEGER STATUS             
+      INTEGER STATUS
 
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
@@ -122,8 +122,8 @@
          IF ( L .GT. 0 ) THEN
             FLAG = ' '
 
-*  Loop to write the text into the group as a sequence of lines of length 
-*  one less than the max. number of characters in each group element (the 
+*  Loop to write the text into the group as a sequence of lines of length
+*  one less than the max. number of characters in each group element (the
 *  first character of each line is reserved for use as a flag character).
             DO 1 I1 = 1, L, ASTTSZ - 1
 

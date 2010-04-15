@@ -14,16 +14,16 @@
 *     CALL POL1_ANGRT( IWCS, XC, YC, ANGROT, STATUS )
 
 *  Description:
-*     This routine returns the anti-clockwise angle in degrees from the 
-*     positive X axis (i.e. the first pixel axis) to the reference direction 
+*     This routine returns the anti-clockwise angle in degrees from the
+*     positive X axis (i.e. the first pixel axis) to the reference direction
 *     for the created Stokes vectors.
 *
 *     If a SkyFrame can be found in the supplied FrameSet, then the
-*     reference direction is the direction of increasing latitude at the 
-*     supplied pixel co-ordinates. If no SkyFrame can be found, the 
+*     reference direction is the direction of increasing latitude at the
+*     supplied pixel co-ordinates. If no SkyFrame can be found, the
 *     reference direction is the positive Y axis (i.e. the second pixel
 *     axis). Note, the current Frame is checked first. This means that
-*     the specific flavour of "north" can be selected by setting the 
+*     the specific flavour of "north" can be selected by setting the
 *     Current Frame (e.g. to a galactic, equatorial or ecliptic Frame).
 
 *  Arguments:
@@ -41,7 +41,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants
 
 *  Arguments Given:
-      INTEGER IWCS 
+      INTEGER IWCS
       REAL XC
       REAL YC
 
@@ -91,7 +91,7 @@
       DOUBLE PRECISION P2( NDF__MXDIM )   ! Co-ordinates at a second point
       INTEGER CMPT               ! The search template
       INTEGER DEFT               ! A Frame used within the search template
-      INTEGER FSET               ! Pointer to a FrameSet 
+      INTEGER FSET               ! Pointer to a FrameSet
       INTEGER I                  ! Loop count
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER ICURR              ! Index of original Current Frame
@@ -117,12 +117,12 @@
 *  Attempt to find a Frame with Domain PIXEL in the supplied FrameSet.
 *  Set MaxAxes large so that we pick up PIXEL Frames with any number of axes
 *  (e.g. specpol data has more than 2 pixel axes).
-      IF( AST_FINDFRAME( IWCS, AST_FRAME( 2, 'MAXAXES=100', STATUS ), 
+      IF( AST_FINDFRAME( IWCS, AST_FRAME( 2, 'MAXAXES=100', STATUS ),
      :                   'PIXEL', STATUS ) .NE. AST__NULL ) THEN
 
 *  AST_FINDFRAME will have made the PIXEL Frame the Current Frame. Make
 *  it the Base Frame also.
-         CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', 
+         CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT',
      :                                          STATUS ), STATUS )
 
 *  Create a template CmpFrame which will match a SkyFrame or a CmpFrame
@@ -139,13 +139,13 @@
 
 *  The FrameSet returned by AST_FINDFRAME will have the PIXEL Frame as the
 *  Base Frame, and the Current Frame will look like the template Frame -
-*  specifically, axes 1 and 2 will be sky longitude and latitude. Note the 
+*  specifically, axes 1 and 2 will be sky longitude and latitude. Note the
 *  number of Base and Current Frame axes.
             NIN = AST_GETI( FSET, 'NIN', STATUS )
             NOUT = AST_GETI( FSET, 'NOUT', STATUS )
 
 *  Now transform the supplied central pixel position into the SkyFrame.
-*  Also transform another point about one pixel away from the supplied 
+*  Also transform another point about one pixel away from the supplied
 *  position. Any extra pixel axes (3 and above) are assigned the value zero.
 *  The value on these extra axes should make no difference since the sky
 *  axes should be independant of the others.
@@ -163,12 +163,12 @@
      :                      STATUS )
 
 *  Check that the transformed positions are defined.
-            IF( OUT( 1, 1 ) .NE. AST__BAD .AND. 
+            IF( OUT( 1, 1 ) .NE. AST__BAD .AND.
      :          OUT( 1, 2 ) .NE. AST__BAD .AND.
      :          OUT( 2, 1 ) .NE. AST__BAD .AND.
      :          OUT( 2, 2 ) .NE. AST__BAD ) THEN
 
-*  Get the arc distance between the two points. Assign zero to any extra 
+*  Get the arc distance between the two points. Assign zero to any extra
 *  axes.
                P1( 1 ) = OUT( 1, 1 )
                P1( 2 ) = OUT( 1, 2 )
@@ -181,21 +181,21 @@
 
                ARC = AST_DISTANCE( FSET, P1, P2, STATUS )
 
-*  If the returned value is good, and not zero, find the long/lat of a 
+*  If the returned value is good, and not zero, find the long/lat of a
 *  point one pixel to the north of the central point.
                IF( ARC .NE. AST__BAD .AND. ARC .GT. 0.0 ) THEN
                   OUT( 2, 1 ) = OUT( 1, 1 )
                   OUT( 2, 2 ) = OUT( 1, 2 ) + ARC
 
-*  X/YOUT( 1 ) now holds the sky coords at the central point, and 
+*  X/YOUT( 1 ) now holds the sky coords at the central point, and
 *  X/YOUT( 2 ) holds the sky coords at a point just to the north of the
 *  central point. Convert these back into pixel coordinates.
-                  CALL AST_TRANN( FSET, 2, NOUT, 2, OUT, .FALSE., NIN, 
+                  CALL AST_TRANN( FSET, 2, NOUT, 2, OUT, .FALSE., NIN,
      :                            2, IN, STATUS )
 
 *  Find the anti-clockwise angle from the +ve X axis to the line joining
 *  the two transformed sky positions.
-                  ANGROT = ATAN2( IN( 2, 2 ) - IN( 1, 2 ), 
+                  ANGROT = ATAN2( IN( 2, 2 ) - IN( 1, 2 ),
      :                            IN( 2, 1 ) - IN( 1, 1 ) )/DTOR
 
                END IF

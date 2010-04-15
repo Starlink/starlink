@@ -4,7 +4,7 @@ C
 C     A R C E N T R
 C
 C     Arc utility.  Determines the center of a line using a
-C     center of gravity algorithm, with the user indicating the 
+C     center of gravity algorithm, with the user indicating the
 C     limits to be used on an expanded plot.
 C
 C     Parameters -  (">" input, "<" output)
@@ -36,7 +36,7 @@ C     23rd Jul 1993  HME / UoE, Starlink.  Disuse PAR_Q*. Use PAR_ABORT.
 C+
       IMPLICIT NONE
 C
-C     Parameters - 
+C     Parameters -
 C
       INTEGER NX,IX
       REAL XVALS(NX),ZVALS(NX),CENT,XCENT
@@ -96,7 +96,7 @@ C
          Y1=MIN(Y1,Y2)
 C
 C        Get X's in element numbers.
-C 
+C
          KX1=GEN_BSEARCH(XVALS(IXST),IXEN-IXST+1,X1)+IXST
          KX2=GEN_BSEARCH(XVALS(IXST),IXEN-IXST+1,X2)+IXST-1
 C

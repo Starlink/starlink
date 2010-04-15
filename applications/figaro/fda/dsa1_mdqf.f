@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine maps the main data array in an NDF, returning
-*     the address of the dynamic memory array that may be used to 
+*     the address of the dynamic memory array that may be used to
 *     access it. The data array is accepted as it is, including bad
 *     values.
 *
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

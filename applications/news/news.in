@@ -2,9 +2,9 @@
 #
 # Program: news
 # Version: 2.1
-# Date   : 1/6/95    
+# Date   : 1/6/95
 # Author : Geoff Mellor (grm@star.le.ac.uk)
-# Descrip: 
+# Descrip:
 #    v2.0: News system (see help subroutine for use).
 #          news has been rewritten and improved
 #          by using perl. Important improvements:
@@ -43,7 +43,7 @@
 #
 # 1) news expects the perl binary in /usr/bin. edit line 1
 #    of this script if it resides elsewhere on your system.
-# 2) $newsdir points to the news directory -modify if not in 
+# 2) $newsdir points to the news directory -modify if not in
 #    the standard starlink directory
 # 3) $printc is the default printer command - modify to suit
 #
@@ -80,10 +80,10 @@ $now = time;                                     # current time
  @files = grep(!/^\./,readdir(FL));
  foreach (@files) {
      $_ = $newsdir . "/" . $_;                   # add dir spec to filename
-     $fileages{$_} = $now - (-M $_)*86400;       # file ages in secs 
+     $fileages{$_} = $now - (-M $_)*86400;       # file ages in secs
      ($sec,$min,$hour,$mday,$mon,$year) = localtime($fileages{$_});
      $year += 1900;
-     $filedates{$_} = "$mday $month[$mon] $year";# file dates for display  
+     $filedates{$_} = "$mday $month[$mon] $year";# file dates for display
      open (FILE, $_);
      chop($filetitles{$_} = <FILE>);             # file titles for display
      $filetitles{$_} =~ s/^[1-2] // && $filetitles{$_} =~ s/_/ /g ;
@@ -91,7 +91,7 @@ $now = time;                                     # current time
 #
 # Determine how the topic list shall be sorted
 #
-if ($opt_t){                             # sort @files by title if -t option 
+if ($opt_t){                             # sort @files by title if -t option
 @files = sort by_title keys(%filetitles);
 } else {                                 # default action - sort @files by date
 @files  = sort by_date keys(%fileages);
@@ -100,7 +100,7 @@ if ($opt_t){                             # sort @files by title if -t option
 # action determined by command line arguments
 #
 if ($opt_n){
-    &new_news;                                   # display new news items    
+    &new_news;                                   # display new news items
 } elsif ($opt_h){
     &help;
 } else {                                         # main NEWS option
@@ -108,7 +108,7 @@ if ($opt_n){
     while (true) {
         if ($pdtopic eq "") {                    # no topic defined, so:
             &all_news_titles;                    # lists all news items
-            if ($morein eq "") {                 
+            if ($morein eq "") {
                 print "Topic ? ";                # select topic to display
                 chop($topic=<STDIN>);
                 if ($topic eq "") {              # exit if no topic selected
@@ -129,7 +129,7 @@ if ($opt_n){
             $topic = $pdtopic;                   # set topic
             $pdtopic = "";                       # reset pdtopic
         }
-        &display_item_l1;                        # display news item 
+        &display_item_l1;                        # display news item
     }                                            # commencing in "$topic"
 }
 exit;
@@ -157,7 +157,7 @@ sub by_title {
 }
 #
 #----------------------------------------------------------------------------
-#subroutine: all_news_items 
+#subroutine: all_news_items
 #   descrip: displays a list of all news items
 #
  sub all_news_titles {
@@ -174,7 +174,7 @@ sub by_title {
          write;                                  # output formatted title info
          $rowsout++;
      }
-     print "\n";    
+     print "\n";
  }
 #
 #----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ sub by_title {
          open (FILE, $filename);                 # reopen file, start again
          print "\n";
          print "Subtopics: \n";
-         print "\n"; 
+         print "\n";
          while (<FILE>) {                        # search for level 2 titles
              if (/^2/) {
                  s/2 // && s/_/ /g;
@@ -212,10 +212,10 @@ sub by_title {
 #
  sub display_item_l1 {
 OUT: foreach $filename (@files) {                #
-         if ($filetitles{$filename} =~ /^$topic/i) {  # compare all news titles 
+         if ($filetitles{$filename} =~ /^$topic/i) {  # compare all news titles
              system "clear";                          # with "$topic"
              open(FILE, $filename);
-             print " \n";                        # 
+             print " \n";                        #
              $rowsout=1;                         # remember no. rows printed
              while (<FILE>) {                    # print text until a level 2
                  if (/^2/) {                     # title is found.
@@ -231,8 +231,8 @@ OUT: foreach $filename (@files) {                #
              }
              while ($rowsout < ($rows - 1)){     # when finished, skip to end
                  print " \n";                    # of current screen
-                 $rowsout++; 
-             }                                   
+                 $rowsout++;
+             }
              print "[q]uit [p]rint, [e]xport, <RET> to continue ";
              chop($l1_action=<STDIN>);
              if ($l1_action =~ /^p/i) {
@@ -241,7 +241,7 @@ OUT: foreach $filename (@files) {                #
                  &export;
              } elsif ($l1_action =~ /^q/i) {
                  last OUT;
-             }                     
+             }
          }
      }
  }
@@ -256,13 +256,13 @@ OUT: foreach $filename (@files) {                #
      open (FILE, $filename);
      while (<FILE>) {
          if (/^2/) {
-             s/^2 // && s/_/ /g;                 # compare each subtopic title 
+             s/^2 // && s/_/ /g;                 # compare each subtopic title
              if (/^$topic/i) {                   # and print selected one
-                 s/2 // && s/_/ /g; 
-                 system "clear";    
-                 print " \n";       
-                 print $_;          
-                 $rowsout=2;        
+                 s/2 // && s/_/ /g;
+                 system "clear";
+                 print " \n";
+                 print $_;
+                 $rowsout=2;
                  while (<FILE>) {                # followed by subtopic text
                      if (/^2/) {                 # until next subtopic title
                          last;
@@ -275,8 +275,8 @@ OUT: foreach $filename (@files) {                #
                  }
                  while ($rowsout < ($rows - 1)){ # when finished, skip to end
                      print " \n";                # of current screen
-                     $rowsout++; 
-                 }                                   
+                     $rowsout++;
+                 }
                  print "[q]uit, [p]rint, [e]xport, <RET> to continue ";
                  chop($l1_action=<STDIN>);
                  if ($l1_action =~ /^p/i) {
@@ -285,7 +285,7 @@ OUT: foreach $filename (@files) {                #
                      &export;
                  } elsif ($l1_action =~ /^q/i) {
                      last OUT;
-                 }                     
+                 }
              }
          }
      }
@@ -297,7 +297,7 @@ OUT: foreach $filename (@files) {                #
 #    descrip: paginates title output
 #
  sub more_titles {
-     $morein="";                                 # reset value of morein          
+     $morein="";                                 # reset value of morein
      print "\n";
      print " [q]uit, <title> display topic, <RET> display more topics: ";
      chop($morein=<STDIN>);
@@ -315,7 +315,7 @@ OUT: foreach $filename (@files) {                #
 #    descrip: paginates topic output
 #
  sub more_topics {
-     $morein="";                                 # reset value of morein          
+     $morein="";                                 # reset value of morein
      print "\n";
      print " [q]uit, <RET> to continue: ";
      chop($morein=<STDIN>);
@@ -363,7 +363,7 @@ OUT: foreach $filename (@files) {                #
 #             of .newsstat in HOME directory. Create if not there.
 #
  sub new_news {                                  #
-     if (-e "$home/.newsstat") {                 # if .newsstat exists, get 
+     if (-e "$home/.newsstat") {                 # if .newsstat exists, get
          $accdate = (-M "$home/.newsstat");      # time of last access
          open(NEWSSTAT, ">$home/.newsstat");     # update .newsstat
          close(NEWSSTAT);
@@ -377,7 +377,7 @@ OUT: foreach $filename (@files) {                #
      foreach $filename (@files) {
          $date = -M $filename;                   # get news files' mod dates
          if ((-M $filename) < $accdate) {        # if newer than last access
-             if ($items eq "") {                  
+             if ($items eq "") {
                  print "\n";
                  print "There is new NEWS on:\n";
                  print "\n";
@@ -397,7 +397,7 @@ OUT: foreach $filename (@files) {                #
 # subroutine: help
 #    descrip: tells you what's what
 #
- sub help { 
+ sub help {
      system "clear";
      print " \n";
      print " \t \t \t News v2.1 \n";
@@ -420,11 +420,11 @@ OUT: foreach $filename (@files) {                #
      print " Note: when prompted for a topic, \"?\" will repeat the  \n";
      print " topic list and \"h\" will produce this help page \n";
      if ($_[0] eq "inside") {
-         $rowsout = 20;  
+         $rowsout = 20;
          while ($rowsout < ($rows - 1)){     # when finished, skip to end
              print " \n";                    # of current screen
-             $rowsout++; 
-         }                                   
+             $rowsout++;
+         }
          print "<RET> to continue ";
          $dummy=<STDIN>;
      }

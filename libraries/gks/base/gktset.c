@@ -54,14 +54,14 @@
  *
  *   This routine does no error checking or reporting.
  *
- *  *lun    Fortran logical unit number (Input) 
+ *  *lun    Fortran logical unit number (Input)
  *  *echo   Echo control (Input)    [logical]
  *  *purge  Purge control (Input)   [logical]
  *
  *  Always returns 0
  */
 
-f77_integer gktset_(f77_integer *lun, 
+f77_integer gktset_(f77_integer *lun,
 		    f77_integer *echo,
 		    f77_integer *purge)
 {

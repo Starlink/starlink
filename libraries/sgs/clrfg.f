@@ -67,7 +67,7 @@
       IF (IFLAG.EQ.0) THEN
          NCLORQ = .FALSE.
       ELSE
-         NCLORQ = .TRUE. 
+         NCLORQ = .TRUE.
       END IF
 
       END

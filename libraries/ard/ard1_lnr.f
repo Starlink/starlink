@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
-     :                     PAR, C, FRM, B, LBEXTB, UBEXTB, LBINTB, 
+     :                     PAR, C, FRM, B, LBEXTB, UBEXTB, LBINTB,
      :                     UBINTB, STATUS )
 *+
 *  Name:
@@ -21,7 +21,7 @@
 *     supplied interior bounding box to the exterior value 0.
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
-*     supplied parameters. 
+*     supplied parameters.
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -59,7 +59,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBEXTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        exterior points in B. 
+*        exterior points in B.
 *     LBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The lower pixel bounds of the smallest box which contains all
 *        interior points in B. A value of VAL__MAXI for element 1 is
@@ -67,7 +67,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     LOADED = LOGICAL (Given and Returned)
 *        Have the contents of the supplied mask already been loaded onto
 *        the stack? Always returned .TRUE. if the keyword is an INPUT
@@ -87,12 +87,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -113,7 +113,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,7 +149,7 @@
       LOGICAL
      :        BADPAR            ! Are the parameters missing?
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        D( ARD__MXDIM*(ARD__MXDIM + 1 ) ) ! User->pixel coeffs
       integer i
 
@@ -164,13 +164,13 @@
 *  Initialise a flag to indicate that the correct number of parameters
 *  are available.
       BADPAR = .FALSE.
- 
+
 *  Call a separate suboutine to handle each type of region.
 *  POINT and PIXEL keywords...
       IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX ) THEN
          IF( NPAR .GT. 0 .AND. MOD( NPAR, NDIM ) .EQ. 0  ) THEN
             CALL ARD1_POI( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR,
-     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
          ELSE
             BADPAR = .TRUE.
@@ -180,7 +180,7 @@
       ELSE IF( TYPE .EQ. ARD__LIN ) THEN
          IF( NPAR .EQ. 2*NDIM ) THEN
             CALL ARD1_LIN( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR,
-     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
          ELSE
             BADPAR = .TRUE.
@@ -189,8 +189,8 @@
 *  ROW keywords...
       ELSE IF( TYPE .EQ. ARD__ROW ) THEN
          IF( NPAR .GT. 0  ) THEN
-            CALL ARD1_ROW( RINDEX, NDIM, D, LBND, UBND, MSKSIZ, 
-     :                     NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB, 
+            CALL ARD1_ROW( RINDEX, NDIM, D, LBND, UBND, MSKSIZ,
+     :                     NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB,
      :                     UBINTB, STATUS )
          ELSE
             BADPAR = .TRUE.
@@ -199,8 +199,8 @@
 *  COLUMN keywords...
       ELSE IF( TYPE .EQ. ARD__COL ) THEN
          IF( NPAR .GT. 0  ) THEN
-            CALL ARD1_COL( RINDEX, NDIM, D, LBND, UBND, MSKSIZ, 
-     :                     NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB, 
+            CALL ARD1_COL( RINDEX, NDIM, D, LBND, UBND, MSKSIZ,
+     :                     NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB,
      :                     UBINTB, STATUS )
          ELSE
             BADPAR = .TRUE.

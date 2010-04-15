@@ -40,7 +40,7 @@
 
 *    Find last occurrence of file separator (0 or N)
       SEPPOS = CHR_LEN( IFILE )
-      CALL CHR_FIND( IFILE, SEPARATOR, .FALSE., SEPPOS ) 
+      CALL CHR_FIND( IFILE, SEPARATOR, .FALSE., SEPPOS )
 
 *    Set the output file
       CALL CHR_FILL( ' ', RIFILE )

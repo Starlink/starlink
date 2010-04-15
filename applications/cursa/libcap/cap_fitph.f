@@ -28,7 +28,7 @@
 *        .TRUE.  -  fit the atmospheric extinction,
 *        .FALSE. -  determine the atmospheric extinction.
 *     CINCL(ROWS)  =  LOGICAL (Given)
-*        Flags indicating for each row (ie. star) whether they are to be 
+*        Flags indicating for each row (ie. star) whether they are to be
 *        included in the fit.  The coding is as follows:
 *        .TRUE.  - include in fit,
 *        .FALSE. - exclude from fit.
@@ -56,7 +56,7 @@
 *  Algorithm:
 *     Initialise the control arrays to indicate which elements are to
 *     vary.
-*     Copy the data to the work array, excluding stars which are not 
+*     Copy the data to the work array, excluding stars which are not
 *     to be fitted.
 *     If there are sufficient stars then
 *       Perform the fit.

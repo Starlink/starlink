@@ -44,7 +44,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -196,12 +196,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -587,7 +587,7 @@ each of which can be thought of as a foreign format NDF. When an
 NDF application is run, a specific NDF within such a FITS file can be
 selected by appending a {\em foreign extension specifier} (FXS) to the
 end of the file name. A foreign extension specifier consists of a string
-delimited by matching square brackets. The string identifies a sub-structure 
+delimited by matching square brackets. The string identifies a sub-structure
 within the specified file, using syntax specific to the data format. So,
 for instance, the second image extension within a FITS file called {\tt
 m51.fit} could be specified using the string ``{\tt m51.fit[2]}''. Here, the
@@ -600,7 +600,7 @@ square brackets (and possibly other non-alphanumeric characters), it
 cannot safely be included directly within the name of a file. You may
 want to do this for instance, when setting up the NDF\_KEEP\_  or
 NDF\_TEMP\_ environment variables. For this reason, a ``cleaned'' version
-of the foreign extension specifier is also available, in a message token 
+of the foreign extension specifier is also available, in a message token
 called {\bf fxscl}. This is equal to {\bf fxs} except that all
 non-alphanumeric characters are replaced by underscores.
 
@@ -774,7 +774,7 @@ description is being used to create the \st{output} dataset, so it
 would not strictly be necessary for the FIGARO format to appear in the
 NDF\_FORMATS\_OUT list.}
 
-Note that output datasets which are created by applications 
+Note that output datasets which are created by applications
 without propagation from an existing dataset do not inherit any format
 information. In this case, any `$*$' in the format list is ignored and
 the normal rules apply (in the example above, a native format NDF
@@ -1368,7 +1368,7 @@ to the foreign dataset as part of its conversion task.
 The processes of (a) creating a specialist extension from information
 stored in the FITS extension and (b) writing specialist extension
 information back into the FITS extension are referred to as
-\st{importing} and \st{exporting} the extension information. 
+\st{importing} and \st{exporting} the extension information.
 
 Using this scheme, utilities that import and export extension
 information will, in many circumstances, be able to rely entirely on
@@ -1487,7 +1487,7 @@ importing and exporting CCDPACK extension information to
 \begin{small}
 \begin{verbatim}
 setenv NDF_IMP_CCDPACK_FIGARO 'impccd ndf=^ndf file=^dir^name^type'
-setenv NDF_EXP_CCDPACK_FIGARO 'expccd ndf=^ndf file=^dir^name^type' 
+setenv NDF_EXP_CCDPACK_FIGARO 'expccd ndf=^ndf file=^dir^name^type'
 \end{verbatim}
 \end{small}
 \end{quote}

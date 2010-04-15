@@ -67,7 +67,7 @@
 *
       integer nli
       integer max_kp1
-      
+
       double precision pos(nli)
       double precision intensity(nli)
       character*(*) label

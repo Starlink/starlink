@@ -1,6 +1,6 @@
 
 /*
- * E.S.O. - VLT project 
+ * E.S.O. - VLT project
  * "@(#) $Id$"
  *
  * Colormap definitions for RTD

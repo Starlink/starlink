@@ -2,7 +2,7 @@
 * X, Y and Z are data arrays with NPT points to fit.
 * SCALE receives XMIN, XMAX, YMIN and YMAX and returns AX, BX, AY, BY
 * where X' = AX * (X - BX)  and Y' = AY * (Y - BY)
-* A two-dimensional polynomial of degree NCX-1 in X and NCY-1 in Y 
+* A two-dimensional polynomial of degree NCX-1 in X and NCY-1 in Y
 * is fit and the coefficients are returned in COEFF.
 *
 * The parameter statement had no brackets. The Sun compiler doesn't like

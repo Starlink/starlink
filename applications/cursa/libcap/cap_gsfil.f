@@ -40,7 +40,7 @@
 *        'S'  -  include only a summary of the parameters,
 *        'F'  -  include full details of the parameters.
 *     FTXT  =  CHARACTER*(*) (Given)
-*        Flag indicating whether header text is to be included in the 
+*        Flag indicating whether header text is to be included in the
 *        output file.  It is coded as follows:
 *        'A'  -  the text should be absent,
 *        'F'  -  include the text.
@@ -63,7 +63,7 @@
 *         end if
 *       else
 *         Set appropriate value to the common block.
-*       end if  
+*       end if
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:

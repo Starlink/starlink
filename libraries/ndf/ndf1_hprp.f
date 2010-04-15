@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,15 +63,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -90,8 +90,8 @@
 *        Write)
 *           Locator for array of history records.
 *        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Read and Write)
-*           The date/time to attach to the next history record to be 
-*           created, as a UTC Modified Julian Date. If negative, then 
+*           The date/time to attach to the next history record to be
+*           created, as a UTC Modified Julian Date. If negative, then
 *           the current time will be used.
 *        DCB_HTLEN( NDF__MXDCB ) = INTEGER (Read and Write)
 *           Text length of the current history record.
@@ -182,7 +182,7 @@
             END IF
          END IF
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_HPRP', STATUS )
 

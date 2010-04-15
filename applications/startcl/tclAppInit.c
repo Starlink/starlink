@@ -1,4 +1,4 @@
-/* 
+/*
  * tclAppInit.c --
  *
  *	Provides a default version of the main program and Tcl_AppInit
@@ -45,7 +45,7 @@ EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #ifdef TCL_XT_TEST
 EXTERN int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif
-
+
 /*
  *----------------------------------------------------------------------
  *
@@ -78,7 +78,7 @@ main(argc, argv)
     Tcl_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }
-
+
 /*
  *----------------------------------------------------------------------
  *

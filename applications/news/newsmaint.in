@@ -30,7 +30,7 @@ $rows = 24;
      }
      &all_news_titles;                       # lists all news items
      if ($morein eq "") {
-         print "Topic for deletion ? ";                
+         print "Topic for deletion ? ";
          chop($topic=<STDIN>);
          if ($topic eq "") {                 # exit if no topic selected
              last;
@@ -41,7 +41,7 @@ $rows = 24;
          $topic=$morein;
          $morein="";
      }
-     &delete_item_l1;                        # delete news item 
+     &delete_item_l1;                        # delete news item
  }                                           # commencing in "$topic"
 exit;
 #
@@ -51,7 +51,7 @@ exit;
 #
 #----------------------------------------------------------------------------
 #
-#subroutine: all_news_items 
+#subroutine: all_news_items
 #   descrip: displays a list of all news items
 #
  sub all_news_titles {
@@ -69,7 +69,7 @@ exit;
          printf "%-45s\t%s\n", $title, $expiry;  # and print
          $rowsout++;
      }
-     print "\n";    
+     print "\n";
  }
 #
 #----------------------------------------------------------------------------
@@ -85,8 +85,8 @@ exit;
      $title  = substr($title,0,44);
      chop($expiry = <FILE>);
      $expiry =~ /./ || chop($expiry = <FILE>); #(try third line down)
-     
-     $expiry =~ s/^\s+// && $expiry =~ s/xpiry/xpires/;   
+
+     $expiry =~ s/^\s+// && $expiry =~ s/xpiry/xpires/;
      $expiry =~ /xpir/ || ($expiry = "Expires: No expiry date set");
      $expiry =~ s/^.*(Exp.*)\)/$1/
  }
@@ -118,7 +118,7 @@ exit;
 #    descrip: paginates output
 #
  sub more {
-     $morein="";                                 # reset value of morein          
+     $morein="";                                 # reset value of morein
      print "\n";
      if ($_[0] eq "titles") {                    # different message for different points
          print " <title> select topic for deletion, <RET> display more topics: ";

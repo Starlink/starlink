@@ -11,13 +11,13 @@
 
 *  Description:
 *     This routine is supplied so that a C extension to Tcl which may
-*     have a long execution time can be executed while Tcl events 
+*     have a long execution time can be executed while Tcl events
 *     continue to be dealt with.
 *
 *     This routine can be used to wrap the declaration of the command,
 *     so that instead of calling
 *
-*        Tcl_CreateObjCommand( interp, "newcmd", NewcmdCmd, 
+*        Tcl_CreateObjCommand( interp, "newcmd", NewcmdCmd,
 *                              (ClientData) NULL, NULL );
 *
 *     you would call
@@ -27,11 +27,11 @@
 *
 *     i.e. pass a pointer to the Tcl_ObjCmdProc representing the new
 *     command as client data to the object command registration routine.
-*     Other than that, you can hopefully forget that this routine is 
+*     Other than that, you can hopefully forget that this routine is
 *     involved.
 *
 *     When the command is invoked, this routine forks; the new object
-*     command executes in the child and writes the results back to 
+*     command executes in the child and writes the results back to
 *     the parent via a pipe; meanwhile the parent continues to service
 *     such Tcl events as come along in the normal way.  There are
 *     probably implications from this about what the new object
@@ -72,7 +72,7 @@
 
 *-
 */
-                           
+
 
 #include <unistd.h>
 #include <string.h>
@@ -82,7 +82,7 @@
 
 #define BUFLENG 4096
 
-/* Declarations of local files in Tcl terms ensure that their local 
+/* Declarations of local files in Tcl terms ensure that their local
    declarations are correct. */
 
    Tcl_ObjCmdProc tclbgcmd;
@@ -90,7 +90,7 @@
 
 
 /************************************************************************/
-   int tclbgcmd( ClientData clientData, Tcl_Interp *interp, int objc, 
+   int tclbgcmd( ClientData clientData, Tcl_Interp *interp, int objc,
                  Tcl_Obj *CONST objv[] ) {
 /************************************************************************/
       int bytes;
@@ -113,7 +113,7 @@
          Tcl_SetObjResult( interp, Tcl_NewStringObj( "IPC error", -1 ) );
          return TCL_ERROR;
       }
-     
+
 
 /* Child process - runs the object command. */
 /* ---------------------------------------- */
@@ -126,7 +126,7 @@
          ofd = fds[ 1 ];
 
 /* Execute the object command. */
-         tclrtn = ((Tcl_ObjCmdProc *) clientData)( (ClientData) NULL, interp, 
+         tclrtn = ((Tcl_ObjCmdProc *) clientData)( (ClientData) NULL, interp,
                                                    objc, objv );
 
 /* Write the exit status and result string up the pipe. */
@@ -146,10 +146,10 @@
       close( fds[ 1 ] );
       ifd = fds[ 0 ];
 
-/* Set up a filehandler so that a Tcl event will be generated when the 
+/* Set up a filehandler so that a Tcl event will be generated when the
    file is ready to read. */
       ready = 0;
-      Tcl_CreateFileHandler( ifd, TCL_READABLE | TCL_EXCEPTION, bgready, 
+      Tcl_CreateFileHandler( ifd, TCL_READABLE | TCL_EXCEPTION, bgready,
                              (ClientData) &ready );
 
 /* Loop processing events until we find that the child has finished. */
@@ -178,10 +178,10 @@
 
 /* Close the pipe. */
       close( ifd );
-         
+
 /* Reap the child's exit status. */
       waitpid( pid, &pidstat, 0 );
-         
+
 /* Set the result object and return with the correct status. */
       Tcl_SetObjResult( interp, Tcl_NewStringObj( retbuf, -1 ) );
       return tclrtn;

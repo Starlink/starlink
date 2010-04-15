@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_PSPLT( NBIN, SIGMA, AXISR, AMP, GAMMA, BACK,
-     :                       SCALE, YSCALE, RUNITS, YUNITS, PNMIN, 
+     :                       SCALE, YSCALE, RUNITS, YUNITS, PNMIN,
      :                       PROFIL, PROFR, PROFWT, WORK, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_PSPLT( NBIN, SIGMA, AXISR, AMP, GAMMA, BACK, SCALE,
-*                      YSCALE, RUNITS, YUNITS, PNMIN, PROFIL, PROFR, 
+*                      YSCALE, RUNITS, YUNITS, PNMIN, PROFIL, PROFR,
 *                      PROFWT, WORK, STATUS )
 
 *  Description:
@@ -73,15 +73,15 @@
 *     routine:
 *
 *     PROFOUT = NDF (Write)
-*        The name of a 1-dimensional NDF to be created holding the profile 
+*        The name of a 1-dimensional NDF to be created holding the profile
 *        data. The DATA component holds the fitted profile values, and the
-*        VARIANCE component holds the square of the residuals. If a null (!) 
+*        VARIANCE component holds the square of the residuals. If a null (!)
 *        value is supplied, no NDF is created.
 
 *  Copyright:
 *     Copyright (C) 1991-1993 Science & Engineering Research Council.
 *     Copyright (C) 1999-2001, 2004 Central Laboratory of the Research
-*     Councils. 
+*     Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2008 Science and Technology Faciities Council.
 *     All Rights Reserved.
@@ -140,7 +140,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -148,7 +148,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ definitions
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -169,7 +169,7 @@
       REAL PROFIL( 0:NBIN - 1 )
       REAL PROFR( 0:NBIN - 1 )
       REAL PROFWT( 0:NBIN - 1 )
-      DOUBLE PRECISION WORK( 0:NBIN - 1 , 2 ) 
+      DOUBLE PRECISION WORK( 0:NBIN - 1 , 2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -252,8 +252,8 @@
 *  Initialise counter of good bins.
       NDATA = -1
 
-*  Loop through all the bins in the mean profile, scaling the data to the 
-*  units. Also compress the data arrays to remove empty bins. 
+*  Loop through all the bins in the mean profile, scaling the data to the
+*  units. Also compress the data arrays to remove empty bins.
       DO BIN = 0, NBIN - 1
          IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
             NDATA = NDATA + 1
@@ -270,7 +270,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an output NDF to hold the profile.
-      CALL LPG_CREAT( 'PROFOUT', '_REAL', 1, 1, NDATA + 1, INDF, 
+      CALL LPG_CREAT( 'PROFOUT', '_REAL', 1, 1, NDATA + 1, INDF,
      :                STATUS )
 
 *  If a null was supplied, annul the error.
@@ -290,27 +290,27 @@
          END DO
 
 *  Map the DATA array, and copy the fit values into it.
-         CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IPDAT, EL, 
+         CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IPDAT, EL,
      :                 STATUS )
-         CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 1 ), 0, NDATA, 
+         CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 1 ), 0, NDATA,
      :                    %VAL( CNF_PVAL( IPDAT ) ), EL, STATUS )
 
 *  Map the VARIANCE array, and copy the squared residuals into it.
-         CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'WRITE', IPVAR, EL, 
+         CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'WRITE', IPVAR, EL,
      :                 STATUS )
-         CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 2 ), 0, NDATA, 
+         CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 2 ), 0, NDATA,
      :                    %VAL( CNF_PVAL( IPVAR ) ), EL, STATUS )
 
 *  Map the AXIS CENTRE array, and copy the radii values to it.
-         CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'WRITE', IPAX, EL, 
+         CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'WRITE', IPAX, EL,
      :                  STATUS )
-         CALL KPG1_CPNDR( 1, 0, NDATA, PROFR, 0, NDATA, 
+         CALL KPG1_CPNDR( 1, 0, NDATA, PROFR, 0, NDATA,
      :                    %VAL( CNF_PVAL( IPAX ) ),
      :                    EL, STATUS )
 
       END IF
 
-*  Calculate the fitted profile over the data range for each of the points 
+*  Calculate the fitted profile over the data range for each of the points
 *  where the mean profile is known.  Apply the scaling to the radius.
 *  Update the extreme data values to be plotted.
       RMAX = PROFR( NDATA ) / SCALE
@@ -336,10 +336,10 @@
 
 *  Plot the binned data.
       IPLOT = AST__NULL
-      CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0, 
-     :                 DEFLBX( : IATX ), DEFLBY( : IATY ), 
-     :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3, 
-     :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX, 
+      CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0,
+     :                 DEFLBX( : IATX ), DEFLBY( : IATY ),
+     :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3,
+     :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX,
      :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS )
 
 *  Only proceed if a plot was produced.
@@ -371,7 +371,7 @@
          CALL AST_ANNUL( IPLOT, STATUS )
          CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
-*  Free resources. 
+*  Free resources.
          CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
       END IF

@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     
+*
 *     Sample a catalogue at frequency N creating a new catalogue to
 *     contain the selected entries. By using the REJECT option a second
 *     catalogue can be created that contains those entries that were not
@@ -56,7 +56,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,7 +112,7 @@
              call msg_setc('outname',outcat)
              call msg_setc('rejname',rejcat)
              call msg_out('message 2','and the tables ^outname and
-     : ^rejname were produced.', status) 
+     : ^rejname were produced.', status)
              call msg_setc('outname',outcat)
              call msg_setc('rejname',rejcat)
              call msg_out('message 3','The table ^outname contains the
@@ -122,7 +122,7 @@
      :  sampled at frequency ^freqnum', status)
              call msg_setc('outname',outcat)
              call msg_out('message 5','and the table ^outname
-     : was produced.', status) 
+     : was produced.', status)
            endif
          elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)

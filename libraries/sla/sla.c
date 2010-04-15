@@ -7,7 +7,7 @@
 
 *  Description:
 *     This file implements a C interface to the Fortran version of the
-*     SLALIB library. 
+*     SLALIB library.
 
 *  Notes:
 *     This interface only supports a subset of the functions provided by
@@ -23,12 +23,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -52,7 +52,7 @@
 *     23-AUG-2001 (DSB):
 *        Added SLA_SVD and SLA_SVDSOL
 *     11-NOV-2002 (DSB):
-*        Added SLA_RVEROT, SLA_GMST, SLA_EQEQX, SLA_RVLSRK, SLA_RVLSRD, 
+*        Added SLA_RVEROT, SLA_GMST, SLA_EQEQX, SLA_RVLSRK, SLA_RVLSRD,
 *        SLA_RVLG, SLA_RVGALC.
 *     11-JUN-2003 (DSB):
 *        Added SLA_GEOC, SLA_HFK5Z and SLA_FK5HZ.
@@ -125,11 +125,11 @@ static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) 
 *     the FORTRAN string, then the string is truncated.
 
 *  Parameters:
-*     source_c 
+*     source_c
 *        A pointer to the input C string.
-*     dest_f 
+*     dest_f
 *        A pointer to the output FORTRAN string.
-*     dest_len 
+*     dest_len
 *        The length of the output FORTRAN string.
 
 *  Notes:
@@ -449,12 +449,12 @@ void slaDd2tf ( int ndp, double days, char *sign, int ihmsf[4] ) {
    DECLARE_INTEGER_ARRAY(IHMSF,4);
    int i;
 
-   NDP = ndp;   
+   NDP = ndp;
    DAYS = days;
    F77_CALL(sla_dd2tf)( INTEGER_ARG(&NDP),
                         DOUBLE_ARG(&DAYS),
                         CHARACTER_ARG(SIGN),
-                        INTEGER_ARRAY_ARG(IHMSF) 
+                        INTEGER_ARRAY_ARG(IHMSF)
                         TRAIL_ARG(SIGN) );
    sign[0] = SIGN[0];
    sign[1] = 0;
@@ -475,12 +475,12 @@ slaDr2tf( int ndp, double angle, char * sign, int ihmsf[4] )  {
   DECLARE_INTEGER_ARRAY(IHMSF,4);
   int i;
 
-  NDP = ndp;   
+  NDP = ndp;
   ANGLE = angle;
   F77_CALL(sla_dr2tf)( INTEGER_ARG(&NDP),
 		       DOUBLE_ARG(&ANGLE),
 		       CHARACTER_ARG(SIGN),
-		       INTEGER_ARRAY_ARG(IHMSF) 
+		       INTEGER_ARRAY_ARG(IHMSF)
 		       TRAIL_ARG(SIGN) );
   sign[0] = SIGN[0];
   sign[1] = 0;
@@ -501,12 +501,12 @@ slaDr2af( int ndp, double angle, char * sign, int idmsf[4] )  {
   DECLARE_INTEGER_ARRAY(IDMSF,4);
   int i;
 
-  NDP = ndp;   
+  NDP = ndp;
   ANGLE = angle;
   F77_CALL(sla_dr2af)( INTEGER_ARG(&NDP),
 		       DOUBLE_ARG(&ANGLE),
 		       CHARACTER_ARG(SIGN),
-		       INTEGER_ARRAY_ARG(IDMSF) 
+		       INTEGER_ARRAY_ARG(IDMSF)
 		       TRAIL_ARG(SIGN) );
   sign[0] = SIGN[0];
   sign[1] = 0;
@@ -672,7 +672,7 @@ void slaDmxv ( double dm[3][3], double va[3], double vb[3] ) {
    for ( i = 0; i < 3; i++ ) vb[ i ] = VB[ i ];
 }
 
-F77_DOUBLE_FUNCTION(sla_dbear)( DOUBLE(A1), DOUBLE(B1), 
+F77_DOUBLE_FUNCTION(sla_dbear)( DOUBLE(A1), DOUBLE(B1),
                                 DOUBLE(A2), DOUBLE(B2) );
 
 double slaDbear ( double a1, double b1, double a2, double b2  ) {
@@ -685,7 +685,7 @@ double slaDbear ( double a1, double b1, double a2, double b2  ) {
    B1 = b1;
    A2 = a2;
    B2 = b2;
-   result = F77_CALL(sla_dbear)( DOUBLE_ARG(&A1), DOUBLE_ARG(&B1), 
+   result = F77_CALL(sla_dbear)( DOUBLE_ARG(&A1), DOUBLE_ARG(&B1),
                                  DOUBLE_ARG(&A2), DOUBLE_ARG(&B2) );
    return result;
 }
@@ -833,7 +833,7 @@ void slaDtf2r ( int ihour, int imin, double sec, double *rad, int *j ) {
 
 F77_DOUBLE_FUNCTION(sla_dt)( DOUBLE(EPOCH) );
 
-double slaDt ( double epoch ) 
+double slaDt ( double epoch )
 {
     DECLARE_DOUBLE(EPOCH);
     double result;
@@ -939,7 +939,7 @@ F77_DOUBLE_FUNCTION(sla_eqeqx)( DOUBLE(DATE) );
 double slaEqeqx ( double date ) {
    DECLARE_DOUBLE(DATE);
    double result;
-   DATE = date; 
+   DATE = date;
    result = F77_CALL(sla_eqeqx)( DOUBLE_ARG(&DATE) );
    return result;
 }
@@ -1480,14 +1480,14 @@ void slaSvdsol ( int m, int n, int mp, int np,
 
 
 
-F77_SUBROUTINE(sla_evp)( DOUBLE(DATE), 
+F77_SUBROUTINE(sla_evp)( DOUBLE(DATE),
                          DOUBLE(DEQX),
                          DOUBLE_ARRAY(DVB),
                          DOUBLE_ARRAY(DPB),
                          DOUBLE_ARRAY(DVH),
                          DOUBLE_ARRAY(DPH) );
 
-void slaEvp ( double date, double deqx, double dvb[3], double dpb[3], 
+void slaEvp ( double date, double deqx, double dvb[3], double dpb[3],
               double dvh[3], double dph[3] ) {
    DECLARE_DOUBLE(DATE);
    DECLARE_DOUBLE(DEQX);
@@ -1895,7 +1895,7 @@ void slaOap ( const char *type, double ob1, double ob2, double date,
   RH = rh;
   WL = wl;
   TLR = tlr;
-  
+
   F77_CALL(sla_oap)( CHARACTER_ARG(TYPE),
                      DOUBLE_ARG(&OB1), DOUBLE_ARG(&OB2),
                      DOUBLE_ARG(&DATE), DOUBLE_ARG(&DUT),
@@ -1947,7 +1947,7 @@ void slaAmp( double ra, double da, double date, double eq,
 
 }
 
-F77_SUBROUTINE(sla_aop)( 
+F77_SUBROUTINE(sla_aop)(
                          DOUBLE(RAP),
                          DOUBLE(DAP),
                          DOUBLE(DATE),

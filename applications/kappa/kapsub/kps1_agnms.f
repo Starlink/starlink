@@ -74,7 +74,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No default typing allowed
 
@@ -83,7 +83,7 @@
 
 *  Arguments Given:
       CHARACTER * ( * ) ARDDEF   ! Input ARD keyword
-      INTEGER MXPOL         
+      INTEGER MXPOL
 
 *  Arguments Returned:
       INTEGER NPTS               ! Number of positions available
@@ -107,32 +107,32 @@
       ELSE IF ( ARDDEF .EQ. 'BOX' ) THEN
          NPTS = 2
          CALL MSG_OUT( 'KPS1_AGNMS_MSG2', 'Region type is "BOX". '/
-     :                 /'Identify the centre and then give a corner.', 
+     :                 /'Identify the centre and then give a corner.',
      :                 STATUS )
 
 *  Point.
-      ELSE IF ( ARDDEF .EQ. 'POINT' ) THEN 
+      ELSE IF ( ARDDEF .EQ. 'POINT' ) THEN
          NPTS = 1
          CALL MSG_OUT( 'KPS1_AGNMS_MSG3', 'Region type is "POINT". '/
      :                 /'Identify the point.', STATUS )
 
 *  Frame.
-      ELSE IF ( ARDDEF .EQ. 'FRAME' ) THEN 
+      ELSE IF ( ARDDEF .EQ. 'FRAME' ) THEN
          NPTS = 1
          CALL MSG_OUT( 'KPS1_AGNMS_MSG4', 'Region type is "FRAME". '/
      :                 /'Identify any point on the frame interior '/
      :                 /'border.', STATUS )
 
 *  Rotbox.
-      ELSE IF ( ARDDEF .EQ. 'ROTBOX' ) THEN 
+      ELSE IF ( ARDDEF .EQ. 'ROTBOX' ) THEN
          NPTS = 3
          CALL MSG_OUT( 'KPS1_AGNMS_MSG5', 'Region type is "ROTBOX". '/
      :                 /'Identify the two end points of any edge and '/
-     :                 /'then give a point on the opposite edge.', 
-     :                 STATUS ) 
+     :                 /'then give a point on the opposite edge.',
+     :                 STATUS )
 
 *  Polygon.
-      ELSE IF ( ARDDEF .EQ. 'POLYGON' ) THEN 
+      ELSE IF ( ARDDEF .EQ. 'POLYGON' ) THEN
          NPTS = -1
          CALL MSG_SETI( 'MX', MXPOL )
          CALL MSG_OUT( 'KPS1_AGNMS_MSG6', 'Region type is "POLYGON". '/
@@ -152,7 +152,7 @@
      :                 STATUS )
 
 *  Column.
-      ELSE IF ( ARDDEF .EQ. 'COLUMN' ) THEN 
+      ELSE IF ( ARDDEF .EQ. 'COLUMN' ) THEN
          NPTS = 1
          CALL MSG_OUT( 'KPS1_AGNMS_MSG9', 'Region type is "COLUMN". '/
      :                 /'Identify a point on the column.', STATUS )

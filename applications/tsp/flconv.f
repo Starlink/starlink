@@ -24,16 +24,16 @@ C     Parameters:
 C    (1) INPUT      (TSP, 1D)  The input spectrum to be converted.
 C    (2) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C        Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C        6/12/1991
 C
 C-
 C
 C  History:
-C    16/8/1990   Original Version.   JAB/AAO 
+C    16/8/1990   Original Version.   JAB/AAO
 C    6/12/1991   Handle bad values.  JAB/AAO
 C
 
@@ -54,7 +54,7 @@ C
 *  HDS locators
       CHARACTER*(DAT__SZLOC) OLOC,ILOC,DLOC,SLOC,XLOC
       LOGICAL OK,QZ,UZ,VZ
-      INTEGER SIZE,NUM,STAT                                        
+      INTEGER SIZE,NUM,STAT
       CHARACTER*40 LABEL,UNITS
       INTEGER NTYPE,NCH
 
@@ -78,7 +78,7 @@ C
 
 *  Map intensity data
 
-         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)
 
 *  Map X-axis (wavelength) data
 
@@ -120,7 +120,7 @@ C
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_FLCONV(SIZE,NTYPE,%VAL(XPTR),%VAL(DPTR))
          ENDIF
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Scale the variance if present
 
@@ -145,7 +145,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_FLCONV(SIZE,NTYPE,%VAL(XPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -167,7 +167,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_FLCONV(SIZE,NTYPE,%VAL(XPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -189,7 +189,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_FLCONV(SIZE,NTYPE,%VAL(XPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -217,7 +217,7 @@ C
 
       END
 
-      
+
 
       SUBROUTINE TSP_FLCONV (NX,NTYPE,X,DATA)
 C+

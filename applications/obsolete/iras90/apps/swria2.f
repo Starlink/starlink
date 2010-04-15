@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL SWRIA2( PTXT, PLON, PLAT, MODE, IRA, SCS, X1, X2, Y1, Y2,
 *                  MXNTXT, NTXT, LON, LAT, TXT, DIRX, DIRY, HIGT, RTIO,
-*                  JSTF, SPAC, FONT, PEN, STATUS ) 
+*                  JSTF, SPAC, FONT, PEN, STATUS )
 
 *  Description:
 *     This subroutine is used by applicaition SKYWRITE to write text
@@ -24,7 +24,7 @@
 *     will keep prompting the user for the specification of the next
 *     text until a null. '!' response is obtained or the position
 *     specified by the cursor is outside the zone. The positions,
-*     texts and their attributes are retruned in arrays. 
+*     texts and their attributes are retruned in arrays.
 
 *  Arguments:
 *     PTXT = CHARACTER (Given)
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -136,7 +136,7 @@
 *  Inquire the present attribute setting.
       CALL SGS_ITXA( NF, NPR, HT, AR, XU, YU, SP, TXJ )
       CALL SGS_IPEN( NPEN )
-      
+
 *  If working in keyboard mode, write text at the given sky position.
       IF ( MODE( : 8 ) .EQ. 'KEYBOARD' ) THEN
          PRNTXT = NTXT

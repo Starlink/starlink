@@ -77,21 +77,21 @@
 #.
 
 itcl::class gaia::StarArdLine {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
-      #  Set the type of canvas object. 
+      #  Set the type of canvas object.
       configure -mode line
       eval configure $args
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
@@ -115,10 +115,10 @@ itcl::class gaia::StarArdLine {
    #  Set the properties of the object to those of an ARD description
    #  of an object of this type.
    method setard {desc} {
-      if {$desc != "" } { 
+      if {$desc != "" } {
          set failed 1
-         if { [check_description line $desc] } { 
-            if { [llength $qualifiers_] == 4 } { 
+         if { [check_description line $desc] } {
+            if { [llength $qualifiers_] == 4 } {
                lassign $qualifiers_ xlower ylower xupper yupper
                set endpoints "$xlower $ylower $xupper $yupper"
                lassign [canvas_coord $xlower $ylower] x0 y0
@@ -127,12 +127,12 @@ itcl::class gaia::StarArdLine {
                set failed 0
             }
          }
-         if { $failed } { 
+         if { $failed } {
             error "Failed to interpret \"$desc\" as an ARD line"
          }
       }
    }
-   
+
    #  Create a new line using an ARD description.
    method createard {desc {cmd {}}} {
       setard "$desc"
@@ -141,7 +141,7 @@ itcl::class gaia::StarArdLine {
 
    #  Set new endpoints to appropriate variables in correct coordinate
    #  systems.
-   method process_endpoints_ {imagecoords} { 
+   method process_endpoints_ {imagecoords} {
       set endpoints $imagecoords
       lassign $endpoints x0 y0 x1 y1
       lassign [canvas_coord $x0 $y0] x0 y0
@@ -151,7 +151,7 @@ itcl::class gaia::StarArdLine {
 
    #  Process coordinates and assign the result to the public
    #  variables, endpoints and coords in the correct system.
-   method process_coords_ {canvcoords} { 
+   method process_coords_ {canvcoords} {
       set coords $canvcoords
       lassign $coords x0 y0 x1 y1
       lassign [image_coord $x0 $y0] x0 y0
@@ -165,7 +165,7 @@ itcl::class gaia::StarArdLine {
       if { $name == {} } {
          set name ".poly$canvas_id_"
       }
-      if { ! [create_properties_window $name] } { 
+      if { ! [create_properties_window $name] } {
 
          #  Now add the entry  for the description.
          set Endpoints_ [ETable $Frame_.table -columns 2 -rows 2 \
@@ -174,7 +174,7 @@ itcl::class gaia::StarArdLine {
          $Endpoints_ setlabel 0 X
          $Endpoints_ setlabel 1 Y
          pack $Endpoints_ -side top -fill both -expand true
-      } 
+      }
 
       #  Update the information to be current.
       update_properties
@@ -188,7 +188,7 @@ itcl::class gaia::StarArdLine {
       process_coords_ $coords
 
       #  Update the properties box if it exists.
-      if { [winfo exists $Endpoints_] } { 
+      if { [winfo exists $Endpoints_] } {
          lassign $endpoints x0 y0 x1 y1
          $Endpoints_ insert 0 $x0 $y0
          $Endpoints_ insert 1 $x1 $y1
@@ -197,7 +197,7 @@ itcl::class gaia::StarArdLine {
 
    #  Update coords from the table.
    method update_from_table {} {
-      if { [winfo exists $Endpoints_] } { 
+      if { [winfo exists $Endpoints_] } {
          process_endpoints_  "[$Endpoints_ get 0] [$Endpoints_ get 1]"
          redraw
       }

@@ -1,5 +1,5 @@
 
-            SUBROUTINE FIND20( SPFNAM, STATUS )   
+            SUBROUTINE FIND20( SPFNAM, STATUS )
 *+
 *  Name:
 *     FIND20
@@ -14,28 +14,28 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIND20( SPFNAM, STATUS )   
+*     CALL FIND20( SPFNAM, STATUS )
 
 *  Description:
 *  The subroutine tests each observation to see whether it passes
 *  within the area required for each source position. If so parameters
 *  defining the required subsection of it, ie. scan, are stored for
 *  possible extraction.
-*  
+*
 *  The subroutine uses the SPFARCH file which contains details of
 *  scan parameters, but these differ sightly from those of the
 *  Boresight file. This means that positions are sufficiently
 *  accurate for selection but have to be refined in EXCRDD for
 *  further processing.
-*  
+*
 *  Arguments:
 *     SPFNAM = CHARACTER * ( * ) (Given)
 *        Parameter SPFARCHFILE for name of file containing the SDF
-*        version of the SPFARCH positions archive catalogue      
+*        version of the SPFARCH positions archive catalogue
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  
+*
 *  Notes:
 *  Section 1
 *     -  The problem is to check whether each scan crosses the required
@@ -101,7 +101,7 @@
 *     rate of change of its longitude. These figures are then fed into
 *     the next iteration of the satellite angle calculation.
 *     -  The spherical triangle then looks like this
-*  
+*
 *
 *                          North ecliptic pole
 *                                / I
@@ -116,12 +116,12 @@
 *                                \ I
 *                                Sun
 *      Given
-*            A = Solar longitude - Source ecliptic longitude 
+*            A = Solar longitude - Source ecliptic longitude
 *           ab = Pi/2
 *           ac = Pi/2 - Source ecliptic latitude
 *      To be found
 *           bc = Theta ( satellite Sun angle )
-*            C = Psi ( satellite clock angle ) 
+*            C = Psi ( satellite clock angle )
 *
 *
 *  Section 3.
@@ -135,7 +135,7 @@
 *     calculated, using the solar longitude at the beginning of the SOP.
 *     This is in radians. It is then tested to see whether it lies
 *     between pi/3 and 2pi/3. If it is outside this range it is
-*     rejected.  
+*     rejected.
 *     -  In the second stage a scan is accepted if it meets two
 *     criteria:-
 *     First that the Scan's theta is within plus or minus a crosscan
@@ -150,7 +150,7 @@
 *     -  In the third stage the criteria are the same as in the second
 *     stage except that the crosscan range is tightened by removing the
 *     allowance for timing discrepancies.
-*     
+*
 *  Section 4.
 *  How do we access the data we need?
 *     -  We need three types of data:-
@@ -181,7 +181,7 @@
 *     first observation associated with a SOP is also held in the SOP
 *     header. Observation data for a SOP may start in one block and be
 *     completed in the next.
-*     
+*
 *     _  The data on positions covered in the IRAS mission is given in
 *     the SPFARCH file. The original file was an indexed file
 *     containing the following data.
@@ -198,7 +198,7 @@
 *              rate,
 *           Two data items that are not used,
 *           Direction of scan given as the sign of psi dot.
-*     
+*
 *     -  The Observation data consists of:-
 *           Observation identifier?,
 *           Observation sequence number,
@@ -212,7 +212,7 @@
 *           Uncertainty in psi rate.
 
 *     -  From this data we have the theta and range of psi covered by
-*     each observation. We can derive a crossing time as 
+*     each observation. We can derive a crossing time as
 *        Crossing time =  (source psi - start of scan psi)
 *                               / (scan psi rate)
 *     We can use this time to calculate a more accurate solar longitude
@@ -234,7 +234,7 @@
 *     FIO/RIO:
 *        FIO_SERR, FIO_UNIT, RIO_OPEN
 *     MSG:
-*        MSG_FMTC,MSG_FMTI,MSG_OUT   
+*        MSG_FMTC,MSG_FMTI,MSG_OUT
 
 *  Authors:
 *     DCP: Diana Parsons (IPMAF/RAL)
@@ -269,7 +269,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-                                       
+
 *  Arguments Given:
       CHARACTER * ( * ) SPFNAM
 
@@ -394,7 +394,7 @@
       CALL MSG_OUT( ' ', ' ', STATUS )
       CALL MSG_OUT( ' ', ' The program is now finding scans, this will '
      : //'take a couple of minutes', STATUS )
-      
+
 *  Call FIND09 to clean scan common and associated source pointers
       CALL FIND09( STATUS )
 
@@ -477,7 +477,7 @@
      : STATUS )
       CALL CMP_GET1R( LOC2, 'OBS_PSIRATEUNC', NOOBUS, OBPSRU, ELS,
      : STATUS )
-      
+
 *  Annul locator to OBS cell
       CALL DAT_ANNUL( LOC2, STATUS )
 
@@ -485,10 +485,10 @@
 *  Start of for each SOP loop
 * **********************************************************************
       DO 400 ISOP = 11, 603
-      
+
 *  Check whether the SOP is valid and has observations
          IF ( SPVAL( ISOP ) .AND. ( SPNOOB( ISOP ) .GT. 0 ) ) THEN
-            
+
 *  Calculate the start of SOP paf time from the start of SOP in days
 *  years and secs, using FIND32.
             CALL FIND32( SPSTD( ISOP ), SPSTS( ISOP ), SPSTY( ISOP ),
@@ -524,7 +524,7 @@
 *  to the first observation position for this SOP
                         CUBLNO = SPOBBL( ISOP )
                         CUOBNO = SPOBCT( ISOP )
-      
+
 * *********************************************************************
 *  Start of for each Observation loop
 * **********************************************************************
@@ -541,7 +541,7 @@
 *  Set block number required to that specified by the current block
 *  number
                                  OBBLCT = CUBLNO
-      
+
 *  Read in the correct block of observation data for this observation
 *  Find the cell in the OBS blocks for this particular block
                                  CALL DAT_CELL( LOC1, 1, OBBLCT, LOC2,
@@ -573,7 +573,7 @@
      :                           NOOBUS, OBPSR, ELS, STATUS )
                                  CALL CMP_GET1R( LOC2, 'OBS_PSIRATEUNC',
      :                           NOOBUS, OBPSRU, ELS, STATUS )
-      
+
 *  Annul locator to OBS cell
                                  CALL DAT_ANNUL( LOC2, STATUS )
 
@@ -585,11 +585,11 @@
      :                           ' programmer' , STATUS )
                                  RETURN
                               END IF
-                           
+
 *  End if for if incorrect observation block was required and a new one
 *  had to be read
                            END IF
-      
+
 *  Create double precision copies of the start and end of observation
 *  satcal times
                            OBST1D = DBLE( OBST1S( CUOBNO ) )
@@ -599,7 +599,7 @@
 *  as the values calculated for epoch 1983.5
                            SLPSI = SLPSI3( ISOURC )
                            SLTH  = SLTH3( ISOURC )
-      
+
 * **********************************************************************
 * Second stage of testing
 * **********************************************************************
@@ -611,7 +611,7 @@
 *  approximate as the source position is that at epoch 1983.5, the
 *  solar longitude and the observation satellite angles are at the
 *  epoch of the start of the SOP. A wider range of angles are accepted
-*  to compensate. 
+*  to compensate.
                            CALL FIND18( OBPS( CUOBNO ), OBPSR( CUOBNO ),
      :                     OBST1D, OBST2D, OBTH( CUOBNO ),
      :                     SOCRSZ( ISOURC ), SLPSI, SLTH, TESTOK,
@@ -620,7 +620,7 @@
 *  Is second stage of testing criterion met?
                            IF ( TESTOK .AND. ( STATUS .EQ. SAI__OK ) )
      :                        THEN
-      
+
 * **********************************************************************
 * Third stage of testing
 * **********************************************************************
@@ -654,7 +654,7 @@
 * **********************************************************************
 * Observation meets positional requirement, store it
 * **********************************************************************
-* 
+*
 *  Call FIND21 to store details of the section of the observation which
 *  forms the scan in scan common, and set up cross references between
 *  the scan details and the corresponding source details, and vice
@@ -670,7 +670,7 @@
 
 *  Check that the return status is ok
 	                        IF ( STATUS .NE. SAI__OK ) RETURN
-	
+
 *  End if for third stage criterion
                               END IF
 
@@ -687,14 +687,14 @@
 *  Update observation required to the first observation of the next
 *  block
                               CUBLNO = CUBLNO + 1
-                              CUOBNO = 1                           
+                              CUOBNO = 1
                            END IF
-      
+
 * *********************************************************************
 *  End of for each Observation loop
 * **********************************************************************
  200                    CONTINUE
-               
+
 *  End if for first stage criterion
                      END IF
 
@@ -719,17 +719,17 @@
 
 *  End if for test that source still has room for more scans
                   END IF
-      
+
 *  End if for test of whether source is not marked for deletion
                END IF
-      
+
 * **********************************************************************
 *  End of for each Source loop
 * **********************************************************************
  300        CONTINUE
 
          END IF
-      
+
 * **********************************************************************
 *  End of for each SOP loop
 * **********************************************************************

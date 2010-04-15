@@ -2,7 +2,7 @@
 
         implicit none
 
-	integer 
+	integer
      :	  nx,
      :	  ny,
      :	  xdim,
@@ -11,7 +11,7 @@
      :	  j,
      :	  k
 
-	real 
+	real
      :	  arr( nx, ny),
      :	  sarr( xdim, ydim)
 

@@ -12,19 +12,19 @@ C     comprehensive routine FIG_CROSS in order to determine the relative
 C     shift between two spectra.  None of the options of FIG_CROSS are
 C     available, and reasonable default values are used for all its
 C     various parameters. The spectra passed are returned unchanged.
-C     The shift is that of the first spectrum relative to the second, 
-C     and is positive if the first is shifted to the right (similar 
+C     The shift is that of the first spectrum relative to the second,
+C     and is positive if the first is shifted to the right (similar
 C     data appears at higher pixel numbers) relative to the second.
 C
 C  Language: FORTRAN
-C     
+C
 C  Call:
 C     CALL FIG_SHIFT (SPECT0,SPECT1,NX,SHIFT,STATUS)
 C
 C  Parameters:    (">" input, "<" output, "!" modified, "W" workspace)
 C     (>) SPECT0  (Float array,ref) The first spectrum.
 C     (>) SPECT1  (Float array,ref) The second spectrum.
-C     (>) NX      (Integer, ref) The number of elements in each of the 
+C     (>) NX      (Integer, ref) The number of elements in each of the
 C                 spectra.
 C     (<) SHIFT   (Float,ref) The shift of spectrum 1 relative to
 C                 spectrum 2 in elements (pixels).
@@ -34,7 +34,7 @@ C                 will have been used to output an error message.
 C
 C  External variables used: None.
 C
-C  External subroutines / functions used: 
+C  External subroutines / functions used:
 C     DSA_GET_WORKSPACE, DSA_FREE_WORKSPACE, DSA_TYPESIZE, DSA_WRUSER
 C     CNF_PVAL, GEN_MOVE, GEN_POWER2, FIG_CROSS
 C
@@ -61,29 +61,29 @@ C
       REAL SPECT0(NX),SPECT1(NX),SHIFT
 C
 C     Functions
-C 
+C
       INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER   ARRAY0           ! Pointer to workspace holding SPECT 
+      INTEGER   ARRAY0           ! Pointer to workspace holding SPECT
                                  ! data
       INTEGER   ARRAY1           ! Pointer to workspace holding TEMPLATE
                                  ! data
       INTEGER   BDOUB            ! Number of bytes per double-prec.
                                  ! number
-      INTEGER   BFLOAT           ! Number of bytes per floating-point 
+      INTEGER   BFLOAT           ! Number of bytes per floating-point
                                  ! number
       INTEGER   BYTES            ! Number of bytes
-      LOGICAL   CFIT             ! If false, disables the usual 
+      LOGICAL   CFIT             ! If false, disables the usual
                                  ! continuum fit
-      INTEGER   CFN              ! Pointer to the correlation function 
+      INTEGER   CFN              ! Pointer to the correlation function
                                  ! array
-      INTEGER   FT0              ! Pointer to the fourier transform of 
+      INTEGER   FT0              ! Pointer to the fourier transform of
                                  ! SPECT data
       INTEGER   FT1              ! Pointer to the fourier transform of
                                  ! TEMPLATE data
-      INTEGER   FTFCN            ! Pointer to the fourier transform of 
+      INTEGER   FTFCN            ! Pointer to the fourier transform of
                                  ! CORRL data
       LOGICAL   GOTWORK          ! Indicates workspace was obtained
       INTEGER   IGNORE           ! Used for status values we don't care

@@ -2172,8 +2172,8 @@ itcl::class gaia::GaiaSextractor {
       set valuenames_ {
          catname catpar cattype minsize threshtype detthresh
          analthresh detfilter debthresh debcontrast detclean deteffic
-         photzero photnum photapps kronfact kronmin petrofact petromin 
-         photmask dettype imagescale photsat photgain photgamma fwhm 
+         photzero photnum photapps kronfact kronmin petrofact petromin
+         photmask dettype imagescale photsat photgain photgamma fwhm
          nettable backmesh backfilter backtype backvalue backphot backthick
          checktype checkimage memory_objstack memory_pixstack memory_bufsize
          verbose_type radtype radthresh

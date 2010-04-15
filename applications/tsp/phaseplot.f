@@ -38,11 +38,11 @@ C        CHANn      (Integer)  Channel for nth plot. This and the
 C                               following parameters repeat for
 C                               n = 1 to NPLOTS.
 C        ITEMn      (Char)     Item for nth plot (I,FLUX,MAG,Q,U,V,P,THETA)
-C        AUTOn      (Logical)  If True nth plot is autoscaled.    
+C        AUTOn      (Logical)  If True nth plot is autoscaled.
 C        BINn       (Double)   Bin size (negative for no binning).
 C        PLABELn    (Char)     Label for plot n.
 C    (C) MINn       (Real)     Minimum scaling level for plot n.
-C    (C) MAXn       (Real)     Maximum scaling level for plot n. 
+C    (C) MAXn       (Real)     Maximum scaling level for plot n.
 C        LABEL      (Char)     Label for Diagram.
 C    (H) ERRORS     (Logical)  If True (default), Error bars are plotted.
 C    (H) LINE       (Logical)  If True, the points are joined by a
@@ -60,7 +60,7 @@ C
 C-
 C
 C  History:
-C    Nov/1987   Original Version.   JAB/AAO 
+C    Nov/1987   Original Version.   JAB/AAO
 C    28/2/1988   TSP Monolith version.  JAB/AAO
 C    1/3/1990    Handle bad pixels.  JAB/AAO
 C
@@ -72,9 +72,9 @@ C
 
 *  Status argument
       INTEGER STATUS
-      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays   
+      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays
       INTEGER XPTR                         ! Pointer to X (time) array
-      INTEGER WPTR                         ! Pointer to wavelength axis     
+      INTEGER WPTR                         ! Pointer to wavelength axis
       INTEGER STRT,FIN                     ! Start and finish channels
       INTEGER SIZE                         ! Original size of data in X
       INTEGER FSIZE                        ! Size after X limits selection
@@ -85,7 +85,7 @@ C
       REAL IMIN,IMAX                       ! Y scaling limits
       CHARACTER*(DAT__SZLOC) LOC           ! Top level locator
       CHARACTER*1 C                        ! Character to append to
-                                           ! parameter names for current plot  
+                                           ! parameter names for current plot
       CHARACTER*5 ITEM                     ! Current item to be plotted
       INTEGER CHAN                         ! Current channel to be plotted
       REAL TOP,BOT                         ! Grid positions for Top and
@@ -95,18 +95,18 @@ C
       CHARACTER*40 XLABEL                  ! X axis label
       LOGICAL FIRST,LAST                   ! First,Last plot flags
       INTEGER NCHANS                       ! Number of channels in data
-      INTEGER ZONE                         ! SGS zone for plot      
-      DOUBLE PRECISION BINSIZE             ! Binsize for current plot 
+      INTEGER ZONE                         ! SGS zone for plot
+      DOUBLE PRECISION BINSIZE             ! Binsize for current plot
       REAL PTOP, PBOTTOM                   ! Plot positioning
       INTEGER DIMS(3)                      ! Dimensions of data
       INTEGER ACTDIM                       ! Actual number of dimensions
       CHARACTER*(DAT__SZLOC) XLOC,WLOC     ! Axis locators
       LOGICAL FILE
-      INTEGER STAT                                        
+      INTEGER STAT
 
 *  HDS locators
 
-      CHARACTER*(DAT__SZLOC) YRLOC,YELOC,SRLOC,SELOC,S2RLOC,S2ELOC          
+      CHARACTER*(DAT__SZLOC) YRLOC,YELOC,SRLOC,SELOC,S2RLOC,S2ELOC
       CHARACTER*(DAT__SZLOC) XXLOC,XDLOC,TILOC,TDLOC,T1LOC,T2LOC
 
 *   Temporary array pointers
@@ -116,29 +116,29 @@ C
       INTEGER S2RPTR,S2EPTR,STPTR
 
 *  Phase range parameters
-                 
+
       DOUBLE PRECISION PHSTART,PHEND
 
 *  Get the data
-                                             
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
 
 *  Get the number of plots
 
       CALL PAR_GET0I('NPLOTS',NPLOTS,STATUS)
-                      
-      IF (STATUS .EQ. SAI__OK) THEN                           
+
+      IF (STATUS .EQ. SAI__OK) THEN
 
 *  Initialize for plotting
 
         CALL TSP_PHSINITAG(ZONE,STATUS)
 
 *  Get file parameter
-        
+
         CALL PAR_GET0L('FILE',FILE,STATUS)
 
 *  Get X Axis data
-                 
+
         CALL TSP_MAP_TIME(LOC,'READ',XPTR,XLOC,STATUS)
         CALL TSP_MAP_LAMBDA(LOC,'READ',WPTR,WLOC,STATUS)
 
@@ -164,9 +164,9 @@ C
         CALL TSP_TEMP(3*SIZE,'_DOUBLE',TDPTR,TDLOC,STATUS)
         CALL TSP_TEMP(3*SIZE,'_DOUBLE',XXPTR,XXLOC,STATUS)
         CALL TSP_TEMP(3*SIZE,'_DOUBLE',XDPTR,XDLOC,STATUS)
-                                     
+
 *   Find X plotting limits
-                     
+
         CALL TSP_PHSXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
         SIZE = FIN-STRT+1
         FSIZE = SIZE
@@ -174,7 +174,7 @@ C
 *  Get phase range parameters
 
         CALL PAR_GET0D('PHSTART',PHSTART,STATUS)
-        CALL PAR_GET0D('PHEND',PHEND,STATUS)           
+        CALL PAR_GET0D('PHEND',PHEND,STATUS)
 
 *  Plot Positioning
 
@@ -208,8 +208,8 @@ C
           IF (STATUS .NE. SAI__OK) GOTO 100
 
 *   Check that all the necessary components are available
-       
-          IF (ITEM .EQ. 'I' .OR. ITEM .EQ. 'MAG' 
+
+          IF (ITEM .EQ. 'I' .OR. ITEM .EQ. 'MAG'
      :        .OR. ITEM .EQ. 'FLUX') THEN
 
 *  We need intensity if item is I, MAG or FLUX
@@ -241,12 +241,12 @@ C
               IF (IPTR .EQ. 0 .OR. UPTR .EQ. 0) THEN
                   CALL MSG_OUT('MSG','Item Not Available',STATUS)
                   STATUS = USER__001
-              ENDIF                 
+              ENDIF
           ELSE IF (ITEM .EQ. 'P' .OR. ITEM .EQ. 'THETA') THEN
 
 *  We need I, Q and U if item is P or THETA
 
-              IF (IPTR .EQ. 0 .OR. QPTR .EQ. 0 
+              IF (IPTR .EQ. 0 .OR. QPTR .EQ. 0
      :               .OR. UPTR .EQ. 0) THEN
                   CALL MSG_OUT('MSG','Item Not Available',STATUS)
                   STATUS = USER__001
@@ -256,7 +256,7 @@ C
 *  Bin Size and Autoscaling?
 
           CALL PAR_GET0D('BIN'//C,BINSIZE,STATUS)
-          CALL PAR_GET0L('AUTO'//C,AUTO,STATUS)    
+          CALL PAR_GET0L('AUTO'//C,AUTO,STATUS)
 
 *  Bin data, convert the item to required form for plots, and get scaling limits
 
@@ -264,8 +264,8 @@ C
 
           IF (ITEM.EQ.'I'.OR.ITEM.EQ.'FLUX'.OR.ITEM.EQ.'MAG') THEN
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
+     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
               SIZE = NEWSIZE
               IF (ITEM .EQ. 'FLUX') THEN
                 CALL TSP_PHSFLUX(SIZE,%VAL(YRPTR),%VAL(YEPTR),STATUS)
@@ -276,19 +276,19 @@ C
               CALL TSP_PHSSCALE(SIZE,%VAL(XDPTR),%VAL(YRPTR),
      :             %VAL(YEPTR),IMIN,IMAX,STATUS)
 
-*  Stokes Q, U OR V (%) 
+*  Stokes Q, U OR V (%)
 
           ELSE IF (ITEM.EQ.'Q'.OR.ITEM.EQ.'U'.OR.ITEM.EQ.'V') THEN
               IF (ITEM .EQ. 'Q') STPTR=QPTR
               IF (ITEM .EQ. 'U') STPTR=UPTR
               IF (ITEM .EQ. 'V') STPTR=VPTR
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
+     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(STPTR),%VAL(SRPTR),%VAL(SEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
-              SIZE = NEWSIZE      
+     :          %VAL(STPTR),%VAL(SRPTR),%VAL(SEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
+              SIZE = NEWSIZE
               CALL TSP_PHSSTOKES(SIZE,%VAL(YRPTR),%VAL(YEPTR),
      :             %VAL(SRPTR),%VAL(SEPTR),STATUS)
               CALL TSP_PHSSCALE(SIZE,%VAL(XDPTR),%VAL(YRPTR),
@@ -298,15 +298,15 @@ C
 
           ELSE IF (ITEM .EQ. 'P') THEN
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
+     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(QPTR),%VAL(SRPTR),%VAL(SEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
+     :          %VAL(QPTR),%VAL(SRPTR),%VAL(SEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(UPTR),%VAL(S2RPTR),%VAL(S2EPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
-              SIZE = NEWSIZE      
+     :          %VAL(UPTR),%VAL(S2RPTR),%VAL(S2EPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
+              SIZE = NEWSIZE
               CALL TSP_PHSPOL(SIZE,%VAL(YRPTR),%VAL(YEPTR),%VAL(SRPTR),
      :             %VAL(SEPTR),%VAL(S2RPTR),%VAL(S2EPTR),STATUS)
               CALL TSP_PHSSCALE(SIZE,%VAL(XDPTR),%VAL(YRPTR),
@@ -316,21 +316,21 @@ C
 
           ELSE IF (ITEM .EQ. 'THETA') THEN
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
+     :          %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(QPTR),%VAL(SRPTR),%VAL(SEPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
+     :          %VAL(QPTR),%VAL(SRPTR),%VAL(SEPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
               CALL TSP_PHSBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :          %VAL(UPTR),%VAL(S2RPTR),%VAL(S2EPTR),BINSIZE,   
-     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)    
-              SIZE = NEWSIZE      
+     :          %VAL(UPTR),%VAL(S2RPTR),%VAL(S2EPTR),BINSIZE,
+     :          %VAL(TIPTR),%VAL(TDPTR),PHSTART,PHEND,NEWSIZE,STATUS)
+              SIZE = NEWSIZE
               CALL TSP_PHSTHETA(SIZE,%VAL(YRPTR),%VAL(YEPTR),
      :             %VAL(SRPTR),%VAL(SEPTR),%VAL(S2RPTR),
      :             %VAL(S2EPTR),STATUS)
               CALL TSP_PHSSCALE(SIZE,%VAL(XDPTR),%VAL(YRPTR),
      :             %VAL(YEPTR),IMIN,IMAX,STATUS)
-          ENDIF         
+          ENDIF
 
 *  Set scaling limits
 
@@ -339,30 +339,30 @@ C
              CALL PAR_DEF0R('MAX'//C,IMAX,STATUS)
              CALL PAR_GET0R('MIN'//C,IMIN,STATUS)
              CALL PAR_GET0R('MAX'//C,IMAX,STATUS)
-          ENDIF        
+          ENDIF
 
 *  Set first,last flags
-                            
+
           LAST = (PLOT .EQ. NPLOTS)
-          FIRST = (PLOT .EQ. 1)     
-                       
+          FIRST = (PLOT .EQ. 1)
+
 *  Determine plot position
 
-          TOP = REAL(NPLOTS-PLOT+1)/REAL(NPLOTS) 
+          TOP = REAL(NPLOTS-PLOT+1)/REAL(NPLOTS)
      :       * (PTOP-PBOTTOM) + PBOTTOM
-          BOT = REAL(NPLOTS-PLOT)/REAL(NPLOTS) 
+          BOT = REAL(NPLOTS-PLOT)/REAL(NPLOTS)
      :       * (PTOP-PBOTTOM) + PBOTTOM
 
 *  Set Y axis label
 
-          IF (ITEM .EQ. 'I') THEN     
+          IF (ITEM .EQ. 'I') THEN
               YLABEL = 'Counts/sec$'
           ELSE IF (ITEM .EQ. 'FLUX') THEN
               YLABEL = 'Flux mJy$'
           ELSE IF (ITEM .EQ. 'MAG') THEN
               YLABEL = 'Magnitude$'
           ELSE IF (ITEM .EQ. 'V') THEN
-              YLABEL = 'V/I (%)$'              
+              YLABEL = 'V/I (%)$'
           ELSE IF (ITEM .EQ. 'Q') THEN
               YLABEL = 'Q/I (%)$'
           ELSE IF (ITEM .EQ. 'U') THEN
@@ -372,7 +372,7 @@ C
           ELSE IF (ITEM .EQ. 'THETA') THEN
               YLABEL = 'Theta (degrees)$'
           ENDIF
-              
+
 *  Get plot label
 
           CALL PAR_GET0C('PLABEL'//C,PLABEL,STATUS)
@@ -389,13 +389,13 @@ C
           CALL TSP_PHSUNMAPITEM(LOC,STATUS)
           PLOT = PLOT+1
         ENDDO
-      ENDIF        
-                                           
+      ENDIF
+
 100   CONTINUE
 
-*  Tidy up      
-                              
-      STAT = SAI__OK    
+*  Tidy up
+
+      STAT = SAI__OK
       CALL TSP_UNMAP(XLOC,STAT)
       CALL TSP_UNMAP(WLOC,STAT)
       CALL TSP_UNMAP(YRLOC,STAT)
@@ -413,11 +413,11 @@ C
       CALL DAT_ANNUL(LOC,STAT)
       CALL SGS_ANNUL(ZONE,STAT)
       END
-              
 
-             
-             
- 
+
+
+
+
 
 
 
@@ -447,7 +447,7 @@ C
 *  (>)  PHEND    (Double)    End phase for plot
 *  (<)  NEWSIZE  (Integer)   Number of data points after binning
 *  (!)  STATUS   (Integer)   Status value
-*    
+*
 *  Jeremy Bailey    28/2/1988
 *
 *  Modified:
@@ -463,25 +463,25 @@ C
       INCLUDE 'USER_ERR'
 
 *  Parameters
-      INTEGER SIZE,NEWSIZE                    
+      INTEGER SIZE,NEWSIZE
       REAL Y(SIZE), YB(*), YE(*)
       INTEGER STATUS
       DOUBLE PRECISION BINSIZE
       DOUBLE PRECISION X(*),XB(*)
-      INTEGER NP(*)                    
-      DOUBLE PRECISION DS(*)                   
+      INTEGER NP(*)
+      DOUBLE PRECISION DS(*)
       DOUBLE PRECISION PHSTART,PHEND
 
-*  Local variables      
-      INTEGER I                    
+*  Local variables
+      INTEGER I
       DOUBLE PRECISION D,DD
       INTEGER BIN1,BIN2,BIN3,BIN
-      REAL PHASE    
+      REAL PHASE
       REAL YX
-     
-               
+
+
       IF (STATUS .EQ. SAI__OK) THEN
-                                      
+
 *  determine size of binned array and check that it is not too large
 
          IF (BINSIZE .GT. 0.0) THEN
@@ -489,7 +489,7 @@ C
          ELSE
              NEWSIZE = SIZE
              BIN = 1
-         ENDIF             
+         ENDIF
 
 *  Complain if there are too many bins for the data array sizes
 
@@ -503,51 +503,51 @@ C
 
          DO I=1,NEWSIZE
              YB(I) = 0.0
-             DS(I) = 0.0            
-             NP(I) = 0  
+             DS(I) = 0.0
+             NP(I) = 0
              XB(I) = 0.0
          ENDDO
-                                                                    
+
 *  Loop over points of unbinned data, adding into appropriate bin
 *  We have to take into account the fact that the same data point could
 *  appear in up to three bins, since the phase range can go from -1 to
 *  2.
 
-         DO I=1,SIZE                                  
-             IF (BINSIZE .GT. 0.0 .AND. Y(I) .NE. VAL__BADR) THEN               
+         DO I=1,SIZE
+             IF (BINSIZE .GT. 0.0 .AND. Y(I) .NE. VAL__BADR) THEN
 
 *  Determine three possible bin numbers
 
                  BIN1 = (X(I)-PHSTART)/BINSIZE + 1
                  BIN2 = (X(I)-PHSTART-1.0)/BINSIZE + 1
-                 BIN3 = (X(I)-PHSTART+1.0)/BINSIZE + 1 
+                 BIN3 = (X(I)-PHSTART+1.0)/BINSIZE + 1
 
 *  If first bin number is in range to be plotted add data into bin
-       
-                 IF (BIN1 .GT. 0 .AND. BIN1 .LE. NEWSIZE) THEN                         
-                     YB(BIN1) = YB(BIN1) + Y(I)                   
-                     DS(BIN1) = DS(BIN1) + Y(I)*Y(I)              
-                     NP(BIN1) = NP(BIN1) + 1                      
-                     XB(BIN1) = XB(BIN1) + X(I)                   
-                 ENDIF                                            
+
+                 IF (BIN1 .GT. 0 .AND. BIN1 .LE. NEWSIZE) THEN
+                     YB(BIN1) = YB(BIN1) + Y(I)
+                     DS(BIN1) = DS(BIN1) + Y(I)*Y(I)
+                     NP(BIN1) = NP(BIN1) + 1
+                     XB(BIN1) = XB(BIN1) + X(I)
+                 ENDIF
 
 *  If second bin number is in range to be plotted add data into bin
 
-                 IF (BIN2 .GT. 0 .AND. BIN2 .LE. NEWSIZE) THEN                         
-                     YB(BIN2) = YB(BIN2) + Y(I)                   
-                     DS(BIN2) = DS(BIN2) + Y(I)*Y(I)              
-                     NP(BIN2) = NP(BIN2) + 1                      
-                     XB(BIN2) = XB(BIN2) + X(I)-1.0               
-                 ENDIF                                            
+                 IF (BIN2 .GT. 0 .AND. BIN2 .LE. NEWSIZE) THEN
+                     YB(BIN2) = YB(BIN2) + Y(I)
+                     DS(BIN2) = DS(BIN2) + Y(I)*Y(I)
+                     NP(BIN2) = NP(BIN2) + 1
+                     XB(BIN2) = XB(BIN2) + X(I)-1.0
+                 ENDIF
 
 *  If third bin number is in range to be plotted add data into bin
 
-                 IF (BIN3 .GT. 0 .AND. BIN3 .LE. NEWSIZE) THEN                         
-                     YB(BIN3) = YB(BIN3) + Y(I)                   
-                     DS(BIN3) = DS(BIN3) + Y(I)*Y(I)              
-                     NP(BIN3) = NP(BIN3) + 1                      
-                     XB(BIN3) = XB(BIN3) + X(I)+1.0               
-                 ENDIF                                            
+                 IF (BIN3 .GT. 0 .AND. BIN3 .LE. NEWSIZE) THEN
+                     YB(BIN3) = YB(BIN3) + Y(I)
+                     DS(BIN3) = DS(BIN3) + Y(I)*Y(I)
+                     NP(BIN3) = NP(BIN3) + 1
+                     XB(BIN3) = XB(BIN3) + X(I)+1.0
+                 ENDIF
              ELSE IF (Y(I) .NE. VAL__BADR) THEN
 
 *  Handle the case where we are not binning, but plotting every point
@@ -555,7 +555,7 @@ C
 
 *  Phase range 0 to 1
 
-                 PHASE = X(I) 
+                 PHASE = X(I)
                  IF (PHASE .GT. PHSTART .AND. PHASE .LT. PHEND) THEN
                      YB(BIN) = Y(I)
                      NP(BIN) = 1
@@ -565,7 +565,7 @@ C
 
 *  Phase range 1 to 2
 
-                 PHASE = PHASE+1.0                    
+                 PHASE = PHASE+1.0
                  IF (PHASE .GT. PHSTART .AND. PHASE .LT. PHEND) THEN
                      YB(BIN) = Y(I)
                      NP(BIN) = 1
@@ -582,12 +582,12 @@ C
                      XB(BIN) = PHASE
                      BIN=BIN+1
                  ENDIF
-             ENDIF       
-         ENDDO                 
+             ENDIF
+         ENDDO
          IF (BINSIZE .LT. 0.0) THEN
              NEWSIZE = BIN-1
-         ENDIF                       
-                                                                  
+         ENDIF
+
 *  Calculate X,Y and errors for bin
 
          DO I=1,NEWSIZE
@@ -608,8 +608,8 @@ C
 *  Otherwise calculate mean and standard error of data in bin
 
                  YB(I) = YB(I)/NP(I)
-                 XB(I) = XB(I)/NP(I)    
-                 D = YB(I) 
+                 XB(I) = XB(I)/NP(I)
+                 D = YB(I)
                  DD = DS(I)-D*D*NP(I)
                  IF (DD .GT. 0.0) THEN
                      YE(I) = REAL(DSQRT(DD/(NP(I)*(NP(I)-1))))
@@ -617,11 +617,11 @@ C
                      YE(I) = 0
                  ENDIF
              ENDIF
-         ENDDO              
-         
-      ENDIF                              
+         ENDDO
+
+      ENDIF
       END
-                                   
+
 
 
 

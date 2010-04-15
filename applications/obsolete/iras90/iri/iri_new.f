@@ -19,9 +19,9 @@
 *     deleted and a new one created with an HDS locator to it being
 *     returned to the calling application. Values are stored for the
 *     mandatory IMAGE_INFO components BAND, INSTRUMENT and TYPE, and the
-*     NDF UNITS component. Note, no ASTROMETRY structure is created by 
-*     this routine. The IRA package must be used to create such a 
-*     structure before the image can be used by other IRAS90 
+*     NDF UNITS component. Note, no ASTROMETRY structure is created by
+*     this routine. The IRA package must be used to create such a
+*     structure before the image can be used by other IRAS90
 *     applications.
 
 *  Arguments:
@@ -29,21 +29,21 @@
 *        An identifier for the NDF holding the image.
 *     INSTRM = CHARACTER * ( * ) (Given)
 *        The instrument from which the data originated; CPC or
-*        SURVEY. 
+*        SURVEY.
 *     BAND = INTEGER (Given)
 *        The IRAS waveband no of the data in the image. This must be
 *        in the range 1 - 4 for data from the survey array and 1 - 2
 *        for data from the CPC.
 *     TYPE = CHARACTER * ( * ) (Given)
-*        The image type. Legal values are listed in ID/12. An error is 
+*        The image type. Legal values are listed in ID/12. An error is
 *        reported if an unknown value is supplied.
 *     UNITS = CHARACTER * ( * ) (Given)
 *        A string describing the system of units in which the DATA array
 *        values are stored. This string is stored as the NDF UNITS
 *        component. The supplied value must be on of the standard values
-*        listed in ID12, otherwise an error is reported. Note, in this 
-*        case the error is reported after the units have been stored, 
-*        so that annulling the error will enable an application to 
+*        listed in ID12, otherwise an error is reported. Note, in this
+*        case the error is reported after the units have been stored,
+*        so that annulling the error will enable an application to
 *        proceed without needing to store a new value for UNITS.
 *     LOC = CHARACTER * ( * ) (Returned)
 *        An HDS locator to the created IMAGE_INFO structure residing
@@ -133,10 +133,10 @@
      :                 STATUS )
          GO TO 999
 
-      END IF            
+      END IF
 
 *  Validate the TYPE argument.
-      IF( TYPE .NE. IRI__CPC .AND.      
+      IF( TYPE .NE. IRI__CPC .AND.
      :    TYPE .NE. IRI__SKYFL .AND.
      :    TYPE .NE. IRI__GALPL .AND.
      :    TYPE .NE. IRI__ALLSK .AND.
@@ -153,10 +153,10 @@
      :                 'IRI_NEW: Illegal image type (^T) given',
      :                 STATUS )
 
-      END IF      
+      END IF
 
 *  Check that the NDF is two dimensional.
-      CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )      
+      CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
       IF( STATUS .EQ. SAI__OK .AND. NDIM .NE. 2 ) THEN
          STATUS = IRI__NOT2D
          CALL MSG_SETI( 'ND', NDIM )
@@ -210,7 +210,7 @@
       CALL NDF_CPUT( UNITS, INDF, 'UNITS', STATUS )
 
 *  Validate argument UNITS.
-      IF( UNITS .NE. IRI__JPS .AND.      
+      IF( UNITS .NE. IRI__JPS .AND.
      :    UNITS .NE. IRI__MJPS .AND.
      :    UNITS .NE. IRI__JPP .AND.
      :    UNITS .NE. IRI__FPS .AND.
@@ -222,7 +222,7 @@
      :                 'IRI_NEW: Non-standard units (^U) given',
      :                 STATUS )
 
-      END IF      
+      END IF
 
 *  If an error has been reported, give a context message.
  999  CONTINUE

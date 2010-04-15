@@ -30,23 +30,23 @@ C
 C     all in blocks MUINFO and MUCHAR
 C
 C     Subroutines / functions used -
-C 
+C
 C     DAT_ANNUL    (HDS_ package) Annul an HDS locator
 C     DTA_HDSERC   (DTA_    "   ) Convert an HDS error to a DTA code
 C     DTA_TRNAME   ( "      "   ) Fold name to upper case and tidy up
 C     EMS_ANNUL    (EMS_  "     ) Clear current EMS error status.
-C     
+C
 C                                         KS / AAO 26th May 1986
 C     Modified:
 C
 C     8th  Jan 1992.  KS / AAO. Syntax of include file names changed to allow
 C                     routine to compile on a SUN.
 C     24th Jan 1992.  KS / AAO. With new HDS, setting STATUS=0 before a call
-C                     to an HDS routine may not be enough. Replaced by 
+C                     to an HDS routine may not be enough. Replaced by
 C                     CALL EMS_ANNUL(STATUS).
 C     12th Apr 1993.  HME / UoE, Starlink. For DTAMAP must include SAE_PAR
 C                     and DAT_PAR as well.
-C                     
+C
 C+
       IMPLICIT NONE
 C
@@ -95,7 +95,7 @@ C
                CALL DAT_VALID(MULOCS(I),VALID,STATUS)
                IF (VALID) THEN
                   CALL DAT_ANNUL(MULOCS(I),STATUS)
-                  IF (STATUS.NE.0) THEN 
+                  IF (STATUS.NE.0) THEN
                      CALL DTA_HDSERC(STATUS)
                      GO TO 600
                   END IF
@@ -105,7 +105,7 @@ C
       END DO
 C
 C     Exit
-C     
+C
   600 CONTINUE
 C
       END

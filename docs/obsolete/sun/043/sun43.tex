@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -45,10 +45,10 @@ RUTHERFORD APPLETON LABORATORY\\
 EDFITS is a program used at AAO to copy and edit FITS tapes.  Since it is
 designed to be used with original data tapes, it has a slightly unusual
 style which places a heavy emphasis on making as sure as possible that you
-are not doing anything rash---such as mounting an input tape with a write 
+are not doing anything rash---such as mounting an input tape with a write
 ring fitted---and that you understand the consequences of the commands
 given.  So, for example, after most commands the effect that the command will
-have is described and you are asked to confirm the command before it is 
+have is described and you are asked to confirm the command before it is
 executed.  Apart from its ability to produce usefully formatted header listings
 for a variety of flavours of FITS tapes, EDFITS provides little that cannot
 be done with standard tape manipulation programs such as MTCOPY.  However,
@@ -69,9 +69,9 @@ EDFITS works with one input tape and one output tape.  Its main function is
 to allow you to copy selected files from the input tape onto the output tape.
 Its other capabilities---allowing you to move around on either tape, for
 example, or make a directory of the tape contents---are really just to help
-with this main function. The tapes do not need to be MOUNTED before the 
+with this main function. The tapes do not need to be MOUNTED before the
 program is run (you can set the output tape density from within EDFITS, so
-MOUNT/DEN= is not needed), but it is probably a good idea to ALLocate the 
+MOUNT/DEN= is not needed), but it is probably a good idea to ALLocate the
 drives first,
 e.g.
 \begin{verbatim}
@@ -90,7 +90,7 @@ severely to your system manager.
 \section{Initial setup}
 
 EDFITS leads you by the hand through the initial stages of determining
-which tape drives are to be used for the input and output tapes.  
+which tape drives are to be used for the input and output tapes.
 
 Firstly, an introductory message is displayed and you are invited to press
 RETURN to indicate that you have read it.  The introductory message makes the
@@ -99,12 +99,12 @@ important point that you can invariably get more help at any time by entering
 at this point instead of just pressing RETURN; you will get an idea of the
 (irritating?) way EDFITS works.
 
-Then, you are prompted for the name of the input tape drive.  This can be 
+Then, you are prompted for the name of the input tape drive.  This can be
 the actual name, for example \_MTA0: (the `:' is optional, as is the `\_'),
 or a logical name.  EDFITS will complain if the tape has a write ring.  If
 the tape is not at the load point (perhaps having been left there from a
-previous run of EDFITS or some other program), it will point this out and 
-give you the option of rewinding it.  It helps EDFITS a little if you start 
+previous run of EDFITS or some other program), it will point this out and
+give you the option of rewinding it.  It helps EDFITS a little if you start
 with the tapes at the load point, since it can then keep track of the actual
 tape positions, but this is not necessary.
 
@@ -116,8 +116,8 @@ will complain if the output tape does not have a write ring.  As for the
 input tape, EDFITS will offer to rewind a tape that is not at the load point.
 
 EDFITS will then give you the option of initialising the output tape.  Note
-that EDFITS is fussy about its output tapes and will NEVER (really, 
-NEVER\footnote{Well, HARDLY ever.  The only exceptions are when a tape is 
+that EDFITS is fussy about its output tapes and will NEVER (really,
+NEVER\footnote{Well, HARDLY ever.  The only exceptions are when a tape is
 initialised or terminated by the TERM command})
 write to an output tape without first locating the two successive file marks
 that it assumes indicate the end of the data already on the tape.  This means
@@ -138,7 +138,7 @@ in the FITS headers, it leaves the choice of all bar a few standard keywords
 up to the writer of the tape.  EDFITS---a mere copying program---is not
 concerned with the meaning of the various keywords, but there is one case
 where they are of some importance.  When EDFITS does what it calls a
-`Partial Directory' of a tape, where it generates a one line summary of 
+`Partial Directory' of a tape, where it generates a one line summary of
 each FITS image on the tape, it needs to know which of the FITS keywords to
 include in the listing and how to format their values.
 
@@ -160,7 +160,7 @@ syntax.
 Many commands have no parameters at all.  Those that could sensibly
 apply to either tape have a parameter shown in the menu as `I/O'.  You actually
 specify this parameter as either `INPUT' or `OUTPUT'---or an abbreviation
-of these, usually just `I' or `O'---to indicate which tape you intend to 
+of these, usually just `I' or `O'---to indicate which tape you intend to
 be used.  If you only have one tape this parameter becomes optional.  Some
 commands have a numeric parameter: `SKip', for example, needs to know
 not only what tape to skip on, but how many files to skip, and is shown
@@ -183,12 +183,12 @@ The commands will now be listed individually:
 
 Copy specified number of file from input tape to output
 
-Syntax:   `COpy  \#'     
+Syntax:   `COpy  \#'
 
 where \# is some positive number.
 
-COPY will copy the specified number of files from the input tape to 
-the output tape.  The copy will start from the current position of the 
+COPY will copy the specified number of files from the input tape to
+the output tape.  The copy will start from the current position of the
 input tape.
 
 These files will be appended to the files already on the output
@@ -198,16 +198,16 @@ tape.
 
 Copy up to specified file from input tape to output
 
-Syntax:  `CT \#'       
+Syntax:  `CT \#'
 
 where \# is some input tape file number
 
-CT will copy files from the input tape to the output tape, up to 
+CT will copy files from the input tape to the output tape, up to
 and including the specified file. The copy will start at the current
-input tape position.    
+input tape position.
 
 These files will be appended to the files already on the output
-tape.  
+tape.
 
 \item [DUPE] --- Duplicate tapes.
 
@@ -220,7 +220,7 @@ input tape to the end of data on the input tape, to the output
 tape.   Note that the input tape is NOT rewound first.
 
 These files will be appended to the files already on the output
-tape.  
+tape.
 
 If the input tape is rewound, and the output tape has just been
 initialised, DUPE will produce a complete copy of the input tape.
@@ -241,14 +241,14 @@ will still be available, but not at their current positions.
 
 Full directory of input or output tape.
 
-Syntax:  `FD  tape'      
+Syntax:  `FD  tape'
 
 where `tape' is INPUT or OUTPUT
 
 The specified tape is rewound.  EDFITS then runs through all the
 files on it, listing the full FITS header for each in a file.  When
 the last file is read, the listing file is automatically printed.
-The tape will be left at the end of the last file on it.  
+The tape will be left at the end of the last file on it.
 
 Note that FD produces a lot of paper output, and is really rather
 wasteful.  In most cases, PD should be used instead, particularly if
@@ -260,7 +260,7 @@ file, as described later.
 
 Find end of output tape.
 
-Syntax:   `FEnd'             
+Syntax:   `FEnd'
 
 only applies to output tape.
 
@@ -269,15 +269,15 @@ at the end of the last file on the tape.  This is done automatically
 at the start of any copy command, but can be done separately to find
 how many files are on the output tape (if the tape position is known.)
 
-Ye of little faith may use FEND prior to a DUPE or COPY command if it 
-makes ye feel happier to see the tape positioned at the end of its 
-existing data before you give the command that will write to it.  
+Ye of little faith may use FEND prior to a DUPE or COPY command if it
+makes ye feel happier to see the tape positioned at the end of its
+existing data before you give the command that will write to it.
 
 \item [HElp] --- Describe command.
 
 Describe an EDFITS command.
 
-Syntax:  `Help command'  
+Syntax:  `Help command'
 
 where command is any EDFITS command.
 
@@ -289,7 +289,7 @@ HELP with no command specified will redisplay the main node menu.
 
 Rewind and Initialise Output Tape.
 
-Syntax:  `INit'            
+Syntax:  `INit'
 
 can only be used on the output tape.
 
@@ -303,12 +303,12 @@ want to do this. You have to explicitly confirm this command with a
 
 List header of next file on tape.
 
-Syntax:   `List  tape'    
+Syntax:   `List  tape'
 
 where `tape' can be INPUT or OUTPUT
 
 EDFITS will read the header of the next file on the specified tape
-and list it on the terminal. It will then backspace over that header, 
+and list it on the terminal. It will then backspace over that header,
 leaving the tape positioned exactly as it was.
 
 \item [NOw] --- Give positions.
@@ -331,8 +331,8 @@ Syntax:   `NPR'
 
 If EDFITS gets a parity error when reading the input tape, it can
 attempt to re-read the record a number of times before accepting
-that it has a solid parity error.  The `NPR' command disables the 
-re-reading of records with parity errors, and is the best option if 
+that it has a solid parity error.  The `NPR' command disables the
+re-reading of records with parity errors, and is the best option if
 you know that your tape is full of solid parity errors, since the
 continual re-reading takes a long time and may stress the tape
 unduly.
@@ -341,12 +341,12 @@ unduly.
 
 Partial directory of input or output tape.
 
-Syntax:  `PD  tape'      
+Syntax:  `PD  tape'
 
 where `tape' is INPUT or OUTPUT
 
 The specified tape is rewound.  EDFITS then runs through all the
-files on it, producing a disk file containing a single line for 
+files on it, producing a disk file containing a single line for
 each tape file, summarising the contents of its FITS header. When
 the last file is read, the listing file is automatically printed.
 The tape will be left at the end of the last file on it.
@@ -362,10 +362,10 @@ Syntax:  `PR'
 
 If EDFITS gets a parity error when reading the input tape, it can
 attempt to re-read the record a number of times before accepting
-that it has a solid parity error.  The `PR' command enables the 
-re-reading of records with parity errors, and is the best option if 
+that it has a solid parity error.  The `PR' command enables the
+re-reading of records with parity errors, and is the best option if
 you think your tape has only a few errors, or if they are marginal,
-since a marginal record may in fact be read properly on one of the 
+since a marginal record may in fact be read properly on one of the
 retries.
 
 \item [QUIT] --- Leave EDFITS.
@@ -381,12 +381,12 @@ positions, so you can restart EDFITS as you left it, should you need to.
 
 Rewind the input or output tape.
 
-Syntax:  `RW  tape'      
+Syntax:  `RW  tape'
 
 where `tape' is INPUT or OUTPUT
 
 The specified tape will be rewound.  If a tape was not at the load
-point when EDFITS was started, its position is unknown.  Rewinding 
+point when EDFITS was started, its position is unknown.  Rewinding
 a tape whose position is unknown is the only way of making sure
 EDFITS knows the position of the tape, and this can be useful.
 
@@ -394,13 +394,13 @@ EDFITS knows the position of the tape, and this can be useful.
 
 Skip files on input or output tape.
 
-Syntax:   `SKip  tape  \#'    
+Syntax:   `SKip  tape  \#'
 
 where `tape' is INPUT or OUTPUT and \# is a positive or negative number.
 
 EDFITS skips over the specified number of files on the specified tape.
 A positive number will cause the tape to be skipped forwards, and a
-negative number will cause a backwards skip.  The tape will be left 
+negative number will cause a backwards skip.  The tape will be left
 positioned at the start of a file.  LIST can be used to check that
 it is positioned where you wanted it.
 
@@ -408,7 +408,7 @@ it is positioned where you wanted it.
 
 Skip to a specified file on a tape.
 
-Syntax:    `ST  tape  \#'      
+Syntax:    `ST  tape  \#'
 
 where `tape' is INPUT or OUTPUT and \# is a file number.
 
@@ -420,7 +420,7 @@ it.  The position of the tape must be known for ST to work.
 
 Write an end of data marker on output tape.
 
-Syntax:   `TErm'            
+Syntax:   `TErm'
 
 can only be used for the output tape.
 
@@ -440,7 +440,7 @@ tape is in FITS format are the listing commands `LIST', `PD' and `FD'.
 The copying and positioning commands just treat the tapes as having a
 number of files and a double file mark to indicate the end of
 data on the tape.  Any tape that looks like this can be copied using EDFITS.
-This includes, for example, VAX standard tapes---indeed, EDFITS is the 
+This includes, for example, VAX standard tapes---indeed, EDFITS is the
 program its author uses to copy VMS BACKUP tapes.  The ability to suppress
 the re-reading of records with parity errors makes EDFITS a useful utility
 for making a copy of tapes with large numbers of parity errors.  EDFITS
@@ -450,15 +450,15 @@ than 8192 bytes.
 When using non-FITS tapes it helps if the `NONE' option is selected when
 you are prompted for the tape type.  If EDFITS thinks it is copying a FITS
 tape and it gets a parity error on input, it will force the output record
-length to be the standard FITS length of 2880 bytes if the input record 
+length to be the standard FITS length of 2880 bytes if the input record
 seems to be close to but not exactly that length.  This is an extremely
-minor consideration and EDFITS will normally copy any non-FITS tape 
+minor consideration and EDFITS will normally copy any non-FITS tape
 quite happily no matter what type it was told it was.
 
 \section{Logical names}
 
 EDFITS makes use of two files which it refers to by the logical names
-`EDFITS\_HELP' and `EDFITS\_TYPES'.  
+`EDFITS\_HELP' and `EDFITS\_TYPES'.
 
 EDFITS\_HELP should point to the file containing the various help and
 information blocks that are displayed during the running of EDFITS.  Normally
@@ -492,9 +492,9 @@ The rules governing the format of this file are as follows:
 
 \begin{itemize}
 
-\item Any line whose first character is `*' is treated as a comment.    
+\item Any line whose first character is `*' is treated as a comment.
 Blank lines are ignored.
-                                                                     
+
 \item The type described first will become the default type.
 
 \item A new type description is begun with a line that has a character
@@ -503,7 +503,7 @@ of the type.  Anything else on the line is regarded as just
 descriptive text.  This line should then be followed by lines
 describing the keywords to be used.
 
-\item A keyword description line has up to four parts, of which the 
+\item A keyword description line has up to four parts, of which the
 last two are optional.  They are separated by blanks.
 
 The first part is the name of the keyword itself.  In addition
@@ -511,8 +511,8 @@ to the actual names of FITS keywords, the following are also
 recognised:
 \begin{description}
 \item{\%FILE} is the file number on the tape.  Note that this refers only
-to which physical file on the tape is being processed, which is all that 
-EDFITS knows about.  
+to which physical file on the tape is being processed, which is all that
+EDFITS knows about.
 \item{\%BLANK} is a comment line - cols 1-8 in the FITS line are blank.
 \item{\%SIZE} is used for a formatted description of the image size.  This
 is based on the values of the NAXIS, NAXISn keywords.
@@ -596,11 +596,11 @@ If you specify the output tape as, for example,
 `MTA1/LEAVE', then EDFITS will bypass any positioning of the output tape
 at the setup stage.  This is sometimes useful for output tapes that
 already have a lot of data files. If you know, for example, that the first
-thing you are going to do is a directory of the output tape, then the 
+thing you are going to do is a directory of the output tape, then the
 normal way EDFITS locates the end of the tape data during setup is both
 time-consuming and unnecessary.  Using /LEAVE has no particularly dreadful
 consequences, since EDFITS will always find the end of tape before writing
-new files to it, but it goes against the `safety-first' policy of the 
+new files to it, but it goes against the `safety-first' policy of the
 EDFITS design.
 \end{description}
 \end{document}

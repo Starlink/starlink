@@ -1,6 +1,6 @@
       SUBROUTINE RTD1_STINT( IORD )
 C----------------------------------------------------------------------
-C   RTD1_STINT computes certain quantities which are needed by RTD1_EVERT 
+C   RTD1_STINT computes certain quantities which are needed by RTD1_EVERT
 C      when it computes the actual weights for an interpolation. The
 C      result produced by RTD1_STINT is in the BCOEF array in the COMMON
 C      block, and is based on binomial coefficients computed by RTD1_BINOM.
@@ -14,7 +14,7 @@ C                   1 = cubic, 2 = quintic, 3 = septic.
 C
 C  Modified by P.W. Draper, 25 November 1997. Was the FIGARO routine
 C     INITEI. Renamed and calls & common blocks modified to RTD1_
-C     namespace. 
+C     namespace.
 C
 C  Licence:
 C     This program is free software; you can redistribute it and/or
@@ -67,6 +67,6 @@ C
 C     Set up pointer constants:
       IS0   = MORD2 + 1
       NVALS = IS0  + IS0
-C     
+C
  999  RETURN
       END

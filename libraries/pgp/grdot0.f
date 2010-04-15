@@ -32,13 +32,13 @@
       GRYPRE(GRCIDE) = Y
 
       IF (GRVPVI(GRCIDE)) THEN
-      
+
 *     If a "thick pen" is to be simulated, use the line-drawing routines
          IF (GRWIDT(GRCIDE).GT.1) THEN
             CALL GRLIN3(X,Y,X,Y)
          ELSE
 
-*        Use GKS polymarker        
+*        Use GKS polymarker
             CALL GPM(1,X,Y)
          END IF
       END IF

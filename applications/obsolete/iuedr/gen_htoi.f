@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE gen_HTOI
 *
-*   Description: 
+*   Description:
 *      Decode integer from hex string.
 *
 *   Authors:
@@ -40,11 +40,11 @@
 
 *   Import:
       BYTE SVALUE(ARB)            ! string to be scanned
- 
+
 *   Export:
       INTEGER IVALUE              ! decoded value
       INTEGER STATUS              ! status return
- 
+
 *   Local variables:
       CHARACTER CVALUE*(MAXBUF)   ! Fortran 77 version of value string
       CHARACTER FORMAT*(6)        ! Fortran 77 format string

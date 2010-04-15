@@ -515,8 +515,8 @@
 *     PISAFIND  histogram bin limit as a lower point.
       NHIST = INT( MAX( 32767.0, 16.0 * SQRT( REAL( NPIX ) ) ) )
       CALL PSX_CALLOC( NHIST, '_INTEGER', IHIST, STATUS )
-      CALL PSA1_MKHII( %VAL( CNF_PVAL( MAP ) ), NPIX, BAD, NHIST, 
-     :                 %VAL( CNF_PVAL( IHIST ) ), 
+      CALL PSA1_MKHII( %VAL( CNF_PVAL( MAP ) ), NPIX, BAD, NHIST,
+     :                 %VAL( CNF_PVAL( IHIST ) ),
      :                 MODE, ZERO, WIDTH, STATUS )
       CALL HISTAT( %VAL( CNF_PVAL( IHIST ) ), MODE, MAXH, XMEAN, XPEAK,
      :             SIGMA, GSIGMA, NHIST )
@@ -588,17 +588,17 @@
 
 *     If input data have BAD pixels then replace them with the
 *     background value. This gives them zero weight.
-      IF ( BAD ) THEN 
+      IF ( BAD ) THEN
          CALL NDF_TEMP( PLACE, STATUS )
          LBND( 1 ) = 1
          LBND( 2 ) = 1
          UBND( 1 ) = NYOUT
          UBND( 2 ) = NXOUT
-         CALL NDF_NEW( '_INTEGER', 2, LBND, UBND, PLACE, PTEMP, 
+         CALL NDF_NEW( '_INTEGER', 2, LBND, UBND, PLACE, PTEMP,
      :                 STATUS )
          CALL NDF_MAP( PTEMP, 'Data', '_INTEGER', 'WRITE', IPTMP, EL,
      :                 STATUS )
-         CALL PSA1_IMINV( %VAL( CNF_PVAL( MAP ) ), NPIX, 
+         CALL PSA1_IMINV( %VAL( CNF_PVAL( MAP ) ), NPIX,
      :                    %VAL( CNF_PVAL( IPTMP ) ), IXPEAK, STATUS )
 
 *     MAP should now point to temporary NDF array. Ideally would release
@@ -624,9 +624,9 @@
       IF (IPASS.EQ.3) GOTO 900
 
 *     Load 1st and 2nd lines into the buffers
-      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUFO, NYOUT, 0, 
+      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUFO, NYOUT, 0,
      :                 STATUS )
-      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUF, NYOUT, NYOUT, 
+      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUF, NYOUT, NYOUT,
      :                 STATUS )
 
 *     Reset some variables
@@ -646,7 +646,7 @@
 
 *     Load next line into buffer
       KK = KK + NYOUT
-      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUFN, NYOUT, KK, 
+      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUFN, NYOUT, KK,
      :                 STATUS )
       IW = IREC + 1
       IWW = IJC + JJC
@@ -1027,7 +1027,7 @@
          ENDIF
 *     *** get profile intensities
          IF (ISOPH.EQ.2) THEN
-            CALL PHOPT4( %VAL( CNF_PVAL( MAP ) ), PARM, NBIT, REC, 
+            CALL PHOPT4( %VAL( CNF_PVAL( MAP ) ), PARM, NBIT, REC,
      :                   XPEAK, R ,SIGSQ )
          ENDIF
 

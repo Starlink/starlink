@@ -75,9 +75,9 @@
 	read( 42, '(a)', end=200) dline
 	read( 42, '(a)', end=200) dline
 	read( 42, '(a)', end=200) dline
-	call crestd_getpar( iobs, objnam, objtyp, ut1, ut2, ut3, exptime, 
-     :	                    icoadds, readout, filter, airmass, array, 
-     :	                    mag, pixscal, ra1, ra2, ra3, dec1, dec2, 
+	call crestd_getpar( iobs, objnam, objtyp, ut1, ut2, ut3, exptime,
+     :	                    icoadds, readout, filter, airmass, array,
+     :	                    mag, pixscal, ra1, ra2, ra3, dec1, dec2,
      :	                    dec3, more)
 	first = 1
 	more = .true.
@@ -102,9 +102,9 @@
 	  inumb = 0
 	  more2 = .true.
 	  do while ( more2)
-	    call crestd_getpar( iobs, objnam, objtyp, ut1, ut2, ut3, 
-     :	                        exptime, icoadds, readout, filter, 
-     :	                        airmass, array, mag, pixscal, ra1, ra2, 
+	    call crestd_getpar( iobs, objnam, objtyp, ut1, ut2, ut3,
+     :	                        exptime, icoadds, readout, filter,
+     :	                        airmass, array, mag, pixscal, ra1, ra2,
      :	                        ra3, dec1, dec2, dec3, more)
 !	    type *, onam
 	    if( more) then
@@ -197,12 +197,12 @@
 
 	end
 
-	subroutine crestd_getpar( iobs, objnam, objtyp, ut1, ut2, ut3, 
-     :	                          exptime, 
-     :	                          icoadds, readout, filter, airmass, 
-     :	                          array, 
-     :	                          mag, pixscal, ra1, ra2, ra3, dec1, 
-     :	                          dec2, 
+	subroutine crestd_getpar( iobs, objnam, objtyp, ut1, ut2, ut3,
+     :	                          exptime,
+     :	                          icoadds, readout, filter, airmass,
+     :	                          array,
+     :	                          mag, pixscal, ra1, ra2, ra3, dec1,
+     :	                          dec2,
      :	                          dec3, more)
 
 	implicit none
@@ -291,7 +291,7 @@
 	goto 200
   300	continue
 	more = .false.
-	
+
   200	continue
 
 	goto 100

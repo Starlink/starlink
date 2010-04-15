@@ -20,8 +20,8 @@
 *        The global status.
 
 *  Description:
-*     This application creates a new TranMap and optionally initialises its 
-*     attributes. 
+*     This application creates a new TranMap and optionally initialises its
+*     attributes.
 *
 *     A TranMap is a Mapping which combines the forward transformation of
 *     a supplied Mapping with the inverse transformation of another
@@ -30,7 +30,7 @@
 *
 *     When the forward transformation of the TranMap is referred to, the
 *     transformation actually used is the forward transformation of the
-*     first Mapping supplied when the TranMap was constructed. Likewise, 
+*     first Mapping supplied when the TranMap was constructed. Likewise,
 *     when the inverse transformation of the TranMap is referred to, the
 *     transformation actually used is the inverse transformation of the
 *     second Mapping supplied when the TranMap was constructed.
@@ -39,19 +39,19 @@
 *     asttranmap map1 map2 options result
 
 *  ADAM Parameters:
-*     MAP1 = LITERAL (Read) 
+*     MAP1 = LITERAL (Read)
 *        An NDF or text file holding the first component Mapping, which
-*        defines the forward transformation. If an NDF is supplied, the 
-*        Mapping from the Base Frame to the Current Frame of its WCS FrameSet 
+*        defines the forward transformation. If an NDF is supplied, the
+*        Mapping from the Base Frame to the Current Frame of its WCS FrameSet
 *        will be used.
-*     MAP2 = LITERAL (Read) 
+*     MAP2 = LITERAL (Read)
 *        An NDF or text file holding the second component Mapping, which
-*        defines the inverse transformation. If an NDF is supplied, the 
-*        Mapping from the Base Frame to the Current Frame of its WCS FrameSet 
+*        defines the inverse transformation. If an NDF is supplied, the
+*        Mapping from the Base Frame to the Current Frame of its WCS FrameSet
 *        will be used.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new TranMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new TranMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new TranMap.
 
@@ -107,7 +107,7 @@
       INTEGER MAP2
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

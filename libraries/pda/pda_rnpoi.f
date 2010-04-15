@@ -2,13 +2,13 @@
 *+
 *  Name:
 *     PDA_RNPOI
- 
+
 *  Purpose:
 *     Returns pseudo-random numbers from a Poisson distribution.
-      
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     RESULT = PDA_RNPOI( MEAN )
 
@@ -16,12 +16,12 @@
 *     This is a simple random-number generator providing deviates in the
 *     from a Poisson distribution, with a period of 2**26, and to 6 or
 *     7 digits accuracy.  It is based upon Ahrens, Dieter & Grube's
-*     TOMS599 routines.  
- 
-*  Arguments:               
+*     TOMS599 routines.
+
+*  Arguments:
 *     MEAN = REAL (Given)
 *        The mean value of the Poisson distribution.
- 
+
 *  Returned Value:
 *     PDA_RNPOI = INTEGER
 *        The pseudo-random deviate. A value of -1 is returned if the
@@ -52,7 +52,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 November 21 (MJC)
 *        Original version.
@@ -61,12 +61,12 @@
 *        Remove STATUS argument. "SAVE" statement added since Linux
 *        really does clobber previous values.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -148,7 +148,7 @@
 *  Assign a dummy value first.
       PDA_RNPOI = -1
 
-*  Return the dummy value if the supplied mean is not positive. 
+*  Return the dummy value if the supplied mean is not positive.
       IF ( MEAN .LE. 0.0 ) RETURN
 
 *  Separation of cases A and B.

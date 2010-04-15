@@ -9,7 +9,7 @@ C     opened (or created and opened) and all the pointers
 C     etc used by the data system are initialised.  This
 C     routine has to be called before any other data structure
 C     programs can reference part of the specified data
-C     structure in that file.  
+C     structure in that file.
 C
 C     Parameters - (">" input, "<" output, "!" modified)
 C
@@ -20,7 +20,7 @@ C                 '.' or '[' and should be terminated either
 C                 by a blank or by the end of the string.
 C     (>) FILE    (Character) The name of the disk file
 C                 containing (or to contain) the data structure.
-C                 This should be a full filename. Under VMS, it can 
+C                 This should be a full filename. Under VMS, it can
 C                 also be a logical name equivalenced to a VMS file.
 C     (>) EXIST   (Character) Defines whether the file already
 C                 exists or should be created.  It must be
@@ -28,7 +28,7 @@ C                 one of 'NEW', 'OLD' or 'UNKNOWN', these having
 C                 the same meanings as in a Fortran OPEN
 C                 statement:
 C                 'NEW' => create a new file
-C                 'OLD' => use existing file 
+C                 'OLD' => use existing file
 C                 'UNKNOWN' => use an existing file if there is
 C                              one, otherwise create a new one.
 C     (>) BLOCKS  (Integer) Number of disk blocks for the initial
@@ -59,7 +59,7 @@ C     with the same name as an existing file, then a new version of the file
 C     is created - the version number being appended to the file name following
 C     a semi-colon.  Under UNIX, file names may have mixed case, and upper and
 C     lower case versions of the same letter are regarded as different letters.
-C     Also under UNIX, files do not normally have version numbers.  However, 
+C     Also under UNIX, files do not normally have version numbers.  However,
 C     DTA, for compatability between the VAX and UNIX versions, prefers to
 C     treat file names as case-insignificant, and to use version numbers when
 C     a new file of the same name as an existing file is created. So, under
@@ -104,11 +104,11 @@ C     16th Jun 1986.  KS / AAO.  File passed to DTA_FILET is now the
 C                     full container file name.
 C     7th  Jan 1992.  KS / AAO.  Include file syntax modified to compile
 C                     on SUNs. Unused variable I removed.  Call to DTA_ICACHE
-C                     moved to start of code - where it should always have 
+C                     moved to start of code - where it should always have
 C                     been.
 C     24th Jan 1992.  KS / AAO. Calls to EMS added to control error reporting.
 C     10th Feb 1991.  KS / AAO. Calls to DTA_VERSNAME and DTA_FILEFOLD
-C                     added to handle operating system file name 
+C                     added to handle operating system file name
 C                     considerations.
 C     12th Feb 1992.  KS / AAO. System-dependent routines now called
 C                     DTAZ_ routines.
@@ -144,12 +144,12 @@ C
       CHARACTER FEXIST*7,FENAME*16
       CHARACTER LOC*(DAT__SZLOC)
       CHARACTER FTYPE*16,PATH*16,CFILE*80
-      CHARACTER NFILE*132,FFILE*132 
-C 
+      CHARACTER NFILE*132,FFILE*132
+C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Ensure name cache is initialised
 C
@@ -184,7 +184,7 @@ C
       CALL DTA_TYTIDY(FTYPE)
 C
 C     Open the file and initialise file access routines for it, after first
-C     modifying it as required by the operating system - version names, 
+C     modifying it as required by the operating system - version names,
 C     folding to lower case, etc.  (DTA_VERSNAME and DTA_FILEFOLD are
 C     opearting-system dependent routines.)
 C
@@ -206,7 +206,7 @@ C
       END IF
       CALL DTA_FILET(FENAME,ENAME,CFILE,STATUS)
 C
-C     Normal end 
+C     Normal end
 C
       GO TO 600
 C

@@ -15,7 +15,7 @@
 
 *  Description:
 *     Construct the final text of a message using the text in "text",
-*     and available message tokens, keywords and parameter-object associations. 
+*     and available message tokens, keywords and parameter-object associations.
 *     Clean any non-printing characters from the final string if "clean"
 *     is true.
 *
@@ -50,7 +50,7 @@
 *  Algorithm:
 *     -  Attempt to get a message text from the parameter system,
 *     otherwise use "text".
-*     -  Parse the message text and copy it into "msgstr", making 
+*     -  Parse the message text and copy it into "msgstr", making
 *     translations for parameter, status and token escapes.
 *     -  The string will be null terminated.
 
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -253,7 +253,7 @@ void msg1Form ( const char * param, const char * text, int clean,
          for the fact that "token" reports a value one larger than the position
          of the ^ */
         offset = token - texst1 - 1;
-        
+
         /* Append the text from the STATUS token and the subsequent text */
         texst0[offset] = '\0';
         star_strappend( texst0, stmsg, sizeof(texst0) );
@@ -306,8 +306,8 @@ void msg1Form ( const char * param, const char * text, int clean,
     while (1) {
 
       if (pstat == SAI__OK && curpos < texlen) {
-      
-        /*        Check if a double or paired escape character sequence has 
+
+        /*        Check if a double or paired escape character sequence has
          *        occurred. */
         if (prevec[0] == escape[0] ) {
           hasdouble = 1;
@@ -325,18 +325,18 @@ void msg1Form ( const char * param, const char * text, int clean,
       /*     Find the next occurrence of an escape character. */
       ems1Gesc( escstr, texst2, &curpos );
 
-      /*     Append any text prior to the escape character to the returned 
+      /*     Append any text prior to the escape character to the returned
        *     string. */
       if (curpos == -1) {
 
-        /*        No more escape characters have been found, so append all 
-         *        the text that remains to the returned message text and exit 
+        /*        No more escape characters have been found, so append all
+         *        the text that remains to the returned message text and exit
          *        the loop. */
         pstat = star_strappend( msgstr, &(texst2[lstpos+1]), msglen );
         break;
       } else {
 
-        /*        A token escape has been found, so get which escape character 
+        /*        A token escape has been found, so get which escape character
          *        has occurred. */
         escape[0] = texst2[curpos];
 
@@ -383,7 +383,7 @@ void msg1Form ( const char * param, const char * text, int clean,
 
           /*           Check that a token name exists. */
           if (lstat != SAI__OK) {
-            /*              The name string has been over-run, so indicate this 
+            /*              The name string has been over-run, so indicate this
              *              in the message text. */
             star_strappend( msgstr, escape, msglen);
             star_strappend( msgstr, "<", msglen);
@@ -411,7 +411,7 @@ void msg1Form ( const char * param, const char * text, int clean,
               /*            Append the token value to the returned string. */
               star_strappend( msgstr, tokval, msglen );
             } else {
-              /*                 A value has not been found, so append the 
+              /*                 A value has not been found, so append the
                *                 "undefined" token string. */
               star_strappend( msgstr, escape, msglen);
               star_strappend( msgstr, "<", msglen);
@@ -423,7 +423,7 @@ void msg1Form ( const char * param, const char * text, int clean,
             escape[0] = '\0';
 
           } else {
-            /*              There is an isolated token escape character in the 
+            /*              There is an isolated token escape character in the
              *              string, so set the literal token escape flag. */
             literl = 1;
             star_strappend( msgstr, escape, msglen );

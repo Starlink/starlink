@@ -20,7 +20,7 @@
 *               char *pntrs[], size_t * actval, int * status );
 
 *  Description :
-*     Retrieves the values from a _CHAR*n primitive array object into a 
+*     Retrieves the values from a _CHAR*n primitive array object into a
 *     character buffer and optionally an array of pointers. The C implementation
 *     will populate the buffer with nul terminated strings one after the other.
 *     Sufficient space must be made available to include the nul terminators.
@@ -206,7 +206,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
 	}
 
 	/* Number of characters to copy is 1 plus position at exit of loop */
-	i++; 
+	i++;
 
 	if ( nleft < (i+1) ) {
 	  *status = DAT__TRUNC;
@@ -235,7 +235,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
 
     /* Free the temporary buffer */
     starFree( tmpbuf );
-      
+
   }
 
   return *status;

@@ -13,8 +13,8 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
-{Copyright 
+\newcommand{\stardoccopyright}
+{Copyright
 \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -89,7 +89,7 @@ uses the Message System Primitives (MSP).}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -514,12 +514,12 @@ uses the Message System Primitives (MSP).}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -575,7 +575,7 @@ tasks on a single machine.
 
 The
 \htmlref{example}{example} \latex{ (see Section \ref{example})}
-shows that communicating programs do not have to be strictly ADAM tasks but 
+shows that communicating programs do not have to be strictly ADAM tasks but
 the term `task' is used throughout this document to mean either end of a
 communications link.
 More details on the way ADAM uses AMS can be found in
@@ -605,7 +605,7 @@ and is terminated as described under
 `\htmlref{Getting Expected Replies}
 {getting_expected_replies}'\latex{ (see Section \ref{getting_expected_replies})}.
 
-When sending a message, the user specifies a \texttt{message\_function} and a 
+When sending a message, the user specifies a \texttt{message\_function} and a
 \texttt{message\_status} which are passed as arguments to functions
 \texttt{ams\_send}
 or
@@ -622,7 +622,7 @@ rendered obsolete by \texttt{ams\_path}.}.
 \end{description}
 
 \section{Task Initialisation}
-A task initialises AMS by calling 
+A task initialises AMS by calling
 \htmlref{\texttt{ams\_init()}}{AMS_INIT}
 specifying the name by which the task is to be known to the
 message system. The name is registered and an exit handler set up.
@@ -653,11 +653,11 @@ The path number returned can then be used for further communications with the
 other task.
 
 A short transaction consisting of a connection request message and an
-acknowledgement from the slave task is carried out. 
+acknowledgement from the slave task is carried out.
 If the slave task is
 \htmlref{waiting to receive a command}
 {receiving_a_command}\latex{ (see Section \ref{receiving_a_command})},
-the acknowledgement is sent automatically from within 
+the acknowledgement is sent automatically from within
 \htmlref{\texttt{ams\_receive()}}{AMS_RECEIVE}.
 The acknowledgement is expected within \texttt{MESSYS\_\_INIT\_WAIT\_TIME}
 (currently 30000) milliseconds.
@@ -673,7 +673,7 @@ transaction. The task which sends the message becomes the `master' and
 the one which receives it becomes the `slave' for the transaction.
 
 Command messages are designed for use with ADAM tasks but this does not
-preclude their use for other purposes (see the 
+preclude their use for other purposes (see the
 \htmlref{example}{example}\latex{ in Section~\ref{example}}).
 The other arguments to \texttt{ams\_send} are packed into the message and are
 unpacked by AMS at the other end.
@@ -754,7 +754,7 @@ A reply associated with an existing command has to be sent using
 \htmlref{\texttt{ams\_reply()}}{AMS_REPLY},
 specifying the relevant (\texttt{path,messid}).
 The command transaction is terminated automatically if a reply is sent with a
-\texttt{message\_status} other than those listed in 
+\texttt{message\_status} other than those listed in
 \htmlref{`Getting Expected Replies'}{getting_expected_replies}\latex{ (Section
 \ref{getting_expected_replies})}
 
@@ -868,7 +868,7 @@ transaction has its own queue (reply queue).
 The AMS user will not need to know about MSP queues.
 
 \subsection{Communications Directory}
-MSP communications are opened between tasks by name. 
+MSP communications are opened between tasks by name.
 The name lookup is provided by
 each task making an entry in a directory pointed to by the environment
 variable \texttt{ADAM\_USER}. If \texttt{ADAM\_USER} is not defined when a task
@@ -876,7 +876,7 @@ attempts to register itself with the message system, directory \texttt{\~{}/adam
 will be used and, if the specified directory does not exist, an attempt will
 be made to create it.
 
-This results in a file being created in the \texttt{ADAM\_USER} directory 
+This results in a file being created in the \texttt{ADAM\_USER} directory
 with a name compounded of the task name and an identifying number
 (\textit{e.g} \texttt{\$ADAM\_USER/slave\_5001}).
 Another task can then open communications by searching \texttt{ADAM\_USER} for
@@ -908,7 +908,7 @@ this case) -- it is immaterial to MSP.
 \newpage
 \appendix
 \section{\label{example}Example}
-The example consists of a pair of C programs called \texttt{master} and 
+The example consists of a pair of C programs called \texttt{master} and
 \texttt{slave}.
 They should be run in the background by:
 \begin{quote}
@@ -997,17 +997,17 @@ int main()
    for ( j=0; j<1000; j++ )
    {
 /* Send the OBEY command */
-      ams_send ( path, outmsg_function, outmsg_status, outmsg_context, 
+      ams_send ( path, outmsg_function, outmsg_status, outmsg_context,
         outmsg_name, outmsg_length, outmsg_value, &messid, &status );
 /* Get the acknowledement reply - content not checked */
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
 /* Get the completion reply - content not checked.
  * AMS will terminate the transaction if it is the expected message status
  * SAI__OK */
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
    }
 
@@ -1097,22 +1097,22 @@ int main()
    for ( j=0; j<1000; j++ )
    {
 /* Await a command message */
-      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status, 
-        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path, 
+      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status,
+        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path,
         &messid, &status );
 
 /* Send an initial acknowledgement (message_status = DTASK_ACTSTART). */
       outmsg_status = DTASK__ACTSTART;
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
 
 /* Send a completion message (message_status = SAI__OK) - this will terminate
    the transaction at both ends */
       outmsg_status = SAI__OK;
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
 
 /* If there was a failure, exit the loop */
       if ( status != SAI__OK ) break;
@@ -1150,7 +1150,7 @@ int main()
 
    \sstarguments{
       \sstsubsection{
-         status = int * (given and returned) 
+         status = int * (given and returned)
       }{
          global status
       }
@@ -1192,7 +1192,7 @@ int main()
          message to be passed to main-line code
       }
       \sstsubsection{
-         status = int * (given and returned) 
+         status = int * (given and returned)
       }{
          global status
       }
@@ -1220,7 +1220,7 @@ int main()
 
    \sstarguments{
       \sstsubsection{
-         status = int * (given and returned) 
+         status = int * (given and returned)
       }{
          global status
       }
@@ -1240,7 +1240,7 @@ int main()
    }
 
 }
-          
+
 
 \sstroutine{
    AMS\_GETREPLY
@@ -1257,7 +1257,7 @@ int main()
 
    \sstarguments{
       \sstsubsection{
-         timeout = int (given) 
+         timeout = int (given)
       }{
          timeout time in milliseconds
       }
@@ -1418,7 +1418,7 @@ int main()
 
       Register with msp, obtain the command queue for incoming messages,
       then create the queues used for this task sending messages to
-      itself. 
+      itself.
 
       Finally set up the signal handler if so requested.
    }
@@ -1435,7 +1435,7 @@ int main()
       \sstsubsection{
          name = char * (given)
       }{
-         name of the action to be rescheduled 
+         name of the action to be rescheduled
       }
 
       \sstsubsection{
@@ -1572,7 +1572,7 @@ int main()
 
    \sstinvocation{
       (void)ams\_receive( timeout, message\_name\_s, message\_value\_s,\\
-                             message\_status, message\_context, message\_name, 
+                             message\_status, message\_context, message\_name,
                              message\_length,\\
                              message\_value, path, messid, status )
    }
@@ -1679,7 +1679,7 @@ int main()
 
    \sstinvocation{
       (void)ams\_reply( path, messid, message\_function, message\_status,\\
-                             message\_context, message\_name, message\_length, 
+                             message\_context, message\_name, message\_length,
                              message\_value, status )
    }
 
@@ -1797,7 +1797,7 @@ int main()
 
    \sstdescription{
       Causes the task to send specified RESCHED message 'value', qualified by
-      'name' to itself. 
+      'name' to itself.
    }
 
    \sstimplementation{
@@ -1813,7 +1813,7 @@ int main()
 
    \sstinvocation{
       (void)ams\_send( path, message\_function, message\_status,\\
-                       message\_context, message\_name, message\_length, 
+                       message\_context, message\_name, message\_length,
                        message\_value, messid,\\
                        status )}
    \sstarguments{

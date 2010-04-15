@@ -26,23 +26,23 @@
 *
 * Arguments:
 *    XC(NGAUSS*3+1) = REAL ARRAY (Given)
-*       
+*
 *    NGAUSS = INTEGER (Given)
-*       
+*
 *    M = INTEGER (Given)
-*       
+*
 *    FIT_VALUES(M,NGAUSS) = REAL ARRAY (Given)
-*       
+*
 *    FIT_TOTAL(M) = REAL ARRAY (Given)
-*       
+*
 *    SDATA(M) = REAL ARRAY (Given)
-*       
+*
 *    BACK = INTEGER (Given)
-*       
+*
 *    VBASE(M) = REAL ARRAY (Given)
 *        variable component of base (Chebyshev fit)
 *    YRANGE(3) = REAL ARRAY (Given)
-*       
+*
 
 * History:
 *  Altered to use GEN routines TNW 5/12/88

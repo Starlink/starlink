@@ -4,7 +4,7 @@
 *    Description :
 *     Get the names and various other details for the columns which are
 *     to be listed.
-*    Invocation : 
+*    Invocation :
 *     CAR_GTFLD (CI, MXFLD; NUMFLD, NAMEA, FIA, UNITS, CWIDTH; STATUS)
 *    Parameters :
 *     CI  =  INTEGER (ENTRY)
@@ -276,7 +276,7 @@ C    :                 I3, 2X, A10, 2X, I5, 2X, A10, 2X, A10, 2X, I3 )
 
                END IF
             END IF
- 
+
 *
 *          Set the termination flag if the maximum number of columns
 *          have been entered.
@@ -296,6 +296,6 @@ C    :                 I3, 2X, A10, 2X, I5, 2X, A10, 2X, A10, 2X, I3 )
             END IF
          END DO
 
-      END IF 
+      END IF
 
       END

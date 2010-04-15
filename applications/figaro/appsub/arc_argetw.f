@@ -22,7 +22,7 @@ C     (>) VINT     (Real) A guess at the possible value obtained
 C                  by interpolation. Ignored if zero.
 C     (>) VFIT     (Real) A guess at the possible value obtained
 C                  by fitting.  Ignored if 0.
-C     (<) FORGET   (Logical) Returned true if the line 
+C     (<) FORGET   (Logical) Returned true if the line
 C                  is to be ignored.
 C     (<) WAVEL    (Real) The wavelength of the line.
 C

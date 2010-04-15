@@ -149,7 +149,7 @@
 *     width rounded down to the next odd number, the result is the same
 *     whether BOX is even or odd.
          CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
-     :        NX, 1, IMAGE(1,I), BOX/2, 0, 1, 
+     :        NX, 1, IMAGE(1,I), BOX/2, 0, 1,
      :        IFILT, BADOUT, WORK, WORKI, STATUS )
          CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
      :        NX, 1, OUTPUT, BOX/2, 0, 1,

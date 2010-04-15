@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -344,7 +344,7 @@
 *           Add contribution to off-diagonal element of Hesse matrix.
                HESSE(K2,K1) = HESSE(K2,K1) + DFDAK1 * DFDAK2 * WGHT(I)
  16         CONTINUE
- 17      CONTINUE      
+ 17      CONTINUE
  18   CONTINUE
 
 *  Must still copy the K2 .LT. K1 part of the Hesse matrix.

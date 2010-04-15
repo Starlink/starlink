@@ -5,10 +5,10 @@ C
 C History:  Original version J. Tonry.
 C Modified: KS 22-SEP-1983. VMIN and VMAX made parameters, test
 C           that fit is to at least 3 pixels added.
-C         : HME (UoE) 01-SEP-1992. The parameter statement had 
+C         : HME (UoE) 01-SEP-1992. The parameter statement had
 C           no brackets. The Sun compiler doesn't like that.
 C         : TDCA (RAL) 18-FEB-1999. Minor style changes.
-C         : TDCA (RAL) 03-MAR-1999. Explictly declared V0, PEAK 
+C         : TDCA (RAL) 03-MAR-1999. Explictly declared V0, PEAK
 C           and WIDTH.
 C         : TIMJ (JACH) DO loop must take integer args
 
@@ -31,7 +31,7 @@ C         : TIMJ (JACH) DO loop must take integer args
               IF(CFN(I).GT.CMAX) THEN
                   CMAX = CFN(I)
                   IMAX = I
-              END IF    
+              END IF
           END IF
       END DO
       SCALE(1) = VELOCITY(IMAX-2)

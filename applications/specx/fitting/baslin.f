@@ -42,14 +42,14 @@
       L4=IBLRPT(4)
 
       NI   = 0
-      YLOW = 0.0      
-      DO I = L1, L2      
-        IF (BUF(I).NE.BADVAL) YLOW = YLOW + BUF(I)      
+      YLOW = 0.0
+      DO I = L1, L2
+        IF (BUF(I).NE.BADVAL) YLOW = YLOW + BUF(I)
         NI = NI + 1
       END DO
 
       IF (NI.NE.0) THEN
-        YLOW = YLOW/FLOAT(NI)  
+        YLOW = YLOW/FLOAT(NI)
         XLOW = FLOAT(L1) + 0.5*FLOAT(L2-L1)
       ELSE
         PRINT *, '-- basfit --   No good points in first interval'
@@ -58,11 +58,11 @@
       END IF
 
       NI    = 0
-      YHIGH = 0.0      
-      DO I = L3, L4      
+      YHIGH = 0.0
+      DO I = L3, L4
         IF (BUF(I).NE.BADVAL) YHIGH = YHIGH + BUF(I)
         NI = NI + 1
-      END DO 
+      END DO
 
       IF (NI.NE.0) THEN
         YHIGH = YHIGH/FLOAT(NI)
@@ -83,7 +83,7 @@
         RETURN
       END IF
 
-      DO I=1,NBPTS      
+      DO I=1,NBPTS
         YI=GRAD*(I-XLOW)+YLOW
         IF (BUF(I).NE.BADVAL) THEN
           DATA(I) = BUF(I) - YI

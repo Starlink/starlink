@@ -73,21 +73,21 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       INTEGER NVALS         ! number of values in the 1-D array
- 
+
       INTEGER IVALS(NVALS) ! the array to be encoded
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
- 
+
 *  Status:
       INTEGER STATUS
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       CALL TASK_ENC1I ( NVALS, IVALS, STRING, STATUS )
- 
+
       END

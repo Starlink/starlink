@@ -4,19 +4,19 @@
 *+
 *  Name:
 *     KPS1_FAINx
- 
+
 *  Purpose:
 *     Scales an image to a range of standard deviations about the
 *     mean value of the image.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation
- 
+
 *     CALL KPS1_FAINx( BAD, DIM1, DIM2, INARR, SIGRNG, LOW, HIGH,
 *    :                 BADVAL, INVERT, OUTARR, LOWER, UPPER, STATUS )
- 
+
 *  Description:
 *     This routine scales a 2-d array such that the lower and upper
 *     limits are specified by two standard-deviation values about the
@@ -27,7 +27,7 @@
 *     correspond to lookup-table entries. Also, the scaled array may be
 *     inverted so that when it is displayed it will come out the right
 *     way around.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        If true bad pixels will be processed.  This should not be set
@@ -61,7 +61,7 @@
 *        The upper limit used for scaling the image.
 *     STATUS = INTEGER (Given)
 *        Value of the status on entry.
- 
+
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by B, D, I, R, or W as appropriate. The array
@@ -72,71 +72,71 @@
 *     to display the image inverts it.
 *     -  The statistical calculations are performed in double-precision
 *     arithmetic.
- 
+
 *  Algorithm:
 *     - Compute the mean and standard deviation of the array values.
 *     - Derive the scaling limits.
 *     - The scaled image is then produced with or without inversion,
 *       and with or without bad-pixel checking via a subroutine. Bad
 *       pixels are set to defined value.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 July 19 (MJC):
 *        Original version.
 *     1991 July 23 (MJC):
 *        Added BADVAL argument.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
- 
+
 *  Arguments Given:
       INTEGER
      :  DIM1, DIM2,
      :  HIGH,
      :  LOW,
      :  BADVAL
- 
+
       LOGICAL
      :  BAD,
      :  INVERT
- 
+
       REAL
      :  SIGRNG( 2 )
- 
+
       BYTE
      :  INARR( DIM1, DIM2 )
- 
+
 *  Arguments Returned:
       INTEGER
      :  OUTARR( DIM1, DIM2 )
- 
+
       BYTE
      :  LOWER,
      :  UPPER
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER
      :  I, J,                  ! General variables
      :  VALCNT                 ! Count of valid values of data elements
                                ! in the image
- 
+
       DOUBLE PRECISION
      :  DIMAGE,                ! Current pixel value
      :  MEAN,                  ! Mean value of data
@@ -145,47 +145,47 @@
      :  SXX,                   ! Sum of the squares of the image data
                                ! elements
      :  VARNCE                 ! Variance of the image
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
- 
+
 *.
- 
+
 *    If the status on entry of this subroutine is bad, then
 *    return to the calling program.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       SX = 0.0D0
       SXX = 0.0D0
- 
+
 *    Bad-pixel checking.
- 
+
       IF ( BAD ) THEN
          VALCNT = 0
- 
+
 *       For all pixels in the input image.
- 
+
          DO  I = 1, DIM2, 1
             DO  J = 1, DIM1, 1
- 
+
 *             Calculate the sum of the data elements and of the squares
 *             of the data elements in the image, excluding the bad
 *             pixels.
- 
+
                IF ( INARR( J, I ) .NE. VAL__BADB ) THEN
                   DIMAGE = NUM_BTOD( INARR( J, I ) )
                   SX = SX + DIMAGE
                   SXX = SXX + DIMAGE * DIMAGE
                   VALCNT = VALCNT + 1
                END IF
- 
+
             END DO
          END DO
- 
+
 *       Check that there sufficient pixels to define a sigma.
- 
+
          IF ( VALCNT .LT. 2 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPS1_FAINx_INSP',
@@ -194,59 +194,59 @@
             GOTO 999
          END IF
       ELSE
- 
+
 *       All elements are valid.
- 
+
          VALCNT = DIM1 * DIM2
- 
+
 *       For all pixels in the input image.
- 
+
          DO  I = 1, DIM2, 1
             DO  J = 1, DIM1, 1
- 
+
                DIMAGE = NUM_BTOD( INARR( J, I ) )
- 
+
 *             Calculate the sum of the data elements and of the squares
 *             of the data elements in the image.
- 
+
                SX = SX + DIMAGE
                SXX = SXX + DIMAGE * DIMAGE
             END DO
          END DO
       END IF
- 
+
 *    Calculate the mean and standard deviation of the image.
- 
+
       MEAN = SX/ DBLE( VALCNT )
- 
+
       VARNCE = ( SXX - SX * SX / DBLE( VALCNT ) ) / DBLE( VALCNT-1 )
       IF ( VARNCE .LT. VAL__SMLD ) THEN
          SIGMA = 0.0
       ELSE
          SIGMA = REAL( SQRT( VARNCE ) )
       END IF
- 
+
 *    Calculate the upper and lower limits between which the image will
 *    be scaled.  These may be constrained by the extreme values for the
 *    data type.
- 
+
       LOWER = NUM_DTOB( MAX( MEAN + SIGRNG( 1 ) * SIGMA,
      :                    NUM_BTOD( VAL__MINB ) ) )
       UPPER = NUM_DTOB( MIN( MEAN + SIGRNG( 2 ) * SIGMA,
      :                    NUM_BTOD( VAL__MAXB ) ) )
- 
+
 *    Report the scaling limits.
- 
+
       CALL MSG_SETD( 'MINVAL', NUM_BTOD( LOWER ) )
       CALL MSG_SETD( 'MAXVAL', NUM_BTOD( UPPER ) )
       CALL MSG_OUT( 'PVLO', 'Data will be scaled from ^MINVAL to '/
      :              /'^MAXVAL.', STATUS )
- 
+
 *    Scale the values between the upper and lower pens.
- 
+
       CALL KPG1_ISCLB( BAD, DIM1, DIM2, INARR, INVERT, LOWER, UPPER,
      :                   LOW, HIGH, BADVAL, OUTARR, STATUS )
- 
+
  999  CONTINUE
- 
+
       END

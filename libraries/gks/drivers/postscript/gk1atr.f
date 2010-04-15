@@ -21,7 +21,7 @@
 *  ARGUMENTS
 *  ---------
 *      INP IFLAG  Flag to indicate Trailer for whole file or PageTrailer
- 
+
        INTEGER IFLAG
 *
 *  COMMON BLOCK USAGE
@@ -58,7 +58,7 @@
 *  S       - Character variable, via which chunks of PostScript are sent for
 *            buffering.
 *
- 
+
 *     Integer workspace offset parameters
       INTEGER    IPAGES,   IFTINT,   IFTNAM,   IFTPSE,     IFTUSD
       PARAMETER (IPAGES=7, IFTINT=8, IFTNAM=9, IFTPSE=10 , IFTUSD=12)
@@ -81,7 +81,7 @@
 *     Number of Points per Metre
       REAL       SCFACT
       PARAMETER (SCFACT=72.0/0.0254)
- 
+
       INTEGER I, IREM, NDIG, ILEN, ISTRT, IEND, JJ
       INTEGER IBBXL,IBBXR,IBBYB,IBBYT
 *
@@ -123,7 +123,7 @@
         IBBYT = KNIL
       ENDIF
 *
- 
+
 *     Determine whether its a Trailer or a PageTrailer that is needed
       IF(IFLAG .EQ. IWHOLE)THEN
 *     Trailer for whole file
@@ -133,7 +133,7 @@
          CALL GKFOCO(KIOSN,DUMMY,IREM)
          CALL GKFOCO(KIOPB, '%%Trailer', IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *        Write Bounding Box into trailer, if EPSF
 *
@@ -146,12 +146,12 @@
 *
 *        Send information about the fonts used:
 *
- 
+
 *        First prepend the comment text:
          CALL GKFOCO(KIOPB,
      :    '%%DocumentFonts:',
      :    IREM)
- 
+
 *
 *        Set up a loop to find which fonts were used
          DO 100 I=1,KWKDAT(IFTINT,KWKIX)
@@ -178,7 +178,7 @@
                CALL GKFOCO(KIOPB, S(1:ILEN), IREM)
             ENDIF
   100    CONTINUE
- 
+
 *
 *        Finish off with comment on total number of pages in the document
 *
@@ -191,7 +191,7 @@
          ELSE
             NDIG=3
          ENDIF
- 
+
 *        Prepare the output format
          CALL GKFOCO(KIOSN,DUMMY,IREM)
          WRITE(FORMT, '(A,I1,A)') '(''%%Pages: '',I',NDIG,')'
@@ -200,7 +200,7 @@
 *        Send the comment
          CALL GKFOCO(KIOPB,S(1:9+NDIG),IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
       ELSEIF(IFLAG .EQ. IPAGE)THEN
 *     PageTrailer
 *
@@ -209,7 +209,7 @@
          CALL GKFOCO(KIOSN,DUMMY,IREM)
          CALL GKFOCO(KIOPB, '%%PageTrailer', IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *        Write Page Bounding Box into Trailer, if not EPSF
 *
@@ -221,6 +221,6 @@
          ENDIF
 *
       ENDIF
- 
+
 *
       END

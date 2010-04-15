@@ -93,7 +93,7 @@
 *     Check that memory has been allocated successfully.
 *
 *  Description:
-*     This routine checks that a pointer does not point to NULL.  It 
+*     This routine checks that a pointer does not point to NULL.  It
 *     should be called on any pointer value which is got by a call to
 *     malloc, realloc or calloc.
 *

@@ -2,13 +2,13 @@
 *+
 *  Name:
 *     PDA_RAND
- 
+
 *  Purpose:
 *     Returns pseudo-random numbers in the range 0 to 1.
-      
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     RESULT = PDA_RAND( X )
 
@@ -49,7 +49,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 November 20 (MJC)
 *        Original version.
@@ -57,12 +57,12 @@
 *        Removed "      INCLUDE 'SAE_PAR'".
 *        Explicitly included common block PDA_SEEDY.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,4 +85,4 @@
       R = MOD( R * FACTOR, 1.0D0 )
       PDA_RAND = SNGL( R )
 
-      END 
+      END

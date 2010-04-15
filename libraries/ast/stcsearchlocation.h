@@ -15,11 +15,11 @@
 *     #include "stcsearchlocation.h"
 
 *  Description:
-*     This include file defines the interface to the StcSearchLocation class 
+*     This include file defines the interface to the StcSearchLocation class
 *     and provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The StcSearchLocation class is a sub-class of Stc used to describe 
+*     The StcSearchLocation class is a sub-class of Stc used to describe
 *     the coverage of a VO query.
 *
 *     See http://hea-www.harvard.edu/~arots/nvometa/STC.html
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,7 +117,7 @@ typedef struct AstStcSearchLocationVtab {
 /* Properties (e.g. methods) specific to this class. */
 } AstStcSearchLocationVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within the
    object.c file. */

@@ -20,35 +20,35 @@
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
-*        A GRP identifier for the group holding the 2-dimensional ARD 
+*        A GRP identifier for the group holding the 2-dimensional ARD
 *        description.
 *     IPLOT = INTEGER (Given)
 *        An AST pointer to a Plot which will be used to draw the boundary.
 *        The Plot and the ARD description will be aligned in a suitable
 *        common coordinate Frame, present in both the Plot and the WCS
-*        FrameSet implied by the ARD description. If no such common Frame 
+*        FrameSet implied by the ARD description. If no such common Frame
 *        is available, an error is reported.
 *     GBOX( 4 ) = REAL (Given)
 *        An array giving the position and extent of the plotting area
 *        (on the plotting surface of the underlying graphics system)
-*        in which graphical output is to appear. This must be specified 
+*        in which graphical output is to appear. This must be specified
 *        in the base (i.e. GRAPHICS) Frame of the supplied Plot. This can
-*        be smaller than the area covered by the supplied Plot, in which 
+*        be smaller than the area covered by the supplied Plot, in which
 *        case the graphics will be truncated.
 *
 *        The first pair of values should give the coordinates of the
 *        bottom left corner of the plotting area and the second pair
 *        should give the coordinates of the top right corner. The
 *        coordinate on the horizontal axis should be given first in
-*        each pair. 
+*        each pair.
 *     REGVAL = INTEGER (Given and Returned)
 *        The index of the region within the ARD description to be outlined.
 *        If the value zero is supplied, the entire ARD description is
 *        outlined. If a positive value is supplied, then only the region
 *        with the specified index is outlined. If a negative value is
 *        supplied, then regions with indices greater than or equal to the
-*        absolute value are outlined. If the supplied value is not zero, 
-*        then REGVAL is modified on return to hold one more than the largest 
+*        absolute value are outlined. If the supplied value is not zero,
+*        then REGVAL is modified on return to hold one more than the largest
 *        value used to represent any of the keywords in the ARD description.
 *        The supplied value is left unchanged if it zero.
 *     STATUS = INTEGER (Given and Returned)
@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,15 +89,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'ARD_CONST'        ! ARD private constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'ARD_CONST'        ! ARD private constants
 
 *  Global Constants:
       INCLUDE 'ARD_COM'          ! ARD common blocks
@@ -130,10 +130,10 @@
       PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a contour
 
       INTEGER N                  ! Fixed size of mask array
-      PARAMETER( N = 500 )  
+      PARAMETER( N = 500 )
 
 *  Local Variables:
-      CHARACTER*40 ADOM0         ! Orig. pixel Domain name 
+      CHARACTER*40 ADOM0         ! Orig. pixel Domain name
       DOUBLE PRECISION DLBND( 2 )! Lower bounds of pixel coords
       DOUBLE PRECISION DUBND( 2 )! Upper bounds of pixel coords
       DOUBLE PRECISION INA( 2 )  ! Input coords of window corner A
@@ -142,8 +142,8 @@
       DOUBLE PRECISION OUTB( 2 ) ! Output coords of window corner B
       INTEGER AWCS               ! WCS Frameset
       INTEGER AWCS0              ! Pointer to original application FrameSet.
-      INTEGER DIM( 2 )           ! Dimensions of mask array 
-      INTEGER GFRM               ! AST pointer to mask grid coords Frame 
+      INTEGER DIM( 2 )           ! Dimensions of mask array
+      INTEGER GFRM               ! AST pointer to mask grid coords Frame
       INTEGER I                  ! Loop count
       INTEGER ICURR              ! Index of original current Frame
       INTEGER IGRID              ! Index of mask grid coords Frame within JPLOT
@@ -154,14 +154,14 @@
       INTEGER IPXY               ! Pointer to contour locus work array
       INTEGER IWCS               ! pixel->user FrameSet
       INTEGER JPLOT              ! AST pointer to modified Plot
-      INTEGER LBND( 2 )          ! Lower bounds for mask array 
+      INTEGER LBND( 2 )          ! Lower bounds for mask array
       INTEGER LBNDE( 2 )         ! Lower bounds of exterior bounding box
       INTEGER LBNDI( 2 )         ! Lower bounds of interior bounding box
-      INTEGER PFRM               ! AST pointer to mask pixel coords Frame 
+      INTEGER PFRM               ! AST pointer to mask pixel coords Frame
       INTEGER RV                 ! The returned value of REGVAL
       INTEGER SZEXPR             ! Size of supplied algebraic expression
       INTEGER SZOPND             ! Size of operand stack
-      INTEGER UBND( 2 )          ! Lower bounds for mask array 
+      INTEGER UBND( 2 )          ! Lower bounds for mask array
       INTEGER UBNDE( 2 )         ! Upper bounds of exterior bounding box
       INTEGER UBNDI( 2 )         ! Upper bounds of interior bounding box
       INTEGER WINMAP             ! AST pointer to a WinMap Mapping
@@ -177,7 +177,7 @@
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Create a work array over which the ARD description will be evaluated. 
+*  Create a work array over which the ARD description will be evaluated.
 *  coordinates are equivalent. This array will be mapped onto the
 *  plotting area specified by GBOX.
       LBND( 1 ) = 1
@@ -192,7 +192,7 @@
       JPLOT = AST_COPY( IPLOT, STATUS )
 
 *  Note the index of the original current Frame in the Plot.
-      ICURR = AST_GETI( JPLOT, 'CURRENT', STATUS )       
+      ICURR = AST_GETI( JPLOT, 'CURRENT', STATUS )
 
 *  Create a new Frame representing grid coords within the above work
 *  array. Give it the Domain ARDGRIDCO so that it can be distinguished
@@ -213,15 +213,15 @@
       WINMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
       CALL AST_ADDFRAME( JPLOT, AST__BASE, WINMAP, GFRM, STATUS )
 
-*  Note the index of the ARDGRIDCO Frame. 
-      IGRID = AST_GETI( JPLOT, 'CURRENT', STATUS )       
+*  Note the index of the ARDGRIDCO Frame.
+      IGRID = AST_GETI( JPLOT, 'CURRENT', STATUS )
 
-*  Create a new Frame representing pixel coords within the work array. 
-*  Give it the Domain ARDPIXCO so that it can be distinguished from 
+*  Create a new Frame representing pixel coords within the work array.
+*  Give it the Domain ARDPIXCO so that it can be distinguished from
 *  any PIXEL Frame already in the Plot.
       PFRM = AST_FRAME( 2, 'DOMAIN=ARDPIXCO', STATUS )
 
-*  Add this Frame into the Plot, connecting it to the ARDGRIDCO Frame 
+*  Add this Frame into the Plot, connecting it to the ARDGRIDCO Frame
 *  using a WinMap which performs the required pixel shift.
       INA( 1 ) = 0.5D0
       INA( 2 ) = 0.5D0
@@ -237,7 +237,7 @@
 *  Reinstate the original current Frame.
       CALL AST_SETI( JPLOT, 'CURRENT', ICURR, STATUS )
 
-*  Save the original application FrameSet and Domain, and use the modified 
+*  Save the original application FrameSet and Domain, and use the modified
 *  Plot as the application FrameSet within ARD_WORK.
       AWCS0 = CMN_AWCS
       CMN_AWCS = JPLOT
@@ -248,7 +248,7 @@
 *  so, we can use a much faster algorithm for drawing the region.
 *  ====================================================================
 
-*  The fast algorithm cannot be used if the REGVAL value indicate that a 
+*  The fast algorithm cannot be used if the REGVAL value indicate that a
 *  complicated ARD description has been supplied.
       IF( REGVAL .NE. 0 .AND. REGVAL .NE. 2 ) THEN
          OK = .FALSE.
@@ -259,10 +259,10 @@
 
 *  Create an AST FrameSet describing the known coordinate Frames. The
 *  base Frame of this FrameSet will be pixel coords within the work
-*  array, and the current Frame will be "Application co-ordinates" (i.e. 
+*  array, and the current Frame will be "Application co-ordinates" (i.e.
 *  the default user coordinate system). This Frame wil have Domain ARDAPP.
-*  The FrameSet may also contain other Frames specified using the ARD_WCS 
-*  routine. 
+*  The FrameSet may also contain other Frames specified using the ARD_WCS
+*  routine.
          CALL ARD1_APWCS( 2, VAL__BADR, AWCS, STATUS )
 
 *  Get work space to hold the algebraic Boolean expression
@@ -270,7 +270,7 @@
 *  operands.
          SZEXPR = 50
          CALL PSX_CALLOC( SZEXPR, '_INTEGER', IPEXPR, STATUS )
-   
+
          SZOPND = 200
          CALL PSX_CALLOC( SZOPND, '_DOUBLE', IPOPND, STATUS )
 
@@ -281,7 +281,7 @@
          END DO
 
 *  Set a flag in common which prevents any Mapping being considered Linear.
-         CMN_LINOK = .FALSE.  
+         CMN_LINOK = .FALSE.
 
 *  Create an algebraic Boolean expression in which operators and
 *  operands are represented by integer codes by analysing the ARD
@@ -290,7 +290,7 @@
 *  included in the ARD description. The returned expression corresponds
 *  to the ARD description as supplied (i.e. no implicit .OR.s are
 *  inserted).
-         CALL ARD1_ADANL( IGRP, 2, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
+         CALL ARD1_ADANL( IGRP, 2, AWCS, DLBND, DUBND, IPEXPR, IPOPND,
      :                    SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Attempt to draw the region assuming it consists of a single keyword.
@@ -298,7 +298,7 @@
      :                    %VAL( CNF_PVAL( IPOPND ) ), OK, STATUS )
 
 *  Clear the flag which prevents any Mapping being considered Linear.
-         CMN_LINOK = .TRUE.  
+         CMN_LINOK = .TRUE.
 
       END IF
 
@@ -309,8 +309,8 @@
 
 *  Fill the work array with integers representing the ARD description.
          RV = 2
-         CALL ARD_WORK( IGRP, 2, LBND, UBND, VAL__BADR, .FALSE., 
-     :                  RV, %VAL( CNF_PVAL( IPMASK ) ), 
+         CALL ARD_WORK( IGRP, 2, LBND, UBND, VAL__BADR, .FALSE.,
+     :                  RV, %VAL( CNF_PVAL( IPMASK ) ),
      :                  LBNDI, UBNDI, LBNDE, UBNDE,
      :                  STATUS )
 
@@ -322,21 +322,21 @@
          CALL AST_SETI( JPLOT, 'CURRENT', IGRID, STATUS )
 
 *  If we are contouring below or above the range of region indicies used
-*  by the ARD description, skip the contouring since there is nothing to 
+*  by the ARD description, skip the contouring since there is nothing to
 *  contour.
-         IF( ABS( REGVAL ) .LT. RV ) THEN 
+         IF( ABS( REGVAL ) .LT. RV ) THEN
 
 *  Allocate work space.
-            XSIZE = UBNDI( 1 ) - LBNDI( 1 ) + 1                          
-            YSIZE = UBNDI( 2 ) - LBNDI( 2 ) + 1                          
-            CALL PSX_CALLOC( ( XSIZE + 1 ) * ( YSIZE + 1 ), '_LOGICAL', 
+            XSIZE = UBNDI( 1 ) - LBNDI( 1 ) + 1
+            YSIZE = UBNDI( 2 ) - LBNDI( 2 ) + 1
+            CALL PSX_CALLOC( ( XSIZE + 1 ) * ( YSIZE + 1 ), '_LOGICAL',
      :                       IPDONE, STATUS )
             CALL PSX_CALLOC( 2*MAXPTS, '_DOUBLE', IPXY, STATUS )
 
 *  Contour this array at the specified integer value.
-            CALL ARD1_CNTDR( JPLOT, DIM( 1 ), DIM( 2 ), 
+            CALL ARD1_CNTDR( JPLOT, DIM( 1 ), DIM( 2 ),
      :                       %VAL( CNF_PVAL( IPMASK ) ),
-     :                       LBNDI( 1 ), LBNDI( 2 ), XSIZE, YSIZE, 
+     :                       LBNDI( 1 ), LBNDI( 2 ), XSIZE, YSIZE,
      :                       REGVAL, MAXPTS, %VAL( CNF_PVAL( IPXY ) ),
      :                       %VAL( CNF_PVAL( IPDONE ) ), STATUS )
 

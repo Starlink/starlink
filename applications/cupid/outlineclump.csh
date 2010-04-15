@@ -14,8 +14,8 @@
 
 #  Description:
 #     This procedure will outline a specified clump previously identified
-#     by CUPID:FINDCLUMPS or CUPID:EXTRACTCLUMPS. The data must be 
-#     2-dimensional, and the image over which the outline is to be drawn 
+#     by CUPID:FINDCLUMPS or CUPID:EXTRACTCLUMPS. The data must be
+#     2-dimensional, and the image over which the outline is to be drawn
 #     must have been displayed previously using KAPPA:DISPLAY.
 
 #  Usage:
@@ -25,22 +25,22 @@
 #     NDF = NDF (Read)
 #        The name of the NDF containing the clump information. This NDF
 #        should have been created using the CUPID:FINDCLUMPS or
-#        CUPID:EXTRACTCLUMPS command. The clump cut-out images contained in 
-#        the CUPID extension of this NDF will be used to define the outline 
+#        CUPID:EXTRACTCLUMPS command. The clump cut-out images contained in
+#        the CUPID extension of this NDF will be used to define the outline
 #        of the clump.
 #     INDEX = _INTEGER (Read)
 #        The integer index of the clump to be identified.
 #     STYLE = LITERAL (Read)
-#        A group of attribute settings describing the plotting style to 
-#        use for the outline. 
+#        A group of attribute settings describing the plotting style to
+#        use for the outline.
 #
 #        A comma-separated list of strings should be given in which each
-#        string is either an attribute setting, or the name of a text 
-#        file preceded by an up-arrow character "^".  Such text files 
+#        string is either an attribute setting, or the name of a text
+#        file preceded by an up-arrow character "^".  Such text files
 #        should contain further comma-separated lists which will be read
-#        and interpreted in the same manner.  Attribute settings are 
+#        and interpreted in the same manner.  Attribute settings are
 #        applied in the order in which they occur within the list, with
-#        later settings overriding any earlier settings given for the 
+#        later settings overriding any earlier settings given for the
 #        same attribute.
 #
 #        Each individual attribute setting should be of the form:
@@ -51,9 +51,9 @@
 #        is the value to assign to the attribute. Default values will be
 #        used for any unspecified attributes.  All attributes will be
 #        defaulted if a null value (!) is supplied.  See section
-#        "Plotting Attributes" in SUN/95 for a description of the 
-#        available attributes.  Any unrecognised attributes are ignored 
-#        (no error is reported). 
+#        "Plotting Attributes" in SUN/95 for a description of the
+#        available attributes.  Any unrecognised attributes are ignored
+#        (no error is reported).
 #
 #        The appearance of the clump outline is controlled by the attributes
 #        Colour(Curves), Width(Curves), etc (the synonym Contours may be
@@ -63,7 +63,7 @@
 
 #  Examples:
 #     outlineclump m51b 2 style="'colour=blue,width=4'"
-#        This draws an outline of the second clump (as stored in 
+#        This draws an outline of the second clump (as stored in
 #        m51b.more.cupid.clumps(2).model) on the current graphics device,
 #        using a blue line of four times the default thinkness.
 
@@ -121,11 +121,11 @@ if ( $narg == 0 ) then
 #   Ensure that the following invocation of parget will return a non-zero
 #   status value if anything goes wrong.
 #
-      set adam_exit_set = $?ADAM_EXIT 
+      set adam_exit_set = $?ADAM_EXIT
       setenv ADAM_EXIT 1
 #
 #   Obtain the current DATA_ARRAY. Check that parget worked ok by testing
-#   status. Also remove angle brackets introduced by parget (eg. replace 
+#   status. Also remove angle brackets introduced by parget (eg. replace
 #   "$<KAPPA_DIR>/m31" by "$KAPPA_DIR/m31" ), and any NDF section specifier.
 #
       set defndf = `$KAPPA_DIR/parget data_array GLOBAL`
@@ -181,7 +181,7 @@ if ( $narg == 0 ) then
             set ndf = $defndf
          endif
          unset noglob
-#  
+#
 #   Remove any shell meta-characters
 #
          eval set ndf = "$ndf"

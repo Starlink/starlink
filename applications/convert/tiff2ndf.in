@@ -3,13 +3,13 @@
 #+
 #  Name:
 #     tiff2ndf
- 
+
 #  Purpose:
 #     Converts a TIFF file into an NDF.
- 
+
 #  Type of Module:
 #     Bourne shell script
- 
+
 #   Usage:
 #     tiff2ndf in [out]
 
@@ -21,7 +21,7 @@
 #      FITS file, flipped top to bottom, and then FITS2NDF to produce
 #      the final NDF.  Error messages are converted into Starlink style
 #      (preceded by !).
- 
+
 #  Parameters:
 #     IN = FILENAME (Read)
 #        The name of the TIFF file to be converted. (A .tif name extension
@@ -30,10 +30,10 @@
 #        The name of the NDF to be generated (without the .sdf extension).
 #        If the OUT parameter is omitted, the value of the IN parameter
 #        is used.
- 
+
 #  Examples:
 #     tiff2ndf old new
-#        This converts the TIFF file old.tif into an NDF called old 
+#        This converts the TIFF file old.tif into an NDF called old
 #        (in file old.sdf).
 #     tiff2ndf horse
 #        This converts the TIFF file horse.tif into an NDF called horse
@@ -49,7 +49,7 @@
 #
 #     -  The Netpbm utilities tifftopnm, ppmtopgm, pnmflip and pnmtofits
 #        must be available on your PATH.
- 
+
 #  Related Applications:
 #     CONVERT: NDF2TIFF
 
@@ -58,7 +58,7 @@
 #     GJP: G.J. Privett (Starlink - UWCC)
 #     AJC: A.J. Chipperfield (Starlink - RAL)
 #     {enter_new_authors_here}
- 
+
 #  History:
 #     1995 March 3 (MJC):
 #        Original version (GIFs).
@@ -76,14 +76,14 @@
 #        to remove any .tif that may be present in the first argument.
 #     1998 November 19 (AJC):
 #        Use Netpbm - common for all platforms
-#          Use pnmtofits not pgmtofits 
+#          Use pnmtofits not pgmtofits
 #     1999 March 11 (AJC):
 #        Only remove .tif if at end of name
 #     {note_further_changes_here}
- 
+
 #  Bugs:
 #     {note_any_bugs_here}
- 
+
 #-
 
 # Check that a file name was given.
@@ -119,7 +119,7 @@ out=${2:-$name}
 rm -f convert_err?_$name.lis
 
 # Convert the image to an NDF of data type _UBYTE.  Make the error look
-# as if it came from MSG, so as this is a secondary error report, 
+# as if it came from MSG, so as this is a secondary error report,
 # replace the !! prefix with !.
 $CONVERT_DIR/fits2ndf in=convert_temp_$name.fit out=$out fmtcnv=t \
   </dev/null  2>&1 | \

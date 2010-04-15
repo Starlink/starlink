@@ -18,11 +18,11 @@
 *     The routine writes a series of text lines to the current history
 *     record, after first applying optional message token translation
 *     and formatting operations.  If the history has not yet been
-*     modified by the current application (and APPN is not "<APPEND>"), 
-*     it creates a new history record, initialises it, and inserts the 
+*     modified by the current application (and APPN is not "<APPEND>"),
+*     it creates a new history record, initialises it, and inserts the
 *     text suppled. If the history has already been modified (or if APPN
-*     is "<APPEND>"), then the new text is simply appended to any already 
-*     present. The routine returns without action if the NDF does not 
+*     is "<APPEND>"), then the new text is simply appended to any already
+*     present. The routine returns without action if the NDF does not
 *     have a history component.
 
 *  Arguments:
@@ -33,8 +33,8 @@
 *        new history record) if the history has not yet been modified
 *        by the current application, otherwise it is ignored. If a
 *        blank value is given, then a suitable default will be used
-*        instead. The special value "<APPEND>" may be supplied in order 
-*        to append the text lines to the current history text even if 
+*        instead. The special value "<APPEND>" may be supplied in order
+*        to append the text lines to the current history text even if
 *        the  history has not yet been modified by the current application.
 *     NLINES = INTEGER (Given)
 *        Number of new lines of text to be added to the history record.
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -100,7 +100,7 @@
 *        Changed to preserve indentation on un-wrapped text and on the
 *        first line of each wrapped paragraph.
 *     16-OCT-2009 (DSB):
-*        If APPN is "<APPEND>", always append text to the current 
+*        If APPN is "<APPEND>", always append text to the current
 *        history record.
 *     {enter_further_changes_here}
 
@@ -108,15 +108,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
@@ -197,7 +197,7 @@
 
 *  Obtain the text length for the current history record. If this is
 *  zero (because there is not yet a current record), then use the
-*  length of the input text lines instead, or if APPN is <APPEND> use 
+*  length of the input text lines instead, or if APPN is <APPEND> use
 *  the length of the current history record.
                L = DCB_HTLEN( IDCB )
                IF ( L .EQ. 0 ) THEN
@@ -414,12 +414,12 @@
                               GO TO 1
                            END IF
                         END IF
-                     END IF        
+                     END IF
 
 *  Quit processing input lines if an error occurs.
                      IF ( STATUS .NE. SAI__OK ) GO TO 4
  3                CONTINUE
- 4                CONTINUE                 
+ 4                CONTINUE
                END IF
 
 *  If any lines remain in the output buffer, then write them to the

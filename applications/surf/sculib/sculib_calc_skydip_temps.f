@@ -1,26 +1,26 @@
       SUBROUTINE SCULIB_CALC_SKYDIP_TEMPS( N_TEMPS, SUB_REQUIRED,N_FITS,
      :     FITS, PARAM, N_INTEGRATIONS, N_MEASUREMENTS, N_POS, N_BOLS,
      :     MAX_SUB, NUM_CHAN, NUM_ADC, BOL_CHAN, BOL_TYPE, BOL_ADC,
-     :     DEM_PNTR,IN_DATA, OUT_DATA, OUT_VAR, OUT_QUAL, OUT_DEM_PNTR, 
+     :     DEM_PNTR,IN_DATA, OUT_DATA, OUT_VAR, OUT_QUAL, OUT_DEM_PNTR,
      :     OUT_DATA_AV, OUT_VAR_AV, OUT_QUAL_AV, SCRATCH,
      :     STATUS)
 *+
 *  Name:
 *     SCULIB_CALC_SKYDIP_TEMPS
- 
+
 *  Purpose:
 *     Calculate all the skydip temps from raw data
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SCULIB_CALC_SKYDIP_TEMPS( N_TEMPS, N_FITS, FITS, PARAM,
-*    :     N_INTEGRATIONS, N_MEASUREMENTS, N_POS, N_BOLS, DEM_PNTR, 
-*    :     IN_DATA, OUT_DATA, OUT_VAR, OUT_QUAL, OUT_DEM_PNTR, 
+*    :     N_INTEGRATIONS, N_MEASUREMENTS, N_POS, N_BOLS, DEM_PNTR,
+*    :     IN_DATA, OUT_DATA, OUT_VAR, OUT_QUAL, OUT_DEM_PNTR,
 *    :     OUT_DATA_AV, OUT_VAR_AV, OUT_QUAL_AV, SCRATCH,
 *    :     STATUS)
- 
+
 *  Description:
 *     This routine accepts the SKYDIP (3 dimensional) raw data and
 *     works out the temperature associated with each integration.
@@ -49,7 +49,7 @@
 *     N_POS = INTEGER (Given)
 *        Number of data points
 *     N_BOLS = INTEGER (Given)
-*        Number of bolometers (sub instruments)      
+*        Number of bolometers (sub instruments)
 *     NUM_CHAN                   = INTEGER (Given)
 *           number of A/D channels per A/D card
 *     NUM_ADC                    = INTEGER (Given)
@@ -80,14 +80,14 @@
 *     OUT_QUAL_AV(N_MEASUREMENTS, N_BOLS) = BYTE (Returned)
 *        Quality of the Average sky temp for each measurement
 *     SCRATCH(N_TEMPS, N_BOLS, N_INTEGRATIONS) = REAL (Given)
-*        Work space to store the data for each measurement (since I 
+*        Work space to store the data for each measurement (since I
 *        cant simply pass a pointer in as the data is non-contiguous)
 *     STATUS = INTEGER (Given)
 *        Global Status
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
- 
+
 *  Notes:
 *     Uses the T_HOT and TARRAY parameters.
 
@@ -117,12 +117,12 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
@@ -153,7 +153,7 @@
       INTEGER SUB_REQUIRED
       REAL    SCRATCH(N_TEMPS, N_BOLS, N_POS)
 
-*     Arguments Returned:      
+*     Arguments Returned:
       REAL    OUT_DATA(N_BOLS, N_POS)
       REAL    OUT_VAR (N_BOLS, N_POS)
       BYTE    OUT_QUAL(N_BOLS, N_POS)
@@ -231,7 +231,7 @@
          ITEMP = 4
          CALL CHR_PUTI (I, STEMP, ITEMP)
 
-         CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+         CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :        STEMP, SUB_INSTRUMENT(I), STATUS)
          CALL CHR_UCASE (SUB_INSTRUMENT(I))
 
@@ -246,7 +246,7 @@
 *     BOL_CHAN and BOL_ADC are set in the demodulated data file so we
 *     dont need to do anything here
 
-      
+
 *     Get WAVElength list
       STEMP = 'WAVE_'
       DO I = 1, N_SUB
@@ -264,7 +264,7 @@
       CALL CHR_UCASE( FILT_NAME )
 
 
-*     Construct a filter name list. Include the w and n specifiers 
+*     Construct a filter name list. Include the w and n specifiers
 *     as required. Does not work for 450o:850s or 850s:phot
       STEMP = 'FILT_'
       DO I = 1, N_SUB
@@ -274,7 +274,7 @@
          CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :        STEMP, SUB_FILT(I), STATUS)
 
-*     Compare with the filter name itself and add a 'w' or 'n' as 
+*     Compare with the filter name itself and add a 'w' or 'n' as
 *     required.
          ITEMP = CHR_LEN(SUB_FILT(I))
          IF (FILT_NAME .EQ. '450N:850N') THEN
@@ -289,12 +289,12 @@
 *     get the required value from the parameter.
 *     Before 19980204 (MJD = 50848) we have to use T_AMB instead.
 *     Get the MJD (don't bother about the startup time correction)
-      CALL SCULIB_GET_MJD(N_FITS, FITS, -1.0D0, MJD, EPOCH, RTEMP, 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, -1.0D0, MJD, EPOCH, RTEMP,
      :     STATUS)
 
       IF (MJD .LT. 50848.0D0 .AND. INSTRUMENT .EQ. 'SCUBA') THEN
          CALL MSG_OUTIF(MSG__NORM, ' ', ' Skydip taken before '//
-     :        '19980204. Using T_AMB rather than T_HOT as default.', 
+     :        '19980204. Using T_AMB rather than T_HOT as default.',
      :        STATUS)
          CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 'T_AMB',
      :        T_HOT_FITS, STATUS)
@@ -314,7 +314,7 @@
 *     Read the COLD temperatures from FITS information
 *     We now have to be clever since it is not always true that the
 *     cold load temperatures are correct. Prior to 13 March 2000
-*     the 450/850 T_COLD values stored in the header are known to 
+*     the 450/850 T_COLD values stored in the header are known to
 *     be incorrect. After that date, the colod temperatures are correct
 *     for 450W:850W but not for 450N:850N. We have no idea about the
 *     validity of the cold load temperatures for other wavelengths.
@@ -342,26 +342,26 @@
 
                T_COLD(I) = 95.0
                ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
-               
+
             ELSE IF (SUB_FILT(I) .EQ. '450N') THEN
-               
+
                T_COLD(I) = 102.0
                ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
-               
+
             ELSE IF (SUB_FILT(I) .EQ. '850W') THEN
-               
+
                T_COLD(I) = 90.0
                ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
-               
+
             ELSE IF (SUB_FILT(I) .EQ. '850N') THEN
-               
+
                T_COLD(I) = 92.0
                ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
-               
+
             END IF
 
          END IF
-            
+
       END DO
 
 *     Get all the temperatures. Note that we have to change the prompt
@@ -403,7 +403,7 @@
 *     Separate this from the T_COLD code since it may have a different
 *     time scale to the T_COLD adjustment (this will always be required
 *     (modulo BOLOCAM) whereas the T_COLD adjustment will be removable
-*     after a certain date. (and the adjustment is only wavelength 
+*     after a certain date. (and the adjustment is only wavelength
 *     dependent, not filter dependent)
 *     Generate an array of T_HOT
 *     This works because START=1 for SKYDIP and REDUCE_SWITCH
@@ -431,7 +431,7 @@
             CALL MSG_SETR('T', T_HOT_DELTA(I))
             CALL MSG_OUTIF(MSG__NORM, ' ', ' Hot load temperature for'//
      :           ' sub ^SUB will be changed by ^T K', STATUS)
-            
+
          ELSE
 
             T_HOT_DELTA(I) = 0.0
@@ -466,7 +466,7 @@
          DO I = START, FINISH
             CALL MSG_SETC('SUB', SUB_INSTRUMENT(I))
             CALL MSG_SETR('T_COLD', T_COLD(I))
-            CALL MSG_OUTIF(MSG__NORM, ' ', '  ^SUB  - ^T_COLD K', 
+            CALL MSG_OUTIF(MSG__NORM, ' ', '  ^SUB  - ^T_COLD K',
      :           STATUS)
          END DO
 
@@ -490,7 +490,7 @@
 
          CALL PAR_EXACR(PARAM, I, T_COLD, STATUS)
 
-      ELSE 
+      ELSE
 
          DO I = START, FINISH
 
@@ -530,7 +530,7 @@
             OUT_VAR(BOL,I) = VAL__BADR
             OUT_QUAL(BOL,I)  = 1
          END DO
-      END DO 
+      END DO
 
 *     Now we can read in the data and average it all together
 
@@ -540,7 +540,7 @@
 
 
 *  find where the exposure starts and finishes in the data array
- 
+
          CALL SCULIB_FIND_SWITCH (DEM_PNTR,
      :        1, 1, N_INTEGRATIONS, N_MEASUREMENTS,
      :        N_POS, 1, 1, 1, MEASUREMENT,
@@ -557,15 +557,15 @@
      :           'in measurement ^M', STATUS)
 
 *     Since there is no data set the quality to bad for all bolometers
-            
+
             DO BOL = 1, N_BOLS
-               
+
                OUT_DATA_AV(BOL, MEASUREMENT) = VAL__BADR
                OUT_VAR_AV(BOL, MEASUREMENT) = VAL__BADR
                OUT_QUAL_AV(BOL, MEASUREMENT) = 1
 
             END DO
-            
+
 
          ELSE
 
@@ -579,7 +579,7 @@
                DO BOL = 1, N_BOLS
                   DO INTEGRATION = EXP_START, EXP_END
                      COUNT = INTEGRATION - EXP_START + 1
-                     SCRATCH(LOAD, BOL, COUNT) = IN_DATA(LOAD, BOL, 
+                     SCRATCH(LOAD, BOL, COUNT) = IN_DATA(LOAD, BOL,
      :                    INTEGRATION)
                   END DO
                END DO
@@ -587,9 +587,9 @@
 
             POS = EXP_START
 
-            CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT, 
+            CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT,
      :           N_SUB, SUB_INSTRUMENT, SUB_WAVE, NUM_CHAN,
-     :           NUM_ADC, BOL_TYPE, N_BOLS, 
+     :           NUM_ADC, BOL_TYPE, N_BOLS,
      :           BOL_CHAN, BOL_ADC, N_SAMP_IN, SCRATCH,
      :           N_INTEGRATIONS, OUT_DATA(1,POS), OUT_VAR(1,POS),
      :           OUT_QUAL(1,POS), J_SKY_AV,
@@ -612,7 +612,7 @@
       END IF
 
 *     Fix DEM_PNTR for the output file
-*     I know where all the data has gone so I just need to set the 
+*     I know where all the data has gone so I just need to set the
 *     reference
 
       COUNT = 1
@@ -625,7 +625,7 @@
             COUNT = COUNT + 1
 
          END DO
-         
+
       END DO
 
 

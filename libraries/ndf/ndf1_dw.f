@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,11 +71,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'AST_PAR'          ! AST_ public interface
-      
+
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
 *        DCB_ASTLC = CHARACTER * ( DAT__SZLOC ) (Write)
@@ -91,16 +91,16 @@
 *           available in the DCB.
 *        DCB_LOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Data object locator.
-      
+
 *  Arguments Given:
       INTEGER IDCB
 
 *  Status:
       INTEGER STATUS             ! Global status
-      
+
 *  External References:
       EXTERNAL NDF1_RDAST        ! Read AST_ data from an HDS object
-      
+
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) WCSLOC ! Locator to WCS structure
       CHARACTER * ( DAT__SZTYP ) TYPE ! HDS component type string
@@ -115,7 +115,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  See if WCS information is already available. There is nothing to do
 *  if it is.
       IF ( .NOT. DCB_KW( IDCB ) ) THEN
@@ -264,15 +264,15 @@
      :                          'the HDS object ^OBJECT.', STATUS )
                         END IF
 
-*  Validate the FrameSet and ensure it contains all the standard dummy 
+*  Validate the FrameSet and ensure it contains all the standard dummy
 *  Frames expected by the NDF library.
-                        CALL NDF1_VWCS( 0, IWCS, DCB_IWCS( IDCB ), 
+                        CALL NDF1_VWCS( 0, IWCS, DCB_IWCS( IDCB ),
      :                                  STATUS )
 
 *  Annul the original FrameSet pointer.
                         CALL AST_ANNUL( IWCS, STATUS )
 
-*  Exempt this pointer from AST_ context handling (so it is not annulled if 
+*  Exempt this pointer from AST_ context handling (so it is not annulled if
 *  AST_END is called).
                         CALL AST_EXEMPT( DCB_IWCS( IDCB ), STATUS )
 

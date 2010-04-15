@@ -125,7 +125,7 @@ C-----------------------------------------------------------------------
       REAL XR(100), YR(100)
 C
       CALL PGENV(-2.,10.,-0.4,1.2,0,1)
-      CALL PGLAB('(x)', 'sin(x)/x', 
+      CALL PGLAB('(x)', 'sin(x)/x',
      $             'PGPLOT Example 2:  Sinc Function')
       DO 20 I=1,100
           XR(I) = (I-20)/6.
@@ -156,7 +156,7 @@ C
 C Set the color index for the axes and grid (index 5 = cyan).
 C Call PGBOX to draw first a grid at low brightness, and then a
 C frame and axes at full brightness. Note that as the x-axis is
-C to represent an angle in degrees, we request an explicit tick 
+C to represent an angle in degrees, we request an explicit tick
 C interval of 90 deg with subdivisions at 30 deg, as multiples of
 C 3 are a more natural division than the default.
 C
@@ -176,7 +176,7 @@ C
       DO 20 I=1,360
           XR(I) = 2.0*I
           ARG = XR(I)/180.0*PI
-          YR(I) = SIN(ARG) + 0.5*COS(2.0*ARG) + 
+          YR(I) = SIN(ARG) + 0.5*COS(2.0*ARG) +
      1                0.5*SIN(1.5*ARG+PI/3.0)
    20 CONTINUE
 C
@@ -272,8 +272,8 @@ C----------------------------------------------------------------------
      1            2.7, 3.0, 0.34, 0.8, 0.2, 0.46,
      2            0.15, 0.08, 0.01 /
 C
-C Call PGENV to initialize the viewport and window; the AXIS argument 
-C is 30 so both axes will be logarithmic. The X-axis (frequency) runs 
+C Call PGENV to initialize the viewport and window; the AXIS argument
+C is 30 so both axes will be logarithmic. The X-axis (frequency) runs
 C from 0.01 to 100 GHz, the Y-axis (flux density) runs from 0.3 to 300
 C Jy. Note that it is necessary to specify the logarithms of these
 C quantities in the call to PGENV. We request equal scales in x and y
@@ -286,8 +286,8 @@ C
      1             'Flux Density, S\d\gn\u (Jy)',
      2             'PGPLOT Example 5:  Log-Log plot')
 C
-C Draw a fit to the spectrum (don't ask how this was chosen). This 
-C curve is drawn before the data points, so that the data will write 
+C Draw a fit to the spectrum (don't ask how this was chosen). This
+C curve is drawn before the data points, so that the data will write
 C over the curve, rather than vice versa.
 C
       DO 10 I=1,100
@@ -323,7 +323,7 @@ C-----------------------------------------------------------------------
       SUBROUTINE PGEX6
 C----------------------------------------------------------------------
 C Demonstration program for the PGPLOT plotting package.  This example
-C illustrates the use of PGPOLY, PGCIRC, and PGRECT using SOLID, 
+C illustrates the use of PGPOLY, PGCIRC, and PGRECT using SOLID,
 C OUTLINE, HATCHED, and CROSS-HATCHED fill-area attributes.
 C----------------------------------------------------------------------
       REAL TWOPI
@@ -351,7 +351,7 @@ C
 C Label the graph.
 C
       CALL PGSCI(1)
-      CALL PGMTXT('T', -2.0, 0.5, 0.5, 
+      CALL PGMTXT('T', -2.0, 0.5, 0.5,
      :     'PGPLOT fill area: routines PGPOLY, PGCIRC, PGRECT')
 C
 C Draw assorted polygons.
@@ -686,7 +686,7 @@ C
           CALL PGPT(1,VERT(1,I)+0.2*ZZ,VERT(2,I)+0.3*ZZ,9)
     2 CONTINUE
 C
-C Draw the edges - test all vertex pairs to find the edges of the 
+C Draw the edges - test all vertex pairs to find the edges of the
 C correct length.
 C
       CALL PGSLW(3)
@@ -767,7 +767,7 @@ C----------------------------------------------------------------------
       CHARACTER*20 XOPT(N), BSL*1
       DATA X1 /   4*0.0, -8000.0, 100.3, 205.3, -45000.0, 2*0.0/
       DATA X2 /4*8000.0,  8000.0, 101.3, 201.1, 3*-100000.0/
-      DATA XOPT / 'BSTN', 'BSTNZ', 'BSTNZH', 'BSTNZD', 'BSNTZHFO', 
+      DATA XOPT / 'BSTN', 'BSTNZ', 'BSTNZH', 'BSTNZD', 'BSNTZHFO',
      :      'BSTNZD', 'BSTNZHI', 'BSTNZHP', 'BSTNZDY', 'BSNTZHFOY'/
 C
       BSL = CHAR(92)
@@ -776,13 +776,13 @@ C
       CALL PGBBUF
       CALL PGSCH(0.7)
       DO 100 I=1,N
-        CALL PGSVP(0.15, 0.85, (0.7+REAL(N-I))/REAL(N), 
-     :                         (0.7+REAL(N-I+1))/REAL(N)) 
+        CALL PGSVP(0.15, 0.85, (0.7+REAL(N-I))/REAL(N),
+     :                         (0.7+REAL(N-I+1))/REAL(N))
         CALL PGSWIN(X1(I), X2(I), 0.0, 1.0)
         CALL PGTBOX(XOPT(I),0.0,0,' ',0.0,0)
         CALL PGLAB('Option = '//XOPT(I), ' ', ' ')
         IF (I.EQ.1) THEN
-           CALL PGMTXT('B', -1.0, 0.5, 0.5, 
+           CALL PGMTXT('B', -1.0, 0.5, 0.5,
      :                 BSL//'fiAxes drawn with PGTBOX')
         END IF
   100 CONTINUE
@@ -856,7 +856,7 @@ C----------------------------------------------------------------------
       INTEGER I, J, NV
       REAL A, D, X(100), Y(100)
 C
-C Set the number of vertices, and compute the 
+C Set the number of vertices, and compute the
 C coordinates for unit circumradius.
 C
       NV = 17
@@ -904,7 +904,7 @@ C Bessel function of order 0 (approximate).
 C Reference: Abramowitz and Stegun: Handbook of Mathematical Functions.
 C-----------------------------------------------------------------------
       REAL X, XO3, T, F0, THETA0
-C     
+C
       X = ABS(XX)
       IF (X .LE. 3.0) THEN
          XO3 = X/3.0
@@ -918,7 +918,7 @@ C
       ELSE
          T = 3.0/X
          F0 =     0.79788456 +
-     1        T*(-0.00000077 + 
+     1        T*(-0.00000077 +
      2        T*(-0.00552740 +
      3        T*(-0.00009512 +
      4        T*( 0.00137237 +
@@ -959,12 +959,12 @@ C
          T = 3.0/X
          F1 =    0.79788456 +
      1       T*( 0.00000156 +
-     2       T*( 0.01659667 + 
+     2       T*( 0.01659667 +
      3       T*( 0.00017105 +
      4       T*(-0.00249511 +
-     5       T*( 0.00113653 + 
+     5       T*( 0.00113653 +
      6       T*(-0.00020033))))))
-         THETA1 = X   -2.35619449 + 
+         THETA1 = X   -2.35619449 +
      1             T*( 0.12499612 +
      2             T*( 0.00005650 +
      3             T*(-0.00637879 +
@@ -980,7 +980,7 @@ C-----------------------------------------------------------------------
       REAL FUNCTION PGRNRM (ISEED)
       INTEGER ISEED
 C-----------------------------------------------------------------------
-C Returns a normally distributed deviate with zero mean and unit 
+C Returns a normally distributed deviate with zero mean and unit
 C variance. The routine uses the Box-Muller transformation of uniform
 C deviates. For a more efficient implementation of this algorithm,
 C see Press et al., Numerical Recipes, Sec. 7.2.

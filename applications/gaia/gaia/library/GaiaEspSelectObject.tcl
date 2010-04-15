@@ -10,7 +10,7 @@
 #
 #  Description:
 #    The ESP widget needs to have the user select sources and matching
-#    radii.  Encapsulate a StarCanvasDraw widget. 
+#    radii.  Encapsulate a StarCanvasDraw widget.
 #
 #    This module is based on, and simplified from, Peter Draper's
 #    GaiaArd and GaiaPhotom* widgets.
@@ -88,7 +88,7 @@ itcl::class gaia::GaiaEspSelectObject {
 
     #  Destructor
     destructor {
-	# Clear the canvas.  Better would be to clear only those objects 
+	# Clear the canvas.  Better would be to clear only those objects
 	# which this class has created, but that'll have to wait until I
 	# sort out how to manage those internally.  See GaiaPhotomObject
 	$canvasdraw clear
@@ -128,7 +128,7 @@ itcl::class gaia::GaiaEspSelectObject {
     # Shape to draw on the canvas
     public variable drawmode {} {}
 
-    # Code which is executed with the canvasid as argument, 
+    # Code which is executed with the canvasid as argument,
     # when an object is updated
     public variable update_callback {} {}
 
@@ -176,7 +176,7 @@ body gaia::GaiaEspSelectObject::created_circle_ {id args} {
     set canvas_id_ $id
     update_circle_ $id create
 
-    # Update display and deselect object (immediate resize isn't 
+    # Update display and deselect object (immediate resize isn't
     # desirable).
     update idletasks
     $canvasdraw deselect_object $canvas_id_
@@ -213,7 +213,7 @@ body gaia::GaiaEspSelectObject::created_square_ {id args} {
     set canvas_id_ $id
     update_square_ $id create
 
-    # Update display and deselect object (immediate resize isn't 
+    # Update display and deselect object (immediate resize isn't
     # desirable).
     update idletasks
     $canvasdraw deselect_object $canvas_id_
@@ -241,7 +241,7 @@ body gaia::GaiaEspSelectObject::update_square_ {id mode} {
 
 	$canvas coords $id [expr $centx-$hwid] [expr $centy-$hwid] \
 		[expr $centx+$hwid] [expr $centy+$hwid]
-	
+
 	if {$mode == "create"} {
 	    $canvasdraw add_notify_cmd $id [code $this update_square_ $id] 0
 	}
@@ -257,7 +257,7 @@ body gaia::GaiaEspSelectObject::created_sector_ {id args} {
     update_sector_ $id create
     set issector_ 1
 
-    # Update display and deselect object (immediate resize isn't 
+    # Update display and deselect object (immediate resize isn't
     # desirable).
     update idletasks
     $canvasdraw deselect_object $canvas_id_

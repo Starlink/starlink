@@ -14,15 +14,15 @@ C     and an XYT cube is collapsed along the T direction to give an XY
 C     image.
 C
 C     Typical uses include the combination of the various cycles of a
-C     CGS2 or FIGS observation as output by the FIGS322 or RCGS2 
+C     CGS2 or FIGS observation as output by the FIGS322 or RCGS2
 C     programs, or coadding of CGS4 observations (for this purpose the
 C     individual images must be first grown into a cube using GROWXY).
 C
 C     If the NORM keyword is specified the errors are calculated after
 C     normalizing each row or plane so that the mean value is the same
 C     for all rows (planes). This does not effect the output data but
-C     generates errors which are determined only by the noise level in 
-C     the data and are not influenced by any general trend in the data. 
+C     generates errors which are determined only by the noise level in
+C     the data and are not influenced by any general trend in the data.
 C
 C     If the CUTOFF parameter is specified, points which deviate from
 C     the mean by more than CUTOFF times the standard error for the
@@ -41,7 +41,7 @@ C                be ignored.
 C
 C     Command keywords -
 C
-C     'NORM'     Normalize data to mean level. 
+C     'NORM'     Normalize data to mean level.
 C
 C     Input data -
 C
@@ -50,7 +50,7 @@ C
 C     Modified:
 C     1st  Mar 1991  Add 3-2 dimensional coadding.
 C     2nd  Apr 1991  JMS/AAO. Added STATUS checks to support user
-C                    requested aborts. Now aborts if Input Data is 
+C                    requested aborts. Now aborts if Input Data is
 C                    not 2 or 3 dimensional.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
 C                    removed.
@@ -81,7 +81,7 @@ C
       REAL      CUTOFF             ! Cutoff value for despiking
       REAL      YEND               ! Last Y value used - ignored
       REAL      YSTART             ! First Y value used - ignored
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -102,7 +102,7 @@ C     case by treating it as a 2D image of size DIMS(1)*DIMS(2) by DIMS(3)
 C
       CALL DSA_DATA_SIZE ('IMAGE',3,NDIM,DIMS,NELM,STATUS)
       IF (NDIM .EQ. 2) THEN
-         NX=DIMS(1) 
+         NX=DIMS(1)
          NY=DIMS(2)
       ELSE IF (NDIM .EQ. 3) THEN
          NX=DIMS(1)*DIMS(2)
@@ -209,7 +209,7 @@ C     (<) QUALITY (Byte array QUALITY(NX)) The output quality array.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_FILL    (GEN_ package) Fill an array of bytes with a constant.
 C
@@ -254,7 +254,7 @@ C
 C     Copy the quality array of the original image to form the
 C     initial EXCLUDE array. Additional points may subsequently get
 C     added to the EXCLUDE array if the CUTOFF option is in use.
-C 
+C
       CALL GEN_MOVE(NX*NY,IQUAL,EXCLUDE)
 C
 C     Fill output quality with zeroes.
@@ -368,26 +368,26 @@ C
          END IF
 C
 C     Check for points to exclude - i.e. any that deviate from
-C     the mean by more than CUTOFF times SIGMA - if there are any, set 
+C     the mean by more than CUTOFF times SIGMA - if there are any, set
 C     FINISHED to false to repeat calculation of spectrum and error
 C
          IF (CUTOFF .LT. 1E37) THEN
             DO IX=1,NX
                IF (NUM_CYCLES(IX) .GT. 1) THEN
-                  SIGMA = ERRORS(IX) * SQRT(REAL(NUM_CYCLES(IX)))       
-                  DO IY=IYST,IYEN                                       
-                     IF (EXCLUDE(IX,IY) .EQ. 0) THEN                    
-                        IF (ABS(IMAGE(IX,IY)-SPECT(IX)) .GT.            
-     :                          (CUTOFF*SIGMA)) THEN                    
-                           EXCLUDE(IX,IY) = 1                           
-                           FINISHED = .FALSE.                           
-                           WRITE(OUTMES,'('' Point'',I4,'' Cycle'',I4,  
-     :                          '' Excluded'')') IX,IY                  
-                           CALL PAR_WRUSER(OUTMES,STATUS)               
-                        END IF                                           
-                     END IF                                              
+                  SIGMA = ERRORS(IX) * SQRT(REAL(NUM_CYCLES(IX)))
+                  DO IY=IYST,IYEN
+                     IF (EXCLUDE(IX,IY) .EQ. 0) THEN
+                        IF (ABS(IMAGE(IX,IY)-SPECT(IX)) .GT.
+     :                          (CUTOFF*SIGMA)) THEN
+                           EXCLUDE(IX,IY) = 1
+                           FINISHED = .FALSE.
+                           WRITE(OUTMES,'('' Point'',I4,'' Cycle'',I4,
+     :                          '' Excluded'')') IX,IY
+                           CALL PAR_WRUSER(OUTMES,STATUS)
+                        END IF
+                     END IF
                   END DO
-               END IF                                                 
+               END IF
             END DO
          END IF
 C

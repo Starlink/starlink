@@ -9,12 +9,12 @@ C
 C     Function:
 C        Reduce CGS4 spectropolarimetry data.
 C
-C     Description:                           
+C     Description:
 C        CGS4POL reduces data obtained with the CGS4 instrument at UKIRT
 C        used in its spectropolarimetry mode. The data for a
 C        single observation consists of four Figaro files containing the
 C        frames for plate position 0, 45, 22.5 and 67.5 degrees. Within each
-C        frame there should be two spectra corresponding to two slit 
+C        frame there should be two spectra corresponding to two slit
 C        positions. These spectra are combined
 C        to derive a polarization spectrum in TSP format.
 C
@@ -57,10 +57,10 @@ C
 *  Number of elements in data arrays
       INTEGER NELM
       INTEGER NDIM, DIMS(7),DIMS2(7)
-      INTEGER LENNAME                            
+      INTEGER LENNAME
 
 *  Extraction parameters
-      INTEGER ASTART,BSTART,OESEP,WIDTH,SEP         
+      INTEGER ASTART,BSTART,OESEP,WIDTH,SEP
 
 *  CCD parameters
       REAL BIAS,PHOTADU,RDN
@@ -85,7 +85,7 @@ C
       CALL PAR_GET0C('POS1',FNAME,STATUS)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME,STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -98,7 +98,7 @@ C
      :          STATUS)
             GOTO 100
          ELSE
-            SEP = DIMS(2)                                 
+            SEP = DIMS(2)
 
 *  Map the data
 
@@ -138,7 +138,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -171,9 +171,9 @@ C
              CALL DSA_NAMED_INPUT('INPUT3',FNAME,STATUS)
              IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
-               GOTO 100 
+               GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -208,7 +208,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                STATUS = USER__001
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -249,9 +249,9 @@ C
 
 *  Check them for validity
 
-             IF (ASTART+(WIDTH-1) .GT. SEP .OR. 
+             IF (ASTART+(WIDTH-1) .GT. SEP .OR.
      :           BSTART+(WIDTH-1) .GT. SEP) THEN
-                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)        
+                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)
                  GOTO 100
              ENDIF
 
@@ -286,7 +286,7 @@ C
              CALL TSP_WLU_LAMBDA(OLOC,XLABEL,XUNITS,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
 
 *  Map the Q Stokes data and its variance
@@ -314,10 +314,10 @@ C
 
              CALL TSP_TEMP(DIMS(1),'_REAL',T1PTR,T1LOC,STATUS)
              CALL TSP_TEMP(DIMS(1),'_REAL',T2PTR,T2LOC,STATUS)
-             
+
 *  Reduce the data (This is equivalent to doing CCD2STOKES on each
 *  pair and then QUMERGE).
-      
+
              IF (STATUS .EQ. SAI__OK) THEN
 
 *  Call CCD2STOKES for the first pair of frames (0 and 45) and
@@ -360,7 +360,7 @@ C
           ENDIF
 
 *  Unmap input arrays
- 
+
       ENDIF
 100   CONTINUE
       CALL DSA_CLOSE(STATUS)
@@ -368,7 +368,7 @@ C
 
 
       SUBROUTINE TSP_CGS4STOKES(NX,NY,I1,I2,ASTART,BSTART,WIDTH,
-     :    AP,INT,STOKES,VSTOKES,IX,OX)      
+     :    AP,INT,STOKES,VSTOKES,IX,OX)
 *+
 *
 *   Reduce CGS4 spectropolarimetry
@@ -400,7 +400,7 @@ C
 
 *  Parameters
       INTEGER NX,NY,ASTART,BSTART,WIDTH
-      CHARACTER*(*) AP                            
+      CHARACTER*(*) AP
       REAL I1(NX,NY),I2(NX,NY)
       REAL INT(NX),STOKES(NX),VSTOKES(NX)
       REAL IX(NX),OX(NX)
@@ -411,11 +411,11 @@ C
       INTEGER PT(2)
       REAL STAR,SKY
 
-*  Copy X axis to output           
+*  Copy X axis to output
       DO I=1,NX
          OX(I)=IX(I)
       ENDDO
-                   
+
 *  Determine position ranges to extract data over
       IF (AP .EQ. 'A') THEN
           PT(1) = ASTART
@@ -424,20 +424,20 @@ C
           PT(1) = BSTART
           PT(2) = ASTART
       ENDIF
-      
+
 *  Extract 4 spectra (star and sky for each of two polarization states)
       DO I=1,NX
           DO J=1,2
-              SPEC2(J) = I1(I,PT(J)) 
+              SPEC2(J) = I1(I,PT(J))
               SPEC2(J+2) = I2(I,PT(J))
               DO K=1,WIDTH-1
                   SPEC2(J) = SPEC2(J)+I1(I,PT(J)+K)
                   SPEC2(J+2) = SPEC2(J+2)+I2(I,PT(J)+K)
-              ENDDO 
+              ENDDO
 
           ENDDO
-    
-*  Determine star intensity 
+
+*  Determine star intensity
           STAR = SPEC2(1)+SPEC2(3)
 
 *  Determine sky intensity

@@ -16,7 +16,7 @@
 
 *  Notes:
 *     - Given the size of the PDA library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use PDA from C extend this file (and
 *     pda.h) to include any functions which they need but which are
 *     not already included.
@@ -63,7 +63,7 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h"                 
+#include "f77.h"
 #include "pda.h"
 
 
@@ -119,26 +119,26 @@ F77_SUBROUTINE(CALCG)( INTEGER(N), DOUBLE_ARRAY(X), INTEGER(NF),
 /* Wrapper function implementations. */
 /* ================================= */
 
-F77_SUBROUTINE(pda_sumsl)( INTEGER(N), 
-                           DOUBLE_ARRAY(D), 
-                           DOUBLE_ARRAY(X), 
-                           SUBROUTINE(CALCF), 
-                           SUBROUTINE(CALCG), 
-                           INTEGER_ARRAY(IV), 
-                           INTEGER(LIV), 
-                           INTEGER(LV), 
+F77_SUBROUTINE(pda_sumsl)( INTEGER(N),
+                           DOUBLE_ARRAY(D),
+                           DOUBLE_ARRAY(X),
+                           SUBROUTINE(CALCF),
+                           SUBROUTINE(CALCG),
+                           INTEGER_ARRAY(IV),
+                           INTEGER(LIV),
+                           INTEGER(LV),
                            DOUBLE_ARRAY(V),
-                           INTEGER_ARRAY(UIPARM), 
-                           DOUBLE_ARRAY(URPARM), 
+                           INTEGER_ARRAY(UIPARM),
+                           DOUBLE_ARRAY(URPARM),
                            SUBROUTINE(UFPARM) );
 
 /* The C interface for PDA_SUMSL omits the UIPARM, URPARM and UFPARM
    parameters of PDA_SUMSL. Communication between the calling program and
    the "calcf" and "calcg" functions should instead be done using
-   external variables. Likewise the supplied "calcf" and "calcg" functions 
+   external variables. Likewise the supplied "calcf" and "calcg" functions
    should not include "uiparm", "urparm" or "ufparm" parameters. */
 
-void pdaSumsl( int n, double *d, double *x, 
+void pdaSumsl( int n, double *d, double *x,
                void (*calcf)( int, double *, int *, double * ),
                void (*calcg)( int, double *, int *, double * ),
                int *iv, int liv, int lv, double *v ){
@@ -160,10 +160,10 @@ void pdaSumsl( int n, double *d, double *x,
 
    F77_CREATE_DOUBLE_ARRAY( X, n );
    F77_EXPORT_DOUBLE_ARRAY( x, X, n );
-   
+
    this_calcf = calcf;
    this_calcg = calcg;
-   
+
    F77_EXPORT_INTEGER( liv, LIV );
    F77_CREATE_INTEGER_ARRAY( IV, liv );
    F77_EXPORT_INTEGER_ARRAY( iv, IV, liv );
@@ -239,8 +239,8 @@ int pdaRnpoi( float mean ){
 }
 
 
-F77_SUBROUTINE(pda_deflt)( INTEGER(ALG), 
-                           INTEGER_ARRAY(IV), 
+F77_SUBROUTINE(pda_deflt)( INTEGER(ALG),
+                           INTEGER_ARRAY(IV),
                            INTEGER(LIV),
                            INTEGER(LV),
                            DOUBLE_ARRAY(V));

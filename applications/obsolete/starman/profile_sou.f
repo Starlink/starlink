@@ -69,7 +69,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       call printo ( ' ' )						!Type out fit ouput header
-      write ( text, '( '' '', 4x, 9x, 5x, 5x, ''    RMS  '', 
+      write ( text, '( '' '', 4x, 9x, 5x, 5x, ''    RMS  '',
      +        ''Iter- '', '' No pixs '', ''   Radius'' )' )
       call printo ( text )
       write ( text, '( '' '', ''Star'', ''   Height'', ''  Dx '',
@@ -88,14 +88,14 @@ Cbegin
             rkx = 1.2*SR(1)						!then fit
             rky = 1.2*SR(2)
             if ( IMTYPE.eq.'SHORT' ) then
-               call gauss2sa ( %val(IPIM), NX, NY, xa, ya, lx, ly, 0, 
+               call gauss2sa ( %val(IPIM), NX, NY, xa, ya, lx, ly, 0,
      +                         rkx, rky, INVAL, 20, amag, height, base,
-     +                         dx, dy, anx, any, rx, ry, rms, iter, 
+     +                         dx, dy, anx, any, rx, ry, rms, iter,
      +                         ninval )
             else
-               call gauss2ra ( %val(IPIM), NX, NY, xa, ya, lx, ly, 0, 
+               call gauss2ra ( %val(IPIM), NX, NY, xa, ya, lx, ly, 0,
      +                         rkx, rky, RINVAL, 20, amag, height, base,
-     +                         dx, dy, anx, any, rx, ry, rms, iter, 
+     +                         dx, dy, anx, any, rx, ry, rms, iter,
      +                         ninval )
             endif
 
@@ -157,7 +157,7 @@ Cbegin
       pout(4) = trunc(SR(4),4)
       pout(5) = trunc(SR(5),4)
       pout(6) = trunc(SR(6),4)
-      write ( text, '( '' Adopted Profile ='',f7.3,f8.3,f7.3,3f8.2)' )	!Type out fit and 
+      write ( text, '( '' Adopted Profile ='',f7.3,f8.3,f7.3,3f8.2)' )	!Type out fit and
      +        (pout(k),k=1,6)						! recommend box size
       call printo ( text )
       seeing = trunc((SR(1)+SR(2)),4)
@@ -266,7 +266,7 @@ Cbegin
                   write ( text, '(1x,i3,f9.1,3x,f7.3,f8.3,f7.3,3f8.2)' )
      +                    k, (pout(j),j=1,6), angle
                   call printo ( text )
-               endif 
+               endif
             enddo
          endif
          if ( kaccn.eq.0 ) then
@@ -318,7 +318,7 @@ Cbegin
          pout(4) = trunc(SR(4),4)
          pout(5) = trunc(SR(5),4)
          call printo ( ' ' )
-         write ( text, '(''  Weighted Mean'',f8.3,f8.3,f7.3,3f8.2)' ) 
+         write ( text, '(''  Weighted Mean'',f8.3,f8.3,f7.3,3f8.2)' )
      +          (pout(k),k=1,5), angle
          call printo ( text )
          seeing = trunc((SR(1)+SR(2)),3)
@@ -326,12 +326,12 @@ Cbegin
          call printo ( text )
          call printo ( ' ' )
 
-         if ( kopt.eq.1 ) then						!Type out rejected stars, get 
+         if ( kopt.eq.1 ) then						!Type out rejected stars, get
             call pr_starrk ( 3, change )				! angle flips and reject changes
          else
             call pr_starrk ( 0, change )				! angle flips and reject changes
          endif
-								
+
       enddo
 
       flag = .false.							!Flag if profile has changed
@@ -388,7 +388,7 @@ Cbegin
                write ( text, '(1x,i3,f9.1,3x,f7.3,f8.3,f7.3,3f8.2)' )
      +                 k, (pout(j),j=1,6), angle
                call printo ( text )
-            endif 
+            endif
          enddo
       endif
       if ( kaccn.eq.0 ) then
@@ -476,7 +476,7 @@ C--
      +             'Change parameter 8 - Wing radius',
      +             'Change parameter 9 - Wing power'/
 Cbegin
-   
+
 
       if ( ST_FAILED ) return
 
@@ -540,7 +540,7 @@ Cbegin
       pout(7) = trunc(RES(15,k),5)
       pout(8) = trunc(RES(16,k),5)
       angle = trunc((RES(17,k)*HOPI),5)
-      write ( text, '(1x,f9.1,2f8.2,3f7.3,2f8.2,f9.2)' ) 
+      write ( text, '(1x,f9.1,2f8.2,3f7.3,2f8.2,f9.2)' )
      +        (pout(j),j=1,8), angle
       call printo ( text )
       dx = trunc((RES(1,k)-INXY(1,k)),5)
@@ -562,7 +562,7 @@ Cbegin
             pout(3) = trunc(COM(2,j),5)
             jn = jn + 1
             if ( jn.le.MAXCL ) then
-               write ( text, '(1x,i2,f9.1,2f8.2,2x,2f8.2)' ) jn, 
+               write ( text, '(1x,i2,f9.1,2f8.2,2x,2f8.2)' ) jn,
      +                 pout(1), pout(2), pout(3), dx, dy
                call printo ( text )
             endif
@@ -582,7 +582,7 @@ Cbegin
             pout(3) = trunc(COM(2,j),5)
             jn = jn + 1
             if ( jn.le.MAXFA ) then
-               write ( text, '(1x,i2,f9.1,2f8.2,2x,2f8.2)' ) 
+               write ( text, '(1x,i2,f9.1,2f8.2,2x,2f8.2)' )
      +                 jn, pout(1), pout(2), pout(3), dx, dy
                call printo ( text )
             endif
@@ -611,7 +611,7 @@ Cbegin
             endif
          endif
       enddo
-      
+
 
       end
 
@@ -621,7 +621,7 @@ C PR_ALLSUB -- Remove stars of fit (and maybe its base) from an array
 C
 C   a.j.penny                   ral                    86-01-02-1700
 
-      subroutine pr_allsub ( data, kxd, kyd, kxsd, kysd, kbase, kxs, 
+      subroutine pr_allsub ( data, kxd, kyd, kxsd, kysd, kbase, kxs,
      +                       kys, tres, tcom, kstar )
 
       implicit none
@@ -651,7 +651,7 @@ Cbegin
                if ( data(j,k).ne.RINVAL ) then
                   x = j - (kxsd-kxs)
                   y =  k - (kysd-kys)
-                  sky = tres(10,kstar)+x*tres(32,kstar)+y*tres(33,kstar) 
+                  sky = tres(10,kstar)+x*tres(32,kstar)+y*tres(33,kstar)
                   data(j,k) = data(j,k) - sky
                endif
             enddo
@@ -664,17 +664,17 @@ Cbegin
       x = res(1,kstar) - kxsd + 1					!Remove main
       y = res(2,kstar) - kysd + 1
       h = res(9,kstar)
-      call popsmr ( data, kxd, kyd, 1.0, RINVAL, x, y, h, prof, 
+      call popsmr ( data, kxd, kyd, 1.0, RINVAL, x, y, h, prof,
      +  %val(IPMAP), MX, MY, 1, 1, MX, MY, MAGNIF, DOMAP, ierr, kww )
 
-      do k = 1, MAXTOT							!Remove close and faint 
+      do k = 1, MAXTOT							!Remove close and faint
          if ( (nint(tcom(6,k)).eq.1 .or. nint(tcom(6,k)).eq.2)  .and.	! stars fitted as well
      +        nint(tcom(5,k)).eq.kstar   ) then
             x = tcom(1,k) - kxsd + 1
             y = tcom(2,k) - kysd + 1
-            h = tcom(3,k)    
-            call popsmr ( data, kxd, kyd, 1.0, RINVAL, x, y, h, prof, 
-     +                    %val(IPMAP), MX, MY, 1, 1, MX, MY, MAGNIF, 
+            h = tcom(3,k)
+            call popsmr ( data, kxd, kyd, 1.0, RINVAL, x, y, h, prof,
+     +                    %val(IPMAP), MX, MY, 1, 1, MX, MY, MAGNIF,
      +                    DOMAP, ierr, kww )
          endif
       enddo
@@ -685,7 +685,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_GETANGLE -- Get whether angle to be fixed and if so, what at
-C 
+C
 C   a.j.penny                   ral                    86-01-02-1200
 
       subroutine pr_getangle ( tfixangle, sr6, flag )
@@ -726,7 +726,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_GETFIXP -- Main pars (rmaj,rmin,power,prmaj,prmin) to be fixed?
-C 
+C
 C   a.j.penny                   ral                    86-01-02-1200
 
       subroutine pr_getfixp ( )
@@ -959,7 +959,7 @@ C--
 Cbegin
 
 
-      full = .true.							!Check residuals map is full 
+      full = .true.							!Check residuals map is full
       do k = 1, LYM							! (or completely blank). If not return
          do j = 1, LXM
             if ( residh(j,k).eq.0.0 ) full = .false.
@@ -985,7 +985,7 @@ Cbegin
             ks = LYM/2 - MY/2
             jin = j + js
             kin = k + ks
-            if ( jin.ge.1 .and. jin.le.lxm .and. 
+            if ( jin.ge.1 .and. jin.le.lxm .and.
      +           kin.ge.1 .and. kin.le.lym       ) then
                map(j,k,1) = map(j,k,1) + resid(jin,kin)
             else
@@ -1037,7 +1037,7 @@ C  Load the Map
                xin = dxout*real(magi) + jxi
                dyout = (k-nyo/2)/real(mago)
                yin = dyout*real(magi) + kyi
-               out(j,k) = rinter ( in, nxi, nyi, 1, 1, nxi, nyi, xin, 
+               out(j,k) = rinter ( in, nxi, nyi, 1, 1, nxi, nyi, xin,
      +                             yin, dfdx, dfdy )
             enddo
          enddo
@@ -1052,7 +1052,7 @@ C  Load the Map
             do j = 1, nxo
                jin = j + js
                kin = k + ks
-               if ( jin.ge.1 .and. jin.le.nxi .and. 
+               if ( jin.ge.1 .and. jin.le.nxi .and.
      +              kin.ge.1 .and. kin.le.nyi       ) then
                   out(j,k) = in(jin,kin)
                else
@@ -1205,10 +1205,10 @@ C  a j penny                      stsci                   1987-04-23
 C--
       integer j, k
 Cbegin
-      
+
 
       do j = 1, MAXTOT
-         if ( nint(COM(6,j)).eq.1 .or. 
+         if ( nint(COM(6,j)).eq.1 .or.
      +        nint(COM(6,j)).eq.2       ) then
             do k = 1, 6
                COM(k,j) = 0.0
@@ -1353,10 +1353,10 @@ Cbegin
             nrej(numb) = numa
             if ( numb.eq.8 ) then
                if ( ktype ) then
-                  write ( text, '(''                       '',8i4)' ) 
+                  write ( text, '(''                       '',8i4)' )
      +                    (nrej(k),k=1,8)
                else
-                  write ( text, '('' Rejected stars are :- '',8i4)' ) 
+                  write ( text, '('' Rejected stars are :- '',8i4)' )
      +                    (nrej(k),k=1,8)
                endif
                call printo ( text )
@@ -1370,10 +1370,10 @@ Cbegin
       if ( numb.ne.0 ) then
          rejout = .true.
          if ( ktype ) then
-            write ( text, '(''                       '',8i4)' ) 
+            write ( text, '(''                       '',8i4)' )
      +              (nrej(k),k=1,numb)
          else
-            write ( text, '('' Rejected stars are :- '',8i4)' ) 
+            write ( text, '('' Rejected stars are :- '',8i4)' )
      +              (nrej(k),k=1,numb)
          endif
          call printo ( text )
@@ -1453,10 +1453,10 @@ Cbegin
       nout = 0
       call pr_avstda ( val, nuse, num, av, std )
 
-      exit = .false.							!Loop until mean and std dev 
+      exit = .false.							!Loop until mean and std dev
       do while ( .not.exit )						! no longer corrected
 
-         call asumi ( nuse, num, rv )					!Chuck out largest residual and 
+         call asumi ( nuse, num, rv )					!Chuck out largest residual and
          ntot = nint(rv)							! recalc mean and std dev (If more than 3)
          if ( ntot.gt.3 ) then
             vmax = 0.0
@@ -1565,10 +1565,10 @@ C      a j penny                  ral                  85-12-31-1226
       real	totb(LX,LY)		!o: Work space for image data
 C--
       integer  j, k, kk, ljx, ljy, next, kgap, istat, jstar,
-     +         jxso(TBYMAX), jyso(TBYMAX), numpar, ksent, jxs, jys, 
+     +         jxso(TBYMAX), jyso(TBYMAX), numpar, ksent, jxs, jys,
      +         jfit(36), jfitf(36), lxa, lya, nin, iter, numm, numf
-      real     anum(200), rx, ry, aljx, aljy, xc, yc, xmaxa, ymaxa, 
-     +         xmax, ymax, drmax, anumpt, ah, rr, prr, p, d, da, db, 
+      real     anum(200), rx, ry, aljx, aljy, xc, yc, xmaxa, ymaxa,
+     +         xmax, ymax, drmax, anumpt, ah, rr, prr, p, d, da, db,
      +         ddd, ak, ag, cc(36), ccf(36)
       logical  toobig, parfix
 
@@ -1602,7 +1602,7 @@ Cbegin
       drmax = sqrt(xmax*xmax+ymax*ymax)
       anumpt = min(15.0*drmax,200.0)
 
-      call azeror ( tres, LXM*LYM )					!Zero radial profile values and 
+      call azeror ( tres, LXM*LYM )					!Zero radial profile values and
       call azeror ( hres, LXM*LYM )					! residuals and total height
       call azeror ( anum, 200 )
       call azeror ( PDIST, 200 )
@@ -1626,19 +1626,19 @@ Cbegin
                if ( ksent.ge.numpar ) then
                   call pr_parin ( jstar, cc, ccf, jxs, jys, iter, nin,
      +                            lxa, lya )
-                  call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA, 
-     +                            MAXTOT, 0, cc, ccf, jxs, jys, iter, 
+                  call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA,
+     +                            MAXTOT, 0, cc, ccf, jxs, jys, iter,
      +                            nin, lxa, lya, MAXCL, MAXFA )
-                  call pr_mload ( tres, hres, tota, jstar, jxso, jyso, 
-     +                            rx, ry, aljx, aljy, drmax, anumpt, 
+                  call pr_mload ( tres, hres, tota, jstar, jxso, jyso,
+     +                            rx, ry, aljx, aljy, drmax, anumpt,
      +                            anum )
                endif
                call pr_fitload ( totb, .true., .true., SR,
-     +                           k, RESA, COMA, 1, cc, jfit, numm, 
+     +                           k, RESA, COMA, 1, cc, jfit, numm,
      +                           ccf, jfitf, numf, parfix, LX, LY, jxs,
      +                           jys, nin )
-               call pr_parout ( totb, LX, LY, %val(IPMAP), .true., 
-     +                          .true., k, 1, cc, jfit, numm, ccf,  
+               call pr_parout ( totb, LX, LY, %val(IPMAP), .true.,
+     +                          .true., k, 1, cc, jfit, numm, ccf,
      +                          jfitf,  numf, parfix, jxs, jys, nin,20)
                ksent = ksent + 1
             else
@@ -1659,11 +1659,11 @@ Cbegin
                if ( k.eq.1 .and. ksent.lt.numpar ) call pr_par_fend
                call pr_parin ( jstar, cc, ccf, jxs, jys, iter, nin,
      +                         lxa, lya )
-               call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA, 
-     +                         MAXTOT, 0, cc, ccf, jxs, jys, iter, 
+               call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA,
+     +                         MAXTOT, 0, cc, ccf, jxs, jys, iter,
      +                         nin, lxa, lya, MAXCL, MAXFA )
-               call pr_mload ( tres, hres, tota, jstar, jxso, jyso, 
-     +                         rx, ry, aljx, aljy, drmax, anumpt, 
+               call pr_mload ( tres, hres, tota, jstar, jxso, jyso,
+     +                         rx, ry, aljx, aljy, drmax, anumpt,
      +                         anum )
                if ( k.eq.1 .and. ksent.ge.numpar ) call pr_par_fend
             enddo
@@ -1681,7 +1681,7 @@ Cbegin
          enddo
       enddo
 
-      do k = 1, 200-1							!Bunch up if any points in the 
+      do k = 1, 200-1							!Bunch up if any points in the
          if ( anum(k).eq.0.0 ) then					! radial profile have no data
             next = k
             kk = 0
@@ -1722,7 +1722,7 @@ Cbegin
          PFIT(k) = ak + ag
       enddo
 
-  
+
       end
 
 
@@ -1731,7 +1731,7 @@ C PR_MLOAD -- Load the mean residual/radial residuals
 C
 C  alan penny               RAL               1991 July
 
-      subroutine pr_mload ( tres, hres, tota, k, jxs, jys, rx, 
+      subroutine pr_mload ( tres, hres, tota, k, jxs, jys, rx,
      +                      ry, aljx, aljy, drmax, anumpt, anum )
 
       implicit none
@@ -1775,10 +1775,10 @@ Cbegin
 
       call pr_loadbl ( tota, LX, LY, COMA, kxs, kys, k )
 
-      call pr_allsub ( tota, LX, LY, kxs, kys, 1, kxs, kys, 
+      call pr_allsub ( tota, LX, LY, kxs, kys, 1, kxs, kys,
      +                 RESA, COMA, k )
 
-      do kk = 1, LY							!Add this into the mean residuals 
+      do kk = 1, LY							!Add this into the mean residuals
          do jj = 1, LX							! and mean profile
             dx = real(jj) - (RESA(1,k)-real(kxs)+1.0)
             dy = real(kk) - (RESA(2,k)-real(kys)+1.0)
@@ -1814,7 +1814,7 @@ C
 C      a j penny                  stsci                   86-10-24
 
       subroutine pr_qpstore ( )
- 
+
       implicit none
       include 'profile.inc'
       include 'STARMAN_INC'
@@ -1864,14 +1864,14 @@ C PR_FITLOR    Determine a Lorentz profile from an array with no faint comps
 C PR_SORTANGLE Put angle (and major/minor axes) in standard way
 C PR_PROFIT    Fits a variable Lorentz to an array
 C PR_FITPAR    Calc normal eqn values for this star at this posn
-C PR_CCSUB     Remove stars  from an array, using info loaded into CC 
+C PR_CCSUB     Remove stars  from an array, using info loaded into CC
 
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_WWFITLOR -- Determine a Lorentz profile from an array with faint comps
-C This fits the Lorentz to a box containing a group of main stars to be 
-C solved together, and a group of faint or distant companions which are 
+C This fits the Lorentz to a box containing a group of main stars to be
+C solved together, and a group of faint or distant companions which are
 C subtracted from the array as the fit progresses.
 C
 C   alan penny                   ral                    1991 July
@@ -1879,7 +1879,7 @@ C   alan penny                   ral                    1991 July
       subroutine pr_wwfitlor ( data, kx, ky, dataw, cc, jfit, numm,
      +                         itertot, ccf, jfitf, numf, itslim, kp,
      +                         parfix, tfixangle, tfixp, ftlim, htlim,
-     +                         damp, rinval, map, mx, my, magnif, 
+     +                         damp, rinval, map, mx, my, magnif,
      +                         domap )
 
       implicit none
@@ -1896,7 +1896,7 @@ C   alan penny                   ral                    1991 July
       integer   jfitf(36)	!i/o: Control for fit for faint
       integer   numf		!i: Number of faint/distant comp stars
       integer   itslim		!i: Max no of iterations allowed
-      integer	kp		!i: Print out intermediate fits results 
+      integer	kp		!i: Print out intermediate fits results
 				!   (1/0=y/n) ?
       logical   parfix		!i: All profile pars fixed (true) or var
       logical   tfixangle	!i: Profile angle fixed (true) or var
@@ -1923,7 +1923,7 @@ Cbegin
       itertot = 0
       again = .true.
       nloops = 0
-      
+
       do while ( again )						!Do the loop
          nloops = nloops + 1
 
@@ -1971,16 +1971,16 @@ Cbegin
          call amovr ( ccall, cc, 12+numm*3 )
          call amovi ( jfitall, jfit, 12+numm*3 )
 
-         call pr_fitlor ( dataw, kx, ky, cc, jfit, numm, iter,		!Fit the profile for main 
+         call pr_fitlor ( dataw, kx, ky, cc, jfit, numm, iter,		!Fit the profile for main
      +                    4, kp, parfix, tfixangle, tfixp,		! (+ bright close comps)
      +                    ftlim, htlim, damp, rinval, map, mx, my,
      +                    magnif, domap, nearpos, nearprof, chisq )
-         call pr_sortangle ( cc )    
+         call pr_sortangle ( cc )
 
          nearprof = .true.
          itertot = itertot + iter
 
-         again = .true.							!See if need to repeat 
+         again = .true.							!See if need to repeat
 
          if ( nloops.gt.1 ) then					!After  2 loops is
             again = .false.
@@ -2015,14 +2015,14 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_FITLOR -- Determine a Lorentz profile from an array with no faint comps
-C This fits an array with a sloping background and up to 8 stars with 
-C the same Lorentz 2-D profile, whose shape parameters can be found at 
+C This fits an array with a sloping background and up to 8 stars with
+C the same Lorentz 2-D profile, whose shape parameters can be found at
 C the same time.
 C
-C It does this by using the s/r PR_PROFIT (qv), but does it carefully, 
-C taking the approximate input parameters and solving for the easy ones 
-C roughly and then with refined parameters doing the real fit. This 
-C ensures that even if the input parameters are not too good, the fit 
+C It does this by using the s/r PR_PROFIT (qv), but does it carefully,
+C taking the approximate input parameters and solving for the easy ones
+C roughly and then with refined parameters doing the real fit. This
+C ensures that even if the input parameters are not too good, the fit
 C will still converge.
 C
 C Even so, the input parameters must be quite good to be safe.
@@ -2034,9 +2034,9 @@ C    alan penny                  ral                  1991 July
       subroutine pr_fitlor ( data, kx, ky, cc, jfit, nstar, iter,
      +                       itslim, kp, parfix, tfixangle, tfixp,
      +                       ftlim, htlim, damp, rinval, map,
-     +                       mx, my, magnif, domap, nearpos, 
+     +                       mx, my, magnif, domap, nearpos,
      +                       nearprof, chisq )
- 
+
       implicit none
 
       integer	kx		!i: X size of DATA
@@ -2047,7 +2047,7 @@ C    alan penny                  ral                  1991 July
 				!      profile (4,5,6,7,8,9,10,11,12)
 				!     star posns, heights (13,14,...,36)
       integer	jfit(36)	!i: -1= par fixed;0=not used;1=variable
-      integer	nstar		!i: No of stars 
+      integer	nstar		!i: No of stars
       integer	iter		!o: No of iterations taken
       integer	itslim		!i: Max no of iterations allowed
       integer	kp		!i: Printing flag
@@ -2074,8 +2074,8 @@ Cbegin
       call amovki ( -1, jfit(4), 9 )
 
       if ( .not.nearpos ) then
-         do k = 1, nstar						!Get 1st approx to posns by 
-            jh(k) = jfit(12+k*3)					! keeping heights and 
+         do k = 1, nstar						!Get 1st approx to posns by
+            jh(k) = jfit(12+k*3)					! keeping heights and
             if ( jh(k).ne.0 ) jfit(12+k*3) = -1				! profile fixed
          enddo
          call pr_profit ( data, kx, ky, cc, jfit, nstar, iter, 3, kp,
@@ -2093,7 +2093,7 @@ Cbegin
       else
          if ( .not.nearprof ) then
             call pr_profit ( data, kx, ky, cc, jfit, nstar, iter, 2, 	!Variable profile: 1st get heights
-     +                       kp, ftlim, htlim, damp, rinval, map, mx, 
+     +                       kp, ftlim, htlim, damp, rinval, map, mx,
      +                       my, magnif, domap, chisq )
             if ( .not.tfixp(1) .or. .not.tfixp(2) ) then		!Then get approx radius
                if ( .not.tfixp(1) ) jfit(4) = 1
@@ -2102,7 +2102,7 @@ Cbegin
      +                          kp, ftlim, htlim, damp, rinval, map,
      +                          mx, my, magnif, domap, chisq )
             endif
-            if ( .not.tfixangle ) then					!Then get angle and fix 
+            if ( .not.tfixangle ) then					!Then get angle and fix
                jfit(9) = 1						! it, if doing angle
                call pr_profit ( data, kx, ky, cc, jfit, nstar, iter, 4,
      +                          kp, ftlim, htlim, damp, rinval, map,
@@ -2114,16 +2114,16 @@ Cbegin
                if ( .not.tfixp(4) ) jfit(7) = 1
                if ( .not.tfixp(5) ) jfit(8) = 1
                call pr_profit ( data, kx, ky, cc, jfit, nstar, iter, 3,
-     +                          kp, ftlim, htlim, damp, rinval, map, 
+     +                          kp, ftlim, htlim, damp, rinval, map,
      +                          mx, my, magnif, domap, chisq )
             endif
 
-            if ( .not.tfixangle ) then					!Then get angle and fix 
+            if ( .not.tfixangle ) then					!Then get angle and fix
                jfit(9) = 1						! it again, if doing angle
                jfit(7) = -1
                jfit(8) = -1
                call pr_profit ( data, kx, ky, cc, jfit, nstar, iter, 4,
-     +                          kp, ftlim, htlim, damp, rinval, map, 
+     +                          kp, ftlim, htlim, damp, rinval, map,
      +                          mx, my, magnif, domap, chisq )
                jfit(9) = -1
                if ( .not.tfixp(4) .or. .not.tfixp(5) ) then		!Then re-let power radial change
@@ -2134,7 +2134,7 @@ Cbegin
 
          endif
 
-         if ( .not.tfixp(3) ) jfit(6) = 1				!Then do full fit including 
+         if ( .not.tfixp(3) ) jfit(6) = 1				!Then do full fit including
          call pr_profit ( data, kx, ky, cc, jfit, nstar, iter, itslim,	! profile power, but angle  fixed
      +                    kp, ftlim, htlim, damp, rinval, map, mx,
      +                    my, magnif, domap, chisq )
@@ -2163,19 +2163,19 @@ C--
       parameter ( pih=pi/2.0 )
 Cbegin
 
-      rv = cc(9)							!Get angle in one of the 
+      rv = cc(9)							!Get angle in one of the
       if ( rv.gt.pih .and. rv.le.pi ) then				! two right quadrants
-         cc(9) = cc(9) - pi	
+         cc(9) = cc(9) - pi
       elseif ( rv.gt.pi .and. rv.le.(pi+pih) ) then
-         cc(9) = cc(9) - pi	
+         cc(9) = cc(9) - pi
       elseif ( rv.gt.(pi+pih) ) then
-         cc(9) = cc(9) - 2.0*pi	
+         cc(9) = cc(9) - 2.0*pi
       elseif ( rv.lt.-1.0*pih .and. rv.ge.-1.0*pi ) then
-         cc(9) = cc(9) + pi	
+         cc(9) = cc(9) + pi
       elseif ( rv.lt.-1.0*pi .and. rv.ge.-1.0*(pi+pih) ) then
-         cc(9) = cc(9) + pi	
+         cc(9) = cc(9) + pi
       elseif ( rv.lt.-1.0*(pih+pi) ) then
-         cc(9) = cc(9) + 2.0*pi	
+         cc(9) = cc(9) + 2.0*pi
       endif
 
       if ( cc(4).lt.cc(5) ) then					!Get first parameter the major axis
@@ -2198,7 +2198,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_PROFIT -- Fits a variable Lorentz to an array
-C The data in an array are fitted by a model of a sloping background and up 
+C The data in an array are fitted by a model of a sloping background and up
 C to 8 2-D Lorentzian profiled stars. There is also an empirical residuals
 C map which is fitted.
 C
@@ -2241,7 +2241,7 @@ C      work.
 C
 C    alan penny                  ral				1991 July
 
-      subroutine pr_profit ( data, kx, ky, ccc, jjfit, nsfit, iter, 
+      subroutine pr_profit ( data, kx, ky, ccc, jjfit, nsfit, iter,
      +                       itslim, kp, ftlim, htlim, damp, rinval,
      +                       map, mx, my, magnif, domap, chisq )
 
@@ -2255,7 +2255,7 @@ C    alan penny                  ral				1991 July
 				!      profile (4,5,6,7,8,9,10,11,12)
 				!     star posns, heights (13,14,...,36)
       integer	jjfit(36)	!i: -1= par fixed;0=not used;1=variable
-      integer	nsfit		!i: No of stars 
+      integer	nsfit		!i: No of stars
       integer	iter		!o: No of iterations taken
       integer	itslim		!i: Max no of iterations allowed
       integer	kp		!i: Printing flag
@@ -2285,7 +2285,7 @@ C--
       equivalence (jfit(1),jf1),   (jfit(2),jf2), (jfit(3),jf3),
      +            (jfit(4),jf4),   (jfit(5),jf5), (jfit(6),jf6),
      +            (jfit(7),jf7),   (jfit(8),jf8), (jfit(9),jf9),
-     +            (jfit(10),jf10), (jfit(11),jf11), 
+     +            (jfit(10),jf10), (jfit(11),jf11),
      +            (jfit(12),jf12)
 
       real erf(36)							!Error functions
@@ -2297,13 +2297,13 @@ C--
       integer nstar							!Current star
       integer npf							!No of free parameters
 
-      real    ochisq			!previous chi-squared sum 
+      real    ochisq			!previous chi-squared sum
       real    dchi			!fractional change in chi-squared
       real    var			!'varience' of a pixel
       real    psum			!No of pixels used
 
-      integer j, k, kk, jk, kj, kjo, npfa, jfx, jfy, jfi, jx, jy, llx, 
-     +        lly, nac2, nac, nac0, n, kdo, imi, iminac, npsize, lxa, 
+      integer j, k, kk, jk, kj, kjo, npfa, jfx, jfy, jfi, jx, jy, llx,
+     +        lly, nac2, nac, nac0, n, kdo, imi, iminac, npsize, lxa,
      +        lya, npixel
       real rx, ry, co, si, sim, gx2, gy2, hx2, hy2, a0, alxly, x,
      +     y, z, zd, xdm, ydm, dx, dy, dxaa, dyaa, resval, dfdx, dfdy,
@@ -2324,12 +2324,12 @@ Cbegin
       call amovr ( ccc, cc, 36 )					!Translate CCC and JJFIT from outside
       call amovi ( jjfit, jfit, 36 )
 
-      cc(4) = max(0.01,abs(cc(4)))					!Check input profile parameters 
+      cc(4) = max(0.01,abs(cc(4)))					!Check input profile parameters
       cc(5) = max(0.01,abs(cc(5)))					! are in possible range
       cc(7) = max(0.01,abs(cc(7)))
       cc(8) = max(0.01,abs(cc(8)))
       if ( abs(theta).lt.0.000005 ) theta = sign(0.000005,theta)
-      if ( abs(theta).gt.2.0*pi ) theta = 
+      if ( abs(theta).gt.2.0*pi ) theta =
      +                               sign(amod(abs(theta),2.0*pi),theta)
       cc(10) = abs(cc(10))
       cc(11) = abs(cc(11))
@@ -2375,7 +2375,7 @@ Cbegin
          acc(3) = trunc(cc(3),6)
          k = 1
          write ( text, '(1x,''Start '',i3,1x,f9.1,2f7.2,4x,f12.4,
-     +                   2f8.4)') 
+     +                   2f8.4)')
      +           k, aht(1), axt(1), ayt(1), acc(1), acc(2), acc(3)
          call printo ( text )
          if ( nstars.ge.2 ) then
@@ -2392,7 +2392,7 @@ Cbegin
          if ( jfit(k).eq.1 ) npf = npf + 1
       enddo
 
-      tdomap = domap							!See if the profile residuals 
+      tdomap = domap							!See if the profile residuals
       if ( tdomap ) call rchzero ( map, mx, my, 1, 1, mx, my, tdomap )	! are to be used
 
       iter = 0								!End of initialization and
@@ -2409,7 +2409,7 @@ CX      endif
 
       chisq = 0.0							!Chi-squared start
 
-      rx = 1.0/gx							!Loop through the pixels, 
+      rx = 1.0/gx							!Loop through the pixels,
       ry = 1.0/gy							! setting up the simultaenous equations
       call subdiv ( rx, ry, lxa )
       lya = lxa
@@ -2437,7 +2437,7 @@ CX      endif
                nac = nac + 1
                erf(nac) = y
             endif
-									!Accumulate profile, error 
+									!Accumulate profile, error
 									! functions over all stars
 
             call azeror ( erf(nac+1), 12-(nac+1)+1 )			!Clear the functions first
@@ -2466,7 +2466,7 @@ CX      endif
                   if ( tdomap .and. kdone(nstar).eq.0 ) then
                      dxaa = mx/2 + dx*magnif
                      dyaa = my/2 + dy*magnif
-                     resval = rinter ( map, mx, my, 1, 1, mx, 
+                     resval = rinter ( map, mx, my, 1, 1, mx,
      +                                 my, dxaa, dyaa, dfdx, dfdy )
                      dfdx = dfdx*real(magnif)
                      dfdy = dfdy*real(magnif)
@@ -2503,7 +2503,7 @@ CX      endif
                     if ( abs(dy).lt.0.0001 ) dy = sign(0.0001,dy)
 
                     a0 = cc(n+2)
-                    call pr_fitpar ( a0, dx, dy, gx2, gy2, p, hx2, 
+                    call pr_fitpar ( a0, dx, dy, gx2, gy2, p, hx2,
      +                               hy2, hx, hy, gx, gy, co, si, sim,
      +                               qh, qr, qp, jfit, resval, dfdx,
      +                               dfdy, afact, tdomap, nstar, zfac,
@@ -2530,7 +2530,7 @@ CX            call azeror ( axt, 8 )
 CX            do jk = 1, 4
 CX               axt(jk) = trunc(zfac(jk+8),1)
 CX            enddo
-CX            write ( text, '(1x,''mb '',15x,2x,4f9.6)' ) 
+CX            write ( text, '(1x,''mb '',15x,2x,4f9.6)' )
 CX     +                           (axt(jk),jk=1,4)
 CX            call printo ( text )
 CX         endif
@@ -2574,13 +2574,13 @@ CX         endif
                        nac0 = nac0 + 1
                        erfd(nac0) = erfd(nac0) + zfac(8)
                     endif
-  
+
                     if ( jf12.eq.1 ) then				!Q power
                        nac0 = nac0 + 1
                        erfd(nac0) = erfd(nac0) + zfac(9)
                     endif
 
-                    if ( nac2.eq.0 ) nac2 = nac0			!Error functions for position 
+                    if ( nac2.eq.0 ) nac2 = nac0			!Error functions for position
                     if ( jfx.eq.1 ) then				! and intensity for each star
                        nac2 = nac2 + 1
                        erfd(nac2) = erfd(nac2) + zfac(10)
@@ -2614,7 +2614,7 @@ CX            do jk = 1, min(8,npf)
 CX               axt(jk) = trunc(erf(jk),4)
 CX            enddo
 CX            ayt(1) = trunc(z,4)
-CX            write ( text, '(1x,''l '',i5,f10.3,2x,8f9.3)' ) 
+CX            write ( text, '(1x,''l '',i5,f10.3,2x,8f9.3)' )
 CX     +                                npixel,ayt(1),(axt(jk),jk=1,8)
 CX            call printo ( text )
 CX         endif
@@ -2626,7 +2626,7 @@ CX         endif
             var = abs(data(jx,jy)) 					!Chi-squared
             if ( var.gt.1.0e-7 ) chisq = chisq + vres*vres/var
 
-            if ( abs(vres).gt.1.0e10 ) vres = 1.0e10*sign(1.0,vres)	!Accumulate vector and matrix 
+            if ( abs(vres).gt.1.0e10 ) vres = 1.0e10*sign(1.0,vres)	!Accumulate vector and matrix
             if ( abs(vres).lt.1.0e-10 ) vres = 1.0e-10*sign(1.0,vres)	! contributions at this pixel
             do k = 1, npf
              if (abs(erf(k)).gt.1.0e10) erf(k) = 1.0e10*sign(1.0,erf(k))
@@ -2683,7 +2683,7 @@ CX         endif
          call simulx ( cvec, cmat, rvec, npf )				!Solve the normal equations
 
          nac = 0							!Update the solution
-         do k = 1, npfa		
+         do k = 1, npfa
             if ( jfit(k).eq.1 ) then
                nac = nac + 1
                rv = rvec(nac)
@@ -2714,7 +2714,7 @@ CX         endif
 
       endif
 
-      again=.false.							!Compare new variable parameters 
+      again=.false.							!Compare new variable parameters
       do k = 1, 36							! with the old ones.
          if ( jfit(k).eq.1 ) then					! Only do variables
 
@@ -2738,7 +2738,7 @@ CX         endif
          cclast(k) = cc(k)
       enddo
 
-      if (  cc(4).gt.10.0    .or.  cc(4).lt.0.01    .or.		!Stop if profile has 
+      if (  cc(4).gt.10.0    .or.  cc(4).lt.0.01    .or.		!Stop if profile has
      +      cc(5).gt.10.0    .or.  cc(5).lt.0.01    .or.		! become impossible
      +      cc(6).gt.10.0    .or.  cc(6).lt.0.1     .or.
      +      cc(7).gt.10.0    .or.  cc(7).lt.0.001   .or.
@@ -2767,7 +2767,7 @@ CX         endif
          acc(2) = trunc(cc(2),6)
          acc(3) = trunc(cc(3),6)
          k = iter + 1
-         write ( text, '(1x,6x,i3,1x,f9.1,2f7.2,4x,f12.4,2f8.4)' ) 
+         write ( text, '(1x,6x,i3,1x,f9.1,2f7.2,4x,f12.4,2f8.4)' )
      +         k, aht(1), axt(1), ayt(1), acc(1), acc(2), acc(3)
          call printo ( text )
          if ( nstars.ge.2 ) then
@@ -2817,7 +2817,7 @@ CX         endif
       endif
 
       if ( nstars.ge.2 ) then						!Remove comp star if moved
-         do k = 2, nstars						! too far or height too small	
+         do k = 2, nstars						! too far or height too small
             j = 13 + (k-1)*3
             ax = cc(j) - ccs(j)
             ay = cc(j+1) - ccs(j+1)
@@ -2853,12 +2853,12 @@ CX         endif
          enddo
       endif
 
-      iter = iter + 1							!Loop again if star heights 
+      iter = iter + 1							!Loop again if star heights
       if ( .not.again .or. iter.ge.itslim ) loop = .false.		! changing and done less than limit
 
       enddo
 
-      call amovr ( cc, ccc, 36 )					!Put back to outside 
+      call amovr ( cc, ccc, 36 )					!Put back to outside
       call amovi ( jfit, jjfit, 36 )
 
       ccc(4) = 1.0/ccc(4)						!Restore radii convention
@@ -2876,8 +2876,8 @@ C PR_FITPAR -- Calc normal eqn values for this star at this posn
 C
 C   alan penny                 ral                      1991 July
 
-      subroutine pr_fitpar ( a0, dx, dy, gx2, gy2, p, hx2, hy2, 
-     +                       hx, hy, gx, gy, co, si, sim, 
+      subroutine pr_fitpar ( a0, dx, dy, gx2, gy2, p, hx2, hy2,
+     +                       hx, hy, gx, gy, co, si, sim,
      +                       qh, qr, qp, jfit, resval, dfdx, dfdy,
      +                       afact, tdomap, nstar, zfac, zv )
 
@@ -2912,8 +2912,8 @@ C   alan penny                 ral                      1991 July
       real	zv		!o: star height here
 C--
       real gg, hh, h, hp1, alpha, aon2, alg2, alg, algam2,
-     +     g2am2, g2a, f4, f4s, f9, qd, qdd, qa, qt, f6, ggalg, f7, f8, 
-     +     ddthg, ddthh, ggagph, ddth, ddxa, ddxb, ddxc, ddya, ddyb, 
+     +     g2am2, g2a, f4, f4s, f9, qd, qdd, qa, qt, f6, ggalg, f7, f8,
+     +     ddthg, ddthh, ggagph, ddth, ddxa, ddxb, ddxc, ddya, ddyb,
      +     ddyc, dmaj, dmin, dmaj2, dmin2
       integer jf45, jf78, jf6789, jfx, jfy, jfxy, jfi, n
 Cbegin
@@ -3002,14 +3002,14 @@ Cbegin
 
       if ( jfit(12).eq.1 ) zfac(9) = qh*a0*qa*qdd*alog(qd*qr)*afact	!Do the Q power
 
-      if ( jfxy.eq.1 ) then						!Error functions for position 
+      if ( jfxy.eq.1 ) then						!Error functions for position
          ggagph = ggalg*p/h						! and intensity for each star
          if ( jfx.eq.1 ) then
             ddxa = gx2*co*dmaj + gy2*sim*dmin
             ddxb = hx2*co*dmaj + hy2*sim*dmin
             ddxc = f9*(alpha*ddxa+ggagph*ddxb)
             ddxc = ddxc + qt*dx
-            zfac(10) = ddxc*afact 
+            zfac(10) = ddxc*afact
             if ( tdomap ) zfac(10) = zfac(10) - a0*dfdx
          endif
          if ( jfy.eq.1 ) then
@@ -3034,12 +3034,12 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PR_CCSUB -- Remove stars from an array, using info loaded into CC 
+C PR_CCSUB -- Remove stars from an array, using info loaded into CC
 C
 C   alan penny                   ral                    1991 July
 
 
-      subroutine pr_ccsub ( data, kx, ky, cc, nst, map, mx, my, 
+      subroutine pr_ccsub ( data, kx, ky, cc, nst, map, mx, my,
      +                      magnif, domap, rinval )
 
       implicit none
@@ -3069,7 +3069,7 @@ Cbegin
          x = cc(10+3*k)
          y = cc(11+3*k)
          h = cc(12+3*k)
-         call popsmr ( data, kx, ky, 1.0, rinval, x, y, h, prof, 
+         call popsmr ( data, kx, ky, 1.0, rinval, x, y, h, prof,
      +                 map, mx, my, 1, 1, mx, my, magnif, domap,
      +                 ierr, kww )
       enddo
@@ -3108,7 +3108,7 @@ C PR_GRID         Paint a frame in the area displays, showing the calc areas
 C PR_POLFILL      Use the cursor to define a set of polygonal  shapes
 C PR_FILL         Fill an array defined by a polygon
 C PR_XSECT        Find intersections of polygon with this line
-C PR_INSIDE       (Function) See if inside the polygon 
+C PR_INSIDE       (Function) See if inside the polygon
 C PR_RANGLE       (Function) Find the rotation angle
 C PR_POLDO        Take a masks and zeroes/smooths an area of an array
 C PR_INFILL       Fill in empty pixels in the array RESID, where an empty
@@ -3159,22 +3159,22 @@ Cbegin
          call get_choice ( ktopt, 1 )					!Get choice
          if ( ST_FAILED ) return
 
-         if ( ktopt.eq.'comp_br' ) call pr_gtcompa ( 1, MAXCL, klxsd, 
+         if ( ktopt.eq.'comp_br' ) call pr_gtcompa ( 1, MAXCL, klxsd,
      +                                               klysd, klxd, klyd )
 
-         if ( ktopt.eq.'comp_fa' ) call pr_gtcompa ( 2, MAXFA, klxsd, 
+         if ( ktopt.eq.'comp_fa' ) call pr_gtcompa ( 2, MAXFA, klxsd,
      +                                               klysd, klxd, klyd )
 
-         if ( ktopt.eq.'blank' ) call pr_gtboxa ( tcom, klxd, klyd, 
+         if ( ktopt.eq.'blank' ) call pr_gtboxa ( tcom, klxd, klyd,
      +                                     klxsd, klysd, tres )
 
-         if ( ktopt.eq.'uncomp_br' ) call pr_uncompa ( 1, tcom, klxd, 
+         if ( ktopt.eq.'uncomp_br' ) call pr_uncompa ( 1, tcom, klxd,
      +                                    klyd, tres, klxsd, klysd )
 
-         if ( ktopt.eq.'uncomp_fa' ) call pr_uncompa ( 2, tcom, klxd, 
+         if ( ktopt.eq.'uncomp_fa' ) call pr_uncompa ( 2, tcom, klxd,
      +                                      klyd, tres, klxsd, klysd )
 
-         if ( ktopt.eq.'unblank' ) call pr_unbox ( tcom, klxd, klyd, 
+         if ( ktopt.eq.'unblank' ) call pr_unbox ( tcom, klxd, klyd,
      +                                             tres, klxsd, klysd )
 
 
@@ -3186,20 +3186,20 @@ Cbegin
 
          if ( ktopt.eq.'im_values' ) then
                           if ( IMTYPE.eq.'SHORT' ) then
-                             call pr_printvals ( %val(IPIM), klxd, 
+                             call pr_printvals ( %val(IPIM), klxd,
      +                               klyd, klxsd, klysd, 1, tres, tcom )
                           else
-                             call pr_printvalr ( %val(IPIM), klxd, 
+                             call pr_printvalr ( %val(IPIM), klxd,
      +                               klyd, klxsd, klysd, 1, tres, tcom )
                           endif
                           endif
 
          if ( ktopt.eq.'res_values' ) then
                            if ( IMTYPE.eq.'SHORT' ) then
-                              call pr_printvals ( %val(IPIM), klxd, 
+                              call pr_printvals ( %val(IPIM), klxd,
      +                               klyd, klxsd, klysd, 2, tres, tcom )
                            else
-                              call pr_printvalr ( %val(IPIM), klxd, 
+                              call pr_printvalr ( %val(IPIM), klxd,
      +                               klyd, klxsd, klysd, 2, tres, tcom )
                            endif
                            endif
@@ -3207,7 +3207,7 @@ Cbegin
          if ( ktopt.eq.'paint_comp' ) then
                            call pr_paintcomp ( klxd, klyd, tres, tcom,
      +                                         klxsd, klysd, 0 )
-                           call pr_paintbox  ( klxd, klyd, tcom, klxsd, 
+                           call pr_paintbox  ( klxd, klyd, tcom, klxsd,
      +                                         klysd, 0 )
                            endif
 
@@ -3223,20 +3223,20 @@ Cbegin
                                 endif
                                 endif
 
-         if ( ktopt.eq.'shift' ) call pr_gtcen ( klxd, klyd, tres, 
+         if ( ktopt.eq.'shift' ) call pr_gtcen ( klxd, klyd, tres,
      +                                           klxsd, klysd )
 
          if ( ktopt.eq.'clear' ) call pr_dsclear			!Clear display
 
 
          if ( ktopt.eq.'disp_all' ) call pr_dispfit ( 0, 1, klx, kly,	!Display all fits/areas
-     +                                             klxs, klys, klxd, 
+     +                                             klxs, klys, klxd,
      +                                             klyd, klxsd, klysd )
 
          if ( ktopt.eq.'disp_one' ) call pr_dispfit ( 1, 1, klx, kly, 	!Display one fit/area
-     +                                             klxs, klys, klxd, 
+     +                                             klxs, klys, klxd,
      +                                             klyd, klxsd, klysd )
-  
+
          if ( ktopt.eq.'close' ) call pr_setd				!Close display
 
          if ( ktopt.eq.'posntype' ) call pr_posntype 			!Set posn display type
@@ -3273,7 +3273,7 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-  
+
       data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'blank', 'Remove an area from the calculations',
      + 'A rectangle in the image near a fit star can be ignored. It ',
@@ -3288,7 +3288,7 @@ C--
      + 'Clear the display window. This only affects the window. It',
      + 'does not affect any of the image or residuals, or profile. It ',
      + 'is used solely for tidying up a window that has got too ',
-     + 'cluttered, and you wish to display some new stuff.', 
+     + 'cluttered, and you wish to display some new stuff.',
      + ' ', ' '/
 
       data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
@@ -3301,16 +3301,16 @@ C--
      + 'comp_br', 'Add a bright or close companion' ,
      + 'Make the display window active. Place the cursor in a box at a',
      + 'position, press the left hand button. A purple marker is put ',
-     + 'up and a -bright- or -close- companion is entered in for that', 
+     + 'up and a -bright- or -close- companion is entered in for that',
      + 'position. Repeat as desired. Press another button to end.',
-     + 'These companions take full part in fitting, so they must be ', 
+     + 'These companions take full part in fitting, so they must be ',
      + 'either bright and fit easy, or close so cannot be done else.'/
 
       data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'comp_fa', 'Add a faint or distant companion',
      + 'Make the display window active. Place the cursor in a box at a',
      + 'position, press the left hand button. A purple marker is put ',
-     + 'ip and a -faint- or -far- companion is entered in for that ', 
+     + 'ip and a -faint- or -far- companion is entered in for that ',
      + 'position. Repeat as desired. Press another button to end.',
      + 'These companions take a secondary part in the fitting, being',
      + 'fitted with fixed profiles in steps, to ease the fitting.' /
@@ -3318,7 +3318,7 @@ C--
 
       data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'box', 'Paint fitting box when displaying fits',
-     + 'If the areas around the stars have been displayed, then ', 
+     + 'If the areas around the stars have been displayed, then ',
      + 'shall a rectangle round the actual area used in the fitting be',
      + 'displayed? Toggles between -yes- and -no-, with -yes- being ',
      + 'the starting default. ',
@@ -3328,22 +3328,22 @@ C--
       data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'shift', 'Reposition a main star',
      + 'You can change the position of one -main- star with this.',
-     + 'Look at the display, choose which -central- star you want to', 
-     + 'move, place the cursor at the desired new position (in either', 
+     + 'Look at the display, choose which -central- star you want to',
+     + 'move, place the cursor at the desired new position (in either',
      + 'the raw or residuals display box), press the left-hand button.',
-     + 'The new position is marked up. If you wish to see the effect', 
+     + 'The new position is marked up. If you wish to see the effect',
      + 'of this, you can do the -disp_one- option for that star. '/
 
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'paint_comp', 'Paint up companions and bad areas',
-     + ' ', 
-     + 'Take current companions and bad areas, and paint them up on', 
-     + 'the display, in both set of boxes ', 
+     + ' ',
+     + 'Take current companions and bad areas, and paint them up on',
+     + 'the display, in both set of boxes ',
      + ' ', ' ', ' '/
 
       data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'posntype', 'Change posn markers between spot and crosses',
-     + ' ', 
+     + ' ',
      + 'Change the way the position markers for -main- stars and',
      + 'companion stars are painted up, when they are so painted up.',
      + 'The choice is toggled between spot and crosses.',
@@ -3359,8 +3359,8 @@ C--
      + 'Gives -residual- values after the stars have been subtracted.',
      + 'Place the cursor at a position in one of the boxes, and press',
      + 'the left-hand button. Move the cursor to another position in',
-     + 'the same box, and press the button again. A ractangle is ', 
-     + 'painted with those two positions as blh and trh corners, and ', 
+     + 'the same box, and press the button again. A ractangle is ',
+     + 'painted with those two positions as blh and trh corners, and ',
      + 'the -residual- values of the fit in that area typed out.'/
 
       data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
@@ -3369,7 +3369,7 @@ C--
      + 'position, press the left hand button. The closest such compan-',
      + 'ion is looked for, removed from the list and marked with a ',
      + 'yellow marker. Repeat as desired. Press another button to end.',
-     + 'These companions take full part in fitting, so they must be ', 
+     + 'These companions take full part in fitting, so they must be ',
      + 'either bright and fit easy, or close so cannot be done else.' /
 
       data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
@@ -3378,7 +3378,7 @@ C--
      + 'position, press the left hand button. The closest such compan-',
      + 'ion is looked for, removed from the list and marked with a ',
      + 'yellow marker. Repeat as desired. Press another button to end.',
-     + 'These companions take full part in fitting, so they must be ', 
+     + 'These companions take full part in fitting, so they must be ',
      + 'either bright and fit easy, or close so cannot be done else.' /
 
       data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
@@ -3394,8 +3394,8 @@ C--
      + 'Gives image pixel values.',
      + 'Place the cursor at a position in one of the boxes, and press',
      + 'the left-hand button. Move the cursor to another position in',
-     + 'the same box, and press the button again. A ractangle is ', 
-     + 'painted with those two positions as blh and trh corners, and ', 
+     + 'the same box, and press the button again. A ractangle is ',
+     + 'painted with those two positions as blh and trh corners, and ',
      + 'the image pixel values in that area are typed out.'/
 
       data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
@@ -3420,7 +3420,7 @@ C--
      + '-cleaned- and -uncleaned- area for the same star, and between',
      + 'stars. The position of fitted and companion stars is marked',
      + 'and also -bad- areas you have determined. '/
- 
+
       data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'disp_one',  'Display the areas + residuals to a single fit',
      + 'Display the area around a star and the same area after',
@@ -3429,12 +3429,12 @@ C--
      + '-cleaned- and -uncleaned- areas. The position of fitted and ',
      + 'companion stars is marked and also -bad- areas you have ',
      + 'determined. You are asked for the number of star to show.'/
-    
+
       data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'paint_box', 'Paint up fitting boxes',
-     + ' ', 
+     + ' ',
      + 'Paint up a purple rectangle on the displayed fits, to show',
-     + 'the actual fits area', 
+     + 'the actual fits area',
      + ' ', ' ', ' '/
 
       data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
@@ -3443,10 +3443,10 @@ C--
      + 'It types out fit details, details of close and of faint  ',
      + 'companions, and of the bad areas. ',
      + ' ', ' ', ' '/
-  
+
       character*50 title, option
       integer ncode
-      data title, option, ncode / 'Display and Display-fit', 
+      data title, option, ncode / 'Display and Display-fit',
      +                            'DOPTION', 2 /
 
       integer def_x, def_y
@@ -3458,7 +3458,7 @@ C--
       integer sect_num
       parameter ( sect_num=9 )
       character*10 sect_head(sect_num)
-      data sect_head / 'LOOK', 'MAINS', 'COMPANIONS', 'BAD AREAS', 
+      data sect_head / 'LOOK', 'MAINS', 'COMPANIONS', 'BAD AREAS',
      +            'INSPECT', 'SETUP', 'INFORM', 'DISPLAY', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'disp_all:disp_one:paint_comp:paint_box' /
@@ -3494,11 +3494,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -3535,11 +3535,11 @@ C   a.j.penny                   stsci                    86-05-08
       integer	kxe		!i: X   end in box of area to calc val range
       integer	kys		!i: Y start in box of area to calc val range
       integer	kye		!i: Y   end in box of area to calc val range
-      integer	kopt		!i: Display value scale method (1=indicated 
+      integer	kopt		!i: Display value scale method (1=indicated
 				!   area;2=not central;3= bmin/bmax)
       real	bmin		!i: Display value scale minimum (if used)
       real	bmax		!i: Display value scale maximum (if used)
-      integer	kbl		!i: Display in Upper (raw)(2) or lower 
+      integer	kbl		!i: Display in Upper (raw)(2) or lower
 				!   (fitted) sets (1)?
 C--
       integer jx, jy, jya, ierr
@@ -3551,7 +3551,7 @@ Cbegin
       if ( ierr.ne.0 ) return
 
       if ( kopt.eq.0 ) then						!Get pixel values scale
-         call ds_imgsclr ( rim, kx, ky, kxs, kxe, kys, kye )					
+         call ds_imgsclr ( rim, kx, ky, kxs, kxe, kys, kye )
       elseif ( kopt.eq.1 ) then
          call ds_imgsclr ( rim, kx, ky, 1, kxs, 1, ky )
          a = DSVMIN
@@ -3602,16 +3602,16 @@ Cbegin
       do k = 1, MAXTOT							!Paint old boxes
          if ( nint(tcom(6,k)).eq.3 ) then
             xa = com(1,k)
-            ya = com(2,k)            
+            ya = com(2,k)
             ka = nint(tcom(5,k))
             if ( kw.eq.0 .or. ka.eq.kw ) then
-               call pr_boxpos ( ka, TBY, kx, ky, kxsd, kysd, 
+               call pr_boxpos ( ka, TBY, kx, ky, kxsd, kysd,
      +                          xa, ya, xaa, yaa, yab )
                xs = xaa
                ys = yaa
                xa = com(3,k)
-               ya = com(4,k)            
-               call pr_boxpos ( ka, TBY, kx, ky, kxsd, kysd, 
+               ya = com(4,k)
+               call pr_boxpos ( ka, TBY, kx, ky, kxsd, kysd,
      +                          xa, ya, xba, yba, ybb )
                xe = xba
                ye = yba
@@ -3653,7 +3653,7 @@ C  a j penny                   stsci                 1987-02-28
 C--
       integer jxs, jys, jxe, jye, jysa
 Cbegin
-    
+
 
       call pr_aboxpos ( k, tbya, kx, ky, jxs, jys, jysa )
 
@@ -3765,7 +3765,7 @@ Cbegin
 
             xa = tres(1,k)
             ya = tres(2,k)
-            call pr_boxpos ( k, TBY, kx, ky, kxsd, kysd, 
+            call pr_boxpos ( k, TBY, kx, ky, kxsd, kysd,
      +                       xa, ya, xp, yp, ypa )
             if ( PAINTSPOT ) then
                call ds_spot ( xp,  yp, 1 )
@@ -3784,7 +3784,7 @@ Cbegin
             ya = tcom(2,k)
             ka = nint(tcom(5,k))
             if ( kw.eq.0 .or. ka.eq.kw ) then
-               call pr_boxpos ( ka, TBY, kx, ky, kxsd, kysd, 
+               call pr_boxpos ( ka, TBY, kx, ky, kxsd, kysd,
      +                          xa, ya, xp, yp, ypa )
                if ( PAINTSPOT ) then
                   call ds_spot ( xp,  yp, 3 )
@@ -3853,7 +3853,7 @@ Cbegin
 
          dothis = .true.
 
-         loop = .true.	
+         loop = .true.
          kp = 0
          do while ( loop )
             kp = kp + 1
@@ -3868,7 +3868,7 @@ Cbegin
          enddo
 
          call ds_gcur ( .false., ix, iy, kbut, ierr )			!Get cursor posn
-         
+
          if ( kbut.ne.1 ) then
             mloop = .false.
             dothis = .false.
@@ -3883,7 +3883,7 @@ Cbegin
          if ( dothis ) then
             ns = 1							!See if too many companions
             do k = 1, MAXTOT
-               if ( nint(COM(6,k)).eq.kopt .and. 
+               if ( nint(COM(6,k)).eq.kopt .and.
      +              nint(COM(5,k)).eq.nbox ) ns = ns + 1
             enddo
             if ( ns.ge.maxfc ) then					!If not OK, return
@@ -3897,7 +3897,7 @@ Cbegin
          if ( dothis ) then
             lmx = ix - jxa + 1 + kxsd(nbox) - 1.0			!Comp position
             lmy = iy - jya + 1 + kysd(nbox) - 1.0
-            if ( lmx.lt.1  .or. lmx.gt.NX .or. lmy.lt.1 .or. 
+            if ( lmx.lt.1  .or. lmx.gt.NX .or. lmy.lt.1 .or.
      +           lmy.gt.NY ) then
                  call printo ( 'ERROR: Not added, outside image' )
                dothis = .false.
@@ -3919,7 +3919,7 @@ Cbegin
                call ds_cross ( x, y, CWIDTH, kc )
                call ds_cross ( x, ya, CWIDTH, kc )
             endif
-      
+
             COM(1,kp) = lmx
             COM(2,kp) = lmy
             COM(5,kp) = nbox
@@ -4044,7 +4044,7 @@ C PR_PRINTVALR -- Get area, print values or residuals in it (real image)
 C
 C    a j penny                  ral               85-12-31
 
-      subroutine pr_printvalr ( im, kxd, kyd, kxsd, kysd, kopt, tres, 
+      subroutine pr_printvalr ( im, kxd, kyd, kxsd, kysd, kopt, tres,
      +                          tcom )
 
       implicit none
@@ -4133,7 +4133,7 @@ Cbegin
                   call pr_valstars ( ja, k, rv, tres, nbox, tcom )
                   x = ja - kxsd(nbox) - kxd/4
                   y =  k - kysd(nbox) - kyd/4
-                  sky = tres(10,nbox)+x*tres(32,nbox)+y*tres(33,nbox) 
+                  sky = tres(10,nbox)+x*tres(32,nbox)+y*tres(33,nbox)
                   rv = BS*im(ja,k) + BZ - rv - sky
                   kv(j) = min(999999.0,max(-999999.0,rv))
                endif
@@ -4159,7 +4159,7 @@ C PR_PRINTVALS -- Get area, print values or residuals in it (int*2 image)
 C
 C    a j penny                  ral               85-12-31
 
-      subroutine pr_printvals ( im, kxd, kyd, kxsd, kysd, kopt, tres, 
+      subroutine pr_printvals ( im, kxd, kyd, kxsd, kysd, kopt, tres,
      +                          tcom )
 
       implicit none
@@ -4247,7 +4247,7 @@ Cbegin
                   call pr_valstars ( ja, k, rv, tres, nbox, tcom )
                   x = ja - kxsd(nbox) - kxd/4
                   y =  k - kysd(nbox) - kyd/4
-                  sky = tres(10,nbox)+x*tres(32,nbox)+y*tres(33,nbox) 
+                  sky = tres(10,nbox)+x*tres(32,nbox)+y*tres(33,nbox)
                   kv(j) = BS*im(ja,k) + BZ - rv - sky
                endif
             enddo
@@ -4320,7 +4320,7 @@ Cbegin
 
          if ( dothis ) then
             call pr_gtnbox ( kx, ky, TBY, kxd, kyd, nbox, jxa, 		!Find which box it is in
-     +                       jya, kdhy ) 
+     +                       jya, kdhy )
             if ( nbox.eq.0 ) dothis = .false.
          endif
 
@@ -4330,7 +4330,7 @@ Cbegin
             amy = ky - jya + 1.0 + kysd(nbox) - 1.0
             adist = NX + NY
             do k = 1, MAXTOT
-               if ( nint(tcom(5,k)).eq.nbox .and. 
+               if ( nint(tcom(5,k)).eq.nbox .and.
      +              nint(tcom(6,k)).eq.kopt ) then
                   dist = sqrt( (amx-tcom(1,k))**2.0 +
      +                         (amy-tcom(2,k))**2.0 + 0.001 )
@@ -4383,10 +4383,10 @@ Cbegin
       if ( ierr.ne.0 ) return
 
       mloop = .true.
-      do while ( mloop ) 
+      do while ( mloop )
          dothis = .true.
 
-         loop = .true.	
+         loop = .true.
          kp = 0
          do while ( loop )
             kp = kp + 1
@@ -4415,7 +4415,7 @@ Cbegin
          if ( dothis ) then
             ns = 1							!See if too many boxes. Return if bad.
             do ll = 1, MAXTOT
-               if ( nint(tcom(6,ll)).eq.3 .and. 
+               if ( nint(tcom(6,ll)).eq.3 .and.
      +              nint(tcom(5,ll)).eq.nbox ) ns = ns + 1
             enddo
             if ( ns.ge.MAXBAD ) then
@@ -4474,14 +4474,14 @@ Cbegin
             tcom(5,kp) = nbox
             tcom(6,kp) = 3.0
             if ( nint(tcom(1,kp)).gt.nint(tcom(3,kp)) ) then
-               akl = tcom(1,kp) 
+               akl = tcom(1,kp)
                tcom(1,kp) = tcom(3,kp)
-               tcom(3,kp) = akl 
+               tcom(3,kp) = akl
             endif
             if ( nint(tcom(2,kp)).gt.nint(tcom(4,kp)) ) then
-               akl = tcom(2,kp) 
+               akl = tcom(2,kp)
                tcom(2,kp) = tcom(4,kp)
-               tcom(4,kp) = akl 
+               tcom(4,kp) = akl
             endif
             tres(36,nbox) = 3.0
             call pr_paintbox ( kxd, kyd, tcom, kxsd, kysd, 0 )
@@ -4554,7 +4554,7 @@ Cbegin
             adist = NX + NY
             kit = 0
             do k = 1, MAXTOT
-               if ( nint(tcom(6,k)).eq.3 .and. 
+               if ( nint(tcom(6,k)).eq.3 .and.
      +              nint(tcom(5,k)).eq.nbox    ) then
                   do j = 1, 4
                      dist = sqrt( (lmx-tcom(jkx(j),k))**2.0+
@@ -4607,7 +4607,7 @@ Cbegin
       loop = .true.
       do while ( loop )
 
-         call prga_opt_setup ( ktopt, 5, .false. )	
+         call prga_opt_setup ( ktopt, 5, .false. )
          call get_choice ( ktopt, 1 )					!Get choice
          if ( ST_FAILED ) return
 
@@ -4654,7 +4654,7 @@ Cbegin
          if ( ktopt.eq.'clear' ) call pr_dsclear			!Clear display
 
          if ( ktopt.eq.'display' ) call pr_disresb ( map, rima, rimb,	!Display map
-     +                                               MX, MY, 1) 
+     +                                               MX, MY, 1)
 
          if ( ktopt.eq.'original' ) call amovr ( omap, map, MX*MY )	!Load original map
 
@@ -4686,17 +4686,17 @@ C--
 
       integer opt_num
       parameter ( opt_num=14 )
-    
+
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-    
+
       data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'clear', 'Clear the display window',
      + 'Clear the display window. This only affects the window. It',
      + 'does not affect any of the image or residuals, or profile. It',
      + 'is used solely for tidying up a window that has got too',
-     + 'cluttered, and you wish to display some new stuff.', 
+     + 'cluttered, and you wish to display some new stuff.',
      + ' ', ' '/
 
       data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) /
@@ -4712,7 +4712,7 @@ C--
      + 'return', 'Return to main OPTION choice',
      + 'Return to main program option list.',
      + ' ', ' ', ' ', ' ', ' '/
- 
+
       data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'spolyin', 'Define a polygon with cursor, smooth area inside',
      + 'This smooths an area of the array. Place cursor on a vertex',
@@ -4721,7 +4721,7 @@ C--
      + 'SAME position). The program completes the polygon, asks what',
      + 'size of box to smooth with, smooths inside the polygon,',
      + 'displays the result. ' /
-  
+
       data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'spolyout', 'Define a polygon with cursor, smooth area outside',
      + 'Smooths OUTSIDE a polygon defined in the array. Place cursor',
@@ -4730,9 +4730,9 @@ C--
      + 'SAME position). The program completes the polygon, asks what',
      + 'size of box to smooth with, smooths outside the polygon,',
      + 'displays the result. ' /
-   
+
       data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
-     + 'smooth', 'Smooth profile map by >top hat> NxM box', 
+     + 'smooth', 'Smooth profile map by >top hat> NxM box',
      + 'You input the size of a box (say XxY). The program then ',
      + 'smooths the WHOLE array by replacing each pixel with the ',
      + 'average of the XxY pixels around it. (Pixels too near edge ',
@@ -4748,7 +4748,7 @@ C--
      + 'values are the fraction of a star of unit height that this ',
      + 'empirical map represents the profile.',
      + ' '/
- 
+
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'zero', 'Zero all profile map',
      + 'Zeroes all the values in the empirical map. and displays it.',
@@ -4771,7 +4771,7 @@ C--
      + 'SAME position). The program completes the polygon, and',
      + 'zeroes inside the polygon, displays the result. ',
      + ' ' /
-   
+
       data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
      + 'zpolyout', 'Define a polygon with cursor, zero area outside',
      + 'Zeroes OUTSIDE a polygon defined in the array. Place cursor',
@@ -4780,7 +4780,7 @@ C--
      + 'SAME position). The program completes the polygon, smooths ',
      + 'outside the polygon, displays the result.  ',
      + ' ' /
-   
+
       data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'zrect', 'Define a rectangle with cursor, zero area inside' ,
      + 'This zeroes a rectangle in the array. Place cursor on b.l.h.',
@@ -4788,13 +4788,13 @@ C--
      + 't.r.h. corner. The program completes the polygon, and',
      + 'zeroes inside the polygon, displays the result. ',
      + ' ', ' ' /
- 
+
       data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + ' ',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' '/
- 
+
       data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'display',  'Display the profile empirical map array',
      + ' ',
@@ -4823,7 +4823,7 @@ C--
       data sect_text(4) / 'values' /
       data sect_text(5) / 'clear:display:zoom:reset' /
       data sect_text(6) / 'return' /
-           
+
       integer help_num
       parameter ( help_num=11 )
       character*68 help_text(help_num)
@@ -4846,11 +4846,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -4871,7 +4871,7 @@ C    A.J.Penny          ral             1990-07-24
       integer	kx		!i: X size of arrays
       integer	ky		!i: Y size of arrays
       real	rim(kx,ky)	!i/o: Data array
-      real	rb(kx,ky)	!i/o: Flag array for data 
+      real	rb(kx,ky)	!i/o: Flag array for data
       integer*2 wim(kx,ky)	!o: Work array
       integer   km		!i: Flag (2=integer*2 input; 1= real input)
       integer   kopt		!i: Flag (1=smooth in;2=smooth out;3=zero in;
@@ -4932,12 +4932,12 @@ Cbegin
          call get_choice ( ktopt, 1 )					!Get option
          if ( ST_FAILED ) return
 
-         if ( ktopt.eq.'calculate' ) call pr_mrescalc			!Calculate residuals and 
+         if ( ktopt.eq.'calculate' ) call pr_mrescalc			!Calculate residuals and
 									! put them in residuals map
 
          if ( ktopt.eq.'display' ) call pr_disresb ( rd, rdh, wim,	!Display residuals
      +                                               kx, ky, 2 )
-  
+
          if ( ktopt.eq.'values' ) call pr_prarea ( rd, kx, ky )		!List residual values
 
          if ( ktopt.eq.'zero' ) then					!Zero all residuals
@@ -4959,24 +4959,24 @@ Cbegin
                           endif
                           endif
 
-         if ( ktopt.eq.'smooth' ) then					!Smooth residuals 
+         if ( ktopt.eq.'smooth' ) then					!Smooth residuals
                           call pr_boxfr ( rd, rdh, rim, kx, ky, ierr )
-                          if ( ierr.eq.0 ) call pr_disresb ( rd, rdh, 
+                          if ( ierr.eq.0 ) call pr_disresb ( rd, rdh,
      +                                               wim, kx, ky, 2 )
                           endif
 
          if ( ktopt.eq.'spolyin' ) call pr_dopol ( rd, rdh, wim, 	!Smooth area inside polygon
      +                                             kx, ky, 2, 1 )
 
-         if ( ktopt.eq.'spolyout' ) call pr_dopol ( rd, rdh, wim, 	!Smooth area outside polygon 
+         if ( ktopt.eq.'spolyout' ) call pr_dopol ( rd, rdh, wim, 	!Smooth area outside polygon
      +                                             kx, ky, 2, 2 )
 
          if ( ktopt.eq.'zpolyin' ) call pr_dopol ( rd, rdh, wim, 	!Zero area inside polygon
      +                                             kx, ky, 2, 3 )
 
-         if ( ktopt.eq.'zpolyout' ) call pr_dopol ( rd, rdh, wim,	!Zero area outside polygon 
+         if ( ktopt.eq.'zpolyout' ) call pr_dopol ( rd, rdh, wim,	!Zero area outside polygon
      +                                             kx, ky, 2, 4 )
-	
+
          if ( ktopt.eq.'original' ) then				!Load original residuals
                           call amovr ( ord, rd, kx*ky )
                           call amovr ( ordh, rdh, kx*ky )
@@ -4989,7 +4989,7 @@ Cbegin
 
          if ( ktopt.eq.'fill' ) then					!Set empty areas to interpolated values
                               call pr_infill ( rd, rdh, kx, ky, .true.)
-                              call pr_disresb ( rd, rdh, wim, kx,ky,2) 
+                              call pr_disresb ( rd, rdh, wim, kx,ky,2)
                                 endif
 
          if ( ktopt.eq.'clear' ) call pr_dsclear			!Clear display
@@ -5022,7 +5022,7 @@ C--
 
       integer opt_num
       parameter ( opt_num=16 )
-    
+
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
@@ -5032,15 +5032,15 @@ C--
      + 'Clear the display window. This only affects the window. It',
      + 'does not affect any of the image or residuals, or profile. It ',
      + 'is used solely for tidying up a window that has got too',
-     + 'cluttered, and you wish to display some new stuff.', 
+     + 'cluttered, and you wish to display some new stuff.',
      + ' ', ' '/
 
       data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) /
      + 'original', 'Load original values from last fit calculations',
-     + 'This loads the residuals array with the -original- values, ', 
+     + 'This loads the residuals array with the -original- values, ',
      + 'that is, those it had when you entered this panel of ',
      + '-RES_INTERACT- options. It then displays it.',
-     + 'This is of use when you have done various actions on the ', 
+     + 'This is of use when you have done various actions on the ',
      + 'array and want to erase their effect, without recalculating',
      + 'the array from the fits. '/
 
@@ -5048,12 +5048,12 @@ C--
      + 'return', 'Return to main OPTION choice',
      + 'Return to main program option list.',
      + ' ', ' ', ' ', ' ', ' '/
- 
+
       data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'spolyin', 'Define a polygon with cursor, smooth area inside',
      + 'This smooths an area of the array. Place cursor on a vertex',
      + 'of a polygon inside which to smooth, press a button and ',
-     + 'repeat for the other verticies. At last one, re-press (at the', 
+     + 'repeat for the other verticies. At last one, re-press (at the',
      + 'SAME position). The program completes the polygon, asks what',
      + 'size of box to smooth with, smooths inside the polygon,',
      + 'displays the result. Area must be -full- (see -FILL-) option. '/
@@ -5062,26 +5062,26 @@ C--
      + 'spolyout', 'Define a polygon with cursor, smooth area outside',
      + 'Smooths OUTSIDE a polygon defined in the array. Place cursor',
      + 'on vertex of a polygon, press a button and ',
-     + 'repeat for the other verticies. At last one, re-press (at the', 
+     + 'repeat for the other verticies. At last one, re-press (at the',
      + 'SAME position). The program completes the polygon, asks what',
      + 'size of box to smooth with, smooths outside the polygon,',
      + 'displays the result. Area must be -full- (see -FILL- option). '/
 
       data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
-     + 'smooth', 'Smooth profile map by >top hat> NxM box', 
-     + 'You input the size of a box (say XxY). The program then ', 
+     + 'smooth', 'Smooth profile map by >top hat> NxM box',
+     + 'You input the size of a box (say XxY). The program then ',
      + 'smooths the WHOLE array by replacing each pixel with the ',
      + 'average of the XxY pixels around it. (Pixels too near edge ',
      + 'will be smoothed as if the array projected beyond its edges ',
-     + 'with a refection of its edge pixels.) ', 
+     + 'with a refection of its edge pixels.) ',
      + 'Only works if array is -full- (see -FILL- option).'/
 
       data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'values', 'Type out values for an area of the residual array',
      + 'You use the keyboard to define the X and Y range of a ',
-     + 'rectangular box in the array. The values are then typed out.', 
-     + 'They are multiplied by 1000 for ease of display. The actual ', 
-     + 'values are the fraction of a star of unit height that the ', 
+     + 'rectangular box in the array. The values are then typed out.',
+     + 'They are multiplied by 1000 for ease of display. The actual ',
+     + 'values are the fraction of a star of unit height that the ',
      + 'average stars pixels are bigger than the calculated fits.',
      + ' '/
 
@@ -5089,8 +5089,8 @@ C--
      + 'zero', 'Zero all residual array',
      + 'Zeroes all the values in the residual array. Also flags that ',
      + 'none of the values have had a value loaded into them, by',
-     + 'clearing the loading array. (You can set them as loaded with', 
-     + 'the -FILL- option.)', 
+     + 'clearing the loading array. (You can set them as loaded with',
+     + 'the -FILL- option.)',
      + ' ', ' '/
 
       data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
@@ -5106,7 +5106,7 @@ C--
      + 'zpolyin', 'Define a polygon with cursor, zero area inside',
      + 'This zeroes an area of the array. Place cursor on a vertex',
      + 'of a polygon inside which to smooth, press a button and ',
-     + 'repeat for the other verticies. At last one, re-press (at the', 
+     + 'repeat for the other verticies. At last one, re-press (at the',
      + 'SAME position). The program completes the polygon, and',
      + 'zeroes inside the polygon, displays the result. (Any pixel',
      + 'that has not been loaded will be zeroed and marked as loaded.)'/
@@ -5115,7 +5115,7 @@ C--
      + 'zpolyout', 'Define a polygon with cursor, zero area outside',
      + 'Zeroes OUTSIDE a polygon defined in the array. Place cursor',
      + 'on vertex of a polygon, press a button and ',
-     + 'repeat for the other verticies. At last one, re-press (at the', 
+     + 'repeat for the other verticies. At last one, re-press (at the',
      + 'SAME position). The program completes the polygon, smooths ',
      + 'outside the polygon, displays the result.  (Any pixel',
      + 'that has not been loaded will be zeroed and marked as loaded.)'/
@@ -5146,7 +5146,7 @@ C--
      + 'A pixel may be empty if they are subdivided, as there',
      + 'may not be a star with the right centre offset from the image',
      + 'pixel centres. Use -FILL- to cure this.'/
- 
+
       data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
@@ -5207,11 +5207,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -5275,7 +5275,7 @@ Cbegin
       endif
       kxe = kx - jxa + 1
       kye = ky - jya + 1
-      
+
       call cswopi ( kxs, kxe )						!Store box
       call cswopi ( kys, kye )
 
@@ -5385,7 +5385,7 @@ C--
       real    ist(150*150), nst(150*150), il(150), nl(150)
 Cbegin
 
-    
+
       ierr = 0								!Error flag
 
       if ( kx.gt.150 .or. ky.gt.150 ) then				!Check not too large
@@ -5471,7 +5471,7 @@ C--
       real    rst(150*150), rl(150)
 Cbegin
 
-    
+
       if ( kx.gt.150 .or. ky.gt.150 ) then				!Check not too large
          call printo ( 'ERROR: Can only handle boxup to 150x150' )
          call printo ( '       in subroutine pr_boxfra' )
@@ -5741,7 +5741,7 @@ C         a j penny               stsci                     1987-jan-25
       integer*2 data(kx,ky)	!o: Array (0s and 1s)
       integer   ierr		!o: Error flag (0=ok;1=not)
 C--
-      integer ip, ix, iy, px(512), py(512), i, kbut, ierra, ixsub, 
+      integer ip, ix, iy, px(512), py(512), i, kbut, ierra, ixsub,
      +        iysub, ixa, iya
       real    apx, apy, bpx, bpy
       logical loop
@@ -5792,7 +5792,7 @@ Cbegin
 
       enddo
 
-      apx = px(1) + ixsub						!Close up display polygon 
+      apx = px(1) + ixsub						!Close up display polygon
       apy = py(1) + iysub
       bpx = px(ip) + ixsub
       bpy = py(ip) + iysub
@@ -5833,7 +5833,7 @@ Cbegin
 
       call azeros ( data, kx*ky )					!Load array with 0's
 
-      st = ky								!Find start line and end 
+      st = ky								!Find start line and end
       en = 1								! line for smallest box containing polygon
       do k = 1, nv
          en = max(en,yv(k))
@@ -5844,7 +5844,7 @@ Cbegin
 
 C  Find all the intersections of the line number 'k' with the
 C  line segments of the polygon.
-C  If regions between intersections are interior points fill 
+C  If regions between intersections are interior points fill
 C  them in with 1's.
 
       do k = st, en
@@ -5910,7 +5910,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PR_INSIDE -- (Function) See if inside the polygon 
+C PR_INSIDE -- (Function) See if inside the polygon
 C  Uses cauchy's integral theorem to test for inside. connect test
 C  point to each vertex in turn and if the sum of the rotation angles
 C  is zero then the point is exterior
@@ -6013,7 +6013,7 @@ C--
       real    rv
 Cbegin
 
-     
+
       if ( kopt.eq.1 .or. kopt.eq.2 ) then
 
          call gtwrkr ( 'KPOLYA', kx*ky, ip, i )
@@ -6075,7 +6075,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_INFILL -- Fill in empty pixels in the array RD, where an empty
-C   pixel is flagged by 0.0 in the matching RDH pixel. It does it 
+C   pixel is flagged by 0.0 in the matching RDH pixel. It does it
 C   by interpolation.
 C
 C  a j penny                       stsci                    1987-02-16
@@ -6127,7 +6127,7 @@ Cbegin
      +                                (jx.eq.2.and.ja.lt.1) ) then
                                     more = .false.
                                  else
-                                    fk = rdh(ja,ka) 
+                                    fk = rdh(ja,ka)
                                     if ( fk.ne.0.0 ) more = .false.
                                  endif
                               enddo
@@ -6188,7 +6188,7 @@ Cbegin
                      endif
                   endif
               enddo
-      
+
               val = 0.0
               if ( kky(1).eq.kky(2) ) then
                  val = res(1)
@@ -6197,7 +6197,7 @@ Cbegin
                  val = res(1) + (res(2)-res(1))*diff
               endif
               rd(j,k) = val
-               
+
             endif
 
          enddo
@@ -6226,7 +6226,7 @@ C  a j penny                       stsci                1987-02-27
       integer  kysd(TBY)	!i: Y posns of blh of display areas
 C--
       integer kx, ky, kbut, ierr, nbox, k, jx, jy, kdhy
-      real x, ya, yb 
+      real x, ya, yb
 Cbegin
 
 
@@ -6282,7 +6282,7 @@ C--
       integer k, jxb, jyb, jyaa, jyba
 Cbegin
 
-	
+
       nbox = 0								!Go through all boxes,
       k = 1								! seeing if in
       do while ( k.le.tbya .and. nbox.eq.0 )
@@ -6290,11 +6290,11 @@ Cbegin
          call pr_aboxpos ( k, tbya, kxd, kyd, jxa, jya, jyaa )
          jxb = jxa + kxd - 1
          jyb = jya + kyd - 1
-         if ( kx.ge.jxa .and. kx.le.jxb .and. ky.ge.jya .and. 
+         if ( kx.ge.jxa .and. kx.le.jxb .and. ky.ge.jya .and.
      +        ky.le.jyb ) nbox = k
 
          jyba = jyaa + kyd - 1
-         if ( kx.ge.jxa .and. kx.le.jxb .and. ky.ge.jyaa .and. 
+         if ( kx.ge.jxa .and. kx.le.jxb .and. ky.ge.jyaa .and.
      +        ky.le.jyba ) then
             nbox = k
             ky = ky - (jyaa-jya)
@@ -6368,7 +6368,7 @@ Cbegin
       yp = tres(2,kstar)
       hp = tres(9,kstar)
 
-      call profval ( vala, j, k, xp, yp, hp, kx, ky, co, si, sim, 	!Get the profile summed 
+      call profval ( vala, j, k, xp, yp, hp, kx, ky, co, si, sim, 	!Get the profile summed
      +               gx2, gy2, ap, hx2, hy2, qh, qr, qp, DOMAP,		! over the pixel
      +               %val(IPMAP), MX, MY, MZ, 1, MAPX, MAPY, MAGNIF )
       val = val + vala
@@ -6381,9 +6381,9 @@ Cbegin
                yp = tcom(2,l)
                hp = tcom(3,l)
                if (hp.ne.0.0) then
-                  call profval ( vala, j, k, xp, yp, hp, kx, ky, co, 
-     +                           si, sim, gx2, gy2, ap, hx2, hy2, qh, 
-     +                           qr, qp, DOMAP, %val(IPMAP), MX, MY, 
+                  call profval ( vala, j, k, xp, yp, hp, kx, ky, co,
+     +                           si, sim, gx2, gy2, ap, hx2, hy2, qh,
+     +                           qr, qp, DOMAP, %val(IPMAP), MX, MY,
      +                           MZ, 1, MAPX, MAPY, MAGNIF )
                   val = val + vala
                endif
@@ -6528,14 +6528,14 @@ C
 C    alan penny                ral              1989-08-14
 
       subroutine pr_parout ( datar, lxa, lya, map, tfixangle, tfixp,
-     +                       kstar, kfix, cc, jfit, numm, ccf, jfitf, 
+     +                       kstar, kfix, cc, jfit, numm, ccf, jfitf,
      +                       numf, parfix, jxs, jys, nin, iterlim )
 
       implicit none
 
       include 'profile.inc'
       include 'ST_IMAGE_INC'
-     
+
       integer   lxa			!i: X size of array
       integer   lya			!i: Y size of array
       real      datar(lxa*lya)		!i: Input array to fit
@@ -6571,7 +6571,7 @@ C PR_PARIN -- Take array from par processors, store results in common block
 C
 C    alan penny                ral              1989-08-14
 
-      subroutine pr_parin ( jstar, cc, ccf, jxs, jys, iter, nin, lxa, 
+      subroutine pr_parin ( jstar, cc, ccf, jxs, jys, iter, nin, lxa,
      +                      lya )
 
       implicit none
@@ -6691,7 +6691,7 @@ C PRW_OPT_SETUP Set up option choices
 C PR_WFIT       Calculate the star fits for wing option
 C PR_WINGCAL    Calculate wing fit
 C PR_WGAUSS     Calculate wing fit from radial data
-C PR_WFITL      Fit wing line data 
+C PR_WFITL      Fit wing line data
 C PR_GCUR       Get wing plot cursor positions
 C PR_WPQLINE    Plots out a wing profile in 1-D
 C PR_WTYPE      Type out fit params
@@ -6701,7 +6701,7 @@ C PR_WTYPE      Type out fit params
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_WING -- Find the profile wings
 C
-C alan penny                 ral                    90-05-09     
+C alan penny                 ral                    90-05-09
 
       subroutine pr_wing ( data, store, tota, totb, amax, amin )
 
@@ -6713,8 +6713,8 @@ C alan penny                 ral                    90-05-09
 
       real       data(LXW,LYW)		!o: Work space for wing image
       real       store(LXW,LYWN)	!o: Work space for wing image
-      real       tota(LX,LY)		!o: Work space for star image 
-      real       totb(LX,LY)		!o: Work space for star image 
+      real       tota(LX,LY)		!o: Work space for star image
+      real       totb(LX,LY)		!o: Work space for star image
       real       amax			!i: Max display value
       real       amin			!i: Min display value
 C--
@@ -6745,12 +6745,12 @@ Cbegin
          call get_choice ( ktopt, 1 )					!Get choice
          if ( ST_FAILED ) return
 
-         if ( ktopt.eq.'display' ) call pr_dispfit ( 0, 1, LXW, LYW,	!Display residuals 
-     +                                        LXSW, LYSW, LXWD, LYWD, 
+         if ( ktopt.eq.'display' ) call pr_dispfit ( 0, 1, LXW, LYW,	!Display residuals
+     +                                        LXSW, LYSW, LXWD, LYWD,
      +                                        LXSWD, LYSWD )
 
          if ( ktopt.eq.'interact' ) call pr_dfinter ( RESA, COMA, 	!Display residuals and get more
-     +                                           LXW, LYW, LXSW, LYSW, 	! comps and bad areas, possibly 
+     +                                           LXW, LYW, LXSW, LYSW, 	! comps and bad areas, possibly
      +                                      LXWD, LYWD, LXSWD, LYSWD )
 
          if ( ktopt.eq.'fit_stars' ) call pr_wfit ( data, store, tota,	!Calculate the star fits for wing
@@ -6775,7 +6775,7 @@ Cbegin
          if ( ktopt.eq.'type_param' ) call pr_wtype			!Type parameters
 
          if ( ktopt.eq.'gshowfit' ) then				!Display fitted line
-                           if ( GOTXRANGE ) call pr_wpqline 
+                           if ( GOTXRANGE ) call pr_wpqline
                            endif
          if ( ktopt.eq.'gclose' ) call gd_close 			!Close the graph device
 
@@ -6816,7 +6816,7 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-  
+
       data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'display',  'Display the areas + residuals to the fits',
      + 'Display the areas around each star and the areas after the',
@@ -6838,28 +6838,28 @@ C--
       data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
      + 'set_param', 'Insert your own wing profile values',
      + 'You can change the parameters of the wing profile.',
-     + ' ', 
+     + ' ',
      + 'The wing equation is:-',
-     + '   Val = Base + [-main height- * ht * exp(-1.0*dd)]', 
-     + '   where dd = [(distance from star centre)/radius)]**power', 
+     + '   Val = Base + [-main height- * ht * exp(-1.0*dd)]',
+     + '   where dd = [(distance from star centre)/radius)]**power',
      + ' ' /
 
       data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'return', 'Return to main option',
      + ' ', 'Return to main program option list.' ,
      + ' ', ' ', ' ', ' ' /
-  
+
       data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'type_Param', 'Type present wing parameters',
-     + ' ', 
-     + 'Type out the present values of the wing parameters,', 
-     + 'and whether or not the parameters are fixed of can vary ', 
-     + 'in the fitting.', 
+     + ' ',
+     + 'Type out the present values of the wing parameters,',
+     + 'and whether or not the parameters are fixed of can vary ',
+     + 'in the fitting.',
      + ' ', ' ' /
 
       data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'gplot', 'Plot the wing points graphically',
-     + 'This opens a graphics window and gives a graph of the average', 
+     + 'This opens a graphics window and gives a graph of the average',
      + 'residuals in annular bins round the star centres. It is thus a',
      + '1-D plot of -residual vs distance from star-, where residuals',
      + 'are averaged between stars and in azimuth round the star',
@@ -6877,7 +6877,7 @@ C--
 
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'fit_gcursor', 'Fit to wing points input by cursor',
-     + 'Fit the data, input via the cursor, with a simple modified ', 
+     + 'Fit the data, input via the cursor, with a simple modified ',
      + 'Gaussian. The data and present fit are plotted. The present',
      + 'parameter values are given, with the chance to modify them,',
      + 'and to select which parameters to hold fixed in the fitting. ',
@@ -6896,7 +6896,7 @@ C--
       data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'gshowfit', 'Plot fitted line',
      + ' ',
-     + 'Plot the present fit on the graph of the radial data.', 
+     + 'Plot the present fit on the graph of the radial data.',
      + ' ', ' ', ' ', ' ' /
 
       data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
@@ -6907,7 +6907,7 @@ C--
      + '         main stars.',
      + 'DISPLAY: Pan/zoom the fits display; type out the image or ',
      + '         residuals values; remove/replace coloured lines.' /
-   
+
       data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'gclose', 'Close the graphics device',
      + ' ',
@@ -6944,7 +6944,7 @@ C--
      + '             ',
      + '             ',
      + 'A normal course might be to:-',
-     + ' -Display-     Display the x2 areas round the stars', 
+     + ' -Display-     Display the x2 areas round the stars',
      + ' -Interact-    Blank off or mark up the extra stars in ',
      + '                the large wing areas',
      + ' -Fit_stars-   Fit the stars in the large wing area and calc ',
@@ -6962,16 +6962,16 @@ C--
      + '               ' ,
      + 'Then -Return-  back to the main option.' /
 
-Cbegin   
+Cbegin
 
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -7013,7 +7013,7 @@ Cbegin
       if ( .not.done ) then
 
          if ( DOPAR ) call pr_par_sii ( numpar, istat )			!Number of par processors
-  
+
          ksent = 0
          do k = 1, TBY							!Do all the stars
             if ( RESA(34,k).gt.0.5 ) then
@@ -7021,20 +7021,20 @@ Cbegin
                call pr_partoobig ( k, toobig )
                if ( DOPAR .and. .not.toobig ) then			!Use par processors
                   if ( ksent.ge.numpar ) then
-                     call pr_parin ( jstar, cc, ccf, jxs, jys, iter, 
+                     call pr_parin ( jstar, cc, ccf, jxs, jys, iter,
      +                               nin, lxa, lya )
-                     call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA, 
-     +                               MAXTOT, 0, cc, ccf, jxs, jys, 
-     +                               iter, nin, lxa, lya, MAXCL, 
+                     call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA,
+     +                               MAXTOT, 0, cc, ccf, jxs, jys,
+     +                               iter, nin, lxa, lya, MAXCL,
      +                               MAXFA )
                   endif
                   call pr_fitload ( totb, .true., .true., SR, k,
-     +                              RESA, COMA, 1, cc, jfit, numm, 
-     +                              ccf, jfitf, numf, parfix, LX, LY, 
+     +                              RESA, COMA, 1, cc, jfit, numm,
+     +                              ccf, jfitf, numf, parfix, LX, LY,
      +                              jxs, jys, nin )
-                  call pr_parout ( totb, LX, LY, %val(IPMAP), .true., 
-     +                             .true., k, 1, cc, jfit, numm, ccf, 
-     +                             jfitf, numf, parfix, jxs, jys, nin, 
+                  call pr_parout ( totb, LX, LY, %val(IPMAP), .true.,
+     +                             .true., k, 1, cc, jfit, numm, ccf,
+     +                             jfitf, numf, parfix, jxs, jys, nin,
      +                             20 )
                   ksent = ksent + 1
                else
@@ -7053,8 +7053,8 @@ Cbegin
                   if ( k.eq.1 .and. ksent.lt.numpar ) call pr_par_fend
                   call pr_parin ( jstar, cc, ccf, jxs, jys, iter, nin,
      +                            lxa, lya )
-                  call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA, 
-     +                            MAXTOT, 0, cc, ccf, jxs, jys, iter, 
+                  call pr_dores ( jstar, RESA, TBX, TBYMAX, COMA,
+     +                            MAXTOT, 0, cc, ccf, jxs, jys, iter,
      +                            nin, lxa, lya, MAXCL, MAXFA )
                   if ( k.eq.1 .and. ksent.ge.numpar ) call pr_par_fend
                enddo
@@ -7063,28 +7063,28 @@ Cbegin
 
       endif
 
-      do k = 1, TBY							
+      do k = 1, TBY
          if ( RESA(34,k).gt.0.5 ) then					!Do all good stars
 
-            LXSW(k) = RESA(1,k) - real((LXW/2)-1)			!Load the residuals arrays 
-            LYSW(k) = RESA(2,k) - real((LYW/2)-1)			! into work area 
+            LXSW(k) = RESA(1,k) - real((LXW/2)-1)			!Load the residuals arrays
+            LYSW(k) = RESA(2,k) - real((LYW/2)-1)			! into work area
             jxs = LXSW(k)
             jxe = jxs + LXW - 1
             jys = LYSW(k)
             jye = jys + LYW - 1
             if ( IMTYPE.eq.'SHORT' ) then
-               call copvsr ( %val(IPIM), NX, NY, data, LXW, LYW, jxs, 
-     +                       jxe, jys, jye, BS, BZ, INVAL, RINVAL, nin, 
+               call copvsr ( %val(IPIM), NX, NY, data, LXW, LYW, jxs,
+     +                       jxe, jys, jye, BS, BZ, INVAL, RINVAL, nin,
      +                       0 )
             else
-               call copvrr ( %val(IPIM), NX, NY, data, LXW, LYW, jxs, 
+               call copvrr ( %val(IPIM), NX, NY, data, LXW, LYW, jxs,
      +                       jxe, jys, jye, BS, BZ, RINVAL, nin, 0 )
             endif
-            call pr_allsub ( data, LXW, LYW, LXSW(k), LYSW(k), 0, 
+            call pr_allsub ( data, LXW, LYW, LXSW(k), LYSW(k), 0,
      +                       1, 1, RESA, COMA, k )
             call pr_loadbl ( data, LXW, LYW, COMA, jxs, jys, k )
             lyas = 1 + (k-1)*LYW
-            call coprr ( data, LXW, LYW, 1, LXW, 1, LYW, 
+            call coprr ( data, LXW, LYW, 1, LXW, 1, LYW,
      +                   store, LXW, LYWN, 1, lyas )
 
          endif
@@ -7119,7 +7119,7 @@ Cbegin
 
 
       if ( .not.WSTARCALC ) then					!Check star fits done for wing
-         call printo ( 
+         call printo (
      +        'ERROR: You must do the star fits for the wing first' )
          return
       endif
@@ -7130,7 +7130,7 @@ Cbegin
       ymax = max ( (yca-1.0), (real(LYW)-yca) )
       drmax = sqrt(xmax*xmax+ymax*ymax)
 
-      call azeror ( APNUM, NWMAX )					!Zero radial profile values and 
+      call azeror ( APNUM, NWMAX )					!Zero radial profile values and
       call azeror ( X, NWMAX )						! residuals and total height
       call azeror ( Y, NWMAX )
 
@@ -7152,7 +7152,7 @@ Cbegin
                   dx = real(j) - real(LXW/2)
                   dy = real(k) - real(LYW/2)
                   dr = sqrt(dx*dx+dy*dy)
-                  if ( dr.le.drmax .and. 
+                  if ( dr.le.drmax .and.
      +                 data(j,k).ne.RINVAL ) then
                      kd = 1 + int(198.0*(dr/drmax))
                      X(kd) = X(kd) + dr
@@ -7164,11 +7164,11 @@ Cbegin
                   endif
                enddo
             enddo
- 
+
          endif
       enddo
 
-      do k = 1, NWMAX-1							!Bunch up if any points in the 
+      do k = 1, NWMAX-1							!Bunch up if any points in the
          if ( nint(APNUM(k)).eq.0 ) then				! radial profile have no data
             next = k
             found = .false.
@@ -7190,7 +7190,7 @@ Cbegin
          if ( nint(APNUM(k)).ne.0 ) NTOT = NTOT + 1
       enddo
 
-      call adivr ( Y, APNUM, Y, NTOT )					!Divide by number of points added 
+      call adivr ( Y, APNUM, Y, NTOT )					!Divide by number of points added
       									! in each radial point to get mean value
       call adivr ( X, APNUM, X, NTOT )
 
@@ -7208,7 +7208,7 @@ C        a j penny           stsci           1988-0318
       implicit none
       include 'profw.inc'
 
-      integer kopt		!i: Fit option number (1=fit data;2=fit 
+      integer kopt		!i: Fit option number (1=fit data;2=fit
 				!                  points;3=get points)
 C--
       real xs, xe, ys, ye, ymin, ymax, xf(NWMAX), yf(NWMAX)
@@ -7219,13 +7219,13 @@ Cbegin
 
 
       if ( .not.WSTARCALC ) then					!Check star fits done for wing
-         call printo ( 
+         call printo (
      +        'ERROR: You must do the star fits for the wing first' )
          return
       endif
 
       call alimr ( X, NTOT, XMIN, XMAX ) 				!Get ranges of data
-      call alimr ( Y, NTOT, ymin, ymax ) 
+      call alimr ( Y, NTOT, ymin, ymax )
       xs = XMIN - 0.05*(XMAX-XMIN)
       xe = XMAX + 0.05*(XMAX-XMIN)
       ys = ymin - 0.05*(ymax-ymin)
@@ -7255,14 +7255,14 @@ Cbegin
          call amovr ( X, xf, NTOT )
          call amovr ( Y, yf, NTOT )
          call pr_wfitl ( xf, yf, NTOT )
-         call pr_wpqline 
+         call pr_wpqline
          FITTED = .true.
       elseif ( kopt.eq.2 ) then						!Fit points
          if ( POINTSPUT ) then
             call amovr ( XC, xf, NUMC )
             call amovr ( YC, yf, NUMC )
             call pr_wfitl ( xf, yf, NUMC )
-            call pr_wpqline 
+            call pr_wpqline
             FITTED = .true.
          else
             call printo ( 'ERROR: No points put yet' )
@@ -7282,7 +7282,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PR_WFITL -- Fit wing line data 
+C PR_WFITL -- Fit wing line data
 C
 C  a j penny                  stsci            1988-03-19
 
@@ -7319,7 +7319,7 @@ Cbegin
 
       call printo ( ' ' )
       call printo ( 'Input starting parameter values for the fits' )
-      call printo ( 
+      call printo (
      +     '   (The defaults are previous estimates by the program.)' )
       call get1r ( 'BASE',   BASE, BASE, -1.0e10, 1.0e10 )
       call get1r ( 'HEIGHT',   QH,   QH, -1.0e10, 1.0e10 )
@@ -7336,15 +7336,15 @@ Cbegin
       do k = 1, 2							!Two fit loops
 
          if ( JFF(1).eq.1 ) jfit(1) = 1					!Relase base
-         call gauss1r ( ya, xa, num, .true., 1, num, BASE, QH, QR, 
+         call gauss1r ( ya, xa, num, .true., 1, num, BASE, QH, QR,
      +             QP, xo, jfit, WHTLIM, WFTLIM, 5, WDAMP, iter, 1 )
 
          if ( JFF(2).eq.1  ) jfit(2) = 1				! Relase ht
-         call gauss1r ( ya, xa, num, .true., 1, num, BASE, QH, QR, 
+         call gauss1r ( ya, xa, num, .true., 1, num, BASE, QH, QR,
      +             QP, xo, jfit, WHTLIM, WFTLIM, 5, WDAMP, iter, 1 )
 
          if ( JFF(3).eq.1 ) jfit(3) = 1					! Release radius
-         call gauss1r ( ya, xa, num, .true., 1, num, BASE, QH, QR, 
+         call gauss1r ( ya, xa, num, .true., 1, num, BASE, QH, QR,
      +             QP, xo, jfit, WHTLIM, WFTLIM, 20, WDAMP, iter, 1 )
 
          if ( k.eq.2 .and. JFF(4).eq.1 ) jfit(4) = 1			! Release power, unless
@@ -7391,9 +7391,9 @@ C--
 Cbegin
 
 
-      call printo ( 
+      call printo (
      +         'Enter cursor position by pressing any KEY ON KEYBOARD' )
-      call printo ( 
+      call printo (
      +         'End by inputting a position to left of axis or zero' )
       call printo ( ' ' )
 
@@ -7485,7 +7485,7 @@ Cbegin
       pout(1) = trunc(BASE,4)
       write ( text, '(''   Base = '',f10.4)' ) pout(1)
       call printo ( text )
-      
+
       call printo ( '  Parameters fixed in fitting?' )
       do k = 1, 4
          ach = 'Yes'
@@ -7506,7 +7506,7 @@ C T_PROFILE      Determine profiles of stars
 C PR_SET         Set up defaults
 C PR_SETC        Clear arrays; Set up box size
 C PR_SETD        Set up display defaults
-C PR_MGSTARS     Manually get stars 
+C PR_MGSTARS     Manually get stars
 C PR_FITSETUP    Sets up for fit
 C PR_AUTO        Do the automatic estimating
 C PR_MAN         Do the interactive profile estimating
@@ -7533,7 +7533,7 @@ C PR_OSTORE      Store results
 C PR_CHMAP       Change map size. Remap map.
 C PR_CHBOX       Change box size. remap residuals, change posns of
 C PR_UPMAP       Adjust map for new size or magnification
-C PR_GCOMP       Get new companion lists 
+C PR_GCOMP       Get new companion lists
 C PR_GPROF       Get new profile file
 C PR_FIT         Do the fits
 C PR_DISPFIT     Display the areas and the fits
@@ -7541,8 +7541,8 @@ C PR_CHFITPAR    Change the fit calculation control parameters
 C PR_DORES       Store the result of a fit
 C PR_FITLOAD     Load data for fitting
 C PR_SOLVE       Fit a profile to a star with poss companions, bad areas
-C PR_COMPSET     Set CCA/JFITA from COM for removing faint/distant stars 
-C PR_FIFILL      Load profile and star (x,y,height) for PR_FITLOR 
+C PR_COMPSET     Set CCA/JFITA from COM for removing faint/distant stars
+C PR_FIFILL      Load profile and star (x,y,height) for PR_FITLOR
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -7590,8 +7590,8 @@ CX      endif
 
       call pr_listfit							!Type out present fit
 
-      if ( .not.ST_FAILED ) call get_job ( 'USE', 'auto:inter', 	!Get if use manual or auto approach 
-     +                                      kauto, 2, ' ', 0 )	
+      if ( .not.ST_FAILED ) call get_job ( 'USE', 'auto:inter', 	!Get if use manual or auto approach
+     +                                      kauto, 2, ' ', 0 )
       if ( ST_FAILED ) return
       if ( kauto.eq.1 ) then
          call pr_auto							!Do the automatic work
@@ -7627,7 +7627,7 @@ Cbegin
 
       call ds_sdef ( 3, 21 )						!Set display default
       PRDSOK = .false.
-    
+
       DAMP = 0.5							!Set fit calculation control parameters
       FTLIM = 0.001
       HTLIM = 0.001
@@ -7734,7 +7734,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PR_MGSTARS -- Manually get stars 
+C PR_MGSTARS -- Manually get stars
 C
 C   a j penny                 dao           1988-04-25
 
@@ -7774,9 +7774,9 @@ Cbegin
 
       call azeror ( RES, TBX*TBY )					!Clear results array
 
-      ka = 0								!Load input star data columns 
+      ka = 0								!Load input star data columns
       kb = 0								! into their proper columns, but
-      do j = 1, tbxva - 5						! if havent found 'X' or 'Y', 
+      do j = 1, tbxva - 5						! if havent found 'X' or 'Y',
          call gthead ( 'INSTARS', j, ahead, istat )			! assume they are in 1st and 2nd cols.
          if ( istat.eq.0 ) then
             kal = lens(ahead)
@@ -7905,14 +7905,14 @@ Cbegin
       call printo ( '    CALCULATE EMPIRICAL PROFILE' )
       call printo ( ' ' )
 
-      call pr_mrescalc 							!Calculate residuals and put them in residuals map 
+      call pr_mrescalc 							!Calculate residuals and put them in residuals map
 
       call pr_infill ( %val(IPTR), %val(IPTH), LXM, LYM, DONERES )	!Fill in any gaps in residual map
 
       if ( LXM.gt.150 .or. LYM.gt.150 ) then
          call pargi ( LXM )
          call pargi ( LYM )
-         call printd ( 
+         call printd (
      +           'ERROR: Map sides are %d x %d - must be < 150x150')
          return
       endif
@@ -7976,20 +7976,20 @@ Cbegin
          if ( ktopt.eq.'fit_all' ) call pr_fit ( 2, 1 )			!Fit all accepted stars
 
          if ( ktopt.eq.'fit_one' ) call pr_fit ( 3, 1 )			!Fit one star
-	
+
          if ( ktopt.eq.'disp_fit_all' ) call pr_dispfit ( 0, 1, LX, LY,	!Display all fits/areas
      +                                 LXS, LYS, LXD, LYD, LXSD, LYSD )
 
          if ( ktopt.eq.'disp_fit_one' ) call pr_dispfit ( 1, 1, LX, LY,	!Display one fit/area
      +                                 LXS, LYS, LXD, LYD, LXSD, LYSD )
 
-         if ( ktopt.eq.'mean' ) call pr_mean ( 1 )			!Ring rejects on screenChoose best stars and calculate mean values 
+         if ( ktopt.eq.'mean' ) call pr_mean ( 1 )			!Ring rejects on screenChoose best stars and calculate mean values
 
          if ( ktopt.eq.'reject' ) call pr_starrk ( 2, change )		!Get change of stars to be used
 
          if ( ktopt.eq.'flip' ) call pr_starrk ( 1, change )		!Get change of stars to be used
 
-         if ( ktopt.eq.'res_calc' ) call pr_mrescalc 			!Calculate residuals and put them in residuals map 
+         if ( ktopt.eq.'res_calc' ) call pr_mrescalc 			!Calculate residuals and put them in residuals map
 
          if ( ktopt.eq.'res_fill' ) call pr_infill ( %val(IPTR),	!Fill any empty pixels in residuals array
      +                             %val(IPTH), LXM, LYM, DONERES )
@@ -7998,12 +7998,12 @@ Cbegin
      +                             %val(IPTH), rworka, LXM, LYM, 2 )
 
          if ( ktopt.eq.'res_interact' ) call pr_resinter ( LXM, LYM, 	!Look at and change residuals
-     +                                     rworka, rworkb, %val(IPTR), 
-     +                                      %val(IPTH), %val(IPOCC), 
+     +                                     rworka, rworkb, %val(IPTR),
+     +                                      %val(IPTH), %val(IPOCC),
      +                                      %val(IPOCD) )
 
          if ( ktopt.eq.'map_disp' ) call pr_disresb ( %val(IPMAP), 	!Display the profile map
-     +                                   rworka, rworkb, MX, MY, 1 )         
+     +                                   rworka, rworkb, MX, MY, 1 )
 
          if ( ktopt.eq.'map_size' ) call pr_chmap			!Change Map size
 
@@ -8038,7 +8038,7 @@ Cbegin
 
          if ( ktopt.eq.'info_fits' ) call pr_listfit 			!Type out the fits
 
-         if ( ktopt.eq.'info_fitting' ) call pr_chfitpr			!Get if to print out intermediate 
+         if ( ktopt.eq.'info_fitting' ) call pr_chfitpr			!Get if to print out intermediate
                         						! fitting step results
 
          if ( ktopt.eq.'info_star' ) call pr_listcomp 			!Type out the details of a star and its comps, bad areas
@@ -8059,7 +8059,7 @@ Cbegin
 
          if ( ktopt.eq.'new_cm_pr' ) then 				!Get input companion list and input profile
                                       call pr_gcomp
-                                      call pr_gprof 
+                                      call pr_gprof
                                    endif
 
          if ( ktopt.eq.'new_image' ) call pr_newim			!Get new image
@@ -8121,7 +8121,7 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-     
+
 C DISPLAY
 
       data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
@@ -8176,7 +8176,7 @@ C  FITS
       data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'fit_all',  'Fit all the accepted stars',
      + 'The program goes through the star list fitting the stars.',
-     + ' ', 
+     + ' ',
      + 'The fits are under the control of many aspects, which have all',
      + 'been defaulted, unless you have changed them. Stars which have',
      + 'been -rejected- are not fitted. Before the fitting you are ',
@@ -8188,13 +8188,13 @@ C  FITS
      + 'the fitted stars have been subtraced. The contrast in each ',
      + 'area is maximised to show detail, so will be different for the',
      + '-cleaned- and -uncleaned- area for the same star, and between',
-     + 'stars. The position of fitted and companion stars is marked', 
+     + 'stars. The position of fitted and companion stars is marked',
      + 'and also -bad- areas you have determined. '/
 
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'fit_changed', 'Fit only stars with changed circumstances',
      + 'It goes through the star list fitting the stars. It only does',
-     + 'those with new circumstances (a new companion,bad area,etc.)', 
+     + 'those with new circumstances (a new companion,bad area,etc.)',
      + 'The fits are under the control of many aspects, which have all',
      + 'been defaulted, unless you have changed them. Stars which have',
      + 'been -rejected- are not fitted. Before the fitting you are ',
@@ -8203,7 +8203,7 @@ C  FITS
       data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'fit_one',  'Fit a certain star',
      + 'Fits a profile to one of the stars in star list. You input the',
-     + 'number of the star in the list you want to do.', 
+     + 'number of the star in the list you want to do.',
      + 'The fit is under the control of many aspects, which have all',
      + 'been defaulted, unless you have changed them. A star which has',
      + 'been -rejected- is even so fitted. Before the fitting you are ',
@@ -8224,7 +8224,7 @@ C  FITS
      + 'calculations can be altered if the fits are not proceeding',
      + 'as desired. The parameters asked for are: the damping factor -',
      + 'which controls the sensitivity of the fit; the accuracy of the',
-     + 'end of the fit, when it should stop, for the height and the ', 
+     + 'end of the fit, when it should stop, for the height and the ',
      + 'profile. These are askedfor the main and wing profile fit.'/
 
       data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
@@ -8247,11 +8247,11 @@ C  FITS
 
       data opt_text(46),opt_head(46),(opt_help(j,46),j=1,6) /
      + 'flip',  'Rotate profile ellipse of stars by 180 degrees',
-     + 'Sometimes the fit will produce an angle more than +/- 90 ', 
+     + 'Sometimes the fit will produce an angle more than +/- 90 ',
      + 'degrees away from the X axis. To make the averaging of the',
-     + 'angles to work out, these should be corrected by rotating by', 
+     + 'angles to work out, these should be corrected by rotating by',
      + '+/- 180 degrees (which does not change the profile w.r.t. the',
-     + 'image) until the angle lies within that +/-90 degree range. ', 
+     + 'image) until the angle lies within that +/-90 degree range. ',
      + ' '/
 
 C RESIDUALS
@@ -8262,7 +8262,7 @@ C RESIDUALS
      + ' ' ,
      + 'CHANGES: Fill in -empty- pixels by interpolating from neigh-',
      + '         bours; smooth; smooth areas; zero areas; zero.',
-     + 'DISPLAY: Pan/zoom the display; look at values; clear.', 
+     + 'DISPLAY: Pan/zoom the display; look at values; clear.',
      + 'RESTORE: Reload calculated values '/
 
       data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
@@ -8270,13 +8270,13 @@ C RESIDUALS
      + 'The mean profile is fixed and fitted to all accepted stars. ',
      + 'The residuals from these fits are then scaled and averaged',
      + 'into a -residual- image. (The pixels may be sub-divided',
-     + 'versions of the image pixels if the profile is sharp. In this', 
+     + 'versions of the image pixels if the profile is sharp. In this',
      + 'case each residual from a star is put in its right sub-pixel)',
      + 'This residual image IS USED IN making the output -MAP- image. '/
 
       data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'res_disp',  'Display the mean fit residuals array',
-     + 'After using the -RESCALC- option to get the residuals image,', 
+     + 'After using the -RESCALC- option to get the residuals image,',
      + 'this displays it, with, to its right side a picture of whether',
      + 'pixels actually have a residuals value (white if they have). ',
      + 'A pixel may be empty if they are subdivided, as there',
@@ -8289,7 +8289,7 @@ C RESIDUALS
      + 'pixels may be empty, if they are subdivided, as there',
      + 'may not be a star with the right centre offset from the image',
      + 'pixel centres. Use this option or -RESINTER- to cure this',
-     + 'by interpolating between neighbouring pixels. ', 
+     + 'by interpolating between neighbouring pixels. ',
      + 'Using -RESINTER- lets you see the amount of underfilling.' /
 
 C  MAP
@@ -8299,17 +8299,17 @@ C  MAP
      + 'Look in detail at the Profile Map, and change if needed.',
      + ' ' ,
      + 'CHANGES: smooth; smooth areas; zero areas; zero.',
-     + 'DISPLAY: Pan/zoom the display; look at values; clear.', 
+     + 'DISPLAY: Pan/zoom the display; look at values; clear.',
      + 'RESTORE: Reload calculated values ',
      + ' ' /
 
       data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'map_add',  'Add the Residuals array onto the Profile Map',
      + 'This is means whereby the residuals array, calculated by',
-     + '-RESCALC- after doing fits is transferred to the Profile Map', 
-     + 'ready for storing in the output profile image.', 
+     + '-RESCALC- after doing fits is transferred to the Profile Map',
+     + 'ready for storing in the output profile image.',
      + 'It adds the residuals array to the present values in the ',
-     + 'Profile Map. The Map is used in the fits, so a subsequent add', 
+     + 'Profile Map. The Map is used in the fits, so a subsequent add',
      + 'will add in the new residuals correctly.  '/
 
       data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
@@ -8317,50 +8317,50 @@ C  MAP
      + 'The profile map is displayed at the centre of the display',
      + 'window. It may have -more- pixels than the area of the image,',
      + 'if the pixels have been sub-divided because of the narrowness',
-     + 'of the profile. ', 
+     + 'of the profile. ',
      + ' ', ' '/
 
       data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'map_scale',  'Change Profile Map scale (mult/div its values)',
-     + 'In use, the Profile Map has its pixel values multiplied by a ', 
+     + 'In use, the Profile Map has its pixel values multiplied by a ',
      + 'scale factor. This factor is defaulted at the beginning to 1.',
      + 'This option can change this scale factor to anything desired.',
-     + 'Its purpose is somewhat obscure, but may be useful at odd ', 
+     + 'Its purpose is somewhat obscure, but may be useful at odd ',
      + 'times. The author would be grateful if you would let him know',
      + 'if you have found a use for it. '/
 
       data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'map_size',  'Change Profile Map size',
-     + 'The size of the Profile Map may be changed. If it becomes ', 
+     + 'The size of the Profile Map may be changed. If it becomes ',
      + 'smaller than it was, the outside bits are lost. If it becomes',
      + 'larger, then the new bits at the edges are filled with zeroes.',
      + ' ', ' ', ' '/
 
       data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
      + 'map_use',  'Change whether to apply the Profile Map or not',
-     + 'The default state is that the Profile Map is used in a fit. ', 
+     + 'The default state is that the Profile Map is used in a fit. ',
      + 'This may be used to switch it -off-, so that it is not used',
-     + 'in the fitting or making of the residuals.  ', 
-     + ' ', 
-     + 'If used again, it switches it back -on- again, and so on.',  
+     + 'in the fitting or making of the residuals.  ',
+     + ' ',
+     + 'If used again, it switches it back -on- again, and so on.',
      + ' ' /
 
       data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'map_zero',  'Zero the Profile Map',
-     + 'Replace all the contents of the Profile Map with zeroes.', 
+     + 'Replace all the contents of the Profile Map with zeroes.',
      + 'This may be used when an unwanted residuals have been added, ',
      + 'or when the Profile Map has been modified wrongly, and it is ',
-     + 'desired to start over again. ', 
+     + 'desired to start over again. ',
      + ' ', ' '/
 
 C  WING
 
       data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'wing',  'Fit a broad Gaussian wing - zero broad wing start',
-     + 'After the profile with its empirical map has been subtracted', 
+     + 'After the profile with its empirical map has been subtracted',
      + 'from a star, there is sometimes a very wide wing left, which',
      + 'is too wide to fit with a normal boxsize. After doing a normal',
-     + 'fit with a normal boxsize, this option then uses a box size', 
+     + 'fit with a normal boxsize, this option then uses a box size',
      + 'twice the normal size, takes the residuals, and makes a mean',
      + 'radial profile. This is then fit with a modified Gaussian.'/
 
@@ -8368,36 +8368,36 @@ C  ACTIONS
 
       data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) /
      + 'radial_plot', 'Put a radial plot of profile and fit into file',
-     + 'Perform fit to the accepted stars with mean fit, if not', 
-     + 'already done so. Then calculate the mean radial profile of', 
-     + 'the mean profile, and of the data. Calculate the difference', 
-     + 'between the two. Store these plots out to a file as a table.', 
-     + 'with the columns (distance:fit:data:residuals). This table', 
+     + 'Perform fit to the accepted stars with mean fit, if not',
+     + 'already done so. Then calculate the mean radial profile of',
+     + 'the mean profile, and of the data. Calculate the difference',
+     + 'between the two. Store these plots out to a file as a table.',
+     + 'with the columns (distance:fit:data:residuals). This table',
      + 'can then be plotted out with the program TBPLOT.'/
 
       data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) /
      + 'prof_change',  'Change the mean profile parameters',
-     + 'The profile has nine analytical parameters. For the mean', 
+     + 'The profile has nine analytical parameters. For the mean',
      + 'profile, which is used at a number of points in this program,',
-     + 'these can be set with this option. The -VALUE- parameter is ', 
+     + 'these can be set with this option. The -VALUE- parameter is ',
      + 'used. You are told nine times which of the paramters to change',
-     + 'and offered the present value as a default. Afterwards, the ', 
+     + 'and offered the present value as a default. Afterwards, the ',
      + 'new profile is used to suggest a new fitting box size.'/
 
       data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) /
      + 'fit_rough',  'Make rough estimate of posns, heights, radii',
      + 'This calculates the mean profile, using a fast, but rough ',
      + 'method. It takes the present profile radius (start default ',
-     + 'radius = 2.0) and fits a Gaussian to the active stars. The  ', 
-     + 'fitted radii are then used to make a crude mean profile. ', 
-     + 'It types the fit details, so you can look for anomalies,', 
+     + 'radius = 2.0) and fits a Gaussian to the active stars. The  ',
+     + 'fitted radii are then used to make a crude mean profile. ',
+     + 'It types the fit details, so you can look for anomalies,',
      + 'and it changes the star positions to their fitted positions.'/
 
       data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'fit_trial',  'Calculate the mean profile from one star',
-     + 'The mean profile is calculated by doing a proper fit to one', 
+     + 'The mean profile is calculated by doing a proper fit to one',
      + 'star and putting the fit parameters found into the mean ',
-     + 'profile. ', 
+     + 'profile. ',
      + 'The program looks for the first not -rejected- star in the ',
      + 'list, and suggests it. You choose any one, even a -rejected-',
      + 'one. It fits, notes, and types out the fit. '/
@@ -8406,9 +8406,9 @@ C  ACTIONS
      + 'volume',  'Calculate the profile volume',
      + 'Takes the mean profile, asks you how far out from the centre',
      + 'to go, and integrates the -volume- under the profile of a star',
-     + 'of unit height. This is in units of (square pixels)*height.', 
+     + 'of unit height. This is in units of (square pixels)*height.',
      + 'This is typed out, remembered and stored with the profile when',
-     + 'it is stored. It is used in the transformation from height to', 
+     + 'it is stored. It is used in the transformation from height to',
      + 'magnitude for stars of different profiles.'/
 
 C  SETUPS
@@ -8416,7 +8416,7 @@ C  SETUPS
       data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) /
      + 'angle',  'Change Fix/Vary angle and/or angle',
      + 'The angle profile parameter (angle in degrees between X-axis',
-     + 'and the profile major axis) can be allowed to vary during', 
+     + 'and the profile major axis) can be allowed to vary during',
      + 'fitting for stars, or it can be fixed at the starting value. ',
      + ' ',
      + 'Also the angle of the mean profile can be can be set to a ',
@@ -8427,7 +8427,7 @@ C  SETUPS
      + 'Analysis of stars is done in a rectangular box round the stars',
      + 'This tells you the old size, calculates what a good size would',
      + 'be from the current mean profile, and asks for a new XY size.',
-     + 'It also gives the chance to change the size of the empirical', 
+     + 'It also gives the chance to change the size of the empirical',
      + 'map of the profile. Usually, the two boxes should be the same ',
      + 'size, but there is no obligation for them to be so.'/
 
@@ -8435,8 +8435,8 @@ C  SETUPS
      + 'comp_zero',  'Delete all comp/faint comp/bad area list entries',
      + 'Each star can have companions, faint companions, and bad areas',
      + 'which are used in fitting. These are loaded from the ',
-     + '-new_cm_pr- option, or via the -interact_fit- option.', 
-     + ' ', 
+     + '-new_cm_pr- option, or via the -interact_fit- option.',
+     + ' ',
      + 'This deletes any ones which are presently noted. ', ' '/
 
       data opt_text(34),opt_head(34),(opt_help(j,34),j=1,6) /
@@ -8445,23 +8445,23 @@ C  SETUPS
      + 'it can be allowed to move. This lets you fix the positions of ',
      + 'some of the stars. (The companions to the fit can still move.)',
      + 'It also lets you change the positions of stars. (The positions',
-     + 'of the companions are unchanged so they will move relative ', 
+     + 'of the companions are unchanged so they will move relative ',
      + 'to the main stars. '/
 
       data opt_text(35),opt_head(35),(opt_help(j,35),j=1,6) /
      + 'info_fits',  'List the present fits',
      + 'Types out:- ',
-     + '            the parameters of the fit stars', 
-     + '            the mean profile', 
+     + '            the parameters of the fit stars',
+     + '            the mean profile',
      + '            whether the profile empirical map is used',
-     + '            the -seeing- (Full Width at Half Maximum)', 
+     + '            the -seeing- (Full Width at Half Maximum)',
      + '            the fitting box size and suggested size' /
 
       data opt_text(36),opt_head(36),(opt_help(j,36),j=1,6) /
      + 'info_star',  'List the fit, comps, bads of a star',
      + 'It asks the number of the desired star. You put it in.',
-     + 'It types out fit details, details of close and of faint  ', 
-     + 'companions, and of the bad areas. ', 
+     + 'It types out fit details, details of close and of faint  ',
+     + 'companions, and of the bad areas. ',
      + ' ', ' ', ' '/
 
       data opt_text(37),opt_head(37),(opt_help(j,37),j=1,6) /
@@ -8473,11 +8473,11 @@ C  SETUPS
 
       data opt_text(38),opt_head(38),(opt_help(j,38),j=1,6) /
      + 'info_fitting',  'Type intermediate step results in the fitting',
-     + 'This toggles the switch for the option of typing out the', 
+     + 'This toggles the switch for the option of typing out the',
      + 'intermediate steps in a fit calculation. What gets typed out,',
-     + 'if the option is -on-, is for each star, at each step in the', 
+     + 'if the option is -on-, is for each star, at each step in the',
      + 'iteration, the star and iteration number, height, x, y ',
-     + '(in box); for 1st star, the base level, X slope, Y slope. ', 
+     + '(in box); for 1st star, the base level, X slope, Y slope. ',
      + 'The full profile at each step is typed (3 wing params first).' /
 
       data opt_text(39),opt_head(39),(opt_help(j,39),j=1,6) /
@@ -8493,13 +8493,13 @@ C  SETUPS
      + 'show_reject', 'Put red border for rejected stars on display',
      + 'This enables you to see which of the displayed stars have been',
      + 'rejected (either by the -mean- option, or by you. It paints',
-     + 'up a red border round the displayed box area in the ', 
+     + 'up a red border round the displayed box area in the ',
      + 'image display for the rejected stars.',
-     + ' ', ' '/ 
+     + ' ', ' '/
 
 CX      data opt_text(47),opt_head(47),(opt_help(j,47),j=1,6) /
 CX     + 'parallel',  'Switch between parallel processors/not choice',
-CX     + ' ', 
+CX     + ' ',
 CX     + 'This option is not available. The software exists, but no',
 CX     + 'as there is no generally available parallel processor ',
 CX     + 'system in use, the particular implementation that would',
@@ -8514,13 +8514,13 @@ C  FILES
      + 'The program can output full details of the results of its',
      + 'These can be input, via two calls:- ',
      + 'INCOMPS inputs the list of companions, faint companions and',
-     + 'bad areas - as fitted previously. INPROF inputs a profile,', 
+     + 'bad areas - as fitted previously. INPROF inputs a profile,',
      + 'via an image containing the profile (parameters are headers,',
      + 'profile map is stored as the image values). '/
 
       data opt_text(42),opt_head(42),(opt_help(j,42),j=1,6) /
      + 'new_image',  'Input new image to replace the present one ',
-     + 'Replace present image by new one. All other details will be ', 
+     + 'Replace present image by new one. All other details will be ',
      + 'unchanged. You have the option to make a rough calculation',
      + 'of the star heights by looking at the 3x3 pixels at the',
      + 'positions, taking the highest, subtractinga rough sky from',
@@ -8531,7 +8531,7 @@ C  FILES
      + 'new_stars',  'Input list of star posns to replace present ones',
      + 'This is like the original -INSTARS- at the start of the ',
      + 'program. It wipes out ALL the previous stars, companions, ',
-     + 'bad areas, profile, fits. ', 
+     + 'bad areas, profile, fits. ',
      + ' ', ' ', ' '/
 
       data opt_text(44),opt_head(44),(opt_help(j,44),j=1,6) /
@@ -8551,14 +8551,14 @@ C  FILES
       parameter ( def_x=7 )
       parameter ( def_y=1 )
       character*12 def_text(def_x,def_y)
-      data def_text / ' ', 'fit_rough', 'box_size', 'fit_all', 
+      data def_text / ' ', 'fit_rough', 'box_size', 'fit_all',
      +                'disp_fit_all', 'panel', 'interact_fit' /
 
       integer sect_num
       parameter ( sect_num=10 )
       character*10 sect_head(sect_num)
-      data sect_head / 'FILES', 'AREAS', 'POSITIONS', 'FIT', 'PROFILE', 
-     +                 'RESIDUALS', 'MAP', 'WING', 'DISPLAY', 
+      data sect_head / 'FILES', 'AREAS', 'POSITIONS', 'FIT', 'PROFILE',
+     +                 'RESIDUALS', 'MAP', 'WING', 'DISPLAY',
      +                 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'new_image:new_stars:new_cm_pr:store' /
@@ -8582,22 +8582,22 @@ C  FILES
       data (help_text(k),k=1,help_num) /
      + '             ',
      + '             ' /
-      
+
 Cbegin
 
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
 
-  
+
       end
 
 
@@ -8606,7 +8606,7 @@ C PR_IFPARALLEL -- Toggle between use/not use of parallel processors
 C
 C     a j penny                 ral             1990-05-10
 
-      subroutine pr_ifparallel () 
+      subroutine pr_ifparallel ()
 
       implicit none
       include 'profile.inc'
@@ -8657,7 +8657,7 @@ C PR_CHFITPR -- Change printing out of intermediate fit steps
 C
 C     a j penny                 ral             1990-05-10
 
-      subroutine pr_chfitpr () 
+      subroutine pr_chfitpr ()
 
       implicit none
       include 'profile.inc'
@@ -8669,7 +8669,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       call printo ( ' ' )
-      if ( KFITPR.eq.0 ) then	
+      if ( KFITPR.eq.0 ) then
          call printo ( 'Intermediate steps in the fitting were not'//
      +                 ' output' )
          call printo ( 'They are now' )
@@ -8702,8 +8702,8 @@ Cbegin
       if ( ST_FAILED ) return
 
       call pr_setc
-      call pr_mgstars 
-      call pr_fitsetup 
+      call pr_mgstars
+      call pr_fitsetup
 
       nsq = 1 + int(sqrt(2.0*real(TBY)))				!Set display default
       nsqy = 1 + ((TBY-1)/nsq)
@@ -8720,8 +8720,8 @@ Cbegin
       call wrkcan ( 'RESH' )
       call wrkcan ( 'DISC' )
       call wrkcan ( 'DISD' )
-      call pr_opwrk	
-      call pr_listfit	
+      call pr_opwrk
+      call pr_listfit
 
 
       end
@@ -8794,10 +8794,10 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( DOMAP ) then
-         call printo ( 
+         call printo (
      +   'At present the Profile Map is used in the fitting' )
       else
-         call printo ( 
+         call printo (
      +   'At present the Profile Map is not used in the fitting')
       endif
       call get1b ( 'USEMAP', DOMAP, DOMAP )
@@ -8858,7 +8858,7 @@ Cbegin
       endif
       if ( .not.ok ) return
 
-      call pr_rescalc ( %val(IPTR), %val(IPTH), 
+      call pr_rescalc ( %val(IPTR), %val(IPTH),
      +                  %val(IPDATA), %val(IPDATAR) )
       call amovr ( %val(IPTR), %val(IPOCC), LXM*LYM )
       call amovr ( %val(IPTH), %val(IPOCD), LXM*LYM )
@@ -8907,7 +8907,7 @@ Cbegin
       if ( .not.DONERES ) then						!If not calculated mean residuals and mean radial residuals, do so
          call printo ( 'You have not calculated the residuals yet' )
          call printo ( 'Will do so now' )
-         call pr_rescalc ( %val(IPTR), %val(IPTH), 
+         call pr_rescalc ( %val(IPTR), %val(IPTH),
      +                     %val(IPDATA), %val(IPDATAR) )
          call amovr ( %val(IPTR), %val(IPOCC), LXM*LYM )
          call amovr ( %val(IPTH), %val(IPOCD), LXM*LYM )
@@ -8942,13 +8942,13 @@ Cbegin
       if ( kopt.eq.1 ) call get1r ( 'VOLRAD', VOLRAD, VOLRAD, 1.0,1.0e6)
       if ( ST_FAILED ) return
 
-      call cvolume ( SR, DOMAP, %val(IPMAP), MX, MY, 1, 
+      call cvolume ( SR, DOMAP, %val(IPMAP), MX, MY, 1,
      +                  1, MX, MY, MAGNIF, VOLRAD, VOL )
 
       call pargr ( VOL )
-      call printd ( 
+      call printd (
      + '   Volume out to that radius of unit height star = %f' )
-      call printo ( 
+      call printo (
      + '   Where volume is in units of: pixel.pixel.height' )
       call printo ( ' ' )
 
@@ -8982,7 +8982,7 @@ Cbegin
       call pr_dsopen ( istat ) 						!Open display if not already open
       if ( istat.ne.0 ) return
 
-      call pr_dfinter ( RES, COM, LX, LY, LXS, LYS, LXD, LYD, 
+      call pr_dfinter ( RES, COM, LX, LY, LXS, LYS, LXD, LYD,
      +                  LXSD, LYSD )
 
       DONERES = .false.
@@ -9068,7 +9068,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( RES(34,k).lt.0.5 ) then
-         call printo ( 
+         call printo (
      +    '  This star has been -rejected-. Fitting will still occur' )
       endif
 
@@ -9076,7 +9076,7 @@ Cbegin
      +              '    P       PRmaj   PRmin  Theta  ' )
       LXS(k) = RES(1,k) - real((LX/2)-1)
       LYS(k) = RES(2,k) - real((LY/2)-1)
-      call pr_solve ( %val(IPDATA), %val(IPDATAR), FIXANGLE, FIXPROF, 
+      call pr_solve ( %val(IPDATA), %val(IPDATAR), FIXANGLE, FIXPROF,
      +                SR, 10, k, RES, COM, 1, 0 )
       call amovr ( RES(12,k), SR, 6 )
 
@@ -9120,12 +9120,12 @@ Cbegin
 
       call gtwrkr ( 'CALCA',  LX*LY, IPDATA,  istat )			!Get temp work space for data,fit,residuals,,,.
       call gtwrkr ( 'CALCB',  LX*LY, IPDATAR, istat )
- 
+
       call gtwrkr ( 'DISP',  LXWD*LYWD, IPDISP,  istat )		!Open display area
 
       call gtwrkr ( 'MAPMAP', MX*MY, IPMAP, istat )			!Open Profile Map array
       call azeror ( %val(IPMAP), MX*MY )
-      
+
       call gtwrkr ( 'RESMAP', LXM*LYM, IPTR, istat )			!Open Residuals array
       call azeror ( %val(IPTR),  LXM*LYM )
       call gtwrkr ( 'RESH',   LXM*LYM, IPTH, istat )
@@ -9174,10 +9174,10 @@ Cbegin
          kyc(1) = 1
          kyc(2) = NY
          if ( IMTYPE.eq.'SHORT' ) then
-            call ranges ( %val(IPIM), NX, NY, kxc, kyc, INVAL, aam, 
+            call ranges ( %val(IPIM), NX, NY, kxc, kyc, INVAL, aam,
      +                    astd, istat )
          else
-            call ranger ( %val(IPIM), NX, NY, kxc, kyc, RINVAL, aam, 
+            call ranger ( %val(IPIM), NX, NY, kxc, kyc, RINVAL, aam,
      +                    astd, istat )
          endif
          amax = (aam+3.0*astd)*BS + BZ
@@ -9194,7 +9194,7 @@ Cbegin
       call gtwrkr ( 'WINGB', LXW*LYWN, ipwb, istat )
       call gtwrkr ( 'WINGC', LX*LY,  ipwc, istat )
       call gtwrkr ( 'WINGD', LX*LY,  ipwd, istat )
-      call pr_wing ( %val(ipwa), %val(ipwb), %val(ipwc), %val(ipwd), 
+      call pr_wing ( %val(ipwa), %val(ipwb), %val(ipwc), %val(ipwd),
      +               amax, amin )
       call wrkcan ( 'WINGA' )
       call wrkcan ( 'WINGB' )
@@ -9260,9 +9260,9 @@ Cbegin
       call printo ( 'Entry of +ve number will fix that star' )
       call printo ( 'Entry of -ve number will unfix that +ve star' )
       iv = 1
-      more = .true.							!Get posn 
+      more = .true.							!Get posn
       do while ( more )
-         call get1i ( 'NUMBER', iv, iv, -1*TBY, TBY ) 
+         call get1i ( 'NUMBER', iv, iv, -1*TBY, TBY )
          if ( ST_FAILED ) return
          if ( iv.gt.0 .and. iv.le.TBY  ) then
             XYNFIX(iv) = 1
@@ -9325,10 +9325,10 @@ Cbegin
          call gtwrkr ( 'DISD',   LXM*LYM, IPOCD, istat )
       endif
 
-      call azeror ( %val(IPTR), LXM*LYM )		
+      call azeror ( %val(IPTR), LXM*LYM )
       call azeror ( %val(IPTH), LXM*LYM )
       call printo ( 'Had to zero residuals - profile changed' )
-      if ( MAGNIF.ne.magnifo ) call pr_upmap ( magnifo, LXR, LYR ) 
+      if ( MAGNIF.ne.magnifo ) call pr_upmap ( magnifo, LXR, LYR )
 
       call boxeli ( SR(1), SR(2), SR(6), alx, aly )
       lxa = 10.0*alx
@@ -9370,7 +9370,7 @@ Cbegin
       DONEMEAN = .true.
       if ( .not.flag ) return						! Profile actually changed?
 
-      DONERES = .false.							!If mean profile changed, 	
+      DONERES = .false.							!If mean profile changed,
       DONEMAP = .false.							! look at consequnces
       DONEFIX = .false.
       DONESTOR = .false.
@@ -9485,7 +9485,7 @@ Cbegin
          call canpar ( 'OUT' )
       endif
 
-      call printo ( 'File to put stars details into' )			!Get the output list of 
+      call printo ( 'File to put stars details into' )			!Get the output list of
       call optabw ( 'OUTSTARS', ipxyo, TBXV, TBY, .true., istat )	! results of main fits
       if ( ST_FAILED ) return
       if ( istat.eq.0 ) then
@@ -9495,13 +9495,13 @@ Cbegin
          do k = 1, TBX
             call pthead ( 'OUTSTARS', k, HEADER(k), istat )
          enddo
-         call coprr ( RES, TBX, TBY, 1, TBX, 1, TBY, 
+         call coprr ( RES, TBX, TBY, 1, TBX, 1, TBY,
      +                %val(ipxyo), TBXV, TBY, 6, 1 )
          call ident ( %val(ipxyo), TBXV, TBY )
          call canpar ( 'OUTSTARS' )
       endif
 
-      maxout = 0							!Load the output of the possible 
+      maxout = 0							!Load the output of the possible
       do k = 1, MAXTOT							! companion stars + bads
          if ( COM(6,k).gt.0.5 ) maxout = maxout + 1
       enddo
@@ -9604,7 +9604,7 @@ Cbegin
       call printo ( text )
       write (text,'(1h ,'' Suggested X Y sides of box'',2i5)')lxa,lya
       call printo ( text )
-      if ( kopt.eq.1 ) call get2i ( 'SIZE', lxa, lya, .true., 1, 200 ) 
+      if ( kopt.eq.1 ) call get2i ( 'SIZE', lxa, lya, .true., 1, 200 )
       if ( ST_FAILED ) return
 
       if ( LX.ne.lxa .or. LY.ne.lya ) then
@@ -9659,7 +9659,7 @@ Cbegin
       call printo ( text )
       lxrn = lxa
       lyrn = lya
-      if ( kopt.eq.1 ) call get2i ( 'SIZE', lxrn, lyrn, .true.,1,200) 
+      if ( kopt.eq.1 ) call get2i ( 'SIZE', lxrn, lyrn, .true.,1,200)
       if ( ST_FAILED ) return
       if ( LXR.ne.lxrn .or. LYR.ne.lyrn ) then
          mxo = MX
@@ -9675,11 +9675,11 @@ Cbegin
          call wrkcan ( 'MAPMAP' )
          call gtwrkr ( 'MAPMAP', MX*MY, IPMAP, istat )
          call azeror ( %val(ipmap), MX*MY )
-         call pr_copmap ( %val(ipmapt), mxo, myo, MAGNIF, 
+         call pr_copmap ( %val(ipmapt), mxo, myo, MAGNIF,
      +                    %val(IPMAP), MX, MY, MAGNIF )
          call wrkcan ( 'MAPTEMP' )
       endif
-   
+
 
       end
 
@@ -9721,7 +9721,7 @@ Cbegin
       call gtwrkr ( 'MAPMAP', MX*MY, IPMAP, istat )
       call azeror ( %val(IPMAP), MX*MY )
 
-      call pr_copmap ( %val(ipmapt), mxo, myo, magnifo,			!Move old map from temporary 
+      call pr_copmap ( %val(ipmapt), mxo, myo, magnifo,			!Move old map from temporary
      +                 %val(IPMAP),  MX,  MY,  MAGNIF )			! area into new map array
 
 
@@ -9732,7 +9732,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PR_GCOMP -- Get new companion lists 
+C PR_GCOMP -- Get new companion lists
 C
 C     a j penny                 stsci            1988-03-24
 
@@ -9749,7 +9749,7 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      valid = .false.							!Get the position list of 
+      valid = .false.							!Get the position list of
 									! the possible companions and bads
       do while ( .not.valid )
          call optabr ( 'INCOMPS', ipecom, tbxe, tbye, .true., istat )
@@ -9768,8 +9768,8 @@ Cbegin
                call coprr ( %val(ipecom), tbxe, tbye, 6, tbxe, 1, tbye,
      +                      COM, 6, MAXTOT, 1, 1 )
                do k = 1, MAXTOT
-                  if ( (nint(COM(5,k)).gt.TBY) .or. 
-     +                 (nint(COM(5,k)).le.0)           ) then 
+                  if ( (nint(COM(5,k)).gt.TBY) .or.
+     +                 (nint(COM(5,k)).le.0)           ) then
                      COM(6,k) = -1.0*abs(COM(6,k))
                   endif
                enddo
@@ -9859,7 +9859,7 @@ Cbegin
 
       DONEMEAN = .true.
       if ( flag ) DONEVOL = .false.
-   
+
       MX = mxa
       MY = mya
       MZ = mza
@@ -9892,7 +9892,7 @@ Cbegin
          call printo ( 'Residuals zeroed' )
       endif
 
-      call pr_listfit 
+      call pr_listfit
 
 
 
@@ -9953,7 +9953,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( kuser.eq.1 ) then						!Get type of fit
-         call get_job ( 'FITTYPE', topt, kfitm, 2, thelp, nthelp ) 
+         call get_job ( 'FITTYPE', topt, kfitm, 2, thelp, nthelp )
          if ( ST_FAILED ) return
          if ( kfitm.eq.6 ) return
       else
@@ -9979,9 +9979,9 @@ Cbegin
       if ( DOPAR ) call pr_par_sii ( numpar, istat )			!Number of par processors
 
       ksent = 0
-      doneone = .false.							!Solve for each star 
+      doneone = .false.							!Solve for each star
       do k = 1, TBY
-         if ( 
+         if (
      +       ( kopt.eq.3 .and. k.eq.knum ) .or.
      +       ( (RES(34,k).gt.0.5) .and.
      +         ((kopt.eq.2).or.((kopt.eq.1).and.(RES(36,k).ge.2.0))) )
@@ -10027,17 +10027,17 @@ Cbegin
      +                            1, cc, ccf, jxs, jys, iter, nin,
      +                            lxa, lya, MAXCL, MAXFA )
                endif
-               call pr_fitload ( %val(IPDATAR), FIXANGLE, FIXPROF, bsr, 
-     +                           k, RES, COM, kfixm, cc, jfit, numm, 
+               call pr_fitload ( %val(IPDATAR), FIXANGLE, FIXPROF, bsr,
+     +                           k, RES, COM, kfixm, cc, jfit, numm,
      +                           ccf, jfitf, numf, parfix, LX, LY, jxs,
      +                           jys, nin )
-               call pr_parout ( %val(IPDATAR), LX, LY, %val(IPMAP), 
-     +                          FIXANGLE, FIXPROF, k, kfixm, cc, 
-     +                          jfit, numm, ccf, jfitf, numf, parfix, 
+               call pr_parout ( %val(IPDATAR), LX, LY, %val(IPMAP),
+     +                          FIXANGLE, FIXPROF, k, kfixm, cc,
+     +                          jfit, numm, ccf, jfitf, numf, parfix,
      +                          jxs, jys, nin, ITSLIM )
                ksent = ksent + 1
             else
-               call pr_solve ( %val(IPDATA), %val(IPDATAR), 
+               call pr_solve ( %val(IPDATA), %val(IPDATAR),
      +                         FIXANGLE, FIXPROF, bsr, ITSLIM, k, RES,
      +                         COM, 1, kfixm )
             endif
@@ -10063,7 +10063,7 @@ Cbegin
                call pr_parin ( jstar, cc, ccf, jxs, jys, iter, nin, lxa,
      +                         lya )
                call pr_dores ( jstar, RES, TBX, TBYMAX, COM, MAXTOT,
-     +                         1, cc, ccf, jxs, jys, iter, nin, 
+     +                         1, cc, ccf, jxs, jys, iter, nin,
      +                         lxa, lya, MAXCL, MAXFA )
                if ( k.eq.1 .and. ksent.ge.numpar ) call pr_par_fend
             enddo
@@ -10100,7 +10100,7 @@ C  a j penny               stsci              1988-03-19
       integer   klxsd(TBY)      !i: X posns of blh of display areas
       integer   klysd(TBY)      !i: Y posns of blh of display areas
 C--
-      integer knum, kxc(2), kyc(2), jx1, jy1, jx2, jy2, k, nin, ierr, 
+      integer knum, kxc(2), kyc(2), jx1, jy1, jx2, jy2, k, nin, ierr,
      +        kw, i
       real am, std, amax, amin, rv, rva
 Cbegin
@@ -10120,10 +10120,10 @@ Cbegin
          kyc(1) = 1
          kyc(2) = NY
          if ( IMTYPE.eq.'SHORT' ) then
-            call ranges ( %val(IPIM), NX, NY, kxc, kyc, INVAL, am, 
+            call ranges ( %val(IPIM), NX, NY, kxc, kyc, INVAL, am,
      +                    std, i )
          else
-            call ranger ( %val(IPIM), NX, NY, kxc, kyc, RINVAL, am, 
+            call ranger ( %val(IPIM), NX, NY, kxc, kyc, RINVAL, am,
      +                    std, i )
          endif
          amax = (am+3.0*std)*BS + BZ
@@ -10132,7 +10132,7 @@ Cbegin
       endif
 
       do k = 1, TBY							!Top part - areas
-         if ( kopt.eq.0 .or. kopt.eq.2 .or. 
+         if ( kopt.eq.0 .or. kopt.eq.2 .or.
      +        (kopt.eq.1.and.k.eq.knum) ) then
             if ( RES(36,k).eq.3.0 ) then
                RES(36,k) = 2.0
@@ -10144,25 +10144,25 @@ Cbegin
             jx2 = klxsd(k) + klxd - 1
             jy2 = klysd(k) + klyd - 1
             if ( IMTYPE.eq.'SHORT' ) then
-               call copvsr ( %val(IPIM), NX, NY, %val(IPDISP), klxd, 
-     +                       klyd, klxsd(k), jx2, klysd(k), jy2, BS, 
+               call copvsr ( %val(IPIM), NX, NY, %val(IPDISP), klxd,
+     +                       klyd, klxsd(k), jx2, klysd(k), jy2, BS,
      +                       BZ, INVAL, RINVAL, nin, 0 )
             else
-               call copvrr ( %val(IPIM), NX, NY, %val(IPDISP), klxd, 
-     +                       klyd, klxsd(k), jx2, klysd(k), jy2, BS, 
+               call copvrr ( %val(IPIM), NX, NY, %val(IPDISP), klxd,
+     +                       klyd, klxsd(k), jx2, klysd(k), jy2, BS,
      +                       BZ, RINVAL, nin, 0 )
             endif
             jx1 = 1 + real((klxd/2)-1) - real((klx/2)-1)
             jx2 = jx1 + klx - 1
             jy1 = 1 + real((klyd/2)-1) - real((kly/2)-1)
             jy2 = jy1 + kly - 1
-            call pr_disresa ( %val(IPDISP), klxd, klyd, k, jx1, jx2, 
+            call pr_disresa ( %val(IPDISP), klxd, klyd, k, jx1, jx2,
      +                        jy1, jy2, 2, amin, amax, 2 )
          endif
       enddo
 
       if ( kopt.eq.0 .or. kopt.eq.1 ) then				!Bottom part - areas less fits
-         do k = 1, TBY			
+         do k = 1, TBY
             if ( kopt.eq.0 .or. (kopt.eq.1.and.k.eq.knum) ) then
                if ( RES(36,k).eq.3.0 ) then
                   RES(36,k) = 2.0
@@ -10174,11 +10174,11 @@ Cbegin
                jx2 = klxsd(k) + klxd - 1
                jy2 = klysd(k) + klyd - 1
                if ( IMTYPE.eq.'SHORT' ) then
-                  call copvsr ( %val(IPIM), NX, NY, %val(IPDISP), klxd, 
+                  call copvsr ( %val(IPIM), NX, NY, %val(IPDISP), klxd,
      +                          klyd, klxsd(k), jx2, klysd(k), jy2, BS,
      +                          BZ, INVAL, RINVAL, nin, 0 )
                else
-                  call copvrr ( %val(IPIM), NX, NY, %val(IPDISP), klxd, 
+                  call copvrr ( %val(IPIM), NX, NY, %val(IPDISP), klxd,
      +                          klyd, klxsd(k), jx2, klysd(k), jy2, BS,
      +                          BZ, RINVAL, nin, 0 )
                endif
@@ -10186,12 +10186,12 @@ Cbegin
                jx2 = jx1 + klx - 1
                jy1 = 1 + real((klyd/2)-1) - real((kly/2)-1)
                jy2 = jy1 + kly - 1
-               call pr_allsub ( %val(IPDISP), klxd, klyd, klxsd(k), 
-     +                          klysd(k), 1, klxs(k), klys(k), RES, 
+               call pr_allsub ( %val(IPDISP), klxd, klyd, klxsd(k),
+     +                          klysd(k), 1, klxs(k), klys(k), RES,
      +                          COM, k )
-               call pr_loadbl ( %val(IPDISP), klxd, klyd, COM, 
+               call pr_loadbl ( %val(IPDISP), klxd, klyd, COM,
      +                          klxsd(k), klysd(k), k )
-               call pr_disresa ( %val(IPDISP), klxd, klyd, k, jx1, jx2, 
+               call pr_disresa ( %val(IPDISP), klxd, klyd, k, jx1, jx2,
      +                           jy1, jy2, 0, rv, rva, 1 )
             endif
          enddo
@@ -10202,12 +10202,12 @@ Cbegin
 
       if ( DOGRID ) call pr_grid ( klx, kly, klxs, klys, klxd,		!Paint frame for calc areas
      +                             klyd, klxsd, klysd, TBY, kw )
-  
+
       if ( koptb.eq.1 ) then						!Paint markers
                         call pr_paintlit ( kw )
-                        call pr_paintcomp ( klxd, klyd, RES, COM, 
+                        call pr_paintcomp ( klxd, klyd, RES, COM,
      +                                      klxsd, klysd, kw )
-                        call pr_paintbox ( klxd, klyd, COM, klxsd, 
+                        call pr_paintbox ( klxd, klyd, COM, klxsd,
      +                                     klysd, kw )
                         endif
 
@@ -10246,7 +10246,7 @@ Cbegin
       VOL = 22.31404
       VOLRAD = 30.0
 
-C  Load default profile fits, if stars list was not MEASURE or 
+C  Load default profile fits, if stars list was not MEASURE or
 C  PROFILE output
 
       if ( .not.INMEAS .and. .not.INPROF ) then
@@ -10322,7 +10322,7 @@ C  a j penny                          stsci                   1987-05-24
 C--
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       call get1r ( 'DAMP', DAMP, DAMP, 0.0, 100.0 )
@@ -10342,7 +10342,7 @@ C
 C   a.j.penny                   ral                    1991 April
 
       subroutine pr_dores ( kstar, tres, tbx, tbymax, tcom, maxtot,
-     +                      ktype, cc, ccf, jxs, jys, iter, nin, lx, 
+     +                      ktype, cc, ccf, jxs, jys, iter, nin, lx,
      +                      ly, maxcl, maxfa )
 
       implicit none
@@ -10367,7 +10367,7 @@ C   a.j.penny                   ral                    1991 April
       integer   maxfa			!i: Max no of far/faint companions
 C--
       integer k, nlistc, nlistf
-      real    ah, oldx, oldy, bh, armaj, armin, ap, aprmaj, aprmin, 
+      real    ah, oldx, oldy, bh, armaj, armin, ap, aprmaj, aprmin,
      +        angle
       character*72 text
       real pi
@@ -10384,14 +10384,14 @@ Cbegin
          armaj  = trunc(cc(4),2)
          armin  = trunc(cc(5),2)
          ap     = trunc(cc(6),1)
-         aprmaj = trunc(cc(7),3) 
+         aprmaj = trunc(cc(7),3)
          aprmin = trunc(cc(8),3)
          angle  = cc(9)*180.0/pi
          angle  = trunc(angle,4)
          write ( text,
      +           '(1x,i4,f9.1,i4,f10.3,f8.3,f7.3,f8.2,f8.2,f8.2)' )
      +        kstar, ah, iter, armaj, armin, ap, aprmaj, aprmin, angle
-         call printo ( text ) 
+         call printo ( text )
       endif
 
       oldx = tres(1,kstar)						!Note fit. Remove comps gone too small
@@ -10497,13 +10497,13 @@ Cbegin
       qh    = tsr(7)
       qr    = tsr(8)
       qp    = tsr(9)
-      
+
       jxs = tres(1,kstar) - real((lxa/2)-1)				!Get the area into an array
       jxe = jxs + lxa - 1
       jys = tres(2,kstar) - real((lya/2)-1)
       jye = jys + lya - 1
       if ( IMTYPE.eq.'SHORT' ) then
-         call copvsr ( %val(IPIM), NX, NY, datar, lxa, lya, jxs, jxe, 
+         call copvsr ( %val(IPIM), NX, NY, datar, lxa, lya, jxs, jxe,
      +                 jys, jye, BS, BZ, INVAL, RINVAL, nin, 0 )
       else
          call copvrr ( %val(IPIM), NX, NY, datar, lxa, lya, jxs, jxe,
@@ -10527,7 +10527,7 @@ Cbegin
       parfix  = .false.
       if ( kfix.eq.1 ) parfix = .true.
 
-      xp(1)  = tres(1,kstar) - jxs + 1.0				!Set the positions of the main 
+      xp(1)  = tres(1,kstar) - jxs + 1.0				!Set the positions of the main
       yp(1)  = tres(2,kstar) - jys + 1.0				! and close or bright companions
       aht(1) = tres(9,kstar)
       xds(1) = XNFIX(kstar) - jxs + 1.0
@@ -10538,7 +10538,7 @@ Cbegin
       do k = 1, MAXTOT
          if ( nint(tcom(6,k)).eq.1 .and. nint(tcom(5,k)).eq.kstar ) then
             numm = min((MAXCL+1),(numm+1))
-            xp(numm)  = tcom(1,k) - jxs + 1.0 
+            xp(numm)  = tcom(1,k) - jxs + 1.0
             yp(numm)  = tcom(2,k) - jys + 1.0
             aht(numm) = tcom(3,k)
             xds(numm) = 1.0
@@ -10548,12 +10548,12 @@ Cbegin
       enddo
 
       if ( parfix ) then						!Load the fitting input
-         call pr_fifill ( datar, lxa, lya, parfix, .true., kfixed, 
-     +                    prof, xp, yp, aht, xds, yds, xyf, numm, cc, 
+         call pr_fifill ( datar, lxa, lya, parfix, .true., kfixed,
+     +                    prof, xp, yp, aht, xds, yds, xyf, numm, cc,
      +                    jfit, RINVAL )
       else
-         call pr_fifill ( datar, lxa, lya, parfix, tfixangle, tfixp, 
-     +                    prof, xp, yp, aht, xds, yds, xyf, numm, cc, 
+         call pr_fifill ( datar, lxa, lya, parfix, tfixangle, tfixp,
+     +                    prof, xp, yp, aht, xds, yds, xyf, numm, cc,
      +                    jfit, RINVAL )
       endif
 
@@ -10565,8 +10565,8 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_SOLVE -- Fit a profile to a star with poss companions, bad areas
-C     Takes an area, with a star in the middle, and up to 7 other stars 
-C     round it, and solves for the profile. It can also deal with 8 
+C     Takes an area, with a star in the middle, and up to 7 other stars
+C     round it, and solves for the profile. It can also deal with 8
 C     more faint or distant stars.
 C
 C     It needs rough input positions and a rough star radii.
@@ -10577,7 +10577,7 @@ C
 C   a.j.penny                   ral                    1991 April
 
 
-      subroutine pr_solve ( data, dataw, tfixangle, tfixp, tsr, 
+      subroutine pr_solve ( data, dataw, tfixangle, tfixp, tsr,
      +                      titslim, kstar, tres, tcom, ktype, kfix )
 
       implicit none
@@ -10616,14 +10616,14 @@ Cbegin
      +                      RINVAL, %val(IPMAP), MX, MY, MAGNIF, DOMAP)
       else
          call pr_fitlor ( data, LX, LY, cc, jfit, numm, iter, titslim,
-     +                    KFITPR, parfix, tfixangle, tfixp, FTLIM, 
-     +                    HTLIM, DAMP, RINVAL, %val(IPMAP), MX, MY, 
+     +                    KFITPR, parfix, tfixangle, tfixp, FTLIM,
+     +                    HTLIM, DAMP, RINVAL, %val(IPMAP), MX, MY,
      +                    MAGNIF, DOMAP, .false., .false., chisq )
 
       endif
 
       call pr_dores ( kstar, tres, TBX, TBYMAX, tcom, MAXTOT, ktype,	!Store and type result
-     +                cc, ccf, jxs, jys, iter, nin, LX, LY, MAXCL, 
+     +                cc, ccf, jxs, jys, iter, nin, LX, LY, MAXCL,
      +                MAXFA )
 
 
@@ -10631,7 +10631,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C PR_COMPSET -- Set CCA/JFITA from COM for removing faint/distant stars 
+C PR_COMPSET -- Set CCA/JFITA from COM for removing faint/distant stars
 C
 C   a.j.penny                   ral                    85-12-31
 
@@ -10684,7 +10684,7 @@ Cbegin
       do k = 13, 12+numf*3, 3
          jfitf(k) = 1
          jfitf(k+1) = 1
-         if ( ccf(k).lt.-1.0 .or. ccf(k).gt.(alx+2.0) .or. 
+         if ( ccf(k).lt.-1.0 .or. ccf(k).gt.(alx+2.0) .or.
      +        ccf(k+1).lt.-1.0 .or. ccf(k+1).gt.(aly+2.0) ) then
             jfitf(k) = -1
             jfitf(k+1) = -1
@@ -10699,12 +10699,12 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PR_FIFILL -- Load profile and star (x,y,height) for PR_FITLOR
 C  This takes the profile parameters and and star (x,y,height) parameters
-C  and loads them into CC and JFIT for use in the Lorentz 2-D profile 
+C  and loads them into CC and JFIT for use in the Lorentz 2-D profile
 C  fitting subroutines.
 C
 C   A.J.Penny           RAL                  1990-05-09
 
-      subroutine pr_fifill ( data, nx, ny, parfix, tfixangle, tfixp, 
+      subroutine pr_fifill ( data, nx, ny, parfix, tfixangle, tfixp,
      +                       prof, x, y, aht, xds, yds, xyf, nstar,
      +                       cc, jfit, rinval )
 
@@ -10713,7 +10713,7 @@ C   A.J.Penny           RAL                  1990-05-09
       integer	nx			!i: X size of DATA
       integer	ny			!i: Y size of DATA
       real	data(nx,ny)		!i: data
-      logical	parfix			!i: All profile pars fixed (true) or 
+      logical	parfix			!i: All profile pars fixed (true) or
 					!   var
       logical	tfixangle		!i: Profile angle fixed (true) or var
       logical   tfixp(5)        	!i: Profile pars fixed (true) or var
@@ -10724,9 +10724,9 @@ C   A.J.Penny           RAL                  1990-05-09
       real	xds(8)			!i: X coords if fixing star posns
       real	yds(8)			!i: X coords if fixing star posns
       integer   xyf(8)			!i: Flag for fixing star posns
-      integer	nstar			!i/o: No of stars (1 to 8); if 
-					!   outside that a single central 
-					!   star is assumed and NSTAR is 
+      integer	nstar			!i/o: No of stars (1 to 8); if
+					!   outside that a single central
+					!   star is assumed and NSTAR is
 					!   returned as 1
       real	cc(36)			!o: Fit starting parameters:-
 					!   background (1,2,3)
@@ -10740,7 +10740,7 @@ C--
 Cbegin
 
 
-      amin = 1.1e10							!Estimate the background parameters from 
+      amin = 1.1e10							!Estimate the background parameters from
       do k = 1, ny							! the minimum of the array
          do j = 1, nx
            if ( data(j,k).ne.rinval ) amin = min(amin,data(j,k))
@@ -10754,7 +10754,7 @@ Cbegin
       jfit(2) = 1
       jfit(3) = 1
 
-      call amovr ( prof, cc(4), 6 )					!Set the profile parameters to be fixed. 
+      call amovr ( prof, cc(4), 6 )					!Set the profile parameters to be fixed.
       call amovki ( -1, jfit(4), 9 )					! Then see if not fixed.
       if ( .not.parfix ) then						! If variable set at input starting values
          call amovki ( 1, jfit(4), 6 )
@@ -10765,14 +10765,14 @@ Cbegin
          call amovki ( -1, jfit(10), 3 )
       endif
 
-      if ( nstar.lt.1 .or. nstar.gt.8 ) then				!If NSTAR outside range 1 to 8, 
+      if ( nstar.lt.1 .or. nstar.gt.8 ) then				!If NSTAR outside range 1 to 8,
          nstar = 1							! assume a single star at centre
          x(1) = real(nx)/2.0 + 0.5
          y(1) = real(ny)/2.0 + 0.5
       endif
 
 C  Put in star positions and rough heights and flag these to be fitted
-C  Calculate heights from height above base of highest point in 3x3 box 
+C  Calculate heights from height above base of highest point in 3x3 box
 C  round the position, if there is no input height.
 
       do kk = 1, nstar

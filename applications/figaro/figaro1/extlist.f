@@ -13,7 +13,7 @@ C                 are to be taken.
 C
 C     'NROWS'    The number of rows to be added.
 C
-C     'SECTIONS' The array of row numbers. 
+C     'SECTIONS' The array of row numbers.
 C
 C     'SPECTRUM' The name of the resulting data.
 C
@@ -185,4 +185,4 @@ C
          SPECTRM(I)=SUM
       END DO
 
-      END 
+      END

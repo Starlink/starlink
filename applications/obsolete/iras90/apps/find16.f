@@ -8,7 +8,7 @@
 *     IRAS boresight survey data is held in plates, each plate holding
 *     all data for one region of the sky. These plates are stored either
 *     on UKP tapes for Pass 2 or on Exobyte for Pass 3.
-*     
+*
 *     The main function of the program is to calculate from the
 *     position of each source the plate number required. It prepares a
 *     list in common of each plate required in subsequent processing,
@@ -16,7 +16,7 @@
 *     obtained from it. For each source it also determines whether the
 *     area of source required may fall partly outside the region
 *     covered by the plate, and gives details if this is so.
-*     
+*
 *     Part of the plate details consists of the identification number of
 *     the tape or exobyte containing the plate and the position of the
 *     plate on the tape/exobyte. The user has the option of specifying
@@ -32,11 +32,11 @@
 *     :   PNEXTP, POFFIL, PRETMA, MENU, RETMAI, STATUS )
 
 *  Description:
-*  
+*
 *     IRAS boresight survey data is held in plates, each plate holding
 *     all data for one region of the sky. These plates are stored either
 *     on UKP tapes for Pass 2 or on Exobyte for Pass 3.
-*     
+*
 *     The main function of the program is to calculate from the
 *     position of each source the plate number required. It prepares a
 *     list in common of each plate required in subsequent processing,
@@ -44,7 +44,7 @@
 *     obtained from it. For each source it also determines whether the
 *     area of source required may fall partly outside the region
 *     covered by the plate, and gives details if this is so.
-*     
+*
 *     Part of the plate details consists of the identification number of
 *     the tape or exobyte containing the plate and the position of the
 *     plate on the tape/exobyte. The user has the option of specifying
@@ -57,10 +57,10 @@
 *  pass 3 data is organised onto its Exobytes is not known at the time
 *  version 1.1 was written, and therefore this part of the code is
 *  commented out.
-*     
+*
 *  For each Source that is not marked for deletion (ie has valid region
 *  size and at least one waveband required) the program:-
-*     
+*
 *     Calculates the Dec band in which the source falls
 *
 *     Separate calculations are carried out for each pole, and for all
@@ -72,7 +72,7 @@
 *
 *     Calculates the plate number required and checks whether it has
 *     already been entered in the list of plates required in common.
-*     
+*
 *     If plate details are not stored the program stores plate details,
 *     including "tape" identification if possible, and boundaries of
 *     the plate.
@@ -91,7 +91,7 @@
 *
 *  If at the end of processing all sources, one or more are off the edge
 *  of the plate the user is offered the option of returning to the main
-*  menu. 
+*  menu.
 
 *  Arguments:
 *     DISFIL = CHARACTER * ( * ) (Given)
@@ -142,7 +142,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) DISFIL
       INTEGER ILEVEL
@@ -170,7 +170,7 @@
       CHARACTER * ( * ) PRETMA
 
 *  Arguments Given and Returned:
-      CHARACTER * ( 1 )  MENU   
+      CHARACTER * ( 1 )  MENU
 
 *  Arguments Returned:
       LOGICAL RETMAI
@@ -198,14 +198,14 @@
 *  Rather than carry out the latter calculation we assume that the RA
 *  size is approx 1/2 in scan size, and Dec size is max( cross scan, in
 *  scan). To obtain the final sizes we take the max of these two
-*  alternatives.  
+*  alternatives.
       REAL TWOPI                 ! 2*pi in radians
       PARAMETER ( TWOPI = 6.283185307 )
       REAL PI                    ! pi in radians
       PARAMETER ( PI = 3.141592654 )
       REAL PIBY2                 ! pi/2 in radians
       PARAMETER ( PIBY2 = 1.570796327)
-      
+
 *  Local Variables:
       INTEGER DATATY             ! Type of data from which extraction is
                                  ! to take place, 0 = Don't know,
@@ -241,7 +241,7 @@
       REAL RAHIS                 ! High RA value for source area
       REAL RAINC( 37 )           ! Gives the RA size of a plate for each
                                  ! Dec band in degrees
-      REAL RALOP                 ! Low RA boundary value for plate 
+      REAL RALOP                 ! Low RA boundary value for plate
       REAL RALOS                 ! Low RA value for source area
       INTEGER REQPLA             ! Plate required for this source
       REAL SODESZ                ! Source Dec size used for off edge
@@ -291,7 +291,7 @@
       DATA DEC1PL(36)/1706/ , RAINC(36)/ 36.0/
       DATA DEC1PL(37)/1716/ , RAINC(37)/360.0/
 
-*. 
+*.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -310,7 +310,7 @@
 **  Cancel the parameter so that a new value is obtained next time
 **  through this section
 *      CALL PAR_CANCL( PDATTY, STATUS )
-*      
+*
 **  Check whether the parameter was abort
 *      IF ( STATUS .EQ. PAR__ABORT ) RETURN
 *
@@ -321,7 +321,7 @@
 *      END IF
 * *********************************************************************
 *
-      
+
 *  Set sources off edge flag to .FALSE.
       OFFEDG = .FALSE.
 
@@ -333,7 +333,7 @@
 
 *  Print a blank line
       CALL MSG_OUT( ' ', ' ', STATUS )
-      
+
 *  *********************************************************************
 *  For each source
 *  *********************************************************************
@@ -345,9 +345,9 @@
 *  that the source area or waveband details were incorrect and the
 *  source will not be processed further
          IF ( .NOT. SOMADE( SOPOS ) ) THEN
-      
+
 *  *********************************************************************
-*     Calculate the plate number for source. 
+*     Calculate the plate number for source.
 *  *********************************************************************
 
 *  Calculate the DEC band from the source DEC. For clarity the source
@@ -361,7 +361,7 @@
 
 *  *********************************************************************
 * CALCULATION NOW SPLITS DEPENDING ON WHETHER POSITION IS SOUTH POLE,
-* NORTH POLE, OR OTHER DEC BAND. 
+* NORTH POLE, OR OTHER DEC BAND.
 *  *********************************************************************
 
 *  *********************************************************************
@@ -376,10 +376,10 @@
 *  Define the boundaries of the area covered by the plate. These are
 *  given in degrees and converted to radians.
                DECHIP = -87.5 * DEGTOR
-               DECLOP = -90.0 * DEGTOR        
+               DECLOP = -90.0 * DEGTOR
                RAHIP  = 359.99999 * DEGTOR
                RALOP  =   0.0 * DEGTOR
-      
+
 *  Call FIND06 to check whether the plate is in plate common and add it
 *  if not. The pointers to cross link the source record and the plate
 *  record are set up. The subroutine returns the position of the plate
@@ -410,7 +410,7 @@
      :                       COCRDE * SOCRSZ( SOPOS ))
                SORASZ = MAX( COINRA * SOINSZ( SOPOS ),
      :                       COCRRA * SOCRSZ( SOPOS ))
-      
+
 *  Calculate the raw source region RA and Dec high and low values
 *  (not wrapped over if the source region goes over the pole itsself)
                DECHIS = SODEC( SOPOS ) + SODESZ/2.0
@@ -425,7 +425,7 @@
 
 *  Normalise the DECLOS value to the range - pi/2 and upwards
                   DECLOS = - ( PI + DECLOS )
-      
+
 *  If so set the dec high value to the max of the dec high value and the
 *  normalised dec low value. Set the dec low to the radian equivalent
 *  of -90 deg. Also we need to set the RA high and low to a complete
@@ -441,7 +441,7 @@
                IF ( RAHIS .GT. TWOPI ) RAHIS = RAHIS - TWOPI
                IF ( RALOS .LT. 0.0   ) RALOS = RALOS + TWOPI
                IF ( RALOS .GT. TWOPI ) RALOS = RALOS - TWOPI
-      
+
 *  *********************************************************************
 *  See whether requested area will fall outside plate boundaries
 *  *********************************************************************
@@ -455,7 +455,7 @@
                   CALL MSG_OUT( ' ', ' Actual scan RA values may cover'
      :            //' a different range from that reported here',
      :            STATUS )
-      
+
 *  Call subroutine to display or write file of off edge details
                  CALL FIND45( DECHIS, DECLOS, DISFIL, ILEVEL, PDISFI,
      :           PLPOS, PNEXTP, POFFIL, RAHIS, RALOS, SOPOS, STATUS )
@@ -466,7 +466,7 @@
 
 *  Set off edge flag to .TRUE.
                  OFFEDG = .TRUE.
-      
+
                ENDIF
 *
 *  *********************************************************************
@@ -494,7 +494,7 @@
 *  then checks for sources using the last plate of the dec band as the
 *  boundaries of this last plate may be "short" if the Dec band is not
 *  coverd by an integral number of plates.
-*  
+*
 *  *********************************************************************
 
 *  Calculate the plate center of the "last" plate in the Dec band, this
@@ -527,11 +527,11 @@
 
 *  Work out the value of the upper boundary of the first plate of the
 *  dec band
-               RAHIP  = ( RAINC( DECBND ) * DEGTOR ) / 2.0 
+               RAHIP  = ( RAINC( DECBND ) * DEGTOR ) / 2.0
 
 *  Set first plate flag to TRUE
                FIRSTP = .TRUE.
-      
+
 *  Actually the program checks that the source RA is not in the wrap
 *  around region ie Check whether the source RA is less than the
 *  lower boundary of the first plate. ( The RA will not be more than
@@ -542,10 +542,10 @@
 *  check whether that it is not in the rest of the first plate.
                   IF ( SORA( SOPOS) .GE. RAHIP  ) THEN
 
-*  Having established that the source is not in the first plate 
+*  Having established that the source is not in the first plate
 *  Set first plate flag to FALSE
                      FIRSTP = .FALSE.
-      
+
 *  We now check whether it is in the last plate of the dec band.
 *  Set up the boundaries of the last plate of the dec band.
                      RAHIP = RALOP
@@ -565,7 +565,7 @@
 *  band.
 *  Set the plate boundries to those for the second plate in the dec band
                         RAHIP  = ( RAINC( DECBND ) * DEGTOR ) * 1.5
-                        RALOP  = RAHIP - ( RAINC( DECBND ) * DEGTOR ) 
+                        RALOP  = RAHIP - ( RAINC( DECBND ) * DEGTOR )
 
 *  Increment the required plate count by 1 to give the second plate
                         REQPLA = REQPLA + 1
@@ -581,13 +581,13 @@
                            RAHIP  = RAHIP + ( RAINC( DECBND ) * DEGTOR )
                            REQPLA = REQPLA + 1
                            GO TO 200
-                        END IF                        
+                        END IF
                      END IF
                   END IF
- 
+
 *  End if for modify plate required according to the RA of the source
                END IF
-      
+
 *  Define the Dec boundaries of the area covered by the plate. These are
 *  given in degrees and converted to radians.
                DECLOP = -87.5 + ( DECBND - 2) * 5
@@ -595,7 +595,7 @@
 
                DECLOP = DECLOP * DEGTOR
                DECHIP = DECHIP * DEGTOR
-      
+
 *  Call FIND06 to check whether the plate is in plate common and add it
 *  if not. The pointers to cross link the source record and the plate
 *  record are set up. The subroutine returns the position of the plate
@@ -626,7 +626,7 @@
      :                       COCRDE * SOCRSZ( SOPOS ))
                SORASZ = MAX( COINRA * SOINSZ( SOPOS ),
      :                       COCRRA * SOCRSZ( SOPOS ))
-      
+
 *  Calculate the source region RA and Dec high and low values
                DECHIS = SODEC( SOPOS ) + SODESZ/2.0
                DECLOS = SODEC( SOPOS ) - SODESZ/2.0
@@ -665,7 +665,7 @@
 *  Set the off edge flag for this particular source to .FALSE.
 *  indicating not off edge.
                SOOFEG = .FALSE.
-      
+
 *  Simple checks of off edge for plates other than the first plate
                IF ( .NOT. FIRSTP ) THEN
                   IF      ( RAHIS  .GT. RAHIP  ) THEN
@@ -703,7 +703,7 @@
 
 *  If the source is off edge
                IF ( SOOFEG ) THEN
-      
+
 *  Write a message to say data required for this source may be off edge
                   CALL MSG_FMTC( 'C1', 'A8',
      :            SONAME( SOPOS ) )
@@ -720,7 +720,7 @@
 
 *  Set off edge flag to .TRUE.
                   OFFEDG = .TRUE.
-      
+
                ENDIF
 *  *********************************************************************
 *  Is Dec band north pole ie 87.5 to 90 degrees
@@ -734,10 +734,10 @@
 *  Define the boundaries of the area covered by the plate. These are
 *  given in degrees and converted to radians.
                DECHIP =  90.0 * DEGTOR
-               DECLOP =  87.5 * DEGTOR        
+               DECLOP =  87.5 * DEGTOR
                RAHIP  = 359.99999 * DEGTOR
                RALOP  =   0.0 * DEGTOR
-      
+
 *  Call FIND06 to check whether the plate is in plate common and add it
 *  if not. The pointers to cross link the source record and the plate
 *  record are set up. The subroutine returns the position of the plate
@@ -768,7 +768,7 @@
      :                       COCRDE * SOCRSZ( SOPOS ))
                SORASZ = MAX( COINRA * SOINSZ( SOPOS ),
      :                       COCRRA * SOCRSZ( SOPOS ))
-      
+
 *  Calculate the raw source region RA and Dec high and low values
 *  (not wrapped over if the source region goes over the pole itsself)
                DECHIS = SODEC( SOPOS ) + SODESZ/2.0
@@ -783,7 +783,7 @@
 
 *  Normalise the DECHIS value to the range  pi/2 and downwards
                   DECHIS = ( PI - DECHIS )
-      
+
 *  If so set the dec low value to the min of the dec low value and the
 *  normalised dec high value. Set the dec high to the radian equivalent
 *  of 90 deg. Also we need to set the RA high and low to a complete
@@ -823,7 +823,7 @@
 
 *  Set off edge flag to .TRUE.
                   OFFEDG = .TRUE.
-      
+
                ENDIF
 *  *********************************************************************
 *  If Dec band is not found
@@ -840,13 +840,13 @@
 *  End if for if source is marked to be deleted and therefore is not
 *  processed
          END IF
-      
+
 *  End of loop of for each source
  300  CONTINUE
 
 *  Set return to main menu as false
       RETMAI = .FALSE.
-      
+
 *  Check whether any source was off edge
       IF ( OFFEDG ) THEN
 
@@ -859,7 +859,7 @@
 *  Cancel the parameter so that a new value is obtained next time
 *  through this section
          CALL PAR_CANCL( PRETMA, STATUS )
-      
+
 *  Check whether the parameter was abort
          IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -872,7 +872,7 @@
 *  If a return to the FINDCRDD main menu is required, the program sets
 *  the FINDCRDD main menu choice to 'M'
          IF ( RETMAI ) MENU = 'M'
-      
+
       END IF
-      
+
       END

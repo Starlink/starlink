@@ -136,7 +136,7 @@ smf_inst_get( const smfHead * hdr, int * status ) {
 		  status );
 	return INST__ACSIS;
       } else if (strncmp( backend, "DAS", SZFITSCARD) == 0) {
-	msgOutif( MSG__DEBUG, " ", 
+	msgOutif( MSG__DEBUG, " ",
                   "Data file contains DAS data, treating as ACSIS",
 		  status );
 	return INST__ACSIS;

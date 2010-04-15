@@ -13,7 +13,7 @@
       INCLUDE 'SAE_PAR'
 *    Status :
       INTEGER STATUS             ! Global status
-*    Global variables : 
+*    Global variables :
       INCLUDE 'RED4_ENG.INC'     ! RED4 (engineering) common block
 *-
 
@@ -22,5 +22,5 @@
 
 *   Close the file
       IF ( LOG_OPEN ) CALL FIO_CLOSE( LOG_UNIT, STATUS )
- 
+
       END

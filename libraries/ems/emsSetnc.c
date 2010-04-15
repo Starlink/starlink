@@ -17,7 +17,7 @@
  *     This is similar to emsSetc but should be used if the given string
  *     is not null-terminated, as a maximum length for the token is specified.
  *     In this respect it is a replacement for the old ems_setc_c interface
- *     to the Fortran EMS. References to ems_setc_c will be translated to 
+ *     to the Fortran EMS. References to ems_setc_c will be translated to
  *     references to this function by a definition in ems.h
  *
  *     A null or blank string will be rendered as a token of one space and if
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@
 
 /* Function Definitons: */
 void emsSetnc( const char *token, const char *cvalue, int maxchar ){
-   
+
    int vallen;
    int i;
    char valbuf[ EMS__SZTOK + 1 ];
@@ -114,7 +114,7 @@ void emsSetnc( const char *token, const char *cvalue, int maxchar ){
 
 /*  Set the token value. */
    ems1Stok( token, valbuf );
- 
+
    return;
 
 }

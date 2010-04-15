@@ -150,7 +150,7 @@ int fsync ( int );
 /* To make sure that a mapped file is correctly written to disk we need to  */
 /* perform an fsync, this should have also been preceded by calls to        */
 /* msync(MS_ASYNC) when the data was unmapped. Ignore any errors.           */
-         if ( mode != 'R' ) 
+         if ( mode != 'R' )
          {
              fd = fileno( iochan );
              if ( fd != -1 )

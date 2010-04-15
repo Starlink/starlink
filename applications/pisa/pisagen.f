@@ -46,7 +46,7 @@
 *        frames. [1.0]
 *     ANGLE = _REAL (Read)
 *        The positional angle of the major axis of the stellar ellipses
-*        measured in degrees anti-clockwise from the y-axis 
+*        measured in degrees anti-clockwise from the y-axis
 *        (i.e. as per PISAFIND). [0.0]
 *     BACKGROUND = _REAL (Read)
 *        The background value for the output frame. [0.0]
@@ -94,13 +94,13 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output frame. [Output from PISAGEN]
 *     XHIGH = _INTEGER (Read)
-*        If an input frame is not given then this value defines the 
+*        If an input frame is not given then this value defines the
 *        upper limit of the output data array X-axis. [Dynamic]
 *     XLOW = _INTEGER (Read)
 *        If an input frame is not given then this value defines the
 *        origin of the output data array X-axis. [Dynamic]
 *     YHIGH = _INTEGER (Read)
-*        If an input frame is not given then this value defines the 
+*        If an input frame is not given then this value defines the
 *        upper limit of the output data array Y-axis. [Dynamic]
 *     YLOW = _INTEGER (Read)
 *        If an input frame is not given then this value defines the
@@ -145,7 +145,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -208,11 +208,11 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Start up NDF context 
+*  Start up NDF context
       CALL NDF_BEGIN
 
 *  Attempt to access an input NDF, to get the size etc.
-      GOTIN = .TRUE. 
+      GOTIN = .TRUE.
       CALL NDF_ASSOC( 'INPUT', 'READ', NDFIN, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
 
@@ -232,9 +232,9 @@
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Read in the data from this file until EOF is reached. The object 
+*  Read in the data from this file until EOF is reached. The object
 *  is to count the number of entries and to obtain runtime output
-*  frame limits 
+*  frame limits
 
       NOBJ=0
       XLIM( 1 ) = 1.0E20
@@ -251,7 +251,7 @@
          YLIM( 2 ) = MAX( YLIM( 2 ), YOUT + 0.5 )
       GO TO 1
 
-*  End of file 
+*  End of file
 2     CONTINUE
 
 *  May have status other than end-of-file, check for this
@@ -323,7 +323,7 @@
       CALL PAR_GET0R( 'ELLIP', ELLIP, STATUS )
       CALL PAR_GET0R( 'ANGLE', ANGLE, STATUS )
       ANGLE = ( ANGLE + 90.0 )
-      ANGLE = MOD( ANGLE , 180.0 ) 
+      ANGLE = MOD( ANGLE , 180.0 )
 
 *  Get the background and saturation values
       BACK = 0.0
@@ -344,7 +344,7 @@
          ADDNOI = .TRUE.
 
 *  add a variance component to the output NDF
-         CALL NDF_MAP( NDFOUT, 'Variance', '_REAL', 'WRITE', IPVAR, 
+         CALL NDF_MAP( NDFOUT, 'Variance', '_REAL', 'WRITE', IPVAR,
      :                 EL, STATUS )
          IF ( NTYPE(1:1) .EQ. 'P' ) THEN
             POISON = .TRUE.
@@ -362,16 +362,16 @@
 
 *  Now in a position to add the model stars
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL ADDMOD( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ), IDIM( 2 ), 
-     :                LBND( 1 ), LBND( 2 ), IFS, NOBJ, GSIGM, CROSS, 
-     :                COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA, .FALSE., 
+         CALL ADDMOD( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ), IDIM( 2 ),
+     :                LBND( 1 ), LBND( 2 ), IFS, NOBJ, GSIGM, CROSS,
+     :                COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA, .FALSE.,
      :                SCALE, STATUS )
       END IF
 
-*  Add some noise to the data, if required 
+*  Add some noise to the data, if required
       IF ( ADDNOI ) THEN
-         CALL ANOISE( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ) * IDIM( 2 ), 
-     :                POISON, SIGMA, ADU, %VAL( CNF_PVAL( IPVAR ) ), 
+         CALL ANOISE( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ) * IDIM( 2 ),
+     :                POISON, SIGMA, ADU, %VAL( CNF_PVAL( IPVAR ) ),
      :                STATUS )
       END IF
 
@@ -399,7 +399,7 @@
          CALL FIO_CANCL( 'POSITIONS', STATUS )
        END IF
 
-*  Report error identifying this task  
+*  Report error identifying this task
          CALL ERR_REP( 'PISAGEN_ERR',
      :                 'PISAGEN: error generating model star frame.',
      :                  STATUS )

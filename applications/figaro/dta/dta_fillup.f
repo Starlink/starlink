@@ -3,7 +3,7 @@ C+
 C
 C     D T A _ F I L L U P
 C
-C     Sets a numeric array of any type to zeros.  
+C     Sets a numeric array of any type to zeros.
 C
 C     Parameters  (">" input, "<" output)
 C
@@ -18,8 +18,8 @@ C
 C                                       KS / AAO 20th March 1986
 C     Modified:
 C
-C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C     25th Jul  1996.  MJCL/Starlink, UCL. Moved DTATYPES.
 C+

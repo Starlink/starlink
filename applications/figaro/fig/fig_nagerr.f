@@ -5,7 +5,7 @@ C     F I G _ N A G E R R
 C
 C     Outputs an error message given a bad return code from
 C     a NAG routine.  This is a Figaro utility, and the error
-C     message is output using the PAR_WRUSER routine. 
+C     message is output using the PAR_WRUSER routine.
 C
 C     Parameters -  (">" input, "<" output)
 C
@@ -17,14 +17,14 @@ C                  not be in upper case.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     ICH_LEN      (ICH_ package) Position of last non-blank char.
 C     ICH_FOLD     ( "      "   ) Convert string to upper case.
 C     PAR_WRUSER   (PAR_ package) Output message to user.
 C
 C     Note: 1) At present, this routine only supports a limited
-C              number of NAG routines - those currently used 
+C              number of NAG routines - those currently used
 C              by Figaro.
 C           2) Usually, the NAG routine in question should be
 C              called with IFAIL set to 1, to suppress the normal
@@ -39,7 +39,7 @@ C     28th Jul 1993.  HME / UoE, Starlink.  Disuse STR$UPCASE.
 C+
       IMPLICIT NONE
 C
-C     Paramters 
+C     Paramters
 C
       INTEGER IFAIL
       CHARACTER*(*) ROUTINE
@@ -99,7 +99,7 @@ C
                DESCR(DPT:)=' Number of dimensions is < 1.'
             ELSE IF (IFAIL.EQ.2) THEN
                DESCR(DPT:)=' # of elements does not match dimensions.'
-            ELSE 
+            ELSE
                IF (MOD(IFAIL,10).EQ.1) THEN
                   DESCR(DPT:)=' A dimension has a prime factor > 19.'
                ELSE IF (MOD(IFAIL,10).EQ.2) THEN

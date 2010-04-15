@@ -13,7 +13,7 @@
 *     CALL ESP1_CRPT(FSET,XB,YB,STATUS)
 *
 *  Description:
-*     This routine reports to the user the position of the cursor in 
+*     This routine reports to the user the position of the cursor in
 *     coordinates of the Current coordinate frame of the given frameset.
 *
 *  Arguments:

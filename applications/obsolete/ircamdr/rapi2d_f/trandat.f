@@ -8,7 +8,7 @@
 *     file and converts the data into an image structure under the
 *     HDS data storage system, such that the image is then compatible
 *     with SSE and Adam data processing packages.
-*     The user is prompted for the name of a free-format data file 
+*     The user is prompted for the name of a free-format data file
 *     ( default extension .DAT ), which contains ( for example )
 *     mapping data which he wants converted into an image. The format
 *     of the data should be one record (line) per point of input data,
@@ -73,7 +73,7 @@
 *        Create a structure to hold the output image
 *        If no error so far then
 *           Map a data array component to hold the data
-*           If no error so far then 
+*           If no error so far then
 *              Call subroutine TRANDATSUB to create an image from
 *                the data read in from the free-format file
 *           Endif
@@ -84,7 +84,7 @@
 *     Return
 *
 *    Deficiencies :
-*     
+*
 *     Uses Fortran statement labels for i/o from free-format data file
 *
 *    Bugs :
@@ -114,8 +114,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -123,7 +123,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :    NDIMS,                  ! dimensionality of image
      :    MAXDIM,                 ! maximum size of output array
      :    MAXPTS,                 ! maximum number of points allowed
@@ -160,7 +160,7 @@
 
       CHARACTER*80
      :    FREENAME                ! name of input free-format file
- 
+
 
 *-
 *    check status on entry - return if not o.k.
@@ -269,11 +269,11 @@
          IF( ODIMS( 1 ) .GT. MAXDIM .OR. ODIMS( 2 ) .GT. MAXDIM ) THEN
             CALL MSG_SETI( 'MAXDIM', MAXDIM )
             CALL MSG_OUT( 'TOO_BIG',
-     :      'Maximium output array dimension is ^MAXDIM - aborting', 
+     :      'Maximium output array dimension is ^MAXDIM - aborting',
      :       STATUS )
             CLOSE( UNIT=10 )
             RETURN
-         END IF         
+         END IF
 
 
 *       now get the output image
@@ -283,7 +283,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          map the output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :               PNTRO, NELEMENTS, STATUS )
 
 *          check for error before accessing pointer
@@ -291,8 +291,8 @@
 
 *             now call the subroutine that does the work of filling
 *             the image with the input data
-               CALL TRANDATSUB( %VAL( PNTRO ), ODIMS(1), ODIMS(2), 
-     :                      DATA, MAXREC, COUNT, XPOS, YPOS, 
+               CALL TRANDATSUB( %VAL( PNTRO ), ODIMS(1), ODIMS(2),
+     :                      DATA, MAXREC, COUNT, XPOS, YPOS,
      :                      INTENSPOS, PSCALE, XMIN, YMIN, STATUS )
 
 *          end of if-no-error-before-accessing-pointer check
@@ -322,7 +322,7 @@
 *    no need to flush error as quitting
 998   CALL MSG_SETC( 'FNAME', FREENAME )
       CALL ERR_REP( 'BAD_DATA',
-     :    'Error found whilst accessing file ^FNAME - aborting', 
+     :    'Error found whilst accessing file ^FNAME - aborting',
      :     STATUS )
       CLOSE( UNIT=10 )
 

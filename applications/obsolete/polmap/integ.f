@@ -1,23 +1,23 @@
       SUBROUTINE INTEG(NPARAMS,PARAMS,STOKES_I,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
-C       I N T E G 
+C       I N T E G
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), STOKES_I (<), LAMBDA (<), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Integrates the Stokes I spectrum using a very simple trapeziodal
 C integration.
 C

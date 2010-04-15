@@ -85,7 +85,7 @@
             IF (J.GE.N) GYPLUS  = .TRUE.
 
             CALL READ_NEW_CUBE2 (I, J, NDATA, N1, N2, BUF1)
-     
+
             CURRENT_WEIGHT = WEIGHT(IABS(M-I),IABS(N-J))
             SIGMA_W = SIGMA_W + CURRENT_WEIGHT
             DO K = 1,NDATA

@@ -66,7 +66,7 @@
 *     CHCOEF( MCOEF ) = DOUBLE PRECISION (Returned)
 *        The Chebyshev polynomial coefficients, in the order increasing
 *        x power for each increasing y power.  Thus coefficient Aij in
-*        the standard convention is %CHCOEF(i*(%NYPAR)+j+1). The array 
+*        the standard convention is %CHCOEF(i*(%NYPAR)+j+1). The array
 *        may be rectangular, i.e. the highest x and y orders do not
 *        have to be the same.
 *     NCOEF = INTEGER (Given)
@@ -137,7 +137,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -238,11 +238,11 @@
             W( I ) = W( I ) * W( I )
          END DO
       END IF
- 
+
 *  Initialise arrays to hold the coefficients of normal equations.
       DO J = 1, MCOEF
          B( J ) = 0.0D0
- 
+
          DO I = 1, MCOEF
             A( I, J ) = 0.0D0
          END DO
@@ -255,12 +255,12 @@
          DO I = 1, MAX( NXPAR, NYPAR )
             CC( I ) = 0.0D0
          END DO
- 
+
 *  Evaluate the Chebyshev polynomials of the orders required along each
 *  axis at the data position.
          DO I = 1, MAX( NXPAR, NYPAR )
             CC( I ) = 1.0D0
- 
+
             IF ( I .LE. NXPAR ) THEN
                CALL KPG1_CHEVD( XMIN, XMAX, I, CC, 1, X( IBIN ),
      :                          PX( I ), STATUS )
@@ -279,13 +279,13 @@
 
 *  Now form the required products of the x and y polynomials.
          NC = 0
- 
+
          DO J = 1, NYPAR
             DO I = 1, NXPAR
 
 *  Omit those products which are of too high an order in x or y.
                IF ( I .GT. 1 .AND. I + J - 1 .GT. NXPAR ) GOTO 20
- 
+
                IF ( J .GT. 1 .AND. I + J - 1 .GT. NYPAR ) GOTO 20
 
 *  Store the required products.
@@ -298,15 +298,15 @@
 *  Add to the normal equation sums (a term for each product).
          DO J = 1, NC
             B( J ) = B( J ) + CHCOEF( J ) * W( IBIN ) * Z( IBIN )
- 
+
             DO I = 1, NC
                A( I, J ) = A( I, J ) +
      :                     CHCOEF( I ) * CHCOEF( J ) * W( IBIN )
             END DO
          END DO
- 
+
       END DO
- 
+
 *  Call a PDA routine to solve the normal equations.  Contain its
 *  limited error handling in a new error context, and report specific
 *  messages.  The fit is returned in R.
@@ -329,7 +329,7 @@
 *  Put the solution coefficients into an array with the terms not
 *  required set to zero.
       NC = 0
- 
+
       DO J = 1, NYPAR
          DO I = 1, NXPAR
 
@@ -337,7 +337,7 @@
 
 *  Leave zeroes in if the term is of too high an order in x or y.
             IF ( I .GT. 1 .AND. I + J - 1 .GT. NXPAR ) GOTO 50
- 
+
             IF ( J .GT. 1 .AND. I + J - 1 .GT. NYPAR ) GOTO 50
 
 *  Otherwise put the appropriate coefficient into the store.
@@ -347,8 +347,8 @@
          END DO
       END DO
 
-      NCOEF = NC 
- 
+      NCOEF = NC
+
   999 CONTINUE
- 
+
       END

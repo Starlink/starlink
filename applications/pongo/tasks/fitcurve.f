@@ -16,7 +16,7 @@
 *     This command fits data using either a polynomial or a smooth
 *     spline. If weights are available these can be used when
 *     determining the fit.
-* 
+*
 *     The resultant fit parameters are displayed and written to the
 *     environment for use by the PLOTFUN application, which can replot the
 *     polynomial or spline with other datasets etc.
@@ -58,15 +58,15 @@
 *        The value of this parameter is written to the global parameter
 *        PONGO_POLYCOEF.
 *     POLYFILE = _CHAR (Read)
-*        The name of a file to contain the polynomials coefficients 
+*        The name of a file to contain the polynomials coefficients
 *        of the fit (only used ACTION is "POLY"). This file can be
-*        used to store the fit permanently and can be used by the 
+*        used to store the fit permanently and can be used by the
 *        PLOTFUN command to redraw the fit.
-*        
+*
 *        [POLYFILE.dat]
 *     SMOOTH = _REAL (Read)
 *        Only used if ACTION is "SPLINE". This factor determines the
-*        tradeoff between the closeness and smoothness of the spline 
+*        tradeoff between the closeness and smoothness of the spline
 *        fit. It should be a real number greater than 0.0. Normally this
 *        is dynamically defaulted to a number equal to the number of
 *        points to be fitted. Decreasing this value to 0.0 produces an
@@ -76,7 +76,7 @@
 *        positions from the spline fit -- used when ACTION is
 *        "SPLINE". This file can be used by the PLOTFUN command to
 *        redraw the fit.
-*        
+*
 *        [The value of the global parameter PONGO_SPLINEF is used. If
 *        PONGO_SPLINEF is not defined, the value is prompted for.]
 *     XMIN = _REAL (Read)
@@ -137,8 +137,8 @@
 *        In actual fact only XMIN and XMAX were every used and these
 *        inconsistently. XMIN and XMAX are the only parameters left.
 *     6-MAY-1997 (PDRAPER):
-*        Added POLYFILE parameter to allow permanent storage of the 
-*        polynomial coefficients and so that string truncation 
+*        Added POLYFILE parameter to allow permanent storage of the
+*        polynomial coefficients and so that string truncation
 *        problems for complex fits can be avoided (mainly in IRAF).
 *     1-OCT-2004 (TIMJ):
 *        Use CNF_PVAL
@@ -231,7 +231,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NPOLY', NPOLY )
          CALL ERR_REP( 'FITCURVE_NPOLYV',
-     :                 'Order of polynomial knots is invalid: ^NPOLY.', 
+     :                 'Order of polynomial knots is invalid: ^NPOLY.',
      :                 STATUS )
          GO TO 999
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
@@ -240,7 +240,7 @@
 
 *  Check whether a weighted fit is both required and possible, and
 *  inform the user if it is required but no weights are available.
-      IF ( USEWEI .AND. ( ERYCOL.EQ.0 ) ) THEN 
+      IF ( USEWEI .AND. ( ERYCOL.EQ.0 ) ) THEN
          CALL MSG_OUT( ' ',
      :        'No error data available, using uniform weight.', STATUS )
       END IF
@@ -249,7 +249,7 @@
       NDATFIT = 0
       DO 100 I = 1, NDAT
          IF ( XDATA( I ) .GE. XMINP .AND. XDATA( I ) .LE. XMAXP )
-     :   THEN          
+     :   THEN
             NDATFIT = NDATFIT + 1
             XD( NDATFIT ) = XDATA( I )
             YD( NDATFIT ) = YDATA( I )
@@ -279,13 +279,13 @@
  100  CONTINUE
 
 *  Check we have some points.
-      IF ( NDATFIT .LE. 1 ) THEN 
+      IF ( NDATFIT .LE. 1 ) THEN
          STATUS = SAI__ERROR
-         IF ( NDATFIT .EQ. 1 ) THEN 
-            CALL ERR_REP( 'FITCURVE_ONEPNT', 
+         IF ( NDATFIT .EQ. 1 ) THEN
+            CALL ERR_REP( 'FITCURVE_ONEPNT',
      :      'There is only one selected point.', STATUS )
          ELSE
-            CALL ERR_REP( 'FITCURVE_NOPNTS', 
+            CALL ERR_REP( 'FITCURVE_NOPNTS',
      :      'There are no selected points.', STATUS )
          END IF
          GO TO 999
@@ -321,7 +321,7 @@
          END IF
 
 *     Perform the polynomial fit.
-         CALL PSX_CALLOC( 3 * NDATFIT + 3 * NPOLY + 3, '_DOUBLE', 
+         CALL PSX_CALLOC( 3 * NDATFIT + 3 * NPOLY + 3, '_DOUBLE',
      :                    IPWRK, STATUS )
          EPS = 0.0D0
          NPOLY = NPOLY - 1
@@ -344,12 +344,12 @@
             CALL ERR_ANNUL( IFAIL2 )
          END IF
          CALL ERR_RLSE
-            
+
 *     Print the fit results (extract the coefficients for polynomial
 *     first).
          CALL PDA_DPCOEF( NPOLY, 0.0D0, COEFF,
      :                  %VAL( CNF_PVAL( IPWRK ) ), STATUS )
-         CALL PON_SPOL( XMINP, XMAXP, NDATFIT, USEWEI, NPOLY, COEFF, 
+         CALL PON_SPOL( XMINP, XMAXP, NDATFIT, USEWEI, NPOLY, COEFF,
      :                  EPS, STATUS )
          CALL PSX_FREE( IPWRK, STATUS )
 
@@ -374,7 +374,7 @@
          CALL PAR_PUT0I( 'NPOLY', NPOLY, STATUS )
 
 *     And write them to a file also (IRAF cannot handle long strings).
-         CALL PON_ASFIO( 'POLYFILE', 'WRITE', 'LIST', 0, PFD, OPEN, 
+         CALL PON_ASFIO( 'POLYFILE', 'WRITE', 'LIST', 0, PFD, OPEN,
      :                   STATUS )
          WRITE( OUTBUF, '( X, I6 )' ) NPOLY
          CALL FIO_WRITE( PFD, OUTBUF, STATUS )
@@ -393,7 +393,7 @@
 *     Get the "smoothing" factor. Offer a dynamic default mid-range of
 *     that suggested in the PDA_CURFIT documentation. Note SFACT=0.0 is
 *     equivalent to interpolation.
-         SFACT = REAL( NDATFIT ) 
+         SFACT = REAL( NDATFIT )
          CALL PAR_DEF0R( 'SMOOTH', SFACT, STATUS )
          CALL PAR_GET0R( 'SMOOTH', SFACT, STATUS )
          SFACT = MAX( 0.0, SFACT )
@@ -416,13 +416,13 @@
 
 *     Data are of type REAL so transform existing positions and weights.
 *     Also check that no adjacent X positions are the same this is not
-*     allowed. 
+*     allowed.
          XC = XD( NDATFIT )
          DO 11 I = 1, NDATFIT
             XR( I ) = REAL( XD( I ) )
             YR( I ) = REAL( YD( I ) )
             WR( I ) = REAL( WD( I ) )
-            IF ( XC .EQ. XR( I ) ) THEN 
+            IF ( XC .EQ. XR( I ) ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'FITCURVE_NOMULT', 'You cannot fit'//
      :              ' splines to data that have more than one point '//
@@ -441,8 +441,8 @@
          LWRK = NDATFIT * ( NPOLY + 1 ) + NEST * ( 7 + 3 * NPOLY )
          CALL PSX_CALLOC( LWRK, '_REAL', IPWRK3, STATUS )
 
-         CALL PDA_CURFIT( IOPT, NDATFIT, XR, YR, WR, XMINP, XMAXP, 
-     :                    NPOLY, SFACT, NEST, IKNOTS, KNOTS, 
+         CALL PDA_CURFIT( IOPT, NDATFIT, XR, YR, WR, XMINP, XMAXP,
+     :                    NPOLY, SFACT, NEST, IKNOTS, KNOTS,
      :                    SPLINE, EPSR, %VAL( CNF_PVAL ( IPWRK3 ) ),
      :                    LWRK, %VAL( CNF_PVAL( IPWRK2 ) ), IFAIL1 )
 
@@ -450,7 +450,7 @@
          CALL PSX_FREE( IPWRK3, STATUS )
 
 *     Check the success or otherwise of the routine.
-         IF ( IFAIL1 .GT. 0 ) THEN 
+         IF ( IFAIL1 .GT. 0 ) THEN
             CALL MSG_SETI( 'IFAIL', IFAIL1 )
             STATUS = SAI__ERROR
             CALL ERR_REP( 'FITCURVE_SPLINE',
@@ -467,7 +467,7 @@
          CALL PGSCI( COLSAV )
 
 *     And save the description to a "spline" file.
-         CALL PON_ASFIO( 'SPLINEFILE', 'WRITE', 'LIST', 0, SFD, OPEN, 
+         CALL PON_ASFIO( 'SPLINEFILE', 'WRITE', 'LIST', 0, SFD, OPEN,
      :                   STATUS )
          WRITE( OUTBUF, '( X, I6, I6 )' ) IKNOTS, NPOLY
          CALL FIO_WRITE( SFD, OUTBUF, STATUS )
@@ -477,7 +477,7 @@
  180     CONTINUE
 
 *     Finally make a report about the fit "statistics".
-         CALL PON_SSPL( XMINP, XMAXP, NDATFIT, USEWEI, NPOLY, EPSR, 
+         CALL PON_SSPL( XMINP, XMAXP, NDATFIT, USEWEI, NPOLY, EPSR,
      :                  IKNOTS, SFD, SFACT, STATUS )
          IF ( OPEN ) CALL FIO_CLOSE( SFD, STATUS )
       ELSE

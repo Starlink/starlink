@@ -56,7 +56,7 @@ Cbegin
          open ( UNIT=num, FILE=file, READONLY, STATUS='OLD', err=999 )
       else
          if ( isvms ) then
-            open ( UNIT=num, FILE=file, STATUS='NEW', 
+            open ( UNIT=num, FILE=file, STATUS='NEW',
      +             CARRIAGECONTROL='LIST', err=999 )
          else
             open ( UNIT=num, FILE=file, STATUS='UNKNOWN',

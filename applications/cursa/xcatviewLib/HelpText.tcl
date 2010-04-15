@@ -72,7 +72,7 @@ proc HelpText helpItem {
     .helptext.text.output insert end "
 xcatview is a Starlink application for browsing or viewing the contents
 of an astronomical catalogue or similar tabular dataset.  It can access
-catalogues and tables held as either ASCII or binary FITS tables and 
+catalogues and tables held as either ASCII or binary FITS tables and
 several other formats.  xcatview provides functions to:
 
 *  list the contents of a catalogue,
@@ -88,22 +88,22 @@ several other formats.  xcatview provides functions to:
 You can use xcatview to view either the entire catalogue, or subsets
 created from it according to some criteria which you supply (these
 subsets are called 'selections').  Usually a catalogue will contain more
-rows than the twenty-odd which can be fitted into xcatview's main 
+rows than the twenty-odd which can be fitted into xcatview's main
 display region.  Thus, functions are provided to 'move' or 'navigate'
-through the catalogue or selection, displaying a strip of contiguous 
-rows.  Similarly, often a catalogue will have more columns than can fit 
-into the main display region, and again options are provided to choose 
+through the catalogue or selection, displaying a strip of contiguous
+rows.  Similarly, often a catalogue will have more columns than can fit
+into the main display region, and again options are provided to choose
 the columns to be displayed.
 
 Using xcatview you can create an arbitrary number of selections from
-the catalogue, each defined by its own criteria.  Any of these 
+the catalogue, each defined by its own criteria.  Any of these
 selections can be displayed or saved as a text file or catalogue.
-xcatview has the notion of a 'current selection', which is the 
+xcatview has the notion of a 'current selection', which is the
 selection that it is currently working on.  It is the current selection
 which is displayed or saved as a text file or catalogue.  Similarly when
 a new selection is created it is generated from the current selection.
-By default the most recent selection is the current one, though you may 
-choose to make any of the selections the current one.  If no selections 
+By default the most recent selection is the current one, though you may
+choose to make any of the selections the current one.  If no selections
 have been made, the current selection is the entire catalogue.
 
 xcatview is part of the CURSA package for manipulating astronomical
@@ -123,20 +123,20 @@ described in these documents.
 
     .helptext.text.output insert end "
 Currently you are accessing the primary window for navigating through
-a catalogue and displaying information from it.  It is divided 
+a catalogue and displaying information from it.  It is divided
 horizontally into four components:
 
 
 *  along the top is a list of options for controlling xcatview,
 
 *  beneath this is the main display region, which is used to view the
-   rows and columns of the current selection, and also to display 
+   rows and columns of the current selection, and also to display
    various auxiliary information about the catalogue,
 
 *  next is a row of buttons for navigating through the current
    selection,
 
-*  Finally, at the bottom, is a smaller window where any error, 
+*  Finally, at the bottom, is a smaller window where any error,
    warning or information messages are displayed.
 
 
@@ -161,14 +161,14 @@ The row of buttons below the main display area is used to navigate
 through the current selection.  The purpose of each button is:
 
 
-Next:  display the next page of the current selection.  A series of 
+Next:  display the next page of the current selection.  A series of
    clicks on this button will progress sequentially through the current
    selection,
 
 Previous:  display the previous page in the current selection, that is,
    the set of rows immediately preceding those currently displayed,
 
-Position:  display a page of rows in the current selection, starting at 
+Position:  display a page of rows in the current selection, starting at
    an a arbitrary position, which you will specify,
 
 Top:  display the first few rows in the current selection,
@@ -291,8 +291,8 @@ To navigate through your directory tree:
    (or edit the existing directory name) and hit return.
 
 
-In any event, when you move to a new directory the lists of 
-subdirectories and catalogues will be updated automatically to 
+In any event, when you move to a new directory the lists of
+subdirectories and catalogues will be updated automatically to
 correspond to the contents of this new directory.
 "
     }
@@ -316,9 +316,9 @@ hit return.
 This window allows you to save the current selection as a catalogue.
 
 You should enter the file name required for the new catalogue in the box
-labelled 'Catalogue:' towards the top of the window.  If you simply 
-enter a file name the catalogue will be created in your current 
-directory.  Alternatively, you can create the catalogue in another 
+labelled 'Catalogue:' towards the top of the window.  If you simply
+enter a file name the catalogue will be created in your current
+directory.  Alternatively, you can create the catalogue in another
 directory by prefixing the file name with the appropriate Unix directory
 specification.
 
@@ -326,19 +326,19 @@ If you want to annotate the catalogue with descriptive comments then
 type the required comments into the box labelled 'Comments:'.  These
 comments are optional, so you can omit them if you wish.
 
-The new catalogue may contain either all the columns in the original 
-catalogue or just the currently chosen columns.  Similarly, it may 
-optionally contain a copy of any header information associated with the 
+The new catalogue may contain either all the columns in the original
+catalogue or just the currently chosen columns.  Similarly, it may
+optionally contain a copy of any header information associated with the
 original catalogue.  These items are specified by the two buttons on the
-left of the lower portion of the window.  The text to the right of each 
-button shows the option which is currently in effect.  To change the 
+left of the lower portion of the window.  The text to the right of each
+button shows the option which is currently in effect.  To change the
 option for either of the items: click on the button corresponding to the
-item.  A list of the options for the item will appear; click on the one 
-that you require.  The current option shown to the right of the button 
+item.  A list of the options for the item will appear; click on the one
+that you require.  The current option shown to the right of the button
 will be updated to reflect your choice.  Details of the individual items
 are given below.
 
-When you are happy with the file name for the catalogue and the items 
+When you are happy with the file name for the catalogue and the items
 to be included simply click on the \"OK\" button or hit return.
 
 
@@ -346,17 +346,17 @@ Details of the catalogue items
 ------------------------------
 
 Columns:  specifies which columns will be saved in the new catalogue.
-   There are two options: either all the columns in the original 
+   There are two options: either all the columns in the original
    catalogue or just the currently chosen columns (as specified with
-   the 'Choose columns to be listed' option under the 'Listing' option 
+   the 'Choose columns to be listed' option under the 'Listing' option
    on the main window).  Note that if you choose the 'currently chosen
    columns' option then any expressions in the list will be converted to
    columns in the new catalogue.  (Options: all or current list).
 
 Text:  specifies whether any header text associated with the original
-   catalogue will be copied to the new catalogue.  Often such text will 
-   contain information intended to be read by users of the original 
-   catalogue, for example, perhaps an explanation of its contents or 
+   catalogue will be copied to the new catalogue.  Often such text will
+   contain information intended to be read by users of the original
+   catalogue, for example, perhaps an explanation of its contents or
    details of its provenance.  (Options: yes or no).
 "
 
@@ -369,7 +369,7 @@ This window allows you to save the current selection and various other
 items from the catalogue as a text file suitable for printing.
 
 You should enter the name required for the output file in the box
-labelled 'File name:' towards the top of the window.  If you simply 
+labelled 'File name:' towards the top of the window.  If you simply
 enter a file name the file will be created in your current directory.
 Alternatively, you can create the file in another directory by prefixing
 the name with the appropriate Unix directory specification.
@@ -384,16 +384,16 @@ may be included or full details may be included.
 The items to be included in the file are controlled by the vertical row
 of buttons on the left of the middle portion of the window.  The text to
 the right of each button shows the option which is currently in effect.
-To change the option for any of the items: click on the button 
+To change the option for any of the items: click on the button
 corresponding to the item.  A list of the options for the item will
 appear; click on the one that you require.  The current option shown
-to the right of the button will be updated to reflect your choice.  
+to the right of the button will be updated to reflect your choice.
 Details of the individual items are given below.
 
 You may also specify the range of rows in the current selection to be
-listed.  Simply enter the numbers of the first and last rows required in 
-the boxes towards the bottom of the window.  If you want the last row 
-listed to be the last row in the current selection then, as an alternative 
+listed.  Simply enter the numbers of the first and last rows required in
+the boxes towards the bottom of the window.  If you want the last row
+listed to be the last row in the current selection then, as an alternative
 to entering the actual row number, simply type 'last' into the 'Last row:'
 box, or alternatively (and even simpler) click on the 'Last row:' button
 and the string 'last' will automatically be inserted into the 'Last
@@ -412,14 +412,14 @@ Details of the text file items
 Summary:  a brief summary of the catalogue.  (Options: none or present).
 
 Columns:  details of all the columns in the catalogue.  For every column
-   the name, data type etc. is listed.  (Options: none, summary or 
+   the name, data type etc. is listed.  (Options: none, summary or
    full).
 
-Parameters:  details of all the parameters in the catalogue.  For every 
+Parameters:  details of all the parameters in the catalogue.  For every
    parameter the name, data type etc. is listed.  (Options: none,
    summary or full).
 
-Text:  a listing of any header text associated with the catalogue.  
+Text:  a listing of any header text associated with the catalogue.
    Often such text will contain information intended to be read by
    users of the catalogue, for example, perhaps an explanation of its
    contents or details of its provenance.  (Options: none or present).
@@ -442,8 +442,8 @@ the columns that they are to read without any additional annotation.
 This effect can be achieved as follows.
 
 
-*  Choose the columns to be listed to be just those which are to go into 
-   the file (use the 'Choose columns to be listed' option under the 
+*  Choose the columns to be listed to be just those which are to go into
+   the file (use the 'Choose columns to be listed' option under the
    'Listing' option on the main window).
 
 *  Set the text file options as follows:
@@ -496,7 +496,7 @@ If the catalogue that you wish to search is in the current list then click
 on its entry.  Its description and an abbreviation identifying it will be
 displayed towards the top of the window.  Note that the abbreviation,
 together with the central coordinates of the search, are used to create
-the name given to the local catalogue containing the selected objects.  
+the name given to the local catalogue containing the selected objects.
 
 Next you need to specify the region of sky to be searched, which can
 be done either by giving the name of an object on which the region is
@@ -582,14 +582,14 @@ Enter the name required for the new column in the 'Name:' box.  The
 rules for column names are as follows.
 
 
-*  The name must be unique within the totality of parameters and 
+*  The name must be unique within the totality of parameters and
    columns for the catalogue.
 
 *  A name can comprise up to fifteen characters.
 
-*  A name can contain only: upper or lower case alphabetic characters 
-   (a-z, A-Z), numeric characters (0-9) and the underscore character 
-   ('_'). Note that corresponding upper and lower case characters are 
+*  A name can contain only: upper or lower case alphabetic characters
+   (a-z, A-Z), numeric characters (0-9) and the underscore character
+   ('_'). Note that corresponding upper and lower case characters are
    considered to be equivalent; that is, names are case insensitive.
    Thus, for example, the names: 'B_V', 'B_v' and 'b_v' would all refer to
    the same column.
@@ -636,10 +636,10 @@ described here.
 Creating a new column
 ---------------------
 
-Expressions for creating a new column have an algebraic format, and comprise 
-columns, parameters and constants linked by arithmetic operators and 
-mathematical functions.  For example, suppose that a catalogue contained 
-columns called x, y and z and parameters called p and q.  Some valid 
+Expressions for creating a new column have an algebraic format, and comprise
+columns, parameters and constants linked by arithmetic operators and
+mathematical functions.  For example, suppose that a catalogue contained
+columns called x, y and z and parameters called p and q.  Some valid
 expressions are:
 
 x
@@ -648,8 +648,8 @@ x + p
 (x + y + 2) / (p + q)
 (2.0*x + y + 3.75*p) + 13.0) / (z + 1.8q)
 
-Column and parameter names are not case sensitive; corresponding upper 
-and lower case letters are considered equivalent.  Thus, the following 
+Column and parameter names are not case sensitive; corresponding upper
+and lower case letters are considered equivalent.  Thus, the following
 names would all refer to the same column or parameter:
 
 HD_NUMBER
@@ -695,14 +695,14 @@ brackets (\"(\" and \")\") may be used as required.
 Mathematical functions provided
 -------------------------------
 
-The Following mathematical functions are provided.  In the following list the 
-letters denote data types permitted: B = byte, H = halfint, I = integer, 
+The Following mathematical functions are provided.  In the following list the
+letters denote data types permitted: B = byte, H = halfint, I = integer,
 R = real, D = double-precision, C = character, L = logical.
 The appearance of N as an argument means that any numeric type (BHIRD)
 is permitted, as a result it means that the type is the widest type of
 any of the arguments.  R/D means that the result is REAL unless one or
 more arguments is of double-precision type in which case D is the
-result. 
+result.
 
 B = BYTE(N)       convert to BYTE             data type
 H = HALF(N)          \"    \"  INTEGER*2         \"    \"
@@ -736,7 +736,7 @@ C = SUBSTR(C,N,N) returns chars from positions arg2 to arg3 inclusive,
                   with the positions starting at 1.
 L = NULL(*)       .TRUE. if argument is NULL.
 D = HMSRAD(N,N,N) converts 3 args hours,mins,secs to radians
-D = DMSRAD(C,N,N,N) first arg is the sign ('+' default), converts 
+D = DMSRAD(C,N,N,N) first arg is the sign ('+' default), converts
                   degs,mins,secs to radians.
 D = GREAT(N,N,N,N) great circle distance between two spherical
                   coordinates.  All the input arguments and the return
@@ -751,16 +751,16 @@ D = PANGLE(N,N,N,N) position angle of point alpha(2), delta(2) from point
 Rules for expressions
 ---------------------
 
-The expression string can contain constants, variable names, operators, 
-functions, and parentheses.  In general the usual rules of algebra and 
+The expression string can contain constants, variable names, operators,
+functions, and parentheses.  In general the usual rules of algebra and
 Fortran should be followed, with some minor exceptions as follows.
 
 * Spaces are permitted between items, except that a function-name must
 be followed immediately by a left parenthesis.  Spaces are not permitted
 within items such as names and numerical constants, but can be used
-within character strings and date/time values in curly braces. 
+within character strings and date/time values in curly braces.
 
-* Lower-case letters are treated everywhere as identical to the 
+* Lower-case letters are treated everywhere as identical to the
 corresponding upper-case letter.
 
 * Column and parameter names can be up to fifteen characters long, and
@@ -771,54 +771,54 @@ character must not be a digit.
 consist of a name followed by an unsigned integer constant subscript
 enclosed in square brackets, for example MAGNITUDE\[13\].
 
-* Character constants may be enclosed in a pair of single or double 
-quotes; embedded quotes of the same type may be denoted by doubling up 
+* Character constants may be enclosed in a pair of single or double
+quotes; embedded quotes of the same type may be denoted by doubling up
 on the quote character within the string, for example 'DON''T or \"DON'T\".
 
-* Logical constants may be .TRUE. or .FALSE. but abbreviations of the 
+* Logical constants may be .TRUE. or .FALSE. but abbreviations of the
 word are allowed down to .T. and .F.
 
-* Numerical constants may appear in any valid form for Fortran77 (except 
-that embedded spaces are not allowed).  Some additional forms are also 
+* Numerical constants may appear in any valid form for Fortran77 (except
+that embedded spaces are not allowed).  Some additional forms are also
 permitted, as shown below.
 
 * %Xstring %Ostring %Bstring for hex/octal/binary integer constants.
 
 * angles in sexagesimal notation: colons must to separate items, for
 example hours:mins:secs (or degs:mins:secs).  If there is a leading sign
-then the value will be taken as degs:mins:secs, otherwise hours:mins:secs.  
+then the value will be taken as degs:mins:secs, otherwise hours:mins:secs.
 In either case the value is internally converted to RADIANS.
 
 * A date/time value may be given as a string enclosed in curly braces;
-A range of common formats are permitted, with order year-month-day or 
+A range of common formats are permitted, with order year-month-day or
 day-month-year, and the month as a number or three-character abbreviation.
-The time may follow with colons separating hour:min:second.  Examples of 
+The time may follow with colons separating hour:min:second.  Examples of
 valid dates: {1992-JUL-26 12:34:56}  {92.7.26} {26/7/92T3:45}
 
 * Relational operators are supported in both Fortran77 form (for example
 .GE. .NE.) as well as in the Fortran90 forms (for example >= /= ).
 
-* Single-symbol forms for .AND. .OR. and .NOT. are provided as an 
+* Single-symbol forms for .AND. .OR. and .NOT. are provided as an
 alternative: & | # respectively.
 
 * The dots may be left off the Fortran77 forms of the relational
 operators and the logical operators .AND. and .OR. where spaces or
 parentheses separate them from names or constants, but the logical
 constants and the .NOT. operator need the enclosing dots to distinguish
-them from other lexical items in all cases. 
+them from other lexical items in all cases.
 
-* Integer division does not result in truncation (as in Fortran) but 
-produces a floating-point result.  The NINT or INT function should be 
+* Integer division does not result in truncation (as in Fortran) but
+produces a floating-point result.  The NINT or INT function should be
 used (as appropriate) if an integer result is required.
 
 * The functions MAX and MIN may only have exactly two arguments.
 
-* All arithmetic is carried out internally in DOUBLE PRECISION (but the 
-compiler works out the effective data type of the result using the 
+* All arithmetic is carried out internally in DOUBLE PRECISION (but the
+compiler works out the effective data type of the result using the
 normal expression rules).
 
-* Exponentiation is performed by log/exp functions, with use of ABS to 
-avoid taking logs of negative args, thus -2**3 will come out as +8 not 
+* Exponentiation is performed by log/exp functions, with use of ABS to
+avoid taking logs of negative args, thus -2**3 will come out as +8 not
 -8.
 
 
@@ -847,7 +847,7 @@ In the following table the larger numbers denote higher precedence
       28	**
       30 	all functions
 
-Note that all operators except ** associate from left to right, but ** 
+Note that all operators except ** associate from left to right, but **
 and functions associate from right to left.
 
 "
@@ -861,22 +861,22 @@ This window allows you to set a few options to configure how xcatview
 displays columns.
 
 The items which may be controlled are displayed in the three buttons on
-the left hand side of the window.  The text to the right of each button 
+the left hand side of the window.  The text to the right of each button
 shows the option which is currently in effect.  To change the option for
 any of the items: click on the button corresponding to the item.  A list
-of the options for the item will appear; click on the one that you 
-require.  The current option shown to the right of the button will be 
-updated to reflect your choice.  Details of the individual items are 
+of the options for the item will appear; click on the one that you
+require.  The current option shown to the right of the button will be
+updated to reflect your choice.  Details of the individual items are
 given below.
 
-When you are happy with the settings of the items then simply click on 
+When you are happy with the settings of the items then simply click on
 the \"OK\" button or hit return.
 
 
 Details of the configuration items
 ----------------------------------
 
-Sequence Number:  specifies whether or not a sequence number is 
+Sequence Number:  specifies whether or not a sequence number is
    displayed at the start of every row listed in the current selection.
 
 Angle Format:  specifies how columns of angles are displayed.  The
@@ -1057,7 +1057,7 @@ In the following:
    corresponds exactly to a given quartile.  In this case the value is
    computed by averaging the two nearest elements.
 
-   The interquartile range is simply the positive difference between 
+   The interquartile range is simply the positive difference between
    Q(1) and Q(3).
 
 *  The median is simply the second quartile (j = 2).  The mean has its
@@ -1130,7 +1130,7 @@ The purpose of this window is twofold:
 
 
 On the left hand side of the window is a box listing all the selections
-which currently exist.  The list starts with two lines of titles and 
+which currently exist.  The list starts with two lines of titles and
 then shows a summary line for each selection.  The line corresponding to
 the current selection starts with an asterisk ('*').
 
@@ -1140,7 +1140,7 @@ If you do not want to change the current selection simply click on the
 To choose a new selection proceed as follows:
 
 
-*  click on the required selection in the list of selections (any 
+*  click on the required selection in the list of selections (any
    attempts to click on either of the two title lines will be ignored).
    The number of the chosen selection appears in the box immediately
    above the row of buttons on the right hand side of the window,
@@ -1148,8 +1148,8 @@ To choose a new selection proceed as follows:
 *  alternatively, you can type the number of the required selection
    directly into this box,
 
-*  in either case, once you are satisfied with the number of the 
-   selection appearing in the 'Selection:' box either click on the 
+*  in either case, once you are satisfied with the number of the
+   selection appearing in the 'Selection:' box either click on the
    \"OK\" button or hit return.
 "
 
@@ -1223,12 +1223,12 @@ Two menu options are available for creating selections:
 They are used under different circumstances.
 
 
-*  'Create a new selection' is a flexible way to generate selections 
+*  'Create a new selection' is a flexible way to generate selections
    which satisfy a wide range of different sorts of criteria.  You
    supply an algebraic expression, involving the names of columns,
    parameters, numeric constants etc. which defines the selection.  The
    rows of the current selection which satisfy this criterion become
-   the selection.  This sort of selection is always available for all 
+   the selection.  This sort of selection is always available for all
    catalogues.  It may be slow for large catalogues (say more than
    15,000 rows) because every row in the catalogue has to be examined.
 
@@ -1240,7 +1240,7 @@ They are used under different circumstances.
    rows are selected essentially immediately, irrespective of the size
    of the catalogue.  The disadvantage is that they are only available
    on columns which are sorted into ascending or descending order (or,
-   more precisely, columns which are known to xcatview to be so 
+   more precisely, columns which are known to xcatview to be so
    sorted).
 
    If you click on the 'Create a new range selection' menu option the
@@ -1254,7 +1254,7 @@ They are used under different circumstances.
    main display window.
 
 
-If you are intending to perform a series of selections on a large 
+If you are intending to perform a series of selections on a large
 catalogue with some columns suitable for range selection then it is
 usually advisable to perform any range selections first, if possible,
 in order to reduce the size of the current selection and hence speed up
@@ -1309,7 +1309,7 @@ plot.  These values are only required if Auto-scale is set to \"No\".
 You should simply enter the required values into the boxes.  Note that
 if Auto-scale is set to \"Yes\" you cannot enter values in the boxes.
 
-When you are happy with the settings of the items then simply click on 
+When you are happy with the settings of the items then simply click on
 the \"OK\" button or hit return.
 "
 
@@ -1326,7 +1326,7 @@ set of points.  Typically, the original plot and overlay will show
 different selections from the same catalogue.
 
 On the left hand side of the window is a box listing all the selections
-which currently exist.  The list starts with two lines of titles and 
+which currently exist.  The list starts with two lines of titles and
 then shows a summary line for each selection.  The line corresponding to
 the current selection starts with an asterisk ('*').
 
@@ -1352,7 +1352,7 @@ A list of the options for the item will appear; click on the one that
 you require.  The current option shown to the right of the button will
 be updated to reflect your choice.
 
-When you are happy with the settings of the items then simply click on 
+When you are happy with the settings of the items then simply click on
 the \"OK\" button or hit return.
 "
 
@@ -1415,7 +1415,7 @@ histogram.  These values are only required if Auto-scale is set to \"No\".
 You should simply enter the required values into the boxes.  Note that
 if Auto-scale is set to \"Yes\" you cannot enter values in the boxes.
 
-When you are happy with the settings of the items then simply click on 
+When you are happy with the settings of the items then simply click on
 the \"OK\" button or hit return.
 "
 
@@ -1432,7 +1432,7 @@ of points.  Typically, the original histogram and overlay will show
 different selections from the same catalogue.
 
 On the left hand side of the window is a box listing all the selections
-which currently exist.  The list starts with two lines of titles and 
+which currently exist.  The list starts with two lines of titles and
 then shows a summary line for each selection.  The line corresponding to
 the current selection starts with an asterisk ('*').
 
@@ -1451,7 +1451,7 @@ the button.  A list of colours will appear; click on the one that you
 require.  The current colour shown to the right of the button will be
 updated to reflect your choice.
 
-When you are happy with the settings of the items then simply click on 
+When you are happy with the settings of the items then simply click on
 the \"OK\" button or hit return.
 
 Note: if you want the bins in an overlay histogram to correspond exactly
@@ -1484,11 +1484,11 @@ options, at least, are fairly obscure and you are unlikely to need to
 change them; if in doubt stick with the defaults.
 
 The 'Echo Command' option specifies whether or not commands sent to the
-catview ADAM A-task are to be echoed in the error messages and information 
-region.  Seeing the commands echoed in this way is more likely to be 
-useful to a programmer working on xcatview than to a user.  If you do 
+catview ADAM A-task are to be echoed in the error messages and information
+region.  Seeing the commands echoed in this way is more likely to be
+useful to a programmer working on xcatview than to a user.  If you do
 not understand this explanation then you probably want to leave this item
-set to 'No'; turning it on will just cause lines of apparent gibberish to 
+set to 'No'; turning it on will just cause lines of apparent gibberish to
 appear in the error messages and information region.
 
 The 'Reformat Angle Units' option controls the appearance of the units

@@ -1,12 +1,12 @@
- 
- 
-      SUBROUTINE PDA_IDGRID(xd,yd,nt,ipt,nl,ipl,nxi,nyi,xi,yi,ngp, 
+
+
+      SUBROUTINE PDA_IDGRID(xd,yd,nt,ipt,nl,ipl,nxi,nyi,xi,yi,ngp,
      :                      igp,istat)
- 
+
 c this subroutine organizes grid points for surface fitting by
 c sorting them in ascending order of triangle numbers and of the
 c border line segment number.
- 
+
 c the input parameters are
 c     xd,yd = arrays of dimension ndp containing the x and y
 c           coordinates of the data points, where ndp is the
@@ -24,7 +24,7 @@ c     nyi = number of grid points in the y coordinate,
 c     xi,yi = arrays of dimension nxi and nyi containing
 c           the x and y coordinates of the grid points,
 c           respectively.
- 
+
 c the output parameters are
 c     ngp = integer array of dimension 2*(nt+2*nl) where the
 c           number of grid points that belong to each of the
@@ -35,13 +35,13 @@ c           grid point numbers are to be stored in ascending
 c           order of the triangle number and the border line
 c           segment number.
 *     istat = starlink error message.
- 
- 
+
+
 c declaration statements
-      dimension xd(100), yd(100), ipt(585), ipl(300), xi(101), yi(101), 
+      dimension xd(100), yd(100), ipt(585), ipl(300), xi(101), yi(101),
      :          ngp(800), igp(10201)
       integer istat
- 
+
 *   check the inherited error status.
       if ( istat.ne.0 ) return
 
@@ -56,7 +56,7 @@ c preliminary processing
       ximx = amax1(xi(1), xi(nxi0))
       yimn = amin1(yi(1), yi(nyi0))
       yimx = amax1(yi(1), yi(nyi0))
- 
+
 c determines grid points inside the data area.
       jngp0 = 0
       jngp1 = 2*(nt0+2*nl0) + 1
@@ -130,7 +130,7 @@ c determines grid points inside the data area.
          jngp1 = jngp1 - 1
          ngp(jngp1) = ngp1
  300  continue
- 
+
 c determines grid points outside the data area.
 c - in semi-infinite rectangular area.
       do 800 il0 = 1, nl0
@@ -205,7 +205,7 @@ c - in semi-infinite rectangular area.
          ngp(jngp0) = ngp0
          jngp1 = jngp1 - 1
          ngp(jngp1) = ngp1
- 
+
 c - in semi-infinite triangular area.
          ngp0 = 0
          ngp1 = 0

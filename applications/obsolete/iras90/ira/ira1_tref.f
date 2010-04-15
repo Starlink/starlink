@@ -81,7 +81,7 @@
 *        ACM_DRVPO( 5 ) = REAL (Write)
 *           Values defining the area occupied by the text, in the
 *           order; (X,Y) at start of box, (X,Y) at end of box, height
-*           of box (perpendicular to the line joing start and end of 
+*           of box (perpendicular to the line joing start and end of
 *           box).
 
 *  Arguments Given:

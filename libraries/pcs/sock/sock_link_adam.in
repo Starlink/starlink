@@ -24,8 +24,8 @@
 
 #  Description:
 #     This script should be invoked by those building ADAM applications
-#     which use SOCK in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
+#     which use SOCK in order to generate the correct arguments for the
+#     compiler (or ld) command. The arguments generated are written to
 #     the standard output.
 
 #  Copyright:

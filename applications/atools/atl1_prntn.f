@@ -14,7 +14,7 @@
 *     CALL ATL1_PRNTN( NP, NAX, AXVAL, PAR, STATUS )
 
 *  Description:
-*     The screen output is one position per line, x followed y, etc, 
+*     The screen output is one position per line, x followed y, etc,
 *     separated by spaces. Each output text file has one axis value
 *     per line.
 
@@ -27,8 +27,8 @@
 *        The axis values.
 *     PAR = CHARACTER * ( * ) (Given)
 *        The parameter name which gives the name of the text file to
-*        receive the axis values. If a null (!) value is obtained no output 
-*        file is created and the error is annulled. If a blank value is 
+*        receive the axis values. If a null (!) value is obtained no output
+*        file is created and the error is annulled. If a blank value is
 *        supplied for PAR no output file is created.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  List the values to the screen
       BUF = ' '
       DO I = 1, NP
-         IAT = 2   
+         IAT = 2
          DO J = 1, NAX
             IF( AXVAL( I, J ) .NE. AST__BAD ) THEN
                CALL CHR_PUTD( AXVAL( I, J ), BUF, IAT )
@@ -113,16 +113,16 @@
       END DO
 
 * If required, write the values to a text file.
-      IF( PAR .NE. ' ' ) THEN 
+      IF( PAR .NE. ' ' ) THEN
 
-*  Get the name of the output file. If non given, annul the error and 
+*  Get the name of the output file. If non given, annul the error and
 *  pass on.
          CALL PAR_GET0C( PAR, FNAME, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
 
-*  We delete any pre-existing file first. 
+*  We delete any pre-existing file first.
             CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
@@ -145,7 +145,7 @@
 *  Close the file.
             CALL FIO_ANNUL( FD, STATUS )
 
-         END IF  
+         END IF
 
       END IF
 

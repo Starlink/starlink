@@ -9,7 +9,7 @@ C     Prompts for a character string during a graphics dialogue.
 C
 C  Description:
 C     This routine prompts for a character string during an interactive
-C     graphics dialogue using the alphanumeric terminal screen 
+C     graphics dialogue using the alphanumeric terminal screen
 C     controlled by the GKD_ package.  It is intended to be used
 C     instead of PAR_QSTR during such dialogues.
 C
@@ -33,7 +33,7 @@ C
 C  External subroutines / functions details:
 C
 C     PAR_QSTR   Get a character string from the user.
-C-  
+C-
       SUBROUTINE GKD_QSTR (PROMPT,DEFAULT,BLANKOK,FOLD,STRING)
 C
       IMPLICIT NONE

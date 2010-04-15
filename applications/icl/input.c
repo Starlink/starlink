@@ -2,11 +2,11 @@
  *
  *	I N P U T . C
  *
- * This module implements both the input handling before the lexical analyser 
+ * This module implements both the input handling before the lexical analyser
  * (lex) see it AND all other input from files and stdin.
  *
  * LEX input
- * 	Since input may come from a number of sources (terminals, files, 
+ * 	Since input may come from a number of sources (terminals, files,
  *	strings) we hide all this behind an input stack.
  *	We can also auto-sense VMS files and perform the appropriate conversion
  *
@@ -115,7 +115,7 @@ static struct {
  *
  ******************************************************************************
  */
-static int 
+static int
 stack_this_input(void)
 {
     if (in_stack_height == ICL_BUFSIZE)
@@ -143,7 +143,7 @@ stack_this_input(void)
  *
  ******************************************************************************
  */
-static int 
+static int
 stack_file_input(FILE *fp, char *name)
 {
     if (!stack_this_input() ||
@@ -169,7 +169,7 @@ stack_file_input(FILE *fp, char *name)
  *
  ******************************************************************************
  */
-int 
+int
 stack_string_input(char *s, int length)
 {
     if (!stack_this_input())
@@ -191,7 +191,7 @@ stack_string_input(char *s, int length)
  *
  ******************************************************************************
  */
-void 
+void
 unstack_input(void)
 {
     if (in_stack_height == 0) {
@@ -227,7 +227,7 @@ unstack_input(void)
  */
 static int nprompt = 0;			/* depth of prompt stack */
 static char *prompts[ICL_BUFSIZE];	/* The stack itself      */
-char *prompt;				/* The current prompt. This is NOT 
+char *prompt;				/* The current prompt. This is NOT
 					 * static as SET prompt (in procs.c)
 					 *  needs to set it */
 
@@ -240,7 +240,7 @@ char *prompt;				/* The current prompt. This is NOT
  *
  ******************************************************************************
  */
-int 
+int
 stack_prompt(char *newprompt)
 {
     if (nprompt >= ICL_BUFSIZE)
@@ -258,7 +258,7 @@ stack_prompt(char *newprompt)
  *
  ******************************************************************************
  */
-int 
+int
 unstack_prompt(void)
 {
     if (nprompt <= 0)
@@ -277,7 +277,7 @@ unstack_prompt(void)
  *
  ******************************************************************************
  */
-void 
+void
 clear_promptstack(void)
 {
     while (nprompt)
@@ -297,7 +297,7 @@ clear_promptstack(void)
  *
  ******************************************************************************
  */
-value 
+value
 init_input(void)
 {
     if ((in_buffer = (char *) malloc(VMS_BUFSIZE)) == CHARNIL)
@@ -311,7 +311,7 @@ init_input(void)
     in_name = "STDIN";
     prompt = ICLDEFAULTPROMPT;
     in_fp = stdin;
-    return (store_symbol("STDIN", SYM_FILE, 
+    return (store_symbol("STDIN", SYM_FILE,
 			  node_value(value_file((PORTPTR) stdin))));
 }
 
@@ -324,7 +324,7 @@ init_input(void)
  *
  ******************************************************************************
  */
-int 
+int
 interactive(void)
 {
     return (in_flags & INPUT_TTY);
@@ -339,7 +339,7 @@ interactive(void)
  *
  ******************************************************************************
  */
-int 
+int
 terminal_output(void)
 {
     int flags;
@@ -370,7 +370,7 @@ terminal_output(void)
  *
  ******************************************************************************
  */
-int 
+int
 sense_vms(FILE *fp)
 {
     int res = 1, length, length2;
@@ -411,7 +411,7 @@ sense_vms(FILE *fp)
  *
  ******************************************************************************
  */
-static value 
+static value
 get_vms_line(FILE *fp)
 {
     int length, length1;
@@ -502,7 +502,7 @@ get_vms_line(FILE *fp)
  *
  ******************************************************************************
  */
-int 
+int
 icl_input(void)
 {
     value val;
@@ -516,7 +516,7 @@ icl_input(void)
 	/*
 	 * here we must wait for the reply from the io system to our request
 	 * for an input line AND handle any adam task messages
-	 * 
+	 *
 	 */
 	    do {
 		val = icl_gets( 1, "ICL Command input", in_buffer,
@@ -576,7 +576,7 @@ icl_input(void)
  *
  ******************************************************************************
  */
-void 
+void
 icl_unput(int c)
 {
     if (c <= 0)
@@ -599,7 +599,7 @@ icl_unput(int c)
 static struct iocommand message;
 static int inputcommandnumber = 1;
 
-value 
+value
 icl_gets
 (
 int interuptable,	/* Boolean controlling input interruption (input) */
@@ -629,8 +629,8 @@ char *dflt		/* default value for input (input) */
 	message.buflen += strlen(dflt) +1;
 	strcpy(&message.buff[message.dindex], dflt);
     } else
-	message.dindex = 0;	
-  
+	message.dindex = 0;
+
  /* Send command to io subsystem */
     write(iocommand_fd, &message, iocommandlength(message));
 
@@ -654,7 +654,7 @@ char *dflt		/* default value for input (input) */
  *
  ******************************************************************************
  */
-value 
+value
 clearupafterinput(char *whofor)
 {
 /*
@@ -682,7 +682,7 @@ clearupafterinput(char *whofor)
  *
  ******************************************************************************
  */
-value 
+value
 icl_fgets(char *filename, char *buffer, int buffersize, value vfp)
 {
     FILE *fp;
@@ -710,7 +710,7 @@ icl_fgets(char *filename, char *buffer, int buffersize, value vfp)
  *
  ******************************************************************************
  */
-value 
+value
 clearupafterread(value file, char *whofor, char *filename)
 {
     FILE *fp;
@@ -718,7 +718,7 @@ clearupafterread(value file, char *whofor, char *filename)
 
     fp = (FILE *) file_part(file);
     if (ferror(fp) || feof(fp)) {
-	sprintf(buf, "%s  during %s on file %s", (ferror(fp) ? 
+	sprintf(buf, "%s  during %s on file %s", (ferror(fp) ?
 					"READERR" : "EOF"), whofor, filename);
 	return exception(buf);
     } else
@@ -747,7 +747,7 @@ clearupafterread(value file, char *whofor, char *filename)
  *
  ******************************************************************************
  */
-value 
+value
 iclopenfile(char *whofor, char *filename, char *mode)
 {
     char buf[ICL_BUFSIZE];
@@ -785,7 +785,7 @@ iclopenfile(char *whofor, char *filename, char *mode)
  *
  ******************************************************************************
  */
-value 
+value
 do_load(char *command_name, char *name)
 {
     extern value interpret(node *n);			        /* interp.c */
@@ -856,7 +856,7 @@ compose_syntaxerr(char *mess)
 
     sprintf(buf, "SYNTAXERR  %s\n%s%s", mess, prompt, in_buffer);
     p = &buf[strlen(buf)];
-    for (i = plen + in_bufp - in_buffer - (yytext ? strlen(yytext) : 0); 
+    for (i = plen + in_bufp - in_buffer - (yytext ? strlen(yytext) : 0);
 	 	i; i--)
 	*p++ = ' ';
     *p++ = '^';

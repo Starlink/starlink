@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_RMBND( NIN, BLO, BHI, USEZ, Z, MAG, ANG, X, Y, NOUT, 
+*     CALL POL1_RMBND( NIN, BLO, BHI, USEZ, Z, MAG, ANG, X, Y, NOUT,
 *                      STATUS )
 
 *  Description:
@@ -25,7 +25,7 @@
 *          check is only applied if the Z argument is not equal to
 *          VAL__BADR).
 *
-*     All bad values are then  shuffled to the end of the array, and the 
+*     All bad values are then  shuffled to the end of the array, and the
 *     number of valid positions in the returned arrays is returned.
 
 *  Arguments:
@@ -56,7 +56,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,15 +121,15 @@
       YLO = DBLE( BLO( 2 ) )
 
 *  First handle cases where a Z value has been supplied.
-      IF( USEZ .NE. VAL__BADR ) THEN 
+      IF( USEZ .NE. VAL__BADR ) THEN
          ZZ  = USEZ
 
 *  Set any bad or out-of-bounds points bad (in all arrays).
          DO I = 1, NIN
-            IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR 
-     :          .OR. X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD 
-     :          .OR. X( I ) .LT. XLO .OR. X( I ) .GT. XHI 
-     :          .OR. Y( I ) .LT. YLO .OR. Y( I ) .GT. YHI 
+            IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR
+     :          .OR. X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD
+     :          .OR. X( I ) .LT. XLO .OR. X( I ) .GT. XHI
+     :          .OR. Y( I ) .LT. YLO .OR. Y( I ) .GT. YHI
      :          .OR. Z( I ) .NE. ZZ ) THEN
                MAG( I ) = VAL__BADR
                ANG( I ) = VAL__BADR
@@ -143,9 +143,9 @@
 
 *  Set any bad or out-of-bounds points bad (in all arrays).
          DO I = 1, NIN
-            IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR 
-     :          .OR. X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD 
-     :          .OR. X( I ) .LT. XLO .OR. X( I ) .GT. XHI 
+            IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR
+     :          .OR. X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD
+     :          .OR. X( I ) .LT. XLO .OR. X( I ) .GT. XHI
      :          .OR. Y( I ) .LT. YLO .OR. Y( I ) .GT. YHI ) THEN
                MAG( I ) = VAL__BADR
                ANG( I ) = VAL__BADR
@@ -162,10 +162,10 @@
          IF( MAG( I ) .NE. VAL__BADR ) THEN
             NOUT = NOUT + 1
             IF( I .NE. NOUT ) THEN
-               MAG( NOUT ) = MAG( I )            
-               ANG( NOUT ) = ANG( I )            
-               X( NOUT ) = X( I )            
-               Y( NOUT ) = Y( I )            
+               MAG( NOUT ) = MAG( I )
+               ANG( NOUT ) = ANG( I )
+               X( NOUT ) = X( I )
+               Y( NOUT ) = Y( I )
             END IF
          END IF
       END DO

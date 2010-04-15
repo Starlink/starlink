@@ -14,23 +14,23 @@
 *     CALL CCD1_DQEDS( XC, FJACC, LJC, IGO, IOPT, ROPT )
 
 *  Description:
-*     This is an instance of the DQEDEV service routine required by 
-*     the PDA library routine PDA_DQED which solves constrained 
-*     non-linear least-squares minimisation problems. It is configured 
-*     for use when determining an optimum set of logarithmic scale 
-*     factor and zero point corrections for a set of data arrays which 
-*     have been inter-compared in pairs and for which a set of individual 
-*     scale and zero differences have been found. The form of this routine 
+*     This is an instance of the DQEDEV service routine required by
+*     the PDA library routine PDA_DQED which solves constrained
+*     non-linear least-squares minimisation problems. It is configured
+*     for use when determining an optimum set of logarithmic scale
+*     factor and zero point corrections for a set of data arrays which
+*     have been inter-compared in pairs and for which a set of individual
+*     scale and zero differences have been found. The form of this routine
 *     is governed by the requirements of the PDA routine.
 
 *  Arguments:
 *     XC( * ) = DOUBLE PRECISION (Given)
-*        Value of the unknowns for which residuals and derivatives are 
-*        required. The first CCD1_N/2 of these will be the logarithmic 
-*        scale factor corrections for each data array; the second 
+*        Value of the unknowns for which residuals and derivatives are
+*        required. The first CCD1_N/2 of these will be the logarithmic
+*        scale factor corrections for each data array; the second
 *        CCD1_N/2 will be the zero point corrections.
 *     FJACC( LJC, * ) = DOUBLE PRECISION (Returned)
-*        Array of residuals and derivates. 
+*        Array of residuals and derivates.
 *        The first part of this array gives the partial derivative of
 *        each residual with respect to each correction, evaluated with
 *        the current set of correctins. The final part contains the the
@@ -173,13 +173,13 @@
 
 *.
 
-*  Determine the number of data arrays and the number of 
-*  inter-comparisons which were made. Remember to exclude the 
+*  Determine the number of data arrays and the number of
+*  inter-comparisons which were made. Remember to exclude the
 *  normalization variables, if a reference array isn't given.
-      IF ( CCD1_IREF .EQ. 0 ) THEN 
+      IF ( CCD1_IREF .EQ. 0 ) THEN
          NIN = ( CCD1_N - 2 ) / 2
          NCMP = ( CCD1_M - 2 ) / 2
-      ELSE 
+      ELSE
          NIN = CCD1_N / 2
          NCMP = CCD1_M / 2
       END IF

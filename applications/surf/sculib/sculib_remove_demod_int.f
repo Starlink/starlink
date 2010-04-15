@@ -7,7 +7,7 @@
 *     SCULIB_REMOVE_DEMOD_INT
 
 *  Purpose:
-*     remove demodulated data for one sub-instrument 
+*     remove demodulated data for one sub-instrument
 *     in an integration from a coadded result
 
 *  Description:
@@ -191,10 +191,10 @@
                      COADD_VARIANCE (BOL,J) = 0.0
                   ELSE
                      COADD_DATA (BOL,J) = SUM / COADD_NUMBER (BOL,J)
-                     COADD_VARIANCE (BOL,J) = 
-     :                 (SUMSQ - COADD_NUMBER(BOL,J) * 
+                     COADD_VARIANCE (BOL,J) =
+     :                 (SUMSQ - COADD_NUMBER(BOL,J) *
      :                 COADD_DATA(BOL,J) **2) /
-     :                 (COADD_NUMBER (BOL,J) * 
+     :                 (COADD_NUMBER (BOL,J) *
      :                 (COADD_NUMBER (BOL,J) - 1))
                      COADD_QUALITY (BOL,J) = 0
                   END IF

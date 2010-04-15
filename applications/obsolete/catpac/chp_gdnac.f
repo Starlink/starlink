@@ -18,7 +18,7 @@
 *  Description:
 *     Get all the data from the next entry in a catalogue allowing non standard
 *     formats, fixed and variable length arrays and variable length
-*     character strings. Each possible column type has an associated 
+*     character strings. Each possible column type has an associated
 *     array CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS and PTRVALS
 *     and the data is returned in these arrays.
 *     NAMES will contain the names of the columns. COLDES and COLTYPES are
@@ -26,7 +26,7 @@
 *     correctly interpreted.
 *
 *     The data in each array appear in the same order that the columns appear
-*     in CNAMES, the list of column names. So if 
+*     in CNAMES, the list of column names. So if
 *
 *     NAMES     COL1  COL2  COL3  COL4  COL5  COL6  COL7  COL8  COL9  COL10
 *
@@ -42,16 +42,16 @@
 *
 *     COLDES(i) = 1 This is a scalar column, if it is a character string it
 *     is CHP__SZCVAL long. COLTYPES(i) will be C,D,I,L or R.
-*     The null value flag is returned in NULLS(i). 
+*     The null value flag is returned in NULLS(i).
 *
-*     COLDES(i) = 2 This is a structure column. A pointer to the structure in 
+*     COLDES(i) = 2 This is a structure column. A pointer to the structure in
 *     dynamic memory is returned in PTRVALS(i). The null value flag,
-*     ie. TRUE for no valid structure, is returned in NULLS(i). COLTYPES(i) 
+*     ie. TRUE for no valid structure, is returned in NULLS(i). COLTYPES(i)
 *     will be P.
 *
-*     COLDES(i) = 3 This is an array column whose size is the same for all 
-*     entries. Character string are always CHP__SZCVAL long. 
-*     A pointer to the array of data and the associated information is given 
+*     COLDES(i) = 3 This is an array column whose size is the same for all
+*     entries. Character string are always CHP__SZCVAL long.
+*     A pointer to the array of data and the associated information is given
 *     in the corresponding PTRVALS(i).
 *     The null value flag, ie. TRUE for no valid array, is returned in NULLS(i).
 *     COLTYPES(i) will be C,D,I,L or R reflecting the type of elements in the
@@ -59,21 +59,21 @@
 *
 *     COLDES(i) = 4 This is an array whose shape and dimensions may vary from
 *     entry to entry. Character string are always CHP__SZCVAL long.
-*     A pointer to the array of data and the associated information is given 
+*     A pointer to the array of data and the associated information is given
 *     in the corresponding PTRVALS(i).
 *     The null value flag, ie. TRUE for no valid array, is returned in NULLS(i).
 *     COLTYPES(i) will be C,D,I,L or R reflecting the type of elements in the
 *     array.
 *
-*     COLDES(i) = 5 This is a scalar column. It is a variable length character 
+*     COLDES(i) = 5 This is a scalar column. It is a variable length character
 *     string. A pointer to the character string and the associated information
 *     is given in PTRVALS(i).
 *     The null value flag is returned in NULLS(i).
 *     COLTYPES(i) will be C.
 *
-*     COLDES(i) = 6 This is an array column of character strings whose shape, 
+*     COLDES(i) = 6 This is an array column of character strings whose shape,
 *     dimensions and string length may vary from entry to entry.
-*     A pointer to the array of data and the associated information is given 
+*     A pointer to the array of data and the associated information is given
 *     in PTRVALS(i).
 *     The null value flag, ie. TRUE for no valid array, is returned in NULLS(i).
 *     COLTYPES(i) will be C.
@@ -108,7 +108,7 @@
 *        Global status.
 
 *  Notes:
-*     This routine may allocate virtual memory. Always remember to release 
+*     This routine may allocate virtual memory. Always remember to release
 *     any allocated virtual memory.
 
 *  Anticipated Errors:
@@ -127,7 +127,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -154,12 +154,12 @@
       CHARACTER * ( 1 ) COLTYPES( * )
       INTEGER COLDES ( * )
       LOGICAL NULLS ( * )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External references:
-      logical chr_simlr 
+      logical chr_simlr
 
 *  Local Variables:
       integer count
@@ -214,7 +214,7 @@
 *  Local Data:
 *
 *  PI, 2PI, PI/2
-      REAL*8 DPI 
+      REAL*8 DPI
       PARAMETER (DPI=3.141592653589793238462643D0)
       REAL*8 D2PI
       PARAMETER (D2PI=6.283185307179586476925287D0)
@@ -268,7 +268,7 @@
 *
 *    This could be an Extension join catalogue, an Extension Search
 *    catalogue, an Extension Plain catalogue or a Regular catalogue.
-*    Whatever the type of catalogue get the data from the underlying 
+*    Whatever the type of catalogue get the data from the underlying
 *    CHI catalogue(s).
 *
       call chp_getcd(input, 'WRITE', cd, status)
@@ -293,12 +293,12 @@
 *  This must be a Regular Catalogue so get the data out of the
 *  CHI catalogue.
 *
-        call chi_gdnac(input, tcnames, tnumcols, tcharvals, 
+        call chi_gdnac(input, tcnames, tnumcols, tcharvals,
      :  tdoubvals, tintvals,
      :  tlogvals, trealvals, tcoltypes, tnulls, status)
 *
 *  Each of these columns may be a column in the catalogue, an identifier to
-*  an array or structure or a non standard format. 
+*  an array or structure or a non standard format.
 *  Every column from the underlying catalogue has a match in the CHP catalogue
 *  find the match and process the column data
 *
@@ -326,7 +326,7 @@
                 endif
               else
                 dval = trealvals(cc)
-                call chp_condsn( dval, EPnsformat(cd,cb), 
+                call chp_condsn( dval, EPnsformat(cd,cb),
      - cval, status)
                 charvals(cb) = cval
                 coltypes(cb) = 'C'
@@ -341,8 +341,8 @@
 *                 elseif(EParrtype(cd,cb) .eq. 0) then
 *                   continue
 *                 elseif(EParrtype(cd,cb) .eq. 1) then
-*                   call chp_retrieve(input, EPname(cd,cb), tintvals(cc), 
-*     :  coltypes(cb), arrtypes(cb), arrshp(cb), temparrdim(7), 
+*                   call chp_retrieve(input, EPname(cd,cb), tintvals(cc),
+*     :  coltypes(cb), arrtypes(cb), arrshp(cb), temparrdim(7),
 *     :  charlen(cb), charoff(cb), intvals(cb), nullarr(cb), status)
 *                   numcols = numcols + 1
 *                   do count = 1, 7
@@ -356,8 +356,8 @@
 *                   continue
 *                 endif
             endif
-            cc = cc + 1 
-          enddo 
+            cc = cc + 1
+          enddo
         enddo
       endif
 *

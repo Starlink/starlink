@@ -9,7 +9,7 @@ C     Sets the exposure time associated with a data structure.
 C
 C  Description:
 C     A number of Figaro routines make use of an exposure time
-C     associated with a structure.  This routine allows such an 
+C     associated with a structure.  This routine allows such an
 C     exposure time to be set.
 C
 C  Language:
@@ -27,7 +27,7 @@ C                      associated with the structure.
 C     (!) STATUS       (Integer,ref) Status code.  If bad status is
 C                      passed, this routine returns immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables internal to the DSA system.
 C
 C  External subroutines / functions used:
@@ -93,7 +93,7 @@ C
       INTEGER   IGNORE                      ! Dummy status value
       INTEGER   LENGTH                      ! Length of structure name
       CHARACTER NAME*80                     ! DTA_ name for exposure time
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*80                ! Full name of structure
 C
 C     Return immediately on bad status

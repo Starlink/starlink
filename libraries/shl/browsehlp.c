@@ -17,7 +17,7 @@
  *    The following description assumes this library function is
  *    called as described below by a thin calling routine from main.
  *    The application itself has been factored into a subroutine to simplify
- *    code re-use. Whenever "application" is used it refers to this 
+ *    code re-use. Whenever "application" is used it refers to this
  *    library function. The usage described above is assumed since this
  *    module process the command line arguments.
  *
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,7 +92,7 @@
  *    2-SEP-2005 (TIMJ):
  *       Initialise fortran runtime
 
- * Bugs: 
+ * Bugs:
  *    {Enter_new_bugs_here}
 
  *-

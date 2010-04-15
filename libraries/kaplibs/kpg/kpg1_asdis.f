@@ -1,4 +1,4 @@
-      DOUBLE PRECISION FUNCTION KPG1_ASDIS( FRAME, DIM, NAX, POS, I1, 
+      DOUBLE PRECISION FUNCTION KPG1_ASDIS( FRAME, DIM, NAX, POS, I1,
      :                                      I2, GEO, STATUS )
 *+
 *  Name:
@@ -14,8 +14,8 @@
 *     RESULT = KPG1_ASDIS( FRAME, DIM, NAX, POS, I1, I2, GEO, STATUS )
 
 *  Description:
-*     This routine returns the distance between two positions in the 
-*     supplied co-ordinate Frame. Either the geodesic or Euclidean distance 
+*     This routine returns the distance between two positions in the
+*     supplied co-ordinate Frame. Either the geodesic or Euclidean distance
 *     can be returned.
 
 *  Arguments:
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,11 +76,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Arguments Given:
@@ -96,7 +96,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      
+
 *  Local Variables:
       DOUBLE PRECISION L2        ! The sum of squared axis increments
       DOUBLE PRECISION P1( NDF__MXDIM )! The first position

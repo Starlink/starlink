@@ -26,7 +26,7 @@
 *     examine your data and decide which columns in the data
 *     are to included in the catalogue. For each of these fields note
 *     the start position and the FORTRAN format that should be used to
-*     read the data in this field. A wide range of sexagesimal formats are 
+*     read the data in this field. A wide range of sexagesimal formats are
 *     also available. A good idea for finding the correct
 *     start positions is to copy the first few entries of the data into
 *     a separate file and include a first line containing
@@ -51,7 +51,7 @@
 *     application first prompts for the name of the catalogue being
 *     created and the name of the file from which the data is to be
 *     read and then for the information file.
-*     
+*
 *     This application creates a Regular catalogue which contains only
 *     real columns. Virtual columns, Catnotes, Cathelp and Parameters
 *     may be added to the catalogue later. Columns may only be scalar
@@ -59,7 +59,7 @@
 *     have an assert expression and all the values are none null.
 
 *  Usage:
-*     ASCIICAT INPUT DATAFILE INFOFILE 
+*     ASCIICAT INPUT DATAFILE INFOFILE
 
 *  ADAM Parameters:
 *     INPUT = _CHAR (Read)
@@ -70,7 +70,7 @@
 *        Name of the file containing the field information.
 
 *  Example:
-*     ASCIICAT TEST TESTDATA.DAT TESTINFO.DAT 
+*     ASCIICAT TEST TESTDATA.DAT TESTINFO.DAT
 
 *  Notes:
 *     This application performs no checking on your column definition.
@@ -90,7 +90,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'PAR_ERR'   ! PAR errors
       INCLUDE 'CHP_PAR'   ! CHP constants
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -142,7 +142,7 @@
        call par_get0c('INPUT', incat, status)
        call par_get0c('DATAFILE', datafile, status)
        call par_get0c('INFOFILE', filename, status)
-* 
+*
 *   Loop prompting for the column details
 *
 *
@@ -158,14 +158,14 @@
         call fio_read(fd, buff1, numc1, status)
         ccomments(numcol) = buff1(1:numc1)
         call fio_read(fd, buff1, numc1, status)
-        call chr_ctoi(buff1(1:numc1), start, status) 
+        call chr_ctoi(buff1(1:numc1), start, status)
         startpos(numcol) = start
-*   
+*
             numcol = numcol + 1
        enddo
         call err_annul(status)
         numcol = numcol - 2
-*      
+*
         call fio_close(fd, status)
        if (status .eq. SAI__OK) then
 *

@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -114,7 +114,7 @@
 
 
       SUBROUTINE DSA1_DELAX( SLOT, AXIS, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

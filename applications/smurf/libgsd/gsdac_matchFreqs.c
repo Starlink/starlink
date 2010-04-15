@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs, 
+*     gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 *                        double *IFFreqs, int *status )
 
 *  Arguments:
@@ -25,10 +25,10 @@
 *     IFFreqs = double* (Given and Returned)
 *        Array of IFFreqs to be associated with each subband.
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
-*     This routine checks the spacing of the frequencies in the 
+*     This routine checks the spacing of the frequencies in the
 *     subbands to see if this is a special configuration.  It then
 *     determines which subbands should share a common IFFreq and
 *     what it should be for those subbands.  Each subband's IFFreq
@@ -37,9 +37,9 @@
 *     the same matching is performed.
 *
 *     NOTE: currently this routine only determines whether all
-*     subbands belong together or not.  It does not deal with 
+*     subbands belong together or not.  It does not deal with
 *     observation in which some BUT NOT ALL subbands belong
-*     together.  In its current form, matchFreqs is an 
+*     together.  In its current form, matchFreqs is an
 *     all-or-nothing method.
 
 *  Authors:
@@ -79,9 +79,9 @@
 
 *  Bugs:
 *     NOTE: currently this routine only determines whether all
-*     subbands belong together or not.  It does not deal with 
+*     subbands belong together or not.  It does not deal with
 *     observation in which some BUT NOT ALL subbands belong
-*     together.  In its current form, matchFreqs is an 
+*     together.  In its current form, matchFreqs is an
 *     all-or-nothing method.
 *-
 */
@@ -100,7 +100,7 @@
 
 #define FUNC_NAME "gsdac_matchFreqs"
 
-void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs, 
+void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
                         double *IFFreqs, int *status )
 
 {
@@ -124,7 +124,7 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
   /* Sort the frequencies from lowest to highest. */
   for ( i = 1; i < gsdVars->nBESections; i++ ) {
- 
+
     sortFreq = centreFreqs[i];
 
     for ( j = i - 1; j >= 0 && centreFreqs[j] > sortFreq; j-- ) {
@@ -142,18 +142,18 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
       i = gsdVars->nBESections;
       special = 1;
-      msgOutif(MSG__VERB," ", 
-      	       "This appears to be a special configuration", status); 
+      msgOutif(MSG__VERB," ",
+      	       "This appears to be a special configuration", status);
 
     }
 
   }
 
-  /* If this is flagged as a special configuration, set each of the 
+  /* If this is flagged as a special configuration, set each of the
      IFFreqs to the corresponding value found in the GSD BES_TOT_IF
      array.  Otherwise, set all IFFreqs to 4.0 GHz. */
   if ( special ) {
- 
+
     for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
       IFFreqs[i] = gsdVars->totIFs[i];
@@ -165,17 +165,17 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
     for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
-      /* MPI frontends used an IF of 3.5 GHz, other frontends 
+      /* MPI frontends used an IF of 3.5 GHz, other frontends
          used 4.0GHz. */
       if ( strncmp ( gsdVars->frontend, "MPI", 3 ) == 0 )
         IFFreqs[i] = 3.5 * gsdVars->sbSigns[i];
-      else 
+      else
         IFFreqs[i] = 4.0 * gsdVars->sbSigns[i];
 
       lineFreqs[i] = gsdVars->restFreqs[i];
 
     }
 
-  }    
+  }
 
 }

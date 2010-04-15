@@ -67,7 +67,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,7 +88,7 @@
 *  internal memory within common block /MECOMS/.  Area <3> holds the FFT
 *  of the PSF.
       IF ( C1_WEXT ) THEN
-         CALL KPS1_TROP1( %VAL( CNF_PVAL( C1_IP( 3 ) ) ), 
+         CALL KPS1_TROP1( %VAL( CNF_PVAL( C1_IP( 3 ) ) ),
      :                    %VAL( CNF_PVAL( C1_IP( K ) ) ),
      :                    %VAL( CNF_PVAL( C1_IP( J ) ) ) )
 
@@ -97,12 +97,12 @@
 *  images because of the need to have an integer number of buffers in
 *  each area).  This simulates a response function of zero at these
 *  pixels.
-         CALL KPS1_MEMFX( ME_MK * ME_NK, C1_NPX * C1_NLN, 
+         CALL KPS1_MEMFX( ME_MK * ME_NK, C1_NPX * C1_NLN,
      :                    %VAL( CNF_PVAL( C1_IP( J ) ) ) )
 
-      ELSE 
-         CALL KPS1_TROP1( ME_ST( ME_KB( 3 ) ), ME_ST( ME_KB( K ) ), 
-     :                    ME_ST( ME_KB( J ) ) ) 
+      ELSE
+         CALL KPS1_TROP1( ME_ST( ME_KB( 3 ) ), ME_ST( ME_KB( K ) ),
+     :                    ME_ST( ME_KB( J ) ) )
 
       END IF
 

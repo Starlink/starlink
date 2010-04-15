@@ -16,11 +16,11 @@
 *
 * Arguments:
 *    WAVEP(LINE_COUNT) = REAL ARRAY (Given)
-*       
+*
 *    DELWAVE(LINE_COUNT) = REAL ARRAY (Given)
-*       
+*
 *    LINE_COUNT = INTEGER (Given)
-*       
+*
 *-
       implicit none
       integer line_count
@@ -31,7 +31,7 @@
       character bss*2,bs*1
       data bss/'\\'/
       bs = bss(1:1)
- 
+
       zeroy(1) = 0.0
       zeroy(2) = 0.0
 *

@@ -73,12 +73,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -147,12 +147,12 @@
 
 *  Convert the N dimensional coordinates to the corresponding 1D vector
 *  addresses, excluding any coordinates which fall outside the bounds.
-      CALL IRQ1_NDTOV( NDIM, NCOORD, LIST, LBND, UBND, 
+      CALL IRQ1_NDTOV( NDIM, NCOORD, LIST, LBND, UBND,
      :                 %VAL( CNF_PVAL( PNT ) ), NOK,
      :                 STATUS )
 
 *  Perform the required operation on the selected pixels.
-      CALL IRQ1_QLST2( BIT, LISTED, SET, NOK, %VAL( CNF_PVAL( PNT ) ), 
+      CALL IRQ1_QLST2( BIT, LISTED, SET, NOK, %VAL( CNF_PVAL( PNT ) ),
      :                 SIZE, QUAL,
      :                    STATUS )
 

@@ -27,7 +27,7 @@
       IF ( USED_RECORDS .GE. MAX_QENTRIES ) CALL QMAN_REORDER( STATUS )
 
 *   If it's still too big, signal an error
-      IF ( ( USED_RECORDS .GE. MAX_QENTRIES ) .OR. 
+      IF ( ( USED_RECORDS .GE. MAX_QENTRIES ) .OR.
      :     ( STATUS .NE. SAI__OK ) ) THEN
 
         STATUS = SAI__ERROR

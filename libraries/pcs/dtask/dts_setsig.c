@@ -68,7 +68,7 @@
 *     14-MAY-1999 (BKM):
 *        Revise logic for selecting Alpha version of sigaction.
 *     17-MAY-1999 (BKM):
-*        Revise for new header files with egcs-2.91.66 on RedHat Linux 
+*        Revise for new header files with egcs-2.91.66 on RedHat Linux
 *        version 6.0.
 *     11-JAN-2001 (BKM):
 *        Revise to defeat new C compiler extreme fussiness on Compaq Tru64 V5.0
@@ -108,7 +108,7 @@ static struct siglist *stack_top = NULL;
 static unsigned int sigisset=0;
 
 /* Function declaration */
-static void 
+static void
 #ifndef SA_SIGINFO
 dtask_sighdlr(int isig);
 #else
@@ -125,12 +125,12 @@ process_signal(int signo, struct sigaction oact)
 {
     struct siglist *entry, *new_entry;
 #ifdef __alpha
-    void (*hanfun) (int,int,struct sigcontext *); 
+    void (*hanfun) (int,int,struct sigcontext *);
 #else
     void (*hanfun);
 #endif
 
-    if( (sigisset>>signo) & 1) /* Signal handler already processed */ 
+    if( (sigisset>>signo) & 1) /* Signal handler already processed */
 	return;
 
     if( oact.sa_handler != SIG_DFL ) {
@@ -166,8 +166,8 @@ process_signal(int signo, struct sigaction oact)
 
 /* Mark signal handler set in bitmask */
    sigisset |= (1<<signo);
- 
-} 
+
+}
 
 /* DTASK_SETSIG - Fortran callable routine to set up signal handlers.
  *                Called from DTASK_MAIN
@@ -178,8 +178,8 @@ F77_SUBROUTINE(dtask_setsig)( LOGICAL(iflag) )
     struct sigaction ignact, oact;
     sigset_t curset;
 
-/*   Set up an exit handler and default signal handlers for our process 
- *   Note: all signal handlers can be overridden by the user elsewhere in 
+/*   Set up an exit handler and default signal handlers for our process
+ *   Note: all signal handlers can be overridden by the user elsewhere in
  *   the process and we should document any side effects of doing this.
  */
     ignact.sa_handler = SIG_IGN;
@@ -190,8 +190,8 @@ F77_SUBROUTINE(dtask_setsig)( LOGICAL(iflag) )
  * from the shell or from ICL or Tcl (via the messaging system).
  */
     if ( F77_ISTRUE(*iflag) ) {	/* Running from ICL or Tcl */
-	sigaction(SIGINT,  &ignact, NULL); 
-	sigaction(SIGQUIT, &ignact, NULL); 
+	sigaction(SIGINT,  &ignact, NULL);
+	sigaction(SIGQUIT, &ignact, NULL);
 /* We use socket based communications - avoid process abort on SIGPIPE
  * (the read/write errors on the closed socket will be detected and
  *  processed by the software)
@@ -206,7 +206,7 @@ F77_SUBROUTINE(dtask_setsig)( LOGICAL(iflag) )
 
 /* Defaults for all processes */
 
-/* Hangup and Default kill signals  - we use these to make an ADAM task exit 
+/* Hangup and Default kill signals  - we use these to make an ADAM task exit
  * quietly after running all exit handlers
  */
     sigaction ( SIGHUP, NULL, &oact );
@@ -280,7 +280,7 @@ dtask_sighdlr(int isig, int sigcode, struct sigcontext *scp)
     struct siglist *entry, *cur_entry = NULL;
     sigset_t set, curset;
 #ifdef __alpha
-    void (*hanfun) (int,int,struct sigcontext *); 
+    void (*hanfun) (int,int,struct sigcontext *);
 #endif
 
 #ifdef __alpha

@@ -115,7 +115,7 @@
 
 * Vaxstation 2-plane device
 	ELSE IF( DEVICE_NAME. EQ. 'VAXSTATION2') THEN
-          WKSTN_ID = '1740,0' 
+          WKSTN_ID = '1740,0'
           WKSTN_SEQ = 1740
 
 * Tektronix T4010 device

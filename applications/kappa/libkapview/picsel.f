@@ -137,7 +137,7 @@
      :  DEVCAN,                ! Image-display parameter is to be
                                ! cancelled
      :  FIRST,                 ! The current picture is the last picture
-                               ! i.e. it is the first time around the 
+                               ! i.e. it is the first time around the
                                ! search loop
      :  SEARCH                 ! The picture with the required label
                                ! has not been found

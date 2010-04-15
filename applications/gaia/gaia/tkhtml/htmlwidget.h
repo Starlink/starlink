@@ -309,7 +309,7 @@ struct HtmlImage {
   char *zUrl;              /* The URL for this image. */
   char *zWidth, *zHeight;  /* Width and height in the <img> markup. */
   HtmlImage *pNext;        /* Next image on the list */
-  HtmlElement *pList;      /* List of all <IMG> markups that use this 
+  HtmlElement *pList;      /* List of all <IMG> markups that use this
                            ** same image */
 };
 #define STYLER_RUNNING       0x000800
@@ -383,7 +383,7 @@ struct HtmlWidget {
   int nToken;                   /* Number of HTML tokens on the list.
                                  * Html_Block tokens don't count. */
   HtmlElement *lastSized;       /* Last HTML element that has been sized */
-  HtmlElement *nextPlaced;      /* Next HTML element that needs to be 
+  HtmlElement *nextPlaced;      /* Next HTML element that needs to be
                                  * positioned on canvas. */
   HtmlBlock *firstBlock;        /* List of all HtmlBlock tokens */
   HtmlBlock *lastBlock;         /* Last HtmlBlock in the list */
@@ -406,7 +406,7 @@ struct HtmlWidget {
   HtmlBlock *pSelEndBlock;      /* Block in which selection ends */
 
   /*
-   * Information about the insertion cursor 
+   * Information about the insertion cursor
    */
   int insOnTime;                /* How long the cursor states one (millisec) */
   int insOffTime;               /* How long it is off (milliseconds) */
@@ -433,7 +433,7 @@ struct HtmlWidget {
                                  * Html_XMP */
   HtmlScript *pScript;            /* <SCRIPT> currently being parsed */
   char *zHandler[Html_TypeCount]; /* If not NULL, this is a TCL routine that
-                                 * is used to process tokens of the given 
+                                 * is used to process tokens of the given
                                  * type */
   /*
    * These fields hold state information used by the HtmlAddStyle routine.
@@ -541,7 +541,7 @@ struct HtmlWidget {
                                  * corresponds to (0,0) on the physical screen
                                  * in window tkwin */
   int maxX, maxY;               /* Maximum extent of any "paint" that appears
-                                 * on the virtual canvas.  Used to compute 
+                                 * on the virtual canvas.  Used to compute
                                  * scrollbar positions. */
   int dirtyLeft, dirtyTop;      /* Top left corner of region to redraw.  These
                                  * are physical screen coordinates relative to

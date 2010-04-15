@@ -4,7 +4,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -120,11 +120,11 @@ C# IL>=a, OL>=0
         LPOSS = JPOSS
         JPOSS = 0
    21   CONTINUE
- 
+
 *       Insert Peak in new place
         JETNXT(LPOSS) = JPEAK(1)
         JETNXT(JPEAK(2)) = JPOSS
- 
+
 *       Truncate Edges of Peak
         VXETT(JPEAK(1)) = XCUT1
         VXETT(JPEAK(2)) = XCUT2
@@ -134,5 +134,5 @@ C# IL>=a, OL>=0
 *  Cut too high - do nothing
       ENDIF
   999 CONTINUE
- 
+
       END

@@ -9,7 +9,7 @@ C     Indicates whether or not a data array may contain flagged values.
 C
 C  Description:
 C     If an application needs to explicitly indicate either that a newly
-C     created data array contains flagged data values, or needs to 
+C     created data array contains flagged data values, or needs to
 C     indicate to the system that a data array that did contain flagged
 C     values no longer does so, it can call this routine to set the
 C     appropriate flags in the data structure.  This routine should be
@@ -34,7 +34,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
@@ -82,7 +82,7 @@ C
       INTEGER STATUS
 C
 C     Functions
-C  
+C
       INTEGER ICH_FOLD, ICH_LEN
 C
 C     Local variables
@@ -93,7 +93,7 @@ C
       INTEGER   LENGTH                      ! Object name length - ignored
       CHARACTER OBJ_NAME*32                 ! DTA_ name of data object - ignored
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     DSA system common
 C

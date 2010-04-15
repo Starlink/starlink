@@ -60,8 +60,8 @@
 *    History :
 *
 *     28-06-1985 : Modified GLITCH (which calculates local mean
-*                : around specified pixel, and replaces old value 
-*                : with this mean) to take a user specified value 
+*                : around specified pixel, and replaces old value
+*                : with this mean) to take a user specified value
 *                : for the replacement, and called it CHPIX.
 *                : (REVA::MJM)
 *     09-12-1985 : Fixed error checking bug and implemented some
@@ -79,7 +79,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'           ! global SSE definitions
-      INCLUDE 'NDF_PAR'          
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'
 
 *    Status :
@@ -93,7 +93,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  IDIMS( NDIMS ), ! dimensions of input DATA_ARRAY
      :  NELEMENTS,      ! Number of elements mapped
      :  NDIM,           ! Number of dimensions from NDF_DIM
@@ -106,7 +106,7 @@
      :  LOCI,                 ! input data structure
      :  LOCO                  ! output data structure
 
-      REAL 
+      REAL
      :  OLDVAL,               ! old value of deglitched pixel
      :  NEWVAL                ! new   "   "       "       "
 
@@ -121,14 +121,14 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error so far then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
-      
+
 *       get dimensions of array
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS)
 
@@ -138,7 +138,7 @@
          CALL MSG_OUT( 'INPUT_DIMS',
      :        'Image is ^XDIM by ^YDIM pixels', STATUS )
 
-*       now create output IMAGE type data structure with DATA_ARRAY 
+*       now create output IMAGE type data structure with DATA_ARRAY
 *       component; also create and get value for TITLE component
          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, LOCO, STATUS )
 
@@ -146,14 +146,14 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                     PNTRO, NELEMENTS, STATUS )
 
 *          check for error before accessing pointer
             IF ( STATUS .EQ. SAI__OK ) THEN
 
-*             copy old array into new array 
-               CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
+*             copy old array into new array
+               CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
      :                      %VAL( PNTRO ), STATUS )
 
             END IF
@@ -179,8 +179,8 @@
 *             check for error before accessing pointer
                IF ( STATUS .EQ. SAI__OK ) THEN
 
-                  CALL CHPIXSUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ), 
-     :                           XCOORD, YCOORD, NEWVAL, OLDVAL, 
+                  CALL CHPIXSUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ),
+     :                           XCOORD, YCOORD, NEWVAL, OLDVAL,
      :                           STATUS )
 
 
@@ -194,7 +194,7 @@
                   CALL MSG_OUT( 'INPUT_NEWVAL',
      :               'New pixel value is  = ^NEWVAL', STATUS )
                   CALL MSG_OUT( 'BLANK', ' ',STATUS )
-  
+
 *             end of if-no-error-before-calling-subroutine check
                END IF
 

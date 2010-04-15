@@ -1,5 +1,5 @@
       SUBROUTINE FRQUAL(S_VM, L_VM, Q_VM, STATUS)
- 
+
 
 *+
 *
@@ -26,10 +26,10 @@
       INTEGER S_VM       ! address of DATA array
       INTEGER L_VM       ! address of QUAL array
       INTEGER Q_VM       ! address of R array
- 
+
 *   Export:
       INTEGER STATUS     ! status return
- 
+
       IF (Q_VM.GT.0) CALL DLADR(Q_VM, STATUS)
       IF (L_VM.GT.0) CALL DLADR(L_VM, STATUS)
       IF (S_VM.GT.0) CALL DLADR(S_VM, STATUS)

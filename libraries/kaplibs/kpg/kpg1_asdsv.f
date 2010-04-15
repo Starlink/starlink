@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASDSV( FRM, NP, NAX, POS, NORM, DIS, BAD, 
+      SUBROUTINE KPG1_ASDSV( FRM, NP, NAX, POS, NORM, DIS, BAD,
      :                       STATUS )
 *+
 *  Name:
@@ -15,12 +15,12 @@
 
 *  Description:
 *     This routine returns the distance to each point in a set of points,
-*     from the first point, measured along the path joining the points. 
+*     from the first point, measured along the path joining the points.
 *     Geodesic distances within the supplied Frame are used.
 
 *  Arguments:
 *     FRM = INTEGER (Given)
-*        An AST pointer to the Frame. 
+*        An AST pointer to the Frame.
 *     NP = INTEGER (Given)
 *        The size of the first dimension of the POS array.
 *     NAX = INTEGER (Given)
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,11 +74,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Arguments Given:
@@ -97,7 +97,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION INC       ! The distance between P1 and P2
-      DOUBLE PRECISION MXDIS     ! The max distance 
+      DOUBLE PRECISION MXDIS     ! The max distance
       DOUBLE PRECISION P1( NDF__MXDIM )! The first position
       DOUBLE PRECISION P2( NDF__MXDIM )! The second position
       INTEGER I                  ! Position index
@@ -128,7 +128,7 @@
 
 *  Add on the distance from the previous position to this position (if
 *  known).
-            INC = AST_DISTANCE( FRM, P1, P2, STATUS ) 
+            INC = AST_DISTANCE( FRM, P1, P2, STATUS )
             IF( INC .NE. AST__BAD ) THEN
                DIS( I ) = DIS( I - 1 ) + INC
                MXDIS = DIS( I )
@@ -159,7 +159,7 @@
             IF( DIS( I ) .NE. AST__BAD ) THEN
                DIS( I ) = DIS( I ) / MXDIS
             END IF
-         END DO               
+         END DO
       END IF
 
       END

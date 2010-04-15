@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, 
-     :                       XSIZE, YSIZE, NCONT, CONT, STATS, FAST, 
+      SUBROUTINE KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL,
+     :                       XSIZE, YSIZE, NCONT, CONT, STATS, FAST,
      :                       DONE, CNTUSD, CNTLEN, CNTCLS, CNTPEN,
      :                       STATUS )
 *+
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
-*                      YSIZE, NCONT, CONT, STATS, FAST, DONE, CNTUSD, 
+*     CALL KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE,
+*                      YSIZE, NCONT, CONT, STATS, FAST, DONE, CNTUSD,
 *                      CNTLEN, CNTCLS, CNTPEN, STATUS )
 
 *  Description:
@@ -34,15 +34,15 @@
 *  Arguments:
 *     IPLOT = INTEGER (Given)
 *        An AST pointer to the Plot through which the graphics will be
-*        produced.  The Current Frame should describe the GRID 
+*        produced.  The Current Frame should describe the GRID
 *        co-ordinates of the array to be contoured.
 *     IGRP = INTEGER (Given)
-*        A GRP identifier for a group containing descriptions of the 
-*        pens to be used to draw each contour.  If this is supplied as 
-*        GRP__NOID, then all contours are drawn using the "Curves" 
-*        attributes (e.g. Colour(Curves), Width(Curves), etc.) in the 
+*        A GRP identifier for a group containing descriptions of the
+*        pens to be used to draw each contour.  If this is supplied as
+*        GRP__NOID, then all contours are drawn using the "Curves"
+*        attributes (e.g. Colour(Curves), Width(Curves), etc.) in the
 *        supplied Plot.  If a group is supplied, then each element in
-*        the group should be a comma-separated list of AST attribute 
+*        the group should be a comma-separated list of AST attribute
 *        settings to be established prior to drawing a contour.  Element
 *        1 in the group is used for the first contour, element 2 for
 *        the second, etc.  If the end of the group is reached before all
@@ -72,11 +72,11 @@
 *     STATS = LOGICAL (Given)
 *        Are contour statistics required?
 *     FAST = LOGICAL (Given)
-*        If .TRUE., then contours are drawn using straight lines as the 
+*        If .TRUE., then contours are drawn using straight lines as the
 *        basic drawing element.  Otherwise, the basic drawing elements
-*        are geodesic curves in the Current coordinate system of the 
-*        supplied Plot.  This is much slower to draw, but may be useful 
-*        when a severly non-linear or discontinuous mapping exists 
+*        are geodesic curves in the Current coordinate system of the
+*        supplied Plot.  This is much slower to draw, but may be useful
+*        when a severly non-linear or discontinuous mapping exists
 *        between grid co-ordinates in the array, and graphics
 *        co-ordinates.
 *     DONE( XSIZE, YSIZE ) = LOGICAL (Returned)
@@ -202,11 +202,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'GRP_PAR'          ! GRP constants
 
@@ -240,14 +240,14 @@
 
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum number of positions in each
-      PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a 
+      PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a
                                  ! contour
 
       INTEGER NCELL              ! Number of pixels in a cell
       PARAMETER ( NCELL = 4 )
 
 *  Local Variables:
-      CHARACTER DOMAIN*( 40 )    ! Domain of Current Frame in supplied 
+      CHARACTER DOMAIN*( 40 )    ! Domain of Current Frame in supplied
                                  ! Plot
       CHARACTER PENDEF*( GRP__SZNAM ) ! AST attribute settings
                                  ! for current pen
@@ -261,7 +261,7 @@
       INTEGER IMOVE( NCELL )     ! X directions to move from the cell
                                  ! side where a contour leaves
       INTEGER IPEN               ! Current pen number
-      INTEGER IPLOTT             ! AST pointer to Plot with current pen 
+      INTEGER IPLOTT             ! AST pointer to Plot with current pen
                                  ! set
       INTEGER IX                 ! X element numbers of current pixel in
                                  ! full-size array
@@ -269,7 +269,7 @@
                                  ! full-size array
       INTEGER J                  ! Loop counter through lines
       INTEGER J1                 ! Index at start of attribute setting
-      INTEGER J2                 ! Index of comma at end of attribute 
+      INTEGER J2                 ! Index of comma at end of attribute
                                  ! setting
       INTEGER JJ                 ! Y element numbers of current pixel in
                                  ! sub-array
@@ -365,9 +365,9 @@
 
       END IF
 
-*  Simplify the Plot.  This adds a new Current Frame into the Plot, so 
+*  Simplify the Plot.  This adds a new Current Frame into the Plot, so
 *  note the index of the original Current Frame so that it can be
-*  re-instated later.  This can help to speed up the drawing, and also 
+*  re-instated later.  This can help to speed up the drawing, and also
 *  avoids the possibility of the Mapping going via a Frame in which the
 *  positions are undefined.
       ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
@@ -388,7 +388,7 @@
          CVAL = CONT( ICONT )
 
 *  If different pens are being used, produce a modified Plot which draws
-*  curves with the pen style supplied for this contour. 
+*  curves with the pen style supplied for this contour.
          IF ( NPEN .GT. 0 ) THEN
 
 *  Take a deep copy of the supplied Plot. This Plot will be modify using
@@ -396,7 +396,7 @@
 *  plotting attributes can be re-instated later.
             IPLOTT = AST_COPY( IPLOT, STATUS )
 
-*  Get the next list of AST Attribute settings from the group. 
+*  Get the next list of AST Attribute settings from the group.
             CALL GRP_GET( IGRP, IPEN, 1, PENDEF, STATUS )
 
 *  Abort if an error has occurred.
@@ -410,7 +410,7 @@
                DO WHILE( J1 .LE. GRP__SZNAM )
                   J2 = J1
                   CALL CHR_FIND( PENDEF, ',', .TRUE., J2 )
-                  CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE., 
+                  CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE.,
      :                             .TRUE., IPLOTT, BADAT, STATUS )
                   J1 = J2 + 1
                END DO
@@ -418,7 +418,7 @@
 *  Issue a context message if anything went wrong setting the pen.
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETI( 'I', ICONT )
-                  CALL MSG_SETC( 'I', CHR_NTH( ICONT ) )               
+                  CALL MSG_SETC( 'I', CHR_NTH( ICONT ) )
                   CALL ERR_REP( 'KPS1_CNTDR_1', 'Unable to set the '//
      :                         'pen for the ^I contour level.', STATUS )
                   GO TO 999
@@ -441,10 +441,10 @@
          CNTPEN( ICONT ) = AST_GETI( IPLOTT, 'COLOUR(CURVES)', STATUS )
 
 *  Buffer all PGPLOT output produced while drawing this contour.
-         CALL PGBBUF 
+         CALL PGBBUF
 
 *  If using FAST drawing mode, establish the new PGPLOT attributes,
-*  saving the old in ATTRS. If not using fast drawing mode, AST will 
+*  saving the old in ATTRS. If not using fast drawing mode, AST will
 *  establish them when AST_CURVE is called to draw the contour.
          IF ( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .TRUE., ATTRS,
      :                               STATUS )
@@ -648,13 +648,13 @@
                            END IF
                         END IF
 
-*  Plot the stored contour. 
-                        CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, 
+*  Plot the stored contour.
+                        CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y,
      :                                   STATUS )
 
 *  Plot the segment of the other contour found in the confused cell.
                         IF ( CONFUS ) THEN
-                           CALL KPG1_ASCRV( IPLOTT, FAST, 2, 
+                           CALL KPG1_ASCRV( IPLOTT, FAST, 2,
      :                                     X( NPTS + 1 ), Y( NPTS + 1 ),
      :                                     STATUS )
                         END IF
@@ -680,14 +680,14 @@
 *  Flush the buffers used by KPG1_ASCRV.
          CALL KPG1_ASCRV( IPLOTT, FAST, 0, 0.0, 0.0, STATUS )
 
-*  If using FAST drawing mode, re-establish the old PGPLOT plotting 
+*  If using FAST drawing mode, re-establish the old PGPLOT plotting
 *  attributes.
-         IF ( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS, 
+         IF ( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS,
      :                               STATUS )
 
 *  Flush the buffer holding PGPLOT output produced while drawing this
 *  contour.
-         CALL PGEBUF 
+         CALL PGEBUF
 
 *  Annul the temporary copy of the supplied Plot which was used to do
 *  the drawing.

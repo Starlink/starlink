@@ -12,7 +12,7 @@ C     Parameters -    (">" input, "<" output)
 C
 C     (>) FILE    (Character) The name of the file to be
 C                 opened.  This is passed straight to HDS,
-C                 so can be any form that HDS (or the underlying 
+C                 so can be any form that HDS (or the underlying
 C                 operating system) will recognise.
 C     (>) EXIST   (Character) The existence status of the file
 C                 - must be one of 'NEW', 'OLD' or 'UNKNOWN'
@@ -28,7 +28,7 @@ C                 record.
 C     (<) NEW     (Logical) True if the file was created, false
 C                 if it already existed.
 C     (<) STATUS  (Integer) Returns a status code.
-C                 0 => OK   
+C                 0 => OK
 C                 Other error codes may be passed back from the
 C                 lower level routines.
 C-

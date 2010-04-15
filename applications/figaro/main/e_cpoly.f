@@ -99,7 +99,7 @@ C      double precision xcap
         ifail = 0
 *     JWP put aa for athree
 *        CALL PDA_DP1VLU( k1-1, 0, xcap, ycap, dummy, athree, ifail)
- 
+
         CALL PDA_DP1VLU( k1-1, 0, x(i), ycap, dummy, athree, ifail)
 
         y(i) = ycap

@@ -35,7 +35,7 @@ my %TESTS = (
 	     "DOUBLE" => [ "0D", 5.4, "comment" ],
 	     "INTEGER" => [ "0I", 42, "" ],
 	     "STRING" => [ "0C", "hello again", "comment2" ],
-	     "OBJECT" => [ "0A", new Starlink::AST::UnitMap(2,""), 
+	     "OBJECT" => [ "0A", new Starlink::AST::UnitMap(2,""),
 			   "comment3" ],
 	     "DARR" => [ "1D", [2.3,-1.3], ""],
 	     "IARR" => [ "1I", [22,-13], ""],
@@ -60,7 +60,7 @@ for my $k (keys %TESTS) {
   print "# Processing key $k...\n";
   my $method = "MapGet". $TESTS{$k}->[0];
   my @results = $map->$method( $k );
-  my @ori = ( ref( $TESTS{$k}->[1] ) eq 'ARRAY' 
+  my @ori = ( ref( $TESTS{$k}->[1] ) eq 'ARRAY'
 	      ? @{ $TESTS{$k}->[1]} : $TESTS{$k}->[1] );
   is( scalar(@results), scalar(@ori) , "Check number of returned elements $k");
   is( $map->MapLength( $k ), scalar(@ori), "Confirm number $k");

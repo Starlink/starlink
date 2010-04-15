@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application allows you to remove one or more co-ordinate Frames
-*     from the WCS component in an NDF. The indices of any remaining Frames 
+*     from the WCS component in an NDF. The indices of any remaining Frames
 *     are "shuffled down" to fill the gaps left by the removed Frames.
 
 *  Usage:
@@ -31,26 +31,26 @@
 *     FRAMES()  = LITERAL (Read
 *        The list of the indices (within the WCS component of the supplied NDF)
 *        of the Frames to be removed. Any indices outside the range of the
-*        available Frames are ignored. Single Frames or a set of adjacent 
-*        Frames may be specified, e.g. typing [4,6-9,12,14-16] will remove 
-*        Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to 
-*        distinguish this array of characters from a single string including 
-*        commas.  The brackets are unnecessary when there only one item.) If 
-*        you wish to remove all the files enter the wildcard *. 5-* will 
-*        remove from 5 to the last Frame. 
+*        available Frames are ignored. Single Frames or a set of adjacent
+*        Frames may be specified, e.g. typing [4,6-9,12,14-16] will remove
+*        Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to
+*        distinguish this array of characters from a single string including
+*        commas.  The brackets are unnecessary when there only one item.) If
+*        you wish to remove all the files enter the wildcard *. 5-* will
+*        remove from 5 to the last Frame.
 *     NDF = NDF (Read and Write)
 *        The NDF data structure.
 
 *  Examples:
 *     wcsremove m51 "3-5"
 *        This removes Frames 3, 4 and 5 from the NDF "m51". Any remaining
-*        Frames with indices higher than 5 will be re-numbered to fill the 
+*        Frames with indices higher than 5 will be re-numbered to fill the
 *        gaps left by the removed Frames (i.e. the original Frame 6 will
 *        become Frame 3, etc).
 
 *  Notes:
-*     - The Frames within the WCS component of an NDF may be examined 
-*     using application NDFTRACE. 
+*     - The Frames within the WCS component of an NDF may be examined
+*     using application NDFTRACE.
 
 *  Related Applications:
 *     KAPPA: NDFTRACE, WCSADD, WCSFRAME, WCSATTRIB, WCSCOPY
@@ -84,7 +84,7 @@
 *     2-APR-1998 (DSB):
 *        Original version.
 *     5-MAY-1999 (TDCA):
-*        If an attempt is made to remove the Base Frame, WCSREMOVE now 
+*        If an attempt is made to remove the Base Frame, WCSREMOVE now
 *        refuses and continues to remove any other specified frames,
 *        rather than simply reporting an error.
 *     20-SEP-2000 (DSB):
@@ -159,7 +159,7 @@
 *  Calculate the Frame index limits implied by this specification.
          CALL KPG1_CNLIM( SPECS( ISPEC ), FIRST, LAST, STATUS )
 
-*  A wildcard in the first part of a range or a full wildcard indicates the 
+*  A wildcard in the first part of a range or a full wildcard indicates the
 *  Frames start from beginning, i.e. Frame one.
          FIRST = MAX( 1, FIRST )
 
@@ -177,18 +177,18 @@
                CALL MSG_OUT( 'WCSREMOVE_1', '   Attempt to remove '//
      :                       'Base Frame of ''^NDF'' ignored.', STATUS )
             ELSE
-            
+
 *  Add the Frame index into a list of indices. Report an error if the
 *  list is full.
                NGIVE = NGIVE + 1
                IF( NGIVE .LE. MXGIVE ) THEN
                   GIVEN( NGIVE ) = IFRM
 
-               ELSE 
+               ELSE
 
                   IF( STATUS .EQ. SAI__OK ) THEN
                      STATUS = SAI__ERROR
-                     CALL MSG_SETI( 'N', MXGIVE ) 
+                     CALL MSG_SETI( 'N', MXGIVE )
                      CALL ERR_REP( 'WCSREMOVE_2', 'Too many Frame '//
      :                          'indices given. Can only handle up '//
      :                          'to ^N.', STATUS )
@@ -204,7 +204,7 @@
       END DO
 
 *  Sort the Frame indices into ascending order.
-      IF( NGIVE .GT. 1 ) CALL KPG1_QSRTI( NGIVE, 1, NGIVE, GIVEN, 
+      IF( NGIVE .GT. 1 ) CALL KPG1_QSRTI( NGIVE, 1, NGIVE, GIVEN,
      :                                    STATUS )
 
 *  Initialise the number of Frames removed so far.

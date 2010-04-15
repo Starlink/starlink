@@ -89,7 +89,7 @@
                FF(L+2:) = DEFLT
                L = L+1+LD
             END IF
-         ELSE 
+         ELSE
             IF (I2.NE.0) THEN
                I2 = INDEX(PATH(I1:LP),':')
                IF (I2.EQ.0) THEN

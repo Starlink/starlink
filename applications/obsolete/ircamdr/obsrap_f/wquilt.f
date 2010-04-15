@@ -15,7 +15,7 @@
 *     Only like-sized frames may be input. The reason for this is that
 *     it is difficult to work out how big the output frame needs to be
 *     until all the input frames and their offsets have been read in. By
-*     confining the frames to be the same size, only the maximum and 
+*     confining the frames to be the same size, only the maximum and
 *     minimum x and y offsets from the central frame need be input by
 *     the user, then the output image size can be worked out from these
 *     numbers along with the size of the central frame.
@@ -83,7 +83,7 @@
 *     Endif
 *     If no error so far then
 *        Map in the central image
-*        If no error so far then 
+*        If no error so far then
 *           Work out size of output image and workspace
 *           Ask if bad pixel handling wanted
 *           If so then
@@ -128,14 +128,14 @@
 *                             Set up error message
 *                             Set status bad
 *                          Endif
-*                       Else 
+*                       Else
 *                          Get offsets and next image locator from interface
 *                          Cancel parameters ready for next loop
 *                       Endif
 *                       If no error so far then
 *                          Map next image
 *                          If no error so far then
-*                             If current image has same dimensions as 
+*                             If current image has same dimensions as
 *                              central image then
 *                                Redefine the offsets of the current frame to
 *                                 be with respect to the lower left corner of
@@ -194,7 +194,7 @@
 *     29-12-1986 : First implementation (from MOSAIC) (REVA::MJM)
 *     07-03-1989 : added weights (JACH::CAA)
 *     20-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
-*     23-JUNE-1994 Changed a MSG_OUT for error to ERR_REP (SKL@JACH) 
+*     23-JUNE-1994 Changed a MSG_OUT for error to ERR_REP (SKL@JACH)
 *
 *    Type definitions :
 
@@ -203,8 +203,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -212,7 +212,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :    NDIMS                   ! dimensionality of input images
       PARAMETER( NDIMS  =  2 )    ! 2-d images only
 
@@ -228,7 +228,7 @@
      :    PLACE,                  ! place holder for temporary NDF
      :    LBND( 2 ),              ! lower bounds for temporary NDF
      :    NUMBER,                 ! number of input images to be mosaiced
-     :    MAXI( 2 ),              ! maximum x,y offsets 
+     :    MAXI( 2 ),              ! maximum x,y offsets
      :    MINI( 2 )               ! minimum  "     "
       INTEGER
      :    IDIMS( NDIMS ),         ! dimensions of central  image
@@ -250,13 +250,13 @@
       REAL
      :    BADVAL,                 ! value taken to represent bad pixels
      :	  WEIGHT                  ! weight for this image
- 
+
       CHARACTER*1
      :    WHERE,                  ! source of input - F(ile) or I(nterface)
      :    BADMETH                 ! method of bad pixel handling - by V(alue)
                                   ! or by bad M(ask)
 
-      CHARACTER*80 
+      CHARACTER*80
      :    FNAME                   ! name of file holding input information
 
       LOGICAL                     ! true if :
@@ -293,7 +293,7 @@
 *       open the file and get the initial information from it, namely
 *       the number of frames to be input, the max and min x,y offsets,
 *       and a locator to the central frame
-         CALL WMFOPEN( FNAME, 'INPICI', LUN, LOCI, NUMBER, MAXI, 
+         CALL WMFOPEN( FNAME, 'INPICI', LUN, LOCI, NUMBER, MAXI,
      :                 MINI, WEIGHT, STATUS )
 
 *       check status - will be set not ok if it was not possible
@@ -342,7 +342,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          work out size of the output frame and workspace array
-            ODIMS( 1 )  =  ( MAXI( 1 )+IDIMS( 1 ) ) - MINI( 1 )            
+            ODIMS( 1 )  =  ( MAXI( 1 )+IDIMS( 1 ) ) - MINI( 1 )
             ODIMS( 2 )  =  ( MAXI( 2 )+IDIMS( 2 ) ) - MINI( 2 )
 
 *          ask whether bad pixel handling is wanted
@@ -356,7 +356,7 @@
 
 *             force to upper-case
                CALL UPCASE( BADMETH, BADMETH, STATUS )
- 
+
 *             check to see which method is wanted
                IF ( BADMETH .EQ. 'V' ) THEN
 
@@ -405,7 +405,7 @@
                CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO,
      :                       STATUS )
                CALL NDF_TEMP( PLACE, STATUS )
-               CALL NDF_NEW( '_REAL', NDIMS, LBND, ODIMS, PLACE, LOCW, 
+               CALL NDF_NEW( '_REAL', NDIMS, LBND, ODIMS, PLACE, LOCW,
      :                       STATUS )
 
 *             check status before continuing
@@ -427,10 +427,10 @@
 *                check status before continuing
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
-*                   zero the output image and workspace 
-                     CALL ZERO2D( ODIMS( 1), ODIMS( 2), 
+*                   zero the output image and workspace
+                     CALL ZERO2D( ODIMS( 1), ODIMS( 2),
      :                            %VAL( PNTRO ), STATUS )
-                     CALL ZERO2D( ODIMS( 1), ODIMS( 2), 
+                     CALL ZERO2D( ODIMS( 1), ODIMS( 2),
      :                            %VAL( PNTRW ), STATUS )
 
 *                   redfine offsets of central frame to be with respect
@@ -445,10 +445,10 @@
                         IF ( BADMETH .EQ. 'V' ) THEN
 
 *                         by value - insert central frame into output
-                           CALL WMOSAIC_ADDBV( %VAL( PNTRI ), 
-     :                       IDIMS( 1), IDIMS( 2), BADVAL, 
-     :                       OFFSET( 1 ), OFFSET( 2 ), 
-     :	                     WEIGHT, %VAL( PNTRO ), %VAL( PNTRW ), 
+                           CALL WMOSAIC_ADDBV( %VAL( PNTRI ),
+     :                       IDIMS( 1), IDIMS( 2), BADVAL,
+     :                       OFFSET( 1 ), OFFSET( 2 ),
+     :	                     WEIGHT, %VAL( PNTRO ), %VAL( PNTRW ),
      :	                     ODIMS( 1), ODIMS( 2), OVERLAP, STATUS )
 
 *                      else by mask
@@ -456,9 +456,9 @@
 
 *                         insert central frame into output
                            CALL WMOSAIC_ADDBM( %VAL( PNTRI ),
-     :                       %VAL( PNTRM ), IDIMS( 1), IDIMS( 2), 
+     :                       %VAL( PNTRM ), IDIMS( 1), IDIMS( 2),
      :	                     OFFSET( 1 ), OFFSET( 2 ), WEIGHT,
-     :                       %VAL( PNTRO ), %VAL( PNTRW ), ODIMS( 1), 
+     :                       %VAL( PNTRO ), %VAL( PNTRW ), ODIMS( 1),
      :	                     ODIMS( 2), OVERLAP, STATUS )
 
 *                      end of if-bad-method-is-by-value check
@@ -469,7 +469,7 @@
 
 *                      insert central frame into output
                         CALL WMOSAIC_ADD( %VAL( PNTRI ), IDIMS( 1),
-     :                     IDIMS( 2), OFFSET( 1 ), OFFSET( 2 ), WEIGHT, 
+     :                     IDIMS( 2), OFFSET( 1 ), OFFSET( 2 ), WEIGHT,
      :	                   %VAL( PNTRO ), %VAL( PNTRW ), ODIMS( 1),
      :	                   ODIMS( 2), OVERLAP, STATUS )
 
@@ -502,7 +502,7 @@
                            CALL WMFNEXT( LUN,  'CURPIC', LOCC,
      :                                  OFFSET, WEIGHT, STATUS )
 
-*                         check status on return 
+*                         check status on return
                            IF ( STATUS .NE. SAI__OK ) THEN
 
 *                            set up error message that will be flushed
@@ -513,10 +513,10 @@
                               RETURN
 
 *                         check offsets returned
-                           ELSEIF ( OFFSET( 1 ) .GT. MAXI( 1 ) .OR. 
+                           ELSEIF ( OFFSET( 1 ) .GT. MAXI( 1 ) .OR.
      :                              OFFSET( 1 ) .LT. MINI( 1 ) .OR.
-     :                              OFFSET( 2 ) .GT. MAXI( 2 ) .OR. 
-     :                              OFFSET( 2 ) .LT. MINI( 2 ) ) 
+     :                              OFFSET( 2 ) .GT. MAXI( 2 ) .OR.
+     :                              OFFSET( 2 ) .LT. MINI( 2 ) )
      :                       THEN
 
 *                            set up error message and set bad status
@@ -554,7 +554,7 @@
 
                           CALL NDF_MAP( LOCC, 'DATA', '_REAL', 'READ',
      :                                  PNTRC, NELEMENTS, STATUS )
-                          CALL NDF_DIM( LOCC, NDIMS, CDIMS, ACTDIM, 
+                          CALL NDF_DIM( LOCC, NDIMS, CDIMS, ACTDIM,
      :                                  STATUS )
 
 *                         check status before continuing
@@ -563,13 +563,13 @@
 *                            check that the current frame is the same size
 *                            as the central frame
                               IF ( CDIMS( 1 ) .EQ. IDIMS( 1 ) .AND.
-     :                             CDIMS( 2 ) .EQ. IDIMS( 2 ) ) THEN 
+     :                             CDIMS( 2 ) .EQ. IDIMS( 2 ) ) THEN
 
 *                               redefine the offsets to be with respect to
 *                               the lower left corner of the output array
-                                 OFFSET( 1 )  =  
+                                 OFFSET( 1 )  =
      :                                  OFFSET( 1 ) - MINI( 1 )
-                                 OFFSET( 2 )  =  
+                                 OFFSET( 2 )  =
      :                                  OFFSET( 2 ) - MINI( 2 )
 
 *                               check if we are bad pixel handling
@@ -580,25 +580,25 @@
 
 *                                     by value - insert the current frame
 *                                     into the output accordingly
-                                       CALL WMOSAIC_ADDBV( 
+                                       CALL WMOSAIC_ADDBV(
      :                                   %VAL( PNTRC ), CDIMS( 1),
-     :                                   CDIMS( 2), BADVAL, 
-     :	                                 OFFSET( 1 ), OFFSET( 2 ), 
-     :                                   WEIGHT, %VAL( PNTRO ), 
-     :	                                 %VAL( PNTRW ), ODIMS( 1), 
-     :                                   ODIMS( 2), OVERLAP, 
+     :                                   CDIMS( 2), BADVAL,
+     :	                                 OFFSET( 1 ), OFFSET( 2 ),
+     :                                   WEIGHT, %VAL( PNTRO ),
+     :	                                 %VAL( PNTRW ), ODIMS( 1),
+     :                                   ODIMS( 2), OVERLAP,
      :	                                 STATUS )
 
 *                                  else by mask
                                     ELSE
 
 *                                     insert current frame into output
-                                       CALL WMOSAIC_ADDBM( 
+                                       CALL WMOSAIC_ADDBM(
      :                                   %VAL( PNTRC ), %VAL( PNTRM ),
-     :                                   CDIMS( 1), CDIMS( 2), 
-     :	                                 OFFSET( 1 ), OFFSET( 2 ), 
-     :                                   WEIGHT, %VAL( PNTRO ), 
-     :	                                 %VAL( PNTRW ), ODIMS( 1), 
+     :                                   CDIMS( 1), CDIMS( 2),
+     :	                                 OFFSET( 1 ), OFFSET( 2 ),
+     :                                   WEIGHT, %VAL( PNTRO ),
+     :	                                 %VAL( PNTRW ), ODIMS( 1),
      :                                   ODIMS( 2), OVERLAP, STATUS )
 
 *                                  end of if-by-value check
@@ -609,11 +609,11 @@
 
 *                                  insert current frame into output without
 *                                  any bad pixel handling
-                                    CALL WMOSAIC_ADD( %VAL( PNTRC ), 
-     :                                CDIMS( 1), CDIMS( 2), OFFSET( 1 ), 
-     :	                              OFFSET( 2 ), WEIGHT, 
-     :                                %VAL( PNTRO ), %VAL( PNTRW ), 
-     :                                ODIMS( 1), ODIMS( 2), 
+                                    CALL WMOSAIC_ADD( %VAL( PNTRC ),
+     :                                CDIMS( 1), CDIMS( 2), OFFSET( 1 ),
+     :	                              OFFSET( 2 ), WEIGHT,
+     :                                %VAL( PNTRO ), %VAL( PNTRW ),
+     :                                ODIMS( 1), ODIMS( 2),
      :	                              OVERLAP, STATUS )
 
 *                               end of if-handling-bad-pixels check
@@ -668,8 +668,8 @@
 
 *                   now normalise output image with respect to the values
 *                   stored in the mask in the workspace
-                     CALL MOSAIC_DIV( %VAL( PNTRO ), ODIMS( 1), 
-     :                                ODIMS( 2), %VAL( PNTRW ), 
+                     CALL MOSAIC_DIV( %VAL( PNTRO ), ODIMS( 1),
+     :                                ODIMS( 2), %VAL( PNTRW ),
      :                                STATUS )
 
 *                end of if-no-error-after-mapping-output-and-workspace check
@@ -701,7 +701,7 @@
          CALL NDF_ANNUL( LOCI, STATUS )
 
 *    end of if-no-error-after-getting-central-frame check
-      END IF    
+      END IF
 
 *    check to see if the input was from a File
       IF ( WHERE .EQ. 'F' ) THEN

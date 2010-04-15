@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_DCEN( DIM1, X, Y, DINT, GROUP, MAXGRP, MINPIX, 
-     :                      SUM1, SUM2, NCON, XC, YC, MINT, NOUT, 
+      SUBROUTINE CCD1_DCEN( DIM1, X, Y, DINT, GROUP, MAXGRP, MINPIX,
+     :                      SUM1, SUM2, NCON, XC, YC, MINT, NOUT,
      :                      STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_DCEN( DIM1, X, Y, DINT, GROUP, MAXGRP, MINPIX, SUM1, 
+*     CALL CCD1_DCEN( DIM1, X, Y, DINT, GROUP, MAXGRP, MINPIX, SUM1,
 *                     SUM2, NCON, XC, YC, MINT, NOUT, STATUS )
 
 *  Description:
@@ -40,16 +40,16 @@
 *        The minimum number of pixels which must be members of a group
 *        for that group to be valid.
 *     SUM1( MAXGRP ) = DOUBLE PRECISION (Given and Returned)
-*        Workspace for holding group sums. 
+*        Workspace for holding group sums.
 *     SUM2( MAXGRP ) = DOUBLE PRECISION (Given and Returned)
-*        Workspace for holding group sums. 
+*        Workspace for holding group sums.
 *     NCON( MAXGRP ) = INTEGER (Given and Returned)
 *        Workspace. The number of pixels which contribute to each
-*        group. 
+*        group.
 *     XC( MAXGRP ) = DOUBLE PRECISION (Returned)
-*        The X centroid of the pixel groups. 
+*        The X centroid of the pixel groups.
 *     YC( MAXGRP ) = DOUBLE PRECISION (Returned)
-*        The Y centroid of the pixel groups. 
+*        The Y centroid of the pixel groups.
 *     MINT( MAXGRP ) = DOUBLE PRECISION (Returned)
 *        The mean intensity values of pixels within the group.
 *     NOUT = INTEGER (Returned)
@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
 *  Local Variables:
       INTEGER I                  ! Loop variable
       INTEGER GRP                ! Current group
-      INTEGER NGRP               ! Number of possible groups 
+      INTEGER NGRP               ! Number of possible groups
 
 *.
 
@@ -146,7 +146,7 @@
          GRP = GROUP( I )
 
 *  Is this a valid group (i.e. non-zero).
-         IF ( GRP .GT. 0 ) THEN 
+         IF ( GRP .GT. 0 ) THEN
 
 *  Form the centroid sums.
             SUM1( GRP ) = SUM1( GRP ) + DINT( I ) * DBLE( X( I ) )
@@ -171,7 +171,7 @@
  3    CONTINUE
 
 *  Check that we have some output values.
-      IF ( NOUT .GT. 0 ) THEN 
+      IF ( NOUT .GT. 0 ) THEN
 
 *  Now do the same for the Y centroids.
 *  Initialise the buffers.
@@ -186,7 +186,7 @@
             GRP = GROUP( I )
 
 *  Is this a valid group (i.e. non-zero).
-            IF ( GRP .GT. 0 ) THEN 
+            IF ( GRP .GT. 0 ) THEN
 
 *  Form the centroid sums.
                SUM1( GRP ) = SUM1( GRP ) + DINT( I ) * DBLE( Y( I ) )
@@ -214,7 +214,7 @@
             GRP = GROUP( I )
 
 *  Is this a valid group (i.e. non-zero).
-            IF ( GRP .GT. 0 ) THEN 
+            IF ( GRP .GT. 0 ) THEN
 
 *  Form the intensity sums.
                SUM1( GRP ) = SUM1( GRP ) + DINT( I )
@@ -232,7 +232,7 @@
             END IF
  9       CONTINUE
       END IF
-      IF ( NOUT .EQ. 0 ) THEN 
+      IF ( NOUT .EQ. 0 ) THEN
 
 *  No output centroids. Set STATUS and exit.
          STATUS = SAI__ERROR

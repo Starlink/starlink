@@ -9,7 +9,7 @@ Synopsis:
 Description:
    This macro allows a virtual function created with edstar-virtual (q.v.) to
    be overridden by giving it a new implementation (the calling interface
-   remains the same). 
+   remains the same).
 
    The usual way of using this macro is first to create a local version of a
    variable with the same name as the virtual function (either using let or

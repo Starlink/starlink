@@ -7,14 +7,14 @@
 /* Local Macros */
 
 
-/* This macro checks the pixel with index "iv" (a neighbour of the central 
-   pixel) to see if it belongs to a PixelSet. If it does, the index of the 
-   PixelSet is either returned in "*il2" (if the PixelSet was defined at a 
-   higher contour level and the peak of this PixelSet is closer than any 
-   other neighbouring PixelSet defined at a higher contour level), or is 
-   appended to the end of the list of indices returned in "il" (if the 
-   PixelSet was defined at the same contour level as the central pixel). 
-   In this second case, the index is also returned in "*il1" if it is the 
+/* This macro checks the pixel with index "iv" (a neighbour of the central
+   pixel) to see if it belongs to a PixelSet. If it does, the index of the
+   PixelSet is either returned in "*il2" (if the PixelSet was defined at a
+   higher contour level and the peak of this PixelSet is closer than any
+   other neighbouring PixelSet defined at a higher contour level), or is
+   appended to the end of the list of indices returned in "il" (if the
+   PixelSet was defined at the same contour level as the central pixel).
+   In this second case, the index is also returned in "*il1" if it is the
    lowest such index yet encountered. */
 #define CHECK_NEIGHBOUR \
          if( ipa[ iv ] != CUPID__CFNULL ) { \
@@ -98,9 +98,9 @@
 
 
 
-void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
-                  int skip[3], int hindex, int perspectrum, int naxis, 
-                  int *n1, int *il1, int i1[27], int *n2, int *il2, 
+void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
+                  int skip[3], int hindex, int perspectrum, int naxis,
+                  int *n1, int *il1, int i1[27], int *n2, int *il2,
                   CupidPixelSet **clumps, int *status ){
 /*
 *+
@@ -114,21 +114,21 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
-*                       int skip[3], int hindex, int perspectrum, int naxis, 
-*                       int *n1, int *il1, int i1[27], int *n2, int *il2, 
+*     void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
+*                       int skip[3], int hindex, int perspectrum, int naxis,
+*                       int *n1, int *il1, int i1[27], int *n2, int *il2,
 *                       CupidPixelSet **clumps, int *status )
 
 *  Description:
-*     This function returns information about which, if any, PixelSets 
+*     This function returns information about which, if any, PixelSets
 *     adjoin a given pixel.
 
 *  Parameters:
 *     ipa
 *        Pointer to the start of the array holding the integer index
 *        (if any) associated with each pixel in the data array. This
-*        shows which clump each pixel belongs to (each clump is identified 
-*        by a unique integer index). The array should be the same shape and 
+*        shows which clump each pixel belongs to (each clump is identified
+*        by a unique integer index). The array should be the same shape and
 *        size as the data array. Pixels which have not yet been assigned
 *        to a clump are marked with the integer value CUPID__CFNULL.
 *     iv
@@ -142,7 +142,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *        The number of pixels along each pixel axis in the data array.
 *        This is padded with trailing 1's if "ndim" is less than 3.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
@@ -154,36 +154,36 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *        higher contour level.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
-*        neighbours. A clump that extends across several spectra will be 
+*        neighbours. A clump that extends across several spectra will be
 *        split into multiple clumps, each restricted to a single spectrum.
 *        The non-zero value supplied should be the 1-based axis index of
 *        the spectral pixel axis. Should be supplied as zero if "ndim" is
 *        not 3.
 *     naxis
-*        Determines which adjoining pixels are considered to be "neighbours" 
-*        of a specified central pixel. Should be in the range 1 to "ndim". 
+*        Determines which adjoining pixels are considered to be "neighbours"
+*        of a specified central pixel. Should be in the range 1 to "ndim".
 *        For a pixel to be considered to be a neighbour of another pixel,
-*        the two pixels must be no more than 1 pixel away along no more than 
+*        the two pixels must be no more than 1 pixel away along no more than
 *        "naxis" axes. The supplied value is ignored and a value of 1 is
 *        used if "perspectrum" is non-zero.
 *     n1
 *        Location at which to return the number of PixelSets defined at
 *        the current contour level which adjoin the pixel specified by "iv".
 *     i11
-*        Location at which to return the lowest index of any PixelSets 
-*        defined at the current contour level which adjoin the pixel 
+*        Location at which to return the lowest index of any PixelSets
+*        defined at the current contour level which adjoin the pixel
 *        specified by "iv". Returned equal to CUPID__CFNULL if "*n1" is
 *        zero.
 *     i1
 *        The first "*n1" elements of this array will be returned holding
-*        the indices of all PixelSets defined at the current contour level 
-*        which adjoin the pixel specified by "iv". 
+*        the indices of all PixelSets defined at the current contour level
+*        which adjoin the pixel specified by "iv".
 *     n2
 *        Location at which to return the number of PixelSets defined at
 *        a higher contour level which adjoin the pixel specified by "iv".
 *     i12
 *        Location at which to return the index of a PixelSet defined at a
-*        higher contour level which adjoins the pixel specified by "iv". 
+*        higher contour level which adjoins the pixel specified by "iv".
 *        Returned equal to CUPID__CFNULL if no such PixelSets adjoin the
 *        pixel. If there is more than one such PixelSet, the returned
 *        PixelSet is the one which has the closest peak to the pixel
@@ -275,11 +275,11 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
       CHECK_NEIGHBOURS(velax);
    }
 
-/* If required, now check the pixels which are 1 pixel away along two axes. 
+/* If required, now check the pixels which are 1 pixel away along two axes.
    For a naxis value of 2, "ndim" must be either 2 or 3 (it cannot be 1). */
    if( naxis >= 2 && !perspectrum ) {
 
-/* If not at the upper edge on axis 0, get the 1D and nD coords at the upper 
+/* If not at the upper edge on axis 0, get the 1D and nD coords at the upper
    neighbour on axis 0. */
       if( x[ 0 ] < dims[ 0 ] ) {
          iv += skip[ 0 ];
@@ -335,7 +335,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
          }
       }
 
-/* If required, now check the pixels which are 1 pixel away along three axes. 
+/* If required, now check the pixels which are 1 pixel away along three axes.
    For a naxis value of 3, "ndim" must be 3 (it cannot be 1 or 2). */
       if( naxis == 3 ) {
 
@@ -344,7 +344,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
             iv += skip[ 2 ];
             x[ 2 ]++;
 
-/* If not at the upper edge on axis 0, get the 1D and nD coords at the upper 
+/* If not at the upper edge on axis 0, get the 1D and nD coords at the upper
    neighbour on axis 0. */
             if( x[ 0 ] < dims[ 0 ] ) {
                iv += skip[ 0 ];
@@ -404,7 +404,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 
 }
 
-#undef CHECK_NEIGHBOUR 
-#undef CHECK_UPNEIGHBOUR 
-#undef CHECK_LONEIGHBOUR 
-#undef CHECK_NEIGHBOURS 
+#undef CHECK_NEIGHBOUR
+#undef CHECK_UPNEIGHBOUR
+#undef CHECK_LONEIGHBOUR
+#undef CHECK_NEIGHBOURS

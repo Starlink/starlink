@@ -90,10 +90,10 @@ smfFilter *smf_free_smfFilter( smfFilter *filt, int *status ) {
   if( filt ) {
     filt->real = smf_free( filt->real, status );
     filt->imag = smf_free( filt->imag, status );
-    if( filt->wcs) filt->wcs = astAnnul( filt->wcs ); 
+    if( filt->wcs) filt->wcs = astAnnul( filt->wcs );
     filt = smf_free( filt, status );
   }
-  
+
   return filt;
 
 }

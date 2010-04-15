@@ -3,7 +3,7 @@
 #define AST__NOTYPE       -1
 #define AST__COMMENT       0
 #define AST__INT           1
-#define AST__FLOAT         2  
+#define AST__FLOAT         2
 #define AST__STRING        3
 #define AST__COMPLEXF      4
 #define AST__COMPLEXI      5
@@ -17,7 +17,7 @@
 #define FITSCARDLEN        80
 #define MXLIT              80
 
-/* A macro which tests a character to see if it can be used within a FITS 
+/* A macro which tests a character to see if it can be used within a FITS
    keyword name. We include lower case letters here, but they are considered
    as equivalent to upper case letter. */
 #define isFits(a) ( islower(a) || isupper(a) || isdigit(a) || (a)=='-' || (a)=='_' )
@@ -33,11 +33,11 @@
 
 /* Include files. */
 /* ============== */
-#include "sae_par.h" 
-#include "f77.h" 
-#include "cnf.h" 
-#include "mers.h" 
-#include "ast.h" 
+#include "sae_par.h"
+#include "f77.h"
+#include "cnf.h"
+#include "mers.h"
+#include "ast.h"
 #include "star/grp.h"
 #include <ctype.h>
 #include <float.h>
@@ -62,26 +62,26 @@ int pol1Ustrcmp( const char *, const char * );
 int pol1Ustrncmp( const char *, const char *, size_t );
 int pol1FullForm( const char *, const char *, int * );
 
-unsigned char *pol1Fchr( unsigned char *, unsigned char *, 
+unsigned char *pol1Fchr( unsigned char *, unsigned char *,
                          unsigned char, int * );
 
-int pol1Teval( unsigned char *, unsigned char *, AstFitsChan *, 
+int pol1Teval( unsigned char *, unsigned char *, AstFitsChan *,
                 Grp *, Grp *, char **, char *, int * );
 
-int pol1Ceval( unsigned char *, unsigned char *, AstFitsChan *, 
+int pol1Ceval( unsigned char *, unsigned char *, AstFitsChan *,
                Grp *, Grp *, char **, char *, int * );
 
-unsigned char *pol1Seval( unsigned char *, unsigned char *, 
-                          AstFitsChan *, int, Grp *, 
-                          Grp *, char **, char *, int *, 
+unsigned char *pol1Seval( unsigned char *, unsigned char *,
+                          AstFitsChan *, int, Grp *,
+                          Grp *, char **, char *, int *,
                           int * );
 
 int pol1Cmpr( char *, char *, char *, char * );
 
 /* Functions Definitions. */
 /* ====================== */
-F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1), 
-                            INTEGER(IGRP2), CHARACTER(VALUE), LOGICAL(OK), 
+F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
+                            INTEGER(IGRP2), CHARACTER(VALUE), LOGICAL(OK),
                             INTEGER(STATUS) TRAIL(EXPR) TRAIL(VALUE) ){
 /*
 *  Name:
@@ -97,7 +97,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 *     CALL POL1_CEVAL( EXPR, FCHAN, IGRP1, IGRP2, VALUE, OK, STATUS )
 
 *  Description:
-*   This routine evaluates an import control table expression as a 
+*   This routine evaluates an import control table expression as a
 *   character function.
 
 *  Arguments:
@@ -117,22 +117,22 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 *     OK = LOGICAL (Returned)
 *        Was the supplied expression a character function? If not, it
 *        must be a numerical function. This flag is returned .TRUE. even
-*        if there were references to undefined FITS keywords within the 
+*        if there were references to undefined FITS keywords within the
 *        expression. It is returned .FALSE. only if there were no
 *        character operators within the string ("//", "=", quotes,
-*        backslashes), and the expression contained one or more characters 
+*        backslashes), and the expression contained one or more characters
 *        which are not legal within a FITS keyword name.
 *     STATUS = INTEGER (Given and Returned)
-*        The global status. A value of SAI__WARN is returned iff any 
+*        The global status. A value of SAI__WARN is returned iff any
 *        undefined FITS keywords are referenced within the expression.
 
 *  Notes:
-*     -  To be a character function the supplied expression must have the 
+*     -  To be a character function the supplied expression must have the
 *     following form:
-*     
+*
 *        term [ // term ] [// term ] ...
 *
-*     The terms in this expression are concatenated together. A "term" has 
+*     The terms in this expression are concatenated together. A "term" has
 *     the following form:
 *
 *        value [ literal = literal ] [ literal = literal ] ...
@@ -163,14 +163,14 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 *
 *     A word is any text which does not include any of the following:
 *       - spaces
-*       - equal signs 
+*       - equal signs
 *       - single quotes
 *       - double quotes
 *       - adjacent slashes (/)
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -227,7 +227,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
       expr = malloc( ( iend + 1 )*sizeof( char ) );
       if( !expr ) {
          *STATUS = SAI__ERROR;
-         errRep( " ", "POL1_CEVAL: Unable to allocate memory.", 
+         errRep( " ", "POL1_CEVAL: Unable to allocate memory.",
                   STATUS );
          return;
       }
@@ -240,7 +240,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
       pair = 0;
       ok = 0;
 
-      for( c = EXPR; c < EXPR + iend; c++ ){   
+      for( c = EXPR; c < EXPR + iend; c++ ){
 
 /* If this character was escaped, copy it to the output string, and
    indicate that the next character is not escaped. Escape characters can
@@ -258,14 +258,14 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
             esc = 1;
 
 /* Now compare this (un-escaped) character with each of the special
-   control characters. If a match is found, store a special integer token 
+   control characters. If a match is found, store a special integer token
    in the output string in place of the input character. Matches are only
    allowed outside quoted strings (except for closing quotes). Set "ok"
    non-zero if any characters are found which can only appear within
    character functions. Also remove any uncessarary delimiters before
    or after an equals sign or a concatentation operator (//). */
          } else if( ( *c == ' ' || *c == ',' ) && quote == ' ' ){
-            if( *( d - 1 ) != DELIM && 
+            if( *( d - 1 ) != DELIM &&
                 *( d - 1 ) != EQUALS &&
                 *( d - 1 ) != CONCAT ) *(d++) = DELIM;
 
@@ -314,7 +314,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 /* Process the whole expression. */
       v = VALUE;
       vl = VALUE + VALUE_length - 1;
-      ok = pol1Ceval( expr, d, astI2P( *FCHAN ), grp1, grp2, &v, 
+      ok = pol1Ceval( expr, d, astI2P( *FCHAN ), grp1, grp2, &v,
                       vl, STATUS ) || ok;
 
 /* Free the Grp structurs used to hold the F77 GRP identifiers. */
@@ -339,7 +339,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 
 }
 
-int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan, 
+int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
                Grp *grp1, Grp *grp2, char **v, char *vl, int *status ){
 /*
 *  Name:
@@ -352,8 +352,8 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 *     Starlink C
 
 *  Synopsis:
-*     int pol1Ceval( unsigned char *e0, unsigned char *e1, 
-*                    AstFitsChan *fchan, Grp *grp1, Grp *grp2, char **v, 
+*     int pol1Ceval( unsigned char *e0, unsigned char *e1,
+*                    AstFitsChan *fchan, Grp *grp1, Grp *grp2, char **v,
 *                    char *vl, int *status )
 
 *  Description:
@@ -361,25 +361,25 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 *   Special characters in the expression should have been replaced by the
 *   appropriate control codes before calling this function.
 *
-*   The string to which the expression evaluates is stored in the memory 
+*   The string to which the expression evaluates is stored in the memory
 *   pointed to by *v.
 
 *  Arguments:
-*     e0 
+*     e0
 *        Pointer to the first character of the expression.
 *     e1
 *        Pointer to the first character beyond the end of the expression.
 *     fchan
-*        A pointer to an AST FitsChan containing the FITS header cards to 
+*        A pointer to an AST FitsChan containing the FITS header cards to
 *        be used when resolving references to FITS keywords contained in
 *        the expression.
-*     grp1 
+*     grp1
 *        Pointer to the GRP group holding HDS data types. Ignored
 *        if either grp1 or grp2 is NULL.
 *     grp2
 *        Pointer to the GRP group holding FITS keyword names. Ignored
 *        if either grp1 or grp2 is NULL.
-*     v 
+*     v
 *        Address of a pointer to the start of the string to receive the string
 *        corresponding to the expression. The pointer is updated on exit
 *        to hold the address of the next character following the end of
@@ -388,7 +388,7 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 *        Pointer to the end of the string to receive the string
 *        corresponding to the expression. The string should not be null
 *        terminated.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
@@ -397,7 +397,7 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -446,7 +446,7 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 
 }
 
-unsigned char *pol1Fchr( unsigned char *e0, unsigned char *e1, 
+unsigned char *pol1Fchr( unsigned char *e0, unsigned char *e1,
                          unsigned char chr, int *status ){
 /*
 *  Name:
@@ -460,7 +460,7 @@ unsigned char *pol1Fchr( unsigned char *e0, unsigned char *e1,
 *     Starlink C
 
 *  Synopsis:
-*      unsigned char *pol1Fchr( unsigned char *e0, unsigned char *e1, 
+*      unsigned char *pol1Fchr( unsigned char *e0, unsigned char *e1,
 *                               unsigned char chr, int *status )
 
 *  Description:
@@ -468,22 +468,22 @@ unsigned char *pol1Fchr( unsigned char *e0, unsigned char *e1,
 *   character within a string which is not enclosed within parentheses.
 
 *  Arguments:
-*     e0 
+*     e0
 *        Pointer to the first character of the expression.
 *     e1
 *        Pointer to the first character beyond the end of the expression.
 *     chr
 *        The character to be searched for.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
-*     A pointer to the found character. Returned equal to e1 if no character 
+*     A pointer to the found character. Returned equal to e1 if no character
 *     was found.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -542,20 +542,20 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 *     card
 *        Pointer to a string holding the FITS header card.
 *     name
-*        Pointer to a location at which to return the pointer to a string 
+*        Pointer to a location at which to return the pointer to a string
 *        holding the keyword name.
 *     value
-*        Pointer to a location at which to return the pointer to a string 
-*        holding the keyword value. 
+*        Pointer to a location at which to return the pointer to a string
+*        holding the keyword value.
 *     comment
-*        Pointer to a location at which to return the pointer to a string 
+*        Pointer to a location at which to return the pointer to a string
 *        holding the keyword comment.
-*     status 
+*     status
 *        Inherited status value.
 
 *  Returned value:
 *     -  An integer identifying the data type of the keyword value. This
-*     will be one of the values AST__COMMENT, AST__INT, AST__STRING, 
+*     will be one of the values AST__COMMENT, AST__INT, AST__STRING,
 *     AST__FLOAT, AST__COMPLEXI or AST__COMPLEXF.
 
 *  Notes:
@@ -563,11 +563,11 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 *     include the delimiting quotes, and pairs of adjacent quotes within the
 *     string are replaced by single quotes.
 *     -  A maximum of 80 characters are read from the supplied card, so the
-*     string does not need to be null terminated unless less than 80 
+*     string does not need to be null terminated unless less than 80
 *     characters are to be read.
-*     -  The memory holding the string "value" should be released when no 
+*     -  The memory holding the string "value" should be released when no
 *     longer needed using free.
-*     -  A NULL pointer and a data type of AST__COMMENT are returned if an 
+*     -  A NULL pointer and a data type of AST__COMMENT are returned if an
 *     error has already occurred, or if this function fails for any reason.
 */
 
@@ -594,18 +594,18 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 /* Initialise the returned pointers. */
    *value = NULL;
    type = AST__COMMENT;
-   
+
 /* Check the global status. */
    if( *status != SAI__OK ) return type;
 
 /* Store the number of characters to be read from the supplied card. This
    is not allowed to be more than the length of a FITS header card.
-   Trailing white space and non-printing characters such as new-line are 
+   Trailing white space and non-printing characters such as new-line are
    ignored. */
    nc = cnf_lenc( card );
    if( nc > FITSCARDLEN ) nc = FITSCARDLEN;
 
-/* Allocate memory for a copy of the keyword name plus a terminating 
+/* Allocate memory for a copy of the keyword name plus a terminating
    null character. */
    *name = (char *) malloc( ( 1 + FITSNAMLEN )*sizeof(char) );
 
@@ -632,7 +632,7 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
          dd = *name + strlen( *name ) - 1;
          while( *dd == ' ' ) *(dd--) = 0;
       }
-      
+
 /* Allocate memory to hold the keyword value and comment strings. */
       *value = (char *) malloc( sizeof(char)*( 2 + nc ) );
       *comment = (char *) malloc( sizeof(char)*( 1 + nc ) );
@@ -649,7 +649,7 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
                               || blank_name ){
             (*value)[ 0 ] = 0;
             if( nc > FITSNAMLEN ){
-               (void) strncpy( *comment, card + FITSNAMLEN, 
+               (void) strncpy( *comment, card + FITSNAMLEN,
                                nc - FITSNAMLEN );
                (*comment)[ nc - FITSNAMLEN ] = 0;
             } else {
@@ -661,15 +661,15 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* Find the first non-blank character in the value string. */
             v0 = card + FITSNAMLEN + 1;
-            while( (size_t)(v0 - card) < nc && 
+            while( (size_t)(v0 - card) < nc &&
                    isspace( (int) *v0 ) ) v0++;
 
 /* Store pointers to the start of the returned value and comment strings. */
             v = *value;
             c = *comment;
 
-/* If the first character in the value string is a single quote, the value is 
-   a string. In this case the value ends at the first non-escaped single 
+/* If the first character in the value string is a single quote, the value is
+   a string. In this case the value ends at the first non-escaped single
    quote. */
             if( *v0 == '\''){
                type = AST__STRING;
@@ -678,8 +678,8 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
    returned value string. Single quotes within the string are represented
    by two adjacent quotes, so we also need to check for these and replace
    them by one quote in the returned string. First initialise a pointer
-   to the first character after the opening quote, and set a flag 
-   indicating that (for the purposes of identifying pairs of adjacent 
+   to the first character after the opening quote, and set a flag
+   indicating that (for the purposes of identifying pairs of adjacent
    quotes within the string) the previous character was not a quote. */
                d = v0 + 1;
                lq = 0;
@@ -699,18 +699,18 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
                        lq = 0;
 
 /* If the last character was not a quote, then set the flag for the next
-   pass through the loop, but do not copy the quote to the returned string 
+   pass through the loop, but do not copy the quote to the returned string
    since it will either be a quote escaping a following adjacent quote, or
    a quote to mark the end of the string. */
                     } else {
                        lq = 1;
                     }
-                  
+
 /* If the current character is not a quote... */
                   } else {
 
 /* If the previous character was a quote, then we have found a single
-   isolated quote which therefore marks the end of the string value. 
+   isolated quote which therefore marks the end of the string value.
    The pointer "d" is left pointing to the first character
    after the terminating quote. */
                      if( lq ){
@@ -726,12 +726,12 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* Terminate the returned value string. */
                *v = 0;
-               
+
 /* Now deal with logical and numerical values. */
             } else {
 
 /* The end of the value field is marked by the first "/". Find the number
-   of characters in the value field. Pointer "d" is left pointing to the 
+   of characters in the value field. Pointer "d" is left pointing to the
    first character in the comment (if any). */
                d = strchr( card, '/' );
                if( !d ){
@@ -742,7 +742,7 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* Copy the value string to the returned string. */
                if( ncv == 0 ){
-                  *v = 0;               
+                  *v = 0;
                } else {
                   strncpy( v, card + FITSNAMLEN + 1, ncv );
                   v[ ncv ] = ' ';
@@ -778,13 +778,13 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* First attempt to read two integers from the string (separated by white
    space). */
-                     if( nch = 0, 
+                     if( nch = 0,
                          ( 2 == sscanf( v, " %d %d%n", &ir, &ii, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__COMPLEXI;
 
 /* If that failed, attempt to read a single integer from the string. */
-                     } else if( nch = 0, 
+                     } else if( nch = 0,
                          ( 1 == sscanf( v, " %d%n", &ir, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__INT;
@@ -795,13 +795,13 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* First attempt to read two doubles from the string (separated by white
    space). */
-                     if( nch = 0, 
+                     if( nch = 0,
                          ( 2 == sscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__COMPLEXF;
 
 /* If that failed, attempt to read a single double from the string. */
-                     } else if( nch = 0, 
+                     } else if( nch = 0,
                          ( 1 == sscanf( v, " %lf%n", &fr, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__FLOAT;
@@ -821,13 +821,13 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* Attempt to read two doubles from the edited string (separated by white
    space). */
-                        if( nch = 0, 
+                        if( nch = 0,
                           ( 2 == sscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
                           ( nch >= len ) ) {
                            type = AST__COMPLEXF;
 
 /* If that failed, attempt to read a single double from the edited string. */
-                        } else if( nch = 0, 
+                        } else if( nch = 0,
                             ( 1 == sscanf( v, " %lf%n", &fr, &nch ) ) &&
                             ( nch >= len ) ) {
                            type = AST__FLOAT;
@@ -839,7 +839,7 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 /* If the value type could not be determined report an error. */
                if( type == AST__COMMENT ) {
                   *status = SAI__ERROR;
-                  errRep( " ", "Illegal keyword value supplied.", 
+                  errRep( " ", "Illegal keyword value supplied.",
                           status );
                }
             }
@@ -851,13 +851,13 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
             } else {
                ncc = 0;
             }
-            
+
 /* Copy the remainder of the card to the returned comment string. */
             if( *status == SAI__OK && ncc > 0 ){
                strncpy( c, d, ncc );
                c[ ncc ] = 0;
 
-/* Find the start of the comment (indicated by the first "/" after the 
+/* Find the start of the comment (indicated by the first "/" after the
    value string). */
                slash = strchr( c, '/' );
 
@@ -871,7 +871,7 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
                   d = slash + 1;
                   for( i = 0; i < 1 + (int) ncc; i++ ) *(c++) = *(d++);
                }
-               
+
 /* If there is no comment string, return a null string. */
             } else {
                *c = 0;
@@ -882,9 +882,9 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* If an error occurred, free the returned strings. */
    if( *status != SAI__OK ){
-      free( (void *) *name );   
-      free( (void *) *value );   
-      free( (void *) *comment );   
+      free( (void *) *name );
+      free( (void *) *value );
+      free( (void *) *comment );
       *name = NULL;
       *value = NULL;
       *comment = NULL;
@@ -893,7 +893,7 @@ int pol1Split( const char *card, char **name, char **value, char **comment,
 
 /* Return the data type. */
    return type;
-   
+
 }
 
 int pol1FullForm( const char *list, const char *test, int *status ){
@@ -957,15 +957,15 @@ int pol1FullForm( const char *list, const char *test, int *status ){
    trailing spaces). */
       len = cnf_lenc( test );
 
-/* Compare the supplied test option against each of the known options in 
+/* Compare the supplied test option against each of the known options in
    turn. Count the number of matches. */
       nmatch = 0;
       option = strtok( llist, " " );
       i = 0;
       while( option ){
-      
+
 /* If every character in the supplied label matches the corresponding
-   character in the current test label we have a match. Increment the 
+   character in the current test label we have a match. Increment the
    number of matches and save the current item index. */
          if( !pol1Ustrncmp( test, option, len ) ) {
             nmatch++;
@@ -1006,7 +1006,7 @@ int pol1Ustrcmp( const char *a, const char *b ){
 *     int pol1Ustrcmp( const char *a, const char *b )
 
 *  Description:
-*     Returns 0 if there are no differences between the two strings, and 1 
+*     Returns 0 if there are no differences between the two strings, and 1
 *     otherwise. Comparisons are case blind.
 
 *  Parameters:
@@ -1021,7 +1021,7 @@ int pol1Ustrcmp( const char *a, const char *b ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strcmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -1100,7 +1100,7 @@ int pol1Ustrncmp( const char *a, const char *b, size_t n ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strncmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -1150,7 +1150,7 @@ int pol1Ustrncmp( const char *a, const char *b, size_t n ){
 
 }
 
-int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan, 
+int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
                Grp *grp1, Grp *grp2, char **v, char *vl, int *status ){
 /*
 *  Name:
@@ -1163,7 +1163,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 *     Starlink C
 
 *  Synopsis:
-*     int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan, 
+*     int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 *                    Grp *grp1, Grp *grp2, char **v, char *vl, int *status )
 
 *  Description:
@@ -1187,21 +1187,21 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 *   the original value is returned at *v.
 
 *  Arguments:
-*     e0 
+*     e0
 *        Pointer to the first character of the expression.
 *     e1
 *        Pointer to the first character beyond the end of the expression.
 *     fchan
-*        A pointer to an AST FitsChan containing the FITS header cards to 
+*        A pointer to an AST FitsChan containing the FITS header cards to
 *        be used when resolving references to FITS keywords contained in
 *        the expression.
-*     grp1 
+*     grp1
 *        Pointer to the GRP group holding HDS data types. Ignored
 *        if either grp1 or grp2 is NULL.
 *     grp2
 *        Pointer to the GRP group holding FITS keyword names. Ignored
 *        if either grp1 or grp2 is NULL.
-*     v 
+*     v
 *        Address of a pointer to the start of the string to receive the string
 *        corresponding to the expression. The pointer is updated on exit
 *        to hold the address of the next character following the end of
@@ -1210,7 +1210,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 *        Pointer to the end of the string to receive the string
 *        corresponding to the expression. The string should not be null
 *        terminated.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
@@ -1219,7 +1219,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -1293,7 +1293,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
    keywords here. */
          lhs0 = lhs;
          lhs1 = lhs;
-         e = pol1Seval( d, t1, fchan, 0, grp1, grp2, &lhs1, 
+         e = pol1Seval( d, t1, fchan, 0, grp1, grp2, &lhs1,
                         lhs0 + MXLIT - 1, &dummy, status );
          if( *status != SAI__OK ) return ok;
 
@@ -1302,7 +1302,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
             *status = SAI__ERROR;
             errRep( " ", "Possible missing equals sign.", status );
             return ok;
-         }         
+         }
 
 /* The next character must not be a delimter. */
          e++;
@@ -1310,21 +1310,21 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
             *status = SAI__ERROR;
             errRep( " ", "Extra spaces after an equal sign.", status );
             return ok;
-         }         
+         }
 
-/* Find the component to the right of the equals sign. Do not allow 
+/* Find the component to the right of the equals sign. Do not allow
    references to FITS keywords here. */
          rhs0 = rhs;
          rhs1 = rhs;
-         f = pol1Seval( e, t1, fchan, 0, grp1, grp2, &rhs1, rhs0 + MXLIT - 1, 
+         f = pol1Seval( e, t1, fchan, 0, grp1, grp2, &rhs1, rhs0 + MXLIT - 1,
                         &dummy, status );
          if( *status != SAI__OK ) {
             *status = SAI__ERROR;
             errRep( " ", "Possible missing delimiter.", status );
             return ok;
-         }         
+         }
 
-/* Compare the string to the left of the equals with the original value. 
+/* Compare the string to the left of the equals with the original value.
    If they match, store the right hand string and leave the loop. */
          test_done = 1;
          if( pol1Cmpr( *v, v0, lhs1, lhs0 ) ) {
@@ -1355,9 +1355,9 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 }
 
 
-unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1, 
-                          AstFitsChan *fchan, int fitsok, Grp *grp1, 
-                          Grp *grp2, char **v, char *vl, int *ok, 
+unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
+                          AstFitsChan *fchan, int fitsok, Grp *grp1,
+                          Grp *grp2, char **v, char *vl, int *ok,
                           int *status ){
 /*
 *  Name:
@@ -1370,9 +1370,9 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 *     Starlink C
 
 *  Synopsis:
-*     unsigned char *polSeval( unsigned char *t0, unsigned char *t1, 
-*                              AstFitsChan *fchan, int fitsok, Grp *grp1, 
-*                              Grp *grp2, char **v, char *vl, int *ok, 
+*     unsigned char *polSeval( unsigned char *t0, unsigned char *t1,
+*                              AstFitsChan *fchan, int fitsok, Grp *grp1,
+*                              Grp *grp2, char **v, char *vl, int *ok,
 *                              int *status )
 
 *  Description:
@@ -1382,46 +1382,46 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 *     - If the first non-delimiter is a quote, the string betwen the first
 *     opening and closing quote is stored at *v.
 *
-*     - If the first non-delimiter is an opening parenthesis, the string 
+*     - If the first non-delimiter is an opening parenthesis, the string
 *     between the first opening and closing parentheses is evaluated as
 *     an expression and stored at *v.
 *
 *     - Otherwise, the first component ends at the first control token.
 *     If fitsok is non-zero, this is taken to be the name of a FITS
 *     keyword, and the value of the keyword is stored at v (an error is
-*     reported and STATUS is set to SAI__WARN if the keyword is not defined 
+*     reported and STATUS is set to SAI__WARN if the keyword is not defined
 *     in the FitsChan). Otherwise, the component is stored unchanged at *v.
 
 *  Arguments:
-*     t0 
-*        Pointer to the first character 
+*     t0
+*        Pointer to the first character
 *     t1
-*        Pointer to the first character beyond the end 
+*        Pointer to the first character beyond the end
 *     fchan
-*        A pointer to an AST FitsChan containing the FITS header cards to 
+*        A pointer to an AST FitsChan containing the FITS header cards to
 *        be used when resolving references to FITS keywords contained in
 *        the expression.
 *     fitsok
 *        If non-zero, then the first component can be a reference to a
 *        FITS keyword, in which case the stored string is the keyword value.
-*     grp1 
-*        Pointer to a GRP group holding HDS data types. Ignored if either 
+*     grp1
+*        Pointer to a GRP group holding HDS data types. Ignored if either
 *        grp1 or grp2 is NULL.
 *     grp1
-*        Pointer to a GRP group holding FITS keyword names. Ignored if either 
+*        Pointer to a GRP group holding FITS keyword names. Ignored if either
 *        grp1 or grp2 is NULL.
-*     v 
+*     v
 *        Address of a pointer to the start of the string to receive the string
-*        corresponding to the expression. 
+*        corresponding to the expression.
 *     vl
 *        Pointer to the end of the string to receive the string
 *        corresponding to the expression. The string should not be null
 *        terminated.
-*     ok 
+*     ok
 *        Returned equal to 1 if the first component is a quoted string,
-*        or if it is a literal string containing only characters which are 
+*        or if it is a literal string containing only characters which are
 *        valid in the context of a FITS keyword name.
-*     status 
+*     status
 *        The global status.
 
 *  Returned Value:
@@ -1429,7 +1429,7 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -1480,9 +1480,9 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 /* Check there is something left. */
       if( d >= t1 ) return ret;
 
-/* If the first character is an opening parenthesis, then find the 
+/* If the first character is an opening parenthesis, then find the
    corresponding closing parenthesis. */
-      if( *d == OPEN_P ) {        
+      if( *d == OPEN_P ) {
          e = pol1Fchr( d + 1, t1, CLOSE_P, status );
 
 /* Report an error if there is no corresponding closing parenthesis. */
@@ -1496,9 +1496,9 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 /*  Process the string within the parentheses as a new expression. */
          *ok = pol1Ceval( d + 1, e, fchan, grp1, grp2, v, vl, status );
          if( *status == SAI__OK ) ret = e + 1;
-            
+
 /* If the first character is a quoted string. */
-      } else if( *d == OPEN_Q ) {        
+      } else if( *d == OPEN_Q ) {
          e = pol1Fchr( d + 1, t1, CLOSE_Q, status );
 
 /* Report an error if there is no corresponding closing quote. */
@@ -1531,12 +1531,12 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
                *ok = 0;
                *status = SAI__ERROR;
                errRep( " ", "Syntax error in supplied expression.",
-                       status ); 
+                       status );
                return ret;
             }
 
-/* Copy the FITS keyword name into a null teminated string, checking each 
-   character to see if it is allowed within a FITS keyword name. */         
+/* Copy the FITS keyword name into a null teminated string, checking each
+   character to see if it is allowed within a FITS keyword name. */
             name = fname;
             for( ;  d < ret; d++ ) {
                if( isFits( (int) *d ) ) {
@@ -1545,22 +1545,22 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
                   *ok = 0;
                   *status = SAI__ERROR;
                   errRep( " ", "Syntax error in supplied expression.",
-                          status ); 
+                          status );
                   return ret;
                }
             }
             *name = 0;
 
-/* Search the entire FitsChan for this keyword. If found, extract the 
+/* Search the entire FitsChan for this keyword. If found, extract the
    keyword name, value and comment, and get its natural data type. */
             astClear( fchan, "card" );
             if( astFindFits( fchan, fname, card, 0 ) ){
                type = pol1Split( card, &name, &value, &comment, status );
 
-/* Remove any leading spaces from its value if its natural type is not 
+/* Remove any leading spaces from its value if its natural type is not
    AST__STRING */
                if( type != AST__STRING ) {
-                  text = value;                  
+                  text = value;
                   c = NULL;
                   while( *text ){
                     if( c || *text != ' ' ) {
@@ -1580,7 +1580,7 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 /* Remove any trailing spaces. */
                while( c >= value && *c == ' ' ) *(c--) = 0;
 
-/* See if it is explicitly declared in the control table. The declared 
+/* See if it is explicitly declared in the control table. The declared
    type over-rides the natural type. */
                dtype = AST__NOTYPE;
                if( grp1 != NULL && grp2 != NULL ) {
@@ -1589,13 +1589,13 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 
 /* Get it using grpInfoc, which converts the name to upper case. */
                      grpInfoc( grp1, idec, "NAME", buffer, 256, status );
-                     text = ( *status == SAI__OK ) ? buffer : NULL;     
+                     text = ( *status == SAI__OK ) ? buffer : NULL;
 
-                     if( !pol1Ustrcmp( text, "_DOUBLE") || 
+                     if( !pol1Ustrcmp( text, "_DOUBLE") ||
                          !pol1Ustrcmp( text, "_REAL") ){
                         dtype = AST__FLOAT;
 
-                     } else if( !pol1Ustrcmp( text, "_INTEGER") || 
+                     } else if( !pol1Ustrcmp( text, "_INTEGER") ||
                                 !pol1Ustrcmp( text, "_WORD") ||
                                 !pol1Ustrcmp( text, "_BYTE") ){
                         dtype = AST__INT;
@@ -1609,9 +1609,9 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
                         errRep( " ", "Unsupported or unrecognised data type \"^TYPE\".",
                                 status );
 
-                        free( (void *) name );         
-                        free( (void *) value );         
-                        free( (void *) comment );         
+                        free( (void *) name );
+                        free( (void *) value );
+                        free( (void *) comment );
 
                         return ret;
                      }
@@ -1621,8 +1621,8 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 /* If it was declared, use its declared type instead of its natural type. */
                if( dtype != AST__NOTYPE ) type = dtype;
 
-/* Return the character equivalent of the keyword value, so long as the 
-   keyword was not explicitly declared as non-character, in which 
+/* Return the character equivalent of the keyword value, so long as the
+   keyword was not explicitly declared as non-character, in which
    case report an error. */
                if( dtype != AST__NOTYPE && dtype != AST__STRING &&
                    *status == SAI__OK ){
@@ -1633,12 +1633,12 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
                   errRep( " ", "FITS keyword ^NAME was declared to be "
                           "of type ^TYPE but must be _CHAR.", status );
 
-                  free( (void *) name );         
-                  free( (void *) value );         
-                  free( (void *) comment );         
+                  free( (void *) name );
+                  free( (void *) value );
+                  free( (void *) comment );
 
                   return ret;
-               }                   
+               }
 
                *ok = 1;
 
@@ -1657,12 +1657,12 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
             if( *ok ) {
                c = value;
                while( *c && *v < vl ) *((*v)++) = *(c++);
-            }            
+            }
 
 /* Release the memory storing the strings returned by pol1Split. */
-            free( (void *) name );         
-            free( (void *) value );         
-            free( (void *) comment );         
+            free( (void *) name );
+            free( (void *) value );
+            free( (void *) comment );
 
 /* If it cannot be a FITS keyword, return the first component as a literal
    string. */
@@ -1676,8 +1676,8 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 
 }
 
-F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE), 
-                            CHARACTER(TYPE), LOGICAL(THERE), INTEGER(STATUS) 
+F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE),
+                            CHARACTER(TYPE), LOGICAL(THERE), INTEGER(STATUS)
                             TRAIL(NAME) TRAIL(VALUE) TRAIL(TYPE) ){
 /*
 *  Name:
@@ -1701,7 +1701,7 @@ F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE),
 *     FCHAN = INTEGER (Given)
 *        The FitsChan.
 *     NAME = CHARACTER * ( * ) (Given)
-*        The FITS keyword name. 
+*        The FITS keyword name.
 *     VALUE = CHARACTER * ( * ) (Returned)
 *        The formatted keyword value. Set blank if the keyword was not found.
 *     TYPE = CHARACTER * ( * ) (Returned)
@@ -1713,7 +1713,7 @@ F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE),
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -1746,7 +1746,7 @@ F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE),
       char card[ FITSCARDLEN + 1 ];
       int i;
       int there;
-      int type; 
+      int type;
 
 /* Initialise */
       for( i = 0; i < VALUE_length; i++ ) VALUE[ i ] = ' ';
@@ -1780,13 +1780,13 @@ F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE),
 /* Search the FitsChan for the keyword. */
       there = astFindFits( fchan, fname, card, 0 );
 
-/* If found, extract the keyword name, value and comment, and get its 
+/* If found, extract the keyword name, value and comment, and get its
    natural data type. */
       if( there ){
          *THERE = F77_TRUE;
          type = pol1Split( card, &name, &value, &comment, STATUS );
 
-/* Get a pointer to the first character to be copied to the returned 
+/* Get a pointer to the first character to be copied to the returned
    value string. If the natural type of the keyword is not AST__STRING,
    ignore leading spaces. */
          a = value;
@@ -1842,19 +1842,19 @@ int pol1Cmpr( char *a1, char *a0, char *b1, char *b0 ){
 *  Description:
 *     This function compares two strings for equality. If both strings
 *     are numerical they care converted to double precision before doing
-*     the comparison so that for instance the strings "45.0", "45", "45.0E0", 
+*     the comparison so that for instance the strings "45.0", "45", "45.0E0",
 *     "45.0D0", "45.", etc, will all be considered equal. If either string
 *     is not numerical the srings must have the same length and must be
 *     identical, except for case in order to match.
 
 *  Parameters:
-*     a1 
+*     a1
 *        A pointer to the first character beyond the end of the A string.
-*     a0 
+*     a0
 *        A pointer to the first character of the A string.
-*     b1 
+*     b1
 *        A pointer to the first character beyond the end of the B string.
-*     b0 
+*     b0
 *        A pointer to the first character of the B string.
 
 *  Returned Value:
@@ -1869,7 +1869,7 @@ int pol1Cmpr( char *a1, char *a0, char *b1, char *b0 ){
       int b0_length;           /* Length of B string */
 
 /* Initialise. */
-      ret = 0;         
+      ret = 0;
       ISTAT = 0;
 
 /* Save the lengths of the two strings. */

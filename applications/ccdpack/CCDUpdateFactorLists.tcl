@@ -15,14 +15,14 @@ proc CCDUpdateFactorLists { element Table } {
 #     in the appropriate elements of the global array CCDndfs. The times
 #     used are assumed to be stored (together with the file names) in
 #     a Table widget (or multitem). The number of columns determines
-#     the actions (a single time is assumed to be that associated 
+#     the actions (a single time is assumed to be that associated
 #     with the given frame type).
 #
 #     If the data are flash frames then it is assumed that they have a
 #     flash exposure time (which is 1 if CCDsame(flashes) is true) and
 #     a dark time (which defaults to 0 if unless set).
 #
-#     If the data are dark frames then it is assumed that they have a 
+#     If the data are dark frames then it is assumed that they have a
 #     dark exposure time (which is 1 if CCDsame(darks) is true) and
 #     have a flash time of 0.
 
@@ -88,17 +88,17 @@ proc CCDUpdateFactorLists { element Table } {
    global CCDndfs
    global CCDsame
    global CCDfactors
-#. 
+#.
 
 #  Unset the global variables before update.
    if { [info exists CCDndfs($element)] } {
       unset CCDndfs($element)
    }
-   if { [info exists CCDfactors($element,darks)] } { 
+   if { [info exists CCDfactors($element,darks)] } {
       unset CCDfactors($element,darks)
    }
-   if { [info exists CCDfactors($element,flashes)] } { 
-      unset CCDfactors($element,flashes) 
+   if { [info exists CCDfactors($element,flashes)] } {
+      unset CCDfactors($element,flashes)
    }
 
 #  For each entry obtain its value(s) and insert into the global arrays.
@@ -107,21 +107,21 @@ proc CCDUpdateFactorLists { element Table } {
       set item [$Table get $i]
       lappend CCDndfs($element) [lindex $item 0]
       set index 1
-      if { $element == "darks" } { 
+      if { $element == "darks" } {
 
 #  Darks only have a dark time flash time is always zero.
          if { ! $CCDsame(darks) } {
             lappend CCDfactors($element,darks) [lindex $item 1]
-         } else { 
+         } else {
             lappend CCDfactors($element,darks) 1
          }
          lappend CCDfactors($element,flashes) 0
-      } else { 
+      } else {
 
 #  Flashes. Darks times are 0 (unlikely to have much dark time in flashes)
          if { ! $CCDsame(flashes) } {
             lappend CCDfactors($element,flashes) [lindex $item 1]
-         } else { 
+         } else {
             lappend CCDfactors($element,flashes) 1
          }
          lappend CCDfactors($element,darks) 0

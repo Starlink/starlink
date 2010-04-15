@@ -31,8 +31,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 * Status :
 
@@ -45,7 +45,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  IDIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
      :  ODIMS( NDIMS ),  ! dimensions of output DATA_ARRAY
      :  ACTDIM,               ! actual dimensions from NDF_DIM
@@ -86,7 +86,7 @@
 	CALL MSG_SETI( 'XDIM', IDIMS(1))
 	CALL MSG_SETI( 'YDIM', IDIMS(2))
 
-	CALL MSG_OUT( 'INPUT_DIMS', 
+	CALL MSG_OUT( 'INPUT_DIMS',
      :                'Input image is ^XDIM by ^YDIM pixels',
      :	              STATUS)
 *
@@ -97,7 +97,7 @@
 *
 * create output image structures
 *
-	CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO, 
+	CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO,
      :                STATUS )
 	IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL NDF_ANNUL( LOCI, STATUS )
@@ -118,7 +118,7 @@
 *
 * call subroutine to do the work
 *
-	CALL THETAFIXSUB( IDIMS(1), IDIMS(2), %VAL( PNTRI ), ODIMS(1), 
+	CALL THETAFIXSUB( IDIMS(1), IDIMS(2), %VAL( PNTRI ), ODIMS(1),
      :	                  ODIMS(2), %VAL( PNTRO ), STATUS )
 *
 * tidy up the input/output structures

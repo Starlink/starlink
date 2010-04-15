@@ -32,7 +32,7 @@
 *     COMM = CHARACTER * ( * ) (Given)
 *        The command name.
 *     PROMPT = CHARACTER * ( * ) (Given)
-*        The prompt string. 
+*        The prompt string.
 *     DEFVAL = CHARACTER * ( * ) (Given)
 *        The default character string to use if blank value is
 *        supplied.
@@ -61,15 +61,15 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR__ constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) COMM
       CHARACTER * ( * ) PROMPT
       CHARACTER * ( * ) DEFVAL
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) VALUE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -116,8 +116,8 @@ C     PRLEN = 4
          CALL CHR_APPND( PROMPT( F : L ), FULLPR, PRLEN )
          PRLEN = PRLEN + 1
       END IF
-         
-*  If a default value has been given, add it to the full prompt. 
+
+*  If a default value has been given, add it to the full prompt.
       IF( DEFVAL .NE. ' ' ) THEN
          CALL CHR_APPND( '/', FULLPR, PRLEN )
          CALL CHR_APPND( DEFVAL, FULLPR, PRLEN )
@@ -126,8 +126,8 @@ C     PRLEN = 4
       END IF
 
 *  Add a question mark to the full prompt string.
-      CALL CHR_APPND( '?', FULLPR, PRLEN )     
-      PRLEN = PRLEN + 1      
+      CALL CHR_APPND( '?', FULLPR, PRLEN )
+      PRLEN = PRLEN + 1
 
 *  Loop until a value is obtained.
       MORE = .TRUE.
@@ -141,14 +141,14 @@ C     PRLEN = 4
             CALL ERR_REP( 'RDSTR_ERR1', 'Error obtaining a string '//
      :                    'from the terminal', STATUS )
             GO TO 999
-         END IF        
-         
+         END IF
+
 *  If a blank value was supplied, accept the default value if one was
 *  supplied, and indicate that a value has been obtained.
          IF( LVALUE .EQ. ' '  ) THEN
             IF( DEFVAL .NE. ' ' ) THEN
-               LVALUE = DEFVAL         
-               MORE = .FALSE.      
+               LVALUE = DEFVAL
+               MORE = .FALSE.
             END IF
 
 *  If the supplied value is not blank, return it.
@@ -162,7 +162,7 @@ C     PRLEN = 4
       EXCLAM = LVALUE
       CALL CHR_RMBLK( EXCLAM )
 
-*  If a single exclamation was given, report a null value. 
+*  If a single exclamation was given, report a null value.
       IF( EXCLAM .EQ. '!' ) THEN
          STATUS = PAR__NULL
          CALL ERR_REP( 'RDSTR_ERR3', 'Null parameter value given.',
@@ -171,7 +171,7 @@ C     PRLEN = 4
 *  If a double exclamation was given, report a parameter abort.
       ELSE IF( EXCLAM .EQ. '!!' ) THEN
          STATUS = PAR__ABORT
-         CALL ERR_REP( 'RDSTR_ERR4', 'Parameter request aborted.', 
+         CALL ERR_REP( 'RDSTR_ERR4', 'Parameter request aborted.',
      :                 STATUS )
       END IF
 
@@ -180,5 +180,5 @@ C     PRLEN = 4
 
 *  Jump to here if an error occurs.
  999  CONTINUE
-      
+
       END

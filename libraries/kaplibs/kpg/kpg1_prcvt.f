@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     5-MAY-1992 (RFWS):
 *        Original version.
 *     12-OCT-1998 (DSB):
-*        Check _REAL and _DOUBLE objects for IEEE NaN and Inf values, 
+*        Check _REAL and _DOUBLE objects for IEEE NaN and Inf values,
 *        converting them to the appropriate Starlink bad value if any
 *        are found.
 *     2004 September 1 (TIMJ):
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
       PRIM = .FALSE.
       CALL DAT_PRIM( LOC, PRIM, STATUS )
       IF ( ( STATUS .EQ. SAI__OK ) .AND. PRIM ) THEN
-      
+
 *  If this is the first conversion to be performed, then create a
 *  temporary HDS structure for use as a work area, saving its locator.
          IF ( FIRST ) THEN
@@ -175,7 +175,7 @@
 *  original object into it (thus performing the conversion).
                   CALL DAT_MAPV( LOCSCR, TYPE, 'WRITE', PNTR, SIZE( 1 ),
      :                           STATUS )
-                  CALL KPG1_NAGTC( %VAL( CNF_PVAL( PNTR ) ), 
+                  CALL KPG1_NAGTC( %VAL( CNF_PVAL( PNTR ) ),
      :                             LOC, NDIM, DIM, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
 
@@ -184,7 +184,7 @@
 *  performing the conversion).
                ELSE
                   CALL PSX_MALLOC( LENGTH * SIZE( 1 ), PNTR, STATUS )
-                  CALL DAT_GET( LOC, TYPE, NDIM, DIM, 
+                  CALL DAT_GET( LOC, TYPE, NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR ) ),
      :                          STATUS )
                END IF
@@ -219,7 +219,7 @@
 *  the new object, annul the scratch object locator and erase the
 *  associated object.
                IF ( TYPE( : 5 ) .EQ. '_CHAR' ) THEN
-                  CALL KPG1_NAPTC( %VAL( CNF_PVAL( PNTR ) ), 
+                  CALL KPG1_NAPTC( %VAL( CNF_PVAL( PNTR ) ),
      :                             LOC, NDIM, DIM, STATUS,
      :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   CALL DAT_ANNUL( LOCSCR, STATUS )
@@ -228,7 +228,7 @@
 *  If it is not a character object, then write the converted values and
 *  free the allocated memory.
                ELSE
-                  CALL DAT_PUT( LOC, TYPE, NDIM, DIM, 
+                  CALL DAT_PUT( LOC, TYPE, NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR ) ),
      :                          STATUS )
                   CALL PSX_FREE( PNTR, STATUS )
@@ -239,19 +239,19 @@
 *  Starlink bad value. This is always done for _REAL or _DOUBLE data,
 *  even if no format conversion was necessary above.
             IF( STATUS .EQ. SAI__OK .AND.
-     :             ( TYPE( : 5 ) .EQ. '_REAL' .OR. 
+     :             ( TYPE( : 5 ) .EQ. '_REAL' .OR.
      :               TYPE( : 7 ) .EQ. '_DOUBLE' ) ) THEN
 
 *  Map the object for update.
-               CALL DAT_MAPV( LOC, TYPE, 'UPDATE', PNTR, SIZE( 1 ), 
+               CALL DAT_MAPV( LOC, TYPE, 'UPDATE', PNTR, SIZE( 1 ),
      :                        STATUS )
 
 *  Do the conversion.
                IF( TYPE( : 5 ) .EQ. '_REAL' ) THEN
-                  CALL FTS1_RNANR( SIZE( 1 ), %VAL( CNF_PVAL( PNTR ) ), 
+                  CALL FTS1_RNANR( SIZE( 1 ), %VAL( CNF_PVAL( PNTR ) ),
      :                             STATUS )
                ELSE
-                  CALL FTS1_RNAND( SIZE( 1 ), %VAL( CNF_PVAL( PNTR ) ), 
+                  CALL FTS1_RNAND( SIZE( 1 ), %VAL( CNF_PVAL( PNTR ) ),
      :                             STATUS )
                END IF
 

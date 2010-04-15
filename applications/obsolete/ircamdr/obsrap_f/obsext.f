@@ -5,9 +5,9 @@
 
 * Description :
 *
-*     This routine opens a specified HDS container file containing 
-*     observations and reads the specified DATA_ARRAY components, 
-*     creating new single observation HDS files with the DATA_ARRAY 
+*     This routine opens a specified HDS container file containing
+*     observations and reads the specified DATA_ARRAY components,
+*     creating new single observation HDS files with the DATA_ARRAY
 *     values
 *
 * Invocation :
@@ -19,7 +19,7 @@
 *     CONTAINER = IMAGE( READ )
 *	   Input container file, the source of the information
 *     STARTOBS  = INTEGER( READ )
-*	   The start observation number of the extraction 
+*	   The start observation number of the extraction
 *     ENDOBS    = INTEGER( READ )
 *	   The end observation number of the extraction
 *     CHANNAME  = CHARACTER( READ )
@@ -41,7 +41,7 @@
 *
 *     29-07-1986 : First implementation (REVA::CAA)
 *     06-06-1989 : added option to create full output structure (JACH::CAA)
-*     29-JUN-1994  Changed MSG_OUT on error to ERR_REP, STR$ and LIB$ 
+*     29-JUN-1994  Changed MSG_OUT on error to ERR_REP, STR$ and LIB$
 *                  to CHR_ (SKL@JACH)
 *     08-Sep-1994  Unused variables identified by UNIX compile removed(SKL@JACH)
 *
@@ -52,7 +52,7 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'		! SSE global definitions
-        INCLUDE  'DAT_PAR'              ! Necessary for non_VMS 
+        INCLUDE  'DAT_PAR'              ! Necessary for non_VMS
         INCLUDE  'CHR_ERR'
 
 * Status :
@@ -63,7 +63,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :	  ENDOBS,			! last obs element to be written
      :	  IMCODE,			! image code for subpar calls
      :	  J,				! loop counter for all obs elements
@@ -72,7 +72,7 @@
      :	  LEN2,				! length of trimmed string
      :	  NCOMP,                        ! number of components
      :	  STARTOBS,			! start obs element in write
-     :	  SUBS( 2)			! subscript for the observation 
+     :	  SUBS( 2)			! subscript for the observation
 
 	CHARACTER
      :	  CHANNAME*20,			! name of data_array channel to be used
@@ -84,9 +84,9 @@
 	CHARACTER*(DAT__SZLOC)		! locators for :
      :    LOCTOP,			! input container file structure
      :    LOCOBS,			! obs structure
-     :    LOCCELL,			! cell observation 
+     :    LOCCELL,			! cell observation
      :    LOC2,	 			! another locator
-     :    LOCCHAN,			! data channel 
+     :    LOCCHAN,			! data channel
      :	  LOCDA,                        ! data array in selected channel
      :	  LOCOUT			! output single image
 
@@ -99,7 +99,7 @@
 	  RETURN
 	END IF
 
-*      find the index for the parameter system output image 
+*      find the index for the parameter system output image
 
         CALL SUBPAR_FINDPAR( 'OUTPIC', IMCODE, STATUS )
 
@@ -160,7 +160,7 @@
 	  FILENAME = PREFIX( 1:LEN1) // '0000'
 	END IF
 
-*      loop to get locator to each of the specified obs cells and get the 
+*      loop to get locator to each of the specified obs cells and get the
 *      DATA_ARRAY values to be written to the stand alone data file
 
 	DO J = STARTOBS, ENDOBS
@@ -315,7 +315,7 @@
 	  CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	  GOTO 10
 	END IF
-	  
+
 *      tidy up the input container file
 
 	CALL DAT_ANNUL( LOCOBS, STATUS)

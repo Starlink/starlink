@@ -86,7 +86,7 @@ C
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       INTEGER   REFLEN                      ! Length of REF_NAME_UC
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     DSA system common
 C

@@ -1,26 +1,26 @@
-      SUBROUTINE  POINA3( PDETCH, PDETRQ, PUNITS, AUTO, BAND, DETLBD, 
-     :                    DETUBD, EXPDEC, EXPRA, EXPSRC, IDC, LOGFID, 
-     :                    LOGREQ, MAXDET, NDFID, SCLENN, SCLENS, SMPLBD, 
-     :                    SMPUBD, WHLSCN, DATA, DETERR, DETEXS, DETNUM, 
-     :                    DETNSM, DETREQ, DETSCA, DETSMP, DETVAL, 
+      SUBROUTINE  POINA3( PDETCH, PDETRQ, PUNITS, AUTO, BAND, DETLBD,
+     :                    DETUBD, EXPDEC, EXPRA, EXPSRC, IDC, LOGFID,
+     :                    LOGREQ, MAXDET, NDFID, SCLENN, SCLENS, SMPLBD,
+     :                    SMPUBD, WHLSCN, DATA, DETERR, DETEXS, DETNUM,
+     :                    DETNSM, DETREQ, DETSCA, DETSMP, DETVAL,
      :                    DETXSC, UNITS, STATUS )
 *+
 *  Name:
 *     POINA3
 
 *  Purpose:
-*     To get detectors required and calculate start and end sample to be 
+*     To get detectors required and calculate start and end sample to be
 *     included in noise calculations and point source search.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA3( PDETCH, PDETRQ, PUNITS, AUTO, BAND, DETLBD, 
-*                  DETUBD, EXPDEC, EXPRA, EXPSRC, IDC, LOGFID, 
-*                  LOGREQ, MAXDET, NDFID, SCLENN, SCLENS, SMPLBD, 
-*                  SMPLBD, WHLSCN, DATA, DETERR, DETEXS, DETNUM, 
-*                  DETNSM, DETREQ, DETSCA, DETSMP, DETVAL, 
+*     CALL POINA3( PDETCH, PDETRQ, PUNITS, AUTO, BAND, DETLBD,
+*                  DETUBD, EXPDEC, EXPRA, EXPSRC, IDC, LOGFID,
+*                  LOGREQ, MAXDET, NDFID, SCLENN, SCLENS, SMPLBD,
+*                  SMPLBD, WHLSCN, DATA, DETERR, DETEXS, DETNUM,
+*                  DETNSM, DETREQ, DETSCA, DETSMP, DETVAL,
 *                  DETXSC, UNITS, STATUS )
 
 *  Description:
@@ -34,7 +34,7 @@
 *        The name of the parameter used to get the users reply to whether this
 *        detector is required or not.
 *     PUNITS = CHARACTER (Given)
-*        The name of the parameter used to get the value of the units in 
+*        The name of the parameter used to get the value of the units in
 *        which the data values are to be reported.
 *     AUTO = LOGICAL (Given)
 *        TRUE when application is required to run in automatic mode.
@@ -113,7 +113,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,35 +131,35 @@
       CHARACTER*( * ) PDETCH
       CHARACTER*( * ) PDETRQ
       CHARACTER*( * ) PUNITS
-      LOGICAL AUTO 
+      LOGICAL AUTO
       INTEGER BAND
       INTEGER DETLBD
       INTEGER DETUBD
       DOUBLE PRECISION EXPDEC
       DOUBLE PRECISION EXPRA
       LOGICAL EXPSRC
-      INTEGER IDC                
+      INTEGER IDC
       INTEGER LOGFID
       LOGICAL LOGREQ
       INTEGER MAXDET
-      INTEGER NDFID              
-      REAL SCLENN 
-      REAL SCLENS 
+      INTEGER NDFID
+      REAL SCLENN
+      REAL SCLENS
       INTEGER SMPLBD
       INTEGER SMPUBD
-      LOGICAL WHLSCN 
+      LOGICAL WHLSCN
       REAL DATA( SMPLBD : SMPUBD , DETLBD : DETUBD )
 
 *  Arguments Returned:
-      LOGICAL DETERR 
-      LOGICAL DETEXS( MAXDET ) 
-      INTEGER DETNUM( MAXDET )  
-      REAL DETNSM( MAXDET )  
-      LOGICAL DETREQ( MAXDET )  
-      REAL DETSCA( MAXDET )  
-      INTEGER DETSMP( MAXDET, 2 )  
-      LOGICAL DETVAL( MAXDET )  
-      REAL DETXSC( MAXDET )  
+      LOGICAL DETERR
+      LOGICAL DETEXS( MAXDET )
+      INTEGER DETNUM( MAXDET )
+      REAL DETNSM( MAXDET )
+      LOGICAL DETREQ( MAXDET )
+      REAL DETSCA( MAXDET )
+      INTEGER DETSMP( MAXDET, 2 )
+      LOGICAL DETVAL( MAXDET )
+      REAL DETXSC( MAXDET )
       CHARACTER*( * ) UNITS
 
 *  Status:
@@ -201,10 +201,10 @@
       INTEGER SCSOSA             ! Number of samples south of expected source
       REAL SPEED                 ! Returned Scan speed at sample position
       REAL XDIS                  ! Cross_scan distance from expected source
-      REAL XSMP                  ! Sample number of nearest sample to 
+      REAL XSMP                  ! Sample number of nearest sample to
                                  ! expected source position
       REAL Z                     ! Focal plane Z coord to be translated into
-                                 ! cross_scan distance from expected source 
+                                 ! cross_scan distance from expected source
 *.
 
 *  Programmers note
@@ -252,12 +252,12 @@
 
 *  Add one to the count of valid detectors
             NOVDET = NOVDET + 1
-            
+
 *  If an expected source position was supplied, find the point on this
 *  detector track closest to the reference position, and focal plane Z
 *  coordinate of the given position at the point of closest approach.
             IF ( EXPSRC ) THEN
-               CALL IRC_DCLAP( IDC, IDET, EXPRA, EXPDEC, 
+               CALL IRC_DCLAP( IDC, IDET, EXPRA, EXPDEC,
      :                         XSMP, Z, STATUS )
 
 *  Calculate the detector cross-scan distance in arcmins from the Boresight
@@ -293,9 +293,9 @@
 
          END IF
       END DO
-    
-      
-*  If there are no detectors available for selection give message and return 
+
+
+*  If there are no detectors available for selection give message and return
 *  to calling subroutine
       IF ( NOVDET .LE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          DETERR = .TRUE.
@@ -305,16 +305,16 @@
 
 *  If the logfile is required display message to logfile
          IF ( LOGREQ ) THEN
-            CALL FIO_WRITE( LOGFID, 
+            CALL FIO_WRITE( LOGFID,
      :                 'No detectors with sufficient valid '/
-     :                 /'data are available for this scan', 
+     :                 /'data are available for this scan',
      :                 STATUS )
          END IF
          RETURN
       END IF
 
 * ************************************************************************
-* Get the detector choice parameter(s) 
+* Get the detector choice parameter(s)
 * ************************************************************************
 *  If the application is running automatically then set the det choice
 *  value to nearest.
@@ -345,12 +345,12 @@
          IF ( LOGREQ ) THEN
             CALL FIO_WRITE( LOGFID, 'No detectors have been selected '/
      :                 /'for this scan', STATUS )
-            CALL FIO_WRITE( LOGFID, 'POINTCRDD: Now aborting run', 
+            CALL FIO_WRITE( LOGFID, 'POINTCRDD: Now aborting run',
      :                      STATUS )
          END IF
          RETURN
       END IF
-      
+
 * ************************************************************************
 * Mark the required detectors including offering each to the user if his
 * option is choice
@@ -371,21 +371,21 @@
 *  Choice is 'nearest'
 * ************************************************************************
 *  If DETCHO is nearest select the valid detector with the minimum absolute
-*  cross-scan distance 
+*  cross-scan distance
       ELSE IF(( DETCHO .EQ. 'N' ) .OR. ( DETCHO .EQ. 'NEAREST' )) THEN
          MINXSC = 50.0
          MINDNO = 0
          DO IDET = DETLBD, DETUBD
-            IF( DETVAL( IDET ) .AND. 
+            IF( DETVAL( IDET ) .AND.
      :                ( DETXSC( IDET ) .NE. VAL__BADR ) ) THEN
                IF ( ABS( DETXSC( IDET ) ) .LT. MINXSC ) THEN
-                  MINXSC = ABS( DETXSC( IDET ) ) 
+                  MINXSC = ABS( DETXSC( IDET ) )
                   MINDNO = IDET
                END IF
             END IF
          END DO
 
-* Check whether there is a valid minimum xscan detector and make that detector 
+* Check whether there is a valid minimum xscan detector and make that detector
 * required
          IF ( MINDNO .GT. 0 ) THEN
             DETREQ( MINDNO ) = .TRUE.
@@ -399,7 +399,7 @@
 * ************************************************************************
 *  If DETCHO is choose display each valid detector with its cross_scan distance
 *  and allow the user to choose whether the detector is required. If no scans
-*  are chosen repeat choice. 
+*  are chosen repeat choice.
       ELSE
 
 *  Set detfnd to false indicating no detectors have been chosen
@@ -410,14 +410,14 @@
          DETERR = .FALSE.
 
 *  Start of repeat if DETFND is false
-100      CONTINUE                   
+100      CONTINUE
 
          DO IDET = DETLBD, DETUBD
-            IF( DETVAL( IDET ) .AND. 
+            IF( DETVAL( IDET ) .AND.
      :                ( DETXSC( IDET ) .NE. VAL__BADR ) ) THEN
                CALL CHR_ITOC( DETNUM( IDET ), IDETST, IDETLN)
                CALL CHR_RTOC( DETXSC( IDET ), DETXST, DETXLN)
-               CALL MSG_OUT( ' ', 
+               CALL MSG_OUT( ' ',
      :                   'Detector number '// IDETST( : IDETLN )//
      :                   ' Cross_scan distance '// DETXST( : DETXLN ),
      :                    STATUS )
@@ -425,7 +425,7 @@
                CALL PAR_CANCL( PDETRQ, STATUS )
 
 *  Check return status for detector required parameter
-               IF ( STATUS .EQ. SAI__OK) THEN 
+               IF ( STATUS .EQ. SAI__OK) THEN
 
 *  Valid response to the required parameter, set detector required variable to
 *  the response
@@ -446,7 +446,7 @@
 
 *  If the logfile is required display message to logfile
                   IF ( LOGREQ ) THEN
-                     CALL FIO_WRITE( LOGFID, 
+                     CALL FIO_WRITE( LOGFID,
      :                    'No detectors have been selected '/
      :                    /'for this scan', STATUS )
                   END IF
@@ -462,10 +462,10 @@
 
 *  If the logfile is required display message to logfile
                   IF ( LOGREQ ) THEN
-                     CALL FIO_WRITE( LOGFID, 
+                     CALL FIO_WRITE( LOGFID,
      :                 'No detectors have been selected '/
      :                 /'for this scan', STATUS )
-                     CALL FIO_WRITE( LOGFID, 
+                     CALL FIO_WRITE( LOGFID,
      :                 'POINTCRDD: Now aborting run', STATUS )
                   END IF
                   RETURN
@@ -491,13 +491,13 @@
 *  For each detector trace
       DO IDET = DETLBD, DETUBD
 
-*  Is the detector valid and required 
+*  Is the detector valid and required
          IF ( DETVAL( IDET ) .AND. DETREQ( IDET ) ) THEN
 
 *  Is whole scan required
             IF ( WHLSCN ) THEN
 
-*  Set the scan  to be used for this detector bounds to the sample bounds 
+*  Set the scan  to be used for this detector bounds to the sample bounds
 *  for the scan
                DETSMP( IDET, 1 ) = SMPLBD
                DETSMP( IDET, 2 ) = SMPUBD
@@ -506,7 +506,7 @@
 *  sample number associated with the reference position
             ELSE IF( DETNSM( IDET ) .EQ. VAL__BADR ) THEN
 
-*  Invalid sample number whole scan used, set the scan to be used for this 
+*  Invalid sample number whole scan used, set the scan to be used for this
 *  detector bounds to the sample bounds for the scan
                WHLSCN = .TRUE.
                DETSMP( IDET, 1 ) = SMPLBD
@@ -524,36 +524,36 @@
      :                       RA, DEC, SCANG, SPEED, STATUS )
 
 *  Find the scan direction. shift scan angle to the range from -pi to
-*  pi. 
+*  pi.
                ANGLE = SLA_RANGE( REAL( SCANG) )
 
 *  Determine whether this implies northern end is a lower sample value
-*  than the expected source point ( Since ANGLE is the angle between north 
-*  pole and focus plan Y axis this is in the direction opposite to the 
+*  than the expected source point ( Since ANGLE is the angle between north
+*  pole and focus plan Y axis this is in the direction opposite to the
 *  scan direction )
                IF ( ABS( ANGLE ) .LT. REAL( IRA__PIBY2 ) ) THEN
 
-*  North is lower sample number, calculate the detector bounds as 
-*  The lower bound is either 
+*  North is lower sample number, calculate the detector bounds as
+*  The lower bound is either
 *     expected source sample - number of samples reqired to North of ESS
 *  or
 *     lower bound of the scan
 *  The upper bound is corresponding
 
                   DETSMP( IDET, 1 ) = INT( DETNSM( IDET ) ) - SCNOSA
-                  DETSMP( IDET, 1 ) = MAX( SMPLBD, 
-     :                                      DETSMP( IDET, 1 ) ) 
+                  DETSMP( IDET, 1 ) = MAX( SMPLBD,
+     :                                      DETSMP( IDET, 1 ) )
                   DETSMP( IDET, 2 ) = INT( DETNSM( IDET ) ) + SCSOSA
-                  DETSMP( IDET, 2 ) = MIN( SMPUBD, 
+                  DETSMP( IDET, 2 ) = MIN( SMPUBD,
      :                                      DETSMP( IDET, 2 ) )
                ELSE
 *  North is the higher sample numbers, in calculation north and south are
 * interchanged
                   DETSMP( IDET, 1 ) = INT( DETNSM( IDET ) ) - SCSOSA
-                  DETSMP( IDET, 1 ) = MAX( SMPLBD, 
-     :                                      DETSMP( IDET, 1 ) ) 
+                  DETSMP( IDET, 1 ) = MAX( SMPLBD,
+     :                                      DETSMP( IDET, 1 ) )
                   DETSMP( IDET, 2 ) = INT( DETNSM( IDET ) ) + SCNOSA
-                  DETSMP( IDET, 2 ) = MIN( SMPUBD, 
+                  DETSMP( IDET, 2 ) = MIN( SMPUBD,
      :                                      DETSMP( IDET, 2 ) )
                END IF
 
@@ -565,7 +565,7 @@
 
 *  End do for end of calculating start and end sample for each detector required
       END DO
-      
+
 * ************************************************************************
 *  Get the units to be used in displaying values for this scan and
 *  determine the scale factor to be applied to the NDF values to get
@@ -573,19 +573,19 @@
 * ************************************************************************
 *  Get the data units used in the input CRDD NDF.
       CALL NDF_CGET( NDFID, 'Units', CRDUNT, STATUS )
-      
+
 *  Get the data units used when output detected sources.
       CALL IRM_GTCUN( PUNITS, CRDUNT, UNITS, STATUS )
 
 *  For each detector trace
       DO IDET = DETLBD, DETUBD
 
-*  Is the detector valid and required 
+*  Is the detector valid and required
          IF ( DETVAL( IDET ) .AND. DETREQ( IDET ) ) THEN
 
 *  Find the scale factors needed to convert the data in input units
 *  to the user specified units.
-            CALL IRM_UNTCV( CRDUNT, UNITS, 1, DETNUM( IDET ), 
+            CALL IRM_UNTCV( CRDUNT, UNITS, 1, DETNUM( IDET ),
      :                      DETSCA( IDET ), STATUS )
 
          END IF

@@ -20,8 +20,8 @@
 
 
 
-void c_tcr_trim 
-( 
+void c_tcr_trim
+(
 char char_,         /* the character to be skipped (given) */
 char * string,      /* the string to be searched (given) */
 int * pos,         /* position of first non-matching character - if no
@@ -36,7 +36,7 @@ int * status       /* inherited status (updateable) */
 *     c_tcr_trim
 
 *  Purpose:
-*     Trim trailing characters  
+*     Trim trailing characters
 
 *  Language:
 *     Starlink C
@@ -74,7 +74,7 @@ int * status       /* inherited status (updateable) */
    n = (long) strlen( string ) ;
    for ( j = n ; j > 0 ; j-- )
    {
-      if ( string[j-1] != char_ ) 
+      if ( string[j-1] != char_ )
       {
          break ;
       }
@@ -124,19 +124,19 @@ int main()
    }
 /*   ams_path ( "cosaxp0.roe.ac.uk!!slave", &path, &status ); */
 /*   ams_path ( "resun06!!slave", &path, &status ); */
-   ams_path ( "revaxi!!trace", &path, &status ); 
+   ams_path ( "revaxi!!trace", &path, &status );
    if ( status != SAI__OK )
    {
       printf ( "master - bad status after ams_path\n" );
    }
-   else 
+   else
    {
       printf ( "master - got path ok = %d\n", path );
    }
 
    for ( j=0; j<1; j++ )
    {
-      ams_send ( path, outmsg_function, outmsg_status, outmsg_context, 
+      ams_send ( path, outmsg_function, outmsg_status, outmsg_context,
         outmsg_name, outmsg_length, outmsg_value, &messid, &status );
       if ( status != SAI__OK )
       {
@@ -146,8 +146,8 @@ int main()
       {
       printf ( "master - sent message ok\n" );
       }
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
       if ( status != SAI__OK )
       {
@@ -163,8 +163,8 @@ int main()
       }
       for ( ; ; )
       {
-         ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-           &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+         ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+           &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
            inmsg_value, &status );
          if ( inmsg_status != MESSYS__INFORM )
          {
@@ -198,8 +198,8 @@ int main()
    }
 
    status = SAI__OK;
-/*   ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status, 
-     &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path, 
+/*   ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status,
+     &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path,
      &messid, &status ); */
    kill ( getpid(), SIGINT );
    return 0;

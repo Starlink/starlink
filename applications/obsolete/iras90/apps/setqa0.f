@@ -22,12 +22,12 @@
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the indices of a set of
-*        pixels. Each string within the group should hold a single 
-*        index value, and the indices for a single pixel should be in 
+*        pixels. Each string within the group should hold a single
+*        index value, and the indices for a single pixel should be in
 *        adjacent names (eg in the order X1,Y1,Z1,X2,Y2,Z2... for a
 *        three dimensional NDF).
 *     IC = INTEGER (Given)
-*        The index within the array LIST at which the indices of the 
+*        The index within the array LIST at which the indices of the
 *        pixel are to be stored (i.e. the pixel number).
 *     NDIM = INTEGER (Given)
 *        The no. of dimensions (e.g. the no. of indices needed to
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop round each name in the group.
-      START = ( IC - 1 )*NDIM 
+      START = ( IC - 1 )*NDIM
       DO I = START + 1, START + NDIM
 
 *  Get the next NAME.

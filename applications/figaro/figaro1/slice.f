@@ -41,7 +41,7 @@ C     17th Jan 1991  JMS / AAO. Added PAR_ABORT calls to support user
 C                    requested aborts.
 C     18th Jan 1991  JMS / AAO. Changed the maximum number of allowed
 C                    data-array dimensions from 10 to 2.
-C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected 
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
 C                    in mapping calls.
 C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     27th Jul 1996  MJCL / Starlink, UCL.  One more PAR_ABORT check.
@@ -53,10 +53,10 @@ C+
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C
-C     Functions 
+C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER GEN_BSEARCH        ! Returns the array index of the 
+      INTEGER GEN_BSEARCH        ! Returns the array index of the
                                  ! element closest to a given test value
       REAL GEN_ELEMF             ! Returns value of Nth element of a
                                  ! given array
@@ -66,11 +66,11 @@ C
       CHARACTER CITEMS(2)*32     ! Axis character items retrieved
       INTEGER   DIMS(2)          ! Dimensions of an array
       REAL      ENDS(4)          ! The ends of the slice
-      INTEGER   IND              ! Array index of number closest to 
+      INTEGER   IND              ! Array index of number closest to
                                  ! VALUE
-      INTEGER   IND1             ! Array index one less than IND (min 
+      INTEGER   IND1             ! Array index one less than IND (min
                                  ! value=1)
-      INTEGER   IND2             ! Array index one greater than IND 
+      INTEGER   IND2             ! Array index one greater than IND
       INTEGER   IORD             ! Order to be used for interpolation
       INTEGER   IPTR             ! Pointer to IMAGE data
       INTEGER   NAXIS            ! Axis number
@@ -176,7 +176,7 @@ C     Map data
       ELSE
          YEND=VALUE
       END IF
-C    
+C
 C     ... and now for AXIS(1)
 C
       NAXIS=1

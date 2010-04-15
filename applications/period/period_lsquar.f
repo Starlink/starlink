@@ -1,6 +1,6 @@
- 
+
       SUBROUTINE PERIOD_LSQUAR(DATA, NUMBER, N, A, CHISQ, XM, NORM)
- 
+
 C=============================================================================
 C PERIOD_LSQUAR provides a polynomial fit of specified degree to a set of
 C data points. the fit is done in double precision. Uses the double precision
@@ -38,7 +38,7 @@ C Removed unused variable PRINTR
 C
 C GJP March 1997
 C
-C Modifed test for CHISQ=ZERO. Changed REAL*8 to DOUBLE PRECISION. 
+C Modifed test for CHISQ=ZERO. Changed REAL*8 to DOUBLE PRECISION.
 C ITEST passed to another routine without having a value or type.
 C
 C Cosmetic Double Precision mods. (KPD), August 2001
@@ -47,7 +47,7 @@ C===============================================================================
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
- 
+
       INTEGER NMAX,ITER,ITEST,N21,N22,N23,I,J,K,L,M2
       INTEGER N,NUMBER,NORM
       LOGICAL RITE
@@ -55,23 +55,23 @@ C===============================================================================
       DOUBLE PRECISION DATA(3, NUMBER), A(N), CHISQ, S, R
       DOUBLE PRECISION X1, X2, X3, X1MULT
 
- 
+
 C-------------------------------------------------------------------------------
 C EPS    =  MAXIMUM ALLOWED ERROR IN ITERATIONS ON THE POLYNOMIAL
 C           COEFFICIENTS. CONVERGENCE TERMINATES WHEN ERROR.LT.EPS
 C NMAX   =  MAXIMUM ALLOWED NUMBER OF COEFFICIENTS (DUE TO DIMENSION
 C           STATEMENTS).
 C-------------------------------------------------------------------------------
- 
+
       DATA EPS, NMAX/1.D-6, 50/
 
       RITE = .FALSE.
       ITEST=0
- 
+
 C-------------------------------------------------------------------------------
 C Test input data.
 C-------------------------------------------------------------------------------
- 
+
       IF ( (NUMBER.LE.0.OR.N.GT.NUMBER) .OR. N.LE.0 ) THEN
          CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_LSQUAR failed.'
@@ -86,28 +86,28 @@ C-------------------------------------------------------------------------------
          CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_LSQUAR failed.'
          WRITE (*, *) '** ERROR: Number of coefficients = ', N
-         WRITE (*, *) '** ERROR: Maximum number of coefficients' // 
+         WRITE (*, *) '** ERROR: Maximum number of coefficients' //
      :                ' permitted = ', NMAX
          WRITE (*, *) ' '
          CHISQ = -3.0D0
          RETURN
       END IF
- 
+
 C-------------------------------------------------------------------------------
 C If the input value of CHISQ is 0. allow printing of error messages.
 C-------------------------------------------------------------------------------
- 
+
       IF ( DABS(CHISQ).LT.DPMN30 ) RITE = .TRUE.
       ITER = 5
       IF ( RITE ) ITER = -ITER
       N21 = 2*N + 1
       N22 = N21 + 1
       N23 = N21 + 2
- 
+
 C-------------------------------------------------------------------------------
 C Rescale the input data (for NORM .NE. 0).
 C-------------------------------------------------------------------------------
- 
+
       IF ( NORM.NE.0 .AND. N.NE.1 ) THEN
          AVE = 0.0D0
          SIGMA = 0.0D0
@@ -119,11 +119,11 @@ C-------------------------------------------------------------------------------
          AVE = AVE/DFLOAT(NUMBER)
          SIGMA = DSQRT(SIGMA/DFLOAT(NUMBER)-AVE*AVE)
       END IF
- 
+
 C-------------------------------------------------------------------------------
 C Zero the working array.
 C-------------------------------------------------------------------------------
- 
+
       DO 200 I = 1, N
          DO 100 J = N21, N23
             XM(I, J) = 0.0D0
@@ -131,13 +131,13 @@ C-------------------------------------------------------------------------------
  200  CONTINUE
       X2 = 0.0D0
       X3 = 0.0D0
- 
+
 C-------------------------------------------------------------------------------
 C Compute the moments of the data.
 C Change by TRM @RGO 7-June-1988. Ignore point if sigma error estimate less
 C than or equal to zero.
 C-------------------------------------------------------------------------------
- 
+
       M2 = 2*N
       DO 300 I = 1, NUMBER
          IF ( DATA(3,I).GT.0.0D0 ) THEN
@@ -169,11 +169,11 @@ C-------------------------------------------------------------------------------
  300  CONTINUE
       XM(2, N21) = X2
       XM(1, N23) = X3
- 
+
 C-------------------------------------------------------------------------------
 C Compute matrix for inversion.
 C-------------------------------------------------------------------------------
- 
+
       DO 400 I = 1, N
          DO 350 J = 1, N
             K = I + J
@@ -184,13 +184,13 @@ C-------------------------------------------------------------------------------
             END IF
  350     CONTINUE
  400  CONTINUE
- 
+
 C-------------------------------------------------------------------------------
 C Call double precision matrix inversion routine.
 C-------------------------------------------------------------------------------
- 
+
       IF ( N.NE.1 ) THEN
-         CALL PERIOD_MLSRAR(N,XM,XM(1,N23),ITER,EPS,A,ITEST,0, 
+         CALL PERIOD_MLSRAR(N,XM,XM(1,N23),ITER,EPS,A,ITEST,0,
      :                      XM(1,N+1))
          IF ( ITEST.GE.5 ) THEN
             CHISQ = -2.0D0
@@ -200,11 +200,11 @@ C-------------------------------------------------------------------------------
          XM(1, 1) = 1.0D0/XM(1, 1)
          A(1) = XM(1, 1)*XM(1, N23)
       END IF
- 
+
 C-------------------------------------------------------------------------------
 C Compute chi-square for resulting fit.
 C-------------------------------------------------------------------------------
- 
+
       CHISQ = 0.0D0
       DO 500 I = 1, NUMBER
          IF ( DATA(3,I).GT.0.0D0 ) THEN
@@ -225,17 +225,17 @@ C-------------------------------------------------------------------------------
             CHISQ = CHISQ + ((S-DATA(2,I))/DATA(3,I))**2
          END IF
  500  CONTINUE
- 
+
 C-------------------------------------------------------------------------------
 C Error messages after inversion of the matrix XM (H in the write-up).
 C-------------------------------------------------------------------------------
- 
+
       IF ( NORM.EQ.0 .OR. N.EQ.1 ) RETURN
- 
+
 C-------------------------------------------------------------------------------
 C Rescale coefficients if data scaling was requested.
 C-------------------------------------------------------------------------------
- 
+
       SIGMA = 1.0D0/SIGMA
       AVE = -AVE*SIGMA
       L = N - 1
@@ -257,6 +257,6 @@ C-------------------------------------------------------------------------------
          A(I) = A(I)*SIGMA**(I-1)
  800  CONTINUE
       A(N) = A(N)*SIGMA**(N-1)
- 
+
       RETURN
       END

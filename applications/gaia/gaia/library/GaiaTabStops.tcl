@@ -126,7 +126,7 @@ itcl::class gaia::GaiaTabStops {
 
       #  Add the "source" tabstop triangle. Pressing <1> on this
       #  generates a new marker, moving the cursor also moves the new
-      #  marker. 
+      #  marker.
       set xo 5
       set id [$canvas_ create polygon \
                  $xo $trioffset_ \
@@ -171,7 +171,7 @@ itcl::class gaia::GaiaTabStops {
       }
       set last_id_ $id
    }
-   
+
    #  Move the tab-stop that has just been created or moved.
    protected method move_last_stop_ {x} {
       move_stop_ $last_id_ $x
@@ -197,7 +197,7 @@ itcl::class gaia::GaiaTabStops {
       set last_id_ $id
       return $id
    }
-   
+
    #  Control the autoscan function when dragged off canvas.
    protected method autoscan_ {do w x} {
       if { $do == "start" } {
@@ -230,7 +230,7 @@ itcl::class gaia::GaiaTabStops {
       #  Get x position for tab-stop.
       set cx [expr ($index+1)*$step_]
       if { $cx < $step_ || $cx > $entwidth_+$step_ } {
-         
+
          #  Off range so put at initial position.
          set cx 10
       }

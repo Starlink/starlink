@@ -77,7 +77,7 @@ float cupidRanVal( int dist, float p[2], int *status ){
 
 /* Local Constants: */
 #define PMEAN 1.0E8
-   
+
 /* Local Variables: */
    float ret;             /* Returned value */
 
@@ -97,6 +97,6 @@ float cupidRanVal( int dist, float p[2], int *status ){
    }
 
 /* Return the required value */
-   return ret;   
+   return ret;
 
 }

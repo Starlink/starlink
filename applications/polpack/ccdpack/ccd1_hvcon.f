@@ -15,7 +15,7 @@
 
 *  Description:
 *     The routine checks to see if the last non - blank character
-*     in the given string is the continuation character. 
+*     in the given string is the continuation character.
 
 *  Arguments:
 *     LINE = CHARACTER * ( * ) (Given)
@@ -30,7 +30,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Find the position of the last non-blank character.
       IAT = MAX( 1, CHR_LEN( LINE ) )
 

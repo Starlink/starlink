@@ -18,7 +18,7 @@
  *                                  struct STR *msg_str
  *                                  TRAIL(msg_str) )
  */
- 
+
 int
 datErmsg(int  status,
          size_t *len,
@@ -125,135 +125,135 @@ datErmsg(int  status,
       case DAT__OK:
          trans = "OK, no error (DAT__OK)";
          break;
- 
+
       case DAT__LOCIN:
          trans = "Locator invalid (DAT__LOCIN)";
          break;
- 
+
       case DAT__TYPIN:
          trans = "Type invalid (DAT__TYPIN)";
          break;
- 
+
       case DAT__NAMIN:
          trans = "Name invalid (DAT__NAMIN)";
          break;
- 
+
       case DAT__MODIN:
          trans = "Mode invalid (DAT__MODIN)";
          break;
- 
+
       case DAT__DELIN:
          trans = "Deletion invalid (DAT__DELIN)";
          break;
- 
+
       case DAT__DIMIN:
          trans = "Dimensions invalid (DAT__DIMIN)";
          break;
- 
+
       case DAT__FILIN:
          trans = "File invalid (DAT__FILIN)";
          break;
- 
+
       case DAT__OBJIN:
          trans = "Object invalid (DAT__OBJIN)";
          break;
- 
+
       case DAT__GRPIN:
          trans = "Group invalid (DAT__GRPIN)";
          break;
- 
+
       case DAT__SUBIN:
          trans = "Subscripts invalid (DAT__SUBIN)";
          break;
- 
+
       case DAT__COMEX:
          trans = "Component already exists (DAT__COMEX)";
          break;
- 
+
       case DAT__OBJNF:
          trans = "Object not found (DAT__OBJNF)";
          break;
- 
+
       case DAT__TRUNC:
          trans = "Text truncated (DAT__TRUNC)";
          break;
- 
+
       case DAT__ACCON:
          trans = "Access conflict (DAT__ACCON)";
          break;
- 
+
       case DAT__CONER:
          trans = "Conversion error (DAT__CONER)";
          break;
- 
+
       case DAT__UNSET:
          trans = "Primitive data undefined (DAT__UNSET)";
          break;
- 
+
       case DAT__VERMM:
          trans = "Version mismatch (DAT__VERMM)";
          break;
- 
+
       case DAT__PRMAP:
          trans = "Primitive data mapped (DAT__PRMAP)";
          break;
- 
+
       case DAT__FILCK:
          trans = "File lock error (DAT__FILCK)";
          break;
- 
+
       case DAT__FILNF:
          trans = "File not found (DAT__FILNF)";
          break;
- 
+
       case DAT__FILPR:
          trans = "File protected (DAT__FILPR)";
          break;
- 
+
       case DAT__INCHK:
          trans = "Integrity check (DAT__INCHK)";
          break;
- 
+
       case DAT__FATAL:
          trans = "Fatal internal error (DAT__FATAL)";
          break;
- 
+
       case DAT__ISMAP:
          trans = "Data currently mapped (DAT__ISMAP)";
          break;
- 
+
       case DAT__BOUND:
          trans = "Outside bounds of object (DAT__BOUND)";
          break;
- 
+
       case DAT__FILCL:
          trans = "File close error (DAT__FILCL)";
          break;
- 
+
       case DAT__FILCR:
          trans = "File create error (DAT__FILCR)";
          break;
- 
+
       case DAT__FILMP:
          trans = "File mapping error (DAT__FILMP)";
          break;
- 
+
       case DAT__FILND:
          trans = "File not deleted (DAT__FILND)";
          break;
- 
+
       case DAT__FILNX:
          trans = "File not extended (DAT__FILNX)";
          break;
- 
+
       case DAT__FILRD:
          trans = "File read error (DAT__FILRD)";
          break;
- 
+
       case DAT__FILWR:
          trans = "File write error (DAT__FILWR)";
          break;
- 
+
       case DAT__NOMEM:
          trans = "Memory allocation error (DAT__NOMEM)";
          break;

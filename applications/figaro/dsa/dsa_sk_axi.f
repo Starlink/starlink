@@ -13,7 +13,7 @@ C     array - or other axis information that could generate a data
 C     array - for a specified axis.  If an axis array exists but has
 C     dimensions incompatible with the main data array - the axis array
 C     may have fewer dimensions than the main array, but those it has
-C     must match the dimensions in the main array - then a warning 
+C     must match the dimensions in the main array - then a warning
 C     message is output and the array is treated as non-existent.
 C
 C  Language:
@@ -32,7 +32,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ system.
 C
 C  External subroutines / functions used:
@@ -101,7 +101,7 @@ C     Local variables
 C
       INTEGER   DIMS(MAX_AXES)              ! Dimensions of axis array
       INTEGER   DIMS2(MAX_AXES)             ! Dimensions of main data array
-      CHARACTER ERROR*64                    ! Error string 
+      CHARACTER ERROR*64                    ! Error string
       LOGICAL   FLAGS(MAX_AXES)             ! Flags dimensions in data
       INTEGER   I                           ! Loop index through axis dimensions
       INTEGER   IGNORE                      ! Dummy status argument
@@ -114,7 +114,7 @@ C
       CHARACTER NUMBER*12                   ! Formatted number
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       INTEGER   STATE                       ! Existence state code for array
       CHARACTER STRUCTURE_NAME*128          ! Full structure name from ref_name
 C
@@ -151,7 +151,7 @@ C
          CALL DSA_ARRAY_EXIST(OBJ_NAME(:LENGTH),EXIST,STATUS)
 C
 C        If it exists, get its dimensions and check them against those of
-C        the main data array.  This can be a little tricky.  Consider a 
+C        the main data array.  This can be a little tricky.  Consider a
 C        3-d main array.  The first dimension of the y-axis data must match
 C        the y-dimension of the data, and its other dimensions must match
 C        other dimensions of the data, but not necessarily in any given order.
@@ -215,7 +215,7 @@ C
             END IF
          END IF
 C
-C        Now we know, set the common flags so we don't have to look 
+C        Now we know, set the common flags so we don't have to look
 C        it up again.
 C
          IF (EXIST) THEN

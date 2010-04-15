@@ -103,7 +103,7 @@ itcl::class gaia::StarCanvasObject {
       incr number_of_objects -1
       set notify_change_cmd {}
 
-      #  Delete the graphic item (someone else may have removed it so 
+      #  Delete the graphic item (someone else may have removed it so
       #  be careful).
       if { $canvas_id_ != {} } {
          catch { $canvasdraw remove_notify_cmd $canvas_id_ }
@@ -336,7 +336,7 @@ itcl::class gaia::StarCanvasObject {
       if { $xpos == {} || $ypos == {} } {
          lassign [$canvas coords $canvas_id_] xpos ypos
       }
-      set dx [expr sin($rad)+$xpos] 
+      set dx [expr sin($rad)+$xpos]
       set dy [expr cos($rad)+$ypos]
       $rtdimage convert coords $dx $dy canvas ndx ndy image
       $rtdimage convert coords $xpos $ypos canvas nxcen nycen image
@@ -346,7 +346,7 @@ itcl::class gaia::StarCanvasObject {
       return $angle
    }
 
-   #  Convert a canvas distance to an image distance (along X axis). 
+   #  Convert a canvas distance to an image distance (along X axis).
    #  Need to be careful that axes interchange hasn't taken place, in
    #  which case the value we want can be in the out "y" system.
    method image_dist { dist } {
@@ -381,7 +381,7 @@ itcl::class gaia::StarCanvasObject {
          lassign [$canvas coords $canvas_id_] xpos ypos
       }
       $rtdimage convert coords $xpos $ypos canvas nxcen nycen image
-      set dx [expr sin($rad)+$nxcen] 
+      set dx [expr sin($rad)+$nxcen]
       set dy [expr cos($rad)+$nycen]
       $rtdimage convert coords $dx $dy image ndx ndy canvas
       set ndx [expr $ndx-$xpos]
@@ -408,7 +408,7 @@ itcl::class gaia::StarCanvasObject {
    }
 
    #  Return whether the object is selected or not.
-   method is_selected {} { 
+   method is_selected {} {
       return $selected_
    }
 
@@ -494,7 +494,7 @@ itcl::class gaia::StarCanvasObject {
 
    #  Command to execute after interactive object is completed.
    protected variable create_cmd_ {}
-   
+
    #  Common variables: (shared by all instances)
    #  -----------------
 

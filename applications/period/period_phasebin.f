@@ -1,31 +1,31 @@
- 
+
       SUBROUTINE PERIOD_PHASEBIN(XDATA, YDATA, YERR, NDATA,
      :                           XBIN, YBIN, EBIN, NBIN,
      :                           YARRAY, MXCOL)
- 
+
 C===========================================================================
 C Bins data on a given period for PHASE.
 C
 C Written by Kevin P Duffey @RAL, October 2001
 C===========================================================================
- 
+
       IMPLICIT NONE
 
 C-----------------------------------------------------------------------------
 C PERIOD_PHASEBIN declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER NDATA, NBIN, MXCOL, BINCOUNT, I, J
       DOUBLE PRECISION BINWID, CENBIN, MINBIN, MAXBIN
       DOUBLE PRECISION XDATA(NDATA), YDATA(NDATA), YERR(NDATA)
       DOUBLE PRECISION XBIN(NBIN), YBIN(NBIN), EBIN(NBIN)
       DOUBLE PRECISION YARRAY(NBIN,MXCOL)
- 
+
 
 C-----------------------------------------------------------------------------
 C Bin data in phase bins (if NBIN = 0, leave data unchanged).
 C-----------------------------------------------------------------------------
- 
+
       BINWID = 1.0D0/DFLOAT(NBIN)
 
       DO 20 I = 1, NBIN

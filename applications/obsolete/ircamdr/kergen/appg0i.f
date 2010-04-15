@@ -1,7 +1,7 @@
 *+  APPG0I - to obtain an integer scalar between certain limits
       SUBROUTINE APPG0I( PARNAM, DEFAUL, MIN, MAX, VALUE, STATUS )
 *    Description :
-*     A value is obtained for the integer variable VALUE, associated with 
+*     A value is obtained for the integer variable VALUE, associated with
 *     parameter name PARNAM, which is in the range MIN <= VALUE <= MAX. The
 *     value given as DEFAUL is suggested to the data system as the default
 *     value for VALUE, if a defualt has already been suggested for this

@@ -98,7 +98,7 @@ HIDDEN PROC BEGPLOT [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10]
    ELSE IF UNDEFINED(p5)
       BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'')
    ELSE IF UNDEFINED(p6)
-      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') 
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'')
    ELSE IF UNDEFINED(p7)
       BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'')
    ELSE IF UNDEFINED(p8)
@@ -109,7 +109,7 @@ HIDDEN PROC BEGPLOT [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10]
    ELSE IF UNDEFINED(p10)
       BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'') ~
                (p7&'') (p8&'') (p9&'')
-   ELSE 
+   ELSE
       BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'') ~
                (p7&'') (p8&'') (p9&'') (p10&'')
    END IF
@@ -144,7 +144,7 @@ HIDDEN PROC DEGTOR COLUMN
 {  Authors:
 {     PCTR: P.C.T. Rees (STARLINK)
 {     PDRAPER: P.W. Draper (Starlink - Durham University).
-      
+
 {  History:
 {     25-NOV-1992 (PCTR):
 {        Starlink release.
@@ -253,7 +253,7 @@ HIDDEN PROC MTEXT SIDE XPOS YPOS JUSTIFICATION TEXT
 {           vertically.
 {           - "RV" -- The right-hand edge, but with the string written
 {           vertically.
-{           
+{
 {        The current value is used. The current value is initially set
 {        to "T".
 {     XPOS = _REAL (Read and Write)
@@ -277,7 +277,7 @@ HIDDEN PROC MTEXT SIDE XPOS YPOS JUSTIFICATION TEXT
 {     TEXT = _CHAR (Read and Write)
 {        The text string to be plotted. This may include any of the
 {        PGPLOT control sequences for producing special characters.
-{        
+{
 {        The value is prompted for.
 
 {  Invocation:
@@ -355,16 +355,16 @@ HIDDEN PROC PTEXT XPOS YPOS ANGLE JUSTIFICATION TEXT
 {     TEXT = _CHAR (Read and Write)
 {        The text string to be plotted. This may include any of the
 {        PGPLOT control sequences for producing special characters.
-{        
+{
 {        The value is prompted for.
 
 {  Invocation:
 {     Via ICL DEFPROC command
 
 {  Description:
-{     Draw a text string on the plot at the specified position and 
+{     Draw a text string on the plot at the specified position and
 {     angle. The command uses the PGPLOT routine PGPTEXT.
-{     
+{
 {     This command is a an ICL hidden procedure which uses the WTEXT
 {     application.
 
@@ -385,10 +385,10 @@ HIDDEN PROC PTEXT XPOS YPOS ANGLE JUSTIFICATION TEXT
 
 {-
    IF UNDEFINED(XPOS) OR UNDEFINED(YPOS) OR  UNDEFINED(ANGLE) OR ~
-      UNDEFINED(JUSTIFICATION) OR UNDEFINED(TEXT) 
+      UNDEFINED(JUSTIFICATION) OR UNDEFINED(TEXT)
       PRINT "Must supply all parameters:-"
       PRINT "   XPOS YPOS ANGLE JUSTIFICATION TEXT"
-   ELSE 
+   ELSE
       TEMP=''''&(TEXT)&''''
       WTEXT P (XPOS+0.0) (YPOS+0.0) (TEMP&'') ~
             JUSTIFICATION=(JUSTIFICATION+0.0) ANGLE=(ANGLE+0.0)
@@ -417,8 +417,8 @@ HIDDEN PROC PTINFO LABEL
 {     Via ICL DEFPROC command
 
 {  Description:
-{     The value of a label in the LABCOL data area is given and the 
-{     resulting (x,y) co-ordinates associated with the label are 
+{     The value of a label in the LABCOL data area is given and the
+{     resulting (x,y) co-ordinates associated with the label are
 {     printed.
 
 {  Authors:
@@ -469,17 +469,17 @@ HIDDEN PROC RADIATE X Y NP
 {     Y = _REAL (Read)
 {        The Y-axis position of the radiant. []
 {     NP = _INTEGER (Read)
-{        The number of data in the XCOL and YCOL data areas to use, 
+{        The number of data in the XCOL and YCOL data areas to use,
 {        starting from the beginning of the data. []
 
 {  Invocation:
 {     Via ICL DEFPROC command
 
 {  Description:
-{     A line is drawn from the given radiant, position (x,y), to the 
+{     A line is drawn from the given radiant, position (x,y), to the
 {     first NP data points in the XCOL and YCOL data areas.
 {
-{     This command is an ICL hidden procedure which uses successive calls 
+{     This command is an ICL hidden procedure which uses successive calls
 {     to the GETPOINT, MOVE and DRAW applications.
 
 {  Authors:
@@ -527,7 +527,7 @@ HIDDEN PROC RPGLOBALS
 {     Via ICL DEFPROC command
 
 {  Description:
-{     The PONGO global parameters are reset to their ADAM interface 
+{     The PONGO global parameters are reset to their ADAM interface
 {     file defaults using the ICL command SETGLOBAL. Note that file
 {     names and device names are not reset.
 
@@ -828,7 +828,7 @@ HIDDEN PROC XOFFSET OFFSET
 {  Description:
 {     Add a constant offset to the X-axis data.  It also applies the
 {     offset to the X limits of the world co-ordinates.
-{     
+{
 {     This command is an ICL hidden procedure which uses the CCMATH
 {     application.
 
@@ -888,7 +888,7 @@ HIDDEN PROC XSCALE SCALE
 
 {  Arguments:
 {     SCALE = _REAL (Read)
-{        The constant by which the XCOL and EXCOL data areas are 
+{        The constant by which the XCOL and EXCOL data areas are
 {        scaled. []
 
 {  Invocation:
@@ -897,7 +897,7 @@ HIDDEN PROC XSCALE SCALE
 {  Description:
 {     Multiply the values in the XCOL and EXCOL data areas by a
 {     constant.  It also scales the limits of the X world co-ordinates.
-{     
+{
 {     This command is an ICL hidden procedure which uses the CCMATH
 {     application.
 
@@ -965,7 +965,7 @@ HIDDEN PROC YOFFSET OFFSET
 {  Description:
 {     Add a constant offset to the Y-axis data.  It also offsets the
 {     limits of the Y world co-ordinates.
-{     
+{
 {     This command is an ICL hidden procedure which uses the CCMATH
 {     constant.
 
@@ -1035,7 +1035,7 @@ HIDDEN PROC YSCALE SCALE
 {  Description:
 {     Multiply the values in the YCOL and EYCOL data areas by a
 {     constant.  It also scales the limits of the Y world co-ordinates.
-{     
+{
 {     This command is an ICL hidden procedure which uses the CCMATH
 {     application.
 
@@ -1080,7 +1080,7 @@ HIDDEN PROC YSCALE SCALE
 
 {   Scale the YCOL and EYCOL values.
    CCMATH Y=(VALUE) EY=(VALUE2)
-   
+
 END PROC
 
 HIDDEN PROC ZSCALE SCALE
@@ -1106,7 +1106,7 @@ HIDDEN PROC ZSCALE SCALE
 
 {  Description:
 {     Multiply the values in the ZCOL data area by a constant.
-{     
+{
 {     This command is an ICL hidden procedure which uses the CCMATH
 {     application.
 
@@ -1192,7 +1192,7 @@ HIDDEN PROC GETPONGLOB PARAM VALUE
 {     GETPONGLOB
 
 {  Purpose:
-{     Print the value of an individual PONGO global parameter, ensuring 
+{     Print the value of an individual PONGO global parameter, ensuring
 {     a silent failure if the parameter has not yet been created.
 
 {  Language:
@@ -1207,7 +1207,7 @@ HIDDEN PROC GETPONGLOB PARAM VALUE
 {     Via ICL DEFPROC command
 
 {  Description:
-{     Print the value of an individual PONGO global parameter, ensuring 
+{     Print the value of an individual PONGO global parameter, ensuring
 {     a silent failure if the parameter has not yet been created.
 {     The ICL command GETGLOBAL is used.
 
@@ -1245,7 +1245,7 @@ HIDDEN PROC GETPONGLOB PARAM VALUE
 END PROC
 
 {  Add procedures to enhance the abilities of the vp_xx commands.
-{  These now accept one argument which is set to "yes" or "true", 
+{  These now accept one argument which is set to "yes" or "true",
 {  "false" or "no". The values of this determines whether or not
 {  space is added around these viewports for showing labels.
 {
@@ -1258,14 +1258,14 @@ END PROC
 {     defstring vp_tr   viewport ndc 0.5417 0.959 0.55 0.95
 
 
-HIDDEN PROC VP_BH LABELS 
+HIDDEN PROC VP_BH LABELS
    IF UNDEFINED(LABELS)
 
 {  Original behaviour
       VIEWPORT NDC 0.0833 0.917 0.05 0.45
-   else 
+   else
 
-{  If requested leave space for labels (this is a guess as label 
+{  If requested leave space for labels (this is a guess as label
 {  spacing depends on character size).
       FIRSTC = SUBSTR(LABELS,1,1)
       FIRSTC = UPCASE(FIRSTC)
@@ -1277,14 +1277,14 @@ HIDDEN PROC VP_BH LABELS
    END IF
 END PROC
 
-HIDDEN PROC VP_BL LABELS 
+HIDDEN PROC VP_BL LABELS
    IF UNDEFINED(LABELS)
 
 {  Original behaviour
      VIEWPORT NDC 0.0417 0.459 0.05 0.45
-   else 
+   else
 
-{  If requested leave space for labels (this is a guess as label 
+{  If requested leave space for labels (this is a guess as label
 {  spacing depends on character size).
       FIRSTC = SUBSTR(LABELS,1,1)
       FIRSTC = UPCASE(FIRSTC)
@@ -1296,14 +1296,14 @@ HIDDEN PROC VP_BL LABELS
    END IF
 END PROC
 
-HIDDEN PROC VP_BR LABELS 
+HIDDEN PROC VP_BR LABELS
    IF UNDEFINED(LABELS)
 
 {  Original behaviour
       VIEWPORT NDC 0.5417 0.959 0.05 0.45
-   else 
+   else
 
-{  If requested leave space for labels (this is a guess as label 
+{  If requested leave space for labels (this is a guess as label
 {  spacing depends on character size).
       FIRSTC = SUBSTR(LABELS,1,1)
       FIRSTC = UPCASE(FIRSTC)
@@ -1315,14 +1315,14 @@ HIDDEN PROC VP_BR LABELS
    END IF
 END PROC
 
-HIDDEN PROC VP_TH LABELS 
+HIDDEN PROC VP_TH LABELS
    IF UNDEFINED(LABELS)
 
 {  Original behaviour
       VIEWPORT NDC 0.0833 0.917 0.55 0.95
-   else 
+   else
 
-{  If requested leave space for labels (this is a guess as label 
+{  If requested leave space for labels (this is a guess as label
 {  spacing depends on character size).
       FIRSTC = SUBSTR(LABELS,1,1)
       FIRSTC = UPCASE(FIRSTC)
@@ -1334,14 +1334,14 @@ HIDDEN PROC VP_TH LABELS
    END IF
 END PROC
 
-HIDDEN PROC VP_TL LABELS 
+HIDDEN PROC VP_TL LABELS
    IF UNDEFINED(LABELS)
 
 {  Original behaviour
       VIEWPORT NDC 0.0417 0.459 0.55 0.95
-   else 
+   else
 
-{  If requested leave space for labels (this is a guess as label 
+{  If requested leave space for labels (this is a guess as label
 {  spacing depends on character size).
       FIRSTC = SUBSTR(LABELS,1,1)
       FIRSTC = UPCASE(FIRSTC)
@@ -1353,14 +1353,14 @@ HIDDEN PROC VP_TL LABELS
    END IF
 END PROC
 
-HIDDEN PROC VP_TR LABELS 
+HIDDEN PROC VP_TR LABELS
    IF UNDEFINED(LABELS)
 
 {  Original behaviour
       VIEWPORT NDC 0.5417 0.959 0.55 0.95
-   else 
+   else
 
-{  If requested leave space for labels (this is a guess as label 
+{  If requested leave space for labels (this is a guess as label
 {  spacing depends on character size).
       FIRSTC = SUBSTR(LABELS,1,1)
       FIRSTC = UPCASE(FIRSTC)
@@ -1377,14 +1377,14 @@ HIDDEN PROC FILLSTY FILLSTY ANGLE SEPARATION PHASE
 {  Set the parameters of the fill.
 
    IF UNDEFINED(FILLSTY)
-      PRINT "Must give a fill style (1-4)"      
+      PRINT "Must give a fill style (1-4)"
    ELSE IF UNDEFINED(ANGLE)
       CHANGE FILLSTY=(FILLSTY&'')
    ELSE IF UNDEFINED(SEPARATION)
       CHANGE FILLSTY=(FILLSTY&'') ANGLE=(ANGLE&'')
    ELSE IF UNDEFINED(PHASE)
       CHANGE FILLSTY=(FILLSTY&'') ANGLE=(ANGLE&'') SEPARATION=(SEPARATION&'')
-   ELSE 
+   ELSE
       CHANGE FILLSTY=(FILLSTY&'') ANGLE=(ANGLE&'') ~
              SEPARATION=(SEPARATION&'') PHASE=(PHASE&'')
    END IF
@@ -1396,13 +1396,13 @@ HIDDEN PROC SETPROJ PROJECTION RACENTRE DECCENTRE
 {  Set the projection related global variables.
 
    IF UNDEFINED(PROJECTION)
-      PRINT "You must give a projection as the first parameter"      
+      PRINT "You must give a projection as the first parameter"
    ELSE IF UNDEFINED(RACENTRE)
       SETGLOBAL PONGO_PROJECTN (PROJECTION&'')
    ELSE IF UNDEFINED(DECCENTRE)
       SETGLOBAL PONGO_PROJECTN (PROJECTION&'')
       SETGLOBAL PONGO_RACENTRE (RACENTRE&'')
-   ELSE 
+   ELSE
       SETGLOBAL PONGO_PROJECTN (PROJECTION&'')
       SETGLOBAL PONGO_RACENTRE (RACENTRE&'')
       SETGLOBAL PONGO_DECENTRE (DECCENTRE&'')

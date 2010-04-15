@@ -4,10 +4,10 @@
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER DIMSX, DIMSY, J, K, N, STATUS, 
+	INTEGER DIMSX, DIMSY, J, K, N, STATUS,
      :	        XST, XSZ, YST, YSZ
 
-	REAL ARROUT( DIMSX, DIMSY), VALMIN, VALMAX, SUM, MEAN, MEDIAN, 
+	REAL ARROUT( DIMSX, DIMSY), VALMIN, VALMAX, SUM, MEAN, MEDIAN,
      :	     MODE, TOLERANCE, XEN, YEN
 
 	REAL*8 DATA( 65536)
@@ -41,7 +41,7 @@
 *      calculate the median value of the normalization area
 	CALL PDA_QSAD( N, DATA )
 
-	CALL MED3D_CALMEDSUB( N, DATA, VALMAX, VALMIN, SUM, MEAN, 
+	CALL MED3D_CALMEDSUB( N, DATA, VALMAX, VALMIN, SUM, MEAN,
      :	                      MEDIAN, MODE)
 
 *      tell user the normalization value

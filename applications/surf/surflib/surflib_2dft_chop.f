@@ -3,13 +3,13 @@
 *+
 *  Name:
 *    SURFLIB_2DFT_CHOP
- 
+
 *  Purpose:
 *     Calculate the FT of the 2D chop throw
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE,
 *    :     NX, NY, FT_DATA, FT_VARIANCE, WT_DATA, WT_VARIANCE, STATUS)
@@ -22,7 +22,7 @@
 *     is a sine wave in the direction of the chop (zero at the middle
 *     beam) with wavelength related to the spatial frequency of the
 *     array (pixel spacing).
-      
+
 
 *  Arguments:
 *     CHOP_THROW                  = REAL (Given)
@@ -46,11 +46,11 @@
 *           variance on DATA; set to 0
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
- 
+
 *  Authors:
 *     Tim Jenness (JACH)
 *     John Lightfoot (RoE)
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -74,39 +74,39 @@
 *     Revision 1.1  1998/04/28 00:30:53  timj
 *     Initial revision
 *
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       REAL    CHOP_THROW
       REAL    CHOP_PA
       REAL    PIXSIZE
       INTEGER NX
       INTEGER NY
- 
+
 *  Arguments Returned:
       REAL    FT_DATA (NX, NY)
       REAL    FT_VARIANCE (NX, NY)
       REAL    WT_DATA (NX, NY)
       REAL    WT_VARIANCE (NX, NY)
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  External references:
- 
+
 *  Global variables:
- 
+
 *  Local Constants:
-      REAL    PI 
+      REAL    PI
       PARAMETER (PI = 3.141592654)
- 
+
 *  Local variables:
       REAL    COS_PA            ! Cosine of the position angle
       REAL    DX                ! X Distance from centre (unrotated)
@@ -125,22 +125,22 @@
       REAL    XCEN              ! Position of image centre (X)
       INTEGER Y                 ! Y position in output image
       REAL    YCEN              ! Position of image centre (Y)
- 
+
 *  Internal References :
- 
+
 *  Local data:
- 
+
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Setup IDIMS
       IDIMS ( 1 ) = NX
       IDIMS ( 2 ) = NY
- 
+
 *     Calculate half the chop in pixels
       HALF_CHOP = CHOP_THROW / (2.0 * PIXSIZE)
- 
+
 *     Centre of image
       XCEN = REAL(IDIMS(1) ) / 2.0
       YCEN = REAL(IDIMS(2) ) / 2.0
@@ -163,7 +163,7 @@
 *     Factor of 2 comes from being symmetric about XCEN,YCEN
 
       DX = 2.0 * MIN( XCEN, ABS(YCEN * TAN_PA) )
-      
+
       IF (ABS(TAN_PA) .LT. 1.0E-20) THEN
          DY = 2.0 * YCEN
       ELSE
@@ -177,7 +177,7 @@
 
       SC = HALF_CHOP / TOT
 
-      
+
 
 *     In order to handle rotation the FT is no longer constant
 *     for constant X or Y
@@ -194,7 +194,7 @@
 *     Calculate distance of Y pixel from Y centre
             DY = REAL(Y) - YCEN
 
-*     Rotate -- FT depends on X distance from centre 
+*     Rotate -- FT depends on X distance from centre
 *     of rotated frame
             RX =  DX * COS_PA + DY * SIN_PA
             RY = -DX * SIN_PA + DY * COS_PA
@@ -210,5 +210,5 @@
          END DO
 
       END DO
- 
+
       END

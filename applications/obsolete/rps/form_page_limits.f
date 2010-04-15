@@ -11,27 +11,27 @@
 **************************************************************************
       SUBROUTINE FORM_PAGE_LIMITS(STATUS)
       IMPLICIT NONE
- 
+
 *  Calling Argument
       INTEGER STATUS			! Out	0=OK, -1 = bad dscf file
- 
+
 *  Global Variables
       INCLUDE 'com_form_points.inc'	! Common to pass data
       INCLUDE 'com_form_files.inc'
- 
+
 *  Functions
       INTEGER DBS_FIELDNO, DBS_INFOI
- 
+
 
 *  Executable Code
- 
+
       FLD_NTARGETS = DBS_FIELDNO( REF_FORM , 'NUMBER.OF.TARGETS' )
       IF (FLD_NTARGETS .LE.0) GOTO 90
       FLD_TARG_NUMBER = DBS_FIELDNO( REF_TARGET , 'TARGET.NUMBER' )
       IF (FLD_TARG_NUMBER .LE.0) GOTO 90
       FLD_CONSTRAINTS = DBS_FIELDNO( REF_TARGET , 'TIME.CRITICAL' )
       IF (FLD_CONSTRAINTS .LE.0) GOTO 90
- 
+
       FLD_LIMS_COVER(1) = 1							! Cover page
       FLD_LIMS_COVER(2) = FLD_NTARGETS - 1					! 	Omit No. of targets
       FLD_LIMS_GEN(1) = FLD_NTARGETS + 1					! General page
@@ -44,10 +44,10 @@
 
       STATUS = 0
       GOTO 99
- 
+
 90    CONTINUE
       CALL FORM_ERR('DSCF File Contents Error')
       STATUS = -1
 99    CONTINUE
- 
+
       END

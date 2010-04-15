@@ -41,7 +41,7 @@ public final class GSDObject {
 	// These constants denote how much space is used for the different
 	// types of strings and what the maximum number of dimensions are
 	// allowed for array data. These values are required for the header read.
-        // Make GSD__SZUNIT and GSD__SZNAME package-private so that we know the 
+        // Make GSD__SZUNIT and GSD__SZNAME package-private so that we know the
         // largest possible size
         // of the name and unit for printing without having to look at all the unts.
 	private static final int GSD__SZLABEL = 40;
@@ -76,7 +76,7 @@ public final class GSDObject {
 	 * Constructs a GSDObject given a File object
 	 *
 	 * @param file File object corresponding to the name of the GSD file on disk.
-	 * @throws FileNotFoundException if the specified file can not be found 
+	 * @throws FileNotFoundException if the specified file can not be found
 	 *         or opened.
 	 * @throws IOException if there is an error reading the file contents.
 	 * @throws NullPointerException if an item describing an array
@@ -110,7 +110,7 @@ public final class GSDObject {
 		// File read okay so store the filename
 		this.file = file;
 
-		// Now parse the buffer 
+		// Now parse the buffer
 		this.parseBuffer(allcontents);
 
 	}
@@ -211,7 +211,7 @@ public final class GSDObject {
         int year = dayObj.intValue();
         int month = (int)(100 *(dayObj.doubleValue()-(double)year));
         // Handle rounding errors
-        int day = (int)( 0.5 + 10000*( (dayObj.doubleValue()) - (double)year) ) 
+        int day = (int)( 0.5 + 10000*( (dayObj.doubleValue()) - (double)year) )
                              - 100*month;
         int hour = (int)dechour;
         int min = (int)(60*(dechour - hour));
@@ -234,7 +234,7 @@ public final class GSDObject {
         GregorianCalendar cal = new GregorianCalendar(ut);
 
         // and set the actual date
-        cal.set(year, month, day, hour,min , sec);        
+        cal.set(year, month, day, hour,min , sec);
 
         return cal.getTime();
     }
@@ -255,7 +255,7 @@ public final class GSDObject {
 	}
 
     /**
-     * Return an item iterator. Each time a call to .next() is made the next GSD 
+     * Return an item iterator. Each time a call to .next() is made the next GSD
      * item is returned. Always starts from item 1.
      *
      */
@@ -288,7 +288,7 @@ public final class GSDObject {
 	  * Return item contents by GSD item name. Item names are case
 	  * insensitive. The name can be either the long name or the short
 	  * name.
-          * 
+          *
 	  * @param itemname Name of the requested item.
 	  * @return a GSDItem object with all the Item information
 	  * @throws GSDException if the named item is not present.
@@ -309,7 +309,7 @@ public final class GSDObject {
 	 * @param itemno The item number (starting at 1, maximum value defined
 	 *               by getNumItems)
 	 * @return a GSDItem object with all the Item information
-	 * @throws IndexOutOfBoundsException  if the requested item number is 
+	 * @throws IndexOutOfBoundsException  if the requested item number is
 	 *         outside the allowed range.
 	 */
 	public GSDItem itemByNum(int itemno) {
@@ -372,7 +372,7 @@ public final class GSDObject {
 			"-----------------------------------------------------");
 
 		// Upper limit for number of data values to print. Should
-		// be an argument so that a command line option can be 
+		// be an argument so that a command line option can be
 		// triggered.
 		long maxsize = 1024;
 
@@ -419,15 +419,15 @@ public final class GSDObject {
 		/**
 		   The GSD file descriptor is defined as follows:
 		   [See also gsd1.h in struct file_descriptor]
-		
-		   float version;      GSD file format version for SPECX         
-		   int   max_no_items;    Maximum number of items in file ?         
-		   int   no_items;        Number of items in this file    ?         
-		   int   str_data;        Start of data area in file - byte number  
-		   int   end_data;        End of data area - byte number       
+
+		   float version;      GSD file format version for SPECX
+		   int   max_no_items;    Maximum number of items in file ?
+		   int   no_items;        Number of items in this file    ?
+		   int   str_data;        Start of data area in file - byte number
+		   int   end_data;        End of data area - byte number
 		   char  comment[40];
 		   int size;
-		
+
 		*/
 
 		// For efficiency reasons do a single read and then extract
@@ -502,7 +502,7 @@ public final class GSDObject {
 	 * with each item but not the data itself
 	 * [which is to be extracted later]. Assumes the buffer is at
 	 * the correct position.
-	 * 
+	 *
 	 * @throws NullPointerException if an item describing an array
 	 * dimension has not been read before the array item itself.
 	 */
@@ -519,13 +519,13 @@ public final class GSDObject {
 		   int   length;
 		   int   no_dims;
 		   int   dimnumbers[5];
-		   
+
 		   But we assume there are no extra bytes padding the file
 		   for now (a safe assumption since it is unlikely that
 		   the VAX will decide to change format on us)
 		*/
 
-		// For efficiency reasons do a single read of the item block 
+		// For efficiency reasons do a single read of the item block
 		// and then extract the contents from the byte buffer
 		int[] struct = { GSD__SZLOGICAL, // array
 			GSD__SZNAME, // name[15]
@@ -626,7 +626,7 @@ public final class GSDObject {
 
 			//System.out.println("Location: " +  curritem.start_byte() +
 			//		       " Length = "  + curritem.nbytes()  +
-			//		       " bytes, Ndims  = " + curritem.ndims() 
+			//		       " bytes, Ndims  = " + curritem.ndims()
 			//		       );
 
 			// This is an array of item numbers corresponding to each

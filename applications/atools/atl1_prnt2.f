@@ -27,13 +27,13 @@
 *        The Y axis values to print.
 *     XPAR = CHARACTER * ( * ) (Given)
 *        The parameter name whicg gives the name of the text file to
-*        receive the X values. If a null (!) value is obtained no output 
-*        file is created and the error is annulled. If a blank value is 
+*        receive the X values. If a null (!) value is obtained no output
+*        file is created and the error is annulled. If a blank value is
 *        supplied for XPAR no output file is created.
 *     YPAR = CHARACTER * ( * ) (Given)
 *        The parameter name whicg gives the name of the text file to
-*        receive the Y values. If a null (!) value is obtained no output 
-*        file is created and the error is annulled. If a blank value is 
+*        receive the Y values. If a null (!) value is obtained no output
+*        file is created and the error is annulled. If a blank value is
 *        supplied for YPAR no output file is created.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,16 +109,16 @@
       END DO
 
 * If required, write the X values to a text file.
-      IF( XPAR .NE. ' ' ) THEN 
+      IF( XPAR .NE. ' ' ) THEN
 
-*  Get the name of the output file. If non given, annul the error and 
+*  Get the name of the output file. If non given, annul the error and
 *  pass on.
          CALL PAR_GET0C( XPAR, FNAME, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
 
-*  We delete any pre-existing file first. 
+*  We delete any pre-existing file first.
             CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
@@ -126,28 +126,28 @@
 
 *  Write the values to the file.
             DO I = 1, NP
-               CALL CHR_DTOC( XOUT( I ), BUF, NC )               
+               CALL CHR_DTOC( XOUT( I ), BUF, NC )
                CALL FIO_WRITE( FD, BUF( : NC ), STATUS )
             END DO
 
 *  Close the file.
             CALL FIO_ANNUL( FD, STATUS )
 
-         END IF  
+         END IF
 
       END IF
 
 * If required, write the Y values to a text file.
-      IF( YPAR .NE. ' ' ) THEN 
+      IF( YPAR .NE. ' ' ) THEN
 
-*  Get the name of the output file. If non given, annul the error and 
+*  Get the name of the output file. If non given, annul the error and
 *  pass on.
          CALL PAR_GET0C( YPAR, FNAME, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
 
-*  We delete any pre-existing file first. 
+*  We delete any pre-existing file first.
             CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
@@ -155,14 +155,14 @@
 
 *  Write the values to the file.
             DO I = 1, NP
-               CALL CHR_DTOC( YOUT( I ), BUF, NC )               
+               CALL CHR_DTOC( YOUT( I ), BUF, NC )
                CALL FIO_WRITE( FD, BUF( : NC ), STATUS )
             END DO
 
 *  Close the file.
             CALL FIO_ANNUL( FD, STATUS )
 
-         END IF  
+         END IF
 
       END IF
 

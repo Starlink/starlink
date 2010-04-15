@@ -13,7 +13,7 @@
       integer cardno
       character*(*)  card
       save
-         call getent( memc(((((im+(200 +1024 ) )-1)*2+1)) ), cardno, 
+         call getent( memc(((((im+(200 +1024 ) )-1)*2+1)) ), cardno,
      *   card )
 100      return
       end

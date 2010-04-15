@@ -29,30 +29,30 @@
 *     Each displayed NDF (see parameter SHOW) is described in a
 *     block of lines. The first line holds an integer index for the NDF
 *     followed by the path to that NDF. Note, this path is where the NDF
-*     was when the provenance information was recorded. It is of course 
+*     was when the provenance information was recorded. It is of course
 *     possible that the NDF may subsequently have been moved or deleted.
 *
 *     The remaining lines in the NDF description are as follows:
 *
-*       "Parents" -- A comma-separated list of integers that are the 
+*       "Parents" -- A comma-separated list of integers that are the
 *       indices of the immediate parents of the NDF.  These are the
-*       integers that are displayed on the first line of each NDF 
+*       integers that are displayed on the first line of each NDF
 *       description.
 *
-*       "Date" -- The formatted UTC date and time at which the 
+*       "Date" -- The formatted UTC date and time at which the
 *       provenance information for the NDF was recorded.
 *
 *       "Creator" -- A string identifying the software that created the
 *       NDF.
 *
-*       "More" -- A summary of any extra information about the NDF 
-*       stored with the provenance information.  In general this may be 
-*       an arbitrary HDS structure and so full details cannot be given 
-*       on a single line.  The HDSTRACE command can be used to examine 
-*       the MORE field in detail.  To see full details of the NDF with 
+*       "More" -- A summary of any extra information about the NDF
+*       stored with the provenance information.  In general this may be
+*       an arbitrary HDS structure and so full details cannot be given
+*       on a single line.  The HDSTRACE command can be used to examine
+*       the MORE field in detail.  To see full details of the NDF with
 *       "ID" value of 12 (say), enter (from a UNIX shell)
 *       "hdstrace fred.more.provenance.ancestors'(12)'", where "fred" is
-*       the name of the NDF supplied for parameter "NDF".  If the NDF 
+*       the name of the NDF supplied for parameter "NDF".  If the NDF
 *       has no extra information, this item will not be present.
 *
 *       "History" -- This is only displayed if parameter HISTORY is set
@@ -74,7 +74,7 @@
 *     HISTORY = _LOGICAL (Read)
 *        If TRUE, any history records stored with each ancestor are
 *        included in the displayed information. Since the amount of
-*        history information displayed can be large, and thus swamp other 
+*        history information displayed can be large, and thus swamp other
 *        information, the default is not to display history information.
 *
 *        When an existing NDF is used in the creation of a new NDF, the
@@ -82,7 +82,7 @@
 *        component of the existing NDF and store them with the provenance
 *        information in the new NDF. The history records copied are those
 *        that describe operations performed on the existing NDF itself.
-*        Inherited history records that describe operations performed on 
+*        Inherited history records that describe operations performed on
 *        ancestors of the existing NDF are not copied. [FALSE]
 *     NDF = NDF (Read)
 *        The NDF data structure.
@@ -92,23 +92,23 @@
 *        no extra text. If null, no file is created. [!]
 *     HIDE = _LOGICAL (Read)
 *        If TRUE, then any ancestors which are flagged as "hidden" (for
-*        example, using PROVREM) are excluded from the display. If FALSE, 
-*        then all requested ancestors, whether hidden or not, are included 
-*        in the display (but hidden ancestors will be highlighted as such). 
-*        Note, choosing to exclude hidden ancestors may change the index 
-*        displayed for each ancestor. The default is to display hidden 
-*        ancestors if and only if history is being displayed (see Parameter 
+*        example, using PROVREM) are excluded from the display. If FALSE,
+*        then all requested ancestors, whether hidden or not, are included
+*        in the display (but hidden ancestors will be highlighted as such).
+*        Note, choosing to exclude hidden ancestors may change the index
+*        displayed for each ancestor. The default is to display hidden
+*        ancestors if and only if history is being displayed (see Parameter
 *        HISTORY). []
 *     SHOW = LITERAL (Read)
 *        Determines which ancestors are displayed on the screen. It can
-*        take any of the following case-insensitive values (or any 
+*        take any of the following case-insensitive values (or any
 *        abbreviation).
 *
 *        - "All" -- Display all ancestors, including the supplied NDF
 *                   itself.
 *
 *        - "Roots" -- Display only the root ancestors (i.e. ancestors that
-*                    do not themselves have any recorded parents). The 
+*                    do not themselves have any recorded parents). The
 *                    supplied NDF itself is not displayed.
 *
 *        - "Parents" -- Display only the direct parents of the supplied
@@ -120,34 +120,34 @@
 *     - An input NDF is included in the provenance of an output NDF only
 *     if the Data component of the input NDF is mapped for read or update
 *     access by the application. In other words, input NDFs which are
-*     accessed only for their meta-data (e.g. WCS information) are not 
+*     accessed only for their meta-data (e.g. WCS information) are not
 *     included in the output provenance of an application.
-*     - If a KAPPA application uses one or more input NDFs to create an 
-*     output NDF, the output NDF may or may not contain provenance 
+*     - If a KAPPA application uses one or more input NDFs to create an
+*     output NDF, the output NDF may or may not contain provenance
 *     information depending on two things: 1) whether any of the
 *     input NDFs already contain provenance information, and 2) the
-*     value of the AUTOPROV environment variable. It is usually 
-*     necessary to set the AUTOPROV variable to "1" in order to create 
+*     value of the AUTOPROV environment variable. It is usually
+*     necessary to set the AUTOPROV variable to "1" in order to create
 *     output NDFs that contain provenance information.  The exception to
-*     this if you are supplied with NDFs from another source that 
-*     already contain provenance.  If such NDFs are used as inputs to 
-*     KAPPA applications, then the output NDFs will contain provenance 
+*     this if you are supplied with NDFs from another source that
+*     already contain provenance.  If such NDFs are used as inputs to
+*     KAPPA applications, then the output NDFs will contain provenance
 *     even if the AUTOPROV variable is unset.  However, setting AUTOPROV
-*     to "0" will always prevent provenance information being stored in 
+*     to "0" will always prevent provenance information being stored in
 *     the output NDFs.
 *     - Some other packages, such as CCDPACK, follow the same strategy
 *     for creating and propagating provenance information.
 
 *  Examples:
-*     provshow m51 
+*     provshow m51
 *        This displays information about the NDF m51, and all its
 *        recorded ancestors.
 *     provshow m51 roots
-*        This displays information about the root ancestors of the NDF 
-*        m51. 
+*        This displays information about the root ancestors of the NDF
+*        m51.
 *     provshow m51 parents
-*        This displays information about the direct parents of the NDF 
-*        m51. 
+*        This displays information about the direct parents of the NDF
+*        m51.
 
 *  Related Applications:
 *     KAPPA: PROVADD, HISLIST.
@@ -205,9 +205,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'DAT_PAR'          ! DAT constants 
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Status:
       INTEGER STATUS
@@ -223,13 +223,13 @@
       PARAMETER( MXREC = 100 )
 
 *  Local Variables:
-      CHARACTER C*1              ! Current character 
+      CHARACTER C*1              ! Current character
       CHARACTER ID*10            ! Integer index for the current NDF
       CHARACTER KEY*20           ! Key for entry within KeyMap
       CHARACTER MORE*(DAT__SZLOC)! Locator for MORE info
       CHARACTER PARIDS*255       ! Buffer for direct parent ID list
-      CHARACTER QUOTE1*1         ! Outer quote character 
-      CHARACTER QUOTE2*1         ! Inner quote character 
+      CHARACTER QUOTE1*1         ! Outer quote character
+      CHARACTER QUOTE2*1         ! Inner quote character
       CHARACTER SHOW*7           ! The ancestors to be displayed
       CHARACTER TEXT*255         ! Text for output dot file
       CHARACTER VALUE*1024       ! Buffer for one field value
@@ -278,7 +278,7 @@
       CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Determine which ancestors are to be displayed on the screenn.
-      CALL PAR_CHOIC( 'SHOW', 'All', 'All,Roots,Parents', .FALSE., SHOW, 
+      CALL PAR_CHOIC( 'SHOW', 'All', 'All,Roots,Parents', .FALSE., SHOW,
      :                STATUS )
 
 *  See if history information is to be displayed.
@@ -291,7 +291,7 @@
       CALL PAR_DEF0L( 'HIDE', .NOT. HIST, STATUS )
       CALL PAR_GET0L( 'HIDE', HIDE, STATUS )
 
-*  If we are excluding hidden ancestors create a copy of the provenance 
+*  If we are excluding hidden ancestors create a copy of the provenance
 *  structure from which all hidden ancestors have been removed.
       IF( HIDE ) THEN
          CALL NDG_COPYPROV( IPROV, .TRUE., IPROV2, STATUS )
@@ -299,7 +299,7 @@
          IPROV = IPROV2
       END IF
 
-*  Format the provenance information. The resulting strings are returned in 
+*  Format the provenance information. The resulting strings are returned in
 *  an AST KeyMap.
       CALL NDG_FORMATPROV( IPROV, .FALSE., KYMAP1, STATUS )
 
@@ -324,11 +324,11 @@
       END IF
 
 *  Loop round each NDF to be described.
-      DO IROW = 1, NROW 
+      DO IROW = 1, NROW
 
 *  Get the KeyMap holding details for this row.
          CALL CHR_ITOC( IROW - 1, KEY, NC )
-         IF( .NOT. AST_MAPGET0A( KYMAP1, KEY( : NC ), KYMAP2, 
+         IF( .NOT. AST_MAPGET0A( KYMAP1, KEY( : NC ), KYMAP2,
      :                           STATUS ) ) THEN
             STATUS = SAI__ERROR
             IF( STATUS .EQ. SAI__OK ) THEN
@@ -357,24 +357,24 @@
 
 *  Get the list of direct parent ID values for this ancestor.
          PARIDS = ' '
-         IF( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', PARIDS, NC, 
+         IF( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', PARIDS, NC,
      :                           STATUS ) ) THEN
             PARIDS = '<unknown>'
          END IF
 
 *  Decide if this ancestor should be displayed. This depends on the value
 *  supplied for parameter SHOW. If "ROOT" then only display this ancestor
-*  if it has no direct parents. 
+*  if it has no direct parents.
          IF( SHOW .EQ. 'ROOTS' ) THEN
             USE = ( PARIDS .EQ. '<unknown>' )
 
-*  If "PARENTS" then only display this ancestor if its integer ID is 
+*  If "PARENTS" then only display this ancestor if its integer ID is
 *  included in the list of direct parent IDs stored when processing the
 *  first row (if this is the first row then we always process it).
          ELSE IF( SHOW .EQ. 'PARENTS' ) THEN
 
-*  If we are currently checking the first row, then we never display 
-*  it, but we extract the direct parent ID values into an array of 
+*  If we are currently checking the first row, then we never display
+*  it, but we extract the direct parent ID values into an array of
 *  integers for use when checking subsequent rows.
             IF( IROW .EQ. 1 ) THEN
                USE = .FALSE.
@@ -396,7 +396,7 @@
             USE = .TRUE.
          END IF
 
-*  Jump to the next row if we are not displaying the current row. 
+*  Jump to the next row if we are not displaying the current row.
          IF( USE ) THEN
 
 *  White space between NDF descriptions.
@@ -404,18 +404,18 @@
 
 *  First line starts with the ID value followed by the NDF path.
             VALUE = ' '
-            IF( .NOT. AST_MAPGET0C( KYMAP2, 'PATH', VALUE, NC, 
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'PATH', VALUE, NC,
      :                              STATUS ) ) THEN
                VALUE = '<the NDF path is unknown>'
             END IF
-	    
+
             CALL MSG_SETC( 'ID', ID )
             CALL MSG_SETC( 'P', VALUE )
             CALL MSG_OUT( ' ', '^ID: ^P', STATUS )
 
 *  If producing a dot description of the provenance, create a text string
 *  that declares a graph node with the name "A<id>" and assigns it a
-*  label containing (initially) the NDF path. 
+*  label containing (initially) the NDF path.
             IF( DOT ) THEN
                TEXT = ' '
                IAT = 3
@@ -427,7 +427,7 @@
                CALL FIO_WRITE( DOTFD, TEXT( : IAT ), STATUS )
             END IF
 
-*  Next, if hidden ancestors are being included in the display, indicate 
+*  Next, if hidden ancestors are being included in the display, indicate
 *  if this ancestor is flagged as hidden.
             IF( .NOT. HIDE ) THEN
                CALL NDG_ISHIDDENPROV( IPROV, INTID, HIDDEN, STATUS )
@@ -445,21 +445,21 @@
 
 *  Next line shows the date at which the provenance was stored in the NDF.
             VALUE = ' '
-            IF( .NOT. AST_MAPGET0C( KYMAP2, 'DATE', VALUE, NC, 
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'DATE', VALUE, NC,
      :                              STATUS ) ) THEN
                VALUE = '<unknown>'
             END IF
-	    
+
             CALL MSG_SETC( 'P', VALUE )
             CALL MSG_OUT( ' ', '   Date:  ^P', STATUS )
 
 *  Next line shows the software that created the NDF.
             VALUE = ' '
-            IF( .NOT. AST_MAPGET0C( KYMAP2, 'CREATOR', VALUE, NC, 
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'CREATOR', VALUE, NC,
      :                              STATUS ) ) THEN
                VALUE = '<unknown>'
             END IF
-	    
+
             CALL MSG_SETC( 'P', VALUE )
             CALL MSG_OUT( ' ', '   Creator:  ^P', STATUS )
 
@@ -482,47 +482,47 @@
 *  Next, display the history information (if required).
             IF( HIST .AND. ID .NE. '0' ) THEN
 
-               IF( AST_MAPGET1A( KYMAP2, 'HISTORY', MXREC, NREC, 
+               IF( AST_MAPGET1A( KYMAP2, 'HISTORY', MXREC, NREC,
      :                           KMHIST, STATUS ) ) THEN
                   CALL MSG_OUT( ' ', '   History:', STATUS )
 
-                  DO IREC = 1, NREC               
+                  DO IREC = 1, NREC
                      VALUE = ' '
-	       
-                     IF( AST_MAPGET0C( KMHIST( IREC ), 'DATE', VALUE, 
+
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'DATE', VALUE,
      :                                 NC, STATUS ) ) THEN
                         CALL MSG_SETC( 'P', VALUE )
                         CALL MSG_OUT( ' ', '      Date:  ^P', STATUS )
                      END IF
-	       
-                     IF( AST_MAPGET0C( KMHIST( IREC ), 'COMMAND', VALUE, 
+
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'COMMAND', VALUE,
      :                                 NC, STATUS ) ) THEN
                         CALL MSG_SETC( 'P', VALUE )
-                        CALL MSG_OUT( ' ', '      Command:  ^P', 
+                        CALL MSG_OUT( ' ', '      Command:  ^P',
      :                                STATUS )
                      END IF
-	       
+
                      IF( AST_MAPGET0C( KMHIST( IREC ), 'USER', VALUE,
      :                                 NC, STATUS ) ) THEN
                         CALL MSG_SETC( 'P', VALUE )
                         CALL MSG_OUT( ' ', '      User:  ^P', STATUS )
                      END IF
-	       
-                     IF( AST_MAPGET0C( KMHIST( IREC ), 'TEXT', VALUE, 
+
+                     IF( AST_MAPGET0C( KMHIST( IREC ), 'TEXT', VALUE,
      :                                 NC, STATUS ) ) THEN
 
 *  Text written by the NDF library starts with 'Parameters: '. Use the
 *  colon-terminated words as the headers, and put a single word on each line.
                         IF( VALUE( : 12 ) .EQ. 'Parameters: ' ) THEN
                            FIRST = .TRUE.
-			   
+
                            ISTART = 1
-                           DO WHILE( VALUE( ISTART:ISTART ) .EQ. ' ' 
+                           DO WHILE( VALUE( ISTART:ISTART ) .EQ. ' '
      :                               .AND. ISTART .LT. NC )
                               ISTART = ISTART + 1
                            END DO
-			   
-                           DO WHILE( ISTART .LE. NC ) 
+
+                           DO WHILE( ISTART .LE. NC )
 
 *  Handle nested " and ' quotes using QUOTE1 (holds the outer most quote
 *  character or blank if no quoting) and QUOTE2 (holds the inner quote
@@ -533,9 +533,9 @@
                               IEND = ISTART
                               DO WHILE( ( QUOTE1 .NE. ' ' .OR.
      :                                    VALUE( IEND:IEND ) .NE. ' ' )
-     :                                  .AND. IEND .LE. NC ) 
+     :                                  .AND. IEND .LE. NC )
 
-                                 C = VALUE( IEND:IEND ) 
+                                 C = VALUE( IEND:IEND )
                                  IF( C .EQ. '''' .OR. C .EQ. '"' ) THEN
                                     IF( QUOTE2 .EQ. C ) THEN
                                        QUOTE2 = ' '
@@ -554,40 +554,40 @@
 
                               IEND = IEND - 1
                               IF( VALUE( IEND : IEND ) .EQ. ':' ) THEN
-                                 CALL MSG_SETC( 'V', 
+                                 CALL MSG_SETC( 'V',
      :                                          VALUE( ISTART:IEND ) )
                                  CALL MSG_OUT( ' ', '      ^V', STATUS )
-			   
+
                               ELSE IF( FIRST ) THEN
-                                 CALL MSG_OUT( ' ', '      Text:', 
+                                 CALL MSG_OUT( ' ', '      Text:',
      :                                         STATUS )
-			   
+
                               ELSE
-                                 CALL MSG_SETC( 'V', 
+                                 CALL MSG_SETC( 'V',
      :                                          VALUE( ISTART:IEND ) )
-                                 CALL MSG_OUT( ' ', '         ^V', 
+                                 CALL MSG_OUT( ' ', '         ^V',
      :                                         STATUS )
                               END IF
-			   
+
                               ISTART = IEND + 1
-                              DO WHILE( VALUE( ISTART:ISTART ) .EQ. ' ' 
+                              DO WHILE( VALUE( ISTART:ISTART ) .EQ. ' '
      :                                  .AND. ISTART .LT. NC )
                                  ISTART = ISTART + 1
                               END DO
-			   
+
                               FIRST = .FALSE.
-                           END DO                           
+                           END DO
 
 *  If the text was not written by the NDF library, display it as a single
 *  string.
                         ELSE
                            CALL MSG_SETC( 'P', VALUE )
-                           CALL MSG_OUT( ' ', '      Text:  ^P', 
+                           CALL MSG_OUT( ' ', '      Text:  ^P',
      :                                   STATUS )
                         END IF
 
                      END IF
-	       
+
                      CALL MSG_BLANK( STATUS )
                      CALL AST_ANNUL( KMHIST( IREC ), STATUS )
                   END DO
@@ -611,7 +611,7 @@
                IF( PARIDS .NE. '<unknown>' .AND. PARIDS .NE. ' ' ) THEN
                   START = 1
                   COMMA = INDEX( PARIDS, ',' )
-                  DO WHILE( COMMA .NE. 0 ) 
+                  DO WHILE( COMMA .NE. 0 )
                      COMMA = COMMA + START - 1
                      TEXT = ' '
                      IAT = 3
@@ -621,10 +621,10 @@
                      CALL CHR_APPND( PARIDS( START : COMMA - 1 ),
      :                                TEXT, IAT )
                      CALL FIO_WRITE( DOTFD, TEXT( : IAT ), STATUS )
-                     START = COMMA + 1                                    
+                     START = COMMA + 1
                      COMMA = INDEX( PARIDS( START : ), ',' )
                   END DO
-	          
+
                   TEXT = ' '
                   IAT = 3
                   CALL CHR_APPND( 'A', TEXT, IAT )
@@ -648,7 +648,7 @@
 *  A final blank line.
       CALL MSG_BLANK( STATUS )
 
-*  If the provenance is being written out to a text file using the "dot" 
+*  If the provenance is being written out to a text file using the "dot"
 *  language, write out the closing brace and close the file.
       IF( DOT ) THEN
          CALL FIO_WRITE( DOTFD, '}', STATUS )
@@ -681,8 +681,8 @@
             DO IPAR = 1, NPAR
 
 *  Get the next parent index.
-               THERE = AST_MAPGETELEMI( KM, 'PARENTS', IPAR, PARI, 
-     :                                  STATUS ) 
+               THERE = AST_MAPGETELEMI( KM, 'PARENTS', IPAR, PARI,
+     :                                  STATUS )
 
 *  Get the provenance information for the parent.
                CALL NDG_GETPROV( IPROV, PARI, KMP, MORE, STATUS )
@@ -694,7 +694,7 @@
                   CALL FIO_WRITE( FD, VALUE( : L ), STATUS )
                END IF
 
-*  Free resources. 
+*  Free resources.
                CALL AST_ANNUL( KMP, STATUS )
 
 *  Next parent.

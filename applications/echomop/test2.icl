@@ -11,67 +11,67 @@ PRINT "Note that some methods do not trace the test data particularly"
 PRINT "well, producing lost traces and untraceable order warnings."
 REPORT test2a
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=3 trace_mode=tc soft=NONE 
+ trc_npoly=3 trace_mode=tc soft=NONE
 LOGFILE LOGFILENAME= test2a OUTPUT=test2a.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2b
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=c soft=NONE 
+ trc_npoly=7 trace_mode=c soft=NONE
 LOGFILE LOGFILENAME= test2b OUTPUT=test2b.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2c
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=b soft=NONE 
+ trc_npoly=7 trace_mode=b soft=NONE
 LOGFILE LOGFILENAME= test2c OUTPUT=test2c.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2d
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=g soft=NONE 
+ trc_npoly=7 trace_mode=g soft=NONE
 LOGFILE LOGFILENAME= test2d OUTPUT=test2d.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2e
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=tc soft=NONE 
+ trc_npoly=7 trace_mode=tc soft=NONE
 LOGFILE LOGFILENAME= test2e OUTPUT=test2e.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2f
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=tb soft=NONE 
+ trc_npoly=7 trace_mode=tb soft=NONE
 LOGFILE LOGFILENAME= test2f OUTPUT=test2f.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2g
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=tg soft=NONE 
+ trc_npoly=7 trace_mode=tg soft=NONE
 LOGFILE LOGFILENAME= test2g OUTPUT=test2g.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2h
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=poly ~
- trc_npoly=7 trace_mode=tag soft=NONE 
+ trc_npoly=7 trace_mode=tag soft=NONE
 LOGFILE LOGFILENAME= test2h OUTPUT=test2h.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2i
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=e soft=NONE 
+ trc_npoly=16 trace_mode=e soft=NONE
 LOGFILE LOGFILENAME= test2i OUTPUT=test2i.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2j
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=c soft=NONE 
+ trc_npoly=16 trace_mode=c soft=NONE
 LOGFILE LOGFILENAME= test2j OUTPUT=test2j.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2k
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=b soft=NONE 
+ trc_npoly=16 trace_mode=b soft=NONE
 LOGFILE LOGFILENAME= test2k OUTPUT=test2k.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2l
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=g soft=NONE 
+ trc_npoly=16 trace_mode=g soft=NONE
 LOGFILE LOGFILENAME= test2l OUTPUT=test2l.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2m
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=tc soft=NONE 
+ trc_npoly=16 trace_mode=tc soft=NONE
 LOGFILE LOGFILENAME= test2m OUTPUT=test2m.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2n
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=tb soft=NONE 
+ trc_npoly=16 trace_mode=tb soft=NONE
 LOGFILE LOGFILENAME= test2n OUTPUT=test2n.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2o
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=tg soft=NONE 
+ trc_npoly=16 trace_mode=tg soft=NONE
 LOGFILE LOGFILENAME= test2o OUTPUT=test2o.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 REPORT test2p
 ech_trace ech_rdctn=ech_test idx_num_orders=0 tracim=test_flat trcfit=spline ~
- trc_npoly=16 trace_mode=tag soft=NONE 
+ trc_npoly=16 trace_mode=tag soft=NONE
 LOGFILE LOGFILENAME= test2p OUTPUT=test2p.log TASKS=ALL LABELS=ALL DTNS=xxxS SINCE=S
 PRINT "Comparing results with reference."
 $ DIFFERENCE ECHOMOP_TEST:test2a.ref test2a

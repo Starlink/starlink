@@ -35,8 +35,8 @@ C
 C
 C   Author/s
 C   --------
-C   Nick Fuller  RGO  
-C   Guy Rixon    RGO  
+C   Nick Fuller  RGO
+C   Guy Rixon    RGO
 C   Jim Lewis    RGO
 C
 C
@@ -53,15 +53,15 @@ C+-----------------------------------------------------------------------------
 c
       implicit none
 c
-c    Function calls:                                        
+c    Function calls:
 c
 c
 c    Given parameters:
 c
-      real          
+      real
      :   ximv(2), yimv(2),  ! limits of imge viewport
      :   low, high          ! extreme data-values to be plotted
-c                   
+c
 c    local constants:
 c
       integer
@@ -70,13 +70,13 @@ c
 c
 c    Local variables:
 c
-      integer       
+      integer
      :   cispan,            ! number of colour values to be set
      :   i, j,              ! loop indicies
      :   iarray(xdim,ydim), ! colour index array
      :   ci_start,ci_end,   ! colour index range
      :   status             ! status variable
-      real          
+      real
      :   rarray(xdim,ydim), ! array of ramp values
      :   xmax, xmin,        ! limits of the ramp viewport
      :   val                ! dummy variable
@@ -93,7 +93,7 @@ c    Set world coordinates in Y to the image data range.
 c
       call pgwindow(1.0,2.0,low,high)
 c
-c    Fill the ramp array with the image data range interpolated over the 
+c    Fill the ramp array with the image data range interpolated over the
 c    available colour indices.
 c
       call ndp_device_index(ci_start,ci_end,status)

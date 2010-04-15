@@ -1,11 +1,11 @@
-/*************************************************** 
- DSX_UTILC.C 
+/***************************************************
+ DSX_UTILC.C
 
   Contains-
 -
- C_PRINTO    Print out text 
+ C_PRINTO    Print out text
  C_TYHELP    Put out help
- C_GCMDLST   Squeeze command list and get defaults 
+ C_GCMDLST   Squeeze command list and get defaults
  C_GET1I     Get 1 integer from command line
  C_GET2I     Get 2 integers from command line
  C_GET1B     Get 1 Boolean from command line
@@ -28,7 +28,7 @@
 
 #include "f77.h"
 #include "cnf.h"
-  
+
 #define Bool int
 
 /* Fortran routines to be used */
@@ -39,10 +39,10 @@ extern void F77_EXTERNAL_NAME(printo)
 DECLARE_CHARACTER(c1_0,2000);
 
 extern void F77_EXTERNAL_NAME(tyhelp)
-    ( CHARACTER_ARRAY(ca1_1), INTEGER(i1_1), CHARACTER(c2_1), 
-      INTEGER_ARRAY(ia1_1), INTEGER_ARRAY(ia2_1), INTEGER_ARRAY(ia3_1), 
+    ( CHARACTER_ARRAY(ca1_1), INTEGER(i1_1), CHARACTER(c2_1),
+      INTEGER_ARRAY(ia1_1), INTEGER_ARRAY(ia2_1), INTEGER_ARRAY(ia3_1),
       INTEGER(i2_1) TRAIL(ca1_1) TRAIL(c2_1) );
-     
+
 DECLARE_CHARACTER_ARRAY(ca1_1,68,200);
 DECLARE_CHARACTER(c2_1,10000);
 DECLARE_INTEGER_ARRAY(ia1_1,200);
@@ -52,9 +52,9 @@ DECLARE_INTEGER(i1_1);
 DECLARE_INTEGER(i2_1);
 
 extern void F77_EXTERNAL_NAME(gcmdlst)
-    ( CHARACTER(c1_2), CHARACTER(c2_2), INTEGER(i1_2), INTEGER(i2_2), 
-      INTEGER(i3_2), INTEGER(i4_2), INTEGER(i5_2), INTEGER(i6_2), 
-      INTEGER_ARRAY(ia1_2), INTEGER_ARRAY(ia2_2), INTEGER_ARRAY(ia3_2) 
+    ( CHARACTER(c1_2), CHARACTER(c2_2), INTEGER(i1_2), INTEGER(i2_2),
+      INTEGER(i3_2), INTEGER(i4_2), INTEGER(i5_2), INTEGER(i6_2),
+      INTEGER_ARRAY(ia1_2), INTEGER_ARRAY(ia2_2), INTEGER_ARRAY(ia3_2)
       TRAIL(c1_2) TRAIL(c2_2)  );
 
 DECLARE_CHARACTER(c1_2,2000);
@@ -82,7 +82,7 @@ DECLARE_INTEGER(i4_3);
 extern void F77_EXTERNAL_NAME(get2i)
     ( CHARACTER(param_4), INTEGER(i1_4), INTEGER(i2_4), LOGICAL(b1_4),
       INTEGER(i3_4), INTEGER(i4_4) TRAIL(param_4) );
-    
+
 DECLARE_CHARACTER(param_4,512);
 DECLARE_INTEGER(i1_4);
 DECLARE_INTEGER(i2_4);
@@ -104,7 +104,7 @@ DECLARE_CHARACTER(ostr,2000);
 
 DECLARE_LOGICAL(b2);
 
-   
+
 
 /***********************************************************************
   C_PRINTO -- Buffers call to Fortran rountine printo  (Xwindows)
@@ -142,9 +142,9 @@ char* cc2;
 /* C-- */
 /* Cbegin */
 
-                
-     cnf_exprt ( cca1, istra, istra_length ); 
-     cnf_exprt ( cc2, istr, istr_length ); 
+
+     cnf_exprt ( cca1, istra, istra_length );
+     cnf_exprt ( cc2, istr, istr_length );
 
      (void) F77_CALL(tyhelp) ( CHARACTER_ARRAY_ARG(istra), INTEGER_ARG(&i1_1),
                                CHARACTER_ARG(istr), INTEGER_ARRAY_ARG(&ia1_1),
@@ -156,12 +156,12 @@ char* cc2;
 
 
 /**************************************************************************
- C_GCMDLST -- Squeeze command list and get defaults 
+ C_GCMDLST -- Squeeze command list and get defaults
 
     a j penny                    ral         1990 jan
 */
 
-c_gcmdlst ( cc1, cc2, i1_2, i2_2, i3_2, i4_2, i5_2, i6_2, ia1_2, ia2_2, 
+c_gcmdlst ( cc1, cc2, i1_2, i2_2, i3_2, i4_2, i5_2, i6_2, ia1_2, ia2_2,
             ia3_2 )
 
 char* cc1;
@@ -179,7 +179,7 @@ char* cc2;
                 INTEGER_ARG(&i4_2),   INTEGER_ARG(&i5_2),  INTEGER_ARG(&i6_2),
                 INTEGER_ARRAY_ARG(&ia1_2), INTEGER_ARRAY_ARG(&ia2_2),
                 INTEGER_ARRAY_ARG(&ia3_2) TRAIL_ARG(istr) TRAIL_ARG(ostr) );
-                             			
+
       cnf_imprt ( ostr, ostr_length, cc2 );
 
 }
@@ -205,7 +205,7 @@ char* cc2;
       i2_3 = iv2; i3_3 = iv3; i4_3 = iv4;
 
       (void) F77_CALL(get1i) ( CHARACTER_ARG(param_3), INTEGER_ARG(&i1_3),
-                               INTEGER_ARG(&i2_3), INTEGER_ARG(&i3_3), 
+                               INTEGER_ARG(&i2_3), INTEGER_ARG(&i3_3),
                                INTEGER_ARG(&i4_3) TRAIL_ARG(param_3) );
 
       *iv1 = i1_3;
@@ -239,7 +239,7 @@ char* cc2;
          i1_4 = *iv1; i2_4 = *iv2; i3_4 = iv3; i4_4 = iv4;
 
          (void) F77_CALL(get2i) ( CHARACTER_ARG(param_4), INTEGER_ARG(&i1_4),
-                 INTEGER_ARG(&i2_4), LOGICAL_ARG(&b1_4), INTEGER_ARG(&i3_4), 
+                 INTEGER_ARG(&i2_4), LOGICAL_ARG(&b1_4), INTEGER_ARG(&i3_4),
                  INTEGER_ARG(&i4_4) TRAIL_ARG(param_4) );
 
          *iv1 = i1_4; *iv2 = i2_4;

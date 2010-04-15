@@ -115,7 +115,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
   int numaver;                     /* Number of samples to average */
   int numimages;                   /* Number of output STARE images */
   int numsamples;                  /* Number of time slices (samples) */
-  int remainder;                   /* Remainder from dividing no of timeslices 
+  int remainder;                   /* Remainder from dividing no of timeslices
 				      by number of frames to average */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
   double steptime;                 /* Step time per sample, sec */
@@ -126,8 +126,8 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
   /* Check we have time-series data */
   if ( data->ndims != 3) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-	   "File does not contain time series data - unable to process", 
+    errRep(FUNC_NAME,
+	   "File does not contain time series data - unable to process",
 	   status);
     return;
   }
@@ -147,7 +147,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     msgOutif(MSG__VERB," ", "Processing STARE data", status);
 
     if (smf_history_check( data, "smf_calc_stareimage", status) ) {
-      msgOut(" ", "File contains STARE data which has already been processed: proceeding but this WILL OVERWRITE any STARE images already written into the SCU2RED extension", 
+      msgOut(" ", "File contains STARE data which has already been processed: proceeding but this WILL OVERWRITE any STARE images already written into the SCU2RED extension",
 	     status);
     }
 
@@ -188,7 +188,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
 
     /* Obtain a locator for the extension where for the images will
        be stored */
-    scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 
+    scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE",
 			      0, NULL, status);
 
     /* Set the dimensions of the output images - they are all the same
@@ -214,7 +214,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     /* Release SCU2RED locator */
     datAnnul( &scu2redloc, status );
   } else {
-    msgOutif(MSG__NORM," ", 
+    msgOutif(MSG__NORM," ",
 	     "Input file is not a STARE observation - ignoring", status);
   }
 

@@ -42,7 +42,7 @@
 *            value to be substituted for pixels outside the circle
 *           If no error then
 *              Create an output structure to hold processed image
-*              If no error then 
+*              If no error then
 *                 Map a data array component in the output structure
 *                 If no error then
 *                    Call working subroutine to copy input data array
@@ -85,7 +85,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                 ! image dimensionality
       PARAMETER ( NDIMS  =  2 ) ! 2-d images only
 
@@ -97,7 +97,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    IDIMS( NDIMS ),       ! dimensions of input DATA_ARRAY
      :    NELEMENTS,            ! number of elements mapped by NDF_MAP
      :    NDIM,                 ! number of dimensions from NDF_DIM
@@ -108,7 +108,7 @@
      :    XCENTRE,              ! x coordinate of circle centre
      :    YCENTRE               ! y     "      "    "      "
 
-      REAL 
+      REAL
      :    DIAMETER,             ! diameter of circle to be used
      :    NEWVAL                ! new value for points outside circle
 
@@ -121,16 +121,16 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    check status before continuing
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       try to map a data array component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS)
-      
+
 *       check status before continuing
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -161,23 +161,23 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *             now get an output array to contain modified data
-               CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, 
+               CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS,
      :                                IDIMS, LOCO, STATUS )
 
 *             check error before continuing
                IF ( STATUS .EQ. SAI__OK ) THEN
 
 *                map an output data array component
-                  CALL NDF_MAP( LOCO, 'DATA', '_REAL', 
+                  CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                    'WRITE', PNTRO, NELEMENTS, STATUS )
 
 *                check status before accessing pointers
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
 *                   now call the subroutine that does the actual work
-                     CALL OUTSETSUB( %VAL( PNTRI ), %VAL( PNTRO ), 
-     :                               IDIMS(1), IDIMS(2), XCENTRE, 
-     :                               YCENTRE, DIAMETER, NEWVAL, 
+                     CALL OUTSETSUB( %VAL( PNTRI ), %VAL( PNTRO ),
+     :                               IDIMS(1), IDIMS(2), XCENTRE,
+     :                               YCENTRE, DIAMETER, NEWVAL,
      :                               STATUS )
 
 *                end of if-no-error-before-accessing-pointers check

@@ -33,11 +33,11 @@
 *        The NDF identifier of the output NDF.
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
-*        extension. 
+*        extension.
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -128,7 +128,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -291,7 +291,7 @@
       IF ( DARRAY ) THEN
 
 *  Set the data type of the data array.
-         CALL COF_STYPE( NDF, 'Data', TYPE, BITPIX, FMTCNV, ITYPE, 
+         CALL COF_STYPE( NDF, 'Data', TYPE, BITPIX, FMTCNV, ITYPE,
      :                   STATUS )
 
 *  Set the shape of the NDF.
@@ -428,7 +428,7 @@
 *  Read the IMAGE extension array into the workspace.  By definition
 *  there can be no bad values (hence fifth argument is zero).
       WVALUE = 0
-      CALL FTGPVI( FUNIT, 0, 1, EL, WVALUE, %VAL( CNF_PVAL( WPNTR ) ), 
+      CALL FTGPVI( FUNIT, 0, 1, EL, WVALUE, %VAL( CNF_PVAL( WPNTR ) ),
      :             BAD, FSTAT )
 
 *  Map the input array component with the desired data type.  Any type
@@ -437,14 +437,14 @@
      :              STATUS )
 
 *  Transfer the most-significant IUE quality flags across to the NDF's
-*  QUALITY component.  
-      CALL COF_IUEQ( EL, %VAL( CNF_PVAL( WPNTR ) ), 
+*  QUALITY component.
+      CALL COF_IUEQ( EL, %VAL( CNF_PVAL( WPNTR ) ),
      :               %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *  Tidy up the workspace and quality.
       CALL DAT_ANNUL( WLOC, STATUS )
       CALL NDF_UNMAP( NDF, 'Quality', STATUS )
 
-  999 CONTINUE      
+  999 CONTINUE
 
       END

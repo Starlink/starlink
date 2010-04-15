@@ -11,14 +11,14 @@ C
 C     Command parameters -
 C
 C     'HCUBE'    (Character) The name of the hypercube to be processed.
-C     'XSTART'   (Real) The start of the wavelength range to be 
+C     'XSTART'   (Real) The start of the wavelength range to be
 C                included.
 C     'XEND'     (Real) The end of the wavelength range to be included.
 C     'CYSTART'  (Integer) The first cycle to be included.
 C     'CYEND'    (Integer) The last cycle to be included.
 C     'IMAGE'    (Character) The name of the resulting image.
 C
-C     Command keywords - 
+C     Command keywords -
 C
 C     'SPLIT'    If specified, FIGS422 will create a number of output
 C                files, one for each cycle in the specified range,
@@ -42,9 +42,9 @@ C     Output data -
 C
 C     IMAGE is created with the same structure as HCUBE except that the
 C     main data array will only have 2 dimensions, and any AXIS
-C     sub-structures that HCUBE has will be deleted/renamed as 
-C     appropriate. 
-C     
+C     sub-structures that HCUBE has will be deleted/renamed as
+C     appropriate.
+C
 C                                     KS / AAO 6th Jan 1985
 C
 C     Modified:
@@ -69,7 +69,7 @@ C+
 C
 C     Functions
 C
-      INTEGER ICH_LEN            ! Position of last non-blank char in 
+      INTEGER ICH_LEN            ! Position of last non-blank char in
                                  ! string
       INTEGER ICH_ENCODE
       INTEGER DSA_TYPESIZE
@@ -91,7 +91,7 @@ C
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   SLOTO            ! Slot number for succesive output data
       INTEGER   STATUS           ! Running status for DSA routines
-     
+
 C
 C     Local variables
 C
@@ -117,7 +117,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -184,10 +184,10 @@ C
 C     See if this is sorted data, ie data that has been processed
 C     by FIGS424.
 C
-    
+
       CALL DSA_GET_FITS_I('HCUBE','FIG_SORT',0,SFLAG,COMENT,STATUS)
       IF ((STATUS.EQ.0).AND.(SFLAG.NE.0)) THEN
-C  
+C
 C        It is sorted data. Get the wavelength array directly from
 C        the hypercube structure.  The sorted array will be the same
 C        as the wavelength array.
@@ -201,7 +201,7 @@ C
          END DO
       ELSE
 C
-C        The data is unsorted.  We shall have to work out the 
+C        The data is unsorted.  We shall have to work out the
 C        wavelength array directly from the data parameters.
 C
          CALL DSA_GET_FITS_I('HCUBE','FIG_STEP',0,STEP,COMENT,STATUS)
@@ -323,7 +323,7 @@ C
       REPEAT=.TRUE.
       DO WHILE (REPEAT)
 C
-C        Determine the limits for this pass through the loop.  See if 
+C        Determine the limits for this pass through the loop.  See if
 C        the loop has to be repeated, and if SPLIT is set, append
 C        the cycle number to the output file name.
 C
@@ -353,7 +353,7 @@ C
      :                          NEW_FILE,STATUS)
 C
 C        Copy all of the input structure to the output, except for
-C        the Axis(1) and and .U components (which are always lost) The .Z 
+C        the Axis(1) and and .U components (which are always lost) The .Z
 C        structure is handled separately.  The .Y and .T components
 C        will eventaully become the .X and .Y components of the new
 C        image.
@@ -378,7 +378,7 @@ C
          CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOTO,STATUS)
          IF(STATUS.NE.0)GOTO 500
 C
-C        Perform the basic processing of the hypercube down to 
+C        Perform the basic processing of the hypercube down to
 C        an image.
 C
          CALL FIG_FIGS422(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,NU,CY1,CY2,
@@ -408,7 +408,7 @@ C+
 C
 C     F I G _ S E L 4 2 2
 C
-C     Determines which wavelength planes are to be included in the 
+C     Determines which wavelength planes are to be included in the
 C     image being constructed by FIGS422.  It looks at each wavelength
 C     value in turn and compares it with the limits selected by the
 C     user, given the wavelength values of the adjacent elements.
@@ -477,14 +477,14 @@ C     (>) NT        (Integer) Third     "     "    "
 C     (>) NU        (Integer) Fourth    "     "    "
 C     (>) CY1       (Integer) First cycle (U value) to be included
 C     (>) CY2       (Integer) Last cycle (U value) to be included
-C     (>) SELECT    (Logical array SELECT(NX)) The selection vector 
-C                   indicating which wavelength planes are to be 
+C     (>) SELECT    (Logical array SELECT(NX)) The selection vector
+C                   indicating which wavelength planes are to be
 C                   included in the image.
 C     (<) IMAGE     (Real array IMAGE(NY,NT)) The resulting image.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_FILL      Sets an array of bytes to a constant value
 C

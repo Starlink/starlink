@@ -14,7 +14,7 @@
 \newcommand{\stardocinitials}  {SSN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
-% Variable part 
+% Variable part
 \newcommand{\stardocnumber}    {68.3}
 \newcommand{\stardocauthors}   {A J Chipperfield}
 \newcommand{\stardocdate}      {17 December 1997}
@@ -22,12 +22,12 @@
                                 Interface Definition Files}
 \newcommand{\stardocversion}   {1.2}
 \newcommand{\stardocmanual}    {}
-\newcommand{\stardocabstract}  {Interface Definition Files (IFDs) provide a 
-generic method of defining the interface between Starlink 
-(\xref{ADAM}{sg4}{}) applications 
-and various software environments.  Software is described which enables 
+\newcommand{\stardocabstract}  {Interface Definition Files (IFDs) provide a
+generic method of defining the interface between Starlink
+(\xref{ADAM}{sg4}{}) applications
+and various software environments.  Software is described which enables
 developers to create IFDs and use them to create files required by the
-Starlink or 
+Starlink or
 \htmladdnormallink{IRAF}{\IRAFURL} environments.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ Starlink or
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -149,7 +149,7 @@ Starlink or
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -202,10 +202,10 @@ Starlink or
 %     source prior to any statements that make use of the SST commands.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -467,7 +467,7 @@ xxx\=xxx\=\kill
    }
 
 %  \sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -555,12 +555,12 @@ xxx\=xxx\=\kill
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -597,14 +597,14 @@ xxx\=xxx\=\kill
 % ? Main text
 
 \section{\xlabel{introduction}Introduction}
-The 
+The
 \xref{Starlink Software Environment (ADAM)}{sg4}{}
 requires that application packages
-to be run in it have an associated Interface File (\texttt{.ifl}) which defines 
-the parameters of the various applications, and package definition files 
+to be run in it have an associated Interface File (\texttt{.ifl}) which defines
+the parameters of the various applications, and package definition files
 which define the commands available and the source of help \textit{etc.}
 
-Other environments such as 
+Other environments such as
 \htmladdnormallink{IRAF}{\IRAFURL} require very similar information presented
 in a different way.
 
@@ -613,7 +613,7 @@ so that a single file can be the source of all the different files required
 to form the interface between Starlink packages and the software environment
 in which they are to be run.
 
-This document describes the Interface Definition Format and the software to 
+This document describes the Interface Definition Format and the software to
 process IFD files into the required environment-specific files. Currently
 only ADAM and IRAF are handled.  A utility to assist in the production of an
 IFD file given an ADAM Interface File is also described.
@@ -664,29 +664,29 @@ where `\texttt{...}' represents omitted lines.
 
 This is interpreted by
 \htmladdnormallink{Tcl}{\TCLURL}
-with the keywords `\texttt{package}', `\texttt{executable}', `\texttt{action}', 
+with the keywords `\texttt{package}', `\texttt{executable}', `\texttt{action}',
 \textit{etc.}\ treated as procedures which are defined appropriately depending
-upon the software environment for which files are being produced. 
+upon the software environment for which files are being produced.
 There are currently three scripts which make these definitions and produce
 environment-specific files:
 \begin{description}
-\item[\htmlref{\texttt{ifd2star}}{ifd2star}] Produces files required by the 
+\item[\htmlref{\texttt{ifd2star}}{ifd2star}] Produces files required by the
 Starlink environment.
-\item[\htmlref{\texttt{ifd2iraf}}{ifd2iraf}] Produces files required by the 
+\item[\htmlref{\texttt{ifd2iraf}}{ifd2iraf}] Produces files required by the
 IRAF environment.
-\item[\htmlref{\texttt{ifd2irafifl}}{ifd2irafifl}] Produces Starlink interface 
+\item[\htmlref{\texttt{ifd2irafifl}}{ifd2irafifl}] Produces Starlink interface
 files for use when running Starlink applications from IRAF.
 \end{description}
 
 The following points should be noted:
 \begin{itemize}
 \item Keywords must be in lower case.
-\item Comments may be included \dash\ if \texttt{\#} is found where a command 
+\item Comments may be included \dash\ if \texttt{\#} is found where a command
 (keyword) is expected, the remainder of the line is treated as comment.
 \item Lists of values, such as the
-\htmlref{\texttt{vpath}}{vpath} specifier are space-separated (not 
+\htmlref{\texttt{vpath}}{vpath} specifier are space-separated (not
 comma-separated as in ADAM Interface Files).
-\item String values containing space or \texttt{\$} must be quoted (with 
+\item String values containing space or \texttt{\$} must be quoted (with
 \{\}).
 Other Tcl special characters will also need to be quoted or escaped.
 \end{itemize}
@@ -694,29 +694,29 @@ Other Tcl special characters will also need to be quoted or escaped.
 A `full' IFD will normally contain additional keywords to define absolutely
 everything required in producing the environment-specific files.
 
-\subsection{\xlabel{conditional_sections}\label{conditional_sections}Conditional 
+\subsection{\xlabel{conditional_sections}\label{conditional_sections}Conditional
 Sections}
-The IFD may contain sections to be included or excluded depending upon the 
-environment for which it is being processed. 
+The IFD may contain sections to be included or excluded depending upon the
+environment for which it is being processed.
 \begin{quote} {\tt
 \textit{environment}: \{ \textit{code} \}\\
 \textit{environment}! \{ \textit{code} \}
 } \end{quote}
-The separator `\texttt{:}' causes the code to be processed, and `\texttt{!}' 
-causes the code to be ignored only if the environment is 
+The separator `\texttt{:}' causes the code to be processed, and `\texttt{!}'
+causes the code to be ignored only if the environment is
 \texttt{\textit{environment}}.
-In both cases, \texttt{\textit{environment}} can be a comma-separated list of 
+In both cases, \texttt{\textit{environment}} can be a comma-separated list of
 environment names and the code may consist of multiple lines.
 
 The term `environment' is used loosely here \dash\ the environment is set to:
 \begin{description}
 \item[\texttt{star}] when \htmlref{\texttt{ifd2star}}{ifd2star} is running.
 \item[\texttt{iraf}] when \htmlref{\texttt{ifd2iraf}}{ifd2iraf} is running.
-\item[\texttt{irafifl}] when \htmlref{\texttt{ifd2irafifl}}{ifd2irafifl} is 
+\item[\texttt{irafifl}] when \htmlref{\texttt{ifd2irafifl}}{ifd2irafifl} is
 running.
 \end{description}
 
-For example with, 
+For example with,
 \begin{quote} {\tt
 star: \{ \textit{code} \}
 } \end{quote}
@@ -724,17 +724,17 @@ star: \{ \textit{code} \}
 \begin{quote} {\tt
 star,iraf! \{ \textit{code} \}
 } \end{quote}
-\texttt{\textit{code}} will not be processed by either \texttt{ifd2star} or 
+\texttt{\textit{code}} will not be processed by either \texttt{ifd2star} or
 \texttt{ifd2iraf}.
 
-\subsection{\xlabel{creating_ifds_from_interface_files}Creating IFDs from 
+\subsection{\xlabel{creating_ifds_from_interface_files}Creating IFDs from
 Interface files}
 For existing packages a basic IFD can be produced by running the
 \texttt{ifl2ifd} script on the \texttt{.ifl} file(s) of the package.
 \begin{quote} \begin{verbatim}
 % ifl2ifd kappa_mon
 \end{verbatim} \end{quote}
-Will produce IFD \texttt{kappa\_mon.ifd} from interface file 
+Will produce IFD \texttt{kappa\_mon.ifd} from interface file
 \texttt{kappa\_mon.ifl}.
 
 Where the package consists of several monoliths, the resulting IFDs must be
@@ -743,21 +743,21 @@ combined to produce a single IFD.
 This basic IFD will define all the package applications which are in the
 monoliths. However:
 \begin{enumerate}
-\item Some action definitions may not be required for all environments 
-\dash\ the 
+\item Some action definitions may not be required for all environments
+\dash\ the
 \htmlref{conditional inclusion}{conditional_sections}
 syntax
 \latex{(see Section \ref{conditional_sections})} should be used for these.
-\item Any 
+\item Any
 \htmlref{aliases}{alias}
 for the command names should be inserted. This includes the abbreviations
-allowed in 
+allowed in
 \xref{ICL}{sg5}{} \dash\ IRAF has its own system for command abbreviation which
 does not require any additions to the IFD.
 \item Some parameter definitions may need tweaking. In particular:
 \begin{itemize}
-\item Vector or array parameters which have not been recognised as such 
-(because there was no vector or array static default specified in the 
+\item Vector or array parameters which have not been recognised as such
+(because there was no vector or array static default specified in the
 interface file) must have a
 \htmlref{\texttt{size}}{size}
 definition added.
@@ -768,7 +768,7 @@ were not apparent in ADAM. In other cases, no default value has been
 specified (probably because a GLOBAL value was expected to be used) whereas
 a default value would be useful for IRAF.
 \end{itemize}
-\item Commands which form part of the package but are not just simple 
+\item Commands which form part of the package but are not just simple
 invocations of the applications must be defined.
 \item Any
 \htmlref{Comments}{comment}
@@ -779,10 +779,10 @@ required in the package definition files must be defined.
 More information on the changes required for IRAF is given in
 \xref{SSN/35}{ssn35}{}.
 
-\section{\label{ifd2star}\xlabel{producing_starlink_environment_files_from_an_ifd}Producing 
+\section{\label{ifd2star}\xlabel{producing_starlink_environment_files_from_an_ifd}Producing
 Starlink Environment Files from an IFD}
-The \textbf{Tcl} script \texttt{ifd2star} is used to produce the Starlink 
-environment files for the package. 
+The \textbf{Tcl} script \texttt{ifd2star} is used to produce the Starlink
+environment files for the package.
 \begin{quote}
 \texttt{ifd2star \textit{package}}
 \end{quote}
@@ -793,13 +793,13 @@ required by the Starlink (ADAM) environment:
 These files are described in detail in
 \xref{SUN/115}{sun115}{}.
 Where applications are combined into monolithic executable files, individual
-interface files are produced for each application in addition to a monolithic 
+interface files are produced for each application in addition to a monolithic
 interface file.
-\item[The \xref{ICL}{sg5}{} Package Definition File] Defining the ICL commands 
+\item[The \xref{ICL}{sg5}{} Package Definition File] Defining the ICL commands
 associated with the package and known as the package \texttt{.icl} file.
 These files are described in detail in
 \xref{SSN/64}{ssn64}{}.
-\item[Shell Package Definition File] Defining the commands associated with 
+\item[Shell Package Definition File] Defining the commands associated with
 running the package direct from the shell. This file is written in two
 syntaxes, the package \texttt{.csh} file for csh-type shells, and a
 \texttt{.sh} file for sh-type shells.
@@ -807,10 +807,10 @@ These files are described in detail in
 \xref{SSN/64}{ssn64}{}.
 \end{description}
 
-\section{\label{ifd2iraf}\xlabel{producing_iraf_files_from_an_ifd}Producing 
+\section{\label{ifd2iraf}\xlabel{producing_iraf_files_from_an_ifd}Producing
 IRAF Files from an IFD}
-The \textbf{Tcl} scripts \texttt{ifd2iraf} and \texttt{ifd\_irafhlpgen} are 
-used to produce the files required by IRAF. 
+The \textbf{Tcl} scripts \texttt{ifd2iraf} and \texttt{ifd\_irafhlpgen} are
+used to produce the files required by IRAF.
 More details on the files produced may be found in
 \xref{SSN/35}{ssn35}{}
 and the IRAF documentation.
@@ -819,51 +819,51 @@ and the IRAF documentation.
 \end{quote}
 will process IFD \texttt{\textit{package}.ifd} and produce the following files:
 \begin{itemize}
-\item An 
+\item An
 \xref{IRAF parameter file}{ssn35}{task_parameter_files},
 \texttt{\textit{application}.par}, for each application in the package.
-These define the IRAF parameters associated with the application. 
-There will be a one-to-one correspondence between the IRAF parameters and the 
-ADAM parameters although they may be handled differently in the two 
+These define the IRAF parameters associated with the application.
+There will be a one-to-one correspondence between the IRAF parameters and the
+ADAM parameters although they may be handled differently in the two
 environments.
-\item An 
+\item An
 \xref{IRAF package definition file}{ssn35}{package_definition_files},
 \texttt{\textit{package}.cl}. This defines the IRAF commands to run
 the applications in the package.
-The name \texttt{\textit{package}} is derived from the argument of the 
-\htmlref{\texttt{package}}{package} 
+The name \texttt{\textit{package}} is derived from the argument of the
+\htmlref{\texttt{package}}{package}
 procedure call in the \texttt{.ifd} file.
-\item An 
+\item An
 \xref{IRAF package parameter file}{ssn35}{package_parameter_files},
 \texttt{\textit{package}.par}.
 This defines parameters for the package - in particular, the version number.
-\item An 
+\item An
 \xref{Output Parameter File}{ssn35}{the_output_parameters_file},
-\texttt{\textit{executable}.tcl} for each executable in the package. 
-Each one lists the 
+\texttt{\textit{executable}.tcl} for each executable in the package.
+Each one lists the
 \xref{`output'}{ssn35}{output_parameters}
-and 
+and
 \xref{`dynamic'}{ssn35}{dynamic_parameters}
 parameters for each action in the executable.
-This information is required by the IRAF/Starlink inter-operability system 
+This information is required by the IRAF/Starlink inter-operability system
 rather than IRAF itself.
 \end{itemize}
 and:
 \begin{quote}
 \texttt{ifd\_irafhlpgen \textit{package}}
 \end{quote}
-will read the Starlink HLP source file \texttt{\textit{package}.hlp} and 
+will read the Starlink HLP source file \texttt{\textit{package}.hlp} and
 produce a set of
 \xref{IRAF help files}{ssn35}{help_files}
 for the package but it is likely that changes to the text will be required.
 
-\section{\label{ifd2irafifl}\xlabel{producing_irafspecific_interface_files_from_an_ifd}Producing 
+\section{\label{ifd2irafifl}\xlabel{producing_irafspecific_interface_files_from_an_ifd}Producing
 IRAF-specific Interface Files from an IFD}
 It may sometimes be found that the interface file required when running a
 Starlink application from IRAF is different from that required normally.
 \htmlref{Conditional statements}{conditional_sections}\latex{ (see Section
-\ref{conditional_sections})} for the `\texttt{irafifl}' environment may be 
-included in the IFD and the \textbf{Tcl} script \texttt{ifd2irafifl} used to 
+\ref{conditional_sections})} for the `\texttt{irafifl}' environment may be
+included in the IFD and the \textbf{Tcl} script \texttt{ifd2irafifl} used to
 create the special interface files (no other files are produced).
 
 For example, with the IFD:
@@ -888,34 +888,34 @@ package pkg {
 }
 \end{verbatim} \end{quote}
 The command:
-\begin{quote} 
+\begin{quote}
 \texttt{\% ifd2irafifl \textit{package}}
 \end{quote}
-will produce an interface file for \texttt{pkg\_exe2} only, with a 
-\texttt{ppath} of `\texttt{DYNAMIC,DEFAULT}' for parameter \texttt{act1par} of 
+will produce an interface file for \texttt{pkg\_exe2} only, with a
+\texttt{ppath} of `\texttt{DYNAMIC,DEFAULT}' for parameter \texttt{act1par} of
 action \texttt{act1}.
 
 \section{\xlabel{the_full_ifd_file}\label{IFD_file}The `Full' IFD File}
-The basic keywords in an IFD have already been described but in order to 
-produce complete versions of the required environment files automatically, 
+The basic keywords in an IFD have already been described but in order to
+produce complete versions of the required environment files automatically,
 additional syntax and keywords are available.
 This section outlines what is available; see elsewhere
-\latex{(Section \ref{keywords}) } for 
+\latex{(Section \ref{keywords}) } for
 \htmlref{complete descriptions}{keywords} of all the keywords.
 
 \subsection{\xlabel{ifd_initial_keywords}IFD Initial Keywords}
-The following are examples of the additional keywords which may appear within 
-the package description (\textit{i.e.}\ after \texttt{package \textit{name} 
-\{}). 
-They are all optional and will be ignored for environments for which they are 
-not relevant. 
+The following are examples of the additional keywords which may appear within
+the package description (\textit{i.e.}\ after \texttt{package \textit{name}
+\{}).
+They are all optional and will be ignored for environments for which they are
+not relevant.
 \begin{quote} \begin{verbatim}
 version 1.0              # Specifies a package version number
 
 exepath {$PKGNAME_DIR}   # specifies the directory containing executable
                          # images etc. - default $PKGNAME_DIR
 
-helplib {$PKGNAME_HELP}  # specifies the help library - default 
+helplib {$PKGNAME_HELP}  # specifies the help library - default
                          # $PKGNAME_HELP
                          # Will be effective until another helplib
 
@@ -923,7 +923,7 @@ prefix pkg               # specifies a prefix for automatic aliases E.g
                          # 'prefix kap' would result in kap_add etc
                          # being defined in addition to add.
 
-display {                 
+display {
 Message to display whilst .csh, .sh, .icl scripts for example are running
 It will usually be the welcome message for the package.
 A display may contain any number of lines which will be displayed line
@@ -931,16 +931,16 @@ for line. There may be more that one display in an IFD.
 }
 
 defhelp topic entry [library]  # Help on topic may be found in library
-                               # (default Current(helplib)) section 
+                               # (default Current(helplib)) section
                                # defined by entry
 \end{verbatim} \end{quote}
 
-\subsection{\xlabel{additional_action_keywords}\label{add_act}Additional 
+\subsection{\xlabel{additional_action_keywords}\label{add_act}Additional
 Action Keywords}
 The following are examples of the additional keywords which may appear within
-the action description (\textit{i.e.}\ after \texttt{action \textit{name} \{}). 
-They are all optional and will be ignored for environments for which they are 
-not relevant. 
+the action description (\textit{i.e.}\ after \texttt{action \textit{name} \{}).
+They are all optional and will be ignored for environments for which they are
+not relevant.
 \begin{quote} \begin{verbatim}
 alias {acto(ne) act1 act_1} # possible aliases
 
@@ -949,7 +949,7 @@ helplib {$EXAMPLE1_HELP}    # New helplib if required.
 
 \subsection{\xlabel{parameter_definition_keywords}Parameter Definition Keywords}
 \subsubsection{\xlabel{general}General}
-Within the parameter description 
+Within the parameter description
 (\textit{i.e.}\ after \texttt{parameter \textit{name} \{}), The following
 keywords may appear (example arguments are given):
 \begin{quote} \begin{verbatim}
@@ -970,13 +970,13 @@ size *
 type _REAL
 vpath GLOBAL DEFAULT
 \end{verbatim} \end{quote}
-They are all optional and will be ignored for environments for which they are 
-not relevant. There is an obvious correspondence between most of these 
+They are all optional and will be ignored for environments for which they are
+not relevant. There is an obvious correspondence between most of these
 keywords and the parameter definition fields of an ADAM interface file as
-described in 
+described in
 \xref{SUN/115}{sun115}{}
 which should be consulted for the finer details of permitted values but
-remember that lists, such the ppath value, are space-separated in the IFD but 
+remember that lists, such the ppath value, are space-separated in the IFD but
 comma-separated in the Interface File, and character constants only need to be
 quoted in the IFD (with \{\}) if they contain spaces or \texttt{\$}.
 
@@ -988,14 +988,14 @@ are
 and
 \htmlref{\texttt{size}}{size_key}\latex{ (see the following sections)}.
 
-\subsubsection{\xlabel{the_dynamic_keyword}\label{dynamic_key}The 
+\subsubsection{\xlabel{the_dynamic_keyword}\label{dynamic_key}The
 \texttt{dynamic} keyword}
 This keyword forces the parameter to be classed as `dynamic' or `non-dynamic'
-regardless of the normal default. 
+regardless of the normal default.
 
 A dynamic parameter is one whose value cannot
-easily be set as a static default or calculated by the user at runtime. 
-The Starlink Software Environment allows such values to be set by means of 
+easily be set as a static default or calculated by the user at runtime.
+The Starlink Software Environment allows such values to be set by means of
 VPATH GLOBAL or VPATH DYNAMIC but this is not available for other environments
 so they must be handled as special cases. In the case of IRAF, for instance,
 dynamic parameters are handled by forcing the ADAM task to issue a parameter
@@ -1006,15 +1006,15 @@ For more information on this, see
 \xref{SSN/35}{ssn35}{dynamic_parameters}.
 
 In the absence of a
-\htmlref{\texttt{dynamic}}{dynamic} 
-keyword, all parameters with VPATH starting with GLOBAL are classed as 
+\htmlref{\texttt{dynamic}}{dynamic}
+keyword, all parameters with VPATH starting with GLOBAL are classed as
 dynamic and all others (including VPATH DYNAMIC) as non-dynamic.
 
 So that users are warned, particularly when using IRAF \texttt{epar}, that
 changing the parameter is likely to have an unexpected effect, the prompt
 string has \texttt{*!} prepended to it.
 
-\subsubsection{\xlabel{the_outputpar_keyword}\label{outputpar_key}The 
+\subsubsection{\xlabel{the_outputpar_keyword}\label{outputpar_key}The
 \texttt{outputpar} keyword}
 For non-primitive parameter types, there is a potential confusion between the
 access required to the parameter and the access required to the file
@@ -1027,24 +1027,24 @@ The list of parameters which must be updated is read from the Output Parameter
 File created by \texttt{ifd2iraf}.
 
 The system will assume that primitive types need updating if the access
-mode (as defined by the 
+mode (as defined by the
 \htmlref{\texttt{access}}{access}
 keyword) is `WRITE' or `UPDATE' and that other types are not output.
-For this reason, the 
+For this reason, the
 \htmlref{\texttt{outputpar}}{outputpar}
-keyword is provided to force a non-primitive parameter to be output if 
+keyword is provided to force a non-primitive parameter to be output if
 necessary.
 
-\subsubsection{\xlabel{the_repeated_keyword}\label{repeated_key}The 
+\subsubsection{\xlabel{the_repeated_keyword}\label{repeated_key}The
 \texttt{repeated} keyword}
-This keyword is used to indicate that new values for the parameter may 
-required repeatedly during one invocation of the program. 
+This keyword is used to indicate that new values for the parameter may
+required repeatedly during one invocation of the program.
 This will usually mean that the user must be prompted each time. In IRAF the
 recommended default `automatic' mode allows prompting to be overridden and the
 same value supplied each time a value is requested so `query' mode must be set
 for `repeated' parameters.
 
-\subsubsection{\xlabel{the_size_keyword}\label{size_key}The \texttt{size} 
+\subsubsection{\xlabel{the_size_keyword}\label{size_key}The \texttt{size}
 keyword}
 ADAM does not require to know the size of a parameter, or even whether it is
 a scalar, vector or array.  However, this information is required for some
@@ -1057,9 +1057,9 @@ parameter is non-scalar so currently the argument is ignored and may be given
 as \texttt{*}.
 
 \subsection{\xlabel{the_command_keywords}The \texttt{command} Keywords}
-A keyword 
+A keyword
 \htmlref{\texttt{command}}{command}
-is provided to define commands for the command language in use (ICL, CL 
+is provided to define commands for the command language in use (ICL, CL
 \textit{etc.}) which will do various generic things as follows:
 \begin{itemize}
 \item Define a command which will display a message to the user.
@@ -1086,12 +1086,12 @@ is provided to define commands for the command language in use (ICL, CL
              }
   }
 \end{verbatim} \end{quote}
-The \texttt{taskinherit} subcommand gives the names of parameters of the 
-command whose values will be inherited by the action named in the 
-\texttt{task} subcommand. 
+The \texttt{taskinherit} subcommand gives the names of parameters of the
+command whose values will be inherited by the action named in the
+\texttt{task} subcommand.
 The \texttt{taskparam} subcommand gives the name and fixed value of the other
 parameters to be passed to the action.
-The code above will result in command \texttt{fitsexist} being defined with 
+The code above will result in command \texttt{fitsexist} being defined with
 two parameters, \texttt{ndf} and \texttt{keyword} so that obeying
 \begin{quote} \begin{verbatim}
 fitsexist comwest simple
@@ -1104,10 +1104,10 @@ and
 parameter \texttt{mode} set to \texttt{interface}.
 
 Note that in Starlink mode, the csh, sh and ICL user-interfaces will just
-append anything following the \texttt{fitsexist} command to the 
+append anything following the \texttt{fitsexist} command to the
 \texttt{fitsmod} command, following the fixed parameters. The
 \texttt{taskinherit} keyword has no effect.
-\item Define an obsolete command \dash\ if it is obeyed, the message is 
+\item Define an obsolete command \dash\ if it is obeyed, the message is
 displayed.
 \begin{quote} \begin{verbatim}
   command oldcommand {
@@ -1116,8 +1116,8 @@ displayed.
 \end{verbatim} \end{quote}
 \end{itemize}
 
-Note that in addition to the subcommand \texttt{print}, \texttt{obey} 
-\textit{etc.} the command definition may contain \texttt{alias} 
+Note that in addition to the subcommand \texttt{print}, \texttt{obey}
+\textit{etc.} the command definition may contain \texttt{alias}
 specifications.
 
 \subsection{\xlabel{filespecific_output}File-specific Output}
@@ -1146,7 +1146,7 @@ load file
 # (the exotic reference to the positional arguments is a portable
 # version of plain "$@")
    command () { shell_command ${1+"$@"}; }
-  } 
+  }
 
 # Output to the package.cl file.
   cl {
@@ -1156,7 +1156,7 @@ set FIGARO_AXES=true
 \end{verbatim} \end{quote}
 
 \newpage
-\section{\xlabel{details_of_ifd_file_keywords}\label{keywords}Details of IFD 
+\section{\xlabel{details_of_ifd_file_keywords}\label{keywords}Details of IFD
 File Keywords}
 
 \sstroutine{
@@ -1165,7 +1165,7 @@ File Keywords}
    define the access needed to the parameter.
 }{
    \sstdescription{
-      The access may be READ, WRITE or UPDATE (see 
+      The access may be READ, WRITE or UPDATE (see
       \xref{SUN/115}{sun115}{}
       for details).
    }
@@ -1188,7 +1188,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt access} field is written to the Interface 
+         {The appropriate {\ssttt access} field is written to the Interface
           Files.}
       \sstsubsection{IRAF:}
          {For file type parameters there is currently no action. For other
@@ -1203,7 +1203,7 @@ File Keywords}
    Declare an action within an executable
 }{
    \sstdescription{
-      Declares the name of an action (application) within an executable 
+      Declares the name of an action (application) within an executable
       image and defines the action.
    }
    \sstinvocation{
@@ -1220,7 +1220,7 @@ File Keywords}
       }{
          A Tcl script defining the action in terms of the Tcl procedures
          declared for an action.
-      }         
+      }
    }
    \sstdiytopic{Subcommands}{
       The following keywords are defined within an \texttt{action} definition:
@@ -1255,11 +1255,11 @@ File Keywords}
       \htmlref{{\ssttt prefix}}{prefix}
       is defined, a command name with the given prefix will also be defined.
 
-      The \texttt{alias} command allows a list of additional command names to be 
+      The \texttt{alias} command allows a list of additional command names to be
       defined to invoke the action.  The list of aliases may be a list
       of simple command names or names of the form:
 
-        com(mand) 
+        com(mand)
 
       where the part before the parentheses is the minimum abbreviation.
       (Currently this only applies for ICL.)
@@ -1281,7 +1281,7 @@ File Keywords}
       \sstexamplesubsection{
          alias \{ acto(ne) act1 \}
       }{
-         Defines {\ssttt acto}, {\ssttt acton} and  {\ssttt act1} as 
+         Defines {\ssttt acto}, {\ssttt acton} and  {\ssttt act1} as
          aliases for {\ssttt actone}.
       }
    }
@@ -1297,7 +1297,7 @@ File Keywords}
    Specify an associated GLOBAL parameter
 }{
    \sstdescription{
-      This corresponds with the ADAM ASSOCIATION field (see 
+      This corresponds with the ADAM ASSOCIATION field (see
       \xref{SUN/115}{sun115}{}
       for details).
    }
@@ -1311,27 +1311,27 @@ File Keywords}
          specifies the name of the associated GLOBAL parameter and the
          allowed access to it.
       }
-         
+
    }
    \sstexamples{
       \sstexamplesubsection{
          association <->GLOBAL.DEVICE
       }{
          GLOBAL.DEVICE may be used as a source for the value or suggested
-         value of the current parameter, and will be updated with the 
+         value of the current parameter, and will be updated with the
          current value of the parameter if the application ends successfully.
       }
       \sstexamplesubsection{
          association <-GLOBAL.DEVICE
       }{
          GLOBAL.DEVICE may be used as a source for the value or suggested
-         value of the current parameter but will not be updated with the 
+         value of the current parameter but will not be updated with the
          current value of the parameter.
       }
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt association} field is written to the 
+         {The appropriate {\ssttt association} field is written to the
           Interface Files.}
       \sstsubsection{IRAF:}{None.}
    }
@@ -1352,18 +1352,18 @@ File Keywords}
       \sstsubsection{
          \textit{text}
       }{
-         The specified text is written to the package \texttt{.cl} file. 
+         The specified text is written to the package \texttt{.cl} file.
          It may consist of more than one line. The text should be legal
          IRAF command language.
       }
-         
+
    }
    \sstexamples{
       \sstexamplesubsection{
          cl \{ \# Set an IRAF environment variable\\
          \tab set FIGARO\_AXES=true \}
       }{
-         Inserts a comment and a set command into the package \texttt{.cl} 
+         Inserts a comment and a set command into the package \texttt{.cl}
          file.
       }
    }
@@ -1379,7 +1379,7 @@ File Keywords}
    Define a command
 }{
    \sstdescription{
-      This command defines package commands other than those to run 
+      This command defines package commands other than those to run
       applications in the standard way. The command definition may contain
       an \texttt{alias} subcommand and must contain one of the other subcommands
       listed below.
@@ -1402,7 +1402,7 @@ File Keywords}
    }
    \sstdiytopic{Subcommands}{
       The following keywords are defined within a \texttt{command} definition:\\
-      \htmlref{{\ssttt alias}}{alias} \dash\ define aliases for the new 
+      \htmlref{{\ssttt alias}}{alias} \dash\ define aliases for the new
       command\\
       \htmlref{{\ssttt print}}{print} \dash\ print a message\\
       \htmlref{{\ssttt obey}}{obey} \dash\ obey a shell command\\
@@ -1442,10 +1442,10 @@ File Keywords}
          \textit{text}
       }{
          The specified text is written to the \texttt{.csh} file. It may consist
-         of more than one line. The text should be legal C-shell command 
+         of more than one line. The text should be legal C-shell command
          language.
       }
-         
+
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -1470,7 +1470,7 @@ File Keywords}
       Defines the default value for a parameter and must be of an appropriate
       type (see
       \xref{SUN/115}{sun115}{}
-      for details). 
+      for details).
    }
    \sstinvocation{
       default \textit{value}
@@ -1506,7 +1506,7 @@ File Keywords}
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl} 
+      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl}
                             files.}
       \sstsubsection{IRAF:}{The value is used as the initial default value in
                             the \texttt{.par} file. For primitive data types,
@@ -1522,14 +1522,14 @@ File Keywords}
 }{
    \sstdescription{
       The defhelp procedure specifies the location of help information on
-      a topic assuming a hierarchical help system such as 
+      a topic assuming a hierarchical help system such as
 \xref{Starlink HLP}{sun124}{}
-      and the currently defined help library (see 
+      and the currently defined help library (see
 \htmlref{{\ssttt helplib}}{helplib}).
-      Currently \texttt{defhelp} is only used in defining help when running 
+      Currently \texttt{defhelp} is only used in defining help when running
       from ICL.
       The location of help on the applications is defined automatically
-      \dash\ it is only necessary to include \texttt{defhelp} keywords in the 
+      \dash\ it is only necessary to include \texttt{defhelp} keywords in the
       IFD for other topics.
    }
    \sstinvocation{
@@ -1551,7 +1551,7 @@ File Keywords}
       \sstexamplesubsection{
          defhelp data\_structures data\_structures
       }{
-         Help on  `data\_structures' is found in subtopic 
+         Help on  `data\_structures' is found in subtopic
          `data\_structures' of the current help library.
       }
       \sstexamplesubsection{
@@ -1635,7 +1635,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}{None.}
-      \sstsubsection{IRAF:}{If the parameter is made dynamic, it is listed 
+      \sstsubsection{IRAF:}{If the parameter is made dynamic, it is listed
           in the DynParList array in the Output Parameter File and has its
           mode set to automatic in the task parameter file and its prompt
           string will be preceded by \texttt{*!}.
@@ -1660,7 +1660,7 @@ File Keywords}
    }
    \sstarguments{
       \sstsubsection{
-         \textit{image} 
+         \textit{image}
       }{
          The name of the executable image.
       }
@@ -1683,9 +1683,9 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}{Opens the monolithic interface file and changes
-          the executable image referred to in the {\ssttt .icl} and 
+          the executable image referred to in the {\ssttt .icl} and
           {\ssttt .csh} files.}
-      \sstsubsection{IRAF:}{Opens the {\ssttt .tcl} file and changes the 
+      \sstsubsection{IRAF:}{Opens the {\ssttt .tcl} file and changes the
           executable image referred to in the {\ssttt .cl} file.}
    }
 }
@@ -1696,9 +1696,9 @@ File Keywords}
    Specify the directory containing executables \textit{etc.}
 }{
    \sstdescription{
-      The specified directory is used in constructing the Starlink package 
-      definition files \texttt{\textit{package}.icl} and 
-      \texttt{\textit{package}.csh}. 
+      The specified directory is used in constructing the Starlink package
+      definition files \texttt{\textit{package}.icl} and
+      \texttt{\textit{package}.csh}.
       IT IS NOT USED IN PRODUCING THE IRAF FILES.
 
       If not specified, the directory \${\em{PACKAGE}}\_DIR is used.
@@ -1718,8 +1718,8 @@ File Keywords}
       \sstexamplesubsection{
          exepath \{ \$KAPPA\_DIR \}
       }{
-         will result in the directory defined by environment variable 
-         KAPPA\_DIR being used \dash\ for package KAPPA, this is the same 
+         will result in the directory defined by environment variable
+         KAPPA\_DIR being used \dash\ for package KAPPA, this is the same
          as the default.
       }
       \sstexamplesubsection{
@@ -1740,8 +1740,8 @@ File Keywords}
    Define the `one-line' help for this parameter
 }{
    \sstdescription{
-      Currently only for ADAM (see 
-\xref{SUN/115}{sun115}{} 
+      Currently only for ADAM (see
+\xref{SUN/115}{sun115}{}
      for details).
    }
    \sstinvocation{
@@ -1779,8 +1779,8 @@ File Keywords}
    Define the source of help for this parameter
 }{
    \sstdescription{
-      Currently only for ADAM (see 
-\xref{SUN/115}{sun115}{} 
+      Currently only for ADAM (see
+\xref{SUN/115}{sun115}{}
      for details).
    }
    \sstinvocation{
@@ -1875,7 +1875,7 @@ File Keywords}
          \tab defstring welcome print "hello" \}
       }{
          Inserts a comment and a defstring command into the \texttt{.icl} file.
-         NOTE the \texttt{\{} in the comment must be escaped. 
+         NOTE the \texttt{\{} in the comment must be escaped.
       }
    }
    \ssteffects{
@@ -1890,8 +1890,8 @@ File Keywords}
    Define a set of acceptable values for the parameter
 }{
    \sstdescription{
-      Currently only for ADAM (see 
-\xref{SUN/115}{sun115}{} 
+      Currently only for ADAM (see
+\xref{SUN/115}{sun115}{}
      for details).
    }
    \sstinvocation{
@@ -1908,7 +1908,7 @@ File Keywords}
       \sstexamplesubsection{
          in { Red White Blue }
       }{
-         The acceptable values are: {\ssttt Red}, {\ssttt White} or 
+         The acceptable values are: {\ssttt Red}, {\ssttt White} or
          {\ssttt Blue}.
       }
    }
@@ -1964,7 +1964,7 @@ File Keywords}
    \sstdescription{
       A subcommand of
       \htmlref{\texttt{command}}{command}.
-      When the defined command is invoked, a command will be obeyed in the 
+      When the defined command is invoked, a command will be obeyed in the
       underlying shell.  Obviously the command will vary depending upon the
       shell in use \dash\ currently Interface Definition Files assume
       \texttt{csh}.
@@ -1991,7 +1991,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate commands are written to the \texttt{.icl} and 
+         {The appropriate commands are written to the \texttt{.icl} and
           \texttt{.csh} files.}. The implementation for ICL means that the
           command is actually obeyed by ICL which will pass most shell commands
           on to the shell.
@@ -2033,7 +2033,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate commands are written to the \texttt{.icl} and 
+         {The appropriate commands are written to the \texttt{.icl} and
           \texttt{.csh} files.}
       \sstsubsection{IRAF:}{The foreign command mechanism is used.}
    }
@@ -2188,7 +2188,7 @@ File Keywords}
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl} 
+      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl}
                             files.}
       \sstsubsection{IRAF:}{As specified \dash\ output to the {\ssttt .par}
                             file.}
@@ -2245,10 +2245,10 @@ File Keywords}
    Define a search path for the suggested value in a prompt
 }{
    \sstdescription{
-      This corresponds with the ADAM PPATH field (see 
+      This corresponds with the ADAM PPATH field (see
       \xref{SUN/115}{sun115}{}
       for details).
-      The specified search path comprises a space-separated list of one or 
+      The specified search path comprises a space-separated list of one or
       more of:\\
       CURRENT \dash\ The last-used value of the parameter\\
       DEFAULT \dash\ take the static default\\
@@ -2275,7 +2275,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate \texttt{ppath} field is written to the Interface 
+         {The appropriate \texttt{ppath} field is written to the Interface
           File.}
       \sstsubsection{IRAF:}{None.}
    }
@@ -2321,9 +2321,9 @@ File Keywords}
    Define a command to print a message
 }{
    \sstdescription{
-      A subcommand of 
+      A subcommand of
       \htmlref{\texttt{command}}{command}.
-      When the defined command is invoked, the 
+      When the defined command is invoked, the
       specified message is displayed to the user.
    }
    \sstinvocation{
@@ -2348,7 +2348,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate commands are written to the \texttt{.icl} and 
+         {The appropriate commands are written to the \texttt{.icl} and
           \texttt{.csh} files.}
       \sstsubsection{IRAF:}{The foreign command mechanism is used.}
    }
@@ -2384,7 +2384,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt prompt} field is written to the Interface 
+         {The appropriate {\ssttt prompt} field is written to the Interface
           Files.}
       \sstsubsection{IRAF:}
          {The appropriate {\ssttt prompt} field is written to the \texttt{.par}
@@ -2398,8 +2398,8 @@ File Keywords}
    Define the range of values permitted for the parameter
 }{
    \sstdescription{
-      Currently only for ADAM (see 
-\xref{SUN/115}{sun115}{} 
+      Currently only for ADAM (see
+\xref{SUN/115}{sun115}{}
      for details).
    }
    \sstinvocation{
@@ -2487,7 +2487,7 @@ File Keywords}
          of more than one line. The text should be legal sh-style
          shell command language.
       }
-         
+
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -2549,7 +2549,7 @@ File Keywords}
       Invoke an action with a given set of parameters.
 }{
    \sstdescription{
-      A subcommand of 
+      A subcommand of
       \htmlref{\texttt{command}}{command}.
       When the defined command is invoked, it
       invokes the named action. Fixed and variable parameters for the
@@ -2584,8 +2584,8 @@ File Keywords}
          \}
       }{
          Obeying command {\ssttt abc filename} will be equivalent to obeying
-         command {\ssttt xyz} with parameters {\ssttt method} and 
-         {\ssttt value} set as specified and parameter {\ssttt ndf} set to 
+         command {\ssttt xyz} with parameters {\ssttt method} and
+         {\ssttt value} set as specified and parameter {\ssttt ndf} set to
          {\ssttt filename}.
       }
    }
@@ -2599,7 +2599,7 @@ File Keywords}
       \sstsubsection{IRAF:}{A CL procedure is created and a command defined in
           the package \texttt{.cl} file to run it. The procedure will have
           parameters as defined by any
-          \htmlref{{\ssttt taskinherit}}{taskinherit} 
+          \htmlref{{\ssttt taskinherit}}{taskinherit}
           keywords and will invoke the named action with the inherited
           parameter values followed by the fixed parameters, all in
           {\ssttt keyword=value} form.
@@ -2615,7 +2615,7 @@ File Keywords}
    \sstdescription{
       A subcommand of
       \htmlref{\texttt{task}}{task}.
-      Specifies the name of a parameter of the action whose value is to be 
+      Specifies the name of a parameter of the action whose value is to be
       inherited from the top-level command
    }
    \sstinvocation{
@@ -2650,7 +2650,7 @@ File Keywords}
    \sstdescription{
       A subcommand of
       \htmlref{\texttt{task}}{task}.
-      The parameter specification is added, verbatim, to the invocation of 
+      The parameter specification is added, verbatim, to the invocation of
       the name action.
    \sstinvocation{
       taskparam \{ \textit{parameter\_specification} \}
@@ -2660,7 +2660,7 @@ File Keywords}
          \textit{parameter\_specification}
       }{
          A string to be added to the command line when invoking the named
-         action. It may be any string which is legal as a parameter 
+         action. It may be any string which is legal as a parameter
          of the command specified by the \htmlref{\texttt{task}}{task}
          keyword} but will normally be of the form `\texttt{keyword=value}'.
       }
@@ -2670,7 +2670,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The parameter specification is added to the command written to 
+         {The parameter specification is added to the command written to
           the \texttt{.icl} and \texttt{.csh} files.}
       \sstsubsection{IRAF:}
          {The parameter specification is added to the command line in
@@ -2685,8 +2685,8 @@ File Keywords}
    Define the type of the parameter
 }{
    \sstdescription{
-      The parameter type may be: \_CHAR, LITERAL, \_DOUBLE, \_INTEGER, \_REAL, 
-      \_LOGICAL or a structure type (see 
+      The parameter type may be: \_CHAR, LITERAL, \_DOUBLE, \_INTEGER, \_REAL,
+      \_LOGICAL or a structure type (see
       \xref{SUN/115}{sun115}{}
       for details). For environments other than ADAM, suitable choices are made.
    }
@@ -2708,12 +2708,12 @@ File Keywords}
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl} 
+      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl}
                             files.}
       \sstsubsection{IRAF:}{ Scalar \_CHAR, LITERAL, \_DOUBLE, \_INTEGER,
          \_REAL and \_LOGICAL types become string, string, real, integer, real
-         and boolean respectively. Vectors and arrays are defined as type 
-         struct (see the 
+         and boolean respectively. Vectors and arrays are defined as type
+         struct (see the
 \htmlref{{\ssttt size}}{size}
          keyword). All other types are treated as filenames.}
    }
@@ -2760,10 +2760,10 @@ File Keywords}
    Define the source of the parameter value.
 }{
    \sstdescription{
-      This corresponds with the ADAM VPATH field (see 
+      This corresponds with the ADAM VPATH field (see
       \xref{SUN/115}{sun115}{}
       for details).
-      The specified search path comprises a space-separated list of one or 
+      The specified search path comprises a space-separated list of one or
       more of:\\
       CURRENT \dash\ The last-used value of the parameter\\
       PROMPT \dash\ prompt for the value\\
@@ -2792,15 +2792,15 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt vpath} field is written to the Interface 
+         {The appropriate {\ssttt vpath} field is written to the Interface
           Files.}
-      \sstsubsection{IRAF:}{In the absence of a 
-\htmlref{\texttt{repeated}}{repeated} or 
+      \sstsubsection{IRAF:}{In the absence of a
+\htmlref{\texttt{repeated}}{repeated} or
 \htmlref{\texttt{dynamic}}{dynamic}
          keyword, the following rules apply: If the first element of the vpath
          is \texttt{PROMPT} or there is no vpath specifier, the IRAF parameter
          is made automatic mode. If the first element is \texttt{GLOBAL}, the
-         parameter is made 
+         parameter is made
 \htmlref{dynamic}{dynamic_key}.
          In all other cases it is made hidden.}
 

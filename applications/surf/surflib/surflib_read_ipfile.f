@@ -9,7 +9,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_READ_IPFILE( FD, NUM_CHAN, NUM_ADC,
 *    :     N_FILT, FILTERS, FAST_ANG, BOL_IP_DATA, STATUS)
@@ -21,7 +21,7 @@
 *     Any line starting with the string 'FAST' is assumed
 *     to be specifying the angle between 0 degrees on the waveplate
 *     and the angle to the fast axis. This is wavelength dependent.
-*     The line should be of the format 
+*     The line should be of the format
 *     FAST filter angle
 *     eg   FAST 450 -3.0
 *     The list of valid filter names is passed in to the routine.
@@ -93,7 +93,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! Status
       INCLUDE 'FIO_ERR'         ! FIO__EOF
@@ -112,7 +112,7 @@
 
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Constants:
       INTEGER MAX_WRD           ! number of words on a valid bolometer
       PARAMETER (MAX_WRD = 9)   ! definition line
@@ -159,7 +159,7 @@
 
 *     Loop through lines in file
 
-      DO WHILE (.NOT. FINISHED) 
+      DO WHILE (.NOT. FINISHED)
 
          CALL FIO_READF(FD, LINE, STATUS)
 
@@ -184,7 +184,7 @@
 
 *  break the line up into its component words, check it's the right `shape'
 
-               CALL CHR_DCWRD (LINE, MAX_WRD, NWRD, 
+               CALL CHR_DCWRD (LINE, MAX_WRD, NWRD,
      :              WSTART, WSTOP, WORDS, CHR_STATUS)
 
 *     Check return status (we know that STATUS must be good
@@ -244,7 +244,7 @@
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Bad '//
      :                       'bolometer name', STATUS)
                      END IF
-                     
+
                   END IF
 
 *     Check that this bolometer has not been set already
@@ -284,20 +284,20 @@
      :                    STATUS)
                      BOL_IP_DATA(2,CHAN,ADC) = BOL_IP_DATA(2,CHAN,ADC)
      :                    * D2R
-                     
+
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Error '//
      :                       'converting Pslope to REAL', STATUS)
                      END IF
                   END IF
-                  
+
 *     Convert Pslope_Err to variance (and 'per radian')
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL CHR_CTOR(WORDS(5), BOL_IP_DATA(6,CHAN,ADC),
      :                    STATUS)
-                     BOL_IP_DATA(6,CHAN,ADC) = (BOL_IP_DATA(6,CHAN,ADC) 
+                     BOL_IP_DATA(6,CHAN,ADC) = (BOL_IP_DATA(6,CHAN,ADC)
      :                    * D2R) **2
-                     
+
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Error '//
      :                       'converting Pslope_Err to REAL', STATUS)
@@ -308,10 +308,10 @@
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL CHR_CTOR(WORDS(6), BOL_IP_DATA(3,CHAN,ADC),
      :                    STATUS)
-                     
+
                      BOL_IP_DATA(3,CHAN,ADC) = BOL_IP_DATA(3,CHAN,ADC)
      :                    * D2R
-                     
+
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Error '//
      :                       'converting ThetZero to REAL', STATUS)
@@ -322,23 +322,23 @@
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL CHR_CTOR(WORDS(7), BOL_IP_DATA(7,CHAN,ADC),
      :                    STATUS)
-                     
-                     BOL_IP_DATA(7,CHAN,ADC) = (BOL_IP_DATA(7,CHAN,ADC) 
+
+                     BOL_IP_DATA(7,CHAN,ADC) = (BOL_IP_DATA(7,CHAN,ADC)
      :                    * D2R ) **2
-                     
+
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Error '//
      :                       'converting ThetZeroErr to REAL', STATUS)
                      END IF
                   END IF
-                  
+
 *     Convert ThetaSlope (the gradient has units of deg/deg which
 *     is the same as rad/rad)
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL CHR_CTOR(WORDS(8), BOL_IP_DATA(4,CHAN,ADC),
      :                    STATUS)
-                     
-                     
+
+
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Error '//
      :                       'converting ThetaSlope to REAL', STATUS)
@@ -351,19 +351,19 @@
                      CALL CHR_CTOR(WORDS(9), BOL_IP_DATA(8,CHAN,ADC),
      :                    STATUS)
                      BOL_IP_DATA(8,CHAN,ADC) =BOL_IP_DATA(8,CHAN,ADC)**2
-                     
+
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_REP(' ','SURFLIB_READ_IPFILE: Error '//
      :                       'converting ThetaSlopeErr to REAL', STATUS)
                      END IF
                   END IF
-                  
+
                END IF
 
             END IF
 
          END IF
-      
+
       END DO
 
 *     Now check the FAST_ANG array for bad values
@@ -376,7 +376,7 @@
      :                 'No fast axis specified for filter ^FI',
      :                 STATUS)
                END IF
-         END DO      
+         END DO
       END IF
 
       END

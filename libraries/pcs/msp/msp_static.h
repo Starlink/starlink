@@ -7,7 +7,7 @@ int *status          /* global status (given and returned) */
 
 /*=  MSP_CHECKSOCK - check a socket number is in use */
 
-void msp_checksock 
+void msp_checksock
 (
 int sock,            /* a socket number (given) */
 int *status          /* global status (given and returned) */

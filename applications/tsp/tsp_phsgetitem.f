@@ -25,14 +25,14 @@
 *   Jeremy Bailey    28/2/1988
 *
 *+
-                        
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters
       INTEGER CHAN
-      INTEGER STRT,FIN,IPTR,QPTR,UPTR,VPTR,STATUS         
+      INTEGER STRT,FIN,IPTR,QPTR,UPTR,VPTR,STATUS
 
 *  HDS locators (in common)
       CHARACTER*(DAT__SZLOC) LOC,ILOC2,QLOC,QLOC2,ULOC,ULOC2
@@ -44,58 +44,58 @@
       INTEGER STAT
       IF (STATUS .EQ. SAI__OK) THEN
 
-*  Intensity Data  -  Map the Intensity Array  
-                              
+*  Intensity Data  -  Map the Intensity Array
+
 *  Determine limits of slice
 
-          UPPER(1) = CHAN                                            
-          UPPER(2) = FIN                                             
-          LOWER(1) = CHAN                                            
-          LOWER(2) = STRT                                         
+          UPPER(1) = CHAN
+          UPPER(2) = FIN
+          LOWER(1) = CHAN
+          LOWER(2) = STRT
           CALL TSP_MAP_SLICE(LOC,2,LOWER,UPPER,'READ',IPTR,
-     :             ILOC2,STATUS)         
-          IF (STATUS .NE. SAI__OK) THEN                             
+     :             ILOC2,STATUS)
+          IF (STATUS .NE. SAI__OK) THEN
               IPTR = 0
-              CALL ERR_REP('MSG','Error Accessing Data ^STATUS',STATUS)      
+              CALL ERR_REP('MSG','Error Accessing Data ^STATUS',STATUS)
           ENDIF
 
 *  Q Stokes parameter  -  Map the Q array
-                                                          
-          CALL TSP_GET_STOKES(LOC,'Q',QLOC,STATUS)    
+
+          CALL TSP_GET_STOKES(LOC,'Q',QLOC,STATUS)
           CALL TSP_MAP_SLICE(QLOC,2,LOWER,UPPER,'READ',QPTR,
-     :             QLOC2,STATUS)         
+     :             QLOC2,STATUS)
           CALL DAT_ANNUL(QLOC,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               QPTR = 0
               CALL ERR_ANNUL(STATUS)
-          ENDIF             
+          ENDIF
 
 *  U Stokes parameter  -  Map the U array
 
           CALL TSP_GET_STOKES(LOC,'U',ULOC,STATUS)
           CALL TSP_MAP_SLICE(ULOC,2,LOWER,UPPER,'READ',UPTR,
-     :             ULOC2,STATUS)         
+     :             ULOC2,STATUS)
           CALL DAT_ANNUL(ULOC,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               UPTR = 0
               CALL ERR_ANNUL(STATUS)
-          ENDIF             
+          ENDIF
 
 *  V Stokes parameter  -  Map the V array
 
           CALL TSP_GET_STOKES(LOC,'V',VLOC,STATUS)
           CALL TSP_MAP_SLICE(VLOC,2,LOWER,UPPER,'READ',VPTR,
-     :             VLOC2,STATUS)         
+     :             VLOC2,STATUS)
           CALL DAT_ANNUL(VLOC,STATUS)
           IF (STATUS .NE. SAI__OK) THEN
               VPTR = 0
               CALL ERR_ANNUL(STATUS)
-          ENDIF             
-       ENDIF                                                     
+          ENDIF
+       ENDIF
        END
-                            
 
-      
+
+
 
 
       SUBROUTINE TSP_PHSUNMAPITEM(LOC,STATUS)
@@ -121,19 +121,19 @@
 *+
 
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'           
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters
       INTEGER STATUS
       CHARACTER*(DAT__SZLOC) LOC,ILOC2,QLOC2,ULOC2,VLOC2
       COMMON /GET_ITEM/ ILOC2,QLOC2,ULOC2,VLOC2
-      
+
 *  Unmap each item
       CALL TSP_UNMAP(ILOC2,STATUS)
       CALL TSP_UNMAP(QLOC2,STATUS)
       CALL TSP_UNMAP(ULOC2,STATUS)
       CALL TSP_UNMAP(VLOC2,STATUS)
       STATUS = SAI__OK
-      END      
+      END
 

@@ -7,7 +7,7 @@
 *
 *   Description:
 *      This writes the spectrum part of the dataset to the file NAME.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     IUEDR Vn. 1.0
 *      Paul Rees          22-SEP-88     IUEDR Vn. 2.0

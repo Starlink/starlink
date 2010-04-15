@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -279,12 +279,12 @@
      :                    PTRFI, I, STATUS )
 
 *        Copy data to work space.
-            CALL VEC_RTOR( .FALSE., ADIM(1)*ADIM(2), 
-     :                     %VAL( CNF_PVAL( PTRCD ) ), 
+            CALL VEC_RTOR( .FALSE., ADIM(1)*ADIM(2),
+     :                     %VAL( CNF_PVAL( PTRCD ) ),
      :                     %VAL( CNF_PVAL( PTRFI ) ), I, J, STATUS )
 
 *        Work out extrema of work space.
-            CALL SPD_UAAAR( .TRUE., ADIM(1)*ADIM(2), 
+            CALL SPD_UAAAR( .TRUE., ADIM(1)*ADIM(2),
      :                      %VAL( CNF_PVAL( PTRFI ) ), MINVAL, MAXVAL,
      :                      STATUS )
 
@@ -333,7 +333,7 @@
      :                      MAXVAL, STATUS )
 
 *        Replace bad values with 2*min-max in work space.
-            CALL SPD_UAABR( ADIM(2)*ADIM(3), 2*MINVAL-MAXVAL, 
+            CALL SPD_UAABR( ADIM(2)*ADIM(3), 2*MINVAL-MAXVAL,
      :                      %VAL( CNF_PVAL( PTRFI ) ), STATUS )
 
 *        Register work space as finder image.

@@ -117,8 +117,8 @@
 *        the number of input variables, and that in turn equals the
 *        number of dimensions in the input NDF.
 *
-*        If a null (!) value is supplied, a default value is used. When 
-*        COSYS = "Data" this is "Bounds", and when COSYS = "World" the 
+*        If a null (!) value is supplied, a default value is used. When
+*        COSYS = "Data" this is "Bounds", and when COSYS = "World" the
 *        default is "Match".  [!]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
@@ -196,7 +196,7 @@
 *     these limits, TRANSFORMER derives the co-ordinates of the output
 *     NDF's pixel centres by linear interpolation.  Therefore, the
 *     co-ordinate limits define the region of the input NDF that will
-*     appear in the output.  
+*     appear in the output.
 
 *     The bounds of the output NDF define its shape and origin.  So
 *     an additional linear scaling transformation can be applied along
@@ -245,7 +245,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -468,7 +468,7 @@
 *  Obtain the number of variables in the transformation.
       CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 980
-      
+
 *  Obtain the method to define the bounds of the output NDF.
 *  =========================================================
 
@@ -485,7 +485,7 @@
      :                      .FALSE., SHAPE, STATUS )
          END IF
          SAME = SHAPE .EQ. 'SAME'
-      
+
       ELSE
          IF ( COSYS .EQ. 'DATA' ) THEN
             CALL PAR_CHOIC( 'SHAPE', 'Bounds', 'Bounds,Full,Limits',
@@ -549,7 +549,7 @@
 
 *  Validate dimensions and number of input co-ordinates.
 *  =====================================================
-*  
+*
 *  Check that processing is possible.  The number of dimensions in the
 *  NDF must be at least the number of input variables for the
 *  transformation to be applied.
@@ -687,7 +687,7 @@
 *  ==============================================
 
 *  This only needs to be done if the shape of the output NDF is unknown
-*  at this point. 
+*  at this point.
       IF ( .NOT. ( SAME .OR. SHAPE .EQ. 'MATCH' ) ) THEN
 
 *  Report the extents using an appropriate precision.
@@ -1045,7 +1045,7 @@
 
 *  Fill the centre array using the scale and offset.  Scale is applied
 *  from the second element in this routine, rather than the centre of
-*  the first. 
+*  the first.
                CALL KPG1_SSAZR( AEL( IAXIS ), SCALE, OFFSET,
      :                          %VAL( AXPNTR( 1, IAXIS ) ), STATUS )
             END IF
@@ -1205,7 +1205,7 @@
                   ELSE
                      OPNTRW = OPNTR( 1 )
                   END IF
-      
+
 *  Perform the transformation on the data array for the numeric data
 *  type.  First for a byte array
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -1266,32 +1266,32 @@
                         CALL KPG1_CMULB( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                   %VAL( OPNTR( 1 ) ), NBAD,
      :                                   STATUS )
- 
+
                      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                         CALL KPG1_CMULUB( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                    %VAL( OPNTR( 1 ) ), NBAD,
      :                                    STATUS )
- 
+
                      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                         CALL KPG1_CMULD( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                   %VAL( OPNTR( 1 ) ), NBAD,
      :                                   STATUS )
- 
+
                      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                         CALL KPG1_CMULI( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                   %VAL( OPNTR( 1 ) ), NBAD,
      :                                   STATUS )
- 
+
                      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                         CALL KPG1_CMULR( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                   %VAL( OPNTR( 1 ) ), NBAD,
      :                                   STATUS )
- 
+
                      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                         CALL KPG1_CMULW( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                   %VAL( OPNTR( 1 ) ), NBAD,
      :                                   STATUS )
- 
+
                      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                         CALL KPG1_CMULUW( BAD, EL, %VAL( OPNTRW ), FLUX,
      :                                    %VAL( OPNTR( 1 ) ), NBAD,
@@ -1370,7 +1370,7 @@
 *  Map the input and output arrays.
                CALL KPG1_MAP( NDFIS, 'Data,Variance', ITYPE, 'READ',
      :                       IPNTR, ELIN, STATUS )
-               CALL KPG1_MAP( NDFOS, 'Data,Variance', ITYPE, 
+               CALL KPG1_MAP( NDFOS, 'Data,Variance', ITYPE,
      :                       'WRITE/BAD', OPNTR, ELOUT, STATUS )
 
                IF ( DPAXIS ) THEN
@@ -1556,7 +1556,7 @@
 *  type.  First apply to a byte array.
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
                      CALL KPG1_TDLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARB, CTRID, FLUX, 
+     :                                VAR, VARB, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARBO, %VAL( WPNTR1 ),
@@ -1566,7 +1566,7 @@
 *  Transform a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARD, CTRID, FLUX, 
+     :                                VAR, VARD, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARDO, %VAL( WPNTR1 ),
@@ -1576,7 +1576,7 @@
 *  Transform an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                      CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARI, CTRID, FLUX, 
+     :                                VAR, VARI, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARIO, %VAL( WPNTR1 ),
@@ -1586,7 +1586,7 @@
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARR, CTRID, FLUX, 
+     :                                VAR, VARR, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARRO, %VAL( WPNTR1 ),
@@ -1596,7 +1596,7 @@
 *  Transform an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                      CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                 VAR, VARB, CTRID, FLUX, 
+     :                                 VAR, VARB, CTRID, FLUX,
      :                                 %VAL( CAXPTR ), ODIMS( 1 ),
      :                                 NDIMO, OLBND, ODIMS,
      :                                 %VAL( OPNTR( 1 ) ), VARBO,
@@ -1606,7 +1606,7 @@
 *  Transform an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                      CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                 VAR, VARW, CTRID, FLUX, 
+     :                                 VAR, VARW, CTRID, FLUX,
      :                                 %VAL( CAXPTR ), ODIMS( 1 ),
      :                                 NDIMO, OLBND, ODIMS,
      :                                 %VAL( OPNTR( 1 ) ), VARWO,
@@ -1616,7 +1616,7 @@
 *  Transform a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                      CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARW, CTRID, FLUX, 
+     :                                VAR, VARW, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARWO, %VAL( WPNTR1 ),
@@ -1632,7 +1632,7 @@
 *  type.  First apply to a byte array.
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
                      CALL KPG1_TRLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARB, CTRID, FLUX, 
+     :                                VAR, VARB, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARBO, %VAL( WPNTR1 ),
@@ -1642,7 +1642,7 @@
 *  Transform a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPG1_TRLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARD, CTRID, FLUX, 
+     :                                VAR, VARD, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARDO, %VAL( WPNTR1 ),
@@ -1652,7 +1652,7 @@
 *  Transform an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                      CALL KPG1_TRLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARI, CTRID, FLUX, 
+     :                                VAR, VARI, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARIO, %VAL( WPNTR1 ),
@@ -1662,7 +1662,7 @@
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_TRLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARR, CTRID, FLUX, 
+     :                                VAR, VARR, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARRO, %VAL( WPNTR1 ),
@@ -1672,7 +1672,7 @@
 *  Transform an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                      CALL KPG1_TRLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                 VAR, VARB, CTRID, FLUX, 
+     :                                 VAR, VARB, CTRID, FLUX,
      :                                 %VAL( CAXPTR ), ODIMS( 1 ),
      :                                 NDIMO, OLBND, ODIMS,
      :                                 %VAL( OPNTR( 1 ) ), VARBO,
@@ -1682,7 +1682,7 @@
 *  Transform an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                      CALL KPG1_TRLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                 VAR, VARW, CTRID, FLUX, 
+     :                                 VAR, VARW, CTRID, FLUX,
      :                                 %VAL( CAXPTR ), ODIMS( 1 ),
      :                                 NDIMO, OLBND, ODIMS,
      :                                 %VAL( OPNTR( 1 ) ), VARWO,
@@ -1692,7 +1692,7 @@
 *  Transform a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                      CALL KPG1_TRLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                                VAR, VARW, CTRID, FLUX, 
+     :                                VAR, VARW, CTRID, FLUX,
      :                                %VAL( CAXPTR ), ODIMS( 1 ), NDIMO,
      :                                OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                                VARWO, %VAL( WPNTR1 ),
@@ -1719,11 +1719,11 @@
 *  ===============
 
 *  Free the workspace holding the concatenated axes.
-  940 CONTINUE  
+  940 CONTINUE
       CALL PSX_FREE( CAXPTR, STATUS )
 
 *  Tidy the NDF context.
-  960 CONTINUE  
+  960 CONTINUE
       CALL NDF_END( STATUS )
 
 *  Free the transformation resources.

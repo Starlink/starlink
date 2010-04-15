@@ -3,7 +3,7 @@ C+
 C
 C   -----------
 C   D E P I C T
-C   ----------- 
+C   -----------
 C
 C   Description
 C   -----------
@@ -29,7 +29,7 @@ C
 C
 C   Parameters (read or written)
 C   ----------------------------
-C   IMAGE    Name of the structure containing the image to be displayed. 
+C   IMAGE    Name of the structure containing the image to be displayed.
 C            (character)(prompted for).
 C
 C   START    Coordinate in each dimension of IMAGE at which the display is
@@ -38,11 +38,11 @@ C
 C   END      Coordinate in each dimension of IMAGE at which the display is
 C            to end. (real, array)(prompted for).
 C
-C   LOW      Data value which is plotted in the lowest colour index or as 
-C            black. (real)(prompted for). 
+C   LOW      Data value which is plotted in the lowest colour index or as
+C            black. (real)(prompted for).
 C
 C   HIGH     Data value which is plotted in the highest colour index or as
-C            white. (real)(prompted for). 
+C            white. (real)(prompted for).
 C
 C   PLACE    Code for one of nine possible locations on the display surface,
 C            being a combination of T, C, or B, and L, C, or R. (character)
@@ -51,7 +51,7 @@ C
 C   MAG      Magnification of the plot. Magnification 1 fits the plot to the
 C            whole display surface. (real)(prompted for).
 C
-C   LABEL    Text placed centrally above the plot. (character)(prompted 
+C   LABEL    Text placed centrally above the plot. (character)(prompted
 C            for).
 C
 C   IMAGE1   Name of the structure containing the image to be contoured, if
@@ -62,12 +62,12 @@ C
 C   HIGH1    Highest data value to be contoured. (real)(prompted for).
 C
 C   LEVELS   Number of contour levels. The first contour is at LOW and the
-C            last is at HIGH. The data range HIGH-LOW divided by LEVELS-1 
+C            last is at HIGH. The data range HIGH-LOW divided by LEVELS-1
 C            gives the contour interval. (integer)(prompted for).
 C
 C   TABLE    Name of colour or grey scale lookup table. (character)
-C            (prompted for).      
-C            
+C            (prompted for).
+C
 C   SOFTDEV  Current screen device name (character)(read from file).
 C
 C   HARDDEV  Current hardcopy device name (character)(read from file).
@@ -75,13 +75,13 @@ C
 C
 C   Keywords
 C   --------
-C   WHOLE    Instruction to display the whole image. Otherwise, a subset of 
+C   WHOLE    Instruction to display the whole image. Otherwise, a subset of
 C            each dimension may be selected.
 C
 C   AXES     Instruction to plot calibrated axes. Otherwise, the image is
 C            framed with a plain box.
 C
-C   RAMP     Instruction to plot a calibrated bar of the colour or grey 
+C   RAMP     Instruction to plot a calibrated bar of the colour or grey
 C            scale to the right of the image.
 C
 C   CONTOUR  Instruction to overplot with contours of the same or another
@@ -111,16 +111,16 @@ C   - The data array is mapped as FLOAT regardless of its type, because
 C     PGPLOT (and ultimately GKS) only handle floating point data.
 C   - If magic values are present, they are replaced by a value below the
 C     lower threshold as supplied by the user.
-C   - The required lookup table is read and stored. This is done by the 
+C   - The required lookup table is read and stored. This is done by the
 C     routine NDP_IMAGE_LUT.
 C   - The mapped array is processed into integer colour indices by
 C     NDP_IAMGE_INDEX.
 C   - The index array is passed to NDP_IMAGE_PLOT, which calls PGPIXL to
 C     plot the image.
-C   - If overplotted contours of a different image are required, the data 
+C   - If overplotted contours of a different image are required, the data
 C     array is mapped as FLOAT and any magic values are replaced by values
 C   - below the user supplied threshold for the contour map.
-C   - The mapped array to be contoured is passed to PGCONT without clearing 
+C   - The mapped array to be contoured is passed to PGCONT without clearing
 C     the screen or changing the PGPLOT viewport, so that the contours are
 C     registered with the image.
 C
@@ -163,7 +163,7 @@ C   Library PAR:
 C     PAR_RDCHAR
 C     PAR_RDKEY
 C     PAR_RDVAL
-C     
+C
 C   Library VAR:
 C     VAR_GETCHR
 C
@@ -185,13 +185,13 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
-C   -----------------------                           
+C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
-C                           
+C
 C   Possible future upgrades
 C   ------------------------
 C
@@ -206,38 +206,38 @@ C
 C   History
 C   -------
 C   01-FEB-1989   - Original program (NMJF)
-C   14-JUN-1990   - Parameters in some subroutine calls changed to avoid 
-C                   dimensioning arrays with elements of another array.  Also 
-C                   included call to new LUT routine.  (Temporary measure as 
+C   14-JUN-1990   - Parameters in some subroutine calls changed to avoid
+C                   dimensioning arrays with elements of another array.  Also
+C                   included call to new LUT routine.  (Temporary measure as
 C                   NDP_IMAGE_LUT no longer works...) (JRL)
 C   29-AUG-1990   - New version of NDP_IMAGE_LUT now included.  (JRL)
-C   17-SEP-1990   - No longer replaces magic values with zeros.  This assumes 
-C                   that the data is always going to be greater than zero which 
-C                   in certain cases (e.g. a velocity map) it may not be.  
+C   17-SEP-1990   - No longer replaces magic values with zeros.  This assumes
+C                   that the data is always going to be greater than zero which
+C                   in certain cases (e.g. a velocity map) it may not be.
 C                   They are now replaced by a value which is below the lower
-C                   threshold requested for the plot and/or the contour map.  
-C                   The magic values are now also replaced only in a direct 
-C                   copy of the original file.  This is because if the data 
+C                   threshold requested for the plot and/or the contour map.
+C                   The magic values are now also replaced only in a direct
+C                   copy of the original file.  This is because if the data
 C                   are mapped directly, then any changes will be copied to the
-C                   disk, even if it is mapped READ.  The data pointer for 
-C                   non-FLOAT data which has been mapped FLOAT (e.g. type 
-C                   converted) will be the pointer for a workspace anyway, 
-C                   so the copying only has to be done for FLOAT data which 
+C                   disk, even if it is mapped READ.  The data pointer for
+C                   non-FLOAT data which has been mapped FLOAT (e.g. type
+C                   converted) will be the pointer for a workspace anyway,
+C                   so the copying only has to be done for FLOAT data which
 C                   has been mapped FLOAT.  (JRL)
 C   15-OCT-1991   - Quality arrays implemeted. (GOLDJIL)
 C   07-FEB-1992   - Changed to new NDP 2D gfx routines. (GOLDJIL)
 C   24-NOV-1992   - Unix version (GOLDJIL)
 C+-----------------------------------------------------------------------------
 c
-      implicit none    
+      implicit none
 c
-c   Functions. 
+c   Functions.
 c
       integer   dyn_element,ich_len,pgbegin,dsa_typesize
 c
 c   Local variables.
 c
-      integer   address   
+      integer   address
       logical   axes
       logical   badpix
       logical   badpix1
@@ -274,8 +274,8 @@ c
       real      mag
       integer   ndim
       integer   ndim1
-      integer   nelm      
-      integer   nelm1      
+      integer   nelm
+      integer   nelm1
       character place*2
       logical   qual,qual1
       integer   qptr,q1ptr
@@ -302,8 +302,8 @@ c
       real      vmin
       integer   wptr
       integer   wslot
-      real      ximv(2) 
-      real      yimv(2) 
+      real      ximv(2)
+      real      yimv(2)
 c
       INCLUDE 'DYNAMIC_MEMORY'
       INCLUDE 'MAGIC_VALUES'
@@ -327,7 +327,7 @@ c
      &    ('No screen device selected - use SOFT command.\\N')
         go to 500
       end if
-c                       
+c
 c   Get current PGPLOT hardcopy device.
 c
       call var_getchr('harddev',0,0,harddev,status)
@@ -338,17 +338,17 @@ c
       end if
 c
 c   Get name of image.
-c                        
+c
       call dsa_input('image','image',status)
       if(status.ne.0)go to 500
       call ndp_get_image_info('image',.true.,.false.,type,badpix,status)
-      if(status.ne.0)go to 500  
+      if(status.ne.0)go to 500
 c
 c   Get dimensions of image.
 c
-      call dsa_data_size('image',2,ndim,dims,nelm,status)      
+      call dsa_data_size('image',2,ndim,dims,nelm,status)
       if(status.ne.0)go to 500
-      if(ndim.lt.2)then           
+      if(ndim.lt.2)then
         call dsa_wruser('This is not a 2-D image.\\N')
         go to 500
       end if
@@ -358,21 +358,21 @@ c
       call ndp_axis_range
      &  ('image',dims,ndim,start,end,stapix,endpix,status)
       if(status.ne.0)go to 500
-c                      
+c
 c   Set up dimensions and start and end coordinates in 2-D.
 c
       do i=1,2
         dim2d(i)=dims(i)
-        spx2d(i)=stapix(i)     
+        spx2d(i)=stapix(i)
         epx2d(i)=endpix(i)
-        sta2d(i)=start(i)     
+        sta2d(i)=start(i)
         end2d(i)=end(i)
-      end do   
+      end do
 c
 c   Quality, quality, quality street?
 c
       call dsa_seek_quality('image',qual,status)
-      if (status.ne.0) go to 500  
+      if (status.ne.0) go to 500
 c
 c   Magic values are not to be removed from the data array if no quality
 c   array is present
@@ -387,7 +387,7 @@ c   are already FLOAT then we need to copy the original data over to
 c   a workspace.  This is because the pointer to such data will point
 c   to the actual disk file and thus when the magic values are changed,
 c   (temporarily) it will change them on disk.
-c              
+c
       if (type .ne. 'FLOAT') then
         call dsa_map_data('image','read','FLOAT',address,islot,status)
         if(status.ne.0)go to 500
@@ -396,7 +396,7 @@ c
         bytes = nelm*dsa_typesize('float',status)
         call dsa_get_workspace(bytes,address,islot,status)
         imptr = dyn_element(address)
-        call dsa_map_data('image','read','float',address,tslot,status) 
+        call dsa_map_data('image','read','float',address,tslot,status)
         if (status .ne. 0) go to 500
         tptr = dyn_element(address)
         call gen_move(bytes,dynamic_mem(tptr),dynamic_mem(imptr))
@@ -424,7 +424,7 @@ c   Get range for plot
 c
       call par_rdval('low',vmin,vmax,0.0,' ',low)
       call par_rdval('high',vmin,vmax,0.0,' ',high)
-c                  
+c
 c   Get image viewport location.
 c
       call par_rdchar('place',' ',place)
@@ -432,7 +432,7 @@ c
 c   Get magnification factor.
 c
       call par_rdval('mag',0.1,1.0,1.0,' ',mag)
-c                  
+c
 c   Get label for image.
 c
       call par_rdchar('label',' ',label)
@@ -465,7 +465,7 @@ c
         if(status.ne.0)go to 500
         call ndp_get_image_info
      &    ('image1',.true.,.false.,type1,badpix1,status)
-        if(status.ne.0)go to 500 
+        if(status.ne.0)go to 500
 c
 c   Any quality data in image1 ?
 c
@@ -478,7 +478,7 @@ c
 c
 c   - get image dimensions.
 c
-        call dsa_data_size('image1',2,ndim1,dims1,nelm1,status)      
+        call dsa_data_size('image1',2,ndim1,dims1,nelm1,status)
         if(status.ne.0)go to 500
         if(ndim1.lt.2)then
           call dsa_wruser('This is not a 2-D image.\\N')
@@ -486,35 +486,35 @@ c
         end if
 c
 c   - get coordinate range to be displayed.
-c                        
+c
         call ndp_axis_range
      &    ('image1',dims1,ndim1,start,end,stapix,endpix,status)
         if(status.ne.0)go to 500
-c                      
+c
 c   - set up dimensions and start and end coordinates in 2-D.
 c
         do i=1,2
           dim2d1(i)=dims(i)
-          spx2d1(i)=stapix(i)     
+          spx2d1(i)=stapix(i)
           epx2d1(i)=endpix(i)
-          sta2d1(i)=start(i)     
+          sta2d1(i)=start(i)
           end2d1(i)=end(i)
-        end do     
+        end do
 c
 c   - make sure the two sets of dimensions match.
 c
         do i=1,2
-          if((epx2d1(i)-spx2d1(i)).ne.(epx2d(i)-stapix(i)))then 
+          if((epx2d1(i)-spx2d1(i)).ne.(epx2d(i)-stapix(i)))then
             call dsa_wruser('The two sets of image dimensions ')
             call dsa_wruser('do not match.\\N')
             go to 500
           end if
-        end do            
+        end do
 c
 c   Map data array as FLOAT (this is required by PGPLOT).  If the data
 c   are already FLOAT then we need to copy the original data over to
 c   a workspace.  I've explained why before...
-c              
+c
         if (type1 .ne. 'FLOAT') then
           call dsa_map_data('image1','read','FLOAT',address,i1slot,
      :    status)
@@ -525,7 +525,7 @@ c
           call dsa_get_workspace(bytes1,address,i1slot,status)
           im1ptr = dyn_element(address)
           call dsa_map_data('image1','read','float',address,t1slot,
-     :    status) 
+     :    status)
           if (status .ne. 0) go to 500
           t1ptr = dyn_element(address)
           call gen_move(bytes1,dynamic_mem(t1ptr),dynamic_mem(im1ptr))
@@ -541,7 +541,7 @@ c
         end if
 c
 c   - Set up ranges according to type
-c 
+c
         if(type.eq.'SHORT')then
           vmin=real(min_short)
           vmax=real(max_short)
@@ -556,7 +556,7 @@ c
         call par_rdval('high1',vmin,vmax,0.0,' ',high1)
 c
 c   - get number of contour levels and compute their values.
-c                       
+c
         call par_rdval('levels',1.0,30.0,10.0,' ',dumreal)
         levels=int(dumreal)
         if(levels.gt.1)then
@@ -582,11 +582,11 @@ c
         call par_rdchar('table',' ',table)
 c
 c   - get instruction to erase screen.
-c         
+c
         call par_rdkey('erase',.false.,erase)
       end if
 c
-c   Open required plot device.       
+c   Open required plot device.
 c
       if(.not.hard)then
         if(erase)then
@@ -648,9 +648,9 @@ c
      &    (dynamic_mem(im1ptr),dim2d1(1),dim2d1(2),spx2d1,epx2d1,
      &     sta2d1,end2d1,values,levels,ximv,yimv)
       end if
-c                            
+c
 c   Tidy and exit
-c          
+c
   500 continue
       call pgend
       call dsa_close(status)
@@ -662,8 +662,8 @@ c
 
       subroutine depict_contour
      &  (array,nx,ny,stapix,endpix,start,end,values,levels,ximv,yimv)
-c     
-      implicit none              
+c
+      implicit none
 c
 c   Parameters.
 c
@@ -672,7 +672,7 @@ c
      &              ximv(2),yimv(2)
 c
 c   Local variables.
-c                   
+c
       real          tran(6)
 c
 c   Define contour map viewport.
@@ -683,7 +683,7 @@ c   Set world coordinates to axis units.
 c
       call pgwindow(start(1),end(1),start(2),end(2))
 c
-c   Compute transformation array for contour plot. The world coordinates of the 
+c   Compute transformation array for contour plot. The world coordinates of the
 c   array point ARRAY(I,J) are are given by:
 c   X = TRAN(1) + TRAN(2)*I + TRAN(3)*J
 c   Y = TRAN(4) + TRAN(5)*I + TRAN(6)*J

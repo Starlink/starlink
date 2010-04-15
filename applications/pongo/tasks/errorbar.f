@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
       LOGICAL PON_DEVOP          ! PGPLOT device is open
       EXTERNAL CHR_SIMLR
       LOGICAL CHR_SIMLR          ! Strings are similar
-      
+
 *  Local Variables:
       CHARACTER * ( 20 ) ACTION
 
@@ -111,7 +111,7 @@
 
 *  Check a plotting device is open.
       IF ( .NOT. PON_DEVOP( .TRUE., STATUS ) ) GO TO 99
-      
+
       CALL PAR_GET0C( 'ACTION', ACTION, STATUS )
       CALL PAR_GET0L( 'SYMERR', SYMERR, STATUS )
       CALL PAR_GET0R( 'ERTERM', ERTERM, STATUS )
@@ -133,7 +133,7 @@
                      ELSE
                         TEMP2=-999
                      ENDIF
-                  ELSE 
+                  ELSE
                      TEMP1=REAL(XDATA(IDAT))
                      IF(ERRX(IDAT).GT.0) THEN
                         TEMP2=LOG10(ERRX(IDAT))
@@ -172,7 +172,7 @@
                      ELSE
                         TEMP2=-999
                      ENDIF
-                  ELSE 
+                  ELSE
                      TEMP1=REAL(YDATA(IDAT))
                      IF(ERRY(IDAT).GT.0) THEN
                         TEMP2=LOG10(ERRY(IDAT))
@@ -204,7 +204,7 @@
          CALL ERR_REP( 'ERRORB_END',
      :'ERRORBAR: Unable to draw error bars on the plotted data.',
      :                 STATUS )
-         
+
       END IF
       END
 * $Id$

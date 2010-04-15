@@ -1,4 +1,4 @@
-*+  IO2RO - top level subroutine for A-task monolith 
+*+  IO2RO - top level subroutine for A-task monolith
 
       SUBROUTINE IO2RO (STATUS)
 
@@ -45,7 +45,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'PAR_PAR'          ! necessary for non-VMS 
+      INCLUDE  'PAR_PAR'          ! necessary for non-VMS
       INCLUDE  'CHR_ERR'
 
 
@@ -72,7 +72,7 @@
       CALL CHR_UCASE( NAME )
 
 *    check the string against valid A-task names - if matched then
-*    call the relevant A-task 
+*    call the relevant A-task
 *    (actually only one task currently)
 
       IF( NAME .EQ. 'REDUCE') THEN
@@ -88,7 +88,7 @@
         CALL MSG_OUT( 'ERR', 'No such IO2RO action exists',
      :                 STATUS )
         CALL MSG_SETC( 'NAME', NAME)
-        CALL MSG_OUT( 'MESSAGE', 'Action requested was ^NAME', 
+        CALL MSG_OUT( 'MESSAGE', 'Action requested was ^NAME',
      :                 STATUS)
 
       END IF

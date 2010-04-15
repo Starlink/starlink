@@ -1,9 +1,9 @@
 **==rdaray.spg  processed by SPAG 4.54K  at 14:22 on  4 Oct 1996
- 
+
 ************************************************************************
- 
+
       SUBROUTINE RDARAY(ENVIRO,LX,LY,MX,MY,NX,FUNC,IFLAG)
- 
+
 *+
 *  Name :
 *     RDARAY
@@ -88,20 +88,20 @@
 *-
 *  Type Definitions :
       IMPLICIT NONE
- 
+
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
- 
+
 *    Global variables :
 *   ...Daophot picture size:
       INTEGER NCOL
       INTEGER NROW
       COMMON /SIZE  / NCOL , NROW
- 
+
       INCLUDE 'ndf_cmn'         ! Common block for NDF information
       INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
- 
+
 *  Arguments Given :
       CHARACTER*(*) ENVIRO      ! Environment whose data is to be read
       INTEGER LX                ! X coordinate of first sub-array corner
@@ -109,13 +109,13 @@
       INTEGER MX                ! Number of sub-array columns
       INTEGER MY                ! Number of sub_array rows
       INTEGER NX                ! First dimension of FUNC array
- 
+
 *  Arguments Returned :
       REAL FUNC(NX,*)           ! Array to hold sub-array data values
- 
+
 *  Status :
       INTEGER IFLAG             ! Daophot status variable
- 
+
 *  Local variables :
       INTEGER STATUS            ! HDS error status
       INTEGER J                 ! Loop counter for data rows
@@ -132,10 +132,10 @@
       INTEGER NERR
       INTEGER UBND(2)           ! Upper bounds of NDF
 *.
- 
+
 *   Initialise the HDS status variable.
       STATUS = SAI__OK
- 
+
 *   Adjust the sub-array bounds so that it lies within the DATA_ARRAY.
       MX = LX + MX - 1  ! Upper limit in X
       MY = LY + MY - 1  ! Upper limit in Y
@@ -145,19 +145,19 @@
       IF ( MY.GT.NROW ) MY = NROW
       MX = MX - LX + 1  ! Number of pixels in X
       MY = MY - LY + 1  ! Number of pixels in Y
- 
+
 *   Return if the sub-array lies completely outside the main array.
       IF ( (MX.LE.0) .OR. (MY.LE.0) ) RETURN
- 
+
 *   Select the identifier associated with the specified environment.
 *   ..."DATA" environment:
       IF ( ENVIRO.EQ.'DATA' ) THEN
          NDF_ISEL = NDF_IDATA
- 
+
 *   ..."COPY" environment:
       ELSE IF ( ENVIRO.EQ.'COPY' ) THEN
          NDF_ISEL = NDF_ICOPY
- 
+
 *   ...environment not known, so report an error:
       ELSE
          CALL TBLANK
@@ -170,41 +170,41 @@
       CALL NDF_BOUND(NDF_ISEL,2,LBND,UBND,NDIM,STATUS)
       OFFS(1) = LBND(1) - 1
       OFFS(2) = LBND(2) - 1
- 
+
 *   Loop to read each line of the sub-array from the DATA_ARRAY.
       DO 100 J = 1 , MY
- 
+
 *   Locate the required slice of the DATA_ARRAY.
-         DIML(1) = OFFS(1) + LX 
+         DIML(1) = OFFS(1) + LX
          DIMU(1) = OFFS(1) + LX + MX - 1
          DIML(2) = OFFS(2) + LY + J - 1
          DIMU(2) = DIML(2)
          CALL NDF_SECT(NDF_ISEL,2,DIML,DIMU,NDF_ISECT,STATUS)
- 
+
 *   Obtain a pointer to the mapped DATA_ARRAY component
          CALL NDF_MAP(NDF_ISECT,'DATA','_REAL','READ',IPNTR,NELE,STATUS)
- 
+
 *   Read the data into the given array
          CALL VEC_RTOR(.FALSE.,MX,%VAL(CNF_PVAL(IPNTR)),
      :                 FUNC(1,J),IERR,NERR,STATUS)
- 
+
 *   Unmap the data and annul the identifier
          CALL NDF_UNMAP(NDF_ISECT,'DATA',STATUS)
          CALL NDF_ANNUL(NDF_ISECT,STATUS)
  100  CONTINUE
- 
+
 *   Report any errors.
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL TBLANK
          CALL ERR_REP(' ','RDARAY - error reading data',STATUS)
       END IF
- 
+
 *   Set the Daophot status flag.
       IF ( STATUS.EQ.SAI__OK ) THEN
          IFLAG = 0
       ELSE
          IFLAG = STATUS
       END IF
- 
+
 *   Exit routine.
       END

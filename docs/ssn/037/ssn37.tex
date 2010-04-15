@@ -40,7 +40,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -189,12 +189,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -227,7 +227,7 @@
 \renewcommand{\thepage}{\arabic{page}}
 % \setcounter{page}{1}
 
-\section{\label{introduction}\xlabel{introduction}Introduction} 
+\section{\label{introduction}\xlabel{introduction}Introduction}
 
 There is already a very large amount of documentation on Unix security,
 indeed too much for your average site manager to find time to read. The
@@ -309,10 +309,10 @@ other flavour of Unix, such as Digital Unix or Linux.
 
 \section{\label{securing_your_system}\xlabel{securing_your_system}Securing your system}
 
-This is not a description on how to weld your system shut. 
+This is not a description on how to weld your system shut.
 Such actions are likely to reduce the usability of your system
 to the extent that your users complain. Instead emphasis is placed
-on plugging up loopholes and avoiding bad practise. 
+on plugging up loopholes and avoiding bad practise.
 
 The following list is far from complete. Only a small selection of the more
 important issues are considered. Site managers wishing further
@@ -337,7 +337,7 @@ booted single user, if possible. Additionally, remote login as root
 should be disabled.  Root logins can still be accomplished, but users
 must first login as a user and then {\tt su} to root. This is done for
 logging and accountability purposes. Both are the default on Solaris
-2.x but the former is not for Digital Unix. 
+2.x but the former is not for Digital Unix.
 
 \subsection{Passwords}
 
@@ -371,7 +371,7 @@ You should be aware that programs for cracking passwords are not very
 complex. You can do it in 32 lines of C. More sophisticated versions are
 considerably longer but can crack even some very obscure passwords.
 
-\subsubsection{Old and new accounts} 
+\subsubsection{Old and new accounts}
 
 This is an area for potential security lapses. Make sure that new
 accounts have passwords on them as soon as they are created and ensure
@@ -415,11 +415,11 @@ Here are a couple of ``gotchas'' which are worth bearing in mind.
 
 \begin{itemize}
 \item To delete a file, you just need ``write access'' to the directory
-in which it is in and not the file. 
+in which it is in and not the file.
 \item Always send a new user a welcoming mail message. The mail directory
 has public write access (to allow mail delivery) but consequently if
 a user does not already have a mail file there, then another user could
-create that file before they receive any mail and place a ``spoof'' message 
+create that file before they receive any mail and place a ``spoof'' message
 in it.
 \end{itemize}
 
@@ -446,7 +446,7 @@ thumb are:
 \begin{itemize}
 \item Don't run code as root unless you have to
 \item Don't run setuid programs unless you have to. If it is necessary
-to run such a program or script, take a look at it first. 
+to run such a program or script, take a look at it first.
 \end{itemize}
 
 If for some reason you think you need to write a setuid script, try and think
@@ -486,7 +486,7 @@ Suppose you have a sensitive document that you don't want anyone else
 to read (\emph{e.g.}, the scientific discovery of the century, or more likely
 a staff report). You can use {\tt chmod} to ensure that no-one but
 yourself and root can read it. If there are other users of the system
-with knowledge of the root account, then your document is not secure. 
+with knowledge of the root account, then your document is not secure.
 Under Solaris 2.5 it is possible to easily encrypt your documents so that
 a password is required in order to render them readable. One option is
 to use {\tt vi -x}. This prompts for a password and the resultant file
@@ -498,10 +498,10 @@ nor Linux.
 
 \subsection{C2 security}
 
-The U.S. government's security classification system called Orange Book 
+The U.S. government's security classification system called Orange Book
 defines a series of divisions for D (least secure) to A (most secure)
 and levels within those divisions. Division D (minimal protection)
-covers systems such as PCs running DOS. 
+covers systems such as PCs running DOS.
 
 Division C, level 1 (discretionary security protection) is where most
 Unix systems come in (\emph{i.e.}, they have the concept of users, with users
@@ -536,32 +536,32 @@ What might a hacker do once he/she has access to your system? Here are
 a some of the tools of the trade:
 
 \begin{description}
-\item {\bf Holes} -- 
-Just poor security. Some flavours of Unix as supplied by the manufacturer 
-are full of holes. 
-\item {\bf Trojan Horses} -- 
+\item {\bf Holes} --
+Just poor security. Some flavours of Unix as supplied by the manufacturer
+are full of holes.
+\item {\bf Trojan Horses} --
 Where something is placed on your system for activation later -- either at the
 request of the person who placed it, or by a user (or you) accidentally falling over it.
-\item {\bf Worms} -- 
+\item {\bf Worms} --
 Where a system gains illegal access to your workstation over the network,
 copies itself onto your system, and start trying to gain access to the next
-system. 
-\item {\bf Viruses} -- 
-Where a program `fragment' attaches itself to another program and keeps replicating within further applications as they are run. These are almost unheard of 
+system.
+\item {\bf Viruses} --
+Where a program `fragment' attaches itself to another program and keeps replicating within further applications as they are run. These are almost unheard of
 on Unix.
-\item {\bf Mimics/spoofs} -- 
-Programs that appear to be what they are not. Spoofing a login session 
+\item {\bf Mimics/spoofs} --
+Programs that appear to be what they are not. Spoofing a login session
 on Unix requires a trivial 13 line script and can be run by any user and
 there is very little that you can do about it. Only users who already have
 an account on the system can do this but it might appeal to students
 wanting to pinch each others passwords.
-Use of X-terminals and X-based login sessions prevents this. 
+Use of X-terminals and X-based login sessions prevents this.
 \end{description}
 
 How do you know if your security has been breached? What should you do
 if you receive a CERT announcement that many machines have been
-hacked via an operating system loophole? Here is a list of things to 
-look for on your system that may indicate that you have received a 
+hacked via an operating system loophole? Here is a list of things to
+look for on your system that may indicate that you have received a
 visit from a hacker:
 
 \begin{enumerate}
@@ -569,7 +569,7 @@ visit from a hacker:
 \item Look for a {\tt .exrc} file in {\tt /tmp}
 \item Look for extra lines added to the end of {\tt /etc/passwd}
 \item Look for shells with the {\tt `s'} bit set (see below)
-\item Look for other accounts with UID {\tt `0'} 
+\item Look for other accounts with UID {\tt `0'}
 \end{enumerate}
 
 This can be done automatically via scripts run from {\tt cron} and the
@@ -617,14 +617,14 @@ but here are a few useful examples:
 Some system commands are supposed to have this permission (\emph{e.g.},
 {\tt passwd} but not, for example, shells (\emph{e.g.}, {\tt csh}).
 
-\item Search from the current directory downwards for files 
+\item Search from the current directory downwards for files
 which have been changed in the last 3 days:
 \begin{quote} {\tt find . -ctime -3 -print} \end{quote}
 This command is also useful for finding out who has recently filled up a disk.
 
 \item Search for setuid files which have been modified in the last 3 days
 (there should be none!):
-\begin{quote} {\tt find / -mount -type f -perm -4000 -mtime -3 -ls} \end{quote} 
+\begin{quote} {\tt find / -mount -type f -perm -4000 -mtime -3 -ls} \end{quote}
 This is a good one to have as a {\tt cron} job.
 
 \item Look for files recently altered in {\tt /usr}:
@@ -646,14 +646,14 @@ Look for funny looking devices. Why? A hacker with temporary
 access to the root account can create a new device with the same major
 and minor device numbers as, say, the system disk and then make himself
 the owner of that new device. He could then bypass all the Unix file
-system security and get at the raw system disk from his own account. 
+system security and get at the raw system disk from his own account.
 
 \end{itemize}
 
 \subsection{Monitoring users}
 
 System administrators are not permitted to monitor users actions
-without their knowledge. 
+without their knowledge.
 
 However, you should be aware that Unix has plenty of commands for
 monitoring system usage which might be invaluable when chasing a
@@ -666,9 +666,9 @@ hacker.
 \item {\tt grep su /var/adm/messages} (to check who been using the {\tt su} command)
 \end{itemize}
 
-To ``tune'' what sort of messages go into {\tt /var/adm/messages}, use the 
+To ``tune'' what sort of messages go into {\tt /var/adm/messages}, use the
 file {\tt /etc/syslog.conf}. You can also divert messages to a
-private file. 
+private file.
 
 %------------------------------------------------------------------------
 
@@ -697,7 +697,7 @@ covers:
 \item Cover for consequential loss \emph{i.e.}, loss of data?
 
 \item Cover for hiring equipment temporarily until permanent replacements
-are bought? Starlink will of course try to help in any way possible to 
+are bought? Starlink will of course try to help in any way possible to
 provide stop-gap hardware but in practise, we seldom have unused hardware
 available.
 
@@ -705,11 +705,11 @@ available.
 
 \item Is your hardware properly maintained? Starlink maintains most of
 the hardware at most sites but there are exceptions, particularly
-new sites which arrange their own maintenance via starter grants. 
+new sites which arrange their own maintenance via starter grants.
 Even if Starlink is nominally maintaining your hardware, be sure that
 you have actually told RAL about your new equipment and its serial numbers
-and that all your equipment is actually on a maintenance schedule 
-(see \xref{SGP/25}{sgp25}{} for further details). 
+and that all your equipment is actually on a maintenance schedule
+(see \xref{SGP/25}{sgp25}{} for further details).
 
 
 \item Is your system regularly backed up and are the backup tapes
@@ -727,58 +727,58 @@ in case of emergency.
 
 \item Do you have detailed records of your current system setup?
 If your entire system was stolen/destroyed, do you have sufficient
-information to re-construct it? Here is a list of the sort of information 
+information to re-construct it? Here is a list of the sort of information
 you would need:
 
 \begin{enumerate}
 
 \item Inventory list with model names and serial numbers for every piece
-of equipment. You will need this not only so that you know what you need to 
+of equipment. You will need this not only so that you know what you need to
 order in the way of replacements but also because this information will
-almost certainly be required for your insurance claim. 
+almost certainly be required for your insurance claim.
 
-\item Configuration diagram. You will need to know how all these pieces 
+\item Configuration diagram. You will need to know how all these pieces
 of equipment fitted together. Which disks were on which machines?
-What were the disks called, or the machines for that matter. 
+What were the disks called, or the machines for that matter.
 
 \item Detailed system-by-system configuration information. For example,
 you will need the hostid if you have commercial software tied to that machine
 (For example, Sun can give you a new machine with a specified hostid). Also
 you will need listings of disk partitions so that you can restore your
-backups. 
+backups.
 
 \begin{enumerate}
 
 \item Machine details (Hostname, model type, \emph{etc.})
 \begin{quote} {\tt uname -a} \end{quote}
 
-\item hostid 
+\item hostid
 \begin{quote} {\tt hostid} \end{quote}
 
-\item eeprom details 
+\item eeprom details
 \begin{quote} {\tt /usr/sbin/eeprom} (Solaris 2.x) \end{quote}
 
-\item Processor details 
+\item Processor details
 \begin{quote} {\tt /usr/sbin/psrinfo -v} \end{quote}
 
-\item Memory details 
+\item Memory details
 \begin{quote} {\tt /usr/sbin/prtconf | grep Memory} \end{quote}
 
-\item Disk information  
+\item Disk information
 \begin{quote} {\tt /usr/sbin/prtvtoc} {\it raw disk} (Solaris 2.x) \end{quote}
 
-\item showrev information, including patch level 
+\item showrev information, including patch level
 \begin{quote} {\tt /usr/bin/showrev -a} (Solaris 2.x) \end{quote}
 
 \end{enumerate}
 
 Scripts to gather most of this information for you for both Solaris and
-Digital Unix are available via the \htmladdnormallink{Starlink 
+Digital Unix are available via the \htmladdnormallink{Starlink
 security WWW pages.}{http://www.starlink.ac.uk/\~{}cac/security}
 
 Example output from such a script showing, the sort of information you
-may need for system recovery, can be found in 
-\htmlref{Appendix A}{system_recovery}. Make sure that 
+may need for system recovery, can be found in
+\htmlref{Appendix A}{system_recovery}. Make sure that
 you keep a paper copy of this file!
 
 \item Backups of your file system. Make sure that you know which are the last
@@ -796,15 +796,15 @@ set of tapes, when they were written and how to restore from them.
 
 This topic is discussed in gory detail in almost every Unix systems
 administration or security guide and hence I will not repeat that
-information again here (a brief summary is given in 
+information again here (a brief summary is given in
 \htmlref{Appendix B}{app_trusted_host_security}
-for your convenience). 
+for your convenience).
 Instead, I will make some general comments and give a few
 examples of why these files can be dangerous.
 
 Some people argue that these files should not be used at all due to
 their potential security risks: {\tt .rhosts} files are bad once your
-system has been hacked because the hacker gets immediate access to 
+system has been hacked because the hacker gets immediate access to
 other systems.
 
 However, I personally don't see a problem using {\tt .rhosts} to allow
@@ -822,16 +822,16 @@ file and can (through error or otherwise) configure it so that
 non-accredited users can gain access \emph{i.e.}, without any reference to
 you the system manager. For example, one Starlink site
 reported that a user trusted hosts from several domains in Spain
-with a wildcard in the user field because ``he had a different 
+with a wildcard in the user field because ``he had a different
 username there''. In practise, this meant that this user had given access
-to the system to {\em any} user on those remote Spanish systems.  
+to the system to {\em any} user on those remote Spanish systems.
 
 I use a {\tt .rhosts} file within our own cluster (\emph{i.e.}, machines
 which share the same password information) but would not use it
 between, for example, Starlink sites.
 
 The following examples refer to files under the control of the system
-administrator. 
+administrator.
 
 \begin{description}
 
@@ -940,9 +940,9 @@ Hardware provider: Sun_Microsystems
 Domain: ral_project.starlink.uk
 Kernel version: SunOS 5.5 Generic November 1995
 
-OpenWindows version: 
+OpenWindows version:
 OpenWindows Version 3.5 29 September 1995
-Patch: 101911-01  Obsoletes:   Packages: SPROf77.2 3.0.1,PATCH=01, 
+Patch: 101911-01  Obsoletes:   Packages: SPROf77.2 3.0.1,PATCH=01,
    SPROlang.2 3.0.1,PATCH=01
 ----------------------------------------------------------
 Disk information

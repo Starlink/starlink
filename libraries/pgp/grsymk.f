@@ -129,7 +129,7 @@ C   80:87 P Q R S T U V W
       DATA (HERSH( 85,K),K=1,4) / 521,2021,2071,2571/
       DATA (HERSH( 86,K),K=1,4) / 522,2022,2072,2572/
       DATA (HERSH( 87,K),K=1,4) / 523,2023,2073,2573/
-C   88:95 X Y Z bracketleft 
+C   88:95 X Y Z bracketleft
 C         backslash bracketright asciicircum underscore
       DATA (HERSH( 88,K),K=1,4) / 524,2024,2074,2574/
       DATA (HERSH( 89,K),K=1,4) / 525,2025,2075,2575/
@@ -261,7 +261,7 @@ C   192:199 Agrave Aacute Acircumflex Atilde Aring AE Ccedilla
       DATA (HERSH(197,K),K=1,4) / 501,2078,2051,2551/
       DATA (HERSH(198,K),K=1,4) / 699,2199,2199,2199/
       DATA (HERSH(199,K),K=1,4) / 503,2003,2053,2553/
-C   200:207 Egrave Eacute Ecircumflex Edieresis 
+C   200:207 Egrave Eacute Ecircumflex Edieresis
 C           Igrave Iacute Icircumflex Idieresis
       DATA (HERSH(200,K),K=1,4) / 505,2005,2055,2555/
       DATA (HERSH(201,K),K=1,4) / 505,2005,2055,2555/
@@ -271,7 +271,7 @@ C           Igrave Iacute Icircumflex Idieresis
       DATA (HERSH(205,K),K=1,4) / 509,2009,2059,2559/
       DATA (HERSH(206,K),K=1,4) / 509,2009,2059,2559/
       DATA (HERSH(207,K),K=1,4) / 509,2009,2059,2559/
-C   208:215 Eth Ntilde Ograve Oacute 
+C   208:215 Eth Ntilde Ograve Oacute
 C           Ocircumflex Otilde Odieresis multiply
       DATA (HERSH(208,K),K=1,4) / 504,2004,2054,2554/
       DATA (HERSH(209,K),K=1,4) / 514,2014,2064,2564/
@@ -300,7 +300,7 @@ C   224:231 agrave aacute acircumflex atilde aring ae ccedilla
       DATA (HERSH(229,K),K=1,4) / 601,2101,2151,2651/
       DATA (HERSH(230,K),K=1,4) / 699,2199,2199,2199/
       DATA (HERSH(231,K),K=1,4) / 603,2103,2153,2653/
-C   232:239 egrave eacute ecircumflex edieresis 
+C   232:239 egrave eacute ecircumflex edieresis
 C           igrave iacute icircumflex idieresis
       DATA (HERSH(232,K),K=1,4) / 605,2105,2155,2655/
       DATA (HERSH(233,K),K=1,4) / 605,2105,2155,2655/
@@ -310,7 +310,7 @@ C           igrave iacute icircumflex idieresis
       DATA (HERSH(237,K),K=1,4) / 609,2109,2159,2659/
       DATA (HERSH(238,K),K=1,4) / 609,2109,2159,2659/
       DATA (HERSH(239,K),K=1,4) / 609,2109,2159,2659/
-C   240:247 eth ntilde ograve oacute 
+C   240:247 eth ntilde ograve oacute
 C           ocircumflex otilde odieresis divide
       DATA (HERSH(240,K),K=1,4) / 699,2199,2199,2199/
       DATA (HERSH(241,K),K=1,4) / 614,2114,2164,2664/

@@ -37,7 +37,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -188,12 +188,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -227,10 +227,10 @@
 \section{Introduction}
 The present procedure for reporting bugs in the Starlink Software Collection is
 thought by many to be unsatisfactory. The purpose of this document is to outline
-the procedures to be followed by the person discovering the bug, the Starlink 
+the procedures to be followed by the person discovering the bug, the Starlink
 Software Librarian and the person to whom the bug is reported. In the past,
 bug reports have seemed to disappear down a black hole, with a fix (maybe)
-appearing, without warning, sometime later. This was generally due to a lack of 
+appearing, without warning, sometime later. This was generally due to a lack of
 communication on all parts and it is hoped that the procedures outlined below
 will keep all users informed of the progress of a bug through the system.
 
@@ -246,7 +246,7 @@ process.} will then acknowledge the user's note within $1/2$ working day.
 Having received the bug report, STAR will then forward all the details to the
 person(s) responsible for supporting the software (as given in the Starlink
 Software Index). A VAX NOTES conference has been set up to allow the
-progress of a bug to be followed. Each note will be a particular 
+progress of a bug to be followed. Each note will be a particular
 bug report
 with the name of the person dealing with the problem. The replies will consist
 of information from the person supporting the software as to possible fixes.
@@ -261,7 +261,7 @@ The four keywords will identify the bug by the following categories:
 \begin{enumerate}
 \item The name of the software item,
 \item Whether the item is {\bf SUPPORTED} or {\bf UNSUPPORTED},
-\item The  status of the bug, 
+\item The  status of the bug,
 \begin{enumerate}
 \item {\bf ACTIVE} -- under investigation.
 \item {\bf FEATURE} -- may or may not be fixed in a forthcoming release.
@@ -288,26 +288,26 @@ become a `free for all' and some order can be maintained.
 \subsubsection{Bug status}
 An {\bf ACTIVE} bug is currently being investigated by the support programmer
 and its progress can be followed in the conference. A {\bf FEATURE}, is a `bug'
-which has a known cause/effect and possibly has a workround. 
+which has a known cause/effect and possibly has a workround.
 It may be that it will be
 fixed in a forthcoming release or that it is a true feature of the software and
-may not be fixed. A {\bf FIXED} bug is where a fix or patch has been supplied 
-and is awaiting release in a Starlink Software Change. It may be that the bug 
-is not reproduceable by the support programmer (over a period of time), the 
-bug will go into a state of {\em suspended animation} and assigned the status 
+may not be fixed. A {\bf FIXED} bug is where a fix or patch has been supplied
+and is awaiting release in a Starlink Software Change. It may be that the bug
+is not reproduceable by the support programmer (over a period of time), the
+bug will go into a state of {\em suspended animation} and assigned the status
 of {\bf SUSPEND}. The keyword {\bf DEAD} will be assigned to a bug that has
 been fixed and released. Periodically all DEAD bugs will be extracted from the
 conference and archived.
 \subsubsection{Severity of bugs}
 This class of keywords is designed to inform the user as to whether the bug
 will cause {\bf SEVERE} disruption or just a {\bf MINOR} inconvenience. The
-keyword {\bf PATCH} indicates a minor bug with a possible workround 
+keyword {\bf PATCH} indicates a minor bug with a possible workround
 until the bug is fixed properly.
 \subsection{Using the VAX Notes KEYWORD facility}
 As described above, each note will be assigned 4 keywords. To search for all
 bugs on a specific software item, you would type:
 \begin{verbatim}
-        Notes> DIRECTORY/KEYWORD=<item>  
+        Notes> DIRECTORY/KEYWORD=<item>
 \end{verbatim}
 Where {\em item} is ADAM, FIGARO  etc.
 and similarly for the keywords in the other categories.
@@ -316,5 +316,5 @@ and similarly for the keywords in the other categories.
 Once the support programmer receives a bug report from STAR, s/he should put a
 reply in the topic associated with that bug containing any information relating
 to the bug. As progress is made in fixing the bug, replies should be entered
-so that users can follow its progress. 
+so that users can follow its progress.
 \end{document}

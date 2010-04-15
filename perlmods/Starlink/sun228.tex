@@ -129,7 +129,7 @@ GSD format data files.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -284,12 +284,12 @@ GSD format data files.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -340,14 +340,14 @@ GSD format data files.
 The \textsc{Starperl} package provides modules for perl/Starlink
 interoperability. The purpose of this package is to allow access to the
 Starlink infrastructure libraries from the \xref{perl}{sun193}{} programming
-language. Modules provided by this packages support  \ndf\ and \gsd\ file I/O, 
+language. Modules provided by this packages support  \ndf\ and \gsd\ file I/O,
 the \ADAM\ messaging system, the \ems\ messaging layer  and an interface to
 the Noticeboard system. Additionally a module is provided for determining the
 version number of any installed Starlink package.
 
 \section{The usefulness of this package\label{stats}}
 
-The \ndf\ module can be used for reading, writing and modifying 
+The \ndf\ module can be used for reading, writing and modifying
 the standard Starlink data format (NDF and HDS). This can be
 very useful for changing headers and determining file properties
 from within a program without having to launch \Kappa.
@@ -395,7 +395,7 @@ The Starlink::HDSPACK module provides a \perl\ alternative to using the
 
 All the modules from this distribution are placed in the \texttt{Starlink::}
 hierarchy so that Starlink \perl\ functionality does not clash with existing
-modules.  The exceptions are the file I/O \ndf\ and \gsd\ modules which have 
+modules.  The exceptions are the file I/O \ndf\ and \gsd\ modules which have
 their own namespace.
 
 The individual modules are discussed in the following sections.
@@ -481,7 +481,7 @@ ems1_get_facility_error($status, $facility, $ident, $text);
 
 When passed a status error code, this routine returns the facility
 name, error identifier and error message. It is used by the perl/ADAM
-module to decode error status codes returned by ADAM monoliths. 
+module to decode error status codes returned by ADAM monoliths.
 
 Generic status values can be imported with the '\texttt{sai}' tag:
 
@@ -496,7 +496,7 @@ $err  = SAI__ERROR;
 \end{myquote}
 % $
 
-An interface to MERS (\xref{SUN/104}{sun104}{}) is provided by the 
+An interface to MERS (\xref{SUN/104}{sun104}{}) is provided by the
 the \texttt{NDF} module (see \S\ref{ndfperl})
 
 \section{NDF\label{ndfperl}}
@@ -587,7 +587,7 @@ print "An error occurred\n" if ($status != &NDF::SAI__OK);
 \end{verbatim}
 \end{myquote}
 
-At present all the \texttt{DAT\_\_}, \texttt{ERR\_\_}, \texttt{EMS\_\_}, 
+At present all the \texttt{DAT\_\_}, \texttt{ERR\_\_}, \texttt{EMS\_\_},
 \texttt{MSG\_\_} and \texttt{SAI\_\_} constants are available.  More
 can be included as more C include files are created.  In the absence of
 the necessary include files a request for a specific compiler constant
@@ -603,9 +603,9 @@ pointers to the data arrays. These pointers are handled differently in
 
 To read a mapped array you must first \emph{copy\/} the data from the mapped
 array into a \perl\ array. Modifiying this \perl\ array \emph{will not\/} change
-the mapped array. The \perl\ array must be copied back into the mapped 
+the mapped array. The \perl\ array must be copied back into the mapped
 array for any changes to become permanent. To reduce resource requirements
-you may want to unmap the array as soon as it has been copied to the 
+you may want to unmap the array as soon as it has been copied to the
 \perl\ array. Currently there is no way to access the mapped data directly.
 
 In \perl\ the array must first be packed into a single string and this
@@ -736,7 +736,7 @@ access the \texttt{nth} entry via
 ($keyword, $value, $comment) = fits_extract_key_val($fits[$n]);
 \end{verbatim}
 \end{myquote}
-% $ 
+% $
 
 To find out the value that goes with a keyword:
 
@@ -817,7 +817,7 @@ used.
 \subsubsection{Function calls}%
 \index{Function calls}
 
-The commands in this module use  \perl\ prototypes to check argument 
+The commands in this module use  \perl\ prototypes to check argument
 passing. This means that arrays do not have to be referenced when being
 used as arguments \emph{unless\/} the routine is called with an \texttt{\&}.
 
@@ -836,14 +836,14 @@ $value = &fits_get_item(\@fits, $keyword);
 \end{myquote}
 
 are correct but
-\begin{myquote} 
+\begin{myquote}
 \begin{verbatim}
 $value = &fits_get_item(@fits, $keyword);
 \end{verbatim}
 \end{myquote}
 
 will fail because \perl\ will pass all the members of the array and not the
-reference to the array. 
+reference to the array.
 
 \subsubsection{Arrays}%
 \index{Arrays}
@@ -900,7 +900,7 @@ matching the \texttt{obs*.sdf} pattern (such as \texttt{obs1.sdf},
 
 This is what needs to happen in such as script
 
-\begin{itemize} 
+\begin{itemize}
 
 \item The Starlink modules are included
 
@@ -972,10 +972,10 @@ foreach my $file (<obs*.sdf>) {
 The perl-ADAM interface is made of four modules:
 
 \begin{description}
-\item[Starlink::ADAM] 
+\item[Starlink::ADAM]
 
 This is the low-level interface to libams. It should not be used directly
-unless you are familiar with the AMS library.\footnote{In future releases this 
+unless you are familiar with the AMS library.\footnote{In future releases this
 module might be renamed to Starlink::AMS::AMSLib. If this happens a stub
 interface to Starlink::ADAM will be provided.} This module does provide
 access to constants such as SAI\_\_OK and DTASK\_\_ACTCOMPLETE.
@@ -1010,7 +1010,7 @@ This class is responsible for starting the messaging layer (unlike
 the code is loaded) and controlling the user-interface to the messaging system
 (such as timeouts and where the replies from the monolith are sent).
 
-The messaging is initialised by creating a new instance of 
+The messaging is initialised by creating a new instance of
 a Starlink::AMS::Init object. All further attempts to create a new
 instance of this object will result in the \emph{same} object being
 returned (i.e.\ only one instance of this object will actually exist).
@@ -1032,7 +1032,7 @@ monoliths. The monoliths can be launched as either A-tasks (where the
 parameters are reset after each message and values stored in a
 file in the ADAM\_USER directory) or as I-tasks (where the state
 of the parameters is retained in the monolith). The default is to launch
-monoliths as A-tasks since this replicates the behaviour seen from 
+monoliths as A-tasks since this replicates the behaviour seen from
 \xref{ICL}{sg5}{} and the Unix shell.
 
 Example usage is:
@@ -1052,24 +1052,24 @@ $kappa->control("par_reset");
 \subsection{Constants}
 
 Compiler constants are made available via the Starlink::ADAM module.
-The available constants are: 
+The available constants are:
 
 \begin{myquote}
-SAI\_\_OK, SAI\_\_WARN, SAI\_\_ERROR\footnote{The 
+SAI\_\_OK, SAI\_\_WARN, SAI\_\_ERROR\footnote{The
 SAI\_\_ constants are also available from the NDF and the
 Starlink::EMS modules},
 
-DTASK\_\_ACTSTART, DTASK\_\_ACTCOMPLETE, 
+DTASK\_\_ACTSTART, DTASK\_\_ACTCOMPLETE,
 
 MESSYS\_\_INFINITE, MESSYS\_\_PARAMREQ, MESSYS\_\_PARAMREP, MESSYS\_\_INFORM,
 MESSYS\_\_SYNC, MESSYS\_\_SYNCREP, MESSYS\_\_TRIGGER, MESSYS\_\_MESSAGE,
 
-MSG\_VAL\_LEN, MSG\_NAME\_LEN, 
+MSG\_VAL\_LEN, MSG\_NAME\_LEN,
 
 OBEY, GET, SET, CANCEL, CONTROL.
 \end{myquote}
 
-These constants are not exported by the module (the Autoloader module is used) 
+These constants are not exported by the module (the Autoloader module is used)
 and must be fully-qualified, eg:
 
 \begin{myquote}
@@ -1117,7 +1117,7 @@ $nbs = new Starlink::NBS($nbsname);
 \end{verbatim}
 \end{myquote}
 
-Once a top-level object exists, the find() method can be used to 
+Once a top-level object exists, the find() method can be used to
 descend the hierarchy returning new Starlink::NBS objects each time.
 This means that a Starlink::NBS object can be associated with a structure
 in the NB or a primitive (i.e.\ an integer, or character string).
@@ -1148,7 +1148,7 @@ More information can be found in the Starlink::NBS man page
 
 
 \section{HDS wrapper commands}
- 
+
 The Starlink::HDSPACK module provides some high level HDS manipulation
 routines (cf. NDFPACK in \Kappa). Routines are provided for creating,
 deleting, copying and setting the values of HDS structures and primitives. For
@@ -1177,8 +1177,8 @@ delete_hdsobj("file.more.fits") or die "Oops3";
 set_hdsobj("file.more.xxx", 52.5) or die "Oops4";
 \end{verbatim}
 \end{myquote}
- 
-These are similar to the \Figaro\ \copobj, \creobj, \setobj\ and \delobj\ 
+
+These are similar to the \Figaro\ \copobj, \creobj, \setobj\ and \delobj\
 commands.  This module requires that the NDF module (\S\ref{ndfperl}) is
 available.
 
@@ -1226,7 +1226,7 @@ it is sometimes necessary to check the relevant version number
 before attempting specific tasks. This module attempts to determine
 the version number and returns it to the caller. It is not guaranteed
 to be successful in all cases (since in some cases it is not
-clear where to look for the version string) but does try a number of different 
+clear where to look for the version string) but does try a number of different
 techniques before giving up.
 
 \begin{myquote}
@@ -1269,17 +1269,17 @@ In this example, it assumes that the caller is requesting the
 version number for an application called ``prog''.
 
 \begin{enumerate}
-\item 
+\item
 
 Determine the installed directory by looking in the directory pointed
-to by the environment variable \texttt{PROG\_DIR} for a file called 
-\texttt{version.dat}. Some applications such as POLPACK or KAPPA write 
+to by the environment variable \texttt{PROG\_DIR} for a file called
+\texttt{version.dat}. Some applications such as POLPACK or KAPPA write
 version numbers in this file. This allows the version number to be determined
 directly from the \texttt{PROG\_DIR} rather than trying to determine it from
 related directories (which relies on the application being properly
 installed).
 
-\item 
+\item
 
 If the previous method does not work look in directory
 
@@ -1293,8 +1293,8 @@ or a file call \texttt{prog\_datestamp}. These files are written during a
 standard Starlink install and contain package and version information.  The
 file is searched for a version string.
 
-\item 
-  
+\item
+
   If no environment variable \texttt{PROG\_DIR} can be found (or the directory
   does not exist), query \texttt{Starlink::Config} for the location of the
   standard Starlink directory and look in file
@@ -1350,7 +1350,7 @@ to be \texttt{../dates} rather than \texttt{../../dates}.
 The \texttt{starversion} command is a \perl\ program that can be used in scripts
 to determine version numbers.  It can return the 3 parts of the version number
 (major version, minor version and patchlevel) separately or as a string of the
-form "\textbf{Vm.n-p}". 
+form "\textbf{Vm.n-p}".
 
 If a single package is given as argument the version number is printed to the
 screen with no other information allowing the output to be used in scripts.
@@ -1398,7 +1398,7 @@ BLAH:  UNKNOWN
 \end{verbatim}
 \end{myquote}
 
-Additionally, the program can be used to compare the version of 
+Additionally, the program can be used to compare the version of
 an installed package with a supplied version number via the
 \texttt{-compare} flag.
 
@@ -1485,7 +1485,7 @@ information on the calling arguments of this command.
 \subsection{New in version 1.12}
 
 \begin{itemize}
-\item The \texttt{starversion} command and Starlink::Versions module have 
+\item The \texttt{starversion} command and Starlink::Versions module have
 been added to help determine the version number of an installed Starlink
 package.
 
@@ -1495,7 +1495,7 @@ package.
 \item The NDF/perl documentation is now included in SUN/228 rather than
   SUN/222.
 
-\item The \texttt{msg\_tune} and \texttt{err\_tune} subroutines are now 
+\item The \texttt{msg\_tune} and \texttt{err\_tune} subroutines are now
 supported by the NDF module.
 
 \item The Starlink::EMS module now exports the new format names (eg emsBegin)
@@ -1526,7 +1526,7 @@ standard error to a different file handle.
 
 \section{NDF module\label{ndfapp}}
 
-This section lists name of each sub-system that can be imported via the 
+This section lists name of each sub-system that can be imported via the
 \perl\ \texttt{use} command. By default all sub-systems are loaded into the
 current namespace.
 
@@ -1562,7 +1562,7 @@ This imports most of the \texttt{CMP\_} functions.
 
 \item[:misc] \mbox{}
 
-This imports routines for converting DATA pointers to arrays and routines for 
+This imports routines for converting DATA pointers to arrays and routines for
 easy access to FITS arrays commonly found in NDFs. A routine for accessing
 parameters stored by ADAM tasks is also available.
 
@@ -1687,8 +1687,8 @@ All \texttt{hds\_} routines are implemented:
 \index{:misc@:misc}\mbox{}
 
 \begin{flushleft}
-\texttt{mem2string} \texttt{string2mem} \texttt{array2mem} 
-\texttt{mem2array} \texttt{fits\_get\_nth\_item} \texttt{fits\_read\_header} 
+\texttt{mem2string} \texttt{string2mem} \texttt{array2mem}
+\texttt{mem2array} \texttt{fits\_get\_nth\_item} \texttt{fits\_read\_header}
 \texttt{fits\_get\_item} \texttt{fits\_extract\_key\_val}
 \texttt{fits\_construct\_string} \texttt{par\_get}
 \end{flushleft}
@@ -1731,7 +1731,7 @@ else they are ignored.
 \begin{verbatim}
 $current = $ams->messages;
 $ams->messages(0);
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 Default is to print all messages.
@@ -1745,7 +1745,7 @@ else they are ignored.
 \begin{verbatim}
 $current = $ams->errors;
 $ams->errors(0);
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 Default is to print all messages.
@@ -1758,7 +1758,7 @@ Default is 30 seconds.
 \begin{verbatim}
 $ams->timeout(10);
 $current = $ams->timeout;
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 \item[stderr] \mbox{}
@@ -1782,7 +1782,7 @@ default value) and should return the required value.
 \begin{myquote}
 \begin{verbatim}
 $self->paramrep(\&mysub);
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 A simple check is made to make sure that the supplied argument
@@ -1815,7 +1815,7 @@ Returns the status.
 \end{description}
 
 The messaging interface is automatically shutdown when the \perl\ process is
-exited. 
+exited.
 
 \subsection{Starlink::AMS::Task}
 
@@ -1841,7 +1841,7 @@ fails then undef is returned (which will not be an object reference).
 
 The name used by the messaging system to contact the monolith.
 Can be used to set or retrieve the value of name (do not set
-this value from outside unless you know that a path to the 
+this value from outside unless you know that a path to the
 new name exists in the messaging system).
 \begin{myquote}
 \begin{verbatim}
@@ -1869,7 +1869,7 @@ Should be either 'A' or 'I'.
 \begin{myquote}
 \begin{verbatim}
 $task->tasktype('A');
-\end{verbatim} 
+\end{verbatim}
 \end{myquote}  %$
 
 \item[monolith] \mbox{}
@@ -1890,7 +1890,7 @@ adam parameter file can be found (for A-tasks).
 
 Destructor for this object. When the last reference to this
 object is removed the destructor is executed automatically.
-In this case the monolith attached to object is killed 
+In this case the monolith attached to object is killed
 unless it is already {\em dead\/}(!) or it has been forgotten
 via the {\em forget()\/} method.
 
@@ -1905,10 +1905,10 @@ $status = $obj->load("name","monolith_binary",{ TASKTYPE => 'A' });
 \end{myquote}
 
 If the second argument is omitted it is assumed that the binary
-is already running and can be called by "name".   
+is already running and can be called by "name".
 
 The last argument, if needed, is a reference to a hash containing
-the load options. 
+the load options.
 
 Options currently supported are:
 \begin{myquote}
@@ -1921,8 +1921,8 @@ MONOLITH => monolith name to be used for A-task parameter retrieval
 Default is to launch an A-task. Default task type when no monolith
 or options are specified is `I'.
 
-The MONOLITH option can be used to configure A-tasks such that 
-they can retrieve parameters from monoliths that were not started by this 
+The MONOLITH option can be used to configure A-tasks such that
+they can retrieve parameters from monoliths that were not started by this
 object. (It is identical to creating the object and then setting the
 monolith name via the {\em monolith()\/} method)
 
@@ -1940,7 +1940,7 @@ $status = $obj->obeyw("action","params");
 
 \item[get] \mbox{}
 
-Obtain the value of a parameter from a task. 
+Obtain the value of a parameter from a task.
 When called from an array context the status and values are returned
 (multiple values are returned in an array). When called from a scalar
 context the values are returned as a single string joined by commas.
@@ -1989,7 +1989,7 @@ Remove the monolith name from the list of known monoliths.
 This method prevents the monolith from being killed when adam
 exits or when the object is destroyed.
 
-This routine has no input arguments. 
+This routine has no input arguments.
 
 \item[contact] \mbox{}
 
@@ -2173,7 +2173,7 @@ Must be a primitive object
 Arguments: None (uses current status of object)
 Returns:   Status and The values (in array context)
            ($status, @values)
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 \item[put] \mbox{}
@@ -2193,7 +2193,7 @@ This is the equivalent of a {\em find()\/} followed by a {\em put()\/}.
 \begin{myquote}
 \begin{verbatim}
 $nbs->poke(".port_0.display_data", 'IMAGE');
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 Status of the {\em put()\/} is returned.
@@ -2238,7 +2238,7 @@ tie (%hash, ref($what), $what);
 \end{myquote}
 
 Now \%hash can be used to update the entire noticeboard structure.
-Note that keys are always assumed to be relative to the 
+Note that keys are always assumed to be relative to the
 tied object --- in effect this means that a '.' is automatically
 prepended to all keys if one is not found. (see {\em find()\/}
 for more information on relative addressing).
@@ -2266,7 +2266,7 @@ use Data::Dumper;
 $nbs = new Starlink::NBS($nbsname);
 tie %hash, ref($nbs), $nbs;
 
-print Dumper(\%hash);  
+print Dumper(\%hash);
 \end{verbatim}
 \end{myquote}
 
@@ -2435,7 +2435,7 @@ The following functions are available using Starlink inherited status:
 
 \item[\textbf{retrieve\_locs}] \mbox{}
 
-Given a full path to a HDS structure, returns an array of 
+Given a full path to a HDS structure, returns an array of
 locators corresponding to each structure referenced in the path.
 
 \begin{verbatim}
@@ -2624,7 +2624,7 @@ patchlevel version numbers.
 
 
 Starting with Perl version 5.6.0, a \perl\ version string is returned
-when \texttt{starversion} is called in a scalar context. This allows 
+when \texttt{starversion} is called in a scalar context. This allows
 versions to be compared directly using Perl.
 
 \begin{myquote}
@@ -2657,7 +2657,7 @@ can not be determined.
 \begin{myquote}
 \begin{verbatim}
 $major = starversion_major( 'prog' );
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 \item[starversion\_minor] \mbox{}
@@ -2668,7 +2668,7 @@ can not be determined.
 \begin{myquote}
 \begin{verbatim}
 $major = starversion_minor( 'prog' );
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 \item[starversion\_patchlevel] \mbox{}
@@ -2679,11 +2679,11 @@ can not be determined.
 \begin{myquote}
 \begin{verbatim}
 $patch = starversion_patchlevel( 'prog' );
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 \item[starversion\_cmp] \mbox{}
-  
+
   Can be used to compare the version number of a package with a supplied
   version number. Returns -1 if the supplied version is greater than that of
   the installed package (the installed package is older), 0 if it is the same,
@@ -2707,7 +2707,7 @@ V1.2.3
 \end{myquote}
 
 \texttt{undef} is returned if a comparison could not be made due to
-either the application having no version number or if the 
+either the application having no version number or if the
 supplied version string could not be parsed.
 
 
@@ -2719,11 +2719,11 @@ the \texttt{starversion} command in a scalar context with a string literal
 \begin{myquote}
 \begin{verbatim}
 $cmp = starversion('prog') cmp v0.15.4;
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 \item[starversion\_lt] \mbox{}
-  
+
   Test whether the version of the installed package is less than a supplied
   version number. In other words, whether the installed package is older than
   the requested version.
@@ -2753,7 +2753,7 @@ if ( starversion('prog') lt v0.15.2 ) {
 
 \item[starversion\_le] \mbox{}
 
-Test whether the version of the installed package is less than 
+Test whether the version of the installed package is less than
 or equal to a supplied version number. In other words, whether the installed
 package is newer than or same as the requested version.
 
@@ -2770,7 +2770,7 @@ The version string format is described in the description of
 
 
 
-In \perl\ 5.6.0 this command can be implemented directly using a 
+In \perl\ 5.6.0 this command can be implemented directly using a
 string literal:
 
 \begin{myquote}
@@ -2812,7 +2812,7 @@ if ( starversion('prog') eq v0.15.2 ) {
 
 \item[starversion\_gt] \mbox{}
 
-Test whether the version of the installed package is greater than 
+Test whether the version of the installed package is greater than
 a supplied version number. In other words, whether the installed
 package is newer than the requested version.
 
@@ -2829,7 +2829,7 @@ The version string format is described in the description of
 
 
 
-In \perl\ 5.6.0 this command can be implemented directly using a 
+In \perl\ 5.6.0 this command can be implemented directly using a
 string literal:
 
 \begin{myquote}
@@ -2842,7 +2842,7 @@ if ( starversion('prog') gt v0.15.2 ) {
 
 \item[starversion\_ge] \mbox{}
 
-Test whether the version of the installed package is greater than 
+Test whether the version of the installed package is greater than
 or equal to a supplied version number. In other words, whether the installed
 package is newer than or same as the requested version.
 
@@ -2859,7 +2859,7 @@ The version string format is described in the description of
 
 
 
-In \perl\ 5.6.0 this command can be implemented directly using a 
+In \perl\ 5.6.0 this command can be implemented directly using a
 string literal:
 
 \begin{myquote}
@@ -2942,7 +2942,7 @@ Version number of \texttt{starversion}.
 
 \section{GSD interface specification\label{appgsd}}
 
-This section describes in detail the programming interface provided 
+This section describes in detail the programming interface provided
 by the perl GSD module.
 
 \subsection{Library interface\label{LIBRARY_INTERFACE}\index{LIBRARY INTERFACE}}
@@ -2986,7 +2986,7 @@ array rather than an N-D array.
 
 \subsection{Object oriented interface\label{OBJECT_ORIENTED_INTERFACE}\index{OBJECT ORIENTED INTERFACE}}
 
-An OO interface is provided. This can be used to hide 
+An OO interface is provided. This can be used to hide
 the GSD layer from the user.
 
 \subsubsection*{Constructors\label{Constructors}\index{Constructors}}\begin{description}
@@ -3036,7 +3036,7 @@ Returns the version number of the GSD file.
 \begin{myquote}
 \begin{verbatim}
 $version = $gsd->version;
-\end{verbatim} 
+\end{verbatim}
 \end{myquote}
 
 
@@ -3058,7 +3058,7 @@ Find the GSD item number by name.
 \begin{verbatim}
 ($itemno, $units, $type, $array) = $gsd->Find($name);
 \end{verbatim}
-\end{myquote} 
+\end{myquote}
 
 Returns \texttt{undef} on error (technically 4 \texttt{undefs}).
 In a scalar context, simply returns the item number.
@@ -3066,7 +3066,7 @@ In a scalar context, simply returns the item number.
 \begin{myquote}
 \begin{verbatim}
 $itemno = $gsd->Find($name);
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 Spaces are stripped from the end of the units string.
@@ -3079,13 +3079,13 @@ form:
 \begin{myquote}
 \begin{verbatim}
   $data = $gsd->Get0x($itemno);
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 Returns \texttt{undef} if an error occurred.
 
 \item[\textbf{Get1x}] \mbox{}
-  
+
   All the \texttt{gsdGet0x} commands are available as methods of the following
   form:
 
@@ -3114,8 +3114,8 @@ they can be supplied as scalars
 \begin{myquote}
 \begin{verbatim}
 @data = $gsd->Get1x($itemno, $size, 1, $size);
-\end{verbatim} 
-\end{myquote} 
+\end{verbatim}
+\end{myquote}
 
 Returns undef if an error occurred.
 
@@ -3165,7 +3165,7 @@ Trailing spaces are stripped from strings.
 \item[\textbf{DESTROY}] \mbox{}
 
 Automatic destructor. This tidies up the object and frees
-memory when the object goes out of scope. It is not 
+memory when the object goes out of scope. It is not
 necessary to run this method explicitly.
 
 This methods runs \texttt{gsdClose} so that the user does not
@@ -3189,7 +3189,7 @@ Returns the contents of the GSD item from the named entry.
 \begin{verbatim}
 $data = $gsd->GetByName($name);
 @data = $gsd->GetByName($name);
-\end{verbatim} 
+\end{verbatim}
 \end{myquote} %$
 
 Works for array and scalar types. The data are returned in their native

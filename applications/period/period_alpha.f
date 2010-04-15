@@ -1,8 +1,8 @@
- 
+
 C===========================================================================
- 
+
       FUNCTION PERIOD_ALPHA(L, M, SPEC, WIND)
- 
+
 C===========================================================================
 C Returns an estimate for the component A, responsible for SPEC(L) through
 C the relation:
@@ -21,14 +21,14 @@ C===========================================================================
       DOUBLE COMPLEX SPEC(0:M), WIND(0:2*M), WIN2L, PERIOD_CVAL
 
       DOUBLE PRECISION ERROR,WNORM
-    
+
 C---------------------------------------------------------------------------
 C Find the (L,-L) components which produce SPEC(L) through WIND.
 C---------------------------------------------------------------------------
 
 *   Allowed error in WNORM.
       ERROR=0.0001D0
- 
+
       WIN2L = WIND(2*L)                                   ! (L,-L) interference.
       WNORM = 1.0D0 - CDABS(WIN2L)**2
       IF ( WNORM.LT.ERROR ) THEN
@@ -41,6 +41,6 @@ C---------------------------------------------------------------------------
 C---------------------------------------------------------------------------
 C Return with the estimate of A.
 C---------------------------------------------------------------------------
- 
+
       RETURN
       END

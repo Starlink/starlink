@@ -73,7 +73,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,5 +119,5 @@
 
 *  Change the type of the component.
       CALL NDF_ASTYP( ITYPE, NDF, COMP, IAXIS, STATUS )
- 
+
       END

@@ -1,7 +1,7 @@
- 
-      SUBROUTINE PERIOD_SINFIT(XDATA,YDATA,YERR,NUM,PERIOD,GAM, 
+
+      SUBROUTINE PERIOD_SINFIT(XDATA,YDATA,YERR,NUM,PERIOD,GAM,
      :                         KVEL,PHI0,COV,NP,F,IFAIL)
- 
+
 C============================================================================
 C Subroutine to fit " Y = GAM + KVEL*SIN( 2*PI*(X/PERIOD-PHI0) ) "
 C Returning GAM, KVEL, PHI0.
@@ -39,8 +39,8 @@ C
 C Adapted for PERIOD by Vikram Singh Dhillon @Sussex 1-July-1992.
 C
 C GJP March 1997
-C 
-C Corrected the SIN2D, COSD and ATAN2D expressions. Removed 
+C
+C Corrected the SIN2D, COSD and ATAN2D expressions. Removed
 C REAL*4 and INTEGER *4 expressions. Removed IJK - did not seem
 C to do anything.
 C
@@ -59,18 +59,18 @@ C============================================================================
       IMPLICIT NONE
 
       INCLUDE "PIVARS"
- 
+
       INTEGER IFAIL,NP,I,NUM
       DOUBLE PRECISION XDATA(NUM),YDATA(NUM),YERR(NUM)
       DOUBLE PRECISION A,B,C,PERIOD,COV(6)
       DOUBLE PRECISION KVEL,GAM,PHI0, QTWOPI
       DOUBLE PRECISION XX,SN,CN,WW,W1,C1,C2,C3,C4,C5,C6,DET,F,SQ
       DOUBLE PRECISION SW,SY,SY2,SS,SS2,SYS,SYC,SC,SSC,SC2
- 
+
 C----------------------------------------------------------------------------
 C Set dummy variables to 0.0D0, to accumulate sums.
 C----------------------------------------------------------------------------
-       
+
       QTWOPI = 4.0D0*DATAN(1.0D0)
       IF ( PERIOD.LE.0.0D0 ) THEN
          IFAIL = 1
@@ -99,11 +99,11 @@ C----------------------------------------------------------------------------
             CN = DCOS(XX)
             WW = 1.0D0/YERR(I)/YERR(I)
             W1 = WW*SN
- 
+
 C----------------------------------------------------------------------------
 C Accumulate sums.
 C----------------------------------------------------------------------------
- 
+
             SW = SW + WW
             SY = SY + WW*YDATA(I)
             SY2 = SY2 + WW*YDATA(I)*YDATA(I)
@@ -119,26 +119,26 @@ C----------------------------------------------------------------------------
       IF ( NP.LE.3 ) THEN
          CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_SINFIT failed.'
-         WRITE (*, *) 
+         WRITE (*, *)
      :              '** ERROR: <= 3 valid points for a 3 parameter fit.'
          IFAIL = 1
       END IF
- 
+
 C----------------------------------------------------------------------------
 C Linear least squares to find A, B and C. Need to invert 3x3 (symmetric)
 C matrix. Calculate co-factors (only 6).
 C----------------------------------------------------------------------------
- 
+
       C1 = SS2*SC2 - SSC*SSC
       C2 = SC*SSC - SS*SC2
       C3 = SS*SSC - SC*SS2
       C4 = SW*SC2 - SC*SC
       C5 = SC*SS - SW*SSC
       C6 = SW*SS2 - SS*SS
- 
+
 C----------------------------------------------------------------------------
 C Calculate determinant.
-C---------------------------------------------------------------------------- 
+C----------------------------------------------------------------------------
       DET = SW*C1 + SS*C2 + SC*C3
       IF ( DABS(DET).LT.1.0D-24 ) THEN
          IFAIL = 1
@@ -147,27 +147,27 @@ C----------------------------------------------------------------------------
          WRITE (*, *) '** ERROR: ABS(DETERMINANT) < 1.D-24.'
          RETURN
       END IF
- 
+
 C----------------------------------------------------------------------------
 C Calculate A, B and C.
 C----------------------------------------------------------------------------
- 
+
       A = (C1*SY+C2*SYS+C3*SYC)/DET
       B = (C2*SY+C4*SYS+C5*SYC)/DET
       C = (C3*SY+C5*SYS+C6*SYC)/DET
- 
+
 C----------------------------------------------------------------------------
 C Calculate chi-squared.
 C----------------------------------------------------------------------------
- 
+
       F = SY2 + A*A*SW + B*B*SS2 + C*C*SC2 + 2.0D0*B*C*SSC +
      :    2.0D0*A*B*SS + 2.0D0*A*C*SC - 2.0D0*A*SY -
      :    2.0D0*B*SYS - 2.0D0*C*SYC
- 
+
 C----------------------------------------------------------------------------
 C Calculate GAM, KVEL and PHI0, and their errors.
 C----------------------------------------------------------------------------
- 
+
       SQ = B*B + C*C
       KVEL = DSQRT(SQ)
       IF ( KVEL.EQ.0.0D0 ) THEN

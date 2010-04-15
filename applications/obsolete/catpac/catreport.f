@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     
+*
 *     Produces a catalogue report. A simple report is produced with or
 *     without a header, selecting fields or reporting all fields. The report
 *     is made either to the screen or to a file ($<$catalogue name$>$.REP),
@@ -48,7 +48,7 @@
 *
 *        Produce a report with no header, output to a file and selecting
 *        fields.
-*        
+*
 
 *  Notes:
 *     A report to the screen is limited to 80 characters and to file 132
@@ -66,7 +66,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
        call par_get0l('ALLFLDS', all, status)
 *
        if (.not. all) then
-          call par_get1c('FLDNAMES', chp__numcols, fnames, numflds, 
+          call par_get1c('FLDNAMES', chp__numcols, fnames, numflds,
      :                    status)
        endif
 *
@@ -106,11 +106,11 @@
 *
 *    Make the call.
 *
-         call chu_catrep(incat, header, screen, fnames, numflds, 
+         call chu_catrep(incat, header, screen, fnames, numflds,
      : all, status)
 *
 *   Dispaly the result.
-*      
+*
          if (status .eq. SAI__OK) then
            if (.not. screen) then
              call msg_setc('name', incat)

@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_FIT_PLANE (N, X, Y, Z, QUALITY, MX, MY, C, 
+      SUBROUTINE SCULIB_FIT_PLANE (N, X, Y, Z, QUALITY, MX, MY, C,
      :  STATUS)
 *+
 *  Name:
@@ -41,15 +41,15 @@
 *     If status is good on entry the routine will loop through the
 *     input data calculating the sums required and the number of valid
 *     data points (i.e. those with good quality flags).
-*        
-*     If there are less than 3 valid data then 
+*
+*     If there are less than 3 valid data then
 *        an error message will be output and bad status returned
 *     else
 *        the plane coefficients will be calculated from the following
 *        formulae:-
 *
 *        MX = nv.sum(y^2).sum(xz) - sum(y^2).sum(x).sum(z) -
-*               sum(y).sum(y).sum(xz) - nv.sum(xy).sum(yz) + 
+*               sum(y).sum(y).sum(xz) - nv.sum(xy).sum(yz) +
 *               sum(xy).sum(y).sum(z) + sum(x).sum(y).sum(yz)
 *            .-------------------------------------------------
 *             sum(xy).sum(x).sum(y) - nv.sum(xy).sum(xy) +
@@ -59,13 +59,13 @@
 *        MY = nv.sum(yz) - sum(y).sum(z) + MX.[sum(x).sum(y) - nv.sum(xy)]
 *            .------------------------------------------------------------
 *                         nv.sum(y^2) - sum(y).sum(y)
-*           
+*
 *         C = sum(z) - MX.sum(x) - MY.sum(y)
 *            .------------------------------
 *                       nv
 *
 *        where nv is the number of valid data points. If the denominator of the
-*        expression for MX is 0 then an error message will be output and bad 
+*        expression for MX is 0 then an error message will be output and bad
 *        status returned.
 *     end if
 
@@ -119,7 +119,7 @@
       REAL SUMX, SUMY, SUMZ                 ! sums of valid x, y, z
       REAL SUMXY, SUMXZ, SUMYZ              ! sums of valid xy, xz, yz
       REAL SUMX2, SUMY2                     ! sum of valid x^2, y^2
-      REAL DENOM                            ! denominator in calculation of MX 
+      REAL DENOM                            ! denominator in calculation of MX
 
 *  Internal References:
 
@@ -170,7 +170,7 @@
       ELSE
 
          DENOM = SUMXY * SUMX * SUMY - REAL(NDATA) * SUMXY * SUMXY +
-     :     SUMX *SUMY * SUMXY - SUMX * SUMX * SUMY2 + 
+     :     SUMX *SUMY * SUMXY - SUMX * SUMX * SUMY2 +
      :     REAL(NDATA) * SUMX2 * SUMY2 + SUMX2 * SUMY * SUMY
 
          IF (DENOM .EQ. 0.0) THEN
@@ -183,7 +183,7 @@
      :        SUMY * SUMY * SUMXZ - REAL(NDATA) * SUMXY * SUMYZ +
      :        SUMXY * SUMY * SUMZ + SUMX * SUMY * SUMYZ) / DENOM
 
-            MY = (REAL(NDATA) * SUMYZ - SUMY * SUMZ + 
+            MY = (REAL(NDATA) * SUMYZ - SUMY * SUMZ +
      :        MX * (SUMX * SUMY - REAL(NDATA) * SUMXY)) /
      :        (REAL(NDATA) * SUMY2 - SUMY * SUMY)
 

@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, 
+      SUBROUTINE ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS,
      :                       WCSDAT, STATUS )
 *+
 *  Name:
@@ -16,15 +16,15 @@
 
 *  Arguments:
 *     UWCS = INTEGER (Given)
-*        A pointer to an AST FrameSet supplied by the user. This should at 
-*        least have a Frame with Domain ARDAPP referring to "Application 
-*        co-ordinates". The current Frame in this FrameSet should refer to 
-*        "User co-ordinates" (i.e. the coord system in which positions are 
+*        A pointer to an AST FrameSet supplied by the user. This should at
+*        least have a Frame with Domain ARDAPP referring to "Application
+*        co-ordinates". The current Frame in this FrameSet should refer to
+*        "User co-ordinates" (i.e. the coord system in which positions are
 *        supplied in the ARD description).
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
-*        should have a Base Frame referring to pixel coords within the 
-*        pixel mask and another Frame with Domain ARDAPP referring to 
+*        should have a Base Frame referring to pixel coords within the
+*        pixel mask and another Frame with Domain ARDAPP referring to
 *        "Application co-ordinates".
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
@@ -32,9 +32,9 @@
 *        The upper bounds of pixel coordinates.
 *     MAP = INTEGER (Returned)
 *        A pointer to an AST Mapping from the pixel coords in the mask,
-*        to the coordinate system in which positions are specified in the 
+*        to the coordinate system in which positions are specified in the
 *        ARD expression. This is obtained by merging UWCS and AWCS,
-*        aligning them in a suitable common Frame. 
+*        aligning them in a suitable common Frame.
 *     IWCS = INTEGER (Returned)
 *        Returned equal to AST__NULL if the pixel->user mapping is linear.
 *        Otherwise, it is returned holding a pointer to an AST FrameSet
@@ -42,7 +42,7 @@
 *        current Frame is user coords.
 *     WCSDAT( * ) = DOUBLE PRECISION (Returned)
 *        Returned holding information which qualifies IWCS. If IWCS is
-*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping 
+*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping
 *        from pixel to user coords. Otherwise, wcsdat(1) holds a lower
 *        limit on the distance (within the user coords) per pixel, and
 *        the other elements in WCSDAT are not used. The supplied array
@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL LINEAR             ! Is MAP linear? 
+      LOGICAL LINEAR             ! Is MAP linear?
 
 *.
 
@@ -128,11 +128,11 @@
       CALL ARD1_ASMRG( IWCS, UWCS, STATUS )
 
 *  Get the Simplified Mapping from pixel to user coords.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE, 
-     :                                    AST__CURRENT, STATUS ), 
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE,
+     :                                    AST__CURRENT, STATUS ),
      :                    STATUS )
 
-*  See if it is linear. 
+*  See if it is linear.
       CALL ARD1_LINMP( MAP, AST_GETFRAME( UWCS, AST__CURRENT, STATUS ),
      :                 DLBND, DUBND, LINEAR, WCSDAT, STATUS )
 

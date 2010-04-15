@@ -57,11 +57,11 @@
 *        - Change BOX from 10 to 50 to get a more reasonable estimate of
 *        the noise.
 *        - If a gap is found at the start or end of the time series, use
-*        a gradient of zero when filling it, since the gradient estimate 
+*        a gradient of zero when filling it, since the gradient estimate
 *        within a single box can be very unrepresentative (i.e. unusually
 *        high or low).
 *     2010-02-18 (DSB):
-*        Gaps at start or end were using the offset at time zero, rather 
+*        Gaps at start or end were using the offset at time zero, rather
 *        than the offset at the boundary of the good data.
 
 *  Copyright:
@@ -133,7 +133,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status );
 
 
 
-void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality, 
+void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                     unsigned char mask, int *status ) {
 
 /* Local Variables */
@@ -203,7 +203,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
   /* Loop over bolometer in groups of "bpt". */
   pdata = job_data;
   for( i = 0; i < nbolo; i += bpt, pdata++ ) {
-  
+
     /* Store information for this group in the  next smfFillGapsData
        structure. */
     pdata->nbolo = nbolo;
@@ -310,7 +310,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
     count = 0;
 
     /* Initialise the index of the first sample to be replaced. This
-       initial value is only used if there are fewer than BOX unflagged 
+       initial value is only used if there are fewer than BOX unflagged
        samples before the first block of flagged samples. */
     jstart = 0;
     jend = -1;
@@ -322,13 +322,13 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
          unflagged, so that any block of flagged samples at the end of
          the time-series is filled. Samples with bad data values are
          filled, as well as samples with the specified quality. */
-      flagged = ( qua[ i*bstride + j*tstride ] & mask ) || 
+      flagged = ( qua[ i*bstride + j*tstride ] & mask ) ||
                 ( dat[ i*bstride + j*tstride ] == VAL__BADD );
 
       if( flagged && (int) j < jfinal ) {
 
         /* If this is the first flagged sample in a new block of flagged
-           samples, set "inside" to indicate that we are now inside a 
+           samples, set "inside" to indicate that we are now inside a
            block of flagged samples. */
         if( ! inside ) {
           inside = 1;
@@ -337,11 +337,11 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
              previous block of flagged samples is at least BOX, then
              record the index of the first sample to be replaced in this
              new block. If there have been fewer than BOX samples since
-             the end of the previous block of flagged samples, we consider 
+             the end of the previous block of flagged samples, we consider
              this new block to be an extension of the previous block,
              and so we do not change the "jstart" value (the few
-             unflagged samples that were found between the two blocks 
-             of flagged samples will be replaced, together with the 
+             unflagged samples that were found between the two blocks
+             of flagged samples will be replaced, together with the
              neighbouring flagged samples). We do this because we need at
              last BOX unflagged samples between adjacent pairs of flagged
              blocks. */
@@ -352,10 +352,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
          the time-series)... */
       } else {
 
-        /* If this is the first sample following a block of flagged samples, 
-           record the index of the last sample in the block (which may be 
-           the current sample if the current sample is the last sample), and 
-           indicate that we are no longer in a block. Also reset the count 
+        /* If this is the first sample following a block of flagged samples,
+           record the index of the last sample in the block (which may be
+           the current sample if the current sample is the last sample), and
+           indicate that we are no longer in a block. Also reset the count
            of unflagged samples following the end of the flagged block. */
         if( inside ) {
           if( flagged ) {
@@ -371,8 +371,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
            of the previous flagged block. */
         count++;
 
-        /* If we have now found BOX unflagged samples following the end of 
-           the previous block of flagged samples, we can replace the block. 
+        /* If we have now found BOX unflagged samples following the end of
+           the previous block of flagged samples, we can replace the block.
            Also replace the block if we have reached the end of the time
            series. */
         if( ( count == BOX || (int) j == jfinal ) && jend >= jstart ) {
@@ -381,20 +381,20 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
              with the mean of the two neighbouring sample values. */
           if( jend == jstart ) {
               if( jend == 0 ) {
-                 dat[ i*bstride + jend*tstride ] = 
+                 dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend + 1 )*tstride ];
               } else if( jend == jfinal ) {
-                 dat[ i*bstride + jend*tstride ] = 
+                 dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend - 1 )*tstride ];
               } else {
-                 dat[ i*bstride + jend*tstride ] = 0.5*( 
-                         dat[ i*bstride + ( jend + 1 )*tstride ] + 
+                 dat[ i*bstride + jend*tstride ] = 0.5*(
+                         dat[ i*bstride + ( jend + 1 )*tstride ] +
                          dat[ i*bstride + ( jend - 1 )*tstride ] );
               }
 
           /* Otherwise, we fill the block using a straight line plus
              noise... */
-          } else {     
+          } else {
 
             /* If possible fit a straight line to the BOX samples following
                the end of the flagged block. */
@@ -415,7 +415,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
               cr = VAL__BADD;
               sigmar = VAL__BADD;
             }
-  
+
             /* If possible fit a straight line to the BOX samples preceeding
                the start of the flagged block. */
             leftend = jstart - 1;
@@ -433,7 +433,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
               cl = VAL__BADD;
               sigmal = VAL__BADD;
             }
-  
+
             /* Find the mean noise level. */
             if( sigmal != VAL__BADD && sigmar != VAL__BADD ) {
                sigma = 0.5*( sigmal + sigmar );
@@ -442,7 +442,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
             } else {
                sigma = sigmar;
             }
-  
+
             /* Find the gradient and offset for the straight line used to
                create the replacement values for the flagged block. */
             if( jstart <= 0 ) {
@@ -452,14 +452,14 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
             } else if( jend >= jfinal ) {
               grad = 0.0;
               offset = ml*( jstart - 1 ) + cl;
-  
+
             } else {
               meanl = ml*( jstart - 1 ) + cl;
               meanr = mr*( jend + 1 ) + cr;
               grad = ( meanr - meanl )/( jend - jstart + 2 );
               offset = meanl - grad*( jstart - 1 );
-            }                                       
-  
+            }
+
             /* If at least one of the straight line fits above was
                succesful, the flagged block is replaced by a straight line
                plus noise. */
@@ -470,7 +470,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
 
               }
-            } 
+            }
           }
         }
       }

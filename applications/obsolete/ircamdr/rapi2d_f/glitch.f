@@ -109,7 +109,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'           ! global SSE definitions
-      INCLUDE 'NDF_PAR'           
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'           ! global SSE definitions
 
 *    Status :
@@ -123,10 +123,10 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    IDIMS( NDIMS ),         ! dimensions of input DATA_ARRAY
      :    NELEMENTS,              ! number of elements mapped
-     :    NDIM,                   ! dimensions from NDF_DIM    
+     :    NDIM,                   ! dimensions from NDF_DIM
      :    PNTRI,                  ! pointer to input DATA_ARRAY component
      :    PNTRO,                  ! pointer to output DATA_ARRAY component
      :    XCOORD,                 ! x coordinate of pixel to be deglitched
@@ -136,7 +136,7 @@
      :    LOCI,                   ! input data structure
      :    LOCO                    ! output data structure
 
-      REAL 
+      REAL
      :    OLDVAL,                 ! old value of deglitched pixel
      :    NEWVAL,                 ! new   "   "       "       "
      :    BADVAL
@@ -158,12 +158,12 @@
 
 *    get a locator to input IMAGE type data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error so far then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions of array
@@ -176,7 +176,7 @@
      :        'Image is ^XDIM by ^YDIM pixels', STATUS )
          CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
-*       now create output IMAGE type data structure with DATA_ARRAY 
+*       now create output IMAGE type data structure with DATA_ARRAY
 *       component; also create and get value for DATA_LABEL component
          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, LOCO, STATUS )
 
@@ -184,14 +184,14 @@
          IF ( STATUS .EQ .SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                     PNTRO, NELEMENTS, STATUS )
 
 *          check for error before accessing pointer and entering loop
             IF ( STATUS .EQ. SAI__OK ) THEN
 
-*             copy old array into new array 
-               CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
+*             copy old array into new array
+               CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
      :                      %VAL( PNTRO ), STATUS )
 
 *             now find out whether user wants to specify each pixel from
@@ -210,7 +210,7 @@
 
 *                pass all the necessary information to the working
 *                subroutine to do the processing
-                  CALL GLITCHLIST( IDIMS(1), IDIMS(2), %VAL( PNTRO ), 
+                  CALL GLITCHLIST( IDIMS(1), IDIMS(2), %VAL( PNTRO ),
      :                             FILENAME, STATUS )
 
 *                on return, check the status
@@ -255,12 +255,12 @@
                         CALL MSG_SETR( 'OLDVAL', OLDVAL )
                         CALL MSG_OUT( 'INPUT_OLDVAL',
      :         ' Old pixel value was = ^OLDVAL', STATUS )
-   
+
                         CALL MSG_SETR( 'NEWVAL', NEWVAL )
                         CALL MSG_OUT( 'INPUT_NEWVAL',
      :         ' New pixel value is  = ^NEWVAL', STATUS )
                         CALL MSG_OUT( 'BLANK', ' ', STATUS )
-  
+
 *                   end of if-no-error-before-calling-GLITCHSUB check
                      END IF
 
@@ -280,8 +280,8 @@
                   CALL PAR_GET0R( 'BADVAL', BADVAL, STATUS )
 
                   IF ( STATUS .EQ. SAI__OK ) THEN
-         
-                     CALL GLITCHAUTO( IDIMS(1), IDIMS(2), %VAL( PNTRO ), 
+
+                     CALL GLITCHAUTO( IDIMS(1), IDIMS(2), %VAL( PNTRO ),
      :                                BADVAL, STATUS )
 
                   END IF

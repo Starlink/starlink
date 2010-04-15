@@ -110,7 +110,7 @@
 
 *  If USEEXT is true then try to access a value from the NDF extension.
       OK = .FALSE.
-      IF ( USEEXT ) THEN 
+      IF ( USEEXT ) THEN
          CALL CCG1_FCH0C( ID, 'DIRECTION', RETURN, OK, STATUS )
 
 *  If ok then validate the direction.
@@ -132,7 +132,7 @@
       END IF
 
 *  If do not have a value by now prompt the user.
-      IF ( .NOT. OK ) THEN 
+      IF ( .NOT. OK ) THEN
 
 *  Value not obtained from extension.
          FRMEXT = .FALSE.

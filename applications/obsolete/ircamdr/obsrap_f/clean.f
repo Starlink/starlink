@@ -3,12 +3,12 @@
 	IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *     IMAGE (input)                The image
 *     INTEGER*2 (NPIX,NLINES)
-     
+
 *     NPIX,NLINES (input)          The dimensions of the image
 *     INTEGER
 
@@ -27,7 +27,7 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :  LOCI,                 ! input IMAGE structure
      :  LOCO                  ! output IMAGE structure
 
@@ -56,7 +56,7 @@
 
 	    SCALE = 1
 	    ZERO = 0
-	    CALL BUSINESS( %VAL( PNTRI), DIMS( 1), DIMS( 2), -1, SCALE, 
+	    CALL BUSINESS( %VAL( PNTRI), DIMS( 1), DIMS( 2), -1, SCALE,
      :	                     ZERO)
 
             CALL NDF_ANNUL( LOCO, STATUS )
@@ -67,5 +67,5 @@
 
 	END IF
 
-	END 
+	END
 

@@ -20,9 +20,9 @@
 *        The global status.
 
 *  Description:
-*     This application writes a table to standard output containing the axis 
-*     values at a mesh of points covering the surface of the supplied Region. 
-*     Each row of output contains a tab-separated list of axis values, one 
+*     This application writes a table to standard output containing the axis
+*     values at a mesh of points covering the surface of the supplied Region.
+*     Each row of output contains a tab-separated list of axis values, one
 *     for each axis in the Frame encapsulated by the Region. The number of
 *     points in the mesh is determined by the MeshSize attribute.
 *
@@ -30,13 +30,13 @@
 *     single line containing the word "ENDMESH".
 
 *  Usage:
-*     astshowmesh this format ttl 
+*     astshowmesh this format ttl
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF, FITS file or text file holding the Frame. If an NDF is 
-*        supplied, the current Frame of the WCS FrameSet will be used. If a 
-*        FITS file is supplied, the Frame corresponding to the primary axis 
+*        An NDF, FITS file or text file holding the Frame. If an NDF is
+*        supplied, the current Frame of the WCS FrameSet will be used. If a
+*        FITS file is supplied, the Frame corresponding to the primary axis
 *        descriptions will be used.
 *     FORMAT = _LOGICAL (Read)
 *         If TRUE, then the output table contains axis values that have
@@ -85,8 +85,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  External References:
       EXTERNAL AST_ISAREGION
@@ -100,7 +100,7 @@
       LOGICAL FORMAT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

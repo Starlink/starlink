@@ -20,12 +20,12 @@ proc buildQmanWidgets {w} {
 # Build panel layout frames.
     set topFrame [frame $mainFrame.ft]
     set bottomFrame [frame $mainFrame.fb]
-    pack $topFrame 
+    pack $topFrame
     pack $bottomFrame -fill both -expand yes -side left
 
     set leftFrame [frame $topFrame.fl]
     set rightFrame [frame $topFrame.fr -bd 2 -relief sunken]
-    pack $leftFrame $rightFrame -side left -expand yes -fill both 
+    pack $leftFrame $rightFrame -side left -expand yes -fill both
 
     set obsRangeFrame [frame $leftFrame.orf -bd 2 -relief sunken]
     set queuePosFrame [frame $leftFrame.egf -bd 2 -relief sunken]
@@ -66,8 +66,8 @@ proc buildQmanWidgets {w} {
     bind $QmanWidgets(OBS_RANGE_LAST) <Double-Button-2> "$QmanWidgets(OBS_RANGE_LAST) delete 0 end"
     bind $QmanWidgets(OBS_RANGE_LAST) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/qmanObsRangeBox1.html"
 
-    pack $label1 $QmanWidgets(OBS_RANGE_FIRST) -side left 
-    pack $QmanWidgets(OBS_RANGE_LAST) $label2 -side right 
+    pack $label1 $QmanWidgets(OBS_RANGE_FIRST) -side left
+    pack $QmanWidgets(OBS_RANGE_LAST) $label2 -side right
 
     set QmanWidgets(ENTER_OBSERVATION_RANGE) [button $tf3.b1 -text Enter]
     set QmanWidgets(CANCEL_OBSERVATION_RANGE) [button $tf3.b2 -text Remove]
@@ -79,7 +79,7 @@ proc buildQmanWidgets {w} {
 # Now do the queue position panel
     set tf1 [frame $queuePosFrame.tf1]
     set tf2 [frame $queuePosFrame.tf2]
-    pack $tf1 $tf2 
+    pack $tf1 $tf2
 
     set title [label $tf1.title -text "Queue Position"]
     bind $title <Button-2> "qmanUpdate buildQmanWidgets ALL"

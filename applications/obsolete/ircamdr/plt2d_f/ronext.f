@@ -1,6 +1,6 @@
 	SUBROUTINE RONEXT( STATUS)
 
-* Description : 
+* Description :
 *
 * Invocation :
 *     CALL RONEXT( STATUS)
@@ -33,7 +33,7 @@
 
 * Local variables :
 
-        INTEGER NEXT                    ! Number of extensions    
+        INTEGER NEXT                    ! Number of extensions
 	INTEGER LOC_IMAGE   		! locator for image
         INTEGER NUMBER                  ! Extension count
 
@@ -47,7 +47,7 @@
 	   RETURN
 	END IF
 
-*      associate container file 
+*      associate container file
 	CALL NDF_ASSOC( 'IMAGE_NAME', 'READ', LOC_IMAGE, STATUS )
 	IF( STATUS .NE. SAI__OK) THEN
           CALL NDF_ANNUL( LOC_IMAGE, STATUS)
@@ -60,7 +60,7 @@
         CALL NDF_XNUMB( LOC_IMAGE, NEXT, STATUS)
 
         CALL MSG_SETI( 'NEXT', NEXT )
-        CALL MSG_OUT( 'TOTAL', 
+        CALL MSG_OUT( 'TOTAL',
      :             '   Number of extensions:   ^NEXT', STATUS)
 
 
@@ -69,7 +69,7 @@
              CALL NDF_XNAME( LOC_IMAGE, NUMBER, XNAME, STATUS)
 
              CALL MSG_SETI( 'NUMBER', NUMBER )
-             CALL MSG_OUT( 'NAME', 
+             CALL MSG_OUT( 'NAME',
      :      '   Name of extension ^NUMBER :  '// XNAME, STATUS)
 
 

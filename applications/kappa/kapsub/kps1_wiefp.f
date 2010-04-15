@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_WIEFP( DIM1, DIM2, PSF, NPIX, NLIN, XCEN, 
+      SUBROUTINE KPS1_WIEFP( DIM1, DIM2, PSF, NPIX, NLIN, XCEN,
      :                       YCEN, OUT, WORK, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WIEFP( DIM1, DIM2, PSF, NPIX, NLIN, XCEN, YCEN, 
+*     CALL KPS1_WIEFP( DIM1, DIM2, PSF, NPIX, NLIN, XCEN, YCEN,
 *                      OUT, WORK, STATUS )
 
 *  Description:
@@ -41,7 +41,7 @@
 *     YCEN = INTEGER (Given)
 *        Y pixel index of the centre of the PSF.
 *     OUT( NPIX, NLIN ) = REAL (Returned)
-*        The Hermitian FFT of the PSF. 
+*        The Hermitian FFT of the PSF.
 *     WORK( NPIX, NLIN ) = REAL (Returned)
 *        A work array.
 *     STATUS = INTEGER (Given and Returned)
@@ -80,7 +80,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -107,18 +107,18 @@
       REAL     FACTOR            ! Normalisation factor
       INTEGER  LIN		 ! Line counter
       INTEGER  OLIN              ! Line counter in output frame
-      INTEGER  OLINHI            ! Highest value of OLIN (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OLINHI            ! Highest value of OLIN (before wrap
+				 ! around) which can be stored in the
 				 ! output image
-      INTEGER  OLINLO            ! Lowest value of OLIN (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OLINLO            ! Lowest value of OLIN (before wrap
+				 ! around) which can be stored in the
 				 ! output image
       INTEGER  OPIX              ! Pixel counter in output frame
-      INTEGER  OPIXHI            ! Highest value of OPIX (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OPIXHI            ! Highest value of OPIX (before wrap
+				 ! around) which can be stored in the
 				 ! output image
-      INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap
+				 ! around) which can be stored in the
 				 ! output image
       INTEGER  PIX               ! Pixel counter
       REAL     PSFVAL            ! Current PSF value
@@ -130,7 +130,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the whole output image to zero.
-      DO LIN = 1, NLIN 
+      DO LIN = 1, NLIN
          DO PIX = 1, NPIX
             OUT( PIX, LIN ) = 0.0
          END DO
@@ -154,7 +154,7 @@
 *  Loop through all the lines of the input PSF.
       DO LIN = 1, DIM2
 
-*  Calculate the line number in the output image at which this input 
+*  Calculate the line number in the output image at which this input
 *  line is stored.  The resulting value may be negative.
          OLIN = LIN - YCEN +1
 
@@ -162,7 +162,7 @@
 *  the area of the output image.
          IF ( OLIN .GE. OLINLO .AND. OLIN .LE. OLINHI ) THEN
 
-*  If the line number is negative wrap it round to the other side of 
+*  If the line number is negative wrap it round to the other side of
 *  the output image.
             IF ( OLIN .LE. 0 ) OLIN = OLIN + NLIN
 
@@ -174,9 +174,9 @@
 
                   IF ( OPIX .LE. 0 ) OPIX = OPIX + NPIX
 
-*  Copy the input PSF value to the correct place in the output image, 
+*  Copy the input PSF value to the correct place in the output image,
 *  and increment the total data sum.
-                  PSFVAL = PSF( PIX, LIN )            
+                  PSFVAL = PSF( PIX, LIN )
                   OUT( OPIX, OLIN ) = PSFVAL
                   SUM = SUM + PSFVAL
 
@@ -191,14 +191,14 @@
 *  If the PSF had zero data sum, abort.
       IF ( SUM .EQ. 0.0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_WIEFP_ERR1', 'PSF has zero data sum!', 
+         CALL ERR_REP( 'KPS1_WIEFP_ERR1', 'PSF has zero data sum!',
      :                  STATUS )
          GO TO 999
       END IF
-      
+
 *  Normalize the PSF to have a total data sum equal to the square root
 *  of the number of pixels in the image.  This ensures that the zero-
-*  frequency pixel will have value 1.0 when the FFT is taken. 
+*  frequency pixel will have value 1.0 when the FFT is taken.
       FACTOR = SQRT( REAL( NPIX * NLIN ) ) / SUM
 
       DO LIN = 1, NLIN

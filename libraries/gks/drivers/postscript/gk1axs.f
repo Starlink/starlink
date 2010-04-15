@@ -1,6 +1,6 @@
- 
- 
- 
+
+
+
 *---------------------------------------------------------------------
       SUBROUTINE GK1AXS(IFID,ITXPR,NCHARS,ICHSTR,X,Y)
 *---------------------------------------------------------------------
@@ -76,15 +76,15 @@
 *  STX     - Each character's X origin temporary variable
 *  STY     - Each character's Y origin temporary variable
 *
- 
+
 *     Parameters
       INTEGER ICHUNK
       PARAMETER (ICHUNK=64)
- 
+
 *     pi radians
       REAL       PI
       PARAMETER (PI=3.14159)
- 
+
 *     Offsets in KWKDAT and QWKDAT
       INTEGER    ICCHHT,   ICCHAN,   ICHWFT,    IFTNAM,   IFTPSE
       PARAMETER (ICCHHT=3, ICCHAN=4, ICHWFT=6, IFTNAM=9, IFTPSE=10)
@@ -114,13 +114,13 @@
 *
 *     Get current values against which to compare the stored attributes
 *
- 
+
 *     Base to top line distance - get and valuate:
       RUHH   = SQRT( QWCHHX(KWKIX)*QWCHHX(KWKIX) +
      :               QWCHHY(KWKIX)*QWCHHY(KWKIX) )
       RCHH   = AMAX1(QMNCHH(KWKIX),RUHH)
       RCHH   = AMIN1(QMXCHH(KWKIX),RCHH)
- 
+
 *     Character rotation:
       RCHRX  = QWCHWX(KWKIX)
       RCHRY  = QWCHWY(KWKIX)
@@ -128,7 +128,7 @@
       RCHSIN = RCHRY/RCHRL
       RCHCOS = RCHRX/RCHRL
       RANGL  = AMOD(ATAN2(RCHRY,RCHRX)+2*PI,2*PI)*180.0/PI
- 
+
 *     Character Expansion factor (taking account of transformation)
       IF(QWCHXP(KWKIX)*RCHRL .GE. QMXCHX(KWKIX)*RUHH)THEN
          RCHEXP = QMXCHX(KWKIX)
@@ -136,7 +136,7 @@
          RCHEXP = QWCHXP(KWKIX)*RCHRL/RUHH
       ENDIF
       RCHEXP = AMAX1(QMNCHX(KWKIX),RCHEXP)
- 
+
 *     Realised PostScript Height:
 *     PostScript's font height is  defined  to include vertical spacing and
 *     base to bottom line distance. Therefore, GKS Character Height must be
@@ -147,23 +147,23 @@
 *     and multiply it by the unvalidated GKS character height (unvalidated
 *     height was used to normalise the widths) and pass this information on
 *     to PostScript where true font height will be calculated.
- 
+
       RWDSP  = QFWIDS(1) * RUHH
- 
+
 *
 *     Initialise the flag
 *
       CHANGE = .FALSE.
- 
+
 *
 *     See if locally stored copy of the attributes needs updating.
 *
- 
+
 *     Hardware Text Font Number. First map the WDT font index to that of
 *     RCHW entry.
- 
+
       INDTXT = KHP(KHPXI(KWKDAT(IFTMAP,KWKIX))-KWTXFN(KWKIX)-1)
- 
+
 *     Now compare
       IF(KWKDAT(ICHWFT,KWKIX).NE.INDTXT) THEN
          KWKDAT(ICHWFT,KWKIX) = INDTXT
@@ -171,7 +171,7 @@
          KHP(KHPXI(KWKDAT(IFTUSD,KWKIX))+INDTXT-1) = 1
          CHANGE = .TRUE.
       ENDIF
- 
+
 *     PostScript Font height  (actually width of space character in device
 *     coordinates on the basis of which the correct font height would be
 *     calculated  - see above) :
@@ -179,24 +179,24 @@
          QWKDAT(ICCHHT,KWKIX) = RWDSP
          CHANGE = .TRUE.
       ENDIF
- 
+
 *     Character rotation angle
       IF(QWKDAT(ICCHAN,KWKIX).NE.RANGL) THEN
          QWKDAT(ICCHAN,KWKIX) = RANGL
          CHANGE = .TRUE.
       ENDIF
- 
+
 *     Character expansion factor
       IF(QWKDAT(ICCHXF,KWKIX).NE.RCHEXP) THEN
          QWKDAT(ICCHXF,KWKIX) = RCHEXP
          CHANGE = .TRUE.
       ENDIF
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Set up the text attributes (hardware font number, font height and
 *     rotation angle) if change has occurred.
@@ -220,11 +220,11 @@
          CALL GKFOCO(KIOPB, S(1:33+ILEN), IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
       ENDIF
- 
+
 *
 *     Output text (STRING or CHAR precision)
 *
- 
+
 *     Send the string in hexadecimal down to PostScript file
       N = ICHUNK
       CALL GKFOCO(KIOPB, '<', IREM)
@@ -236,12 +236,12 @@
          CALL GKFOCO(KIOPB, S(1:2*N), IREM)
   130 CONTINUE
       CALL GKFOCO(KIOPB, '>', IREM)
- 
+
 *
 *     CHAR precision
 *
       IF (KWTXPR(KWKIX).EQ.GCHARP) THEN
- 
+
 *     Prepare and send the origins, first X, then Y.
          CALL GKFOCO(KIOPB, '[', IREM)
          DO 150 I=1,NCHARS
@@ -255,12 +255,12 @@
             WRITE(S, 210) STX
             CALL GKFOCO(KIOPB, S(1:11), IREM)
   150    CONTINUE
- 
+
 *
 *     Finish X, start Y.
 *
          CALL GKFOCO(KIOPB, '][', IREM)
- 
+
          DO 300 I=1, NCHARS
 *        Calculate Y origin of each character - substract half the height (not
 *        forgetting  to take  into account the angle). Again, the  width  is a
@@ -273,12 +273,12 @@
             CALL GKFOCO(KIOPB, S(1:11), IREM)
   300    CONTINUE
   210    FORMAT(F11.3)
- 
+
 *
 *     Now call the txchar procedure
 *
          CALL GKFOCO(KIOPB, '] txchar', IREM)
- 
+
 *
 *     STRING precision
 *
@@ -291,14 +291,14 @@
          RCENY  = RCHH/2.0
          STX    = X(1)+(RCENY*RCHSIN-RCENX*RCHCOS)
          STY    = Y(1)-(RCENY*RCHCOS+RCENX*RCHSIN)
- 
+
 *
 *     Now call the txstr procedure
 *
          WRITE(S, 220) STX, STY
   220    FORMAT(2F11.3, ' txstr')
          CALL GKFOCO(KIOPB, S(1:28), IREM)
- 
+
       ENDIF
 *
       END

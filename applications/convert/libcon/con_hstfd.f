@@ -108,14 +108,14 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Machine-precision constants
- 
+
 *  Arguments Given:
       DOUBLE PRECISION MAXMUM              ! Maximum value used to evaluate the
                                  ! histogram
@@ -124,16 +124,16 @@
       INTEGER NFRAC              ! Number of fractions to be estimated
       INTEGER NUMBIN             ! Number of bins in histogram
       INTEGER HISTOG( NUMBIN )   ! Histogram
- 
+
 *  Arguments Given and Returned:
       REAL FRAC( NFRAC )         ! The fractions of the histogram
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION VALUES( NFRAC )     ! The data values at the
                                  ! given fractions of the histogram
 *  Status:
       INTEGER  STATUS            ! Global status
- 
+
 *  Local Variables:
       DOUBLE PRECISION BIN                ! Histogram bin width
       INTEGER I                  ! Counter
@@ -149,18 +149,18 @@
                                  ! histogram bin
       DOUBLE PRECISION THRESH             ! Threshold for identical-limits test
       REAL TOTAL                 ! Total number of values in the histogram
- 
+
 *.
- 
+
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set the minimum separation allowed for the data limits such that
 *  each of the histogram bins is resolvable.  The halving prevents
 *  arithmetic overflow for data with a very large dynamic range.
       THRESH = ( ABS( MAXMUM ) / 2.0D0 + ABS( MINMUM ) / 2.0D0 ) *
      :         VAL__EPSD * DBLE( NUMBIN )
- 
+
 *  If the maximum effectively equals minimum, o ordered statistics are
 *  meaningless, so abort.
       IF ( ABS( MAXMUM / 2.0D0 - MINMUM / 2.0D0 ) .LT. THRESH )
@@ -171,13 +171,13 @@
      :     /'be computed.', STATUS )
          GOTO 999
       END IF
- 
+
 *  Get the number of values used to form the histogram.
       NVALUE = 0
       DO  I = 1, NUMBIN
          NVALUE = NVALUE + HISTOG( I )
       END DO
- 
+
 *  Need at least three values before even a median has any sense.
       IF ( NVALUE .LT. 3 ) THEN
          STATUS = SAI__ERROR
@@ -186,11 +186,11 @@
      :     STATUS )
          GOTO 999
       END IF
- 
+
 *  Compute the binsize.
       BIN = ( MAXMUM - MINMUM ) / DBLE( NUMBIN )
       TOTAL = REAL( NVALUE )
- 
+
 *  Sort the fractions into ascending order.
       CALL CON_QSRTR( NFRAC, 1, NFRAC, FRAC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -200,42 +200,42 @@
      :     /'fractions of the histogrammed data.', STATUS )
          GOTO 999
       END IF
- 
+
 *  Decide whether to go forwards or backwards.  The two cases are used
 *  for efficiency.  The search is always to the 80 percentile.  This
 *  assumes most astronomical data, particularly images, are positively
 *  skewed.
- 
+
 *  Forwards...
       IF ( FRAC( 1 ) .LT. 0.8 ) THEN
- 
+
 *  Initialise the counters.
          J = 0
          N = 0
- 
+
 *  Consider each fractional value in the histogram.
          DO  I = 1, NFRAC
- 
+
 *  Look for the special case of zero fraction, i.e. the minimum value.
             IF ( FRAC( I ) .LT. VAL__EPSR ) THEN
                VALUES( I ) = MINMUM
- 
+
 *  Look for the special case of no fraction, i.e. the minimum value.
             ELSE IF ( ( 1.0 - FRAC( I ) ) .LT. VAL__EPSR ) THEN
                VALUES( I ) = MAXMUM
- 
+
 *  Calculate the number of data points corresponding to the required
 *  fraction.  There must be at least one count.
             ELSE
                LIMIT = MAX( 1, NINT( TOTAL * FRAC( I ) ) )
- 
+
 *  Count through the histogram to find this point.
                DO WHILE ( N .LT. LIMIT )
                   J = J + 1
                   PREV = N
                   N = N + HISTOG( J )
                END DO
- 
+
 *  Interpolate to obtain a more-accurate pixel value.
                INTFRA = REAL( LIMIT - PREV ) / REAL( N - PREV )
                VALUES( I ) = MINMUM + BIN *
@@ -243,41 +243,41 @@
             END IF
          END DO
       ELSE
- 
+
 *  Initialise the counters.
          J = NUMBIN + 1
          N = NVALUE
- 
+
 *  Consider each fractional value in the histogram.
          DO  I = NFRAC, 1, -1
- 
+
 *  Look for the special case of no fraction, i.e. the minimum value.
             IF ( ( 1.0 - FRAC( I ) ) .LT. VAL__EPSR ) THEN
                VALUES( I ) = MAXMUM
- 
+
 *  Calculate the number of data points corresponding to the required
 *  fraction.
             ELSE
                LIMIT = NINT( TOTAL * FRAC( I ) )
                LIMITU = NVALUE - LIMIT
- 
+
 *  Count backwards through the histogram to find this point.
                DO WHILE ( N .GE. LIMIT )
                   J = J - 1
                   PREV = N
                   N = N - HISTOG( J )
                END DO
- 
+
 *  Interpolate to obtain a more-accurate pixel value.
                INTFRA = 1.0 - ( REAL( LIMITU - ( NVALUE - PREV ) ) ) /
      :                  REAL( HISTOG( J ) )
- 
+
                VALUES( I ) = MINMUM + BIN *
      :                       DBLE( REAL( J - 1 ) + INTFRA )
             END IF
          END DO
       END IF
- 
+
   999 CONTINUE
- 
+
       END

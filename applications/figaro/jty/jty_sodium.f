@@ -1,6 +1,6 @@
       SUBROUTINE JTY_SODIUM(NPIX,WAVEB,WAVER,V,TEMP,NAD)
 * Program to make a "sodium correction spectrum" from a passed template.
-* Given a continuum subtracted template spectrum, SODIUM will create 
+* Given a continuum subtracted template spectrum, SODIUM will create
 * another that has just NaD of a maximum amplitude of 1. The NaD will
 * be shifted to a redshift of V km/s.
 *

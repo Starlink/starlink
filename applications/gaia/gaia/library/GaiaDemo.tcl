@@ -231,10 +231,10 @@ itcl::class gaia::GaiaDemo {
    #  Method called after initialisation.
    public method init {} {
 
-      #  Check for demo data. This such be stored in a tar file in 
+      #  Check for demo data. This such be stored in a tar file in
       #  the main gaia_dir directory.
       global gaia_dir
-      if { ! [file exists $gaia_dir/demodata.tar] } { 
+      if { ! [file exists $gaia_dir/demodata.tar] } {
          error_dialog {Failed to locate demonstration files \
                        in $GAIA_DIR/demodata.tar. Cannot continue\
                        with demonstration.}
@@ -308,7 +308,7 @@ itcl::class gaia::GaiaDemo {
 			 ====================
 
   That's all for now. If you don't want to see it all happen again
-  then press the "stop" button and wait a while (control-q in 
+  then press the "stop" button and wait a while (control-q in
   the main window will exit somewhat more quickly).
          }
       } else {
@@ -364,35 +364,35 @@ itcl::class gaia::GaiaDemo {
       set running_ 1
       loop_
    }
-   
+
    #  Main loop method.
    protected method loop_ {} {
        while { $running_ } {
-	   if { ! $quick_start_ } { 
+	   if { ! $quick_start_ } {
                display {
 
 		       Welcome to the GAIA demo
 		       ========================
 
  GAIA is an image display and analysis tool, which is distributed
- as part of the Starlink Software Collection for U.K. Astronomers. 
+ as part of the Starlink Software Collection for U.K. Astronomers.
 
- GAIA provides most of the usual facilities of image display tools, 
+ GAIA provides most of the usual facilities of image display tools,
  plus more astronomically useful ones such as object photometry,
  arbitrary region analysis, celestial coordinate support (i.e.
  coordinate readout, calibration and modification), grid overlays,
- blink comparison, defect patching, contouring, object detection 
+ blink comparison, defect patching, contouring, object detection
  and the ability to query on-line (WWW) catalogues.
                     }
                display {
  During this demonstration GAIA will be controlled non-interactively.
- So although you may interact with it (if you feel the need, but 
- don't be surprised if things move on, or go horribly wrong), you 
+ So although you may interact with it (if you feel the need, but
+ don't be surprised if things move on, or go horribly wrong), you
  should really just stand back and watch.
                }
                display {
  By the way, GAIA stands for:
- 
+
              Graphical Astronomy and Image Analysis Tool.
 
  It is based on the SkyCat tool from ESO (the European Southern
@@ -418,13 +418,13 @@ itcl::class gaia::GaiaDemo {
                #  Final message is a warning for those sensitive to
                #  flashing images.
                display {
-                  
+
                        WARNING: FLASHING IMAGES
                        ========================
 
  This demonstration contains flashing images, look away if this
  may affect you.
-                       
+
                     }
 	   }
 	   # Main loop.
@@ -498,10 +498,10 @@ itcl::class gaia::GaiaDemo {
                          ===================
 
   This demonstration will start by displaying an image (of NGC1275).
-  It will then show some basic operations, such modifying the 
+  It will then show some basic operations, such modifying the
   apparent detail through changing the minimum and maximum displayed
-  values, rotation and flips for primitive reorientations and will 
-  finally cycle through a list of some possible false colours tables 
+  values, rotation and flips for primitive reorientations and will
+  finally cycle through a list of some possible false colours tables
   and intensity transfer functions.
       }
       short_display {Displaying the image...}
@@ -545,7 +545,7 @@ itcl::class gaia::GaiaDemo {
 	 $itk_option(-rtdimage) cmap file $cmap
          refresh_
 	 foreach imap "ramp.iasc equa.iasc log.iasc neg.iasc lasritt.iasc" {
-            if { $imap != "null.iasc" } { 
+            if { $imap != "null.iasc" } {
                $itk_option(-gaiactrl) itt file $imap
                short_display "Cycling through tables... cmap: $cmap, itt: $imap"
                refresh_
@@ -775,7 +775,7 @@ itcl::class gaia::GaiaDemo {
  estimates etc. that appear in the object details fields. All object
  measurements can be viewed under the Results tab.
 
- If necessary the object background can be determined from 
+ If necessary the object background can be determined from
  non-annular regions and the objects themselves may be measured
  in elliptical apertures.
       }
@@ -886,7 +886,7 @@ itcl::class gaia::GaiaDemo {
 			      Contouring
 			      ==========
 
- Contouring can be done of the displayed image, or any other image 
+ Contouring can be done of the displayed image, or any other image
  over the displayed image.
 
  The first example shows an image contoured by its own data. The
@@ -929,7 +929,7 @@ itcl::class gaia::GaiaDemo {
  Automated object detection and analysis is performed using a toolbox
  that controls the SExtractor (source extractor) program.
 
- The results are shown in a catalogue window as detection ellipses. 
+ The results are shown in a catalogue window as detection ellipses.
 
       }
       short_display {Displaying an image...}
@@ -959,12 +959,12 @@ itcl::class gaia::GaiaDemo {
 
 			   Blink Comparison
 			   ================
-				   
+
  It is possible to display more than one image at a time. Each of
  these can be compared with the others using a "blink comparision"
  toolbox.
 
- Images in the blink toolbox can be moved about relative to each 
+ Images in the blink toolbox can be moved about relative to each
  other.
       }
       show_image_ frame.sdf 90 1
@@ -986,7 +986,7 @@ itcl::class gaia::GaiaDemo {
       wait_ $readtime_
       $toolbox animate_off
       delete object $toolbox
-      delete object $clone 
+      delete object $clone
    }
 
    #  Display an astrometry grid.
@@ -1058,7 +1058,7 @@ itcl::class gaia::GaiaDemo {
       $toolbox read_options $demo_dir_/cobe_bit.opt
       short_display {Drawing grid just over zoomed part of image}
       $toolbox remove_grid
-      $itk_option(-gaiactrl) scale 3 3 
+      $itk_option(-gaiactrl) scale 3 3
       $toolbox draw_grid 1
       $itk_option(-imagetrans) update_trans
       wait_ $readtime_
@@ -1182,7 +1182,7 @@ itcl::class gaia::GaiaDemo {
  move/scale all the reference positions globally.
 
  For this demonstration an approximate calibration will be added to
- the image, which will then be refined by adding in a shift and 
+ the image, which will then be refined by adding in a shift and
  rotation. These positions will then be corrected further by
  centering on the nearest intensity peaks.
       }
@@ -1315,7 +1315,7 @@ $catlist
       $w_.cat delete
       show_image_ ngc1275.fits 95 2
       display {
- The results of a query on the NGC1275 field for the HST Guide Star 
+ The results of a query on the NGC1275 field for the HST Guide Star
  Catalogue will now be displayed.
 
  Note these results can be used as reference positions when
@@ -1326,7 +1326,7 @@ $catlist
 
       #  Get name of catalogue window. This is the one that is
       #  displaying our file.
-      if { $toolbox == {} } { 
+      if { $toolbox == {} } {
          set toolbox [find_skycat_ ngc1275_gsc.tab]
          if { $toolbox == "" } {
             return
@@ -1373,7 +1373,7 @@ $catlist
       refresh_
       move_to_side_ $toolbox
       refresh_
-      
+
       #  Highlight some objects.
       short_display {Selecting an object...}
       $itk_option(-rtdimage) convert coords 160 160 image x0 y0 canvas
@@ -1520,7 +1520,7 @@ $catlist
         "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
          contour_ detection_ blink_ grid_ astdefine_ astreference_ \
          astrefine_ astcopy_ skycat_ archives_"
-   
+
    #  Interval to wait while reading text
    protected variable readtime_ 15000
 

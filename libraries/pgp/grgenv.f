@@ -7,7 +7,7 @@
 *   Get value of PGPLOT environment parameter or PATH
 *
 *   Given
-*      NAME     c   The name of the parameter to evaluate.  
+*      NAME     c   The name of the parameter to evaluate.
 *
 *   Returned
 *      VALUE    c   receives the value of the parameter, truncated or extended
@@ -16,9 +16,9 @@
 *      L        i   receives the number of characters in VALUE, excluding
 *                   trailing blanks. If the parameter is undefined, zero is
 *                   returned.
-*      
+*
 *    In Unix, environment parameters are environment variables; e.g. parameter
-*    ENVOPT is environment variable PGPLOT_ENVOPT. Translation is not 
+*    ENVOPT is environment variable PGPLOT_ENVOPT. Translation is not
 *    recursive and is case-sensitive.
 *
 *    The strings DEV is considered a special case and a default

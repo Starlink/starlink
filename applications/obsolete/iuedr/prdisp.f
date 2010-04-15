@@ -93,7 +93,7 @@
 
 *     Old format dispersion data.
          IF ( .NOT. STR_SIMLR( 'IUE_DISPN\\', DISPTP ) ) THEN
-          
+
 *        THDA derivatives.
             CALL LINE_WRITF( '%p%4w Standard THDA %.2f (C),\\', DISPT0 )
             CALL LINE_WRITF( ' derivatives (%g,\\', DISPST )

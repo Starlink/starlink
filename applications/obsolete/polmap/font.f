@@ -1,23 +1,23 @@
       SUBROUTINE FONT(NPARAMS,PARAMS,OUT_LU)
 C+
 C
-C Subroutine: 
-C     
+C Subroutine:
+C
 C        F O N T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Interface for PGSCF
 C
 C

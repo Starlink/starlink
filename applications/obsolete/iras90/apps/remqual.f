@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,7 +128,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...',
      :                IGRP1, NIN, STATUS )
 
 *  Create a group to hold the quality names which are to be removed.
@@ -138,7 +138,7 @@
       CALL GRP_SETCS( IGRP2, .FALSE., STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999 
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain the quality names to be removed, storing them in the group
 *  just created. Loop until the group expression obtained from the
@@ -226,7 +226,7 @@
 *  Get the next quality name.
             CALL GRP_GET( IGRP2, INAME, 1, QNAME, STATUS )
 
-*  Remove the quality name. 
+*  Remove the quality name.
             IF( STATUS .EQ. SAI__OK ) THEN
                CALL IRQ_REMQN( LOCS, QNAME, STATUS )
 
@@ -244,7 +244,7 @@
                   IF( QNAME .NE. 'ANY' ) THEN
                      CALL MSG_SETC( 'QN', QNAME )
                      CALL MSG_OUTIF( MSG__NORM, 'REMQUAL_MSG5',
-     :                               '    Quality name "^QN" removed', 
+     :                               '    Quality name "^QN" removed',
      :                               STATUS )
                      HISREC = HISREC + 1
                      HSTORY( HISREC ) = '  '//QNAME
@@ -252,7 +252,7 @@
 *  Give a better message if all quality names have been removed.
                   ELSE
                      CALL MSG_OUTIF( MSG__NORM, 'REMQUAL_MSG6',
-     :                               '    All quality names removed', 
+     :                               '    All quality names removed',
      :                               STATUS )
                      HISREC = 2
                      HSTORY( 1 ) = 'All quality names were removed.'
@@ -302,7 +302,7 @@
 *  If an error occurred, clear up.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was equested, 
+*  If a null parameter was given or a parameter abort was equested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

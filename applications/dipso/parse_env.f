@@ -25,15 +25,15 @@
 *  Initialise the local status.
       STATUS = SAI__OK
 
-       CALL PSX_UNAME ( sysname , nodename , release , 
+       CALL PSX_UNAME ( sysname , nodename , release ,
      :                  version , machine , status )
 
        status = SAI__OK
-       IF ( string(1:1) .EQ. '$' .AND. 
+       IF ( string(1:1) .EQ. '$' .AND.
      :      INDEX(string,'/') .GT. 0 ) THEN
           imark = INDEX(string,'/')
 	  lstring = string(2:imark-1)
-          IF ( sysname .EQ. 'VMS' ) CALL CHR_UCASE(lstring)          
+          IF ( sysname .EQ. 'VMS' ) CALL CHR_UCASE(lstring)
           CALL GTENV ( lstring, env, xlate, status )
           IF ( status .EQ. SAI__OK ) THEN
              xlen = INDEX(xlate,' ') -1
@@ -45,19 +45,19 @@
                 string = xlate(1:xlen)//string(imark:)
                 length = length - imark+1 + xlen
              ENDIF
-          ELSE 
+          ELSE
              CALL ERR_FLUSH ( status )
           ENDIF
 
        ELSE IF ( INDEX(string,':') .GT. 0 ) THEN
           imark = INDEX(string,':')
           ibegin = imark-1
-          DO WHILE ( ibegin .GT. 1 .AND. 
+          DO WHILE ( ibegin .GT. 1 .AND.
      :               string(ibegin:ibegin) .NE. ' ' )
             ibegin = ibegin - 1
           END DO
 	  lstring = string(ibegin:imark-1)
-          IF ( sysname .EQ. 'VMS' ) CALL CHR_UCASE(lstring)          
+          IF ( sysname .EQ. 'VMS' ) CALL CHR_UCASE(lstring)
           CALL GTENV ( lstring, env, xlate, status )
           IF ( status .EQ. SAI__OK ) THEN
              xlen = INDEX(xlate,' ') -1
@@ -68,11 +68,11 @@
                 string = xlate(1:xlen) // '/' // string(imark+1:)
                 length = length - imark+ibegin + xlen
              ENDIF
-          ELSE 
+          ELSE
              CALL ERR_FLUSH ( status )
           ENDIF
 
 
        ENDIF
-       
+
        END

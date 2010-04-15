@@ -115,7 +115,7 @@
       DSA_STATUS = ADAM__OK
       CALL DSA_OPEN( DSA_STATUS )
 
-*    Open the reduced group file and find out the important points of the 
+*    Open the reduced group file and find out the important points of the
 *    observations making up the group
       CALL RED4_CHECK_INPUT( GROUP, STATUS )
       CALL DSA_NAMED_INPUT( 'GRPFILE', GROUP, DSA_STATUS)
@@ -323,7 +323,7 @@
 *          Set the quality of the record to 'GOOD'.
             OBSREC.QUALITY = 'GOOD'
 
-*          from the name of the group file construct the name of the 
+*          from the name of the group file construct the name of the
 *          index file, which should have a name of the form CGS4_890818.INDEX
             CALL RED4_GRPTOINDEX( GROUP, INDEX_FILE, STATUS )
 

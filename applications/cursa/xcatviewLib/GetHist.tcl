@@ -66,7 +66,7 @@ proc GetHist { } {
      global localNormal
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -524,7 +524,7 @@ proc GetHist { } {
        -command {HelpText GetHist_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .gethist.buttonrow.default -relief sunken -bd 1
@@ -575,7 +575,7 @@ proc GetHist { } {
 
      .gethist.opt.title.value delete 0 end
      .gethist.opt.title.value insert 0 $histTitle
-     
+
 #   ... X axis.
 
      .gethist.opt.xaxis.value delete 0 end

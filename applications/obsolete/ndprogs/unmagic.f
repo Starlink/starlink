@@ -26,7 +26,7 @@ C   Environment
 C   -----------
 C   FIGARO
 C
-C                                            
+C
 C   Parameters (read or written)
 C   ----------------------------
 C   IMAGE   Name of the structure containing the input image. (character)
@@ -40,22 +40,22 @@ C           operation is to end. (real, array)(prompted for).
 C
 C   INTERP  Method used to compute the value of each output pixel (integer)
 C           (prompted for). These method numbers are also used in TRANSFORM.
-C           Method 1 (nearest neighbour) is offered in TRANSFORM but is not 
+C           Method 1 (nearest neighbour) is offered in TRANSFORM but is not
 C           appropriate to UNMAGIC.
 C           2 = average of neighbours
 C           3 = linear interpolation
 C           4 = higher order (not yet available)
 C           5 = replace with a constant value
 C
-C   MINADJ  For method 2, the minimum number of adjacent pixels which must 
+C   MINADJ  For method 2, the minimum number of adjacent pixels which must
 C           be non-magic for an average value to be computable. (integer)
-C           (prompted for). 
+C           (prompted for).
 C
-C   VALUE   For method 5, the value to be assigned to all magic value 
-C           pixels. (real)(prompted for).                              
+C   VALUE   For method 5, the value to be assigned to all magic value
+C           pixels. (real)(prompted for).
 C
-C   OUTPUT  Name of the structure containing the output image. May be the 
-C           same as IMAGE. (character)(prompted for).     
+C   OUTPUT  Name of the structure containing the output image. May be the
+C           same as IMAGE. (character)(prompted for).
 C
 C
 C   Keywords
@@ -76,12 +76,12 @@ C   - The IMAGE structure is tested for the bad data flag. If it is found
 C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
 C   - The structure IMAGE is copied to OUTPUT.
-C   - A subroutine appropriate to the data type and the required interpolation 
-C     method values is called to interpolate using the values available in the 
+C   - A subroutine appropriate to the data type and the required interpolation
+C     method values is called to interpolate using the values available in the
 C     IMAGE data array, and store the results in the OUTPUT data array.
 C   - The OUTPUT bad data flag is unset only if the whole of IMAGE was used
-C     and no magic values remain. 
-C                                               
+C     and no magic values remain.
+C
 C
 C   External functions & subroutines called
 C   ---------------------------------------
@@ -129,7 +129,7 @@ C
 C
 C   INCLUDE statements
 C   ------------------
-C   INCLUDE 'DYNAMIC_MEMORY'  
+C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
 C   INCLUDE 'DCV_FUN'
@@ -145,7 +145,7 @@ C   ------------------------
 C   - Provide a higher order interpolation method.
 C   - Repeat the chosen interpolation operation until no magic value pixels
 C     remain. This would mean using work arrays so that the output of one
-C     iteration can become the input for the next. 
+C     iteration can become the input for the next.
 C
 C
 C   Author/s
@@ -170,7 +170,7 @@ C   Functions used.
 C
       INTEGER  DYN_ELEMENT,ICH_ENCODE,ICH_LEN
 C
-C   Local variables.                     
+C   Local variables.
 C
       INTEGER   ADDRESS             ! Address of dynamic memory element
       LOGICAL   BADPIX              ! Value of bad pixel flag
@@ -206,10 +206,10 @@ C
       REAL      VAL_FLOAT           ! REAL constant value
       LOGICAL   WHOLE               ! Whole image processed flag
       REAL      ZAPPIX              ! Number of magic value pixels replaced
-C      
+C
       INTEGER   NEW_FILE,NO_DATA
       PARAMETER (NEW_FILE=1,NO_DATA=0)
-C                      
+C
       INCLUDE 'DYNAMIC_MEMORY'
       INCLUDE 'MAGIC_VALUES'
       INCLUDE 'NUMERIC_RANGES'
@@ -231,7 +231,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Display information on IMAGE.
-C                               
+C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.TRUE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
       CALL DSA_SEEK_QUALITY('IMAGE',QUAL,STATUS)
@@ -253,17 +253,17 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get IMAGE axis range.
-C                              
+C
       CALL NDP_AXIS_RANGE
      &  ('IMAGE',DIMS,NDIM,START,END,STAPIX,ENDPIX,STATUS)
-      IF(STATUS.NE.0)GO TO 500         
+      IF(STATUS.NE.0)GO TO 500
 C
-C   Get interpolation method.                        
+C   Get interpolation method.
 C
       CALL PAR_RDVAL('INTERP',2.0,5.0,2.0,' ',DUMREAL)
       INTERP=INT(DUMREAL)
 C
-C   Get number of adjacent non-magic pixels.                        
+C   Get number of adjacent non-magic pixels.
 C
       IF(INTERP.EQ.2)THEN
         CALL PAR_RDVAL('MINADJ',1.0,REAL(3**NDIM-1),1.0,' ',DUMREAL)
@@ -289,9 +289,9 @@ C
           VAL_FLOAT=DUMREAL
         END IF
       END IF
-C                                          
+C
 C   Open file for OUTPUT.
-C                                                       
+C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
@@ -313,18 +313,18 @@ C
         CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,ISLOT,STATUS)
       END IF
       IF(STATUS.NE.0)GO TO 500
-      IMPTR=DYN_ELEMENT(ADDRESS)                 
+      IMPTR=DYN_ELEMENT(ADDRESS)
 C
 C   Map OUTPUT data array.
 C
       IF(TYPE.EQ.'SHORT')THEN
         CALL DSA_MAP_DATA('OUTPUT','WRITE','SHORT',ADDRESS,OSLOT,STATUS)
-      ELSE                             
+      ELSE
         CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
       END IF
       IF(STATUS.NE.0)GO TO 500
       OUTPTR=DYN_ELEMENT(ADDRESS)
-C   
+C
 C   Map quality arrays if necessary
 C
       IF (QUAL) THEN
@@ -335,49 +335,49 @@ C
      &                        ADDRESS,OQSLOT,STATUS)
         OQPTR=DYN_ELEMENT(ADDRESS)
       END IF
-C       
+C
 C   Perform the editing operation.
 C
       CALL DSA_WRUSER('Editing data array...\\N')
-C                                    
-      IF(TYPE.EQ.'SHORT')THEN                  
-        IF(INTERP.EQ.2)THEN            
+C
+      IF(TYPE.EQ.'SHORT')THEN
+        IF(INTERP.EQ.2)THEN
           CALL UNMAGIC_AVERAGE_W(DYNAMIC_MEM(IMPTR),
      &                           DYNAMIC_MEM(OUTPTR),
      &                           DIMS,NDIM,NELM,STAPIX,ENDPIX,
      &                           MINADJ,ZAPPIX,MAGICPIX,MAGIC_SHORT,
      &                           QUAL,DYNAMIC_MEM(IQPTR),
      &                           DYNAMIC_MEM(OQPTR))
-        ELSE IF(INTERP.EQ.3)THEN            
+        ELSE IF(INTERP.EQ.3)THEN
           CALL UNMAGIC_LINEAR_W(DYNAMIC_MEM(IMPTR),
      &                          DYNAMIC_MEM(OUTPTR),
      &                          DIMS,NDIM,NELM,STAPIX,ENDPIX,
      &                          MINADJ,ZAPPIX,MAGICPIX,MAGIC_SHORT,
      &                          QUAL,DYNAMIC_MEM(IQPTR),
      &                          DYNAMIC_MEM(OQPTR))
-        ELSE IF(INTERP.EQ.5)THEN            
+        ELSE IF(INTERP.EQ.5)THEN
           CALL UNMAGIC_CONSTANT_W(DYNAMIC_MEM(OUTPTR),
      &                            DIMS,NDIM,NELM,STAPIX,ENDPIX,
      &                            VAL_SHORT,ZAPPIX,MAGIC_SHORT,
      &                            QUAL,DYNAMIC_MEM(IQPTR),
      &                            DYNAMIC_MEM(OQPTR))
         END IF
-      ELSE                                                           
-        IF(INTERP.EQ.2)THEN            
+      ELSE
+        IF(INTERP.EQ.2)THEN
           CALL UNMAGIC_AVERAGE_R(DYNAMIC_MEM(IMPTR),
      &                           DYNAMIC_MEM(OUTPTR),
      &                           DIMS,NDIM,NELM,STAPIX,ENDPIX,
      &                           MINADJ,ZAPPIX,MAGICPIX,MAGIC_FLOAT,
      &                           QUAL,DYNAMIC_MEM(IQPTR),
      &                           DYNAMIC_MEM(OQPTR))
-        ELSE IF(INTERP.EQ.3)THEN            
+        ELSE IF(INTERP.EQ.3)THEN
           CALL UNMAGIC_LINEAR_R(DYNAMIC_MEM(IMPTR),
      &                          DYNAMIC_MEM(OUTPTR),
      &                          DIMS,NDIM,NELM,STAPIX,ENDPIX,
      &                          MINADJ,ZAPPIX,MAGICPIX,MAGIC_FLOAT,
      &                          QUAL,DYNAMIC_MEM(IQPTR),
      &                          DYNAMIC_MEM(OQPTR))
-        ELSE IF(INTERP.EQ.5)THEN            
+        ELSE IF(INTERP.EQ.5)THEN
           CALL UNMAGIC_CONSTANT_R(DYNAMIC_MEM(OUTPTR),
      &                            DIMS,NDIM,NELM,STAPIX,ENDPIX,
      &                            VAL_FLOAT,ZAPPIX,MAGIC_FLOAT,
@@ -394,9 +394,9 @@ C
       CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
 C
 C   Set bad pixel flag as appropriate if the whole image was processed. If a
-C   subset was processed this poses a problem since the program has no way of 
-C   knowing whether magic values still remain outside the subset. A run of the 
-C   STATS program using the CHECK option should follow immediately to remove 
+C   subset was processed this poses a problem since the program has no way of
+C   knowing whether magic values still remain outside the subset. A run of the
+C   STATS program using the CHECK option should follow immediately to remove
 C   the doubt.
 C
       IF (.NOT.QUAL) THEN
@@ -421,12 +421,12 @@ C
      &            ('A run of STATS with the CHECK option is ')
           CALL DSA_WRUSER
      &            ('recommended to remove all doubt.\\N')
-        END IF                                             
+        END IF
       END IF ! (.NOT.QUAL)
 C
 C   Tidy up and exit.
 C
-  500 CONTINUE         
+  500 CONTINUE
       CALL DSA_CLOSE(STATUS)
 C
       END

@@ -1,23 +1,23 @@
       SUBROUTINE SET_PAPER(NPARAMS,PARAMS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  S E T _ P A P E R
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Interface for pgpaper subroutine
 C
@@ -29,7 +29,7 @@ C-
       REAL PARAMS(*),ASPECT
       INTEGER OUT_LU
       LOGICAL OK
-      
+
       IF (NPARAMS.EQ.0) THEN
        CALL GET_PARAM('Width in cm',PARAMS(1),OK,OUT_LU)
        IF (.NOT.OK) GOTO 666

@@ -17,99 +17,99 @@
 #     This program attempts to find all the source code files which form
 #     part of the USSC.  Given a base directory $srcdir, typically
 #     /star/sources, it examines all files underneath it, and builds
-#     three indexes: 
+#     three indexes:
 #
 #        - a DBM file called 'file' of C and Fortran functions and routines
 #        - a DBM file called 'func' of all files comprising each package
 #        - a text file called 'tasks' of all package and task names
 #
-#     The files examined to build these indexes may be sitting 'naked' 
+#     The files examined to build these indexes may be sitting 'naked'
 #     in one of the directories below $srcdir, or may be in a (compressed
-#     or uncompressed) tar file, or may be in a tar file within such a 
-#     tar file (nested to an arbitrary level, although not usually deeper 
+#     or uncompressed) tar file, or may be in a tar file within such a
+#     tar file (nested to an arbitrary level, although not usually deeper
 #     than 2).
 #
-#     For every file located, its name and location are written to the 
+#     For every file located, its name and location are written to the
 #     'file' index.
 #
 #     Other actions may be taken according to the kind of file:
 #
-#     If a language-specific tagging routine exists for that file type, 
-#     it is tagged and any function definitions the tagging routines 
-#     identify in it are written by name and location of the file into 
+#     If a language-specific tagging routine exists for that file type,
+#     it is tagged and any function definitions the tagging routines
+#     identify in it are written by name and location of the file into
 #     the 'func' index.
-#     
+#
 #     If a .hlp file is found, it is used to try to identify the names
-#     of 'tasks' within the package.  As well as the examining .hlp 
-#     files, some poking around in $bindir (typically /star/bin) is 
-#     done to try to locate more tasks.  
+#     of 'tasks' within the package.  As well as the examining .hlp
+#     files, some poking around in $bindir (typically /star/bin) is
+#     done to try to locate more tasks.
 #     What constitutes a task is not well defined, but is something
 #     like the name of an executable or alias which can be typed from
 #     the user environment to do something useful in the package, and
 #     for which an identifiable piece of source code exists.
 #     The general philosophy for identifying tasks is to
 #     look everywhere which might give an indication of task names, and
-#     store anything which looks as if it might be a task name in the 
-#     global hash of lists %tasks.  At the end of the indexing, each 
-#     task name candidate in %tasks for which a corresponding source 
+#     store anything which looks as if it might be a task name in the
+#     global hash of lists %tasks.  At the end of the indexing, each
+#     task name candidate in %tasks for which a corresponding source
 #     module (i.e one in the same package with the same, or nearly
-#     the same name) can be found is written out to the task list, 
+#     the same name) can be found is written out to the task list,
 #     and the others are discarded.
 #
 #     The 'file' and 'func' indexes are implemented as StarIndex objects.
-#     These are documented in the module StarIndex.pm, but basically 
+#     These are documented in the module StarIndex.pm, but basically
 #     resemble a (disk based) two-dimensional hash indexed by key
 #     (where key is filename for 'file' and function name for 'func')
 #     and, optionally, package name.  Hooks are present in the code
-#     for use of other indexes, for instance listing function names 
+#     for use of other indexes, for instance listing function names
 #     in languages other than C and Fortran.
 #
 #     Each line in the task file is of the format:
 #
 #           package:time: task1 task2 task3 ...
 #
-#     with each indexed package for which any entries appear in a 
+#     with each indexed package for which any entries appear in a
 #     StarIndex object appearing exactly once.  Thus the tasks file
 #     is the record of all the packages which have been indexed as
 #     well as the record of all the task names.  The time field
 #     indicates the time associated with the index for this package
-#     (in seconds since the epoch); this is currently the time at 
+#     (in seconds since the epoch); this is currently the time at
 #     which the index for that package was built.
-#     Although the task file is plain text, some of the lines may be 
+#     Although the task file is plain text, some of the lines may be
 #     quite long.
 
 #  Arguments:
 #     package-location = string (optional).
-#        Each package-location is either a directory called by the 
-#        name of the package, or a tarfile called 'package.tar', 
-#        'package.tar.Z' or 'package.tar.gz'.  For each package 
+#        Each package-location is either a directory called by the
+#        name of the package, or a tarfile called 'package.tar',
+#        'package.tar.Z' or 'package.tar.gz'.  For each package
 #        indexed in this way, any existing index entries concerning
 #        it are first erased from the indexes, and new entries are
 #        written for all files and routines found.  Index entries
 #        for other packages are not affected.
 #
 #     If no arguments are given, the indexes are erased entirely and
-#     built again for scratch from all the packages in $srcdir 
-#     (typically /star/sources).  Additionally all the files in the 
+#     built again for scratch from all the packages in $srcdir
+#     (typically /star/sources).  Additionally all the files in the
 #     include directory $incdir (typically /star/include) are indexed.
 
 #  Flags:
 #     -update
 #        If this flag is present then only packages which have been
 #        modified since they were last indexed are indexed.
-#        Time of last modification is determined from the mtime of 
-#        the files; of the tar file only if the indexed package is a 
+#        Time of last modification is determined from the mtime of
+#        the files; of the tar file only if the indexed package is a
 #        tar file, or of the directory and all the files in the top
 #        level only of the directory if it is a directory.
 
 #  Notes:
-#     Operation of this script will be affected by the build-time and 
+#     Operation of this script will be affected by the build-time and
 #     run-time values of certain environment variables, as documented
 #     in the module Scb.pm.
 
 #  Examples:
 #     scbindex
-#        Build an index, in directory $SCB_INDEX, of all the packages 
+#        Build an index, in directory $SCB_INDEX, of all the packages
 #        in the default sources directory ($SCB_SOURCES).
 #     scbindex ccdpack
 #        Overwrite the index for the ccdpack package which is stored in
@@ -118,7 +118,7 @@
 #        Overwrite the index in $SCB_INDEX with the copy of the ccdpack
 #        package which is in ~/star.
 #     scbindex -update
-#        Rewrite index entries for all the packages in the default 
+#        Rewrite index entries for all the packages in the default
 #        sources directory which have been updated since the last time
 #        scbindex was run.
 
@@ -173,8 +173,8 @@ rmrf $tmpdir;
 mkdirp $tmpdir, 0755 or error "mkdir -p $tmpdir: $!";
 
 #  Set up signal handler.  Note this is not entirely safe since tidyup
-#  does non-trivial work and so (probably) calls some non-reentrant 
-#  routines.  If the handler is called at an unlucky time this may 
+#  does non-trivial work and so (probably) calls some non-reentrant
+#  routines.  If the handler is called at an unlucky time this may
 #  result in an inelegant exit (core dump).
 
 $SIG{'INT'} = sub {tidyup; exit;};
@@ -217,7 +217,7 @@ if (@ARGV) {
    }
 }
 
-#  If no packages are named on the command line, index all packages 
+#  If no packages are named on the command line, index all packages
 #  under $srcdir, and include files under $incdir.
 
 else {
@@ -230,7 +230,7 @@ else {
 #  Write checked task names out to text file.
 #  Currently, a task is identified as anything which has been identified
 #  as a candidate for taskhood by other routines (stored in global hash
-#  %tasks) for which a module of the same name (possibly with appended 
+#  %tasks) for which a module of the same name (possibly with appended
 #  underscore) exists in the same package.
 
 my ($line, $module);
@@ -279,17 +279,17 @@ sub index_pack {
 
 #  Description:
 #     Given the location (tarfile or directory) of a Starlink package,
-#     index all indexable modules and files in it by writing entries 
+#     index all indexable modules and files in it by writing entries
 #     to StarIndex objects.
 
 #  Arguments:
 #     $pack_file = string.
-#        Location of package.  Either the pathname of a directory having 
-#        the name of the package, or the pathname of a tarfile. 
+#        Location of package.  Either the pathname of a directory having
+#        the name of the package, or the pathname of a tarfile.
 #     $package = string (optional).
 #        Name of package.  If absent it will be inferred from $pack_file
 #        which is assumed to be of the form 'package', 'package.tar',
-#        'package.tar.Z' or 'package.tar.gz'.  If present the package 
+#        'package.tar.Z' or 'package.tar.gz'.  If present the package
 #        is forced to be named as given.
 
 #  Return value:
@@ -369,7 +369,7 @@ sub index_pack {
       }
       if ($uptodate) {
          print "*** Skipping '$fqpack_file' (indexed since last change)"
-             . " ***\n"; 
+             . " ***\n";
          return;
       }
    }
@@ -381,7 +381,7 @@ sub index_pack {
 
    foreach $iname (@indexes) {
       $index{$iname}->delpack($package);
-   }  
+   }
 
 #  If any tasks exist for this package delete them.
 
@@ -391,8 +391,8 @@ sub index_pack {
 
    $index{'file'}->put("$package#", $fqpack_file);
 
-#  Clear hash of files which have been tagged in this package already 
-#  (used so that duplicate entries inside and outside of tar files are 
+#  Clear hash of files which have been tagged in this package already
+#  (used so that duplicate entries inside and outside of tar files are
 #  not both processed).
 
    %tagged = ();
@@ -435,13 +435,13 @@ sub index_pack {
       popd;
    }
 
-#  If we have got this far then indexing has been successful; record last 
+#  If we have got this far then indexing has been successful; record last
 #  indexed time.
 
    $itime{$package} = time;
-   
+
 }
- 
+
 
 
 ########################################################################
@@ -464,7 +464,7 @@ sub index_list {
 #     This routine examines a list of files in a Starlink package;
 #     each file is identified as a naked file of an interesting type,
 #     a tar file, or a directory, and handed off to a routine designed
-#     to deal with that type.  If it falls into none of these 
+#     to deal with that type.  If it falls into none of these
 #     categories it is ignored.
 
 #  Arguments:
@@ -499,14 +499,14 @@ sub index_list {
    my ($path, @files) = @_;
 
 #  Sort the file list so that tar files are indexed before anything else.
-#  If the same files exist inside and outside a tar file, they only get 
-#  tagged once, since the second time round the taggable() routine spots 
+#  If the same files exist inside and outside a tar file, they only get
+#  tagged once, since the second time round the taggable() routine spots
 #  them as having already been done.
-#  Thus by doing this sort, if the file exists both inside and outside 
-#  its tar archive, the one inside is the one that gets indexed.  
-#  The purpose of this is so that the file location recorded is the one 
-#  inside the tar file - this gives more information about where to find 
-#  it than if its unpacked location is recorded (since the unpacked 
+#  Thus by doing this sort, if the file exists both inside and outside
+#  its tar archive, the one inside is the one that gets indexed.
+#  The purpose of this is so that the file location recorded is the one
+#  inside the tar file - this gives more information about where to find
+#  it than if its unpacked location is recorded (since the unpacked
 #  location can be inferred from the packed one, but not vice versa).
 
    @files = sort { index ($b, '.tar') <=> index ($a, '.tar') } @files;
@@ -520,11 +520,11 @@ sub index_list {
 
 #     Directory.  Skip it if it's a symbolic link, since symbolic links
 #     to the current directory or its parents can cause terrible trouble,
-#     and in any case we probably don't want to index it if it's not 
+#     and in any case we probably don't want to index it if it's not
 #     really in the source tree.
 
       if (-d $file && -r _ && -x _ && !-l $file) {
-         index_dir "$path$file/", $file; 
+         index_dir "$path$file/", $file;
       }
 
 #     Tar archive (possibly compressed).
@@ -623,9 +623,9 @@ sub index_tar {
 #     index_tar ($path, $tarfile);
 
 #  Description:
-#     This routine extracts all files from a (possibly compressed) tar 
+#     This routine extracts all files from a (possibly compressed) tar
 #     file and indexes them.  As well as passing them to the source code
-#     tagging and indexing routine, which attempts to tag them in a 
+#     tagging and indexing routine, which attempts to tag them in a
 #     language-specific way, this routine is where all the filenames
 #     are indexed in the 'file' StarIndex object.  It is done here rather
 #     than elsewhere since it is expected that all the files worth
@@ -686,7 +686,7 @@ sub index_tar {
 #  Pass list of files to function indexing routine.
 
    index_list $path, @files;
-   
+
 #  Tidy up.
 
    unlink @files;
@@ -754,7 +754,7 @@ sub index_source {
 
 #  Get language-specific tagging routine.
 
-   (ref ($rtagger = $tagger{$ext}) eq 'CODE') 
+   (ref ($rtagger = $tagger{$ext}) eq 'CODE')
       or error "Language-specific tagging routine doesn't seem to exist\n";
 
 #  Tag source file using language-specific tagging routine.
@@ -797,9 +797,9 @@ sub index_hlp {
 #  Description:
 #     This routine pokes around in a Starlink .hlp file for clues to
 #     what might be a task name.  It adopts a fairly unsophisticated
-#     approach: any help topic which appears at the base level of 
+#     approach: any help topic which appears at the base level of
 #     a .hlp file is taken as a candidate, on the basis that probably
-#     there will be a help topic for each task.  Many of these will be 
+#     there will be a help topic for each task.  Many of these will be
 #     false candidates, but they should get weeded out later, when the
 #     tasks file is being written.
 #
@@ -851,7 +851,7 @@ sub index_hlp {
 
 #     Examine only header lines from file.
 
-      next unless (/^([0-9]) *(\S+)/); 
+      next unless (/^([0-9]) *(\S+)/);
 
 #     Identify the base level of the help file.
 
@@ -887,7 +887,7 @@ sub index_includes {
 #     index_includes ($dir, $packname);
 
 #  Description:
-#     This routine goes through a named directory supposed to contain 
+#     This routine goes through a named directory supposed to contain
 #     a set of files to be indexed, and indexes them under the package
 #     name given.  It is designed to be used for the $incdir (typically
 #     /star/include) directory.  Note that as written no subdirectories
@@ -1098,7 +1098,7 @@ sub uniq {
 #     @list = uniq @dlist;
 
 #  Description:
-#     This routine removes adjacent duplicate entries from a list, 
+#     This routine removes adjacent duplicate entries from a list,
 #     analogously to the Unix command of the same name.
 
 #  Arguments:
@@ -1210,7 +1210,7 @@ sub error {
 #     error (@messages).
 
 #  Description:
-#     Prints an error message to standard error, tidies up, and exits 
+#     Prints an error message to standard error, tidies up, and exits
 #     with an error status.
 
 #  Arguments:

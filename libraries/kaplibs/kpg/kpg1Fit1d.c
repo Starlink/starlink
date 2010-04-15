@@ -3,7 +3,7 @@
 #include "prm_par.h"
 #include <math.h>
 
-void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x, 
+void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
                 double *m, double *c, double *rms, int *status ){
 /*
 *  Name:
@@ -16,7 +16,7 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *     C.
 
 *  Invocation:
-*     void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x, 
+*     void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *                     double *m, double *c, double *rms, int *status )
 
 *  Description:
@@ -29,26 +29,26 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *     in Y, or if the X values cover a range of zero.
 
 *  Arguments:
-*     lbnd 
+*     lbnd
 *        The lower bound of the X and Y arrays.
 *     ubnd
 *        The upper bound of the X and Y arrays.
-*     y 
+*     y
 *        The Y data values. Any bad values are ignored.
 *     x
 *        The X positions corresponding to each Y data value.
-*     m 
+*     m
 *        Pointer to a double in which to return the gradient.
 *     c
 *        Pointer to a double in which to return the intercept.
 *     rms
-*        Pointer to a double in which to return the RMS residual 
+*        Pointer to a double in which to return the RMS residual
 *        between the Y values and the fit.
-*     status 
+*     status
 *        The inherited status.
 
 *  Notes:
-*     - The "lbnd" and "ubnd" arguments serve only to determine the 
+*     - The "lbnd" and "ubnd" arguments serve only to determine the
 *     number of elements in the supplied "x" and "y" arrays.
 
 *  Copyright:
@@ -60,12 +60,12 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,7 +84,7 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *     {note_any_bugs_here}
 
 */
-      
+
 /* Local Variables: */
    double denom;     /* Denominator */
    double sx;        /* Sum of X values */

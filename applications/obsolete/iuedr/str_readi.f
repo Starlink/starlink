@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE str_READI
 *
-*   Description: 
+*   Description:
 *      Decode integer value from string parameter.
 *
 *   History:
@@ -13,7 +13,7 @@
 *      Paul Rees          27-OCT-88     IUEDR Vn. 2.0
 *
 *   Method:
-*      A integer value is decoded from the supplied line string as 
+*      A integer value is decoded from the supplied line string as
 *      specified by the CNTRL format control string.
 *
 *-
@@ -23,20 +23,20 @@
 
 *   Import:
       BYTE CNTRL(256)       ! control string
- 
+
       BYTE LINE(100)        ! string to be scanned
- 
+
 *   Import/Export:
       INTEGER POS           ! current character position in line
- 
+
 *   Export:
       INTEGER IVALUE        ! integer value
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       INTEGER str_INDEX     ! character index in string
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL FOUND         ! whether value found
       LOGICAL JUMPLN        ! whether jump over newlines (ignored)
@@ -45,7 +45,7 @@
 
       BYTE EDIT             ! edit character
       BYTE FORMAT(256)      ! format from CNTRL
- 
+
       INTEGER ITEMP         ! temporary integer value
       INTEGER FIELD         ! field size
       INTEGER FIRST         ! first position in CNTRL
@@ -97,7 +97,7 @@
                FOUND = .TRUE.
 
             END IF
- 
+
 *           call str_mtch(format, line, pos, status)
 
          END IF
@@ -107,7 +107,7 @@
       END IF
 
  200  CONTINUE
- 
+
 *   Check value found
       IF (.NOT.FOUND) STATUS = -3
 

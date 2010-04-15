@@ -13,9 +13,9 @@
 
  *  Description:
  *     Expands any tokens of the form ^NAME within the string 'text', and
- *     returns the result in 'opstr'. Undefined tokens will appear as <NAME>, 
+ *     returns the result in 'opstr'. Undefined tokens will appear as <NAME>,
  *     where 'NAME' is the token name. Expanded messages will be a mximum
- *     of EMS__SZMSG characters, terminated with '...' if they overflow.  
+ *     of EMS__SZMSG characters, terminated with '...' if they overflow.
  *     It is the users resonsibility to ensure that enough space has been
  *     allocated for opstr.
  *     A Fortran-callable interface EMS_MLOAD is also provided.
@@ -37,23 +37,23 @@
  *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
  *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PCTR: P.C.T. Rees (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
@@ -114,7 +114,7 @@ void emsMload( const char *msg __attribute__((unused)), const char *text, char *
     } else {
 
         /*  Form output message string. */
-        ems1Form( text, EMS__SZMSG, 0, !msgtab->msgstm, opstr, oplen, 
+        ems1Form( text, EMS__SZMSG, 0, !msgtab->msgstm, opstr, oplen,
                   status );
     }
     return;

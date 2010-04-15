@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next lines are executed by /bin/sh, but not Tcl \
 if test -f @AWISH@; then \
    exec @AWISH@ $0 ${1+"$@"} ; \
@@ -29,12 +29,12 @@ fi
 #     The LUTEDIT a-task should normally be used to execute this script.
 
 #  Arguments:
-#     lut 
+#     lut
 #        The file containing the initial lookup table.  The supplied string
 #        is not validated. If not supplied on the command line, the
 #        current colour table used by KAPPA for GWM xwindows devices is
 #        used.
-#     image 
+#     image
 #        The image to be displayed. If not supplied, $KAPPA_DIR/m31 is
 #        used.
 
@@ -78,7 +78,7 @@ fi
 # Define procedures...
 
 
-# 
+#
 # Cycle through the 3 curves in the edit.
 #
 proc CycleCurve {} {
@@ -105,7 +105,7 @@ proc DisplayPen {x y} {
    global NDCY1
    global NDCX0
    global NDCY0
-   global PNX1 
+   global PNX1
    global PNX0
    global PNY1
    global PNY0
@@ -121,7 +121,7 @@ proc DisplayPen {x y} {
    set nx [expr $x*$NDCX1 + $NDCX0]
    set ny [expr $y*$NDCY1 + $NDCY0]
 
-# Find the histogram pen number at this X NDC 
+# Find the histogram pen number at this X NDC
    set pen [expr int($nx*$HPNX1 + $HPNX0 + 0.5)]
 
 # If this is a legal pen, set it as the current pen.
@@ -131,7 +131,7 @@ proc DisplayPen {x y} {
 
 # Otherwise, find the pen corresponding to the image pixel value under the
 # pointer.
-   } else {      
+   } else {
 
 # Convert NDC to pixel coords within the displayed image.
       set px [expr $nx*$PNX1+$PNX0]
@@ -147,12 +147,12 @@ proc DisplayPen {x y} {
 # Get the data value of the displayed image at these current frame coords.
          Obey kappa look "ndf=$IMAGE centre=\"$pos\" size=1 mode=centre" 1
          set dv [GetParamED kappa look:value]
-      } else { 
+      } else {
          set dv "BAD"
       }
 
 # Convert to a pen number.
-      if { $dv != "BAD" } {     
+      if { $dv != "BAD" } {
          set DV $dv
          setDV 1
       } else {
@@ -161,7 +161,7 @@ proc DisplayPen {x y} {
    }
 }
 
-# 
+#
 # Set the current pen value to a specified value
 #
 proc SetPenVal {new} {
@@ -178,16 +178,16 @@ proc SetPenVal {new} {
    }
    set LUT($RGBNOW) [lreplace $LUT($RGBNOW) $MENT $MENT $new]
    updateCursor 2
-   updateCurrent 
+   updateCurrent
    record
 }
 
-# 
+#
 # Increment the current pen value by a specified value
 #
 proc IncPenVal {inc} {
    global PVAL
-   global SETPENID 
+   global SETPENID
 
    set new [expr $PVAL+$inc]
    if { $new > 1.0 } {
@@ -260,7 +260,7 @@ proc Sort3D {xx yy zz} {
          set z [lreplace $z $i $i]
          set ord [lreplace $ord $i $i]
          incr ni -1
-         if { $ni > 0 } { 
+         if { $ni > 0 } {
 
 # Find the squared distance to the first remaining input point.
             set dx [expr $xv - [lindex $x 0]]
@@ -285,14 +285,14 @@ proc Sort3D {xx yy zz} {
 # Increment the total length of the journey.
             set ddtot [expr $ddtot + $ddmin]
 
-# If this is a particularly long jump, not that we should try the walk again, 
+# If this is a particularly long jump, not that we should try the walk again,
 # starting at the new point.
-             if { $ddmin > 2.0*$ddtot/$nr } { 
+             if { $ddmin > 2.0*$ddtot/$nr } {
                 if { [lsearch -exact $start $here] == -1 } {
-                   lappend start $here 
+                   lappend start $here
                 }
              }
-    
+
           }
        }
 
@@ -323,7 +323,7 @@ proc PalButs {} {
          $PBUT($i) configure -bg $PAL($i) -activebackground $PAL($i)
          SetHelp $PBUT($i) "Click to fill the selected pens or the current pen with colour $PAL($i) (shift-click to change the button colour)" LUTEDIT_PALEBUT
       }
-   } 
+   }
 }
 
 #
@@ -356,7 +356,7 @@ proc PalSort {} {
 # Sort them, Sort3D returns a list of indices into the original list
 # of buttons. Copy the original colours into PAL in their new sorted order.
    set j 0
-   foreach i [Sort3D $col(red) $col(green) $col(blue)] { 
+   foreach i [Sort3D $col(red) $col(green) $col(blue)] {
       set PAL($j) $ocols($i)
       incr j
    }
@@ -367,7 +367,7 @@ proc PalSort {} {
 # Revert to the previous cursor.
    $UWIN config -cursor $old_cursor
 
-} 
+}
 
 
 #
@@ -645,8 +645,8 @@ proc NewPale {i} {
    set fsamp [frame $topf.samp]
    set fbuts [frame $topf.buts]
 
-   grid $frgb -column 0 -row 0 -sticky nsew -padx 3m -pady 3m 
-   grid $fhsv -column 0 -row 1 -sticky nsew -padx 3m -pady 3m 
+   grid $frgb -column 0 -row 0 -sticky nsew -padx 3m -pady 3m
+   grid $fhsv -column 0 -row 1 -sticky nsew -padx 3m -pady 3m
    grid $fname -column 0 -row 2 -sticky nsew -padx 3m -pady 3m
    grid $fsamp -column 1 -row 0 -rowspan 2 -sticky nsew -padx 3m -pady 3m
    grid $fbuts -column 0 -row 3 -columnspan 2 -sticky nsew -padx 3m -pady 3m
@@ -659,7 +659,7 @@ proc NewPale {i} {
 
    grid [label $frgb.lr -text "Red:"] -column 0 -row 0 -ipadx 2m -ipady 1m -sticky ne
    grid $SAMPR -column 1 -row 0 -ipadx 2m -ipady 1m -sticky ne
-   set ENTR [entry $frgb.enr -width 6 -relief sunken -bd 2 -textvariable NEWR] 
+   set ENTR [entry $frgb.enr -width 6 -relief sunken -bd 2 -textvariable NEWR]
    bind $ENTR <Return> "SampleCol re 0"
    bind $ENTR <FocusOut> "SampleCol re 0"
    bind $ENTR <FocusIn> "$ENTR selection range 0 end;$ENTR icursor end"
@@ -672,7 +672,7 @@ proc NewPale {i} {
 
    grid [label $frgb.lg -text "Green:"] -column 0 -row 1 -ipadx 2m -ipady 1m -sticky ne
    grid $SAMPG -column 1 -row 1 -ipadx 2m -ipady 1m -sticky ne
-   set ENTG [entry $frgb.eng -width 6 -relief sunken -bd 2 -textvariable NEWG] 
+   set ENTG [entry $frgb.eng -width 6 -relief sunken -bd 2 -textvariable NEWG]
    bind $ENTG <Return> "SampleCol ge 0"
    bind $ENTG <FocusOut> "SampleCol ge 0"
    bind $ENTG <FocusIn> "$ENTG selection range 0 end;$ENTG icursor end"
@@ -685,7 +685,7 @@ proc NewPale {i} {
 
    grid [label $frgb.lb -text "Blue:"] -column 0 -row 2 -ipadx 2m -ipady 1m -sticky ne
    grid $SAMPB -column 1 -row 2 -ipadx 2m -ipady 1m -sticky ne
-   set ENTB [entry $frgb.enb -width 6 -relief sunken -bd 2 -textvariable NEWB] 
+   set ENTB [entry $frgb.enb -width 6 -relief sunken -bd 2 -textvariable NEWB]
    bind $ENTB <Return> "SampleCol be 0"
    bind $ENTB <FocusOut> "SampleCol be 0"
    bind $ENTB <FocusIn> "$ENTB selection range 0 end;$ENTB icursor end"
@@ -714,7 +714,7 @@ proc NewPale {i} {
 
    grid [label $fhsv.ls -text "Saturation:"] -column 0 -row 1 -ipadx 2m -ipady 1m -sticky ne
    grid $SAMPS -column 1 -row 1 -ipadx 2m -ipady 1m -sticky ne
-   set ENTS [entry $fhsv.ens -width 6 -relief sunken -bd 2 -textvariable NEWS] 
+   set ENTS [entry $fhsv.ens -width 6 -relief sunken -bd 2 -textvariable NEWS]
    bind $ENTS <Return> "SampleCol se 0;focus $ENTS"
    bind $ENTS <FocusOut> "SampleCol se 0"
    bind $ENTS <FocusIn> "$ENTS selection range 0 end;$ENTS icursor end"
@@ -727,7 +727,7 @@ proc NewPale {i} {
 
    grid [label $fhsv.lb -text "Value:"] -column 0 -row 2 -ipadx 2m -ipady 1m -sticky ne
    grid $SAMPV -column 1 -row 2 -ipadx 2m -ipady 1m -sticky ne
-   set ENTV [entry $fhsv.env -width 6 -relief sunken -bd 2 -textvariable NEWV] 
+   set ENTV [entry $fhsv.env -width 6 -relief sunken -bd 2 -textvariable NEWV]
    bind $ENTV <Return> "SampleCol ve 0"
    bind $ENTV <FocusOut> "SampleCol ve 0"
    bind $ENTV <FocusIn> "$ENTV selection range 0 end;$ENTV icursor end"
@@ -754,11 +754,11 @@ proc NewPale {i} {
    set COLLB [listbox $fname.lb -yscrollcommand "$scb set" -height 5]
    scrollbar $scb -command "$COLLB yview"
 
-   foreach col [array names NAMEDCOL] { 
+   foreach col [array names NAMEDCOL] {
       $COLLB insert end $col
    }
 
-   pack [label $fname.lr -text "Named Colour:"] -side left 
+   pack [label $fname.lr -text "Named Colour:"] -side left
    pack $COLLB -side left
    pack $scb -side right -fill y
 
@@ -776,7 +776,7 @@ proc NewPale {i} {
 # Buttons...
    set b1 [button $fbuts.ok -text "OK" -command "SetPale $i $top"]
    set b2 [button $fbuts.cancel -text "Cancel" -command "SetPale -1 $top"]
-   pack $b1 $b2 -side left -expand 1 
+   pack $b1 $b2 -side left -expand 1
 
 # Set up the initial values
    if { [scan $PAL($i) "#%2x%2x%2x" r g b] == 3 } {
@@ -789,7 +789,7 @@ proc NewPale {i} {
 }
 
 #
-# Display a sample of the colour currently set by the sliders in the 
+# Display a sample of the colour currently set by the sliders in the
 # palette colour selection dialog.
 #
 proc SampleCol {item value} {
@@ -813,15 +813,15 @@ proc SampleCol {item value} {
    global NEWV
 
 # The command given by the -command option on the "scale" widget (i.e.
-# this proc) is fired when the user moves the slider. But it is *also* fired if 
-# the [set] method is used to set a new value in the slider. Since this proc 
+# this proc) is fired when the user moves the slider. But it is *also* fired if
+# the [set] method is used to set a new value in the slider. Since this proc
 # uses the [set] method to adjust the value of the other sliders, we need to be
 # careful that these slider changes don't themselves cause this proc to
-# be called *again*. Check that, if the initiating item is a slider, it is the 
+# be called *again*. Check that, if the initiating item is a slider, it is the
 # currently pressed slider...
    if { [string index $item end] != "s" || $item == $SAMPBUT } {
 
-# If the colour was changed via an RGB slider control, get the RGB slider 
+# If the colour was changed via an RGB slider control, get the RGB slider
 # values.
       if { $item == "rs" || $item == "gs" || $item == "bs" } {
          set new(red) [expr [$SAMPR get]/255.0]
@@ -829,7 +829,7 @@ proc SampleCol {item value} {
          set new(blue) [expr [$SAMPB get]/255.0]
          set got "rgb"
 
-# If the colour was changed via an RGB entry field, get the entry field 
+# If the colour was changed via an RGB entry field, get the entry field
 # values.
       } elseif { $item == "re" || $item == "ge" || $item == "be" } {
          if { $NEWR < 0.0 } {
@@ -855,7 +855,7 @@ proc SampleCol {item value} {
          }
          set got "rgb"
 
-# If the colour was changed via an HSV slider control, get the HSV slider 
+# If the colour was changed via an HSV slider control, get the HSV slider
 # values.
       } elseif { $item == "hs" || $item == "ss" || $item == "vs" } {
          set new(red) [expr [$SAMPH get]/255.0]
@@ -863,7 +863,7 @@ proc SampleCol {item value} {
          set new(blue) [expr [$SAMPV get]/255.0]
          set got "hsv"
 
-# If the colour was changed via an HSV entry field, get the entry field 
+# If the colour was changed via an HSV entry field, get the entry field
 # values.
       } elseif { $item == "he" || $item == "se" || $item == "ve" } {
          if { $NEWH < 0.0 } {
@@ -927,7 +927,7 @@ proc SampleCol {item value} {
       $SAMPH set [expr int($h*255.0)]
       $SAMPS set [expr int($s*255.0)]
       $SAMPV set [expr int($v*255.0)]
-   
+
       set NEWR [format "%.2f" $r]
       set NEWG [format "%.2f" $g]
       set NEWB [format "%.2f" $b]
@@ -945,7 +945,7 @@ proc SampleCol {item value} {
 }
 
 #
-# Save the colour currently set by the sliders in the palette colour 
+# Save the colour currently set by the sliders in the palette colour
 # selection dialog.
 #
 proc SetPale {i t} {
@@ -1055,7 +1055,7 @@ proc PalArea {} {
 #
 proc DefPal {} {
    global PAL
-   global NPAL 
+   global NPAL
    global PBUT
    global FPAL
 
@@ -1093,9 +1093,9 @@ proc DefPal {} {
                 {1     0     1} \
                 {1     0     0.666}] {
 
-      set r [expr int( [lindex $rgb 0]*255.0 + 0.5 )]   
-      set g [expr int( [lindex $rgb 1]*255.0 + 0.5 )]   
-      set b [expr int( [lindex $rgb 2]*255.0 + 0.5 )]   
+      set r [expr int( [lindex $rgb 0]*255.0 + 0.5 )]
+      set g [expr int( [lindex $rgb 1]*255.0 + 0.5 )]
+      set b [expr int( [lindex $rgb 2]*255.0 + 0.5 )]
 
       set PAL($i) [format "#%0.2X%0.2X%0.2X"  $r $g $b]
       incr i
@@ -1103,7 +1103,7 @@ proc DefPal {} {
 
 # Update the colours of the buttons.
    PalButs
-   
+
 }
 
 
@@ -1166,7 +1166,7 @@ proc LutBar {} {
             set id [lindex $LBAR $i]
             $CAN2 itemconfigure $id -fill "$col"
             $CAN2 coords $id $cxl $LBARY $cxh $LBARY
-         }         
+         }
       }
    }
 }
@@ -1182,7 +1182,7 @@ proc addHelp {helpmenu} {
 #  topics, and values equal tot he associated text.
    set f [open $KAPPA_DIR/lutedit.help]
    set name ""
-   while { [gets $f tx] != -1 } {   
+   while { [gets $f tx] != -1 } {
       if { [regexp {^o (.*):$} $tx match ttl] } {
          set name $ttl
          set HELPTEXT($name) ""
@@ -1195,7 +1195,7 @@ proc addHelp {helpmenu} {
 
 #  Add sorted items to the help menu
    foreach topic [lsort [array names HELPTEXT]] {
-      $helpmenu add command -label $topic -command "showHelp \"$topic\"" 
+      $helpmenu add command -label $topic -command "showHelp \"$topic\""
    }
 
 }
@@ -1227,7 +1227,7 @@ proc showHelp {topic} {
    $HTEXT insert end "\n"
    $HTEXT insert end $topic
    $HTEXT tag add topic 2.0 2.end
-   $HTEXT tag configure topic -underline 1 
+   $HTEXT tag configure topic -underline 1
    $HTEXT insert end "\n"
 
 #  Load in the requested help.
@@ -1242,11 +1242,11 @@ proc saveOpts {} {
 #
    global PALON
    global ALLCRV
-   global INITRC 
+   global INITRC
    global AUTOUP
    global LBARON
-   global CSYS 
-   global CSYSNOW 
+   global CSYS
+   global CSYSNOW
    global NN
    global AUTOCUT
    global NEGIMAGE
@@ -1278,14 +1278,14 @@ proc saveOpts {} {
 }
 
 proc resample {} {
-# 
+#
 #  Change the number of entries in the table.
 #
    global CAN2
    global CPEN
    global CTRL
-   global CURX 
-   global EX0 
+   global CURX
+   global EX0
    global HENTRY
    global LP
    global LUT
@@ -1293,7 +1293,7 @@ proc resample {} {
    global NENT
    global NENTM1
    global NN
-   global PPENT 
+   global PPENT
    global RSENT
    global RSINT
    global UP
@@ -1307,7 +1307,7 @@ proc resample {} {
    set lim(RSINT) [list "Linear" "Nearest Neighbour"]
 
    if { ![info exists RSENT] } { set RSENT $NENT }
-   if { ![info exists RSINT] } { 
+   if { ![info exists RSINT] } {
       if { $NN == "NO" } {
          set RSINT "Linear"
       } else {
@@ -1484,17 +1484,17 @@ proc rotate {} {
       set ne [expr $hi-$lo+1]
       set s [expr round(fmod(round($SHIFT/$PPENT),$ne))]
       if { $s < 0 } { incr s $ne }
-      
+
 #  Find the original index for the new top entry.
       if { $s > 0 } {
          set l [expr $hi-$s]
 
 #  Split the original entries into two groups, swap them round and join
 #  them together again.
-         foreach col [array names LUT] { 
+         foreach col [array names LUT] {
             if { $ALLCRV || $col == $RGBNOW } {
                set loents [lrange $LUT($col) $lo $l]
-               set hients [lrange $LUT($col) [expr $l+1] $hi] 
+               set hients [lrange $LUT($col) [expr $l+1] $hi]
                set newents [join [concat $hients $loents]]
                set LUT($col) [eval lreplace {$LUT($col)} $lo $hi  $newents]
             }
@@ -1540,7 +1540,7 @@ proc bridge {} {
             if { $new != "" } {
                set LUT($col) [eval lreplace {$LUT($col)} $f $l $new]
             }
-      
+
          }
       }
 
@@ -1619,7 +1619,7 @@ proc setCon {} {
    global LUT
    global CONST
    global ALLCRV
- 
+
    set type(CONST) "_REAL"
    set lab(CONST) "The constant value (in the range 0.0 to 1.0)"
    set lim(CONST) [list 0.0 1.0]
@@ -1663,7 +1663,7 @@ proc smooth {} {
    global NENT
    global NENTM1
    global ALLCRV
- 
+
    set type(WID) "_INTEGER"
    set lab(WID) "The number of pens across the filter box"
    set lim(WID) [list [expr round($PPENT)+1] $NENT]
@@ -1676,9 +1676,9 @@ proc smooth {} {
 
 #  Find the half width of the filter as a number of entries.
       set hw [expr round($WID/$PPENT)/2]
-      if { $hw > 0 } { 
+      if { $hw > 0 } {
 
-         foreach col [array names LUT] { 
+         foreach col [array names LUT] {
             if { $ALLCRV || $col == $RGBNOW } {
 
                 set lp [expr $LENTRY-$hw]
@@ -1694,7 +1694,7 @@ proc smooth {} {
                       incr nm
                    }
                 }
-       
+
                 set new "[expr $sm/$nm] "
                 for {set i [expr $LENTRY +1] } {$i <= $HENTRY} {incr i} {
                    if { $lp >= $LENTRY && $lp <= $HENTRY } {
@@ -1702,13 +1702,13 @@ proc smooth {} {
                       incr nm -1
                    }
                    incr lp
-       
+
                    incr up
                    if { $up >= $LENTRY && $up <= $HENTRY } {
                       set sm [expr $sm + [lindex $LUT($col) $up]]
                       incr nm
                    }
-       
+
                    if { $nm > 0 } {
                       append new "[expr $sm/$nm] "
                    } else {
@@ -1724,7 +1724,7 @@ proc smooth {} {
 
          if { $ALLCRV } {
             updateDisplay 0
-         } else {                  
+         } else {
             updateCurrent
          }
          record
@@ -1744,7 +1744,7 @@ proc newCsys {} {
    global GB
    global BB
    global LUT
-   
+
    if { $CSYS == "RGB" } {
       $RB configure -text Red -state normal
       SetHelp $RB "Press to edit the red intensity curve..." LUTEDIT_RB
@@ -1778,7 +1778,7 @@ proc newCsys {} {
    }
 
    if { $CSYS != $CSYSNOW } {
-      toCSYS LUT $CSYSNOW 
+      toCSYS LUT $CSYSNOW
       set CSYSNOW $CSYS
       if { $CSYS == "MONO" } {
          set CTRL(green) ""
@@ -1802,11 +1802,11 @@ proc toRGB {a now} {
 
    upvar $a lut
 
-   if { $now == "MONO" } { 
+   if { $now == "MONO" } {
       set lut(green) $lut(red)
       set lut(blue) $lut(red)
 
-   } elseif { $now == "HSV" } { 
+   } elseif { $now == "HSV" } {
       set red ""
       set green ""
       set blue ""
@@ -1815,12 +1815,12 @@ proc toRGB {a now} {
          set h [expr [lindex $lut(red) $j]*6.0]
          set s [lindex $lut(green) $j]
          set v [lindex $lut(blue) $j]
-   
+
          if { $s == 0 } {
             set r $v
             set g $v
             set b $v
-   
+
          } else {
             set i [expr int($h)]
             set f [expr $h - $i]
@@ -1831,38 +1831,38 @@ proc toRGB {a now} {
                set r $v
                set g $t
                set b $p
-   
+
             } elseif { $i == 1 } {
                set r $q
                set g $v
                set b $p
-   
+
             } elseif { $i == 2 } {
                set r $p
                set g $v
                set b $t
-   
+
             } elseif { $i == 3 } {
                set r $p
                set g $q
                set b $v
-   
+
             } elseif { $i == 4 } {
                set r $t
                set g $p
                set b $v
-   
+
             } else {
                set r $v
                set g $p
                set b $q
             }
-         }         
-   
+         }
+
          if { $r < 0.0 } { set r 0.0 } elseif { $r > 1.0 } { set r 1.0 }
          if { $g < 0.0 } { set g 0.0 } elseif { $g > 1.0 } { set g 1.0 }
          if { $b < 0.0 } { set b 0.0 } elseif { $b > 1.0 } { set b 1.0 }
-   
+
          lappend red $r
          lappend green $g
          lappend blue $b
@@ -1879,7 +1879,7 @@ proc toHSV {a now} {
 #  "green" and "blue". On exit, they are changed so that
 #  (red) holds hue values, (green) holds saturation values and (blue)
 #  holds intensity values. All these HSV are in the range 0 to 1.
-#  Hue is represented by a value in the range 0 to 1.0, with red at 
+#  Hue is represented by a value in the range 0 to 1.0, with red at
 #  0 (or 1), green at 0.3333, and blue at 0.6667.
 #
 #  $now is one of RGB, HSV or MONO and gives the system in which $a is
@@ -1906,19 +1906,19 @@ proc toHSV {a now} {
          set r [lindex $lut(red) $j]
          set g [lindex $lut(green) $j]
          set b [lindex $lut(blue) $j]
-   
+
          set sr [lsort -real [list $r $g $b]]
          set ma [lindex $sr 2]
          set mi [lindex $sr 0]
-   
+
          set v $ma
-   
+
          set delta [expr $ma - $mi]
          if { $ma > 0 } {
             set s [expr $delta/$ma]
-   
+
             if { $delta > 0 } {
-   
+
                if { $r == $ma } {
                   set h [expr (($g-$b)/$delta)/6.0]
                } elseif { $g == $ma } {
@@ -1926,23 +1926,23 @@ proc toHSV {a now} {
                } else {
                   set h [expr (4+($r-$g)/$delta)/6.0]
                }
-   
+
                if { $h < 0.0 } { set h [expr $h+1.0] }
-   
+
             } else {
-               set h 0 
+               set h 0
             }
-   
+
          } else {
             set s 0
             set h 0
          }
-   
+
          lappend hue $h
          lappend sat $s
          lappend int $v
       }
-   
+
       set lut(red) $hue
       set lut(green) $sat
       set lut(blue) $int
@@ -1952,7 +1952,7 @@ proc toHSV {a now} {
 proc toMONO {a now} {
 #
 #  $a is the name of a global array with three elements named "red",
-#  "green" and "blue". On exit, they are changed so that (red) holds 
+#  "green" and "blue". On exit, they are changed so that (red) holds
 #  monochrome value, (green) and (blue) hold 0.
 #
 #  $now is one of RGB, HSV or MONO and gives the system in which $a is
@@ -1973,7 +1973,7 @@ proc toMONO {a now} {
       set lut(red) $v
       set lut(green) $dummy
       set lut(blue) $dummy
-   
+
    } elseif { $now == "HSV" } {
       set dummy ""
       set n [llength $lut(red)]
@@ -2008,8 +2008,8 @@ proc toCSYS {a now} {
 }
 
 proc setCursor {} {
-#  
-#  Set up the correct cursor whenever a new item is entered 
+#
+#  Set up the correct cursor whenever a new item is entered
 #  in the editor window.
 #
    global CAN2
@@ -2059,7 +2059,7 @@ proc dpoint {all} {
          set err [expr abs($e - $CENT)]
          if { $err > $errl } {
             break
-         } 
+         }
          set errl $err
          incr i
          set el $e
@@ -2105,12 +2105,12 @@ proc Read {conf} {
    global KEEPFILE
    global UWIN
 
-   if { !$conf || [Saver] } { 
+   if { !$conf || [Saver] } {
       set tfile [UniqueFile]
       Obey kapview lutsave "lut=\! logfile=$tfile" 1
       textLut $tfile
-      file delete -force $tfile   
-      if { !$KEEPFILE } { 
+      file delete -force $tfile
+      if { !$KEEPFILE } {
          set LUTFILE ""
          set KEEPFILE 0
          wm  title $UWIN "LutEdit <untitled>"
@@ -2137,10 +2137,10 @@ proc linesplit {a l} {
          if { $s + $len > $l } {
             append r "\n"
             set s 0
-         }            
+         }
          append r $w
          incr s $len
-      }         
+      }
    }
    return $r
 }
@@ -2157,10 +2157,10 @@ proc updateZoom {} {
 proc updateMark {useent} {
 #
 #  Ensure the mark is displayed correctly. If $useent is non-zero,
-#  then the current value of global MENT (marked entry index) is used to 
+#  then the current value of global MENT (marked entry index) is used to
 #  set the other mark parameters, and the mark is re-drawn. If $useent
-#  is zero, then the coordinates of currently drawn mark is used to set the 
-#  other mark parameters, and the mark is NOT re-drawn. 
+#  is zero, then the coordinates of currently drawn mark is used to set the
+#  other mark parameters, and the mark is NOT re-drawn.
 #
    global CAN2
    global MENT
@@ -2169,7 +2169,7 @@ proc updateMark {useent} {
    global YOFF
    global YSCALE
    global LUT
-   global RGBNOW   
+   global RGBNOW
    global MARKID
    global CXL
    global CXH
@@ -2190,16 +2190,16 @@ proc updateMark {useent} {
 
 #  Find the canvas Y value for this segment.
          set cy [expr $YOFF - $YSCALE*[lindex $LUT($RGBNOW) $MENT]]
- 
+
 #  Create or move the marker.
          if { $MARKID == "" } {
             set MARKID [$CAN2 create line $cx1 $cy $cx2 $cy -width 3 -fill black -tags mark]
          } else {
-            $CAN2 coords $MARKID $cx1 $cy $cx2 $cy 
+            $CAN2 coords $MARKID $cx1 $cy $cx2 $cy
             $CAN2 raise $MARKID
          }
-     
-      }        
+
+      }
 
 #  Otherwise, find the index of the currently marked entry from the
 #  displayed mark.
@@ -2207,7 +2207,7 @@ proc updateMark {useent} {
       if { $MARKID == "" } {
          set MENT ""
       } else {
-         set co [$CAN2 coords $MARKID] 
+         set co [$CAN2 coords $MARKID]
          set x [expr 0.5*( [lindex $co 0] + [lindex $co 2] )]
          set MENT [expr round( $EX0+$EX1*$x )]
       }
@@ -2216,14 +2216,14 @@ proc updateMark {useent} {
 
 proc updateCursor {usepen} {
 #
-#  Ensure the cursor is displayed correctly. If $usepen is 1, then the 
-#  current value of global CPEN (current pen index) is used to set the 
+#  Ensure the cursor is displayed correctly. If $usepen is 1, then the
+#  current value of global CPEN (current pen index) is used to set the
 #  other cursor parameters, and the cursor is re-drawn. If $usepen is 2,
-#  then the current value of global CENT (current entry index) is used to 
-#  set the other cursor parameters, and the cursor is re-drawn. If $usepen 
-#  is zero, then the current value of global CURX (canvas X position of 
-#  the cursor line) is used to set the other cursor parameters, and the 
-#  cursor is NOT re-drawn. 
+#  then the current value of global CENT (current entry index) is used to
+#  set the other cursor parameters, and the cursor is re-drawn. If $usepen
+#  is zero, then the current value of global CURX (canvas X position of
+#  the cursor line) is used to set the other cursor parameters, and the
+#  cursor is NOT re-drawn.
 #
    global CAN2
    global CENT
@@ -2264,7 +2264,7 @@ proc updateCursor {usepen} {
          set CPEN ""
          set PVAL ""
          set EVAL ""
-        
+
       } else {
 
 #  If using the current entry, find the corresponding cursor x value.
@@ -2318,11 +2318,11 @@ proc updateCursor {usepen} {
 }
 
 proc updateCurrent {} {
-# 
+#
 #  Ensure changes to the currently selected curve are correctly reflected
 #  in the editor and the GWM items.
 #
-   global RGBNOW 
+   global RGBNOW
    global AUTOUP
 
    drawCurve $RGBNOW
@@ -2336,7 +2336,7 @@ proc updateCurrent {} {
 
 proc cintCent {x} {
 #
-#  Set the index of the current table entry (CENT), pen (CPEN, and the 
+#  Set the index of the current table entry (CENT), pen (CPEN, and the
 #  current intensity (PVAL and EVAL), using the specified X canvas coord.
 #
    global CENT
@@ -2365,12 +2365,12 @@ proc cintCent {x} {
 #  Find the fractional entry, and then find the corresponding integer
 #  (i.e. nearest) entry.
       set fe [expr $EX0+$EX1*$x]
-      if { $fe < 0 } { 
+      if { $fe < 0 } {
          set fe 0
       } elseif { $fe > $NENTM1 } {
          set fe $NENTM1
       }
-      set CENT [expr round($fe)]       
+      set CENT [expr round($fe)]
 
 #  If there are more entries than pens, find the fractional pen value
 #  which corresponds to the entry centre.
@@ -2423,7 +2423,7 @@ proc Saver {} {
 #
 #  If the current LUT has not been saved, allow the user to save it.
 #  Returns zero if the following operation should be cancelled.
-# 
+#
    set ok 1
    if { [changed] } {
 
@@ -2463,9 +2463,9 @@ proc orig {} {
    catch {unset GOLD}
    catch {unset BOLD}
 
-   set ROLD(orig) $LUT(red) 
-   set GOLD(orig) $LUT(green) 
-   set BOLD(orig) $LUT(blue) 
+   set ROLD(orig) $LUT(red)
+   set GOLD(orig) $LUT(green)
+   set BOLD(orig) $LUT(blue)
    set SOLD(orig) $CSYSNOW
 
    set NOLD 0
@@ -2496,7 +2496,7 @@ proc changed {} {
       set orig(green) $GOLD(orig)
       set orig(blue) $BOLD(orig)
 
-      toCSYS orig $SOLD(orig) 
+      toCSYS orig $SOLD(orig)
 
       if { $orig(red) != $LUT(red) ||
            $orig(green) != $LUT(green) ||
@@ -2562,7 +2562,7 @@ proc undo {} {
    global SOLD
    global UP
 
-   set rid $NOLD 
+   set rid $NOLD
    incr NOLD -1
    if { [info exists ROLD($NOLD)] } {
       catch { unset ROLD($rid) GOLD($rid) BOLD($rid) SOLD($rid)}
@@ -2580,10 +2580,10 @@ proc undo {} {
 #  terms of entry numbers and so cannot be retained, so clear them.
          set MENT ""
          updateMark 1
-   
+
          set HENTRY ""
          select
-   
+
          set CTRL(red) ""
          set CTRL(blue) ""
          set CTRL(green) ""
@@ -2619,10 +2619,10 @@ proc undo {} {
 #  Update the editor and GWM items.
       updateDisplay 0
 
-   } { 
+   } {
       Message "Nothing left to undo"
       set NOLD $rid
-   }      
+   }
 
 }
 
@@ -2719,7 +2719,7 @@ proc histDisp { } {
 
 proc histStyle { update } {
 #
-#  Create a new style file for the the histogram, and optionally redisplay 
+#  Create a new style file for the the histogram, and optionally redisplay
 #  the histogram.
 #
    global LUTEDIT_SCRATCH
@@ -2779,18 +2779,18 @@ proc setTrans {} {
    global CAN2
    global PVAL
    global EVAL
-   global EX0 
-   global EX1 
+   global EX0
+   global EX1
    global LP
    global NENT
    global NENTM1
-   global PX0 
-   global PX1 
+   global PX0
+   global PX1
    global UP
-   global XE0 
+   global XE0
    global XE1
-   global XP0 
-   global XP1 
+   global XP0
+   global XP1
    global YOFF
    global YSCALE
    global ZOOMX
@@ -2811,7 +2811,7 @@ proc setTrans {} {
       set lcx [expr 0.05*$w]
       set hcx [expr 0.95*$w]
 
-#  Find the X value to zoom about, and the fractional pen and entry values 
+#  Find the X value to zoom about, and the fractional pen and entry values
 #  at this X.
       if { $CURX != "" && $EX0 != "" } {
          set cxt $CURX
@@ -2824,7 +2824,7 @@ proc setTrans {} {
       }
 
 #  CX = Fractional canvas X in range 0 to $w
-#  EX = Fractional table entry number (ZERO BASED) in range 0.0 to $NENT-1.0 
+#  EX = Fractional table entry number (ZERO BASED) in range 0.0 to $NENT-1.0
 #  PX = Fractional pen number number (ONE BASED) in range $LP to $UP.
 #
 #  Fractional pen and entry values have an integer value at the *centre* of
@@ -2931,7 +2931,7 @@ proc centreWin {w} {
 }
 
 proc emptyEditor {} {
-#  
+#
 #  Clear the editor canvas and remove the global data defining the
 #  editor contents.
 #
@@ -2944,8 +2944,8 @@ proc emptyEditor {} {
    global HENTRY
    global LENTRY
    global LBAR
-   
-   unzoom 
+
+   unzoom
 
    set HENTRY ""
    set LENTRY ""
@@ -2958,7 +2958,7 @@ proc emptyEditor {} {
 
    $CAN2 delete all
 
-   catch { 
+   catch {
       unset LUT(red)
       unset LUT(green)
       unset LUT(blue)
@@ -2973,7 +2973,7 @@ proc emptyEditor {} {
 }
 
 proc rgbSel {} {
-#  
+#
 #  Raise the curve for the colour given by global RGBSEL, and reconfigure
 #  the cursor and mark. Assign the tag ccrv to the current curve in the
 #  editor.
@@ -2984,7 +2984,7 @@ proc rgbSel {} {
 
    if { $RGBSEL != $RGBNOW } {
 
-      $CAN2 delete cp-$RGBNOW 
+      $CAN2 delete cp-$RGBNOW
 
       $CAN2 itemconfigure c-$RGBNOW -width 1
       $CAN2 itemconfigure c-$RGBSEL -width 2
@@ -3004,7 +3004,7 @@ proc rgbSel {} {
 }
 
 proc Open {} {
-#  
+#
 #  Open and display a new colour table, specified by the user.
 #
    global LUTFILE
@@ -3016,13 +3016,13 @@ proc Open {} {
       set file [tk_getOpenFile -defaultextension ".sdf" -filetypes {{SDF {.sdf}} {All {*}}}]
 
 #  If ok, open the NDF.
-      if { $file != "" } { openNamed $file 0} 
+      if { $file != "" } { openNamed $file 0}
 
    }
 }
 
 proc OpenImage {} {
-#  
+#
 #  Open and display a new image, retaining the current colour table.
 #
    global IMAGE
@@ -3030,37 +3030,37 @@ proc OpenImage {} {
    set file [tk_getOpenFile -defaultextension ".sdf" -filetypes {{SDF {.sdf}} {All {*}}}]
 
 #  Retain the current image if anything went wrong.
-   if { $file != "" } { 
+   if { $file != "" } {
 
 #  Get the name of the NDF, and the full file name.
       if { [file extension $file] == "" } {
-         set ndf $file         
+         set ndf $file
          set file "$ndf.sdf"
       } elseif { [file extension $file] == ".sdf" } {
          set ndf [file rootname $file]
       } else {
          set ndf $file
-      }         
+      }
 
 #  Check the new NDF exists, and is readable.
-      if { ![file exists $file] } { 
+      if { ![file exists $file] } {
          Message "Cannot find \"$file\""
 
-      } elseif { ![file readable $file] } { 
+      } elseif { ![file readable $file] } {
          Message "Cannot read \"$file\""
 
-#  If so, assign the NDF name to the global variable and display 
+#  If so, assign the NDF name to the global variable and display
 #  the image and histogram.
       } else {
          set IMAGE $ndf
          SetHelp disp "$IMAGE displayed with the current colour table. Click to select a pen."
          gwmDisplay
-      }      
+      }
    }
 }
 
 proc openNamed {file force} {
-#  
+#
 #  Open and display a new colour table, specified by the caller.
 #
    global LUTFILE
@@ -3074,7 +3074,7 @@ proc openNamed {file force} {
    if { ![file exists "$ndf.sdf"] } { return 0 }
 
 #  Check the NDF is suitable.
-   Obey ndfpack ndftrace "ndf=$ndf" 
+   Obey ndfpack ndftrace "ndf=$ndf"
    set dims [GetParamED ndfpack ndftrace:dims]
    regexp {\[([-+0-9]+),([-+0-9]+)\]} $dims a xd yd
    if { $xd != 3 } {
@@ -3090,7 +3090,7 @@ proc openNamed {file force} {
    } else {
       set LUTFILE $file
 
-#  Empty the editor, unless thisi the first time (i.e. nothing has been 
+#  Empty the editor, unless thisi the first time (i.e. nothing has been
 #  displayed)
       if { $INITLUT == "" } { emptyEditor }
 
@@ -3102,7 +3102,7 @@ proc openNamed {file force} {
       set tfile [UniqueFile]
       Obey kappa look "ndf=$ndf mode=bounds format=region ubound=\! lbound=\! logfile=$tfile" 1
       textLut $tfile
-      file delete -force $tfile   
+      file delete -force $tfile
 
 #  Save the current LUT arrays as the originals.
       orig
@@ -3118,11 +3118,11 @@ proc Strut {w h} {
    set ret [frame $w.strut -width 0 -height $h]
    pack propagate $ret 0
    pack $ret -side left
-   return $ret 
+   return $ret
 }
 
 proc clearCurve {col} {
-#  
+#
 #  Clears the canvas of items related to the specified intensity curve.
 #
    global CAN2
@@ -3130,7 +3130,7 @@ proc clearCurve {col} {
 }
 
 proc drawCPoint {} {
-#  
+#
 #  Draws the control points for the currently selected curve.
 #
    global CAN2
@@ -3147,12 +3147,12 @@ proc drawCPoint {} {
       foreach ent $CTRL($RGBNOW) {
          set v [lindex $LUT($RGBNOW) $ent]
          $CAN2 create image [expr $XE0+$XE1*$ent] [expr $YOFF-$v*$YSCALE] -image $CPIM -tags [list cp cp-$RGBNOW cp-$RGBNOW-$ent]
-      } 
+      }
    }
 }
 
 proc drawCurve {col} {
-#  
+#
 #  Draws the intensity curve for the colour specified by argument
 #  $col ("red", "green" or "blue").
 #
@@ -3181,13 +3181,13 @@ proc drawCurve {col} {
          set fill "\"\""
       } else {
          set fill $col
-      }         
+      }
 
 #  Ensure the transformations between the various coordinate systems
 #  are set up.
       if { $EX0  == "" } { setTrans }
 
-#  Create a list of the canvas coords at the vertices of the poly line.  
+#  Create a list of the canvas coords at the vertices of the poly line.
 #  A join-the-dots plot is used for linear interpolation.
       if { $NN == "NO" } {
 
@@ -3202,8 +3202,8 @@ proc drawCurve {col} {
          }
 
 #  For nearest-neighbour interpolation (or if entry numbers are being
-#  displayed), a histogram-style plot is used. 
-      } else {    
+#  displayed), a histogram-style plot is used.
+      } else {
          set xl [expr $XE0-0.5*$XE1]
          foreach val $LUT($col) {
             set y [expr $YOFF-$val*$YSCALE]
@@ -3337,8 +3337,8 @@ proc B1MotionBind {x y} {
       set cx $CXL
    }
 
-# The global variable MODE determines how events over the canvas are 
-# processed. 
+# The global variable MODE determines how events over the canvas are
+# processed.
 
 # Dragging a control point
    if { $MODE == "cp" } {
@@ -3352,15 +3352,15 @@ proc B1MotionBind {x y} {
       if { $CP1 == "" } { set CPY1 $cy }
       if { $CP2 == "" } { set CPY2 $cy }
       $CAN2 coords $CPL1 $CPX1 $CPY1 $cx $cy
-      $CAN2 coords $CPL2 $cx $cy $CPX2 $CPY2 
+      $CAN2 coords $CPL2 $cx $cy $CPX2 $CPY2
 
 # Dragging the marker up and down...
    } elseif { $MODE == "seg" } {
       set PVAL [format "%.3f" [expr ($YOFF - $cy)/$YSCALE]]
-      $CAN2 coords mark $MX0 $cy $MX1 $cy 
+      $CAN2 coords mark $MX0 $cy $MX1 $cy
 
 # Dragging the cursor...
-   } else { 
+   } else {
 
 # Move the cursor line to the current pointer position.
       if { $CURSID != "" } {
@@ -3454,7 +3454,7 @@ proc CheckMsg {action val} {
 # add it to the list (on a new line), and indicate an error has occurred.
    if { [regexp {^!+(.*)} $val match mess] } {
       if { [info exists ADAM_ERRORS] } {
-         if { [string length $mess] > 30 } { 
+         if { [string length $mess] > 30 } {
             set ADAM_ERRORS "$ADAM_ERRORS\n$mess"
          } {
             set ADAM_ERRORS "$ADAM_ERRORS $mess"
@@ -3465,7 +3465,7 @@ proc CheckMsg {action val} {
 
 # If the message is not an error message, append it as a new element to
 # the list stored in ATASK_OUTPUT.
-   } { 
+   } {
       lappend ATASK_OUTPUT $val
    }
 }
@@ -3478,7 +3478,7 @@ proc CheckRF {task} {
 #  Purpose:
 #     Check that the AMS rendevous file for a task still exists. If it
 #     does not (for some reason it seems to be occasionally deleted by
-#     the StarTcl system, turning the process into a zombie), then the 
+#     the StarTcl system, turning the process into a zombie), then the
 #     task is killed and re-loaded.
 
 #  Language:
@@ -3488,7 +3488,7 @@ proc CheckRF {task} {
 #     The task to be checked (previously loaded using LoadTask).
 
 #  Returned Value:
-#     Returns 1 if the rendevous file still exists, and zero if it 
+#     Returns 1 if the rendevous file still exists, and zero if it
 #     did not exist (in which case the task will have been re-loaded).
 
 #  Globals:
@@ -3541,7 +3541,7 @@ proc CheckRF {task} {
       set ret 1
    }
 
-   return $ret   
+   return $ret
 
 }
 
@@ -3560,7 +3560,7 @@ proc Confirm {message} {
 
 #  Arguments:
 #     message
-#       The message to display. 
+#       The message to display.
 
 #  Returned Value:
 #     Zero is returned if the operation should be cancelled, one is
@@ -3617,18 +3617,18 @@ proc dialog {w title text bitmap default args} {
 #     TCL
 
 #  Arguments:
-#     w 
+#     w
 #        Window to use for dialog top-level.
-#     title 
+#     title
 #        Title to display in dialog's decorative frame.
-#     text 
+#     text
 #        Text to display in dialog.
-#     bitmap 
+#     bitmap
 #        Bitmap to display in dialog (empty string means none).
-#     default 
+#     default
 #        Index of button that is to display the default ring
 #              (-1 means none).
-#     args 
+#     args
 #        One or more strings to display in buttons across the
 #         bottom of the dialog box.
 
@@ -3772,7 +3772,7 @@ proc Finish {} {
 #-
 
 # If required, save the colour table.
-   if { [Saver] } { exit } 
+   if { [Saver] } { exit }
 }
 
 proc GetParam {task param} {
@@ -3790,7 +3790,7 @@ proc GetParam {task param} {
 #     task
 #       The name of the task (eg "kapview").
 #     param
-#       The name of the parameter in the form "action:param" 
+#       The name of the parameter in the form "action:param"
 #       (eg "datapic:ncx1").
 
 #  Returned Value:
@@ -3854,7 +3854,7 @@ proc GetParamED {task param} {
 #     GetParamED
 
 #  Purpose:
-#     Returns the value of an ATASK parameter substituing "E" exponents for 
+#     Returns the value of an ATASK parameter substituing "E" exponents for
 #     "D" exponents. Also removes single quotes. Also converts values with
 #     a 3 digit exponent to "BAD".
 
@@ -3908,7 +3908,7 @@ proc GetParamED {task param} {
    }
    return $res2
 }
-    
+
 proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #+
 #  Name:
@@ -3917,7 +3917,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #  Purpose:
 #     Obtain a set of values of various data types from the user.
 #     A dialog box is displayed, containing a set of labeled entry
-#     widgets, check buttons and radio buttons. Checks are made that 
+#     widgets, check buttons and radio buttons. Checks are made that
 #     the supplied values are acceptable.
 
 #  Language:
@@ -3926,10 +3926,10 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #  Arguments:
 #     vars
 #        A list of the names of the global variable which are to recieve
-#        the entered values. The initial values of these variables are 
+#        the entered values. The initial values of these variables are
 #        displayed in the entry boxes. NB, these variables must be GLOBAL.
 #     ntypes
-#        The name of a 1-D array indexed by variable name, holding the data 
+#        The name of a 1-D array indexed by variable name, holding the data
 #        type for the the variable. This must be one of:
 #        _REAL - A floating point value.
 #        _INTEGER - An integer value.
@@ -3939,20 +3939,20 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #        _CHOICE - A choice from the strings supplied in the variable's
 #                  entry in the "limits" array.
 #     nlabels
-#        The name of a 1-D array indexed by variable name, holding the labels 
+#        The name of a 1-D array indexed by variable name, holding the labels
 #        to display next to each entry box. These may be blank if no label is required.
 #     nlimits
-#        The name of a 1-D array indexed by variable name. Each element is a 
+#        The name of a 1-D array indexed by variable name. Each element is a
 #        list holding values which restrict the values which can be taken by
-#        the corresponding variable. For _REAL and _INEGER, the first item 
-#        in the list is the minimum allowed value, and the second is the 
+#        the corresponding variable. For _REAL and _INEGER, the first item
+#        in the list is the minimum allowed value, and the second is the
 #        maximum allowed value. If not supplied, no limits are imposed. For
 #        _CHOICE, the items in the list are the allowed string values for the
 #        variable.
 #     title
 #        A title for the dialog box window.
 #     help
-#        An htx cross-reference label into the hypertext documentation to be 
+#        An htx cross-reference label into the hypertext documentation to be
 #        followed if the Help button is pressed. If this is blank then no Help
 #        button is created.
 #     dhelp
@@ -4075,9 +4075,9 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
          set wid [expr $tcl_precision + 6]
 
 # Extract the min and max values from the limits list.
-         if { $nlims > 0 } { 
+         if { $nlims > 0 } {
             set min [lindex $lims 0]
-            if { $nlims > 1 } { 
+            if { $nlims > 1 } {
                set max [lindex $lims 1]
             } {
                set max {\"\"}
@@ -4089,22 +4089,22 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # Create the data entry box, limiting the value to the supplied max and
 # min (if any).
-         set com "if { $max != \\\"\\\" && \\\$$varname > $max } { 
+         set com "if { $max != \\\"\\\" && \\\$$varname > $max } {
                      set $varname $max
-                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } { 
+                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } {
                      set $varname $min
                   }"
          set vl [RealValue $f1.vl $wid $varname $com]
-         pack $vl -side left 
+         pack $vl -side left
 
 # _INTEGER...
       } elseif { $type == "_INTEGER" } {
          incr nent
 
 # Extract the min and max values from the limits list.
-         if { $nlims > 0 } { 
+         if { $nlims > 0 } {
             set min [lindex $lims 0]
-            if { $nlims > 1 } { 
+            if { $nlims > 1 } {
                set max [lindex $lims 1]
             } {
                set max {\"\"}
@@ -4117,22 +4117,22 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
          if { $min != {\"\"} } { set min [expr round( $min )] }
          if { $max != {\"\"} } { set max [expr round( $max )] }
 
-# Create the data entry box, limiting the value to integer values between the 
+# Create the data entry box, limiting the value to integer values between the
 # supplied max and min (if any).
          set com "set $varname \\\[expr round( \\\$$varname ) \\\]
-                  if { $max != \\\"\\\" && \\\$$varname > $max } { 
+                  if { $max != \\\"\\\" && \\\$$varname > $max } {
                      set $varname $max
-                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } { 
+                  } elseif { $min != \\\"\\\" && \\\$$varname < $min } {
                      set $varname $min
                   }"
          set vl [RealValue $f1.vl 12 $varname $com]
-         pack $vl -side left 
+         pack $vl -side left
 
 # _LOGICAL
       } elseif { $type == "_LOGICAL" } {
          set cb [checkbutton $f1.cb -text $label -variable $varname \
                              -font $B_FONT]
-         pack $cb -side left 
+         pack $cb -side left
 
 # _CHAR
       } elseif { [regexp {^_CHAR} $type] } {
@@ -4146,21 +4146,21 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # Create the string entry box.
          set vl [StringValue $f1.vl $wid $varname "" -font $B_FONT]
-         pack $vl -side left 
+         pack $vl -side left
 
 # _CHOICE
       } elseif { $type == "_CHOICE" } {
 
 # Create a frame to hold the radio-buttons.
          set rbf [frame $f1.rbf]
-         pack $rbf -side left 
+         pack $rbf -side left
 
 # Create a radiobutton for each option.
          set ii 0
          foreach string $lims {
             set rb [radiobutton $rbf.$ii -text $string -value $string \
                                 -variable $varname]
-            pack $rb -side top -anchor w 
+            pack $rb -side top -anchor w
             incr ii
          }
 
@@ -4180,8 +4180,8 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
    SetHelp $b2 "Press to close the dialog box, cancelling the operation."
 #   SetHelp $b3 "Press to restore the original values."
 
-#   pack $b1 $b2 $b3 -side left -expand 1 -padx 2m   
-   pack $b1 $b2 -side left -expand 1 -fill x -padx 2m   
+#   pack $b1 $b2 $b3 -side left -expand 1 -padx 2m
+   pack $b1 $b2 -side left -expand 1 -fill x -padx 2m
 
    if { $help != "" } {
       set b4 [button $butfrm.help -text "Help" -command "set INPUTS_BUTTON help"]
@@ -4189,8 +4189,8 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
       pack $b4 -side left -expand 1 -padx 2m
    }
 
-# If there is only one variable being obtained through an entry, then create a 
-# binding so that pressing the <Return> key behaves like clicking the OK 
+# If there is only one variable being obtained through an entry, then create a
+# binding so that pressing the <Return> key behaves like clicking the OK
 # button.
    if { $nent == 1 } { bind $top <Return> "set INPUTS_BUTTON ok" }
 
@@ -4230,7 +4230,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # If the Help button was pressed, display help.
       } elseif { $INPUTS_BUTTON == "help" } {
-         ShowHelp $help 
+         ShowHelp $help
       }
    }
 
@@ -4324,7 +4324,7 @@ proc greyCurves {nent} {
          set int [expr $int + $delta]
       }
 
-   } elseif { $CSYSNOW == "MONO" } { 
+   } elseif { $CSYSNOW == "MONO" } {
       for {set i 0} {$i < $NENT} {incr i} {
          lappend LUT(red) $int
          lappend LUT(green) -1.0
@@ -4332,7 +4332,7 @@ proc greyCurves {nent} {
          set int [expr $int + $delta]
       }
 
-   } elseif { $CSYSNOW == "HSV" } { 
+   } elseif { $CSYSNOW == "HSV" } {
       for {set i 0} {$i < $NENT} {incr i} {
          lappend LUT(red) 0.0
          lappend LUT(green) 0.0
@@ -4342,7 +4342,7 @@ proc greyCurves {nent} {
    }
 
 #  Reset the cursor and mark.
-   set MENT "" 
+   set MENT ""
    set CPEN [expr round( 0.5*($LP+$UP))]
 
 #  Calculate new transformations.
@@ -4400,10 +4400,10 @@ proc updateEditor {} {
 
 #  Set up the scrolling region for the editor.
    set bbox [$CAN2 bbox c]
-   set xl [lindex $bbox 0] 
-   set xh [lindex $bbox 2] 
-   set yl [lindex $bbox 1] 
-   set yh [lindex $bbox 3] 
+   set xl [lindex $bbox 0]
+   set xh [lindex $bbox 2]
+   set yl [lindex $bbox 1]
+   set yh [lindex $bbox 3]
    set dw [expr 0.02*($xh - $xl)]
    set dh [expr 0.05*($yh - $yl)]
    set xl [expr $xl - $dw]
@@ -4418,7 +4418,7 @@ proc updateEditor {} {
    $CAN2 lower bkgrnd
 
 #  If there is a selection, update the selection rectangle.
-   select 
+   select
 
 #  Update the cursor line.
    updateCursor 1
@@ -4539,7 +4539,7 @@ proc gwmUpdate {force} {
    global NN
 
 #  Check that a colour table exists in the editor.
-   if { [info exists LUT(red)] } { 
+   if { [info exists LUT(red)] } {
 
 #  Get the name for a new temporary NDF.
       set tfile [UniqueFile]
@@ -4559,7 +4559,7 @@ proc gwmUpdate {force} {
       if { $force || $GWMNEW || [winfo visual $CAN] != "pseudocolor" } { gwmDisplay }
 
 #  Delete the NDF.
-      file delete -force $tfile   
+      file delete -force $tfile
    }
 }
 
@@ -4570,7 +4570,7 @@ proc gwmMake {} {
 
 #  Purpose:
 #     Create a GWM canvas item which fills the existing canvas widget.
-#     If this fails (e.g. due to lack of colours), an error message 
+#     If this fails (e.g. due to lack of colours), an error message
 #     is returned and GWM is set to "". If succesful, a blank string is
 #     returned.
 
@@ -4655,7 +4655,7 @@ proc gwmMake {} {
       set hgt [expr [winfo height $CAN] - 4]
 
 # If the existing GWM canvas item is (badly) of the wrong size, delete it.
-      if { abs( $wid - $GWMWID ) > 20 || abs( $hgt - $GWMHGT ) > 20 } { 
+      if { abs( $wid - $GWMWID ) > 20 || abs( $hgt - $GWMHGT ) > 20 } {
          $CAN delete $GWM
       }
    }
@@ -4689,12 +4689,12 @@ proc gwmMake {} {
          set GWMNEW 1
          set mess ""
 
-#  On the first invocation, determine the number of colours in the display 
+#  On the first invocation, determine the number of colours in the display
 #  by saving the colour table into an NDF and getting its dimensions.
          if { $NP == "" } {
             set ndf [UniqueFile]
             Obey kapview lutsave "lut=$ndf device=$DEVICE" 1
-            Obey ndfpack ndftrace "ndf=$ndf" 
+            Obey ndfpack ndftrace "ndf=$ndf"
             set dims [GetParamED ndfpack ndftrace:dims]
             regexp {\[([-+0-9]+),([-+0-9]+)\]} $dims a xd yd
             set NP $yd
@@ -4814,7 +4814,7 @@ proc HelpArea {} {
 # Create a dummy frame with height but no width to act as a vertical strut.
 # Geometry propagation is turn off for this frame so that its requested
 # size will be retained even though nothing is put in the frame. This
-# strut is used to keep the help area the same size even if the message text 
+# strut is used to keep the help area the same size even if the message text
 # within it requires a narrower area.
          set HSTRUT [Strut $FHELP $height]
 
@@ -4822,7 +4822,7 @@ proc HelpArea {} {
          update idletasks
          set width [expr 0.9*[winfo width $UWIN]]
 
-# Create a message widget to display dynamic help information about 
+# Create a message widget to display dynamic help information about
 # the widget underneath the pointer.
          set HLAB [message $FHELP.lab -justify left -textvariable HELP \
                             -anchor w -font $HLP_FONT -width $width]
@@ -4847,7 +4847,7 @@ proc Helper { blank } {
 #     Helper
 
 #  Purpose:
-#     Selects the text to display in the help area. 
+#     Selects the text to display in the help area.
 
 #  Language:
 #     TCL
@@ -4859,7 +4859,7 @@ proc Helper { blank } {
 
 #  Globals:
 #     HELPS (Read)
-#        An array holding the help messages for all widgets and canvas tags, 
+#        An array holding the help messages for all widgets and canvas tags,
 #        indexed by widget name or canvas tag.
 #     HELP (Write)
 #        The text to be displayed in the help area.
@@ -4905,9 +4905,9 @@ proc Helper { blank } {
    if { ![winfo exists $HLAB] } { return }
 
 #  Set the help blank is required.
-   if { $blank } { 
+   if { $blank } {
       set HELP ""
-      return 
+      return
    }
 
 # This function is usually invoked when the pointer enters or leaves a
@@ -4917,7 +4917,7 @@ proc Helper { blank } {
    after 10
 
 # Find the lowest level widget under the pointer.
-   set x [winfo pointerx .] 
+   set x [winfo pointerx .]
    set y [winfo pointery .]
    set w [winfo containing $x $y]
 
@@ -4948,8 +4948,8 @@ proc Helper { blank } {
    }
 
 # If no suitable help was found, store a null help string.
-   if { !$got } { 
-      set HELP "" 
+   if { !$got } {
+      set HELP ""
 
 # If the vertical strut which stops the help area collapsing when the
 # the number of lines in the help area reduces, is smaller than the
@@ -4977,14 +4977,14 @@ proc LoadTask {task file} {
 
 #  Arguments:
 #     task
-#      The name by which the task is to be known 
+#      The name by which the task is to be known
 #      (eg "kapview").
 #     file
-#      The file containing the executable image 
+#      The file containing the executable image
 #      (eg "/star/bin/kappa/kapview_mon").
 
 #  Notes:
-#     -  This procedure shuts down the whole application if the task 
+#     -  This procedure shuts down the whole application if the task
 #     cannot be loaded.
 
 #  Globals:
@@ -5040,8 +5040,8 @@ proc LoadTask {task file} {
       after 100
       incr count
       if {$count > 100} {
-         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
-         Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
+         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..."
+         Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..."
          $task kill
          exit 1
       }
@@ -5272,13 +5272,13 @@ proc MenuMotionBind {win y} {
 #-
    global HELP
    global MENUHELPS
-   global FHELP 
+   global FHELP
    global HAREA
    global HLAB
    global HSTRUT
 
 # Ignore separators and tearoffs
-   set mty [$win type @$y] 
+   set mty [$win type @$y]
    if { $mty != "separator" && $mty != "tearoff" } {
 
 # Get the label from the menu entry under the pointer.
@@ -5321,7 +5321,7 @@ proc Message {message} {
 
 #  Arguments:
 #     message
-#       The message to display. 
+#       The message to display.
 
 #  Globals:
 #     TOP (Read)
@@ -5360,8 +5360,8 @@ proc Message {message} {
    global TOP
    global env
 
-# If the top level window has not yet been created, message to standard 
-# output 
+# If the top level window has not yet been created, message to standard
+# output
    if { ![info exists TOP] } {
       puts $message
 
@@ -5583,7 +5583,7 @@ proc New {} {
    global UWIN
 
 #  If there are changes, give the user the chance to save them.
-   if { [Saver] } { 
+   if { [Saver] } {
 
 #  Only proceed if it is ok to erase the current LUT, and if a value is
 #  given for the number of entries in the new LUT.
@@ -5626,7 +5626,7 @@ proc Obey {task action params args} {
 #     Obey
 
 #  Purpose:
-#     Executes an ADAM application. 
+#     Executes an ADAM application.
 
 #  Language:
 #     TCL
@@ -5637,16 +5637,16 @@ proc Obey {task action params args} {
 #     action
 #       The name of the application (eg "display").
 #     params
-#       Any command line parameter assignments to pass to the 
-#       application. A blank string must be supplied if no 
+#       Any command line parameter assignments to pass to the
+#       application. A blank string must be supplied if no
 #       command line parameter assignments are needed.
 #     args
 #       o  If the optional string "noreport" is supplied, then any error
-#       messages generated by the action are not displayed. 
-#       o  If the name of a currently defined global variable is supplied, 
+#       messages generated by the action are not displayed.
+#       o  If the name of a currently defined global variable is supplied,
 #       then the variable is assumed to be a 1-D array, indexed by A-task
-#       parameter name. The associated values are the values to supply for 
-#       the A-task's parameters if they are prompted for. 
+#       parameter name. The associated values are the values to supply for
+#       the A-task's parameters if they are prompted for.
 #       o  The presence of any other non-blank value after "params" causes
 #       the whole TCL application to abort if the specified action
 #       does not complete succesfully.
@@ -5669,7 +5669,7 @@ proc Obey {task action params args} {
 #     ADAM_ERRORS (Write)
 #      The messages from the most recent ADAM application to fail.
 #     ATASK_OUTPUT (Write)
-#       Any non-error messages generated by the action are appended to 
+#       Any non-error messages generated by the action are appended to
 #       this list. Each message is stored as a new element in the list.
 #     STATUS (Write)
 #      The status string returned by the action.
@@ -5739,8 +5739,8 @@ proc Obey {task action params args} {
       } elseif { $args == "noreport" } {
          set report 0
 
-# Otherwise, abort on an error.         
-      } elseif { [lindex $args 0] != "" } { 
+# Otherwise, abort on an error.
+      } elseif { [lindex $args 0] != "" } {
          set abort 1
       }
    }
@@ -5765,7 +5765,7 @@ proc Obey {task action params args} {
 # messages are thrown away. Parameter requests are responded to by
 # sending a null (!) value. The variable STATUS is set when the
 # action completes.
-   set STATUS ""   
+   set STATUS ""
    $task obey $action $params -inform "CheckMsg $action %V" \
                       -endmsg {set STATUS "%S"} \
                       -paramreq $param_req
@@ -5785,7 +5785,7 @@ proc Obey {task action params args} {
          puts $LOGFILE_ID "\n$task $action $params..."
       }
 
-      set STATUS ""   
+      set STATUS ""
       $task obey $action $params -inform "CheckMsg $action %V" \
                          -endmsg {set STATUS "%S"} \
                          -paramreq $param_req
@@ -5835,17 +5835,17 @@ proc Pop {stack args} {
 
 #  Arguments:
 #     stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       On exit, the list holds one less element than on entry.
 #     args
 #        An optional argument giving the number of levels to pop off the
-#        stack. It defaults to 1. If it is supplied as -1, then the 
+#        stack. It defaults to 1. If it is supplied as -1, then the
 #        the first (bottom) entry is returned and the stack is emptied. If it
-#        is supplied as 0, then the top entry on the stack is returned, but 
+#        is supplied as 0, then the top entry on the stack is returned, but
 #        it is not removed from the stack.
 
 #  Returned Value:
-#     The required stack element, or an empty string if the supplied stack 
+#     The required stack element, or an empty string if the supplied stack
 #     was empty.
 
 #  Copyright:
@@ -5883,7 +5883,7 @@ proc Pop {stack args} {
 
    if { $args == "" } {
       set levels 1
-   } { 
+   } {
       set levels $args
    }
 
@@ -5897,7 +5897,7 @@ proc Pop {stack args} {
    } {
       set ret [lindex $stk [expr $levels - 1] ]
       set stk [lrange $stk $levels end]
-   } 
+   }
 
    return $ret
 }
@@ -5915,7 +5915,7 @@ proc Push {stack value} {
 
 #  Arguments:
 #     stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       On exit, the list holds one more element than on entry.
 #     value
 #       The value to be pushed onto stack.
@@ -5968,7 +5968,7 @@ proc RealValue {name width value command args} {
 #     RealValue
 
 #  Purpose:
-#     Create a simple numerical value entry "widget". 
+#     Create a simple numerical value entry "widget".
 
 #  Language:
 #     TCL
@@ -5979,12 +5979,12 @@ proc RealValue {name width value command args} {
 #     width
 #      The number of characters in the text entry widget.
 #     value
-#      The name (NOT the value) of the global variable to receive the 
+#      The name (NOT the value) of the global variable to receive the
 #      numerical value. Note, this must be a *global* variable.
 #     command
 #      A command to execute after a valid value has been assigned to the
 #      variable.
-#     args 
+#     args
 #      Any further options to pass to the command which creates the
 #      "entry" widget (optional).
 
@@ -6052,13 +6052,13 @@ proc RealValue {name width value command args} {
           set OLD_VAL \$$value
        }"
 
-# When <Return> is pressed or the focus leaves the current entry, check that 
-# the current text represents a valid value (if not, the old value will be 
-# re-instated). 
+# When <Return> is pressed or the focus leaves the current entry, check that
+# the current text represents a valid value (if not, the old value will be
+# re-instated).
    set check "if { \[$name cget -state\] == \"normal\" } {
                 set $value \[string trim \$$value\]
-                if { \[scan \$$value \"%%g\" $value\] < 1 } { 
-                   set $value \$OLD_VAL 
+                if { \[scan \$$value \"%%g\" $value\] < 1 } {
+                   set $value \$OLD_VAL
                 } elseif { \$OLD_VAL != \$$value } {
                    eval \"$command\"
                 }
@@ -6066,15 +6066,15 @@ proc RealValue {name width value command args} {
    bind $name <Return> $check
    bind $name <FocusOut> $check
 
-# Store a command to process termination of data entry. Clear the current 
-# selection, pass the focus back to the window which had it before, and 
-# check that the current text represents a valid value (if not, the old 
+# Store a command to process termination of data entry. Clear the current
+# selection, pass the focus back to the window which had it before, and
+# check that the current text represents a valid value (if not, the old
 # value will be re-instated).
    set done "if { \[$name cget -state\] == \"normal\" } {
                 $name select clear
                 set $value \[string trim \$$value\]
-                if { \[scan \$$value \"%%g\" $value\] < 1 } { 
-                   set $value \$OLD_VAL 
+                if { \[scan \$$value \"%%g\" $value\] < 1 } {
+                   set $value \$OLD_VAL
                 } elseif { \$OLD_VAL != \$$value } {
                    eval \"$command\"
                 }
@@ -6095,7 +6095,7 @@ proc ReleaseBind {x y} {
 #     ReleaseBind
 
 #  Purpose:
-#     Process button-1 releases over the editor. 
+#     Process button-1 releases over the editor.
 
 #  Language:
 #     TCL
@@ -6111,7 +6111,7 @@ proc ReleaseBind {x y} {
 #        The name of the canvas widget holding the editor.
 #     MODE (Read and Write)
 #        The interaction mode determining how to process button clicks
-#        and motion in the GWM canvas item. 
+#        and motion in the GWM canvas item.
 #     ROOTX (Read)
 #        The canvas X coordinate at which the button was pressed.
 #     ROOTY (Read)
@@ -6152,8 +6152,8 @@ proc ReleaseBind {x y} {
    global CP0
    global CP1
    global CP2
-   global CPL1 
-   global CPL2 
+   global CPL1
+   global CPL2
    global CURSID
    global CURX
    global CURY1
@@ -6179,7 +6179,7 @@ proc ReleaseBind {x y} {
    global RGBNOW
    global ROOTX
    global ROOTY
-   global SEG 
+   global SEG
    global SELID
    global XE0
    global XE1
@@ -6203,15 +6203,15 @@ proc ReleaseBind {x y} {
       set cx $CXL
    }
 
-# The global variable MODE determines how events over the canvas are 
-# processed. 
+# The global variable MODE determines how events over the canvas are
+# processed.
 
 # Dragging a control point
    if { $MODE == "cp" } {
       set cx $ROOTX
 
 #  Delete the two lines which were drawn when the button was clicked.
-      $CAN2 delete $CPL1 $CPL2 
+      $CAN2 delete $CPL1 $CPL2
 
 #  find the change in intensity at the control point.
       set incy [expr ($YOFF-$cy)/$YSCALE - [lindex $LUT($RGBNOW) $CP0] ]
@@ -6233,7 +6233,7 @@ proc ReleaseBind {x y} {
          append new "$nv "
          set inc [expr $inc + $dy]
       }
-        
+
 #  Move all the entries between CP0 and CP2 up a bit.
       set inc $incy
       if { $CP2 != "" } {
@@ -6249,19 +6249,19 @@ proc ReleaseBind {x y} {
          if { $nv > 1.0 } { set nv 1.0 } elseif { $nv < 0.0 } { set nv 0.0 }
          append new "$nv "
       }
-        
+
       set LUT($RGBNOW) [eval lreplace {$LUT($RGBNOW)} $CP1 $CP2 $new]
 
-      updateCurrent 
+      updateCurrent
       record
 
-# Moving a curve segment vertically: change the LUT and update the current 
+# Moving a curve segment vertically: change the LUT and update the current
 # curve. Set the cursor position to the centre of the mark.
    } elseif { $MODE == "seg" } {
       set nv [expr ($YOFF-$cy)/$YSCALE]
       if { $nv != [lindex $LUT($RGBNOW) $MENT] } {
          set LUT($RGBNOW) [lreplace $LUT($RGBNOW) $MENT $MENT $nv]
-         updateCurrent 
+         updateCurrent
          record
       }
 
@@ -6281,7 +6281,7 @@ proc ReleaseBind {x y} {
          set HENTRY [expr round( $EX0+$EX1*$ROOTX )]
       }
       select
-   } 
+   }
 
 #  Any double click is now finished with.
    set DOUBLE 0
@@ -6349,9 +6349,9 @@ proc Resize {} {
 #  We do not want to continually update the GWM items if the interface is
 #  slowly resized by the user (causing a series of continual calls to ths
 #  procedure), because each GWM update takes ages. We just want to
-#  respond to the final resize. So... Issue a ticket to the current resize, 
-#  and then tell it to wait for a second. If no other tickets have been 
-#  taken at the end of 1 second, then go ahead and resize the display 
+#  respond to the final resize. So... Issue a ticket to the current resize,
+#  and then tell it to wait for a second. If no other tickets have been
+#  taken at the end of 1 second, then go ahead and resize the display
 #  (resetting the ticket number for the next resize).
    incr TKT
    after 1000 "
@@ -6422,18 +6422,18 @@ proc doResize {} {
    global LUTFILE
    global TKT
 
-#  Cancel the binding for Configure so that the configuration changes 
+#  Cancel the binding for Configure so that the configuration changes
 #  produced by this procedure do not cause an infinite loop.
    set com [bind $UWIN <Configure>]
    bind $UWIN <Configure> ""
 
 #  Make a new GWM canvas item, if required (i.e. if the canvas has
 #  changed size).
-   gwmMake 
+   gwmMake
 
 #  If the GWM canvas item has changed size, or has not yet been used...
    if { ![info exists CURY1] } { set GWMNEW 1 }
-   if { $GWMNEW || ![info exists CURY1] } { 
+   if { $GWMNEW || ![info exists CURY1] } {
 
 # Establish the graphics and image display devices.
       Obey kapview paldef "device=$DEVICE" 1
@@ -6460,11 +6460,11 @@ proc doResize {} {
       set y1 [expr $y1 + $dw]
       set y2 [expr $y2 - $dw]
       set rx [expr $x2 - $x1]
-      $CAN create rectangle [expr 0.05*$rx + $x1] $y1 [expr 0.35*$rx + $x1] $y2 -outline "" -tags disp 
-      $CAN create rectangle [expr 0.45*$rx + $x1] $y1 [expr 0.9*$rx + $x1] $y2 -outline "" -tags hist 
+      $CAN create rectangle [expr 0.05*$rx + $x1] $y1 [expr 0.35*$rx + $x1] $y2 -outline "" -tags disp
+      $CAN create rectangle [expr 0.45*$rx + $x1] $y1 [expr 0.9*$rx + $x1] $y2 -outline "" -tags hist
 
-#  Determine the canvas y value at which to place the top and bottom of the 
-#  cursor. Make sure the cursor extends across the entire scrollable area of 
+#  Determine the canvas y value at which to place the top and bottom of the
+#  cursor. Make sure the cursor extends across the entire scrollable area of
 #  the widget window.
       update idletasks
       set sy [winfo y $CAN2]
@@ -6483,18 +6483,18 @@ proc doResize {} {
 #  specified initial LUT if any.
       if { $INITLUT != "" } {
          set done [openNamed $INITLUT 1]
-         if { $done } { 
-            set LUTFILE $INITLUT 
-            set KEEPFILE 1 
+         if { $done } {
+            set LUTFILE $INITLUT
+            set KEEPFILE 1
          }
          set INITLUT ""
       } else {
-         set done 0      
+         set done 0
       }
 
-#  If no colour table has yet been loaded, save the current kappa colour 
+#  If no colour table has yet been loaded, save the current kappa colour
 #  table into a text file, and initialize the editor to use it.
-      if { !$done } { 
+      if { !$done } {
          Read 0
          updateDisplay 1
       }
@@ -6624,12 +6624,12 @@ proc SaveAs {} {
    set file [tk_getSaveFile -defaultextension ".sdf" -filetypes {{SDF {.sdf}} {All {*}}}]
 
 #  If ok, store the name of the NDF and use the Save proc.
-   if { $file != "" } { 
+   if { $file != "" } {
       set LUTFILE $file
       set ok [Save 1]
 
 # Set the name of the top level window.
-      if { $ok } { 
+      if { $ok } {
          wm  title $UWIN "LutEdit $file"
       }
 
@@ -6653,7 +6653,7 @@ proc saveLUT {file conf} {
 #  Arguments:
 #     file
 #        The name of the NDF to create.
-#     conf 
+#     conf
 #        If 1, then confirm that it is OK to replace an existing file.
 
 #  Returned:
@@ -6723,9 +6723,9 @@ proc saveLUT {file conf} {
       set lut(red) $LUT(red)
       set lut(green) $LUT(green)
       set lut(blue) $LUT(blue)
-      toRGB lut $CSYSNOW 
+      toRGB lut $CSYSNOW
 
-#  Open a temporary text file 
+#  Open a temporary text file
       set tfile [UniqueFile]
       set id [open $tfile "w"]
 
@@ -6768,7 +6768,7 @@ proc SetHelp {widgets help args} {
 #     widgets
 #       A list of widget names (eg ".fr1.button"), or canvas tags.
 #     help
-#       The text to display. 
+#       The text to display.
 #     args
 #       An optional htx cross-reference label to be associated with the
 #       widget.
@@ -6820,16 +6820,16 @@ proc SetHelp {widgets help args} {
 # Store the supplied text.
 #      set HELPS($wid) [linesplit $help 70]
       set HELPS($wid) $help
- 
+
 # Store the htx label for the widget (if any).
       if { $args != "" } {
          set HELP_LABELS($wid) $args
       }
    }
 
-# Ensure that the displayed help text is up-to-date. 
+# Ensure that the displayed help text is up-to-date.
    Helper 0
-   
+
 }
 
 proc SingleBind {x y shift} {
@@ -6892,9 +6892,9 @@ proc SingleBind {x y shift} {
    global CPY1
    global CPY2
    global CTRL
-   global CURSID 
-   global CURX 
-   global CURY1 
+   global CURSID
+   global CURX
+   global CURY1
    global CURY2
    global CXH
    global CXL
@@ -6930,7 +6930,7 @@ proc SingleBind {x y shift} {
 
    if { $ROOTX > $CXH } {
       set ROOTX $CXH
-   } elseif { $ROOTX < $CXL } { 
+   } elseif { $ROOTX < $CXL } {
       set ROOTX $CXL
    }
 
@@ -6950,7 +6950,7 @@ proc SingleBind {x y shift} {
    if { [lsearch -exact $curtags cp] != -1 } {
 
 #  Pretent the click occurred at the centre of the control point.
-      set c [$CAN2 coords current] 
+      set c [$CAN2 coords current]
       set ROOTX [lindex $c 0]
       set ROOTY [lindex $c 1]
 
@@ -6960,9 +6960,9 @@ proc SingleBind {x y shift} {
       set i [lsearch -exact $CTRL($RGBNOW) $CP0]
       if { $i != -1 } {
 
-#  indicate we are dragging a control point, and set the current cursor 
+#  indicate we are dragging a control point, and set the current cursor
 #  intensity value.
-         set MODE cp 
+         set MODE cp
          set PVAL [format "%.3f" [expr ($YOFF - $ROOTY)/$YSCALE]]
 
 #  Draw a line from the selected control point to the previous control point.
@@ -7033,7 +7033,7 @@ proc SingleBind {x y shift} {
 
 #  Delete any selection box.
       if { $SELID != "" } {
-         $CAN2 delete $SELID  
+         $CAN2 delete $SELID
          set SELID ""
          set HENTRY ""
          set LENTRY ""
@@ -7041,7 +7041,7 @@ proc SingleBind {x y shift} {
 
 # Set the new cursor position.
       if { $CURSID != "" } {
-         set CURX $ROOTX 
+         set CURX $ROOTX
          $CAN2 coords $CURSID $CURX $CURY1 $CURX $CURY2
          updateCursor 0
       }
@@ -7055,7 +7055,7 @@ proc textLut {file} {
 
 #  Purpose:
 #     Loads a new LUT from a text file. The data is placed in the global
-#     LUT arrays. Other globals are initialized, but the editor and GWM 
+#     LUT arrays. Other globals are initialized, but the editor and GWM
 #     items are not redrawn.
 
 #  Language:
@@ -7153,12 +7153,12 @@ proc textLut {file} {
          toCSYS LUT RGB
 
 #  Set the number of LUT entries.
-         set NENT [incr lnum -1] 
+         set NENT [incr lnum -1]
          set NENTM1 [expr $NENT-1]
          set PPENT [format "%.2f" [expr double($UP-$LP+1)/double($NENT)]]
 
 #  Reset the cursor and mark.
-         set MENT "" 
+         set MENT ""
          set CPEN [expr round( 0.5*($LP+$UP))]
 
 #  Calculate new transformations.
@@ -7198,7 +7198,7 @@ proc UniqueFile {} {
 #     LUTEDIT_SCRATCH (Read)
 #        The path to the LUTEDIT_SCRATCH directory.
 #     IFILE (Read and Write)
-#        File names have a name of the form lutedit<i> where <i> is an 
+#        File names have a name of the form lutedit<i> where <i> is an
 #        integer, which is different for each file. IFILE
 #        records the value of i used in the previous call to this
 #        function. The first value of i considered is one greater than
@@ -7256,7 +7256,7 @@ proc WaitFor {name args} {
 #  Purpose:
 #     Pause the caller until a named global variable changes its value.
 #     Meanwhile, events are directed to a nominated "safe" window. This
-#     "freezes" the display so that further actions cannot be initiated by 
+#     "freezes" the display so that further actions cannot be initiated by
 #     the user
 
 #  Language:
@@ -7267,8 +7267,8 @@ proc WaitFor {name args} {
 #        The name (NOT the value) of the global variable to be watched.
 #     args
 #        An optional list argument. If supplied, the first element should
-#        be a command and the second element should be a time in milliseconds. 
-#        The supplied command will be executed after each period of the 
+#        be a command and the second element should be a time in milliseconds.
+#        The supplied command will be executed after each period of the
 #        specified time, until the variable is changed. If the delay time
 #        is not supplied it defaults to 100 milliseconds. If the suppleid
 #        command returns a zero value, then the loop is aborted prematurely.
@@ -7285,7 +7285,7 @@ proc WaitFor {name args} {
 #  Globals:
 #     SAFE (Read)
 #        The path to a window which can receive notifivcation of all events
-#        while we are waiting. This should be a window which ignores all 
+#        while we are waiting. This should be a window which ignores all
 #        events.
 
 #  Copyright:
@@ -7453,10 +7453,10 @@ proc WaitFor {name args} {
    set CURX ""
    set DOUBLE 0
    set EVAL ""
-   set EX0 "" 
+   set EX0 ""
    set FHELP ""
    set GWM ""
-   set HAREA 1 
+   set HAREA 1
    set HELP ""
    set HENTRY ""
    set HISTTSIZ "1.0"
@@ -7497,7 +7497,7 @@ proc WaitFor {name args} {
    tk appname lutedit
 
 # Rename the "exit" command so that it calls a procedure which cleans up,
-# and then calls the built-in shut-down commands. This new exit command is 
+# and then calls the built-in shut-down commands. This new exit command is
 # called even if an exceptional exit occurs.
    rename exit tcl_exit
    rename my_exit exit
@@ -7510,7 +7510,7 @@ proc WaitFor {name args} {
 # Get the pixels per inch on the screen.
    if { ![info exists dpi] } {
       set dpi [winfo fpixels . "1i"]
-   }       
+   }
 
 # Set the size of the canvas widget.
    set CANWID [expr round( ( $CANWID * $dpi ) / 88.0 ) ]
@@ -7531,7 +7531,7 @@ proc WaitFor {name args} {
 # Set up the default palette
    DefPal
 
-# Try to stop problems with the AMS (ADAM Message System) rendevous files 
+# Try to stop problems with the AMS (ADAM Message System) rendevous files
 # by creating a new directory as ADAM_USER.
    if { [info exists env(ADAM_USER)] } {
       set OLD_ADAM_USER $env(ADAM_USER)
@@ -7593,20 +7593,20 @@ proc WaitFor {name args} {
    }
 
 # Get the image to display and initial lut from the command line.
-   if { $argc >= 2 } { 
-      set IMAGE [lindex $argv 1] 
+   if { $argc >= 2 } {
+      set IMAGE [lindex $argv 1]
       if { [string trim $IMAGE] == "" } { set IMAGE $KAPPA_DIR/m31 }
    } else {
       set IMAGE $KAPPA_DIR/m31
    }
 
-   if { $argc >= 1 } { 
-      set INITLUT [lindex $argv 0] 
+   if { $argc >= 1 } {
+      set INITLUT [lindex $argv 0]
    } else {
       set INITLUT ""
    }
 
-# Load the required ADAM monoliths. 
+# Load the required ADAM monoliths.
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa $KAPPA_DIR/kappa_mon
    LoadTask ndfpack $KAPPA_DIR/ndfpack_mon
@@ -7650,15 +7650,15 @@ proc WaitFor {name args} {
 #  One way to get round this seems to be for the user interface to be
 #  created in a separate toplevel rather than in the main window. First,
 #  create a frame in the main window with a private colour map, and then
-#  create a toplevel to contain the user interface, with the same private 
+#  create a toplevel to contain the user interface, with the same private
 #  colour map as the first frame.
          frame .hold -colormap new
          wm withdraw .
          set UWIN [toplevel .lutedit -colormap .hold]
          centreWin $UWIN
 
-#  If we do not need a private colour map, put the user interface in the 
-#  main window 
+#  If we do not need a private colour map, put the user interface in the
+#  main window
       } {
          set UWIN .
       }
@@ -7666,14 +7666,14 @@ proc WaitFor {name args} {
 # Set the name of the top level window.
       wm  title $UWIN "LutEdit <untitled>"
 
-#  Create an all encompassing frame. 
+#  Create an all encompassing frame.
       set TOP [frame $UWIN.top -relief raised -bd 2]
 
-# Create a frame which goes at the top of the screen but contains nothing. 
+# Create a frame which goes at the top of the screen but contains nothing.
 # X events will be directed to this window during any pauses
 # (see procedure WaitFor). The window has no user controls and so is
-# "safe" (i.e. it will just ignore any button presses, mouse movements, etc). 
-# This ensures that new commands cannot be initiated by the user before 
+# "safe" (i.e. it will just ignore any button presses, mouse movements, etc).
+# This ensures that new commands cannot be initiated by the user before
 # previous ones have finished.
       set SAFE [frame $TOP.dummy]
       pack $SAFE
@@ -7713,7 +7713,7 @@ proc WaitFor {name args} {
       $filemenu add command -label "Save        " -command {Save 0} -accelerator "Ctrl-s"
       $filemenu add command -label "Save As     " -command {SaveAs} -accelerator "Ctrl-a"
       $filemenu add command -label "Exit        " -command {Finish} -accelerator "Ctrl-e"
-   
+
       MenuHelp $filemenu "Open        " "Open a colour table contained in an existing NDF."
       MenuHelp $filemenu "Open Image  " "Open a new image, retaining the current colour table."
       MenuHelp $filemenu "Read Current" "Read colour table currently in use by the image display."
@@ -7721,7 +7721,7 @@ proc WaitFor {name args} {
       MenuHelp $filemenu "Save        " "Save the current colour table."
       MenuHelp $filemenu "Save As     " "Save the current colour table to a new file."
       MenuHelp $filemenu "Exit        " "Exit the application."
-   
+
       bind $UWIN <Control-o> {Open}
       bind $UWIN <Control-i> {OpenImage}
       bind $UWIN <Control-r> {Read 1}
@@ -7754,48 +7754,48 @@ proc WaitFor {name args} {
       MenuHelp $editmenu "Flip        " "Flip the curve(s) horizontally."
 
 # Add menu items to the Options menu.
-      $optsmenu add checkbutton -label "Auto-update" -variable AUTOUP 
+      $optsmenu add checkbutton -label "Auto-update" -variable AUTOUP
       MenuHelp $optsmenu "Auto-update" "Update the image display and histogram automatically whenever any change is mad to the colour table?"
 
       $optsmenu add checkbutton -label "Colour bar" -variable LBARON -command LutBar
       MenuHelp $optsmenu "Colour bar" "Include a colour bar at the bottom of the editor window?"
 
-      $optsmenu add checkbutton -label "All curves" -variable ALLCRV 
+      $optsmenu add checkbutton -label "All curves" -variable ALLCRV
       MenuHelp $optsmenu "All curves" "Should Edit menu functions affect all the curves, or only the current curve?"
 
       set palmenu "$optsmenu.pal"
       MenuHelp $optsmenu "Palette   " "Options for the palette of pre-defined colours"
       $optsmenu add cascade -label "Palette   " -menu $palmenu
-         menu $palmenu 
+         menu $palmenu
          $palmenu add checkbutton -label "Show" -variable PALON -command PalArea
          MenuHelp $palmenu "Show" "Display the palette?"
-         $palmenu add command -label "Default" -command {DefPal} 
+         $palmenu add command -label "Default" -command {DefPal}
          MenuHelp $palmenu "Default" "Restore the default palette colours"
-         $palmenu add command -label "Sort" -command {PalSort} 
+         $palmenu add command -label "Sort" -command {PalSort}
          MenuHelp $palmenu "Sort" "Sort the palette colours"
 
       set csysmenu "$optsmenu.csys"
       MenuHelp $optsmenu "Colour system" "Specifies how colours are represented within the colour editor"
       $optsmenu add cascade -label "Colour system" -menu $csysmenu
-         menu $csysmenu 
+         menu $csysmenu
          $csysmenu add radiobutton -label "RGB" -variable CSYS -value RGB -command newCsys
          MenuHelp $csysmenu "RGB" "Colours are represented by red, green and blue intensities."
          $csysmenu add radiobutton -label "HSV" -variable CSYS -value HSV -command newCsys
          MenuHelp $csysmenu "HSV" "Colours are represented by hue, saturation and value."
          $csysmenu add radiobutton -label "Greyscale" -variable CSYS -value MONO -command newCsys
          MenuHelp $csysmenu "Greyscale" "All colours are shades of grey."
-   
+
       set intermenu "$optsmenu.inter"
       MenuHelp $optsmenu "Interpolation" "Specifies how to interpolate the table entries to get individual pen value"
       $optsmenu add cascade -label "Interpolation" -menu $intermenu
-         menu $intermenu 
+         menu $intermenu
          $intermenu add radiobutton -label "Linear" -variable NN -value NO -command "updateDisplay 0"
          $intermenu add radiobutton -label "Nearest neighbour" -variable NN -value YES -command "updateDisplay 1"
-   
+
       set imagemenu "$optsmenu.image"
       $optsmenu add cascade -label "Image display" -menu $imagemenu
       MenuHelp $optsmenu "Image display" "Options related to the image display"
-         menu $imagemenu 
+         menu $imagemenu
 
          $imagemenu add command -label "Open" -command {OpenImage} -accelerator "Ctrl-i"
          MenuHelp $imagemenu "Open" "Open a new image, retaining the current colour table."
@@ -7819,19 +7819,19 @@ proc WaitFor {name args} {
       set histmenu "$optsmenu.hist"
       $optsmenu add cascade -label "Histogram" -menu $histmenu
       MenuHelp $optsmenu "Histogram" "Options related to the histogram."
-         menu $histmenu 
+         menu $histmenu
 
          set histlabmenu "$histmenu.lab"
          $histmenu add cascade -label "X axis labels" -menu $histlabmenu
          MenuHelp $histmenu "X axis labels" "Set the quantity to display along the horizontal axis of the histogram."
-            menu $histlabmenu 
+            menu $histlabmenu
             $histlabmenu add radiobutton -label "Pen number" -variable HISTXLAB -value pen -command "histStyle 1"
             $histlabmenu add radiobutton -label "Data value" -variable HISTXLAB -value data -command "histStyle 1"
-   
+
          set histtsizmenu "$histmenu.tsiz"
          $histmenu add cascade -label "Text size" -menu $histtsizmenu
          MenuHelp $histmenu "Text size" "Scale factor for histogram text."
-            menu $histtsizmenu 
+            menu $histtsizmenu
             $histtsizmenu add radiobutton -label "0.25" -variable HISTTSIZ -value 0.25 -command "histStyle 1"
             $histtsizmenu add radiobutton -label "0.5" -variable HISTTSIZ -value 0.5 -command "histStyle 1"
             $histtsizmenu add radiobutton -label "0.85" -variable HISTTSIZ -value 0.85 -command "histStyle 1"
@@ -7842,17 +7842,17 @@ proc WaitFor {name args} {
             $histtsizmenu add radiobutton -label "2.0" -variable HISTTSIZ -value 2.0 -command "histStyle 1"
             $histtsizmenu add radiobutton -label "2.5" -variable HISTTSIZ -value 2.5 -command "histStyle 1"
             $histtsizmenu add radiobutton -label "3.0" -variable HISTTSIZ -value 3.0 -command "histStyle 1"
-   
+
          $histmenu add checkbutton -label "Logarithmic Y axis" -variable LOGPOP -command "histStyle 1"
          MenuHelp $histmenu "Logarithmic Y axis" "Display the log base 10 of the bin populations on the vertical axis of the histogram?."
-   
-      $optsmenu add separator 
+
+      $optsmenu add separator
       $optsmenu add command -label "Save options" -command {saveOpts} -accelerator "Ctrl-p"
       MenuHelp $optsmenu "Save options" "Save the current options settings and palette colours so that they become the default settings in future."
       bind $UWIN <Control-p> {saveOpts}
-      
+
 #  Pack the menu buttons.
-      pack $file $edit $opts -side left 
+      pack $file $edit $opts -side left
       pack $help -side right
 
 #  Create and pack the canvas widget.
@@ -7868,7 +7868,7 @@ proc WaitFor {name args} {
       if { $mess != "" } {
          if { !$usingnewcmap } {
             destroy $TOP
-            set usingnewcmap 1 
+            set usingnewcmap 1
 
 # If we failed while using a private colour map, give up.
          } {
@@ -7915,7 +7915,7 @@ proc WaitFor {name args} {
    set cframe [frame $F4.cframe -relief sunken -bd 3 -bg $MENUBACK]
    set YSCROLL $cframe.yscroll
    set XSCROLL $cframe.xscroll
-   
+
    set CAN2 [canvas $cframe.can2 -highlightthickness 0 -height 200 -bg $MENUBACK -yscrollcommand "$YSCROLL set" -xscrollcommand "$XSCROLL set"]
    scrollbar $YSCROLL -command "$CAN2 yview" -orient vertical -highlightthickness 0
    scrollbar $XSCROLL -command "$CAN2 xview" -orient horizontal -highlightthickness 0
@@ -7935,7 +7935,7 @@ proc WaitFor {name args} {
 
    set upbut [button $rhs.up -bitmap @$KAPPA_DIR/uparrow.bit -command "gwmUpdate 0"]
    SetHelp $upbut "Click to force the image and histogram to be re-displayed with the current colour table." LUTEDIT_UPBUT
-   pack $upbut -side top 
+   pack $upbut -side top
 
    set fyzoom [frame $rhs.yzoom]
    set yplus [button $fyzoom.plus -bitmap @$KAPPA_DIR/plus.bit -command {Zoom y 1}]
@@ -7943,7 +7943,7 @@ proc WaitFor {name args} {
    set yminus [button $fyzoom.minus -bitmap @$KAPPA_DIR/minus.bit -command {Zoom y 0}]
    SetHelp $yminus "Press to compress vertical scale..." LUTEDIT_YMINUS
    pack $yplus $yminus -side top
-   pack $fyzoom -side left -expand 1 
+   pack $fyzoom -side left -expand 1
 
    pack $rhs -side left -padx 3m -pady 2m -fill y
 
@@ -7952,7 +7952,7 @@ proc WaitFor {name args} {
    set GB [radiobutton $F5.g -text "Green" -selectcolor green -highlightbackground green -command rgbSel -variable RGBSEL -value green -anchor w]
    set BB [radiobutton $F5.b -text "Blue" -selectcolor blue -highlightbackground blue -command rgbSel -variable RGBSEL -value blue -anchor w]
    pack $RB $GB $BB -side left -padx 4m -pady 1m -anchor nw
-   newCsys   
+   newCsys
 
    set unzoom [button $F5.unzoom -bitmap @$KAPPA_DIR/unzoom.bit -command {unzoom}]
    SetHelp $unzoom "Press to reset zoom factors..." LUTEDIT_UNZOOM
@@ -8015,11 +8015,11 @@ proc WaitFor {name args} {
 # Execute procedure ReleaseBind when button 1 is released over the canvas.
    bind $CAN2 <ButtonRelease-1> "ReleaseBind %x %y"
 
-# Execute procedure B1MotionBind when the pointer is moved over the canvas 
+# Execute procedure B1MotionBind when the pointer is moved over the canvas
 # with button 1 pressed.
    bind $CAN2 <B1-Motion> "B1MotionBind %x %y"
 
-# Execute procedure MotionBind when the pointer is moved over the canvas 
+# Execute procedure MotionBind when the pointer is moved over the canvas
 # with no buttons pressed.
 #   bind $CAN2 <Motion> "MotionBind %x %y"
 

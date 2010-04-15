@@ -24,7 +24,7 @@
       LOGICAL*4 COMMENT, CONTINUATION, BLANK
       INTEGER*4 GEN_ILEN, ILEN, ITRM
       CHARACTER ALINE*132,STRING*(*),PROMPT*(*)
- 
+
       INTEGER*4 GET_ALINE
       EXTERNAL  GET_ALINE
 
@@ -58,7 +58,7 @@
              ILEN = IERR
              IERR = 0
           ELSE
-             IF (ISP.eq.0)   
+             IF (ISP.eq.0)
      1         WRITE(LUN_OUT,'(A),$', ERR=10, IOSTAT=IERR) PROMPT
              READ (LUN_IN, '(A)', ERR=10, END=20, IOSTAT=IERR) ALINE
           ENDIF

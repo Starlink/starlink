@@ -94,46 +94,46 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       LOGICAL
      :  REGION,
      :  LINE
- 
+
       REAL
      :  COLBND( 2 ),
      :  LINBND( 2 )
- 
+
 *  Arguments Returned:
       CHARACTER * ( * )
      :  BUFFER
- 
+
       INTEGER
      :  LEN
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *.
- 
+
 *    Check the inherited global status.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Initialise the length.
- 
+
       LEN = 0
- 
+
 *    Record the region zapped.
- 
+
       IF ( REGION ) THEN
- 
+
          CALL CHR_PUTR( COLBND( 1 ), BUFFER, LEN )
          CALL CHR_PUTC( '  ', BUFFER, LEN )
          CALL CHR_PUTR( LINBND( 1 ), BUFFER, LEN )
@@ -141,24 +141,24 @@
          CALL CHR_PUTR( COLBND( 2 ), BUFFER, LEN )
          CALL CHR_PUTC( '  ', BUFFER, LEN )
          CALL CHR_PUTR( LINBND( 2 ), BUFFER, LEN )
- 
+
 *    Record the lines zapped.
- 
+
       ELSE IF ( LINE ) THEN
- 
+
          CALL CHR_PUTR( LINBND( 1 ), BUFFER, LEN )
          CALL CHR_PUTC( '  ', BUFFER, LEN )
          CALL CHR_PUTR( LINBND( 2 ), BUFFER, LEN )
          CALL CHR_PUTC( '  L', BUFFER, LEN )
- 
+
 *    Record the columns zapped.
- 
+
       ELSE
- 
+
          CALL CHR_PUTR( COLBND( 1 ), BUFFER, LEN )
          CALL CHR_PUTC( '  ', BUFFER, LEN )
          CALL CHR_PUTR( COLBND( 2 ), BUFFER, LEN )
          CALL CHR_PUTC( '  C', BUFFER, LEN )
       END IF
- 
+
       END

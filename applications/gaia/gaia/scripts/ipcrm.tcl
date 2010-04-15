@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
 exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 

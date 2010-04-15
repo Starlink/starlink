@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmpv2ue(double qfoo[],double qbar,double qbaz,double 
+void sbmpv2ue(double qfoo[],double qbar,double qbaz,double
 Q0[],int*qfobar)
 #define q1 0.01720209895
 #define q2 (q1/86400.0);

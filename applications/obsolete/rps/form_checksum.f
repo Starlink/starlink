@@ -8,20 +8,20 @@
 *****************************************************************
       SUBROUTINE FORM_CHECKSUM(REFPF,KTARGET)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       INTEGER REFPF		! In	Reference no. of file
       INTEGER KTARGET		!	Target no. or 0 for cover
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_qual.inc'
       INCLUDE 'aaa_dbs_params.inc'	! Needs DBSLIB in same directory
       INCLUDE 'com_dbs_rec.inc'
       INCLUDE 'com_dbs_iof.inc'
- 
+
 *  Functions
-      CHARACTER*6  MDH_ITOC 
+      CHARACTER*6  MDH_ITOC
       INTEGER DBS_FIELDNO, DBS_INFOI
 
 
@@ -29,7 +29,7 @@
       INTEGER ISUM
       CHARACTER*6 BSUM
       INTEGER LASTBYTE, I, FLD_NTARG, IADD
- 
+
 * ______________________ Executable Code ________________________
 
       IF (REFPF .EQ. REF_FORM) THEN
@@ -46,7 +46,7 @@
       ELSE
          IF (.NOT.QUAL_TARGET(KTARGET) ) GOTO 10
       END IF
- 
+
       ISUM = 0
       DO I=1, LASTBYTE
          IADD = ICHAR( RECORD(REFPF)(I:I) )

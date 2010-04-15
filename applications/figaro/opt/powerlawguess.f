@@ -18,19 +18,19 @@
 *
 * Arguments:
 *    X1 = REAL (Given)
-*       
+*
 *    Y1 = REAL (Given)
-*       
+*
 *    X2 = REAL (Given)
-*       
+*
 *    Y2 = REAL (Given)
-*       
+*
 *    XC(N_PAR) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    N_PAR = INTEGER (Given)
-*       
+*
 *    NORMALIZATION_WAVE = DOUBLE PRECISION (Given)
-*       
+*
 *-
       implicit none
       real x1, y1, x2, y2

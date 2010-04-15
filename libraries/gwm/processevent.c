@@ -32,7 +32,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 *     	The exposed area of the window is refreshed by copying the
 *     	relevant area of the pixmap.
 *     ConfigureNotify:
-*     	The pixmap offset is computed, and the new values of the 
+*     	The pixmap offset is computed, and the new values of the
 *     	offset properties set.
 *     PropertyNotify:
 *     	The new value of the changed property is stored in the window
@@ -44,7 +44,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 *     	Colour cells are loaded in response to requests from
 *     	applications. (this mechanism is obsolete and will be removed
 *       in a future release).
-*     	
+*
 *  Function return value:
 *     status = int
 *        The error status
@@ -64,12 +64,12 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -115,7 +115,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
     XColor color;
     XRectangle clip[8];
     int nrect;
-    
+
 	switch( event->type )
 	{
 	    case Expose:
@@ -125,15 +125,15 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
             */
 		x0 = event->xexpose.x > info->x_offset ? event->xexpose.x :
 		    info->x_offset;
-		x1 = (event->xexpose.x + event->xexpose.width) < 
-		    (info->x_offset + info->pix_width) ? 
-		    (event->xexpose.x + event->xexpose.width) : 
+		x1 = (event->xexpose.x + event->xexpose.width) <
+		    (info->x_offset + info->pix_width) ?
+		    (event->xexpose.x + event->xexpose.width) :
 		    ( info->x_offset + info->pix_width);
 		y0 = event->xexpose.y > info->y_offset ? event->xexpose.y :
 		    info->y_offset;
-		y1 = (event->xexpose.y + event->xexpose.height) < 
-		    (info->y_offset + info->pix_height) ? 
-		    (event->xexpose.y + event->xexpose.height) : 
+		y1 = (event->xexpose.y + event->xexpose.height) <
+		    (info->y_offset + info->pix_height) ?
+		    (event->xexpose.y + event->xexpose.height) :
 		    ( info->y_offset + info->pix_height);
 
 	    /*
@@ -209,7 +209,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		}
 
 	    /*
-	    **  Set the exposed area to the background 
+	    **  Set the exposed area to the background
 	    */
 		if (nrect > 0)
 		{
@@ -218,7 +218,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		    XSetClipRectangles( info->display, info->gc, 0, 0, clip,
 		        nrect, YXSorted);
 		    XFillRectangle(info->display, info->win_id, info->gc,
-		        event->xexpose.x, event->xexpose.y, 
+		        event->xexpose.x, event->xexpose.y,
 			event->xexpose.width, event->xexpose.height);
 		}
 	    /*
@@ -239,17 +239,17 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
             */
 		if (~info->mask)
 		{
-		    x0 = event->xexpose.x > info->x_ov_offset ? 
+		    x0 = event->xexpose.x > info->x_ov_offset ?
 			event->xexpose.x : info->x_ov_offset;
-		    x1 = (event->xexpose.x + event->xexpose.width) < 
-		    	(info->x_ov_offset + info->pix_width) ? 
-		    	(event->xexpose.x + event->xexpose.width) : 
+		    x1 = (event->xexpose.x + event->xexpose.width) <
+		    	(info->x_ov_offset + info->pix_width) ?
+		    	(event->xexpose.x + event->xexpose.width) :
 		    	( info->x_ov_offset + info->pix_width);
-		    y0 = event->xexpose.y > info->y_ov_offset ? 
+		    y0 = event->xexpose.y > info->y_ov_offset ?
 			event->xexpose.y : info->y_ov_offset;
-		    y1 = (event->xexpose.y + event->xexpose.height) < 
-		    	(info->y_ov_offset + info->pix_height) ? 
-		    	(event->xexpose.y + event->xexpose.height) : 
+		    y1 = (event->xexpose.y + event->xexpose.height) <
+		    	(info->y_ov_offset + info->pix_height) ?
+		    	(event->xexpose.y + event->xexpose.height) :
 		    	( info->y_ov_offset + info->pix_height);
 		    expx1 = event->xexpose.width + event->xexpose.x;
 		    expy1 = event->xexpose.height + event->xexpose.y;
@@ -325,7 +325,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 			XSetClipRectangles( info->display, info->gc, 0, 0, clip,
 	 		    nrect, YXSorted);
 			XFillRectangle(info->display, info->win_id, info->gc,
-	 		    event->xexpose.x, event->xexpose.y, 
+	 		    event->xexpose.x, event->xexpose.y,
 			    event->xexpose.width, event->xexpose.height);
 		    }
 		    if ( (x0 < x1) && (y0 < y1) )
@@ -333,17 +333,17 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		    	XSetPlaneMask( info->display, info->gc, ~info->mask);
 			XSetClipMask(info->display, info->gc, None);
 		    	XCopyArea( info->display, info->pix_id, info->win_id,
-			    info->gc, x0 - info->x_ov_offset, 
+			    info->gc, x0 - info->x_ov_offset,
 			    y0 - info->y_ov_offset, x1 - x0, y1 - y0, x0, y0);
 		    }
 		}
 		break;
 
 	    case ConfigureNotify:
-	    /*	  
-	    **  Deal with x first - only do something if the width has 
+	    /*
+	    **  Deal with x first - only do something if the width has
 	    **  changed.
-	    */	  
+	    */
 		if ( event->xconfigure.width != info->pix_width )
 		{
 		/*
@@ -420,16 +420,16 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
         		(unsigned char*)(&local_offset), 1 );
 		}
                 break;
-		    
+
 	    case PropertyNotify:
             /*
             **  If the property has been deleted then ignore the event
             */
 		if ( event->xproperty.state == PropertyDelete) break;
-	    /*	  
+	    /*
 	    **	Update the window info structure with the new value of the
 	    **	property that has change.
-	    */	  
+	    */
 		if ( event->xproperty.atom == info->pix_atom )
 		{
 		    status = XGetWindowProperty( info->display,
@@ -447,7 +447,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		    status = XGetWindowProperty( info->display,
 			info->win_id, event->xproperty.atom, 0, 1, False,
 		 	XA_INTEGER, &actual_type, &actual_format,
-			&nitems, &bytes_after, 
+			&nitems, &bytes_after,
 			(unsigned char**)(&plocal_offset));
 		    if (!status)
 		    {
@@ -460,7 +460,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		    status = XGetWindowProperty( info->display,
 			info->win_id, event->xproperty.atom, 0, 1, False,
 			XA_INTEGER, &actual_type, &actual_format,
-			&nitems, &bytes_after, 
+			&nitems, &bytes_after,
 			(unsigned char**)(&plocal_offset));
 		    if (!status)
 		    {
@@ -473,7 +473,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		    status = XGetWindowProperty( info->display,
 			info->win_id, event->xproperty.atom, 0, 1, False,
 		 	XA_INTEGER, &actual_type, &actual_format,
-			&nitems, &bytes_after, 
+			&nitems, &bytes_after,
 			(unsigned char**)(&plocal_offset));
 		    if (!status)
 		    {
@@ -486,7 +486,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		    status = XGetWindowProperty( info->display,
 			info->win_id, event->xproperty.atom, 0, 1, False,
 			XA_INTEGER, &actual_type, &actual_format,
-			&nitems, &bytes_after, 
+			&nitems, &bytes_after,
 			(unsigned char**)(&plocal_offset));
 		    if (!status)
 		    {
@@ -516,7 +516,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 			for( i = 0; i < info->ctsize; i++)
 			{
 			    if (info->ctable[i] == event->xclient.data.l[0]
-				|| (info->ctable[i] | ~info->mask) 
+				|| (info->ctable[i] | ~info->mask)
 				== event->xclient.data.l[0])
 			    {
 			    	color.pixel = event->xclient.data.l[0];
@@ -534,7 +534,7 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 	    /*
 	    **  or a WM_PROTOCOLS message
 	    */
-		if (event->xclient.message_type == 
+		if (event->xclient.message_type ==
 		    XInternAtom(info->display, "WM_PROTOCOLS", True) )
 		{
 			event->type = DestroyNotify;
@@ -542,25 +542,25 @@ int GWM_ProcessEvent( struct wininfo *info, XEvent *event)
 		break;
 
 	    case DestroyNotify:
-	    /*	  
+	    /*
 	    **  Destroy the pixmap
 	    */
 		XFreePixmap( info->display, info->pix_id);
-	    /*	  
+	    /*
 	    **  Remove the window name from the root window
 	    */
-		status = XGetWindowProperty( info->display, 
+		status = XGetWindowProperty( info->display,
 		    DefaultRootWindow( info->display ),
-		    info->winname_atom, 0, 1, True, XA_WINDOW, 
-		    &actual_type, &actual_format, &nitems, &bytes_after, 
+		    info->winname_atom, 0, 1, True, XA_WINDOW,
+		    &actual_type, &actual_format, &nitems, &bytes_after,
 		    (unsigned char**)(&win_id));
 		XFree( win_id);
 		break;
 	    }
-/*	  
+/*
 **  Flush the display queue
-*/	  
+*/
     XFlush( info->display );
-    
+
     return GWM_SUCCESS;
 }

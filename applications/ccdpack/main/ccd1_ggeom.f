@@ -15,7 +15,7 @@
 *  Description:
 *     This routine runs up the geometry script as an external
 *     application. It then waits for the script to complete and uses the
-*     information it passes back to setup values for the geometry of 
+*     information it passes back to setup values for the geometry of
 *     a CCD.
 
 *  Arguments:
@@ -72,18 +72,18 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard constants
       INCLUDE 'FIO_ERR'         ! FIO error codes
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) EXTENT
       CHARACTER * ( * ) DIRECT
       CHARACTER * ( * ) BOUNDS
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
       INTEGER CHR_LEN
-      EXTERNAL CHR_LEN          ! Used length of string 
+      EXTERNAL CHR_LEN          ! Used length of string
 
 *  Local Variables:
       CHARACTER * ( 132 ) CCDDIR ! $CCDPACK_DIR
@@ -92,12 +92,12 @@
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in string
       INTEGER LINLEN            ! Used length of LINE
-      LOGICAL EXISTS            ! File exists with geom information 
+      LOGICAL EXISTS            ! File exists with geom information
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Locate and run up the geometry script.
       CALL PSX_GETENV( 'CCDPACK_DIR', CCDDIR, STATUS )
       CCDDIR = CCDDIR( :CHR_LEN( CCDDIR ) )//'/geometry >REDUCE.GEOM'
@@ -107,10 +107,10 @@
       EXTENT = ' '
       DIRECT = ' '
       BOUNDS = ' '
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
          INQUIRE ( FILE = 'REDUCE.GEOM', EXIST = EXISTS )
-         IF ( EXISTS ) THEN 
-            CALL FIO_OPEN( 'REDUCE.GEOM', 'READ', 'LIST', 0, FD, 
+         IF ( EXISTS ) THEN
+            CALL FIO_OPEN( 'REDUCE.GEOM', 'READ', 'LIST', 0, FD,
      :                     STATUS )
             DO 1 I = 1, 9
                CALL FIO_READ( FD, LINE, LINLEN, STATUS )
@@ -120,25 +120,25 @@
 *  Need to check out the lines for the information we require. These
 *  look like:
 *
-*     USEFUL CCD AREA = 7,120,0,128 
-*     READOUT DIRECTION = X 
-*     BIAS STRIP BOUNDS = 2,4,122,127 
+*     USEFUL CCD AREA = 7,120,0,128
+*     READOUT DIRECTION = X
+*     BIAS STRIP BOUNDS = 2,4,122,127
                   IAT = INDEX( LINE( :LINLEN ), 'USEFUL CCD AREA =' )
-                  IF ( IAT .NE. 0 ) THEN 
+                  IF ( IAT .NE. 0 ) THEN
                      EXTENT = LINE( INDEX( LINE( :LINLEN ), '=' ) + 1: )
                      CALL CHR_LDBLK( EXTENT )
                   ELSE
-                     IAT = INDEX( LINE( :LINLEN ), 
+                     IAT = INDEX( LINE( :LINLEN ),
      :                            'READOUT DIRECTION =' )
-                     IF ( IAT .NE. 0 ) THEN 
-                        DIRECT = 
+                     IF ( IAT .NE. 0 ) THEN
+                        DIRECT =
      :                     LINE( INDEX( LINE( :LINLEN ), '=' ) + 1: )
                         CALL CHR_LDBLK( DIRECT )
-                     ELSE 
+                     ELSE
                         IAT = INDEX( LINE( :LINLEN ),
      :                              'BIAS STRIP BOUNDS =' )
-                        IF ( IAT .NE. 0 ) THEN 
-                           BOUNDS = 
+                        IF ( IAT .NE. 0 ) THEN
+                           BOUNDS =
      :                        LINE( INDEX( LINE( :LINLEN ), '=' ) + 1: )
                            CALL CHR_LDBLK( BOUNDS )
                         END IF
@@ -146,7 +146,7 @@
                   END IF
                END IF
  1          CONTINUE
-            IF ( STATUS .EQ. FIO__EOF ) THEN 
+            IF ( STATUS .EQ. FIO__EOF ) THEN
                CALL ERR_ANNUL( STATUS )
             END IF
             CALL FIO_CLOSE( FD, STATUS )

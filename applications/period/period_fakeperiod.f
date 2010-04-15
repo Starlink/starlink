@@ -4,7 +4,7 @@ C===========================================================================
       SUBROUTINE PERIOD_FAKEPERIOD(IPARRAY, NUMPTS, MXCOL, PERIOD,
      :                             AMPLITUDE, ZEROPT, GAMMA, MAXSIN,
      :                             NUMSIN, STARTPT, ENDPT)
- 
+
 C===========================================================================
 C Calculates periodic data for FAKE. All arrays can correspond to slices
 C of dynamically-allocated memory, provided that the appropriate "calling"
@@ -17,7 +17,7 @@ C===========================================================================
       IMPLICIT NONE
 
       INCLUDE "PIVARS"
- 
+
       INTEGER NUMPTS, MXCOL, MAXSIN, NUMSIN, K, L
       DOUBLE PRECISION IPARRAY(NUMPTS,MXCOL), PERIOD(MAXSIN)
       DOUBLE PRECISION AMPLITUDE(MAXSIN), ZEROPT(MAXSIN)

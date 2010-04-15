@@ -107,12 +107,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -149,7 +149,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -226,9 +226,9 @@
 *  Ensure that form information is available in the DCB.
       CALL ARY1_DFRM( IDCB, STATUS )
 
-*  Set a flag indicating if creation of the HDS primitive data array 
+*  Set a flag indicating if creation of the HDS primitive data array
 *  has been deferrred until the array is mapped.
-      DEFER = ARY1_DEFR( IDCB, STATUS ) 
+      DEFER = ARY1_DEFR( IDCB, STATUS )
 
 *  Handle each form of array in turn...
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -255,18 +255,18 @@
                      GO TO 2
                   END IF
 1              CONTINUE
-2              CONTINUE            
-            
+2              CONTINUE
+
 *  If no conversion is needed, then the bounds of the primitive array
 *  must be changed. This may involve erasing the existing object and
 *  creating a new one, so annul the non-imaginary component locator
 *  which will be re-acquired later.
                IF ( .NOT. CVT ) THEN
-                  IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN 
+                  IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN
                      CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
                      DCB_DLOC( IDCB ) = ARY__NOLOC
                   END IF
-                
+
 *  Obtain a locator to the array's parent structure and obtain the name
 *  of the array.
                   LOCP = ARY__NOLOC
@@ -275,19 +275,19 @@
 
 *  Change the array bounds, possibly obtaining a new data object locator
 *  as a result.
-                  CALL ARY1_REBND( DEFER, LOCP, NAME, DCB_TYP( IDCB ), 
-     :                             DCB_STA( IDCB ), DCB_NDIM( IDCB ), 
-     :                             DCB_LBND( 1, IDCB ), 
-     :                             DCB_UBND( 1, IDCB ), NDIM, LBND, 
-     :                             UBND, DCB_LOC( IDCB ), SAME, DRX, 
+                  CALL ARY1_REBND( DEFER, LOCP, NAME, DCB_TYP( IDCB ),
+     :                             DCB_STA( IDCB ), DCB_NDIM( IDCB ),
+     :                             DCB_LBND( 1, IDCB ),
+     :                             DCB_UBND( 1, IDCB ), NDIM, LBND,
+     :                             UBND, DCB_LOC( IDCB ), SAME, DRX,
      :                             LX, UX, STATUS )
 
-*  Derive a new non-imaginary component locator by cloning the data object 
+*  Derive a new non-imaginary component locator by cloning the data object
 *  locator. We do not do this if the creation of the HDS data array has
 *  been deferred since the a null value for DLOC is one of the things
 *  that flags a deferred array (see ARY1_DEFR).
                   IF( .NOT. DEFER ) THEN
-                     CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ), 
+                     CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ),
      :                               STATUS )
                   END IF
 
@@ -341,20 +341,20 @@
             CALL ARY1_DBND( IDCB, STATUS )
 
 *  Change the bounds of the non-imaginary data component.
-            CALL ARY1_REBND( DEFER, DCB_LOC( IDCB ), 'DATA', 
-     :                       DCB_TYP( IDCB ), DCB_STA( IDCB ), 
-     :                       DCB_NDIM( IDCB ), DCB_LBND( 1, IDCB ), 
-     :                       DCB_UBND( 1, IDCB ), NDIM, LBND, UBND, 
-     :                       DCB_DLOC( IDCB ), SAME, DRX, LX, UX, 
+            CALL ARY1_REBND( DEFER, DCB_LOC( IDCB ), 'DATA',
+     :                       DCB_TYP( IDCB ), DCB_STA( IDCB ),
+     :                       DCB_NDIM( IDCB ), DCB_LBND( 1, IDCB ),
+     :                       DCB_UBND( 1, IDCB ), NDIM, LBND, UBND,
+     :                       DCB_DLOC( IDCB ), SAME, DRX, LX, UX,
      :                       STATUS )
 
 *  If the array holds complex data, then change the bounds of the
 *  imaginary data component.
             IF ( DCB_CPX( IDCB ) ) THEN
-               CALL ARY1_REBND( DEFER, DCB_LOC( IDCB ), 
-     :                          'IMAGINARY_DATA', DCB_TYP( IDCB ), 
-     :                          DCB_STA( IDCB ), DCB_NDIM( IDCB ), 
-     :                          DCB_LBND( 1, IDCB ), 
+               CALL ARY1_REBND( DEFER, DCB_LOC( IDCB ),
+     :                          'IMAGINARY_DATA', DCB_TYP( IDCB ),
+     :                          DCB_STA( IDCB ), DCB_NDIM( IDCB ),
+     :                          DCB_LBND( 1, IDCB ),
      :                          DCB_UBND( 1, IDCB ), NDIM, LBND, UBND,
      :                          DCB_ILOC( IDCB ), SAME, DRX, LX, UX,
      :                          STATUS )
@@ -441,7 +441,7 @@
 
 *  Note if bounds information is now available in the DCB.
       DCB_KBND( IDCB ) = STATUS .EQ. SAI__OK
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DSBND', STATUS )
 

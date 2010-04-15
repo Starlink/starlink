@@ -1,5 +1,5 @@
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C   UNCCD.FOR 
+C   UNCCD.FOR
 C
 C   Contains:-
 C
@@ -10,7 +10,7 @@ C UN_OPREFIM    Open reference images
 C UN_GINOUT     Get input/output information
 C UN_GOPT       Get user input controls
 C UN_CHECK      Check input values for faults
-C UN_CHAREA     Check area is in possible area 
+C UN_CHAREA     Check area is in possible area
 C UN_GWORK      Get work space
 C UN_LBPL       Check BPLs and load to bad pixel maps
 C UN_MBPL       Load BPL to map
@@ -179,7 +179,7 @@ Cbegin
       NXW(2) = NX
       NYW(1) = 1
       NYW(2) = NY
-      call get4i ( 'NAREA', NXW(1), NXW(2), NYW(1), NYW(2), 
+      call get4i ( 'NAREA', NXW(1), NXW(2), NYW(1), NYW(2),
      +             .true., 1, 100000 )
       if ( ST_FAILED ) return
       call cswopi ( NXW(1), NXW(2) )
@@ -194,7 +194,7 @@ Cbegin
       OUTTYPE = 'REAL'
       if ( kopt.eq.1 ) OUTTYPE = 'REAL'
       if ( kopt.eq.2 ) OUTTYPE = 'SHORT'
-      
+
       call opimzw ( 'OUT', OUTTYPE, IPO, NXO, NYO, .false., istat )	!Obtain output image frame
       if ( ST_FAILED ) return
       if ( istat.ne.0 ) then
@@ -245,7 +245,7 @@ Cbegin
       endif
       if ( DOBIAS ) call gtimsd ( 'IM_B', BSB, BZB, INVALB, text, i )
 
-      IPP = 1								!Preflash - Option to subtract image 
+      IPP = 1								!Preflash - Option to subtract image
       NSP(1) = 1
       NSP(2) = 1
       call opimsr ( 'IM_P', IPP, NSP(1), NSP(2), .true., istat )
@@ -273,7 +273,7 @@ Cbegin
       endif
       if ( DODARK ) call gtimsd ( 'IM_D', BSD, BZD, INVALD, text, i )
 
-      IPFL = 1								!Flat - Option to divide by image 
+      IPFL = 1								!Flat - Option to divide by image
       NSFL(1) = 1
       NSFL(2) = 1
       call opimsr  ( 'IM_FL', IPFL, NSFL(1), NSFL(2), .true., istat )
@@ -403,7 +403,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C UN_GOPT -- Get user input controls 
+C UN_GOPT -- Get user input controls
 C
 C  a j penny                ral          1988-12-2
 
@@ -462,7 +462,7 @@ Cbegin
       call get1b ( 'BIAS', DOBVAL, .false. )
       if ( ST_FAILED ) return
       if ( DOBVAL) then
-         call get4i ( 'NBIAS', NXBW(1), NXBW(2), NYBW(1), NYBW(2), 
+         call get4i ( 'NBIAS', NXBW(1), NXBW(2), NYBW(1), NYBW(2),
      +                .true., 1, 100000 )
          if ( ST_FAILED ) return
          call cswopi ( NXBW(1), NXBW(2) )
@@ -478,7 +478,7 @@ Cbegin
       call get_job ( 'LIN', 'none:mode1', kk, 1, thelp1, 7 )		!Option for linearising
       if ( ST_FAILED ) return
       LINTYPE = kk - 1
-      if ( LINTYPE.eq.1 ) call get1r ( 'LINF', ALPHA, 3.2e-6, 
+      if ( LINTYPE.eq.1 ) call get1r ( 'LINF', ALPHA, 3.2e-6,
      +                                 -1.0e8, 1.0e8 )
       if ( ST_FAILED ) return
 
@@ -505,7 +505,7 @@ Cbegin
       NYNW(1) = NYW(1)
       NYNW(2) = NYW(2)
       if ( DONORM ) then
-         call get4i ( 'NNORM', NXNW(1), NXNW(2), NYNW(1), NYNW(2), 
+         call get4i ( 'NNORM', NXNW(1), NXNW(2), NYNW(1), NYNW(2),
      +                .true., 1, 100000 )
          if ( ST_FAILED ) return
          call cswopi ( NXNW(1), NXNW(2) )
@@ -542,7 +542,7 @@ Cbegin
          NXDW(2) = NXW(2)
          NYDW(1) = NYW(1)
          NYDW(2) = NYW(2)
-         call get4i ( 'NDISP', NXDW(1), NXDW(2), NYDW(1), NYDW(2), 
+         call get4i ( 'NDISP', NXDW(1), NXDW(2), NYDW(1), NYDW(2),
      +                .true., 1, 100000 )
          if ( ST_FAILED ) return
          call cswopi ( NXDW(1), NXDW(2) )
@@ -687,10 +687,10 @@ Cbegin
      +        (NYW(1)+NYOF).lt.1 .or. (NYW(2)+NYOF).gt.NYC      ) then
             ST_FAILED = .true.
             if ( nrefs.eq.1 ) then
-               call printo ( 
+               call printo (
      +        'ERROR: Reference image does not cover area to be used' )
             else
-               call printo ( 
+               call printo (
      +        'ERROR: Reference images do not cover area to be used' )
             endif
             iv = NXW(1) + NXOF
@@ -735,11 +735,11 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C UN_CHAREA -- Check area is in possible area 
+C UN_CHAREA -- Check area is in possible area
 C
 C  alan penny           ral               1990-070-26
 
-      subroutine un_charea ( dothis, kxw, kyw, kxs, kxe, kys, kye, 
+      subroutine un_charea ( dothis, kxw, kyw, kxs, kxe, kys, kye,
      +                       text )
 
 
@@ -771,13 +771,13 @@ Cbegin
          call pargi ( kxw(2) )
          call pargi ( kxs )
          call pargi ( kxe )
-         call printd ( 
+         call printd (
      +           '       X range is %d to %d - should be in %d to %d' )
          call pargi ( kyw(1) )
          call pargi ( kyw(2) )
          call pargi ( kys )
          call pargi ( kye )
-         call printd ( 
+         call printd (
      +           '       Y range is %d to %d - should be in %d to %d' )
       endif
 
@@ -893,13 +893,13 @@ Cbegin
 
       call azeros ( bpmap, nx*ny )
       do l = 1, nybpl
-         kxa = nint(bpl(6,l)) 
-         kxb = nint(bpl(7,l)) 
-         kya = nint(bpl(8,l)) 
-         kyb = nint(bpl(9,l)) 
+         kxa = nint(bpl(6,l))
+         kxb = nint(bpl(7,l))
+         kya = nint(bpl(8,l))
+         kyb = nint(bpl(9,l))
          call cswopi ( kxa, kxb )
          call cswopi ( kya, kyb )
-         if ( kxa.le.nx .and. kxb.ge.1 .and. 
+         if ( kxa.le.nx .and. kxb.ge.1 .and.
      +        kya.le.ny .and. kyb.ge.1 ) then
             kxa = min(nx,max(1,kxa))
             kxb = min(nx,max(1,kxb))
@@ -912,7 +912,7 @@ Cbegin
             enddo
          endif
       enddo
-    
+
 
       end
 
@@ -933,7 +933,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       call un_proca ( %val(IPBPMAP), %val(IPBBPMAP), %val(IPB), 	!Process image
-     +                %val(IPP), %val(IPD), %val(IPFL), %val(IPFR), 
+     +                %val(IPP), %val(IPD), %val(IPFL), %val(IPFR),
      +                %val(IPT), %val(IPTB), %val(IPWB) )
 
       if ( .not.ST_FAILED .and. DONORM ) then				!Apply normalisation
@@ -982,7 +982,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       do k = 1, ny
-         call un_movlrr ( rim(1,k), rimb(1,k), nx, ny, k, 
+         call un_movlrr ( rim(1,k), rimb(1,k), nx, ny, k,
      +                    out, bs, bz, rinval )
       enddo
 
@@ -1016,7 +1016,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       do k = 1, ny
-         call un_movlrs ( rim(1,k), rimb(1,k), nx, ny, k, 
+         call un_movlrs ( rim(1,k), rimb(1,k), nx, ny, k,
      +                    iout, bs, bz, inval )
       enddo
 
@@ -1092,7 +1092,7 @@ Cbegin
         write ( text, '(10x,''Name'',13x,''Exp'',8x,''Value'',7x,
      +                   ''Bias'',7x,''Std'')' )
       elseif ( DOBVAL ) then
-         write ( text, 
+         write ( text,
      +           '(10x,''Name'',13x,''Exp'',9x,''Bias'',7x,''Std'')' )
       elseif ( DONORM ) then
          write ( text, '(36x,''Normalise'')' )
@@ -1104,10 +1104,10 @@ Cbegin
       call printo ( text )
 
       if ( DOBVAL .and. DONORM ) then
-         write ( text, '(1x,2x,a20,f10.3,2f12.2,f12.4)' ) 
+         write ( text, '(1x,2x,a20,f10.3,2f12.2,f12.4)' )
      +              NAME, EXPT, ANORM, ABIAS, ABIASSTD
       elseif ( DOBVAL ) then
-         write ( text, '(1x,2x,a20,f10.3,f12.2,f12.4)' ) 
+         write ( text, '(1x,2x,a20,f10.3,f12.2,f12.4)' )
      +              NAME, EXPT, ABIAS, ABIASSTD
       elseif ( DONORM ) then
          write ( text,' (1x,2x,a20,f10.3,f12.2)' ) NAME, EXPT, ANORM
@@ -1119,7 +1119,7 @@ Cbegin
 
       end
 
-         
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C UN_MOVLRR -- Put real bad mapped line into real flagged scaled array
@@ -1133,7 +1133,7 @@ C   alan penny                   ral                    1988-12-23
 
       integer   nx		!i: X size of output
       integer   ny		!i: Y size of output
-      real      rim(nx)		!i: Input line 
+      real      rim(nx)		!i: Input line
       integer*2 map(nx)		!i: Bad pixel map of line
       integer   ky		!i: Output line
       real      out(nx,ny)	!o: Output
@@ -1172,7 +1172,7 @@ C   alan penny                   ral                    1988-12-23
 
       integer   nx		!i: X size of output
       integer   ny		!i: Y size of output
-      real      rim(nx)		!i: Input line 
+      real      rim(nx)		!i: Input line
       integer*2 map(nx)		!i: Bad pixel map of line
       integer   ky		!i: Output line
       integer*2 iout(nx,ny)	!o: Output
@@ -1237,7 +1237,7 @@ Cbegin
       DSNYS = 1
       DSNYE = nyd
 
-      call ds_init ( TITLEO, 0, ierr )					!Open display 
+      call ds_init ( TITLEO, 0, ierr )					!Open display
       if ( ierr.ne.0 ) then
          ST_FAILED = .true.
          return
@@ -1273,12 +1273,12 @@ Cbegin
       call gtwrks ( 'WIF', nxd*nyd, ipd, ierr )				!Get work space
 
       if ( NXW(1).ne.NXDW(1) .or. NXW(2).ne.NXDW(2) .or.
-     +     NYW(1).ne.NYDW(1) .or. NYW(1).ne.NYDW(2) ) call un_select 
+     +     NYW(1).ne.NYDW(1) .or. NYW(1).ne.NYDW(2) ) call un_select
      +                                      ( %val(IPT), %val(IPTB) )
 
       call un_mapmagics ( %val(IPT), %val(IPTB), %val(ipd),		!Convert to i*2 magic values array
      +                    nxd, nyd, BSO, BZO, INVALO )
-      
+
       kxr(1) = 1							!Get display range
       kxr(2) = nxd
       kyr(1) = 1
@@ -1432,8 +1432,8 @@ Cbegin
 
       if ( CORRTYPE.eq.1 ) then
          write ( descr1, '(e11.4)' ) CORRTYPE
-         call ptdesc ( 'OUT', 'CORRECT', descr1// 
-     +     '    / Correction type '//date_time(idt1:idt2) ) 
+         call ptdesc ( 'OUT', 'CORRECT', descr1//
+     +     '    / Correction type '//date_time(idt1:idt2) )
       endif
 
       if ( DOBVAL ) then
@@ -1490,7 +1490,7 @@ Cbegin
       if ( ST_FAILED ) return
 
 C Load and scale image into store and into bias store, line-by-line
-      
+
       np = 1
       ks = min(NYW(1),NYBW(1))
       ke = max(NYW(2),NYBW(2))
@@ -1505,10 +1505,10 @@ C Load and scale image into store and into bias store, line-by-line
             call un_movsr ( %val(IPIM), NX, NY, 1, k, rtemp, NX, BS, 	!+ bp line
      +                      BZ, INVAL, rtempb )
          elseif ( KTYPE.eq.2 .or. KTYPE.eq.3 ) then
-            call un_movur ( %val(IPIM), NX, NY, 1, k, rtemp, NX, BS, 
+            call un_movur ( %val(IPIM), NX, NY, 1, k, rtemp, NX, BS,
      +                      BZ, INVAL, rtempb )
          else
-            call un_movrr ( %val(IPIM), NX, NY, 1, k, rtemp, NX, BS, 
+            call un_movrr ( %val(IPIM), NX, NY, 1, k, rtemp, NX, BS,
      +                      BZ, RINVAL, rtempb )
          endif
 
@@ -1560,10 +1560,10 @@ C Load and scale image into store and into bias store, line-by-line
 
          if ( DOSTORE .and. .not.DONORM ) then
                    if ( OUTTYPE.eq.'SHORT' ) then
-                      call un_movlrs ( rim(1,k), rimb(1,k), NXO, NYO, 
+                      call un_movlrs ( rim(1,k), rimb(1,k), NXO, NYO,
      +                               k, %val(IPO), BSO, BZO, INVALO )
                    else
-                      call un_movlrr ( rim(1,k), rimb(1,k), NXO, NYO, 
+                      call un_movlrr ( rim(1,k), rimb(1,k), NXO, NYO,
      +                               k, %val(IPO), BSO, BZO, RINVALO )
                    endif
                                           endif
@@ -1756,7 +1756,7 @@ C UN_MOVSR -- Move a part of a line of an short array to a real vector
 C
 C     alan penny        ral                    1988-11-24
 
-      subroutine un_movsr ( kdata, nx, ny, ix, iy, out, n, sc, ze, 
+      subroutine un_movsr ( kdata, nx, ny, ix, iy, out, n, sc, ze,
      +                      inv, outb )
 
       implicit none
@@ -1781,7 +1781,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       do k = 1, n
-         l = kdata(ix+k-1,iy) 
+         l = kdata(ix+k-1,iy)
          if ( l.eq.inv ) outb(k) = 1
          out(k) = sc*real(l) + ze
       enddo
@@ -1821,7 +1821,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       do k = 1, n
-         v = data(ix+k-1,iy) 
+         v = data(ix+k-1,iy)
          if ( v.eq.rinv ) outb(k) = 1
          out(k) = sc*v + ze
       enddo
@@ -2063,7 +2063,7 @@ Cbegin
 
       if ( nx.lt.1 .or. ny.lt.1 .or. nxs.lt.1 .or. nxe.lt.1 .or.
      +     nys.lt.1 .or. nye.lt.1 ) return
-     
+
       ds = 0.0
       dss = 0.0
       do k = nys, nye

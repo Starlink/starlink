@@ -1,6 +1,6 @@
       SUBROUTINE
-     : CHU_FK524( INPUT, OUTPUT, RAFK5, DECFK5, RAPMFK5, DECPMFK5, 
-     : PARLXFK5, RADVELFK5, RAFK4, DECFK4, RAPMFK4, DECPMFK4, PARLXFK4, 
+     : CHU_FK524( INPUT, OUTPUT, RAFK5, DECFK5, RAPMFK5, DECPMFK5,
+     : PARLXFK5, RADVELFK5, RAFK4, DECFK4, RAPMFK4, DECPMFK4, PARLXFK4,
      : RADVELFK4, STATUS )
 *+
 *  Name:
@@ -13,18 +13,18 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHU_FK524( INPUT, OUTPUT, RAFK5, DECFK5, RAPMFK5, DECPMFK5, 
-*     PARLXFK5, RADVELFK5, RAFK4, DECFK4, RAPMFK4, DECPMFK4, PARLXFK4, 
+*     CALL CHU_FK524( INPUT, OUTPUT, RAFK5, DECFK5, RAPMFK5, DECPMFK5,
+*     PARLXFK5, RADVELFK5, RAFK4, DECFK4, RAPMFK4, DECPMFK4, PARLXFK4,
 *     RADVELFK4, STATUS )
 
 *  Description:
 *     Create a catalogue containing new fields for the Right Ascension,
-*     Declination, Parallax, Radial velocity and proper motions after a 
-*     conversion has been made from the FK4 system coordinates. The 
+*     Declination, Parallax, Radial velocity and proper motions after a
+*     conversion has been made from the FK4 system coordinates. The
 *     new fields are calculated using SLA_FK524. See SUN 67
-* 
+*
 *     Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
-*     is provided. 
+*     is provided.
 *
 *     Proper motions should be given in sec/yr and arcsecs/yr
 *     Parallax should be given in arcseconds.
@@ -77,7 +77,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -214,7 +214,7 @@
 *  ARC SECONDS to RADIANS
       REAL*8 DAS2R
       PARAMETER (DAS2R=0.4848136811095359949D-05)
-*- 
+*-
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -236,8 +236,8 @@
         DR1FLG = .FALSE.
         DD1FLG = .FALSE.
         P1FLG = .FALSE.
-        V1FLG = .FALSE.  
-    
+        V1FLG = .FALSE.
+
         DO FLDCOUNT = 1, NUMFLDS
           IF (NAMES(FLDCOUNT) .EQ. RAFK5) THEN
             R1FLG = .TRUE.
@@ -262,9 +262,9 @@
 *
 *   Continue only if the fields are in the catalogue.
 *
-        IF (R1FLG .AND. D1FLG .AND. DR1FLG .AND. DD1FLG .AND. 
+        IF (R1FLG .AND. D1FLG .AND. DR1FLG .AND. DD1FLG .AND.
      :      P1FLG .AND. V1FLG) THEN
-* 
+*
 *   Add the new fields and create an empty catalogue.
 *
           NUMFLDS = NUMFLDS + 1
@@ -326,7 +326,7 @@
           FIRSTPASS = .TRUE.
           CALL CHP_GNENTS(INPUT, NUMENTS, STATUS)
           DO ENTCOUNT = 1, NUMENTS
-            CALL CHP_GDNAC(INPUT, INPUTNFLDS, OLDFNAMES, FTYPES, 
+            CALL CHP_GDNAC(INPUT, INPUTNFLDS, OLDFNAMES, FTYPES,
      :  COLDES, CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
      :  PTRVALS, NULLS, STATUS)
 *
@@ -354,10 +354,10 @@
 *  Check for nulls in all the fields to be used in the calculation
 *
            IF (NULLS(R1POS) .OR.
-     :         NULLS(D1POS) .OR. 
-     :         NULLS(DR1POS) .OR. 
-     :         NULLS(DD1POS) .OR. 
-     :         NULLS(P1POS) .OR. 
+     :         NULLS(D1POS) .OR.
+     :         NULLS(DR1POS) .OR.
+     :         NULLS(DD1POS) .OR.
+     :         NULLS(P1POS) .OR.
      :         NULLS(V1POS) ) THEN
 *
               NULLS(R2POS) = .TRUE.
@@ -368,7 +368,7 @@
               NULLS(V2POS) = .TRUE.
 *
            ELSE
-* 
+*
 *    For all passes calculate new fields
 *
               NULLS(R2POS) = .FALSE.
@@ -380,22 +380,22 @@
              CALL CHP_CONNDS(CHARVALS(R1POS), R1FMT, DBR1, STATUS)
              CALL CHP_CONNDS(CHARVALS(D1POS), D1FMT, DBD1, STATUS)
 
-             IF (FTYPES(DR1POS) .EQ. 'D') THEN 
+             IF (FTYPES(DR1POS) .EQ. 'D') THEN
                DBDR1 = DOUBVALS(DR1POS)
              ELSE
                DBDR1 = REALVALS(DR1POS)
              ENDIF
-             IF (FTYPES(DD1POS) .EQ. 'D') THEN 
+             IF (FTYPES(DD1POS) .EQ. 'D') THEN
                DBDD1 = DOUBVALS(DD1POS)
              ELSE
                DBDD1 = REALVALS(DD1POS)
              ENDIF
-             IF (FTYPES(P1POS) .EQ. 'D') THEN 
+             IF (FTYPES(P1POS) .EQ. 'D') THEN
                DBP1 = DOUBVALS(P1POS)
              ELSE
                DBP1 = REALVALS(P1POS)
              ENDIF
-             IF (FTYPES(V1POS) .EQ. 'D') THEN 
+             IF (FTYPES(V1POS) .EQ. 'D') THEN
                DBV1 = DOUBVALS(V1POS)
              ELSE
                DBV1 = REALVALS(V1POS)
@@ -420,8 +420,8 @@
 *
 *    Put the complete row into the table
 *
-          call chp_putent(output,1, numflds,names,ftypes, charvals, 
-     :  doubvals, intvals, logvals, realvals, ptrvals, nulls, 
+          call chp_putent(output,1, numflds,names,ftypes, charvals,
+     :  doubvals, intvals, logvals, realvals, ptrvals, nulls,
      :  status)
           ENDDO
 *

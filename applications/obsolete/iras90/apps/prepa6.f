@@ -1,4 +1,4 @@
-      SUBROUTINE PREPA6( INDF, INDF1, INDF2, STATUS )  
+      SUBROUTINE PREPA6( INDF, INDF1, INDF2, STATUS )
 *+
 *  Name:
 *     PREPA6
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL PREPA6( INDF, INDF1, INDF2, STATUS )  
+*     CALL PREPA6( INDF, INDF1, INDF2, STATUS )
 
 *  Description:
 *     CPC FITS images are three dimensional. They consist of two planes;
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
          SHIFT( 1 ) = 0
          SHIFT( 2 ) = 0
          SHIFT( 3 ) = 1 - LBND3
-         CALL NDF_SHIFT( 3, SHIFT, INDF1, STATUS )      
+         CALL NDF_SHIFT( 3, SHIFT, INDF1, STATUS )
       END IF
 
 *  Reduce the NDF section to 2 dimensions.
@@ -117,7 +117,7 @@
          SHIFT( 1 ) = 0
          SHIFT( 2 ) = 0
          SHIFT( 3 ) = 1 - UBND3
-         CALL NDF_SHIFT( 3, SHIFT, INDF2, STATUS )      
+         CALL NDF_SHIFT( 3, SHIFT, INDF2, STATUS )
       END IF
 
 *  Reduce the NDF section to 2 dimensions.
@@ -125,5 +125,5 @@
 
 *  Finish
  999  CONTINUE
-      
+
       END

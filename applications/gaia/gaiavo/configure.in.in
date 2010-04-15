@@ -1,4 +1,4 @@
-# E.S.O. - VLT project 
+# E.S.O. - VLT project
 # $Id: configure.in.in 25681 2007-11-29 15:34:55Z pdraper $
 #
 # This file is used with GNU autoconf to generate a configure script
@@ -12,7 +12,7 @@
 # --------------  --------  ---------------------------------------------
 # Allan Brighton  15/12/05  Rewrote using TCL TEA standard
 # Peter W. Draper 30/04/07  Adapted for GAIA.
-#                 18/07/08  Adapted for GaiaVO.        
+#                 18/07/08  Adapted for GaiaVO.
 # -----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -201,7 +201,7 @@ OS=`uname`
 AC_SUBST(OS)
 
 #--------------------------------------------------------------------
-# Local tests that depend on the compiler setup, including CFLAGS 
+# Local tests that depend on the compiler setup, including CFLAGS
 #--------------------------------------------------------------------
 
 GAIAVO_COMPILER_TESTS

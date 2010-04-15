@@ -143,7 +143,7 @@
 *           TITLE, LABEL, and UNITS NDF components respectively.
 *           o  The CDELTn, CRVALn, CTYPEn, and CUNITn keywords make
 *           linear axis structures within the NDF.  CUNITn define the
-*           axis units, and the axis labels are assigned to CTYPEn. 
+*           axis units, and the axis labels are assigned to CTYPEn.
 *           If some are missing, pixel co-ordinates are used for those
 *           axes.
 *           o  BSCALE and BZERO in a FITS extension are ignored.
@@ -203,7 +203,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -250,7 +250,7 @@
       INTEGER HDNUM( MAXHDR )    ! Number of headers cards in each
                                  ! header section in the sub-file
       INTEGER HPNTR              ! Pointer to the mapped header array
-      INTEGER HSTART( MAXHDR )   ! Start card number of each header 
+      INTEGER HSTART( MAXHDR )   ! Start card number of each header
                                  ! section of the sub-file in the full
                                  ! header
       INTEGER I                  ! Loop counter
@@ -380,7 +380,7 @@
 *   Check that the mandatory descriptors are present.  Want to start
 *   the searchs in the last (NHEADS) header.  When there are two
 *   headers, the first will be a dummy header.
-         CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ),
      :                   BITPIX, NDIM, DIMS, DARRAY, NONSDA, EL,
      :                   STATUS, %VAL( CNF_CVAL( 80 ) ) )
@@ -408,9 +408,9 @@
 
 *  Obtain the scale and zero, the blank value.
          CALL CON_FTYPE( BITPIX, HSTART( NHEADS ), NCARD,
-     :                   %VAL( CNF_PVAL( HPNTR ) ), 
+     :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   BSCALE, BZERO, BLANK,
-     :                   BADPIX, UNSIGN, STATUS, 
+     :                   BADPIX, UNSIGN, STATUS,
      :                   %VAL( CNF_CVAL( 80 ) ) )
 
 *  Determine the HDS data type of the data array.  Note that the QUALITY
@@ -489,18 +489,18 @@
 *  unmapped.  This should not generate conversion errors, unless the
 *  type specified by the user is incorrect.
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IAFFI( FD, EL, SKIP, MAXLEN, 
+         CALL CON_IAFFI( FD, EL, SKIP, MAXLEN,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IAFFD( FD, EL, SKIP, MAXLEN, 
+         CALL CON_IAFFD( FD, EL, SKIP, MAXLEN,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_IAFFR( FD, EL, SKIP, MAXLEN, 
+         CALL CON_IAFFR( FD, EL, SKIP, MAXLEN,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
@@ -511,14 +511,14 @@
 *  The first argument is the number of header cards from the start of
 *  the headers up to the end of the current header.
       IF ( HEADER ) THEN
-         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, 
+         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD,
      :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS,
      :                   %VAL( CNF_CVAL( 80 ) ) )
       END IF
 
 *  End the NDF context.
-  970 CONTINUE  
+  970 CONTINUE
       CALL NDF_END( STATUS )
 
 *  Tidy workspace used to obtain the FITS headers.

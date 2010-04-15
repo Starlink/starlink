@@ -1,26 +1,26 @@
       SUBROUTINE PAR_GDR1R( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL,
      :                        VALUES, STATUS )
- 
+
 *+
 *  Name:
 *     PAR_GDR1x
- 
+
 *  Purpose:
 *     Obtains an exact number of values within a given range from a
 *     parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_GDR1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
 *                     STATUS )
- 
+
 *  Description:
 *     This routine obtains an exact number of values from a parameter.
 *     all of which must be within a supplied range of acceptable
 *     values.  Dynamic defaults may be defined.
- 
+
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter.
@@ -50,7 +50,7 @@
 *        returns with STATUS=PAR__NULL.  If NULL is .TRUE., the
 *        returned VALUE takes the value of DEFAUL and, if the MSG filtering
 *        level (see SUN/104) is 'verbose', a message informs the user of the
-*        value used for the parameter. The routine then returns with 
+*        value used for the parameter. The routine then returns with
 *        STATUS=SAI__OK.  This feature is intended for
 *        convenient handling of null values.  NULL should only be set
 *        to .TRUE. when the value of DEFAUL will always give a
@@ -61,7 +61,7 @@
 *        DEFAUL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types double
 *     precision integer, and real: replace "x" in the routine name by
@@ -70,7 +70,7 @@
 *     -  If any of the values violates the constraint, the user is
 *     informed of the constraint and prompted for another vector of
 *     values.  This is not achieved through the MIN/MAX system.
- 
+
 *  Algorithm:
 *     -  If the number of values is not positive then report the error
 *     and exit.
@@ -86,7 +86,7 @@
 *     the returned value to the suggested default.  When the bad status
 *     is PAR__NULL and the NULL flag is true, annul the error and output
 *     a message.  The loop is exited.
- 
+
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
@@ -97,12 +97,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,7 +112,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AJC: Alan J. Chipperfield   (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 January 1 (MJC):
 *        Original based upon PAR_GDR0.
@@ -125,28 +125,28 @@
 *     1999 September 16 (AJC):
 *        Warn in MSG__VERB mode if NULL operates to adopt default.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE            ! Switch off default typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Environment constants
       INCLUDE 'PAR_ERR'        ! Parameter-system error constants
       INCLUDE 'MSG_PAR'        ! Message-system constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * )
      :  PARAM                  ! Parameter name associated with value
                                ! to be obtained
- 
+
       INTEGER
      :  NVALS                  ! Number of values to obtain
- 
+
       REAL
      :  DEFAUL( NVALS ),       ! Suggested defaults for values to be
                                ! obtained
@@ -154,57 +154,57 @@
                                ! be obtained
      :  VMAX                   ! Maximum acceptable value for values to
                                ! be obtained
- 
+
       LOGICAL                  ! True if:
      :  NULL                   ! Default values used when bad status is
                                ! returned by the parameter get.
- 
+
 *  Arguments Returned:
       REAL
      :  VALUES( NVALS )        ! Values---only valid if STATUS does not
                                ! have an error
- 
+
 *  Status:
       INTEGER STATUS           ! Global status
- 
+
 *  Local Variables:
       LOGICAL                  ! True if:
      :  EXCLUD,                ! The range is an exclusion zone
      :  NOTOK,                 ! No acceptable value obtained
      :  SUGDEF                 ! Defaults are to be suggested
- 
+
       INTEGER
      :  I                      ! Loop counter
- 
+
       REAL
      :  VRANGE( 2 )            ! Minimum and maximum of values read
- 
+
 *.
- 
+
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Ensure that the number of values needed is positive.
       IF ( NVALS .LT. 1 ) THEN
- 
+
 *  Report the error.
          STATUS = PAR__ERROR
          CALL MSG_SETC( 'PARAM', PARAM )
- 
+
 *  Too few values requested.
          CALL ERR_REP( 'PAR_GDR1x_TOOFEW',
      :     'A non-positive number of values was requested for '/
      :     /'parameter ^PARAM. (Probable programming error.)', STATUS )
- 
+
 *  Exit the routine.
          GOTO 999
- 
+
       END IF
- 
+
 *  Find whether the range is inclusive or exclusive depending on the
 *  polarity of the two values.
       EXCLUD = VMIN .GT. VMAX
- 
+
 *  Determine whether or not a suggested default is required.  All
 *  defaults must be in the included range(s).
       SUGDEF = .TRUE.
@@ -219,46 +219,46 @@
      :               DEFAUL( I ) .LE. VMAX .AND. SUGDEF
    80    CONTINUE
       END IF
- 
+
 *  Set the suggested value.
       IF ( SUGDEF ) CALL PAR_DEF1R( PARAM, NVALS, DEFAUL, STATUS )
- 
+
 *  Start a new error context.
       CALL ERR_MARK
- 
+
 *  Loop to obtain the values of the parameter.
 *  ===========================================
- 
+
 *  Initialise NOTOK to start off the loop.
       NOTOK = .TRUE.
- 
+
   120 CONTINUE
- 
+
 *  The loop will keep going as long as suitable values have not be read
 *  and there is no error.
          IF ( .NOT. NOTOK .OR. ( STATUS .NE. SAI__OK ) ) GOTO 160
- 
+
 *  Get exactly NVALS values for the parameter.
          CALL PAR_EXACR( PARAM, NVALS, VALUES, STATUS )
- 
+
 *  Obtain the range of the values given.
 *  =====================================
- 
+
 *  Initialise the minimum and maximum values.
          VRANGE( 1 ) = VALUES( 1 )
          VRANGE( 2 ) = VALUES( 1 )
- 
+
 *   Search all the remaining values for their minimum and maximum.
          DO 190 I = 2, NVALS
             VRANGE( 1 ) = MIN( VRANGE( 1 ), VALUES( I ) )
             VRANGE( 2 ) = MAX( VRANGE( 2 ), VALUES( I ) )
   190    CONTINUE
- 
+
 *   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *   Check for an error.
          IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  Check that the values are within the specified include or exclude
 *  range.
             IF ( EXCLUD ) THEN
@@ -268,7 +268,7 @@
                NOTOK = ( VRANGE( 1 ) .LT. VMIN ) .OR.
      :                 ( VRANGE( 2 ) .GT. VMAX )
             END IF
- 
+
 *  The value is not within the constraints, so report as an error,
 *  including full information using tokens.
             IF ( NOTOK ) THEN
@@ -281,37 +281,37 @@
                ELSE
                   CALL MSG_SETC( 'XCLD', 'in' )
                END IF
- 
+
                CALL ERR_REP( 'PAR_GDR1x_OUTR',
      :           'At least one of the values is outside the allowed '/
      :           /'range for parameter ^PARAM.  Give values ^XCLD the '/
      :           /'range ^MIN to ^MAX please.', STATUS )
- 
+
 *  Note that the error is flushed immediately as we are in a loop.
                CALL ERR_FLUSH( STATUS )
- 
+
 *  Cancel the parameter to enable a retry to get all values within the
 *  range.
                CALL PAR_CANCL( PARAM, STATUS )
- 
+
 *  Reset the dynamic defaults in the parameter system.
                IF ( SUGDEF )
      :           CALL PAR_DEF1R( PARAM, NVALS, DEFAUL, STATUS )
- 
+
             ELSE
- 
+
 *  The values must be satisfactory so terminate the loop.
                NOTOK = .FALSE.
             END IF
- 
+
 *  Use the default value following an error.
          ELSE
- 
+
 *  Annul a null error to prevent an error report about null appearing.
 *  Create a message informing the user of what has happened.
             IF ( STATUS .EQ. PAR__NULL .AND. NULL ) THEN
                CALL ERR_ANNUL( STATUS )
- 
+
 *  Inform the user what has happened.
                CALL MSG_SETR( 'DEFAULT', DEFAUL )
                CALL MSG_SETC( 'PARAM', PARAM )
@@ -319,28 +319,28 @@
      :           'The default values have been adopted for parameter '/
      :           /'^PARAM.', STATUS )
             END IF
- 
+
 *  Set the returned values to the defaults.
             DO 140 I = 1, NVALS
                VALUES( I ) = DEFAUL( I )
   140       CONTINUE
- 
+
 *  Terminate the loop.
             NOTOK = .FALSE.
- 
+
          END IF
- 
+
 *  Go to the head of the main loop.
          GOTO 120
- 
+
 *    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *  Come here when the main loop has been exited.
   160 CONTINUE
- 
+
 *  Release the new error context.
       CALL ERR_RLSE
- 
+
   999 CONTINUE
- 
+
       END

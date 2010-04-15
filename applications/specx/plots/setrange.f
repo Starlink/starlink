@@ -28,7 +28,7 @@ C     Local variables:
 C  Ok, go...
 
       IF (IERR.NE.0) RETURN
- 
+
 C     First find maximum and minimum values in data array
 
       BLIM = BUF(1)

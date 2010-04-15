@@ -1,5 +1,5 @@
-      SUBROUTINE NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1, 
-     :                       VALUE2, NVAL, FRAME1, FRAME2, ISBND, 
+      SUBROUTINE NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1,
+     :                       VALUE2, NVAL, FRAME1, FRAME2, ISBND,
      :                       ISDEF1, ISDEF2, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1, 
-*                      VALUE2, NVAL, FRAME1, FRAME2, ISBND, ISDEF1, 
+*     CALL NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1,
+*                      VALUE2, NVAL, FRAME1, FRAME2, ISBND, ISDEF1,
 *                      ISDEF2, STATUS )
 
 *  Description:
@@ -39,31 +39,31 @@
 *        WCS axis values if WCSSEC is .TRUE., and should be pixel coordinates
 *        otherwise.
 *     IWCS = INTEGER (Given)
-*        An AST pointer to the NDF's WCS FrameSet. 
+*        An AST pointer to the NDF's WCS FrameSet.
 *     WCSSEC = LOGICAL (Given)
-*        If .TRUE., then the section specifier uses WCS syntax. Otherwise, 
+*        If .TRUE., then the section specifier uses WCS syntax. Otherwise,
 *        it uses the old pixel/axis syntax. In WCS syntax, the supplied
 *        STR string should contain a specification for the bounds on each
 *        WCS axis, supplied in the order of the WCS axes. Each bound
 *        specification must be given using WCS axis values. The number of
-*        bounds specifications must equal the number of WCS axes (supplied 
-*        in NAX). If WCSSEC is .FALSE., the supplied STR string should 
-*        contain a specification for the bounds on each pixel axis, supplied 
-*        in the order of the pixel axes. Each bound specification must be 
+*        bounds specifications must equal the number of WCS axes (supplied
+*        in NAX). If WCSSEC is .FALSE., the supplied STR string should
+*        contain a specification for the bounds on each pixel axis, supplied
+*        in the order of the pixel axes. Each bound specification must be
 *        given using either pixel indices (integers), or WCS axis values.
 *     VALUE1( NDF__MXDIM ) = DOUBLE PRECISION (Returned)
 *        First value specifying section bounds for each dimension.
 *     VALUE2( NDF__MXDIM ) = DOUBLE PRECISION (Returned)
 *        Second value specifying section bounds for each dimension.
 *     NVAL = INTEGER (Returned)
-*        Number of axes for which values are returned (cannot exceed 
+*        Number of axes for which values are returned (cannot exceed
 *        NDF__MXDIM).
 *     FRAME1( NDF__MXDIM ) = INTEGER (Returned)
-*        0 ==> the corresponding VALUE1 value is to be interpreted as a 
+*        0 ==> the corresponding VALUE1 value is to be interpreted as a
 *        WCS or axis coordinate value, 1 ==> it is a pixel index, 2 ==> it
 *        is a FRACTION value.
 *     FRAME2( NDF__MXDIM ) = LOGICAL (Returned)
-*        0 ==> the corresponding VALUE2 value is to be interpreted as a 
+*        0 ==> the corresponding VALUE2 value is to be interpreted as a
 *        WCS or axis coordinate value, 1 ==> it is a pixel index, 2 ==> it
 *        is a FRACTION value.
 *     ISBND( NDF__MXDIM ) = LOGICAL (Returned)
@@ -99,12 +99,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -129,14 +129,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
@@ -245,7 +245,7 @@
                VALUE1( NVAL ) = LBND0
                VALUE2( NVAL ) = UBND0
 
-               IF( WCSSEC ) THEN 
+               IF( WCSSEC ) THEN
                   FRAME1( NVAL ) = 0
                   FRAME2( NVAL ) = 0
                ELSE
@@ -267,7 +267,7 @@
                   VALUE1( NVAL ) = LBND0
                   VALUE2( NVAL ) = UBND0
 
-                  IF( WCSSEC ) THEN 
+                  IF( WCSSEC ) THEN
                      FRAME1( NVAL ) = 0
                      FRAME2( NVAL ) = 0
                   ELSE
@@ -284,11 +284,11 @@
                ELSE
                   F = F + I1 - 1
                   L = L + I1 - 1
-                  CALL NDF1_PSNDF( STR( F : L ), LBND0, UBND0, NVAL, 
-     :                             IWCS, WCSSEC, VALUE1( NVAL ), 
-     :                             VALUE2( NVAL ), FRAME1( NVAL ), 
-     :                             FRAME2( NVAL ), ISBND( NVAL ), 
-     :                             ISDEF1( NVAL ), ISDEF2( NVAL ), 
+                  CALL NDF1_PSNDF( STR( F : L ), LBND0, UBND0, NVAL,
+     :                             IWCS, WCSSEC, VALUE1( NVAL ),
+     :                             VALUE2( NVAL ), FRAME1( NVAL ),
+     :                             FRAME2( NVAL ), ISBND( NVAL ),
+     :                             ISDEF1( NVAL ), ISDEF2( NVAL ),
      :                             STATUS )
 
 *  Make a contextual error report if an error occurs.
@@ -308,7 +308,7 @@
 *  process it.
          I1 = I2 + 2
          GO TO 1
-      END IF     
+      END IF
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PSNDE', STATUS )

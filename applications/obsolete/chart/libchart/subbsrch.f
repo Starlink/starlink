@@ -58,7 +58,7 @@ C      instead of 'NORMAL'.
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statement, with a call to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the READONLY specifier is used which is 
+*        porting, as the READONLY specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -75,7 +75,7 @@ C      instead of 'NORMAL'.
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@ C      instead of 'NORMAL'.
       INCLUDE 'MAIN'             ! Chart control common blocks
 
 * Globals used from MAIN.FOR:
-* 
+*
 *        BATCH = LOGICAL (Read)
 *           TRUE IF BATCH INPUT OF FIELD CENTRES
 *        AO = DOUBLE PRECISION (Read and Write)
@@ -127,9 +127,9 @@ C
       IF (BATCH) THEN
 
 * This statement :
-* 
+*
 *        OPEN (UNIT=IFC,FILE=FILENAME,ERR=800,STATUS='OLD',READONLY)
-*        
+*
 * is replaced by this call (see History):
 
          CALL FILEOPEN( IFC, FILENAME, 'OLD', ' ', ' ', .FALSE., 0,

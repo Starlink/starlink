@@ -1,21 +1,21 @@
-	SUBROUTINE CUT_INTERPOLATER( NPTS, MAXP, LINDAT, LINE, NX, NY, 
+	SUBROUTINE CUT_INTERPOLATER( NPTS, MAXP, LINDAT, LINE, NX, NY,
      :	                             DATAARRAY, STATUS)
 
 * Description : Get the row data from the data image
 
 	IMPLICIT NONE
 
-	INTEGER 
-     :	  NPTS, 
-     :	  NX, 
-     :	  NY, 
+	INTEGER
+     :	  NPTS,
+     :	  NX,
+     :	  NY,
      :	  MAXP,
-     :	  STATUS, 
+     :	  STATUS,
      :	  I,
      :	  J,
      :	  K
 
-	REAL 
+	REAL
      :	  LINDAT( MAXP, 2),
      :	  LINE( MAXP),
      :	  DATAARRAY( NX, NY)

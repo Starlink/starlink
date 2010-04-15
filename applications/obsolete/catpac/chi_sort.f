@@ -15,14 +15,14 @@
 *
 *  Description:
 *     Sort a catalogue on given columns.
-*     The order of column names in the SORTCOLS array is significant. 
+*     The order of column names in the SORTCOLS array is significant.
 *     SORTCOLS(1) must contain the primary column.
 *     SORTCOL(2) and SORTCOLS(3) contain the secondary and tertiary columns.
-*     Spaces in either the secondary or tertiary position simply indicates 
+*     Spaces in either the secondary or tertiary position simply indicates
 *     that there should be no secondary or tertiary ordering.
 *     The direction of the sort for each column in given in the corresponding
 *     element of the SORTDIR array. TRUE for ascending.
- 
+
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
 *        Catalogue name.
@@ -34,7 +34,7 @@
 *        Global status.
 
 *  Notes:
-*     If a column name does not exist in the catalogue an error will be 
+*     If a column name does not exist in the catalogue an error will be
 *     reported.
 *
 *     The cataalogue is RESET to its first entry on exit from this routine.
@@ -55,7 +55,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

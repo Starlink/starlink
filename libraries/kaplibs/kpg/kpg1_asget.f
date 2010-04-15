@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASGET( INDF, NDIM, EXACT, TRIM, REQINV, SDIM, 
+      SUBROUTINE KPG1_ASGET( INDF, NDIM, EXACT, TRIM, REQINV, SDIM,
      :                       SLBND, SUBND, IWCS, STATUS )
 *+
 *  Name:
@@ -11,45 +11,45 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASGET( INDF, NDIM, EXACT, TRIM, REQINV, SDIM, SLBND, SUBND, 
+*     CALL KPG1_ASGET( INDF, NDIM, EXACT, TRIM, REQINV, SDIM, SLBND, SUBND,
 *                      IWCS, STATUS )
 
 *  Description:
 *     This routine determines the axes to be used from an NDF and returns a
-*     FrameSet representing the WCS information in the NDF. 
+*     FrameSet representing the WCS information in the NDF.
 *
-*     Each axis of the supplied NDF is checked to see if it is significant 
-*     (i.e. has a size greater than 1).  The index of each significant axis 
-*     is returned in SDIM, and the bounds of the axis are returned in SLBND 
-*     and SUBND.  If EXACT is .TRUE., an error is reported if the number of 
-*     significant axes is not exactly NDIM.  This mode is intended for case 
+*     Each axis of the supplied NDF is checked to see if it is significant
+*     (i.e. has a size greater than 1).  The index of each significant axis
+*     is returned in SDIM, and the bounds of the axis are returned in SLBND
+*     and SUBND.  If EXACT is .TRUE., an error is reported if the number of
+*     significant axes is not exactly NDIM.  This mode is intended for case
 *     where (say) the user has supplied a single plane from a 3D data cube
 *     to an application which requires a 2D array.
 *
-*     If EXACT is .FALSE. an error is only reported if the number of 
-*     significant dimensions is higher than NDIM.  If there are less than 
-*     NDIM significant dimensions then the insignificant dimensions are 
-*     used (starting from the lowest) to ensure that the required number 
+*     If EXACT is .FALSE. an error is only reported if the number of
+*     significant dimensions is higher than NDIM.  If there are less than
+*     NDIM significant dimensions then the insignificant dimensions are
+*     used (starting from the lowest) to ensure that the required number
 *     of dimensions are returned. This mode is intended for cases where (say)
 *     the user supplies a 1D data stream to an application which requires a
 *     2D array.
 *
-*     The GRID Frame (i.e. the Base Frame) obtained from the NDFs WCS 
-*     component is modified so that it has NDIM axes corresponding to the 
-*     axes returned in SDIM (the value 1.0 is used for the other axes). 
+*     The GRID Frame (i.e. the Base Frame) obtained from the NDFs WCS
+*     component is modified so that it has NDIM axes corresponding to the
+*     axes returned in SDIM (the value 1.0 is used for the other axes).
 *
-*     Likewise, the PIXEL Frame obtained from the NDFs WCS component is 
-*     modified so that it has NDIM axes corresponding to the axes returned 
+*     Likewise, the PIXEL Frame obtained from the NDFs WCS component is
+*     modified so that it has NDIM axes corresponding to the axes returned
 *     in SDIM (the lower pixel bound is used for the other axes). The
 *     original PIXEL Frame is retained, but with Domain changed to
 *     NDF_PIXEL.
 *
 *     If TRIM is .TRUE., then the Current Frame obtained from the NDFs WCS
 *     component is also modified so that it has NDIM axes. If the original
-*     Current Frame has more than NDIM axes, then the axes to use are 
-*     obtained from the environment using parameter USEAXIS. A new Current 
+*     Current Frame has more than NDIM axes, then the axes to use are
+*     obtained from the environment using parameter USEAXIS. A new Current
 *     Frame is then made by picking these axes from the original Current
-*     Frame, assigning the value AST__BAD to the axes which have not been 
+*     Frame, assigning the value AST__BAD to the axes which have not been
 *     chosen.
 *
 *     If the original Current Frame has less than NDIM axes, then simple
@@ -58,18 +58,18 @@
 *
 *     Various environment parameters may be used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between applications. 
+*     order to ensure conformity between applications.
 
 *  Environment Parameters:
 *     USEAXIS = LITERAL (Read)
-*        A set of NDIM axes to be selected from the Current Frame. Each 
-*        axis can be specified either by giving its index within the Current 
+*        A set of NDIM axes to be selected from the Current Frame. Each
+*        axis can be specified either by giving its index within the Current
 *        Frame in the range 1 to the number of axes in the Frame, or by
 *        giving its symbol. This parameter is only accessed if TRIM is
 *        .TRUE. and the original Current Frame in the supplied NDF has
 *        too many axes. The dynamic default selects the axes with the same
 *        indices as the selected NDF axes. The value should be given as a
-*        GRP group expression, with default control characters. 
+*        GRP group expression, with default control characters.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -90,14 +90,14 @@
 *     SDIM( NDIM ) = INTEGER (Returned)
 *        The indices of the significant dimensions.
 *     SLBND( NDIM ) = INTEGER (Returned)
-*        The lower pixel index bounds of the significant dimensions.  These 
+*        The lower pixel index bounds of the significant dimensions.  These
 *        are stored in the same order as the indices in SDIM.
 *     SUBND( NDIM ) = INTEGER (Returned)
 *        The upper pixel index bounds of the significant dimensions.  These
 *        are stored in the same order as the indices in SDIM.
 *     IWCS = INTEGER (Returned)
 *        An AST pointer to the WCS FrameSet. Returned equal to AST__NULL
-*        if an error occurs. The Base Frame is an NDIM-dimensional GRID 
+*        if an error occurs. The Base Frame is an NDIM-dimensional GRID
 *        Domain.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -117,12 +117,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -149,7 +149,7 @@
 *        Added INPRM to argument list for KPG1_ASTRM.
 *     14-FEB-2006 (DSB):
 *        Ensure INPRM is initialised even if NDIM is equal to NBAX. Lack
-*        of initialisation caused KPG1_ASTRM to crash in the case where 
+*        of initialisation caused KPG1_ASTRM to crash in the case where
 *        NDIM and NBAX are equal.
 *     12-SEP-2006 (DSB):
 *        If the current Frame is AXIS and the AXIS structures are
@@ -162,7 +162,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -253,12 +253,12 @@
          CALL KPG1_SDIMP( INDF, NDIM, SDIM, STATUS )
       END IF
 
-*  Obtain the bounds of the NDF.  
+*  Obtain the bounds of the NDF.
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
 *  Return the bounds of the chosen pixel axes. Also find the largest
 *  chosen pixel dimension, and ininitialise the base Frame axis
-*  permutation array (INPRM). 
+*  permutation array (INPRM).
       MXDIM = 0
       DO I = 1, NDIM
          SLBND( I ) = LBND( SDIM( I ) )
@@ -267,20 +267,20 @@
          IF( DIM .GT. MXDIM ) MXDIM = DIM
          INPRM( I ) = I
       END DO
-         
+
 *  Get a pointer to the WCS FrameSet.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  Remove any insignificant axes from the Current Frame. We do not do
 *  this if later code will trim the current Frame to have the required
 *  number of axes.
-      IF( .NOT. TRIM ) CALL KPG1_ASSIG( IWCS, NDIMS, LBND, UBND, 
+      IF( .NOT. TRIM ) CALL KPG1_ASSIG( IWCS, NDIMS, LBND, UBND,
      :                                  STATUS )
 
 *  Re-map the Base (GRID) Frame by selecting the chosen axes.
 *  ==========================================================
 *  Save the number of axes in the Base Frame.
-      NBAX = AST_GETI( IWCS, 'NIN', STATUS ) 
+      NBAX = AST_GETI( IWCS, 'NIN', STATUS )
 
 *  If the number of GRID axes in the NDF is wrong, create a FrameSet
 *  containing the NDF-special Frames (GRID, AXIS, PIXEL and FRACTION)
@@ -318,8 +318,8 @@
          END DO
 
 *  Create a PermMap which goes from the NDIM-dimensional GRID Frame in this
-*  FrameSet to the original NBAX-dimensional GRID Frame. First, initialise 
-*  the axis permutation arrays so that all input and output axes take the 
+*  FrameSet to the original NBAX-dimensional GRID Frame. First, initialise
+*  the axis permutation arrays so that all input and output axes take the
 *  value of the first constant supplied to AST_PERMMAP (i.e. 1.0).
          DO I = 1, NBAX
             OUTPRM( I ) = -1
@@ -329,18 +329,18 @@
             INPRM( I ) = -1
          END DO
 
-*  Now over-write elements of the axis permutation arrays which correspond to 
+*  Now over-write elements of the axis permutation arrays which correspond to
 *  genuine axes.
          DO I = 1, NDIM
             IF( SDIM( I ) .LE. NBAX ) THEN
                INPRM( I ) = SDIM( I )
                OUTPRM( SDIM( I ) ) = I
-            END IF 
+            END IF
          END DO
 
 *  Create the PermMap.
-         PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, 1.0D0, ' ', 
-     :                       STATUS ) 
+         PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, 1.0D0, ' ',
+     :                       STATUS )
 
 *  Find the indicies of the NDF special Frames in the FrameSet read from
 *  the NDF.
@@ -378,8 +378,8 @@
 *  Record the original number of Frames in the new FrameSet.
          NFRAME = AST_GETI( NEWFS, 'NFRAME', STATUS )
 
-*  Add the FrameSet read from the NDF into the new FrameSet, using the 
-*  PermMap created above to connect the Base (GRID) Frame to the new FrameSet. 
+*  Add the FrameSet read from the NDF into the new FrameSet, using the
+*  PermMap created above to connect the Base (GRID) Frame to the new FrameSet.
 *  We need to make the old GRID Frame the current Frame first since
 *  AST_ADDFRAME uses the current Frame.
          CALL AST_SETI( IWCS, 'Current', IGRI2, STATUS )
@@ -414,7 +414,7 @@
 *  Rename the original PIXEL Frame as NEW_PIXEL.
          FRM = AST_GETFRAME( NEWFS, IPIX2, STATUS )
          CALL AST_SETC( FRM, 'DOMAIN', 'NDF_PIXEL', STATUS )
-         CALL AST_ANNUL( FRM, STATUS )          
+         CALL AST_ANNUL( FRM, STATUS )
 
 *  Delete the other three original NDF special Frames.
          CALL AST_REMOVEFRAME( NEWFS, IAXI2, STATUS )
@@ -430,13 +430,13 @@
          CALL AST_ANNUL( IWCS, STATUS )
          IWCS = NEWFS
 
-      END IF       
+      END IF
 
 *  Now modify the Current Frame if required to have exactly NDIM axes.
 *  ===================================================================
       IF( TRIM ) THEN
          CALL PSX_CALLOC( MXDIM*2, '_DOUBLE', IPWORK, STATUS )
-         CALL KPG1_ASTRM( IWCS, INPRM, SLBND, SUBND, 
+         CALL KPG1_ASTRM( IWCS, INPRM, SLBND, SUBND,
      :                    %VAL( CNF_PVAL(IPWORK) ), STATUS )
          CALL PSX_FREE( IPWORK, STATUS )
       END IF
@@ -448,7 +448,7 @@
 *  If the Current Frame has no Title, use the Title from the NDF (if any).
       TTL = ' '
       CALL NDF_CGET( INDF, 'TITLE', TTL, STATUS )
-      IF( TTL .NE. ' ' .AND. 
+      IF( TTL .NE. ' ' .AND.
      :    .NOT. AST_TEST( IWCS, 'TITLE', STATUS ) ) THEN
          LTTL = CHR_LEN( TTL )
          CALL AST_SETC( IWCS, 'TITLE', TTL( : LTTL ), STATUS )
@@ -456,19 +456,19 @@
 
 *  Report an error if the inverse mapping is required, but is not
 *  available.
-      IF( REQINV .AND. .NOT. AST_GETL( IWCS, 'TRANINVERSE', STATUS ) 
+      IF( REQINV .AND. .NOT. AST_GETL( IWCS, 'TRANINVERSE', STATUS )
      :    .AND. STATUS .EQ. SAI__OK ) THEN
 
          STATUS = SAI__ERROR
-         CALL NDF_MSG( 'NDF', INDF ) 
+         CALL NDF_MSG( 'NDF', INDF )
          CALL ERR_REP( 'KPG1_ASGET_2', 'The mapping from the current '//
      :                 'co-ordinate Frame in ^NDF to the pixel '//
      :                 'co-ordinate Frame is not defined.', STATUS )
 
-         CALL NDF_MSG( 'NDF', INDF ) 
+         CALL NDF_MSG( 'NDF', INDF )
          CALL ERR_REP( 'KPG1_ASGET_3', 'It may be possible to avoid '//
      :                 'this problem by changing the current '//
-     :                 'co-ordinate Frame in ^NDF using WCSFRAME.', 
+     :                 'co-ordinate Frame in ^NDF using WCSFRAME.',
      :                  STATUS )
 
       END IF
@@ -476,7 +476,7 @@
 *  If the current Frame is AXIS, check that the AXIS structures are
 *  monotonic. If not, reset the current Frame to PIXEL.
       DOM = AST_GETC( IWCS, 'Domain', STATUS )
-      IF( DOM .EQ. 'AXIS' ) THEN      
+      IF( DOM .EQ. 'AXIS' ) THEN
 
          CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
          DO I = 1, NDIMS
@@ -490,7 +490,7 @@
             CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX2, STATUS )
             CALL AST_SETI( IWCS, 'Current', IPIX2, STATUS )
             CALL MSG_OUT( 'KPG1_GTWCS_MSG4', 'PIXEL co-ordinates will'//
-     :                    ' be used instead of AXIS co-ordinates.', 
+     :                    ' be used instead of AXIS co-ordinates.',
      :                    STATUS )
          END IF
 
@@ -502,5 +502,5 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
-    
+
       END

@@ -15,10 +15,10 @@
 *  Description:
 *     The routine writes lines of text to the history component of an
 *     NDF. If the history has not yet been modified by the current
-*     application (and APPN is not "<APPEND>"), it creates a new history 
-*     record, initialises it, and inserts the text suppled. If the history 
-*     has already been modified (or if APPN is "<APPEND>"), then the new 
-*     text is simply appended to any already present. The routine returns 
+*     application (and APPN is not "<APPEND>"), it creates a new history
+*     record, initialises it, and inserts the text suppled. If the history
+*     has already been modified (or if APPN is "<APPEND>"), then the new
+*     text is simply appended to any already present. The routine returns
 *     without action if the NDF does not have a history component.
 
 *  Arguments:
@@ -29,8 +29,8 @@
 *        new history record) if the history has not yet been modified
 *        by the current application, otherwise it is ignored. If a
 *        blank value is given, then a suitable default will be used
-*        instead. The special value "<APPEND>" may be supplied in order 
-*        to append the text lines to the current history text even if 
+*        instead. The special value "<APPEND>" may be supplied in order
+*        to append the text lines to the current history text even if
 *        the  history has not yet been modified by the current application.
 *     NLINES = INTEGER (Given)
 *        Number of new lines of text to be added to the history record
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -101,10 +101,10 @@
 *     26-APR-1994 (RFWS):
 *        Added creation of the DATASET component.
 *     23-JAN-2009 (DSB):
-*        Set the new history record date and time to the values 
+*        Set the new history record date and time to the values
 *        specified by DCB_HTIME (if set).
 *     16-OCT-2009 (DSB):
-*        If APPN is "<APPEND>", always append text to the current 
+*        If APPN is "<APPEND>", always append text to the current
 *        history record.
 *     {enter_further_changes_here}
 
@@ -112,7 +112,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,8 +120,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -134,8 +134,8 @@
 *        DCB_HSORT( NDF__MXDCB ) = LOGICAL (Write)
 *           Do the history records need sorting?
 *        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Read)
-*           The date/time to attach to the next history record to be 
-*           created, as a UTC Modified Julian Date. If negative, then 
+*           The date/time to attach to the next history record to be
+*           created, as a UTC Modified Julian Date. If negative, then
 *           the current time will be used.
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator for array of history records.
@@ -201,7 +201,7 @@
 
 *  See if we should append the text to the current history record.
             APPEND = ( APPN .EQ. '<APPEND>' ) .AND.
-     :               ( DCB_HNREC( IDCB ) .GT. 0 ) 
+     :               ( DCB_HNREC( IDCB ) .GT. 0 )
 
 *  Note if a new history record must be initialised. This will be so if
 *  history has not yet been modified by the current application so that
@@ -235,9 +235,9 @@
                   CALL NDF1_HRST( CELL, STATUS )
 
 *  If a date/time for the history record has been specified using
-*  NDF_HDATE then convert it to separate fields, as needed by NDF1_FMHDT. 
+*  NDF_HDATE then convert it to separate fields, as needed by NDF1_FMHDT.
                   IF( DCB_HTIME( IDCB ) .GT. 0.0 ) THEN
-                     CALL NDF1_MJD2T( DCB_HTIME( IDCB ), YMDHM, SEC, 
+                     CALL NDF1_MJD2T( DCB_HTIME( IDCB ), YMDHM, SEC,
      :                                STATUS )
 
 *  The supplied date may not be in chronological order, so indicate that
@@ -352,7 +352,7 @@
                CALL DAT_MAPV( TLOC, '_CHAR', 'WRITE', PNTR, EL, STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_HCPY( NLINES, %VAL( CNF_PVAL( PNTR ) ),
-     :                            TEXT, STATUS, 
+     :                            TEXT, STATUS,
      :                            %VAL( CNF_CVAL( CLEN ) ) )
                END IF
 
@@ -364,7 +364,7 @@
             END IF
          END IF
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_HWRT', STATUS )
 

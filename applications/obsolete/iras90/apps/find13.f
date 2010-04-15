@@ -28,13 +28,13 @@
 *     parameter request within FIND02. FIND02 will return to this
 *     subroutine and the next source with the same name will be found.
 *     If the source list is searched and no source with the name the
-*     user has specified is found the program will inform the user.     
+*     user has specified is found the program will inform the user.
 *     The process is repeated until the user enters a ! for the
 *     filename.
 *     The program lists the last page of the source list (if ILEVEL = 2
 *     or 4 ) The routine returns to FIND25 and the user is then given
 *     the edit sources menu.
-*     
+*
 *  Arguments:
 *     CONREQ = LOGICAL (Given)
 *        Set .TRUE. if added, and edited, sources are to be confirmed
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -148,7 +148,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  *********************************************************************
 *  Continue getting next source to edit details until the user enters !
 *  for edit source name
@@ -165,7 +165,7 @@
 *  Program returns here if the name of the source to be edited is not a
 *  valid filename
  200     CONTINUE
-      
+
 *  *********************************************************************
 *  Ask user for name of source to edit
 *  *********************************************************************
@@ -203,16 +203,16 @@
 
 *  Set the source pointer SOPOS to this position in the source list
                   SOPOS = IJ
-*  *********************************************************************      
+*  *********************************************************************
 *  Call FIND02 to edit the source
 *  *********************************************************************
                   CALL FIND02( CONREQ, ILEVEL, MAXLEN, .FALSE., PCONAD,
      :            PSCOR1, PSCOR2, PSCOSY, PSNAME, PSTITL, SCS,
-     :            SOPOS, STATUS ) 
-         
+     :            SOPOS, STATUS )
+
 *  Check the status on return from FIND02
                  IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
                END IF
  300        CONTINUE
 
@@ -225,9 +225,9 @@
                CALL MSG_OUT( ' ',
      :         'WARNING - source to edited, ^c1, was not found',
      :         STATUS )
-            
+
             END IF
-      
+
 *  Go to the begining of the next source to be edited loop
             GO TO 100
 

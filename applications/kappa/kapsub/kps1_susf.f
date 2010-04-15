@@ -89,10 +89,10 @@
 *        order increasing x knot, then increasing y.  Thus coefficient
 *        Cij in the standard convention is %COEFF((i-1)*(%NYKNOT+8)+j).
 *     NCOEF = INTEGER (Returned)
-*        The number of bi-cubic coefficients. 
+*        The number of bi-cubic coefficients.
 *     SCALE = REAL (Returned)
 *        The scale factor applied to the data values before calculating
-*        the spline. 
+*        the spline.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -158,7 +158,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -241,9 +241,9 @@
       DO I = 1, NBIN
          BINW( I ) = Y( I )
       END DO
- 
+
       CALL PDA_QSAR( NBIN, BINW )
- 
+
       IF ( NYKNOT .GE. 1 )
      :   CALL KPS1_SUSKR( NBIN, BINW, NYKNOT, YKNOT( 5 ), STATUS )
 
@@ -268,7 +268,7 @@
             SCALE = -1.0
          ELSE
             SCALE = 1. / REAL( MAXV - MINV )
-      
+
 *  Scale data values to lie in the range -1 to +1 to improve
 *  performance of the fitting routines.
              DO I = 1, NBIN
@@ -327,5 +327,5 @@
       NCOEF = ( NXKNOT + 4 ) * ( NYKNOT + 4 )
 
   999 CONTINUE
- 
+
       END

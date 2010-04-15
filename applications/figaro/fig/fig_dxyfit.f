@@ -8,9 +8,9 @@ C
 C     Parameters -  (">" input, "<" output, "!" modified, "W" workspace)
 C
 C     (>) X      (Double precision array X(NPTS)) The X values for the
-C                points to be fitted.  
-C     (>) Y      (Double precision array Y(NPTS)) The Y values for the 
-C                points to be fitted.  
+C                points to be fitted.
+C     (>) Y      (Double precision array Y(NPTS)) The Y values for the
+C                points to be fitted.
 C                X and Y are returned sorted into increasing X order.
 C     (>) NPTS   (Integer) The number of points to be fitted.
 C     (>) MAXDEG (Integer) The maximum degree to be attempted.  Should
@@ -98,7 +98,7 @@ C
 C
       DEGREE=MD
 C
-C     Decode the orthogonal polynomials 
+C     Decode the orthogonal polynomials
 C
       IFAIL2=0
       CALL PDA_DPCOEF(DEGREE,0D0,COEFFS,WORK1(NPTS+1),IFAIL2)

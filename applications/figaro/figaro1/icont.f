@@ -18,7 +18,7 @@ C              Note that this initial version only accepts these
 C              values as pixel numbers.
 C     LOW      (Numeric) The minimum contour level (ICONT) or
 C              the black level (IGREY).
-C     HIGH     (Numeric) The maximum contour level (ICONT) or 
+C     HIGH     (Numeric) The maximum contour level (ICONT) or
 C              the white level (IGREY).
 C     CONTOURS (Numeric) The number of contours displayed - these
 C              will be divided evenly between HIGH and LOW, unless
@@ -28,7 +28,7 @@ C     THICKNESS(Numeric) Thickness to use for lines (only used if
 C              the HARDCOPY parameter is specified, and ICONT only)
 C     LEVELS   (Numeric array) The contour levels to use (ICONT only,
 C              and only if the BYVALUE keyword is specified).
-C     
+C
 C     Command keywords -
 C
 C     HARDCOPY Output the plot to the current hard graphics device.
@@ -125,7 +125,7 @@ C
       REAL      LOW              ! The lowest brightness level
       INTEGER   NCONT            ! The number of contours
       INTEGER   NDELM            ! Total number of elements in the data
-      INTEGER   NDIM             ! Number of dimensions in data 
+      INTEGER   NDIM             ! Number of dimensions in data
                                  ! structure
       INTEGER   NX               ! The size of the data's 1st dimension
       INTEGER   NY               ! The size of the data's 2nd dimension
@@ -200,7 +200,7 @@ C
             IF (.NOT.FIG_SCRCHK(DDIMS(AXIS),%VAL(CNF_PVAL(AXPTR)))) THEN
                CALL PAR_WRUSER('Warning - axis data is not linear. The '
      :                 //'axis scales will only be approximate.',IGNORE)
-             
+
             END IF
             CALL DSA_UNMAP(ASLOT,STATUS)
          END IF
@@ -340,7 +340,7 @@ C
          END IF
       END IF
 C
-C     Get the label for the plot - 
+C     Get the label for the plot -
 C
       CALL PAR_RDCHAR('LABEL',' ',LABEL)
 C
@@ -392,7 +392,7 @@ C
 C
 C     Store the image file name for other applications to retrieve.
 C
-      CALL DSA_GET_ACTUAL_NAME('IMAGE',INAME,STATUS) 
+      CALL DSA_GET_ACTUAL_NAME('IMAGE',INAME,STATUS)
       CALL VAR_SETCHR('IMFILE',0,0,INAME,STATUS)
 C
 C     Close down
@@ -434,7 +434,7 @@ C     (>) LEVELS   (Real array LEVELS(NCONT)) The contour levels to
 C                  be plotted.
 C     (>) ADJUST   (Logical) Adust scales so as to fil display.
 C     (>) NCONT    (Integer) The number of levels to be plotted.
-C     (>) THICK    (Integer) The line thickness for the plot.  
+C     (>) THICK    (Integer) The line thickness for the plot.
 C     (<) STATUS   (Integer) Return status.  0 => OK, non-zero
 C                  indicates an error code from FIG_PGBEG.
 C
@@ -449,12 +449,12 @@ C     PGENV        (  "   ) Set plotting environment
 C     PGSLW        (  "   ) Set line width
 C
 C                                      KS / CIT 21st March 1984
-C     Modified: 
+C     Modified:
 C
 C     27th Nov 1985.  KS / AAO.  LABEL, ERASE and AXES added.
 C                     At the moment, AXES and ERASE are ignored.
 C     4th Jan 1989.   KS / AAO.  XSTART,XEND,YSTART,YEND,XLAB,YLAB
-C                     parameters added.  Program now takes note of 
+C                     parameters added.  Program now takes note of
 C                     the axis data values, instead of just using pixel
 C                     numbers.  THICK also added.
 C     29th Mar 1991.  KS/AAO. Fix from JLC/CIT re calculation of TR(1)
@@ -556,7 +556,7 @@ C
 C     Modified:
 C
 C     4th Jan 1989.   KS / AAO.  XSTART,XEND,YSTART,YEND,XLAB,YLAB
-C                     parameters added.  Program now takes note of 
+C                     parameters added.  Program now takes note of
 C                     the axis data values, instead of just using pixel
 C                     numbers.
 C     29th Mar 1991.  KS/AAO. Fix from JLC/CIT re calculation of TR(1)

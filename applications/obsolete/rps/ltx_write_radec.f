@@ -2,20 +2,20 @@
 *     1993 June         P. Brisco       Recompile with new com_form_files.inc
 *---------------------------------------------------------------------------
       SUBROUTINE LTX_WRITE_RADEC(IFILE,FIELD,LUN_OUT,I)
- 
+
 *  Type Declaration
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       INTEGER IFILE
       CHARACTER*(*) FIELD
       INTEGER LUN_OUT
       INTEGER I							!Field number.
- 
+
 *  Global Variables
       INCLUDE 'com_form_latex.inc'
       INCLUDE 'com_form_files.inc'
- 
+
       INTEGER CHECKSUM
       COMMON /KEEPCHECK/ CHECKSUM
 *******************************************************************************
@@ -28,7 +28,7 @@
       INTEGER MDH_ENDWORD
       INTEGER MDH_CTOI
       CHARACTER*60 DBS_GETC                            ! Retrieves the value of a character field
- 
+
 *  Local Parameters
       CHARACTER*5  S1/'put('/
       CHARACTER*24 S2/'makebox(0,0)[bl]{'/
@@ -45,18 +45,18 @@
       CHARACTER*1 SIGN
 
       PARAMETER(R2D=180.0/3.1415926536)
- 
+
 *  Executable Code
 
       TARG = DBS_GETC(REF_TARGET,I)
-      
+
       IF(FIELD.EQ.'TARGET.DEC')THEN					!Write sign to LATEX file.
          CALL DEC_CONVERT(TARG, RADS, LSTATUS)
          IF (RADS.LT.0) THEN
            SIGN = '-'
-         ELSE 
+         ELSE
            SIGN = '+'
-         END IF 
+         END IF
 
          ISX = MDH_CTOI(XSTART(I,1,IFILE))
          ISX=ISX-22
@@ -84,6 +84,6 @@
            FINISH = START + 1
          END IF
       END DO
- 
+
 
       END

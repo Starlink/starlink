@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Find order in ripple table.
-* 
+*
 *   History:
 *      Jack Giddings      31-DEC-81     IUEDR Vn. 1.0
 *      Paul Rees          13-OCT-88     IUEDR Vn. 2.0
@@ -21,7 +21,7 @@
 
 *   Import:
       INTEGER ORD      ! echelle order number
- 
+
 *   Export:
       INTEGER IORD     ! order index in table
 

@@ -30,7 +30,7 @@ C                       as you move from left to right in the spectrum -
 C                       as specified by the MDELTA parameter.
 C     (<) MINORD        (Integer,ref) The lowest order number selected.
 C     (<) MAXORD        (Integer,ref) The highest order number selected.
-C     (<) SKY           (Logical,ref) True if there were sky orders 
+C     (<) SKY           (Logical,ref) True if there were sky orders
 C                       selected.
 C     (<) CODE          (Integer, ref) Error code. 0=> OK, 1=> Information,
 C                       2=> Warning, 3=> Error, 4=> Severe.
@@ -121,7 +121,7 @@ C
                   MAXORD=MAX(MAXORD,ORDVAL)
                   IF (DIRN.EQ.0) THEN
 C
-C                    If DIRN is zero, we've not established direction yet, 
+C                    If DIRN is zero, we've not established direction yet,
 C                    (ie this is the second order we've found) Use this
 C                    to establish the basic direction.
 C
@@ -154,7 +154,7 @@ C
                   END IF
 C
 C                 Now see if any orders have been missed out.
-C   
+C
                   IF (ORDVAL.NE.(LASTORD+DIRN)) THEN
                      STRING='* Selection jumps from order '//
      :                                               ICH_CI(LASTORD)

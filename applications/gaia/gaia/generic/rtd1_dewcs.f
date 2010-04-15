@@ -17,7 +17,7 @@
 *     an encoded WCS which it returns as an AST FrameSet (suitable for
 *     writing to an NDF component). The headers are scanned using the
 *     normal sequence of encoding priorities (so Native, the most
-*     accurate, are scanned for first, followed by FITS-WCS). If a 
+*     accurate, are scanned for first, followed by FITS-WCS). If a
 *     Native system is encountered and EAT is true, then this is removed
 *     permanently by the read (should only keep this in the NDF WCS
 *     component and any FITS WCS information in the FITS header).

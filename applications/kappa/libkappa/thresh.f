@@ -22,17 +22,17 @@
 
 *  Description:
 *     This application creates an output NDF by copying values from an
-*     input NDF, replacing all values within given data ranges by 
+*     input NDF, replacing all values within given data ranges by
 *     a user-specified constant or by the bad value. Upper and lower
-*     thresholds are supplied using parameters THRLO and THRHI. 
+*     thresholds are supplied using parameters THRLO and THRHI.
 *
-*     If THRLO is less than or equal to THRHI, values between and 
-*     including the two thresholds are copied from the input to output 
-*     array.  Any values in the input array greater than the upper 
-*     threshold will be set to the value of parameter NEWHI, and anything 
+*     If THRLO is less than or equal to THRHI, values between and
+*     including the two thresholds are copied from the input to output
+*     array.  Any values in the input array greater than the upper
+*     threshold will be set to the value of parameter NEWHI, and anything
 *     less than the lower threshold will be set to the value of parameter
-*     NEWLO, in the output data array. Thus the output NDF is constrained 
-*     to lie between the two bounds.  
+*     NEWLO, in the output data array. Thus the output NDF is constrained
+*     to lie between the two bounds.
 *
 *     If THRLO is greater than THRHI, values greater than or equal to
 *     THRLO are copied from the input to output array, together with
@@ -243,7 +243,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Associate the input NDF. 
+*  Associate the input NDF.
 *  ========================
 
 *  Begin an NDF context.
@@ -294,7 +294,7 @@
      :                  NDFO, STATUS )
 
       ELSE IF ( COMP( 1:7 ) .EQ. 'QUALITY' ) THEN
-         CALL LPG_PROP( NDFI, 'WCS,Data,Variance,Units,Axis', 'OUT', 
+         CALL LPG_PROP( NDFI, 'WCS,Data,Variance,Units,Axis', 'OUT',
      :                  NDFO, STATUS )
 
       END IF
@@ -332,9 +332,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSR( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSR( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    RTHRLO,
-     :                    RTHRHI, RNEWLO, RNEWHI, 
+     :                    RTHRHI, RNEWLO, RNEWHI,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
@@ -346,9 +346,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSB( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSB( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    BTHRLO,
-     :                    BTHRHI, BNEWLO, BNEWHI, 
+     :                    BTHRHI, BNEWLO, BNEWHI,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
@@ -360,9 +360,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSD( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSD( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    DTHRLO,
-     :                    DTHRHI, DNEWLO, DNEWHI, 
+     :                    DTHRHI, DNEWLO, DNEWHI,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
@@ -374,9 +374,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSI( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSI( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    ITHRLO,
-     :                    ITHRHI, INEWLO, INEWHI, 
+     :                    ITHRHI, INEWLO, INEWHI,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
@@ -388,9 +388,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSUB( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSUB( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     BTHRLO,
-     :                     BTHRHI, BNEWLO, BNEWHI, 
+     :                     BTHRHI, BNEWLO, BNEWHI,
      :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     NREPLO, NREPHI, STATUS )
 
@@ -402,9 +402,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSUW( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSUW( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     WTHRLO,
-     :                     WTHRHI, WNEWLO, WNEWHI, 
+     :                     WTHRHI, WNEWLO, WNEWHI,
      :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     NREPLO, NREPHI, STATUS )
 
@@ -416,9 +416,9 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSW( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_THRSW( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    WTHRLO,
-     :                    WTHRHI, WNEWLO, WNEWHI, 
+     :                    WTHRHI, WNEWLO, WNEWHI,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 

@@ -98,13 +98,13 @@
 *
 
 *  If necessary extend the FITS block in memory to allow for extra cards.
-      IF ( ICARD .GE. AVAIL ) THEN 
+      IF ( ICARD .GE. AVAIL ) THEN
          AVAIL = AVAIL + 256
          CALL PSX_REALLOC( AVAIL * 80, IPHEAD, STATUS )
       END IF
 
 *  Now insert card.
       NHEAD = MAX( NHEAD, ICARD )
-      CALL GAI1_ICARD( CARD, NHEAD, ICARD, %VAL( CNF_PVAL( IPHEAD ) ), 
+      CALL GAI1_ICARD( CARD, NHEAD, ICARD, %VAL( CNF_PVAL( IPHEAD ) ),
      :                 STATUS, %VAL( CNF_CVAL( 80 ) ) )
       END

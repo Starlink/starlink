@@ -7,7 +7,7 @@
 *
 *   Description:
 *      AND operation on packed integer values (8 bits only).
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -33,7 +33,7 @@
 *   Import:
       INTEGER VALUE        ! value to be mask
       INTEGER MASK         ! mask to be applied
- 
+
 *   Local variables:
       INTEGER I            ! loop index
       INTEGER MBITS(8)     ! mask bit array

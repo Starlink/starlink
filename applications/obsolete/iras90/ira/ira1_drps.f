@@ -1,5 +1,5 @@
       SUBROUTINE IRA1_DRPS( ACEN, BCEN, GAPLON, GAPLAT, SCS, IDA, IMLO,
-     :                      IMHI, IPLO, IPHI, LBND, UBND, 
+     :                      IMHI, IPLO, IPHI, LBND, UBND,
      :                      MAXLAB, MAXTIC, BLAX, LABS, NLABS, TICKS,
      :                      NTICKS, STATUS )
 *+
@@ -18,7 +18,7 @@
 *                     MAXTIC, BLAX, LABS, NLABS, TICKS, NTICKS, STATUS )
 
 *  Description:
-*     This routine draws each of the parallels in turn. 
+*     This routine draws each of the parallels in turn.
 *     Positions and directions of latitude tick marks are
 *     returned, together with information about the positions of
 *     latitude "end" labels (i.e. latitude labels placed at the start

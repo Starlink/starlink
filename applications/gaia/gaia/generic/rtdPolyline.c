@@ -188,7 +188,7 @@ static Tk_ConfigSpec configSpecs[] = {
         TK_CONFIG_DONT_SET_DEFAULT, &arrowShapeOption},
     {TK_CONFIG_CAP_STYLE, "-capstyle", (char *) NULL, (char *) NULL,
         "butt", Tk_Offset(PolyLineItem, capStyle), TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_CUSTOM, "-dash", (char *) NULL, (char *) NULL, (char *) NULL, 
+    {TK_CONFIG_CUSTOM, "-dash", (char *) NULL, (char *) NULL, (char *) NULL,
      Tk_Offset(PolyLineItem, dash), TK_CONFIG_NULL_OK, &dashOption},
     {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL,
         "black", Tk_Offset(PolyLineItem, fg), TK_CONFIG_NULL_OK},
@@ -881,11 +881,11 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         Tk_CanvasSetStippleOrigin(canvas, linePtr->arrowGC);
     }
 
-    /* 
+    /*
      * Same for dashing.
      */
     if ( linePtr->dash[0] != '\0' ) {
-        XSetDashes( display, linePtr->gc, 0, linePtr->dash,  
+        XSetDashes( display, linePtr->gc, 0, linePtr->dash,
                     strlen( linePtr->dash ) );
     }
 
@@ -1876,7 +1876,7 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
 
 /*  Quick configuration routines. */
 
-EXTERN void RtdLineSetColour( Tk_Window tkwin, Display *display, 
+EXTERN void RtdLineSetColour( Tk_Window tkwin, Display *display,
                               Tk_Item *itemPtr, XColor *colour )
 {
     XColor *tkColor;
@@ -1927,7 +1927,7 @@ DashParseProc( ClientData clientData, Tcl_Interp *interp, Tk_Window tkwin,
         Tcl_Panic( "ParseDashProc received bogus offset" );
     }
 
-    /* -dash is a list of integers which we code to encode into 
+    /* -dash is a list of integers which we code to encode into
      * a character array. Allow an empty string to clear value.
      */
     if ( value[0] == '\0' ) {
@@ -1979,7 +1979,7 @@ DashPrintProc( ClientData clientData, Tk_Window tkwin, char *recordPtr,
     char *buffer;
     char *ptr1;
     char *ptr2;
-    
+
     ptr1 = linePtr->dash;
     ptr2 = buffer = ckalloc( 120 );
     *ptr2 = '\0';

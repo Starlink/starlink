@@ -1,8 +1,8 @@
- 
+
       SUBROUTINE PERIOD_PERFORMPDM(XDATA, YDATA, NDATA, NBIN, WBIN,
      :                             VARI, PDM, MAXPTS, IFAIL, NPTS,
      :                             SAMPLE, SVAR)
- 
+
 C===========================================================================
 C This routine calculates the PDM statistic of XDATA(NDATA), YDATA(NDATA),
 C following the method described by Stellingwerf (1978, APJ, 224, 953).
@@ -19,13 +19,13 @@ C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
- 
+
       IMPLICIT NONE
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_PDM declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER NDATA, NBIN, IFAIL, MAXPTS, I, J, K
       INTEGER NPTS(NBIN)
       DOUBLE PRECISION XDATA(NDATA), YDATA(NDATA)
@@ -34,27 +34,27 @@ C-----------------------------------------------------------------------------
       DOUBLE PRECISION NOM, DENOM
       DOUBLE PRECISION AVE, ADEV, SDEV
       DOUBLE PRECISION SAMPLE(NDATA*3), SVAR(NBIN)
- 
- 
+
+
 C-----------------------------------------------------------------------------
 C Loop through the NBIN samples.
 C-----------------------------------------------------------------------------
- 
+
       DO 30 I = 1, NBIN
- 
+
 C-----------------------------------------------------------------------------
 C Determine the limits of the bin.
 C-----------------------------------------------------------------------------
- 
+
          BINWID = 1.0D0/DFLOAT(NBIN)
          CENBIN = (DFLOAT(I)*BINWID) - (0.5D0*BINWID)
          MINBIN = CENBIN - (0.5D0*WBIN)
          MAXBIN = CENBIN + (0.5D0*WBIN)
- 
+
 C-----------------------------------------------------------------------------
 C Loop through the phases and store those that fall in the bin.
 C-----------------------------------------------------------------------------
- 
+
          NPTS(I) = 0
          DO 20 K = 1, 3
             DO 10 J = 1, NDATA
@@ -82,11 +82,11 @@ C-----------------------------------------------------------------------------
                END IF
   10        CONTINUE
   20     CONTINUE
-         
+
 C-----------------------------------------------------------------------------
 C Calculate the mean and variance of the sample and store the variance.
 C-----------------------------------------------------------------------------
-         
+
          IF ( NPTS(I).GT.1 ) THEN
 
             CALL PERIOD_MOMENT(SAMPLE, NPTS(I), AVE, ADEV, SDEV,
@@ -96,12 +96,12 @@ C-----------------------------------------------------------------------------
             SVAR(I) = 0.0D0
          END IF
   30  CONTINUE
- 
+
 C-----------------------------------------------------------------------------
 C Calculate the overall variance for all of the samples and divide it by the
 C variance of the whole dataset. The result is the PDM statistic.
 C-----------------------------------------------------------------------------
- 
+
       NOM = 0.0D0
       DENOM = 0.0D0
       DO 40 I = 1, NBIN
@@ -122,11 +122,11 @@ C-----------------------------------------------------------------------------
       END IF
       DENOM = DENOM - DFLOAT(NBIN)
       PDM = (NOM/DENOM)/VARI
- 
+
 C-----------------------------------------------------------------------------
 C And return.
 C-----------------------------------------------------------------------------
- 
+
       IFAIL = 0
 
  300  CONTINUE

@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -84,7 +84,7 @@ but have now been modified to run as normal Starlink tasks.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -498,12 +498,12 @@ but have now been modified to run as normal Starlink tasks.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -566,7 +566,7 @@ HDSTOOLS package, which will be supported by Starlink.
 content of HDS objects.
 
 The applications should run as before but the underlying parameter system has
-been simplified (to the normal Starlink parameter system) and some bugs have 
+been simplified (to the normal Starlink parameter system) and some bugs have
 been fixed and deficiencies addressed.
 
 \section{Running the Applications}
@@ -604,16 +604,16 @@ defined to allow for the possibility of name conflict with other packages.
 \subsection{Command Line Parameters}
 The Starlink (ADAM) parameter system used by the HDSTOOLS application programs
 allows parameter values to be specified on the command line by `positional' or
-`keyword' parameter specifiers. 
+`keyword' parameter specifiers.
 
 Keyword parameter specifiers have the syntax
 \texttt{keyword=value} where \texttt{name} is the parameter keyword.
 (For HDSTOOLS the keyword is always the same as the parameter name.)
 Keyword specifiers may appear in any order on the command line and the case of
-the keyword is not significant. 
+the keyword is not significant.
 
 Parameter specifiers which are not keyword specifiers are positional -- the
-first of them applies to the parameter whose position is defined as 1, 
+first of them applies to the parameter whose position is defined as 1,
 the second to the parameter whose position is defined as 2 \textit{etc.}
 For example:
 \begin{quote}
@@ -644,15 +644,15 @@ This is not a problem when replying to prompts or when running from ICL.
 If a parameter value is not specified on the command line, its value may be
 obtained by following a `value-path' (known as the vpath) until a value is
 found. The path consists of a list of possible `default' sources, including
-prompting the user (which will always produce a value). 
+prompting the user (which will always produce a value).
 
 Prompts may include a `suggested value' obtained by
-following a `ppath' similar to the vpath. 
+following a `ppath' similar to the vpath.
 In response to a prompt, you can type in a value, terminated by the
 $<$return$>$ key, or the suggested value may be used by just
 hitting the $<$return$>$ key, or placed in the input area by hitting the
 $<$tab$>$
-key. The input area may be edited (see 
+key. The input area may be edited (see
 \xref{SUN/144}{sun144}{input_line_editing}
 for details).
 
@@ -670,7 +670,7 @@ the user will be re-prompted.
 \end{tabular}
 
 \subsection{\label{specifying_hds_objects}Specifying HDS Objects}
-An HDS object is specified as a pathname comprising a 'container file' 
+An HDS object is specified as a pathname comprising a 'container file'
 optionally followed by a number of component names separated by `.' -- all but
 the last component must be structures. For example:
 \begin{quote}
@@ -728,7 +728,7 @@ same object.
 
 \subsection{Interface Files}
 Each program's parameters and their positions, keywords, vpaths, ppaths and
-associations \textit{etc.} are defined in an 
+associations \textit{etc.} are defined in an
 \xref{`Interface File'}{sun115}{}\latex{ (see SUN/115)}
 
 Interface files are provided for each program but it is possible to use
@@ -746,7 +746,7 @@ PRINTER  & The printer. Output is written to a temporary file,
    to provide a unique name) and then spooled using the command specified
    in environment variable AST\_LIST\_SPOOL (which must be set).\\
 NEWFILE[=\textit{fnm}] & Write to a new file whose name is specified by the
-   environment variable NEWFILE (default \textit{fnm} else 
+   environment variable NEWFILE (default \textit{fnm} else
    \texttt{ast\_print.lis}). \\
 OLDFILE[=\textit{fnm}] & Append to the file whose name is specified by the
    environment variable OLDFILE (default \textit{fnm} else
@@ -757,12 +757,12 @@ other    & Anything else is taken to be a new filename to be written.
 CONSOLE, STDOUT and blank are synonyms for TERMINAL. The case of the value is
 not significant and it may be abbreviated (except for filenames).
 When a new file is to be written, any existing file of the same name will
-be saved as its filename with \texttt{$\sim$} appended. Any existing 
+be saved as its filename with \texttt{$\sim$} appended. Any existing
 \texttt{filename$\sim$} will be overwritten.
 
 If the NEWFILE or OLDFILE=filename form is used on the command line,
 the `=' must be protected from the parameter system which would
-assume you were trying to specify a parameter called NEWFILE or OLDFILE. 
+assume you were trying to specify a parameter called NEWFILE or OLDFILE.
 There are two ways to do this:
 \begin{itemize}
 \item Enclose it all in double quotes \texttt{"NEW=filename"} (but note that
@@ -774,7 +774,7 @@ the quotes will need protecting from the shell so you end up with
 \section{MSG Tuning}
 HDSTOOLS applications output messages to the user via the Starlink
 \xref{MSG}{sun104}{}
-library and interrogate the environment variables to determine any 
+library and interrogate the environment variables to determine any
 \xref{MSG tuning parameters}{sun104}{MSG_TUNE}\latex{ (see SUN/104)}.
 
 For example, on Unix,
@@ -794,7 +794,7 @@ Jim Peden, Trevor Ponman, Dick Willingale, Ray Forbes.
 \subsubsection{The Usage Section}
 The command name and parameters are listed using the following conventions:
 \begin{description}
-\item[\textit{par}] Positional parameter specifier for parameter \textit{par}, 
+\item[\textit{par}] Positional parameter specifier for parameter \textit{par},
 in position order -- a prompt will be issued if it is not specified,
 \item[\texttt{[\textit{par}]}] Optional positional parameter specifier for
 parameter \textit{par}, in position order -- a default will be used if it is
@@ -819,7 +819,7 @@ HDSTOOLS parameters.
 
 \textit{TYPE} is the parameter type. Type UNIV means that the type of the
 parameter will depend on the type of the argument given -- an unquoted string
-is assumed to be an HDS object name (except for `INTERNAL' parameters). 
+is assumed to be an HDS object name (except for `INTERNAL' parameters).
 If you want the type to be a string, you must enclose it in double quotes (and
 possibly protect them from the shell with further single quotes -- HCOPY has
 an example of this). Conversely, if the parameter type is '\_CHAR' and you want

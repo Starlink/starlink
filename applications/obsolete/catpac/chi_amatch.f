@@ -1,5 +1,5 @@
 *+  CHI_AMATCH - Operand type match for expression parse system
-      subroutine chi_amatch (op, type1, type2, optype, 
+      subroutine chi_amatch (op, type1, type2, optype,
      :                          comnt1, comnt2, opcomnt, status)
 *    Description :
 *     Matches operand types for binary operators.
@@ -80,7 +80,7 @@
 *     Alan Wood (STADAT::ARW)
 *     Esther Gershuny (RLVAD::EJG)
 *    History :
-*     9-Feb-1992: Original 
+*     9-Feb-1992: Original
 *    Deficiencies :
 *     L type is not forced from logical operator
 *    Type definitions :
@@ -134,7 +134,7 @@
 *   operator preserving special type, ie + - or relational
 *
       if (radop) then
-        optype= thi 
+        optype= thi
         if (optype.eq.C_type .and. .not.relop) then
           status= CHI__ICMPT
         endif

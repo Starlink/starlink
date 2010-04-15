@@ -1,7 +1,7 @@
         SUBROUTINE PLT2D( STATUS)
 *
 * Description : D-task to plot images and related phenomena on workstation
-*               using SGS/GKS 7.2 software under ADAM/SSE implementation. 
+*               using SGS/GKS 7.2 software under ADAM/SSE implementation.
 * =========================================================================
 *
 * Invocation : Invoked by the ADAM D-task environment
@@ -10,21 +10,21 @@
 *
 * Parameters : As defined in interface module PLT2D.IFL
 *
-* Options : DEVINIT 
+* Options : DEVINIT
 *
 * Authors : C.Aspin (UOE) - 1stFeb85
 * History
 *   Top level DEVINIT
-* 17-FEB-1994 SKL@JACH: Scratch file created using NDF call 
-* 17-Aug-1994 SKL@JACH: Changed DEVINIT and ACT routines to new ADAM 
+* 17-FEB-1994 SKL@JACH: Scratch file created using NDF call
+* 17-Aug-1994 SKL@JACH: Changed DEVINIT and ACT routines to new ADAM
 *                       Instrument task style single routine
 *   ACT subroutine
-*  1) CAA : 28thJun85 : rationalized routine to make more general and ADAM 
+*  1) CAA : 28thJun85 : rationalized routine to make more general and ADAM
 *                       compatible
 *  2) CAA : 01stJul85 : added GRID, XLINE, YLINE options
 *  3) CAA : 31stOct85 : rationalized actions and modified cursoring
 *  4) CAA : 03rdNov85 : added FLASH option and renamed several others
-*  5) CAA : 06thNov85 : added LINE, CURLINE, BOX, CURBOX, COMMENT, CURCOM 
+*  5) CAA : 06thNov85 : added LINE, CURLINE, BOX, CURBOX, COMMENT, CURCOM
 *                       options
 *  6) CAA : 07thNov85 : added CIRCLE, CURCIR, CROSS, CURCRO options
 *  7) CAA : 08thNov85 : moved SGS/GKS open/closed to OPEN,CLOSE options
@@ -46,7 +46,7 @@
 * SKL@JACH  24thFeb94 : Removed MON calls, ANNOTATE_DEFAULT and LABEL_PLOT
 * SKL@JACH  24thFeb94 : Added ROPARS and RONEXT
 * SKL@JACH  25thJul94 : Removed 'value' from action arguments, errors
-*                       reported using ERR_ system within routines 
+*                       reported using ERR_ system within routines
 * TIMJ@JACH 11Aug2004 : Use ADAM_DEFNS
 * Endhistory
 *
@@ -109,7 +109,7 @@
           RETURN
         END IF
 
-        
+
 * Pick up required ACT parameters
 
         CALL TASK_GET_NAME( NAME, STATUS )
@@ -123,16 +123,16 @@
 
 *       See if scratch image PLT2D_SCRATCH in ADAM_USER already exits
 
-           CALL NDF_EXIST( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)    
+           CALL NDF_EXIST( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)
 
 *       If it doesn't exist then create a small image as for subsequent assocs
 
            IF ( LOCSR .EQ. NDF__NOID ) THEN
 
-              CALL NDF_CREAT ( 'SCRATCH_NAME', '_INTEGER', 2, TEMP_LBND, 
+              CALL NDF_CREAT ( 'SCRATCH_NAME', '_INTEGER', 2, TEMP_LBND,
      :                         TEMP_UBND, LOCSR, STATUS)
 
-           END IF 
+           END IF
 
            CALL NDF_MAP( LOCSR, 'DATA', '_INTEGER', 'WRITE', PNTSR,
      :                   NELEMENTS, STATUS )
@@ -145,7 +145,7 @@
 
         END IF
 
-        
+
 
 *
 * test if context is OBEY
@@ -155,13 +155,13 @@
           CALL PAR_GET0C( 'DEVICE_OPENED', DEVICE_OPENED, STATUS)
 *
 * test parameter to see if action allowed for opened/closed device
-          IF( DEVICE_OPENED .EQ. 'NO' .AND. 
+          IF( DEVICE_OPENED .EQ. 'NO' .AND.
      :        NAME .NE. 'OPEN' .AND.
      :        NAME .NE. 'WELCOME' .AND.
      :        NAME .NE. 'RONEXT' .AND.
      :        NAME .NE. 'ROPARS' .AND.
      :        NAME .NE. 'CONTPARS') THEN
-            CALL MSG_OUT('ERR', 
+            CALL MSG_OUT('ERR',
      :           'Error, need to OPEN plotting before proceeding',
      :           STATUS )
             RETURN
@@ -173,13 +173,13 @@
 
 * start NDF context
 
-          CALL NDF_BEGIN 
+          CALL NDF_BEGIN
 
 
 *
 * =========================================================================
 *
-* obey BLOCK option - plot colour table block 
+* obey BLOCK option - plot colour table block
           IF( NAME .EQ. 'BLOCK') THEN
 *
 * call subroutine to plot colour table block on workstation
@@ -252,7 +252,7 @@
 * obey COLTAB option - writes colour table to workstation
           ELSE IF( NAME .EQ. 'COLTAB') THEN
 *
-* call subroutine to write colour table 
+* call subroutine to write colour table
             CALL COLOUR_TABLE( STATUS)
 *
 * =========================================================================
@@ -273,7 +273,7 @@
 *
 * =========================================================================
 *
-* obey CROSS option - plots CROSS 
+* obey CROSS option - plots CROSS
           ELSE IF( NAME .EQ. 'CROSS') THEN
 *
 * call subroutine to plot CROSS
@@ -335,7 +335,7 @@
 * obey CURCUT option - plots a cut/slice through an image on workstation
           ELSE IF( NAME .EQ. 'CURCUT') THEN
 *
-* select to use cursor and call subroutine to plot cut on workstation 
+* select to use cursor and call subroutine to plot cut on workstation
             CALL PAR_PUT0C( 'CUT_USE_CURSOR', 'Y', STATUS)
             CALL CUT_DISPLAY( STATUS)
 *
@@ -382,7 +382,7 @@
 * obey CURSOR option - puts up cursor and return position and value
           ELSE IF( NAME .EQ. 'CURSOR') THEN
 *
-* calls subroutine to put up cursor on workstation and return X,Y and 
+* calls subroutine to put up cursor on workstation and return X,Y and
 * value at chosen pixel
             CALL CURSOR_DISPLAY( STATUS)
 *
@@ -391,7 +391,7 @@
 * obey CURSOR option - puts up cursor and return position and value
           ELSE IF( NAME .EQ. 'CURPOS') THEN
 *
-* calls subroutine to put up cursor on workstation and return X,Y and 
+* calls subroutine to put up cursor on workstation and return X,Y and
 * value at chosen pixel
             CALL CURSOR_POSITION( STATUS)
 *
@@ -400,7 +400,7 @@
 * obey CUT option - plots a cut/slice through an image on workstation
           ELSE IF( NAME .EQ. 'CUT') THEN
 *
-* select not to use cursor and call subroutine to plot cut on workstation 
+* select not to use cursor and call subroutine to plot cut on workstation
             CALL PAR_PUT0C( 'CUT_USE_CURSOR', 'N', STATUS)
             CALL CUT_DISPLAY(  STATUS)
 *
@@ -444,7 +444,7 @@
 *
           ELSE IF( NAME .EQ. 'GLITCHMARK') THEN
 *
-* calls subroutine to put up cursor on workstation and write the X,Y 
+* calls subroutine to put up cursor on workstation and write the X,Y
 * value at chosen pixel to a text file for GLITCH to read
 *
             CALL GLITCH_MARK(  STATUS)
@@ -504,7 +504,7 @@
 *
 * =========================================================================
 *
-* obey CONTPARS option - get container file paramters and stuff into 
+* obey CONTPARS option - get container file paramters and stuff into
 * parameter system  (for old style IRCAM frames)
 *
           ELSE IF( NAME .EQ. 'CONTPARS') THEN
@@ -579,10 +579,10 @@
 *
 * call subroutine to get container file parameters
             CALL RONEXT(  STATUS)
-*                                                                          
+*
 * =========================================================================
 *
-* obey ROPARS option - get container file paramters and stuff into 
+* obey ROPARS option - get container file paramters and stuff into
 * parameter system
           ELSE IF( NAME .EQ. 'ROPARS') THEN
 *
@@ -601,7 +601,7 @@
 *
 * =========================================================================
 *
-* obey SURROUND option - puts DEFAULT border and ticks around an image 
+* obey SURROUND option - puts DEFAULT border and ticks around an image
 *
           ELSE IF( NAME .EQ. 'SURROUND') THEN
 *
@@ -638,7 +638,7 @@
 * never occur
 *
             CALL MSG_SETC('NAME', NAME)
-            CALL MSG_OUT( 'UNIMP', 'Action ^NAME not implemented', 
+            CALL MSG_OUT( 'UNIMP', 'Action ^NAME not implemented',
      :                     STATUS )
 
           ENDIF
@@ -651,7 +651,7 @@
 
         ELSE
 
-          CALL MSG_OUT('ERR', 
+          CALL MSG_OUT('ERR',
      :     'ERROR : PLT2D : Unknown context - not OBEY/GET/SET',
      :     STATUS )
 

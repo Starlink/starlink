@@ -1,27 +1,27 @@
 //  This file is part of moggy.
-//  
+//
 //  Copyright 2001, Council for the Central Laboratory of the Research Councils
-//  
+//
 //  This program is part of the Starlink Software Distribution: see
-//  http://www.starlink.ac.uk 
-//  
+//  http://www.starlink.ac.uk
+//
 //  moggy is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  moggy is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with moggy; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//  
+//
 //  The General Public License is distributed along with this
 //  program in the file LICENCE.
-//  
+//
 //  Author: Norman Gray <norman@astro.gla.ac.uk>
 //  $Id$
 
@@ -177,7 +177,7 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     // Fail noisily if either is false.  As noted above, it might be
     // desirable, in future, to accept a Mapping as serialised input,
     // rather than a FrameSet, but then we can't necessarily make
-    // check 2 (though we could just abandon check 2 in that case, and 
+    // check 2 (though we could just abandon check 2 in that case, and
     // explicitly trust the caller to get things right).  It almost
     // certainly _will_ be desirable to allow SkyFrames with other
     // coordinate systems, and simply and silently add a further
@@ -260,7 +260,7 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
     astTran2 (astmap_, 1, &xpix, &ypix, 1, &radeg, &decdeg);
 
     // RA and Dec can be swapped. Also normalize the result into the
-    // correct range. 
+    // correct range.
     double point[2];
     point[0] = radeg;
     point[1] = decdeg;
@@ -268,7 +268,7 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
     if ( raIndex_ == 1 ) {
         radeg = point[0];
         decdeg = point[1];
-    } 
+    }
     else {
         decdeg = point[0];
         radeg = point[1];
@@ -329,7 +329,7 @@ bool AstHandler::transFromSky (const double radeg, const double decdeg,
 // astRead function.
 //
 // This does _not_ handle multiple AstHandler objects, so you can't
-// presently call this sequence more than once in a program.  However, 
+// presently call this sequence more than once in a program.  However,
 // it is written to _fail_ noisily in this case, so it won't fail
 // without you getting to hear about it.
 void AstHandler::channel_source_init (AstHandler *h)
@@ -345,7 +345,7 @@ const char *AstHandler::channel_source_server(void)
 {
     if (channel_source_currenthandler_ == 0)
 	throw MoggyException ("channel_source_server not initialised");
-    
+
     return channel_source_currenthandler_->channel_source();
 }
 const char *AstHandler::channel_source (bool reset)

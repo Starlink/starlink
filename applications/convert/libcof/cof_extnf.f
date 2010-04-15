@@ -90,7 +90,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'         ! HDS constants
       INCLUDE 'MSG_PAR'         ! MSG constants
-      
+
 *  Global Variables:
       INCLUDE 'F2NDF1_CMN'      ! The EXTABLE
 *     Symbolic constants defined
@@ -105,7 +105,7 @@
 *           Number of extension sets in EXTABLE
 *        EXTNS(MAXCMP,MAXEXT) = CHARACTER*32
 *           Extension table from EXTABLE
-*        NDFNMS(MAXEXT) = CHARACTER*(DAT__SZNAM) 
+*        NDFNMS(MAXEXT) = CHARACTER*(DAT__SZNAM)
 *           NDF names from EXTABLE
 *        COMPS(MAXCMP) = CHARACTER*(DAT__SZNAM*2)
 *           Component names from EXTABLE
@@ -114,20 +114,20 @@
 
 *  Arguments Given:
       CHARACTER*(*) FILNAM
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
       LOGICAL FIRST             ! If first not found
       INTEGER I, J              ! Loop counters
-     
+
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       FIRST = .TRUE.
 
       DO J = 1, NEXTS
-         DO I = 1, NCMP                     
+         DO I = 1, NCMP
             IF( .NOT. DONE(I,J) ) THEN
                IF ( FIRST ) THEN
                   FIRST = .FALSE.
@@ -136,7 +136,7 @@
      :             'The file $EXTABLE, specified by the EXTABLE '//
      :             'parameter, contained the following extension '//
      :             'specifiers which were not matched by extensions '//
-     :             'in file ^FILE', 
+     :             'in file ^FILE',
      :             STATUS )
                END IF
                CALL MSG_SETC( 'NDF', NDFNMS(I) )

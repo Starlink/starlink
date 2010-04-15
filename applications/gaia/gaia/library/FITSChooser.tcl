@@ -180,11 +180,11 @@ itcl::class gaia::FITSChooser {
          $itk_component(listing) clear
       }
    }
-   
+
    #  Return a list of the selected header.
    protected method get_selected_ {} {
       set card [$itk_component(listing) get_selected]
-      if { $card != {} } { 
+      if { $card != {} } {
          eval set card $card
          return [parse_header_card $card]
       }
@@ -208,7 +208,7 @@ itcl::class gaia::FITSChooser {
 
       #  Non-key/value pair lines are treated as keyed comments
       set equals [string range $card 8 9]
-      if { $equals != "= " } { 
+      if { $equals != "= " } {
          set comment [string range $card 9 end]
          return [list $key $value $comment]
       }
@@ -238,7 +238,7 @@ itcl::class gaia::FITSChooser {
             set comment $rest
          }
       } else {
-         
+
          # Look for a / to terminate the field.
          set slash [string last {/} $rest]
          if { $slash != -1 } {

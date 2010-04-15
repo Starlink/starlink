@@ -36,7 +36,7 @@ static void handle_row(FILE*, XImage*, int[NINKS][NPLANES][NBITS],
 static void get_planes( XImage*, int[NINKS][NPLANES][NBITS],
     int[MAXDOTS][MAXCOLOURS], int[MAXX], int, int, int,
     float, int*, int[MAXX_BYTES], int[MAXX_BYTES], int[MAXX_BYTES]);
-static void clear_planes(int, int[MAXX_BYTES], int[MAXX_BYTES], 
+static void clear_planes(int, int[MAXX_BYTES], int[MAXX_BYTES],
     int [MAXX_BYTES]);
 static void handle_plane(FILE*, int, int[MAXX_BYTES]);
 static int encode(int[MAXX_BYTES], int, int[MAXRLE]);
@@ -92,7 +92,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
     if ( !fullname ) return TCL_ERROR;
     gwmPtr->out = fopen( fullname, "wb");
     if ( !gwmPtr->out ) {
-	Tcl_AppendResult(interp, "couldn't open \"", fullname, 
+	Tcl_AppendResult(interp, "couldn't open \"", fullname,
 		"\"", (char *) NULL);
         Tcl_DStringFree( &buffer );
 	return TCL_ERROR;
@@ -103,7 +103,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
 /*
 **  Get a copy of the colour table
 */
-    if (gwmPtr->info->visclass == DirectColor || 
+    if (gwmPtr->info->visclass == DirectColor ||
           gwmPtr->info->visclass == TrueColor ) {
 
 /*
@@ -113,13 +113,13 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
 /*
 **  Find first pixel value for each colour.
 */
-       for ( gwmPtr->rbase = 1; 
-              (gwmPtr->vinfo->red_mask & gwmPtr->rbase) == 0; 
+       for ( gwmPtr->rbase = 1;
+              (gwmPtr->vinfo->red_mask & gwmPtr->rbase) == 0;
               gwmPtr->rbase *= 2 );
-       for ( gwmPtr->gbase = 1; 
+       for ( gwmPtr->gbase = 1;
               (gwmPtr->vinfo->green_mask & gwmPtr->gbase) == 0;
               gwmPtr->gbase *= 2 );
-       for ( gwmPtr->bbase = 1; 
+       for ( gwmPtr->bbase = 1;
               (gwmPtr->vinfo->blue_mask & gwmPtr->bbase) == 0;
               gwmPtr->bbase *= 2 );
 
@@ -195,7 +195,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
 /*
 **  Get a copy of the pixmap
 */
-    gwmPtr->image = XGetImage( gwmPtr->display, gwmPtr->info->pix_id, 0, 0, 
+    gwmPtr->image = XGetImage( gwmPtr->display, gwmPtr->info->pix_id, 0, 0,
 	gwmPtr->width, gwmPtr->height, AllPlanes, XYPixmap );
 
     length = strlen(gwmPtr->printformat);
@@ -210,7 +210,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
         init_printer( gwmPtr->out );
         get_mask( gwmPtr->mask );
         get_inks( gwmPtr->ct, gwmPtr->inks);
-        send_nxo( gwmPtr->out, gwmPtr->image, &gwmPtr->nyi, &gwmPtr->nxi, 
+        send_nxo( gwmPtr->out, gwmPtr->image, &gwmPtr->nyi, &gwmPtr->nxi,
 		&gwmPtr->nxo, &gwmPtr->expand, &gwmPtr->dimin);
         get_locx( gwmPtr->nxi, gwmPtr->nxo, gwmPtr->dimin, gwmPtr->locx);
         gwmPtr->nyo = round (gwmPtr->nyi*gwmPtr->expand);
@@ -219,7 +219,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
     }
     else if ( strncmp(gwmPtr->printformat, "JPEG", length) == 0 ) {
 #if HAVE_JPEGLIB_H
-    
+
     /*
     **  Allocate and initialise compression structures
     */
@@ -277,7 +277,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
     /*
     **  Must be postscript
     */
-	gwmPtr->colour = (strncmp(gwmPtr->printformat, "colour_ps", length) == 
+	gwmPtr->colour = (strncmp(gwmPtr->printformat, "colour_ps", length) ==
 	    0) || (strncmp(gwmPtr->printformat, "colour_postscript", length) ==
 	    0) || (strncmp(gwmPtr->printformat, "colour_eps", length) == 0);
 	epsf = (strncmp(gwmPtr->printformat, "eps", length) == 0) ||
@@ -331,8 +331,8 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
         fprintf( gwmPtr->out, "%%%%Creator: mxrefresh V1.0\n" );
         fprintf( gwmPtr->out, "%%%%Pages: 1\n" );
         fprintf( gwmPtr->out, "%%%%DocumentFonts:\n" );
-        if (epsf) fprintf( gwmPtr->out, "%%%%BoundingBox: %f %f %f %f\n", 
-	    0.0, 0.0, (float)gwmPtr->width * scale, 
+        if (epsf) fprintf( gwmPtr->out, "%%%%BoundingBox: %f %f %f %f\n",
+	    0.0, 0.0, (float)gwmPtr->width * scale,
 	    (float)gwmPtr->height * scale);
         fprintf( gwmPtr->out, "%%%%EndComments\n" );
         if ( !epsf )
@@ -396,7 +396,7 @@ static void DoPs(ClientData clientData)
             pix = XGetPixel( gwmPtr->image, i, gwmPtr->j );
             if (gwmPtr->colour)
             {
-                if (gwmPtr->info->visclass == DirectColor || 
+                if (gwmPtr->info->visclass == DirectColor ||
                       gwmPtr->info->visclass == TrueColor ) {
                     rpix = (pix & gwmPtr->vinfo->red_mask) / gwmPtr->rbase;
                     gpix = (pix & gwmPtr->vinfo->green_mask) / gwmPtr->gbase;
@@ -433,7 +433,7 @@ static void DoPs(ClientData clientData)
             /*
             **  Convert the pixel value to a B/W intensity
             */
-                if (gwmPtr->info->visclass == DirectColor || 
+                if (gwmPtr->info->visclass == DirectColor ||
                       gwmPtr->info->visclass == TrueColor ) {
                     rpix = (pix & gwmPtr->vinfo->red_mask) / gwmPtr->rbase;
                     gpix = (pix & gwmPtr->vinfo->green_mask) / gwmPtr->gbase;
@@ -486,7 +486,7 @@ static void DoPs(ClientData clientData)
     **  Close file and clean up
     */
         fclose( gwmPtr->out );
-        if (gwmPtr->info->visclass == DirectColor || 
+        if (gwmPtr->info->visclass == DirectColor ||
              gwmPtr->info->visclass == TrueColor ) {
            free( (void*)gwmPtr->ctr );
            free( (void*)gwmPtr->ctg );
@@ -500,7 +500,7 @@ static void DoPs(ClientData clientData)
      */
 	gwmPtr->printing = 0;
 	Tcl_Release((ClientData) gwmPtr);
-	Tcl_SetVar(gwmPtr->interp, gwmPtr->printvar, "1", 
+	Tcl_SetVar(gwmPtr->interp, gwmPtr->printvar, "1",
 		TCL_GLOBAL_ONLY);
     }
 }
@@ -528,7 +528,7 @@ static void DoInkjet(ClientData clientData)
 
     if ( gwmPtr->yo < gwmPtr->nyo )
     {
-        handle_row( gwmPtr->out, gwmPtr->image, gwmPtr->mask, gwmPtr->inks, 
+        handle_row( gwmPtr->out, gwmPtr->image, gwmPtr->mask, gwmPtr->inks,
 	    gwmPtr->locx, gwmPtr->nyi, gwmPtr->nxo, gwmPtr->expand,
 	    gwmPtr->dimin, gwmPtr->yo);
         gwmPtr->yo++;
@@ -545,7 +545,7 @@ static void DoInkjet(ClientData clientData)
     **  Close file and clean up
     */
         fclose( gwmPtr->out );
-        if (gwmPtr->info->visclass == DirectColor || 
+        if (gwmPtr->info->visclass == DirectColor ||
              gwmPtr->info->visclass == TrueColor ) {
            free( (void*)gwmPtr->ctr );
            free( (void*)gwmPtr->ctg );
@@ -609,15 +609,15 @@ void get_mask ( int mask[NINKS][NPLANES][NBITS])
     int bitSet[NBITS] = {1, 2, 4, 8, 16, 32, 64, 128};
     int rawColour[NINKS] =
     {  4,    5,       1,   3,      2,     6,    0,     7};
-    /**^*****^********^****^*******^******^*****^******^******/ 
+    /**^*****^********^****^*******^******^*****^******^******/
     /* blue, magenta, red, yellow, green, cyan, black, white */
-    /*********************************************************/ 
+    /*********************************************************/
 
-    for (iPlane=0; iPlane<NPLANES; iPlane++) 
+    for (iPlane=0; iPlane<NPLANES; iPlane++)
     {
 	int iInk;
 
-	for (iInk=0; iInk<NINKS; iInk++) if (BITTEST(rawColour[iInk], iPlane)) 
+	for (iInk=0; iInk<NINKS; iInk++) if (BITTEST(rawColour[iInk], iPlane))
 	{
 	    int iBit;
 
@@ -636,7 +636,7 @@ void get_inks (XColor *colourmap, int inks[MAXDOTS][MAXCOLOURS])
 {
     int index;
 
-    for (index=0; index<MAXCOLOURS; index++) 
+    for (index=0; index<MAXCOLOURS; index++)
     {
 	int ink1, ink2, n1, n2, nb, k;
 
@@ -656,7 +656,7 @@ void get_inks (XColor *colourmap, int inks[MAXDOTS][MAXCOLOURS])
 /*   calc various ink-related values                                    */
 /************************************************************************/
 
-void get_ink1 (XColor *colourmap, int index, int *p_ink1, int *p_ink2, 
+void get_ink1 (XColor *colourmap, int index, int *p_ink1, int *p_ink2,
     int *p_n1, int *p_n2, int *p_nb)
 {
     float hue, sat, val;
@@ -701,7 +701,7 @@ void get_rgb (XColor *colourmap, int index, float *p_red, float *p_green,
 /* "Fundamentals of Interactive Graphics", p615).                       */
 /************************************************************************/
 
-void rgb_2_hsv (float red, float green, float blue, float *p_hue, 
+void rgb_2_hsv (float red, float green, float blue, float *p_hue,
     float *p_sat, float *p_val)
 {
     float vmax = *p_val = max3f (red, green, blue);
@@ -782,7 +782,7 @@ void send_nxo (FILE *out, XImage *image, int *p_nyi, int *p_nxi,
 /************************************************************************/
 /*  get locx, where xi = locx[xo]x                                      */
 /************************************************************************/
-void get_locx (int nxi, int nxo, float dimin, int locx[MAXX]) 
+void get_locx (int nxi, int nxo, float dimin, int locx[MAXX])
 {
     int j;
 
@@ -793,8 +793,8 @@ void get_locx (int nxi, int nxo, float dimin, int locx[MAXX])
 /* Generates the LJ250 representation of a row of pixels from the screen*/
 /************************************************************************/
 
-void handle_row (FILE *out, XImage *image, int mask[NINKS][NPLANES][NBITS], 
-    int inks[MAXDOTS][MAXCOLOURS], int locx[MAXX], int nyi, int nxo, 
+void handle_row (FILE *out, XImage *image, int mask[NINKS][NPLANES][NBITS],
+    int inks[MAXDOTS][MAXCOLOURS], int locx[MAXX], int nyi, int nxo,
     float expand, float dimin, int yo)
 {
 
@@ -820,9 +820,9 @@ void handle_row (FILE *out, XImage *image, int mask[NINKS][NPLANES][NBITS],
 /* from  the screen.                                                    */
 /************************************************************************/
 
-void get_planes ( XImage *image, int mask[NINKS][NPLANES][NBITS], 
+void get_planes ( XImage *image, int mask[NINKS][NPLANES][NBITS],
     int inks[MAXDOTS][MAXCOLOURS], int locx[MAXX], int nyi, int nxo, int yo,
-    float dimin, int *p_nWords, int plane0[MAXX_BYTES], 
+    float dimin, int *p_nWords, int plane0[MAXX_BYTES],
     int plane1[MAXX_BYTES], int plane2[MAXX_BYTES])
 {
     int yi = MIN (nyi - 1, (int)round(yo*dimin));
@@ -832,14 +832,14 @@ void get_planes ( XImage *image, int mask[NINKS][NPLANES][NBITS],
     int modyo = yo%4;
     int iWord;
     int xo;
-    int matrix[4][4] = 
+    int matrix[4][4] =
 	{{5, 1, 4, 0},
 	 {3, 7, 2, 6},
 	 {4, 0, 5, 1},
 	 {2, 6, 3, 7}};
 
     clear_planes (nxo, plane0, plane1, plane2);
-    for (xo = 0;  xo < nxo;  xo++) 
+    for (xo = 0;  xo < nxo;  xo++)
     {
 	/********************************/
 	/* loop over printer pixel cols */
@@ -863,7 +863,7 @@ void get_planes ( XImage *image, int mask[NINKS][NPLANES][NBITS],
 /************************************************************************/
 /* just resets the plane0/1/2 arrays to zero                            */
 /************************************************************************/
-void clear_planes (int nxo, int plane0[MAXX_BYTES], int plane1[MAXX_BYTES], 
+void clear_planes (int nxo, int plane0[MAXX_BYTES], int plane1[MAXX_BYTES],
    int plane2[MAXX_BYTES])
 {
     int i;
@@ -909,7 +909,7 @@ int encode (int plane[MAXX_BYTES], int nBytes, int rle_plane[MAXRLE])
     {
 	if (plane[i] == plane[i-1])
             count++;
-	else 
+	else
 	{
 	    rle_plane[index++] = count;
 	    rle_plane[index++] = plane[i-1];
@@ -926,16 +926,16 @@ int encode (int plane[MAXX_BYTES], int nBytes, int rle_plane[MAXRLE])
 /*  Output plane i (bit i of every pixel in a given row).               */
 /************************************************************************/
 
-void send_plane (FILE *out, int change, int is_rle, int nBytes, 
+void send_plane (FILE *out, int change, int is_rle, int nBytes,
     int plane[MAXX_BYTES])
 {
-    if (change) 
+    if (change)
 	fprintf (out, "%s%d%s", "\033*b", (int) is_rle, "M");
     fprintf (out, "%s%d%s", "\033*b", nBytes, "V");
     {
 	int i;
 
-	for (i = 0;  i < nBytes; i++) 
+	for (i = 0;  i < nBytes; i++)
 	{
 	    fputc (plane[i], out);
 	}
@@ -961,7 +961,7 @@ static void DoJpeg(ClientData clientData)
         {
            pix = XGetPixel( gwmPtr->image, i, gwmPtr->j );
 
-           if (gwmPtr->info->visclass == DirectColor || 
+           if (gwmPtr->info->visclass == DirectColor ||
                  gwmPtr->info->visclass == TrueColor ) {
 
                rpix = (pix & gwmPtr->vinfo->red_mask) / gwmPtr->rbase;
@@ -1006,7 +1006,7 @@ static void DoJpeg(ClientData clientData)
     */
         fclose( gwmPtr->out );
         jpeg_destroy_compress( gwmPtr->cinfo );
-        if (gwmPtr->info->visclass == DirectColor || 
+        if (gwmPtr->info->visclass == DirectColor ||
              gwmPtr->info->visclass == TrueColor ) {
            free( (void*)gwmPtr->ctr );
            free( (void*)gwmPtr->ctg );
@@ -1023,7 +1023,7 @@ static void DoJpeg(ClientData clientData)
      */
 	gwmPtr->printing = 0;
 	Tcl_Release((ClientData) gwmPtr);
-	Tcl_SetVar(gwmPtr->interp, gwmPtr->printvar, "1", 
+	Tcl_SetVar(gwmPtr->interp, gwmPtr->printvar, "1",
 		TCL_GLOBAL_ONLY);
     }
 }

@@ -4,7 +4,7 @@ C
 C     G E N _ C H K I N T
 C
 C     Checks a real array for the condition that each element
-C     contains an integer.  That is, GEN_CHKINT is true if 
+C     contains an integer.  That is, GEN_CHKINT is true if
 C     ARRAY(I)=INT(ARRAY(I)) for all values of I.
 C
 C     Parameters -   (">" input, "<" output)

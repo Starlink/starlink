@@ -15,7 +15,7 @@
 *     3-MAR-1993 (AJJB):
 *       STATUS argument added.
 *
-*       
+*
 *   It throws a page except for the first page.
 *
 *   Gets
@@ -33,7 +33,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (IP.GT.0) THEN
          WRITE (7,900)
   900    FORMAT ('1')

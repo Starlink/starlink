@@ -14,9 +14,9 @@
 
 #  Description:
 #     This control provides an interface from which the user can select
-#     a canvas item to use for marking points on a GWM widget.  It 
+#     a canvas item to use for marking points on a GWM widget.  It
 #     is also used by other objects to draw the markers.  In this way,
-#     the client objects need have no knowledge of the shape of 
+#     the client objects need have no knowledge of the shape of
 #     the markers.
 
 #  Public Methods:
@@ -99,7 +99,7 @@
          itk_component add shower {
             canvas $itk_component(markstyle).shower \
                -height 24 \
-               -width 50 
+               -width 50
          } {
             usual
             ignore -background
@@ -202,7 +202,7 @@
 #-----------------------------------------------------------------------
          set x [ expr round( $cx ) + 1 ]
          set y [ expr round( $cy ) - 1 ]
-         
+
          foreach copair $mcopairs {
             lappend coords [ expr [ lindex $copair 0 ] + $x ] \
                            [ expr [ lindex $copair 1 ] + $y ]
@@ -293,7 +293,7 @@
             $canv configure -background [ $this cget -background ]
          }
       }
- 
+
 
 #-----------------------------------------------------------------------
       public variable value "" {
@@ -303,7 +303,7 @@
                setatt $att $val
             }
          }
-         if { $value != [ getvalue ] } { 
+         if { $value != [ getvalue ] } {
             configure -value [ getvalue ]
          }
          newmarker
@@ -391,7 +391,7 @@
 
       private variable attchecks         ;# List of attribute checkbox names
       private variable attmenus          ;# List of attribute menu names
-      private variable but               ;# Path name button-like window 
+      private variable but               ;# Path name button-like window
       private variable canv              ;# Path name of canvas show window
       private variable checkvars         ;# Value of checkbox attributes
       private variable dialog            ;# Path name of marker dialog box
@@ -408,7 +408,7 @@
 ########################################################################
 
    itk::usual Markstylecontrol {
-      keep -background -cursor -foreground 
+      keep -background -cursor -foreground
    }
    option add *Markstylecontrol.selectColor #b03060 widgetDefault
 
@@ -420,6 +420,6 @@
    proc markstylecontrol { pathname args } {
       uplevel Markstylecontrol $pathname $args
    }
-   
+
 
 # $Id$

@@ -41,7 +41,7 @@
       CHARACTER*(*)
      :  PARNAM ! parameter name associated with the input data structure
 *    Export :
-      INTEGER 
+      INTEGER
      :  LOCAT  ! locator to input data structure
 *    Status :
       INTEGER STATUS

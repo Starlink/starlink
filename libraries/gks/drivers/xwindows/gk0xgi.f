@@ -1,7 +1,7 @@
 *---------------------------------------------------------------------
 
 
-      SUBROUTINE GK0XGI(INTA,REALA,PROMPT,RETSTR,NOUT)           
+      SUBROUTINE GK0XGI(INTA,REALA,PROMPT,RETSTR,NOUT)
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
@@ -47,7 +47,7 @@
 *  LOCALS
 *  ------
       INTEGER I
-      
+
 *  Find the length of the prompt string minus any trailing spaces
       DO 10 I = LEN(PROMPT),2,-1
          IF (PROMPT(I:I).NE.' ') GO TO 20

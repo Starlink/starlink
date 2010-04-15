@@ -9,17 +9,17 @@ C
 C     Function:
 C        Reduce IRIS imaging polarimetry data.
 C
-C     Description:                           
+C     Description:
 C        IRISPOL reduces data obtained with the AAT IRIS polarimeter
 C        using the wolaston  prism poarizer. The data for a
 C        single observation consists of four Figaro files containing the
 C        frames for plate position 0, 45, 22.5 and 67.5 degrees. Within each
-C        frame are selected two images corresponding to the O and E rays for 
+C        frame are selected two images corresponding to the O and E rays for
 C        a siingle mask slot. These spectra are combined
 C        to derive a polarization image in TSP format.
 C
 C        Two different algorithms may be selected for the polarimetry
-C        reduction. The two algorithms differ in the method used to 
+C        reduction. The two algorithms differ in the method used to
 C        compensate for transparency variations between the observations
 C        at the two plate positions.
 C
@@ -48,7 +48,7 @@ C
 C-
 C
 C  History:
-C    3/5/1993   Original Version.   JAB/AAO 
+C    3/5/1993   Original Version.   JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
 C
 
@@ -66,11 +66,11 @@ C
 
 *  Number of elements in data arrays
       INTEGER NDIM, DIMS(7),DIMS2(7)
-                       
+
 
 *  Extraction parameters
       INTEGER X1,Y1,WIDTH,HEIGHT
-      REAL XSEP,YSEP        
+      REAL XSEP,YSEP
 
 *  HDS locators
       CHARACTER*(DAT__SZLOC) ILOC,OLOC,ULOC,QLOC,
@@ -89,7 +89,7 @@ C
       CALL PAR_GET0C('POS1',FNAME,STATUS)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME,STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -101,7 +101,7 @@ C
             CALL MSG_OUT(' ','Dimensions of Input File Invalid',
      :          STATUS)
             GOTO 100
-         ELSE                   
+         ELSE
 
 *  Map the data
 
@@ -152,7 +152,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -185,9 +185,9 @@ C
              CALL DSA_NAMED_INPUT('INPUT3',FNAME,STATUS)
              IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
-               GOTO 100 
+               GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -222,7 +222,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                STATUS = USER__001
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -276,7 +276,7 @@ C
              IF (X1 .LT. 1 .OR. X1+WIDTH+XSEP-1 .GT. DIMS(1)
      :          .OR. Y1 .LT. 1 .OR. Y1+HEIGHT-1 .GT. DIMS(2)) THEN
                CALL MSG_OUT(' ','Invalid Position of Data Window',
-     :           STATUS)        
+     :           STATUS)
                  GOTO 100
              ENDIF
 
@@ -292,14 +292,14 @@ C
                 ENDIF
              ENDDO
              RATIO = ALGORITHM .EQ. 'RATIO'
-      
+
 *  Create the output file
 
              CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
              CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
 
 *  Create the structure
- 
+
              CALL TSP_CREATE_2D(OLOC,WIDTH,HEIGHT,'QU',.FALSE.,
      :            .FALSE.,STATUS)
 
@@ -314,7 +314,7 @@ C
              CALL TSP_WLU_Y(OLOC,YLABEL,YUNITS,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
 
 *  Map the Q Stokes data
@@ -340,10 +340,10 @@ C
 
              CALL TSP_TEMP(WIDTH*HEIGHT,'_REAL',T1PTR,T1LOC,STATUS)
              CALL TSP_TEMP(WIDTH*HEIGHT,'_REAL',T2PTR,T2LOC,STATUS)
-              
+
 *  Reduce the data (This is equivalent to doing IRISSTOKES on each
 *  pair and then QUMERGE).
-      
+
              IF (STATUS .EQ. SAI__OK) THEN
                 IF (RATIO) THEN
 
@@ -381,7 +381,7 @@ C
      :                %VAL(IPTR4),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
      :                %VAL(T2PTR),%VAL(QPTR),
      :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
- 
+
                 ENDIF
 
 *  Merge the Q and U data
@@ -404,7 +404,7 @@ C
           ENDIF
 
 *  Unmap input arrays
- 
+
       ENDIF
 100   CONTINUE
       PRINT *,'Calling DSA_CLOSE'
@@ -412,13 +412,13 @@ C
       PRINT *,'DSA_CLOSE Finished'
       END
 
-      
+
 
 
       SUBROUTINE TSP_IRISMERGE(IX,IY,I1,I2,IO,QS,US,STATUS)
 *+
 *   Subroutine to do the merging of the data
-*       
+*
 *    Sum the intensities for the two datasets, and scale up the
 *    Stokes arrays and variances to be correct for the new intensity
 *
@@ -459,7 +459,7 @@ C
            DO J=1,IY
 
 *  Only sum channels for which both intensities are good
-            IF (I1(I,J) .NE. VAL__BADR .AND. 
+            IF (I1(I,J) .NE. VAL__BADR .AND.
      :          I2(I,J) .NE. VAL__BADR) THEN
                 I1S = I1S+I1(I,J)
                 I2S = I2S+I2(I,J)
@@ -467,22 +467,22 @@ C
            ENDDO
          ENDDO
 
-         NEWINT=I1S+I2S                
+         NEWINT=I1S+I2S
 
 *  Determine scaling factor for Stokes parameters
-         IF (I1S .GT. 0.0) THEN          
-            QFAC=NEWINT/I2S              
-         ELSE                              
-            QFAC=0.0                       
-         ENDIF                             
-         IF (I1S .GT. 0.0) THEN          
-            UFAC=NEWINT/I1S              
-         ELSE                              
-            UFAC=0.0                       
-         ENDIF                             
+         IF (I1S .GT. 0.0) THEN
+            QFAC=NEWINT/I2S
+         ELSE
+            QFAC=0.0
+         ENDIF
+         IF (I1S .GT. 0.0) THEN
+            UFAC=NEWINT/I1S
+         ELSE
+            UFAC=0.0
+         ENDIF
          DO I=1,IX
             DO J=1,IY
-  
+
 *  Scale up the Stokes parameters (if good data)
 
             IF (QS(I,J) .NE. VAL__BADR) QS(I,J)=QS(I,J)*QFAC
@@ -492,7 +492,7 @@ C
 *  Add the intensities (set intensity to bad if either input value
 *  is bad).
 
-            IF (I1(I,J) .NE. VAL__BADR .AND. 
+            IF (I1(I,J) .NE. VAL__BADR .AND.
      :         I2(I,J) .NE. VAL__BADR) THEN
                 IO(I,J)=I1(I,J)+I2(I,J)
             ELSE

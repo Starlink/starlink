@@ -15,11 +15,11 @@
 *  Description:
 *     Increments a pointer to a character position within the given
 *     string and checks if the following sequence of characters matches
-*     the specified substring, ignoring differences in case. The search 
-*     may be performed either forwards or backwards. If a match is found, 
-*     the position of the substring is returned. If no match exists, 
-*     the pointer is set to one more than the length of the string 
-*     if the search is forwards, zero if the search is backwards. 
+*     the specified substring, ignoring differences in case. The search
+*     may be performed either forwards or backwards. If a match is found,
+*     the position of the substring is returned. If no match exists,
+*     the pointer is set to one more than the length of the string
+*     if the search is forwards, zero if the search is backwards.
 
 *  Arguments:
 *     STRING = CHARACTER * ( * ) (Given)
@@ -30,8 +30,8 @@
 *        The search direction: if .TRUE., proceed through the string
 *        in a forward direction, otherwise work backwards.
 *     IPOSN = INTEGER (Given and Returned)
-*        The starting position for the search. If the initial value of 
-*        IPOSN does not point at a character within the string, the 
+*        The starting position for the search. If the initial value of
+*        IPOSN does not point at a character within the string, the
 *        routine returns without action.
 
 *  Copyright:
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
  10      CONTINUE
          IF ( ( IPOSN .GT. 0 ) .AND. ( IPOSN .LE. STRLEN-SUBLEN ) ) THEN
 
-*        Find the indices of the lower and uppercase substring start 
+*        Find the indices of the lower and uppercase substring start
 *        in the string - first the lowercase.
             DO 20 LINDX = IPOSN, END, INCR
                IF ( LCHAR .EQ. STRING( LINDX : LINDX ) ) GO TO 30
@@ -173,9 +173,9 @@
 *        Check if a substring with start LCHAR/UCHAR exists.
             IF ( SINDX .NE. 0 ) THEN
 
-*           A substring with start LCHAR/UCHAR does exist: is the 
+*           A substring with start LCHAR/UCHAR does exist: is the
 *           substring similar?
-               IF ( CHR_SIMLR( STRING( SINDX : SINDX+SUBLEN-1 ), 
+               IF ( CHR_SIMLR( STRING( SINDX : SINDX+SUBLEN-1 ),
      :                                 SUBSTR ) ) THEN
 
 *              If so, then set IPOSN and return.

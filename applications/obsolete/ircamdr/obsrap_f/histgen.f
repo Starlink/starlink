@@ -24,7 +24,7 @@
 *  30-04-1986 :  First implementation (REVA::CAA)
 *  24-05-1986 :  Added the storage of the X axis scale in DATA_ARRAY( i,2)
 *                (REVA::CAA)
-*  25-05-1986 :  Added the option to get terminal output of histogram 
+*  25-05-1986 :  Added the option to get terminal output of histogram
 *                (REVA::CAA)
 *  20-Apr-1994   Changed DAT and CMP calls to NDF (SKL@JACH)
 *  12-AUG-1994   Changed input DIMS for GENHIS (SKL@JACH)
@@ -37,8 +37,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	  ! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 * Status :
 
@@ -52,7 +52,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,             ! locator for input data structure
      :    LOCO,             ! locator for output data structure
      :	  HIST_BINS,        ! number of bins in calculated histogram
@@ -134,13 +134,13 @@
 	      X_END = X_START + X_SIZE - 1
 	      Y_END = Y_START + Y_SIZE - 1
 *
-* calculate maximum and minimum in sub-image and suggest as defaults for 
+* calculate maximum and minimum in sub-image and suggest as defaults for
 * HIST_MAX and HIST_MIN parameters. The suggested defaults are in varaibles
 * SUGGESTED_MAX and SUGGESTED_MIN
 *
-	      CALL HIST_MAXMIN( 
-     :                IDIMS( 1), IDIMS( 2), %VAL( PNTRI), X_START, 
-     :	              Y_START, X_END, Y_END, SUGGESTED_MAX, 
+	      CALL HIST_MAXMIN(
+     :                IDIMS( 1), IDIMS( 2), %VAL( PNTRI), X_START,
+     :	              Y_START, X_END, Y_END, SUGGESTED_MAX,
      :	              SUGGESTED_MIN)
 
 	      CALL PAR_DEF0R( 'HIST_MAX', SUGGESTED_MAX, STATUS)
@@ -156,9 +156,9 @@
 * call subroutine to generate the histogram of the requested section of the
 * image between the requested maximum and minimum values
 *
-	        CALL GENHIS( 
-     :                 IDIMS(1), IDIMS(2), %VAL( PNTRI ), X_START, 
-     :	               Y_START, X_END, Y_END, HIST_MAX, HIST_MIN, 
+	        CALL GENHIS(
+     :                 IDIMS(1), IDIMS(2), %VAL( PNTRI ), X_START,
+     :	               Y_START, X_END, Y_END, HIST_MAX, HIST_MIN,
      :	               HIST_BINS, HISTOGRAM, STATUS )
 
 	        IF( STATUS .EQ. SAI__OK) THEN
@@ -170,7 +170,7 @@
 *
 * create output image structures
 *
-	          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, 
+	          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS,
      :                          LOCO, STATUS )
 
 	          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -184,13 +184,13 @@
 *
 * get the option to type the histogram to the terminal
 *
-	              CALL PAR_GET0L( 'TERMINAL_OUTPUT', 
+	              CALL PAR_GET0L( 'TERMINAL_OUTPUT',
      :                                TERMINAL_OUTPUT, STATUS)
 *
 * call subroutine to put the histogram parameters into the structure
 *
-	              CALL HISTOGRAM_SAVE( 
-     :                           ODIMS(1), ODIMS(2), %VAL( PNTRO), 
+	              CALL HISTOGRAM_SAVE(
+     :                           ODIMS(1), ODIMS(2), %VAL( PNTRO),
      :	                         HISTOGRAM, HIST_MAX, HIST_MIN,
      :	                         HIST_BINS, TERMINAL_OUTPUT, STATUS)
 

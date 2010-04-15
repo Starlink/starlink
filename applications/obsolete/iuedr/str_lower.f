@@ -5,7 +5,7 @@
 *   Name:
 *      BYTE FUNCTION str_LOWER
 *
-*   Description: 
+*   Description:
 *      Give lower case equivalent of character.
 *
 *   Authors:

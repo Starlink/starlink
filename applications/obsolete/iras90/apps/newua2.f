@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,7 +108,7 @@
 
 *  If valid, write the input value to the output in the new units.
          VAL = DATIN( I )
-         IF( VAL .NE. VAL__BADR ) then 
+         IF( VAL .NE. VAL__BADR ) then
             DATOUT( I ) = VAL*SCALE
 
 *  Store a bad value in the output if the input is bad, and set the bad
@@ -116,21 +116,21 @@
          ELSE
             DATOUT( I ) = VAL__BADR
             DBAD = .TRUE.
-         END IF               
+         END IF
 
 *  If required, do the same with the variance value.
          IF( VAR ) THEN
 
             VAL = VARIN( I )
-            IF( VAL .NE. VAL__BADR ) then 
+            IF( VAL .NE. VAL__BADR ) then
                VAROUT( I ) = VAL*SCALE*SCALE
             ELSE
                VAROUT( I ) = VAL__BADR
                VBAD = .TRUE.
-            END IF               
+            END IF
 
          END IF
 
       END DO
-      
+
       END

@@ -1,27 +1,27 @@
 //  This file is part of moggy.
-//  
+//
 //  Copyright 2001, Council for the Central Laboratory of the Research Councils
-//  
+//
 //  This program is part of the Starlink Software Distribution: see
-//  http://www.starlink.ac.uk 
-//  
+//  http://www.starlink.ac.uk
+//
 //  moggy is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  moggy is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with moggy; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//  
+//
 //  The General Public License is distributed along with this
 //  program in the file LICENCE.
-//  
+//
 //  Author: Norman Gray <norman@astro.gla.ac.uk>
 //  $Id$
 
@@ -30,10 +30,10 @@
 // <title>moggy
 //
 // <description>
-//   <p>A simple server which wraps the Skycat library.  It's designed 
+//   <p>A simple server which wraps the Skycat library.  It's designed
 //   to be used within a two-way pipe, so its dialogue with its
 //   environment is rather strictly defined (see moggy-doc.txt), it
-//   communicates via status codes, and is careful to flush its output 
+//   communicates via status codes, and is careful to flush its output
 //   appropriately.
 //
 //   <p>It comes with a Perl module which encapsulates the dialogue
@@ -117,7 +117,7 @@ void Usage ();
 
 int main (int argc, char **argv)
 {
-    bool errorExit = true;	// Initialise to true, and clear it if 
+    bool errorExit = true;	// Initialise to true, and clear it if
 				// we exit normally from the loop
 				// below.  Exceptions don't clear it,
 				// and so result in a non-zero exit status.
@@ -193,9 +193,9 @@ int main (int argc, char **argv)
 	// Keep reading a string from stdin until EOF or keepGoing
 	// becomes true.  This will read lines terminated by '\n' (on
 	// unix): this is supposed to accept lines terminated by
-	// "\r\n", but will in fact accept either _because_ 
+	// "\r\n", but will in fact accept either _because_
 	// CommandParse splits strings at whitespace which includes
-	// both '\r' and '\n' (ie, this is good, as it's being liberal 
+	// both '\r' and '\n' (ie, this is good, as it's being liberal
 	// in what it accepts).
 	while (keepGoing && getline (cin, commandline))
 	{
@@ -212,10 +212,10 @@ int main (int argc, char **argv)
 		Util::logstream() << endl;
 	    }
 
-	    // Process the parsed command obtained from the input.  If 
+	    // Process the parsed command obtained from the input.  If
 	    // the processing of a command produces multi-line output
 	    // then that is written to cout and an empty response
-	    // returned.  Otherwise, this returns a one-line response, 
+	    // returned.  Otherwise, this returns a one-line response,
 	    // which we write to cout below.
 	    string response = processCommand (cmd, cin, keepGoing);
 
@@ -487,7 +487,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 		  default:
 		    Util::logstream() << "    type=IMPOSSIBLE" << endl;
 		    break;
-		}			 
+		}
 	    }
 
 	    switch (coordsok)
@@ -508,7 +508,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 
 	      case decdegrees:
 		if (cat.setPos (cmd->type()==CommandParse::COORD1 ?1:2,
-				radouble, decdouble, 
+				radouble, decdouble,
 				equinox))
 		    response = "250 Parameter set successfully";
 		else
@@ -631,7 +631,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 			     n != names.end();
 			     ++n)
 			    cout << *n << crlf;
-			// Write out the number of catalogue rows, 
+			// Write out the number of catalogue rows,
 			// followed by the catalogue.
 			cout << nrows << crlf;
 			for (CatalogueHandler::const_iterator p = cat.begin();
@@ -675,7 +675,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 			 n != colname.end();
 			 ++n)
 			cout << *n << crlf;
-		    // Write out the number of catalogue rows, 
+		    // Write out the number of catalogue rows,
 		    // followed by the catalogue.
 		    cout << nrows << crlf;
 		    int rowcountcheck = nrows;
@@ -688,7 +688,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 			    // This shouldn't happen -- we've entered
 			    // this loop more times than we promised.
 			    // Somehow, the number of rows reported
-			    // and held in nrows is different from the 
+			    // and held in nrows is different from the
 			    // number returned by the iterator.
 			    throw MoggyException
 				("We have more rows than we expected -- extras discarded");
@@ -874,7 +874,7 @@ string processAstCommand (vector<string>& arglist,
 	    if (ast)
 	    {
 		double arg1, arg2;
-		bool convok = 
+		bool convok =
 		    Util::stringToDouble (arglist[2], arg1)
 		    && Util::stringToDouble (arglist[3], arg2);
 		string direction = arglist[4];

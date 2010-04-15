@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,10 +106,10 @@
 *  Test for each recognised data type and call the appropriate routine
 *  to do the work.
       IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CCD1_PTBDR( LBND, UBND, NY, I1, I2, 
+         CALL CCD1_PTBDR( LBND, UBND, NY, I1, I2,
      :                    %VAL( CNF_PVAL( DATA ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCD1_PTBDD( LBND, UBND, NY, I1, I2, 
+         CALL CCD1_PTBDD( LBND, UBND, NY, I1, I2,
      :                    %VAL( CNF_PVAL( DATA ) ), STATUS )
       END IF
 

@@ -21,14 +21,14 @@
 *        re-shaped. NULL is returned.
 *     tile = smfTile * (Given)
 *        Pointer to the structure defining the required shape for the
-*        re-shaped NDF. 
+*        re-shaped NDF.
 *     status = int * (Given and Returned)
 *        Inherited status value. This function attempts to execute even
 *        if status is set to an error value on entry.
 
 *  Description:
 *     This function closes the specified NDF and associated resources,
-*     then optionally changes the pixel bounds of the NDF to match the 
+*     then optionally changes the pixel bounds of the NDF to match the
 *     unextended bounds of the specified tile.
 
 *  Authors:
@@ -40,7 +40,7 @@
 *     4-SEP-2007 (DSB):
 *        Initial version.
 *     1-OCT-2007 (DSB):
-*        Ensure the reshaped NDF has the same number of pixel axes 
+*        Ensure the reshaped NDF has the same number of pixel axes
 *        as the original NDF.
 *     14-JAB-2008 (DSB):
 *        Added argument "trim".
@@ -93,14 +93,14 @@
 void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 
 /* Local Variables */
-   IRQLocs *qlocs;              
+   IRQLocs *qlocs;
    int bit;
    int ix;
    int iy;
    int iz;
    int lbnd[ 3 ];
    int ndim;
-   int nel;           
+   int nel;
    int there;
    int tndf;
    int ubnd[ 3 ];
@@ -114,7 +114,7 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 
 /* If the NDF identifier is available, clone it. */
       if( (*data)->file && tile ) {
-         ndfClone( (*data)->file->ndfid, &tndf, status ); 
+         ndfClone( (*data)->file->ndfid, &tndf, status );
       } else {
          tndf = NDF__NOID;
       }
@@ -125,13 +125,13 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 /* Get the number of pixel axes in the original NDF (should be 3 for the
    main arrays, and 2 for the extension arrays). */
       if( tndf != NDF__NOID ) {
-         ndfBound( tndf, 3, lbnd, ubnd, &ndim, status ); 
+         ndfBound( tndf, 3, lbnd, ubnd, &ndim, status );
 
 /* Change the shape of the NDF. */
-         ndfSbnd( ndim, tile->lbnd, tile->ubnd, tndf, status ); 
+         ndfSbnd( ndim, tile->lbnd, tile->ubnd, tndf, status );
 
-/* If the output NDF includes a border area, update the quality array to 
-   include a quality flag indicating the border pixels. We assume that the 
+/* If the output NDF includes a border area, update the quality array to
+   include a quality flag indicating the border pixels. We assume that the
    output NDF currently has no quality information. */
          if( ( ( tile->lbnd[ 0 ] < tile->qlbnd[ 0 ] ) && tile->qxl ) ||
              ( ( tile->lbnd[ 1 ] < tile->qlbnd[ 1 ] ) && tile->qyl ) ||
@@ -155,9 +155,9 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
    required mumerical quality value. */
                irqRbit( qlocs, "BORDER", &bit, status );
                qval = pow( 2, bit - 1 );
-            
+
 /* Map the quality array of the output NDF. */
-               ndfMap( tndf, "Quality", "_UBYTE", "WRITE", ipqpntr, &nel, 
+               ndfMap( tndf, "Quality", "_UBYTE", "WRITE", ipqpntr, &nel,
                        status );
                ipq = ipqpntr[0];
 
@@ -170,9 +170,9 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
                   for( iz = tile->lbnd[ 2 ]; iz <= tile->ubnd[ 2 ]; iz++ ) {
                      for( iy = tile->lbnd[ 1 ]; iy <= tile->ubnd[ 1 ]; iy++ ) {
                         for( ix = tile->lbnd[ 0 ]; ix <= tile->ubnd[ 0 ]; ix++ ) {
-                           if( ( ( ix < tile->qlbnd[ 0 ] ) && tile->qxl ) || 
-                               ( ( ix > tile->qubnd[ 0 ] ) && tile->qxu ) || 
-                               ( ( iy < tile->qlbnd[ 1 ] ) && tile->qyl ) || 
+                           if( ( ( ix < tile->qlbnd[ 0 ] ) && tile->qxl ) ||
+                               ( ( ix > tile->qubnd[ 0 ] ) && tile->qxu ) ||
+                               ( ( iy < tile->qlbnd[ 1 ] ) && tile->qyl ) ||
                                ( ( iy > tile->qubnd[ 1 ] ) && tile->qyu ) ){
                               *(q++) = qval;
                            } else {
@@ -191,6 +191,6 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 /* Free the clonded NDF identifier. */
          ndfAnnul( &tndf, status );
       }
-   }          
+   }
 }
 

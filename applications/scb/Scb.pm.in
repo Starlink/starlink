@@ -17,12 +17,12 @@ package Scb;
 #     Utility routines and global variables for source code browser
 #     and indexer programs.  Via their definitions in this module
 #     the locations of various files and directories are determined.
-#     Both build-time (via the mk script) and run-time values of 
+#     Both build-time (via the mk script) and run-time values of
 #     some environment variables affect these locations, as documented
 #     in the "Global variables" section.
 
 #  Notes:
-#     This module reports errors using the routine &main::error 
+#     This module reports errors using the routine &main::error
 #     (this is to make sensible handling of exceptions easier),
 #     if it exists.  Otherwise such errors will be reported using die().
 
@@ -50,12 +50,12 @@ use Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf mkdirp popd pushd chdir cwd starpack rmrf parsetag taggable 
+@EXPORT = qw/tarxf mkdirp popd pushd chdir cwd starpack rmrf parsetag taggable
              $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir $indexdir
              $mimetypes_file
              $htxserver
              $docslisfile
-             @indexes 
+             @indexes
              %tagged %tagger/;
 
 @EXPORT_OK = qw/error/;
@@ -67,7 +67,7 @@ use vars qw/ $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir $indexdir
              $mimetypes_file
              $htxserver
              $docslisfile
-             @indexes 
+             @indexes
              %tagger %tagged/;
 
 #  Map error handler routine to that from the main:: namespace.
@@ -76,12 +76,12 @@ sub error { defined (&main::error) ? &main::error (@_) : die (@_) }
 
 #  Includes.
 
-#  By overriding the standard Perl 'chdir' with the one from the Cwd 
-#  module, the PWD environment variable is kept up to date.  We then 
+#  By overriding the standard Perl 'chdir' with the one from the Cwd
+#  module, the PWD environment variable is kept up to date.  We then
 #  provide our own cwd using PWD.  If PWD isn't set initially we set it.
 #  Using PWD is preferable to using &Cwd::cwd, because the latter gives
 #  the actual directory location instead of the location we've asked to
-#  go to; the actual one can be in some weird symlinked place that the 
+#  go to; the actual one can be in some weird symlinked place that the
 #  automounter umounts while we're not looking, which causes trouble
 #  if we try to go back there some time.
 
@@ -93,12 +93,12 @@ sub cwd { $ENV{'PWD'} ||= Cwd::cwd }
 ########################################################################
 
 #  The capitalised variable names in this section may be replaced by
-#  configure variables or mk script variables by autoconf at 
+#  configure variables or mk script variables by autoconf at
 #  configure time.  Since the configure modifies this file, if you are
 #  looking at the configured version of this script it may look confusing.
 #
 #  Some of the values determined by install-time environment variables
-#  (or pre-install defaults) can be overridden at run-time by environment 
+#  (or pre-install defaults) can be overridden at run-time by environment
 #  variables of the same name, if they exist and have a value.
 
 #  Starlink source tree directory locations.
@@ -116,7 +116,7 @@ $scbindex_tmpdir = $ENV{'SCB_INDEXER_TMP'} || "@SCB_INDEXER_TMP@";
 
 #  System file locations.
 
-$mimetypes_file = "@bindir@" . "/mime.types"; 
+$mimetypes_file = "@bindir@" . "/mime.types";
 
 #  HTX server base URL
 
@@ -127,9 +127,9 @@ $htxserver = "@HTX_SERVER@";
 $indexdir = $ENV{'SCB_INDEX'} || "@SCB_INDEX@" || cwd;
 
 #  Names of indexes (independent name spaces).
-#     By adding entries to this list, additional name spaces for indexing 
+#     By adding entries to this list, additional name spaces for indexing
 #     may be added, for instance to index callable routines in a different
-#     language such as Tcl.  The indexing program (and possibly the browsing 
+#     language such as Tcl.  The indexing program (and possibly the browsing
 #     program) would need to be modified to take advantage of these.
 #
 #     Current indexes are:
@@ -140,38 +140,38 @@ $indexdir = $ENV{'SCB_INDEX'} || "@SCB_INDEX@" || cwd;
 
 #  Language-specific tagging routines.
 #     Both the indexer and the extractor programs must be able to identify
-#     certain points in the source code.  This is done by calling 
+#     certain points in the source code.  This is done by calling
 #     language-specific tagging routines using the sequence:
 #
 #        use Scb.pm;
 #        $tagged = &{$tagger{$ftype}} ($sourcefh, $ftype);
 #
 #     where $ftype is the file type (usually the filename extension), as
-#     given in the keys to %tagger below.  The mapping from file type 
+#     given in the keys to %tagger below.  The mapping from file type
 #     to tagging routine is done here, by setting the %tagger hash.
 #
 #     New tagging routines may be written, or the ones supplied may be
-#     replaced as desired.  The remainder of this comment block 
-#     documents the interface between the tagging routines and the 
+#     replaced as desired.  The remainder of this comment block
+#     documents the interface between the tagging routines and the
 #     rest of the package for anybody wishing to do this.
 #
-#     The interface is fairly simple: the tagging routine must take the 
+#     The interface is fairly simple: the tagging routine must take the
 #     filehandle from which the raw source code may be read as its first
-#     argument (and may optionally read the second argument to tell it 
-#     the file type), and must return the tagged source code.  
-#     The tagged source is a kind of stripped down HTML; it should be 
+#     argument (and may optionally read the second argument to tell it
+#     the file type), and must return the tagged source code.
+#     The tagged source is a kind of stripped down HTML; it should be
 #     the same as the raw source, with the following anchor tags added:
 #
-#        <a name=''> tags identifying function/subroutine definitions, 
-#        <a href=''> tags identifying function/subroutine calls, 
+#        <a name=''> tags identifying function/subroutine definitions,
+#        <a href=''> tags identifying function/subroutine calls,
 #        <a href='INCLUDE-'> tags identifying references to files.
 #
-#     Additionally, any '<' or '&' characters in the source must be 
+#     Additionally, any '<' or '&' characters in the source must be
 #     replaced by '&lt;' and '&amp;' respectively (replacement of '>'
 #     by '&gt;' is optional).
 #
-#     Closing </a> tags MUST be supplied (as per the HTML DTD, despite 
-#     the fact that this is often disregarded for <a name=''> tags).  
+#     Closing </a> tags MUST be supplied (as per the HTML DTD, despite
+#     the fact that this is often disregarded for <a name=''> tags).
 #     Thus if the raw source is supplied as:
 #
 #        #include "header.h"
@@ -185,34 +185,34 @@ $indexdir = $ENV{'SCB_INDEX'} || "@SCB_INDEX@" || cwd;
 #        int <a name='code'>code</a> (int argc, char **argv) {
 #           (void) <a href='do_stuff'>do_stuff</a>();
 #        }
-#        
+#
 #     Note that the values of the href attributes are not URLs or even
 #     unique references, merely the name under which the file has been
 #     indexed.  It is the job of the extractor program to map the names
-#     in the hrefs to actual URLs where required.  The function index 
-#     names can be anything, as long as a function whose definition is 
-#     marked with an <a name=''> tag gets referred to using the same 
-#     name when it causes an <a href=''> tag.  Files referred to 
-#     (presumably include files or similar) must have index names 
-#     consisting of the literal 'INCLUDE-' followed by the bare name 
-#     of the file - this filename must not contain the path, only the 
+#     in the hrefs to actual URLs where required.  The function index
+#     names can be anything, as long as a function whose definition is
+#     marked with an <a name=''> tag gets referred to using the same
+#     name when it causes an <a href=''> tag.  Files referred to
+#     (presumably include files or similar) must have index names
+#     consisting of the literal 'INCLUDE-' followed by the bare name
+#     of the file - this filename must not contain the path, only the
 #     filename itself.
 #
-#     The function index names currently used are the same as the names 
+#     The function index names currently used are the same as the names
 #     used by the Unix linker (on the supported platforms), i.e. for C
-#     the function name as it appears in the source code, and for Fortran 
-#     the function/subroutine name in lower case, followed by an 
+#     the function name as it appears in the source code, and for Fortran
+#     the function/subroutine name in lower case, followed by an
 #     underscore.  If a tagger were written for a language (e.g. Perl or
-#     Tcl) with a separate namespace from C and the things which can be 
-#     linked with it, it would need to use a separate index from the 
-#     'func' one currently used.  There are hooks in the indexer and 
+#     Tcl) with a separate namespace from C and the things which can be
+#     linked with it, it would need to use a separate index from the
+#     'func' one currently used.  There are hooks in the indexer and
 #     extractor programs for this.
 
 use YyTag;
 
 my( $ctag, $ftag ) = ( \&YyTag::ctag, \&YyTag::fortrantag );
 
-%tagger = ( 
+%tagger = (
             c   => $ctag,
             h   => $ctag,
             C   => $ctag,
@@ -230,10 +230,10 @@ my( $ctag, $ftag ) = ( \&YyTag::ctag, \&YyTag::fortrantag );
 ########################################################################
 
 #  Define necessary shell commands.
-#  Note: this is used in a CGI program, so you should be sure that these 
+#  Note: this is used in a CGI program, so you should be sure that these
 #  commands do what they ought to, for security reasons.
-#  In the case that this is being used from a CGI program, the path 
-#  $ENV{'PATH'} should have been stripped down to a minimum 
+#  In the case that this is being used from a CGI program, the path
+#  $ENV{'PATH'} should have been stripped down to a minimum
 #  ('/bin:/usr/bin' is probably sufficient).
 
 my $tar = "tar";
@@ -272,7 +272,7 @@ sub taggable {
 #
 #     Calling this routine constitutes an assertion that tagging will
 #     be done, if the return value is true.  Thus, if it is called again
-#     on a file with the same name, since the last time %tagged was cleared, 
+#     on a file with the same name, since the last time %tagged was cleared,
 #     it will return false.
 #
 #     The list of which files have already been tagged is the global
@@ -330,18 +330,18 @@ sub taggable {
 
    $retval &&= defined $tagger{$ext};
 
-#  A file which ultimately lives in the same place must not have been 
+#  A file which ultimately lives in the same place must not have been
 #  tagged already (since the %tagger hash was last cleared - it is the
 #  responsibility of the calling routine to clear this at appropriate
 #  points).
 
    $retval &&= !exists $tagged{$untarloc};
 
-#  If this is going to be tagged mark it as such (calling this routine 
+#  If this is going to be tagged mark it as such (calling this routine
 #  constitutes an assertion that the tagging will be done).
 
    $tagged{$untarloc} = 1 if $retval;
-   
+
    return $retval;
 }
 
@@ -364,19 +364,19 @@ sub tarxf {
 #     @fextracted = tarxf ($tarfile, @files)
 
 #  Description:
-#     Extracts either all files, or a list of named files, from the 
+#     Extracts either all files, or a list of named files, from the
 #     named tar archive into their archived positions relative to the
 #     current directory, just as tar(1).  The tar archive may however
 #     be compressed using gzip(1) or compress(1).
 #
-#     If an error occurs during execution of the extraction, an error 
+#     If an error occurs during execution of the extraction, an error
 #     message is printed, and the routine returns with an empty list
 #     of files.
 
 #  Arguments:
 #     $tarfile = string.
-#        Name of the tar archive.  If it ends '.Z' or '.gz' it is 
-#        supposed to be compressed using compress(1) or gzip(1) 
+#        Name of the tar archive.  If it ends '.Z' or '.gz' it is
+#        supposed to be compressed using compress(1) or gzip(1)
 #        respectively.
 #     @files = list of strings (optional).
 #        If present, @files contains a list of filenames to be extracted
@@ -388,7 +388,7 @@ sub tarxf {
 #        List of files successfully extracted.
 
 #  Notes:
-#     To accomodate differences which exist between the output of tar 
+#     To accomodate differences which exist between the output of tar
 #     on different platforms with the 'xv' flags, the list of extracted
 #     files is generated in a separate step from doing the extraction
 #     itself.  This may be somewhat wasteful.
@@ -427,7 +427,7 @@ sub tarxf {
       error "Dangerous tar file name: $tarfile",
          "The filename given is badly formed.  For security reasons " .
          "execution has been aborted.";
-   }   
+   }
 
 #  Define a (possibly null) compression filter.
 
@@ -486,7 +486,7 @@ sub mkdirp {
 
 #  Description:
 #     Creates the given directory and, if required, its parents (like
-#     mkdir -p).  Any directories created are given the specified 
+#     mkdir -p).  Any directories created are given the specified
 #     access mode (in this respect it differs from the mkdir(1) command).
 #     Directories which already exist are not modified.
 #     The given access mode is not modified by the current mask.
@@ -636,9 +636,9 @@ sub rmrf {
 
 #  Description:
 #     This routine deletes a single directory and all its subdirectories.
-#     It examines its arguments rather carefully to try to avoid any 
+#     It examines its arguments rather carefully to try to avoid any
 #     unintentional deletions.
-#     This is entirely a precautionary measure - it is never expected 
+#     This is entirely a precautionary measure - it is never expected
 #     that this function will be called with dangerous arguments, but
 #     (especially since it may run under CGI control) it seems prudent
 #     to be as safe as possible.
@@ -651,7 +651,7 @@ sub rmrf {
 
 #  Arguments:
 #     $dir = string.
-#        Single word giving the relative or absolute pathname of a 
+#        Single word giving the relative or absolute pathname of a
 #        directory.
 
 #  Return value:
@@ -683,7 +683,7 @@ sub rmrf {
    my $dir = shift;
 
 #  Assemble command (by presenting a list, rather than a string, to
-#  system() we guarantee that no shell processing will be done on 
+#  system() we guarantee that no shell processing will be done on
 #  the arguments).
 
    my @cmd = ("/bin/rm", "-rf", "$dir");
@@ -731,8 +731,8 @@ sub pushd {
 
 #  Description:
 #     This function does the same as its C shell namesake, changing
-#     directory to the value given by its argument and pushing the 
-#     current directory onto a stack whence it can be recalled by 
+#     directory to the value given by its argument and pushing the
+#     current directory onto a stack whence it can be recalled by
 #     a subsequent popd.
 
 #  Arguments:
@@ -827,7 +827,7 @@ sub popd {
 
 
 ########################################################################
-sub parsetag {  
+sub parsetag {
 
 #+
 #  Name:
@@ -865,11 +865,11 @@ sub parsetag {
 #        Start => ''
 #        End   => 'tagname'
 #
-#     Thus one of the hash keys 'Start' and 'End' will have an empty 
+#     Thus one of the hash keys 'Start' and 'End' will have an empty
 #     string value, and the other will have a non-empty string value.
 #     End tags can have attributes too but usually don't.  Parsing is
 #     as per usual in SGML/HTML, in particular:
-#     
+#
 #        - Attribute names are case insensitive (always returned lower case)
 #        - Attribute value may be ''- or ""-delimited, or be a single
 #             alphanumeric word without delimiters, or be nonexistent
@@ -907,7 +907,7 @@ sub parsetag {
 #  Initialise 'Start' and 'End' pseudo-attributes.
 
    my %tag = (Start => '', End => '');
-  
+
 #  Identify tag name, and whether it is starting or ending.
 
    $tag =~ m%<(/?)\s*(\w+)\s*%g

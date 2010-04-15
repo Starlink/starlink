@@ -1,4 +1,4 @@
-      
+
 *+  KFH_DFAINT - Scales image to range mean-s.d. to mean+7*s.d..
       SUBROUTINE KFH_DFAINT(IMAGE,XDIM,YDIM,SCRTCH,BLNKVL,NINTS,STATUS)
 *    Description :

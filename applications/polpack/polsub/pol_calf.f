@@ -41,7 +41,7 @@
 *     NSET = INTEGER (Given)
 *        Number of sorted polarisation sets. Each set contains a maximum
 *        of eight images sorted into polarisation states.
-*     NPOS = INTEGER (Given) 
+*     NPOS = INTEGER (Given)
 *        The number of waveplate positions recorded. This will be 4 for
 *        linear polarimetry and 2 for circular polarimetry.
 *     IPDIN( 8, NSET ) =  (Given)
@@ -126,10 +126,10 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'MSG_PAR'          ! For MSG__ constants
-      
+
 *  Global Variables:
 *      {include_global_variables}...
-      
+
 *  Arguments Given:
       INTEGER NEL
       INTEGER NSET
@@ -143,20 +143,20 @@
       INTEGER MAXIT
       REAL SKYSUP
       CHARACTER * ( * ) IMGID( 4, NSET )
-      
+
 *  Arguments Given and Returned:
 
       REAL FEST( 2 * NSET )
       REAL VFEST( 2 * NSET )
-      
+
 *  Arguments Returned:
       REAL F
       REAL VF
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
-      
+
 *  Local Variables:
       INTEGER NWRK1, NWRK2, NWRK3, NWRK4
                                  ! workspace dimensions
@@ -166,11 +166,11 @@
                                  ! in image intercomparisons
       INTEGER NEST               ! number of valid F factor estimates
       INTEGER ISET, I            ! loop counters
-      
+
       REAL F1, F2, DF1, DF2      ! image scales and errors
       REAL SUM1, SUM2            ! sums for calculating mean F and
                                  ! variance
-      
+
       LOGICAL GETS, GETZ, BAD    ! logical flags
       LOGICAL FLUSHING           ! If we are in verbose mode and flushing
 
@@ -180,7 +180,7 @@
                                  ! scale and zero on final iteration.
 
       CHARACTER * ( 80 ) STRING  ! Output information buffer.
-      
+
 *.
 
 * Check inherited global status.
@@ -197,7 +197,7 @@
       GETS = .TRUE.
       GETZ = .TRUE.
 
-* Assume BAD pixel values are present in all images. 
+* Assume BAD pixel values are present in all images.
 
       BAD = .TRUE.
 
@@ -229,7 +229,7 @@
       CALL PSX_CALLOC( NWRK3, '_REAL', IPWRK3, STATUS )
       CALL PSX_CALLOC( NWRK4, '_REAL', IPWRK4, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
+
 * Loop through the mapped input image sets to perform F factor
 * calculations where possible. Initialise the count of F factor
 * estimates.
@@ -241,11 +241,11 @@
 * images 1->4 must be defined.
 
          IF ( NSTATE( 1 ) .GE. ISET .AND. NSTATE( 2 ) .GE. ISET ) THEN
-         
+
 * Calculate the ratio of the first pair of like `Q' polarisation states,
 * I4/I1.
             NITER = 0
-            CALL CCD1_CMPRR( BAD, VAR, NEL, 
+            CALL CCD1_CMPRR( BAD, VAR, NEL,
      :                       %VAL( CNF_PVAL( IPDIN( 1, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPVIN( 1, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPDIN( 4, ISET ) ) ),
@@ -253,7 +253,7 @@
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
@@ -261,7 +261,7 @@
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
 *  resulting approximate solution will probably be OK, so just annul (or
 *  flush if verbose mode) the error and carry on.
-            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN
                IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
@@ -280,7 +280,7 @@
 * Calculate the ratio of the second pair of like `Q' polarisation
 * states, I2/I3.
             NITER = 0
-            CALL CCD1_CMPRR( BAD, VAR, NEL, 
+            CALL CCD1_CMPRR( BAD, VAR, NEL,
      :                       %VAL( CNF_PVAL( IPDIN( 3, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPVIN( 3, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPDIN( 2, ISET ) ) ),
@@ -288,11 +288,11 @@
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
-            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN
                IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
@@ -357,7 +357,7 @@
                END IF
             ENDIF
          ENDIF
-            
+
 * To calculate the F factor associated with the U images in the data set
 * images 5->8 must be defined.
 
@@ -366,7 +366,7 @@
 * Calculate the ratio of the first pair of like `U' polarisation states,
 * I8/I5.
             NITER = 0
-            CALL CCD1_CMPRR( BAD, VAR, NEL, 
+            CALL CCD1_CMPRR( BAD, VAR, NEL,
      :                       %VAL( CNF_PVAL( IPDIN( 5, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPVIN( 5, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPDIN( 8, ISET ) ) ) ,
@@ -374,11 +374,11 @@
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
-            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN
                IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
@@ -392,12 +392,12 @@
 
             F1 = SNGL( SCALE )
             DF1 = SNGL( DSCALE )
-      
+
 * Calculate the ratio of the second pair of like `U' polarisation
 * states, I6/I7.
 
             NITER = 0
-            CALL CCD1_CMPRR( BAD, VAR, NEL, 
+            CALL CCD1_CMPRR( BAD, VAR, NEL,
      :                       %VAL( CNF_PVAL( IPDIN( 7, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPVIN( 7, ISET ) ) ),
      :                       %VAL( CNF_PVAL( IPDIN( 6, ISET ) ) ),
@@ -405,11 +405,11 @@
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
-            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN
                IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
@@ -475,7 +475,7 @@
          SUM1 = 0.0
          SUM2 = 0.0
          DO I = 1, NEST
-            SUM1 = SUM1 + ( FEST( I ) / MAX( 1.0E-10, VFEST( I ) ) ) 
+            SUM1 = SUM1 + ( FEST( I ) / MAX( 1.0E-10, VFEST( I ) ) )
             SUM2 = SUM2 + ( 1.0 / MAX( 1.0E-10, VFEST( I ) ) )
          ENDDO
          F = SUM1 / SUM2
@@ -488,7 +488,7 @@
      :        '( ''   Mean F factor,'', I3, '' estimates: '', F6.3 )' )
      :        NEST, F
          CALL MSG_OUT( ' ', STRING, STATUS )
-         
+
 * If no estimates were possible then exit with an error and add context.
 
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
@@ -496,7 +496,7 @@
          CALL ERR_REP( 'POL_CALF_NOF', 'POL_CALF: No F factor '//
      :                 'estimates could be made', STATUS )
       ENDIF
-      
+
 * Free workspace.
 
       CALL PSX_FREE( IPWRK1, STATUS )

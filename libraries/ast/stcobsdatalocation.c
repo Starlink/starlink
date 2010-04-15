@@ -11,27 +11,27 @@ c     astStcObsDataLocation
 f     AST_STCOBSDATALOCATION
 
 *  Description:
-*     The StcObsDataLocation class is a sub-class of Stc used to describe 
+*     The StcObsDataLocation class is a sub-class of Stc used to describe
 *     the coordinate space occupied by a particular observational dataset.
 *
 *     See http://hea-www.harvard.edu/~arots/nvometa/STC.html
 *
 *     An STC ObsDataLocation element specifies the extent of the
-*     observation within a specified coordinate system, and also specifies 
+*     observation within a specified coordinate system, and also specifies
 *     the observatory location within a second coordinate system.
 *
-*     The AST StcObsDataLocation class inherits from Stc, and therefore 
-*     an StcObsDataLocation can be used directly as an Stc. When used 
-*     in this way, the StcObsDataLocation describes the location of the 
+*     The AST StcObsDataLocation class inherits from Stc, and therefore
+*     an StcObsDataLocation can be used directly as an Stc. When used
+*     in this way, the StcObsDataLocation describes the location of the
 *     observation (not the observatory).
 *
 *     Eventually, this class will have a method for returning an Stc
-*     describing the observatory location. However, AST currently does not 
-*     include any classes of Frame for describing terrestrial or solar 
-*     system positions. Therefore, the provision for returning observatory 
+*     describing the observatory location. However, AST currently does not
+*     include any classes of Frame for describing terrestrial or solar
+*     system positions. Therefore, the provision for returning observatory
 *     location as an Stc is not yet available. However, for terrestrial
-*     observations, the position of the observatory can still be recorded 
-*     using the ObsLon and ObsLat attributes of the Frame encapsulated 
+*     observations, the position of the observatory can still be recorded
+*     using the ObsLon and ObsLat attributes of the Frame encapsulated
 *     within the Stc representing the observation location (this assumes
 *     the observatory is located at sea level).
 
@@ -56,12 +56,12 @@ f     The StcObsDataLocation class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,12 +121,12 @@ static int class_check;
 /* Pointers to parent class methods which are extended by this class. */
 static int (* parent_getobjsize)( AstObject *, int * );
 
- 
+
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(StcObsDataLocation)
@@ -179,7 +179,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "stcobsdatalocation.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     StcObsDataLocation member function (over-rides the astGetObjSize protected
@@ -260,7 +260,7 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -337,7 +337,7 @@ static void StcSetObs( AstStcObsDataLocation *this, AstPointList *obs, int *stat
 *     void astStcSetObs( AstStcObsDataLocation *this, AstPointList *obs )
 
 *  Class Membership:
-*     StcObsDataLocation virtual function 
+*     StcObsDataLocation virtual function
 
 *  Description:
 *     This function stores a clone of the supplied PointList pointer
@@ -390,7 +390,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 *     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
-*     This function implements the copy constructor for StcObsDataLocation 
+*     This function implements the copy constructor for StcObsDataLocation
 *     objects.
 
 *  Parameters:
@@ -540,7 +540,7 @@ astMAKE_ISA(StcObsDataLocation,Stc)
 astMAKE_CHECK(StcObsDataLocation)
 
 
-AstStcObsDataLocation *astStcObsDataLocation_( void *region_void, int ncoords, 
+AstStcObsDataLocation *astStcObsDataLocation_( void *region_void, int ncoords,
                                AstKeyMap **coords, const char *options, int *status, ...) {
 /*
 *++
@@ -567,7 +567,7 @@ f     RESULT = AST_STCOBSDATALOCATION( REGION, NCOORDS, COORDS, OPTIONS, STATUS 
 *     This function creates a new StcObsDataLocation and optionally initialises its
 *     attributes.
 *
-*     The StcObsDataLocation class is a sub-class of Stc used to describe 
+*     The StcObsDataLocation class is a sub-class of Stc used to describe
 *     the coverage of the datasets contained in some VO resource.
 *
 *     See http://hea-www.harvard.edu/~arots/nvometa/STC.html
@@ -585,22 +585,22 @@ c     coords
 f     COORDS( NCOORDS ) = INTEGER (Given)
 c        Pointer to an array holding "ncoords" AstKeyMap pointers (if "ncoords"
 f        An array holding NCOORDS AstKeyMap pointers (if NCOORDS
-*        is zero, the supplied value is ignored). Each supplied KeyMap 
-*        describes the contents of a single STC <AstroCoords> element, and 
-*        should have elements with keys given by constants AST__STCNAME, 
-*        AST__STCVALUE, AST__STCERROR, AST__STCRES, AST__STCSIZE, 
-*        AST__STCPIXSZ. Any of these elements may be omitted, but no other 
-*        elements should be included. If supplied, the AST__STCNAME element 
-*        should be a vector of character string pointers holding the "Name" 
+*        is zero, the supplied value is ignored). Each supplied KeyMap
+*        describes the contents of a single STC <AstroCoords> element, and
+*        should have elements with keys given by constants AST__STCNAME,
+*        AST__STCVALUE, AST__STCERROR, AST__STCRES, AST__STCSIZE,
+*        AST__STCPIXSZ. Any of these elements may be omitted, but no other
+*        elements should be included. If supplied, the AST__STCNAME element
+*        should be a vector of character string pointers holding the "Name"
 *        item for each axis in the coordinate system represented by
 c        "region".
 f        REGION.
-*        Any other supplied elements should be scalar elements, each  holding 
-*        a pointer to a Region describing the associated item of ancillary 
-*        information (error, resolution, size, pixel size or value). These 
-*        Regions should describe a volume within the coordinate system 
-c        represented by "region". 
-f        represented by REGION. 
+*        Any other supplied elements should be scalar elements, each  holding
+*        a pointer to a Region describing the associated item of ancillary
+*        information (error, resolution, size, pixel size or value). These
+*        Regions should describe a volume within the coordinate system
+c        represented by "region".
+f        represented by REGION.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -629,7 +629,7 @@ f     AST_STCOBSDATALOCATION = INTEGER
 
 *  Notes:
 *     - A deep copy is taken of the supplied Region. This means that
-*     any subsequent changes made to the encapsulated Region using the 
+*     any subsequent changes made to the encapsulated Region using the
 *     supplied pointer will have no effect on the Stc.
 *     - A null Object pointer (AST__NULL) will be returned if this
 c     function is invoked with the AST error status set, or if it
@@ -678,7 +678,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords, 
+AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
                                AstKeyMap **coords, const char *options, ... ) {
 /*
 *  Name:
@@ -779,8 +779,8 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
    return astMakeId( new );
 }
 
-AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size, 
-                                    int init, AstStcObsDataLocationVtab *vtab, 
+AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size,
+                                    int init, AstStcObsDataLocationVtab *vtab,
                                     const char *name, AstRegion *region,
                                     int ncoords, AstKeyMap **coords, int *status ) {
 /*
@@ -796,8 +796,8 @@ AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size,
 
 *  Synopsis:
 *     #include "stcobsdatalocation.h"
-*     AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size, 
-*                                    int init, AstStcObsDataLocationVtab *vtab, 
+*     AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size,
+*                                    int init, AstStcObsDataLocationVtab *vtab,
 *                                    const char *name, AstRegion *region,
 *                                    int ncoords, AstKeyMap **coords )
 
@@ -845,17 +845,17 @@ AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size,
 *        Ignored if "coords" is NULL.
 *     coords
 *        Pointer to an array of "ncoords" KeyMap pointers, or NULL if
-*        "ncoords" is zero. Each KeyMap defines defines a single <AstroCoords> 
-*        element, and should have elements with keys given by constants 
+*        "ncoords" is zero. Each KeyMap defines defines a single <AstroCoords>
+*        element, and should have elements with keys given by constants
 *        AST__STCNAME, AST__STCVALUE, AST__STCERROR, AST__STCRES, AST__STCSIZE,
-*        AST__STCPIXSZ. These elements hold values for the corresponding 
-*        components of the STC AstroCoords element. Any of these elements may 
-*        be omitted, but no other elements should be included. All supplied 
-*        elements should be vector elements, with vector length less than or 
-*        equal to the number of axes in the supplied Region. The data type of 
-*        all elements should be "double", except for AST__STCNAME which should 
+*        AST__STCPIXSZ. These elements hold values for the corresponding
+*        components of the STC AstroCoords element. Any of these elements may
+*        be omitted, but no other elements should be included. All supplied
+*        elements should be vector elements, with vector length less than or
+*        equal to the number of axes in the supplied Region. The data type of
+*        all elements should be "double", except for AST__STCNAME which should
 *        be "character string". If no value is available for a given axis, then
-*        AST__BAD (or NULL for the AST__STCNAME element) should be stored in 
+*        AST__BAD (or NULL for the AST__STCNAME element) should be stored in
 *        the vector at the index corresponding to the axis (trailing axes
 *        can be omitted completely from the KeyMap).
 
@@ -894,7 +894,7 @@ AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size,
    return new;
 }
 
-AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstStcObsDataLocationVtab *vtab, 
+AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstStcObsDataLocationVtab *vtab,
                                                    const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -909,7 +909,7 @@ AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstSt
 
 *  Synopsis:
 *     #include "stcobsdatalocation.h"
-*     AstStcObsDataLocation *astLoadStcObsDataLocation( void *mem, size_t size, AstStcObsDataLocationVtab *vtab, 
+*     AstStcObsDataLocation *astLoadStcObsDataLocation( void *mem, size_t size, AstStcObsDataLocationVtab *vtab,
 *                                       const char *name, AstChannel *channel )
 
 *  Class Membership:

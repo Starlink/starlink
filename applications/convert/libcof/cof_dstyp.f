@@ -82,7 +82,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,7 +129,7 @@
       FSTAT = FITSOK
 
 *  Initialise the returned data type.
-      TYPE = ' '      
+      TYPE = ' '
 
 *  Obtain the values of the scale and offset keywords.
 *  ===================================================
@@ -184,7 +184,7 @@
             IF ( FSTAT .GT. FITSOK ) THEN
                BUFFER = 'Error obtaining the string value of keyword '/
      :                  /ZERKEY
-      
+
                CALL COF_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY',
      :                         BUFFER, STATUS )
                GOTO 999

@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Find the next token in the control string.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -53,15 +53,15 @@
 
 *   Import:
       BYTE CNTRL(MAXTOK)    ! cntrl string
- 
+
       INTEGER LAST          ! last character position
- 
+
 *   Import/Export:
       INTEGER FIRST         ! first character in CNTRL
- 
+
 *   Export:
       INTEGER TYPE          ! token type index
- 
+
       BYTE TOKEN(MAXTOK)    ! token string
 
       IF (FIRST.EQ.LAST) THEN

@@ -90,7 +90,7 @@
       INCLUDE 'gns.cmn'
       INCLUDE 'GNS_ERR'
       INTEGER STATUS
-      
+
       LOGICAL OPEN
       INTEGER NDELS, LREC, IREC(RECSIZ), IOERR
       PARAMETER (LREC = 134, NDELS = 6)
@@ -198,7 +198,7 @@
      :                          STATUS )
                   GO TO 70
                END IF
-      
+
                IF (IDEL(2)-IDEL(1).GT.1) THEN
                   READ (UNIT=REC(IDEL(1):IDEL(2)-2), FMT='(I99)',
      :               IOSTAT=IOERR) ITYPES(I)
@@ -216,13 +216,13 @@
      :                          STATUS )
                   GO TO 70
                END IF
-      
+
                IF (IDEL(3)-IDEL(2).GT.1) THEN
                   VMSNAM(I) = REC(IDEL(2):IDEL(3)-2)
                ELSE
                   VMSNAM(I) = ' '
                END IF
-      
+
                IF (IDEL(4)-IDEL(3).GT.1) THEN
                   WSDESC(I) = REC(IDEL(3):IDEL(4)-2)
                   LDESC(I) = IDEL(4) - IDEL(3) - 1
@@ -271,15 +271,15 @@
                   INQUIRE (UNIT=LUNGKS, OPENED=LUNOPN)
                   GO TO 80
                END IF
-         
+
 *           Open the workstation description file
                CALL GNS_1FNDF('GKS', 'DEVICES', DEVFNG)
-               OPEN (UNIT=LUNGKS, FILE=DEVFNG, STATUS='OLD', 
+               OPEN (UNIT=LUNGKS, FILE=DEVFNG, STATUS='OLD',
      :              RECL=RECLEN,
 #if HAVE_FC_OPEN_READONLY
      :              READONLY,
 #endif
-     :              ACCESS='DIRECT', 
+     :              ACCESS='DIRECT',
      :               FORM='UNFORMATTED', ERR=100)
 
 *           Save the file name returned by INQUIRE
@@ -316,14 +316,14 @@
   120 CONTINUE
       STATUS = GNS__DBINV
       CALL EMS_REP( 'GNS_1INITG_DBN3',
-     :              'GNS names database file has invalid format (0)', 
+     :              'GNS names database file has invalid format (0)',
      :              STATUS )
       CLOSE (UNIT=LUNGKS)
       GO TO 999
   110 CONTINUE
       STATUS = GNS__DBINV
       CALL EMS_REP( 'GNS_1INITG_DBN3',
-     :              'GNS devices database file has invalid format (0)', 
+     :              'GNS devices database file has invalid format (0)',
      :              STATUS )
       CLOSE (UNIT=LUNGKS)
   999 CONTINUE
@@ -333,4 +333,4 @@
          CALL EMS_REP( 'GNS_INITG_NAMESFILE',
      :                 'GNS names database: ^FILENAME', STATUS )
       END IF
-      END       
+      END

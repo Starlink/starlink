@@ -1,5 +1,5 @@
 
-c   this is the first version of FFIELD (find field)                            
+c   this is the first version of FFIELD (find field)
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       PROGRAM FFIELD
       real      epoch, myeqnx, olon, olat
@@ -25,11 +25,11 @@ c    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 c    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
       data  myeqnx /1950./, mycs   /'equd'/
       data  unlstd /'unlstd'/, ecs /'ecl'/
-      data  epoch  /1950./                   
-      data  plates /'cmdd'/ 
+      data  epoch  /1950./
+      data  plates /'cmdd'/
       data online / 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
      + 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-     + 30, 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 
+     + 30, 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48,
      + 49, 50, 51, 52, 53, 54, 55, 68, 69, 70, 71, 72, 73, 74, 75,
      + 76, 77, 78, 79, 80, 98, 99, 100, 101, 102, 103, 104, 105,
      + 106, 107, 133, 134, 135, 136, 137, 138, 293, 294, 295, 296,
@@ -51,12 +51,12 @@ c---------------------------------------------
       print*,'-----------------------------------------------'
   720 print*,' Specify the coordinate system you wish to use:'
       print*,'                1 - Equatorial Degrees'
-      print*,'                2 - Sexigesimal '        
+      print*,'                2 - Sexigesimal '
       print*,'                3 - Ecliptic Degrees'
       print*,'                4 - Galactic Degrees'
-      write(*,899)                          
+      write(*,899)
   899 format(' Enter your selection (from 1 to 4)=========>',$)
-      read(*,301) ans 
+      read(*,301) ans
   301 format(a1)
       if (ans .EQ. '1' .OR. ans .EQ. '2' .OR. ans .EQ. '3'
      +    .OR. ans .EQ. '4') then
@@ -66,7 +66,7 @@ c---------------------------------------------
 	   go to 720
       endif
       if (isys .EQ. 1 .OR. isys .EQ. 2) then
-  352    write(*,901)                                         
+  352    write(*,901)
   901    format(' Specify the equinox of your position ======>',$)
 	 read(*,302,err=803)  epoch
   302    format(f10.0)
@@ -90,17 +90,17 @@ c---------------------------------------------
 	 read(*,303) clat
       endif
       if (isys .NE. 2) then
-	write(*,902)                              
+	write(*,902)
   902   format(' Enter longitude in degrees ================>',$)
 	read(*,303) clon
   303   format(a18)
-	write(*,903)                              
+	write(*,903)
   903   format(' Enter latitude  in degrees ================>',$)
 	read(*,303) clat
-        ilen = INDEX(clon,' ') 
+        ilen = INDEX(clon,' ')
         jlen = INDEX(clon,'.')
         if(jlen .EQ. 0) clon(ilen:ilen) = '.'
-        ilen = INDEX(clat,' ') 
+        ilen = INDEX(clat,' ')
         jlen = INDEX(clat,'.')
         if(jlen .EQ. 0) clat(ilen:ilen) = '.'
       endif
@@ -111,23 +111,23 @@ c
       do 543 j=1,18
 	if (clon(j:j) .NE. ' ') len =j
   543 continue
-      lonl = len   
+      lonl = len
       do 544 j=1,18
 	if (clat(j:j) .NE. ' ') len =j
   544 continue
-      latl = len   
+      latl = len
 
       posn = clon(1:lonl) // ';' // clat(1:latl)
-      if (isys .EQ. 1) coord = 'equd'   
+      if (isys .EQ. 1) coord = 'equd'
       if (isys .EQ. 2) coord = 'equs'
       if (isys .EQ. 3) coord = 'ecl '
       if (isys .EQ. 4) coord = 'gal '
       call gic(coord,epoch,posn,mycs,myeqnx,olon,olat,cra,cdec,ierr)
       print*,'======================================================='
       print*,'Input Coordinates:'
-      write(*,907) clon,clat,coord,epoch                 
+      write(*,907) clon,clat,coord,epoch
   907 format(3x,a15,2x,a15,'  (',a4,f8.2,')')
-      write(*,905) cra,cdec                  
+      write(*,905) cra,cdec
   905 format(2x,a15,2x,a15,'   (equatorial 1950.00)')
       write(*,906) olon,olat
   906 format(f10.3,6x,f10.3,'           (equatorial 1950.00)')
@@ -138,7 +138,7 @@ c--------------------------------------------
       call gic(coord,epoch,posn,ecs,myeqnx,elon,elat,cra,cdec,ierr)
 c
       if (ierr.eq.0) goto 1100
-      write (*,51) 
+      write (*,51)
       goto 1500
 1100  continue
       iptype=2
@@ -174,7 +174,7 @@ c-----loop over all posible plates
 822   continue
       write(*,823)
   823 format(' Enter another position? (y/n)==============>',$)
-      read(*,821) ans 
+      read(*,821) ans
   821 format(a1)
       if (ans .EQ. 'y') go to 816
       if (ans .EQ. 'n') go to 1500
@@ -620,7 +620,7 @@ c
 c
       return
       end
-c- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+c- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 c-gic
 c
        subroutine gic(cs,epoch,posn,mycs,myepoc,olon,olat,cra,cdec,
@@ -865,13 +865,13 @@ c
           sec = tsec - hr*10000. - min*100.
       else
 c-------
-      ilen = INDEX(tmph,' ') 
+      ilen = INDEX(tmph,' ')
       jlen = INDEX(tmph,'.')
       if(jlen .EQ. 0) tmph(ilen:ilen) = '.'
-      ilen = INDEX(tmpm,' ') 
+      ilen = INDEX(tmpm,' ')
       jlen = INDEX(tmpm,'.')
       if(jlen .EQ. 0) tmpm(ilen:ilen) = '.'
-      ilen = INDEX(tmps,' ') 
+      ilen = INDEX(tmps,' ')
       jlen = INDEX(tmps,'.')
       if(jlen .EQ. 0) tmps(ilen:ilen) = '.'
           read(tmph, '(f20.0)') hr
@@ -972,7 +972,7 @@ c
 c
 c     If There the Number is Too Big, Assume +ddmmss.s
 c
-      ilen = INDEX(tmps,' ') 
+      ilen = INDEX(tmps,' ')
       jlen = INDEX(tmps,'.')
       if(jlen .EQ. 0) tmps(ilen:ilen) = '.'
       read(tmps,'(f20.0)') sec
@@ -983,13 +983,13 @@ c
           min = aint((tsec - deg*10000.) / 100.)
           sec = tsec - deg*10000. - min*100.
       else
-      ilen = INDEX(tmpd,' ') 
+      ilen = INDEX(tmpd,' ')
       jlen = INDEX(tmpd,'.')
       if(jlen .EQ. 0) tmpd(ilen:ilen) = '.'
-      ilen = INDEX(tmpm,' ') 
+      ilen = INDEX(tmpm,' ')
       jlen = INDEX(tmpm,'.')
       if(jlen .EQ. 0) tmpm(ilen:ilen) = '.'
-      ilen = INDEX(tmps,' ') 
+      ilen = INDEX(tmps,' ')
       jlen = INDEX(tmps,'.')
       if(jlen .EQ. 0) tmps(ilen:ilen) = '.'
           read(tmpd, '(f20.0)') deg
@@ -1147,464 +1147,464 @@ c
    20 return
       end
 
-      subroutine eclequ(xlam,beta,rad,decd)                             
+      subroutine eclequ(xlam,beta,rad,decd)
 c 16jun86 jdb  cdc double precision version of eclequ.
 c   probably will not be needed. in file declequ_f.
 c 22mar85 for hepvax (changed darsin to dasin)
-c jdb  22jan81,28jan81,29jan81  08apr81 to speed routine up a bit.      
-c ecliptic to 1950. equatorial coordinate subroutine                    
-c                                                                       
-c  epsilon = e = 23deg26'44.84"     equations from j.fowler             
-c                                                                       
-c inputs: xlam=lambda=ecliptic longitude in degrees (single prec.)      
-c                     (0 - 360 deg)                                     
-c                                                                       
-c         beta= ecliptic latitude in degrees (single prec.)             
-c                      (-90. to +90. deg)                               
-c  xl = sin(beta)              xe = xl*cos(e) - yl*sin(e)               
-c  yl = -cos(beta)*sin(lambda) ye = xl*sin(e) + yl*cos(e)               
-c  zl = cos(beta)*cos(lambda)  ze = zl                                  
-c                                                                       
-c  outputs: rad ra in degrees; decd dec in degrees. (single prec.)      
-c                                                                       
-cc    real*8 darsin (required statement for series/1 only)              
+c jdb  22jan81,28jan81,29jan81  08apr81 to speed routine up a bit.
+c ecliptic to 1950. equatorial coordinate subroutine
+c
+c  epsilon = e = 23deg26'44.84"     equations from j.fowler
+c
+c inputs: xlam=lambda=ecliptic longitude in degrees (single prec.)
+c                     (0 - 360 deg)
+c
+c         beta= ecliptic latitude in degrees (single prec.)
+c                      (-90. to +90. deg)
+c  xl = sin(beta)              xe = xl*cos(e) - yl*sin(e)
+c  yl = -cos(beta)*sin(lambda) ye = xl*sin(e) + yl*cos(e)
+c  zl = cos(beta)*cos(lambda)  ze = zl
+c
+c  outputs: rad ra in degrees; decd dec in degrees. (single prec.)
+c
+cc    real*8 darsin (required statement for series/1 only)
       double precision dtor,rtod,cosb,cosl,sinb,sinl,xl,yl,zl,
-     1 xe,ye,ze,cose,sine,xlamr,betar,rar,decr                          
-c                                                                       
-      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/        
-      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/        
-c                                                                       
-      xlamr = dble(xlam)*dtor                                           
-      betar = dble(beta)*dtor                                           
-c                                                                       
-      cosb = dcos(betar)                                                
-      cosl = dcos(xlamr)                                                
-      sinb = dsin(betar)                                                
-      sinl = dsin(xlamr)                                                
-c                                                                       
-      xl = sinb                                                         
-      yl = -(cosb*sinl)                                                 
-      zl = cosb*cosl                                                    
-c                                                                       
-      xe = cose*xl - sine*yl                                            
-      ye = sine*xl + cose*yl                                            
-      ze = zl                                                           
-c                                                                       
-      if(dabs(xe) .gt. 1.d0) xe = dsign(1.0d0,xe)                       
-cc    decr = darsin(xe)                                                 
-      decr =  dasin(xe)                                                 
-c     if(dabs(ze) .gt. 1.d0) ze = dsign(1.0d0,ze) do not need these     
-c     if(dabs(ye) .gt. 1.d0) ye = dsign(1.0d0,ye) ..2 statements.       
-      rar = datan2(-ye,ze)                                              
-c                                                                       
-      rad = rar * rtod                                                  
-      if(rad .lt. 0.) rad = 360. + rad                                  
-      decd = decr * rtod                                                
-      return                                                            
-c                                                                       
-      end                                                               
+     1 xe,ye,ze,cose,sine,xlamr,betar,rar,decr
+c
+      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/
+      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/
+c
+      xlamr = dble(xlam)*dtor
+      betar = dble(beta)*dtor
+c
+      cosb = dcos(betar)
+      cosl = dcos(xlamr)
+      sinb = dsin(betar)
+      sinl = dsin(xlamr)
+c
+      xl = sinb
+      yl = -(cosb*sinl)
+      zl = cosb*cosl
+c
+      xe = cose*xl - sine*yl
+      ye = sine*xl + cose*yl
+      ze = zl
+c
+      if(dabs(xe) .gt. 1.d0) xe = dsign(1.0d0,xe)
+cc    decr = darsin(xe)
+      decr =  dasin(xe)
+c     if(dabs(ze) .gt. 1.d0) ze = dsign(1.0d0,ze) do not need these
+c     if(dabs(ye) .gt. 1.d0) ye = dsign(1.0d0,ye) ..2 statements.
+      rar = datan2(-ye,ze)
+c
+      rad = rar * rtod
+      if(rad .lt. 0.) rad = 360. + rad
+      decd = decr * rtod
+      return
+c
+      end
 
-      subroutine eclgal(xlam,beta,xlg,xbg)                              
+      subroutine eclgal(xlam,beta,xlg,xbg)
 c 16jun86 jdb.  cdc/ve double precision version of eclgal
 c   probably will not be needed on cdc. stored in declgal_f.
 c
 c 22mar85 for hepvax (changed darsin to dasin)
-c jdb  04jun81  ecliptic to galactic coordinate conversion              
-c inputs: xlam is ecl.long in degrees;beta is ecl.lat in degrees.       
-c outputs:xlg is gal.long in degrees;xbg is gal.lat in degrees.         
-c   all subroutine arguments single precision.                          
-c                                                                       
-c note: statements w/ cc**** are kept here for comparison w/ the        
-c  individual subroutines that this one is based on.                    
-c                                                                       
-c 1st section based on ecliptic to equatorial coordinate subroutine     
-c    eclequ.  2nd based on equ to gal subroutine galcor.                
-c                                                                       
-c  epsilon = e = 23deg26'44.84"  equations for ecl. conv. from j.fowler 
-c                                                                       
-c inputs: xlam=lambda=ecliptic longitude in degrees (single prec.)      
-c                     (0 - 360 deg)                                     
-c                                                                       
-c         beta= ecliptic latitude in degrees (single prec.)             
-c                      (-90. to +90. deg)                               
-c  xl = sin(beta)              xe = xl*cos(e) - yl*sin(e)               
-c  yl = -cos(beta)*sin(lambda) ye = xl*sin(e) + yl*cos(e)               
-c  zl = cos(beta)*cos(lambda)  ze = zl                                  
-c                                                                       
-compute equatorial from ecliptic  (section 1)                           
-c                                                                       
-cc    real*8 darsin (required statement for series/1 only)              
+c jdb  04jun81  ecliptic to galactic coordinate conversion
+c inputs: xlam is ecl.long in degrees;beta is ecl.lat in degrees.
+c outputs:xlg is gal.long in degrees;xbg is gal.lat in degrees.
+c   all subroutine arguments single precision.
+c
+c note: statements w/ cc**** are kept here for comparison w/ the
+c  individual subroutines that this one is based on.
+c
+c 1st section based on ecliptic to equatorial coordinate subroutine
+c    eclequ.  2nd based on equ to gal subroutine galcor.
+c
+c  epsilon = e = 23deg26'44.84"  equations for ecl. conv. from j.fowler
+c
+c inputs: xlam=lambda=ecliptic longitude in degrees (single prec.)
+c                     (0 - 360 deg)
+c
+c         beta= ecliptic latitude in degrees (single prec.)
+c                      (-90. to +90. deg)
+c  xl = sin(beta)              xe = xl*cos(e) - yl*sin(e)
+c  yl = -cos(beta)*sin(lambda) ye = xl*sin(e) + yl*cos(e)
+c  zl = cos(beta)*cos(lambda)  ze = zl
+c
+compute equatorial from ecliptic  (section 1)
+c
+cc    real*8 darsin (required statement for series/1 only)
       double precision dtor,rtod,cosb,cosl,sinb,sinl,xl,yl,zl,
-     1 xe,ye,ze,cose,sine,xlamr,betar,rar,decr                          
+     1 xe,ye,ze,cose,sine,xlamr,betar,rar,decr
       double precision cosa,sina,cosd,x,y,z,eq2,eq3,xbr,xlr
-      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/        
-      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/        
-c                                                                       
-c                                                                       
-      xlamr = dble(xlam)*dtor                                           
-      betar = dble(beta)*dtor                                           
-c                                                                       
-      cosb = dcos(betar)                                                
-      cosl = dcos(xlamr)                                                
-      sinb = dsin(betar)                                                
-      sinl = dsin(xlamr)                                                
-c                                                                       
-      xl = sinb                                                         
-      yl = -(cosb*sinl)                                                 
-      zl = cosb*cosl                                                    
-c                                                                       
-      xe = cose*xl - sine*yl                                            
-      ye = sine*xl + cose*yl                                            
-      ze = zl                                                           
-c                                                                       
-      if(dabs(xe) .gt. 1.d0) xe = dsign(1.0d0,xe)                       
-cc    decr = darsin(xe)                                                 
-      decr =  dasin(xe)                                                 
-c     if(dabs(ze) .gt. 1.d0) ze = dsign(1.0d0,ze)                       
-c     if(dabs(ye) .gt. 1.d0) ye = dsign(1.0d0,ye)                       
-c     if(dabs(ze) .gt. 1.d0) write(10,2001) ze,ye                       
-c     if(dabs(ye) .gt. 1.d0) write(10,2001) ze,ye                       
-c2001 format(1x,'ze,ye=',2f12.5,' abs val > 1.')                        
-      rar = datan2(-ye,ze)                                              
-c                                                                       
-cc****rad = rar * rtod                                                  
-cc****if(rad .lt. 0.) rad = 360. + rad                                  
-c                                                                       
-cc****decd = decr * rtod                                                
-c                                                                       
-c compute galactic  from equatorial  (section 2)                        
-c        equations for gal. conversion from t. soifer.                  
-c                                                                       
-c inputs: rar ra in radians, decr is dec in radians. double precision.  
-c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360) 
-c  x = cos(alpha)*cos(delta)                                            
-c  y = sin(alpha)*cos(delta)                                            
-c  z = sin(delta)                                                       
-c  eq1 = sin(b) = -.8676*x - .1884*y + .4602*z                          
-c  eq2 = cos(b)*cos(l) = -.0669*x - .8728*y - .4835*z                   
-c  eq3 = cos(b)*sin(l) = +.4927*x - .4503*y + .7446*z                   
-c    b = arsin(sin(b))                                                  
-c  cos(b) = sqrt(1.-sin(b)*sin(b))                                      
-c  cos(l) = eq2/cos(b)                                                  
-c  sin(l) = eq3/cos(b)                                                  
-c  l = atan2(sin(l)/cos(l): if(l.lt.0) l = l+2*pi if radians.           
-c                                                                       
-c note: variable names cosb,sinb,cosl,sinl reused in this section,but   
-c  with different meanings than previous section.                       
-c                                                                       
-      cosa = dcos(rar)                                                  
-      sina = dsin(rar)                                                  
-c     note: xe is dsin(decr) already                                    
-cc****z = dsin(decr)                                                    
-      cosd = dcos(decr)                                                 
-      z    = xe                                                         
-      x = cosa*cosd                                                     
-      y = sina*cosd                                                     
-      sinb = -.86760082d0*x - .18837460d0*y + .46019979d0*z             
-      if(dabs(sinb).lt.1.d0) go to 2                                    
-      sinb = dsign(1.d0,sinb)                                           
-cc    xbr = darsin(sinb)                                                
-      xbr =  dasin(sinb)                                                
-      xlr = 0.d0                                                        
-      go to 3                                                           
-    2 eq2  = -.06698874d0*x - .87275577d0*y - .48353892d0*z             
-      eq3  = +.49272847d0*x - .45034696d0*y + .74458464d0*z             
-cc    xbr = darsin(sinb)                                                
-      xbr =  dasin(sinb)                                                
-      cosb = dsqrt(1.d0-sinb*sinb)                                      
-      cosl = eq2/cosb                                                   
-      sinl = eq3/cosb                                                   
-      if(dabs(cosl).gt.1.d0) cosl = dsign(1.d0,cosl)                    
-      if(dabs(sinl).gt.1.d0) sinl = dsign(1.d0,sinl)                    
-      xlr = datan2(sinl,cosl)                                           
-    3 xlg = xlr * rtod                                                  
-      if(xlg .lt. 0.) xlg = 360. + xlg                                  
-      xbg = xbr * rtod                                                  
-      return                                                            
-c                                                                       
-      end                                                               
+      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/
+      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/
+c
+c
+      xlamr = dble(xlam)*dtor
+      betar = dble(beta)*dtor
+c
+      cosb = dcos(betar)
+      cosl = dcos(xlamr)
+      sinb = dsin(betar)
+      sinl = dsin(xlamr)
+c
+      xl = sinb
+      yl = -(cosb*sinl)
+      zl = cosb*cosl
+c
+      xe = cose*xl - sine*yl
+      ye = sine*xl + cose*yl
+      ze = zl
+c
+      if(dabs(xe) .gt. 1.d0) xe = dsign(1.0d0,xe)
+cc    decr = darsin(xe)
+      decr =  dasin(xe)
+c     if(dabs(ze) .gt. 1.d0) ze = dsign(1.0d0,ze)
+c     if(dabs(ye) .gt. 1.d0) ye = dsign(1.0d0,ye)
+c     if(dabs(ze) .gt. 1.d0) write(10,2001) ze,ye
+c     if(dabs(ye) .gt. 1.d0) write(10,2001) ze,ye
+c2001 format(1x,'ze,ye=',2f12.5,' abs val > 1.')
+      rar = datan2(-ye,ze)
+c
+cc****rad = rar * rtod
+cc****if(rad .lt. 0.) rad = 360. + rad
+c
+cc****decd = decr * rtod
+c
+c compute galactic  from equatorial  (section 2)
+c        equations for gal. conversion from t. soifer.
+c
+c inputs: rar ra in radians, decr is dec in radians. double precision.
+c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360)
+c  x = cos(alpha)*cos(delta)
+c  y = sin(alpha)*cos(delta)
+c  z = sin(delta)
+c  eq1 = sin(b) = -.8676*x - .1884*y + .4602*z
+c  eq2 = cos(b)*cos(l) = -.0669*x - .8728*y - .4835*z
+c  eq3 = cos(b)*sin(l) = +.4927*x - .4503*y + .7446*z
+c    b = arsin(sin(b))
+c  cos(b) = sqrt(1.-sin(b)*sin(b))
+c  cos(l) = eq2/cos(b)
+c  sin(l) = eq3/cos(b)
+c  l = atan2(sin(l)/cos(l): if(l.lt.0) l = l+2*pi if radians.
+c
+c note: variable names cosb,sinb,cosl,sinl reused in this section,but
+c  with different meanings than previous section.
+c
+      cosa = dcos(rar)
+      sina = dsin(rar)
+c     note: xe is dsin(decr) already
+cc****z = dsin(decr)
+      cosd = dcos(decr)
+      z    = xe
+      x = cosa*cosd
+      y = sina*cosd
+      sinb = -.86760082d0*x - .18837460d0*y + .46019979d0*z
+      if(dabs(sinb).lt.1.d0) go to 2
+      sinb = dsign(1.d0,sinb)
+cc    xbr = darsin(sinb)
+      xbr =  dasin(sinb)
+      xlr = 0.d0
+      go to 3
+    2 eq2  = -.06698874d0*x - .87275577d0*y - .48353892d0*z
+      eq3  = +.49272847d0*x - .45034696d0*y + .74458464d0*z
+cc    xbr = darsin(sinb)
+      xbr =  dasin(sinb)
+      cosb = dsqrt(1.d0-sinb*sinb)
+      cosl = eq2/cosb
+      sinl = eq3/cosb
+      if(dabs(cosl).gt.1.d0) cosl = dsign(1.d0,cosl)
+      if(dabs(sinl).gt.1.d0) sinl = dsign(1.d0,sinl)
+      xlr = datan2(sinl,cosl)
+    3 xlg = xlr * rtod
+      if(xlg .lt. 0.) xlg = 360. + xlg
+      xbg = xbr * rtod
+      return
+c
+      end
 
-      subroutine equecl(rad,decd,xlam,beta)                             
-c  1950. equatorial to ecliptic conversion coordinate subroutine        
-c                                                                       
-c  epsilon = e = 23deg26'44.84"     equations from j.fowler             
-c                                                                       
-c inputs: rad ra in degrees; decd dec in degrees. (single prec.)        
-c                                                                       
-c returned: xlam=lambda=ecliptic longitude in degrees (single prec.)    
-c                     (0 - 360 deg)                                     
-c                                                                       
-c         beta= ecliptic latitude in degrees (single prec.)             
-c                      (-90. to +90. deg)                               
-c  xe = sin(dec)              xl = xe*cos(e) - ye*sin(e)                
-c  ye = -cos(dec)*sin(ra)     yl = xe*sin(e) + ye*cos(e)                
-c  ze = cos(dec)*cos(ra)      zl = ze                                   
-c                                                                       
-cc    real*8 darsin  (needed for series/1 only)                         
+      subroutine equecl(rad,decd,xlam,beta)
+c  1950. equatorial to ecliptic conversion coordinate subroutine
+c
+c  epsilon = e = 23deg26'44.84"     equations from j.fowler
+c
+c inputs: rad ra in degrees; decd dec in degrees. (single prec.)
+c
+c returned: xlam=lambda=ecliptic longitude in degrees (single prec.)
+c                     (0 - 360 deg)
+c
+c         beta= ecliptic latitude in degrees (single prec.)
+c                      (-90. to +90. deg)
+c  xe = sin(dec)              xl = xe*cos(e) - ye*sin(e)
+c  ye = -cos(dec)*sin(ra)     yl = xe*sin(e) + ye*cos(e)
+c  ze = cos(dec)*cos(ra)      zl = ze
+c
+cc    real*8 darsin  (needed for series/1 only)
       double precision dtor,rtod,cosd,cosr,sind,sinr,xl,yl,zl,
-     1 xe,ye,ze,cose,sine,xlamr,betar,rar,decr                          
-c                                                                       
-      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/        
-      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/        
-c                                                                       
-      rar = dble(rad)*dtor                                              
-      decr = dble(decd)*dtor                                            
-c                                                                       
-      cosd = dcos(decr)                                                 
-      cosr = dcos(rar)                                                  
-      sind = dsin(decr)                                                 
-      sinr = dsin(rar)                                                  
-c                                                                       
-      xe = sind                                                         
-      ye = -(cosd*sinr)                                                 
-      ze = cosd*cosr                                                    
-c                                                                       
-      xl = cose*xe + sine*ye                                            
-      yl = -sine*xe + cose*ye                                           
-      zl = ze                                                           
-c                                                                       
-      if(dabs(xl) .gt. 1.d0) xl = dsign(1.0d0,xl)                       
-cc    betar = darsin(xl)                                                
-      betar =  dasin(xl)                                                
-c     if(dabs(zl) .gt. 1.d0) zl = dsign(1.0d0,zl) do not need these 2   
-c     if(dabs(yl) .gt. 1.d0) yl = dsign(1.0d0,yl) .. statements.        
-      xlamr = datan2(-yl,zl)                                            
-c                                                                       
-      xlam = xlamr * rtod                                               
-      if(xlam .lt. 0.) xlam = 360. + xlam                               
-      beta = betar * rtod                                               
-      return                                                            
-c                                                                       
-      end                                                               
+     1 xe,ye,ze,cose,sine,xlamr,betar,rar,decr
+c
+      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/
+      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/
+c
+      rar = dble(rad)*dtor
+      decr = dble(decd)*dtor
+c
+      cosd = dcos(decr)
+      cosr = dcos(rar)
+      sind = dsin(decr)
+      sinr = dsin(rar)
+c
+      xe = sind
+      ye = -(cosd*sinr)
+      ze = cosd*cosr
+c
+      xl = cose*xe + sine*ye
+      yl = -sine*xe + cose*ye
+      zl = ze
+c
+      if(dabs(xl) .gt. 1.d0) xl = dsign(1.0d0,xl)
+cc    betar = darsin(xl)
+      betar =  dasin(xl)
+c     if(dabs(zl) .gt. 1.d0) zl = dsign(1.0d0,zl) do not need these 2
+c     if(dabs(yl) .gt. 1.d0) yl = dsign(1.0d0,yl) .. statements.
+      xlamr = datan2(-yl,zl)
+c
+      xlam = xlamr * rtod
+      if(xlam .lt. 0.) xlam = 360. + xlam
+      beta = betar * rtod
+      return
+c
+      end
 
-      subroutine equgal(rad,decd,xl,xb)                                 
+      subroutine equgal(rad,decd,xl,xb)
 c 16jun86 jdb. a double precision vers. for cdc/ve (probably will not be
 c   necessary). will be stored in dequgal_f. real*8 changed to double pr
 c
 c 22mar85 for hepvax (darsin changed to dasin;entry galcor removed)
-cc    entry galcor(rad,decd,xl,xb)                                      
-c 17mar82 updated for more sensible name- equgal, while retaining       
-c     alias for old name of galcor.                                     
-c 02oct80 jdb:subroutine to compute galactic coords from earth          
-c  equatorial coords.29jan81 for more places in dtor,rtod.22apr81       
-c inputs: rad ra in degrees, decd is dec in degrees.  single precision. 
-c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360) 
-c  x = cos(alpha)*cos(delta)                                            
-c  y = sin(alpha)*cos(delta)                                            
-c  z = sin(delta)                                                       
-c  eq1 = sin(b) = -.8676*x - .1884*y + .4602*z                          
-c  eq2 = cos(b)*cos(l) = -.0669*x - .8728*y - .4835*z                   
-c  eq3 = cos(b)*sin(l) = +.4927*x - .4503*y + .7446*z                   
-c    b = arsin(sin(b))                                                  
-c  cos(b) = sqrt(1.-sin(b)*sin(b))                                      
-c  cos(l) = eq2/cos(b)                                                  
-c  sin(l) = eq3/cos(b)                                                  
-c  l = atan2(sin(l)/cos(l): if(l.lt.0) l = l+2*pi if radians.           
-c                                                                       
-cc    real*8 darsin  (required for series/1 only)                       
+cc    entry galcor(rad,decd,xl,xb)
+c 17mar82 updated for more sensible name- equgal, while retaining
+c     alias for old name of galcor.
+c 02oct80 jdb:subroutine to compute galactic coords from earth
+c  equatorial coords.29jan81 for more places in dtor,rtod.22apr81
+c inputs: rad ra in degrees, decd is dec in degrees.  single precision.
+c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360)
+c  x = cos(alpha)*cos(delta)
+c  y = sin(alpha)*cos(delta)
+c  z = sin(delta)
+c  eq1 = sin(b) = -.8676*x - .1884*y + .4602*z
+c  eq2 = cos(b)*cos(l) = -.0669*x - .8728*y - .4835*z
+c  eq3 = cos(b)*sin(l) = +.4927*x - .4503*y + .7446*z
+c    b = arsin(sin(b))
+c  cos(b) = sqrt(1.-sin(b)*sin(b))
+c  cos(l) = eq2/cos(b)
+c  sin(l) = eq3/cos(b)
+c  l = atan2(sin(l)/cos(l): if(l.lt.0) l = l+2*pi if radians.
+c
+cc    real*8 darsin  (required for series/1 only)
       double precision dtor,rtod,rar,decr,cosa,sina,cosd,x,y,z,cosb,
      1 sinb,eq2,eq3,xbr,xlr,cosl,sinl
-      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/        
-      rar  = dble(rad) * dtor                                           
-      decr = dble(decd) * dtor                                          
-      cosa = dcos(rar)                                                  
-      sina = dsin(rar)                                                  
-      cosd = dcos(decr)                                                 
-      z    = dsin(decr)                                                 
-      x = cosa*cosd                                                     
-      y = sina*cosd                                                     
-      sinb = -.86760082d0*x - .18837460d0*y + .46019979d0*z             
-      if(dabs(sinb).lt.1.d0) go to 2                                    
-      sinb = dsign(1.d0,sinb)                                           
-cc    xbr = darsin(sinb)                                                
-      xbr =  dasin(sinb)                                                
-      xlr = 0.d0                                                        
-      go to 3                                                           
-    2 eq2  = -.06698874d0*x - .87275577d0*y - .48353892d0*z             
-      eq3  = +.49272847d0*x - .45034696d0*y + .74458464d0*z             
-cc    xbr = darsin(sinb)                                                
-      xbr =  dasin(sinb)                                                
-      cosb = dsqrt(1.d0-sinb*sinb)                                      
-      cosl = eq2/cosb                                                   
-      sinl = eq3/cosb                                                   
-      if(dabs(cosl).gt.1.d0) cosl = dsign(1.d0,cosl)                    
-      if(dabs(sinl).gt.1.d0) sinl = dsign(1.d0,sinl)                    
-      xlr = datan2(sinl,cosl)                                           
-    3 xl  = xlr * rtod                                                  
-      if(xl .lt. 0.) xl = 360. + xl                                     
-      xb = xbr * rtod                                                   
-      return                                                            
-c                                                                       
-      end                                                               
+      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/
+      rar  = dble(rad) * dtor
+      decr = dble(decd) * dtor
+      cosa = dcos(rar)
+      sina = dsin(rar)
+      cosd = dcos(decr)
+      z    = dsin(decr)
+      x = cosa*cosd
+      y = sina*cosd
+      sinb = -.86760082d0*x - .18837460d0*y + .46019979d0*z
+      if(dabs(sinb).lt.1.d0) go to 2
+      sinb = dsign(1.d0,sinb)
+cc    xbr = darsin(sinb)
+      xbr =  dasin(sinb)
+      xlr = 0.d0
+      go to 3
+    2 eq2  = -.06698874d0*x - .87275577d0*y - .48353892d0*z
+      eq3  = +.49272847d0*x - .45034696d0*y + .74458464d0*z
+cc    xbr = darsin(sinb)
+      xbr =  dasin(sinb)
+      cosb = dsqrt(1.d0-sinb*sinb)
+      cosl = eq2/cosb
+      sinl = eq3/cosb
+      if(dabs(cosl).gt.1.d0) cosl = dsign(1.d0,cosl)
+      if(dabs(sinl).gt.1.d0) sinl = dsign(1.d0,sinl)
+      xlr = datan2(sinl,cosl)
+    3 xl  = xlr * rtod
+      if(xl .lt. 0.) xl = 360. + xl
+      xb = xbr * rtod
+      return
+c
+      end
 
-      subroutine galecl(xlg,xbg,xlam,beta)                              
+      subroutine galecl(xlg,xbg,xlam,beta)
 c 16jun86  cdc/ve double precision version stored in dgalecl_f
 c  probably no need for this version on cdc.
 c
 c 22mar85 for hepvax (changed darsin to dasin)
-c jdb  04jun81 galactic to ecliptic coordinate conversion.              
-c inputs: xlg is gal.long in degrees; xbg is gal.lat in degrees.        
-c outputs:xlam is ecl.long in degrees;beta is ecl.lat in degrees.       
-c  all subroutine arguments single precision.                           
-c                                                                       
-c note: statements w/cc**** are kept here for comparison w/ the         
-c  individual subroutines that this one is based on.                    
-c                                                                       
-c 1st section based on galactic to equatorial conversion subroutine     
-c   equcor.  2nd based on equ. to ecliptic subroutine equecl.           
-c                                                                       
-c compute equatorial from galcatic (section 1). equations from t.soifer 
-c                                                                       
-c inputs: xlg l in degrees, xbg b in degrees.(single precision)         
-c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360) 
-c  x = cos(b)*cos(l)                                                    
-c  y = sin(l)*cos(b)                                                    
-c  z = sin(b)                                                           
-c                                                                       
-cc    real*8 darsin  (required statement for series/1 only)             
+c jdb  04jun81 galactic to ecliptic coordinate conversion.
+c inputs: xlg is gal.long in degrees; xbg is gal.lat in degrees.
+c outputs:xlam is ecl.long in degrees;beta is ecl.lat in degrees.
+c  all subroutine arguments single precision.
+c
+c note: statements w/cc**** are kept here for comparison w/ the
+c  individual subroutines that this one is based on.
+c
+c 1st section based on galactic to equatorial conversion subroutine
+c   equcor.  2nd based on equ. to ecliptic subroutine equecl.
+c
+c compute equatorial from galcatic (section 1). equations from t.soifer
+c
+c inputs: xlg l in degrees, xbg b in degrees.(single precision)
+c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360)
+c  x = cos(b)*cos(l)
+c  y = sin(l)*cos(b)
+c  z = sin(b)
+c
+cc    real*8 darsin  (required statement for series/1 only)
       double precision dtor,rtod,xlr,xbr,cosb,cosl,sinl,x,y,z,sind,
      1 cosd,eq2,eq3,cosa,sina
       double precision sinr,cosr,xl,yl,zl,xe,ye,ze,cose,sine,xlamr,
      1 betar
-cc****real*8 decr,rar                                                   
-      equivalence (sinr,sina),(cosr,cosa)                               
-      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/        
-      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/        
-c                                                                       
-      xlr = dble(xlg) * dtor                                            
-      xbr = dble(xbg) * dtor                                            
-      cosb = dcos(xbr)                                                  
-      cosl = dcos(xlr)                                                  
-      sinl = dsin(xlr)                                                  
-      z    = dsin(xbr)                                                  
-      x = cosb*cosl                                                     
-      y = sinl*cosb                                                     
-      sind = -.48353892d0*x + .74458464d0*y + .46019979d0*z             
-      if(dabs(sind).lt.1.d0) go to 2                                    
-      sind = dsign(1.d0,sind)                                           
-      cosd = 0.0d0                                                      
-      sina = 0.0d0                                                      
-      cosa = 1.0d0                                                      
-cc****decr = darsin(sind)                                               
-cc****rar = 0.d0                                                        
-      go to 3                                                           
-    2 eq2  = -.06698874d0*x + .49272847d0*y - .86760082d0*z             
-      eq3  = -.87275577d0*x - .45034696d0*y - .18837460d0*z             
-cc****decr = darsin(sind)                                               
-      cosd = dsqrt(1.d0-sind*sind)                                      
-      cosa = eq2/cosd                                                   
-      sina = eq3/cosd                                                   
-      if(dabs(cosa).gt.1.d0) cosa = dsign(1.d0,cosa)                    
-      if(dabs(sina).gt.1.d0) sina = dsign(1.d0,sina)                    
-cc****rar = datan2(sina,cosa)                                           
-    3 continue                                                          
-cc**3 rad  = rar * rtod                                                 
-cc****if(rad .lt. 0.) rad = 360. + rad                                  
-cc****decd = decr * rtod                                                
-c                                                                       
-c                                                                       
-c compute ecliptic from equatorial coordinates (section 2)              
-c                                                                       
-c  1950. equatorial to ecliptic conversion coordinate subroutine        
-c                                                                       
-c  epsilon = e = 23deg26'44.84"  equations for ecl.conv.from j.fowler   
-c                                                                       
-c inputs: rar ra in radians; decr dec in radians. (double prec.)        
-c                                                                       
-c returned: xlam=lambda=ecliptic longitude in degrees (single prec.)    
-c                     (0 - 360 deg)                                     
-c                                                                       
-c         beta= ecliptic latitude in degrees (single prec.)             
-c                      (-90. to +90. deg)                               
-c  xe = sin(dec)              xl = xe*cos(e) - ye*sin(e)                
-c  ye = -cos(dec)*sin(ra)     yl = xe*sin(e) + ye*cos(e)                
-c  ze = cos(dec)*cos(ra)      zl = ze                                   
-c                                                                       
-c                                                                       
-cc****rar = dble(rad)*dtor                                              
-cc****decr = dble(decd)*dtor                                            
-c                                                                       
-c sind & cosd previously computed; also sinr & cosr which are           
-c    equivalenced w/ sina & cosa.                                       
-cc****cosd = dcos(decr)                                                 
-cc****cosr = dcos(rar)                                                  
-cc****sind = dsin(decr)                                                 
-cc****sinr = dsin(rar)                                                  
-c                                                                       
-      xe = sind                                                         
-      ye = -(cosd*sinr)                                                 
-      ze = cosd*cosr                                                    
-c                                                                       
-      xl = cose*xe + sine*ye                                            
-      yl = -sine*xe + cose*ye                                           
-      zl = ze                                                           
-c                                                                       
-      if(dabs(xl) .gt. 1.d0) xl = dsign(1.0d0,xl)                       
-cc    betar = darsin(xl)                                                
-      betar =  dasin(xl)                                                
-c     if(dabs(zl) .gt. 1.d0) zl = dsign(1.0d0,zl) do not need these 2   
-c     if(dabs(yl) .gt. 1.d0) yl = dsign(1.0d0,yl) .. statements.        
-      xlamr = datan2(-yl,zl)                                            
-c                                                                       
-      xlam = xlamr * rtod                                               
-      if(xlam .lt. 0.) xlam = 360. + xlam                               
-      beta = betar * rtod                                               
-      return                                                            
-c                                                                       
-      end                                                               
+cc****real*8 decr,rar
+      equivalence (sinr,sina),(cosr,cosa)
+      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/
+      data cose/0.9174369452102114d0/,sine/0.3978812028273710d0/
+c
+      xlr = dble(xlg) * dtor
+      xbr = dble(xbg) * dtor
+      cosb = dcos(xbr)
+      cosl = dcos(xlr)
+      sinl = dsin(xlr)
+      z    = dsin(xbr)
+      x = cosb*cosl
+      y = sinl*cosb
+      sind = -.48353892d0*x + .74458464d0*y + .46019979d0*z
+      if(dabs(sind).lt.1.d0) go to 2
+      sind = dsign(1.d0,sind)
+      cosd = 0.0d0
+      sina = 0.0d0
+      cosa = 1.0d0
+cc****decr = darsin(sind)
+cc****rar = 0.d0
+      go to 3
+    2 eq2  = -.06698874d0*x + .49272847d0*y - .86760082d0*z
+      eq3  = -.87275577d0*x - .45034696d0*y - .18837460d0*z
+cc****decr = darsin(sind)
+      cosd = dsqrt(1.d0-sind*sind)
+      cosa = eq2/cosd
+      sina = eq3/cosd
+      if(dabs(cosa).gt.1.d0) cosa = dsign(1.d0,cosa)
+      if(dabs(sina).gt.1.d0) sina = dsign(1.d0,sina)
+cc****rar = datan2(sina,cosa)
+    3 continue
+cc**3 rad  = rar * rtod
+cc****if(rad .lt. 0.) rad = 360. + rad
+cc****decd = decr * rtod
+c
+c
+c compute ecliptic from equatorial coordinates (section 2)
+c
+c  1950. equatorial to ecliptic conversion coordinate subroutine
+c
+c  epsilon = e = 23deg26'44.84"  equations for ecl.conv.from j.fowler
+c
+c inputs: rar ra in radians; decr dec in radians. (double prec.)
+c
+c returned: xlam=lambda=ecliptic longitude in degrees (single prec.)
+c                     (0 - 360 deg)
+c
+c         beta= ecliptic latitude in degrees (single prec.)
+c                      (-90. to +90. deg)
+c  xe = sin(dec)              xl = xe*cos(e) - ye*sin(e)
+c  ye = -cos(dec)*sin(ra)     yl = xe*sin(e) + ye*cos(e)
+c  ze = cos(dec)*cos(ra)      zl = ze
+c
+c
+cc****rar = dble(rad)*dtor
+cc****decr = dble(decd)*dtor
+c
+c sind & cosd previously computed; also sinr & cosr which are
+c    equivalenced w/ sina & cosa.
+cc****cosd = dcos(decr)
+cc****cosr = dcos(rar)
+cc****sind = dsin(decr)
+cc****sinr = dsin(rar)
+c
+      xe = sind
+      ye = -(cosd*sinr)
+      ze = cosd*cosr
+c
+      xl = cose*xe + sine*ye
+      yl = -sine*xe + cose*ye
+      zl = ze
+c
+      if(dabs(xl) .gt. 1.d0) xl = dsign(1.0d0,xl)
+cc    betar = darsin(xl)
+      betar =  dasin(xl)
+c     if(dabs(zl) .gt. 1.d0) zl = dsign(1.0d0,zl) do not need these 2
+c     if(dabs(yl) .gt. 1.d0) yl = dsign(1.0d0,yl) .. statements.
+      xlamr = datan2(-yl,zl)
+c
+      xlam = xlamr * rtod
+      if(xlam .lt. 0.) xlam = 360. + xlam
+      beta = betar * rtod
+      return
+c
+      end
 
-      subroutine galequ(xl,xb,rad,decd)                                 
+      subroutine galequ(xl,xb,rad,decd)
 c 16jun86  jdb.  double precision cdc/ve version (probably will not be
 c    needed)  stored in dgalequ_f.
 c
-cccc  entry equcor(xl,xb,rad,decd)   obsolete entry pt equcor.          
+cccc  entry equcor(xl,xb,rad,decd)   obsolete entry pt equcor.
 c 22mar85 for hepvax (changed darsin to dasin;removed entry equcor)
-c 17mar82 updated so has more sensible name- galequ, but still          
-c   retains alias for equcor.                                           
-c 02oct80  jdb   29jan81 to input dtor,rtod to more places. 22apr81     
-c subroutine to compute earth equatorial coords from galactic coords    
-c inputs: xl l in degrees, xb b in degrees.(single precision)           
-c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360) 
-c outputs: rad ra in degrees, decd dec in degrees.(single precision)    
-c  x = cos(b)*cos(l)                                                    
-c  y = sin(l)*cos(b)                                                    
-c  z = sin(b)                                                           
-c                                                                       
-ccc   real*8 darsin  (required state.for series/1 only)                 
+c 17mar82 updated so has more sensible name- galequ, but still
+c   retains alias for equcor.
+c 02oct80  jdb   29jan81 to input dtor,rtod to more places. 22apr81
+c subroutine to compute earth equatorial coords from galactic coords
+c inputs: xl l in degrees, xb b in degrees.(single precision)
+c b = galactic latitude (-90. to + 90. deg);l=galactic longitude(0-360)
+c outputs: rad ra in degrees, decd dec in degrees.(single precision)
+c  x = cos(b)*cos(l)
+c  y = sin(l)*cos(b)
+c  z = sin(b)
+c
+ccc   real*8 darsin  (required state.for series/1 only)
       double precision dtor,rtod,xlr,xbr,cosb,cosl,sinl,x,y,z,sind,
      1 cosd,decr,rar,eq2,eq3,cosa,sina
-      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/        
-      xlr = dble(xl) * dtor                                             
-      xbr = dble(xb) * dtor                                             
-      cosb = dcos(xbr)                                                  
-      cosl = dcos(xlr)                                                  
-      sinl = dsin(xlr)                                                  
-      z    = dsin(xbr)                                                  
-      x = cosb*cosl                                                     
-      y = sinl*cosb                                                     
-      sind = -.48353892d0*x + .74458464d0*y + .46019979d0*z             
-      if(dabs(sind).lt.1.d0) go to 2                                    
-      sind = dsign(1.d0,sind)                                           
-cc    decr = darsin(sind)                                               
-      decr =  dasin(sind)                                               
-      rar = 0.d0                                                        
-      go to 3                                                           
-    2 eq2  = -.06698874d0*x + .49272847d0*y - .86760082d0*z             
-      eq3  = -.87275577d0*x - .45034696d0*y - .18837460d0*z             
-cc    decr = darsin(sind)                                               
-      decr =  dasin(sind)                                               
-      cosd = dsqrt(1.d0-sind*sind)                                      
-      cosa = eq2/cosd                                                   
-      sina = eq3/cosd                                                   
-      if(dabs(cosa).gt.1.d0) cosa = dsign(1.d0,cosa)                    
-      if(dabs(sina).gt.1.d0) sina = dsign(1.d0,sina)                    
-      rar = datan2(sina,cosa)                                           
-    3 rad  = rar * rtod                                                 
-      if(rad .lt. 0.) rad = 360. + rad                                  
-      decd = decr * rtod                                                
-      return                                                            
-c                                                                       
-      end                                                               
+      data dtor/0.01745329251994329d0/,rtod/57.29577951308233d0/
+      xlr = dble(xl) * dtor
+      xbr = dble(xb) * dtor
+      cosb = dcos(xbr)
+      cosl = dcos(xlr)
+      sinl = dsin(xlr)
+      z    = dsin(xbr)
+      x = cosb*cosl
+      y = sinl*cosb
+      sind = -.48353892d0*x + .74458464d0*y + .46019979d0*z
+      if(dabs(sind).lt.1.d0) go to 2
+      sind = dsign(1.d0,sind)
+cc    decr = darsin(sind)
+      decr =  dasin(sind)
+      rar = 0.d0
+      go to 3
+    2 eq2  = -.06698874d0*x + .49272847d0*y - .86760082d0*z
+      eq3  = -.87275577d0*x - .45034696d0*y - .18837460d0*z
+cc    decr = darsin(sind)
+      decr =  dasin(sind)
+      cosd = dsqrt(1.d0-sind*sind)
+      cosa = eq2/cosd
+      sina = eq3/cosd
+      if(dabs(cosa).gt.1.d0) cosa = dsign(1.d0,cosa)
+      if(dabs(sina).gt.1.d0) sina = dsign(1.d0,sina)
+      rar = datan2(sina,cosa)
+    3 rad  = rar * rtod
+      if(rad .lt. 0.) rad = 360. + rad
+      decd = decr * rtod
+      return
+c
+      end
 
 c \iras\hgtprc.for = :user.iras649.ipacx.hgtprc_f
 c herget general precession routine (note: all arguments double precision).

@@ -13,11 +13,11 @@
 *     CALL CHR_CTOC( STR1, STR2, NCHAR )
 
 *  Description:
-*     Write the given character string into the returned character string. 
+*     Write the given character string into the returned character string.
 *     If the given string is longer than the returned string, the given
 *     string is truncated. If the returned string is longer than the
 *     given character variable, the remainder of the returned string
-*     is padded with blanks. 
+*     is padded with blanks.
 
 *  Arguments:
 *     STR1 = CHARACTER * ( * ) (Given)
@@ -25,7 +25,7 @@
 *     STR2 = CHARACTER * ( * ) (Returned)
 *        The character string into which the value is to be written.
 *     NCHAR = INTEGER (Returned)
-*        The resulting length of the character string, ignoring 
+*        The resulting length of the character string, ignoring
 *        trailing blanks.
 
 *  Algorithm:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

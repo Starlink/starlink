@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_find_acsis_corners( smfData *data, double xc[4], double yc[4], 
+*     smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
 *                             int *status );
 
 *  Arguments:
@@ -30,7 +30,7 @@
 *     This function finds the GRID coords of the corner detectors in an
 *     ACSIS data structure. Note, it is possible that there is no
 *     detector at one or more of the corners, in which case the detector
-*     closest to the corner will be returned. 
+*     closest to the corner will be returned.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -89,7 +89,7 @@
 #define FUNC_NAME "smf_find_acsis_corners"
 
 
-void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4], 
+void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
                              int *status ){
 
 /* Local Variables */
@@ -116,12 +116,12 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
 /* Get a FrameSet in which the base Frame is GRID coords and the current
    Frame is focal plane offsets in radians. */
    hdr = data->hdr;
-   hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, 
-                                    hdr->ndet, NULL, 0.0, hdr->instap, 
-                                    hdr->telpos, &wcs, hdr->cache2, 
+   hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney,
+                                    hdr->ndet, NULL, 0.0, hdr->instap,
+                                    hdr->telpos, &wcs, hdr->cache2,
                                     status );
 
-/* The X axis in GRID coords represents detector index, The Y axis in GRID 
+/* The X axis in GRID coords represents detector index, The Y axis in GRID
    coords is just a degenerate axis needed to ensure we have 2 axes (it
    should always have the value 1). Transform every GRID position into
    focal plane coords. */
@@ -130,7 +130,7 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
    lbnd[ 1 ] = 1;
    ubnd[ 1 ] = 1;
    work = astMalloc( 2*hdr->ndet*sizeof( *work ) );
-   astTranGrid( wcs, 2, lbnd, ubnd, 0.0, 0, 1, 2, hdr->ndet, work ); 
+   astTranGrid( wcs, 2, lbnd, ubnd, 0.0, 0, 1, 2, hdr->ndet, work );
 
 /* Find the extereme values of focal plane X and Y. */
    fxlo = VAL__MAXD;
@@ -155,7 +155,7 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
       dy =  *(py++) - fylo;
       d2 = dx*dx + dy*dy;
       if( d2 < d2_min ) {
-         xc[ 0 ] = (double) i;         
+         xc[ 0 ] = (double) i;
          yc[ 0 ] = 1.0;
          d2_min = d2;
       }
@@ -171,7 +171,7 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
       dy =  *(py++) - fyhi;
       d2 = dx*dx + dy*dy;
       if( d2 < d2_min ) {
-         xc[ 1 ] = (double) i;         
+         xc[ 1 ] = (double) i;
          yc[ 1 ] = 1.0;
          d2_min = d2;
       }
@@ -186,7 +186,7 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
       dy =  *(py++) - fyhi;
       d2 = dx*dx + dy*dy;
       if( d2 < d2_min ) {
-         xc[ 2 ] = (double) i;         
+         xc[ 2 ] = (double) i;
          yc[ 2 ] = 1.0;
          d2_min = d2;
       }
@@ -201,7 +201,7 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
       dy =  *(py++) - fylo;
       d2 = dx*dx + dy*dy;
       if( d2 < d2_min ) {
-         xc[ 3 ] = (double) i;         
+         xc[ 3 ] = (double) i;
          yc[ 3 ] = 1.0;
          d2_min = d2;
       }

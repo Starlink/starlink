@@ -23,11 +23,11 @@
 *     NAME = CHARACTER * ( * ) (Given)
 *        The name of the nearest colour in the named colour set to the
 *        input RGB colour.  Note at least eighteen characters are
-*        required to avoid truncation. This string may also be an HTML 
-*        code of the form "#aabbcc" (or "@aabbcc" - for use in contexts 
-*        where "#" is a comment character, e.g. kappa style files) where 
-*        a, b and c are hexadecimal digits, and "aa", "bb" and "cc" give 
-*        red, blue and green intensities normalised to a maximum of "ff" 
+*        required to avoid truncation. This string may also be an HTML
+*        code of the form "#aabbcc" (or "@aabbcc" - for use in contexts
+*        where "#" is a comment character, e.g. kappa style files) where
+*        a, b and c are hexadecimal digits, and "aa", "bb" and "cc" give
+*        red, blue and green intensities normalised to a maximum of "ff"
 *        (256).
 *     R = REAL (Returned)
 *        The red intensity of the named colour to be identified.  It is
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -84,14 +84,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colour-table management definitions
-      INCLUDE 'AST_PAR'          ! AST constants and function 
+      INCLUDE 'AST_PAR'          ! AST constants and function
                                  ! definitions
 
 *  Global Variables:
@@ -117,7 +117,7 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
-      CHARACTER CNAME*( 24 )     ! Colour name in uppercase and sans 
+      CHARACTER CNAME*( 24 )     ! Colour name in uppercase and sans
                                  ! blanks
       DOUBLE PRECISION DVAL      ! Unformatted value
       INTEGER FRM                ! AST Frame used for unformatting
@@ -140,7 +140,7 @@
       CNAME = NAME
       CALL CHR_UCASE( CNAME )
       CALL CHR_LDBLK( CNAME )
-      
+
 *  Save the used length of the supplied string.
       LEN = CHR_LEN( CNAME )
 
@@ -153,10 +153,10 @@
       FRM = AST_FRAME( 1, ' ', STATUS )
 
       NC = AST_UNFORMAT( FRM, 1, CNAME, DVAL, STATUS )
-      IAT = 1 + NC 
+      IAT = 1 + NC
       IF ( NC .GT. 0 .AND. IAT .LE. LEN ) THEN
          R = MIN( 1.0, MAX( 0.0, REAL( DVAL ) ) )
-        
+
          NC = AST_UNFORMAT( FRM, 1, CNAME( IAT: ), DVAL, STATUS )
          IAT = IAT + NC
          IF ( NC .GT. 0 .AND. IAT .LE. LEN ) THEN
@@ -170,13 +170,13 @@
             END IF
 
          END IF
-      END IF            
+      END IF
 
 *  Release AST resources.
       CALL AST_ANNUL( FRM, STATUS )
 
 *  If no match was found, attempt to interpret the colour as an HTML
-*  code of the form "#aabbcc" (or "@aabbcc") where a, b and c are 
+*  code of the form "#aabbcc" (or "@aabbcc") where a, b and c are
 *  hexadecimal digits.
       IF ( .NOT. MATCH .AND. ( CNAME( 1 : 1 ) .EQ. '#' .OR.
      :    CNAME( 1 : 1 ) .EQ. '@' ) .AND. LEN .EQ. 7 ) THEN
@@ -189,7 +189,7 @@
                MATCH = .FALSE.
             ELSE
                HX( I - 1 ) = J
-            END IF            
+            END IF
          END DO
 
          IF ( MATCH ) THEN
@@ -200,9 +200,9 @@
 
       END IF
 
-*  If no match has been found, test for a grey level.  These have 
+*  If no match has been found, test for a grey level.  These have
 *  percentage suffices except for just Grey or Gray.
-      IF ( .NOT. MATCH .AND. ( CNAME( 1:4 ) .EQ. 'GREY' .OR. 
+      IF ( .NOT. MATCH .AND. ( CNAME( 1:4 ) .EQ. 'GREY' .OR.
      :                        CNAME( 1:4 ) .EQ. 'GRAY' ) ) THEN
          MATCH = .TRUE.
 
@@ -218,7 +218,7 @@
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETC( 'CNAME', CNAME )
                CALL ERR_REP( 'KPG1_NMCOL_NSGREY', 'An unknown grey '/
-     :                       /'level ^CNAME has been specified.', 
+     :                       /'level ^CNAME has been specified.',
      :                       STATUS )
             ELSE
                GLEVEL = REAL( PC ) / 100.0
@@ -238,8 +238,8 @@
          I = 1
          DO WHILE ( .NOT. MATCH .AND. I .LE. CTM__NAMED )
 
-*  Look for the match. The colour set names are stored in uppercase 
-*  with no blanks.  Read the corresponding RGB values, otherwise just 
+*  Look for the match. The colour set names are stored in uppercase
+*  with no blanks.  Read the corresponding RGB values, otherwise just
 *  increment the colour counter.
             MATCH = CNAME( :LEN ) .EQ. CTM_NAM( I )( :LEN )
             IF ( MATCH ) THEN
@@ -260,5 +260,5 @@
          END IF
 
       END IF
-      
+
       END

@@ -38,7 +38,7 @@
 
 *  Check the CTYPE1 card is still present in the FitsChan.
       call ast_clear( fc, 'Card', status )
-      if( .not. ast_findfits( fc, 'CTYPE1', card, .FALSE., 
+      if( .not. ast_findfits( fc, 'CTYPE1', card, .FALSE.,
      :                        status ) ) then
          call stopit( 2, 'CTYPE1 has not been retained', status )
       end if
@@ -90,11 +90,11 @@ c      call ast_setl( fc, 'Clean', .true., status )
       fs = ast_read( fc, status )
 
       if( fs .ne. AST__NULL ) then
-         call stopit( 4, 'A FrameSet has been read from the FitsChan', 
+         call stopit( 4, 'A FrameSet has been read from the FitsChan',
      :                status )
 
       else if( status .eq. sai__ok ) then
-         call stopit( 5, 'No error has been reported by ast_read', 
+         call stopit( 5, 'No error has been reported by ast_read',
      :                status )
 
       else
@@ -105,7 +105,7 @@ c      call ast_setl( fc, 'Clean', .true., status )
 
 *  Check the CTYPE1 card is still present in the FitsChan.
       call ast_clear( fc, 'Card', status )
-      if( .not. ast_findfits( fc, 'CTYPE1', card, .FALSE., 
+      if( .not. ast_findfits( fc, 'CTYPE1', card, .FALSE.,
      :                        status ) ) then
          call stopit( 6, 'CTYPE1 has not been retained', status )
       end if
@@ -114,7 +114,7 @@ c      call ast_setl( fc, 'Clean', .true., status )
 *  cards are not removed if an error is reported in ast_read unless the
 *  Clean attribute is set true).
       call ast_clear( fc, 'Card', status )
-      if( .not. ast_findfits( fc, 'CTYPE2', card, .FALSE., 
+      if( .not. ast_findfits( fc, 'CTYPE2', card, .FALSE.,
      :                        status ) ) then
          call stopit( 7, 'CTYPE2 has not been retained', status )
       end if
@@ -156,11 +156,11 @@ c      call ast_setl( fc, 'Clean', .true., status )
       fs = ast_read( fc, status )
 
       if( fs .ne. AST__NULL ) then
-         call stopit( 8, 'A FrameSet has been read from the FitsChan', 
+         call stopit( 8, 'A FrameSet has been read from the FitsChan',
      :                status )
 
       else if( status .eq. sai__ok ) then
-         call stopit( 9, 'No error has been reported by ast_read', 
+         call stopit( 9, 'No error has been reported by ast_read',
      :                status )
 
       else
@@ -172,7 +172,7 @@ c      call ast_setl( fc, 'Clean', .true., status )
 *  Check the CTYPE1 card is still present in the FitsChan (because of the
 *  call to ast_retainfits).
       call ast_clear( fc, 'Card', status )
-      if( .not. ast_findfits( fc, 'CTYPE1', card, .FALSE., 
+      if( .not. ast_findfits( fc, 'CTYPE1', card, .FALSE.,
      :                        status ) ) then
          call stopit( 10, 'CTYPE1 has not been retained', status )
       end if

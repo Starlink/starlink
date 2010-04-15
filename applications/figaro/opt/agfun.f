@@ -41,9 +41,9 @@
 *   XC(N) = DOUBLE PRECISION ARRAY (Given)
 *        Parameters
 *   FC1 = DOUBLE PRECISION (Given)
-*       
+*
 *   GC1(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 * Not used:-
 *   IFLAG
 *   W(LW) (LW not used otherwise)

@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This routine deletes the value of a global parameter. 
+*     This routine deletes the value of a global parameter.
 
 *  Usage:
 *     UNSETGLOBAL parameter
@@ -82,7 +82,7 @@
       ELSE
          FNAME = FNAME( :CHR_LEN( FNAME ) ) // '/GLOBAL'
       END IF
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Now open it.
          CALL ERR_MARK
@@ -91,7 +91,7 @@
 
 *  Check if the component exists.
             CALL DAT_THERE( FLOC, PARAM, EXISTS, STATUS )
-            IF ( EXISTS ) THEN 
+            IF ( EXISTS ) THEN
 
 *  Delete it.
                CALL DAT_ERASE( FLOC, PARAM, STATUS )
@@ -99,7 +99,7 @@
 
 *  And close the file.
             CALL DAT_ANNUL( FLOC, STATUS )
-         ELSE 
+         ELSE
 
 *  Failed to open global file, so do nothing.
             CALL ERR_ANNUL( STATUS )

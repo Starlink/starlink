@@ -3,7 +3,7 @@ proc flatlot
   print "Flatfield images using user-specified flatfield image."
   print "Enter name of flatfield image to be used "
   askname (flat) "Flatfield image ? "
-  flatn = flat & "_norm" 
+  flatn = flat & "_norm"
   print "Do you want the flatfield image normalized to unity ?"
   asklog (normy) "Normalize Flatfield (Yes or No) \Y\ ? "
   if normy = 1
@@ -45,7 +45,7 @@ proc flatlot
         print "O.K. finished using FLATLOT ..."
         return
       end if
-      out = im & "f" 
+      out = im & "f"
     else
       im  = ffpre & dummy & ffsuf
       out = im & "f"

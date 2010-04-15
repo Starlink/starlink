@@ -201,7 +201,7 @@
 *     8/5/97   (ACD): Original version.
 *     16/11/97 (ACD): First stable version.
 *     5/4/01   (ACD): Added the quiet mode.
-*     22/6/06  (DSB): Initialised individual fixed value flags if FIXED 
+*     22/6/06  (DSB): Initialised individual fixed value flags if FIXED
 *                     is false.
 *-
 *  Type Definitions:
@@ -215,7 +215,7 @@
 *  External References:
       INTEGER CHR_LEN
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  NUMFIX,   ! Number of fixed transformation coefficients.
      :  CI,       ! Catalogue identifier.
      :  ROWS,     ! Number of rows in the catalogue.
@@ -409,7 +409,7 @@
             ELSE
                EINCL = CAT__NOID
             END IF
-               
+
             CALL PAR_GET0C ('CATMAG', CATMG, STATUS)
             CALL PAR_CANCL ('CATMAG', STATUS)
             CALL CAT_EIDNT (CI, CATMG, ECATMG, STATUS)
@@ -428,13 +428,13 @@
             CALL CAT_EIDNT (CI, AIRMS, EAIRMS, STATUS)
 
 *
-*          Read in the required columns.  
+*          Read in the required columns.
 
 C           print2001, rows
 C2001       format(1x, 'rows: ', i5 )
 
             CALL CAP_RDTPH (CI, ROWS, EINCL, ECATMG, EINSMG, EAIRMS,
-     :        %VAL(CNF_PVAL(INCPTR)), %VAL(CNF_PVAL(CMGPTR)), 
+     :        %VAL(CNF_PVAL(INCPTR)), %VAL(CNF_PVAL(CMGPTR)),
      :        %VAL(CNF_PVAL(IMGPTR)), %VAL(CNF_PVAL(AIRPTR)),
      :        STATUS)
 C           print2000, 'after reading in catalogue', status
@@ -453,9 +453,9 @@ C2000       format(1x, a, 3X, 'status: ', I20)
 
             IF (NUMFIX .LT. 2) THEN
                CALL CAP_FITPH (ROWS, FZEROP, FATMOS,
-     :           %VAL(CNF_PVAL(INCPTR)), %VAL(CNF_PVAL(CMGPTR)), 
+     :           %VAL(CNF_PVAL(INCPTR)), %VAL(CNF_PVAL(CMGPTR)),
      :           %VAL(CNF_PVAL(IMGPTR)), %VAL(CNF_PVAL(AIRPTR)),
-     :           INSCON, ZEROP, ATMOS, %VAL(CNF_PVAL(WRKPTR)), 
+     :           INSCON, ZEROP, ATMOS, %VAL(CNF_PVAL(WRKPTR)),
      :           RNORM, NUMFIT, STATUS)
 C              print2000, 'after fit', status
             END IF
@@ -502,10 +502,10 @@ C              print2000, 'after fit', status
 *             If required then list the residuals.
 
                IF (RESID) THEN
-                  CALL CAP_RESPH (ROWS, CI, ENAME, 
+                  CALL CAP_RESPH (ROWS, CI, ENAME,
      :              %VAL(CNF_PVAL(INCPTR)),
-     :              %VAL(CNF_PVAL(CMGPTR)), %VAL(CNF_PVAL(IMGPTR)), 
-     :              %VAL(CNF_PVAL(AIRPTR)), INSCON, ZEROP, ATMOS, 
+     :              %VAL(CNF_PVAL(CMGPTR)), %VAL(CNF_PVAL(IMGPTR)),
+     :              %VAL(CNF_PVAL(AIRPTR)), INSCON, ZEROP, ATMOS,
      :              %VAL(CNF_PVAL(CLCPTR)), %VAL(CNF_PVAL(RSDPTR)),
      :              STATUS)
 C                 print2000, 'after residuals', status

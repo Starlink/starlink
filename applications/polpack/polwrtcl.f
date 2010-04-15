@@ -4,7 +4,7 @@
 *     POLWRTCL
 
 *  Purpose:
-*     Creates a text file holding the contents of a specified catalogue in 
+*     Creates a text file holding the contents of a specified catalogue in
 *     the form of a Tcl code fragment which can be used in a Tcl applications
 *     such as GAIA.
 
@@ -22,8 +22,8 @@
 *        The global status.
 
 *  Description:
-*     This application creates a description of a POLPACK catalogue which 
-*     can be used by the Tcl applications such as the GAIA polarimetry 
+*     This application creates a description of a POLPACK catalogue which
+*     can be used by the Tcl applications such as the GAIA polarimetry
 *     toolbox. The description includes the bulk data.
 *
 *     The desciption of the catalogue is written to an output text file
@@ -55,12 +55,12 @@
 *                 the bounding box.
 *      yrefpix_ : The pixel offset to ra_/dec_ from the bottom-left corner of
 *                 the bounding box.
-*      nxpix_   : No of pixels in X in bounding box 
-*      nypix_   : No of pixels in Y in bounding box 
+*      nxpix_   : No of pixels in X in bounding box
+*      nypix_   : No of pixels in Y in bounding box
 *      secpix_  : An estimate of the pixel size in arcseconds
-*      equinox_ : The equinox for the RA and DEC values in the file 
+*      equinox_ : The equinox for the RA and DEC values in the file
 *                 (e.g. "2000" - may be blank)
-*      epoch_   : The epoch of observation for the RA and DEC values 
+*      epoch_   : The epoch of observation for the RA and DEC values
 *      fmts_    : A list of Tcl formats specifications, one for each column.
 *                 Column values are formatted with this format.
 *      hfmts_   : A list of Tcl formats specifications, one for each column.
@@ -72,18 +72,18 @@
 *                 Not written if the catalogue does not have a Z column.
 
 *  Usage:
-*     polwrtcl in out 
+*     polwrtcl in out
 
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
-*        The name of the input catalogue. 
+*        The name of the input catalogue.
 *        if none is provided.
 *     OUT = LITERAL (Read)
 *        The name of the output text file.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -113,9 +113,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT_ constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'CAT_ERR'          ! CAT_ error constants 
+      INCLUDE 'CAT_PAR'          ! CAT_ constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CAT_ERR'          ! CAT_ error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
@@ -123,7 +123,7 @@
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( CONTIN = '\\' )    
+      PARAMETER( CONTIN = '\\' )
 
 *  Status:
       INTEGER STATUS
@@ -185,7 +185,7 @@
       DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
-      INTEGER DECCOL             ! Index of DEC column within output catalogue 
+      INTEGER DECCOL             ! Index of DEC column within output catalogue
       INTEGER FD                 ! FIO identifier for output file
       INTEGER FS                 ! An AST FrameSet pointer
       INTEGER GA( 3 )            ! CAT id.s for i/p cols giving o/p RA/DEC
@@ -211,12 +211,12 @@
       INTEGER NCOL               ! No. of columns in output catalogue
       INTEGER NDIM               ! No. of dimensions in WCS Base Frame
       INTEGER NROW               ! No. of rows in output catalogue
-      INTEGER RACOL              ! Index of RA column within output catalogue 
+      INTEGER RACOL              ! Index of RA column within output catalogue
       INTEGER SKYFRM             ! An AST SkyFrame pointer
       INTEGER SZBAT              ! Size of each batch
-      INTEGER XCOL               ! Index of X column within output catalogue 
-      INTEGER YCOL               ! Index of Y column within output catalogue 
-      INTEGER ZCOL               ! Index of Z column within output catalogue 
+      INTEGER XCOL               ! Index of X column within output catalogue
+      INTEGER YCOL               ! Index of Y column within output catalogue
+      INTEGER ZCOL               ! Index of Z column within output catalogue
       LOGICAL GOTRD              ! Will o/p catalogue have RA and DEC columns?
       LOGICAL MAKERD             ! Will we be creating new RA/DEC o/p columns?
       LOGICAL NULL               ! Is the stored value null?
@@ -239,10 +239,10 @@
       CALL CTG_ASSO1( 'IN', VERB, 'READ', CI, FIELDS, STATUS )
 
 *  Get the number of rows in the catalogue.
-      CALL CAT_TROWS( CI, NROW, STATUS ) 
+      CALL CAT_TROWS( CI, NROW, STATUS )
 
 *  Get the number of columns in the supplied catalogue.
-      CALL CAT_TCOLS( CI, CAT__GPHYS, NCIN, STATUS ) 
+      CALL CAT_TCOLS( CI, CAT__GPHYS, NCIN, STATUS )
       IF( NCIN .GT. MXCOL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'N', NCIN )
@@ -263,8 +263,8 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get a list of column identifiers and headings from the input catalogue. 
-*  Note, the indices of the X, Y, RA, DEC and ID columns. 
+*  Get a list of column identifiers and headings from the input catalogue.
+*  Note, the indices of the X, Y, RA, DEC and ID columns.
       XCOL = 0
       YCOL = 0
       ZCOL = 0
@@ -299,7 +299,7 @@
 
       END DO
 
-*  If the input catalogue has no ID column, we need to add one. 
+*  If the input catalogue has no ID column, we need to add one.
       IF( IDCOL .EQ. 0 ) THEN
          NCOL = NCIN + 1
          IDCOL = NCOL
@@ -309,7 +309,7 @@
       ELSE
          NCOL = NCIN
          CALL CAT_TIQAI( GCOL( IDCOL ), 'DTYPE', IDTYPE, STATUS )
-         IF( IDTYPE .EQ. CAT__TYPEC ) THEN 
+         IF( IDTYPE .EQ. CAT__TYPEC ) THEN
             CALL CAT_TIQAI( GCOL( IDCOL ), 'CSIZE', IDLEN, STATUS )
          ELSE
             IDLEN = 8
@@ -318,7 +318,7 @@
       END IF
 
 *  Abort if no X or Y column was found.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          IF( XCOL .EQ. 0 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'C', XCNM )
@@ -337,7 +337,7 @@
 
 *  Re-arrange them so that X become column 1 in the output catalogue.
       ITEMP = GCOL( XCOL )
-      DO ICOL = XCOL, 2, -1 
+      DO ICOL = XCOL, 2, -1
          HEAD( ICOL ) = HEAD( ICOL - 1 )
          GCOL( ICOL ) = GCOL( ICOL - 1 )
       END DO
@@ -353,7 +353,7 @@
 
 *  Re-arrange them so that Y become column 2 in the output catalogue.
       ITEMP = GCOL( YCOL )
-      DO ICOL = YCOL, 3, -1 
+      DO ICOL = YCOL, 3, -1
          HEAD( ICOL ) = HEAD( ICOL - 1 )
          GCOL( ICOL ) = GCOL( ICOL - 1 )
       END DO
@@ -386,15 +386,15 @@
 *  both base and current Frames.
       IF( ZCOL .GT. 0 ) THEN
 
-         IF( NAXC .GT. 2 ) THEN 
-            ZAUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, 
+         IF( NAXC .GT. 2 ) THEN
+            ZAUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT,
      :                                       STATUS ),
      :                         'UNIT(3)', STATUS )
          ELSE
             ZAUNIT = ' '
          END IF
 
-         IF( NAXB .GT. 2 ) THEN 
+         IF( NAXB .GT. 2 ) THEN
             ZCUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
      :                         'UNIT(3)', STATUS )
          ELSE
@@ -420,19 +420,19 @@
 *  If the catalogue contains columns holding RA/DEC coordinates...
       IF( RACOL .GT. 0 .AND. DECCOL .GT. 0 ) THEN
 
-*  See if the catalogue contains an EPOCH parameter. 
-         CALL CAT_TIDNT( CI, 'EPOCH', GI, STATUS ) 
+*  See if the catalogue contains an EPOCH parameter.
+         CALL CAT_TIDNT( CI, 'EPOCH', GI, STATUS )
          IF( STATUS .EQ. CAT__NOCMP ) THEN
             CALL ERR_ANNUL( STATUS )
             EPOCH = ' '
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             CALL CAT_EGT0F( GI, EPOCH, NULL, STATUS )
             CALL CAT_TRLSE( GI, STATUS )
-         END IF                     
+         END IF
 
-*  Get their equinox from the catalogue EQUINOX parameter. Assume default if 
+*  Get their equinox from the catalogue EQUINOX parameter. Assume default if
 *  no value is available.
-         CALL CAT_TIDNT( CI, 'EQUINOX', GI, STATUS ) 
+         CALL CAT_TIDNT( CI, 'EQUINOX', GI, STATUS )
          IF( STATUS .EQ. CAT__NOCMP ) THEN
             CALL ERR_ANNUL( STATUS )
 
@@ -452,7 +452,7 @@
                CALL CHR_UCASE( BJ )
                IF( BJ .EQ. 'B' .OR. BJ .EQ. 'J' ) THEN
                   EQN( 1:1 ) = ' '
-               ELSE 
+               ELSE
                   BJ = ' '
                END IF
 
@@ -468,19 +468,19 @@
                   CALL ERR_FLUSH( STATUS )
 
 *  Otherwise...
-               ELSE 
+               ELSE
 
 *  If no B/J specifier was included, use the 1984 rule.
                   IF( BJ .EQ. ' ' ) THEN
                      IF( DEQN .LT. 1984.0 ) THEN
-                        BJ = 'B' 
+                        BJ = 'B'
                      ELSE
                         BJ = 'J'
                      END IF
                   END IF
 
 *  The existing RA/DEC values are only directly usable if they have the
-*  required equinox.  Otherwise we create new RA/DEC columns by mapping the 
+*  required equinox.  Otherwise we create new RA/DEC columns by mapping the
 *  existing RA/DEC columns. Set flags to indicate this.
                   IF( BJ .NE. 'J' .OR. DEQN .NE. DEQNOX ) THEN
                      MAKERD = .TRUE.
@@ -493,19 +493,19 @@
 
 *  Create a default AST SkyFrame.
                      SKYFRM = AST_SKYFRAME( ' ', STATUS )
-                  
-*  Assume supplied RA/DEC values are FK5 if a Julian equinox was supplied. 
+
+*  Assume supplied RA/DEC values are FK5 if a Julian equinox was supplied.
 *  FK4 otherwise.
                      IF( BJ .EQ. 'J' ) THEN
                         CALL AST_SETC( SKYFRM, 'SYSTEM', 'FK5', STATUS )
-                     ELSE 
+                     ELSE
                         CALL AST_SETC( SKYFRM, 'SYSTEM', 'FK5', STATUS )
                      END IF
 
 *  Set the equinox of the SkyFrame.
                      CALL AST_SETC( SKYFRM, 'EQUINOX', EQN, STATUS )
 
-*  If the catalogue contains an EPOCH parameter, copy its value to the 
+*  If the catalogue contains an EPOCH parameter, copy its value to the
 *  SkyFrame. Otherwise, retrieve the default epoch value.
                      IF( EPOCH .NE. ' ' ) THEN
                         CALL AST_SETC( SKYFRM, 'EPOCH', EPOCH, STATUS )
@@ -514,11 +514,11 @@
                      END IF
 
 *  Find a Mapping from the supplied system to the required system.
-                     FS = AST_FINDFRAME( SKYFRM, AST_SKYFRAME( 
+                     FS = AST_FINDFRAME( SKYFRM, AST_SKYFRAME(
      :                                   'System='//SYSTEM//
-     :                                   ',Equinox='//EQUINOX, 
-     :                                   STATUS ), ' ', STATUS ) 
-               
+     :                                   ',Equinox='//EQUINOX,
+     :                                   STATUS ), ' ', STATUS )
+
                      MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
      :                                     STATUS )
 
@@ -528,15 +528,15 @@
          END IF
 
 *  If the catalogue does not contain RA/DEC columns...
-      ELSE         
+      ELSE
 
 *  Assume for the moment that the output catalogue will not contain
 *  RA/DEC columns.
          GOTRD = .FALSE.
 
 *  See if the WCS FrameSet contains a SKY Frame. If the input has more than 2
-*  axes this call will look for a SkyFrame within the CmpFrame and append a 
-*  copy of it to the end of the FrameSet so that the following call to 
+*  axes this call will look for a SkyFrame within the CmpFrame and append a
+*  copy of it to the end of the FrameSet so that the following call to
 *  AST_CONVERT will be able to use it.
          CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
 
@@ -544,12 +544,12 @@
          IF( IFRM .NE. AST__NOFRAME ) THEN
 
 *  Attempt to get a FrameSet connecting X/Y(Z) to RA/DEC.
-            CALL AST_SETI( IWCS, 'CURRENT', 
+            CALL AST_SETI( IWCS, 'CURRENT',
      :                     AST_GETI( IWCS, 'BASE', STATUS ),
      :                     STATUS )
-            FS = AST_CONVERT( IWCS, AST_SKYFRAME( 
-     :                        'System='//SYSTEM//',Equinox='//EQUINOX, 
-     :                        STATUS ), ' ', STATUS ) 
+            FS = AST_CONVERT( IWCS, AST_SKYFRAME(
+     :                        'System='//SYSTEM//',Equinox='//EQUINOX,
+     :                        STATUS ), ' ', STATUS )
 
 *  If succesfull...
             IF( FS .NE. AST__NULL ) THEN
@@ -558,11 +558,11 @@
                EPOCH = AST_GETC( FS, 'EPOCH', STATUS )
 
 *  Get the Mapping from X/Y(/Z) to RA/DEC.
-               MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, 
+               MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
      :                               STATUS )
 
-*  Set the flags to indicate that new RA/DEC columns should be created on 
-*  the basis of existing X/Y(/Z) columns. 
+*  Set the flags to indicate that new RA/DEC columns should be created on
+*  the basis of existing X/Y(/Z) columns.
                MAKERD = .TRUE.
                GOTRD = .TRUE.
 
@@ -582,24 +582,24 @@
 
       END IF
 
-*  If the output catalogue will contain RA and DEC columns, re-arrange the 
+*  If the output catalogue will contain RA and DEC columns, re-arrange the
 *  column headings so that RA and DEC are columns 3 and 4.
       IF( GOTRD ) THEN
          ITEMP = GCOL( RACOL )
-         DO ICOL = RACOL, 4, -1 
+         DO ICOL = RACOL, 4, -1
             HEAD( ICOL ) = HEAD( ICOL - 1 )
             GCOL( ICOL ) = GCOL( ICOL - 1 )
          END DO
          HEAD( 3 ) = RACNM
          GCOL( 3 ) = ITEMP
-   
+
          IF( DECCOL .LT. RACOL ) DECCOL = DECCOL + 1
          IF( IDCOL .LT. RACOL ) IDCOL = IDCOL + 1
          IF( ZCOL .GT. 0 .AND. ZCOL .LT. RACOL ) ZCOL = ZCOL + 1
          RACOL = 3
 
          ITEMP = GCOL( DECCOL )
-         DO ICOL = DECCOL, 5, -1 
+         DO ICOL = DECCOL, 5, -1
             HEAD( ICOL ) = HEAD( ICOL - 1 )
             GCOL( ICOL ) = GCOL( ICOL - 1 )
          END DO
@@ -614,11 +614,11 @@
 
 *  Open the output text file.
       CALL FIO_ASSOC( 'OUT', 'WRITE', 'LIST', 256, FD, STATUS )
-      CALL FIO_FNAME( FD, FNAME, STATUS ) 
+      CALL FIO_FNAME( FD, FNAME, STATUS )
       CALL MSG_SETC( 'F', FNAME )
 
-*  Write a flag to the output text file indicating if RA/DEC values 
-*  are available. 
+*  Write a flag to the output text file indicating if RA/DEC values
+*  are available.
       IF( GOTRD ) THEN
          CALL FIO_WRITE( FD, 'set gotwcs_ 1', STATUS )
       ELSE
@@ -666,7 +666,7 @@
             CALL CHR_APPND( XYHFMT, TEXT, IAT )
          ELSE IF( ICOL .EQ. RACOL .OR. ICOL .EQ. DECCOL ) THEN
             CALL CHR_APPND( RDHFMT, TEXT, IAT )
-         ELSE 
+         ELSE
             CALL CHR_APPND( HFMT, TEXT, IAT )
          END IF
          CALL CHR_APPND( ' '//CONTIN, TEXT, IAT )
@@ -686,14 +686,14 @@
          ELSE IF( ICOL .EQ. RACOL .OR. ICOL .EQ. DECCOL ) THEN
             CALL CHR_APPND( RDFMT, TEXT, IAT )
          ELSE IF( ICOL .EQ. IDCOL ) THEN
-            IF( IDTYPE .EQ. CAT__TYPEC ) THEN 
+            IF( IDTYPE .EQ. CAT__TYPEC ) THEN
                CALL CHR_APPND( '%-', TEXT, IAT )
                CALL CHR_PUTI( IDLEN + 1, TEXT, IAT )
                CALL CHR_APPND( 's', TEXT, IAT )
             ELSE
                CALL CHR_APPND( FMT, TEXT, IAT )
-            END IF 
-         ELSE 
+            END IF
+         ELSE
             CALL CHR_APPND( FMT, TEXT, IAT )
          END IF
          CALL CHR_APPND( ' '//CONTIN, TEXT, IAT )
@@ -744,12 +744,12 @@
       CALL PSX_CALLOC( SZBAT*IDLEN, '_CHAR', IPW4, STATUS )
 
 *  Write values to the output file.
-      CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, 
-     :                 NROW, IDCOL, ZCOL, FD, SZBAT, LBND, UBND, 
-     :                 %VAL( CNF_PVAL( IPW1 ) ), 
-     :                 %VAL( CNF_PVAL( IPW2 ) ), 
+      CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL,
+     :                 NROW, IDCOL, ZCOL, FD, SZBAT, LBND, UBND,
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPW3 ) ),
-     :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS, 
+     :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS,
      :                 %VAL( CNF_CVAL( IDLEN ) ) )
 
 *  Free the work space.
@@ -779,12 +779,12 @@
       CALL CHR_PUTI( NINT( 0.5 + UBND( 2 ) ), TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-      IF( ZCOL .GT. 0 ) THEN 
+      IF( ZCOL .GT. 0 ) THEN
          TEXT = 'set zlo_ '
          IAT = 9
          CALL CHR_PUTR( LBND( 3 ), TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-   
+
          TEXT = 'set zhi_ '
          IAT = 9
          CALL CHR_PUTR( UBND( 3 ), TEXT, IAT )

@@ -14,7 +14,7 @@
 *     CALL CHP_DELADDF( FILE, STATUS )
 *
 *  Description:
-*     Delete a CHP additional information file. Currently assumes that the 
+*     Delete a CHP additional information file. Currently assumes that the
 *     file is in the current directory. Later to include a search path.
 
 *  Arguments:
@@ -39,14 +39,14 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
 *      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'FIO_ERR'
- 
+
 *  Local Variables:
       CHARACTER * ( 32 ) FILENAME ! Full filename
       CHARACTER * ( 28 ) FILENAME1 ! Full filename

@@ -22,7 +22,7 @@ proc cred4ListMasks {taskname} {
    if {[file exists $env(CGS4DR_ROOT)/dst/${filename}.dst] != 1} {set bpmn "${bpmn} [list ${filename}.sdf]"}
   }
 
-# Output the results  
+# Output the results
   cgs4drInform $taskname "Bad Pixel or Window Masks are:\n"
   cgs4drInform $taskname "DST: [lsort $bpmd]\n"
   cgs4drInform $taskname "NDF: [lsort $bpmn]\n"

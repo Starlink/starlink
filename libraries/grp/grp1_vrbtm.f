@@ -15,7 +15,7 @@
 
 *  Description:
 *     This subroutine searches the supplied group expression for the
-*     strings "<!!" (which marks the start of a verbatim section) and  
+*     strings "<!!" (which marks the start of a verbatim section) and
 *     "!!>" (which marks the end of a verbatim section). A modified form
 *     of the supplied group expression is created in which:
 *
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
          END IF
       END DO
 
-*  Process the supplied string      
+*  Process the supplied string
       GRPEXP = ' '
       I = 1
       J = 1
@@ -141,9 +141,9 @@
             I = I + 3
             VERB = .FALSE.
 
-*  If an escape character is defined, and we are in a verbatim section, 
+*  If an escape character is defined, and we are in a verbatim section,
 *  check the current character against the list of control characters.
-         ELSE IF( ESCOK .AND. VERB ) THEN 
+         ELSE IF( ESCOK .AND. VERB ) THEN
 
 *  If found, insert an escape character in the output string.
             IF( INDEX( CCS( : NC ), GEXP( I : I ) ) .GT. 0 ) THEN
@@ -152,14 +152,14 @@
             END IF
 
 * Copy the input character.
-            GRPEXP( J : J ) = GEXP( I : I ) 
+            GRPEXP( J : J ) = GEXP( I : I )
             I = I + 1
             J = J + 1
 
-*  If we are not escaping control characters for any reason, just copy the 
+*  If we are not escaping control characters for any reason, just copy the
 *  current character to the returned group expression.
          ELSE
-            GRPEXP( J : J ) = GEXP( I : I ) 
+            GRPEXP( J : J ) = GEXP( I : I )
             I = I + 1
             J = J + 1
          END IF

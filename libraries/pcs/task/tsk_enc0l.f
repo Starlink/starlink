@@ -72,22 +72,22 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       LOGICAL LVAL         ! the value to be encoded
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER NCHAR         ! length of encoded string
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       CALL CHR_LTOC( LVAL, STRING, NCHAR )
- 
+
       END

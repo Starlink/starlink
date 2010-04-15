@@ -1,5 +1,5 @@
 { Procedure OBJPROC : auto scans RO lis file and creates batch file
-proc objproc 
+proc objproc
   get plt2d name_prefix (ropref)
   print "Using RO prefix " (ropref)
   utd = substr(ropref,3,6)

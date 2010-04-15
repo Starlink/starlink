@@ -53,7 +53,7 @@ proc setfile newold newutd newsuf
   else
     send plt2d set filetype 0
     send plt2d set rosuf ' '
-    if yn2 
+    if yn2
       SETPRE
     else
       SETPRE (newutd)

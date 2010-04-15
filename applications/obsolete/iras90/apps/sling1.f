@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
-                                 
+
 *  Arguments Given:
       INTEGER IGRP
       INTEGER IRA
@@ -112,8 +112,8 @@
       CALL IRA_CTOD( NAMES( 1 ), NAMES( 2 ), SCS, LON( NMERD + 1 ),
      :               LAT( NMERD + 1 ), STATUS )
 
-*  The third should be the arc-length of the curve, in degrees. 
-*  Convert it to a floating point value, storing it at the end of the 
+*  The third should be the arc-length of the curve, in degrees.
+*  Convert it to a floating point value, storing it at the end of the
 *  returned array.
       CALL CHR_CTOD( NAMES( 3 ), SCT( NMERD + 1 ), STATUS )
 
@@ -130,5 +130,5 @@
          NMERD = NMERD + 1
          INDEX = INDEX + 3
       END IF
-      
+
       END

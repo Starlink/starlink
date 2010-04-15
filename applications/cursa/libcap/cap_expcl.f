@@ -146,7 +146,7 @@
 *          Check whether the column is a scalar or a vector.
 
             IF (DIMS .EQ. CAT__SCALR) THEN
-           
+
 *
 *             Add the identifier to the list of columns to copy.
 
@@ -163,8 +163,8 @@
 
 *
 *             The column is a vector.  First obtain identifiers for the
-*             parent input and output catalogues.  Then determine the number 
-*             of elements in the column and and its name. Finally get an 
+*             parent input and output catalogues.  Then determine the number
+*             of elements in the column and and its name. Finally get an
 *             identifier for each element.
 
                CALL CAT_TIDPR (FIINC, CIIN, STATUS)

@@ -16,33 +16,33 @@
 
 * Arguments:
 *    N = INTEGER (Given)
-*       
+*
 *    XC(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    FC1 = DOUBLE PRECISION (Given)
-*       
+*
 *    GC1(N) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    ISTATE(N) = INTEGER ARRAY (Given)
-*       
+*
 *    GPJNRM = DOUBLE PRECISION (Given)
-*       
+*
 *    COND = DOUBLE PRECISION (Given)
-*       
+*
 *    POSDEF = LOGICAL (Given)
-*       
+*
 *    NITER = INTEGER (Given)
-*       
+*
 *    NF = INTEGER (Given)
-*       
+*
 *    IW(LIW) = INTEGER ARRAY (Given)
-*       
+*
 *    LIW = INTEGER (Given)
-*       
+*
 *    W(LW) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    LW = INTEGER (Given)
-*       
+*
 *
       implicit none
       include 'opt_cmn'

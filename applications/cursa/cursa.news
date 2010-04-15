@@ -3,9 +3,9 @@
   Version 6.5 of CURSA is now part of the Starlink CVS release.
 
   This version includes a new "geturl" command that understands
-  proxy servers. To define a proxy server set the environment 
-  variable "http_proxy" to something like:  
- 
+  proxy servers. To define a proxy server set the environment
+  variable "http_proxy" to something like:
+
      http://wwwcache.myuni.ac.uk:8080/
 
   before running geturl, or xcatview.

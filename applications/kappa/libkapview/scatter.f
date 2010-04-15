@@ -22,17 +22,17 @@
 *  Description:
 *     This application displays a 2-dimensional plot in which the
 *     horizontal axis corresponds to the data value in the NDF given
-*     by parameter IN1, and the vertical axis corresponds to the data 
+*     by parameter IN1, and the vertical axis corresponds to the data
 *     value in the NDF given by parameter IN2. Optionally, the variance,
-*     standard deviation or quality may be used instead of the data value for 
-*     either axis (see parameters COMP1 and COMP2). A symbol is displayed 
-*     at an appropriate position in the plot for each pixel which has a 
+*     standard deviation or quality may be used instead of the data value for
+*     either axis (see parameters COMP1 and COMP2). A symbol is displayed
+*     at an appropriate position in the plot for each pixel which has a
 *     good value in both NDFs, and falls within the bounds specified by
 *     parameter XLEFT, XRIGHT, YBOT and YTOP. The type of symbol may be
 *     specified using parameter MARKER.
 *
-*     The supplied arrays may be compressed prior to display (see parameter 
-*     COMPRESS). This reduces the number of points in the scatter plot, and 
+*     The supplied arrays may be compressed prior to display (see parameter
+*     COMPRESS). This reduces the number of points in the scatter plot, and
 *     also reduces the noise in the data.
 
 *  Usage:
@@ -41,85 +41,85 @@
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot. The width of the margins left for the annotation may be 
-*        controlled using parameter MARGIN. The appearance of the axes 
+*        plot. The width of the margins left for the annotation may be
+*        controlled using parameter MARGIN. The appearance of the axes
 *        (colours, fonts, etc) can be controlled using the parameter
 *        STYLE. [TRUE]
 *     CLEAR = _LOGICAL (Read)
-*        If TRUE the current picture is cleared before the plot is 
-*        drawn. If CLEAR is FALSE not only is the existing plot retained, 
+*        If TRUE the current picture is cleared before the plot is
+*        drawn. If CLEAR is FALSE not only is the existing plot retained,
 *        but also an attempt is made to align the new picture with the
-*        existing picture. Thus you can generate a composite plot within 
-*        a single set of axes, say using different colours or modes to 
+*        existing picture. Thus you can generate a composite plot within
+*        a single set of axes, say using different colours or modes to
 *        distinguish data from different datasets. [TRUE]
 *     COMP1 = LITERAL (Read)
-*        The NDF array component to be displayed on the horizontal axis.  
-*        It may be "Data", "Quality", "Variance", or "Error" (where "Error" 
+*        The NDF array component to be displayed on the horizontal axis.
+*        It may be "Data", "Quality", "Variance", or "Error" (where "Error"
 *        is an alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
 *        the range 0 to 255). ["Data"]
 *     COMP2 = LITERAL (Read)
-*        The NDF array component to be displayed on the vertical axis.  
-*        It may be "Data", "Quality", "Variance", or "Error" (where "Error" 
+*        The NDF array component to be displayed on the vertical axis.
+*        It may be "Data", "Quality", "Variance", or "Error" (where "Error"
 *        is an alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
 *        the range 0 to 255). ["Data"]
 *     COMPRESS() = _INTEGER (Read)
 *        The compression factors to be used when compressing the supplied
-*        arrays prior to display. If any of the supplied values are greater 
-*        than 1, then the supplied arrays are compressed prior to display 
-*        by replacing each box of input pixels by a single pixel equal to 
-*        the mean of the pixels in the box. The size of each box in pixels 
-*        is given by the compression factors. No compression occurs if all 
+*        arrays prior to display. If any of the supplied values are greater
+*        than 1, then the supplied arrays are compressed prior to display
+*        by replacing each box of input pixels by a single pixel equal to
+*        the mean of the pixels in the box. The size of each box in pixels
+*        is given by the compression factors. No compression occurs if all
 *        values supplied for this parameter are 1. If the number of values
-*        supplied is smaller than the number of axes, the final value 
+*        supplied is smaller than the number of axes, the final value
 *        supplied is duplicated for the remaining axes. [1]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
-*        null value (!) is supplied no plot will be made. [Current graphics 
+*        null value (!) is supplied no plot will be made. [Current graphics
 *        device]
 *     IN1 = NDF (Read)
 *        The NDF to be displayed on the horizontal axis.
 *     IN2 = NDF (Read)
 *        The NDF to be displayed on the vertical axis.
 *     MARGIN( 4 ) = _REAL (Read)
-*        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the current picture. 
-*        Four values may be given, in the order - bottom, right, top, left. 
-*        If less than four values are given, extra values are used equal to 
-*        the first supplied value. If these margins are too narrow any axis 
+*        The widths of the margins to leave for axis annotation, given
+*        as fractions of the corresponding dimension of the current picture.
+*        Four values may be given, in the order - bottom, right, top, left.
+*        If less than four values are given, extra values are used equal to
+*        the first supplied value. If these margins are too narrow any axis
 *        annotation may be clipped. If a null (!) value is supplied, the
-*        used value is 0.15 (for all edges) if annotated axes are produced, 
+*        used value is 0.15 (for all edges) if annotated axes are produced,
 *        and zero otherwise. [current value]
 *     MARKER = _INTEGER (Read)
 *        Specifies the symbol with which each position should be marked in
-*        the plot. It should be given as an integer PGPLOT marker type. For 
-*        instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives 
-*        an asterisk, 7 gives a triangle. The value must be larger than or 
+*        the plot. It should be given as an integer PGPLOT marker type. For
+*        instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
+*        an asterisk, 7 gives a triangle. The value must be larger than or
 *        equal to -31. [current value]
 *     PERC1( 2 ) = _REAL (Read)
 *        The percentiles that define the default values for XLEFT and
-*        XRIGHT. For example, [5,95] would result in the lowest and 
+*        XRIGHT. For example, [5,95] would result in the lowest and
 *        highest 5% of the data value in IN1 being excluded from the plot
-*        if the default values are accepted for XLEFT and XRIGHT. 
+*        if the default values are accepted for XLEFT and XRIGHT.
 *        [current value]
 *     PERC2( 2 ) = _REAL (Read)
 *        The percentiles that define the default values for YBOT and
-*        YTOP. For example, [5,95] would result in the lowest and 
+*        YTOP. For example, [5,95] would result in the lowest and
 *        highest 5% of the data value in IN2 being excluded from the plot
-*        if the default values are accepted for YBOT and YTOP. 
+*        if the default values are accepted for YBOT and YTOP.
 *        [current value]
 *     STYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style to use 
+*        A group of attribute settings describing the plotting style to use
 *        when drawing the annotated axes, and markers.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text file
 *        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
+*        contain further comma-separated lists which will be read and
+*        interpreted in the same manner. Attribute settings are applied in
 *        the order in which they occur within the list, with later settings
 *        over-riding any earlier settings given for the same attribute.
 *
@@ -133,35 +133,35 @@
 *        defaulted if a null value (!) is supplied. See section "Plotting
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        reported).
 *
-*        The appearance of markers is controlled by Colour(Markers), 
-*        Width(Markers), etc (the synonym Symbols may be used in place 
+*        The appearance of markers is controlled by Colour(Markers),
+*        Width(Markers), etc (the synonym Symbols may be used in place
 *        of Markers). [current value]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis. If a null (!) value is suplied, the value used is determined 
-*        by parameter PERC1. The value supplied may be greater than or less 
+*        axis. If a null (!) value is suplied, the value used is determined
+*        by parameter PERC1. The value supplied may be greater than or less
 *        than the value supplied for XRIGHT. [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis. If a null (!) value is suplied, the value used is determined 
-*        by parameter PERC1. The value supplied may be greater than or less 
+*        axis. If a null (!) value is suplied, the value used is determined
+*        by parameter PERC1. The value supplied may be greater than or less
 *        than the value supplied for XLEFT. [!]
 *     YBOT = _REAL (Read)
-*        The axis value to place at the bottom end of the vertical axis. 
-*        If a null (!) value is suplied, the value used is determined 
-*        by parameter PERC2. The value supplied may be greater than or less 
+*        The axis value to place at the bottom end of the vertical axis.
+*        If a null (!) value is suplied, the value used is determined
+*        by parameter PERC2. The value supplied may be greater than or less
 *        than the value supplied for YTOP. [!]
 *     YTOP = _REAL (Read)
-*        The axis value to place at the top end of the vertical axis. 
-*        If a null (!) value is suplied, the value used is determined 
-*        by parameter PERC2. The value supplied may be greater than or less 
+*        The axis value to place at the top end of the vertical axis.
+*        If a null (!) value is suplied, the value used is determined
+*        by parameter PERC2. The value supplied may be greater than or less
 *        than the value supplied for YBOT. [!]
 
 *  Examples:
-*     scatter cl123a cl123b 
-*        This displays a scatter plot of the data value in NDF cl123b 
+*     scatter cl123a cl123b
+*        This displays a scatter plot of the data value in NDF cl123b
 *        against the data value in NDF cl123a, on the current graphics
 *        device.
 *     scatter cl123a cl123a pscol_l comp2=error compress=3
@@ -174,11 +174,11 @@
 *     -  Any pixels that are bad (after any compression) in either array
 *     are excluded from the plot, and from the calculation of the
 *     default axis limits
-*     -  The application stores two pictures in the graphics database in 
-*     the following order: a FRAME picture containing the annotated axes 
+*     -  The application stores two pictures in the graphics database in
+*     the following order: a FRAME picture containing the annotated axes
 *     and data plot, and a DATA picture containing just the data plot.
-*     Note, the FRAME picture is only created if annotated axes have been 
-*     drawn, or if non-zero margins were specified using parameter 
+*     Note, the FRAME picture is only created if annotated axes have been
+*     drawn, or if non-zero margins were specified using parameter
 *     MARGIN. The world co-ordinates in the DATA picture will correspond
 *     to data value in the two NDFs.
 
@@ -190,7 +190,7 @@
 *     supported.
 *     -  Only _REAL data can be processed directly.  Other non-complex
 *     numeric data types will undergo a type conversion before
-*     processing occurs.  
+*     processing occurs.
 
 *  Copyright:
 *     Copyright (C) 1999, 2001, 2004 Central Laboratory of the Research
@@ -226,7 +226,7 @@
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
 *     19-SEP-2001 (DSB):
-*        Ensure that none of the compression factors are bigger than the 
+*        Ensure that none of the compression factors are bigger than the
 *        number of pixels on the corresponding axis.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
@@ -252,7 +252,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER NUMBIN             ! Size of percetiles histogram 
+      INTEGER NUMBIN             ! Size of percetiles histogram
       PARAMETER ( NUMBIN = 1000 )
 
 *  Local Variables:
@@ -263,7 +263,7 @@
       CHARACTER MCOMP1*10        ! NDF component from IN1 to be mapped
       CHARACTER MCOMP2*10        ! NDF component from IN2 to be mapped
       CHARACTER NDFNAM*80        ! NDF name (without directory path)
-      CHARACTER UNITS1*30        ! Units string from NDF IN1 
+      CHARACTER UNITS1*30        ! Units string from NDF IN1
       CHARACTER UNITS2*30        ! Units string from NDF IN2
       INTEGER CMPRS( NDF__MXDIM )! Compression factors for each axis
       INTEGER CDIM( NDF__MXDIM ) ! Dimensions of compressed array
@@ -309,7 +309,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise pointers to dynamic work arrays indicate that none of them 
+*  Initialise pointers to dynamic work arrays indicate that none of them
 *  are being used.
       IPW1 = 0
       IPW2 = 0
@@ -332,15 +332,15 @@
       CALL KPG1_ARCOG( 'COMP1', INDF1, MCOMP1, COMP1, STATUS )
       CALL KPG1_ARCOG( 'COMP2', INDF2, MCOMP2, COMP2, STATUS )
 
-*  Obtain the units if present.  
+*  Obtain the units if present.
       CALL KPG1_DAUNI( INDF1, MCOMP1, UNITS1, NCU1, STATUS )
       CALL KPG1_DAUNI( INDF2, MCOMP2, UNITS2, NCU2, STATUS )
 
 *  Find the percentiles defining the default axis limits, and convert to
 *  fractions.
-      CALL PAR_GDR1R( 'PERC1', 2, -1.0, 0.0, 100.0, .FALSE., PERC1, 
+      CALL PAR_GDR1R( 'PERC1', 2, -1.0, 0.0, 100.0, .FALSE., PERC1,
      :                STATUS )
-      CALL PAR_GDR1R( 'PERC2', 2, -1.0, 0.0, 100.0, .FALSE., PERC2, 
+      CALL PAR_GDR1R( 'PERC2', 2, -1.0, 0.0, 100.0, .FALSE., PERC2,
      :                STATUS )
       PERC1( 1 ) = PERC1( 1 ) * 0.01
       PERC1( 2 ) = PERC1( 2 ) * 0.01
@@ -352,7 +352,7 @@
       CALL NDF_MBND( 'TRIM', INDF1, INDF2, STATUS )
 
 *  Get the dimensions of the section being display.
-      CALL NDF_DIM( INDF1, NDF__MXDIM, DIM, NDIM, STATUS )      
+      CALL NDF_DIM( INDF1, NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  1D data must be handled as 2D data with a second dimension of 1.
       IF( NDIM .EQ. 1 ) THEN
@@ -365,18 +365,18 @@
       IF( MCOMP1( 1 : 1 ) .NE. 'Q' ) THEN
 
 *  Just map these components as _REAL.
-         CALL NDF_MAP( INDF1, MCOMP1, '_REAL', 'READ', IP1, NEL, 
+         CALL NDF_MAP( INDF1, MCOMP1, '_REAL', 'READ', IP1, NEL,
      :                 STATUS )
 
-*  Quality arrays have to be handled a bit differently because they can 
+*  Quality arrays have to be handled a bit differently because they can
 *  only be accessed as _UBYTE arrays. Therefore, we need to map them as
-*  _UBYTE, and then convert them explicitly to _REAL, allocating storage 
+*  _UBYTE, and then convert them explicitly to _REAL, allocating storage
 *  for the result.
       ELSE
-         CALL NDF_MAP( INDF1, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL, 
+         CALL NDF_MAP( INDF1, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL,
      :                 STATUS )
          CALL PSX_CALLOC( NEL, '_REAL', IPW1, STATUS )
-         CALL VEC_UBTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ), 
+         CALL VEC_UBTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ), IERR,
      :                   NERR, STATUS )
          CALL NDF_UNMAP( INDF1, '*', STATUS )
@@ -385,13 +385,13 @@
 
 *  Map the required array from the second NDF in the same way.
       IF( MCOMP2( 1 : 1 ) .NE. 'Q' ) THEN
-         CALL NDF_MAP( INDF2, MCOMP2, '_REAL', 'READ', IP2, NEL, 
+         CALL NDF_MAP( INDF2, MCOMP2, '_REAL', 'READ', IP2, NEL,
      :                 STATUS )
       ELSE
-         CALL NDF_MAP( INDF2, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL, 
+         CALL NDF_MAP( INDF2, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL,
      :                 STATUS )
          CALL PSX_CALLOC( NEL, '_REAL', IPW2, STATUS )
-         CALL VEC_UBTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ), 
+         CALL VEC_UBTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ),
      :                   %VAL( CNF_PVAL( IPW2 ) ), IERR,
      :                   NERR, STATUS )
          CALL NDF_UNMAP( INDF2, '*', STATUS )
@@ -399,8 +399,8 @@
       END IF
 
 *  Get the compression factors to use when block averaging the supplied data,
-*  duplicating the last value if insufficient values are given. 
-      CALL PAR_GDRVI( 'COMPRESS', NDIM, 1, VAL__MAXI, CMPRS, NVAL, 
+*  duplicating the last value if insufficient values are given.
+      CALL PAR_GDRVI( 'COMPRESS', NDIM, 1, VAL__MAXI, CMPRS, NVAL,
      :                STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       DO I = NVAL + 1, NDIM
@@ -423,10 +423,10 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  If required, block average the data to reduce the number of points to
-*  display. 
+*  display.
       IF( BLAV ) THEN
 
-*  Find the size of the output arrays. 
+*  Find the size of the output arrays.
          CEL = 1
          DO I = 1, NDIM
             CDIM( I ) = MAX( 1, DIM( I ) / CMPRS( I ) )
@@ -434,7 +434,7 @@
          END DO
 
 *  Create workspace: four are needed --- two for the compressed
-*  arrays, and the other two are needed to perform the averaging 
+*  arrays, and the other two are needed to perform the averaging
 *  calculations.
          CALL PSX_CALLOC( CEL, '_REAL', IPW3, STATUS )
          CALL PSX_CALLOC( CEL, '_REAL', IPW4, STATUS )
@@ -443,16 +443,16 @@
 
 *  Block average the first array.
          CALL KPG1_CMAVR( NDIM, DIM, %VAL( CNF_PVAL( IP1 ) ), CMPRS, 1,
-     :                    %VAL( CNF_PVAL( IPW3 ) ), 
-     :                    %VAL( CNF_PVAL( IPW5 ) ), 
+     :                    %VAL( CNF_PVAL( IPW3 ) ),
+     :                    %VAL( CNF_PVAL( IPW5 ) ),
      :                    %VAL( CNF_PVAL( IPW6 ) ),
      :                    STATUS )
          IP1 = IPW3
 
 *  Block average the second array.
          CALL KPG1_CMAVR( NDIM, DIM, %VAL( CNF_PVAL( IP2 ) ), CMPRS, 1,
-     :                    %VAL( CNF_PVAL( IPW4 ) ), 
-     :                    %VAL( CNF_PVAL( IPW5 ) ), 
+     :                    %VAL( CNF_PVAL( IPW4 ) ),
+     :                    %VAL( CNF_PVAL( IPW5 ) ),
      :                    %VAL( CNF_PVAL( IPW6 ) ),
      :                    STATUS )
          IP2 = IPW4
@@ -465,31 +465,31 @@
       ELSE
          CALL PSX_CALLOC( NEL, '_REAL', IPW3, STATUS )
          CALL PSX_CALLOC( NEL, '_REAL', IPW4, STATUS )
-         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
+         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IP1 ) ),
      :                   %VAL( CNF_PVAL( IPW3 ) ), IERR,
      :                   NERR, STATUS )
-         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
+         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IP2 ) ),
      :                   %VAL( CNF_PVAL( IPW4 ) ), IERR,
      :                   NERR, STATUS )
       END IF
 
 *  Ensure the two work arrays have the same bad pixel mask.
-      CALL KPS1_SCAT1( NEL, %VAL( CNF_PVAL( IPW3 ) ), 
+      CALL KPS1_SCAT1( NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS )
-      
-*  Obtain the maximum and minimum values to define the bounds of the 
+
+*  Obtain the maximum and minimum values to define the bounds of the
 *  first histogram.
-      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ), 
+      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
 
 *  Generate the histogram between those bounds.
-      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ), 
+      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
 
 *  Estimate the values at the percentiles.
-      CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC1, PERV1, 
+      CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC1, PERV1,
      :                 STATUS )
 
 *  Ensure they are the right way round.
@@ -500,13 +500,13 @@
       END IF
 
 *  Do the same for the second NDF.
-      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ), 
+      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ),
      :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
-      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ), 
+      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ),
      :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
-      CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC2, PERV2, 
+      CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC2, PERV2,
      :                 STATUS )
 
       IF( PERV2( 1 ) .GT. PERV2( 2 ) ) THEN
@@ -541,12 +541,12 @@
 
 *  Produce the scatter plot.
       IPLOT = AST__NULL
-      CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IPW3 ) ), 
+      CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
-     :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ), 
-     :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), 
-     :                 'KAPPA_SCATTER', .FALSE., .FALSE., IPLOT, 
+     :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ),
+     :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ),
+     :                 'KAPPA_SCATTER', .FALSE., .FALSE., IPLOT,
      :                 STATUS )
 
 *  Close the workstation.

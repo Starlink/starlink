@@ -30,7 +30,7 @@
 *        The pixel indices of the breaks in X and Y. These should be
 *        sorted into ascending order.
 *     N = INTEGER (Given)
-*        The number of elements in the FLUX and WAVE arrays. 
+*        The number of elements in the FLUX and WAVE arrays.
 *     FLUX( N ) = REAL (Given)
 *        The flux values.
 *     WAVE( N ) = REAL (Given)
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :        I,                 ! Index of next element to be read
      :        IBRK,              ! Index of next break
      :        J,                 ! Index of next element to be written
@@ -101,7 +101,7 @@
 *  If a SPECTRUM format 0 file is being produced...
       IF( COMM .EQ. 'SP0WR' ) THEN
 
-*  Initialise the index within X and Y at which the next output values will 
+*  Initialise the index within X and Y at which the next output values will
 *  be stored.
          J = 1
 
@@ -111,7 +111,7 @@
 
 *  Store the maximum step in X between points in a gap.
          DWAV = 0.0001
- 
+
 *  Loop round all the elements in the input arrays (FLUX and WAVE).
          DO I = 1, N
 
@@ -151,11 +151,11 @@
                   CALL ERR_REP( 'WRCOPY_ERR1', 'Break point ^IBRK '//
      :                          '(at element ^NXTBRK) occurs before '//
      :                          'or at the previous one (at element '//
-     :                          '^LSTBRK) - (programming error).', 
+     :                          '^LSTBRK) - (programming error).',
      :                          STATUS )
                   GO TO 999
                END IF
- 
+
             END IF
 
          END DO
@@ -165,7 +165,7 @@
 
          DO I = 1, N
             X( I ) = WAVE( I )
-            Y( I ) = FLUX( I ) 
+            Y( I ) = FLUX( I )
          END DO
 
       END IF
@@ -173,4 +173,4 @@
 *  Jump to here if an error occurs.
  999  CONTINUE
 
-      END 
+      END

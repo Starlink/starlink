@@ -67,7 +67,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'         
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'          ! SSE global definitions
 
 *    Status :
@@ -82,7 +82,7 @@
 
       REAL
      :    MAXSCAL,                ! maximum scalar allowed in addition
-     :    MINSCAL                 ! minimum    "      "     "    "   
+     :    MINSCAL                 ! minimum    "      "     "    "
       PARAMETER( MAXSCAL  =  1.0E30 )
       PARAMETER( MINSCAL  = -1.0E30 )
 
@@ -117,7 +117,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the input structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get image dimensions
@@ -139,7 +139,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )

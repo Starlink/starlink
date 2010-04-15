@@ -16,9 +16,9 @@
 #endif
 
 int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
-			Boolean inter, Boolean iconic, unsigned int border, 
-			char *fg, char *bg, Boolean ovl, char *ovcol, 
-			int size_x, int size_y, int pos_x, int pos_y, 
+			Boolean inter, Boolean iconic, unsigned int border,
+			char *fg, char *bg, Boolean ovl, char *ovcol,
+			int size_x, int size_y, int pos_x, int pos_y,
 			Window *win_id )
 /*
 *+
@@ -46,7 +46,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 *         GWM properties set on the window
 *     If any part of the operation fails, all resources allocated are released
 *     and the window id set to NULL.
-*     
+*
 *
 *  Function return value:
 *     status = int
@@ -95,12 +95,12 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -144,7 +144,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     XColor bg_color, fg_color, ov_color;
     long zero = 0;
     Colormap colormap;
-    
+
 #include "starlink.icon"		/* icon pixmap definition */
 
     XWMHints wmhints;
@@ -158,12 +158,12 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     Atom dwatom;                 /* atom identifier */
 
 
-/*	  
+/*
 **  Preset window id to zero
-*/	  
+*/
     *win_id = (Window)0;
 
-/*	  
+/*
 **  Attempt to find a window with this name in case it already exists; if
 **  it does then just exit.
 */
@@ -174,7 +174,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 **  Get the visual class of the display
 */
     visual_class = DefaultVisual( display, DefaultScreen( display ) )-> class;
-    
+
 /*
 **  Select a suitable number of colours to allocate - if the number
 **  requested is < 0 then use that number, otherwise no number has been
@@ -220,17 +220,17 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 
   /*  From now on there are resources to be deallocated if an error occurs */
 
-/*	  
+/*
 **  Allocate the number of colour cells requested - read/write if the server
 **  supports it. If the colour map is read only then we just have to check that
 **  it is at least as big as the number of requested colours.
-*/	  
+*/
 
     colormap = DefaultColormap( display, DefaultScreen( display ) );
 
     if ( visual_class == GrayScale || visual_class == PseudoColor )
     {
-	status = XAllocColorCells( display, colormap, False, &mask, 
+	status = XAllocColorCells( display, colormap, False, &mask,
 	    ovl ? 1 : 0 ,pix_array_l, lncols);
 
 /*
@@ -239,7 +239,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 	if (!status)
 	{
 	    colormap = XCopyColormapAndFree( display, colormap);
-	    status = XAllocColorCells( display, colormap, False, &mask, 
+	    status = XAllocColorCells( display, colormap, False, &mask,
 		ovl ? 1 : 0 ,pix_array_l, lncols);
 	}
     }
@@ -264,8 +264,8 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 	    if (!status)
 	    {
 		colormap = XCopyColormapAndFree( display, colormap);
-	    	status = XAllocColorPlanes( display, colormap, False, 
-		    pix_array_l, lncols, 0, 0, 0, &mask_return, 
+	    	status = XAllocColorPlanes( display, colormap, False,
+		    pix_array_l, lncols, 0, 0, 0, &mask_return,
 		    &mask_return, &mask_return );
 	    }
 	}
@@ -277,7 +277,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 		status = False;
 	}
     }
-    if ( !status ) 
+    if ( !status )
     {
 	status = GWM_COL_ALLOC;
 	goto cleanup;
@@ -288,14 +288,14 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 **  and background colours
 */
     status = XParseColor( display, colormap, bg, &bg_color);
-    if ( !status ) 
+    if ( !status )
     {
 	status = GWM_BAD_COLOUR;
 	goto cleanup;
     }
 
     status = XParseColor( display, colormap, fg, &fg_color);
-    if ( !status ) 
+    if ( !status )
     {
 	status = GWM_BAD_COLOUR;
 	goto cleanup;
@@ -323,7 +323,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     if (ovl)
     {
     	status = XParseColor( display, colormap, ovcol, &ov_color);
-    	if ( !status ) 
+    	if ( !status )
     	{
 	    status = GWM_BAD_COLOUR;
 	    goto cleanup;
@@ -336,10 +336,10 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     }
 
 
-/*	  
+/*
 **  Create the window.
-*/	  
-    *win_id = XCreateSimpleWindow( display, 
+*/
+    *win_id = XCreateSimpleWindow( display,
 	RootWindow( display, DefaultScreen( display ) ),
 	pos_x, pos_y, size_x, size_y, border, pix_array_l[1], pix_array_l[0]);
 
@@ -360,9 +360,9 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 /*
  *  Create the icon pixmap
  */
-    icon_pixmap = XCreateBitmapFromData( display, 
+    icon_pixmap = XCreateBitmapFromData( display,
 	RootWindow( display, DefaultScreen( display ) ),
-	(char*)captain_starlink_bits, captain_starlink_width, 
+	(char*)captain_starlink_bits, captain_starlink_width,
 	captain_starlink_height);
 
 
@@ -377,14 +377,14 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 /*
  *  Create the icon pixmap
  */
-    cs_icon_pixmap = XCreateBitmapFromData( display, 
+    cs_icon_pixmap = XCreateBitmapFromData( display,
 	RootWindow( display, DefaultScreen( display ) ),
 	(char*)cshead_bits, cshead_width, cshead_height);
 /*
  * 	Set the "iconify pixmap" into title bar and small icon
  */
     wmatom = XInternAtom(display, "DEC_WM_HINTS", 0);
-    if (wmatom != None) 
+    if (wmatom != None)
     {
         dwmhints.value_mask = DECWmIconifyPixmapMask;
         dwmhints.iconify_pixmap = cs_icon_pixmap;
@@ -408,7 +408,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
  *  Declare an interest in the WM_DELETE_WINDOW window manager protocol
  */
     wmatom = XInternAtom(display, "WM_PROTOCOLS", 0);
-    if (wmatom != None) 
+    if (wmatom != None)
     {
     	dwatom = XInternAtom(display, "WM_DELETE_WINDOW", 0);
 	XChangeProperty(display,                 /* display */
@@ -451,7 +451,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     }
     XStoreName( display, *win_id, ltitle);
     if (!title) free( ltitle );
-	
+
 /*
  *  Map the window and wait for it to be created
  */
@@ -459,32 +459,32 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     XMapWindow( display, *win_id );
     XWindowEvent( display, *win_id, StructureNotifyMask, &event );
 
-/*	  
+/*
 **  The window should now have appeared on the screen (unless its
-**  initial state is iconic) and if requested, we wait for a button 
+**  initial state is iconic) and if requested, we wait for a button
 **  press event to signify that the user has finished resizing the
-**  new window. Any configure notify events that appear before the 
+**  new window. Any configure notify events that appear before the
 **  button press are discarded
-*/	  
+*/
     if ( inter && (!iconic) )
     {
 	for (;;)
 	{
-	    XSelectInput( display, *win_id, 
+	    XSelectInput( display, *win_id,
 		StructureNotifyMask | ButtonPressMask );
-	    XWindowEvent( display, *win_id, 
+	    XWindowEvent( display, *win_id,
 		StructureNotifyMask  |ButtonPressMask, &event );
 	    if (event.type == ButtonPress ) break;
 	}
     }
 
-/*	  
+/*
 **  We can now create the off-screen pixmap
-*/	  
+*/
     XGetWindowAttributes( display, *win_id, &win_attrib );
     pix_id = XCreatePixmap( display, *win_id, win_attrib.width,
-	win_attrib.height, 
-	DefaultDepthOfScreen(ScreenOfDisplay(display,DefaultScreen(display)))); 
+	win_attrib.height,
+	DefaultDepthOfScreen(ScreenOfDisplay(display,DefaultScreen(display))));
 
     if ( !(pix_id) )
     {
@@ -502,10 +502,10 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     XFreeGC( display, gc);
 
 
-/*	  
+/*
 **  All the necessary resources have now been allocated and various window
 **  properties can be created to tie them all together.
-*/	  
+*/
     title = malloc( strlen(name) + 5 );
     if ( !title )
     {
@@ -517,7 +517,7 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
     atom = XInternAtom( display, title, False );
     free( title );
     XChangeProperty( display, DefaultRootWindow( display ), atom, XA_WINDOW,
-	32, PropModeReplace, (unsigned char*)win_id, 1); 
+	32, PropModeReplace, (unsigned char*)win_id, 1);
 
     atom = XInternAtom( display, "GWM_name", False );
     XChangeProperty( display, *win_id, atom, XA_STRING, 8,PropModeReplace,

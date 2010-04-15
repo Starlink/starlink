@@ -28,7 +28,7 @@ C     CALL DSA__READ_FITS_{x} (STRING,CODE,REF_NAME,ITEM,VALUE,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) STRING          (Fixed string,descr) The DTA_ name 
+C     (>) STRING          (Fixed string,descr) The DTA_ name
 C                         of the object used for the FITS value, for
 C                         original Figaro format data, as a formatted
 C                         version of the data for NDF formatted data.
@@ -41,7 +41,7 @@ C                         used to identify the structure.  This is only
 C                         used to generate error messages.
 C     (>) ITEM            (Fixed string,descr) The name of the item
 C                         in question - (this is a FITS keyword).
-C                         Case-insensitive. This is only used to 
+C                         Case-insensitive. This is only used to
 C                         generate error messages.
 C     (<) VALUE           (Any, ref/descr) The value of the item
 C                         in question.   DSA__READ_FITS_C expects a
@@ -56,7 +56,7 @@ C  External variables used: None.
 C
 C  External subroutines / functions used:
 C     DSA_POST_GET_FITS, DSA_GET_FITS_ERR, ICH_NUMBR, ICH_NUMBD,
-C     DTA_SZVAR, DTA_RDVARB, DTA_RDVARD, DTA_RDVARF, DTA_RDVARI, 
+C     DTA_SZVAR, DTA_RDVARB, DTA_RDVARD, DTA_RDVARF, DTA_RDVARI,
 C     DTA_RDVARS, DTA_RDVARC
 C
 C  Version date: 31st August 1992.
@@ -74,7 +74,7 @@ C     DSA_POST_GET_FITS     Test DTA_ status after read from FITS structure
 C     ICH_NUMBR             Decode a string into a single precision number
 C     ICH_NUMBD             Decode a string into a double precision number
 C     DTA_SZVAR             Get size of a data object
-C     DTA_RDVAR{x}          Read an item from a data object 
+C     DTA_RDVAR{x}          Read an item from a data object
 C
 C  History:
 C     7th  Feb 1990  Original version.  KS / AAO.

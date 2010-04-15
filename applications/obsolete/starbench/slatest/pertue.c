@@ -18,7 +18,7 @@ void sbmpertue(double qfoo,double qbar[],int*qbaz)
 #define Q5 (QQUUX*QQUUX)
 {double QFRED;double qdog[13];double qcat;double QFISH;
 double QgASp;double Q6;int q7;double q8,QBAD[3],qBuG[3],
-qsilly[3];double QBUGGY,QMUM;double qDAd;double q9=0.0;int 
+qsilly[3];double QBUGGY,QMUM;double qDAd;double q9=0.0;int
 Q10;double Q11[8][13];double q12=0.0;double Q13[8][6];double
  Q14[3],qdisk[3],Q15[3],q16[3];double q17[6],QEMPTY[3];
 double q18[3][3];double QFULL[8],qfast[8],qsmall,QBIG;double

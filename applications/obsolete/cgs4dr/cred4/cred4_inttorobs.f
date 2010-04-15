@@ -8,7 +8,7 @@
 *    Parameters :
 *     IFILE  = CHARACTER*(*)( READ )
 *         The integration file name (Iyymmdd_oooo_iiii or
-*         IDIR:Iyymmdd_oooo_iiii) 
+*         IDIR:Iyymmdd_oooo_iiii)
 *     ROFILE = CHARACTER*(*)( WRITE )
 *         The reduced observation file name (RODIR:ROyymmdd_oooo)
 *     STATUS    = INTEGER( UPDATE )
@@ -43,19 +43,19 @@
 
 *    Find last occurrence of file separator (0 or N)
       SEPPOS = CHR_LEN( IFILE )
-      CALL CHR_FIND( IFILE, SEPARATOR, .FALSE., SEPPOS ) 
+      CALL CHR_FIND( IFILE, SEPARATOR, .FALSE., SEPPOS )
 
 *    Find last occurrence of underscore
       USCPOS = CHR_LEN( IFILE )
       CALL CHR_FIND( IFILE, '_', .FALSE., USCPOS )
- 
+
 *    Set the output file
       CALL CHR_FILL( ' ', ROFILE )
       ROFILE = PREFIX // 'RODIR' // SEPARATOR // 'ro' // IFILE(SEPPOS+2:USCPOS-1)
 *     ROFILE = RODIR(1:CHR_LEN(RODIR)) /
 *    :  / 'ro' // IFILE(SEPPOS+2:USCPOS-1)
       CALL CHR_RMBLK( ROFILE )
- 
+
 *    Exit routine
       IF ( VERBOSE ) THEN
          CALL MSG_SETC( 'ROFILE', ROFILE )

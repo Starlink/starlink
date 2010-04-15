@@ -112,7 +112,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -154,29 +154,29 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the output count.
-      NN = 0 
+      NN = 0
 
 *  Visit each edge.
       DO 1 I = 1, NEDGES
 
 *  Does this edge contain the node?
-         IF ( GRAPH( 1, I ) .EQ. NODE ) THEN 
+         IF ( GRAPH( 1, I ) .EQ. NODE ) THEN
 
 *  Start copying X, Y and IDs
             DO 2 K = OFFS( I ), OFFS( I + 1 ) - 1
                NN = NN + 1
                IDN( NN ) = ID1( K )
-               XN( NN ) = X1( K ) 
+               XN( NN ) = X1( K )
                YN( NN ) = Y1( K )
                RN( NN ) = R1( K )
  2          CONTINUE
-         ELSE IF ( GRAPH( 2, I ) .EQ. NODE ) THEN 
+         ELSE IF ( GRAPH( 2, I ) .EQ. NODE ) THEN
 
 *  Start copying X, Y and IDs
-            DO 3 K = OFFS( I ), OFFS( I + 1 ) - 1 
+            DO 3 K = OFFS( I ), OFFS( I + 1 ) - 1
                NN = NN + 1
                IDN( NN ) = ID1( K )
-               XN( NN ) = X2( K ) 
+               XN( NN ) = X2( K )
                YN( NN ) = Y2( K )
                RN( NN ) = R2( K )
  3          CONTINUE
@@ -204,6 +204,6 @@
             YN( NOUT ) = YN( I )
             RN( NOUT ) = RN( I )
          END IF
- 6    CONTINUE      
+ 6    CONTINUE
       END
 * $Id$

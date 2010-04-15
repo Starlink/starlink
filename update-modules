@@ -41,11 +41,11 @@
 #  Notes:
 #     Recovering after errors: If a submodule fails to clone (typical causes
 #     are usually network errors or badly configured git) on the initial
-#     update the container directory can often be automatically removed. In 
+#     update the container directory can often be automatically removed. In
 #     that case you'll need to re-create it before updating will succeed. It
 #     can also be a good idea to remove the partial repository that a failed
 #     clone can give you, so for instance if the Perl module failed to clone
-#     you should do:  
+#     you should do:
 #
 #         rm -rf thirdparty/perlsys/perl/perl
 #         mkdir thirdparty/perlsys/perl/perl
@@ -172,7 +172,7 @@ if test "$check" = "1"; then
       if test -d "$m"; then
 
          #  May not be checked in yet, so no repository in place. Check that
-         #  by counting the files, must be more than ". ..", if this is a 
+         #  by counting the files, must be more than ". ..", if this is a
          #  submodule.
          nfiles=`cd $m && ls -a | wc -w`
          if test $nfiles -gt 2 ; then
@@ -198,7 +198,7 @@ if test "$check" = "1"; then
          else
             echo "... $m requires initialisation"
          fi
-      else 
+      else
          echo "ERROR: submodule directory is missing, not updating anything"
          echo "... $m"
          exit 1

@@ -1,5 +1,5 @@
-	SUBROUTINE HISTOGRAM_SAVE( ODIMS1, ODIMS2, HDS_OUT, 
-     :	                           HISTOGRAM, HIST_MAX, HIST_MIN, 
+	SUBROUTINE HISTOGRAM_SAVE( ODIMS1, ODIMS2, HDS_OUT,
+     :	                           HISTOGRAM, HIST_MAX, HIST_MIN,
      :	                           HIST_BINS, TERMINAL_OUTPUT, STATUS)
 
 
@@ -29,17 +29,17 @@
 
 	END DO
 *
-* calculate the histogram X axis Max, Min range values and store that in next 
+* calculate the histogram X axis Max, Min range values and store that in next
 * element of the output DATA_ARRAY primitive
 *
 	DO K = 1, ODIMS1
 
-	  HDS_OUT( K, 2) = 
+	  HDS_OUT( K, 2) =
      :           HIST_MIN + ( K - 1)*( HIST_MAX - HIST_MIN)/HIST_BINS
 
 	END DO
 *
-* look at the terminal output flag and if TRUE then print out the histogram 
+* look at the terminal output flag and if TRUE then print out the histogram
 * values to the users terminal
 *
 	IF( TERMINAL_OUTPUT ) THEN
@@ -50,7 +50,7 @@
 	    CALL MSG_SETR( 'BIN', HDS_OUT( K, 2))
 	    CALL MSG_SETR( 'HIST', HDS_OUT( K, 1))
 
-	    CALL MSG_OUT( 'OUTPUT', 
+	    CALL MSG_OUT( 'OUTPUT',
      :'Bin Number = ^COUNTER, Bin DN Value = ^BIN, No. in Bin = ^HIST',
      :	                  STATUS)
 

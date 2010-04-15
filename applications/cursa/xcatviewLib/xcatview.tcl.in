@@ -17,7 +17,7 @@
 
 #  GUI for the Starlink catalogue browing application catview.
 
-#   ACD, 
+#   ACD,
 
 #  History:
 #   11/5/94  (ACD): Original version.
@@ -202,7 +202,7 @@
 #
 #  The expression to define a new selection.
 
-    global selectionExpression 
+    global selectionExpression
 
 #
 #  Variables to hold the name and new units and display format for a
@@ -213,7 +213,7 @@
 
     global columnUnits
     set columnUnits       ""
-    
+
     global columnFormat
     set columnFormat      ""
 
@@ -264,7 +264,7 @@
 
 #
 #  Variable to control the appearance of, and the items included in,
-#  an output text file.  Also the range of rows to be listed and the 
+#  an output text file.  Also the range of rows to be listed and the
 #  name of the output file.
 #
 #  The values for the options have the following meanings:
@@ -273,13 +273,13 @@
 #   S  -  display a summary of the item,
 #   F  -  display the item in full.
 #
-#  textfileFirstRow and textfileLastRow hold the numbers of the first 
+#  textfileFirstRow and textfileLastRow hold the numbers of the first
 #  and last row to be listed respectively.  If textfileLastRow is set
 #  to zero it has the special meaning that the last row to be listed
 #  is the last row in the current selection.
 
 
-    global textfileWidth 
+    global textfileWidth
     set    textfileWidth       132
 
     global textfilePage
@@ -514,7 +514,7 @@
          -label "Access remote catalogue"  \
          -command {Error "Remote access not available."}
     }
-      
+
     .menubar.file.menu add command \
        -label Quit \
        -command {

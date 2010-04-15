@@ -106,7 +106,7 @@ char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
 
    /* Check the inherited status */
    if ( *status != SAI__OK ) return NULL;
-   
+
    /* Check for NULL hdr */
 
    if( !hdr ) {

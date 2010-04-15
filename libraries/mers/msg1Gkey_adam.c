@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     13-MAR-1990 (PCTR):
 *        Changed function name.
 *     22-OCT-1991 (PCTR):
-*        Added EMS_MARK and EMS_RLSE to annul any error messages from 
+*        Added EMS_MARK and EMS_RLSE to annul any error messages from
 *        SUBPAR on error.
 *     10-SEP-2008 (TIMJ):
 *        Rewrite in C
@@ -107,7 +107,7 @@ int msg1Gkey( const char * param, char * keystr, size_t keylen ) {
   /*  Set new error reporting context */
   emsMark();
 
-  /*  Attempt to get the keyword associated with PARAM from the parameter 
+  /*  Attempt to get the keyword associated with PARAM from the parameter
    *  system. */
   subParFindpar( param, &namecode, &status );
   subParGetkey( namecode, keystr, keylen, &status );

@@ -398,12 +398,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -518,7 +518,7 @@ typedef struct AstFrameSetVtab {
    void (* SetCurrent)( AstFrameSet *, int, int * );
 } AstFrameSetVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -526,9 +526,9 @@ typedef struct AstFrameSetGlobals {
    AstFrameSetVtab Class_Vtab;
    int Class_Init;
    char GetAttrib_Buff[ 51 ];
-   AstFrame *Integrity_Frame;    
-   const char *Integrity_Method; 
-   int Integrity_Lost;           
+   AstFrame *Integrity_Frame;
+   const char *Integrity_Method;
+   int Integrity_Lost;
 } AstFrameSetGlobals;
 
 #endif
@@ -563,7 +563,7 @@ AstFrameSet *astLoadFrameSet_( void *, size_t, AstFrameSetVtab *,
                                const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitFrameSetGlobals_( AstFrameSetGlobals * );
 #endif
 

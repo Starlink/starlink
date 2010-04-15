@@ -4,7 +4,7 @@
 *     smf_spreadwidth
 
 *  Purpose:
-*     Determines the width of the output volume into which each input pixel 
+*     Determines the width of the output volume into which each input pixel
 *     value is spread by astRebinSeq.
 
 *  Language:
@@ -18,25 +18,25 @@
 
 *  Arguments:
 *     spread = int (Given)
-*        Specifies the scheme to be used for dividing each input data value 
+*        Specifies the scheme to be used for dividing each input data value
 *        up amongst the corresponding output pixels. See docs for astRebinSeq
 *        (SUN/211) for the allowed values.
 *     params = const double[] (Given)
 *        An optional pointer to an array of double which should contain any
-*        additional parameter values required by the pixel spreading scheme. 
-*        See docs for astRebinSeq (SUN/211) for further information. If no 
+*        additional parameter values required by the pixel spreading scheme.
+*        See docs for astRebinSeq (SUN/211) for further information. If no
 *        additional parameters are required, this array is not used and a
-*        NULL pointer may be given. 
+*        NULL pointer may be given.
 *     status = int * (Given and Returned)
 *        Pointer to an int holding the inherited status value.
 
 *  Returned Value:
-*     The diameter of the spherical volume in the output into which each input 
-*     pixel is spread, in output pixels. This is always an odd value. One is 
+*     The diameter of the spherical volume in the output into which each input
+*     pixel is spread, in output pixels. This is always an odd value. One is
 *     returned if an error occurs.
 
 *  Description:
-*     This function returns the diameter (in output pixels) of the spherical 
+*     This function returns the diameter (in output pixels) of the spherical
 *     volume in the output array into which each input pixel is spread
 *     when astRebinSeq uses the supplied spreading scheme and parameter values.
 
@@ -112,9 +112,9 @@ int smf_spreadwidth( int spread, const double params[], int *status ){
    lbout = -1000;
    ubout = 1000;
    work = astMalloc( sizeof( float )*( ubout - lbout + 1 ) );
-   if( work ) {   
+   if( work ) {
       astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
-                 0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work, 
+                 0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work,
                  NULL );
 
       w = work + 1001;

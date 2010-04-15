@@ -1,12 +1,12 @@
 *+  ADC_GRCIRC - Evaluate Great Circle distance
-      double precision function chi_agrcirc(ilong1, ilat1, ilong2, 
+      double precision function chi_agrcirc(ilong1, ilat1, ilong2,
      :      ilat2)
-*    Description : 
-*     Evaluate the great circle distance betwenn two points in a 
+*    Description :
+*     Evaluate the great circle distance betwenn two points in a
 *     spherical coordinate system
 *    Invocation
 *     ADC_GRCIRC(ILONG1, ILAT1, ILONG2, ILAT2)
-*    Parameters : 
+*    Parameters :
 *     ILONG1=DOUBLE(INPUT)
 *           Longitude of position 1 in radians
 *     ILAT1=DOUBLE(INPUT)
@@ -17,24 +17,24 @@
 *           Latitude of position 2 in radians
 *     ADC_GRCIRC=DOUBLE(OUTPUT)
 *           Great circle distance in radians between P1 and P2
-*    Method : 
+*    Method :
 *     Use the cosine rule
-*    Authors : 
-*     Jon Fairclough & Brian Stewart(RAL::IPMAF) 
-*    History : 
+*    Authors :
+*     Jon Fairclough & Brian Stewart(RAL::IPMAF)
+*    History :
 *     22-Apr-1985: Original
 *     890815     : Check that values are less than pi (STADAT::DATAMAN)
 *     19-Jun-1990: Fix 24 hour boundary and neg dec   (STADAT::ARW)
-*    Type Definitions : 
-      implicit none 
-*    Global constants : 
+*    Type Definitions :
+      implicit none
+*    Global constants :
       include 'CHIPAR2_PAR'                ! SLA contants
 *    Import
       real*8 ilong1
       real*8 ilat1
       real*8 ilong2
       real*8 ilat2
-*    Local variables : 
+*    Local variables :
       real*8 tlong1
       real*8 tlat1
       real*8 tlong2
@@ -47,7 +47,7 @@
       integer ihr, imin
       integer ideg
       integer istat
-*- 
+*-
 *    Begin
 *
       tlong1 = ilong1
@@ -83,7 +83,7 @@
          call sla_daf2r( ideg, imin, dsec, tlat2, istat)
          tlat2= tlat2*sign(1.0, float(dec) )
       endif
-****************************************************************         
+****************************************************************
       ab = dpiby2 - tlat1
       ac = dpiby2 - tlat2
 *

@@ -1,7 +1,7 @@
 ************************************************************************
 
       SUBROUTINE PHO1_BACK ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, GRID,
-     :                       GS, MASK, USEMSK, NXL, NXH, NYL, NYH, 
+     :                       GS, MASK, USEMSK, NXL, NXH, NYL, NYH,
      :                       VALUES, NV, SKY, SIGMA, VSKY )
 
 *+
@@ -15,8 +15,8 @@
 *     FORTRAN
 *
 *  Invocation :
-*     CALL PHO1_BACK( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, GRID, GS, 
-*                     MASK, USEMSK, NXL, NXH, NYL, NYH, VALUES, NV, 
+*     CALL PHO1_BACK( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, GRID, GS,
+*                     MASK, USEMSK, NXL, NXH, NYL, NYH, VALUES, NV,
 *                     SKY, SIGMA, VSKY )
 *
 *  Description :
@@ -48,13 +48,13 @@
 *     USEMSK = LOGICAL (Given)
 *        Flag to indicate use of mask
 *     NXL = INTEGER (Given)
-*        X value for lower integration limit 
+*        X value for lower integration limit
 *     NXH = INTEGER (Given)
-*        X value for upper integration limit 
+*        X value for upper integration limit
 *     NYL = INTEGER (Given)
-*        Y value for lower integration limit 
+*        Y value for lower integration limit
 *     NYH = INTEGER (Given)
-*        Y value for upper integration limit 
+*        Y value for upper integration limit
 *     VALUES( * ) = REAL (Given)
 *        Work space array for storing sky values
 *     NV = INTEGER (Given and Returned)
@@ -100,7 +100,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 

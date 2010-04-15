@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
       INTEGER K                  ! Loop counter
       INTEGER N                  ! Number of catalogues found
       CHARACTER*200 TEXT         ! Internal buffer for msg. to user
-                                
+
 *  Local Data:
       DATA IDNAM/'HD','AGK','HZ','CPC','YZ','CCFS','BOSS',' ','SAO'
      : ,'ADS','IDS','GCRV','YBS','N30','FK4','JSK','A+B','KDY',
@@ -128,7 +128,7 @@
      :          ( IDNAM( YESCAT( K ) )( :LENG( IDNAM( YESCAT( K ) ) ) ),
      :          K = 1 , N )
                CALL MSG_OUT( ' ', TEXT, STATUS )
-      
+
 * otherwise, flush error message written in CATSEL
             ELSE
 
@@ -136,7 +136,7 @@
 
             ENDIF
 
-      
+
 902         FORMAT( 1X, 'OK - Stars will only be selected if they are',
      :         '  in ', 50(A:' and ') )
          ENDIF

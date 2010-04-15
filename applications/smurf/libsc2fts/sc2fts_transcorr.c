@@ -25,14 +25,14 @@
 *        the parameter Keymap for this operation. Currently,
 *        there are three parameters in parKeymap:
 *          AM:  Air Mass
-*          PWV: Precipitable Water Vapor (in mm). 
+*          PWV: Precipitable Water Vapor (in mm).
 *          TAU: the TAU data file name. The values of wet and dry
 *               components of TAU are for PWV=1mm and airmass of 1.
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
-*     Structure of TAU data file which stores dry and wet components of 
+*     Structure of TAU data file which stores dry and wet components of
 *     atmosphere. Output of hdstrace:
 
 TAU  <NDF>
@@ -50,9 +50,9 @@ TAU  <NDF>
                                      ... 238.8973,242.7828,246.7523,250.8079
 
 End of Trace.
- 
+
 *     Here, the wavenumber (=1/wavelength) for DRY(n) or WET(n) is n*FACTOR
-*     (in UNIT) (n starts from 0). 
+*     (in UNIT) (n starts from 0).
 *     Combinative TAU = (PWV x AM x TAU_wet) + (AM x TAU_dry)
 
 *  Authors:
@@ -139,7 +139,7 @@ int *status          /* global status (given and returned) */
   int bolcol;                   /* Col of bolometer array */
   float intensity;              /* intensity for a specified wavenumber of a pixel */
 
- 
+
   /* get the TAU file name */
   if(astMapHasKey( parKeymap, "TAU" ) ==0)
   {
@@ -198,11 +198,11 @@ int *status          /* global status (given and returned) */
 
   /* get dry/wet components */
   datSize(loc_dry, &drywet_size, status);
-    
+
   dry_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
   wet_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
 
-   
+
   datGetVR(loc_dry, drywet_size, dry_ptr,
            &drywet_size, status);
   datGetVR(loc_wet, drywet_size, wet_ptr,

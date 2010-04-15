@@ -69,13 +69,13 @@ namespace gaia {
      *  for finer control if that's needed).
      */
     template <typename T>
-        inline bool from_string( const std::string &s, T &t, 
+        inline bool from_string( const std::string &s, T &t,
                                  std::ios_base &(*f)( std::ios_base &fmt ) )
     {
         std::istringstream iss( s );
         return !( iss >> f >> t ).fail();
     }
-    
+
     /**
      *  Quicker conversion of string to any type.
      */

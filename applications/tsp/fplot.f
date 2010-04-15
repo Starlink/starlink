@@ -10,12 +10,12 @@ C     Function:
 C        Plot a polarization spectrum as Polarized Intensity
 C
 C     Description:
-C        FPLOT produces a plot of a polarization spectrum. The plot is 
+C        FPLOT produces a plot of a polarization spectrum. The plot is
 C        divided into two panels. The lower panel is the total intensity,
-C        the top panel is the polarized intensity (or polarized flux). 
+C        the top panel is the polarized intensity (or polarized flux).
 C
 C        The polarized intensity data is binned into fixed size bins of
-C        size specified by the BINSIZE parameter. Plotting is done with the 
+C        size specified by the BINSIZE parameter. Plotting is done with the
 C        NCAR/SGS/GKS graphics system.
 C
 C     Parameters:
@@ -31,21 +31,21 @@ C    (C) IMAX       (Real)     Maximum Intensity level to plot.
 C    (C) PMIN       (Real)     Minimum Polarization level to plot.
 C    (C) PMAX       (Real)     Maximum Polarization level to plot.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         9/12/1991
 C
 C-
 C
 C  History:
-C    Jan/1988   Original Version.   JAB/AAO 
+C    Jan/1988   Original Version.   JAB/AAO
 C    26/2/1988   TSP Monolith version.  JAB/AAO
-C    29/4/1988   Use X-label from data. JAB/AAO  
+C    29/4/1988   Use X-label from data. JAB/AAO
 C    16/8/1988   Use fixed rather than variable size bins.  JAB/AAO
 C    19/8/1988   Prevent Crash on bad input file.  JAB/AAO
-C    19/8/1988   Handle abort on LABEL or DEVICE.  JAB/AAO     
+C    19/8/1988   Handle abort on LABEL or DEVICE.  JAB/AAO
 C    2/12/1988   Allow Circular Polarization data.  JAB/JACH
 C    9/12/1991   Handle bad values.   JAB/AAO
 C
@@ -59,7 +59,7 @@ C
 *  Data pointers
       INTEGER IPTR,QPTR,UPTR,QEPTR,UEPTR,T1PTR,T2PTR,LPTR
 
-*  Array size 
+*  Array size
       INTEGER SIZE,DIMS(3),ACTDIM
 
 *  bin size
@@ -76,10 +76,10 @@ C
 
 *  Label and units
       CHARACTER*64 LABEL,UNITS,XLABEL,YLABEL
-      INTEGER L1,L2  
-      LOGICAL CIRC                   
+      INTEGER L1,L2
+      LOGICAL CIRC
 
-      INTEGER CHR_LEN                            
+      INTEGER CHR_LEN
 
 *  Get the data
 
@@ -88,7 +88,7 @@ C
 *  Find its size
       CALL TSP_SIZE(LOC,3,DIMS,ACTDIM,STATUS)
       SIZE = DIMS(1)
-                                            
+
 *  Get the Q and U Stokes parameter objects - if these can't be found look
 *  for a V Stokes parameter object, and if that is present set the CIRC flag
 
@@ -109,7 +109,7 @@ C
 
       CALL TSP_MAP_DATA(LOC,'READ',IPTR,IDLOC,STATUS)
 
-*  Map the Q (or V) data 
+*  Map the Q (or V) data
 
       CALL TSP_MAP_DATA(QLOC,'READ',QPTR,QDLOC,STATUS)
       CALL TSP_MAP_VAR(QLOC,'READ',QEPTR,QELOC,STATUS)
@@ -144,10 +144,10 @@ C
           YLABEL = 'Intensity$'
       ELSE
           YLABEL = LABEL(1:L1)//' '//UNITS(1:L2)//'$'
-      ENDIF      
+      ENDIF
 
 *  Get temporary array for binned data
-                   
+
       CALL TSP_TEMP(SIZE,'_REAL',T1PTR,T1LOC,STATUS)
 
 *  Get the Bin size
@@ -182,13 +182,13 @@ C
       ENDIF
 
 *  Do the plot
-                    
+
       IF (STATUS .EQ. SAI__OK) THEN
         CALL TSP_FPLOT(SIZE,%VAL(IPTR),%VAL(T1PTR),
      :   %VAL(LPTR),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,STATUS)
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(IDLOC,STATUS)
       CALL TSP_UNMAP(QDLOC,STATUS)
@@ -198,11 +198,11 @@ C
       CALL TSP_UNMAP(LLOC,STATUS)
       CALL TSP_UNMAP(T1LOC,STATUS)
       CALL DAT_ANNUL(QLOC,STATUS)
-      IF (.NOT. CIRC) CALL DAT_ANNUL(ULOC,STATUS) 
+      IF (.NOT. CIRC) CALL DAT_ANNUL(ULOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-                   
+
 
        SUBROUTINE TSP_FPSCALE(SIZE,INT,P,IMIN,IMAX,PMIN,PMAX,STATUS)
 *+
@@ -237,34 +237,34 @@ C
        INTEGER SIZE
        REAL INT(SIZE),P(SIZE)
        REAL IMIN,IMAX,PMIN,PMAX
-       INTEGER STATUS       
+       INTEGER STATUS
 
 *  Local variables
        REAL RANGE
        INTEGER I
-                               
+
        IF (STATUS .EQ. SAI__OK) THEN
-  
+
 *  Set initial values
 
-          IMIN = VAL__MAXR                       
-          IMAX = VAL__MINR                      
+          IMIN = VAL__MAXR
+          IMAX = VAL__MINR
 
 *  Loop over good data values data replacing current value of IMAX with
-*  any data value larger than IMAX, similarly for IMIN                  
-          DO I = 1,SIZE   
-            IF (INT(I) .NE. VAL__BADR) THEN                  
-              IF (INT(I) .GT. IMAX) THEN    
-                  IMAX=INT(I)               
-              ENDIF                         
-              IF (INT(I) .LT. IMIN) THEN    
-                  IMIN=INT(I)               
-              ENDIF                        
-            ENDIF 
-          ENDDO                             
+*  any data value larger than IMAX, similarly for IMIN
+          DO I = 1,SIZE
+            IF (INT(I) .NE. VAL__BADR) THEN
+              IF (INT(I) .GT. IMAX) THEN
+                  IMAX=INT(I)
+              ENDIF
+              IF (INT(I) .LT. IMIN) THEN
+                  IMIN=INT(I)
+              ENDIF
+            ENDIF
+          ENDDO
 
-*  Expand range slightly for tidier plot                                        
-                                        
+*  Expand range slightly for tidier plot
+
           RANGE=IMAX-IMIN
           IMAX=IMAX+0.05*RANGE
           IMIN=IMIN-0.05*RANGE
@@ -273,29 +273,29 @@ C
 *  Set initial values
 
 *  Force PMIN to zero
-          PMIN = 0.0                       
-*  Set initial value for PMAX                      
-          PMAX = VAL__MINR                      
+          PMIN = 0.0
+*  Set initial value for PMAX
+          PMAX = VAL__MINR
 
 *  Loop over good data values data replacing current value of PMAX with
 *  any data value larger than PMAX,
           DO I = 1,SIZE
-            IF (P(I) .NE. VAL__BADR) THEN                     
-              IF (P(I) .GT. PMAX) THEN    
-                  PMAX=P(I)               
-              ENDIF                      
-            ENDIF   
-          ENDDO    
+            IF (P(I) .NE. VAL__BADR) THEN
+              IF (P(I) .GT. PMAX) THEN
+                  PMAX=P(I)
+              ENDIF
+            ENDIF
+          ENDDO
 
-*  Expand range slightly for tidier plot                                        
+*  Expand range slightly for tidier plot
 
           RANGE=PMAX-PMIN
           PMAX=PMAX+0.05*RANGE
-       ENDIF                         
+       ENDIF
        END
 
 
-                      
+
 
        SUBROUTINE TSP_FPBIN(SIZE,INT,Q,U,QERROR,UERROR,TEMP1,
      :   CIRC,BINSIZE,STATUS)
@@ -310,14 +310,14 @@ C
 *   type plot when it is plotted as a continuous line.
 *
 *   Bins with no data are filled with the bad value (VAL__BADR)
-*       
+*
 *    (>)  SIZE   (Integer)           The number of spectral points
 *    (>)  INT    (Real array(SIZE))  The intensity array
 *    (>)  Q      (Real array(SIZE))  The Q stokes parameter array
 *    (>)  U      (Real array(SIZE))  The U stokes parameter array
 *    (>)  QERROR (Real array(SIZE))  The Q error array (variance of data)
 *    (>)  UERROR (Real array(SIZE))  The U error array (variance of data)
-*    (<)  TEMP1  (Real array(SIZE))  Temporary array for the binned data      
+*    (<)  TEMP1  (Real array(SIZE))  Temporary array for the binned data
 *    (>)  CIRC   (Logical)           TRUE if circular polarization data
 *    (>)  BINSIZE(Integer)           The size of bin for plotting
 *    (!)  STATUS (Integer)           Status value
@@ -346,7 +346,7 @@ C
       INTEGER BIN_START, BIN_END
       REAL BIN_Q, BIN_U, BIN_INT, BIN_VAR
       REAL QQ,UU,P,THETA
-      INTEGER I                                             
+      INTEGER I
       LOGICAL CIRC
       INTEGER BIN_N
 
@@ -390,7 +390,7 @@ C
 
                 IF (.NOT. CIRC) THEN
                    BIN_U = BIN_U+U(BIN_END)
-                ENDIF  
+                ENDIF
                 BIN_N = BIN_N+1
 
 *  Have we finished bin?
@@ -407,7 +407,7 @@ C
 *  Calculate value for bin. If we are doing circular polarization this
 *  is the fractional V stokes parameter times the intensity divided by
 *  the number of good points. For linear polarization it is the fractional
-*  polarization times the intensity divided by the number of good points 
+*  polarization times the intensity divided by the number of good points
 
             IF (BIN_N .NE. 0) THEN
                QQ = BIN_Q/BIN_INT
@@ -442,21 +442,21 @@ C
 *   T S P _ F P L O T
 *
 *   Subroutine to do the polarized intensity plot. This routine plots
-*   the intensity and polarized intensity arrays as a function of 
-*   wavelength. It includes the PAR_ calls to get the plot device 
+*   the intensity and polarized intensity arrays as a function of
+*   wavelength. It includes the PAR_ calls to get the plot device
 *   and plot label.
-*       
+*
 *   (>)  SIZE   (Integer)           The number of spectral points
 *   (>)  INT    (Real array(SIZE))  The intensity array
-*   (>)  TEMP1  (Real array(SIZE))  Temporary array for the binned 
+*   (>)  TEMP1  (Real array(SIZE))  Temporary array for the binned
 *                                     polarized intensity data
-*   (>)  LAMBDA (Real array(SIZE))  Wavelength array             
+*   (>)  LAMBDA (Real array(SIZE))  Wavelength array
 *   (>)  PMIN   (Real)              Minimum polarization value
 *   (>)  PMAX   (Real)              Maximum polarization value
 *   (>)  IMIN   (Real)              Minimum Intensity for scaling
 *   (>)  IMAX   (Real)              Maximum Intensity for scaling
-*   (>)  XLABEL (Real)              X axis label                        
-*   (>)  YLABEL (Real)              Y axis label         
+*   (>)  XLABEL (Real)              X axis label
+*   (>)  YLABEL (Real)              Y axis label
 *   (!)  STATUS (Integer)           Status value
 *
 *    Jeremy Bailey    16/8/1988
@@ -476,9 +476,9 @@ C
       REAL INT(SIZE),TEMP1(SIZE)
       REAL LAMBDA(SIZE)
       REAL IMIN,IMAX
-      REAL PMIN,PMAX      
+      REAL PMIN,PMAX
       CHARACTER*(*) XLABEL,YLABEL
-      INTEGER STATUS     
+      INTEGER STATUS
 
 *  Local variables
       INTEGER ZONE
@@ -495,7 +495,7 @@ C
       CHARACTER*80 LABEL
 
 *  First time through flag
-             
+
       DATA FIRST /.TRUE./
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -518,13 +518,13 @@ C
          ELSE
 *             CALL SNX_AGRES(HEAP)
          ENDIF
-       
+
 *  Set up for NCAR plot
 
          CALL AGSETP('GRAPH.',VIEWP,4)
-                                      
+
 *  Set position of top plot (polarized intensity)
-                                  
+
          CALL AGSETF('GRID/TOP.',0.90)
          CALL AGSETF('GRID/BOTTOM.',0.5)
 
@@ -548,7 +548,7 @@ C
          CALL AGSETF('X/NICE.',0.0)
 
 *  Set plot scaling for polarization
-                                
+
          CALL AGSETF('Y/MIN.',PMIN)
          CALL AGSETF('Y/MAX.',PMAX)
          CALL AGSETF('Y/NICE.',0.0)
@@ -572,7 +572,7 @@ C
 *  Plot the polarization data
 
          CALL EZXY(LAMBDA,TEMP1,SIZE,LABEL)
-                             
+
 *  Set bottom part of screen for intensity plot
 
          CALL AGSETF('GRID/TOP.',0.5)
@@ -596,7 +596,7 @@ C
          CALL AGSETF('B/WI.',0.040)
          CALL AGSETF('X/NICE.',0.0)
 
-*  Setr plot scaling for intensity             
+*  Setr plot scaling for intensity
 
          CALL AGSETF('Y/MIN.',IMIN)
          CALL AGSETF('Y/MAX.',IMAX)
@@ -607,7 +607,7 @@ C
          CALL EZXY(LAMBDA,INT,SIZE,' $')
 
 *  Annul the SGS zone
-                                       
+
          CALL SGS_ANNUL(ZONE,STATUS)
       ENDIF
       END

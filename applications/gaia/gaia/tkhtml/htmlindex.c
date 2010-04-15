@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -69,8 +69,8 @@ int HtmlTokenNumber(HtmlElement *p){
   int n = 0;
 
   while( p ){
-    if( p->base.type!=Html_Block ){ 
-      TestPoint(0); 
+    if( p->base.type!=Html_Block ){
+      TestPoint(0);
       n++;
     }else{
       TestPoint(0);
@@ -414,7 +414,7 @@ static int DecodeBaseIndex(
           dotest = 1;
           TestPoint(0);
         }
-        if (dotest){ 
+        if (dotest){
           if( pBlock->top <= y && pBlock->bottom >= y ){
             if( pBlock->left > x ){
               if( pBlock->left - x < dist ){

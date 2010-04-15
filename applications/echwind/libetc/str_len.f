@@ -42,7 +42,7 @@
 *     2-OCT-1984 (ACD):
 *        Documentation improved.
 *     13-SEP-1988 (AJC):
-*        Add VAX VMS version in comments (slower unless the tail is 
+*        Add VAX VMS version in comments (slower unless the tail is
 *        very long).
 *     3-OCT-1988 (AJC):
 *        Improve documentation.
@@ -50,12 +50,12 @@
 *        Improve Method comments.
 *     07-FEB-1997 (BLY):
 *        This version borrwoed form CHR routine CHR_LEN for Linux port
-*           of ECHWIND to provide LNBLNK Fortran Intrinsic not 
+*           of ECHWIND to provide LNBLNK Fortran Intrinsic not
 *           available on Linux.
 *     21-AUG-2005 (TIMJ):
 *        It's more portable simply to use our own namespace rather than
 *        guessing whether LNBLNK will exist on the particular compiler.
-*        <sarcasm>Here's a thought: simply use CHR_LEN. 
+*        <sarcasm>Here's a thought: simply use CHR_LEN.
 *        No, that would never work!</sarcasm>
 *     {enter_further_changes_here}
 

@@ -3,7 +3,7 @@
      :  SLICE_START, SLICE_END, COUNTER, OUT, OUTQUAL, STATUS)
 *    Description :
 *     This routine extracts a 1-D slice from a 2-D array by averaging
-*     rows or columns together, in a similar manner to the FIGARO 
+*     rows or columns together, in a similar manner to the FIGARO
 *     EXTRACT function. However, this routine can deal with data quality
 *     if required. It is mainly used when producing a 1-D graph from
 *     a 2-D dataset.
@@ -183,7 +183,7 @@
       ELSE
 
 *      The slice is to be made in the Y direction.
-*      Determine if data quality is to be used.           
+*      Determine if data quality is to be used.
          IF ( QUALITY ) THEN
 
 *         Quality is to be used.

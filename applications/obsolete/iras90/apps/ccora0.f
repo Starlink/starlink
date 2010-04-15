@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -162,5 +162,5 @@
      :   STATUS )
          CALL MSG_BLANKIF( MSG__QUIET, STATUS )
       END IF
-      
+
       END

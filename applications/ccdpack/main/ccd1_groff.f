@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,10 +171,10 @@
 *  Look at all the edges of the graph locating all the occurences of
 *  this node. If any edges are located put the end nodes which have not
 *  already been visited on the queue and visit them sometime in the
-*  future. 
+*  future.
          DO 4 I = 1, NEDGES
             IF ( GRAPH( 1, I ) .EQ. NODE ) THEN
-               IF ( .NOT. BEEN( GRAPH( 2, I ) ) ) THEN 
+               IF ( .NOT. BEEN( GRAPH( 2, I ) ) ) THEN
 
 *  See if this node is already on the queue.
                   ADD = .TRUE.
@@ -184,10 +184,10 @@
                         GO TO 6
                      END IF
  5                CONTINUE
- 6                CONTINUE    
+ 6                CONTINUE
 
 *  Add to queue if not present already
-                  IF ( ADD ) THEN             
+                  IF ( ADD ) THEN
                      QCNT = QCNT + 1
                      QUEUE( QCNT ) = GRAPH( 2, I )
                   END IF
@@ -200,7 +200,7 @@
      :                                     YOFF( GRAPH( 4, I ) )
                END IF
             ELSE IF ( GRAPH( 2, I ) .EQ. NODE ) THEN
-               IF ( .NOT. BEEN( GRAPH( 1, I ) ) ) THEN 
+               IF ( .NOT. BEEN( GRAPH( 1, I ) ) ) THEN
 
 *  See if this node is already on the queue.
                   ADD = .TRUE.
@@ -210,10 +210,10 @@
                         GO TO 8
                      END IF
  7                CONTINUE
- 8                CONTINUE    
+ 8                CONTINUE
 
 *  Add to queue if not present already
-                  IF ( ADD ) THEN             
+                  IF ( ADD ) THEN
                      QCNT = QCNT + 1
                      QUEUE( QCNT ) = GRAPH( 1, I )
                   END IF
@@ -230,7 +230,7 @@
 
 *  Next while.
          GO TO 2
-      END IF     
+      END IF
 
       END
 * $Id$

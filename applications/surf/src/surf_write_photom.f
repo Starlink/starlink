@@ -1,12 +1,12 @@
       SUBROUTINE SURF_WRITE_PHOTOM (FD, PARABOLA, MAX_BEAM,
-     :     N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, 
-     :     N_MEASUREMENTS, N_INTEGRATIONS, 
+     :     N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT,
+     :     N_MEASUREMENTS, N_INTEGRATIONS,
      :     PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
      :     MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
      :     MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
 *+
 *  Name:
-*     SURF_WRITE_PHOTOM 
+*     SURF_WRITE_PHOTOM
 
 *  Purpose:
 *     Routine to output ASCII results of PHOTOM reduction
@@ -30,7 +30,7 @@
 *
 
 *  Invocation:
-*      CALL SURF_WRITE_PHOTOM (FD, MAX_BEAM, 
+*      CALL SURF_WRITE_PHOTOM (FD, MAX_BEAM,
 *     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_MEASUREMENTS,
 *     :  N_INTEGRATIONS,PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
 *     :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
@@ -51,7 +51,7 @@
 *     BOL_ADC (N_BOLS)       = INTEGER (Given)
 *           the A/D numbers of the bolometers observing the object
 *     PHOT_BB (MAX_BEAM)     = INTEGER (Given)
-*           the indices of the bolometers used to observe the source in 
+*           the indices of the bolometers used to observe the source in
 *           each beam in the BOL_CHAN and BOL_ADC arrays
 *     MAX_INT                = INTEGER (Given)
 *           the maximum number of integrations in an observation
@@ -60,7 +60,7 @@
 *     N_INTEGRATIONS         = INTEGER (Given)
 *           the number of integrations in the observation
 *     PEAK_D (MAX_INT, MAX_BEAM) = REAL (Given)
-*           the fitted peak value for each integration with each 
+*           the fitted peak value for each integration with each
 *           bolometer
 *     PEAK_V (MAX_INT, MAX_BEAM) = REAL (Given)
 *           the variance on PEAK
@@ -189,7 +189,7 @@
          IF (PHOT_BB(BEAM) .NE. 0) THEN
             CALL FIO_WRITE (FD, ' ', STATUS)
 
-            CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)), 
+            CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
      :        BOL_CHAN(PHOT_BB(BEAM)), STEMP, STATUS)
             LINE = 'Bolometer: '//STEMP
             CALL FIO_WRITE (FD, LINE, STATUS)
@@ -200,18 +200,18 @@
             CALL FIO_WRITE (FD, LINE, STATUS)
 
             CALL FIO_WRITE (FD, ' ', STATUS)
- 
+
             LINE = 'Meas/Int        Peak    Error       S/N      '//
      ;        'Peak_x     Peak_y'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
             DO M = 1, N_MEASUREMENTS
                DO I = 1, N_INTEGRATIONS
-                  
+
 *     Total number of integrations so fat
                   COUNT = I + ((M-1) * N_INTEGRATIONS)
 
-                  IF (PEAK_D(COUNT,BEAM).EQ.VAL__BADR .OR. 
+                  IF (PEAK_D(COUNT,BEAM).EQ.VAL__BADR .OR.
      :                 PEAK_Q(COUNT,BEAM) .GT. 0) THEN
                      WRITE(LINE,15) I
                   ELSE

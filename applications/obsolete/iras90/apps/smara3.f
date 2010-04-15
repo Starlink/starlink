@@ -14,7 +14,7 @@
 
 *  Description:
 *     This subroutine is used by application SKYMARK to write sky
-*     coordinate to a text in the IRAS90 position exchange format. 
+*     coordinate to a text in the IRAS90 position exchange format.
 
 *  Arguments:
 *     NPNT = INTEGER (Given)
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -54,7 +54,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
-              
+
 *  Arguments Given:
       INTEGER NPNT
       DOUBLE PRECISION X( NPNT )
@@ -70,7 +70,7 @@
 *  External References:
 
 *  Local Constants:
-      INTEGER SZFSC              ! Size of a style 2 formatted sky 
+      INTEGER SZFSC              ! Size of a style 2 formatted sky
       PARAMETER ( SZFSC = 15 )   ! coordinate
 
 *  Local Variables:
@@ -80,7 +80,7 @@
 
       INTEGER I                  ! Do loop index
       INTEGER BLEN               ! Used length of BUF.
-          
+
 *.
 
 *  Check inherited global status.
@@ -89,7 +89,7 @@
 *  Write the name of the sky coordinate system as the first record.
       CALL FIO_WRITE( FID, SCS, STATUS )
       CALL FIO_WRITE( FID, ' ', STATUS )
-      
+
 *  Write all positions one by one.
       DO I = 1, NPNT
 
@@ -110,19 +110,19 @@
             BUF = ' '
             BUF( 3: ) = LONSTR
             BUF( 6 + SZFSC: ) = LATSTR
-            CALL MSG_LOAD( ' ', '#  =  ^X, ^Y', 
+            CALL MSG_LOAD( ' ', '#  =  ^X, ^Y',
      :                     BUF( 9 + 2*SZFSC: ), BLEN, STATUS )
 
 *  Write the message to the log file.
-            CALL FIO_WRITE( FID, BUF( : MIN( 80, BLEN + 9 + 2*SZFSC) ), 
+            CALL FIO_WRITE( FID, BUF( : MIN( 80, BLEN + 9 + 2*SZFSC) ),
      :                      STATUS )
 
-*  If any of the coordinates are bad, write a warning message to the 
+*  If any of the coordinates are bad, write a warning message to the
 *  log file.
          ELSE
-            CALL FIO_WRITE( FID,'   (unusable coordinates ignored)',  
+            CALL FIO_WRITE( FID,'   (unusable coordinates ignored)',
      :                      STATUS )
-         END IF            
+         END IF
 
       END DO
 

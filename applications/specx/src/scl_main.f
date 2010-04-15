@@ -23,10 +23,10 @@
 *     1. The VMS system for printer output has never worked on Unix. It
 *        relied on the non-standard CLOSE parameter 'DISP='PRINT/DELETE'
 *        but the CLOSE was never invoked anyway because the default output
-*        filename had not been changed in the code for Unix.  Therefore 
+*        filename had not been changed in the code for Unix.  Therefore
 *        the system has been changed in V6.7-8.  Printer output will now
 *        be written to the default output filename (fort.nn on current
-*        patforms) and kept when the output is closed.  A second 
+*        patforms) and kept when the output is closed.  A second
 *        SET-LIST-FILE P command could result in the file being overwritten.
 
 *  Usage:
@@ -105,7 +105,7 @@
 *      1 Aug 2000 (ajc):
 *        Remove HASH_TAB structure
 *        Change TYPE * to PRINT *
-*        ANM_COLS Colors 257 from 256 
+*        ANM_COLS Colors 257 from 256
 *        Unused IDUM, LASTCL, GEN_LINENO
 *        Change DISP= to STATUS= in CLOSE
 *        Remove attempt to print printer output after every command.
@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -246,7 +246,7 @@
          COMMON / LINFT /    CMI011(2), CMR008(60)
          COMMON / LOGCOL /   CMR009(2), CML005
          COMMON / LUN_TABLE / CMI012(MAXENT1), CML006(MAXENT1),
-     :      CMC008(MAXENT1) 
+     :      CMC008(MAXENT1)
          COMMON / NOKEEP /   CMI013
          COMMON / PLTDEV /   CMI014
          COMMON / PR_SCAN /  CMI015
@@ -264,7 +264,7 @@
          COMMON / TITLES /   CMC00A(3), CMC00B(3), CMC00C
          COMMON / UMEMORY /  CMI01F(3)
          COMMON / VM_TABLE / CMI020(2*MAXENT2), CML00A(MAXENT2),
-     :      CMC00D(MAXENT2) 
+     :      CMC00D(MAXENT2)
          COMMON / WORK /     CMR00F(LSPMAX+30+LSPMAX)
          COMMON / STACK /    CMD001(8+8+2), CMR010(4+8+4),
      :      CMI021(8*8), CMB002, CMC00E, CMR011(1024+8064+2176*5)
@@ -345,7 +345,7 @@
      :     / UMEMORY /,
      :     / VM_TABLE /,
      :     / WORK /,
-     :     / STACK /   
+     :     / STACK /
 
 *.
 
@@ -440,7 +440,7 @@
 *D    print *,'gen cli line now   --> ', lastcl(:gen_ilen(lastcl))
 
 *  Search for the current command in the command table. If it is a predefined
-*  command carry on, otherwise substitute its equivalence string into the 
+*  command carry on, otherwise substitute its equivalence string into the
 *  command stream (i.e. this routine's command buffer), and go back to see if
 *  we now have an atomic command we can do.
       CNAME       =  COMX       ! save, since altered by GEN_COMACH if found

@@ -16,7 +16,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -27,14 +27,14 @@
 *     13-SEP-1993 (PDRAPER):
 *        Added automated CCDPACK constants.
 *     11-July-1995 (PDRAPER):
-*        Increased CCD1__MXPNT to accomodate the maximum number of 
+*        Increased CCD1__MXPNT to accomodate the maximum number of
 *        intercomparisons in FINDOFF.
 *     12-JUL-1995 (PDRAPER);
 *        Backed out of previous change to some extent as requirement
 *        was even greater (several times CCD1__MXLIC). Memory now allows
 *        overflows of stack without error.
 *     9-SEP-1995 (PDRAPER):
-*        Added package version string. 
+*        Added package version string.
 *     {enter_further_changes_here}
 
 *  Bugs:

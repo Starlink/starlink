@@ -185,7 +185,7 @@ Cbegin
 
       call printo ( ' ' )
       call printo ( '  Input other set-ups:-' )
-      call get1r ( 'GAIN',   ZGAIN, 1.0, 1.0e-8, 1.0e8 )		!Get poisson values of 
+      call get1r ( 'GAIN',   ZGAIN, 1.0, 1.0e-8, 1.0e8 )		!Get poisson values of
       call get1r ( 'NOISE', ZNOISE, 0.0,    0.0, 1.0e8 )		! input image
 
       call get1c ( 'EXPNAME', EXPNAME, 'EXPOSED', .true. )		!Image exposure time
@@ -329,7 +329,7 @@ Cbegin
          LOCFILT(2) = 79
          call get2i ( 'FILTLOC', LOCFILT(1), LOCFILT(2), .true., 1,256)
          if ( ST_FAILED ) return
- 
+
          k = 0								!get filter names in image
          more = .true.							! and in stds file
          do while ( k.lt.9 .and. more )					! and extinctions
@@ -467,7 +467,7 @@ Cbegin
             return
          endif
       enddo
-    
+
 
       end
 
@@ -521,13 +521,13 @@ Cbegin
           kk(6) = ilen
           ja = 7
       endif
-      
+
       r1 = 0.0								!Failure default
       r2 = 0.0
       r3 = 0.0
       if ( ja.ne.7 ) then						!Not found 3 numbers
          istat = 1
-      else   
+      else
          call chartor ( str(kk(1):kk(2)), r1, istata )			!Turn strings to numbers
          call chartor ( str(kk(3):kk(4)), r2, istatb )
          call chartor ( str(kk(5):kk(6)), r3, istatc )
@@ -612,12 +612,12 @@ C alan penny                     ral            1990-03-09
       include 'automag.inc'
       include 'STARMAN_INC'
       include 'ST_IMAGE_INC'
-      
+
       integer*2 wc(NX,NY)		!o: Work space
 C--
       integer j, k, kxc(2), kyc(2), np, jj, kk, iter, nin, kl, jb, kb,
      +        jba, jbb, kba, kbb, ierr, jbc, jbd, kbc, kbd
-      real    std, rx, ry, am, ah, ab, dx, dy, xa, ya, arx, ary, arms, 
+      real    std, rx, ry, am, ah, ab, dx, dy, xa, ya, arx, ary, arms,
      +        athresh, px, py, pnum, rv
       logical more, amore, bmore
 
@@ -675,7 +675,7 @@ Cbegin
             kbd = min(NY,(kb+IBOX))
             jbc = max(1,(jb-(IBOX/2)))
             jbd = min(NX,(jb+(IBOX/2)))
-            amore = .true.						
+            amore = .true.
             do while ( amore )
                amore = .false.
                k = kbc - 1
@@ -739,15 +739,15 @@ Cbegin
       call amovki ( 1, kf, np )						!Flag stars as ok
 
       if ( CENTRE ) then
-         do j = 1, np							!Centre on the images. 
+         do j = 1, np							!Centre on the images.
             if ( IMTYPE.eq.'SHORT' ) then
-               call gauss2sa ( %val(IPIM), NX, NY, XP(j),YP(j), 20, 20, ! If Gaussian height less 
+               call gauss2sa ( %val(IPIM), NX, NY, XP(j),YP(j), 20, 20, ! If Gaussian height less
      +                         0, rx, ry, INVAL, 20, am, ah, ab, dx, 	! than 100 or a radius
      +                         dy, xa, ya, arx, ary, arms, iter, nin )	! less than 0.6, reject.
             else
-               call gauss2ra ( %val(IPIM), NX, NY, XP(j),YP(j), 20, 20, 
-     +                         0, rx, ry, RINVAL, 20, am, ah, ab, dx, 	
-     +                         dy, xa, ya, arx, ary, arms, iter, nin )	
+               call gauss2ra ( %val(IPIM), NX, NY, XP(j),YP(j), 20, 20,
+     +                         0, rx, ry, RINVAL, 20, am, ah, ab, dx,
+     +                         dy, xa, ya, arx, ary, arms, iter, nin )
             endif
             XP(j) = xa
             YP(j) = ya
@@ -758,7 +758,7 @@ Cbegin
       do j = 2, np							!Reject all 'stars' too close to others
          do k = 1, j-1
             if ( kf(k).eq.1 ) then
-               if ( abs(XP(k)-XP(j)).lt.8.0 .and. 
+               if ( abs(XP(k)-XP(j)).lt.8.0 .and.
      +              abs(YP(k)-YP(j)).lt.8.0 ) kf(j) = 0
             endif
          enddo
@@ -853,7 +853,7 @@ C  alan penny                  ral               1990-03-10
       include 'ST_IMAGE_INC'
 
 C--
-      integer  j, ja, kl, nsky(4), iserr(4), ierr, ninval, nstar, 
+      integer  j, ja, kl, nsky(4), iserr(4), ierr, ninval, nstar,
      +         jerr, isneg
       real     amag(4), sky(4), am, astop, snum, sum, ama,
      +         x, y, rms, flux, star, slevel, atop, top, alevel(4)
@@ -879,15 +879,15 @@ Cbegin
 
       write ( text,'('' Star'',5x,''X'',6x,''Y'',''        Top '',
      +       ''    Mag'',''   Rms'',''    Sk1'',''   Sk2'',
-     +       ''   Sk3'',''   Sk4'')' ) 
+     +       ''   Sk3'',''   Sk4'')' )
       call au_print ( DOFILE, text )					!Stars found info header
 
       do kl = 1, NTOT							!For each star
-         if ( IMTYPE.eq.'SHORT' ) then					!Do photometry for star 
-            call au_phots ( %val(IPIM), XP(kl), YP(kl), STARDIA, star, 
+         if ( IMTYPE.eq.'SHORT' ) then					!Do photometry for star
+            call au_phots ( %val(IPIM), XP(kl), YP(kl), STARDIA, star,
      +                      slevel, astop, nstar, ninval, jerr, ierr )
          else
-            call au_photr ( %val(IPIM), XP(kl), YP(kl), STARDIA, star, 
+            call au_photr ( %val(IPIM), XP(kl), YP(kl), STARDIA, star,
      +                      slevel, astop, nstar, ninval, jerr, ierr )
          endif
 
@@ -906,10 +906,10 @@ Cbegin
                x = XP(kl) + DXSKY(j)
                y = YP(kl) + DYSKY(j)
                if ( IMTYPE.eq.'SHORT' ) then
-                  call au_phots ( %val(IPIM), x, y, SKYDIA, sky(j), 
+                  call au_phots ( %val(IPIM), x, y, SKYDIA, sky(j),
      +            alevel(j), top, nsky(j), ninval, jerr, iserr(j) )
                else
-                  call au_photr ( %val(IPIM), x, y, SKYDIA, sky(j), 
+                  call au_photr ( %val(IPIM), x, y, SKYDIA, sky(j),
      +            alevel(j), top, nsky(j), ninval, jerr, iserr(j) )
                endif
             enddo
@@ -956,9 +956,9 @@ Cbegin
                      endif
                   endif
                enddo
-  
+
                write ( text, '('' '',i3,2x,2f7.1,2x,f8.1,1x,f7.3,
-     +         f6.3,1x,a24)' ) kl, XP(kl), YP(kl), atop, am, rms, 
+     +         f6.3,1x,a24)' ) kl, XP(kl), YP(kl), atop, am, rms,
      +                         texta
                call au_print ( DOFILE, text )
 
@@ -979,7 +979,7 @@ C AU_PHOTR -- Do aperture photometry on an area in a real image
 C
 C  alan penny                      ral              1990-03-09
 
-      subroutine au_photr ( rim, x, y, dia, flux, level, top, nsp, 
+      subroutine au_photr ( rim, x, y, dia, flux, level, top, nsp,
      +                      ninval, jerr, ierr )
 
       implicit none
@@ -1031,7 +1031,7 @@ Cbegin
       kys = min(NY,max(1,kys))
       kye = min(NY,max(1,kye))
 
-      saprad = (dia/2.0)**2.0						!Flux in aperture and 
+      saprad = (dia/2.0)**2.0						!Flux in aperture and
       sum = 0.0d0							! bad pixels and
       nsp = 0								! max value
       ninval = 0
@@ -1069,7 +1069,7 @@ C AU_PHOTS -- Do aperture photometry on an area in an int*2 image
 C
 C  alan penny                      ral              1990-03-09
 
-      subroutine au_phots ( im, x, y, dia, flux, level, top, nsp, 
+      subroutine au_phots ( im, x, y, dia, flux, level, top, nsp,
      +                      ninval, jerr, ierr )
 
       implicit none
@@ -1121,7 +1121,7 @@ Cbegin
       kys = min(NY,max(1,kys))
       kye = min(NY,max(1,kye))
 
-      saprad = (dia/2.0)**2.0						!Flux in aperture and 
+      saprad = (dia/2.0)**2.0						!Flux in aperture and
       sum = 0.0d0							! bad pixels and
       nsp = 0								! max value
       ninval = 0
@@ -1159,7 +1159,7 @@ C AU_AVER -- Average sky values and make mean mag
 C
 C alan penny             ral                 1990-03-09
 
-      subroutine au_aver ( star, nstar, sky, nsky, flux, am, amag, 
+      subroutine au_aver ( star, nstar, sky, nsky, flux, am, amag,
      +                     rms, isneg )
 
       implicit none
@@ -1174,11 +1174,11 @@ C alan penny             ral                 1990-03-09
       real    flux		!o: Mean flux
       real    am		!o: Mean magnitude
       real    amag(4)		!o: Individual magn corrns (mag-mean)
-      real    rms		!o: Star flux error 
+      real    rms		!o: Star flux error
       integer isneg		!o: Star flux is -ve =1; +ve = 0
 C--
       integer j, k, ka, kb, nsum, ngood, nnsky(4), knum(4)
-      real    aflux(4), slevel(4), afl, afla, dmin, dmina, ama, 
+      real    aflux(4), slevel(4), afl, afla, dmin, dmina, ama,
      +        var, varsk, err, ssky(4), diff, totsf, totsn
 Cbegin
 
@@ -1191,7 +1191,7 @@ Cbegin
       rms = 0.0
       isneg = 0
       if ( nstar.le.0 ) return
-      
+
       ngood = 0								!Bunch skies up into only good ones
       do k = 1, NAPER
          if ( nsky(k).ne.0 ) then
@@ -1207,7 +1207,7 @@ Cbegin
       endif
 
       do k = 1, ngood
-         slevel(k) = ssky(k)/real(nnsky(k))				!Get level and star flux 
+         slevel(k) = ssky(k)/real(nnsky(k))				!Get level and star flux
          aflux(k) = star - slevel(k)*nstar				! over sky for each star
       enddo
 
@@ -1217,7 +1217,7 @@ Cbegin
          flux = aflux(1)						!if = 1, take it
       elseif ( ngood.eq.2 ) then
          flux = (aflux(1)+aflux(2))/2.0					!if = 2, take mean
-      else 
+      else
 									!If 3 or 4, take close skies
 
          ka = 1								!Get 2 closest and make mean
@@ -1235,11 +1235,11 @@ Cbegin
          enddo
          afla = (aflux(ka)+aflux(kb))/2.0
 
-         afl = 0.0							!Take mean or	
+         afl = 0.0							!Take mean or
          nsum = 0							! all those within AVLIM mags of mean
          call azeroi ( knum, 4 )
          do k = 1, ngood
-            diff = abs((aflux(k)-afla)/afla) 
+            diff = abs((aflux(k)-afla)/afla)
             if ( diff.lt.AVLIM ) then
                afl = afl + aflux(k)
                nsum = nsum + 1
@@ -1374,7 +1374,7 @@ Cbegin
             am1 = PMAG(k) - EXTINC*(secz-1.0)
             diff = am1 - stdmag
             if ( DOSTDS .and. SFOUND ) then
-               write ( text, '(1x,2f10.3,6x,f10.3,f8.3)' ) PMAG(k), 
+               write ( text, '(1x,2f10.3,6x,f10.3,f8.3)' ) PMAG(k),
      +                                            am1, stdmag, diff
             else
                write ( text, '(1x,2f10.3)' ) PMAG(k), am1
@@ -1462,7 +1462,7 @@ Cbegin
       endif
 
       if ( DOSECZ ) then
-      
+
          ERA = 0.0							!Image RA and Dec
          DERA = ERA
          EDEC = 0.0
@@ -1571,7 +1571,7 @@ Cbegin
                if ( len.eq.lena ) then
                   if ( name(1:len).eq.OBJECT(1:len) ) then
                      SFOUND = .true.
-                     DSRA = stds(6,k)	
+                     DSRA = stds(6,k)
                      DSDEC = stds(7,k)
                      dequ = stds(8,k)
                      call sla_preces ( 'FK5', dequ, DDATE, DSRA, DSDEC)	! and precess them
@@ -1589,7 +1589,7 @@ Cbegin
       if ( DOSTDS .and. SFOUND .and. (STDMAST .or. .not.ISPOSN) ) 	! - image or stds?
      +   DRA = DSRA
       DDEC = DEDEC
-      if ( DOSTDS .and. SFOUND .and. (STDMAST .or. .not.ISPOSN) ) 
+      if ( DOSTDS .and. SFOUND .and. (STDMAST .or. .not.ISPOSN) )
      +   DDEC = DSDEC
 
       DAH = dabs(DRA-DSIDT)						!Calc Sec Z
@@ -1615,7 +1615,7 @@ Cbegin
 
 
       if ( ST_FAILED ) IMORE = .false.
-  
+
       if ( .not.MULTIPLE ) IMORE = .false.
 
       if ( IMORE ) then

@@ -1,11 +1,11 @@
 /*
  * getputc: very basic implementations of fputc and fgetc functions
- *          that only use UNIX file descriptors. Use with great 
+ *          that only use UNIX file descriptors. Use with great
  *          caution as not optimal in anyway. Will not be used if
  *          Fortran has FPUTC anyway.
  *
- * Copyright (C) 2005 Particle Physics and Astronomy Research Council 
- * 
+ * Copyright (C) 2005 Particle Physics and Astronomy Research Council
+ *
  * Authors:
  *    28-JUL-2005: Peter W. Draper (JAC, Durham University)
  *       Original version.

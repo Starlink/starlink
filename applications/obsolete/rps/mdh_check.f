@@ -3,7 +3,7 @@
 
 *DESCRIPTION:
 
-*     Checks the format of data string and returns a correctly formatted 
+*     Checks the format of data string and returns a correctly formatted
 *     string if possible if not it returns a message.
 
 *INPUT:
@@ -39,7 +39,7 @@
       J = MDH_ENDWORD( VALIN )							! Get length of string itself.
 
       IF ( J .GE. 1 ) THEN							! Initialise return string.
-                       
+
         VALOUT = VALIN( : J )
 
       ELSE
@@ -60,7 +60,7 @@
         I = MAX( INDEX( VALIN , 'D' ) , INDEX( VALIN , 'E' ) ) + 1
 
         IF ( I .GT. 1 ) THEN
-                                            
+
           READ( VALIN( I:J ) , '( I )' ) EXP
 
           IF ( ABS( EXP ) .GT. 38 ) THEN
@@ -75,7 +75,7 @@
 
         ELSE
 
-          J = J + 1               
+          J = J + 1
 
         END IF
 
@@ -95,7 +95,7 @@
         I = MAX( INDEX( VALIN , 'D' ) , INDEX( VALIN , 'E' ) ) + 1
 
         IF ( I .GT. 1 ) THEN
-                                            
+
           READ( VALIN( I:J ) , '( I )' ) EXP
 
           IF ( EXP .GT. 9 .OR. EXP .LT. 0 ) THEN
@@ -104,7 +104,7 @@
             RETURN
 
           END IF
-                        
+
           J = I - 2
           VALOUT( J + 1: ) = ' '
 
@@ -116,7 +116,7 @@
 
           IF ( EXP .GT. 0 ) IVAL = IVAL * 10 ** EXP
           WRITE( VALOUT , '(' // FORMAT // ')' , IOSTAT = IERR ) IVAL
-                          
+
         END IF
 
       ELSE IF ( INDEX( FORMAT , 'L' ) .NE. 0 ) THEN				! Else if logical then.
@@ -131,7 +131,7 @@
 
         ELSE IF ( ILOG .LT. 0 ) THEN						!  Else if false then.
 
-          IERR = 0                               
+          IERR = 0
           LVAL = .FALSE.							!   Return false.
           VALOUT = 'N'
 
@@ -143,7 +143,7 @@
 
 C        IF ( IERR .EQ. 0 )
 C     &     WRITE( VALOUT , '(' // FORMAT // ')' , IOSTAT = IERR ) LVAL	!  Return corrected value.
-                                
+
       ELSE IF ( INDEX( FORMAT , 'HHMMSS' ) .NE. 0 ) THEN				! Else if hours minuetes seconds then.
 
         J = J + 1
@@ -151,13 +151,13 @@ C     &     WRITE( VALOUT , '(' // FORMAT // ')' , IOSTAT = IERR ) LVAL	!  Retur
         IF ( INDEX( VALIN , '.' ) .EQ. 0 .AND. J .LT. LEN(VALIN) ) THEN		!  Add .0 if not there so as to get correct format -
 
           VALOUT( J: ) = '.0'							!  if the string has a numerical content.
- 
+
         END IF
 
         READ ( VALOUT , '(F)' , IOSTAT = IERR ) RVAL				!  See if string is real and if so -
-        
+
         IF ( RVAL .GT. 240000.0 .OR. RVAL .LT. 0.0 .OR.
-     &       RVAL - INT( RVAL / 10000 ) * 10000 .GT. 5959.999 .OR. 
+     &       RVAL - INT( RVAL / 10000 ) * 10000 .GT. 5959.999 .OR.
      &       RVAL - INT( RVAL / 100 ) * 100 .GT. 59.999 ) THEN
 
           IERR = 1
@@ -175,14 +175,14 @@ C     &     WRITE( VALOUT , '(' // FORMAT // ')' , IOSTAT = IERR ) LVAL	!  Retur
         IF ( INDEX( VALIN , '.' ) .EQ. 0 .AND. J .LT. LEN(VALIN) ) THEN		!  Add .0 if not there so as to get correct format -
 
           VALOUT( J: ) = '.0'							!  if the string has a numerical content.
- 
+
         END IF
 
         READ ( VALOUT , '(F)' , IOSTAT = IERR ) RVAL				!  See if string is real and if so -
-        
+
         RVAL = ABS( RVAL )
         IF ( RVAL .GT. 900000.0 .OR.
-     &       RVAL - INT( RVAL / 10000 ) * 10000 .GT. 5959.999 .OR. 
+     &       RVAL - INT( RVAL / 10000 ) * 10000 .GT. 5959.999 .OR.
      &       RVAL - INT( RVAL / 100 ) * 100 .GT. 59.999 ) THEN
 
           IERR = 1

@@ -15,7 +15,7 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     datMapN( const HDSLoc* loc, const char * type, const char * mode, 
+*     datMapN( const HDSLoc* loc, const char * type, const char * mode,
 *              int ndim, void **pntr, hdsdim dims[], int * status )
 *     DAT_MAPN( LOC, TYPE, MODE, NDIM, PNTR, DIMS, STATUS )
 

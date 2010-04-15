@@ -4,7 +4,7 @@
 *     ARY1_DOBJ
 
 *  Purpose:
-*     Ensure that the HDS primitive arrays holding the real and (if 
+*     Ensure that the HDS primitive arrays holding the real and (if
 *     necessary) imaginary values have been created.
 
 *  Language:
@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -116,13 +116,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Do nothing if the creation of hte arrays is not deferred. 
+*  Do nothing if the creation of hte arrays is not deferred.
       IF( ARY1_DEFR( IDCB, STATUS ) ) THEN
 
 *  Report an error if required information is not available. The
 *  only situation in which creation is deferred is if ARY1_DCRE(P) is
-*  called with its DEFER parameter set TRUE. In this case, all the 
-*  required information should already be available because ARY1_DCRE(P) 
+*  called with its DEFER parameter set TRUE. In this case, all the
+*  required information should already be available because ARY1_DCRE(P)
 *  will have set it up.
          IF( .NOT. DCB_KTYP( IDCB ) ) THEN
             STATUS = ARY__UNDEF
@@ -163,19 +163,19 @@
             DCB_LOC( IDCB ) = ARY__NOLOC
             CALL DAT_ERASE( LOCP, NAME, STATUS )
 
-*  Create a new primitive array of the required type and shape in its place 
+*  Create a new primitive array of the required type and shape in its place
 *  and obtain a new locator to it.
-            CALL DAT_NEW( LOCP, NAME,  DCB_TYP( IDCB ), 
-     :                    DCB_NDIM( IDCB ), DCB_UBND( 1, IDCB ), 
-     :                    STATUS ) 
+            CALL DAT_NEW( LOCP, NAME,  DCB_TYP( IDCB ),
+     :                    DCB_NDIM( IDCB ), DCB_UBND( 1, IDCB ),
+     :                    STATUS )
             CALL DAT_FIND( LOCP, NAME, DCB_LOC( IDCB ), STATUS )
 
-*  Link this locator into a private group to prevent external events 
+*  Link this locator into a private group to prevent external events
 *  annulling it.
             CALL HDS_LINK( DCB_LOC( IDCB ), 'ARY_DCB', STATUS )
 
-*  Obtain a non-imaginary component locator by cloning the data object 
-*  locator. 
+*  Obtain a non-imaginary component locator by cloning the data object
+*  locator.
             CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ), STATUS )
 
 *  Simple and scaled arrays.
@@ -188,18 +188,18 @@
                DIM( I ) = DCB_UBND( I, IDCB ) - DCB_LBND( I, IDCB ) + 1
 1           CONTINUE
 
-*  Create the non-imaginary data component and obtain a locator to it. 
+*  Create the non-imaginary data component and obtain a locator to it.
 *  Store the locator in the DCB.
-            CALL DAT_NEW( DCB_LOC( IDCB ), 'DATA', DCB_TYP( IDCB ), 
-     :                    DCB_NDIM( IDCB ), DIM, STATUS ) 
+            CALL DAT_NEW( DCB_LOC( IDCB ), 'DATA', DCB_TYP( IDCB ),
+     :                    DCB_NDIM( IDCB ), DIM, STATUS )
             CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
      :                     STATUS )
 
 *  If a complex array is required, then create and locate the imaginary
 *  component similarly.
             IF ( DCB_CPX( IDCB ) ) THEN
-               CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA', 
-     :                       DCB_TYP( IDCB ), DCB_NDIM( IDCB ), DIM, 
+               CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                       DCB_TYP( IDCB ), DCB_NDIM( IDCB ), DIM,
      :                       STATUS )
                CALL DAT_FIND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
      :                        DCB_ILOC( IDCB ), STATUS )

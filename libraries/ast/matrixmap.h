@@ -19,7 +19,7 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The MatrixMap class implements Mappings that transform a set of 
+*     The MatrixMap class implements Mappings that transform a set of
 *     coordinates by multiplying them by a matrix. The inverse transformation
 *     can only be applied if the associated matrix is square and non-singular.
 
@@ -111,12 +111,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -198,12 +198,12 @@ typedef struct AstMatrixMapVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   AstMatrixMap *(* MtrRot)( AstMatrixMap *, double, const double[], int * ); 
+   AstMatrixMap *(* MtrRot)( AstMatrixMap *, double, const double[], int * );
    AstMatrixMap *(* MtrMult)( AstMatrixMap *,  AstMatrixMap *, int * );
 
 } AstMatrixMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within the
    object.c file. */

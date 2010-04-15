@@ -141,16 +141,16 @@
 *        SPAXIS.NE.1.
 *     25 Nov 1997 (acc):
 *        SPECDRE merged with FIGARO:
-*          Name changed from GROW to GROWS because of clash with FIGARO 
+*          Name changed from GROW to GROWS because of clash with FIGARO
 *          routine GROW.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
-      
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

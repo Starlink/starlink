@@ -2,7 +2,7 @@ C+
 C                      D S A _ _ N D F _ T O P _ N A M E
 C
 C  Routine name:
-C     DSA__NDF_TOP_NAME 
+C     DSA__NDF_TOP_NAME
 C
 C  Function:
 C     Checks on a named item at the top of an NDF structure.

@@ -14,7 +14,7 @@
 
 *  Notes:
 *     Note that it is never necessary to build this test package; the
-*     presence of the source code as files which are syntactically correct 
+*     presence of the source code as files which are syntactically correct
 *     and (in some sense) representative of files found elsewhere in the
 *     Starlink source code collection is all that is required.
 
@@ -34,7 +34,7 @@
 
       PROGRAM SCB_TEST
 
-      WRITE( 6, 61 ) 
+      WRITE( 6, 61 )
  61   FORMAT( 'IN FORTRAN:' )
       CALL SCB_HW
       END

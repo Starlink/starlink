@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SPD_CZDE( DIALOG, MAXTRI, NCOMP, FITPAR, FITDIM, CONT, 
+*     CALL SPD_CZDE( DIALOG, MAXTRI, NCOMP, FITPAR, FITDIM, CONT,
 *        CFLAGS, PFLAGS, SFLAGS, CENTRE, PEAK, FWHM, COVAR, STATUS )
 
 *  Description:
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

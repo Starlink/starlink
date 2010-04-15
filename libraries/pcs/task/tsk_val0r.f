@@ -70,23 +70,23 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       REAL RVAL         ! the value to be encoded
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
- 
+
 *  Status:
       INTEGER STATUS
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       CALL TASK_ENC0R ( RVAL, STRING, STATUS )
- 
+
       END
- 
+
 !*+  TASK_VAL0 - encode a value as a character string
 !      SUBROUTINE TASK_VAL0
 !*    Description :

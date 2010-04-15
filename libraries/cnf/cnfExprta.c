@@ -20,8 +20,8 @@ void cnfExprta( const char *source_c, int source_len, char *dest_f,
 *  Description:
 *     Export a C string array to a FORTRAN CHARACTER array. A null character
 *     is assumed to terminate each C string - it will not be copied.
-*     If the C string is shorter than the space allocated to the FORTRAN 
-*     strings, then pad it with blanks. 
+*     If the C string is shorter than the space allocated to the FORTRAN
+*     strings, then pad it with blanks.
 *     No more than 'dest_len' characters will be copied for each string.
 
 *  Arguments:
@@ -34,7 +34,7 @@ void cnfExprta( const char *source_c, int source_len, char *dest_f,
 *     char *dest_f (Returned via pointer)
 *        A pointer to the output FORTRAN array.
 *     int dest_len (Given)
-*        The declared maximum number of characters in a element of the 
+*        The declared maximum number of characters in a element of the
 *        FORTRAN array.
 *     int ndims (Given)
 *        The number of dimensions of the FORTRAN array.
@@ -45,7 +45,7 @@ void cnfExprta( const char *source_c, int source_len, char *dest_f,
 *  Notes:
 *     -  The C array is treated as an array of strings but it will actually
 *        be a char array with one more dimension than the FORTRAN array, the
-*        last dimension being source_len. The other dimensions must be as for 
+*        last dimension being source_len. The other dimensions must be as for
 *        the FORTRAN array.
 
 *  Copyright:
@@ -57,12 +57,12 @@ void cnfExprta( const char *source_c, int source_len, char *dest_f,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

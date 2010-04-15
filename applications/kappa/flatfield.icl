@@ -21,7 +21,7 @@ PROC FLATFIELD
 
 { Generate the name of the flattened NDF.
          IMAGEOUT = (IMAGE) & 'F'
-         PRINT Writing to (IMAGEOUT) 
+         PRINT Writing to (IMAGEOUT)
 
 { Divide the image by the flat field.
 

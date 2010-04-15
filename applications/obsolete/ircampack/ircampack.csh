@@ -1,4 +1,4 @@
-#+          
+#+
 #  Name:
 #     ircampack.csh
 
@@ -13,9 +13,9 @@
 
 #  Description:
 #     This procedure defines an alias for each IRCAMPACK command. The string
-#     INSTALL_BIN is replaced by the path of the directory containing the 
+#     INSTALL_BIN is replaced by the path of the directory containing the
 #     package executable files when the package is installed. The string
-#     HELP_DIR is likewise replaced by the path to the directory containing 
+#     HELP_DIR is likewise replaced by the path to the directory containing
 #     help libraries.
 
 #  Authors:

@@ -1,23 +1,23 @@
       SUBROUTINE TAPPEND(CPARAM,TITLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  T A P P E N D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), TITLE (><), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Appends a string to the title of the current spectrum
 C

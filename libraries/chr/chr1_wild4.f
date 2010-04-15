@@ -14,15 +14,15 @@
 *     RESULT = CHR1_WILD4( STRING, WILDS, SLEN, WLEN, MATCH )
 
 *  Description:
-*     The given candidate string (STRING) is matched with another 
-*     character string (WILDS) containing a pattern of characters and 
+*     The given candidate string (STRING) is matched with another
+*     character string (WILDS) containing a pattern of characters and
 *     single-character wild-card characters.
 *     The wild-cards used are:
 *
 *        % a single character wild-card;
 *
-*     There is also a literal escape character '\' for use when the 
-*     characters '*' and '%' are to be interpreted literally within 
+*     There is also a literal escape character '\' for use when the
+*     characters '*' and '%' are to be interpreted literally within
 *     the wild-card pattern.
 
 *  Arguments:
@@ -36,10 +36,10 @@
 *        The declared length of WILDS.
 *     MATCH = CHARACTER * ( * ) (Returned)
 *        The wild-card match: this string must be the same length as
-*        STRING. All characters matched individually are returned as 
+*        STRING. All characters matched individually are returned as
 *        blanks in MATCH, and all characters matched by wild-cards are
 *        returned assigned to the particular wild-cards they matched.
-*        If the length of MATCH is less than that of STRING, then 
+*        If the length of MATCH is less than that of STRING, then
 *        CHR1_WILD4 returns the value .FALSE.
 
 *  Returned Value:
@@ -49,7 +49,7 @@
 
 *  Algorithm:
 *     Determine if there are any wild-card characters in the wild
-*     card pattern. 
+*     card pattern.
 *     Since there are only single-character wild-card in the wild-card
 *     pattern, compare the two strings character by character.
 
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,7 +84,7 @@
 *     8-OCT-1991 (PCTR):
 *        Final (working) version with changes prompted by P.T. Wallace.
 *     8-MAR-1993 (PCTR):
-*        Cure bug which leads to a WILDN chracter being present 
+*        Cure bug which leads to a WILDN chracter being present
 *        at the beginning of the WILDS string.
 *     28-SEP-1993 (ACC):
 *        Subprogram created during modularisation.
@@ -120,7 +120,7 @@
       CHR1_WILD4 = .FALSE.
 
 *  There are single-character wild characters in the wild-card pattern, so
-*  perform a character by character comparison. 
+*  perform a character by character comparison.
 *  Initialise the character pointers.
       ICHS = 1
       ICHW = 1

@@ -10,7 +10,7 @@
 
 #  Description:
 #     This class redefines the RtdImageMBand class to work in image
-#     coordinates and with the GAIA "gband" command. 
+#     coordinates and with the GAIA "gband" command.
 #
 #     Image coordinates are used so that an initial reference position
 #     defined by the first <3> press remains correct if the image is
@@ -73,11 +73,11 @@ itcl::class gaia::GaiaImageMBand {
 
 	set image_ [$itk_option(-image) get_image]
 	set canvas_ [$itk_option(-image) get_canvas]
-	
+
 	bind $canvas_ <3> "+[code $this start %x %y]"
     }
 
-    
+
     # start displaying the measure band
 
     public method start {x y} {
@@ -88,7 +88,7 @@ itcl::class gaia::GaiaImageMBand {
 	set x_ $x
 	set y_ $y
         $image_ convert coords $x $y image x y canvas
-	
+
 	# create diagonal line with arrows
 	$canvas_ create line $x $y $x $y \
 	    -width $itk_option(-line_width) \
@@ -103,7 +103,7 @@ itcl::class gaia::GaiaImageMBand {
 	    -fill $itk_option(-line_color) \
 	    -stipple  pat8 \
 	    -tags {mband mband_angle}
-	
+
 	# create labels for width, height, diagonal
 	foreach i {width height diag} {
 	    $canvas_ create rectangle $x $y [expr $x+1] [expr $y+1] \
@@ -123,7 +123,7 @@ itcl::class gaia::GaiaImageMBand {
 
 	# save and set bindings
 	set saved_bindtags_ [bindtags $canvas_]
-	# use a unique name 
+	# use a unique name
 	set tag mband$w_
 	bind $tag <3> [code $this stop]
 	bind $tag <ButtonRelease-3> [code $this check_stop %x %y]
@@ -143,7 +143,7 @@ itcl::class gaia::GaiaImageMBand {
 	bindtags $canvas_ $tag
     }
 
-    
+
     # stop displaying the measure band and restore cursor and bindings
 
     public method stop {} {
@@ -177,7 +177,7 @@ itcl::class gaia::GaiaImageMBand {
 
     # main RtdImage widget (set by caller)
     itk_option define -image image Image {}
-    
+
     # line width option for measure band
     itk_option define -line_width line_width Line_width 1
 
@@ -191,7 +191,7 @@ itcl::class gaia::GaiaImageMBand {
     itk_option define -arrow_shape arrow_shape Arrow_shape {8 10 3}
 
     # outline color for label rectangle
-    itk_option define -outline_color outline_color Outline_color {grey90} 
+    itk_option define -outline_color outline_color Outline_color {grey90}
 
     # fill color for label rectangle
     itk_option define -fill_color fill_color Fill_color {yellow}
@@ -208,7 +208,7 @@ itcl::class gaia::GaiaImageMBand {
     # default cursor when not drawing
     itk_option define -defaultcursor defaultCursor DefaultCursor {}
 
-    # -- protected vars -- 
+    # -- protected vars --
 
     # internal rtdimage widget for main image
     protected variable image_
@@ -223,5 +223,5 @@ itcl::class gaia::GaiaImageMBand {
     protected variable y_ 0
 
     # saved canvas bindings, restored later
-    protected variable saved_bindtags_ 
+    protected variable saved_bindtags_
 }

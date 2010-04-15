@@ -80,7 +80,7 @@
 *        Added ACCESS parameter.
 *     3-MAR-1997 (PDRAPER):
 *        Removed all code dealing with top-level locators. HDS can now
-*        perform this task for itself. This is part of the changes to 
+*        perform this task for itself. This is part of the changes to
 *        IRG to allow foreign data access.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
@@ -158,7 +158,7 @@
          AGAIN = .FALSE.
 
 *  Check that maximum number has not been exceeded, if so reset the
-*  group and reprompt. 
+*  group and reprompt.
          IF ( NNDF .GT. MAXVAL  .OR. NNDF .GT. CCD1__MXNDF ) THEN
              IF ( NNDF .GT. CCD1__MXNDF ) THEN
                 CALL MSG_SETI( 'MAXVAL', CCD1__MXNDF )

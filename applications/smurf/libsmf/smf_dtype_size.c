@@ -91,7 +91,7 @@ size_t smf_dtype_size( const smfData* data, int * status ) {
 
   /* Set a default value */
   size_t retval = 0;
-  
+
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 

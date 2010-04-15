@@ -31,12 +31,12 @@
 *     images also cause bad output values to be created.
 *
 *     The input NDFs should be aligned pixel-for-pixel. If the bounds
-*     of the two NDFs do not match, the output images cover just the 
-*     overlap area. Any QUALITY component present in the shorter 
-*     waveband NDF is propagated to the output NDFs. All extensions are 
-*     propagated from the short waveband NDF, but some information 
-*     describing the origin of the input image is deleted from the 
-*     IRAS extension. 
+*     of the two NDFs do not match, the output images cover just the
+*     overlap area. Any QUALITY component present in the shorter
+*     waveband NDF is propagated to the output NDFs. All extensions are
+*     propagated from the short waveband NDF, but some information
+*     describing the origin of the input image is deleted from the
+*     IRAS extension.
 *
 *     The calculation of colour temperature and optical depth is based
 *     on the use of the detector spectral response curves described in
@@ -47,7 +47,7 @@
 *     optical depth values caused by varying the spectral response
 *     curves slightly can be investigated using the parameters LERR and
 *     RERR.
-*     
+*
 *     Variances for the calculated temperatures and optical depths can
 *     be created if both input NDFs have VARIANCE components (see
 *     parameter VAROUT). These variances do not take into account the
@@ -60,17 +60,17 @@
 
 *  ADAM Parameters:
 *     BETA = _REAL (Read)
-*        The emissivity spectral index. A value of zero causes a 
+*        The emissivity spectral index. A value of zero causes a
 *        blackbody source spectrum to be used.
 *     HISTORY = _LOGICAL (Read)
 *        Determines if history information is to be stored within the
 *        output NDF. See help on "History_in_IRAS90" for more
-*        information on history. 
+*        information on history.
 *                                              [current history setting]
 *     IN1 = NDF (Read)
-*        The first input image. 
+*        The first input image.
 *     IN2 = NDF (Read)
-*        The second input image. 
+*        The second input image.
 *     LERR = _REAL (Read)
 *        Specifies a shift in wavelength to apply to the published
 *        detector spectral response curves before using them. The
@@ -93,7 +93,7 @@
 *        this parameter, no optical depth image is created.
 *     TEMP = NDF (Write)
 *        The temperature output image. Temperatures are stored in
-*        Kelvin. 
+*        Kelvin.
 *     VAROUT = _LOGICAL (Read)
 *        Specifies if VARIANCE components should be created in the
 *        output NDFs. A warning is given if output variances are
@@ -132,7 +132,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,7 +164,7 @@
      :      BAND1,               ! Waveband index from first input.
      :      BAND2,               ! Waveband index from first input.
      :      EL,                  ! No. of elements in a mapped array.
-     :      INDF,                ! Temporary identifier 
+     :      INDF,                ! Temporary identifier
      :      INDF1,               ! Identifier for first input NDF.
      :      INDF2,               ! Identifier for second input NDF.
      :      INDF3,               ! Identifier for output temp. NDF.
@@ -177,7 +177,7 @@
                                  ! first input NDF.
      :      IPIN2                ! Pointer to mapped data array from
                                  ! second input NDF.
-      INTEGER 
+      INTEGER
      :      IPLKF1,              ! Pointer to workspace holding
                                  ! BAND1 flux cubic spline knots.
      :      IPLKR,               ! Pointer to workspace holding
@@ -334,7 +334,7 @@
       CALL NDF_CPUT( 'Output from IRAS90:COLTEMP', INDF3, 'TITLE',
      :               STATUS )
       CALL NDF_CPUT( 'K', INDF3, 'UNITS', STATUS )
-      
+
 *  Map the DATA component of the output temperature map.
       CALL NDF_MAP( INDF3, 'DATA', '_REAL', 'WRITE', IPT, EL, STATUS )
 
@@ -352,8 +352,8 @@
       CALL NDF_PROP( INDF1, 'NOHISTORY,NOLABEL,NOTITLE,QUALITY',
      :               'TAU', INDF4, STATUS )
 
-*  If a null value was supplied, annul the error and set the constant 
-*  needed to evaluate optical depths to a nagative value to indicate 
+*  If a null value was supplied, annul the error and set the constant
+*  needed to evaluate optical depths to a nagative value to indicate
 *  that no optical depth output is required.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -407,7 +407,7 @@
      :                  STATUS )
 
 *  Map the data array
-         CALL NDF_MAP( INDF4, 'DATA', '_REAL', 'WRITE', IPOD, EL, 
+         CALL NDF_MAP( INDF4, 'DATA', '_REAL', 'WRITE', IPOD, EL,
      :                 STATUS )
 
 *  If required, map the VARIANCE component.
@@ -460,7 +460,7 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL NDF_DELET( INDF3, STATUS )
          CALL NDF_DELET( INDF4, STATUS )
-      END IF      
+      END IF
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

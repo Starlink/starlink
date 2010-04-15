@@ -1,7 +1,7 @@
-      SUBROUTINE SKE1_GLOBAL(MULT,ELEMS,ARRAY,RADIUS,MODE, 
-     :                       XMAX,YMAX,USEALL,HIEST,STATUS,ARRAY2)    
+      SUBROUTINE SKE1_GLOBAL(MULT,ELEMS,ARRAY,RADIUS,MODE,
+     :                       XMAX,YMAX,USEALL,HIEST,STATUS,ARRAY2)
 *+
-*  Name: 
+*  Name:
 *     SKE1_GLOBAL
 
 *  Purpose:
@@ -13,24 +13,24 @@
 
 *  Invocation:
 *     CALL SKE1_GLOBAL(MULT,ELEMS,%VAL(POINT1(1)),RADIUS,MODE,
-*                      XMAX,YMAX,USEALL,HIEST,STATUS,%VAL(POINT2(1)))  
-      
+*                      XMAX,YMAX,USEALL,HIEST,STATUS,%VAL(POINT2(1)))
+
 *  Description:
 *     Given a source image, the routine generates an equivalent image of
 *     similar size that shows, at each pixel, the degree of skewness
 *     that was present in the circular area around the equivalent point
 *     in the source image. Skewness should normally be near zero for
-*     a Gaussian (Normal) distribution. Large deviations from this 
+*     a Gaussian (Normal) distribution. Large deviations from this
 *     suggest regions either containing objects or flatfielding flaws.
 *
 *     The calculation is carried out as follows:
 *
-*     The value for each pixel of the output image is determined 
+*     The value for each pixel of the output image is determined
 *     as follows. An imaginary circle is drawn about the pixel
-*     and the count values for all pixels within that circle, 
-*     are stored. 
+*     and the count values for all pixels within that circle,
+*     are stored.
 *
-*     The count values are then used to calculate the skewness using 
+*     The count values are then used to calculate the skewness using
 *     a global mode value.
 
 *  Arguments:
@@ -43,7 +43,7 @@
 *        The array containing the source NDF image count values.
 *     RADIUS = REAL (Given)
 *        The radius of the circular template that is used to define
-*        the region about a given pixel, that might contribute to the 
+*        the region about a given pixel, that might contribute to the
 *        skewness value that will be inserted into
 *        the equivalent pixel in ARRAY2.
 *     MODE = REAL (Given)
@@ -57,10 +57,10 @@
 *        employed.
 *     HIEST = REAL (Given)
 *        The highest pixel count value that will be used in the analysis.
-*        All pixels with count values above this will be ignored. Units 
+*        All pixels with count values above this will be ignored. Units
 *        counts.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status.     
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 *     ARRAY2(ELEMS) = REAL (Returned)
 *        The array that eventually contains the skewness 'image'.
 
@@ -78,14 +78,14 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'SKE_PAR'               ! SKEW constants
-                     
+
 *  Arguments Given:
-      LOGICAL USEALL                  ! Is a high count cut out being 
+      LOGICAL USEALL                  ! Is a high count cut out being
                                       ! used?
       INTEGER ELEMS                   ! Number of pixels in the data array
       INTEGER RADIUS                  ! Radius of the size of object
@@ -103,24 +103,24 @@
       REAL ARRAY2(ELEMS)              ! Image array containing the
                                       ! skewness results
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables:                 
-      INTEGER I                       ! Loop variable 
+*  Local variables:
+      INTEGER I                       ! Loop variable
       INTEGER ADD2                    ! Array element address
       INTEGER J                       ! Loop variable
       INTEGER N                       ! The number of valid pixels
                                       ! that were present about a given
                                       ! origin pixel
-      INTEGER NPIX                    ! The maximum number of pixels 
-                                      ! about a given origin. Depends on the 
-                                      ! pixel size and filter width. 
+      INTEGER NPIX                    ! The maximum number of pixels
+                                      ! about a given origin. Depends on the
+                                      ! pixel size and filter width.
       INTEGER OFFSETS(SKE1__PIXN)     ! Address offsets for the
                                       ! pixels in the circular
                                       ! template used
-      INTEGER PERC                    ! Percentage of the calculations 
-                                      ! done so far                  
+      INTEGER PERC                    ! Percentage of the calculations
+                                      ! done so far
       INTEGER X                       ! Pixel x axis index
       INTEGER X1                      ! Pixel x axis index offset
       INTEGER Y                       ! Pixel y axis index
@@ -128,9 +128,9 @@
 
       REAL RN                         ! Number of pixels used
       REAL SKEW                       ! Temporary skewness sum
-      REAL VALUE                      ! Temporary storage 
+      REAL VALUE                      ! Temporary storage
       REAL VALUES(SKE1__PIXN)         ! Values of pixel counts
-      REAL VALUE1                     ! Temporary storage 
+      REAL VALUE1                     ! Temporary storage
       REAL VARI                       ! Temporary variance sum
 *.
 
@@ -143,23 +143,23 @@
  10   CONTINUE
 
 *   Construct an array containing the memory address offsets of all the
-*   pixels in the template relative to the memory address of the circle 
-*   centre. 
+*   pixels in the template relative to the memory address of the circle
+*   centre.
 *
       I=RADIUS*RADIUS
       NPIX=0
-      DO 30 X1=-RADIUS,RADIUS    
+      DO 30 X1=-RADIUS,RADIUS
          DO 20 Y1=-RADIUS,RADIUS
 
 *         Check that the pixel at pixel offsets X1,Y1 is
-*         within a circle of the given radius and hence within the 
+*         within a circle of the given radius and hence within the
 *         required circular area.
             IF (I.GT.(X1*X1+Y1*Y1)) THEN
 
-*            Calculate the memory address offset. 
+*            Calculate the memory address offset.
                VALUE=Y1*XMAX+X1
-  
-*            Increment the address counter and store the 
+
+*            Increment the address counter and store the
 *            address offset.
                NPIX=NPIX+1
 
@@ -177,13 +177,13 @@
 
  20      CONTINUE
 
- 30   CONTINUE  
+ 30   CONTINUE
 
-*   Consider all pixels within the template. Obviously, a point off the 
+*   Consider all pixels within the template. Obviously, a point off the
 *   side of the image is not valid. To increase speed of operation only
 *   the parts of the image where this is not the case are considered.
-*   This leads to the generation of a border of bad-valued points around 
-*   the image. The border width is the same as the radius of the circular 
+*   This leads to the generation of a border of bad-valued points around
+*   the image. The border width is the same as the radius of the circular
 *   filter in use.
 *
 *   Two nearly identical routines are used to maximise execution speed.
@@ -193,7 +193,7 @@
 *      high count cutoff.
          PERC=0
          DO 100 Y=RADIUS+1,YMAX-RADIUS-1
-         
+
 *         Indicate that something is happening.
             IF (Y.EQ.NINT(Y/50.)*50) THEN
                PERC=NINT((Y-RADIUS)*100./(YMAX-2.*RADIUS)+1.)
@@ -216,21 +216,21 @@
                DO 40 J=1,NPIX
 
 *               Get the value of the point but only uses if
-*               it is not defined as bad. 
+*               it is not defined as bad.
                   VALUE1=ARRAY(I+OFFSETS(J))
                   IF (VALUE1.NE.VAL__BADR) THEN
-               
-*                  Increment the number of usable pixels 
+
+*                  Increment the number of usable pixels
 *                  and retain latest value.
                      N=N+1
                      VALUES(N)=VALUE1
 
                   END IF
 
- 40            CONTINUE  
+ 40            CONTINUE
 
 *            Consider all the pixels that were found.
-               IF (N.GT.1) THEN 
+               IF (N.GT.1) THEN
 
 *               Calculate the skewness and variance totals.
                   SKEW=0.0
@@ -251,7 +251,7 @@
 
  90         CONTINUE
 
- 100     CONTINUE                    
+ 100     CONTINUE
 
       ELSE
 
@@ -259,7 +259,7 @@
 *      count cutofff defined by HIEST
          PERC=0
          DO 1100 Y=RADIUS+1,YMAX-RADIUS-1
-         
+
 *         Indicate that something is happening.
             IF (Y.EQ.NINT(Y/50.)*50) THEN
                PERC=NINT((Y-RADIUS)*100./(YMAX-2.*RADIUS)+1.)
@@ -283,22 +283,22 @@
 
 *               Get the value of the point but only use if
 *               it is not defined as bad and is not above the
-*               cutoff value. 
+*               cutoff value.
                   VALUE1=ARRAY(I+OFFSETS(J))
 
                   IF ((VALUE1.NE.VAL__BADR).AND.(VALUE1.LT.HIEST)) THEN
-               
-*                  Increment the number of usable pixels 
+
+*                  Increment the number of usable pixels
 *                  found and retain the latest value.
                      N=N+1
                      VALUES(N)=VALUE1
 
                   END IF
 
- 1040          CONTINUE  
+ 1040          CONTINUE
 
 *            Consider all the pixels that were found.
-               IF (N.GT.1) THEN 
+               IF (N.GT.1) THEN
 
 *               Calculate the skewness and variance totals.
                   SKEW=0.0
@@ -319,10 +319,10 @@
 
  1090       CONTINUE
 
- 1100    CONTINUE                    
-      
+ 1100    CONTINUE
+
       END IF
-        
+
  9999 CONTINUE
 
       END

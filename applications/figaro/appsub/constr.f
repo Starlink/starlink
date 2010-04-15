@@ -6,10 +6,10 @@ C
 C     C O N S T R
 C
 C     Handles the interactive set up of the single constraints on
-C     the fit parameters for position, height and width and the 
+C     the fit parameters for position, height and width and the
 C     multiple constraints in the form of chained values
-C     for position ( CHAINP ), height ( CHAINH ) and width ( CHAINW ). 
-C   
+C     for position ( CHAINP ), height ( CHAINH ) and width ( CHAINW ).
+C
 C     Parameters - (">" input, "<" output )
 C
 C     (>) NG       (Integer) Number of elements in the GINF. arrays
@@ -19,21 +19,21 @@ C     (>) GINFH    (Real array) The array of peak heights of the fitted
 C                  Gaussians
 C     (>) GINFW    (Real array) The array of widths ( sigma ) of the fitted
 C                  Gaussians
-C     (<) CONP     (Integer array) The array of the index number of the 
+C     (<) CONP     (Integer array) The array of the index number of the
 C                  Gaussians whose peak position is to be fixed
-C     (<) CONH     (Integer array) The array of the index number of the 
+C     (<) CONH     (Integer array) The array of the index number of the
 C                  Gaussians whose peak height is to be fixed
-C     (<) CONW     (Integer array) The array of the index number of the 
+C     (<) CONW     (Integer array) The array of the index number of the
 C                  Gaussians whose sigma is to be fixed
-C     (<) ICHAINP  (Integer array) The array of the chaining index 
+C     (<) ICHAINP  (Integer array) The array of the chaining index
 C                  number of the Gaussians to be chained in position
 C     (<) CHAINP   (Real array) The array of values of the line seperations
 C                  of lines to be locked
-C     (<) ICHAINH  (Integer array) The array of the chaining index number 
+C     (<) ICHAINH  (Integer array) The array of the chaining index number
 C                  of the Gaussians to be chained in height
 C     (<) CHAINH   (Real array) The array of values of the line height
 C                  ratios of the lines to be locked
-C     (<) ICHAINW  (Integer array) The array of the chaining index number 
+C     (<) ICHAINW  (Integer array) The array of the chaining index number
 C                  of the Gaussians to be chained in width
 C     (<) CHAINW   (Real array) The array of values of the line width
 C                  ratios of lines to be locked
@@ -41,7 +41,7 @@ C
 C                                                JRW/ AAO Sept 1987
 C
 C     Subroutines called:
-C        TERMWRIT - writes the parameters of the fitted Gaussians to 
+C        TERMWRIT - writes the parameters of the fitted Gaussians to
 C                   the terminal
 C
 C      1992 Aug 31 Calls to WRUSER changed to PAR_WRUSER.  HME / UoE, Starlink.
@@ -107,7 +107,7 @@ C
 C         Check integer value is within range 1 to NG and a legitimate
 C         parameter
 C
-          IF (I1.EQ.-1) THEN 
+          IF (I1.EQ.-1) THEN
 C
 C           Input of values complete
 C
@@ -281,7 +281,7 @@ C
             IF (NEW.NE.0) THEN
               WRITE(OUT,69) ORIGW
 69            FORMAT('Enter width relative to line of width ',F9.2)
-              CALL PAR_WRUSER(OUT,STAT) 
+              CALL PAR_WRUSER(OUT,STAT)
               CALL PAR_CNPAR('RCHAIN')
               CALL PAR_RDVAL('RCHAIN',FMIN,FMAX,0.0,' ',VALUE)
               CHAINW(ICH)=VALUE
@@ -319,7 +319,7 @@ C
           END DO
         END DO
 C
-C       Now report values of the height chains 
+C       Now report values of the height chains
 C
         DO J=1,NJ,1
           LOW=0
@@ -333,7 +333,7 @@ C
               GO TO 86
             ENDIF
             IF (ICHAINH(I).EQ.J.AND.LOW.EQ.1) THEN
-              WRITE(OUT,85) I,J,CHAINH(I)              
+              WRITE(OUT,85) I,J,CHAINH(I)
 85            FORMAT(' Gaussian no. ',I2,' chain no. ',I2,
      :' relative height = ',F9.2)
               CALL PAR_WRUSER(OUT,STAT)
@@ -343,7 +343,7 @@ C
           END DO
         END DO
 C
-C       Now report values of the width chains 
+C       Now report values of the width chains
 C
         DO J=1,NJ,1
           LOW=0
@@ -357,7 +357,7 @@ C
               GO TO 89
             ENDIF
             IF (ICHAINW(I).EQ.J.AND.LOW.EQ.1) THEN
-              WRITE(OUT,88) I,J,CHAINW(I)              
+              WRITE(OUT,88) I,J,CHAINW(I)
 88            FORMAT(' Gaussian no. ',I2,' chain no. ',I2,
      :' relative width = ',F9.2)
               CALL PAR_WRUSER(OUT,STAT)
@@ -368,4 +368,4 @@ C
         END DO
       ENDIF
 
-99    END 
+99    END

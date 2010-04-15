@@ -45,7 +45,7 @@
 *  Notes:
 
 *  Authors:
-*     Ed Chapin (UBC) 
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,7 +67,7 @@
 *     2008-11-20 (TIMJ):
 *        "Close" the smfData instead of "free".
 *     2009-10-8 (DSB):
-*         Use a smf job context to ensure that smf_wait only waits for the jobs 
+*         Use a smf job context to ensure that smf_wait only waits for the jobs
 *         submitted within this function.
 *     2009-10-28 (DSB):
 *         Use sc2ast_make_bolo_frame.

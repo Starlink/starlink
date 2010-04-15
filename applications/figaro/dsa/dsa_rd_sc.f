@@ -10,7 +10,7 @@ C
 C  Description:
 C     This routine reads a specified text file containing one or more
 C     parameterised structure definitions.  The values of the parameters
-C     may be set later by calls to DSA_SET_PARM, and structures 
+C     may be set later by calls to DSA_SET_PARM, and structures
 C     corresponding to the definitions may then be created through calls
 C     to routines such as DSA_CREATE_STRUCTURE.
 C
@@ -33,7 +33,7 @@ C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     ICH_FOLD, ICH_LEN, ICH_WORD, ICH_VERIF, ICH_CI, DSA_DEF_ERROR, 
+C     ICH_FOLD, ICH_LEN, ICH_WORD, ICH_VERIF, ICH_CI, DSA_DEF_ERROR,
 C     DSA_OPEN_TEXT_FILE, DSA_FREE_LU, DSA_WRUSER, GEN_FORTERR, GEN_DETAB
 C
 C  Prior requirements:  None.
@@ -176,7 +176,7 @@ C
       FOPEN=.TRUE.
       FLEN=ICH_LEN(FULL_NAME)
 C
-C     Start to read through the definition file 
+C     Start to read through the definition file
 C
       FILE_LINE=0
       STRUCT_LINE=0
@@ -212,7 +212,7 @@ C
             IF ((CHR.NE.' ').AND.(CHR.NE.'*')) THEN
 C
 C              It isn't a comment.  So, it ought to start with one of
-C              the keywords (VARIANT,VARIABLE,STRUCTURE,END,IF or EQUATE) 
+C              the keywords (VARIANT,VARIABLE,STRUCTURE,END,IF or EQUATE)
 C              or be a structure element definition, in which case it begins
 C              with a '.'.  Note that the parsing performed by this
 C              routine is rather 'brute force' in nature, and isn't
@@ -550,8 +550,8 @@ C
 C
 C     Utility routine for DSA_READ_STRUCT_DEF.  Outputs an error
 C     description (ERROR), the name of the structure file in question
-C     (FULL_NAME) the text (LINE) and line number (FILE_LINE) of the line 
-C     causing the error, and sets the status (STATUS) to an error value, 
+C     (FULL_NAME) the text (LINE) and line number (FILE_LINE) of the line
+C     causing the error, and sets the status (STATUS) to an error value,
 C     if it does not already indicate an error.  Should be regarded as an
 C     internal routine of DSA_READ_STRUCT_DEF.
 C

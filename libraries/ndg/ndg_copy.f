@@ -20,8 +20,8 @@
 *     information about each NDF in the group. This function ensures that
 *     the returned group also has such supplemental information.
 *
-*     NDG's supplemental information is stored in a chain of "slave 
-*     groups" that are attached to each other using the facilities of 
+*     NDG's supplemental information is stored in a chain of "slave
+*     groups" that are attached to each other using the facilities of
 *     GRP (e.g. see GRP_SOWN). The supplied group is the lowest level
 *     "slave" in this chain.
 
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -133,7 +133,7 @@
          IF( IGRPB .NE. GRP__NOID ) THEN
 
 *  Copy the base file name from this group into a new group.
-            CALL GRP_COPY( IGRPB, INDXLO, INDXHI, REJECT, IGRPB2, 
+            CALL GRP_COPY( IGRPB, INDXLO, INDXHI, REJECT, IGRPB2,
      :                     STATUS )
 
 *  Establish the directory paths group as the slave of the new group.
@@ -144,7 +144,7 @@
             IF( IGRPT .NE. GRP__NOID ) THEN
 
 *  Copy the file type from this group into a new group.
-               CALL GRP_COPY( IGRPT, INDXLO, INDXHI, REJECT, IGRPT2, 
+               CALL GRP_COPY( IGRPT, INDXLO, INDXHI, REJECT, IGRPT2,
      :                        STATUS )
 
 *  Establish the file base name group as the slave of the new group.
@@ -155,7 +155,7 @@
                IF( IGRPH .NE. GRP__NOID ) THEN
 
 *  Copy the HDS path from this group into a new group.
-                  CALL GRP_COPY( IGRPH, INDXLO, INDXHI, REJECT, IGRPH2, 
+                  CALL GRP_COPY( IGRPH, INDXLO, INDXHI, REJECT, IGRPH2,
      :                           STATUS )
 
 *  Establish the file type group as the slave of the new group.
@@ -166,7 +166,7 @@
                   IF( IGRPS .NE. GRP__NOID ) THEN
 
 *  Copy the NDF section from this group into a new group.
-                     CALL GRP_COPY( IGRPS, INDXLO, INDXHI, REJECT, 
+                     CALL GRP_COPY( IGRPS, INDXLO, INDXHI, REJECT,
      :                              IGRPS2, STATUS )
 
 *  Establish the HDS path group as the slave of the new group.

@@ -1,26 +1,26 @@
       SUBROUTINE MOTD(IO_LU,TRANS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   M O T D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C IO_LU (<), TRANS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Displays the current "message of the day" which is located in
 C POLMAP_DIR/polmap.mtd
-C 
+C
 C
 C-
 
@@ -44,6 +44,6 @@ C
       GOTO 999
 666   CONTINUE
       CALL WR_ERROR('Cannot open message file',OUT_LU)
-999   CONTINUE 
+999   CONTINUE
       CLOSE(IO_LU)
       END

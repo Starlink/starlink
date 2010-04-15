@@ -49,12 +49,12 @@ int GWM_SetScroll( Display *display, Window win_id, int xoffset, int yoffset)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@ int GWM_SetScroll( Display *display, Window win_id, int xoffset, int yoffset)
 {
     Atom atom;
     long local_offset;
-        
+
     atom = XInternAtom(display, "GWM_x_offset", False );
     if (!atom) return GWM_NO_OFFSET;
 
@@ -86,7 +86,7 @@ int GWM_SetScroll( Display *display, Window win_id, int xoffset, int yoffset)
 
     atom = XInternAtom(display, "GWM_y_offset", False );
     if (!atom) return GWM_NO_OFFSET;
-    
+
     local_offset = (long)yoffset;
     XChangeProperty( display, win_id, atom, XA_INTEGER, 32, PropModeReplace,
         (unsigned char*)(&local_offset), 1 );

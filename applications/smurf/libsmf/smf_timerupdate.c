@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     elapsed = smf_timerupdate( struct timeval *tv1, struct timeval *tv2, 
+*     elapsed = smf_timerupdate( struct timeval *tv1, struct timeval *tv2,
 *                                int *status);
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *     The elapsed time since the previous call to smf_timerupdate in seconds,
 *     or 0 if bad status detected.
 
-*  Description: 
+*  Description:
 *     Update tv2 to current time, calculate difference in seconds between
 *     tv1 and tv2, set tv1 to tv2 and return the calculated difference.
 
@@ -100,7 +100,7 @@ double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status) {
     return 0;
   }
 
-  gettimeofday( tv2, NULL ); 
+  gettimeofday( tv2, NULL );
   diff = smf_difftime( tv1, tv2, status);
   smf_copytime( tv1, tv2, status );
 

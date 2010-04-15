@@ -7,7 +7,7 @@
 ***********************************************************************
       SUBROUTINE CON_CHECK_GEN(REF_NO,MESID,SCREEN,XTYPE,FIELD_NO)
       IMPLICIT NONE
- 
+
 *   Input :
       INTEGER REF_NO		! Database reference number.
       INTEGER MESID		! Screen Number
@@ -16,17 +16,17 @@
 *   Output :
       CHARACTER*1 XTYPE
       INTEGER FIELD_NO		! Field number Where error detected, else 1
- 
+
 *  Global Variables
       INCLUDE 'com_form_qual.inc'
- 
+
 *-
 *   Functions
       INTEGER DBS_FIELDNO					!Gets field numberfrom the database.
       CHARACTER*20 DBS_GETC					!Gets character value from the database.
       INTEGER MDH_ENDWORD					!Finds length of word.
       CHARACTER*1 CON_CHECK_ERR
- 
+
 * Local Variables
       CHARACTER*7 CVAL
       INTEGER I							!Array counter.
@@ -90,7 +90,7 @@
       FIELD_NO = 1
       QUAL_GEN = .TRUE.
       GOTO 20
- 
+
 10    CONTINUE
       XTYPE = CON_CHECK_ERR(MESID,MESSAGE)
       QUAL_GEN = .FALSE.

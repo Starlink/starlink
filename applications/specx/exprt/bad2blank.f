@@ -5,7 +5,7 @@
 *         Port to Linux
 *         Replace 'TYPE *' with 'PRINT *'
 *         Remove inaccessible error handling
-*                
+*
 *
 *-----------------------------------------------------------------------
 
@@ -13,8 +13,8 @@
 
 *  This routine remedies the omission of support for an undefined value
 *  in the FIGARO FIT routines.
-*  It takes the simple-minded approach to change undefined values 
-*  (badpix_val) to min(array values) - 1 and should be run before 
+*  It takes the simple-minded approach to change undefined values
+*  (badpix_val) to min(array values) - 1 and should be run before
 *  determining the FITS scaling factors with FIT_SCALC.
 *  The FITS BLANK keyword can be calculated as
 *
@@ -33,7 +33,7 @@
       REAL      RBLANK      !  RETURNED: new value of bad pixels.
       INTEGER   NBAD        !  RETURNED: Number of BAD pixels
       INTEGER   IFAIL       !  Error status, returned
-  
+
 *     include files
       INCLUDE  'FLAGCOMM'   !  Badpix_value
 
@@ -82,7 +82,7 @@ CD     PRINT *, 'Rblank: ', RBLANK
          PRINT *, 'Flagged ',NBAD,' undefined pixels'
       END IF
 
-      
+
 
       RETURN
 

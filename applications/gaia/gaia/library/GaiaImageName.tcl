@@ -134,7 +134,7 @@ itcl::class gaia::GaiaImageName {
 
    #  Get the GAIA compliant fully expanded name. Do not add the FITS
    #  extension, unless it is needed (i.e. we have a slice) when
-   #  requested. 
+   #  requested.
    public method fullname { {fitsext 1} } {
       if { $fitsext || $fitsext_ == {} || $slice_ != {} } {
          return $fullname_

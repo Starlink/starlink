@@ -22,7 +22,7 @@
 *  Description:
 *     This is an interactive tool for selecting regions of a displayed
 *     image using a cursor, and then storing a description of the
-*     selected regions in a text file in the form of an 
+*     selected regions in a text file in the form of an
 *     `ARD Description' (see SUN/183).  This text file may subsequently
 *     be used in conjunction with packages such as CCDPACK or ESP.
 *
@@ -48,10 +48,10 @@
 *     In the absence of any other information, subsequent application
 *     will use the union (i.e. the logical OR) of all the defined
 *     regions.  However, regions can be combined in other ways using
-*     the COMBINE option (see Parameter OPTION).  For instance, two 
-*     regions originally defined using the cursor could be replaced by 
-*     their region of intersection (logical AND), or a single region 
-*     could be replaced by its own exterior (logical NOT).  Other 
+*     the COMBINE option (see Parameter OPTION).  For instance, two
+*     regions originally defined using the cursor could be replaced by
+*     their region of intersection (logical AND), or a single region
+*     could be replaced by its own exterior (logical NOT).  Other
 *     operators can also be used (see Parameter OPERATOR).
 
 *  Usage:
@@ -113,7 +113,7 @@
 *        - "Delete" -- Delete previously defined regions, see parameter
 *        REGIONS.
 *
-*        - "Draw" -- Draw the outline of the union of one or more 
+*        - "Draw" -- Draw the outline of the union of one or more
 *        previously defined regions, see Parameter REGIONS.
 *
 *        - "Exit" -- Write out the currently defined regions to a text
@@ -121,27 +121,27 @@
 *
 *        - "List" -- List the textual descriptions of the currently
 *        defined regions on the screen.  Each region is described by an
-*        index value, a "keyword" corresponding to the shape, and 
-*        various arguments describing the extent and position of the 
-*        shape.  These arguments are described in the "Notes" section 
+*        index value, a "keyword" corresponding to the shape, and
+*        various arguments describing the extent and position of the
+*        shape.  These arguments are described in the "Notes" section
 *        below.
 *
 *        - "Multi" -- The cursor is displayed and you can then identify
-*        multiple regions of the current shape, without being 
-*        re-prompted for OPTION after each one.  These regions are 
+*        multiple regions of the current shape, without being
+*        re-prompted for OPTION after each one.  These regions are
 *        added to the end of the list of currently defined regions.  If
-*        the current shape is "Polygon", "Frame" or "Whole" (see 
-*        Parameter SHAPE) then multiple regions cannot be defined and 
+*        the current shape is "Polygon", "Frame" or "Whole" (see
+*        Parameter SHAPE) then multiple regions cannot be defined and
 *        the selected option automatically reverts to "Single".
 *
 *        - "Single" -- The cursor is displayed and you can then identify
-*        single region of the current shape.  You are re-prompted for 
-*        Parameter OPTION once you have defined the region.  The 
-*        identified region is added to the end of the list of currently 
+*        single region of the current shape.  You are re-prompted for
+*        Parameter OPTION once you have defined the region.  The
+*        identified region is added to the end of the list of currently
 *        defined regions.
 *
 *        - "Shape" -- Change the shape of the regions created by the
-*        "Single" and "Multi" options.  This causes a new value for 
+*        "Single" and "Multi" options.  This causes a new value for
 *        Parameter SHAPE to be obtained.
 *
 *        - "Style" -- Change the drawing style by providing a new value
@@ -151,19 +151,19 @@
 *        defined regions.
 *
 *        - "Undo" -- Undo the changes made to the list of ARD regions by
-*        the previous option. Note, the undo list can contain up to 30 
-*        entries.  Entries are only stored for options which actually 
-*        produce a change in the list of regions. 
+*        the previous option. Note, the undo list can contain up to 30
+*        entries.  Entries are only stored for options which actually
+*        produce a change in the list of regions.
 *
 *     REGIONS() = LITERAL (Read)
-*        The list of regions to be deleted or drawn.  Regions are 
-*        numbered consecutively from 1 and can be listed using the 
-*        "List" option (see Parameter OPTION).  Single regions or a set 
-*        of adjacent regions may be specified, e.g. assigning 
-*        [4,6-9,12,14-16] will delete regions 4,6,7,8,9,12,14,15,16. 
-*        (Note that the brackets are required to distinguish this array 
-*        of characters from a single string including commas.  The 
-*        brackets are unnecessary when there is only one item.)  The 
+*        The list of regions to be deleted or drawn.  Regions are
+*        numbered consecutively from 1 and can be listed using the
+*        "List" option (see Parameter OPTION).  Single regions or a set
+*        of adjacent regions may be specified, e.g. assigning
+*        [4,6-9,12,14-16] will delete regions 4,6,7,8,9,12,14,15,16.
+*        (Note that the brackets are required to distinguish this array
+*        of characters from a single string including commas.  The
+*        brackets are unnecessary when there is only one item.)  The
 *        numbers need not be in ascending order.
 *
 *        If you wish to delete or draw all the regions enter the
@@ -184,11 +184,11 @@
 *        Axis 2.
 *
 *        - "Ellipse" -- An ellipse, defined by its centre, one end of
-*        the major axis, and one other point which can be anywhere on 
+*        the major axis, and one other point which can be anywhere on
 *        the ellipse.
 *
 *        - "Frame" -- The whole image excluding a border of constant
-*        width, defined by a single point on the frame. 
+*        width, defined by a single point on the frame.
 *
 *        - "Point" -- A single pixel.
 *
@@ -212,11 +212,11 @@
 *        mode (see Parameter OPTION). ["Multi"]
 *     UNDO = _LOGICAL (Read)
 *        Used to confirm that it is OK to proceed with an "Undo" option.
-*        The consequences of proceeding are described before the 
+*        The consequences of proceeding are described before the
 *        parameter is obtained.
 
 *  Examples:
-*     ardgen extract.txt circle exit startup=single 
+*     ardgen extract.txt circle exit startup=single
 *        This example allows you to create a text file (extract.txt)
 *        describing a single circular region of the image displayed on
 *        the current graphics device.  The application immediately exits
@@ -239,14 +239,14 @@
 *        - "Column" -- The Axis 1 co-ordinate of the column.
 *
 *        - "Ellipse" -- The co-ordinates of the centre, followed by the
-*        lengths of the semi-major and semi-minor axes, followed by the 
+*        lengths of the semi-major and semi-minor axes, followed by the
 *        angle between Axis 1 and the semi-major axis (in radians).
 *
 *        - "Frame" -- The width of the border.
 *
 *        - "Point" -- The co-ordinates of the pixel.
 *
-*        - "Polygon" -- The co-ordinates of each vertex in the order 
+*        - "Polygon" -- The co-ordinates of each vertex in the order
 *        given.
 *
 *        - "Rectangle" -- The co-ordinates of two diagonally opposite
@@ -261,14 +261,14 @@
 *        - "Whole" -- No arguments.
 *
 *      -  The shapes are defined within the current co-ordinate Frame of
-*      the displayed NDF.  For instance, if the current co-ordinate 
-*      Frame of the displayed NDF is RA/DEC, then "COLUMN" regions will 
-*      be curves of constant DEC, "ROW" regions will be curves of 
-*      constant RA (assuming Axis 1 is RA and Axis 2 is DEC), straight 
+*      the displayed NDF.  For instance, if the current co-ordinate
+*      Frame of the displayed NDF is RA/DEC, then "COLUMN" regions will
+*      be curves of constant DEC, "ROW" regions will be curves of
+*      constant RA (assuming Axis 1 is RA and Axis 2 is DEC), straight
 *      lines will correspond to geodesics, etc. Numerical values will be
 *      stored in the output text file in the current coordinate Frame of
 *      the NDF.  WCS information will also be stored in the output text
-*      file allowing the stored positions to be converted to other 
+*      file allowing the stored positions to be converted to other
 *      systems (pixel co-ordinates, for instance).
 
 *  Related Applications:
@@ -333,12 +333,12 @@
 *  Type Definitions:
       IMPLICIT NONE              ! No default typing allowed
 
-*  Global Constants: 
+*  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE constants
       INCLUDE 'DAT_PAR'          ! HDS public constants
       INCLUDE 'PAR_ERR'          ! Parameter system error constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -352,10 +352,10 @@
       PARAMETER ( NDIM = 2 )     ! 2-d arrays only
 
       INTEGER MXGRP              ! Max. no. of undo operations
-      PARAMETER ( MXGRP = 30 )     
+      PARAMETER ( MXGRP = 30 )
 
       INTEGER MXPOL              ! Max. no. of vertices in a polygon
-      PARAMETER ( MXPOL = 200 )     
+      PARAMETER ( MXPOL = 200 )
 
 *  Local Variables:
       CHARACTER OPTION*7         ! User selected option
@@ -406,14 +406,14 @@
 *  Find the most recent DATA picture.
       CALL KPG1_AGFND( 'DATA', IPIC, STATUS )
 
-*  Report the name, comment, and label, if one exists, for the current 
+*  Report the name, comment, and label, if one exists, for the current
 *  picture.
       CALL KPG1_AGATC( STATUS )
 
-*  Set the PGPLOT viewport and AST Plot for this DATA picture.  The 
-*  PGPLOT viewport is set equal to the selected picture, with world 
-*  co-ordinates giving millimetres from the bottom-left corner of the 
-*  view surface. 
+*  Set the PGPLOT viewport and AST Plot for this DATA picture.  The
+*  PGPLOT viewport is set equal to the selected picture, with world
+*  co-ordinates giving millimetres from the bottom-left corner of the
+*  view surface.
       CALL KPG1_GDGET( IPIC, AST__NULL, .FALSE., IPLOT, STATUS )
 
 *  Save the bounds of the DATA picture.
@@ -428,9 +428,9 @@
 
 *  Obtain a group, and initial option and shape.
 *  =============================================
-*  Create a GRP group in which to store the ARD description. 
+*  Create a GRP group in which to store the ARD description.
       CALL GRP_NEW( 'ARDGEN output', IGRP, STATUS )
-      
+
 *  Get the initial region shape to use.
       CALL PAR_CHOIC( 'SHAPE', 'CIRCLE', 'Circle,Box,Point,Row,'/
      :                /'Column,Ellipse,Line,Rectangle,Whole,Frame,'/
@@ -438,7 +438,7 @@
 
 *  Get the start up option.  Flag that the user has not yet performed
 *  this option.
-      CALL PAR_CHOIC( 'STARTUP', 'Multi', 'Multi,Single', .FALSE., 
+      CALL PAR_CHOIC( 'STARTUP', 'Multi', 'Multi,Single', .FALSE.,
      :                OPTION, STATUS )
       READY = .FALSE.
 
@@ -472,10 +472,10 @@
             READY = .FALSE.
             IF( STATUS .EQ. PAR__NULL ) OPTION = 'QUIT'
          END IF
-         
+
 *  If user wants to define more regions of the current shape...
-         IF( OPTION .EQ. 'SINGLE' .OR. 
-     :        OPTION .EQ. 'MULTI' ) THEN          
+         IF( OPTION .EQ. 'SINGLE' .OR.
+     :        OPTION .EQ. 'MULTI' ) THEN
 
 *  Save the original number of regions in the group.
              NREG0 = NREG
@@ -503,9 +503,9 @@
 *  Initialise the number of cursor positions obtained.
                NP = 0
 
-*  Obtain the required number of positions via the graphics cursor.  An 
+*  Obtain the required number of positions via the graphics cursor.  An
 *  exact number of points is required.
-               CALL KPS1_AGNCP( IPLOT, SHAPE, MXPOL, NPTS, X1, X2, Y1, 
+               CALL KPS1_AGNCP( IPLOT, SHAPE, MXPOL, NPTS, X1, X2, Y1,
      :                          Y2, INFO, XIN, YIN, NP, XP, YP, STATUS )
 
 *  If the required number of positions were obtained (or at least 1
@@ -522,7 +522,7 @@
 
 *  Draw the region.
                   CALL KPS1_AGNDR( IPLOT, IGRP, NREG, STATUS )
-               
+
 *  Issue a warning if sufficient positions were not obtained. Only do
 *  this if the user is giving a single region.  Otherwise take it as an
 *  indication that the user doesn't want to give any more regions.
@@ -530,21 +530,21 @@
                   CALL MSG_SETC( 'SH', SHAPE )
                   CALL MSG_SETI( 'NPTS', NPTS )
                   CALL MSG_OUT( 'ARDGEN_MSG', '^NPTS positions '//
-     :                          'required to define a "^SH" region!', 
+     :                          'required to define a "^SH" region!',
      :                          STATUS )
                END IF
 
 *  If the user only wanted to give one region, or if the user gave an
 *  incomplete region, leave the loop.
-               IF( ( OPTION .EQ. 'SINGLE' ) .OR. 
+               IF( ( OPTION .EQ. 'SINGLE' ) .OR.
      :              ( NP .NE. NPTS ) ) THEN
                   REGION = .FALSE.
 
 *  If another region is to be defined, tell the user.
-               ELSE                
+               ELSE
                   CALL MSG_SETC( 'SH', SHAPE )
                   CALL MSG_OUT( 'ARDGEN_MSG', 'Region completed. '//
-     :                          'Identify another ''^SH'' region...', 
+     :                          'Identify another ''^SH'' region...',
      :                          STATUS )
                END IF
 
@@ -559,15 +559,15 @@
             CALL CHR_APPND( SHAPE, UNDOTX, UNDOI )
             UNDOI = UNDOI + 1
             CALL CHR_APPND( 'region', UNDOTX, UNDOI )
-            IF( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX, 
+            IF( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX,
      :                                                UNDOI )
 
 *  If user wants to change the current shape...
-         ELSE IF( OPTION .EQ. 'SHAPE' ) THEN          
+         ELSE IF( OPTION .EQ. 'SHAPE' ) THEN
 
 *  Cancel the SHAPE parameter value.
-            CALL PAR_CANCL( 'SHAPE', STATUS )            
-            
+            CALL PAR_CANCL( 'SHAPE', STATUS )
+
 *  Get a new value for the SHAPE parameter.
             CALL ERR_MARK
             CALL PAR_CHOIC( 'SHAPE', SHAPE, 'Circle,Box,Point,Row,'/
@@ -583,7 +583,7 @@
             OPTION = 'MULTI'
 
 *  If user wants to delete an identified region...
-         ELSE IF( OPTION .EQ. 'DELETE' ) THEN          
+         ELSE IF( OPTION .EQ. 'DELETE' ) THEN
             NREG0 = NREG
             CALL KPS1_AGNDL( 'REGIONS', IGRP, NREG, STATUS )
             READY = .TRUE.
@@ -593,29 +593,29 @@
             CALL CHR_PUTI( NREG - NREG0, UNDOTX, UNDOI )
             UNDOI = UNDOI + 1
             CALL CHR_APPND( 'deleted region', UNDOTX, UNDOI )
-            IF( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX, 
+            IF( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX,
      :                                                UNDOI )
-            
+
 *  If user wants to draw a region...
-         ELSE IF( OPTION .EQ. 'DRAW' ) THEN          
+         ELSE IF( OPTION .EQ. 'DRAW' ) THEN
             CALL KPS1_AGNDW( 'REGIONS', IPLOT, IGRP, NREG, STATUS )
             READY = .TRUE.
 
 *  If user wants to list the currently defined region...
-         ELSE IF( OPTION .EQ. 'LIST' ) THEN          
+         ELSE IF( OPTION .EQ. 'LIST' ) THEN
             CALL KPS1_AGNLS( IGRP, STATUS )
             READY = .TRUE.
 
 *  If user wants to combined regions together...
          ELSE IF( OPTION .EQ. 'COMBINE' ) THEN
             CALL ERR_MARK
-            CALL KPS1_AGNCM( 'OPERATOR', 'OPERANDS', IGRP, NREG, 
+            CALL KPS1_AGNCM( 'OPERATOR', 'OPERANDS', IGRP, NREG,
      :                       STATUS )
             IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
             CALL ERR_RLSE
             READY = .TRUE.
             UNDOTX = 'undo the effects of the previous COMBINE option'
-            
+
 *  If user wants to undo the previous change...
          ELSE IF( OPTION .EQ. 'UNDO' ) THEN
             IF( TOPGRP .GT. 0 .AND. GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
@@ -631,10 +631,10 @@
                   NREGS( TOPGRP ) = 0
 
                   TOPGRP = TOPGRP - 1
-                  IF( TOPGRP .EQ. 0 ) TOPGRP = MXGRP 
+                  IF( TOPGRP .EQ. 0 ) TOPGRP = MXGRP
                   IF( GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
                      CALL GRP_COPY( GRPS( TOPGRP ), 0, 0, .FALSE., IGRP,
-     :                              STATUS )                   
+     :                              STATUS )
                      NREG = NREGS( TOPGRP )
                   ELSE
                      CALL GRP_NEW( ' ', IGRP, STATUS )
@@ -644,33 +644,33 @@
                END IF
 
             ELSE
-               CALL MSG_OUT( ' ', 'There are no changes to undo.', 
+               CALL MSG_OUT( ' ', 'There are no changes to undo.',
      :                       STATUS )
             END IF
             READY = .TRUE.
-            
+
 *  If user wants to change the drawing style...
-         ELSE IF( OPTION .EQ. 'STYLE' ) THEN          
+         ELSE IF( OPTION .EQ. 'STYLE' ) THEN
             CALL PAR_CANCL( 'STYLE', STATUS )
             CALL KPG1_ASSET( 'KAPPA_ARDGEN', 'STYLE', IPLOT, STATUS )
             READY = .TRUE.
 
 *  If user wants to exit the program...
-         ELSE IF( OPTION .EQ. 'EXIT' ) THEN          
+         ELSE IF( OPTION .EQ. 'EXIT' ) THEN
             MORE = .FALSE.
 
 *  If user wants to quit the program, throwing away the current
 *  regions...
-         ELSE IF( OPTION .EQ. 'QUIT' ) THEN          
+         ELSE IF( OPTION .EQ. 'QUIT' ) THEN
             NREG = 0
             MORE = .FALSE.
 
-         END IF         
+         END IF
 
 *  If the contents of the group has changed (except for the action of an
 *  UNDO option), add a copy of the group into the undo list.
          CALL KPS1_AGNCH( IGRP, MXGRP, GRPS, TOPGRP, CHANGE, STATUS )
-         IF( CHANGE .AND. OPTION .NE. 'UNDO' ) THEN 
+         IF( CHANGE .AND. OPTION .NE. 'UNDO' ) THEN
 
 *  Find the index at which to store the new group. Go back to the
 *  beginning when the end is reached.
@@ -727,7 +727,7 @@
          END IF
       END DO
       CALL GRP_DELET( IGRP, STATUS )
-         
+
 *  Close down AGI and PGPLOT.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
@@ -742,5 +742,5 @@
          CALL ERR_REP( 'ARDGEN_ERR', 'ARDGEN: Failed to create an ARD'//
      :                 ' description file.', STATUS )
       END IF
- 
+
       END

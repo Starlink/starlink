@@ -1,23 +1,23 @@
       SUBROUTINE QUPOINT(NPARAMS,PARAMS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   Q U P O I N T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Plots a userdefined point in the QU plane
 C
 C
@@ -74,7 +74,7 @@ C
 C
       FILL=INT(PARAMS(7))
       IF ( (FILL.NE.1).AND.(FILL.NE.2) ) THEN
-        CALL WR_ERROR('Wrong fill sytle',OUT_LU)  
+        CALL WR_ERROR('Wrong fill sytle',OUT_LU)
         GOTO 999
       ENDIF
       CALL PGSFS(FILL)

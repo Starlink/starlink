@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        PCB_IDCTX = INTEGER (Read)
 *           Current identifier context level.
-      
+
       INCLUDE 'NDF_PCB'          ! NDF_ Placeholder Control Block
 *        PCB_CHK( NDF__MXPCB ) = INTEGER (Write)
 *           Record of placeholders issued, for subsequent checking.
@@ -115,7 +115,7 @@
       PLACE = NDF__NOPL
 
 *  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that the PCB index is valid and report an error if it is not.
       IF ( ( IPCB .LT. 1 ) .OR. ( IPCB .GT. NDF__MXPCB ) ) THEN
@@ -142,7 +142,7 @@
 
 *  Assign the current identifier context level to the PCB entry.
          PCB_CTX( IPCB ) = ACB_IDCTX
-      END IF       
+      END IF
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_EXPPL', STATUS )

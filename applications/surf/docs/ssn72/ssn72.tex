@@ -257,7 +257,7 @@ a SURF import task.}
 % General commands
 \newcommand{\scusoft}          {{\sc Surf}}
 
-\newcommand{\mmicron}           {$\mu$m}  
+\newcommand{\mmicron}           {$\mu$m}
 
 
 % ? End of document identification
@@ -339,7 +339,7 @@ a SURF import task.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -752,12 +752,12 @@ a SURF import task.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -796,18 +796,18 @@ a SURF import task.}
 
 \section{Introduction}
 
-The SCUBA User Reduction Facility (\surfref, SUN/33) provides data reduction 
-software for submillimetre bolometer cameras. It was specifically designed for 
+The SCUBA User Reduction Facility (\surfref, SUN/33) provides data reduction
+software for submillimetre bolometer cameras. It was specifically designed for
 the Submillimetre Common-User Bolometer Array (SCUBA; Holland et al 1999,
 MNRAS, 303, 659) but could be ported to similar bolometer cameras. This
-document describes the programming interface used to write \scusoft\ tasks and 
+document describes the programming interface used to write \scusoft\ tasks and
 import foreign data formats into the system.
 
 
 \section{SURF File Format}
 
-\scusoft\ uses that standard Starlink \ndf\ (SUN/33) file format. This 
-is a hierarchical format based on \hds\ (SUN/92) and has native support for 
+\scusoft\ uses that standard Starlink \ndf\ (SUN/33) file format. This
+is a hierarchical format based on \hds\ (SUN/92) and has native support for
 variances, quality flags, non-linear axes and arbritrary extensions.
 
 \subsection{Raw data format\label{sec:raw}}
@@ -823,7 +823,7 @@ STRUCT  <NDF>
       FIGARO         <FIGARO_EXT>    {structure}
 
       SCUCD          <SCUCD_ST>      {structure}
-         
+
       SCUBA          <SCUBA_ST>      {structure}
 
       FITS(171)      <_CHAR*80>      'ACCEPT  = 'not used'           / ac...'
@@ -834,7 +834,7 @@ STRUCT  <NDF>
 \end{verbatim}
 \end{myquote}
 It is a very simple NDF format with a single \texttt{DATA\_ARRAY} and
-four extensions. The extensions are described in section \ref{scu:ext}. 
+four extensions. The extensions are described in section \ref{scu:ext}.
 The \texttt{DATA\_ARRAY} is three dimensional with the following meanings:
 
 \begin{enumerate}
@@ -858,7 +858,7 @@ measured (AMBIENT, SKY and COLD).
 observed. This should match the size of the \texttt{BOL\_CHAN} and
 \texttt{BOL\_ADC} arrays in the \texttt{SCUBA} extension.
 
-\item The third dimension is the time axis and is equal to the total number of 
+\item The third dimension is the time axis and is equal to the total number of
 samples (of length \texttt{EXP\_TIME}). This dimension must be greater than
 any value stored in the \texttt{DEM\_PNTR} array. For a JIGGLE observation
 the size can be calculated (assuming the observation was not aborted early)
@@ -1200,7 +1200,7 @@ These are the Y coordinate of every bolometer. For SCUBA, these are arcsec Y
 (U4) offsets (i.e.\ $\mathrm{d}U4$) from the left-hand Nasmyth centre.
 
 \item[BOL\_QUAL]\mbox{} \\
-This is an array of quality flags. A 0 indicates that the bolometer is `good', 
+This is an array of quality flags. A 0 indicates that the bolometer is `good',
 a 1 indicates that the bolometer is `bad'. This array is used during
 flatfielding (\texttt{sculib\_flatfield\_data})to set bit 1 in the NDF
 quality array.
@@ -1213,14 +1213,14 @@ bolometers from the specified sub-instrument.
 \item[BOL\_ADC]\mbox{}\\
 This array contains the A/D card numbers corresponding to each of the
 bolometers that were used for the observation. The order and size should match
-the size of the second dimension of the main data array for raw SCUBA data and 
+the size of the second dimension of the main data array for raw SCUBA data and
 the first dimension for data that has been processed by \resw. The \ext\ task
 modifies this array to reflect the sub-instrument selection.
 
 \item[BOL\_CHAN]\mbox{}\\
 This array contains the A/D channel numbers corresponding to each of the
 bolometers that were used for the observation. The order and size should match
-the size of the second dimension of the main data array for raw SCUBA data and 
+the size of the second dimension of the main data array for raw SCUBA data and
 the first dimension for data that has been processed by \resw. The \ext\ task
 modifies this array to reflect the sub-instrument selection.
 
@@ -1236,7 +1236,7 @@ Not used by \scusoft.
 \item[PHOT\_BB]\mbox{}\\
 This is only used for PHOTOM (and POLPHOT) observations. The first dimension
 corresponds to the number of beam positions (3 for 2 position chopping with
-nodding) and the second dimension corresponds to the number of sub-instruments 
+nodding) and the second dimension corresponds to the number of sub-instruments
 used for the observation. The array contains the bolometer number (using the
 same indexing scheme as for the BOL\_CHAN and BOL\_ADC arrays) that is on
 source for each of the beam positions. For standard single bolometer
@@ -1344,8 +1344,8 @@ keywords in \texttt{SCULIB\_GET\_MJD}.
 
 \item[WPLATE]\mbox{} \\
 
-For polarimetry observations (POLPHOT or POLPMAP) this array contains the 
-waveplate angle for each measurement (where a measurement is defined as a move 
+For polarimetry observations (POLPHOT or POLPMAP) this array contains the
+waveplate angle for each measurement (where a measurement is defined as a move
 of the waveplate). It is used by the \texttt{SURFLIB\_FILL\_WPLATE} routine.
 
 \end{description}
@@ -1362,7 +1362,7 @@ It can contain the following entries:
 
 \begin{description}
 \item[BEAM\_WT]\mbox{} \\
-The relative weight of the beams. Only used for PHOTOM observations. This is 
+The relative weight of the beams. Only used for PHOTOM observations. This is
 created by \resw.
 \item[SKY]\mbox{} \\
 An NDF containing the estimate of the sky fluctuations. This is usually
@@ -1380,13 +1380,13 @@ When an observation completes normally (either because the specified number of
 measurements has been taken or a \texttt{TERMINATE} command has been issued)
 the size of the final dimension of the data array and the contents and shape
 of the \texttt{DEM\_PNTR} array agree.  In some cases an observation must be
-aborted suddenly using the \texttt{ABORT} command. 
-Aborted observation files do not always have the correct shape for 
+aborted suddenly using the \texttt{ABORT} command.
+Aborted observation files do not always have the correct shape for
 \texttt{DEM\_PNTR} (e.g.\ the number of integrations specified by the second
 dimension of the array does not agree with the number that were actually
 observed). \scusoft\ overcomes this problem by looking in the \texttt{STATE}
-FITS keyword; if it contains the string ``ABORTING'' the exposure, integration 
-and measurement values are read from the FITS keywords \texttt{LAST\_EXP}, 
+FITS keyword; if it contains the string ``ABORTING'' the exposure, integration
+and measurement values are read from the FITS keywords \texttt{LAST\_EXP},
 \texttt{LAST\_INT} and \texttt{LAST\_MEAS} respectively.
 
 
@@ -1455,7 +1455,7 @@ This library was designed to provide the fundamental building blocks for
 manipulating SCUBA data in the off-line and real-time system. Many of the
 routines in this library are not used in \scusoft\ itself. In general,
 new routines are added to \texttt{SURFLIB} rather than \texttt{SCULIB}
-although \texttt{SCULIB} does contain some routines that are used solely in 
+although \texttt{SCULIB} does contain some routines that are used solely in
 \scusoft.\footnote{\ldots for historical reasons.}
 
 
@@ -1474,7 +1474,7 @@ been run prior to running the current task. This always contains a check to
 see that the \resw\ task has been run on the data.
 \item Check the dimensions of the data array, the \texttt{LST\_STRT} array and
 the \texttt{DEM\_PNTR} arrays.
-\item Retrieve information from NDF extensions (see e.g.\ 
+\item Retrieve information from NDF extensions (see e.g.\
 \texttt{SCULIB\_GET\_BOL\_DESC}, \texttt{SCULIB\_GET\_JIGGLE}). [as required]
 \item If required, construct an output name based on the input filename
 (\texttt{SCULIB\_CONSTRUCT\_OUT}). The output file is usually propogated from
@@ -1493,7 +1493,7 @@ The file can be converted to the same format as written by the SCUBA
 acquisition system (\S\ref{sec:raw}) or the format written by the
 \resw\ task (\S\ref{sec:surfform}).
 
-It is expected that the conversion of the data structure to the correct format 
+It is expected that the conversion of the data structure to the correct format
 will be fairly simple. The difficulty lies in generating the required FITS
 information (with the correct FITS keywords) and the NDF extensions.
 
@@ -1564,7 +1564,7 @@ For one of the mapping modes it means the data from one fully-sampled coverage
 of the map area. In a JIGGLE/MAP, where full sampling is achieved by jiggling
 the secondary mirror, an integration is generally the results from one pass
 through the complete jiggle pattern. An integration is made up of one or more
-exposures. 
+exposures.
 
 Similarly, an integration for a SCAN/MAP observation is made up of data from
 the raster scans that cover the map area once.
@@ -1612,14 +1612,14 @@ is called a sub-instrument. They are:
 observation. For example in a JIGGLE/MAP or PHOTOM observation each chunk of
 jiggle positions measured with the object in the beam of a telescope is a
 switch. Each scan across the source in a SCAN/MAP observation is also a switch.
- 
+
 \item{{\bf tau ($\tau$)}} Submillimetre extinction is measured using the
 zenith optical depth, tau or $\tau$, this is a measure of the amount of water
 vapour present in the atmosphere. For a tau, $\tau$ at a given airmass, $A$,
 the attenuation due to the atmosphere is given as e$^{-A \tau}$. Note that tau
-is wavelength dependent and that the value quoted by the 
+is wavelength dependent and that the value quoted by the
 \htmladdnormallink{Caltech Submillimetre
-Observatory}{http://www.cco.caltech.edu/\~{}cso/} (CSO) is the $\tau$ at 225~GHz and will therefore be different at 
+Observatory}{http://www.cco.caltech.edu/\~{}cso/} (CSO) is the $\tau$ at 225~GHz and will therefore be different at
 the other wavelengths used by SCUBA
 
 \end{description}
@@ -1631,7 +1631,7 @@ the other wavelengths used by SCUBA
 \section{SURF coordinate frames\label{app:frames}}
 
 \scusoft\ understands a number of different coordinate frames and uses
-two letter codes\footnote{with the exception of PLANET frame} 
+two letter codes\footnote{with the exception of PLANET frame}
 (as used by the JCMT) to describe them. The following
 are available:
 
@@ -1658,7 +1658,7 @@ platform.
 \section{Building SURF}
 
 The \scusoft\ development tree is in CVS and has the layout shown in
-Fig.\ \ref{surf:devel}. The development version can be built 
+Fig.\ \ref{surf:devel}. The development version can be built
 by using the default make target in the \texttt{surf} directory or
 by running the individual makefiles in the \texttt{sculib}, \texttt{surflib},
 \texttt{surf\_kap} and \texttt{src} directories. The \scusoft\ monolith is
@@ -1713,7 +1713,7 @@ directory and copies them to the \texttt{starlink} directory.  If required, the
 version number must be updated manually in the Starlink \texttt{makefile}.
 The platform dependencies are stored in the \texttt{mk} script that is used
 to run \texttt{make} with the correct environment. The environment is selected
-with the \texttt{SYSTEM} environment variable and can be one of 
+with the \texttt{SYSTEM} environment variable and can be one of
 \texttt{sun4\_Solaris}, \texttt{ix86\_Linux} or \texttt{alpha\_OSF1}.
 
 Once the \texttt{SYSTEM} environment variable has been set the \texttt{mk}
@@ -1745,9 +1745,9 @@ Usually, \texttt{INSTALL} is set to \texttt{/star}.
 \section{SURF Constants\label{app:const}}
 
 The SURF\_PAR include file defines the global constants that are used
-in \scusoft\ for preallocating arrays and defining useful mathematical 
+in \scusoft\ for preallocating arrays and defining useful mathematical
 constants and strings. Only top level \scusoft\ routines (ie names of
-\texttt{surf\_*} include this file; all other library routines 
+\texttt{surf\_*} include this file; all other library routines
 obtain the value from argument.
 
 \subsection{Constant strings}
@@ -1791,7 +1791,7 @@ observer the source in a PHOTOM observation. [INTEGER]
       maximum number of switches per exposure. [INTEGER]
   \item[SCUBA\_\_MAX\_JIGGLE = 512] \mbox{} \\
       maximum number of offsets in a jiggle pattern. [INTEGER]
-\end{description} 
+\end{description}
 \end{quote}
 
 \subsection{Parameters governing the instrument itself}
@@ -1840,7 +1840,7 @@ the environment variable specified by SUFFIX\_ENV [CHAR*10 (SCUBA\_N\_SUFFIX)]
    Maximum number of SCUBA sections that can be specified.
   \item[SCUBA\_\_N\_TEMPS = 3] \mbox{} \\
     Number of temperatures per reading for SKYDIP observations: AMBIENT, SKY,
-COLD. 
+COLD.
 
 \end{description}
 \end{quote}
@@ -2593,47 +2593,47 @@ proc SET_BOLS
 { Mon Jun 16 17:20:00 1997
 { observation run number 01
 {      Name Type      dU3         dU4         Calib       Theta       A           B         Qual
- SETBOL G1  LONG      0.7830E+01 -0.7610E+02  0.1290E+01  0.4280E+01  0.7106E+01  0.7117E+01  0  66.0359490741  12 H8         
- SETBOL G2  LONG      0.2679E+02 -0.6138E+02  0.1086E+01  0.2370E+00  0.7387E+01  0.6795E+01  0  66.0482523148  12 H8         
- SETBOL G3  LONG      0.4785E+02 -0.4588E+02  0.1160E+01  0.1088E+00  0.7340E+01  0.6600E+01  0  66.0606250000  12 H8         
- SETBOL G4  LONG      0.7119E+02 -0.3377E+02  0.1080E+01  0.2125E-01  0.7499E+01  0.6642E+01  0  66.0729050926  12 H8         
- SETBOL G7  LONG     -0.1777E+02 -0.6524E+02  0.1089E+01  0.1843E+01  0.6980E+01  0.7279E+01  0  66.0852893519  12 H8         
- SETBOL G8  LONG      0.2193E+01 -0.4958E+02  0.1032E+01 -0.1701E+02 -0.4981E+01 -0.9338E+00  0  66.0979166667  12 H8         
- SETBOL G9  LONG      0.2291E+02 -0.3673E+02  0.1194E+01  0.9538E+01  0.7368E+01  0.6878E+01  0  66.1170254630  13 H8         
- SETBOL G10 LONG      0.4500E+02 -0.2298E+02  0.1187E+01  0.1407E+02  0.6766E+01  0.7412E+01  0  66.1295138889  13 H8         
- SETBOL G11 LONG      0.6850E+02 -0.1106E+02  0.1159E+01 -0.1926E+00  0.7540E+01  0.6623E+01  0  66.1417013889  13 H8         
- SETBOL G13 LONG     -0.3950E+02 -0.5281E+02  0.1039E+01 -0.3004E+01  0.7097E+01  0.6988E+01  0  66.1540625000  13 H8         
- SETBOL G14 LONG     -0.2157E+02 -0.3796E+02  0.1072E+01 -0.1470E+01  0.6906E+01  0.7204E+01  0  66.1663194444  13 H8         
- SETBOL G15 LONG      0.0510E+00 -0.2533E+02  0.1150E+01 -0.7553E-01  0.7276E+01  0.6851E+01  0  66.1786805556  13 H8         
- SETBOL G16 LONG      0.2174E+02 -0.1171E+02  0.9190E+00  0.6017E+03  0.7038E+01  0.7038E+01  0  66.1910532407  13 H8         
- SETBOL H1  LONG      0.4506E+02  0.1172E+01  0.1014E+01 -0.2208E+00  0.7407E+01  0.6631E+01  0  66.2103472222  14 H8         
- SETBOL H2  LONG      0.6772E+02  0.1328E+02  0.9490E+00 -0.1933E+00  0.7481E+01  0.6458E+01  0  66.2226736111  14 H8         
- SETBOL I12 LONG_DC   0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL        
- SETBOL H4  LONG     -0.6336E+02 -0.3956E+02  0.1003E+01  0.5146E+02  0.7361E+01  0.6270E+01  0  66.2350000000  14 H8         
- SETBOL H5  LONG     -0.4256E+02 -0.2631E+02  0.9240E+00 -0.2044E+02  0.7017E+01  0.7017E+01  0  66.2473611111  14 H8         
- SETBOL H6  LONG     -0.2200E+02 -0.1264E+02  0.9870E+00 -0.3340E+01  0.7200E+01  0.6928E+01  0  66.2596296296  14 H8         
- SETBOL H7  LONG     -0.0000E+00  0.0000E+00  0.1000E+01  0.4839E+01  0.7151E+01  0.6991E+01  0  66.2720138889  14 H8         
- SETBOL H8  LONG      0.2262E+02  0.1231E+02  0.9270E+00 -0.3250E+00  0.7358E+01  0.6627E+01  0  66.5038773148  16 H8         
- SETBOL H9  LONG      0.4633E+02  0.2465E+02  0.1039E+01  0.1223E+02  0.7425E+01  0.6624E+01  0  66.2913541667  15 H8         
- SETBOL H10 LONG      0.7049E+02  0.3728E+02  0.1134E+01 -0.3192E+00  0.7535E+01  0.6472E+01  0  66.3037037037  15 H8         
- SETBOL H11 LONG     -0.6490E+02 -0.1333E+02  0.9580E+00  0.7245E+01  0.6991E+01  0.7178E+01  0  66.3161921296  15 H8         
- SETBOL H12 LONG     -0.4228E+02 -0.4700E+00  0.9160E+00  0.1142E+01  0.6943E+01  0.7179E+01  0  66.3286921296  15 H8         
- SETBOL H13 LONG     -0.2029E+02  0.1298E+02  0.1068E+01 -0.4099E+00  0.7245E+01  0.6759E+01  0  66.3409490741  15 H8         
- SETBOL H14 LONG      0.1250E+01  0.2529E+02  0.9650E+00  0.3552E+01  0.7087E+01  0.7087E+01  0  66.3532407407  15 H8         
- SETBOL H15 LONG      0.2519E+02  0.3783E+02  0.9380E+00 -0.2608E+05  0.7130E+01  0.7130E+01  0  66.3657407407  15 H8         
- SETBOL H16 LONG      0.4965E+02  0.4959E+02  0.9280E+00 -0.3867E+00  0.7513E+01  0.6436E+01  0  66.3780902778  15 H8         
- SETBOL I1  LONG     -0.6385E+02  0.1301E+02  0.9940E+00 -0.2134E+01  0.6749E+01  0.7152E+01  0  66.3975578704  16 H8         
- SETBOL I2  LONG     -0.4057E+02  0.2669E+02  0.1051E+01  0.4635E+03  0.7093E+01  0.7094E+01  0  66.4102546296  16 H8         
- SETBOL I3  LONG     -0.1803E+02  0.3894E+02  0.1135E+01  0.8583E+02  0.6732E+01  0.7409E+01  0  66.4227893519  16 H8         
- SETBOL I4  LONG      0.5930E+01  0.5154E+02  0.9620E+00 -0.5106E+01  0.6806E+01  0.7535E+01  0 192.7277662037   6 H7         
- SETBOL I5  LONG      0.2938E+02  0.6318E+02  0.9410E+00 -0.4519E+00  0.7451E+01  0.6512E+01  0  66.4477083333  16 H8         
- SETBOL I6  LONG     -0.6020E+02  0.4057E+02  0.9970E+00  0.3169E+01  0.7024E+01  0.7024E+01  0  66.4604976852  16 H8         
- SETBOL I7  LONG     -0.3669E+02  0.5404E+02  0.1054E+01 -0.6765E+02  0.7037E+01  0.7043E+01  0  66.4728125000  16 H8         
- SETBOL I8  LONG     -0.1578E+02  0.6389E+02  0.1065E+01 -0.2099E+02  0.6717E+01  0.7520E+01  0  66.4855787037  16 H8         
- SETBOL I9  LONG      0.9047E+01  0.7776E+02  0.1045E+01 -0.7307E-02  0.7092E+01  0.7032E+01  0  66.4977546296  16 H8         
-                                                                                                
-{ short-wave array                                                                              
- SETBOL A1  SHORT     0.5708E+02 -0.2814E+02  0.1286E+01 -0.7433E-01  0.4129E+01  0.3690E+01  0  64.9820833333  43 C14        
+ SETBOL G1  LONG      0.7830E+01 -0.7610E+02  0.1290E+01  0.4280E+01  0.7106E+01  0.7117E+01  0  66.0359490741  12 H8
+ SETBOL G2  LONG      0.2679E+02 -0.6138E+02  0.1086E+01  0.2370E+00  0.7387E+01  0.6795E+01  0  66.0482523148  12 H8
+ SETBOL G3  LONG      0.4785E+02 -0.4588E+02  0.1160E+01  0.1088E+00  0.7340E+01  0.6600E+01  0  66.0606250000  12 H8
+ SETBOL G4  LONG      0.7119E+02 -0.3377E+02  0.1080E+01  0.2125E-01  0.7499E+01  0.6642E+01  0  66.0729050926  12 H8
+ SETBOL G7  LONG     -0.1777E+02 -0.6524E+02  0.1089E+01  0.1843E+01  0.6980E+01  0.7279E+01  0  66.0852893519  12 H8
+ SETBOL G8  LONG      0.2193E+01 -0.4958E+02  0.1032E+01 -0.1701E+02 -0.4981E+01 -0.9338E+00  0  66.0979166667  12 H8
+ SETBOL G9  LONG      0.2291E+02 -0.3673E+02  0.1194E+01  0.9538E+01  0.7368E+01  0.6878E+01  0  66.1170254630  13 H8
+ SETBOL G10 LONG      0.4500E+02 -0.2298E+02  0.1187E+01  0.1407E+02  0.6766E+01  0.7412E+01  0  66.1295138889  13 H8
+ SETBOL G11 LONG      0.6850E+02 -0.1106E+02  0.1159E+01 -0.1926E+00  0.7540E+01  0.6623E+01  0  66.1417013889  13 H8
+ SETBOL G13 LONG     -0.3950E+02 -0.5281E+02  0.1039E+01 -0.3004E+01  0.7097E+01  0.6988E+01  0  66.1540625000  13 H8
+ SETBOL G14 LONG     -0.2157E+02 -0.3796E+02  0.1072E+01 -0.1470E+01  0.6906E+01  0.7204E+01  0  66.1663194444  13 H8
+ SETBOL G15 LONG      0.0510E+00 -0.2533E+02  0.1150E+01 -0.7553E-01  0.7276E+01  0.6851E+01  0  66.1786805556  13 H8
+ SETBOL G16 LONG      0.2174E+02 -0.1171E+02  0.9190E+00  0.6017E+03  0.7038E+01  0.7038E+01  0  66.1910532407  13 H8
+ SETBOL H1  LONG      0.4506E+02  0.1172E+01  0.1014E+01 -0.2208E+00  0.7407E+01  0.6631E+01  0  66.2103472222  14 H8
+ SETBOL H2  LONG      0.6772E+02  0.1328E+02  0.9490E+00 -0.1933E+00  0.7481E+01  0.6458E+01  0  66.2226736111  14 H8
+ SETBOL I12 LONG_DC   0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
+ SETBOL H4  LONG     -0.6336E+02 -0.3956E+02  0.1003E+01  0.5146E+02  0.7361E+01  0.6270E+01  0  66.2350000000  14 H8
+ SETBOL H5  LONG     -0.4256E+02 -0.2631E+02  0.9240E+00 -0.2044E+02  0.7017E+01  0.7017E+01  0  66.2473611111  14 H8
+ SETBOL H6  LONG     -0.2200E+02 -0.1264E+02  0.9870E+00 -0.3340E+01  0.7200E+01  0.6928E+01  0  66.2596296296  14 H8
+ SETBOL H7  LONG     -0.0000E+00  0.0000E+00  0.1000E+01  0.4839E+01  0.7151E+01  0.6991E+01  0  66.2720138889  14 H8
+ SETBOL H8  LONG      0.2262E+02  0.1231E+02  0.9270E+00 -0.3250E+00  0.7358E+01  0.6627E+01  0  66.5038773148  16 H8
+ SETBOL H9  LONG      0.4633E+02  0.2465E+02  0.1039E+01  0.1223E+02  0.7425E+01  0.6624E+01  0  66.2913541667  15 H8
+ SETBOL H10 LONG      0.7049E+02  0.3728E+02  0.1134E+01 -0.3192E+00  0.7535E+01  0.6472E+01  0  66.3037037037  15 H8
+ SETBOL H11 LONG     -0.6490E+02 -0.1333E+02  0.9580E+00  0.7245E+01  0.6991E+01  0.7178E+01  0  66.3161921296  15 H8
+ SETBOL H12 LONG     -0.4228E+02 -0.4700E+00  0.9160E+00  0.1142E+01  0.6943E+01  0.7179E+01  0  66.3286921296  15 H8
+ SETBOL H13 LONG     -0.2029E+02  0.1298E+02  0.1068E+01 -0.4099E+00  0.7245E+01  0.6759E+01  0  66.3409490741  15 H8
+ SETBOL H14 LONG      0.1250E+01  0.2529E+02  0.9650E+00  0.3552E+01  0.7087E+01  0.7087E+01  0  66.3532407407  15 H8
+ SETBOL H15 LONG      0.2519E+02  0.3783E+02  0.9380E+00 -0.2608E+05  0.7130E+01  0.7130E+01  0  66.3657407407  15 H8
+ SETBOL H16 LONG      0.4965E+02  0.4959E+02  0.9280E+00 -0.3867E+00  0.7513E+01  0.6436E+01  0  66.3780902778  15 H8
+ SETBOL I1  LONG     -0.6385E+02  0.1301E+02  0.9940E+00 -0.2134E+01  0.6749E+01  0.7152E+01  0  66.3975578704  16 H8
+ SETBOL I2  LONG     -0.4057E+02  0.2669E+02  0.1051E+01  0.4635E+03  0.7093E+01  0.7094E+01  0  66.4102546296  16 H8
+ SETBOL I3  LONG     -0.1803E+02  0.3894E+02  0.1135E+01  0.8583E+02  0.6732E+01  0.7409E+01  0  66.4227893519  16 H8
+ SETBOL I4  LONG      0.5930E+01  0.5154E+02  0.9620E+00 -0.5106E+01  0.6806E+01  0.7535E+01  0 192.7277662037   6 H7
+ SETBOL I5  LONG      0.2938E+02  0.6318E+02  0.9410E+00 -0.4519E+00  0.7451E+01  0.6512E+01  0  66.4477083333  16 H8
+ SETBOL I6  LONG     -0.6020E+02  0.4057E+02  0.9970E+00  0.3169E+01  0.7024E+01  0.7024E+01  0  66.4604976852  16 H8
+ SETBOL I7  LONG     -0.3669E+02  0.5404E+02  0.1054E+01 -0.6765E+02  0.7037E+01  0.7043E+01  0  66.4728125000  16 H8
+ SETBOL I8  LONG     -0.1578E+02  0.6389E+02  0.1065E+01 -0.2099E+02  0.6717E+01  0.7520E+01  0  66.4855787037  16 H8
+ SETBOL I9  LONG      0.9047E+01  0.7776E+02  0.1045E+01 -0.7307E-02  0.7092E+01  0.7032E+01  0  66.4977546296  16 H8
+
+{ short-wave array
+ SETBOL A1  SHORT     0.5708E+02 -0.2814E+02  0.1286E+01 -0.7433E-01  0.4129E+01  0.3690E+01  0  64.9820833333  43 C14
  SETBOL A2  SHORT     0.4590E+02 -0.3591E+02  0.9311E+00 -0.3590E-01  0.4002E+01  0.3673E+01  0  64.9895138889  43 C14
  SETBOL A3  SHORT     0.3615E+02 -0.4146E+02  0.9499E+00  0.1720E+00  0.3987E+01  0.3677E+01  0  64.9969675926  43 C14
  SETBOL A4  SHORT     0.2464E+02 -0.4962E+02  0.1002E+01  0.2098E+00  0.3995E+01  0.3715E+01  0  65.0044212963  43 C14
@@ -2725,13 +2725,13 @@ proc SET_BOLS
  SETBOL F10 SHORT    -0.4009E+02  0.3977E+02  0.9474E+00  0.8256E+00  0.3667E+01  0.3968E+01  0  66.0116203704  11 C14
  SETBOL F11 SHORT    -0.5045E+02  0.3338E+02  0.1169E+01  0.7934E+00  0.3701E+01  0.3940E+01  0  66.0190625000  11 C14
  SETBOL I11 SHORT_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  1   0.0000000000   0 NUL
-{ P1100 bolometer                                                                                                   
+{ P1100 bolometer
  SETBOL I10 P1100    -0.5465E+02  0.7116E+02  0.1000E+01 -0.1453E+03  0.1002E+02  0.9003E+01  1  69.6688541667  65 NUL
  SETBOL I15 P1100_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  1   0.0000000000   0 NUL
-{ P1350 bolometer                                                                                                   
+{ P1350 bolometer
  SETBOL G12 P1350    -0.5827E+02 -0.7068E+02  0.1000E+01 -0.8953E+00  0.9681E+01  0.1101E+02  0  69.7100231481  66 NUL
  SETBOL I14 P1350_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
-{ P2000 bolometer                                                                                                   
+{ P2000 bolometer
  SETBOL G6  P2000     0.1000E+03  0.2375E+01  0.1000E+01 -0.1447E+00  0.1735E+02  0.1374E+02  0  69.7901157407  71 NUL
  SETBOL I13 P2000_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
 end proc
@@ -2741,7 +2741,7 @@ end proc
 
 \section{The DREAM2SURF import task}
 
-This section lists the complete source code for the \texttt{dream2surf} import 
+This section lists the complete source code for the \texttt{dream2surf} import
 task. This is an example of an import task for JIGGLE map type observations.
 
 \begin{myquote}
@@ -2766,11 +2766,11 @@ task. This is an example of an import task for JIGGLE map type observations.
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine reads in a DREAM format file and converts it
 *     into a file format that can be processed by SURF.
-*     This new file will have been 'REDUCE_SWITCH'ed and 
+*     This new file will have been 'REDUCE_SWITCH'ed and
 *     'FLATFIELD'ed.
 
 *  Usage:
@@ -2815,12 +2815,12 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'       ! Starlink status
       INCLUDE 'DAT_PAR'       ! DAT__ constants
@@ -2843,7 +2843,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *  Local Constants:
       INTEGER       DREAM__NBYTES
       PARAMETER     (DREAM__NBYTES = 4)  ! Number of bytes per DREAM record
-      INTEGER       SRECSIZE                 
+      INTEGER       SRECSIZE
       PARAMETER     (SRECSIZE = 4096)          ! Small record size in bytes
       INTEGER       HEADER
       PARAMETER     (HEADER   = 5120)          ! Nr of I4 in Header records
@@ -2854,7 +2854,7 @@ task. This is an example of an import task for JIGGLE map type observations.
       PARAMETER (LAT_OBS = 19.8258323669)
       DOUBLE PRECISION LONG_OBS          ! Longitude of JCMT (degrees)
       PARAMETER (LONG_OBS = 204.520278931)
-       
+
 
 
 *  Local variables:
@@ -2866,10 +2866,10 @@ task. This is an example of an import task for JIGGLE map type observations.
                                                  ! the bolometer flatfield was
                                                  ! measured
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
-                                                 ! Nasmyth dU3 coords of 
+                                                 ! Nasmyth dU3 coords of
                                                  ! bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
-                                                 ! Nasmyth dU4 coords of 
+                                                 ! Nasmyth dU4 coords of
                                                  ! bolometers
       INTEGER          BOL_QUAL (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                                  ! bolometer flatfield quality
@@ -2936,7 +2936,7 @@ task. This is an example of an import task for JIGGLE map type observations.
       INTEGER RECIN           ! Current input record
       INTEGER RECORD          ! Record number in input file
       INTEGER RECSS           ! Record size in words
-      CHARACTER *20 RUNNO     ! Run number in 0 padded form (eg 0015) 
+      CHARACTER *20 RUNNO     ! Run number in 0 padded form (eg 0015)
       CHARACTER * 80 STEMP    ! Scratch string
       INTEGER UBND ( 2 )      ! Upper bounds of output NDF
 
@@ -2945,11 +2945,11 @@ task. This is an example of an import task for JIGGLE map type observations.
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Set the MSG output level (for use with MSG_OUTIF)
- 
+
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 
-*     Read in the DREAM file (currently assume that 
+*     Read in the DREAM file (currently assume that
 *     user will supply full path or use DREAM_OUT env var.
 
       CALL RIO_ASSOC('IN', 'READ', 'UNFORMATTED', SRECSIZE, FD,
@@ -2983,7 +2983,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 *     Ask for the number of cycles to be selected
       MAXCYC = r_Ncycle - FSCYCLE + 1
-      CALL PAR_GDR0I('NRCYCLE', MAXCYC, 1, MAXCYC, .FALSE., 
+      CALL PAR_GDR0I('NRCYCLE', MAXCYC, 1, MAXCYC, .FALSE.,
      :     NRCYCLE, STATUS)
 
 *     Now we can start doing things.
@@ -3120,7 +3120,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *     Axis 1: bolometers   2: Data
 
 *     Deal with BOLOMETER axis
- 
+
       CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
@@ -3132,7 +3132,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *     Integrations
       CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
- 
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_NFILLR (ITEMP, %val(OUT_A_PTR))
          CALL SCULIB_MULCAR(ITEMP, %VAL(OUT_A_PTR), 1.0/REAL(NPIX),
@@ -3220,7 +3220,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *     Loop over cycles
       DO I = FSCYCLE, NRCYCLE
          LST = LST_STRT + (DBLE(I-1) * DLST)
-         
+
          CALL VEC_DTOD(.FALSE., 1, LST,
      :        %VAL(DEM_PNTR + (I-FSCYCLE) * VAL__NBD), IERR, NERR,
      :        STATUS)
@@ -3254,7 +3254,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 
       ITEMP = 0
       DO I = 0, MAX_PIX  - 1
-         IF (INT_POS(I) .NE. - 1) THEN 
+         IF (INT_POS(I) .NE. - 1) THEN
             ITEMP = ITEMP + 1
             JIGL_X(ITEMP) = JIG_X(I)
             JIGL_Y(ITEMP) = JIG_Y(I)
@@ -3347,10 +3347,10 @@ task. This is an example of an import task for JIGGLE map type observations.
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SAM_MODE', 'JIGGLE', 'Sampling method', STATUS)
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_CRDS', 'NA', 'Coordinate system of sampling mesh', 
+     :     'SAM_CRDS', 'NA', 'Coordinate system of sampling mesh',
      :     STATUS)
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_PA', -1, 'Scan P.A. rel. to lat. line; 0=lat, 90=long', 
+     :     'SAM_PA', -1, 'Scan P.A. rel. to lat. line; 0=lat, 90=long',
      :     STATUS)
 
 *     Coordinates of observation
@@ -3374,7 +3374,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *     Store in token
       CALL MSG_SETC('DEC', STEMP)
 
-*     Determine Right ascension 
+*     Determine Right ascension
       RA = DBLE(RAHH) + (DBLE(RAMN)/60.0D0) + (DBLE(RASS)/3600.0D0)
       IPOSN = 0
       CALL CHR_RTOAN(REAL(RA), 'HOURS', STEMP, IPOSN)
@@ -3424,7 +3424,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *     Write the date
 *      STEMP = '1998:1:1'
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'UTDATE', STEMP, 'UT Date of observation', STATUS)     
+     :     'UTDATE', STEMP, 'UT Date of observation', STATUS)
 
 
 
@@ -3461,7 +3461,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 *     Also store STEND
       IPOSN = 0
 
-      DTEMP = LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE - 1) 
+      DTEMP = LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE - 1)
      :     * 180.0D0 / (PI * 15.0D0))
       CALL CHR_DTOAN(DTEMP,
      :     'HOURS',STEMP, IPOSN)
@@ -3477,17 +3477,17 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 *     Set up MAP_X and MAP_Y offsets
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :      'MAP_X', 0.0, 
+     :      'MAP_X', 0.0,
      :      'Map X offset from telescope centre (arcsec)',
      :      STATUS)
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :      'MAP_Y', 0.0, 
+     :      'MAP_Y', 0.0,
      :      'Map Y offset from telescope centre (arcsec)',
      :      STATUS)
 
 *     Number of bolometers
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :      'N_BOLS', R_NBOL, 
+     :      'N_BOLS', R_NBOL,
      :      'Number of bolometers selected', STATUS)
 
 *     State of the observation (anything except ABORT)
@@ -3522,7 +3522,7 @@ task. This is an example of an import task for JIGGLE map type observations.
      :     'LAT-OBS', LAT_OBS, 'Latitude of observatory (degrees)',
      :     STATUS)
       CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'LONG-OBS', LONG_OBS, 
+     :     'LONG-OBS', LONG_OBS,
      :     'East Longitude of observatory (degrees)',
      :     STATUS)
 
@@ -3575,7 +3575,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 
 *     Write FITS component
-      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', 1, N_FITS, 
+      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', 1, N_FITS,
      :     OUT_FITS_LOC, STATUS)
       CALL DAT_PUT1C (OUT_FITS_LOC, N_FITS, FITS, STATUS)
 
@@ -3591,7 +3591,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 *     Close the NDF and shut down the NDF system (write DREAM history)
       CALL NDF_ANNUL(OUT_NDF, STATUS)
- 
+
 *     It seems that the only way to write multiple history
 *     entries is to open and close the NDF multiple times!
 
@@ -3601,7 +3601,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 *     Need to write REDUCE_SWITCH and FLATFIELD tags to fool SURF
 *     into thinking that the data have been processed by these tasks
-      CALL NDF_HPUT(' ', 'REDUCE_SWITCH', .TRUE., 1, 
+      CALL NDF_HPUT(' ', 'REDUCE_SWITCH', .TRUE., 1,
      :     'This is a dummy history component to fool SURF',
      :     .FALSE., .TRUE., .FALSE., OUT_NDF, STATUS)
 
@@ -3613,7 +3613,7 @@ task. This is an example of an import task for JIGGLE map type observations.
       CALL NDF_ASSOC('OUT', 'UPDATE', OUT_NDF, STATUS)
 
 
-      CALL NDF_HPUT(' ', 'FLATFIELD', .TRUE., 1, 
+      CALL NDF_HPUT(' ', 'FLATFIELD', .TRUE., 1,
      :     'This is a dummy history component to fool SURF',
      :     .FALSE., .TRUE., .FALSE., OUT_NDF, STATUS)
 
@@ -3630,7 +3630,7 @@ task. This is an example of an import task for JIGGLE map type observations.
 
 \section{Library APIs}
 
-This section lists the full API documentation for the \scusoft\ 
+This section lists the full API documentation for the \scusoft\
 libraries.
 
 \subsection{SURF}

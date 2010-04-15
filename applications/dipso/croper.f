@@ -1,9 +1,9 @@
       SUBROUTINE CROPER
 
-* Modifies the GKS workstation transformation so that the workstation 
-* viewport is the same size as the user's viewport (in NDC). In 
-* practice this means that the workstation viewport matches the current 
-* SGS zone. This can be used to crop postscript files so that they are 
+* Modifies the GKS workstation transformation so that the workstation
+* viewport is the same size as the user's viewport (in NDC). In
+* practice this means that the workstation viewport matches the current
+* SGS zone. This can be used to crop postscript files so that they are
 * only as big are the graphics they contain (instead of being A4 sized).
 
       IMPLICIT NONE

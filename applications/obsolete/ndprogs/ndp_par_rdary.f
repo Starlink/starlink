@@ -36,7 +36,7 @@ C
          call par_rdary(ref_name,amin,amax,order,units,nv,nvmax,vals)
          accept = .true.
          do i = 1,nv
-            if ((vals(i) .gt. max_val(i)) .or. 
+            if ((vals(i) .gt. max_val(i)) .or.
      :      (vals(i) .lt. min_val(i))) then
                status = ich_encode(field1,min_val(i),1,6,next)
                status = ich_encode(field2,max_val(i),1,6,next)

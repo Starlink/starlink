@@ -2,24 +2,24 @@
      &                    AXIS,NELM,ACOEFF,NCOEFF,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C        P A _ C A L I B
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C IARR (<), QARR (><), UARR (><), QV (><), UV (><),
 C AXIS (<), NELM (<), ACOEFF (<), NCOEFF (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Applies the polynomial correction to the PA of the current spectrum
 C (correction found using FITPA command).
 C

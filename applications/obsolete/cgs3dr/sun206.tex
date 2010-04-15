@@ -225,7 +225,7 @@ Starlink Project, CLRC.
 \cleardoublepage
 \pagenumbering{arabic}
 %------------------------------------------------------------------------------
-%  Part I 
+%  Part I
 \part{INTRODUCTION TO CGS3DR}
 \pagestyle{myheadings}
 \markboth{Introduction to Portable--CGS3DR}{\stardocname}
@@ -240,7 +240,7 @@ attached to ISU2. The beam passes through a rotating chopper on the CGS3
 optical bench (the Sector chopper). When this is switched on it provides
 the instrument with alternating views through the telescope and of the
 ambient blackbody emission, it is used for sky-spectra, flatfielding, and
-lamp spectra. Two warm mirrors direct the beam into the dewar through a 
+lamp spectra. Two warm mirrors direct the beam into the dewar through a
 hygroscopic CsI window.
 
 Three gratings are available. The LORES 10 and 20 gratings cover
@@ -248,20 +248,20 @@ essentially all of the N and Q atmospheric windows with a single grating
 setting, the HIRES 10 requires three grating settings to cover the N band.
 Full (Nyquist) or over sampling is done by scanning the grating so each
 final spectrum consists of a number of `subspectra'  which must be
-interleaved to produce the final result. Aperture diameters range from 
-1.5 to 9 arcseconds. 
+interleaved to produce the final result. Aperture diameters range from
+1.5 to 9 arcseconds.
 
 As CGS3 data is obtained, it is stored in the directory \$DATADIR/.
-Reduced spectra are stored in \$RODIR/. Off-line reduction programs, CGS3DR 
-and Figaro are used to reduce the data. Although these algorithms must be run 
+Reduced spectra are stored in \$RODIR/. Off-line reduction programs, CGS3DR
+and Figaro are used to reduce the data. Although these algorithms must be run
 manually, they can generate fully sampled spectra with an estimated wavelength
-scale quickly and easily. The RED3 monolith, also loaded with CGS3DR, contains 
-specialized data reduction commands. 
+scale quickly and easily. The RED3 monolith, also loaded with CGS3DR, contains
+specialized data reduction commands.
 
 In addition to the commands described below, standard Figaro commands
 commonly used with CGS3 data are IRFLAT and IDIV for derippling, ARC for
 accurate wavelength calibration, IRFLUX for dividing by a standard source and
-IRCONV for converting from F$_{\nu}$ to F$_{\lambda}$. 
+IRCONV for converting from F$_{\nu}$ to F$_{\lambda}$.
 
 Note that CGS3 raw data is stored in a four dimensional data array, the
 four axes being polarimeter plate position, wavelength, beam position and
@@ -270,12 +270,12 @@ dimension is always 1, and the beam position dimension will be 1 or 2. The
 wavelength axis should contain 32 elements. Note that the wavelength axis
 for this data is 'Y' in Figaro terms, though it becomes 'X' after
 extraction. Also the raw data is stored with the wavelength axis reversed,
-but this is taken care of by the CGS3DR and RED3 routines. 
+but this is taken care of by the CGS3DR and RED3 routines.
 
 CGS3 data files are already in Figaro format, written using the AAO Data
 Recording Task, but the four dimensional data file used needs to be reduced
 using routines in CGS3DR or in RED3 before normal Figaro commands can
-access the data. 
+access the data.
 
 \section{Version History}
 This is the first incantation of the Portable--CGS3DR software. The
@@ -301,7 +301,7 @@ When reducing CGS3 data the following error may be reported:
 !! Failed to reduce run number {\em x}.
 \end{quote}
 
-This is a known problem with Figaro using parameters associated with global 
+This is a known problem with Figaro using parameters associated with global
 parameters in the $\sim$/adam/global.sdf file. The data {\em has} been reduced
 properly and the above message has been reported to Starlink. Ignore it.
 
@@ -315,7 +315,7 @@ properly and the above message has been reported to Starlink. Ignore it.
 \section{Introduction}
 This section describes the ICL command line interface to
 Portable--CGS3DR now available under all Unix platforms supported by
-{\sc starlink}. 
+{\sc starlink}.
 
 \section{Starting the Software}
 Portable--CGS3DR can be started with two optional command line parameters:
@@ -342,7 +342,7 @@ and use your local data directory. {\em E.g.:}
 
 \section{Changing System Defaults}
 On some systems, certain defaults may be changed {\em prior} to
-starting the software. Some common examples are\footnote[2]{Note that I 
+starting the software. Some common examples are\footnote[2]{Note that I
 use the `;:' construct for Unix in-line comments.}:
 
 \begin{quote}
@@ -399,7 +399,7 @@ you observed with a single detector and a broad--band filter.
 One sets the parameters
 ``ichanbeg'' and ``ichanend'' (see icl commands shopar and setpar below).
 Sensible defaults are ichanbeg = 3 and ichanend = 29.  In that case one
-sums up the raw fluxes from channels 3 to 29.  
+sums up the raw fluxes from channels 3 to 29.
 
 The output of whatever reduce\_phot commands are executed is an ASCII
 file
@@ -427,7 +427,7 @@ Use: Display the data reduction flags and paramters. \\
 
 
 %------------------------------------------------------------------------------
-%  Part III 
+%  Part III
 \part{THE Tcl/tk INTERFACE}
 \pagestyle{myheadings}
 \markboth{Tcl/tk Interface}{\stardocname}
@@ -442,7 +442,7 @@ modified to suit the user's needs {\em i.e.} it had to be {\em
 extensible}. Thus tcl was born. The addition of the toolkit at a later
 stage made tcl/tk a very powerful {\sc gui} prototyping environment available
 with little effort and, perhaps more importantly, at no cost to the
-community. 
+community.
 
 In September 1993, the {\sc adam} V Workshop provided demonstrations of two
 proposed {\sc gui}s for Starlink development: Xadam (based upon tcl/tk's expect
@@ -454,7 +454,7 @@ extensions to tcl to allow the system to communicate with {\sc adam} tasks.
 Later work done at ROE provided tcl extensions to communicate with NBS.
 Together these systems formed what is now known as {\sc tcladam} (Terrett, 1995)
 and it is this product that is the basis for the Portable-CGS3DR graphical
-user interface. 
+user interface.
 
 \section{A Few Words on {\sc gui}s}
 {\sc gui} stands for graphical user interface. Personally, I prefer the term
@@ -465,14 +465,14 @@ and the like. All of these elements are generically termed `widgets' and
 they can be ordered into hierarchies called widget trees. {\sc gui}s are also
 capable of providing colourful interfaces and usually require a mouse to
 interact with the system. Advanced {\sc gui}s have {\em keyboard traveral} so
-that a keyboard can be used for input when a mouse is not available. 
+that a keyboard can be used for input when a mouse is not available.
 
 \section{The Portable-CGS3DR Style}
 The Portable-CGS3DR {\sc tcladam} interface provides a window to each major
 task. Each window consists of a title bar, a menu bar, a text pane and a
 wigdet tree in some order. In addtion, {\sc tcladam} also provides a {\sc gwm} widget
 which includes the xdisplay plotting surface. Note that the style described
-below may change as users feedback their preferences. 
+below may change as users feedback their preferences.
 
 It may also appear different if your $\sim$/.Xdefaults file has been edited for any reason.
 In particular, if you use white or near-white as a foregound colour, the Portable-CGS3DR
@@ -491,7 +491,7 @@ The defaults for the Portable-CGS3DR interface are:
 \item[{\sf Defaults Button}] --- Sets defaults and {\em exits dialogue box}.
 \item[{\sf Background}] --- wheat.
 \item[{\sf Text Pane}] --- snow.
-\item[{\sf Scrollbars}] --- lightyellow (inactive), palegreen (active). 
+\item[{\sf Scrollbars}] --- lightyellow (inactive), palegreen (active).
 \item[{\sf Checkbuttons}] --- wheat with grey border (inactive), all grey (active). Used
 for binary choices ({\em e.g.} autoscaling in the plotting interface).
 \item[{\sf Radiobuttons}] --- wheat with grey border (inactive), palegreen with grey border (active).
@@ -500,7 +500,7 @@ Used for multiple but restricted choices ({\em e.g.} {\sf Yes}, {\sf No} or {\sf
 either by communicating directly with the task ({\em e.g.} Plot) or generating a dialogue box
 for further input ({\em e.g.} flux\_calibrate).
 \item[{\sf Menus}] --- wheat (inactive), palegreen (active).
-\item[{\sf Menu Items}] --- wheat (inactive), palegreen (active). 
+\item[{\sf Menu Items}] --- wheat (inactive), palegreen (active).
 \item[{\sf Cursor}] --- green arrow (normal), orange pirate (a dialogue box is open), red wrist-watch (task busy).
 \end{description}
 
@@ -511,7 +511,7 @@ The title bar identifies the software version and task name to which it applies.
 The menu bar and the menus contained within have keyboard traversal enabled so that, for example, any option
 can be invoked using the {\sc alt} key and the appropriate underscored character.
 
-The menu bar consists of three items: {\sf File}, {\sf Options} and {\sf Help}. 
+The menu bar consists of three items: {\sf File}, {\sf Options} and {\sf Help}.
 
 The {\sf File} menu contains just one entry: {\sf Exit}. This is used to exit Portable-CGS3DR after confirmation
 via the dialogue box shown in figure \ref{sun206_fig1}. Note the use of the {\sf OK} and {\sf Cancel} buttons
@@ -526,7 +526,7 @@ to invoke the action or abort the option respectively. This is common practice t
  \end{center}
 \end{figure}
 
-The {\sf Help} menu is shown in figure \ref{sun206_fig2}. 
+The {\sf Help} menu is shown in figure \ref{sun206_fig2}.
 The {\sf Author(s)}, {\sf Tcl/tk Version} and {\sf Portable-CGS3DR Version} items all write an information
 string to the text pane. The {\sf Portable-CGS3DR WWW Page} and {\sf CGS3 WWW Page}
 items invoke {\em separate} incantations of {\sc netscape}.
@@ -563,10 +563,10 @@ to re-initialise the software for another dataset without exiting the interface.
  \end{center}
 \end{figure}
 
-The {\sf Clear Text Widget} option clears the text pane for the given task. 
+The {\sf Clear Text Widget} option clears the text pane for the given task.
 
-The {\sf Send Task an Action} returns the dialogue box shown in figure \ref{sun206_fig5} requesting an 
-action name to send to the selected task and is used for debugging. 
+The {\sf Send Task an Action} returns the dialogue box shown in figure \ref{sun206_fig5} requesting an
+action name to send to the selected task and is used for debugging.
 \begin{figure}[htpb]
  \setlength{\unitlength}{1mm}
  \begin{center}
@@ -587,7 +587,7 @@ The widget tree is specific to each task. They are dealt with in separate chapte
 
 \section{Starting the Software}
 The Portable-CGS3DR {\sc gui} can be started with two optional command line
-parameters: 
+parameters:
 
 \begin{minipage}{120mm}
 \begin{quote}
@@ -630,7 +630,7 @@ ready.
 
 \section{Common Problems Upon Startup}
 \begin{description}
-\item[] {\sf /star/bin/cgs3dr/tcl/cgs3dr\_tcl: Command not found.} 
+\item[] {\sf /star/bin/cgs3dr/tcl/cgs3dr\_tcl: Command not found.}
 
   The awish program has not been found.
 
@@ -639,12 +639,12 @@ ready.
   \begin{verbatim}
            #!/star/bin/awish -file
   \end{verbatim}
-  If awish has been installed elsewhere, this line will need editing to reflect 
+  If awish has been installed elsewhere, this line will need editing to reflect
   the correct location.
 
 \item[] {\sf Invalid command name ``adamtask''.}
 
-  The {\sc adam} extensions to tcl are not readable. 
+  The {\sc adam} extensions to tcl are not readable.
 
   The {\sc tcladam} software specifies a series of extensions to tcl that allow
   communications with the {\sc adam} messaging system and, hence, the tasks. These
@@ -659,11 +659,11 @@ ready.
 
   Task redezvous files were not deleted by previous shutdown.
 
-  The task rendezvous files are located in the directory {\sc \$home}/adam and have the generic form 
+  The task rendezvous files are located in the directory {\sc \$home}/adam and have the generic form
   {\sf xxxx}\_{\em task}\_{\sf yyyy} where {\sf xxxx} and {\sf yyyy} are unique numbers
   and {\em task} is one of the Portable-CGS3DR tasks (cgs3dr, red3 and figaro1).
   There are also files called cgs3dr\_tcl\_relay\_{\sf zzzz} and the like where {\sf zzzz}
-  is another unique identifier. These are the task rendezvous files. If the software is, 
+  is another unique identifier. These are the task rendezvous files. If the software is,
   for example, aborted (using \% kill -9 {\em something}) rather than shutdown, these files may not be deleted.
   Subsequent attempts to run the software will fail until these rendezvous files are
   deleted. A list of current rendezvous files can be created thus:
@@ -699,7 +699,7 @@ is returned. The defaults button sets the defaults from the ADAM parameter syste
 The right hand side of the interface controls actions in the RED3 monolith and are
 invoked by {\em double-clicking} with the mouse on any item in the
 listbox. Each item returns a dialogue box containing the parameters pertinent to that
-tasks action. These are not shown. 
+tasks action. These are not shown.
 
 \begin{figure}[htpb]
  \setlength{\unitlength}{1mm}
@@ -725,7 +725,7 @@ tasks action. These are not shown.
 \chapter{Miscellaneous}
 \markboth{Miscellaneous}{\stardocname}
 \section{May I run the {\sc gui} More Than Once?}
-No, although this is being investigated. 
+No, although this is being investigated.
 
 \section{May I Run the Software in Batch?}
 No. Unix does not recognize `batch' mode. The {\sc tcladam} interface, by default,
@@ -755,13 +755,13 @@ If you encounter several problems and wish to revert to a known state, do the fo
 \end{quote}
 
 %%-----------------------------------------------------------------------------
-%  References 
+%  References
 \chapter*{References}
 \markboth{References}{\stardocname}
 
 \begin{description}
 \item[] Shortridge, K. 1993, in  Astronomical Data Analysis Software
-      and Systems II, A. S. P. Conf. Ser., Vol. 52, eds. R. J. Hanisch, 
+      and Systems II, A. S. P. Conf. Ser., Vol. 52, eds. R. J. Hanisch,
       R. J. V. Brissenden \& J. Barnes, p219-223.
 \item[] Lawden, M. D., \& Hartley, K. F. 1992, SG/4, Starlink Project, CCL.
 \item[] Ousterhout, J. K. 1994, `Tcl and the Tk Toolkit', ISBN 0--201--63337--X, Addison Wesley.

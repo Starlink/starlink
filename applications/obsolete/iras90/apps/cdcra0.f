@@ -15,8 +15,8 @@
 *                  BAND, SOP, OBS, SCNDIR, STATUS )
 
 *  Description:
-*     This subroutine returns the names, sky coordinates (RA and DEC) 
-*     of the reference positions and other information of a group of 
+*     This subroutine returns the names, sky coordinates (RA and DEC)
+*     of the reference positions and other information of a group of
 *     CRDD NDFs.
 
 *  Arguments:
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IRA_PAR'          ! IRA_ Package constants
       INCLUDE 'PRM_PAR'          ! Primitive constants
- 
+
 *  Arguments Given:
       INTEGER NCRDD
       INTEGER NDFID( NCRDD ), IRCID( NCRDD )
@@ -78,7 +78,7 @@
       DOUBLE PRECISION RA( NCRDD ), DEC( NCRDD )
       INTEGER BAND( NCRDD ), SOP( NCRDD ), OBS( NCRDD )
       LOGICAL SCNDIR( NCRDD )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -101,7 +101,7 @@
       REAL SPEED( 1 )            ! Scan speed at a particular sample
       LOGICAL THERE              ! Source position existing flag
       CHARACTER*( 20 ) TITLE     ! Title of a CRDD NDF
-      
+
 *.
 
 *  Check inherited global status.
@@ -113,7 +113,7 @@
 *  Get the title of the NDF which is used as the name of the source.
          CALL NDF_CGET( NDFID( I ), 'Title', TITLE, STATUS )
          CALL CHR_LDBLK( TITLE )
-      
+
 *  Get other CRDD information about this CRDD NDF.
          CALL IRC_INFO( IRCID( I ), BAND( I ), RAFIL, DECFIL, NOMSPD,
      :                  SOP( I ), OBS( I ), STATUS )
@@ -121,7 +121,7 @@
 *  Obtain the scan angle of the CRDD NDF at first sample of first
 *  detector.
          CALL NDF_BOUND( NDFID( I ), 2, LBND, UBND, NDIM, STATUS )
-         CALL IRC_BPOS( IRCID( I ), 1, REAL( LBND( 1 ) ), LBND( 2 ), 
+         CALL IRC_BPOS( IRCID( I ), 1, REAL( LBND( 1 ) ), LBND( 2 ),
      :                  RASMP, DECSMP, ANGLE, SPEED, STATUS )
 
 *  Put scan angle into [-pi, pi].
@@ -155,7 +155,7 @@
                DEC( NSRCE ) = DECFIL
                NAME( NSRCE ) = TITLE
             END IF
-      
+
 *  For the first CRDD NDF, no such check is needed.
          ELSE
             NSRCE = 1

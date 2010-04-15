@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, 
-     :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
+      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L,
+     :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I,
      :                      KEYW, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND, 
+*     CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND,
 *                     IOPND, PNARG, SZOPND, NARG, I, KEYW, STATUS )
 
 *  Description:
@@ -33,15 +33,15 @@
 *     NWCS = INTEGER (Given)
 *        The number of axes in the user coord system.
 *     IWCS = INTEGER (Given)
-*        If AST__NULL, then the pixel->user mapping is linear. Otherwise, 
-*        IWCS is a pointer to an AST FrameSet containing just two Frames, 
+*        If AST__NULL, then the pixel->user mapping is linear. Otherwise,
+*        IWCS is a pointer to an AST FrameSet containing just two Frames,
 *        the Base frame is pixel coords, the current Frame is user coords.
 *     WCSDAT( * ) = DOUBLE PRECISION (Given)
 *        Supplied holding information which qualifies IWCS. If IWCS is
-*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping 
+*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping
 *        from pixel to user coords. Otherwise, wcsdat(1) holds a lower
 *        limit on the distance (within the user coords) per pixel, and
-*        the other elements in WCSDAT are not used. 
+*        the other elements in WCSDAT are not used.
 *     ELEM = CHARACTER * ( * ) (Given)
 *        The text of the current element of the ARD description.
 *     L = INTEGER (Given)
@@ -51,7 +51,7 @@
 *     IPOPND = INTEGER (Given and Returned)
 *        A pointer to the one dimensional _double work array holding the
 *        operand stack. The array is extended if necessary. See ARD1_LKR
-*        for details of what is stored for each keyword.        
+*        for details of what is stored for each keyword.
 *     IOPND = INTEGER (Given and Returned)
 *        The index at which the next value is to be stored in the
 *        operand stack.
@@ -61,7 +61,7 @@
 *        the index supplied by PNARG. PNARG is incremented by one or more on
 *        return.
 *     SZOPND = INTEGER (Given and Returned)
-*        The current size of the array pointed to by IPOPND. 
+*        The current size of the array pointed to by IPOPND.
 *     NARG = INTEGER (Given and Returned)
 *        The number of arguments read from the keyword argument list.
 *        Supplied equal to -1 if a new argument list is being started.
@@ -83,12 +83,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -108,7 +108,7 @@
 *     6-DEC-2004 (DSB):
 *        Previously, CC was assigned a literal question mark if
 *        I was supplied equal to L. Not sure why this was done, but it
-*        results in the last non blank character being ignored in the 
+*        results in the last non blank character being ignored in the
 *        supplied ELEM. The question mark has been replaced so that that
 *        CC is assigned ELEM( I : I ) if I == L on entry.
 *     1-OCT-2007 (DSB):
@@ -120,7 +120,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -175,7 +175,7 @@
 *  the real operand value as an integer identifier.
       EQUIVALENCE ( JAST, DAST )
 
-*  Ensure that the local variable IOPND0 is saved between invocations 
+*  Ensure that the local variable IOPND0 is saved between invocations
 *  of this routine.
       SAVE IOPND0
 *.
@@ -212,12 +212,12 @@
 *  parenthesis which marks the start of the argument list.
          IF( I .LT. L ) THEN
             CC = ELEM( I : I )
-            DO WHILE( CC .EQ. ' ' .AND. I .LT. L ) 
+            DO WHILE( CC .EQ. ' ' .AND. I .LT. L )
                I = I + 1
                CC = ELEM( I : I )
             END DO
          ELSE
-            CC = ELEM( I : I ) 
+            CC = ELEM( I : I )
          END IF
 
 *  Increment the index of the next character to be checked so that it
@@ -225,10 +225,10 @@
          I = I + 1
 
 *  Indicate that the argument list has been started by setting the number of
-*  arguments read so far to zero. 
+*  arguments read so far to zero.
          NARG = 0
 
-*  If the next non-blank character is an opening parenthesis, report an error 
+*  If the next non-blank character is an opening parenthesis, report an error
 *  if the current keyword should not have an argument list.
          IF( CC .EQ. '(' ) THEN
 
@@ -237,9 +237,9 @@
                CALL ERR_REP( 'ARD1_KEYW_ERR2', 'Unnecessary argument '//
      :                       'list found.', STATUS )
             END IF
-  
+
 *  If some other non-blank character was found, an error is reported
-*  unless the keyword should not have an argument list (in which case 
+*  unless the keyword should not have an argument list (in which case
 *  decrement the index of the next character to be checked so that the
 *  current character can be included as part of the next field).
          ELSE IF( CC .NE. ' ' ) THEN
@@ -325,11 +325,11 @@
 *  to the operand stack, at the index supplied in argument PNARG.
 
          IF( .NOT. KEYW ) THEN
-            CALL ARD1_STORD( DBLE( IOPND - IOPND0 ), SZOPND, PNARG, 
+            CALL ARD1_STORD( DBLE( IOPND - IOPND0 ), SZOPND, PNARG,
      :                       IPOPND, STATUS )
 
 *  Also store WCS Information in the operand stack. First deal with
-*  linear Mappings... 
+*  linear Mappings...
             IF( IWCS .EQ. AST__NULL ) THEN
 
 *  Store a flag value (1.0) to indicate that the mapping is linear.
@@ -347,19 +347,19 @@
                CALL ARD1_STORD( DAST, SZOPND, IOPND, IPOPND, STATUS )
 
 *  Now store the transformation coefficients.
-               DO J = 1, NWCS*( NWCS + 1 )               
-                  CALL ARD1_STORD( WCSDAT( J ), SZOPND, IOPND, IPOPND, 
+               DO J = 1, NWCS*( NWCS + 1 )
+                  CALL ARD1_STORD( WCSDAT( J ), SZOPND, IOPND, IPOPND,
      :                             STATUS )
                END DO
 
-*  Now deal with non-linear Mappings, store the FrameSet pointer and the 
+*  Now deal with non-linear Mappings, store the FrameSet pointer and the
 *  user distance per pixel.
             ELSE
                CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, STATUS )
                JAST( 1 ) = AST_CLONE( IWCS, STATUS )
                CALL AST_EXPORT( JAST( 1 ), STATUS )
                CALL ARD1_STORD( DAST, SZOPND, IOPND, IPOPND, STATUS )
-               CALL ARD1_STORD( WCSDAT( 1 ), SZOPND, IOPND, IPOPND, 
+               CALL ARD1_STORD( WCSDAT( 1 ), SZOPND, IOPND, IPOPND,
      :                          STATUS )
 
             END IF
@@ -371,7 +371,7 @@
 *  Jump to here if an error occurs.
  999  CONTINUE
 
-*  Give a context message if an error has occurred.      
+*  Give a context message if an error has occurred.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'ELEM', ELEM )
          CALL MSG_SETC( 'KW', CMN_KWSYM( TYPE ) )

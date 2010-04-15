@@ -15,7 +15,7 @@
 *  Description:
 *     An application uses this routine to indicate that it expects
 *     bad values ('flagged' values, or 'magic numbers') in the main
-*     data array of an NDF. 'Expects' here merely means that it is 
+*     data array of an NDF. 'Expects' here merely means that it is
 *     prepared to process such values should there be any in the data,
 *     and it is not necessary to protect it from receiving such
 *     values.
@@ -40,7 +40,7 @@
 *     29 Aug 1992 (ks):
 *        "INCLUDE" filenames now upper case.
 *     06 Feb 1995 (ks):
-*        Now allows both this and DSA_USE_QUALITY to be 
+*        Now allows both this and DSA_USE_QUALITY to be
 *        called for the same file.
 *     17 Feb 1995 (ks):
 *        Now sets and checks QF_HANDLING.
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

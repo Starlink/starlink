@@ -43,11 +43,11 @@
 *        The NDF identifier of the output NDF.
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
-*        extension. 
+*        extension.
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -149,7 +149,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -187,7 +187,7 @@
       PARAMETER( NAHEAD = 21 )
 
 *  Local Variables:
-      CHARACTER * ( 8 ) ARTYPE   ! Array type: FLUX|FLUX_ERR|EXPOSURE 
+      CHARACTER * ( 8 ) ARTYPE   ! Array type: FLUX|FLUX_ERR|EXPOSURE
       LOGICAL BAD                ! Column array contains bad values?
       INTEGER BLANK              ! Data blank (undefined) value
       REAL BSCALE                ! Data scale factor
@@ -275,7 +275,7 @@
          CALL AIF_GETVM( '_CHAR*80', 1, TNHEAD, HPNTR, WKLOC, STATUS )
 
 *  Transfer the headers from the primary HDU to the workspace.
-         CALL COF_RHEAD( FUNIT, FILE, NHEAD, TNHEAD, 
+         CALL COF_RHEAD( FUNIT, FILE, NHEAD, TNHEAD,
      :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
@@ -509,7 +509,7 @@
             BUFFER = 'Error assigning the data-blank value for FITS '/
      :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
 
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_BLANK', 'FTTNUL', 
+            CALL COF_FIOER( FSTAT, 'COF_CAMAA_BLANK', 'FTTNUL',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -526,7 +526,7 @@
 *  first time).
                CALL NDF_VALID( NDFO, VALID, STATUS )
                IF ( VALID ) CALL NDF_ANNUL( NDFO, STATUS )
- 
+
 *  Increment the count of the number of NDFs.
                TOBS = TOBS + 1
 
@@ -599,19 +599,19 @@
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADW,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'IT', ITYPE )
@@ -698,7 +698,7 @@
 *  appearance of being one of a series of simple FITS files.  The
 *  merged headers are written to the FITS extension if one is desired.
                CALL COF_WGBFE( FUNIT, FILE, NDFE, PROFIT, IOBS, NFIELD,
-     :                         USED, NHEAD, TNHEAD, 
+     :                         USED, NHEAD, TNHEAD,
      :                         %VAL( CNF_PVAL( HPNTR ) ),
      :                         STATUS, %VAL( CNF_CVAL( 80 ) ) )
          END IF
@@ -707,7 +707,7 @@
 *  name and HDU number (1) for the heading, and the length of the FITS
 *  header card as the array is mapped.
             IF ( LOGHDR )
-     :        CALL COF_HALOG( FDL, TNHEAD, %VAL( CNF_PVAL( HPNTR ) ), 
+     :        CALL COF_HALOG( FDL, TNHEAD, %VAL( CNF_PVAL( HPNTR ) ),
      :                        FILE, 1,
      :                        STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
@@ -726,7 +726,7 @@
 *  always be so, but no harm to be defensive).
       CALL NDF_VALID( NDFO, VALID, STATUS )
       IF ( VALID ) CALL NDF_ANNUL( NDFO, STATUS )
- 
+
 *  Tidy the workspace.
       CALL DAT_ANNUL( WKLOC, STATUS )
 

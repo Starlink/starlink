@@ -11,10 +11,10 @@ C  Description:
 C     DSA_CREATE_STRUCTURE gets the value of a specified Figaro parameter,
 C     which should give the name of a data structure file, and creates in
 C     that file a structure as specified by a structure definition file (as
-C     read by DSA_READ_STRUCT_DEF) and opens it for output, associating it 
-C     with a specified reference name.   Note that at least in this 
-C     implementation, the output structure specified can only be a file 
-C     name and not a structure within that file, since it is unclear what 
+C     read by DSA_READ_STRUCT_DEF) and opens it for output, associating it
+C     with a specified reference name.   Note that at least in this
+C     implementation, the output structure specified can only be a file
+C     name and not a structure within that file, since it is unclear what
 C     else should be at the upper levels.
 C
 C  Language:
@@ -27,7 +27,7 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME       (Fixed string,descr) The reference name to be
 C                        associated with the opened data object.
-C     (>) PARM_NAME      (Fixed string, descr) The name of the Figaro 
+C     (>) PARM_NAME      (Fixed string, descr) The name of the Figaro
 C                        parameter giving the name of the data object
 C                        to be created - this has to be just a file name.
 C     (>) STRUCTURE_ID   (Fixed string,descr) The name of a structure type
@@ -35,7 +35,7 @@ C                        as already defined by a structure definition file.
 C     (!) STATUS         (Integer,ref) Status code.  If a bad status value
 C                        is passed, this routine returns immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
@@ -91,7 +91,7 @@ C
       INTEGER ICH_FOLD, ICH_LEN
 C
 C     DSA_ system error codes
-C 
+C
       INCLUDE 'DSA_ERRORS'
 C
 C     Local variables
@@ -107,7 +107,7 @@ C
       CHARACTER STRUCTURE_NAME*80               ! Name of input structure
       CHARACTER STRING*80                       ! Local string storage
 C
-C     DSA system common 
+C     DSA system common
 C
       INCLUDE 'DSA_COMMON'
 C

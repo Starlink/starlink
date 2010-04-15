@@ -25,7 +25,7 @@ proc p4Cursor {taskname} {
     set P4Widgets(RESETPLOT) 0
     p4Plot $taskname
   }
-  
+
 # Do the cursoring on the given data set
   set done 0
   $taskname obey cursorval "port=$P4Widgets(PORT_NO)" -inform "cgs4drInform $taskname %V" -endmsg {set done 1}
@@ -55,7 +55,7 @@ proc p4Cursor {taskname} {
 # Inform the user what happened
   set message [format "Pixel ( %f , %f ) has values:   Data = %10.4f  Error = %10.4f  Quality = %1i" \
     $act_x $act_y $dataval $dataerr $dataqual]
-  cgs4drInform $taskname $message 
+  cgs4drInform $taskname $message
 
 # Change the cursor and exit
   set P4Widgets(CROSSHAIR) $old_xhair

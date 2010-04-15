@@ -31,7 +31,7 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2001 Central Laboratory of the Research
-*     Copyright (C) 2009 Science & Technology Facilities Council. 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -77,7 +77,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'DAT_ERR'          ! HDS error definitions
-      INCLUDE 'MSG_PAR'          ! Message-system constants 
+      INCLUDE 'MSG_PAR'          ! Message-system constants
       INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Status:
@@ -138,7 +138,7 @@
 *  Translate the ADAM_USER environment variable and its length.
          CALL PSX_GETENV( 'ADAM_USER', PATH, STATUS )
          NC = CHR_LEN( PATH )
-      
+
 *  First look in ADAM_USER.  If this is not defined deal with the error
 *  silently and try the default directory.
          CALL HDS_OPEN( PATH( :NC )//'/GLOBAL', 'READ', LOC,
@@ -158,7 +158,7 @@
       END IF
 
 *  Inquire the various global parameters.
-*  ======================================      
+*  ======================================
 
 *  Bracket each with an error context, since we want to annul the
 *  error if the object is not found (DAT__OBJNF) and substitute another
@@ -244,7 +244,7 @@
       CALL ERR_RLSE
 
 *  The message-reporting level.  Note this comes not from the global
-*  parameter file, but from the environment variable MSG_FILTER.  This 
+*  parameter file, but from the environment variable MSG_FILTER.  This
 *  avoids having a parameter in every application to control this.
 *  MSG_IFLEV should always work given that MSG_IFGETENV is called
 *  earlier.

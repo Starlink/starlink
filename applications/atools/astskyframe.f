@@ -23,10 +23,10 @@
 *     This application creates a new SkyFrame and optionally initialises
 *     its attributes. A SkyFrame is a specialised form of Frame which
 *     describes celestial longitude/latitude coordinate systems. The
-*     particular celestial coordinate system to be represented is 
-*     specified by setting the SkyFrame's System attribute (currently, 
-*     the default is FK5) qualified, as necessary, by a mean Equinox 
-*     value and/or an Epoch. 
+*     particular celestial coordinate system to be represented is
+*     specified by setting the SkyFrame's System attribute (currently,
+*     the default is FK5) qualified, as necessary, by a mean Equinox
+*     value and/or an Epoch.
 *
 *     All the coordinate values used by a SkyFrame are in radians.
 
@@ -35,8 +35,8 @@
 
 *  ADAM Parameters:
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new SkyFrame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new SkyFrame.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new SkyFrame.
 
@@ -87,7 +87,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

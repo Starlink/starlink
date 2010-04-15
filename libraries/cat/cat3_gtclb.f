@@ -1,16 +1,16 @@
-      SUBROUTINE CAT3_GTCLB (FITUNT, NXCOL, SKIP, FNAME, FDTYPE, FCSIZE, 
+      SUBROUTINE CAT3_GTCLB (FITUNT, NXCOL, SKIP, FNAME, FDTYPE, FCSIZE,
      :  FDIM, FSIZE, FUNIT, FSCALE, FZERO, FXCEPT, FXFMT, FPDISP, FCOMM,
      :  FITYPE, SFLAG, STATUS)
 *+
 *  Name:
-*     CAT3_GTCLB 
+*     CAT3_GTCLB
 *  Purpose:
 *     Read details of a column from a binary FITS table.
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_GTCLB (FITUNT, NXCOL; SKIP, FNAME, FDTYPE, FCSIZE, FDIM, 
-*       FSIZE, FUNIT, FSCALE, FZERO, FXCEPT, FXFMT, FPDISP, FCOMM, 
+*     CALL CAT3_GTCLB (FITUNT, NXCOL; SKIP, FNAME, FDTYPE, FCSIZE, FDIM,
+*       FSIZE, FUNIT, FSCALE, FZERO, FXCEPT, FXFMT, FPDISP, FCOMM,
 *       FITYPE, SFLAG; STATUS)
 *  Description:
 *     Read details of a column from a binary FITS table.
@@ -97,12 +97,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -250,7 +250,7 @@ C    :     3x, 'fitstt: ', i20 / )
                SKIP = .FALSE.
 
 *
-*             Replace the default values for the column with those read 
+*             Replace the default values for the column with those read
 *             for the column.
 
                FNAME = TTYPE
@@ -427,7 +427,7 @@ C    :                       i4, i4, i20)
 *             Check if the column is scaled and adjust the CAT data type
 *             if necessary.  The check is made by seeing if the scale
 *             factor is significantly different from 1.0D0 or the zero
-*             point is significantly different from 0.0D0.  CAT forces all 
+*             point is significantly different from 0.0D0.  CAT forces all
 *             scaled columns to have data type DOUBLE PRECISION.
 
                IF (ABS(FSCALE - 1.0D0) .LT. CAT3__MINVL  .AND.
@@ -473,7 +473,7 @@ C    :                       i4, i4, i20)
                   IF (KEYVAL .NE. ' ') THEN
                      LKEYVL = CHR_LEN(KEYVAL)
 
-                     IF (KEYVAL(1 : 1) .EQ. ''''  .AND.  
+                     IF (KEYVAL(1 : 1) .EQ. ''''  .AND.
      :                   KEYVAL(LKEYVL : LKEYVL) .EQ. '''') THEN
                        KEYVAL(1 : 1) = ' '
                        KEYVAL(LKEYVL : LKEYVL) = ' '
@@ -515,8 +515,8 @@ C    :                       i4, i4, i20)
 
 *
 *             Attempt to get the preferential display flag for the column,
-*             from FITS keyword TPRFDn.  Note that the TPRFDn keyword is a 
-*             CAT convention and is likely to be found only in binary FITS 
+*             from FITS keyword TPRFDn.  Note that the TPRFDn keyword is a
+*             CAT convention and is likely to be found only in binary FITS
 *             tables written with CAT.
 
                KEYNAM = ' '

@@ -40,7 +40,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 1998, 1999 Central Laboratory of the Research 
+*     Copyright (C) 1998, 1999 Central Laboratory of the Research
 *                   Councils.
 *     All Rights Reserved.
 
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,13 +132,13 @@
 *  device.
       CALL PGQCOL( CI1, CI2 )
 
-*  For Xoverlay devices, the above call returns CI1=0 implying that 
-*  the background can be written to.  This is technically correct 
-*  because writing to the background causes any foreground graphics to 
-*  be "rubbed out".  However, the pen representation for the background 
+*  For Xoverlay devices, the above call returns CI1=0 implying that
+*  the background can be written to.  This is technically correct
+*  because writing to the background causes any foreground graphics to
+*  be "rubbed out".  However, the pen representation for the background
 *  gives rgb=0,0,0 (i.e. it thinks the background is a black pen).  This
-*  is not correct, therefore do not allow pen 0 to be used if CI1 is 
-*  zero and CI2 = 1. 
+*  is not correct, therefore do not allow pen 0 to be used if CI1 is
+*  zero and CI2 = 1.
       IF( CI1 .EQ. 0 .AND. CI2 .EQ. 1 ) THEN
          COLIND = 1
 
@@ -150,7 +150,7 @@
 
 *  Inquire the palette colour indices.
          DO  I = 0, HI
-            CALL PGQCR( I, PALETT( 1, I ), PALETT( 2, I ), 
+            CALL PGQCR( I, PALETT( 1, I ), PALETT( 2, I ),
      :                  PALETT( 3, I ) )
          END DO
 
@@ -183,7 +183,7 @@
      :                ABS( B0 - PALETT( 3, I ) ) .LE. 0.5 )
 
 *  Accept this colour if it matches the requested colour exactly, or if
-*  it is close to the requested colour and is not close to the 
+*  it is close to the requested colour and is not close to the
 *  background colour.
             IF ( METRIC .EQ. 0 .OR.
      :           METRIC .LT. 3 * COPREC .AND. .NOT. BACKG ) THEN
@@ -194,13 +194,13 @@
 
             ELSE
 
-*  Look to see whether or not the latest colour is nearer than the 
+*  Look to see whether or not the latest colour is nearer than the
 *  previous nearest.
                IF ( METRIC .LT. CLOMET .AND. .NOT. BACKG ) THEN
                   CLOMET = METRIC
                   COLIND = I
                END IF
-   
+
                I = I + 1
             END IF
          END DO

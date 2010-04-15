@@ -21,7 +21,7 @@
 *     represents the conversion using one of the intermediate domains
 *     given in the DMNS array; preferentially the first, if that fails
 *     then the second, and so on.  The graph is returned as a series
-*     of edges, each containing the node numbers, the index of the 
+*     of edges, each containing the node numbers, the index of the
 *     domain used for matching, and an index into any associated data
 *     created.  If USESET is true, then the first domain in DMNS
 *     is only used if the corresponding SNAME values match; in this
@@ -47,8 +47,8 @@
 *        The graph as a set of edges, with node numbers (1,*) and (2,*),
 *        match domain indices (3,*), and index into associated data
 *        (4,*) (this last is not really used, but exists for
-*        compatibility with other CCD1_ graph handling routines). 
-*        The second dimension should be large enough to hold all 
+*        compatibility with other CCD1_ graph handling routines).
+*        The second dimension should be large enough to hold all
 *        possible matches, NFSET * ( NFSET - 1 ) / 2.
 *     NEDGE = INTEGER (Returned)
 *        Second dimension of GRAPH, which is the number of successful
@@ -58,7 +58,7 @@
 
 *  Notes:
 *     The algorithm used makes use of high-level AST routines
-*     including AST_CONVERT.  If necessary it could probably be recoded 
+*     including AST_CONVERT.  If necessary it could probably be recoded
 *     more efficiently by examining the Domain attributes of each frame
 *     in turn directly.
 
@@ -103,7 +103,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Arguments Given:
       INTEGER NFSET
       INTEGER IFSETS( NFSET )
@@ -111,11 +111,11 @@
       CHARACTER * ( * ) DMNS( NDMN )
       LOGICAL USESET
       CHARACTER * ( * ) SNAME( NFSET )
-      
+
 *  Arguments Returned:
       INTEGER GRAPH( 4, * )
       INTEGER NEDGE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -131,7 +131,7 @@
       INTEGER IDMN               ! Index in DLIST of conversion domain
       INTEGER J                  ! Loop variable
       INTEGER K                  ! Loop variable
-      
+
 *.
 
 *  Check inherited global status.
@@ -189,7 +189,7 @@
                   END IF
  3             CONTINUE
 
-*  This shouldn't really happen, but just in case an empty domain has 
+*  This shouldn't really happen, but just in case an empty domain has
 *  slipped in or something.
                IDMN = NDMN + 1
  4             CONTINUE

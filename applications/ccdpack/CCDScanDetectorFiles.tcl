@@ -94,7 +94,7 @@
 #  Check for file with line pattern: space word space = space word, spaces
 #  are optional.
 		     set index [lsearch -regexp $contents {^[ ]*[^\ ]+[ ]*=[ ]*[^\ ]+}]
-                     if { $index == -1 } { 
+                     if { $index == -1 } {
 
 #  Import control table.
                         set type "(table)"

@@ -1,23 +1,23 @@
       SUBROUTINE GET_LIMITS(XARRAY,N1,N2,XMAX,XMIN)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    G E T _ L I M I T S
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C XARRAY (<), N1 (<), N2 (<), XMAX (>), XMIN (>)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Given an array this routine finds the limits (used for plotting) which
 C give a border of 5% of the data range above and below the maximum and
@@ -44,4 +44,4 @@ C-
        XMAX=XMAX+1.E-5
       ENDIF
       END
-      
+

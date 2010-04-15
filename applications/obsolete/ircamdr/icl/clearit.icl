@@ -17,6 +17,6 @@ proc clearit
   send plt2d set im_yst (val2)
   send plt2d set im_xen (val3)
   send plt2d set im_yen (val4)
-  obeyw plt2d clearit 
+  obeyw plt2d clearit
 end proc
 

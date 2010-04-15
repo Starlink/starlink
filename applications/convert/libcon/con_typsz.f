@@ -4,8 +4,8 @@
 *     CON_TYPSZ
 
 *  Purpose:
-*     Returns the number of bytes used to store an item of 
-*     any of the HDS primitive data types.      
+*     Returns the number of bytes used to store an item of
+*     any of the HDS primitive data types.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,7 +15,7 @@
 
 *  Description:
 *     If the input TYPE is one of the HDS primitive numeric data types,
-*     i.e. one of _REAL, _DOUBLE, _INTEGER, _WORD, _UWORD, _BYTE or 
+*     i.e. one of _REAL, _DOUBLE, _INTEGER, _WORD, _UWORD, _BYTE or
 *      _UBYTE, then the number of bytes used by that data type is
 *     returned as NBYTES. The values are those stored as the symbolic
 *     constants VAL__NBx in the PRM_PAR include file. (See SUN/39.)

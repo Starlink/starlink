@@ -1,10 +1,10 @@
-      SUBROUTINE  ADDSTR  (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+      SUBROUTINE  ADDSTR  (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
      .     F, NCOL, NROW, WATCH)
 C
 C=======================================================================
 C
 C This subroutine generates random x,y coordinates and magnitudes,
-C appropriately scales the point-spread function, and adds these 
+C appropriately scales the point-spread function, and adds these
 C artificial stars into a copy of the original picture at the
 C appropriate locations.  As an alternative, it will read positions
 C and magnitudes in from a disk file, and add synthetic stars with
@@ -23,7 +23,7 @@ C
 *     17-Mar-1995 (GJP)
 *     Replaced very negative, very large or very small numbers with
 *     their PRM_PAR equivalents.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
@@ -96,7 +96,7 @@ C
          CALL GETDAT ('Minimum, maximum magnitudes desired:', RMAG, 2)
          IF (RMAG(1) .LT. VAL__MINR) RETURN            ! CTRL-Z was entered
 C
-         CALL GETDAT ('Number of stars to add to each frame:', 
+         CALL GETDAT ('Number of stars to add to each frame:',
      .        DATUM, 1)
          IF (DATUM .LT. -VAL__SMLR) RETURN             ! CTRL-Z was entered
          NSTAR=MAX0(1, NINT(DATUM))
@@ -120,7 +120,7 @@ C
          ADDPIC=SWITCH(ADDFIL, ' ')
          CALL GETNAM ('Output picture name:', ADDPIC)
          NL=-1
-         CALL RDHEAD (2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, AP1, 
+         CALL RDHEAD (2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, AP1,
      .        DUMMY, READNS, FRAD)
          IF (NL .LE. 0) NL=1
       END IF
@@ -220,12 +220,12 @@ C
                IF (DX**2+DYSQ .GE. PSFRSQ) THEN
                   IF (DX .GT. 0.) GO TO 2210
                ELSE
-                  DIFF=SCALE*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR, PSF, 
-     .                 NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, DVDXC, 
+                  DIFF=SCALE*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR, PSF,
+     .                 NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, DVDXC,
      .                 DVDYC)
 C
 C DIFF represents the value of the stellar profile at this pixel.
-C Compute a Poisson random error using a normal approximation, 
+C Compute a Poisson random error using a normal approximation,
 C sigma(DIFF)=sqrt(DIFF/PHPADU).
 C
                   ERR=SQRT(AMAX1(0.,DIFF/PHPADU))*
@@ -301,11 +301,11 @@ C
                   IF (DX .GT. 0.) GO TO 3030
                ELSE
                   DIFF=SCALE*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR, PSF,
-     .                 NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, DVDXC, 
+     .                 NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, DVDXC,
      .                 DVDYC)
 C
 C DIFF represents the value of the stellar profile at this pixel.
-C Compute a Poisson random error using a normal approximation, 
+C Compute a Poisson random error using a normal approximation,
 C sigma(DIFF)=sqrt(DIFF/PHPADU).
 C
                   ERR=DAORAN(ISEED(MOD(I+J,3)+1))

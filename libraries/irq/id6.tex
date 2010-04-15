@@ -1,5 +1,5 @@
 
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -63,17 +63,17 @@ to indicate if the corresponding pixel in the DATA component holds some specific
 indicate if any DATA pixels are saturated. A particular pixel in the QUALITY
 component would have bit 3 set (i.e. equal to 1) if the corresponding DATA pixel
 is saturated, or cleared (i.e. equal to 0) if the corresponding DATA pixel is
-not saturated. 
+not saturated.
 
 Another option for flagging saturated data is to replace saturated DATA pixel
 values with a ``bad'' (or ``magic'') value. This has the disadvantage that the
 data is permanently destroyed by being flagged, and also there is no distinction
 between data values which are set bad because of the fact they were saturated,
-and pixels set bad for any other reason. 
+and pixels set bad for any other reason.
 
-SUN/33 doesn't specify how the facilities of the QUALITY component are to be 
-used, and many possibilities exist. Obviously some coordination between 
-applications is needed so that different applications interpret the QUALITY 
+SUN/33 doesn't specify how the facilities of the QUALITY component are to be
+used, and many possibilities exist. Obviously some coordination between
+applications is needed so that different applications interpret the QUALITY
 values in a consistent manner (i.e. using the above example, later applications
 must know that bit 3 is a saturation flag). The IRQ package provides a set of
 routines for doing this.
@@ -85,7 +85,7 @@ either held or not held by each DATA pixel) on either VMS or UNIX systems. From
 the point of view of an application, each defined quality is identified by a
 {\em quality name} rather than by a bit number. Information about these quality
 names is stored in an NDF extension, so that later applications can determine
-which pixels within the NDF hold a given quality (or combination of qualities). 
+which pixels within the NDF hold a given quality (or combination of qualities).
 
 Within IRQ, each defined quality name is usually associated with a bit in the
 QUALITY array, and this bit is set if the corresponding DATA pixels are assigned
@@ -98,19 +98,19 @@ stored with the quality name in the NDF extension. This scalar is set to .TRUE.
 if {\em all} pixels hold the quality, and .FALSE. if {\em no} pixels hold the
 quality. In this way, the number of defined quality names can sometimes exceed
 the number of bits in the QUALITY component. The handling of such situations is
-done within IRQ and is completely invisible to the calling application. 
+done within IRQ and is completely invisible to the calling application.
 
-IRQ provides facilities to 
+IRQ provides facilities to
 \begin{itemize}
 \item Add quality name definitions (and associated descriptive comments) to an
 NDF. There is a limit to the number of quality names which may be defined within
 an NDF. The exact number depends on how many quality names require a QUALITY
-bit, but it will always be at least 8. 
+bit, but it will always be at least 8.
 \item Remove quality name definitions from an NDF.
 \item List all quality names defined within an NDF.
 \item Assign a given quality to selected pixels.
 \item Remove a given quality from selected pixels.
-\item Set ``bad'' those pixels of a supplied array which hold a certain 
+\item Set ``bad'' those pixels of a supplied array which hold a certain
 combination of qualities.
 \end{itemize}
 
@@ -118,7 +118,7 @@ combination of qualities.
 The IRAS90 package contains a set of four typical IRQ applications, which give
 an indication of the benefits which IRQ can provide for the user. The ATASK
 documentation for these four applications is included in appendix
-\ref{APP:APPS}, and they are briefly described in this section. 
+\ref{APP:APPS}, and they are briefly described in this section.
 \subsection{SETQUAL}
 SETQUAL creates quality name definitions and stores them within a specified
 extension of an NDF. It also assigns a specified quality to a sub-set of the
@@ -130,14 +130,14 @@ also provides another NDF to be used as a ``mask''. The ``bad'' pixels within
 the mask NDF define the pixels which are to be assigned the given quality. For
 instance, a user may have an image containing saturated pixels. If he wants
 these pixels flagged without being permanently destroyed, he could proceed as
-follows: 
+follows:
 \begin{enumerate}
-\item Produce a mask NDF from the original NDF by setting all DATA pixels 
-above the saturation value to the ``bad'' value. 
+\item Produce a mask NDF from the original NDF by setting all DATA pixels
+above the saturation value to the ``bad'' value.
 \item Run SETQUAL on the original NDF, giving some quality name such as
 ``SATURATED'', and specifying the mask created in the previous step. This leaves
 the DATA component of the original NDF unchanged, but assigns the quality
-``SATURATED'' to all the pixels which correspond to ``bad'' pixels in the mask. 
+``SATURATED'' to all the pixels which correspond to ``bad'' pixels in the mask.
 \end{enumerate}
 Alternatively, instead of using a mask, the pixels to which the quality is
 assigned may be specified by an explicit list of pixel indices stored in a
@@ -149,12 +149,12 @@ necessary if there is no room for any more quality name definitions within an
 NDF. In this case the user may choose to remove some unimportant quality name
 definitions to make room for new, more important quality names. REMQUAL can also
 remove {\em all} quality names information from an NDF. This can be useful if
-for any reason the quality name information becomes corrupted. 
+for any reason the quality name information becomes corrupted.
 
 \subsection{SHOWQUAL}
 The SHOWQUAL application displays all currently defined quality names within an
 NDF together with the associated descriptive comments. Optionally, the number of
-pixels which hold each quality can be displayed. 
+pixels which hold each quality can be displayed.
 
 \subsection{QUALTOBAD}
 The QUALTOBAD application sets selected pixels within an NDF to the ``bad''
@@ -165,20 +165,20 @@ original data, and then want to set pixels which were saturated in the original
 data to the ``bad'' value . In this case he would run QUALTOBAD specifying the
 background removed NDF as input, and specifying a {\em quality expression} of
 ``SATURATED''. This would cause all pixels which hold the quality ``SATURATED''
-to be set bad in the output NDF. 
+to be set bad in the output NDF.
 
-The ``quality expression'' can be more complex than a single quality name. In 
-fact, a quality expression can consist of several quality names combined 
+The ``quality expression'' can be more complex than a single quality name. In
+fact, a quality expression can consist of several quality names combined
 together using the usual operators of Boolean algebra. For instance, if the
-quality expression ``SATURATED.AND..NOT.(SOURCE\_A .OR. SOURCE\_B)'' was given to 
-QUALTOBAD, then pixels would be set ``bad'' only if they had the quality 
+quality expression ``SATURATED.AND..NOT.(SOURCE\_A .OR. SOURCE\_B)'' was given to
+QUALTOBAD, then pixels would be set ``bad'' only if they had the quality
 SATURATED, but did not have either of the qualities SOURCE\_A or SOURCE\_B.
 
 \section{Quality Names}
 A quality name must contain 15 or less characters. Any leading blanks are
 removed from supplied quality names, and they are converted to upper case before
-being stored in the NDF. Quality names may contain embedded blanks, but may not 
-contain full-stop (".") characters. Certain names are reserved and may not be 
+being stored in the NDF. Quality names may contain embedded blanks, but may not
+contain full-stop (".") characters. Certain names are reserved and may not be
 used. These are ``ANY'', ``IRQ\_BAD\_SLOT'' and ``IRQ\_FREE\_SLOT''.
 
 \section{Quality Expressions}
@@ -187,12 +187,12 @@ using Boolean operators into a legal Boolean expression. See section \ref
 {SEC:QEXP} for a description of the use of quality expressions within IRQ. In
 the following, the symbols ``A'' and ``B'' are used to represent two qualities.
 These can be considered as Boolean values; ``true'' if a pixel holds the
-quality, and ``false'' otherwise. The supported Boolean operators are: 
+quality, and ``false'' otherwise. The supported Boolean operators are:
 \begin {description}
 \item [.AND.] - The expression (A.AND.B) is true if and only if both A and B are
-true. 
+true.
 \item [.OR.] - The expression (A.OR.B) is true if and only if either A or B is
-true. 
+true.
 \item [.XOR.] - The expression (A.XOR.B) is true if and only if either A is
 true and B is false, or A is false and B is true.
 \item [.EQV.] - The expression (A.EQV.B) is true if and only if either A is
@@ -201,27 +201,27 @@ true and B is true, or A is false and B is false.
 \end{description}
 In addition to the above operators, the Boolean constants .FALSE. and .TRUE. can
 be included within a quality expression. Expressions may contain several levels
-of nested parentheses. 
+of nested parentheses.
 
 The precedence of these operators decreases in the following order; .NOT.,
 .AND., .OR., .XOR., .EQV. (the final two have equal precedence). In an
 expression such as (A.XOR.B.EQV.C.XOR.D) in which all operators have equal
 precedence, the evaluation proceeds from left to right., i.e. the expression is
-evaluated as  (((A.XOR.B).EQV.C).XOR.D). If there is any doubt about the order 
-in which an expression will be evaluated, parentheses should be used to ensure 
+evaluated as  (((A.XOR.B).EQV.C).XOR.D). If there is any doubt about the order
+in which an expression will be evaluated, parentheses should be used to ensure
 the required order of evaluation.
 
 Some attempts are made to simplify a quality expression to reduce the run time
-needed to evaluate the expression for every pixel. 
+needed to evaluate the expression for every pixel.
 
-Quality expressions can be up to 254 characters long, and must not contain more 
+Quality expressions can be up to 254 characters long, and must not contain more
 than 40 symbols (Boolean operators, constants, or quality names).
 
 
 \section {Using IRQ routines}
-This section gives a brief outline of the IRQ routines which are available to 
-perform some common tasks. The specific details required to use these routines 
-are not included here but can be found in the subroutine specifications 
+This section gives a brief outline of the IRQ routines which are available to
+perform some common tasks. The specific details required to use these routines
+are not included here but can be found in the subroutine specifications
 contained in appendix \ref {SEC:FULLSPEC}.
 
 \subsection {Constants and Error Values}
@@ -229,7 +229,7 @@ contained in appendix \ref {SEC:FULLSPEC}.
 The IRQ package has associated with it various symbolic constants. These values
 consist of a name of up to 5 characters prefixed by ``IRQ\_\_''  (note the {\em
 double} underscore), and can be made available to an application by including
-the following line at the start of the routines which uses them: 
+the following line at the start of the routines which uses them:
 
 \begin{verbatim}
       INCLUDE 'IRQ_PAR'
@@ -241,7 +241,7 @@ alternative instructions given in appendix /ref {APP:NOSTAR} should be followed.
 
 The values thus defined are described in the following sections, and also in the
 subroutine specifications. Another set of symbolic constants is made available
-by the statements 
+by the statements
 
 \begin{verbatim}
       INCLUDE 'IRQ_ERR'
@@ -251,7 +251,7 @@ These values have the same format of those contained in IRQ\_PAR, put define
 various error conditions which can be generated within the IRQ package.
 Applications can compare the $STATUS$ argument with these values to check for
 specific error conditions. These values are described in appendix \ref
-{APP:ERRORS}. 
+{APP:ERRORS}.
 
 \subsection{Initialising an NDF for use with IRQ}
 Certain HDS structures must be created within an NDF before the NDF can be used
@@ -270,7 +270,7 @@ releasing resources used for accessing quality name information. These two
 routines are only used for releasing resources used to store {\em compiled
 quality expressions} (see section /ref {SEC:QEXP}). IRQ\_RLSE is the only
 routine which needs to be called to release resources used for accessing {\em
-quality names}. 
+quality names}.
 
 \subsection{Using previously initialised NDFs within IRQ}
 If the NDF has been initialised for use by IRQ, then the structure holding the
@@ -282,20 +282,20 @@ structure, then the status value IRQ\_\_MULT is returned. If the routine runs
 successfully, then an array of HDS locators is returned similar to the array
 returned by IRQ\_NEW. Once access to the quality names information is no longer
 required, the resources used by these HDS locators (including the cloned
-NDF identifier) should be annulled by calling IRQ\_RLSE. 
+NDF identifier) should be annulled by calling IRQ\_RLSE.
 
 \subsection{Accessing the quality names information stored in an NDF}
-To access the quality names information stored within an NDF, a set of HDS 
-locators to the information must first be obtained by calling either IRQ\_NEW or 
-IRQ\_FIND (see above). Once this has been done the information can be read, 
-modified, or added to. IRQ\_ADDQN adds a new quality name definition to an NDF 
-(so long as there is room for it within the structures and the QUALITY 
-component). IRQ\_CHKQN checks to see if a given name is defined. IRQ\_GETQN 
-searches for a specified quality name, and 
-returns various items of information about it (such as which bit of the QUALITY 
-component it is assigned to). IRQ\_NUMQN returns the number of defined quality 
-names. IRQ\_NXTQN returns the next defined quality name. Repeated calls to 
-IRQ\_NXTQN can be made to get a list of all the quality names defined within an 
+To access the quality names information stored within an NDF, a set of HDS
+locators to the information must first be obtained by calling either IRQ\_NEW or
+IRQ\_FIND (see above). Once this has been done the information can be read,
+modified, or added to. IRQ\_ADDQN adds a new quality name definition to an NDF
+(so long as there is room for it within the structures and the QUALITY
+component). IRQ\_CHKQN checks to see if a given name is defined. IRQ\_GETQN
+searches for a specified quality name, and
+returns various items of information about it (such as which bit of the QUALITY
+component it is assigned to). IRQ\_NUMQN returns the number of defined quality
+names. IRQ\_NXTQN returns the next defined quality name. Repeated calls to
+IRQ\_NXTQN can be made to get a list of all the quality names defined within an
 NDF. IRQ\_REMQN removes the definition of a quality name from an NDF, so
 long as the quality name has not been flagged as ``read-only'' (see
 IRQ\_RWQN).
@@ -309,19 +309,19 @@ assigned. Routine IRQ\_SETQL requires a list of pixel indices to be provided
 which defines the pixels in the NDF DATA component to which the quality is to be
 assigned. The quality of the NDF pixels which are {\em not} selected is left
 unchanged. Thus, if an unselected pixel already has the specified quality, these
-routines will not {\em remove} the quality from those pixels. 
+routines will not {\em remove} the quality from those pixels.
 
-The routines IRQ\_RESQM and IRQ\_RESQL, are complimentary to IRQ\_SETQM and 
+The routines IRQ\_RESQM and IRQ\_RESQL, are complimentary to IRQ\_SETQM and
 IRQ\_SETQL. Instead of ensuring that the selected pixels hold the specified
-quality, these routines ensure that the selected pixels {\em do not} hold the 
+quality, these routines ensure that the selected pixels {\em do not} hold the
 specified quality. Again, the quality of unselected pixels is left unchanged.
 
 Routine IRQ\_SETQ ensures that {\em all} pixels in an NDF have a specified
 quality, and routine IRQ\_RESQ ensures that {\em no} pixels in an NDF have a
-specified quality. 
+specified quality.
 
 The routine IRQ\_CNTQ will count the number of bits set in each bit plane in the
-QUALITY component. 
+QUALITY component.
 
 \subsection{Finding NDF pixels which satisfy a quality expression}
 \label {SEC:QEXP}
@@ -332,10 +332,10 @@ satisfy the quality expression would not usually be used by the application. The
 quality expression is usually obtained from the user using the ADAM parameter
 system. It is then passed to IRQ\_COMP to be compiled. If any problems are
 detected with the expression (such as syntax errors, or undefined quality names)
-IRQ\_COMP will report an error, and it is then up to the applications to decide 
+IRQ\_COMP will report an error, and it is then up to the applications to decide
 what to do. Typically, it will flush the error, and reprompt the user for a new
-quality expression. The routine IRQ\_SYNTX will check a quality expression for 
-syntax errors without actually compiling it or checking that the referenced 
+quality expression. The routine IRQ\_SYNTX will check a quality expression for
+syntax errors without actually compiling it or checking that the referenced
 quality names are defined.
 
 If IRQ\_COMP successfully compiles the quality expression, it returns an
@@ -349,12 +349,12 @@ the quality expression can be set bad in the supplied array. Note, the array
 supplied to IRQ\_SBAD must be the same shape and size as the NDF supplied to
 IRQ\_FIND or IRQ\_NEW. If an NDF section was used, then the array supplied to
 IRQ\_SBAD must be the same shape and size as the NDF section, {\em not} the base
-NDF. 
+NDF.
 
 Up to ten compiled quality expressions can be active at once. The identifiers
 for each compiled quality expression should be annuled when it is no longer
-needed by calling IRQ\_ANNUL. IRQ\_CLOSE should be called when all compiled 
-quality expressions have been finished with. 
+needed by calling IRQ\_ANNUL. IRQ\_CLOSE should be called when all compiled
+quality expressions have been finished with.
 
 \section {Compiling and Linking with IRQ}
 \label{SEC:LINK}
@@ -363,7 +363,7 @@ subroutines, on both VMS and UNIX systems. It is assumed that the IRAS90 package
 is installed as part of the Starlink Software Collection.
 
 \subsection{VMS}
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use the IRQ package should start by issuing the commands:
 
 \begin{verbatim}
@@ -374,12 +374,12 @@ $ IRAS90_DEV
 \end{verbatim}
 
 These commands set up logical names related to all the IRAS90
-subsystems, including IRQ. 
+subsystems, including IRQ.
 
 To link a VMS ADAM application with the IRQ package, the linker options file
 IRAS90\_LINK\_ADAM should be used. For example, to compile and link an ADAM
 application called PROG with the IRQ library, the following commands should be
-used: 
+used:
 
 \begin{verbatim}
 $ ADAMSTART
@@ -387,29 +387,29 @@ $ ADAMDEV
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ ALINK PROG, IRAS90_LINK_ADAM/OPT 
+$ ALINK PROG, IRAS90_LINK_ADAM/OPT
 \end{verbatim}
 
 Stand-alone (i.e. non-ADAM) applications can be linked with the ``standalone''
 version of IRQ. This version excludes the routines described in appendix
 \ref{APP:ADAM}. To do this the link options file IRAS90\_LINK should be used
 instead of IRAS90\_LINK\_ADAM. Thus to compile and link a stand-alone
-application with the IRQ package, the following commands should be given: 
+application with the IRQ package, the following commands should be given:
 
 \begin{verbatim}
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ LINK PROG, IRAS90_LINK/OPT 
+$ LINK PROG, IRAS90_LINK/OPT
 \end{verbatim}
 
 \subsection{UNIX}
 
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use any IRAS90 sub-package should do the following:
 
 \begin{enumerate}
-\item Execute the {\bf iras90} command. This sets up an alias for the 
+\item Execute the {\bf iras90} command. This sets up an alias for the
 {\bf iras90\_dev} command.
 
 \item Execute the {\bf iras90\_dev} command.  This creates soft links
@@ -417,26 +417,26 @@ within the current directory to
 all the iras90 include files, defines an environment variable IRAS90\_SRC
 pointing to the IRAS90 source directory, adds the {\bf bin}
 sub-directory of IRAS90\_SRC on to the end of the current value for the
-environment variable PATH, and adds the {\bf lib} sub-directory of 
-IRAS90\_SRC on to the end of the current value for the environment 
+environment variable PATH, and adds the {\bf lib} sub-directory of
+IRAS90\_SRC on to the end of the current value for the environment
 variable LD\_LIBRARY\_PATH. The command {\bf iras90\_dev star} will do
 the same but will also create soft links to all starlink include files
 (i.e. all files in the directory /star/include).
 
 \item If a UNIX application accesses any include files (such as
-IRQ\_PAR) then they should be specified (within the source file) in upper case 
+IRQ\_PAR) then they should be specified (within the source file) in upper case
 without any directory
 path. The I90\_PAR file (for instance) can be included using the statement
 
 \verb+      INCLUDE 'I90_PAR'+\\
 
-\item Soft links can be deleted (using the {\bf rm} command) when no longer 
+\item Soft links can be deleted (using the {\bf rm} command) when no longer
 needed.
 The command {\bf iras90\_dev remove} will remove all IRAS90 soft links from
 the current directory. The command {\bf iras90\_dev remove star} will
 remove all IRAS90 and Starlink soft links from the current directory.
-Note, soft links are only accessable in the directory from which the {bf ln} 
-or {\bf iras90\_dev} command was issued. 
+Note, soft links are only accessable in the directory from which the {bf ln}
+or {\bf iras90\_dev} command was issued.
 \item For ADAM applications the following {\bf alink} command should be used:
 
 \verb+% alink prog.f -L$IRAS90_SRC/lib `irq_link_adam`+\\
@@ -572,7 +572,7 @@ apostrophy (') in the above {\bf alink} command.
    \newline
    \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
    \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstbannerlength}{0.5em}
    \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
    \addtolength{\sstcaptionlength}{-4.45pt}
    \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
@@ -1896,47 +1896,47 @@ The STARLSE package (see SUN/105) provides facilities for initialising the VAX
 Language Sensitive Editor (LSE) to simplify the generation of Fortran
 code conforming to the Starlink programming standard (see SGP/16). One of the
 facilities provided by LSE is the automatic production of argument lists for
-subroutine calls. Templates for all the subroutines in the IRQ package can be 
+subroutine calls. Templates for all the subroutines in the IRQ package can be
 made available within LSE by performing the following steps (within LSE):
 \begin{enumerate}
 \item Issue the LSE command GOTO FILE/READ IRQ\_DIR:IRQ.LSE
 \item Issue the LSE command DO
 \item Move to a buffer holding a .FOR of a .GEN file in the usual way.
-\item IRQ subroutine templates are then available by typing in the name of an 
+\item IRQ subroutine templates are then available by typing in the name of an
 IRQ subroutine (or an abbreviation) and expanding it (CTRL-E).
 \item Help on the subroutine and its arguments can be obtained by placing the
-cursor at a point in the buffer at which the subroutine name has been entered 
+cursor at a point in the buffer at which the subroutine name has been entered
 and pressing GOLD-PF2.
 \end{enumerate}
 
 \section {Using IRQ Without the Rest of IRAS90}
 \label {APP:NOSTAR}
-If the IRAS90 package has not been installed as part of the Starlink 
-Software Collection, then some of the instructions given above need to be 
+If the IRAS90 package has not been installed as part of the Starlink
+Software Collection, then some of the instructions given above need to be
 changed. In this appendix the term ``IRQ root directory'' is used to refer to
 the directory containing the released IRQ files (on either VMS or UNIX).
 
 \subsection{Compiling and Linking}
-On VMS systems the IRAS90 start-up commands should be omitted and the 
+On VMS systems the IRAS90 start-up commands should be omitted and the
 development command IRQ\_DEV should be used in place of IRAS90\_DEV. The
 linker options files IRQ\_LINK and IRQ\_LINK\_ADAM should be used instead
 of IRAS90\_LINK and IRAS90\_LINK\_ADAM.
 
 On UNIX systems, the {\bf iras90} startup command should be omitted and the
-development command {\bf irq\_dev} should be used instead of {\bf iras90\_dev}. 
+development command {\bf irq\_dev} should be used instead of {\bf iras90\_dev}.
 The link files {\bf irq\_link} and {\bf irq\_link\_adam} should be used instead
-of {\bf iras90\_link} and {\bf iras90\_link\_adam}. 
+of {\bf iras90\_link} and {\bf iras90\_link\_adam}.
 
 \section {HDS Data Structures}
-The IRQ package uses several different HDS data structures. These are described 
+The IRQ package uses several different HDS data structures. These are described
 in this appendix. HDS {\em names} are indicated by being placed within
-square brackets ({[} {]}), and HDS {\em types} are indicated by being placed 
+square brackets ({[} {]}), and HDS {\em types} are indicated by being placed
 within angled brackets ($<$ $>$).
 \subsection{Quality names information stored in an NDF}
 Information describing the quality names which are defined within an NDF is
-stored in a structure called {[}{\bf QUALITY\_NAMES}{]}, with HDS {\em type} 
-$<${\bf QUALITY\_NAMES}$>$. This structure can be stored in any extension 
-within the NDF. The components of this structure are shown in table \ref 
+stored in a structure called {[}{\bf QUALITY\_NAMES}{]}, with HDS {\em type}
+$<${\bf QUALITY\_NAMES}$>$. This structure can be stored in any extension
+within the NDF. The components of this structure are shown in table \ref
 {TAB:QN}.
 
 \begin{table}[htb]
@@ -1947,11 +1947,11 @@ within the NDF. The components of this structure are shown in table \ref
 \hline
 Component Name & TYPE & Brief Description \\ \hline
 {[}{\bf QUAL}{]} & $<${\bf IRQ\_QUAL}$>$ & Vector of quality name definitions\\
-{[}{\bf LAST\_USED}{]} & $<${\bf \_INTEGER}$>$ & Highest used index within 
+{[}{\bf LAST\_USED}{]} & $<${\bf \_INTEGER}$>$ & Highest used index within
 {[}{\bf QUAL}{]}\\
 {[}{\bf NFREE}{]} & $<${\bf \_INTEGER}$>$ & No. of un-used cells within
 {[}{\bf QUAL}{]}\\
-{[}{\bf FREE}(NFREE){]} & $<${\bf \_INTEGER}$>$ & Vector holding indices of 
+{[}{\bf FREE}(NFREE){]} & $<${\bf \_INTEGER}$>$ & Vector holding indices of
 un-used cells in {[}{\bf QUAL}{]}\\
 \hline
 \end{tabular}
@@ -1965,15 +1965,15 @@ and the other components of the {[}{\bf QUALITY\_NAMES}{]} structure listed in
 table \ref {TAB:QN} are used to locate these unused cells. In particular,
 {[}{\bf FREE}{]} is a vector which holds the indices of all unused cells within
 {[}{\bf QUAL}{]}. These indices may appear in any order within in {[}{\bf
-FREE}{]}. 
+FREE}{]}.
 
 The set of five HDS locators returned by routines IRQ\_NEW and IRQ\_FIND include
 locators to each of the four components of the {[}{\bf QUALITY\_NAMES}{]}
 structure, together with a locator for a temporary HDS structure holding a
-single $<${\bf \_INTEGER}$>$ scalar used to store the cloned NDF identifier. 
+single $<${\bf \_INTEGER}$>$ scalar used to store the cloned NDF identifier.
 
 The information describing each individual quality name is stored in a single
-cell of the {[}{\bf QUAL}{]} vector. The components within each cell of this 
+cell of the {[}{\bf QUAL}{]} vector. The components within each cell of this
 array are listed in table \ref {TAB:QUAL}.
 
 \begin{table}[htb]
@@ -1984,12 +1984,12 @@ array are listed in table \ref {TAB:QUAL}.
 \hline
 Component Name & TYPE & Brief Description \\ \hline
 {[}{\bf NAME}{]} & $<${\bf \_CHAR}$>*$15 & A quality name \\
-{[}{\bf FIXED}{]} & $<${\bf \_LOGICAL}$>$ & True if all pixels are in the same 
+{[}{\bf FIXED}{]} & $<${\bf \_LOGICAL}$>$ & True if all pixels are in the same
 state\\
 {[}{\bf VALUE}{]} & $<${\bf \_LOGICAL}$>$ & The state of all pixels, if fixed\\
-{[}{\bf BIT}{]} & $<${\bf \_INTEGER}$>$ & QUALITY bit used to store this 
+{[}{\bf BIT}{]} & $<${\bf \_INTEGER}$>$ & QUALITY bit used to store this
 quality\\
-{[}{\bf COMMENT}{]} & $<${\bf \_CHAR}$>*$50 & A descriptive comment for the 
+{[}{\bf COMMENT}{]} & $<${\bf \_CHAR}$>*$50 & A descriptive comment for the
 quality\\
 \hline
 \end{tabular}
@@ -2000,11 +2000,11 @@ quality, then a true value is stored for {[}{\bf FIXED}{]}. A true value is
 stored for {[}{\bf VALUE}{]} if {\em all} pixels hold the quality, and a false
 value if {\em no} pixels hold the quality. In either case, {[}{\bf BIT}{]} is
 ignored since no QUALITY bit needs to be reserved for the quality name, thus
-allowing more than 8 quality names to be defined simultaneously. 
+allowing more than 8 quality names to be defined simultaneously.
 
-If some pixels {\em do} hold the quality but some {\em do not}, then a false 
-value is stored for {[}{\bf FIXED}{]} and {[}{\bf VALUE}{]} is ignored. In this 
-case, a QUALITY bit is reserved to represent the quality and its bit number (in 
+If some pixels {\em do} hold the quality but some {\em do not}, then a false
+value is stored for {[}{\bf FIXED}{]} and {[}{\bf VALUE}{]} is ignored. In this
+case, a QUALITY bit is reserved to represent the quality and its bit number (in
 the range 1 to 8) is stored in {[}{\bf BIT}{]}.
 
 \subsection{Temporary structures used to hold compiled quality expressions}
@@ -2015,7 +2015,7 @@ simultaneously, each being stored in one cell of an array of temporary
 structures. The identifier returned by IRQ\_COMP is just an index within this
 array. Each cell of the array has an HDS {\em name} of {[}{\bf QEXP}{]} and an
 HDS {\em type} of $<${\bf QEXP}$>$, and contains the components listed in table
-\ref {TAB:QEXP}. 
+\ref {TAB:QEXP}.
 
 \begin{table}[htb]
 \centering
@@ -2035,7 +2035,7 @@ are to be tested as part of the evaluation of a quality expression performed by
 routine IRQ\_SBAD. The instruction codes held in {[}{\bf OPCODE}{]} represent
 the operations which must be performed on a ``First In - Last Out'' stack in
 order to evaluate a quality expression. The sizes of theses vectors are held in
-common. 
+common.
 
 \section {Examples of Using IRQ}
 \newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
@@ -2146,13 +2146,13 @@ An error is reported if the quality name is already in use.
 \end{quote}
 
 \subsection {Finding pixels which satisfy a quality expression}
-This example produces a copy of an input NDF in which all pixels which do not 
+This example produces a copy of an input NDF in which all pixels which do not
 satisfy the quality expression ``.NOT.( BACKGROUND .OR. SATURATED ) '' are
 set bad.
 
 
 \begin{quote}
-\begin{tabbing} 
+\begin{tabbing}
 
 \verb#*  Attempt to locate any quality name information in   #\\
 \verb#*  the input NDF. If no quality name information is    #\\
@@ -2203,7 +2203,7 @@ converting the expression to upper case. An access violation would result if a
 literal string were supplied as an argument, instead of a character variable. If
 either of the quality names ``SATURATED'' or ``BACKGROUND'' is not defined in
 the input NDF, then an error will be reported by IRQ\_COMP, and the undefined
-names will be returned in the UNDEF array. 
+names will be returned in the UNDEF array.
 
 \end{enumerate}
 
@@ -2583,17 +2583,17 @@ The STARLSE package (see SUN/105) provides facilities for initialising the VAX
 Language Sensitive Editor (LSE) to simplify the generation of Fortran
 code conforming to the Starlink programming standard (see SGP/16). One of the
 facilities provided by LSE is the automatic production of argument lists for
-subroutine calls. Templates for all the subroutines in the IRQ package can be 
+subroutine calls. Templates for all the subroutines in the IRQ package can be
 made available within LSE by performing the following steps (within LSE):
 \begin{enumerate}
 \item Issue the LSE command GOTO FILE/READ IRQ\_DIR:IRQ.LSE
 \item Issue the LSE command DO
 \item Issue the LSE command DELETE BUFFER
 \item Move to a buffer holding a .FOR of a .GEN file in the usual way.
-\item IRQ subroutine templates are then available by typing in the name of an 
+\item IRQ subroutine templates are then available by typing in the name of an
 IRQ subroutine (or an abbreviation) and expanding it (CTRL-E).
 \item Help on the subroutine and its arguments can be obtained by placing the
-cursor at a point in the buffer at which the subroutine name has been entered 
+cursor at a point in the buffer at which the subroutine name has been entered
 and pressing GOLD-PF2.
 \end{enumerate}
 
@@ -2609,84 +2609,84 @@ IRQ\_ makes calls to the following packages:
 \item [VEC\_] - The PRIMDAT package; see SUN/39.
 \end{description}
 
-Access to these packages, together with packages called from within these 
-packages, is necessary to use IRQ. 
+Access to these packages, together with packages called from within these
+packages, is necessary to use IRQ.
 
 \section {IRQ Error Codes}
 \label {APP:ERRORS}
-IRQ routines can return any STATUS value generated by the subroutine packages 
-which it calls. In addition it can return the following IRQ-specific values 
+IRQ routines can return any STATUS value generated by the subroutine packages
+which it calls. In addition it can return the following IRQ-specific values
 
 \begin{description}
-\item {\bf IRQ\_\_BADBT}\\ 
+\item {\bf IRQ\_\_BADBT}\\
 Bit value outside range [1,8] supplied.
 \item {\bf IRQ\_\_BADDM}\\
 Incorrect NDF dimensions supplied.
-\item {\bf IRQ\_\_BADNM}\\ 
+\item {\bf IRQ\_\_BADNM}\\
 An illegal quality name has been given.
-\item {\bf IRQ\_\_BADQN}\\ 
+\item {\bf IRQ\_\_BADQN}\\
 Incomplete QUALITY\_NAMES structure found.
-\item {\bf IRQ\_\_BADSL}\\ 
+\item {\bf IRQ\_\_BADSL}\\
 Invalid slot number supplied.
-\item {\bf IRQ\_\_BADST}\\ 
+\item {\bf IRQ\_\_BADST}\\
 Incomplete slot structure found.
-\item {\bf IRQ\_\_BADSY}\\ 
+\item {\bf IRQ\_\_BADSY}\\
 Unrecognised logical operator or constant in quality expression.
-\item {\bf IRQ\_\_CMPLX}\\ 
+\item {\bf IRQ\_\_CMPLX}\\
 Too many symbols in quality expression.
-\item {\bf IRQ\_\_INCOM}\\ 
+\item {\bf IRQ\_\_INCOM}\\
 Supplied vector has different size to the NDF
-\item {\bf IRQ\_\_INTER}\\ 
+\item {\bf IRQ\_\_INTER}\\
 Internal IRQ error (report to maintainer of IRQ).
-\item {\bf IRQ\_\_INVID}\\ 
+\item {\bf IRQ\_\_INVID}\\
 Invalid IRQ identifier supplied.
-\item {\bf IRQ\_\_IVNDF}\\ 
+\item {\bf IRQ\_\_IVNDF}\\
 Invalid NDF identifier found.
-\item {\bf IRQ\_\_LSHRT}\\ 
+\item {\bf IRQ\_\_LSHRT}\\
 Character variable too short.
-\item {\bf IRQ\_\_MSDOT}\\ 
+\item {\bf IRQ\_\_MSDOT}\\
 Missing delimiter "." in quality expression.
-\item {\bf IRQ\_\_MSOPD}\\ 
+\item {\bf IRQ\_\_MSOPD}\\
 Missing operand in quality expression.
-\item {\bf IRQ\_\_MSOPT}\\ 
+\item {\bf IRQ\_\_MSOPT}\\
 Missing or invalid operator in quality expression.
-\item {\bf IRQ\_\_MSPAR}\\ 
+\item {\bf IRQ\_\_MSPAR}\\
 Unpaired parentheses in quality expression.
-\item {\bf IRQ\_\_MULT }\\ 
+\item {\bf IRQ\_\_MULT }\\
 More than one structure found holding quality names information.
 \item {\bf IRQ\_\_NOMOR}\\
 No identifiers left for compiled quality expressions.
-\item {\bf IRQ\_\_NOOPS}\\ 
+\item {\bf IRQ\_\_NOOPS}\\
 No operands can be found.
-\item {\bf IRQ\_\_NOQNM}\\ 
+\item {\bf IRQ\_\_NOQNM}\\
 A quality name could not be found.
-\item {\bf IRQ\_\_NOQNI}\\ 
+\item {\bf IRQ\_\_NOQNI}\\
 No quality names structure found in the NDF.
-\item {\bf IRQ\_\_NOSPA}\\ 
+\item {\bf IRQ\_\_NOSPA}\\
 Can't reclaim space in an instruction array.
-\item {\bf IRQ\_\_NOWRT}\\ 
+\item {\bf IRQ\_\_NOWRT}\\
 Write access to the NDF is unavailable.
-\item {\bf IRQ\_\_QBAD }\\ 
+\item {\bf IRQ\_\_QBAD }\\
 BAD values exists in the QUALITY component.
-\item {\bf IRQ\_\_QEXPL}\\ 
+\item {\bf IRQ\_\_QEXPL}\\
 Too many characters in quality expression.
-\item {\bf IRQ\_\_QIEXS}\\ 
+\item {\bf IRQ\_\_QIEXS}\\
 Extension already contains a quality names structure.
-\item {\bf IRQ\_\_QNEXS}\\ 
+\item {\bf IRQ\_\_QNEXS}\\
 Quality name is already defined.
-\item {\bf IRQ\_\_QLONG}\\ 
+\item {\bf IRQ\_\_QLONG}\\
 Quality name too long.
-\item {\bf IRQ\_\_QREFS}\\ 
+\item {\bf IRQ\_\_QREFS}\\
 Too many quality names in quality expression.
-\item {\bf IRQ\_\_QUNDF}\\ 
+\item {\bf IRQ\_\_QUNDF}\\
 QUALITY component is undefined.
-\item {\bf IRQ\_\_RDONL}\\ 
+\item {\bf IRQ\_\_RDONL}\\
 An attempt has been made to remove a read-only quality name.
-\item {\bf IRQ\_\_STKOV}\\ 
+\item {\bf IRQ\_\_STKOV}\\
 Evaluation stack overflow.
-\item {\bf IRQ\_\_STKUN}\\ 
+\item {\bf IRQ\_\_STKUN}\\
 Evaluation stack underflow.
-\item {\bf IRQ\_\_XBITS}\\ 
+\item {\bf IRQ\_\_XBITS}\\
 No bits left in QUALITY component.
 \end{description}
 
@@ -2704,15 +2704,15 @@ Changes introduced in version 4 of ID6:
 \item STARLSE templates and help available for IRQ subroutines.
 \item It is no longer necessary to include I90\_PAR before including
 IRQ\_ERR.
-\item The names of symbolic constants (both errors and parameters) which previously 
+\item The names of symbolic constants (both errors and parameters) which previously
 were longer than five characters (excluding the IRQ\_\_ prefix) have been
-truncated to five characters. The actual {\em values} associated with each name 
+truncated to five characters. The actual {\em values} associated with each name
 have not changed.
-\item The VMS version of IRQ is now released in the form of a sharable image 
-rather than an object library. Applications linked with the sharable image have 
-the advantage that they will not need to be {\em re}-linked when IRQ is upgraded 
+\item The VMS version of IRQ is now released in the form of a sharable image
+rather than an object library. Applications linked with the sharable image have
+the advantage that they will not need to be {\em re}-linked when IRQ is upgraded
 in future. Note, the object library has been removed from the IRQ system.
-\item The linking and development procedures have been modified to bring them 
+\item The linking and development procedures have been modified to bring them
 into line with Starlink standards (see SSN/8).
 
 \end {enumerate}

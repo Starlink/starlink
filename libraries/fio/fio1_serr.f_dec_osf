@@ -56,7 +56,7 @@
 *     10-FEB-1988 (AJC):
 *        Rationalize include files.
 *     29-OCT-1991 (PMA):
-*        Changed references to FIO_$xxxxx to FIO1_xxxxx 
+*        Changed references to FIO_$xxxxx to FIO1_xxxxx
 *     10-JAN-1992 (PMA):
 *        Remove machine specific features and hide them in INCLUDE
 *        statements.
@@ -124,7 +124,7 @@
      :   FOR$IOS_DUPFILSPE,   FIO__DUPFL,
      :   FOR$IOS_INPRECTOO,   FIO__RECTL,
      :   FOR$IOS_BACERR,      FIO__BACER,
-     :   FOR$IOS_ENDDURREA,   FIO__EOF,  
+     :   FOR$IOS_ENDDURREA,   FIO__EOF,
      :   FOR$IOS_RECNUMOUT,   FIO__OUTFL,
      :   FOR$IOS_OPEDEFREQ,   FIO__OPREQ,
      :   FOR$IOS_TOOMANREC,   FIO__TOORC,
@@ -139,7 +139,7 @@
      :   FOR$IOS_ATTACCNON,   FIO__OUTFL,
      :   FOR$IOS_INCRECLEN,   FIO__INCRC,
      :   FOR$IOS_ERRDURWRI,   FIO__WRTER,
-     :   FOR$IOS_ERRDURREA,   FIO__RDER, 
+     :   FOR$IOS_ERRDURREA,   FIO__RDER,
      :   FOR$IOS_RECIO_OPE,   FIO__RECIO,
      :   FOR$IOS_INSVIRMEM,   FIO__INSVR,
      :   FOR$IOS_NO_SUCDEV,   FIO__NODEV,

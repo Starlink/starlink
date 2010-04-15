@@ -10,8 +10,8 @@ C
 C  Description:
 C     This routine is passed a string which may contain tab characters.
 C     It is also passed a list of the tab settings (for standard 8 col
-C     tabs, for example, these values are I*8+1, ie 9,17,25,33,41,..).  
-C     It returns a string in which the tab characters have been replaced 
+C     tabs, for example, these values are I*8+1, ie 9,17,25,33,41,..).
+C     It returns a string in which the tab characters have been replaced
 C     by the appropriate number of blank spaces.
 C
 C  Language:

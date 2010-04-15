@@ -37,6 +37,6 @@ void shlTrnvar( const char libnam[], int isenv, char libray[],
 void shlGethlp( const char helplb[], const char keywrd[],
 		int inter, int * status );
 
-/* ADAM interfaces */ 
+/* ADAM interfaces */
 
 void shlAdam( const char libnam[], int isenv, int * status );

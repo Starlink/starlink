@@ -1,9 +1,9 @@
-*+  OLDPARS - gets container file parameters and stuffs them into 
+*+  OLDPARS - gets container file parameters and stuffs them into
 *   paramter system
 
 	SUBROUTINE OLDPARS( STATUS)
 
-* Description : 
+* Description :
 *
 * Invocation :
 *     CALL OLDPARS( STATUS)
@@ -42,7 +42,7 @@
 	REAL EXPOSURE_TIME              ! exposure time
 	REAL AIRMASS                    ! for airmass start/end parameters
 
-	INTEGER DIMS( 2)		! dimensions array 
+	INTEGER DIMS( 2)		! dimensions array
 	INTEGER NDIMS			! number of dimensions variable
 	INTEGER IMAGE_NO		! number of element in OBS structure
 	INTEGER NUMBER_ELEMENTS		! number of elements in OBS structure
@@ -86,7 +86,7 @@
 	  RETURN
 	END IF
 
-*      associate container file 
+*      associate container file
 	CALL DAT_ASSOC( 'CONTAINER', 'READ', LOCTOP_O, STATUS )
 	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'NO CONTAINER FILE BY THE NAME FOUND',
@@ -97,35 +97,35 @@
 *      find the top level locators for the GENERAL, ID and OBS structures
 	CALL DAT_FIND( LOCTOP_O, 'GENERAL', LOCGEN_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :             'NO GENERAL STRUCTURE IN SPECIFIED CONTAINER FILE ',
      :                  STATUS )
 	  RETURN
 	END IF
 	CALL DAT_FIND( LOCGEN_O, 'INSTRUMENT', LOCINST_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'NO INSTRUMENT STRUCTURE IN SPECIFIED CONTAINER FILE ',
      :                  STATUS )
 	  RETURN
 	END IF
 	CALL DAT_FIND( LOCGEN_O, 'ID', LOCID_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :            'NO ID STRUCTURE IN SPECIFIED CONTAINER FILE ',
      :                  STATUS )
 	  RETURN
 	END IF
 	CALL DAT_FIND( LOCGEN_O, 'TELESCOPE', LOCTELE_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'NO TELESCOPE STRUCTURE IN SPECIFIED CONTAINER FILE ',
      :                  STATUS )
 	  RETURN
 	END IF
 	CALL DAT_FIND( LOCTOP_O, 'OBS', LOCOBS_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :            'NO OBS STRUCTURE IN SPECIFIED CONTAINER FILE ',
      :                  STATUS )
 	  RETURN
@@ -134,11 +134,11 @@
 *      get the size of the OBS structure to be scanned
 	CALL DAT_SHAPE( LOCOBS_O, 2, DIMS, NDIMS, STATUS)
 	NUMBER_ELEMENTS = DIMS( 1)
-	
+
 *      check that image is defined
 	CALL REDCONT_CHECKDATA( IMAGE_NO, LOCOBS_O, FILLED, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'DATA IN SPECIFIED OBSERVATION NOT DEFINED',
      :                  STATUS )
 	  RETURN
@@ -151,7 +151,7 @@
 	  SUBS( 1) = IMAGE_NO
 	  SUBS( 2) =0
 	  CALL DAT_CELL( LOCOBS_O, 1, SUBS, LOCCELL_O, STATUS)
-	  CALL DAT_FIND( LOCCELL_O, 'NUMBER_COADDS', LOCPRIM_O, 
+	  CALL DAT_FIND( LOCCELL_O, 'NUMBER_COADDS', LOCPRIM_O,
      :                   STATUS)
 	  CALL DAT_GETI( LOCPRIM_O, 0, DIMS, NUMBER_COADDS, STATUS)
 	  CALL DAT_ANNUL( LOCPRIM_O, STATUS)

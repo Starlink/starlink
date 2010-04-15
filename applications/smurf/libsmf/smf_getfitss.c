@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_getfitss( const smfHead * hdr, const char * name, char * result, 
+*     smf_getfitss( const smfHead * hdr, const char * name, char * result,
 *                    size_t len, int * status );
 
 *  Arguments:
@@ -111,7 +111,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_getfitss"
 
-void smf_getfitss (const smfHead *hdr, const char * name, char * result, 
+void smf_getfitss (const smfHead *hdr, const char * name, char * result,
                    size_t len, int * status ) {
   char * astres; /* Pointer to AST static buffer */
   int i;         /* Loop counter */

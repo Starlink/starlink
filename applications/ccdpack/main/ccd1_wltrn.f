@@ -28,7 +28,7 @@
 *        Comment to be added to transform structure.
 *     IFIT = INTEGER (Given)
 *        The type of fit which was performed to produce the fit
-*        coefficients. 
+*        coefficients.
 *          1 = shift of origin only
 *          2 = shift of origin and rotation
 *          3 = shift of origin and magnification
@@ -45,7 +45,7 @@
 *        Classification type       IFIT value
 *
 *           Linear:
-*                                     all 
+*                                     all
 *
 *           Independent:
 *                                     1
@@ -123,7 +123,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,7 +152,7 @@
       INTEGER NSUBS              ! Dummy
       INTEGER I                  ! Loop variable
       LOGICAL CLASS( TRN__MXCLS ) ! Classification array
-      
+
 *.
 
 *  Check inherited global status.
@@ -216,9 +216,9 @@
          PIBY2 = ACOS( 0.0D0 )
 
 *  Get the angle from the transformations.
-         IF ( TR( 5 ) .NE. 0.0D0 ) THEN 
+         IF ( TR( 5 ) .NE. 0.0D0 ) THEN
             THETA = ATAN( TR( 2 ) / TR( 5 ) )
-         ELSE IF ( TR( 6 ) .NE. 0.0D0 ) THEN 
+         ELSE IF ( TR( 6 ) .NE. 0.0D0 ) THEN
             THETA = ATAN( TR( 3 ) / TR( 6 ) )
          ELSE
             THETA = PIBY2 * 0.5 ! Null value

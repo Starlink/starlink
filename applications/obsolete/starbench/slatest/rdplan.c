@@ -9,7 +9,7 @@ double*Q0,double*qfobar,double*q1)
 #define q2 1.49597870e8
 #define qfoobar 499.004782
 {int Q3,q4,qfOBAz;double qfoobaz,QQUUX[6],Q5[6],QFRED[3][3],
-qdog[6],qcat[6],QFISH[6],QgASp[6],Q6,q7,q8,QBAD,qBuG;static 
+qdog[6],qcat[6],QFISH[6],QgASp[6],Q6,q7,q8,QBAD,qBuG;static
 double qsilly[]={696000.0,2439.7,6051.9,1738.0,3397.0,
 71492.0,60268.0,25559.0,24764.0,1151.0};Q3=(qbar>=1&&qbar<=9
 )?qbar:0;qfoobaz=sbmgmst(qfoo-sbmdt(sbmepj(qfoo))/86400.0)+

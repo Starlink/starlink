@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -162,7 +162,7 @@ static struct sgEsc esc_sequences[] = {
 ** escape sequences known to the system. */
 #define ESC_HASH_SIZE (sizeof(esc_sequences)/sizeof(esc_sequences[0])+7)
 
-/* The hash table 
+/* The hash table
 **
 ** If the name of an escape sequences hashes to the value H, then
 ** apEscHash[H] will point to a linked list of Esc structures, one of
@@ -192,7 +192,7 @@ static int EscHash(const char *zName){
 }
 
 #ifdef TEST
-/* 
+/*
 ** Compute the longest and average collision chain length for the
 ** escape sequence hash table
 */
@@ -205,7 +205,7 @@ static void EscHashStats(void){
   struct sgEsc *p;
 
   for(i=0; i<sizeof(esc_sequences)/sizeof(esc_sequences[0]); i++){
-    cnt = 0; 
+    cnt = 0;
     p = apEscHash[i];
     if( p ) notempty++;
     while( p ){
@@ -216,7 +216,7 @@ static void EscHashStats(void){
     if( cnt>max ) max = cnt;
   }
   printf("Longest chain=%d  avg=%g  slots=%d  empty=%d (%g%%)\n",
-     max,(double)sum/(double)notempty, i, i-notempty, 
+     max,(double)sum/(double)notempty, i, i-notempty,
      100.0*(i-notempty)/(double)i);
 }
 #endif
@@ -355,8 +355,8 @@ LOCAL void HtmlTranslateEscapes(char *z){
         z[i] = 0;
         h = EscHash(&z[from+1]);
         p = apEscHash[h];
-        while( p && strcmp(p->zName,&z[from+1])!=0 ){ 
-          p = p->pNext; 
+        while( p && strcmp(p->zName,&z[from+1])!=0 ){
+          p = p->pNext;
         }
         z[i] = c;
         if( p ){
@@ -373,7 +373,7 @@ LOCAL void HtmlTranslateEscapes(char *z){
         }
       }
 
-    /* On UNIX systems, look for the non-standard microsoft characters 
+    /* On UNIX systems, look for the non-standard microsoft characters
     ** between 0x80 and 0x9f and translate them into printable ASCII
     ** codes.  Separate algorithms are required to do this for plain
     ** ascii and for utf-8.
@@ -444,7 +444,7 @@ static int HtmlHash(const char *zName){
 }
 
 #ifdef TEST
-/* 
+/*
 ** Compute the longest and average collision chain length for the
 ** markup hash table
 */
@@ -457,7 +457,7 @@ static void HtmlHashStats(void){
   struct sgMap *p;
 
   for(i=0; i<HTML_MARKUP_COUNT; i++){
-    cnt = 0; 
+    cnt = 0;
     p = apMap[i];
     if( p ) notempty++;
     while( p ){
@@ -466,7 +466,7 @@ static void HtmlHashStats(void){
     }
     sum += cnt;
     if( cnt>max ) max = cnt;
-    
+
   }
   printf("longest chain=%d  avg=%g  slots=%d  empty=%d (%g%%)\n",
     max, (double)sum/(double)notempty, i, i-notempty,
@@ -532,7 +532,7 @@ static void ToLower(char *z){
 ** the number of characters actually processed.
 **
 ** This routine may invoke a callback procedure which could delete
-** the HTML widget. 
+** the HTML widget.
 **
 ** This routine is not reentrant for the same HTML widget.  To
 ** prevent reentrancy (during a callback), the p->iCol field is
@@ -619,7 +619,7 @@ static int Tokenize(
       }
       AppendElement(p,pElem);
       n += i;
-    }else if( c!='<' || p->iPlaintext!=0 || 
+    }else if( c!='<' || p->iPlaintext!=0 ||
       (!isalpha(z[n+1]) && z[n+1]!='/' && z[n+1]!='!' && z[n+1]!='?') ){
       /* Ordinary text */
       for(i=1; (c=z[n+i])!=0 && !isspace(c) && c!='<'; i++){}
@@ -693,7 +693,7 @@ doMarkup:
         }
         argv[argc] = &z[n+i];
         j = 0;
-        while( (c=z[n+i+j])!=0 && !isspace(c) && c!='>' 
+        while( (c=z[n+i+j])!=0 && !isspace(c) && c!='>'
                && c!='=' && (c!='/' || z[n+i+j+1]!='>') ){
           j++;
         }
@@ -751,7 +751,7 @@ doMarkup:
       }
       n += i + 1;
 
-      /* Lookup the markup name in the hash table 
+      /* Lookup the markup name in the hash table
       */
       if( !isInit ){
         HtmlHashInit();
@@ -769,7 +769,7 @@ doMarkup:
 
 makeMarkupEntry:
       /* Construct a HtmlMarkup entry for this markup.
-      */ 
+      */
       if( pMap->extra ){
         nByte = pMap->extra;
       }else if( argc==1 ){
@@ -863,7 +863,7 @@ makeMarkupEntry:
       /* If this is self-closing markup (ex: <br/> or <img/>) then
       ** synthesize a closing token.
       */
-      if( selfClose && argv[0][0]!='/' 
+      if( selfClose && argv[0][0]!='/'
       && strcmp(&pMap[1].zName[1],pMap->zName)==0 ){
         selfClose = 0;
         pMap++;
@@ -883,7 +883,7 @@ incomplete:
 **
 ** This routine (actually the Tokenize() subroutine that is called
 ** by this routine) may invoke a callback procedure which could delete
-** the HTML widget. 
+** the HTML widget.
 */
 void HtmlTokenizerAppend(HtmlWidget *htmlPtr, const char *zText){
   int len = strlen(zText);
@@ -908,7 +908,7 @@ void HtmlTokenizerAppend(HtmlWidget *htmlPtr, const char *zText){
 
 /*
 ** This routine takes a text representation of a token, converts
-** it into an HtmlElement structure and inserts it immediately 
+** it into an HtmlElement structure and inserts it immediately
 ** prior to pToken.  If pToken==0, then the newly created HtmlElement
 ** is appended.
 **
@@ -1086,7 +1086,7 @@ char *HtmlTokenName(HtmlElement *p){
     }
     break;
   default:
-    if( p->base.type >= HtmlMarkupMap[0].type 
+    if( p->base.type >= HtmlMarkupMap[0].type
     && p->base.type <= HtmlMarkupMap[HTML_MARKUP_COUNT-1].type ){
       zName = HtmlMarkupMap[p->base.type - HtmlMarkupMap[0].type].zName;
     }else{
@@ -1137,7 +1137,7 @@ void HtmlTclizeList(Tcl_Interp *interp, HtmlElement *p, HtmlElement *pEnd){
       default:
         Tcl_DStringStartSublist(&str);
         Tcl_DStringAppendElement(&str,"Markup");
-        if( p->base.type >= HtmlMarkupMap[0].type 
+        if( p->base.type >= HtmlMarkupMap[0].type
          && p->base.type <= HtmlMarkupMap[HTML_MARKUP_COUNT-1].type ){
           zName = HtmlMarkupMap[p->base.type - HtmlMarkupMap[0].type].zName;
         }else{

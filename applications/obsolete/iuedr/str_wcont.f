@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Write control string into line parameter.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -30,21 +30,21 @@
 
 *   Import:
       BYTE CNTRL(256)      ! control string
- 
+
       INTEGER MAXC         ! size of value
- 
+
 *   Import/Export:
       BYTE LINE(MAXC)      ! line to be modified
- 
+
       INTEGER POS          ! character position
- 
+
 *   External references:
       INTEGER str_LEN      ! string length
- 
+
 *   Local variables:
       BYTE FORMAT(256)     ! format from CNTRL
       BYTE VALUE(256)      ! value coded into string
- 
+
       INTEGER FIRST        ! first position in CNTRL
       INTEGER LAST         ! last position in CNTRL
       INTEGER TYPE         ! format type index

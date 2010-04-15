@@ -1,5 +1,5 @@
       SUBROUTINE DTASK_GSOC ( DTASK_APPLIC, PATH, MESSID, CONTEXT, NAME,
-     :  VALUE, STATUS ) 
+     :  VALUE, STATUS )
 *+
 *  Name:
 *     DTASK_GSOC
@@ -15,10 +15,10 @@
 
 *  Invocation:
 *     CALL DTASK_GSOC ( DTASK_APPLIC, PATH, MESSID, CONTEXT, NAME,
-*     :  VALUE, STATUS ) 
+*     :  VALUE, STATUS )
 
 *  Description:
-*     Interpret a message requesting GET, SET, OBEY, CANCEL or CONTROL. If 
+*     Interpret a message requesting GET, SET, OBEY, CANCEL or CONTROL. If
 *     necessary, activate the application.
 
 *  Arguments:
@@ -38,7 +38,7 @@
 
 *  Algorithm:
 *     A GET, SET or CONTROL is passed to the routine which handles it. For
-*     OBEY and CANCEL check whether this is a valid request before calling 
+*     OBEY and CANCEL check whether this is a valid request before calling
 *     the corresponding routine.
 
 *  Copyright:
@@ -112,7 +112,7 @@
       EXTERNAL DTASK_APPLIC        ! application calling routine
       INTEGER PATH                 ! path for message received
       INTEGER MESSID               ! transaction number for message
-                                   ! received 
+                                   ! received
       INTEGER CONTEXT              ! context of message received
       CHARACTER*(*) NAME           ! name field in received message
       CHARACTER*(*) VALUE          ! command-line parameter string
@@ -128,11 +128,11 @@
       INTEGER MESSTATUS            ! message status sent out
       INTEGER MESLEN               ! length of VALUE
       INTEGER SEQ                  ! sequence number for action
-      INTEGER ACODE                ! number for the action in the 
+      INTEGER ACODE                ! number for the action in the
                                    ! parameter system
 *.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *   Enable communications for error reporting
 *
@@ -151,15 +151,15 @@
 *
       ELSE IF ( CONTEXT .EQ. OBEY .OR. CONTEXT .EQ. CANCEL ) THEN
          CALL DTASK_SRCHKEY ( NAME, ACTPTR, STATUS )
-         IF ( ( CONTEXT .EQ. OBEY ) .AND. 
-     :     ( STATUS .EQ. DTASK__ACTACTIVE ) ) THEN 
+         IF ( ( CONTEXT .EQ. OBEY ) .AND.
+     :     ( STATUS .EQ. DTASK__ACTACTIVE ) ) THEN
             MESSTATUS = DTASK__REJECTED
             STATUS = SAI__OK
             CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, NAME,
      :        VALUE, STATUS )
 
-         ELSE IF ( ( CONTEXT .EQ. CANCEL ) .AND. 
-     :     ( STATUS .EQ. DTASK__NOTFOUND ) ) THEN 
+         ELSE IF ( ( CONTEXT .EQ. CANCEL ) .AND.
+     :     ( STATUS .EQ. DTASK__NOTFOUND ) ) THEN
             MESSTATUS = DTASK__NOTACTIVE
             STATUS = SAI__OK
             CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, NAME,
@@ -200,17 +200,17 @@
      :                 MESSTATUS, CONTEXT, AKEY, MESLEN, VALUE, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
                         MESSTATUS = STATUS
-                        CALL ERR_REP ( ' ', 
+                        CALL ERR_REP ( ' ',
      :                    'failed to send initial acknowledgement',
-     :                    STATUS ) 
+     :                    STATUS )
                         STATUS = SAI__OK
                         CALL DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS,
-     :                    CONTEXT, ACTPTR, ANAME, AKEY, VALUE, STATUS ) 
+     :                    CONTEXT, ACTPTR, ANAME, AKEY, VALUE, STATUS )
                      ELSE
 *
 *                     Can start the OBEY
 *
-                        CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, 
+                        CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE,
      :                    STATUS )
                      ENDIF
                   ELSE
@@ -218,7 +218,7 @@
      :                 STATUS )
                      MESSTATUS = STATUS
                      STATUS = SAI__OK
-                     CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, 
+                     CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS,
      :                 CONTEXT, NAME, VALUE, STATUS )
                   ENDIF
                ELSE
@@ -236,7 +236,7 @@
 *
                MESSTATUS = STATUS
                STATUS = SAI__OK
-               CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, 
+               CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS,
      :            CONTEXT, NAME, VALUE, STATUS )
 
             ENDIF
@@ -245,10 +245,10 @@
       ELSE
 *
 *      Illegal CONTEXT message
-*        
-         MESSTATUS = DTASK__ILLCONTEXT      
+*
+         MESSTATUS = DTASK__ILLCONTEXT
          STATUS = SAI__OK
-         CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, 
+         CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS,
      :      CONTEXT, NAME, VALUE, STATUS )
       ENDIF
 

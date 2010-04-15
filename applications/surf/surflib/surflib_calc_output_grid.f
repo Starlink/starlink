@@ -1,5 +1,5 @@
       SUBROUTINE SURFLIB_CALC_OUTPUT_GRID (N_FILES, N_PTS, PIXEL_SZ,
-     :     X_PTR, Y_PTR, NX, NY, I_CENTRE, J_CENTRE, 
+     :     X_PTR, Y_PTR, NX, NY, I_CENTRE, J_CENTRE,
      :     STATUS )
 
 *+
@@ -11,10 +11,10 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL SURFLIB_CALC_OUTPUT_GRID (N_FILES, N_PTS, PIXEL_SZ,
-*     :     X_PTR, Y_PTR, NX, NY, I_CENTRE, J_CENTRE, 
+*     :     X_PTR, Y_PTR, NX, NY, I_CENTRE, J_CENTRE,
 *     :     STATUS )
 
 *  Description:
@@ -89,7 +89,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -144,12 +144,12 @@
       END IF
 
 *     Find range of data
-      
+
       CALL SCULIB_RANGED (%val(cnf_pval(X_PTR(1))), 1,
      :     N_PTS(1), XMAX, XMIN, STATUS)
       CALL SCULIB_RANGED (%val(cnf_pval(Y_PTR(1))), 1,
      :     N_PTS(1), YMAX, YMIN, STATUS)
-         
+
       IF (N_FILES .GT. 1) THEN
          DO I = 1, N_FILES
             CALL SCULIB_RANGED (%val(cnf_pval(X_PTR(I))), 1,

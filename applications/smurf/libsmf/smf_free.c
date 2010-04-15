@@ -26,7 +26,7 @@
 *     This is the SMURF free routine. It should be used in preference
 *     to system free() and should be paired with a SMURF allocation
 *     routine (smf_malloc). If the free was successful a null pointer
-*     is returned, else the original. 
+*     is returned, else the original.
 
 *  Authors:
 *     Tim Jenness (TIMJ)

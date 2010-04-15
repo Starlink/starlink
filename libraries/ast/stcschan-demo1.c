@@ -2,13 +2,13 @@
       stcschan-demo1.c
 
    Purpose:
-      A demonstration of the facilities provided by the AST library 
-      for reading STC metadata encoded using the STC-S linear string 
+      A demonstration of the facilities provided by the AST library
+      for reading STC metadata encoded using the STC-S linear string
       format.
 
    Description:
       This program reads an STC-S description from a disk file, and
-      tests a given position to see if it is inside or outside the 
+      tests a given position to see if it is inside or outside the
       AstroCoordsArea specified by the STC-S description.
 
    Usage:
@@ -17,13 +17,13 @@
       <stcs-file>: The path to the disk file containing the STC-S
       description.
 
-      <axis1> <axis2> ...: The axis values at the position to be tested.   
+      <axis1> <axis2> ...: The axis values at the position to be tested.
       If insufficient values are supplied, a message describing the
       required values is displayed (label, units, etc).
 
    Example:
       % stcschan-demo1 stcs-ex1.txt 1996-01-01T00:00:15 11:56:00 -11:30:00 \
-                       1420.4 1000 
+                       1420.4 1000
 
    To compile and link:
       Assuming your starlink distribution is in "/star":
@@ -87,8 +87,8 @@ int main( int argc, char **argv ){
 /* If a disk file was opened successfully... */
    if( !status ) {
 
-/* Start an AST object context. This means we do not need to annull 
-   each AST Object individually. Instead, all Objects created within 
+/* Start an AST object context. This means we do not need to annull
+   each AST Object individually. Instead, all Objects created within
    this context will be annulled automatically by the corresponding
    invocation of astEnd. */
       astBegin;
@@ -100,36 +100,36 @@ int main( int argc, char **argv ){
    use. Other attributes of the StcsChan class retain their default
    values. */
       channel = astStcsChan( source, NULL, "ReportLevel=3" );
-  
+
 /* Associate the descriptor for the input disk file with the StcsChan.
    This makes it available to the "source" function. Since this
-   application is single threaded, we could instead have made "fd" a 
-   global variable, but the ChannelData facility is used here to illustrate 
-   how to pass data to a source or sink function safely in a multi-threaded 
+   application is single threaded, we could instead have made "fd" a
+   global variable, but the ChannelData facility is used here to illustrate
+   how to pass data to a source or sink function safely in a multi-threaded
    application. */
       astPutChannelData( channel, fd );
 
-/* The default behaviour of the astRead function when used on an StcsChan is 
+/* The default behaviour of the astRead function when used on an StcsChan is
    to read and return the AstroCoordArea as an AST Region. This behaviour
    can be changed by assigning appropriate values to the StcsChan attributes
-   "StcsArea", "StcsCoords" and "StcsProps". Options exist to return the 
+   "StcsArea", "StcsCoords" and "StcsProps". Options exist to return the
    AstroCoords as an AST PointList, and/or to return the individual
    property values read from the STC-S text in the form of an AST KeyMap
-   (a sort of hashmap). For now, just take the default action of reading the 
+   (a sort of hashmap). For now, just take the default action of reading the
    AstroCoordsArea. */
       object = astRead( channel );
 
 /* The astRead function is a generic function and so returns a generic
    AstObject pointer. Check an Object was created successfully. */
       if( !object ) {
-         printf( "Failed to read an AST Object from file '%s'.\n", 
+         printf( "Failed to read an AST Object from file '%s'.\n",
                  argv[ 1 ] );
          status = 1;
 
 /* Now check that the object read is actually an AST Region, rather than
    some other class of AST Object. */
-      } else if( !astIsARegion( object ) ) {      
-         printf( "Expected a Region but read a %s from file '%s'.\n", 
+      } else if( !astIsARegion( object ) ) {
+         printf( "Expected a Region but read a %s from file '%s'.\n",
                  astGetC( object, "Class" ), argv[ 1 ] );
          status = 1;
 
@@ -137,20 +137,20 @@ int main( int argc, char **argv ){
    returned by astRead as a Region pointer. Do the cast now to avoid
    repeated casting in future. */
       } else {
-         region = (AstRegion *) object;      
+         region = (AstRegion *) object;
 
 /* Get the number of axes in the AstroCoordSystem, and check it is not
    larger than expected. */
          naxis = astGetI( region, "Naxes" );
          if( naxis > MAX_AXES ) {
             printf( "The coordinate system read from file '%s' has "
-                    "too many axes (%d). Up to %d axes are allowed.\n", 
+                    "too many axes (%d). Up to %d axes are allowed.\n",
                     argv[ 1 ], naxis, MAX_AXES );
             status = 1;
 
 /* Now check that the correct number of axis values were supplied on the
    command line. If not, issue a warning message and give details of the
-   label and units for each axis. Note, AST axis indices are one-based, 
+   label and units for each axis. Note, AST axis indices are one-based,
    in the range 1 to "Naxes". */
          } else if( argc != 2 + naxis ) {
             printf( "The coordinate system read from file '%s' has "
@@ -178,7 +178,7 @@ int main( int argc, char **argv ){
 
             for( axis = 1; axis <= naxis; axis++ ) {
 
-               nc = astUnformat( region, axis, argv[ axis + 1 ], 
+               nc = astUnformat( region, axis, argv[ axis + 1 ],
                                  inpos + axis - 1 );
 
                if( nc != strlen( argv[ axis + 1 ] ) ) {
@@ -198,7 +198,7 @@ int main( int argc, char **argv ){
 /* If we have obtained a full set of floating point axis values, use the
    Region as a Mapping to transform the supplied position. When a Region
    is used as a Mapping, the transformation leaves all axis values
-   unchanged for interior positions, but assigns the magic value AST__BAD 
+   unchanged for interior positions, but assigns the magic value AST__BAD
    to all axes for exterior positions. */
          if( !status ) {
             astTranN( region, 1, naxis, 1, inpos, 1, naxis, 1, outpos );
@@ -215,7 +215,7 @@ int main( int argc, char **argv ){
 
             printf( " ) is " );
 
-            if( outpos[ 0 ] == AST__BAD ) {            
+            if( outpos[ 0 ] == AST__BAD ) {
                printf( "OUTSIDE" );
             } else {
                printf( "INSIDE" );
@@ -250,7 +250,7 @@ int main( int argc, char **argv ){
             } else {
                break;
             }
-         }             
+         }
       }
 
 /* End the AST Object context. All Objects created since the

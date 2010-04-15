@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 1997 Council for the Central Laboratory of the Research C
 ouncils}
 \newcommand{\stardocnumber}    {9.1}
@@ -21,7 +21,7 @@ ouncils}
                                 Anne Charles}
 \newcommand{\stardocdate}      {14 May 1997}
 \newcommand{\stardoctitle}     {\LaTeX\ Cookbook}
-\newcommand{\stardocabstract}  {This cookbook shows some examples of 
+\newcommand{\stardocabstract}  {This cookbook shows some examples of
 \LaTeX\ in action and should help you to
 get to know how to use \LaTeX\ effectively.}
 % ? End of document identification
@@ -79,7 +79,7 @@ get to know how to use \LaTeX\ effectively.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -232,12 +232,12 @@ get to know how to use \LaTeX\ effectively.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -626,9 +626,9 @@ Routines belonging to the HDS kernel are identified by the symbol `[K]'.
 \noindent
 \textbf{CMP\_GET0x}\emph{(loc,name;value,status)} --- Read scalar component\\
 \textbf{CMP\_GET1x}\emph{(loc,name,elx;value,el,status)} --- Read vector component\\
-\textbf{CMP\_GETNx}\emph{(loc,name,ndim,dimx;value,dim,status)} --- Read array 
+\textbf{CMP\_GETNx}\emph{(loc,name,ndim,dimx;value,dim,status)} --- Read array
 component\\
-\textbf{CMP\_GETVx}\emph{(loc,name,elx;value,el,status)} --- Read vectorised 
+\textbf{CMP\_GETVx}\emph{(loc,name,elx;value,el,status)} --- Read vectorised
 component\\
 \textbf{CMP\_LEN}\emph{(loc,name;len,status)} --- Enquire component precision\\
 
@@ -657,8 +657,8 @@ These are the catalogues online at RAL, (R = Access restricted):
   \textbf{\LaTeX\ OUTPUT}
 \end{center}
 
-There are three main areas of help information: CAR\_HELP for information 
-about the CAR routines; CAT\_HELP for information about the catalogues and 
+There are three main areas of help information: CAR\_HELP for information
+about the CAR routines; CAT\_HELP for information about the catalogues and
 SCAR\_HELP for general information.
 \begin{verbatim}
     ICL> CAR_HELP
@@ -682,9 +682,9 @@ Routines belonging to the HDS kernel are identified by the symbol `[K]'.
 \noindent
 \textbf{CMP\_GET0x}\emph{(loc,name;value,status)} --- Read scalar component\\
 \textbf{CMP\_GET1x}\emph{(loc,name,elx;value,el,status)} --- Read vector component\\
-\textbf{CMP\_GETNx}\emph{(loc,name,ndim,dimx;value,dim,status)} --- Read array 
+\textbf{CMP\_GETNx}\emph{(loc,name,ndim,dimx;value,dim,status)} --- Read array
 component\\
-\textbf{CMP\_GETVx}\emph{(loc,name,elx;value,el,status)} --- Read vectorised 
+\textbf{CMP\_GETVx}\emph{(loc,name,elx;value,el,status)} --- Read vectorised
 component\\
 \textbf{CMP\_LEN}\emph{(loc,name;len,status)} --- Enquire component precision\\
 
@@ -960,7 +960,7 @@ centre of the cluster.
 $k$, $r_{c}$ and $r_{t}$ are constants, $k$ being a scale factor and $r_{c}$
 and $r_{t}$ the core and tidal radii respectively.
 
-Moffat's formula gives the intensity I(r) at a radial distance r from the 
+Moffat's formula gives the intensity I(r) at a radial distance r from the
 centre of the star image as
 \begin{equation}
   I(r)=I_{0}/(1+(\frac{r}{R})^{2})^{\beta}
@@ -986,7 +986,7 @@ be calculated
   f=(1+(\frac{r_{th}}{R})^{2})^{1-\beta}
 \end{equation}
 \begin{displaymath}
-  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} + 
+  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
   (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
 \end{verbatim}
@@ -1007,7 +1007,7 @@ centre of the cluster.
 $k$, $r_{c}$ and $r_{t}$ are constants, $k$ being a scale factor and $r_{c}$
 and $r_{t}$ the core and tidal radii respectively.
 
-Moffat's formula gives the intensity I(r) at a radial distance r from the 
+Moffat's formula gives the intensity I(r) at a radial distance r from the
 centre of the star image as
 \begin{equation}
   I(r)=I_{0}/(1+(\frac{r}{R})^{2})^{\beta}
@@ -1033,7 +1033,7 @@ be calculated
   f=(1+(\frac{r_{th}}{R})^{2})^{1-\beta}
 \end{equation}
 \begin{displaymath}
-  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} + 
+  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
   (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
 
@@ -1060,7 +1060,7 @@ The values of Tij are restricted to the range 0 to +$\pi$ radians.
 
 Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
 \begin{displaymath}
-  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} + 
+  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
   (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
 \end{verbatim}
@@ -1091,7 +1091,7 @@ The values of Tij are restricted to the range 0 to +$\pi$ radians.
 
 Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
 \begin{displaymath}
-  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} + 
+  B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
   (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
 \newpage
@@ -1188,11 +1188,11 @@ The following qualifiers are recognized:
   \setlength{\leftmargin}{\labelwidth}
   \addtolength{\labelwidth}{\labelsep}}
   \item[\texttt{-b}] Process pages in reverse order; this can be useful on the
-  A2 model printers which stack their pages face up and therefore in the 
+  A2 model printers which stack their pages face up and therefore in the
   reverse of the order in which they were printed.
   \item[\texttt{-c\#}]  Print \texttt{\#} copies of each page; a photocopier is
   cheaper so this qualifier shouldn't really be needed.
-  \item[\texttt{-x\#}\textit{unit}] Set the left margin to \texttt{\#} (which 
+  \item[\texttt{-x\#}\textit{unit}] Set the left margin to \texttt{\#} (which
   can be both a real number and negative); \textit{unit} is one of:
 
   \begin{tabular}{ll}
@@ -1222,7 +1222,7 @@ The following qualifiers are recognized:
   \item[0385--41191] (RDC) V21, (use 8-bit no-parity), connected to
   Departmental Gandalf PACX.
   PACX service is \texttt{STARN}.
-  More details if you specify \texttt{HELP} instead of \texttt{STARN} after 
+  More details if you specify \texttt{HELP} instead of \texttt{STARN} after
   the Gandalf prompt.
   \item[061--273--5730] (RDC) V21/V23 (autobaud), seven bits, even parity,
   connected to VAX--11/750.
@@ -1246,12 +1246,12 @@ The following qualifiers are recognized:
 \begin{list}{}{\settowidth{\labelwidth}{\texttt{-f}\emph{filename}}
   \setlength{\leftmargin}{\labelwidth}
   \addtolength{\labelwidth}{\labelsep}}
-  \item[\texttt{-b}] Process pages in reverse order; this can be useful on the 
-  A2 model printers which stack their pages face up and therefore in the 
+  \item[\texttt{-b}] Process pages in reverse order; this can be useful on the
+  A2 model printers which stack their pages face up and therefore in the
   reverse of the order in which they were printed.
   \item[\texttt{-c\#}]  Print \texttt{\#} copies of each page; a photocopier is
   cheaper so this qualifier shouldn't really be needed.
-  \item[\texttt{-x\#}\textit{unit}] Set the left margin to \texttt{\#} (which 
+  \item[\texttt{-x\#}\textit{unit}] Set the left margin to \texttt{\#} (which
   can be both a real number and negative); \textit{unit} is one of:
 
   \begin{tabular}{ll}
@@ -1281,7 +1281,7 @@ The following qualifiers are recognized:
   \item[0385--41191] (RDC) V21, (use 8-bit no-parity), connected to
   Departmental Gandalf PACX.
   PACX service is \texttt{STARN}.
-  More details if you specify \texttt{HELP} instead of \texttt{STARN} after 
+  More details if you specify \texttt{HELP} instead of \texttt{STARN} after
   the Gandalf prompt.
   \item[061--273--5730] (RDC) V21/V23 (autobaud), seven bits, even parity,
   connected to VAX--11/750.
@@ -1376,7 +1376,7 @@ The following qualifiers are recognized:
 \begin{table}
   \begin{center}
     \begin{tabular}{|ll|ll|} \hline
-      \multicolumn{2}{|c|}{\textbf{R.A.}}&\multicolumn{2}{c|}{\textbf{DEC.}} \\ 
+      \multicolumn{2}{|c|}{\textbf{R.A.}}&\multicolumn{2}{c|}{\textbf{DEC.}} \\
       Accuracy used &Window size&Accuracy used &Window size\\ \hline
       Hours only&$\pm$30 mins&Degrees Only&$\pm$4 Degs\\
       Hours \& minutes&$\pm$10 mins&Degrees \& minutes &$\pm$25 mins\\
@@ -1392,17 +1392,17 @@ The following qualifiers are recognized:
     \textbf{$<$fac$>$} & \textbf{Facility provides\ldots } \\
     \hline
     \\
-    VAL & Arithmetic, mathematical functions and type conversion on single 
+    VAL & Arithmetic, mathematical functions and type conversion on single
     (scalar) \emph{values}.
     Handling of numerical errors and \emph{bad value} propagation are
-    incorporated.\\ 
-    \\ 
+    incorporated.\\
+    \\
     VEC & Arithmetic, mathematical functions and type conversion on {\em
     vectorised arrays}, allowing more efficient processing of large numbers of
-    data. 
+    data.
     Handling of numerical errors and \emph{bad value} propagation are
-    incorporated.\\ 
-    \\ 
+    incorporated.\\
+    \\
   \end{tabular}
 \end{center}
 \end{verbatim}
@@ -1416,7 +1416,7 @@ The following qualifiers are recognized:
 \begin{table}[h]
   \begin{center}
     \begin{tabular}{|ll|ll|} \hline
-      \multicolumn{2}{|c|}{\textbf{R.A.}}&\multicolumn{2}{c|}{\textbf{DEC.}} \\ 
+      \multicolumn{2}{|c|}{\textbf{R.A.}}&\multicolumn{2}{c|}{\textbf{DEC.}} \\
       Accuracy used &Window size&Accuracy used &Window size\\ \hline
       Hours only&$\pm$30 mins&Degrees Only&$\pm$4 Degs\\
       Hours \& minutes&$\pm$10 mins&Degrees \& minutes &$\pm$25 mins\\
@@ -1432,17 +1432,17 @@ The following qualifiers are recognized:
     \textbf{$<$fac$>$} & \textbf{Facility provides\ldots } \\
     \hline
     \\
-    VAL & Arithmetic, mathematical functions and type conversion on single 
+    VAL & Arithmetic, mathematical functions and type conversion on single
     (scalar) \emph{values}.
     Handling of numerical errors and \emph{bad value} propagation are
-    incorporated.\\ 
-    \\ 
+    incorporated.\\
+    \\
     VEC & Arithmetic, mathematical functions and type conversion on {\em
     vectorised arrays}, allowing more efficient processing of large numbers of
-    data. 
+    data.
     Handling of numerical errors and \emph{bad value} propagation are
-    incorporated.\\ 
-    \\ 
+    incorporated.\\
+    \\
   \end{tabular}
 \end{center}
 
@@ -1874,7 +1874,7 @@ The following qualifiers are recognized:
   \end{center}
 \end{figure}
 
-\newpage 
+\newpage
 
 \small
 \begin{verbatim}
@@ -2194,10 +2194,10 @@ The following qualifiers are recognized:
     \end{center}
   \end{small}
   \caption{Transformations for mean \radec}
-  The forms marked $\Rightarrow$ are those available for target data entry (target coordinates), 
-  a choice of four; the forms marked $\rightarrow$ are available for telescope control (tracking 
-coordinates).  Pick one of each and follow the flow downwards.  The sequences down to the chosen 
-  tracking coordinates have only to be executed once per new target, but all the transformations 
+  The forms marked $\Rightarrow$ are those available for target data entry (target coordinates),
+  a choice of four; the forms marked $\rightarrow$ are available for telescope control (tracking
+coordinates).  Pick one of each and follow the flow downwards.  The sequences down to the chosen
+  tracking coordinates have only to be executed once per new target, but all the transformations
   from that level down have to be performed at the full pointing rate.
 \end{figure}
 \end{verbatim}

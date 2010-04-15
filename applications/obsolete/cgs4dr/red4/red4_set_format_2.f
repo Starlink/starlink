@@ -6,8 +6,8 @@
 *    Parameters :
 *     STATUS   = INTEGER( UPDATE )
 *           Global ADAM status. This must be SAI__OK on entry, or the
-*           routine will not execute. It will be returned SAI__OK if 
-*           the routine is successful. Otherwise it will contain an 
+*           routine will not execute. It will be returned SAI__OK if
+*           the routine is successful. Otherwise it will contain an
 *           error status.
 *    Method :
 *    Deficiencies :
@@ -70,13 +70,13 @@
          CALIB_STRUCTURE      = 'X'
          integration_template = LPREFIX(:CHR_LEN(LPREFIX))/
      :      /'integration_template'
-         observation_template = LPREFIX(:CHR_LEN(LPREFIX))/ 
+         observation_template = LPREFIX(:CHR_LEN(LPREFIX))/
      :      /'observation_template'
-         mask_template        = LPREFIX(:CHR_LEN(LPREFIX))/ 
+         mask_template        = LPREFIX(:CHR_LEN(LPREFIX))/
      :      /'mask_template'
-         intred_template      = LPREFIX(:CHR_LEN(LPREFIX))/ 
+         intred_template      = LPREFIX(:CHR_LEN(LPREFIX))/
      :      /'intred_template'
-         obsred_template      = LPREFIX(:CHR_LEN(LPREFIX))/ 
+         obsred_template      = LPREFIX(:CHR_LEN(LPREFIX))/
      :      /'obsred_template'
          CALL MSG_OUT( ' ', 'Format is DST', STATUS )
       ELSE IF ( FORMAT .EQ. 'EITHER' ) THEN
@@ -96,7 +96,7 @@
       ELSE
 
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 
+        CALL ERR_REP( ' ',
      :     'Unknown format - must be DST, NDF or EITHER!', STATUS )
       ENDIF
 

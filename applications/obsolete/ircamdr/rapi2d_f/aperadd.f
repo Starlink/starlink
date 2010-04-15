@@ -10,8 +10,8 @@
 *     the signal-to-noise over that region, or to simulate a circular
 *     aperture measurement of the image as with single element
 *     detector instruments.
-*     Output are the noise on the intensity of the pixels before 
-*     binning, the integrated value over the aperture, and the 
+*     Output are the noise on the intensity of the pixels before
+*     binning, the integrated value over the aperture, and the
 *     calculated mean signal level and reduced noise after binning.
 *
 *    Invocation :
@@ -39,7 +39,7 @@
 *
 *     Get input image from environment
 *     If no error so far then
-*        Map in DATA_ARRAY 
+*        Map in DATA_ARRAY
 *        Output image dimensions to user
 *        Get circle centre x, y coordinates somewhere on array
 *        Initialise circle diameter to invalid value 0.0
@@ -76,7 +76,7 @@
 *    History :
 *
 *     22-10-1985 : First implementation (REVA::MJM)
-*     17-01-1986 : More error checking and tidying (REVA::MJM) 
+*     17-01-1986 : More error checking and tidying (REVA::MJM)
 *     03-12-1987 : ask if want another input (UKTH::CAA)
 *     24-10-1990 : added output restriction (JACH::CAA)
 *     10-MAR-94    DAT_,CMP_ calls changed to NDF_ (SKL@JACH)
@@ -89,7 +89,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'       
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'          ! SSE global definitions
 
 *    Status :
@@ -122,7 +122,7 @@
      :     OLDNOISE,           ! standard deviation of pixels before add
      :     NEWNOISE            !     "        "      "    "   after   "
 
-	LOGICAL 
+	LOGICAL
      :	   AGAIN,              ! another input option
      :	   QUIET               ! output option
 
@@ -148,7 +148,7 @@
 	 CALL PAR_GET0L( 'QUIET', QUIET, STATUS)
 
 *       map its DATA_ARRAY component onto a pointer
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get array dimensions
@@ -180,11 +180,11 @@
          DO WHILE( PIXDIAM .LE. 1.0 )
 
 *          get the diameter of the circle in arbitrary units
-            CALL AIF_GET0R( 'DIAM', DIAM, 0.0001, 10000.0, 
+            CALL AIF_GET0R( 'DIAM', DIAM, 0.0001, 10000.0,
      :                       DIAM, STATUS )
 
 *          get the size of a pixel in these arbitrary units
-            CALL AIF_GET0R( 'SCALE', SCALE, 0.0001, 10000.0, 
+            CALL AIF_GET0R( 'SCALE', SCALE, 0.0001, 10000.0,
      :                       SCALE, STATUS )
 
 *          check for error here - do not divide unless parameters have
@@ -226,8 +226,8 @@
 
 *          given valid x,y centre and circle diameter, call the
 *          subroutine that does the actual work
-            CALL APERADDSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
-     :                       XCEN, YCEN, PIXDIAM, NUMPIX, OLDNOISE, 
+            CALL APERADDSUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
+     :                       XCEN, YCEN, PIXDIAM, NUMPIX, OLDNOISE,
      :                       TOTAL, MEAN, NEWNOISE, STATUS )
 
 

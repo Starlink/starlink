@@ -97,14 +97,14 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! Parameter system error constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
-      
+
 *  Arguments Given and Returned:
       INTEGER IGRP
       INTEGER NREG
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -114,7 +114,7 @@
 
       INTEGER MXREG              ! Maximum number of regions
       PARAMETER ( MXREG = 100 )
-      
+
 *  Local Variables:
       LOGICAL AGAIN              ! Should another element be checked?
       LOGICAL DELETE( MXREG )    ! Flags to show which regions to delete
@@ -141,7 +141,7 @@
      :                 /'regions defined.', STATUS )
          GO TO 999
       END IF
-      
+
 *  Report an error and abort if there are too many regions.
       IF ( NREG .GT. MXREG .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -150,11 +150,11 @@
      :                 /'defined (>^MX).', STATUS )
          GO TO 999
       END IF
-         
+
 *  Obtain a list of indices for the regions to be deleted.
       CALL PAR_GET1C( PARAM, MXEXPR, EXPR, NEXPR, STATUS )
       CALL MSG_BLANK( STATUS )
-      
+
 *  If a null value was supplied, assume that the user no longer wants
 *  to delete anything.  Annul the error, warn the user and return.
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -165,13 +165,13 @@
       END IF
 
 *  Cancel the current value of the parameter, ready for next time.
-      CALL PAR_CANCL( PARAM, STATUS )      
+      CALL PAR_CANCL( PARAM, STATUS )
 
 *  Clear the flags which identify the regions which are to be deleted.
-      DO REG = 1, NREG      
+      DO REG = 1, NREG
          DELETE( REG ) = .FALSE.
       END DO
-         
+
 *  Scan through each supplied expression.  Each expression specifies a
 *  range of region indices.
       DO IEXPR = 1, NEXPR
@@ -211,7 +211,7 @@
          DO REG = FIRST, LAST
             DELETE( REG ) = .TRUE.
          END DO
-         
+
       END DO
 
 *  Get the size of the group.
@@ -219,9 +219,9 @@
 
 *  Initialise the index within the group at which the next region starts.
 *  and set the number of regions deleted so far to zero.
-      I = 1      
+      I = 1
       NDEL = 0
-      
+
 *  Go through each region.
       DO REG = 1, NREG
 
@@ -264,9 +264,9 @@
          CALL MSG_OUT( 'KPS1_AGNDL_MSG6', '1 region deleted.', STATUS )
       ELSE
          CALL MSG_SETI( 'N', NDEL )
-         CALL MSG_OUT( 'KPS1_AGNDL_MSG7', '^N regions deleted.', 
+         CALL MSG_OUT( 'KPS1_AGNDL_MSG7', '^N regions deleted.',
      :                 STATUS )
-      END IF      
+      END IF
 
 *  Correct the number of regions currently defined.
       NREG = NREG - NDEL
@@ -280,6 +280,6 @@
 *  Delete the original group and return the identifier for the new
 *  group.
       CALL GRP_DELET( IGRP, STATUS )
-      IGRP = IGRP2      
-      
+      IGRP = IGRP2
+
       END

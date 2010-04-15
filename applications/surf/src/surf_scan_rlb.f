@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_SCAN_RLB( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine removes a linear baseline from each scan.
 *     It does this by fitting a straight line to the scan ends and then
@@ -31,7 +31,7 @@
 *     CHOP = INTEGER (Read)
 *        The basline fit is calculated over regions CHOP arcseconds from the
 *        scan ends. This region should be as large as possible but should
-*        only include baseline regions -- any scan that includes a source 
+*        only include baseline regions -- any scan that includes a source
 *        detection within CHOP arcseconds of the scan ends will be rendered
 *        useless. Only used for METHOD=LINEAR.
 *        The default value is the chop throw.
@@ -40,7 +40,7 @@
 *     METHOD = CHAR (Read)
 *        Baseline removal method. Options are:
 *           LINEAR:  Remove a linear baseline using the ends of the scan
-*           MEDIAN:  Remove a DC level calculated from the median of each 
+*           MEDIAN:  Remove a DC level calculated from the median of each
 *                    scan
 *           MEAN:    Remove the mean level from each scan (data further
 *                    than 3 sigma from the mean are ignored and the MEAN
@@ -59,9 +59,9 @@
 *        corrected data are returned. If RLB is .FALSE. the fit is returned.
 *     SECTION() = CHAR (Read)
 *         This array parameter can be used to specify SCUBA sections
-*         to be used for baseline calculation. It is requested when 
+*         to be used for baseline calculation. It is requested when
 *         METHOD=SECTION. In general the SCUBA section should
-*         include scan (exposure) or position (p) specifiers which 
+*         include scan (exposure) or position (p) specifiers which
 *         will be applied to each bolometer and integration. It is
 *         possible to be more specific and to provide multiple sections
 *         singling out certain bolometers or integrations. If entire
@@ -74,22 +74,22 @@
 *         Curly brackets must still be given. Since this is an array
 *         parameter square brackets must be used to specify more than
 *         one component:
-* 
+*
 *             SECTION > [ {e1} , {e4;b2} ]
 *
 *         would select exposure one from each integration along with
 *         exposure 4 for bolometer 2.
-*         be used if the square brackets are not used. 
+*         be used if the square brackets are not used.
 
 *         Care must also be taken when using commas in SCUBA sections -
-*         the parameter system will split multiple entries on commas 
+*         the parameter system will split multiple entries on commas
 *         unless the entire section is quoted:
 *
 *             SECTION > "{e1,4}"
 *
 *         If necessary the negation character should come after a
-*         section (ie after the closing curly bracket) and that 
-*         negation applies to the combined section and not just the string 
+*         section (ie after the closing curly bracket) and that
+*         negation applies to the combined section and not just the string
 *         containing the negation character:
 *
 *             SECTION > {e3}-
@@ -134,7 +134,7 @@
 *     Add SECTIONing
 *
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -163,7 +163,7 @@
       CHARACTER * 10 TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'SCAN_RLB')
       CHARACTER * 1    NEGCHAR  ! Character used to negate a section
-      PARAMETER (NEGCHAR = '-') ! 
+      PARAMETER (NEGCHAR = '-') !
 
 
 *  Local variables:
@@ -178,7 +178,7 @@
       INTEGER      DIM (MAXDIM)         ! the dimensions of an array
       LOGICAL      DORLB                ! Perform the subtraction
       LOGICAL      EXTINCTION           ! .TRUE. if the EXTINCTION application
-                                        ! has already been run on the 
+                                        ! has already been run on the
                                         ! input file
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
@@ -205,7 +205,7 @@
       INTEGER      NDIM                 ! the number of dimensions in an array
       INTEGER      NEGPOS               ! Position of NEGCHAR
       INTEGER      NREC                 ! number of history records in file
-      INTEGER      N_BOL                ! number of bolometers measured 
+      INTEGER      N_BOL                ! number of bolometers measured
       INTEGER      N_EXPOSURES          ! number of exposures per integration
       INTEGER      N_FITS               ! number of FITS lines read from file
       INTEGER      N_INTEGRATIONS       ! number of integrations per measurement
@@ -217,7 +217,7 @@
       CHARACTER*132 OUTFILE             ! Output filename
       INTEGER      OUTNDF               ! NDF identifier of output file
       INTEGER      OUT_DATA_PTR         ! pointer to data array in output
-      INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output 
+      INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output
       INTEGER      OUT_VARIANCE_PTR     ! pointer to variance array in output
       LOGICAL      REDUCE_SWITCH        ! .TRUE. if REDUCE_SWITCH has been run
       INTEGER      RUN_NUMBER           ! run number of observation
@@ -269,14 +269,14 @@
      :  STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
      :  OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :  'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -286,7 +286,7 @@
 *  check that the observation was suitable for RESTORE
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .NE. 'MAP' .AND. 
+         IF (OBSERVING_MODE .NE. 'MAP' .AND.
      :        OBSERVING_MODE .NE. 'POLMAP') THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
@@ -303,7 +303,7 @@
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a MAP observation '//
      :     'of object ^OBJECT', STATUS)
 
@@ -371,7 +371,7 @@
          ABORTED = .TRUE.
       END IF
 
-*  check the data dimensions 
+*  check the data dimensions
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
@@ -405,7 +405,7 @@
 *  map the DEM_PNTR array and check its dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
       CALL MSG_SETI ('N_E', N_EXPOSURES)
@@ -414,7 +414,7 @@
       CALL MSG_SETC ('PKG', PACKAGE)
 
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integration(s) in '//
      :        '^N_M measurement(s)', STATUS)
@@ -430,18 +430,18 @@
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
      :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM,' ', 
+         CALL MSG_OUTIF (MSG__NORM,' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
-      END IF         
+      END IF
 
 *     Generate a default name for the output file
       CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
@@ -458,7 +458,7 @@
 
       CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE',
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
@@ -467,7 +467,7 @@
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
 *     Ask for the baseline removal mode
-      CALL PAR_CHOIC('METHOD', 'LINEAR','LINEAR,MEDIAN,MEAN,SECTION', 
+      CALL PAR_CHOIC('METHOD', 'LINEAR','LINEAR,MEDIAN,MEAN,SECTION',
      :     .TRUE., METHOD, STATUS)
 
 *     Ask for the chop throw (only needed for METHOD=LINEAR)
@@ -496,7 +496,7 @@
 *     Method = linear
 
          IF (METHOD .EQ. 'LINEAR') THEN
-            
+
             CHOP_SIZE = INT(CHOP_THROW / SAMPLE_DX)
 
 
@@ -505,10 +505,10 @@
             CALL SCULIB_REMOVE_LINEAR_BASELINE(DORLB, N_EXPOSURES,
      :           N_INTEGRATIONS, N_MEASUREMENTS,
      :           %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
-     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)),
      :           %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(IN_QUALITY_PTR)), CHOP_SIZE, CHOP_SIZE,
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADBIT, STATUS)
 
@@ -517,10 +517,10 @@
             CALL SURFLIB_REMOVE_DC_FROM_EXP(DORLB, N_EXPOSURES,
      :           N_INTEGRATIONS, N_MEASUREMENTS, METHOD,
      :           %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
-     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)),
      :           %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(IN_QUALITY_PTR)),
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADBIT, STATUS)
 
@@ -529,7 +529,7 @@
 *     Get the section
             CALL PAR_GET1C('SECTION', SCUBA__MAX_SECT, DATA_SPEC,
      :           N_SPEC, STATUS)
-            
+
 
 *     Look for inverse section specified
             USE_SECT = .TRUE.
@@ -557,13 +557,13 @@
             END IF
 
 *     Do the removal
-            CALL SURFLIB_REMOVE_DC_VIA_SECT(DORLB, N_SPEC, DATA_SPEC, 
+            CALL SURFLIB_REMOVE_DC_VIA_SECT(DORLB, N_SPEC, DATA_SPEC,
      :           USE_SECT, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :           %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
-     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)),
      :           %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(IN_QUALITY_PTR)),
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADBIT, STATUS)
 

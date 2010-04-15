@@ -12,11 +12,11 @@
 
 *   Input :
       INTEGER REF_NO						!Database reference number.
- 
+
 *  Global Variables
       INCLUDE 'com_form_points.inc'		! Gives Constraints field
       INCLUDE 'com_form_qual.inc'
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -64,7 +64,7 @@
       INTEGER FIELD_NO
 
 *  __________________________ Executable Code __________________________________
- 
+
       FIELD_NO=DBS_FIELDNO(REF_NO,'TARGET.NAME')
       CVAL=DBS_GETC(REF_NO,FIELD_NO)
       IF(MDH_ENDWORD(CVAL).EQ.0)THEN
@@ -110,7 +110,7 @@
          GO TO 10
       END IF
       CALL DBS_INSERTD(REF_NO,DECRADS,'TARGET.DEC')				!Inset value of DEC in radians into the record.
- 
+
       FIELD_NO=DBS_FIELDNO(REF_NO,'TOTAL.OBS.TIME')
       TOTT = DBS_GETR(REF_NO,FIELD_NO)
       IF(TOTT .LT. 1.5 .OR. TOTT .GT. 1000.0)THEN
@@ -124,10 +124,10 @@
          MESSAGE = 'Number of observations'
          GOTO 10
       END IF
-      
+
       IF ((IVAL .GT. 1).AND.(.NOT.DBS_GETL(REF_NO,FLD_CONSTRAINTS))) THEN
          MESSAGE = 'time critical flag - not set'
-         GOTO 10      
+         GOTO 10
       END IF
 
 5        FORMAT(A,I1,A)
@@ -137,10 +137,10 @@
          FIELD_NO=DBS_FIELDNO(REF_NO,FLD)
 	 WFC_FILTER(I) = DBS_GETC(REF_NO,FIELD_NO)
 	 CALL UPC(WFC_FILTER(I))
-         IF (WFC_FILTER(I).NE.'S1 ' .AND. WFC_FILTER(I) .NE. 'S2 ' .AND. 
-     &            WFC_FILTER(I).NE.'S1A' .AND. WFC_FILTER(I) .NE. 'S1B' .AND. 
-     &            WFC_FILTER(I).NE.'S2A' .AND. WFC_FILTER(I) .NE. 'S2B' .AND. 
-     &            WFC_FILTER(I).NE.'P1 ' .AND. WFC_FILTER(I) .NE. 'P2 ' .AND. 
+         IF (WFC_FILTER(I).NE.'S1 ' .AND. WFC_FILTER(I) .NE. 'S2 ' .AND.
+     &            WFC_FILTER(I).NE.'S1A' .AND. WFC_FILTER(I) .NE. 'S1B' .AND.
+     &            WFC_FILTER(I).NE.'S2A' .AND. WFC_FILTER(I) .NE. 'S2B' .AND.
+     &            WFC_FILTER(I).NE.'P1 ' .AND. WFC_FILTER(I) .NE. 'P2 ' .AND.
      &            WFC_FILTER(I) .NE.'OPQ' .AND. WFC_FILTER(I) .NE. '   ') THEN
             MESSAGE = 'Invalid WFC filter code'
             GOTO 10
@@ -175,7 +175,7 @@
 *  No errors found
       CON_RECHECK_TARG = .TRUE.
       GOTO 20
- 
+
 10    CONTINUE
       CON_RECHECK_TARG = .FALSE.
 20    CONTINUE

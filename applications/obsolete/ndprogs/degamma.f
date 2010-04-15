@@ -1,4 +1,4 @@
-      SUBROUTINE DEGAMMA                                      
+      SUBROUTINE DEGAMMA
 C+
 C
 C   -------------
@@ -38,7 +38,7 @@ C               used to decide whether a pixel is similar to any of its
 C               neighbours, ie it will be if
 C                                 | PIXEL - NEIGHBOUR | < TOL
 C               for any neighbour. (float)
-C   
+C
 C   NNPIX       This is the number of neighbouring pixels we might expect to
 C               find similar to the pixel in question. If it's 0, then the
 C               suspect pixel will be wiped regardless. If it's n, then the
@@ -54,7 +54,7 @@ C               or below eacj other (real, hidden).
 C
 C   Keywords
 C   --------
-C   DOEDGE      If true (default) then the edge pixels will be processed. 
+C   DOEDGE      If true (default) then the edge pixels will be processed.
 C               Since there is less information for an edge pixel, it is
 C               more likely to change value when processed.
 C
@@ -72,8 +72,8 @@ C
 C   POSDEV      Only count positive deviations from the mean as bad.
 C
 C   Method
-C   ------ 
-C   - The file to be processed is opened and relevant attributes are obtained. 
+C   ------
+C   - The file to be processed is opened and relevant attributes are obtained.
 C   - Various processing controls are obtained through the parameter system.
 C   - The output file is opened.
 C   - The data arrays, quality and variance arrays are mapped as appropriate.
@@ -94,7 +94,7 @@ C   - Clean up and exit.
 C
 C   Possible Improvements
 C   ---------------------
-C   Consider the "diagonal" neighbours as well for extra information. 
+C   Consider the "diagonal" neighbours as well for extra information.
 C
 C   External functions & subroutines called
 C   ---------------------------------------
@@ -116,7 +116,7 @@ C      DSA_WRUSER
 C
 C   Library DYN:
 C      DYN_ELEMENT
-C   
+C
 C   Library ICH:
 C      ICH_CI
 C      ICH_LEN
@@ -141,10 +141,10 @@ C   DEGAMMA_W_SETBAD
 C   DEGAMMA_W_SUBMEAN
 C   GET_PIXEL_STATUS
 C   REPLACE_PIXEL_<T>[Q]3
-C 
+C
 C   INCLUDE statements
 C   ------------------
-C   INCLUDE 'DYNAMIC_MEMORY'       
+C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
 C   INCLUDE 'DCV_FUN'
@@ -156,7 +156,7 @@ C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
 C
 C   Possible future upgrades
-C   ------------------------ 
+C   ------------------------
 C
 C
 C   Author
@@ -195,7 +195,7 @@ C
       INTEGER   ENDPIX(6)          ! End of subset in pixel-talk
       LOGICAL   ERR   		   ! Flag for error array creation
       LOGICAL   FLAGBAD            ! What do we do with the drunken pixel?
-      INTEGER   I                  ! Loop counter   
+      INTEGER   I                  ! Loop counter
       INTEGER   IEPTR              ! Dynamic pointer to i/p error array
       INTEGER   IESLOT             ! Slot number for i/p error array
       INTEGER   IPTR               ! Dynamic pointer to i/p data
@@ -216,7 +216,7 @@ C
       INTEGER   OQSLOT             ! Map slot number for o/p quality array
       INTEGER   OSLOT              ! Map slot number for data array
       LOGICAL   POSDEV             ! Only count positive deviations?
-      LOGICAL   QUAL		   ! Flag for quality array creation	
+      LOGICAL   QUAL		   ! Flag for quality array creation
       INTEGER   SDPTR              ! Dynamic pointer to standard devaitions
       INTEGER   SDSLOT             ! Slot number for standard deviations
       REAL      START(6)           ! Start of subset
@@ -233,12 +233,12 @@ C
 C
 C     Initialize
 C
-      STATUS=0     
+      STATUS=0
 C
 C     Open DSA system
 C
       CALL DSA_OPEN(STATUS)
-      IF(STATUS.NE.0)GO TO 999 
+      IF(STATUS.NE.0)GO TO 999
 C
 C     Get hidden keyword(s)
 C
@@ -246,7 +246,7 @@ C
 C
       CALL PAR_RDVAL('XYWEIGHT',0.0,10.0,1.0,' ',XYWEIGHT)
 C
-C     Get image filename 
+C     Get image filename
 C
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
       IF (STATUS.NE.0) GO TO 999
@@ -273,7 +273,7 @@ C
         GO TO 999
       END IF
 C
-C     Check for strange dimensions 
+C     Check for strange dimensions
 C
       IF (DIMS(1) .GT. (DIMS(3)+DIMS(2))/2) THEN
         CALL DSA_WRUSER('%DEGAMMA-W-NOTZXY  ')
@@ -316,13 +316,13 @@ C
       CALL PAR_RDVAL('NDEVS',1.0,256.0,2.0,' ',DUMREAL)
       NSD = INT(DUMREAL)
 C
-C     Cosmic rays usually cause only positive deviations - do we count only 
+C     Cosmic rays usually cause only positive deviations - do we count only
 C     these or all deviations?
 C
       CALL PAR_RDKEY('POSDEV',.FALSE.,POSDEV)
-C          
+C
 C     Get and open OUTPUT structure
-C                              
+C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',0,1,STATUS)
       IF (STATUS .NE. 0) GO TO 999
 C
@@ -330,15 +330,15 @@ C     Do we signal duff pixels with bad quality or substitute an average?
 C
       CALL PAR_RDKEY('FLAGBAD',.FALSE.,FLAGBAD)
 C
-C     Map IMAGE and OUTPUT data arrays 
+C     Map IMAGE and OUTPUT data arrays
 C
       CALL DSA_MAP_DATA('IMAGE','READ',TYPE,ADDRESS,ISLOT,STATUS)
       IF(STATUS.NE.0)GO TO 999
-      IPTR=DYN_ELEMENT(ADDRESS)                 
+      IPTR=DYN_ELEMENT(ADDRESS)
 
       CALL DSA_MAP_DATA('OUTPUT','WRITE',TYPE,ADDRESS,OSLOT,STATUS)
       IF(STATUS.NE.0)GO TO 999
-      OPTR=DYN_ELEMENT(ADDRESS)                 
+      OPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Map and set up quality or error arrays if needed
 C
@@ -496,8 +496,8 @@ C
 
 C
 C     Set bad pixel flag if appropriate and report findings
-C     
-      IF (NBADPIX .GT. 0) THEN     
+C
+      IF (NBADPIX .GT. 0) THEN
         IF ((FLAGBAD).AND.(.NOT.QUAL).AND.(.NOT.BADPIX)) THEN
           CALL DSA_SET_FLAGGED_VALUES('OUTPUT',.TRUE.,STATUS)
           IF (VERBOSE) THEN
@@ -518,7 +518,7 @@ C
         CALL DSA_WRUSER('No suspicious pixels found.\\n')
       END IF
 
-C                                        
+C
 C     Tidy up and exit
 C
 

@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,7 +81,7 @@
  *     24-Feb-2009 (TIMJ):
  *        Support F95 BOZ "Z" prefix.
  *     26-FEB-2009 (PWD):
- *        After discussion back out of supporting Z prefix. Using a BOZ 
+ *        After discussion back out of supporting Z prefix. Using a BOZ
  *        descriptor doesn't in itself give the necessary support to
  *        assign the appropriate values for unsigned integers. That either
  *        requires a typeless BOZ, which is usually the 'X descriptor, or
@@ -126,7 +126,7 @@ char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, Council
 #endif
 
 /* Make sure that HAVE_OLD_TYPELESS_BOZ and HAVE_TYPELESS_BOZ have
-   values */ 
+   values */
 #ifndef HAVE_OLD_TYPELESS_BOZ
 #define HAVE_OLD_TYPELESS_BOZ 0
 #endif
@@ -162,7 +162,7 @@ char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, Council
 
 
 
-/* 
+/*
  * Does this look like IEEE?  IEEE has 23 binary digits in the
  * significand, not counting the suppressed leading 1, and a bias of
  * 127, and thus a FLT_MAX_EXP of 128.  VAX floats have a bias one
@@ -188,7 +188,7 @@ char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, Council
 #  include <stdint.h>
    /*
     * Assume that if stdint.h is defined, then all the required constants
-    * are defined also 
+    * are defined also
     */
 #else
    /* Avoid redefining any values */
@@ -367,7 +367,7 @@ double min_norm_d(void);
  * receive a Fortran program, which can be compiled and run to make
  * some checks on the values we generate.  The program should exit
  * with zero status if everything's OK.
- * 
+ *
  * I have gone to some lengths to try to write this out in a
  * form where they can be compared for equality, but have failed,
  * because there are just too many subtleties in integer and
@@ -628,7 +628,7 @@ int main (int argc, char **argv)
     }
 #endif /* TEST_CODE */
 
-    
+
     comment("Bad values, used for flagging undefined data.");
     par_i(+1, "VAL__BADUB",  UINT8_MAX);
     par_i(-1, "VAL__BADB",    INT8_MIN);
@@ -736,7 +736,7 @@ int main (int argc, char **argv)
     }
 
     exit(0);
-    
+
 }
 
 
@@ -769,7 +769,7 @@ void par_i(const int size, const char* name, int val)
 {
     const char *type = NULL;
     int min = 0;
-    
+
     switch (size) {
       case 1:
       case -1:
@@ -782,7 +782,7 @@ void par_i(const int size, const char* name, int val)
         min = INT16_MIN;
         break;
       case 4:
-      case -4: 
+      case -4:
         type = "INTEGER";
         min = INT32_MIN;
         break;
@@ -833,7 +833,7 @@ void par_i(const int size, const char* name, int val)
     if (TestOutput && size > 0) {
         /* Write out a test only if size is positive (indicating that
            we did write out a value for this number in hex).
-	   These aren't good tests for the unsigned numbers: when 
+	   These aren't good tests for the unsigned numbers: when
 	   constants such as VAL__BADUB are read in, they're read in
 	   as signed, but the val here is an unsigned value, so the
 	   test fails spuriously.  The answer can still be correct, though. */
@@ -922,7 +922,7 @@ const char *tolongint(Number *n)
         if (i != x)
 	    fprintf(stderr, "FAIL: tolongint: i=%lld = %s = %lld\n", i, b, x);
     }
-    
+
     return b;
 }
 #endif /* TEST_CODE */
@@ -1005,7 +1005,7 @@ void par_fp(const int size, const char* name, void* valp)
 
 #if TEST_CODE
     if (TestOutput) {
-        /* 
+        /*
          * Write out a few lines of Fortran to the test file, which
          * check that the value in varname, when parsed by the
          * configured Fortran, do in fact turn into the correct bit
@@ -1019,7 +1019,7 @@ void par_fp(const int size, const char* name, void* valp)
         const char *varname;
         const char *testint;
         const char *t;
-        
+
         if (issingle) {
             varname = "x1";
             testint = "xi";
@@ -1051,7 +1051,7 @@ void par_fp(const int size, const char* name, void* valp)
 #endif /* TEST_CODE */
 
     if (COutput) {
-        /* 
+        /*
          * The values {float,double}_precision indicate the maximum
          * number of significant figures required to represent a
          * float uniquely as a decimal.  The number of decimal places
@@ -1099,7 +1099,7 @@ const char *todaysdate(void)
 #if HAVE_TIME_H
     static char s[12];
     time_t t = time(0);
-    
+
     strftime(s, sizeof(s), "%d-%b-%Y", localtime(&t));
     return s;
 #else
@@ -1157,9 +1157,9 @@ const char* tohex(Number* p)
 }
 
 
-        
+
 #if !HAVE_NEXTAFTERF
-/* 
+/*
  * Replacement nextafter functions.  These are NOT general
  * implementations of these functions: they work only for negative
  * IEEE floats (of either endianness), and always take the next after
@@ -1261,7 +1261,7 @@ double min_norm_d(void)
 #endif
 	} ieee;
     } f;
-	
+
     f.ieee.s = 0;
     f.ieee.e = 1;
     f.ieee.m = 0;
@@ -1322,7 +1322,7 @@ void sigfpe_on_denormalized_test(void)
 void sigfpe_on_denormalized_handler(int i)
 {
     sigfpe_on_denormalized_result = 1; /* true */
-    
+
     return;
 }
 

@@ -12,15 +12,15 @@ C     This routine creates a new data array of specified type and
 C     size.  If such an array already exists, it will replace it if
 C     necessary - if the type is not that specified, or if the dimensions
 C     differ.  Note that this can be used to create a data array in a
-C     structure that does not at present have such an array, but cannot 
-C     be used to change the basic dimensions of an existing array in the 
-C     way that DSA_RESHAPE_DATA can.  If the array does exist, it should 
-C     not be mapped at the time this call is made.  The data, if any, in 
+C     structure that does not at present have such an array, but cannot
+C     be used to change the basic dimensions of an existing array in the
+C     way that DSA_RESHAPE_DATA can.  If the array does exist, it should
+C     not be mapped at the time this call is made.  The data, if any, in
 C     an existing array is maintained unless the type is changed, in which
 C     case it is lost completely.  If the data array merely changes size,
 C     then existing data will not be lost, but it will not be re-ordered
 C     in the array either, so the relation between array index values and
-C     data will change unless the only change is to the last dimension of 
+C     data will change unless the only change is to the last dimension of
 C     the array.
 C
 C  Language:
@@ -97,14 +97,14 @@ C
       CHARACTER ERROR*32              ! DTA error string - ignored
       INTEGER   IGNORE                ! Dummy status value
       INTEGER   LENGTH                ! Length of DATA_NAME
-      INTEGER   REF_SLOT              ! Reference name common slot 
+      INTEGER   REF_SLOT              ! Reference name common slot
 C
 C     Return if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
 C     Look up the reference name in the table.
-C          
+C
       CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
 C
 C     Get the DTA_ name for the data array.

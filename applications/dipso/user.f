@@ -7,7 +7,7 @@
 *     If the command can be handled then the parameter string is
 *     decoded and any modifications to the current spectrum made.
 *     The current spectrum and associated break points are assumed
-*     to be handled PROPERLY, and the argument list should be 
+*     to be handled PROPERLY, and the argument list should be
 *     reproduced exactly as given!    Any units that are OPENed
 *     should be in the range 20-29.
 *    Invocation :
@@ -39,7 +39,7 @@
 *           Y arrays.
 *     NBRK=INTEGER(UPDATE)
 *           Variable containing the number of break points stored
-*           in the BRKS array.   (The minimum legitimate value 
+*           in the BRKS array.   (The minimum legitimate value
 *           is 1 if there are any data in the X and Y arrays).
 *     TITLE*(*)=CHARACTER(UPDATE)
 *           Expression containing the title associated with
@@ -53,7 +53,7 @@
 *    Method :
 *     See if the CMD string matches one of the commands available
 *     from this routine.   If so then act accordingly.
-*     The parameter string, PARAMS, may be decoded as appropriate for 
+*     The parameter string, PARAMS, may be decoded as appropriate for
 *     the particular command.
 *     The Y array can be modified arbitrarily.   However, if the
 *     X array is modified or NPT is changed, then the break
@@ -188,7 +188,7 @@
             INDEX = NINT(VALUES(1))
             NPTS  = MAXPT
             NBRKS = MAXBRK
-            CALL GETSTK(INDEX, NPTS, X, Y, NBRKS, BRKS, TITLE, 
+            CALL GETSTK(INDEX, NPTS, X, Y, NBRKS, BRKS, TITLE,
      :      WORV, OK)
             IF (.NOT.OK) RETURN
             NPT = NPTS

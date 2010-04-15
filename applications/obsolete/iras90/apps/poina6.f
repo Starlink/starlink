@@ -1,8 +1,8 @@
-	SUBROUTINE POINA6( EXTEND, INSMPL, INSMPU, MINSMP, OUTSMP, 
+	SUBROUTINE POINA6( EXTEND, INSMPL, INSMPU, MINSMP, OUTSMP,
      :                     SINGLR, SMPLBD, SMPUBD, THSD, DATA,
      :                     ACTSMP, DETER2, MEAN, NOBAD,
      :                     NOLARG, NOSAMP, STDDEV, STATUS )
- 
+
 *+
 *  Name:
 *     POINA6
@@ -11,32 +11,32 @@
 *     To calculate the mean and variance of a set of samples, the
 *     calculation takes place iteratively rejecting any samples
 *     which are outside THSD * previous iteration standard deviation
-*     from the mean. 
+*     from the mean.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA6( EXTEND, INSMPL, INSMPU, MINSMP, OUTSMP, 
+*     CALL POINA6( EXTEND, INSMPL, INSMPU, MINSMP, OUTSMP,
 *                  SINGLR, SMPLBD, SMPUBD, THSD, DATA,
 *                  ACTSMP, DETER2, MEAN, NOBAD,
 *                  NOLARG, NOSAMP, STDDEV, STATUS )
- 
+
 
 *  Description:
 *     To calculate the mean and variance of a set of samples, the
 *     calculation takes place iteratively rejecting any samples
 *     which are outside THSD * previous iteration standard deviation
-*     from the mean. 
+*     from the mean.
 *     The calculation can be done in two modes. If SINGLR is true
 *     then the noise is calculated over a single range from OUTSMP( 1 )
 *     to OUTSMP( 1 ). If SINGLR is false then the calculation takes place
 *     over two ranges OUTSMP( 1 ) to INSMPL and INSMPU to OUTSMP( 2 ).
-*     If the argument EXTEND is true then if the number of samples 
-*     in the current iteration is less than MINSMP, the length of 
+*     If the argument EXTEND is true then if the number of samples
+*     in the current iteration is less than MINSMP, the length of
 *     samples taken is extended at either side and the range used
 *     is entered in ACTSMP. In two range mode this implies that samples
-*     outside the OUTSMP range are used but the gap in the middle (which 
+*     outside the OUTSMP range are used but the gap in the middle (which
 *     might be excluding a source) is not altered.
 *     If the argument EXTEND is false then if the number of samples
 *     is less than MINSMP an error is reported and the variable
@@ -71,14 +71,14 @@
 *        Upper limit of the sample index in the current NDF
 *     THSD = REAL (Given)
 *        Threshold of standard deviations above which sample is to be excluded
-*	 from noise calculations as an assumed source 
+*	 from noise calculations as an assumed source
 *     DATA( SMPLBD : SMPUBD ) = REAL
 *        The single dimension input data array
 *     ACTSMP( 2 ) = INTEGER (Returned)
 *        The first and last sample numbers of the actual sample range used
 *     DETER2 = LOGICAL (Returned)
-*        TRUE if there are so many bad values in the detector trace in the 
-*        region from which noise is to be calculated that a minimum number 
+*        TRUE if there are so many bad values in the detector trace in the
+*        region from which noise is to be calculated that a minimum number
 *        of samples is not reached
 *     MEAN = REAL (Returned)
 *        Mean value of the samples over which the noise is calculated
@@ -107,7 +107,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
       INTEGER INSMPL
       INTEGER INSMPU
       INTEGER MINSMP
-      INTEGER OUTSMP( 2 )  
+      INTEGER OUTSMP( 2 )
       LOGICAL SINGLR
       INTEGER SMPLBD
       INTEGER SMPUBD
@@ -180,7 +180,7 @@
 
 *  Set thew number of iterations carried out to zero
       IITER = 0
-      
+
 *  Repeat until either the iteration count is exceeded or the standard deviation
 *  does not change significantly between iterations
       DO WHILE( ( IITER .LT. NITER ) .AND.
@@ -206,25 +206,25 @@
 * Calculation of noise for this iteration
 * ************************************************************************
          DO ISMP = ACTSMP( 1 ), ACTSMP( 2 )
-      
+
 * Process samples if a single range is true or
-* if the sample number is outside the inner range limits if the single range 
+* if the sample number is outside the inner range limits if the single range
 * is false
             IF ( ( SINGLR ) .OR.
      :           ( ( ISMP .LE. INSMPL ) .OR.
      :             ( ISMP .GE. INSMPU ) ) ) THEN
-      
+
 * Determine whether the value is bad
                IF ( DATA( ISMP ) .EQ. VAL__BADR ) THEN
                   NOBAD = NOBAD + 1
-      
+
 * Or above the rejection threshold
                ELSE IF ( DATA( ISMP ) .GE. THRESH ) THEN
                   NOLARG = NOLARG + 1
 
 * Or a sample from which the noise of the next iteration should be calculated
                ELSE
-                  SUM = SUM + DATA( ISMP ) 
+                  SUM = SUM + DATA( ISMP )
                   SUMSQU = SUMSQU +
      :                     ( DATA( ISMP ) * DATA( ISMP ) )
                   NOSAMP = NOSAMP + 1
@@ -232,7 +232,7 @@
 
 * End if for inner range reject test
             END IF
-      
+
 * End do for sample loop
          END DO
 
@@ -258,12 +258,12 @@
 
 * There are sufficient samples to extend set flag to noerror
                DETER2 = .FALSE.
-      
+
 * While there are still extension samples to find alternately add extension
 * samples at either end until either it bumps into one end, or there are no
 * more to add. If it bumps into one end of the scan and there are still samples
 * to add then they are all added at the other end.
-               DO WHILE ( TOFIND .GT. 0 ) 
+               DO WHILE ( TOFIND .GT. 0 )
                   IF ( ACTSMP( 1 ) .GT. OUTSMP( 1 ) ) THEN
                       ACTSMP( 1 ) =  ACTSMP( 1 )  - 1
                       TOFIND = TOFIND - 1
@@ -272,7 +272,7 @@
      :                      .AND. ( TOFIND .GT. 0 ) ) THEN
                       ACTSMP( 2 ) =  ACTSMP( 2 ) + 1
                       TOFIND = TOFIND - 1
-                  END IF                
+                  END IF
                END DO
 
 *  If there is insuficient data in rest of scan to extend
@@ -280,15 +280,15 @@
                DETER2 = .TRUE.
                RETURN
             ENDIF
-               
+
 *  If no extend then set flag indicating lack of data and exit
          ELSE
             DETER2 = .TRUE.
             RETURN
- 
+
 *  End if for check on validity of iteration results
          END IF
-      
+
 *  End do for iteration loop
       END DO
 

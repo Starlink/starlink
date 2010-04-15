@@ -16,8 +16,8 @@
 **    GNU General Public License for more details.
 **
 **    You should have received a copy of the GNU General Public License
-**    along with this program; if not, write to the Free Software 
-**    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  
+**    along with this program; if not, write to the Free Software
+**    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 **    USA.
 **
 **  Last revision:   10 December 2002
@@ -136,7 +136,7 @@ void palSlaDeuler ( char *order, double phi, double theta, double psi,
 
 void palSlaDfltin ( char *string, int *nstrt, double *dreslt, int *jflag );
 
-void palSlaDh2e( double az, double el, double phi, double diurab, double *ha, 
+void palSlaDh2e( double az, double el, double phi, double diurab, double *ha,
                  double *dec);
 
 void palSlaDimxv ( double dm[3][3], double va[3], double vb[3] );

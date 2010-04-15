@@ -9,7 +9,7 @@ C
 C     Function:
 C        Photometry of a star on a time series image
 C
-C     Description:   
+C     Description:
 C        Measure the brightness of a star on each frame of a time
 C        series image, and generate a 2D TSP dataset containing the
 C        resulting time series photometry. The data should previously
@@ -37,7 +37,7 @@ C
 C-
 C
 C  History:
-C    26/10/1989   Original Version.   JAB/JAC 
+C    26/10/1989   Original Version.   JAB/JAC
 C    29/10/1989   Add WEIGHT option   JAB/JAC
 C    1/11/1989    Add photometry zero point  JAB/JAC
 C    20/11/1990   Remove WEIGHT option - This is now done with
@@ -58,7 +58,7 @@ C
       INTEGER PTR,NDIMS,IPTR,DIMS(3),TPTR,OTPTR,OPTR,LPTR,PPTR
       INTEGER WPTR
       REAL X,Y,RADIUS,LAMBDA,ZEROPT
-      CHARACTER*64 LABEL,UNITS      
+      CHARACTER*64 LABEL,UNITS
 
 *  Get the input file
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)

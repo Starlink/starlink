@@ -13,7 +13,7 @@
 *     CALL  KPG1_PGESC( TEXT, STATUS )
 
 *  Description:
-*     This routine removes PGPLOT escape sequences form a text string. 
+*     This routine removes PGPLOT escape sequences form a text string.
 *     Any "\" characters in the string are removed, together with the
 *     character following each "\".
 
@@ -39,7 +39,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -51,7 +51,7 @@
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( ESC = '\\' )    
+      PARAMETER( ESC = '\\' )
 
 *  Arguments Given and Returned:
       CHARACTER TEXT*(*)
@@ -70,7 +70,7 @@
 
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the index of the next character to be read.
@@ -99,7 +99,7 @@
 *  character following the esscape character.
          ELSE
             IR = IR + 1
-         END IF                  
+         END IF
 
 *  Move on to read the next character.
          IR = IR + 1

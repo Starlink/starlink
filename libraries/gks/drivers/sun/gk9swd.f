@@ -91,7 +91,7 @@
 *     30/01/91  KEVP  Made sure inQuire TeXt Facilities returns font 1 at
 *                     ALL precisions (C27).
 *     08/02/91  KEVP  In inQuire Colour Representation, got correct
-*                     REALIsed values output (S455). 
+*                     REALIsed values output (S455).
 *     13/02/91  PLP   Changed the Set Text Attributes entry, so that
 *                     expansion factor for string precision is always
 *                     1.0 (S453).
@@ -100,12 +100,12 @@
 *     22/02/91  PLP   Moved the font loading call from Set Text Attributes
 *                     to the Text entrypoint. Expanded the calling sequence
 *                     og GK9SSF to include arrays KWTYIX and KLAWKT - these
-*                     are needed to work out workstation type from the 
+*                     are needed to work out workstation type from the
 *                     workstation ID (S469).
-*     14/03/91  PLP   Of the above fix, in the end only the bit about moving 
-*                     the font loading call to the Text entrypoint turned out 
-*                     to be needed. Restored the original version of GK9SSF 
-*                     and added the call to it in the Enquire Text Extent 
+*     14/03/91  PLP   Of the above fix, in the end only the bit about moving
+*                     the font loading call to the Text entrypoint turned out
+*                     to be needed. Restored the original version of GK9SSF
+*                     and added the call to it in the Enquire Text Extent
 *                     entrypoint (needed for open but not active WS).
 *
 *  ARGUMENTS
@@ -1041,7 +1041,7 @@
 *       magnitude of the character height vector. This is needed
 *       so as to return proper values for opened but not active
 *       workstations (when no foat has been loaded and consequently
-*       no font data stored into QWKDAT and KWKDAT). 
+*       no font data stored into QWKDAT and KWKDAT).
         CALL GK9SSF(SQRT(QWCHHX(KWKIX)**2 + QWCHHY(KWKIX)**2))
 *       Baseline vector from WS Set Text Attributes entry.
         CALL GKXQXC (NID,IDAT,QWCHWX(KWKIX),QWCHWY(KWKIX),
@@ -1067,7 +1067,7 @@
                RICOL = 1.0 - 0.3*QWR1 - 0.59*QWR2 - 0.11*QWR3
              ELSE
 *              Last colour set is the one inquired - get its intensity
-               RICOL = 0.3*QWR1 + 0.59*QWR2 + 0.11*QWR3 
+               RICOL = 0.3*QWR1 + 0.59*QWR2 + 0.11*QWR3
              ENDIF
 *            Change intensity to nearest black or white
              IF(RICOL .GT. 0.5)THEN

@@ -12,7 +12,7 @@
  *     emsStat( status )
 
  *  Description:
- *     This function provides the functionality of the Error Message 
+ *     This function provides the functionality of the Error Message
  *     Service routine EMS_STAT (written in Fortran).
 
  *  Arguments:
@@ -24,23 +24,23 @@
  *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
  *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PCTR: P.C.T. Rees (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
@@ -85,7 +85,7 @@ void emsStat( int *status )
 
     /*  Check for context stack overflow. */
     if ( msgtab->msglev <= EMS__MXLEV ) {
-        
+
         /*  Find the first message in the current context. */
         if ( msgtab->msgmrk == EMS__BASE ) {
 
@@ -110,11 +110,11 @@ void emsStat( int *status )
             }
         }
     } else {
-        
+
         /* The error context stack has overflowed, so return the appropriate
          * error status. */
         *status = EMS__CXOVF;
     }
-    
+
     return;
 }

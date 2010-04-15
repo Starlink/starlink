@@ -17,7 +17,7 @@
 *  Invocation:
 *     CALL POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN, NSTATE, VAR,
 *                    TOLS, TOLZ,  MAXIT, SKYSUP, ID, IMGID, F,
-*                    ETOL, WEIGHT, IPDOU, IPVOU, EEST, ZEST, VE, VZ, DE, 
+*                    ETOL, WEIGHT, IPDOU, IPVOU, EEST, ZEST, VE, VZ, DE,
 *                    TI1, TI2, STATUS )
 
 *  Description:
@@ -108,7 +108,7 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -119,19 +119,19 @@
 *     11-SEP-1997 (TMG):
 *        Original version.
 *     16-JAN-1998 (DSB):
-*        Declaration of RE, SENSL, SENSR, SENS2L and SENS2R changed from REAL 
+*        Declaration of RE, SENSL, SENSR, SENS2L and SENS2R changed from REAL
 *        to DOUBLE PRECISION.
 *     11-MAY-1998 (DSB):
 *        Introduced lagging into the iterative estimation of the E factors
 *        to suppress instability in the process. Also, corrected the
-*        order of the arguments to CCD1_CMPRR (previously the data arrays were 
+*        order of the arguments to CCD1_CMPRR (previously the data arrays were
 *        passed the other way round, resulting in the calculated E factors
 *        being the reciprocal of the correct values).
 *     02-JUN-1998 (TMG):
 *        Correctly dimension IPDIN, IPVIN, IMGID, IPVOUT, IPDOUT. Add extra
 *        passed array ID.
 *     4-JUN-1998 (DSB):
-*        Removed 10 character restriction on image identifiers. Swapped 
+*        Removed 10 character restriction on image identifiers. Swapped
 *        order of arguments ID and IMGID to use of mapped dyanmic memory
 *        for ID.
 *     24-JUN-1998 (DSB):
@@ -139,7 +139,7 @@
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
 *     13-JUL-2009 (DSB):
-*        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs 
+*        Make WEIGHT argument REAL, not DOUBLE PRECISION. Use kaplibs
 *        CCG_MD3R instead of CCDPACK CCG1_MDR3R.
 *     31-JUL-2009 (TIMJ):
 *        Remove ILEVEL. Use MSG filtering.
@@ -161,7 +161,7 @@
 
 *  Global Variables:
 *      {include_global_variables}...
-      
+
 *  Arguments Given:
       INTEGER NEL
       INTEGER NSET
@@ -180,7 +180,7 @@
       CHARACTER * ( * ) ID( NPAIR )
       CHARACTER * ( * ) IMGID( 4, NSET )
       REAL WEIGHT( NPAIR )
-      
+
 *  Arguments Given and Returned:
       REAL EEST( NPAIR )
       REAL ZEST( NPAIR )
@@ -189,18 +189,18 @@
       REAL DE( NPAIR )
       REAL TI1( NEL, NPAIR )
       REAL TI2( NEL, NPAIR )
-      
+
 *  Arguments Returned:
       INTEGER IPDOU( 8, NSET )
       INTEGER IPVOU( 8, NSET )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
       REAL LAG                   ! The E-factor lagging coefficient
       PARAMETER ( LAG = 0.5 )
-      
+
 *  Local Variables:
       INTEGER NWRK1, NWRK2, NWRK3, NWRK4
                                  ! workspace dimensions
@@ -214,10 +214,10 @@
       INTEGER ITER               ! iteration count in convergence loop
       INTEGER NITER, NPTS        ! number of iterations and points used
                                  ! in image intercomparisons
-      REAL E                     ! local estimate of E 
+      REAL E                     ! local estimate of E
       REAL MAXDE                 ! max change in E
       REAL EMED, ZMED            ! median scale factor and zero shift
-      
+
       LOGICAL GETS, GETZ, BAD    ! logical flags
       LOGICAL CONVERGED          ! convergence flag
       LOGICAL FLUSHING           ! If we are in verbose mode and flushing
@@ -240,7 +240,7 @@
 * Determine whether errors are flushed
       FLUSHING = MSG_FLEVOK( MSG__VERB, STATUS )
 
-* Assume BAD pixel values are present in all images. 
+* Assume BAD pixel values are present in all images.
 
       BAD = .TRUE.
 
@@ -249,7 +249,7 @@
 
       GETS = .TRUE.
       GETZ = .TRUE.
-      
+
 * Size the workspace arrays for image intercomparison as necessary. See
 * CCD1_CMPRx for details.
 
@@ -296,14 +296,14 @@
          DO IPOS = 1, NPOS
             IF ( NSTATE( IPOS ) .GE. ISET ) THEN
                IPAIR = IPAIR + 1
-               
+
 * Correct the right hand image with the polarisation sensitivity factor.
 * Add the left and corrected right hand images to form a total intensity
 * image. Index the result into an array of total intensity images.
 
-               CALL POL_CALTI( NEL, 
+               CALL POL_CALTI( NEL,
      :   %VAL( CNF_PVAL( IPDIN( 2 * IPOS - 1, ISET ) ) ),
-     :                        
+     :
      :   %VAL( CNF_PVAL( IPDIN( 2 * IPOS, ISET ) ) ), F,
      :                        TI1( 1, IPAIR ), STATUS )
                ID( IPAIR ) = IMGID( IPOS, ISET )
@@ -314,7 +314,7 @@
 * Set up unit weightings and initialise the scale factor and zero level
 * estimates.
 
-      DO IPAIR = 1, NPAIR 
+      DO IPAIR = 1, NPAIR
          WEIGHT( IPAIR ) = 1.0
          EEST( IPAIR ) = 1.0
          ZEST( IPAIR ) = 0.0
@@ -329,8 +329,8 @@
 * Enter a loop to calculate E factor estimates for each image pair by
 * comparing then against an iteratively refined median total intensity
 * image. Loop until a convergence criterion is met.
-      
-      CONVERGED = .FALSE. 
+
+      CONVERGED = .FALSE.
       ITER = 0
       DO WHILE ( .NOT. CONVERGED )
 
@@ -338,33 +338,33 @@
 * Insist on at least two pixels being valid so that different images are
 * intercompared.
 
-         CALL CCG_MD3R( NEL, NPAIR, TI2, WEIGHT, 2, 
+         CALL CCG_MD3R( NEL, NPAIR, TI2, WEIGHT, 2,
      :        %VAL( CNF_PVAL( IPMED ) ),
-     :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK6 ) ), 
-     :        %VAL( CNF_PVAL( IPWRK8 ) ), %VAL( CNF_PVAL( IPWRK9 ) ), 
+     :        %VAL( CNF_PVAL( IPWRK5 ) ), %VAL( CNF_PVAL( IPWRK6 ) ),
+     :        %VAL( CNF_PVAL( IPWRK8 ) ), %VAL( CNF_PVAL( IPWRK9 ) ),
      :        %VAL( CNF_PVAL( IPWRK7 ) ), NBAD, STATUS )
-        
+
 * Loop through the intensity images to compare them with the median and
 * form estimates of the scale factors and zero shifts. Variance
 * information is not used here.
 
          DO IPAIR = 1, NPAIR
             NITER = 0
-            CALL CCD1_CMPRR( BAD, .FALSE., NEL, 
+            CALL CCD1_CMPRR( BAD, .FALSE., NEL,
      :                       %VAL( CNF_PVAL( IPMED ) ),
      :                       %VAL( CNF_PVAL( IPMED ) ), TI1( 1, IPAIR ),
      :                       TI1( 1, IPAIR ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPWRK3 ) ),
      :                       %VAL( CNF_PVAL( IPWRK4 ) ), STATUS )
 
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
 *  resulting approximate solution will probably be OK, so just annul (or
 *  flush if verbose) the error and carry on.
-            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN
                IF( FLUSHING ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
      :                       'does not matter and so is being '//
@@ -384,7 +384,7 @@
 
 * Instabilty can occur in this iterative process, for instance causing E
 * values to oscillate between two values. This prevents convergence. To
-* overcome this, do not allow the E factor to change quickly. This is 
+* overcome this, do not allow the E factor to change quickly. This is
 * achieved by lagging the estimate of E found above with some faction of
 * the previous estimate. Also not the resulting change in E factor, and
 * save the estimate.
@@ -409,7 +409,7 @@
 * If an error has occurred then abort.
 
          IF ( STATUS .NE. SAI__OK ) GO TO 99
-         
+
 * If we have more than one estimate of the E factor, calculate the
 * maximum E factor change on this iteration.
 
@@ -433,7 +433,7 @@
             EEST( IPAIR ) = EEST( IPAIR ) / EMED
             ZEST( IPAIR ) = ZEST( IPAIR ) / ZMED
          ENDDO
-         
+
 * If at least two iterations have been performed and the maximum change
 * in the E factor estimate on the last iteration was within the
 * specified tolerance then the iteration has converged.
@@ -497,7 +497,7 @@
      :        ITER
          CALL MSG_OUTIF( MSG__VERB, ' ', STRING, STATUS )
       ENDIF
-         
+
       IF ( CONVERGED ) THEN
          WRITE( STRING, '( 3X, ''Image       E-factor'' )' )
          CALL MSG_OUT( ' ', STRING, STATUS )
@@ -517,7 +517,7 @@
       END IF
 
       CALL MSG_BLANK( STATUS )
-         
+
 * Loop through the input images again to apply the left and right
 * channel sensitivity factors to the input data and put the result in
 * the output data workspace.
@@ -530,13 +530,13 @@
                SENSL = 1.0D0 / DBLE( EEST( IPAIR ) )
                SENSR = SENSL / DBLE( F )
                CALL CCG1_CMLTR( BAD, NEL,
-     :              %VAL( CNF_PVAL( IPDIN( 2 * IPOS - 1, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPDIN( 2 * IPOS - 1, ISET ) ) ),
      :              SENSL,
-     :              %VAL( CNF_PVAL( IPDOU( 2 * IPOS - 1, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPDOU( 2 * IPOS - 1, ISET ) ) ),
      :              NERR, STATUS )
                CALL CCG1_CMLTR( BAD, NEL,
      :              %VAL( CNF_PVAL( IPDIN( 2 * IPOS, ISET ) ) ), SENSR,
-     :              %VAL( CNF_PVAL( IPDOU( 2 * IPOS, ISET ) ) ), 
+     :              %VAL( CNF_PVAL( IPDOU( 2 * IPOS, ISET ) ) ),
      :              NERR, STATUS )
 
 * If variance information is present then scale it with the
@@ -547,17 +547,17 @@
                   SENS2L = SENSL * SENSL
                   SENS2R = SENSR * SENSR
                   CALL CCG1_CMLTR( BAD, NEL,
-     :                 %VAL( CNF_PVAL( IPVIN( 2 * IPOS - 1, ISET ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN( 2 * IPOS - 1, ISET ) ) ),
      :                 SENS2L,
-     :                 %VAL( CNF_PVAL( IPVOU( 2 * IPOS - 1, ISET ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVOU( 2 * IPOS - 1, ISET ) ) ),
      :                 NERR,
      :                 STATUS )
                   CALL CCG1_CMLTR( BAD, NEL,
-     :                 %VAL( CNF_PVAL( IPVIN( 2 * IPOS, ISET ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN( 2 * IPOS, ISET ) ) ),
      :                 SENS2R,
-     :                 %VAL( CNF_PVAL( IPVOU( 2 * IPOS, ISET ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVOU( 2 * IPOS, ISET ) ) ),
      :                 NERR, STATUS )
-               ENDIF                  
+               ENDIF
             ENDIF
          ENDDO
       ENDDO
@@ -574,7 +574,7 @@
       CALL PSX_FREE( IPWRK7, STATUS )
       CALL PSX_FREE( IPWRK8, STATUS )
       CALL PSX_FREE( IPWRK9, STATUS )
-      
+
 * Exit routine.
 
  99   CONTINUE

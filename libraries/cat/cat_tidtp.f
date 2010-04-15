@@ -16,7 +16,7 @@
 *     GI  =  INTEGER (Given)
 *        Identifier to a component.
 *     IDTYP  =  INTEGER (Returned)
-*        Type of the identifier, coded according to the following 
+*        Type of the identifier, coded according to the following
 *        scheme:
 *        CAT__CITYP - catalogue,
 *        CAT__FITYP - column (or field),
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -55,7 +55,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     7/3/95  (ACD): Re-written, utilising the fact that the identifier
 *       can be used as an array index.
-*     19/9/99 (ACD): Moved determining the type of the component to 
+*     19/9/99 (ACD): Moved determining the type of the component to
 *       another, internal, routine, leaving just the error reporting
 *       in this one.
 *  Bugs:

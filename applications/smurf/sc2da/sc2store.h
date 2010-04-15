@@ -59,9 +59,9 @@
 */
 
 #ifndef HEADGEN___src_sc2store_sc2store_h
-#define HEADGEN___src_sc2store_sc2store_h 
+#define HEADGEN___src_sc2store_sc2store_h
 
- 
+
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"
 

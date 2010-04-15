@@ -73,7 +73,7 @@ C
             IF (STATUS.NE.0) GO TO 600
          END IF
       END DO
-      IF ((.NOT.NOSWAP).AND.FPTRI.GT.1) 
+      IF ((.NOT.NOSWAP).AND.FPTRI.GT.1)
      :         CALL GEN_WBSWAP(FBUFFI(FPTRO),FPTRI-FPTRO)
       FPTR=(FPTRI-1)*4+1
 C

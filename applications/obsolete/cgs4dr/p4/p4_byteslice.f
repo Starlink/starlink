@@ -77,6 +77,6 @@
                OUT (I) = IN (SLICE,I)
             END DO
          ENDIF
-      ENDIF   
+      ENDIF
 
       END

@@ -16,7 +16,7 @@ jmp_buf CupidGCHere;
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    used to communicate with the service functions cupidGCcalcf and
    cupidGCcalcg called by the PDA minimisation function. The contents of
    this structure are initialised in cupidSetInit. */
@@ -38,28 +38,28 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                               void *ipd, double *ipv, double rms, 
+*     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd,
+*                               void *ipd, double *ipv, double rms,
 *                               AstKeyMap *config, int velax,
 *                               double beamcorr[ 3 ], int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
-*     array using the GAUSSCLUMPS algorithm, described by Stutski & Gusten 
-*     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
-*     profile to the brightest peak in the data. It then subtracts the fit 
-*     from the data and iterates, fitting a new ellipse to the brightest peak 
+*     array using the GAUSSCLUMPS algorithm, described by Stutski & Gusten
+*     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian
+*     profile to the brightest peak in the data. It then subtracts the fit
+*     from the data and iterates, fitting a new ellipse to the brightest peak
 *     in the residuals. This continues until a termination criterion is
 *     reached. The main termination criterion in this implementation is
 *     not quite the same as in the Stutski & Gusten paper. They had two main
 *     termination criteria; 1) the total data sum of the fitted gaussians
 *     is close to the total data sum of the original data, and 2) the peak
 *     residual is less than a given multiple of the RMS noise in the data.
-*     However, 1) is very sensitive to errors in the estimation of the 
+*     However, 1) is very sensitive to errors in the estimation of the
 *     background level in the data, and 2) may never be achieved because
 *     the expected residuals depend not only on the RMS noise in the data
 *     but also on how accurately gaussian the clumps are, which is not
-*     known. Therefore, this implementation instead terminates when the 
+*     known. Therefore, this implementation instead terminates when the
 *     peak amplitude of the fitted clumps falls below a given fraction of
 *     the first (i.e. largest) fitted peak.
 *
@@ -70,7 +70,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Parameters:
 *     type
-*        An integer identifying the data type of the array values pointed to 
+*        An integer identifying the data type of the array values pointed to
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
 *        cupid.h).
 *     ndim
@@ -86,7 +86,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Fortran order. The data type of this array is given by "itype".
 *     ipv
 *        Pointer to the input Variance array, or NULL if there is no Variance
-*        array. The elements should be stored in Fortran order. The data 
+*        array. The elements should be stored in Fortran order. The data
 *        type of this array is "double".
 *     rms
 *        The default value for the global RMS error in the data array.
@@ -94,7 +94,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
-*        used if "ndim" is 3. 
+*        used if "ndim" is 3.
 *     beamcorr
 *        An array in which is returned the FWHM (in pixels) describing the
 *        instrumental smoothing along each pixel axis. The clump widths
@@ -105,17 +105,17 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
-*     implementation of GaussClumps obtained on 27/9/05 from 
+*     implementation of GaussClumps obtained on 27/9/05 from
 *     ftp.astro.uni-bonn.de/pub/heith/gaussclumps.
 *     - Most of the "cupid..." functions used in this file which start
 *     with a "type" parameter (e.g. cupidFindMax, cupidUpdateArrays, etc) are
 *     actually not functions at all, but macros defined in cupid.h. These
-*     macros are wrappers which invoke a type-specific function (e.g. 
-*     cupidFindMaxD, cupidFindMaxF) appropriate to the specific data type 
-*     being used (as indicated by the "type" parameter). Macros are used in 
-*     order to simplify the code here, and thus make the flow of the 
+*     macros are wrappers which invoke a type-specific function (e.g.
+*     cupidFindMaxD, cupidFindMaxF) appropriate to the specific data type
+*     being used (as indicated by the "type" parameter). Macros are used in
+*     order to simplify the code here, and thus make the flow of the
 *     algorithm clearer. The source code for the type-specific functions
-*     are generated automatically at build time from equivalent files which 
+*     are generated automatically at build time from equivalent files which
 *     have file type ".cupid". For instance, the files cupidfindmaxD.c and
 *     cupidfindmaxF.c are generated automatically from cupidfindmax.cupid.
 *     Also, the rlevant macros definitions and prototypes within cupid.h
@@ -123,9 +123,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
-*     Each NDF will hold the data values associated with a single clump and 
-*     will be the smallest possible NDF that completely contains the 
-*     corresponding clump. Pixels not in the clump will be set bad. The 
+*     Each NDF will hold the data values associated with a single clump and
+*     will be the smallest possible NDF that completely contains the
+*     corresponding clump. Pixels not in the clump will be set bad. The
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Copyright:
@@ -231,14 +231,14 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "GAUSSCLUMPS", (AstObject *) &gcconfig ) ) {     
+   if( !astMapGet0A( config, "GAUSSCLUMPS", (AstObject *) &gcconfig ) ) {
       gcconfig = astKeyMap( " " );
       astMapPut0A( config, "GAUSSCLUMPS", gcconfig, " " );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
    case the "config" KeyMap may contain values which should really be in
-   the "gcconfig" KeyMap. Add a copy of the "config" KeyMap into "gcconfig" 
+   the "gcconfig" KeyMap. Add a copy of the "config" KeyMap into "gcconfig"
    so that it can be searched for any value which cannot be found in the
    "gcconfig" KeyMap. */
    astMapPut0A( gcconfig, CUPID__CONFIG, astCopy( config ), NULL );
@@ -273,8 +273,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    rms = cupidConfigD( gcconfig, "RMS", rms, status );
 
 /* Find the size of each dimension of the data array, and the total number
-   of elements in the array. We use the memory management functions of the 
-   AST library since they provide greater security and functionality than 
+   of elements in the array. We use the memory management functions of the
+   AST library since they provide greater security and functionality than
    direct use of malloc, etc. */
    dims = astMalloc( sizeof( *dims )*(size_t) ndim );
    el = 1;
@@ -309,7 +309,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Initialise the number of clumps found so far. */
       iclump = 0;
 
-/* Indicate that no peaks have been found below the lower threshold for clump 
+/* Indicate that no peaks have been found below the lower threshold for clump
    peak values, or below the lower area threshold. */
       peaks_below = 0;
       area_below = 0;
@@ -334,7 +334,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Use the setjmp function to define here to be the place to which the
    signal handling function will jump when a signal is detected. Zero is
    returned on the first invocation of setjmp. If a signal is detected,
-   a jump is made into setjmp which then returns a positive signal 
+   a jump is made into setjmp which then returns a positive signal
    identifier. */
          if( setjmp( CupidGCHere ) ) {
             iter = 0;
@@ -355,22 +355,22 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       while( iter && *status == SAI__OK ) {
 
 /* Report the iteration number to the user if required. */
-         ++niter;         
+         ++niter;
          msgBlankif( MSG__DEBUG1, status );
          msgOutiff( MSG__DEBUG1, "", "Iteration %d:", status, niter );
 
-/* Find the 1D vector index of the elements with the largest value in the 
+/* Find the 1D vector index of the elements with the largest value in the
    residuals array. */
          allbad = cupidGCFindMax( type, res, el, &imax, &sumdata, status );
 
-/* Finish iterating if all the residuals are bad, or if too many iterations 
+/* Finish iterating if all the residuals are bad, or if too many iterations
    have been performed since the last succesfully fitted clump. */
-         if( allbad ) {    
+         if( allbad ) {
             iter = 0;
             niter--;
             msgBlankif( MSG__DEBUG, status );
             msgOutif( MSG__DEBUG1, "",
-                      "There are no good pixels left to be fitted.", 
+                      "There are no good pixels left to be fitted.",
                       status );
             msgBlankif( MSG__DEBUG1, status );
          } else if( nskip > maxskip ){
@@ -388,20 +388,20 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
                             ( niter == 1 ), velax, x, slbnd, status );
 
-/* Find the best fitting parameters, starting from the above initial guess. 
+/* Find the best fitting parameters, starting from the above initial guess.
    This returns a function value of zero if no fit could be performed. */
             if( cupidGCFit( type, res, imax, x, &chisq, status ) ) {
 
 /* Skip this fit if we have an estimate of the standard deviation of the
    "npeak" most recent clump peak values, and the peak value of the clump
-   just fitted is a long way (more than NSIGMA standard deviations) from the 
+   just fitted is a long way (more than NSIGMA standard deviations) from the
    peak value of the previously fitted clump. Also skip it if the peak
    value is less than the "mlim" value. */
-               if( ( npeak == 0 || iclump < npeak || 
+               if( ( npeak == 0 || iclump < npeak ||
                      fabs( x[ 0 ] - new_peak ) < nsig*sigma_peak ) &&
                     x[ 0 ] > mlim ) {
 
-/* Record the new peak value for use with the next peak, and update the 
+/* Record the new peak value for use with the next peak, and update the
    standard deviation of the "npeak" most recent peaks. These values are
    stored cyclically in the "peaks" array. */
                   if( npeak > 0 ) {
@@ -425,10 +425,10 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Remove the model fit (excluding the background) from the residuals
    array. This also creates an NDF containing the data values associated
    with the clump. This NDF is stored in the HDS array of NDFs in the
-   returned HDS object. The standard deviation of the new residuals is 
+   returned HDS object. The standard deviation of the new residuals is
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
-                                       x, rms, mlim, imax, slbnd,    
+                                       x, rms, mlim, imax, slbnd,
                                        &ret, iclump, excols, mean_peak,
                                        maxbad, &area, &sumclumps, status );
 
@@ -479,15 +479,15 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      msgOutiff( MSG__DEBUG1,"",
                                 "The total data sum of the fitted "
                                 "Gaussians (%g) has reached the total "
-                                "data sum in the supplied data (%g).", 
+                                "data sum in the supplied data (%g).",
                                 status, (float)sumclumps, (float)sumdata );
                      msgBlankif( MSG__DEBUG1, status );
-                  
+
 /* If the count of consecutive peaks below the threshold has reached
    "Npad", terminate. */
                   } else if( peaks_below == npad ) {
                      iter = 0;
- 
+
                      msgBlankif( MSG__DEBUG, status );
                      msgOutiff( MSG__DEBUG1, "",
                                 "The previous %d clumps all had peak "
@@ -499,7 +499,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    "Npad", terminate. */
                   } else if( area_below == npad ) {
                      iter = 0;
- 
+
                      msgBlankif( MSG__DEBUG, status );
                      msgOutiff( MSG__DEBUG1, "",
                                 "The previous %d clumps all had areas "
@@ -530,8 +530,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                nskip++;
                msgOutif( MSG__DEBUG1, "", "   No clump fitted.", status );
 
-/* Set the specified element of the residuals array bad if no fit was 
-   performed. This prevents the any subsequent attempt to fit a Gaussian 
+/* Set the specified element of the residuals array bad if no fit was
+   performed. This prevents the any subsequent attempt to fit a Gaussian
    to the same peak value.*/
                if( type == CUPID__DOUBLE ) {
                   ((double *)res)[ imax ] = VAL__BADD;
@@ -557,7 +557,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
       if( nclump == 0 ) msgOutif( MSG__NORM, "", "No usable clumps found.", status );
-   
+
       if( iclump - nclump == 1 ) {
         msgOutif( MSG__NORM, "",
                   "1 clump rejected because it touches an edge of "
@@ -583,9 +583,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
    }
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration 
-   parameters for this algorithm. This prevents the values in the secondary 
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is 
+/* Remove the secondary KeyMap added to the KeyMap containing configuration
+   parameters for this algorithm. This prevents the values in the secondary
+   KeyMap being written out to the CUPID extension when cupidStoreConfig is
    called. */
    astMapRemove( gcconfig, CUPID__CONFIG );
 
@@ -609,17 +609,17 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 }
 
 void cupidGCHandler( int sig ){
-/* 
+/*
 *  Name:
 *     cupidGCHandler
 
 *  Purpose:
 *     Called when an interupt occurs within GaussClumps.
- 
+
 *  Description:
 *     This function is called when an interupt signal is detected during
-*     execution of the GaussClumps algorithm. It just jumps back to the 
-*     location defined by the global variable "CupidGCHere", returning the 
+*     execution of the GaussClumps algorithm. It just jumps back to the
+*     location defined by the global variable "CupidGCHere", returning the
 *     signal value.
 */
    longjmp( CupidGCHere, sig );

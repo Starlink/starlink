@@ -6,7 +6,7 @@ C--------------------------------------------------------------------------
 
       SUBROUTINE PPAIR(P,IPTS,NCH,XSCALE,IFAIL)
 
-C   Routine to get ordered pair of data points in P corresponding to 
+C   Routine to get ordered pair of data points in P corresponding to
 C   points in IPTS(1) and IPTS(2)
 
       REAL*4  P(2),XSCALE(*)

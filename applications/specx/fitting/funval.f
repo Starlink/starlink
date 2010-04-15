@@ -68,7 +68,7 @@ C
       YHAT=0.0
 C
 C ****FIRST THE POLYNOMIAL TERM
-C 
+C
       XP=1.
       DO 20 J=1,NP1
       YHAT=YHAT+VAR(J)*XP

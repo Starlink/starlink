@@ -85,14 +85,14 @@
 
 *       create the new IMAGE type structure
 
-         CALL NDF_CREAT( PARNAM, '_REAL', NDIM, LBND, DIMS, LOCAT, 
+         CALL NDF_CREAT( PARNAM, '_REAL', NDIM, LBND, DIMS, LOCAT,
      :                   STATUS )
 
 *       check for error
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          create the TITLE component and write TITLE to it
-*          A null value will be interpreted as 
+*          A null value will be interpreted as
 *          'don't change value', status will not be set
 
             CALL NDF_CINP( TLENAM, LOCAT, 'TITLE', STATUS )

@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -221,7 +221,7 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then return a null locator.
       IF ( STATUS .NE. SAI__OK ) THEN
          LOC2 = DAT__NOLOC

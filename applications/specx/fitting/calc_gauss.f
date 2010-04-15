@@ -47,7 +47,7 @@ C     Find out which lines to use:
       ISTAT = 0
       DO WHILE (ISTAT.NE.2)
          IF (LIMITS(1).EQ.0) LIMITS(1) = 1
-         CALL GEN_GETI4A 
+         CALL GEN_GETI4A
      &        ('Line or range of lines to model? (EOF to finish)',
      &          LIMITS, 2, 'I2'',''I2', LIMITS, ISTAT)
          IF (ISTAT.LT.0) THEN
@@ -65,7 +65,7 @@ C     Find out which lines to use:
                  POS = PARAM(3*I)
                  IF (WID.GT.0.0 .AND. AMP.NE.0.0) THEN
                    DO N = NTOT(NQ-1)+1,NTOT(NQ)
-                     DATA(N) = DATA(N) 
+                     DATA(N) = DATA(N)
      &                         + AMP * EXP(-((XSCALE(N)-POS)/WID)**2)
                    END DO  ! channels
                  END IF

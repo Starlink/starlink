@@ -15,7 +15,7 @@
 *  Description:
 *     This routine interprets the characters in LINE to see if they
 *     represent a valid restoration statement for the CCDSETUP
-*     application. Valid statements may have two formats: a line 
+*     application. Valid statements may have two formats: a line
 *     giving the value of a keyed parameter is of the form:
 *
 *        KEY PARAM VALUE
@@ -29,7 +29,7 @@
 *
 *     If the input line is valid then an attempt to set
 *     a dynamic default for that parameter is made, and a keyed value
-*     will also be written into the keyed part of the GLOBAL ADAM 
+*     will also be written into the keyed part of the GLOBAL ADAM
 *     parameter file where it can be accessed by CCD1_KPLD. The calling
 *     application must then take appropriate action if this value is to
 *     be used (by setting the VPATH and/or PPATH in the application
@@ -46,7 +46,7 @@
 *        True if parameter setup is currently being done for a single
 *        Set Index value.
 *     SINDEX = INTEGER (Given)
-*        The Set Index value for which parameters are currently being 
+*        The Set Index value for which parameters are currently being
 *        set up.  Only used when BYSET is true.
 *     SLOC = CHARACTER * ( * ) (Given)
 *        An HDS locator for the HDS structure in which to store keyed
@@ -175,7 +175,7 @@
       IF ( NOTFND ) THEN
 
 *  No text.  Report this and exit.
-         STATUS = SAI__ERROR 
+         STATUS = SAI__ERROR
          STATE = '  Invalid restore file line. No text '
          GO TO 99
       END IF
@@ -202,9 +202,9 @@
          CALL ERR_RLSE
       END IF
 
-*  Decide whether we will wish to set the dynamic default for the 
+*  Decide whether we will wish to set the dynamic default for the
 *  variable in question.  We wish to do this if parameter setup is
-*  not being done by Set Index and this line does not have a key, 
+*  not being done by Set Index and this line does not have a key,
 *  or if setup is being done by Set Index and this line has a key
 *  which matches the Set Index for which it is being done.
       SETDEF = ( .NOT. BYSET .AND. .NOT. KEYED )
@@ -226,7 +226,7 @@
          END IF
 
 *  Write the value to the keyed parameter structure if the line is keyed.
-         IF ( KEYED ) 
+         IF ( KEYED )
      :      CALL CCG1_KPPTC( 'MASK', 0, 0, LINE1( FIRST : LAST ), KEY,
      :                       SLOC, STATUS )
 
@@ -258,7 +258,7 @@
          END IF
 
 *  Write the value to the keyed parameter structure if the line is keyed.
-         IF ( KEYED ) 
+         IF ( KEYED )
      :      CALL CCG1_KPPTD( 'ADC', 0, 0, DVALUE, KEY, SLOC, STATUS )
 
 *  Set the dynamic default if required.
@@ -289,7 +289,7 @@
          END IF
 
 *  Write out the value.
-         IF ( KEYED ) 
+         IF ( KEYED )
      :      CALL CCG1_KPPTD( 'RNOISE', 0, 0, DVALUE, KEY, SLOC, STATUS )
 
 *  Set the default value if required.

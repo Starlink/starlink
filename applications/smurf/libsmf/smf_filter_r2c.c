@@ -26,7 +26,7 @@
 *  Description: This function checks for the existence, and data type
 *     of filt. If it is real, it is converted to complex, and the old
 *     (real) values of the filter are preserved. If the buffer data
-*     type is already complex nothing is done. If the buffer, or the 
+*     type is already complex nothing is done. If the buffer, or the
 *     smfFilter are NULL, an error is generated.
 
 *  Notes:
@@ -89,12 +89,12 @@ void smf_filter_r2c( smfFilter *filt, int *status ) {
     errRep( FUNC_NAME, "NULL smfFilter supplied.", status );
     return;
   }
-  
+
   if( !filt->real ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "smfFilter contains a NULL buffer", status );
   }
-  
+
   if( filt->isComplex ) return;
 
   /* Allocate space for the imaginary part */
@@ -102,5 +102,5 @@ void smf_filter_r2c( smfFilter *filt, int *status ) {
 
   if( *status == SAI__OK ) {
     filt->isComplex = 1;
-  }   
+  }
 }

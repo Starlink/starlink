@@ -93,7 +93,7 @@
       INTEGER ESLT                            ! Error array
       INTEGER EPTR
       INTEGER TD_SLOT                         ! Temporary data
-      INTEGER TD_PTR 
+      INTEGER TD_PTR
       INTEGER TE_SLOT                         ! Temporary errors
       INTEGER TE_PTR
       INTEGER TQ_SLOT                         ! Temporary quality
@@ -103,12 +103,12 @@
       INTEGER C_SLOT                          ! Temporary counter workspace
       INTEGER C_PTR
       INTEGER BYTES                           ! Size of temporary data array
-      INTEGER DATAQUAL                        ! 0 if data value returned is 
+      INTEGER DATAQUAL                        ! 0 if data value returned is
 *                                             !  valid
       INTEGER IPOS, JPOS                      ! Array coords of specified data
 *                                             !  point
       INTEGER MASK_X, MASK_Y                  ! Array coordinates of the
-*                                             !  equivalent point in a 
+*                                             !  equivalent point in a
 *                                             !  bad pixel mask.
       INTEGER SUPERSAMPLING                   ! "Supersampling" factor
       INTEGER OVERSAMPLING                    ! "Oversampling" factor
@@ -116,7 +116,7 @@
       INTEGER DET_NINCR                       ! Number of detector increments
       REAL DET_INCR                           ! The detector increment in pixels.
       REAL X, Y                               ! cursor position
-      REAL ACT_X, ACT_Y                       ! actual position of datum 
+      REAL ACT_X, ACT_Y                       ! actual position of datum
       REAL DATAVAL                            ! data value at cursor position
       REAL DATAERR                            ! error value at cursor position
       CHARACTER*4
@@ -136,19 +136,19 @@
 *    Check that the port is open
       CALL P4_CHECK_PORT( PORT, STATUS )
 
-*    Get the keystroke 
+*    Get the keystroke
       CALL P4_GET_CURSOR( PORT, STATUS )
       CALL PAR_GET0R( 'X', X, STATUS )
       CALL PAR_GET0R( 'Y', Y, STATUS )
 
 *    Now map in the data, error and quality arrays (if present)
       CALL DSA_OPEN( STATUS )
-      CALL P4_CHECK_INPUT( DISPLAY_DATA( PORT ), STATUS ) 
+      CALL P4_CHECK_INPUT( DISPLAY_DATA( PORT ), STATUS )
       CALL DSA_NAMED_INPUT ('DATA', DISPLAY_DATA( PORT ), STATUS )
 
 *    Determine the value of DCOLUMNS
       DCOLUMNS = 62
-      CALL DSA_SEEK_FITS( 'DATA', 'DCOLUMNS', EXIST, 
+      CALL DSA_SEEK_FITS( 'DATA', 'DCOLUMNS', EXIST,
      :  ACCESS, ELEMENTS, STRLEN, STATUS )
       IF ( EXIST ) CALL DSA_GET_FITS_I( 'DATA', 'DCOLUMNS', 0,
      :  DCOLUMNS, COMMENT, STATUS )
@@ -189,12 +189,12 @@
       IF ( ERRORS ) THEN
         CALL DSA_MAP_ERRORS( 'DATA', 'READ', 'FLOAT', EPTR, ESLT, STATUS )
       ENDIF
-       
-*    Map axis data           
-      CALL DSA_MAP_AXIS_DATA( 'DATA', 1, 'READ', 
+
+*    Map axis data
+      CALL DSA_MAP_AXIS_DATA( 'DATA', 1, 'READ',
      :  'FLOAT', A1PTR, A1SLT, STATUS )
       IF ( NDIM .GE. 1 ) THEN
-        CALL DSA_MAP_AXIS_DATA( 'DATA', 2, 'READ', 
+        CALL DSA_MAP_AXIS_DATA( 'DATA', 2, 'READ',
      :                 'FLOAT', A2PTR, A2SLT, STATUS )
       ELSE
         DIMS(2) = 1
@@ -211,7 +211,7 @@
 
 *    Further treatment depends on type of display involved
       IF ( DISPLAY_TYPE( PORT ) .EQ. 'IMAGE' ) THEN
- 
+
 *      Simply copy pointers, since data is already in desired format
         TD_PTR = DPTR
         TE_PTR = EPTR
@@ -220,16 +220,16 @@
         A2_PTR = A2PTR
       ELSE IF ( DISPLAY_TYPE( PORT ) .EQ. 'GRAPH' ) THEN
 
-*      Get a work array, and copy into it the slice of data 
+*      Get a work array, and copy into it the slice of data
         IF ( NDIM .EQ. 1 ) THEN
 
-*        Already have data in suitable form, just set the pointers 
+*        Already have data in suitable form, just set the pointers
           TD_PTR = DPTR
           TE_PTR = EPTR
           TQ_PTR = QPTR
           A1_PTR = A1PTR
           A2_PTR = 0
-        ELSE IF ( ( NDIM .EQ. 2 ) .AND. 
+        ELSE IF ( ( NDIM .EQ. 2 ) .AND.
      :            ( CUT_DIRECTION( PORT ) .EQ. 'X' ) ) THEN
 
 *        A cut in X through a 2d array.
@@ -238,15 +238,15 @@
 
 *        If necessary, get some workspace for the slice quality and errors.
           TQ_PTR = 0
-          IF ( QUALITY ) 
+          IF ( QUALITY )
      :      CALL DSA_GET_WORKSPACE (DIMS(1), TQ_PTR, TQ_SLOT, STATUS )
 
           TE_PTR = 0
-          IF ( ERRORS ) 
+          IF ( ERRORS )
      :      CALL DSA_GET_WORKSPACE (BYTES, TE_PTR, TE_SLOT, STATUS )
 
 *        If the start and end positions are the same, we have a single slice
-          IF (  NINT( SLICE_START( PORT ) ) .EQ. 
+          IF (  NINT( SLICE_START( PORT ) ) .EQ.
      :          NINT( SLICE_END( PORT ) ) ) THEN
             CALL P4_SLICE( DIMS( 1 ), DIMS( 2 ), %val( DPTR ), 'X',
      :        NINT( SLICE_START( PORT ) ), %val( TD_PTR ), STATUS )
@@ -266,15 +266,15 @@
             CALL DSA_GET_WORKSPACE( BYTES, C_PTR, C_SLOT, STATUS )
 
 *          Average together the required slices from the data array.
-            CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( DPTR ), 
-     :        %val( QPTR ), QUALITY, 'X', NINT( SLICE_START( PORT ) ), 
-     :        NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TD_PTR ), 
+            CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( DPTR ),
+     :        %val( QPTR ), QUALITY, 'X', NINT( SLICE_START( PORT ) ),
+     :        NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TD_PTR ),
      :        %val( TQ_PTR ), STATUS )
 
             IF ( ERRORS ) THEN
-              CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( EPTR ), 
-     :          %val( QPTR ), QUALITY, 'X', NINT( SLICE_START( PORT ) ), 
-     :          NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TE_PTR ), 
+              CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( EPTR ),
+     :          %val( QPTR ), QUALITY, 'X', NINT( SLICE_START( PORT ) ),
+     :          NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TE_PTR ),
      :          %val( TQ_PTR ), STATUS )
             ENDIF
           ENDIF
@@ -286,7 +286,7 @@
 *        Change dimensions to show P4_FINDVAL that we're looking at a 1-d array
           NDIM = 1
           DIMS( 2 ) = 1
-        ELSE IF ( ( NDIM .EQ. 2 ) .AND. 
+        ELSE IF ( ( NDIM .EQ. 2 ) .AND.
      :            ( CUT_DIRECTION( PORT ) .EQ. 'Y' ) ) THEN
 
 *        A cut in Y through a 2d array.
@@ -294,15 +294,15 @@
           CALL DSA_GET_WORKSPACE( BYTES, TD_PTR, TD_SLOT, STATUS )
 
           TQ_PTR = 0
-          IF ( QUALITY ) 
+          IF ( QUALITY )
      :      CALL DSA_GET_WORKSPACE( DIMS( 2 ), TQ_PTR, TQ_SLOT, STATUS )
 
           TE_PTR = 0
-          IF ( ERRORS ) 
+          IF ( ERRORS )
      :      CALL DSA_GET_WORKSPACE( BYTES, TE_PTR, TE_SLOT, STATUS )
 
 *        If the start and end positions are the same, we have a single slice
-          IF ( NINT( SLICE_START( PORT ) ) .EQ. 
+          IF ( NINT( SLICE_START( PORT ) ) .EQ.
      :         NINT( SLICE_END( PORT ) ) ) THEN
             CALL P4_SLICE( DIMS( 1 ), DIMS( 2 ), %val( DPTR ), 'Y',
      :        NINT( SLICE_START( PORT ) ), %val( TD_PTR ), STATUS )
@@ -322,15 +322,15 @@
             CALL DSA_GET_WORKSPACE( BYTES, C_PTR, C_SLOT, STATUS )
 
 *          Average together the required slices from the data array.
-            CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( DPTR ), 
-     :        %val( QPTR ), QUALITY, 'Y', NINT( SLICE_START( PORT ) ), 
-     :        NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TD_PTR ), 
+            CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( DPTR ),
+     :        %val( QPTR ), QUALITY, 'Y', NINT( SLICE_START( PORT ) ),
+     :        NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TD_PTR ),
      :        %val( TQ_PTR ), STATUS )
 
             IF ( ERRORS ) THEN
-              CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( EPTR ), 
-     :          %val( QPTR ), QUALITY, 'Y',  NINT( SLICE_START( PORT ) ), 
-     :          NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TE_PTR ), 
+              CALL P4_EXTRACT( DIMS( 1 ), DIMS( 2 ), %val( EPTR ),
+     :          %val( QPTR ), QUALITY, 'Y',  NINT( SLICE_START( PORT ) ),
+     :          NINT( SLICE_END( PORT ) ), %val( C_PTR ), %val( TE_PTR ),
      :          %val( TQ_PTR ), STATUS )
             ENDIF
           ENDIF
@@ -363,14 +363,14 @@
         OUTSIDE = .FALSE.
 
 *      Find data value at position of cursor X,Y
-        CALL P4_FINDVAL( X, Y, %val( A1_PTR ), %val( A2_PTR ), 
+        CALL P4_FINDVAL( X, Y, %val( A1_PTR ), %val( A2_PTR ),
      :    %val( TD_PTR ), %val( TE_PTR ), %val( TQ_PTR ),
-     :    NDIM, DIMS( 1 ), DIMS( 2 ), ERRORS, QUALITY, DATAVAL, 
+     :    NDIM, DIMS( 1 ), DIMS( 2 ), ERRORS, QUALITY, DATAVAL,
      :    DATAERR, DATAQUAL, ACT_X, ACT_Y, IPOS, JPOS, STATUS )
 
 *      Determine the mask co-ords from the array co-ords and the oversampling
         IF ( OVERSAMPLING .GT. 1 ) THEN
-          MASK_X = ( IPOS + OVERSAMPLING - 1 ) / OVERSAMPLING 
+          MASK_X = ( IPOS + OVERSAMPLING - 1 ) / OVERSAMPLING
           MASK_Y = JPOS
         ELSE
           MASK_X = IPOS

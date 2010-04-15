@@ -9,7 +9,7 @@ C     the cursor, selecting rows and columns to be corrected and
 C     cosmic rays to be zapped.  The idea is that this routine can
 C     be used to fix up any areas in an image that were not fixed
 C     automatically by the non-interactive version ('BCLEAN').  It
-C     may also give a better idea of the best settings for the 
+C     may also give a better idea of the best settings for the
 C     BCLEAN parameters.
 C
 C     Command parameters -
@@ -74,7 +74,7 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions 
+C     Functions
 C
       LOGICAL PAR_ABORT
       INTEGER DSA_TYPESIZE,ICH_LEN,PGBEGIN
@@ -124,10 +124,10 @@ C
 C     Map the data.
 C
       CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
-C                         
+C
 C     The workspace is only needed for the Undo function, and may be
-C     any size (must be more than 3 elements).  The size controls the 
-C     number of operations that may be Undone.  Here it is set at some 
+C     any size (must be more than 3 elements).  The size controls the
+C     number of operations that may be Undone.  Here it is set at some
 C     multiple of the larger of the image dimensions.
 C
       WSIZE=12*MAX(NX,NY)
@@ -135,7 +135,7 @@ C
       CALL DSA_GET_WORKSPACE(BYTES,WPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Open display device 
+C     Open display device
 C
       CALL VAR_GETCHR('IDEV',0,0,DEVNAM,STATUS)
       STATUS=PGBEGIN(0,DEVNAM(:ICH_LEN(DEVNAM))//'/append',1,1)
@@ -166,7 +166,7 @@ C
 C     Set user variable IMARRAY to reflect current display parameters
 C
       CALL DSA_GET_ACTUAL_NAME('IMAGE',IMAGE,STATUS)
-      CALL VAR_SETARY('IMARRAY',12,ARRAY,STATUS) 
+      CALL VAR_SETARY('IMARRAY',12,ARRAY,STATUS)
       CALL VAR_SETCHR('IMFILE',0,0,IMAGE,STATUS)
 C
 C     Tidy up
@@ -324,9 +324,9 @@ C
       CALL PGWINDOW(WINDOW(1),WINDOW(2),WINDOW(3),WINDOW(4))
       DEVX=INT(WINDOW(2)-WINDOW(1))+1
       DEVY=INT(WINDOW(4)-WINDOW(3))+1
-C     
-C     If image is to be redrawn, then get the range of the data, 
-C     for the first scaling guess.  Also use for value of 'invalid 
+C
+C     If image is to be redrawn, then get the range of the data,
+C     for the first scaling guess.  Also use for value of 'invalid
 C     pixel' flag.
 C
       IF (REDRAW) THEN
@@ -653,7 +653,7 @@ C
 C
          ELSE IF ((CHR.EQ.'X').OR.(CHR.EQ.'Y')) THEN
 C
-C           'X' is for fix by interpolation in the 'X' direction, 
+C           'X' is for fix by interpolation in the 'X' direction,
 C           'Y' is for fix by interpolation in the 'Y' direction.
 C
             IF (BADPOSN) THEN
@@ -959,13 +959,13 @@ C
 C     (>) DATA     (Real array DATA(NX,NY)) The image being cleaned.
 C     (>) NX       (Integer) The first image dimension
 C     (>) NY       (Integer) The second image dimension
-C     (>) IX1      (Integer) The x-coordinate of the first element 
+C     (>) IX1      (Integer) The x-coordinate of the first element
 C                  in the block to be modified.
-C     (>) IX2      (Integer) The x-coordinate of the last element 
+C     (>) IX2      (Integer) The x-coordinate of the last element
 C                  in the block to be modified.
-C     (>) IY1      (Integer) The y-coordinate of the first element 
+C     (>) IY1      (Integer) The y-coordinate of the first element
 C                  in the block to be modified.
-C     (>) IY2      (Integer) The y-coordinate of the last element 
+C     (>) IY2      (Integer) The y-coordinate of the last element
 C                  in the block to be modified.
 C     (>) CHR      (Character) A character indicating the CLEAN command
 C                  being remembered.
@@ -992,7 +992,7 @@ C
       LOGICAL CANCEL
       INTEGER IX, IY, NWORK, STATUS, WEND, WLIM, WPTR, WVAL
 C
-C     Note the structure of an entry in the circular buffer.  Taking 
+C     Note the structure of an entry in the circular buffer.  Taking
 C     element 1 as the first for this entry, the elements contain:
 C     1: The number of the last element in the entry.
 C     2: IX1 (as a real number)
@@ -1007,7 +1007,7 @@ C     If the elements of the entry reach the end of the buffer, they
 C     start immediately at the beginning.  The element at which the first
 C     (earliest) entry in the buffer starts is WFIRST, the element at
 C     which the last (latest) entry ends is WLAST.
-C     
+C
 C
 C     Make sure that the work array is large enough for the
 C     operation information.
@@ -1019,11 +1019,11 @@ C
      :         //'"Undo" this operation.',STATUS)
       ELSE
 C
-C        Put the operation data into the workspace.  First of all a lot 
+C        Put the operation data into the workspace.  First of all a lot
 C        of messing about is required with the circular buffer to see if
 C        the new data is going to overwrite any of the data from earlier
 C        operations.  In what follows, WPTR is the buffer element to be
-C        used for the start of the new data, WEND is the last element 
+C        used for the start of the new data, WEND is the last element
 C        needed for the new data.  If WEND is such that data from earlier
 C        entries will be overwritten, they are removed from the buffer
 C        by moving WFIRST past them.  The circular nature of the buffer
@@ -1129,13 +1129,13 @@ C
 C     (!) DATA     (Real array DATA(NX,NY)) The image being cleaned.
 C     (>) NX       (Integer) The first image dimension
 C     (>) NY       (Integer) The second image dimension
-C     (<) IX1      (Integer) The x-coordinate of the first element 
+C     (<) IX1      (Integer) The x-coordinate of the first element
 C                  in the block that was modified.
-C     (<) IX2      (Integer) The x-coordinate of the last element 
+C     (<) IX2      (Integer) The x-coordinate of the last element
 C                  in the block that was modified.
-C     (<) IY1      (Integer) The y-coordinate of the first element 
+C     (<) IY1      (Integer) The y-coordinate of the first element
 C                  in the block that was modified.
-C     (<) IY2      (Integer) The y-coordinate of the last element 
+C     (<) IY2      (Integer) The y-coordinate of the last element
 C                  in the block that was modified.
 C                  If no operation was saved in the buffer, the limits
 C                  are returned all set to -1.
@@ -1310,7 +1310,7 @@ C
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

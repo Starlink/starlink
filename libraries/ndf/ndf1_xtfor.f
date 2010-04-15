@@ -104,7 +104,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -310,7 +310,7 @@
                                  CALL MSG_RENEW
                                  CALL MSG_OUT( ' ',
      :                                ' derived from: ^FMT file ' //
-     :                                '^DIR^NAME^TYPE^VERS^FXS', 
+     :                                '^DIR^NAME^TYPE^VERS^FXS',
      :                                STATUS )
 
 *  Exporting an extension.
@@ -326,7 +326,7 @@
                                  CALL MSG_RENEW
                                  CALL MSG_OUT( ' ',
      :                                ' destined for: ^FMT file ' //
-     :                                '^DIR^NAME^TYPE^VERS^FXS', 
+     :                                '^DIR^NAME^TYPE^VERS^FXS',
      :                                STATUS )
                               END IF
 
@@ -369,8 +369,8 @@
 
 *  Quit processing extensions if an error occurs.
                IF ( STATUS .NE. SAI__OK ) GO TO 2
- 1          CONTINUE     
- 2          CONTINUE     
+ 1          CONTINUE
+ 2          CONTINUE
          END IF
       END IF
 

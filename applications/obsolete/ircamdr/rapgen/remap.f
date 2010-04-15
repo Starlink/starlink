@@ -85,7 +85,7 @@
       INTEGER
      :    OLDBIN,                ! array pointer to old histogram bin
      :    NEWBIN,                ! array pointer to new histogram bin
-     :    I, J                   ! counters 
+     :    I, J                   ! counters
 
       REAL
      :    SCALE                  ! scale factor used for choosing correct bin

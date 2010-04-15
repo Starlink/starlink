@@ -5,5 +5,5 @@ $loaded = 1;
 print "ok 1\n";
 
 foreach (keys %StarConfig) {
-  print "$_\t=> $StarConfig{$_}\n"; 
+  print "$_\t=> $StarConfig{$_}\n";
 }

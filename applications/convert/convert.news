@@ -1,11 +1,11 @@
 1 CONVERT_Version_1.5-19
 
- NDF2FITS now recognises the modified data type of the SMURF 
+ NDF2FITS now recognises the modified data type of the SMURF
  extension. It also handles component names that are too long to
- fit in a single EXTNAME header by creating an EXTNAMEF keyword 
+ fit in a single EXTNAME header by creating an EXTNAMEF keyword
  that uses the Long-string convention.
 
- Added support for the SMURF_EXT type for the SMURF extension, 
+ Added support for the SMURF_EXT type for the SMURF extension,
  and for extensions within the SMURF extension's NDFs.
 
  Propagate LABEL keyword to NDF label in FITS2NDF.
@@ -18,8 +18,8 @@
  original paragraph and indentation may be preserved after an
  NDF->FITS->NDF cycle.
 
- Removed default history recording in FITS2NDF's output NDF since 
- a user can control automatic history creation via the 
+ Removed default history recording in FITS2NDF's output NDF since
+ a user can control automatic history creation via the
  NDF_AUTO_HISTORY environment variable.
 
  NDF2FITS allows three-letter permutations for Parameter COMP.
@@ -33,7 +33,7 @@
  The bash CONVERT initialisation script has been changed so that it
  now works from any Bourne-compatible shell.
 
- FITS2NDF now adds a default History record to the output NDF if the 
+ FITS2NDF now adds a default History record to the output NDF if the
  FITS file contains no NDF2FITS history information.
 
 1 CONVERT_Version_1.5-16
@@ -41,7 +41,7 @@
  The FITS converters use the new NDG provenance system that inherits
  history records too.  NDF2FITS also ignores hidden ancestors.
 
- NDF2FITS can now handle files names with multiple fullstops in the 
+ NDF2FITS can now handle files names with multiple fullstops in the
  path.
 
  The formatting of history records written by FITSNDF has been
@@ -50,14 +50,14 @@
 
 1 CONVERT_Version_1.5-15
 
- The CADC provenance processing now also modifies the PRODUCT 
+ The CADC provenance processing now also modifies the PRODUCT
  keyword's value in FITS extensions to the original PRODUCT string
  followed by underscore and the extension name in lowercase.  Also
  the CADC provenance now only records unique OBSIDD values.
 
 1 CONVERT_Version_1.5-14
 
- The creation of AXIS structures by SPECX2NDF can now be suppressed 
+ The creation of AXIS structures by SPECX2NDF can now be suppressed
  using its new AXIS parameter.
 
  NDF2FITS is now much quicker when writing out WCS information that
@@ -74,7 +74,7 @@
  NDF2FITS now handles extensions containing only NDFs by adding a
  dummy FITS sub-file that retains the name and type of the wrapper
  structure.
- 
+
  FITS2NDF processes SMURF-package data better, permitting a
  roundtrip via FITS, perserving the original data structures, save
  for some additional FITS headers.
@@ -104,7 +104,7 @@
 
 1 CONVERT_Version_1.5-9
 
- NDF2FITS Parameter ENCODING has a new allowed value of 
+ NDF2FITS Parameter ENCODING has a new allowed value of
  "FITS-WCS(CD)". This is the same as "FITS-WCS" except that it uses
  the old CD matrix formalism to describe the data array's rotation
  and scaling.
@@ -128,7 +128,7 @@
 
 1 CONVERT_Version_1.5-7
 
- FITS2NDF has a new TYPE group parameter to set the data type of 
+ FITS2NDF has a new TYPE group parameter to set the data type of
  the NDF, overriding the value propagated from the FITS BITPIX, or
  BSCALE and BZERO precision when FMTCNV is TRUE.
 
@@ -140,25 +140,25 @@
  FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
  files.  The recognised extensions are fits.gz, fit.gz, and fts.gz.
 
- FITS2NDF supports the new AAO Instruments (AAOMEGA and FMOS) that use 
+ FITS2NDF supports the new AAO Instruments (AAOMEGA and FMOS) that use
  the 2dF data structures.
-  
+
 1 CONVERT_Version_1.5-5
 
  Added FITS-AIPS++ and FITS-CLASS encodings to FITS2NDF and NDF2FITS.
 
  Clarified the description of UNF2NDF Parameter TYPE so that it
- is clear that the type given should also be of the input data, not 
+ is clear that the type given should also be of the input data, not
  just the output NDF.
 
- SPECX2NDF now creates NDF files using the new double-sideband 
- SpecFrame.  See the AST documentation for more details on 
- double-sideband spectra. 
+ SPECX2NDF now creates NDF files using the new double-sideband
+ SpecFrame.  See the AST documentation for more details on
+ double-sideband spectra.
 
 1 CONVERT_Version_1.5-4
 
  Added IRAF compatibility libs for Linux systems.  CONVERT should now
- build on any ix86 Linux platform. 
+ build on any ix86 Linux platform.
 
 
 1 CONVERT_Version_1.5
@@ -167,7 +167,7 @@
  functionality allowing translation between spectral frames without
  re-running SPECX2NDF.  The SPECTRUM Parameter (and associated
  parameters SOR, DOPPLER) are no longer required since they can be
- changed after conversion using the KAPPA:WCSATTRIB application. 
+ changed after conversion using the KAPPA:WCSATTRIB application.
  **Scripts using SPECX2NDF may therefore need modification.**  In
  addition to dealing with map files, SPECX2NDF has now been extended
  to deal with SPECX data files; each spectrum in the file is
@@ -184,16 +184,16 @@
 
 1 CONVERT_Version_1.4-4
  Fixed a bug in FITS2NDF caused by a missing END card on a merged header.
-  
+
 1 CONVERT_Version_1.4-3
  Fixed a problem in NDF2FITS caused by a mismatch of conventions used in the
  TFORMn and TDIMn header cards for multi-dimensional character arrays.
  A corresponding fix was required for FITS2NDF.
- 
+
 1 CONVERT_Version_1.4-2
- Parameter WCSATTRS is added to FITS2NDF. This enables users to modify 
+ Parameter WCSATTRS is added to FITS2NDF. This enables users to modify
  the way WCS information is extracted from the FITS headers. This can
- be useful when the headers do not conform to conventions. 
+ be useful when the headers do not conform to conventions.
 
 1 CONVERT_Version_1.4-1
  Updated the IDL converters to work with IDL 5.5. Fix a problem causing a
@@ -203,7 +203,7 @@
 
  Corrected an error in the section of this document describing the easy
  way to do IDL/NDF conversions. WRITE_NDF was described as if it were a
- function rather than a procedure.  
+ function rather than a procedure.
 
 1 CONVERT_Version_1.4
  MTFITS2NDF added - a tcsh script to convert FITS tapes to NDF using FITS2NDF.
@@ -222,7 +222,7 @@
 
   o Correct handling of NDF history records in the FITS header.
 
-  
+
 1 CONVERT_Version_1.3-5
  FITS2NDF creates a component of type FITS_HEADER, not NDF, in a container
  file for multi-extension FITS files if the FITS extension does not contain
@@ -241,19 +241,19 @@
  record in the NDF's FITS airlock, and stops a second ORIGIN header being
  output (copied from the airlock) if the ORIGIN parameter has been used to
  specify a non-default ORIGIN.
- 
+
 1 CONVERT_Version_1.3-2
-  
+
  Two new converters, HDS2IDL and IDL2HDS, are provided for IDL users. They
  handle complete structures, unlike READ_NDF and WRITE_NDF which only handle
- the main arrays of NDFs. 
+ the main arrays of NDFs.
 
  NDF2FITS and FITS2NDF have been enhanced by the addition of FITS-AIPS and
  FITS-PC encodings. Also, appropriate messages are  output if there are no
  valid input files.
 
  FITS2NDF has also been enhanced to allow more flexibility over the handling
- of multi-extension FITS files. Syntax such as filename.fit[1] or 
+ of multi-extension FITS files. Syntax such as filename.fit[1] or
  "filename.fit[extname=im2]" can be used to specify a single FITS extension
  to be converted, and additional parameters EXTABLE and CONTAINER allow FITS
  extensions to be combined to produce a single NDF or a series of components
@@ -261,7 +261,7 @@
 
  The scripts associated with the NDF on-the-fly conversion system have been
  modified to allow a single extension from a multi-extension FITS file to be
- specified This feature requires applications to have been built with NDF 
+ specified This feature requires applications to have been built with NDF
  V1.5-6 or later.
 
  Different numbers of axes in the BaseFrames of the NDF and FitsChan FrameSets
@@ -279,7 +279,7 @@
  is now retained in the source directory.
 
 2 CONVERT_Version_1.2-4
- All the converters which are ADAM tasks have been combined into a 
+ All the converters which are ADAM tasks have been combined into a
  monolith to save disk space.
 
  The FITS converters now use the CFITSIO library.
@@ -307,10 +307,10 @@
   WRITE_NDF An IDL procedure to write an IDL array to an  NDF component.
 
   Changed Applications:
-  NDF2TIFF Various alternative methods of scaling the NDF data are 
+  NDF2TIFF Various alternative methods of scaling the NDF data are
     provided.
 
-  NDF2GIF Various alternative methods of scaling the NDF data are 
+  NDF2GIF Various alternative methods of scaling the NDF data are
     provided (the scaling is performed by NDF2TIFF).
 
   NDF2FITS Now has an additional parameter, ENCODING, to control the
@@ -320,7 +320,7 @@
   SUN/55 and CONVERT help have been updated to describe the changes.
 
 2 CONVERT_Version_1.1-3
-  NDF2FITS  Corrected failure to propagate an extension containing a 
+  NDF2FITS  Corrected failure to propagate an extension containing a
     character array.
 
   FITS2NDF
@@ -331,7 +331,7 @@
     from 8 to 10.
 
 2 CONVERT_Version_1.1-2
-  FITS2NDF and NDF2FITS now allow the FITS-IRAF encoding. 
+  FITS2NDF and NDF2FITS now allow the FITS-IRAF encoding.
 
   NDF2FITS will no longer produce 'native' encoding by default. To this
     end, Parameter ENCODINGS has been replaced by Parameter NATIVE.
@@ -354,7 +354,7 @@
   The automatic NDF conversion system has been altered so that the
   production of 'error' messages, preceded by !, by the conversion program
   will no longer be taken to mean that the conversion has failed.
-  
+
 2 CONVERT_Version_1.1
 
 3 New_applications
@@ -366,45 +366,45 @@ There are two new applications:
 
 3 Changed_applications
 
-  o ASCII2NDF Added MAXLEN parameter to permit long input records 
+  o ASCII2NDF Added MAXLEN parameter to permit long input records
     without impacting the efficiency of processing short records.
 
   o FITS2NDF
-    - Propagates the NDF WCS component. 
-    - Filters out NDF-style history from the FITS airlock.  
+    - Propagates the NDF WCS component.
+    - Filters out NDF-style history from the FITS airlock.
     - Fixed bug which prevented the creation of NDF extensions which
-      are arrays of structures.  
-    - Processes the revised 2dF formats, and allows arbitrary additional 
-      extensions; all 2dF extensions can now be an arbitrary order.  
-    - Fixed bug which occurred when replacing negative errors in IUE 
-      MXLO data. 
+      are arrays of structures.
+    - Processes the revised 2dF formats, and allows arbitrary additional
+      extensions; all 2dF extensions can now be an arbitrary order.
+    - Fixed bug which occurred when replacing negative errors in IUE
+      MXLO data.
     - It now recognises logical binary-table columns.
     - Corrected validating Log file by record length on Solaris.
     - Processes IUE MXHI format.
-    - Changed the scheme for naming multiple IUE MXLO NDFs within the 
-      output container file; previously the row number was used, but 
-      NDF names cannot start with numeric characters and an error was 
+    - Changed the scheme for naming multiple IUE MXLO NDFs within the
+      output container file; previously the row number was used, but
+      NDF names cannot start with numeric characters and an error was
       consequently reported. The names LARGE and SMALL are now used.
 
 
   o IRAF2NDF
-    - Sets the bounds of the NDF according to LBOUNDn keywords, 
+    - Sets the bounds of the NDF according to LBOUNDn keywords,
       if present.
     - It no longer crashes when closing the IRAF file, if there
-      was a problem opening the IRAF file.  
+      was a problem opening the IRAF file.
     - Propagates all IRAF history records (including blanks) to the
-      FITS airlock when PROFITS=TRUE.  
-    - IRAF HISTORY lines which are too long for a FITS header are 
+      FITS airlock when PROFITS=TRUE.
+    - IRAF HISTORY lines which are too long for a FITS header are
       truncated with an ellipsis.
 
   o NDF2FITS
-    - Creates a WCS component within the output NDFs (if possible), 
-      based on FITS-WCS keywords (CRVAL, CRPIX, etc.), DSS keywords 
+    - Creates a WCS component within the output NDFs (if possible),
+      based on FITS-WCS keywords (CRVAL, CRPIX, etc.), DSS keywords
       (PLTRAH, PLTRAM, etc.), or AST Native keywords (see SUN/210).
-    - Modified to propagate the revised 2dF extensions.  Thus the 
-      OBJECT extension generates wider binary tables (from 210 to 
-      224 bytes).  
-    - Now propagates primitive NDF extensions to binary tables.  
+    - Modified to propagate the revised 2dF extensions.  Thus the
+      OBJECT extension generates wider binary tables (from 210 to
+      224 bytes).
+    - Now propagates primitive NDF extensions to binary tables.
     - Does not transfer the LBOUNDn headers in the FITS airlock.
     - Correct handling of null values.
     - Added TDISPn cards for better formatting of tables.
@@ -414,27 +414,27 @@ There are two new applications:
     airlock.
 3 IRAF_Versions
   The CONVERT utilities NDF2IRAF and IRAF2NDF are built using copies of
-  relevant IRAF libraries (which are included in the CONVERT release) 
+  relevant IRAF libraries (which are included in the CONVERT release)
   so they exhibit the same behaviour as the IRAF version from which the
-  libraries were extracted. There are also some IRAF dependencies in the 
-  so-called SPP routines of CONVERT. (These originate written in the 
+  libraries were extracted. There are also some IRAF dependencies in the
+  so-called SPP routines of CONVERT. (These originate written in the
   IRAF SPP language and include header files defining the layout of the
-  IRAF image.) The versions of IRAF2NDF and NDF2IRAF which you use must 
+  IRAF image.) The versions of IRAF2NDF and NDF2IRAF which you use must
   therefore be compatible with the version of IRAF which you are using.
 
   A new version of the IRAF image format has been developed for IRAF
-  Version 2.11 onwards but at the time of writing this is not available 
+  Version 2.11 onwards but at the time of writing this is not available
   for all platforms.
-  IRAF Version 2.11 will read either the old or new image formats but 
+  IRAF Version 2.11 will read either the old or new image formats but
   will produce the new format by default. (It can be made to produce
   old-format images by setting environment variable oifversion=1.)
-  Appropriate versions of the IRAF libraries and the SPP routines are 
+  Appropriate versions of the IRAF libraries and the SPP routines are
   required for IRAF2NDF and NDF2IRAF to handle the new image format.
 
   CONVERT Version 1.1 contains IRAF V2.11 compatible versions of the
   SPP routines and the IRAF libraries Version 2.11.1. If you are still
-  running IRAF V2.10, set environment variable oifversion=1 before 
-  running NDF2IRAF. (This includes when running Starlink programs from 
+  running IRAF V2.10, set environment variable oifversion=1 before
+  running NDF2IRAF. (This includes when running Starlink programs from
   IRAF cl if an output image is produced by `on-the-fly' conversion.)
 
 3 Documentation
@@ -549,7 +549,7 @@ There are two new applications:
      has been corrected and improved.  Parameter FILLBAD defaults to
      0.  IRAF filenames are no longer converted to lowercase.
      The pixel origin is transferred from LBOUNDn headers.  The NDF
-     label and units are progagated to OBJECT and BUNIT headers. 
+     label and units are progagated to OBJECT and BUNIT headers.
 
   o  TIFF2NDF --  Removed KAPPA dependency.  It uses one less
      conversion stage, so is more efficient.  It is now available for
@@ -574,13 +574,13 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
 
 3 Withdrawn_Applications
 
-  BDF2NDF, NDF2BDF, DIPSO2NDF, and NDF2DIPSO.  See topic 
+  BDF2NDF, NDF2BDF, DIPSO2NDF, and NDF2DIPSO.  See topic
   "VMS_differences".
 
 3 Changed_Applications
   o  IRAF2NDF and NDF2IRAF utilities are now available for alpha
      OSF/1 and sun4 Solaris platforms.  The libraries necessary to
-     build them for sunOS and Ultrix are no longer distributed. 
+     build them for sunOS and Ultrix are no longer distributed.
      The availability on different systems is now documented.
 
   o  ASCII2NDF, NDF2ASCII, NDF2UNF, and UNF2NDF have no upper-limit
@@ -664,7 +664,7 @@ There are four new applications.
    NDF2GASP converts a two-dimensional NDF into a GASP image.
 
 3 Extended_and_corrected_applications
-  
+
 Here is a summary of the main modifications.
 
   o  BDF2NDF now ignores deleted descriptors rather than propagating
@@ -733,7 +733,7 @@ files. There are five new commands.
 
   o  Online help is provided.
 
-  o  From DCL, CONVERT commands must be enabled by entering 
+  o  From DCL, CONVERT commands must be enabled by entering
      CONVERTSTART.
 
   o  Compiled interface files are provided for efficiency.
@@ -759,14 +759,14 @@ files. There are five new commands.
 
 There are five new applications.
 
-   ASCII2NDF converts an ASCII file to an NDF. 
-   NDF2ASCII converts an NDF to an ASCII file. 
-   NDF2IRAF converts an NDF to an IRAF (OIF) image. 
-   NDF2UNF converts an NDF to a sequential unformatted file. 
+   ASCII2NDF converts an ASCII file to an NDF.
+   NDF2ASCII converts an NDF to an ASCII file.
+   NDF2IRAF converts an NDF to an IRAF (OIF) image.
+   NDF2UNF converts an NDF to a sequential unformatted file.
    UNF2NDF converts a sequential unformatted file to an NDF.
 
 3 Extended_and_corrected_applications
-  
+
 Here is a summary of the main modifications.
 
   o BDF2NDF and NDF2BDF can handle La Palma ING-style FITS headers.

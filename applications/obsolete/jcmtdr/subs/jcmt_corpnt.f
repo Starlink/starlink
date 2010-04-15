@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_CORRECT_POINTING (N, RA, DEC, LST, LAT, NCORR, 
+      SUBROUTINE JCMT_CORRECT_POINTING (N, RA, DEC, LST, LAT, NCORR,
      :   POINT_LST, POINT_DAZ, POINT_DALT, STATUS)
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE JCMT_CORRECT_POINTING (N, RA, DEC, LST, LAT, NCORR, 
+*     SUBROUTINE JCMT_CORRECT_POINTING (N, RA, DEC, LST, LAT, NCORR,
 *    :   POINT_LST, POINT_DAZ, POINT_DALT, STATUS)
 
 *  Description:
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,15 +142,15 @@
                DO WHILE (.NOT. DONE)
                   IF ((LST(I) .GT. POINT_LST(J)) .AND.
      :                (LST(I) .LE. POINT_LST(J+1))) THEN
-                  
+
 *  linearly interpolate corrections
 
-                     AZ_CORR = DBLE(POINT_DAZ (J)) + 
+                     AZ_CORR = DBLE(POINT_DAZ (J)) +
      :                  (LST(I)-POINT_LST(J)) *
-     :                  DBLE (POINT_DAZ(J+1) - POINT_DAZ(J)) / 
+     :                  DBLE (POINT_DAZ(J+1) - POINT_DAZ(J)) /
      :                  (POINT_LST(J+1) - POINT_LST(J))
 
-                     ALT_CORR = DBLE(POINT_DALT(J)) + 
+                     ALT_CORR = DBLE(POINT_DALT(J)) +
      :                  (LST(I)-POINT_LST(J)) *
      :                  DBLE (POINT_DALT(J+1) - POINT_DALT(J)) /
      :                  (POINT_LST(J+1) - POINT_LST(J))
@@ -180,7 +180,7 @@
             SIN_ALT = SIN (LAT) * SIN (DEC(I)) + COS (LAT) *
      :        COS (DEC(I)) * COS (HA)
             ALT = ASIN (SIN_ALT)
-      
+
 *  note also that there's a factor of cos(alt) missing from the denominator of
 *  both sinaz and cosaz. It's their ratio that matters.
 
@@ -188,15 +188,15 @@
             COSAZ = (SIN(DEC(I)) - SIN(ALT) * SIN(LAT)) / COS(LAT)
             AZ = ATAN2 (SINAZ, COSAZ)
 
-*  assume pointing corrections are tangent plane alt/az offsets to calculate 
+*  assume pointing corrections are tangent plane alt/az offsets to calculate
 *  corrected az, el of beam (remembering that JCMT az is minus what SLA_DTP2S)
 
-            CALL SLA_DTP2S (-AZ_CORR * DAS2R, ALT_CORR * DAS2R, AZ, 
+            CALL SLA_DTP2S (-AZ_CORR * DAS2R, ALT_CORR * DAS2R, AZ,
      :        ALT, AZ_CORRECTED, ALT_CORRECTED)
 
 *  calculate corrected RA and dec of point
 
-            SIND = SIN (ALT_CORRECTED) * SIN (LAT) + 
+            SIND = SIN (ALT_CORRECTED) * SIN (LAT) +
      :        COS (ALT_CORRECTED) * COS (LAT) * COS (AZ_CORRECTED)
             DEC (I) = ASIN (SIND)
 

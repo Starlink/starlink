@@ -30,12 +30,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -205,9 +205,9 @@ int IIZWZM_C ( int display, int memlist[] , int nmem, int zoomf )
 
 /* Local Variables */
 int    i , k , curconf , curmem, outmem;
-int    xc , yc , xc_mem , yc_mem , xc_dev , yc_dev; 
+int    xc , yc , xc_mem , yc_mem , xc_dev , yc_dev;
 int    xc_mem_min , yc_mem_min, xc_mem_max, yc_mem_max;
-int    xc_dev_min , yc_dev_min, xc_dev_max, yc_dev_max; 
+int    xc_dev_min , yc_dev_min, xc_dev_max, yc_dev_max;
 int    zoom;
 int    iizerr;
 
@@ -256,8 +256,8 @@ for (i = 0; i < nmem; i++)
 
       xc = xc_dev - xc_mem * zoom;
       yc = yc_dev - yc_mem * zoom;
-      
-      if (zoom == 1)	
+
+      if (zoom == 1)
          {
          xc = (int)mem->x_scroll;
          yc = (int)mem->y_scroll;
@@ -266,24 +266,24 @@ for (i = 0; i < nmem; i++)
 
 /* compute zooming centre for ROI (if visible) */
       for (k = 0; k < device[display].n_roi; k++)
-         {            
+         {
          roi = device[display].roi[k];
          if (roi->vis == 1)
             {
             iizerr = IIRRRI_C (display, -1, k, &xc_dev_min, &yc_dev_min,
                                &xc_dev_max, &yc_dev_max, &outmem);
-            iizerr = IIRRRI_C (display, curmem, k, 
+            iizerr = IIRRRI_C (display, curmem, k,
                                &xc_mem_min, &yc_mem_min,
                                &xc_mem_max, &yc_mem_max, &outmem);
 
 /* Zoom about centre of ROI */
-              xc = (xc_dev_max - xc_dev_min)/2 + xc_dev_min -  
+              xc = (xc_dev_max - xc_dev_min)/2 + xc_dev_min -
                     ( (xc_mem_max - xc_mem_min)/2 + xc_mem_min) * zoom;
               yc = (yc_dev_max - yc_dev_min)/2 + yc_dev_min -
                     ( (yc_mem_max - yc_mem_min)/2 + yc_mem_min) * zoom;
 
 /* Update memory scroll */
-              mem->x_scroll = (xc_dev_max - xc_dev_min)/2 + xc_dev_min -  
+              mem->x_scroll = (xc_dev_max - xc_dev_min)/2 + xc_dev_min -
                     ( (xc_mem_max - xc_mem_min)/2 + xc_mem_min) ;
               mem->y_scroll = (yc_dev_max - yc_dev_min)/2 + yc_dev_min -
                     ( (yc_mem_max - yc_mem_min)/2 + yc_mem_min) ;
@@ -296,7 +296,7 @@ for (i = 0; i < nmem; i++)
 /* compute zooming centre for cursor (if visible) */
 
       for (k = 0; k < device[display].n_curs; k++)
-         {            
+         {
          curs = device[display].cursor[k];
          if (curs->vis == 1)
             {
@@ -305,7 +305,7 @@ for (i = 0; i < nmem; i++)
 
 
             xc = xc_dev - xc_mem * zoom;
-            yc = yc_dev - yc_mem * zoom;   
+            yc = yc_dev - yc_mem * zoom;
 
 /* Update memory scroll */
             mem->x_scroll = xc_dev - xc_mem ;

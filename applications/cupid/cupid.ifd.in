@@ -494,7 +494,7 @@ package cupid {
             vpath CURRENT,DEFAULT
             ppath CURRENT,DEFAULT
             prompt {Spatial FWHM of instrument beam in pixels}
-            default 2.0 
+            default 2.0
             helpkey *
           }
 
@@ -623,7 +623,7 @@ package cupid {
             vpath CURRENT,DEFAULT
             ppath CURRENT,DEFAULT
             prompt {RMS noise to add to data}
-            default 0.2 
+            default 0.2
             helpkey *
           }
 
@@ -643,7 +643,7 @@ package cupid {
             vpath CURRENT,DEFAULT
             ppath CURRENT,DEFAULT
             prompt {Truncation level for clumps}
-            default 0.2 
+            default 0.2
             helpkey *
           }
 
@@ -663,7 +663,7 @@ package cupid {
             vpath CURRENT,DEFAULT
             ppath CURRENT,DEFAULT
             prompt {FWHM of velocity resolution in pixels}
-            default 1.0 
+            default 1.0
             helpkey *
           }
 
@@ -708,7 +708,7 @@ package cupid {
 
      Note, CUPID is new software and is still under active development.
      Modifications and bug fixes will be made regularly. (22/3/06)
-    
+
 
    }
 

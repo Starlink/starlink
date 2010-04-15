@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,12 +132,12 @@
 *  version of the routine to perform the work.
       IF ( TYPE .EQ. '_REAL' ) THEN
          CALL CCD1_CRDTR( BAD, DOVAR, EL, SCALE, DSCALE, ZERO, DZERO,
-     :                    ORIG, %VAL( CNF_PVAL( DAT ) ), 
+     :                    ORIG, %VAL( CNF_PVAL( DAT ) ),
      :                    %VAL( CNF_PVAL( VAR ) ), NBADD, NBADV,
      :                    STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL CCD1_CRDTD( BAD, DOVAR, EL, SCALE, DSCALE, ZERO, DZERO,
-     :                    ORIG, %VAL( CNF_PVAL( DAT ) ), 
+     :                    ORIG, %VAL( CNF_PVAL( DAT ) ),
      :                    %VAL( CNF_PVAL( VAR ) ), NBADD, NBADV,
      :                    STATUS )
       END IF

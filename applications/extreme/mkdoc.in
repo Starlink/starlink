@@ -10,11 +10,11 @@
         rm -f $f.tex
         case $f in
            inscnf | frepint | crepint)
-              in=$f.c 
+              in=$f.c
               ;;
-           extmk | extmakefile | do-xxx | cmp-xxx)   
+           extmk | extmakefile | do-xxx | cmp-xxx)
               sed 's/^#/\*/' <$f >tmp
-              in=tmp 
+              in=tmp
               ;;
         esac
         @PROLAT@ in=$in out=$f.tex nodocument single

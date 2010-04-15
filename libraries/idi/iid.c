@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,7 +98,7 @@
 /* Package definitions */
 
 #include    "device.dep"
-#include    "kwm.h"   
+#include    "kwm.h"
 #include    "idi.h"
 #include    "idi_err.h"
 #include    "idistruct_e.h"
@@ -324,7 +324,7 @@ if (i > n_devices)
 disp_init (i, wind, xdisp, xwind, &depth, &lutlen, &iiderr);
 if (iiderr != II_SUCCESS)
    return (iiderr);
-   
+
 device [i].unique    = uniflag;
 device [i].opened    = 1;
 device [i].vd_id    = xdisp;
@@ -350,11 +350,11 @@ fscanf( fdat, "%d", &device[i].depth );    /* keyword = DEPTH        */
 device[i].depth = depth;
 
 fscanf( fdat, "%d", &device[i].zoom_min ); /* keyword = ZOOM_RANGE   */
-fscanf( fdat, "%d", &device[i].zoom_max ); 
+fscanf( fdat, "%d", &device[i].zoom_max );
 fscanf( fdat, "%d", &device[i].n_lut );    /* keyword = N_LUT        */
 
 for (j = 0; j < device [i].n_lut; j++)
-   {                                 
+   {
    lut = (struct lut_data *) malloc (sizeof(struct lut_data));
    if (lut == II_NULL)
       {
@@ -409,7 +409,7 @@ for (j = 0; j < device [i].n_roi; j++)
    roi->y_max = 0;
    }
                                       /* keyword = N_INTERACTIONS */
-fscanf (fdat , "%d" , &device [i].n_max_inter); 
+fscanf (fdat , "%d" , &device [i].n_max_inter);
 
 device [i].n_inter = 0;
 
@@ -429,7 +429,7 @@ for (j = 0; j < device [i].n_max_inter; j++)
    inter->oper     = 0;
    }
                                       /* keyword = N_CONF         */
-fscanf (fdat , "%d" , &device [i].n_conf);       
+fscanf (fdat , "%d" , &device [i].n_conf);
 device [i].confid    = -1;           /* configuration not selected */
 
 for (j = 0; j < device [i].n_conf; j++)
@@ -445,9 +445,9 @@ for (j = 0; j < device [i].n_conf; j++)
 
 for (j = 0; j < device [i].n_conf; j++)
    {
-   conf = device [i].config [j];   
+   conf = device [i].config [j];
                                    /* keyword = N_MEM          */
-   fscanf (fdat , "%d" , &conf->n_mem);         
+   fscanf (fdat , "%d" , &conf->n_mem);
    }
 
 for (j = 0; j < device [i].n_conf; j++)
@@ -473,9 +473,9 @@ for (j = 0; j < device [i].n_conf; j++)
    conf = device [i].config [j];
    for (k = 0; k < conf->n_mem; k++)
       {
-      mem = conf->memory[k];     
+      mem = conf->memory[k];
                                   /* keyword = MEM_X_SIZE     */
-      fscanf (fdat , "%d" , &mem->x_size);      
+      fscanf (fdat , "%d" , &mem->x_size);
       }
    }
 
@@ -484,9 +484,9 @@ for (j = 0; j < device [i].n_conf; j++)
    conf = device [i].config [j];
    for (k = 0; k < conf->n_mem; k++)
       {
-      mem = conf->memory[k];                                    
+      mem = conf->memory[k];
                                  /* keyword = MEM_Y_SIZE     */
-      fscanf (fdat , "%d" , &mem->y_size);      
+      fscanf (fdat , "%d" , &mem->y_size);
       }
    }
 
@@ -495,9 +495,9 @@ for (j = 0; j < device [i].n_conf; j++)
    conf = device [i].config [j];
    for (k = 0; k < conf->n_mem; k++)
       {
-      mem = conf->memory[k];        
+      mem = conf->memory[k];
                                  /* keyword = MEM_DEPTH     */
-      fscanf (fdat , "%d" , &mem->depth);        
+      fscanf (fdat , "%d" , &mem->depth);
 /* Replace with value obtained from X */
       mem->depth = depth;
       }
@@ -508,7 +508,7 @@ for (j = 0; j < device [i].n_conf; j++)
    conf = device [i].config [j];
    for (k = 0; k < conf->n_mem; k++)
       {
-      mem = conf->memory[k];     
+      mem = conf->memory[k];
                                 /* keyword = MEM_TYPE      */
       fscanf (fdat , "%d" , &mem->type);
       }
@@ -532,7 +532,7 @@ for (j = 0; j < device [i].n_conf; j++)
       mem->y_v_off = 0;
       mem->x_woff   = 0;                        /* default I/O Transfer Window */
       mem->y_woff   = 0;
-      mem->x_wdim   = mem->x_size;      
+      mem->x_wdim   = mem->x_size;
       mem->y_wdim   = mem->y_size;
       mem->lut_id = 0;
       mem->itt_id = 0;
@@ -569,7 +569,7 @@ for (j = 0; j < device [i].n_conf; j++)     /* ITT memory structure allocation *
             }
          mem->itt[l] = itt;
          itt = mem->itt[l];
-         itt->itt_def = 1;                   
+         itt->itt_def = 1;
          itt->itt_len = (int)rint (pow ( (double) 2. , (double) mem->depth ));
 
          for (m = 0; m < itt->itt_len; m++)
@@ -596,7 +596,7 @@ for ( j = 0; j < device[i].n_lut; j++ )
 /* With no overlay both LUT entries go 0,1,2,3... */
 /* With an overlay the first LUT goes 0,2,4,6... and the second 1,3,5,7... */
    for ( k = 0; k < lutlen; k++ )
-      lut->lutpix[k] = ( k << ~device[i].pm_mask ) + 
+      lut->lutpix[k] = ( k << ~device[i].pm_mask ) +
                        ( j & ~device[i].pm_mask );
    }
 
@@ -629,7 +629,7 @@ for ( j = 0; j < device[i].n_conf; j++ )
 
 device[i].bar.created = 0;
 
-if (int_struct.opened == 0)   
+if (int_struct.opened == 0)
    local_init (i);
 
 /* Set the default configuration = 0 */
@@ -661,7 +661,7 @@ update_memory( i );
 
 iiderr = II_SUCCESS;
 
-if (int_struct.opened == 1)                        
+if (int_struct.opened == 1)
    return(iiderr);
 
 /* Interaction structure */
@@ -1205,7 +1205,7 @@ for (j = 0; j < device [display].n_roi; j++)     /* disable ROIs */
    {
    roi = device[display].roi[j];
    roi->memid = -1;
-   roi->sh    = -1;                    
+   roi->sh    = -1;
    roi->col   = 0;
    roi->vis   = 0;
    roi->x_min = 0;
@@ -1214,7 +1214,7 @@ for (j = 0; j < device [display].n_roi; j++)     /* disable ROIs */
    roi->y_max = 0;
    }
 
-for (j = 0; j < device [display].n_conf; j++)       
+for (j = 0; j < device [display].n_conf; j++)
    {
    conf = device [display].config [j];        /* reset config & memory structure */
 
@@ -1224,15 +1224,15 @@ for (j = 0; j < device [display].n_conf; j++)
       mem->ebdepth = 0;
       mem->ebpackf = 0;
       mem->visibility = 1;
-      mem->x_v_size = (device[display].dev_xsiz < mem->x_size) ? 
+      mem->x_v_size = (device[display].dev_xsiz < mem->x_size) ?
                        device[display].dev_xsiz : mem->x_size;
-      mem->y_v_size = (device[display].dev_ysiz < mem->y_size) ? 
+      mem->y_v_size = (device[display].dev_ysiz < mem->y_size) ?
                        device[display].dev_ysiz : mem->y_size;
       mem->x_v_off = 0;
       mem->x_v_off = 0;
       mem->x_woff   = 0;                   /* default I/O Transfer Window */
       mem->y_woff   = 0;
-      mem->x_wdim   = mem->x_size;      
+      mem->x_wdim   = mem->x_size;
       mem->y_wdim   = mem->y_size;
       mem->lut_id = 0;
       mem->itt_id = 0;
@@ -1248,7 +1248,7 @@ for (j = 0; j < device [display].n_conf; j++)
       for (l = 0; l < mem->n_itt; l++)           /* reset ITT structure */
          {
          itt = mem->itt[l];
-         itt->itt_def = 1;                   
+         itt->itt_def = 1;
          itt->itt_len = (int)rint (pow ( (double) 2. , (double) mem->depth ));
 
          factor = (float) itt->itt_len / (float) curlut.len;
@@ -1531,7 +1531,7 @@ switch (devcap)
       break;
 
    case 11:
-   
+
       cap[0] = device[display].confid;
       nc = 1;
       break;
@@ -1581,9 +1581,9 @@ switch (devcap)
       cap[0] = curlut.len;
       nc = 1;
       break;
- 
+
    case 20:
-   
+
       nc = 0;
       for (i = 0; i < conf->n_mem; i++)
          {
@@ -1599,7 +1599,7 @@ switch (devcap)
       break;
 
    case 21:
-   
+
       if (conf->dyn == 0)
          {
          nc = conf->n_mem;
@@ -1607,7 +1607,7 @@ switch (devcap)
             cap[i] = i;
          }
       else
-         { 
+         {
          nc = 0;
          for (i = 0; i < conf->n_mem; i++)
             {
@@ -1640,7 +1640,7 @@ switch (devcap)
          cap[i] = mem->lut_id;
          }
       nc = conf->n_mem;
-         
+
       break;
 
    case 25:
@@ -1651,9 +1651,9 @@ switch (devcap)
          cap[i] = mem->itt_id;
          }
       nc = conf->n_mem;
-         
+
       break;
-      
+
    case 30:
 
       nit = ARGSIZE;
@@ -1736,7 +1736,7 @@ switch (devcap)
       cap[0] = arg[0];
       nc = nit;
       break;
-   
+
    case 41:
 
       nit = ARGSIZE;
@@ -1752,7 +1752,7 @@ switch (devcap)
       kwi_xtr (fildct , "CURS_SHAPES" , &nit , arg);
       cap[0] = nit;
       nc = 1;
-      break;  
+      break;
 
    case 43:
 
@@ -1793,7 +1793,7 @@ switch (devcap)
          }
       nc = device[display].n_curs;
       break;
-   
+
    case 50:
 
       nit = ARGSIZE;
@@ -1803,7 +1803,7 @@ switch (devcap)
          cap[0] += arg[i];
       nc = 1;
       break;
-   
+
    case 51:
 
       nit = ARGSIZE;
@@ -1885,7 +1885,7 @@ switch (devcap)
       nc = 1;
 
       break;
-   
+
    case 61:
 
       nit = ARGSIZE;
@@ -1894,7 +1894,7 @@ switch (devcap)
       nc = nit;
 
       break;
-   
+
    case 62:
 
       for (i = 0; i < device[display].n_roi; i++)
@@ -1933,7 +1933,7 @@ switch (devcap)
       nc = 1;
 
       break;
-   
+
    case 80:
 
       nit = ARGSIZE;
@@ -1952,7 +1952,7 @@ switch (devcap)
       break;
 
    case 91:
-      
+
       for (i = 0; i < conf->n_mem; i++)
          {
          if (i == device[display].bar.mem)
@@ -2086,7 +2086,7 @@ switch (devcap)
    {
    case 71:
 
-      cap[0] = 0;               
+      cap[0] = 0;
       nc = 0;
       break;
 
@@ -2209,10 +2209,10 @@ switch (memtyp)
    case II_GRAPHIC + II_TEXT:
    case II_IMAGE + II_GRAPHIC + II_TEXT:
    case II_NULL:
-   
+
       memtyp0 = memtyp;
       break;
-   
+
    default:
 
       iiderr = MEMTYPERR;

@@ -1,6 +1,6 @@
 proc red4ReportEmlt {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
 
 # Check to see if task is busy

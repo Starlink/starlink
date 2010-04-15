@@ -18,19 +18,19 @@
 
 *  Description:
 *     This task allows regions of an NDF's to be masked, so
-*     that they can (for instance) be excluded from subsequent data 
-*     processing.  ARD (ASCII Region Definition) descriptions stored in 
+*     that they can (for instance) be excluded from subsequent data
+*     processing.  ARD (ASCII Region Definition) descriptions stored in
 *     a text file define which pixels of the data array are masked.  An
 *     output NDF is created which is the same as the input file except
 *     that all pixels specified by the ARD file have been assigned either
 *     the bad value or a specified constant value. This value can be
-*     assigned to either the inside or the outside of the specified 
+*     assigned to either the inside or the outside of the specified
 *     ARD region.
 *
 *     If positions in the ARD description are given using a co-ordinate
 *     system that has one fewer axes than the input NDF, then each plane
-*     in the NDF will be masked independently using the supplied ARD 
-*     description. For instance, if a 2-D ARD description that uses (RA,Dec) 
+*     in the NDF will be masked independently using the supplied ARD
+*     description. For instance, if a 2-D ARD description that uses (RA,Dec)
 *     to specify positions is used to mask a 3-D (ra,dec,velocity) NDF,
 *     then each velocity plane in the NDF will be masked independently.
 
@@ -40,32 +40,32 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of the ARD file containing a description of the parts
-*        of the image to be masked out, i.e. set to bad. The co-ordinate 
-*        system in which positions within this file are given should be 
-*        indicated by including suitable COFRAME or WCS statements within 
+*        of the image to be masked out, i.e. set to bad. The co-ordinate
+*        system in which positions within this file are given should be
+*        indicated by including suitable COFRAME or WCS statements within
 *        the file (see SUN/183), but will default to pixel or current
 *        WCS Frame co-ordinates in the absence of any such statements
-*        (see parameter DEFPIX). For instance, starting the file with a 
-*        line containing the text "COFRAME(SKY,System=FK5)" would indicate 
-*        that positions are specified in RA/DEC (FK5,J2000). The statement 
-*        "COFRAME(PIXEL)" indicates explicitly that positions are specified 
-*        in pixel co-ordinates. 
+*        (see parameter DEFPIX). For instance, starting the file with a
+*        line containing the text "COFRAME(SKY,System=FK5)" would indicate
+*        that positions are specified in RA/DEC (FK5,J2000). The statement
+*        "COFRAME(PIXEL)" indicates explicitly that positions are specified
+*        in pixel co-ordinates.
 *     COMP = LITERAL (Read)
 *        The NDF array component to be masked.  It may be "Data", or
-*        "Variance", or "Error" (where "Error" is equivalent to 
+*        "Variance", or "Error" (where "Error" is equivalent to
 *        "Variance"). ["Data"]
 *     CONST = LITERAL (Given)
-*        The constant numerical value to assign to the region, or the string 
+*        The constant numerical value to assign to the region, or the string
 *        "bad". ["bad"]
 *     DEFPIX = _LOGICAL (Read)
-*        If a TRUE value is supplied for DEFPIX, then co-ordinates in 
+*        If a TRUE value is supplied for DEFPIX, then co-ordinates in
 *        the supplied ARD file will be assumed to be pixel coordinates.
-*        Otherwise, they are assumed to be in the current WCS co-ordinate 
+*        Otherwise, they are assumed to be in the current WCS co-ordinate
 *        system of the supplied NDF. [TRUE]
 *     IN = NDF (Read)
 *        The name of the source NDF.
 *     INSIDE = _LOGICAL (Read)
-*        If a TRUE value is supplied, the constant value is assigned to the 
+*        If a TRUE value is supplied, the constant value is assigned to the
 *        inside of the region specified by the ARD file. Otherwise, it is
 *        assigned to the outside. [TRUE]
 *     OUT = NDF (Write)
@@ -108,7 +108,7 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-1998, 2001, 2004 Central Laboratory of the
-*     Research Councils. 
+*     Research Councils.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -183,11 +183,11 @@
       INCLUDE 'GRP_PAR'          ! GRP_ data constants
       INCLUDE 'PRM_PAR'          ! VAL_ data constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-               
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER COMP*8           ! Name of array component to mask
       CHARACTER CONTXT*40        ! Text version of constant value
       CHARACTER FILNAM*132       ! Name of ARD file
@@ -201,7 +201,7 @@
       INTEGER PFRM               ! Reduced PIXEL frame
       INTEGER I                  ! Loop count
       INTEGER IGRP               ! Group identifier
-      INTEGER INDF1              ! Identifier for the source NDF  
+      INTEGER INDF1              ! Identifier for the source NDF
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER INDFS              ! Identifier for the output NDF section
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
@@ -210,7 +210,7 @@
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER J                  ! Loop count
       INTEGER JUNK               ! Unused Mapping
-      INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
+      INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index
       INTEGER LBNDE( NDF__MXDIM )! Lower bounds of external array elements
       INTEGER LBNDI( NDF__MXDIM )! Lower bounds of internal array elements
       INTEGER NDIM               ! Number of pixel axes in the image
@@ -245,12 +245,12 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain an identifier for the NDF structure to be examined.       
+*  Obtain an identifier for the NDF structure to be examined.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
-*  Determine which array component is to be masked, converting 'ERROR' into 
+*  Determine which array component is to be masked, converting 'ERROR' into
 *  'VARIANCE'.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE., 
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE.,
      :                COMP, STATUS )
       IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
 
@@ -264,7 +264,7 @@
          CALL ERR_REP( 'ARDMASK_ERR1', 'The ^COMP component is '//
      :                 'undefined in the NDF structure ^NDF', STATUS )
       END IF
-      
+
 *  Obtain the numeric type of the NDF array component to be masked.
       CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
 
@@ -290,18 +290,18 @@
       CALL PAR_GET0l( 'DEFPIX', DEFPIX, STATUS )
 
 *  Get the WCS FrameSet from the NDF and use it to establish the WCS
-*  information used by the following cal to ARD_WORK. If required, 
-*  select PIXEL coords as the current Frame first (this means that 
+*  information used by the following cal to ARD_WORK. If required,
+*  select PIXEL coords as the current Frame first (this means that
 *  the default co-ord system in the ard file will be pixel coords).
       CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
-      IF( DEFPIX ) THEN 
+      IF( DEFPIX ) THEN
          CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
          CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
       END IF
       CALL ARD_WCS( IWCS, ' ', STATUS )
 
 *  Propagate the bits of the source NDF required.
-      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
+      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS',
      :               'OUT', INDF2, STATUS )
 
 *  Get the title for the output NDF.
@@ -315,7 +315,7 @@
       BAD = ( CONTXT .EQ. 'BAD' )
       IF( .NOT. BAD ) CALL CHR_CTOD( CONTXT, CONST, STATUS )
 
-*  See if the value is to be assigned to the inside or the outside of the 
+*  See if the value is to be assigned to the inside or the outside of the
 *  region.
       CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
@@ -337,7 +337,7 @@
 *  and extracting the one that transforms the NWCS current Frame axes into
 *  pixel coords.
          DO I = 1, NWCS
-            WCSAX( I ) = I 
+            WCSAX( I ) = I
          END DO
          CALL AST_MAPSPLIT( UMAP, NWCS, WCSAX, PIXAX, SPMAP, STATUS )
 
@@ -346,7 +346,7 @@
 
 *  Get the number of pixel axes that are used to feed the NWCS current
 *  Frame axes. If this is one less than the total number of pixel axes in
-*  the NDF, then we will loop round every plane along the extra pixel axis 
+*  the NDF, then we will loop round every plane along the extra pixel axis
 *  and mask each one.
             IF( AST_GETI( SPMAP, 'Nout', STATUS ) .EQ. NDIM - 1 ) THEN
 
@@ -355,7 +355,7 @@
                   USED = .FALSE.
                   DO J = 1, NDIM - 1
                      IF( PIXAX( J ) .EQ. I ) USED = .TRUE.
-                  END DO                  
+                  END DO
                   IF( .NOT. USED ) AXLOOP = I
                END DO
             END IF
@@ -365,11 +365,11 @@
 *  If we will be looping to mask multiple planes, change the application
 *  FrameSet so that it spans the reduced number of pixel axes.
       IF( AXLOOP .NE. 0 ) THEN
-         PFRM = AST_PICKAXES( AST_GETFRAME( UWCS, AST__BASE, STATUS ), 
+         PFRM = AST_PICKAXES( AST_GETFRAME( UWCS, AST__BASE, STATUS ),
      :                        NDIM - 1, PIXAX, JUNK, STATUS )
          AWCS = AST_FRAMESET( PFRM, ' ', STATUS )
          CALL AST_INVERT( SPMAP, STATUS )
-         CALL AST_ADDFRAME( AWCS, AST__BASE, SPMAP, 
+         CALL AST_ADDFRAME( AWCS, AST__BASE, SPMAP,
      :                      AST_GETFRAME( UWCS, AST__CURRENT, STATUS ),
      :                      STATUS )
          CALL ARD_WCS( AWCS, ' ', STATUS )
@@ -387,18 +387,18 @@
             END IF
          END DO
 
-*  Allocate the memory needed for the logical mask array covering one 
+*  Allocate the memory needed for the logical mask array covering one
 *  plane.
          CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
-      
+
 *  Create the mask.  Value 2 should be used to represent pixels
 *  specified by the first keyword in the ARD description. TRCOEF is
 *  ignored because we have previously called ARD_WCS.
          REGVAL = 2
-         CALL ARD_WORK( IGRP, NDIM - 1, PLBND, PUBND, TRCOEF, .FALSE., 
-     :                  REGVAL, %VAL( CNF_PVAL( IPMASK ) ), LBNDI, 
+         CALL ARD_WORK( IGRP, NDIM - 1, PLBND, PUBND, TRCOEF, .FALSE.,
+     :                  REGVAL, %VAL( CNF_PVAL( IPMASK ) ), LBNDI,
      :                  UBNDI, LBNDE, UBNDE, STATUS )
-       
+
 *  Note how many masking operations will be performed.
          NMASK = UBND( AXLOOP ) - LBND( AXLOOP ) + 1
 
@@ -411,13 +411,13 @@
 *  Allocate the memory needed for the logical mask array.
          CALL NDF_SIZE( INDF1, EL, STATUS )
          CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
-      
+
 *  Create the mask.  Value 2 should be used to represent pixels
 *  specified by the first keyword in the ARD description. TRCOEF is
 *  ignored because we have previously called ARD_WCS.
          REGVAL = 2
          CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :                  %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, LBNDE, 
+     :                  %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, LBNDE,
      :                  UBNDE, STATUS )
 
 *  Note how many masking operations will be performed.
@@ -445,40 +445,40 @@
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
          IF( TYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL,
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL,
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL,
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL,
      :                        %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL,
      :                        %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          ELSE IF( TYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, 
+            CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL,
      :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
-         
+
          END IF
 
 *  Annul the section identifier.
@@ -496,7 +496,7 @@
       CALL GRP_DELET( IGRP, STATUS )
 
 *  End the NDF context.
-      CALL NDF_END( STATUS )                              
+      CALL NDF_END( STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

@@ -35,7 +35,7 @@ c *** is i j neighbour to any in ijlist
       if(kl.eq.kref)goto 380
       goto 400
 c *** addition to present group
-  320 if(kl.eq.kref)goto 360  
+  320 if(kl.eq.kref)goto 360
       numb=njist(k)
       newnum=njist(ijc)
       if(numb.eq.newnum)goto 350

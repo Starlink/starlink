@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE gen_ITOH
 *
-*   Description: 
+*   Description:
 *      Encode hex integer value into string.
 *
 *   Authors:
@@ -42,10 +42,10 @@
       INTEGER IVALUE              ! value to be coded
       INTEGER FIELD               ! field width
       INTEGER MAXC                ! maximum size of string
- 
+
 *   Export:
       BYTE SVALUE(MAXC)           ! string to be filled
- 
+
 *   Local variables:
       CHARACTER CVALUE*(MAXBUF)   ! Fortran 77 version of value string
       CHARACTER FORMAT*(MAXFMT)   ! Fortran 77 format string

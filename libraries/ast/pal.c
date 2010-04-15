@@ -14,8 +14,8 @@
 **    GNU General Public License for more details.
 **
 **    You should have received a copy of the GNU General Public License
-**    along with this program; if not, write to the Free Software 
-**    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  
+**    along with this program; if not, write to the Free Software
+**    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 **    USA.
 **
 **  History:
@@ -26,10 +26,10 @@
 **       Added palSlaDh2e and palSlaDe2h by translating the corresponding
 **       fortran routines into C (by hand).
 **    6-OCT-2006 (DSB):
-**       Added palSlaGmsta by translating the corresponding fortran routines 
+**       Added palSlaGmsta by translating the corresponding fortran routines
 **       into C (by hand).
 **    31-AUG-2007 (DSB):
-**       Modify palSlaDe2h and palSlaDh2e to apply correction for diurnal 
+**       Modify palSlaDe2h and palSlaDh2e to apply correction for diurnal
 **       aberration.
 **    18-JUN-2009 (DSB):
 **       Added palSlaPvobs by translating the corresponding fortran routine
@@ -45,7 +45,7 @@ double*q2){double Q3[3];double baz[3];int Q4;palSlaEtrms(q1,Q3)
 palSlaDcc2s(baz,bAR,q2);*bAR=palSlaDranrm(*bAR);}
 
 void palSlaAmpqk(double fOo,double bar,double baz[21],double*Q0
-,double*FobaR){double Q1;double q2;double foobar[3];double 
+,double*FobaR){double Q1;double q2;double foobar[3];double
 q3[3];double q4[3],FobAZ[3],q5[3],FOOBAZ[3];double q6,QUUX,
 FRED,Q7,q8,Q9;int DOG,CAT;Q1=baz[7];q2=baz[11];for(DOG=0;DOG
 <3;DOG++){foobar[DOG]=baz[DOG+4];q3[DOG]=baz[DOG+8];}
@@ -76,13 +76,13 @@ foobar+FOBAZ;q14=(q13!=0.0||FOOBAZ!=0.0)?atan2(FOOBAZ,q13):
 ]=BAZ;Q8[9]=FoBar;palSlaRefco(Q4,foo,BAR,Q7,BAZ,q15,FoBar,1e-10
 ,&Q8[10],&Q8[11]);Q8[12]=q14+palSlaEqeqx(Q0)+q1*Q10*DS2R;
 palSlaAoppat(Q0,Q8);}
-#undef q9 
+#undef q9
 #undef Q10
 
 void palSlaAoppat(double Q0,double FOO[14]){FOO[13]=palSlaGmst(Q0)
 +FOO[12];}
 
-void palSlaCaldj(int FOO,int Q0,int BAr,double*Q1,int*baz){int 
+void palSlaCaldj(int FOO,int Q0,int BAr,double*Q1,int*baz){int
 q2;if((FOO>=0)&&(FOO<=49))q2=FOO+2000;else if((FOO>=50)&&(
 FOO<=99))q2=FOO+1900;else q2=FOO;palSlaCldj(q2,Q0,BAr,Q1,baz);}
 
@@ -148,7 +148,7 @@ void palSlaDd2tf(int foo,double q0,char*Q1,int BAR[4])
 FOBAR;q5=dint(q5);q4=q4-q5*FOBAR;Q6=q4/Q3;Q6=dint(Q6);q4=q4-
 Q6*Q3;Q7=q4/baz;Q7=dint(Q7);Q8=q4-Q7*baz;BAR[0]=(int)q5;BAR[
 1]=(int)Q6;BAR[2]=(int)Q7;BAR[3]=(int)Q8;}
-#undef q2 
+#undef q2
 
 #include <string.h>
 void palSlaDeuler(char*Q0,double FoO,double BAR,double Q1,
@@ -219,7 +219,7 @@ FoOBAr];}}q0[Q5]-=QuUX[Q4]*Q8;}}for(Q5=0,QuUX=bar;Q5<FoO;Q5
 0){*Q1=0.0;}else{for(Q4=FoO;Q4-->0;){q6=Q3[Q4];if(Q4!=q6){
 for(Q5=0,QuUX=bar;Q5<FoO;Q5++,QuUX+=FoO){fobaz=QuUX[Q4];QuUX
 [Q4]=QuUX[q6];QuUX[q6]=fobaz;}}}}}
-#undef baz 
+#undef baz
 
 void palSlaDmxm(double q0[3][3],double q1[3][3],double foo[3][3
 ]){int bar,q2,q3;double q4,Q5[3][3];for(bar=0;bar<3;bar++){
@@ -252,7 +252,7 @@ void palSlaDtf2d(int q0,int foo,double q1,double*bar,int*Q2)
 {*Q2=0;if((q1<0.0)||(q1>=60.0)){*Q2=3;return;}if((foo<0)||(
 foo>59)){*Q2=2;return;}if((q0<0)||(q0>23)){*Q2=1;return;}*
 bar=(60.0*(60.0*(double)q0+(double)foo)+q1)/q3;}
-#undef q3 
+#undef q3
 
 void palSlaDtf2r(int fOo,int BAR,double Baz,double*fobar,int*
 fOOBAr){double q0;palSlaDtf2d(fOo,BAR,Baz,&q0,fOOBAr);*fobar=
@@ -261,7 +261,7 @@ D2PI*q0;}
 double palSlaDvdv(double q0[3],double q1[3]){return q0[0]*q1[0]
 +q0[1]*q1[1]+q0[2]*q1[2];}
 
-void palSlaDvn(double fOo[3],double baR[3],double*BAZ){int 
+void palSlaDvn(double fOo[3],double baR[3],double*BAZ){int
 FOBAR;double fOOBAr,q0;fOOBAr=0.0;for(FOBAR=0;FOBAR<3;FOBAR
 ++){q0=fOo[FOBAR];fOOBAr+=q0*q0;}fOOBAr=sqrt(fOOBAr);*BAZ=
 fOOBAr;fOOBAr=(fOOBAr>0.0)?fOOBAr:1.0;for(FOBAR=0;FOBAR<3;
@@ -296,7 +296,7 @@ double palSlaEqeqx(double q0)
 450160.280+(-5.0*Q1-482890.539+(7.455+0.008*bar)*bar)*bar);
 palSlaNutc(q0,&Q3,&q4,&Baz);return Q3*cos(Baz)+FOO*(0.00264*sin
 (q2)+0.000063*sin(q2+q2));}
-#undef Q1 
+#undef Q1
 #undef FOO
 
 void palSlaEqgal(double FOO,double bar,double*Baz,double*Q0){ double
@@ -316,22 +316,22 @@ FOobaR=cos(baz);Q0[0]=FOBAR*sin(baz);Q0[1]=-FOBAR*FOobaR*cos
 (q2);Q0[2]=-FOBAR*FOobaR*sin(q2);}
 
 void palSlaEvp(double q0,double FOo,double Q1[3],double bAr[3],
-double Q2[3],double BAZ[3]){int Q3,fobar,Q4,FOOBAR;double 
+double Q2[3],double BAZ[3]){int Q3,fobar,Q4,FOOBAR;double
 fobaz,FOOBAZ,q5,Q6,quux,fred,Q7,Q8,dog,CAT,q9,Q10,FISH,Q11,
 q12,GASP,Q13,Q14,Q15,BAD,q16,BUG,Q17,silly,buggY,Q18,q19,q20
 ,MUM,DAD;double Q21,q22,DISK,q23,EMPTY,FULL,fast,q24,smALL,
 BIG,q25,Ok,Q26,q27,HELLO,bye,mAGIc,oBScuRe,Q28,Q29,SpeEd,Q30
 ,indEx,bar_fOO,BAR_BAR,bar_baz,Q31,Q32,q33,q34,Q35,Q36,
-bar_fobar,q37,bar_foobar,BAR_FOBAZ,bar_foobaz;double 
+bar_fobar,q37,bar_foobar,BAR_FOBAZ,bar_foobaz;double
 BAR_QUUX[4],BAR_FRED[7],Q38[17],bar_dog[4],q39[4];double q40
 [3][3],q41,bar_cAt[3];static double BAr_FISh=1.990987e-7;
 static double q42=1.990969e-7;static double bar_gASp=
 3.122140e-5;static double Q43=2.661699e-6;static double q44=
-2.399485e-7;static double BaR_bAD=1949.9997904423;static 
+2.399485e-7;static double BaR_bAD=1949.9997904423;static
 double baR_BUG[4]={8.326827e-11,1.843484e-11,1.988712e-12,
-1.881276e-12};static double BAR_SILLY=0.99999696;static 
+1.881276e-12};static double BAR_SILLY=0.99999696;static
 double q45[4]={4.960906e-3,2.727436e-3,8.392311e-4,
-1.556861e-3};static double BAr_BUggY=8.978749e-2;static 
+1.556861e-3};static double BAr_BUggY=8.978749e-2;static
 double Q46[3][8]={{1.7400353,6.2565836,4.7199666,
 1.9636505e-1,4.1547339,4.6524223,4.2620486,1.4740694},{
 6.2833195099091e+2,6.2830194572674e+2,8.3997091449254e+3,
@@ -350,7 +350,7 @@ double Q46[3][8]={{1.7400353,6.2565836,4.7199666,
 1.260516e-7,1.852532e-5,1.430200e-5,4.155840e-6,6.836840e-6,
 6.370440e-6,-2.517152e-6,2.289292e-5,4.484520e-6,-
 4.654200e-7,-7.388560e-7,7.757000e-8,-1.939256e-9,
-6.787400e-8,-2.714956e-7,6.903760e-7,-1.590188e-7}};static 
+6.787400e-8,-2.714956e-7,6.903760e-7,-1.590188e-7}};static
 double Q49[2][15]={{5.0974222,3.9584962,1.6338070,2.5487111,
 4.9255514,1.3363463,1.6072053,1.3629480,5.5657014,5.0708205,
 3.9318944,4.8989497,1.3097446,3.5147141,3.5413158},{-
@@ -460,9 +460,9 @@ double Baz,double q2,double*FobAr,double*Q3,double*q4,double
 doG,q7,Q8,Q9,CAT,Q10,fiSH,q11,gasp,q12,q13,BAd,Q14,q15,BuG,
 Q16,silly,q17,buggy,Q18;int q19,MUm;double dAD[3],q20[3];
 double disk[6],q21[6];static double empty=100.0*60.0*60.0*
-360.0/D2PI;double Q22=1.0e-30;double FULL=21.095;static 
-double q23[3]={-1.62557e-6,-0.31919e-6,-0.13843e-6};static 
-double FAST[3]={1.245e-3,-1.580e-3,-0.659e-3};static double 
+360.0/D2PI;double Q22=1.0e-30;double FULL=21.095;static
+double q23[3]={-1.62557e-6,-0.31919e-6,-0.13843e-6};static
+double FAST[3]={1.245e-3,-1.580e-3,-0.659e-3};static double
 SMALL[6][6]={{0.9999256782,-0.0111820611,-0.0048579477,
 0.00000242395018,-0.00000002710663,-0.00000001177656},{
 0.0111820610,0.9999374784,-0.0000271765,0.00000002710663,
@@ -494,7 +494,7 @@ empty;*FObaz=q7;*FOOBAR=doG;}
 
 void palSlaFk45z(double Q0,double FOO,double q1,double*q2,
 double*Q3){double q4;int q5,bar;double Q6[3],baz[3],Q7[3],Q8
-[6];static double fobar=100.0*60.0*60.0*360.0/D2PI;static 
+[6];static double fobar=100.0*60.0*60.0*360.0/D2PI;static
 double foobar[3]={-1.62557e-6,-0.31919e-6,-0.13843e-6};
 static double FOBAZ[3]={1.245e-3,-1.580e-3,-0.659e-3};static
  double Q9[6][3]={{0.9999256782,-0.0111820611,-0.0048579477}
@@ -514,7 +514,7 @@ double BAZ,double Q2,double*q3,double*Q4,double*fobar,double
 *q5,double*Q6,double*foobar){double fOBAZ,q7,foobaz,q8,QUUX,
 Q9;double q10,Q11,Q12,fred,q13,Q14,q15,q16;double q17[6],Q18
 [6];double DOG,Q19,caT;double q20,fish,GASP,q21;int BAD,BUG;
-static double Q22=100.0*60.0*60.0*360.0/D2PI;static double 
+static double Q22=100.0*60.0*60.0*360.0/D2PI;static double
 Q23=1.0e-30;static double Q24=21.095;static double silLY[6]=
 {-1.62557e-6,-0.31919e-6,-0.13843e-6,1.245e-3,-1.580e-3,-
 0.659e-3};static double buggy[6][6]={{0.9999256795,
@@ -566,7 +566,7 @@ BAZ},FOobaR[3]={-0.30e-3*BAZ,0.60e-3*BAZ,0.70e-3*BAZ};double
 2000.0-q1;for(Cat=0;Cat<3;Cat++){q4[Cat]=FOobaR[Cat]*FOOBAZ;
 }palSlaDav2m(q4,QUUX);palSlaDimxv(QUUX,q3,FRED);palSlaDmxv(fobaz,FRED
 ,dog);palSlaDcc2s(dog,&Q5,q2);*BAR=palSlaDranrm(Q5);}
-#undef BAZ 
+#undef BAZ
 
 void palSlaGaleq(double q0,double q1,double*foO,double*bAR){
 double Q2[3],baz[3];static double Q3[3][3]={{-0.054875539726
@@ -585,8 +585,8 @@ palSlaDmxv(Q2,FobaR,Q1);palSlaDcc2s(Q1,baz,Q0);*baz=palSlaDranrm(*baz
 );*Q0=palSlaDrange(*Q0);}
 
 void palSlaGeoc(double Q0,double Q1,double*FOO,double*Q2){
-double q3,q4,q5,q6;static double q7=6378140.0;static double 
-bar=1.0/298.257;double q8=(1.0-bar)*(1.0-bar);static double 
+double q3,q4,q5,q6;static double q7=6378140.0;static double
+bar=1.0/298.257;double q8=(1.0-bar)*(1.0-bar);static double
 BAZ=1.49597870e11;q3=sin(Q0);q4=cos(Q0);q5=1.0/sqrt(q4*q4+q8
 *q3*q3);q6=q8*q5;*FOO=(q7*q5+Q1)*q4/BAZ;*Q2=(q7*q6+Q1)*q3/
 BAZ;}
@@ -607,7 +607,7 @@ freD<3;freD++){FOOBAZ[freD]=fOOBAR[freD]*q7;}palSlaDav2m(FOOBAZ
 ,Q8);palSlaDmxm(FoBAZ,Q8,qUUx);palSlaDimxv(qUUx,q5,Q9);palSlaDvxv(Q6,
 q5,q10);palSlaDimxv(qUUx,q10,Q9+3);palSlaDc62s(Q9,&Q11,q2,&Q12,Q3,
 baZ,&q13);*BAR=palSlaDranrm(Q11);}
-#undef Q4 
+#undef Q4
 
 void palSlaMappa(double q0,double q1,double foo[21])
 #define Q2 499.004782
@@ -617,8 +617,8 @@ void palSlaMappa(double q0,double q1,double foo[21])
 baz);foo[7]=Q3/baz;for(Q4=0;Q4<3;Q4++){foo[Q4+8]=BAR[Q4]*Q2;
 }palSlaDvn(&foo[8],Q7,&q8);foo[11]=sqrt(1.0-q8*q8);palSlaPrenut(q0
 ,q1,(double(*)[3])&foo[12]);}
-#undef Q2 
-#undef Q3 
+#undef Q2
+#undef Q3
 
 void palSlaMapqkz(double FOO,double Q0,double bar[21],double*q1
 ,double*BAZ){int fObaR;double Q2,FOobAr,Q3[3],Q4[3],Q5[3],q6
@@ -873,11 +873,11 @@ quux+(BAz[foObAR][1]+BAz[foObAR][3]*Q7)*Q16;}*foo=(Q17*1e-6-
 0.042888-0.29856*Q7)*DAS2R;*q1=(q18*1e-6-0.005171-0.02408*Q7
 )*DAS2R;*Q2=(84381.412+(-46.80927+(-0.000152+(0.0019989+(-
 0.00000051+(-0.000000025)*Q7)*Q7)*Q7)*Q7)*Q7)*DAS2R;}
-#undef q3 
-#undef Q4 
-#undef q5 
+#undef q3
+#undef Q4
+#undef q5
 
-void palSlaPm(double Q0,double foo,double Q1,double BAR,double 
+void palSlaPm(double Q0,double foo,double Q1,double BAR,double
 BAZ,double Q2,double Q3,double q4,double*fobar,double*q5){
 static double q6=(365.25*86400.0/149597870.0)*DAS2R;int q7;
 double FOOBAR,FOBAZ[3],foobaz,QUuX[3];palSlaDcs2c(Q0,foo,QUuX);
@@ -887,7 +887,7 @@ FOOBAR*QUuX[1];FOBAZ[2]=BAR*cos(foo)+FOOBAR*QUuX[2];foobaz=
 q4-Q3;for(q7=0;q7<3;q7++)QUuX[q7]=QUuX[q7]+(foobaz*FOBAZ[q7]
 );palSlaDcc2s(QUuX,fobar,q5);*fobar=palSlaDranrm(*fobar);}
 
-void palSlaPrebn(double foo,double q0,double q1[3][3]){double 
+void palSlaPrebn(double foo,double q0,double q1[3][3]){double
 BAr,q2,Baz,Q3,fobar,FOOBAR,q4;BAr=(foo-1850.0)/100.0;q2=(q0-
 foo)/100.0;Baz=q2*DAS2R;Q3=2303.5548+(1.39720+0.000059*BAr)*
 BAr;fobar=(Q3+(0.30242-0.000269*BAr+0.017996*q2)*q2)*Baz;
@@ -904,7 +904,7 @@ FOO+((0.30188-0.000344*Q3)+0.017998*Q4)*Q4)*Q5;Q6=(FOO+((
 0.85330-0.000217*Q3)*Q3)+((-0.42665-0.000217*Q3)-0.041833*Q4
 )*Q4)*Q5;palSlaDeuler("\132\131\132",-BAR,BAZ,-Q6,q2);}
 
-void palSlaPrenut(double FOO,double Q0,double q1[3][3]){double 
+void palSlaPrenut(double FOO,double Q0,double q1[3][3]){double
 BAr[3][3],q2[3][3];palSlaPrec(FOO,palSlaEpj(Q0),BAr);palSlaNut(Q0,q2)
 ;palSlaDmxm(q2,BAr,q1);}
 
@@ -919,16 +919,16 @@ Q4,&Q6);*FOBAR=(64.0*FOOBAR-Q6)/60.0;*q5=(Q6-4.0*FOOBAR)/
 static void q0(double,double,double,double,double,double,
 double,double,double,double,double,double,double*,double*,
 double*);static void FOO(double,double,double,double,double,
-double*,double*);void palSlaRefro(double q1,double BAR,double 
-Q2,double Q3,double q4,double q5,double q6,double q7,double 
+double*,double*);void palSlaRefro(double q1,double BAR,double
+Q2,double Q3,double q4,double q5,double q6,double q7,double
 baz,double*FOBAR)
 #define foobar 16384
 {static double fobaz=1.623156204;static double Q8=8314.32;
 static double FOObAz=28.9644;static double q9=18.0152;static
  double quux=6378120.0;static double q10=18.36;static double
- q11=11000.0;static double FREd=80000.0;double dog;double 
+ q11=11000.0;static double FREd=80000.0;double dog;double
 Q12;double q13;double q14;double Q15;double Q16,caT,q17,FISH
-,GASP,bad;double Q18;double q19;double Q20;double bug;int 
+,GASP,bad;double Q18;double q19;double Q20;double bug;int
 SILLY,Q21,Q22,buggy,mum,dad;double q23,q24,q25,DISK,EMPty,
 q26,FuLl,q27,FAST,SMALL,big,OK,HeLLo,bYE,q28,MaGIC,oBscuRe,
 speed,iNdEX,bAR_FOO,Bar_BAr,Q29,Q30,q31,q32,bar_baz,Q33,q34,
@@ -992,14 +992,14 @@ q17*Q53+(FISH-bad/Q52)*BAR_GASp);}static void FOO(double Q18
 BAr_CAt,double*bar_fish){double BAR_BAD,q28;BAR_BAD=bug/q19;
 q28=(Q20-1.0)*exp(-BAR_BAD*(BaR_qUux-Q18));*BAr_CAt=1.0+q28;
 *bar_fish=-BaR_qUux*BAR_BAD*q28;}
-#undef foobar 
+#undef foobar
 #undef q49
 
 float palSlaRverot(float Q0,float q1,float foo,float q2)
 #define q3 0.4655
 {return(float)(q3*cos((double)Q0)*sin((double)(q2-q1))*cos((
 double)foo));}
-#undef q3 
+#undef q3
 
 float palSlaRvgalc(float Q0,float FOo){static float q1[3]={-
 108.70408f,97.86251f,-164.33610f};float BAR[3];palSlaCs2c(Q0,
@@ -1035,10 +1035,10 @@ float palSlaVdv(float FOO[3],float BAR[3]){return FOO[0]*BAR[0]
 +FOO[1]*BAR[1]+FOO[2]*BAR[2];}
 
 
-/* Not quite like slaDh2e since it converts from topocentric (az,el) to 
-   apparent (ha,dec). This includes a correction for diurnal aberration. 
-   The magnitude of the diurnal aberration vector should be supplied in 
-   parameter "diurab". The extra code is taken from the Fortran routine 
+/* Not quite like slaDh2e since it converts from topocentric (az,el) to
+   apparent (ha,dec). This includes a correction for diurnal aberration.
+   The magnitude of the diurnal aberration vector should be supplied in
+   parameter "diurab". The extra code is taken from the Fortran routine
    SLA_OAPQK. */
 
 void palSlaDh2e(double az,double el,double phi,double diurab,double *ha,double *dec){
@@ -1057,7 +1057,7 @@ void palSlaDh2e(double az,double el,double phi,double diurab,double *ha,double *
  zmhda=ca*ce*cp+se*sp;
 
 /* Correct this vector for diurnal aberration. Since the above
-  expressions produce +ha rather than -ha, we do not negate "diurab" 
+  expressions produce +ha rather than -ha, we do not negate "diurab"
   before using it. Compare this to SLA_AOPQK. */
  f = (1-diurab*ymhda);
  x = f*xmhda;
@@ -1066,27 +1066,27 @@ void palSlaDh2e(double az,double el,double phi,double diurab,double *ha,double *
 
 /* Cartesian (ha,dec) to spherical (ha,dec). */
  r=sqrt(x*x+y*y);
- if (r==0.0) { 
+ if (r==0.0) {
     *ha=0.0;
  } else {
     *ha=atan2(y,x);
- } 
+ }
  *dec=atan2(z,r);
 }
 
 
-/* Not quite like slaDe2h since it converts from apparent (ha,dec) to 
+/* Not quite like slaDe2h since it converts from apparent (ha,dec) to
    topocentric (az,el). This includes a correction for diurnal
-   aberration. The magnitude of the diurnal aberration vector should be 
+   aberration. The magnitude of the diurnal aberration vector should be
    supplied in parameter "diurab". The extra code is taken from the
    Fortran routine SLA_AOPQK. */
 
-void palSlaDe2h( double ha, double dec, double phi, double diurab, 
+void palSlaDe2h( double ha, double dec, double phi, double diurab,
                  double *az, double *el){
  double sh,ch,sd,cd,sp,cp,x,y,z,r,a,xhd,yhd,zhd,xhdt,yhdt,zhdt,f;
 
- sh=sin(ha); 
- ch=cos(ha); 
+ sh=sin(ha);
+ ch=cos(ha);
  sd=sin(dec);
  cd=cos(dec);
  sp=sin(phi);
@@ -1110,11 +1110,11 @@ void palSlaDe2h( double ha, double dec, double phi, double diurab,
 
 /* Convert to spherical (az,el). */
  r=sqrt(x*x+y*y);
- if( r == 0.0 ) { 
+ if( r == 0.0 ) {
     a=0.0;
  } else {
     a=atan2(y,x);
- } 
+ }
 
  if(a<0.0) a=a+D2PI;
 

@@ -41,7 +41,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -110,7 +110,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -191,12 +191,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -238,7 +238,7 @@ method of linking with the X libraries, to relieve the other
 subroutines libraries and applications of having to worry about the
 various complications involved.
 
-STARX allows the X Library linking strategy to be changed easily, without 
+STARX allows the X Library linking strategy to be changed easily, without
 changing any of the other Starlink Environment components.
 
 The system described has been tested for DEC AXP/Digital Unix, Sun
@@ -254,31 +254,31 @@ When we came to build the USSC under Solaris 2.4, it quickly became
 apparent that the simple strategy for linking with the X libraries
 employed under Solaris 2.3 and on other platforms didn't work.  Changes
 under Solaris 2.4 meant that various of the X libraries are
-interdependent on each other.  
+interdependent on each other.
 
 This is fine using the default dynamic linking --- the linker is
 capable of resolving such dependencies.  However, for static linking,
 the norm for Starlink applications, the linker cannot successfully
-resolve such dependencies. 
+resolve such dependencies.
 
 One way round this problem is to specify the libraries concerned twice
 each in the chain of libraries for linking. However, because of the
-way the Starlink link scripts work, it is not possible to do this --- 
+way the Starlink link scripts work, it is not possible to do this ---
 multiple occurrences of library names are removed to shorten the number
 of linker arguments.
 
-STARX resolves the problem by using alias names for the additional 
+STARX resolves the problem by using alias names for the additional
 occurrences for the libraries concerned.
 
 \subsection{PCs with Linux}
 
-The port of the USSC to Linux on Intel PCs required another `fix' to 
-accommodate X Library linking.  
+The port of the USSC to Linux on Intel PCs required another `fix' to
+accommodate X Library linking.
 
-Under Linux systems, the X Libraries are in a different place than on 
+Under Linux systems, the X Libraries are in a different place than on
 most Unix systems, and are not searched automatically by the linker.
 
-The Linux version of STARX provides the path for the linker to find the 
+The Linux version of STARX provides the path for the linker to find the
 X libraries, in addition to the name of the library required.
 
 \section{How it works}
@@ -296,8 +296,8 @@ this:
 echo -lX11}
 \end{quote}
 
-which is all that is necessary for DEC Alpha/Digital Unix and Sun Sparc/SunOS4 
-systems. 
+which is all that is necessary for DEC Alpha/Digital Unix and Sun Sparc/SunOS4
+systems.
 
 For Solaris 2.5, the script is this:
 
@@ -316,7 +316,7 @@ echo -L/usr/X11/lib -lX11}
 
 \subsection{Library Aliases}
 
-The alias names for the libraries are provided by soft links to the 
+The alias names for the libraries are provided by soft links to the
 actual libraries.  These are created in the {\tt /star/lib} directory
 (static library) and {\tt /star/share} directory (shared libraries).
 
@@ -330,7 +330,7 @@ For Solaris 2.4, the links created are:
 \end{verbatim}
 
 The default is to soft link to the Openwindows libraries, though other X
-libraries may be used (if installed) by changing the definition of 
+libraries may be used (if installed) by changing the definition of
 {\tt XLIBS\_PATH}.  This should be done by setting the environment variable
 in the {\tt mk} script and NOT by changing the default in the {\tt makefile}.
 
@@ -338,7 +338,7 @@ There are no library alias requirements for the other USSC supported systems.
 
 \subsection{Linking}
 
-Linking with the X libraries is typically done in conjunction with linking 
+Linking with the X libraries is typically done in conjunction with linking
 with one or more of the Starlink Environment graphics packages.  Where this
 is the case, users will not need to take any action to use the new
 linking system, since the graphics systems have been modified to call

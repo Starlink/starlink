@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
       YC( 1 ) = VAL__BADR
       XC( 2 ) = VAL__BADR
       YC( 2 ) = VAL__BADR
-      
+
 *  If the cursor is to be used to get the position of the box centre...
       IF( CURSOR ) THEN
 
@@ -224,7 +224,7 @@
 
 *  Store the actual size as a fraction of the requested box size.
          IF( DIST .NE. VAL__BADD ) THEN
-            FRACX = ABS( REAL( DIST ) )/BOXSIZ( 1 ) 
+            FRACX = ABS( REAL( DIST ) )/BOXSIZ( 1 )
          ELSE
             FRACX = VAL__BADR
          END IF
@@ -242,7 +242,7 @@
 
 *  Store the actual size as a fraction of the requested box size.
          IF( DIST .NE. VAL__BADD ) THEN
-            FRACY = ABS( REAL( DIST ) )/BOXSIZ( 2 ) 
+            FRACY = ABS( REAL( DIST ) )/BOXSIZ( 2 )
          ELSE
             FRACY = VAL__BADR
          END IF
@@ -270,7 +270,7 @@
          YC( 1 ) = YCEN - 0.5*BOXSIZ( 2 )
          YC( 2 ) = YC( 1 ) + BOXSIZ( 2 )
 
-      END IF         
+      END IF
 
  999  CONTINUE
 

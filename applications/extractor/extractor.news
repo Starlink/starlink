@@ -16,7 +16,7 @@
     EXTRACTOR has been changed so that it now works on NDFs with higher
     number of dimensions, provided that only two dimensions are significant.
     This means it's now possible to run EXTRACTOR on a plane of a cube:
-   
+
        extractor cube'(,,1)'
 
     EXTRACTOR has also been changed to avoid converting all data to single
@@ -34,9 +34,9 @@
     EXTRACTOR will now work with images that have Dec,RA coordinate systems
     (previously it would only work with RA,Dec systems, but these could have
     any orientation and could therefore appear as Dec,RA).
- 
+
  Changes in release 2.3.
- 
+
     EXTRACTOR has been updated to work with SExtractor 2.3.2.
 
     This updates the native SExtractor command to include Large File Support

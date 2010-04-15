@@ -20,7 +20,7 @@
 *     Checks to see whether a plate is incuded in plate common and if
 *     not adds it. Sets up cross linkage between the source record in
 *     source common and the plate record in plate common.
-*     
+*
 
 *  Arguments:
 *     DATATY = INTEGER (Given)
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,17 +140,17 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  *********************************************************************
 *  Check whether the plate is present in the plate list in common
 *  *********************************************************************
 
 *  Set plate found flag to .FALSE.
       PLFOUN = .FALSE.
-      
+
 *  Set the position examined to the first record in the plate list
       PLPOS = 1
-      
+
 *  Search through plate list to see if required plate is already
 *  included in plate list
  100  CONTINUE             ! Start of 'DO WHILE' loop
@@ -161,7 +161,7 @@
             PLPOS = PLPOS + 1
             GO TO 100
          END IF
-      END IF         
+      END IF
 
 *  *********************************************************************
 *  If the plate has not been found add a new plate at the next position
@@ -171,7 +171,7 @@
       IF ( .NOT. PLFOUN ) THEN
 
 *  Set PLPOS to this position
-         PLPOS = NOPLAT + 1   
+         PLPOS = NOPLAT + 1
 
 *  Add details of the new plate
          PLNUM( PLPOS )  = REQPLA
@@ -228,7 +228,7 @@
      :         STATUS       )
                STATUS = SAI__ERROR
             END IF
-	 END IF            
+	 END IF
 
 *  *********************************************************************
 *  For Pass 3    Exobyte use
@@ -252,7 +252,7 @@
 
 *  End if for end of add new plate to plate common
       END IF
-      
+
 *  *********************************************************************
 *  When either the plate has been found in plate common or a new plate
 *  has been added, set up pointers to cross reference the plate to the
@@ -270,6 +270,6 @@
       PLSOI( PLPOS,NEXTSO) = SOPOS
 
 *  And update the number of sources in that plate
-      PLNOSO( PLPOS ) = NEXTSO 
+      PLNOSO( PLPOS ) = NEXTSO
 
       END

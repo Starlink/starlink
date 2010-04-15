@@ -39,7 +39,7 @@ proc zaplot
         print "O.K. finished using ZAPLOT ..."
         return
       end if
-      out = im & "z" 
+      out = im & "z"
     else
       im = ffpre & dummy & ffsuf
       out = im & "z"

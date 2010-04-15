@@ -44,15 +44,15 @@
       INTEGER
      :  I             ! index to array elements
 *-
- 
+
 *    check for error on entry
       IF( STATUS .EQ. SAI__OK ) THEN
- 
+
 *      Fill the array with the value of VALUE
          DO I = 1,DIM
             ARRAY( I ) = VALUE
          ENDDO
- 
+
       ENDIF
- 
+
       END

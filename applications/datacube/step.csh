@@ -11,7 +11,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     step [-i filename] [-l number] [-p] [-s number] [-u number] 
+#     step [-i filename] [-l number] [-p] [-s number] [-u number]
 #
 #  Description:
 #     This shell script reads a three-dimensional IFU NDF as input and
@@ -25,13 +25,13 @@
 #       input file.
 #     -l number
 #       Lower spectral-axis bound of the region of interest.
-#     -p 
-#       The script will plot the extracted images to the current display 
+#     -p
+#       The script will plot the extracted images to the current display
 #       as well as saving it to an NDF file. [FALSE]
 #     -s number
 #       Spectral-axis step size for each passband chunk.
 #     -u number
-#       Upper spectral-axis bound of the region of interest.  
+#       Upper spectral-axis bound of the region of interest.
 #
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA package.
@@ -64,20 +64,20 @@
 #       parameters FLBND/FUBND.
 #     2005 September  2 (MJC):
 #       Replaced PUTAXIS with KAPPA:SETAXIS in WCS mode.  Some tidying:
-#       spelling & punctuation corrections, sorted parameters in 
+#       spelling & punctuation corrections, sorted parameters in
 #       alphabetical order.  Added section headings in the code.  Replace
 #       explicit wavelength in prompts with the current WCS Frame's label for
-#       the spectral axis, and also used the corresponding units in the 
+#       the spectral axis, and also used the corresponding units in the
 #       output commentary.
 #     2005 November 3 (MJC):
 #       Plot the image slices in an optimally shaped grid rather than
-#       full size in quick succession, and thereby permit comparison.  
+#       full size in quick succession, and thereby permit comparison.
 #       Surmised the units for a UK data-cube format NDF.  Add options
 #       waste disposal.
 #     2006 March 2 (MJC):
 #       Allow for NDF sections to be supplied with the input filename.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
 #    {enter_further_changes_here}
@@ -125,7 +125,7 @@ while ( $#args > 0 )
       set gotlower = "TRUE"
       set lower = $args[1]
       shift args
-      breaksw            
+      breaksw
    case -p:    # plot each chunk?
       set pltimg = "TRUE"
       shift args
@@ -145,7 +145,7 @@ while ( $#args > 0 )
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw      
+   endsw
 end
 
 # Do package setup.
@@ -240,8 +240,8 @@ while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
       setaxis "ndf=${outfile} dim=1 mode=wcs comp=Centre" >& /dev/null
       setaxis "ndf=${outfile} dim=2 mode=wcs comp=Centre" >& /dev/null
       echo "        Axes: Adding AXIS centres."
-   endif 
-   settitle "ndf=${outfile} title='${curr_low}--${curr_upp} ${sunits}'" 
+   endif
+   settitle "ndf=${outfile} title='${curr_low}--${curr_upp} ${sunits}'"
    echo "        Title: Setting to ${curr_low}--${curr_upp} ${sunits}"
    echo " "
 
@@ -286,7 +286,7 @@ if ( ${pltimg} == "TRUE" ) then
 # Find the ratio of the aspect ratios.  The idea is to match the shape
 # of the images best to the plotting region, and tile accordingly.
 # So if this ratio is near 1.0, the number of tiles in each axis
-# should be the same, i.e. the next enclosing square.  Smaller than 
+# should be the same, i.e. the next enclosing square.  Smaller than
 # 1.0 it means that more images will fit across the width of the
 # base picture than will fit the height.
    set asp = `calc exp="'sqrt(${pasp}/${iasp})'"`
@@ -298,11 +298,11 @@ if ( ${pltimg} == "TRUE" ) then
 # Determine optimum shape of the grid of pictures.
 # ------------------------------------------------
 
-# To determine the best ratio, create various ratios around the square 
+# To determine the best ratio, create various ratios around the square
 # +/-3 tiles.
    set grid_range = 3
 
-# The image has larger aspect ratio than the picture.  There will be fewer 
+# The image has larger aspect ratio than the picture.  There will be fewer
 # tiles along the x direction than the y.
    if ( `echo "if ( ${asp} <= 1.0 ) 1" | bc` ) then
       set i = `calc exp="'max(1,${gm}-${grid_range})'"`
@@ -310,7 +310,7 @@ if ( ${pltimg} == "TRUE" ) then
       set ip = 0
       set jp = $grid_range
 
-# The image has smaller aspect ratio than the picture.  There will be fewer 
+# The image has smaller aspect ratio than the picture.  There will be fewer
 # tiles along the y direction than the x.
    else
       @ i = $gm
@@ -335,7 +335,7 @@ if ( ${pltimg} == "TRUE" ) then
 # the number of images.
          if ( $kount >= $counter ) then
 
-# We need to determine the fraction of the plotting area that would 
+# We need to determine the fraction of the plotting area that would
 # contain the channel images.  This is the fraction of used frames
 # in the grid, times the fraction of each frame displaying the image.
             set used = `calc exp="'${counter}/${kount}'"`
@@ -366,10 +366,10 @@ if ( ${pltimg} == "TRUE" ) then
       set j = $jps
       @ i++
    end
-     
+
 # Set up the display.
 # -------------------
-   echo "      Display:" 
+   echo "      Display:"
    paldef device=${plotdev}
    lutgrey device=${plotdev}
 

@@ -14,17 +14,17 @@
 
 * Arguments:
 *    H_TOL = REAL (Given)
-*       
+*
 *    V_TOL = REAL (Given)
-*       
+*
 *    W_TOL = REAL (Given)
-*       
+*
 *    E_H = REAL (Given)
-*       
+*
 *    E_V = REAL (Given)
-*       
+*
 *    E_W = REAL (Given)
-*       
+*
 *- -----------------------------------------------------------------
       implicit none
       real h_tol,v_tol,w_tol,e_h,e_v,e_w

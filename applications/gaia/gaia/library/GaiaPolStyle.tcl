@@ -11,7 +11,7 @@
 
 #  Description:
 #     This class encapsulates information about how to display vectors.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolStyle object_name [configuration options]
@@ -78,9 +78,9 @@ itcl::class gaia::GaiaPolStyle {
 #  ============
    constructor {} {
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolStyle" } {
          init
@@ -92,16 +92,16 @@ itcl::class gaia::GaiaPolStyle {
 
 #  Initializer:
 #  ============
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolStyle constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolStyle constructor using a user-supplied
 #  argument list.
    protected method init {args} {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class...
-      reset 
+      reset
 
    }
 
@@ -126,7 +126,7 @@ itcl::class gaia::GaiaPolStyle {
 
 #  Make a copy of $this.
 #  --------------------
-   public method copy {} {   
+   public method copy {} {
       if { [catch {set ret [::gaia::GaiaPolStyle PolStyle#auto] } mess ] } {
          error_dialog "Failed to copy style: $mess"
          set ret ""
@@ -144,7 +144,7 @@ itcl::class gaia::GaiaPolStyle {
       return $ret
    }
 
-#  Length and angle columns. 
+#  Length and angle columns.
 #  ----------------------------------------------------------------------
    public method setLcol { col } { set lencol_ $col }
    public method getLcol { } { return $lencol_ }
@@ -157,31 +157,31 @@ itcl::class gaia::GaiaPolStyle {
 #  ------------------------------------------------------------------
    public method setSwid { wid } { set selwid_ $wid }
    public method getSwid {} { return $selwid_ }
-   public method getSwidd {} { 
-      set ret [getSwid] 
+   public method getSwidd {} {
+      set ret [getSwid]
       if { $ret == "" } {
          set ret [getUwid]
-      } 
+      }
       return $ret
    }
- 
+
 #  Vector scale (image pixels per unit value in the $lencol_ column).
-#  If a null value is supplied, a default value is calculated and returned 
-#  by getMagd. 
+#  If a null value is supplied, a default value is calculated and returned
+#  by getMagd.
 #  -------------------------------------------------------------------
    public method setMag { mag } { set mag_ $mag }
    public method getMag {} { return $mag_ }
-   public method getMagd {cat rtdimage} { 
+   public method getMagd {cat rtdimage} {
       set ret [getMag]
 
-#  Calculate a default value if the stored value if blank. Otherwise 
+#  Calculate a default value if the stored value if blank. Otherwise
 #  the stored value will be returned.
       if { $ret == "" } {
 
 #  Set a default value of 1 in case a proper default cannot be found.
          set ret 1
 
-#  Get the index of the vector length column within the catalogue headings. 
+#  Get the index of the vector length column within the catalogue headings.
 #  Check the column was found.
          set lcol [getLcoli $cat]
          if { $lcol != -1 } {
@@ -189,7 +189,7 @@ itcl::class gaia::GaiaPolStyle {
 #  Get the data array from the PolCat.
             set data [$cat getData]
 
-#  Get access to an array of row states (selected, unselected, deleted) 
+#  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
             upvar 0 [$cat getStates] states
 
@@ -266,7 +266,7 @@ itcl::class gaia::GaiaPolStyle {
    public method setUwid { wid } { set unswid_ $wid }
    public method getUwid {} { return $unswid_ }
 
-   public method setUflash { f } { 
+   public method setUflash { f } {
       if { $f } {
          set unsflash_ 1
       } else {
@@ -275,7 +275,7 @@ itcl::class gaia::GaiaPolStyle {
    }
    public method getUflash {} { return $unsflash_ }
 
-   public method setSflash { f } { 
+   public method setSflash { f } {
       if { $f } {
          set selflash_ 1
       } else {
@@ -308,9 +308,9 @@ itcl::class gaia::GaiaPolStyle {
 #
 #  if vectors drawn with style $this can be made to appear as if they were
 #  drawn with style $that just by reconfiguring their Tk canvas options,
-#  then a list of two elements is returned as the second element. Both elements 
-#  consist of one or more "option value" strings (separated by spaces). These 
-#  are usedto reconfigure previously drawn vectors, so "option" should be a 
+#  then a list of two elements is returned as the second element. Both elements
+#  consist of one or more "option value" strings (separated by spaces). These
+#  are usedto reconfigure previously drawn vectors, so "option" should be a
 #  legal option name for a Tk canvas item, and "value" should be a legal value
 #  for the option. The first element of the returned two-element list
 #  refers to unselected vectors, and the second refers to selected vectors.
@@ -326,109 +326,109 @@ itcl::class gaia::GaiaPolStyle {
 
       if { [getMag] != [$that getMag] } {
          set ret "redraw"
-         if { $des == "" } { 
+         if { $des == "" } {
             set des "change vector scale"
          } else {
-            set des "change rendering options" 
+            set des "change rendering options"
          }
       }
 
       if { [getArot] != [$that getArot] } {
          set ret "redraw"
-         if { $des == "" } { 
-            set des "change vector rotation" 
+         if { $des == "" } {
+            set des "change vector rotation"
          } else {
-            set des "change rendering options" 
+            set des "change rendering options"
          }
       }
 
       if { [getLcol] != [$that getLcol] } {
          set ret "redraw"
-         if { $des == "" } { 
-            set des "change vector length column" 
+         if { $des == "" } {
+            set des "change vector length column"
          } else {
-            set des "change rendering options" 
+            set des "change rendering options"
          }
       }
 
       if { [getAcol] != [$that getAcol] } {
          set ret "redraw"
-         if { $des == "" } { 
-            set des "change vector angle column" 
+         if { $des == "" } {
+            set des "change vector angle column"
          } else {
-            set des "change rendering options" 
+            set des "change rendering options"
          }
       }
 
       if { [getNvec] != [$that getNvec] } {
          set ret "redraw"
-         if { $des == "" } { 
-            set des "change maximum number of drawn vectors" 
+         if { $des == "" } {
+            set des "change maximum number of drawn vectors"
          } else {
-            set des "change rendering options" 
+            set des "change rendering options"
          }
       }
 
       if { $des == "" } {
          set retu ""
-         set val [$that getUclr] 
-         if { [getUclr] != $val } { 
-            append retu "-fill \"$val\" " 
-            if { $des == "" } { 
-               set des "change vector colour" 
+         set val [$that getUclr]
+         if { [getUclr] != $val } {
+            append retu "-fill \"$val\" "
+            if { $des == "" } {
+               set des "change vector colour"
             } else {
-               set des "change rendering options" 
+               set des "change rendering options"
             }
          }
 
-         set val [$that getUwid] 
-         if { [getUwid] != $val } { 
-            append retu "-width $val " 
-            if { $des == "" } { 
-               set des "change vector width" 
+         set val [$that getUwid]
+         if { [getUwid] != $val } {
+            append retu "-width $val "
+            if { $des == "" } {
+               set des "change vector width"
             } else {
-               set des "change rendering options" 
+               set des "change rendering options"
             }
          }
 
-         set val [$that getUflash] 
-         if { [getUflash] != $val } { 
-            append retu "-flash $val " 
-            if { $des == "" } { 
-               set des "change vector flashing" 
+         set val [$that getUflash]
+         if { [getUflash] != $val } {
+            append retu "-flash $val "
+            if { $des == "" } {
+               set des "change vector flashing"
             } else {
-               set des "change rendering options" 
+               set des "change rendering options"
             }
          }
 
          set rets ""
-         set val [$that getSclr] 
-         if { [getSclr] != $val } {  
-            append rets "-fill \"$val\" " 
-            if { $des == "" } { 
-               set des "change colour of selected vectors" 
+         set val [$that getSclr]
+         if { [getSclr] != $val } {
+            append rets "-fill \"$val\" "
+            if { $des == "" } {
+               set des "change colour of selected vectors"
             } else {
-               set des "change rendering options" 
+               set des "change rendering options"
             }
          }
 
-         set val [$that getSwidd] 
-         if { [getSwidd] != $val } { 
-            append rets "-width $val " 
-            if { $des == "" } { 
-               set des "change width of selected vectors" 
+         set val [$that getSwidd]
+         if { [getSwidd] != $val } {
+            append rets "-width $val "
+            if { $des == "" } {
+               set des "change width of selected vectors"
             } else {
-               set des "change rendering options" 
+               set des "change rendering options"
             }
          }
 
-         set val [$that getSflash] 
-         if { [getSflash] != $val } { 
-            append rets "-flash $val " 
-            if { $des == "" } { 
-               set des "change selected vector flashing" 
+         set val [$that getSflash]
+         if { [getSflash] != $val } {
+            append rets "-flash $val "
+            if { $des == "" } {
+               set des "change selected vector flashing"
             } else {
-               set des "change rendering options" 
+               set des "change rendering options"
             }
          }
 
@@ -438,13 +438,13 @@ itcl::class gaia::GaiaPolStyle {
             set ret ""
          }
 
-      } 
+      }
 
       return [list $des $ret]
 
    }
 
-#  Stores the canvas colour and width values used to render unselected 
+#  Stores the canvas colour and width values used to render unselected
 #  and selected vectors in the supplied variables
 #  -------------------------------------------------------------------
    public method colwid {} {
@@ -487,12 +487,12 @@ itcl::class gaia::GaiaPolStyle {
 #  Public data members:
 #  ====================
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
-#  The vector length scale factor (i.e. the number of image pixels for a 
-#  unit value in the $lencol_ column). If mag has a blank value, then a 
+#  The vector length scale factor (i.e. the number of image pixels for a
+#  unit value in the $lencol_ column). If mag has a blank value, then a
 #  default value will be found and used.
       variable mag_ ""
 
@@ -527,7 +527,7 @@ itcl::class gaia::GaiaPolStyle {
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

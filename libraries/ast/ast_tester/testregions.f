@@ -17,7 +17,7 @@ c      call ast_watchmemory( 282905 )
       call checkBox( status )
       call checkNullRegion( status )
       call generalChecks( status )
-      call checkCmpRegion( status ) 
+      call checkCmpRegion( status )
       call checkPointList( status )
 
       call ast_end( status )
@@ -57,9 +57,9 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( reg1, lbnd, ubnd, status )
       if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 'General 1' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 2' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 3' )
       if( ubnd(2) .ne. 0.0D0 ) call stopit( status, 'General 4' )
 
@@ -82,9 +82,9 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( reg3, lbnd, ubnd, status )
       if( lbnd(1) .ne. -1.0D0 ) call stopit( status, 'General 9' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 10' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 11' )
       if( ubnd(2) .ne. 1.0D0 ) call stopit( status, 'General 12' )
 
@@ -105,9 +105,9 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( reg5, lbnd, ubnd, status )
       if( lbnd(1) .ne. -1.0D0 ) call stopit( status, 'General 15' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 16' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 17' )
       if( ubnd(2) .ne. 1.0D0 ) call stopit( status, 'General 18' )
       if( lbnd(3) .ne. -1.0D0 ) call stopit( status, 'General 19' )
@@ -119,26 +119,26 @@ c      call ast_activememory( 'testregions' )
       reg3 = ast_cmpregion( reg1, reg2, AST__OR, ' ', status )
 
       call ast_getregionbounds( reg3, lbnd, ubnd, status )
-      if( lbnd(1) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(1) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 21' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 22' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 23' )
-      if( ubnd(2) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(2) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 24' )
 
 
       reg5 = ast_prism( reg3, reg4, ' ', status )
 
       call ast_getregionbounds( reg5, lbnd, ubnd, status )
-      if( lbnd(1) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(1) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 25' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 26' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 27' )
-      if( ubnd(2) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(2) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 28' )
       if( lbnd(3) .ne. -1.0D0 ) call stopit( status, 'General 29' )
       if( ubnd(3) .ne. 1.0D0 ) call stopit( status,  'General 30' )
@@ -148,9 +148,9 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( reg3, lbnd, ubnd, status )
       if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 'General 31' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 32' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 33' )
       if( ubnd(2) .ne. 0.0D0 ) call stopit( status, 'General 34' )
 
@@ -160,9 +160,9 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( reg5, lbnd, ubnd, status )
       if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 'General 35' )
-      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status,
      :                                               'General 36' )
-      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status,
      :                                               'General 37' )
       if( ubnd(2) .ne. 0.0D0 ) call stopit( status, 'General 38' )
       if( lbnd(3) .ne. -1.0D0 ) call stopit( status, 'General 39' )
@@ -182,7 +182,7 @@ c      call ast_activememory( 'testregions' )
       include 'AST_PAR'
       include 'SAE_PAR'
 
-      integer status, frm1, frm2, frm3, unc, int1, int2, int3, int4, 
+      integer status, frm1, frm2, frm3, unc, int1, int2, int3, int4,
      :        int5, frm4, map, outperm(6), inperm(6), pm, reg
       double precision lbnd(3), ubnd(3), p(5,3), q(5,3),in(4,3),out(4,3)
       double precision xin(9), yin(9), xout(9), yout(9)
@@ -197,15 +197,15 @@ c      call ast_activememory( 'testregions' )
       frm2 = ast_specframe( 'Unit=Angstrom', status )
       frm3 = ast_cmpframe( frm1, frm2, ' ', status )
 
-      lbnd( 1 ) = AST__BAD     
-      lbnd( 2 ) = AST__BAD     
+      lbnd( 1 ) = AST__BAD
+      lbnd( 2 ) = AST__BAD
       lbnd( 3 ) = 5000.0
-      ubnd( 1 ) = AST__BAD     
-      ubnd( 2 ) = AST__BAD     
+      ubnd( 1 ) = AST__BAD
+      ubnd( 2 ) = AST__BAD
       ubnd( 3 ) = 6000.0
 
       int1 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
-      call checkdump( int1, 'checkdump int1', status ) 
+      call checkdump( int1, 'checkdump int1', status )
 
       p(1,1) = 0.0            ! On boundary
       p(1,2) = 0.0
@@ -216,10 +216,10 @@ c      call ast_activememory( 'testregions' )
       p(3,1) = -2.0           ! Inside
       p(3,2) = 1.0
       p(3,3) = 5999.0
-      p(4,1) = 2.0            ! Outside 
+      p(4,1) = 2.0            ! Outside
       p(4,2) = -2.0
       p(4,3) = 6010.0
-      p(5,1) = 1.0            ! Outside 
+      p(5,1) = 1.0            ! Outside
       p(5,2) = -1.0
       p(5,3) = 4910.0
 
@@ -295,15 +295,15 @@ c      call ast_activememory( 'testregions' )
       if( q(5,3) .ne. p(5,3) ) call stopit( status, 'Interval 11c' )
 
 
-      lbnd( 1 ) = AST__BAD     
-      lbnd( 2 ) = AST__BAD     
+      lbnd( 1 ) = AST__BAD
+      lbnd( 2 ) = AST__BAD
       lbnd( 3 ) = 6000.0
-      ubnd( 1 ) = AST__BAD     
-      ubnd( 2 ) = AST__BAD     
+      ubnd( 1 ) = AST__BAD
+      ubnd( 2 ) = AST__BAD
       ubnd( 3 ) = 5000.0
 
       int2 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
-      call checkdump( int2, 'checkdump int2', status ) 
+      call checkdump( int2, 'checkdump int2', status )
 
       p(1,1) = 0.0            ! On boundary
       p(1,2) = 0.0
@@ -314,10 +314,10 @@ c      call ast_activememory( 'testregions' )
       p(3,1) = -2.0           ! Outside
       p(3,2) = 1.0
       p(3,3) = 5999.0
-      p(4,1) = 2.0            ! Inside 
+      p(4,1) = 2.0            ! Inside
       p(4,2) = -2.0
       p(4,3) = 6010.0
-      p(5,1) = 1.0            ! Inside 
+      p(5,1) = 1.0            ! Inside
       p(5,2) = -1.0
       p(5,3) = 4910.0
 
@@ -397,15 +397,15 @@ c      call ast_activememory( 'testregions' )
 
 
       lbnd( 1 ) = AST__BAD
-      lbnd( 2 ) = AST__BAD     
+      lbnd( 2 ) = AST__BAD
       lbnd( 3 ) = 5000.0
-      ubnd( 1 ) = 0.5     
-      ubnd( 2 ) = AST__BAD     
+      ubnd( 1 ) = 0.5
+      ubnd( 2 ) = AST__BAD
       ubnd( 3 ) = AST__BAD
 
       int3 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
 
-      call checkdump( int3, 'checkdump int3', status ) 
+      call checkdump( int3, 'checkdump int3', status )
 
       p(1,1) = 0.0            ! On boundary
       p(1,2) = 0.0
@@ -416,10 +416,10 @@ c      call ast_activememory( 'testregions' )
       p(3,1) = -2.0           ! Inside
       p(3,2) = 0.4
       p(3,3) = 5999.0
-      p(4,1) = 2.0            ! Outside 
+      p(4,1) = 2.0            ! Outside
       p(4,2) = -2.0
       p(4,3) = 6010.0
-      p(5,1) = 0.0            ! Outside 
+      p(5,1) = 0.0            ! Outside
       p(5,2) = -3.0
       p(5,3) = 4910.0
 
@@ -497,60 +497,60 @@ c      call ast_activememory( 'testregions' )
 
 
       lbnd( 1 ) = AST__BAD
-      lbnd( 2 ) = 0.0     
+      lbnd( 2 ) = 0.0
       lbnd( 3 ) = AST__BAD
       ubnd( 1 ) = AST__BAD
-      ubnd( 2 ) = -1.0     
+      ubnd( 2 ) = -1.0
       ubnd( 3 ) = 6000.0
 
       call ast_setl( int3, 'Negated', .false., status )
       int4 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
-      if( ast_overlap( int3, int4, status ) .ne. 4 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 4 )
      :    call stopit( status, 'Interval overlap 1' )
 
       call ast_negate( int3, status )
-      if( ast_overlap( int3, int4, status ) .ne. 4 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 4 )
      :    call stopit( status, 'Interval overlap 2' )
 
       call ast_negate( int4, status )
-      if( ast_overlap( int3, int4, status ) .ne. 4 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 4 )
      :    call stopit( status, 'Interval overlap 3' )
 
       call ast_negate( int3, status )
-      if( ast_overlap( int3, int4, status ) .ne. 4 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 4 )
      :    call stopit( status, 'Interval overlap 4' )
 
 
       lbnd( 1 ) = 0.6
-      lbnd( 2 ) = 0.0     
+      lbnd( 2 ) = 0.0
       lbnd( 3 ) = AST__BAD
       ubnd( 1 ) = AST__BAD
-      ubnd( 2 ) = -1.0     
+      ubnd( 2 ) = -1.0
       ubnd( 3 ) = 6000.0
 
       int4 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
-      if( ast_overlap( int3, int4, status ) .ne. 1 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 1 )
      :    call stopit( status, 'Interval overlap 5' )
 
       call ast_negate( int3, status )
-      if( ast_overlap( int3, int4, status ) .ne. 3 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 3 )
      :    call stopit( status, 'Interval overlap 6' )
 
       call ast_negate( int4, status )
-      if( ast_overlap( int3, int4, status ) .ne. 4 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 4 )
      :    call stopit( status, 'Interval overlap 7' )
 
       call ast_negate( int3, status )
-      if( ast_overlap( int3, int4, status ) .ne. 2 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 2 )
      :    call stopit( status, 'Interval overlap 8' )
 
 
       int4 = ast_copy( int3, status )
-      if( ast_overlap( int3, int4, status ) .ne. 5 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 5 )
      :    call stopit( status, 'Interval overlap 9' )
 
       call ast_negate( int4, status )
-      if( ast_overlap( int3, int4, status ) .ne. 6 ) 
+      if( ast_overlap( int3, int4, status ) .ne. 6 )
      :    call stopit( status, 'Interval overlap 10' )
 
 
@@ -561,8 +561,8 @@ c      call ast_activememory( 'testregions' )
 
       lbnd(1) = 0.0
       lbnd(2) = 0.0
-      ubnd(1) = 0.01  
-      ubnd(2) = 0.01  
+      ubnd(1) = 0.01
+      ubnd(2) = 0.01
       unc = ast_box( frm1, 0, lbnd, ubnd, AST__NULL, ' ', status )
 
       lbnd(1) = -2.0
@@ -574,20 +574,20 @@ c      call ast_activememory( 'testregions' )
       outperm(1) = 2
       outperm(2) = -1
       outperm(3) = 1
-     
+
       inperm(1) = 3
       inperm(2) = 1
 
       pm = ast_permmap( 2, inperm, 3, outperm, 0.0D0, ' ', status )
-      
+
       frm2 = ast_frame( 3, 'Domain=B', status )
       reg = ast_mapregion( int1, pm, frm2, status )
 
-      if( .not. ast_isainterval( reg, status ) ) call stopit( status, 
+      if( .not. ast_isainterval( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 1' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 2' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status,
      :                                            'Int: perm check 3' )
 
       in( 1, 1 ) = 0.0    ! Outside
@@ -626,20 +626,20 @@ c      call ast_activememory( 'testregions' )
       outperm(1) = 2
       outperm(2) = -1
       outperm(3) = 1
-     
+
       inperm(1) = 3
       inperm(2) = 1
 
       pm = ast_permmap( 2, inperm, 3, outperm, 1.5D0, ' ', status )
-      
+
       frm2 = ast_frame( 3, 'Domain=B', status )
       reg = ast_mapregion( int1, pm, frm2, status )
 
-      if( .not. ast_isainterval( reg, status ) ) call stopit( status, 
+      if( .not. ast_isainterval( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 4' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 5' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status,
      :                                            'Int: perm check 6' )
 
       in( 1, 1 ) = 20.0   ! Outside
@@ -681,11 +681,11 @@ c      call ast_activememory( 'testregions' )
       call ast_negate( int1, status )
       call ast_set( int1, 'closed=1', status )
 
-      if( .not. ast_isainterval( reg, status ) ) call stopit( status, 
+      if( .not. ast_isainterval( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 7' )
       if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 8' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status,
      :                                            'Int: perm check 9' )
 
       in( 1, 1 ) = 20.0   ! Inside
@@ -728,9 +728,9 @@ c      call ast_activememory( 'testregions' )
       lbnd(1) = 0.0
       lbnd(2) = 0.0
       lbnd(3) = 0.0
-      ubnd(1) = 0.01  
-      ubnd(2) = 0.01  
-      ubnd(3) = 0.01  
+      ubnd(1) = 0.01
+      ubnd(2) = 0.01
+      ubnd(3) = 0.01
       unc = ast_box( frm1, 0, lbnd, ubnd, AST__NULL, ' ', status )
 
       lbnd(1) = 0.5
@@ -744,33 +744,33 @@ c      call ast_activememory( 'testregions' )
 
       outperm(1) = 1
       outperm(2) = 3
-     
+
       inperm(1) = 1
       inperm(2) = -1
       inperm(3) = 2
 
       pm = ast_permmap( 3, inperm, 2, outperm, 1.0D0, ' ', status )
-      
+
       frm2 = ast_frame( 2, 'Domain=B', status )
       reg = ast_mapregion( int1, pm, frm2, status )
 
-      if( .not. ast_isainterval( reg, status ) ) call stopit( status, 
+      if( .not. ast_isainterval( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 10' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 11' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status,
      :                                            'Int: perm check 12' )
 
       xin( 1 ) = 0.4    ! Out
       yin( 1 ) = -1.0
       xin( 2 ) = 1.0    ! Out
-      yin( 2 ) = 0.1 
+      yin( 2 ) = 0.1
       xin( 3 ) = 1.0    ! Out
       yin( 3 ) = -2.1
       xin( 4 ) = 0.5    ! Boundary
       yin( 4 ) = -1.0
       xin( 5 ) = 10.0   ! In
-      yin( 5 ) = -0.1 
+      yin( 5 ) = -0.1
       xin( 6 ) =  0.55  ! Boundary
       yin( 6 ) = -2.0
 
@@ -794,26 +794,26 @@ c      call ast_activememory( 'testregions' )
       pm = ast_permmap( 3, inperm, 2, outperm, -2.0D0, ' ', status )
       reg = ast_mapregion( int1, pm, frm2, status )
 
-      if( .not. ast_isanullregion( reg, status ) ) call stopit( status, 
+      if( .not. ast_isanullregion( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 13' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 14' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status,
      :                                            'Int: perm check 15' )
-      if( ast_getl( reg, 'negated', status ) ) call stopit( status, 
+      if( ast_getl( reg, 'negated', status ) ) call stopit( status,
      :                                            'Int: perm check 16' )
 
 
       call ast_negate( int1, status )
       reg = ast_mapregion( int1, pm, frm2, status )
 
-      if( .not. ast_isanullregion( reg, status ) ) call stopit( status, 
+      if( .not. ast_isanullregion( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 17' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Int: perm check 18' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status,
      :                                            'Int: perm check 19' )
-      if( .NOT.ast_getl( reg, 'negated', status ) ) call stopit( status, 
+      if( .NOT.ast_getl( reg, 'negated', status ) ) call stopit( status,
      :                                            'Int: perm check 20' )
 
 
@@ -847,7 +847,7 @@ c      call ast_activememory( 'testregions' )
 
       p1(1) = 0.0
       p1(2) = 0.5*pi
-      p2(1) = 0.01  
+      p2(1) = 0.01
       unc = ast_circle( frm, 1, p1, p2, AST__NULL, ' ', status )
 
       p(1,1) = 0.0
@@ -863,18 +863,18 @@ c      call ast_activememory( 'testregions' )
 
       pol1 = ast_polygon( frm, 5, 5, p, unc, 'closed=0', status )
 
-      call checkdump( pol1, 'checkdump pol1', status ) 
+      call checkdump( pol1, 'checkdump pol1', status )
 
 
       p(1,1) = 0.0            ! On boundary
       p(1,2) = 0.0
       p(2,1) = 1.0            ! Outside
-      p(2,2) = 0.5*pi + 0.1  
+      p(2,2) = 0.5*pi + 0.1
       p(3,1) = 0.5*pi - 0.1   ! Inside
       p(3,2) = 0.25*pi
-      p(4,1) = 0.0            ! On boundary 
-      p(4,2) = 0.1 
-      p(5,1) = 0.25*pi        ! Inside 
+      p(4,1) = 0.0            ! On boundary
+      p(4,2) = 0.1
+      p(5,1) = 0.25*pi        ! Inside
       p(5,2) = 0.25*pi + 0.1
 
       call ast_trann( pol1, 5, 2, 5, p, .true., 2, 5, q, status )
@@ -936,7 +936,7 @@ c      call ast_activememory( 'testregions' )
       end if
 
       call ast_setc( pol1, 'system', 'fk5', status )
-      call checkdump( pol1, 'checkdump pol2', status ) 
+      call checkdump( pol1, 'checkdump pol2', status )
 
       if( .not. hasframeset( pol1, status ) ) then
          call stopit( status, 'pol1 does not have FrameSet' )
@@ -956,7 +956,7 @@ c      call ast_activememory( 'testregions' )
 
       p1(1) = 0.0
       p1(2) = 0.5*pi
-      p2(1) = 0.01  
+      p2(1) = 0.01
       unc = ast_circle( frm, 1, p1, p2, AST__NULL, ' ', status )
 
       p(1,1) = 1.5*pi
@@ -979,11 +979,11 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( pol1, lbnd, ubnd, status )
       if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status, 'Poly 23' )
-      if( abs( lbnd(2) - 1.25663708 ) .gt. 1.0E-6 ) 
+      if( abs( lbnd(2) - 1.25663708 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 24' )
-      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 25' )
-      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 26' )
 
 
@@ -996,15 +996,15 @@ c      call ast_activememory( 'testregions' )
 
       call ast_getregionbounds( r4, lbnd, ubnd, status )
       if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status, 'Poly 27' )
-      if( abs( lbnd(2) - 1.25663708 ) .gt. 1.0E-6 ) 
+      if( abs( lbnd(2) - 1.25663708 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 28' )
-      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 29' )
-      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 30' )
-      if( abs( lbnd(3) - 5000.0 ) .gt. 1.0E-10 ) 
+      if( abs( lbnd(3) - 5000.0 ) .gt. 1.0E-10 )
      :           call stopit( status, 'Poly 31' )
-      if( abs( ubnd(3) - 6000.0 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(3) - 6000.0 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Poly 32' )
 
 
@@ -1024,13 +1024,13 @@ c      call ast_activememory( 'testregions' )
 
       subroutine checkBox( status )
       implicit none
-      include 'SAE_PAR' 
+      include 'SAE_PAR'
       include 'AST_PAR'
       include 'PRM_PAR'
 
       integer status, box1, frm1, i, fc, fs, map1, perm(3), frm2, box3,
      :                box2, frm3, map2, res, j, bfrm, cfrm, reg1, map
-      double precision p1(3), p2(3), v2, xin(9), yin(9), xout(9), 
+      double precision p1(3), p2(3), v2, xin(9), yin(9), xout(9),
      :                 yout(9),in(4,3),out(4,3),matrix(9)
       character*(AST__SZCHR) t1, t2, cards(9)*80
       logical hasframeset
@@ -1060,7 +1060,7 @@ c      call ast_activememory( 'testregions' )
       end do
       call ast_clear( fc, 'card', status )
       fs = ast_read( fc, status )
-      
+
       frm1 = ast_getframe( fs, ast__current, status )
       call ast_seti( frm1, 'digits(1)', 12, status )
 
@@ -1072,7 +1072,7 @@ c      call ast_activememory( 'testregions' )
       box1 = ast_box( frm1, 0, p1, p2, AST__NULL, ' ', status )
       call checkdump( box1, 'checkdump box1', status )
 
-      if( ast_getc( box1, 'system', status ) .ne. 'ICRS' ) 
+      if( ast_getc( box1, 'system', status ) .ne. 'ICRS' )
      :        call stopit( status, 'box1 system is not ICRS' )
 
       call ast_setc( box1, 'system', 'galactic', status )
@@ -1083,16 +1083,16 @@ c      call ast_activememory( 'testregions' )
 
       box3 = ast_copy( box1, status )
 
-      yin(1) = 2.82175432250852 
+      yin(1) = 2.82175432250852
       xin(1) = -0.0269096590283195
-      yin(2) = 2.70798275154741 
+      yin(2) = 2.70798275154741
       xin(2) = 0.2467384819891
 
       call ast_tran2( box1, 2, xin, yin, .true., xout, yout, status )
 
-      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-6 ) 
+      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-6 )
      :       call stopit( status, 'error 1' )
-      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-7 ) 
+      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-7 )
      :       call stopit( status, 'error 2' )
       if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 3' )
       if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4' )
@@ -1104,32 +1104,32 @@ c      call ast_activememory( 'testregions' )
       call ast_setl( box3, 'Adaptive', .false., status )
       call ast_setc( box3, 'system', 'icrs', status )
 
-      yin(1) = 2.82175432250852 
+      yin(1) = 2.82175432250852
       xin(1) = -0.0269096590283195
-      yin(2) = 2.70798275154741 
+      yin(2) = 2.70798275154741
       xin(2) = 0.2467384819891
 
       call ast_tran2( box3, 2, xin, yin, .true., xout, yout, status )
 
-      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-8 ) 
+      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-8 )
      :       call stopit( status, 'error 1' )
-      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-8 ) 
+      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-8 )
      :       call stopit( status, 'error 2' )
       if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 4b' )
       if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4c' )
 
       call ast_clear( box3, 'system', status )
 
-      yin(1) = 2.82175432250852 
+      yin(1) = 2.82175432250852
       xin(1) = -0.0269096590283195
-      yin(2) = 2.70798275154741 
+      yin(2) = 2.70798275154741
       xin(2) = 0.2467384819891
 
       call ast_tran2( box3, 2, xin, yin, .true., xout, yout, status )
 
-      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-8 ) 
+      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-8 )
      :       call stopit( status, 'error 1' )
-      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-8 ) 
+      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-8 )
      :       call stopit( status, 'error 2' )
       if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 4d' )
       if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4e' )
@@ -1142,7 +1142,7 @@ c      call ast_activememory( 'testregions' )
       t1 = ast_format( frm1, 1, 0.25D0, status )
       call ast_annul( frm1, status )
       t2 = ast_format( box1, 1, 0.25D0, status )
-      if( t1 .ne. t2 ) call stopit( status, 
+      if( t1 .ne. t2 ) call stopit( status,
      :       'ast_format is different for frm1 and box1' )
 
       i = ast_unformat( box1, 1, t2, v2, status )
@@ -1179,7 +1179,7 @@ c      call ast_activememory( 'testregions' )
       xin( 8 ) = 1.5
       yin( 8 ) = 0.45
       xin( 9 ) = 1.501
-      yin( 9 ) = 1.0    
+      yin( 9 ) = 1.0
 
       call ast_tran2( BOX1, 9, xin, yin, .true., xout, yout, status )
 
@@ -1300,15 +1300,15 @@ c      call ast_activememory( 'testregions' )
 
       map1 = ast_getmapping( fs, ast__current, ast__current, status )
 
-      if( .not.ast_isaregion( map1, status ) ) 
+      if( .not.ast_isaregion( map1, status ) )
      :         call stopit( status, 'map1 is not a Region' )
- 
+
       call ast_setl( fs, 'Negated', .true., status )
-      if( .not. ast_getl( box1, 'Negated', status ) ) 
-     :           call stopit( status, 
+      if( .not. ast_getl( box1, 'Negated', status ) )
+     :           call stopit( status,
      :           'FrameSet Negated attribute not reflected in box1' )
       call ast_clear( fs, 'Negated', status )
-     
+
       map1 = ast_getmapping( fs, ast__base, ast__current, status )
 
       call ast_tran2( map1, 9, xin, yin, .false., xout, yout, status )
@@ -1333,10 +1333,10 @@ c      call ast_activememory( 'testregions' )
       if( yout( 9 ) .ne. AST__BAD ) call stopit( status, 'error F18' )
 
       call ast_tran2( map1, 9, xout, yout, .true., xout, yout, status )
-      
-      if( abs( xout( 1 ) - 1.25 ) .gt. 1.0D-7 ) call stopit( status, 
+
+      if( abs( xout( 1 ) - 1.25 ) .gt. 1.0D-7 ) call stopit( status,
      :                                                  'error G1' )
-      if( abs( yout( 1 ) - 0.75 ) .gt. 1.0D-7 ) call stopit( status, 
+      if( abs( yout( 1 ) - 0.75 ) .gt. 1.0D-7 ) call stopit( status,
      :                                                  'error G2' )
       if( xout( 6 ) .ne. AST__BAD ) call stopit( status, 'error G11' )
       if( yout( 6 ) .ne. AST__BAD ) call stopit( status, 'error G12' )
@@ -1377,29 +1377,29 @@ c      call ast_activememory( 'testregions' )
       in( 4, 3 ) = 2.70798275154741
       call ast_trann( frm3, 4, 3, 4, in, .true., 3, 4, out, status )
 
-      if( abs( out(1,1)+0.0269096587 ) .gt. 1.0E-8 ) 
+      if( abs( out(1,1)+0.0269096587 ) .gt. 1.0E-8 )
      :       call stopit( status, 'error H1' )
-      if( abs( out(1,2)-2997924.5 ) .gt. 1.0E-1 ) 
+      if( abs( out(1,2)-2997924.5 ) .gt. 1.0E-1 )
      :       call stopit( status, 'error H2' )
-      if( abs( out(1,3)-2.82175422 ) .gt. 1.0E-6 ) 
+      if( abs( out(1,3)-2.82175422 ) .gt. 1.0E-6 )
      :       call stopit( status, 'error H3' )
 
       if( out(2,1) .ne. ast__bad ) call stopit( status, 'error H4' )
-      if( abs( out(2,2)-2997924.5 ) .gt. 1.0E-1 ) 
+      if( abs( out(2,2)-2997924.5 ) .gt. 1.0E-1 )
      :       call stopit( status, 'error H5' )
       if( out(2,3) .ne. ast__bad ) call stopit( status, 'error H6' )
 
-      if( abs( out(3,1)+0.0269096587 ) .gt. 1.0E-8 ) 
+      if( abs( out(3,1)+0.0269096587 ) .gt. 1.0E-8 )
      :       call stopit( status, 'error H7' )
       if( out(3,2) .ne. ast__bad ) call stopit( status, 'error H8' )
-      if( abs( out(3,3)-2.82175422 ) .gt. 1.0E-6 ) 
+      if( abs( out(3,3)-2.82175422 ) .gt. 1.0E-6 )
      :       call stopit( status, 'error H9' )
 
       if( out(4,1) .ne. ast__bad ) call stopit( status, 'error H10' )
       if( out(4,2) .ne. ast__bad ) call stopit( status, 'error H11' )
       if( out(4,3) .ne. ast__bad ) call stopit( status, 'error H12' )
 
-      if( .not. ast_getl( frm3, 'closed(1)', status ) ) 
+      if( .not. ast_getl( frm3, 'closed(1)', status ) )
      :    call stopit( status, 'compound frame region is not closed' )
 
 
@@ -1410,10 +1410,10 @@ C Testing astMapRegion
 C
 
       frm1 = ast_frame( 3, 'Domain=A', status )
-      p1(1) = 100  
-      p1(2) = 200  
-      p1(3) = 300  
-      p2(1) = 0  
+      p1(1) = 100
+      p1(2) = 200
+      p1(3) = 300
+      p2(1) = 0
       p2(2) = 400
       p2(3) = 250
       box1 = ast_box( frm1, 0, p1, p2, AST__NULL, ' ', status )
@@ -1466,8 +1466,8 @@ C
       call checkdump( box2, 'checkdump box2', status )
 
       frm1 = ast_frame( 1, 'Domain=A', status )
-      p1(1) = 100  
-      p2(1) = 0  
+      p1(1) = 100
+      p2(1) = 0
       box1 = ast_box( frm1, 0, p1, p2, AST__NULL, ' ', status )
 
       frm2 = ast_frame( 1, 'Domain=B', status )
@@ -1484,8 +1484,8 @@ C
       end if
 
       frm1 = ast_skyframe( ' ', status )
-      p1(1) = 0  
-      p1(2) = 0  
+      p1(1) = 0
+      p1(2) = 0
       p2(1) = 0.001
       p2(2) = 0.001
       box1 = ast_box( frm1, 0, p1, p2, AST__NULL, ' ', status )
@@ -1516,10 +1516,10 @@ C
       yin( 6 ) = 0.0
 
       call ast_tran2( box2, 6, xin, yin, .true., xout, yout, status )
-      
-      if( abs( xout( 1 ) - xin( 1 ) ) .gt. 1D-10 ) call stopit( status, 
+
+      if( abs( xout( 1 ) - xin( 1 ) ) .gt. 1D-10 ) call stopit( status,
      :                                                  'error I1' )
-      if( abs( yout( 1 ) - yin( 1 ) ) .gt. 1D-10 ) call stopit( status, 
+      if( abs( yout( 1 ) - yin( 1 ) ) .gt. 1D-10 ) call stopit( status,
      :                                                  'error I2' )
 
       if( xout(2) .ne. AST__BAD ) call stopit( status, 'error I3' )
@@ -1529,13 +1529,13 @@ C
       if( xout(3) .ne. AST__BAD ) call stopit( status, 'error I7' )
       if( yout(3) .ne. AST__BAD ) call stopit( status, 'error I8' )
 
-      if( abs( xout( 4 ) - xin( 4 ) ) .gt. 1D-10 ) call stopit( status, 
+      if( abs( xout( 4 ) - xin( 4 ) ) .gt. 1D-10 ) call stopit( status,
      :                                                  'error I9' )
-      if( abs( yout( 4 ) - yin( 4 ) ) .gt. 1D-10 ) call stopit( status, 
+      if( abs( yout( 4 ) - yin( 4 ) ) .gt. 1D-10 ) call stopit( status,
      :                                                  'error I10' )
-      if( abs( xout( 6 ) - xin( 6 ) ) .gt. 1D-10 ) call stopit( status, 
+      if( abs( xout( 6 ) - xin( 6 ) ) .gt. 1D-10 ) call stopit( status,
      :                                                  'error I11' )
-      if( abs( yout( 6 ) - yin( 6 ) ) .gt. 1D-10 ) call stopit( status, 
+      if( abs( yout( 6 ) - yin( 6 ) ) .gt. 1D-10 ) call stopit( status,
      :                                                  'error I12' )
 
 
@@ -1552,10 +1552,10 @@ C Testing astOverlap
 C
 
       frm1 = ast_frame( 3, 'Domain=A', status )
-      p1(1) = 100  
-      p1(2) = 200  
-      p1(3) = 300  
-      p2(1) = 0  
+      p1(1) = 100
+      p1(2) = 200
+      p1(3) = 300
+      p2(1) = 0
       p2(2) = 400
       p2(3) = 250
       box1 = ast_box( frm1, 0, p1, p2, AST__NULL, 'closed=1', status )
@@ -1576,10 +1576,10 @@ C
       end if
 
       call ast_setc( frm2, 'Domain', 'A', status )
-      p1(1) = 100  
-      p1(2) = 200  
-      p1(3) = 300  
-      p2(1) = -100  
+      p1(1) = 100
+      p1(2) = 200
+      p1(3) = 300
+      p2(1) = -100
       p2(2) = 600
       p2(3) = 400
       box2 = ast_box( frm2, 0, p1, p2, AST__NULL, ' ', status )
@@ -1594,9 +1594,9 @@ C
          call stopit( status, 'ast_overlap E: result should be 3' )
       end if
 
-      p1(1) = 300  
-      p1(2) = 200  
-      p1(3) = 300  
+      p1(1) = 300
+      p1(2) = 200
+      p1(3) = 300
       p2(1) = 201
       p2(2) = 400
       p2(3) = 250
@@ -1610,9 +1610,9 @@ C
          call stopit( status, 'ast_overlap G: result should be 1' )
       end if
 
-      p1(1) = 150  
-      p1(2) = 200  
-      p1(3) = 300  
+      p1(1) = 150
+      p1(2) = 200
+      p1(3) = 300
       p2(1) = 50
       p2(2) = 400
       p2(3) = 250
@@ -1646,14 +1646,14 @@ C
          end do
       end do
 
-      res = ast_maskr( box1, AST__NULL, .false., 2, lbnd_in, ubnd_in, 
+      res = ast_maskr( box1, AST__NULL, .false., 2, lbnd_in, ubnd_in,
      :                 rin, VAL__BADR, status )
 
       if( res .ne. 13 ) then
          write(*,*) 'Res is ',res
          call stopit( status, 'res should be 13' )
       end if
-      
+
       do i =1, 5
          do j = 1, 5
             if( j .le. 3 .and. i .le. 4 ) then
@@ -1686,7 +1686,7 @@ C
       call ast_clear( fc, 'card', status )
       fs = ast_read( fc, status )
 
-      p1( 1 ) = 0.13089969  ! RA at centre = 0h30m 
+      p1( 1 ) = 0.13089969  ! RA at centre = 0h30m
       p1( 2 ) = 0.17453293  ! Dec at centre = 10d
       p2( 1 ) = -0.13089971 ! RA at corner = 23h30m
       p2( 2 ) = -0.17453293 ! Dec at corner = -10d
@@ -1706,7 +1706,7 @@ C
 
       call ast_negate( box1, status )
       call ast_invert( fs, status )
-      res = ast_maskr( box1, fs, .false., 2, lbnd_in, ubnd_in, 
+      res = ast_maskr( box1, fs, .false., 2, lbnd_in, ubnd_in,
      :                 image, VAL__BADR, status )
 
       if( res .ne. 522 ) then
@@ -1741,7 +1741,7 @@ C
 
       p1(1) = 0.0
       p1(2) = 0.0
-      p2(1) = 0.01  
+      p2(1) = 0.01
       unc = ast_circle( frm1, 1, p1, p2, AST__NULL, ' ', status )
 
       p1(1) = -1.0
@@ -1754,20 +1754,20 @@ C
       outperm(1) = 2
       outperm(2) = -1
       outperm(3) = 1
-     
+
       inperm(1) = 3
       inperm(2) = 1
 
       pm = ast_permmap( 2, inperm, 3, outperm, 0.0D0, ' ', status )
-      
+
       frm2 = ast_frame( 3, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
 
-      if( .not. ast_isabox( reg, status ) ) call stopit( status, 
+      if( .not. ast_isabox( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 1' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 2' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status,
      :                                            'Box: perm check 3' )
 
       in( 1, 1 ) = 0.0   ! Outside
@@ -1805,26 +1805,26 @@ C
       outperm(1) = 2
       outperm(2) = -1
       outperm(3) = 1
-     
+
       inperm(1) = 3
       inperm(2) = 1
 
       pm = ast_permmap( 2, inperm, 3, outperm, 1.0D0, ' ', status )
-      
+
       frm2 = ast_frame( 3, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
 
-      if( .not. ast_isabox( reg, status ) ) call stopit( status, 
+      if( .not. ast_isabox( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 4' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 5' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 3 ) call stopit( status,
      :                                            'Box: perm check 6' )
 
       in( 1, 1 ) = 0.0   ! Outside
       in( 1, 2 ) = 0.0
       in( 1, 3 ) = 0.0
-      in( 2, 1 ) = 0.7   ! boundary 
+      in( 2, 1 ) = 0.7   ! boundary
       in( 2, 2 ) = 1.0
       in( 2, 3 ) = -0.5
       in( 3, 1 ) = 0.7   ! outside
@@ -1855,20 +1855,20 @@ C
 
 
       outperm(1) = 1
-     
+
       inperm(1) = 1
       inperm(2) = -1
 
       pm = ast_permmap( 2, inperm, 1, outperm, 1.4D0, ' ', status )
-      
+
       frm2 = ast_frame( 1, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
 
-      if( .not. ast_isabox( reg, status ) ) call stopit( status, 
+      if( .not. ast_isabox( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 7' )
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 8' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 1 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 1 ) call stopit( status,
      :                                            'Box: perm check 9' )
 
       xin( 1 ) = -2.5   ! Outside
@@ -1886,26 +1886,26 @@ C
 
 
       outperm(1) = 1
-     
+
       inperm(1) = 1
       inperm(2) = -1
 
       pm = ast_permmap( 2, inperm, 1, outperm, 1.6D0, ' ', status )
       frm2 = ast_frame( 1, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
-      if( .not. ast_isanullregion( reg, status ) ) call stopit( status, 
+      if( .not. ast_isanullregion( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 10' )
 
 
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 11' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 1 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 1 ) call stopit( status,
      :                                            'Box: perm check 12' )
 
-      xin( 1 ) = -2.5  
-      xin( 2 ) = -1.9  
-      xin( 3 ) = 0.0   
-      xin( 4 ) = 0.5   
+      xin( 1 ) = -2.5
+      xin( 2 ) = -1.9
+      xin( 3 ) = 0.0
+      xin( 4 ) = 0.5
 
       call ast_tran1( reg, 4, xin, .true., xout, status )
 
@@ -1928,34 +1928,34 @@ C
 
       outperm(1) = 1
       outperm(2) = 3
-     
+
       inperm(1) = 1
       inperm(2) = -1
       inperm(3) = 2
 
       pm = ast_permmap( 3, inperm, 2, outperm, 1.0D0, ' ', status )
-      
+
       frm2 = ast_frame( 2, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
 
-      if( .not. ast_isabox( reg, status ) ) call stopit( status, 
+      if( .not. ast_isabox( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 13' )
 
-      if( hasFrameSet( reg, status ) ) call stopit( status, 
+      if( hasFrameSet( reg, status ) ) call stopit( status,
      :                                            'Box: perm check 14' )
-      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status, 
+      if( ast_geti( reg, 'naxes', status ) .ne. 2 ) call stopit( status,
      :                                            'Box: perm check 15' )
 
       xin( 1 ) = 0.4    ! Out
       yin( 1 ) = -1.0
       xin( 2 ) = 1.0    ! Out
-      yin( 2 ) = 0.1 
+      yin( 2 ) = 0.1
       xin( 3 ) = 1.0    ! Out
       yin( 3 ) = -2.1
       xin( 4 ) = 0.5    ! Boundary
       yin( 4 ) = -1.0
       xin( 5 ) = 10.0   ! In
-      yin( 5 ) = -0.1 
+      yin( 5 ) = -0.1
       xin( 6 ) =  0.55  ! Boundary
       yin( 6 ) = -2.0
 
@@ -2009,10 +2009,10 @@ C
       cfrm = ast_getFrame( fs, AST__CURRENT, status )
       map = ast_getmapping( fs, AST__BASE, AST__CURRENT, status )
       reg1 = ast_mapregion( box1, map, cfrm, status )
-      
-      if( hasFrameSet( reg1, status ) ) call stopit( status, 
+
+      if( hasFrameSet( reg1, status ) ) call stopit( status,
      :                                            'Box: poly simp 1' )
-      if( .not. ast_isapolygon( reg1, status) ) call stopit( status, 
+      if( .not. ast_isapolygon( reg1, status) ) call stopit( status,
      :                                            'Box: poly simp 2' )
 
       call ast_end( status )
@@ -2051,9 +2051,9 @@ C
 
       fsfound = .false.
       done = .false.
-      ch = ast_channel( AST_NULL, sink1, ' ', STATUS )      
+      ch = ast_channel( AST_NULL, sink1, ' ', STATUS )
       nw = ast_write( ch, reg, status )
-      call ast_annul( ch, status )      
+      call ast_annul( ch, status )
 
       hasframeset = fsfound
 
@@ -2076,7 +2076,7 @@ C
       if( index( line( : l ),'Unc =' ) .GT. 0 ) then
          done = .true.
 
-      else if( .not. done .and. 
+      else if( .not. done .and.
      :         index( line( : l ),'FrameSet' ) .GT. 0 ) then
          fsfound= .true.
       end if
@@ -2112,7 +2112,7 @@ C
       call checkdump( reg, 'checkdump reg', status )
 
       if( ast_overlap( reg, reg, status ) .ne. 5 ) then
-         call stopit( status, 
+         call stopit( status,
      :                'PointList: self is not identical with self' )
       end if
 
@@ -2121,13 +2121,13 @@ C
       call checkdump( reg2, 'checkdump reg2', status )
 
       if( ast_overlap( reg, reg2, status ) .ne. 6 ) then
-         call stopit( status, 
+         call stopit( status,
      :                'PointList: overlap with self-exclusion' )
       end if
 
 
-      xin( 1 ) = 1.0  
-      xin( 2 ) = 1.05  
+      xin( 1 ) = 1.0
+      xin( 2 ) = 1.05
       xin( 3 ) = 1.1
       call ast_tran1( reg, 3, xin, .true., xout, status )
 
@@ -2139,7 +2139,7 @@ C
          call stopit( status, 'PointList: Error 3' )
       end if
 
-      
+
       call ast_tran1( reg2, 3, xin, .true., xout, status )
       if( xout( 1 ) .ne. AST__BAD ) then
          call stopit( status, 'PointList: Error 4' )
@@ -2177,46 +2177,46 @@ C
       outb = 7.0
       map = ast_winmap( 1, ina, inb, outa, outb, ' ', status )
 
-      nbad = ast_maski( reg, map, .true., 1, lbnd, ubnd, mdata, 2, 
+      nbad = ast_maski( reg, map, .true., 1, lbnd, ubnd, mdata, 2,
      :                  status )
 
       if( nbad .ne. 2 ) then
          write(*,*) 'nbad = ',nbad
          call stopit( status, 'Above value should be 2' )
       end if
-      
+
       if( mdata(1) .ne. 0 ) then
          write(*,*) 'mdata(1) = ',mdata(1)
          call stopit( status, 'Above value should be 0' )
       end if
-      
+
       if( mdata(2) .ne. 2 ) then
          write(*,*) 'mdata(2) = ',mdata(2)
          call stopit( status, 'Above value should be 2' )
       end if
-      
+
       if( mdata(3) .ne. 0 ) then
          write(*,*) 'mdata(3) = ',mdata(3)
          call stopit( status, 'Above value should be 0' )
       end if
-      
+
       if( mdata(6) .ne. 0 ) then
          write(*,*) 'mdata(6) = ',mdata(6)
          call stopit( status, 'Above value should be 0' )
       end if
-      
+
       if( mdata(7) .ne. 2 ) then
          write(*,*) 'mdata(7) = ',mdata(7)
          call stopit( status, 'Above value should be 2' )
       end if
-      
+
       if( mdata(8) .ne. 0 ) then
          write(*,*) 'mdata(8) = ',mdata(8)
          call stopit( status, 'Above value should be 0' )
       end if
 
-      
-      
+
+
 
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'PointList tests failed'
@@ -2265,7 +2265,7 @@ C
       end do
       call ast_clear( fc, 'card', status )
       fs = ast_read( fc, status )
-      
+
       frm1 = ast_getframe( fs, ast__current, status )
 
       p1( 1 ) = 0.0
@@ -2275,13 +2275,13 @@ C
       cir1 = ast_circle( frm1, 1, p1, p2, AST__NULL, ' ', status )
       call ast_getregionbounds( cir1, lbnd, ubnd, status )
 
-      if( abs(lbnd(1)-(-0.01850666061475259)) .gt. 1.0E-6 ) 
+      if( abs(lbnd(1)-(-0.01850666061475259)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA1' )
-      if( abs(lbnd(2)-(0.9900000002235173)) .gt. 1.0E-6 ) 
+      if( abs(lbnd(2)-(0.9900000002235173)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA2' )
-      if( abs(ubnd(1)-(0.01850666061475276)) .gt. 1.0E-6 ) 
+      if( abs(ubnd(1)-(0.01850666061475276)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA3' )
-      if( abs(ubnd(2)-(1.009994987166073)) .gt. 1.0E-6 ) 
+      if( abs(ubnd(2)-(1.009994987166073)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA4' )
 
       p1( 1 ) = 0.0
@@ -2291,13 +2291,13 @@ C
       cir1 = ast_circle( frm1, 1, p1, p2, AST__NULL, ' ', status )
       call ast_getregionbounds( cir1, lbnd, ubnd, status )
 
-      if( abs(lbnd(1)-(0.0)) .gt. 1.0E-6 ) 
+      if( abs(lbnd(1)-(0.0)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA5' )
-      if( abs(lbnd(2)-(1.560000052675599)) .gt. 1.0E-6 ) 
+      if( abs(lbnd(2)-(1.560000052675599)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA6' )
-      if( abs(ubnd(1)-(6.283185307179586)) .gt. 1.0E-6 ) 
+      if( abs(ubnd(1)-(6.283185307179586)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA7' )
-      if( abs(ubnd(2)-(1.5707963267948966)) .gt. 1.0E-6 ) 
+      if( abs(ubnd(2)-(1.5707963267948966)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA8' )
 
 
@@ -2321,9 +2321,9 @@ C
       call ast_tran2( cir1, 2, xin, yin, .true., xout, yout, status )
       if( xout(1) .ne. xin(1) ) call stopit( status, 'Circle: Error 1' )
       if( yout(1) .ne. yin(1) ) call stopit( status, 'Circle: Error 2' )
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Circle: Error 3' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Circle: Error 4' )
 
 
@@ -2345,9 +2345,9 @@ C
       call ast_tran2( cir1, 2, xin, yin, .true., xout, yout, status )
       if( xout(1) .ne. xin(1) ) call stopit( status, 'Circle: Error 5' )
       if( yout(1) .ne. yin(1) ) call stopit( status, 'Circle: Error 6' )
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                          'Circle: Error 7' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                          'Circle: Error 8' )
 
 
@@ -2370,7 +2370,7 @@ C
       cir1 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
       rad = ast_distance( cir1, p1, p2, status )
-      
+
       call ast_offset( frm1, p1, p2, rad*0.999, p3, status )
       xin(1) = p3(1)
       yin(1) = p3(2)
@@ -2381,9 +2381,9 @@ C
       call ast_tran2( cir1, 2, xin, yin, .true., xout, yout, status )
       if( xout(1) .ne. xin(1) ) call stopit( status, 'Circle: Error 1b')
       if( yout(1) .ne. yin(1) ) call stopit( status, 'Circle: Error 2b')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Circle: Error 3b' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Circle: Error 4b' )
 
       p2(1)=0.0
@@ -2398,23 +2398,23 @@ C
       call ast_tran2( cir1, 2, xin, yin, .true., xout, yout, status )
       if( xout(1) .ne. xin(1) ) call stopit( status, 'Circle: Error 5b')
       if( yout(1) .ne. yin(1) ) call stopit( status, 'Circle: Error 6b')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                          'Circle: Error 7b' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                          'Circle: Error 8b' )
 
       cir2 = ast_copy( cir1, status )
       call ast_setc( cir2, 'system', 'galactic', status )
       call checkdump( cir2, 'checkdump cir2', status )
-   
+
       cir2 = ast_simplify( cir2, status )
 
       if( hasframeset( cir2,status ) ) call stopit( status,
      :                  'Circle: error 9b' )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 5 ) call stopit(status,
      :                                          'Circle: Error 10' )
-      if( ast_overlap( cir2, cir1, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( cir2, cir1, status ) .ne. 5 ) call stopit(status,
      :                                          'Circle: Error 11' )
 
       p1( 1 ) = 1.2217305
@@ -2422,9 +2422,9 @@ C
       p2( 1 ) = 1.2218
       p2( 2 ) = 1.3963
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
-      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status,
      :                                          'Circle: Error 12' )
-      if( ast_overlap( cir2, cir1, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( cir2, cir1, status ) .ne. 4 ) call stopit(status,
      :                                          'Circle: Error 13' )
 
       p1( 1 ) = 1.2217305
@@ -2432,9 +2432,9 @@ C
       p2( 1 ) = 1.221731
       p2( 2 ) = 1.396268
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
-      if( ast_overlap( cir1, cir2, status ) .ne. 3 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 3 ) call stopit(status,
      :                                          'Circle: Error 14' )
-      if( ast_overlap( cir2, cir1, status ) .ne. 2 ) call stopit(status, 
+      if( ast_overlap( cir2, cir1, status ) .ne. 2 ) call stopit(status,
      :                                          'Circle: Error 15' )
 
       p1( 1 ) = 0.8
@@ -2442,7 +2442,7 @@ C
       p2( 1 ) = 0.88
       p2( 2 ) = 1.05
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
-      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status,
      :                                          'Circle: Error 16' )
 
 
@@ -2451,13 +2451,13 @@ C
       p2( 1 ) = 0.1
       cir2 = ast_circle( frm1, 1, p1, p2, unc, ' ', status )
       call ast_getregionbounds( cir2, lbnd, ubnd, status )
-      if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 
+      if( lbnd(1) .ne. 0.0D0 ) call stopit( status,
      :                                      'Circle: Error 16a'  )
-      if( abs( lbnd(2) - 1.47079625 ) .gt. 1.0E-6 ) call stopit( status, 
+      if( abs( lbnd(2) - 1.47079625 ) .gt. 1.0E-6 ) call stopit( status,
      :                                      'Circle: Error 16b'  )
-      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) call stopit( status, 
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) call stopit( status,
      :                                      'Circle: Error 16c'  )
-      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) call stopit( status, 
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) call stopit( status,
      :                                      'Circle: Error 16d'  )
 
 
@@ -2475,9 +2475,9 @@ C
       p2( 2 ) = 1.3963
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 0 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 0 ) call stopit(status,
      :                                          'Circle: Error 17' )
-      if( ast_overlap( cir2, cir1, status ) .ne. 0 ) call stopit(status, 
+      if( ast_overlap( cir2, cir1, status ) .ne. 0 ) call stopit(status,
      :                                          'Circle: Error 18' )
 
 
@@ -2494,7 +2494,7 @@ C
       p2( 3 ) = 3.01
       p2( 4 ) = 3.01
       cir2 = ast_circle( f3, 0, p1, p2, AST__NULL, ' ', status )
-      if( ast_overlap( cir2, cir2, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( cir2, cir2, status ) .ne. 5 ) call stopit(status,
      :                                          'Circle: Error 18b' )
 
 * Test 3D spheres
@@ -2532,17 +2532,17 @@ C
 
       call ast_trann( cir1, 2, 3, 2, in, .true., 3, 2, out, status )
 
-      if( out(1,1) .ne. in(1,1) ) call stopit( status, 
+      if( out(1,1) .ne. in(1,1) ) call stopit( status,
      :                                         'Sphere: Error 1' )
-      if( out(1,2) .ne. in(1,2) ) call stopit( status, 
+      if( out(1,2) .ne. in(1,2) ) call stopit( status,
      :                                         'Sphere: Error 2' )
-      if( out(1,3) .ne. in(1,3) ) call stopit( status, 
+      if( out(1,3) .ne. in(1,3) ) call stopit( status,
      :                                         'Sphere: Error 2z')
-      if( out(2,1) .ne. AST__BAD ) call stopit( status, 
+      if( out(2,1) .ne. AST__BAD ) call stopit( status,
      :                                         'Sphere: Error 3' )
-      if( out(2,2) .ne. AST__BAD ) call stopit( status, 
+      if( out(2,2) .ne. AST__BAD ) call stopit( status,
      :                                         'Sphere: Error 4' )
-      if( out(2,3) .ne. AST__BAD ) call stopit( status, 
+      if( out(2,3) .ne. AST__BAD ) call stopit( status,
      :                                         'Sphere: Error 4z' )
 
       p2(1)=0.0
@@ -2558,21 +2558,21 @@ C
       in(2,3) = p3(3)
 
       call ast_trann( cir1, 2, 3, 2, in, .true., 3, 2, out, status )
-      if( out(1,1) .ne. in(1,1) ) call stopit( status, 
+      if( out(1,1) .ne. in(1,1) ) call stopit( status,
      :                                          'Sphere: Error 5' )
-      if( out(1,2) .ne. in(1,2) ) call stopit( status, 
+      if( out(1,2) .ne. in(1,2) ) call stopit( status,
      :                                          'Sphere: Error 6' )
-      if( out(1,3) .ne. in(1,3) ) call stopit( status, 
+      if( out(1,3) .ne. in(1,3) ) call stopit( status,
      :                                          'Sphere: Error 6z')
-      if( out(2,1) .ne. AST__BAD ) call stopit( status, 
+      if( out(2,1) .ne. AST__BAD ) call stopit( status,
      :                                          'Sphere: Error 7' )
-      if( out(2,2) .ne. AST__BAD ) call stopit( status, 
+      if( out(2,2) .ne. AST__BAD ) call stopit( status,
      :                                          'Sphere: Error 8' )
-      if( out(2,3) .ne. AST__BAD ) call stopit( status, 
+      if( out(2,3) .ne. AST__BAD ) call stopit( status,
      :                                          'Sphere: Error 8z' )
 
 
-      if( ast_overlap( cir1, cir1, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( cir1, cir1, status ) .ne. 5 ) call stopit(status,
      :                                          'Sphere: Error 10' )
 
 
@@ -2587,10 +2587,10 @@ C
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
       call checkdump( cir2, 'checkdump sph2', status )
 
-      if( ast_overlap( cir2, cir1, status ) .ne. 2 ) call stopit(status, 
+      if( ast_overlap( cir2, cir1, status ) .ne. 2 ) call stopit(status,
      :                                          'Sphere: Error 11' )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 3 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 3 ) call stopit(status,
      :                                          'Sphere: Error 12' )
 
 
@@ -2602,7 +2602,7 @@ C
       p2( 2 ) = -1.0
       p2( 3 ) = -2.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
-      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status,
      :                                          'Sphere: Error 13' )
 
       p1( 1 ) = 1.0
@@ -2612,7 +2612,7 @@ C
       p2( 2 ) = 99.0
       p2( 3 ) = -2.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
-      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status,
      :                                          'Sphere: Error 14' )
 
 
@@ -2636,7 +2636,7 @@ C
          write(*,*) ast_overlap( cir1, cir2, status ),' should be 4 '
          call stopit(status, 'Sphere: Error 15' )
       end if
- 
+
       p1( 1 ) = 2.000001
       p1( 2 ) = 0.0
       p1( 3 ) = 0.0
@@ -2645,18 +2645,18 @@ C
       p2( 3 ) = 0.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status,
      :                                          'Sphere: Error 16' )
 
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
-      call ast_setl( cir1, 'Closed', .false., status ) 
+      call ast_setl( cir1, 'Closed', .false., status )
       call ast_setl( cir2, 'Closed', .false., status )
-      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
-     :                                          'Sphere: Error 17' )     
-      call ast_clear( cir1, 'Closed', status ) 
+      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status,
+     :                                          'Sphere: Error 17' )
+      call ast_clear( cir1, 'Closed', status )
       call ast_clear( cir2, 'Closed', status )
-           
+
       p1( 1 ) = 2.000004
       p1( 2 ) = 0.0
       p1( 3 ) = 0.0
@@ -2665,9 +2665,9 @@ C
       p2( 3 ) = 0.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
-     :                                          'Sphere: Error 18' )     
-      
+      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status,
+     :                                          'Sphere: Error 18' )
+
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'Circle tests failed'
 
@@ -2710,8 +2710,8 @@ C
       call ast_begin( status )
 
       f1 = ast_SkyFrame( 'system=fk4', status )
-      f3 = ast_cmpframe( ast_pickaxes( f1, 1, 1, map, status ), 
-     :                   ast_specframe( 'system=wave,unit=um', status ), 
+      f3 = ast_cmpframe( ast_pickaxes( f1, 1, 1, map, status ),
+     :                   ast_specframe( 'system=wave,unit=um', status ),
      :                   ' ', status )
       perm(1)=2
       perm(2)=1
@@ -2736,21 +2736,21 @@ C
 
       if( xout(1) .ne. xin(1) ) call stopit( status, 'Ellipse: Cmp 1')
       if( yout(1) .ne. yin(1) ) call stopit( status, 'Ellipse: Cmp 2')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Cmp 3' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Cmp 4' )
       if( xout(3) .ne. xin(3) ) call stopit( status, 'Ellipse: Cmp 5')
       if( yout(3) .ne. yin(3) ) call stopit( status, 'Ellipse: Cmp 6')
-      if( xout(4) .ne. AST__BAD ) call stopit( status, 
+      if( xout(4) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Cmp 7' )
-      if( yout(4) .ne. AST__BAD ) call stopit( status, 
+      if( yout(4) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Cmp 8' )
 
       call checkdump( ell1, 'checkdump ell1 cmp', status )
       ell2 = ast_simplify( ell1, status )
       call checkdump( ell2, 'checkdump ell2 cmp', status )
-      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status,
      :                                          'ellipse: Error 5 cmp' )
 
       fc = ast_fitschan( ast_null, ast_null, ' ', status )
@@ -2759,7 +2759,7 @@ C
       end do
       call ast_clear( fc, 'card', status )
       fs = ast_read( fc, status )
-      
+
       frm1 = ast_getframe( fs, ast__current, status )
 
       p1( 1 ) = 1.2217305
@@ -2774,13 +2774,13 @@ C
 
 
       call ast_getregionbounds( ell1, lbnd, ubnd, status )
-      if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status, 
+      if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status,
      :                                               'Error b1' )
-      if( abs( lbnd(2) - 1.19059777 ) .gt. 1.0E-6 ) 
+      if( abs( lbnd(2) - 1.19059777 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Error b2' )
-      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Error b3' )
-      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Error b4' )
 
       rad = ast_distance( ell1, p1, p2, status )
@@ -2795,9 +2795,9 @@ C
       call ast_tran2( ell1, 2, xin, yin, .true., xout, yout, status )
       if( xout(1) .ne. xin(1) ) call stopit( status, 'Ellipse: Error 1')
       if( yout(1) .ne. yin(1) ) call stopit( status, 'Ellipse: Error 2')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 3' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 4' )
 
 
@@ -2809,13 +2809,13 @@ C
       yin(2) = p4(2)
 
       call ast_tran2( ell1, 2, xin, yin, .true., xout, yout, status )
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                         'Ellipse: Error 1b')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                         'Ellipse: Error 2b')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 3b' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 4b' )
 
 
@@ -2829,13 +2829,13 @@ C
       yin(2) = p4(2)
 
       call ast_tran2( ell1, 2, xin, yin, .true., xout, yout, status )
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                         'Ellipse: Error 1c')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                         'Ellipse: Error 2c')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 3c' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 4c' )
 
       call ast_offset( frm1, p1, p3, -rad*0.999, p4, status )
@@ -2846,32 +2846,32 @@ C
       yin(2) = p4(2)
 
       call ast_tran2( ell1, 2, xin, yin, .true., xout, yout, status )
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                         'Ellipse: Error 1d')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                         'Ellipse: Error 2d')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 3d' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                         'Ellipse: Error 4d' )
 
 
       ell2 = ast_copy( ell1, status )
 
-      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status,
      :                                          'ellipse: Error 5' )
-      if( ast_overlap( ell2, ell1, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell2, ell1, status ) .ne. 5 ) call stopit(status,
      :                                          'ellipse: Error 6' )
 
       call ast_set( ell2, 'system=galactic', status )
-      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status,
      :                                          'ellipse: Error 7' )
-      if( ast_overlap( ell2, ell1, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell2, ell1, status ) .ne. 5 ) call stopit(status,
      :                                          'ellipse: Error 8' )
 
-       
 
-       
+
+
       xin(1) = p1( 1 )
       yin(1) = p1( 2 )
       xin(2) = p2( 1 )
@@ -2905,12 +2905,12 @@ C
       xout(3) = q3b(1)
       yout(3) = q3b(2)
       call ast_tran2( fs, 3, xout, yout, .true., xin, yin, status )
-      p1b( 1 ) = xin(1) 
-      p1b( 2 ) = yin(1)  
-      p2b( 1 ) = xin(2)  
-      p2b( 2 ) = yin(2)  
-      p3b( 1 ) = xin(3)  
-      p3b( 2 ) = yin(3)  
+      p1b( 1 ) = xin(1)
+      p1b( 2 ) = yin(1)
+      p2b( 1 ) = xin(2)
+      p2b( 2 ) = yin(2)
+      p3b( 1 ) = xin(3)
+      p3b( 2 ) = yin(3)
 
       frm1 = ast_GetFrame( fs, AST__CURRENT, status )
 
@@ -2920,9 +2920,9 @@ C
       pp2( 2 ) = 1.0D-7
       unc = ast_box( frm1, 0, pp1, pp2, AST__NULL, ' ', status )
       ell2 = ast_ellipse( frm1, 0, p1b, p2b, p3b, unc, ' ', status )
-      if( ast_overlap( ell2, ell1, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( ell2, ell1, status ) .ne. 4 ) call stopit(status,
      :                                          'ellipse: Error 9' )
-      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status,
      :                                          'ellipse: Error 10' )
 
 
@@ -2941,12 +2941,12 @@ C
       xout(3) = q3b(1)
       yout(3) = q3b(2)
       call ast_tran2( fs, 3, xout, yout, .true., xin, yin, status )
-      p1b( 1 ) = xin(1) 
-      p1b( 2 ) = yin(1)  
-      p2b( 1 ) = xin(2)  
-      p2b( 2 ) = yin(2)  
-      p3b( 1 ) = xin(3)  
-      p3b( 2 ) = yin(3)  
+      p1b( 1 ) = xin(1)
+      p1b( 2 ) = yin(1)
+      p2b( 1 ) = xin(2)
+      p2b( 2 ) = yin(2)
+      p3b( 1 ) = xin(3)
+      p3b( 2 ) = yin(3)
 
       frm1 = ast_GetFrame( fs, AST__CURRENT, status )
       pp1( 1 ) = 0.0
@@ -2955,9 +2955,9 @@ C
       pp2( 2 ) = 1.0D-7
       unc = ast_box( frm1, 0, pp1, pp2, AST__NULL, ' ', status )
       ell2 = ast_ellipse( frm1, 0, p1b, p2b, p3b, unc, ' ', status )
-      if( ast_overlap( ell2, ell1, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( ell2, ell1, status ) .ne. 1 ) call stopit(status,
      :                                          'ellipse: Error 11' )
-      if( ast_overlap( ell1, ell2, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 1 ) call stopit(status,
      :                                          'ellipse: Error 12' )
 
       p1b( 1 ) = p1( 1 )
@@ -2968,9 +2968,9 @@ C
       p3b( 2 ) = 0.9*p3( 2 ) + 0.1*p1( 2 )
 
       ell2 = ast_ellipse( frm1, 0, p1b, p2b, p3b, unc, ' ', status )
-      if( ast_overlap( ell2, ell1, status ) .ne. 2 ) call stopit(status, 
+      if( ast_overlap( ell2, ell1, status ) .ne. 2 ) call stopit(status,
      :                                          'ellipse: Error 13' )
-      if( ast_overlap( ell1, ell2, status ) .ne. 3 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 3 ) call stopit(status,
      :                                          'ellipse: Error 14' )
 
 
@@ -3009,7 +3009,7 @@ C
       ell3 = ast_mapregion( ell2, mm, frm1, status )
       if( hasframeset( ell3,status ) ) call stopit( status,
      :                  'Ellipse: error 16' )
-      if( ast_overlap( ell1, ell3, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell1, ell3, status ) .ne. 5 ) call stopit(status,
      :                                          'ellipse: Error 17' )
 
 
@@ -3028,11 +3028,11 @@ C
       p3(2)=1.0
       ell1 = ast_ellipse( frm1, 0, p1, p2, p3, unc, ' ', status )
       reg = ast_simplify( ell1, status )
-      if( .not. ast_IsACircle( reg, status ) ) call stopit(status, 
+      if( .not. ast_IsACircle( reg, status ) ) call stopit(status,
      :                                          'ellipse: Error 18' )
 
       ell1 = ast_circle( frm1, 0, p1, p2, AST__NULL, ' ', status )
-      if( ast_overlap( reg, ell1, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( reg, ell1, status ) .ne. 5 ) call stopit(status,
      :                                          'Ellipse: Error 19' )
 
 
@@ -3054,7 +3054,7 @@ C
       p3(2)=0.0D0
       ell2 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
 
-      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status,
      :                                          'Ellipse: Error 20' )
 
       p1(1)=6.2681853D0
@@ -3065,7 +3065,7 @@ C
       p3(2)=0.0D0
       ell2 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
 
-      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 4 ) call stopit(status,
      :                                          'Ellipse: Error 21' )
 
       p1(1)=-0.015D0
@@ -3076,7 +3076,7 @@ C
       p3(2)=0.0D0
       ell1 = ast_ellipse( frm1, 1, p1, p2, p3, AST__NULL, ' ', status )
 
-      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( ell1, ell2, status ) .ne. 5 ) call stopit(status,
      :                                          'Ellipse: Error 22' )
 
 
@@ -3121,24 +3121,24 @@ C
       cir = ast_circle( nr, 0, p1, p2, AST__NULL, ' ', status )
       call checkdump( cir, 'checkdump NullRegion:cir', status )
 
-      if( ast_overlap( cir, nr, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( cir, nr, status ) .ne. 1 ) call stopit(status,
      :                                          'NullRegion: Error 1' )
 
-      if( ast_overlap( nr, cir, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( nr, cir, status ) .ne. 1 ) call stopit(status,
      :                                          'NullRegion: Error 2' )
 
-      if( ast_overlap( nr, nr, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( nr, nr, status ) .ne. 5 ) call stopit(status,
      :                                          'NullRegion: Error 3' )
 
       call ast_negate( nr, status )
 
-      if( ast_overlap( cir, nr, status ) .ne. 2 ) call stopit(status, 
+      if( ast_overlap( cir, nr, status ) .ne. 2 ) call stopit(status,
      :                                          'NullRegion: Error 4' )
 
-      if( ast_overlap( nr, cir, status ) .ne. 3 ) call stopit(status, 
+      if( ast_overlap( nr, cir, status ) .ne. 3 ) call stopit(status,
      :                                          'NullRegion: Error 5' )
 
-      if( ast_overlap( nr, nr, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( nr, nr, status ) .ne. 5 ) call stopit(status,
      :                                          'NullRegion: Error 6' )
 
       call ast_set( nr, 'system(1)=FK4', status )
@@ -3160,14 +3160,14 @@ C
       end do
 
       nr = ast_NullRegion( f2, AST__NULL, 'negated=1', status )
-      res = ast_maskd( nr, AST__NULL, .false., 2, lbnd_in, ubnd_in, 
+      res = ast_maskd( nr, AST__NULL, .false., 2, lbnd_in, ubnd_in,
      :                 rin, VAL__BADD, status )
 
       if( res .ne. 0 ) then
          write(*,*) 'NullRegion:Res is ',res
          call stopit( status, 'res should be 0' )
       end if
-      
+
       do i =1, 5
          do j = 1, 5
             if( rin(j,i) .NE. 1.0 ) then
@@ -3178,7 +3178,7 @@ C
       end do
 
       call ast_negate( nr, status )
-      res = ast_maskd( nr, AST__NULL, .false., 2, lbnd_in, ubnd_in, 
+      res = ast_maskd( nr, AST__NULL, .false., 2, lbnd_in, ubnd_in,
      :                 rin, VAL__BADD, status )
 
       if( res .ne. 25 ) then
@@ -3231,18 +3231,18 @@ C
 
       f2 = ast_skyframe( 'system=galactic', status )
 
-      p1(1) = 1.68166715892457 
+      p1(1) = 1.68166715892457
       p1(2) = -1.050436507472
       p2(1) = 1.68140254777194
       p2(2) = -1.05048840003467
       r2 = ast_circle( f2, 0, p1, p2, AST__NULL, ' ', status )
 
-      if( ast_overlap( r1, r2, status ) .ne. 4 ) call stopit(status, 
+      if( ast_overlap( r1, r2, status ) .ne. 4 ) call stopit(status,
      :                                        'CmpRegion: Error 0' )
 
       cr = ast_cmpregion( r1, r2, AST__AND, ' ', status )
       cr = ast_Copy( cr, status )
-      if( ast_overlap( cr, cr, status ) .ne. 5 ) call stopit(status, 
+      if( ast_overlap( cr, cr, status ) .ne. 5 ) call stopit(status,
      :                                        'CmpRegion: Error 1' )
 
       xin( 1 ) = 0.5E-4! In both r1 and r2
@@ -3257,84 +3257,84 @@ C
 
       call ast_tran2( cr, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                    'CmpRegion: AND Error 1x')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                    'CmpRegion: AND Error 1y')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion: AND Error 2x')
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion: AND Error 2y')
-      if( xout(3) .ne. AST__BAD ) call stopit( status, 
+      if( xout(3) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion: AND Error 3x')
-      if( yout(3) .ne. AST__BAD ) call stopit( status, 
+      if( yout(3) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion: AND Error 3y')
-      if( xout(4) .ne. AST__BAD ) call stopit( status, 
+      if( xout(4) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion: AND Error 4x')
-      if( yout(4) .ne. AST__BAD ) call stopit( status, 
+      if( yout(4) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion: AND Error 4y')
 
       cr = ast_cmpregion( r1, r2, AST__OR, ' ', status )
       call ast_tran2( cr, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                     'CmpRegion: OR Error 1x')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                     'CmpRegion: OR Error 1y')
-      if( xout(2) .ne. xin(2) ) call stopit( status, 
+      if( xout(2) .ne. xin(2) ) call stopit( status,
      :                                     'CmpRegion: OR Error 2x')
-      if( yout(2) .ne. yin(2) ) call stopit( status, 
+      if( yout(2) .ne. yin(2) ) call stopit( status,
      :                                     'CmpRegion: OR Error 2y')
-      if( xout(3) .ne. xin(3) ) call stopit( status, 
+      if( xout(3) .ne. xin(3) ) call stopit( status,
      :                                     'CmpRegion: OR Error 3x')
-      if( yout(3) .ne. yin(3) ) call stopit( status, 
+      if( yout(3) .ne. yin(3) ) call stopit( status,
      :                                     'CmpRegion: OR Error 3y')
-      if( xout(4) .ne. AST__BAD ) call stopit( status, 
+      if( xout(4) .ne. AST__BAD ) call stopit( status,
      :                                     'CmpRegion: OR Error 4x')
-      if( yout(4) .ne. AST__BAD ) call stopit( status, 
+      if( yout(4) .ne. AST__BAD ) call stopit( status,
      :                                     'CmpRegion: OR Error 4y')
 
-     
+
       call ast_negate( r2, status )
       cr = ast_cmpregion( r1, r2, AST__AND, ' ', status )
       call ast_tran2( cr, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. AST__BAD ) call stopit( status, 
+      if( xout(1) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 1x')
-      if( yout(1) .ne. AST__BAD ) call stopit( status, 
+      if( yout(1) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 1y')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 2x')
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 2y')
-      if( xout(3) .ne. xin(3) ) call stopit( status, 
+      if( xout(3) .ne. xin(3) ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 3x')
-      if( yout(3) .ne. yin(3) ) call stopit( status, 
+      if( yout(3) .ne. yin(3) ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 3y')
-      if( xout(4) .ne. AST__BAD ) call stopit( status, 
+      if( xout(4) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 4x')
-      if( yout(4) .ne. AST__BAD ) call stopit( status, 
+      if( yout(4) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDb Error 4y')
 
       call ast_negate( r1, status )
       cr = ast_cmpregion( r1, r2, AST__AND, ' ', status )
       call ast_tran2( cr, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. AST__BAD ) call stopit( status, 
+      if( xout(1) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 1x')
-      if( yout(1) .ne. AST__BAD ) call stopit( status, 
+      if( yout(1) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 1y')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 2x')
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 2y')
-      if( xout(3) .ne. AST__BAD ) call stopit( status, 
+      if( xout(3) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 3x')
-      if( yout(3) .ne. AST__BAD ) call stopit( status, 
+      if( yout(3) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 3y')
-      if( xout(4) .ne. xin(4) ) call stopit( status, 
+      if( xout(4) .ne. xin(4) ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 4x')
-      if( yout(4) .ne. yin(4) ) call stopit( status, 
+      if( yout(4) .ne. yin(4) ) call stopit( status,
      :                                   'CmpRegion: ANDc Error 4y')
 
 
@@ -3342,33 +3342,33 @@ C
       call ast_negate( cr, status )
       call ast_tran2( cr, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 1x')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 1y')
-      if( xout(2) .ne. xin(2) ) call stopit( status, 
+      if( xout(2) .ne. xin(2) ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 2x')
-      if( yout(2) .ne. yin(2) ) call stopit( status, 
+      if( yout(2) .ne. yin(2) ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 2y')
-      if( xout(3) .ne. xin(3) ) call stopit( status, 
+      if( xout(3) .ne. xin(3) ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 3x')
-      if( yout(3) .ne. yin(3) ) call stopit( status, 
+      if( yout(3) .ne. yin(3) ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 3y')
-      if( xout(4) .ne. AST__BAD ) call stopit( status, 
+      if( xout(4) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 4x')
-      if( yout(4) .ne. AST__BAD ) call stopit( status, 
+      if( yout(4) .ne. AST__BAD ) call stopit( status,
      :                                   'CmpRegion: ANDd Error 4y')
 
 
       cr2 = ast_cmpregion( r2, r1, AST__AND, ' ', status )
 
       fs = ast_convert( cr, cr2, ' ', status )
-      if( fs .eq. AST__NULL ) call stopit( status, 
+      if( fs .eq. AST__NULL ) call stopit( status,
      :                                    'CmpRegion: Error 5')
       map = ast_getmapping( fs, AST__BASE, AST__CURRENT, status )
       frm = ast_getframe( fs, AST__CURRENT, status )
       cr3 = ast_mapRegion( cr, map, frm, status )
-      if( ast_overlap( cr3, cr2, status ) .ne. 6 ) call stopit(status, 
+      if( ast_overlap( cr3, cr2, status ) .ne. 6 ) call stopit(status,
      :                                        'CmpRegion: Error 6' )
 
       cr = ast_Copy( cr, status )
@@ -3436,21 +3436,21 @@ C
 
       call ast_tran2( cr2, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. xin(1) ) call stopit( status, 
+      if( xout(1) .ne. xin(1) ) call stopit( status,
      :                                    'CmpRegion:Error 11')
-      if( yout(1) .ne. yin(1) ) call stopit( status, 
+      if( yout(1) .ne. yin(1) ) call stopit( status,
      :                                    'CmpRegion:Error 12')
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 
+      if( xout(2) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 13')
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 
+      if( yout(2) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 14')
-      if( xout(3) .ne. AST__BAD ) call stopit( status, 
+      if( xout(3) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 15')
-      if( yout(3) .ne. AST__BAD ) call stopit( status, 
+      if( yout(3) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 16')
-      if( xout(4) .ne. AST__BAD ) call stopit( status, 
+      if( xout(4) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 17')
-      if( yout(4) .ne. AST__BAD ) call stopit( status, 
+      if( yout(4) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 18')
 
 
@@ -3459,21 +3459,21 @@ C
       cr2 = ast_simplify( cr2, status )
       call ast_tran2( cr2, 4, xin, yin, .true., xout, yout, status )
 
-      if( xout(1) .ne. AST__BAD ) call stopit( status, 
+      if( xout(1) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 19')
-      if( yout(1) .ne. AST__BAD ) call stopit( status, 
+      if( yout(1) .ne. AST__BAD ) call stopit( status,
      :                                    'CmpRegion:Error 20')
-      if( xout(2) .ne. xin(2) ) call stopit( status, 
+      if( xout(2) .ne. xin(2) ) call stopit( status,
      :                                    'CmpRegion:Error 21')
-      if( yout(2) .ne. yin(2) ) call stopit( status, 
+      if( yout(2) .ne. yin(2) ) call stopit( status,
      :                                    'CmpRegion:Error 22')
-      if( xout(3) .ne. xin(3) ) call stopit( status, 
+      if( xout(3) .ne. xin(3) ) call stopit( status,
      :                                    'CmpRegion:Error 23')
-      if( yout(3) .ne. yin(3) ) call stopit( status, 
+      if( yout(3) .ne. yin(3) ) call stopit( status,
      :                                    'CmpRegion:Error 24')
-      if( xout(4) .ne. xin(4) ) call stopit( status, 
+      if( xout(4) .ne. xin(4) ) call stopit( status,
      :                                    'CmpRegion:Error 25')
-      if( yout(4) .ne. yin(4) ) call stopit( status, 
+      if( yout(4) .ne. yin(4) ) call stopit( status,
      :                                    'CmpRegion:Error 26')
 
 
@@ -3504,7 +3504,7 @@ C
       external mysource, mysink
       character buf*45000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -3529,14 +3529,14 @@ C
          call stopit( status, 'Cannot read object from channel' )
       end if
 
-*  Check that it is a Region and its boundary is identical to the supplied 
+*  Check that it is a Region and its boundary is identical to the supplied
 *  Region.
       overlap = ast_overlap( obj, result, status )
       if( overlap .ne. 5 ) then
          write(*,*) 'obj result Overlap: ', overlap
          write(*,*) 'obj self-Overlap: ', ast_overlap( obj, obj,
      :                                                 status )
-         write(*,*) 'result self-Overlap: ', ast_overlap( result, 
+         write(*,*) 'result self-Overlap: ', ast_overlap( result,
      :                                                 result, status )
          call ast_Show( obj, status )
          call ast_Show( result, status )
@@ -3544,7 +3544,7 @@ C
          call stopit( status, 'Object has changed' )
       end if
 
-      end  
+      end
 
       subroutine mysource( status )
       implicit none
@@ -3553,7 +3553,7 @@ C
       integer status, next, end, ll
       character buf*45000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -3576,7 +3576,7 @@ C
       character buf*45000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -3595,7 +3595,7 @@ C
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l,' greater than ',ll
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif
@@ -3635,14 +3635,14 @@ C
 
       call checkdump( r3, 'checkdump Prism 1', status )
 
-      if( ast_overlap( r3, r3, status ) .ne. 5 ) call stopit( status, 
+      if( ast_overlap( r3, r3, status ) .ne. 5 ) call stopit( status,
      :                                                    'Prism 1' )
 
       r4 = ast_Simplify( r3, status )
-      if( .not. ast_isabox( r4, status ) ) call stopit( status, 
+      if( .not. ast_isabox( r4, status ) ) call stopit( status,
      :                                                    'Prism 1b' )
       if( hasframeset( r4, status ) ) call stopit( status, 'Prism 1c' )
-      if( ast_overlap( r3, r4, status ) .ne. 5 ) call stopit( status, 
+      if( ast_overlap( r3, r4, status ) .ne. 5 ) call stopit( status,
      :                                                    'Prism 1d' )
 
 
@@ -3651,7 +3651,7 @@ C
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
 
-      if( ast_overlap( r3, r4, status ) .ne. 3 ) call stopit( status, 
+      if( ast_overlap( r3, r4, status ) .ne. 3 ) call stopit( status,
      :                                                    'Prism 2' )
       if( ast_overlap( r4, r3, status ) .ne. 2 ) then
          write(*,*) ast_overlap( r4, r3, status ),' should be 2'
@@ -3662,23 +3662,23 @@ C
       ubnd( 1 ) = 6500.0
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
-      if( ast_overlap( r3, r4, status ) .ne. 4 ) call stopit( status, 
+      if( ast_overlap( r3, r4, status ) .ne. 4 ) call stopit( status,
      :                                                    'Prism 4' )
-      if( ast_overlap( r4, r3, status ) .ne. 4 ) call stopit( status, 
+      if( ast_overlap( r4, r3, status ) .ne. 4 ) call stopit( status,
      :                                                    'Prism 5' )
 
       lbnd( 1 ) = 6500.0
       ubnd( 1 ) = 7500.0
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
-      if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status, 
+      if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status,
      :                                                    'Prism 6' )
-      if( ast_overlap( r4, r3, status ) .ne. 1 ) call stopit( status, 
+      if( ast_overlap( r4, r3, status ) .ne. 1 ) call stopit( status,
      :                                                    'Prism 7' )
 
       r4 = ast_copy( r3, status )
       call ast_Negate( r4, status )
-      if( ast_overlap( r4, r3, status ) .ne. 6 ) call stopit( status, 
+      if( ast_overlap( r4, r3, status ) .ne. 6 ) call stopit( status,
      :                                                    'Prism 8' )
 
 
@@ -3707,7 +3707,7 @@ C
       call ast_setl( r4, 'Closed', .false., status )
       if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status,
      :                                                    'Prism 11' )
-      
+
 
 
       f1 = ast_skyframe( 'system=fk5', status )
@@ -3769,17 +3769,17 @@ C
       r4 = ast_Simplify( r3, status )
 
       call ast_getregionbounds( r4, lbnd, ubnd, status )
-      if( abs( lbnd(1) + 0.8D0 ) .gt. 1.0E-6 ) call stopit( status, 
+      if( abs( lbnd(1) + 0.8D0 ) .gt. 1.0E-6 ) call stopit( status,
      :                                               'Prism 16' )
-      if( abs( lbnd(2) + 1.64D0 ) .gt. 1.0E-6 ) 
+      if( abs( lbnd(2) + 1.64D0 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Prism 17' )
-      if( abs( ubnd(1) - 0.8D0 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(1) - 0.8D0 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Prism 18' )
-      if( abs( ubnd(2) + 1.5 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(2) + 1.5 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Prism 19' )
-      if( abs( lbnd(3) - 5000.0 ) .gt. 1.0E-10 ) 
+      if( abs( lbnd(3) - 5000.0 ) .gt. 1.0E-10 )
      :           call stopit( status, 'Prism 20' )
-      if( abs( ubnd(3) - 6000.0 ) .gt. 1.0E-6 ) 
+      if( abs( ubnd(3) - 6000.0 ) .gt. 1.0E-6 )
      :           call stopit( status, 'Prism 21' )
 
       call ast_end( status )
@@ -3792,11 +3792,11 @@ C
       subroutine checkRemoveRegions( status )
       implicit none
 
-      include 'SAE_PAR' 
+      include 'SAE_PAR'
       include 'AST_PAR'
 
       integer status, sf1, sf2, reg, fs, map, fs2
-      double precision cen(2), ixin(2), iyin(2), gxin(2), gyin(2), 
+      double precision cen(2), ixin(2), iyin(2), gxin(2), gyin(2),
      :                 xout(2), yout(2)
 
       if( status .ne. sai__ok ) return
@@ -3818,7 +3818,7 @@ C
       if( xout(1) .eq. AST__BAD .or. yout(1) .eq. AST__BAD ) then
          call stopit( status, 'RemoveRegions test 1 failed' )
 
-      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or. 
+      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or.
      :         abs( yout(1) - iyin(1) ) .gt. 1.0E-10 ) then
          call stopit( status, 'RemoveRegions test 2 failed' )
 
@@ -3849,7 +3849,7 @@ C
       if( xout(1) .eq. AST__BAD .or. yout(1) .eq. AST__BAD ) then
          call stopit( status, 'RemoveRegions test 4 failed' )
 
-      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or. 
+      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or.
      :           abs( yout(1) - iyin(1) ) .gt. 1.0E-10 ) then
          call stopit( status, 'RemoveRegions test 5 failed' )
 
@@ -3869,11 +3869,11 @@ C
       if( xout(1) .eq. AST__BAD .or. yout(1) .eq. AST__BAD ) then
          call stopit( status, 'RemoveRegions test 7 failed' )
 
-      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or. 
+      else if( abs( xout(1) - ixin(1) ) .gt. 1.0E-10 .or.
      :           abs( yout(1) - iyin(1) ) .gt. 1.0E-10 ) then
          call stopit( status, 'RemoveRegions test 8 failed' )
 
-      else if( abs( xout(2) - ixin(2) ) .gt. 1.0E-10 .or. 
+      else if( abs( xout(2) - ixin(2) ) .gt. 1.0E-10 .or.
      :           abs( yout(2) - iyin(2) ) .gt. 1.0E-10 ) then
          call stopit( status, 'RemoveRegions test 9 failed' )
       end if

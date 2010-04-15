@@ -24,40 +24,40 @@
 *     single output NDF.  It differs from WCSALIGN in both the algorithm
 *     used, and in the requirements placed on the input NDFs.  WCSMOSAIC
 *     requires that the transformation from pixel to WCS co-ordinates
-*     be defined in each input NDF, but (unlike WCSALIGN) the inverse 
+*     be defined in each input NDF, but (unlike WCSALIGN) the inverse
 *     transformation from WCS to pixel co-ordinates need not be defined.
-*     For instance, this means that WCSMOSAIC can process data in which 
+*     For instance, this means that WCSMOSAIC can process data in which
 *     the WCS position of each input pixel is defined via a look-up
-*     table rather than an analytical expression.  Note however, that 
+*     table rather than an analytical expression.  Note however, that
 *     the WCS information in the reference NDF (see Parameter REF) must
 *     have a defined inverse transformation.
 *
-*     The WCSMOSAIC algorithm proceeds as follows.  First, the output 
-*     NDF is filled with zeros.  An associated array of weights (one 
-*     weight for each output pixel) is created and is also filled with 
-*     zeros.  Each input NDF is then processed in turn.  For each pixel 
-*     in the current input NDF, the corresponding transformed position 
-*     in the output NDF is found (based on the WCS information in both 
-*     NDFs).  The input pixel value is then divided up between a small 
-*     group of output pixels centred on this central output position.  
-*     The method used for choosing the fraction of the input pixel 
-*     value assigned to each output pixel is determined by the METHOD 
-*     and PARAMS parameters.  Each of the affected output pixel values 
-*     is then incremented by its allocated fraction of the input pixel 
-*     value.  The corresponding weight values are incremented by the 
-*     fractions used (that is, if 0.25 of an input pixel is assigned to 
+*     The WCSMOSAIC algorithm proceeds as follows.  First, the output
+*     NDF is filled with zeros.  An associated array of weights (one
+*     weight for each output pixel) is created and is also filled with
+*     zeros.  Each input NDF is then processed in turn.  For each pixel
+*     in the current input NDF, the corresponding transformed position
+*     in the output NDF is found (based on the WCS information in both
+*     NDFs).  The input pixel value is then divided up between a small
+*     group of output pixels centred on this central output position.
+*     The method used for choosing the fraction of the input pixel
+*     value assigned to each output pixel is determined by the METHOD
+*     and PARAMS parameters.  Each of the affected output pixel values
+*     is then incremented by its allocated fraction of the input pixel
+*     value.  The corresponding weight values are incremented by the
+*     fractions used (that is, if 0.25 of an input pixel is assigned to
 *     an output pixel, the weight for the output pixel is incremented by
-*     0.25).  Once all pixels in the current input NDF have been 
-*     rebinned into the output NDF in this way, the algorithm proceeds 
+*     0.25).  Once all pixels in the current input NDF have been
+*     rebinned into the output NDF in this way, the algorithm proceeds
 *     to rebin the next input NDF in the same way.  Once all input NDFs
-*     have been processed, output pixels which have a weight less than 
-*     the value given by Parameter WLIM are set bad.  The mean value in 
+*     have been processed, output pixels which have a weight less than
+*     the value given by Parameter WLIM are set bad.  The mean value in
 *     the weights array (excluding those values less than WLIM) is then
 *     found.  The output NDF is then normalised by dividing it by the
 *     weights array.  This normalisation of the output NDF takes account
 *     of any difference in the number of pixels contributing to each
 *     output pixel, and also removes artifacts which may be produced by
-*     aliasing between the input and output pixel grids. 
+*     aliasing between the input and output pixel grids.
 *
 *     If the input NDFs contain variances, then these are propagated to
 *     the output.  Alternatively, output variances can be generated from
@@ -69,14 +69,14 @@
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
 *     the supplied NDFs.  For each input NDF, alignment is first
-*     attempted in the current co-ordinate Frame of the reference NDF. 
+*     attempted in the current co-ordinate Frame of the reference NDF.
 *     If this fails, alignment is attempted in the current co-ordinate
 *     Frame of the input NDF.  If this fails, alignment occurs in the
-*     pixel co-ordinate Frame.  A message indicating which Frame 
+*     pixel co-ordinate Frame.  A message indicating which Frame
 *     alignment was achieved in is displayed.
 
 *  Usage:
-*     wcsmosaic in out lbnd ubnd ref 
+*     wcsmosaic in out lbnd ubnd ref
 
 *  ADAM Parameters:
 *     ACC = _REAL (Read)
@@ -89,25 +89,25 @@
 *        region is used.  High accuracy is paid for by longer run times.
 *        [0.05]
 *     FLBND( ) = _DOUBLE (Write)
-*        The lower bounds of the bounding box enclosing the output NDF 
-*        in the current WCS Frame. The number of elements in this parameter 
-*        is equal to the number of axes in the current WCS Frame. Celestial 
+*        The lower bounds of the bounding box enclosing the output NDF
+*        in the current WCS Frame. The number of elements in this parameter
+*        is equal to the number of axes in the current WCS Frame. Celestial
 *        axis values will be in units of radians.
 *     FUBND( ) = _DOUBLE (Write)
-*        The upper bounds of the bounding box enclosing the output NDF 
-*        in the current WCS Frame. The number of elements in this parameter 
-*        is equal to the number of axes in the current WCS Frame. Celestial 
+*        The upper bounds of the bounding box enclosing the output NDF
+*        in the current WCS Frame. The number of elements in this parameter
+*        is equal to the number of axes in the current WCS Frame. Celestial
 *        axis values will be in units of radians.
 *     GENVAR = _LOGICAL (Read)
-*        If TRUE, output variances are generated based on the spread of 
+*        If TRUE, output variances are generated based on the spread of
 *        input pixel values contributing to each output pixel.  Any
-*        input variances then have no effect on the output variances 
-*        (although input variances will still be used to weight the 
+*        input variances then have no effect on the output variances
+*        (although input variances will still be used to weight the
 *        input data if the VARIANCE parameter is set TRUE).  If GENVAR
 *        is set FALSE, the output variances are based on the variances
-*        in the input NDFs, so long as all input NDFs contain variances 
+*        in the input NDFs, so long as all input NDFs contain variances
 *        (otherwise the output NDF will not contain any Variances). If a
-*        null (!) value is supplied, then a value of FALSE is adopted if 
+*        null (!) value is supplied, then a value of FALSE is adopted if
 *        and only if all the input NDFs have variance components (TRUE is
 *        used otherwise). [FALSE]
 *     IN = NDF (Read)
@@ -115,8 +115,8 @@
 *        given as a comma-separated list, in which each list element
 *        can be one of the following options.
 *
-*        - An NDF name, optionally containing wild-cards and/or regular 
-*        expressions ("*", "?", "[a-z]" etc.). 
+*        - An NDF name, optionally containing wild-cards and/or regular
+*        expressions ("*", "?", "[a-z]" etc.).
 *
 *        - The name of a text file, preceded by an up-arrow character
 *        "^".  Each line in the text file should contain a
@@ -137,13 +137,13 @@
 *        these same defaults being used.  [!]
 *     LBOUND() = _INTEGER (Write)
 *        The lower pixel bounds of the output NDF. Note, values will be
-*        written to this output parameter even if a null value is supplied 
+*        written to this output parameter even if a null value is supplied
 *        for Parameter OUT.
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
 *        piece-wise linear transformations.  If MAXPIX is larger than
-*        any dimension of the region of the output grid being used, a 
+*        any dimension of the region of the output grid being used, a
 *        first attempt will be made to approximate the Mapping by a
 *        linear transformation over the entire output region.  If a
 *        smaller value is used, the output region will first be divided
@@ -151,13 +151,13 @@
 *        dimension, and then attempts will be made at approximation.
 *        [1000]
 *     METHOD = LITERAL (Read)
-*        The method to use when dividing an input pixel value between a 
+*        The method to use when dividing an input pixel value between a
 *        group of neighbouring output pixels.  For details on these
 *        schemes, see the description of AST_REBINx in SUN/210.  METHOD
 *        can take the following values.
 *
 *        - "Bilinear" -- The input pixel value is divided bi-linearly
-*        between  the four nearest output pixels.  This produces 
+*        between  the four nearest output pixels.  This produces
 *        smoother output NDFs than the nearest-neighbour scheme, but is
 *        marginally slower.
 *
@@ -171,12 +171,12 @@
 *        - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel.  This
 *        is a valuable general-purpose scheme, intermediate in its
 *        visual effect on NDFs between the bilinear and
-*        nearest-neighbour schemes. 
+*        nearest-neighbour schemes.
 *
 *        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  It gives
 *        similar results to the "Sincsinc" scheme.
 *
-*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
+*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point-spread function of the
 *        input data (see Parameter PARAMS).
@@ -195,10 +195,10 @@
 *
 *        All methods propagate variances from input to output, but the
 *        variance estimates produced by schemes other than
-*        nearest neighbour need to be treated with care since the 
-*        spatial smoothing produced by these methods introduces 
-*        correlations in the variance estimates.  Also, the degree of 
-*        smoothing produced varies across the NDF.  This is because a 
+*        nearest neighbour need to be treated with care since the
+*        spatial smoothing produced by these methods introduces
+*        correlations in the variance estimates.  Also, the degree of
+*        smoothing produced varies across the NDF.  This is because a
 *        sample taken at a pixel centre will have no contributions from
 *        the neighbouring pixels, whereas a sample taken at the corner
 *        of a pixel will have equal contributions from all four
@@ -214,7 +214,7 @@
 *        The output NDF. If a null (!) value is supplied, the application
 *        will terminate early without creating an output cube, but
 *        without reporting an error. Note, the pixel bounds which the
-*        output cube would have had will still be written to output 
+*        output cube would have had will still be written to output
 *        parameters LBOUND and UBOUND, even if a null value is supplied
 *        for OUT.
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -222,21 +222,21 @@
 *        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
 *        SombCos and Gauss methods.
 *
-*        PARAMS( 1 ) is required by all the above schemes.  It is used 
+*        PARAMS( 1 ) is required by all the above schemes.  It is used
 *        to specify how many output pixels on either side of the central
 *        output pixel are to receive contribution from the corresponding
-*        input pixel.  Typically, a value of 2 is appropriate and the 
+*        input pixel.  Typically, a value of 2 is appropriate and the
 *        minimum allowed value is 1 (i.e. one pixel on each side).  A
 *        value of zero or fewer indicates that a suitable number of
 *        pixels should be calculated  automatically.  [0]
 *
-*        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc, 
+*        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
 *        SincCos, and SincGauss schemes. For the SombCos, SincSinc and
 *        SincCos schemes, it specifies the number of output pixels at
-*        which the envelope of the function goes to zero.  The minimum 
-*        value is 1.0, and the run-time default value is 2.0.  For the 
-*        Gauss and SincGauss scheme, it specifies the full-width at 
-*        half-maximum (FWHM) of the Gaussian envelope.  The minimum 
+*        which the envelope of the function goes to zero.  The minimum
+*        value is 1.0, and the run-time default value is 2.0.  For the
+*        Gauss and SincGauss scheme, it specifies the full-width at
+*        half-maximum (FWHM) of the Gaussian envelope.  The minimum
 *        value is 0.1, and the run-time default is 1.0.  []
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned.  If a
@@ -251,25 +251,25 @@
 *        these same defaults being used.  [!]
 *     UBOUND() = _INTEGER (Write)
 *        The upper pixel bounds of the output NDF. Note, values will be
-*        written to this output parameter even if a null value is supplied 
+*        written to this output parameter even if a null value is supplied
 *        for Parameter OUT.
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, then any input VARIANCE components in the input NDFs
 *        are used to weight the input data (the weight used for each
 *        data value is the reciprocal of the variance).  If FALSE, all
 *        input data is given equal weight.  Note, some applications
-*        (such as CCDPACK:MAKEMOS) use a parameter named USEVAR to 
-*        determine both whether input variances are used to weights 
-*        input data values, and also how to calculate output variances. 
-*        However, WCSMOSAIC uses the VARIANCE parameter only for the 
-*        first of these purposes (determining whether to weight the 
-*        input data).  The second purpose (determining how to create 
+*        (such as CCDPACK:MAKEMOS) use a parameter named USEVAR to
+*        determine both whether input variances are used to weights
+*        input data values, and also how to calculate output variances.
+*        However, WCSMOSAIC uses the VARIANCE parameter only for the
+*        first of these purposes (determining whether to weight the
+*        input data).  The second purpose (determining how to create
 *        output variances) is fulfilled by the GENVAR parameter. [FALSE]
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels
 *        that must contribute to an output pixel for the output pixel
 *        to be valid.  Note, fractional values are allowed.  If a value
-*        less than 1.0E-10 is supplied, a value of 1.0E-10 is used. 
+*        less than 1.0E-10 is supplied, a value of 1.0E-10 is used.
 *        [1.0E-10]
 
 *  Examples:
@@ -277,20 +277,20 @@
 *        This example rebins all the NDFs with names starting with
 *        the string "m51" in the current directory so that they are
 *        aligned with the first input NDF, and combines them all into a
-*        single output NDF called mosaic.  The output NDF is just big 
+*        single output NDF called mosaic.  The output NDF is just big
 *        enough to contain all the pixels in all the input NDFs.
 
 *  Notes:
-*     -  WCS information (including the current co-ordinate Frame) is 
-*     propagated from the reference NDF to the output NDF. All other 
+*     -  WCS information (including the current co-ordinate Frame) is
+*     propagated from the reference NDF to the output NDF. All other
 *     information is propagated form the first input NDF.
-*     -  The QUALITY and AXIS components are not propagated from input 
+*     -  The QUALITY and AXIS components are not propagated from input
 *     to output.
 *     -  There are different facts reported, their verbosity depending
 *     on the current message-reporting level set by environment variable
-*     MSG_FILTER.  If this is set to QUIET, no information will be 
-*     displayed while the command is executing.  When the filtering 
-*     level is at least as verbose as NORMAL, the interpolation method 
+*     MSG_FILTER.  If this is set to QUIET, no information will be
+*     displayed while the command is executing.  When the filtering
+*     level is at least as verbose as NORMAL, the interpolation method
 *     being used will be displayed.  If set to VERBOSE, the name of each
 *     input NDF will also be displayed as it is processed.
 
@@ -298,18 +298,18 @@
 *     KAPPA: WCSFRAME, WCSALIGN, REGRID; CCDPACK: TRANNDF.
 
 *  Implementation Status:
-*     -  This routine correctly processes the DATA, VARIANCE, LABEL, 
+*     -  This routine correctly processes the DATA, VARIANCE, LABEL,
 *     TITLE, UNITS, WCS, and HISTORY components of the input NDFs (see
 *     the METHOD parameter for notes on the interpretation of output
 *     variances).
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled, but the data
-*     type will be converted to one of _INTEGER, _DOUBLE or _REAL for 
+*     type will be converted to one of _INTEGER, _DOUBLE or _REAL for
 *     processing.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -363,7 +363,7 @@
 *     4-FEB-2008 (DSB):
 *        Allow a null value to be supplied for Parameter GENVAR.
 *     23-JUN-2008 (DSB):
-*        Propagate from the first input NDF rather than the reference 
+*        Propagate from the first input NDF rather than the reference
 *        NDF.
 *     2009 July 22 (MJC):
 *        Remove ILEVEL parameter and use the current reporting level
@@ -393,10 +393,10 @@
       CHARACTER MESS*60      ! Message text
       CHARACTER METHOD*13    ! Interpolation method to use.
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
-      DOUBLE PRECISION FLBND( NDF__MXDIM ) ! Lower WCS bounds of output 
-      DOUBLE PRECISION FUBND( NDF__MXDIM ) ! Upper WCS bounds of output 
-      DOUBLE PRECISION GLBND( NDF__MXDIM ) ! Lower GRID bounds of output 
-      DOUBLE PRECISION GUBND( NDF__MXDIM ) ! Upper GRID bounds of output 
+      DOUBLE PRECISION FLBND( NDF__MXDIM ) ! Lower WCS bounds of output
+      DOUBLE PRECISION FUBND( NDF__MXDIM ) ! Upper WCS bounds of output
+      DOUBLE PRECISION GLBND( NDF__MXDIM ) ! Lower GRID bounds of output
+      DOUBLE PRECISION GUBND( NDF__MXDIM ) ! Upper GRID bounds of output
       DOUBLE PRECISION PARAMS( 2 )! Param values passed to AST_RESAMPLE
       DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID position at lower limit
       DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID position at upper limit
@@ -428,7 +428,7 @@
       INTEGER MAP2           ! Mapping from PIXEL to output GRID Frame
       INTEGER MAPR           ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER MAXPIX         ! Initial scale size in pixels
-      INTEGER METHOD_CODE    ! Integer identifier for spreading method 
+      INTEGER METHOD_CODE    ! Integer identifier for spreading method
       INTEGER NAX            ! No. of axes in reference WCS Frame
       INTEGER NDIM           ! Number of pixel axes in output NDF
       INTEGER NDIM1          ! Number of pixel axes in input NDF
@@ -456,7 +456,7 @@
       CALL NDF_BEGIN
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...',
      :                 IGRP1, SIZE, STATUS )
 
 *  Get an identifier for the fiorst input NDF.
@@ -500,8 +500,8 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          DO I = 1, NDIM
-            LBND( I ) = DLBND( I )     
-            UBND( I ) = DUBND( I )     
+            LBND( I ) = DLBND( I )
+            UBND( I ) = DUBND( I )
          END DO
       END IF
 
@@ -509,7 +509,7 @@
       CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS )
       CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS )
 
-*  Convert these pixel index bounds to WCS bounds, and write them out to 
+*  Convert these pixel index bounds to WCS bounds, and write them out to
 *  the FLBND and FUBND output parameters.
       DO I = 1, NDIM
          GLBND( I ) = 0.5D0
@@ -533,12 +533,12 @@
      :                'Somb,SombCos', .TRUE., METHOD, STATUS )
 
 *  Tell the user what method is being used, and convert value of
-*  METHOD to one of the values expected by AST_REBINSEQ<x>. 
+*  METHOD to one of the values expected by AST_REBINSEQ<x>.
       NPAR = 0
       IF( METHOD( 1 : 1 ) .EQ. 'N' ) THEN
          METHOD_CODE = AST__NEAREST
          MESS = '  Using nearest neighbour binning.'
- 
+
       ELSE IF( METHOD( 1 : 2 ) .EQ. 'BI' ) THEN
          METHOD_CODE = AST__LINEAR
          MESS = '  Using bi-linear binning.'
@@ -595,19 +595,19 @@
 
       CALL MSG_OUTIF( MSG__NORM, 'WCSMOSAIC_MSG1', MESS, STATUS )
 
-*  If required, set the dynamic defaults for PARAMS, then get new 
+*  If required, set the dynamic defaults for PARAMS, then get new
 *  values.
       IF( NPAR .GT. 0 ) THEN
          CALL PAR_DEF1D( 'PARAMS', NPAR, PARAMS, STATUS )
-         CALL PAR_EXACD( 'PARAMS', NPAR, PARAMS, STATUS ) 
+         CALL PAR_EXACD( 'PARAMS', NPAR, PARAMS, STATUS )
       END IF
 
 *  Get the positional accuracy required.
-      CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )      
+      CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )
       ERRLIM = MAX( 0.0001, ERRLIM )
 
 *  Get the minimum acceptable output weight.
-      CALL PAR_GET0R( 'WLIM', WLIM, STATUS )      
+      CALL PAR_GET0R( 'WLIM', WLIM, STATUS )
 
 *  Get a value for MAXPIX.
       CALL PAR_GET0I( 'MAXPIX', MAXPIX, STATUS )
@@ -617,7 +617,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See if output variances are to be generated on the basis of the
-*  spread of input data values.  
+*  spread of input data values.
       CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
 
 *  If a null value was supplied, annul the error and use FALSE if all the
@@ -625,7 +625,7 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GENVAR = .NOT. HASVAR
-      END IF         
+      END IF
 
 *  If we are creating output variances from the spread of input data
 *  values, then we do not use the input variances to calculate the output
@@ -634,19 +634,19 @@
          USEVAR = .FALSE.
 
 *  If output variances are not being created on the basis of the spread
-*  in input values, then thet are created on the basis of input variances, 
-*  if all input NDF have defined Variance components. 
+*  in input values, then thet are created on the basis of input variances,
+*  if all input NDF have defined Variance components.
       ELSE
          USEVAR = HASVAR
       END IF
 
-*  If all input have variance components, see if input variances are to 
+*  If all input have variance components, see if input variances are to
 *  be used as weights.
       IF( HASVAR ) THEN
          CALL PAR_GET0L( 'VARIANCE', VARWGT, STATUS )
       ELSE
          VARWGT = .FALSE.
-      END IF      
+      END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -666,11 +666,11 @@
 *  Change the bounds of the output NDF to the required values.
       CALL NDF_SBND( NDIM, LBND, UBND, INDF2, STATUS )
 
-*  We now create the WCS FrameSet for the output NDF.  This will be a 
-*  copy of the reference FrameSet, modified to take account of any 
-*  difference in the pixel origins between the reference and output 
+*  We now create the WCS FrameSet for the output NDF.  This will be a
+*  copy of the reference FrameSet, modified to take account of any
+*  difference in the pixel origins between the reference and output
 *  NDFs.  We do this by taking a copy of the reference WCS FrameSet and
-*  then re-mapping the GRID Frame in the copy.  The Mapping used is the 
+*  then re-mapping the GRID Frame in the copy.  The Mapping used is the
 *  mapping from reference GRID Frame to output GRID Frame, going via the
 *  common PIXEL Frame.  Get the default WCS FrameSet for the output NDF.
       CALL NDF_GTWCS( INDF2, IWCS2, STATUS )
@@ -692,7 +692,7 @@
 
 *  Concatenate and simplify MAPR and MAP2 to get the Mapping from
 *  reference GRID Frame to output GRID Frame.
-      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAPR, MAP2, .TRUE., ' ', 
+      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAPR, MAP2, .TRUE., ' ',
      :                                 STATUS ), STATUS )
 
 *  Re-map the GRID Frame in the copy of the reference WCS FrameSet so
@@ -703,7 +703,7 @@
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
 
 *  Choose the data type to use.
-      CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', INDF2, INDF2, 'DATA', 
+      CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', INDF2, INDF2, 'DATA',
      :                TY_IN, DTYPE, STATUS )
 
 *  Map the output Data array.
@@ -712,7 +712,7 @@
 *  If an output Variance component is to be created, map it, else assign
 *  a value of the corresponding DATA component (safe value).
       IF( USEVAR .OR. GENVAR ) THEN
-         CALL NDF_MAP( INDF2, 'VAR', TY_IN, 'WRITE', IPV2, EL, 
+         CALL NDF_MAP( INDF2, 'VAR', TY_IN, 'WRITE', IPV2, EL,
      :                 STATUS )
       ELSE
          IPV2 = IPD2
@@ -728,7 +728,7 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Initialise to zero the number of input values pasted into the 
+*  Initialise to zero the number of input values pasted into the
 *  output array.
       NUSED = 0
 
@@ -742,7 +742,7 @@
 *  processed.
          CALL MSG_BLANKIF( MSG__VERB, STATUS )
          CALL NDF_MSG( 'NDF', INDF1 )
-         CALL MSG_OUTIF( MSG__VERB, 'WCSMOSAIC_MSG2', 
+         CALL MSG_OUTIF( MSG__VERB, 'WCSMOSAIC_MSG2',
      :                   '  Processing ^NDF...', STATUS )
 
 *  Set the AST_REBINSEQ flags for this input.
@@ -752,66 +752,66 @@
          IF( GENVAR ) FLAGS = FLAGS + AST__GENVAR
          IF( USEVAR ) FLAGS = FLAGS + AST__USEVAR
          IF( VARWGT ) FLAGS = FLAGS + AST__VARWGT
-   
+
          CALL NDF_BAD( INDF1, 'DATA,VARIANCE', .FALSE., BAD_DV, STATUS )
-         IF( BAD_DV ) FLAGS = FLAGS + AST__USEBAD 
+         IF( BAD_DV ) FLAGS = FLAGS + AST__USEBAD
 
 *  Get the pixel bounds of the input NDF.
-         CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, 
+         CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1,
      :                   STATUS )
 
 *  Map the required components of the input.
          CALL NDF_MAP( INDF1, 'DATA', TY_IN, 'READ', IPD1, EL, STATUS )
          IF ( USEVAR .OR. VARWGT  ) THEN
-            CALL NDF_MAP( INDF1, 'VAR', TY_IN, 'READ', IPV1, EL, 
+            CALL NDF_MAP( INDF1, 'VAR', TY_IN, 'READ', IPV1, EL,
      :                    STATUS )
          ELSE
             IPV1 = IPD1
          END IF
 
 *  Get a pointer to the Mapping from input to output pixel co-ordinates.
-         CALL KPG1_RETRI( SIZE, I, %VAL( CNF_PVAL( IPMAP ) ), MAP, 
+         CALL KPG1_RETRI( SIZE, I, %VAL( CNF_PVAL( IPMAP ) ), MAP,
      :                    STATUS )
 
 *  Call the appropriate rebinning routine.
          IF ( TY_IN .EQ. '_INTEGER' ) THEN
             CALL AST_REBINSEQI( MAP, DBLE( WLIM ), NDIM1, LBND1, UBND1,
-     :                          %VAL( CNF_PVAL( IPD1 ) ), 
+     :                          %VAL( CNF_PVAL( IPD1 ) ),
      :                          %VAL( CNF_PVAL( IPV1 ) ), METHOD_CODE,
-     :                          PARAMS, FLAGS, DBLE( ERRLIM ), MAXPIX, 
-     :                          VAL__BADI, NDIM, LBND, UBND, LBND1, 
-     :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ), 
+     :                          PARAMS, FLAGS, DBLE( ERRLIM ), MAXPIX,
+     :                          VAL__BADI, NDIM, LBND, UBND, LBND1,
+     :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ),
      :                          %VAL( CNF_PVAL( IPV2 ) ),
      :                          %VAL( CNF_PVAL( IPW ) ), NUSED,
      :                          STATUS )
 
          ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
             CALL AST_REBINSEQR( MAP, DBLE( WLIM ), NDIM1, LBND1, UBND1,
-     :                          %VAL( CNF_PVAL( IPD1 ) ), 
+     :                          %VAL( CNF_PVAL( IPD1 ) ),
      :                          %VAL( CNF_PVAL( IPV1 ) ), METHOD_CODE,
-     :                          PARAMS, FLAGS, DBLE( ERRLIM ), MAXPIX, 
-     :                          VAL__BADR, NDIM, LBND, UBND, LBND1, 
-     :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ), 
+     :                          PARAMS, FLAGS, DBLE( ERRLIM ), MAXPIX,
+     :                          VAL__BADR, NDIM, LBND, UBND, LBND1,
+     :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ),
      :                          %VAL( CNF_PVAL( IPV2 ) ),
      :                          %VAL( CNF_PVAL( IPW ) ), NUSED,
      :                          STATUS )
-         
+
          ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
             CALL AST_REBINSEQD( MAP, DBLE( WLIM ), NDIM1, LBND1, UBND1,
-     :                          %VAL( CNF_PVAL( IPD1 ) ), 
+     :                          %VAL( CNF_PVAL( IPD1 ) ),
      :                          %VAL( CNF_PVAL( IPV1 ) ), METHOD_CODE,
-     :                          PARAMS, FLAGS, DBLE( ERRLIM ), MAXPIX, 
-     :                          VAL__BADD, NDIM, LBND, UBND, LBND1, 
-     :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ), 
+     :                          PARAMS, FLAGS, DBLE( ERRLIM ), MAXPIX,
+     :                          VAL__BADD, NDIM, LBND, UBND, LBND1,
+     :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ),
      :                          %VAL( CNF_PVAL( IPV2 ) ),
      :                          %VAL( CNF_PVAL( IPW ) ), NUSED,
      :                          STATUS )
-         
+
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'TY', TY_IN )
             CALL ERR_REP( 'KPS1_WMOS2_ERR1', 'KPS1_WMOS2: Unsupported'//
-     :             ' rebinning data type ''^TY'' (programming error).', 
+     :             ' rebinning data type ''^TY'' (programming error).',
      :             STATUS )
          END IF
 

@@ -24,7 +24,7 @@
 *     First the number of sources is written to the file.
 *     Then vectors containing: source name and title, source positions,
 *     extent of source required, and wavebands required for each source
-*      
+*
 *  Arguments:
 *     POUTSF = CHARACTER * ( * ) (Given)
 *        Parameter OUTSOURCEFILE1 for name of file to contain source
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,7 +77,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER SZFNAM             ! Number of characters for file name   
+      INTEGER SZFNAM             ! Number of characters for file name
       PARAMETER ( SZFNAM = 80 )
 
 *  Local Variables:
@@ -102,7 +102,7 @@
          CALL ERR_ANNUL( STATUS )
          CALL MSG_OUT( ' ', ' The source positions will not be '//
      :   'saved, but you can continue processing', STATUS )
-      
+
 *  If a file is supplied by the user then write the source details to it
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -172,5 +172,5 @@
 
 *  Cancel the association to the file
       CALL DAT_CANCL( POUTSF, STATUS )
-      
+
       END

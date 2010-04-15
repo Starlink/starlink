@@ -10,10 +10,10 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_CLIP_GRID(N_FILES, N_PTS, NX, NY, NMAX, NSIGMA,
-*    :     N_BOLS, BITNUM, QUALITY_PTR, BINS, BIN_POS, STATS, IPOS, 
+*    :     N_BOLS, BITNUM, QUALITY_PTR, BINS, BIN_POS, STATS, IPOS,
 *    :     JPOS, NSPIKES, STATUS)
 
 *  Description:
@@ -95,7 +95,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -165,7 +165,7 @@
 *     to find (I,J) except that people might want to see where their
 *     bad points correspond to position on the plotted image.
 
-*         J = INT((COUNT - 1) / NX) + 1 
+*         J = INT((COUNT - 1) / NX) + 1
 *         I = COUNT - ((J-1) * NX)
 
          I = IPOS(COUNT)
@@ -179,11 +179,11 @@
 *     Use the mean (as long as it is good)
 
          IF ((HIGH .NE. VAL__BADR) .AND. (LOW .NE. VAL__BADR)) THEN
-         
+
 *     Go through the data for this bin
 
             DO N = 1, NMAX
-               
+
                IF ((BINS(I,J,N) .LT. LOW .OR. BINS(I,J,N) .GT. HIGH)
      :              .AND. BINS(I,J,N) .NE. VAL__BADR) THEN
 
@@ -203,9 +203,9 @@
                      ELSE
                         REAL_FILE = NN
                      END IF
-                     
+
                      NN = NN + 1
-                     
+
                   END DO
 
 *     Mark the point bad (need to use indirection because of the
@@ -213,7 +213,7 @@
 *     Make sure that we are in range (although we should be given
 *     the above)
 
-                  IF (REAL_FILE .LE. N_FILES .AND. 
+                  IF (REAL_FILE .LE. N_FILES .AND.
      :                 REAL_POS .LE. N_PTS(REAL_FILE)) THEN
 
                      OFFSET = (REAL_POS - 1) * VAL__NBUB
@@ -221,25 +221,25 @@
 
                      BTEMP = SCULIB_BITON(%VAL(CNF_PVAL(QPTR)+OFFSET),
      :                    BITNUM)
-                  
-                     CALL VEC_UBTOUB(.FALSE., 1, BTEMP, 
+
+                     CALL VEC_UBTOUB(.FALSE., 1, BTEMP,
      :                    %VAL(CNF_PVAL(QPTR)+OFFSET),
      :                    IERR, NERR, STATUS)
 
 *     It is conceivable that people will want to replace the spike with
 *     a median value. This is possible in this routine but we have to make
-*     sure that the input data is the version that we need to write out 
+*     sure that the input data is the version that we need to write out
 *     to the file. The problem here is that an SCUBA section (in this context)
 *     works by setting all points not in the section to bad. Obviously
 *     this would ruin the data when copied to the output file. Need to
-*     work out how to give this routine untainted data AND let the 
+*     work out how to give this routine untainted data AND let the
 *     SURFLIB_FILL_GRID routine only use the requested section.
 *     Let's assume the data does not suffer from this problem.
 
                      OFFSET = (REAL_POS - 1) * VAL__NBR
                      QPTR = DATA_PTR(REAL_FILE)
 
-                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
+                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1),
      :                    %VAL(CNF_PVAL(QPTR)+OFFSET),
      :                    IERR, NERR, STATUS)
 
@@ -257,7 +257,7 @@
 
 *     Be nice and calculate where this spike was in the input file
 
-                     NPS = INT((REAL_POS- 1) / N_BOLS(REAL_FILE)) + 1 
+                     NPS = INT((REAL_POS- 1) / N_BOLS(REAL_FILE)) + 1
                      NBS = REAL_POS - ((NPS-1) * N_BOLS(REAL_FILE))
 
 *     ...and write a message to the screen telling the user
@@ -268,7 +268,7 @@
                      CALL MSG_SETI('NPOS', NPS)
                      CALL MSG_SETI('NBOL', NBS)
 
-                     CALL MSG_OUTIF(MSG__VERB, ' ', 
+                     CALL MSG_OUTIF(MSG__VERB, ' ',
      :                    ' Spike found in bin ^NB, file ^NF, pos ('//
      :                    '^NBOL, ^NPOS)', STATUS)
 

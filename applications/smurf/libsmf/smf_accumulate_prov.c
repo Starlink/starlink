@@ -84,7 +84,7 @@
 #include "sae_par.h"
 
 void
-smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index, 
+smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
                      int ondf, const char *creator, int * status ) {
 
   int indf = NDF__NOID;  /* input NDF identifier */
@@ -108,6 +108,6 @@ smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
   if (opened) {
     ndfAnnul( &indf, status );
   }
-    
+
   return;
 }

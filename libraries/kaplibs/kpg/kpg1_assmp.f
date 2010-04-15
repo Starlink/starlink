@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSMP( FRAME, ARRDIM, NAX, NPOS, POS, GEO, NSAMP, SAMP, 
+*     CALL KPG1_ASSMP( FRAME, ARRDIM, NAX, NPOS, POS, GEO, NSAMP, SAMP,
 *                      DELTA, STATUS )
 
 *  Description:
@@ -38,7 +38,7 @@
 *        axis indexes the axis number. An error is reported if any
 *        invalid positions are supplied.
 *     GEO = LOGICAL (Given)
-*        Should the poly-line be constructed from geodesic curves in the 
+*        Should the poly-line be constructed from geodesic curves in the
 *        supplied Frame? If not, the poly-line is made up of
 *        straight-line segments in the supplied Frame.
 *     NSAMP = INTEGER (Given)
@@ -47,7 +47,7 @@
 *        The increment between samples. If not known, this should be set
 *        to zero. Returned holding the used increment.
 *     SAMP( NSAMP, NAX ) = DOUBLE PRECISION (Returned)
-*        The array holding the sample positions. 
+*        The array holding the sample positions.
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,12 +86,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER FRAME
@@ -112,7 +112,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      DOUBLE PRECISION KPG1_ASDIS! Distance between 2 positions      
+      DOUBLE PRECISION KPG1_ASDIS! Distance between 2 positions
       CHARACTER CHR_NTH*2        ! "st", "nd", "rd", etc.
 
 *  Local Variables:
@@ -134,10 +134,10 @@
 *  Find the total length of the lines joining the profile positions.
          CLEN = 0.0D0
          DO I = 2, NPOS
-            DELTA = KPG1_ASDIS( FRAME, NPOS, NAX, POS, I - 1, I, 
+            DELTA = KPG1_ASDIS( FRAME, NPOS, NAX, POS, I - 1, I,
      :                          GEO, STATUS )
             IF( DELTA .NE. AST__BAD ) CLEN = CLEN + DELTA
-            
+
          END DO
 
 *  Find the increment between each of the NSAMP points.
@@ -145,11 +145,11 @@
 
       END IF
 
-*  Initialise the "root" profile position to be the first supplied profile 
-*  position. 
+*  Initialise the "root" profile position to be the first supplied profile
+*  position.
       IROOT = 1
 
-*  Initialise the distance from the root profile position to the 
+*  Initialise the distance from the root profile position to the
 *  "current" sample.
       DIS = -DELTA
 
@@ -160,9 +160,9 @@
       IF( MXDIS .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'I', 1 )
-         CALL MSG_SETC( 'I', CHR_NTH( 1 ) )         
+         CALL MSG_SETC( 'I', CHR_NTH( 1 ) )
          CALL MSG_SETI( 'IP1', 2 )
-         CALL MSG_SETC( 'IP1', CHR_NTH( 2 ) )         
+         CALL MSG_SETC( 'IP1', CHR_NTH( 2 ) )
          CALL ERR_REP( 'KPG1_ASSMP_ERR', 'The distance between the '//
      :                 '^I and the ^IPI positions is undefined.',
      :                 STATUS )
@@ -181,7 +181,7 @@
          IF( DIS .GE. MXDIS .AND. IROOT .LT. NPOS - 1 ) THEN
             IROOT = IROOT + 1
             DIS = DIS - MXDIS
-            MXDIS = KPG1_ASDIS( FRAME, ARRDIM, NAX, POS, IROOT, 
+            MXDIS = KPG1_ASDIS( FRAME, ARRDIM, NAX, POS, IROOT,
      :                         IROOT + 1, GEO, STATUS )
 
 *  Report an error if the distance between these two points is undefined.
@@ -199,9 +199,9 @@
 
          END IF
 
-*  Find the sample position by offsetting from the root profile position 
+*  Find the sample position by offsetting from the root profile position
 *  towards the next profile position by the required distance.
-         CALL KPG1_ASOFF( FRAME, ARRDIM, NAX, POS, IROOT, IROOT + 1, 
+         CALL KPG1_ASOFF( FRAME, ARRDIM, NAX, POS, IROOT, IROOT + 1,
      :                    GEO, DIS, SPOS, STATUS )
 
 *  Store the sample position.

@@ -1,6 +1,6 @@
 C
 C This file contains subroutines that are not I/O related, but rather
-C involve arithmetic or character operations that my be somewhat 
+C involve arithmetic or character operations that my be somewhat
 C machine-specific-- it may be necessary or desirable to make some
 C changes to optimize the code to run on your computer.
 C
@@ -30,11 +30,11 @@ C be inverted with sufficient accuracy if the elements are REAL
 C rather than DOUBLE PRECISION
 C
 C Arguments
-C 
-C     A (INPUT/OUTPUT) is a square matrix of dimension N.  The inverse 
+C
+C     A (INPUT/OUTPUT) is a square matrix of dimension N.  The inverse
 C       of the input matrix A is returned in A.
 C
-C   MAX (INPUT) is the size assigned to the matrix A in the calling 
+C   MAX (INPUT) is the size assigned to the matrix A in the calling
 C       routine.  It's needed for the dimension statement below.
 C
 C IFLAG (OUTPUT) is an error flag.  IFLAG = 1 if the matrix could not
@@ -95,7 +95,7 @@ C Arguments
 C
 C    A(column,row)  (INPUT) is a square matrix of dimension N.
 C
-C              MAX  (INPUT) is the size assigned to the array in the 
+C              MAX  (INPUT) is the size assigned to the array in the
 C                           calling routine.
 C
 C           V(row)  (INPUT) is a column vector of dimension N.
@@ -212,14 +212,14 @@ C is my own attempt at encoding a quicksort-- PBS.
 C
 C Arguments
 C
-C DATUM (INPUT/OUTPUT) is a vector of dimension N containing randomly 
-C        ordered real data upon input.  Upon output the elements of 
+C DATUM (INPUT/OUTPUT) is a vector of dimension N containing randomly
+C        ordered real data upon input.  Upon output the elements of
 C        DATUM will be in order of increasing value.
 C
-C 
+C
 C INDEX (OUTPUT) is an integer vector of dimension N.  Upon return to
 C       the calling program the i-th element of INDEX will tell where
-C       the i-th element of the sorted vector DATUM had been BEFORE 
+C       the i-th element of the sorted vector DATUM had been BEFORE
 C       DATUM was sorted.
 C
 C=======================================================================
@@ -231,8 +231,8 @@ C
 C Parameter
 C
 C MAXSTK is the maximum number of entries the stack can contain.
-C         A limiting stack length of 14 restricts this quicksort 
-C         subroutine to vectors of maximum length of order 32,768 
+C         A limiting stack length of 14 restricts this quicksort
+C         subroutine to vectors of maximum length of order 32,768
 C         (= 2**15).
 
       REAL DATUM(N)
@@ -309,22 +309,22 @@ CD     TYPE *, DATUM(LO), ' KEY'
 CD     DO 2666 I=LO+1,LIMHI
 CD2666 TYPE *, DATUM(I)
 C
-C At this point in the subroutine, all data between LIMLO and LO-1, 
-C inclusive, are less than DATUM(LO), and all data between LO+1 and 
+C At this point in the subroutine, all data between LIMLO and LO-1,
+C inclusive, are less than DATUM(LO), and all data between LO+1 and
 C LIMHI are larger than DATUM(LO).
 C
 C If both subarrays contain no more than one element, then take the most
 C recent interval from the stack (if the stack is empty, we're done).
 C If the larger of the two subarrays contains more than one element, and
-C if the shorter subarray contains one or no elements, then forget the 
+C if the shorter subarray contains one or no elements, then forget the
 C shorter one and reduce the other subarray.  If the shorter subarray
 C contains two or more elements, then place the larger subarray on the
 C stack and process the subarray.
 C
       IF (LIMHI-LO .GT. LO-LIMLO) GO TO 300
 C
-C Case 1:  the lower subarray is longer.  If it contains one or no 
-C elements then take the most recent interval from the stack and go 
+C Case 1:  the lower subarray is longer.  If it contains one or no
+C elements then take the most recent interval from the stack and go
 C back and operate on it.
 C
       IF (LO-LIMLO .LE. 1) GO TO 400
@@ -344,10 +344,10 @@ C
 C
   250 CONTINUE
 C
-C Case 1b:  the upper (shorter) subinterval contains at least two 
+C Case 1b:  the upper (shorter) subinterval contains at least two
 C elements, so we place the lower (longer) subinterval on the stack and
 C then go back and operate on the upper subinterval.
-C 
+C
       NSTAK=NSTAK+1
       STKLO(NSTAK)=LIMLO
       STKHI(NSTAK)=LO-1
@@ -358,8 +358,8 @@ CD3666 TYPE *, 'STACK: ', I, STKLO(I), STKHI(I)
 C
   300 CONTINUE
 C
-C Case 2:  the upper subarray is longer.  If it contains one or no 
-C elements then take the most recent interval from the stack and 
+C Case 2:  the upper subarray is longer.  If it contains one or no
+C elements then take the most recent interval from the stack and
 C operate on it.
 C
       IF (LIMHI-LO .LE. 1) GO TO 400
@@ -379,10 +379,10 @@ C
 C
   350 CONTINUE
 C
-C Case 2b:  the lower (shorter) subinterval contains at least two 
+C Case 2b:  the lower (shorter) subinterval contains at least two
 C elements, so we place the upper (longer) subinterval on the stack and
 C then go back and operate on the lower subinterval.
-C 
+C
       NSTAK=NSTAK+1
       STKLO(NSTAK)=LO+1
       STKHI(NSTAK)=LIMHI
@@ -393,7 +393,7 @@ CD4666 TYPE *, 'STACK: ', I, STKLO(I), STKHI(I)
 C
   400 CONTINUE
 C
-C Take the most recent interval from the stack.  If the stack happens 
+C Take the most recent interval from the stack.  If the stack happens
 C to be empty, we are done.
 C
       IF (NSTAK .LE. 0) RETURN                           ! Normal return
@@ -436,20 +436,20 @@ C percentile in that vector:
 C
 C    DATUM (input real vector)     containing real data.
 C    N     (input integer)         number of elements in DATUM.
-C    NPCT  (input integer)         element of sorted vector whose value 
+C    NPCT  (input integer)         element of sorted vector whose value
 C                                  is desired.
 C    PCTILE (output real)          the value of the NPCT-th element
 C                                  in the sorted vector DATUM.
 C
 C-----------------------------------------------------------------------
 C
-C The quick-sorting algorithm was suggested by the discussion on pages 
-C 114-119 of THE ART OF COMPUTER PROGRAMMING, Vol. 3, SORTING AND 
-C SEARCHING, by D.E. Knuth, which was referenced in Don Wells' 
-C subroutine QUIK.  This is my own attempt at encoding a quicksort-- 
+C The quick-sorting algorithm was suggested by the discussion on pages
+C 114-119 of THE ART OF COMPUTER PROGRAMMING, Vol. 3, SORTING AND
+C SEARCHING, by D.E. Knuth, which was referenced in Don Wells'
+C subroutine QUIK.  This is my own attempt at encoding a quicksort--
 C                                                             PBS.
 C
-C The array DATUM contains randomly ordered data. 
+C The array DATUM contains randomly ordered data.
 C
       IMPLICIT NONE
       INTEGER MAXSTK
@@ -522,12 +522,12 @@ CD     TYPE *,DATUM(LO),' KEY'
 CD     DO 2666 I=LO+1,LIMHI
 CD2666 TYPE *,DATUM(I)
 C
-C At this point in the subroutine, all data between LIMLO and LO-1, 
-C inclusive, are less than DATUM(LO), and all data between LO+1 and 
+C At this point in the subroutine, all data between LIMLO and LO-1,
+C inclusive, are less than DATUM(LO), and all data between LO+1 and
 C LIMHI are larger than DATUM(LO).  If LO = NPCT, then DATUM(LO) is
 C the value we are looking for.  If NPCT < LO, then we want to sort the
 C values of DATUM from LIMLO to LO-1, inclusive, whereas if NPCT > LO,
-C then we want to sort the values of DATUM from LO+1 to LIMHI, 
+C then we want to sort the values of DATUM from LO+1 to LIMHI,
 C inclusive.
 C
 CD     TYPE *,'NPCT=',NPCT,' LO=',LO
@@ -584,7 +584,7 @@ C
 C
 C#######################################################################
 C
-      SUBROUTINE  MMM (SKY, NSKY, HIBAD, SKYMN, SKYMED, 
+      SUBROUTINE  MMM (SKY, NSKY, HIBAD, SKYMN, SKYMED,
      .     SKYMOD, SIGMA, SKEW)
 C
 C=======================================================================
@@ -597,7 +597,7 @@ C sorted on entering this routine, and that pixels outside the "bad"
 C limits have already been eliminated.
 C
 C This particular version of MMM also takes cognizance of the fact that,
-C pixels falling below the LOBAD threshold already having been 
+C pixels falling below the LOBAD threshold already having been
 C eliminated, the contaminated sky pixels values overwhelmingly display
 C POSITIVE departures from the true value.
 C
@@ -649,7 +649,7 @@ C
       SUMSQ=0.D0
       CUT1=AMIN1(SKYMID-SKY(1), SKY(NSKY)-SKYMID, HIBAD-SKYMID)
 C
-C For the first pass we will consider only pixels in a symmetric 
+C For the first pass we will consider only pixels in a symmetric
 C interval of brightness values about the median value.  This exploits
 C the assumption that all the bad pixels are already rejected from the
 C lower end of the brightness range.
@@ -683,8 +683,8 @@ C
       SIGMA=DSQRT(SUMSQ/DBLE(MAXIMM-MINIMM)-SKYMN**2)
       SKYMN=SKYMN+SKYMID
 C
-C The middle sky value, SKYMID, was subtracted off up above and added 
-C back in down here to reduce the truncation error in the computation 
+C The middle sky value, SKYMID, was subtracted off up above and added
+C back in down here to reduce the truncation error in the computation
 C of SIGMA.
 C Note that this definition of SIGMA is incorrect by a factor of
 C SQRT [NSKY/(NSKY-1.)], but for all but pathological cases (where none
@@ -712,7 +712,7 @@ C
      .     GO TO 9900
 C
 C Compute Chauvenet rejection criterion.
-C         
+C
       R=ALOG10(FLOAT(MAXIMM-MINIMM))
       R=AMAX1(2., (-.1042*R+1.1695)*R+.8895)
 C
@@ -726,9 +726,9 @@ C
 C Recompute mean and sigma by adding and/or subtracting sky values
 C at both ends of the interval of acceptable values.
 C
-C At each end of the interval, ISTEP will show the direction we have to 
+C At each end of the interval, ISTEP will show the direction we have to
 C step through the vector to go from the old partition to the new one.
-C Pixels are added or subtracted depending upon whether the limit is 
+C Pixels are added or subtracted depending upon whether the limit is
 C moving toward or away from the mode.
 C
       REDO=.FALSE.
@@ -738,7 +738,7 @@ C
       ISTEP=INT(SIGN(1.0001, CUT1-SKY(MINIMM+1)))
       JSTEP=(ISTEP+1)/2
 C
-C If ISTEP = +1, JSTEP = 1.  If ISTEP = -1, JSTEP=0.  If ISTEP = +1, 
+C If ISTEP = +1, JSTEP = 1.  If ISTEP = -1, JSTEP=0.  If ISTEP = +1,
 C then we know that at least one pixel must be deleted at the low end.
 C
       IF (ISTEP .GT. 0) GO TO 2120
@@ -749,7 +749,7 @@ C
       IF ((SKY(MINIMM) .LE. CUT1) .AND. (SKY(MINIMM+1) .GE. CUT1))
      .     GO TO 2150
 C
-C If ISTEP is positive, subtract out the sky value at MINIMM+1; if 
+C If ISTEP is positive, subtract out the sky value at MINIMM+1; if
 C ISTEP is negative, add in the sky value at MINIMM.
 C
  2120 CONTINUE
@@ -767,8 +767,8 @@ C
       ISTEP=INT(SIGN(1.0001, CUT2-SKY(MAXIMM)))
       JSTEP=(ISTEP+1)/2
 C
-C If ISTEP = +1, JSTEP = 1.  If ISTEP = -1, JSTEP=0.  If ISTEP = -1, 
-C then we know that we must subtract at least one pixel from the high 
+C If ISTEP = +1, JSTEP = 1.  If ISTEP = -1, JSTEP=0.  If ISTEP = -1,
+C then we know that we must subtract at least one pixel from the high
 C end.
 C
       IF (ISTEP .LT. 0) GO TO 2220
@@ -779,7 +779,7 @@ C
       IF ((SKY(MAXIMM) .LE. CUT2) .AND. (SKY(MAXIMM+1) .GE. CUT2))
      .     GO TO 2250
 C
-C If ISTEP is positive, add in the sky value at MAXIMM+1; if ISTEP is 
+C If ISTEP is positive, add in the sky value at MAXIMM+1; if ISTEP is
 C negative, subtract off the sky value at MAXIMM.
 C
  2220 DELTA=SKY(MAXIMM+JSTEP)-SKYMID
@@ -879,11 +879,11 @@ C   NCHAR is the number of discrete gray levels we wish to produce.
 C
 C MAXPLT is the widest plot that can be produced on the terminal
 C         screen.  Since two characters will be typed out per pixel (to
-C         make the overall plot more nearly square) MAXPLT should be 
-C         equal to (N-2)/2 where N is the number of character positions 
+C         make the overall plot more nearly square) MAXPLT should be
+C         equal to (N-2)/2 where N is the number of character positions
 C         per line on the screen; the extra two characters will be used
 C         for vertical bars ('|') to delimit the picture.  Arrays
-C         which are more than MAXPLT pixels on a side will be 
+C         which are more than MAXPLT pixels on a side will be
 C         rebinned before display.
 C
       REAL F(NCOL,*), FF(MAXPLT)
@@ -896,7 +896,7 @@ C
       REAL SUM, PIXELS, FMAX, FZERO, S
       INTEGER I, ISTEP, NX, MX, IX, IY, KX, JX, JY, NY, LOW
       DATA BLANK /' '/, DASH/'--'/
-      DATA CHAR / '  ', '- ', '--', '::', '==', 'll', 
+      DATA CHAR / '  ', '- ', '--', '::', '==', 'll',
      .     'II', '%%', '00', 'HH', '##' /
 C
 C-----------------------------------------------------------------------
@@ -908,7 +908,7 @@ C will have to be averaged for each pixel of the display.
 C
       MX=(NX+ISTEP-1)/ISTEP
 C
-C MX is the number of pixels per row which will be produced on the 
+C MX is the number of pixels per row which will be produced on the
 C output display.
 C
       LOW=MAXPLT-MX+1
@@ -930,7 +930,7 @@ C
  1007 FF(KX)=SUM/PIXELS
  1010 WRITE (6,602) BLANK(1:LOW), '|', (CHAR(MIN0(
      .     NCHAR,
-     .     IFIX( NCHAR*SQRT(AMAX1(0., FF(IX)-FZERO)  )/S )+1)), 
+     .     IFIX( NCHAR*SQRT(AMAX1(0., FF(IX)-FZERO)  )/S )+1)),
      .     IX=1,MX), '|'
   602 FORMAT ( 80A )
       WRITE (6,610) BLANK(1:LOW), (DASH, I=1,MX), '+ '
@@ -941,7 +941,7 @@ C
 C#######################################################################
 C
       INTEGER FUNCTION  RDPSF  (PSFFIL, IPSTYP, PAR, MAXPAR, NPAR,
-     .     PSF, MAXPSF, MAXEXP, NPSF, NEXP, NFRAC, 
+     .     PSF, MAXPSF, MAXEXP, NPSF, NEXP, NFRAC,
      .     PSFMAG, BRIGHT, XPSF, YPSF)
 C
 C Read in the point-spread function
@@ -965,7 +965,7 @@ C
          RETURN
       END IF
 C
-      READ (3,302,IOSTAT=ISTAT) LABEL, NPSF, NPAR, NEXP, NFRAC, PSFMAG, 
+      READ (3,302,IOSTAT=ISTAT) LABEL, NPSF, NPAR, NEXP, NFRAC, PSFMAG,
      .     BRIGHT, XPSF, YPSF
   302 FORMAT (1X, A8, 4I5, F9.3, F15.3, 2F9.1)
       IF (ISTAT .NE. 0) THEN
@@ -1012,7 +1012,7 @@ C#######################################################################
 C
       REAL  FUNCTION  DAOERF (XIN, XO, BETA, DFDXO, DFDBET)
 C
-C Numerically integrate a Gaussian function 
+C Numerically integrate a Gaussian function
 C
 C          F = EXP {-0.5*[(x-XO)/SIGMA]**2 },
 C
@@ -1022,7 +1022,7 @@ C Thus,
 C
 C          F = EXP {-0.6931472*[(x-XO)/BETA]**2 }.
 C
-C Also: provide the first derivative of the integral with respect to 
+C Also: provide the first derivative of the integral with respect to
 C Xo and BETA.  Use Gauss-Legendre integration.
 C
 C-----------------------------------------------------------------------
@@ -1089,7 +1089,7 @@ C
 C
 C#######################################################################
 C
-      REAL  FUNCTION  USEPSF (IPSTYP, DX, DY, BRIGHT, PAR, PSF, 
+      REAL  FUNCTION  USEPSF (IPSTYP, DX, DY, BRIGHT, PAR, PSF,
      .     NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, DVDXC, DVDYC)
 C
 C Evaluate the PSF for a point distant DX, DY from the center of a
@@ -1109,7 +1109,7 @@ C
       INTEGER NFRAC, NTERM, NPSF, NEXP, NPAR
 C
       NTERM = NEXP + NFRAC
-      USEPSF = BRIGHT*PROFIL(IPSTYP, DX, DY, PAR, DVDXC, DVDYC, 
+      USEPSF = BRIGHT*PROFIL(IPSTYP, DX, DY, PAR, DVDXC, DVDYC,
      .     JUNK, 0)
 CD     TYPE *, USEPSF, ' ANALYTIC '
       DVDXC = BRIGHT*DVDXC
@@ -1153,7 +1153,7 @@ C This point in the stellar profile lies between columns LX and LX+1,
 C and between rows LY and LY+1 in the look-up tables.
 C
       DO K=1,NTERM
-         CORR = BICUBC(PSF(LX-1,LY-1,K), MAXPSF, 
+         CORR = BICUBC(PSF(LX-1,LY-1,K), MAXPSF,
      .        XX-REAL(LX), YY-REAL(LY), DFDX, DFDY)
          USEPSF = USEPSF + JUNK(K)*CORR
 CD        TYPE *, USEPSF, ' CORRECTED ', JUNK(K), CORR
@@ -1205,7 +1205,7 @@ C
 C
 C#######################################################################
 C
-      REAL  FUNCTION  PROFIL  (IPSTYP, DX, DY, PAR, DHDXC, DHDYC, 
+      REAL  FUNCTION  PROFIL  (IPSTYP, DX, DY, PAR, DHDXC, DHDYC,
      .     TERM, IDERIV)
 C
 C Compute the value of an ANALYTIC prfile for a point DX,DY distant
@@ -1276,7 +1276,7 @@ C                            BETA-1
 C F = --------------------------------------------------------
 C      Ax * Ay * [1 + (X/Ax)**2 + (Y/Ay)**2 + (XY*Axy)]**BETA
 C
-C PAR(1) is the HWHM in x at y = 0: 
+C PAR(1) is the HWHM in x at y = 0:
 C
 C             1/2 = 1/[1 + (PAR(1)/Ax)**2]**BETA
 C so
@@ -1291,7 +1291,7 @@ C
 C                                  1
 C F = ---------------------------------------------------------------
 C     P(1)*P(2)*{1+0.3195079*[(X/P(1))**2+(Y/P(2))**2+(XY*P(3))]**2.5
-C 
+C
 C neglecting a constant of proportionality.
 C
          ALPHA = 0.3195079
@@ -1348,9 +1348,9 @@ C
                DHDXC = DHDXC + WP4FOD*(2.*X(IX)/P1SQ + Y*PAR(3))
                DHDYC = DHDYC + WP4FOD*(2.*Y/P2SQ + X(IX)*PAR(3))
                IF (IDERIV .GT. 0) THEN
-                  TERM(1) = TERM(1) + 
+                  TERM(1) = TERM(1) +
      .                     (2.*WP4FOD*P1XSQ(IX)-WF)/PAR(1)
-                  TERM(2) = TERM(2) + 
+                  TERM(2) = TERM(2) +
      .                     (2.*WP4FOD*P2YSQ-WF)/PAR(2)
                   TERM(3) = TERM(3) - WP4FOD*XY
 C                 TERM(4) = TERM(4) + WF*(1./(PAR(4)-1.)-ALOG(DENOM))
@@ -1359,7 +1359,7 @@ C                 TERM(4) = TERM(4) + WF*(1./(PAR(4)-1.)-ALOG(DENOM))
          END DO
       ELSE IF (IPSTYP .EQ. 5) THEN
 C
-C Penny function --- Gaussian core plus Lorentzian wings.  The Lorentzian 
+C Penny function --- Gaussian core plus Lorentzian wings.  The Lorentzian
 C is elongated along the x or y axis, the Gaussian may be tilted.
 C
          P1SQ = PAR(1)**2
@@ -1435,7 +1435,7 @@ C
                DFBY = WT*ONEMP3*F**2
                DBYX0 = 2.*P1XSQ(IX)
                DBYY0 = 2.*P2YSQ
-               DHDXC = DHDXC + 
+               DHDXC = DHDXC +
      .              DEBY*(DBYX0 + DY*PAR(4)) + DFBY*DBYX0
                DHDYC = DHDYC +
      .              DEBY*(DBYY0 + DX*PAR(4)) + DFBY*DBYY0
@@ -1485,9 +1485,9 @@ C
             DEBY = 0.6931472*PAR(3)*E
             DBYX0 = 2.*DX/P1SQ
             DBYY0 = 2.*DY/P2SQ
-            DHDXC = DEBY*(DBYX0 + DY*PAR(4)) + 
+            DHDXC = DEBY*(DBYX0 + DY*PAR(4)) +
      .              DFBY*(DBYX0 + DY*PAR(5))
-            DHDYC = DEBY*(DBYY0 + DX*PAR(4)) + 
+            DHDYC = DEBY*(DBYY0 + DX*PAR(4)) +
      .              DFBY*(DBYY0 + DX*PAR(5))
             IF (IDERIV .GT. 0) THEN
                DBYX0 = DBYX0*DX/PAR(1)
@@ -1531,11 +1531,11 @@ C
                DFBY = WT*ONEMP3*F**2
                DBYX0 = 2.*P1XSQ(IX)
                DBYY0 = 2.*P2YSQ
-               DHDXC = DHDXC + 
-     .              DEBY*(DBYX0 + DY*PAR(4)) + 
+               DHDXC = DHDXC +
+     .              DEBY*(DBYX0 + DY*PAR(4)) +
      .              DFBY*(DBYX0 + DY*PAR(5))
                DHDYC = DHDYC +
-     .              DEBY*(DBYY0 + DX*PAR(4)) + 
+     .              DEBY*(DBYY0 + DX*PAR(4)) +
      .              DFBY*(DBYY0 + DX*PAR(5))
                IF (IDERIV .GT. 0) THEN
                   DBYX0 = DBYX0*DX/PAR(1)
@@ -1556,7 +1556,7 @@ C                            BETA-1
 C F = --------------------------------------------------------
 C      Ax * Ay * [1 + (X/Ax)**2 + (Y/Ay)**2 + (XY*Axy)]**BETA
 C
-C PAR(1) is the HWHM in x at y = 0: 
+C PAR(1) is the HWHM in x at y = 0:
 C
 C             1/2 = 1/[1 + (PAR(1)/Ax)**2]**BETA
 C so
@@ -1571,7 +1571,7 @@ C
 C                                  1
 C F = ---------------------------------------------------------------
 C     P(1)*P(2)*{1+0.5874011*[(X/P(1))**2+(Y/P(2))**2+(XY*P(3))]**1.5
-C 
+C
 C neglecting a constant of proportionality.
 C
          ALPHA = 0.5874011
@@ -1628,9 +1628,9 @@ C
                DHDXC = DHDXC + WP4FOD*(2.*X(IX)/P1SQ + Y*PAR(3))
                DHDYC = DHDYC + WP4FOD*(2.*Y/P2SQ + X(IX)*PAR(3))
                IF (IDERIV .GT. 0) THEN
-                  TERM(1) = TERM(1) + 
+                  TERM(1) = TERM(1) +
      .                     (2.*WP4FOD*P1XSQ(IX)-WF)/PAR(1)
-                  TERM(2) = TERM(2) + 
+                  TERM(2) = TERM(2) +
      .                     (2.*WP4FOD*P2YSQ-WF)/PAR(2)
                   TERM(3) = TERM(3) - WP4FOD*XY
 C                 TERM(4) = TERM(4) + WF*(1./(PAR(4)-1.)-ALOG(DENOM))

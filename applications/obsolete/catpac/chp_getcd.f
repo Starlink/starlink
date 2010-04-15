@@ -15,7 +15,7 @@
 *
 *  Description:
 *     Not part of the CHI interface definition. Only use CHI_GETCD if you
-*     are really sure about what is going on. 
+*     are really sure about what is going on.
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -43,7 +43,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,7 +82,7 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-        icount = 1     
+        icount = 1
         openflg = .false.
         do while (icount .le. chp__numcats .and. .not. openflg)
           if (opcatnames(icount) .eq. input ) then

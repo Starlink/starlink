@@ -112,30 +112,30 @@ sub do_cmd_micron { join('', &iso_map("micro", ""), $_[0]);}
 
 %iso_8859_3_character_map
      = (
-	'Aacute', '&#193;', 	# capital A, acute accent 
+	'Aacute', '&#193;', 	# capital A, acute accent
 #	'Abreve', '&#195;', 	# capital A, breve accent
-	'Acirc', '&#194;', 	# capital A, circumflex accent 
+	'Acirc', '&#194;', 	# capital A, circumflex accent
 	'Agrave', '&#192;', 	# capital A, grave accent
-	'Auml', '&#196;', 	# capital A, dieresis or umlaut mark   
+	'Auml', '&#196;', 	# capital A, dieresis or umlaut mark
 	'Cdot', '&#197;', 	# capital C, dot accent
-	'Ccirc', '&#198;', 	# capital C, caron accent 
-	'Ccedil', '&#199;', 	# capital C, cedilla 
-#	'ETH', '&#208;', 	# capital Eth, Icelandic 
-	'Eacute', '&#201;', 	# capital E, acute accent 
-	'Egrave', '&#200;', 	# capital E, grave accent 
-	'Ecirc', '&#202;', 	# capital E, circumflex accent 
-	'Euml', '&#203;', 	# capital E, dieresis or umlaut mark 
-	'Gbreve', '&#171;', 	# capital G, breve accent 
-	'Gcirc', '&#216;', 	# capital G, circumflex accent 
-	'Gdot', '&#213;', 	# capital G, dot accent 
-	'Hstrok', '&#161;', 	# maltese H 
-	'Hcirc', '&#166;', 	# capital H, circumflex accent 
-	'Iacute', '&#205;', 	# capital I, acute accent 
-	'Icirc', '&#206;', 	# capital I, circumflex accent 
-	'Idot', '&#169;', 	# capital I, dot accent 
-	'Igrave', '&#204;', 	# capital I, grave accent 
-	'Iuml', '&#207;', 	# capital I, dieresis or umlaut mark 
-	'Jcirc', '&#172;', 	# capital J, circumflex accent 
+	'Ccirc', '&#198;', 	# capital C, caron accent
+	'Ccedil', '&#199;', 	# capital C, cedilla
+#	'ETH', '&#208;', 	# capital Eth, Icelandic
+	'Eacute', '&#201;', 	# capital E, acute accent
+	'Egrave', '&#200;', 	# capital E, grave accent
+	'Ecirc', '&#202;', 	# capital E, circumflex accent
+	'Euml', '&#203;', 	# capital E, dieresis or umlaut mark
+	'Gbreve', '&#171;', 	# capital G, breve accent
+	'Gcirc', '&#216;', 	# capital G, circumflex accent
+	'Gdot', '&#213;', 	# capital G, dot accent
+	'Hstrok', '&#161;', 	# maltese H
+	'Hcirc', '&#166;', 	# capital H, circumflex accent
+	'Iacute', '&#205;', 	# capital I, acute accent
+	'Icirc', '&#206;', 	# capital I, circumflex accent
+	'Idot', '&#169;', 	# capital I, dot accent
+	'Igrave', '&#204;', 	# capital I, grave accent
+	'Iuml', '&#207;', 	# capital I, dieresis or umlaut mark
+	'Jcirc', '&#172;', 	# capital J, circumflex accent
         'Ntilde', '&#209;',     # capital N, tilde
         'Oacute', '&#211;',     # capital O, acute accent
         'Ocirc', '&#212;',      # capital O, circumflex accent
@@ -143,39 +143,39 @@ sub do_cmd_micron { join('', &iso_map("micro", ""), $_[0]);}
         'Ouml', '&#214;',       # capital O, dieresis or umlaut mark
 	'Scedil', '&#170;',	# capital S, cedil accent
 	'Scirc', '&#222;',	# capital S, circumflex accent
-	'Uacute', '&#218;', 	# capital U, acute accent 
-	'Ubreve', '&#221;', 	# capital U, breve accent 
-	'Ucirc', '&#219;', 	# capital U, circumflex accent 
+	'Uacute', '&#218;', 	# capital U, acute accent
+	'Ubreve', '&#221;', 	# capital U, breve accent
+	'Ucirc', '&#219;', 	# capital U, circumflex accent
 	'Ugrave', '&#217;', 	# capital U, grave accent
-	'Uuml', '&#220;', 	# capital U, dieresis or umlaut mark 
+	'Uuml', '&#220;', 	# capital U, dieresis or umlaut mark
 	'Zdot', '&#175;',	# capital Z, dot above
-	'aacute', '&#225;', 	# small a, acute accent 
+	'aacute', '&#225;', 	# small a, acute accent
 #	'abreve', '&#227;', 	# small a, breve accent
 	'agrave', '&#224;', 	# small a, grave accent
-	'acirc', '&#226;', 	# small a, circumflex accent 
-	'amp', '&amp;', 	# ampersand 
-	'auml', '&#228;', 	# small a, dieresis or umlaut mark   
+	'acirc', '&#226;', 	# small a, circumflex accent
+	'amp', '&amp;', 	# ampersand
+	'auml', '&#228;', 	# small a, dieresis or umlaut mark
 	'ccirc', '&#230;', 	# small c, circumflex accent
-	'cdot', '&#229;', 	# small c, dot accent 
-	'ccedil', '&#231;', 	# small c, cedilla 
-	'eacute', '&#233;', 	# small e, acute accent 
-	'ecirc', '&#234;', 	# small e, circumflex accent 
-	'egrave', '&#232;', 	# small e, grave accent 
-#	'eth', '&#240;', 	# small eth, Icelandic 
-	'euml', '&#235;', 	    # small e, dieresis or umlaut mark 
-	'gbreve', '&#187;', 	# small g, breve accent 
-	'gcirc', '&#248;', 	# small g, circumflex accent 
-	'gdot', '&#245;', 	# small g, dot accent 
-	'gt', '&#62;',		# greater than 
-	'hstrok', '&#177;', 	# maltese h 
-	'hcirc', '&#182;', 	# small h, circumflex accent 
-	'iacute', '&#237;', 	# small i, acute accent 
-	'icirc', '&#238;', 	# small i, circumflex accent 
-	'igrave', '&#236;', 	# small i, grave accent 
-	'iuml', '&#239;', 	# small i, dieresis or umlaut mark 
-	'inodot', '&#185;', 	# small i, circumflex accent 
-	'jcirc', '&#188;', 	# small j, circumflex accent 
-	'lt', '&lt;',		# less than 
+	'cdot', '&#229;', 	# small c, dot accent
+	'ccedil', '&#231;', 	# small c, cedilla
+	'eacute', '&#233;', 	# small e, acute accent
+	'ecirc', '&#234;', 	# small e, circumflex accent
+	'egrave', '&#232;', 	# small e, grave accent
+#	'eth', '&#240;', 	# small eth, Icelandic
+	'euml', '&#235;', 	    # small e, dieresis or umlaut mark
+	'gbreve', '&#187;', 	# small g, breve accent
+	'gcirc', '&#248;', 	# small g, circumflex accent
+	'gdot', '&#245;', 	# small g, dot accent
+	'gt', '&#62;',		# greater than
+	'hstrok', '&#177;', 	# maltese h
+	'hcirc', '&#182;', 	# small h, circumflex accent
+	'iacute', '&#237;', 	# small i, acute accent
+	'icirc', '&#238;', 	# small i, circumflex accent
+	'igrave', '&#236;', 	# small i, grave accent
+	'iuml', '&#239;', 	# small i, dieresis or umlaut mark
+	'inodot', '&#185;', 	# small i, circumflex accent
+	'jcirc', '&#188;', 	# small j, circumflex accent
+	'lt', '&lt;',		# less than
         'ntilde', '&#241;',     # small n, tilde
         'oacute', '&#243;',     # small O, acute accent
         'ocirc', '&#244;',      # small O, circumflex accent
@@ -184,12 +184,12 @@ sub do_cmd_micron { join('', &iso_map("micro", ""), $_[0]);}
 	'quot', '&quot;',	# double quote
 	'scedil', '&#186;',	# small s, cedil accent
 	'scirc', '&#254;',	# small s, circumflex accent
-	'szlig', '&#223;', 	# small sharp s, German (sz ligature) 
-	'uacute', '&#250;', 	# small u, acute accent 
-	'ubreve', '&#253;', 	# small u, breve accent 
-	'ucirc', '&#251;', 	# small u, circumflex accent 
+	'szlig', '&#223;', 	# small sharp s, German (sz ligature)
+	'uacute', '&#250;', 	# small u, acute accent
+	'ubreve', '&#253;', 	# small u, breve accent
+	'ucirc', '&#251;', 	# small u, circumflex accent
 	'ugrave', '&#249;', 	# small u, grave accent
-	'uuml', '&#252;', 	# small u, dieresis or umlaut mark 
+	'uuml', '&#252;', 	# small u, dieresis or umlaut mark
 	'zdot', '&#191;',	# small z, dot above
 
 

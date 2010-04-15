@@ -85,7 +85,7 @@ C     ... Or, label true RA and Dec
           XRDH =  XLIM(2)+3600.*MAP_DEC
           CALL SXGXSIX (0)
         ELSE
-          XRDL = XLIM(1)          
+          XRDL = XLIM(1)
           XRDH = XLIM(2)
           LABELX = MAPTIT(IX)//' ('//AXTIT(IX)//')'
         END IF
@@ -101,7 +101,7 @@ C     ... Or, label true RA and Dec
           YRDH =  YLIM(2)+3600.*MAP_DEC
           CALL SXGYSIX (0)
         ELSE
-          YRDL = YLIM(1)          
+          YRDL = YLIM(1)
           YRDH = YLIM(2)
           LABELY = MAPTIT(IY)//' ('//AXTIT(IY)//')'
         END IF

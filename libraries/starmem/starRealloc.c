@@ -37,7 +37,7 @@
 
 *  Returned Value:
 *     starCalloc = void * (Returned)
-*        Pointer to newly-allocated memory. NULL if the memory could not be 
+*        Pointer to newly-allocated memory. NULL if the memory could not be
 *        obtained.
 
 *  Authors:
@@ -103,7 +103,7 @@ void * starRealloc( void * ptr, size_t size ) {
   case STARMEM__DL:
     tmp = dlrealloc( ptr, size );
     break;
-    
+
   case STARMEM__GC:
 #if HAVE_LIBGC && HAVE_GC_H
     if (ptr == NULL) {

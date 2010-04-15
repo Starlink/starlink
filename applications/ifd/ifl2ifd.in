@@ -64,7 +64,7 @@ proc write {string} {
 }
 
 proc interface { par } {
-    puts $par 
+    puts $par
     write "      action [string tolower $par] \{"
 }
 proc endinterface { } {
@@ -246,7 +246,7 @@ while { [gets $input line] != -1 } {
                 set exitquote 1
             } else {
 
-#      We are not inside quotes 
+#      We are not inside quotes
                 if { $exitquote } {
 
 #         The previous character was a closing quote so this must be the
@@ -256,11 +256,11 @@ while { [gets $input line] != -1 } {
                     set l [string length $line1]
                     incr l -2
                     set line1 [string range $line1 0 $l]
-                    set line1 $line1$next 
+                    set line1 $line1$next
                     set exitquote 0
                 } else {
 
-#      It really was an opening quotes so replace the quote with \{ 
+#      It really was an opening quotes so replace the quote with \{
 #      and record that we are now inside quotes.
                     set inquote 1
                     set exitquote 0
@@ -275,7 +275,7 @@ while { [gets $input line] != -1 } {
 
 #      A # not inside quotes is an end of line comment
             if {$inquote} {
-                set line1 $line1$next 
+                set line1 $line1$next
                 set exitquote 0
             } else {
 		set comment [string range $line $i end]
@@ -285,7 +285,7 @@ while { [gets $input line] != -1 } {
         , {
             set exitquote 0
             if { $inquote } {
-                set line1 $line1$next 
+                set line1 $line1$next
             } else {
                 set line1 "$line1 "
                 set multiple 1
@@ -304,13 +304,13 @@ while { [gets $input line] != -1 } {
     if {$inquote} {
        puts "Missing end quote assumed line $linenum"
        puts "Parameter [string toupper $par_name]"
-       set line1 $line1\} 
+       set line1 $line1\}
     }
 
 #  Convert the line to a list
     set line1 [string trim $line1]
     if {[string length $line1] != 0} {
-	set l [eval $line1]       
+	set l [eval $line1]
 #  Add end-of-line comment if any
 	if {[string length [string trim $comment]] != 0 } {
 	    for {} {$l} {incr l -1} {puts -nonewline $ifd " "}

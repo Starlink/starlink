@@ -30,7 +30,7 @@
 *=============================================================================
 *
 *  This version of wcstrig.h is based on the version in wcslib-2.9, but has
-*  been modified in the following ways by the Starlink project (e-mail: 
+*  been modified in the following ways by the Starlink project (e-mail:
 *  ussc@star.rl.ac.uk):
 *     -  Changed the name of the WCSLIB_MATH macro to WCSLIB_MATH_INCLUDED
 *===========================================================================*/

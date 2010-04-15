@@ -10,7 +10,7 @@ C
 C  Description:
 C     This is the system-dependent part of the routine DSA_FNAME, which
 C     takes an object name and splits it up into a full unambiguous
-C     filename and, if specified, the hierarchical name of a data object 
+C     filename and, if specified, the hierarchical name of a data object
 C     held in that file.  This involves an intimate knowledge of the
 C     file name syntax of the machine in question, and ambiguities may
 C     need to be resolved by looking at the existence of actual files
@@ -27,12 +27,12 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) OBJECT       (Chcracter*(*)) The name of the data object.
 C     (>) NEW          (Logical)  True if it is intended that a new file
-C                      will eventually be created.  
-C     (>) DEFEXTS      (Character(NEXTS)*(*)) The possible default 
+C                      will eventually be created.
+C     (>) DEFEXTS      (Character(NEXTS)*(*)) The possible default
 C                      file extensions, in order of priority. Each array
-C                      element should be a character string giving the 
+C                      element should be a character string giving the
 C                      extension preceded by a '.'. The case of DEFEXTS
-C                      is left unchanged by this routine, and whether it 
+C                      is left unchanged by this routine, and whether it
 C                      is respected or not depends on the Operating system.
 C     (>) NEXTS        (Integer) The number of possible default extensions.
 C     (<) FILENAME     (Character*(*)) The full file specification.
@@ -46,7 +46,7 @@ C                      to generate a warning message).If STATUS is returned
 C                      indicating an error, ALTFILE is used to return a more
 C                      informative error message.
 C     (!) STATUS       (Integer) Status code.  If a bad status value
-C                      (non-zero) is passed to it, this routine will return 
+C                      (non-zero) is passed to it, this routine will return
 C                      immediately.
 C
 C  External variables used:  None.
@@ -66,23 +66,23 @@ C     VMS will accept) followed optionally by the name of an object in
 C     that file in a hierarchical form with the various level names
 C     all prefaced by a '.'. So in 'DISK$DATA:[DIR.SUBDIR]FILE.X.DATA'
 C     the file is 'DISK$DATA:[DIR.SUBDIR]FILE' and the object name
-C     within the file is '.X.DATA'. 
+C     within the file is '.X.DATA'.
 C
 C     The file extension is assumed to be the current default extension
 C     recognised by Figaro (.DST or .SDF, depending on the logical name
 C     FIGARO_FORMATS). If both extensions are recognised, then for a
-C     new file the one that has priority is used, for an existing file 
+C     new file the one that has priority is used, for an existing file
 C     the program looks to see if a file with either extension exists.
 C     If such a file does exist it assumes that is the file that is
 C     to be used. If files with the same name but both extensions exist,
 C     then the extension with priority is used, but the ambiguity is
 C     signalled.
 C
-C     The only problem comes from the ambiguity between the first component 
-C     of the name of the object within the file and a possible file 
-C     extension (both of which have used the 'dot' syntax for too long to 
-C     be changed). Generally, this routine will assume that the object name 
-C     starts at the first '.' within the filename (dots within any directory 
+C     The only problem comes from the ambiguity between the first component
+C     of the name of the object within the file and a possible file
+C     extension (both of which have used the 'dot' syntax for too long to
+C     be changed). Generally, this routine will assume that the object name
+C     starts at the first '.' within the filename (dots within any directory
 C     name, as in '[DIR.SUBDIR]' being recognised properly). The only exception
 C     is when what would then be the first level of the object name is
 C     the same as a default file extension currently being recognised.
@@ -146,7 +146,7 @@ C
 C     Local variables
 C
       LOGICAL   EXIST                      ! True if file exists already
-      LOGICAL   EXIST2                     ! File with alternative .ext exists 
+      LOGICAL   EXIST2                     ! File with alternative .ext exists
       CHARACTER EXT_UC*16                  ! Upper case default extension
       CHARACTER FILE*256                   ! Filename generated from OBJECT
       INTEGER   I                          ! Loop variable through OBJECT
@@ -174,7 +174,7 @@ C
       INTEGER   EXT                        ! Within an extension spec
       INTEGER   ENDEXT                     ! At the ')' after EXT
       INTEGER   STRDOT                     ! Start of structure - ie at '.'
-      INTEGER   END                        ! Finished 
+      INTEGER   END                        ! Finished
       INTEGER   ERR                        ! Error
 C
       PARAMETER (START=1,DIR=2,INFILE=3,STEXT=4,EXT=5,ENDEXT=6,STRDOT=7,
@@ -193,7 +193,7 @@ C
      :      EXT,    ERR,     ERR,    ERR,   ERR,   ENDEXT, EXT,       ! Ext
      :      INFILE, END,     ERR,    ERR,   ERR,   ERR,    STRDOT/    ! Endext
 C           ------  ------   ------  ------ ------ ------  ------
-C           Char    Blank    [       ]      (      )       . 
+C           Char    Blank    [       ]      (      )       .
 C
 C     Special characters recognised by the parser.  Note that the order
 C     of the chars in this string is important, since it gives the column
@@ -276,9 +276,9 @@ C
             END DO
          END IF
 C
-C        See if such a file exists, and see what the full file spec is.  
-C        We allow here for the possibility that more than one file 
-C        extension is in use, but force a new file to the main default 
+C        See if such a file exists, and see what the full file spec is.
+C        We allow here for the possibility that more than one file
+C        extension is in use, but force a new file to the main default
 C        extension.
 C
          INQUIRE (FILE=FILE(:ICH_LEN(FILE)),

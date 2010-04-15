@@ -1,9 +1,9 @@
 /*
  * gk9srt_.c --- Module for handling a string tool on the SUN workstation for
- * RAL GKS. 
+ * RAL GKS.
  *
  * Written by: A C Arnold, University of Manchester Computer Graphics Unit,
- * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405 
+ * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405
  *
  * 18/03/87  TAW   Changed name to gk9srt_
  * 06/05/87  PJWR  Corrected to use GKS drawing area of bitmap rather than
@@ -44,7 +44,7 @@ extern char *sprintf();
  *   2001 Output parameter size insufficient.
  */
 
-f77_integer 
+f77_integer
 gk9srt_(buff_len, string_ptr, length_ptr, string_len)
   char string_ptr[];
 f77_integer *buff_len, *length_ptr;
@@ -68,10 +68,10 @@ int string_len;
 	  &nint, &nreal, &inta[1], &reala[1]);
 	if(gkyerr_.kerror !=0) return(GNONE);
 	echoarea = boxbuild((int) reala[KIPEXL],	/* Construct echo box */
-		      (int)(gkywdt_.kdsry[gkywca_.kwkix - 1] - 1) - 
+		      (int)(gkywdt_.kdsry[gkywca_.kwkix - 1] - 1) -
                       (int) reala[KIPEYT],
 		      (int) reala[KIPEXR],
-		      (int)(gkywdt_.kdsry[gkywca_.kwkix - 1] - 1) - 
+		      (int)(gkywdt_.kdsry[gkywca_.kwkix - 1] - 1) -
                       (int) reala[KIPEYB]);
 
   gk9soe(echoarea,"String device");		/* Open the echo area */

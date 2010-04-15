@@ -19,7 +19,7 @@
 *     data values from an array.
 *
 *     If the output buffer is potentially too short to hold all the
-*     values in each column of the array, then a message to this 
+*     values in each column of the array, then a message to this
 *     effect will be written, and every line of output will contain
 *     the same, reduced, number of items.
 
@@ -85,7 +85,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
-      
+
 *  Arguments Given:
       INTEGER FD
       INTEGER N
@@ -95,10 +95,10 @@
       DOUBLE PRECISION X( N )
       DOUBLE PRECISION Y( N )
       DOUBLE PRECISION P( NP, N )
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) BUFFER
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -118,7 +118,7 @@
 
 *  Local Data:
       DATA GAP / 2 /
-      
+
 *.
 
 *  Check inherited global status.

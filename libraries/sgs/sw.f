@@ -81,7 +81,7 @@
       REAL X1N,X2N,Y1N,Y2N
       CHARACTER RNAME*2
       PARAMETER (RNAME='SW')
- 
+
       INCLUDE 'sgscom'
 
       INCLUDE 'SGS_ERR'
@@ -118,4 +118,4 @@
  9999 CONTINUE
 
       END
-                                                           
+

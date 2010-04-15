@@ -275,7 +275,7 @@ proc action_end_hook {name} {
          set aliased 1
          break
       }
-   }          
+   }
    if {! $aliased} { set Aliases [linsert $Aliases 0 $name] }
 
 # Write the .icl file
@@ -471,7 +471,7 @@ proc command_end_hook {name} {
          set aliased 1
          break
       }
-   }          
+   }
    if {! $aliased} { set Aliases [linsert $Aliases 0 $name] }
 
 # Write the .icl file

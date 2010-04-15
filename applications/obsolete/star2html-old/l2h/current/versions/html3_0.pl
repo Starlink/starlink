@@ -41,7 +41,7 @@ sub do_cmd_underline {
     local($_) = @_;
     s/$next_pair_pr_rx//o;
     &lost_argument("underline") unless ($&);
-    join('',"<U>$2</U>",$_); 
+    join('',"<U>$2</U>",$_);
 }
 
 ### Allow for alignment to work

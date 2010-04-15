@@ -12,14 +12,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASAPA( INDF, FRM, MAP, IAXIS, AXLOW, AXHIGH, PAXIS, 
+*     CALL KPG1_ASAPA( INDF, FRM, MAP, IAXIS, AXLOW, AXHIGH, PAXIS,
 *                      PXLOW, PXHIGH, MAP1D, STATUS )
 
 *  Description:
 *     This routine aligns a supplied WCS axis to the best-matching
 *     pixel axis of an NDF.  It also returns pixel co-ordinates
-*     corresponding to supplied WCS-axis limits, and where possible a 
-*     mapping with one input and one output that transforms current 
+*     corresponding to supplied WCS-axis limits, and where possible a
+*     mapping with one input and one output that transforms current
 *     Frame co-ordinates into pixel co-ordinates.
 *
 *     It first attempts to split the mapping to derive a one-to-one
@@ -54,7 +54,7 @@
 *        the WCS axis.
 *     MAP1D = INTEGER (Returned)
 *        The mapping from the current WCS Frame to PIXEL whose input
-*        is purely along the chosen axis (IAXIS).  It is set to 
+*        is purely along the chosen axis (IAXIS).  It is set to
 *        AST__NULL if the supplied mapping (MAP) could not be split.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -68,12 +68,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -151,7 +151,7 @@
       PXHIGH = AST__BAD
       PAXIS = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       USEALL = AXLOW .EQ. AST__BAD .OR. AXHIGH .EQ. AST__BAD
@@ -163,7 +163,7 @@
 *  units of the ranges.
       NAX = AST_GETI( FRM, 'NAXES', STATUS )
       TTLC = AST_GETC( FRM, 'TITLE', STATUS )
-            
+
 *  Try splitting the mapping.
 *  ==========================
 
@@ -193,16 +193,16 @@
          END IF
       END IF
 
-*  Find an arbitrary position within the NDF which has valid current 
-*  Frame co-ordinates.  Both pixel and current Frame co-ordinates for 
+*  Find an arbitrary position within the NDF which has valid current
+*  Frame co-ordinates.  Both pixel and current Frame co-ordinates for
 *  this position are returned.
       DO I = 1, NDIM
          DLBND( I ) = DBLE( LBND( I ) - 1 )
          DUBND( I ) = DBLE( UBND( I ) )
       END DO
-      CALL KPG1_ASGDP( MAP, NDIM, NAX, DLBND, DUBND, PIXPOS, CURPOS, 
+      CALL KPG1_ASGDP( MAP, NDIM, NAX, DLBND, DUBND, PIXPOS, CURPOS,
      :                 STATUS )
-   
+
 *  If the Mapping could not be split using AST_MAPSPLIT, we attempt to
 *  analyse it by transforming positions, in order to find the pixel axis
 *  which is most nearly parallel to the selected WCS axis.
@@ -216,9 +216,9 @@
             CALL MSG_SETC( 'T', TTLC )
             CALL ERR_REP( 'KPG1_ASAPA_ERR1', 'The transformation from '/
      :                    /'the current co-ordinate Frame of ''^NDF'' '/
-     :                    /'(^T) to pixel co-ordinates is not defined.', 
+     :                    /'(^T) to pixel co-ordinates is not defined.',
      :                    STATUS )
-         
+
          ELSE IF ( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
      :             STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -234,9 +234,9 @@
          DO I = 1, NAX
             CPOS( 1, I ) = CURPOS( I )
             CPOS( 2, I ) = CURPOS( I )
-         END DO 
-   
-*  If no ranges were supplied, modify the collapse axis values in these 
+         END DO
+
+*  If no ranges were supplied, modify the collapse axis values in these
 *  positions by an arbitrary amount.
          IF ( USEALL ) THEN
             IF ( CURPOS( IAXIS ) .NE. 0.0D0 ) THEN
@@ -246,17 +246,17 @@
                CPOS( 1, IAXIS ) = CURPOS( IAXIS ) + 1.0D-4
                CPOS( 2, IAXIS ) = CURPOS( IAXIS ) - 1.0D-4
             END IF
-   
+
 *  If ranges values for the collapse axis were supplied, substitute the
-*  first pair into these positions. 
+*  first pair into these positions.
          ELSE
             CPOS( 1, IAXIS ) = AXHIGH
             CPOS( 2, IAXIS ) = AXLOW
          END IF
-   
+
 *  Transform these two positions into pixel co-ordinates.
          CALL AST_TRANN( MAP, 2, NAX, 2, CPOS, .FALSE., NDIM, 2, PPOS,
-     :                   STATUS ) 
+     :                   STATUS )
 
 *  Find the pixel axis with the largest projection of the vector joining
 *  these two pixel positions.  The collapse will occur along this pixel
@@ -266,13 +266,13 @@
          DO I = 1, NDIM
             IF ( PPOS( 1, I ) .NE. AST__BAD .AND.
      :           PPOS( 2, I ) .NE. AST__BAD ) THEN
-   
+
                PRJ = ABS( PPOS( 1, I ) - PPOS( 2, I ) )
                IF ( PRJ .GT. PRJMAX ) THEN
                   PAXIS = I
                   PRJMAX = PRJ
                END IF
-   
+
             ELSE IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'KPG1_ASAPA_ERR3', 'The WCS information '/
@@ -280,15 +280,15 @@
      :                       /'pixel positions).', STATUS )
                GO TO 999
             END IF
-   
+
          END DO
-   
+
 *  Report an error if the selected WCS axis is independent of pixel
 *  position.
          IF ( PRJMAX .EQ. 0.0 ) THEN
             IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETI( 'I', IAXIS )   
+               CALL MSG_SETI( 'I', IAXIS )
                CALL ERR_REP( 'KPS1_ASAPA_ERR4', 'The specified WCS '/
      :                       /'axis (axis ^I) has a constant value '/
      :                       /'over the whole NDF and so cannot be '/

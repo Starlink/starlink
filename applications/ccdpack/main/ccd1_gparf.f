@@ -21,21 +21,21 @@
 *     ACMODE = CHARACTER * ( * ) (Given)
 *        The access mode, 'READ', 'WRITE' or 'UPDATE'.
 *     CREAT = LOGICAL (Given)
-*        True if the GLOBAL file and the keyed parameter structure 
+*        True if the GLOBAL file and the keyed parameter structure
 *        should be created in the event of their non-existence.
 *     GLOC = CHARACTER * ( * ) (Returned)
 *        HDS locator for the GLOBAL file.  This is a primary locator and
 *        should be annulled by the calling routine to close the file
-*        and reclaim resources.  If CREAT is true and the file does 
+*        and reclaim resources.  If CREAT is true and the file does
 *        not already exist it will be created.  If CREAT is false
 *        and the file does not exist GLOC will be returned as DAT__NOLOC
 *        without error.
 *     SLOC = CHARACTER * ( * ) (Returned)
 *        HDS locator for the CCDPACK_KEYPARS structure within the
-*        GLOBAL parameters file.  This is a secondary locator. 
-*        If CREAT is true and the structure does not already exist 
-*        then it will be created.  If CREAT is false and the 
-*        structure does not already exist SLOC will be returned as 
+*        GLOBAL parameters file.  This is a secondary locator.
+*        If CREAT is true and the structure does not already exist
+*        then it will be created.  If CREAT is false and the
+*        structure does not already exist SLOC will be returned as
 *        DAT__NOLOC without error.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -81,7 +81,7 @@
       INCLUDE 'DAT_PAR'          ! HDS system constants
       INCLUDE 'FIO_PAR'          ! FIO system constants
       INCLUDE 'DAT_ERR'          ! HDS system error values
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) ACMODE
       LOGICAL CREAT
@@ -89,7 +89,7 @@
 *  Arguments Returned:
       CHARACTER * ( * ) GLOC
       CHARACTER * ( * ) SLOC
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -97,7 +97,7 @@
       CHARACTER * ( FIO__SZFNM ) FILE ! File name of global parameter file
       INTEGER LENG               ! Length of filename
       LOGICAL THERE              ! Does HDS component exist?
-      
+
 *.
 
 *  Check inherited global status.

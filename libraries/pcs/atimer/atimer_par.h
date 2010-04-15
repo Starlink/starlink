@@ -21,4 +21,4 @@ struct timer_q {
    { \
       (tvp)->tv_usec = (tvp)->tv_usec + 1000000; \
       --((tvp)->tv_sec);\
-   }       
+   }

@@ -44,7 +44,7 @@ C  Ok, go...
         X1 = X(N1)
         X2 = X(N1+1)
       END IF
-       
+
       F       = P - N1
       XTRANS8 = X1*(1.-F) + X2*F
 

@@ -582,7 +582,7 @@ itcl::class gaia::StarBlink {
 
    #  Method to detect image combination completed. When so image is
    #  displayed in a new clone, unless we've already got one to work
-   #  with. 
+   #  with.
    private method finished_combine_ {} {
 
       #  Remove all the temporary files.
@@ -590,11 +590,11 @@ itcl::class gaia::StarBlink {
 
       set gotcha 0
       if { $myclone_ != {} } {
-         if { [winfo exists $myclone_] } { 
+         if { [winfo exists $myclone_] } {
             set gotcha 1
          }
       }
-      if { $gotcha } { 
+      if { $gotcha } {
          $myclone_ open StarBlink.sdf
       } else {
          set clones "

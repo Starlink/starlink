@@ -123,7 +123,7 @@
 *        case if (GETS.AND.(GETZ.OR.VAR)) is .TRUE.). The routine will
 *        return once MAXIT iterations have been performed unless
 *        convergence is achieved earlier. An error will be reported if
-*        convergence has not been achieved after MAXIT iterations 
+*        convergence has not been achieved after MAXIT iterations
 *        A MAXIT value of at least 1 is always used.
 *     SKYSUP = REAL (Given)
 *        Sky noise suppression factor. When a relative scale factor is
@@ -242,7 +242,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     DSB: David S. Berry (STARLINK)
@@ -273,7 +273,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -467,8 +467,8 @@
 *  values being used.
             DO 1 IIP = 1, NIP
                IP( NPTS, IIP ) = I
- 1          CONTINUE           
- 2       CONTINUE     
+ 1          CONTINUE
+ 2       CONTINUE
 
 *  If there are insufficient usable data values to obtain a fit, then
 *  report an error.
@@ -620,7 +620,7 @@
                DO 5 I = 1, NPTS
                   II = IP( I, IZERO )
                   WRK( II ) = DAT2( II ) - DAT1( II ) * SCL
- 5             CONTINUE     
+ 5             CONTINUE
 
 *  Find the (weighted) median distance and correct the result for the
 *  constant omitted above.
@@ -663,7 +663,7 @@
                   ELSE
                      WRK( II ) = SIGN( NUM__MAXR, DELTA2 * DIST )
                   END IF
- 6             CONTINUE     
+ 6             CONTINUE
 
 *  Find the (weighted) median ratio, using weights modified to suppress
 *  sky noise, if required. Correct for the use of vertical distances
@@ -684,7 +684,7 @@
 *  Return for another iteration if necessary.
             IF ( DOITER ) GO TO 3
          END IF
-      
+
 *  Return the results of the iterations.
          SCALE = SCL
          ZERO = ZER
@@ -748,7 +748,7 @@
                   DO 7 I = 1, NPTS
                      II = IP( I, IZERO )
                      WRK( II ) = DAT2( II ) - DAT1( II ) * SCL
- 7               CONTINUE     
+ 7               CONTINUE
                END IF
 
 *  Obtain values of the +/- 1-sigma quantiles for the final
@@ -805,7 +805,7 @@
       END IF
 
 *  Arrive here if an error occurs.
- 99   CONTINUE     
+ 99   CONTINUE
 
       END
 * @(#)ccg1_cmpr.grd	1.2     9/19/96     1

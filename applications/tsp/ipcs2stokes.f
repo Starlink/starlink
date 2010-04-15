@@ -1,4 +1,4 @@
-C+                    
+C+
       SUBROUTINE IPCS2STOKES(STATUS)
 C
 C            I P C S 2 S T O K E S
@@ -9,7 +9,7 @@ C
 C     Function:
 C        Reduce IPCS spectropolarimetry data.
 C
-C     Description:                           
+C     Description:
 C        IPCS2STOKES reduces data obtained with the AAO Pockels cell
 C        spectropolarimeter with the IPCS as detector. The data is read
 C        in the form of Figaro files each containing a pair of A and B
@@ -30,16 +30,16 @@ C        APERTURE   (Char)     The aperture containing the star (A or B).
 C        STOKESPAR  (Char)     The Stokes parameter (Q,U,V).
 C        OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         17/03/2000
 C
 C-
 C
 C  History:
-C    27/4/1988   Original Version.   JAB/AAO 
+C    27/4/1988   Original Version.   JAB/AAO
 C    20/11/1991  Use DSA for Figaro access.   JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
 C
@@ -61,9 +61,9 @@ C
 
 *  Dimensions of array
       INTEGER NDIM, DIMS(7)
-      INTEGER LENNAME 
+      INTEGER LENNAME
 
-*  Parameters giving position of spectra                           
+*  Parameters giving position of spectra
       INTEGER ASTART,BSTART,OESEP,WIDTH,SEP
 
 *  HDS locators
@@ -82,7 +82,7 @@ C
       CALL PAR_GET0C('FIGARO',FNAME,STATUS)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME,STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -147,11 +147,11 @@ C
 
 *  Check for validity
 
-             IF (ASTART+(WIDTH-1) .GT. SEP .OR. 
+             IF (ASTART+(WIDTH-1) .GT. SEP .OR.
      :           ASTART+(WIDTH-1)+OESEP .GT. SEP .OR.
      :           BSTART+(WIDTH-1) .GT. SEP .OR.
      :           BSTART+(WIDTH-1)+OESEP .GT. SEP) THEN
-                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)        
+                 CALL MSG_OUT(' ','Invalid Position of Spectra',STATUS)
                  GOTO 100
              ENDIF
 
@@ -165,7 +165,7 @@ C
                      CALL PAR_CANCL('APERTURE',STATUS)
                  ENDIF
              ENDDO
-            
+
 
 *  Which Stokes Parameter?
 
@@ -178,7 +178,7 @@ C
                    CALL PAR_CANCL('STOKESPAR',STATUS)
                 ENDIF
              ENDDO
-      
+
 *  Get the output file
 
              CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -195,15 +195,15 @@ C
              CALL TSP_WLU_LAMBDA(OLOC,XLABEL,XUNITS,STATUS)
 
 *  Get Stokes Structure
-      
+
              CALL TSP_GET_STOKES(OLOC,STOKESPAR,SLOC,STATUS)
              CALL TSP_MAP_DATA(SLOC,'WRITE',OSPTR,ESLOC,STATUS)
              CALL TSP_MAP_VAR(SLOC,'WRITE',OEPTR,ELOC,STATUS)
              CALL TSP_WLU(OLOC,LABEL,UNITS,STATUS)
              CALL TSP_MAP_DATA(OLOC,'WRITE',OIPTR,ILOC,STATUS)
-             
+
 *  Copy the data
-      
+
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_IPCS2STOKES(DIMS(1),DIMS(2),%VAL(IPTR),
      :           ASTART,BSTART,OESEP,WIDTH,AP,SEP,%VAL(OIPTR),
@@ -226,7 +226,7 @@ C
       ENDIF
       END
 
-      
+
 
       SUBROUTINE TSP_IPCS2STOKES(SIZE,NY,I1,ASTART,BSTART,OESEP,WIDTH,
      :   AP,SEP,INT,STOKES,VSTOKES,IX,OX)
@@ -234,7 +234,7 @@ C
 *
 *   T S P _ I P C S 2 S T O K E S
 *
-*   Reduce IPCS spectropolarimetry 
+*   Reduce IPCS spectropolarimetry
 *
 *   (>)  NY      (Integer)  Size of spatial axis of input array
 *   (>)  SIZE    (Integer)  Number of spectral channels
@@ -278,7 +278,7 @@ C
       DO I=1,SIZE
          OX(I)=IX(I)
       ENDDO
-                   
+
 *  Set up position of eight spectra
       IF (AP .EQ. 'A') THEN
           PT(1) = ASTART
@@ -294,7 +294,7 @@ C
       DO I=5,8
           PT(I) = PT(I-4)+SEP
       ENDDO
-      
+
 *  Loop over spectral points
       DO I=1,SIZE
 
@@ -323,4 +323,4 @@ C
       ENDDO
       END
 
-      
+

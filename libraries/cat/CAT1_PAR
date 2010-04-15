@@ -17,7 +17,7 @@
 *  History:
 *     13/5/93 (ACD): Original version.
 *     15/7/93 (ACD): First stable version.
-*     9/2/94  (ACD): Increased the maximum permitted number of 
+*     9/2/94  (ACD): Increased the maximum permitted number of
 *       attributes.
 *     3/3/95  (ACD): Changed definitions of the constants for array
 *       sizes from CAT1_SZ... to CAT1__MX...  Also removed unused constants.

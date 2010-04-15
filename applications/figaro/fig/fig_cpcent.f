@@ -38,7 +38,7 @@ C                                     KS / CIT 7th May 1983
 C+
       IMPLICIT NONE
 C
-C     Parameters - 
+C     Parameters -
 C
       INTEGER NX,NY,NRAD,IX,IY,STATUS
       REAL IMAGE(NX,NY),SUMX(2*NRAD+1),SUMY(2*NRAD+1),X,Y

@@ -73,7 +73,7 @@
 
 *   Set BIN undefined
       NOBIN = .TRUE.
- 
+
 *   For each point in the wavelength array
       DO I = 1, NWAV
          BINSIZ = 1.0

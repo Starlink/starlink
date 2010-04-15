@@ -113,7 +113,7 @@ smf_realloc( void * pntr, size_t nelem, size_t bperel, int * status ) {
     msgSeti( "BP" , bperel );
     if ( nelem == 0 ) {
       errRep( FUNC_NAME, "Attempt to allocate zero elements of size ^BP bytes "
-	      "(possible programming error)", status);      
+	      "(possible programming error)", status);
     } else {
       errRep( FUNC_NAME, "Attempt to allocate ^NEL elements of zero bytes "
 	      "(possible programming error)", status);

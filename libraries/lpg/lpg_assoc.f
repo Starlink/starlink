@@ -16,20 +16,20 @@
 *     This routine should be called in place of NDF_ASSOC within
 *     applications that process groups of NDFs.
 *
-*     On the first invocation of the application, a group of names of 
-*     existing NDFs will be obtained from the environment using the 
-*     specified parameter, and an NDF identifier for the first one 
-*     will be returned. If more than one NDF was supplied for the 
-*     parameter then the application may be invoked again (see 
-*     LPG_AGAIN), in which case this routine will return an identifier 
-*     for the next NDF in the group supplied on the first invocation. 
+*     On the first invocation of the application, a group of names of
+*     existing NDFs will be obtained from the environment using the
+*     specified parameter, and an NDF identifier for the first one
+*     will be returned. If more than one NDF was supplied for the
+*     parameter then the application may be invoked again (see
+*     LPG_AGAIN), in which case this routine will return an identifier
+*     for the next NDF in the group supplied on the first invocation.
 *
-*     If an application attempts to get a new NDF by cancelling the 
-*     parameter (PAR_CANCL), the returned NDF is NOT the next one in 
+*     If an application attempts to get a new NDF by cancelling the
+*     parameter (PAR_CANCL), the returned NDF is NOT the next one in
 *     the group, but is obtained by prompting the user for a single NDF.
 *
-*     The monolith routine should arrange to invoke the application 
-*     repeatedly until one or more of its NDF parameters have been 
+*     The monolith routine should arrange to invoke the application
+*     repeatedly until one or more of its NDF parameters have been
 *     exhausted (i.e. all its values used). See LPG_AGAIN.
 
 *  Arguments:
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -97,7 +97,7 @@
 *        PNAME( LPG__MXPAR ) = CHARACTER * ( DAT__SZNAM ) (Read and Write)
 *           The names of the data file parameters used by the application.
 *        IGRP( LPG__MXPAR ) = INTEGER (Read and Write)
-*           The identifier for the GRP groups holding the names 
+*           The identifier for the GRP groups holding the names
 *           supplied for each data file parameter.
 *        SIZE( LPG__MXPAR ) = INTEGER (Read and Write)
 *           The number of files supplied for each data file parameter.
@@ -106,16 +106,16 @@
 *        NRUN = INTEGER (Read)
 *           The number of times the application has been invoked so far.
 *        OLD( LPG__MXPAR ) = LOGICAL (Write)
-*           A flag for each data file parameter indicating if the parameter is 
-*           used to access existing (i.e. old) data files. If not, the 
-*           parameter is used to access new data files to be created by the 
+*           A flag for each data file parameter indicating if the parameter is
+*           used to access existing (i.e. old) data files. If not, the
+*           parameter is used to access new data files to be created by the
 *           application.
 *        REP( LPG__MXPAR ) = LOGICAL (Read and Write)
-*           A flag for each data file parameter indicating if the parameter 
+*           A flag for each data file parameter indicating if the parameter
 *           value has been reported yet by the current invocation of the
 *           application.
 *        VERB = LOGICAL (Read)
-*           A flag indicating if the values used for each multi-valued 
+*           A flag indicating if the values used for each multi-valued
 *           parameter should be displayed each time the parameter is accessed.
 *           Also produces more verbose error messages if an input NDF
 *           cannot be acessed.
@@ -124,7 +124,7 @@
 *        OPNLST = INTEGER (Read)
 *           A GRP identifier for a group holding the full specification
 *           for any existing NDFs which have been opened for read-only
-*           input by this invocation of the application. 
+*           input by this invocation of the application.
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -173,7 +173,7 @@
       DO I = 1, NPAR
          IF( PNAME( I ) .EQ. UPAR ) THEN
             IPAR = I
-            GO TO 10 
+            GO TO 10
          END IF
       END DO
  10   CONTINUE
@@ -200,8 +200,8 @@
 *  Loop until a group expression is given which is not terminated by a
 *  flag character.
          FLAG = .TRUE.
-         DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK ) 
-            CALL NDG_ASSOC( UPAR, VERB, IGRP( NPAR ), SIZE( NPAR ), 
+         DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK )
+            CALL NDG_ASSOC( UPAR, VERB, IGRP( NPAR ), SIZE( NPAR ),
      :                      FLAG, STATUS )
             IF( FLAG ) THEN
                CALL PAR_CANCL( UPAR, STATUS )
@@ -218,13 +218,13 @@
             STATUS = PAR__NULL
             CALL MSG_SETC( 'PARAM', UPAR )
             CALL ERR_REP( 'LPG_ASSOC_ERR2', 'Null NDF structure '//
-     :                    'specified for the ''%^PARAM'' parameter.', 
+     :                    'specified for the ''%^PARAM'' parameter.',
      :                    STATUS )
          END IF
 
 *  If a PAR__NULL status exists, store a null group identifier in common
 *  for this parameter, and reset the size to zero.
-         IF( STATUS .EQ. PAR__NULL ) THEN 
+         IF( STATUS .EQ. PAR__NULL ) THEN
             IF( IGRP( NPAR ) .NE. GRP__NOID ) THEN
                CALL GRP_DELET( IGRP( NPAR ), STATUS )
             END IF
@@ -237,28 +237,28 @@
 *  If the parameter has been accessed before...
       ELSE
 
-*  See if the application has cancelled the parameter value. If so, 
+*  See if the application has cancelled the parameter value. If so,
 *  we get a new NDF using the parameter directly. This will probably
 *  result in the user being prompted for a new parameter value.
          CALL PAR_STATE( UPAR, STATE, STATUS )
          IF( STATE .EQ. SUBPAR__CANCEL ) THEN
             CALL NDG_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
-            
+
 *  Store the new value in the group, replacing the old value, and store
 *  the new list of names as the parameter's current value.
             IF( SIZE( IPAR ) .GT. 1 ) THEN
                CALL NDG_PTSUP( IGRP( IPAR ), NRUN, FIELDS, STATUS )
-               CALL LPG1_PTPAR( UPAR, IGRP( NPAR ), STATUS )         
+               CALL LPG1_PTPAR( UPAR, IGRP( NPAR ), STATUS )
             END IF
 
 *  Otherwise, report a PAR__NULL error if the parameter has no GRP group
 *  associated with it.
-         ELSE IF( IGRP( IPAR ) .EQ. GRP__NOID .AND. 
+         ELSE IF( IGRP( IPAR ) .EQ. GRP__NOID .AND.
      :            STATUS .EQ. SAI__OK ) THEN
             STATUS = PAR__NULL
             CALL MSG_SETC( 'PARAM', UPAR )
             CALL ERR_REP( 'LPG_ASSOC_ERR3', 'Null NDF structure '//
-     :                    'specified for the ''%^PARAM'' parameter.', 
+     :                    'specified for the ''%^PARAM'' parameter.',
      :                    STATUS )
          END IF
 
@@ -267,21 +267,21 @@
 *  Get the NDF identifier unless one was obtained above.
       IF( INDF .EQ. NDF__NOID .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  If the group only contains one NDF name, use it on all invocations of the 
+*  If the group only contains one NDF name, use it on all invocations of the
 *  application.
          IF( SIZE( IPAR ) .EQ. 1 ) THEN
-            IRUN = 1 
+            IRUN = 1
          ELSE
             IRUN =NRUN
          END IF
 
-*  Get the NDF from the group. 
+*  Get the NDF from the group.
          CALL NDG_NDFAS( IGRP( IPAR ), IRUN, MODE, INDF, STATUS )
 
 *  Get the supplemental information for this element.
          CALL NDG_GTSUP( IGRP( IPAR ), IRUN, FIELDS, STATUS )
 
-*  Tell the user which NDF is being used, if required, and if it has not 
+*  Tell the user which NDF is being used, if required, and if it has not
 *  already been reported.
          IF( VERB .AND. .NOT. REP( IPAR ) ) THEN
             CALL NDF_MSG( 'N', INDF )
@@ -292,9 +292,9 @@
 
       END IF
 
-*  If the NDF was opened read-only, store the full NDF specification 
+*  If the NDF was opened read-only, store the full NDF specification
 *  in the OPNLST group. This group contains the list of all
-*  opened input NDFs which are candidates for being replaced with an 
+*  opened input NDFs which are candidates for being replaced with an
 *  output NDF.
       IF( STATUS .EQ. SAI__OK .AND. INDF .NE. NDF__NOID ) THEN
          CALL NDF_ISACC( INDF, 'WRITE', WRACC, STATUS )

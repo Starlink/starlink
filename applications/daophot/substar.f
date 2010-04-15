@@ -1,4 +1,4 @@
-      SUBROUTINE  SUBSTR  (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+      SUBROUTINE  SUBSTR  (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
      .     F, NCOL, NROW, WATCH)
 C
 C=======================================================================
@@ -11,7 +11,7 @@ C             OFFICIAL DAO VERSION:  1991 April 18
 C
 C Arguments
 C
-C  WATCH (INPUT) governs whether information relating to the progress 
+C  WATCH (INPUT) governs whether information relating to the progress
 C        of the reductions is to be typed on the terminal screen
 C        during execution.
 C
@@ -66,7 +66,7 @@ C
          RETURN
       END IF
       ISTAT = RDPSF (PSFFIL, IPSTYP, PAR, MAXPAR, NPAR,
-     .     PSF, MAXPSF, MAXEXP, NPSF, NEXP, NFRAC, 
+     .     PSF, MAXPSF, MAXEXP, NPSF, NEXP, NFRAC,
      .     PSFMAG, BRIGHT, XPSF, YPSF)
       IF (ISTAT .LT. 0) THEN
          PSFFIL = 'GIVE UP'
@@ -124,7 +124,7 @@ C
          CALL CLFILE (3)
       END IF
 C
-      CALL RDHEAD (2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, AP1, 
+      CALL RDHEAD (2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, READNS, FRAD)
 C
       SUBPIC=SWITCH(PROFIL, CASE('s'))
@@ -203,8 +203,8 @@ C
             IF (DX**2+DYSQ .GE. PSFRSQ) THEN
                IF (DX .GT. 0.) GO TO 2030
             ELSE
-               F(I,J)=F(I,J)-SCALE*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR, 
-     .              PSF, NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, 
+               F(I,J)=F(I,J)-SCALE*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR,
+     .              PSF, NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY,
      .              DVDXC, DVDYC)
             END IF
  2020    CONTINUE

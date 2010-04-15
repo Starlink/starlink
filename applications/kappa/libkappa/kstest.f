@@ -315,7 +315,7 @@
 
 *  Get a file specification from the group.
          CALL GRP_GET( IGRP, 1, 1, INFILE, STATUS )
-         
+
 *  Open the named file.
          CALL NDF_FIND( DAT__ROOT, INFILE, NDFR, STATUS )
 
@@ -323,7 +323,7 @@
          IF ( STATUS .EQ. SAI__OK ) FNAMES( 1 ) = INFILE
 
 *  Inquire the dataset size in pixels
-         CALL NDF_SIZE( NDFR, EL, STATUS ) 
+         CALL NDF_SIZE( NDFR, EL, STATUS )
 
 *  Obtain the number of samples.
          CALL PAR_GDR0I( 'NSAMPLE', 3, 2, MXFILE, .FALSE., NFILES,
@@ -369,9 +369,9 @@
 *  Inquire which arrays are available and form a comma-separated list
 *  of them.  The required component must be present in all the datasets.
             IF ( I .EQ. 1 ) THEN
-               CALL KPG1_ARCOL( NDFI, 'Data,Quality,Error,Variance', 
+               CALL KPG1_ARCOL( NDFI, 'Data,Quality,Error,Variance',
      :                          COMLIS, COMLN, STATUS )
- 
+
 *  Find which component to plot.  No need to inquire the value, if the
 *  only array component is Data.  Note the mixed-case returned in the
 *  list is for attractive error reports.  See below why there is a
@@ -382,7 +382,7 @@
                ELSE
                   CALL PAR_CHOIC( 'COMP', 'Data', COMLIS( :COMLN ),
      :                            .FALSE., COMP, STATUS )
- 
+
 *  Most NDF routines with a component argument don't recognise 'ERROR',
 *  so we need two variables.  Thus convert 'ERROR' into 'VARIANCE' in
 *  the variable needed for such routines.  The original value is held
@@ -390,7 +390,7 @@
 *  routines that does support 'ERROR' is NDF_MAP.
                   MCOMP = COMP
                   IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
- 
+
                END IF
             END IF
 
@@ -408,7 +408,7 @@
 
 *  Map the data and variance arrays (as REAL arrays regardless of
 *  actual type).
-               CALL KPG1_MAP( NDFI, 'Data,Variance', '_REAL', 'READ', 
+               CALL KPG1_MAP( NDFI, 'Data,Variance', '_REAL', 'READ',
      :                       INPTR, EL, STATUS )
                USEVAR = .TRUE.
 
@@ -418,7 +418,7 @@
             ELSE
 
 *  Map the data array (as a REAL array regardless of actual type).
-               CALL KPG1_MAP( NDFI, MCOMP, '_REAL', 'READ', 
+               CALL KPG1_MAP( NDFI, MCOMP, '_REAL', 'READ',
      :                       INPTR, EL, STATUS )
             END IF
 
@@ -431,7 +431,7 @@
 *  to extract good data.
             CALL KPG1_KGODR( ISVAR, EL, %VAL( CNF_PVAL( INPTR( 1 ) ) ),
      :                       %VAL( CNF_PVAL( INPTR( 2 ) ) ), NGOOD( I ),
-     :                       %VAL( CNF_PVAL( GDPTR( I ) ) ), 
+     :                       %VAL( CNF_PVAL( GDPTR( I ) ) ),
      :                       %VAL( CNF_PVAL( GVPTR( I ) ) ),
      :                       STATUS )
 
@@ -489,20 +489,20 @@
 
 *  Now compare the two samples.
          CALL KPS1_KS2TR( NKEPT, NPTS, %VAL( CNF_PVAL( KSDPTR ) ),
-     :                    %VAL( CNF_PVAL( GDPTR( I ) ) ), 
+     :                    %VAL( CNF_PVAL( GDPTR( I ) ) ),
      :                    D( I - 1 ), PROB( I - 1 ),
-     :                    %VAL( CNF_PVAL( WPTR ) ), 
+     :                    %VAL( CNF_PVAL( WPTR ) ),
      :                    %VAL( CNF_PVAL( WNPTR ) ), STATUS )
 
 *  If they are from the same sample then copy them.
          IF ( PROB( I - 1 ) .GT. LIMIT ) THEN
-            CALL VEC_RTOR( .FALSE., NPTS, 
+            CALL VEC_RTOR( .FALSE., NPTS,
      :                     %VAL( CNF_PVAL( GDPTR( I ) ) ),
      :                    %VAL( CNF_PVAL( KSDPTR + NKEPT * VAL__NBR ) ),
      :                     IERR, NERR, STATUS )
 
             IF ( USEVAR ) THEN
-               CALL VEC_RTOR( .FALSE., NPTS, 
+               CALL VEC_RTOR( .FALSE., NPTS,
      :                        %VAL( CNF_PVAL( GVPTR( I ) ) ),
      :                    %VAL( CNF_PVAL( KSVPTR + NKEPT * VAL__NBR ) ),
      :                        IERR, NERR, STATUS )
@@ -520,7 +520,7 @@
 *  MSG__QUIET.
          IF ( I .EQ. 2 ) THEN
             CALL MSG_BLANKIF( MSG__NORM, STATUS )
-            CALL MSG_OUTIF( MSG__NORM, 'HEADING', 
+            CALL MSG_OUTIF( MSG__NORM, 'HEADING',
      :        '                  Probability        Max. Sep.', STATUS )
             CALL MSG_OUTIF( MSG__NORM, 'LINE',
      :        '------------------------------------------------------'/
@@ -566,14 +566,14 @@
          CALL MSG_OUTIF( MSG__NORM, 'FINAL',
      :     'All subsamples were rejected', STATUS )
 
-      ELSE 
+      ELSE
 
          IF ( NFAIL .GT. 0 ) THEN
             CALL MSG_SETI( 'FAIL', NFAIL )
-            CALL MSG_OUTIF( MSG__NORM, 'FINAL', 
+            CALL MSG_OUTIF( MSG__NORM, 'FINAL',
      :        'Number of subsamples rejected: ^FAIL', STATUS )
          ELSE
-            CALL MSG_OUTIF( MSG__NORM, 'FINAL', 
+            CALL MSG_OUTIF( MSG__NORM, 'FINAL',
      :        'All subsamples were accepted.', STATUS )
          END IF
 
@@ -604,7 +604,7 @@
          CALL PAR_PUT0D( 'SIGMA', STDEV, STATUS )
          CALL PAR_PUT0D( 'ERRMEAN', STDEV / SQRT( DBLE( NKEPT ) ),
      :                   STATUS )
-         
+
 *  Now create the output file.  Start a new error context for the
 *  acceptable null reponse.
          CALL ERR_MARK
@@ -622,11 +622,11 @@
 
 *  Map the output data array.  Copy the processed data to the output
 *  file.
-            CALL KPG1_MAP( NDFO, 'DATA', '_REAL', 'WRITE', 
+            CALL KPG1_MAP( NDFO, 'DATA', '_REAL', 'WRITE',
      :                    OUTPTR( 1 ), ITEMP, STATUS )
 
             CALL VEC_RTOR( .FALSE., NKEPT, %VAL( CNF_PVAL( KSDPTR ) ),
-     :                     %VAL( CNF_PVAL( OUTPTR( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( OUTPTR( 1 ) ) ),
      :                     IERR, NERR, STATUS )
 
 *  Map the variance array.  Copy the processed variance to the output
@@ -635,9 +635,9 @@
                CALL KPG1_MAP( NDFO, 'VARIANCE', '_REAL', 'WRITE',
      :                       OUTPTR( 2 ), ITEMP, STATUS )
 
-               CALL VEC_RTOR( .FALSE., NKEPT, 
+               CALL VEC_RTOR( .FALSE., NKEPT,
      :                        %VAL( CNF_PVAL( KSVPTR ) ),
-     :                        %VAL( CNF_PVAL( OUTPTR( 2 ) ) ), 
+     :                        %VAL( CNF_PVAL( OUTPTR( 2 ) ) ),
      :                        IERR, NERR, STATUS )
             END IF
 

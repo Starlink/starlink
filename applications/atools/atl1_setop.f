@@ -54,14 +54,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
@@ -89,9 +89,9 @@
       CALL KPG1_GTGRP( PARAM, IGRP, SIZE, STATUS )
 
 *  If not supplied, annul the error.
-      IF( STATUS .EQ. PAR__NULL ) THEN 
+      IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
- 
+
 *  Otherwise, apply each one to the returned Frame.
       ELSE
          DO I = 1, SIZE

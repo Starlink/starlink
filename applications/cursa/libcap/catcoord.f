@@ -215,7 +215,7 @@
       INTEGER MCRDCL          ! Maximum possible number of columns to
       PARAMETER (MCRDCL = 6)  ! Define celestial coordinates.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  ROWS,       ! No. of rows in the input catalogue.
@@ -241,7 +241,7 @@
      :  MO(35)  ! 'Observed' coordinates conversion array.
 *
 *    The following arrays hold the identifiers and names of the columns
-*    defining the input coordinates.  The contents of the array 
+*    defining the input coordinates.  The contents of the array
 *    elements are:
 *
 *     1 - Right Ascension,
@@ -329,11 +329,11 @@
 *
 *          Get identifiers for the input Right Ascension and Declination.
 
-            CALL PAR_GET0C ('RAIN', CRDCOL(1), STATUS) 
+            CALL PAR_GET0C ('RAIN', CRDCOL(1), STATUS)
             CALL PAR_CANCL ('RAIN', STATUS)
             CALL CAT_TIDNT (CIIN, CRDCOL(1), CRDI(1), STATUS)
 
-            CALL PAR_GET0C ('DECIN', CRDCOL(2), STATUS) 
+            CALL PAR_GET0C ('DECIN', CRDCOL(2), STATUS)
             CALL PAR_CANCL ('DECIN', STATUS)
             CALL CAT_TIDNT (CIIN, CRDCOL(2), CRDI(2), STATUS)
 

@@ -4,7 +4,7 @@
 *     smf_geod
 
 *  Purpose:
-*     Convert a terrestrial Cartesian (x,y,z) position to geodetic lat/long 
+*     Convert a terrestrial Cartesian (x,y,z) position to geodetic lat/long
 
 *  Synopsis:
 *     #include "smf.h"
@@ -107,7 +107,7 @@ void smf_geod( const double pos[3], double *phi, double *h, double *lambda ){
       sn = -1.0;
    }
 
-/* If the supplied position is on the polar axis, the returned values are 
+/* If the supplied position is on the polar axis, the returned values are
    trivial. We check this case because it corresponds to a singularity in
    the main algorithm. */
    r = sqrt( pos[ 0 ]*pos[ 0 ] + pos[ 1 ]*pos[ 1 ] );
@@ -116,7 +116,7 @@ void smf_geod( const double pos[3], double *phi, double *h, double *lambda ){
       *phi = M_PI_2;
       *h = pos[ 2 ] - sn*b0;
 
-   } else {   
+   } else {
 
 /* The longitude is simple. */
       *lambda = atan2( pos[ 1 ], pos[ 0 ] );

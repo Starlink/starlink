@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_dump_smfData( const smfData *data, int showflags, int *status ) 
+*     smf_dump_smfData( const smfData *data, int showflags, int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -30,7 +30,7 @@
 *     presence is reported. The showflags parameter may be used to
 *     show AST objects.
 
-*  Notes: 
+*  Notes:
 *     - Use of showflags is not implemented yet.
 *     - Does not query contents of smfDream
 

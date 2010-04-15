@@ -29,7 +29,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       READ (ICHAN,ERR=800,END=800) CATRUN,GRID,CHOOSE,SQUARE,COLOUR,
      :      QEBOX,IDENTS
       READ (ICHAN) IND,IPRINT,ICAT1,NCH,JCAT,MAXNUM,NUM

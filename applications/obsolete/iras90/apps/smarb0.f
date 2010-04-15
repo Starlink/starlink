@@ -32,7 +32,7 @@
 *     X( NPNT ), Y( NPNT ) = DOUBLE PRECISION (Given)
 *        The image coordinates of the positions to be marked.
 *     MXMNSZ( 2 ) = REAL (Given)
-*        The max and min mark size. 
+*        The max and min mark size.
 *     MKSIZ( NPNT ) = REAL (Returned)
 *        The calculated size of all markers.
 *     STATUS = INTEGER (Given and Returned)
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,7 +103,7 @@
 *  If the max value and the min value are the same, the image values on
 *  these positions are a constant. Set the marker size for these point
 *  as the median size.
-      IF ( ( IMGMAX - IMGMIN ) .LE. VAL__SMLR ) THEN         
+      IF ( ( IMGMAX - IMGMIN ) .LE. VAL__SMLR ) THEN
          DO I = 1, NPNT
             MKSIZ( I ) = 0.5 * ( MXMNSZ( 2 ) + MXMNSZ( 1 ) )
          END DO
@@ -129,5 +129,5 @@
             END IF
          END DO
       END IF
-      
+
       END

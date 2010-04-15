@@ -11,20 +11,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_RDLST( PARAM, CURFRM, IWCS, NPOS, NAX, IPPOS, IPID, TITLE, 
+*     CALL KPG1_RDLST( PARAM, CURFRM, IWCS, NPOS, NAX, IPPOS, IPID, TITLE,
 *                      NAME, STATUS )
 
 *  Description:
 *     This routine reads a FrameSet, and a set of positions with
 *     associated integer identifiers from a CAT catalogue. The FrameSet
 *     should be stored as an AST Dump in the textual information associated
-*     with the catalogue. Such catalogues can be created using KPG1_WRLST. 
+*     with the catalogue. Such catalogues can be created using KPG1_WRLST.
 *     If the catalogue does not contain a FrameSet, then a default
-*     FrameSet will be used if possible. If the catalogue contains 
+*     FrameSet will be used if possible. If the catalogue contains
 *     floating point columns named RA and DEC, then the default FrameSet
 *     contains a single SkyFrame (Epoch and Equinox are set from the
 *     EPOCH and EQUINOX catalogue parameters - if they exist). Otherwise,
-*     if the catalogue contains floating point columns named X and Y, then 
+*     if the catalogue contains floating point columns named X and Y, then
 *     the default FrameSet contains a single 2D Frame with axis symbols X
 *     and Y, and Domain GRID. If there is also a column named Z, then
 *     the Frame will be 3D, with a Z axis.
@@ -39,12 +39,12 @@
 *     Frame index. An error is reported if no Frame has a set of
 *     corresponding columns.
 *
-*     It is assumed that position identifiers are stored in an integer column 
+*     It is assumed that position identifiers are stored in an integer column
 *     with name PIDENT. If no such column is found, the returned position
 *     identifiers start at 1 and increase monotonically.
 *
 *     The routine KPG1_RDTAB is like KPG1_RDLST, but provides an extra
-*     option to return a group of position labels read from a LABEL column 
+*     option to return a group of position labels read from a LABEL column
 *     in the catalogue.
 
 *  Arguments:
@@ -52,7 +52,7 @@
 *        The name of the parameter to use.
 *     CURFRM = LOGICAL (Given)
 *        If .TRUE. the positions read from the catalogue are Mapped
-*        into the Current Frame of the associated FrameSet before being 
+*        into the Current Frame of the associated FrameSet before being
 *        returned. Otherwise, they are returned in the Base Frame.
 *     IWCS = INTEGER (Returned)
 *        An AST pointer to the FrameSet read from the catalogue.
@@ -64,7 +64,7 @@
 *        A pointer to a 2-dimensional DOUBLE PRECISION array holding the
 *        returned positions. Element (I,J) of this array gives axis J for
 *        position I. The first axis will have NPOS elements, and the
-*        second will have NAX elements. Should be released using PSX_FREE 
+*        second will have NAX elements. Should be released using PSX_FREE
 *        when no longer needed.
 *     IPID = INTEGER (Returned)
 *        A pointer to a 1-dimensional INTEGER array holding the integer
@@ -88,12 +88,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -120,7 +120,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,7 +149,7 @@
 
 *  Call KPG1_RDTAB to do the work.
       LABS = GRP__NOID
-      CALL KPG1_RDTAB( PARAM, CURFRM, LABS, IWCS, NPOS, NAX, IPPOS, 
+      CALL KPG1_RDTAB( PARAM, CURFRM, LABS, IWCS, NPOS, NAX, IPPOS,
      :                 IPID, TITLE, NAME, STATUS )
 
 *  Delete any unwanted labels group.

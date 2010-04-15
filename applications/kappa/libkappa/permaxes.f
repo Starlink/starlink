@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application re-orders the pixel axes of an NDF, together with
-*     all related information (AXIS structures, and the axes of all 
+*     all related information (AXIS structures, and the axes of all
 *     co-ordinate Frames stored in the WCS component of the NDF).
 
 *  Usage:
@@ -33,12 +33,12 @@
 *     OUT = NDF (Write)
 *        The output NDF data structure.
 *     PERM() = _INTEGER (Read)
-*        A list of integers defining how the pixel axes are to be 
+*        A list of integers defining how the pixel axes are to be
 *        permuted.  The list must contain one element for each pixel
-*        axis in the NDF.  The first element is the index of the pixel 
-*        axis within the input NDF which is to become axis 1 in the 
-*        output NDF.  The second element is the index of the pixel axis 
-*        within the input NDF which is to become axis 2 in the output 
+*        axis in the NDF.  The first element is the index of the pixel
+*        axis within the input NDF which is to become axis 1 in the
+*        output NDF.  The second element is the index of the pixel axis
+*        within the input NDF which is to become axis 2 in the output
 *        NDF, etc.  Axes are numbered from 1.
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
@@ -51,16 +51,16 @@
 *     permaxes a b [3,1,2]
 *        Creates a new three-dimensional NDF called "b" in which axis 1
 *        corresponds to axis 3 in the input three-dimensional NDF called
-*        "a", axis 2 corresponds to input axis 1, axis 3 corresponds to 
-*        input axis 2. 
+*        "a", axis 2 corresponds to input axis 1, axis 3 corresponds to
+*        input axis 2.
 
 *  Notes:
 *     - If any WCS co-ordinate Frame has more axes then the number of
 *     pixel axes in the NDF, then the high numbered surplus axes in the
 *     WCS Frame are left unchanged.
 *     - If any WCS co-ordinate Frame has fewer axes then the number of
-*     pixel axes in the NDF, then the Frame is left unchanged if the 
-*     specified permutation would change any of the high numbered 
+*     pixel axes in the NDF, then the Frame is left unchanged if the
+*     specified permutation would change any of the high numbered
 *     surplus pixel axes.  A warning message is issued if this occurs.
 
 *  Related Applications:
@@ -77,9 +77,9 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. 
-*     Copyright (C) 2006 Particle Physics & Astronomy Research 
-*     Council. 
+*     Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research
+*     Council.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -118,7 +118,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,9 +143,9 @@
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the NDF array
       CHARACTER TYPE*( NDF__SZTYP ) ! Array component numeric type
       CHARACTER VALUE*80         ! Axis character component value
-      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Matrix 
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Matrix
                                  ! component of linear mapping
-      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of 
+      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of
                                  ! linear mapping
       INTEGER DIM( NDF__MXDIM )  ! Input NDF dimension sizes
       INTEGER DIMO( NDF__MXDIM ) ! Output NDF dimension sizes
@@ -170,7 +170,7 @@
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NERR               ! Number of numerical errors
       INTEGER PERM( NDF__MXDIM ) ! Axis permutation array
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds in input 
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds in input
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds in output
       LOGICAL BAD                ! Bad-pixel flag
       LOGICAL THERE              ! Component is defined?
@@ -194,8 +194,8 @@
 
 *  Get the axis permutation array.
       PERM( 1 ) = -1
-      CALL PAR_GDR1I( 'PERM', NDIM, PERM, 1, NDIM, .FALSE., PERM, 
-     :                STATUS ) 
+      CALL PAR_GDR1I( 'PERM', NDIM, PERM, 1, NDIM, .FALSE., PERM,
+     :                STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -227,7 +227,7 @@
       CALL LPG_PROP( INDF1, 'Units', 'OUT', INDF2, STATUS )
 
 *  Set the bounds of the output NDF.
-      CALL NDF_SBND( NDIM, LBNDO, UBNDO, INDF2, STATUS ) 
+      CALL NDF_SBND( NDIM, LBNDO, UBNDO, INDF2, STATUS )
 
 *  Process the main NDF array components.
 *  =====================================
@@ -241,50 +241,50 @@
 
 *  Determine if the input array is defined.
          CALL NDF_STATE( INDF1, COMP( ICOMP ), THERE, STATUS )
-      
+
 *  If so, then determine its numeric type and map the input and output
 *  arrays for access using this type.
-         IF ( THERE ) THEN      
+         IF ( THERE ) THEN
             CALL NDF_TYPE( INDF1, COMP( ICOMP ), TYPE, STATUS )
-            CALL NDF_MAP( INDF1, COMP( ICOMP ), TYPE, 'READ', IP1, 
+            CALL NDF_MAP( INDF1, COMP( ICOMP ), TYPE, 'READ', IP1,
      :                     EL, STATUS )
-            CALL NDF_MAP( INDF2, COMP( ICOMP ), TYPE, 'WRITE', IP2, 
+            CALL NDF_MAP( INDF2, COMP( ICOMP ), TYPE, 'WRITE', IP2,
      :                     EL, STATUS )
 
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
             IF ( TYPE .EQ. '_BYTE' ) THEN
-               CALL KPS1_PRMXB( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXB( NDIM, DIM, DIMO, PERM,
      :                          %VAL( CNF_PVAL( IP1 ) ),
      :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-               CALL KPS1_PRMXUB( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXUB( NDIM, DIM, DIMO, PERM,
      :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_PRMXD( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXD( NDIM, DIM, DIMO, PERM,
      :                          %VAL( CNF_PVAL( IP1 ) ),
      :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL KPS1_PRMXI( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXI( NDIM, DIM, DIMO, PERM,
      :                          %VAL( CNF_PVAL( IP1 ) ),
      :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_PRMXR( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXR( NDIM, DIM, DIMO, PERM,
      :                          %VAL( CNF_PVAL( IP1 ) ),
      :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL KPS1_PRMXW( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXW( NDIM, DIM, DIMO, PERM,
      :                          %VAL( CNF_PVAL( IP1 ) ),
      :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-               CALL KPS1_PRMXUW( NDIM, DIM, DIMO, PERM, 
+               CALL KPS1_PRMXUW( NDIM, DIM, DIMO, PERM,
      :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ), STATUS )
             END IF
@@ -299,7 +299,7 @@
 *  array unless its storage format is primitive.
             ELSE
                CALL NDF_FORM( INDF2, COMP( ICOMP ), FORM, STATUS )
-               CALL NDF_BAD( INDF1, COMP( ICOMP ), .FALSE., BAD, 
+               CALL NDF_BAD( INDF1, COMP( ICOMP ), .FALSE., BAD,
      :                       STATUS )
                IF ( FORM .NE. 'PRIMITIVE' ) THEN
                   CALL NDF_SBAD( BAD, INDF2, COMP( ICOMP ), STATUS )
@@ -326,10 +326,10 @@
 
 *  Determine if the input axis array is defined.
             CALL NDF_ASTAT( INDF1, ACOMP( ICOMP ), IDIM, THERE, STATUS )
-      
+
 *  If so, then determine its numeric type and map the input and output
 *  axis arrays for access using this type.
-            IF ( THERE ) THEN      
+            IF ( THERE ) THEN
                CALL NDF_ATYPE( INDF1, ACOMP( ICOMP ), IDIM, TYPE,
      :                         STATUS )
                CALL NDF_AMAP( INDF1, ACOMP( ICOMP ), IDIM, TYPE, 'READ',
@@ -340,38 +340,38 @@
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
                IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                   CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
-     :                             %VAL( CNF_PVAL( IP2 ) ), 
+     :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
- 
+
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                   CALL VEC_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
-     :                             %VAL( CNF_PVAL( IP2 ) ), 
+     :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
 
                END IF
@@ -388,17 +388,17 @@
          DO ICOMP = 1, 2
 
 *  Determine if the input component is defined.
-            CALL NDF_ASTAT( INDF1, ACCOMP( ICOMP ), IDIM, THERE, 
+            CALL NDF_ASTAT( INDF1, ACCOMP( ICOMP ), IDIM, THERE,
      :                      STATUS )
-      
-*  If so, then copy it to the output  Note that NDF_ACPUT does not 
+
+*  If so, then copy it to the output  Note that NDF_ACPUT does not
 *  truncate trailing blanks.
-            IF ( THERE ) THEN      
-               CALL NDF_ACGET( INDF1, ACCOMP( ICOMP ), IDIM, VALUE, 
-     :                         STATUS ) 
+            IF ( THERE ) THEN
+               CALL NDF_ACGET( INDF1, ACCOMP( ICOMP ), IDIM, VALUE,
+     :                         STATUS )
                NC = CHR_LEN( VALUE )
-               CALL NDF_ACPUT( VALUE( :NC ), INDF2, ACCOMP( ICOMP ), I, 
-     :                         STATUS ) 
+               CALL NDF_ACPUT( VALUE( :NC ), INDF2, ACCOMP( ICOMP ), I,
+     :                         STATUS )
             END IF
 
          END DO
@@ -407,7 +407,7 @@
 
 *  Propagate the WCS component.
 *  ============================
-*  Set up a matrix and offset vector describing the linear mapping from 
+*  Set up a matrix and offset vector describing the linear mapping from
 *  input pixel co-ordinates to output pixel co-ordinates.  First of all
 *  set the matrix and vector to a unit transformation.
       DO I = 1, NDIM*NDIM
@@ -426,7 +426,7 @@
 *  GRID Frame).  To do this make each Frame in the frameSet current in
 *  turn and then permute the axes of the FrameSet using AST_PERMAXES.
 *  Doing it this way (rather than simply getting a pointer to each Frame
-*  and using AST_PERMAXES on the Frame) is better because the FrameSet 
+*  and using AST_PERMAXES on the Frame) is better because the FrameSet
 *  class includes code for automatically modifying the Mappings in the
 *  FrameSet to take account of any changes in the Frames properties
 *  ("integrity checking").  If we used AST_PERMAXES on the Frame instead
@@ -440,17 +440,17 @@
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
       IBASE = AST_GETI( IWCS, 'BASE', STATUS )
 
-*  Pad the permutation array with values which leave any surplus WCS 
+*  Pad the permutation array with values which leave any surplus WCS
 *  axes unchanged.
       DO I = NDIM + 1, NDF__MXDIM
          PERM( I ) = I
       END DO
 
 *  Find the lowest number of axes allowed in a WCS Frame for the
-*  permutation to be possible. This is just equal to the index of the 
+*  permutation to be possible. This is just equal to the index of the
 *  highest changed pixel axis.
       MINAX = 0
-      DO I = 1, NDIM 
+      DO I = 1, NDIM
          IF( PERM( I ) .NE. I ) THEN
             MINAX = I
          END IF
@@ -464,15 +464,15 @@
             CALL AST_SETI( IWCS, 'CURRENT', I, STATUS )
 
 *  Get the number of axes in the Frame.
-            NAX = AST_GETI( IWCS, 'NOUT', STATUS ) 
+            NAX = AST_GETI( IWCS, 'NOUT', STATUS )
 
-*  If there not enough WCS axes, issue a warning and do not permute the 
+*  If there not enough WCS axes, issue a warning and do not permute the
 *  axes.
             IF( NAX .LT. MINAX ) THEN
                DOM = AST_GETC( IWCS, 'DOMAIN', STATUS )
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETI( 'N', NAX )
-               IF( DOM .NE. ' ' ) THEN 
+               IF( DOM .NE. ' ' ) THEN
                   CALL MSG_SETC( 'D', DOM )
                   CALL MSG_OUT( 'PERMAXES_MSG1', 'WCS frame number ^I'//
      :                          '(^D) has only ^N axes and so cannot '//
@@ -485,7 +485,7 @@
 
 *  Otherwise, permute the order of the axes in the current Frame.
             ELSE
-               CALL AST_PERMAXES( IWCS, PERM, STATUS ) 
+               CALL AST_PERMAXES( IWCS, PERM, STATUS )
             END IF
 
          END IF

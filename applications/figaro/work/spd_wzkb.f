@@ -92,7 +92,7 @@
       INTEGER max_perm_ftrs      !Maximum number of active features
       REAL iden_ftr_position ( max_perm_ftrs ) !Identified feature positions
       REAL iden_ftr_wavelength ( max_perm_ftrs ) !Identified feature wavelengths
-      REAL start_wavelength      !Wavelength window start 
+      REAL start_wavelength      !Wavelength window start
       REAL end_wavelength        !Wavelength window end
       REAL min_dispersion        !Dispersion window  start
       REAL max_dispersion        !Dispersion window end
@@ -135,8 +135,8 @@
          ENDIF
       END DO
       IF ( min_id_wave .GT. 0.0 ) THEN
-         scale =     ( max_id_wave - min_id_wave ) / 
-     :               ( max_id_pos - min_id_pos ) 
+         scale =     ( max_id_wave - min_id_wave ) /
+     :               ( max_id_pos - min_id_pos )
          start_wavelength = min_id_wave - scale * min_id_pos
          end_wavelength = min_id_wave + scale * FLOAT ( nx )
          IF ( start_wavelength .GT. end_wavelength ) THEN
@@ -164,14 +164,14 @@
          end_wavelength = abs_max_wavelength
 
 *%    Else
-*hme  ELSE 
+*hme  ELSE
 
 *%       Estimate min/max dispersions using the wavelength window
 *%             and use if more stringent than what we have already
-*hme     est_min_dispersion = FLOAT ( nx ) * 0.5 / 
-*hme :                       ( end_wavelength - start_wavelength ) 
-*hme     est_max_dispersion = FLOAT ( nx ) * 4.0 / 
-*hme :                       ( end_wavelength - start_wavelength ) 
+*hme     est_min_dispersion = FLOAT ( nx ) * 0.5 /
+*hme :                       ( end_wavelength - start_wavelength )
+*hme     est_max_dispersion = FLOAT ( nx ) * 4.0 /
+*hme :                       ( end_wavelength - start_wavelength )
 *hme     min_dispersion = MAX ( est_min_dispersion , min_dispersion )
 *hme     max_dispersion = MIN ( est_max_dispersion , max_dispersion )
 
@@ -189,8 +189,8 @@
 *%       If feature is at a lower wavelength than start of window then
 *%          Set up feature list index search-start-point
 *%       Endif
-         IF ( ftr_list ( i ) .LE. start_wavelength ) 
-     :                              start_wavelength_index = i    
+         IF ( ftr_list ( i ) .LE. start_wavelength )
+     :                              start_wavelength_index = i
 
 *%       If end of window is at a higher wavelength than feature then
 *%       Endif

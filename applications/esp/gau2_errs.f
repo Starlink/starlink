@@ -18,7 +18,7 @@
       implicit none
       include 'SAE_PAR'
       include 'GAU_PAR'
-      
+
 *   Arguments
       integer gau2par(gau2len), status
 
@@ -27,7 +27,7 @@
 *   We need to pass a separate status variable to the msg_* routines.
       integer localstatus
 
-*   It _should_ be the case that 
+*   It _should_ be the case that
 *   (status.eq.sai__ok .eqv. gau2par(gau2status).eq.0).  We don't rely
 *   on this, but if it's not true, it suggests something has gone amiss
 *   elsewhere.
@@ -39,7 +39,7 @@
       endif
 
       errno = gau2par(gau2status)
-      
+
       if (errno .eq. 0) then
          status = sai__ok
 
@@ -48,16 +48,16 @@
          call msg_out (' ', 'GAUFIT2: converged (^IV)', localstatus)
       else
          status = sai__error
-         
+
          call msg_out (' ', 'GAUFIT2: algorithm failed:', localstatus)
-         
+
          errinf = gau2par(gau2xstatus)
 
          if (errno .eq. gau2noconv) then
             call msg_out (' ', 'no convergence', localstatus)
          else if (errno .eq. gau2maxiter) then
             call msg_seti ('MXIT', errinf)
-            call msg_out (' ', 'too many iterations: max=^MXIT', 
+            call msg_out (' ', 'too many iterations: max=^MXIT',
      :           localstatus)
          else if (errno .eq. gau2unkerror) then
             call msg_seti ('CODE', errinf)
@@ -71,7 +71,7 @@
             call msg_out (' ', 'coding error no. ^CODE', localstatus)
          else
             call msg_seti ('CODE', errno)
-            call msg_out (' ', 'Unexpected error!! no. ^CODE', 
+            call msg_out (' ', 'Unexpected error!! no. ^CODE',
      :           localstatus)
          endif
 

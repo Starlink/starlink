@@ -46,10 +46,10 @@
 *        Placing NEWVAL on the command line permits only one section
 *        to be replaced.  If there are multiple replacements, a null
 *        value (!) terminates the loop. If the section being modified
-*        contains only a single pixel, then the original value of that 
-*        pixel is used as the suggested default value. 
+*        contains only a single pixel, then the original value of that
+*        pixel is used as the suggested default value.
 *     OLDVAL = LITERAL (Write)
-*        If the section being modified contains only a single pixel, then 
+*        If the section being modified contains only a single pixel, then
 *        the original value of that pixel is written out to this output
 *        parameter.
 *     OUT = NDF (Write)
@@ -90,7 +90,7 @@
 *        the output NDF called zzcha_c.
 
 *  Related Applications:
-*     KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, REGIONMASK, SEGMENT, 
+*     KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, REGIONMASK, SEGMENT,
 *     SETMAGIC SUBSTITUTE, ZAPLIN; Figaro: CSET, ICSET, NCSET, TIPPEX.
 
 *  Implementation Status:
@@ -133,7 +133,7 @@
 *     1995 April 25 (MJC):
 *        Original NDF version.
 *     27-FEB-1998 (DSB):
-*        Use NUM_ functions to convert lower precision integer values to 
+*        Use NUM_ functions to convert lower precision integer values to
 *        _INTEGER when calling PAR_MIX0I.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
@@ -145,7 +145,7 @@
 *        Provide current pixel value as dynamic default for NEWVAL if section
 *        contains only 1 pixel.
 *     18-SEP-2007 (DSB):
-*        Correct formatting of bad values when using current pixel value as 
+*        Correct formatting of bad values when using current pixel value as
 *        dynamic default for NEWVAL.
 *     2008 May 1 (MJC):
 *        Fix bug affecting bad-value substitution for byte and word
@@ -240,14 +240,14 @@
      :                 'structure ^NDF', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  Obtain the numeric type of the NDF array component to be analysed.
       CALL NDF_TYPE( NDFI, COMP, TYPE, STATUS )
 
 *  Create the output NDF.
 *  ======================
 *  Obtain an output NDF and propagate the whole of the input NDF to it.
-      CALL LPG_PROP( NDFI, 'WCS,Data,Variance,Quality,Axis,Units', 
+      CALL LPG_PROP( NDFI, 'WCS,Data,Variance,Quality,Axis,Units',
      :               'OUT', NDFO, STATUS )
 
 *  Get the title for the output NDF.
@@ -308,7 +308,7 @@
 *  If the section contains only a single pixel, use its value as the
 *  default for the parameter.
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANR( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEANR( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          RVALUE, STATUS )
                IF( RVALUE .NE. VAL__BADR ) THEN
                   CALL CHR_RTOC( RVALUE, SUGDEF, NCHAR )
@@ -319,7 +319,7 @@
             END IF
 
 *  Get the replacement value.  The range depends on the processing data
-*  type.  
+*  type.
             CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR, VAL__MAXR,
      :                      'Bad', .FALSE., CVALUE, STATUS )
 
@@ -332,14 +332,14 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLR( RVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLR( RVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       STATUS )
 
 *  Double precision
 *  ----------------
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEAND( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEAND( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          DVALUE, STATUS )
                IF( DVALUE .NE. VAL__BADD ) THEN
                   CALL CHR_DTOC( DVALUE, SUGDEF, NCHAR )
@@ -361,14 +361,14 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLD( DVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLD( DVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       STATUS )
 
 *  Integer
 *  -------
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          IVALUE, STATUS )
                IF( IVALUE .NE. VAL__BADI ) THEN
                   CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
@@ -390,14 +390,14 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLI( IVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLI( IVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       STATUS )
 
 *  Byte
 *  ----
          ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          BVALUE, STATUS )
                IF( BVALUE .NE. VAL__BADB ) THEN
                   CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
@@ -408,8 +408,8 @@
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_BTOI( VAL__MINB ), 
-     :                      NUM_BTOI( VAL__MAXB ), 'Bad', .FALSE., 
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_BTOI( VAL__MINB ),
+     :                      NUM_BTOI( VAL__MAXB ), 'Bad', .FALSE.,
      :                      CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -422,14 +422,14 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       STATUS )
 
 *  Unsigned Byte
 *  -------------
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                           BVALUE, STATUS )
                IF( BVALUE .NE. VAL__BADUB ) THEN
                   CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
@@ -440,7 +440,7 @@
             END IF
 
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UBTOI( VAL__MINUB ),
-     :                      NUM_UBTOI( VAL__MAXUB ), 'Bad', .FALSE., 
+     :                      NUM_UBTOI( VAL__MAXUB ), 'Bad', .FALSE.,
      :                      CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -453,14 +453,14 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLUB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLUB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                        STATUS )
 
 *  Word
 *  ----
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                          WVALUE, STATUS )
                IF( WVALUE .NE. VAL__BADW ) THEN
                   CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
@@ -471,7 +471,7 @@
             END IF
 
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_WTOI( VAL__MINW ),
-     :                       NUM_WTOI( VAL__MAXW ), 'Bad', .FALSE., 
+     :                       NUM_WTOI( VAL__MAXW ), 'Bad', .FALSE.,
      :                       CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -484,14 +484,14 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       STATUS )
 
 *  Unsigned Word
 *  -------------
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
             IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+               CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                           WVALUE, STATUS )
                IF( WVALUE .NE. VAL__BADUW ) THEN
                   CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
@@ -501,7 +501,7 @@
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UWTOI( VAL__MINUW ),
-     :                      NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE., 
+     :                      NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE.,
      :                      CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -514,7 +514,7 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLUW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_FILLUW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                        STATUS )
          END IF
 

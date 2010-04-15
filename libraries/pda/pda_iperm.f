@@ -24,10 +24,10 @@
 *        The permutation. On exit this contains the inverse.
 
 *  References:
-*     "The Art of Computer Programming, Fundermental Algorithms Vol 1", 
+*     "The Art of Computer Programming, Fundermental Algorithms Vol 1",
 *     by Donald E. Knuth (Addison-Wesley).
 
-*  Notes: 
+*  Notes:
 *     The permutation must consist of positive integers.
 *
 *     The permutation inverse:
@@ -58,14 +58,14 @@
 
 *  Arguments Given:
       INTEGER N
-      
+
 *  Arguments Given and Returned:
       INTEGER X( N )
-      
+
 *  Local Variables:
       INTEGER M                 ! Number value processed.
       INTEGER I, J, K           ! Storage variables.
-      
+
 *.
 
 *  Initialise number of processed elements.
@@ -74,13 +74,13 @@
 *  Start main loop.
  2    CONTINUE
       I = X( M )
-      IF ( I .LT. 0 ) THEN 
+      IF ( I .LT. 0 ) THEN
 
 *  This one has already been done, skip change back to original
 *  sign and skip to next.
          X( M ) = -X( M )
          GO TO 6
-      ELSE IF ( M .EQ. I ) THEN 
+      ELSE IF ( M .EQ. I ) THEN
 
 *  Permutation fixed.
          GO TO 6
@@ -91,11 +91,11 @@
  4    CONTINUE
       J = X( I )
       X( I ) = -K
-      IF ( J .EQ. M ) THEN 
+      IF ( J .EQ. M ) THEN
 
 *  End of this cycle.
          X( M ) = I
-      ELSE 
+      ELSE
          K = I
          I = J
          GO TO 4
@@ -104,7 +104,7 @@
 *  Decrement number of processes elements.
  6    CONTINUE
       M = M - 1
- 
+
 *  Return to process more if not all done.
       IF ( M .GT. 0 ) GO TO 2
       END

@@ -5,7 +5,7 @@
 
 *    Description :
 *
-*     This routine multiplies each pixel of an input image 
+*     This routine multiplies each pixel of an input image
 *     by a scalar. The result goes into a new output image.
 *
 *    Invocation :
@@ -68,7 +68,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'
 
 *    Status :
@@ -118,7 +118,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the input structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get image dimensions
@@ -140,7 +140,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )

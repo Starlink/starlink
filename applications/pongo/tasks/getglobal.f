@@ -22,8 +22,8 @@
 *  Description:
 *     This routine gets the value of a global parameter. It is
 *     a standalone replacement for the ICL GETGLOBAL command. One
-*     significant difference is that this routine fails silently if 
-*     the requested variable doesn't exist, or the GLOBAL itself 
+*     significant difference is that this routine fails silently if
+*     the requested variable doesn't exist, or the GLOBAL itself
 *     doesn't exist. In these cases the result is set to 'not_set'.
 
 *  Usage:
@@ -94,7 +94,7 @@
       ELSE
          FNAME = FNAME( :CHR_LEN( FNAME ) ) // '/GLOBAL'
       END IF
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Default value is:
          VALUE = 'not_set'
@@ -106,17 +106,17 @@
 
 *  Check if the component exists.
             CALL DAT_THERE( FLOC, PARAM, EXISTS, STATUS )
-            IF ( EXISTS ) THEN 
+            IF ( EXISTS ) THEN
 
 *  Get a locator to it.
                CALL DAT_FIND( FLOC, PARAM, PLOC, STATUS )
 
 *  Get the type.
                CALL DAT_TYPE( PLOC, TYPE, STATUS )
-               IF ( TYPE .NE. 'ADAM_PARNAME' ) THEN 
+               IF ( TYPE .NE. 'ADAM_PARNAME' ) THEN
                   CALL DAT_PRIM( PLOC, PRIM, STATUS )
-                  IF ( PRIM ) THEN 
-                     CALL DAT_GET0C( PLOC, VALUE, STATUS ) 
+                  IF ( PRIM ) THEN
+                     CALL DAT_GET0C( PLOC, VALUE, STATUS )
                   END IF
                ELSE
 
@@ -130,7 +130,7 @@
 
 *  And close the file.
             CALL DAT_ANNUL( FLOC, STATUS )
-         ELSE 
+         ELSE
 
 *  Failed to open global file, so no value.
             CALL ERR_ANNUL( STATUS )

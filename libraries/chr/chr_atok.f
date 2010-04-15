@@ -16,8 +16,8 @@
 *     The given ASCII character token is converted to a single returned
 *     character in the machine's character set.  All
 *     non-printable ASCII characters are represented by their equivalent
-*     token strings. If no such ASCII character exists, the character 
-*     code 0 (the ASCII NUL character) is returned. The routine is intended 
+*     token strings. If no such ASCII character exists, the character
+*     code 0 (the ASCII NUL character) is returned. The routine is intended
 *     for the portable initialisation of unprintable characters.
 
 *  Arguments:
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,8 +93,8 @@
       INTEGER ASCVAL( MXTVAL )   ! Array of ASCII codes
 
 *  Local Data:
-      DATA ASCVAL /  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 
-     :              13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 
+      DATA ASCVAL /  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
+     :              13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
      :              26, 27, 28, 29, 30, 31, 32, 127 /
 
       DATA TOKVAL / 'NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK',
@@ -116,7 +116,7 @@
 
 *     The given string is a single character, so no token. Check that the
 *     given character is part of the ASCII character set.
-         IF ( LGT( TOKEN, CHAR( NUL ) ) 
+         IF ( LGT( TOKEN, CHAR( NUL ) )
      :       .AND. LLE( TOKEN, CHAR( DEL ) ) ) THEN
             CHR_ATOK = TOKEN
          END IF

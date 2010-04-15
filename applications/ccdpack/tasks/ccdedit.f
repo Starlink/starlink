@@ -45,9 +45,9 @@
 *     be specified as an expression. Forward and inverse transformations
 *     are required.
 *
-*     Invert transform inverts the sense of the transformation. 
+*     Invert transform inverts the sense of the transformation.
 *
-*     Note that TRANSFORM structures are no longer (since version 3) 
+*     Note that TRANSFORM structures are no longer (since version 3)
 *     widely used in CCDPACK, so the TRANSFORM-structure manipulation
 *     options of this command are unlikely to be very useful.
 
@@ -82,7 +82,7 @@
 *        information can be used to make other applications run more
 *        efficiently, and the lack of a classification may stop certain
 *        types of operation. See SUN/61 appendix B for details. Linear
-*        transformations are classified by this routine using the 
+*        transformations are classified by this routine using the
 *        FITTYPE parameter.
 *        [FALSE]
 *     FA-FZ = LITERAL (Read)
@@ -100,12 +100,12 @@
 *           PA > 100D0
 *           FB > SQRT(XX*XX+YY*YY)
 *     FITTYPE = _INTEGER (Read)
-*        The type of fit specified by coefficients supplied via the 
+*        The type of fit specified by coefficients supplied via the
 *        TR parameter. Appropriate values are.
 *           - 1 -- shift of origin
 *           - 2 -- shift of origin and rotation
 *           - 3 -- shift of origin and magnification
-*           - 4 -- shift of origin, rotation and magnification 
+*           - 4 -- shift of origin, rotation and magnification
 *                  (solid body)
 *           - 5 -- a full six parameter fit
 *
@@ -117,7 +117,7 @@
 *        whether the CCD_SET coordinate frame should be removed from
 *        the World Coordinate System etension of the NDF as well.
 *        Since CCD_SET coordinates are usually a copy of another
-*        coordinate system, and mainly intended for Set-related 
+*        coordinate system, and mainly intended for Set-related
 *        registration, it is usually sensible to erase this coordinate
 *        frame when the rest of the Set header information has
 *        been erased.
@@ -128,16 +128,16 @@
 *        separated by commas and may include wildcards.
 *     INLIST = LITERAL (Read)
 *        A list specifying one or more position list names (only used
-*        if MODE = "ALIST" ). If a single name is given then this 
-*        position list will be associated with all the input NDFs. If 
-*        a list of names is given then there should be as many names 
-*        as input NDFs. The order of the input NDF names is shown so 
+*        if MODE = "ALIST" ). If a single name is given then this
+*        position list will be associated with all the input NDFs. If
+*        a list of names is given then there should be as many names
+*        as input NDFs. The order of the input NDF names is shown so
 *        that the correct correspondence may be achieved.
 *
 *        Position list names may NOT include wildcards. So a comma
 *        separated list of explicit names should be used and/or the
 *        names should be read from indirection files (the indirection
-*        indicator is "^"). 
+*        indicator is "^").
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -174,7 +174,7 @@
 *        (this sets the "CURRENT_LIST" item).  This is useful when
 *        importing position lists generated externally to CCDPACK.
 *
-*        The "ERASE" option removes a named item from NDF extensions. 
+*        The "ERASE" option removes a named item from NDF extensions.
 *        Two possible items are "CURRENT_LIST" and "SET".
 *
 *        The "TRANSFORM" option allows the generation or import of
@@ -203,7 +203,7 @@
 *        precisions?) using one reference. It also allows easy
 *        modification of parameterised expressions (expressions say
 *        with an adjustable centre) provided the application has not
-*        been used in the interim. The parameter PI has a default 
+*        been used in the interim. The parameter PI has a default
 *        value of 3.14159265359D0. An example of using parameters is:
 *           XFOR > 'XX=SQRT(FX*FX+FY*FY)'
 *           YFOR > 'YY=ATAN2D(-FY,FX)'
@@ -279,9 +279,9 @@
 *        equals sign.
 *     XINV = LITERAL (Read)
 *        If TRTYPE="EXPRES" is chosen then this parameter's value is
-*        the transformation that maps to the old X coordinate - the 
-*        inverse transformation of XFOR. The expression can contain 
-*        constants, arithmetic operators (+,-,/,*,**) and the 
+*        the transformation that maps to the old X coordinate - the
+*        inverse transformation of XFOR. The expression can contain
+*        constants, arithmetic operators (+,-,/,*,**) and the
 *        functions described in SUN/61 (SIN,COS,TAN, etc.).
 *
 *        Constants may be specified using the special tokens PA-PZ
@@ -315,9 +315,9 @@
 *        equals sign.
 *     YINV = LITERAL (Read)
 *        If TRTYPE="EXPRES" is chosen then this parameter's value is
-*        the transformation that maps to the old Y coordinate - the 
-*        inverse transformation of YFOR. The expression can contain 
-*        constants, arithmetic operators (+,-,/,*,**) and the 
+*        the transformation that maps to the old Y coordinate - the
+*        inverse transformation of YFOR. The expression can contain
+*        constants, arithmetic operators (+,-,/,*,**) and the
 *        functions described in SUN/61 (SIN,COS,TAN, etc.).
 *
 *        Constants may be specified using the special tokens PA-PZ.
@@ -347,7 +347,7 @@
 *        In this example the TRANSFORM structure in the CCDPACK
 *        extension of the NDF ndf_with_bad_transform is removed.
 *
-*     ccdedit mode=erase name=set fixwcs=yes in='*' 
+*     ccdedit mode=erase name=set fixwcs=yes in='*'
 *        All Set header information, and any CCD_SET coordinate
 *        frames which are associated with it, will be removed from
 *        the NDFs in the current directory.
@@ -404,10 +404,10 @@
 *     - When using the MODE=ALIST option the item CURRENT_LIST in the
 *       CCDPACK extension of the input NDFs is set to the name of the
 *       input list(s). Such NDF items may be used by other CCDPACK
-*       position list processing routines to automatically access 
+*       position list processing routines to automatically access
 *       these lists.
 *
-*     - When using the MODE=ERASE option the name of the item to be 
+*     - When using the MODE=ERASE option the name of the item to be
 *       erase is the name of the structure or primitive after the
 *       XXX.MORE.CCDPACK has been removed.
 *
@@ -478,7 +478,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -523,7 +523,7 @@
       LOGICAL CLASS( TRN__MXCLS ) ! Classifications
       LOGICAL EXISTS             ! Component exists
       LOGICAL HAVCLS             ! Have classification
-      LOGICAL HAVFIO             ! Have an FIO group      
+      LOGICAL HAVFIO             ! Have an FIO group
       LOGICAL RMSET              ! Remove Set info from WCS component?
 *.
 
@@ -546,7 +546,7 @@
 
 *  Get the basic operation mode.
       MODE = ' '
-      CALL PAR_CHOIC( 'MODE', ' ', 'ALIST,ERASE,TRANSFORM,INVERT', 
+      CALL PAR_CHOIC( 'MODE', ' ', 'ALIST,ERASE,TRANSFORM,INVERT',
      :                .FALSE., MODE, STATUS )
 
 *  Get a group of NDFs.
@@ -576,7 +576,7 @@
 *  User wants to associate position lists with NDFs. Get the name(s) of
 *  the position lists. If only one list is given then associate this
 *  with all the input NDFs. Otherwise we want as many lists as NDFs.
-         NTRY = 0 
+         NTRY = 0
  1       CONTINUE
          NTRY = NTRY + 1
          CALL CCD1_GTMLG( 'INLIST', NDFGRP, 1, NNDF, NLIST, FIOGRP,
@@ -589,7 +589,7 @@
 *  Whoops, try again. Annul the current group. See how many attempts
 *  we've had and then maybe try again.
                CALL CCD1_GRDEL( FIOGRP, STATUS )
-               IF ( NTRY .LE. 10 ) THEN 
+               IF ( NTRY .LE. 10 ) THEN
                   CALL MSG_SETI( 'NNDF', NNDF )
                   CALL MSG_OUT( ' ',
      :'  You must supply ^NNDF position list names (or just one)',
@@ -637,7 +637,7 @@
 *  Stop now if in error.
             IF ( STATUS .NE. SAI__OK ) GO TO 99
  2       CONTINUE
- 
+
 *=======================================================================
 *  Erase specified extension items.
 *=======================================================================
@@ -727,9 +727,9 @@
  3       CONTINUE
 
 *=======================================================================
-*  Put a transform into extensions. 
+*  Put a transform into extensions.
 *=======================================================================
-      ELSE IF ( MODE .EQ. 'TRANSFORM' ) THEN 
+      ELSE IF ( MODE .EQ. 'TRANSFORM' ) THEN
          CALL CCD1_MSG( ' ', '  Adding transformations to NDFs',
      :                  STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -738,7 +738,7 @@
 *  copy a transformation from a previous structure, create on using
 *  linear transformation coefficients or allow the user to specify the
 *  whole thing.
-         CALL PAR_CHOIC( 'TRTYPE', ' ', 'COEFF,EXPRES,STRUCT', 
+         CALL PAR_CHOIC( 'TRTYPE', ' ', 'COEFF,EXPRES,STRUCT',
      :                   .FALSE., TRTYPE, STATUS )
 
 *  Act on the various transformations.
@@ -801,7 +801,7 @@
             CALL PAR_GET0L( 'CLASSIFY', HAVCLS, STATUS )
 
 *  And get the user to classify it.
-            IF ( HAVCLS ) THEN 
+            IF ( HAVCLS ) THEN
                CALL PAR_CHOIV( 'CLASS', TRN__MXCLS,
      :                         'LINEAR,INDEPENDENT,DIAGONAL,'//
      :                         'ISOTROPIC,POSITIVE_DET,NEGATIVE_DET,'//
@@ -874,7 +874,7 @@
                LOCTR = DAT__NOLOC
                CALL TRN_NEW( 2, 2, FOR, INV, '_DOUBLE', 'CCDEDIT',
      :                       LOCEXT, 'TRANSFORM', LOCTR, STATUS )
-               IF ( STATUS .EQ. SAI__OK ) THEN 
+               IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Add classification.
                    IF ( HAVCLS ) THEN
@@ -889,7 +889,7 @@
      : ' variables and be of the form:', STATUS )
                    CALL ERR_REP( 'CCDEDIT_FORM1',
      : '    XX = func( X, Y ); YY = func( X, Y )', STATUS )
-                   CALL ERR_REP( 'CCDEDIT_FORM2', 
+                   CALL ERR_REP( 'CCDEDIT_FORM2',
      : '    X = func( XX, YY ); Y = func( XX, YY )', STATUS )
                END IF
             ELSE
@@ -910,7 +910,7 @@
 *  Stop now if in error.
             IF ( STATUS .NE. SAI__OK ) GO TO 98
  5       CONTINUE
-      
+
 
 *  Close down transform. Release input transform structure if accessed.
  98      CONTINUE
@@ -922,7 +922,7 @@
 *=======================================================================
 *  Invert transformations.
 *=======================================================================
-      ELSE IF ( MODE .EQ. 'INVERT' ) THEN 
+      ELSE IF ( MODE .EQ. 'INVERT' ) THEN
          CALL CCD1_MSG( ' ', '  Inverting NDF transformations',
      :                  STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -955,7 +955,7 @@
 *  Cannot locate transformation structure in this NDF.
                CALL MSG_SETC( 'NDF', NDFNAM )
                CALL CCD1_MSG( ' ', '  Cannot invert transformation'//
-     :         ' in NDF ^NDF (none present)', STATUS ) 
+     :         ' in NDF ^NDF (none present)', STATUS )
             END IF
 
 *  Close the NDF.
@@ -990,6 +990,6 @@
 
 *  Close log file.
       CALL CCD1_END( STATUS )
-      
+
       END
 * $Id$

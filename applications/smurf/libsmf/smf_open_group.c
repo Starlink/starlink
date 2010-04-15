@@ -109,7 +109,7 @@ void smf_open_group( const Grp * igrp, const dim_t refdims[],
 
   /* calculate size of group */
   nfiles = grpGrpsz( igrp, status );
-  
+
   for (i = 1; i <= nfiles; i++) {
     smfData *ifile = NULL;
     smf_open_file( igrp, i, "READ", 0, &ifile, status );

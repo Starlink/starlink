@@ -18,7 +18,7 @@
 
 *  Notes:
 *     Note that it is never necessary to build this test package; the
-*     presence of the source code as files which are syntactically correct 
+*     presence of the source code as files which are syntactically correct
 *     and (in some sense) representative of files found elsewhere in the
 *     Starlink source code collection is all that is required.
 
@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SCB_OUT2(o1, o2) printf("     %s %s\n", o1, o2) 
+#define SCB_OUT2(o1, o2) printf("     %s %s\n", o1, o2)
 
 int scb_test();
 int test_greet();

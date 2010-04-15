@@ -1,4 +1,4 @@
-/* 
+/*
  *+
  *  Name:
  *     ems1Form
@@ -35,10 +35,10 @@
  *        The global status.
 
  *  Algorithm:
- *     -  Parse the message text, TEXT, and copy it into OPSTR, making 
+ *     -  Parse the message text, TEXT, and copy it into OPSTR, making
  *     translations for token escapes.
  *     -  The message length is returned in OPLEN.
- 
+
  *  Notes:
  *     The code assumes "%" is the escape character to be doubled up in
  *     token values. This is done for simplicity and can easily be made
@@ -56,17 +56,17 @@
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     JRG: Jack Giddings (UCL)
  *     BDK: Dennis Kelly (ROE)
@@ -89,7 +89,7 @@
  *        Add 'maxlen' argument
  *        Remove 'param' argument
  *     13-AUG-2001 (AJC):
- *        #include stdlib.h and ems1.h 
+ *        #include stdlib.h and ems1.h
  *     23-FEB-2006 (TIMJ):
  *        Use starMem
  *     15-MAY-2008 (PWD):
@@ -99,7 +99,7 @@
  *        than checking for char < 32. Add argument to enable escaping
  *        of % characters in token values. Required for safe sprintf processing.
  *     {enter_further_changes_here}
- 
+
  *  Bugs:
  *     {note_any_bugs_here}
  */
@@ -118,7 +118,7 @@
 
 void ems1Form( const char *text, const int maxlen, Logical esctokval,
                Logical clean, char *opstr, int *oplen,
-               int *status __attribute__((unused)) ) 
+               int *status __attribute__((unused)) )
 {
     Logical literl;              /* Whether a literal token escape */
 
@@ -132,28 +132,28 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
     int tkvlen;                  /* TOKVAL length */
     int j;
     int i;
-    
+
     char namstr[ EMS__SZMSG + 1 ] = ""; /* Token name string */
     char tokval[ EMS__SZTOK + 1 ] = ""; /* Token value string */
     char tstr[EMS__SZTOK + 1 ];  /* Escaped token value temp string buffer */
     const char tokescval = '%';  /* Escape value to look for in token values */
     char *texbuf;                /* Ptr to temporary text buffer */
-    
+
     TRACE("ems1Form");
 
     /*  Initialise the returned message. */
     opstr[0] = '\0';
-    
+
     /*  Get the length of the given string. */
     texlen = strlen( text );
-    
+
     /*  Check for an empty string. */
     if ( texlen > 0 ) {
-        
+
         /*  Use a temporary text buffer which can be modified */
         texbuf = starMalloc( texlen + 1 );
         strcpy( texbuf, text );
-        
+
         /*  Initialise the text pointers and local status. */
         literl = FALSE;
         curpos = -1;
@@ -161,12 +161,12 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
         oppos = -1;
         lstat = SAI__OK;
         pstat = SAI__OK;
-        
+
         /*  Parse and expand the message text.
          *  DO WHILE loop.
          */
-        while ( pstat == SAI__OK && curpos < texlen ) { 
-            
+        while ( pstat == SAI__OK && curpos < texlen ) {
+
             /*  Find the next occurrence of an escape character. */
             ems1Gesc( EMS__TOKEC, texbuf, &curpos );
 
@@ -178,7 +178,7 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
                  */
                 ems1Putc( &texbuf[ lstpos+1 ], maxlen, opstr, &oppos, &pstat );
                 break;
-                
+
             } else {
                 /*  A token escape has been found, so check if it is a double
                  *  token escape.
@@ -198,7 +198,7 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
                     /*  Terminate the string to be copied at the escape */
                     if ( curpos - lstpos > 0 ) {
                         texbuf[ curpos ] = '\0';
-                        (void)ems1Putc( &texbuf[ lstpos+1 ], maxlen, opstr, 
+                        (void)ems1Putc( &texbuf[ lstpos+1 ], maxlen, opstr,
                                         &oppos, &pstat );
 
                         /*  Overwrite the terminator - actual character
@@ -234,7 +234,7 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
                           if ( esctokval ) {
                             j=0;
                             for ( i = 0; i < tkvlen; i++) {
-                              /* if we have found the escape char we 
+                              /* if we have found the escape char we
                                  insert an additional one */
                               if (tokval[i] == tokescval) {
                                 tstr[j] = tokescval;
@@ -258,7 +258,7 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
                         } else {
                             /*  The message token is not defined, so indicate
                              *  this in the message text. */
-                            ems1Putc( EMS__TOKEC, maxlen, opstr, &oppos, 
+                            ems1Putc( EMS__TOKEC, maxlen, opstr, &oppos,
                                       &pstat );
                             ems1Putc( "<", maxlen, opstr, &oppos, &pstat );
                             ems1Putc( namstr, maxlen, opstr, &oppos, &pstat );
@@ -281,7 +281,7 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
         }
         starFree( texbuf );
     }
-    
+
     /*  Get the length of the string and, if CLEAN is TRUE, ensure the
      *  returned message string contains no unprintable characters.
      */
@@ -301,6 +301,6 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
 
     /*  Clear the message token table. */
     ems1Ktok();
- 
+
     return;
 }

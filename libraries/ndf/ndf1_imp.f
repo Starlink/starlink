@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -261,11 +261,11 @@
 *  must later be deleted or because it resides in a temporary file
 *  which was previously opened with this access mode) then the DCB
 *  access mode entry will reflect this. If UPDATE access to the
-*  object's contents is not available through the existing DCB entry, then 
-*  modify the new DCB entry, since it will otherwise cause the NDF's 
-*  contents to be written back to the foreign file (with format conversion) 
+*  object's contents is not available through the existing DCB entry, then
+*  modify the new DCB entry, since it will otherwise cause the NDF's
+*  contents to be written back to the foreign file (with format conversion)
 *  when it is released.
-               IF( DCB_FOREX( IDCBT ) .AND. 
+               IF( DCB_FOREX( IDCBT ) .AND.
      :             DCB_MOD( IDCBT ) .EQ. 'READ' ) THEN
                   DCB_MOD( IDCB ) = 'READ'
                END IF

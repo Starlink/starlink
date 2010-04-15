@@ -50,7 +50,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,11 +113,11 @@
             EPcoldes(cd1,ca) = EPcoldes(cd1,cc)
             EPassert(cd1,ca) = EPassert(cd1,cc)
             EPdomchk(cd1,ca) = EPdomchk(cd1,cc)
-            EParrshp(cd1,ca) = EParrshp(cd1,cc) 
-            EPdatelm(cd1,ca) = EPdatelm(cd1,cc) 
-            EPnsflag(cd1,ca) = EPnsflag(cd1,cc) 
+            EParrshp(cd1,ca) = EParrshp(cd1,cc)
+            EPdatelm(cd1,ca) = EPdatelm(cd1,cc)
+            EPnsflag(cd1,ca) = EPnsflag(cd1,cc)
             EPnsformat(cd1,ca) = EPnsformat(cd1,cc)
-            EPhidden(cd1,ca) = EPhidden(cd1,cc) 
+            EPhidden(cd1,ca) = EPhidden(cd1,cc)
             EPorig(cd1,ca) = EPorig(cd1,cc)
             EParrdim(cd1,ca,1) = EParrdim(cd1,cc,1)
             EParrdim(cd1,ca,2) = EParrdim(cd1,cc,2)
@@ -133,9 +133,9 @@
             do nvccount = 1, EPnvcdep(cd1,ca)
               EPvcdep(cd1,ca,nvccount) = EPvcdep(cd1,cc,nvccount)
             enddo
-          endif 
+          endif
           ca = ca + 1
-        endif 
+        endif
       enddo
       CPnumcols(cd1) = ca - 1
 *

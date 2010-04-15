@@ -95,7 +95,7 @@ proc CCDInitialize { } {
 #      }
 #   }
 #
-#  And clear any existing values. 
+#  And clear any existing values.
    if { ! [info exists env(ADAM_USER)] } {
       set env(ADAM_USER) $env(HOME)/adam/
    }

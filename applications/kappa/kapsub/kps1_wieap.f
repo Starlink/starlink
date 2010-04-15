@@ -51,9 +51,9 @@
 *        Supplied holding the input image.  Returned holding the
 *        filtered input image.
 *     FILE_2( EL ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     FILE_6( EL ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -97,7 +97,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       LOGICAL BAD
       REAL WLIM
@@ -105,19 +105,19 @@
       INTEGER M
       INTEGER N
       REAL FILE_3( EL )
-      
+
 *  Arguments Given and Returned:
       REAL FILE_4( EL )
-      
+
 *  Arguments Returned:
       REAL FILE_2( EL )
       REAL FILE_6( EL )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Element count      
+      INTEGER I                  ! Element count
 
 *.
 
@@ -169,11 +169,11 @@
                FILE_4( I ) = VAL__BADR
             END IF
          END DO
-         
+
 *  Now perform the algorithm assuming there are no bad pixels in the
 *  supplied image.
       ELSE
-         
+
 *  Take the FFT of the input image, storing the FT back in the
 *  original file.  File 6 is used as work space.
          CALL KPG1_FFTFR( M, N, FILE_4, FILE_6, FILE_4, STATUS )

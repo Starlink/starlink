@@ -29,7 +29,7 @@
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statement, with call to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the CARRIAGECONTROL specifier is used which is 
+*        porting, as the CARRIAGECONTROL specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -53,7 +53,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *   This rather complicated OPEN statement is needed for the direct
 *   access which allows the corresponding subroutine PUTPARAMS
@@ -69,7 +69,7 @@
      :              .TRUE., 70, .FALSE., STATUS )
 
       IF (STATUS .NE. SAI__OK) RETURN
-      
+
       DO I=1,25
          READ (1,REC=I,FMT='(A70)') PARAMS(I)
       END DO

@@ -1,12 +1,12 @@
 
 *+  MOFFDCSUB - calculates d.c. sky offset between an image mosaic pair
 
-      SUBROUTINE MOFFDCSUB ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1, 
+      SUBROUTINE MOFFDCSUB ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1,
      :                       DIMSB2, XOFF, YOFF, DCOFF, STATUS )
 
 *    Description :
 *
-*     This routine calculates the d.c. sky offset between the two images of 
+*     This routine calculates the d.c. sky offset between the two images of
 *     a mosaic pair. The x,y spatial offset should have been located using
 *     MOFFXYSUB, and this routine assumes that the input x,y spatial offset
 *     input is correct. The value returned is the offset from the first to
@@ -21,7 +21,7 @@
 *    Parameters :
 *
 *     ARRAYA( DIMSA(1), DIMSA(2) )  =  REAL( READ )
-*         First input image 
+*         First input image
 *     DIMSA( 2 )  =  INTEGER( READ )
 *         Dimensions of first input image
 *     ARRAYB( DIMSB(1), DIMSB(2) )  =  REAL( READ )
@@ -190,7 +190,7 @@
          DCOFF  =  CURTOT / NUMVAL
 
       ELSE
-  
+
 *       none were so set mean offset to large number
          DCOFF  =  1.0E30
 

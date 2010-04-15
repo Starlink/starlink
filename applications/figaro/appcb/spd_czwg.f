@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_CVAL( 32 ) ), 
+     :                     STATUS, %VAL( CNF_CVAL( 32 ) ),
      :                     %VAL( CNF_CVAL( 32 ) ) )
          ELSE IF ( TYPE(2) .EQ. '_REAL' ) THEN
             CALL SPD_CZWJ( FILE, FU, NCOMP,
@@ -136,7 +136,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_CVAL( 32 ) ), 
+     :                     STATUS, %VAL( CNF_CVAL( 32 ) ),
      :                     %VAL( CNF_CVAL( 32 ) ) )
          ELSE
             WRITE( FU, 102 )
@@ -165,7 +165,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_CVAL( 32 ) ), 
+     :                     STATUS, %VAL( CNF_CVAL( 32 ) ),
      :                     %VAL( CNF_CVAL( 32 ) ) )
          ELSE IF ( TYPE(2) .EQ. '_REAL' ) THEN
             SHORT = ' '
@@ -177,7 +177,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_CVAL( 32 ) ), 
+     :                     STATUS, %VAL( CNF_CVAL( 32 ) ),
      :                     %VAL( CNF_CVAL( 32 ) ) )
          ELSE
             CALL MSG_OUT( 'SPD_CZWG_LIST',

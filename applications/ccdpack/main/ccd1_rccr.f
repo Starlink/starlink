@@ -135,7 +135,7 @@
 
 *  Calibration exposure time.
       CALL MSG_SETR( 'RCCR_EXPOSE', REAL( EXPOSE ) )
-      IF ( EXTEXP ) THEN 
+      IF ( EXTEXP ) THEN
          CALL CCD1_MSG( ' ',
      :'  Calibration exposure factor: ^RCCR_EXPOSE*', STATUS )
       ELSE
@@ -162,7 +162,7 @@
 *  And the saturation value.
       IF ( SETSAT ) THEN
          CALL MSG_SETR( 'RCAL_SATVAL', REAL( SATVAL ) )
-         IF ( EXTSAT ) THEN 
+         IF ( EXTSAT ) THEN
             CALL CCD1_MSG( ' ',
      :'  Saturation value           : ^RCAL_SATVAL*', STATUS )
          ELSE

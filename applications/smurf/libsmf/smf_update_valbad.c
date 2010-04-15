@@ -60,7 +60,7 @@
 *     2009-11-10 (EC):
 *       - handle iterative map-maker model components by supplying external
 *         quality array and dimensions
-*       - handle multiple data types 
+*       - handle multiple data types
 *     {enter_further_changes_here}
 
 *  Copyright:

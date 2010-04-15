@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CURDV( MAP, XC, YC, NDIM, LBND, UBND, COMP, IN, 
+      SUBROUTINE KPS1_CURDV( MAP, XC, YC, NDIM, LBND, UBND, COMP, IN,
      :                       IAT, LINE, STATUS )
 *+
 *  Name:
@@ -11,17 +11,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CURDV( MAP, XC, YC, NDIM, LBND, UBND, COMP, IN, 
+*     CALL KPS1_CURDV( MAP, XC, YC, NDIM, LBND, UBND, COMP, IN,
 *                      IAT, LINE, STATUS )
 
 *  Description:
-*     This routine formats the value of an array element for application 
-*     CURSOR. The position is supplied in GRAPHICS co-ordinates. It is mapped 
+*     This routine formats the value of an array element for application
+*     CURSOR. The position is supplied in GRAPHICS co-ordinates. It is mapped
 *     into PIXEL Frame before being used.
 
 *  Arguments:
 *     MAP = INTEGER (Given)
-*        A pointer to the Mapping from the supplied graphics position 
+*        A pointer to the Mapping from the supplied graphics position
 *        (XC, YC) to the PIXEL Frame.
 *     XC = REAL (Given)
 *        The X GRAPHICS co-ordinate.
@@ -78,11 +78,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER MAP
@@ -100,14 +100,14 @@
 
 *  Status:
       INTEGER STATUS            ! Global status
-      
+
 *  Local Variables:
       DOUBLE PRECISION GXY( 2 ) ! Graphics position
       DOUBLE PRECISION CXY( 2 ) ! PIXEL position
       INTEGER I                 ! Loop count
       INTEGER IV                ! Vectorised index into IN
-      INTEGER IX                ! Pixel index 
-      INTEGER STEP              ! Step between adjacent pixels on current axis 
+      INTEGER IX                ! Pixel index
+      INTEGER STEP              ! Step between adjacent pixels on current axis
       LOGICAL OUT               ! Is pixel outside bounds of IN?
 *.
 
@@ -128,9 +128,9 @@
       OUT = .FALSE.
 
       DO I = 1, NDIM
-         IX = INT( CXY( I ) ) 
+         IX = INT( CXY( I ) )
          IF( CXY( I ) .GE. 0 ) IX = IX + 1
-         
+
          IF( IX .LT. LBND( I ) .OR. IX .GT. UBND( I ) ) THEN
             OUT = .TRUE.
          ELSE

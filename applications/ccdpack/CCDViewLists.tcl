@@ -73,7 +73,7 @@
 #.
 
 #  Check that we have some variables to list.
-      if { $args != {} } { 
+      if { $args != {} } {
 
 #-----------------------------------------------------------------------------
 #  Widget creation
@@ -101,7 +101,7 @@
          pack $box -fill both -expand true
 
 #-----------------------------------------------------------------------------
-#  Fill the listbox with the names 
+#  Fill the listbox with the names
 #-----------------------------------------------------------------------------
 #  Loop for all items in the args list.
 	 foreach gvar $args {
@@ -109,16 +109,16 @@
 #  "Declare" the global variable.
 	    global $gvar
             if { [info exists $gvar] } {
-            
+
 #  Check if this is an array.
-               if { [array size $gvar] == 0  } { 
+               if { [array size $gvar] == 0  } {
 
 #  Isn't an array, just enter the list.
                   eval $Box insert end [eval split $$gvar]
-               } else { 
+               } else {
 
 #  Is an array process each index in turn as a list.
-                  foreach index [ array names $gvar ] { 
+                  foreach index [ array names $gvar ] {
                      eval $Box insert end [ eval split $$gvar($index) ]
                   }
                }
@@ -126,7 +126,7 @@
 	 }
       } else {
          CCDIssueInfo "No lists exist"
-      } 
+      }
 
 #  End of procedure.
    }

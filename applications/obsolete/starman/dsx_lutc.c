@@ -1,5 +1,5 @@
 /**********************************************************************
-   DSX_LUTC.C   
+   DSX_LUTC.C
 -
  Contains:-
 -
@@ -16,11 +16,11 @@
  DSXC_LUTSCA     Scale, shift color Look-up table for image display (XWindows)
  DSXC_LUTPAI     Paint a color in the LUT for image display (XWindows)
  DSXC_LUTPUT     Put a LUT into operation for image display (XWindows)
- DSXC_LUTBAR     Load/clear display of Look-up Table bar 
- DSXC_LUTBARL    Load 'background' of LUT bar 
- DSXC_LUTTRAN    Translate bar posn to LUT posn 
+ DSXC_LUTBAR     Load/clear display of Look-up Table bar
+ DSXC_LUTBARL    Load 'background' of LUT bar
+ DSXC_LUTTRAN    Translate bar posn to LUT posn
  DSXC_LUTLOAD    Load LUT into working LUT
- DSXC_LUTVGET    Copy 'LUT.INC' Fortran variables over in this C  
+ DSXC_LUTVGET    Copy 'LUT.INC' Fortran variables over in this C
  DSXC_LUTVPUT    Copy 'LUT.H' C variables over into Fortran vserionC
 */
 
@@ -65,7 +65,7 @@ char   TEXTAA[200];
                           PDSOPEN, DSNXS, DSNXE, DSNYS, DSNYE );
    (void) c_printo ( TEXTAA );
 */
-  
+
 /***********************************************************************
   DSX_LUTCOL -- Set up color Look-up table for image display - FORTRAN interface (Xwindows)
 
@@ -79,7 +79,7 @@ F77_SUBROUTINE(dsx_lutcol) (void)
 /* Cbegin */
 
        (void) dsxc_lutcol ( );
-     
+
 }
 
 
@@ -96,7 +96,7 @@ F77_SUBROUTINE(dsx_lutrot) (void)
 /* Cbegin */
 
        (void) dsxc_lutrot ( );
-     
+
 }
 
 
@@ -113,7 +113,7 @@ F77_SUBROUTINE(dsx_lutpai) (void)
 /* Cbegin */
 
        (void) dsxc_lutpai ( );
-     
+
 }
 
 
@@ -130,7 +130,7 @@ F77_SUBROUTINE(dsx_lutsca) (void)
 /* Cbegin */
 
        (void) dsxc_lutsca ( );
-     
+
 }
 
 
@@ -150,7 +150,7 @@ F77_SUBROUTINE(dsx_lutbar) ( INTEGER(kopt) )
 
       ka = *kopt;
       (void) dsxc_lutbar ( ka );
-     
+
 }
 
 
@@ -167,7 +167,7 @@ F77_SUBROUTINE(dsx_lutput) (void)
 /* Cbegin */
 
        (void) dsxc_lutput ( );
-     
+
 }
 
 
@@ -328,11 +328,11 @@ dsxc_lutrot (void)
                   if ( ja>=LVX ) ja = ja % (LVX-1);
                   ta[j] = LUTC_VAL[ja][k];
                }
-               for ( j=0 ; j<LVX ; j++ ) 
+               for ( j=0 ; j<LVX ; j++ )
                   LUTC_VAL[j][k] = ta[j] ;
             }
             (void) dsxc_lutvput();
-            (void) dsxc_lutput (); 
+            (void) dsxc_lutput ();
          }
 
       }
@@ -360,7 +360,7 @@ dsxc_lutsca (void)
 
 /* C-- */
 {
-      float rv; 
+      float rv;
       int istat, kb[3], kbut, kpx, kpy, kpxa, kpya, kdpx, kdpy;
       Bool loop;
 /* Cbegin */
@@ -374,7 +374,7 @@ dsxc_lutsca (void)
       (void) dsxc_pscur ( rv, 10.0 );						/*Set cursor on bar*/
 
       (void) dsxc_waitbut ( True, False, &kbut, &kpxa, &kpya );			/*Buttons up?*/
-                                                
+
       loop = True;
       while ( loop ) {
          (void) dsxc_waitbut ( True, True, &kbut, &kpxa, &kpya );		/*Button pressed?*/
@@ -396,7 +396,7 @@ dsxc_lutsca (void)
          }
 
          kdpx = kpx - kpxa;
-         kdpy = kpy - kpya; 
+         kdpy = kpy - kpya;
 
          if ( kbut==3 )
             loop = False;
@@ -448,7 +448,7 @@ dsxc_lutpai (void)
 /* C-- */
 {
       float  col[3], acol[3], rv;
-      int    j, istat, kb[3], kpx, kpy, kbut, js, je, 
+      int    j, istat, kb[3], kpx, kpy, kbut, js, je,
              kxss, kxse, kpxa;
       Bool   loop, loopmain;
 /* Cbegin */
@@ -494,7 +494,7 @@ dsxc_lutpai (void)
                (void) dsxc_getcurpb ( True, &kpx, &kpy, kb, &istat );
                kpx = imin(kxse,imax(kxss,kpx));
                if ( istat==0 ) {
-                  if ( (kb[0]==0) && (kb[1]==0) && (kb[2]==0) ) 
+                  if ( (kb[0]==0) && (kb[1]==0) && (kb[2]==0) )
                      loop = False;
                }
                if ( loop && (istat==0) && (kpx>kpxa) ) {
@@ -523,7 +523,7 @@ dsxc_lutpai (void)
                   (void) dsxc_lutput ();
                }
             }
-  
+
          }
 
       }
@@ -652,7 +652,7 @@ dsxc_lutbar ( kopt )
       }
       kyss = 0;
       kyse = 17;
-      kx = kxse - kxss + 1; 
+      kx = kxse - kxss + 1;
       ky = kyse - kyss + 1;
       kxcs = kxss + 2;
       kxce = kxse - 2;
@@ -743,7 +743,7 @@ dsxc_lutbarl ( im, kx, ky, xdu, xdd )
                   }
                }
             }
-         }       
+         }
       }
 
       if ( kb<ky ) {
@@ -798,11 +798,11 @@ dsxc_luttran ( rv, col, jm )
             en[0] = 0.0; en[1] = 0.0; en[2] = 0.0;
          }
       }else if ( LUTC_ENDS==3 ) {
-         st[0] = LUTC_VAL[0][0]; 
-         st[1] = LUTC_VAL[0][1]; 
+         st[0] = LUTC_VAL[0][0];
+         st[1] = LUTC_VAL[0][1];
          st[2] = LUTC_VAL[0][2];
-         en[0] = LUTC_VAL[LVX-1][0]; 
-         en[1] = LUTC_VAL[LVX-1][1]; 
+         en[0] = LUTC_VAL[LVX-1][0];
+         en[1] = LUTC_VAL[LVX-1][1];
          en[2] = LUTC_VAL[LVX-1][2];
       }
 
@@ -834,8 +834,8 @@ dsxc_luttran ( rv, col, jm )
             col[0] = en[0]; col[1] = en[1]; col[2] = en[2];
          }
       }else{
-          col[0] = LUTC_VAL[*jm-1][0]; 
-          col[1] = LUTC_VAL[*jm-1][1]; 
+          col[0] = LUTC_VAL[*jm-1][0];
+          col[1] = LUTC_VAL[*jm-1][1];
           col[2] = LUTC_VAL[*jm-1][2];
       }
 
@@ -975,7 +975,7 @@ dsxc_lutvput (void)
       F77_NAMED_COMMON(lutacom).lut_ze      = LUTC_ZE;
       F77_NAMED_COMMON(lutbcom).lut_flipped = LUTC_FLIPPED;
 
-      
+
       for ( k=0; k<=2; k++ ) {
          for ( j=0; j<=LVX-1; j++ ) {
             F77_NAMED_COMMON(lutacom).lut_val[k][j] = LUTC_VAL[j][k];

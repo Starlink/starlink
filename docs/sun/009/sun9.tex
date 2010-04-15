@@ -13,11 +13,11 @@
 \newcommand{\stardoctitle}     {\LaTeX \\ A Document Preparation System}
 \newcommand{\stardocversion}   {Version 2e}
 \newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {This is a guide to the \LaTeX\ 
-                                facilities available on Starlink. It gives a 
-                                brief description of how \LaTeX\ works. 
-                                It also tells how to display or print the 
-                                document, 
+\newcommand{\stardocabstract}  {This is a guide to the \LaTeX\
+                                facilities available on Starlink. It gives a
+                                brief description of how \LaTeX\ works.
+                                It also tells how to display or print the
+                                document,
                                 and how to include a PostScript file.}
 % ? End of document identification
 
@@ -50,7 +50,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -203,12 +203,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -252,22 +252,22 @@
 \section{\xlabel{introduction}\label{introduction}Introduction}
 
 \LaTeX\ is a system for typesetting documents.
-The style of the printed page is 
+The style of the printed page is
 controlled by using commands (\TeX\ macros) within the text of the document.
-The \texttt{latex} program interprets the commands and produces a 
+The \texttt{latex} program interprets the commands and produces a
 device-independent (dvi) file.
-A separate program then prints or displays the page on a variety of devices. 
+A separate program then prints or displays the page on a variety of devices.
 
 For further details about \TeX\ and \LaTeX, see the following:
 
 \begin{itemize}
-  \item \emph{\LaTeX\ A Document Preparation System --- 
-        User's Guide and Reference Manual}, 
+  \item \emph{\LaTeX\ A Document Preparation System ---
+        User's Guide and Reference Manual},
         by Leslie Lamport\cite{lamport}.
-  \item \emph{The \LaTeX Companion}, 
+  \item \emph{The \LaTeX Companion},
         by Michel Gossens, Frank Mittelbach, Alexander Samarin\cite{latexcomp}.
   \item \emph{The \TeX\ book}, by Donald Knuth\cite{texbook}.
-  \item \xref{SC/9: \emph{\LaTeX\ Cook-Book}}{sc9}{}, 
+  \item \xref{SC/9: \emph{\LaTeX\ Cook-Book}}{sc9}{},
         by Mike Lawden\cite{sc9}.
   \item \xref{SUN/93: \emph{\TeX\ --- A Superior document preparation system}}
         {sun93}{},
@@ -277,7 +277,7 @@ For further details about \TeX\ and \LaTeX, see the following:
 All of the above should be available at your site.
 For \LaTeX, the most useful are SC/9
 and the books by Lamport and by Gossens, \emph{et al}.
-Many \LaTeX-related documents can be accessed via the WWW page 
+Many \LaTeX-related documents can be accessed via the WWW page
 \emph{\TeX\ and \LaTeX\ on Starlink}:
 
 \begin{quote}
@@ -285,16 +285,16 @@ Many \LaTeX-related documents can be accessed via the WWW page
       {http://www.starlink.ac.uk/\~{}acc/tex/tex.html}
 \end{quote}
 
-If you intend to use \LaTeX\ to write Starlink documentation (such as SUNs), 
+If you intend to use \LaTeX\ to write Starlink documentation (such as SUNs),
 please read the following paper:
 \begin{itemize}
-  \item \xref{SGP/28: 
+  \item \xref{SGP/28:
          \emph{How to write good documents for Starlink}}{sgp28}{},
          by Mike Lawden\cite{sgp28}.
-  \item \xref{SGP/50: 
+  \item \xref{SGP/50:
          \emph{Starlink document styles}}{sgp50}{},
          by Mike Lawden\cite{sgp50}.
-  \item \xref{SUN/199: 
+  \item \xref{SUN/199:
          \emph{Star2HTML, Converting Starlink documents to hypertext}}{sun199}{},
          by Peter Draper\cite{sun199}.
 \end{itemize}
@@ -328,7 +328,7 @@ Copy it to your current directory:
 \begin{verbatim}
       % cp /usr/local/teTeX/texmf/tex/latex/base/sample2e.tex .
 \end{verbatim}
-Invoke \LaTeX\ to convert the source 
+Invoke \LaTeX\ to convert the source
 \texttt{.tex} file to the device independent \texttt{.dvi} file:
 \begin{verbatim}
       % latex sample2e
@@ -336,16 +336,16 @@ Invoke \LaTeX\ to convert the source
 The file extension is assumed to be \texttt{.tex}.
 This creates the file \texttt{sample2e.dvi}.
 
-To process the \texttt{.dvi} file for printing in PostScript mode, 
-use the \texttt{dvips} program:\footnote{Use \texttt{dvican sample2e} 
-for a Canon laser printer in native mode.} 
+To process the \texttt{.dvi} file for printing in PostScript mode,
+use the \texttt{dvips} program:\footnote{Use \texttt{dvican sample2e}
+for a Canon laser printer in native mode.}
 
 \begin{verbatim}
       % dvips sample2e
 \end{verbatim}
 
 The file extension is assumed to be \texttt{.dvi}.
-This creates the file \texttt{sample2e.ps}\footnote{\texttt{sample.dvi-can} 
+This creates the file \texttt{sample2e.ps}\footnote{\texttt{sample.dvi-can}
 if you used \texttt{dvican}}.
 
 To print the file:\footnote{\texttt{lpr -Pn sample2e.dvi-can} for a Canon laser
@@ -356,7 +356,7 @@ printer file.}
 
 \texttt{n} specifies the printer.
 
-After the document has been processed with \texttt{latex}, 
+After the document has been processed with \texttt{latex},
 there will be several additional files
 in your directory with the name \texttt{sample2e.nnn}:
 \begin{quote}
@@ -365,30 +365,30 @@ in your directory with the name \texttt{sample2e.nnn}:
 \end{quote}
 
 Files with other extensions may also be generated, depending upon what
-instructions are contained within the source file. 
+instructions are contained within the source file.
 All of these additional files may be deleted. However, it is best to keep them
 because future invocations of \texttt{latex} may use them.
 
-Always run \texttt{latex} from the directory in which the \texttt{.tex} file 
+Always run \texttt{latex} from the directory in which the \texttt{.tex} file
 resides. This enables \LaTeX\ most easily to find its auxiliary files.
 
 \subsection{\xlabel{latex_errors}\LaTeX\ Errors}
 \label{se:latexerrs}
 
-When \LaTeX\ encounters an error it reports the error, displays the problem 
-line, and prompts with a `\texttt{?}'.  
+When \LaTeX\ encounters an error it reports the error, displays the problem
+line, and prompts with a `\texttt{?}'.
 The simplest response is to either:
 
 \begin{itemize}
-  \item type a \texttt{$<$cr$>$} to cause \LaTeX\ to continue, 
-        improvising what it considers the optimum solution to the problem, or 
+  \item type a \texttt{$<$cr$>$} to cause \LaTeX\ to continue,
+        improvising what it considers the optimum solution to the problem, or
   \item type \texttt{x} to exit from \LaTeX.
 \end{itemize}
 
 See the \LaTeX\ manual\cite[sections 2.3 and 2.4 and Chapter 8]{lamport}
 for a discussion about how to handle errors.
 
-If you want to stop \LaTeX\ in the middle of its execution, 
+If you want to stop \LaTeX\ in the middle of its execution,
 type \texttt{<Ctrl-C>}. This will make \LaTeX\ stop as if it
 had encountered an ordinary error. Return to command level by typing \texttt{x}.
 
@@ -399,30 +399,30 @@ To use the spell utility for finding spelling errors in a \LaTeX\ input file:
       % ispell <filename>
 \end{verbatim}
 
-For details on how to use the \texttt{ispell} utility, type \texttt{man ispell}. 
+For details on how to use the \texttt{ispell} utility, type \texttt{man ispell}.
 
 \section{\xlabel{how_to_display_the_document}\label{how_to_display_the_document}How to Display the Document}
 
 \LaTeX\ produces files which are device-independent (dvi). To get a
-viewable or printable version, you must use a dvi previewer or translator 
+viewable or printable version, you must use a dvi previewer or translator
 program which can interpret the dvi code for the device you want to use:\footnote{
 \texttt{dvi2vdu} is a previewer for Pericom, Graphon and some VT terminals;
-                  there is help in the program and a 
+                  there is help in the program and a
     \htmladdnormallink{manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dviman.dvi}
     \cite{dvican}.
-\texttt{dvican} is a translator for Canon LBP-8II and LBP-8III Laser 
-                 printers in native Canon mode; see the 
+\texttt{dvican} is a translator for Canon LBP-8II and LBP-8III Laser
+                 printers in native Canon mode; see the
     \htmladdnormallink{manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dvitovdu.dvi}
-    \cite{dvi2vdu} 
+    \cite{dvi2vdu}
     for more information.}
 
 \begin{itemize}
-\item \texttt{xdvi} --- previewer for Xwindows terminals and Xworkstations; 
+\item \texttt{xdvi} --- previewer for Xwindows terminals and Xworkstations;
                      type \texttt{man xdvi} for more information.
 \item \texttt{dvips} --- translator for PostScript devices; type \texttt{man dvips}
-                  or see the 
+                  or see the
     \htmladdnormallink{dvips manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dvipsk.dvi}\cite{dvips}
     for more information.
@@ -430,7 +430,7 @@ program which can interpret the dvi code for the device you want to use:\footnot
 
 To save paper, if you have access to
 an Xwindows terminal or an Xworkstation\footnote{or a Pericom or Graphon
-graphics terminal}, you should use the dvi previewer. 
+graphics terminal}, you should use the dvi previewer.
 
 \subsection{\xlabel{xdvi}XDVI}
 \label{se:dvixdvi}
@@ -438,11 +438,11 @@ graphics terminal}, you should use the dvi previewer.
 \subsubsection{Setting the Display Device}
 
 The \verb+xdvi+ translator will work on Xterminals and Xworkstations.
-Usually, \verb+xdvi+ knows where to send its output, but sometimes it must 
-be told by using \xref{\texttt{xdisplay}}{sun129}{}\cite{sun129}.  
-This will interrogate your terminal and access method: 
+Usually, \verb+xdvi+ knows where to send its output, but sometimes it must
+be told by using \xref{\texttt{xdisplay}}{sun129}{}\cite{sun129}.
+This will interrogate your terminal and access method:
 \begin{verbatim}
-      % xdisplay 
+      % xdisplay
 \end{verbatim}
 or
 \begin{verbatim}
@@ -451,7 +451,7 @@ or
 You only need to do this once per session.
 
 For \texttt{xdisplay} to work properly you may need to authorize the remote
-workstation to open a window on the local workstation: 
+workstation to open a window on the local workstation:
 \begin{verbatim}
       % xhost +<workstation_name>
 \end{verbatim}
@@ -468,21 +468,21 @@ The command:
 \begin{verbatim}
       % xdvi <filename>
 \end{verbatim}
-creates a window on the default X-windows display and displays the first 
+creates a window on the default X-windows display and displays the first
 page of the file \texttt{<filename>.dvi}.
 
 It can show the file shrunk by various
 (integer) factors, and also has a ``magnifying glass'' which allows one
 to see a small part of the unshrunk image momentarily.
 
-\texttt{xdvi} has various buttons which can be used to select the page 
-being viewed and the magnification. There are also various 
-keystrokes which can be typed to control the display, \emph{e.g.}: 
+\texttt{xdvi} has various buttons which can be used to select the page
+being viewed and the magnification. There are also various
+keystrokes which can be typed to control the display, \emph{e.g.}:
 \begin{quote}
   \texttt{u} to move up the page \\
   \texttt{d} to move down the page \\
   \texttt{n} to go to the next page \\
-  \texttt{p} to go to the previous page \\ 
+  \texttt{p} to go to the previous page \\
   \texttt{q} to quit
 \end{quote}
 
@@ -490,7 +490,7 @@ Type \texttt{man xdvi} for more information.
 
 \subsubsection{Resource Names}
 
-Default values for the command line options may be set via the resource names 
+Default values for the command line options may be set via the resource names
 given in the descriptions of the options. To do this
 create a file \texttt{.Xdefaults} in your top level directory.
 Include in this file the resource names
@@ -516,7 +516,7 @@ Here are a few useful things you can do with \texttt{dvips}:
 
 $\bullet$ \textbf{Print at 600 dpi}
 
-Most PostScript printers print at 300dpi.  However, 
+Most PostScript printers print at 300dpi.  However,
 if your printer is capable of printing at 600dpi you can invoke it by:
 \begin{verbatim}
       % dvips -D 600 -Z <filename>
@@ -538,7 +538,7 @@ To print the fifth through tenth pages:
 
 $\bullet$ \textbf{Print in landscape mode}
 
-Use the \texttt{landscape} class option in the \texttt{.tex} file 
+Use the \texttt{landscape} class option in the \texttt{.tex} file
 to set the default margins correctly:
 
 \begin{verbatim}
@@ -552,27 +552,27 @@ Then invoke \texttt{dvips} as follows:
 \end{verbatim}
 
 For more information about \texttt{dvips} options, type \texttt{man dvips} or
-see the 
+see the
     \htmladdnormallink{dvips manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dvipsk.dvi}\cite[section 7, p. 26]{dvips}.
 
 \section{\xlabel{more_about_latex}\label{more_about_latex}More about \LaTeX}
 
-\subsection{\xlabel{document_classes}Document Classes: standard classes, 
+\subsection{\xlabel{document_classes}Document Classes: standard classes,
 proc, slides}
 \label{se:dstyle}
 
 $\bullet$ \\textbf{Standard Classes}
 
 \LaTeX\ provides the following standard document classes:
-\texttt{article, book, letter, report} and \texttt{slides}. 
+\texttt{article, book, letter, report} and \texttt{slides}.
 The \texttt{article} class is for short reports and is the standard class
-for Starlink documents.  
+for Starlink documents.
 You may specify class options for size of type, one or two-column formatting,
 \emph{etc}.
-Templates for producing the document in standard Starlink styles, 
-{\em e.g.} SUNs, SGPs, \emph{etc}. are stored in 
-\verb+/star/docs+ as \verb+sun.tex+, \verb+sgp.tex+, \verb+ssn.tex+ and 
+Templates for producing the document in standard Starlink styles,
+{\em e.g.} SUNs, SGPs, \emph{etc}. are stored in
+\verb+/star/docs+ as \verb+sun.tex+, \verb+sgp.tex+, \verb+ssn.tex+ and
 \verb+sg.tex+.
 
 If you use \LaTeX's default margin settings in your non-Starlink documents,
@@ -580,9 +580,9 @@ you should specify \texttt{a4paper} as a document-class option:
 \begin{verbatim}
       \documentclass[a4paper]{article}
 \end{verbatim}
-otherwise it will default to \texttt{letterpaper}, American quarto.  
-There has been much discussion about this on USENET News.  
-The conclusion seems to be that it has to default to 
+otherwise it will default to \texttt{letterpaper}, American quarto.
+There has been much discussion about this on USENET News.
+The conclusion seems to be that it has to default to
 something and no matter what is chosen a lot of people will be unhappy.
 
 $\bullet$ \\textbf{The \texttt{proc} Document Class}
@@ -595,10 +595,10 @@ by producing a blank footnote, so it is placed in the text of the first
 column.  It must go after any \hbox{\verb|\footnote|} command that
 generates a footnote in that column.
 
-\LaTeX\ automatically numbers the output pages.  It is a good idea 
+\LaTeX\ automatically numbers the output pages.  It is a good idea
 to identify the paper on each page of output.  Placing the following command
 in the preamble (before the \hbox{\verb|\begin{document}|} command)
-prints ``Jones---Foo'' at the bottom of each page:  
+prints ``Jones---Foo'' at the bottom of each page:
 
 \begin{verbatim}
       \markright{Jones---Foo}
@@ -606,18 +606,18 @@ prints ``Jones---Foo'' at the bottom of each page:
 
 $\bullet$ \\textbf{Slides}
 
-\SLITeX\ has been replaced by the \texttt{slides} document class, 
+\SLITeX\ has been replaced by the \texttt{slides} document class,
 which is accessed by specifying:
 
 \begin{verbatim}
       \documentclass{slides}
 \end{verbatim}
- 
+
 See the \LaTeX\ manual\cite{lamport} for more information.
-There are other ways of making 
+There are other ways of making
 \htmladdnormallink{slides}
 {http://www.starlink.ac.uk/\~{}acc/tex/packages.html#slides}.
-\begin{latexonly} See the 
+\begin{latexonly} See the
 WWW page mentioned in Section~\ref{introduction} more information.
 \end{latexonly}
 
@@ -625,11 +625,11 @@ WWW page mentioned in Section~\ref{introduction} more information.
 
 $\bullet$ \\textbf{Packages}
 
-An extensive range of 
+An extensive range of
 \htmladdnormallink{\LaTeX\ packages}
 {http://www.starlink.ac.uk/\~{}acc/tex/packages.html}
-is included in this release. 
-\begin{latexonly} See the 
+is included in this release.
+\begin{latexonly} See the
 WWW page mentioned in Section~\ref{introduction} more information.
 \end{latexonly}
 
@@ -643,39 +643,39 @@ Specify each package you use as follows:
 
 $\bullet$ \\textbf{BIBTeX}
 
-\BIBTeX\ produces a bibliography from databases of sources. 
-See the 
+\BIBTeX\ produces a bibliography from databases of sources.
+See the
 \htmladdnormallink{\BIBTeX\ manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/bibtex/base/btxdoc.dvi}\cite{bibtex} 
-and the \LaTeX\ manual\cite[Section 4.3.1 and Appendix B]{lamport}  
+{http://www.starlink.ac.uk/\~{}acc/tex/doc/bibtex/base/btxdoc.dvi}\cite{bibtex}
+and the \LaTeX\ manual\cite[Section 4.3.1 and Appendix B]{lamport}
 for more information.
 
 
 $\bullet$ \\textbf{MakeIndex}
 
 MakeIndex is a tool for making an index for a document.
-See the 
+See the
 \htmladdnormallink{MakeIndex manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/makeindex/makeindex.dvi}\cite{makeindex}  
+{http://www.starlink.ac.uk/\~{}acc/tex/doc/makeindex/makeindex.dvi}\cite{makeindex}
 for more information.
 
 \subsection{\xlabel{fonts}Fonts}
 \label{se:fonts}
 There are type sizes not
 obtainable by \LaTeX's size-changing commands with the ordinary
-document class options.  If you try to use a font 
-that is not available, \LaTeX\ will issue a warning and substitute a font of 
+document class options.  If you try to use a font
+that is not available, \LaTeX\ will issue a warning and substitute a font of
 the same size that is as close as possible in style to the one you wanted.
 
 Table~\ref{tab:styles} tells you what size of type is used for each
 \LaTeX\ type-size command in the various document-class options.  For
 example, with the \texttt{12pt} option, the \hbox{\verb|\large|}
-declaration causes \LaTeX\ to use 14-pt type.  
+declaration causes \LaTeX\ to use 14-pt type.
 
 \begin{table}[htb]
 \centering
 \begin{tabular}{l|r|r|r|}
-\multicolumn{1}{l}{size} & 
+\multicolumn{1}{l}{size} &
 \multicolumn{1}{c}{default (10pt)} &
         \multicolumn{1}{c}{11pt option}  &
         \multicolumn{1}{c}{12pt option}\\
@@ -710,8 +710,8 @@ How to Include a PostScript File in a \LaTeX\ Document}
 
 \subsection{\xlabel{creating_the_graphics_files}Creating the Graphics Files}
 
-When running the application program which creates your graphics, 
-specify the appropriate GKS workstation:\footnote{\texttt{canon\_ptex} and 
+When running the application program which creates your graphics,
+specify the appropriate GKS workstation:\footnote{\texttt{canon\_ptex} and
 \texttt{canon\_ltex} for Canon portrait and landscape.}
 
 \begin{quote}
@@ -719,30 +719,30 @@ specify the appropriate GKS workstation:\footnote{\texttt{canon\_ptex} and
   \texttt{epsf\_l} --- Encapsulated PostScript, landscape
 \end{quote}
 
-Note that the output from these workstations cannot be plotted directly on 
+Note that the output from these workstations cannot be plotted directly on
 the printer. Each new frame generates a separate file.
 
-Hint: The name of the output file will default to \texttt{gks74.ps}. 
+Hint: The name of the output file will default to \texttt{gks74.ps}.
 However, you can enter it at the time of specifying the GKS workstation:
 
 \begin{verbatim}
        epsf_p;graph.eps
 \end{verbatim}
 
-The output will then be in files \texttt{graph.eps}, 
+The output will then be in files \texttt{graph.eps},
 \texttt{graph.eps.1}, \texttt{graph.eps.2}, \emph{etc}.
 
-The \LaTeX\ graphics package contains options which allow you to 
-adjust the size of the figure. 
-However, you may change it within GKS by setting the workstation viewport to 
+The \LaTeX\ graphics package contains options which allow you to
+adjust the size of the figure.
+However, you may change it within GKS by setting the workstation viewport to
 the required size, bearing in mind that:
 
-\begin{itemize} 
-  \item GKS sets the graphics origin to the top left corner of the workstation 
+\begin{itemize}
+  \item GKS sets the graphics origin to the top left corner of the workstation
         viewport.
   \item The position of the viewport on the display surface is irrelevant.
-  \item With some high level graphics packages, setting the workstation 
-        viewport may interfere with the working of the package. 
+  \item With some high level graphics packages, setting the workstation
+        viewport may interfere with the working of the package.
 \end{itemize}
 
 You may change the size independently of GKS in any of the following ways:
@@ -757,49 +757,49 @@ You may change the size independently of GKS in any of the following ways:
 
 \subsection{\xlabel{preparing_the_postscript_file}\label{preparing_the_postscript_file}Preparing the PostScript File}
 
-If you have an Encapsulated PostScript (EPS) file (\texttt{.eps}), 
+If you have an Encapsulated PostScript (EPS) file (\texttt{.eps}),
 go on to section \ref{IncludePSFile}.
- 
-    Verify that your file has a \texttt{BoundingBox} line in 
-    the header or the footer. 
-    This line tells \LaTeX\ the size of the image to be included. 
-    If it is in the footer, move it to the header. 
 
-    If you do not have a \texttt{BoundingBox} but 
-    do have a simple one-page PostScript file,  
-    you can convert it to EPS by using 
-    the \texttt{ghostscript} program \texttt{ps2epsi}. 
-    For more information, see the 
+    Verify that your file has a \texttt{BoundingBox} line in
+    the header or the footer.
+    This line tells \LaTeX\ the size of the image to be included.
+    If it is in the footer, move it to the header.
+
+    If you do not have a \texttt{BoundingBox} but
+    do have a simple one-page PostScript file,
+    you can convert it to EPS by using
+    the \texttt{ghostscript} program \texttt{ps2epsi}.
+    For more information, see the
     \htmladdnormallink{EPS manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[section 3.1, p 7]{eps}.
-    If you are unable to use \texttt{ps2epsi}, you must determine what the 
-    \texttt{BoundingBox}  should be and add it by hand. For information see the 
+    If you are unable to use \texttt{ps2epsi}, you must determine what the
+    \texttt{BoundingBox}  should be and add it by hand. For information see the
     \htmladdnormallink{EPS manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[section 3.1, \#2, p 8]{eps}.
 
 \subsection{\xlabel{including_the_postscript_file}\label{includepsfile}Including the PostScript File\xlabel{IncludePSFile}
 \label{IncludePSFile}}
 
-The recommended method for including PostScript files in \LaTeX\ 
-documents is the \LaTeXe\ \texttt{graphicx} package, which 
+The recommended method for including PostScript files in \LaTeX\
+documents is the \LaTeXe\ \texttt{graphicx} package, which
 is enabled by the \verb+\usepackage+ command.
-Use the \verb+\includegraphics+ command to include the PostScript file. 
-For more information about the \texttt{graphicx} package, see the 
+Use the \verb+\includegraphics+ command to include the PostScript file.
+For more information about the \texttt{graphicx} package, see the
 \htmladdnormallink{graphics manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/grfguide.ps}\cite[section 4, pp 6-14]{graphics}, 
-and the 
+{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/grfguide.ps}\cite[section 4, pp 6-14]{graphics},
+and the
 \htmladdnormallink{EPS manual}
 {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part I, section 1,  p 5]{eps}.
 
-Allow the image to float to the next page if it does not fit on the 
-current page by placing the \verb+\includegraphics+ command inside a 
+Allow the image to float to the next page if it does not fit on the
+current page by placing the \verb+\includegraphics+ command inside a
 \texttt{figure} environment.
-For more information about the \texttt{figure} environment, see the \LaTeX\ 
-manual\cite[section 3.5.1]{lamport} and the 
+For more information about the \texttt{figure} environment, see the \LaTeX\
+manual\cite[section 3.5.1]{lamport} and the
 \htmladdnormallink{EPS manual}
 {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 10, p 36]{eps}.
 
-Centre the image by preceding the \verb+\includegraphics+ command with 
+Centre the image by preceding the \verb+\includegraphics+ command with
 \verb+\centering+.
 
     \begin{verbatim}
@@ -814,16 +814,16 @@ Centre the image by preceding the \verb+\includegraphics+ command with
     \end{verbatim}
 
 Specifying \texttt{draft} as an option to the \texttt{graphicx} package,
-prints the filename in a box of the correct size. This can save time 
-when writing the document:  
+prints the filename in a box of the correct size. This can save time
+when writing the document:
 
     \begin{verbatim}
       \documentclass{article}
       \usepackage[draft]{graphicx}
     \end{verbatim}
 
-You can specify a scale factor, angle of rotation, image width, and/or 
-image height within the \verb+\includegraphics+ command, for example: 
+You can specify a scale factor, angle of rotation, image width, and/or
+image height within the \verb+\includegraphics+ command, for example:
     \begin{verbatim}
       \includegraphics[scale=0.5]{<filename>}
       \includegraphics[angle=45]{<filename>}
@@ -831,7 +831,7 @@ image height within the \verb+\includegraphics+ command, for example:
       \includegraphics[totalheight=4in]{<filename>}
       \includegraphics[scale=0.5,totalheight=4in]{<filename>}
     \end{verbatim}
-For a more detailed discussion, see the 
+For a more detailed discussion, see the
 \htmladdnormallink{EPS manual}
 {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part III, section 6, pp 15-19]{eps}.
 
@@ -840,7 +840,7 @@ Placement, Landscape, Side-by-side, Text Around Image\xlabel{ManipulatingImage}}
 
 $\bullet$ \textbf{Placement}
 
-    Choose where \LaTeX\ should place the figure by specifying an 
+    Choose where \LaTeX\ should place the figure by specifying an
     option to the \texttt{figure} environment:
 
     \begin{verbatim}
@@ -851,7 +851,7 @@ $\bullet$ \textbf{Placement}
       \end{figure}
     \end{verbatim}
 
-    where the \texttt{figure} \emph{option} can be any combination of the 
+    where the \texttt{figure} \emph{option} can be any combination of the
     following:
     \begin{quote}
       \texttt{h} --- here (where the \texttt{figure} command is located)\\
@@ -859,21 +859,21 @@ $\bullet$ \textbf{Placement}
       \texttt{b} --- at the bottom of the page\\
       \texttt{p} --- on a separate page which contains only floats
     \end{quote}
-   
-    If you specify more than one of these options, \LaTeX\ will use the order 
+
+    If you specify more than one of these options, \LaTeX\ will use the order
     \texttt{h-t-b-p} regardless of the order you specify.
-    Precede the specification with a \texttt{!}, \emph{e.g.}, \texttt{[!ht]},  
-    to make \LaTeX\ try really hard to place the figure where you have 
-    specified.  See the 
+    Precede the specification with a \texttt{!}, \emph{e.g.}, \texttt{[!ht]},
+    to make \LaTeX\ try really hard to place the figure where you have
+    specified.  See the
     \htmladdnormallink{EPS manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 10, p 36]{eps}.
 
 $\bullet$ \textbf{Landscape}
 
     Use the \texttt{landscape} environment from the \texttt{lscape} package
-    to print an image in the landscape orientation, while 
-    keeping the page heading in the portrait orientation: 
-    
+    to print an image in the landscape orientation, while
+    keeping the page heading in the portrait orientation:
+
     \begin{verbatim}
       \documentclass{article}
       \usepackage{lscape,graphicx}
@@ -887,18 +887,18 @@ $\bullet$ \textbf{Landscape}
       \end{landscape}
     \end{verbatim}
 
-    For more information about the \texttt{landscape} environment and other 
-    ways of producing landscape orientation, see the 
+    For more information about the \texttt{landscape} environment and other
+    ways of producing landscape orientation, see the
     \htmladdnormallink{EPS manual}
     {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 11, p 38-41]{eps}.
 
-    Note: I have found that the caption may not be rotated when viewed with 
-    \texttt{xdvi}; however, it is rotated correctly by \texttt{dvips}. The 
+    Note: I have found that the caption may not be rotated when viewed with
+    \texttt{xdvi}; however, it is rotated correctly by \texttt{dvips}. The
     resulting \texttt{.ps} file can be viewed with \texttt{ghostview}.
 
 $\bullet$ \textbf{Side-by-side}
 
-    There are three common methods of organizing side-by-side graphics: 
+    There are three common methods of organizing side-by-side graphics:
 
     \begin{enumerate}
       \item Combined into a single figure
@@ -906,14 +906,14 @@ $\bullet$ \textbf{Side-by-side}
       \item Each in a subfigure which form a single figure
     \end{enumerate}
 
-    These are all discussed in detail in the 
-    \htmladdnormallink{EPS manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 12, pp 41-48]{eps}. 
-    The \texttt{subfigure} method is also documented in the 
+    These are all discussed in detail in the
+    \htmladdnormallink{EPS manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 12, pp 41-48]{eps}.
+    The \texttt{subfigure} method is also documented in the
     \htmladdnormallink{subfigure manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/styles/subfigure.dvi}\cite{subfigure}.
 
 $\bullet$ \textbf{Text Around Image: floatflt}
 
-  Use the \texttt{floatflt} package to get text to wrap around a small figure: 
+  Use the \texttt{floatflt} package to get text to wrap around a small figure:
 
   \begin{verbatim}
     \documentclass{article}
@@ -926,12 +926,12 @@ $\bullet$ \textbf{Text Around Image: floatflt}
     \end{floatingfigure}
   \end{verbatim}
 
-where \emph{option} indicates the placement of the figure on the page and 
-can be any combination of the following: 
+where \emph{option} indicates the placement of the figure on the page and
+can be any combination of the following:
 \begin{quote}
   \texttt{r} --- right\\
   \texttt{l} --- left\\
-  \texttt{p} --- right for odd-numbered pages, left for even-numbered pages 
+  \texttt{p} --- right for odd-numbered pages, left for even-numbered pages
 \end{quote}
 
 \emph{width} is the width of the figure in the final document.
@@ -950,48 +950,48 @@ For example:
   \end{verbatim}
 
 
-  Detailed information, including a section about `Known problems and 
-limitations', can be found in the 
+  Detailed information, including a section about `Known problems and
+limitations', can be found in the
   \htmladdnormallink{\texttt{floatflt} manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/floatflt/floatflt.dvi}\cite{floatflt}.
 
-  Note: If the size of the image is larger than the size allowed by 
-{\em width}, no figure will be created and no warning message will be 
-given. To get the figure to appear, increase {\em width} and/or  
-decrease \texttt{scale}. 
+  Note: If the size of the image is larger than the size allowed by
+{\em width}, no figure will be created and no warning message will be
+given. To get the figure to appear, increase {\em width} and/or
+decrease \texttt{scale}.
 
 
 \subsection{\xlabel{converting_another_image_format_to_postscript}Converting Another Image Format to PostScript}
 
-The following are tools for converting from another image format to 
+The following are tools for converting from another image format to
 PostScript:
 
 \begin{enumerate}
-  \item \texttt{xv} --- This is an interactive program for both displaying 
-    and converting the format of images. \texttt{xv} is part of the base set 
+  \item \texttt{xv} --- This is an interactive program for both displaying
+    and converting the format of images. \texttt{xv} is part of the base set
     of software distributed by Starlink.\\
     To convert to PostScript format, do the following:
     \begin{quote}
       type \texttt{xv}\\
-      click the right mouse button on the xv window to call-up the 
+      click the right mouse button on the xv window to call-up the
         `xv controls' window\\
       click `Load' on the `xv controls' window\\
       select the file and click on it twice (or on it once and then on `OK')\\
       click `Save'\\
-      hold down the left mouse button after `Format' on the `xv save' window 
-        and move the highlighted line to `PostScript' and release the mouse 
+      hold down the left mouse button after `Format' on the `xv save' window
+        and move the highlighted line to `PostScript' and release the mouse
         button\\
       click `OK' on the `xv save' window\\
       click `OK' on the `xv PostScript' window
-    \end{quote} 
+    \end{quote}
     See the
     \htmladdnormallink{xv manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/xvdocs.ps}\cite[section 8 `The Load Window', section 9 `The Save Window', section 10 
+    {http://www.starlink.ac.uk/\~{}acc/tex/xvdocs.ps}\cite[section 8 `The Load Window', section 9 `The Save Window', section 10
     `The PostScript Window']{xv}.
   \item \htmladdnormallink{ImageMagick}
     {http://www.wizards.dupont.com/cristy/ImageMagick.html}
-    --- This performs similar functions to \texttt{xv} but can be run from a 
-    command line. ImageMagick is public domain software but is not currently 
-    distributed by Starlink. 
+    --- This performs similar functions to \texttt{xv} but can be run from a
+    command line. ImageMagick is public domain software but is not currently
+    distributed by Starlink.
     \begin{latexonly}
     You can find out more about it at:
     \begin{verbatim}
@@ -1003,7 +1003,7 @@ PostScript:
 
 \section{\xlabel{conversion}\label{conversion}Conversion between \LaTeX\ and Other Formats}
 
-There are two sources of information about conversion between \TeX/\LaTeX\ and 
+There are two sources of information about conversion between \TeX/\LaTeX\ and
 other formats:
 
 \begin{itemize}
@@ -1027,7 +1027,7 @@ http://www.kfa-juelich.de/isr/1/texconv.html
 \section{\xlabel{acknowledgements}\label{acknowledgements}Acknowledgements}
 
 Thanks are due to Malcolm~Currie, Dave~Terrett, Alan~Lotts,
-Mike~Lawden, and Martin~Bly who wrote sections of this document. 
+Mike~Lawden, and Martin~Bly who wrote sections of this document.
 
 \section{\xlabel{trademarks}\label{trademarks}Trademarks}
 \begin{itemize}

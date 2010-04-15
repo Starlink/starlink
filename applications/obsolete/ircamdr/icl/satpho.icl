@@ -1,5 +1,5 @@
 proc satpho
-{ xobj0 = 166 
+{ xobj0 = 166
 { yobj0 = 114
 xobj0 = 75
 yobj0 = 109

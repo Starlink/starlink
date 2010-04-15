@@ -78,7 +78,7 @@
 
       INCLUDE 'SGS_ERR'
 
-      
+
       REAL X1,X2,Y1,Y2,X1N,X2N,Y1N,Y2N
       INTEGER JSTAT
 

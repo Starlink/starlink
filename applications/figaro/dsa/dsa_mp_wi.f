@@ -8,11 +8,11 @@ C  Function:
 C     Maps one of the axis width arrays in a structure.
 C
 C  Description:
-C     This routine maps a specified axis width array in a structure, 
-C     returning a memory address that may be used to access it.   The 
-C     whole array is mapped.  If there is in fact no axis width array, 
-C     then a dummy array is generated and its address is returned, 
-C     unless the mapping is for write or update, in which case 
+C     This routine maps a specified axis width array in a structure,
+C     returning a memory address that may be used to access it.   The
+C     whole array is mapped.  If there is in fact no axis width array,
+C     then a dummy array is generated and its address is returned,
+C     unless the mapping is for write or update, in which case
 C     such an array is created in the data structure and mapped. The
 C     contents of the array depend on the axis data.  If there is an
 C     existing axis data array, then the width values are the differences
@@ -31,7 +31,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) AXIS         (Integer,ref) The number of the axis in question.
 C                      Should be between 1 and 6.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
@@ -39,8 +39,8 @@ C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
 C     (<) ADDRESS      (Integer,ref) The address of the mapped data array.
 C     (<) SLOT         (Integer,ref) A handle value associated with this
@@ -50,7 +50,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
@@ -176,13 +176,13 @@ C        array.
 C
 C        Look up the reference name in the tables and get the name
 C        of the axis width array.
-C          
+C
          CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
          CALL DSA__AXIS_WIDTH_NAME (REF_SLOT,AXIS,OBJ_NAME,LENGTH)
 C
          IF (EXIST.AND.(.NOT.SINGLE)) THEN
 C
-C           If it did exist, get its dimensions.  
+C           If it did exist, get its dimensions.
 C
             CREATED=.FALSE.
             CALL DSA_ARRAY_SIZE(OBJ_NAME(:LENGTH),

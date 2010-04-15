@@ -50,7 +50,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995-1999, 2004, 2006 Particle Physics and Astronomy
@@ -90,7 +90,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -152,7 +152,7 @@
       DOUBLE PRECISION SUMSQ       ! Sum of squares data
       REAL    QSORT(MAX__BOL)      ! Scratch sort array
       INTEGER QS_PTR               ! Another sort array
-      INTEGER QS_PTR_END           ! End of QS_PTR 
+      INTEGER QS_PTR_END           ! End of QS_PTR
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
@@ -169,7 +169,7 @@
      :        STATUS)
       END IF
 
-*     Keep track of the levels removed and the number of times 
+*     Keep track of the levels removed and the number of times
 *     this occurred so that we can add the level back on at the end
 
 *     Need to get some memory for this (store as DOUBLE PRECISION)
@@ -179,7 +179,7 @@
       CALL SCULIB_MALLOC(N_POS * VAL__NBR, SKY_PTR, SKY_PTR_END,
      :     STATUS)
 
-      NLOOPS = 0 
+      NLOOPS = 0
 
 *     Loop over all data
       DO I = 1, N_POS
@@ -223,15 +223,15 @@
                CALL MSG_SETD('BG', BACKGROUND)
                CALL MSG_SETR('ERR', ERRMEAN)
                CALL MSG_SETI('GOOD', GOOD)
-               
+
                CALL MSG_OUTIF(MSG__VERB, ' ',
      :              '^POS: MEAN = ^BG +- ^ERR (^GOOD points)', STATUS)
             ELSE
                BACKGROUND = MEDIAN
-               
+
                CALL MSG_SETI('POS', I)
                CALL MSG_SETD('BG', BACKGROUND)
-               
+
                CALL MSG_OUTIF(MSG__VERB, ' ',
      :              '^POS: MEDIAN = ^BG', STATUS)
             END IF
@@ -242,7 +242,7 @@
                   IF (SCUDATA(BOL, I) .NE. VAL__BADR) THEN
 
                      SCUDATA(BOL, I) =SCUDATA(BOL, I) - SNGL(BACKGROUND)
-                     
+
                      IF (MODE .EQ. 'MEAN') THEN
                         SCUVAR(BOL, I) = SCUVAR(BOL, I) + SKYVAR
                      END IF
@@ -255,7 +255,7 @@
      :              %VAL(CNF_PVAL(SKY_PTR) + (NLOOPS * VAL__NBR)), IERR,
      :              NERR, STATUS)
                NLOOPS = NLOOPS + 1
-                     
+
             END IF
          ELSE
 
@@ -292,9 +292,9 @@
      :        STATUS)
          LCLIP = -1.0
 
-         CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(CNF_PVAL(SKY_PTR)), 
+         CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(CNF_PVAL(SKY_PTR)),
      :        %VAL(CNF_PVAL(DQ_PTR)),
-     :        BADBIT, GOOD, MEAN_LEVEL, MEDIAN, SUM, SUMSQ, STDEV, 
+     :        BADBIT, GOOD, MEAN_LEVEL, MEDIAN, SUM, SUMSQ, STDEV,
      :        %VAL(CNF_PVAL(QS_PTR)), STATUS)
 
 
@@ -326,7 +326,7 @@
 *     Add the mean back on (ignore the slight change in variance associated
 *     with the fact that the MEAN has an error on it)
 
-         CALL SCULIB_ADDCAR(N_POS * N_BOLS, SCUDATA, 
+         CALL SCULIB_ADDCAR(N_POS * N_BOLS, SCUDATA,
      :        SNGL(MEAN_LEVEL), SCUDATA)
 
 *     and print a message in verbose mode

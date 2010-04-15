@@ -10,8 +10,8 @@ typedef struct Pix {
    int edge;
 } Pix;
 
-int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-                  int skip[3], int perspectrum, int naxis, 
+int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
+                  int skip[3], int perspectrum, int naxis,
                   CupidPixelSet **clumps, int *status ){
 /*
 *+
@@ -26,16 +26,16 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-*                       int skip[3], int perspectrum, int naxis, 
+*     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
+*                       int skip[3], int perspectrum, int naxis,
 *                       CupidPixelSet **clumps, int *status )
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps" which are
 *     adjacent to another PixelSet into the neighbouring PixelSet. The
 *     Williams et al ApJ ClumpFInd paper describes such pixels as
-*     "friends" of the neighbouring PixelSet, and the "friends-of-friends" 
-*     algorithm described in that paper is implemented by repeated calls 
+*     "friends" of the neighbouring PixelSet, and the "friends-of-friends"
+*     algorithm described in that paper is implemented by repeated calls
 *     to this function.
 
 *  Parameters:
@@ -53,33 +53,33 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with 1's.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords.
 *        Unused trailing elements should be filled with zero.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
-*        neighbours. A clump that extends across several spectra will be 
+*        neighbours. A clump that extends across several spectra will be
 *        split into multiple clumps, each restricted to a single spectrum.
 *        The non-zero value supplied should be the 1-based axis index of
 *        the spectral pixel axis. Should be supplied as zero if "ndim" is
 *        not 3.
 *     naxis
-*        Determines which adjoining pixels are considered to be "neighbours" 
-*        of a specified central pixel. Should be in the range 1 to "ndim". 
+*        Determines which adjoining pixels are considered to be "neighbours"
+*        of a specified central pixel. Should be in the range 1 to "ndim".
 *        For a pixel to be considered to be a neighbour of another pixel,
-*        the two pixels must be no more than 1 pixel away along no more than 
+*        the two pixels must be no more than 1 pixel away along no more than
 *        "naxis" axes. The supplied value is ignored and a value of 1 is
 *        used if "perspectrum" is non-zero.
 *     clumps
-*        Array holding pointers to all previously defined PixelSets, such 
-*        that a pointer to the PixelSet with index value "i" is stored at 
+*        Array holding pointers to all previously defined PixelSets, such
+*        that a pointer to the PixelSet with index value "i" is stored at
 *        element "i" of the "clumps" array.
 *     status
 *        Pointer to the inherited status value.
 
 *  Returned Value:
-*     Non-zero if any pixels were transferred out of the source PixelSet. 
+*     Non-zero if any pixels were transferred out of the source PixelSet.
 *     Zero otherwise.
 
 *  Copyright:
@@ -164,10 +164,10 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 /* Get the index value of the source PixelSet. */
    old_index = ps->index;
 
-/* Get a pointer to the first pixel in the source PixelSet bounding box. If 
-   the data  has less than 3 axes, the unused upper and lower bounds will be 
-   set to [1,1] and so we can always pretend there are 3 axes. */ 
-   v = ipa + ( ps->lbnd[ 0 ] - 1 ) + ( ps->lbnd[ 1 ] - 1 )*skip[ 1 ] + 
+/* Get a pointer to the first pixel in the source PixelSet bounding box. If
+   the data  has less than 3 axes, the unused upper and lower bounds will be
+   set to [1,1] and so we can always pretend there are 3 axes. */
+   v = ipa + ( ps->lbnd[ 0 ] - 1 ) + ( ps->lbnd[ 1 ] - 1 )*skip[ 1 ] +
              ( ps->lbnd[ 2 ] - 1 )*skip[ 2 ];
 
 /* Loop round the pixels in the source PixelSet bounding box. */
@@ -192,7 +192,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
                cupidCFNebs( ipa, iv, x, ndim, dims, skip, old_index, perspectrum,
                             naxis, &n1, &il1,  i1, &n2, &il2, clumps, status );
 
-/* If this pixel adjoins another PixelSet, add its details to the end of the 
+/* If this pixel adjoins another PixelSet, add its details to the end of the
    list of pixels to be transferred to that PixelSet. */
                if( il2 != CUPID__CFNULL ) {
                   xflist = astGrow( xflist, ++nxf, sizeof( Pix ) );
@@ -230,7 +230,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    PixelSet. */
    pix = xflist;
    for( i = 0; i < nxf; i++, pix++ ) {
-      cupidCFAddPixel( ipa, clumps[ pix->ineb ], pix->iv, pix->x, VAL__MIND, 
+      cupidCFAddPixel( ipa, clumps[ pix->ineb ], pix->iv, pix->x, VAL__MIND,
                        pix->edge, status );
    }
 
@@ -246,7 +246,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    ps->ubnd[ 2 ] = ubnd[ 2 ];
 
 /* Free resources. */
-   xflist = astFree( xflist );   
+   xflist = astFree( xflist );
 
 /* Return a flag indicating if any pixels were transferred. */
    return ( nxf > 0 );

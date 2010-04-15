@@ -15,7 +15,7 @@
 
 * History :
 *  27-Jul-94 Changed error reporting to use ERR_, removed VALUE,
-*            changed IFIX to INT  (SKL@JACH) 
+*            changed IFIX to INT  (SKL@JACH)
 * 26-oct-1994 Changed MAGNIF from INT to REAL (SKL@JACH)
 * Endhistory
 

@@ -101,7 +101,7 @@
 	CALL PAR_GET0R( 'Y_CUR_REAL', CIRCLE_YCEN, STATUS)
 
 	IF( STATUS. NE. SAI__OK)THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :           'Error : PLOT_CURCIRCLE after PAR_GET cursor position',
      :                  STATUS )
 	  RETURN

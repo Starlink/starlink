@@ -45,7 +45,7 @@ f77_integer gk9scc_(index)
   {
     case 0:
       return((f77_integer)0);
-    
+
     case 1:
       return(gkywdt_.kpci[gkywca_.kwkix - 1] - 1);
 

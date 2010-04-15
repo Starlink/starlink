@@ -73,7 +73,7 @@
 *        Added FILENAME to the FIELD structure.
 *     2006 June 15 (MNB):
 *        Added the definitions of additional keywords relevent to the
-*        "FIBRES_IFU" table to be included in the fibres-table 
+*        "FIBRES_IFU" table to be included in the fibres-table
 *        conversion.
 *     2006 September 10 (MNB):
 *        Added additional keyword WLNSUSD.
@@ -343,7 +343,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  ATMTEMP
       CALL COF_GKEYD( FUNIT, 'ATMTEMP', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -361,7 +361,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TELMA
       CALL COF_GKEYD( FUNIT, 'TELMA', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -379,7 +379,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TELNP
       CALL COF_GKEYD( FUNIT, 'TELNP', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -388,7 +388,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TELCH
       CALL COF_GKEYD( FUNIT, 'TELCH', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -397,7 +397,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TELHF
       CALL COF_GKEYD( FUNIT, 'TELHF', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -424,7 +424,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  INSTOFFX
       CALL COF_GKEYD( FUNIT, 'INSTOFFX', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -433,7 +433,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  INSTOFFY
       CALL COF_GKEYD( FUNIT, 'INSTOFFY', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -451,7 +451,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TCRVL7
       CALL COF_GKEYD( FUNIT, 'TCRVL7', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -469,7 +469,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TCRPX7
       CALL COF_GKEYD( FUNIT, 'TCRPX7', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -614,7 +614,7 @@
          CALL DAT_PUT0D( CLOC, DVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  NUMELMY
       CALL COF_GKEYD( FUNIT, 'NUMELMY', THERE, DVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -625,7 +625,7 @@
       END IF
 
 * ***********************************
-* THE AAOMEGA-IFU ADDITIONAL STRINGS: 
+* THE AAOMEGA-IFU ADDITIONAL STRINGS:
 * ***********************************
 
 *  ACTUTC
@@ -645,7 +645,7 @@
          CALL DAT_PUT0C( CLOC, CVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TCTYP6
       CALL COF_GKEYC( FUNIT, 'TCTYP6', THERE, CVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -654,7 +654,7 @@
          CALL DAT_PUT0C( CLOC, CVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TCTYP7
       CALL COF_GKEYC( FUNIT, 'TCTYP7', THERE, CVALUE, COMENT, STATUS )
       IF ( THERE ) THEN
@@ -681,7 +681,7 @@
          CALL DAT_PUT0C( CLOC, CVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
-      
+
 *  TWCS6
       CALL COF_GKEYC( FUNIT, 'TWCS6', THERE, CVALUE, COMENT, STATUS )
       IF ( THERE ) THEN

@@ -11,7 +11,7 @@ F77_INTEGER_FUNCTION(con_copen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
 /*
  *  Name:
  *    con_copen
- 
+
  *  Purpose:
  *    Provides access to the C "fopen" function from Fortran.
 
@@ -30,7 +30,7 @@ F77_INTEGER_FUNCTION(con_copen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
  *       Status: 0 = failure, 1 = success
 
 
- */   
+ */
       GENPTR_CHARACTER(name)
       GENPTR_CHARACTER(access)
 
@@ -57,7 +57,7 @@ F77_INTEGER_FUNCTION(con_copen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
          c_access = (char *) malloc( sizeof( char )*( access_length + 1 ) );
          if( c_access ){
             cnf_imprt( access, access_length, c_access );
- 
+
 
 /*  Call fopen to open the file */
 
@@ -67,14 +67,14 @@ F77_INTEGER_FUNCTION(con_copen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
 /*  Free the storage used to hold the copy of the ACCESS argument. */
 
             free( c_access );
- 
+
          }
- 
+
 
 /*  Free the storage used to hold the copy of the NAME argument. */
 
          free( c_name );
- 
+
       }
 
 
@@ -84,10 +84,10 @@ F77_INTEGER_FUNCTION(con_copen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
       if( fd ) {
          return( 1 );
 
-      } else { 
+      } else {
          return( 0 );
 
       }
 
-} 
+}
 

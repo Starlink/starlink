@@ -42,14 +42,14 @@ C-
 C  Subroutine / function details:
 C
 C  History:
-C     28/2/1988   Original version.  JAB / AAO.  
+C     28/2/1988   Original version.  JAB / AAO.
 C     30/4/1988   Create the Polarimetry extension
 C                  if it does not exist.   JAB/AAO
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -59,14 +59,14 @@ C
 C
 C     Local variables
 C
-      CHARACTER*(DAT__SZLOC) PLOC           
+      CHARACTER*(DAT__SZLOC) PLOC
       INTEGER ACTDIM,DIMS(7),LOW(7)
       INTEGER ID,I,PLACE,ID2
       LOGICAL THERE
 C
       IF (STATUS .EQ. SAI__OK) THEN
 
-                                                     
+
           CALL TSP_SIZE(LOC,7,DIMS,ACTDIM,STATUS)
           CALL NDF_BEGIN
           CALL NDF_IMPRT(LOC,ID,STATUS)
@@ -78,7 +78,7 @@ C
           END IF
           DO I=1,ACTDIM
               LOW(I)=1
-          ENDDO          
+          ENDDO
           IF (STOKES .EQ. 'Q') THEN
               CALL NDF_PLACE(PLOC,'STOKES_Q',PLACE,STATUS)
               CALL NDF_NEW('_REAL',ACTDIM,LOW,DIMS,PLACE,ID2,STATUS)

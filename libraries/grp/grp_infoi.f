@@ -54,7 +54,7 @@
 *        bounds, then zero is returned.
 *
 *        NGRP - The number of GRP group identifiers currently in use.
-*        The values of the IGRP and INDEX arguments are ignored. 
+*        The values of the IGRP and INDEX arguments are ignored.
 *
 *        ACTIVE - Like "NGRP", except that in addition to returning the
 *        number of GRP group identifiers currently in use, the numerical
@@ -63,8 +63,8 @@
 *
 *        ALLSIMPLE - A value of 1 is returned if all elements within the
 *        group were specified explicitly (i.e. by a literal name rather
-*        than by indirection or modification). Otherwise a value of zero 
-*        is returned. The value of the INDEX argument is ignored. 
+*        than by indirection or modification). Otherwise a value of zero
+*        is returned. The value of the INDEX argument is ignored.
 *
 *     VALUE = INTEGER (Returned)
 *        The requested item of information.
@@ -82,12 +82,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -179,7 +179,7 @@
       LITEM = ITEM
       CALL CHR_UCASE( LITEM )
 
-*  The NGRP and ACTIVE items are special in that they do not use the 
+*  The NGRP and ACTIVE items are special in that they do not use the
 *  supplied GRP identifier or name index, so check for these now, before
 *  we check the validity of the supplied GRP identifier.
       IF( LITEM( : 4 ) .EQ. 'NGRP' ) THEN
@@ -187,7 +187,7 @@
 *  For NGRP, just count the number of used slots in the common arrays.
          VALUE = 0
          DO SLOT = 1, GRP__MAXG
-            IF( CMN_USED( SLOT ) ) VALUE = VALUE + 1         
+            IF( CMN_USED( SLOT ) ) VALUE = VALUE + 1
          END DO
 
 *  All done, so jump to the end.
@@ -200,7 +200,7 @@
          VALUE = 0
          DO SLOT = 1, GRP__MAXG
             IF( CMN_USED( SLOT ) ) THEN
-               VALUE = VALUE + 1         
+               VALUE = VALUE + 1
                IF( VALUE .GT. 1 ) CALL MSG_SETC( 'ID', ', ' )
                CALL MSG_SETI( 'ID', CMN_CHK( SLOT ) )
             END IF
@@ -209,20 +209,20 @@
          IF( VALUE .GT. 1 ) THEN
             CALL MSG_SETI( 'N', VALUE )
             CALL MSG_OUT( ' ', 'There are ^N currently active GRP '//
-     :                    'identifiers: ^ID', STATUS ) 
+     :                    'identifiers: ^ID', STATUS )
 
          ELSE IF( VALUE .EQ. 1 ) THEN
             CALL MSG_OUT( ' ', 'There is 1 currently active GRP '//
-     :                    'identifier: ^ID', STATUS ) 
+     :                    'identifier: ^ID', STATUS )
 
-         ELSE 
+         ELSE
             CALL MSG_OUT( ' ', 'There are no currently active GRP '//
-     :                    'identifiers', STATUS ) 
+     :                    'identifiers', STATUS )
          END IF
 
 *  All done, so jump to the end.
          GO TO 999
-      END IF         
+      END IF
 
 *  Check that the supplied GRP identifier is valid, and find the index
 *  within the common arrays at which information describing the group is

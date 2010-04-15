@@ -10,7 +10,7 @@ C
 C     The approximate positions input are obtained from environment
 C     variables.  These variables should be set up prior to running
 C     CENTERS, usually by using Figaro functions IGCUR or ICUR.
-C     Alternatively, you may enter the positions into a text file and 
+C     Alternatively, you may enter the positions into a text file and
 C     use IMPOS to read this file and copy the values into the
 C     environment variables required by CENTERS.
 C
@@ -21,7 +21,7 @@ C
 C     IMAGE    (Character) The name of the image containing the
 C              objects.  This need not be the image used to
 C              generate the original list of points - it may be
-C              a similar image in a different waveband, with 
+C              a similar image in a different waveband, with
 C              offsets in X and Y with respect to the original image.
 C     APERTURE (Integer) The aperture used for the centroiding.
 C              The aperture actually used is a box APERTURE*2+1
@@ -55,21 +55,21 @@ C
 C     Output -
 C
 C     center.dat contains one record for each point, giving
-C                XCENT,YCENT,IX,IY,DX,DY,AP 
+C                XCENT,YCENT,IX,IY,DX,DY,AP
 C                in the format 2F8.2,2I5,2F8.2,I4 where
 C                XCENT,YCENT give the position of the centroid
 C                IX,IY are the original pixel position of the point.
 C                DX,DY are the offsets in X and Y, and
 C                AP is the value used for APERTURE.
 C                If the centroid for a point cannot be determined, a
-C                record is written giving 
+C                record is written giving
 C                '*** No centroid ',IX,IY,DX,DY,AP
 C                in the format A,2I5,2F8.2,I4.
-C                 
+C
 C                                       KS / CIT 29th Sept 1983
 C     Modified:
 C
-C     31st Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs 
+C     31st Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs
 C                    changed. Now uses DYN routines for dynamic-memory
 C                    handling.
 C     22nd Mar 1988  KS / AAO. Conversion completed.  Use of STATUS
@@ -341,7 +341,7 @@ C
             END IF
             CENTOK=.FALSE.
          ELSE
-            WRITE (STRING,'(2I5,2F8.2)',IOSTAT=IGNORE) 
+            WRITE (STRING,'(2I5,2F8.2)',IOSTAT=IGNORE)
      :                                 X,Y,XCENT,YCENT
             CENTOK=.TRUE.
          END IF
@@ -445,7 +445,7 @@ C
 C     Parameters  (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) SOFT    (Character) The name/type of the device for soft
-C                 plots.  
+C                 plots.
 C     (>) FILE    (Character) The name to be used for the build file,
 C                 if required.
 C     (>) IMAGE   (Real array IMAGE(NX,NY)) The image data
@@ -459,7 +459,7 @@ C     (>) SZMAX   (Integer) The maximum value for SIZE.
 C     (!) BUOPEN  (Logical) True if a 'build' file for hardcopy output
 C                 has been opened.
 C     (!) SIZE    (Integer) The profile data is gathered from a box of
-C                 side SIZE centered at (XCENT,YCENT).  This may be 
+C                 side SIZE centered at (XCENT,YCENT).  This may be
 C                 changed by the user.
 C     (W) SUMX    (Real array SUMX(SZMAX)) Workspace
 C     (W) SUMY    (Real array SUMY(SZMAX)) Workspace
@@ -622,10 +622,10 @@ C     ICH_ENCODE  (ICH_ package) Encode a real number into a char string
 C     DSK_PGLABEL (DSK_    "   ) Build file version of PGLABEL
 C     DSK_PGENV   ( "      "   )   "    "      "    "  PGENV
 C     DSK_PGPOINT ( "      "   )   "    "      "    "  PGPOINT
-C     DSK_PGSLW   ( "      "   )   "    "      "    "  PGSLW (set 
+C     DSK_PGSLW   ( "      "   )   "    "      "    "  PGSLW (set
 C                                line width for plots)
 C
-C     Note: This routine assumes that the graphics device is 
+C     Note: This routine assumes that the graphics device is
 C     already open - ie PGBEGIN has already been called.  It does
 C     not CALL PGEND to close the device; this is also up to the
 C     caller.  Similarly, if BUILD is true, it leaves the calling

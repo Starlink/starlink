@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_STBIN( NPIX, NROW, NPLANE, DIN, VAR, VIN, BOX, 
+      SUBROUTINE POL1_STBIN( NPIX, NROW, NPLANE, DIN, VAR, VIN, BOX,
      :                       METH, MINPIX, NSIGMA, NXBIN, NYBIN, DBIN,
      :                       VBIN, TR, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_STBIN( NPIX, NROW, NPLANE, DIN, VAR, VIN, BOX, METH, 
+*     CALL POL1_STBIN( NPIX, NROW, NPLANE, DIN, VAR, VIN, BOX, METH,
 *                      MINPIX, NSIGMA, NXBIN, NYBIN, DBIN, VBIN, TR,
 *                      STATUS )
 
@@ -31,7 +31,7 @@
 *     VAR = LOGICAL (Given)
 *        It is .TRUE. if output variance values are to be returned.
 *     VIN( NPIX, NROW, NPLANE ) = REAL (Given)
-*        The variance on the Stokes parameters. It is ignored if VAR is 
+*        The variance on the Stokes parameters. It is ignored if VAR is
 *        .FALSE..
 *     BOX( 2 ) = INTEGER (Given)
 *        The dimensions of each bin, in pixels.
@@ -65,7 +65,7 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,7 +94,7 @@
 
 *  Arguments Given:
       INTEGER NPIX
-      INTEGER NROW 
+      INTEGER NROW
       INTEGER NPLANE
       REAL DIN( NPIX, NROW, NPLANE )
       LOGICAL VAR
@@ -127,7 +127,7 @@
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
       INTEGER NBIN               ! No. of bins
-      INTEGER NMAT               ! Size of workspace 
+      INTEGER NMAT               ! Size of workspace
 *.
 
 *  Check the inherited global status.
@@ -149,7 +149,7 @@
       IF( VAR ) THEN
          CALL PSX_CALLOC( NBIN*BINSZ, '_REAL', IPSTVI, STATUS )
          CALL PSX_CALLOC( BINSZ, '_DOUBLE', IPPP, STATUS )
-         NMAT = BINSZ*( BINSZ + 1 )/2 
+         NMAT = BINSZ*( BINSZ + 1 )/2
          CALL PSX_CALLOC( BINSZ*NMAT, '_DOUBLE', IPCOV, STATUS )
 
       ELSE
@@ -166,36 +166,36 @@
 *  Copy this plane out of the input arrays, into workspace. Re-arrange
 *  the values so that the input pixel values in each bin are stored in
 *  a single column, there being NBIN columns in the work arrays. This
-*  call also stores the value 1.0 in each element of the array pointed to 
+*  call also stores the value 1.0 in each element of the array pointed to
 *  by IPVAR (but only if VAR is .FALSE.).
-         CALL POL1_STK( NPIX, NROW, DIN( 1, 1, IPLANE ), VAR, 
-     :                  VIN( 1, 1, IPLANE ), BOX, NXBIN, NYBIN, 
-     :                  %VAL( CNF_PVAL( IPSTDI ) ), 
-     :                  %VAL( CNF_PVAL( IPSTVI ) ), 
+         CALL POL1_STK( NPIX, NROW, DIN( 1, 1, IPLANE ), VAR,
+     :                  VIN( 1, 1, IPLANE ), BOX, NXBIN, NYBIN,
+     :                  %VAL( CNF_PVAL( IPSTDI ) ),
+     :                  %VAL( CNF_PVAL( IPSTVI ) ),
      :                  %VAL( CNF_PVAL( IPVAR ) ),
      :                  TR, STATUS )
 
 *  Do the binning.
          IF( VAR ) THEN
             CALL POL1_CM1RR( %VAL( CNF_PVAL( IPSTDI ) ), NBIN, BINSZ,
-     :                       %VAL( CNF_PVAL( IPSTVI ) ), 
+     :                       %VAL( CNF_PVAL( IPSTVI ) ),
      :                       METH, MINPIX, NSIGMA,
-     :                       DBIN( 1, 1, IPLANE ), 
-     :                       VBIN( 1, 1, IPLANE ), 
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       DBIN( 1, 1, IPLANE ),
+     :                       VBIN( 1, 1, IPLANE ),
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
      :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       %VAL( CNF_PVAL( IPPP ) ), 
+     :                       %VAL( CNF_PVAL( IPPP ) ),
      :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
-     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
      :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          ELSE
-            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPSTDI ) ), NBIN, BINSZ, 
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPSTDI ) ), NBIN, BINSZ,
      :                       %VAL( CNF_PVAL( IPVAR ) ),
-     :                       METH, MINPIX, NSIGMA, DBIN( 1, 1, IPLANE ), 
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       METH, MINPIX, NSIGMA, DBIN( 1, 1, IPLANE ),
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
      :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
      :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          END IF
@@ -216,7 +216,7 @@
          CALL PSX_FREE( IPSTVI, STATUS )
          CALL PSX_FREE( IPPP, STATUS )
          CALL PSX_FREE( IPCOV, STATUS )
-      ELSE 
+      ELSE
          CALL PSX_FREE( IPVAR, STATUS )
       END IF
 

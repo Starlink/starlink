@@ -1,10 +1,10 @@
-       
+
       SUBROUTINE PERIOD_PERFORMCLEAN(XDATA, YDATA, NDATA, MAXPTS,
      :                               FMIN, FMAX, FINT, NCL, GAIN,
      :                               FREQUENCY, POWER, NOUT, INFO,
      :                               ONES, WFREQ, DFREQ, D, W, R,
      :                               B, C, S)
- 
+
 C===========================================================================
 C Calculates the CLEANed power spectrum of a dataset of length NDATA stored
 C in the arrays XDATA and YDATA. The spectrum will be calculated between the
@@ -33,8 +33,8 @@ C the original code written by Joseph Lehar (JLEHAR@MAIL.AST.CAM.AC.UK).
 C
 C GJP March 1997
 C
-C Modified ONES array dimensions since it was 0-MAXPNTS-1 and 
-C 1-MAXPNTS were actually being used. Modified calls to 
+C Modified ONES array dimensions since it was 0-MAXPNTS-1 and
+C 1-MAXPNTS were actually being used. Modified calls to
 C PERIOD_DFOUR to use FREQ rather than array (say) DFREQ(I) value.
 C
 C Converted to Double Precision (KPD), August 2001
@@ -42,15 +42,15 @@ C Power-raising modified to use INTEGER power (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE "PIVARS"
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_CLEAN declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER NDATA, MAXPTS, NCL, NOUT, I
       INTEGER NDFREQ, NWFREQ, NBFREQ
       INTEGER ICL, L, PERIOD_MAXLOC
@@ -69,22 +69,22 @@ C-----------------------------------------------------------------------------
       DOUBLE COMPLEX B(0:MAXPTS-1), C(0:MAXPTS-1),     S(0:MAXPTS-1)
       DATA ISTEP/50/
 
- 
+
 C----------------------------------------------------------------------------
 C Initialise the C array.
 C----------------------------------------------------------------------------
- 
+
       DO 10 I = 0, MAXPTS - 1
          C(I) = (0.0D0,0.0D0)
   10  CONTINUE
- 
+
 C----------------------------------------------------------------------------
 C Find the mean time and data mean and subtract (for simplicity). Also fill
 C the ONES array with 1's in order to calculate the spectral window. The
 C time information TZERO and TMEAN are used later in the CLEANing for beam
 C phases.
 C-----------------------------------------------------------------------------
- 
+
       CALL PERIOD_MOMENT(XDATA, NDATA, TMEAN, ADEV, SDEV, VAR)
       CALL PERIOD_MOMENT(YDATA, NDATA, DMEAN, ADEV, SDEV, VAR)
 
@@ -93,16 +93,16 @@ C-----------------------------------------------------------------------------
          XDATA(I) = XDATA(I) - TMEAN
          YDATA(I) = YDATA(I) - DMEAN
          ONES(I)  = 1.0D0
-  20  CONTINUE      
+  20  CONTINUE
 
 *    This line included because of a fault in the original code.
       ONES(1)=0.0D0
-      
+
 C-----------------------------------------------------------------------------
 C Calculate the dirty spectrum D (using a normal discrete Fourier transform).
 C Fill the residual array R with the dirty spectrum.
 C-----------------------------------------------------------------------------
- 
+
       IF ( INFO.EQ.1 ) THEN
          WRITE (*, *) '** OK: Calculating window and dirty spectra...'
          WRITE (*, *) ' '
@@ -142,7 +142,7 @@ C  variables! (KPD)
 C-----------------------------------------------------------------------------
 C Complete the spectral window.
 C-----------------------------------------------------------------------------
- 
+
       IF ( INFO.EQ.1 ) THEN
          WRITE (*, *) ' '
          WRITE (*, *) '** OK: Completing spectral window...'
@@ -159,7 +159,7 @@ C-----------------------------------------------------------------------------
          IF ( INFO.EQ.1 ) THEN
             IF ( I.EQ.(LOOP*ISTEP) ) THEN
                WRITE (*, 99002) WFREQ(I),(CDABS(W(I)))**2
-99002          FORMAT ('+Frequency =', D12.6, ',  Window Power =', 
+99002          FORMAT ('+Frequency =', D12.6, ',  Window Power =',
      :                 D18.6)
                LOOP = LOOP + 1
             END IF
@@ -175,11 +175,11 @@ C   Ensure that NDFREQ = NWFREQ/2
       WRITE (*, *) 'I = ', I
       WRITE (*, *) 'LOOP = ', LOOP
       WRITE (*, *) 'MAXPTS = ', MAXPTS
-							
+
 C-----------------------------------------------------------------------------
 C Fit a restoring beam B to the spectral window peak.
 C-----------------------------------------------------------------------------
- 
+
       PHINC = TWOPI*FINT*(TZERO-TMEAN)          ! Phase increment per element.
       HWIDTH = PERIOD_HWHM(NWFREQ, W)
 
@@ -193,11 +193,11 @@ C-----------------------------------------------------------------------------
       END IF
 
       NBFREQ = PERIOD_FILLB(MAXPTS-1, B, HWIDTH, PHINC)! Fill the restoring beam
- 
+
 C-----------------------------------------------------------------------------
 C CLEAN the residual spectrum, storing the components in C(0:MS).
 C-----------------------------------------------------------------------------
- 
+
       IF ( INFO.EQ.1 ) THEN
          WRITE (*, *) ' '
          WRITE (*, *) '** OK: Performing CLEAN iterations...'
@@ -219,11 +219,11 @@ C-----------------------------------------------------------------------------
          END IF
 
   50  CONTINUE
- 
+
 C-----------------------------------------------------------------------------
 C Generate the clean spectrum S(0:MS).
 C-----------------------------------------------------------------------------
- 
+
       IF ( INFO.EQ.1 ) THEN
          WRITE (*, *) ' '
          WRITE (*, *) '** OK: Generating CLEANed spectrum...'
@@ -234,18 +234,18 @@ C-----------------------------------------------------------------------------
      :                    DFREQ, INFO)                      ! B to form S.
 
       CALL PERIOD_ADD(NDFREQ, S, NDFREQ, S, NDFREQ, R)      ! Then add R to S.
- 
+
 C-----------------------------------------------------------------------------
 C Finally, load the output arrays with the POWER of the CLEANed spectrum and
 C their corresponding FREQUENCIES.
 C-----------------------------------------------------------------------------
- 
+
       DO 60 I = 0, NDFREQ
          POWER(I+1) = CDABS(S(I))*CDABS(S(I))
          FREQUENCY(I+1) = DFREQ(I)
   60  CONTINUE
       NOUT = NDFREQ + 1
- 
+
  700  CONTINUE
       RETURN
       END

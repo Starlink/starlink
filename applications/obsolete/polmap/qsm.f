@@ -3,24 +3,24 @@
      &               STOKES_UV,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C         Q S M
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), STOKES_I (><), STOKES_Q (><), STOKES_QV (><),
 C STOKES_U (><), STOKES_UV (><), LAMBDA (><), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Applies a gaussian smoothing to the current polarization spectrum.
 C End regions are poorly dealt with at the moment.
 C

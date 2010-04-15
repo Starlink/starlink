@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     VAL_RTOD
- 
+
 *  Purpose:
 *     Convert a value from REAL to DOUBLE PRECISION.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     RESULT = VAL_RTOD( BAD, ARG, STATUS )
- 
+
 *  Description:
 *     The routine performs type conversion on a value of type REAL,
 *     converting it to the equivalent DOUBLE PRECISION value.  If a numerical
 *     error occurs, the value VAL__BADD is returned and a STATUS
 *     value is set.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether the argument value (ARG) may be "bad".
@@ -28,12 +28,12 @@
 *        returns immediately with the result VAL__BADD.  A STATUS
 *        value will be set by this routine if a numerical error occurs
 *        during type conversion.
- 
+
 *  Returned Value:
 *     VAL_RTOD = DOUBLE PRECISION
 *        Returns the converted DOUBLE PRECISION value.  The value VAL__BADD
 *        will be returned under error conditions.
- 
+
 *  Copyright:
 *     Copyright (C) 1988, 1991, 1992 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -57,7 +57,7 @@
 *  Authors:
 *     R.F. Warren-Smith (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     11-AUG-1988 (RFWS):
 *        Original version.
@@ -70,15 +70,15 @@
 *        Temporarily removed adjustments to data limits to account for
 *        rounding.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
@@ -86,25 +86,25 @@
 
       INCLUDE 'PRM_ERR'          ! PRM_ error codes
 
- 
+
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
       REAL ARG                 ! Value to be converted
- 
+
 *  Status:
       INTEGER STATUS             ! Error status
- 
+
 *  Local Variables:
       REAL HI                  ! Upper bound on argument
       REAL LO                  ! Lower bound on argument
       DOUBLE PRECISION DHI       ! Upper bound on data
       DOUBLE PRECISION DLO       ! Lower bound on data
       LOGICAL FIRST              ! First invocation?
- 
+
       SAVE FIRST
       SAVE HI
       SAVE LO
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
 
@@ -114,17 +114,17 @@
 
       INCLUDE 'NUM_DEF_R'      ! Define NUM_ arithmetic functions
 
- 
+
 *  Local Data:
       DATA FIRST / .TRUE. /      ! First invocation
- 
+
 *.
- 
+
 *  If the conversion can potentially fail, then on the first invocation
 *  set up the lower and upper bounds on the argument values.
       IF ( .FALSE. ) THEN
          IF ( FIRST ) THEN
- 
+
 *  Find the intersection of the ranges of allowed values between the
 *  input and output data types. Perform this calculation in double
 *  precision.
@@ -132,7 +132,7 @@
      :                 NUM_DTOD( NUM__MIND ) )
             DHI = MIN( NUM_RTOD( NUM__MAXR ),
      :                 NUM_DTOD( NUM__MAXD ) )
- 
+
 *  Adjust the resulting limits to allow for rounding of both the input
 *  and output data types.
 C            IF ( DLO .GT. 0.0D0 ) THEN
@@ -155,16 +155,16 @@ C
             FIRST = .FALSE.
          END IF
       END IF
- 
+
 *  Check status.  Return the function result VAL__BADD if not OK.
       IF( STATUS .NE. SAI__OK ) THEN
          VAL_RTOD = VAL__BADD
- 
+
 *  If the bad data flag is set, check if the argument given is bad.
 *  Return VAL__BADD if it is.
       ELSE IF( BAD .AND. ( ARG .EQ. VAL__BADR ) ) THEN
          VAL_RTOD = VAL__BADD
- 
+
 *  If the conversion can potentially fail, then test if the argument
 *  value lies within its allowed bounds.  If not, then return the value
 *  VAL__BADD and set a STATUS value.
@@ -172,11 +172,11 @@ C
      :         ( NUM_LTR( ARG, LO ) .OR. NUM_GTR( ARG, HI ) ) ) THEN
          VAL_RTOD = VAL__BADD
          STATUS = SAI__OK
- 
+
 *  Otherwise, perform data conversion.
       ELSE
          VAL_RTOD = NUM_RTOD( ARG )
       ENDIF
- 
+
 *  Exit routine.
       END

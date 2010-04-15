@@ -1,5 +1,5 @@
       program applylm
-      
+
 *   Test understanding of ASTROM and dcmpf.
 *
 *   The plan here is to generate a linear fit from known zero points,
@@ -59,10 +59,10 @@
 *      yscale = +0.3315d0/3600/r2d
 *      perp = -0.345d0/r2d
 *      orient = -88.828d0/r2d
-      
+
       call makecpts(lm, 0d0, 0d0, xscale, yscale, perp, orient)
       write(*,'("*** Components: ",6e11.3)') (lm(j),j=1,6)
-      
+
       pixpos(1)  = -100
       pixpos(2)  = +100
       pixpos(3)  = 0
@@ -83,7 +83,7 @@
       pixpos(16) = -100
       pixpos(17) = +100
       pixpos(18) = -100
-      
+
       write(*,'("J2000")')
       write(*,'("ASTR")')
       call sla_dr2tf(3, xzero, xsign, ihmsf)
@@ -112,7 +112,7 @@
 
       stop
       end
-      
+
       subroutine makecpts (mat, xz, yz, xs, ys, perp, orient)
 * Do the forward transformation that slaDcmpf inverts.
 *

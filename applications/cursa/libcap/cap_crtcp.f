@@ -13,7 +13,7 @@
 *  Description:
 *     Create the columns and parameters to hold the graphics attributes.
 *
-*     Also, identifiers are obtained and stored internally for 
+*     Also, identifiers are obtained and stored internally for
 *     expressions defining the clauses and SIZEn columns.
 *  Arguments:
 *     CIIN  =  INTEGER (Given)
@@ -156,7 +156,7 @@
                   CALL CAT_PPTSR (CIOUT, 'SIZE1', RVAL,
      :              'Plotting symbol size.', QI, STATUS)
                ELSE
-                  CALL CAT_CNEWS (CIOUT, 'SIZE1', CAT__TYPER, 1, 
+                  CALL CAT_CNEWS (CIOUT, 'SIZE1', CAT__TYPER, 1,
      :              ' ', 'E12.3', 'Plotting symbol size.', FI, STATUS)
 
                   NGRAT = NGRAT + 1
@@ -175,7 +175,7 @@
                   CALL CAT_PPTSR (CIOUT, 'SIZE2', RVAL,
      :              'Second plotting symbol size.', QI, STATUS)
                ELSE
-                  CALL CAT_CNEWS (CIOUT, 'SIZE2', CAT__TYPER, 1, 
+                  CALL CAT_CNEWS (CIOUT, 'SIZE2', CAT__TYPER, 1,
      :              ' ', 'E12.3', 'Second plotting symbol size.', FI,
      :              STATUS)
 
@@ -195,7 +195,7 @@
                   CALL CAT_PPTSR (CIOUT, 'SIZE3', RVAL,
      :              'Third plotting symbol size.', QI, STATUS)
                ELSE
-                  CALL CAT_CNEWS (CIOUT, 'SIZE3', CAT__TYPER, 1, 
+                  CALL CAT_CNEWS (CIOUT, 'SIZE3', CAT__TYPER, 1,
      :              ' ', 'E12.3', 'Third plotting symbol size.', FI,
      :              STATUS)
 
@@ -215,7 +215,7 @@
                   CALL CAT_PPTSR (CIOUT, 'SIZE4', RVAL,
      :              'Fourth plotting symbol size.', QI, STATUS)
                ELSE
-                  CALL CAT_CNEWS (CIOUT, 'SIZE4', CAT__TYPER, 1, 
+                  CALL CAT_CNEWS (CIOUT, 'SIZE4', CAT__TYPER, 1,
      :              ' ', 'E12.3', 'Fourth plotting symbol size.', FI,
      :              STATUS)
 

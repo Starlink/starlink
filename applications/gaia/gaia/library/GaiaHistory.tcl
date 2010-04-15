@@ -330,7 +330,7 @@ itcl::class gaia::GaiaHistory {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The GAIA toplevel instance, inheriting util::TopLevelWidget. Required, 
+   #  The GAIA toplevel instance, inheriting util::TopLevelWidget. Required,
    #  must also offer the following methods:
    #
    #     get_accessor  - return an GaiaNDAccess instance wrapping the image.

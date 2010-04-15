@@ -58,7 +58,7 @@
 
 *  Notes:
 *     The rules for the conversion are as follows:
-*     -  The NDF is created with bounds determined by any LBOUNDn 
+*     -  The NDF is created with bounds determined by any LBOUNDn
 *        keywords in the IRAF image header.
 *     -  The NDF data array is copied from the ".pix" file.
 *     -  The title of the IRAF image (object i_title in the ".imh"
@@ -66,7 +66,7 @@
 *     BUNIT become the NDF label and units respectively.
 *     -  The pixel origin is set if any LBOUNDn headers are present.
 *     -  Lines from the IRAF image header file may be transferred to
-*     the FITS extension of the NDF, when PROFITS=TRUE.  Any 
+*     the FITS extension of the NDF, when PROFITS=TRUE.  Any
 *     compulsory FITS keywords that are missing are added.  Certain
 *     other keywords are not propagated.  These are the IRAF "Mini
 *     World Coordinate System" (MWCS) keywords WCSDIM, DC_FLAG,
@@ -180,10 +180,10 @@
 *        Removed erroneous mention of LIN2MAP, PREFITS and PUTLIN.
 *     09-AUG-1995 (GJP):
 *        Added the ability to generate a sensible error message when
-*        IMOPEN fails - as would happen if the file requested did 
+*        IMOPEN fails - as would happen if the file requested did
 *        not exist.
 *     11-AUG-1995 (GJP):
-*        Added a check to see if any header lines were found before 
+*        Added a check to see if any header lines were found before
 *        calling GETLIN to obtain them.
 *     1997 April and July (MJC):
 *        Added PROFITS and PROHIS facilities.  Now propagates axis
@@ -209,7 +209,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -219,7 +219,7 @@
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'CNF_PAR'          ! For CNF_CVAL function
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -228,12 +228,12 @@
                                  ! trailing blanks
 
 *  Local Constants:
-      INTEGER NDIM               ! Maximum number of dimensions the 
+      INTEGER NDIM               ! Maximum number of dimensions the
       PARAMETER ( NDIM = 3 )     ! application can handle
 
       INTEGER STRLEN             ! Length of output title string
       PARAMETER ( STRLEN = 80 )
-        
+
 *  Local Variables:
       INTEGER ACCESS             ! IRAF access mode
       INTEGER BUFLEN             ! Text-buffer length
@@ -249,7 +249,7 @@
       CHARACTER * ( STRLEN ) IRAFIL ! Input IRAF image name
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Type of the NDF
       INTEGER K                  ! Loop counter
-      CHARACTER * ( 70 ) LABEL   ! Label of the NDF 
+      CHARACTER * ( 70 ) LABEL   ! Label of the NDF
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF axes
       INTEGER LIPNTR             ! Pointer to a line of pixels
       INTEGER MDIM               ! Number of axes
@@ -268,9 +268,9 @@
                                  ! HISTORY structure in the NDF
       INTEGER REPNTR             ! Pointer to header-propagation flags
       INTEGER SPNTR              ! Pointer to spec1 buffer workspace
-      CHARACTER * ( 70 ) TITLE   ! Title of the NDF 
+      CHARACTER * ( 70 ) TITLE   ! Title of the NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF axes
-      CHARACTER * ( 70 ) UNITS   ! Units of the NDF 
+      CHARACTER * ( 70 ) UNITS   ! Units of the NDF
 
 *.
 
@@ -296,7 +296,7 @@
 
 *  Get the name of the IRAF image.
       CALL PAR_GET0C( 'IN', IRAFIL, STATUS )
-            
+
 *  Access mode is 1 for read only and 3 for read and write access.
       ACCESS = 1
 
@@ -319,7 +319,7 @@
 *  Obtain the dimensions and pixeltype of the IRAF image.
       CALL IMGSIZ( IMDESC, DIMS, MDIM, DTYPE, ERR )
       IF ( ERR .NE. 0 ) GOTO 999
-      
+
 *  Check the data type of the input image.  It must be real (6) or
 *  signed word (3).
       IF ( DTYPE .NE. 6 .AND. DTYPE .NE. 3 ) THEN
@@ -355,13 +355,13 @@
 
 *  Look for any LBOUNDn keywords.  Just use the default origin when
 *  the keyword is absent, as indicated by a non-zero IRAF status.
-      CALL IMGKWI( IMDESC, 'LBOUND1', LBND( 1 ), ERR ) 
+      CALL IMGKWI( IMDESC, 'LBOUND1', LBND( 1 ), ERR )
       IF ( ERR .NE. 0 ) LBND( 1 ) = 1
 
-      CALL IMGKWI( IMDESC, 'LBOUND2', LBND( 2 ), ERR ) 
+      CALL IMGKWI( IMDESC, 'LBOUND2', LBND( 2 ), ERR )
       IF ( ERR .NE. 0 ) LBND( 2 ) = 1
 
-      CALL IMGKWI( IMDESC, 'LBOUND3', LBND( 3 ), ERR ) 
+      CALL IMGKWI( IMDESC, 'LBOUND3', LBND( 3 ), ERR )
       IF ( ERR .NE. 0 ) LBND( 3 ) = 1
 
 *  Set the upper bounds.
@@ -382,10 +382,10 @@
 
 *  Create the output NDF.
 *  ======================
-      
+
 *  Start an NDF context.
       CALL NDF_BEGIN
-      
+
 *  Create an NDF with the required dimensions and type.
       CALL NDF_CREAT( 'OUT', ITYPE, MDIM, LBND, UBND, NDF, STATUS )
 
@@ -401,17 +401,17 @@
          CALL PSX_CALLOC( NCOLS, ITYPE, LIPNTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 980
-      
+
 *  Pass the Image descriptor, image dimensions, line buffer,
 *  dimensionality and the mapped array to a subroutine. Each line of
 *  the IRAF image will be extracted and propagated to the NDF array.
       IF ( DTYPE .EQ. 3 ) THEN
          CALL CON_CI2DW( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
-     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
       ELSE
          CALL CON_CI2DR( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
-     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
       END IF
 
@@ -425,7 +425,7 @@
       CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 980
-            
+
 *  Get and validate header and history records.
 *  ============================================
 
@@ -444,7 +444,7 @@
 *  the airlock.
       IF ( ( PROFIT .OR. PROHIS ) .AND. NHDRLI .GT. 0 ) THEN
          CALL PSX_CALLOC( NHDRLI, '_LOGICAL', REPNTR, STATUS )
-         CALL CON_CONSL( .TRUE., NHDRLI, %VAL( CNF_PVAL( REPNTR ) ), 
+         CALL CON_CONSL( .TRUE., NHDRLI, %VAL( CNF_PVAL( REPNTR ) ),
      :                   STATUS )
       END IF
 
@@ -454,7 +454,7 @@
 *  This is to avoid growing duplication of potentially bulky text
 *  especially if a user is mixing Starlink and IRAF tasks.
       IF ( PROHIS .AND. NHDRLI .GT. 0 )
-     :   CALL COI_CHISR( IMDESC, NDF, NHDRLI, 
+     :   CALL COI_CHISR( IMDESC, NDF, NHDRLI,
      :                   %VAL( CNF_PVAL( REPNTR ) ), STATUS )
 
 *  Propagate the FITS headers, and include mandatory headers too.
@@ -465,7 +465,7 @@
       CALL PSX_FREE( REPNTR, STATUS )
 
 *  Write the IRAF image's title to the NDF title.
-*  ==============================================      
+*  ==============================================
 
 *  Get the title of the IRAF image using imfort routine imgkwc.
       CALL IMGKWC( IMDESC, 'i_title', TITLE, ERR )
@@ -528,9 +528,9 @@
       CALL PSX_MALLOC( BUFLEN, SPNTR, STATUS )
 
 *  Create the axis structure.
-      CALL COI_AXIMP( IMDESC, NDF, %VAL( CNF_PVAL( BUPNTR ) ), 
+      CALL COI_AXIMP( IMDESC, NDF, %VAL( CNF_PVAL( BUPNTR ) ),
      :                %VAL( CNF_PVAL( SPNTR ) ),
-     :                STATUS, %VAL( CNF_CVAL( BUFLEN ) ), 
+     :                STATUS, %VAL( CNF_CVAL( BUFLEN ) ),
      :                %VAL( CNF_CVAL( BUFLEN ) ) )
 
 *  Free the buffers.

@@ -83,13 +83,13 @@
 *.
 
 *  Set status to OK.
-      STATUS = SAI__OK  
+      STATUS = SAI__OK
 
 *  Take the FFT of the input image, storing the result back in the array
 *  IN.  The array OUT is used here as work space.
       CALL KPG1_FFTFR( C1_NPX, C1_NLN, IN, OUT, IN, STATUS )
 
-*  Multiply the FFT of the input image by the FFT of the PSF.  Store 
+*  Multiply the FFT of the input image by the FFT of the PSF.  Store
 *  the result back in the array IN.
       CALL KPG1_HMLTR( C1_NPX, C1_NLN, IN, PSF, IN, STATUS )
 

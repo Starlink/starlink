@@ -3,9 +3,9 @@ C+
 C
 C     G E N _ C H K N S F
 C
-C     Checks a real array for the (admittedly somewhat odd) 
+C     Checks a real array for the (admittedly somewhat odd)
 C     condition that every element of the array contains its own
-C     element number.  That is, GEN_CHKNSF is true if 
+C     element number.  That is, GEN_CHKNSF is true if
 C     ARRAY(I)=FLOAT(I) for all values of I.
 C
 C     Parameters -   (">" input, "<" output)

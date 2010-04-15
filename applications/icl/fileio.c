@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *		F I L E I O . C 
+ *		F I L E I O . C
  *
  * Procedures associated with ICL files.
  *
@@ -16,7 +16,7 @@
  *			(2) Correct bug in proc_write() that was
  *			    printing newline to std_out not the file
  *			(3) Correct bug that create will not complain
- *			    if file already exists (by changing 
+ *			    if file already exists (by changing
  *			    create_helper())
  *	Edited  :	S.K. Robinson, I. R. Jenkins 5/5/92
  *			(1) To correct behaviour in read_values()
@@ -57,7 +57,7 @@
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_print(node * n)
 {
     value val;
@@ -92,7 +92,7 @@ proc_print(node * n)
  *                  if the error_indicator is set
  ******************************************************************************
  */
-static value 
+static value
 proc_write(node * n)
 {
     extern int stackandsetoutfp(value vfp);		/* output.c */
@@ -107,7 +107,7 @@ proc_write(node * n)
     char *filename;
     int savep = precision;
 
-    if (nargs == 0) 
+    if (nargs == 0)
 	return exception("TOOFEWPARS  WRITE: internal name required");
     else if(nargs == 1)
 	val = interpret_to_string(n);
@@ -170,7 +170,7 @@ proc_write(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_read(node * n)
 {
     value val;
@@ -248,7 +248,7 @@ proc_read(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 read_values(char *command, int type, char *filename)
 {
     int i;
@@ -326,7 +326,7 @@ read_values(char *command, int type, char *filename)
  *
  ******************************************************************************
  */
-static value 
+static value
 read_helper(char *command, int type)
 {
     value val;
@@ -347,7 +347,7 @@ read_helper(char *command, int type)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_readr(node * n)
 {
     return read_helper("READR", TYPE_REAL);
@@ -361,7 +361,7 @@ proc_readr(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_readi(node * n)
 {
     return read_helper("READI", TYPE_INTEGER);
@@ -375,7 +375,7 @@ proc_readi(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_readl(node * n)
 {
     return read_helper("READL", TYPE_LOGICAL);
@@ -428,7 +428,7 @@ proc_readl(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 input_values(char *command, int type, int start, char *prompt)
 {
     int i;
@@ -499,7 +499,7 @@ input_values(char *command, int type, int start, char *prompt)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_inputr(node * n)
 {
     value val;
@@ -533,7 +533,7 @@ proc_inputr(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_inputi(node * n)
 {
     value val;
@@ -567,7 +567,7 @@ proc_inputi(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_inputl(node * n)
 {
     value val;
@@ -617,7 +617,7 @@ proc_inputl(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_input(node * n)
 {
     extern int uface_interrupt(void);				/* uface.c */
@@ -626,7 +626,7 @@ proc_input(node * n)
     char buf[ICL_BUFSIZE];
     char *prompt;
     int i;
-    
+
 
     if (n == NODENIL)
 	return exception("TOOFEWPARS  INPUT: variable required");
@@ -706,7 +706,7 @@ proc_input(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 create_helper(char *command, char *mode)
 {
     extern node *node_value (value v);		/* node.c   */
@@ -752,7 +752,7 @@ create_helper(char *command, char *mode)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_create(node * n)
 {
     return create_helper("CREATE", "w");
@@ -766,7 +766,7 @@ proc_create(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_append(node * n)
 {
     return create_helper("APPEND", "a");
@@ -780,7 +780,7 @@ proc_append(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_open(node * n)
 {
     return create_helper("OPEN", "r");
@@ -816,7 +816,7 @@ proc_open(node * n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_close(node * n)
 {
     value val;
@@ -844,17 +844,17 @@ proc_close(node * n)
  *
  ******************************************************************************
  */
-value 
+value
 init_fileio(void)
 {
     extern node *node_builtin (value (*fn)() );			/* node.c   */
     value val;
 
-    if ((isexc(val = store_symbol("CREATE", SYM_BUILTIN, 
+    if ((isexc(val = store_symbol("CREATE", SYM_BUILTIN,
 					node_builtin(proc_create))))	||
 	(isexc(val = store_symbol("OPEN", SYM_BUILTIN,
 					node_builtin(proc_open))))	||
-	(isexc(val = store_symbol("APPEND", SYM_BUILTIN, 
+	(isexc(val = store_symbol("APPEND", SYM_BUILTIN,
 					node_builtin(proc_append))))	||
 	(isexc(val = store_symbol("CLOSE", SYM_BUILTIN,
 					node_builtin(proc_close))))	||

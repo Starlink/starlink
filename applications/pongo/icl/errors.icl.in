@@ -26,7 +26,7 @@
 {  History:
 {     15-DEC-1992 (PCTR):
 {        Starlink release.
-{     11-JUN-1994 (PDRAPER): 
+{     11-JUN-1994 (PDRAPER):
 {        Ported to UNIX.
 
 {  Bugs:
@@ -47,7 +47,7 @@ XCOLUMN 1
 EXCOLUMN 2
 YCOLUMN 3
 EYCOLUMN 4
-                              
+
 {  Read the data file.
 READF DATA=(PONGO_EXAMPLES&'')/tutorial.dat ALL
 
@@ -81,7 +81,7 @@ FITLINE WEIGHT COLOUR=2
 LTYPE 4
 FITCURVE POLY NPOLY=2 WEIGHT COLOUR=4
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 

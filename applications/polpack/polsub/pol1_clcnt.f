@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_CLCNT( NIN, SPEC, XIN, YIN, ZIN, TR, NXBIN, NYBIN, 
+      SUBROUTINE POL1_CLCNT( NIN, SPEC, XIN, YIN, ZIN, TR, NXBIN, NYBIN,
      :                       NZBIN, WORK, MXCNT, STATUS )
 *+
 *  Name:
@@ -15,7 +15,7 @@
 *                      WORK, MXCNT, STATUS )
 
 *  Description:
-*     This routine counts the number of input positions contained in each 
+*     This routine counts the number of input positions contained in each
 *     output grid cell. The largest number in any one cell is returned.
 *     An error is reported if no good input positions are supplied.
 
@@ -33,9 +33,9 @@
 *        .TRUE.
 *     TR( 6 ) = REAL (Given)
 *        The  coefficients of the transformation from (X,Y,Z) to cell indices.
-*        The X cell index for a position (X,Y) is given by 
-*        INT( TR( 1 ) + TR( 2 )*X ), the Y cell index is given by 
-*        INT( TR( 3 ) + TR( 4 )*Y ), the Z cell index is given by 
+*        The X cell index for a position (X,Y) is given by
+*        INT( TR( 1 ) + TR( 2 )*X ), the Y cell index is given by
+*        INT( TR( 3 ) + TR( 4 )*Y ), the Z cell index is given by
 *        INT( TR( 5 ) + TR( 6 )*Z ).
 *     NXBIN = INTEGER (Given)
 *        The number of cells along the X axis.
@@ -54,7 +54,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       DO IZ = 1, NZBIN
          DO IY = 1, NYBIN
             DO IX = 1, NXBIN
-               WORK( IX, IY, IZ ) = 0  
+               WORK( IX, IY, IZ ) = 0
             END DO
          END DO
       END DO
@@ -123,10 +123,10 @@
 
 *  Go through each good input position.
          DO I = 1, NIN
-            X = XIN( I )    
+            X = XIN( I )
             Y = YIN( I )
             Z = ZIN( I )
-            IF( X .NE. VAL__BADR .AND. 
+            IF( X .NE. VAL__BADR .AND.
      :          Y .NE. VAL__BADR .AND.
      :          Z .NE. VAL__BADR ) THEN
 
@@ -152,7 +152,7 @@
 
 *  Go through each good input position.
          DO I = 1, NIN
-            X = XIN( I )    
+            X = XIN( I )
             Y = YIN( I )
             IF( X .NE. VAL__BADR .AND. Y .NE. VAL__BADR ) THEN
 

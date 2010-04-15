@@ -6,8 +6,8 @@ C
 C  Description:
 C     This is a Figaro program that removes any 'flagged' values from
 C     the main data array in a Figaro data file. If there are in fact
-C     such values in the main data array (many arrays are flagged as 
-C     'may contain flagged values', but in fact do not) then this 
+C     such values in the main data array (many arrays are flagged as
+C     'may contain flagged values', but in fact do not) then this
 C     routine sets the equivalent elements of an associated quality
 C     array (which it may have to create).
 C
@@ -15,7 +15,7 @@ C  Command parameters:
 C
 C     INPUT  (Character) The name of the structure containing the data.
 C
-C     OUTPUT (Character) The name of the result of the operation.  This 
+C     OUTPUT (Character) The name of the result of the operation.  This
 C            can be the same as for INPUT.  If not, a new structure
 C            is created, with everything but the data a direct
 C            copy of the input.
@@ -27,7 +27,7 @@ C  Command keywords:
 C
 C     FIXED  If specified, a fixed value (supplied in VALUE) is used
 C            to replace the flagged data values. If not, the program
-C            interpolates over them.  
+C            interpolates over them.
 C-
 C  History:
 C     11th Feb 1995  KS / AAO.  Original version.
@@ -174,7 +174,7 @@ C     Set the file to indicate it has no flagged values
 C
       CALL DSA_SET_FLAGGED_VALUES ('OUTPUT',.FALSE.,STATUS)
 C
-C     Close down everything 
+C     Close down everything
 C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
@@ -209,7 +209,7 @@ C     Local variables
 C
       REAL    DELTA             ! Increment for interpolation
       INTEGER I                 ! Loop index through all elements of array
-      INTEGER IBAD              ! Loop index through flagged elements 
+      INTEGER IBAD              ! Loop index through flagged elements
       INTEGER LAST_GOOD         ! Index of last good element
       REAL    LAST_VALUE        ! Value of last good element
 C

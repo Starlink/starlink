@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ This note is intended to assist managers with Q-BUS and UNIBUS  configuration.
 It is not a complete description.
 Please send any corrections or suggested additions to the Starlink Librarian.
 
-{\bf WARNING} Make sure that the current  configuration 
+{\bf WARNING} Make sure that the current  configuration
 both in terms of addresses and vectors and physical placement
  of all boards are carefully noted before any changes are made.
 Also note carefully any changes that are made so that there is a reasonable
@@ -77,7 +77,7 @@ This section will only deal with bus integrity and cabling
  problems and {\bf not} with placement to avoid bus interaction problems and
  efficiency.
 
-	
+
 \subsection{UNIBUS}
 \subsubsection{Cabling}
 Problems can arise with some boards when connecting and routing the
@@ -132,16 +132,16 @@ No jumpers or changes are required in the top two areas nor in the bottom two.
 
 Clearly if removing one board and inserting another the
 first  choice will be a simple replacement.
-However, ignoring any other considerations, the boards must be checked to 
+However, ignoring any other considerations, the boards must be checked to
 see if both are DMA or not.
 If both are DMA there is no problem.
 If both not DMA you will also be alright if both  pass or do not pass the NPG.
- Problems may arise if mixed DMA and non DMA or both non DMA but mixed NPG 
+ Problems may arise if mixed DMA and non DMA or both non DMA but mixed NPG
 jumpering.
 Suppliers should be able to help with this information.
 Failing that you could (with care) simply see what happens when you access
 the bus.
-All devices will configure properly  but DMA devices may not work if the 
+All devices will configure properly  but DMA devices may not work if the
 NPG is not contiguous in the correct way.
 Be especially  careful if disc drives are involved.
 It is always a good idea to set {\bf \it all}  drives to write protected when
@@ -150,8 +150,8 @@ Note that VMS will run in a limited way with even the system disc write
 protected.
 Also remember to check all devices on the bus after configuration changes.
 
-Another possible solution will be use use a different spare slot 
-or in some other way re-arrange things -- remembering that the idea is to 
+Another possible solution will be use use a different spare slot
+or in some other way re-arrange things -- remembering that the idea is to
 get contiguous grant lines.
 Major changes are {\bf \it not} recommended without an engineer since
 machines should really only be re-configured by DEC (or whoever is maintaining
@@ -164,7 +164,7 @@ the system)
 
 Other than the cramped working space it is believed that there are few
  significant problems with cables and cable routing with Q-BUS machines.
-On 3000 series machines however, problems may arise because of the 
+On 3000 series machines however, problems may arise because of the
 requirement for the baffles on the front of the boards.
 These can interfere with cables unless the correct baffles are available.
 
@@ -181,17 +181,17 @@ The only complications arise because the backplane is divided into areas
 AB and CD for each slot.
 Each normal slot will take either 1 quad size board or two `dual' height
 boards.
-The word normal has been used because in some Q-BUSes the first slots 
+The word normal has been used because in some Q-BUSes the first slots
 (on the right ?) are used for the CPU.
 In fact the first slot normally {\bf is} the CPU, 2 and possibly 3 are
 normally memory.
- DEC in fact recommend that slot 3 is reserved for memory and although 
+ DEC in fact recommend that slot 3 is reserved for memory and although
  it is possible to use the AB position for a normal board it should, if
  not used for memory, have a standard M9047 grant card in the AB position.
- 
+
  After these first 3 slots, the remaining are sometimes connected
  in a serpentine fashion.
- This in practice means that unless you can work 
+ This in practice means that unless you can work
  out the pattern (see the CPU hardware manual), the safest thing is to
 make sure that the last quad slot is
  completely filled by including a grant card if necessary.
@@ -204,15 +204,15 @@ as possible.
 This seems to be over-ridden by a DZQ11 in at least one DEC configuration
 guideline.
 
-There will be other rules but they seem to change as new devices are used 
+There will be other rules but they seem to change as new devices are used
 and will not be dealt with in this section.
 
 \section{ADDRESSING}
 
 Addressing can be a very confusing on both UNIBUS and Q-BUS.
-As far as is known, these notes will apply to both, although the actual values 
-of some addresses and vectors differ from the UNIBUS tables supplied for 
-VMS when using a Q-BUS -- despite the appearance of Q-BUS devices in the 
+As far as is known, these notes will apply to both, although the actual values
+of some addresses and vectors differ from the UNIBUS tables supplied for
+VMS when using a Q-BUS -- despite the appearance of Q-BUS devices in the
 tables.
 
 Please note that the address of a device is totally independent of its
@@ -235,7 +235,7 @@ It may be useful to describe what happens, when during the boot it occurs
 and how the manager can control the actions.
 
 \begin{sloppypar}
-The intended place for a manager to control the device configuration is the 
+The intended place for a manager to control the device configuration is the
 file SYS\$MANAGER:SYCONFIG.COM.
 Here a manager can configure devices explicitly and, as may be useful for
 debugging configurations, switch off the normal automatic configuration
@@ -258,7 +258,7 @@ commands will be needed in these files.
 Note that discs that are served {\bf\it to} this machine are available without
 configuration but would need to be mounted.
 
-The automatic configuration that occurs after any SYCONFIG.COM has been 
+The automatic configuration that occurs after any SYCONFIG.COM has been
 executed is achieved by the command SYSGEN AUTOCONFIGURE ALL.
 This causes the SYSGEN programme to search through the bus address space,
 looking for addresses that respond.
@@ -304,11 +304,11 @@ Below is an example of the output for a 750.
 \begin{verbatim}
 
 	System CSR and Vectors on 17-JUL-1987 10:47:28.95
- Name: DRA  Units: 1  Nexus:4  (MBA) 
+ Name: DRA  Units: 1  Nexus:4  (MBA)
  Name: IDA  Units: 1  Nexus:8  (UBA) CSR: 764064  Vector1: 274  Vector2: 000
  Name: MMA  Units: 1  Nexus:8  (UBA) CSR: 772440  Vector1: 224  Vector2: 000
- Name: MTA  Units: 1  Nexus:5  (MBA) 
- Name: DRC  Units: 4  Nexus:6  (MBA) 
+ Name: MTA  Units: 1  Nexus:5  (MBA)
+ Name: DRC  Units: 4  Nexus:6  (MBA)
  Name: LPA  Units: 1  Nexus:8  (UBA) CSR: 777514  Vector1: 200  Vector2: 000
  Name: TTA  Units: 8  Nexus:8  (UBA) CSR: 760100  Vector1: 300  Vector2: 304
  Name: TTB  Units: 8  Nexus:8  (UBA) CSR: 760110  Vector1: 310  Vector2: 314
@@ -320,7 +320,7 @@ Below is an example of the output for a 750.
 
 It is necessary to identify which are DEC devices and which are 3rd party.
 Your  site management guide should help (the configuration section).
-Once it is known what devices there are and what there will be, SYSGEN can 
+Once it is known what devices there are and what there will be, SYSGEN can
 be used give the expected configuration.
 
 
@@ -328,19 +328,19 @@ If there are problems associating the physical devices with the addresses
 in use, look at the SHOW /CONFIG output for the current
  system and find the name: field (without the trailing A B C) under the
  DEVICE NAME column in a SYSGEN DEVICE table.
- This should provide the full  device name in the Controller name column 
+ This should provide the full  device name in the Controller name column
  (e.g.\ an LPA --$>$ LP --$>$ LP11).
 These controller names are the ones that will be needed.
 
 \subsection{New Configuration}
 
-Having found all the names of DEC devices on the new configuration, it may be 
+Having found all the names of DEC devices on the new configuration, it may be
 necessary to consult the SYSGEN  CONFIGURE documentation in the VMS
 documentation of the utility.
 This shows how to enter multiple devices on the same controller and
 how to handle multiple UNIBUSes.
 
-To investigate new configurations, run SYSGEN, enter CONFIGURE and 
+To investigate new configurations, run SYSGEN, enter CONFIGURE and
 then enter the {\bf current} set to see if it agrees with the current
 configuration.
 Then start again with a new CONFIGURE and enter the devices in the new
@@ -350,8 +350,8 @@ Floating vectors or addresses are indicated with an *.
 If this is a pure DEC system, it should have been completely described
 and the rest of this section can be ignored.
 
-If this is not a pure DEC or DEC compatible system you need to 
-check that there are no conflicts between your new DEC addresses and the 
+If this is not a pure DEC or DEC compatible system you need to
+check that there are no conflicts between your new DEC addresses and the
 non DEC ones.
 This may not be quite as simple as it sounds.
 Check all the devices in the sysgen tables for the number of vectors and
@@ -364,9 +364,9 @@ Also remember that you are working in {\bf OCTAL} !
 If there are conflicts then  something will have to be moved -- probably
 the non DEC things are safest.
 Note that the vectors and addresses are not tied
-together and for fixed ones  can be changed without problems. 
+together and for fixed ones  can be changed without problems.
 
-Be {\bf very} careful about non DEC devices that are said to be 
+Be {\bf very} careful about non DEC devices that are said to be
 DEC compatible.
 For example the UNIBUS MBS DR-11W equivalent would be
 expected  to have addresses of a DR-11W -- however, when the actual
@@ -376,17 +376,17 @@ The Q-BUS version actually does use the addresses of a DEC DR-11W !
 
 \subsection{Preparing to Set addresses and vectors}
 
-If addresses on boards need to be changed, the manuals must be found for them. 
+If addresses on boards need to be changed, the manuals must be found for them.
 It is probably wise to find all such manuals in any case just in
  case they are needed. Make sure that all the tools that may be needed
 are available -- e.g.\  anti static wrist strap, wire wrap tools, soldering
-iron etc. 
+iron etc.
 
 \subsection{Check software}
 
 The drivers for DEC or DEC compatible devices that say SUPPORTED YES
  in the sysgen tables are loaded automatically when the machine autoconfigures.
- If the driver is absent from SYS\$SYSTEM (VMS 4) or SYS\$LOADABLE\_IMAGES 
+ If the driver is absent from SYS\$SYSTEM (VMS 4) or SYS\$LOADABLE\_IMAGES
 (VMS 5) there will be an error reported.
  If SUPPORTED  NO then
  the address and vector space is allocated but no driver loaded and no error
@@ -406,15 +406,15 @@ The notes in SSN 47 about memory replacement give a guide to how to handle
 boards using  grounding wrist straps etc..
 Also note that if using a currently  empty UNIBUS slot there will be a grant
 card in it. It will need to be removed which may well entail removing other
-boards to get enough working space. 
+boards to get enough working space.
 
 Always allow plenty of time for these operations and do not rush !
 
 Once any addresses have been reset and the boards inserted,
-try to boot the machine again but you want to write protect disks and 
+try to boot the machine again but you want to write protect disks and
 generally do a `no users' type of boot.
-Remember that even the normal autoconfigure can be prevented either as 
-described above or by invoking a minimum startup -- that is setting 
+Remember that even the normal autoconfigure can be prevented either as
+described above or by invoking a minimum startup -- that is setting
 STARTUP\_P1 to ``MIN".
 Useful things  to do in these conditions include using
 SYSGEN SHOW /UNIBUS to see what  bus addresses respond.
@@ -428,7 +428,7 @@ It will NOT check that you have all the grants properly installed.
 The  only way to fully check is to actually use all the
 devices.
 Note that  incorrect jumpers can affect devices other than the one
-or slot in error. 
+or slot in error.
 
 \appendix
 \section{Sysgen Autoconfigure}
@@ -488,17 +488,17 @@ pre-defined fashion.
 It has nothing to do with physical placement and not necessarily anything
 to do with order in address space.
 Suppose it is possible for some of the very clever controllers whose address
-and vectors are loaded dynamically may break this rule but it is thought 
-that the identity problem this may produce is resolved by straps on the board 
+and vectors are loaded dynamically may break this rule but it is thought
+that the identity problem this may produce is resolved by straps on the board
 which define the device order.
 
 \item Some devices (for example UDA) actually work in an even more
 complicated way.
 Their addresses and vectors can be set by AUTOGEN itself!
-These would usually have no physical way to set the address and vector 
+These would usually have no physical way to set the address and vector
 although they may have straps to define if it is the first or second
 similar device.
-Under some circumstances, it may appear that the device has not actually 
+Under some circumstances, it may appear that the device has not actually
 configured but it will do later.
 (I believe this can occur when autoconfigure has been suppressed and a
 SHOW/UNIBUS is performed but this is open to correction).
@@ -509,7 +509,7 @@ that correspond to a DR11-B !
 \item Full details can be found in the Guide to Device drivers starting
 at section 14.3 (VMS 4) or in Device Support Manual section 15.4 (VMS 5).
 Other related sections may also be useful.
-    
+
 \end{itemize}
 
 \section{Terms in addressing}
@@ -537,7 +537,7 @@ They are addresses outside the ranges described below.
  configures the machine automatically.
 They are approximately 764100 through to 767776.
 These are often used by third party devices and, provided the device has
-fixed address and vector and these are well seperated from other 
+fixed address and vector and these are well seperated from other
 addresses and vectors, they should take no part in autoconfiguration.
 
 \item{FIXED vector} These are vectors that do not depend on other devices.

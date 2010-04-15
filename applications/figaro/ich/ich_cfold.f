@@ -28,13 +28,13 @@ C     Returns -  (if called as a function)
 C
 C     (<) ICH_CFOLD  (Integer) The number - starting from 1 -
 C                    of the last non-blank character in STRING.
-C                    In some cases this is the logical length 
+C                    In some cases this is the logical length
 C                    of STRING.
 C
 C     Example:
 C
 C     CHARACTER STRING*38
-C     
+C
 C     STRING = 'String with "quotes" and [ braces ] '
 C
 C     N = ICH_CFOLD (STRING,'[]""')

@@ -19,7 +19,7 @@
 2.2-0
 
    * Support for using EMS together with POSIX threads has been added.
-     SSN/4 has been updated to describe this change. This is enabled 
+     SSN/4 has been updated to describe this change. This is enabled
      by default on platforms with POSIX threads support.
 
    * A bug when concatenating message tokens inside a mark has been fixed.
@@ -27,7 +27,7 @@
    * A new routine EMS_GTUNE has been added, with a C version emsGtune.
 
    * The emsTune routine has been deprecated and replaced by a new
-     routine emsStune. This also returns the current value of the 
+     routine emsStune. This also returns the current value of the
      tuning parameter.
 
    * The old 3 argument interface to emsSetc has been removed.
@@ -37,7 +37,7 @@
 
 2.1-2
 
-   * A memory overrun bug storing and retrieving parameter names has been 
+   * A memory overrun bug storing and retrieving parameter names has been
      fixed. Note this only concerned the C interface.
 
 2.1
@@ -72,20 +72,20 @@
         some undesirable conflicts may occur if output by this method occurs
         interspersed with Fortran output. The base level, EMS__BASE is now
         available in the ems_par.h header file and the EMS_PAR Fortran include
-        file. 
+        file.
 
       * New subroutines EMS_TUNE (and emsTune) and EMS_EXPND (and emsExpnd)
         are included. EMS_EXPND (emsExpnd) is similar in function to
         EMS_MLOAD (emsMload), which is now deprecated because it has a
-        redundant parameter, PARAM, and the C interface provides no 
+        redundant parameter, PARAM, and the C interface provides no
         limit on the output string size.
 
       * The EMS_FMTx and emsFmtx routines are withdrawn on the assumption that
         they have not been called directly and to avoid confusion between
-        Fortran and C format syntax. 
+        Fortran and C format syntax.
 
       * emsFioer is withdrawn as it is Fortran-specific. The Fortran-callable
-        EMS_FIOER is still provided. 
+        EMS_FIOER is still provided.
 
       * The calling sequence for the C functions is identical to the existing
         C interface to Fortran EMS, with the following exceptions:
@@ -102,18 +102,18 @@
 
       * The temporary drop-through functions introduced in Version 1.6 to
         enable compiled C code which uses the old form of EMS function name
-        (ems_annul_c, etc.) to continue working have been withdrawn. 
+        (ems_annul_c, etc.) to continue working have been withdrawn.
         Any such code which has not been re-compiled using a Version 1.6 or
         later ems.h header file must be re-compiled now.
 
      * The EMS library has been split into two -- one containing the C
        interface and the other containing the Fortran interface. This makes it
        possible to link C programs with EMS without requiring the Starlink CNF
-       library to be present (use `ems_link Conly`). 
+       library to be present (use `ems_link Conly`).
 
        Any programs linked with the shared libraries must be re-linked.
 
-     * A bug which prevented tokens from being renewed in some cases has been 
+     * A bug which prevented tokens from being renewed in some cases has been
        fixed.
 
 1.7
@@ -121,15 +121,15 @@
    * EMS tuning parameters are implemented but there is no public interface to
      them at the EMS level.  They provide the functionality in EMS required for
      tuning MSG and ERR and will be altered by new subroutines ERR_TUNE and
-     MSG_TUNE in the MERS package described in SUN/104. 
+     MSG_TUNE in the MERS package described in SUN/104.
 
 1.6
 
-   * The names of the C interface functions have been changed from the form 
+   * The names of the C interface functions have been changed from the form
      ems_xxx_c to the form emsXxx for compatibility with other Starlink
      libraries. There are no changes to the argument lists and existing code
      will continue to work by virtue of statements:
- 
+
         #define ems_xxx_c emsXxx
 
      in ems.h.

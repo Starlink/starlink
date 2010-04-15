@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine serves NDF2FITS.  It merges the FITS airlocks of
-*     two NDFs in the first NDF supplied.  The routine first stores any 
-*     headers in the first NDF airlock.  Then it replaces the first 
+*     two NDFs in the first NDF supplied.  The routine first stores any
+*     headers in the first NDF airlock.  Then it replaces the first
 *     airlock with the second NDF's FITS airlock.  It finally inserts
 *     any original headers from the first NDF just before the END card,
 *     or appendss the headers should there be no END card.
@@ -63,7 +63,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,7 +119,7 @@
      :     /'(Probable programming error.)', STATUS )
          GOTO 999
       END IF
-      
+
       CALL NDF_VALID( NDF2, VALID, STATUS )
 
 *  Report an error if the identifier is not valid.
@@ -221,7 +221,7 @@
             CALL DAT_PUT0C( HLOC, ECARD, STATUS )
          ELSE
             CALL DAT_PUT0C( HLOC, 'END      ', STATUS )
-         END IF   
+         END IF
          CALL DAT_ANNUL( HLOC, STATUS )
 
 *  Remove the original first-NDF airlock.

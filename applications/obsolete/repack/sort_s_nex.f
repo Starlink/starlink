@@ -15,14 +15,14 @@
 	INTEGER		IND_SAV
 	DATA 		IND_SAV /1/
 	SAVE		IND_SAV
- 
+
 	IF (STATUS .NE. 0) RETURN
- 
+
 * Loop from where we left off last call
 	FOUND = .FALSE.
 	CALL PAR_GET0I ('INDSAV', IND_SAV, STATUS)
 	IND_SAV = MAX(1, IND_SAV)
- 
+
 	DO IN = IND_SAV, NLON*NLAT
 	  ILO = IN - INT((IN-1)/NLON) * NLON
 	  ILA = INT((IN-1)/NLON) + 1
@@ -33,7 +33,7 @@
 	    GOTO 888
 	  ENDIF
 	ENDDO
- 
+
 	DO IN = 1, IND_SAV-1
 	  ILO = IN - INT((IN-1)/NLON) * NLON
 	  ILA = INT((IN-1)/NLON) + 1
@@ -43,7 +43,7 @@
 	    GOTO 888
 	  ENDIF
 	ENDDO
- 
+
 888	IF (FOUND) THEN
 	  MLO = ILO
 	  MLA = ILA
@@ -52,5 +52,5 @@
 	  MLA = -999
 	ENDIF
 	CALL PAR_PUT0I ('INDSAV', IND_SAV, STATUS)
- 
+
 	END

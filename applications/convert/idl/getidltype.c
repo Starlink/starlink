@@ -16,14 +16,14 @@
 *        The HDS type
 
 *  Returned Value:
-*     idltype = UCHAR  
+*     idltype = UCHAR
 *        The IDL type
 
 *  Description:
 *     The IDL type corresponding to the HDS type in the Starlink/IDL
 *     data conversion process is returned as a UCHAR - that is the form
 *     suitable to place in an IDL_VARIABLE structure.
-*     
+*
 *     IDL_TYP_UNDEF is returned if the type is not primitive or not handled.
 
 *  Pitfalls:

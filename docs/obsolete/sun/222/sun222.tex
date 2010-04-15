@@ -78,7 +78,7 @@ convenient way of accessing NDF data for users not wanting to use Fortran.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -146,7 +146,7 @@ convenient way of accessing NDF data for users not wanting to use Fortran.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -254,12 +254,12 @@ convenient way of accessing NDF data for users not wanting to use Fortran.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -394,7 +394,7 @@ print "An error occurred\n" if ($status != &NDF::SAI__OK);
 \end{verbatim}
 \end{myquote}
 
-At present all the \texttt{DAT\_\_}, \texttt{ERR\_\_}, \texttt{EMS\_\_}, 
+At present all the \texttt{DAT\_\_}, \texttt{ERR\_\_}, \texttt{EMS\_\_},
 \texttt{MSG\_\_} and \texttt{SAI\_\_} constants are available.  More
 can be included as more C include files are created.  In the absence of
 the necessary include files a request for a specific compiler constant
@@ -409,9 +409,9 @@ perl than in Fortran.
 
 To read a mapped array you must first \emph{copy\/} the data from the mapped
 array into a perl array. Modifiying this perl array \emph{will not\/} change
-the mapped array. The perl array must be copied back into the mapped 
+the mapped array. The perl array must be copied back into the mapped
 array for any changes to become permanent. To reduce resource requirements
-you may want to unmap the array as soon as it has been copied to the 
+you may want to unmap the array as soon as it has been copied to the
 perl array. Currently there is no way to access the mapped data directly.
 
 In perl the array must first be packed into a single string and this
@@ -540,7 +540,7 @@ access the \texttt{nth} entry via
 ($keyword, $value, $comment) = fits_extract_key_val($fits[$n]);
 \end{verbatim}
 \end{myquote}
-% $ 
+% $
 
 To find out the value that goes with a keyword:
 
@@ -622,7 +622,7 @@ used\footnote{Please contact the author for more information on the
 \subsubsection{Function calls}%
 \index{Function calls}
 
-The commands in this module use  perl prototypes to check argument 
+The commands in this module use  perl prototypes to check argument
 passing. This means that arrays do not have to be referenced when being
 used as arguments \emph{unless\/} the routine is called with an \texttt{\&}.
 
@@ -641,14 +641,14 @@ $value = &fits_get_item(\@fits, $keyword);
 \end{myquote}
 
 are correct but
-\begin{myquote} 
+\begin{myquote}
 \begin{verbatim}
 $value = &fits_get_item(@fits, $keyword);
 \end{verbatim}
 \end{myquote}
 
 will fail because perl will pass all the members of the array and not the
-reference to the array. 
+reference to the array.
 
 \subsubsection{Arrays}%
 \index{Arrays}
@@ -690,7 +690,7 @@ implemented and \texttt{NDF\_HECHO} is called by default.
 \newpage
 \section{\xlabel{ndfperl_sub-systems}NDFPERL sub-systems\label{subsys}}
 
-This section lists name of each sub-system that can be imported via the 
+This section lists name of each sub-system that can be imported via the
 perl \texttt{use} command. By default all sub-systems are loaded into the
 current namespace.
 
@@ -734,7 +734,7 @@ This imports most of the \texttt{CMP\_} functions.
 \item[:misc]%
 \index{:misc@:misc}%
 \hfil\\
-This imports routines for converting DATA pointers to arrays and routines for 
+This imports routines for converting DATA pointers to arrays and routines for
 easy access to FITS arrays commonly found in NDFs. A routine for accessing
 parameters stored by ADAM tasks is also available.
 
@@ -854,13 +854,13 @@ All \texttt{hds\_} routines are implemented:
 \item[:misc]%
 \index{:misc@:misc}\mbox{}
 \begin{flushleft}
-\texttt{mem2string} \texttt{string2mem} \texttt{array2mem} 
-\texttt{mem2array} \texttt{fits\_get\_nth\_item} \texttt{fits\_read\_header} 
+\texttt{mem2string} \texttt{string2mem} \texttt{array2mem}
+\texttt{mem2array} \texttt{fits\_get\_nth\_item} \texttt{fits\_read\_header}
 \texttt{fits\_get\_item} \texttt{fits\_extract\_key\_val}
 \texttt{fits\_construct\_string} \texttt{par\_get}
 \end{flushleft}
 
 \end{description}
 
-% ? End of main text 
+% ? End of main text
 \end{document}

@@ -35,7 +35,7 @@
 *
 *     2 - Simulated data is created from the new restored image by
 *     smoothing it with the PSF and adding the background.  The
-*     chi-squared value for the new simulated data is found at this 
+*     chi-squared value for the new simulated data is found at this
 *     point.
 
 *  Arguments:
@@ -67,18 +67,18 @@
 *     FILE_3( N ) = REAL (Given)
 *        The Fourier transform of the PSF.
 *     FILE_4( N ) = REAL (Given)
-*        The observed data. 
+*        The observed data.
 *     FILE_6( N ) = REAL (Given)
-*        The background data. 
+*        The background data.
 *     FILE_8( N ) = REAL (Given)
 *        The data variances.
 *     FILE_1( N ) = REAL (Given and Returned)
 *        Returned holding the reconstructed image.  On entry, it should
-*        hold the initial guess at the reconstructed image. 
+*        hold the initial guess at the reconstructed image.
 *     FILE_2( N ) = REAL (Returned)
 *        Work space.
 *     FILE_5( N ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     FILE_7( N ) = REAL (Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -100,8 +100,8 @@
 *       2 - Work space (image or data set).
 *       3 - The Fourier transform of the PSF.
 *       4 - The observed data.
-*       5 - A work array to hold bad-pixel masks. 
-*       6 - The background data. 
+*       5 - A work array to hold bad-pixel masks.
+*       6 - The background data.
 *       7 - Work space (image or data set).
 *       8 - Data variances.
 
@@ -146,7 +146,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message-system constants
-      
+
 *  Arguments Given:
       INTEGER N
       INTEGER NPIX
@@ -165,7 +165,7 @@
 
 *  Arguments Given and Returned:
       REAL FILE_1( N )
-      
+
 *  Arguments Returned:
       REAL FILE_2( N )
       REAL FILE_5( N )
@@ -191,7 +191,7 @@
      :                 FILE_2, FILE_5, XSQ, STATUS )
 
 *  Display the initial normalised chi-squared.
-      CALL MSG_SETR( 'X', XSQ )      
+      CALL MSG_SETR( 'X', XSQ )
       CALL MSG_OUTIF( MSG__NORM, 'KPS1_LUCY_MSG1',
      :  '  Initial normalised chi squared is ^X', STATUS )
 
@@ -209,7 +209,7 @@
      :                   '  Iteration ^I', STATUS )
 
 *  Create the next estimate of the reconstructed image.
-         CALL KPS1_LUCIM( N, NPIX, NLIN, WLIM, SNYDER, FILE_3, FILE_4, 
+         CALL KPS1_LUCIM( N, NPIX, NLIN, WLIM, SNYDER, FILE_3, FILE_4,
      :                    FILE_8, FILE_1, FILE_7, FILE_2, FILE_5,
      :                    STATUS )
 
@@ -221,13 +221,13 @@
      :                    FILE_7, FILE_2, FILE_5, XSQ, STATUS )
 
 *  Display the current normalised chi-squared.
-         CALL MSG_SETR( 'X', XSQ )      
+         CALL MSG_SETR( 'X', XSQ )
          CALL MSG_OUTIF( MSG__NORM, 'KPS1_LUCY_MSG3',
      :                   '    Normalised chi squared: ^X', STATUS )
 
 *  Increment the iteration count.
          ITER = ITER + 1
-      
+
       END DO
 
 *  Warn the user if the required normalised chi-squared has not been
@@ -235,13 +235,13 @@
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       IF ( XSQ .GT. AIM ) THEN
-         CALL MSG_SETR( 'X', AIM )      
-         CALL MSG_SETI( 'N', NITER )      
+         CALL MSG_SETR( 'X', AIM )
+         CALL MSG_SETI( 'N', NITER )
          CALL MSG_OUT( 'KPS1_LUCY_MSG4', '  WARNING: The required ' /
      :     /'normalised chi squared (^X) was not reached within the ' /
      :     /'specified maximum number of iterations (^N).  Is the '/
      :     /'value of parameter AIM too low?', STATUS )
          CALL MSG_BLANK( STATUS )
-      END IF         
-      
+      END IF
+
       END

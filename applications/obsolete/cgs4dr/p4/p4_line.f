@@ -15,7 +15,7 @@
 *     P.N.Daly (JACH::PND)
 *    History :
 *     25-Oct-1989: History added. The use of PGMOVE and PGDRAW to
-*                  construct lines from many short vectors was 
+*                  construct lines from many short vectors was
 *                  inefficient and exacerbated a bug in GKS/UIS.
 *                  Modified so that PGLINE is used instead       (SMB)
 *      1-Nov-1989: Modified to test quality against a BYTE
@@ -47,7 +47,7 @@
 *                                         !  array if QUALITY is .FALSE.)
       REAL XSHIFT                         ! number added to axis before
 *                                         !  plotting
-      REAL YSHIFT                         ! number added to data before 
+      REAL YSHIFT                         ! number added to data before
 *                                         !  plotting
 *    Status :
       INTEGER STATUS
@@ -153,7 +153,7 @@
                   DO WHILE ( (I.LE.IFIN) .AND. (QDATA(I).NE.GOOD) )
 
                      I = I + 1
-                  END DO 
+                  END DO
                END DO
 
             ELSE
@@ -163,7 +163,7 @@
 
                   CALL PGPOINT (1, AXIS(IBEG), DATA(IBEG), 5)
                ENDIF
-            ENDIF 
+            ENDIF
 
 *          now plot error bars, faster without PGERRY
             IF (ERRORS) THEN
@@ -230,7 +230,7 @@
                   DO WHILE ( (I.LE.IFIN) .AND. (QDATA(I).NE.GOOD) )
 
                      I = I + 1
-                  END DO 
+                  END DO
                END DO
 
             ELSE
@@ -241,7 +241,7 @@
                   CALL PGPOINT( 1, AXIS(IBEG)+XSHIFT,
      :              DATA(IBEG)+YSHIFT, 5 )
                ENDIF
-            ENDIF 
+            ENDIF
 
 *          now plot error bars, faster without PGERRY
             IF (ERRORS) THEN
@@ -307,7 +307,7 @@
 
 *             plot marker at position of single point
                CALL PGPOINT (1, AXIS(I), DATA(I), 5)
-            ENDIF 
+            ENDIF
 
 *          now plot error bars, faster without PGERRY
             IF (ERRORS) THEN
@@ -361,7 +361,7 @@
 
 *             plot marker at position of single point
                CALL PGPOINT (1, AXIS(I)+XSHIFT, DATA(I)+YSHIFT, 5)
-            ENDIF 
+            ENDIF
 
 *          now plot error bars, faster without PGERRY
             IF (ERRORS) THEN

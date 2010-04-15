@@ -33,7 +33,7 @@
 *     MEAN = DOUBLE PRECISION (Given)
 *        Mean of the new values to be substituted for the old value.
 *     SIGMA = DOUBLE PRECISION (Given)
-*        Standard deviation of the new values to be substituted for the 
+*        Standard deviation of the new values to be substituted for the
 *        old value.
 *     DATMIN = DOUBLE PRECISION (Given)
 *        The minimum new value allowed.
@@ -147,7 +147,7 @@
       LOLIM = MAX( NUM_ITOD( VAL__MINI ), DATMIN )
 
 *  Report an error and abort if the high limit is less than or equal to
-*  the low limit. 
+*  the low limit.
       IF ( HILIM .LE. LOLIM ) THEN
          STATUS = SAI__ERROR
 
@@ -161,7 +161,7 @@
             CALL MSG_SETR( 'HI', NUM_DTOR( HILIM ) )
             CALL MSG_SETR( 'LO', NUM_DTOR( LOLIM ) )
 
-         ELSE 
+         ELSE
             CALL MSG_SETD( 'HI', HILIM )
             CALL MSG_SETD( 'LO', LOLIM )
 
@@ -206,7 +206,7 @@
             NTRY = 1
             DO WHILE ( ( DVAL .GE. HILIM .OR. DVAL .LE. LOLIM ) .AND.
      :                 NTRY .LT. MAXTRY )
-               NTRY = NTRY + 1            
+               NTRY = NTRY + 1
                DVAL = DBLE( PDA_RNNOR( MEAN, SIGMA ) )
             END DO
 

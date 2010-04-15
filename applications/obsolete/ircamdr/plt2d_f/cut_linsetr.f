@@ -5,19 +5,19 @@
 
 	IMPLICIT NONE
 
-	INTEGER 
-     :	  NPTS, 
-     :	  X1, 
-     :	  X2, 
-     :	  Y1, 
-     :	  Y2, 
+	INTEGER
+     :	  NPTS,
+     :	  X1,
+     :	  X2,
+     :	  Y1,
+     :	  Y2,
      :	  MAXP,
-     :	  I, 
+     :	  I,
      :	  J,
      :	  STATUS,
      :	  STEP
 
-	REAL 
+	REAL
      :	  LINDAT( MAXP, 2)
 
 * set the number of pixels and the line data to the row pixel numbers

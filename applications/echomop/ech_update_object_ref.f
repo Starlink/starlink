@@ -134,7 +134,7 @@
          string = usr_arc_type
 
       ELSE IF ( ref_name .EQ. 'ASCII_FILE' ) THEN
-         string = out_file 
+         string = out_file
 
       ELSE IF ( ref_name .EQ. 'AUTO_ID' ) THEN
          boolean_value = usr_id_interactive

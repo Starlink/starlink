@@ -1,7 +1,7 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d, 
+void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
                       int edge, int *status ){
 /*
 *+
@@ -15,7 +15,7 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], 
+*     void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3],
 *                           double d, int edge, int *status )
 
 *  Description:
@@ -26,8 +26,8 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 *     ipa
 *        Pointer to the start of the array holding the integer index
 *        (if any) associated with each pixel in the data array. This
-*        shows which clump each pixel belongs to (each clump is identified 
-*        by a unique integer index). The array should be the same shape and 
+*        shows which clump each pixel belongs to (each clump is identified
+*        by a unique integer index). The array should be the same shape and
 *        size as the data array. Pixels which have not yet been assigned
 *        to a clump are marked with the integer value CUPID__CFNULL.
 *     ps
@@ -40,7 +40,7 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 *     d
 *        The data value at the pixel.
 *     edge
-*        A boolean flag indicating if the pixel is adjacent to any edge of 
+*        A boolean flag indicating if the pixel is adjacent to any edge of
 *        the data array.
 *     status
 *        Pointer to the inherited status value.
@@ -87,8 +87,8 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* If this is not the first pixel to be added to the PixelSet, extend the 
-   bounding box so that it includes the supplied pixel. Increment the number 
+/* If this is not the first pixel to be added to the PixelSet, extend the
+   bounding box so that it includes the supplied pixel. Increment the number
    of pixels in the PixelSet at the same time. */
    if( ps->pop++ ) {
       for( i = 0; i < 3; i++ ) {
@@ -96,7 +96,7 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
          if( x[ i ] > ps->ubnd[ i ] ) ps->ubnd[ i ] = x[ i ];
       }
 
-/* If this is the first pixel to be added to the PixelSet, initialise the 
+/* If this is the first pixel to be added to the PixelSet, initialise the
    bounding box so that it includes just the supplied pixel. */
    } else {
       ps->lbnd[ 2 ] = ps->ubnd[ 2 ] = x[ 2 ];
@@ -119,6 +119,6 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
    if( edge ) ps->edge = 1;
 
 /* Store the new index value. */
-   ipa[ iv ] = ps->index; 
+   ipa[ iv ] = ps->index;
 
 }

@@ -105,7 +105,7 @@ C  Put a scale-bar on the plot
       END IF
 
 C  Put a label to the screen in the best place
-      
+
       CALL SXGEXPAND        (CHARHT/3.)
       CALL SXGFONT          (1)
 

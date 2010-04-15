@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -52,7 +52,7 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
-      CHARACTER DEFAUL*(*) 
+      CHARACTER DEFAUL*(*)
 
 *  Arguments Returned:
       CHARACTER UNITS*(*)
@@ -79,11 +79,11 @@
 
 *  Get the list of legal CRDD units.
       CALL IRC_IUNIT( UNTLIS, STATUS )
-      
+
 *  Get a value from the enironment. The returned string is in upper
 *  case.
-      CALL PAR_CHOIC( 'UNITS', DEFAUL, UNTLIS, .FALSE., UNITS, 
-     :                 STATUS )      
+      CALL PAR_CHOIC( 'UNITS', DEFAUL, UNTLIS, .FALSE., UNITS,
+     :                 STATUS )
 
 *  Find the corresponding  string in the original case.
       UCLIST = UNTLIS

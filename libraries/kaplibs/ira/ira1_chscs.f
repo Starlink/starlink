@@ -22,7 +22,7 @@
 *     a Julian epoch (eg "EQUAT(J2000.0)", "ECLIPT(B1983.3)" ). If the
 *     epoch is not preceded with either B or J, a Besselian epoch is
 *     assumed if the date is less than 1984.0, and a Julian epoch is assumed
-*     otherwise.  If no equinox specifier is included in the input 
+*     otherwise.  If no equinox specifier is included in the input
 *     SCS name, a value of B1950.0 is assumed (if required). If the SCS is
 *     not referred to the equinox, any equinox specifier is ignored.
 *
@@ -50,8 +50,8 @@
 *        "B" is returned (without the quotes) if the epoch in the
 *        equinox specifier represents a Besselian epoch, and "J"
 *        if it represents a Julian epoch. If no epoch is specified in
-*        argument SCS, then a value of B is returned (unless the epoch is 
-*        2000 in which case J is returned). If the SCS is not reference to 
+*        argument SCS, then a value of B is returned (unless the epoch is
+*        2000 in which case J is returned). If the SCS is not reference to
 *        the equinox (eg GALACTIC) then BJ is returned blank.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

@@ -12,7 +12,7 @@
    gives a quantitative description of these distortions. It also
    explains how they can be corrected for easily using the
    CCDPACK package.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

@@ -384,7 +384,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -551,7 +551,7 @@
          CALL VEC_SUBR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(1)) ),
      :                  %VAL( CNF_PVAL(PNTR(2)) ),
      :                  %VAL( CNF_PVAL(ZPTR(1)) ), IERR, NERR, STATUS )
-         CALL VEC_ADDR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(1)) ), 
+         CALL VEC_ADDR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(1)) ),
      :                  %VAL( CNF_PVAL(PNTR(2)) ),
      :                  %VAL( CNF_PVAL(ZPTR(2)) ), IERR, NERR, STATUS )
          CALL NDF_UNMAP( NDF(1), 'VARIANCE', STATUS )

@@ -20,7 +20,7 @@
 #define OLD_DCMPF 0
 #endif
 
-/* If FORTRAN_DCMPF is true, then link this against the Fortran version of 
+/* If FORTRAN_DCMPF is true, then link this against the Fortran version of
 ** this routine
 */
 #ifndef FORTRAN_DCMPF
@@ -369,7 +369,7 @@ int main (int argc, char **argv)
           0.00, 0.00,  1.00,  1.00,   0,  120  },
 	{ 0.00, 0.00,  1.00,  1.00,   0, -120,
           0.00, 0.00,  1.00,  1.00,   0, -120  },
-	{ 0.00, 0.00, -1.00,  1.00,   0, -120, 
+	{ 0.00, 0.00, -1.00,  1.00,   0, -120,
           0.00, 0.00, -1.00,  1.00,   0, -120  },
 	{ 0.00, 0.00, -1.00,  1.00,   0, +120,
           0.00, 0.00, -1.00,  1.00,   0,  120  },

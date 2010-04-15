@@ -1,5 +1,5 @@
 *+  RED4_ADD_OBSERVATION_2 - Add an observation to a reduced group file - 2
-      SUBROUTINE RED4_ADD_OBSERVATION_2( OBSTYPE, COADDED_OBS, 
+      SUBROUTINE RED4_ADD_OBSERVATION_2( OBSTYPE, COADDED_OBS,
      :  COADD_NAME, VARIANCE_WT, SKY_WT, STATUS )
 *    Description :
 *     This is a lower level routine, called by RED4_ADD_OBSERVATION, which
@@ -10,12 +10,12 @@
 *     observation has been opened with a DSA reference of 'OBSRED',
 *     the reduced group has been opened with a DSA reference of 'GRPRED',
 *     and the .MORE.CGS4_COADDS structure within the reduced group has
-*     been opened with a reference of 'COADDS'. When this routine is 
+*     been opened with a reference of 'COADDS'. When this routine is
 *     called non of the data arrays have been mapped.
 *
 *     Reduced observations of type OBJECT are added to the contents of th
 *     reduced group file. Reduced observations of type SKY are subtracted
-*     from the contents of the reduced group file, after being optionally 
+*     from the contents of the reduced group file, after being optionally
 *     multiplied by a weighting factor indicated by the SKY_WT parameter.
 *     Observations may also optionally be weighted according to their
 *     variance, if observing conditions dictate.
@@ -23,11 +23,11 @@
 *
 *     A record of all the observations added is kept in the COADDS
 *     structure of the reduced group file. If this record shows that the
-*     specified observation has already been added, a warning message 
+*     specified observation has already been added, a warning message
 *     will be issued and it will not be added again.
 *
 *     The FITS header information from the first OBJECT observation is
-*     copied to the reduced group file. When subsequent OBJECT observations 
+*     copied to the reduced group file. When subsequent OBJECT observations
 *     are added, the header information is updated as follows :-
 *
 *     EXPOSED     - Value is accumulated (new = old + current)
@@ -41,7 +41,7 @@
 *     OBJECT observations making up the group.
 *
 *     A record of the total exposure time contributed from the SKY
-*     observations will be accumulated in a SKYEXP parameter, taking 
+*     observations will be accumulated in a SKYEXP parameter, taking
 *     into account any weighting factors used :-
 *
 *     SKYEXP      - Value is accumulated (new = old + current*SKY_WT)
@@ -50,7 +50,7 @@
 *     SKYEXP should be equal if the sky has been subtracted correctly.
 *     See CGS4/SOFT/057 for details.
 *    Invocation :
-*     CALL RED4_ADD_OBSERVATION_2( OBSTYPE, COADDED_OBS, COADD_NAME, 
+*     CALL RED4_ADD_OBSERVATION_2( OBSTYPE, COADDED_OBS, COADD_NAME,
 *     :  STATUS )
 *    Parameters :
 *     OBSTYPE     = CHARACTER*(*)( READ )
@@ -89,7 +89,7 @@
 *     3. The variance weighting algorithm will work properly only for
 *        a series of consecutive OBJECT observations. If both OBJECT and
 *        SKY observations are reduced, different weights may be applied
-*        to OBJECT and SKY, and the data will not be properly 
+*        to OBJECT and SKY, and the data will not be properly
 *        sky-subtracted.
 *
 *     Because of these deficiencies, it is recommended that OBJECT and
@@ -207,27 +207,27 @@
      :  NELM,                      ! Number of elements in data array.
      :  ADDRESS,                   ! Address returned when mapping.
      :  OBSDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    reduced observation file 
+*                                  !    reduced observation file
      :  OBSDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    reduced observation file
      :  OBSVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    reduced observation file 
+*                                  !    reduced observation file
      :  OBSVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    reduced observation file
      :  OBSQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    reduced observation file 
+*                                  !    reduced observation file
      :  OBSQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    reduced observation file
      :  GRPDATA_SLOT,              ! Mapping slot for data array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPDATA_PTR,               ! Pointer to data array mapped from
 *                                  !    reduced group file
      :  GRPVAR_SLOT,               ! Mapping slot for variance array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPVAR_PTR,                ! Pointer to variance array mapped from
 *                                  !    reduced group file
      :  GRPQUAL_SLOT,              ! Mapping slot for quality array in
-*                                  !    reduced group file 
+*                                  !    reduced group file
      :  GRPQUAL_PTR,               ! Pointer to quality array mapped from
 *                                  !    reduced group file
      :  COADDS_SLOT,               ! Mapping slot for data array in COADDS
@@ -245,15 +245,15 @@
 *   (These have already been verified to be the same size as the ones
 *   in the reduced observation file).
       DSA_STATUS = ADAM__OK
-      CALL DSA_DATA_SIZE( 'GRPRED', MAXDIM, NDIM, DIMS, NELM, 
+      CALL DSA_DATA_SIZE( 'GRPRED', MAXDIM, NDIM, DIMS, NELM,
      :  DSA_STATUS )
 
-*   Indicate to DSA that a data quality array will be used to 
+*   Indicate to DSA that a data quality array will be used to
 *   indicate bad values in both structures.
       CALL DSA_USE_QUALITY( 'OBSRED', DSA_STATUS )
       CALL DSA_USE_QUALITY( 'GRPRED', DSA_STATUS )
 
-*   Map the data, variance and quality arrays from the reduced 
+*   Map the data, variance and quality arrays from the reduced
 *   observation file.
       CALL DSA_MAP_DATA( 'OBSRED', 'READ', 'FLOAT', ADDRESS,
      :  OBSDATA_SLOT, DSA_STATUS )
@@ -300,7 +300,7 @@
 
 *         Clean up the observation before checking it.
 *         (THIS IS A FUDGE!!).
-            CALL GEN_CLEANV( NELM, %val(OBSDATA_PTR), 
+            CALL GEN_CLEANV( NELM, %val(OBSDATA_PTR),
      :        %val(OBSVAR_PTR), %val(OBSQUAL_PTR), SNCUT, TLOW,
      :        .TRUE., .FALSE., 0.0 )
 
@@ -329,7 +329,7 @@
 *            Co-add the observation data to the reduced group,
 *            propagating variance and quality and updating the
 *            COADDS array.
-               CALL RED4_COADD_OBS( DIMS(1), DIMS(2), 1.0, 
+               CALL RED4_COADD_OBS( DIMS(1), DIMS(2), 1.0,
      :           VARIANCE_WT,
      :           %val(OBSDATA_PTR), %val(OBSVAR_PTR),
      :           %val(OBSQUAL_PTR),
@@ -340,12 +340,12 @@
 *            Check this has worked.
                IF ( STATUS .EQ. ADAM__OK ) THEN
 
-*               For an OBJECT observation, the FITS parameters in the 
+*               For an OBJECT observation, the FITS parameters in the
 *               reduced group file now need to be updated.
 *               Check if this is the very first OBJECT observation to be added.
 *               It is assumed that a reduced group file with no OBJECT
 *               observations added will have an EXPOSED parameter of zero
-*               in the FITS structure. 
+*               in the FITS structure.
                   DSA_STATUS = STATUS
                   CALL DSA_GET_FITS_F( 'GRPRED', 'EXPOSED', 0,
      :              EXPOSED, COMMENT, DSA_STATUS )
@@ -363,11 +363,11 @@
                      CALL DSA_GET_FITS_I( 'GRPRED', 'NSKY', 0,
      :                 NSKY, COMMENT, DSA_STATUS )
 
-*                  Copy all the FITS structure from the reduced observation 
+*                  Copy all the FITS structure from the reduced observation
 *                  file to the reduced group file (deleting any existing FITS
-*                  structure in that file). 
-                     CALL RED4_COPY_STRUCTURE( 
-     :                 'OBSRED.'//FITS_STRUCTURE, 
+*                  structure in that file).
+                     CALL RED4_COPY_STRUCTURE(
+     :                 'OBSRED.'//FITS_STRUCTURE,
      :                 'GRPRED.'//FITS_STRUCTURE, STATUS )
 
 *                  Restore the SKYEXP, NOBJ and NSKY items.
@@ -390,7 +390,7 @@
                      CALL DSA_PUT_FITS_C( 'GRPRED', 'STDUSED',
      :                 '(none)', ' ', DSA_STATUS )
 
-*                  Obtain the correct values for the object name and 
+*                  Obtain the correct values for the object name and
 *                  observation time, and update these in the OBS structure.
                      CALL DSA_GET_FITS_C( 'GRPRED', 'OBJECT', 0,
      :                 OBJECT, COMMENT, DSA_STATUS )
@@ -424,12 +424,12 @@
                   ELSE
 
 *                  This is the second or subsequent OBJECT observation.
-*                  Most of the fixed FITS parameters will already be 
+*                  Most of the fixed FITS parameters will already be
 *                  correct, but the following will need updating:
 *                  Update RUTSTART and RUTEND to be the minimum and
 *                  maximum respectively of those found to far (carry
 *                  the UTSTART, AMSTART, UTEND and AMEND parameters with
-*                  these). 
+*                  these).
                      CALL DSA_GET_FITS_F( 'GRPRED', 'RUTSTART', 0,
      :                 RUTSTART, COMMENT, DSA_STATUS )
                      CALL DSA_GET_FITS_F( 'GRPRED', 'RUTEND', 0,
@@ -476,7 +476,7 @@
                      CALL DSA_PUT_FITS_F( 'GRPRED', 'EXPOSED',
      :                 EXPOSED, ' ', DSA_STATUS )
                      CALL DSA_SET_EXPOSURE( 'GRPRED', EXPOSED,
-     :                 DSA_STATUS ) 
+     :                 DSA_STATUS )
 
 *                  Increment the NOBJ counter.
                      CALL DSA_GET_FITS_I( 'GRPRED', 'NOBJ', 0,
@@ -494,7 +494,7 @@
                   CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION_2: '/
      :              /'First arithmetic error during coadd', STATUS )
                   CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION_2: '/
-     :              /'Suspect zero variance in group file', 
+     :              /'Suspect zero variance in group file',
      :              STATUS )
                END IF
 
@@ -505,7 +505,7 @@
 *            weighting the observations by the factor SKY_WT,
 *            propagating variance and quality and updating the
 *            COADDS array. (Note that the same routine as that to add
-*            the OBJECT observation is used, but the weight is 
+*            the OBJECT observation is used, but the weight is
 *            multiplied by -1 so the data values are subtracted).
                CALL RED4_COADD_OBS( DIMS(1), DIMS(2), -SKY_WT,
      :           VARIANCE_WT,
@@ -547,7 +547,7 @@
 *                     are not changed. (Note that, as DSA_GET_DATA_INFO is
 *                     a general purpose routine, dummy arguments are needed
 *                     to take the place of values we don't need or don't
-*                     want to change). 
+*                     want to change).
                         CPOS = 0
                         CLEN = MAX( 1, CHR_LEN( CHAR_ARRAY(2) ) )
                         CALL CHR_PUTC( CHAR_ARRAY(2)(1:CLEN),
@@ -561,9 +561,9 @@
                      END IF
                   END IF
 
-*               Add the observation time of the current sky observation 
+*               Add the observation time of the current sky observation
 *               (multiplied by SKY_WT) to SKYEXP and write the new value
-*               back to the reduced group file. 
+*               back to the reduced group file.
                   CALL DSA_GET_FITS_F( 'OBSRED', 'EXPOSED', 0,
      :              OBSEXPOSED, COMMENT, DSA_STATUS )
 
@@ -609,7 +609,7 @@
      :        COADDED_OBS(1:CLEN)//'.'//COADD_NAME, STATUS )
          END IF
       ELSE
- 
+
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION_2: '/
      :     /'Error mapping arrays', STATUS )

@@ -14,9 +14,9 @@
 *   the function value.
 * Arguments:
 *    B = REAL (Given)
-*       
+*
 *    XHALF = REAL (Given)
-*       
+*
 * Returned (function value):
 *    SKEW_FWHM     (r)
 *-

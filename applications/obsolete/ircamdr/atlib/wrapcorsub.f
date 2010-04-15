@@ -1,23 +1,23 @@
 
-	SUBROUTINE WRAPCORSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT, 
+	SUBROUTINE WRAPCORSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT,
      :	                       DATAVAL, VALADD, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
-     :	  ODIMSX, 
-     :	  ODIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
+     :	  ODIMSX,
+     :	  ODIMSY,
      :	  STATUS,
      :	  J,
      :	  K,
      :	  NUMPIX
 
-	REAL 
-     :	  ARROUT( ODIMSX, ODIMSY), 
+	REAL
+     :	  ARROUT( ODIMSX, ODIMSY),
      :	  ARRIN( DIMSX, DIMSY),
      :	  DATAVAL,
      :	  VALADD
@@ -49,7 +49,7 @@
 	    ELSE
 
 *            if above then set output value
-	      ARROUT( K, J) = ARRIN( K, J) 
+	      ARROUT( K, J) = ARRIN( K, J)
 
 	    END IF
 
@@ -60,7 +60,7 @@
 *      tell user how many pixels below specified threshold
 	CALL MSG_SETR( 'VAL', DATAVAL)
 	CALL MSG_SETI( 'NUM', NUMPIX)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Number of pixels below ^VAL in image = ^NUM', STATUS)
 
 	END

@@ -2,16 +2,16 @@
       stcschan-demo3.c
 
    Purpose:
-      A demonstration of the facilities provided by the AST library 
-      for reading STC metadata encoded using the STC-S linear string 
+      A demonstration of the facilities provided by the AST library
+      for reading STC metadata encoded using the STC-S linear string
       format.
 
    Description:
       This program reads an STC-S description from a text file, and also
-      reads a set of 2-D spatial FITS-WCS headers from another (text) file. 
-      It then opens a specified graphics device, and displays an annotated 
+      reads a set of 2-D spatial FITS-WCS headers from another (text) file.
+      It then opens a specified graphics device, and displays an annotated
       coordinate grid covering the region described by the FITS headers.
-      Finally, it draws the outline of the spatial extent of the STC-S 
+      Finally, it draws the outline of the spatial extent of the STC-S
       description over the top of the annotated coordinate grid.
 
    Usage:
@@ -60,7 +60,7 @@ AstRegion *ReadStcs( const char * );
 int main( int argc, char **argv ){
 
 /* Local variables: */
-   AstBox *pixbox;   
+   AstBox *pixbox;
    AstFrame *pixfrm;
    AstFrameSet *align_fs = NULL;
    AstFrameSet *fset = NULL;
@@ -72,12 +72,12 @@ int main( int argc, char **argv ){
    double bbox[ 4 ];
    float gbox[ 4 ];
    int overlap_flag, status, naxis1, naxis2, ibase;
-   
+
 /* Initialise the returned system status to indicate failure. */
    status = 1;
 
-/* Start an AST object context. This means we do not need to annull 
-   each AST Object individually. Instead, all Objects created within 
+/* Start an AST object context. This means we do not need to annull
+   each AST Object individually. Instead, all Objects created within
    this context will be annulled automatically by the corresponding
    invocation of astEnd. */
    astBegin;
@@ -86,8 +86,8 @@ int main( int argc, char **argv ){
    if( argc < 3 ) {
       printf( "Usage: stcschan-demo3 <stcs-file> <header-file> <device>\n" );
 
-/* If so, attempt to read the STC-S description, creating a corresponding 
-   AST Region. If this is successful, attempt to read the FITS header file 
+/* If so, attempt to read the STC-S description, creating a corresponding
+   AST Region. If this is successful, attempt to read the FITS header file
    and create an equivalent AST FrameSet. */
    } else {
       reg = ReadStcs( argv[ 1 ] );
@@ -98,9 +98,9 @@ int main( int argc, char **argv ){
    if( reg && fset ){
 
 /* Check that we can align the FITS WCS with the spatial axes in the
-   STC-S description. AST contains various built-in conversions between 
+   STC-S description. AST contains various built-in conversions between
    standard celestial coordinate system. The necessary conversion will be
-   identified and used automatically if necessary to achieve alignment. 
+   identified and used automatically if necessary to achieve alignment.
    The returned object "align_fs" is a FrameSet that encapsulates the
    the FITS WCS coordinate system, the STC-S spatial coordinate system and
    the Mapping between them. A NULL pointer is returned if alignment is
@@ -109,17 +109,17 @@ int main( int argc, char **argv ){
    alignment. So we first note the original base Frame index and then
    re-instate it afterwards. */
       ibase = astGetI( fset, "Base" );
-      align_fs = astConvert( reg, fset, " " ); 
+      align_fs = astConvert( reg, fset, " " );
       astSetI( fset, "Base", ibase );
 
       if( !align_fs ) {
          printf( "Could not align the FITS WCS with the spatial axes "
                  "in the STC-S\n" );
 
-/* If alignment was possible, use the alignment FrameSet to create a new 
-   Region representing the same region as the supplied STC-S, but 
+/* If alignment was possible, use the alignment FrameSet to create a new
+   Region representing the same region as the supplied STC-S, but
    expressed in the coordinate system of the FITS WCS. The FrameSet class
-   inherits from both Frame and Mapping, and so the "align_fs" FrameSet can 
+   inherits from both Frame and Mapping, and so the "align_fs" FrameSet can
    be used both as the Mapping in this call, and as the Frame. When used
    as a Mapping, a FrameSet represents the transformation between its base
    and current Frame. When used as a Frame, a FrameSet represents its
@@ -129,8 +129,8 @@ int main( int argc, char **argv ){
 
 /* It would be nice to warn the user if the STC-S AstroCoordsArea does
    not overlap the FITS grid. To do so we need a Region representing the
-   FITS grid. Create one now (an AST Box). First store the bounds of the 
-   FITS grid, in pixel coordinates (i.e. a system in which the centre of 
+   FITS grid. Create one now (an AST Box). First store the bounds of the
+   FITS grid, in pixel coordinates (i.e. a system in which the centre of
    the bottom left pixel is at (1.0,1.0) ). */
          bbox[ 0 ] = 0.5;
          bbox[ 1 ] = 0.5;
@@ -155,8 +155,8 @@ int main( int argc, char **argv ){
          if( !wcsbox ) {
             astClearStatus;
             printf("\nContinuing, but omitting overlap test...\n\n");
-                
-/* Now see if the Region representing the FITS grid overlaps the region 
+
+/* Now see if the Region representing the FITS grid overlaps the region
    read from the STC-S description.*/
          } else {
             overlap_flag = astOverlap( wcsreg, wcsbox );
@@ -164,7 +164,7 @@ int main( int argc, char **argv ){
             if( overlap_flag == 1 || overlap_flag == 6 ) {
                printf( "\nThere is no overlap between the FITS grid and the "
                        "STC-S AstroCoordsArea\n\n" );
-   
+
             } else if( overlap_flag == 3 || overlap_flag == 5 ) {
                printf( "\nThe FITS grid is completely contained within the "
                        "STC-S AstroCoordsArea\n\n" );
@@ -200,8 +200,8 @@ int main( int argc, char **argv ){
 /* Create an AST Plot. This is a special sort of FrameSet in which the
    base Frame corresponds to graphics coordinates. All the coordinate
    Frames and Mappings read from the FITS-WCS headers are added into the
-   Plot so that graphics can be drawn in any coordinate system. The extent 
-   of the FITS array in pixel coordinates is mapped onto the extent of the 
+   Plot so that graphics can be drawn in any coordinate system. The extent
+   of the FITS array in pixel coordinates is mapped onto the extent of the
    graphics device as returned above by cpgqwin. The AST library comes with
    a driver module that provides primitive drawing functions by calling
    appropriate PGFPLOT functions. It is simple to write driver modules
@@ -214,20 +214,20 @@ int main( int argc, char **argv ){
 /* Draw a set of annotated coordinate axes labelling the FITS WCS axes. */
          astGrid( plot );
 
-/* If there is any overlap (or if the overlap test could not be performed), 
-   add the STC-S Region into the Plot. We use a UnitMap to connect it to 
+/* If there is any overlap (or if the overlap test could not be performed),
+   add the STC-S Region into the Plot. We use a UnitMap to connect it to
    the current Frame (the FITS WCS frame). */
          if( 1 || overlap_flag == 2 || overlap_flag == 4 || !wcsbox ) {
             astAddFrame( plot, AST__CURRENT, astUnitMap( 2, " " ), wcsreg );
 
 /* Now draw the border round the STC-S Region. A Region is a sub-class of
-   Mapping and so can be used to transform positions. When a Region is used 
+   Mapping and so can be used to transform positions. When a Region is used
    as a Mapping, positions that are inside the Region are left unchanged
    by the transformation, and positions that are outside the Region are
    transformed into "bad" positions (i.e. every axis value has the nmagic
    value AST__BAD indicating that the axis value is undefined). The
    astBorder method is a generic function that will outline the areas
-   within the current coordinate Frame of the Plot that correspond to 
+   within the current coordinate Frame of the Plot that correspond to
    valid (i.e. non-bad) positions. Set the colour and line thickness first
    to emphasise the border. */
             astSet( plot, "Colour(border)=4,Width(border)=8" );
@@ -261,7 +261,7 @@ int main( int argc, char **argv ){
 /* -------------------------------------------------------------------
  * This is a function that reads a line of text from the disk file and
  * returns it to the AST library. It is called from within the astRead
- * function. 
+ * function.
 */
 
 const char *source( void ){
@@ -276,8 +276,8 @@ const char *source( void ){
  * This function reads a set of FITS-WCS headers from a given text file,
  * and attempts to convert them into an AST FrameSet. If successful, a
  * pointer to the FrameSet is returned. A NULL pointer is returned if
- * anything goes wrong, or if the WCS is not 2-dimensional. The values of 
- * the NAXIS1 and NAXIS2 headers are returned in "*naxis1" and "*naxis2". 
+ * anything goes wrong, or if the WCS is not 2-dimensional. The values of
+ * the NAXIS1 and NAXIS2 headers are returned in "*naxis1" and "*naxis2".
 */
 
 AstFrameSet *ReadFitsHeaders( const char *file, int *naxis1, int *naxis2 ){
@@ -295,32 +295,32 @@ AstFrameSet *ReadFitsHeaders( const char *file, int *naxis1, int *naxis2 ){
    if( !fd ) {
       printf("Failed to open FITS header file '%s'.\n", file );
 
-/* If successful, create a FitsChan. This is the object that converts 
-   external FITS headers into corresponding AST Objects. Tell it to use 
+/* If successful, create a FitsChan. This is the object that converts
+   external FITS headers into corresponding AST Objects. Tell it to use
    the "source" function for obtaining lines of text from the disk file. */
    } else {
       chan = astFitsChan( source, NULL, " " );
 
 /* Associate the descriptor for the input disk file with the StcsChan.
    This makes it available to the "source" function. Since this
-   application is single threaded, we could instead have made "fd" a 
-   global variable, but the ChannelData facility is used here to illustrate 
-   how to pass data to a source or sink function safely in a multi-threaded 
+   application is single threaded, we could instead have made "fd" a
+   global variable, but the ChannelData facility is used here to illustrate
+   how to pass data to a source or sink function safely in a multi-threaded
    application. */
       astPutChannelData( chan, fd );
 
 /* Attempt to read the FITS heades and convert them into an AST FrameSet. */
       object = astRead( chan );
-      
+
 /* The astRead function is a generic function and so returns a generic
    AstObject pointer. Check an Object was created successfully. */
       if( !object ) {
-         printf( "Failed to read an AST Object from FITS header file '%s'.\n", 
+         printf( "Failed to read an AST Object from FITS header file '%s'.\n",
                  file );
 
 /* Now check that the object read is actually an AST FrameSet, rather than
    some other class of AST Object. */
-      } else if( !astIsAFrameSet( object ) ) {      
+      } else if( !astIsAFrameSet( object ) ) {
          printf( "Expected a FrameSet but read a %s from FITS header "
                  "file '%s'.\n", astGetC( object, "Class" ), file );
 
@@ -342,13 +342,13 @@ AstFrameSet *ReadFitsHeaders( const char *file, int *naxis1, int *naxis2 ){
             if( !astGetFitsI( chan, "NAXIS1", naxis1 ) ){
                printf("Keyword 'NAXIS1' not found in header\n" );
                result = NULL;
-            } 
+            }
 
             if( !astGetFitsI( chan, "NAXIS2", naxis2 ) ){
                printf("Keyword 'NAXIS2' not found in header\n" );
                result = NULL;
-            } 
-       
+            }
+
          }
       }
 
@@ -364,7 +364,7 @@ AstFrameSet *ReadFitsHeaders( const char *file, int *naxis1, int *naxis2 ){
  * This function reads an STC-S description from a given text file,
  * and attempts to convert them into an AST Region. If successful, a
  * pointer to the Region is returned. A NULL pointer is returned if
- * anything goes wrong. 
+ * anything goes wrong.
 */
 
 AstRegion *ReadStcs( const char *file ){
@@ -382,31 +382,31 @@ AstRegion *ReadStcs( const char *file ){
    if( !fd ) {
       printf("Failed to open STC-S descrption file '%s'.\n", file );
 
-/* If successful, create an StcsChan. This is the object that converts 
-   external STC-S descriptions into corresponding AST Objects. Tell it to 
-   use the "source" function for obtaining lines of text from the disk 
+/* If successful, create an StcsChan. This is the object that converts
+   external STC-S descriptions into corresponding AST Objects. Tell it to
+   use the "source" function for obtaining lines of text from the disk
    file. */
    } else {
       chan = astStcsChan( source, NULL, " " );
 
 /* Associate the descriptor for the input disk file with the StcsChan.
    This makes it available to the "source" function. Since this
-   application is single threaded, we could instead have made "fd" a 
-   global variable, but the ChannelData facility is used here to illustrate 
-   how to pass data to a source or sink function safely in a multi-threaded 
+   application is single threaded, we could instead have made "fd" a
+   global variable, but the ChannelData facility is used here to illustrate
+   how to pass data to a source or sink function safely in a multi-threaded
    application. */
       astPutChannelData( chan, fd );
 
-/* The default behaviour of the astRead function when used on an StcsChan is 
+/* The default behaviour of the astRead function when used on an StcsChan is
    to read and return the AstroCoordArea as an AST Region. This behaviour
    can be changed by assigning appropriate values to the StcsChan attributes
-   "StcsArea", "StcsCoords" and "StcsProps". Options exist to return the 
+   "StcsArea", "StcsCoords" and "StcsProps". Options exist to return the
    AstroCoords as an AST PointList, and/or to return the individual
    property values read from the STC-S text in the form of an AST KeyMap
-   (a sort of hashmap). For now, just take the default action of reading the 
+   (a sort of hashmap). For now, just take the default action of reading the
    AstroCoordsArea. */
       object = astRead( chan );
-      
+
 /* The astRead function is a generic function and so returns a generic
    AstObject pointer. Check an Object was created successfully. */
       if( !object ) {
@@ -415,7 +415,7 @@ AstRegion *ReadStcs( const char *file ){
 
 /* Now check that the object read is actually an AST Region, rather than
    some other class of AST Object. */
-      } else if( !astIsARegion( object ) ) {      
+      } else if( !astIsARegion( object ) ) {
          printf( "Expected a Region but read a %s from STC-S description "
                  "file '%s'.\n", astGetC( object, "Class" ), file );
 

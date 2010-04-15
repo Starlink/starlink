@@ -12,14 +12,14 @@
 {
 {    For each "standard" ADAM applications package:
 {      * Define the source of introductory help.
-{      * Define the Package Startup Command. 
+{      * Define the Package Startup Command.
 {
 {    Define (hidden) procedure ADAM_OPTIONS to search for installed Options
 {    and define appropriate startup command.
 {
 {    Run ADAM_OPTIONS procedure
 {
-{    Inform the user of HELP commands 
+{    Inform the user of HELP commands
 {
 {    Define (hidden) procedure ADAM_LOCAL to search for LADAM_PACKAGES:.ICL
 {    and LOAD it if it exists
@@ -151,7 +151,7 @@ HIDDEN PROC ADAM_OPTIONS
 {            Define Package Startup Command(s)
 {        Else If: Shell package startup available
 {            Display not ICL message
-{        Else:             
+{        Else:
 {            Define as Not Installed
 {        End If.
 
@@ -169,7 +169,7 @@ else
 endif
 
 {  ATOOLS
-if file_exists("$ATOOLS_DIR/atools.icl") 
+if file_exists("$ATOOLS_DIR/atools.icl")
    defstring atools load $ATOOLS_DIR/atools.icl
 elseif file_exists("$ATOOLS_DIR/atools.csh")
    defstring atools notavailable ATOOLS
@@ -179,7 +179,7 @@ endif
 
 {  CATPAC
 defhelp catpac $ADAM_PACKAGES CATPAC
-IF FILE_EXISTS("$CATPAC_DIR/catpac.icl") 
+IF FILE_EXISTS("$CATPAC_DIR/catpac.icl")
    defstring catpac load $CATPAC_DIR/catpac.icl
    defstring catpacdemo load $CATPAC_DIR/catpacdemo
 ELSE
@@ -189,7 +189,7 @@ ENDIF
 
 {  CCDPACK
 defhelp ccdpack $ADAM_PACKAGES CCDPACK
-if file_exists("$CCDPACK_DIR/ccdpack.icl") 
+if file_exists("$CCDPACK_DIR/ccdpack.icl")
    defstring ccdpack load $CCDPACK_DIR/ccdpack.icl
 elseif file_exists("$CCDPACK_DIR/ccdpack.csh")
    defstring ccdpack notavailable CCDPACK
@@ -219,7 +219,7 @@ endif
 
 {  DAOPHOT
 defhelp daophot $ADAM_PACKAGES DAOPHOT
-if file_exists("$DAOPHOT_DIR/daophot_init") 
+if file_exists("$DAOPHOT_DIR/daophot_init")
    defstring daophot print " DAOPHOT should be run from the shell"
 else
    defstring daophot notinstalled DAOPHOT
@@ -237,7 +237,7 @@ endif
 
 {  ESP
 defhelp esp $ADAM_PACKAGES ESP
-if file_exists("$ESP_DIR/esp.icl") 
+if file_exists("$ESP_DIR/esp.icl")
    defstring esp load $ESP_DIR/esp.icl
 elseif file_exists("$ESP_DIR/esp.csh")
    defstring esp notavailable ESP
@@ -305,7 +305,7 @@ endif
 
 {  KAPPA
 defhelp kappa $ADAM_PACKAGES KAPPA
-if file_exists("$KAPPA_DIR/kappa.icl") 
+if file_exists("$KAPPA_DIR/kappa.icl")
    defstring kappa load $KAPPA_DIR/kappa.icl
 elseif file_exists("$KAPPA_DIR/kappa.csh")
    defstring kappa notavailable KAPPA
@@ -315,7 +315,7 @@ endif
 
 {  NDPROGS
 defhelp ndprogs $ADAM_PACKAGES NDPROGS
-if file_exists("$NDPROGS_DIR/ndprogs.icl") 
+if file_exists("$NDPROGS_DIR/ndprogs.icl")
    defstring ndprogs load $NDPROGS_DIR/ndprogs.icl
 elseif file_exists("$NDPROGS_DIR/ndprogs.csh")
    defstring ndprogs notavailable NDPROGS
@@ -325,7 +325,7 @@ endif
 
 {  POLPACK
 defhelp pamela $ADAM_PACKAGES PAMELA
-if file_exists("$PAMELA_DIR/pamela.icl") 
+if file_exists("$PAMELA_DIR/pamela.icl")
    defstring pamela load $PAMELA_DIR/pamela.icl
 elseif file_exists("$POLPACK_DIR/pamela.csh")
    defstring pamela notavailable PAMELA
@@ -335,7 +335,7 @@ endif
 
 {  PHOTOM
 defhelp photom $ADAM_PACKAGES PHOTOM
-if file_exists("$PHOTOM_DIR/photom.icl") 
+if file_exists("$PHOTOM_DIR/photom.icl")
    defstring photom load $PHOTOM_DIR/photom.icl
 elseif file_exists("$PHOTOM_DIR/photom.csh")
    defstring photom notavailable PHOTOM
@@ -345,7 +345,7 @@ endif
 
 {  PISA
 defhelp pisa $ADAM_PACKAGES PISA
-if file_exists("$PISA_DIR/pisa.icl") 
+if file_exists("$PISA_DIR/pisa.icl")
    defstring pisa load $PISA_DIR/pisa.icl
 elseif file_exists("$PISA_DIR/start")
    defstring pisa notavailable PISA
@@ -355,7 +355,7 @@ endif
 
 {  POLPACK
 defhelp polpack $ADAM_PACKAGES POLPACK
-if file_exists("$POLPACK_DIR/polpack.icl") 
+if file_exists("$POLPACK_DIR/polpack.icl")
    defstring polpack load $POLPACK_DIR/polpack.icl
 elseif file_exists("$POLPACK_DIR/polpack.csh")
    defstring polpack notavailable POLPACK
@@ -388,7 +388,7 @@ endif
 {  SPECDRE
 {  Withdrawn Spring-1998, merged with FIGARO
 defhelp specdre $ADAM_PACKAGES SPECDRE
-if file_exists("$FIG_DIR/specdre.icl") 
+if file_exists("$FIG_DIR/specdre.icl")
    defstring specdre load $FIG_DIR/specdre.icl
 elseif file_exists("$FIG_DIR/specdre.csh")
    defstring specdre notavailable SPECDRE
@@ -412,7 +412,7 @@ endif
 
 {  STARMAN
 defhelp starman $ADAM_PACKAGES STARMAN
-if file_exists("$STARMAN_DIR/starman.icl") 
+if file_exists("$STARMAN_DIR/starman.icl")
    defstring starman load $STARMAN_DIR/starman.icl
 elseif file_exists("$STARMAN_DIR/starman.csh")
    defstring starman notavailable STARMAN
@@ -432,7 +432,7 @@ endif
 
 { TSP
 defhelp tsp $ADAM_PACKAGES TSP
-if file_exists("$TSP_DIR/tsp.icl") 
+if file_exists("$TSP_DIR/tsp.icl")
    defstring tsp load $TSP_DIR/tsp.icl
 elseif file_exists("$TSP_DIR/tsp.csh")
    defstring tsp notavailable TSP
@@ -445,7 +445,7 @@ endif
 
 { WFCPACK
 defhelp wfcpack $ADAM_PACKAGES WFCPACK
-if file_exists("$WFCBIN/wfcpack.icl") 
+if file_exists("$WFCBIN/wfcpack.icl")
    defstring wfcpack load $WFCBIN/wfcpack.icl
 elseif file_exists("$WFCBIN/wfcpack.csh")
    defstring wfcpack notavailable WFCPACK
@@ -474,13 +474,13 @@ PRINT   "  -   or HELP PACKAGES for a list of all Starlink packages"
 
 {  LOCAL Packages  }
 
-{  Define a procedure to determine if LADAM_PACKAGES.ICL file exists, 
+{  Define a procedure to determine if LADAM_PACKAGES.ICL file exists,
 {  and load it if it does.
 HIDDEN PROC ADAM_LOCAL
 IF FILE_EXISTS("$LADAM_PACKAGES")
-   PRINT 
+   PRINT
    PRINT "Loading local package definitions..."
-   PRINT 
+   PRINT
    LOAD $LADAM_PACKAGES
 ENDIF
 ENDPROC

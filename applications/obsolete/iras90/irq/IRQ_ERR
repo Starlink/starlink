@@ -29,7 +29,7 @@
       INTEGER IRQ__NOWRT  ! Write access to the NDF is unavailable.
       INTEGER IRQ__QBAD   ! BAD values exists in the QUALITY component.
       INTEGER IRQ__QEXPL  ! Too many characters in quality expression.
-      INTEGER IRQ__QIEXS  ! Extension already contains a QUALITY_NAMES 
+      INTEGER IRQ__QIEXS  ! Extension already contains a QUALITY_NAMES
 			  ! structure.
       INTEGER IRQ__QNEXS  ! Quality name is already defined.
       INTEGER IRQ__QLONG  ! Quality name too long.
@@ -38,8 +38,8 @@
       INTEGER IRQ__STKOV  ! Evaluation stack overflow.
       INTEGER IRQ__STKUN  ! Evaluation stack underflow.
       INTEGER IRQ__XBITS  ! No bits left in QUALITY component.
-      
-*  IRAS90 error numbers 31 to 60, and 231 and 241 are reserved for use 
+
+*  IRAS90 error numbers 31 to 60, and 231 and 241 are reserved for use
 *  by IRQ.
       PARAMETER (
      :           IRQ__BADBT = 134250498 + 65536*FAC90 + 8*31,

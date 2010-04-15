@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -689,6 +689,6 @@
       CALL FIO_PUNIT( UNIT, STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
       CALL ERR_RLSE
-      
+
 *  Return.
       END

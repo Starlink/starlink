@@ -78,23 +78,23 @@
 	END IF
 
 * get the box positioning parameter
- 
+
         CALL PAR_GET0C( 'BOX_POSITION', BOX_POSITION, STATUS)
-*        type *, 'box_position = ', box_position 
+*        type *, 'box_position = ', box_position
         IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'Error : PLOT_BOX : after PAR_GET BOX POSITION',
      :                  STATUS )
           RETURN
         END IF
- 
+
 * get the size of the box to be plotted
 
 	CALL PAR_GET0I( 'BOX_XSIZE', BOX_XSIZE, STATUS)
 	CALL PAR_GET0I( 'BOX_YSIZE', BOX_YSIZE, STATUS)
 
 	IF( STATUS. NE. SAI__OK)THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :               'Error : PLOT_CURBOX after PAR_GET BOX SIZE',
      :                 STATUS )
 	  RETURN
@@ -105,7 +105,7 @@
 	CALL PAR_GET0R( 'ARCSEC_PIXEL', ARCSEC_PIXEL, STATUS)
 
 	IF( STATUS. NE. SAI__OK)THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :               'Error : PLOT_CURBOX after PAR_GET ARCSEC_PIXEL',
      :                 STATUS )
 	  RETURN
@@ -117,7 +117,7 @@
 	CALL PAR_GET0C( 'BOX_COLOUR', COLOUR_CODE, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :               'Error : PLOT_CURBOX after PAR_GET BOX COLOUR',
      :                 STATUS )
 	  RETURN

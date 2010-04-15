@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GKS_PAR'          ! GKS parameter definitions
       INCLUDE 'CTM_PAR'          ! Colour-table-management definitions
-      INCLUDE 'GNS_PAR'          ! GNS constants 
+      INCLUDE 'GNS_PAR'          ! GNS constants
 
 *  Arguments Given:
       CHARACTER * ( * )
@@ -274,7 +274,7 @@
 
             ICOL = INDEX( CRITER, 'COLOUR' )
             IF ( ICOL .GT. 0 ) THEN
-           
+
 *             Inquire whether colour is supported on the device.
 
                CALL GQCF( WSTYPE, GSTAT, NCOLS, SWCOL, NPCI )
@@ -301,7 +301,7 @@
 
             ICUR = INDEX( CRITER, 'CURSOR' )
             IF ( ICUR .GT. 0 ) THEN
-           
+
 *             Inquire whether there is a cursor.
 
                CALL SGS_ICUAV( CURSOR )
@@ -327,7 +327,7 @@
 
             IINPUT = INDEX( CRITER, 'INPUT' )
             IF ( IINPUT .GT. 0 ) THEN
-           
+
 *             Inquire the category of the workstation.
 
                CALL GQWKCA( WSTYPE, GSTAT, WKCAT )
@@ -353,7 +353,7 @@
 
             IRESET = INDEX( CRITER, 'RESET' )
             IF ( IRESET .GT. 0 ) THEN
-           
+
 *             Find the reset keyword of the workstation.  Note in order
 *             to list all reasons for failing to be suitable a temporary
 *             status is required.  This was not needed before because

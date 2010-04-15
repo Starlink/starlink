@@ -9,7 +9,7 @@
 * Parameters:
 *
 *  INPUT        -- The input spectrum file
-* 
+*
 *  OUTPUT       -- Output spectrum file.
 *
 *  NPOLY        -- Number of fit coefficients for polynomials
@@ -17,7 +17,7 @@
 *  THRLO,THRHI  -- The reject thresholds for the fit.
 *
 *  NCYCLE       -- Maximum number of reject cycles
-*  
+*
 *  PLOT         -- .TRUE. for option of plotting
 *
 *  DEVICE       -- Plot device
@@ -40,7 +40,7 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('INPUT', 'READ',INPUT, STATUS)
       CALL NDF_BOUND(INPUT, 1, XLO, XHI, NDIM, STATUS)
@@ -69,17 +69,17 @@ C
 C     Map
 C
       CALL NDF_MAP(INPUT,'Data','_REAL','READ',IDPTR,EL,STATUS)
-      IF(ANYERR) 
+      IF(ANYERR)
      &     CALL NDF_MAP(INPUT,'Error','_REAL','READ',IEPTR,EL,STATUS)
       CALL NDF_MAP(OUTPUT,'Data','_REAL','WRITE',ODPTR,EL,STATUS)
 C
-      CALL POL_FIT(%VAL(CNF_PVAL(ODPTR)), %VAL(CNF_PVAL(IDPTR)), 
+      CALL POL_FIT(%VAL(CNF_PVAL(ODPTR)), %VAL(CNF_PVAL(IDPTR)),
      :             %VAL(CNF_PVAL(IEPTR)), NXS,
-     &     XLO, ANYERR, PLOT, NPOLY, THRLO, THRHI, NCYCLE, DEVICE, 
+     &     XLO, ANYERR, PLOT, NPOLY, THRLO, THRHI, NCYCLE, DEVICE,
      &     LIMITS(1), LIMITS(2), AUTO, STATUS)
-C     
+C
 C     Store limits for next time
-C     
+C
       IF(AUTO) THEN
          CALL PAR_DEF1R('LIMITS',2,LIMITS,STATUS)
          CALL PAR_GET1R('LIMITS',2,LIMITS,NSET,STATUS)
@@ -87,12 +87,12 @@ C
       CALL NDF_END(STATUS)
       RETURN
       END
-        
+
       SUBROUTINE POL_FIT(OUTPUT,SPECTRUM,ERRORS,NXS,XLO,ANYERR,
      &PLOT,NPOLY,THRLO,THRHI,NCYCLE,DEVICE,Y1,Y2,AUTO,STATUS)
 C
 C     Fits polynomials to a spectrum
-C     
+C
 C     R*4 OUTPUT(NXS)     -- Output fit
 C     R*4 SPECTRUM(NXS) spectrum to be fitted
 C     R*4 ERRORS(NXS)     --- 1-sigma uncertainties. Only used
@@ -100,7 +100,7 @@ C     if ANYERR. Set negative to ignore.
 C     I*4 NXS             --- Number of points
 C     I*4 XLO             --- First point
 C     L ANYERR            --- Shows whether uncertainties are available
-C     L PLOT              --- TRUE allows plot option 
+C     L PLOT              --- TRUE allows plot option
 C     I*4 NPOLY           --- Number of polynomial coefficients
 C     R*4 THRLO, THRHI    --- Upper and lower sigma reject thresholds
 C     I*4 NCYCLE          --- Maximum number of cycles
@@ -136,7 +136,7 @@ C
       DO IX = 1, NXS
          PLOTX(IX) = REAL(XLO+IX-1)
          IF(ANYERR) THEN
-            IF(SPECTRUM(IX).EQ.VAL__BADR .OR. 
+            IF(SPECTRUM(IX).EQ.VAL__BADR .OR.
      &           ERRORS(IX).EQ.VAL__BADR) THEN
                PLOTZ(IX) = -1.
             ELSE
@@ -172,14 +172,14 @@ C
 C
 C     Fit
 C
-      CALL POLYFITA( N2-N1+1, PLOTX(N1), SPECTRUM(N1), 
-     &     PLOTZ(N1), PLOTY(N1), NPOLY, NCYCLE, THRHI, 
+      CALL POLYFITA( N2-N1+1, PLOTX(N1), SPECTRUM(N1),
+     &     PLOTZ(N1), PLOTY(N1), NPOLY, NCYCLE, THRHI,
      &     THRLO, IFAIL )
 C
 C     Evaluate fit beyond good data regions
 C
       IF(N1.GT.1) CALL POLYCALC(N1-1, PLOTX, PLOTY, IFAIL)
-      IF(N2.LT.NXS) CALL POLYCALC(NXS-N2, PLOTX(N2+1), 
+      IF(N2.LT.NXS) CALL POLYCALC(NXS-N2, PLOTX(N2+1),
      &                  PLOTY(N2+1), IFAIL)
 C
 C Plot fit
@@ -222,15 +222,15 @@ C
                ELSE IF(I1.GE.NXS) THEN
                   I2 = I1
                END IF
-               IF(I1.LE.NXS) 
+               IF(I1.LE.NXS)
      &              CALL PGBIN(I2-I1+1, PLOTX(I1), SPECTRUM(I1),.TRUE.)
             END DO
-C     
+C
 C     Plot points rejected during fit Xs
-C     
+C
             CALL PGSCI(2)
             DO I = 1, NXS
-               IF(PLOTZ(I).LE.0. .AND. SPECTRUM(I).NE.VAL__BADR) 
+               IF(PLOTZ(I).LE.0. .AND. SPECTRUM(I).NE.VAL__BADR)
      &              CALL PGPOINT(1,PLOTX(I),SPECTRUM(I),5)
             END DO
 C

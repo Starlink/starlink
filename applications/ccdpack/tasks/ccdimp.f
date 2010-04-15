@@ -192,7 +192,7 @@
 
 *  Find the FITS extension and map it.
       CALL NDF_XLOC( IDIN, 'FITS', 'READ', LOC, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          GO TO 98
       END IF
@@ -282,10 +282,10 @@
                         ITMP = INSERT - 1
                         CALL CHR_PUTI( I, KEYWRD, ITMP )
                      END IF
-                     CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+                     CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                1,
      :                                KEYWRD, FOUND, CVAL, CARD,
-     :                                STATUS, 
+     :                                STATUS,
      :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -308,7 +308,7 @@
 *  Obtain a value for the keyword from the FITS header. Note
 *  extra %VAL(LENGTH) used to pass length of mapped character array.
                   IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_CHAR' ) THEN
-                     CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+                     CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                CVAL, CARD, STATUS,
      :                                %VAL( CNF_CVAL( LENGTH ) ) )
@@ -329,7 +329,7 @@
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_DOUBLE' )
      :                    THEN
-                     CALL FTS1_GKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+                     CALL FTS1_GKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                DVAL, CARD, STATUS,
      :                                %VAL( CNF_CVAL( LENGTH ) ) )
@@ -348,7 +348,7 @@
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_INTEGER' )
      :                    THEN
-                     CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+                     CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                IVAL, CARD, STATUS,
      :                                %VAL( CNF_CVAL( LENGTH ) ) )
@@ -367,7 +367,7 @@
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_LOGICAL' )
      :                    THEN
-                     CALL FTS1_GKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+                     CALL FTS1_GKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                LVAL, CARD, STATUS,
      :                                %VAL( CNF_CVAL( LENGTH ) ) )
@@ -385,7 +385,7 @@
 *  ====
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_REAL' ) THEN
-                     CALL FTS1_GKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+                     CALL FTS1_GKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                RVAL, CARD, STATUS,
      :                                %VAL( CNF_CVAL( LENGTH ) ) )
@@ -435,7 +435,7 @@
 *  doesn't exist already).
       IF ( SEETRN ) THEN
          CALL DAT_THERE( CCDLOC, 'TRANSFORM', THERE, STATUS )
-         IF ( .NOT. THERE ) THEN 
+         IF ( .NOT. THERE ) THEN
             CALL CCD1_ENTRN( CCDLOC, .FALSE., LINE, CVAL,
      :                       TRNI, TRNC, TRNL, STATUS )
          END IF

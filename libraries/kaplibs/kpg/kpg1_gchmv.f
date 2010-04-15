@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GCHMV( PARAM, NOPT, OPTS, MAXVAL, IDEF, NVAL, 
+      SUBROUTINE KPG1_GCHMV( PARAM, NOPT, OPTS, MAXVAL, IDEF, NVAL,
      :                       VALS, STATUS )
 *+
 *  Name:
@@ -15,21 +15,21 @@
 *                      STATUS )
 
 *  Description:
-*     This routine gets up to MAXVAL strings from the user, selected 
+*     This routine gets up to MAXVAL strings from the user, selected
 *     from those supplied in OPTS.  The indices of the supplied strings
-*     within OPTS are returned.  The user supplies the strings in the 
-*     form of a GRP group expression, using the default GRP control 
+*     within OPTS are returned.  The user supplies the strings in the
+*     form of a GRP group expression, using the default GRP control
 *     characters.
 *
-*     The user may supply an integer value instead of a string, in 
-*     which case the integer is understood to be the index of the 
-*     required string within OPTS.  If the supplied list of strings 
+*     The user may supply an integer value instead of a string, in
+*     which case the integer is understood to be the index of the
+*     required string within OPTS.  If the supplied list of strings
 *     contains the integer itself, then the integer is understood to be
 *     a string, not an index.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter to use. 
+*        The name of the parameter to use.
 *     NOPT = INTEGER (Given)
 *        The number of available options supplied in OPTS.
 *     OPTS( NOPT ) = CHARACTER * ( * ) (Given)
@@ -37,12 +37,12 @@
 *        Leading and trailing white space is ignored. Blank options are
 *        not allowed.
 *     MAXVAL = INTEGER (Given)
-*        The maximum number of choices. 
+*        The maximum number of choices.
 *     IDEF( MAXVAL ) = INTEGER (Given)
-*        The indices within OPTS of the default strings to use if a 
-*        null (!) value is supplied for the parameter.  If the first 
-*        value is zero, a null parameter value results in a PAR__NULL 
-*        status being returned. 
+*        The indices within OPTS of the default strings to use if a
+*        null (!) value is supplied for the parameter.  If the first
+*        value is zero, a null parameter value results in a PAR__NULL
+*        status being returned.
 *     NVAL = INTEGER (Given)
 *        The number of choices supplied.
 *     VALS( MAXVAL ) = INTEGER (Returned)
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -128,7 +128,7 @@
       INTEGER F                  ! Index of first non-blank character
       INTEGER L                  ! Index of last non-blank character
       INTEGER LSTAT              ! CHR status value
-      LOGICAL PROMPT             ! Should a new group of strings be 
+      LOGICAL PROMPT             ! Should a new group of strings be
                                  ! obtained?
       CHARACTER*(GRP__SZNAM) TEXT ! User-supplied string
 
@@ -136,7 +136,7 @@
 
       NVAL = 0
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the supplied values are OK.
@@ -167,7 +167,7 @@
                CALL ERR_REP( 'KPG1_GCHMV_3', 'KPG1_GCHMV: The ^ITH '//
      :                       'default value (^D) is fewer than 1 or '//
      :                       'greater than the number of available '//
-     :                       'options (^N) (programming error).', 
+     :                       'options (^N) (programming error).',
      :                       STATUS )
                GO TO 999
 
@@ -184,7 +184,7 @@
      :                       'available option is blank '//
      :                       '(programming error).', STATUS )
                GO TO 999
-            END IF         
+            END IF
          END DO
       END IF
 
@@ -212,7 +212,7 @@
 
 *  Loop until at least one valid choice is obtained, or an error occurs.
       PROMPT = .TRUE.
-      DO WHILE ( PROMPT .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE ( PROMPT .AND. STATUS .EQ. SAI__OK )
 
 *  Get a group of strings from the user.  A new group is created if
 *  necessary, or any existing group is emptied.
@@ -335,7 +335,7 @@
             IF ( MAXVAL .EQ. 1 ) THEN
                CALL ERR_REP( 'KPG1_GCHMV_9', 'Please supply a new '//
      :                       'value for parameter %^PAR.', STATUS )
-            ELSE 
+            ELSE
                CALL ERR_REP( 'KPG1_GCHMV_10', 'Please supply new '//
      :                       'values for parameter %^PAR.', STATUS )
             END IF

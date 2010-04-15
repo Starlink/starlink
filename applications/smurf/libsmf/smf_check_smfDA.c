@@ -110,7 +110,7 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
       /* Report error if input smfDA is null */
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Input smfDA struct is null. Possible programming error.", 
+	errRep(FUNC_NAME, "Input smfDA struct is null. Possible programming error.",
 	       status);
       }
     }

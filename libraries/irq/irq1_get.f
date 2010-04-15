@@ -42,10 +42,10 @@
 *        false, then the quality is held by no pixels. If FIXED is
 *        false, then VALUE is indeterminate.
 *     BIT = INTEGER (Returned)
-*        BIT holds the corresponding bit number in the QUALITY component. 
+*        BIT holds the corresponding bit number in the QUALITY component.
 *        The least-significant bit is called Bit 1 (not Bit 0). A value
-*        of zero is returned if the quality has no associated bit in the 
-*        quality array. In this case, the FIXED argument will indicate if 
+*        of zero is returned if the quality has no associated bit in the
+*        quality array. In this case, the FIXED argument will indicate if
 *        all pixel do, or do not, hold the quality.
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        A descriptive comment stored with the name.
@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -186,7 +186,7 @@
          CALL CMP_GET0L( QULOC, IRQ__RONAM, RDONLY, STATUS )
       ELSE
          RDONLY = .FALSE.
-      END IF     
+      END IF
 
 *  The "fixed bit" flag was added at 4/3/2008, so check it exists before
 *  accessing it.
@@ -195,7 +195,7 @@
          CALL CMP_GET0L( QULOC, IRQ__FBNAM, FIXBIT, STATUS )
       ELSE
          RDONLY = .FALSE.
-      END IF     
+      END IF
 
 *  Return a bit number of zero if no bit is assigned to the quality name.
       IF( FIXED .AND. .NOT. FIXBIT ) BIT = 0

@@ -91,11 +91,11 @@ void smf_model_stripsuffix( const char *instr, char *outstr, int *status) {
 
   /* Main routine */
   if (*status != SAI__OK) return;
-  
+
   inname = grpNew( "GRP", status );
   outname = grpNew( "GRP", status );
   grpPut1( inname, instr, 1, status );
-  grpGrpex( "*|" SMF__DIMM_SUFFIX "||", inname, outname, &msize, &added, 
+  grpGrpex( "*|" SMF__DIMM_SUFFIX "||", inname, outname, &msize, &added,
             &flag, status );
   pname = outstr;
   grpGet( outname, 1, 1, &pname, GRP__SZNAM, status );

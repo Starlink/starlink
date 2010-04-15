@@ -45,9 +45,9 @@
 *     I       Loop variable
 *     ICHHT   Index in QWKDAT for char. height of raster font loaded.
 *     ICHWD   Index in QWKDAT for char. width of raster font loaded.
-*     ICHCT   Index in QWKDAT for cap to top line distance of raster 
+*     ICHCT   Index in QWKDAT for cap to top line distance of raster
 *             font loaded.
-*     ICHBB   Index in QWKDAT for base to bottom line distance of  
+*     ICHBB   Index in QWKDAT for base to bottom line distance of
 *             raster font loaded.
 *
       INTEGER    ICHHT,     ICHWD,     ICHCT,     ICHBB

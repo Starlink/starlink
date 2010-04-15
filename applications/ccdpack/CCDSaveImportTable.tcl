@@ -1,11 +1,11 @@
   proc CCDSaveImportTable { savefile fitsbox extenbox } {
 #+
 #  Name:
-#     CCDSaveImportTable 
+#     CCDSaveImportTable
 
 #  Purpose:
 #     Saves an import table described in two listboxes managed by the
-#     CCDCreateImportTable interface. 
+#     CCDCreateImportTable interface.
 
 #  Language:
 #     TCL
@@ -110,7 +110,7 @@
 
 #  Failed to open file.
          CCDIssueError "Failed to open file: $savefile"
-         set status 0 
+         set status 0
       }
 
 #  End of procedure.

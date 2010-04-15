@@ -5,10 +5,10 @@
 
 *+
 *  Name :
-*     MRQ_COF   
-* 
+*     MRQ_COF
+*
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -18,11 +18,11 @@
 *     1		     ALPHA, BETA, DIM_A, CHI, FUNCTN, FDERIV )
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *

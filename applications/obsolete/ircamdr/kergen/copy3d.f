@@ -31,7 +31,7 @@
 *    History :
 *     02/12/1983 : Original version                     (ROE::ASOC5)
 *     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
-*     15_JULY-1994 Changed arguments to input DIMS separately 
+*     15_JULY-1994 Changed arguments to input DIMS separately
 *                  so that routine will still compile  (SKL@JACH)
 *
 *    Type Definitions :
@@ -41,7 +41,7 @@
 *    Import :
       INTEGER
      :  DIMS1, ! dimensions of the input/output arrays
-     :  DIMS2, ! dimensions of the input/output arrays     
+     :  DIMS2, ! dimensions of the input/output arrays
      :  DIMS3  ! dimensions of the input/output arrays
       REAL
      :  ARRIN( DIMS1, DIMS2, DIMS3 ) ! the input array, data to be copied

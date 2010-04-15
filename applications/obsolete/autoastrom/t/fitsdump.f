@@ -1,5 +1,5 @@
       program fitsdump
-      
+
       implicit none
       integer ftstat,ftunit,blocksize,i
       character*(80) s
@@ -7,9 +7,9 @@
       logical keepreading
       logical printline
       logical trimlines
-      
+
       integer iargc
-      
+
       trimlines = .true.
       ffname = ''
 
@@ -31,7 +31,7 @@
       ftstat = 0
       call ftgiou (ftunit, ftstat)
       call ftopen (ftunit, ffname, 0, blocksize, ftstat)
-      
+
       if (ftstat.gt.0) then
          write (*,'("Can''t open file ",a)') ffname
          goto 990

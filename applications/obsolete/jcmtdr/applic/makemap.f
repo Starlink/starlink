@@ -114,7 +114,7 @@
 
 *  Functions
       LOGICAL PAR_ABORT                ! check PAR abort flag
-      LOGICAL PAR_GIVEN                ! 
+      LOGICAL PAR_GIVEN                !
       INTEGER DYN_ELEMENT              !
       INTEGER ICH_LEN                  !
       INTEGER ICH_FOLD                 !
@@ -145,7 +145,7 @@
      :   DIMINDEX(GSD__SZINDEX,GSD__MXDIM)
       INTEGER ACTDIMS
       INTEGER ACTVALS
-      
+
 *  -GSD file items
 
       LOGICAL*1 C3FLY                  ! T if data taken `on the fly'
@@ -159,8 +159,8 @@
       INTEGER C3NO_SCAN_VARS1          ! number of variables per entry in
                                        ! scan table 1
       INTEGER C3NCH                    ! number of backend data channels stored
-      INTEGER C3NIS                    ! planned no. of scans measured in 
-                                       !   observation, = no of entries in 
+      INTEGER C3NIS                    ! planned no. of scans measured in
+                                       !   observation, = no of entries in
                                        !   scan tables
       INTEGER C3NSAMPLE                ! actual number of scans measured, = no
                                        !   of non-zero entries in scan tables
@@ -194,7 +194,7 @@
 *  -general
 
       LOGICAL LTEMP                    !
-      INTEGER STATUS                   ! 
+      INTEGER STATUS                   !
       INTEGER NCH                      ! backend data channel to be read
       INTEGER IY, IM, ID               ! year month day of observation
       INTEGER NX, NY                   ! number of map pixels in x and y
@@ -203,7 +203,7 @@
       INTEGER NPOINTS                  ! number of valid map points
       INTEGER DSTAT                    ! DTA status
       INTEGER SLASTAT                  ! SLA status
-      INTEGER IDX                      ! 
+      INTEGER IDX                      !
       INTEGER ITEMP                    !
       INTEGER IGNORE                   ! unimportant status
       REAL XMIN, XMAX                  ! extrema of map in x offset
@@ -228,7 +228,7 @@
       CHARACTER*128 JCMT_DTA_NAME      ! DTA name of JCMT section
       CHARACTER*128 SEC_NAME           ! "      "    current section
       CHARACTER*128 DTA_NAME           ! "      "    general item
-      CHARACTER*(2*GSD__SZCHAR+1) STRING ! 
+      CHARACTER*(2*GSD__SZCHAR+1) STRING !
 
 *  Initialisations
       DATA NUMBER / 0 /
@@ -314,7 +314,7 @@
       IF (C3FLY) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             NAME = 'C6SD'
-            CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, 
+            CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY,
      :         GSDINDEX, STATUS)
             CALL GSD_GET0C (GSDINDEX, C6SD, STATUS)
             IF (STATUS .NE. SAI__OK) THEN
@@ -330,7 +330,7 @@
 
       NAME = 'C3NCH'
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, 
+         CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY,
      :      GSDINDEX, STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
             CALL GSD_GET0I (GSDINDEX, C3NCH, STATUS)
@@ -439,30 +439,30 @@
 ** The object of this section is to obtain the measured data value
 ** and the LST of its observation for each map pixel. This is complicated
 ** because of changes in the way things were stored between versions
-** 3 and 4 of GSD, and by the fact that the storage method depends 
+** 3 and 4 of GSD, and by the fact that the storage method depends
 ** on whether the data was taken as discrete pixels or `on the fly'
 ** in a series of ROW actions.
 
-      IF (VERSION .GE. 3.999) THEN  
+      IF (VERSION .GE. 3.999) THEN
 
 *  For GSD versions greater than 4 the scan tables were stored.
 *  Entries are made in the scan tables at the beginning of each scan
-*  which means that there will be a different number of entries 
-*  depending whether the map was obtained `on-the-fly' or as discrete 
-*  pixels. In an on-the-fly observation the `scan' is a ROW of the 
+*  which means that there will be a different number of entries
+*  depending whether the map was obtained `on-the-fly' or as discrete
+*  pixels. In an on-the-fly observation the `scan' is a ROW of the
 *  raster which may cover many map points. For discrete pixel
 *  observations a `scan' refers to a single map point.
 
 *  C12SCAN_TABLE_1 is an array dimensioned (C3NO_SCAN_VARS1, C3NIS)
-*  where C3NO_SCAN_VARS1 is assumed to be 6, giving for each scan 
-*  the LST, airmass, x offset, y offset, direction, scan_length. 
+*  where C3NO_SCAN_VARS1 is assumed to be 6, giving for each scan
+*  the LST, airmass, x offset, y offset, direction, scan_length.
 *  C3NIS is the number of scans made in the observation.
 
 *  get C3NO_SCAN_VARS1
 
          IF (STATUS .EQ. SAI__OK) THEN
             NAME = 'C3NO_SCAN_VARS1'
-            CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, 
+            CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY,
      :         GSDINDEX, STATUS)
             CALL GSD_GET0I (GSDINDEX, C3NO_SCAN_VARS1, STATUS)
 
@@ -495,11 +495,11 @@
 
                IF (.NOT. C3FLY) THEN
 
-*  for a map made of integrations on discrete points the contents of 
+*  for a map made of integrations on discrete points the contents of
 *  the scan table are, for each observed point; lst,airmass,x,y.
 *  We only need the LST and the x, y. The airmass will be recalculated
 *  in JCMTEXTC. The dimensions of LST, x, y are C3NIS. The corresponding
-*  data array which is dealt with later will be dimensioned 
+*  data array which is dealt with later will be dimensioned
 *  (C3NCH, C3MXP, C3NIS) and C3MXP should always be 1 in this case.
 
 *  get workspace for LST array
@@ -521,8 +521,8 @@
 
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL JCMT_GETLSTXY (DYNAMIC_MEM(ST1PTR),
-     :                  C3NO_SCAN_VARS1, C3NIS, C3NSAMPLE, 
-     :                  DYNAMIC_MEM(LSTPTR), DYNAMIC_MEM(XPTR), 
+     :                  C3NO_SCAN_VARS1, C3NIS, C3NSAMPLE,
+     :                  DYNAMIC_MEM(LSTPTR), DYNAMIC_MEM(XPTR),
      :                  DYNAMIC_MEM(YPTR), STATUS)
                   END IF
                   IF (STATUS .NE. SAI__OK) THEN
@@ -539,17 +539,17 @@
                ELSE
 
 *  for 'on the fly' observations the scan table items are stored
-*  only at the start of each scan in the raster. The LST and x,y must be 
+*  only at the start of each scan in the raster. The LST and x,y must be
 *  recalculated for each of the map points using C6SD to specify
 *  the scan direction and C3SRT to indicate the length of time
-*  spent on each scan. In this case the dimensions of LST, x, y are 
-*  (C3MXP,C3NIS). The corresponding data array to be dealt with later 
+*  spent on each scan. In this case the dimensions of LST, x, y are
+*  (C3MXP,C3NIS). The corresponding data array to be dealt with later
 *  is dimensioned (C3NCH, C3MXP, C3NIS).
 
 *  get workspace for the LST array
 
                   NELM = C3MXP * C3NIS
-                  CALL DSA_GET_WORK_ARRAY (NELM, 'DOUBLE', ADDRESS, 
+                  CALL DSA_GET_WORK_ARRAY (NELM, 'DOUBLE', ADDRESS,
      :               SLOT, STATUS)
                   LSTPTR = DYN_ELEMENT(ADDRESS)
 
@@ -565,10 +565,10 @@
 *  call routine to get LST, x, y from scan table into temporary arrays
 
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL JCMT_MKLSTXY (DYNAMIC_MEM(ST1PTR), 
-     :                  C3NO_SCAN_VARS1, C3NIS, C3NSAMPLE, C6SD, 
-     :                  C3SRT, DYNAMIC_MEM(LSTPTR), 
-     :                  DYNAMIC_MEM(XPTR), DYNAMIC_MEM(YPTR), C3MXP, 
+                     CALL JCMT_MKLSTXY (DYNAMIC_MEM(ST1PTR),
+     :                  C3NO_SCAN_VARS1, C3NIS, C3NSAMPLE, C6SD,
+     :                  C3SRT, DYNAMIC_MEM(LSTPTR),
+     :                  DYNAMIC_MEM(XPTR), DYNAMIC_MEM(YPTR), C3MXP,
      :                  STATUS)
                   END IF
                   IF (STATUS .NE. SAI__OK) THEN
@@ -581,13 +581,13 @@
 
                   NPOINTS = C3NSAMPLE * C3MXP
 
-               END IF    
+               END IF
             END IF
          END IF
 
       ELSE
 
-*  Before version 4 no scan tables were stored, so use the pointing history 
+*  Before version 4 no scan tables were stored, so use the pointing history
 *  table to specify x, y and the LST item C14LST to specify the LST for each
 *  pixel. The pointing history table holds results for all points measured,
 *  and I assume LST array does as well. This probably implies that
@@ -605,14 +605,14 @@
                   GOTO 500
                END IF
 
-            ELSE  
+            ELSE
 
 *  The pointing history table is an array dimensioned (C3NPP, C3NMAP),
 *  find these values
 
                IF (STATUS .EQ. SAI__OK) THEN
                   NAME = 'C3NMAP'
-                  CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, 
+                  CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY,
      :               GSDINDEX, STATUS)
                   CALL GSD_GET0I (GSDINDEX, C3NMAP, STATUS)
                   IF (STATUS .NE. SAI__OK) THEN
@@ -624,7 +624,7 @@
 
                IF (STATUS .EQ. SAI__OK) THEN
                   NAME = 'C3NPP'
-                  CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, 
+                  CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY,
      :               GSDINDEX, STATUS)
                   CALL GSD_GET0I (GSDINDEX, C3NPP, STATUS)
                   IF (STATUS .NE. SAI__OK) THEN
@@ -634,7 +634,7 @@
                   END IF
                END IF
 
-*  Generate an error if C3NIS does not equal C3NMAP, because that means 
+*  Generate an error if C3NIS does not equal C3NMAP, because that means
 *  that our assumptions about how version 3 data was stored are not correct.
 
                IF (C3NIS .NE. C3NMAP) THEN
@@ -654,17 +654,17 @@
 
                IF (STATUS .EQ. SAI__OK) THEN
                   NAME = 'C14PHIST'
-                  CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, 
+                  CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY,
      :               GSDINDEX, STATUS)
                   CALL GSD_INQ_SIZE(FD, NUMBER, MAXDIMS, DIMNAMES,
      :               DIMUNITS, DIMVALS, ACTDIMS, SIZE, STATUS)
-*                 CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS, 
-*    :               DIMNUMBERS, DIMNAMES, DIMUNITS, DIMVALS, DIMINDEX, 
+*                 CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS,
+*    :               DIMNUMBERS, DIMNAMES, DIMUNITS, DIMVALS, DIMINDEX,
 *    :               ACTDIMS, SIZE, STATUS)
 
 *  get workspace for it and copy it in
 
-                  CALL DSA_GET_WORK_ARRAY (SIZE, 'FLOAT', ADDRESS, 
+                  CALL DSA_GET_WORK_ARRAY (SIZE, 'FLOAT', ADDRESS,
      :               SLOT, STATUS)
                   PHTPTR = DYN_ELEMENT(ADDRESS)
 
@@ -674,7 +674,7 @@
                      GOTO 500
                   ELSE
 
-                     CALL GSD_GET1R (GSDINDEX, 1, SIZE, 1, SIZE, 
+                     CALL GSD_GET1R (GSDINDEX, 1, SIZE, 1, SIZE,
      :                  DYNAMIC_MEM(PHTPTR), ACTVALS, STATUS)
 
 *  get workspace for x and y arrays
@@ -689,10 +689,10 @@
 *  call routine to transfer PHT values to temporary arrays
 
                      IF (STATUS .EQ. SAI__OK) THEN
-                        CALL JCMT_GETPHT (DYNAMIC_MEM(PHTPTR), 
-     :                     C3NPP, C3NMAP, C3NSAMPLE, 
-     :                     DYNAMIC_MEM(XPTR), DYNAMIC_MEM(YPTR), 
-     :                     STATUS)  
+                        CALL JCMT_GETPHT (DYNAMIC_MEM(PHTPTR),
+     :                     C3NPP, C3NMAP, C3NSAMPLE,
+     :                     DYNAMIC_MEM(XPTR), DYNAMIC_MEM(YPTR),
+     :                     STATUS)
                      END IF
 
 *  set number of valid points
@@ -709,16 +709,16 @@
 *  find the LST array
 
                         NAME = 'C14LST'
-                        CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, 
+                        CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE,
      :                     TABLE, GSDINDEX, STATUS)
                         CALL GSD_INQ_SIZE(FD, NUMBER, MAXDIMS, DIMNAMES,
      :                     DIMUNITS, DIMVALS, ACTDIMS, SIZE, STATUS)
-*                       CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS, 
-*    :                     DIMNUMBERS, DIMNAMES, DIMUNITS, DIMVALS, 
+*                       CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS,
+*    :                     DIMNUMBERS, DIMNAMES, DIMUNITS, DIMVALS,
 *    :                     DIMINDEX, ACTDIMS, SIZE, STATUS)
 
 *  generate an error if LST does not have C3NIS values
-     
+
                         IF (C3NIS .NE. SIZE) THEN
                            IF (STATUS .EQ. SAI__OK) THEN
                               CALL PAR_WRUSER ('MAKEMAP - GSD '//
@@ -732,12 +732,12 @@
 *  get workspace for it and copy it in (double precision for accuracy
 *  in later LST calculations)
 
-                        CALL DSA_GET_WORK_ARRAY (C3NIS, 'DOUBLE', 
+                        CALL DSA_GET_WORK_ARRAY (C3NIS, 'DOUBLE',
      :                     ADDRESS, SLOT, STATUS)
-                        LSTPTR = DYN_ELEMENT(ADDRESS)      
+                        LSTPTR = DYN_ELEMENT(ADDRESS)
                         IF (STATUS .EQ. SAI__OK) THEN
-                           CALL GSD_GET1D (GSDINDEX, 1, SIZE, 1, 
-     :                        SIZE, DYNAMIC_MEM(LSTPTR), ACTVALS, 
+                           CALL GSD_GET1D (GSDINDEX, 1, SIZE, 1,
+     :                        SIZE, DYNAMIC_MEM(LSTPTR), ACTVALS,
      :                        STATUS)
                         END IF
                         IF (STATUS .NE. SAI__OK) THEN
@@ -758,14 +758,14 @@
 **  contain the measured points
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_CALCULATE_GRID (NPOINTS, 
-     :     DYNAMIC_MEM(XPTR), DYNAMIC_MEM(YPTR), 
-     :     XMIN, XMAX, XSPACE, NX, 
+         CALL JCMT_CALCULATE_GRID (NPOINTS,
+     :     DYNAMIC_MEM(XPTR), DYNAMIC_MEM(YPTR),
+     :     XMIN, XMAX, XSPACE, NX,
      :     YMIN, YMAX, YSPACE, NY, STATUS)
       END IF
 
 
-**  Now find the data array 
+**  Now find the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
          NAME = 'C13DAT'
@@ -783,8 +783,8 @@
 
             CALL GSD_INQ_SIZE(FD, NUMBER, MAXDIMS, DIMNAMES,
      :         DIMUNITS, DIMVALS, ACTDIMS, SIZE, STATUS)
-*           CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS, DIMNUMBERS, 
-*    :         DIMNAMES, DIMUNITS, DIMVALS, DIMINDEX, ACTDIMS, SIZE, 
+*           CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS, DIMNUMBERS,
+*    :         DIMNAMES, DIMUNITS, DIMVALS, DIMINDEX, ACTDIMS, SIZE,
 *    :         STATUS)
             IF (SIZE .NE. C3NCH*C3MXP*C3NIS) THEN
                CALL PAR_WRUSER ('MAKEMAP - Data array is not '//
@@ -795,11 +795,11 @@
 
 *  get temporary array and read in the data
 
-            CALL DSA_GET_WORK_ARRAY (SIZE, 'FLOAT', ADDRESS, SLOT, 
+            CALL DSA_GET_WORK_ARRAY (SIZE, 'FLOAT', ADDRESS, SLOT,
      :         STATUS)
             DATPTR = DYN_ELEMENT(ADDRESS)
             IF (STATUS .EQ. SAI__OK) THEN
-            CALL GSD_GET1R (GSDINDEX, 1, SIZE, 1, SIZE, 
+            CALL GSD_GET1R (GSDINDEX, 1, SIZE, 1, SIZE,
      :         DYNAMIC_MEM(DATPTR), ACTVALS, STATUS)
             END IF
          END IF
@@ -828,7 +828,7 @@
 
       CALL DSA_OUTPUT ('OUTPUT', 'OUTPUT', ' ', 1, 1, STATUS)
 
-*  create data array in the output file 
+*  create data array in the output file
 
       DIMVALS(1) = NX
       DIMVALS(2) = NY
@@ -840,33 +840,33 @@
       CALL DSA_USE_FLAGGED_VALUES ('OUTPUT', STATUS)
       CALL DSA_SET_FLAGGED_VALUES ('OUTPUT', .TRUE., STATUS)
 
-*  map the output data array and call a routine to sort 
-*  the input data into it according to x,y 
+*  map the output data array and call a routine to sort
+*  the input data into it according to x,y
 
       CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, SLOT,
      :   STATUS)
       ODPTR = DYN_ELEMENT(ADDRESS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_SORT_RDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE, 
+         CALL JCMT_SORT_RDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE,
      :      DYNAMIC_MEM(DATPTR), NCH, DYNAMIC_MEM(XPTR),
      :      DYNAMIC_MEM(YPTR), FFLAG, XMIN, XSPACE, NX, YMIN, YSPACE,
      :      NY, DYNAMIC_MEM(ODPTR), STATUS)
       END IF
-    
+
 *  find the error array, if present
 
       IF (STATUS .EQ. SAI__OK) THEN
          NAME = 'C13ERR'
          CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, GSDINDEX,
-     :      STATUS) 
+     :      STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             STATUS = SAI__OK
          ELSE
             CALL GSD_INQ_SIZE(FD, NUMBER, MAXDIMS, DIMNAMES,
      :         DIMUNITS, DIMVALS, ACTDIMS, SIZE, STATUS)
 *           CALL GSD_INQUIRE_ARRAY (GSDINDEX, MAXDIMS, DIMNUMBERS,
-*    :         DIMNAMES, DIMUNITS, DIMVALS, DIMINDEX, ACTDIMS, SIZE, 
+*    :         DIMNAMES, DIMUNITS, DIMVALS, DIMINDEX, ACTDIMS, SIZE,
 *    :         STATUS)
             CALL DSA_GET_WORK_ARRAY (SIZE, 'FLOAT', ADDRESS, SLOT,
      :         STATUS)
@@ -899,7 +899,7 @@
 
          CALL GEN_NFILLF (NX, DYNAMIC_MEM(XAXPTR))
 
-*  multiply the axis by the spacing between pixels in the map grid (in cell 
+*  multiply the axis by the spacing between pixels in the map grid (in cell
 *  units)
 
          CALL GEN_MULCAF (DYNAMIC_MEM(XAXPTR), NX, XSPACE,
@@ -921,7 +921,7 @@
 
       CHAR_ITEMS(1) = CELLX_UNIT
       CHAR_ITEMS(2) = 'X offset'
-      CALL DSA_SET_AXIS_INFO ('OUTPUT', 1, 2, CHAR_ITEMS, 0, 0, 
+      CALL DSA_SET_AXIS_INFO ('OUTPUT', 1, 2, CHAR_ITEMS, 0, 0,
      :   STATUS)
 
 *  now the same for the y axis
@@ -940,7 +940,7 @@
       END IF
       CHAR_ITEMS(1) = CELLY_UNIT
       CHAR_ITEMS(2) = 'Y offset'
-      CALL DSA_SET_AXIS_INFO ('OUTPUT', 2, 2, CHAR_ITEMS, 0, 0, 
+      CALL DSA_SET_AXIS_INFO ('OUTPUT', 2, 2, CHAR_ITEMS, 0, 0,
      :   STATUS)
 
 
@@ -958,21 +958,21 @@
          DIMVALS(1) = NX
          DIMVALS(2) = NY
          CALL DTA_CRVAR ('OUTPUT.MORE.JCMT.LST', 'NDF', DSTAT)
-         CALL DTA_CRNAM ('OUTPUT.MORE.JCMT.LST', 'DATA_ARRAY', 2, 
+         CALL DTA_CRNAM ('OUTPUT.MORE.JCMT.LST', 'DATA_ARRAY', 2,
      :      DIMVALS, DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'DOUBLE', DSTAT)
-         CALL DTA_CRNAM ('OUTPUT.MORE.JCMT.LST', 'DATA_ARRAY', 0, 0, 
+         CALL DTA_CRNAM ('OUTPUT.MORE.JCMT.LST', 'DATA_ARRAY', 0, 0,
      :      DTA_NAME, DSTAT)
          CALL DTA_MUVARD (DTA_NAME, NX*NY, ADDRESS, DSTAT)
          OLSTPTR = DYN_ELEMENT(ADDRESS)
          IF (DSTAT .NE. 0) THEN
-            CALL PAR_WRUSER ('MAKEMAP - Error creating LST array', 
+            CALL PAR_WRUSER ('MAKEMAP - Error creating LST array',
      :        IGNORE)
             GOTO 500
          END IF
 
 *  correct the LST for the case where the observation spans a sidereal
-*  day 
+*  day
 
          NLST = C3MXP * C3NSAMPLE
          IF (STATUS .EQ. SAI__OK) THEN
@@ -987,7 +987,7 @@
      :         DYNAMIC_MEM(LSTPTR))
          END IF
 
-*  sort the LST array so that it maps properly to the pixel array 
+*  sort the LST array so that it maps properly to the pixel array
 *  as for the data and error arrays
 
          IF (STATUS .EQ. SAI__OK) THEN
@@ -1021,7 +1021,7 @@
          NAME = 'C1SNA2'
          CALL GSD_FIND (FD, NAME, NUMBER, UNIT, TYPE, ARRAY, GSDINDEX,
      :      STATUS)
-         CALL GSD_GET0C (GSDINDEX, 
+         CALL GSD_GET0C (GSDINDEX,
      :      STRING(GSD__SZCHAR+2:2*GSD__SZCHAR+1), STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             STRING = 'UNKNOWN'
@@ -1343,7 +1343,7 @@
          CALL DTA_WRVARF (DTA_NAME, 1, RTEMP, DSTAT)
       END IF
 
-*  the angle between the x-axis and the y-axis of the cells 
+*  the angle between the x-axis and the y-axis of the cells
 *  (anti-clockwise, degrees), convert to radians
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -1370,7 +1370,7 @@
          CALL DTA_CRNAM (SEC_NAME, 'CELL_X', 0, 0, DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'FLOAT', DSTAT)
          CALL DTA_WRVARF (DTA_NAME, 1, C6DX, DSTAT)
-         CALL DTA_CRNAM (SEC_NAME, 'CELL_X_UNIT', 1, GSD__SZUNIT, 
+         CALL DTA_CRNAM (SEC_NAME, 'CELL_X_UNIT', 1, GSD__SZUNIT,
      :      DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'CHAR', DSTAT)
          CALL DTA_CRNAM (SEC_NAME, 'CELL_X_UNIT', 0, 0, DTA_NAME,
@@ -1382,7 +1382,7 @@
          CALL DTA_CRNAM (SEC_NAME, 'CELL_Y', 0, 0, DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'FLOAT', DSTAT)
          CALL DTA_WRVARF (DTA_NAME, 1, C6DY, DSTAT)
-         CALL DTA_CRNAM (SEC_NAME, 'CELL_Y_UNIT', 1, GSD__SZUNIT, 
+         CALL DTA_CRNAM (SEC_NAME, 'CELL_Y_UNIT', 1, GSD__SZUNIT,
      :      DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'CHAR', DSTAT)
          CALL DTA_CRNAM (SEC_NAME, 'CELL_Y_UNIT', 0, 0, DTA_NAME,
@@ -1401,7 +1401,7 @@
             CALL DTA_WRVARI (DTA_NAME, 1, 0, DSTAT)
          END IF
       END IF
-      
+
 *  work out integration time per pixel and write that
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -1419,10 +1419,10 @@
          CALL DTA_WRVARF (DTA_NAME, 1, INT_TIME, DSTAT)
       END IF
 
-*  the scan direction 
+*  the scan direction
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL DTA_CRNAM (SEC_NAME, 'SCAN_DIR', 1, GSD__SZCHAR, 
+         CALL DTA_CRNAM (SEC_NAME, 'SCAN_DIR', 1, GSD__SZCHAR,
      :      DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'CHAR', DSTAT)
          CALL DTA_CRNAM (SEC_NAME, 'SCAN_DIR', 0, 0, DTA_NAME, DSTAT)
@@ -1453,11 +1453,11 @@
             STATUS = SAI__OK
             MJDSTART = DFLAG
          END IF
-         CALL DTA_CRNAM (SEC_NAME, 'MJD_START', 0, 0, DTA_NAME, 
+         CALL DTA_CRNAM (SEC_NAME, 'MJD_START', 0, 0, DTA_NAME,
      :      DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'DOUBLE', DSTAT)
          CALL DTA_WRVARD (DTA_NAME, 1, MJDSTART, DSTAT)
-      END IF      
+      END IF
 
 *  get the chopper function, 2-position (SQUARE) or 3-position (TRIPOS)
 
@@ -1479,7 +1479,7 @@
          CALL DTA_WRVARC (DTA_NAME, 32, C4FUN, DSTAT)
       END IF
 
-*  get the beam throw in arcseconds 
+*  get the beam throw in arcseconds
 
       IF (STATUS .EQ. SAI__OK) THEN
          NAME = 'C4THROW'
@@ -1607,10 +1607,10 @@
          CALL DTA_WRVARD (DTA_NAME, 1, DTEMP, DSTAT)
       END IF
 
-      
+
 **ENVIRONMENT specific parameters
 
-      CALL DTA_CRNAM ('OUTPUT.MORE.JCMT', 'ENVRNMNT', 0, 0, SEC_NAME, 
+      CALL DTA_CRNAM ('OUTPUT.MORE.JCMT', 'ENVRNMNT', 0, 0, SEC_NAME,
      :   DSTAT)
       CALL DTA_CRVAR (SEC_NAME, 'STRUC', DSTAT)
 
@@ -1633,7 +1633,7 @@
          CALL DTA_WRVARF (DTA_NAME, 1, RTEMP, DSTAT)
       END IF
 
-*  pressure in mbar 
+*  pressure in mbar
 
       IF (STATUS .EQ. SAI__OK) THEN
          NAME = 'C5PRS'
@@ -1672,7 +1672,7 @@
 
 **Create stub for pointing correction structure
 
-      CALL DTA_CRNAM ('OUTPUT.MORE.JCMT', 'PCORR', 0, 0, SEC_NAME, 
+      CALL DTA_CRNAM ('OUTPUT.MORE.JCMT', 'PCORR', 0, 0, SEC_NAME,
      :   DSTAT)
       CALL DTA_CRVAR (SEC_NAME, 'STRUC', DSTAT)
 
@@ -1688,7 +1688,7 @@
 
 
 *  tidy up
-      
+
   500 CONTINUE
 
       IF (STATUS .NE. SAI__OK) FAULT = .TRUE.

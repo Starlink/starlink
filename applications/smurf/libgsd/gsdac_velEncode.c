@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_velEncode ( const char *vframe, const char *vdef, 
+*     gsdac_velEncode ( const char *vframe, const char *vdef,
                         int *LSRFlg, int *status )
 
 *  Arguments:
@@ -24,13 +24,13 @@
 *     LSRFlg = int* (Given and Returned)
 *        LSR flag
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *    Encodes contents of LSRFLG given velocity frame and velocity law
 *    used to observe data: Must be consistent with longstanding usage.
 *
-*    The assumption is that the LO frequency offsets were made to 
+*    The assumption is that the LO frequency offsets were made to
 *    bring a souce *at velocity VRAD* in the nominated frame to the
 *    centre of the spectrum.
 *
@@ -84,7 +84,7 @@
 
 #define FUNC_NAME "gsdac_velEncode.c"
 
-void gsdac_velEncode ( const char *vframe, const char *vdef, 
+void gsdac_velEncode ( const char *vframe, const char *vdef,
                        int *LSRFlg, int *status )
 
 {
@@ -115,8 +115,8 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
   }
 
   if ( i > 3 ) {
-    msgOut ( FUNC_NAME, 
-             "Did not understand velocity definition string, assuming RADIO.", 
+    msgOut ( FUNC_NAME,
+             "Did not understand velocity definition string, assuming RADIO.",
              status );
     i = 1;
   }
@@ -137,19 +137,19 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
   }
 
   /* Equate BARYCENTRIC with GEOCENTRIC. */
-  if ( j == 5 ) j = 4; 
+  if ( j == 5 ) j = 4;
 
   /* Equsate TELLURIC with TOPOCENTRIC. */
-  if ( j == 6 ) j = 1;  
+  if ( j == 6 ) j = 1;
 
   if ( j > 6 ) {
-    msgOut ( FUNC_NAME, 
-             "Did not understand velocity frame string, assuming LSR.", 
+    msgOut ( FUNC_NAME,
+             "Did not understand velocity frame string, assuming LSR.",
              status );
     j = 2;
-  } 
+  }
 
   /* Calculate the LSRFlg. */
-  *LSRFlg = 16 * ( i - 1 ) + ( j - 1 ); 
+  *LSRFlg = 16 * ( i - 1 ) + ( j - 1 );
 
 }

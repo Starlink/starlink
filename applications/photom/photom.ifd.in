@@ -308,7 +308,7 @@ package photom {
             helpkey *
             prompt {Source of exposure time}
           }
-   
+
          parameter optima {
             position 32
             type _LOGICAL
@@ -336,7 +336,7 @@ package photom {
             prompt {Approx seeing in pixels}
             helpkey *
           }
-    
+
       }
       action autophotom {
 
@@ -550,7 +550,7 @@ package photom {
             prompt {Define annuli using fixed radii}
             helpkey *
           }
-   
+
          parameter optima {
             type _LOGICAL
             vpath CURRENT DEFAULT NOPROMPT
@@ -575,10 +575,10 @@ package photom {
             prompt {Approx seeing in pixels}
             helpkey *
           }
-   
+
       }
       action photgrey {
-   
+
          helplib {$PHOTOM_HELP}
 
          parameter in {

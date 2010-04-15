@@ -57,7 +57,7 @@ int find_word(int envid,int n,char *word);
 
 static int lsid[128];	/* Static ID's for words starting with given	    */
 			/* letters.					    */
-			
+
 static int status;	/* Global status				    */
 
 static FILE *fid;	/* Input file id				    */

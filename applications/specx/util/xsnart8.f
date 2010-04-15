@@ -5,8 +5,8 @@
 
       DOUBLE PRECISION FUNCTION XSNART8 (X, V, NX, IFAIL)
 
-C  Routine to return postion in X array (i.e. fractional points) 
-C  corresponding to the input value V. 
+C  Routine to return postion in X array (i.e. fractional points)
+C  corresponding to the input value V.
 C  Algorithm:
 C      o  find approximate starting value
 C      o  apply correction until V lies between translations
@@ -72,7 +72,7 @@ CD    PRINT *, '  left and right limits: ', xl, xr
         XLL = 0.5*X(NX)
         XRR = XR
       ELSE
-        XLL = X(N1) 
+        XLL = X(N1)
         XRR = X(N1+1)
       END IF
 
@@ -116,7 +116,7 @@ CD      PRINT *, '  channel increment dx: ', dx
 
       END DO
 
-*     final interpolation 
+*     final interpolation
 
       IF (N1 .EQ. 0) THEN
         XSNART8 = 1.0 + (V-X(1))/(2.*DX)

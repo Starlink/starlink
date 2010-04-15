@@ -104,13 +104,13 @@
 *        being fitted to the background.
 *        [5]
 *     OUTLIST = LITERAL (Read)
-*        The names of the output lists. 
+*        The names of the output lists.
 *
-*        These may be specified as list of comma separated names, 
-*        using indirection if required, OR, as a single modification 
+*        These may be specified as list of comma separated names,
+*        using indirection if required, OR, as a single modification
 *        element (of the input NDF names). The simplest modification
 *        element is the asterisk "*" which means call each of the
-*        output lists the same name as the corresponding input NDFs 
+*        output lists the same name as the corresponding input NDFs
 *        (but without the ".sdf" extension).
 *        So,
 *           IN > *
@@ -137,7 +137,7 @@
 *        pixels in the group.
 *        [*.DAT]
 *     OVERRIDE = _LOGICAL (Read)
-*        If TRUE then it is not a fatal error to detect no objects on an 
+*        If TRUE then it is not a fatal error to detect no objects on an
 *        image. In this case the output list of positions will not be
 *        written and the value in the COUNTS parameter will be set to 0.
 *        [FALSE]
@@ -208,24 +208,24 @@
 *     - Threshold estimation.
 *
 *       The algorithm used for calculating the values of percentiles
-*       for threshold determination should give good results even in the 
+*       for threshold determination should give good results even in the
 *       presence of pixel values which lie very far away from the bulk
-*       of the data.  However, the sampling of the histogram used to 
-*       estimate the mode and standard deviation may be poor in the 
-*       presence of extreme outliers.  If there are extreme outliers 
-*       therefore, the percentile method (USEPER set to TRUE) of 
+*       of the data.  However, the sampling of the histogram used to
+*       estimate the mode and standard deviation may be poor in the
+*       presence of extreme outliers.  If there are extreme outliers
+*       therefore, the percentile method (USEPER set to TRUE) of
 *       determining the threshold should be used.
 *
-*       The histogram used by FINDOBJ when USEPER is FALSE is formed by 
-*       (if necessary) re-binning until the BINFRAC criterion is met, 
-*       it is expected that this will always result in a well sampled 
-*       histogram. The background value is the mode of this histogram 
-*       and is not refined during the gaussian fitting. The gaussian 
-*       fitting just estimates the standard deviation of the background 
-*       and uses a fixed peak value and position (the mode of the 
-*       histogram) and iterates rejecting bins whose counts fall below 
+*       The histogram used by FINDOBJ when USEPER is FALSE is formed by
+*       (if necessary) re-binning until the BINFRAC criterion is met,
+*       it is expected that this will always result in a well sampled
+*       histogram. The background value is the mode of this histogram
+*       and is not refined during the gaussian fitting. The gaussian
+*       fitting just estimates the standard deviation of the background
+*       and uses a fixed peak value and position (the mode of the
+*       histogram) and iterates rejecting bins whose counts fall below
 *       20 percent of the peak value, stopping when either 3 iterations
-*       have been performed or the standard deviation does not change 
+*       have been performed or the standard deviation does not change
 *       by more than one bin width in data values.
 *
 *       FINDOBJ is optimised to determine a reliable detection threshold
@@ -238,7 +238,7 @@
 *       is not suited without understanding how if differs from other
 *       more specialized routines.
 *
-*     - NDF extension items. 
+*     - NDF extension items.
 *
 *       On exit the CURRENT_LIST items in the CCDPACK extensions
 *       (.MORE.CCDPACK) of the input NDFs are set to the names of the
@@ -261,7 +261,7 @@
 *       file using the characters # and !. Columns may be separated by
 *       the use of commas or spaces.
 *
-*       In all cases the coordinates in position lists are pixel 
+*       In all cases the coordinates in position lists are pixel
 *       coordinates.
 
 *  Behaviour of Parameters:
@@ -340,7 +340,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -379,7 +379,7 @@
       INTEGER IDIN              ! Input NDF identifier
       INTEGER INDEX             ! Loop counter
       INTEGER IPCON             ! Number of contributions
-      INTEGER IPGRP             ! Pointer to pixel groups 
+      INTEGER IPGRP             ! Pointer to pixel groups
       INTEGER IPHIST            ! Pointer to histogram array
       INTEGER IPIN              ! Pointer to input data array
       INTEGER IPINT             ! Pointer to pixel intensities
@@ -410,7 +410,7 @@
       INTEGER XDIM              ! First dimension of input NDF
       INTEGER YDIM              ! Second dimension of input NDF
       LOGICAL AUTOTH            ! True if user will allow auto-thresholding
-      LOGICAL BAD               ! Whether BAD pixels are present 
+      LOGICAL BAD               ! Whether BAD pixels are present
       LOGICAL TOUCH             ! Whether pixels group can touch the edges of the array or not
       LOGICAL USEPER            ! Whether to use percentiles to estimates threshold
       LOGICAL OVERRD            ! Whether to continue if no objects are detected or not
@@ -459,7 +459,7 @@
          CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
      :                  STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
- 
+
 *  Get the bounds of the NDF.
          CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
 
@@ -488,7 +488,7 @@
 *  background needs to be determined. The standard deviation is
 *  estimated by a gaussian fit to the background counts.
          CALL PAR_GET0L( 'USEPER', USEPER, STATUS )
-         IF ( USEPER ) THEN 
+         IF ( USEPER ) THEN
 
 *  Get the number of percentiles that the threshold is to be set at.
             CALL PAR_GET0D( 'PERCENTILE', PERCEN, STATUS )
@@ -537,7 +537,7 @@
 *  the mode (bin number which contains the peak count). Note the BAD
 *  flag is updated by this routine.
             CALL CCD1_MKHIS( ITYPE, IPIN, EL, BAD, MINBIN, NEED,
-     :                       %VAL( CNF_PVAL( IPHIST ) ), 
+     :                       %VAL( CNF_PVAL( IPHIST ) ),
      :                       MODE, PEAK, NBIN, ZERO,
      :                       WIDTH, STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 98
@@ -554,7 +554,7 @@
             CALL CCD1_MSG( ' ', '  Bin width     : ^WIDTH', STATUS )
 
 *  Fit the background using a gaussian.
-            CALL CCD1_GAFIT( %VAL( CNF_PVAL( IPHIST ) ), 
+            CALL CCD1_GAFIT( %VAL( CNF_PVAL( IPHIST ) ),
      :                       NBIN, MODE, SD, STATUS )
 
 *  Release histogram workspace.
@@ -640,7 +640,7 @@
 *  Count the number of pixels above the threshold to estimate the
 *  workspace requirements.
          CALL CCD1_NABV( ITYPE, IPIN, EL, BAD, THRESH, NABOVE, STATUS )
-         IF ( NABOVE .GT. 0 ) THEN 
+         IF ( NABOVE .GT. 0 ) THEN
 
 *  Get workspace for object connectivity information.
             CALL CCD1_MALL( NABOVE, '_INTEGER', IPX, STATUS )
@@ -651,8 +651,8 @@
 
 *  Determine the connectivity of images above the threshold.
             CALL CCD1_DCON( ITYPE, IPIN, XDIM, YDIM, BAD, THRESH, TOUCH,
-     :                      %VAL( CNF_PVAL( IPX ) ), 
-     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ),
      :                      %VAL( CNF_PVAL( IPINT ) ),
      :                      %VAL( CNF_PVAL( IPGRP ) ), NPIXEL, NABOVE,
      :                      STATUS )
@@ -662,24 +662,24 @@
                CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPXC, STATUS )
                CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPYC, STATUS )
                CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPMIN, STATUS )
-               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPSUM1, 
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPSUM1,
      :                         STATUS )
-               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPSUM2, 
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPSUM2,
      :                         STATUS )
-               CALL CCD1_MALL( NPIXEL, '_INTEGER', IPCON, 
+               CALL CCD1_MALL( NPIXEL, '_INTEGER', IPCON,
      :                         STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 98
-               
+
 *  Now form the centroids.
-               CALL CCD1_DCEN( NABOVE, %VAL( CNF_PVAL( IPX ) ), 
+               CALL CCD1_DCEN( NABOVE, %VAL( CNF_PVAL( IPX ) ),
      :                         %VAL( CNF_PVAL( IPY ) ),
-     :                         %VAL( CNF_PVAL( IPINT ) ), 
+     :                         %VAL( CNF_PVAL( IPINT ) ),
      :                         %VAL( CNF_PVAL( IPGRP ) ),
-     :                         NPIXEL, MINPIX, 
+     :                         NPIXEL, MINPIX,
      :                         %VAL( CNF_PVAL( IPSUM1 ) ),
-     :                         %VAL( CNF_PVAL( IPSUM2 ) ), 
+     :                         %VAL( CNF_PVAL( IPSUM2 ) ),
      :                         %VAL( CNF_PVAL( IPCON ) ),
-     :                         %VAL( CNF_PVAL( IPXC ) ), 
+     :                         %VAL( CNF_PVAL( IPXC ) ),
      :                         %VAL( CNF_PVAL( IPYC ) ),
      :                         %VAL( CNF_PVAL( IPMIN )), NOUT, STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 98
@@ -687,7 +687,7 @@
 *  Inform the user about the number of features located.
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL MSG_SETI( 'NOUT', NOUT )
-               IF ( NOUT .EQ. 1 ) THEN 
+               IF ( NOUT .EQ. 1 ) THEN
                   CALL CCD1_MSG( ' ',
      :'  ^NOUT image features located.', STATUS )
                ELSE
@@ -698,19 +698,19 @@
 
 *  Transform the centroid positions to data coordinates.
                TR( 1 ) = DBLE( LBND( 1 ) ) - 1.5D0
-               TR( 2 ) = 1.0D0 
+               TR( 2 ) = 1.0D0
                TR( 3 ) = 0.0D0
                TR( 4 ) = DBLE( LBND( 2 ) ) - 1.5D0
                TR( 5 ) = 0.0D0
-               TR( 6 ) = 1.0D0 
-               CALL CCD1_LXYT3( %VAL( CNF_PVAL( IPXC ) ), 
+               TR( 6 ) = 1.0D0
+               CALL CCD1_LXYT3( %VAL( CNF_PVAL( IPXC ) ),
      :                          %VAL( CNF_PVAL( IPYC ) ), NOUT, TR,
      :                          STATUS )
 
 *  Get the output file which is to contain the results. The name of this
 *  file is stored in the FIOGRP group of names.
                CALL GRP_GET( FIOGRP, INDEX, 1, FNAME, STATUS )
-               CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT, 
+               CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT,
      :                          STATUS )
 
 *  Report error message if open failed.
@@ -722,11 +722,11 @@
 
 *  Write the output results.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CCD1_FIOHD( FDOUT, 'Output from FINDOBJ', 
+                  CALL CCD1_FIOHD( FDOUT, 'Output from FINDOBJ',
      :                             STATUS )
-                  CALL CCD1_WRXYP( FDOUT, %VAL( CNF_PVAL( IPXC ) ), 
+                  CALL CCD1_WRXYP( FDOUT, %VAL( CNF_PVAL( IPXC ) ),
      :                             %VAL( CNF_PVAL( IPYC ) ),
-     :                             %VAL( CNF_PVAL( IPMIN ) ), 
+     :                             %VAL( CNF_PVAL( IPMIN ) ),
      :                             NOUT, LINE,
      :                             CCD1__BLEN, STATUS )
 
@@ -742,12 +742,12 @@
 *  Finally enter the name of the file to the extension.
                CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
             END IF
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
+         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'FINDOBJ_NOPIX', 
+            CALL ERR_REP( 'FINDOBJ_NOPIX',
      :'  There are no pixels with value greater than the threshold.',
      :                    STATUS )
-         
+
          END IF
 *=======================================================================
 *  End of image feature detection and centroiding section
@@ -761,23 +761,23 @@
 
 *  Write terminator for Processing NDF: message.
          CALL CCD1_MSG( ' ', '  ---',STATUS )
- 
+
 *  Trap cyclic errors, or continue if asked.
  98      CONTINUE
-         IF ( OVERRD .AND. STATUS .NE. SAI__OK ) THEN 
+         IF ( OVERRD .AND. STATUS .NE. SAI__OK ) THEN
 
 *  Override on errors. Make sure that we record no objects as being
 *  found. Note that the output object list cannot be created if an error
 *  occurred. This should always remain the case in changes to the coding
 *  above. The error is reported for informational purposes.
             NOBJ( INDEX ) = 0
-            CALL ERR_REP( ' ', 
+            CALL ERR_REP( ' ',
      :      '  Warning - Failed to detect any objects', STATUS )
             CALL ERR_FLUSH( STATUS )
          ELSE
             NOBJ( INDEX ) = NOUT
          END IF
-         IF ( STATUS .NE. SAI__OK ) THEN 
+         IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_RLSE
             GO TO 99
          END IF
@@ -786,9 +786,9 @@
 
 *  Successful scan for image features. Now write a list of the output
 *  positions list names.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CCD1_LNAMM( 'NAMELIST', 1, NNDF,
-     :   '# FINDOBJ - output position lists', FIOGRP, NOBJ, .TRUE., 
+     :   '# FINDOBJ - output position lists', FIOGRP, NOBJ, .TRUE.,
      :                   STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )

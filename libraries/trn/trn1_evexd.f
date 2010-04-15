@@ -1,29 +1,29 @@
       SUBROUTINE TRN1_EVEXD ( CODE, ICODE, CON, ICON, BAD, ND1, NDVEC,
      :                          DATA, NDAT, NS1, NSTACK, S, NCODE,
      :                          NCON, IERR, NERR, NSTAT, STATUS)
- 
- 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
+
+
 *+
 *  Name:
 *     TRN1_EVEXD
- 
+
 *  Purpose:
 *     evaluate a compiled DOUBLE PRECISION expression.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL TRN1_EVEXD ( CODE, ICODE, CON, ICON, BAD, ND1, NDVEC,
 *                         DATA, NDAT, NS1, NSTACK, S, NCODE,
 *                         NCON, IERR, NERR, NSTAT, STATUS)
- 
+
 *  Description:
 *     The routine evaluates an arithmetic expression for a vectorised
 *     array of input values using DOUBLE PRECISION arithmetic.  Arithmetic is
@@ -32,7 +32,7 @@
 *     input array of integer arithmetic operation codes (produced by
 *     the routine TRN1_CMPEX). These codes are defined in the include
 *     file TRN_CONST_STM.
- 
+
 *  Copyright:
 *     Copyright (C) 1988 Science & Engineering Research Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,25 +58,25 @@
 *     R.F. Warren-Smith (DUVAD::RFWS)
 *     D.S. Berry (DSB)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     11-FEB-1988:  Original version (DUVAD::RFWS)
 *     28-MAR-1988:  Improved error handling (DUVAD::RFWS)
 *     16-AUG-1988:  Added "bad value" handling (DUVAD::RFWS)
-*     12-JAN-2006:  Added IDV, QIF and boolean operators. Moved LDBAD 
+*     12-JAN-2006:  Added IDV, QIF and boolean operators. Moved LDBAD
 *                   from label 35 to 37.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
- 
+
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
- 
- 
+
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
@@ -85,8 +85,8 @@
                                  ! which perform processing of standard
                                  ! transformation modules
       INCLUDE 'TRN_ERR'          ! TRN_ error codes
- 
- 
+
+
 *  Arguments Given:
       INTEGER CODE( * )         ! Input operation codes from TRN1_CMPEX
       INTEGER ICODE             ! Initial element of CODE array to use
@@ -105,12 +105,12 @@
                                 ! at least equal to the maximum stack
                                 ! size for the expression as calculated
                                 ! by TRN1_CMPEX
- 
- 
+
+
 *  Arguments Given and Returned:
 *     <declarations and descriptions for imported/exported arguments>
- 
- 
+
+
 *  Arguments Returned:
       DOUBLE PRECISION S( NS1, NSTACK )   ! Array used as arithmetic stack for
                                 ! workspace/output
@@ -123,24 +123,24 @@
       INTEGER NERR              ! Number of numerical errors which occur
       INTEGER NSTAT             ! Numerical error status - identifies
                                 ! the first error (pointed to by IERR)
- 
- 
+
+
 *  Status:
       INTEGER STATUS            ! Error status
- 
- 
+
+
 *  External References:
       DOUBLE PRECISION VAL_DTOD         ! Convert DOUBLE PRECISION to DOUBLE PRECISION
- 
- 
+
+
 *  Global Variables:
 *     <any INCLUDE files for global variables held in named COMMON>
- 
- 
+
+
 *  Local Constants:
 *     <local constants defined by PARAMETER>
- 
- 
+
+
 *  Local Variables:
       LOGICAL BADL              ! Local bad data flag
       INTEGER TOS               ! Pointer to top of arithmetic stack
@@ -154,55 +154,55 @@
       INTEGER NERRL             ! Local numerical error count
       INTEGER NSTATL            ! Local numerical error status variable
       DOUBLE PRECISION CONST              ! Variable to hold DOUBLE PRECISION constant
- 
- 
+
+
 *  Internal References:
 *     <declarations for internal functions>
- 
- 
+
+
 *  Local Data:
 *     <any DATA initialisations for local variables>
- 
- 
+
+
 *.
- 
- 
- 
+
+
+
 *   Check status.
       IF( STATUS .NE. SAI__OK ) RETURN
- 
- 
+
+
 *   Initialise the numerical error pointer, error count and status
 *   variable.
       IERR = 0
       NERR = 0
       NSTAT = SAI__OK
- 
- 
+
+
 *   Initialise the local bad data flag.
       BADL = BAD
- 
- 
+
+
 *   Initialise the arithmetic stack pointer and the count of constants
 *   consumed.
       TOS=0
       NCON=0
- 
- 
+
+
 *   Return the number of code elements which will be used (the first
 *   code element to be used contains a count of the number which
 *   follow).
       NCODE = CODE( ICODE ) + 1
- 
- 
+
+
 *   Loop to obtain successive arithmetic operation codes from the input
 *   stream.
       IOP = 0
       DO WHILE ( ( IOP .LT. NCODE - 1 ) .AND. ( STATUS .EQ. SAI__OK ) )
         IOP = IOP + 1
         OPER = CODE( IOP + ICODE )
- 
- 
+
+
 *   Branch to perform the required operation on the arithmetic stack.
 *   After performing the operation, control passes on to statement 100
 *   in all cases.
@@ -211,41 +211,41 @@
      :           1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
      :          11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
      :          21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-     :          31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
+     :          31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
      :          41, 42, 43, 44, 45, 46 ) ( OPER - TRN_OP_MINOP + 1 )
- 
- 
+
+
 *   If the operation code was not recognised, report an error.
         STATUS = TRN__OPCIN     ! operation code invalid
         CALL TRN1_ERROR( 'TRN1_EVEXD', ' ', STATUS )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_LDCON - load next constant on to stack.
   901   CONTINUE
- 
+
 *   ...extract the constant from the constant list and convert its type:
         NCON = NCON + 1
         CONST = VAL_DTOD( .FALSE., CON( ICON + NCON - 1 ), NSTATL )
- 
+
 *   ...if a conversion error occurred, set the local error pointer and
 *      error count appropriately:
         IF( NSTATL .NE. SAI__OK ) THEN
           IERRL = 1
           NERRL = NDAT - NERR
         ENDIF
- 
+
 *   ...fill the next stack vector with the constant:
         TOS = TOS + 1
         DO I = 1, NDAT
           S( I, TOS ) = CONST
         ENDDO
         GO TO 100
- 
- 
+
+
 *   TRN_OP_LDVAR - load variable on to stack.
   902   CONTINUE
- 
+
 *   ...the variable identification number is held in the next constant:
         NCON = NCON + 1
         NVAR = NINT( CON( ICON + NCON - 1 ) )
@@ -253,209 +253,209 @@
         CALL VEC_DTOD( BADL, NDAT, DATA( 1, NVAR ),
      :                     S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ADD - add.
     1   CONTINUE
         CALL VEC_ADDD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_SUB - subtract.
     2   CONTINUE
         CALL VEC_SUBD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_MUL - multiply.
     3   CONTINUE
         CALL VEC_MULD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_DIV - divide.
     4   CONTINUE
         CALL VEC_DIVD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_PWR - raise to power.
     5   CONTINUE
         CALL VEC_PWRD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_NEG - negate.
     6   CONTINUE
         CALL VEC_NEGD( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_SQRT - square root.
     7   CONTINUE
         CALL VEC_SQRTD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_LOG - log (natural).
     8   CONTINUE
         CALL VEC_LOGD( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_LG10 - common log (base 10).
     9   CONTINUE
         CALL VEC_LG10D( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_EXP - exponentiate.
    10   CONTINUE
         CALL VEC_EXPD( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_SIN - sine function.
    11   CONTINUE
         CALL VEC_SIND( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_COS - cosine function.
    12   CONTINUE
         CALL VEC_COSD( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_TAN - tangent function.
    13   CONTINUE
         CALL VEC_TAND( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_SIND - sine function (degrees).
    14   CONTINUE
         CALL VEC_SINDD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_COSD - cosine function (degrees).
    15   CONTINUE
         CALL VEC_COSDD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_TAND - tangent function (degrees).
    16   CONTINUE
         CALL VEC_TANDD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ASIN - inverse sine function.
    17   CONTINUE
         CALL VEC_ASIND( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ACOS - inverse cosine function.
    18   CONTINUE
         CALL VEC_ACOSD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ATAN - inverse tangent function.
    19   CONTINUE
         CALL VEC_ATAND( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ASND - inverse sine function (degrees).
    20   CONTINUE
         CALL VEC_ASNDD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ACSD - inverse cosine function (degrees).
    21   CONTINUE
         CALL VEC_ACSDD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ATND - inverse tangent function (degrees).
    22   CONTINUE
         CALL VEC_ATNDD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_SINH - hyperbolic sine function.
    23   CONTINUE
         CALL VEC_SINHD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_COSH - hyperbolic cosine function.
    24   CONTINUE
         CALL VEC_COSHD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_TANH - hyperbolic tangent function.
    25   CONTINUE
         CALL VEC_TANHD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ABS - absolute value.
    26   CONTINUE
         CALL VEC_ABSD( BADL, NDAT, S( 1, TOS ),
      :                   S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_NINT - nearest integer.
    27   CONTINUE
         CALL VEC_NINTD( BADL, NDAT, S( 1, TOS ),
      :                    S( 1, TOS ), IERRL, NERRL, NSTATL )
         GO TO 100
- 
- 
+
+
 *   TRN_OP_MIN - minimum.
    28   CONTINUE
- 
+
 *   ...the number of arguments is determined by the next constant:
         NCON = NCON + 1
         NARG = NINT( CON( ICON + NCON - 1 ) )
- 
+
 *   ...loop to repeatedly find the minimum of the two top of stack
 *      entries, decrementing the stack pointer each time:
         DO I = 1, ( NARG - 1 )
@@ -464,15 +464,15 @@
           TOS = TOS - 1
         ENDDO
         GO TO 100
- 
- 
+
+
 *   TRN_OP_MAX - maximum.
    29   CONTINUE
- 
+
 *   ...the number of arguments is determined by the next constant:
         NCON = NCON + 1
         NARG = NINT( CON( ICON + NCON - 1 ) )
- 
+
 *   ...loop to repeatedly find the maximum of the two top of stack
 *      entries, decrementing the stack pointer each time:
         DO I = 1, ( NARG - 1 )
@@ -481,56 +481,56 @@
           TOS = TOS - 1
         ENDDO
         GO TO 100
- 
- 
+
+
 *   TRN_OP_DIM - Fortran DIM function.
    30   CONTINUE
         CALL VEC_DIMD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_MOD - Fortran MOD function.
    31   CONTINUE
         CALL VEC_MODD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                   S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_SIGN - Fortran SIGN function.
    32   CONTINUE
         CALL VEC_SIGND( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                    S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_ATN2 - Fortran ATAN2 function.
    33   CONTINUE
         CALL VEC_ATN2D( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                    S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_AT2D - Fortran ATAN2 function (degrees).
    34   CONTINUE
         CALL VEC_AT2DD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                    S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_IDV - Integer division.
    35   CONTINUE
         CALL VEC_IDVD( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
      :                  S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
         TOS = TOS - 1
         GO TO 100
- 
- 
+
+
 *   TRN_OP_QIF - If-then-else function (like the C "a ? b : c" construct).
    36   CONTINUE
 
@@ -543,7 +543,7 @@
         END DO
         TOS = TOS - 2
         GO TO 100
- 
+
 *   TRN_OP_LDBAD - Load "bad" value on to stack.
    37   CONTINUE
         TOS = TOS + 1
@@ -554,7 +554,7 @@
         IERRL = 1
         NERRL = NDAT - NERR
         GO TO 100
- 
+
 *   TRN_OP_EQ - .EQ. operator
    38   CONTINUE
 
@@ -567,7 +567,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_NE - .NE. operator
    39   CONTINUE
 
@@ -580,7 +580,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_GT - .GT. operator
    40   CONTINUE
 
@@ -593,7 +593,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_GE - .GE. operator
    41   CONTINUE
 
@@ -606,7 +606,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_LT - .LT. operator
    42   CONTINUE
 
@@ -619,7 +619,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_LE - .LE. operator
    43   CONTINUE
 
@@ -632,7 +632,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_OR - .OR. operator
    44   CONTINUE
 
@@ -646,7 +646,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_AND - .AND. operator
    45   CONTINUE
 
@@ -660,7 +660,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_NOT - .NOT. operator
    46   CONTINUE
 
@@ -672,19 +672,19 @@
            END IF
         END DO
         GO TO 100
- 
+
 *   Control passes to here after each operation on the arithmetic stack
 *   is complete.
   100   CONTINUE
- 
- 
+
+
 *   If numerical errors occurred during the last stack operation, ensure
 *   the local bad data flag is set and update the error count.
         IF( NSTATL .NE. SAI__OK ) THEN
           BADL = .TRUE.
           NERR = NERR + NERRL
- 
- 
+
+
 *   If this is the first error, or if it occurred nearer the beginning
 *   of the data array than any previous error, then set the error
 *   pointer and the numerical error status.
@@ -693,14 +693,14 @@
             NSTAT = NSTATL
           ENDIF
         ENDIF
- 
- 
+
+
 *   End of "obtain successive operation codes from the input stream"
 *   loop.
       ENDDO
- 
- 
+
+
 *   Exit routine.
       END
- 
- 
+
+

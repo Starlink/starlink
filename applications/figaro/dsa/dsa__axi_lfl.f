@@ -10,7 +10,7 @@ C
 C  Description:
 C     This routine, given the refernece slot number for a structure,
 C     returns the DTA system name of the `log binning' flag for the
-C     specified axis, should it contain one.  Whether or not the flag 
+C     specified axis, should it contain one.  Whether or not the flag
 C     actually exists is not the province of this routine, which is just
 C     a repository of naming information.
 C
@@ -46,7 +46,7 @@ C  Version date: 29th August 1992
 C-
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is

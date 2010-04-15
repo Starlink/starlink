@@ -41,7 +41,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -60,7 +60,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References: 
+*  External References:
       logical chr_simlr
 
 
@@ -98,7 +98,7 @@
 *  Local Data:
 *
 *  PI, 2PI, PI/2
-      REAL*8 DPI 
+      REAL*8 DPI
       PARAMETER (DPI=3.141592653589793238462643D0)
       REAL*8 D2PI
       PARAMETER (D2PI=6.283185307179586476925287D0)
@@ -176,9 +176,9 @@
    10   format(BN, D<w>.0)
         dval = dval * DD2R
 *
-      elseif (chr_simlr(informat(:11), 'SDD MM SS.S') 
+      elseif (chr_simlr(informat(:11), 'SDD MM SS.S')
      :   .or. chr_simlr(informat(:11), 'SDD:MM:SS.S')) then
-        read (cval, '(I3, 1X, I2, 1X, F4.2)', err=1) 
+        read (cval, '(I3, 1X, I2, 1X, F4.2)', err=1)
      -  ideg, iamin, dasec
         iabsdeg = abs(ideg)
         call sla_daf2r(iabsdeg, iamin, dasec, dval, jstat)
@@ -187,7 +187,7 @@
 *
       elseif (chr_simlr(informat(:9), 'SDD MM SS') .or.
      :          chr_simlr(informat(:9), 'SDD:MM:SS')) then
-        read (cval, '(I3, 1X, I2, 1X, I2)', err=1) 
+        read (cval, '(I3, 1X, I2, 1X, I2)', err=1)
      -  ideg, iamin,iasec
         dasec = iasec
         iabsdeg = abs(ideg)

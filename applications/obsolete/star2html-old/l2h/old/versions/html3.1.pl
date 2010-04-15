@@ -37,14 +37,14 @@ sub do_env_math {
     local($saved) = $_;
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     if ($failed) {
-	$_ = join ('', $comment, $labels 
+	$_ = join ('', $comment, $labels
             , &process_undefined_environment("tex2html_wrap", $id, $saved));
     } elsif ($NO_SIMPLE_MATH) {
         $_ = join('', $comment, $labels, " ", $_ );
     } else {
         $_ = join('', $comment, $labels, "<MATH CLASS=\"INLINE\">\n$_\n</MATH>");
     }
-    if (($border||($attributes))&&($HTML_VERSION > 2.1 )) { 
+    if (($border||($attributes))&&($HTML_VERSION > 2.1 )) {
 	&make_table( $border, $attribs, '', '', '', $_ )
     } else { $_ }
 }
@@ -59,15 +59,15 @@ sub do_env_tex2html_wrap {
     s/^\\\(//;    s/\\\)$//;
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     if ($failed) {
-	$_ = join ('', $comment, $labels 
+	$_ = join ('', $comment, $labels
              , &process_undefined_environment("tex2html_wrap", $id, $saved));
-    } elsif ($NO_SIMPLE_MATH) { 
+    } elsif ($NO_SIMPLE_MATH) {
         $_ = $comment . $labels ." ".$_;
-    } else { 
+    } else {
         $_ = $comment . $labels . "<MATH CLASS=\"INLINE\">\n$_\n</MATH>";
     }
-    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) { 
-	&make_table( $border, $attribs, '', '', '', $_ ) 
+    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) {
+	&make_table( $border, $attribs, '', '', '', $_ )
     } else { $_ }
 }
 
@@ -83,15 +83,15 @@ sub do_env_tex2html_wrap_inline {
     $_ = &translate_environments($_) unless (($NO_SIMPLE_MATH)||($failed));
     ($labels, $comment, $_) = &process_math_env($math_mode,$_);
     if ($failed) {
-	$_ = join ('', $labels, $comment 
+	$_ = join ('', $labels, $comment
             , &process_undefined_environment("tex2html_wrap_inline", $id, $saved));
     } elsif ($NO_SIMPLE_MATH) {
         $_ = join('', $labels, $comment, $_);
-    } else { 
+    } else {
         $_ = join('', $labels, $comment, "<MATH CLASS=\"INLINE\">\n$_\n</MATH>");
     }
-    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) { 
-	&make_table( $border, $attribs, '', '', '', $_ ) 
+    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) {
+	&make_table( $border, $attribs, '', '', '', $_ )
     } else { $_ }
 }
 
@@ -126,7 +126,7 @@ sub do_env_equation {
 
     if ($EQN_TAGS =~ /L/) {
         # equation number on left
-        ($math_start,$math_end) = 
+        ($math_start,$math_end) =
             ("\n<TABLE WIDTH=\"100%\" ALIGN=\"CENTER\""
 	      . (($border)? " BORDER=\"$border\"" : '')
 	      . (($attribs)? " $attribs" : '')
@@ -136,7 +136,7 @@ sub do_env_equation {
 	    $border = $attribs='';
     } else {
         # equation number on right
-        ($math_start,$math_end) = 
+        ($math_start,$math_end) =
             ("\n<TABLE WIDTH=\"100%\" ALIGN=\"CENTER\""
 	      . (($border)? " BORDER=\"$border\"" : '')
 	      . (($attribs)? " $attribs" : '')
@@ -160,7 +160,7 @@ sub do_env_equation {
 	       , "\n<MATH CLASS=\"EQUATION\">\n"
 	       , $_ , "\n</MATH>", $math_end );
     }
-    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) { 
+    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) {
 	join('',"<BR>\n<DIV ALIGN=\"CENTER\">\n"
             , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "\n<BR CLEAR=\"ALL\">");
@@ -181,13 +181,13 @@ sub do_env_displaymath {
     if ($failed) {
 	$_ = join('', $comment, $labels
             , &process_undefined_environment("displaymath", $id, $saved));
-    } elsif ($NO_SIMPLE_MATH) { 
-	$_ = "$comment\n<P ALIGN=\"CENTER\">$labels\n$sbig$_$ebig\n</P>" 
-    } else { 
+    } elsif ($NO_SIMPLE_MATH) {
+	$_ = "$comment\n<P ALIGN=\"CENTER\">$labels\n$sbig$_$ebig\n</P>"
+    } else {
         $_ = join('', $comment, "<P ALIGN=\"CENTER\">", $labels
             , "$sbig\n<MATH CLASS=\"DISPLAYMATH\">\n",$_,"\n</MATH>\n$ebig</P>");
     }
-    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) { 
+    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) {
 	join('',"<BR>\n<DIV ALIGN=\"CENTER\">\n"
             , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "\n<BR CLEAR=\"ALL\">");
@@ -262,7 +262,7 @@ sub make_math {
         s/;SPM(thin)?sp;/ /g; s/&thinsp;/ /g; s/&sp;/ /g;
         s/;SPMthicksp;/&nbsp; /g; s/&thicksp;/&nbsp; /g; s/&ensp;/&nbsp; /g;
 #        &replace_math_constructions($math_mode);
-    } else { 
+    } else {
         # Inside <MATH>, { and } have special meaning. Thus, need &lcub;
 	# and &rcub;
 #    s/{/&lcub;/g; s/}/&rcub;/g; # Where are these defined ?
@@ -270,7 +270,7 @@ sub make_math {
         s/}/&rbrace;/g;
 
         # Remove the safety markers for math-entities
-        s/(\&\w+)#\w+;/$1;/g; 
+        s/(\&\w+)#\w+;/$1;/g;
 
 	# Substitute <BOX> and </BOX> with { and } to improve readability
         # on browsers that do not support math.
@@ -350,7 +350,7 @@ do {
 };
 
 %mathentities = (
-		 # Ellipsis  %ISOpub 
+		 # Ellipsis  %ISOpub
 		 'ldots', 'hellip', 'cdots', 'cdots', 'vdots', 'vellip',
 		 'ddots', 'ddots', 'dotfill', 'dotfill',
 ### Mathematical Symbols
@@ -402,7 +402,7 @@ do {
 		 'neq', 'ne', 'ne', 'ne', 'doteq', 'esdot', 'propto', 'prop',
 		 'models', 'models', 'perp', 'perp', 'mid', 'mid',
 		 'parallel', 'par', 'bowtie', 'bowtie', 'Join', '',
-		 'smile', 'smile', 'frown', 'frown', 
+		 'smile', 'smile', 'frown', 'frown',
 		 'vee', 'or', 'land', 'and', 'lor', 'or',
 
 		 # Arrows and pointers  %ISOamsa  %ISOnum
@@ -463,7 +463,7 @@ do {
 		 'llcorner', 'dlcorn', 'lrcorner', 'drcorn',
 		 'leftparengtr', 'lpargt', 'rightparengtr', 'rpargt',
 
-		 # Arrows  %ISOamsa 
+		 # Arrows  %ISOamsa
 		 'dashrightarrow', '', 'dashleftarrow', '',
 		 'leftleftarrows', 'larr2', 'leftrightarrows', 'lrarr2',
 		 'Lleftarrow', 'lArr', 'twoheadleftarrow', 'Larr',
@@ -491,7 +491,7 @@ do {
 		 'lesssim', 'lsim', 'lessapprox', 'lap', 'approxeq', 'ape',
 		 'lessdot', 'ldot', 'lll', 'Ll', 'Ll', 'Ll', 'llless', 'Ll',
 		 'lessgtr', 'lg', 'lesseqgtr', 'leg', 'lesseqqgtr', 'lEg',
-		 'backcong', 'bcong', 
+		 'backcong', 'bcong',
 		 'barwedge', 'barwed', 'doublebarwedge', 'Barwed',
 		 'doublecap', 'Cap', 'doublecup', 'Cup',
 		 'curlyvee', 'cuvee', 'curlywedge', 'cuwed',
@@ -504,11 +504,11 @@ do {
 		 'dotplus', 'plusdo', 'dotsquare', 'sdotb', 'smallsetminus', 'ssetmn',
 		 'fallingdotseq', 'efDot', 'backsim', 'bsim',
 		 'backsimeq', 'bsime', 'subseteqq', 'subE', 'Subset', 'Sub',
-		 'curlypreceq', 'cupre', 'curlyeqprec', 'cuepr', 
-		 'precsim', 'prsim', 'precapprox', 'prap', 
-		 'vartriangleleft', 'vltri', 'trianglelefteq', 'ltrie', 
+		 'curlypreceq', 'cupre', 'curlyeqprec', 'cuepr',
+		 'precsim', 'prsim', 'precapprox', 'prap',
+		 'vartriangleleft', 'vltri', 'trianglelefteq', 'ltrie',
 		 'vDash', 'vDash', 'Vvdash', 'Vvdash', 'Vdash', 'Vdash',
-		 'smallsmile', 'ssmile', 'smallfrown', 'sfrown', 
+		 'smallsmile', 'ssmile', 'smallfrown', 'sfrown',
 		 'bumpeq', 'bumpe', 'Bumpeq', 'bump',
 		 'coloneq', 'colone', 'eqcolon', 'ecolon',
 		 'geqq', 'gE', 'geqslant', 'ges', 'eqslantgtr', 'egs',
@@ -530,16 +530,16 @@ do {
 		 'blacktriangle', 'utrif', 'blacktriangledown', 'dtrif',
 		 'blacktriangleleft', 'ltrif', 'blacktriangleright', 'rtrif',
 
-		 # Negated binary relations  %ISOamsn 
-		 'gnapprox', 'gnap', 'gneq', 'gne', 'gneqq', 'gnE', 
-		 'lnapprox', 'lnap', 'lneq', 'lne', 'lneqq', 'lnE', 
+		 # Negated binary relations  %ISOamsn
+		 'gnapprox', 'gnap', 'gneq', 'gne', 'gneqq', 'gnE',
+		 'lnapprox', 'lnap', 'lneq', 'lne', 'lneqq', 'lnE',
 		 'gnsim', 'gnsim', 'gvertneqq', 'gvnE',
 		 'lnsim', 'lnsim', 'lvertneqq', 'lvnE',
 		 'nsim', 'nsim', 'nsimeq', 'nsime',
 		 'napprox', 'nap', 'ncong', 'ncong', 'nequiv', 'nequiv',
 		 'ngeq', 'nge', 'ngeqq', 'ngE', 'ngeqslant', 'nges', 'ngtr', 'ngt',
 		 'nleq', 'nle', 'nleqq', 'nlE', 'nleqslant', 'nles', 'nless', 'nlt',
-		 'ntriangleleft', 'nltri', 'ntrianglelefteq', 'nltrie', 
+		 'ntriangleleft', 'nltri', 'ntrianglelefteq', 'nltrie',
 		 'ntriangleright', 'nrtri', 'ntrianglerighteq', 'nrtrie',
 		 'nmid', 'nmid', 'nparallel', 'npar',
 		 'nprec', 'npr', 'npreceq', 'npre', 'nsucc', 'nps', 'nsucceq', 'npse',
@@ -557,8 +557,8 @@ do {
 
 		 # Binary operators
 		 'Cup', 'Cup', 'Cap', 'Cap',
-		 # miscellaneous  %ISOamso 
-		 'hslash', 'planck', 'circledS', 'oS', 
+		 # miscellaneous  %ISOamso
+		 'hslash', 'planck', 'circledS', 'oS',
 		 'nexists', 'nexist', 'varnothing', 'empty',
 		 'measuredangle', 'angmsd',
 		 'complement', 'comp', 'backprime', 'bprime',
@@ -599,7 +599,7 @@ sub do_math_cmd_bmod {
     if ($NO_SIMPLE_MATH) { join( '', " mod " , $_) }
     else {"(<T CLASS=\"FUNCTION\"> mod </T>)$_"}
  }
- 
+
 sub do_math_cmd_circ {
     if ($NO_SIMPLE_MATH) { ("<TT>o</TT>","@_") }
     else { "o@_"}
@@ -628,7 +628,7 @@ sub do_env_array {
     local($i,@colspec,$char,$cols,$cell,$htmlcolspec,$frames,$rules);
     local(@rows,@cols,$border);
     local($colspan);
-    
+
     ($htmlcolspec,$frames,$rules,$cols,@colspec) =
 	&translate_colspec($colspec, 'ITEM');
 
@@ -710,7 +710,7 @@ sub do_env_eqnarray {
         $failed = 0;
 	s/$htmlimage_rx/$doimage = $&;''/eo ; # force an image
         local($sarray, $srow, $slcell, $elcell, $srcell, $ercell, $erow, $earray);
-	($sarray, $elcell, $srcell, $erow, $earray, $sempty) = ( 
+	($sarray, $elcell, $srcell, $erow, $earray, $sempty) = (
 	    "\n<TABLE CELLPADDING=\"0\" ALIGN=\"CENTER\""
 	    , "</TD>\n<TD ALIGN=\"CENTER\" NOWRAP>"
 	    , "</TD>\n<TD ALIGN=\"LEFT\" NOWRAP>"
@@ -734,7 +734,7 @@ sub do_env_eqnarray {
             , (($labels)? $labels : "\n") , $comment, $sarray);
 	foreach (@rows) { # displaymath
             $eqno = '&nbsp;&nbsp;';
-            do { 
+            do {
 	        $global{'eqn_number'}++ ;
 		$eqno = &simplify(&do_cmd_theequation());
 	        } unless ((s/\\nonumber//)||($no_eqn_numbers));
@@ -752,7 +752,7 @@ sub do_env_eqnarray {
 		}
 	        if ($_) {
 	            $return .= join('', $sbig, $_, $ebig, $erow);
-		} else { $return .= join('',"\&nbsp;", $erow); } 
+		} else { $return .= join('',"\&nbsp;", $erow); }
 		next;
 	    }
 
@@ -760,13 +760,13 @@ sub do_env_eqnarray {
 	    @cols = split(/$html_specials{'&'}/o);
 
 	    # left column, set using \displaystyle
-	    $thismath = shift(@cols); 
+	    $thismath = shift(@cols);
 	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
 	    if (($doimage)||($failed)) {
 	        $thismath = (($thismath)? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');
 	    } else {
-	        $thismath = (($thismath) ? 
+	        $thismath = (($thismath) ?
 	            &make_math('displaymath', '', '', $thismath) : "" );
 	    }
 	    if ($thismath) {
@@ -782,7 +782,7 @@ sub do_env_eqnarray {
 	        $thismath = (($thismath)? &process_math_in_latex(
 		    "indisplay" , 'text', '', $doimage.$thismath ):'');
 	    } else {
-	        $thismath = (($thismath)? 
+	        $thismath = (($thismath)?
 	            &make_math('display','text','',$thismath):'');
 	    }
 	    if ($thismath) {
@@ -817,7 +817,7 @@ sub do_env_eqnarray {
 	    , &do_env_array("$O$max_id${C}rcl$O$max_id$C$_")
 	    , "</MATH>\n$ebig</P>" )
     }
-    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) { 
+    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) {
 	join('',"<BR>\n<DIV ALIGN=\"CENTER\">\n"
             , &make_table( $border, $attribs, '', '', '', $_ )
 	    , "\n<BR CLEAR=\"ALL\">");
@@ -838,7 +838,7 @@ sub do_env_eqnarraystar {
         local($no_eqn_numbers) = 1;
 	$_ = &do_env_eqnarray($_) unless ($failed);
 	if ($failed) {
-            if ($saved =~ s/$htmlborder_rx//o) 
+            if ($saved =~ s/$htmlborder_rx//o)
 	        { $attribs = $2; $border = (($4)? "$4" : 1) }
             $_ = join('', $labels
 	    , &process_undefined_environment("eqnarraystar", $id, $saved));
@@ -857,8 +857,8 @@ sub do_env_eqnarraystar {
 	        , "</MATH>\n$ebig</P>" );
 	}
     }
-    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) { 
-	$_ = &make_table( $border, $attribs, '', '', '', $_ ) 
+    if (($border||($attribs))&&($HTML_VERSION > 2.1 )) {
+	$_ = &make_table( $border, $attribs, '', '', '', $_ )
     } else { $_ }
 }
 
@@ -873,7 +873,7 @@ sub do_math_cmd_nonumber {
 sub do_math_cmd_overline {
     local($_) = @_;
     local($over) = &get_next_token;
-    if ($NO_SIMPLE_MATH) { 
+    if ($NO_SIMPLE_MATH) {
         local($supsub) = &get_supsub;
         local($after) = $_;
         ( &process_math_in_latex( $mode, $math_style, $slevel
@@ -1011,7 +1011,7 @@ sub do_math_cmd_stackrel {
     local($top,$bot);
     $top = &get_next_token;
     $bot = &get_next_token;
-    if ($NO_SIMPLE_MATH) { 
+    if ($NO_SIMPLE_MATH) {
         local($after) = $_;
         ( &process_math_in_latex( $mode, $math_style, $slevel
             , "\\;\\stackrel{$top}{$bot}\\;") , $after)
@@ -1044,7 +1044,7 @@ sub do_math_cmd_mbox {
     if ($NO_SIMPLE_MATH) {
         $after = $_;
 	if (!($text)||($text =~ /^\s*$/)) { ("\&nbsp; ", $after) }
-	elsif (!($text =~ /(tex2html_wrap_inline|\$$OP(\d+)$CP$OP\2$CP\$|\$$O(\d+)$C$O\2$C\$)/)) { 
+	elsif (!($text =~ /(tex2html_wrap_inline|\$$OP(\d+)$CP$OP\2$CP\$|\$$O(\d+)$C$O\2$C\$)/)) {
             $text = &translate_commands($text);
 	    ("$text", $after)
         } else {
@@ -1071,16 +1071,16 @@ sub do_math_cmd_scriptscript {
 }
 
 # This is supposed to put the font back into math italics.
-# Since there is no HTML equivalent for reverting 
-# to math italics we keep track of the open font tags in 
+# Since there is no HTML equivalent for reverting
+# to math italics we keep track of the open font tags in
 # the current context and close them.
-# *** POTENTIAL ERROR ****#  
+# *** POTENTIAL ERROR ****#
 # This will produce incorrect results in the exceptional
 # case where \mit is followed by another context
 # containing font tags of the type we are trying to close
 # e.g. {a \bf b \mit c {\bf d} e} will produce
 #       a <b> b </b> c   <b> d   e</b>
-# i.e. it should move closing tags from the end 
+# i.e. it should move closing tags from the end
 sub do_math_cmd_mit {
     local($_, @open_font_tags) = @_;
     local($next);
@@ -1137,7 +1137,7 @@ sub make_math_comment{
     $verbatim{$global{'verbatim_counter'}} = $_;
     &write_mydb('verbatim_counter', $global{'verbatim_counter'}, $_ );
     join('', $verbatim_mark, '#math' , $global{'verbatim_counter'},'#')
-} 
+}
 
 sub process_math_env {
     local($mode,$_) = @_;
@@ -1184,7 +1184,7 @@ sub process_math_toks {
 	    s/$next_pair_pr_rx/$this=$2;''/eo;
 	    $this =~ s/^\s*//; $this =~ s/\s*$//;
 	    # if there is \atop.. or \over.. then make an image
-	    # Better would be to create a table after establishing 
+	    # Better would be to create a table after establishing
 	    # the minimum number of tokens involved...
 	    #    ...but that's getting pretty complicated.
 	    if ($this =~ /\\(atop|over([^a-zA-Z]|withdelims))/) {
@@ -1211,7 +1211,7 @@ sub process_math_toks {
 	    $this .= &get_supsub;
 	    $this = &process_math_in_latex($mode, $style, $slevel,$this);
 	} elsif (($2) && ($2 =~/begin/)) {
-            # embedded environment; e.g.  tex2html_wrap 
+            # embedded environment; e.g.  tex2html_wrap
 	    if (s/^\s*<([<#])(\d+)([#>])>(tex2html_(deferred|wrap(\w*))|array)<\1\2\3>//o) {
 	        print ".";
 	        print STDERR "$4" if ($VERBOSITY > 2);
@@ -1243,10 +1243,10 @@ sub process_math_toks {
 	    }
 	} elsif (($2) && ($2 =~ /\w+/)) {
 	    # macro or math-entity
-	    $cmd = $&; 
+	    $cmd = $&;
 	    print ".";
 	    print STDERR "$cmd" if ($VERBOSITY > 2);
-	    local($mtmp, $ctmp, $wtmp) = 
+	    local($mtmp, $ctmp, $wtmp) =
 	        ("do_math_cmd_$cmd","do_cmd_$cmd", "wrap_cmd_$cmd");
 	    if ($cmd eq 'left') {
 	        #expandable delimiter: make an image
@@ -1265,7 +1265,7 @@ sub process_math_toks {
 		}
 	        undef $blevel;
 	        undef $delim;
-		
+
 		# include any super/sub scripts, to position them correctly
 	        $this .= &get_supsub;
 		$this = &process_math_in_latex($mode,$style,$slevel,$this);
@@ -1291,7 +1291,7 @@ sub process_math_toks {
 			$this = "$cmd "
 		    }
 		} elsif ($cmd =~ /^(circ)$/) {
-	            if ($_ =~ /^$/) {$this = "\&cir;"} # ...\degrees 
+	            if ($_ =~ /^$/) {$this = "\&cir;"} # ...\degrees
 		    else { $this = " \&cir; " }  # ... as a binary relation
 		} else {
 		    # do what comes naturally ...
@@ -1335,7 +1335,7 @@ sub process_math_toks {
 		        unless ((s/$next_pair_pr_rx\s*//o)&&($this = $2));
 		    $this = "\{".$this."\}";
 		    $this .= &get_supsub;
-		    $this = &process_math_in_latex($mode,$style,$slevel,"\\$cmd$this" );	
+		    $this = &process_math_in_latex($mode,$style,$slevel,"\\$cmd$this" );
                 } else {
 		    $this = &missing_braces
 		        unless ((s/$next_pair_pr_rx\s*//o)&&($this = "{$2}"));
@@ -1391,9 +1391,9 @@ sub process_math_toks {
 	            elsif ($1 =~ /text/) { $mode = "inline"  }# ; $slevel = 0 }
 		    $this = "";  # &process_math_in_latex($mode,$style,0,$_);
 		    $pre .= "<BIG>"; $_ .= "</BIG>";
-	        } elsif ($1 =~ /display/) { 
+	        } elsif ($1 =~ /display/) {
 	            $mode = "display";  $this = ''; # $slevel = 0; $this = '';
-	        } elsif ($1 =~ /text/) { 
+	        } elsif ($1 =~ /text/) {
 	            $mode = "inline"; $this = ''; # $slevel = 0; $this = '';
 		}
 	    } elsif (defined &$ctmp) {
@@ -1459,11 +1459,11 @@ sub process_math_toks {
 		# ... but not inside <...> tags
 	        $pre =~ s/(<\/?)<$face>([a-zA-Z\']+)<\/$face>>/$1$2>/go;
 	    } else {
-	    # but all alphanumerics, with a special style 
+	    # but all alphanumerics, with a special style
 	        $pre =~ s/(([\.\,]?[\w\']+)+)/<$face>$1<\/$face>/go
 	    }
 	    # but don't split multipliers from multiplicands
-	    $pre =~ s/(\d) </$1</g; 
+	    $pre =~ s/(\d) </$1</g;
 	    # remove spaces just created around brackets etc.
 	    $pre =~ s/\s*(^|[\{\}\(\)\[\]\|\!\/]|$)\s*/$1/g;
 
@@ -1550,7 +1550,7 @@ sub get_next_token {
     local($this,$cmd)=('',"^ or \_ ");
     s/$next_token_rx/$this = $&;''/eo
         unless (s/$next_pair_pr_rx/$this = $2;''/eo);
-    if ($this =~ /^(&|;)$/) { s/^([a-zA-Z]+;(#\w+;)?)/$this.=$1;''/eo; } 
+    if ($this =~ /^(&|;)$/) { s/^([a-zA-Z]+;(#\w+;)?)/$this.=$1;''/eo; }
     elsif (! $this) { s/^\s*([&;][a-zA-Z]+;)/$this =$1;''/eo; }
     $this;
 }
@@ -1581,7 +1581,7 @@ $binary_rels_rx = "(eq|prec|succ|\^ll\$|\^gg\$|subset|supset|\^in\$|\^ni\$|dash|
 
 $arrow_rels_rx = "(arrow|harpoon|mapsto|leadsto)";
 
-     
+
 
 &ignore_commands( <<_IGNORED_CMDS_);
 allowbreak

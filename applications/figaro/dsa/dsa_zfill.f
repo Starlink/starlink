@@ -8,7 +8,7 @@ C  Function:
 C     Fills an array of the specified type with zeros.
 C
 C  Description:
-C     Given the address of an array of specified type, this routine 
+C     Given the address of an array of specified type, this routine
 C     fills the array with zeros.
 C
 C  Language:
@@ -23,7 +23,7 @@ C     (>) NELM        (Integer,ref) The number of elements in the array.
 C     (>) ADDRESS     (Integer,ref) The address of the array.
 C     (>) TYPE        (Fixed string,descr) The type of the data array.
 C                     This must be one of 'FLOAT','INT',SHORT','REAL'
-C                     'BYTE', 'USHORT', or 'DOUBLE'.  Anything else is 
+C                     'BYTE', 'USHORT', or 'DOUBLE'.  Anything else is
 C                     ignored.
 C     (>) STATUS      (Integer,ref) Status code.  If bad status is passed,
 C                     this routine returns immediately.

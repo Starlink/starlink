@@ -14,10 +14,10 @@
 
 *  Description:
 *     This routine create a Plot covering the current PGPLOT viewport.
-*     The bounds of the PGPLOT window are changed if necessary to ensure 
-*     that the PGPLOT world co-ordinate system corresponds to milliemtres 
+*     The bounds of the PGPLOT window are changed if necessary to ensure
+*     that the PGPLOT world co-ordinate system corresponds to milliemtres
 *     from the bottom left corner of the view surface. This is the
-*     co-ordinate system used in the Base (GRAPHICS) Frame of the returned 
+*     co-ordinate system used in the Base (GRAPHICS) Frame of the returned
 *     Plot.
 
 *  Arguments:
@@ -27,21 +27,21 @@
 *        An array holding the bounds of the area within the Base Frame of
 *        IWCS which is to be mapped linearly onto the current PGPLOT
 *        viewport. The first pair of values should give the coordinates at
-*        the bottom left corner of the plotting area and the second pair 
-*        should give the coordinates at the top right corner. The coordinate 
+*        the bottom left corner of the plotting area and the second pair
+*        should give the coordinates at the top right corner. The coordinate
 *        on the horizontal axis should be given first in each pair.
 *     OPTS = CHARACTER * ( * ) (Given)
 *        A set of Plot attribute settings to be used when creating the
 *        Plot.
 *     IPLOT = INTEGER (Returned)
-*        An AST pointer to the Plot. Returned equal to AST__NULL if an 
+*        An AST pointer to the Plot. Returned equal to AST__NULL if an
 *        error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  The PGPLOT interface to the AGI library should be opened before
-*     calling this routine.  
+*     calling this routine.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,10 +103,10 @@
 *  Initialise returned values.
       IPLOT = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Ensure that the current PGPLOT world-coordinate system is millimetres 
+*  Ensure that the current PGPLOT world-coordinate system is millimetres
 *  from the bottom left corner of the view surface.
       CALL PGQVP( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
       CALL PGSWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
@@ -114,7 +114,7 @@
 *  Create the Plot.
       IPLOT = AST_PLOT( IWCS, BX, BOX, OPTS, STATUS )
 
-*  Set the Label and Unit attributes of the Base (GRAPHICS) Frame axes of 
+*  Set the Label and Unit attributes of the Base (GRAPHICS) Frame axes of
 *  the Plot.
       BASFRM = AST_GETFRAME( IPLOT, AST__BASE, STATUS )
 

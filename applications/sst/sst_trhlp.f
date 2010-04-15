@@ -36,11 +36,11 @@
 *     the terms of the GNU General Public License as published by the Free Software
 *     Foundation; either version 2 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,but WITHOUT ANY
 *     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 *     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License along with
 *     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 *     Place,Suite 330, Boston, MA  02111-1307, USA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,7 +169,7 @@
 
 *  Output the purpose description in paragraph mode, followed by a
 *  blank line.
-      CALL SST_PUTP( 0, FIRST, LAST, STATUS )         
+      CALL SST_PUTP( 0, FIRST, LAST, STATUS )
       CALL SST_PUT( 0, ' ', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -215,7 +215,7 @@
          CALL SST_PUT( 0, ' ', STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
       END IF
-      
+
 *  Description:
 *  ===========
 *  Locate the routine's description section.
@@ -352,14 +352,14 @@
       NAME( 12 ) = 'History'
       NAME( 13 ) = 'Implementation Status'
       NAME( 14 ) = 'Bugs'
-         
+
 *  Inhibit those not required at all.
       NAME( 15 ) = 'Type of Module'
       NAME( 16 ) = 'Algorithm'
       NAME( 17 ) = 'Implementation Deficiencies'
       NAME( 18 ) = 'Language'
       NAME( 19 ) = 'Synopsis'
-      
+
 *  Loop to find all remaining sections.
 1     CONTINUE                ! Start of 'DO WHILE' loop
       CALL SST_NSECT( .FALSE., 19, NAME, HEADER, FIRST, LAST, STATUS )

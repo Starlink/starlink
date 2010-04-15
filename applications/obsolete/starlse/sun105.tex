@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -58,13 +58,13 @@ RUTHERFORD APPLETON LABORATORY\\
 \mbox{STARLSE} is a ``Starlink Sensitive'' editor based on the \mbox{VAX}
 Language Sensitive Editor \mbox{LSE}. It exploits the extensibility of
 \mbox{LSE} to provide additional features which assist in the writing of
-portable Fortran~77 software with a standard Starlink style. 
+portable Fortran~77 software with a standard Starlink style.
 
 \mbox{STARLSE} is intended mainly for use by those writing \mbox{ADAM}
 applications and subroutine libraries for distribution as part of the Starlink
 Software Collection, although it may also be suitable for other software
 projects. It is designed to integrate with the SST (Simple Software Tools)
-package described in SUN/110. 
+package described in SUN/110.
 
 %------------------------------------------------------------------------------
 %  Add this part if you want a table of contents
@@ -105,29 +105,29 @@ Language Sensitive Editor \mbox{LSE}.\footnote{N.B.\ \mbox{LSE} is part of
 the \mbox{VAXset} (\mbox{VAX} Software Engineering Tools) package and
 \mbox{STARLSE} can only be used if you are logged in to a machine on which
 the \mbox{VAXset} software is installed. You should consult your site
-manager if you are unsure which machine to use.} 
- 
+manager if you are unsure which machine to use.}
+
 It exploits the extensibility of \mbox{LSE} to provide additional features which
 assist in the writing of portable Fortran~77 software with a standard Starlink
-style. 
+style.
 \mbox{STARLSE} is intended mainly for use by those writing \mbox{ADAM}
 applications and subroutine libraries for distribution as part of the Starlink
 Software Collection, although it may also be suitable for other software
-projects. 
+projects.
 
 The \mbox{VAX} Language Sensitive Editor is fully described in the
 \mbox{VAX} \mbox{LSE/SCA} User and Reference Manuals, which should be
 consulted if you have not used \mbox{LSE} before, and in case of difficulty.
 This note aims only to describe the additional features provided by
-\mbox{STARLSE}. 
+\mbox{STARLSE}.
 In fact, many powerful features of \mbox{LSE}, such as its interaction with
 other VAXset tools like \mbox{CMS} and \mbox{SCA}, are not mentioned here at
-all, although they are, of course, all available within \mbox{STARLSE}. 
+all, although they are, of course, all available within \mbox{STARLSE}.
 The relevant \mbox{VAX} documentation should be consulted if these other
 facilities are required.
 
 Note that STARLSE is also designed to integrate with the SST (Simple
-Software Tools) package described in SUN/110. 
+Software Tools) package described in SUN/110.
 
 
 \section{Getting Started}
@@ -157,15 +157,15 @@ STARLSE repeatedly.)
 \subsection{Exploring STARLSE}
 
 Perhaps the best way to start using \mbox{STARLSE} is by exploring it
-before you try to write anything serious. 
+before you try to write anything serious.
 This will probably involve moving between the {\em placeholders} in your
 file (these are the things which appear surrounded by [...] or \{...\}) and
-{\em expanding} and {\em un-expanding} them to see what they represent. 
+{\em expanding} and {\em un-expanding} them to see what they represent.
 If you haven't used \mbox{LSE} before, then you should have the \mbox{VAX}
 \mbox{LSE/SCA} User Manual on hand at this stage, as it provides a good
-introduction to placeholders and other important \mbox{LSE} concepts. 
+introduction to placeholders and other important \mbox{LSE} concepts.
 You should probably start by trying to master the following keys, which
-should give you a good initial feel for what \mbox{STARLSE} provides: 
+should give you a good initial feel for what \mbox{STARLSE} provides:
 
 \begin{quote}
 \begin{center}
@@ -178,7 +178,7 @@ ctrl-K & (\underline{K}ill placeholder)
 \end{center}
 \end{quote}
 
-If you make a mistake, or expand a placeholder into something you don't 
+If you make a mistake, or expand a placeholder into something you don't
 want, then you can go back one step (only) by means of the following keys:
 
 \begin{quote}
@@ -195,37 +195,37 @@ GOLD ctrl-K & (un-\underline{K}ill placeholder)
 
 If you normally use a standard screen editor (like EDT) then you will
 probably find that using an \mbox{LSE}-based editor for the first time will
-slow you down considerably. 
+slow you down considerably.
 All those new keys to remember!
 However, once you get used to it, you will start to realise how much time
 you used to spend doing simple things like moving the cursor, formatting
 prologues, indenting lines of code and going to fetch essential
 documentation -- all things which \mbox{STARLSE} can do far more
-efficiently. 
+efficiently.
 
 An important thing to appreciate once you start to use \mbox{STARLSE} in
 earnest is that you shouldn't try too hard to use everything it provides
 (like religiously expanding {\em all} the placeholders, tokens, {\em
-etc.}\,). 
+etc.}\,).
 In fact, one of the strengths of \mbox{LSE}-based editing is that it allows
 you to pick and choose -- to use the features that you personally find
 time-saving, while still being able to type directly over anything which you
-find too fussy. 
+find too fussy.
 In this respect \mbox{STARLSE} can be regarded as a sort of interactive
 ``Manual of Style'' which provides guidelines on layout and programming
 standards when you need reminding of them (generally in response to pressing
 the {\em expand} key \mbox{ctrl-E}, or the {\em help} key
 \mbox{GOLD}~\mbox{PF2}) but lets you work unhindered once you know what you
-are doing. 
+are doing.
 
 Nevertheless, you should be aware that some traditional editing techniques
-do not carry over to LSE all that effectively. 
-In particular, use of the space-bar and the RETURN and arrow keys is not 
-nearly as effective for navigating around an LSE editing buffer as the keys 
+do not carry over to LSE all that effectively.
+In particular, use of the space-bar and the RETURN and arrow keys is not
+nearly as effective for navigating around an LSE editing buffer as the keys
 described above for skipping between placeholders.
 This means that it is generally wise not to delete unused placeholders too
 early, but to leave most of them in position as ``stepping stones'' until
-editing is almost complete. 
+editing is almost complete.
 This may seem untidy at first, but soon becomes second nature.
 
 
@@ -307,7 +307,7 @@ longer required.
 \subsection{Personalising STARLSE}
 
 If you use \mbox{STARLSE} regularly, you may like to make logical name
-definitions such as the following in your \mbox{LOGIN.COM} file: 
+definitions such as the following in your \mbox{LOGIN.COM} file:
 
 \begin{verbatim}
    $ DEFINE STARLSE$PERSONAL_NAME "Fred J. Bloggs"
@@ -317,42 +317,42 @@ definitions such as the following in your \mbox{LOGIN.COM} file:
 
 These definitions allow \mbox{STARLSE} to insert the values you specify at
 certain standard places, in response to pressing the {\em expand} (ctrl-E)
-key. 
+key.
 The first value is a string to be used as your personal name (if this is not
-defined then you will be prompted whenever it is needed). 
+defined then you will be prompted whenever it is needed).
 The second is a short form version of your name ({\em e.g.}\ your initials)
 -- this will default to your \mbox{VMS} user ID, so you need only define it
-if your user ID does not identify you clearly. 
+if your user ID does not identify you clearly.
 The third value is the institution to which you are affiliated and, if
-necessary, your place of work -- this will default simply to `STARLINK'. 
+necessary, your place of work -- this will default simply to `STARLINK'.
 
 Note that it is best to avoid adding extra information (such as your E-mail
 address) to any of these values, because such information soon gets out of
 date and becomes little more than a historical curiosity, if not positively
 misleading (remember, many pieces of software have life-times measured in
-decades). 
+decades).
 The usage suggested above is intended to allow anyone using or supporting
 your software in future to trace you if necessary via the institution at
-which you did the work. 
+which you did the work.
 
 \section{The `STARLINK\_FORTRAN' Language}
 
 Perhaps the most important component of \mbox{STARLSE} is a version of the
 Fortran~77 programming language called \mbox{STARLINK\_FORTRAN}, which
-defines the style of programming that the editor supports. 
+defines the style of programming that the editor supports.
 This language is used as the default for files of type \mbox{.FOR} and
-\mbox{.GEN}. 
+\mbox{.GEN}.
 
 The \mbox{STARLINK\_FORTRAN} language is based on the Starlink Application
 Programming Standard document SGP/16, and contains only a small number of
-approved extensions to the Fortran~77 standard. 
+approved extensions to the Fortran~77 standard.
 It is therefore much simpler and easier to use than the \mbox{VAX}~Fortran
 language which comes with ``native'' \mbox{LSE} (in fact, nearly 80\% of
-\mbox{VAX}~Fortran consists of extensions to the Fortran~77 standard!). 
+\mbox{VAX}~Fortran consists of extensions to the Fortran~77 standard!).
 In \mbox{STARLINK\_FORTRAN}, the number of available options and ambiguous
 abbreviations is greatly reduced, and most of the common language constructs
 can be produced simply by typing a short token, like `DO' or `IF', followed
-by \mbox{ctrl-E}. 
+by \mbox{ctrl-E}.
 
 The most important features of the \mbox{STARLINK\_FORTRAN} language are
 described below.
@@ -363,33 +363,33 @@ described below.
 \mbox{STARLINK\_FORTRAN} provides templates for the common types of
 Fortran~77 program module used in Starlink applications
 (\mbox{ADAM}~\mbox{A-tasks}, \mbox{Subroutine}, \mbox{Function} \&
-\mbox{Block}~\mbox{Data} program units and ADAM~Monoliths). 
+\mbox{Block}~\mbox{Data} program units and ADAM~Monoliths).
 Each of these templates includes a standard {\em prologue} ({\em i.e.}\ a
 set of header comments) with a uniform style, and these prologues may be
 processed automatically into different forms of user documentation using
 applications from the SST (Simple Software Tools) package (see SUN/110 for
-details). 
+details).
 Some examples of completed prologues are given in
-Appendix~\ref{section:prologues}. 
+Appendix~\ref{section:prologues}.
 
 The language definition provides assistance when entering information into
 these prologues by means of placeholders, which expand into suitable default
 values (on pressing \mbox{ctrl-E}) wherever possible.
-If no default value is available, then a message is displayed describing the 
+If no default value is available, then a message is displayed describing the
 information which you should enter.
 Many of the prologue sections are optional and may be omitted if
-circumstances dictate. 
+circumstances dictate.
 In addition, some sections in each prologue constitute a {\em maintenance
 log} ({\em e.g.}\ the ``Authors'' and ``History'' sections) and certain
 placeholders in these sections are intended to remain in place to assist in
-making future additions. 
+making future additions.
 
 If you do not have access to \mbox{LSE}, or wish to use a different editor
-but nevertheless would like to format prologue information in the same style 
-as \mbox{STARLSE}, then a set of blank template files is provided to 
+but nevertheless would like to format prologue information in the same style
+as \mbox{STARLSE}, then a set of blank template files is provided to
 assist.
 These files can be found in the directory \mbox{STARLSE\_DIR} and have names
-as follows: 
+as follows:
 
 \begin{quote}
 \begin{center}
@@ -408,35 +408,35 @@ MON.PRO & {\em ADAM Monolith template} \\
 \end{quote}
 
 For completeness, these files contain templates for {\bf all} the prologue
-items which \mbox{STARLSE} supports. 
+items which \mbox{STARLSE} supports.
 In practice, however, only a fairly small subset of these will normally be
 required, so you may find it convenient to produce your own ``cut down''
-copies of these templates by removing items which you don't normally use. 
+copies of these templates by removing items which you don't normally use.
 
 
 \subsection{Subroutine Definitions}
 
 {\em Package definitions} are provided in \mbox{STARLSE} for most of the
 standard Starlink/\mbox{ADAM} subroutine libraries, and these are accessible
-from the \mbox{STARLINK\_FORTRAN} language. 
+from the \mbox{STARLINK\_FORTRAN} language.
 These definitions allow you to type the name of a routine from any of these
 libraries (or an abbreviation) and to obtain the routine's full name and
-argument list simply by pressing \mbox{ctrl-E}. 
+argument list simply by pressing \mbox{ctrl-E}.
 
-This is particularly helpful if you can't remember the name of the routine 
+This is particularly helpful if you can't remember the name of the routine
 you want, because an ambiguous abbreviation ({\em e.g.}\ just the package
 prefix) will result in a {\em menu} in which all matching routines are shown
-along with a simple description of what they do. 
+along with a simple description of what they do.
 The required routine can then be selected from the menu and will appear in
 your editing buffer, together with its argument list, with the cursor
-positioned ready to enter the first argument. 
+positioned ready to enter the first argument.
 This facility can save a great deal of time which would otherwise be spent
-referring to documentation. 
+referring to documentation.
 It can also virtually eliminate argument-passing errors, which are a
-significant source of software bugs. 
+significant source of software bugs.
 
 The subroutine libraries currently supported by STARLSE package definitions
-are shown in Table~\ref{table:status}. 
+are shown in Table~\ref{table:status}.
 
 \begin{table}
 \begin{center}
@@ -477,21 +477,21 @@ On-line {\em help} information is also available for certain subroutine
 libraries.
 To use this facility the cursor should be positioned on the item for which help
 is required ({\em i.e.}\ the subroutine name) and the {\em help} key
-\mbox{GOLD}~\mbox{PF2} pressed. 
+\mbox{GOLD}~\mbox{PF2} pressed.
 If help is available on the indicated item, it will then be displayed.
 
 Table~\ref{table:status} indicates which subroutine libraries currently have
-on-line help available. 
+on-line help available.
 
 
 \subsection{Alias Definitions}
 
 A number of \mbox{LSE} {\em alias} definitions are provided in the
 \mbox{STARLINK\_FORTRAN} language for expressions which need to be entered
-fairly often. 
+fairly often.
 An alias (or an abbreviation) can simply be typed in, followed by
 \mbox{ctrl-E}, in order to enter the equivalent text into the file you are
-editing. 
+editing.
 The following are given as examples:
 
 \begin{quote}
@@ -508,7 +508,7 @@ CLOC & CHARACTER $*$ ( DAT\_\_SZLOC )
 \end{quote}
 
 A full list of the aliases defined for the current language can be obtained
-by using the \mbox{LSE} command: 
+by using the \mbox{LSE} command:
 
 \begin{verbatim}
    LSE> SHOW ALIAS
@@ -518,10 +518,10 @@ by using the \mbox{LSE} command:
 \subsection{ADAM Programming Constructs}
 \label{sect:adamconstructs}
 
-A small number of tokens are defined to represent programming constructs 
+A small number of tokens are defined to represent programming constructs
 which are commonly used in ADAM applications and subroutines.
 As a simple example, the \mbox{`\_OK\_BLOCK'} token will expand into the
-following block: 
+following block:
 
 \begin{verbatim}
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -529,10 +529,10 @@ following block:
       END IF
 \end{verbatim}
 
-which only executes if the global \mbox{STATUS} value is not set. 
+which only executes if the global \mbox{STATUS} value is not set.
 As further examples, a token \mbox{`\_CHECK\_STATUS'} exists to facilitate
 checking of the \mbox{STATUS} value in \mbox{ADAM} programs, and expands as
-follows: 
+follows:
 
 \begin{verbatim}
       IF ( STATUS .NE. SAI__OK ) GO TO {abort_stmt}
@@ -540,7 +540,7 @@ follows:
 
 while the \mbox{`\_ERROR\_REPORT'} token provides a template for making a
 standard error report using the Starlink \mbox{ERR\_} and \mbox{MSG\_}
-routines. 
+routines.
 Its expansion is:
 
 \begin{verbatim}
@@ -552,9 +552,9 @@ Its expansion is:
 \end{verbatim}
 
 These special \mbox{ADAM} tokens are distinguished by their first character,
-which is always an underscore `\_'. 
+which is always an underscore `\_'.
 Thus, a complete list of available tokens which represent \mbox{ADAM}
-programming constructs may be obtained by using the \mbox{LSE} command: 
+programming constructs may be obtained by using the \mbox{LSE} command:
 
 \begin{verbatim}
    LSE> SHOW TOKEN _*
@@ -562,60 +562,60 @@ programming constructs may be obtained by using the \mbox{LSE} command:
 
 As always, these tokens may be abbreviated (two or three characters normally
 suffice) and you can ``un-expand'' them again (using
-\mbox{GOLD}~\mbox{ctrl-E}) if you are not happy with the result. 
+\mbox{GOLD}~\mbox{ctrl-E}) if you are not happy with the result.
 
 
 \subsection{Symbolic Constants, Error Codes and Include Files}
 
 Information is also available in the \mbox{STARLINK\_FORTRAN} language about
 the symbolic constants, error codes and include files associated with
-certain subroutine libraries. 
+certain subroutine libraries.
 In most cases this has been provided by defining the symbolic names of these
 components to be {\em routines} (but without arguments) in the appropriate
-LSE package definition. 
+LSE package definition.
 You can therefore obtain a menu of symbolic constants, {\em etc.}\
 associated with a subroutine library in the same way as you would obtain a
 menu of the routines themselves; {\em i.e.}\ by typing a suitable
-abbreviation followed by \mbox{ctrl-E}. 
+abbreviation followed by \mbox{ctrl-E}.
 
 This facility is currently available for the GKS, HDS and TRN libraries
-only. 
+only.
 
 
 \subsection{Tokens and Menus}
 
-Because many of the items in \mbox{STARLSE} programming templates are 
-optional, it often happens that a specific item has been omitted from an 
-existing piece of software, but is later required when the software is 
+Because many of the items in \mbox{STARLSE} programming templates are
+optional, it often happens that a specific item has been omitted from an
+existing piece of software, but is later required when the software is
 upgraded.
 
-A simple example would occur if a \mbox{DATA} statement were added to an 
+A simple example would occur if a \mbox{DATA} statement were added to an
 existing subroutine.
 In this case a new ``Local Data'' section in the prologue might be wanted,
 but it could be difficult to remember how such a section should be formatted
 (or even what it is called) because the optional placeholder which once
-represented it is no longer present. 
+represented it is no longer present.
 Another example would occur if you wanted to add a \mbox{STARLSE} prologue
 to an imported routine which did not initially have one.
 In this case, you would not be able to remember all the layout details so
 it would be essential to insert a template for the prologue into the routine
-before starting work. 
+before starting work.
 
 \mbox{LSE} provides s solution to this problem in the form of {\em tokens}
 (of which the \mbox{ADAM} programming constructs described in
-\S\ref{sect:adamconstructs} are a simple example). 
-A token (or an abbreviation) can be entered into an editing buffer at any 
+\S\ref{sect:adamconstructs} are a simple example).
+A token (or an abbreviation) can be entered into an editing buffer at any
 point and then expanded (by pressing ctrl-E).
 Tokens are provided for the majority of items which exist in the
 \mbox{STARLINK\_FORTRAN} language (from single statements, through
 individual prologue sections, to complete program units) so there will
 almost always be a token representing the particular part of a programming
-template you want to use. 
+template you want to use.
 Unfortunately, the sheer number of tokens available can be a problem; you
 will soon learn the ones you use frequently, but it can be difficult to
-remember (or guess) those which are less frequently needed. 
+remember (or guess) those which are less frequently needed.
 
-\mbox{STARLSE} therefore provides a set of hierarchical menus to assist in 
+\mbox{STARLSE} therefore provides a set of hierarchical menus to assist in
 finding the token (or placeholder) you want.
 The top level in this menu system is represented by the token:
 
@@ -628,17 +628,17 @@ obtain the top-level menu from which sub-menus (and sub-sub-menus, {\em
 etc.}\,) can be selected until the required token or placeholder is found.
 This will then be expanded in place of the `MENU' token you initially entered.
 
-Depending on exactly what you are expanding, it may be necessary to adjust 
-the indentation of the original `MENU' token (or perhaps add a comment 
+Depending on exactly what you are expanding, it may be necessary to adjust
+the indentation of the original `MENU' token (or perhaps add a comment
 character in front of it) to obtain the correct result.
-You can use the {\em un-expand} key (GOLD~ctrl-E) to get back to the `MENU' 
+You can use the {\em un-expand} key (GOLD~ctrl-E) to get back to the `MENU'
 token in order to do this.
 
 Note that all the items which appear in these menus are themselves tokens,
 so you can jump into the menu hierarchy at any point by using the
-appropriate initial token. 
+appropriate initial token.
 You should also note the name of the token which you eventually find -- you
-can use it directly in future instead of going through the menu system. 
+can use it directly in future instead of going through the menu system.
 
 
 \subsection{Enumerated Type Codes}
@@ -647,61 +647,61 @@ In certain subroutine libraries (particularly the {\em Graphical Kernel
 System} \mbox{GKS}), extensive use is made of symbolic constants to
 represent {\em enumerated types} ({\em e.g.}\ a routine argument which may
 only take one of a pre-defined set of integer values is ``enumerated'' by
-assigning a symbolic name to each of the allowed values). 
+assigning a symbolic name to each of the allowed values).
 Unfortunately, these can sometimes be difficult to use because (a) there may
 be a large number of them and (b) the names are typically restricted to a
-small number of characters, making them hard to remember. 
+small number of characters, making them hard to remember.
 
 To ease this problem in the case of GKS, \mbox{STARLSE} contains menu
 definitions for all the enumerated types which the GKS subroutine library
-uses. 
+uses.
 Each of these menus is associated with a token whose name is of the form
 `GKS\$...'.
 
-Thus, by typing `GKS\$', followed by \mbox{ctrl-E}, you will obtain a menu 
-showing all the different enumerated types associated with the \mbox{GKS} 
+Thus, by typing `GKS\$', followed by \mbox{ctrl-E}, you will obtain a menu
+showing all the different enumerated types associated with the \mbox{GKS}
 library.
 Having picked the required type from this list, a menu of the symbolic names
 assigned to that type (and what they represent) will then be displayed, from
-which the appropriate symbolic value may be selected. 
+which the appropriate symbolic value may be selected.
 
 These symbolic values are frequently required as input arguments to
-subroutines. 
-Where this is likely, the placeholder for the appropriate subroutine argument 
+subroutines.
+Where this is likely, the placeholder for the appropriate subroutine argument
 will be indicated by the presence of a `GKS\$...' prefix.
 Such placeholders may be expanded (as opposed to simply typing over them)
 and will result in a menu showing the symbolic values which may be supplied
-at that point. 
+at that point.
 
 
 \section{The `IFL' Language}
 
 STARLSE also defines a language called IFL, which is the default for file
 types of \mbox{.IFL}, and which provides a template for writing interface
-files for \mbox{ADAM}~\mbox{A-tasks}. 
+files for \mbox{ADAM}~\mbox{A-tasks}.
 This language is far simpler than the STARLINK\_FORTRAN language as it
 contains no subroutine libraries, {\em etc.}\,, but it does contain a standard
 prologue, together with menus and options to simplify the writing of
 interface files by making all necessary information available through the
-editor. 
+editor.
 
 As with other prologues, a blank template is provided to assist with
-writing interface files in the same style as \mbox{STARLSE} if another 
+writing interface files in the same style as \mbox{STARLSE} if another
 editor is to be used.
 This template can be found in the \mbox{STARLSE\_DIR} directory in the file
-\mbox{IFL.PRO}. 
+\mbox{IFL.PRO}.
 
 \section{Additional Commands}
 \label{sect:additionalcommands}
 
 Some additional commands are provided by STARLSE to enhance the set already
-provided by \mbox{LSE}. 
-Some of these are bound to keyboard keys, which means that they may be 
+provided by \mbox{LSE}.
+Some of these are bound to keyboard keys, which means that they may be
 invoked simply by pressing that key.
 Where this is so, the key is given in parentheses after the command in the
-list below. 
+list below.
 These assignments can easily be changed with the \mbox{DEFINE}~\mbox{KEY}
-and \mbox{DELETE}~\mbox{KEY} commands if required (see later). 
+and \mbox{DELETE}~\mbox{KEY} commands if required (see later).
 
 The following commands are currently available:
 
@@ -709,27 +709,27 @@ The following commands are currently available:
 
 \item[ALIGN\_COMMENT (ctrl-A)] --- Aligns comment lines as an aid to improving
 layout uniformity and to facilitate the integration of foreign code into
-Starlink software. 
+Starlink software.
 If the current line is a comment line or contains an end-of-line comment,
 then it is aligned so that the comment starts in a standard column.
 The comment character is also set to a standard value.
-If there is no comment on the line, then this command has no effect. 
+If there is no comment on the line, then this command has no effect.
 If a select range is active, then this process is applied to all the
 lines in the select range (be careful not to use this on prologues!).
 
 Note that in \mbox{STARLSE} alignment of end-of-line comments also takes
 place implicitly whenever the length of a line is changed by an operation on
-a placeholder, such as expanding or killing it. 
+a placeholder, such as expanding or killing it.
 
 \item[COMMENT (ctrl-$\wedge$)\footnotemark]\footnotetext{This is normally
 obtained by pressing the ctrl and $\wedge$ keys simultaneously ($\wedge$ is
 usually located above the number 6). On some keyboards, however, the shift
 key may also need to be pressed at the same time.} --- Inserts a comment
 line and a comment placeholder in front of the current line and positions
-the cursor on the placeholder, ready to enter a comment. 
+the cursor on the placeholder, ready to enter a comment.
 A blank line is inserted in front of the comment if there is not one
-there already. 
-This command has no effect if the current line is already a comment. 
+there already.
+This command has no effect if the current line is already a comment.
 
 \item[FB] --- ``Flushes'' all modifications to editing buffers, causing the
 modified text to be written back to the file associated with each buffer (FB
@@ -737,20 +737,20 @@ stands for Flush Buffers).
 
 \item[FIX\_CONTINUATION (GOLD-C)] --- Changes the Fortran continuation
 character (if any) on the current line to be a colon `:'.
-If a select range is active, then this process is applied to all lines in 
+If a select range is active, then this process is applied to all lines in
 the select range.
-This command has no effect unless the \mbox{STARLINK\_FORTRAN} language is in 
+This command has no effect unless the \mbox{STARLINK\_FORTRAN} language is in
 use.
 
-Note that when using the \mbox{STARLINK\_FORTRAN} language, this conversion 
+Note that when using the \mbox{STARLINK\_FORTRAN} language, this conversion
 process also takes place on the current line whenever any ``special'' key ({\em
 i.e.}\ other than a normal character entry key) is pressed.
 This is the mechanism by which \mbox{STARLSE} is able to provide `:' as the
-continuation character (whereas \mbox{LSE} itself uses the digit `1'). 
+continuation character (whereas \mbox{LSE} itself uses the digit `1').
 
 \item[GENERIC] --- Runs the Starlink \mbox{GENERIC} utility (SUN/7) on the
 contents of the current select range and replaces the select range with the
-expanded output. 
+expanded output.
 The usual \mbox{GENERIC} qualifiers may be specified.
 
 \item[PB (GOLD-P)] --- Causes STARLSE to return to the buffer (and associated
@@ -759,7 +759,7 @@ for Previous Buffer).
 
 \item[PRINT] --- Causes the contents of the current editing buffer, or the
 current select range (if defined), to be printed as if the \mbox{DCL}
-command \mbox{PRINT} had been used, but without leaving the editor. 
+command \mbox{PRINT} had been used, but without leaving the editor.
 The usual \mbox{PRINT} qualifiers may be specified.
 
 \item[SB (F14)] --- Displays a list of all the current editing buffers and
@@ -767,22 +767,22 @@ highlights the one which was being edited last. The ``Select'' and ``Remove''
 keys may then be used to select a new buffer, or to delete any which are no
 longer required. (SB stands for Show Buffer.)
 
-\item[SORT] --- Runs the \mbox{DCL} \mbox{SORT} utility on the lines in the 
+\item[SORT] --- Runs the \mbox{DCL} \mbox{SORT} utility on the lines in the
 current select range.
-By default, this sorts them into ascending alphabetical order, although any 
-of the usual \mbox{SORT} options may be specified on the command line to 
+By default, this sorts them into ascending alphabetical order, although any
+of the usual \mbox{SORT} options may be specified on the command line to
 alter this behaviour.
 
 \item[WHERE (ctrl-W)] --- Displays the current column and line number of the
 cursor, and shows how many lines there are in the current buffer and what
-percentage of the buffer lies on or above the current line. 
+percentage of the buffer lies on or above the current line.
 
 \end{description}
 
 Any of these commands may be bound to a key by using the \mbox{LSE} command
 \mbox{DEFINE}~\mbox{KEY}.
-For instance, the \mbox{ctrl-W} key has been made to execute the 
-\mbox{WHERE} command by issuing the following \mbox{LSE} command: 
+For instance, the \mbox{ctrl-W} key has been made to execute the
+\mbox{WHERE} command by issuing the following \mbox{LSE} command:
 
 \begin{verbatim}
    LSE> DEFINE KEY CTRL_W_KEY "WHERE"
@@ -790,10 +790,10 @@ For instance, the \mbox{ctrl-W} key has been made to execute the
 
 Key definitions such as this would normally be placed in an {\em
 initialisation file} for convenience, so that they are available whenever
-\mbox{STARLSE} is invoked. 
+\mbox{STARLSE} is invoked.
 To do this, you might enter the commands into a file called
 \mbox{MYSTUFF.LSE}, which is then made available to \mbox{STARLSE} by means
-of a logical name assignment such as: 
+of a logical name assignment such as:
 
 \begin{verbatim}
    $ DEFINE LSE$INITIALIZATION DISK$MYDISK:[MYDIR]MYSTUFF.LSE
@@ -802,7 +802,7 @@ of a logical name assignment such as:
 
 \section{Acknowledgements}
 
-Thanks are due to the following people who have contributed material or 
+Thanks are due to the following people who have contributed material or
 ideas for inclusion in \mbox{STARLSE}:
 
 \begin{quote}
@@ -824,7 +824,7 @@ Dave Terrett
 
 \subsection{An ADAM A-task Prologue}
 
-The following is an example of a completed STARLSE prologue for an ADAM 
+The following is an example of a completed STARLSE prologue for an ADAM
 A-task ({\em i.e.}\ the main routine of an ADAM application program).
 
 \small
@@ -908,7 +908,7 @@ A-task ({\em i.e.}\ the main routine of an ADAM application program).
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -941,7 +941,7 @@ A-task ({\em i.e.}\ the main routine of an ADAM application program).
 \subsection{A Subroutine Prologue}
 
 The following is an example of a completed STARLSE prologue for a normal
-Fortran~77 subroutine. 
+Fortran~77 subroutine.
 
 \small
 \begin{verbatim}
@@ -1006,7 +1006,7 @@ Fortran~77 subroutine.
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1079,7 +1079,7 @@ terminals.
 
 \subsection{Current Limitations}
 
-The following limitations are currently imposed by restrictions and features 
+The following limitations are currently imposed by restrictions and features
 within \mbox{LSE} and other contributed material:
 
 \begin{enumerate}
@@ -1090,38 +1090,38 @@ are appended to the end of the token expansion.  This problem appears to be
 related to a problem introduced in LSE version 3.1 which causes Fortran
 indentation to be wrongly calculated.  Work-arounds have been installed which
 overcome the indentation problem, but the blank spaces have not been
-successfully eliminated. 
+successfully eliminated.
 
 \item Using the RETURN key when positioned on a placeholder causes the
 resulting new line to have the wrong indentation.
 This problem arose with the introduction of LSE version 2.3 and the reason for
-it is unknown. 
+it is unknown.
 
-\item When displaying help information, the help screen is displayed twice 
+\item When displaying help information, the help screen is displayed twice
 in rapid succession.
 This problem arose with the introduction of LSE version 2.3 and the reason for
-it is unknown. 
+it is unknown.
 
 \item If the label placeholder on a Fortran statement is replaced with a
 label which is more than one character long, then the indentation on the
 statement will be wrong and must be corrected manually.
-This appears to be an unavoidable feature of the way LSE handles the label 
+This appears to be an unavoidable feature of the way LSE handles the label
 field of Fortran statements.
 
 \item The names of subroutine arguments in the \mbox{GKS} help library do
 not match the names of the placeholders which appear when \mbox{GKS}
 routines are expanded (the latter names being taken from the \mbox{RAL}
-\mbox{GKS} manual). 
-This problem arises because the GKS specification does not define unique 
+\mbox{GKS} manual).
+This problem arises because the GKS specification does not define unique
 names for the routine arguments.
 
 \item After selecting a symbolic constant (for instance) from a displayed
 menu, the cursor will usually move on to the next placeholder, which is
-often not what is required. 
+often not what is required.
 The use of {\em alias} definitions for these constants (instead of defining
 them as {\em routines}) would overcome this, but no descriptive text can
 currently be associated with an {\em alias}, so the resulting menu would not
-be of use. 
+be of use.
 
 \end{enumerate}
 

@@ -14,10 +14,10 @@
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {%
 The GWM Xdisplay widget is a Tcl/Tk-based replacement for the standard GWM
-Xdisplay manager.  It provides several facilities not available in the 
+Xdisplay manager.  It provides several facilities not available in the
 standard display manager, including manipulation of the colour table of the
 display, capture of the displayed plot or image to JPEG format, and dumping
-to print files of various formats. 
+to print files of various formats.
 }
 % ? End of document identification
 
@@ -50,7 +50,7 @@ to print files of various formats.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -119,7 +119,7 @@ to print files of various formats.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -204,12 +204,12 @@ to print files of various formats.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -245,16 +245,16 @@ to print files of various formats.
 
 \section{\label{introduction}\xlabel{introduction}Introduction}
 
-The TCL/GWM image display and plotting widget\footnote{A widget is the 
+The TCL/GWM image display and plotting widget\footnote{A widget is the
 name given to this type of application in the TCL system.  Any resemblance
-to the widgets found in beer cans is a figment of the imagination.} is a 
+to the widgets found in beer cans is a figment of the imagination.} is a
 alternative Xdisplay manager, to be used in place of the standard
 GWM Xdisplay manager.
 
-By using TCL to develop the display manager, quite small amounts of code 
-can be used to generate quite powerful systems, and it is relatively easy 
-to extend to provide new features.  This version is only a demonstration of 
-what can be achieved.  Users may make copies of the relevant code and 
+By using TCL to develop the display manager, quite small amounts of code
+can be used to generate quite powerful systems, and it is relatively easy
+to extend to provide new features.  This version is only a demonstration of
+what can be achieved.  Users may make copies of the relevant code and
 extend it if they so wish.
 
 Full details on the TCL/GWM widget and the standard GWM Xdisplay
@@ -279,9 +279,9 @@ in you {\tt{PATH}} before {\tt{/star/bin/startcl}}, or ensure that
 
 \section{\label{using_the_widget}\xlabel{using_the_widget}Using the Widget}
 
-If you have the TCL/GWM widget enabled it will be used when any `xwindows' 
+If you have the TCL/GWM widget enabled it will be used when any `xwindows'
 output is produced by a Starlink graphics program, whether the requirement
-is to display a colour image or a simple line plot.  
+is to display a colour image or a simple line plot.
 
 The TCL/GWM widget can be invoked by the standard graphics system and can
 be generated with an overlay if required, in the same manner as the
@@ -294,7 +294,7 @@ A typical TCL/GWM widget might be generated thus:
 {\tt \% xmake -colours 128 xwindows}
 \end{quote}
 
-where {\tt{\%}} is the shell prompt.  This will generate a widget with 
+where {\tt{\%}} is the shell prompt.  This will generate a widget with
 128 colours allocated called {\tt{xwindows}}
 
 If you need an overlay plane ({\em{e.g.}}\/ to plot contour maps over images)
@@ -304,7 +304,7 @@ you can use the {\tt{-overlay}} switch:
 {\tt \% xmake -colours 128 -overlay xwindows}
 \end{quote}
 
-A full list of the TCL/GWM widget command switches is given in 
+A full list of the TCL/GWM widget command switches is given in
 \xref{SUN/186}{sun186}{gwm_widget}.
 
 \subsection{\label{the_main_display_window}\xlabel{the_main_display_window}The  main display window}
@@ -439,7 +439,7 @@ Web.
 \end{description}
 
 \item[Entry]~
- 
+
 \begin{description}
 
 \item[{\tt{Filename:}}] You should type in the name of the file you
@@ -544,11 +544,11 @@ send more plotting commands to the widget.
 
 \subsection{\label{size_of_plotting_surface}\xlabel{size_of_plotting_surface}Size of plotting surface}
 
-The TCL/GWM widget is controlled slightly differently than the standard GWM 
+The TCL/GWM widget is controlled slightly differently than the standard GWM
 Xdisplay manager when specifying the size of the plotting surface.
 
 The standard GWM Xdisplay manager creates a plotting surface with a boarder
-round it either of the default size (780 by 512 pixels), or governed by the 
+round it either of the default size (780 by 512 pixels), or governed by the
 {\tt{-geometry}} command line switch.  The command:
 
 \begin{quote}
@@ -557,7 +557,7 @@ round it either of the default size (780 by 512 pixels), or governed by the
 
 will generate a 64 colour window 900 by 600 pixels in size called xwindows.
 
-The TCL/GWM widget takes any {\tt{-geometry}} command line switch information 
+The TCL/GWM widget takes any {\tt{-geometry}} command line switch information
 to use as the size of the entire widget, and packs the buttons and scrollbars
 round the largest plotting surface it can create inside the size of widget
 defined.
@@ -567,7 +567,7 @@ To create a plotting surface 900 by 600 pixels you should use the
 
 \begin{quote}
 {\tt \% xmake -height 600 -width 900 -colours 64 xwindows}
-\end{quote}                                                            
+\end{quote}
 
 will create a widget with a plotting surface 900 by 600 with the buttons
 and scroll bars packed round the plotting surface.
@@ -579,7 +579,7 @@ error message.
 \subsection{\label{x_resources}\xlabel{x_resources}X resources}
 
 The TCL/GWM widget responds to a slightly different form of X-resource
-default definitions.  These are typically defined in 
+default definitions.  These are typically defined in
 {\verb+${HOME}/.Xdefaults+}.
 
 The following example shows definitions that will create a plotting
@@ -589,7 +589,7 @@ background colours set to green and black.
 \begin{quote}
 \begin{verbatim}
 !
-! GWM 
+! GWM
 !   standard set
 *Gwm*foreground: green
 *Gwm*background: black

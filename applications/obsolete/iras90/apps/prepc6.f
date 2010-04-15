@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,7 +147,7 @@
       CALL CHR_UCASE( TEXT )
 
 *  See if the units are one of the IRI standard system of units.
-      CALL IRI_CHECK( TEXT, OK, STATUS )      
+      CALL IRI_CHECK( TEXT, OK, STATUS )
 
 *  If it is, and if no image type was specified by the comments
 *  following the VERSION keyword, assume the image is an intensity
@@ -156,5 +156,5 @@
 
 *  Finish.
  999  CONTINUE
-      
+
       END

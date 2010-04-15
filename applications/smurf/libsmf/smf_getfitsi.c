@@ -13,18 +13,18 @@
 *     C function
 
 *  Invocation:
-*     smf_getfitsi( const smfHead *hdr, const char *name, int *result, 
+*     smf_getfitsi( const smfHead *hdr, const char *name, int *result,
 *                   int *status );
 
 *  Arguments:
 *     hdr = const smfHdr * (Given)
-*        Header struct. An error is reported if it does not contain a 
+*        Header struct. An error is reported if it does not contain a
 *        FitsChan in the hdr slot
 *     name = const char * (Given)
 *        Name of the FITS keyword to retrieve.
 *     result = int * (Given and Returned)
 *        Pointer to a int in which to store the result. The supplied
-*        int value is left unchanged if the keyword has an undefined 
+*        int value is left unchanged if the keyword has an undefined
 *        value in the FitsChan.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
@@ -32,7 +32,7 @@
 *  Description:
 *     This function searches the supplied header for a named FITS keyword.
 *     If the keyword is not found, an error is reported. If the keyword
-*     is found, but has no associated value, the contents of the supplied 
+*     is found, but has no associated value, the contents of the supplied
 *     result buffer is left unchanged, but no error is reported. If the
 *     keyword has a defined value, it is returned in the buffer.
 *
@@ -91,7 +91,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_getfitsi"
 
-void smf_getfitsi( const smfHead *hdr, const char *name, int *result, 
+void smf_getfitsi( const smfHead *hdr, const char *name, int *result,
                    int *status ) {
 
 /* Local Variables; */

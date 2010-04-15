@@ -22,7 +22,7 @@
 *     NC = INTEGER (Given)
 *        The axis required; 1 for longitude, 2 for latitude.
 *     DESCR = CHARACTER * ( * ) (Returned)
-*        A full description of the axis name (see routine IRA_SCNAM). 
+*        A full description of the axis name (see routine IRA_SCNAM).
 *        This should have a declared length of IRA__SZSCD.
 *     LD = INTEGER (Returned)
 *        No. of used characters in DESCR.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

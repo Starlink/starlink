@@ -10,7 +10,7 @@ C     in the input bin that lies in the overlap area, using either
 C     linear or quadratic interpolation.
 C
 C     Parameters -   (">" input, "!" modified, "W" workspace, "<" output)
-C 
+C
 C     (>) NIN       (Integer) The number of elements in the input arrays
 C     (>) DATIN     (Real array, DATIN(NIN)) The data to be redistributed.
 C     (>) XIN       (Double precision array XIN(NIN)) The wavelength
@@ -106,7 +106,7 @@ C
 C
 C     We have to be sure that the adjacent bins are not at the same
 C     wavelength as the input bin, or the interpolation will go wild.
-C     So we look down and up the array until we either run off the 
+C     So we look down and up the array until we either run off the
 C     ends or find suitable values.  The eventual interpolation involves
 C     the input bin and the two numbered NLEFT and NRIGHT, which are
 C     centered at wavelengths -ALPHA and BETA respecitvely from the
@@ -147,7 +147,7 @@ C     independent straight lines, the other uses a single parabola.
 C     Linear interpolation is used instead of quadratic at the end
 C     points, and all the code for dealing with the end points is in
 C     the linear section.
-C     
+C
       LINEAR=INTERP.EQ.1
       IF (INTERP.EQ.2) THEN
          IF ((NLEFT.LE.0).OR.(NRIGHT.GT.NIN)) LINEAR=.TRUE.
@@ -157,7 +157,7 @@ C
 C
 C        Linear interpolation.  The data is fitted by two straight
 C        lines, one from the centre element to the one on its left,
-C        this being the line Y=LM*X+LC, and one from the centre 
+C        this being the line Y=LM*X+LC, and one from the centre
 C        element to the one on its right, this being the line
 C        Y=RM*X+RC.   First, determine LM,LC and RM,RC.  For the
 C        end bins, the left and right lines are the same - ie the
@@ -179,10 +179,10 @@ C
             RC=LC
          END IF
 C
-C        Now get the total area under the fitted lines in the overlap 
-C        area.  This is calculated in two halves, first for any overlap 
-C        with the left hand side of the input element, then for any 
-C        overlap with the right hand side.  The overlap range is from 
+C        Now get the total area under the fitted lines in the overlap
+C        area.  This is calculated in two halves, first for any overlap
+C        with the left hand side of the input element, then for any
+C        overlap with the right hand side.  The overlap range is from
 C        OVERL to OVERR.
 C
          AREA=0.0

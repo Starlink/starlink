@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -54,22 +54,22 @@
 *     18-SEP-1996 (DSB):
 *        Original version.
 *     28-OCT-1998 (DSB):
-*        Added method astPolyCurve. 
+*        Added method astPolyCurve.
 *     12-OCT-1999 (DSB):
 *        Allow tick marks to be specified separately for both axes.
 *     9-JAN-2001 (DSB):
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Added methods astGenCurve, astGrfSet, astGrfPop, astGrfPush and 
+*        Added methods astGenCurve, astGrfSet, astGrfPop, astGrfPush and
 *        attribute Grf.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitPlotVtab method.
 *     13-JAN-2004 (DSB):
-*        Added bbox, logticks and logplot to the AstPlot structure. Added 
+*        Added bbox, logticks and logplot to the AstPlot structure. Added
 *        LogPlot and LogTicks accessor methods.
 *     19-JAN-2004 (DSB):
-*        Added loggap and loglabel to the AstPlot structure. Added 
+*        Added loggap and loglabel to the AstPlot structure. Added
 *        LogGap and LogLabel accessor methods.
 *     21-MAR-2005 (DSB):
 *        - Added the Clip attribute.
@@ -84,11 +84,11 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "frameset.h"              /* Parent FrameSet class */
-#include "keymap.h"              
-#include "region.h"              
+#include "keymap.h"
+#include "region.h"
 
 #if defined(astCLASS)       /* Protected */
-#include "grf.h"              
+#include "grf.h"
 #endif
 
 /* C header files. */
@@ -165,15 +165,15 @@
 /* Type Definitions */
 /* ================ */
 
-/* Pre-declare the AstPlot structure so that it can be used within the 
+/* Pre-declare the AstPlot structure so that it can be used within the
    GRF function typedefs. */
 struct AstPlot;
 
 /* Interfaces for GRF functions */
 /* ---------------------------- */
-/* A general interface into which actual Grf functions should be cast 
+/* A general interface into which actual Grf functions should be cast
    before being passed as an argument to astGrfSet. */
-typedef void (* AstGrfFun)( void );              
+typedef void (* AstGrfFun)( void );
 
 /* Interfaces for specific Grf funstions implemented in C (other languages
    may have different interfaces). */
@@ -187,9 +187,9 @@ typedef int (* AstGTxExtFun)( AstKeyMap *, const char *, float, float, const cha
 typedef int (* AstGScalesFun)( AstKeyMap *, float *, float * );
 typedef int (* AstGQchFun)( AstKeyMap *, float *, float * );
 
-/* A general interface into which Grf Wrapper functions should be cast 
+/* A general interface into which Grf Wrapper functions should be cast
    before being passed as an argument to astGrfWrapper. */
-typedef void (* AstGrfWrap)( void );              
+typedef void (* AstGrfWrap)( void );
 
 /* Interfaces for the wrapper functions which wrap specific Grf funstions. */
 typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int, int * );
@@ -305,7 +305,7 @@ typedef struct AstPlot {
    int umintk[ 3 ];
    int utxtlb[ 3 ];
    int xrev;
-   int yrev;      
+   int yrev;
    int ink;
    int logplot[ 3 ];
    int logticks[ 3 ];
@@ -364,8 +364,8 @@ typedef struct AstPlotVtab {
    void (* GrfPush)( AstPlot *, int * );
    void (* GrfPop)( AstPlot *, int * );
    void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap, int * );
-   void (* Grid)( AstPlot *, int * ); 
-   void (* Mark)( AstPlot *, int, int, int, const double *, int, int * ); 
+   void (* Grid)( AstPlot *, int * );
+   void (* Mark)( AstPlot *, int, int, int, const double *, int, int * );
    void (* Text)( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
    double (* GetTol)( AstPlot *, int * );
@@ -560,7 +560,7 @@ typedef struct AstPlotVtab {
 
 } AstPlotVtab;
 
-/* Structure holding information about curves drawn by astGridLine and 
+/* Structure holding information about curves drawn by astGridLine and
    astCurve. */
 typedef struct AstPlotCurveData{
    int out;          /* Was the curve completely outside the clipping area? */
@@ -572,15 +572,15 @@ typedef struct AstPlotCurveData{
    float length;     /* Drawn length of the curve in graphics coordinates */
 } AstPlotCurveData;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
 typedef struct AstPlotGlobals {
    AstPlotVtab Class_Vtab;
    int Class_Init;
-   double GrfAttrs_attrs_t[ GRF__NATTR ]; 
-   int GrfAttrs_nesting_t;            
+   double GrfAttrs_attrs_t[ GRF__NATTR ];
+   int GrfAttrs_nesting_t;
    double Crv_limit_t;
    double Crv_scerr_t;
    double Crv_tol_t;
@@ -676,7 +676,7 @@ AstPlot *astPlotId_( void *, const float [], const double [], const char *, ... 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstPlot *astInitPlot_( void *, size_t, int, AstPlotVtab *, 
+AstPlot *astInitPlot_( void *, size_t, int, AstPlotVtab *,
                        const char *, AstFrame *, const float *, const double *, int * );
 
 /* Vtab initialiser. */
@@ -687,7 +687,7 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
                        const char *, AstChannel *channel, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitPlotGlobals_( AstPlotGlobals * );
 #endif
 
@@ -705,7 +705,7 @@ void astInitPlotGlobals_( AstPlotGlobals * );
    void astGridLine_( AstPlot *, int, const double [], double, int * );
    void astCurve_( AstPlot *, const double [], const double [], int * );
    void astGrid_( AstPlot *, int * );
-   void astMark_( AstPlot *, int, int, int, const double *, int, int * ); 
+   void astMark_( AstPlot *, int, int, int, const double *, int, int * );
    void astGrfSet_( AstPlot *, const char *, AstGrfFun, int * );
    void astGrfPush_( AstPlot *, int * );
    void astGrfPop_( AstPlot *, int * );
@@ -1005,7 +1005,7 @@ astINVOKE(V,astGrfPop_(astCheckPlot(this),STATUS_PTR))
 
 
 #define astGrfFunID(name,method,class) astGrfFunID_(name,method,class,STATUS_PTR)
-#define astFindEscape(text,type,value,nc) astFindEscape_(text,type,value,nc,STATUS_PTR) 
+#define astFindEscape(text,type,value,nc) astFindEscape_(text,type,value,nc,STATUS_PTR)
 #define astStripEscapes(text) astStripEscapes_(text,STATUS_PTR)
 #define astGrfConID(this) astGrfConID_(this,STATUS_PTR)
 

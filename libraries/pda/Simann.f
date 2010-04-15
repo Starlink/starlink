@@ -127,14 +127,14 @@ C  Set input values of the input/output parameters.
       CALL PDA_PRTVEC(UB,N,'UPPER BOUND')
       CALL PDA_PRTVEC(C,N,'C VECTOR')
       WRITE(*,'(/,''  ****   END OF DRIVER ROUTINE OUTPUT   ****''
-     1          /,''  ****   BEFORE CALL TO PDA_SA.         ****'')')      
+     1          /,''  ****   BEFORE CALL TO PDA_SA.         ****'')')
 
       CALL PDA_SA(FCNXMP,
      3        N,X,MAX,RT,EPS,NS,NT,NEPS,MAXEVL,LB,UB,C,IPRINT,ISEED1,
      1        ISEED2,T,VM,XOPT,FOPT,NACC,NFCNEV,NOBDS,IER,
      2        FSTAR,XP,NACP)
 
-      WRITE(*,'(/,''  ****   RESULTS AFTER PDA_SA   ****   '')')      
+      WRITE(*,'(/,''  ****   RESULTS AFTER PDA_SA   ****   '')')
       CALL PDA_PRTVEC(XOPT,N,'SOLUTION')
       CALL PDA_PRTVEC(VM,N,'FINAL STEP LENGTH')
       WRITE(*,1001) FOPT, NFCNEV, NACC, NOBDS, T, IER

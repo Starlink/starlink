@@ -23,10 +23,10 @@
 *     : MAXLEN, MENU, STATUS )
 
 *  Description:
-*  
+*
 *  Allows the user to input or modify the size of the region, and
 *  wavebands, he requires for each source.
-*  
+*
 *  The program allows the user the option to:-
 *     Enter a region size for all sources,
 *     Enter a set of wavebands for all sources,
@@ -36,7 +36,7 @@
 *
 *  After all editing is done the program checks that a region size and
 *  waveband requirements have been entered for all sources.
-*  
+*
 *  Arguments:
 *     DISFIL = CHARACTER * ( * ) (Given)
 *        Value of the DISPLAYORFILE parameter
@@ -51,7 +51,7 @@
 *        Parameter CROSSCAN size of req. region in cross scan direction
 *        in arc minutes
 *     PDISFI = CHARACTER * ( * ) (Given)
-*        Parameter DISPLAYORFILE 
+*        Parameter DISPLAYORFILE
 *     PINSCA = CHARACTER * ( * ) (Given)
 *        Parameter INSCAN size of req. region in in scan direction
 *        in arc minutes
@@ -78,17 +78,17 @@
 *        The global status.
 *
 *  Algorithm:
-*  
+*
 *  *********************************************************************
 *  Add source region size and wavebands to all sources
 *  *********************************************************************
-*  
+*
 *
 *     -  Set MENU2 to menu 'M'.
-*     
+*
 *  Repeat until MENU2 is accept source list with size/wavebands 'Y'
 *            or MENU2 is return to main menu 'R':-
-*  
+*
 *     -  If MENU2 is menu 'M':-
 *           Ask do you want to:-
 *              Enter a region size for all sources 'Z',
@@ -102,19 +102,19 @@
 *
 *     (If you alter the menu options you should also alter the valid
 *      MENU2CHOICE options in the .IFL file)
-*              
+*
 *     -  If MENU2 is region size for all sources 'Z'
 *           CALL FIND04 to
 *           Ask for INSCAN and CROSSCAN sizes.
 *           Enter these values in all sources.
 *           Set MENU2 to menu 'M'.
-*     
+*
 *     -  If MENU2 is set of wavebands for all sources 'W'
 *           CALL FIND05 to
 *           Ask for bands required.
 *           Enter these values in all sources.
 *           Set MENU2 to menu 'M'.
-*           
+*
 *     -  If MENU2 is Enter region size and/or waveband details
 *        for sources individually 'I',
 *           CALL FIND44 to
@@ -122,19 +122,19 @@
 *           modified until he responds with a !
 *           Search for all source details with matching source names
 *           For each match found display the source details and ask the
-*           user for cross scan and in scan size and wavebands. 
+*           user for cross scan and in scan size and wavebands.
 *           Inside FIND44, MENU2 is set to menu 'M'.
-*           
+*
 *     -  If MENU2 is display list of sources 'L',
 *           CALL FIND28 to display a paged list of sources.
 *           Inside FIND28, MENU2 is set to menu 'M'.
-*           
+*
 *     -  If MENU2 is change page length 'P',
 *           CALL PAR_GET0I to get new pagelength
 *           MENU2 is set to 'M'
 *
 *  Continue the repeat until
-*  
+*
 *     -  If MENU2 is accept source list and save file 'Y',
 *           CALL FIND07 to
 *           Check that all sources have a non zero in scan size,
@@ -147,7 +147,7 @@
 *           If the user is not returning to the size and wavebands menu
 *           CALL FIND40 to save the source details including size and
 *           wavebands to a file.
-*           
+*
 *  External Routines Used:
 *     FINDCRDD:
 *        FIND07, FIND04, FIND05, FIND28, FIND38, FIND40, FIND44
@@ -186,7 +186,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-      
+
 *  Arguments Given:
       CHARACTER * ( * )  DISFIL
       INTEGER ILEVEL
@@ -197,14 +197,14 @@
       CHARACTER * ( * )  PINSCA
       CHARACTER * ( * )  PMAXLN
       CHARACTER * ( * )  PMENU2
-      CHARACTER * ( * )  PNEXTP 
+      CHARACTER * ( * )  PNEXTP
       CHARACTER * ( * )  POUTF2
       CHARACTER * ( * )  PRETSW
       CHARACTER * ( * )  PSLFIL
 
 *  Arguments Given and Returned:
       INTEGER MAXLEN
-      CHARACTER * ( 1 )  MENU   
+      CHARACTER * ( 1 )  MENU
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -218,19 +218,19 @@
 
 *  *********************************************************************
 *  *********************************************************************
-*  Add region size and wavebands to data 
+*  Add region size and wavebands to data
 *  *********************************************************************
 *  *********************************************************************
 *  Set up size and wavebands menu variable to 'M' in order to obtain
 *  menu as first action
       MENU2 = 'M'
-        
+
 *  The program will allow the user to add region size and wavebands for
 *  all the sources in the source list or to input them for sources
 *  individulaly. The accepted source list is saved to a file.
 *  The selection is controlled by the variable MENU2.
 
-      
+
  100       CONTINUE            ! Start of 'DO WHILE' loop
 
 *  This is a block of IF statements that carries out the various
@@ -271,15 +271,15 @@
          CALL PAR_CANCL( PMENU2, STATUS )
 
       END IF
-      
+
 *  *********************************************************************
 *  If the user chooses Z = Enter region size for all sources
 *  *********************************************************************
 
       IF ( (MENU2 .EQ. 'Z') .AND. (STATUS .EQ. SAI__OK)  ) THEN
-      
+
          CALL FIND04( PCROSS, PINSCA, MENU2, STATUS )
-      
+
       END IF
 
 *  *********************************************************************
@@ -287,23 +287,23 @@
 *  *********************************************************************
 
       IF ( (MENU2 .EQ. 'W') .AND. (STATUS .EQ. SAI__OK) ) THEN
-      
+
          CALL FIND05( PBANDS, MENU2, STATUS )
-      
+
       END IF
-      
+
 *  *********************************************************************
 *  If the user chooses I = Enter region size and wavebands for
 *  individual sources
 *  *********************************************************************
 
       IF ( (MENU2 .EQ. 'I') .AND. (STATUS .EQ. SAI__OK) ) THEN
-      
+
          CALL FIND44( MAXLEN, PAUNAM, PBANDS, PCROSS, PINSCA, MENU2,
      :   STATUS )
-      
+
       END IF
-      
+
 *  *********************************************************************
 *  If the user chooses to list sources 'L'
 *  *********************************************************************
@@ -323,7 +323,7 @@
 
 *  Cancel the parameter for next time through
          CALL PAR_CANCL( PMAXLN, STATUS )
-      
+
 *  Set the parameter back to obtain select data to use menu
          MENU2 = 'M'
 
@@ -350,7 +350,7 @@
          IF ( NOFSO .EQ. 0 ) THEN
             CALL MSG_OUT( ' ',
      :      'WARNING - Current list of sources is empty', STATUS )
-      
+
 *  The choice is changed to M so that the user may select from the menu.
             MENU2 = 'M'
 
@@ -362,18 +362,18 @@
             CALL FIND07( MAXLEN, PRETSW, MENU2, STATUS )
 
 *  If MENU2 is set to 'M' then the data is incomplete and the routine
-*  should not store the source data 
+*  should not store the source data
             IF ( MENU2 .NE. 'M' ) THEN
 
 *  Call routine to store source data
                CALL FIND40( POUTF2, STATUS )
-            
+
             END IF
 
          END IF
 
       END IF
-      
+
 *  *********************************************************************
 *  Return to the edit sources menu if required, or the user enters a !
 *  *********************************************************************
@@ -390,7 +390,7 @@
 
          GO TO 100
       END IF
-      
+
 *  *********************************************************************
 *  End of the set of IF's which add size and wavebands to sources
 *  *********************************************************************

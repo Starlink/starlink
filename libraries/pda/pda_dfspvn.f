@@ -40,7 +40,7 @@ C
          DO 26 L=1,J
             JP1ML = JP1-L
 
-C Check for potential division by zero - DSB (10/2/97). 
+C Check for potential division by zero - DSB (10/2/97).
             IF( DELTAP(L) .EQ. 0.0 .AND. DELTAM(JP1ML) .EQ. 0.0 ) THEN
                VM = 0.0
             ELSE

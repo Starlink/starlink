@@ -5,8 +5,8 @@ XDISPLAY news file.
       Correction for bug that prevented 16 character names being parsed
       correctly (Solaris 2 systems).
 
-   v2.1 
-      Compatable with replacement `login' logdaemon used with TCP 
+   v2.1
+      Compatable with replacement `login' logdaemon used with TCP
       Wrappers (C/O Paul Collison, Oxford).
 
    v2.2

@@ -22,7 +22,7 @@
 *  Description:
 *     This application returns a pointer to a new Polygon that contains
 *     a subset of the vertices in the supplied Polygon. The subset is
-*     chosen so that the returned Polygon is a good approximation to 
+*     chosen so that the returned Polygon is a good approximation to
 *     the supplied Polygon, within the limits specified by the supplied
 *     parameter values. That is, the density of points in the returned
 *     Polygon is greater at points where the curvature of the boundary
@@ -36,18 +36,18 @@
 *        The maximum allowed discrepancy between the supplied and
 *        returned Polygons, expressed as a geodesic distance within the
 *        Polygon's coordinate frame. If this is zero or less, the
-*        returned Polygon will have the number of vertices specified by 
+*        returned Polygon will have the number of vertices specified by
 *        MAXVERT.
 *     MAXVERT = _INTEGER (Read)
 *        The maximum allowed number of vertices in the returned Polygon.
-*        If this is less than 3, the number of vertices in the returned 
-*        Polygon will be the minimum needed to achieve the maximum 
+*        If this is less than 3, the number of vertices in the returned
+*        Polygon will be the minimum needed to achieve the maximum
 *        discrepancy specified by
 *        MAXERR.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the modified Polygon.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Mapping. If an NDF is supplied, 
+*        An NDF or text file holding the Mapping. If an NDF is supplied,
 *        the current Frame in the WCS FrameSet will be used.
 
 *  Copyright:
@@ -103,7 +103,7 @@
       INTEGER MAXVERT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

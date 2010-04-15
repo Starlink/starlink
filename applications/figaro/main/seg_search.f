@@ -17,21 +17,21 @@
 
 * Arguments:
 *    X(IN) = REAL ARRAY (Given)
-*       
+*
 *    Y(IN) = REAL ARRAY (Given)
-*       
+*
 *    IN = INTEGER (Given)
-*       
+*
 *    NYP = INTEGER (Given)
-*       
+*
 *    LINE_COUNT = INTEGER (Returned)
-*       
+*
 *    CHAN1(NYP) = REAL ARRAY (Returned)
 *        borders of lines - for fitting
 *    CHAN2(NYP) = REAL ARRAY (Returned)
 *        borders of lines - for fitting
 *    STATUS = INTEGER (Given and returned)
-*       
+*
 *
 * Subroutines referenced:
 *     GETWORK          : Get work array

@@ -52,7 +52,7 @@
       END IF
 
 * move array elements into order
-      
+
       CALL PDA_DSORT( waves, chans, lincnt, 2, STATUS )
       IF( STATUS .NE. 0 ) THEN
          write(chars,'(''PDA error '',i1,'' (PDA_DSORT)'')')STATUS

@@ -13,7 +13,7 @@
 *     catalogue.
 *
 *     The FITS table is held in its own file.  The primary header and a
-*     header for the binary table extension are created.  The columns 
+*     header for the binary table extension are created.  The columns
 *     and parameters are written as FITS keywords.
 *  Arguments:
 *     CI  =  INTEGER (Given)
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     24/1/94  (ACD): Modified error reporting.
 *     31/1/94  (ACD): Added null values for integer columns.
 *     4/2/94   (ACD): Added handling of vector columns.
-*     18/2/94  (ACD): Fixed bug in handling vector columns of type 
+*     18/2/94  (ACD): Fixed bug in handling vector columns of type
 *        CHARACTER.
 *     21/2/94  (ACD): Removed some unused variables.
 *     7/7/94   (ACD): Added initialisation of FITS specific details.
@@ -127,7 +127,7 @@
       INTEGER FITOK     ! FITSIO success status.
       PARAMETER (FITOK = 0)
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  QI,       ! Parameter identifier.
      :  FI,       ! Column (or field) identifier.
      :  QCOUNT,   ! Number of the current parameter.
@@ -299,12 +299,12 @@ C           write(17, 1000) 'FTCRHD', fitstt, status
                CALL CAT_TNDNT (CI, CAT__FITYP, FCOUNT, FI, STATUS)
 
                IF (STATUS .EQ. CAT__OK  .AND.  FI .NE. CAT__NOID) THEN
-                  CALL CAT_CINQ (FI, 10, FCI, FNAME, FGENUS, FEXPR, 
-     :              FDTYPE, FCSIZE, FDIMS, FSIZEA, FNULL, FXCEPT, 
-     :              FSCALEF, FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, 
+                  CALL CAT_CINQ (FI, 10, FCI, FNAME, FGENUS, FEXPR,
+     :              FDTYPE, FCSIZE, FDIMS, FSIZEA, FNULL, FXCEPT,
+     :              FSCALEF, FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS,
      :              FCOMM, FDATE, STATUS)
 
-C                 print1010, fcount, fi, fname(1:10), fdtype, 
+C                 print1010, fcount, fi, fname(1:10), fdtype,
 C    :              fcsize, funits(1:10)
 C1010             format(1x, 'fcount, fi, fname, fdtype, fcsize, ',
 C    :              'funits: ', i3, i4, a10, i4, i4, a10)
@@ -358,7 +358,7 @@ C    :              'funits: ', i3, i4, a10, i4, i4, a10)
 
 *
 *                Reset the 'type of null value' attribute to indicate
-*                that null values are explicitly defined in the 
+*                that null values are explicitly defined in the
 *                catalogue.
 
                   CALL CAT_TATTI (FI, 'NULL', CAT__NULLS, STATUS)
@@ -461,7 +461,7 @@ C    :              1x, 'bform: ', a10 / )
 
                   TUNIT(FCOUNT) = FUNITS
 
-C                 print1011, ttype(fcount), tform(fcount), 
+C                 print1011, ttype(fcount), tform(fcount),
 C    :              tunit(fcount)
 C1011             format(1x, a, 1x, a, 1x, a)
 
@@ -489,13 +489,13 @@ C1011             format(1x, a, 1x, a, 1x, a)
 
             CALL CAT_TIQAC (CI, 'NAME', CNAME, STATUS)
 
-            CALL FTPHBN (FITUNT, 0, FCOUNT, TTYPE, TFORM, TUNIT, 
+            CALL FTPHBN (FITUNT, 0, FCOUNT, TTYPE, TFORM, TUNIT,
      :        CNAME, 0, FITSTT)
 C           write(17, 1000) 'FTPHBN', fitstt, status
             IF (FITSTT .NE. FITOK) THEN
                STATUS = CAT__ERROR
                CALL CAT3_FITER ('CAT3_FINCR_WBT',
-     :           'Failed to write FITS binary table keywords.', FITSTT, 
+     :           'Failed to write FITS binary table keywords.', FITSTT,
      :           STATUS)
             END IF
 
@@ -554,7 +554,7 @@ C           write(17, 1000) 'FTPHBN', fitstt, status
 
 *
 *          Write CAT external format as the standard FITS keyword
-*          TDISPn and also the CAT specific FITS keywords to hold the 
+*          TDISPn and also the CAT specific FITS keywords to hold the
 *          comments and preferential display flag for each column.
 
             DO LOOP = 1, FCOUNT
@@ -717,8 +717,8 @@ C           write(17, 1000) 'FTBDEF', fitstt, status
                CALL CAT_TNDNT (CI, CAT__QITYP, QCOUNT, QI, STATUS)
 
                IF (STATUS .EQ. CAT__OK  .AND.  QI .NE. CAT__NOID) THEN
-                  CALL CAT_PINQ (QI, 10, QCI, QNAME, QDTYPE, QCSIZE, 
-     :              QDIMS, QSIZEA, QUNITS, QXTFMT, QPRFDS, QCOMM, 
+                  CALL CAT_PINQ (QI, 10, QCI, QNAME, QDTYPE, QCSIZE,
+     :              QDIMS, QSIZEA, QUNITS, QXTFMT, QPRFDS, QCOMM,
      :              QVALUE, QDATE, STATUS)
 
 C                 write(17, 1012) qcount, qname(1:10), qvalue(1:10),

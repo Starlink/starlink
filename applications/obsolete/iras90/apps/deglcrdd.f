@@ -4,7 +4,7 @@
 *     DEGLCRDD
 
 *  Purpose:
-*     Deglitch the CRDD data 
+*     Deglitch the CRDD data
 
 *  Language:
 *     Starlink Fortran 77
@@ -29,7 +29,7 @@
 *
 *     The samples in the detected glitches can either be replaced by a
 *     Starlink bad value or be flaged by a specified quality name, see
-*     parameter QNAME, (GLITCH by default). 
+*     parameter QNAME, (GLITCH by default).
 *
 *     In case the samples in the glitches being replaced by Starlink
 *     bad values, there will be a new CRDD file created for each input
@@ -58,7 +58,7 @@
 *        used when parameter SETBAD has a value of FALSE and the
 *        specified quality name (by parameter QNAME) is not currently
 *        defined within the input CRDD file.
-*        [Samples in the detected glitches] 
+*        [Samples in the detected glitches]
 *     GLWID = REAL (Read)
 *        The spikes whose duration less than this value times the size
 *        of a point source are regarded as a glitch and are either
@@ -70,7 +70,7 @@
 *        Determines if history information is to be added to the input
 *        or output CRDD files. See help on "History_in_IRAS90" for more
 *        information on history.
-*        [Current history setting] 
+*        [Current history setting]
 *     IN = NDF (Read)
 *        Specifies a group of input CRDD files. This should be in the
 *        form of a group expression (see help on "Group_expressions").
@@ -156,7 +156,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -178,10 +178,10 @@
 *  Local Constants:
       INTEGER MXITER             ! Max number of iterations
       PARAMETER ( MXITER = 10 )
-      
+
 *  Local Variables:
       INTEGER BAND               ! Waveband number of input CRDD file
-      REAL BOX                   ! Size of box in times of PSF width 
+      REAL BOX                   ! Size of box in times of PSF width
       INTEGER BOXSZ              ! Size of box in samples
       REAL CLIP( MXITER )        ! Clip threthood when filter data
       INTEGER EL                 ! Number of mapped elements
@@ -193,7 +193,7 @@
       INTEGER IRCID              ! ID for IRC package
       INTEGER LBND( 2 ), UBND( 2 ) ! Bounds of input CRDD data array
       CHARACTER*( DAT__SZLOC ) LOCS( 5 )
-                                 ! HDS locators used by IRQ routines 
+                                 ! HDS locators used by IRQ routines
       INTEGER NBAD               ! Bad sample flag
       INTEGER NCLIP              ! Number of clip value obtained
       INTEGER NCRDD              ! Number of input CRDD files
@@ -201,7 +201,7 @@
       INTEGER NDIM               ! Number of dimension of input CRDD NDF
       INTEGER NITER              ! Number of iteration when filter data
       INTEGER NOCRDD             ! Number of output CRDD files
-      INTEGER NPSMP              ! Number. of samples in point source 
+      INTEGER NPSMP              ! Number. of samples in point source
       INTEGER NPROF              ! No. of point source profiles obtained
       CHARACTER*( 30 ) NSTR      ! String holding input NDF name
       INTEGER NSTRLN             ! Used length of NSTR
@@ -211,7 +211,7 @@
       INTEGER PDIN, PDOUT        ! Pointers to mapped in/output data
       INTEGER PPROFD             ! Pointer to point source profile data
       INTEGER PPROFX             ! Pointer to point source profile axis
-      REAL PRFWID( I90__BANDS )  ! Width of profile for each waveband 
+      REAL PRFWID( I90__BANDS )  ! Width of profile for each waveband
                                  ! in arcmins
       LOGICAL QADD               ! Flag showes quality name added to NDF
       CHARACTER*( IRQ__SZQNM ) QNAME ! Name of quality assigned to
@@ -230,7 +230,7 @@
 *  Establish the conditional message filter level.
       CALL MSG_IFGET( STATUS )
 
-*  See what to do about the samples in the detected glitches. 
+*  See what to do about the samples in the detected glitches.
       CALL PAR_GET0L( 'SETBAD', SETBAD, STATUS )
 
 *  Get the size of smooth box.
@@ -238,31 +238,31 @@
 
 *  Get the number of iterations.
       CALL PAR_GET0I( 'NITER', NITER, STATUS )
-      
+
 *  Get the clip threshood for each iteration.
-      CALL PAR_GET1R( 'CLIP', MXITER, CLIP, NCLIP, STATUS ) 
+      CALL PAR_GET1R( 'CLIP', MXITER, CLIP, NCLIP, STATUS )
 
 *  If number of clip threshood given by the user less than the number
 *  of the iteration, repeat the last clip.
       DO I = NCLIP + 1, NITER
          CLIP( I ) = CLIP( NCLIP )
       END DO
-      
+
 *  Get a group of CRDD file names to be deglitched.
       CALL IRM_RDNDF( 'IN', 0, 1, 'More CRDD file names', GINID, NCRDD,
      :                 STATUS )
-      
+
 *  If the samples in the detected glitches will be replaced by bad
 *  value, get a group of NDFs to contain the output CRDD.
       IF ( SETBAD ) THEN
-         CALL IRM_WRNDF( 'OUT', GINID, NCRDD, NCRDD, 
+         CALL IRM_WRNDF( 'OUT', GINID, NCRDD, NCRDD,
      :                   'More output CRDD file names', GOUTID, NOCRDD,
      :                   STATUS )
       END IF
 
 *  If unable to get access to the input and/or output CRDD files, exit.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
-      
+
 *  Creat 4 temporary arrays. The size of the arrays will be changed
 *  later according to the size of each input CRDD data array.
       OSIZE = 600 * 16
@@ -271,10 +271,10 @@
       CALL PSX_MALLOC( WSIZE * VAL__NBR, WORK1, STATUS )
       CALL PSX_MALLOC( WSIZE * VAL__NBR, WORK2, STATUS )
       CALL PSX_MALLOC( WSIZE * VAL__NBI, WORK3, STATUS )
-      
+
 *  If error happened when getting temporary arrays, exit.
       IF ( STATUS .NE. SAI__OK ) GOTO 980
-      
+
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
@@ -288,11 +288,11 @@
 
 *  Annul the id to the point source profile NDF.
       CALL NDF_ANNUL( NDFPF, STATUS )
-      
+
 *  Get the relative width of spikes belowe which they will be regarded
 *  as  glitches.
       CALL PAR_GET0R( 'GLWID', GLWID, STATUS )
-            
+
 *  Conditionaly report the width of glitches.
       IF ( NPROF .EQ. 4 ) THEN
          CALL MSG_BLANKIF( MSG__VERB, STATUS )
@@ -323,12 +323,12 @@
      :                  'Spikes of ^WID arcmin width or less in all '/
      :                 /'wavebands will be regarded as glitches',
      :                   STATUS )
-         
+
       END IF
-      
+
 *  Initialise the IRC package.
       CALL IRC_INIT( STATUS )
-      
+
 *  Processing input CRDD one by one.
       DO I = 1, NCRDD
 
@@ -346,30 +346,30 @@
 
 *  Get IRC ID for this CRDD file.
          CALL IRC_IMPRT( NDFIN, IRCID, STATUS )
-      
+
 *  Conditionaly tell the user which CRDD file is being processed.
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL NDF_MSG( 'NDF', NDFIN )
          CALL MSG_OUTIF( MSG__NORM, 'DEGLCRDD_MSG2',
      :                  '   Deglitch ^NDF ...' , STATUS )
-      
+
 *  Get the waveband number of this CRDD file.
          CALL IRC_INFO( IRCID, BAND, REFRA, REFDEC, SPD, SOP, OBS,
      :                  STATUS )
 
 *  Get the box size of the smoothing filter in sample numbers.
-         BOXSZ = NINT( BOX * PRFWID( BAND ) 
+         BOXSZ = NINT( BOX * PRFWID( BAND )
      :                / ( SPD * REAL( IRA__RTOD ) * 60.0 )
      :                * I90__SRATE( BAND ) )
 
 *  Find the width of glitches in sample numbers.
-         GLHWID = NINT( GLWID * PRFWID( BAND ) 
+         GLHWID = NINT( GLWID * PRFWID( BAND )
      :                 / ( SPD * REAL( IRA__RTOD ) * 60.0 )
      :                 * I90__SRATE( BAND ) )
-      
+
 *  Find the bounds of this CRDD file.
          CALL NDF_BOUND( NDFIN, 2, LBND, UBND, NDIM, STATUS )
-         
+
 *  If necessary, increase the size of the temporary arrays.
          IF ( OSIZE .LT. ( UBND( 1 ) - LBND( 1 ) + 1 ) *
      :                   ( UBND( 2 ) - LBND( 2 ) + 1 ) ) THEN
@@ -386,20 +386,20 @@
 
 *  If unable to increase the size of the temporary arrays, exit.
          IF ( STATUS .NE. SAI__OK ) GOTO 970
-      
+
 *  Map the NDF data array.
          CALL NDF_MAP( NDFIN, 'DATA', '_REAL', 'READ', PDIN, EL,
      :                 STATUS )
-            
+
 *  Reject the samples which stay too far away from the local average.
-         CALL DGCRA1( UBND( 1 ) - LBND( 1 ) + 1, 
-     :                UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ), BOXSZ, 
-     :                NITER, CLIP, %VAL( OUT ),  %VAL( WORK1 ), 
+         CALL DGCRA1( UBND( 1 ) - LBND( 1 ) + 1,
+     :                UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ), BOXSZ,
+     :                NITER, CLIP, %VAL( OUT ),  %VAL( WORK1 ),
      :               %VAL( WORK2 ),  %VAL( WORK3 ),  STATUS )
 
 *  If error happened while rejecting, exit.
          IF ( STATUS .NE. SAI__OK ) GOTO 970
-      
+
 *  If the samples in the glitch is to be set as bad, create a new output
 *  CRDD file.
          IF ( SETBAD ) THEN
@@ -409,12 +409,12 @@
 *  Map the data component of the output NDF.
             CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE', PDOUT, EL,
      :                    STATUS )
-      
+
 *  Detect glitches in the clearned input data, set set the samples in
 *  the glitches as bad.
-            CALL DGCRA2( UBND( 1 ) - LBND( 1 ) + 1, 
-     :                   UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ), 
-     :                  %VAL( OUT ), GLHWID, NBAD, %VAL( PDOUT ), 
+            CALL DGCRA2( UBND( 1 ) - LBND( 1 ) + 1,
+     :                   UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ),
+     :                  %VAL( OUT ), GLHWID, NBAD, %VAL( PDOUT ),
      :                   STATUS )
 
 *  If some samples have detected as in glitches and set as bad, set the
@@ -437,7 +437,7 @@
             CALL MSG_OUTIF( MSG__NORM, 'DEGLCRDD_MSG3',
      :                  '   Deglitched CRDD data are stored in ^NDF',
      :                      STATUS )
-      
+
 *  Unmap the input and output NDFs.
             CALL NDF_UNMAP( NDFIN, 'DATA', STATUS )
             CALL NDF_UNMAP( NDFOUT, 'DATA', STATUS )
@@ -447,7 +447,7 @@
             CALL MSG_LOAD( 'DEGLCRDD_MSG4', '^NDF', NSTR, NSTRLN,
      :                      STATUS )
             HSTORY = 'Created from '//NSTR( : NSTRLN )//' with samples'/
-     :              /' in detected glitches set as BAD' 
+     :              /' in detected glitches set as BAD'
             CALL IRM_HIST( 'HISTORY', NDFOUT, 'IRAS90:DEGLCRDD', 1,
      :                      HSTORY, STATUS )
 
@@ -482,25 +482,25 @@
                CALL IRQ_REMQN( LOCS, QNAME, STATUS )
                CALL ERR_END( STATUS )
             END IF
-      
+
 *  Release the quality name information.
-            CALL IRQ_RLSE( LOCS, STATUS )      
+            CALL IRQ_RLSE( LOCS, STATUS )
          END IF
 
 *  Annul the IRC ID of the current CRDD file.
          CALL IRC_ANNUL( IRCID, STATUS )
-      
+
 *  Annul the ID of the current CRDD file.
          CALL NDF_ANNUL( NDFIN, STATUS )
-      
+
 *  Process next CRDD file.
       END DO
-      
+
  970  CONTINUE
-      
+
 *  End IRC context.
       CALL IRC_CLOSE( STATUS )
-                  
+
 *  End NDF Context.
       CALL NDF_END( STATUS )
 
@@ -511,11 +511,11 @@
       CALL PSX_FREE( WORK2, STATUS )
       CALL PSX_FREE( WORK1, STATUS )
       CALL PSX_FREE( OUT, STATUS )
-      
+
  999  CONTINUE
 
 *  Delete the input and output groups.
       CALL GRP_DELET( GINID, STATUS )
       IF ( SETBAD ) CALL GRP_DELET( GOUTID, STATUS )
-      
+
       END

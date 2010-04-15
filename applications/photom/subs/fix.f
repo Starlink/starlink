@@ -1,12 +1,12 @@
 ************************************************************************
       INTEGER FUNCTION FIX_PAR(N, NPAR, NTERM)
-      
+
 *+
 *  Name :
 *     FIX_PAR
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -15,7 +15,7 @@
 *      JFLAG = FIX_PAR(N, N_PAR, N_TERM)
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
 *     N = INTEGER (Given)
@@ -24,7 +24,7 @@
 *         Total number of parameters
 *     N_TERM = INTEGER (Given)
 *         Total number of free parameters
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -57,17 +57,17 @@
 *  Global Constants :
       INCLUDE 'SAE_PAR'
 
-*  Arguments Given : 
+*  Arguments Given :
 
-      INTEGER N		
-      INTEGER NPAR		
-      INTEGER NTERM		
-      
+      INTEGER N
+      INTEGER NPAR
+      INTEGER NTERM
+
 *  Arguments Given and Returned :
 
 *  Arguments Returned :
 
-*  Local Variables : 
+*  Local Variables :
 
       INTEGER M_PAR
       PARAMETER( M_PAR = 32 )
@@ -83,7 +83,7 @@
       COMMON / LINK_STATUS / L_INDEX, L_OFFSET
       CHARACTER TEXT * 72
       INTEGER STATUS
-      
+
 *.
       STATUS = SAI__OK
 
@@ -93,33 +93,33 @@
 
 	  WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1               // ' linked'')') N
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
  	  TEXT = '        This call to FIX_PAR is ignored'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 
 *   Error status
 
-	  FIX_PAR = -1		
+	  FIX_PAR = -1
 	  RETURN
-	  
+
       END IF
-      
+
       DO K = 1, NPAR
-      
+
          IF( ABS( L_INDEX( K ) ) .EQ. N .AND. K .NE. N ) THEN
-	 
+
 	    WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1               // ' linked'')') N
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
  	    TEXT = '        This call to FIX_PAR is ignored'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 	
-	        
+	    CALL MSG_OUT(' ', TEXT, STATUS)
+
 *   Error status
 
-            FIX_PAR = -1	
+            FIX_PAR = -1
 	    RETURN
          END IF
-	 
+
       END DO
 
 *   Is it already fixed?
@@ -128,33 +128,33 @@
 
 	  WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1               // ' already fixed'')') N
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
  	  TEXT = '        This call to FIX_PAR is ignored'
 	  CALL MSG_OUT(' ', TEXT, STATUS)
 
 *   Warning status
 
-          FIX_PAR = 0		
+          FIX_PAR = 0
           RETURN
       END IF
-      
+
       TABLE_FREE( N ) = 1
       I = 1
-      
+
       DO WHILE( I .LE. NTERM .AND. INDEX( I ) .NE. N )
          I = I + 1
       END DO
-	
+
 *   One less free parameter
 
-      NTERM = NTERM - 1	
+      NTERM = NTERM - 1
       DO K = I, NTERM
          INDEX( K ) = INDEX( K + 1 )
       END DO
 
 *   OK status
 
-      FIX_PAR = 1		
+      FIX_PAR = 1
 *
 
       END
@@ -168,7 +168,7 @@
 *     FREE_PAR
 *
 *  Purpose :
-*      Parameter N (>0) becomes free again. Or if N=0, all parameters 
+*      Parameter N (>0) becomes free again. Or if N=0, all parameters
 *      will become free
 *
 *  Language :
@@ -210,16 +210,16 @@
 
 *  Type Definitions :
 	IMPLICIT NONE
-        
+
         INCLUDE 'SAE_PAR'
 
 
 	INTEGER M_PAR
 	PARAMETER( M_PAR = 32 )
 *
-	INTEGER N	
-	INTEGER N_PAR	
-	INTEGER N_TERM	
+	INTEGER N
+	INTEGER N_PAR
+	INTEGER N_TERM
 
 	INTEGER K
 
@@ -232,8 +232,8 @@
 
         CHARACTER TEXT * 72
         INTEGER STATUS
-	
-*.	
+
+*.
         STATUS = SAI__OK
 
 	IF( N .GE. 1 .AND. N .LE. N_PAR ) THEN	! Single mode
@@ -241,19 +241,19 @@
 
 	    WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1                // ' linked'')') N
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 	    TEXT = '        Use SEPARATE_PAR to separate'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 
 	    FREE_PAR = -1
 	    RETURN
 	  ELSE IF( TABLE_FREE( N ) .EQ. 0 ) THEN
-	  
+
             WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1                // ' free'')') N
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 	    TEXT = '        This call to FREE_PAR is ignored'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 
 	    FREE_PAR = 0
 	    RETURN
@@ -271,13 +271,13 @@
 	    END IF
 	  END DO
 	  FREE_PAR = 1
-	ELSE	
+	ELSE
 
 *   Unknown mode
 	    TEXT = 'ERROR > invalid arguement'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 	    TEXT = '        This call to FREE_PAR is ignored'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 
 	  FREE_PAR = -1
 	END IF

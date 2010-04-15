@@ -18,7 +18,7 @@
 *     :  VALUE, STATUS )
 
 *  Description:
-*     Tell the application that a request has been received to cancel an 
+*     Tell the application that a request has been received to cancel an
 *     action which is currently waiting to be rescheduled.
 
 *  Arguments:
@@ -37,14 +37,14 @@
 *  Algorithm:
 *     Check the named action is in progress.
 *     Give the command-line parameter string to the parameter system.
-*     Call DTASK_APPLIC to inform the application code what has 
+*     Call DTASK_APPLIC to inform the application code what has
 *     happened.
-*     Check the status returned from the application to see whether the 
+*     Check the status returned from the application to see whether the
 *     action is to be terminated or whether it is to continue
-*     rescheduling. 
+*     rescheduling.
 *     In any case, send an acknowledgement to the task which requested
-*     the CANCEL. 
-*     Send an acknowledgement to the task which issued the obey if the 
+*     the CANCEL.
+*     Send an acknowledgement to the task which issued the obey if the
 *     action has ended.
 
 *  Copyright:
@@ -115,7 +115,7 @@
 *     01-MAR-1990: call DTASK_APPLIC all arguments required by ACT (and more);
 *                  improve status checking, correct comments (AAOEPP::WFL)
 *     09-APR-1991: always send two acknowledgements if the action was
-*                  actually cancelled, two ensure that both transactions 
+*                  actually cancelled, two ensure that both transactions
 *                  are closed-down (REVAD::BDK)
 *     25-APR-1991 (REVAD::BDK):
 *        Revise INCLUDE files
@@ -154,7 +154,7 @@
 
 *  Bugs:
 *     <description of any "bugs" which have not been fixed>
-*     Authors 
+*     Authors
 *     John Cooke (REVS::JAC) 22May84
 *     {note_new_bugs_here}
 
@@ -188,20 +188,20 @@
 
 *  Local Variables:
       INTEGER SEQ                     ! sequence number for stage of
-                                      ! action 
-      INTEGER SCHEDTIME               ! requested reschedule time in 
+                                      ! action
+      INTEGER SCHEDTIME               ! requested reschedule time in
                                       ! millisec
       INTEGER ACODE                   ! parameter system code number for
-                                      ! the action 
+                                      ! the action
       INTEGER MESSTATUS               ! status returned in acknowledgment
       INTEGER MESLEN                  ! length of VALUE
       INTEGER PATHOB                  ! path to task issuing original OBEY
       INTEGER MESSIDOB                ! messid of original OBEY
       CHARACTER*(SUBPAR__NAMELEN) ANAME    ! action name
       CHARACTER*(SUBPAR__NAMELEN) AKEY     ! action keyword
-      LOGICAL HANDLED                 ! did DTASK_ACT_SCHED handle the 
+      LOGICAL HANDLED                 ! did DTASK_ACT_SCHED handle the
                                       ! reschedule
-      INTEGER REQUEST                 ! status signalling reschedule 
+      INTEGER REQUEST                 ! status signalling reschedule
                                       ! type requested
 *.
 
@@ -220,13 +220,13 @@
 *   Call the application.
 *
       CALL DTASK_APPLIC ( CANCEL, ACODE, ANAME, ACTPTR, SEQ,
-     :  VALUE, SCHEDTIME, REQUEST, STATUS ) 
+     :  VALUE, SCHEDTIME, REQUEST, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 *
 *      Check for a reschedule request
 *
-         CALL DTASK_ACT_SCHED ( REQUEST, ACTPTR, SEQ, SCHEDTIME, 
+         CALL DTASK_ACT_SCHED ( REQUEST, ACTPTR, SEQ, SCHEDTIME,
      :     HANDLED, STATUS )
 
          IF ( HANDLED ) THEN
@@ -242,7 +242,7 @@
 *
                MESSTATUS = STATUS
                CALL ERR_REP ( ' ',
-     :           'failed to reschedule on receipt of cancel ' // 
+     :           'failed to reschedule on receipt of cancel ' //
      :           AKEY, STATUS )
                CALL DTASK_ESETK ( 'STAT', STATUS )
                CALL ERR_REP ( ' ', '^STAT', STATUS )
@@ -252,8 +252,8 @@
                CALL DTASK_REMLST ( ANAME, STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL DTASK_ESETK ( 'STAT', STATUS )
-                  CALL ERR_REP ( ' ', 'DTASK_CANCEL: ^STAT', 
-     :              STATUS ) 
+                  CALL ERR_REP ( ' ', 'DTASK_CANCEL: ^STAT',
+     :              STATUS )
                ENDIF
 *
 *            Close down the original OBEY transaction.
@@ -265,8 +265,8 @@
 
             ELSE
 *
-*         The action has been rescheduled to complete the cancellation. 
-*         Tell the process which issued the cancel that everything is ok. 
+*         The action has been rescheduled to complete the cancellation.
+*         Tell the process which issued the cancel that everything is ok.
 *
                MESSTATUS = DTASK__ACTCANCEL
 
@@ -299,11 +299,11 @@
 *
 *         Invalid status.
 *
-            CALL ERR_REP ( ' ', 
+            CALL ERR_REP ( ' ',
      :        'the application returned ACT__END request', REQUEST )
-            CALL ERR_REP ( ' ', 
+            CALL ERR_REP ( ' ',
      :        'this is invalid in response to a CANCEL command',
-     :        REQUEST ) 
+     :        REQUEST )
 
             MESSTATUS = DTASK__ACTNOTCANCEL
 
@@ -332,7 +332,7 @@
 *   Close down the CANCEL transaction.
 *
       STATUS = SAI__OK
-      CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CANCEL, AKEY, 
+      CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CANCEL, AKEY,
      :  VALUE, STATUS )
 
       END

@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_CONVOLVE_ERRORS (A, A_ERR, B, N1, N2, NMID, 
+      SUBROUTINE JCMT_CONVOLVE_ERRORS (A, A_ERR, B, N1, N2, NMID,
      :   ABAD, RNORM, R, R_ERR, STATUS)
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_CONVOLVE (A, A_ERR, B, N1, N2, NMID, ABAD, RNORM, R, 
+*     CALL JCMT_CONVOLVE (A, A_ERR, B, N1, N2, NMID, ABAD, RNORM, R,
 *    :   R_ERR, STATUS)
 
 *  Description:
@@ -26,7 +26,7 @@
 *
 *     r_err = sqrt (sum[convolution_fn * a_err)**2] / rnorm
 *
-*     Errors associated with bad data points are ignored. After this 
+*     Errors associated with bad data points are ignored. After this
 *     process the errors can no longer be considered independent.
 *
 *     This routine is essentially a rewritten version of XCONV from the
@@ -57,7 +57,7 @@
 
 *  [optional_subroutine_items]...
 *  Authors:
-*     REVAD::JFL 
+*     REVAD::JFL
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -1,4 +1,4 @@
-      SUBROUTINE CDCRA9( POUT, PTITL, AUTO, NAME, 
+      SUBROUTINE CDCRA9( POUT, PTITL, AUTO, NAME,
      :                   RA, DEC,
      :                   NDF, BAND, INDX,
      :                   FID, OGID, OUTNDF, STATUS )
@@ -20,7 +20,7 @@
 *     This subroutine creates an one-dimension NDF file to contain the
 *     coadded crossing trace section. The created NDF will inherit the
 *     IRAS extension of a given NDF and the row containning the coadded
-*     trace will have the given index.  
+*     trace will have the given index.
 
 *  Arguments:
 *     POUT = CHARACTER*( * ) (Given)
@@ -55,7 +55,7 @@
 *     FID = INTEGER (Given)
 *        ID of the logging file.
 *     OGID = INTEGER (Given)
-*        ID of the group containning the name of the output NDF files. 
+*        ID of the group containning the name of the output NDF files.
 *     OUTNDF = INTEGER (Returned)
 *        The ID of the output NDF.
 *     STATUS = INTEGER (Given and Returned)
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,10 +98,10 @@
       INTEGER BAND, INDX
       INTEGER FID
       INTEGER OGID
-       
+
 *  Arguments Returned:
       INTEGER OUTNDF
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -113,7 +113,7 @@
       CHARACTER BANDST           ! String form of waveband number
       CHARACTER*( 80 ) CLIST     ! List of components to be propagated
       CHARACTER*( 40 ) DEFNAM    ! Default file name for request filename
-      INTEGER LBND( 2 ), UBND( 2 ) ! Lower and Upper bounds of the NDF 
+      INTEGER LBND( 2 ), UBND( 2 ) ! Lower and Upper bounds of the NDF
       CHARACTER*( DAT__SZLOC ) LOC1 ! Locator to the IRAS extension
       CHARACTER*( DAT__SZLOC ) LOC2 ! Locator to the CRDD_INFO structure
       CHARACTER*( DAT__SZLOC ) LOC3 ! Locator to the REF_RA component
@@ -145,14 +145,14 @@
 *  fails and the auto option is set.
 *  If the auto option is not set the user is prompted for individual file names
 *  for all files using the best name the subroutine can generate as default.
-* 
+*
 *  Determine whether the name is consistent with being part of a file name
       NAMEFL = CHR_ISNAM( NAME )
       IF ( NAMEFL ) THEN
 *  If the name is suitable find its length
          NAMELN = CHR_LEN( NAME )
       ELSE
-*  If the name is not suitable truncate the name to the first space 
+*  If the name is not suitable truncate the name to the first space
          CALL CHR_TRUNC( ' ', NAME )
 *  Check that this is now a suitable filename
          NAMEFL = CHR_ISNAM( NAME )
@@ -177,26 +177,26 @@
 
 *  If the status is bad return
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Find the band character to append to the file name
       CALL CHR_ITOC( BAND, BANDST, NCHAR )
 
 *  If the name was a valid file name
       IF ( NAMEFL ) THEN
-      
+
 *  Convert the name to lower case
          CALL CHR_LCASE( NAME )
 *  Construct the name of the output NDF containing the file name
          ONAM( 1 ) = 'coadded_'//NAME( : NAMELN )//'_b'//BANDST
-      
+
       ELSE
 *  Construct the name of the output NDF without the filename
          ONAM( 1 ) = 'coadded_b'//BANDST
 
       END IF
-      
+
 *  Construct the title of the output NDF.
-      TITLE = 'IRAS90 COADDCRDD: '//ONAM( 1 )       
+      TITLE = 'IRAS90 COADDCRDD: '//ONAM( 1 )
 
 *  If not in automatic mode, using the constructed name and title as
 *  prompt defaults and get a name and a title from the environment.
@@ -204,7 +204,7 @@
 
 *  Set first attempt at defining a name as default name
          DEFNAM = ONAM( 1 )
-100      CONTINUE                    ! Return point for invalid file name 
+100      CONTINUE                    ! Return point for invalid file name
 
 *  Obtain file name from the user
          CALL MSG_OUT('COADDCRDD_MSG',
@@ -222,17 +222,17 @@
      :      'Name entered is not a valid filename, please try again',
      :      STATUS )
             GOTO 100
-      
-*  Check status 
+
+*  Check status
          ELSE IF ( STATUS .NE. SAI__OK) THEN
             RETURN
-      
+
          ELSE
 
-*  The name entered by the user is a valid filename      
+*  The name entered by the user is a valid filename
 *  Create default title from the file name
             TITLE = 'IRAS90 COADDCRDD: '//ONAM( 1 )
-      
+
 *  Obtain title from user
             CALL PAR_DEF0C( PTITL, TITLE, STATUS )
             CALL PAR_GET0C( PTITL, TITLE, STATUS )
@@ -241,11 +241,11 @@
 *  Check status
             IF ( STATUS .EQ. PAR__NULL ) GOTO 100
             IF ( STATUS .NE. SAI__OK ) RETURN
-            
+
          END IF
       END IF
       NAMELN = CHR_LEN( ONAM( 1 ) )
-      
+
 *  Put the name of the output NDF in the group.
       CALL GRP_PUT( OGID, 1, ONAM, 0, STATUS )
 
@@ -258,7 +258,7 @@
      :       /'EXTENSION(IRAS)'
       CALL NDG_NDFPR( NDF, CLIST, OGID, NINDX, OUTNDF, STATUS )
 
-*  Modify the reference RA and Dec - if the reference position is given in an 
+*  Modify the reference RA and Dec - if the reference position is given in an
 *  input NDF the same position will overwrite the template reference position,
 *  if the reference position was given by the user, this will be entered as the
 *  reference position.
@@ -274,7 +274,7 @@
 
 *  Assign the new title to the created NDF.
       CALL NDF_CPUT( TITLE, OUTNDF, 'Title', STATUS )
-      
+
 *  Get the bound of the created NDF.
       CALL NDF_BOUND( OUTNDF, 2, LBND, UBND, NDIM, STATUS )
 
@@ -311,5 +311,5 @@
       CALL MSG_OUT( 'CDONDF_MSG1', 'NDF file ^FLNM is created to '/
      :             /'contain the coadded crossing(s), from waveband '/
      :             /'^WAVE, of the expected source ^SRNM.', STATUS )
-      CALL MSG_BLANK( STATUS )  
+      CALL MSG_BLANK( STATUS )
       END

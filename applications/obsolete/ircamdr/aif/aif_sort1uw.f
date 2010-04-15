@@ -1,4 +1,4 @@
- 
+
 *+  AIF_SORT1UW - sort a 1-D array of type INTEGER*2
       SUBROUTINE AIF_SORT1UW( DIM, ARRAY, STATUS )
 *    Description :
@@ -64,44 +64,44 @@
       INTEGER*2
      :  CURVAL       ! current smallest value during sorting
 *-
- 
+
 *   check for error on entry
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *      loop through the array
          DO TEST = 1,DIM
- 
+
 *         initialise index to current element and current value
             CURR   = TEST
             CURVAL = ARRAY( TEST )
- 
+
 *         compare all ARRAY elements after test element
 *         against current value
- 
+
             DO INDEX = TEST+1, DIM
- 
+
                IF( ARRAY( INDEX ) .LT. CURVAL ) THEN
- 
+
 *               have found a value in list which is less than current
 *               smallest value, this element becomes new current element
                   CURR   = INDEX
                   CURVAL = ARRAY( INDEX )
- 
+
                ENDIF
- 
+
             ENDDO
- 
+
             IF( CURR .NE. TEST ) THEN
- 
+
 *            a smaller value than the test value was found
 *            so swap the values round
                ARRAY( CURR ) = ARRAY( TEST )
                ARRAY( TEST ) = CURVAL
- 
+
             ENDIF
- 
+
          ENDDO
- 
+
       ENDIF
- 
+
       END

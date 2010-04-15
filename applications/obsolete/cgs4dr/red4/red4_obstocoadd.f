@@ -9,7 +9,7 @@
 *    Parameters :
 *     OBS_FILE  = CHARACTER*(*)( READ )
 *         The observation file name (Oyymmdd_oooo or
-*         ODIR:Oyymmdd_oooo) 
+*         ODIR:Oyymmdd_oooo)
 *     COADD_NAME = CHARACTER*(*)( WRITE )
 *         The name of the corresponding COADD structure (O_oooo)
 *     STATUS    = INTEGER( UPDATE )
@@ -25,7 +25,7 @@
 *     24-Feb-1991: Some error reporting mistakes fixed,
 *                  which would have made this routine
 *                  fail under ADAM V1.9.                           (SMB)
-*     22-Feb-1993: Conform to error strategy                       (PND)  
+*     22-Feb-1993: Conform to error strategy                       (PND)
 *     10-Nov-1994: Make vaguely portable                           (AB)
 *    endhistory
 *    Type Definitions :
@@ -76,7 +76,7 @@
       IF ( BUFFER(1:1) .EQ. 'O' .OR. BUFFER(1:1) .EQ. 'o') THEN
 
 *      Remove the "yymmdd" characters lying between this "O"
-*      and the "_". 
+*      and the "_".
          UNDER_POS = INDEX( BUFFER, '_' )
 
 *      Check that an underscore has been found, otherwise the

@@ -12,8 +12,8 @@
 *   To plot a fit to a line profile.
 
 * Description:
-*   If pltdat is true then the line profile itself will be plotted, as 
-*   well as a plot of the residuals on the fit. Otherwise a plot of the 
+*   If pltdat is true then the line profile itself will be plotted, as
+*   well as a plot of the residuals on the fit. Otherwise a plot of the
 *   line profile is assumed already present.
 
 * Parameters:-

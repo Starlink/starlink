@@ -21,13 +21,13 @@
 
 *  Description:
 *     This application creates a new FluxFrame and optionally initialises
-*     its attributes. 
+*     its attributes.
 *
-*     A FluxFrame is a specialised form of one-dimensional Frame which 
+*     A FluxFrame is a specialised form of one-dimensional Frame which
 *     represents various systems used to represent the signal level in an
-*     observation. The particular coordinate system to be used is specified 
-*     by setting the FluxFrame's System attribute qualified, as necessary, by 
-*     other attributes such as the units, etc (see the description of the 
+*     observation. The particular coordinate system to be used is specified
+*     by setting the FluxFrame's System attribute qualified, as necessary, by
+*     other attributes such as the units, etc (see the description of the
 *     System attribute for details).
 *
 *     All flux values are assumed to be measured at the same frequency or
@@ -39,23 +39,23 @@
 
 *  ADAM Parameters:
 *     SPECFRM = LITERAL (Read)
-*        An NDF or text file holding a SpecFrame describing the spectral 
+*        An NDF or text file holding a SpecFrame describing the spectral
 *        coordinate system in which the SPECVAL parameter is given. Only
-*        accessed if a non-null value is supplied for SPECVAL. If an NDF is 
+*        accessed if a non-null value is supplied for SPECVAL. If an NDF is
 *        supplied, the current Frame in the WCS FrameSet will be used
 *        (which must be a SpecFrame)
 *     SPECVAL = _DOUBLE (Read)
 *        The spectral value to which the flux values refer, given in the
-*        spectral coordinate system specified by SPECFRM. The value supplied 
-*        for the SPECVAL parameter becomes the default value for the SpecVal 
-*        attribute. A null value (!) may be supplied if the spectral position 
-*        is unknown (in which case no value will be set for SpecVal), but this 
-*        may result in it not being possible for the AST_CONVERT function to 
-*        determine a Mapping between the new FluxFrame and some other 
+*        spectral coordinate system specified by SPECFRM. The value supplied
+*        for the SPECVAL parameter becomes the default value for the SpecVal
+*        attribute. A null value (!) may be supplied if the spectral position
+*        is unknown (in which case no value will be set for SpecVal), but this
+*        may result in it not being possible for the AST_CONVERT function to
+*        determine a Mapping between the new FluxFrame and some other
 *        FluxFrames.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new FluxFrame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new FluxFrame.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new FluxFrame.
 
@@ -98,7 +98,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'PAR_ERR'          ! Parameter system error constants 
+      INCLUDE 'PAR_ERR'          ! Parameter system error constants
 
 *  External References:
       EXTERNAL AST_ISASPECFRAME
@@ -112,7 +112,7 @@
       INTEGER SPECFRM
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -129,7 +129,7 @@
 *  If a value was supplied for SPECVAL, get a SpecFrame describing the
 *  coordinate system to which the SPECVAL value refers.
       IF( SPECVAL .NE. AST__BAD ) THEN
-         CALL KPG1_GTOBJ( 'SPECFRM', 'SpecFrame', AST_ISASPECFRAME, 
+         CALL KPG1_GTOBJ( 'SPECFRM', 'SpecFrame', AST_ISASPECFRAME,
      :                    SPECFRM, STATUS )
       ELSE
          SPECFRM = AST__NULL

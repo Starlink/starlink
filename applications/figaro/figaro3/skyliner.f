@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,7 +101,7 @@
       INTEGER IAUCO              ! Upper-bound of axis centres of object
                                  ! spectra
       INTEGER IPNTR( 1 )         ! Pointer to mapped input
-                                 ! object-spectrum data array 
+                                 ! object-spectrum data array
       REAL LINLAM( 2, NLINES )   ! Wavelengths of the start and
                                  ! end of the emission lines to
                                  ! interpolate across
@@ -116,7 +116,7 @@
       INTEGER OPNTR( 1 )         ! Pointer to mapped output
                                  ! object-spectrum data array
       INTEGER PIND( NWAVE )      ! Indices of pixels that lie just below
-                                 ! the OI bounds and centre in spectrum 
+                                 ! the OI bounds and centre in spectrum
       REAL RPIND                 ! Pixel index of emission line's
                                  ! nominal central wavelength
       INTEGER SAEL               ! Number of elements in sky spectrum
@@ -180,7 +180,7 @@
      :     /'interpolated across before using SKYLINER.', STATUS )
          GOTO 999
       END IF
-      
+
 *  There must be a wavelength calibration.  Look for an axis component.
       VALID = .FALSE.
       CALL NDF_STATE( NDFS, 'Axis', THERE, STATUS )
@@ -257,7 +257,7 @@
      :     /'interpolated across before using SKYLINER.', STATUS )
          GOTO 999
       END IF
-      
+
 *  There must be a wavelength calibration in the input NDF.  Look for
 *  an axis component.
       VALID = .FALSE.
@@ -353,15 +353,15 @@
       CALL KPG1_AXLVR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ),
      :                 CALLAM( 3 ), PIND( 3 ), SLAM, STATUS )
 
-*  Circumvent the bug in the above routine. 
-      PIND( 3 ) = ABS( PIND( 3 ) )   
+*  Circumvent the bug in the above routine.
+      PIND( 3 ) = ABS( PIND( 3 ) )
 
 *  Finally get the centre value.  This is a floating-point value.
 *  Convert it to integer.
       CALL KPG1_AINDR( LBND, UBND, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ), 1,
      :                 CALLAM( 2 ), RPIND, STATUS )
       PIND( 2 ) = NINT( RPIND )
-      
+
 *  Create the two-dimensional output spectrum.
       CALL NDF_PROP( NDFI, 'Axis,Variance,Quality,Units', 'OUT', NDFO,
      :               STATUS )
@@ -391,7 +391,7 @@
          CALL KPG1_AXLVR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ),
      :                    LINLAM( 2, I ), FPIND( 2, I ), SLAM, STATUS )
 
-*  Circumvent the bug in the above routine. 
+*  Circumvent the bug in the above routine.
          FPIND( 2, I ) = ABS( FPIND( 2, I ) )
 
       END DO

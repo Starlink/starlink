@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine saves the version of a parameter keyed by an integer
-*     value into the ADAM GLOBAL parameter file.  It should be called 
+*     value into the ADAM GLOBAL parameter file.  It should be called
 *     after a parameter is accessed, if the parameter is key-sensitive
-*     and has WRITE global association.  If the parameter has no value 
+*     and has WRITE global association.  If the parameter has no value
 *     when this routine is called, nothing is saved.
 
 *  Arguments:
@@ -26,14 +26,14 @@
 *        The key to be used.  The value of the parameter will be saved
 *        keyed by this value in the ADAM parameter file.
 *     SLOC = CHARACTER * ( * ) (Given)
-*        A locator to the keyed parameters structure.  Should be opened 
+*        A locator to the keyed parameters structure.  Should be opened
 *        for UPDATE access.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     The keyed values are stored in the same ADAM parameter file
-*     as the variables which PAR looks for them in, within a 
+*     as the variables which PAR looks for them in, within a
 *     structure called CCDPACK_KEYPARS.
 *
 *     Meticulous explicit error processing is not undertaken in this
@@ -80,12 +80,12 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER KEY
       CHARACTER * ( DAT__SZLOC ) SLOC
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -101,7 +101,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Try to get a locator for the current value of the parameter we are 
+*  Try to get a locator for the current value of the parameter we are
 *  being asked to save.
       CALL DAT_EXIST( PARAM, 'READ', VLOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -109,7 +109,7 @@
          CALL ERR_ANNUL( STATUS )
       ELSE
 
-*  Get a locator for the component of the keyed parameters structure 
+*  Get a locator for the component of the keyed parameters structure
 *  representing the parameter we are interested in; if none exists,
 *  create one.
          CALL DAT_THERE( SLOC, PARAM, THERE, STATUS )

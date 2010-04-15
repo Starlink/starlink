@@ -14,15 +14,15 @@
 
 *  Description:
 *     This routine create following components in the IMAGE_INFO
-*     structure of a IRAS Sky Survey Atlas NDF. 
+*     structure of a IRAS Sky Survey Atlas NDF.
 *            HCON <_INTEGER>
 *            ISSAFLD <_INTEGER>
 *     Where
 *        HCON - the hours confirmation of the ISSA image.
 *        ISSAFLD - Field number of the image.
-*                    
+*
 *     The components will be assigned values according to the
-*     information obtained from the FITS extension of the NDF.   
+*     information obtained from the FITS extension of the NDF.
 
 *  Arguments:
 *     NCARD = INTEGER (Given)
@@ -50,18 +50,18 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                          
+
 *  Arguments Given:
       INTEGER NCARD
       CHARACTER FITS( NCARD )*(*)
       CHARACTER LOC*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -73,7 +73,7 @@
 
       INTEGER CARD               ! Card number of a FITS keyword
       INTEGER FLDNUM             ! Sky plate number of the image
-      INTEGER FLDPSN             ! Position of plate number string 
+      INTEGER FLDPSN             ! Position of plate number string
       INTEGER HCNPSN             ! Position of hour confirmation string
       INTEGER HCON               ! Hours confirmation of the image
       INTEGER STCARD             ! Start card number when search FITS
@@ -96,17 +96,17 @@
 *  Remove all blanks in the string and convert to upper case.
       CALL CHR_RMBLK( OBJECT )
       CALL CHR_UCASE( OBJECT )
-      
+
 *  Find the positions of 'F' and 'H' in OBJECT string.
       FLDPSN = INDEX( OBJECT, 'F' )
       HCNPSN = INDEX( OBJECT, 'H' )
 
-*  Extract the field number string and the hours confirmation string 
+*  Extract the field number string and the hours confirmation string
 *  from the OBJECT string.
       FLDSTR = OBJECT( FLDPSN + 1 : HCNPSN - 1 )
       HCNSTR = OBJECT( HCNPSN + 1 : )
 
-*  Get the plate number and the hours confirmation from their string 
+*  Get the plate number and the hours confirmation from their string
 *  expression.
       CALL CHR_CTOI( FLDSTR, FLDNUM, STATUS )
       CALL CHR_CTOI( HCNSTR, HCON, STATUS )

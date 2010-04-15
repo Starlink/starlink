@@ -6,7 +6,7 @@ C
 C This routine saves the current PGPLOT attributes in a private storage
 C area. They can be restored by calling PGUNSA (unsave). Attributes
 C saved are: character font, character height, color index, fill-area
-C style, line style, line width, pen position, arrow-head style, 
+C style, line style, line width, pen position, arrow-head style,
 C hatching style. Color representation is not saved.
 C
 C Calls to PGSAVE and PGUNSA should always be paired. Up to 20 copies
@@ -55,7 +55,7 @@ C          CALL PGQWIN(WIN(1,LEV), WIN(2,LEV), WIN(3,LEV), WIN(4,LEV))
           CALL PGQTBG(TBG(LEV))
           CALL PGQHS(HSA(LEV), HSS(LEV), HSP(LEV))
       END IF
-      RETURN     
+      RETURN
 C
 C*PGUNSA -- restore PGPLOT attributes
 C%void cpgunsa(void);
@@ -84,5 +84,5 @@ C          CALL PGSWIN(WIN(1,LEV), WIN(2,LEV), WIN(3,LEV), WIN(4,LEV))
           CALL PGSHS(HSA(LEV), HSS(LEV), HSP(LEV))
           LEV = LEV-1
       END IF
-      RETURN     
+      RETURN
       END

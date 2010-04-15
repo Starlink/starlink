@@ -1,4 +1,4 @@
-      SUBROUTINE GET0L( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, VALUE, 
+      SUBROUTINE GET0L( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, VALUE,
      :                  STATUS )
 *+
 *  Name:
@@ -16,18 +16,18 @@
 *  Description:
 *     A string value is obtained from the list of suplied parameter
 *     values or from the user. This value is converted into a logical value.
-*     (TRUE, T, YES, Y, FALSE, F, NO, N are recognised, case insensitive). If 
-*     this fails the user is reprompted. 
-      
+*     (TRUE, T, YES, Y, FALSE, F, NO, N are recognised, case insensitive). If
+*     this fails the user is reprompted.
+
 *  Arguments:
 *     PARAMS = CHARACTER * ( * ) (Given)
 *        A string containing the list of command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
-*        supplied default value will be returned if no value has 
+*        supplied default value will be returned if no value has
 *        been supplied. Otherwise, the user is prompted if no value
 *        has been supplied.
 *     COMM = CHARACTER * ( * ) (Given)
@@ -55,13 +55,13 @@
 
 *-
 
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -70,10 +70,10 @@
       CHARACTER * ( * ) PROMPT
       LOGICAL DEF
       LOGICAL DEFVAL
-      
+
 *  Arguments Returned:
       LOGICAL VALUE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -111,7 +111,7 @@
 *  Get the text string. APpend "(Y/N)" to the prompt strin
       CALL GET0C( PARAMS, POS, OPT, COMM, PRM, DEFSTR( : NC ), STR,
      :            STATUS )
- 
+
 *  Jump to here when a string value has been obtained.
  10   CONTINUE
 
@@ -120,7 +120,7 @@
 
 *  Attempt to convert the string to a logical value.
       CALL CHR_CTOL( STR, VALUE, STATUS )
-      
+
 *  If any error occurred, annul the error, report another error and flush
 *  it. Then re-prompt the user.
       IF( STATUS .NE. SAI__OK ) THEN
@@ -132,12 +132,12 @@
      :                 '''^STR'' to a logical value.', STATUS )
          CALL ERR_FLUSH( STATUS )
 
-         CALL RDSTR( COMM, PRM, DEFSTR( : NC ), STR, STATUS )             
+         CALL RDSTR( COMM, PRM, DEFSTR( : NC ), STR, STATUS )
          GO TO 10
 
       END IF
 
 *  Jump to here if an error occurs.
  999  CONTINUE
-      
+
       END

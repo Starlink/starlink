@@ -36,7 +36,7 @@
 
 *  Parameters
       INTEGER SIZE,NY,ASTART,BSTART,OESEP,WIDTH
-      CHARACTER*(*) AP                            
+      CHARACTER*(*) AP
       REAL BIAS,PHOTADU,RDN
       REAL I1(NY,SIZE),I2(NY,SIZE)
       REAL INT(SIZE),STOKES(SIZE),VSTOKES(SIZE)
@@ -48,12 +48,12 @@
       INTEGER PT(8)
       REAL STAR,SKY
       REAL RAT
-                                                        
-*  Copy X axis to output           
+
+*  Copy X axis to output
       DO I=1,SIZE
          OX(I)=IX(I)
       ENDDO
-                   
+
 *  Determine position ranges to extract data over
       IF (AP .EQ. 'A') THEN
           PT(1) = ASTART
@@ -66,17 +66,17 @@
           PT(3) = ASTART
           PT(4) = ASTART+OESEP
       ENDIF
-      
+
 *  Extract 8 spectra (star and sky for each of O and E and each
 *  of two polarization states)
       DO I=1,SIZE
           DO J=1,4
-              SPEC2(J) = I1(PT(J),I) 
+              SPEC2(J) = I1(PT(J),I)
               SPEC2(J+4) = I2(PT(J),I)
               DO K=1,WIDTH-1
                   SPEC2(J) = SPEC2(J)+I1(PT(J)+K,I)
                   SPEC2(J+4) = SPEC2(J+4)+I2(PT(J)+K,I)
-              ENDDO 
+              ENDDO
 
 *  Subtract bias
               SPEC2(J)=SPEC2(J) - BIAS * REAL(WIDTH)
@@ -86,8 +86,8 @@
               SPEC2(J)=SPEC2(J)*PHOTADU
               SPEC2(J+4)=SPEC2(J+4)*PHOTADU
           ENDDO
-    
-*  Determine ratio of E and O data                                              
+
+*  Determine ratio of E and O data
           IF (spec2(2)+spec2(6) .NE. 0.0) THEN
              RAT = (SPEC2(1)+SPEC2(5))/(SPEC2(2)+SPEC2(6))
           ELSE
@@ -98,7 +98,7 @@
           SPEC2(2) = SPEC2(2)*RAT
           SPEC2(6) = SPEC2(6)*RAT
 
-*  Determine star intensity 
+*  Determine star intensity
           STAR = SPEC2(1)+SPEC2(2)+SPEC2(5)+SPEC2(6)
 
 *  Determine sky intensity
@@ -109,7 +109,7 @@
 
 *  Variance is photon statistics (quadratic sum of star and sky photons)
 *   plus readout noise (scaled by total number of pixels used, 8*width)
-          VSTOKES(I) = SQRT(STAR*STAR+SKY*SKY) 
+          VSTOKES(I) = SQRT(STAR*STAR+SKY*SKY)
      :        + 8.0*RDN*RDN*REAL(WIDTH)
 
 *  Determine Stokes parameter for star
@@ -124,7 +124,7 @@
       ENDDO
       END
 
-      
+
       SUBROUTINE TSP_CCD2STOKES(NY,SIZE,I1,I2,ASTART,BSTART,OESEP,
      :   WIDTH,AP,BIAS,RDN,PHOTADU,INT,STOKES,VSTOKES,IX,OX)
 *+
@@ -162,7 +162,7 @@
 
 *  Parameters
       INTEGER SIZE,NY,ASTART,BSTART,OESEP,WIDTH
-      CHARACTER*(*) AP                            
+      CHARACTER*(*) AP
       REAL BIAS,PHOTADU,RDN
       REAL I1(NY,SIZE),I2(NY,SIZE)
       REAL INT(SIZE),STOKES(SIZE),VSTOKES(SIZE)
@@ -177,12 +177,12 @@
       INTEGER STATUS
 
       STATUS=0
-  
+
 *  Copy X axis to output
       DO I=1,SIZE
          OX(I)=IX(I)
       ENDDO
-                   
+
 *  Determine position ranges to extract data over
       IF (AP .EQ. 'A') THEN
           PT(1) = ASTART
@@ -195,18 +195,18 @@
           PT(3) = ASTART
           PT(4) = ASTART+OESEP
       ENDIF
-      
+
 *  Extract 8 spectra (star and sky for each of O and E and each
 *  of two polarization states)
-      
+
       DO I=1,SIZE
           DO J=1,4
-              SPEC2(J) = I1(PT(J),I) 
+              SPEC2(J) = I1(PT(J),I)
               SPEC2(J+4) = I2(PT(J),I)
               DO K=1,WIDTH-1
                   SPEC2(J) = SPEC2(J)+I1(PT(J)+K,I)
                   SPEC2(J+4) = SPEC2(J+4)+I2(PT(J)+K,I)
-              ENDDO 
+              ENDDO
 
 *  Subtract bias
               SPEC2(J)=SPEC2(J) - BIAS * REAL(WIDTH)
@@ -216,8 +216,8 @@
               SPEC2(J)=SPEC2(J)*PHOTADU
               SPEC2(J+4)=SPEC2(J+4)*PHOTADU
           ENDDO
-                            
-*  Determine star intensity                      
+
+*  Determine star intensity
           STAR = SPEC2(1)+SPEC2(2)+SPEC2(5)+SPEC2(6)
 
 *  Determine sky intensity
@@ -228,7 +228,7 @@
 
 *  Variance is photon statistics (quadratic sum of star and sky photons)
 *   plus readout noise (scaled by total number of pixels used, 8*width)
-          VSTOKES(I) = SQRT(STAR*STAR+SKY*SKY) 
+          VSTOKES(I) = SQRT(STAR*STAR+SKY*SKY)
      :        + 8.0*RDN*RDN*REAL(WIDTH)
 
 *   Determine ratio

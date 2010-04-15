@@ -23,7 +23,7 @@ C                   the string.
 C
 C     Note -
 C
-C     The tidying process simply changes all non-printing 
+C     The tidying process simply changes all non-printing
 C     characters to blanks.  It is not as dramatic a process as
 C     that performed by ICH_CLEAN.
 C

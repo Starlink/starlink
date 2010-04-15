@@ -18,7 +18,7 @@
 *     This subroutine is used to draw parallel sections specified by
 *     their start positions and their lengths. If the given length of a
 *     section is 0, A longest parallel section will be drawn over the
-*     image. 
+*     image.
 
 *  Arguments:
 *     IRA = INTEGER (Given)
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

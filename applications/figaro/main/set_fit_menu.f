@@ -330,15 +330,15 @@ C      data rout/'N1','N2','LM'/
 * Current model/type
 
           moditm = deccntr(FIT_MODEL)
- 
-          if(moditm.eq.LORENTZ_MODEL) then 
+
+          if(moditm.eq.LORENTZ_MODEL) then
              moditm = moditm - 2
           else
              if(moditm.eq.CAUCHY_MODEL) moditm = moditm - 1
           end if
-          
+
           if(moditm.ge.0) moditm = moditm - 1 + OPT_GAUSSIAN
-          
+
           typitm = deccntr(FIT_TYPE)
           if(typitm.gt.0) typitm = typitm - 1 + OPT_SINGLE
           if((deccntr(FIT_TYPE).eq.MULTIPLE).and.
@@ -358,7 +358,7 @@ C      data rout/'N1','N2','LM'/
              dict(moditm)(69:75) = '*******'
              dict(typitm)(69:75) = '*******'
           end if
-          
+
 *          dict(OPT_OPT)(menlen(OPT_OPT):) = rout(opt_routines(1))//
 *     :         ', Dble - '//rout(opt_routines(2))//', Mult - '//
 *     :         rout(opt_routines(3))
@@ -367,14 +367,14 @@ C      data rout/'N1','N2','LM'/
 * remove blank line
 *          dict(OPT_OPT)(menlen(OPT_OPT):) = '                        '
 
-          
+
        else
-          
+
           ilen = menlen(OPT_TRANSFER)
           call chr_puti(' = ',dict(OPT_TRANSFER),ilen)
           call chr_puti(-deccntr(MAX_DECODE_CONTROL),dict(OPT_TRANSFER)
      :         ,ilen)
-          
+
        end if
 
 *  Display bimodality test before fitting?

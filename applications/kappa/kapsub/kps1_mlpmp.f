@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_MLPMP( NAX, FRM, MAP, NPOS, IN, FORWRD, IAXIS, 
+      SUBROUTINE KPS1_MLPMP( NAX, FRM, MAP, NPOS, IN, FORWRD, IAXIS,
      :                       OUT, WORK, STATUS )
 *+
 *  Name:
@@ -40,7 +40,7 @@
 *     OUT( NPOS ) = DOUBLE PRECISION (Returned)
 *        The required normalized output axis values.
 *     WORK( NPOS, NAX ) = DOUBLE PRECISION (Returned)
-*        Work space. 
+*        Work space.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
 
@@ -76,7 +76,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -108,8 +108,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Transform the supplied 1D positions into the supplied nD Frame.
-      CALL AST_TRANN( MAP, NPOS, 1, NPOS, IN, FORWRD, NAX, NPOS, 
-     :                WORK, STATUS ) 
+      CALL AST_TRANN( MAP, NPOS, 1, NPOS, IN, FORWRD, NAX, NPOS,
+     :                WORK, STATUS )
 
 *  Check each position.
       DO I = 1, NPOS
@@ -120,7 +120,7 @@
          END DO
 
 *  Normalise the position.
-         CALL AST_NORM( FRM, POS, STATUS ) 
+         CALL AST_NORM( FRM, POS, STATUS )
 
 *  Extract the required axis.
          OUT( I ) = POS( IAXIS )

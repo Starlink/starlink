@@ -77,7 +77,7 @@
 *     - When using non-planar coordinates, the coordinates should be
 *       given in degrees. Lines drawn between points are straight.
 *       Use GT_CIRCLE for drawing lines that follow great circles.
-*       
+*
 
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)

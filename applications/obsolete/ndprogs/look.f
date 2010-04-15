@@ -2,7 +2,7 @@
 C+
 C
 C   -------
-C   L O O K 
+C   L O O K
 C   -------
 C
 C   Description
@@ -30,10 +30,10 @@ C   ----------------------------
 C   IMAGE   Name of the structure containing the image. (character)
 C           (prompted for).
 C
-C   STAPIX  Start pixel in each dimension of the subset to be inspected. 
+C   STAPIX  Start pixel in each dimension of the subset to be inspected.
 C          (real, array)(prompted for).
 C
-C   ENDPIX  End pixel in each dimension of the subset to be inspected. 
+C   ENDPIX  End pixel in each dimension of the subset to be inspected.
 C           (real, array)(prompted for).
 C
 C
@@ -49,14 +49,14 @@ C
 C
 C   Method
 C   ------
-C   - The IMAGE structure is tested for the bad pixel flag. If it is found 
-C     and non-zero, magic values are assumed to be present and are left in 
+C   - The IMAGE structure is tested for the bad pixel flag. If it is found
+C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
-C   - The minimum and maximum values in the selected image subset are 
+C   - The minimum and maximum values in the selected image subset are
 C     obtained by calling the appropriate NDP_STATS routine. These are used
-C     to determine the maximum string length required to write out a data 
+C     to determine the maximum string length required to write out a data
 C     value.
-C   - A subroutine appropriate to the data type is called to display the 
+C   - A subroutine appropriate to the data type is called to display the
 C     data values. Dimension 2 of the array is accessed in reverse so that
 C     the display appears with the correct orientation.
 C
@@ -116,7 +116,7 @@ C
 C   Extensions to FORTRAN 77
 C   ------------------------
 C   DO WHILE / END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
-C                       
+C
 C
 C   Possible future upgrades
 C   ------------------------
@@ -133,7 +133,7 @@ C
 C   History
 C   -------
 C   01-FEB-1989  - Original program
-C   22-JUL-1990   - Modified to pass the sizes of adjustable arrays to 
+C   22-JUL-1990   - Modified to pass the sizes of adjustable arrays to
 C                   subroutines as individual variables rather than as
 C                   elements of arrays. This change was made necessary by
 C                   the VAX Fortran 5.2 compiler. (PMA)
@@ -201,7 +201,7 @@ C
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
-C   Get information about IMAGE             
+C   Get information about IMAGE
 C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500

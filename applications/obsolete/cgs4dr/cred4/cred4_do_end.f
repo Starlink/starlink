@@ -33,7 +33,7 @@
 *    Check status on entry.
       IF (STATUS .NE. SAI__OK) RETURN
 
-*    Check file_obs                        
+*    Check file_obs
       IF ( FILE_OBS .EQ. 'ASK' ) THEN
         ASK = .TRUE.
       ELSE
@@ -49,7 +49,7 @@
      :    /'filed !', STATUS )
       ENDIF
 
-*    Check archive_obs                        
+*    Check archive_obs
       IF ( ARCHIVE_OBS .EQ. 'ASK' ) THEN
         ASK = .TRUE.
       ELSE
@@ -62,7 +62,7 @@
         CALL CRED4_ARCHIVE_OBSERVATION( INVAL, WAIT, STATUS )
       ENDIF
 
-*    Check add_obs                        
+*    Check add_obs
       IF ( ADD_OBS .EQ. 'ASK' ) THEN
         ASK = .TRUE.
       ELSE
@@ -73,7 +73,7 @@
       POLYFITTED = .FALSE.
       IF ( ADD_OBS .NE. 'NO' ) THEN
 
-        IF ( ( .NOT.ADD_IN_PAIRS ) .AND. 
+        IF ( ( .NOT.ADD_IN_PAIRS ) .AND.
      :       ( PF_POLYFIT.EQ.'OBJ-SKY' ) .AND.
      :       ( INVAL(1:1).EQ.'O' ) ) THEN
 

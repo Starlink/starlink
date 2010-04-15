@@ -147,7 +147,7 @@ It has the following form:
 This form is essentially equivalent to the DO loop in Fortran.
 The expressions specifying the range of values for the control variable are
 rounded to the nearest integer so that the variable always has an integer value.
-Using this form of the LOOP statement you can simplify the previous example as 
+Using this form of the LOOP statement you can simplify the previous example as
 follows:
 
 \begin{small}
@@ -174,7 +174,7 @@ For example:
 \end{verbatim}
 \end{small}
 
-will count down from 10 to 1. 
+will count down from 10 to 1.
 
 \paragraph{LOOP WHILE:}\hfill
 
@@ -184,7 +184,7 @@ It has the form:
 \begin{small}
 \begin{verbatim}
     LOOP WHILE expression
-        statements                                              
+        statements
     END LOOP
 \end{verbatim}
 \end{small}
@@ -310,7 +310,7 @@ Just type `LIST', followed by the name of the procedure you want to list:
 Typing in procedures directly is fine for very simple procedures, but for
 anything complex it is likely that some mistakes will be made.
 When this happens, it will be necessary to {\em edit} the procedure.
-Editing can be done from within ICL using standard editors. 
+Editing can be done from within ICL using standard editors.
 For example the command:
 
 \begin{small}
@@ -413,7 +413,7 @@ command.
 \end{small}
 
 The SAVE command causes the procedure to be saved in a file with name
-SQUARE\_ROOT.ICL in the current default directory. 
+SQUARE\_ROOT.ICL in the current default directory.
 LOAD will load the procedure from the same file, also in the default directory.
 However, with LOAD it is possible to specify an alternative directory if
 required:
@@ -506,7 +506,7 @@ Thus, after the previous example you would get:
 \begin{verbatim}
     ICL> VARS FRED
                      X  REAL     1.2345000000000E+00
-    ICL> VARS       
+    ICL> VARS
                      X  INTEGER          1
     ICL>
 \end{verbatim}
@@ -543,7 +543,7 @@ To find the names of all the current procedures, use the `PROCS' command:
 
     SQUARE_ROOT
 
-    ICL> 
+    ICL>
 \end{verbatim}
 \end{small}
 
@@ -696,7 +696,7 @@ your earlier example procedure:
     { An ICL procedure to print the square root of a number
        PRINT The Square Root of (X) is (SQRT(X))
     END PROC
-    
+
     PROC TABLE
     { A procedure to print a table of square roots of numbers from 1 to 100
        LOOP FOR I=1 TO 100
@@ -708,7 +708,7 @@ your earlier example procedure:
 
     TABLE
 
-    { And then an EXIT command to terminate the job 
+    { And then an EXIT command to terminate the job
 
     EXIT
 \end{verbatim}
@@ -953,7 +953,7 @@ the behaviour when a ctrl/C is typed.
 
 \subsection{SIGNAL}
 
-The exceptions described up to now have all been generated internally by the 
+The exceptions described up to now have all been generated internally by the
 ICL system, or, in the case of CTRLC, initiated by the user.
 It is also possible for ICL procedures to generate exceptions which may be used
 to indicate error conditions.
@@ -999,7 +999,7 @@ In these cases, the following structure could be used:
 \end{small}
 
 where the exception handler again contains no statements, but simply exists
-to cause normal procedure exit, rather than an error message, when the 
+to cause normal procedure exit, rather than an error message, when the
 exception is signalled.
 
 \section{ICL login files}
@@ -1043,7 +1043,7 @@ facilities which may be used:
     END PROC
 
     { Login Message
-    PRINT 
+    PRINT
     PRINT   Starting ICL at (TIME()) on (DATE())
     PRINT
 \end{verbatim}
@@ -1196,7 +1196,7 @@ The {\small ICL} variable FILE is in parentheses because its value is to be
 substituted into parameter NDF.
 There is a piece of syntax to note which often catches people out.
 Filenames passed via {\small ICL} variables, such as FILE in the above example,
-must be preceded by an {\tt @}. 
+must be preceded by an {\tt @}.
 
 \paragraph{Flatfield:}\hfill
 
@@ -1235,7 +1235,7 @@ Note the {\tt \~{}} continuation character.
 
       { Generate the name of the flattened NDF.
               IMAGEOUT = (IMAGE) & 'F'
-              PRINT Writing to (IMAGEOUT) 
+              PRINT Writing to (IMAGEOUT)
 
       { Divide the image by the flat field.
 
@@ -1299,7 +1299,7 @@ input and output names begin with an {\tt @}.
         PICK2D INPIC=(FILE) OUTPIC=(OUTFILE) XSTART=(XL) YSTART=(YL) ~
            XFINISH=(XU) YFINISH=(YU)
 
-     { Draw a perspective histogram around the star on the current 
+     { Draw a perspective histogram around the star on the current
      { graphics device.
         COLUMNAR IN=(OUTFILE)
 
@@ -1338,7 +1338,7 @@ the LBOUND and UBOUND parameter arrays.
         YB = DY1 - FY1
         YT = FY2 - DY2
 
-     { Only plot a key if there is room. 
+     { Only plot a key if there is room.
         IF MAX(XL, XR, YB, YT) > 0.0
 
      { Determine which side has most room for the key, and derive the
@@ -1371,7 +1371,7 @@ the LBOUND and UBOUND parameter arrays.
               XK2 = 0.5 * (DX2 + DX1 + HEIGHT)
            ENDIF
 
-     { Draw the key to fit within the current picture annotating with 
+     { Draw the key to fit within the current picture annotating with
      { the scaling used in DISPLAY.
            LUTVIEW LOW=(LOW) HIGH=(HIGH) LBOUND=[(XK1&','&YK1)] ~
              UBOUND=[(XK2&','&YK2)] MODE=XY

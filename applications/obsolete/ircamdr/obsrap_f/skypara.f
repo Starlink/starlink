@@ -8,7 +8,7 @@
 *     SKYSIZE (input)                      Size of sky subimage containing
 *     INTEGER                              info
 
-*     SKY,SKYSIGMA (output)                Sky parameters output back to 
+*     SKY,SKYSIGMA (output)                Sky parameters output back to
 *     REAL                                 subroutine business
 
 C     Declare arrays
@@ -98,7 +98,7 @@ C     Now plot histogram
 **      CALL PGLINE(NUMBER,X,Y)
 **      CALL PGEND
 
-**      WRITE(6,'(A)')' SKY HISTOGRAM PLOTTED TO 
+**      WRITE(6,'(A)')' SKY HISTOGRAM PLOTTED TO
 **     >SKYDISTRIBUTION.DAT'
 
 C     Now find the mode,median and the upper and lower quartiles
@@ -114,7 +114,7 @@ C     Remember that the total no. of sky pixels is SKYSIZE*SKYSIZE
       CHECK3=0
       MAXCOUNT=0
 
-      DO I=IMIN,IMAX      
+      DO I=IMIN,IMAX
          IF (SKYCOUNT(I).GT.MAXCOUNT) THEN
             MAXCOUNT=SKYCOUNT(I)
             MODE=REAL(I)
@@ -165,7 +165,7 @@ C     Do the rebinning
 **         STOPY=I+IHALFBIN
 **         DO J=STARTY,STOPY
 **            BINSKYCOUNT(I)=BINSKYCOUNT(I)+SKYCOUNT(J)
-**         ENDDO 
+**         ENDDO
 **         BINSKYCOUNT(I)=(BINSKYCOUNT(I))/(IBINSIZE)
 
 C        Produce real arrays for plotting histogram
@@ -184,7 +184,7 @@ C     Plot histogram
 **      CALL PGLINE(COUNTER,XX,YY)
 **      CALL PGEND
 
-**      WRITE(6,'(A)')' BINNED SKY DISTRIBUTION HISTOGRAM 
+**      WRITE(6,'(A)')' BINNED SKY DISTRIBUTION HISTOGRAM
 **     >PLOTTED TO BINNEDSKY.DAT'
 
 C     We now write out the sky parameters from the unbinned data
@@ -218,7 +218,7 @@ C     Now do a 2 sigma cut and reevaluate the sky parameters
 
 C     Work out how many pixels this leaves
 
-      DO I=IMIN,ICUT      
+      DO I=IMIN,ICUT
          TOTCOUNT=TOTCOUNT+REAL(SKYCOUNT(I))
       ENDDO
 
@@ -232,7 +232,7 @@ C     Now revaluate the sky parameters
       CHECK3=0
       MAXCOUNT=0
 
-      DO I=IMIN,ICUT      
+      DO I=IMIN,ICUT
          IF (SKYCOUNT(I).GT.MAXCOUNT) THEN
             MAXCOUNT=SKYCOUNT(I)
             MODE=REAL(I)

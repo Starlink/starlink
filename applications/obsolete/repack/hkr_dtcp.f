@@ -38,7 +38,7 @@
 * No allowance is made for data loses from the on-board event queue through
 * the telemetry stream right through to the small map file.
 
-	if (status .ne. 0) then 
+	if (status .ne. 0) then
 	  hkr_dtcp = 1.0
 	  return
 	endif

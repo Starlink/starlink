@@ -1,13 +1,13 @@
 
 *+  LOGARR2D - take the logarithm of a 2-d array pixel by pixel
 
-      SUBROUTINE LOGARR2D( INARRAY, DIMS1, DIMS2, BASE, OUTARRAY, 
+      SUBROUTINE LOGARR2D( INARRAY, DIMS1, DIMS2, BASE, OUTARRAY,
      :                     STATUS )
 
 *    Description :
 *
 *     This routine fills the output array pixels with the results
-*     of taking the logarithm of the pixels of the input array 
+*     of taking the logarithm of the pixels of the input array
 *     to the base specified, i.e. New value = Log    ( Old value ).
 *                                                Base
 *     If the input pixel is negative, then a bad pixel value is
@@ -47,7 +47,7 @@
 *              Outarray value  =  bad value
 *           Endif
 *        Endfor
-*     Else base is negative or equal to one 
+*     Else base is negative or equal to one
 *        For all pixels of output array
 *           Outarray value  =  bad value
 *        Endfor
@@ -95,16 +95,16 @@
       INTEGER  STATUS             ! global status parameter
 
 *    Local constants :
- 
+
       REAL
-     :    BADVAL                  ! 'bad pixel' value to be used 
+     :    BADVAL                  ! 'bad pixel' value to be used
       PARAMETER( BADVAL  =  0.0 )      ! temporary usage
 
 *    Local variables :
 
       INTEGER
-     :    I, J                    ! counter variables 
-   
+     :    I, J                    ! counter variables
+
       REAL
      :    FACTOR                  ! factor used to define base being used
 
@@ -156,7 +156,7 @@
 
 *          loop round all pixels in current row
             DO  I  =  1, DIMS1
- 
+
 *             set output pixel value to bad
                OUTARRAY( I, J )  =  BADVAL
 

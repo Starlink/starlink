@@ -21,9 +21,9 @@
 
 *  Description:
 *     This application creates a new WinMap and optionally initialises
-*     its attributes. A Winmap is a linear Mapping which transforms a 
-*     rectangular window in one coordinate system into a similar window 
-*     in another coordinate system by scaling and shifting each axis (the 
+*     its attributes. A Winmap is a linear Mapping which transforms a
+*     rectangular window in one coordinate system into a similar window
+*     in another coordinate system by scaling and shifting each axis (the
 *     window edges being parallel to the coordinate axes).
 *
 *     A WinMap is specified by giving the coordinates of two opposite
@@ -36,22 +36,22 @@
 *  ADAM Parameters:
 *     INA() = _DOUBLE (Read)
 *        The coordinates of corner A of the window in the input
-*        coordinate system. 
+*        coordinate system.
 *     INB() = _DOUBLE (Read)
 *        The coordinates of corner B of the window in the input
-*        coordinate system. 
+*        coordinate system.
 *     NCOORD = _INTEGER (Read)
 *        The number of coordinate values for the WinMap (the same value
 *        is used for both input and output axes).
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new WinMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new WinMap.
 *     OUTA() = _DOUBLE (Read)
 *        The coordinates of corner A of the window in the output
-*        coordinate system. 
+*        coordinate system.
 *     OUTB() = _DOUBLE (Read)
 *        The coordinates of corner B of the window in the output
-*        coordinate system. 
+*        coordinate system.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new WinMap.
 
@@ -94,7 +94,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Status:
       INTEGER STATUS
@@ -105,10 +105,10 @@
       DOUBLE PRECISION OUTA( NDF__MXDIM )
       DOUBLE PRECISION OUTB( NDF__MXDIM )
       INTEGER NCOORD
-      INTEGER RESULT       
+      INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -116,10 +116,10 @@
 
 *  Get the required parameter values.
       CALL PAR_GET0I( 'NCOORD', NCOORD, STATUS )
-      CALL PAR_EXACD( 'INA', NCOORD, INA, STATUS ) 
-      CALL PAR_EXACD( 'INB', NCOORD, INB, STATUS ) 
-      CALL PAR_EXACD( 'OUTA', NCOORD, OUTA, STATUS ) 
-      CALL PAR_EXACD( 'OUTB', NCOORD, OUTB, STATUS ) 
+      CALL PAR_EXACD( 'INA', NCOORD, INA, STATUS )
+      CALL PAR_EXACD( 'INB', NCOORD, INB, STATUS )
+      CALL PAR_EXACD( 'OUTA', NCOORD, OUTA, STATUS )
+      CALL PAR_EXACD( 'OUTB', NCOORD, OUTB, STATUS )
 
 *  Create the required WinMap.
       RESULT = AST_WINMAP( NCOORD, INA, INB, OUTA, OUTB, ' ', STATUS )

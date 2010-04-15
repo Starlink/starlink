@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -64,7 +64,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       REAL WIDTH                 ! plot width in inches
       REAL ASPECT                ! aspect ratio
@@ -73,7 +73,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
+      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
          CALL PAR_GET0R( 'WIDTH', WIDTH, STATUS )
          CALL PAR_GET0R( 'ASPECT', ASPECT, STATUS )
          IF ( ASPECT .GE. 0.0 ) THEN
@@ -81,11 +81,11 @@
          ELSE
             CALL MSG_SETR( 'ASPECT', ASPECT )
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'PAPER_BADASP', 
+            CALL ERR_REP( 'PAPER_BADASP',
      :           'The aspect ratio ^ASPECT is not valid.', STATUS )
          END IF
       END IF
-      
+
 *  Check the returned status and report a contextual error message if
 *  necessary.
       IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'PAPER_END',

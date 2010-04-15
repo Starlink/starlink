@@ -2,14 +2,14 @@
 
       SUBROUTINE ELF1_FOUR(POINTS,BACK,VALIDP,PCV,XE,YE,XO,YO,
      :                     POSANG,ELLIP,RESULT,STATUS)
-*+                  
+*+
 *  Name:
 *     ELF1_FOUR
 
 *  Purpose:
-*     Determines the values of the Fourier descriptors from the current 
-*     ellipse parameters. 
-   
+*     Determines the values of the Fourier descriptors from the current
+*     ellipse parameters.
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -20,9 +20,9 @@
 *  Description:
 *     Uses the ellipse parameters to normalise the isophotal pixel
 *     positions to a unit circle. Then solves a set of simultaneous
-*     equations to determine (consequtively) the amplitudes of 
-*     sin/cos factors that would be required to create the variations 
-*     in brightness found around the circle. 
+*     equations to determine (consequtively) the amplitudes of
+*     sin/cos factors that would be required to create the variations
+*     in brightness found around the circle.
 *
 *     This route is chosen (rather than using actual pixel positions)
 *     due to the small number of pixels involved at low radii.
@@ -35,14 +35,14 @@
 *     VALIDP = INTEGER (Given)
 *        The number of ellipses for which parameters have been found.
 *     PCV(ELF__MXPOI) = REAL (Given)
-*        The ellipse pixel brightness values. Units counts. 
+*        The ellipse pixel brightness values. Units counts.
 *     XE(ELF__MXPOI) = REAL (Given)
 *        Ellipse pixel X co-ordinates. Units pixels.
 *     YE(ELF__MXPOI) = REAL (Given)
 *        Ellipse pixel Y co-ordinates. Units pixels.
-*     XO = REAL (Given) 
+*     XO = REAL (Given)
 *        X co-ordinate of the galaxy centre, Units pixels.
-*     YO = REAL (Given) 
+*     YO = REAL (Given)
 *        Y co-ordinate of the galaxy centre, Units pixels.
 *     POSANG = REAL (Given)
 *        Position angle of the ellipse.
@@ -100,7 +100,7 @@
 
 *  Arguments Given and Returned:
 
-*  Local variables:     
+*  Local variables:
       DOUBLE PRECISION C              ! Cosine amplitude
       DOUBLE PRECISION S              ! Sine amplitude
       DOUBLE PRECISION XV2(500)       ! Angle
@@ -108,7 +108,7 @@
       DOUBLE PRECISION CONT(4)        ! Contributions from the previous
                                       ! Fourier descriptor orders
       DOUBLE PRECISION CONTR          ! Sum of contributions from the previous
-                                      ! FD orders  
+                                      ! FD orders
       DOUBLE PRECISION MEAN           ! Mean pixel count
       INTEGER I                       ! Loop variable
       INTEGER J                       ! Loop variable
@@ -130,7 +130,7 @@
       ZERO=0.0
 
 *   Rotate the ellipse.
-      
+
 *   Rotate each point in turn.
 *   Also, calculate the mean pixel count value.
       MEAN=0.0D0
@@ -151,7 +151,7 @@
          XV(I)=RAD*SIN(ANGLER)
          YV(I)=RAD*COS(ANGLER)
 
-*      Increase the X component of the position to convert the 
+*      Increase the X component of the position to convert the
 *      ellipse into a circle.
          XV(I)=XV(I)/ELLIP
 
@@ -164,10 +164,10 @@
 
 *      Add to the mean summation.
          MEAN=PCV(I)+MEAN
-             
+
  5    CONTINUE
       MEAN=MEAN/REAL(POINTS)
-     
+
 *   Set up the equations of intensity versus angle that must be solved.
 *   Work out the coefficients for each order in turn.
 
@@ -176,13 +176,13 @@
 
 *      For each of the pixels in turn set up a simultaneous equation.
          DO 30 I=1,POINTS
-           
+
 *         First, calculate the contribution from each preceeding order.
             DO 25 J=1,ORDER-1
                ANGLE=ANG(I)*REAL(J)
                K=(J-1)*2+10.
                CONT(J)=RESULT(K,VALIDP)*SIN(ANGLE)
-     :                +RESULT(K+1,VALIDP)*COS(ANGLE)             
+     :                +RESULT(K+1,VALIDP)*COS(ANGLE)
  25         CONTINUE
 
 *         Sum the contributions from the preceeding orders.
@@ -195,29 +195,29 @@
 *         Residual pixel count, sine factor and then cosine factor.
             XV2(I)=REAL(ORDER)*ANG(I)
             YV2(I)=PCV(I)-MEAN-CONTR
-            
+
   30      CONTINUE
-        
+
 *      Solve the equations using a shareware routine.
          CALL ELF1_SOLVE(POINTS,XV2,YV2,S,C,STATUS)
-         
+
 *      Store the un-normalised values.
          J=(ORDER-1)*2+10.
          RESULT(J,VALIDP)=  S
          RESULT(J+1,VALIDP)=C
-      
+
  20   CONTINUE
 
 *   Normalise the Fourier descriptors.
       DO 100 I=10,17
 
 *      Only normalise them if it will not lead to a very large number.
-         IF (ABS(MEAN-BACK).GT.ELF__VSMAL) 
+         IF (ABS(MEAN-BACK).GT.ELF__VSMAL)
      :      RESULT(I,VALIDP)=RESULT(I,VALIDP)/(MEAN-BACK)
 
 100   CONTINUE
 
- 
+
  9999 CONTINUE
 
       END
@@ -226,14 +226,14 @@
 
       SUBROUTINE ELP1_FOUR(NUMPOI,BACK,VALIDP,XR,YR,VA,XO,YO,
      :                     POSANG,ELLIP,RESULT,STATUS)
-*+                  
+*+
 *  Name:
 *     ELP1_FOUR
 
 *  Purpose:
-*     Determines the values of the Fourier descriptors for the current 
-*     ellipse parameters. 
-   
+*     Determines the values of the Fourier descriptors for the current
+*     ellipse parameters.
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -245,7 +245,7 @@
 *     Uses the ellipse parameters to normalise the fit ellipse pixel
 *     positions to a unit circle. Then solves a set of simultaneous
 *     equations to determine the amplitudes of sin/cos factors that would
-*     be required to create the variations in pixel brightness 
+*     be required to create the variations in pixel brightness
 *     found around the circle. These are converted to the values
 *     you would get from contour analysis.
 
@@ -256,7 +256,7 @@
 *        Background count value for the image. Units counts.
 *     VALIDP = INTEGER (Given)
 *        The number of ellipses for which parameters have been found.
-*     XO = REAL (Given) 
+*     XO = REAL (Given)
 *        X co-ordinate of the galaxy centre, Units pixels.
 *     XR(ELP__MXPOI) = REAL (Given)
 *        Isophotal pixel X co-ordinates. Units pixels.
@@ -264,7 +264,7 @@
 *        Isophotal pixel Y co-ordinates. Units pixels.
 *     VA(ELP__MXPOI) = REAL (Given)
 *        Pixel brightness. Units counts.
-*     YO = REAL (Given) 
+*     YO = REAL (Given)
 *        Y co-ordinate of the galaxy centre, Units pixels.
 *     ELLIP = REAL (Given)
 *        Ellipticity of the ellipse.
@@ -284,7 +284,7 @@
 *     14-FEB-1996 (GJP)
 *     Removed some NAG routines.
 *     12-OCT-1996 (GJP)
-*     Removed the last NAG routines. 
+*     Removed the last NAG routines.
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -300,7 +300,7 @@
 *  Arguments Given:
       INTEGER NUMPOI                  ! Number of pixels in the current
                                       ! ellipse and hence the number
-                                      ! of equations to solve 
+                                      ! of equations to solve
       INTEGER VALIDP                  ! Number of profiles for parameters
                                       ! has been determined
       REAL BACK                       ! Background count value
@@ -319,11 +319,11 @@
 
 *  Arguments Given and Returned:
 
-*  Local variables:     
+*  Local variables:
       DOUBLE PRECISION CONT(4)        ! Contributions from the previous
                                       ! Fourier descriptor orders
       DOUBLE PRECISION CONTR          ! Sum of contributions from the previous
-                                      ! FD orders  
+                                      ! FD orders
       DOUBLE PRECISION MEAN           ! Mean pixel count
       DOUBLE PRECISION C              ! Cosine amplitude
       DOUBLE PRECISION S              ! Sine amplitude
@@ -340,9 +340,9 @@
       REAL RAD                        ! Distance of pixel from the origin
       REAL XV(ELP__MXPOI)             ! Transformed/rotated pixel co-ord
       REAL YV(ELP__MXPOI)             ! Transformed/rotated pixel co-ord
-      REAL ZERO                       ! Zero value 
-      
-*.    
+      REAL ZERO                       ! Zero value
+
+*.
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
@@ -370,7 +370,7 @@
          XV(I)=RAD*SIN(ANGLER)
          YV(I)=RAD*COS(ANGLER)
 
-*      Increase the X component of the position to convert the 
+*      Increase the X component of the position to convert the
 *      ellipse into a circle.
          XV(I)=XV(I)/ELLIP
 
@@ -406,7 +406,7 @@
 
 *         Sum the contributions from the preceeding orders.
 *         Performed in this way to avoid rounding errors.
-            IF (ORDER.EQ.1) CONTR=0.0D0 
+            IF (ORDER.EQ.1) CONTR=0.0D0
             IF (ORDER.EQ.2) CONTR=CONT(1)
             IF (ORDER.EQ.3) CONTR=CONT(1)+CONT(2)
             IF (ORDER.EQ.4) CONTR=CONT(1)+CONT(2)+CONT(3)
@@ -414,12 +414,12 @@
 *         Residual pixel count, sine factor and then cosine factor.
             XV2(I)=REAL(ORDER)*ANG(I)
             YV2(I)=VA(I)-MEAN-CONTR
- 
+
  30      CONTINUE
 
 *      Solve the equations using a shareware routine.
          CALL ELP1_SOLVE(NUMPOI,XV2,YV2,S,C,STATUS)
-        
+
 *      Store the un-normalised values.
          J=(ORDER-1)*2+10.
          RESULT(J,VALIDP)=  S
@@ -431,7 +431,7 @@
       DO 100 I=10,17
 
 *      Only normalise them if it will not lead to a very large number.
-         IF (ABS(MEAN-BACK).GT.ELP__VSMAL) 
+         IF (ABS(MEAN-BACK).GT.ELP__VSMAL)
      :      RESULT(I,VALIDP)=RESULT(I,VALIDP)/(MEAN-BACK)
 
 100   CONTINUE

@@ -2,25 +2,25 @@
  *+
  *  Name:
  *     hdrName
- 
+
  *  Purpose:
  *     Returns a header item name.
- 
+
  *  Language:
  *     ANSII C
- 
+
  *  Invocation:
  *     hdrName( param,
  *              xname,
  *              n,
  *              item,
  *              status )
- 
+
  *  Description:
  *     This C function sets up the required arguments and calls the
  *     Fortran subroutine hdr_name.
  *     On return, values are converted back to C form if necessary.
- 
+
  *  Arguments:
  *     param = char * (Given)
  *        Parameter name of the image (case insensitive).
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
  *     Fortran source of hdr_name by the Perl script fcwrap.
  *     PDRAPER: Peter W. Draper (STARLINK - Durham University)
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     17-May-1996 (fcwrap):
  *        Original version
@@ -90,17 +90,17 @@ void hdrName( char *param,
               char *item,
               int item_length,
               int *status ) {
-  
+
   DECLARE_CHARACTER_DYN(fparam);
   DECLARE_CHARACTER_DYN(fxname);
   DECLARE_CHARACTER_DYN(fitem);
-  
+
   F77_CREATE_CHARACTER(fparam,strlen( param ));
   cnf_exprt( param, fparam, fparam_length );
   F77_CREATE_CHARACTER(fxname,strlen( xname ));
   cnf_exprt( xname, fxname, fxname_length );
   F77_CREATE_CHARACTER(fitem,item_length);
-  
+
   F77_CALL(hdr_name)( CHARACTER_ARG(fparam),
                       CHARACTER_ARG(fxname),
                       INTEGER_ARG(&n),
@@ -109,20 +109,20 @@ void hdrName( char *param,
                       TRAIL_ARG(fparam)
                       TRAIL_ARG(fxname)
                       TRAIL_ARG(fitem) );
-  
+
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);
 
   cnf_imprt( fitem, fitem_length, item );
 
   /*  The special name " " is possible. Deal with this correctly */
-  if ( item[0] == '\0' && fitem[0] == ' ' && 
-       ( xname[0] == 'F' || xname[0] == ' ' ) ) { 
+  if ( item[0] == '\0' && fitem[0] == ' ' &&
+       ( xname[0] == 'F' || xname[0] == ' ' ) ) {
     item[0] = ' ';
     item[1] = '\0';
   }
   F77_FREE_CHARACTER(fitem);
-  
+
   return;
 }
 

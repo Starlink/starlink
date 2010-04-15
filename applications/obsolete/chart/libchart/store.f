@@ -17,7 +17,7 @@
 *   History:
 *     4-MAR-1993 (AJJB):
 *       STATUS argument added.
-*       
+*
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -29,7 +29,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *   Firstly write all the parameters in COMMON/CONTROL/
 *

@@ -43,7 +43,7 @@
 
 *    Find last occurrence of file separator (0 or N)
       SEPPOS = CHR_LEN( INVAL )
-      CALL CHR_FIND( INVAL, SEPARATOR, .FALSE., SEPPOS ) 
+      CALL CHR_FIND( INVAL, SEPARATOR, .FALSE., SEPPOS )
 
 *    Set the output file to it's full filename
       CALL CHR_FILL( ' ', ROFILE )

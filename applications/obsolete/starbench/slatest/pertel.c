@@ -7,7 +7,7 @@
 void sbmpertel(int qfoo,double qbar,double qbaz,double Q0,
 double qfobar,double q1,double q2,double qfoobar,double Q3,
 double q4,double*qfOBAz,double*qfoobaz,double*QQUUX,double*
-Q5,double*QFRED,double*qdog,double*qcat,int*QFISH){double 
+Q5,double*QFRED,double*qdog,double*qcat,int*QFISH){double
 QgASp[13],Q6;int q7,q8;if(qfoo<2||qfoo>3){*QFISH=-1;return;}
 else{*QFISH=0;}sbmel2ue(qbar,qfoo,Q0,qfobar,q1,q2,qfoobar,Q3
 ,q4,0.0,QgASp,&q7);if(q7){*QFISH=q7;return;}sbmpertue(qbaz,

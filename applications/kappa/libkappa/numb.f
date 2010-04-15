@@ -233,7 +233,7 @@
       MCOMP = COMP
       IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
 
-*  Associate the input NDF. 
+*  Associate the input NDF.
 *  ========================
 
 *  Begin an NDF context.
@@ -293,7 +293,7 @@
          RVALUE = VAL_DTOR( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBR( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBR( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    RVALUE, NUMBER, STATUS )
 
@@ -321,7 +321,7 @@
          BVALUE = VAL_DTOB( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBB( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBB( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    BVALUE, NUMBER, STATUS )
 
@@ -344,7 +344,7 @@
      :                   DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBD( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBD( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    DVALUE, NUMBER, STATUS )
 
@@ -356,7 +356,7 @@
 
 *  Obtain the threshold in the appropriate data type.  Watch for the
 *  cases where it must not be negative.
-         IF ( VABS .OR. COMP .EQ. 'VARIANCE' .OR. 
+         IF ( VABS .OR. COMP .EQ. 'VARIANCE' .OR.
      :        COMP .EQ. 'QUALITY' ) THEN
             DVMIN = 0.0
          ELSE
@@ -372,7 +372,7 @@
          IVALUE = VAL_DTOI( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBI( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBI( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    IVALUE, NUMBER, STATUS )
 
@@ -395,7 +395,7 @@
          BVALUE = VAL_DTOUB( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBUB( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBUB( BAD, VABS, ABOVE, EL,
      :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     BVALUE, NUMBER, STATUS )
 
@@ -418,7 +418,7 @@
          WVALUE = VAL_DTOUW( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBUW( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBUW( BAD, VABS, ABOVE, EL,
      :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     WVALUE, NUMBER, STATUS )
 
@@ -446,7 +446,7 @@
          WVALUE = VAL_DTOW( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBW( BAD, VABS, ABOVE, EL, 
+         CALL KPG1_NUMBW( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    WVALUE, NUMBER, STATUS )
 
@@ -525,7 +525,7 @@
       END IF
 
 *  Arrive here if an error occurs.
-  999 CONTINUE     
+  999 CONTINUE
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

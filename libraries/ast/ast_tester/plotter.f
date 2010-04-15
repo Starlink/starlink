@@ -54,7 +54,7 @@
          WRITE(*,'(A,I6)') 'Set ObjectCaching VALUE is ',OC
       END IF
 
-* 
+*
 * Create a FitsChan to store the FITS headers.
 *
       CALL GETARG( 3, ATTR )
@@ -107,7 +107,7 @@
          ELSE
             NAXIS1 = 100
          END IF
-   
+
          CALL AST_CLEAR( FC, 'CARD', STATUS )
          IF ( AST_FINDFITS( FC, 'NAXIS2', CARD, .TRUE., STATUS ) ) THEN
             READ(CARD(11:),*) NAXIS2
@@ -121,15 +121,15 @@
          PBOX(4) = DBLE( NAXIS2 )+0.5
       END IF
 
-* 
+*
 * Read an Object from the contents of the FitsChan. This should be a
 * FrameSet (this should be tested really, and an error reported if any
-* other type of Object is obtained). Re-wind the FitsChan first so that 
-* its entire contents are read. Note, this is a destructive read, in that 
-* the cards which are significant to the creation of the FrameSet are 
-* removed from the FitsChan (this is why NAXIS1 and NAXIS2 are read out 
-* earlier - just in case they are significant to the FrameSet). Any 
-* insignificant cards are left as they are. 
+* other type of Object is obtained). Re-wind the FitsChan first so that
+* its entire contents are read. Note, this is a destructive read, in that
+* the cards which are significant to the creation of the FrameSet are
+* removed from the FitsChan (this is why NAXIS1 and NAXIS2 are read out
+* earlier - just in case they are significant to the FrameSet). Any
+* insignificant cards are left as they are.
 *
       CALL AST_CLEAR( FC, 'CARD', STATUS )
       FS = AST_READ( FC, STATUS )
@@ -153,9 +153,9 @@ c         IF( PGBEG( 0, '?', 1, 1 ) .EQ. 1 ) THEN
             CALL PGWNAD( 0.0, 1.0, 0.0, 1.0 )
 
 *
-* Create the Plot. The pixel coordinates box is 
-* mapped onto a window which is 10% smaller than the full PGPLOT window. 
-* This gives some space for things like tick marks with negative length 
+* Create the Plot. The pixel coordinates box is
+* mapped onto a window which is 10% smaller than the full PGPLOT window.
+* This gives some space for things like tick marks with negative length
 * (which stick outside the pixel cooridnates box).
 *
             CALL PGQWIN( GBOX(1), GBOX(3), GBOX(2), GBOX(4) )
@@ -177,7 +177,7 @@ c         IF( PGBEG( 0, '?', 1, 1 ) .EQ. 1 ) THEN
                GBOX(3) = GBOX(3) - DELTA
                GBOX(1) = GBOX(1) + DELTA
             ELSE
-               DELTA = 0.5*( ( GBOX(4) - GBOX(2) ) - 
+               DELTA = 0.5*( ( GBOX(4) - GBOX(2) ) -
      :                       ASP*( GBOX(3) - GBOX(1) ) )
                GBOX(4) = GBOX(4) - DELTA
                GBOX(2) = GBOX(2) + DELTA
@@ -192,7 +192,7 @@ c         IF( PGBEG( 0, '?', 1, 1 ) .EQ. 1 ) THEN
 * Draw the grid.
 *
             CALL AST_GRID( PL, STATUS )
-                
+
 *
 * Annul the Plot, and close PGPLOT.
 *

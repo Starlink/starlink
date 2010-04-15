@@ -77,7 +77,7 @@
 *                 and   yswap is the maximum extent to be rotated + 1 - y
 *              End for
 *           End for
-*        Else 
+*        Else
 *           Number of right angles to rotate is incorrect
 *           Set status and report error
 *        Endif

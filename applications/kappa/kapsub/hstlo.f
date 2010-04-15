@@ -233,7 +233,7 @@
          END DO
       END IF
 
-*    Now for the y positions 
+*    Now for the y positions
 
       IF ( YLOG ) THEN
 

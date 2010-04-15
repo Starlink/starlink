@@ -58,7 +58,7 @@ C Modified to sort the records    Alan Bridger  21-SEP-1983
 C
 C Modified for FIGARO environment     P.W.Hill  16-MAR-1986
 C
-C Calls to Spica routines (HVID,FRMLAB) removed to simplify 
+C Calls to Spica routines (HVID,FRMLAB) removed to simplify
 C linking.  Copy of INDSORT extracted from Spica library.
 C                                  K. Shortridge 9-APR-1987
 C

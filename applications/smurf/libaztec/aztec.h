@@ -25,7 +25,7 @@
 *  History:
 *     2006-09-1 (EC):
 *        Initial version
-*     
+*
 *     {enter_further_changes_here}
 
 *  Copyright:

@@ -1,23 +1,23 @@
       SUBROUTINE DRAWLINE(NPARAMS,PARAMS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    D R A W L I N E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Interface for PGDRAW used for userdefined lines on QU graphs etc
 C
@@ -61,7 +61,7 @@ C
 C
       CALL PGMOVE(X1,Y1)
       CALL PGDRAW(X2,Y2)
-C     
+C
  666  CONTINUE
       END
 

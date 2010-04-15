@@ -92,7 +92,7 @@
       PARAMETER (XBIT = 1.0E-10)
 *  Local Variables:
       INTEGER
-     :  SI,      ! Selection identifier. 
+     :  SI,      ! Selection identifier.
      :  ROWS,    ! Number of rows in the selection.
      :  XPTR,    ! Pointer to the array of X values.
      :  XID,     ! Identifier for the X axis expression.
@@ -170,7 +170,7 @@
 
                XID = XID__HIST
 
-               CALL CAP_RDCLR (SI, XID, ROWS, PTS, 
+               CALL CAP_RDCLR (SI, XID, ROWS, PTS,
      :           %VAL(CNF_PVAL(XPTR)), NUMNUL, STATUS)
 
                IF (STATUS .EQ. SAI__OK) THEN
@@ -179,7 +179,7 @@
 *                Determine the X range of the values to be histogrammed.
 
                   IF (AUTO__HIST) THEN
-                     CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(XPTR)), XMIN, 
+                     CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(XPTR)), XMIN,
      :                 XMAX, STATUS)
                   ELSE
                      XMIN = XMIN__HIST
@@ -203,7 +203,7 @@
                      ELSE
                         BINWD = XRANGE / REAL(NBINS__HIST)
                         BINS = NBINS__HIST
-                     END IF                     
+                     END IF
 
 *
 *                   Map the arrays to hold X and Y values of the histogram
@@ -223,9 +223,9 @@
 *                   Generate the histogram.
 
                      CALL CAP_GNHST (XMIN, XMAX, BINWD, NORM__HIST,
-     :                 PTS, %VAL(CNF_PVAL(XPTR)), BINS, 
+     :                 PTS, %VAL(CNF_PVAL(XPTR)), BINS,
      :                 %VAL(CNF_PVAL(IHYPTR)), %VAL(CNF_PVAL(HXPTR)),
-     :                 %VAL(CNF_PVAL(HYPTR)), YMIN, YMAX, NUMINC, 
+     :                 %VAL(CNF_PVAL(HYPTR)), YMIN, YMAX, NUMINC,
      :                 NUMEXC, STATUS)
 
 *
@@ -335,10 +335,10 @@
 *
 *                      Plot the histogram.
 
-                        CALL CAP_PHIST (PGCOL, BINS, 
+                        CALL CAP_PHIST (PGCOL, BINS,
      :                    %VAL(CNF_PVAL(HXPTR)),
-     :                    %VAL(CNF_PVAL(HYPTR)), WPTS, 
-     :                    %VAL(CNF_PVAL(WXPTR)), 
+     :                    %VAL(CNF_PVAL(HYPTR)), WPTS,
+     :                    %VAL(CNF_PVAL(WXPTR)),
      :                    %VAL(CNF_PVAL(WYPTR)),
      :                    STATUS)
 

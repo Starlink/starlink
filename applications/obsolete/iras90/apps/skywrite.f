@@ -63,7 +63,7 @@
 *        is to be set. It takes the following values:
 *
 *         DIRECTION - Set the text 'up' direction.
-*         
+*
 *         HEIGHT - Set the text height.
 *
 *         ASPECT RATIO - Set aspect ratio (width/height) of the
@@ -143,8 +143,8 @@
 *        sky coordinate systems.
 *     LOGFILE = LITERAL (Read)
 *        The name of the log text file containing the information
-*        about the written text strings. See the NOTES section about 
-*        the format of this file. 
+*        about the written text strings. See the NOTES section about
+*        the format of this file.
 *     LON = LITERAL (Read)
 *        The longitude at which a text string is to be written, in the
 *        coordinate system specified by COORDS (eg if COORDS was
@@ -161,13 +161,13 @@
 *
 *        CURSOR - All positions are specified by cursor. This mode will
 *        only be available on graphic devices which support cursors.
-* 
+*
 *        KEYBOARD - Positions are specified in response to parameter
 *        prompts, using the keyboard.
 *
 *        FILE - Strings are drawn according to the specifications
 *        contained within a text file (see parameter FILE). This is
-*        referred to as "non-interactive" mode. The run-time default is 
+*        referred to as "non-interactive" mode. The run-time default is
 *        CURSOR if a cursor is available, and KEYBOARD otherwise.     []
 *     MSG_FILTER = LITERAL (Read)
 *        The level of information displayed on the users screen. This
@@ -189,11 +189,11 @@
 *         far to a text file.
 *
 *         ERASE - Erase the last writen text string.
-*         
+*
 *         EXIT - Exit the application.
 *
 *        This parameter is only prompted for if parameter LOOP has a
-*        true value.                                              
+*        true value.
 *     PEN = INTEGER (Read)
 *        Pen number used to write the texts. On entry the pen number is
 *        set to 3.
@@ -201,10 +201,10 @@
 *        Specifies the aspect ration (Width/Height) of the charactors
 *        in the text string. On entry it is set to 2/3.
 *     SPACE = REAL (Read)
-*        The space between characters in text strings, as a fraction of 
-*        the width of a character. On entry it is set to 0 which means 
-*        no extra space between characters and results in the text 
-*        being of normal appearance. It can be negative which results 
+*        The space between characters in text strings, as a fraction of
+*        the width of a character. On entry it is set to 0 which means
+*        no extra space between characters and results in the text
+*        being of normal appearance. It can be negative which results
 *        in the characters overlapping.
 *     TEXT = LITERAL (Read)
 *       The text string to be written at a specified position.
@@ -229,13 +229,13 @@
 *        o  If all else fails, the value of the IN parameter is
 *        cancelled, and the user is prompted for the NDF containing
 *        relevant astrometry information.
-*      
+*
 *     -  This routine can only be used to display strings over NDFs
 *     which contain astrometry information in the form used by the
 *     IRAS90 package.
 *
 *     - The format of input and output text files is:
-*   
+*
 *        o The file is divided into comments and fields. Comments
 *        consist of strings commencing with a "#" character, and are
 *        considered to extend to the end of the line. Such comments are
@@ -255,10 +255,10 @@
 *        written to the position. The string may be delimited by single
 *        or double quote marks, which will be ignored. If a blank string
 *        is to be written, it MUST be delimited by quote marks.
-*      
+*
 *        o Fields containing the key words DIRECTION, HEIGHT, ASPECT
 *        RATIO, JUSTIFICATION, FONT, SPACE, PEN and DEFAULT set up the
-*        attributes to be used for writing any remaining text strings. 
+*        attributes to be used for writing any remaining text strings.
 *        Keywords can be abbreviated, and are case insensitive.
 *
 *        o A field containing the keyword DIRECTION should be followed
@@ -278,16 +278,16 @@
 *
 *        o A field containing the keyword FONT should be followed by a
 *        single field giving the font number.
-*   
+*
 *        o A field containing the keyword SPACE should be followed by a
 *        single field giving the space between characters.
-*   
+*
 *        o A field containing the keyword PEN should be followed by a
 *        single field giving the pen number.
-*   
-*        o A field containing the keyword DEFAULT causes the default 
+*
+*        o A field containing the keyword DEFAULT causes the default
 *        text attributes to be re-established.
-*   
+*
 *  Authors:
 *     WG: Wei Gong (IPMAF)
 *     {enter_new_authors_here}
@@ -301,7 +301,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -313,7 +313,7 @@
       INCLUDE 'GNS_PAR'          ! GNS_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
-                                 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -332,7 +332,7 @@
       REAL DIR( 2 )              ! Direction setting of the texts
       DOUBLE PRECISION EPOCH     ! Epoch of sky coordinate system used
       LOGICAL EXIT               ! Exit application flag
-      INTEGER FONT               ! Font setting of the texts 
+      INTEGER FONT               ! Font setting of the texts
       CHARACTER*( GNS__SZKEY ) GDTYPE
                                  ! Graphic device type
       REAL HEIGHT                ! Height setting of the texts
@@ -349,7 +349,7 @@
       CHARACTER*( 45 ) OPTLOP    ! Option list for OPTION
       INTEGER PEN                ! SGS pen number
       INTEGER PICID1             ! ID for the picture on entry
-      INTEGER PICID2             ! ID for the DATA picture 
+      INTEGER PICID2             ! ID for the DATA picture
       CHARACTER PICCOM*(AGI__CMAX)! Picture comment
       CHARACTER PICLAB*(AGI__SZLAB)! Picture label
       REAL RATIO                 ! Aspect Ratio of texts
@@ -373,7 +373,7 @@
       INTEGER ZONE1              ! ID for initial picture SGS zone
       INTEGER ZONE2              ! ID for DATA picture SGS zone
       INTEGER ZONEW              ! ID for the SGS zone to be written in
-  
+
 *.
 
 *  Check inherited global status.
@@ -382,7 +382,7 @@
 *  Get the level of message reporting and set the report filtering
 *  levevl accordingly.
       CALL MSG_IFGET( STATUS )
-            
+
 *  See if the user wants to loop round, performing multiple operations.
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
 
@@ -413,13 +413,13 @@
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_SETC( 'LAB', PICLAB )
          CALL MSG_OUTIF( MSG__NORM, 'SKYWRITE_MSG1',
-     :                   '  DATA picture ^LAB ("^COM") being used', 
+     :                   '  DATA picture ^LAB ("^COM") being used',
      :                      STATUS )
       ELSE
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_OUTIF( MSG__NORM, 'SKYWRITE_MSG2',
      :                   '  DATA picture "^COM" being used', STATUS )
-      END IF   
+      END IF
 
 *  Get the type of the graphic device.
       CALL IRM_GDTYP( 'SGS', GDTYPE, STATUS )
@@ -443,7 +443,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Inquire the size of the picture zone.
-      CALL SGS_IZONE( XW1, XW2, YW1, YW2, XMW, YMW )      
+      CALL SGS_IZONE( XW1, XW2, YW1, YW2, XMW, YMW )
 
 *  See if the display is to be cleared.
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
@@ -471,11 +471,11 @@
       CALL SWRIA0( 'ATTRIBUTE', 'DIRECTION', 'HEIGHT', 'RATIO',
      :             'JUST', 'SPACE', 'FONT', 'PEN', DIR, HEIGHT,
      :              RATIO, JSTFCT, SPACE, FONT, PEN, STATUS )
- 
+
 *  Set text attributes accordingly.
       CALL SWRIA1( XW2 - XW1, DIR, HEIGHT, RATIO, JSTFCT, SPACE, FONT,
      :             PEN, STATUS )
-      
+
 *  Get the sky coordinate system to be used.
       CALL IRA_GTSCS( 'COORDS', .FALSE., SCS, STATUS )
 
@@ -495,7 +495,7 @@
 
 *  Get the required working mode.
       CALL PAR_CHOIC( 'MODE', DEFMOD, OPTMOD, .FALSE., MODE, STATUS )
-      
+
 *  Initialise the number of texts having been written.
       NTXT = 0
 
@@ -517,7 +517,7 @@
      :                FONT, PEN, STATUS )
 
       END IF
-      
+
 *  Set up the option list for OPTION according to the type of the
 *  graphic device.
       IF ( GDTYPE( : 13 ) .EQ. 'IMAGE_OVERLAY' ) THEN
@@ -525,7 +525,7 @@
       ELSE
          OPTLOP = 'CONTINUE,MODE,ATTRIBUTES,SAVE,EXIT'
       END IF
-      
+
 *  Enter a do loop until 'EXIT' is issued by the user or max number of
 *  text has been reached, or anything goes wrong.
       EXIT = .NOT. LOOP
@@ -560,7 +560,7 @@
                CALL SWRIA1( XW2 - XW1, DIR, HEIGHT, RATIO, JSTFCT,
      :                      SPACE, FONT, PEN, STATUS )
             END IF
-         
+
 *  If change mode is required...
          ELSE IF ( OPTION( : 4 ) .EQ. 'MODE' ) THEN
             CALL PAR_CANCL( 'MODE', STATUS )
@@ -578,7 +578,7 @@
 *  And then set the text attributes accordingly.
             CALL SWRIA1( XW2 - XW1, DIR, HEIGHT, RATIO, JSTFCT, SPACE,
      :                   FONT, PEN, STATUS )
-       
+
 *  If 'SAVE' is selected, save the present writting in a text file.
          ELSE IF ( OPTION( : 4 ) .EQ. 'SAVE' ) THEN
 
@@ -587,7 +587,7 @@
                CALL SWRIA4( 'LOGFILE', PICID2, SCS, NTXT, LON, LAT,
      :                       TEXT, TXDIRX, TXDIRY, TXHIGT, TXRTIO,
      :                       TXJSTF, TXSPAC, TXFONT, TXPEN, STATUS )
-       
+
 *  Report and do nothing if nothing has been written.
             ELSE
                CALL MSG_OUTIF( MSG__NORM, 'SKYWRITE_MSG3',
@@ -595,7 +595,7 @@
      :                         STATUS )
                CALL MSG_BLANKIF( MSG__NORM, STATUS )
             END IF
-      
+
 *  If erase is selected, ...
          ELSE IF ( OPTION( : 5 ) .EQ. 'ERASE' ) THEN
 
@@ -611,14 +611,14 @@
      :         CALL SWRIA5( NTXT, IRA, SCS, XW2 - XW1, LON, LAT, TEXT,
      :                      TXDIRX, TXDIRY, TXHIGT, TXRTIO, TXJSTF,
      :                      TXSPAC, TXFONT, TXPEN, STATUS )
-      
+
 *  Re-set the text attributes as before erasing.
             CALL SWRIA1( XW2 - XW1, DIR, HEIGHT, RATIO, JSTFCT, SPACE,
      :                   FONT, PEN, STATUS )
 
 *  If 'EXIT' is selected, set exit flag.
          ELSE IF ( OPTION( : 4 ) .EQ. 'EXIT' ) THEN
-            EXIT = .TRUE.  
+            EXIT = .TRUE.
          END IF
 
 *  Cancel the value of parameter OPTION to get the next action.
@@ -633,7 +633,7 @@
      :'SKYWRITE: Maximum number of text strings (^M) has been reached.',
      :                 STATUS )
       END IF
-      
+
 *  Store an astrometry structure in the AGI data base.
       CALL IRM_PTAST( PICID2, IRA, STATUS )
 
@@ -642,7 +642,7 @@
 
       CALL IRA_ANNUL( IRA, STATUS )
       CALL IRA_CLOSE( STATUS )
-      
+
 *  Set the current picture on entry as current and Close down the AGI
 *  and SGS.
       CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
@@ -658,5 +658,5 @@
      :        'SKYWRITE: Error writing text strings at specified sky '//
      :        'coordinates', STATUS )
       END IF
-      
+
       END

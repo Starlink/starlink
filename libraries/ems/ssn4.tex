@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research
  Councils \newline\
 Copyright \copyright\ 2008 Science and Technology Facilities Council}
@@ -102,7 +102,7 @@ ignored by applications programmers and users.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -521,12 +521,12 @@ ignored by applications programmers and users.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -575,9 +575,9 @@ ignored by applications programmers and users.}
 
 \section{\xlabel{introduction}Introduction}
 
-The Error Message Service is an implementation of the error reporting 
-conventions discussed in 
-\xref{SUN/104}{sun104}{err_error_reporting_system} 
+The Error Message Service is an implementation of the error reporting
+conventions discussed in
+\xref{SUN/104}{sun104}{err_error_reporting_system}
 which is not dependent on any particular software environment and can
 therefore be used in `stand-alone' programs and for implementing components of
 software environments.
@@ -585,14 +585,14 @@ In order to allow its use in environment system software, EMS provides
 no callable facility for delivering these messages to the user.
 It just provides facilities for constructing and storing reported error
 messages.
-In doing so, it also provides many of the facilities required by 
+In doing so, it also provides many of the facilities required by
 \xref{MSG and ERR}{sun104}{}. Indeed, in many cases the MSG and ERR routines
 are implemented as straight-through calls to EMS routines.
 
 EMS can also be used in the threaded parts of applications and libraries
 when compiled with POSIX threads support, see Appendix \ref{threading}.
 
-The hierarchical relationship between MSG, ERR and EMS is illustrated in 
+The hierarchical relationship between MSG, ERR and EMS is illustrated in
 \textit{Figure~\ref{fig_hier}}.
 
 \begin{figure}[h]
@@ -601,7 +601,7 @@ The hierarchical relationship between MSG, ERR and EMS is illustrated in
 \begin{tabular}{|cccc|} \hline
 & & & \\
 \hspace{8em} & \hspace{8em} & \hspace{8em} & \hspace{8em} \\
-\multicolumn{2}{|c}{\fbox{\textbf{Message Reporting System}}} 
+\multicolumn{2}{|c}{\fbox{\textbf{Message Reporting System}}}
    & \multicolumn{2}{c|}{\fbox{\textbf{Error Reporting System}}} \\
 & \multicolumn{2}{|c|}{} & \\ \cline{2-3}
 \multicolumn{2}{|c|}{} & \multicolumn{2}{c|}{} \\
@@ -624,8 +624,8 @@ Message Service}
 At the level of applications code the Error Reporting System, ERR, exclusively
 should be used for error reporting.
 Within environment subroutine libraries the rule is to use calls to EMS unless
-it is necessary to deliver error messages to the user (\textit{i.e.}\ by 
-calls to 
+it is necessary to deliver error messages to the user (\textit{i.e.}\ by
+calls to
 \xref{\texttt{ERR\_FLUSH}}{sun104}{ERR_FLUSH}).
 A subroutine library \emph{must}\/ use one or other of these error reporting
 libraries exclusively: \textit{i.e.}\ if EMS calls are used within a
@@ -647,8 +647,8 @@ This avoids problems with global variable access in the ERR and ADAM
 libraries. See Appendix \ref{threading}.
 
 \section{\xlabel{reporting_errors}Reporting Errors}
-The subroutine used to report errors is \texttt{EMS\_REP}. 
-It has a calling sequence analogous to that of 
+The subroutine used to report errors is \texttt{EMS\_REP}.
+It has a calling sequence analogous to that of
 \xref{\texttt{ERR\_REP}}{sun104}{ERR_REP}, \textit{i.e.}
 \begin{quote}
 \begin{verbatim}
@@ -656,7 +656,7 @@ CALL EMS_REP( PARAM, TEXT, STATUS )
 \end{verbatim}
 \end{quote}
 The argument \texttt{PARAM} is the error message name, \texttt{TEXT}
-is the error message text 
+is the error message text
 and \texttt{STATUS} is the inherited status.
 The \texttt{TEXT} and \texttt{STATUS}  arguments are the same as those used in
 calls to \texttt{ERR\_REP} and are discussed fully in
@@ -683,14 +683,14 @@ The behaviour of these subroutines is analogous to \texttt{ERR\_MARK},
 \texttt{ERR\_RLSE}, \texttt{ERR\_ANNUL}, \texttt{ERR\_BEGIN} and
 \texttt{ERR\_END} provided by the Error Reporting System (see
 \xref{SUN/104}{sun104}{deferred_error_reporting}).
-EMS does not provide an analogue to 
+EMS does not provide an analogue to
 \xref{\texttt{ERR\_FLUSH}}{sun104}{ERR_FLUSH}.
 
 \section{\xlabel{message_tokens}Message Tokens}
 The facility to use message tokens to embed the values of program variables
 within the message text is available in EMS.
 As in MSG and ERR, these message tokens are  indicated by prefixing the token
-name with an up-arrow, ``$^\wedge$'', escape character within message text, 
+name with an up-arrow, ``$^\wedge$'', escape character within message text,
 \textit{e.g.}
 \begin{quote}
 \begin{verbatim}
@@ -720,8 +720,8 @@ C & CHARACTER\\
 \end {tabular}
 \end {center}
 These routines are analogous to the subroutines \texttt{MSG\_SET\textit{x}}
-provided by the Message Reporting System (see 
-\xref{SUN/104}{sun104}{message_tokens}). 
+provided by the Message Reporting System (see
+\xref{SUN/104}{sun104}{message_tokens}).
 As for the MSG routines, if the token has already been set, the new string
 will be appended to the existing one.
 All defined message tokens are annulled by a call to \texttt{EMS\_ANNUL},
@@ -736,13 +736,13 @@ meantime.
 \section{\xlabel{reporting_status_fortran_io_and_operating_system_errors}Reporting
 Status, Fortran I/O and Operating System Errors}\label{Stat_sect}
 Three subroutines are provided by the Error Message Service to enable a message
-token to be built from the error flag value returned from standard Starlink 
+token to be built from the error flag value returned from standard Starlink
 library routines, system routines or Fortran I/O operations. (\emph{For C
 programmers, \texttt{emsErrno} is also provided, see Section \ref{C_lang}.})
-It is important that the correct routine is called, otherwise the wrong 
+It is important that the correct routine is called, otherwise the wrong
 message or, at best, only an error number will be obtained.
 
-It should be noted that the messages returned using these subroutines 
+It should be noted that the messages returned using these subroutines
 will depend upon the operating system in use.
 The error messages returned by operating systems vary considerably in their
 clarity and so should not be relied upon as the sole source of information
@@ -766,26 +766,26 @@ where \texttt{IOSTAT} is a Fortran I/O status code, and
 EMS_SYSER( TOKEN, SYSTAT )
 \end{verbatim}
 \end {quote}
-where \texttt{SYSTAT} is a status value returned from a system routine. 
+where \texttt{SYSTAT} is a status value returned from a system routine.
 
 In each case the message associated with the given error code is assigned to
-the specified message token. 
+the specified message token.
 On completion, each of these subroutines returns its second argument
-unchanged. 
+unchanged.
 
 \section{\xlabel{message_output}Message Output}
 \subsection{\xlabel{no_ems_flush}No EMS\_FLUSH}
-At the risk of belabouring the point, the Error Message Service provides no 
-callable facility for delivering messages to the user, \textit{i.e.}\ there is 
-no analogue to 
+At the risk of belabouring the point, the Error Message Service provides no
+callable facility for delivering messages to the user, \textit{i.e.}\ there is
+no analogue to
 \xref{\texttt{ERR\_FLUSH}}{sun104}{ERR_FLUSH}
 provided by EMS for the programmer.
-This is a direct result of the binding of ERR to the particular 
+This is a direct result of the binding of ERR to the particular
 software environment being used.
 In the Error Message Service no such binding can be used reliably.
 EMS is only able to stack and annul error messages and to
 control error deferral using the same error table as the ERR subroutine
-library. 
+library.
 Responsibility for the delivery of error messages to the user therefore rests
 at a higher level, ultimately with the application programmer.
 
@@ -800,15 +800,15 @@ present.
 Outside any environment EMS has to have some reliable mechanism for ultimately
 delivering any reported error messages to the user, since it cannot be
 guaranteed that the ERR library is being used at the level of the application.
-This is achieved by the having the initial error context level of EMS deliver 
+This is achieved by the having the initial error context level of EMS deliver
 any reported error message immediately to the user using a C \texttt{printf}
 statement: \textit{i.e.}\ if all an application does is call \texttt{EMS\_REP},
 then all error messages are immediately delivered to the user when they are
 reported.
 Any higher error context level, set with a call to \texttt{EMS\_MARK} or
 \texttt{EMS\_BEGIN},
-will have the effect of deferring message output until the error reporting 
-context is returned to its initial level with calls to \texttt{EMS\_RLSE} 
+will have the effect of deferring message output until the error reporting
+context is returned to its initial level with calls to \texttt{EMS\_RLSE}
 or \texttt{EMS\_END}.
 Any deferred error messages will then be delivered to the user and any further
 error messages reported in this context will again be delivered immediately to
@@ -818,10 +818,10 @@ The behaviour of EMS without an environment present means that it is essential
 for error reporting contexts to be properly nested within a package and for a
 subroutine library using EMS not to exit at a context level other than the
 one at which it was invoked.
-If context levels are incorrectly nested within a package it can lead to 
+If context levels are incorrectly nested within a package it can lead to
 EMS failing to deliver reported error messages when an application goes wrong.
-Because the nested use of \texttt{EMS\_MARK} and \texttt{EMS\_RLSE} 
-(or \texttt{EMS\_BEGIN} and 
+Because the nested use of \texttt{EMS\_MARK} and \texttt{EMS\_RLSE}
+(or \texttt{EMS\_BEGIN} and
 \texttt{EMS\_END}) is normally confined within the same routine, incorrect
 nesting of context levels will normally result from simple programming errors
 which can be easily traced.
@@ -836,9 +836,9 @@ statements.}
 \end{quote}
 
 \subsection{\xlabel{ems_within_an_environment}EMS within an environment}
-When using EMS from within an environment, the environment should ensure that 
+When using EMS from within an environment, the environment should ensure that
 the delivery of any reported error messages within the environment is deferred
-and that any undelivered messages are output to the user when the application 
+and that any undelivered messages are output to the user when the application
 has finished.
 There are three routines (actually part of the ERR library), exclusively for
 the use of environment implementors, which facilitate this task -- they are
@@ -847,16 +847,16 @@ discussed in Appendix \ref{ADAM_sect}.
 \section{\xlabel{intercepting_messages}\label{intercepting_messages}Intercepting Messages}
 Although there is no callable provision for message output directly from
 EMS, the  output of messages at this level in the ADAM subroutine hierarchy is
-still possible. 
+still possible.
 It can be done by intercepting any pending error messages within the current
 error context (or informational messages) using subroutines \texttt{EMS\_ELOAD}
 or
 \texttt{EMS\_EXPND}, which return the message in a character variable, and then
-using a private package-related mechanism to output the message. 
+using a private package-related mechanism to output the message.
 Here, the mechanism used to output the message, \textit{e.g.}\ to a log file,
 and its resilience to failure must be the responsibility of the subroutine
 library calling EMS.
-The use of private package equivalents to 
+The use of private package equivalents to
 \xref{\texttt{MSG\_OUT}}{sun104}{MSG_OUT}
 or
 \xref{\texttt{ERR\_FLUSH}}{sun104}{ERR_FLUSH}
@@ -870,10 +870,10 @@ one by one in a series of calls; it has the calling sequence:
 CALL EMS_ELOAD( PARAM, PARLEN, OPSTR, OPLEN, STATUS )
 \end{verbatim}
 \end{quote}
-On the first call of this routine, the error table for the current 
+On the first call of this routine, the error table for the current
 context is copied into a holding area, the current error context
 is annulled and the first message in the holding area is returned.
-Thereafter, each time the routine is called, the next message from 
+Thereafter, each time the routine is called, the next message from
 the holding area is returned.
 The argument \texttt{PARAM} is the returned message name and \texttt{PARLEN}
 the length of the message name in \texttt{PARAM}.
@@ -884,13 +884,13 @@ The status associated with the returned message is returned in \texttt{STATUS}
 until there are no more messages to return -- then \texttt{STATUS} is set to
 SAI\_\_OK, \texttt{PARAM} and \texttt{OPSTR} are set to blanks and
 \texttt{PARLEN} and \texttt{OPLEN} to 1.
-If there are no messages pending on the first call, a warning message 
+If there are no messages pending on the first call, a warning message
 is returned with \texttt{STATUS} set to EMS\_\_NOMSG.
 
 After \texttt{STATUS} has been returned SAI\_\_OK, the whole process is
 repeated for subsequent calls.
-This process is the same as for 
-\xref{\texttt{ERR\_LOAD}}{sun104}{ERR_LOAD}\latex{ (see SUN/104)} 
+This process is the same as for
+\xref{\texttt{ERR\_LOAD}}{sun104}{ERR_LOAD}\latex{ (see SUN/104)}
 which just calls \texttt{EMS\_ELOAD}.
 
 \texttt{EMS\_EXPND} has the calling sequence:
@@ -901,20 +901,20 @@ CALL EMS_EXPND( TEXT, OPSTR, OPLEN, STATUS )
 \end{quote}
 \texttt{TEXT} is the message text, \texttt{OPSTR} is the returned message text,
 \texttt{OPLEN} is the length of the message in \texttt{OPSTR} and
-\texttt{STATUS} is the inherited status. 
+\texttt{STATUS} is the inherited status.
 
 The behaviour of \texttt{EMS\_EXPND} is to expand any message tokens in the
 message text and return the expanded message through the character variable
 \texttt{OPSTR}.
 
 For both \texttt{EMS\_EXPND} and \texttt{EMS\_ELOAD}, if the message text is
-longer than the declared length of OPSTR then the message is truncated with an 
+longer than the declared length of OPSTR then the message is truncated with an
 ellipsis, \textit{i.e.}\ ``\ldots'', but no error results.
 
 The symbolic constants EMS\_\_SZPAR and EMS\_\_SZMSG are provided for declaring
-the lengths of character variables which are to receive message names and 
+the lengths of character variables which are to receive message names and
 error messages in this way.
-These constants are defined in the include file 
+These constants are defined in the include file
 \htmlref{\texttt{EMS\_PAR}}{incl_sect}\latex{ (see
 Appendix~\ref{incl_sect})}.
 
@@ -928,7 +928,7 @@ Fortran language and has therefore been omitted.
 
 The current naming scheme for the C functions (\texttt{emsAnnul}
 \textit{etc.}) replaces the earlier one (\texttt{ems\_annul\_c} \textit{etc.}),
-but the old names will still be recognised. 
+but the old names will still be recognised.
 There is no change to the argument lists.
 (See Appendix \ref{version_1_6} for more details.)
 
@@ -945,7 +945,7 @@ result but on other systems they may be different.
 This returns the value of a tuning parameter. If differs from the Fortran
 version as the value is returned, not passed back by reference.
 
-\item \texttt{emsSetnc( char const *token, char const *string, int maxchar )} 
+\item \texttt{emsSetnc( char const *token, char const *string, int maxchar )}
 This is similar to \texttt{emsSetc} but will limit the token length to
 \texttt{maxchar} characters.
 It must be used if \texttt{string} is not null-terminated.
@@ -959,7 +959,7 @@ to this function (this may be necessary for systems that do not share
 tuning values).
 
 
-\end{itemize} 
+\end{itemize}
 A full list of the C function prototypes is provided in Appendix~\ref{C_sect}.
 
 The function \texttt{emsExpnd} has the argument \texttt{maxlen}, not found in
@@ -992,15 +992,15 @@ char & CHARACTER\\
 \end {tabular}
 \end {center}
 
-Note that the interpretation of the \texttt{int lvalue} argument presented to 
+Note that the interpretation of the \texttt{int lvalue} argument presented to
 the function \texttt{emsSetl} is that defined by the ANSI C language.
 
 \section{\xlabel{compiling_and_linking_with_the_error_message_service}Compiling
 and Linking with the Error Message Service}\label{comp_sect}
 
-There are three Fortran include files available for use with the Error Message 
+There are three Fortran include files available for use with the Error Message
 Service: \texttt{SAE\_PAR}, \texttt{EMS\_PAR} and \texttt{EMS\_ERR}
-(see Appendix \ref{incl_sect} for details of the symbolic constants which they 
+(see Appendix \ref{incl_sect} for details of the symbolic constants which they
 define).
 The Starlink convention is that the name in upper case with no path or
 extension is specified when including these files within Fortran code,
@@ -1016,7 +1016,7 @@ extension is specified when including these files within Fortran code,
 Equivalent header files are installed in \texttt{/star/include} for use in C
 code which is calling EMS -- they are named \texttt{sae\_par.h},
 \texttt{ems\_par.h} and \texttt{ems\_err.h}.
-In addition, \texttt{ems.h} contains the function prototypes for each of the C 
+In addition, \texttt{ems.h} contains the function prototypes for each of the C
 functions.
 The syntax
 \begin{quote}
@@ -1066,7 +1066,7 @@ library, which may not be present at a non-Starlink site.
 
 \begin{latexonly}
 \begin {tabular}{lll}
-Lawden, M.D. & \xref{SG/4}{sg4}{} 
+Lawden, M.D. & \xref{SG/4}{sg4}{}
 --- ADAM -- The Starlink Software Environment.\\
 Rees, P.C.T. & \xref{SUN/104}{sun104}{}
 --- MSG and ERR -- Message and Error Reporting Systems.\\
@@ -1076,7 +1076,7 @@ Chipperfield, A.J. & \xref{SUN/185}{sun185}{}
 \end{latexonly}
 
 \begin{htmlonly}
-Lawden, M.D. : \xref{SG/4}{sg4}{} 
+Lawden, M.D. : \xref{SG/4}{sg4}{}
 --- ADAM -- The Starlink Software Environment.\\
 Rees, P.C.T. : \xref{SUN/104}{sun104}{}
 --- MSG and ERR -- Message and Error Reporting Systems.\\
@@ -1088,8 +1088,8 @@ Chipperfield, A.J. : \xref{SUN/185}{sun185}{}
 \appendix
 
 \section{Justification for EMS}
-The hierarchical structure of an application within a software environment 
-is illustrated in 
+The hierarchical structure of an application within a software environment
+is illustrated in
 \textit{Figure~\ref{fig_appov}}.
 
 \begin{figure}[h]
@@ -1119,38 +1119,38 @@ and the
 operating system any environment is realised as a number of subroutine
 libraries, providing a set of documented facilities for the applications
 programmer to use.
-Between the user and an application, the environment will normally also 
+Between the user and an application, the environment will normally also
 provide a user interface which controls the loading of specific applications,
 the I/O to the user and the parameter system.
 
 The exclusion of any user-callable message delivery mechanism from the Error
 Message Service allows EMS to be used for error reporting within software
 environment system routines without the danger of recursion on error.
-Conversely, the Error and Message Reporting Systems, 
-\xref{ERR and MSG}{sun104}{}\latex{ (see SUN/104)}, 
-have bindings to specific software environments and thus the ability to 
-deliver error and informational messages to the user via the user interface 
+Conversely, the Error and Message Reporting Systems,
+\xref{ERR and MSG}{sun104}{}\latex{ (see SUN/104)},
+have bindings to specific software environments and thus the ability to
+deliver error and informational messages to the user via the user interface
 of that environment.
 The binding of ERR and MSG to a given software environment precludes their use
 for error reporting from within the environment system software because the
-error reporting would rely to some (probably unpredictable) extent upon the 
+error reporting would rely to some (probably unpredictable) extent upon the
 working state of that environment.
-Thus, ERR and MSG act as interfaces for a given environment with EMS, to be 
+Thus, ERR and MSG act as interfaces for a given environment with EMS, to be
 used only within applications software.
 
-As an example, the 
+As an example, the
 \xref{ADAM}{sg4}{}
-versions of ERR and MSG are able to obtain the message text associated with a 
-given message parameter from the ADAM interface file and are also able to 
-include ADAM parameter keywords and references (\textit{i.e.}\ file names, 
+versions of ERR and MSG are able to obtain the message text associated with a
+given message parameter from the ADAM interface file and are also able to
+include ADAM parameter keywords and references (\textit{i.e.}\ file names,
 \xref{HDS}{sun92}{}
 object names or device names) in the message text.
-These features are useful when reporting error and informational messages 
-from ADAM applications software. 
+These features are useful when reporting error and informational messages
+from ADAM applications software.
 However, in order to provide these facilities, MSG and ERR make calls to the
 ADAM parameter system, data system and user interface and so depend
 upon the working state of these parts of the ADAM environment.
-These features preclude the use of MSG and ERR in the development of any 
+These features preclude the use of MSG and ERR in the development of any
 subroutine library used by the parameter system, data system or user interface.
 
 \newpage
@@ -1219,29 +1219,29 @@ will be shown using the default delivery \texttt{printf} mechanism during the
 \section{\xlabel{using_ems_within_adam_system_software}Using EMS within ADAM
 system software} \label{ADAM_sect}
 \subsection{\xlabel{ems_in_adam_overview}Overview}
-This document has so far discussed the use of EMS in a general context. 
+This document has so far discussed the use of EMS in a general context.
 In this section, specific differences between EMS and the ADAM versions of
 the Message and Error Reporting Systems, MSG and ERR, are presented.
 
 \subsection{\xlabel{message_parameters}Message parameters}
 In calls to the ADAM version of \texttt{ERR\_REP}, the error message name
-\texttt{PARAM} is a 
+\texttt{PARAM} is a
 globally unique identifier for the error message text which corresponds to
 the message parameter of the error message.
 The ADAM interface file can be used to associate this message parameter with
-an error message, and only if this message parameter is not defined in the 
+an error message, and only if this message parameter is not defined in the
 interface file is the argument \texttt{TEXT} used in the error report.
 When using \texttt{EMS\_REP} (or the deprecated \texttt{EMS\_MLOAD}) within the
 ADAM environment software, no access to the ADAM interface file exists and so
 the error message given by the argument \texttt{TEXT} is always used.
-The use of a globally unique error message name is still recommended for 
+The use of a globally unique error message name is still recommended for
 reported error messages to uniquely identify the error message text to the
-programmer, using the convention outlined in 
+programmer, using the convention outlined in
 \xref{SUN/104}{sun104}{reporting_errors}.
 
 \subsection{\xlabel{parameter_references}Parameter references}
 The ADAM versions of MSG and ERR allow reference to ADAM program
-parameters within the message text. 
+parameters within the message text.
 Reference can be made either to parameter-keyword associations or to the name
 of an ADAM data system object, data file or device associated with a parameter.
 In message text used in calls to MSG and ERR routines these parameter
@@ -1249,7 +1249,7 @@ associations are indicated by the percent, ``\%'', and dollar, ``\$'', escape
 characters respectively.
 EMS does not have access to the ADAM parameter system and so cannot refer
 to ADAM parameters in the text of  messages.
-The escape characters ``\%'' and ``\$'' are therefore treated literally as 
+The escape characters ``\%'' and ``\$'' are therefore treated literally as
 part of the message text in calls to \texttt{EMS\_REP} and \texttt{EMS\_EXPND}
 (or the deprecated \texttt{EMS\_MLOAD}), as they are in the stand-alone
 versions of MSG and ERR.
@@ -1267,8 +1267,8 @@ the user, no message synchronising mechanism is provided by EMS.
 \subsection{\xlabel{routines_specific_to_the_adam_fixed_part}Routines specific
 to the ADAM fixed part}
 There are three ERR routines which start up, clear and stop the Error Reporting
-System within the ADAM fixed part to ensure that the delivery of any 
-reported error messages is deferred and that any messages pending output are 
+System within the ADAM fixed part to ensure that the delivery of any
+reported error messages is deferred and that any messages pending output are
 delivered to the user when the application has finished.
 These subroutines are \texttt{ERR\_START}, \texttt{ERR\_CLEAR} and
 \texttt{ERR\_STOP} -- they are
@@ -1291,14 +1291,14 @@ the error reporting context to the initial context level, \textit{i.e.}\ the
 level prior to the call to \texttt{ERR\_START}.
 
 \begin {quote}
-\emph{The use of these three routines is entirely reserved for starting up, 
-clearing and 
-stopping error reporting within the environment, \textit{e.g.}\ the ADAM fixed 
+\emph{The use of these three routines is entirely reserved for starting up,
+clearing and
+stopping error reporting within the environment, \textit{e.g.}\ the ADAM fixed
 part, and must not be used for any other purpose.}
 \end {quote}
 
 These routines exist only in the ADAM version of the ERR library and are linked
-using the procedure given in 
+using the procedure given in
 \xref{SUN/104}{sun104}{compiling_and_linking_with_msg_and_err}.
 
 \begin {small}
@@ -1371,7 +1371,7 @@ using the procedure given in
    Close the Error Reporting System
 }{
    \sstdescription{
-      Flush any messages pending output and return the Error Reporting 
+      Flush any messages pending output and return the Error Reporting
       System to its initial state.
    }
    \sstinvocation{
@@ -1405,14 +1405,14 @@ which must be available for building EMS and programs which use its Fortran
 interface.
 
 The correct operation of \texttt{EMS\_FACER} (and \texttt{emsFacer}) also
-requires the necessary facility message files to be installed (see 
+requires the necessary facility message files to be installed (see
 \htmlref{`Operating system specific routines'\latex{ below}}
 {operating_system_specific_routines}).
 
 \subsection{\xlabel{operating_system_specific_routines}Operating system
 specific routines}
 \label{deps}
-EMS is coded in ANSI C, according to the Starlink C coding conventions 
+EMS is coded in ANSI C, according to the Starlink C coding conventions
 described in SGP/4.
 However, the following routines have system-specific features and may need
 re-implementing for new platforms.
@@ -1433,13 +1433,13 @@ It then searches for a file with the name
 \texttt{fac\_}\textit{facnum}\texttt{\_err} (where \textit{facnum} is the
 facility number).
 If environment variable \texttt{EMS\_PATH} is defined, it is taken to be a
-directory search path for the file; 
+directory search path for the file;
 if not, a directory search path of \texttt{../help} relative to each of the
 directories on the user's \texttt{PATH} is used.
 
 If the file cannot be found along the selected search path, or
-a message cannot be associated for any other reason, a `FACERR' message is 
-substituted giving as much information as possible. 
+a message cannot be associated for any other reason, a `FACERR' message is
+substituted giving as much information as possible.
 For example:
 \begin{quote}
 \textit{ident}\texttt{, error 147358667 (fac=200,messid=121)}
@@ -1453,9 +1453,9 @@ number and message number derived from it.
 the given status value was not a valid Starlink status value.
 \item[\texttt{FACERR\_\_NOFAC}] --
 the required facility message file was not found.
-\item[\texttt{FACERR\_\_BADFIL}] -- 
+\item[\texttt{FACERR\_\_BADFIL}] --
 the facility message file was faulty.
-\item[\texttt{FACERR\_\_NOMSG}] -- 
+\item[\texttt{FACERR\_\_NOMSG}] --
 the required message number was not found in the facility message file.
 \end{description}
 \item [\htmlref{\texttt{EMS\_FIOER}}{EMS_FIOER}]
@@ -1476,7 +1476,7 @@ On UNIX platforms this accesses \texttt{sys\_errlist} to obtain the message.
 
 \section{\xlabel{include_files}Include Files}
 \label{incl_sect}
-The symbolic constants defined by the three include files used with EMS are 
+The symbolic constants defined by the three include files used with EMS are
 listed below. The way in which these files are included within Fortran or
 C code is described in Section \ref{comp_sect}.
 \begin {description}
@@ -1520,7 +1520,7 @@ and \texttt{EMS\_END}
 (improper use of EMS).
 \item \texttt{EMS\_\_OPTER} -- Error encountered during message output.
 \item \texttt{EMS\_\_UNSET} -- No status associated with message (improper
-use of \texttt{EMS\_REP}). 
+use of \texttt{EMS\_REP}).
 \end{description}
 \end {description}
 Notes:
@@ -1535,53 +1535,53 @@ the moment.
 
 \newpage
 \section{\xlabel{fortran_subroutine_list}Fortran Subroutine List}
-\begin {description} 
+\begin {description}
 \item [\htmlref{EMS\_ANNUL}{EMS_ANNUL}  ( STATUS )] \listline
 \textit{Annul the contents of the current error context.}
 \item [\htmlref{EMS\_BEGIN}{EMS_BEGIN}  ( STATUS )] \listline
 \textit{Begin a new error reporting environment.}
 \item [\htmlref{EMS\_ELOAD}{EMS_ELOAD}
-( PARAM, PARLEN, OPSTR, OPLEN, STATUS )] \listline 
+( PARAM, PARLEN, OPSTR, OPLEN, STATUS )] \listline
 \textit{Return messages from the current error context.}
 \item [\htmlref{EMS\_END}{EMS_END}  ( STATUS )] \listline
 \textit{End the current error reporting environment.}
 \item [\htmlref{EMS\_EXPND}{EMS_EXPND}
 ( TEXT, OPSTR, OPLEN, STATUS )] \listline
 \textit{Expand and return a message.}
-\item [\htmlref{EMS\_FACER}{EMS_FACER}  ( TOKEN, STATUS )] \listline 
+\item [\htmlref{EMS\_FACER}{EMS_FACER}  ( TOKEN, STATUS )] \listline
 \textit{Assign the message associated with a Starlink status to a token.}
-\item [\htmlref{EMS\_FIOER}{EMS_FIOER}  ( TOKEN, IOSTAT )] \listline 
+\item [\htmlref{EMS\_FIOER}{EMS_FIOER}  ( TOKEN, IOSTAT )] \listline
 \textit{Assign the message associated with a Fortran I/O error to a token.}
-\item [\htmlref{EMS\_GTUNE}{EMS_GTUNE} ( KEY, VALUE, STATUS )] \listline 
+\item [\htmlref{EMS\_GTUNE}{EMS_GTUNE} ( KEY, VALUE, STATUS )] \listline
 \textit{Inquire an EMS tuning parameter.}
 \item [\htmlref{EMS\_LEVEL}{EMS_LEVEL}  ( LEVEL )] \listline
 \textit{Inquire the current error context level.}
 \item [\htmlref{EMS\_MARK}{EMS_MARK}] \listline
 \textit{Start a new error context.}
 \item [\htmlref{EMS\_MLOAD}{EMS_MLOAD}
-( PARAM, TEXT, OPSTR, OPLEN, STATUS )] \listline 
+( PARAM, TEXT, OPSTR, OPLEN, STATUS )] \listline
 \textit{(Deprecated) Expand and return a message. }
 \item [\htmlref{EMS\_RENEW}{EMS_RENEW}] \listline
 \textit{Renew any annulled message tokens in the current context.}
-\item [\htmlref{EMS\_REP}{EMS_REP} ( PARAM, TEXT, STATUS )] \listline 
+\item [\htmlref{EMS\_REP}{EMS_REP} ( PARAM, TEXT, STATUS )] \listline
 \textit{Report an error message.}
 \item [\htmlref{EMS\_RLSE}{EMS_RLSE}] \listline
 \textit{Release (i.e.\ end) the current error context.}
-\item [\htmlref{EMS\_SETx}{EMS_SETx}  ( TOKEN, VALUE )] \listline 
+\item [\htmlref{EMS\_SETx}{EMS_SETx}  ( TOKEN, VALUE )] \listline
 \textit{Concise encoding of a given value. }
 \item [\htmlref{EMS\_STAT}{EMS_STAT}  ( STATUS )] \listline
 \textit{Inquire the last reported error status.}
-\item [\htmlref{EMS\_SYSER}{EMS_SYSER}  ( TOKEN, SYSTAT )] \listline 
+\item [\htmlref{EMS\_SYSER}{EMS_SYSER}  ( TOKEN, SYSTAT )] \listline
 \textit{Assign the message associated with an operating system error
 to a token.}
-\item [\htmlref{EMS\_TUNE}{EMS_TUNE} ( KEY, VALUE, STATUS )] \listline 
+\item [\htmlref{EMS\_TUNE}{EMS_TUNE} ( KEY, VALUE, STATUS )] \listline
 \textit{Set an EMS tuning parameter.}
 \end {description}
 
 \newpage
 \section{\xlabel{c_interface_function_prototypes}C Interface Function
 Prototypes} \label{C_sect}
-\begin {description} 
+\begin {description}
 
 \item[void emsAnnul ( int \texttt{*}status );] \listline
 \textit{Annul the contents of the current error context.}
@@ -1590,7 +1590,7 @@ Prototypes} \label{C_sect}
 \textit{Begin a new error reporting environment.}
 
 \item[void emsEload
-( char \texttt{*}parstr, int \texttt{*}parlen, char \texttt{*}opstr, 
+( char \texttt{*}parstr, int \texttt{*}parlen, char \texttt{*}opstr,
 int \texttt{*}oplen, int \texttt{*}status );] \listline
 \textit{Return messages from the current error context.}
 
@@ -1609,7 +1609,7 @@ const int maxlen, int \texttt{*}oplen, int \texttt{*}status );} \\
 \textit{Assign the messages associated with a Starlink status value to a
 token.}
 
-\item[int emsGtune ( const char \texttt{*}key, int \texttt{*}status );] 
+\item[int emsGtune ( const char \texttt{*}key, int \texttt{*}status );]
 \listline
 \textit{Get the value of a tuning parameter}
 
@@ -1619,15 +1619,15 @@ token.}
 \item[void emsMark ( void );] \listline
 \textit{Start a new error context.}
 
-\item[void emsMload] \listline 
-\textbf{( const char \texttt{*}param, const char \texttt{*}text, 
+\item[void emsMload] \listline
+\textbf{( const char \texttt{*}param, const char \texttt{*}text,
 char \texttt{*}opstr, int \texttt{*}oplen, int~\texttt{*}status );} \\
 \textit{(Deprecated) Expand and return a message.}
 
 \item[void emsRenew ( void );] \listline
 \textit{Renew any annulled message tokens in the current context.}
 
-\item[void emsRep ( const char \texttt{*}param, const char \texttt{*}text, 
+\item[void emsRep ( const char \texttt{*}param, const char \texttt{*}text,
 int \texttt{*}status );] \listline
 \textit{Report an error message.}
 
@@ -1636,7 +1636,7 @@ int \texttt{*}status );] \listline
 
 \item[void emsSetc ( const char \texttt{*}token,
 const char \texttt{*}cvalue, ... );] \listline
-\textit{Concise encoding of a given null-terminated string. String 
+\textit{Concise encoding of a given null-terminated string. String
 \texttt{cvalue} must be null-terminated. (For historical
 reasons, additional arguments are permitted but have no effect.)}
 
@@ -1730,17 +1730,17 @@ Specifications}
    Return error messages from the current error context
 }{
    \sstdescription{
-      On the first call of this routine, the error table for the current 
+      On the first call of this routine, the error table for the current
       error context is copied into a holding area, the current context
       is annulled and the first message in the holding area is returned.
-      Thereafter, each time the routine is called, the next message from 
+      Thereafter, each time the routine is called, the next message from
       the holding area is returned.
       The argument \texttt{PARAM} is the returned message name and
       \texttt{PARLEN} the length of the message name.
       \texttt{OPSTR} is the returned error message text and \texttt{OPLEN}
       is the length of the error message in \texttt{OPSTR}.
       If the message text is longer than the declared length of \texttt{OPSTR},
-      then the message is truncated with an ellipsis, \textit{i.e.}\ 
+      then the message is truncated with an ellipsis, \textit{i.e.}\
       ``\ldots'', but no error results.
 
       The status associated with the returned message is returned in
@@ -1780,7 +1780,7 @@ Specifications}
       \sstsubsection{
          STATUS = INTEGER (Returned)
       }{
-         The status associated with the returned error message: 
+         The status associated with the returned error message:
          it is set to SAI\_\_OK when there are no more messages.
       }
    }
@@ -1815,11 +1815,11 @@ Specifications}
    \sstdescription{
       Any tokens in the supplied message are expanded and the result is
       returned in the character variable supplied. If the status argument
-      is not set to SAI\_\_OK on entry, no action is taken except that the 
-      values of any existing message tokens are always left undefined 
+      is not set to SAI\_\_OK on entry, no action is taken except that the
+      values of any existing message tokens are always left undefined
       after a call to \texttt{EMS\_EXPND}.
-      If the expanded message is longer than 
-      the length of the supplied character variable, the message is 
+      If the expanded message is longer than
+      the length of the supplied character variable, the message is
       terminated with an ellipsis.
    }
    \sstinvocation{
@@ -1855,10 +1855,10 @@ Specifications}
 }{
    \sstdescription{
       The text of the error message associated with the Starlink status
-      value, \texttt{STATUS}, is assigned to the named message token. This 
-      token may then be included in an error message. If the token is 
-      already defined, the error message is appended to the existing token 
-      value. 
+      value, \texttt{STATUS}, is assigned to the named message token. This
+      token may then be included in an error message. If the token is
+      already defined, the error message is appended to the existing token
+      value.
    }
    \sstinvocation{
       CALL EMS\_FACER( TOKEN, STATUS )
@@ -1891,9 +1891,9 @@ Specifications}
    \sstdescription{
       The text of the error message associated with the Fortran I/O status
       value, \texttt{IOSTAT}, is assigned to the named message token.
-      This token may then be included in an error message. If the token is 
-      already defined, the error message is appended to the existing token 
-      value. 
+      This token may then be included in an error message. If the token is
+      already defined, the error message is appended to the existing token
+      value.
    }
    \sstinvocation{
       CALL EMS\_FIOER( TOKEN, IOSTAT )
@@ -1913,7 +1913,7 @@ Specifications}
    \sstdiytopic{
       System-specific
    }{
-      The messages generated using this facility will depend upon the 
+      The messages generated using this facility will depend upon the
       computer system in use.
    }
 }
@@ -2002,8 +2002,8 @@ Specifications}
    \sstdescription{
       Any tokens in the supplied message are expanded and the result is
       returned in the character variable supplied. If the status argument
-      is not set to SAI\_\_OK on entry, no action is taken except that the 
-      values of any existing message tokens are always left undefined 
+      is not set to SAI\_\_OK on entry, no action is taken except that the
+      values of any existing message tokens are always left undefined
       after a call to \texttt{EMS\_MLOAD}. If the expanded message is longer
       than the declared length of the supplied character variable, the message
       is terminated with an ellipsis.
@@ -2051,10 +2051,10 @@ Specifications}
 }{
    \sstdescription{
       Any message tokens which have been annulled by a call to
-      \texttt{EMS\_REP}, \texttt{EMS\_EXPND}, \texttt{EMS\_\-MLOAD}, 
+      \texttt{EMS\_REP}, \texttt{EMS\_EXPND}, \texttt{EMS\_\-MLOAD},
       \texttt{EMS\_ANNUL} or \texttt{EMS\_ELOAD}
       in the current context are renewed.
-      If any new token value has been defined since the previous 
+      If any new token value has been defined since the previous
       tokens were annulled (\textit{e.g.}\ using the \texttt{EMS\_SETx}
       routines), no action is taken. The intended use of \texttt{EMS\_RENEW}
       is to renew all existing message tokens immediately after a message has
@@ -2100,7 +2100,7 @@ Specifications}
          STATUS = INTEGER (Given and Returned)
       }{
          The global status: this is left unchanged on successful
-         completion, and is returned set to an EMS\_\_ error if an 
+         completion, and is returned set to an EMS\_\_ error if an
          internal error occurs.
       }
    }
@@ -2127,10 +2127,10 @@ Specifications}
    Assign a value to a message token (concise)
 }{
    \sstdescription{
-      A given value is encoded using a concise format and the result 
+      A given value is encoded using a concise format and the result
       assigned to the named message token. If the token is already
-      defined, the result is appended to the existing token value. 
-      The given value may be one of the following Fortran 77 data types 
+      defined, the result is appended to the existing token value.
+      The given value may be one of the following Fortran 77 data types
       and there is one routine provided for each data type:
 
       \begin {center}
@@ -2147,7 +2147,7 @@ Specifications}
       \end {tabular}
       \end {center}
 
-      If these subroutines fail, it will usually be apparent in any 
+      If these subroutines fail, it will usually be apparent in any
       messages which refer to this token.
    }
    \sstinvocation{
@@ -2168,7 +2168,7 @@ Specifications}
    \sstdiytopic{
       System-specific
    }{
-      The precise effect of failures will depend upon the computer system 
+      The precise effect of failures will depend upon the computer system
       being used.
    }
 }
@@ -2180,7 +2180,7 @@ Specifications}
    \sstdescription{
       The current error context is checked for any error messages reported
       since the context was created or last annulled.
-      If none exist, \texttt{STATUS} is returned set to SAI\_\_OK. 
+      If none exist, \texttt{STATUS} is returned set to SAI\_\_OK.
       If there are any such messages, \texttt{STATUS} is returned set to the
       status value associated with the last reported error message.
    }
@@ -2203,9 +2203,9 @@ Specifications}
    \sstdescription{
       The text of the error message associated with the operating system
       status value, \texttt{SYSTAT}, is assigned to the named message token.
-      This token may then be included in an error message. If the token is 
-      already defined, the error message is appended to the existing token 
-      value. 
+      This token may then be included in an error message. If the token is
+      already defined, the error message is appended to the existing token
+      value.
    }
    \sstinvocation{
       CALL EMS\_SYSER( TOKEN, SYSTAT )
@@ -2225,7 +2225,7 @@ Specifications}
    \sstdiytopic{
       System-specific
    }{
-      The messages generated using this facility will depend upon the 
+      The messages generated using this facility will depend upon the
       computer system in use.
    }
 }
@@ -2298,13 +2298,13 @@ Specifications}
       }
    }
    \sstnotes{\begin{enumerate}
-      \item SZOUT applies to the case where EMS does its own output - 
+      \item SZOUT applies to the case where EMS does its own output -
       \textit{i.e.} when messages are reported or impending when EMS is at
       its base level.
       Normally output will be from the ERR package and is tuned by
       \texttt{ERR\_TUNE}.
       \item Some aspects of output for both ERR and MSG are controlled by EMS
-      and its tuning parameters therefore \texttt{ERR\_TUNE} and 
+      and its tuning parameters therefore \texttt{ERR\_TUNE} and
       \texttt{MSG\_TUNE} call this
       subroutine to set the EMS tuning parameters appropriately. This may
       result in interference.

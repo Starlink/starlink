@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_ROW( RINDEX, NDIM, D, LBND, UBND, MSKSIZ, 
-     :                     NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB, 
+      SUBROUTINE ARD1_ROW( RINDEX, NDIM, D, LBND, UBND, MSKSIZ,
+     :                     NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB,
      :                     UBINTB, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ROW( RINDEX, NDIM, D, LBND, UBND, MSKSIZ, 
-*                    NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB, 
+*     CALL ARD1_ROW( RINDEX, NDIM, D, LBND, UBND, MSKSIZ,
+*                    NPAR, PAR, B, LBEXTB, UBEXTB, LBINTB,
 *                    UBINTB, STATUS )
 
 *  Description:
@@ -21,7 +21,7 @@
 *     supplied interior bounding box to the exterior value 0.
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
-*     supplied parameters. 
+*     supplied parameters.
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -64,7 +64,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -78,12 +78,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -104,7 +104,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,7 +138,7 @@
       INTEGER
      :        IROW               ! Loop count
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        LPAR( 4 ),         ! Parameters for an extended line
      :        MODUL,             ! Modulus of supplied vector.
      :        MXDIST,            ! Max. distance from any mask edge
@@ -199,10 +199,10 @@
          X = D( 1 ) + D( 3 )*PAR( IROW )
          Y = D( 4 ) + D( 6 )*PAR( IROW )
 
-*  Find the maximum distance of the given position from any of the 
+*  Find the maximum distance of the given position from any of the
 *  mask boundaries.
          MXDIST = MAX( ABS( X - DBLE( LBND( 1 ) ) + 1.0D0 ),
-     :            MAX( ABS( X - DBLE( UBND( 1 ) ) ), 
+     :            MAX( ABS( X - DBLE( UBND( 1 ) ) ),
      :            MAX( ABS( Y - DBLE( LBND( 2 ) ) + 1.0D0),
      :                 ABS( Y - DBLE( UBND( 2 ) ) ) ) ) )
 
@@ -222,7 +222,7 @@
 
 *  If the interior bounding box is null, return the usual value
 *  (VAL__MINI for LBINTB( 1 ) ).
-      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR. 
+      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR.
      :    LBINTB( 2 ) .GT. UBINTB( 2 ) ) LBINTB( 1 ) = VAL__MINI
 
 *  Ensure the the exterior bounding box is returned "infinite".

@@ -6,7 +6,7 @@
 #include "sae_par.h"
 
 F77_SUBROUTINE(kpg1_hdsky)( CHARACTER(LOC), INTEGER(KEYMAP),
-                            INTEGER(OLD), INTEGER(NEW), INTEGER(STATUS) 
+                            INTEGER(OLD), INTEGER(NEW), INTEGER(STATUS)
                             TRAIL(LOC) ) {
 /*
 *+
@@ -23,12 +23,12 @@ F77_SUBROUTINE(kpg1_hdsky)( CHARACTER(LOC), INTEGER(KEYMAP),
 *     CALL KPG1_HDSKY( LOC, KEYMAP, OLD, NEW, STATUS )
 
 *  Description:
-*     This function stores the vectorised data values in the supplied HDS 
-*     object (which must be primitive) in the supplied KeyMap. The key for 
+*     This function stores the vectorised data values in the supplied HDS
+*     object (which must be primitive) in the supplied KeyMap. The key for
 *     the KeyMap entry is the name of the HDS object. If the KeyMap already
-*     contains an entry with this name, then what happens is specified 
-*     by OLD. Likewise, if the KeyMap does not already contain an entry 
-*     with this name, then what happens is specified by NEW. 
+*     contains an entry with this name, then what happens is specified
+*     by OLD. Likewise, if the KeyMap does not already contain an entry
+*     with this name, then what happens is specified by NEW.
 
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
@@ -41,7 +41,7 @@ F77_SUBROUTINE(kpg1_hdsky)( CHARACTER(LOC), INTEGER(KEYMAP),
 *
 *        1 - Append the new vectorised array values read from the HDS
 *        object to the end of the values already in the KeyMap. The HDS
-*        values will be converted to the data type of the values already 
+*        values will be converted to the data type of the values already
 *        in the KeyMap (an error will be reported if this is not possible).
 *
 *        2 - Replace the existing KeyMap entry with a new entry holding
@@ -53,10 +53,10 @@ F77_SUBROUTINE(kpg1_hdsky)( CHARACTER(LOC), INTEGER(KEYMAP),
 *        4 - Report an error. The KeyMap is returned unchanged, and an error
 *        is reported.
 *     NEW = INTEGER (Given)
-*        Specifies what happens if the supplied KeyMap does not already 
+*        Specifies what happens if the supplied KeyMap does not already
 *        contain an entry with the name of the supplied HDS object.
 *
-*        1 - Create a new entry holding the vectorised array values read from 
+*        1 - Create a new entry holding the vectorised array values read from
 *        the HDS object.
 *
 *        2 - Do nothing. The KeyMap is returned unchanged, and no error
@@ -79,12 +79,12 @@ F77_SUBROUTINE(kpg1_hdsky)( CHARACTER(LOC), INTEGER(KEYMAP),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

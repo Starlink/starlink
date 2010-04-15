@@ -1,5 +1,5 @@
 #include "f77.h"
-      F77_SUBROUTINE(chr_etom)( CHARACTER(str1), CHARACTER(str2) 
+      F77_SUBROUTINE(chr_etom)( CHARACTER(str1), CHARACTER(str2)
                                 TRAIL(str1) TRAIL(str2) ) {
 /*
 *+
@@ -16,15 +16,15 @@
 *     CALL CHR_ETOM( STR1, STR2 )
 
 *  Description:
-*     The string STR1, which has been written on a machine which uses 
-*     the EBCDIC character set and subsequently read on a machine which 
-*     may not use the EBCDIC character set to represent characters in 
-*     Fortran, is returned in STR2 translated into the correct 
+*     The string STR1, which has been written on a machine which uses
+*     the EBCDIC character set and subsequently read on a machine which
+*     may not use the EBCDIC character set to represent characters in
+*     Fortran, is returned in STR2 translated into the correct
 *     character set for the host machine.
 
 *  Arguments:
 *     STR1 = CHARACTER * ( * ) (Given)
-*        The character string written on a machine with an EBCDIC 
+*        The character string written on a machine with an EBCDIC
 *        character set and read on a machine which may not use
 *        EBCDIC to represent characters in Fortran.
 *     STR2 = CHARACTER * ( * ) (Returned)
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 
 *-
 */
-      
+
 /*  Local Constants: */
 #define EBCMAX 255 /* Maximum EBCDIC character code */
 
@@ -103,7 +103,7 @@ int table[EBCMAX+1]= {
   98,  99, 100, 101, 102, 103, 104, 105,  32,  32,
   32,  32,  32,  32,  32, 106, 107, 108, 109, 110,
  111, 112, 113, 114,  32,  32,  32,  32,  32,  32,
-  32, 126, 115, 116, 117, 118, 119, 120, 121, 122, 
+  32, 126, 115, 116, 117, 118, 119, 120, 121, 122,
   32,  32,  32,  32,  32,  32,  32,  32,  32,  32,
   32,  32,  32,  32,  32,  32,  32,  32,  32,  32,
   32,  32, 123,  65,  66,  67,  68,  69,  70,  71,
@@ -121,10 +121,10 @@ int table[EBCMAX+1]= {
 /*  If the string length is non-zero, loop to translate it from EBCDIC to */
 /*  ASCII. */
       if ( length > 0 ) {
-        
+
 /*     If the machine value is legitimate, translate it; */
 /*     if not, translate it to an machine code SPACE. */
-         for (ichr=0; ichr<str2_length; ichr++ ) { 
+         for (ichr=0; ichr<str2_length; ichr++ ) {
             if ( ichr > length ) {
                str2[ichr] = ' ';
             } else {

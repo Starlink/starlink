@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, CUTNEG,
-     :                       VAR, NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI, 
+     :                       VAR, NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI,
      :                       LO, MONO, BAD, STATUS )
 
 *+
@@ -13,15 +13,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, CUTNEG, VAR, 
-*                      NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI, LO, MONO, 
+*     CALL KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, CUTNEG, VAR,
+*                      NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI, LO, MONO,
 *                      BAD, STATUS )
 
 *  Description:
 *     This routine finds the ends of a set of error bars, maps them into
-*     another co-ordinate system using 2 supplied AST Mappings, and finds 
-*     the extreme data values spanned by a given range of the resulting error 
-*     bars. The central values are also mapped, returned, and included in the 
+*     another co-ordinate system using 2 supplied AST Mappings, and finds
+*     the extreme data values spanned by a given range of the resulting error
+*     bars. The central values are also mapped, returned, and included in the
 *     returned extreme data values.
 *
 *     The mapping from supplied to returned values is specified by 1 or 2
@@ -62,8 +62,8 @@
 *     CEN( EL ) = DOUBLE PRECISION (Returned)
 *        The central values after mapping with MAP1 and MAP2.
 *     BAR( EL, 2 ) = DOUBLE PRECISION (Returned)
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each error bar after mapping with MAP1 and MAP2.Only accessed 
+*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        for each error bar after mapping with MAP1 and MAP2.Only accessed
 *        if USEVAR is .TRUE.
 *     HI = DOUBLE PRECISION (Returned)
 *        The maximum upper limit of any data value after mapping
@@ -72,9 +72,9 @@
 *        The minimum lower limit of any data value after mapping
 *        (including error bars).
 *     MONO = INTEGER (Returned)
-*        Returned equal to +1 if the mapped central value increases 
-*        monotonically from element 1 to element EL. Returned equal to 
-*        -1 if the mapped central value decreases monotonically from 
+*        Returned equal to +1 if the mapped central value increases
+*        monotonically from element 1 to element EL. Returned equal to
+*        -1 if the mapped central value decreases monotonically from
 *        element 1 to element EL. Returned equal to zero if the mapped
 *        central value is not monotonic.
 *     BAD = LOGICAL (Returned)
@@ -117,11 +117,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
@@ -165,7 +165,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
-      CALL AST_BEGIN( STATUS )     
+      CALL AST_BEGIN( STATUS )
 
 *  Create a compound Mapping from MAP1 and MAP2.
 *  =============================================
@@ -174,7 +174,7 @@
 
 *  Create a PermMap with a single input which is fed by the output from
 *  MAP1, and NIN2 outputs which feed the NIN2 inputs of MAP2. The output
-*  from MAP1 is routed to the selected axis of MAP2. Other PermMap output 
+*  from MAP1 is routed to the selected axis of MAP2. Other PermMap output
 *  axes are assigned AST__BAD by the PermMaps forward transformation.
       DO I = 1, NIN2
          PERM( I ) = 0
@@ -203,7 +203,7 @@
 *  Map the central values.
 *  =======================
 *  Map them.
-      CALL AST_TRAN1( MAP, EL, DAT, .TRUE., CEN, STATUS ) 
+      CALL AST_TRAN1( MAP, EL, DAT, .TRUE., CEN, STATUS )
 
 *  Initialise the limits.
       HI = VAL__MIND
@@ -228,13 +228,13 @@
             CEN( I ) = AST__BAD
             BAD = .TRUE.
 
-*  Only include good positions. 
+*  Only include good positions.
          ELSE IF( CEN( I ) .NE. AST__BAD ) THEN
 
 *  If this element is within the specified bounds, find the mapped limits.
             IF( I .GE. ILO .AND. I .LE. IHI ) THEN
-               HI = MAX( HI, CEN( I ) )               
-               LO = MIN( LO, CEN( I ) )               
+               HI = MAX( HI, CEN( I ) )
+               LO = MIN( LO, CEN( I ) )
             END IF
 
 *  If the previous data was monotonic increasing, reset MONO to zero
@@ -258,7 +258,7 @@
                ELSE
                   MONO = 0
                END IF
-               
+
             END IF
 
 *  Store this good value.
@@ -285,7 +285,7 @@
      :          VAR( I ) .NE. AST__BAD ) THEN
 
                IF( GOTSIG ) THEN
-                  LENBAR = NSIGMA*MAX( 0.0D0, VAR( I ) ) 
+                  LENBAR = NSIGMA*MAX( 0.0D0, VAR( I ) )
                ELSE
                   LENBAR = NSIGMA*SQRT( MAX( 0.0D0, VAR( I ) ) )
                END IF
@@ -299,21 +299,21 @@
          END DO
 
 *  Map them.
-         CALL AST_TRAN1( MAP, 2*EL, BAR, .TRUE., BAR, STATUS ) 
+         CALL AST_TRAN1( MAP, 2*EL, BAR, .TRUE., BAR, STATUS )
 
 *  Find the mapped limits.
          DO I = ILO, IHI
 
             IF( BAR( I, 1 ) .NE. AST__BAD ) THEN
-               HI = MAX( HI, BAR( I, 1 ) )               
-               LO = MIN( LO, BAR( I, 1 ) )               
+               HI = MAX( HI, BAR( I, 1 ) )
+               LO = MIN( LO, BAR( I, 1 ) )
             ELSE
                BAD = .TRUE.
             END IF
 
             IF( BAR( I, 2 ) .NE. AST__BAD ) THEN
-               HI = MAX( HI, BAR( I, 2 ) )               
-               LO = MIN( LO, BAR( I, 2 ) )               
+               HI = MAX( HI, BAR( I, 2 ) )
+               LO = MIN( LO, BAR( I, 2 ) )
             ELSE
                BAD = .TRUE.
             END IF
@@ -329,6 +329,6 @@
       END IF
 
 *  End the AST context.
-      CALL AST_END( STATUS )     
+      CALL AST_END( STATUS )
 
       END

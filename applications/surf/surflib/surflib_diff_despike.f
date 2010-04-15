@@ -4,7 +4,7 @@
      :     OUT_VARIANCE, OUT_QUALITY, NUM_SPIKES, STATUS)
 *+
 *  Name:
-*    SURFLIB_DIFF_DESPIKE 
+*    SURFLIB_DIFF_DESPIKE
 
 *  Purpose:
 *    Despike data scan by detecting points
@@ -29,7 +29,7 @@
 *
 *       diff(i) = point(i) - (point(i-1) + point(i+1))
 *                            -------------------------
-*                                       2.0 
+*                                       2.0
 *
 *
 *     Values of 'diff' for the first and last points in the scan are
@@ -47,7 +47,7 @@
 *     The first criterion for a spike is that it's 'diff' value
 *     should be further from the mean of 'diff' by NSIGMA times the
 *     sigma derived from the endpoints.
-*     
+*
 *     The problem with this simple approach is that bright sources
 *     in the scan themselves lead to excursions in 'diff' that can
 *     be wrongly identified as spikes. To prevent this happening a
@@ -57,7 +57,7 @@
 *     it. 'Box' is expected to increase faster for real sources than
 *     for spikes because in them the increase will be spread over
 *     all 3 averaged points rather than just 1.
-* 
+*
 *     The second criterion for a spike is met, therefore, if a
 *     point's 'diff' is further from the 'diff' mean than the value
 *     of 'box' at that point.
@@ -198,10 +198,10 @@
       LOGICAL GET_SIGMA                        ! .TRUE. while calculating
                                                ! sigma
       INTEGER I                                ! DO loop index
-      INTEGER IHIGH                            ! index of upper 
+      INTEGER IHIGH                            ! index of upper
                                                ! interpolation point
       INTEGER ILOW                             ! index of low
-                                               ! interpolation point 
+                                               ! interpolation point
       INTEGER INTEGRATION                      ! integration number of scan
       INTEGER ITERATION                        ! number of despiking pass
       INTEGER J                                ! array index
@@ -225,7 +225,7 @@
                                                ! spike, 0 otherwise
       REAL    SUM                              ! sum of DIFF
       REAL    SUMSQ                            ! sum of DIFF**2
-      REAL    VARIANCE                         ! variance of DIFF 
+      REAL    VARIANCE                         ! variance of DIFF
 
 *  Internal References :
       INCLUDE 'NDF_FUNC'                       ! for NDF_QMASK
@@ -248,7 +248,7 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
             DO EXPOSURE = 1, N_EXPOSURES
-               
+
                CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, 1,
      :              N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
      :              1, EXPOSURE, INTEGRATION, MEASUREMENT, SCAN_START,
@@ -259,7 +259,7 @@
                   CALL MSG_SETI ('E', EXPOSURE)
                   CALL MSG_SETI ('I', INTEGRATION)
                   CALL MSG_SETI ('M', MEASUREMENT)
-                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+                  CALL MSG_OUTIF (MSG__NORM, ' ',
      :                 'SURFLIB_DIFF_DESPIKE: no data '//
      :                 'for exp ^E in int ^I, meas ^M', STATUS)
                ELSE
@@ -279,7 +279,7 @@
                      IF (STATUS .EQ. SAI__OK) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('LEN', N_SCAN)
-                        CALL ERR_REP (' ', 
+                        CALL ERR_REP (' ',
      :                    'SURFLIB_DIFF_DESPIKE: scan too '//
      :                    'short (^LEN points) for despiking',
      :                    STATUS)
@@ -289,7 +289,7 @@
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('LEN', N_SCAN)
                         CALL MSG_SETI ('MAX', MAX_SCAN)
-                        CALL ERR_REP (' ', 
+                        CALL ERR_REP (' ',
      :                    'SURFLIB_DIFF_DESPIKE: scan longer '//
      :                    '(^LEN) than maximum allowed (^MAX)',
      :                    STATUS)
@@ -332,8 +332,8 @@
      :                       .AND.
      :                       (OUT_DATA(BOL,SCAN_START+2).NE.VAL__BADR))
      :                       THEN
-                              DIFF (1) = OUT_DATA (BOL,SCAN_START) - 
-     :                          (OUT_DATA(BOL,SCAN_START+1) + 
+                              DIFF (1) = OUT_DATA (BOL,SCAN_START) -
+     :                          (OUT_DATA(BOL,SCAN_START+1) +
      :                          OUT_DATA(BOL,SCAN_START+2)) / 2.0
                            ELSE
                               DIFF (1) = VAL__BADR
@@ -348,14 +348,14 @@
      :                          .AND.
      :                          NDF_QMASK(OUT_QUALITY(BOL,I+1),BADBIT)
      :                          .AND.
-     :                          (OUT_DATA(BOL,I-1) .NE. VAL__BADR) 
+     :                          (OUT_DATA(BOL,I-1) .NE. VAL__BADR)
      :                          .AND.
      :                          (OUT_DATA(BOL,I) .NE. VAL__BADR)
      :                          .AND.
      :                          (OUT_DATA(BOL,I+1) .NE. VAL__BADR))
      :                          THEN
 
-                                 DIFF(I-SCAN_START+1) = OUT_DATA(BOL,I)- 
+                                 DIFF(I-SCAN_START+1) = OUT_DATA(BOL,I)-
      :                             (OUT_DATA(BOL,I-1)+OUT_DATA(BOL,I+1))
      :                             / 2.0
                               ELSE
@@ -377,8 +377,8 @@
      :                       .AND.
      :                       (OUT_DATA(BOL,SCAN_END) .NE. VAL__BADR))
      :                       THEN
-                              DIFF(N_SCAN) = OUT_DATA(BOL,SCAN_END) - 
-     :                          (OUT_DATA(BOL,SCAN_END-2) + 
+                              DIFF(N_SCAN) = OUT_DATA(BOL,SCAN_END) -
+     :                          (OUT_DATA(BOL,SCAN_END-2) +
      :                          OUT_DATA(BOL,SCAN_END-1)) / 2.0
                            ELSE
                               DIFF (N_SCAN) = VAL__BADR
@@ -414,7 +414,7 @@
 
                               IF (NSUM .GT. 0) THEN
                                  MEAN = SUM / REAL (NSUM)
-                                 VARIANCE = 
+                                 VARIANCE =
      :                             (SUMSQ-REAL(NSUM)*MEAN**2) /
      :                             REAL (NSUM)
                                  SIGMA = SQRT (VARIANCE)
@@ -460,9 +460,9 @@
      :                          (OUT_DATA(BOL,I+1) .NE. VAL__BADR))
      :                          THEN
 
-                                 BOX (I-SCAN_START+1) = 
-     :                             (ABS (OUT_DATA (BOL,I)) + 
-     :                             ABS (OUT_DATA(BOL,I-1)) + 
+                                 BOX (I-SCAN_START+1) =
+     :                             (ABS (OUT_DATA (BOL,I)) +
+     :                             ABS (OUT_DATA(BOL,I-1)) +
      :                             ABS (OUT_DATA(BOL,I+1))) / 3.0
                               ELSE
                                  BOX (I-SCAN_START+1) = 1.0E6
@@ -484,7 +484,7 @@
      :                          (ABS(DIFF(I)-MEAN) .GE. BOX(I))) THEN
 
 *     The current implementation of the algorithm can not sort
-*     out the case where a spike is detected but is replaced by 
+*     out the case where a spike is detected but is replaced by
 *     a point that is also a spike. In this case a spike is detected
 *     next time round but also replaced by a spike. This situation
 *     is handled by using the cap on iteration numbers but does mean
@@ -542,8 +542,8 @@
                                     ELSE
                                        IF ((SPIKE(J-SCAN_START+1).EQ.0)
      :                                   .AND.
-     :                                   NDF_QMASK(OUT_QUALITY(BOL,J), 
-     :                                   BADBIT) .AND. 
+     :                                   NDF_QMASK(OUT_QUALITY(BOL,J),
+     :                                   BADBIT) .AND.
      :                                   (OUT_DATA(BOL,J).NE.VAL__BADR))
      :                                   THEN
                                           ILOW = J
@@ -562,8 +562,8 @@
                                     ELSE
                                        IF ((SPIKE(J-SCAN_START+1).EQ.0)
      :                                   .AND.
-     :                                   NDF_QMASK(OUT_QUALITY(BOL,J), 
-     :                                   BADBIT) .AND. 
+     :                                   NDF_QMASK(OUT_QUALITY(BOL,J),
+     :                                   BADBIT) .AND.
      :                                   (OUT_DATA(BOL,J).NE.VAL__BADR))
      :                                    THEN
                                            IHIGH = J
@@ -580,7 +580,7 @@
 
                                  IF (ILOW .EQ. VAL__BADI) THEN
                                     IF (IHIGH .EQ. VAL__BADI) THEN
-                                    
+
 *  bad quality, despiking error, leave data as before but set
 *  despiking bit in quality
 
@@ -588,9 +588,9 @@
      :                                      SCULIB_BITON (
      :                                      OUT_QUALITY (BOL,I), 4)
                                     ELSE
-                                       OUT_DATA (BOL,I) = 
+                                       OUT_DATA (BOL,I) =
      :                                   OUT_DATA (BOL,IHIGH)
-                                       OUT_VARIANCE (BOL,I) = 
+                                       OUT_VARIANCE (BOL,I) =
      :                                   OUT_VARIANCE (BOL,IHIGH)
                                        OUT_QUALITY (BOL,I) =
      :                                   OUT_QUALITY (BOL,IHIGH)
@@ -599,21 +599,21 @@
                                     IF (IHIGH .EQ. VAL__BADI) THEN
                                        OUT_DATA (BOL,I) =
      :                                   OUT_DATA (BOL,ILOW)
-                                       OUT_VARIANCE (BOL,I) = 
+                                       OUT_VARIANCE (BOL,I) =
      :                                   OUT_VARIANCE (BOL,ILOW)
-                                       OUT_QUALITY (BOL,I) = 
+                                       OUT_QUALITY (BOL,I) =
      :                                   OUT_QUALITY (BOL,ILOW)
                                     ELSE
                                        FACTOR = REAL (I-ILOW) /
-     :                                   REAL (IHIGH-ILOW) 
-                                       OUT_DATA (BOL,I) = 
+     :                                   REAL (IHIGH-ILOW)
+                                       OUT_DATA (BOL,I) =
      :                                   OUT_DATA (BOL,ILOW) +
      :                                   FACTOR *
-     :                                   (OUT_DATA(BOL,IHIGH) - 
-     :                                   OUT_DATA(BOL,ILOW)) 
-                                       OUT_VARIANCE (BOL,I) = 
+     :                                   (OUT_DATA(BOL,IHIGH) -
+     :                                   OUT_DATA(BOL,ILOW))
+                                       OUT_VARIANCE (BOL,I) =
      :                                   OUT_VARIANCE (BOL,ILOW) +
-     :                                   FACTOR**2 * 
+     :                                   FACTOR**2 *
      :                                   (OUT_VARIANCE(BOL,IHIGH) +
      :                                   OUT_VARIANCE(BOL,ILOW))
                                        OUT_QUALITY (BOL,I) =
@@ -649,7 +649,7 @@
                            END IF
 
                            ITERATION = ITERATION + 1
-                           IF ((NSPIKES .EQ. 0) .OR. 
+                           IF ((NSPIKES .EQ. 0) .OR.
      :                       (ITERATION .GT. 10)) THEN
                               DESPIKING = .FALSE.
                            END IF

@@ -12,7 +12,7 @@
 *     XO,YO (input)                   The accurate star position in integers
 *     REAL
 
-*     SKYRAD,CLEANRAD (input)         The halfsizes of the regions to be 
+*     SKYRAD,CLEANRAD (input)         The halfsizes of the regions to be
 *     INTEGER                         extracted
 
 *     SKYSIZE,CLEANSIZE (input)       The full side lengths of these regions
@@ -45,7 +45,7 @@ C     Now set up the sky square
       YLOW=YO-SKYRAD
       YHIGH=YO+SKYRAD
 
-C     Now check none of these values is out of bounds - if it 
+C     Now check none of these values is out of bounds - if it
 C     is, then slide the square along retaining the total area
 
       XCHECK1=NPIX-XHIGH
@@ -78,7 +78,7 @@ C     is, then slide the square along retaining the total area
       ENDIF
 
 C     Having checked and if necessary shifted the square we now
-C     extract it into the small array SKYARRAY. 
+C     extract it into the small array SKYARRAY.
 
       DO J=1,NLINES
          DO I=1,NPIX
@@ -98,14 +98,14 @@ C     extract it into the small array SKYARRAY.
       WRITE(6,'(A)')' SKY SQUARE HAS BEEN EXTRACTED '
       WRITE(6,'(A)')'      '
 
-C     Now set up square to be cleaned           
+C     Now set up square to be cleaned
 
       XLOW=XO-CLEANRAD
       XHIGH=XO+CLEANRAD
       YLOW=YO-CLEANRAD
       YHIGH=YO+CLEANRAD
 
-C     Now check none of these values is out of bounds - if it 
+C     Now check none of these values is out of bounds - if it
 C     is, then slide the square along retaining the total area
 
       XCHECK1=NPIX-XHIGH
@@ -138,7 +138,7 @@ C     is, then slide the square along retaining the total area
       ENDIF
 
 C     Having checked and if necessary shifted the square we now
-C     extract it into the small array CLEANARRAY. 
+C     extract it into the small array CLEANARRAY.
 
       DO J=1,NLINES
          DO I=1,NPIX

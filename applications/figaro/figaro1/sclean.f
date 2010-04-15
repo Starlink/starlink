@@ -9,20 +9,20 @@ C     the cursor, selecting rows and columns to be corrected and
 C     cosmic rays to be zapped.  The idea is that this routine can
 C     be used to fix up any areas in an image that were not fixed
 C     automatically by the non-interactive version ('BCLEAN').  It
-C     may also give a better idea of the best settings for the 
+C     may also give a better idea of the best settings for the
 C     BCLEAN parameters.  A mode is provided especially suited for
 C     examination of SCUBA data files.
 C
-C     The task works internally with a quality array, setting the 
+C     The task works internally with a quality array, setting the
 C     bit specified by the parameter BITNUM to mark pixels as bad,
-C     but if the input NDF uses flagged bad values and no quality 
-C     array, the output NDF will represent quality information in 
+C     but if the input NDF uses flagged bad values and no quality
+C     array, the output NDF will represent quality information in
 C     the same way.
 C
-C     Variances are propagated, but if any changes are made to the 
-C     data array, the corresponding element of the variance array 
+C     Variances are propagated, but if any changes are made to the
+C     data array, the corresponding element of the variance array
 C     is set to zero.  This is intended to mark it as a bad value,
-C     since Figaro does not support explicitly flagged bad values 
+C     since Figaro does not support explicitly flagged bad values
 C     in the variance array.  If this has been done, the user is
 C     warned at the end of processing.
 C
@@ -40,7 +40,7 @@ C     BITNUM     (Integer) Number of quality bit to modify.
 C     ZOOM       (Integer) Minimum pixel zoom factor.
 C     LOGFILE    (Character) The name of a file to log to.  If null,
 C                no logging is performed.
-C     BATCHFILE  (Character) The name of a file (in SCLEAN log file 
+C     BATCHFILE  (Character) The name of a file (in SCLEAN log file
 C                format) to draw batch input from.  If null (default),
 C                run in interactive mode.
 C
@@ -80,9 +80,9 @@ C     26th Jul  1993.  HME / UoE, Starlink. Disuse PAR_Q*. Use PAR_ABORT.
 C     18th Jul  1996.  MJCL / Starlink, UCL.  Set variables for storage
 C                      of file names to 132 chars.
 C     29th Jul  1998.  MBT / IoA, Starlink. Use quality internally
-C                      instead of flags for bad pixels, and additional 
+C                      instead of flags for bad pixels, and additional
 C                      display mode for SCUBA data. Name changed from
-C                      CLEAN to SCLEAN. 
+C                      CLEAN to SCLEAN.
 C     2005 May 31      MJC / Starlink Use CNF_PVAL for pointers to mapped
 C                      data.
 C+
@@ -96,7 +96,7 @@ C
       INCLUDE 'PAR_ERR'          ! Stati returned by PAR_
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions 
+C     Functions
 C
       INTEGER ICH_LEN,PGBEG
 C
@@ -190,10 +190,10 @@ C
       CALL NDF_DIM(ONDF,2,DIMS,NDIM,STATUS)
       NX=DIMS(1)
       NY=DIMS(2)
-C                         
-C     The required workspace is only used for the Undo function, and may 
-C     be any size (must be more than 12 elements).  The size controls the 
-C     number of operations that may be Undone.  Here it is set at some 
+C
+C     The required workspace is only used for the Undo function, and may
+C     be any size (must be more than 12 elements).  The size controls the
+C     number of operations that may be Undone.  Here it is set at some
 C     multiple of the larger of the image dimensions.
 C
       IF (VEXIST) THEN
@@ -207,8 +207,8 @@ C
       CALL DAT_MAP(WLOC,'_REAL','WRITE',1,DIMS,WPTR,STATUS)
 C
 C     Open log file if LOGFILE parameter is not null
-C     By opening for 'APPEND' and then (if all is well) rewinding we 
-C     effectively open for write but without generating an error if 
+C     By opening for 'APPEND' and then (if all is well) rewinding we
+C     effectively open for write but without generating an error if
 C     the file exists.
 C
       IF (STATUS.NE.SAI__OK) GO TO 500
@@ -229,7 +229,7 @@ C
          CALL NDF_MSG('OUTPUT_NAME',ONDF)
          CALL MSG_LOAD('OUTPUT_LOG','# OUTPUT: ^OUTPUT_NAME',
      :                 STRING,LENG, STATUS)
-         CALL FIO_WRITE(LFD,STRING(:LENG),STATUS) 
+         CALL FIO_WRITE(LFD,STRING(:LENG),STATUS)
       ELSE
          GO TO 500
       END IF
@@ -247,7 +247,7 @@ C
          GO TO 500
       END IF
 C
-C     Open display device 
+C     Open display device
 C
       IF (STATUS.NE.SAI__OK) GO TO 500
       IF (BATCH) CALL PAR_DEF0C('IDEV',' ',STATUS)
@@ -271,7 +271,7 @@ C
          CALL PGQCOL(COL1,COL2)
          IF (COL1.NE.0) THEN
             CALL PAR_WRUSER( 'Cannot use background colour to display '
-     :         // 'bad pixels, will use foreground colour instead.', 
+     :         // 'bad pixels, will use foreground colour instead.',
      :         FSTAT )
          ELSE IF (COL2.LE.17) THEN
             CALL PAR_WRUSER('SCLEAN: Error: Insufficient colours '//
@@ -299,7 +299,7 @@ C
      :                      STATUS)
 C
 C     Set user variable IMARRAY to reflect current display parameters
-C     (local error context is used so that an error here does not 
+C     (local error context is used so that an error here does not
 C     inhibit the rest of the closedown sequence).
 C
       IF (PLOT .AND. STATUS.EQ.SAI__OK) THEN
@@ -307,12 +307,12 @@ C
          CALL NDF_MSG('IMAGE_NAME',INDF)
          CALL MSG_LOAD('IMAGE_NAME','^IMAGE_NAME',IMAGE,IGNORE,STATUS)
          CALL VAR_SETCHR('IMFILE',0,0,IMAGE,STATUS)
-         CALL VAR_SETARY('IMARRAY',12,ARRAY,STATUS) 
+         CALL VAR_SETARY('IMARRAY',12,ARRAY,STATUS)
          CALL ERR_RLSE
          STATUS=SAI__OK
       END IF
 C
-C     If the original NDF had no quality array (used flagged values 
+C     If the original NDF had no quality array (used flagged values
 C     instead) then write the quality info back as flagged values and
 C     remove the quality array.
 C
@@ -368,9 +368,9 @@ C     Parameters -  (">" input, "!" modified, "<" output)
 C
 C     (!) DATA      (Real array IMAGE(NX,NY)) The image data to be
 C                   cleaned up.
-C     (!) QUAL      (Byte array QUAL(NX,NY)) The quality array 
+C     (!) QUAL      (Byte array QUAL(NX,NY)) The quality array
 C                   corresponding to DATA.
-C     (!) VAR       (Real array VAR(NX,NY)) The variance array 
+C     (!) VAR       (Real array VAR(NX,NY)) The variance array
 C                   corresponding to DATA.
 C     (>) VEXIST    (Logical) True if VAR contains values
 C     (>) NX        (Integer) The first dimension of IMAGE
@@ -490,7 +490,7 @@ C
       YCENT=0
       CURMESS='** Cursor outside data area'
 C
-C     Get initial values for degree of fit and box dimensions for 
+C     Get initial values for degree of fit and box dimensions for
 C     'X' and 'Y' cleaning.
 C
       CALL PAR_RDVAL('DEG',0.,7.,2.,' ',VALUE)
@@ -532,8 +532,8 @@ C        Set (sometimes-used) border size to two character heights
 C
          CALL PGQCS(0,XCH,YCH)
          BORD=YCH*2.0
-C     
-C        If image is to be redrawn, then get the range of the data, 
+C
+C        If image is to be redrawn, then get the range of the data,
 C        for the first scaling guess.
 C
          IF (REDRAW) THEN
@@ -670,7 +670,7 @@ C
 C
                ELSE IF (MODE.EQ.'B') THEN
 C
-C                 Mode 'B': SCUBA mode (pixels around XCURR,YCENT and 
+C                 Mode 'B': SCUBA mode (pixels around XCURR,YCENT and
 C                           graph of column XCURR).  Expand pixels to
 C                           fit viewport if possible.
 C
@@ -708,7 +708,7 @@ C
                   END IF
 C
 C                 First plot graph on one half of view surface:
-C                 set abcissa (X) limits appropriately, set coordinates 
+C                 set abcissa (X) limits appropriately, set coordinates
 C                 of plotting surface, plot axes, plot good values with
 C                 lines, finally plot bad values with points.
 C
@@ -735,7 +735,7 @@ C
                   IF (NPT.GE.1) CALL PGPT(NPT,%VAL(CNF_PVAL(XPTR)),
      :                                    %VAL(CNF_PVAL(YPTR)),5)
 C
-C                 Then prepare to plot pixels on other half of view 
+C                 Then prepare to plot pixels on other half of view
 C                 surface.
 C
                   CALL PGSVP(0.0+BORD, 0.5, 0.0+BORD, 1.0-BORD)
@@ -767,10 +767,10 @@ C
 C
 C              Write axes for pixel plot if in 'B' mode
 C
-               IF (MODE.EQ.'B') 
+               IF (MODE.EQ.'B')
      :            CALL PGBOX('BCNMTIS',5.0,5,'BCNTIS',BYTICK,4)
 C
-C              Display the image.  First construct an integer array 
+C              Display the image.  First construct an integer array
 C              corresponding to the selected part, then plot it in world
 C              coordinates on the plotting surface, offset by a half pixel.
 C
@@ -813,7 +813,7 @@ C
             IF (CPOS.EQ.1) THEN
                LENG=0
             ELSE IF (CPOS.GT.0) THEN
-               LENG=ICH_LEN(STRING(:CPOS-1)) 
+               LENG=ICH_LEN(STRING(:CPOS-1))
                STRING=STRING(:LENG)
             END IF
 C
@@ -831,7 +831,7 @@ C
             NARG=0
             IF (LENG.GE.3) THEN
                INVOKE=ICH_NUMBR(STRING,3,' ',ARG1,NEXT)
-               IF (INVOKE.EQ.0) THEN 
+               IF (INVOKE.EQ.0) THEN
                   NARG=1
                   IF (NEXT.GT.0) THEN
                      INVOKE=ICH_NUMBR(STRING,NEXT,' ',ARG2,NEXT)
@@ -850,7 +850,7 @@ C           This is not always their meaning, but doing this enables
 C           us to make use of it easily in the cases where it is.
 C
             IF (NARG.EQ.2 .AND.
-     :          ARG1.GE.1.AND.ARG1.LE.NX .AND. 
+     :          ARG1.GE.1.AND.ARG1.LE.NX .AND.
      :          ARG2.GE.1.AND.ARG2.LE.NY) THEN
                X=ARG1
                Y=ARG2
@@ -861,7 +861,7 @@ C
 C
          ELSE
 C
-C           Interactive mode: Get the cursor position and command key 
+C           Interactive mode: Get the cursor position and command key
 C           from the user
 C
             CALL PGCURSE(RXPOSN,RYPOSN,CHR)
@@ -979,7 +979,7 @@ C           'N' is for 'Number' of pixels on side of area deleted
 C               by 'X' or 'Y'.
 C
             IF (BATCH) THEN
-               IF (NARG.EQ.2 .AND. ARG1.GE.1. .AND. ARG1.LE.20. 
+               IF (NARG.EQ.2 .AND. ARG1.GE.1. .AND. ARG1.LE.20.
      :                       .AND. ARG2.GE.1. .AND. ARG2.LE.20.) THEN
                   NBOXX=ARG1
                   NBOXY=ARG2
@@ -1087,7 +1087,7 @@ C
 C           'C' is for 'Column' - ie delete and fix the indicated column
 C           'K' is for 'Kolumn' - delete column but don't fix
 C
-            IF (BATCH .AND. 
+            IF (BATCH .AND.
      :         (NARG.NE.1 .OR. ARG1.LT.1 .OR. ARG1.GT.NX)) THEN
                CALL PAR_WRUSER(BATMESS,FSTAT)
                GO TO 1
@@ -1177,7 +1177,7 @@ C
 C
          ELSE IF ((CHR.EQ.'X').OR.(CHR.EQ.'Y')) THEN
 C
-C           'X' is for fix by interpolation in the 'X' direction, 
+C           'X' is for fix by interpolation in the 'X' direction,
 C           'Y' is for fix by interpolation in the 'Y' direction.
 C
             IF (BADPOSN) THEN
@@ -1208,7 +1208,7 @@ C
                   END DO
                END IF
                IF (FSTAT.EQ.0) THEN
-                  IF (VEXIST) 
+                  IF (VEXIST)
      :               CALL FIG_PUNCHOUT(VAR,NX,NY,IX1,IY1,IX2,IY2,0.0)
                   CHANGE=.TRUE.
                   REDISPLAY=.TRUE.
@@ -1310,7 +1310,7 @@ C                                       KS / CIT 2nd March 1984
 C     Modified:
 C
 C     17th Dec 1987.  KS / AAO.  'P' option added.
-C     20th Jul 1998.  MBT / IoA.  Changed 'joystick' for 'mouse', and 
+C     20th Jul 1998.  MBT / IoA.  Changed 'joystick' for 'mouse', and
 C                                 added commands 'B' and 'A'.
 C+
       IMPLICIT NONE
@@ -1500,13 +1500,13 @@ C     (>) VEXIST   (Logical) True if VAR contains values
 C     (>) CHANGE   (Logical) True if data array has been changed
 C     (>) NX       (Integer) The first image dimension
 C     (>) NY       (Integer) The second image dimension
-C     (>) IX1      (Integer) The x-coordinate of the first element 
+C     (>) IX1      (Integer) The x-coordinate of the first element
 C                  in the block to be modified.
-C     (>) IX2      (Integer) The x-coordinate of the last element 
+C     (>) IX2      (Integer) The x-coordinate of the last element
 C                  in the block to be modified.
-C     (>) IY1      (Integer) The y-coordinate of the first element 
+C     (>) IY1      (Integer) The y-coordinate of the first element
 C                  in the block to be modified.
-C     (>) IY2      (Integer) The y-coordinate of the last element 
+C     (>) IY2      (Integer) The y-coordinate of the last element
 C                  in the block to be modified.
 C     (>) CHR      (Character) A character indicating the SCLEAN command
 C                  being remembered.
@@ -1535,7 +1535,7 @@ C
       LOGICAL CANCEL
       INTEGER IX, IY, NWORK, STATUS, WEND, WLIM, WPTR, WVAL, MULT
 C
-C     Note the structure of an entry in the circular buffer.  Taking 
+C     Note the structure of an entry in the circular buffer.  Taking
 C     element 1 as the first for this entry, the elements contain:
 C     1:          The number of the last element in the entry.
 C     2:          IX1 (as a real number)
@@ -1551,7 +1551,7 @@ C     8+(2 or 3)N:The number of the first element in the entry.
 C     - where N=(IX2-IX1+1)*(IY2-IY1+1), the number of elements to be saved.
 C     If VEXIST is false the variances are not stored.
 C
-C     Storage of the BYTE quality array section in the REAL array WORK is 
+C     Storage of the BYTE quality array section in the REAL array WORK is
 C     a bit wasteful, but pressure of space here is not anticipated to
 C     be very great.
 C
@@ -1576,11 +1576,11 @@ C
      :         //'"Undo" this operation.',STATUS)
       ELSE
 C
-C        Put the operation data into the workspace.  First of all a lot 
+C        Put the operation data into the workspace.  First of all a lot
 C        of messing about is required with the circular buffer to see if
 C        the new data is going to overwrite any of the data from earlier
 C        operations.  In what follows, WPTR is the buffer element to be
-C        used for the start of the new data, WEND is the last element 
+C        used for the start of the new data, WEND is the last element
 C        needed for the new data.  If WEND is such that data from earlier
 C        entries will be overwritten, they are removed from the buffer
 C        by moving WFIRST past them.  The circular nature of the buffer
@@ -1642,7 +1642,7 @@ C        Now enter the data for the operation into the circular buffer.
 C        Its a bit messy testing WPTR for wrap-round each time, but
 C        so what?
 C
-C        A (statement) function for wrapping increment would be tidier; 
+C        A (statement) function for wrapping increment would be tidier;
 C        but if it ain't broke...
 C
          WORK(WPTR)=WLAST
@@ -1717,13 +1717,13 @@ C     (>) VEXIST   (Logical) True if VAR contains values
 C     (!) CHANGE   (Logical) True if the Data array has been changed
 C     (>) NX       (Integer) The first image dimension
 C     (>) NY       (Integer) The second image dimension
-C     (<) IX1      (Integer) The x-coordinate of the first element 
+C     (<) IX1      (Integer) The x-coordinate of the first element
 C                  in the block that was modified.
-C     (<) IX2      (Integer) The x-coordinate of the last element 
+C     (<) IX2      (Integer) The x-coordinate of the last element
 C                  in the block that was modified.
-C     (<) IY1      (Integer) The y-coordinate of the first element 
+C     (<) IY1      (Integer) The y-coordinate of the first element
 C                  in the block that was modified.
-C     (<) IY2      (Integer) The y-coordinate of the last element 
+C     (<) IY2      (Integer) The y-coordinate of the last element
 C                  in the block that was modified.
 C                  If no operation was saved in the buffer, the limits
 C                  are returned all set to -1.
@@ -1807,9 +1807,9 @@ C
             STRING='Restoring area around ( '
             XWAS=NINT(FLOAT(IX1+IX2)*0.5)
             YWAS=NINT(FLOAT(IY1+IY2)*0.5)
-            INVOKE=ICH_ENCODE(STRING,XWAS,25,0,NEXT) 
-            STRING(NEXT:NEXT+1)=', ' 
-            INVOKE=ICH_ENCODE(STRING,YWAS,NEXT+2,0,NEXT) 
+            INVOKE=ICH_ENCODE(STRING,XWAS,25,0,NEXT)
+            STRING(NEXT:NEXT+1)=', '
+            INVOKE=ICH_ENCODE(STRING,YWAS,NEXT+2,0,NEXT)
             STRING(NEXT:NEXT+1)=' )'
          ELSE IF (CHWAS.EQ.'A') THEN
             STRING='Restoring pixel ( '
@@ -1929,7 +1929,7 @@ C
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -2018,12 +2018,12 @@ C
 
 *  Description:
 *     This routine takes a column from an NDF Data array and returns
-*     a pair of arrays (X and Y) suitable for passing to PGLINE or 
-*     PGPT to make a (sideways) X-Y plot.  
+*     a pair of arrays (X and Y) suitable for passing to PGLINE or
+*     PGPT to make a (sideways) X-Y plot.
 *     According to the value of the parameter QGOOD, the routine will
 *     pick out only the good (quality zero) or only the bad (quality
-*     nonzero) points.  If the selected set contains no points, 
-*     NPT is simply returned as 0.  
+*     nonzero) points.  If the selected set contains no points,
+*     NPT is simply returned as 0.
 
 *  Arguments:
 *     DATA( NX, NY ) = REAL (Given)
@@ -2032,11 +2032,11 @@ C
 *        Quality array corresponding to DATA.
 *     NX = INTEGER (Given)
 *        The X dimension of DATA.
-*     NY = INTEGER (Given) 
+*     NY = INTEGER (Given)
 *        The Y dimension of DATA.
 *     IX = INTEGER (Given)
 *        The column number of DATA to be used.
-*     IYST = INTEGER (Given) 
+*     IYST = INTEGER (Given)
 *        The first Y coordinate to be used.
 *     IYEN = INTEGER (Given)
 *        The last Y coordinate to be used.
@@ -2095,7 +2095,7 @@ C
 *  Loop along column, copying to output arrays either all good or all
 *  bad values.  Flagged values are skipped in any case.
       DO IY=IYST,IYEN
-         IF (((QUAL(IX,IY).EQ.GOOD) .EQV. QGOOD) .AND. 
+         IF (((QUAL(IX,IY).EQ.GOOD) .EQV. QGOOD) .AND.
      :       (DATA(IX,IY).NE.VAL__BADR)) THEN
             NPT=NPT+1
             XR(NPT)=DATA(IX,IY)
@@ -2119,7 +2119,7 @@ C
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIG_SCLEAN_OUT(CHR,STRING,VAL1,VAL2,NVAL,PAREN,LOG,LFD,STATUS) 
+*     CALL FIG_SCLEAN_OUT(CHR,STRING,VAL1,VAL2,NVAL,PAREN,LOG,LFD,STATUS)
 *
 *  Description:
 *     This routine takes zero, one or two numerical values and a
@@ -2328,7 +2328,7 @@ C
 *     CALL FIG_SCL_QUAL2FLAG( DATA, QUAL, EL, STATUS )
 *
 *  Description:
-*     This routine examines a quality array, and if any element has 
+*     This routine examines a quality array, and if any element has
 *     a non-zero value, sets the corresponding element of the data
 *     array to the flagged value.
 

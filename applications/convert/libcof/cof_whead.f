@@ -1,5 +1,5 @@
-      SUBROUTINE COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX, 
-     :                      ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, 
+      SUBROUTINE COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
+     :                      ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM,
      :                      STATUS )
 *+
 *  Name:
@@ -37,7 +37,7 @@
 *        are stored outside of the FITS airlock.
 *     NDFFAI = INTEGER (Given)
 *        The identifier of another NDF whose FITS airlock is used.  In
-*        normal circumstances this will be the same identifier as 
+*        normal circumstances this will be the same identifier as
 *        argument NDFI.  However, when processing an extension NDF,
 *        this argument may point to the primary NDF.
 *     COMP = CHARACTER * ( * ) (Given)
@@ -53,18 +53,18 @@
 *     ORIGIN = CHARACTER * ( * ) (Given)
 *        The value of the ORIGIN card.
 *     ENCOD = CHARACTER * ( * ) (Given)
-*        The encoding to use. If this is blank, then a default encoding 
+*        The encoding to use. If this is blank, then a default encoding
 *        is chosen based on the contents of the FITS extension.  The
-*        supplied string should be a recognised AST encoding such as 
+*        supplied string should be a recognised AST encoding such as
 *        'DSS', 'FITS-WCS', 'NATIVE', etc (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding of the WCS info in the header?
 *     MULTI = LOGICAL (Given)
-*        This should only be set .TRUE. when input NDF is part of a 
+*        This should only be set .TRUE. when input NDF is part of a
 *        multi-NDF container file,
 *     EXTNAM = CHARACTER * ( * ) (Given)
-*        If the input NDF is part of an extension, set this to the 
-*        extension's path (including its name) within the NDF 
+*        If the input NDF is part of an extension, set this to the
+*        extension's path (including its name) within the NDF
 *        hierarchy.  A blank string indicates that the NDF being
 *        processed in the primary NDF.  This argument affects the
 *        values or presence of FITS keywords.  See the Notes
@@ -95,7 +95,7 @@
 *          and UNITS respectively are used if present, otherwise any
 *          units found in the FITS extension are used.  For a variance
 *          array, BUNIT is assigned to "(<unit>)**2", where
-*          <unit> is the unit; for a quality array, the BUNIT header 
+*          <unit> is the unit; for a quality array, the BUNIT header
 *          is absent.
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
@@ -105,15 +105,15 @@
 *        EXTNAME --- is the component name of the object from the COMP
 *          argument, unless argument EXTNAM is not blank when keyword
 *          EXTNAME is set to EXTNAM.  If the component is too long to
-*          fit within the header (68 characters), EXTNAME is set to 
-*          '@EXTNAMEF'.  The full path is then stored in keyword 
+*          fit within the header (68 characters), EXTNAME is set to
+*          '@EXTNAMEF'.  The full path is then stored in keyword
 *          EXTNAMEF using the HEASARC Long-string CONTINUE convention
 *          (http://fits.gsfc.nasa.gov/registry/continue_keyword.html).
 *        EXTVER --- is only set when EXTNAME (q.v.) cannot accommodate
 *          the component name and is assigned the HDU index to provide a
 *          unique identifier.
-*        EXTLEVEL --- when argument EXTNAM is not blank, this is the 
-*          level in the hierarchical structure of the extension.  A 
+*        EXTLEVEL --- when argument EXTNAM is not blank, this is the
+*          level in the hierarchical structure of the extension.  A
 *          top-level extension has value 1, sub-components of this
 *          extension have value 2 and so on.
 *        EXTTYPE --- when argument EXTNAM is not blank, this is set to
@@ -203,7 +203,7 @@
 *     22-JUN-1999 (DSB):
 *        Added ENCOD argument.
 *     11-APR-2000 (DSB):
-*        Updated description of ENCOD argument. 
+*        Updated description of ENCOD argument.
 *     23-OCT-2000 (AJC):
 *        Ignore all after END (could be garbage)
 *     30-NOV-2000 (AJC):
@@ -244,7 +244,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -402,7 +402,7 @@
 *      string.
 *    BLANK --- is created for integer data types from the bad value.
 *
-      CALL COF_WNDFH( NDFI, COMP, FUNIT, NFLAGS, BITPIX, LORIGN, 
+      CALL COF_WNDFH( NDFI, COMP, FUNIT, NFLAGS, BITPIX, LORIGN,
      :                PROPEX, CMPFND, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -427,7 +427,7 @@
             CALL COF_WENAM( FUNIT, EXTNAM, 'Component', STATUS )
 
          ELSE
-            CALL FTPKYS( FUNIT, 'EXTNAME', EXTNAM( :NCHAR ), 
+            CALL FTPKYS( FUNIT, 'EXTNAME', EXTNAM( :NCHAR ),
      :                   'Component', FSTAT )
          END IF
 
@@ -463,7 +463,7 @@
             IF ( DOTPOS .LE. NCHAR ) EXTLEV = EXTLEV + 1
             DOTPOS = DOTPOS + 1
          END DO
- 
+
 *  Set the extension level.
          IF ( EXTLEV .GT. 0 ) THEN
             CALL FTPKYJ( FUNIT, 'EXTLEVEL', EXTLEV, 'Level in the '/
@@ -482,7 +482,7 @@
 *  Write additional header cards for the multi-NDF component.
 *  ==========================================================
 
-*    HDSNAME, HDSTYPE --- used when the input file is a multi-NDF 
+*    HDSNAME, HDSTYPE --- used when the input file is a multi-NDF
 *      container file and specify the NDF component name and type.
       IF ( MULTI ) THEN
 
@@ -493,11 +493,11 @@
 
 *  Set the component name, if one exists.  This indicated by the start
 *  character position of the HDS path name being before its
-*  corresponding end position.  Otherwise NDFNAM is just the container 
+*  corresponding end position.  Otherwise NDFNAM is just the container
 *  file, and HDSNAM is not needed.
          IF ( CPPS .LT. CPPE ) THEN
             CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( CPPS+1:CPPE ),
-     :                   'Component name hierarchical structure', 
+     :                   'Component name hierarchical structure',
      :                   FSTAT )
          END IF
 
@@ -552,7 +552,7 @@
 
 *  Check for presence of NDF FITS extension.
          CALL NDF_XSTAT( NDFI, 'PROVENANCE', PROVPR, STATUS )
- 
+
 *  Can use provenance keywords in the airlock provided there is no
 *  no PROVENANCE extension to supersede them.
          IF ( .NOT. PROVPR ) THEN
@@ -591,15 +591,15 @@
 *  Filter the keywords.
 *  --------------------
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn, ASTWARN keywords.  Also possibly remove LBOUNDn, CDELTn, 
-*  CRVALn, CRPIXn, CRTYPEn, CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, 
-*  BLANK, HDUCLASn, HDSNAME, HDSTYPE, CHECKSUM, DATASUM, and END as 
-*  described above.  Note CROTAn are also excluded.  To avoid duplicate 
-*  FITSIO banners these are also omitted, as they are written when 
+*  NAXISn, ASTWARN keywords.  Also possibly remove LBOUNDn, CDELTn,
+*  CRVALn, CRPIXn, CRTYPEn, CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE,
+*  BLANK, HDUCLASn, HDSNAME, HDSTYPE, CHECKSUM, DATASUM, and END as
+*  described above.  Note CROTAn are also excluded.  To avoid duplicate
+*  FITSIO banners these are also omitted, as they are written when
 *  FITSIO creates the primary headers.
 *
 *  Use an intermediate variables to reduce the number of continuation
-*  lines in the test.  
+*  lines in the test.
 
 *  This combines tests for the absence of mandatory headers.
             MNDKEY = ( KEYWRD .NE. 'SIMPLE' ) .AND.
@@ -619,7 +619,7 @@
      :               ( VALUE( 1:31 ) .EQ. 'Contact the NASA Science '/
      :                 /'Office' ) .OR.
      :               ( VALUE( 1:39 ) .EQ. 'FITS Definition document '/
-     :                 /'#100 and other' ) .OR. 
+     :                 /'#100 and other' ) .OR.
      :               ( VALUE( 1:39 ) .EQ. 'and Astrophysics'', '/
      :                 /'volume 376, page 359') )
 
@@ -627,9 +627,9 @@
             SCAKEY = KEYWRD .NE. 'BSCALE' .AND. KEYWRD .NE. 'BZERO'
 
 *  This tests for the absence of co-ordinate system keywords when there
-*  NDF AXIS values.  It includes the spurious CRTYPE that was 
+*  NDF AXIS values.  It includes the spurious CRTYPE that was
 *  incorrectly written for a while.
-            WCSKEY = 
+            WCSKEY =
      :        ( KEYWRD( 1:5 ) .NE. 'CDELT'  .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CRVAL'  .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CRPIX'  .OR. .NOT. AXIFND ) .AND.
@@ -657,9 +657,9 @@
 *  PROVENANCE extension to supersede them.
             IF ( PROVPR ) THEN
 
-*  Test for CADC provenance keywords.  While these may not be unique, 
-*  it is more likely they are provenance than some other institution's 
-*  keywords.  First test whether or not there is an index number after 
+*  Test for CADC provenance keywords.  While these may not be unique,
+*  it is more likely they are provenance than some other institution's
+*  keywords.  First test whether or not there is an index number after
 *  the first three characters of the keyword.
                CALL ERR_MARK
                CALL CHR_CTOI( KEYWRD( 4:8 ), IVALUE, STATUS )
@@ -681,8 +681,8 @@
      :                  ( KEYWRD( 1:3 ) .NE. 'OBS' .OR. .NOT. ISNUM )
 
 *  Test for general provenance keywords.  While these may not be unique,
-*  it is more likely they are provenance than some other institution's 
-*  keywords.  First test whether or not there is an index number after 
+*  it is more likely they are provenance than some other institution's
+*  keywords.  First test whether or not there is an index number after
 *  the first four characters of the keyword.
                CALL ERR_MARK
                CALL CHR_CTOI( KEYWRD( 5:8 ), IVALUE, STATUS )
@@ -697,27 +697,27 @@
 *  Test for absence of PRVPn, PRVIn, PRVDn, PRVCn, PRVMn.
                PRVKEY = .NOT. ISNUM .OR.
      :                  ( ( KEYWRD( 1:4 ) .NE. 'PRVP' ) .AND.
-     :                    ( KEYWRD( 1:4 ) .NE. 'PRVI' ) .AND. 
-     :                    ( KEYWRD( 1:4 ) .NE. 'PRVD' ) .AND. 
-     :                    ( KEYWRD( 1:4 ) .NE. 'PRVC' ) .AND. 
-     :                    ( KEYWRD( 1:4 ) .NE. 'PRVM' ) ) 
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVI' ) .AND.
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVD' ) .AND.
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVC' ) .AND.
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVM' ) )
 
-*  Exclude the provenance caption.  
+*  Exclude the provenance caption.
 
-*  First remove leading blanks from the header in case this is the 
+*  First remove leading blanks from the header in case this is the
 * "Provenance:" comment-only header.
                COMENT = FITSTR
                CALL CHR_LDBLK( COMENT )
 
 *  Also remove the the blank line before the caption too otherwise
-*  repeated conversions to and from FITS could generate lots of blank 
+*  repeated conversions to and from FITS could generate lots of blank
 *  lines.  Find the current header position and delete the header
 *  provided it is blank.
                PRVCOM = COMENT .NE. '/ Provenance:'
                IF ( .NOT. PRVCOM ) THEN
                   CALL FTGHSP( FUNIT, NHEAD, CHEAD, STATUS )
                   CALL FTGREC( FUNIT, CHEAD, CARD, STATUS )
-                  IF ( CARD .EQ. ' ' ) 
+                  IF ( CARD .EQ. ' ' )
      :              CALL FTDREC( FUNIT, CHEAD, STATUS )
                END IF
             END IF
@@ -782,7 +782,7 @@
 
 *  If that's cured the problem, continue to inform the user of the
 *  errorneous header to encourage correction at the source, e.g. an
-*  observatory. 
+*  observatory.
                   IF ( FSTAT .EQ. FITSOK ) THEN
 
 *  Issue a warning message.
@@ -871,7 +871,7 @@
                   END IF
                END DO
             END IF
-         END DO      
+         END DO
       END IF
 
 *  Write out the NDF WCS information.

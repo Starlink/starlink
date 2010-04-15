@@ -3,8 +3,8 @@ C+
 C
 C     F I T _ E R R O R
 C
-C     Decodes a FIT_ routine error code.  Most of these 
-C     are MTPCKG error codes, and the actual error message 
+C     Decodes a FIT_ routine error code.  Most of these
+C     are MTPCKG error codes, and the actual error message
 C     is already decoded in the common variable MTERR.
 C
 C     Parameters -  (">" input, "<" output)

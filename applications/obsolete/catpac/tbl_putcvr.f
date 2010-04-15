@@ -1,7 +1,7 @@
       SUBROUTINE TBL_PUTCVR( IN, START, LEN, OUT)
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'

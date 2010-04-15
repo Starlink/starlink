@@ -2,7 +2,7 @@ C-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_GSD_V5_HEADER (IERR)
 
-C   Routine to read header from open GSD version 5 file containing a 
+C   Routine to read header from open GSD version 5 file containing a
 C   generalized observation.
 
 C   RMP 30-July-1991  NRC is got from C3NRS not C3NRC
@@ -36,7 +36,7 @@ C-
       CHARACTER*20 DIMUNITS(2)
       INTEGER*4    DIMVALS (2)
       INTEGER*4    ACTVALS
-      
+
 *  GSD_INQ_SIZE
 
       INTEGER*4    SIZE
@@ -237,15 +237,15 @@ CD   &      (J,(PHIST(I,J),I=1,2),J=1,END(2))
 C  Miscellaneous pars
 
 C     ...radial velocity
-      CALL GSD_FIND  (IFD, 'C7VR', 
+      CALL GSD_FIND  (IFD, 'C7VR',
      &                NO, UNITS, TYPE, ARRAY, IND_VRAD, STATUS)
       CALL GSD_GET0D (IND_VRAD, VRAD, STATUS)
 
-      CALL GSD_FIND  (IFD, 'C12VREF', 
+      CALL GSD_FIND  (IFD, 'C12VREF',
      &                NO, UNITS, TYPE, ARRAY, IND_VREF, STATUS)
       CALL GSD_GET0C (IND_VREF, VREF, STATUS)
 
-      CALL GSD_FIND  (IFD, 'C12VDEF', 
+      CALL GSD_FIND  (IFD, 'C12VDEF',
      &                NO, UNITS, TYPE, ARRAY, IND_VDEF, STATUS)
       CALL GSD_GET0C (IND_VDEF, VDEF, STATUS)
 
@@ -257,7 +257,7 @@ C     ...radial velocity
 
 C     ...radial velocities of telescope, earth and sun
 
-      CALL GSD_FIND  (IFD, 'C7VRADIAL', 
+      CALL GSD_FIND  (IFD, 'C7VRADIAL',
      &                NO, UNITS, TYPE, ARRAY, IND_VRADTEL, STATUS)
       CALL GSD_GET1D (IND_VRADTEL, 1, 48, 13, 13, VRGEO, LVAL, STATUS)
       CALL GSD_GET1D (IND_VRADTEL, 1, 48, 25, 25, VRHEL, LVAL, STATUS)
@@ -328,7 +328,7 @@ C     ...# cycles per scan
      &                NO, UNITS, TYPE, ARRAY, IND_NCI, STATUS)
       CALL GSD_GET0I (IND_NCI, NCI, STATUS)
 
-C     ...# phases measured 
+C     ...# phases measured
       CALL GSD_FIND  (IFD, 'C6NP',
      &                NO, UNITS, TYPE, ARRAY, IND_NP, STATUS)
       CALL GSD_GET0I (IND_NP, NP, STATUS)
@@ -355,11 +355,11 @@ C     integration time of last integration in file
         INT_TIME_LAST = FRAC_INT * INT_TIME
       END IF
 
-      IF (NGSDSPEC.NE.NSPEC_FULL) THEN 
-        WRITE (ILOUT,*) 'Last scan finished prematurely -' 
+      IF (NGSDSPEC.NE.NSPEC_FULL) THEN
+        WRITE (ILOUT,*) 'Last scan finished prematurely -'
         WRITE (ILOUT,*) '   # complete spectra in file  ', NSPEC_FULL,
      &                  ' - Integ''n time ', SNGL(INT_TIME)
-        WRITE (ILOUT,*) '   # last spectrum  - Integ''n time ', 
+        WRITE (ILOUT,*) '   # last spectrum  - Integ''n time ',
      &                  SNGL(INT_TIME_LAST)
       END IF
 

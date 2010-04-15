@@ -34,7 +34,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,15 +73,15 @@
          DO HI = 2, LAST
             LO = HI - 1
 
-*  If the lower element has a greater value than the higher element, swap 
+*  If the lower element has a greater value than the higher element, swap
 *  them, and set a flag to indicate that at least one pair of adjacent
 *  values have been found out of order.
             TEMP = ARRAY( LO )
             IF( TEMP .GT. ARRAY( HI ) ) THEN
                ARRAY( LO ) = ARRAY( HI )
-               ARRAY( HI ) = TEMP            
+               ARRAY( HI ) = TEMP
                DONE = .FALSE.
-            END IF        
+            END IF
 
          END DO
 
@@ -92,4 +92,4 @@
 
       END DO
 
-      END 
+      END

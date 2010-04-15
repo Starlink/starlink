@@ -52,7 +52,7 @@
 #     supply.
 
 #  Invocations:
-#        Ccd::labent window 
+#        Ccd::labent window
 #
 #     Returns a command "window" which is available in the global scope.
 #     This may be optionally followed by any of the configuration
@@ -75,11 +75,11 @@
 #        create an object. It is also invoked by classes which inherit
 #        from this class (this happens after the constructor method of
 #        the inheriting class unless the constructor of this class is
-#        invoked explicitly). 
+#        invoked explicitly).
 #     destructor
 #        Deletes the widget command via the "delete" method.
 #     configure
-#        Activates the configuration options. 
+#        Activates the configuration options.
 #     get
 #        Returns the contents of the entry widget.
 #     clear args
@@ -90,11 +90,11 @@
 #        Inserts text into the entry widget. The args are those used by
 #        the entry widget. I.e. an index and the text string.
 #     sethelp document label.
-#        Sets the context sensitive help information for all the 
+#        Sets the context sensitive help information for all the
 #        components of the meta-widget that exist. $document should be
 #        the name of a HTML document and $label the label (HTML
 #        anchor) within the document that identifies the part to be
-#        displayed. 
+#        displayed.
 
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.
@@ -160,7 +160,7 @@
 	 CCDTkWidget Entrywidget entrywidget entry $oldthis.entry
 
 #  Check options database for values to override widget defaults. Look for more
-#  specific option of having a class specified, if this fails try for less 
+#  specific option of having a class specified, if this fails try for less
 #  specific class.
          set opt [ _getoption "placelabel Placelabel PlaceLabel"]
          if { $opt != {} } { set placelabel $opt }
@@ -246,8 +246,8 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
 #  Width of the entry widget. Returns current width if no value.
       public variable width {} {
          if { $exists } {
-            if { $width != {} } { 
-               $Entrywidget configure -width $width 
+            if { $width != {} } {
+               $Entrywidget configure -width $width
             } else {
                set realwidth [ $Entrywidget configure -width ]
                return [ lindex $realwidth 4 ]
@@ -257,7 +257,7 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
 
 #  Set state of entry widget.
       public variable state normal {
-         if { $exists } { 
+         if { $exists } {
             $Entrywidget configure -state $state
          }
       }
@@ -271,7 +271,7 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
       protected variable labelwidget ""
       protected variable Entrywidget
       protected variable entrywidget ""
-  
+
 #  End of class definition.
    }
 # $Id$

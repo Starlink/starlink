@@ -26,12 +26,12 @@ C     (>) WHEN         (Fixed string,descr) The first character of WHEN
 C                      indicates whether the airmass value required is
 C                      that for the S(tart) of the exposure, the E(nd) of
 C                      the exposure, or the M(ean).  Case does not matter.
-C     (<) AIRMASS      (Float,ref) The airmass value associated with the 
+C     (<) AIRMASS      (Float,ref) The airmass value associated with the
 C                      structure.
 C     (!) STATUS       (Integer,ref) Status code.  If bad status is
 C                      passed, this routine returns immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
@@ -95,7 +95,7 @@ C
       INTEGER   LENGTH                      ! Length of structure name
       CHARACTER NAME*80                     ! DTA_ name for airmass
       CHARACTER NUMBER*16                   ! Used to format values
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       REAL      SECZ                        ! Sec Z value from structure
       CHARACTER STRUCTURE*80                ! Full name of structure
 C

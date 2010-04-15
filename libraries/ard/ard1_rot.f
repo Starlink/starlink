@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_ROT( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2, 
+      SUBROUTINE ARD1_ROT( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2,
      :                     NPAR, D, PAR, B, LBEXTB, UBEXTB, LBINTB,
      :                     UBINTB, STATUS )
 *+
@@ -20,8 +20,8 @@
 *     as those for a POLYGON region. ARD1_POL is then called to load the
 *     region.
 *
-*     A polygon vertex is put at the middle of each side in case we are 
-*     dealing with spherical coords, in which case a polygon edge greater 
+*     A polygon vertex is put at the middle of each side in case we are
+*     dealing with spherical coords, in which case a polygon edge greater
 *     than 180 arc-degrees could cause problems.
 
 *  Arguments:
@@ -41,10 +41,10 @@
 *        The size of the PAR array.
 *     D( 6 ) = DOUBLE PRECISION (Given)
 *        The coefficients of the user->pixel mapping. The mapping is:
-*        P1 = D0 + D1*U1 + D2*U2 
-*        P2 = D3 + D4*U1 + D5*U2 
+*        P1 = D0 + D1*U1 + D2*U2
+*        P2 = D3 + D4*U1 + D5*U2
 *     PAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
-*        Region parameters. 
+*        Region parameters.
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( 2 ) = INTEGER (Given and Returned)
@@ -63,7 +63,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( 2 ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -77,12 +77,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,7 +103,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,7 +135,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :    HL,                    ! Half the requested box length
      :    HW,                    ! Half the requested box width
      :    LPAR( 16 ),            ! Local parameters
@@ -160,10 +160,10 @@
       END IF
 
 *  Offset away from the centre point along the first edge, at the
-*  requested angle, going half the box length. Using AST caters for both 
-*  Cartesian and spherical user coords. Store points in the LPAR 
+*  requested angle, going half the box length. Using AST caters for both
+*  Cartesian and spherical user coords. Store points in the LPAR
 *  array, in a suitable order to make the points a continuous curve.
-      PA0 = ( 90.0 - PAR( 5 ) )*ARD__DTOR 
+      PA0 = ( 90.0 - PAR( 5 ) )*ARD__DTOR
       HL = 0.5*PAR( 3 )
       HW = 0.5*PAR( 4 )
       P0( 1 ) = PAR( 1 )
@@ -171,11 +171,11 @@
 
       PA1 = AST_OFFSET2( FRM, P0, PA0, HL, LPAR, STATUS )
 
-*  Now turn to the left by 90 degrees and offset up by half the box height. 
+*  Now turn to the left by 90 degrees and offset up by half the box height.
       PA1 = PA1 - ARD__PIBY2
       PA2 = AST_OFFSET2( FRM, LPAR, PA1, HW, LPAR( 3 ), STATUS )
 
-*  Now offset down by half the box height. 
+*  Now offset down by half the box height.
       PA2 = AST_OFFSET2( FRM, LPAR, PA1, -HW, LPAR( 15 ), STATUS )
 
 *  Now offset up and down by half the box height, starting at the box
@@ -188,11 +188,11 @@
 *  requested angle, going half the box length.
       PA1 = AST_OFFSET2( FRM, PAR, PA0, -HL, LPAR( 9 ), STATUS )
 
-*  Now turn to the left by 90 degrees and offset up by half the box height. 
+*  Now turn to the left by 90 degrees and offset up by half the box height.
       PA1 = PA1 - ARD__PIBY2
       PA2 = AST_OFFSET2( FRM, LPAR( 9 ), PA1, HW, LPAR( 7 ), STATUS )
 
-*  Now offset down by half the box height. 
+*  Now offset down by half the box height.
       PA2 = AST_OFFSET2( FRM, LPAR( 9 ), PA1, -HW, LPAR( 11 ), STATUS )
 
 *  The parameters are now in the same format as those for a POLYGON region.

@@ -411,28 +411,28 @@
 *     standard chunk for polyline,polymarker
       INTEGER    ICHUNK,     IFILSC
       PARAMETER (ICHUNK=200, IFILSC=1)
- 
+
 *     Page, Wholefile and EPSF flags
       INTEGER    IWHOLE,   IPAGE,   IIEPSF
       PARAMETER (IWHOLE=0, IPAGE=1, IIEPSF=1)
- 
+
 *     Conversion factor from DC (metres) to Postscript Coords (points).
 *     NB: There are 72 points to an inch and 2.54cms to an inch.
       REAL       SCFACT
       PARAMETER (SCFACT = 72.0/0.0254)
- 
+
 *     Number of hardware fonts in WDT for each workstation
       INTEGER    IH2700,    IH2701
       PARAMETER (IH2700=13, IH2701=13)
- 
+
 *     maximum no of font and precision pairs (biggest of the above)
       INTEGER    INMAX
       PARAMETER (INMAX=13)
- 
+
 *     Number of Hershey fonts, other than 1
       INTEGER    IFNTMX
       PARAMETER (IFNTMX=KFNTMX-1)
- 
+
 *     default deferral mode and default implicit regeneration mode
       INTEGER IDDFRM, IDIRGM
       PARAMETER (IDDFRM=GASTI, IDIRGM=GSUPPD)
@@ -440,13 +440,13 @@
 *
 *     Variables
 *     ---------
- 
+
 *     Hershey font text variables
       INTEGER IPREC(KFNTMX), IHFONT(IFNTMX)
- 
+
 *     Hardware font text variables
       INTEGER ITXF(INMAX), ITXP(INMAX)
- 
+
 *     miscellaneous variables
       INTEGER IOFF, I, N, INKWI2, INTA(19), IREM, IPSFNT
       REAL REALA(12), RVW, RVS
@@ -456,7 +456,7 @@
       LOGICAL HERSH
 *     Hershey font list
       DATA IHFONT/-101,-102,-103,-104,-105,-106,-107,-110,-115/
- 
+
 *
 *  STACK USAGE
 *  -----------
@@ -487,7 +487,7 @@
 *
 * --------------------------------------------------------------------
 *
- 
+
 *     Set the number of hardware fonts and text variables to the
 *     to the values for the current workstation type.
 *               They are not held in workstation workspace, because
@@ -514,14 +514,14 @@
       ELSE
           IPSFNT=KNIL
       ENDIF
- 
+
 *        Initialise hardware text variables (highest precision GCHARP).
          DO 5 I=1,IPSFNT
             ITXF(I)=-I
             ITXP(I)=GCHARP
     5    CONTINUE
- 
- 
+
+
 * --------------------------------------------------------------------
 * Conditional GOTO on entrypoint code
 * --------------------------------------------------------------------
@@ -546,9 +546,9 @@
      :      1111,1111,1111,1111,1111,1850,1111,1870,1880,1111,
      :      1111,1111,1920,1930,1930,1930,1930,1930,1930) IENT-119
       GOTO 9999
- 
- 
- 
+
+
+
 *===============================================================
 *                 CONTROL FUNCTIONS
 *===============================================================
@@ -563,7 +563,7 @@
 *     data returned
 *     KWI1   workstation category (IO)
 *     KERROR error response or zero
- 
+
 *     Set up workstation state list and WDT
       CALL GKIWSL(KWKIX,KWKTYP)
       IF (KERROR.EQ.0) THEN
@@ -588,14 +588,14 @@
       KWI1 = GOUTPT
 *
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Close workstation
 * --------------------------------------------------------------
    20 CONTINUE
 *     Data expected
 *     KWI1 : first/second pass
- 
+
 *     First pass
       IF(KWI1.EQ.1) THEN
 *        indicate second pass expected
@@ -622,7 +622,7 @@
         CALL GKSLDL(KSSGPT(KWKIX))
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Clear workstation (F/E announcement before clr surface)
 * --------------------------------------------------------------
@@ -630,8 +630,8 @@
 *     Data expected:
 *     KWI1 : first/second pass
 *     KWI2 : conditional - Clear Control Flag (ignored)
- 
- 
+
+
 *     second pass
       IF (KWI1 .EQ. 2) THEN
 *        indicate clear surface entry expected
@@ -640,14 +640,14 @@
          CALL GKSLDL(KSSGPT(KWKIX))
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Redraw all segments on workstation
 * --------------------------------------------------------------
    40 CONTINUE
       KWDONE = KRFUSE
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Update workstation (F/E announcement before close wk)
 * --------------------------------------------------------------
@@ -656,7 +656,7 @@
 *     KWI1 : GPERFO    - Perform update?
       KWDONE = KRFUSE
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set deferral state
 * --------------------------------------------------------------
@@ -664,7 +664,7 @@
 *     Data expected:
 *     KWI1 : New deferral mode (ASAP,BNIG,BNIL,ASTI)
 *     KWI2 : New implicit regeneration mode (SUPPRESSED,ALLOWED)
- 
+
       KDFM(KWKIX) = KWI1
       KIMRGM(KWKIX) = KWI2
       IF (KWI1.EQ.GASAP) THEN
@@ -678,18 +678,18 @@
         KRGN = .TRUE.
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Do deferred output actions
 * --------------------------------------------------------------
    70 CONTINUE
 *     Data returned:
 *     KWI1 : new frame action necessary at update
- 
+
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       KWI1 = KNFAUP(KWKIX)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Clear display surface
 * --------------------------------------------------------------
@@ -701,7 +701,7 @@
 *     reset current wk window and viewport
       CALL GKWCLD
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Message
 * --------------------------------------------------------------
@@ -709,7 +709,7 @@
       IF (NID.GE.1)  WRITE(KERRFL,111) (GKAN1(IDAT(I)),I=1,NID)
   111                FORMAT(80A1)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Escape
 * --------------------------------------------------------------
@@ -718,11 +718,11 @@
 *     KWI1 : function identifier
       KERROR = 180
       GOTO 9999
- 
+
 *===============================================================
 *                OUTPUT FUNCTIONS
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Polyline
 * --------------------------------------------------------------
@@ -744,7 +744,7 @@
          CALL GKSTDA(KREALS,IOFF)
       ENDIF
       GOTO 8888
- 
+
 * --------------------------------------------------------------
 * Polymarker
 * --------------------------------------------------------------
@@ -765,7 +765,7 @@
         CALL GKSTDA(KREALS,IOFF)
       ENDIF
       GOTO 8888
- 
+
 * --------------------------------------------------------------
 * Text
 * --------------------------------------------------------------
@@ -782,7 +782,7 @@
      :               GK1AXF,GK1AXS)
       ENDIF
       GOTO 8888
- 
+
 * --------------------------------------------------------------
 * Fill area
 * --------------------------------------------------------------
@@ -798,7 +798,7 @@
          CALL GK1AFL(NRD, RX, RY)
       ENDIF
       GOTO 8888
- 
+
 * --------------------------------------------------------------
 * Cell array
 * --------------------------------------------------------------
@@ -806,7 +806,7 @@
       IF(KCVIS.EQ.GINVIS)GOTO 9999
       CALL GK1ACA(KWI1,KWI2,IDAT)
       GOTO 8888
- 
+
 * --------------------------------------------------------------
 * GDP
 * --------------------------------------------------------------
@@ -833,12 +833,12 @@
         ENDIF
       ENDIF
       GOTO 8888
- 
- 
+
+
 *===============================================================
 *                WORKSTATION ATTRIBUTES (REALISED)
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Set polyline attributes
 * --------------------------------------------------------------
@@ -850,7 +850,7 @@
 *     QWLNWD holds linewidth scale factor --> work out the actual linewidth
       QWLNWD(KWKIX) = QWLNWD(KWKIX)*QNMLNW(KWKIX)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set polymarker attributes
 * --------------------------------------------------------------
@@ -862,7 +862,7 @@
 *     QWMKSZ holds marker size scale factor --> work out the actual marker size
       QWMKSZ(KWKIX) = QWMKSZ(KWKIX)*QNMMKS(KWKIX)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set  text attributes
 * --------------------------------------------------------------
@@ -891,7 +891,7 @@
       ENDIF
 *
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set fill area attributes
 * --------------------------------------------------------------
@@ -912,11 +912,11 @@
       ENDIF
       IF(KWFACI(KWKIX).GE.KPCI(KWKIX)) KWFACI(KWKIX) = 1
       GOTO 9999
- 
+
 *===============================================================
 *                WORKSTATION ATTRIBUTES (REPRESENTATIONS)
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Set polyline representation
 * --------------------------------------------------------------
@@ -926,11 +926,11 @@
 *     KWI2 : linetype
 *     QWR1 : linewidth scale factor
 *     KWI3 : polyline colour index
- 
+
       INTA(1) = 5
       CALL GKSRPL(1,INTA,.FALSE.)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set polymarker representation
 * --------------------------------------------------------------
@@ -940,10 +940,10 @@
 *     KWI2   : markertype
 *     QWR1   : marker scale factor
 *     KWI3   : polymarker colour index
- 
+
       CALL GKSRPM(0,INTA,.FALSE.)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set text representation
 * --------------------------------------------------------------
@@ -957,7 +957,7 @@
 *     KWI4   : text colour index
 *     Data returned:
 *     KERROR : error indicator
- 
+
 *     Is the requested font a Hershey font?
       DO 252 I=1,IFNTMX
         IF (KWI2.EQ.IHFONT(I)) THEN
@@ -973,7 +973,7 @@
         ENDIF
   252 CONTINUE
       HERSH = .FALSE.
- 
+
 *     Deal with hardware fonts first.
   253 IF(KWI2.LE.ITXF(1) .AND. KWI2.GE.ITXF(IPSFNT)) THEN
          CALL GKSRTX(IPSFNT,ITXF,ITXP,.FALSE.)
@@ -993,7 +993,7 @@
         KERROR=76
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set fill area representation
 * --------------------------------------------------------------
@@ -1003,10 +1003,10 @@
 *     KWI2   : Fill Area Interior Style
 *     KWI3   : Fill Area Style Index
 *     KWI4   : Fill Area Colour Index
- 
+
       CALL GKSRFA(.FALSE.)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set pattern representation
 * --------------------------------------------------------------
@@ -1016,11 +1016,11 @@
 *     KWI2   : Pattern X dimension
 *     KWI3   : Pattern Y dimension
 *     KWI4   : First dimension of colour index array
- 
+
 *     pattern
       CALL GKSRPA(NID,IDAT)
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set colour representation
 * --------------------------------------------------------------
@@ -1030,7 +1030,7 @@
 *     QWR1   : RED component
 *     QWR2   : GREEN component
 *     QWR3   : BLUE component
- 
+
 *     Colour table bundles are stored on the HEAP; bundles can be
 *     modified but new ones may not be added; the total no of bundle
 *     entries (set by WDT) is found from KPCI(KWKIX).
@@ -1053,12 +1053,12 @@
         KERROR = 93
       ENDIF
       GOTO 9999
- 
- 
+
+
 *===============================================================
 *                TRANSFORMATIONS
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Normalisation transformation
 * --------------------------------------------------------------
@@ -1085,7 +1085,7 @@
       CALL GK1ACB
 *
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set workstation window
 * --------------------------------------------------------------
@@ -1094,11 +1094,11 @@
 *     QWR1-4 : workstation window XL, XR, YB, YT
 *     Data returned:
 *     KRGN & KWRGN : .TRUE. if regeneration needed
- 
+
 *     set up requested window
       CALL GKSWKW
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set workstation viewport
 * --------------------------------------------------------------
@@ -1107,23 +1107,23 @@
 *     QWR1-4 : workstation viewport XL, XR, YB, YT
 *     Data returned:
 *     KRGN & KWRGN : .TRUE. if regeneration needed
- 
+
 *     Set up requested viewport
       CALL GKSWKV
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Segment entrypoints (410-510)
 * --------------------------------------------------------------
   410 CONTINUE
       CALL GKSGWK(IENT,.FALSE.)
       GOTO 9999
- 
- 
+
+
 *===============================================================
 *                INPUT FUNCTIONS - INITIALISATION
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Initialise locator/stroke/valuator/choice/pick/string
 * --------------------------------------------------------------
@@ -1131,18 +1131,18 @@
 *     No input devices
       KERROR = 38
       GOTO 9999
- 
- 
+
+
 *===============================================================
 *                INPUT FUNCTIONS - SET MODE
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Set input operating modes
 * --------------------------------------------------------------
   670 CONTINUE
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Set input mode
 * --------------------------------------------------------------
@@ -1150,12 +1150,12 @@
 *     No input devices
       KERROR = 38
       GOTO 9999
- 
- 
+
+
 *===============================================================
 *                INPUT FUNCTIONS - REQUEST
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Request locator/stroke/valuator/choice/pick/string
 * --------------------------------------------------------------
@@ -1163,12 +1163,12 @@
 *     No input devices
       KERROR = 38
       GOTO 9999
- 
- 
+
+
 *===============================================================
 *                INPUT FUNCTIONS - SAMPLE
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Sample locator/stroke/valuator/choice/pick/string
 * --------------------------------------------------------------
@@ -1176,53 +1176,53 @@
 *     No input devices
       KERROR = 38
       GOTO 9999
- 
- 
+
+
 *===============================================================
 *                METAFILE FUNCTIONS
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Write item to GKSM
 * --------------------------------------------------------------
   910 CONTINUE
       KERROR = 32
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Get item type from GKSM
 * --------------------------------------------------------------
   920 CONTINUE
       KERROR = 34
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Read item from GKSM
 * --------------------------------------------------------------
   930 CONTINUE
       KERROR = 34
       GOTO 9999
- 
+
 *===============================================================
 *             INQUIRE EVERYTHING
 *===============================================================
  1111 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       GOTO 9999
- 
- 
- 
+
+
+
 *===============================================================
 *             INQUIRE PIXEL ARRAY DIMENSIONS
 *===============================================================
  1200 CONTINUE
       CALL GKPXAD
       GOTO 9999
- 
+
 *===============================================================
 *             INQUIRY FUNCTIONS - WS STATE LIST
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Inquire polyline representation
 * --------------------------------------------------------------
@@ -1235,7 +1235,7 @@
 *     KWI1   : linetype
 *     KWI2   : polyline colour index
 *     QWR1   : linewidth scale factor
- 
+
       INKWI2 = KWI2
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       IF(INKWI2.EQ.GREALI) THEN
@@ -1248,7 +1248,7 @@
         IF(KWI2.GE.KPCI(KWKIX)) KWI2 = 1
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire polymarker representation
 * --------------------------------------------------------------
@@ -1262,7 +1262,7 @@
 *     KWI1   : marker type
 *     KWI2   : polymarker colour index
 *     QWR1   : marker size scale factor
- 
+
       INKWI2 = KWI2
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       IF(INKWI2.EQ.GREALI) THEN
@@ -1275,7 +1275,7 @@
         IF(KWI2.GE.KPCI(KWKIX)) KWI2 = 1
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire text representation
 * --------------------------------------------------------------
@@ -1291,7 +1291,7 @@
 *     KWI3   : text colour index
 *     QWR1   : character expansion factor
 *     QWR2   : character spacing
- 
+
       INKWI2 = KWI2
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       IF(INKWI2.EQ.GREALI) THEN
@@ -1303,7 +1303,7 @@
            ENDIF
  1371   CONTINUE
         HERSH = .FALSE.
- 
+
 *       String and Char hardware fonts
  1372   CONTINUE
 *       A recognised hardware font?
@@ -1318,7 +1318,7 @@
         IF(KWI3.GE.KPCI(KWKIX)) KWI3 = 1
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire Text Extent.
 * --------------------------------------------------------------
@@ -1331,7 +1331,7 @@
         ENDIF
  1382 CONTINUE
       HERSH = .FALSE.
- 
+
 *     Stroke Precision.
  1383 IF (KWTXPR(KWKIX).EQ.GSTRKP.OR.HERSH) THEN
         CALL GKXQXO(NID,IDAT,RX,RY)
@@ -1340,10 +1340,10 @@
 *       Baseline vector from WS Set Text Attributes entry.
         CALL GKXQXC (NID,IDAT,QWCHWX(KWKIX),QWCHWY(KWKIX),
      :                  RX,RY,GK1AXF)
- 
+
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire colour representation
 * --------------------------------------------------------------
@@ -1357,7 +1357,7 @@
 *     QWR1   : colour (red intensity)
 *     QWR2   : colour (green intensity)
 *     QWR3   : colour (blue intensity)
- 
+
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       IF(KWI2.EQ.GREALI)THEN
          IF(KWKTYP .LT. 2720)THEN
@@ -1368,7 +1368,7 @@
          ENDIF
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire Set Members of Segment Names on Workstation
 * --------------------------------------------------------------
@@ -1384,7 +1384,7 @@
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KSGRQ = KSGRQ + 1
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire locator/stroke/valuator/choice/string device state
 * --------------------------------------------------------------
@@ -1392,38 +1392,38 @@
 *     PostScript Devices have no input devices
       KERROR = 38
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire pick device state
 * --------------------------------------------------------------
  1510 CONTINUE
       KERROR = 37
       GOTO 9999
- 
+
 *===============================================================
 *             INQUIRY FUNCTIONS - WS DESC TABLE
 *===============================================================
- 
+
 * --------------------------------------------------------------
 * Inquire Workstation Category
 * --------------------------------------------------------------
  1700 CONTINUE
 *     Data returned:
 *     KWI1   : Workstation Category
- 
+
       KWI1 = GOUTPT
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire workstation classification
 * --------------------------------------------------------------
  1710 CONTINUE
 *     Data returned:
 *     KWI1   : Workstation Classification
- 
+
       KWI1 = GRASTR
       GOTO 9999
- 
+
 * ---------------------------------------------------------------
 * Inquire maximum display surface size
 * ---------------------------------------------------------------
@@ -1435,11 +1435,11 @@
 *     KWI3   : Y in raster units
 *     QWR1   : X maximum display surface
 *     QWR2   : Y in device units
- 
+
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KWI1 = GMETRE
       GOTO 9999
- 
+
 * ---------------------------------------------------------------
 * Inquire Default Deferral State Values
 * ---------------------------------------------------------------
@@ -1448,12 +1448,12 @@
 *     KERROR : error indicator
 *     KWI1   : default value for deferral mode
 *     KWI2   : default value for implicit regeneration mode
- 
+
       KWI1 = IDDFRM
       KWI2 = IDIRGM
       GOTO 9999
- 
- 
+
+
 * --------------------------------------------------------------
 * Inquire polyline facilities
 * --------------------------------------------------------------
@@ -1471,14 +1471,14 @@
 *     QWR1   : nominal linewidth (DC)
 *     QWR2   : minimum linewidth (DC)
 *     QWR3   : maximum linewidth (DC)
- 
+
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
 *
       QWR1 = QWR1/SCFACT
       QWR2 = QWR2/SCFACT
       QWR3 = QWR3/SCFACT
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire polymarker facilities
 * --------------------------------------------------------------
@@ -1487,14 +1487,14 @@
 *     QWR1 : nominal marker size (DC)
 *     QWR2 : minimum marker size (DC)
 *     QWR3 : maximum marker size (DC)
- 
+
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
 *
       QWR1 = QWR1/SCFACT
       QWR2 = QWR2/SCFACT
       QWR3 = QWR3/SCFACT
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire text facilities
 * --------------------------------------------------------------
@@ -1513,7 +1513,7 @@
 *     QWR2   : maximum character height
 *     QWR3   : minimum character expansion factor
 *     QWR4   : maximum character expansion factor
- 
+
 *     no of text font and precision pairs
       N=IPSFNT+3+IFNTMX
       IF (KWI1.LE.0 .AND. KWI1.GT.N) THEN
@@ -1561,7 +1561,7 @@
         QWR2 = QWR2/SCFACT
       ENDIF
       GOTO 9999
- 
+
 * ---------------------------------------------------------------
 * Inquire Colour facilities
 * ---------------------------------------------------------------
@@ -1571,12 +1571,12 @@
 *     KWI1   : number of available colours
 *     KWI2   : colour available
 *     KWI3   : number of predefined colour indices
- 
+
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KWI1 = KWI3
       IF(KWKTYP .GE. 2720) KWI2 = GCOLOR
       GOTO 9999
- 
+
 * ---------------------------------------------------------------
 * Inquire List Element of Available GDPs
 * ---------------------------------------------------------------
@@ -1597,7 +1597,7 @@
       ENDIF
       KWI1 = 4
       GOTO 9999
- 
+
 * ---------------------------------------------------------------
 * Inquire Generalised Drawing Primitive
 * ---------------------------------------------------------------
@@ -1608,7 +1608,7 @@
 *     Data returned:
 *     KERROR : error indicator
 *     IDAT   : number of sets of attributes used
- 
+
       KNIR = 0
       IDAT(1) = KNIL
       IDAT(2) = KNIL
@@ -1623,7 +1623,7 @@
         KERROR = 41
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire number of available logical input devices
 * --------------------------------------------------------------
@@ -1631,7 +1631,7 @@
 *     No input devices
       KERROR = 38
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire default locator/stroke/valuator/choice/pick/string device data
 * --------------------------------------------------------------
@@ -1639,7 +1639,7 @@
 *     No input devices
       KERROR = 38
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Common end path for output primitives
 * --------------------------------------------------------------
@@ -1648,7 +1648,7 @@
       KDSMT(KWKIX) = GNEMPT
 *     Flush buffer if necessary
       IF(KWIO(KWKIX).EQ.GYES) CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 * --------------------------------------------------------------
 * Return
 * --------------------------------------------------------------

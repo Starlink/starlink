@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -240,9 +240,9 @@ switch (oper)
 /* fixed value for sliced color */
 
       get_slicol (&slir , &slig , &slib);
-      curlut.lutr[0] = slir; 
+      curlut.lutr[0] = slir;
       curlut.lutg[0] = slig;
-      curlut.lutb[0] = slib; 
+      curlut.lutb[0] = slib;
       break;
    default:
       iiierr = ILLINTOPER;
@@ -422,7 +422,7 @@ int_scroll_reset[display] = 1;
 int_scroll = 0;
 user_flag = 0;
 for (i = 0; i < device[display].n_inter; i++)
-   { 
+   {
    intdata = device[display].inter[i];
    switch ( intdata->oper )
       {
@@ -431,7 +431,7 @@ for (i = 0; i < device[display].n_inter; i++)
          break;
       case II_MOVE:
          switch ( intdata->obj_type )
-            {      
+            {
             case II_MEMORY:
                int_scroll = 1;
                int_scroll_mem = intdata->obj_id;
@@ -495,16 +495,16 @@ while ((userstatus == 0) && (exit_trg == -1))
 /* loop on multiple enabled interactions */
 
    for (i = 0; i < device[display].n_inter; i++)
-      { 
+      {
       intdata = device[display].inter[i];
       user = 0;
       switch (intdata->oper)
-         {      
+         {
          case II_USER:
 
             user = 1;
 
-            test_user (display, i, ev_type, ev_data, pos, ew, &user_flag, 
+            test_user (display, i, ev_type, ev_data, pos, ew, &user_flag,
                        &trg_flag);
             userstatus = userstatus | user_flag;
             break;
@@ -524,7 +524,7 @@ while ((userstatus == 0) && (exit_trg == -1))
 /* Scroll the pixmap to achieve a smooth scroll */
                   int_dis_scroll( display, i, ev_type, ev_data, pos, ew, &iiierr );
                   break;
-   
+
                case II_CURSOR:
                   cursor_move (display , i , ev_type , ev_data , pos , ew , &iiierr);
                   break;
@@ -539,8 +539,8 @@ while ((userstatus == 0) && (exit_trg == -1))
                      }
                   roi_move (display , i , ev_type , ev_data , pos , ew , &iiierr);
                   break;
-               }     
-            break;  
+               }
+            break;
 
          case II_MODIFY:
 
@@ -563,9 +563,9 @@ while ((userstatus == 0) && (exit_trg == -1))
                      roi_modify( display, i, ev_type, ev_data, pos, ew, &iiierr );
                      }
                   break;
-               }     
+               }
             break;
-   
+
          case II_ROTATE:
 
             switch (intdata->obj_type)
@@ -587,7 +587,7 @@ while ((userstatus == 0) && (exit_trg == -1))
                   break;
                }
             break;
-   
+
          case II_ZOOM:
             switch (intdata->obj_type)
                {
@@ -601,7 +601,7 @@ while ((userstatus == 0) && (exit_trg == -1))
                   break;
                }
             break;
-         
+
          case II_UNZOOM:
             switch (intdata->obj_type)
                {
@@ -615,7 +615,7 @@ while ((userstatus == 0) && (exit_trg == -1))
                   break;
                }
             break;
-   
+
          case II_CLZOOM:
             switch (intdata->obj_type)
                {
@@ -722,7 +722,7 @@ for (i = 0; i < int_struct.n_int_dev; i++)
       evl = intdev->evl[j];
       if (evl->type == II_EVLI)
          {
-         if (evlid == ii) 
+         if (evlid == ii)
 /* get evaluator value */
 
             *evlival = evl->ival;
@@ -798,7 +798,7 @@ for (i = 0; i < int_struct.n_int_dev; i++)
       evl = intdev->evl[j];
       if (evl->type == II_EVLR)
          {
-         if (evlid == ii) 
+         if (evlid == ii)
 /* get evaluator value */
 
             *evlrval = evl->rval;
@@ -876,7 +876,7 @@ for (i = 0; i < int_struct.n_int_dev; i++)
       evl = intdev->evl[j];
       if (evl->type == II_EVLS)
          {
-         if (evlid == ii) 
+         if (evlid == ii)
 /* get evaluator value */
 
             strcpy (evlsval , evl->sval);
@@ -952,8 +952,8 @@ for (i = 0; i < int_struct.n_int_dev; i++)
       evl = intdev->evl[j];
       if (evl->type == II_EVLI)
          {
-         if (evlid == ii) 
- get evaluator value 
+         if (evlid == ii)
+ get evaluator value
 
             *evlival = evl->ival;
          ii++;

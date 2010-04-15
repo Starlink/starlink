@@ -127,7 +127,7 @@ C
                      SUMVAR(I) = SUMVAR(I) + IMAGE_VARIANCE(I,J)
                      NUMBER(I) = NUMBER(I) + 1
                   END DO
- 
+
                END DO
             ELSE
 
@@ -137,7 +137,7 @@ C
                      SUM(I) = SUM(I) + IMAGE(I,J)
                      NUMBER(I) = NUMBER(I) + 1
                   END DO
- 
+
                END DO
             END IF
 
@@ -223,7 +223,7 @@ C
 
                   SPECT(I) = SUM(I) * REAL( NROWS ) / REAL( NUMBER(I) )
                   SPECT_VARIANCE(I) = SUMVAR(I) * REAL( NROWSSQ ) /
-     :                                REAL( NUMBER(I)*NUMBER(I) ) 
+     :                                REAL( NUMBER(I)*NUMBER(I) )
                   IF (QUALITY) THEN
                      SPECT_QUALITY(I)=GOOD
                   ENDIF

@@ -47,11 +47,11 @@
 
 *  If we are on a DEC machine then there are a couple of special settings...
 *
-*     idx and idx2 point to the most and least significant words of a 
+*     idx and idx2 point to the most and least significant words of a
 *     longword (DEC is the reverse of everybody else)
 *
 *     rev and rev2 specifiy wether byte reversal is required
-*     (rev=.TRUE. means reverse input longword, 
+*     (rev=.TRUE. means reverse input longword,
 *      revo=.TRUE. means reverse output longword and is only used by makeieee)
 *
 *     irecl specifies the record length in longwords (for DEC0 and in
@@ -104,7 +104,7 @@
 *  There is not provision at present to read partial records but this
 *  could easily be added by specifying number of bytes to read in vmssiz
 *  on input to the routine (and changing the code below a bit).
-*                         
+*
 *
 	ELSE
 
@@ -133,7 +133,7 @@
 
 *
 *  Check if end of data in file reached (there may be additional padding
-*  but we don't bother reading it) 
+*  but we don't bother reading it)
 *
 	   IF ( i2num(idx) .EQ. -1 ) status=-1
 
@@ -179,7 +179,7 @@
                 ENDIF
 
 *
-*  If we have got all (exactly) the bytes in a clump then 
+*  If we have got all (exactly) the bytes in a clump then
 *     if this was the last clump, set exit flag
 *     else get length of next clump (setting last flag if last clump)
 *
@@ -191,7 +191,7 @@
                  buffer(kk+2)=segbuffer(2)
                  buffer(kk+3)=segbuffer(3)
                  kk=kk+4
-                 IF ( last ) THEN 
+                 IF ( last ) THEN
 		  more=.FALSE.
                  ELSE
 
@@ -261,8 +261,8 @@
 *  could be avoided by complicating the flags etc but I think it is
 *  clearer in-line.
 *
-                  IF ( nb .EQ. nrec ) THEN 
-                   IF ( last ) THEN 
+                  IF ( nb .EQ. nrec ) THEN
+                   IF ( last ) THEN
     	            more=.FALSE.
                    ELSE
 
@@ -291,7 +291,7 @@
 *
 *  Otherwise just copy the longword into another buffer
 *
-                ELSE 
+                ELSE
                   buffer(kk)=segbuffer(0)
                   buffer(kk+1)=segbuffer(1)
                   buffer(kk+2)=segbuffer(2)
@@ -310,7 +310,7 @@
              nrec=(kw-1)*4+2
 
 
-* 
+*
 *  Other record type are MUCH easier to deal with as they are contained
 *  in a single section.
 *
@@ -384,7 +384,7 @@
 
 *
 *  This routine is translated into fortran from the original C code
-*  (shown as comments). For detail see the original source code 
+*  (shown as comments). For detail see the original source code
 *  routine DAT1_CNV_FORMAT.C in the HDS library.
 *
         INTEGER     nn
@@ -438,7 +438,7 @@
 	iv2 = IAND ( iv2 , MASK_FF )
 	iv3 = IAND ( iv3 , MASK_FF )
 
-	e =  IOR ( IAND ( ISHFT ( iv1,  1  ) , MASK_FE ) , 
+	e =  IOR ( IAND ( ISHFT ( iv1,  1  ) , MASK_FE ) ,
      :             IAND (  iv0 / 128         , MASK_01 )    )
 
 
@@ -469,20 +469,20 @@
 
 	     IF ( .NOT.rev ) THEN
 		ieee_byte(0) =  IOR (   IAND ( iv1,  MASK_80 ),
-     :                                  IAND ( e/2 , MASK_7F )   ) 
+     :                                  IAND ( e/2 , MASK_7F )   )
 
 		ieee_byte(1) =  IOR (   IAND ( iv0,    MASK_7F ) ,
-     :                                  IAND ( e*128 , MASK_80 )   ) 
+     :                                  IAND ( e*128 , MASK_80 )   )
 
 		ieee_byte(2) = vaxf_byte(3)
 		ieee_byte(3) = vaxf_byte(2)
 
 	     ELSE
 		ieee_byte(3) =  IOR (   IAND ( iv1,  MASK_80 ) ,
-     :                                  IAND ( e/2 , MASK_7F )   ) 
+     :                                  IAND ( e/2 , MASK_7F )   )
 
 		ieee_byte(2) =  IOR (   IAND ( iv0,    MASK_7F ) ,
-     :                                  IAND ( e*128 , MASK_80 )   ) 
+     :                                  IAND ( e*128 , MASK_80 )   )
 
 		ieee_byte(1) = vaxf_byte(3)
 		ieee_byte(0) = vaxf_byte(2)
@@ -517,9 +517,9 @@
 
 	ELSE
 
-		f = IOR ( iv2 , 
+		f = IOR ( iv2 ,
      :                    IOR ( iv3*256 ,
-     :				IOR ( IAND ( iv0, MASK_7F ) * 65536 , 
+     :				IOR ( IAND ( iv0, MASK_7F ) * 65536 ,
      :                                128*65536 )
      :                         )
      :                  )
@@ -555,7 +555,7 @@
 
 
 	ENDIF
-!	
+!
 !
 !
 

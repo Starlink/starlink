@@ -245,7 +245,7 @@
             CALL ERR_REP( 'CCD1_IMFIT_BADTEXT',
      : '  CCD1_IMFIT: Syntax error in keyword ^KEY', STATUS )
 
-*  the value of the header is (asserted to be) a character string of 
+*  the value of the header is (asserted to be) a character string of
 *  the form [x1:y1,x2:y2].
          ELSE IF ( IX .GT. 0 ) THEN
 
@@ -322,7 +322,7 @@
                GO TO 99
             ELSE
                CALL MSG_SETC( 'KEY', KEYWRD )
-               CALL CCD1_MSG( ' ', 
+               CALL CCD1_MSG( ' ',
      :'  Warning: keyword ^KEY not found in FITS header.', STATUS )
                IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
                   IVALS( I ) = 0

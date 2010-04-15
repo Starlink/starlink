@@ -37,7 +37,7 @@
 *      2-Feb-1991: ADD_IN_PAIRS and ERRORS parameters added,
 *                  so that OBJECT and SKY observations can be
 *                  added together in pairs. It has been discovered
-*                  that the only way to sky-subtract reliably 
+*                  that the only way to sky-subtract reliably
 *                  is to add pairs in this way.               (UKIRT::SMB)
 *      3-Feb-1991: Typing mistake fixed.                      (UKIRT::SMB)
 *     27-Jun-1991: Add point_source_options                   (UKIRT::PND)
@@ -133,11 +133,11 @@
       CALL NBS_GET_CVALUE( FLAT_MODE_ID, 0, FLAT_MODE, ACTBYTES, STATUS )
       CALL NBS_GET_CVALUE( CALIB_MODE_ID, 0, CALIB_MODE, ACTBYTES, STATUS )
       CALL NBS_GET_CVALUE( STANDARD_MODE_ID, 0, STANDARD_MODE, ACTBYTES, STATUS )
-      CALL NBS_GET_CVALUE( SPECIFIED_BIAS_ID, 0, SPECIFIED_BIAS, ACTBYTES, STATUS ) 
-      CALL NBS_GET_CVALUE( SPECIFIED_DARK_ID, 0, SPECIFIED_DARK, ACTBYTES, STATUS ) 
-      CALL NBS_GET_CVALUE( SPECIFIED_FLAT_ID, 0, SPECIFIED_FLAT, ACTBYTES, STATUS ) 
-      CALL NBS_GET_CVALUE( SPECIFIED_CALIB_ID, 0, SPECIFIED_CALIB, ACTBYTES, STATUS ) 
-      CALL NBS_GET_CVALUE( SPECIFIED_STD_ID, 0, SPECIFIED_STD, ACTBYTES, STATUS ) 
+      CALL NBS_GET_CVALUE( SPECIFIED_BIAS_ID, 0, SPECIFIED_BIAS, ACTBYTES, STATUS )
+      CALL NBS_GET_CVALUE( SPECIFIED_DARK_ID, 0, SPECIFIED_DARK, ACTBYTES, STATUS )
+      CALL NBS_GET_CVALUE( SPECIFIED_FLAT_ID, 0, SPECIFIED_FLAT, ACTBYTES, STATUS )
+      CALL NBS_GET_CVALUE( SPECIFIED_CALIB_ID, 0, SPECIFIED_CALIB, ACTBYTES, STATUS )
+      CALL NBS_GET_CVALUE( SPECIFIED_STD_ID, 0, SPECIFIED_STD, ACTBYTES, STATUS )
 
       IF ( STATUS.EQ.SAI__OK .AND. VERBOSE ) CALL MSG_OUT( ' ', 'Reading second misc items', STATUS )
       CALL NBS_GET_CVALUE( MASK_ID, 0, MASK, ACTBYTES, STATUS )

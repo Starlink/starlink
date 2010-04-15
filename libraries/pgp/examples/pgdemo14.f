@@ -4,7 +4,7 @@ C Demonstration program for PGPLOT: text input with PGRSTR.
 C
 C This program illustrates how an interactive program can be written
 C using PGPLOT. The program displays a number of active fields. Select
-C one of these fields using the cursor (e.g., click the mouse) to 
+C one of these fields using the cursor (e.g., click the mouse) to
 C activate it; then use the keyboard keys to edit the string displayed
 C in the field. Two of the fields have immediate action: 'DRAW' draws
 C a simple picture using the parameters specified in the input fields;
@@ -36,7 +36,7 @@ C
       DATA VALUE /'13',
      :            '0',
      :            '1',
-     :            'DRAW', 
+     :            'DRAW',
      :            'EXIT'/
 C-----------------------------------------------------------------------
       WRITE (*,*) 'This program requires an interactive device.'
@@ -108,7 +108,7 @@ C
             XV(II) = 1.5 + 0.4*COS(A/57.29577951)
             YV(II) = 0.5 + 0.4*SIN(A/57.29577951)
  120     CONTINUE
-C     
+C
          DO 140 II=1,NV-1
             DO 130 JJ=II+1,NV
                CALL PGMOVE(XV(II),YV(II))
@@ -148,7 +148,7 @@ C                 -- DRAW box
                ELSE
 C
 C Read value
-C   
+C
                   IF (RESULT(I).EQ.' ') THEN
                      LSTR = 0
                   ELSE
@@ -169,7 +169,7 @@ C
                CALL PGSCI(1)
                CALL PGRECT(BOX(1,I), BOX(2,I), BOX(3,I), BOX(4,I))
                CALL PGSLW(1)
-            END IF 
+            END IF
  30      CONTINUE
  60   CONTINUE
 C
@@ -206,7 +206,7 @@ C         -- Read a character
           JUNK = PGBAND(0, 1, XCUR, YCUR, XCUR, YCUR, CH)
 C         -- Erase old string
           CALL PGSCI(BCI)
-          IF (LSTR.GT.0) 
+          IF (LSTR.GT.0)
      :         CALL PGPTXT(X, Y, ANGLE, FJUST, TEXT(1:LSTR))
           CALL PGSCI(CI)
 C         -- Avoid problem with PGPLOT escape character
@@ -239,7 +239,7 @@ C
       INTEGER I
 C
 C Attempt to read an integer from a character string, and return
-C the result. No attempt is made to avoid integer overflow. A valid 
+C the result. No attempt is made to avoid integer overflow. A valid
 C integer is any sequence of decimal digits.
 C
 C Returns:

@@ -15,7 +15,7 @@ C     ORDER.
 C
 C  Language: FORTRAN
 C
-C  Call: 
+C  Call:
 C     CALL PAR_RDARY(NAME,VMIN,VMAX,ORDER,UNITS,NV,NVMAX,VALS)
 C
 C  Parameters:     (">" input, "!" modified, "<" output)

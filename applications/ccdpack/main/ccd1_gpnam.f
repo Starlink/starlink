@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine maps the name of a CCDPACK parameter to the name
-*     with which it is associated in the GLOBAL ADAM parameter 
+*     with which it is associated in the GLOBAL ADAM parameter
 *     database.
 
 *  Arguments:
@@ -27,7 +27,7 @@
 
 *  Notes:
 *     This routine does not define the associations.  Changes here must
-*     also be reflected in the association fields of the interface 
+*     also be reflected in the association fields of the interface
 *     definition (.ifd) files.
 
 *  Copyright:
@@ -69,20 +69,20 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) GPARAM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
       INTEGER MAXNAM             ! The number of parameter names
       PARAMETER ( MAXNAM = 19 )
-      
+
 *  Local Variables:
       CHARACTER * ( DAT__SZNAM ) PNAMES( MAXNAM ) ! Parameter names
       CHARACTER * ( DAT__SZNAM ) GNAMES( MAXNAM ) ! Global parameter names
@@ -96,7 +96,7 @@
       DATA GNAMES / 'CCDPACK_ADC', 'CCDPACK_BOUNDS', 'CCDPACK_RNOISE',
      :              'CCDPACK_MASK', 'CCDPACK_DIRECT', 'CCDPACK_DEFER',
      :              'CCDPACK_EXTENT', 'CCDPACK_PRESER',
-     :              'CCDPACK_GENVAR', 'CCDPACK_NDFNAM', 
+     :              'CCDPACK_GENVAR', 'CCDPACK_NDFNAM',
      :              'CCDPACK_USESET', 'CCDPACK_LOGTO',
      :              'CCDPACK_LOGFILE', 'CCDPACK_FLAT',
      :              'CCDPACK_BIAS', 'CCDPACK_CAL', 'CCDPACK_SATUR',
@@ -106,7 +106,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Loop over all known parameters.
       DO I = 1, MAXNAM
 
@@ -122,9 +122,9 @@
 *  Dropped out of loop without finding a match.  Signal an error.
       STATUS = SAI__ERROR
       CALL MSG_SETC( 'PARAM', PARAM )
-      CALL ERR_REP( 'CCD1_GPNAM_NONAM', 
+      CALL ERR_REP( 'CCD1_GPNAM_NONAM',
      :              'CCD1_GPNAM: Parameter ''^PARAM'' unknown', STATUS )
- 
+
  1    CONTINUE
 
       END

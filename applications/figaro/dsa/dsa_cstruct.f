@@ -22,7 +22,7 @@ C
 C     (>) NAME       (Fixed string,descr) The DTA_ system name of the
 C                    complex structure in question - ie the name of an
 C                    object of type 'CSTRUCT'.
-C     (>) ELEMENTS   (Integer,ref) The number of elements in the 
+C     (>) ELEMENTS   (Integer,ref) The number of elements in the
 C                    contracted structure array.
 C     (>) BASE_TYPE  (Integer,ref) Integer code for the type of array
 C                    used as the base array.  This should always be

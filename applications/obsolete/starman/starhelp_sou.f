@@ -1,8 +1,8 @@
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C STARMANHELP --  Help system for Starman
 C
 C         a.j.penny                ral                   1994 Dec
- 
+
       subroutine starmanhelp ( ierradam )
 
       implicit none
@@ -42,7 +42,7 @@ C  alan penny                   ral     1994 Dec
 
       implicit none
       include 'STARMAN_INC'
-      include 'SAE_PAR'        
+      include 'SAE_PAR'
 C--
       integer status
 Cbegin
@@ -225,7 +225,7 @@ C--
                                  ! trailing blanks
      :  STHE_GTHLPI,             ! Routine for reading help command
      :  HLP_HELP,                ! Interactive help
-     :  STHE_PTHLPO              ! Routine for outputting help 
+     :  STHE_PTHLPO              ! Routine for outputting help
 
       EXTERNAL
      :  STHE_GTHLPI,             ! Gets the help information
@@ -285,7 +285,7 @@ Cbegin
 
 *  Initiate interactive help session.
       ISTAT = HLP_HELP( STHE_PTHLPO, WIDTH, KEYWRD( 1:KWRDLN ), LUHLP,
-     :                  HELPLB( 1:HLPLEN ), HFLAGS, STHE_GTHLPI, 
+     :                  HELPLB( 1:HLPLEN ), HFLAGS, STHE_GTHLPI,
      :                  HLP_NAMETR )
 
 *  Watch for an error status.
@@ -317,7 +317,7 @@ C  alan penny                   ral     1994 Dec
 
       INTEGER FUNCTION STHE_PTHLPO( STRING )
 
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
       include 'SAE_PAR'
       include 'DAT_PAR'
@@ -497,7 +497,7 @@ C  alan penny                   ral     1994 Dec
 
       INTEGER FUNCTION STHE_GTHLPI( STRING, PROMPT, LINCH )
 
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
       include 'SAE_PAR'
       include 'DAT_PAR'
@@ -581,7 +581,7 @@ Cbegin
 
 *  Output enabled: write prompt, if any.
 
-            IF ( PROMPT .NE. '  ' ) 
+            IF ( PROMPT .NE. '  ' )
      :        WRITE ( LUTERM, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.

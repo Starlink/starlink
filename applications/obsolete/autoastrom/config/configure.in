@@ -1,6 +1,6 @@
 dnl NOT USED -- all configuration done `by hand' in makefile
 
-dnl   Very simple configure at present -- simply invoke configure in the 
+dnl   Very simple configure at present -- simply invoke configure in the
 dnl   moggy directory
 
 AC_REVISION($Revision$)

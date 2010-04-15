@@ -5,7 +5,7 @@ C     Y T P L A N E ,   X T P L A N E,    X Y P L A N E
 C
 C     Adds a number of consecutive planes from a cube to
 C     produce a 2D data object.  YTPLANE, XTPLANE and XYPLANE
-C     take planes whose X,Y or T values respectively are 
+C     take planes whose X,Y or T values respectively are
 C     constant over the extracted plane.  (Pedantic note:
 C     strictly, a cuboid is meant, rather than a cube.)
 C     (Further pedantic note: the X, Y and T axes mentioned
@@ -21,8 +21,8 @@ C     'CUBE'     The name of the cube from which the planes
 C                are to be taken.
 C
 C     'XSTART'   The X,Y, or T-value of the first plane to be used.
-C     'YSTART'   If CUBE has a X, Y or T  structure, the data 
-C     'TSTART'   from this is used.  If not, the plane numbers 
+C     'YSTART'   If CUBE has a X, Y or T  structure, the data
+C     'TSTART'   from this is used.  If not, the plane numbers
 C                are used, starting from 1.
 C
 C     'XEND'     The X, Y, or T-value of the last plane to be used.
@@ -40,9 +40,9 @@ C
 C     IMAGE is created with the same structure as CUBE
 C     except that the data array will only have 2 dimensions, and if
 C     CUBE has a X,Y or T structure, this will be omitted -
-C     that is, XPLANE will omit any X structure, YPLANE any 
+C     that is, XPLANE will omit any X structure, YPLANE any
 C     Y structure and  etc.
-C     
+C
 C                                     KS / AAO 8th Jan 1985
 C     Modified:
 C
@@ -60,11 +60,11 @@ C+
 C
 C     Local variables
 C
-      REAL      AXEND            ! Data value of end of selected axis 
+      REAL      AXEND            ! Data value of end of selected axis
                                  ! range
       INTEGER   AXIS             ! Axis number
-      REAL      AXST             ! Data value of start of selected axis 
-                                 ! range 
+      REAL      AXST             ! Data value of start of selected axis
+                                 ! range
       CHARACTER COMMAND*6        ! Command name
       INTEGER   CUPTR            ! Dynamic-memory pointer for cube data
       INTEGER   DIMS(5)          ! Various dimensions
@@ -85,7 +85,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -130,7 +130,7 @@ C     Select axis limits
 C
       CALL DSA_AXIS_RANGE('CUBE',AXIS,' ',.FALSE.,AXST,AXEND,IST,IEN,
      :                     STATUS)
-C 
+C
 C     The output IMAGE file, based on CUBE but without the axis
 C     and data information, is now created.
 C
@@ -148,7 +148,7 @@ C
       END IF
 
 C
-C     The IMAGE data structure is now created. This is based on that 
+C     The IMAGE data structure is now created. This is based on that
 C     of CUBE, but has the appropriate dimensions for IMAGE.
 C
       CALL DSA_RESHAPE_DATA('IMAGE','CUBE',2,DIMS,STATUS)

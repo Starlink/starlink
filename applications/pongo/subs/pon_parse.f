@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -62,7 +62,7 @@
 
 *  Arguments Returned:
       CHARACTER * ( * ) PARS( MAXPAR )
-      INTEGER NPAR     
+      INTEGER NPAR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -123,6 +123,6 @@
             IAT = IAT + IDX
          ENDIF
          GO TO 1
-      END IF     
-      END       
+      END IF
+      END
 * $Id$

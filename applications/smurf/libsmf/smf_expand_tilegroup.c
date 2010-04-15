@@ -111,20 +111,20 @@ smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
 
     blen = astChrLen( basename );
     for( itile = 0; itile < ntile; itile++ ) {
-      sprintf( basename + blen, "_%zd", itile + 1 );            
+      sprintf( basename + blen, "_%zd", itile + 1 );
       grpPut1( ogrp, basename, 0, status );
     }
     *outsize = ntile;
   } else {
     *outsize = 1;
   }
-         
+
 /* Expand the group to hold an output NDF name for each polarisation bin
    and tile. */
   if( npbin > 1 ) {
     /* get a copy of the current output group */
     tgrp = ndgCopy(ogrp, 0, 0, 0, status);
-    
+
     /* and clear the output group in preparation for repopulating it */
     grpSetsz(ogrp, 0, status );
 
@@ -135,7 +135,7 @@ smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
       blen = astChrLen( basename );
 
       for( ipbin = 0; ipbin < npbin; ipbin++ ){
-        sprintf( basename + blen, ".p%d", ipbin + 1 );            
+        sprintf( basename + blen, ".p%d", ipbin + 1 );
         grpPut1( ogrp, basename, 0, status );
       }
     }

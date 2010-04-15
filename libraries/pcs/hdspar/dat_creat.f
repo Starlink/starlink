@@ -14,7 +14,7 @@
 
 *  Description:
 *     An HDS data object is created, as specified by the character
-*     string associated with the parameter, and the given type and 
+*     string associated with the parameter, and the given type and
 *     dimensionality. If the object is a component of a structure,
 *     the structure must already exist.
 
@@ -63,7 +63,7 @@
 
 *  History:
 *     24-SEP-1984 (BDK)
-*        Original 
+*        Original
 *     16-JUN-1998 (AJC)
 *        Re-format prologue
 *     {enter_further_changes_here}

@@ -29,7 +29,7 @@
 *           relative to the viewport.
 *           - "S" -- Use PGTEXT which allows only simple (x,y)
 *           positioning of the text.
-*           
+*
 *        [The value is prompted for.]
 *     XPOS = _REAL (Read and Write)
 *        If ACTION is "P" or "S", the X coordinate of the text.  With
@@ -47,7 +47,7 @@
 *     TEXT = _CHAR (Read and Write)
 *        The text string to be plotted. This may include any of the
 *        PGPLOT control sequences for producing special characters.
-*        
+*
 *        [The value is prompted for.]
 *     SIDE = _CHAR (Read and Write)
 *        If ACTION="M", the side of the viewport where the text is to
@@ -60,7 +60,7 @@
 *           vertically.
 *           - "RV" -- The right-hand edge, but with the string written
 *           vertically.
-*           
+*
 *        If the value is not specified on the command line, the current
 *        value is used. The current value is initially set to "T".
 *     JUSTIFICATION = _REAL (Read and Write)
@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       CHARACTER * ( 132 ) PTEXT  ! Text to be displayed
       CHARACTER * ( 7 ) SIDE     ! SIDE parameter value
@@ -128,7 +128,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
+      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
          CALL PAR_GET0C( 'ACTION', TYPE, STATUS )
          CALL CHR_UCASE( TYPE )
          CALL PAR_GET0R( 'XPOS', X, STATUS )
@@ -141,16 +141,16 @@
             CALL PAR_GET0R( 'JUSTIFICATION', JUST, STATUS )
             IF ( TYPE .EQ. 'M' ) THEN
                CALL PAR_GET0C( 'SIDE', SIDE, STATUS )
-               IF ( STATUS .EQ. SAI__OK ) CALL PGMTEXT( SIDE, X, Y, 
+               IF ( STATUS .EQ. SAI__OK ) CALL PGMTEXT( SIDE, X, Y,
      :                                                  JUST, PTEXT )
             ELSE IF ( TYPE .EQ. 'P' ) THEN
                CALL PAR_GET0R( 'ANGLE',ANGLE, STATUS )
-               IF ( STATUS .EQ. SAI__OK ) CALL PGPTEXT( X, Y, ANGLE, 
+               IF ( STATUS .EQ. SAI__OK ) CALL PGPTEXT( X, Y, ANGLE,
      :                                                  JUST, PTEXT )
             END IF
          END IF
       END IF
-         
+
 *  Check the returned status and report a contextual error message if
 *  necessary.
       IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'WTEXT_END',

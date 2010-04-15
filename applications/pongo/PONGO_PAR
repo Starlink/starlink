@@ -22,32 +22,32 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     7-MAY-1992 (JBVAD::PAH):                      
-*        Original version.                          
-*     7-MAY-1992 (PCTR):                            
-*        Convert to Starlink prologue.              
+*     7-MAY-1992 (JBVAD::PAH):
+*        Original version.
+*     7-MAY-1992 (PCTR):
+*        Convert to Starlink prologue.
 *     7-MAY-1992 (JBVAD::PAH):
 *        Add a few more comments.
 *     16-DEC-1992 (PCTR):
 *        Added the global constant NDWORK.
 *     3-JUN-1994 (PDRAPER):
 *        Increased maximum number of points to 5000.
-*     {enter_further_changes_here}                          
-                                                    
-*  Bugs:                                            
-*     {note_any_bugs_here}                          
+*     {enter_further_changes_here}
 
-*-                                                  
+*  Bugs:
+*     {note_any_bugs_here}
 
-*  Useful mathematical conversions.                 
-      DOUBLE PRECISION DPI       ! Pi               
+*-
+
+*  Useful mathematical conversions.
+      DOUBLE PRECISION DPI       ! Pi
       PARAMETER ( DPI = 3.141592653589793238462643D+00 )
 
-      DOUBLE PRECISION D2PI      ! 2 * pi           
+      DOUBLE PRECISION D2PI      ! 2 * pi
       PARAMETER ( D2PI = 6.283185307179586476925287D+00 )
 
       DOUBLE PRECISION DR2DEG    ! Radians to degrees
-      PARAMETER ( DR2DEG = 180.0D+00 / DPI )        
+      PARAMETER ( DR2DEG = 180.0D+00 / DPI )
 
       DOUBLE PRECISION DR2AS     ! Radians to arc seconds
       PARAMETER ( DR2AS = 0.2062648062470963560D+06 )
@@ -67,34 +67,34 @@
 *  Input data arrays.
       INTEGER MAXBUF             ! Size of the input data buffer in
                                  ! characters.
-      PARAMETER( MAXBUF = 1024 )              
+      PARAMETER( MAXBUF = 1024 )
 
       INTEGER MAXCOL             ! Maximum number of data columns
                                  ! allowed in data file
-      PARAMETER( MAXCOL = 50 )                         
+      PARAMETER( MAXCOL = 50 )
 
       INTEGER NDATMAX            ! Maximum number of data points that
                                  ! can be stored
-      PARAMETER( NDATMAX = 5000 )               
+      PARAMETER( NDATMAX = 5000 )
 
 *  Other constants.
-      INTEGER LENLAB             ! Label length                  
-      PARAMETER ( LENLAB = 80 )                                  
+      INTEGER LENLAB             ! Label length
+      PARAMETER ( LENLAB = 80 )
 
       INTEGER MAXLAB             ! Maximum number of labels that can be
-                                 ! stored by the cursor function  
-      PARAMETER( MAXLAB = 50 )                                   
+                                 ! stored by the cursor function
+      PARAMETER( MAXLAB = 50 )
 
-      INTEGER MAXPOLY            ! Maximum number of polynomial 
+      INTEGER MAXPOLY            ! Maximum number of polynomial
                                  ! coefficients
-      PARAMETER( MAXPOLY = 10 )                                     
+      PARAMETER( MAXPOLY = 10 )
 
-      INTEGER MAXSELST           ! Maximum number of clauses in 
+      INTEGER MAXSELST           ! Maximum number of clauses in
                                  ! conditional read
       PARAMETER ( MAXSELST = 10 )
 
       INTEGER NPROJ              ! Number of projections available
-      PARAMETER( NPROJ = 7 )                                     
+      PARAMETER( NPROJ = 7 )
 
       INTEGER PON__NEST         !  Size of spline work array
       PARAMETER ( PON__NEST = NDATMAX + 6 + 1 )

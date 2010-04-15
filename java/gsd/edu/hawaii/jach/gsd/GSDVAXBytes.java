@@ -591,7 +591,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing vax bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of floats.
 	 */
 	public static float[] tofloatArray(
@@ -631,7 +631,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing vax bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of integers.
 	 */
 	public static int[] tointArray(ByteBuffer buffer, int offset, int nelem) {
@@ -668,7 +668,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing vax bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of shorts.
 	 */
 	public static short[] toshortArray(
@@ -708,7 +708,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing vax bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of booleans.
 	 */
 	public static boolean[] toboolArray(
@@ -748,7 +748,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing vax bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of doubles.
 	 */
 	public static double[] todoubleArray(
@@ -788,7 +788,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing vax bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of strings.
 	 */
 	public static String[] tostringArray(
@@ -826,7 +826,7 @@ final class GSDVAXBytes {
 	 *
 	 * @param buffer An ByteBuffer containing simple bytes
 	 * @param offset Start position to begin reading the input buffer.
-	 * @param nelem Number of elements to copy.     
+	 * @param nelem Number of elements to copy.
 	 * @return An array of bytes.
 	 */
 	public static byte[] tobyteArray(

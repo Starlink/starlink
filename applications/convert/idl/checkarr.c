@@ -1,6 +1,6 @@
 /*+
 * Name:
-* 
+*
 * Purpose:
 *    Check an HDS component specification for array index specifiers
 
@@ -29,7 +29,7 @@
 *       The Starlink global status
 
 * Returned Value:
-*    isarr = int 
+*    isarr = int
 *       True if the component spec has any index or slice info
 
 * Description:
@@ -126,10 +126,10 @@ char *colon;          /* pointer to colon within an index spec */
                } else {
 /* No colon */
                   if ( strlen( index) ) {
-                     starts[*ndims] = ends[*ndims] = atoi(index);               
+                     starts[*ndims] = ends[*ndims] = atoi(index);
                   } else {
                      *slice = TRUE;
-                     starts[*ndims] = 1;               
+                     starts[*ndims] = 1;
                      ends[*ndims] = 0;
                   }
                }
@@ -142,7 +142,7 @@ char *colon;          /* pointer to colon within an index spec */
             isarr = FALSE;
          }
          free( tempstr );
-         
+
       } else {
          *status = SAI__ERROR;
          emsRep( " ", "CHECKARR: Failed to malloc space", status );

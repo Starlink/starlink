@@ -31,6 +31,6 @@
         CALL SQU (XPLOT,YPLOT,R, STATUS )
         CALL TILTX (XPLOT,YPLOT,R, STATUS )
         CALL NUMB (XPLOT,YPLOT,R,-N, STATUS )
- 
+
         END
- 
+

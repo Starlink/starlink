@@ -172,17 +172,17 @@
 
 *            Open the mask template file CGS4_TEMPLATES:MASK_TEMPLATE
 *            and use this as a basis for creating the new mask structure
-               CALL DSA_NAMED_INPUT( 'MASK_TEMP', 
+               CALL DSA_NAMED_INPUT( 'MASK_TEMP',
      :            MASK_TEMPLATE, STATUS )
                CALL DSA_NAMED_OUTPUT( 'MASK', MASK,
-     :           'MASK_TEMP', 0, 1, STATUS ) 
+     :           'MASK_TEMP', 0, 1, STATUS )
                CALL DSA_USE_QUALITY( 'MASK', STATUS )
 
 *            Force the data array in the mask structure to be the same size.
-               CALL DSA_RESHAPE_DATA( 'MASK', 'MASK', NDIM, 
+               CALL DSA_RESHAPE_DATA( 'MASK', 'MASK', NDIM,
      :           DIMS, STATUS )
 
-*            Map the data arrays in both structures. 
+*            Map the data arrays in both structures.
                CALL DSA_MAP_DATA( 'INPUT', 'READ', 'FLOAT',
      :           INPUT_PTR, INPUT_SLOT, STATUS )
                CALL DSA_MAP_DATA( 'MASK', 'WRITE', 'BYTE',
@@ -196,8 +196,8 @@
 *               and THIGH parameters. (GEN_RANGEF is used, rather
 *               than DSA_GET_RANGE to ensure that data quality is
 *               ignored.)
-                  CALL GEN_RANGEF( %val(INPUT_PTR), 1, NELM, 
-     :              VMAX, VMIN )  
+                  CALL GEN_RANGEF( %val(INPUT_PTR), 1, NELM,
+     :              VMAX, VMIN )
                   CALL PAR_DEF0R( 'TLOW', VMIN, STATUS )
                   CALL PAR_DEF0R( 'THIGH', VMAX, STATUS )
 
@@ -254,7 +254,7 @@
      :                 INPUT(1:CLEN), ' ', STATUS )
 
 *                  Record the name of the detector in the FITS structure.
-                     CALL DSA_PUT_FITS_C( 'MASK', 'DETECTOR', 
+                     CALL DSA_PUT_FITS_C( 'MASK', 'DETECTOR',
      :                 DETECTOR, ' ', STATUS )
 
 *                  Record the threshold limits in the FITS structure.
@@ -288,7 +288,7 @@
 
                   STATUS = SAI__ERROR
                   CALL ERR_REP( ' ', 'RED4_CRE_THRESH_MASK: '/
-     :              /'Failed to create mask or '/ 
+     :              /'Failed to create mask or '/
      :              /'map data arrays', STATUS )
                END IF
             ELSE
@@ -300,7 +300,7 @@
      :           /'by a factor of ^DETNINCR and not 1', STATUS )
             END IF
          ELSE
-  
+
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_CRE_THRESH_MASK: '/
      :        /'Failed to access data structures', STATUS )
@@ -309,10 +309,10 @@
 *      Close DSA. It will create the new mask structure and will
 *      also unmap all the arrays mapped above.
 *      (The routine will attempt to work even if the status on entry
-*      is bad). 
+*      is bad).
          CALL DSA_CLOSE( STATUS )
       ELSE
- 
+
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_CRE_THRESH_MASK: '/
      :     /'Failed to get %INPUT, %MASK, %GOOD '/

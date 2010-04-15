@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Description:
- *     This include file contains the function prototypes for all 
+ *     This include file contains the function prototypes for all
  *     EMS C internal routines.
 
  *  Authors:

@@ -52,12 +52,12 @@ f     The DssMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@ f     The DssMap class does not define any new routines beyond those
 *        Added prototypes for platepos and platepix.
 *     4-NOV-1997 (DSB):
 *        o  A copy of the supplied FitsChan is no longer stored inside
-*        the DssMap. The FitsChan returned by DssFits is now derived from 
+*        the DssMap. The FitsChan returned by DssFits is now derived from
 *        the wcs information stored in the SAOimage "WorldCoor" structure
 *        (stored within the DssMap), and only contains the keywords
 *        necessary to reconstruct the DssMap.
@@ -105,7 +105,7 @@ f     The DssMap class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS DssMap
 
-/* Macro which returns the nearest integer to a given floating point 
+/* Macro which returns the nearest integer to a given floating point
    value. */
 #define NINT(x) (int)((x)+(((x)>0.0)?0.5:-0.5))
 
@@ -156,9 +156,9 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(DssMap)
@@ -216,7 +216,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     DssMap member function (over-rides the astEqual protected
@@ -243,9 +243,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstDssMap *that;        
-   AstDssMap *this;        
-   int i;           
+   AstDssMap *that;
+   AstDssMap *this;
+   int i;
    int nin;
    int nout;
    int result;
@@ -272,9 +272,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two DssMaps differ, it may still be possible 
-   for them to be equivalent. First compare the DssMaps if their Invert 
-   flags are the same. In this case all the attributes of the two DssMaps 
+/* If the Invert flags for the two DssMaps differ, it may still be possible
+   for them to be equivalent. First compare the DssMaps if their Invert
+   flags are the same. In this case all the attributes of the two DssMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
@@ -297,11 +297,11 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                       result = 0;
                       break;
                    }
-                } 
+                }
 
              }
 
-/* If the Invert flags for the two DssMaps differ, the attributes of the two 
+/* If the Invert flags for the two DssMaps differ, the attributes of the two
    DssMaps must be inversely related to each other. */
          } else {
 
@@ -311,7 +311,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -332,7 +332,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     DssMap member function (over-rides the astGetObjSize protected
@@ -417,7 +417,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
 *        the DSS plate fit.
 *     method
 *        The calling method (for error messages).
-*     class 
+*     class
 *        The object class (for error messages).
 
 *  Returned Value:
@@ -451,13 +451,13 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
 /* Check the memory can be used. */
    if( astOK ){
 
-/* The following code is based on the "wcsinit" function in SAOimage file 
+/* The following code is based on the "wcsinit" function in SAOimage file
    wcs.c. Note, only the values needed in the platepos and platepix
    functions are set up. The FITS keywords are accessed in the order in
    which they are usually stored in a FITS file. This will cut down the
    time spent searching for keywords. Report an error if any required
    keyword is not found. */
- 
+
 /* Plate center RA */
       rah = 0.0;
       ram = 0.0;
@@ -567,7 +567,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
             ret->ppo_coeff[i] = 0.0;
             if( ( i == 2 || i == 5 ) && astOK ) {
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
-                         "for the FITS keyword '%s'.", status, method, class, 
+                         "for the FITS keyword '%s'.", status, method, class,
                          name );
                break;
             }
@@ -578,7 +578,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
    coefficients 1 to 14 are missing. Assume a value of zero for any
    others which are missing.  */
       name = name_buff;
-      for( i = 0; i < 19; i++ ){ 
+      for( i = 0; i < 19; i++ ){
          sprintf( name_buff, "AMDX%d", i + 1 );
          if( !astGetFitsF( fits, name, &ret->amd_x_coeff[i] ) ) {
             ret->amd_x_coeff[i] = 0.0;
@@ -590,7 +590,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
          }
       }
 
-      for( i = 0; i < 19; i++ ){ 
+      for( i = 0; i < 19; i++ ){
          sprintf( name_buff, "AMDY%d", i + 1 );
          if( !astGetFitsF( fits, name, &ret->amd_y_coeff[i] ) ){
             ret->amd_y_coeff[i] = 0.0;
@@ -630,8 +630,8 @@ static AstFitsChan *DssFits( AstDssMap *this, int *status ) {
 *     DssMap method.
 
 *  Description:
-*     This function returns a pointer to a DSS-encoded FitsChan containing 
-*     cards generated from the information stored with the DssMap. The 
+*     This function returns a pointer to a DSS-encoded FitsChan containing
+*     cards generated from the information stored with the DssMap. The
 *     keywords contained in the FitsChan are those which would ne needed to
 *     re-create the DssMap (see astDSSMap).
 
@@ -644,7 +644,7 @@ static AstFitsChan *DssFits( AstDssMap *this, int *status ) {
 *        A pointer to the FitsChan.
 
 *  Notes:
-*     - The returned pointer should be annuled using astAnnul when no longer 
+*     - The returned pointer should be annuled using astAnnul when no longer
 *     needed.
 *     - A value of NULL will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
@@ -707,15 +707,15 @@ static AstFitsChan *DssFits( AstDssMap *this, int *status ) {
                 0 );
 
 /* X and Y corners (in pixels) */
-   astSetFitsI( ret, "CNPIX1", NINT( wcs->x_pixel_offset ), 
+   astSetFitsI( ret, "CNPIX1", NINT( wcs->x_pixel_offset ),
                 "X corner  (pixels)", 0 );
-   astSetFitsI( ret, "CNPIX2", NINT( wcs->y_pixel_offset ), 
+   astSetFitsI( ret, "CNPIX2", NINT( wcs->y_pixel_offset ),
                 "Y corner", 0 );
 
 /* X and Y pixel sizes (microns). */
-   astSetFitsF( ret, "XPIXELSZ", wcs->x_pixel_size, 
+   astSetFitsF( ret, "XPIXELSZ", wcs->x_pixel_size,
                 "X pixel size (microns)", 0 );
-   astSetFitsF( ret, "YPIXELSZ", wcs->y_pixel_size, 
+   astSetFitsF( ret, "YPIXELSZ", wcs->y_pixel_size,
                 "Y pixel size (microns)", 0 );
 
 /* Orientation Coefficients. */
@@ -729,20 +729,20 @@ static AstFitsChan *DssFits( AstDssMap *this, int *status ) {
 
 /* Plate solution x and y coefficients. */
    comm = "Plate solution x coefficients";
-   for( i = 0; i < 19; i++ ){ 
+   for( i = 0; i < 19; i++ ){
       sprintf( name_buff, "AMDX%d", i + 1 );
       astSetFitsF( ret, name, wcs->amd_x_coeff[i], comm, 0 );
       comm = " ";
    }
 
    comm = "Plate solution y coefficients";
-   for( i = 0; i < 19; i++ ){ 
+   for( i = 0; i < 19; i++ ){
       sprintf( name_buff, "AMDY%d", i + 1 );
       astSetFitsF( ret, name, wcs->amd_y_coeff[i], comm, 0 );
       comm = " ";
    }
 
-/* Return a pointer to the FitsChan. */   
+/* Return a pointer to the FitsChan. */
    return ret;
 }
 
@@ -776,7 +776,7 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -823,7 +823,7 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name, int *status ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    object->Equal = Equal;
-   mapping->MapMerge = MapMerge; 
+   mapping->MapMerge = MapMerge;
 
 /* Declare the class dump, copy and delete function. */
    astSetDump( object, Dump, "DssMap", "DSS plate fit mapping" );
@@ -998,7 +998,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    if ( !astOK ) return result;
 
 /* The only simplification easily possible is if a WinMap maps the pixel
-   coordinates prior to a DssMap. If the DssMap has not been inverted, the 
+   coordinates prior to a DssMap. If the DssMap has not been inverted, the
    WinMap must be applied before the DssMap, otherwise the WinMap must be
    applied after the DssMap. */
    if( series ){
@@ -1018,7 +1018,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             astSetInvert( wm, ( *invert_list )[ wmi ] );
 
 /* Get a copy of the scale and shift terms from the WinMap. */
-            astWinTerms( wm, &a, &b );   
+            astWinTerms( wm, &a, &b );
 
 /* Check that the scale and shift terms are usable. */
             if( astOK &&
@@ -1041,7 +1041,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   ypixelsz *= b[ 1 ];
                   cnpix1 = 0.5 + ( cnpix1 + a[ 0 ] - 0.5 )/b[ 0 ];
                   cnpix2 = 0.5 + ( cnpix2 + a[ 1 ] - 0.5 )/b[ 1 ];
-   
+
                } else {
                   xpixelsz /= b[ 0 ];
                   ypixelsz /= b[ 1 ];
@@ -1069,28 +1069,28 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      astSetFitsI( fits, "CNPIX1", NINT( cnpix1 ), NULL, 1 );
                   } else {
                      ok = 0;
-                  }                  
+                  }
 
                   astClearCard( fits );
                   if( astFindFits( fits, "CNPIX2", NULL, 0 ) ){
                      astSetFitsI( fits, "CNPIX2", NINT( cnpix2 ), NULL, 1 );
                   } else {
                      ok = 0;
-                  }                  
+                  }
 
                   astClearCard( fits );
                   if( astFindFits( fits, "XPIXELSZ", NULL, 0 ) ){
                      astSetFitsF( fits, "XPIXELSZ", xpixelsz, NULL, 1 );
                   } else {
                      ok = 0;
-                  }                  
+                  }
 
                   astClearCard( fits );
                   if( astFindFits( fits, "YPIXELSZ", NULL, 0 ) ){
                      astSetFitsF( fits, "YPIXELSZ", ypixelsz, NULL, 1 );
                   } else {
                      ok = 0;
-                  }                  
+                  }
 
 /* If all the keywords were updated succesfully, create the new DssMap
    based on the modified FITS header cards. */
@@ -1103,7 +1103,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      ( *map_list )[ where ] = (AstMapping *) dmnew;
 
 /* Annul the WinMap pointer in the list, and shuffle any remaining
-   Mappings down to fill the gap. */            
+   Mappings down to fill the gap. */
                      wm = astAnnul( wm );
                      for ( i = wmi + 1; i < *nmap; i++ ) {
                         ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
@@ -1224,10 +1224,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
 
-/* Determine the numbers of points from the input PointSet and obtain 
+/* Determine the numbers of points from the input PointSet and obtain
    pointers for accessing the input and output coordinate values. */
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse mapping, according to the
@@ -1247,7 +1247,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
          aa = ptr_out[ 0 ];
          bb = ptr_out[ 1 ];
 
-/* Loop to apply the plate fit to all the points, checking for (and 
+/* Loop to apply the plate fit to all the points, checking for (and
    propagating) bad values in the process. */
          for ( point = 0; point < npoint; point++ ) {
             if( *xx != AST__BAD && *yy != AST__BAD ){
@@ -1287,7 +1287,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
          for ( point = 0; point < npoint; point++ ) {
             if( *aa != AST__BAD && *bb != AST__BAD ){
 
-               if( platepix( AST__DR2D*(*aa), AST__DR2D*(*bb), 
+               if( platepix( AST__DR2D*(*aa), AST__DR2D*(*bb),
                              (struct WorldCoor *) map->wcs, xx, yy ) ){
                   *xx = AST__BAD;
                   *yy = AST__BAD;
@@ -1471,19 +1471,19 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
    for( i = 0; i < 6; i++ ) {
       sprintf( name_buff, "PPO%d", i + 1 );
-      astWriteDouble( channel, name_buff, 1, 1, wcs->ppo_coeff[i], 
+      astWriteDouble( channel, name_buff, 1, 1, wcs->ppo_coeff[i],
                       "Orientation coefficients" );
    }
 
    for( i = 0; i < 19; i++ ) {
       sprintf( name_buff, "AMDX%d", i + 1 );
-      astWriteDouble( channel, name_buff, 1, 1, wcs->amd_x_coeff[i], 
+      astWriteDouble( channel, name_buff, 1, 1, wcs->amd_x_coeff[i],
                       "Plate solution X coefficients" );
    }
 
    for( i = 0; i < 19; i++ ) {
       sprintf( name_buff, "AMDY%d", i + 1 );
-      astWriteDouble( channel, name_buff, 1, 1, wcs->amd_y_coeff[i], 
+      astWriteDouble( channel, name_buff, 1, 1, wcs->amd_y_coeff[i],
                       "Plate solution Y coefficients" );
    }
 
@@ -1529,7 +1529,7 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, int *status, ...) {
 *        describing the plate fit to be used. The FitsChan may contain
 *        other header cards which will be ignored, and it is unchanged on
 *        exit. The required information is copied from the FitsChan, and
-*        so the supplied FitsChan may subsequently be changed or deleted 
+*        so the supplied FitsChan may subsequently be changed or deleted
 *        without changing the DssMap.
 *     options
 *        Pointer to a null-terminated string containing an optional
@@ -1552,7 +1552,7 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, int *status, ...) {
 *        A pointer to the new DssMap.
 
 *  Attributes:
-*     The DssMap class has no additional attributes over and above those 
+*     The DssMap class has no additional attributes over and above those
 *     common to all Mappings.
 
 *  Notes:
@@ -1692,7 +1692,7 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
 
 /* Create a structure holding the information required by the SAOIMAGE
    "platepos" function. The required values are extracted from the
-   supplied FitsChan. An error is reported and NULL returned if any required 
+   supplied FitsChan. An error is reported and NULL returned if any required
    keywords are missing or unusable. */
    if ( ( wcs = BuildWcs( fits, "astInitDssMap", name, status ) ) ) {
 
@@ -1715,7 +1715,7 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
       }
 
 /* Free the SAOIMAGE wcs structure. */
-      wcs = (struct WorldCoor *) astFree( (void *) wcs );      
+      wcs = (struct WorldCoor *) astFree( (void *) wcs );
 
    }
 
@@ -1863,43 +1863,43 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
             astError( AST__RDERR, "astRead(DssMap): 'PltRA' object (Plate "
                       "centre RA) missing from input." , status);
          }
-        
+
          wcs->plate_dec = astReadDouble( channel, "pltdec", AST__BAD );
          if( wcs->plate_dec == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'PltDec' object (Plate "
                       "centre Dec) missing from input." , status);
          }
-        
+
          wcs->plate_scale = astReadDouble( channel, "pltscl", AST__BAD );
          if( wcs->plate_scale == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'PltScl' object (Plate "
                       "scale) missing from input." , status);
          }
-        
+
          wcs->x_pixel_offset = astReadDouble( channel, "cnpix1", AST__BAD );
          if( wcs->x_pixel_offset == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'CNPix1' object (X pixel "
                       "offset) missing from input." , status);
          }
-        
+
          wcs->y_pixel_offset = astReadDouble( channel, "cnpix2", AST__BAD );
          if( wcs->y_pixel_offset == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'CNPix2' object (Y pixel "
                       "offset) missing from input." , status);
          }
-        
+
          wcs->x_pixel_size = astReadDouble( channel, "xpixsz", AST__BAD );
          if( wcs->x_pixel_size == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'XPixSz' object (X pixel "
                       "size) missing from input." , status);
          }
-        
+
          wcs->y_pixel_size = astReadDouble( channel, "ypixsz", AST__BAD );
          if( wcs->y_pixel_size == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'YPixSz' object (Y pixel "
                       "size) missing from input." , status);
          }
-        
+
          for( i = 0; i < 6 && astOK; i++ ) {
             sprintf( name_buff, "ppo%d", i + 1 );
             wcs->ppo_coeff[i] = astReadDouble( channel, name_buff, AST__BAD );
@@ -1913,7 +1913,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
                }
             }
          }
-      
+
          for( i = 0; i < 19 && astOK; i++ ) {
             sprintf( name_buff, "amdx%d", i + 1 );
             wcs->amd_x_coeff[i] = astReadDouble( channel, name_buff, AST__BAD );
@@ -1927,7 +1927,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
                }
             }
          }
-      
+
          for( i = 0; i < 19 && astOK; i++ ) {
             sprintf( name_buff, "amdy%d", i + 1 );
             wcs->amd_y_coeff[i] = astReadDouble( channel, name_buff, AST__BAD );
@@ -1973,7 +1973,7 @@ AstFitsChan *astDssFits_( AstDssMap *this, int *status ){
 
 ***************************************************************************
 *
-* Copyright:   1988 Smithsonian Astrophysical Observatory                 
+* Copyright:   1988 Smithsonian Astrophysical Observatory
 *              You may do anything you like with these files except remove
 *              this copyright.  The Smithsonian Astrophysical Observatory
 *              makes no representations about the suitability of this
@@ -1991,8 +1991,8 @@ AstFitsChan *astDssFits_( AstDssMap *this, int *status ){
 
  * Module:	platepos.c (Plate solution WCS conversion
  * Purpose:	Compute WCS from Digital Sky Survey plate fit
- * Subroutine:	platepos() converts from pixel location to RA,Dec 
- * Subroutine:	platepix() converts from RA,Dec to pixel location   
+ * Subroutine:	platepos() converts from pixel location to RA,Dec
+ * Subroutine:	platepix() converts from RA,Dec to pixel location
 
     These functions are based on the astrmcal.c portion of GETIMAGE by
     J. Doggett and the documentation distributed with the Digital Sky Survey.
@@ -2031,7 +2031,7 @@ double	*ypos;		/* Declination or latitude in degrees */
   double twopi = 6.28318530717959;
   double ctan, ccos;
 
-/*  Ignore magnitude and color terms 
+/*  Ignore magnitude and color terms
   double mag = 0.0;
   double color = 0.0; */
 
@@ -2058,7 +2058,7 @@ double	*ypos;		/* Declination or latitude in degrees */
 	wcs->amd_x_coeff[10]*ymm3	+ wcs->amd_x_coeff[11]*xmm*(x2y2) +
 	wcs->amd_x_coeff[12]*xmm*x2y2*x2y2;
 
-/*  Ignore magnitude and color terms 
+/*  Ignore magnitude and color terms
 	+ wcs->amd_x_coeff[13]*mag	+ wcs->amd_x_coeff[14]*mag*mag +
 	wcs->amd_x_coeff[15]*mag*mag*mag + wcs->amd_x_coeff[16]*mag*xmm +
 	wcs->amd_x_coeff[17]*mag*x2y2	+ wcs->amd_x_coeff[18]*mag*xmm*x2y2 +
@@ -2072,7 +2072,7 @@ double	*ypos;		/* Declination or latitude in degrees */
 	wcs->amd_y_coeff[10]*xmm3	+ wcs->amd_y_coeff[11]*ymm*(x2y2) +
 	wcs->amd_y_coeff[12]*ymm*x2y2*x2y2;
 
-/*  Ignore magnitude and color terms 
+/*  Ignore magnitude and color terms
 	+ wcs->amd_y_coeff[13]*mag	+ wcs->amd_y_coeff[14]*mag*mag +
 	wcs->amd_y_coeff[15]*mag*mag*mag + wcs->amd_y_coeff[16]*mag*ymm +
 	wcs->amd_y_coeff[17]*mag*x2y2)	+ wcs->amd_y_coeff[18]*mag*ymm*x2y2 +
@@ -2276,7 +2276,7 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
    Nov  7 1995	Add half pixel to image coordinates to get astrometric
                   plate coordinates
    Feb 26 1996	Fix plate to image pixel conversion error
-   Feb 18 1997  Modified by D.S. Berry (Starlink) to avoid use of the image 
+   Feb 18 1997  Modified by D.S. Berry (Starlink) to avoid use of the image
                   dimensions stored in wcs->nxpix and wcs->nypix.
    Sep  5 1997  Modified by R.F. Warren-Smith (Starlink) to make the
                 platepos and platepix functions static.

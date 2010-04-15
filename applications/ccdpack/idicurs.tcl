@@ -9,7 +9,7 @@
 #     Tcl.
 
 #  Description:
-#     This script causes the user to be presented with an Ndf viewer 
+#     This script causes the user to be presented with an Ndf viewer
 #     so that points on it may be indicated.
 
 #  External Variables:
@@ -23,7 +23,7 @@
 #        of an error to be presented to the user.  This indicates that
 #        the routine did not complete successfully.
 #     MARKSTYLE = string (Given and Returned)
-#        A string, in the form of comma-separated att=value pairs, 
+#        A string, in the form of comma-separated att=value pairs,
 #        indicating how markers should be plotted on the image.
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
@@ -33,10 +33,10 @@
 #        indicating which NDFs comprise the ndfset to be examined.
 #        The setname may be an empty string if there is only one NDF.
 #     PERCHI = real (Given and Returned)
-#        The percentile of the data above which all values should be 
+#        The percentile of the data above which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
 #     PERCLO = real (Given and Returned)
-#        The percentile of the data below which all values should be 
+#        The percentile of the data below which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
 #     POINTS = list of pairs (Given and Returned)
 #        A list of the pixel coordinates indicated by the user on the NDF.
@@ -147,7 +147,7 @@
       "   `Help' shows this window." \
       "   `Abort' exits the program (following confirmation) without writing" \
       "   a position list." \
-      "   `Done' indicates that you have finished with this image." 
+      "   `Done' indicates that you have finished with this image."
       .viewer configure -helptext [ join $helplines "\n" ]
 
 #  Load the NDF into the widget.
@@ -171,7 +171,7 @@
 #  untoward happened.
       if { $ERROR == "" } {
 
-#  Retrieve configuration variables which the user may have changed 
+#  Retrieve configuration variables which the user may have changed
 #  interactively.
          set ZOOM [ .viewer cget -zoom ]
          set MAXCANV [ .viewer maxcanvas ]
@@ -181,7 +181,7 @@
          set MARKSTYLE [ .viewer cget -markstyle ]
          set CENTROID [ .viewer cget -centroiding ]
 
-#  Set the return variable to contain the list of points selected.  If 
+#  Set the return variable to contain the list of points selected.  If
 #  If we were displaying the indices then return the list with the indices
 #  as plotted, otherwise return the list with indices starting from unity
 #  and increasing to the number of points plotted.  Log the points to the
@@ -215,7 +215,7 @@
             }
          }
       }
-      
+
 #  Free resources.
       destroy .viewer
       $ndfset destroy

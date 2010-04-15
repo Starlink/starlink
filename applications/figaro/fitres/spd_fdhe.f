@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,9 +169,9 @@
       INTEGER SPD_FDABI          ! Get array element
 
 *  Local Data:
-      DATA CNAME / XC9C1, XC9C2, XC9C3, XC9C4, XC9C5, XC9C6 / 
+      DATA CNAME / XC9C1, XC9C2, XC9C3, XC9C4, XC9C5, XC9C6 /
       DATA PNAME / XC9P1 /
-      DATA CTYPE / XT9C1, XT9C2, XT9C3, XT9C4, XT9C5, XT9C6 / 
+      DATA CTYPE / XT9C1, XT9C2, XT9C3, XT9C4, XT9C5, XT9C6 /
       DATA PTYPE / XT9P1 /
 
 *.

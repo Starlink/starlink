@@ -119,7 +119,7 @@
 *             Get the description of the region to be plotted as both
 *             sexagesimal values and radians.
 
-               CALL CAP_PLTDT (GAI, RA__CIO, DEC__CIO, 
+               CALL CAP_PLTDT (GAI, RA__CIO, DEC__CIO,
      :           RAC__CIO, DECC__CIO, STATUS)
 
                CALL CAP_OPGTC (GAI, 'EQUINOX', ' ', EQUNX__CIO, STATUS)

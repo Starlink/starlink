@@ -233,7 +233,7 @@
          STATUS = IRC__BADBN
          CALL MSG_SETI( 'B', BAND )
          CALL ERR_REP( 'IRC_IMPRT_ERR6',
-     :                 'IRC_IMPRT: Invalid IRAS band number found: ^B', 
+     :                 'IRC_IMPRT: Invalid IRAS band number found: ^B',
      :                 STATUS )
          GO TO 999
 
@@ -341,7 +341,7 @@
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL IRC_ANNUL( IDC, STATUS )
          CALL NDF_MSG( 'NDF', INDF )
-         CALL ERR_REP( 'IRC_IMPRT_ERR11', 
+         CALL ERR_REP( 'IRC_IMPRT_ERR11',
      :                 'IRC_IMPRT: Not a valid CRDD file: ^NDF',
      :                  STATUS )
       END IF

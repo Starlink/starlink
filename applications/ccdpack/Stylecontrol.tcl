@@ -39,7 +39,7 @@
 #        zero, there is no upper limit.
 #
 #     value
-#        The value of the ADAM 'style' parameter to be passed to the 
+#        The value of the ADAM 'style' parameter to be passed to the
 #        DISPLAY task.
 #
 #     Marknumcontrol also inherits all the public variables of the Control

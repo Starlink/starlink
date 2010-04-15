@@ -299,7 +299,7 @@
 *  structure.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       CALL CCD1_GPARF( 'UPDATE', .FALSE., LOC, SLOC, STATUS )
-    
+
 *  Check that it exists.
       IF ( LOC .EQ. DAT__NOLOC ) THEN
          CALL CCD1_MSG( ' ',

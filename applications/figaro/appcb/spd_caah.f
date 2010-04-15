@@ -131,7 +131,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -268,7 +268,7 @@
 *     If the laboratory frequencies do not match ...
          IF ( LABTYP .EQ. '_DOUBLE' ) THEN
             IF ( LABFRE .NE. VAL__BADD ) THEN
-               TESTD = SPD_UAAGD( %VAL( CNF_PVAL( RPNTR(2) ) ), 1, 
+               TESTD = SPD_UAAGD( %VAL( CNF_PVAL( RPNTR(2) ) ), 1,
      :                            STATUS )
                IF ( TESTD .EQ. VAL__BADD ) THEN
                   GO TO 3
@@ -292,8 +292,8 @@
 
 *     If the component has a different number of parameters ...
          IF ( NPARA .NE. SPD_UAAGI( %VAL( CNF_PVAL( RPNTR(4) ) ),
-     :        1, STATUS ) ) GO TO 3 
- 
+     :        1, STATUS ) ) GO TO 3
+
 *     If the parameter types do not match ...
          DO 2 I = 1, NPARA
 
@@ -382,7 +382,7 @@
          CMPRNG(1) = COMP
          CMPRNG(2) = COMP
          CALL SPD_FDHE( NDF, XLOC, 'UPDATE', TYPE, CMPRNG, SNDF,
-     :                  RLOC, RLOC(1+XC9NC), XPNTR, RPNTR, 
+     :                  RLOC, RLOC(1+XC9NC), XPNTR, RPNTR,
      :                  RPNTR(1+XC9NC), RNELM, STATUS )
 
 *     Set the new vector elements for the new component in the extension
@@ -404,7 +404,7 @@
 *     Now set the parameter types.
          DO 5 I = 1, NPARA
             CALL SPD_UAAFC( I, I, %VAL( CNF_PVAL( RPNTR(XC9NC+1) ) ),
-     :                      PARATY(I), STATUS, 
+     :                      PARATY(I), STATUS,
      :                      %VAL( CNF_CVAL( XCLEN ) ) )
  5       CONTINUE
       END IF
@@ -420,7 +420,7 @@
 
 *  Put the values.
       IF ( NDFTYP .EQ. '_DOUBLE' ) THEN
-         CALL VEC_DTOD( .FALSE., NELM, DATA, 
+         CALL VEC_DTOD( .FALSE., NELM, DATA,
      :                   %VAL( CNF_PVAL( XPNTR(1) ) ), I, J, STATUS )
          CALL VEC_DTOD( .FALSE., NELM, VARS,
      :                  %VAL( CNF_PVAL( XPNTR(2) ) ), I, J, STATUS )

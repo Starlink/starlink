@@ -2,16 +2,16 @@
 *+
 *  Name:
 *     PON_GETCOL
- 
+
 *  Purpose:
 *     Get the column number of a given column.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PON_GETCOL( PAR, COLLAB, COLNUM, STATUS )
- 
+
 *  Description:
 *     For the PONGO column type specified by PAR, this routine will get
 *     the value of the parameter and then check to see if it is an
@@ -19,7 +19,7 @@
 *     against the column names supplied in COLLAB. The routine reports
 *     what column number the name translates to as well as reporting
 *     any errors.
- 
+
 *  Arguments:
 *     PAR = CHARACTER * ( * ) (Given)
 *        The name of the PONGO column parameter.
@@ -29,13 +29,13 @@
 *        The number of the column (counting from 1).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     PDRAPER: P.W. Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     10-APR-1990 (JBVAD::PAH):
 *        Original version.
@@ -48,36 +48,36 @@
 *     4-JUL-1994 (PDRAPER):
 *        Corrected error message to show values (not message tokens).
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) PAR
       CHARACTER * ( * ) COLLAB( * )
- 
+
 *  Arguments Returned:
       INTEGER COLNUM
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
       INTEGER INTCMD             ! INTCMD(LIST, value) returns the index
                                  ! of VALUE in the array LIST
 *  Local Variables:
       CHARACTER * ( LENLAB ) CTEMP ! Character value of returned column
                                  ! specifier
- 
+
 *.
 
 *  Check inherited global status.
@@ -89,7 +89,7 @@
       CALL CHR_CTOI( CTEMP, COLNUM, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          COLNUM = INTCMD( COLLAB, CTEMP )
-         IF ( COLNUM.GT.0 ) THEN 
+         IF ( COLNUM.GT.0 ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF
       END IF

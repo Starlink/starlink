@@ -4,7 +4,7 @@
       subroutine check_fits(refnam)
 *
 *  Description:
-*     
+*
 *
 *  Arguments:
 *    Given:
@@ -18,7 +18,7 @@
 *    T.N.Wilkins, Cambridge, 25-JUL-1991
 *    A.J.Holloway, Manchester 4-Dec-1997
 *  History:
-*    AJH - Set REFNAM to 4 characters 
+*    AJH - Set REFNAM to 4 characters
 *-
       implicit none
       include 'SAE_PAR'
@@ -40,7 +40,7 @@
       if(status.ne.SAI__OK) call dta_crvar(refnam//'.fits','struct',
      :     status)
 
-             call dta_annul(nloc,status)           
+             call dta_annul(nloc,status)
 
 *      call dta_tyvar(refnam//'.comments',chars,status)
 
@@ -50,7 +50,7 @@
       if(status.ne.SAI__OK) call dta_crvar(refnam//'.comments','struct'
      :     ,status)
 
-             call dta_annul(nloc,status)           
+             call dta_annul(nloc,status)
 
       end
 

@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
       CALL DSA1_MSNEW( MSLOT, STATUS )
 
 *  Allocate memory reqested.
-      CALL PSX_MALLOC( NELM * DSA_TYPESIZE( TYPE, STATUS ), 
+      CALL PSX_MALLOC( NELM * DSA_TYPESIZE( TYPE, STATUS ),
      :     ADDRESS, STATUS )
 
 *  Fill map slot.

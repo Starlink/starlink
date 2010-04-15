@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine create following components in the IMAGE_INFO
-*     structure of a SKYFLUX NDF. 
+*     structure of a SKYFLUX NDF.
 *            HCON <_INTEGER>
 *            MINSOP <_INTEGER>
 *            MAXSOP <_INTEGER>
@@ -28,9 +28,9 @@
 *        SKYWEIGHT - If it is true, the image is a SKYFLUX weight
 *                    image, otherwise, it is the SKYFLUX  Intensity
 *                    image.
-*                    
+*
 *     The components will be assigned values according to the
-*     information obtained from the FITS extension of the NDF.   
+*     information obtained from the FITS extension of the NDF.
 
 *  Arguments:
 *     NCARD = INTEGER (Given)
@@ -58,13 +58,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                          
+
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
       LOGICAL CHR_SIMLR          ! True if 2 strings are equal apart
@@ -74,7 +74,7 @@
       INTEGER NCARD
       CHARACTER FITS( NCARD )*(*)
       CHARACTER LOC*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -82,7 +82,7 @@
       CHARACTER BUNIT*5          ! Value of keyword BUNIT
       CHARACTER CMNT*72          ! A comment string from FITS head
       CHARACTER HCNSTR*1         ! Hour confirmation string
-      CHARACTER MAXSTR*4         ! String expression of max. sop number 
+      CHARACTER MAXSTR*4         ! String expression of max. sop number
       CHARACTER MINSTR*4         ! String expression of min. sop number
       CHARACTER OBJECT*20        ! Value of keyword OBJECT
       CHARACTER PLTSTR*3         ! Plate number string
@@ -96,7 +96,7 @@
       INTEGER MAXSOP             ! Maximum SOP number
       INTEGER MINSOP             ! Minimum SOP number
       INTEGER PLTNUM             ! SKYFLUX plate number
-      INTEGER PLTPSN             ! Position of plate number string 
+      INTEGER PLTPSN             ! Position of plate number string
       INTEGER SEPPSN             ! Position of the separation sign
       INTEGER SEQPSN             ! Position of the second equal sign
       INTEGER STCARD             ! Start card number when search FITS
@@ -127,12 +127,12 @@
       PLTPSN = INDEX( OBJECT, 'PL' )
       HCNPSN = INDEX( OBJECT, 'H' )
 
-*  Extract the plate number string and the hours confirmation string 
+*  Extract the plate number string and the hours confirmation string
 *  from the OBJECT string.
       PLTSTR = OBJECT( PLTPSN + 2 : HCNPSN - 1 )
       HCNSTR = OBJECT( HCNPSN + 1 : )
 
-*  Get the plate number and the hours confirmation from their string 
+*  Get the plate number and the hours confirmation from their string
 *  expression.
       CALL CHR_CTOI( PLTSTR, PLTNUM, STATUS )
       CALL CHR_CTOI( HCNSTR, HCON, STATUS )
@@ -163,7 +163,7 @@
       CALL CHR_CTOI( MINSTR, MINSOP, STATUS )
       CALL CHR_CTOI( MAXSTR, MAXSOP, STATUS )
 
-*  Write them into MINSOP and MAXSOP components of the IMAGE_INFO 
+*  Write them into MINSOP and MAXSOP components of the IMAGE_INFO
 *  structure.
       CALL CMP_PUT0I( LOC, 'MINSOP', MINSOP, STATUS )
       CALL CMP_PUT0I( LOC, 'MAXSOP', MAXSOP, STATUS )
@@ -175,13 +175,13 @@
 *  If the unit is 'JY/SR', the image is SKYFLUX Intensity.
       IF ( CHR_SIMLR( BUNIT, 'JY/SR' ) ) THEN
          INSTY = .TRUE.
-      
+
 *  Otherwise it is Image Weight.
-      ELSE 
+      ELSE
          INSTY = .FALSE.
       END IF
 
 *  Write the SKYWEIGHT component.
       CALL CMP_PUT0L( LOC, 'SKYWEIGHT', .NOT.INSTY, STATUS )
-       
+
       END

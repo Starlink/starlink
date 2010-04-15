@@ -141,8 +141,8 @@
 *     12-AUG-1998 (PWD):
 *        Added FIXANN parameter and associated changes.
 *     30-MAY-1999 (PWD):
-*        Tidied up Al's changes. Modified number of fields used to 
-*        those documented and added centroided values to PSF object. 
+*        Tidied up Al's changes. Modified number of fields used to
+*        those documented and added centroided values to PSF object.
 *        Removed loads of debugging information. Fixed NDF origins for
 *        PSF objects.
 *     28-SEP-2000 (AA):
@@ -329,7 +329,7 @@
 
 *  Should only be 1 PSF star with index zero
            CALL GRP_GET( PSFINF, 1, 1, BUFFER, STATUS )
-           CALL CHR_DCWRD( BUFFER, 9, NWRD, START, STOP, APRWRD, 
+           CALL CHR_DCWRD( BUFFER, 9, NWRD, START, STOP, APRWRD,
      :                     LSTAT )
            IF ( LSTAT .NE. SAI__OK ) THEN
               CALL ERR_REP( 'PHO1_AUTO', 'Error parsing PSF star '//
@@ -380,8 +380,8 @@
                      CALL CHR_CTOR( SKYWRD( 1 ), INNER, STATUS )
                      CALL CHR_CTOR( SKYWRD( 2 ), OUTER, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
-                        CALL ERR_REP( 'PHO1_AUTO', 
-     :                                'Error reading sky regions', 
+                        CALL ERR_REP( 'PHO1_AUTO',
+     :                                'Error reading sky regions',
      :                                STATUS )
                         GO TO 99
                      END IF
@@ -416,14 +416,14 @@
                   EFACT = 3.14159265 * SQRT( 1.0 - ECCEN ** 2 )
                   NV = NINT( EFACT * ( OUTER ** 2 - INNER ** 2 ) )
                   NV = NV + 13
-                  
+
 *  Find the sky value in a ragged annulus.
                   CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                   IF ( STATUS .NE. SAI__OK ) GO TO 99
                   CALL PHO1_RAGGED( SKYTYP, NX, NY, IMAGE, IMVAR, ISVAR,
      :                              MASK, USEMSK, NXL, NXH, NYL, NYH,
      :                              XPOS, YPOS, OUTER, INNER, ECCEN,
-     :                              ANGLE, %VAL( CNF_PVAL( IV ) ), NV, 
+     :                              ANGLE, %VAL( CNF_PVAL( IV ) ), NV,
      :                              LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
@@ -492,8 +492,8 @@
                      CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ),
      :                            1, NXH - NXL + 1,1, NYH - NYL + 1 )
                      CALL BOXELL( NE, ELLIPS, NXL, NXH, NYL, NYH, NX,
-     :                            NY, 1.0, %VAL( CNF_PVAL( IG ) ), 
-     :                            GSIZE, SKYARE, CUTOFF, L, R, YLIST, 
+     :                            NY, 1.0, %VAL( CNF_PVAL( IG ) ),
+     :                            GSIZE, SKYARE, CUTOFF, L, R, YLIST,
      :                            LYLIST, RYLIST, INSL, INSR, POLY )
 
 *  Estimate the number of pixels that will be used in the sky annulus
@@ -506,9 +506,9 @@
                      CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                      IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL PHO1_BACK( SKYTYP, NX, NY, IMAGE, IMVAR,
-     :                               ISVAR, %VAL( CNF_PVAL( IG ) ), 
-     :                               GSIZE, MASK, USEMSK, NXL, NXH, 
-     :                               NYL, NYH, %VAL( CNF_PVAL( IV ) ), 
+     :                               ISVAR, %VAL( CNF_PVAL( IG ) ),
+     :                               GSIZE, MASK, USEMSK, NXL, NXH,
+     :                               NYL, NYH, %VAL( CNF_PVAL( IV ) ),
      :                               NV, LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
@@ -555,7 +555,7 @@
          ELSE
             DPOS = 0.0
          END IF
-  
+
          IF ( ISVAR ) THEN
             VSKY = VSKY
             SIGMA = SIGMA / SQRT( REAL( NV ) )
@@ -566,8 +566,8 @@
          CODE = ' '
          XPOS = XPOS + 0.5  !  Correct to grid from pixel coordinates
          YPOS = YPOS + 0.5
-         CALL PSFCAL( XPOS, YPOS, DPOS, 1, IMAGE, NX, NY, SEE, CLIP, 
-     :                PADU, SATURE, XFINAL, YFINAL, SHAPE, LOCSKY, 
+         CALL PSFCAL( XPOS, YPOS, DPOS, 1, IMAGE, NX, NY, SEE, CLIP,
+     :                PADU, SATURE, XFINAL, YFINAL, SHAPE, LOCSKY,
      :                SIGMA, VSKY, CODE, SEARCH, POSTVE, MXSHFT,
      :                MXITER, TOLER, STATUS)
          XFINAL = XFINAL - 0.5 ! and back again
@@ -576,13 +576,13 @@
 *  Update the GRP groups to contain the new values for this object.
          IF( CODE .NE. 'S' .AND. CODE .NE. 'B' .AND.
      :       CODE .NE. 'E' .AND. CODE .NE. '?' ) CODE = 'OK'
-         
+
          IF( CODE .EQ. 'B' ) THEN
             TEXT = 'WARNING   > Bad pixels in PSF candidate star, '//
      :             'photometry dubious.'
-	    CALL MSG_OUT( ' ', TEXT, STATUS )   
-         ENDIF  
-         
+	    CALL MSG_OUT( ' ', TEXT, STATUS )
+         ENDIF
+
          BUFFER = ' '
          CALL PHO1_GPSF( XFINAL, YFINAL, SHAPE, CODE, CLIP, SEE, PADU,
      :                   ORIGIN, BUFFER, STATUS )
@@ -600,7 +600,7 @@
 *  OBJECT loop  *
 *****************
       DO 3 I = 1, NOBJ
-         
+
 *  Perform initializations for this object aperture.
          BUFFER = ' '
 
@@ -621,7 +621,7 @@
 *  Extract the object index and information.
             CALL GRP_GET( OBJIND, I, 1, INDEXO, STATUS )
             CALL GRP_GET( OBJINF, I, 1, BUFOBJ, STATUS )
-            CALL CHR_DCWRD( BUFOBJ, 8, NWRD, START, STOP, APRWRD, 
+            CALL CHR_DCWRD( BUFOBJ, 8, NWRD, START, STOP, APRWRD,
      :                      LSTAT )
             CALL CHR_CTOR( APRWRD( 1 ), XPOS, STATUS )
             CALL CHR_CTOR( APRWRD( 2 ), YPOS, STATUS )
@@ -671,7 +671,7 @@
 *  outer scale for this object.
                  INNER = VAL__BADR
                  OUTER = VAL__BADR
-                 
+
                  DO  J = 1, NSKY
                     CALL GRP_GET( SKYIND, J, 1, INDEXS, STATUS )
                     IF ( INDEXS .EQ. INDEXO) THEN
@@ -727,7 +727,7 @@
                     CALL PHO1_RAGGED( SKYTYP, NX, NY, IMAGE, IMVAR,
      :                                ISVAR, MASK, USEMSK, NXL, NXH,
      :                                NYL, NYH, XPOS, YPOS, OUTER,
-     :                                INNER, ECCEN, ANGLE, 
+     :                                INNER, ECCEN, ANGLE,
      :                                %VAL( CNF_PVAL( IV ) ),
      :                                NV, LOCSKY, SIGMA, VSKY )
 
@@ -796,12 +796,12 @@
                        CALL PSX_CALLOC( GSIZE * GSIZE, '_REAL', IG,
      :                                  STATUS)
                        IF ( STATUS .NE. SAI__OK ) GO TO 99
-                       CALL CLGRID( GSIZE, GSIZE, 
+                       CALL CLGRID( GSIZE, GSIZE,
      :                              %VAL( CNF_PVAL( IG ) ),
      :                              1, NXH - NXL + 1,1, NYH - NYL + 1 )
                        CALL BOXELL( NE, ELLIPS, NXL, NXH, NYL, NYH, NX,
-     :                              NY, 1.0, %VAL( CNF_PVAL( IG ) ), 
-     :                              GSIZE, SKYARE, CUTOFF, L, R, YLIST, 
+     :                              NY, 1.0, %VAL( CNF_PVAL( IG ) ),
+     :                              GSIZE, SKYARE, CUTOFF, L, R, YLIST,
      :                              LYLIST, RYLIST, INSL, INSR, POLY )
 
 *  Estimate the number of pixels that will be used in the sky annulus
@@ -814,10 +814,10 @@
                        CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                        IF ( STATUS .NE. SAI__OK ) GO TO 99
                        CALL PHO1_BACK( SKYTYP, NX, NY, IMAGE, IMVAR,
-     :                                 ISVAR, %VAL( CNF_PVAL( IG ) ), 
-     :                                 GSIZE, MASK, USEMSK, NXL, NXH, 
-     :                                 NYL, NYH, 
-     :                                 %VAL( CNF_PVAL( IV ) ), NV, 
+     :                                 ISVAR, %VAL( CNF_PVAL( IG ) ),
+     :                                 GSIZE, MASK, USEMSK, NXL, NXH,
+     :                                 NYL, NYH,
+     :                                 %VAL( CNF_PVAL( IV ) ), NV,
      :                                 LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
@@ -957,7 +957,7 @@
             ELSE
                CALL ERR_ANNUL( STATUS )
                TEXT = 'WARNING > Problems during centroiding.'
-	       CALL MSG_OUT( ' ', TEXT, STATUS )      
+	       CALL MSG_OUT( ' ', TEXT, STATUS )
             ENDIF
             CALL ERR_RLSE
          ENDIF
@@ -978,7 +978,7 @@
          GSIZE = INT( 2.0 * ( MAJOR + 2.0 ) ) + 2
          CALL PSX_CALLOC( GSIZE * GSIZE, '_REAL', IG, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1, 
+         CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1,
      :                NXH - NXL + 1, 1, NYH - NYL + 1 )
 
 *  Create an ellipse centered on the cursor
@@ -986,15 +986,15 @@
 
 *  Integrate over the aperture.
          CALL BOXELL ( NE, ELLIPS, NXL, NXH, NYL, NYH, NX, NY, 1.0,
-     :                 %VAL( CNF_PVAL( IG ) ), GSIZE, AREA, CUTOFF, 
+     :                 %VAL( CNF_PVAL( IG ) ), GSIZE, AREA, CUTOFF,
      :                 L, R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY )
-         CALL INTELL ( NX, NY, IMAGE, %VAL( CNF_PVAL( IG ) ), GSIZE, 
+         CALL INTELL ( NX, NY, IMAGE, %VAL( CNF_PVAL( IG ) ), GSIZE,
      :                 NXL, NXH, NYL, NYH, SATURE, CODE, STAR, AREA )
 
 *  Integrate the ellipse over the variance array
          IF ( ISVAR ) THEN
-            CALL INTELL ( NX, NY, IMVAR, %VAL( CNF_PVAL( IG ) ), GSIZE, 
-     :                    NXL, NXH, NYL, NYH, SATURE, CODE, VSTAR, 
+            CALL INTELL ( NX, NY, IMVAR, %VAL( CNF_PVAL( IG ) ), GSIZE,
+     :                    NXL, NXH, NYL, NYH, SATURE, CODE, VSTAR,
      :                    VAREA )
          ENDIF
 
@@ -1072,7 +1072,7 @@
                   CALL PHO1_RAGGED( SKYTYP, NX, NY, IMAGE, IMVAR, ISVAR,
      :                              MASK, USEMSK, NXL, NXH, NYL, NYH,
      :                              XPOS, YPOS, OUTER, INNER, ECCEN,
-     :                              ANGLE, %VAL( CNF_PVAL( IV ) ), NV, 
+     :                              ANGLE, %VAL( CNF_PVAL( IV ) ), NV,
      :                              LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
@@ -1142,8 +1142,8 @@
                      CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ),
      :                            1, NXH - NXL + 1,1, NYH - NYL + 1 )
                      CALL BOXELL( NE, ELLIPS, NXL, NXH, NYL, NYH, NX,
-     :                            NY, 1.0, %VAL( CNF_PVAL( IG ) ), 
-     :                            GSIZE, SKYARE, CUTOFF, L, R, YLIST, 
+     :                            NY, 1.0, %VAL( CNF_PVAL( IG ) ),
+     :                            GSIZE, SKYARE, CUTOFF, L, R, YLIST,
      :                            LYLIST, RYLIST, INSL, INSR, POLY )
 
 *  Estimate the number of pixels that will be used in the sky annulus
@@ -1156,9 +1156,9 @@
                      CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                      IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL PHO1_BACK( SKYTYP, NX, NY, IMAGE, IMVAR,
-     :                               ISVAR, %VAL( CNF_PVAL( IG ) ), 
-     :                               GSIZE, MASK, USEMSK, NXL, NXH, 
-     :                               NYL, NYH, %VAL( CNF_PVAL( IV ) ), 
+     :                               ISVAR, %VAL( CNF_PVAL( IG ) ),
+     :                               GSIZE, MASK, USEMSK, NXL, NXH,
+     :                               NYL, NYH, %VAL( CNF_PVAL( IV ) ),
      :                               NV, LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.

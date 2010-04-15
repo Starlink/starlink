@@ -1,5 +1,5 @@
       SUBROUTINE IRA1_AXLP( IDA, SCS, ALAX, BLAX, BCEN, GAPLAT, IPHI,
-     :                      IPLO, LABELS, TICKLE, LBND, UBND, ACC, 
+     :                      IPLO, LABELS, TICKLE, LBND, UBND, ACC,
      :                      LAXMIN, STATUS )
 *+
 *  Name:
@@ -17,11 +17,11 @@
 
 *  Description:
 *     If LABELS is true, this routine produces latitude labels placed
-*     at equal intervals along a specified meridian. Also, if the 
-*     drawing of lines has been supressed using the LINES graphics 
-*     option (see routine IRA_DROPT), it produces short tick marks at 
-*     regular intervals along the meridian. Each of these tick marks 
-*     is actually a short section of a parallel intersecting the 
+*     at equal intervals along a specified meridian. Also, if the
+*     drawing of lines has been supressed using the LINES graphics
+*     option (see routine IRA_DROPT), it produces short tick marks at
+*     regular intervals along the meridian. Each of these tick marks
+*     is actually a short section of a parallel intersecting the
 *     meridian.
 
 *  Arguments:
@@ -89,12 +89,12 @@
 *  Global Variables:
       INCLUDE 'IRA_COM'          ! IRA common blocks.
 *        ACM_DROPT( 6 ) = DOUBLE PRECISION (Read and Write)
-*           The values of the graphics options set up by routine 
+*           The values of the graphics options set up by routine
 *           IRA_DROPT.
 *        ACM_DRVPO( 5 ) = REAL (Read)
 *           Values defining the area occupied by the text, in the
 *           order; (X,Y) at start of box, (X,Y) at end of box, height
-*           of box (perpendicular to the line joing start and end of 
+*           of box (perpendicular to the line joing start and end of
 *           box).
 
 *  Arguments Given:
@@ -159,9 +159,9 @@
 
 *  Invert the current value of the 'LINES' graphics option. This results
 *  in visible tick marks being produced by IRA_DRPAR if lines have been
-*  suppressed, and no ticks being drawn if visible lines have been 
+*  suppressed, and no ticks being drawn if visible lines have been
 *  drawn.
-      ACM_DROPT( 6 ) = -ACM_DROPT( 6 ) 
+      ACM_DROPT( 6 ) = -ACM_DROPT( 6 )
 
 *  Get the full name of the sky coordinate system, and set the style
 *  number.
@@ -219,12 +219,12 @@
             END IF
 
 *  Draw a short section of the parallel, centred on the labelled
-*  meridian. 
+*  meridian.
             CALL IRA_DRPAR( IDA, ALAX - 0.5*INCA, BLAB, INCA, SCS, LBND,
      :                      UBND, STATUS )
 
 *  Get information about the breaks in the curve just drawn.
-            CALL IRA_DRBRK( IRA__MXBRK, OUT, BREAK, VBREAK, NBREAK, 
+            CALL IRA_DRBRK( IRA__MXBRK, OUT, BREAK, VBREAK, NBREAK,
      :                      LENGTH, STATUS )
 
 *  Find the mid point of the parallel section.
@@ -250,7 +250,7 @@
      :                                ACC, CONTXT, STATUS )
 
 *  Update the lowest X coordinate covered by any coordinate value.
-                  MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) - 
+                  MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) -
      :                   0.5*ACM_DRVPO( 5 )
                   LAXMIN = MIN( LAXMIN, MINX )
 
@@ -281,6 +281,6 @@
       END DO
 
 *  Reinstate the original value for the 'LINES' graphics option.
-      ACM_DROPT( 6 ) = -ACM_DROPT( 6 ) 
+      ACM_DROPT( 6 ) = -ACM_DROPT( 6 )
 
       END

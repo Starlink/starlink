@@ -19,7 +19,7 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The StcsChan class provides facilities for reading and writing AST 
+*     The StcsChan class provides facilities for reading and writing AST
 *     Objects in the form of STC-S text.
 
 *  Inheritance:
@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -77,7 +77,7 @@
 
 /* Define constants used to size global arrays in this module. */
 /* Define other numerical constants for use in this module. */
-#define AST__STCSCHAN_GETATTRIB_BUFF_LEN 200   
+#define AST__STCSCHAN_GETATTRIB_BUFF_LEN 200
 
 /* Type Definitions. */
 /* ================= */
@@ -134,7 +134,7 @@ typedef struct AstStcsChanVtab {
 
 } AstStcsChanVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 typedef struct AstStcsChanGlobals {
    AstStcsChanVtab Class_Vtab;
    int Class_Init;
@@ -170,10 +170,10 @@ AstStcsChan *astStcsChanForId_( const char *(*)( void ),
 
 /* Initialiser. */
 AstStcsChan *astInitStcsChan_( void *, size_t, int, AstStcsChanVtab *,
-                             const char *, const char *(*)( void ), 
-                             char *(*)( const char *(*)( void ), int * ), 
-                             void (*)( const char * ), 
-                             void (*)( void (*)( const char * ), 
+                             const char *, const char *(*)( void ),
+                             char *(*)( const char *(*)( void ), int * ),
+                             void (*)( const char * ),
+                             void (*)( void (*)( const char * ),
                              const char *, int * ), int * );
 
 /* Vtab initialiser. */
@@ -186,7 +186,7 @@ AstStcsChan *astLoadStcsChan_( void *, size_t, AstStcsChanVtab *,
                                const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitStcsChanGlobals_( AstStcsChanGlobals * );
 #endif
 

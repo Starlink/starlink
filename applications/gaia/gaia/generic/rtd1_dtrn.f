@@ -424,7 +424,7 @@
                   SIG( I ) = SQRT( RESID / DBLE( NVAL ) )
                END IF
  2          CONTINUE
-            IF ( SIG( I ) .NE. VAL__MAXD .OR. 
+            IF ( SIG( I ) .NE. VAL__MAXD .OR.
      :           SIG( I ) .NE. VAL__MAXD ) THEN
                IF ( SIG( 1 ) .LT. SIG( 2 ) .OR. NVAL .EQ. 2 ) THEN
                   TR( 1 ) = OLDTR( 1 )

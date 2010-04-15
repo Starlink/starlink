@@ -2,21 +2,21 @@
 *+
 *  Name:
 *     MAG1_GETTP
- 
+
 *  Purpose:
 *     get a tape descriptor.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_GETTP(PARAM, TP, RTP, STATUS)
- 
+
 *  Description:
 *     Given the Device Parameter Name, the corresponding Parameter descriptor
 *     is found.
 *     If the parameter is not known return a free parameter descriptor.
- 
+
 *  Arguments:
 *     PARAM=CHARACTER*(*) (Given)
 *        The device parameter name
@@ -29,13 +29,13 @@
 *        SAI__OK on input, then the routine will return without action.  If
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
- 
+
 *  Algorithm:
 *     The PARAM string is looked up in the MAG_PA common block .
 *     If it is found, then the parameter descriptor corrseponding to its
 *     position in the table is returned.   Otherwise a new parameter descriptor
 *     is returned.
- 
+
 *  Copyright:
 *     Copyright (C) 1980, 1983, 1986, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +59,7 @@
 *  Authors:
 *     Sid Wright (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     30-Jul-1980: Original. (UCL::SLW)
 *     10-May-1983: Tidy up for Starlink version. (UCL::SLW)
@@ -75,47 +75,47 @@
 *        Add INCLUDE 'DAT_PAR'
 *        Add INCLUDE 'PAR_PAR'
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     Formerly known as MAG_$GETTP
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
-      INCLUDE 'PAR_PAR'          ! Parameter system constants 
+      INCLUDE 'PAR_PAR'          ! Parameter system constants
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
       INCLUDE 'MAG_ERR'         ! MAG Errors
       INCLUDE 'MAGSCL_PAR'      ! MAG_SCL Constants
 *    Local Constant
       INTEGER MAG__BASE
       PARAMETER (MAG__BASE=0)
- 
+
 *  Arguments Given:
       CHARACTER*(*) PARAM       ! Device Parameter Name
- 
+
 *  Arguments Returned:
       INTEGER TP                ! tape descriptor
       INTEGER RTP               ! relative tape descriptor
 *    Status return :
       INTEGER STATUS            ! status return
- 
+
 *  Global Variables:
       INCLUDE 'MAGPA_SCL'       ! MAG Parameter Table
- 
+
 *  Local Variables:
       INTEGER I                 ! Loop index
- 
+
 *.
- 
- 
+
+
 C      print *,'mag1_gettp:  param ', param
 *    Get the Tape descriptor
       CALL MAG1_FNDTP(PARAM, TP, RTP, STATUS)
@@ -133,7 +133,7 @@ C      print *,'mag1_gettp:  param ', param
  50      CONTINUE
  1       CONTINUE
       END IF
- 
+
 C      print *,'mag1_gettp,status:tp,rtp,status ',tp,rtp,status
       RETURN
       END

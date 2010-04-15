@@ -157,10 +157,10 @@ C
 * In AVERAGING mode (IMODE>0), after the number of counts
 C in each output bin has been found, these are divided by the width of
 C each output bin in terms of input bins. This ensures that the mean level
-C of the data does not change. 
+C of the data does not change.
 *
 * In INTEGRATING mode (IMODE<0), the total number of counts is preserved.
-* 
+*
 *
 * Declaration of parameters.
 *
@@ -173,16 +173,16 @@ C of the data does not change.
 *
       PARAMETER (MAXCOEFF=20)
 *
-* MAXCOEFF is the maximum number of coefficients allowable in ARC1 and ARC2 
-* (if you change this you should ensure that REBIN_POLY can handle the new 
-* maximum; it must also be changed in REBIN_TFORM). 
+* MAXCOEFF is the maximum number of coefficients allowable in ARC1 and ARC2
+* (if you change this you should ensure that REBIN_POLY can handle the new
+* maximum; it must also be changed in REBIN_TFORM).
 *
       DOUBLE PRECISION ACCBIN
       PARAMETER (ACCBIN = 1.D-4)
 *
-* ACCBIN is an accuracy factor which is used when the program is 
-* interpolating to find the new bin edges in terms of the old bins. 
-* The iterative solution stops when the absolute value of the increment 
+* ACCBIN is an accuracy factor which is used when the program is
+* interpolating to find the new bin edges in terms of the old bins.
+* The iterative solution stops when the absolute value of the increment
 * to the old bin position is less than ACCBIN.
 *
 C Declaration of arguments.
@@ -311,7 +311,7 @@ C anything went wrong.
           D=D+WDATA(MAX(MIN(KK,NPIX),1))
        END DO
        IF( IMODE.GE.0 ) THEN            ! Change here by KDH
-          RBIN(K)=REAL(D/ABS(DX))      
+          RBIN(K)=REAL(D/ABS(DX))
        ELSE                        !
              RBIN(K)=REAL(D)            !
        END IF                        !
@@ -358,10 +358,10 @@ C
       SUBROUTINE SINCBIN(IMODE, DATA, NDATA, RBIN, NRBIN, SSKEW,
      &      NARC1, ARC1, NARC2, ARC2, WORK1, WORK2)
 *
-* Performs sinc (= (Sin X)/X) function rebinning (="scrunching") or 
-* just a simple shift. Similar to REBIN but slower, but gives a superior 
-* result when it is important not to smooth the data and to preserve 
-* the noise properties (such as little pixel-to-pixel correlation). 
+* Performs sinc (= (Sin X)/X) function rebinning (="scrunching") or
+* just a simple shift. Similar to REBIN but slower, but gives a superior
+* result when it is important not to smooth the data and to preserve
+* the noise properties (such as little pixel-to-pixel correlation).
 * One has to be more careful with bad data with sinc function interpolation
 * compared to linear for example since they can cause ringing over neighbouring
 * pixels.
@@ -385,7 +385,7 @@ C
 * windows.
 *
 * After the selection of the window function, the only free parameter is the
-* truncation limit, specified in this program by MAXSINC. Tests show that 
+* truncation limit, specified in this program by MAXSINC. Tests show that
 * SINCBIN is superior to quadratic rebinning for MAXSINC > 2. MAXSINC is
 * set = 15 in this version as a compromise between speed and accuracy. This
 * also defines the scale over which bad pixels can cause ringing.
@@ -403,14 +403,14 @@ C
 * IMODE .NE. 0 rebinning between arbitary ARC scales
 *
 * Action: This case is complicated. Assume data comes from sampling
-* a band-limited function into bins. First we recover the values as if 
-* the function had been sampled at points, not integrated into bins. 
+* a band-limited function into bins. First we recover the values as if
+* the function had been sampled at points, not integrated into bins.
 * This is done by solving a matrix equation by an iterative method and
 * is reasonably fast. We can now get the value of the function at any
-* point. To rebin, the bounds of every new pixel are converted to the old 
-* pixel scale. The function is integrated between the two limits. This 
+* point. To rebin, the bounds of every new pixel are converted to the old
+* pixel scale. The function is integrated between the two limits. This
 * stage requires 2 calls to a NAG routine for the integral of SINC(X)
-* for every pixel and is thus very slow. Work arrays are used here to 
+* for every pixel and is thus very slow. Work arrays are used here to
 * deconvolve the spectrum during the first stage.
 *
 *
@@ -431,17 +431,17 @@ C
 * If IMODE does not equal 0 then you need the following as well:
 *
 * I*4 NARC1       -- Number of arc coefficients for original array
-* R*8 ARC1(NARC1) -- The arc coefficients for the original array 
+* R*8 ARC1(NARC1) -- The arc coefficients for the original array
 * I*4 NARC2       -- Number of arc coefficients for new array
 * R*8 ARC2(NARC2) -- The arc coefficients for the new array
 * R*4 WORK1(NDATA), WORK2(NDATA) - Work space arrays
 *
 *
 * The arc scales define the wavength like so:
-* 
+*
 * Wavelength at centre of pixel I of original data array
 * =   sum J=1,NARC1 of ARC1(J)*(I/NDATA)**(J-1)
-* 
+*
 * and similarly
 *
 * Wavelength at centre of pixel I of final data array
@@ -496,9 +496,9 @@ C
 
       IF(IMODE.EQ.0) THEN
 C
-C     Compute interpolation function for simple shift. As new pixels 
-C     are the same size as the old, we do not need to perform the 
-C     deconvolution iteration done for IMODE .NE. 0. See above for 
+C     Compute interpolation function for simple shift. As new pixels
+C     are the same size as the old, we do not need to perform the
+C     deconvolution iteration done for IMODE .NE. 0. See above for
 C     description of window function.
 C
         PI = 4.D0*ATAN(1.D0)
@@ -525,7 +525,7 @@ C     Now interpolate. Data beyond ends of old array is set equal to
 C     the value at the end of the array.
 C
         DO K = 1, NRBIN
-           IF(K.LE.-NSHIFT) THEN 
+           IF(K.LE.-NSHIFT) THEN
               RBIN(K) = DATA(1)
            ELSE IF(K.GT.NDATA-NSHIFT) THEN
               RBIN(K) = DATA(NDATA)
@@ -537,9 +537,9 @@ C
               END DO
               RBIN(K) = REAL(SUM/WEIGHT)
            END IF
-        END DO        
+        END DO
       ELSE
-C     
+C
 C     First evaluate array of integral of sinc function
 C
         IF(FIRST) THEN
@@ -616,18 +616,18 @@ C
           DO I = 1, 2*MAXSINC+1
              SINCD(I) = SINCD(I)/WEIGHT
           END DO
-C     
+C
 C     Remove identity matrix
-C     
+C
           SINCD(MAXSINC+1) = SINCD(MAXSINC+1) - 1.D0
           FIRST = .FALSE.
         END IF
 *
 * We imagine that the Y values were sampled from some function by integrating
-* over a width of 1 pixelat each point. We now find the values at each point 
-* before binning. This is done by solving a matrix equation iteratively. 
-* (I+B)x = y is solved by putting x = y + e, and then e = - B(y+e). If B is 
-* small then this can be iterated. We start with e = 0 x,y,e vectors, I,B 
+* over a width of 1 pixelat each point. We now find the values at each point
+* before binning. This is done by solving a matrix equation iteratively.
+* (I+B)x = y is solved by putting x = y + e, and then e = - B(y+e). If B is
+* small then this can be iterated. We start with e = 0 x,y,e vectors, I,B
 * matrices. I identity matrix. 8 iterations
 *
         DO I = 1, NDATA
@@ -644,7 +644,7 @@ C
             END DO
 *
 * End effect correction by assuming that data continues with
-* last value of array 
+* last value of array
 *
             DO J = IS-MAXSINC, 0
               SUM = SUM - SINCD(JADD+J)*DATA(1)
@@ -681,7 +681,7 @@ C
         ACC = ACCBIN/REAL(NDATA)
         RNDATA = REAL(1.D0/DBLE(NDATA))
         RNRBIN = REAL(1.D0/DBLE(NRBIN))
-        RX2 = 0.5D0*RNRBIN 
+        RX2 = 0.5D0*RNRBIN
         DO I=1,INARC1
           ARCONE(INARC1+1-I) = ARC1(I)
           DARCONE(INARC1+1-I)= (I-1)*ARC1(I)
@@ -727,7 +727,7 @@ C
             WEIGHT = 0.D0
             SUM = 0.D0
 *
-* Slowest part. 
+* Slowest part.
 *
             DO J = JLO, JHI
               XX1 = X1 - REAL(J)

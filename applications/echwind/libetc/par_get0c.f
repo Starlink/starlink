@@ -28,9 +28,9 @@
          do i = 1,MAXTOKS
             toks(i)(1:40) = '                                       '
          end do
-         if ((found) .and. index(upline,'ENDPARAMETER') .eq. 1) 
+         if ((found) .and. index(upline,'ENDPARAMETER') .eq. 1)
      +     found = .false.
-         if ((index(upline,'PARAMETER') .eq. 1) .and. 
+         if ((index(upline,'PARAMETER') .eq. 1) .and.
      +       (index(upline,param) .ne. 0)) found = .true.
          if (found) then
             do while (start.le.len(line) .and. line(start:start).eq.' ')
@@ -42,7 +42,7 @@
 
             toks(1)(1:end1-start) = line(start:end1-1)
             toks(2)(1:end2-end1-3) = line(end1+2:end2-2)
-            
+
             if (index(toks(1),'keyword') .eq. 1) then
                key = toks(2)
                lenkey = end2 - end1 - 3
@@ -55,7 +55,7 @@
                default = toks(2)
                lendefault = end2 - end1 - 3
             end if
-         end if 
+         end if
 
          read(lun, '(a)', iostat=ios) line
       end do
@@ -71,20 +71,20 @@
          end if
       end if
       if (.not. doesit) then
-         if (param(1:8) .ne. 'DETECTOR') then 
+         if (param(1:8) .ne. 'DETECTOR') then
             write(6,6500) key(:lenkey)//' - '//prompt(:lenprompt)//' '
  6500       format(a,$)
             if (lendefault .gt. 0) then
-               if (default(1:1) .ne. ' ') 
+               if (default(1:1) .ne. ' ')
      +              write(6,6500) '/'//default(:lendefault)//'/ '
             end if
          end if
          write(6,6500) '> '
          read(5,5300) value
  5300    format(a)
-         if (value(1:5) .eq. '     ') 
+         if (value(1:5) .eq. '     ')
      +     value(1:lendefault) = default(1:lendefault)
-      endif 
+      endif
 
       status = 0
 

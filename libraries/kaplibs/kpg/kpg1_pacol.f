@@ -13,8 +13,8 @@
 *     CALL KPG1_PACOL( PNCOL, LP, UP, COLIND, STATUS )
 
 *  Description:
-*     This routine obtains a colour index. A string is obtained from the 
-*     parameter system.  The interpretation of this string provides a number 
+*     This routine obtains a colour index. A string is obtained from the
+*     parameter system.  The interpretation of this string provides a number
 *     of ways to specify the colour index requested.  The options are:
 *
 *       'MAX'          - The maximum (non-reserved) colour index, i.e.
@@ -30,9 +30,9 @@
 *                        palette is selected.
 *       An HTML code   - Has the form "#aabbcc" (or "@aabbcc" - for use
 *                        in contexts where "#" is a comment character,
-*                        e.g. kappa style files) where a, b and c are 
-*                        hexadecimal digits, and "aa", "bb" and "cc" give 
-*                        red, blue and green intensities normalised to a 
+*                        e.g. kappa style files) where a, b and c are
+*                        hexadecimal digits, and "aa", "bb" and "cc" give
+*                        red, blue and green intensities normalised to a
 *                        maximum of "ff" (256).
 
 *  Arguments:
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     18-AUG-1998 (DSB):
 *        Original version, based on KPG1_MACOL by MJC.
 *     25-MAY-2009 (DSB):
-*        Remove the PAR_ restrictions on the acceptable characters that 
+*        Remove the PAR_ restrictions on the acceptable characters that
 *        can be included in the parameter value. Document HTML colour
 *        code option.
 *     {enter_further_changes_here}
@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

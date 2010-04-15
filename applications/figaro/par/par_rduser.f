@@ -43,7 +43,7 @@ C     13th Aug 1992   HME: Translate to ADAM PAR call(s).
 C     20th Jul 1993   HME: No longer return when abort flag is set, no
 C                     longer set abort flag on status from (A)PAR, if
 C                     (A)PAR returns bad status, this routine returns a
-C                     blank string. 
+C                     blank string.
 C-
       SUBROUTINE PAR_RDUSER(STRING,STATUS)
 C

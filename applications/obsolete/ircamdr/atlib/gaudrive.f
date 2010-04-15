@@ -150,7 +150,7 @@
          SY=SQRT(VARY)
          IF(SX.GT.999.99)SX=0
          IF(SY.GT.999.99)SY=0
- 
+
       ENDIF
 
       END

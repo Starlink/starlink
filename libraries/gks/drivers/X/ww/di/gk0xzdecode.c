@@ -47,7 +47,7 @@ PUBLIC bitmap *gk0xbmdecode(pattern,style) char *pattern; int style;{
 		if(start!=cp){	/* doesnt end with newline */
 			if(cp-start>maxwid)maxwid = cp-start;
 			lines++;
-		}	
+		}
 		bm = gk0xbmget(maxwid,lines);
 		cp = pattern;
 		gk0xstreamraster(bm,TRUE);	/* put to raster */
@@ -88,7 +88,7 @@ FORTINTER int wbmdco_(pattern,length,style,width)char *pattern; int *length,*sty
 FORTINTER int wbmdec_(pattern,length,width)char *pattern;int *length,width;{
  	char *p = pattern,*save = malloc((unsigned)*length);
  	int i,bm;
- 	
+
  	for(i = 0;i < *length;i++){
   		p += width;
 		save[i] = p[-1];

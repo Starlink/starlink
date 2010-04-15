@@ -1,4 +1,4 @@
-      
+
 C+
       SUBROUTINE CCDPOL(STATUS)
 C
@@ -10,16 +10,16 @@ C
 C     Function:
 C        Polarimetry of a star on a time series image
 C
-C     Description:   
-C        Measure the brightness of the O and E images of a star on each 
-C        frame of a time series image, and generate a 2D TSP dataset 
-C        containing the resulting time series polarimetry. The data should 
+C     Description:
+C        Measure the brightness of the O and E images of a star on each
+C        frame of a time series image, and generate a 2D TSP dataset
+C        containing the resulting time series polarimetry. The data should
 C        previously have been sky subtracted.
 C
 C        Aperture photometry is performed on each of the two star images
 C        and used to derive the polarization. A polarization offset can
 C        be applied to correct for instrumental effects.
-C     
+C
 C     Parameters:
 C    (1) INPUT     (TSP, 3D)   The time series image dataset.
 C    (2) OUTPUT    (TSP, 2D)   The output photometry dataset
@@ -40,7 +40,7 @@ C
 C-
 C
 C  History:
-C    26/10/1989   Original Version.   JAB/JAC 
+C    26/10/1989   Original Version.   JAB/JAC
 C    1/11/1989    Add OFFSET          JAB/JAC
 C    1/11/1989    Add FLUXCAL         JAB/JAC
 C    2/4/1995     Reorder code and add additional NDF_BEGIN, NDF_END pairs to get
@@ -63,7 +63,7 @@ C
       INTEGER PTR,NDIMS,IPTR,DIMS(3),TPTR,OTPTR,OPTR,LPTR,VPTR
       INTEGER IEPTR,IOPTR,SPTR,VVPTR
       REAL XE,YE,XO,YO,RADIUS,LAMBDA
-      CHARACTER*64 LABEL,UNITS,STOKESPAR     
+      CHARACTER*64 LABEL,UNITS,STOKESPAR
       REAL OFFSET,FLUXCAL
 
 *  Get the input file
@@ -123,7 +123,7 @@ C
 
 
 *  Add Stokes parameter to output dataset and map its data and variance
-      IF (STOKESPAR .EQ. 'Q' .OR. STOKESPAR .EQ. 'U' .OR. 
+      IF (STOKESPAR .EQ. 'Q' .OR. STOKESPAR .EQ. 'U' .OR.
      :     STOKESPAR .EQ. 'V') THEN
           CALL TSP_ADD_STOKES(OLOC,STOKESPAR,.TRUE.,STATUS)
           CALL TSP_GET_STOKES(OLOC,STOKESPAR,SLOC,STATUS)
@@ -195,4 +195,4 @@ C
 
       END
 
-      
+

@@ -131,7 +131,7 @@
 	    END IF
 
 	  ELSE
- 
+
             CALL MSG_OUT('ERR',
      :	          'Error : RANGE_MAXMIN : subimage area outside image',
      :                   STATUS )

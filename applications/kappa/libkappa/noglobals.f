@@ -59,7 +59,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -115,7 +115,7 @@
 *  Translate the ADAM_USER environment variable and its length.
          CALL PSX_GETENV( 'ADAM_USER', PATH, STATUS )
          NC = CHR_LEN( PATH )
-      
+
 *  First look in ADAM_USER.  If this is not defined deal with the error
 *  silently and try the default directory.
          CALL HDS_OPEN( PATH( :NC )//'/GLOBAL', 'UPDATE', LOC,
@@ -136,7 +136,7 @@
       END IF
 
 *  Erase the various global parameters.
-*  ======================================      
+*  ======================================
 
 *  Erase the current data-array parameter, if it is present.
       CALL DAT_THERE( LOC, 'DATA_ARRAY', THERE, STATUS )

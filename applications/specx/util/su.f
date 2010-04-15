@@ -61,7 +61,7 @@ C   Check that there are the same number of quadrants in both spectra
               END IF
             END DO
 
-          ELSE 
+          ELSE
             IFAIL=17
             PRINT *,'Problems in quadrant ',NQ
           END IF

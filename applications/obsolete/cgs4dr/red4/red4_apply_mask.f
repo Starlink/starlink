@@ -139,11 +139,11 @@
                IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *               Copy the bad pixel mask to the data quality array.
-                  CALL GEN_MOVE( NELM, %val(MASK_PTR), 
+                  CALL GEN_MOVE( NELM, %val(MASK_PTR),
      :              %val(QUALITY_PTR) )
 
 *               Set the data array value to zero if quality is bad (1)
-                  CALL GEN_ZDATA( NELM, %val(DATA_PTR), 
+                  CALL GEN_ZDATA( NELM, %val(DATA_PTR),
      :              %val(QUALITY_PTR) )
 
                ELSE

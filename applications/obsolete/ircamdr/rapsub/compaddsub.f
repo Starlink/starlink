@@ -1,7 +1,7 @@
 
 *+  COMPADDSUB - compresses an image by adding together several input pixels
 
-      SUBROUTINE COMPADDSUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, ODIMS1, 
+      SUBROUTINE COMPADDSUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, ODIMS1,
      :                        ODIMS2, COMPRESS, STATUS )
 
 *    Description :
@@ -46,7 +46,7 @@
 *    Deficiencies :
 *
 *     Maximum input array x dimension is 2048, not adjustable.
-*     
+*
 *    Bugs :
 *
 *     None known.
@@ -77,12 +77,12 @@
      :    COMPRESS         ! the linear compression factor to be used
 
       REAL
-     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array 
+     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array
 
 *    Export :
 
       REAL
-     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array 
+     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array
 
 *    Status :
 
@@ -123,7 +123,7 @@
 *       calculate next start and end rows in  the input image which
 *       the current output row will come from
 
-         STARTROW  =  ( ( J - 1 ) * COMPRESS ) + 1      
+         STARTROW  =  ( ( J - 1 ) * COMPRESS ) + 1
          ENDROW    =  STARTROW + COMPRESS - 1
 
 *       now loop round these rows and all the input columns to get
@@ -137,7 +137,7 @@
 
 *       now loop round the number of columns in the output image,
 *       compressing the rolling row in the x direction
-       
+
          DO  I  =  1, ODIMS1
 
 *          first re-initialise the running total
@@ -148,17 +148,17 @@
 *          that go to make up the current output image column
 
             STARTCOL  =  ( ( I - 1 ) * COMPRESS ) + 1
-            ENDCOL    =  STARTCOL + COMPRESS - 1 
+            ENDCOL    =  STARTCOL + COMPRESS - 1
 
-*          loop around the appropriate columns in the input image 
+*          loop around the appropriate columns in the input image
 *          which make up the current column of the output image
 
             DO  M  =  STARTCOL, ENDCOL
-               RUNTOT  =  RUNTOT + ROW( M )        
+               RUNTOT  =  RUNTOT + ROW( M )
             END DO
 
 *          finally make the output pixel equal to the current value
-*          of RUNTOT, it being the sum of the required number of 
+*          of RUNTOT, it being the sum of the required number of
 *          pixels from the input array
 
             OUTARRAY( I, J )  =  RUNTOT

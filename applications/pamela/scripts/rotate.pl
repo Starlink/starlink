@@ -1,18 +1,18 @@
 #!/usr/bin/perl
 #
-# !!begin 
+# !!begin
 # !!title  Image rotation script
 # !!author T.R.Marsh
 # !!created 14 January 2001
 # !!revised 08 December 2005
-# !!root   rotate 
-# !!index  rotate.pl 
-# !!descr  Perl script for rotating frames by 90 degrees 
+# !!root   rotate
+# !!index  rotate.pl
+# !!descr  Perl script for rotating frames by 90 degrees
 # !!head1  Rotation perl script
 #
 # !!table
 # !!trow{!!emph{Name:}}{rotate}
-# !!trow{!!emph{Purpose:}}{to rotate frames to get dispersion 
+# !!trow{!!emph{Purpose:}}{to rotate frames to get dispersion
 # into Y direction if needed}
 # !!trow{!!emph{Invocation}}{perl rotate file1 file2 @list1 @list2}
 # !!table
@@ -26,9 +26,9 @@
 #
 # !!head2 Action
 #
-# !!emph{rotate} rotates a series of frames by 90 degrees, and is often 
+# !!emph{rotate} rotates a series of frames by 90 degrees, and is often
 # needed as a first step to get dispersion to run in Y as expected by
-# pamela. It uses irot90 to rotate the frames by 90 degrees into a 
+# pamela. It uses irot90 to rotate the frames by 90 degrees into a
 # temporary file 'junk.sdf' then moves this back over the original file.
 # This is to avoid corrupting the file.
 #
@@ -79,7 +79,7 @@ if($nfiles == 1){
     print "\n$nfiles file names loaded.\n\n";
 }
 
-# Strip off trailing .sdf, check that files exist, 
+# Strip off trailing .sdf, check that files exist,
 # are not directories, and are readable
 
 my $file;

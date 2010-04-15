@@ -15,10 +15,10 @@ HDS is about storing astronomical data in a compact, flexible and efficient
 way.
 It recognises that observations are often complex --- possibly consisting of a
 data array (in 1, 2, 3, or even more dimensions), together with variable
-amounts of ancillary data --- calibrations, errors, telescope and instrument 
+amounts of ancillary data --- calibrations, errors, telescope and instrument
 information, observing conditions, and so on.
 The way HDS handles this complexity bears some similarities to the way VMS
-handles directories and files. 
+handles directories and files.
 
 \begin{figure}[htb]
 \begin{center}
@@ -113,7 +113,7 @@ When referring to components of objects, the following syntax is used:
 \end{small}
 
 where C is a component of B, and B is a component of A, which is the top-level
-object in the container file. 
+object in the container file.
 Some specific examples of names are given at the end of this section.
 
 \paragraph{Type:}\hfill
@@ -205,7 +205,7 @@ as for {\em name}.
 
 \paragraph{Value:}\hfill
 
-When an object is first created it contains no value, somewhat like 
+When an object is first created it contains no value, somewhat like
 an empty file.
 It must be given a value in a separate operation.
 A value can be a scalar, vector, or an array.
@@ -263,11 +263,11 @@ processed.
 Non-standard items are handled in a standard way by using self-contained
 {\em extensions}.
 There are defined locations for items such as the main data array, axes, title,
-units {\em etc.} 
-The only mandatory item is the main data array; all other items are optional! 
+units {\em etc.}
+The only mandatory item is the main data array; all other items are optional!
 
 All this means that the {\em user} can be certain that no properly written
-application will mess up his data, and there is a very good chance 
+application will mess up his data, and there is a very good chance
 that all the useful information will be properly used.
 (For the {\em programmer}, the huge advantage of this system is that he
 doesn't need to know the details of the format at all!
@@ -343,18 +343,18 @@ EXAMPLE  <NDF>
 Figure 8.2: An example of the internal structure of an NDF file.
 \end{center}
 Of course, this is only an example format.
-There are various ways of representing some of the components. 
+There are various ways of representing some of the components.
 These {\sl variants\/} are described in \xref{SGP/38}{sgp38}{}.
 
 The components of an NDF are described below.
-The names (in bold type) are significant as they are used by the NDF 
+The names (in bold type) are significant as they are used by the NDF
 access routines to identify the components.
 
 \begin{quote}
 \begin{description}
 
 \item[{\bf DATA\_ARRAY}] --- the main data array is the only component which
- {\em must} be present in an NDF. 
+ {\em must} be present in an NDF.
  In the case of EXAMPLE.SDF, this component is a 1-d real array with 856
  elements.
 \item[{\bf TITLE}] --- the  character string {\tt'HR6259 - AAT fibre data'}
@@ -376,14 +376,14 @@ access routines to identify the components.
  QUALITY normally works by taking the {\em bit-wise AND} of BADBITS with
  each element of the QUALITY array.
  Thus, an odd value in the QUALITY array indicates a bad value, while an even
- value identifies a good pixel. 
+ value identifies a good pixel.
 \item[{\bf VARIANCE}] --- the variance array is the same shape and size as the
  main data array and contains the errors associated with the individual data
- values. 
- These are stored as {\sl variance\/} estimates for each pixel. 
+ values.
+ These are stored as {\sl variance\/} estimates for each pixel.
 \item[{\bf AXIS}] --- this structure may contain axis information for any
  dimension of the NDF's main array.
- In this case, the main data array is only 1-d, therefore only the AXIS(1) 
+ In this case, the main data array is only 1-d, therefore only the AXIS(1)
  structure is present.
  This structure contains the actual axis data array, and also label and units
  information.
@@ -392,7 +392,7 @@ access routines to identify the components.
  Only the first of three records is shown in the example.
  This indicates that the spectrum was extracted from fibre data using the
  Figaro FINDSP command on 19th December 1990.
- (Support for the history component is not yet provided by the NDF access 
+ (Support for the history component is not yet provided by the NDF access
  routines.)
 \item[{EXTENSIONs}] --- the purpose of extensions is to store non-standard
  items.

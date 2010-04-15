@@ -46,7 +46,7 @@ C     Only common variables internal to the DSA system.
 C
 C  External subroutines / functions used:
 C     DSA__FLUSH_FITS, ICH_FOLD
-C     
+C
 C  Prior requirements:
 C     DSA_OPEN should have been called to initialise the system.
 C
@@ -170,7 +170,7 @@ C
   360       CONTINUE
 C
 C           If there is still no spare slot (ie there were no
-C           items buffered for this structure at all), flush out 
+C           items buffered for this structure at all), flush out
 C           the items for the structure using the first slot.
 C           This is guaranteed to make the first slot available.
 C

@@ -11,7 +11,7 @@
 
 *  Description:
 *     Specx does not use the standard epoch for its calculation
-*     of modified Julian date. It uses midday on Jan 00 1900 
+*     of modified Julian date. It uses midday on Jan 00 1900
 *     (Julian date of 2415020.0). This routine simply accounts
 *     for this and returns the standard definition of Modified
 *     Julian Date (days from Julian date of 2400000.5)

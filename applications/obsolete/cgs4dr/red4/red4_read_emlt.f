@@ -53,7 +53,7 @@
       ENDIF
 
 *    Read the information from the $CGS4_ENG/emlt.lis file
-      CALL RED4_READ_EMLT2( XMIN, XMAX, BCEN, XCEN, BFWHM, XFWHM, STRENGTH, PEAK, MEANBFWHM, MEANXFWHM, STATUS ) 
+      CALL RED4_READ_EMLT2( XMIN, XMAX, BCEN, XCEN, BFWHM, XFWHM, STRENGTH, PEAK, MEANBFWHM, MEANXFWHM, STATUS )
 
 *    If this has worked, adjust NMEAS to record whether
 *    an EMLT.LIS file has been read an odd or even number

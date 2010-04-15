@@ -17,8 +17,8 @@
 
 *  Description:
 *     The string STR1, which is a Fortran 77 CHARACTER string, is
-*     returned in STR2 translated into a form which can be written and 
-*     subsequently read correctly by a machine which uses the EBCDIC 
+*     returned in STR2 translated into a form which can be written and
+*     subsequently read correctly by a machine which uses the EBCDIC
 *     character set.
 
 *     Any characters which are not represented in the
@@ -29,11 +29,11 @@
 *     STR1 = CHARACTER * ( * ) (Given)
 *        The Fortran 77 character string.
 *     STR2 = CHARACTER * ( * ) (Returned)
-*        A character string which may be written and subsequently read 
+*        A character string which may be written and subsequently read
 *        correctly by a machine which uses the EBCDIC character set
-*        to represent characters in Fortran. If STR2 is shorter than 
-*        STR1, the translated string will be truncated; if STR2 is 
-*        longer than STR1, STR2 will be padded with blanks beyond the 
+*        to represent characters in Fortran. If STR2 is shorter than
+*        STR1, the translated string will be truncated; if STR2 is
+*        longer than STR1, STR2 will be padded with blanks beyond the
 *        translated string.
 
 *  System-specific:
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-*/      
+*/
 /*  Local Constants: */
 #define MCHMAX 127 /* Maximum machine character code */
 #define EBCSPC 64  /* EBCDIC SPACE */
@@ -110,7 +110,7 @@ int table[MCHMAX+1] = {
 
 /*     If the machine value is legitimate, translate it; */
 /*     if not, translate it to an EBCDIC SPACE. */
-         for (ichr=0; ichr<str2_length; ichr++ ) { 
+         for (ichr=0; ichr<str2_length; ichr++ ) {
             if ( ichr > length ) {
                str2[ichr] = EBCSPC;
             } else {

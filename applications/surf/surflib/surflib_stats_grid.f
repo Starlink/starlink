@@ -9,7 +9,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA,
 *    :     IPOS, JPOS, BINS, PNTS, STATS, STATUS)
@@ -43,7 +43,7 @@
 *     BINS(NX, NY, NMAX) = REAL (Given)
 *       The data stored in relation to its position
 *     PNTS(NMAX) = REAL (Given)
-*       Scratch space for copying in the data from each I,J   
+*       Scratch space for copying in the data from each I,J
 *     STATS(NX, NY, 3) = REAL (Returned)
 *       Statistics of each bin. 3 components are: Median, Upper limit
 *       lower limit.
@@ -76,7 +76,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -129,7 +129,7 @@
       DOUBLE PRECISION STDEV  ! Standard deviation
       DOUBLE PRECISION SUM    ! Sum of data
       DOUBLE PRECISION SUMSQ  ! Sum of squares
-      REAL    WEIGHT          ! Total weight 
+      REAL    WEIGHT          ! Total weight
       REAL    WEIGHTS(MAX__LEN)! Weights for each pixel in smoothing
       INTEGER XPOS            ! Position in smoothing array
 
@@ -195,7 +195,7 @@
 
                STATS(I,J,2) = REAL(MEAN + (STDEV * DBLE(NSIGMA)))
                STATS(I,J,3) = REAL(MEAN - (STDEV * DBLE(NSIGMA)))
-               
+
             END IF
          END IF
 
@@ -216,7 +216,7 @@
 *     First need some scratch space for the copy of the data
          SCRATCH_PTR = 0
          SCRATCH_END = 0
-         CALL SCULIB_MALLOC(2 * NX * NY * VAL__NBR, SCRATCH_PTR, 
+         CALL SCULIB_MALLOC(2 * NX * NY * VAL__NBR, SCRATCH_PTR,
      :        SCRATCH_END, STATUS)
 
 *     Loop through all pixels
@@ -234,7 +234,7 @@
 
 *     Loop through each pixel
             DO COUNT = 1, NX * NY
-               
+
 *     Find the position
                I = IPOS(COUNT)
                J = JPOS(COUNT)
@@ -254,7 +254,7 @@
                   XPOS = COUNT + N - ITEMP
 
                   IF ((XPOS .GE. 1) .AND. (XPOS .LE. NX*NY)) THEN
-                     
+
                      NI = IPOS(XPOS)
                      NJ = JPOS(XPOS)
 
@@ -263,7 +263,7 @@
                         WEIGHT = WEIGHT + WEIGHTS(N)
                      END IF
                   END IF
-                  
+
                END DO
 
 *     Save the value if there were any points
@@ -271,10 +271,10 @@
 
                   RUNN = RUNN / WEIGHT
 
-               ELSE     
+               ELSE
 
                   RUNN = VAL__BADR
-               
+
                END IF
 
 *       Copy the value in
@@ -287,7 +287,7 @@
 *     Copy this data back into the median data
 
             DO COUNT = 1, NX*NY
-               
+
                I = IPOS(COUNT)
                J = JPOS(COUNT)
 

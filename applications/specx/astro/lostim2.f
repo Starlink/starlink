@@ -33,9 +33,9 @@ C   The epoch is 1900 January 0.5UT = Julian day 2415020.0
       DU   = DFLOAT(JULDA(UTY)) - 0.5D0
       TU   = DU/36525.D0
 
-*     START is the Greenwich mean sidereal time on Jan 0.0 (days) 
-*     (the extra 129.1794 secs corresponds to the 0.7 century 
-*     subtracted from TU. The precision is thereby improved. 
+*     START is the Greenwich mean sidereal time on Jan 0.0 (days)
+*     (the extra 129.1794 secs corresponds to the 0.7 century
+*     subtracted from TU. The precision is thereby improved.
 
       START=(6.D0 +38.D0/60.D0 +(45.836D0+129.1794D0+8640184.542D0*
      &      (TU-0.7D0)  +.0929D0*TU**2)/3600.D0)/24.D0

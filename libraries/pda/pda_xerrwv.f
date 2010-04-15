@@ -2,7 +2,7 @@
      :                       NR, R1, R2 )
 C
 C     Replacement subroutine for the SLATEC XERRWV package subroutine.
-C     This version routes all output via PDA_XERMSG to conform to 
+C     This version routes all output via PDA_XERMSG to conform to
 C     PDA output standards.
 C
       CHARACTER *( * ) XMESS
@@ -14,9 +14,9 @@ C
       STATUS = 0
       CALL PDA_XERMSG( ' ', ' ', XMESS, NERR, LEVEL, STATUS )
       WRITE(REPORT,
-     :     '('' ERROR NUMBER = '',I5,'', MESSAGE LEVEL = '',I5)') 
+     :     '('' ERROR NUMBER = '',I5,'', MESSAGE LEVEL = '',I5)')
      :     NERR,LEVEL
-      STATUS = 0 
+      STATUS = 0
       CALL PDA_XERMSG( ' ', ' ', REPORT, NERR, LEVEL, STATUS )
       ASSIGN 80 TO IGOIPR
       GO TO (10,20),NI

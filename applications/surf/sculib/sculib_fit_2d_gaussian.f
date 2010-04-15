@@ -9,27 +9,27 @@
 *     fit a 2D Gaussian to an image
 
 *  Description:
-*     This routine fits a 2D Gaussian to an image of a source. It takes as 
+*     This routine fits a 2D Gaussian to an image of a source. It takes as
 *     input data a map made of the source with pixels on a square grid.
 *        If status is good on entry, the routine will calculate the
 *     0th and 1st order moments of the image on the map. Map pixels with
-*     bad quality are ignored. 
+*     bad quality are ignored.
 *
-*         0th order = sum [f(i,j)], 
+*         0th order = sum [f(i,j)],
 *
 *     where i,j are the pixel indices
 *
-*         1st order in x = sum [x * f(i,j)], 
+*         1st order in x = sum [x * f(i,j)],
 *
 *     where x is the x position of pixel i,j
 *
-*         1st order in y = sum [y * f(i,j)], 
+*         1st order in y = sum [y * f(i,j)],
 *
 *     where y is the y position of pixel i,j
 *
 *     If the 0th order moment of the image was 0, i.e. there is no image on
-*     the map, then a warning message will be output and all image parameters 
-*     set to 0 or bad quality. Otherwise, the x,y centre of the image is 
+*     the map, then a warning message will be output and all image parameters
+*     set to 0 or bad quality. Otherwise, the x,y centre of the image is
 *     calculated from:-
 *
 *         X_CENTRE = 1st order in x
@@ -41,14 +41,14 @@
 *     With this information the 2nd order moments can be calculated about the
 *     centre of the image:-
 *
-*         2nd order in x = sum [x^2 x f(i,j)], 
+*         2nd order in x = sum [x^2 x f(i,j)],
 
-*     where x is now the distance of 
+*     where x is now the distance of
 *     pixel i,j from X_CENTRE
 *
-*         2nd order in y = sum [y^2 x f(i,j)], 
+*         2nd order in y = sum [y^2 x f(i,j)],
 *
-*     where y is now the distance of 
+*     where y is now the distance of
 *     pixel i,j from Y_CENTRE
 *
 *     If the image had a 2D Gaussian profile, f = A exp -ax^2*x^2 exp -ay^2*y^2
@@ -59,14 +59,14 @@
 *                       2 * 2nd order
 *
 *     and the half-width at half-maximum is calculated from:-
-* 
+*
 *              X_HWHM = sqrt (ln(2)) / a_x
 *
 *        Lastly, the volume under the image and the variance on it are
 *     calculated. These will be the sum of all map pixels and their variances
-*     that lie within a radius of 2 * max(HWHM_x, HWHM_y) from X_CENTRE, 
-*     Y_CENTRE. If the HWHM in either axis is zero then a warning message will 
-*     be output and PEAK_QUAL set bad. Otherwise, PEAK will be set to 
+*     that lie within a radius of 2 * max(HWHM_x, HWHM_y) from X_CENTRE,
+*     Y_CENTRE. If the HWHM in either axis is zero then a warning message will
+*     be output and PEAK_QUAL set bad. Otherwise, PEAK will be set to
 *     volume / (pi * HWHM_x * HWHM_y).
 *
 
@@ -252,7 +252,7 @@
             END IF
          END IF
 
-*  sum pixels within 2*HWHM of image centre, issue warning if one of the HWHM 
+*  sum pixels within 2*HWHM of image centre, issue warning if one of the HWHM
 *  is zero
 
          IF ((X_HWHM .EQ. 0.0) .OR. (Y_HWHM .EQ. 0.0)) THEN
@@ -276,7 +276,7 @@
                         PEAK_VAR = PEAK_VAR + MAP_VARIANCE (I,J)
                      END IF
                   END IF
-  
+
                END DO
             END DO
 

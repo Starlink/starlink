@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_CALC_APPARENT (LAT_OBS, LONG, LAT, LONG2, LAT2,
-     :     MAP_X, MAP_Y, COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, 
+     :     MAP_X, MAP_Y, COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP,
      :     DEC_APP, ROTATION, STATUS)
 *+
 *  Name:
@@ -21,7 +21,7 @@
 *     This routine takes the input coordinates and coordinate system of the
 *     map centre and converts them to the apparent coords at the time of the
 *     observation. In addition, the angle between the north direction in
-*     the input coordinate frame and that in the apparent frame is calculated 
+*     the input coordinate frame and that in the apparent frame is calculated
 *     (measured anti-clockwise from input north, in radians). See SCU/3.0/JFL/
 *     0393.
 *
@@ -69,11 +69,11 @@
 *        sin (rotation) =   sin(dRA) * cos (dec_N_app)
 *                          .--------------------------
 *                                  cos (lat)
-* 
+*
 *        cos (rotation) = sin (dec_N_app) - sin (dec_app) * sin (lat)
 *                        .-------------------------------------------
 *                                  cos (dec_app) * cos (lat)
-*   
+*
 *        Since cos (lat) is in the denominator for both sin and cos terms,
 *        is always +ve except for +- pi/2 where it goes to zero and blows
 *        up the equations, leave it out in the calculations. The ratio
@@ -113,7 +113,7 @@
 *        If MJD1 = MJD2 then apparent RA, Dec set to input LONG, LAT.
 *           Rotation = 0.0.
 *        Otherwise apparent RA, Dec interpolated (or extrapolated) between
-*           LONG, LAT, MJD1 and LONG2, LAT2, MJD2 according to MJD. 
+*           LONG, LAT, MJD1 and LONG2, LAT2, MJD2 according to MJD.
 *           Rotation = 0.
 *
 
@@ -212,11 +212,11 @@
 
 *  Arguments Given:
       DOUBLE PRECISION LONG
-      DOUBLE PRECISION LAT 
-      DOUBLE PRECISION LONG2 
-      DOUBLE PRECISION LAT2 
+      DOUBLE PRECISION LAT
+      DOUBLE PRECISION LONG2
+      DOUBLE PRECISION LAT2
       DOUBLE PRECISION LAT_OBS
-      DOUBLE PRECISION MAP_X 
+      DOUBLE PRECISION MAP_X
       DOUBLE PRECISION MAP_Y
       CHARACTER*(*) COORD_TYPE
       DOUBLE PRECISION MJD, MJD1, MJD2
@@ -225,7 +225,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION RA_APP
-      DOUBLE PRECISION DEC_APP 
+      DOUBLE PRECISION DEC_APP
       DOUBLE PRECISION ROTATION
 
 *  Status :
@@ -250,15 +250,15 @@
                                               !   of input coord system
       DOUBLE PRECISION RA_N_APP, DEC_N_APP    ! apparent RA, Dec of N pole of
                                               !   input coord system
-      DOUBLE PRECISION DRA                    ! 
+      DOUBLE PRECISION DRA                    !
       DOUBLE PRECISION MYLAT                  ! Internal LAT variable
       DOUBLE PRECISION MYLONG                 ! Internal LONG variable
       DOUBLE PRECISION SIN_DEC                ! Sine of apparent dec
       DOUBLE PRECISION SIN_HA                 ! Sine of hour angle
-      DOUBLE PRECISION SIN_ROT, COS_ROT       ! sin and cos of ROTATION, 
+      DOUBLE PRECISION SIN_ROT, COS_ROT       ! sin and cos of ROTATION,
                                               !   multiplied by cos (lat)
       DOUBLE PRECISION SHIFT_X                ! Offset in X
-      DOUBLE PRECISION SHIFT_Y                ! Offset in Y 
+      DOUBLE PRECISION SHIFT_Y                ! Offset in Y
 
 *  Internal References:
 
@@ -279,20 +279,20 @@
 
          SHIFT_X = MAP_X
          SHIFT_Y = MAP_Y
-      
+
          CALL SLA_DTP2S(SHIFT_X, SHIFT_Y, LONG, LAT, MYLONG, MYLAT)
       END IF
-         
+
 *  handle each coord type in turn
 
-      IF ((COORD_TYPE .EQ. 'RB') .OR. 
+      IF ((COORD_TYPE .EQ. 'RB') .OR.
      :    (COORD_TYPE .EQ. 'RJ') .OR.
      :    (COORD_TYPE .EQ. 'GA') .OR.
      :    (COORD_TYPE .EQ. 'EQ')) THEN
 
          IF (COORD_TYPE .EQ. 'RB') THEN
 
-*  convert map centre and N pole 
+*  convert map centre and N pole
 *     Convert to J2000
             CALL SLA_FK45Z (MYLONG, MYLAT, 1950.0D0, RA_2000, DEC_2000)
 
@@ -300,9 +300,9 @@
             CALL SLA_MAP (RA_2000, DEC_2000, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
-            CALL SLA_FK45Z (0.0D0, DPI2, 1950.0D0, RA_N_2000, 
+            CALL SLA_FK45Z (0.0D0, DPI2, 1950.0D0, RA_N_2000,
      :         DEC_N_2000)
-            CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0, 
+            CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0,
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
 
          ELSE IF (COORD_TYPE .EQ. 'RJ') THEN
@@ -319,7 +319,7 @@
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
             CALL SLA_GALEQ (0.0D0, DPI2, RA_N_2000, DEC_N_2000)
-            CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0, 
+            CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0,
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
 
          ELSE IF (COORD_TYPE .EQ. 'EQ') THEN
@@ -328,7 +328,7 @@
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
             CALL SLA_ECLEQ (0.0D0, DPI2, MJD, RA_N_2000, DEC_N_2000)
-            CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0, 
+            CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0,
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
          END IF
 
@@ -362,11 +362,11 @@
 
          HA = ATAN2( SIN_HA, COS_HA)
          RA_APP = LST - HA
-         
+
          SIN_ROT = SIN(MYLONG) * COS(LAT_OBS)
          COS_ROT = (SIN(LAT_OBS) - SIN(DEC_APP) * SIN(MYLAT)) /
      :        COS(MYLAT)
-         
+
          ROTATION = ATAN2(SIN_ROT, COS_ROT)
 
       ELSE IF (COORD_TYPE .EQ. 'HA') THEN
@@ -385,9 +385,9 @@
             DEC_APP = MYLAT
             ROTATION = 0.0D0
          ELSE
-            RA_APP = MYLONG + (LONG2 - MYLONG) * (MJD - MJD1)/ 
+            RA_APP = MYLONG + (LONG2 - MYLONG) * (MJD - MJD1)/
      :           (MJD2 - MJD1)
-            DEC_APP = MYLAT + (LAT2 - MYLAT) * (MJD - MJD1) / 
+            DEC_APP = MYLAT + (LAT2 - MYLAT) * (MJD - MJD1) /
      :           (MJD2 - MJD1)
             ROTATION = 0.0D0
          END IF
@@ -396,7 +396,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_CALC_APPARENT: can only '//
-     :        'handle PLANET, RJ, RB, RD, GA, AZ and EQ coordinates', 
+     :        'handle PLANET, RJ, RB, RD, GA, AZ and EQ coordinates',
      :        STATUS)
          END IF
       END IF

@@ -25,7 +25,7 @@ x  xxxxxxx  x
 xxxxxxxxxxxxx
 xxxxxxxxxxxxx
  */
-PRIVATE char busychars[] = 
+PRIVATE char busychars[] =
 { /* lines= */ 0,22, /* width= */ 0,13,
 0377,0370,0200,010,
 0200,010,0200,010,

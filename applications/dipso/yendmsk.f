@@ -22,6 +22,6 @@ C
           WMASK = 0.5D+00 * (1.0D+00 - DCOS(PI*(X(NPTS)-X(I))/PMASK))
         ENDIF
         Y(I) = Y(I) * WMASK
-  100 CONTINUE   
+  100 CONTINUE
       RETURN
       END

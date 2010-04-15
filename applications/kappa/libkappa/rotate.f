@@ -22,18 +22,18 @@
 *  Description:
 *     This routine rotates an array stored in an NDF data structure
 *     by an arbitrary angle.  The rotation angle can be chosen
-*     automatically to make north vertical in the output NDF (see 
+*     automatically to make north vertical in the output NDF (see
 *     parameter ANGLE).  The origin of the rotation is around the point
 *     (0,0) in pixel co-ordinates.  The output array dimensions just
-*     accommodate the rotated array.  Output pixels can be generated 
+*     accommodate the rotated array.  Output pixels can be generated
 *     from the input array by one of two methods: nearest-neighbour
 *     substitution or by bi-linear interpolation.  The latter is slower,
-*     but gives better results.  Output pixels not corresponding to 
+*     but gives better results.  Output pixels not corresponding to
 *     input pixels take the bad value.
 *
 *     The NDF may have two or three dimensions.  If it has three
 *     dimensions, then the rotation is applied in turn to each plane in
-*     the cube and the result written to the corresponding plane in the 
+*     the cube and the result written to the corresponding plane in the
 *     output cube.  The orientation of the rotation plane can be
 *     specified using the AXES parameter.
 
@@ -43,7 +43,7 @@
 *  ADAM Parameters:
 *     ANGLE = _REAL (Read)
 *        Number of clockwise degrees by which the data array is to be
-*        rotated.  It must lie between -360 and 360 degrees.  The 
+*        rotated.  It must lie between -360 and 360 degrees.  The
 *        suggested default is the current value.  If a null (!) value is
 *        supplied, then the rotation angle is chosen to make north
 *        vertical.  If the current co-ordinate Frame in the input NDF
@@ -51,14 +51,14 @@
 *        is chosen to make the second axis of the current Frame
 *        vertical.
 *     AXES(2) = _INTEGER (Read)
-*        This parameter is only accessed if the NDF has exactly three 
+*        This parameter is only accessed if the NDF has exactly three
 *        significant pixel axes.  It should be set to the indices of the
 *        NDF pixel axes which span the plane in which rotation is to
-*        be applied.  All pixel planes parallel to the specified plane 
-*        will be rotated independently of each other.  The dynamic 
-*        default comprises the indices of the first two significant 
+*        be applied.  All pixel planes parallel to the specified plane
+*        will be rotated independently of each other.  The dynamic
+*        default comprises the indices of the first two significant
 *        axes in the NDF.  Note that excluding the first significant
-*        axis may be very inefficient for large cubes; a prior 
+*        axis may be very inefficient for large cubes; a prior
 *        reconfiguration with application PERMAXES that is compatible
 *        with the dynamic default for AXES, will often prove beneficial.
 *        []
@@ -85,26 +85,26 @@
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the NDF has more than two axes.  A group of two strings should
 *        be supplied specifying the two axes which are to be used when
-*        determining the rotation angle needed to make north vertical. 
+*        determining the rotation angle needed to make north vertical.
 *        Each axis can be specified using one of the following options.
 *
-*        - Its integer index within the current Frame of the input 
-*        NDF (in the range 1 to the number of axes in the current 
+*        - Its integer index within the current Frame of the input
+*        NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *        - Its symbol string such as "RA" or "VRAD".
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
 *        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
 *        A list of acceptable values is displayed if an illegal value is
-*        supplied.  If a null (!) value is supplied, the axes with the 
-*        same indices as the two used pixel axes within the NDF are 
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the two used pixel axes within the NDF are
 *        used.  [!]
 *     VARIANCE = _LOGICAL (Read)
 *        A TRUE value causes variance values to be used as weights for
-*        the pixel values in bi-linear interpolation, and also causes 
-*        output variances to be created.  This parameter is ignored if 
+*        the pixel values in bi-linear interpolation, and also causes
+*        output variances to be created.  This parameter is ignored if
 *        ANGLE is a multiple of 90 degrees or NNMETH=TRUE; in these
 *        cases the variance array is merely propagated.  If a null (!)
 *        value is supplied, the value used is TRUE if the input NDF has
@@ -114,39 +114,39 @@
 *  Examples:
 *     rotate ns ew 90
 *        This rotates the array components in the NDF called ns by 90
-*        degrees clockwise around pixel co-ordinates [0,0] and stores 
+*        degrees clockwise around pixel co-ordinates [0,0] and stores
 *        the result in the NDF called ew.  The former x axis becomes the
 *        new y axis, and the former y axis becomes the new x axis.  The
 *        former y-axis arrays are also reversed in the process.
 *     rotate m31 m31r angle=!
 *        This rotates the NDF called m31 so that north is vertical and
-*        stores the results in an NDF called m31r.  This assumes that 
-*        the current WCS Frame in the input NDF is a celestial 
+*        stores the results in an NDF called m31r.  This assumes that
+*        the current WCS Frame in the input NDF is a celestial
 *        co-ordinate Frame.
 *     rotate angle=180 out=sn in=ns
 *        This rotates the array components in the NDF called ns by 180
-*        degrees clockwise around the pixel co-ordinates [0,0], and 
+*        degrees clockwise around the pixel co-ordinates [0,0], and
 *        stores the result in the NDF called sn.  The axis arrays are
 *        flipped in the output NDF.
 *     rotate f1 f1r 37.2 novariance
 *        This rotates the array components in the NDF called f1 by 37.2
 *        degrees clockwise around the pixel co-ordinates [0,0], and
-*        stores the result in the NDF called f1r.  The original axis 
+*        stores the result in the NDF called f1r.  The original axis
 *        information is lost.  Bi-linear interpolation is used without
 *        variance information.  No quality or variance information is
 *        propagated.
 *     rotate f1 f1r 106 nnmeth title="Reoriented features map"
 *        This rotates the array components in the NDF called f1 by 106
-*        degrees clockwise around the pixel co-ordinates [0,0], and 
+*        degrees clockwise around the pixel co-ordinates [0,0], and
 *        stores the result in the NDF called f1r.  The original axis
-*        information is lost.  The resultant array components, all of 
+*        information is lost.  The resultant array components, all of
 *        which are propagated, are calculated by the nearest-neighbour
-*        method.  The title of the output NDF is "Reoriented features 
+*        method.  The title of the output NDF is "Reoriented features
 *        map".
 *     rotate velmap rotvelmap 70
 *        This rotates the array components in the three-dimensional NDF
-*        called velmap by 70 degrees clockwise around the pixel 
-*        co-ordinates [0,0], and stores the result in the NDF called 
+*        called velmap by 70 degrees clockwise around the pixel
+*        co-ordinates [0,0], and stores the result in the NDF called
 *        rotvelmap.  The rotation is applied to the first two pixel axes
 *        repeated for all the planes in the cube's third pixel axis.
 *     rotate velmap rotvelmap 70 axes=[1,3]
@@ -164,7 +164,7 @@
 *     The propagation rules depend on parameters ANGLE and NNMETH.
 *
 *     -  For rotations that are multiples of 90-degrees, VARIANCE,
-*     QUALITY, AXIS, HISTORY, LABEL WCS, and UNITS components of the 
+*     QUALITY, AXIS, HISTORY, LABEL WCS, and UNITS components of the
 *     input NDF are propagated to the output NDF.  The axis and WCS
 *     components are switched and flipped as appropriate.
 *     -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
@@ -185,9 +185,9 @@
 
 *  Copyright:
 *     Copyright (C) 1995, 1998-1999, 2002, 2004 Central Laboratory of
-*     the Research Councils. 
-*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research 
-*     Council. 
+*     the Research Councils.
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
+*     Council.
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -219,7 +219,7 @@
 *        Original NDF version.
 *     12-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component.  Fixed bug which
-*        prevented two-dimensional slices from n-dimensional cubes 
+*        prevented two-dimensional slices from n-dimensional cubes
 *        being processed.
 *     30-JUN-1999 (TDCA):
 *        Allowed rotation around an arbitary point.
@@ -233,7 +233,7 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     24-AUG-2005 (DSB):
-*        Corrected to work with one-dimensional NDFs.  Also treat zero 
+*        Corrected to work with one-dimensional NDFs.  Also treat zero
 *        rotation as a special case.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
@@ -242,16 +242,16 @@
 *        cube.
 *     2007 May 16 (MJC):
 *        Fixed bug introduced at previous change, where for a
-*        two-dimensional array with an insignificant dimension, or a 
+*        two-dimensional array with an insignificant dimension, or a
 *        cube with two insignificant dimensions, the wrong bounds were
 *        assigned to the output NDF.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
 *     2009 March 26 (MJC):
-*        Remove unnecessary processing for rotations of zero degrees and 
-*        arbitrary angles.  The latter case had unnecessary 
+*        Remove unnecessary processing for rotations of zero degrees and
+*        arbitrary angles.  The latter case had unnecessary
 *        propagation of the array components that could exhaust memory
-*        for large cubes.  Reduced memory requirements for 180-degree 
+*        for large cubes.  Reduced memory requirements for 180-degree
 *        rotation of cubes.
 *     28-AUG-2009 (DSB):
 *        Correct procedure for determining default rotation angle (old
@@ -297,7 +297,7 @@
       DOUBLE PRECISION A( 2 )    ! First point
       CHARACTER * ( 8 ) ACOMP( 3 ) ! Axis array components to process
       REAL ANGLE                 ! Clockwise degrees rotation
-      DOUBLE PRECISION ANGLED    ! Rotation angle 
+      DOUBLE PRECISION ANGLED    ! Rotation angle
       CHARACTER * ( 80 ) AXCOMP  ! Axis character component
       INTEGER AXES( 2 )          ! Indices of inputs to be picked
       INTEGER AXSUM              ! Sum of the axis indices
@@ -307,7 +307,7 @@
       DOUBLE PRECISION B( 2 )    ! Second point
       LOGICAL BAD                ! Bad-pixel flag
       BYTE BB                    ! Quality Bad-bits value
-      INTEGER BCMAP              ! Base to current WCS Mapping 
+      INTEGER BCMAP              ! Base to current WCS Mapping
       DOUBLE PRECISION C( 2 )    ! Third point
       INTEGER CFRM               ! Current WCS Frame
       CHARACTER * ( 8 ) COMP( 3 ) ! Array components to process
@@ -351,9 +351,9 @@
       INTEGER OUTAX( NDF__MXDIM )! Indices of outputs to be picked
       DOUBLE PRECISION OXC       ! X pixel co-ord., centre of o/p array
       DOUBLE PRECISION OYC       ! Y pixel co-ord., centre of o/p array
-      INTEGER PAXHI              ! Upper pixel bound of perp. axis 
-      INTEGER PAXLO              ! Lower pixel bound of perp. axis 
-      INTEGER PAXVAL             ! Current pixel value on perp. axis 
+      INTEGER PAXHI              ! Upper pixel bound of perp. axis
+      INTEGER PAXLO              ! Lower pixel bound of perp. axis
+      INTEGER PAXVAL             ! Current pixel value on perp. axis
       INTEGER PERPAX             ! Index of axis perp. to rotation plane
       INTEGER PNTRI( 2 )         ! Pointer to mapped input arrays
       INTEGER PNTRO( 2 )         ! Pointer to mapped output arrays
@@ -376,7 +376,7 @@
       LOGICAL XLARGE             ! First dimension is larger dimension?
       DOUBLE PRECISION XP( 2 )   ! Axis-1 values
       DOUBLE PRECISION YP( 2 )   ! Axis-2 values
- 
+
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
       DATA ACOMP / 'Centre', 'Width', 'Variance' /
@@ -401,7 +401,7 @@
 *  Obtain the input NDF, its significant axes up to the maximum two
 *  dimensions for processing, and the NDF's bounds.  If the NDF
 *  possesses three significant dimensions, obtain an iteration axis
-*  through parameter AXES, so that planes along that axis can be 
+*  through parameter AXES, so that planes along that axis can be
 *  processed in sequence.
       CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', NDFI, SDIM, LBND,
      :                 UBND, PERPAX, STATUS )
@@ -423,7 +423,7 @@
 *  Ensure we are using at least two pixel axes and no more than three.
       IDIM = MAX( NDIM, MIN( IDIM, NDIM + 1 ) )
 
-*  If we are dealing with a cube, create a two-dimensional section 
+*  If we are dealing with a cube, create a two-dimensional section
 *  from the input NDF of the size of each plane to be rotated.
       IF ( IDIM .GT. NDIM ) THEN
 
@@ -457,11 +457,11 @@
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
 *  present in the NDF's WCS component.  Modify it to ensure that the
-*  Base, PIXEL and Current frames all have IDIM dimensions.  The NDF 
-*  must have no more than IDIM significant dimensions (i.e. axes 
-*  spanning more than one pixel).  A single significant axis is 
-*  allowed. 
-      CALL KPG1_ASGET( NDFS, IDIM, .FALSE., .TRUE., .TRUE., SWDIM, 
+*  Base, PIXEL and Current frames all have IDIM dimensions.  The NDF
+*  must have no more than IDIM significant dimensions (i.e. axes
+*  spanning more than one pixel).  A single significant axis is
+*  allowed.
+      CALL KPG1_ASGET( NDFS, IDIM, .FALSE., .TRUE., .TRUE., SWDIM,
      :                 SLBNDI, SUBNDI, IWCS, STATUS )
       CALL NDF_ANNUL( NDFS, STATUS )
 
@@ -487,10 +487,10 @@
 *  =============================
 
 *  Get the number of clockwise degrees rotation to be applied
-      CALL PAR_GDR0R( 'ANGLE', 90.0, -360.0 + VAL__SMLR, 
+      CALL PAR_GDR0R( 'ANGLE', 90.0, -360.0 + VAL__SMLR,
      :                360.0 - VAL__SMLR, .FALSE., ANGLE, STATUS )
 
-*  If a null value was supplied, annull the error and find the angle 
+*  If a null value was supplied, annull the error and find the angle
 *  between the second significant pixel axis and north.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -502,9 +502,9 @@
 *  Get the current WCS Frame.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  We need (effectively) a FrameSet in which the base Frame contains the 
-*  two GRID axes that span the rotation plane, and the current Frame 
-*  contains two corresponding WCS axes. If the WCS is 2-dimensional then 
+*  We need (effectively) a FrameSet in which the base Frame contains the
+*  two GRID axes that span the rotation plane, and the current Frame
+*  contains two corresponding WCS axes. If the WCS is 2-dimensional then
 *  we can just use the above Mapping amd Frame to form the FrameSet.
          IF( IDIM .EQ. 2 ) THEN
             MAP2D = AST_CLONE( BCMAP, STATUS )
@@ -521,20 +521,20 @@
             ELSE IF( PERPAX .EQ. 2 ) THEN
                AXES( 1 ) = 1
                AXES( 2 ) = 3
-            ELSE 
+            ELSE
                AXES( 1 ) = 1
                AXES( 2 ) = 2
             END IF
 
 *  Attempt to split the full WCS Mapping in order to get a Mapping from
 *  the above selected GRID axes and the corresponding WCS axes.
-            CALL AST_MAPSPLIT( BCMAP, 2, AXES, OUTAX, MAP2D, STATUS ) 
+            CALL AST_MAPSPLIT( BCMAP, 2, AXES, OUTAX, MAP2D, STATUS )
 
 *  Report an error if the Mapping could not be split.
             IF( MAP2D .EQ. AST__NULL ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 'Rotation angle is undefined.', 
+                  CALL ERR_REP( ' ', 'Rotation angle is undefined.',
      :                          STATUS )
                END IF
 
@@ -543,17 +543,17 @@
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
                IF( AST_GETI( MAP2D, 'Nout', STATUS ) .NE. 2 ) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 'Rotation angle is undefined.', 
+                  CALL ERR_REP( ' ', 'Rotation angle is undefined.',
      :                          STATUS )
 
 *  Otherwise, ceate a Frame containing the two corresponding WCS axes.
                ELSE
-                  FRM2D = AST_PICKAXES( CFRM, 2, OUTAX, JUNK, STATUS ) 
+                  FRM2D = AST_PICKAXES( CFRM, 2, OUTAX, JUNK, STATUS )
                END IF
             END IF
          END IF
 
-*  If the 2D WCS Frame is a celestial co-ord Frame, get the index 
+*  If the 2D WCS Frame is a celestial co-ord Frame, get the index
 *  of the latitude axis.  Otherwise, use the second axis.
          IF ( AST_ISASKYFRAME( FRM2D, STATUS ) ) THEN
             IAXIS = AST_GETI( FRM2D, 'LATAXIS', STATUS )
@@ -574,7 +574,7 @@
          A( 2 ) = YP( 1 )
          B( 1 ) = XP( 2 )
          B( 2 ) = YP( 2 )
-         C( IAXIS ) = AST_AXOFFSET( FRM2D, IAXIS, A( IAXIS ), 
+         C( IAXIS ) = AST_AXOFFSET( FRM2D, IAXIS, A( IAXIS ),
      :                              AST_DISTANCE( FRM2D, A, B, STATUS ),
      :                              STATUS )
          C( 3 - IAXIS ) = A( 3 - IAXIS )
@@ -592,8 +592,8 @@
          A( 2 ) = YP( 1 )
          B( 1 ) = XP( 2 )
          B( 2 ) = YP( 2 )
-         
-         ANGLED = AST_AXANGLE( AST_FRAME( 2, 'Domain=GRID', STATUS ), 
+
+         ANGLED = AST_AXANGLE( AST_FRAME( 2, 'Domain=GRID', STATUS ),
      :                         A, B, 2, STATUS )
 
 *  Check the angle is OK.  If so, convert to degrees.  Otherwise report
@@ -603,7 +603,7 @@
             IF ( ANGLE .LT. 0.0 ) ANGLE = 360 + ANGLE
             CALL MSG_BLANK( STATUS )
             CALL MSG_SETR( 'A', ANGLE )
-            CALL MSG_OUT( 'ROTATE_MSG1', '  Rotating by ^A degrees', 
+            CALL MSG_OUT( 'ROTATE_MSG1', '  Rotating by ^A degrees',
      :                    STATUS )
             CALL MSG_BLANK( STATUS )
          ELSE
@@ -617,11 +617,11 @@
       END IF
 
 *  Ensure the angle is in the range 0 - 360.
-      DO WHILE ( ANGLE .LT. 0.0 ) 
+      DO WHILE ( ANGLE .LT. 0.0 )
          ANGLE = 360 + ANGLE
       END DO
 
-      DO WHILE ( ANGLE .GT. 360.0 ) 
+      DO WHILE ( ANGLE .GT. 360.0 )
          ANGLE = ANGLE - 360.0
       END DO
 
@@ -716,7 +716,7 @@
                CALL PAR_GET0L( 'VARIANCE', VAR, STATUS )
                IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
             END IF
-         
+
 *  Decide whether or not to process the QUALITY array.
             CALL PAR_GET0L( 'QUALITY', QUAL, STATUS )
          END IF
@@ -734,13 +734,13 @@
 *  Create a section from the input NDF of the size of the required NDF.
       CALL NDF_SECT( NDFI, IDIM, LBNDO, UBNDO, NDFS, STATUS )
 
-*  Create the output NDF.  0-degree rotation special case needs the 
+*  Create the output NDF.  0-degree rotation special case needs the
 *  array components to be copied, as nothing else need be done.
       IF ( NUMRA .EQ. 0 ) THEN
          CALL LPG_PROP( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS',
      :                   'OUT', NDFO, STATUS )
 
-*  Axis arrays will be overwritten later for the other right-angle 
+*  Axis arrays will be overwritten later for the other right-angle
 *  multiples.
       ELSE IF ( NUMRA .GE. 1 .AND. NUMRA .LE. 3 ) THEN
          CALL LPG_PROP( NDFS, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
@@ -791,7 +791,7 @@
      :                           STATUS )
 
 *  Map these input and output arrays.
-                  CALL KPG1_MAP( NDFIB, COMP( ICOMP ), TYPE, 'READ', 
+                  CALL KPG1_MAP( NDFIB, COMP( ICOMP ), TYPE, 'READ',
      :                           PNTRI, EL, STATUS )
                   CALL KPG1_MAP( NDFOB, COMP( ICOMP ), TYPE, 'WRITE',
      :                           PNTRO, EL, STATUS )
@@ -801,53 +801,53 @@
 *  the nearest-neighbour method, depending on its numeric type.
                   IF ( TYPE .EQ. '_BYTE' ) THEN
                      CALL KPS1_RONNB( DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
- 
+
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_RONND( DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
- 
+
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_RONNI( DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
- 
+
                   ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_RONNR( DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
- 
+
                   ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_RONNUB( DIMSI( 1 ), DIMSI( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                 ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                 STATUS )
- 
+
                   ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                      CALL KPS1_RONNUW( DIMSI( 1 ), DIMSI( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                 ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                 STATUS )
 
                   ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_RONNW( DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                ANGLE, DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
- 
+
                   END IF
 
 *  Free the section identifiers.
@@ -909,24 +909,24 @@
 *  Map these input and output arrays.
             CALL KPG1_MAP( NDFIB, COMPS, TYPE, 'READ', PNTRI, EL,
      :                     STATUS )
-            CALL KPG1_MAP( NDFOB, COMPS, TYPE, 'WRITE', PNTRO, EL, 
+            CALL KPG1_MAP( NDFOB, COMPS, TYPE, 'WRITE', PNTRO, EL,
      :                     STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Call the appropriate routine to generate the output array using
 *  the bi-linear interpolation method, depending on its numeric type.
             IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_ROLIR( DIMSI( 1 ), DIMSI( 2 ), 
+               CALL KPS1_ROLIR( DIMSI( 1 ), DIMSI( 2 ),
      :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                          VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                          ANGLE, DIMSO( 1 ), DIMSO( 2 ),
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          %VAL( CNF_PVAL( PNTRO( 2 ) ) ), STATUS )
- 
+
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_ROLID( DIMSI( 1 ), DIMSI( 2 ), 
+               CALL KPS1_ROLID( DIMSI( 1 ), DIMSI( 2 ),
      :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                          VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                          ANGLE, DIMSO( 1 ), DIMSO( 2 ),
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          %VAL( CNF_PVAL( PNTRO( 2 ) ) ), STATUS )
@@ -975,14 +975,14 @@
 *  Map the quality arrays using the only valid type, unsigned byte.
                CALL KPG1_MAP( NDFIB, 'Quality', '_UBYTE', 'Read', PNTRI,
      :                        EL, STATUS )
-               CALL KPG1_MAP( NDFOB, 'Quality', '_UBYTE', 'Write', 
+               CALL KPG1_MAP( NDFOB, 'Quality', '_UBYTE', 'Write',
      :                        PNTRO, EL, STATUS )
 
 *  Assign the QUALITY array using the nearest-neighbour technique.  This
 *  is an approximation to retain quality information.
                CALL KPS1_RONNUB( DIMSI( 1 ), DIMSI( 2 ),
-     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                           ANGLE, DIMSO( 1 ), DIMSO( 2 ), 
+     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                           ANGLE, DIMSO( 1 ), DIMSO( 2 ),
      :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           STATUS )
 
@@ -990,7 +990,7 @@
                CALL NDF_ANNUL( NDFIB, STATUS )
                CALL NDF_ANNUL( NDFOB, STATUS )
             END DO
- 
+
 *  Transfer the quality component's bad-bits value.
             CALL NDF_BB( NDFI, BB, STATUS )
             CALL NDF_SBB( BB, NDFO, STATUS )
@@ -1017,9 +1017,9 @@
             CALL NDF_STATE( NDFI, COMP( ICOMP ), THERE, STATUS )
 
 *  If so, then determine its numeric type and map the input and output
-*  arrays for access using this type.  PSX_CALLOC does not allow one- 
+*  arrays for access using this type.  PSX_CALLOC does not allow one-
 *  and two-byte integers.
-            IF ( THERE ) THEN      
+            IF ( THERE ) THEN
                IF ( NUMRA .EQ. 2 ) THEN
                   CALL NDF_TYPE( NDFI, COMP( ICOMP ), TYPE, STATUS )
                ELSE
@@ -1041,7 +1041,7 @@
      :                           STATUS )
 
 *  Map these input and output arrays.
-                  CALL KPG1_MAP( NDFIB, COMP( ICOMP ), TYPE, 'READ', 
+                  CALL KPG1_MAP( NDFIB, COMP( ICOMP ), TYPE, 'READ',
      :                           PNTRI, EL, STATUS )
 
                   CALL KPG1_MAP( NDFOB, COMP( ICOMP ), TYPE, 'WRITE',
@@ -1054,11 +1054,11 @@
 
 *  This process works in situ swapping pixel values, therefore the array
 *  components must first be copied to the output NDF.  At one time all
-*  the arrays were copied in a single LPG_PROP call.   While this is 
+*  the arrays were copied in a single LPG_PROP call.   While this is
 *  efficient for smaller arrays, it mapped both input and output array
-*  in their entirity, and could lead to excessive memory demands for 
+*  in their entirity, and could lead to excessive memory demands for
 *  cubes.  The current coding only maps planes of the cube at a time.
-                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ), 
+                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ),
      :                               STATUS )
 
 *  Call the appropriate routine to generate the output array for a
@@ -1068,31 +1068,31 @@
      :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                         CALL KPS1_RORAD( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                         CALL KPS1_RORAI( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                         CALL KPS1_RORAR( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL KPS1_RORAUB( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL KPS1_RORAUW( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),
@@ -1104,7 +1104,7 @@
      :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      END IF
 
 *  Rotation is through +/- 90 degrees
@@ -1126,31 +1126,31 @@
                      IF ( TYPE .EQ. '_DOUBLE' ) THEN
                         CALL KPS1_ROBLD( NUMRA, LONG, SHORT, ROTSZE,
      :                                   XLARGE, DIMSI( 1 ), DIMSI( 2 ),
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                                   DIMSO( 1 ), DIMSO( 2 ), 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( WKPNTR ) ), 
+     :                                   %VAL( CNF_PVAL( WKPNTR ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                         CALL KPS1_ROBLI( NUMRA, LONG, SHORT, ROTSZE,
      :                                   XLARGE, DIMSI( 1 ), DIMSI( 2 ),
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                                   DIMSO( 1 ), DIMSO( 2 ), 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( WKPNTR ) ), 
+     :                                   %VAL( CNF_PVAL( WKPNTR ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                         CALL KPS1_ROBLR( NUMRA, LONG, SHORT, ROTSZE,
      :                                   XLARGE, DIMSI( 1 ), DIMSI( 2 ),
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                                   DIMSO( 1 ), DIMSO( 2 ), 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   DIMSO( 1 ), DIMSO( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( WKPNTR ) ), 
+     :                                   %VAL( CNF_PVAL( WKPNTR ) ),
      :                                   STATUS )
                      END IF
- 
+
 *  Tidy up the workspace.
                      IF ( PAXVAL .EQ. PAXHI ) THEN
                         CALL PSX_FREE( WKPNTR, STATUS )
@@ -1198,10 +1198,10 @@
 *  Determine if the input axis array is defined.
                CALL NDF_ASTAT( NDFI, ACOMP( ICOMP ), SDIM( 1 ), THERE,
      :                         STATUS )
-      
+
 *  If so, then determine its numeric type and map the input and output
 *  axis arrays for access using this type.
-               IF ( THERE ) THEN      
+               IF ( THERE ) THEN
                   CALL NDF_ATYPE( NDFI, ACOMP( ICOMP ), SDIM( 1 ), TYPE,
      :                            STATUS )
 
@@ -1223,51 +1223,51 @@
 *  numeric type.
                   IF ( NUMRA .EQ. 1 .OR. NUMRA .EQ. 2 ) THEN
                      IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL KPG1_FLIPB( 1, EL, 
+                        CALL KPG1_FLIPB( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                        CALL KPG1_FLIPUB( 1, EL, 
+                        CALL KPG1_FLIPUB( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL KPG1_FLIPD( 1, EL, 
+                        CALL KPG1_FLIPD( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL KPG1_FLIPI( 1, EL, 
+                        CALL KPG1_FLIPI( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL KPG1_FLIPR( 1, EL, 
+                        CALL KPG1_FLIPR( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
-  
+
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL KPG1_FLIPW( 1, EL, 
+                        CALL KPG1_FLIPW( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                        CALL KPG1_FLIPUW( 1, EL, 
+                        CALL KPG1_FLIPUW( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
                      END IF
@@ -1275,8 +1275,8 @@
                   ELSE
 
 *  Call the appropriate routine to copy the axis array, depending on its
-*  numeric type. 
-                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ), 
+*  numeric type.
+                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ),
      :                               STATUS )
 
                   END IF
@@ -1299,10 +1299,10 @@
 *  Determine if the input axis array is defined.
                CALL NDF_ASTAT( NDFI, ACOMP( ICOMP ), SDIM( 2 ), THERE,
      :                         STATUS )
-      
+
 *  If so, then determine its numeric type and map the input and output
 *  axis arrays for access using this type.
-               IF ( THERE ) THEN      
+               IF ( THERE ) THEN
                   CALL NDF_ATYPE( NDFI, ACOMP( ICOMP ), SDIM( 2 ),
      :                            TYPE, STATUS )
                   CALL NDF_AMAP( NDFI, ACOMP( ICOMP ), SDIM( 2 ), TYPE,
@@ -1323,51 +1323,51 @@
 *  numeric type.
                   IF ( NUMRA .EQ. 3 .OR. NUMRA .EQ. 2 ) THEN
                      IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL KPG1_FLIPB( 1, EL, 
+                        CALL KPG1_FLIPB( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                        CALL KPG1_FLIPUB( 1, EL, 
+                        CALL KPG1_FLIPUB( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL KPG1_FLIPD( 1, EL, 
+                        CALL KPG1_FLIPD( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL KPG1_FLIPI( 1, EL, 
+                        CALL KPG1_FLIPI( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL KPG1_FLIPR( 1, EL, 
+                        CALL KPG1_FLIPR( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
-  
+
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL KPG1_FLIPW( 1, EL, 
+                        CALL KPG1_FLIPW( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
- 
+
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                        CALL KPG1_FLIPUW( 1, EL, 
+                        CALL KPG1_FLIPUW( 1, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   1, 
+     :                                   1,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
                      END IF
@@ -1375,8 +1375,8 @@
                   ELSE
 
 *  Call the appropriate routine to copy the axis array, depending on its
-*  numeric type. 
-                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ), 
+*  numeric type.
+                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ),
      :                               STATUS )
 
                   END IF
@@ -1408,7 +1408,7 @@
                   CALL NDF_ACGET( NDFI, 'Label', SDIM( 1 ), AXCOMP,
      :                            STATUS )
                   NC = CHR_LEN( AXCOMP )
-                  CALL NDF_ACPUT( AXCOMP( :NC ), NDFO, 'Label', 
+                  CALL NDF_ACPUT( AXCOMP( :NC ), NDFO, 'Label',
      :                            SDIM( 2 ), STATUS )
                END IF
 
@@ -1453,12 +1453,12 @@
 
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel co-ordinates.  This mapping is described by a matrix and an
-*  offset vector.  Initialise the matrix to hold a unit matrix, and the 
-*  offset vector to be zero vector.  The matrix is declared as a 
+*  offset vector.  Initialise the matrix to hold a unit matrix, and the
+*  offset vector to be zero vector.  The matrix is declared as a
 *  one-dimensional array because the dimensionality of the output NDF is
-*  only known at run time.  Therefore we have to do the conversion from 
-*  row and column numbers to a one-dimensional vectorised index 
-*  explicitly.  Row I, column J of the matrix is stored in element 
+*  only known at run time.  Therefore we have to do the conversion from
+*  row and column numbers to a one-dimensional vectorised index
+*  explicitly.  Row I, column J of the matrix is stored in element
 *  I + IDIM * ( J - 1 ).
       DO I = 1, IDIM * IDIM
          MATRIX( I ) = 0.0D0
@@ -1493,7 +1493,7 @@
       IXC = 0.5D0 * DBLE( SUBNDI( 1 ) + SLBNDI( 1 ) - 1 )
       IYC = 0.5D0 * DBLE( SUBNDI( 2 ) + SLBNDI( 2 ) - 1 )
 
-*  Calculate the pixel offsets produced by the rotation on the 
+*  Calculate the pixel offsets produced by the rotation on the
 *  significant axes.
       OFFSET( SDIM( 1 ) ) = OXC - IXC * COSANG - IYC * SINANG
       OFFSET( SDIM( 2 ) ) = OYC + IXC * SINANG - IYC * COSANG

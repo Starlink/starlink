@@ -13,7 +13,7 @@
 *     CALL CTG_PTSUP( IGRP, I, FIELDS, STATUS )
 
 *  Description:
-*     Stores the supplied items of supplemental information for a given 
+*     Stores the supplied items of supplemental information for a given
 *     entry in a CTG group. The GRP groups needed to store this
 *     supplemental information are created if they do not already exist,
 *     and associated with the supplied group by means of a chain of GRP
@@ -22,19 +22,19 @@
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
-*        The CTG group as returned by CTG_ASSOC, etc. This should be the last 
+*        The CTG group as returned by CTG_ASSOC, etc. This should be the last
 *        group in a GRP owner-slave chain.
 *     I = INTEGER (Given)
 *        The index of the required entry.
 *     FIELDS( 5 ) = CHARACTER * ( * ) (Given)
 *        The supplemental information to be stored with the entry specified
-*        by I. Each element of the supplied array should contain the 
+*        by I. Each element of the supplied array should contain the
 *        following:
 *           1 - FITS extension (e.g. "{3}") if any
 *           2 - File type
 *           3 - Base file name
 *           4 - Directory path
-*           5 - Full catalogue specification 
+*           5 - Full catalogue specification
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 
 *  Arguments Given:
       INTEGER IGRP
-      INTEGER I 
+      INTEGER I
       CHARACTER FIELDS( 5 )*(*)
 
 *  Status:

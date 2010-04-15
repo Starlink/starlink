@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,19 +81,19 @@
       INTEGER IGNORE
       CHARACTER * ( PAR__SZNAM ) ACTION
       CHARACTER * ( 12 ) ENVVAR
- 
+
 *  Internal References:
       INTEGER ICH_FOLD
- 
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-     
+
 *  Get the action name.
       CALL TASK_GET_NAME( ACTION, STATUS )
       IGNORE = ICH_FOLD( ACTION )
-     
+
 *  Find out about the batch mode.
       CALL PSX_GETENV( 'FIGARO_MODE', ENVVAR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -107,14 +107,14 @@
             BATCH = .FALSE.
          END IF
       END IF
-     
+
 *  Initialise the (F)PAR common block.
       CALL PAR_INIT( ACTION, ' ', 0, BATCH, IGNORE )
 
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...
       IF ( 1 .EQ. 2 ) THEN
-    
+
       INCLUDE 'IFBLOCK'
 
 *     [ADAM_action]...

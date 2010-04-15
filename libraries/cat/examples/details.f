@@ -15,8 +15,8 @@
 *        The global status.
 *  Description:
 *     Extract the details of a catalogue and write them to a text file.
-*     The details include the number of columns rows and parameters in 
-*     the catalogue.  Additionally, details are given for each 
+*     The details include the number of columns rows and parameters in
+*     the catalogue.  Additionally, details are given for each
 *     individual column and parameter.  These details include the
 *     name, data type etc.
 *  ADAM Parameters:
@@ -50,7 +50,7 @@
 *     1. Output is simply written to the default Fortran output stream.
 *     It is not explicitly opened, and indeed, there are no checks that
 *     it is free.  This approach is adopted because the application is
-*     intended as an example of using the CAT routines and I do not 
+*     intended as an example of using the CAT routines and I do not
 *     want to clutter it with too much extraneous checking.
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
@@ -60,7 +60,7 @@
 *     28/1/94  (ACD): Tidied up for release.
 *     23/11/94 (ACD): Changed output from unit 17 to the default
 *        output stream.
-*     19/4/95  (ACD): Changed parametric constants to correspond to changes 
+*     19/4/95  (ACD): Changed parametric constants to correspond to changes
 *        in the INCLUDE file CAT_PAR.
 *     16/12/96 (ACD): Removed non-standard features revealed by the port
 *        to Linux (based on modifications by BKM).
@@ -77,7 +77,7 @@
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CI,         ! Catalogue identifier.
      :  QI,         ! Parameter identifier.
      :  FI,         ! Column (or field) identifier.
@@ -190,9 +190,9 @@
             CALL CAT_TNDNT (CI, CAT__FITYP, FCOUNT, FI, STATUS)
 
             IF (STATUS .EQ. CAT__OK  .AND.  FI .NE. CAT__NOID) THEN
-               CALL CAT_CINQ (FI, 10, FCI, FNAME, FGENUS, FEXPR, 
+               CALL CAT_CINQ (FI, 10, FCI, FNAME, FGENUS, FEXPR,
      :           FDTYPE, FCSIZE,FDIMS, FSIZEA, FNULL, FXCEPT, FSCALEF,
-     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, 
+     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM,
      :           FDATE, STATUS)
 
                FCTYPE = ' '
@@ -221,7 +221,7 @@
      :           '3X, ''Comments: '', A', I4, '/',
      :           '3X, ''Modification date: '', 1PD12.3 / )' )
 
-               WRITE(*, COLFMT) FCOUNT, FNAME, FGENUS, FEXPR(1 : 80), 
+               WRITE(*, COLFMT) FCOUNT, FNAME, FGENUS, FEXPR(1 : 80),
      :           FCTYPE, FDIMS, FSIZEA(1), FNULL, FXCEPT, FSCALEF,
      :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, FDATE
 

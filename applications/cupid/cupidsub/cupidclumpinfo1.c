@@ -30,7 +30,7 @@ void cupidClumpInfo1( HDSLoc *cloc, CupidClumpInfo *info, int *status ){
 *  Parameters:
 *     cloc
 *        A locator for a CLUMP structure such as created by cupidstoreclumps.c
-*     info 
+*     info
 *        A pointer to the structure in which to store information about
 *        the supplied clump.
 *     status
@@ -91,7 +91,7 @@ void cupidClumpInfo1( HDSLoc *cloc, CupidClumpInfo *info, int *status ){
       info->ubnd[ 2 ] = VAL__MINI;
       info->npix = astGetI( info->iwcs, "Nin" );
       info->nwcs = astGetI( info->iwcs, "Nout" );
-      info->init = 1; 
+      info->init = 1;
    }
 
 /* Get an NDF identifier for the NDF holding the clump cut-out. */

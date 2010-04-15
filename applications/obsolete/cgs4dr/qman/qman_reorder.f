@@ -1,4 +1,4 @@
-*+  QMAN_REORDER - Re-order routine for QMAN task 
+*+  QMAN_REORDER - Re-order routine for QMAN task
       SUBROUTINE QMAN_REORDER( STATUS )
 *    Invocation :
 *     CALL QMAN_REORDER( STATUS )
@@ -18,9 +18,9 @@
       INCLUDE 'QMAN_GLOBAL.PAR'       ! QMAN common block
       INCLUDE 'QMAN_COMMON.BLK'       ! QMAN global parameter constants
 *    Local variables :
-      CHARACTER*( MSG_VAL_LEN ) 
+      CHARACTER*( MSG_VAL_LEN )
      :  CTEMP( MAX_QENTRIES )         ! Temporary array for command strings
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :  DTEMP( MAX_QENTRIES )         ! Temporary array for timestamps
       INTEGER ICOUNT, JCOUNT          ! Counters
 *-
@@ -29,7 +29,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Put out an informational message
-      IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+      IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :  'Removing holes from command queue array', STATUS )
 
 *   Loop around array and write out acceptable records

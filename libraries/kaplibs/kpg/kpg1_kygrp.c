@@ -21,20 +21,20 @@ F77_SUBROUTINE(kpg1_kygrp)( INTEGER(KEYMAP), INTEGER(IGRP), INTEGER(STATUS) ) {
 
 *  Description:
 *     This function is the inverse of KPG1_KYMAP. It extracts the values
-*     from the supplied AST KeyMap and creates a set of "name=value" strings 
+*     from the supplied AST KeyMap and creates a set of "name=value" strings
 *     which it appends to a supplied group (or creates a new group). If
 *     the KeyMap contains nested KeyMaps, then the "name" associated with
-*     each primitive value stored in the returned group is a hierarchical 
+*     each primitive value stored in the returned group is a hierarchical
 *     list of component names separated by dots.
 
 *  Arguments:
 *     KEYMAP = INTEGER (Given)
-*        An AST pointer to the existing KeyMap. Numerical entries which 
-*        have bad values (VAL__BADI for integer entries or VAL__BADD for 
+*        An AST pointer to the existing KeyMap. Numerical entries which
+*        have bad values (VAL__BADI for integer entries or VAL__BADD for
 *        floating point entries) are not copied into the group.
 *     IGRP = INTEGER (Returned)
-*        A GRP identifier for the group to which to append the "name=value" 
-*        strings read from the KeyMap. A new group is created if GRP__NOID 
+*        A GRP identifier for the group to which to append the "name=value"
+*        strings read from the KeyMap. A new group is created if GRP__NOID
 *        is supplied.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -48,12 +48,12 @@ F77_SUBROUTINE(kpg1_kygrp)( INTEGER(KEYMAP), INTEGER(IGRP), INTEGER(STATUS) ) {
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

@@ -1,4 +1,4 @@
-      SUBROUTINE NDP_LINEAR                             
+      SUBROUTINE NDP_LINEAR
      &  (NDIM,NPIX,PIXELS,VALUES,CPIXEL,RESULT)
 C+
 C
@@ -8,7 +8,7 @@ C   -------------------
 C
 C   Description
 C   -----------
-C   Interpolates a data value at any point in a rectangular grid cell in 
+C   Interpolates a data value at any point in a rectangular grid cell in
 C   any number of dimensions. The supplied points must be the grid cell
 C   corners.
 C
@@ -17,7 +17,7 @@ C   Parameters
 C   ----------
 C   NDIM    (> integer). Number of dimensions in grid cell.
 C   NPIX    (> integer). Number of grid cell corner pixels.
-C   PIXELS  (> integer array). Coordinates of grid cell corners. Must be in 
+C   PIXELS  (> integer array). Coordinates of grid cell corners. Must be in
 C           X,Y,Z... order and values must be 0 or 1.
 C   VALUES  (> real array). Data values at corners, in X,Y,Z... order.
 C   CPIXEL  (> real array). Coordinates of point to be interpolated. Must
@@ -33,7 +33,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -51,7 +51,7 @@ C   Nick Fuller  RGO  (RGVAD::NMJF or NMJF@UK.AC.RGO.STAR)
 C   Chris Benn RGO (RGVAD::CRB or CRB@UK.AC.RGO.STAR)
 C
 C
-C   History                                                 
+C   History
 C   -------
 C   01-FEB-1989   - Original program
 C

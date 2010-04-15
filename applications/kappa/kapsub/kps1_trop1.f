@@ -62,7 +62,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
 *.
 
 *  Set status to OK.
-      STATUS = SAI__OK  
+      STATUS = SAI__OK
 
 *  Take the inverse FFT of the input data, storing the result back in
 *  the array IN.  KPG1_FFTBR cannot be used to do this beccause
@@ -94,7 +94,7 @@
 *  (which expects a purely real image as input and creates an Hermitian
 *  output image holding the FFT), and then take the complex conjugate
 *  of the result to get the inverse FFT in Hermitian format.
-      CALL KPG1_FFTFR( C1_NPX, C1_NLN, IN, OUT, IN, STATUS ) 
+      CALL KPG1_FFTFR( C1_NPX, C1_NLN, IN, OUT, IN, STATUS )
       CALL KPG1_HCONR( C1_NPX, C1_NLN, IN, STATUS )
 
 *  Multiply the inverse FFT of the input image by the FFT of the PSF.

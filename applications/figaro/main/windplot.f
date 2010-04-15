@@ -50,7 +50,7 @@
 *      PLTOLD = LOGICAL (Given and returned)
 *        If to plot old fits (in common ARCDIMS include file)
 *      SAMBLK = LOGICAL (Given and returned)
-*       
+*
 *      STATUS = INTEGER (Given and returned)
 *        Error status
 *      ISTARTX = INTEGER (Returned)

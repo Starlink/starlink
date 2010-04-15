@@ -9,7 +9,7 @@
 *  Description:
 *     This routine converts an angle in dd:mm:ss.dd format into a
 *     double precision number in radians. It assumes that the input
-*     string specifies the angle in degrees. The process involves 
+*     string specifies the angle in degrees. The process involves
 *     removing the ':' delimiters, then calling SLA_DAFIN to perform
 *     the conversion. An error will be returned if there are less than 2 ':'
 *     delimiters in the string, or if the SLA routine errors.
@@ -94,7 +94,7 @@
      :     'too long', STATUS)
       END IF
 
-     
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  strip : delimiters from string
@@ -102,7 +102,7 @@
          DO I = 1, 2
             CPOS = INDEX (COPY, ':')
             IF (CPOS .NE. 0) THEN
-               COPY(CPOS:CPOS) = ' ' 
+               COPY(CPOS:CPOS) = ' '
             ELSE
                STATUS = SAI__ERROR
             END IF

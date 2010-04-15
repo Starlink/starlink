@@ -20,14 +20,14 @@
 *        The global status.
 
 *  Description:
-*     This application allows a lookup table to be created or edited 
+*     This application allows a lookup table to be created or edited
 *     interactively. The process is controlled through a graphical user
-*     interface which presents curves of intensity against pen number, and 
+*     interface which presents curves of intensity against pen number, and
 *     allows the user to change them in various ways. A specified image
 *     is displayed as part of the interface in order to see the effects of
 *     the changes. A histogram of pen values is also included. The colour
-*     of each pen can be displayed either as red, green and blue intensity, 
-*     or as hue, saturation and value. More information on the use of the 
+*     of each pen can be displayed either as red, green and blue intensity,
+*     or as hue, saturation and value. More information on the use of the
 *     GUI is available through the Help menu within the GUI.
 
 *  Usage:
@@ -38,25 +38,25 @@
 *        The name of an image display device.  If a null value is
 *        supplied for parameter LUT, then the current LUT associated with
 *        the specified device will be loaded into the editor initially.
-*        On exit, the final contents of the editor (if saved) are 
-*        established as the current LUT for the specified device. 
+*        On exit, the final contents of the editor (if saved) are
+*        established as the current LUT for the specified device.
 *        [Current image-display device]
 *     LUT = NDF (Read)
-*        Name of an exiting colour table to be edited. This should be an 
-*        NDF containing an array of red, green and blue intensities. The 
-*        NDF must be 2-dimensional, the first dimension being 3, and the 
-*        second being arbitrary.  The method used to compress or expand the 
-*        colour table if the second dimension is different from the number 
-*        of unreserved colour indices is controlled by the "Interpolation" 
-*        option in the GUI. If LUT is null (!) the current KAPPA colour 
+*        Name of an exiting colour table to be edited. This should be an
+*        NDF containing an array of red, green and blue intensities. The
+*        NDF must be 2-dimensional, the first dimension being 3, and the
+*        second being arbitrary.  The method used to compress or expand the
+*        colour table if the second dimension is different from the number
+*        of unreserved colour indices is controlled by the "Interpolation"
+*        option in the GUI. If LUT is null (!) the current KAPPA colour
 *        table for the device specified by parameter DEVICE is used. [!]
 *     IMAGE = NDF (Read)
 *        Input NDF data structure containing the image to be displayed
 *        to show the effect of the created colour table. If a null value
-*        is supplied a default image is used. 
+*        is supplied a default image is used.
 
 *  Related Applications:
-*     KAPPA: LUTABLE, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE; 
+*     KAPPA: LUTABLE, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE;
 *     Figaro: COLOUR.
 
 *  Copyright:
@@ -117,12 +117,12 @@
       CHARACTER LUTNAM*255     ! Full path for LUT NDF
       CHARACTER PLOC*(DAT__SZLOC)! HDS locator for original LUT
       INTEGER IAT              ! Length of CMD
-      INTEGER ILEN             ! Used length of IMNAM 
+      INTEGER ILEN             ! Used length of IMNAM
       INTEGER INDF1            ! LUT NDF identifier
       INTEGER INDF2            ! Image NDF identifier
       INTEGER IPIC             ! AGI identifier for current picture
       INTEGER IPLUT            ! Pointer to mapped lut array
-      INTEGER LLEN             ! Used length of LUTNAM 
+      INTEGER LLEN             ! Used length of LUTNAM
       INTEGER LP               ! Lowest usable pen index
       INTEGER NEL              ! No. of elements in IPLUT
       INTEGER PLACE            ! Unused NDF placeholder
@@ -135,7 +135,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an NDF context.
-      CALL NDF_BEGIN 
+      CALL NDF_BEGIN
 
 *  Associate the parameter with a workstation and current picture.
       CALL AGI_ASSOC( 'DEVICE', 'READ', IPIC, STATUS )
@@ -176,8 +176,8 @@
             IF( PLOC .NE. DAT__NOLOC ) THEN
 
 *  Create an NDF holding the devices colour table.
-               CALL HDS_NEW( LUTNAM, 'LUTEDIT', 'LUT', 0, 0, LOC, 
-     :                       STATUS ) 
+               CALL HDS_NEW( LUTNAM, 'LUTEDIT', 'LUT', 0, 0, LOC,
+     :                       STATUS )
 
 *  Copy the array into it, putting it in "data_array" so that it becomes
 *  a primitive NDF, and can be accessed by other KAPPA apps.
@@ -235,13 +235,13 @@
          CALL PGQCOL( LP, UP )
 
 *  The lowest pen number available for used by the colour table is
-*  CTM__RSVPN.  0 is reserved for the background.  Others below CTM__RSVPN 
+*  CTM__RSVPN.  0 is reserved for the background.  Others below CTM__RSVPN
 *  are reserved for annotations.
          LP = CTM__RSVPN
 
 *  Open the NDF holding the edited LUT.
-         CALL NDF_OPEN( DAT__ROOT, LUTNAM, 'UPDATE', 'OLD', INDF1, 
-     :                  PLACE, STATUS ) 
+         CALL NDF_OPEN( DAT__ROOT, LUTNAM, 'UPDATE', 'OLD', INDF1,
+     :                  PLACE, STATUS )
 
 *  Ignore any error while opening the NDF.
          IF( STATUS .NE. SAI__OK ) THEN
@@ -249,11 +249,11 @@
          ELSE
 
 *  Map the DATA array.
-            CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPLUT, NEL, 
-     :                    STATUS ) 
+            CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPLUT, NEL,
+     :                    STATUS )
 
 *  Load the LUT into the colour table.
-            CALL KPG1_PGLUT( NEL/3, %VAL( CNF_PVAL( IPLUT ) ), 
+            CALL KPG1_PGLUT( NEL/3, %VAL( CNF_PVAL( IPLUT ) ),
      :                       LP, UP, .FALSE.,
      :                       STATUS )
 

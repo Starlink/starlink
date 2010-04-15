@@ -72,7 +72,7 @@
 *        becomes "KAPPA - Snapshot". [!]
 *     WHOLE = _LOGICAL (Read)
 *        If TRUE, the whole image-display memory is recorded, otherwise
-*        a selected region of what is visible on the screen is plotted. 
+*        a selected region of what is visible on the screen is plotted.
 *        Dumping the whole memory can require considerable disc space
 *        for work arrays and the output NDF. [FALSE]
 
@@ -142,7 +142,7 @@
 *        been added.
 *     {enter_further_changes_here}
 
-*  Bugs: 
+*  Bugs:
 *     {note_any_bugs_here}
 
 *-
@@ -167,7 +167,7 @@
 *  Local Constants:
       INTEGER NMEMAX             ! Maximum number of memories
       PARAMETER ( NMEMAX = 10 )
-     
+
       INTEGER NDIM           ! Number of dimensions
       PARAMETER ( NDIM = 2 )
 
@@ -184,7 +184,7 @@
 *  Local Variables:
       INTEGER    ACTVAL      ! Number of values returned
       REAL       ASP         ! Aspect ratio of image display
-      LOGICAL    BAD         ! Bad logical variable for VEC_ITOI 
+      LOGICAL    BAD         ! Bad logical variable for VEC_ITOI
       CHARACTER*72 BUFFER    ! Error messages from IDI
       INTEGER    CAPID       ! IDI inquiry code
       INTEGER    DEPTH( 1 )  ! Data depth (bits/pixel)
@@ -281,7 +281,7 @@
       REAL       YM          ! Y-length in metres of base zone
       INTEGER    YOFF        ! Offset to data position in y
       INTEGER    YSIZ( NMEMAX ) ! Y sizes of available memories
-      REAL       YU          ! Upper limit in Y of SGS box 
+      REAL       YU          ! Upper limit in Y of SGS box
       INTEGER    ZOOM        ! Zoom factor
       INTEGER    ZONE1       ! Zone number
       INTEGER    ZONE2       ! Zone number
@@ -316,10 +316,10 @@
          DEVCAN = .TRUE.
          GOTO 980
       END IF
- 
+
 *   Inquire whether the optional `create snapshot' is implemented
 *   on this particular device.
-*   Integer code CAPID = 100 is used with the `query capabilities' 
+*   Integer code CAPID = 100 is used with the `query capabilities'
 *   routine to check this.
 
       CAPID = 100
@@ -922,14 +922,14 @@
 
          NTITLE = CHR_LEN( TITLE )
          TXTHGT = 0.04
-      
+
          IF ( NTITLE .NE. 0 ) THEN
 
             CALL SGS_SELZ( ZONE1, STATUS )
             CALL SGS_SW( 0.0, 1.0, 0.0, 1.0, STATUS )
             CALL SGS_SHTX( SCALE * TXTHGT )
             CALL SGS_SFONT( 1 )
-            CALL SGS_BTEXT( 0.5 - NTITLE * SCALE * TXTHGT * 0.5, 
+            CALL SGS_BTEXT( 0.5 - NTITLE * SCALE * TXTHGT * 0.5,
      :                      0.5 + 0.475 * SCALE + TXTHGT *0.75 )
             CALL SGS_ATEXT( TITLE )
             CALL SGS_OTEXT

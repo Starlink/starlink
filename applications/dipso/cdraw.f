@@ -71,7 +71,7 @@
 *  Remove leading blanks from supplied command parameter string.
        CALL SSTRIP (PARAMS)
 
-*  If the first parameter is not a file name, we shall use the cursor 
+*  If the first parameter is not a file name, we shall use the cursor
 *  to get points.
        IF (PARAMS(1:).EQ.' '
      : .OR.PARAMS(1:).EQ.'0'
@@ -100,7 +100,7 @@
           MODE = NINT(RMODE)
 
 *  If mode 1 was requested, there should be something on the stack to
-*  define the X positions at which to sample the fit. Abort if there 
+*  define the X positions at which to sample the fit. Abort if there
 *  isn't.
           IF (MODE.NE.0) THEN
              IF (NONSTK.LE.0) THEN

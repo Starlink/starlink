@@ -135,7 +135,7 @@ insub_c( char * string, char * prompt, int * l ) {
 
   /* Find the length of the prompt */
   lprompt = strlen( prompt );
-  
+
   /* Call fortran version - assume trail args */
   jstat = (*gl_insub)( string_f, prompt, l, 80, lprompt );
 
@@ -157,7 +157,7 @@ nametr_c( int kmd, char * strin, int lstrout, char * strout ) {
   int jstat;
 
   if (*gl_nametr == NULL) return hlp_INTERNAL_ERROR;
-  
+
   /* Length of string */
   lstrin = strlen( strin );
 
@@ -166,7 +166,7 @@ nametr_c( int kmd, char * strin, int lstrout, char * strout ) {
 
   /* Terminate the result */
   if ( jstat == 0 || jstat == hlp_STRING_OVERFLOW ) {
-    cnfImprt( strout, lstrout - 1, strout ); 
+    cnfImprt( strout, lstrout - 1, strout );
   } else {
     *strout = '\0';
   }
@@ -292,7 +292,7 @@ F77_SUBROUTINE(hlp_creh)( void (*nametr) ( INTEGER(kmd), CHARACTER(instr), CHARA
   }
 
   /* Call the C function */
-  *jstat = (F77_INTEGER_TYPE)hlpCreh( lnametr_c, source_c, lib_c );  
+  *jstat = (F77_INTEGER_TYPE)hlpCreh( lnametr_c, source_c, lib_c );
 
   /* Free temp storage */
   cnfFree( source_c );

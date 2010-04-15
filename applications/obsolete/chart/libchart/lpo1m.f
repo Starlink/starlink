@@ -1,5 +1,5 @@
       SUBROUTINE LPO1M(X,Y, STATUS )
-      
+
 C
 C      To calculate guide stars for the 1 metre camera
 C      input values of X,Y from CHART are in units of minutes of

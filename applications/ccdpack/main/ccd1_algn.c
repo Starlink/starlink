@@ -11,13 +11,13 @@
 
 #define BUFLENG 200
 
-   F77_SUBROUTINE(ccd1_algn)( INTEGER(ndfgr), INTEGER(nndf), INTEGER(nset), 
+   F77_SUBROUTINE(ccd1_algn)( INTEGER(ndfgr), INTEGER(nndf), INTEGER(nset),
                               INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof),
                               INTEGER(snamgr), INTEGER(refset),
-                              DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
-                              INTEGER(maxcanv), INTEGER_ARRAY(windim), 
-                              CHARACTER(mstyle), INTEGER(npoint), 
-                              POINTER_ARRAY(ipxpos), POINTER_ARRAY(ipypos), 
+                              DOUBLE_ARRAY(percnt), DOUBLE(zoom),
+                              INTEGER(maxcanv), INTEGER_ARRAY(windim),
+                              CHARACTER(mstyle), INTEGER(npoint),
+                              POINTER_ARRAY(ipxpos), POINTER_ARRAY(ipypos),
                               POINTER_ARRAY(ipind), INTEGER(status)
                               TRAIL(mstyle) ) {
 
@@ -40,7 +40,7 @@
 *  Description:
 *     This routine calls a Tcl script which displays a number of NDFs
 *     and allows the user to select a matching set of positions on
-*     each member of the set.  It returns the lists of points to 
+*     each member of the set.  It returns the lists of points to
 *     the calling routine.
 
 *  Arguments:
@@ -81,7 +81,7 @@
 *        for each Set.  The array at position I has NPOINT( I ) elements
 *        of type DOUBLE PRECISION.
 *     IPIND( NSET ) = INTEGER (Returned)
-*        Pointers to arrays of the index label of the marked positions 
+*        Pointers to arrays of the index label of the marked positions
 *        for each Set.  The array at position I has NPOINT( I ) elements
 *        of type INTEGER.
 *     STATUS = INTEGER (Given and Returned)
@@ -178,7 +178,7 @@
 /* Initialise the Tcl interpreter. */
       cinterp = ccdTclStart( status );
 
-/* Construct a list of NDF Set constructor lists available to the Tcl 
+/* Construct a list of NDF Set constructor lists available to the Tcl
    interpreter as the value of the NDFSETS variable. */
       for ( i = 1; i <= *nset; i++ ) {
          F77_CALL(grp_get)( INTEGER_ARG(snamgr), INTEGER_ARG(&i),

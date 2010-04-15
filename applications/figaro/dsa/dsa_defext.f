@@ -12,7 +12,7 @@ C     This routine returns the default file extension for the DSA_
 C     routines.  It should not necessarily be assumed that this is
 C     a three character string.  In fact, this routine returns
 C     the extension preceeded by a '.' in any case, so normally the
-C     argument should be at least four characters. 
+C     argument should be at least four characters.
 C
 C  Language:
 C     FORTRAN
@@ -22,7 +22,7 @@ C     CALL DSA_DEFEXT (DEFEXT)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (<) DEFEXT      (Fixed string,descr) The default extension, 
+C     (<) DEFEXT      (Fixed string,descr) The default extension,
 C                     preceeded by a '.' - eg '.dat'
 C
 C  External variables used:

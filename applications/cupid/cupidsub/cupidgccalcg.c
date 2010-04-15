@@ -4,7 +4,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
 
@@ -16,7 +16,7 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
 *     cupidGCcalcg
 
 *  Purpose:
-*     The gradient of the merit function to be minimised by the GaussClumps 
+*     The gradient of the merit function to be minimised by the GaussClumps
 *     algorithm.
 
 *  Language:
@@ -26,7 +26,7 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
 *     void cupidGCcalcg( int n, double *x, int *nf, double *g )
 
 *  Description:
-*     This function evaluates the gradient of the merit function describing 
+*     This function evaluates the gradient of the merit function describing
 *     the fit between a given Gaussian model and a given data array. It is
 *     designed to be called by the pdaSumsl minimisation function.
 
@@ -36,7 +36,7 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
 *     x
 *        Pointer to an array holding the "n" parameters which define the
 *        model.
-*     nf 
+*     nf
 *        On entry, "*nf" is the number of times "calcf" has been called.
 *        Returned equal to zero if the merit function cannot be evaluated
 *        at "x". Intermediate values are calculated and cached when a new
@@ -101,11 +101,11 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
 
 /* Loop round each parameter */
    for( ipar = 0; ipar < n; ipar++ ) {
-      
+
 /* Calculate the rate of change of the chi-squared with respect to this
    parameter. */
       g[ ipar ] = cupidGCChiSq( cupidGC.ndim, x, ipar, newx, &status );
-             
+
 /* The second and subsequent passes through this loop use the same "x"
    position as the first. */
       newx = 0;

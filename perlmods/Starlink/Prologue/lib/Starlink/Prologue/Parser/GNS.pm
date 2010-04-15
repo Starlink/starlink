@@ -91,7 +91,7 @@ sub push_line {
     # - blank line (*   )
     # - terminator (*++) if we are too late
 
-    if ( $line =~ /^\s*$r\+\+\s*$/  || #   *++ 
+    if ( $line =~ /^\s*$r\+\+\s*$/  || #   *++
 	 $line =~ /^\s*$r\+\s*$/       #   *+
        ) {
       # print "End of prologue detected\n";
@@ -128,7 +128,7 @@ sub push_line {
 
     } elsif (defined $self->section() && $self->section eq 'Name'
 	     && $line =~ /\s*$r\s+(.*)$/) {
-      # first non-blank line is 
+      # first non-blank line is
       #   NAME Purpose
       my $title = $1;
       $title =~ s/^\s+//;
@@ -348,7 +348,7 @@ An example GNS prologue:
  *
  *   Description:
  *       Gets the system name; eg the DECnet node name or IP host name
- *       
+ *
  *   Input arguments:
  *      STATUS  i                 Inherited status
  *

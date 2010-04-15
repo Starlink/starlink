@@ -45,7 +45,7 @@
 *     U = CHARACTER * ( * ) (Given)
 *        The units in which the output data has been created.
 *     FACTOR = REAL (Given)
-*        Factor for converting data stored in the input units to the 
+*        Factor for converting data stored in the input units to the
 *        output units.
 *     PIXSIZ = DOUBLE PRECISION (Given)
 *        Pixel size in steradians.
@@ -68,14 +68,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IRI_PAR'          ! Standard SAE constants
-                                 
+
 *  Arguments Given:
       INTEGER NCARD
       CHARACTER FITS( NCARD )*(*)
@@ -138,10 +138,10 @@
       CALL PREPC7( NCARD, FITS, POFLUX, PONMAP, STATUS )
 
 *  Write the POFLUX component of the IMAGE_INFO structure.
-      CALL CMP_PUT0L( LOC, 'POFLUX', POFLUX, STATUS )   
+      CALL CMP_PUT0L( LOC, 'POFLUX', POFLUX, STATUS )
 
 *  Write the PONMAP component of the IMAGE_INFO structure.
-      CALL CMP_PUT0L( LOC, 'PONMAP', PONMAP, STATUS )   
+      CALL CMP_PUT0L( LOC, 'PONMAP', PONMAP, STATUS )
 
 *  Get the value of FITS keyword DSKYGRID.
       CALL IRM_GKEYR( NCARD, FITS, 1, 'DSKYGRID', THERE, RSKGRD, GRDCRD,
@@ -152,7 +152,7 @@
       CALL IRM_COMNT( NCARD, FITS, STCARD, THERE, CMNT, CARD, STATUS )
 
 *  Remove all blanks and get its used length.
-      CALL CHR_RMBLK( CMNT ) 
+      CALL CHR_RMBLK( CMNT )
       CMNTLN = CHR_LEN( CMNT )
 
 *  Get the positions of first '=', the ';' and the second '='.
@@ -188,12 +188,12 @@
 
 *  Extract the median noise from the comment string.
       MNSSTR = CMNT( EQLPSN + 1 : JSKPSN - 1 )
-      
+
 *  Convert it to real value.
       CALL CHR_CTOR( MNSSTR, MNOIS, STATUS )
 
-*  If this is an intensity grid, and the median noise is given in 
-*  units of Jy, divide it by the pixel size to convert it into units 
+*  If this is an intensity grid, and the median noise is given in
+*  units of Jy, divide it by the pixel size to convert it into units
 *  of Jy/sr.
       IF( .NOT. POFLUX .AND. CMNT( JSKPSN : ) .EQ. 'JY' ) THEN
          MNOIS = REAL( DBLE( MNOIS )/PIXSIZ )
@@ -205,8 +205,8 @@
      :             STATUS )
       CALL CHR_RMBLK( BUNIT )
 
-*  If the median noise value is in the same units as the input data, 
-*  scale it to the same units as the output data, and store the output 
+*  If the median noise value is in the same units as the input data,
+*  scale it to the same units as the output data, and store the output
 *  units as the value for component POUNITS.
       IF( CHR_SIMLR( CMNT( JSKPSN : ), BUNIT ) ) THEN
          MNOIS = FACTOR*MNOIS
@@ -218,8 +218,8 @@
 
       END IF
 
-*  Write the noise stimate into the  PONOISE component of the 
+*  Write the noise stimate into the  PONOISE component of the
 *  IMAGE_INFO structure.
       CALL CMP_PUT0R( LOC, 'PONOISE', MNOIS, STATUS )
-      
+
       END

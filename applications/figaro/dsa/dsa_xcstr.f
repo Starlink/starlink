@@ -13,9 +13,9 @@
 
 *  Description:
 *     DSA_xCSTR covers the routines DSA_FCSTR, DSA_ICSTR, DSA_BCSTR,
-*     DSA_DCSTR, DSA_UCSTR and DSA_SCSTR, which apply a scaling factor 
+*     DSA_DCSTR, DSA_UCSTR and DSA_SCSTR, which apply a scaling factor
 *     and offset to data arrays of type float, integer, byte, double,
-*     unsigned short and short respectively.  In each case the number 
+*     unsigned short and short respectively.  In each case the number
 *     of artihmetic errors that result from the scaling is returned.
 
 *  Arguments:
@@ -105,8 +105,8 @@
 *-
 
       SUBROUTINE DSA_FCSTR( ELEMENTS, BSCALE, BZERO,
-     :   BASE, ARRAY, ERRORS ) 
-      
+     :   BASE, ARRAY, ERRORS )
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -249,8 +249,8 @@
       END
 
       SUBROUTINE DSA_ICSTR( ELEMENTS, BSCALE, BZERO,
-     :   BASE, ARRAY, ERRORS ) 
-      
+     :   BASE, ARRAY, ERRORS )
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -393,8 +393,8 @@
       END
 
       SUBROUTINE DSA_BCSTR( ELEMENTS, BSCALE, BZERO,
-     :   BASE, ARRAY, ERRORS ) 
-      
+     :   BASE, ARRAY, ERRORS )
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -537,8 +537,8 @@
       END
 
       SUBROUTINE DSA_DCSTR( ELEMENTS, BSCALE, BZERO,
-     :   BASE, ARRAY, ERRORS ) 
-      
+     :   BASE, ARRAY, ERRORS )
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -681,8 +681,8 @@
       END
 
       SUBROUTINE DSA_UCSTR( ELEMENTS, BSCALE, BZERO,
-     :   BASE, ARRAY, ERRORS ) 
-      
+     :   BASE, ARRAY, ERRORS )
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -825,8 +825,8 @@
       END
 
       SUBROUTINE DSA_SCSTR( ELEMENTS, BSCALE, BZERO,
-     :   BASE, ARRAY, ERRORS ) 
-      
+     :   BASE, ARRAY, ERRORS )
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, 
+*     CALL ARD1_POL( RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR,
 *                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -39,10 +39,10 @@
 *        The size of the PAR array.
 *     D( 6 ) = DOUBLE PRECISION (Given)
 *        The coefficients of the user->pixel mapping. The mapping is:
-*        P1 = D0 + D1*U1 + D2*U2 
-*        P2 = D3 + D4*U1 + D5*U2 
+*        P1 = D0 + D1*U1 + D2*U2
+*        P2 = D3 + D4*U1 + D5*U2
 *     PAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
-*        Region parameters. 
+*        Region parameters.
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( 2 ) = INTEGER (Given and Returned)
@@ -61,7 +61,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( 2 ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -101,7 +101,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -136,7 +136,7 @@
       PARAMETER ( MXCRS = 100 )
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :  DY,                    ! Gap in y between adjacent vertices
      :  PERT,                  ! Perturbation
      :  TEST,                  ! Line-polygon intersection test
@@ -161,7 +161,7 @@
      :  NTOP,                  ! Sorting index
      :  NVERT,                 ! No. of polygon vertices
      :  UBND( 2 )              ! Mask upper bounds
-  
+
       LOGICAL                  ! True if:
      :  EXIT                   ! Sorting complete
 
@@ -204,14 +204,14 @@
       XMAX = VAL__MIND
       YMIN = VAL__MAXD
       YMAX = VAL__MIND
- 
+
       DO N = 1, NVERT
          XMIN = MIN( PAR( 2*N - 1 ), XMIN )
          XMAX = MAX( PAR( 2*N - 1 ), XMAX )
          YMIN = MIN( PAR( 2*N ), YMIN )
          YMAX = MAX( PAR( 2*N ), YMAX )
       END DO
- 
+
 *  Convert the ranges to integer pixel index limits restricted to the
 *  mask array size. Note, the value 1.0E8 is used to avoid integer
 *  overflow where possible one could have used REAL( VAL__MAXI ). The
@@ -275,16 +275,16 @@
 *  coordinate) and store it.
             ELSE IF( TEST .GT. 0.0 ) THEN
                NCROSS = NCROSS + 1
- 
+
                IF( NCROSS .LE. MXCRS ) THEN
                   DY = PAR( 2*N2 ) - PAR( 2*N1 )
- 
+
                   IF( ABS( DY ) .LT. VAL__SMLD ) DY = SIGN( VAL__SMLD,
      :                                                      DY )
                   XCROSS( NCROSS ) = PAR( 2*N1 - 1 ) +
      :                         ( YL - PAR( 2*N1 ) ) *
      :                         ( PAR( 2*N2 - 1 ) - PAR( 2*N1 -1 ) ) / DY
- 
+
 *  If the storage for intersections is exceeded, return with a bad
 *  status and report an error.
                ELSE
@@ -295,7 +295,7 @@
      :                           STATUS )
                   GO TO 999
                END IF
- 
+
 *  End of the check for line-polygon intersections.
             END IF
 
@@ -306,12 +306,12 @@
          IF( NCROSS .GT. 1 ) THEN
             EXIT = .FALSE.
             NTOP = NCROSS
- 
+
 *  Loop when an interchange was necessary.
             DO WHILE ( .NOT. EXIT )
                EXIT = .TRUE.
                NTOP = NTOP - 1
- 
+
                DO N = 1, NTOP
 
 *  Swap adjacent values if they are in the wrong order.
@@ -323,7 +323,7 @@
                   END IF
                END DO
             END DO
- 
+
 *  Scan through the ordered intersections in pairs.
             DO N = 2, NCROSS, 2
 
@@ -349,13 +349,13 @@
             END DO
 
          END IF
- 
+
 *  Do the next mask line.
       END DO
 
 *  If the interior bounding box is null, return the usual value
 *  (VAL__MINI for LBINTB( 1 ) ).
-      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR. 
+      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR.
      :    LBINTB( 2 ) .GT. UBINTB( 2 ) ) LBINTB( 1 ) = VAL__MINI
 
 *  Ensure the the exterior bounding box is returned "infinite".

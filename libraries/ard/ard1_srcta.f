@@ -19,8 +19,8 @@
 *     the AST_ library for interpretation.
 *
 *     This routine has only a STATUS argument, so it communicates with
-*     other ARD routines via global variables stored in the ARD_AST common 
-*     blocks. These are described below under "Global Variables used as 
+*     other ARD routines via global variables stored in the ARD_AST common
+*     blocks. These are described below under "Global Variables used as
 *     Arguments".
 
 *  Arguments:
@@ -29,7 +29,7 @@
 
 *  Global Variables used as Arguments:
 *     CMN_IGRP = INTEGER (Given)
-*        A GRP identifier for the group which holds the data. 
+*        A GRP identifier for the group which holds the data.
 *     CMN_NXTLN = INTEGER (Given and Returned)
 *        This must initially be set to the value 1, to indicate that
 *        data will be read starting at the first element of the group
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,10 +82,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP_ public constants
-      INCLUDE 'ARD_CONST'        ! ARD_ private constants      
-      INCLUDE 'ARD_ERR'          ! ARD_ error constants      
+      INCLUDE 'ARD_CONST'        ! ARD_ private constants
+      INCLUDE 'ARD_ERR'          ! ARD_ error constants
       INCLUDE 'AST_PAR'          ! AST_ public interface
-      
+
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks.
 *        CMN_IGRP = INTEGER (Read)
@@ -106,7 +106,7 @@
       INTEGER DIM                 ! Size of GRP group
       INTEGER L                   ! Number of characters in AST_ text
 
-      SAVE DIM      
+      SAVE DIM
 *.
 
 *  Check inherited global status.
@@ -132,7 +132,7 @@
       END IF
 
 *  If there has been an error, set the number of characters to -1
-*  to indicate no more data. 
+*  to indicate no more data.
       IF ( STATUS .NE. SAI__OK ) L = -1
 
 *  Send the text to the AST_ library for interpretation.

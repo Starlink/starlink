@@ -4,7 +4,7 @@ C
 C     G E N _ A S M O T H
 C
 C     Smooths the data in a 2D array, using an extension of the
-C     1D 3-point smoothing algorithm.  
+C     1D 3-point smoothing algorithm.
 C
 C     In a standard 1D 3-point smooth, each pixel is replaced by
 C     1/2 it's contents + 1/4 of the contents of each of the two
@@ -27,7 +27,7 @@ C     (><) ARRAY    (Real array ARRAY(NX,NY)) The output data.
 C
 C     Subroutines / functions used - None
 C
-C     Note: 1) Edge effects.  This routine operates as though 
+C     Note: 1) Edge effects.  This routine operates as though
 C              there were extra pixels outside the actual array,
 C              all containing zero.  So some of the data in the
 C              edge pixels can be thought of as being transferred
@@ -36,7 +36,7 @@ C              lost.
 C           2) Special cases: The case where the data to be smoothed
 C              is actually 1 dimensional (ie either NX=1 or NY=1) is
 C              treated as a special case, exactly as a 1D 3-point
-C              smooth.  
+C              smooth.
 C
 C                                       KS / CIT 21st June 1983
 C

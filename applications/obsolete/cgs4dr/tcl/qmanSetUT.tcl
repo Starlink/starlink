@@ -33,7 +33,7 @@ proc qmanSetUT {} {
       } {
 	set env(QMAN_DATE) $date
       }
-    } 
+    }
 
 # Remove the dialog box
     cgs4drCursor arrow green black

@@ -29,7 +29,7 @@
 *   Return immediately if status bad.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Obtain the context, name of the action, sequence number 
+*   Obtain the context, name of the action, sequence number
       CALL TASK_GET_CONTEXT( CONTEXT, STATUS )
       CALL TASK_GET_NAME( NAME, STATUS )
 

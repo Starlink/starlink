@@ -16,7 +16,7 @@
 
 *  Description:
 *     Returns a GRP group conatining a series of formatted file names.
-*     The names of the files are accessed as a list through the GRP 
+*     The names of the files are accessed as a list through the GRP
 *     system (which allows indirection of the names, and wildcards
 *     based on the input modification group MGRP), using the parameter
 *     PARNAM. The files are opened one by one using FIO_OPEN. File
@@ -44,7 +44,7 @@
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
-*     before exit. 
+*     before exit.
 *     -  The calling routine must annul the GRP group before exit.
 
 *  Copyright:
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,7 +112,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename 
+      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename
       INTEGER NRET
       INTEGER I
       INTEGER FD
@@ -125,7 +125,7 @@
       CALL CCD1_STRGR( PARNAM, MGRP, MINOPN, MAXOPN, GID, NRET, STATUS )
 
 *  Report the number of file names returned.
-      IF ( NRET .EQ. 1 ) THEN 
+      IF ( NRET .EQ. 1 ) THEN
          CALL MSG_SETI( 'NRET', NRET )
          CALL MSG_SETC( 'PARNAM', PARNAM )
          CALL MSG_OUT( ' ',

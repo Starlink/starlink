@@ -64,7 +64,7 @@
 *.
 
 *  Initialise the inherited global status.
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
 
 *  Initialise the IRA_ system.
       CALL IRA_INIT( STATUS)

@@ -31,7 +31,7 @@ C-----------------------------------------------------------------------------
 C Generate a new dataset with the same mean and standard deviation as
 C the old.
 C-----------------------------------------------------------------------------
- 
+
       DO 10 I = 1, NUMROWS
          OPARRAY(I, 1) = IPARRAY(I, 1)
          IF ( MOD(ISET,2).NE.0 ) THEN

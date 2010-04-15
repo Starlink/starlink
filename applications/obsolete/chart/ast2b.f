@@ -5,21 +5,21 @@
 * A S T 2 B
 *- - - - - -
 *
-* A program which converts an ASCII version of the star catalog in 
+* A program which converts an ASCII version of the star catalog in
 * ASTROM format, as output by AST2A, back into it's original binary
-* format. 
+* format.
 *     AST2A and this program, AST2B, are intended to make possible the
-* porting of ASTROM format star catalog files between systems, by 
+* porting of ASTROM format star catalog files between systems, by
 * converting the file into ASCII to make it portable, and back to binary
 * on the target machine.
 *
 * The program will ask the user which machine it is running on, first,
-* to be able to select the right record length for the RECL specifier 
-* of the OPEN statement, as the VAX expects it in longwords for 
-* unformatted files. It will then prompt the user for the pathnames 
-* for both the existing ASTROM ASCII file and the binary file which is 
+* to be able to select the right record length for the RECL specifier
+* of the OPEN statement, as the VAX expects it in longwords for
+* unformatted files. It will then prompt the user for the pathnames
+* for both the existing ASTROM ASCII file and the binary file which is
 * to be output.
-* 
+*
 * It's all standard FORTRAN 77, and uses no external or internal
 * subroutines.
 *
@@ -53,17 +53,17 @@
          LEN = 24
       ENDIF
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname of ASTROM ASCII text file ?'
       READ(*, '(A)') FILE
 
       OPEN(UNIT = 11, FILE = FILE, FORM = 'FORMATTED', STATUS = 'OLD')
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname for ASTROM binary file ?'
       READ(*, '(A)') FILE
 
-      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN, 
+      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN,
      +      FORM = 'UNFORMATTED', STATUS = 'NEW')
 
       WRITE(*,*)
@@ -81,13 +81,13 @@
 * file or error occurs
 
       COUNT = 200
-      READ(11, 1010, IOSTAT = IOSTAT) NCAT, MAG, SPEC, 
+      READ(11, 1010, IOSTAT = IOSTAT) NCAT, MAG, SPEC,
      +        IPA, IPD, IRA, IDEC
 
- 300  WRITE(10, REC = COUNT, IOSTAT = IOSTAT) NCAT, MAG, SPEC, IPA, 
-     +        IPD, IRA, IDEC    
+ 300  WRITE(10, REC = COUNT, IOSTAT = IOSTAT) NCAT, MAG, SPEC, IPA,
+     +        IPD, IRA, IDEC
       COUNT = COUNT + 1
-      READ(11, 1010, IOSTAT = IOSTAT) NCAT, MAG, SPEC, 
+      READ(11, 1010, IOSTAT = IOSTAT) NCAT, MAG, SPEC,
      +        IPA, IPD, IRA, IDEC
       IF ((MOD(COUNT, 10000)) .EQ. 0) WRITE(*,*) 'Done ', COUNT
       IF (IOSTAT .EQ. 0) GOTO 300

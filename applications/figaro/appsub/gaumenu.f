@@ -5,21 +5,21 @@ C
      :       XVEN,ORD,SIG,ERR,XUNITS,ZUNITS,LREC,LU,XTOLI,LSECT,SAVE)
 C
 C     This is the menu command interpreter for Gaussian fitting.
-C     The command is read from the user input and executed. 
+C     The command is read from the user input and executed.
 C     The line extent can be selected with cursor; a single Gaussian
 C     fit to a line can be made; multiple Gaussian fits or manual
 C     fits can be made using cursor to set position of lines and
-C     terminal prompts to shift peak position, widen or heighten 
+C     terminal prompts to shift peak position, widen or heighten
 C     lines; fit is optimized by call to NAG routine E04JBF; any
 C     of the fit parameters ( position, height or width ) can
-C     be locked or chained to other values and the residuals can 
-C     be weighted if desired. 
+C     be locked or chained to other values and the residuals can
+C     be weighted if desired.
 C     Fits and residuals are plotted as the analysis proceeds
 C     with minimum interference with the existing plot ( observed
 C     spectrum, continuum fit and error bars ). Results of the fit
 C     are printed to the terminal and written to a data file if so
 C     selected. A previous fit can be read from a data file and
-C     plotted. The final fit can be saved as a file whose name is 
+C     plotted. The final fit can be saved as a file whose name is
 C     prompted for on return to subroutine GAUSS.
 C     On return another continuum section in the same spectrum can
 C     be selected, or a simple quit.
@@ -34,10 +34,10 @@ C     (>) ZRESID   (Real array) The observed -fitted residuals on the
 C                  continuum fit ( values over the line not plotted )
 C     (>) CONVALS  (Real array) The Y values of the fitted continuum
 C     (>) ICONO    (Integer array) A value of 1 indicates a continuum point
-C     (<) FITTOT   (Real array) The final continuum and Gaussian fit 
-C                  spectrum 
+C     (<) FITTOT   (Real array) The final continuum and Gaussian fit
+C                  spectrum
 C     (>) NX       (Integer) Number of elements in XVALS and ZVALS.
-C     (>) CX       (Integer) Number of elements in fitted continuum 
+C     (>) CX       (Integer) Number of elements in fitted continuum
 C     (>) ICST     (Integer) The first element of XVALS to be plotted
 C                  as continuum
 C     (>) HIGH     (Real) The maximum value for the plot.
@@ -68,32 +68,32 @@ C     (<) LSECT    (Logical) True if another section of line+continuum to
 C                  be analysed
 C     (<) SAVE     (Logical) True if fitting spectrum is to be saved as a
 C                  file
-C                                         JRW / AAO February 1987 
+C                                         JRW / AAO February 1987
 C
 C     Subroutines called:
 C      FWHMIT  -  determines the FWHM of a profile from the half-height points
 C      GAUF1   -  sums the signal for all the fitting Gaussians on the continuum
 C      GAUF2   -  sums the signal for all the fitted Gaussians
-C      GAUF3   -  determines the position of the next peak in a partially 
+C      GAUF3   -  determines the position of the next peak in a partially
 C                  fitted profile
 C      GAUF4   -  copies the signal for each fitting Gaussian into an array
-C      GAUS_XZPLOT  -  handles all plotting of lines, fits residuals and 
+C      GAUS_XZPLOT  -  handles all plotting of lines, fits residuals and
 C                      bars
 C      ERASER  -  plots in pen zero a line or set of points to erase them
 C                 from the graphics screen
 C      RMSER   -  calculates residuals on fit, rms and mean fractional error
-C                 ( if errors available ) 
+C                 ( if errors available )
 C      CONSTR  -  handles the prompting for and reporting of singly constrained
 C                 and multiply constrained ( chained ) Gaussian parameters
 C      AUTOFIT  -  performs the optimization of the Gaussian fit using NAG
 C                  routines E04HBF and E04JBF ( calls DOIT1,DOIT2 AND FUNCT )
-C      TERMWRIT  -  writes the parameters of the fitted Gaussians to the 
+C      TERMWRIT  -  writes the parameters of the fitted Gaussians to the
 C                   terminal
-C      GAUS_RECORD  -  writes the parameters of the fitted Gaussians to the 
+C      GAUS_RECORD  -  writes the parameters of the fitted Gaussians to the
 C                 results file
 C
 C      Modified:
-C        Can fit further new lines after optimization ( LLIM set FALSE 
+C        Can fit further new lines after optimization ( LLIM set FALSE
 C        after fit complete ); data on all fits are recorded in results file.
 C        Handles weighting of residuals by value or 1/error**2 ( if available );
 C        no weighting also allowed ( ie. units weights ).
@@ -141,7 +141,7 @@ C                  jumps into an IF block.
 C
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       INTEGER NX,CX,ICST,ICONO(NX),ORD,LU
       REAL XVALS(NX),WID,ZVALS(NX),ZRESID(NX),ERRORS(NX),
@@ -173,7 +173,7 @@ C
       CHARACTER*1 CC,RESP1,WGHT
       CHARACTER*32 RNAME,RECNAME,RLAB1,RLAB2
       CHARACTER*80  RESPON,RESP2,STRING
-      CHARACTER*132 RUBB 
+      CHARACTER*132 RUBB
       LOGICAL LLIM,NOCO,CRES,GRES,GTOT,GALL,LSECT,HARD,ERASE,ANS,
      :LOPEN,LALL,LCONQ,FINAL,FAULT,LWRIT
 
@@ -189,10 +189,10 @@ C
       NOCO=.FALSE.   ! Whether line extent overlapping continuum region
       LSECT=.FALSE.  ! Whether to work on another continuum section
       LLIM=.FALSE.   ! Whether line extent demarcated
-      ERASE=.FALSE.  ! Whether to erase existing plot 
+      ERASE=.FALSE.  ! Whether to erase existing plot
       HARD=.FALSE.   ! Whether a hard copy is made
       LCON=.FALSE.   ! Whether to plot continuum fit
-      CRES=.FALSE.   ! Whether to plot continuum residuals 
+      CRES=.FALSE.   ! Whether to plot continuum residuals
       LWRIT=.FALSE.  ! Whether to results have been recorded to data file
       LALL=.TRUE.    ! Whether to print all of fit results to terminal
       LCONQ=.FALSE.  ! Whether any Gaussians are constrained
@@ -210,19 +210,19 @@ C
 C
 C     Gaussian fitting menu entry. Alternatives are:
 C
-C        LIM    _    delimit edges of line ( default is adjacent 
+C        LIM    _    delimit edges of line ( default is adjacent
 C                    continuum edges )
 C        SIN    -    fit a single Gaussian to an indicated line
 C        NEW    -    introduce a Gaussian at the cursor defined position
 C        NEX    -    introduce a new Gaussian at the peak
 C        INCH   -    interactively alter peak position, height or width
-C        LIS    -    list the Gaussians fitted 
+C        LIS    -    list the Gaussians fitted
 C        SEL    -    select a line to be modified
 C        DEL    -    delete a selected Gaussian
 C        OPT    -    optimize the fit
 C        RECAL  -    read a previous fit data file and plot this fit
 C        HARD   -    plot results of fit for hardcopy device
-C        SAVE   -    save the Gaussian fit spectrum as a file ( name 
+C        SAVE   -    save the Gaussian fit spectrum as a file ( name
 C                    prompted for on quitting )
 C        CON    -    move to another section of continuum for more fitting
 C        QUIT   -    quit from program ( spectrum analysis complete )
@@ -259,7 +259,7 @@ C
      :                  'Q to quit',STATUS)
 51      XC=XVALS(NX/2) ! Somewhere to put the cursor initially
         YC=ABS(HIGH-LOW)/2. + LOW
-        
+
 52      CALL PAR_WRUSER('Use cursor to indicate left edge '//
      :           'of line ',STATUS)
         CALL PGCURSE(XC,YC,CC)
@@ -273,9 +273,9 @@ C       Check values of IA and IB to determine IB>IA and reasonable
 C
         IF (IA.GE.IB.OR.IA.LT.1.OR.IB.GT.NX) THEN
           CALL PAR_WRUSER('Edges of continuum section invalid',STATUS)
-          XC=XVALS(NX/2) 
+          XC=XVALS(NX/2)
           YC=ABS(HIGH-LOW)/2. + LOW
-          GO TO 52 
+          GO TO 52
         END IF
 C
 C       Check that these points are not included as continuum
@@ -311,7 +311,7 @@ C
           END DO
         END IF
 C
-C       Set left edge of extent of line and width and indicate with an 
+C       Set left edge of extent of line and width and indicate with an
 C       asterisk. Set the arrays of X and Y values over the line extent
 C
 55      IGST=IA
@@ -340,7 +340,7 @@ C
         END DO
 C
 C       Set up some scaling parameters for peak position, height and width
-C       for the E04JBF optimization to ensure solution for values in range 
+C       for the E04JBF optimization to ensure solution for values in range
 C       -1...+1. Values postfixed by C
 C       are in COMMON
 C
@@ -348,7 +348,7 @@ C
         HNORM=1.1*HSTEP
         RANG=ABS(GXVALS(GX) - GXVALS(1))/2.
         RANGW=RANG/2.3540
-      
+
         NOCO=.FALSE.
         LLIM=.TRUE.
         GO TO 20
@@ -364,7 +364,7 @@ C
         CALL PGCURSE(XC,YC,CC)
         IP=NINT((XC-XVALS(1))/WID) + 1
 C
-C       Check that this position is inside line extent. 
+C       Check that this position is inside line extent.
 C
         IF (LLIM) THEN
           IF (IP.LT.IGST.OR.IP.GT.(IGST+GX-1)) THEN
@@ -399,7 +399,7 @@ C         Check that IGST and GX are reasonable. If not set to
 C         edges of spectrum but issue a warning
 C
           IF (IGST.LT.1.OR.IGST.GT.NX) THEN
-            CALL PAR_WRUSER('Warning! Left edge of line set to left' 
+            CALL PAR_WRUSER('Warning! Left edge of line set to left'
      :                      //' edge of spectrum',STATUS)
             IGST=1
           ENDIF
@@ -431,7 +431,7 @@ C
           END DO
 C
 C         Set up some scaling parameters for peak position, height and width
-C         for the E04JBF optimization to ensure solution for values in range 
+C         for the E04JBF optimization to ensure solution for values in range
 C         -1...+1. Values postfixed by C
 C         are in COMMON
 C
@@ -477,9 +477,9 @@ C       Form this line as GAUSUM
 C
         CALL GAUF2(GX,GXVALS,1,GINFP,GINFH,GINFW,GAUSUM)
 C
-C       Get residuals and rms on line fit plus mean error in terms 
+C       Get residuals and rms on line fit plus mean error in terms
 C       of error bar ( if applicable ). Set residual max and min
-C       to large and small numbers to prevent alteration of 
+C       to large and small numbers to prevent alteration of
 C       residual scaling
 C
         MILIM=-1.E30
@@ -497,7 +497,7 @@ C
 80    IF (KEY.EQ.NEW) THEN
 C
 C       NEW - introduce a first Gaussian at a position defined by cursor
-C   
+C
         IF (NG.GE.1) THEN
           CALL PAR_WRUSER('Line already set',STATUS)
           GO TO 20
@@ -505,11 +505,11 @@ C
         CALL PAR_WRUSER('Indicate position of line peak',STATUS)
 81      XC=XVALS(NX/2) ! Somewhere to put the cursor initially
         YC=ABS(HIGH-LOW)/2. + LOW
-        
+
         CALL PGCURSE(XC,YC,CC)
         IP=NINT((XC-XVALS(1))/WID) + 1
 C
-C  Check that this position is inside line extent. 
+C  Check that this position is inside line extent.
 C
         IF (LLIM) THEN
           IF (IP.LT.IGST.OR.IP.GT.(IGST+GX-1)) THEN
@@ -565,7 +565,7 @@ C
           END DO
 C
 C         Set up some scaling parameters for peak position, height and width
-C         for the E04JBF optimization to ensure solution for values in range 
+C         for the E04JBF optimization to ensure solution for values in range
 C         -1...+1. Values postfixed by C
 C         are in COMMON
 C
@@ -654,7 +654,7 @@ C
 C       Inch peak position, height or width of Gaussian no. CURRENT
 C       Valid responses are: P-100 to P100; H-100 to H100; W-100 to
 C       W100; S
-C       
+C
         IF (NG.EQ.0) THEN
           CALL PAR_WRUSER('No Gaussians to modify',STATUS)
           GO TO 20
@@ -689,7 +689,7 @@ C
           IF (RESP2 .NE. ' ') THEN
             READ(RESP2,FMT=*,ERR=106) RSTEP
           END IF
-          GINFW(CURRENT)=GINFW(CURRENT) + 
+          GINFW(CURRENT)=GINFW(CURRENT) +
      :                   ((RSTEP*WSTEP/100.)/2.3540)
           IF (GINFW(CURRENT).LT.(WID/2.3540)) THEN
             CALL PAR_WRUSER('FWHM less than one channel.'//
@@ -708,7 +708,7 @@ C
         GO TO 101
 201     CONTINUE
 C
-C       Erase previous Gaussian sum and plot out new profile 
+C       Erase previous Gaussian sum and plot out new profile
 C       without residuals
 C
         IF (IPOL.EQ.1) THEN
@@ -736,8 +736,8 @@ C
         IF (IPOL.EQ.2) THEN
           CALL GAUF2(GX,GXVALS,NG,GINFP,GINFH,GINFW,GAUSUM)
 C
-C       Get residuals and rms on line fit plus mean error in terms 
-C       of error bar ( if applicable ). If residuals larger than 
+C       Get residuals and rms on line fit plus mean error in terms
+C       of error bar ( if applicable ). If residuals larger than
 C       those previously plotted then redraw whole plot to encompass them
 C
           CALL RMSER(GX,GZVALS,GAUSUM,ERRUSE,NX,ERRORS,IGST,
@@ -779,7 +779,7 @@ C
         END IF
         GO TO 20
       END IF
-       
+
 110   IF (KEY.EQ.LIS) THEN
 C
 C       LIST Gaussians fitted so far
@@ -957,13 +957,13 @@ C
             ICHAINH(I)=0
             ICHAINW(I)=0
           ENDDO
-        ENDIF               
+        ENDIF
 C
-C       Determine what sort of weighting of residuals is required. 
+C       Determine what sort of weighting of residuals is required.
 C       Options are: N for none ( ie. unit weighting )
 C                    E for weighting by error values
 C                    S for weighting by values
-C       
+C
 142     CALL PAR_CNPAR('WGHT')
         CALL PAR_RDCHAR('WGHT','N',WGHT)
         IF (PAR_ABORT()) GO TO 999
@@ -1011,7 +1011,7 @@ C
           DO I=1,GX
             IF (ZVALS(I-1+IGST).EQ.0.0) THEN
               WHT(I)=1.0
-            ELSE 
+            ELSE
               WHT(I)=ABS(ZVALS(I-1+IGST))
             ENDIF
             TOTW=TOTW+WHT(I)
@@ -1031,7 +1031,7 @@ C       If sucessful fitting write out the results to the terminal.
 C
         IF (IFAIL2.EQ.0) THEN
           FINAL=.TRUE.
-          CALL PAR_WRUSER('Succesful fit. Gaussian fit parameters'// 
+          CALL PAR_WRUSER('Succesful fit. Gaussian fit parameters'//
      :            ' are:',STATUS)
         ELSE
           IF (IFAIL1.NE.0) THEN
@@ -1086,15 +1086,15 @@ C
             GO TO 147
           ENDIF
           EW=EW+(1. - (ZVALS(I)/CONVALS(I)))
-        END DO     
+        END DO
         EW=WID*EW
 C
 C       Form the total sum of the fitting Gaussians
 C
 147     CALL GAUF2(GX,GXVALS,NG,GONFP,GONFH,GONFW,GAUSUM)
 C
-C       Get residuals and rms on line fit plus mean error in terms 
-C       of error bar ( if applicable ). If residuals larger than 
+C       Get residuals and rms on line fit plus mean error in terms
+C       of error bar ( if applicable ). If residuals larger than
 C       those previously plotted then redraw whole plot to encompass them
 C
         CALL RMSER(GX,GZVALS,GAUSUM,ERRUSE,NX,ERRORS,IGST,
@@ -1128,7 +1128,7 @@ C
         CALL GAUF1(GX,GXVALS,ICST,NX,CX,IGST,CONVALS,NG,GONFP,
      :                  GONFH,GONFW,GAUSUM)
 C
-C       Plot this fit and its residuals 
+C       Plot this fit and its residuals
 C
         IF (ERASE) THEN
           LCON=.TRUE.
@@ -1147,7 +1147,7 @@ C
         IF (STATUS.NE.0) THEN
           CALL PAR_WRUSER('Error in plotting',STAT)
         END IF
-C 
+C
 C       Reset LLIM to false so that another line can be started as NEW
 C       if required
 C
@@ -1157,10 +1157,10 @@ C
 
 150   IF (KEY.EQ.RECAL) THEN
 C
-C       The data file giving the results of a previous fit to this line 
+C       The data file giving the results of a previous fit to this line
 C       is recalled and the Gaussians set by this fit. The parameters
 C       of the fit are written to the terminal and the result plotted.
-C 
+C
         IF (.NOT.LLIM) THEN
 C         Line extent must be demarcated by cursor first
           CALL PAR_WRUSER('Need to indicate line extent with cursor',
@@ -1177,7 +1177,7 @@ C       IF (.NOT.RECSTAT) THEN
         IF (RECSTAT.NE.0) THEN
           CALL PAR_WRUSER('Unable to get logical unit for file',
      :                    STATUS)
-          GO TO 20  
+          GO TO 20
         END IF
 C
 C       Prompt for name of data file. Check that it exists. If so
@@ -1222,13 +1222,13 @@ C
           READ(LUR,151) RUBB
           READ(LUR,151) RUBB
 C
-C         Read the Gaussian fit parameters 
+C         Read the Gaussian fit parameters
 C
           READ(LUR,153,ERR=168,END=166) GINFP(1),GINFH(1),GINFW(1),
      :     RUB,RUB,RUB,RUB,RUBI,RUB,RUB
 C
-C         Check that the centre position of this line lies in the 
-C         range of values for the line extent. If not issue a warning 
+C         Check that the centre position of this line lies in the
+C         range of values for the line extent. If not issue a warning
 C         and don't include this Gaussian in the GINF arrays
 C
           J=1
@@ -1243,7 +1243,7 @@ C
             I=1
           ENDIF
           J=2
-          DO WHILE (.TRUE.) 
+          DO WHILE (.TRUE.)
             READ(LUR,154,ERR=168,END=166) GINFP(I),GINFH(I),GINFW(I),
      :             RUB
             LG=NINT((GINFP(I)-GXVALS(1))/WID)
@@ -1258,12 +1258,12 @@ C
             J=J+1
           END DO
 151       FORMAT(A132)
-152       FORMAT(A17,A32) 
+152       FORMAT(A17,A32)
 153       FORMAT(1X,F12.3,1X,E14.4,1X,F10.4,1X,E12.4,1X,F10.3,1X,
      :         E11.4,1X,F10.4,6X,I5,4X,F8.3,4X,F8.3)
 154       FORMAT(1X,F12.3,1X,E14.4,1X,F10.4,1X,E12.4)
 166       CLOSE(UNIT=LUR)
-          NG=I-1 
+          NG=I-1
 C
 C         Make sure at least one Gaussian has been recalled
 C
@@ -1296,7 +1296,7 @@ C
               GO TO 167
             ENDIF
             EW=EW+(1. - (ZVALS(I)/CONVALS(I)))
-          END DO     
+          END DO
           EW=WID*EW
 C
 C         Get the rms on this fit and write the results to the terminal
@@ -1337,7 +1337,7 @@ C
             CALL PAR_WRUSER('Error in plotting',STAT)
           END IF
         ELSE
-          CALL PAR_WRUSER('Data file not found',STAT) 
+          CALL PAR_WRUSER('Data file not found',STAT)
         END IF
         GO TO 20
 C
@@ -1346,7 +1346,7 @@ C
 168     CALL PAR_WRUSER('Error reading data',STAT)
         GO TO 20
       ENDIF
-        
+
 170   IF (KEY.EQ.IHARD) THEN
 C
 C       Make a HARD copy plot of the fit. Check that there is at least
@@ -1355,7 +1355,7 @@ C       been fitted
 C
         IF (NG.GT.0) THEN
           LCON=.TRUE.
-          CRES=.TRUE. 
+          CRES=.TRUE.
           GRES=.TRUE.
           GTOT=.TRUE.
           GALL=.TRUE.
@@ -1378,7 +1378,7 @@ C
 C       Gaussian and continuum fit to be saved on a file on quitting
 C       from the main subroutine. Copy continuum values and final
 C       fit on continuum ( GAUSUM ) into array FITTOT. If no lines
-C       fitted then just copy continuum fit to FITTOT. Set the logical 
+C       fitted then just copy continuum fit to FITTOT. Set the logical
 C       variable SAVE so that FITTOT for the current fitted section will
 C       be copied to an array which is written out as a file on exit from
 C       the program
@@ -1417,7 +1417,7 @@ C
         ENDIF
         IF (.NOT.LWRIT.AND.LREC) THEN
 C
-C         Results not written to data file ( no optimization performed ), 
+C         Results not written to data file ( no optimization performed ),
 C         yet required. Form the total sum of the fitting Gaussians
 C         and calculate rms and equivalent width and record
 C
@@ -1439,7 +1439,7 @@ C
               GO TO 192
             ENDIF
             EW=EW+(1. - (ZVALS(I)/CONVALS(I)))
-          END DO     
+          END DO
           EW=WID*EW
 
 192       CALL GAUS_RECORD(NG,GINFP,GINFH,GINFW,EW,RMS,MERR,ORD,SIG,
@@ -1463,7 +1463,7 @@ C
         ENDIF
         IF (.NOT.LWRIT.AND.LREC) THEN
 C
-C         Results not written to data file ( no optimization performed ), 
+C         Results not written to data file ( no optimization performed ),
 C         yet required. Form the total sum of the fitting Gaussians
 C         and calculate rms and equivalent width and record
 C
@@ -1485,7 +1485,7 @@ C
               GO TO 202
             ENDIF
             EW=EW+(1. - (ZVALS(I)/CONVALS(I)))
-          END DO     
+          END DO
           EW=WID*EW
 
 202       CALL GAUS_RECORD(NG,GINFP,GINFH,GINFW,EW,RMS,MERR,ORD,SIG,

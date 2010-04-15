@@ -136,10 +136,10 @@ itcl::class gaia::StarArdAnnList {
          set objects_($selected_) [code $local_objects_($selected_)]
 
          #  Create with or without resizing as appropriate.
-         if { $resize } { 
+         if { $resize } {
             $local_objects_($selected_) create_and_resize \
                [code $this created_object $selected_]
-         } else { 
+         } else {
             $local_objects_($selected_) createard "$desc"
          }
       } else {

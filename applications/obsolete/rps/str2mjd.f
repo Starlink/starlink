@@ -6,7 +6,7 @@
       CHARACTER*11 DSTRING
 *   Output :
       DOUBLE PRECISION MJD
- 
+
 
 *  History
 *     1992 DEC		M DUESTERHAUS   CREATE ORIGINAL

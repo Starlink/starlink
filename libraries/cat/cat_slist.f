@@ -83,12 +83,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -122,7 +122,7 @@
       INTEGER
      :  SI,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
@@ -166,7 +166,7 @@
 *          appropriate.
 
             CALL CAT1_CRTAR (NUMSEL, '_INTEGER', SELPTR, STATUS)
-            CALL CAT1_CATRA (CI, NUMSEL, SELIST, %VAL(CNF_PVAL(SELPTR)), 
+            CALL CAT1_CATRA (CI, NUMSEL, SELIST, %VAL(CNF_PVAL(SELPTR)),
      :                       STATUS)
 
 *
@@ -189,7 +189,7 @@
                CALL CAT1_CRTAR (ROWS, '_INTEGER', WKPTR1, STATUS)
                CALL CAT1_CRTAR (ROWS, '_INTEGER', WKPTR2, STATUS)
 
-               CALL CAT1_RJLST (NUMSEL, SELIST, ROWS, 
+               CALL CAT1_RJLST (NUMSEL, SELIST, ROWS,
      :                          %VAL(CNF_PVAL(WKPTR1)),
      :           NUMREJ, %VAL(CNF_PVAL(WKPTR2)), STATUS)
 

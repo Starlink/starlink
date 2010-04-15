@@ -20,7 +20,7 @@ C     (<) BUFF       (Character) Buffer for one header line
 C
 C     Defined in the file COMB.INC
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     ICH_FOLD     (ICH package) Convert string to upper case.
 C

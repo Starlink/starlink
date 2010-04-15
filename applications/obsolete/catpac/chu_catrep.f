@@ -49,7 +49,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -70,13 +70,13 @@
 
 *  External references :
       INTEGER
-     :  CHR_LEN,       ! Length of character string   
+     :  CHR_LEN,       ! Length of character string
      :  CHR_INDEX      ! Position of character in string
 
 *  Local variables :
       LOGICAL MORE
       LOGICAL PAUSE
-      CHARACTER 
+      CHARACTER
      :  FILENAME*(CHP__SZNAME),      ! Name of input catalogue
      :  NEWNAME*(20),      ! Name of input catalogue
      :  CATIN*(CHP__SZNAME),      ! Name of input catalogue
@@ -92,10 +92,10 @@
      :  PAD,           ! Spacing for centring title
      :  NAMLEN,        ! Length of catalogue name
      :  CURCOL,        ! Current field number
-     :  LENNAM,        ! Length of field name character string 
+     :  LENNAM,        ! Length of field name character string
      :  LENUNT,        ! Length of units character string
      :  LENVAL,        ! Length of value character string
-     :  LNFRMT,        ! Length of null format string  
+     :  LNFRMT,        ! Length of null format string
      :  NUMREC,        ! Record number
      :  MARK,          ! Position of '!' in value character string
      :  WRSTAT,        ! Status for write
@@ -117,7 +117,7 @@
      :  LENNFT,
      :  ENDNFT,
      :  WIDTH
-      INTEGER 
+      INTEGER
      :  TABNUMCOL,
      :  TEMPNUMCOL,
      :  ROWCOUNT,
@@ -128,7 +128,7 @@
      :  NUMROW,
      :  I
       REAL
-     :  RVALUE         ! Real value of field 
+     :  RVALUE         ! Real value of field
       LOGICAL
      :  MAXWD
       character*(chp__szcfmt) remfmats(chp__numcols)
@@ -174,7 +174,7 @@
 *
 *   Initialse
 *
-  
+
       SPACE = 1
       IF (SCREEN) THEN
         BUFLEN = 80
@@ -189,7 +189,7 @@
       ENDDO
 *
 *
-      CALL CHP_GALLCD(INPUT, TABNUMCOL, TABNAMES, CFORMATS, 
+      CALL CHP_GALLCD(INPUT, TABNUMCOL, TABNAMES, CFORMATS,
      : CUNITS, CCOMMENTS, PREFDIS, COLTYPES, COLDES, ARRSHP, ARRDIM,
      : ASSERT, ASSEXP, DOMCHK, CMDATAACC, CDATAACC,DATELM, VCFLAG,
      : VCEXP, DELIND, NSFLAG, STATUS)
@@ -203,11 +203,11 @@
         IF (ALL) THEN
           NUMCOL = 1
           DO CLOOP = 1 ,TABNUMCOL
-              CALL CHU_NSPFMAT(CFORMATS(CLOOP), NSFMATFLAG, PRINTFMAT, 
+              CALL CHU_NSPFMAT(CFORMATS(CLOOP), NSFMATFLAG, PRINTFMAT,
      :                         STATUS)
               IF (NSFMATFLAG) THEN
                 CFORMATS(CLOOP) = PRINTFMAT
-              ENDIF 
+              ENDIF
               NFRMT = CFORMATS(CLOOP)
               REMFMATS(NUMCOL) = NFRMT
               LENNFT = CHR_LEN (NFRMT)
@@ -225,12 +225,12 @@
 
                 LENNAM = CHR_LEN (TABNAMES(CLOOP))
                 LENUNT = CHR_LEN (CUNITS(CLOOP))
-                CWIDTH(CLOOP) = MAX(LENCOL,LENNAM,LENUNT) 
-                WIDTH = WIDTH + SPACE + CWIDTH(CLOOP) 
+                CWIDTH(CLOOP) = MAX(LENCOL,LENNAM,LENUNT)
+                WIDTH = WIDTH + SPACE + CWIDTH(CLOOP)
              ELSE
                 CWIDTH(CLOOP) = LENCOL
-                WIDTH = WIDTH + SPACE + CWIDTH(CLOOP) 
-             END IF 
+                WIDTH = WIDTH + SPACE + CWIDTH(CLOOP)
+             END IF
 *
 *       Check if this field will fit on to the page
 *
@@ -248,18 +248,18 @@
 *  Loop through the columns to be reported an find the formats from the info
 *  obout the columns in the table.
 *
-*              If field is not a character string change field 
+*              If field is not a character string change field
 *              length to that given by format
 *
         TEMPNUMCOL = 1
         DO CCOUNT = 1, NUMCOL
           DO CLOOP = 1 ,TABNUMCOL
             IF (CNAMES(CCOUNT) .EQ. TABNAMES(CLOOP)) THEN
-              CALL CHU_NSPFMAT(CFORMATS(CLOOP), NSFMATFLAG, PRINTFMAT, 
+              CALL CHU_NSPFMAT(CFORMATS(CLOOP), NSFMATFLAG, PRINTFMAT,
      :                         STATUS)
               IF (NSFMATFLAG) THEN
                 CFORMATS(CLOOP) = PRINTFMAT
-              ENDIF 
+              ENDIF
               NFRMT = CFORMATS(CLOOP)
               REMFMATS(TEMPNUMCOL) = NFRMT
               LENNFT = CHR_LEN (NFRMT)
@@ -272,17 +272,17 @@
               END IF
 
              IF (HEADER) THEN
-   
+
               LENNAM = CHR_LEN (CNAMES(CCOUNT))
-              CWIDTH(CCOUNT) = MAX(LENCOL,LENNAM,LENUNT) 
-              WIDTH = WIDTH + SPACE + CWIDTH(CCOUNT) 
+              CWIDTH(CCOUNT) = MAX(LENCOL,LENNAM,LENUNT)
+              WIDTH = WIDTH + SPACE + CWIDTH(CCOUNT)
              ELSE
               CWIDTH(CCOUNT) = LENCOL
-              WIDTH = WIDTH + SPACE + CWIDTH(CCOUNT) 
-             END IF 
+              WIDTH = WIDTH + SPACE + CWIDTH(CCOUNT)
+             END IF
 *
 *       Check if this field will fit on to the page
-*  
+*
              IF (WIDTH .GT. BUFLEN) THEN
                CALL MSG_OUT ('MESSAGE 1','Excess fields', STATUS)
                MAXWD = .TRUE.
@@ -321,17 +321,17 @@
                CALL CHR_PUTC('List of named columns '/
      :              /'for catalogue ', TITLE, POS)
                NAMLEN = CHR_LEN (CATIN)
-               CALL CHR_PUTC (CATIN(1:NAMLEN), TITLE, 
+               CALL CHR_PUTC (CATIN(1:NAMLEN), TITLE,
      :            POS)
                CALL CHR_PUTC ('.', TITLE, POS)
 *               centre title
                PAD                 = (BUFLEN - POS)/2
                TITLE(PAD+1:BUFLEN) = TITLE(1:POS)
-               TITLE(1:PAD)        = ' ' 
+               TITLE(1:PAD)        = ' '
 
 *               output the title to file and/or environment
-               CALL CHU_PTLST (TITLE(1:BUFLEN), SCREEN, 
-     :              FD, STATUS)    
+               CALL CHU_PTLST (TITLE(1:BUFLEN), SCREEN,
+     :              FD, STATUS)
              END IF
 
 *           output blank line between title and field names
@@ -340,16 +340,16 @@
 
 *           assemble list of field names, right hand justify
              POS = -1 * SPACE
-              
+
              DO CURCOL = 1, NUMCOL
                 LENNAM = CHR_LEN(REQCNAMES(CURCOL))
                 POS = POS + CWIDTH(CURCOL) + SPACE - LENNAM
                 CALL CHR_PUTC (REQCNAMES(CURCOL)(1:LENNAM), BUFFER, POS)
-             END DO     
+             END DO
 
 *           output the list to file and/or environment
-             CALL CHU_PTLST (BUFFER(1:POS), SCREEN, FD, 
-     :          STATUS)    
+             CALL CHU_PTLST (BUFFER(1:POS), SCREEN, FD,
+     :          STATUS)
 
 
          END IF
@@ -371,9 +371,9 @@
          CALL CHP_GDNAC(INPUT, CATNUMCOL, CATCNAMES, COLTYPES, COLDES,
      :  CHARVALS,
      :  DOUBVALS, INTVALS, LOGVALS, REALVALS, PTRVALS, NULLVALS,
-     :  STATUS) 
+     :  STATUS)
 *
-*   Loop through the fields getting the values an putting them into the 
+*   Loop through the fields getting the values an putting them into the
 *   output buffer using the formats we found earlier.
 *
         BUFFER = ' '
@@ -389,33 +389,33 @@
      : CHARVALS(CATCCOUNT)
 
              ELSEIF (COLTYPES(CATCCOUNT) .EQ. 'D') THEN
-                WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS) 
+                WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS)
      : DOUBVALS(CATCCOUNT)
               ELSEIF (COLTYPES(CATCCOUNT) .EQ. 'I') THEN
-                WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS) 
+                WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS)
      : INTVALS(CATCCOUNT)
               ELSEIF (COLTYPES(CATCCOUNT) .EQ. 'L') THEN
                 WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS)
      :  LOGVALS(CATCCOUNT)
               ELSEIF (COLTYPES(CATCCOUNT) .EQ. 'R') THEN
-                WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS) 
+                WRITE (VALUE(CCOUNT), CURFMAT, IOSTAT=STATUS)
      :  REALVALS(CATCCOUNT)
               ENDIF
-* 
+*
               LENVAL = CHR_LEN (VALUE(CCOUNT))
 
 *                   add value to output buffer
 *
               POS = POS + CWIDTH(CCOUNT) + SPACE - LENVAL
-              CALL CHR_PUTC (VALUE(CCOUNT)(1:LENVAL), BUFFER, 
+              CALL CHR_PUTC (VALUE(CCOUNT)(1:LENVAL), BUFFER,
      :                  POS)
             ENDIF
           ENDDO
         ENDDO
 *  output the buffer to file and/or environment
 
-        CALL CHU_PTLST (BUFFER(1:POS), SCREEN, FD, 
-     :              STATUS)    
+        CALL CHU_PTLST (BUFFER(1:POS), SCREEN, FD,
+     :              STATUS)
            ELSE
              ROWCOUNT = NUMROW
            ENDIF
@@ -427,7 +427,7 @@
          ENDIF
        END DO
        IF (.NOT. SCREEN) THEN
-         CALL FIO_CLOSE(FD, STATUS)  
+         CALL FIO_CLOSE(FD, STATUS)
        ENDIF
       END IF
       END

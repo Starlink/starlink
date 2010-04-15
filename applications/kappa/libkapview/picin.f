@@ -44,37 +44,37 @@
 *        Name of the graphics device about which information is
 *        required. [Current graphics device]
 *     DOMAIN = LITERAL (Write)
-*        The Domain name of the current co-ordinate Frame for the picture.  
+*        The Domain name of the current co-ordinate Frame for the picture.
 *     EPOCH = _DOUBLE (Read)
-*        If a "Sky Co-ordinate System" specification is supplied (using 
-*        parameter FRAME) for a celestial co-ordinate system, then an 
-*        epoch value is needed to qualify it. This is the epoch at 
-*        which the displayed sky co-ordinates were determined. It should 
-*        be given as a decimal years value, with or without decimal places 
-*        ("1996.8" for example). Such values are interpreted as a Besselian 
-*        epoch if less than 1984.0 and as a Julian epoch otherwise. 
+*        If a "Sky Co-ordinate System" specification is supplied (using
+*        parameter FRAME) for a celestial co-ordinate system, then an
+*        epoch value is needed to qualify it. This is the epoch at
+*        which the displayed sky co-ordinates were determined. It should
+*        be given as a decimal years value, with or without decimal places
+*        ("1996.8" for example). Such values are interpreted as a Besselian
+*        epoch if less than 1984.0 and as a Julian epoch otherwise.
 *     FRAME = LITERAL (Read)
 *        A string determining the co-ordinate Frame in which the bounds
 *        of the picture are to be reported. When a picture is
-*        created by an application such as PICDEF, DISPLAY, etc, WCS 
-*        information describing the available co-ordinate systems are stored 
-*        with the picture in the graphics database. This application can 
+*        created by an application such as PICDEF, DISPLAY, etc, WCS
+*        information describing the available co-ordinate systems are stored
+*        with the picture in the graphics database. This application can
 *        report bounds in any of the co-ordinate Frames stored with the
-*        current picture. The string supplied for FRAME can be one of the 
+*        current picture. The string supplied for FRAME can be one of the
 *        following:
 *
-*        - A domain name such as SKY, AXIS, PIXEL, BASEPIC, NDC, CURPIC, etc. 
-*        The special domain AGI_WORLD is used to refer to the world co-ordinate 
-*        system stored in the AGI graphics database. This can be useful if 
+*        - A domain name such as SKY, AXIS, PIXEL, BASEPIC, NDC, CURPIC, etc.
+*        The special domain AGI_WORLD is used to refer to the world co-ordinate
+*        system stored in the AGI graphics database. This can be useful if
 *        no WCS information was store with the picture when it was created.
 *
 *        - An integer value giving the index of the required Frame.
 *
-*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
 *        section "Sky Co-ordinate Systems" in SUN/95).
 *
-*        If a null value (!) is supplied, bounds are reported in the 
-*        co-ordinate Frame which was current when the picture was created. 
+*        If a null value (!) is supplied, bounds are reported in the
+*        co-ordinate Frame which was current when the picture was created.
 *        [!]
 *     LABEL = LITERAL (Write)
 *        The label of the picture.  It is blank if there is no label.
@@ -85,23 +85,23 @@
 *     PNAME = LITERAL (Write)
 *        The name of the picture.
 *     REFNAM = LITERAL (Write)
-*        The reference object associated with the picture.  It is blank if 
+*        The reference object associated with the picture.  It is blank if
 *        there is no reference object.  Up to 132 characters will be written.
 *     REPORT = _LOGICAL (Read)
-*        If this is FALSE details of the picture are not reported, merely the 
-*        results are written to the output parameters.  It is intended for 
+*        If this is FALSE details of the picture are not reported, merely the
+*        results are written to the output parameters.  It is intended for
 *        use within procedures. [TRUE]
 *     X1 = LITERAL (Write)
-*        The lowest value found within the  picture for axis 1 of the 
+*        The lowest value found within the  picture for axis 1 of the
 *        requested co-ordinate Frame (see parameter FRAME).
 *     X2 = LITERAL (Write)
-*        The highest value found within the  picture for axis 1 of the 
+*        The highest value found within the  picture for axis 1 of the
 *        requested co-ordinate Frame (see parameter FRAME).
 *     Y1 = LITERAL (Write)
-*        The lowest value found within the  picture for axis 2 of the 
+*        The lowest value found within the  picture for axis 2 of the
 *        requested co-ordinate Frame (see parameter FRAME).
 *     Y2 = LITERAL (Write)
-*        The highest value found within the  picture for axis 2 of the 
+*        The highest value found within the  picture for axis 2 of the
 *        requested co-ordinate Frame (see parameter FRAME).
 
 *  Examples:
@@ -120,7 +120,7 @@
 *     picin x1=(x1) x2=(x2) y1=(y1) y2=(y2)
 *        This reports the attributes of the last DATA picture within
 *        the current picture for the current graphics device.  The
-*        bounds of the current picture are written to the ICL 
+*        bounds of the current picture are written to the ICL
 *        variables: X1, X2, Y1, Y2.
 
 *  Notes:
@@ -172,7 +172,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -192,7 +192,7 @@
       CHARACTER LABEL*( DAT__SZNAM ) ! Picture label
       CHARACTER LFMT*80          ! Buffer for formatted lower axis value
       CHARACTER NAME*( DAT__SZNAM ) ! Picture name
-      CHARACTER REFNAM*132       ! Reference object's name 
+      CHARACTER REFNAM*132       ! Reference object's name
       CHARACTER SYM*30           ! Buffer for an axis symbol string
       CHARACTER TEXT*256         ! Buffer for a line of output text
       CHARACTER UFMT*80          ! Buffer for formatted upper axis value
@@ -249,7 +249,7 @@
 *  Should the current picture be included in the search?
       CALL PAR_GET0L( 'CURRENT', CURRNT, STATUS )
 
-*  Associate image display and start database activity.  
+*  Associate image display and start database activity.
       CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC, STATUS )
 
 *  Exclude the current picture if requested to do so by skipping on to
@@ -318,7 +318,7 @@
          ELSE
             CALL MSG_SETC( 'RNAME', REFNAM )
          END IF
-         
+
          IF( REPORT ) THEN
             CALL MSG_RENEW
             CALL MSG_OUT( 'REFNAME', 'Reference data object: ^RNAME',
@@ -341,14 +341,14 @@
 
 *  Select the Frame to be reported.
       CALL MSG_SETC( 'OBJ', 'current graphics database picture' )
-      CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IPLOT, ' ', ' ', .TRUE., 
+      CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IPLOT, ' ', ' ', .TRUE.,
      :                 '^OBJ', STATUS )
 
 *  Set a flag indicating whether the required Frame is the original
 *  Current Frame.
-      USECUR = AST_GETI( IPLOT, 'CURRENT', STATUS ) .EQ. ICURR 
+      USECUR = AST_GETI( IPLOT, 'CURRENT', STATUS ) .EQ. ICURR
 
-*  Get the bounds of the current PGPLOT window (i.e. the current picture), 
+*  Get the bounds of the current PGPLOT window (i.e. the current picture),
 *  and store double precision equivalents. These values are in GRAPHICS
 *  co-ordinates (i.e. mm from the bottom left corner of the display surface).
       CALL PGQWIN( X1, X2, Y1, Y2 )
@@ -358,7 +358,7 @@
       UBNDG( 2 ) = DBLE( Y2 )
 
 *  If required, report a description of the Frame being used.
-      IF( REPORT ) THEN 
+      IF( REPORT ) THEN
 
 *  See if a description of the Frame being used is required.
          CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
@@ -375,7 +375,7 @@
 *  not.
          IF( DESC ) THEN
             IF( USECUR ) THEN
-               CALL KPG1_DSFRM( IPLOT, '   Current co-ordinate Frame:', 
+               CALL KPG1_DSFRM( IPLOT, '   Current co-ordinate Frame:',
      :                          .TRUE., STATUS )
             ELSE
                CALL KPG1_DSFRM( IPLOT, '   Requested co-ordinate '//
@@ -389,12 +389,12 @@
       END IF
 
 *  Write the Domain of the Current Frame to an output parameter.
-      CALL PAR_PUT0C( 'DOMAIN', DOM0, STATUS )      
+      CALL PAR_PUT0C( 'DOMAIN', DOM0, STATUS )
 
 *  Get the Mapping from the Base (GRAPHICS) Frame in the Plot to the
 *  current (requested) Frame.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, 
-     :                                    AST__CURRENT, STATUS ), 
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE,
+     :                                    AST__CURRENT, STATUS ),
      :                    STATUS )
 
 *  Give a heading for the axis bounds.
@@ -407,10 +407,10 @@
 *  Loop round each axis in the requested Frame.
       DO IAXIS = 1, AST_GETI( IPLOT, 'NAXES', STATUS )
 
-*  Use the Mapping to determine the bounds of the PGPLOT window 
+*  Use the Mapping to determine the bounds of the PGPLOT window
 *  along this axis of the requested Frame.
-         CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., IAXIS, GLBND, 
-     :                    GUBND, XL, XU, STATUS ) 
+         CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., IAXIS, GLBND,
+     :                    GUBND, XL, XU, STATUS )
 
 *  Construct a string holding the axis number.
          TEXT = '      Axis '
@@ -425,7 +425,7 @@
          CALL CHR_APPND( ')', ATTR, JAT )
 
 *  Get the symbol string.
-         SYM = AST_GETC( IPLOT, ATTR( : JAT ), STATUS) 
+         SYM = AST_GETC( IPLOT, ATTR( : JAT ), STATUS)
 
 *  Remove any PGPLOT escape sequences.
          CALL KPG1_PGESC( SYM, STATUS )
@@ -440,39 +440,39 @@
          END IF
 
          IAT = IAT + 1
- 
+
 *  Format and append the lower bound value.
          LFMT = AST_FORMAT( IPLOT, IAXIS, GLBND, STATUS )
          CALL CHR_APPND( LFMT, TEXT, IAT )
 
-*  Add a delimiter string 
+*  Add a delimiter string
          CALL CHR_APPND( ' to', TEXT, IAT )
          IAT = IAT + 1
-         
+
 *  Format and append the upper bound value.
          UFMT = AST_FORMAT( IPLOT, IAXIS, GUBND, STATUS )
          CALL CHR_APPND( UFMT, TEXT, IAT )
 
 *  Display the text for this axis, if required.
-         IF( REPORT ) CALL MSG_OUT( 'PICIN_MSG8', TEXT( : IAT ), 
-     :                              STATUS ) 
+         IF( REPORT ) CALL MSG_OUT( 'PICIN_MSG8', TEXT( : IAT ),
+     :                              STATUS )
 
 *  Store the first two axis values in the output parameters.
          IF( IAXIS .EQ. 1 ) THEN
             CALL PAR_PUT0C( 'X1', LFMT, STATUS )
             CALL PAR_PUT0C( 'X2', UFMT, STATUS )
-            
+
          ELSE IF( IAXIS .EQ. 2 ) THEN
             CALL PAR_PUT0C( 'Y1', LFMT, STATUS )
             CALL PAR_PUT0C( 'Y2', UFMT, STATUS )
 
-         END IF        
+         END IF
 
       END DO
 
       IF( REPORT ) CALL MSG_BLANK( STATUS )
 
-*  Close down the database and device. 
+*  Close down the database and device.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  End the AST context.

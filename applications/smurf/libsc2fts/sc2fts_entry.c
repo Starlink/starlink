@@ -17,7 +17,7 @@
 
 *  Arguments:
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *
@@ -112,7 +112,7 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   /* Get group of output files */
   kpg1Gtgrp( "OUT",  &ogrp, &ksize, status );
 
-  /* Get the value for PARSLIST */ 
+  /* Get the value for PARSLIST */
   kpg1Gtgrp( "PARSLIST", &parsgrp, &ksize, status );
 
   /* convert the value from Grp into Keymap */
@@ -129,8 +129,8 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
     pname = oname;
     grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
 
-    if( strcmp(iname, oname)!=0 ) /* when input and output files are not the same, 
-                                   * populate the output file with data from input file 
+    if( strcmp(iname, oname)!=0 ) /* when input and output files are not the same,
+                                   * populate the output file with data from input file
                                    */
     {
       /* start of NDF */
@@ -144,7 +144,7 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
 
       /* Close output file */
       ndfAnnul( &ondf, status );
-      
+
       /* end of NDF */
       ndfEnd( status );
     }
@@ -152,8 +152,8 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
 
   for( i=0; i<sizeof(sc2fts_cal)/sizeof(sc2fts_cal[0]); i++ )
   {
-    /* the key/value pair in parsKeymap: op.key=value 
-     * astMapGet0A will get a Keymap for an operation 
+    /* the key/value pair in parsKeymap: op.key=value
+     * astMapGet0A will get a Keymap for an operation
      */
     if( astMapHasKey( parsKeymap, sc2fts_cal[i].name ) !=0 )
     {
@@ -167,8 +167,8 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
         (*(sc2fts_cal[i].op))( igrp, ogrp, NULL, status );
       }
     }
-  }   
-   
+  }
+
   if( igrp != NULL ) grpDelet( &igrp, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   printf("Implementation is under construction! \n");

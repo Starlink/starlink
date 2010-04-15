@@ -26,7 +26,7 @@
 *     For every column
 *       Check the data type of the column, and for the appropriate
 *       data type:
-*         Get the value for the current field from the input 
+*         Get the value for the current field from the input
 *         catalogue.
 *         Put the value to the current field in the output catalogue.
 *       end case
@@ -63,7 +63,7 @@
 
 *
 *    The following values hold the value read (and written) for the
-*    current field.  There are values for each of the data types 
+*    current field.  There are values for each of the data types
 *    supported by SCAR/ADC.
 
       BYTE             VALUEB

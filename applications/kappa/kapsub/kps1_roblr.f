@@ -144,13 +144,13 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAE global constants
- 
+
 *  Arguments Given:
       INTEGER NUMRA
       INTEGER LONG
@@ -162,14 +162,14 @@
       INTEGER ODIM1
       INTEGER ODIM2
       REAL ARRIN( IDIM1, IDIM2 )
- 
+
 *  Arguments Returned:
       REAL ARROUT( ODIM1, ODIM2 )
       REAL WORK( ROTSIZ, ROTSIZ )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER ENDL               ! Position of last rotation box along
                                  ! longer side
@@ -178,68 +178,68 @@
       INTEGER INDEXL             ! Pointer to subsection, long dimension
       INTEGER INDEXS             ! Pointer to subsection, short
                                  ! dimension
- 
+
 *.
- 
+
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set up the positions of the last rotation box along longer and
 *  shorter dimensions.
       ENDL = LONG  + 1 - ROTSIZ
       ENDS = SHORT + 1 - ROTSIZ
- 
+
 *  Rotate the array as a number of ROTSIZ by ROTSIZ boxes move along
 *  the longer side.
       DO INDEXL = 1, ENDL, ROTSIZ
- 
+
 *  Move along shorter side
          DO  INDEXS = 1, ENDS, ROTSIZ
- 
+
             CALL KPS1_RORBR( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
      :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
      :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
          END DO
- 
+
 *  Check for unrotated data along the shorter side of the input array.
          IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
- 
+
 *  The pointer is set to position of the last rotation box along the
 *  shorter side.
             INDEXS = ENDS
- 
+
             CALL KPS1_RORBR( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
      :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
      :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
          END IF
       END DO
- 
+
 *  Check for unrotated data along the longer side of the input array.
       IF ( MOD( LONG, ROTSIZ ) .NE. 0 ) THEN
- 
+
 *  The pointer is set to the position of the last rotation box along
 *  the longer side.
          INDEXL = ENDL
- 
+
 *  Move along the shorter side.
          DO INDEXS = 1, ENDS, ROTSIZ
- 
+
             CALL KPS1_RORBR( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
      :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
      :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
          END DO
- 
+
 *  Check for unrotated data along the shorter side of the input array.
          IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
- 
+
 *  The pointer is set to the position of the last rotation box along
 *  the shorter side.
             INDEXS = ENDS
- 
+
             CALL KPS1_RORBR( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
      :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
      :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
          END IF
       END IF
- 
+
       END

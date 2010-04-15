@@ -7,7 +7,7 @@
  *
  ******************************************************************************
  */
- 
+
 /*
  * Possible actions for *_interpret functions
  */
@@ -20,7 +20,7 @@
  *
  * The *_interpret routines keep track of the procedure and function names
  * which have been called. If an exception occurs, this stack is not popped
- * until the exception is handled. This allows a stack trace to be printed if 
+ * until the exception is handled. This allows a stack trace to be printed if
  * the exception is not handled.
  * Some things use the call_stack when formatting exceptions in order to insert
  * a name.
@@ -35,7 +35,7 @@
  *
  * The arguments to a PROC or function are passed in a global array arglist[].
  * arglist[] contains the arguments and nargs how many there are.
- * all_args is a pointer to the parse tree which contained them, as this is 
+ * all_args is a pointer to the parse tree which contained them, as this is
  * sometimes useful for passing them on elsewhere.
  *
  ******************************************************************************

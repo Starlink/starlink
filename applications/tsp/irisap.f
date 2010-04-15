@@ -9,16 +9,16 @@ C
 C     Function:
 C        Measure polarization within an aperture for IRIS data
 C
-C     Description:                           
+C     Description:
 C        IRISAP reduces data obtained with the AAT IRIS polarimeter
 C        using the wollaston  prism polarizer. The data for a
 C        single observation consists of four Figaro files containing the
 C        frames for plate position 0, 45, 22.5 and 67.5 degrees. Within each
-C        frame are selected two star images corresponding to the O and E rays 
+C        frame are selected two star images corresponding to the O and E rays
 C        for the same star. The polarization is derived for these
 C
 C        Two different algorithms may be selected for the polarimetry
-C        reduction. The two algorithms differ in the method used to 
+C        reduction. The two algorithms differ in the method used to
 C        compensate for transparency variations between the observations
 C        at the two plate positions.
 C
@@ -41,7 +41,7 @@ C
 C-
 C
 C  History:
-C    3/5/1993   Original Version.   JAB/AAO 
+C    3/5/1993   Original Version.   JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
 C
 
@@ -58,10 +58,10 @@ C
 
 *  Number of elements in data arrays
       INTEGER NDIM, DIMS(7),DIMS2(7)
-                       
+
 
 *  Extraction parameters
-      INTEGER XSEP,YSEP        
+      INTEGER XSEP,YSEP
       REAL X,Y,R
 
 *  HDS locators
@@ -82,7 +82,7 @@ C
       CALL PAR_GET0C('POS1',FNAME,STATUS)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME,STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -94,7 +94,7 @@ C
             CALL MSG_OUT(' ','Dimensions of Input File Invalid',
      :          STATUS)
             GOTO 100
-         ELSE                   
+         ELSE
 
 *  Map the data
 
@@ -145,7 +145,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -178,9 +178,9 @@ C
              CALL DSA_NAMED_INPUT('INPUT3',FNAME,STATUS)
              IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
-               GOTO 100 
+               GOTO 100
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -215,7 +215,7 @@ C
                CALL MSG_OUT(' ','Error accessing frame',STATUS)
                STATUS = USER__001
              ENDIF
-      
+
 *  Get the data array
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -262,10 +262,10 @@ C
 
 *  Check them for validity
 
-             
+
 *  Reduce the data (This is equivalent to doing IRISSTOKES on each
 *  pair and then QUMERGE).
-      
+
              IF (STATUS .EQ. SAI__OK) THEN
 
 *  Call IRISSTOKES for the first pair of frames (0 and 45) and
@@ -283,19 +283,19 @@ C
           ENDIF
 
 *  Unmap input arrays
- 
+
       ENDIF
 100   CONTINUE
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
 
       SUBROUTINE TSP_IRISAP(IX,IY,I1,I2,I3,I4,X,Y,R,XSEP,YSEP,STATUS)
 *+
 *   Subroutine to do the aperture polarimetry
-*       
+*
 *
 *    (>) IX   (Integer)  First dimension of arrays
 *    (>) IY   (Integer)  Second dimension of arrays
@@ -351,7 +351,7 @@ C
            DO J=1,IY
 
 *  Only sum channels for which both intensities are good
-            IF (I1(I,J) .NE. VAL__BADR .AND. 
+            IF (I1(I,J) .NE. VAL__BADR .AND.
      :          I2(I,J) .NE. VAL__BADR .AND.
      :          I3(I,J) .NE. VAL__BADR .AND.
      :          I4(I,J) .NE. VAL__BADR) THEN
@@ -374,7 +374,7 @@ C
                 O3 = O3+I3(I,J)
                 O4 = O4+I4(I,J)
               ENDIF
-             
+
 
             ENDIF
            ENDDO

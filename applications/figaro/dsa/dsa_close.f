@@ -22,15 +22,15 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (!) STATUS       (Integer,ref) Status return code.  Note that
 C                      this routine, unlike almost all the other DSA_
-C                      routines, although it does not ignore the value 
+C                      routines, although it does not ignore the value
 C                      of STATUS passed to it, does not return immediately
-C                      if passed bad status, so will always shutdown the 
+C                      if passed bad status, so will always shutdown the
 C                      DSA_ system.
 C
 C  External variables used -
 C     Only common variables internal to the DSA_ system.
 C
-C  External subroutines / functions used: 
+C  External subroutines / functions used:
 C     DSA_UNMAP, DSA_FREE_WORKSPACE, DSA_WRUSER, DSA_WRNAME
 C     DTA_FRVAR, DTA_FCLOSE, DTA_ERROR, DTA_DLVAR, DTA_WRVARI, ICH_LEN
 C     DSA_FREE_LU, DSA_POST_PROCESS_FLAGGED_VALUES, DSA_RENAME_TEMP,
@@ -59,7 +59,7 @@ C    (!) MAP_CALL_USED (Logical array) Indicates table entry in use.
 C    (>) MAX_REFS      (Integer parameter) Maximum number of reference names.
 C    (!) REF_USED      (Logical array) Indicates reference slot in use.
 C    (>) REF_NAMES     (String array) Reference names in use.
-C    (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C    (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                      object corresponding to reference name.
 C    (>) MAX_WORK      (Integer parameter) Number of workspace slots available.
 C    (>) WORK_USED     (Logical array) Indicates workspace slot in use.
@@ -247,7 +247,7 @@ C
 C
 C     Rename any files that were given temporary names.
 C
-      CALL DSA_RENAME_TEMP(STATUS) 
+      CALL DSA_RENAME_TEMP(STATUS)
 C
 C     Flag the system as uninitialised
 C

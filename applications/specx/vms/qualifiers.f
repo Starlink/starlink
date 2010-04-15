@@ -8,7 +8,7 @@
 *        The old VMS routine had different calling arguments
 
 *-----------------------------------------------------------------------
-      SUBROUTINE QUALIFIERS (NO_DUMP, NEW_DUMP, DUMPNAME, 
+      SUBROUTINE QUALIFIERS (NO_DUMP, NEW_DUMP, DUMPNAME,
      &                       NO_MAP,  NEW_MAP,  MAPNAME)
 
 *  Routine to fetch dump and map qualifiers from SPECX command line.

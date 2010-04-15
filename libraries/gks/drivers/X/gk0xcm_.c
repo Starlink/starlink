@@ -50,7 +50,7 @@ f77_integer gk0xcm_(flag, index, red, green, blue)
 {
   char
     *calloc();				/* For allocating colourmap space */
-  
+
   f77_integer
     gk0xcc_();				/* Maps GKS to SunView colour indices */
 

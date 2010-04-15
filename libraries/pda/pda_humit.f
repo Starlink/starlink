@@ -79,8 +79,8 @@ c  ***  no intrinsic functions  ***
 c
 c  ***  external functions and subroutines  ***
 c
-      external pda_assst, pda_deflt, pda_dotprd, pda_dupdu, pda_gqtst, 
-     1         pda_itsum, pda_parck, pda_reldst, spda_lvmul, pda_stopx, 
+      external pda_assst, pda_deflt, pda_dotprd, pda_dupdu, pda_gqtst,
+     1         pda_itsum, pda_parck, pda_reldst, spda_lvmul, pda_stopx,
      1         pda_vaxpy, pda_vcopy, pda_vscopy, pda_v2norm
       logical pda_stopx
       double precision pda_dotprd, pda_reldst, pda_v2norm
@@ -323,7 +323,7 @@ c
       dg1 = iv(dg)
       l = iv(lmat)
       w1 = iv(w)
-      call pda_gqtst(d, v(dg1), h, iv(kagqt), v(l), n, v(step1), v, 
+      call pda_gqtst(d, v(dg1), h, iv(kagqt), v(l), n, v(step1), v,
      1               v(w1))
       if (iv(irc) .eq. 6) go to 210
 c

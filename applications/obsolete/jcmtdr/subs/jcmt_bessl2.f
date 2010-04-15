@@ -1,5 +1,5 @@
-      SUBROUTINE JCMT_BESSEL_REGRID_2 (ZIN, WEIGHT_IN, FBAD, X, Y, NPIX, 
-     :   PIXSPACE, NI, NJ, ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN, 
+      SUBROUTINE JCMT_BESSEL_REGRID_2 (ZIN, WEIGHT_IN, FBAD, X, Y, NPIX,
+     :   PIXSPACE, NI, NJ, ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN,
      :   CONV_SUM, CONV_WEIGHT, STATUS)
 *+
 *  Name:
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE JCMT_BESSEL_REGRID_2 (ZIN, WEIGHT_IN, FBAD, X, Y, NPIX, 
-*    :   PIXSPACE, NI, NJ, ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN, 
+*     SUBROUTINE JCMT_BESSEL_REGRID_2 (ZIN, WEIGHT_IN, FBAD, X, Y, NPIX,
+*    :   PIXSPACE, NI, NJ, ICEN, JCEN, XCEN, YCEN, TOT_WEIGHT_IN,
 *    :   CONV_SUM, CONV_WEIGHT, STATUS)
 
 *  Description:
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -100,10 +100,10 @@
       DOUBLE PRECISION PDA_DBESJ1                ! NAG Bessel function
 
 *  Local Constants:
-      INTEGER WTRESOL                            ! number of subpixel 
+      INTEGER WTRESOL                            ! number of subpixel
       PARAMETER (WTRESOL = 200)                  ! interpolations of the
                                                  ! weighting function
-      INTEGER WTPIXMAX                           ! maximum number of pixels 
+      INTEGER WTPIXMAX                           ! maximum number of pixels
       PARAMETER (WTPIXMAX = 7)                   ! that the weighting function
                                                  ! extends to
 
@@ -112,7 +112,7 @@
       INTEGER ISTART
       INTEGER IOUT, JOUT                         ! loop counters
       INTEGER PIX                                ! current input pixel number
-      INTEGER INEAR                              ! x index of nearest output 
+      INTEGER INEAR                              ! x index of nearest output
                                                  !   pixel
       INTEGER JNEAR                              ! y index of nearest output
                                                  !   pixel
@@ -120,7 +120,7 @@
       DOUBLE PRECISION XINC                      ! x-axis pixel increment
       DOUBLE PRECISION YINC                      ! y-axis pixel increment
       DOUBLE PRECISION WTFN (WTPIXMAX * WTRESOL) ! weighting function
-      DOUBLE PRECISION WT                        ! value of weighting function 
+      DOUBLE PRECISION WT                        ! value of weighting function
                                                  ! at output pixel
       DOUBLE PRECISION XPIX, YPIX                ! position of output pixel
       DOUBLE PRECISION XIN, YIN                  ! position of input pixel
@@ -130,7 +130,7 @@
                                                  ! function array corresponding
                                                  ! to RPIX
       DOUBLE PRECISION XX                        ! argument of PDA_DBESJ1
-      
+
 *   local data
 *.
 
@@ -145,11 +145,11 @@
 
 *  Weighting function used is the function (I/I0 = 2*J1(x)/x), with
 *  a cosine apodization to zero over the last third of its extent.
-*  It is tabulated up to WTPIXMAX pixels out at a resolution of 1/WTRESOL 
+*  It is tabulated up to WTPIXMAX pixels out at a resolution of 1/WTRESOL
 *  of a pixel. The FWHM of the function is such that it would have
 *  been fully sampled by a rectangular mesh with sample points separated
-*  by the input pixel spacing. The width, WTPIXMAX and WTRESOL are all 
-*  measured in units of input pixels. 
+*  by the input pixel spacing. The width, WTPIXMAX and WTRESOL are all
+*  measured in units of input pixels.
 
 *  ..basic function
 
@@ -173,7 +173,7 @@
       DO PIX = 1, NPIX
 
          IF (ZIN(PIX) .NE. FBAD) THEN
-         
+
 *  find the co-ords (INEAR, JNEAR) of the output pixel nearest to the current
 *  input pixel. X offset is corrected for cos(dec) effect.
 
@@ -181,9 +181,9 @@
             INEAR = NINT (XIN/XINC) + ICEN
             JNEAR = NINT ((Y(PIX)-YCEN)/YINC) + JCEN
 
-*  loop over x's and y's in output array that are covered by the convolution 
+*  loop over x's and y's in output array that are covered by the convolution
 *  function centred at (INEAR, JNEAR)
-         
+
             DO JOUT = MAX(1,JNEAR-WTPIXMAX), MIN(NJ,JNEAR+WTPIXMAX)
                DO IOUT = MAX(1,INEAR-WTPIXMAX), MIN(NI,INEAR+WTPIXMAX)
 
@@ -199,12 +199,12 @@
 
 *  distance between them, in units of average input pixel
 *  spacing which is the unit of the interpolation function
- 
+
                   RPIX = SQRT ((YPIX-YIN)**2 + (XPIX-XIN)**2)
-                  RPIX = RPIX / PIXSPACE         
+                  RPIX = RPIX / PIXSPACE
 
 *  work out the appropriate value of the interpolation function
- 
+
                   ICPIX = NINT (RPIX * WTRESOL) + 1
                   IF ((ICPIX.GE.1).AND.(ICPIX.LE.WTPIXMAX*WTRESOL)) THEN
                      WT = WTFN (ICPIX)
@@ -214,14 +214,14 @@
 
 *  add into the convolution result and weight arrays unless TOT_WEIGHT_IN
 *  of output is zero, signifying output pixel is beyond limits of
-*  mapped area. The coaddition is normalised by the `total weight' 
+*  mapped area. The coaddition is normalised by the `total weight'
 *  associated with this input pixel.
 
                   IF (TOT_WEIGHT_IN (IOUT,JOUT) .NE. 0.0) THEN
-                     CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) + 
+                     CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) +
      :                  WT * WEIGHT_IN / TOT_WEIGHT_IN (INEAR,JNEAR)
-                     CONV_SUM (IOUT,JOUT) = CONV_SUM (IOUT,JOUT) + 
-     :                  WT * ZIN(PIX) * WEIGHT_IN / 
+                     CONV_SUM (IOUT,JOUT) = CONV_SUM (IOUT,JOUT) +
+     :                  WT * ZIN(PIX) * WEIGHT_IN /
      :                  TOT_WEIGHT_IN (INEAR,JNEAR)
                   END IF
 

@@ -5,6 +5,6 @@
 
 1998-07-02  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* Init.pm (new): Make sure that only shut down messaging when last 
+	* Init.pm (new): Make sure that only shut down messaging when last
 	object is destroyed.
 

@@ -11,9 +11,9 @@
 *    Parameters :
 *
 *     INPIC  = IMAGE( READ )
-*           IMAGE structure containing 2-D array 
+*           IMAGE structure containing 2-D array
 *     OUTPIC = IMAGE( WRITE )
-*           IMAGE structure to contain output 2-D array 
+*           IMAGE structure to contain output 2-D array
 *     XCENTRE
 *     YCENTRE
 *     RADIALD
@@ -26,7 +26,7 @@
 *
 *    History :
 *
-*     30-09-1987 : Original version 
+*     30-09-1987 : Original version
 *     20-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
 *
 *    Type Definitions :
@@ -36,8 +36,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -58,8 +58,8 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
-     :  RADIALD,              ! 
+     :  PNTRI,                !    "     " input      "
+     :  RADIALD,              !
      :	XCENTRE,              !
      :	YCENTRE               !
 
@@ -116,7 +116,7 @@
 
 *            call subroutine to create radial cut image
 
-	      CALL RADIMSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+	      CALL RADIMSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :	                     DIMSO( 1), DIMSO( 2), %VAL( PNTRO),
      :	                     XCENTRE, YCENTRE, RADIALD)
 

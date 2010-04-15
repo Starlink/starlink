@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *        documentation renamed to NAME to reflect that.  Altered to
 *        modern-style commenting.
 *     8-FEB-2006 (DSB):
-*        Initialise LOC before calling AGI_GTREF to avoid valgrind 
+*        Initialise LOC before calling AGI_GTREF to avoid valgrind
 *        reports.
 *     {enter_further_changes_here}
 
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

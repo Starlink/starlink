@@ -24,7 +24,7 @@ C-
 
       INTEGER*4 NEW_IFD
       INTEGER*4 OLD_IFD
-      INTEGER*4 OLD_NITEM   
+      INTEGER*4 OLD_NITEM
       REAL*4    OLD_VERSION
       CHARACTER OLD_LABEL*40
 
@@ -87,7 +87,7 @@ C  Open the GSD file
         END IF
       END IF
 
-C  Standard return                                     
+C  Standard return
 
       RETURN
       END

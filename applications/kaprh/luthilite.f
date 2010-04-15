@@ -39,7 +39,7 @@
 
 *  Usage:
 *     luthilite colour [device] [plane] [view]
-   
+
 *  ADAM Parameters:
 *     COLOUR() = LITERAL (Read)
 *        The colour to be used as a highlight.  It is either of these
@@ -154,7 +154,7 @@
 
 *  Related Applications:
 *     KAPPA: CRELUT, LUTFLIP, LUTROT, LUTTWEAK.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -168,7 +168,7 @@
 *     1991 July 22 (MJC):
 *        Converted RGB parameter to the more-sophisticated COLOUR.
 *     1991 November 15 (MJC):
-*        Made exit trigger number 2.  Inceased maximum number of 
+*        Made exit trigger number 2.  Inceased maximum number of
 *        triggers to 64.
 *     1991 November 21 (MJC):
 *        Fixed bug so that highlight may appear in but one colour index.
@@ -198,7 +198,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -222,7 +222,7 @@
 
       INTEGER NMEMAX             ! Maximum number of memories
       PARAMETER ( NMEMAX = 10 )
-     
+
 *  Local Variables:
       INTEGER
      :  ACTVAL,                  ! Number of values returned
@@ -256,7 +256,7 @@
      :  MEMTYP,                  ! Memory type
      :  MODCON,                  ! Configuration mode
      :  MXBRSH,                  ! Maximum brush width
-     :  NCHAR,                   ! Number of characters in IDI 
+     :  NCHAR,                   ! Number of characters in IDI
                                  ! interaction instruction message
      :  NCHAR1,                  ! Number of characters in interaction
                                  ! message
@@ -265,7 +265,7 @@
                                  ! colour-table display
      :  NINTS( 1 ),              ! Number of LUT entries
      :  NLOC( 1 ),               ! Number of locators
-     :  NLUTE,                   ! Number of entries in the VLUT less 
+     :  NLUTE,                   ! Number of entries in the VLUT less
                                  ! the reserved pens.
      :  NMEM,                    ! Number of image memories
      :  NRESP,                   ! Number of reserved pens
@@ -552,7 +552,7 @@
 *    Read the current LUT, only storing what is possible.  The buffer
 *    is generous as most devices have no more than 256 levels.
 
-      NLUTE = MIN( NINTS( 1 ) - NRESP, CTM__MXPEN ) 
+      NLUTE = MIN( NINTS( 1 ) - NRESP, CTM__MXPEN )
       CALL IILRLT( DID, MEMID, NRESP, NLUTE, VLUT, IDSTAT )
 
 *    Abort if an error has occurred.  Note IDI does not use
@@ -570,7 +570,7 @@
 *    ==============================================
 
       CALL KPG1_GPCOL( 'COLOUR', RGB, STATUS )
-      MXBRSH = MAX( MIN( 6, NLUTE / 2 ), NLUTE / 4 ) 
+      MXBRSH = MAX( MIN( 6, NLUTE / 2 ), NLUTE / 4 )
 
 *    Display the LUT.
 *    ================
@@ -620,8 +620,8 @@
 *
 *       Note that IDI only works in device pixels and does not resample
 *       arbitrarily sized arrays to match the transfer window.
-       
-*       Find the number of pixels visible. 
+
+*       Find the number of pixels visible.
 
          NXD = DSIZE( 1 ) / ( ZOOM + 1 )
          NYD = DSIZE( 2 ) / ( ZOOM + 1 )
@@ -775,7 +775,7 @@
             TRIGS( 1 ) = 0
             TRIGS( 2 ) = 0
             TRIGS( 3 ) = 0
-      
+
 *          Execute the interactions.
 
             CALL IIIEIW( DID, TRIGS, IDSTAT )
@@ -862,7 +862,7 @@
 
          OX = MIN( MAX( BORDER, XP - NLUTE / 2 ),
      :                  DSIZE( 1 ) + 1 - BORDER - NLUTE )
-         OY = MIN( MAX( BORDER, YP - WIDTH / 2 ), 
+         OY = MIN( MAX( BORDER, YP - WIDTH / 2 ),
      :                  DSIZE( 2 ) + 1 - BORDER - WIDTH )
 
          DEPTH = 8
@@ -893,7 +893,7 @@
 
 *       This may not be implemented so watch out for this particular
 *       error message.  If it is not implemented there is already a
-*       one-to-one correspondence. Abort if an error has occurred. 
+*       one-to-one correspondence. Abort if an error has occurred.
 *       Note IDI does not use inherited status.
          IF ( IDSTAT .NE. IDI__OK .AND. IDSTAT .NE. IDI__NOTIM ) THEN
 
@@ -934,7 +934,7 @@
      :        /'the colour table.', STATUS )
             GOTO 960
          END IF
-      
+
 *       Fill the array with element numbers less one to give colour
 *       indices.  Omit the reserved pens.
 
@@ -1132,7 +1132,7 @@
          TRIGS( 1 ) = 0
          TRIGS( 2 ) = 0
          TRIGS( 3 ) = 0
-      
+
 *       Execute the LUT-highlighting interactions.
 
          CALL IIIEIW( DID, TRIGS, IDSTAT )
@@ -1297,7 +1297,7 @@
                PENDIS = MAX( MIN( REAL( NLUTE - BRUSH ), PENDIS ), 0.0 )
                IPENDI = NINT( PENDIS )
 
-*             Write the modified VLUT. 
+*             Write the modified VLUT.
 *             =======================
 
 *             First copy the input LUT to the colour table.
@@ -1344,7 +1344,7 @@
 
 *       Redefine the origin of the transfer window.
 
-         OY = OY - WIDTH + 1 
+         OY = OY - WIDTH + 1
          CALL IIMSTW( DID, MEMID, 0, NLUTE, WIDTH, DEPTH, OX, OY,
      :                IDSTAT )
 
@@ -1359,7 +1359,7 @@
             GOTO 980
          END IF
 
-*       Write the captured portion of the memory to the screen starting 
+*       Write the captured portion of the memory to the screen starting
 *       at position OX, OY in the transfer window.  The data are taken
 *       from the lowest byte of each integer word in the data array
 *       (defined by PACK = 1, DEPTH = 8 ).
@@ -1411,7 +1411,7 @@
  999  CONTINUE
 
       IF ( DEVCAN ) THEN
-      
+
 *       Close down IDI using the parameter system.
 
          CALL IDI_CANCL( 'DEVICE', STATUS )

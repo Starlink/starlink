@@ -34,17 +34,17 @@
 *        include an NDF slice specification.
 *     X1 = INTEGER (Returned)
 *        Index of the opening square bracket within NAME, or one more
-*        than the used length of the string if the name does not include 
+*        than the used length of the string if the name does not include
 *        a foreign extension specifier.
 *     X2 = INTEGER (Returned)
-*        Index of the closing square bracket within NAME, or -1 if the name 
+*        Index of the closing square bracket within NAME, or -1 if the name
 *        does not include a foreign extension specifier.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     If this routine is called with STATUS set, then value of zero
-*     and -1 will be returned for X1 and X2. The same values will also be 
+*     and -1 will be returned for X1 and X2. The same values will also be
 *     returned if the routine should fail for any reason.
 
 *  Copyright:
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -114,7 +114,7 @@
 *  Save the used length of the string.
       LN = X1 - 1
 
-*  Any NDF slice specification should have been removed from NAME prior 
+*  Any NDF slice specification should have been removed from NAME prior
 *  to calling this routine. Therefore, if there is a foreign extension
 *  specifier, the final non-blank character should be a "]".
       IF( LN .GT. 0 ) THEN
@@ -126,11 +126,11 @@
                   X1 = I
                   X2 = LN
                   GO TO 1
-               END IF               
+               END IF
             END DO
  1          CONTINUE
-      
+
          END IF
       END IF
- 
+
       END

@@ -1,7 +1,7 @@
 proc CCDFileToNDFName { filename } {
 #+
 #  Name:
-#     CCDFileToNDFName 
+#     CCDFileToNDFName
 
 #  Purpose:
 #     Changes a filename into an NDF name or foreign data image.
@@ -50,7 +50,7 @@ proc CCDFileToNDFName { filename } {
 #     3-MAR-1994 (PDRAPER):
 #        Original version.
 #     16-APR-1997 (PDRAPER):
-#        Modified to check against known file extensions other 
+#        Modified to check against known file extensions other
 #        than ".sdf". This is to support foreign formats.
 #     {enter_changes_here}
 
@@ -66,11 +66,11 @@ proc CCDFileToNDFName { filename } {
 #  Check filename for .sdf extension. If it exists then strip it off.
    set nameext [file extension $filename]
    if { $nameext != "" && $nameext != ".sdf" } {
-      
+
 #  The filename cannot be that of an NDF, so check if it is otherwise
 #  known as an image.
-      if { $CCDimagefilters != "" } { 
-         if { [string first $nameext $CCDimagefilters] == 0 } { 
+      if { $CCDimagefilters != "" } {
+         if { [string first $nameext $CCDimagefilters] == 0 } {
             CCDIssueInfo "$filename is not a recognised image"
             set NDFname {}
          } else {
@@ -80,11 +80,11 @@ proc CCDFileToNDFName { filename } {
          }
       }
    } else {
-      
+
 #  It's an NDF so just get the rootname of the file.
       set NDFname [file rootname $filename]
    }
-   
+
 #  End of procedure
    return $NDFname
 }

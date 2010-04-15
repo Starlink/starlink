@@ -38,7 +38,7 @@ C     WAVELEN    Wavelength specification.
 C     CHFACT
 C     SIGFACT
 C
-C     Command keywords -   
+C     Command keywords -
 C
 C     PREVIOUS   If specified, ARC will read in the line list from
 C                the previous fit as a starting point.
@@ -66,7 +66,7 @@ C     (>) HARD   (Char) The device/type for graphics hard plots.
 C
 C     Input -
 C
-C     As named    May use the lines from a previous run.  If so 
+C     As named    May use the lines from a previous run.  If so
 C     by ARFILE   these are read from the previous run's output
 C                 file.  See below.
 C
@@ -94,9 +94,9 @@ C     28th Nov 1984. KS/AAO. Test for only one line added before fit.
 C     10th Dec 1984. KS/AAO. Number of arc lines allowed increased.
 C     5th Sept 1985. KS/AAO. Dispersion plot facility added and menu
 C                    operation adopted for the fit,edit,refit sequence.
-C                    ARFILE parameter added.  Output file name now 
+C                    ARFILE parameter added.  Output file name now
 C                    output. Line number added to output file format.
-C                    RMS now output after 'C'.  Weights array now 
+C                    RMS now output after 'C'.  Weights array now
 C                    incorporated everywhere, but only really used in
 C                    ARFIT for the 'RMS without this line' figure.
 C                    Autofit added, together with class array.  Defaults
@@ -121,9 +121,9 @@ C                    DSA_SET_AXIS_INFO call.
 C     11th Mar  1988 KS/AAO Modified for use with GKS version of PGPLOT.
 C                    Now uses GKD_ routines for the interactive graphics
 C                    dialogue.
-C     7th Sept  1988 KS/AAO Now uses DSA_OPEN_TEXT_FILE to search for 
+C     7th Sept  1988 KS/AAO Now uses DSA_OPEN_TEXT_FILE to search for
 C                    and open .ARC files.  Blank for ARCTYPE now treated
-C                    the same as 'NONE'.  Parameters for AREAD have 
+C                    the same as 'NONE'.  Parameters for AREAD have
 C                    changed. Warning now output if fit is not
 C                    monotonic.
 C     15th Sept 1988 KS/AAO  Error messages improved if errors occur
@@ -131,17 +131,17 @@ C                    when reading arc files.  Arc file names logged.
 C     18th Feb  1991 KS/AAO  Rounding error check on `line already
 C                    specified' improved.
 C     20th Mar  1991 KS/AAO. Arc file name now included in ARLINES.LIS.
-C                    XCORR keyword added and calculation of shift from 
+C                    XCORR keyword added and calculation of shift from
 C                    previous arc added.  Assumes wavelength values less
 C                    than 100 are microns, not angstroms. Precision used
 C                    for wavelength values modified. Number of possible
 C                    arc lines increased to accomodate the THAR line
-C                    list. Number of possible identified lines also 
+C                    list. Number of possible identified lines also
 C                    increased.
 C     30th July 1991 HME/UoE. Calculate HIGH properly.
 C     3rd  Sept 1992 HME/UoE, Starlink. INCLUDE changed, TABs removed.
-C                    Changed declaration to not contain MAX/MIN 
-C                    functions. GKD_QNUM was CALLed in ARSLCT though it 
+C                    Changed declaration to not contain MAX/MIN
+C                    functions. GKD_QNUM was CALLed in ARSLCT though it
 C                    is declared as LOGICAL. Now assign its value to
 C                    IGNORE.  PGPOINT was called with a single character
 C                    string instead of the ASCII code of that character.
@@ -159,28 +159,28 @@ C                    FIGX_SHIFT changed to FIG_SHIFT.
 C                    PGASK is banned from ADAM, commented out.
 C                    HME / UoE, Starlink.
 C     25 Jan 1993    HME / UoE, Starlink.  Put PGASK back.
-C     07 Apr 1993    HME / UoE, Starlink. Call PAR_ABORT after reading 
+C     07 Apr 1993    HME / UoE, Starlink. Call PAR_ABORT after reading
 C                    parameters.
 C     21 Jul 1993    HME / UoE, Starlink.  Hardcopy of arc only if arc
 C                    has been applied to output data.  Use DSA_*_LU to
 C                    get free Fortran unit.
 C     23 Jul 1993    HME / UoE, Starlink.  Disuse GKD_* apart from
-C                    GKD_WRITE_LINE. Disuse PAR_Q*. Add parameters 
+C                    GKD_WRITE_LINE. Disuse PAR_Q*. Add parameters
 C                    WRITEARC, HARDARC, HARDISP, QUITSEL, DISNCHAN,
 C                    MOVETOX, LINEOK, CMD, LINENO, WAVELEN,
 C                    RESOLVE, CHFACT, SIGFACT.  Get abortion to work
 C                    in spite of loops and lack of inherited status.
-C     14 Jan 1994    HME / UoE, Starlink.  If ARCTYPE folds to 'NONE', 
-C                    use the folded string. This is to make 'none', 
+C     14 Jan 1994    HME / UoE, Starlink.  If ARCTYPE folds to 'NONE',
+C                    use the folded string. This is to make 'none',
 C                    'None' etc. acceptable under Unix, where (F)PAR
 C                    does not fold strings.
-C     15 Feb 1995    HME / UoE, Starlink.  In the big workspace move 
+C     15 Feb 1995    HME / UoE, Starlink.  In the big workspace move
 C                    the DOUBLE workspace to the front. Otherwise the
 C                    odd number of FLOAT workspaces combined with an
-C                    odd number of channels in the input spectrum cause 
-C                    the DOUBLE workspace to be misaligned (memory 
+C                    odd number of channels in the input spectrum cause
+C                    the DOUBLE workspace to be misaligned (memory
 C                    address and odd multiple of 4).
-C     19 Jul 1995    HME / UoE, Starlink. Allow ARGETL to cause 
+C     19 Jul 1995    HME / UoE, Starlink. Allow ARGETL to cause
 C                    abort if arlines.lis cannot be opened for output.
 C     18 Jul 1996    MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
@@ -222,7 +222,7 @@ C
                                  ! manual)
       DOUBLE PRECISION COEFFS(NC)! Polynomial coefficients for fit
       LOGICAL   COMPLETE         ! TRUE when user selects QUIT option
-      LOGICAL   DBL              ! TRUE if forcing x data to DOUBLE 
+      LOGICAL   DBL              ! TRUE if forcing x data to DOUBLE
       DOUBLE PRECISION DELTAX    ! Average increment in wavelength array
       CHARACTER DEVICE*32        ! PGPLOT device specification
       CHARACTER DLAB*64          ! Plot data axis label
@@ -248,7 +248,7 @@ C
       LOGICAL   MICRONS          ! Wavelengths seem to be in microns?
       INTEGER   NCENT            ! Central pixel number
       INTEGER   NCHAN            ! Number of pixels to display at once
-      INTEGER   NDIM             ! Dimensionality of input data 
+      INTEGER   NDIM             ! Dimensionality of input data
                                  ! structure
       INTEGER   NELM             ! Total number of elements in the data
       INTEGER   NEXT             ! Next available character position
@@ -258,14 +258,14 @@ C
       INTEGER   ORDER            ! Initial order of polynomial fit
       INTEGER   OXSLOT           ! Map slot number for output x-axis
                                  ! data
-      REAL      PARMS(2)         ! Parameters used to control auto 
+      REAL      PARMS(2)         ! Parameters used to control auto
                                  ! finder
       INTEGER   PPTR             ! Dynamic-memory pointer for previous
                                  ! arc data
       INTEGER   PSLOT            ! Map slot number for previous arc data
       LOGICAL   REPEAT           ! Used to control selection loop
       LOGICAL   PREV             ! Value of PREVIOUS keyword
-      CHARACTER PREVFILE*132     ! Name of arc file used for previous 
+      CHARACTER PREVFILE*132     ! Name of arc file used for previous
                                  ! fit
       LOGICAL   SAME             ! Output is to be same as input data?
       LOGICAL   SHOWRMS          ! Set once RMS can be displayed
@@ -273,7 +273,7 @@ C
       REAL      SIGMA            ! Initial value for line-width
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRINGS(2)*64    ! Receives data and axis information
-      INTEGER   SXPTR            ! Origin of output axis data, XFPTR or 
+      INTEGER   SXPTR            ! Origin of output axis data, XFPTR or
                                  ! XDPTR
       CHARACTER TYPE*8           ! The type of the output x-axis array
       REAL      VALUE            ! Temporary REAL
@@ -290,7 +290,7 @@ C
       CHARACTER XLAB*64          ! X-axis label for plot
       INTEGER   XPTR             ! Dynamic-memory pointer to x-axis data
       INTEGER   XSLOT            ! Map slot number used for x-axis info
-      LOGICAL   XS               ! Indicates lines to be shown using 
+      LOGICAL   XS               ! Indicates lines to be shown using
                                  ! 'X's.
 C
 C     Initialisation of DSA_ routines
@@ -350,7 +350,7 @@ C
       CALL DSA_GET_DATA_INFO ('SPECT',2,STRINGS,0,DUMMY,STATUS)
       CALL FIG_MAKE_AXIS_LABEL(STRINGS(2),STRINGS(1),DLAB)
 C
-C     Get workspace for the dispersion plots (two real arrays, each NX 
+C     Get workspace for the dispersion plots (two real arrays, each NX
 C     long) and for the X arrays (one float,one double precision, each
 C     NX long).
 C
@@ -365,7 +365,7 @@ C
       CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
-C     Initialise the graphics device 
+C     Initialise the graphics device
 C
       STATUS=PGBEGIN(0,DEVICE,1,1)
       IF (STATUS.NE.1) THEN
@@ -374,7 +374,7 @@ C
       END IF
       STATUS=0
 C
-C     Initialise the channel number and wavelength arrays, and 
+C     Initialise the channel number and wavelength arrays, and
 C     open output file (IOUT)
 C
       CALL DSA_GET_LU (IOUT,STATUS)
@@ -525,7 +525,7 @@ C
             SAME=DSA_SAME_DATA('SPECT','OUTPUT',STATUS)
             IF (STATUS.NE.0) GO TO 500
 C
-C           Set the X data (both single and double) to the wavelength 
+C           Set the X data (both single and double) to the wavelength
 C           values
 C
             CALL ARSETX(NX,COEFFS,ORDER,%VAL(CNF_PVAL(XFPTR)))
@@ -549,8 +549,8 @@ C
 C
 C              Create a new X-axis data array.  Note that since this may
 C              extend the file and so invalidate the data array mapping,
-C              the data array will have to be unmapped and remapped 
-C              again if the input is the same as the output. The X-axis 
+C              the data array will have to be unmapped and remapped
+C              again if the input is the same as the output. The X-axis
 C              data will definitely need to be remapped.
 C
                IF (SAME) CALL DSA_UNMAP(DSLOT,STATUS)

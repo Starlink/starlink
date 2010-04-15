@@ -32,7 +32,7 @@
 
 *   The maximum number of pixels within a hemisphere that can be used.
 *   May be necessary to increase as higher res images of large size
-*   become available. 
+*   become available.
       INTEGER SKE1__PIXN
       PARAMETER ( SKE1__PIXN = 10000 )
 

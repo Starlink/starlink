@@ -100,9 +100,9 @@
 *     INLIST = LITERAL (Read)
 *        The group of input NDFs. In a complicated case this could be
 *        something like
-*        
+*
 *           M_51(25:35,-23.0,-24.0),M101,^LISTFILE.LIS
-*        
+*
 *        This NDF group specification consists of
 *        -  one identified NDF from which a subset is to be taken,
 *        -  one identified NDF,
@@ -150,7 +150,7 @@
 *     desired. To illustrate this consider the following spectrum with
 *     four pixels, the intended extents of the pixels and the defaulted
 *     extents:
-*     
+*
 *              x       x                         x       x
 *
 *          |1111111|2222222|                 |3333333|4444444|
@@ -173,7 +173,7 @@
 *     -  one vector of length LMAX,
 *     -  one matrix of size KMAX by LMAX,
 *     -  two matrices of size LMAX by LMAX.
-*     
+*
 *     These workspaces are usually of type _REAL. All (!) are of type
 *     _DOUBLE if the first valid input NDF has type _DOUBLE for either
 *     of the following:
@@ -181,7 +181,7 @@
 *     -  pixel width,
 *     -  data value,
 *     -  data variance.
-*     
+*
 *     In addition one integer vector of length LMAX is needed.
 *
 *     There is an oddity about this routine if only one input NDF is
@@ -248,7 +248,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

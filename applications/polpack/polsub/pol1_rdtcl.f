@@ -14,7 +14,7 @@
 *     POL1_RDTCL( FILE, CIREF, CIOUT, STATUS )
 
 *  Description:
-*     This routine reads a Tcl list holding the column data in a 
+*     This routine reads a Tcl list holding the column data in a
 *     catalogue.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -70,14 +70,14 @@
       CHARACTER DECNAM*30        ! Column names for DEC values
       CHARACTER RANAM*30         ! Column names for RA values
       CHARACTER TEXT*(MXCOL*(VAL__SZD+3)+5)  ! A text buffer
-      CHARACTER WORDS(MXCOL)*(VAL__SZD+3) ! Words in a row of data 
+      CHARACTER WORDS(MXCOL)*(VAL__SZD+3) ! Words in a row of data
       INTEGER CNAMTY(MXCOL)      ! Column types in ref catalogue
       INTEGER COLID( MXCOL )     ! Output column ID for for each tcl col
       INTEGER COLTYP( MXCOL )    ! Output column data type for for each tcl col
       INTEGER DECCOL             ! Zero based index of DEC column in Tcl file
       INTEGER DECGID             ! Column id for DEC col
       INTEGER GI( MXCOL )        ! Column identifier in ref catalogue
-      INTEGER GOTWCS             ! Non-zero if Tcl file has RA/DEC columns 
+      INTEGER GOTWCS             ! Non-zero if Tcl file has RA/DEC columns
       INTEGER II                 ! CAT identifier for a parameter
       INTEGER J                  ! Column index in tcl file
       INTEGER JCOLCI( MXCOL )    ! Col no. in tcl file for eahc ref cat col
@@ -87,21 +87,21 @@
       INTEGER NC                 ! Length of string
       INTEGER NCOL               ! No of columns in Tcl file
       INTEGER NCOLCI             ! No of columns in ref catalogue
-      INTEGER NROW               ! No of rows in tcl file 
-      INTEGER NWRD               ! No. of words in a row of data from Tcl file 
+      INTEGER NROW               ! No of rows in tcl file
+      INTEGER NWRD               ! No. of words in a row of data from Tcl file
       INTEGER RACOL              ! Zero-based index of RA column in Tcl file
       INTEGER RAGID              ! Column id for RA col
-      INTEGER START( MXCOL )     ! Word starts in a row of data from Tcl file 
-      INTEGER STOP( MXCOL )      ! Word ends in a row of data from Tcl file 
+      INTEGER START( MXCOL )     ! Word starts in a row of data from Tcl file
+      INTEGER STOP( MXCOL )      ! Word ends in a row of data from Tcl file
       LOGICAL USEWCS             ! Add equinox/epoch parameters to output?
       REAL VAL                   ! A data value
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the number of columns in the reference catalogue.
-      CALL CAT_TCOLS( CIREF, CAT__GPHYS, NCOLCI, STATUS ) 
+      CALL CAT_TCOLS( CIREF, CAT__GPHYS, NCOLCI, STATUS )
       IF( NCOLCI .GT. MXCOL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'N', NCOLCI )
@@ -114,9 +114,9 @@
 
 *  Get the column names and identifiers from the output catalogue.
       DO L = 1, NCOLCI
-         CALL CAT_TNDNT( CIOUT, CAT__FITYP, L, GI( L ), STATUS ) 
-         CALL CAT_TIQAC( GI( L ), 'NAME', CNAMCI( L ), STATUS ) 
-         CALL CAT_TIQAI( GI( L ), 'DTYPE', CNAMTY( L ), STATUS ) 
+         CALL CAT_TNDNT( CIOUT, CAT__FITYP, L, GI( L ), STATUS )
+         CALL CAT_TIQAC( GI( L ), 'NAME', CNAMCI( L ), STATUS )
+         CALL CAT_TIQAI( GI( L ), 'DTYPE', CNAMTY( L ), STATUS )
       END DO
 
 *  Create a Tcl interpreter and execute the script in the supplied file.
@@ -135,9 +135,9 @@
       CALL POL1_TCLGT( 'gotwcs_', -1, TEXT, NC, STATUS )
       CALL CHR_CTOI( TEXT, GOTWCS, STATUS )
 
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          DO J = 1, NCOL
-            CALL POL1_TCLGT( 'headings_', J - 1, CNAM( J ), NC, 
+            CALL POL1_TCLGT( 'headings_', J - 1, CNAM( J ), NC,
      :                       STATUS )
          END DO
       END IF
@@ -165,7 +165,7 @@
          JCOLCI( L ) = 0
          DO J = 1, NCOL
             IF( CNAM( J ) .EQ. CNAMCI( L ) ) THEN
-               JCOLCI( L ) = J 
+               JCOLCI( L ) = J
                COLID( J ) = GI( L )
                IF( CNAMTY( L ) .EQ. CAT__TYPEI ) THEN
                   COLTYP( J ) = 0
@@ -173,7 +173,7 @@
                   COLTYP( J ) = 1
                ELSE IF( CNAMTY( L ) .EQ. CAT__TYPED ) THEN
                   COLTYP( J ) = 2
-               ELSE 
+               ELSE
                   COLTYP( J ) = 3
                END IF
             END IF
@@ -212,7 +212,7 @@
 *  See if the RA and DEC columns are needed in the output catalogue.
          USEWCS = .FALSE.
          DO L = 1, NCOLCI
-            IF( JCOLCI( L ) .EQ. RACOL .OR. 
+            IF( JCOLCI( L ) .EQ. RACOL .OR.
      :          JCOLCI( L ) .EQ. DECCOL ) THEN
                USEWCS = .TRUE.
             END IF
@@ -231,13 +231,13 @@
 
 *  If this was succesful, set the parameter value.
                IF( STATUS .EQ. SAI__OK ) THEN
-                  CALL CAT_TATTC( II, 'VALUE', TEXT( : NC ), STATUS ) 
+                  CALL CAT_TATTC( II, 'VALUE', TEXT( : NC ), STATUS )
 
 *  If an error occurred looking for a pre-existing parameter, creata a
 *  new one, setting its value.
                ELSE
-                  CALL CAT_PPTSC( CIOUT, 'EQUINOX', TEXT( : NC ), 
-     :                           'Epoch of reference equinox', II, 
+                  CALL CAT_PPTSC( CIOUT, 'EQUINOX', TEXT( : NC ),
+     :                           'Epoch of reference equinox', II,
      :                           STATUS )
                END IF
 
@@ -251,9 +251,9 @@
             IF( NC .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
                CALL CAT_TIDNT( CIOUT, 'EPOCH', II, STATUS )
                IF( STATUS .EQ. SAI__OK ) THEN
-                  CALL CAT_TATTC( II, 'VALUE', TEXT( : NC ), STATUS ) 
+                  CALL CAT_TATTC( II, 'VALUE', TEXT( : NC ), STATUS )
                ELSE
-                  CALL CAT_PPTSC( CIOUT, 'EPOCH', TEXT( : NC ), 
+                  CALL CAT_PPTSC( CIOUT, 'EPOCH', TEXT( : NC ),
      :                            'Epoch of observation', II, STATUS )
                END IF
                CALL CAT_TRLSE( II, STATUS )
@@ -264,11 +264,11 @@
       END IF
 
 *  Read the row/column data into the catalogue.
-      CALL POL1_RDTDT( FILE, NCOL, COLID, COLTYP, RAGID, DECGID, CIOUT, 
+      CALL POL1_RDTDT( FILE, NCOL, COLID, COLTYP, RAGID, DECGID, CIOUT,
      :                 STATUS )
 
 *  Arrive here if an error occurs.
- 999  CONTINUE      
+ 999  CONTINUE
 
 *  Begin a new error reporting environment.
       CALL ERR_BEGIN( STATUS )
@@ -284,4 +284,4 @@
 *  End the current error reporting environment.
       CALL ERR_END( STATUS )
 
-      END 
+      END

@@ -7,7 +7,7 @@
 *     sum the elements of a double precision array
 
 *  Description:
-*     This routine adds up the NELM elements of the double precision ARRAY 
+*     This routine adds up the NELM elements of the double precision ARRAY
 *     and puts the result in SUM.
 
 *  Invocation:

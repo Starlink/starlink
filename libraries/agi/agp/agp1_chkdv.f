@@ -30,12 +30,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -48,7 +48,7 @@
 *     16-NOV-2001 (DSB):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -76,13 +76,13 @@
 *.
 
 *  Check status on entry
-      IF( STATUS .NE. SAI__OK ) RETURN 
-         
+      IF( STATUS .NE. SAI__OK ) RETURN
+
 *  Inquire the current PGPLOT workstation, and convert to upper case.
       CALL PGQINF( 'TYPE', CURTY, NAMLEN )
       CALL CHR_UCASE( CURTY )
 
-*  We now find the PGPLOT device type corresponding to the required AGI 
+*  We now find the PGPLOT device type corresponding to the required AGI
 *  device type. Loop through the known device types, looking for the AGI
 *  name.
       DO I = 1, AGP__NDEV
@@ -93,8 +93,8 @@
 *  Report an error and abort if they differ.
             IF( AGP_PTY( I ) .NE. CURTY ) THEN
                STATUS = AGI__DIFDV
-               CALL MSG_SETC( 'PTY', AGP_PTY( I ) )               
-               CALL MSG_SETC( 'CUR', CURTY )               
+               CALL MSG_SETC( 'PTY', AGP_PTY( I ) )
+               CALL MSG_SETC( 'CUR', CURTY )
                CALL ERR_REP( 'AGP1_CHKDV_ERR1', 'Current PGPLOT '//
      :                       'device has changed from ^PTY to '//
      :                       '^CUR (programming error).', STATUS )

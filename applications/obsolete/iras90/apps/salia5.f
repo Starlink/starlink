@@ -18,7 +18,7 @@
 *     The section (IB1:IB2,JB1:JB2) of the arrays XAMAP and YAMAP are
 *     filled using the full projection mappings. Fixed size double
 *     precision work arrays are used to pass information to and from the
-*     IRA transform routine. 
+*     IRA transform routine.
 
 *  Arguments:
 *     IDAB = INTEGER (Given)
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -107,7 +107,7 @@
      :        XX( SIZE ),     ! X image coordinates
      :        YY( SIZE )      ! Y image coordinates
 
-      INTEGER 
+      INTEGER
      :        FILL,           ! Index of the current fill.
      :        I,              ! Output X pixel index.
      :        I0,             ! Output X pixel index.
@@ -123,7 +123,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the row and column number of the first pixel to be 
+*  Initialise the row and column number of the first pixel to be
 *  transformed.
       J0 = JB1
       J = JB1
@@ -150,11 +150,11 @@
             XX( K ) = DBLE( I ) - 0.5D0
 
 *  Increment the pixel indices.
-            I = I + 1 
+            I = I + 1
             IF( I .GT. IB2 ) THEN
                I = IB1
                J = J + 1
-            END IF            
+            END IF
 
          END DO
 
@@ -180,11 +180,11 @@
             END IF
 
 *  Increment the pixel indices.
-            I0 = I0 + 1 
+            I0 = I0 + 1
             IF( I0 .GT. IB2 ) THEN
                I0 = IB1
                J0 = J0 + 1
-            END IF            
+            END IF
 
          END DO
 

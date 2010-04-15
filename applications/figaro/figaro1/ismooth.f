@@ -37,7 +37,7 @@ C
 C     Modified:
 C
 C     28th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs
-C                    changed. Modified dynamic memory handling - now 
+C                    changed. Modified dynamic memory handling - now
 C                    uses DYN rotuines
 C     7th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
@@ -64,7 +64,7 @@ C     Local variables
 C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       REAL         FRACT         ! see above
-      INTEGER      IRPT          ! 
+      INTEGER      IRPT          !
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
       INTEGER      NX            ! Size of 1st dimension
@@ -114,7 +114,7 @@ C
       CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Get workspace for GEN_ASMOTH (if data is 1D we can use a 
+C     Get workspace for GEN_ASMOTH (if data is 1D we can use a
 C     dummy workspace - ASMOTH will ignore it)
 C
       IF ((NX.GT.1).AND.(NY.GT.1)) THEN

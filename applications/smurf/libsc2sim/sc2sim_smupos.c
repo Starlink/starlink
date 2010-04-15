@@ -12,8 +12,8 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_smupos ( double t, double vertex_t, int movecode, 
-*                     int nvert, double vertxy[][2], double *x, 
+*     sc2sim_smupos ( double t, double vertex_t, int movecode,
+*                     int nvert, double vertxy[][2], double *x,
 *                     double *y, int *status )
 
 *  Arguments:
@@ -33,7 +33,7 @@
 *     y = double* (Given)
 *        Calculated Y-position
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *     This routine calculates the SMU waveform between 2 Jiggle positions.
@@ -88,8 +88,8 @@
 
 #define FUNC_NAME "sc2sim_smu_pos"
 
-void sc2sim_smupos ( double t, double vertex_t, int movecode, 
-                     int nvert, double vertxy[][2], double *x, 
+void sc2sim_smupos ( double t, double vertex_t, int movecode,
+                     int nvert, double vertxy[][2], double *x,
                      double *y, int *status ) {
 
    /* Local variables */
@@ -105,7 +105,7 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
    /* Get vertex coordinates bracketing the measurement instant */
    if ( t < 0.0 ) {
       /* Add a cycle */
-      jstart = ( (int)( (t + (double)nvert * vertex_t ) / vertex_t) ) 
+      jstart = ( (int)( (t + (double)nvert * vertex_t ) / vertex_t) )
                % nvert;
       offset = t + (double)nvert * vertex_t - (double)jstart * vertex_t;
    } else {
@@ -113,7 +113,7 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
       offset = t - (double)jstart * vertex_t;
    }
 
-   jend = ( jstart + 1 ) % nvert;   
+   jend = ( jstart + 1 ) % nvert;
 
    if ( movecode == 0 ) {
 
@@ -127,7 +127,7 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
       /* 2 term not damped. */
       mxv = sin ( M_PI / 4.0 ) + sin ( 3.0 * M_PI / 4.0 ) / 3.0;
       theta = ( -M_PI / 4.0 ) + offset * M_PI / vertex_t;
-      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 ) / 
+      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 ) /
              ( 2.0 * mxv ) + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
@@ -135,10 +135,10 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
    } else if ( movecode == 2 ) {
 
       /* 3 term not damped. */
-      mxv = sin ( M_PI / 6.0 ) + sin ( 3.0 * M_PI / 6.0 ) / 3.0 + 
-            sin ( 5.0 *M_PI / 6.0 ) / 5.0; 
+      mxv = sin ( M_PI / 6.0 ) + sin ( 3.0 * M_PI / 6.0 ) / 3.0 +
+            sin ( 5.0 *M_PI / 6.0 ) / 5.0;
       theta = ( -M_PI / 6.0 ) + offset * M_PI / vertex_t;
-      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 + 
+      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 +
              sin ( 5.0 * theta ) / 5.0 ) / ( 2.0 * mxv ) + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
@@ -146,11 +146,11 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
    } else if ( movecode == 3 ) {
 
       /* 4 term not damped. */
-      mxv = sin ( M_PI / 8.0 ) + sin ( 3.0 * M_PI / 8.0 ) / 3.0 + 
-            sin ( 5.0 * M_PI / 8.0 ) / 5.0 + sin ( 7.0 * M_PI / 8.0 ) / 7.0; 
+      mxv = sin ( M_PI / 8.0 ) + sin ( 3.0 * M_PI / 8.0 ) / 3.0 +
+            sin ( 5.0 * M_PI / 8.0 ) / 5.0 + sin ( 7.0 * M_PI / 8.0 ) / 7.0;
       theta = (-M_PI/8.0) + offset * M_PI / vertex_t;
-      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 + 
-             sin ( 5.0 * theta ) / 5.0 + sin ( 7.0 * theta ) / 7.0 ) 
+      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 +
+             sin ( 5.0 * theta ) / 5.0 + sin ( 7.0 * theta ) / 7.0 )
              / ( 2.0 * mxv ) + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
@@ -177,7 +177,7 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
       theta = (-M_PI/6.0) + offset * M_PI / vertex_t;
 
       if ( theta < M_PI/6.0 ) {
-         frac = ( sin(theta) + sin(3.0*theta) / 3.0 +  sin(5.0*theta) / 5.0 ) / 
+         frac = ( sin(theta) + sin(3.0*theta) / 3.0 +  sin(5.0*theta) / 5.0 ) /
                 (2.0*mxv) + 0.5;
       } else {
          frac = 1.0;
@@ -189,12 +189,12 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
    } else if ( movecode == 6 ) {
 
       /* 4 term flat end. */
-      mxv = sin(M_PI/8.0) + sin(3.0*M_PI/8.0) / 3.0 + 
+      mxv = sin(M_PI/8.0) + sin(3.0*M_PI/8.0) / 3.0 +
             sin(5.0*M_PI/8.0) / 5.0 + sin(7.0*M_PI/8.0) / 7.0;
       theta = -M_PI/8.0 + offset * M_PI / vertex_t;
 
       if ( theta < M_PI/8.0 ) {
-         frac = ( sin(theta) + sin(3.0*theta) / 3.0 + sin(5.0*theta) / 5.0 + 
+         frac = ( sin(theta) + sin(3.0*theta) / 3.0 + sin(5.0*theta) / 5.0 +
                 sin(7.0*theta) / 7.0 ) / (2.0*mxv) + 0.5;
       } else {
          frac = 1.0;
@@ -222,7 +222,7 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
 
    } else if ( movecode == 8 ) {
 
-      /* Experimental. 
+      /* Experimental.
          This is an experimental wave form, which may change often..
          Now it is a cosine waveform from 0 to 1 in the full time. */
       frac = 0.5 * ( 1.0 - cos ( M_PI * offset / vertex_t ) );

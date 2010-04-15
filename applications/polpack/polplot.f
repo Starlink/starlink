@@ -25,21 +25,21 @@
 *     and orientation of each vector, and the position of each vector (see
 *     parameters COLMAG, COLANG, COLX and COLY). If the catalogue has a
 *     third axis (spectral channel for instance), then only vectors with
-*     a specified value on the third axis will be plotted (see parameter 
+*     a specified value on the third axis will be plotted (see parameter
 *     ZAXVAL).
 *
 *     The plot is produced within the current graphics database picture,
 *     and may be aligned with an existing DATA picture if the existing
-*     picture contains suitable co-ordinate Frame information (see 
-*     parameter CLEAR). 
+*     picture contains suitable co-ordinate Frame information (see
+*     parameter CLEAR).
 *
-*     Annotated axes can be produced (see parameter AXES), and the appearance 
-*     of the axes can be controlled in detail (see parameter STYLE). The 
+*     Annotated axes can be produced (see parameter AXES), and the appearance
+*     of the axes can be controlled in detail (see parameter STYLE). The
 *     axes show co-ordinates in the co-ordinate Frame specified by
 *     parameter FRAME.
 *
-*     A key to the vector scale can be displayed to the right of the 
-*     vector map (see parameter KEY). The appearance and position of this 
+*     A key to the vector scale can be displayed to the right of the
+*     vector map (see parameter KEY). The appearance and position of this
 *     key may be controlled using parameters KEYSTYLE and KEYPOS.
 
 *  Usage:
@@ -47,16 +47,16 @@
 
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
-*        A rotation angle in degrees to be added to each vector orientation 
-*        before plotting the vectors (see parameters COLANG and NEGATE). It 
+*        A rotation angle in degrees to be added to each vector orientation
+*        before plotting the vectors (see parameters COLANG and NEGATE). It
 *        should be the range 0-360. Note, this parameter is named ANGROT
 *        for historical reasons, and its use should not be confused with
-*        the ANGROT extension item (see POLIMP) which gives the orientation 
+*        the ANGROT extension item (see POLIMP) which gives the orientation
 *        of the reference direction. [0.0]
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows, with the size of the arrow head
 *        specified by this parameter. Simple lines can be drawn by setting
-*        the arrow head size to zero. The value should be expressed as a 
+*        the arrow head size to zero. The value should be expressed as a
 *        fraction of the largest dimension of the vector map. [0.0]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
@@ -71,44 +71,44 @@
 *        TRUE if the graphics device is to be cleared before displaying
 *        the vector map. If you want the vector map to be drawn over
 *        the top of an existing DATA picture, then set CLEAR to FALSE. The
-*        vector map will then be drawn in alignment with the displayed 
-*        data. If possible, alignment occurs within the co-ordinate Frame 
-*        specified by parameter FRAME. If this is not possible, (for instance 
-*        if suitable WCS information was not stored with the existing DATA 
-*        picture), then alignment is attempted in PIXEL co-ordinates. If this 
-*        is not possible, then alignment is attempted in GRID co-ordinates. If 
-*        this is not possible, then alignment is attempted in the first 
-*        suitable Frame found in the catalogue irrespective of its domain. 
-*        A message is displayed indicating the domain in which alignment 
-*        occurred. If there are no suitable Frames in the catalogue then an 
+*        vector map will then be drawn in alignment with the displayed
+*        data. If possible, alignment occurs within the co-ordinate Frame
+*        specified by parameter FRAME. If this is not possible, (for instance
+*        if suitable WCS information was not stored with the existing DATA
+*        picture), then alignment is attempted in PIXEL co-ordinates. If this
+*        is not possible, then alignment is attempted in GRID co-ordinates. If
+*        this is not possible, then alignment is attempted in the first
+*        suitable Frame found in the catalogue irrespective of its domain.
+*        A message is displayed indicating the domain in which alignment
+*        occurred. If there are no suitable Frames in the catalogue then an
 *        error is reported. [TRUE]
 *     COLANG = LITERAL (Read)
-*        The name of the catalogue column holding the orientation of each 
-*        vector. The values are considered to be in units of degrees unless 
-*        the UNITS attribute of the column has the value "Radians" (case 
-*        insensitive).  The angles are assumed to be measured anti-clockwise 
-*        from the reference direction specified in the catalogue. A list 
-*        of available column names is displayed if a non-existent column name 
+*        The name of the catalogue column holding the orientation of each
+*        vector. The values are considered to be in units of degrees unless
+*        the UNITS attribute of the column has the value "Radians" (case
+*        insensitive).  The angles are assumed to be measured anti-clockwise
+*        from the reference direction specified in the catalogue. A list
+*        of available column names is displayed if a non-existent column name
 *        is given. See also parameter NEGATE. [ANG]
 *     COLMAG = LITERAL (Read)
-*        The name of the catalogue column holding the magnitude of each 
-*        vector. A list of available column names is displayed if a 
+*        The name of the catalogue column holding the magnitude of each
+*        vector. A list of available column names is displayed if a
 *        non-existent column name is given. [P]
 *     COLX = LITERAL (Read)
 *        The name of the catalogue column which gives the position of each
-*        vector along the first axis. A list of available column names is 
-*        displayed if a non-existent column name is given. See the "Notes" 
-*        section below for further details of how these positions are 
+*        vector along the first axis. A list of available column names is
+*        displayed if a non-existent column name is given. See the "Notes"
+*        section below for further details of how these positions are
 *        interpreted. [X]
 *     COLY = LITERAL (Read)
 *        The name of the catalogue column which gives the position of each
-*        vector along the second axis. A list of available column names is 
-*        displayed if a non-existent column name is given. See the "Notes" 
-*        section below for further details of how these positions are 
+*        vector along the second axis. A list of available column names is
+*        displayed if a non-existent column name is given. See the "Notes"
+*        section below for further details of how these positions are
 *        interpreted. [Y]
 *     COLZ = LITERAL (Read)
 *        The name of the catalogue column which gives the position of each
-*        vector along a third axis. A list of available column names is 
+*        vector along a third axis. A list of available column names is
 *        displayed if a non-existent column name is given. A null (!)
 *        value should be supplied if no third axis is to be used. The dynamic
 *        default is 'Z' if the catalogue contains a Z column, and null
@@ -116,24 +116,24 @@
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
 *     EPOCH = _DOUBLE (Read)
-*        If a "Sky Co-ordinate System" specification is supplied (using 
-*        parameter FRAME) for a celestial co-ordinate system, then an epoch 
-*        value is needed to qualify it. This is the epoch at which the 
-*        supplied sky positions were determined. It should be given as a 
-*        decimal years value, with or without decimal places  ("1996.8" for 
-*        example). Such values are interpreted as a Besselian epoch if less 
-*        than 1984.0 and as a Julian epoch otherwise. 
+*        If a "Sky Co-ordinate System" specification is supplied (using
+*        parameter FRAME) for a celestial co-ordinate system, then an epoch
+*        value is needed to qualify it. This is the epoch at which the
+*        supplied sky positions were determined. It should be given as a
+*        decimal years value, with or without decimal places  ("1996.8" for
+*        example). Such values are interpreted as a Besselian epoch if less
+*        than 1984.0 and as a Julian epoch otherwise.
 *     FILL = _LOGICAL (Read)
-*        The DATA picture containing the vector map is usually produced with 
+*        The DATA picture containing the vector map is usually produced with
 *        the same shape as the data. However, for maps with markedly different
-*        dimensions this default behaviour may not give the clearest result. 
+*        dimensions this default behaviour may not give the clearest result.
 *        When FILL is TRUE, the smaller dimension of the picture is expanded
-*        to produce the largest possible picture within the current picture.  
+*        to produce the largest possible picture within the current picture.
 *        [FALSE]
 *     FRAME = LITERAL (Read)
-*        This gives the co-ordinate Frame to be displayed along the annotated 
-*        axes (see parameter AXES). If a null parameter value is supplied, 
-*        then the current Frame in the supplied catalogue is used. The 
+*        This gives the co-ordinate Frame to be displayed along the annotated
+*        axes (see parameter AXES). If a null parameter value is supplied,
+*        then the current Frame in the supplied catalogue is used. The
 *        string can be one of the following:
 *        - A domain name such as SKY, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
@@ -143,7 +143,7 @@
 *        - An integer value giving the index of the required Frame within
 *        the WCS component.
 *
-*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
 *        section "Sky Co-ordinate Systems" in SUN/95). [!]
 *     JUST = LITERAL (Read)
 *        The justification for each vector; it can take any of the
@@ -158,125 +158,125 @@
 *     KEY = _LOGICAL (Read)
 *        TRUE if a key indicating the vector scale is to be produced. [TRUE]
 *     KEYPOS() = _REAL (Read)
-*        Two values giving the position of the key. The first value gives 
-*        the gap between the right hand edge of the vector map and the left 
+*        Two values giving the position of the key. The first value gives
+*        the gap between the right hand edge of the vector map and the left
 *        hand edge of the key (0.0 for no gap, 1.0 for the largest gap). A
 *        positive value will place the key to the right of (i.e. outside)
 *        the vector map, and a negative value will place the key inside
-*        the vector map. The second value gives the vertical position of the 
-*        top of the key (1.0 for the highest position, 0.0 for the lowest). 
-*        If the second value is not given, the top of the key is placed 
-*        level with the top of the vector map. Both values should be in the 
-*        range 0.0 to 1.0. If a key is produced, then the right hand margin 
+*        the vector map. The second value gives the vertical position of the
+*        top of the key (1.0 for the highest position, 0.0 for the lowest).
+*        If the second value is not given, the top of the key is placed
+*        level with the top of the vector map. Both values should be in the
+*        range 0.0 to 1.0. If a key is produced, then the right hand margin
 *        specified by parameter MARGIN is ignored. [current value]
 *     KEYSTYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        for the key (see parameter KEY). 
+*        A group of attribute settings describing the plotting style to use
+*        for the key (see parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text file
 *        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
+*        contain further comma-separated lists which will be read and
+*        interpreted in the same manner. Attribute settings are applied in
 *        the order in which they occur within the list, with later settings
 *        over-riding any earlier settings given for the same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
 *        defaulted if a null value (!) is supplied. See section "Plotting
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        reported).
 *
 *        By default the key starts with two lines of text, the first
 *        being "Vector scale:" and the second giving a numerical value
 *        for the scale in units per centimetre. These two lines may be
-*        replaced by assigning alternative text to the Title attribute 
+*        replaced by assigning alternative text to the Title attribute
 *        using this parameter. If no text is required, either assign a
 *        blank value for Title, or set the DrawTitle attribute to zero.
-*        
-*        The appearance of the text in the key is controlled using "String" 
+*
+*        The appearance of the text in the key is controlled using "String"
 *        attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
-*        TEXT can be used in place of STRINGS). Note, the Size attribute 
-*        specifies the size of key text relative to the size of the numerical 
+*        TEXT can be used in place of STRINGS). Note, the Size attribute
+*        specifies the size of key text relative to the size of the numerical
 *        labels on the vector map axes. Thus a value of 2.0 for Size will
 *        result in text which is twice the size of the numerical axis labels.
-*        The appearance of the example vector is controlled using "Curve" 
-*        attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be 
-*        used in place of CURVES). The numerical scale value is formatted as 
-*        an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the 
-*        synonym SCALE can be used in place of the value 1). The length of 
-*        the example vector is formatted as an axis 2 value (using attribute 
-*        FORMAT(2), etc - the synonym VECTOR can be used in place of the 
-*        value 2). The vertical space between lines in the key can be 
-*        controlled using attribute TextLabGap. A value of 1.0 is used if 
-*        no value is set for this attribute, and produces default vertical 
-*        spacing. Values larger than 1.0 increase the vertical space, and 
+*        The appearance of the example vector is controlled using "Curve"
+*        attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
+*        used in place of CURVES). The numerical scale value is formatted as
+*        an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
+*        synonym SCALE can be used in place of the value 1). The length of
+*        the example vector is formatted as an axis 2 value (using attribute
+*        FORMAT(2), etc - the synonym VECTOR can be used in place of the
+*        value 2). The vertical space between lines in the key can be
+*        controlled using attribute TextLabGap. A value of 1.0 is used if
+*        no value is set for this attribute, and produces default vertical
+*        spacing. Values larger than 1.0 increase the vertical space, and
 *        values less than 1.0 decrease the vertical space. If the key is
 *        drawn over the top of the vector map, the key will ne opaque by
 *        default. The key can be made transparent by including the setting
-*        "Colour(Back)=clear". [current value] 
+*        "Colour(Back)=clear". [current value]
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
 *        lengths in the plot. []
 *     LBND(2) = _REAL (Read)
-*        The coordinates to put at the lower left corner of the plotting 
+*        The coordinates to put at the lower left corner of the plotting
 *        area, in the coordinates system specified by parameters COLX and
-*        COLY. If a null value is supplied then an area is used which just 
+*        COLY. If a null value is supplied then an area is used which just
 *        encloses all the data in the supplied catalogue. [!]
 *     MARGIN( 4 ) = _REAL (Read)
-*        The widths of the margins to leave around the vector map for axis 
-*        annotation. The widths should be given as fractions of the 
-*        corresponding dimension of the current picture. 
-*        The actual margins used may be increased to preserve the aspect 
+*        The widths of the margins to leave around the vector map for axis
+*        annotation. The widths should be given as fractions of the
+*        corresponding dimension of the current picture.
+*        The actual margins used may be increased to preserve the aspect
 *        ratio of the DATA picture. Four values may be given, in the order;
-*        bottom, right, top, left. If fewer than four values are given, 
-*        extra values are used equal to the first supplied value. If these 
+*        bottom, right, top, left. If fewer than four values are given,
+*        extra values are used equal to the first supplied value. If these
 *        margins are too narrow any axis annotation may be clipped. The
-*        dynamic default is 0.15 (for all edges) if annotated axes are being 
+*        dynamic default is 0.15 (for all edges) if annotated axes are being
 *        produced, and zero otherwise. See also parameter KEYPOS. []
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
 *        orientation of the polarization (i.e. the values in the column
-*        specified by parameter COLANG) are negated before adding on any 
+*        specified by parameter COLANG) are negated before adding on any
 *        value specified by parameter ANGROT. [FALSE]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        for the contours and annotated axes. 
+*        A group of attribute settings describing the plotting style to use
+*        for the contours and annotated axes.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text file
 *        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
+*        contain further comma-separated lists which will be read and
+*        interpreted in the same manner. Attribute settings are applied in
 *        the order in which they occur within the list, with later settings
 *        over-riding any earlier settings given for the same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
 *        defaulted if a null value (!) is supplied. See section "Plotting
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        reported).
 *
 *        The appearance of the vectors is controlled by the attributes
 *        Colour(Curves), Width(Curves), etc (the synonym Vectors may be
 *        used in place of Curves). [current value]
 *     UBND(2) = _REAL (Read)
-*        The coordinates to put at the top right corner of the plotting 
+*        The coordinates to put at the top right corner of the plotting
 *        area, in the coordinates system specified by parameters COLX and
-*        COLY. If a null value is supplied then an area is used which just 
+*        COLY. If a null value is supplied then an area is used which just
 *        encloses all the data in the supplied catalogue. [!]
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
@@ -285,15 +285,15 @@
 *     ZAXVAL = LITERAL (Read)
 *        Specifies the Z axis value for the vectors to be displayed. The
 *        given value should be in the current coordinate Frame of the
-*        supplied catalogue (see parameter COLZ). For instance, if the 
+*        supplied catalogue (see parameter COLZ). For instance, if the
 *        current coordinate Frame contains a calibrated wavelength axis,
-*        the value should be given in the units specified in that frame 
-*        (Angstroms, nanometres, etc.). If the wavelength axis has not been 
+*        the value should be given in the units specified in that frame
+*        (Angstroms, nanometres, etc.). If the wavelength axis has not been
 *        calibrated, the value will probably need to be supplied in units
-*        of pixels. Entering a colon (":") for the parameter will result in 
-*        a description of the current coordinate Frame being shown. This may 
+*        of pixels. Entering a colon (":") for the parameter will result in
+*        a description of the current coordinate Frame being shown. This may
 *        help to determine the units in which a value is expected. The
-*        value actually used is the closest available value within the 
+*        value actually used is the closest available value within the
 *        catalogue. This value is displayed on the screen and included in
 *        the default plot title. The ZAXVAL parameter is only accessed if a
 *        null (!) value is supplied for parameter ZCOLVAL. See also
@@ -302,24 +302,24 @@
 *        Specifies the Z column value for the vectors to be displayed.
 *        The given value should be in the same coordinate system as the
 *        values stored in the Z column of the catalogue (usually pixels).
-*        This parameter provides an alternative to the ZAXVAL parameter. 
-*        Use the ZCOLVAL parameter to specify the Z value in pixels, and 
+*        This parameter provides an alternative to the ZAXVAL parameter.
+*        Use the ZCOLVAL parameter to specify the Z value in pixels, and
 *        the ZAXVAL parameter to specify the Z value in Hertz, angstroms,
 *        nanometres, etc (if the Z axis has been calibrated). If a null
-*        value is supplied for ZCOLVAL, then ZAXVAL is used to determine 
+*        value is supplied for ZCOLVAL, then ZAXVAL is used to determine
 *        the Z value to display. [!]
-*        
+*
 *  Examples:
-*     polplot poltab 
+*     polplot poltab
 *        Produces a vector map on the current graphics device with
 *        vectors defined in the FITS binary table "poltab". The magnitudes
 *        are taken from column P, the orientations from column ANG and
-*        the coordinates of each vector from columns X and Y. 
+*        the coordinates of each vector from columns X and Y.
 *     polplot poltab style=^mystyle.dat
 *        As above, but the annotated axes and vectors are drawn according
 *        to the description given in text file mystyle.dat. If this
 *        files contains the following lines:
-*    
+*
 *           title = My favorite colours
 *           grid = 1
 *           minticklen = 0
@@ -346,30 +346,30 @@
 *	 grid coordinates. A message is displayed indicating the domain
 *	 in which alignment took place.
 *     polplot poltab arrow=0.01 just=start nokey
-*        Produces a vector map in which each vector is represented by an 
+*        Produces a vector map in which each vector is represented by an
 *        arrow, starting at the position of the corresponding pixel.  No key
 *        to the vector scale and justification is produced.
 *     polplot ABEB.FIT clear=no colx=ra coly=dec colmag=l colang=b
-*        Reads the non-POLPACK FITS table in file ABEB.FIT, and displays a 
+*        Reads the non-POLPACK FITS table in file ABEB.FIT, and displays a
 *        vector for every row defined by the catalogue columns "l" and "b".
 *        The position of each vector is given by columns "ra" and "dec".
-*        If a previous DATA picture has been displayed, and has a calibration 
+*        If a previous DATA picture has been displayed, and has a calibration
 *        in terms of any of the common sky coordinate systems, then the
 *        vectors are aligned with the existing DATA picture.
 
 *  Notes:
-*     -  The TITLE parameter in the supplied catalogue is used as the default 
-*     title for the annotated axes. If the catalogue does not have a TITLE 
-*     parameter (of it is blank), then the default title is taken from current 
+*     -  The TITLE parameter in the supplied catalogue is used as the default
+*     title for the annotated axes. If the catalogue does not have a TITLE
+*     parameter (of it is blank), then the default title is taken from current
 *     co-ordinate Frame stored in the WCS component of the catalogue. This
 *     default may be over-ridden by specifying a value for the Title
-*     attribute using the STYLE parameter. 
+*     attribute using the STYLE parameter.
 *     -  The columns specified by parameters COLX and COLY should hold
-*     coordinates in the "Base Frame" of the WCS information stored as 
-*     an AST FrameSet (see SUN/210) in the supplied catalogue. If the 
-*     catalogue has been produced by one of the POLPACK application polvec 
-*     or polbin, then the Base Frame will be pixel co-ordinates within the 
-*     aligned intensity images, and these will be stored in columns with 
+*     coordinates in the "Base Frame" of the WCS information stored as
+*     an AST FrameSet (see SUN/210) in the supplied catalogue. If the
+*     catalogue has been produced by one of the POLPACK application polvec
+*     or polbin, then the Base Frame will be pixel co-ordinates within the
+*     aligned intensity images, and these will be stored in columns with
 *     names "X" and "Y". If the catalogue was not created by POLPACK, it
 *     may have no usable WCS information, in which case the supplied
 *     positions are mapped linearly onto the screen. There is one
@@ -379,12 +379,12 @@
 *     (defaults are used for these parameters if they are not present in the
 *     catalogue). If the vector map is displayed over an existing DATA
 *     picture (i.e. if CLEAR=NO) then these RA/DEC positions will be aligned
-*     with the existing DATA picture if possible (i.e. if the existing 
+*     with the existing DATA picture if possible (i.e. if the existing
 *     picture has sky coordinate information stored with it).
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     BC: Brad Cavanagh (JAC, Hawaii)
 *     DSB: David Berry (STARLINK)
@@ -395,9 +395,9 @@
 *     5-FEB-1998 (DSB):
 *        Original version, derived from kappa:vecplot.
 *     5-AUG-1998 (DSB):
-*        Correct the DOMAIN passed to KPG1_PLOT so that it refers to the 
-*        Base Frame of the WCS info, instead of the Current Frame. Changed 
-*        the interpretation of parameters COLX and COLY accordingly. Defaults 
+*        Correct the DOMAIN passed to KPG1_PLOT so that it refers to the
+*        Base Frame of the WCS info, instead of the Current Frame. Changed
+*        the interpretation of parameters COLX and COLY accordingly. Defaults
 *        for LBND and UBND changed.
 *     9-NOV-1998 (DSB):
 *        Modified to bring the handling of WCS and graphics into line with
@@ -417,7 +417,7 @@
 *     22-FEB-2001 (DSB):
 *        Modified to support 3D data.
 *     11-DEC-2003 (DSB):
-*        Clear the unnecessary Format attribute values set in KPG1_GDGET for 
+*        Clear the unnecessary Format attribute values set in KPG1_GDGET for
 *        the key style.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
@@ -439,9 +439,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT_ constants 
-      INCLUDE 'NDF_PAR'          ! NDF_ constants 
-      INCLUDE 'PAR_ERR'          ! PAR_ error constants 
+      INCLUDE 'CAT_PAR'          ! CAT_ constants
+      INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -550,8 +550,8 @@
       REAL DSCALE                ! Vector scale, viz. data units per pixel
       REAL DUMMY                 ! Unused argument
       REAL HGT                   ! Character height scale factor
-      REAL HIST( NBIN )          ! Histogram array 
-      REAL KEYOFF                ! Offset to top of key 
+      REAL HIST( NBIN )          ! Histogram array
+      REAL KEYOFF                ! Offset to top of key
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Margins round DATA picture
       REAL REFANG                ! ACW angle from +ve X to ref direction
@@ -611,7 +611,7 @@
 
       END IF
 
-*  Get CAT identifiers for the columns which are to be used to define the 
+*  Get CAT identifiers for the columns which are to be used to define the
 *  vector magnitudes, orientations, X and Y coordinates.
       CALL POL1_GTCTC( 'COLMAG', CI, CAT__FITYP, ' ', GIMAG, STATUS )
       CALL POL1_GTCTC( 'COLANG', CI, CAT__FITYP, ' ', GIANG, STATUS )
@@ -648,7 +648,7 @@
       CALL PSX_CALLOC( NVEC, '_DOUBLE', IPX2, STATUS )
       CALL PSX_CALLOC( NVEC, '_DOUBLE', IPY2, STATUS )
 
-      IF( GOTZ ) THEN 
+      IF( GOTZ ) THEN
          CALL PSX_CALLOC( NVEC, '_REAL', IPZ, STATUS )
       ELSE
          IPZ = IPMAG
@@ -658,15 +658,15 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy each column into the corresponding array.
-      CALL POL1_CPCTR( CI, GIMAG, NVEC, %VAL( CNF_PVAL( IPMAG ) ), 
+      CALL POL1_CPCTR( CI, GIMAG, NVEC, %VAL( CNF_PVAL( IPMAG ) ),
      :                 NGMAG, STATUS )
-      CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( CNF_PVAL( IPANG ) ), 
+      CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( CNF_PVAL( IPANG ) ),
      :                 NGANG, STATUS )
-      CALL POL1_CPCTD( CI, GIS( 1 ), NVEC, %VAL( CNF_PVAL( IPX ) ), 
+      CALL POL1_CPCTD( CI, GIS( 1 ), NVEC, %VAL( CNF_PVAL( IPX ) ),
      :                 NGX, STATUS )
-      CALL POL1_CPCTD( CI, GIS( 2 ), NVEC, %VAL( CNF_PVAL( IPY ) ), 
+      CALL POL1_CPCTD( CI, GIS( 2 ), NVEC, %VAL( CNF_PVAL( IPY ) ),
      :                 NGY, STATUS )
-      IF( GOTZ ) CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, 
+      IF( GOTZ ) CALL POL1_CPCTR( CI, GIS( 3 ), NVEC,
      :                            %VAL( CNF_PVAL( IPZ ) ), NGZ,
      :                            STATUS )
 
@@ -705,9 +705,9 @@
      :                 '(^NAME) contains no data.', STATUS )
       END IF
 
-*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
+*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of
 *  this FrameSet will be spanned by axes corresponding to the columns
-*  in GIS. 
+*  in GIS.
       CALL POL1_GTCTA( CI, NDIM, GIS, IWCS, STATUS )
 
 *  If required, get the Z column value to use. Only vectors with this
@@ -722,7 +722,7 @@
          CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
 
 *  Find the max and min Z values in the Z column.
-         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( CNF_PVAL( IPZ ) ),
      :                    NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
 
@@ -732,26 +732,26 @@
             ZCURR = .TRUE.
 
 *  Otherwise, allow the user to choose a Z value.
-         ELSE IF( STATUS .EQ. SAI__OK ) THEN 
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
 *  First see if the user wants to give the Z value in pixels.
             CALL PAR_GET0D( 'ZCOLVAL', Z, STATUS )
 
 *  If so, indicate that a base frame Z value has been given.
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF( STATUS .EQ. SAI__OK ) THEN
                ZCURR = .FALSE.
 
-*  Otherwise, annul the error and get a current Frame Z value.                
-            ELSE IF( STATUS .EQ. PAR__NULL ) THEN 
+*  Otherwise, annul the error and get a current Frame Z value.
+            ELSE IF( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
 
 *  Get the required Z value in the current Frame.
-               CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, Z, 
+               CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, Z,
      :                          NVAL, STATUS )
 
 *  Use any third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-               IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
+               IF( MAPS( 3 ) .NE. AST__NULL ) THEN
                   CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
                ELSE
                   Z = AST__BAD
@@ -762,7 +762,7 @@
                IF( Z .EQ. AST__BAD ) THEN
                   ZCURR = .FALSE.
                   CALL PAR_GET0C( 'ZAXVAL', ZTEXT, STATUS )
- 
+
                   CALL MSG_BLANK( STATUS )
                   CALL MSG_SETC( 'NAME', NAME )
                   CALL MSG_SETC( 'Z', ZTEXT )
@@ -783,7 +783,7 @@
             END IF
 
 *  Find the closest available value to the requested Z value.
-            CALL POL1_FCLOS( NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+            CALL POL1_FCLOS( NVEC, %VAL( CNF_PVAL( IPZ ) ),
      :                       REAL( Z ), ZUSE,
      :                       STATUS )
          END IF
@@ -799,8 +799,8 @@
          IAT = IAT + 1
          CALL CHR_PUTR( ZUSE, ZBTEXT, IAT )
 
-         IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
-            CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
+         IF( MAPS( 3 ) .NE. AST__NULL ) THEN
+            CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z,
      :                      STATUS )
          ELSE
             Z = AST__BAD
@@ -808,7 +808,7 @@
 
          ZCTEXT = ' '
          IAT = 0
-         IF( Z .NE. AST__BAD ) THEN 
+         IF( Z .NE. AST__BAD ) THEN
             CALL CHR_APPND( AST_GETC( IWCS, 'SYMBOL(3)', STATUS ),
      :                      ZCTEXT, IAT )
             CALL CHR_APPND( ' =', ZCTEXT, IAT )
@@ -823,17 +823,17 @@
          ZTEXT = ' '
          IAT = 0
          IF( ZCURR ) THEN
-            IF( ZCTEXT .NE. ' ' ) THEN             
+            IF( ZCTEXT .NE. ' ' ) THEN
                CALL CHR_APPND( ZCTEXT, ZTEXT, IAT )
                CALL CHR_APPND( ' (', ZTEXT, IAT )
                CALL CHR_APPND( ZBTEXT, ZTEXT, IAT )
                CALL CHR_APPND( ')', ZTEXT, IAT )
-            ELSE               
-               ZTEXT = ZBTEXT 
+            ELSE
+               ZTEXT = ZBTEXT
             END IF
          ELSE
             CALL CHR_APPND( ZBTEXT, ZTEXT, IAT )
-            IF( ZCTEXT .NE. ' ' ) THEN             
+            IF( ZCTEXT .NE. ' ' ) THEN
                CALL CHR_APPND( ' (', ZTEXT, IAT )
                CALL CHR_APPND( ZCTEXT, ZTEXT, IAT )
                CALL CHR_APPND( ')', ZTEXT, IAT )
@@ -850,14 +850,14 @@
          CONST( 3 ) = DBLE( ZUSE )
          CALL POL1_PKAXS( NDIM, GIS, CONST, IWCS, STATUS )
 
-*  If there is no Z column, store a blank string for the textual descxription 
+*  If there is no Z column, store a blank string for the textual descxription
 *  of the Z value being used.
       ELSE
          ZTEXT = ' '
          ZUSE = VAL__BADR
       END IF
 
-*  Give the user the chance to change the Current Frame. 
+*  Give the user the chance to change the Current Frame.
       CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', .TRUE.,
      :                 'catalogue', STATUS )
 
@@ -870,7 +870,7 @@
       CALL POL1_TIQAC( GIANG, 'UNITS', UNITS2, STATUS )
 
 *  Set up a factor which converts values stored in the orientation column
-*  into units of radians.  If the UNITS attribute does not have the value 
+*  into units of radians.  If the UNITS attribute does not have the value
 *  "RADIANS" (case insensitive), then assume the data values are in degrees.
       IF ( UNITS2 .NE. ' ' ) THEN
          CALL CHR_RMBLK( UNITS2 )
@@ -902,27 +902,27 @@
          CALL ERR_ANNUL( STATUS )
 
 *  Find the maximum and minimum X value.
-         CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC, 
+         CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC,
      :                    %VAL( CNF_PVAL( IPX ) ), NBAD,
      :                    UBND, LBND, MAXPOS, MINPOS, STATUS )
          BHI( 1 ) = REAL( UBND )
          BLO( 1 ) = REAL( LBND )
 
 *  Find the maximum and minimum Y value.
-         CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC, 
+         CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC,
      :                    %VAL( CNF_PVAL( IPY ) ), NBAD,
      :                    UBND, LBND, MAXPOS, MINPOS, STATUS )
          BHI( 2 ) = REAL( UBND )
          BLO( 2 ) = REAL( LBND )
 
 *  Extend these bounds slightly.
-         DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )         
+         DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )
          IF( DX .EQ. 0 ) DX = 0.005*BHI( 1 )
          IF( DX .EQ. 0 ) DX = 1.0
          BLO( 1 ) = BLO( 1 ) - DX
          BHI( 1 ) = BHI( 1 ) + DX
 
-         DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )         
+         DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )
          IF( DY .EQ. 0 ) DY = 0.005*BHI( 2 )
          IF( DY .EQ. 0 ) DY = 1.0
          BLO( 2 ) = BLO( 2 ) - DY
@@ -944,12 +944,12 @@
 
       END IF
 
-*  Remove any positions outside these bounds. This also shuffles bad 
+*  Remove any positions outside these bounds. This also shuffles bad
 *  positions to the end, and counts the number of good positions.
-      CALL POL1_RMBND( NVEC, BLO, BHI, ZUSE, %VAL( CNF_PVAL( IPZ ) ), 
+      CALL POL1_RMBND( NVEC, BLO, BHI, ZUSE, %VAL( CNF_PVAL( IPZ ) ),
      :                 %VAL( CNF_PVAL( IPMAG ) ),
-     :                 %VAL( CNF_PVAL( IPANG ) ), 
-     :                 %VAL( CNF_PVAL( IPX ) ), %VAL( CNF_PVAL( IPY ) ), 
+     :                 %VAL( CNF_PVAL( IPANG ) ),
+     :                 %VAL( CNF_PVAL( IPX ) ), %VAL( CNF_PVAL( IPY ) ),
      :                 NIN,
      :                 STATUS )
 
@@ -965,9 +965,9 @@
 *  =================================
 *  Find the approximate 90% percentile of the magnitude values.
       DMAX = 0.0
-      DMIN = 0.0 
+      DMIN = 0.0
       HINIT = .TRUE.
-      CALL POL1_HIST( NIN, %VAL( CNF_PVAL( IPMAG ) ), 
+      CALL POL1_HIST( NIN, %VAL( CNF_PVAL( IPMAG ) ),
      :                0.9, NBIN, .TRUE., HIST,
      :                DMIN, DMAX, HINIT, TYPDAT, STATUS )
 
@@ -985,7 +985,7 @@
 *  Prepare to produce graphics using AST and PGPLOT.
 *  =================================================
 
-*  Get the index of the Frame corresponding to the catalogue columns 
+*  Get the index of the Frame corresponding to the catalogue columns
 *  specifying the vector positions (i.e. the Base Frame in the above
 *  FrameSet).
       ICAT = AST_GETI( IWCS, 'BASE', STATUS )
@@ -998,7 +998,7 @@
      :       AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
             IFRM = I
          END IF
-         CALL AST_ANNUL( FRM, STATUS )           
+         CALL AST_ANNUL( FRM, STATUS )
       END DO
 
 *  If a 2D PIXEL Frame was found...
@@ -1008,38 +1008,38 @@
          DOMAIN = 'PIXEL'
 
 *  We now need to find the extent of the data in the PIXEL Frame (BLO and
-*  BHI currently contain the extent of the data in the Base Frame). Get 
+*  BHI currently contain the extent of the data in the Base Frame). Get
 *  the Mapping from the Base Frame to the 2D PIXEL Frame.
-         MAP = AST_GETMAPPING( IWCS, AST__BASE, IFRM, STATUS )      
+         MAP = AST_GETMAPPING( IWCS, AST__BASE, IFRM, STATUS )
 
-*  If this Mapping is not a UnitMap, transform the supplied catalogue 
+*  If this Mapping is not a UnitMap, transform the supplied catalogue
 *  positions into PIXEL positions using this Mapping.
          IF( .NOT. AST_ISAUNITMAP( MAP, STATUS ) ) THEN
-            CALL AST_TRAN2( MAP, NIN, %VAL( CNF_PVAL( IPX ) ), 
+            CALL AST_TRAN2( MAP, NIN, %VAL( CNF_PVAL( IPX ) ),
      :                      %VAL( CNF_PVAL( IPY ) ), .TRUE.,
-     :                      %VAL( CNF_PVAL( IPX2 ) ), 
+     :                      %VAL( CNF_PVAL( IPX2 ) ),
      :                      %VAL( CNF_PVAL( IPY2 ) ), STATUS )
 
 *  Find the maximum and minimum X PIXEL value.
-            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, 
+            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN,
      :                       %VAL( CNF_PVAL( IPX2 ) ), NBAD,
      :                      UBND, LBND,  MAXPOS, MINPOS, STATUS )
             BHI( 1 ) = REAL( UBND )
             BLO( 1 ) = REAL( LBND )
 
 *  Find the maximum and minimum Y PIXEL value.
-            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, 
+            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN,
      :                       %VAL( CNF_PVAL( IPY2 ) ), NBAD,
      :                      UBND, LBND, MAXPOS, MINPOS, STATUS )
             BHI( 2 ) = REAL( UBND )
             BLO( 2 ) = REAL( LBND )
 
 *  Extend these bounds slightly.
-            DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )         
+            DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )
             BLO( 1 ) = BLO( 1 ) - DX
             BHI( 1 ) = BHI( 1 ) + DX
-   
-            DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )         
+
+            DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )
             BLO( 2 ) = BLO( 2 ) - DY
             BHI( 2 ) = BHI( 2 ) + DY
          END IF
@@ -1062,7 +1062,7 @@
 *  Get the aspect ratio of the box (assuming equal scales on each axis).
       ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
 
-*  Establish a synonym of VECTORS (minimum abbreviation VEC) for the AST 
+*  Establish a synonym of VECTORS (minimum abbreviation VEC) for the AST
 *  graphical element name CURVES.
       CALL KPG1_ASPSY( '(VEC*TORS)', '(CURVES)', STATUS )
 
@@ -1083,7 +1083,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Use the first value for any unspecified edges.
-      DO I = NMARG + 1, 4      
+      DO I = NMARG + 1, 4
          MARGIN( I ) = MARGIN( 1 )
       END DO
 
@@ -1092,14 +1092,14 @@
 
 *  Start up the graphics system, and create an AST Plot. Leave room for a
 *  key if required. A pointer to the Plot is returned, together with AGI
-*  identifiers for the FRAME, DATA and KEY pictures. Note, to get the index of 
-*  a Frame (eg ICAT) in the returned Plot, you add the returned value of 
+*  identifiers for the FRAME, DATA and KEY pictures. Note, to get the index of
+*  a Frame (eg ICAT) in the returned Plot, you add the returned value of
 *  NFRM onto its index in IWCS.  The PGPLOT viewport is set up so that it
 *  corresponds to the DATA picture.
       CLRKEY = .FALSE.
       IF( KEY ) THEN
 
-*  Get the position required for the key. The margin between DATA and KEY 
+*  Get the position required for the key. The margin between DATA and KEY
 *  Frames is determined by the horizontal position requested for the key.
          CALL PAR_GDRVR( 'KEYPOS', 2, -1.0, 1.0, KEYPOS, NKP, STATUS )
          IF( KEYPOS( 1 ) .GE. 0 ) THEN
@@ -1110,28 +1110,28 @@
          END IF
 
 *  Start up the graphics system, creating a KEY picture.
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
-     :                   MARGIN, 1, 'KEY', 'R', KW, ASPECT, DOMAIN, 
-     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ',
+     :                   MARGIN, 1, 'KEY', 'R', KW, ASPECT, DOMAIN,
+     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN,
      :                   STATUS )
 
 *  Otherwise, start up the graphics system, creating no KEY picture.
       ELSE
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
-     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, DOMAIN, BOX, 
-     :                   IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ',
+     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, DOMAIN, BOX,
+     :                   IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN,
      :                   STATUS )
       END IF
 
-*  Find the index of the Frame within the Plot corresponding to the 
-*  catalogue columns specifying the vector positions. 
+*  Find the index of the Frame within the Plot corresponding to the
+*  catalogue columns specifying the vector positions.
       ICAT = ICAT + NFRM
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the TITLE parameter (if any) from the input catalogue.
-      CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )       
+      CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
          CALL CAT_TRLSE( GTTL, STATUS )
@@ -1145,16 +1145,16 @@
       END IF
 
 *  If the user did not specify a Plot title (as indicated by the Plot title
-*  being the same as the WCS title), make the catalogue Title the default 
-*  Title for the Plot. We have to be careful about the timing of this change 
-*  to the Title. If we did it before KPG1_PLOT (i.e. if we set the Title in 
-*  IWCS) it may prevent alignment ocurring within KPG1_PLOT since alignment 
+*  being the same as the WCS title), make the catalogue Title the default
+*  Title for the Plot. We have to be careful about the timing of this change
+*  to the Title. If we did it before KPG1_PLOT (i.e. if we set the Title in
+*  IWCS) it may prevent alignment ocurring within KPG1_PLOT since alignment
 *  fails if the Title of two Frames differ (??).
-      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
+      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ.
      :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
 
          IF( TITLE .NE. ' ' ) THEN
-            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ), 
+            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ),
      :                     STATUS )
          END IF
 
@@ -1172,7 +1172,7 @@
       IF( .NOT. V2PLUS ) THEN
          REFANG = 0.0
 
-*  Otherwise, for V2 catalogues (or later), get the angle from the POLANAL 
+*  Otherwise, for V2 catalogues (or later), get the angle from the POLANAL
 *  Frame in the catalogues WCS FrameSet...
       ELSE
          REFANG = 0.0
@@ -1183,7 +1183,7 @@
       REFANG = REFANG * DTOR
 
 *  Get the angle (in degrees) which is to be added to the values stored
-*  in the supplied catalogue. Do not set a dynamic default. Constrain to 
+*  in the supplied catalogue. Do not set a dynamic default. Constrain to
 *  0 to 360 degrees.
       CALL PAR_GDR0R( 'ANGROT', -1.0, 0.0, 360.0, .FALSE., ANGROT,
      :                STATUS )
@@ -1191,7 +1191,7 @@
 *  Convert to radians.
       ANGROT = ANGROT * DTOR
 
-*  See if the angles are clockwise (i.e. if they are to be negated before 
+*  See if the angles are clockwise (i.e. if they are to be negated before
 *  being used).
       CALL PAR_GET0L( 'NEGATE', NEGATE, STATUS )
 
@@ -1207,9 +1207,9 @@
       CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Establish the default value for the vector scaling factor such that
-*  a typical data value corresponds to a vector equal to one 15th of 
-*  the smallest DATA zone dimension, and then get a new (positive) value.  
-*  If a value of zero is supplied, use the default value.  XM is measured in 
+*  a typical data value corresponds to a vector equal to one 15th of
+*  the smallest DATA zone dimension, and then get a new (positive) value.
+*  If a value of zero is supplied, use the default value.  XM is measured in
 *  metres so 100 time converts to centimetres.
       DEFSCA = ABS( NVEC0 * TYPDAT / ( 100.0 * MIN( XM, YM ) ) )
       CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
@@ -1225,7 +1225,7 @@
       CALL PAR_CHOIC( 'JUST', 'CENTRE', 'CENTRE,START,END', .TRUE.,
      :                JUST, STATUS )
 
-*  Get the arrow head size, and convert it to units of DATA zone world 
+*  Get the arrow head size, and convert it to units of DATA zone world
 *  coordinates.
       CALL PAR_GET0R( 'ARROW', AHSIZE, STATUS )
       AHSIZE = AHSIZE * MAX( X2 - X1, Y2 - Y1 )
@@ -1239,29 +1239,29 @@
 *  to graphics world coordinates.
       MAP = AST_GETMAPPING( IPLOT, ICAT, AST__BASE, STATUS )
 
-*  Use this Mapping to transform the (x,y) positions in the catalogue 
+*  Use this Mapping to transform the (x,y) positions in the catalogue
 *  into graphics world coordinates.
-      CALL AST_TRAN2( MAP, NIN, %VAL( CNF_PVAL( IPX ) ), 
+      CALL AST_TRAN2( MAP, NIN, %VAL( CNF_PVAL( IPX ) ),
      :                %VAL( CNF_PVAL( IPY ) ), .TRUE.,
-     :                %VAL( CNF_PVAL( IPX2 ) ), 
+     :                %VAL( CNF_PVAL( IPX2 ) ),
      :                %VAL( CNF_PVAL( IPY2 ) ), STATUS )
 
-*  Set the appearance of lines drawn using PGPLOT so that they mimic 
+*  Set the appearance of lines drawn using PGPLOT so that they mimic
 *  curves produced using astCurves.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 
 *  Plot the vectors.
-      CALL POL1_VECPL( NIN, %VAL( CNF_PVAL( IPX2 ) ), 
-     :                 %VAL( CNF_PVAL( IPY2 ) ), 
+      CALL POL1_VECPL( NIN, %VAL( CNF_PVAL( IPX2 ) ),
+     :                 %VAL( CNF_PVAL( IPY2 ) ),
      :                 %VAL( CNF_PVAL( IPMAG ) ),
-     :                 %VAL( CNF_PVAL( IPANG ) ), 
+     :                 %VAL( CNF_PVAL( IPANG ) ),
      :                 ANGFAC, ANGROT, DSCALE, AHSIZE,
      :                 JUST, NEGATE, REFANG, STATUS )
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )
 
-*  First draw the axes if required. 
+*  First draw the axes if required.
       IF ( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
 *  Plot the key.
@@ -1274,19 +1274,19 @@
          IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'POLPLOT_4', 'There is insufficient '//
-     :                    'room in the current picture for a key.', 
+     :                    'room in the current picture for a key.',
      :                    STATUS )
             GO TO 999
          END IF
 
-*  Get the PGPLOT character height scale factor used for numerical labels 
+*  Get the PGPLOT character height scale factor used for numerical labels
 *  in the main vector map area.
          CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .TRUE., ATTRS, STATUS )
          CALL PGQCH( HGT )
          CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .FALSE., ATTRS, STATUS )
 
-*  If no value was supplied for the vertical position of the KEY using 
-*  parameter KEYPOS, find the value which puts the top of the key level 
+*  If no value was supplied for the vertical position of the KEY using
+*  parameter KEYPOS, find the value which puts the top of the key level
 *  with the top of the DATA picture.
          IF( NKP .LT. 2 ) THEN
 
@@ -1311,7 +1311,7 @@
 *  that it does not obscure the top axis).
             IF( CLRKEY ) KEYOFF = 0.99*KEYOFF
 
-*  If the horizontal positions was given using parameter KEYPOS, just 
+*  If the horizontal positions was given using parameter KEYPOS, just
 *  activate the KEY picture. This returns a pointer to an AST Plot which
 *  can be used to draw in the KEY picture.
          ELSE
@@ -1333,7 +1333,7 @@
 *  Establish some synonyms for AST attribute names.
          CALL KPG1_ASPSY( 'FORMAT(SCA*LE)', 'FORMAT(1)', STATUS )
          CALL KPG1_ASPSY( 'FORMAT(VEC*TOR)', 'FORMAT(2)', STATUS )
-         CALL KPG1_ASPSY( 'COLOUR(BACK*GROUND)', 'TEXTBACKCOLOUR', 
+         CALL KPG1_ASPSY( 'COLOUR(BACK*GROUND)', 'TEXTBACKCOLOUR',
      :                    STATUS )
          CALL KPG1_ASPSY( '(VEC*TOR)', '(CURVES)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
@@ -1357,7 +1357,7 @@
 
 *  Arrive here if an error occurs.
  999  CONTINUE
-      
+
 *  Release resources used to hold synonyms for AST attribute names.
       CALL KPG1_ASPSY( ' ', ' ', STATUS )
 

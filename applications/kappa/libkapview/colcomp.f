@@ -25,13 +25,13 @@
 *     NDF. The resulting colour composite image is available in two
 *     forms; as an NDF with an associated colour table (see parameter
 *     OUT and LUT), and as an ASCII PPM image file (see parameter PPM).
-*     The full pixel resolution of the input NDFs is retained. Note, 
+*     The full pixel resolution of the input NDFs is retained. Note,
 *     this application does not actually display the image, it just
 *     creates various output files which must be displayed using other
 *     tools (see below).
 *
 *     The data values in each of the input NDFs which are to be mapped
-*     on to zero intensity and full intensity can be given manually 
+*     on to zero intensity and full intensity can be given manually
 *     using parameters RLOW, RHIGH, GLOW, GHIGH, BLOW and BHIGH, but by
 *     default they are evaluated automatically. This is done by finding
 *     specified percentile points within the data histograms of each of
@@ -103,15 +103,15 @@
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device which will be used to display
 *        the NDF output (see parameter OUT). This is needed only to
-*        determine the number of available colours. No graphics output 
+*        determine the number of available colours. No graphics output
 *        is created by this application. This parameter is not accessed
-*        if a null (!) value is supplied for parameter OUT. The device 
-*        must have at least 24 colour indices or greyscale intensities. 
+*        if a null (!) value is supplied for parameter OUT. The device
+*        must have at least 24 colour indices or greyscale intensities.
 *        [current image-display device]
 *     GHIGH = _DOUBLE (Read)
 *        The data value corresponding to full green intensity. If a null
 *        (!) value is supplied, the value actually used will be
-*        determined by forming a histogram of the data values in the 
+*        determined by forming a histogram of the data values in the
 *        NDF specified by parameter ING, and finding the data value at
 *        the second histogram percentile specified by parameter
 *        PERCENTILES. [!]
@@ -127,7 +127,7 @@
 *        null (!) value may be supplied in which case the blue intensity
 *        in the output will be zero at every pixel.
 *     ING = NDF (Read)
-*        The input NDF containing the data to be displayed in green. A 
+*        The input NDF containing the data to be displayed in green. A
 *        null (!) value may be supplied in which case the green
 *        intensity in the output will be zero at every pixel.
 *     INR = NDF (Read)
@@ -152,17 +152,17 @@
 *        (!) value is supplied, the value actually used will be
 *        determined by forming a histogram of the data values in the
 *        NDF specified by parameter INR, and finding the data value at
-*        the first histogram 
+*        the first histogram
 *        percentile specified by parameter PERCENTILES. [!]
 *     OUT = NDF (Write)
-*        The output colour composite image in NDF format. Values in 
+*        The output colour composite image in NDF format. Values in
 *        this output image are integer colour indices into the colour
 *        table created using parameter LUT. The values are shifted to
 *        account for the indices reserved for the palette (i.e. the
 *        first entry in the colour table is addressed as entry 16, not
 *        entry 1). The NDF is intended to be used as the input data in
 *        conjunction with DISPLAY SCALE=FALSE. If a null value (!) is
-*        supplied, no output NDF will be created.  
+*        supplied, no output NDF will be created.
 *     PERCENTILES( 2 ) = _REAL (Read)
 *        The percentiles that define the default scaling limits. For
 *        example, [25,75] would scale between the quartile values.
@@ -179,7 +179,7 @@
 *  Examples:
 *     colcomp m31_r m31_g m31_b m31_col m31_lut
 *        Combines the 3 NDFs m31_r, m31_g, and m31_b to create a colour
-*        composite image stored in NDF m31_col. A colour look-up table 
+*        composite image stored in NDF m31_col. A colour look-up table
 *        is also created and stored in NDF m31_lut. It is assumed that
 *        the output image will be displayed on the current graphics
 *        device. The created colour composite image should be displayed
@@ -194,17 +194,17 @@
 *
 *           xv m31.ppm
 *
-*        It can be converted to a GIF (for instance, for inclusion in 
+*        It can be converted to a GIF (for instance, for inclusion in
 *        WWW pages) using the command:
 *
 *           ppmquant 256 m31.ppm | ppmtogif > m31.gif
 *
-*        These commands assume you have "xv", "ppmquant" and "ppmtogif" 
+*        These commands assume you have "xv", "ppmquant" and "ppmtogif"
 *        installed at your site. None of them command are part of KAPPA.
 
 *  Notes:
 *     -  The output image (PPM or NDF) covers the area of overlap
-*     between the input NDFs at full resolution. 
+*     between the input NDFs at full resolution.
 *     -  The output image is based on the values in the DATA components
 *     of the input NDFs. Any VARIANCE and QUALITY arrays in the input
 *     NDFs are ignored.
@@ -215,7 +215,7 @@
 *  Implementation Status:
 *     -  The HISTORY, WCS and AXIS components, together with any
 *     extensions are propagated to the output NDF, from the first
-*     supplied input NDF. 
+*     supplied input NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  Only data of type _REAL can be processed directly. Data of
@@ -374,9 +374,9 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the red input NDF, ensuring that it does not have more than 2
-*  significant dimensions. The indices of the two axes to use, together 
+*  significant dimensions. The indices of the two axes to use, together
 *  with their pixel index bounds are returned.
-      CALL KPG1_GTNDF( 'INR', 2, .FALSE., 'READ', INDF( R ), 
+      CALL KPG1_GTNDF( 'INR', 2, .FALSE., 'READ', INDF( R ),
      :                 SDIM( 1, R ), SLBND( 1, R ), SUBND( 1, R ),
      :                 STATUS )
 
@@ -386,10 +386,10 @@
          CALL ERR_ANNUL( STATUS )
          GOT( R ) = .FALSE.
 
-*  Otherwise, set a flag to indicate that we do have the Red image, 
-*  update the overlap area common to all the input images obtained so 
-*  far, store the colour of this input image and increment the number 
-*  of input images obtained so far. 
+*  Otherwise, set a flag to indicate that we do have the Red image,
+*  update the overlap area common to all the input images obtained so
+*  far, store the colour of this input image and increment the number
+*  of input images obtained so far.
       ELSE
          GOT( R ) = .TRUE.
 
@@ -406,7 +406,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Do the same for the green input image.
-      CALL KPG1_GTNDF( 'ING', 2, .FALSE., 'READ', INDF( G ), 
+      CALL KPG1_GTNDF( 'ING', 2, .FALSE., 'READ', INDF( G ),
      :                 SDIM( 1, G ), SLBND( 1, G ), SUBND( 1, G ),
      :                 STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -429,7 +429,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Do the same for the blue input image.
-      CALL KPG1_GTNDF( 'INB', 2, .FALSE., 'READ', INDF( B ), 
+      CALL KPG1_GTNDF( 'INB', 2, .FALSE., 'READ', INDF( B ),
      :                 SDIM( 1, B ), SLBND( 1, B ), SUBND( 1, B ),
      :                 STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -455,13 +455,13 @@
       IF( NIM .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'COLCOMP_ERR1', 'No input NDFs supplied.',
-     :                 STATUS )  
+     :                 STATUS )
          GO TO 999
       END IF
 
 *  Report an error if there is no common overlap area.
-      IF( ( LBNDO( 1 ) .GT. UBNDO( 1 ) .OR. 
-     :      LBNDO( 2 ) .GT. UBNDO( 2 ) ) .AND. 
+      IF( ( LBNDO( 1 ) .GT. UBNDO( 1 ) .OR.
+     :      LBNDO( 2 ) .GT. UBNDO( 2 ) ) .AND.
      :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'N', NIM )
@@ -470,10 +470,10 @@
          GO TO 999
       END IF
 
-*  Find the percentiles required. 
+*  Find the percentiles required.
       PERCNT( 1 ) = 5.0
       PERCNT( 2 ) = 95.0
-      CALL PAR_GDR1R( 'PERCENTILES', 2, PERCNT, 0.0, 100.0, .TRUE., 
+      CALL PAR_GDR1R( 'PERCENTILES', 2, PERCNT, 0.0, 100.0, .TRUE.,
      :                PERCNT, STATUS )
 
 *  Convert percentiles to fractions.
@@ -496,9 +496,9 @@
 
 *  Get the bounds of the NDF, including any insignificant axes.
             CALL NDF_BOUND( INDF( I ), NDF__MXDIM, LBND, UBND, NDIM,
-     :                      STATUS ) 
+     :                      STATUS )
 
-*  Replace the bounds for the axes being used within this input NDF 
+*  Replace the bounds for the axes being used within this input NDF
 *  with the bounds of the overlap region.
             DO J = 1, 2
                IAX = SDIM( J, I )
@@ -506,8 +506,8 @@
                UBND( IAX ) = UBNDO( J )
             END DO
 
-*  Get an NDF identifier for a section matching the overlap area. 
-            CALL NDF_SECT( INDF( I ), NDIM, LBND, UBND, INDFS, STATUS ) 
+*  Get an NDF identifier for a section matching the overlap area.
+            CALL NDF_SECT( INDF( I ), NDIM, LBND, UBND, INDFS, STATUS )
 
 *  Use the section identifier from now on.
             CALL NDF_ANNUL( INDF( I ), STATUS )
@@ -522,7 +522,7 @@
             CALL LPG_STATE( PARLO( I ), ACTLO, STATUS )
             CALL LPG_STATE( PARHI( I ), ACTHI, STATUS )
 
-            IF( ACTLO .EQ. SUBPAR__ACTIVE .AND. 
+            IF( ACTLO .EQ. SUBPAR__ACTIVE .AND.
      :          ACTHI .EQ. SUBPAR__ACTIVE ) THEN
 
                CALL PAR_GET0R( PARLO( I ), LO( I ), STATUS )
@@ -534,7 +534,7 @@
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram used to find the percentiles.
-               CALL KPG1_MXMNR( .TRUE., EL, 
+               CALL KPG1_MXMNR( .TRUE., EL,
      :                          %VAL( CNF_PVAL( IPIN( I ) ) ), NINVAL,
      :                          RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
 
@@ -559,7 +559,7 @@
                END IF
 
 *  Set the dynamic defaults for the scaling limits.  We do this so that
-*  the default values will appear in any parameter prompts which are 
+*  the default values will appear in any parameter prompts which are
 *  issued (assuming PPATH=DYNAMIC in the interface file).
                CALL PAR_DEF0R( PARLO( I ), PERVAL( 1 ), STATUS )
                CALL PAR_DEF0R( PARHI( I ), PERVAL( 2 ), STATUS )
@@ -567,11 +567,11 @@
 *  Check that no error has occurred.
                IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the lower limit. 
+*  Get the lower limit.
                CALL PAR_GET0R( PARLO( I ), LO( I ), STATUS )
 
 *  If a null value was supplied, annul the error and use the dynamic
-*  default.  We do it like this, rather than just setting VPATH=DYNAMIC 
+*  default.  We do it like this, rather than just setting VPATH=DYNAMIC
 *  in the interface file to facilitate automatic re-invocation of the
 *  application for process groups of NDFs (see lpg_again.f).
                IF( STATUS .EQ. PAR__NULL ) THEN
@@ -579,7 +579,7 @@
                   LO( I ) = PERVAL( 1 )
                END IF
 
-*  Now get the upper limit in the same way. 
+*  Now get the upper limit in the same way.
                CALL PAR_GET0R( PARHI( I ), HI( I ), STATUS )
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -602,7 +602,7 @@
             LO( I ) = VAL__BADR
          END IF
 
-      END DO      
+      END DO
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -610,9 +610,9 @@
 *  Create the output NDF to contain the integer colour indices.
 *  Propagate the section from the first supplied input NDF.
       CALL LPG_PROP( INDF( FIRST ), 'AXIS,WCS,NOLABEL,NOTITLE', 'OUT',
-     :               INDFO, STATUS ) 
+     :               INDFO, STATUS )
 
-*  Annul the error if a null value was supplied.  We can still create 
+*  Annul the error if a null value was supplied.  We can still create
 *  the PPM version of the image.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -621,20 +621,20 @@
       ELSE
 
 *  Set the output data type to _INTEGER.
-         CALL NDF_STYPE( '_INTEGER', INDFO, 'DATA', STATUS ) 
+         CALL NDF_STYPE( '_INTEGER', INDFO, 'DATA', STATUS )
 
 *  Map the output data array.
-         CALL NDF_MAP( INDFO, 'DATA', '_INTEGER', 'WRITE', IPOUT, 
+         CALL NDF_MAP( INDFO, 'DATA', '_INTEGER', 'WRITE', IPOUT,
      :                 NDATA, STATUS )
 
 *  Open the graphics device on which the image is to be displayed.
         CALL KPG1_PGOPN( 'DEVICE', 'READ', IPIC, STATUS )
 
 *  Check whether chosen device is an 'image display' with a suitable
-*  minimum number of colour indices, and obtain the number of colour 
+*  minimum number of colour indices, and obtain the number of colour
 *  indices.
          CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'//
-     :                    'WINDOW,MATRIX_PRINTER', ' ', MINCOL, NLUT, 
+     :                    'WINDOW,MATRIX_PRINTER', ' ', MINCOL, NLUT,
      :                    STATUS )
 
 *  Obtain the colour for bad pixels as a colour index into the palette.
@@ -653,10 +653,10 @@
 *  Create the output colour table.
          LUTBND( 1 ) = 3
          LUTBND( 2 ) = NLUT
-         CALL LPG_CREP( 'LUT', '_REAL', 2, LUTBND, INDFL, STATUS ) 
+         CALL LPG_CREP( 'LUT', '_REAL', 2, LUTBND, INDFL, STATUS )
 
 *  Map the output colour table.
-         CALL NDF_MAP( INDFL, 'DATA', '_REAL', 'WRITE', IPLUT, EL, 
+         CALL NDF_MAP( INDFL, 'DATA', '_REAL', 'WRITE', IPLUT, EL,
      :                 STATUS )
 
 *  Get work space.
@@ -666,17 +666,17 @@
          CALL PSX_CALLOC( NHIST, '_REAL', IPBHST, STATUS )
 
 *  Create the output colour index array and colour table.
-         CALL KPS1_CCMQN( NLUT, NDATA, %VAL( CNF_PVAL( IPIN( R ) ) ), 
+         CALL KPS1_CCMQN( NLUT, NDATA, %VAL( CNF_PVAL( IPIN( R ) ) ),
      :                    HI( R ),
-     :                 LO( R ), %VAL( CNF_PVAL( IPIN( G ) ) ), 
+     :                 LO( R ), %VAL( CNF_PVAL( IPIN( G ) ) ),
      :                 HI( G ), LO( G ),
-     :                 %VAL( CNF_PVAL( IPIN( B ) ) ), 
+     :                 %VAL( CNF_PVAL( IPIN( B ) ) ),
      :                 HI( B ), LO( B ), BPCI,
      :                 CTM__RSVPN, NHIST, %VAL( CNF_PVAL( IPRHST ) ),
      :                 %VAL( CNF_PVAL( IPGHST ) ),
-     :                 %VAL( CNF_PVAL( IPBHST ) ), 
+     :                 %VAL( CNF_PVAL( IPBHST ) ),
      :                 %VAL( CNF_PVAL( IPPHST ) ),
-     :                 %VAL( CNF_PVAL( IPLUT ) ), 
+     :                 %VAL( CNF_PVAL( IPLUT ) ),
      :                 %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
 *  Free the work space.
@@ -701,21 +701,21 @@
 *  Otherwise, create the PPM output.
       ELSE
 
-*  If an output NDF was not created, get the BAD colour as a named 
+*  If an output NDF was not created, get the BAD colour as a named
 *  colour, and find the corresponding RGB values.
          IF( INDFO .EQ. NDF__NOID ) THEN
             CALL PAR_GET0C( 'BADCOL', BADCOL, STATUS )
-            CALL KPG1_NMCOL( BADCOL, RGBBAD( R ), RGBBAD( G ), 
+            CALL KPG1_NMCOL( BADCOL, RGBBAD( R ), RGBBAD( G ),
      :                       RGBBAD( B ), STATUS )
          END IF
 
 *  Store the data in the output file.
          CALL KPS1_CCMPP( FD, UBNDO( 1 ) - LBNDO( 1 ) + 1,
-     :                    UBNDO( 2 ) - LBNDO( 2 ) + 1, 
-     :                    %VAL( CNF_PVAL( IPIN( R ) ) ), 
+     :                    UBNDO( 2 ) - LBNDO( 2 ) + 1,
+     :                    %VAL( CNF_PVAL( IPIN( R ) ) ),
      :                    HI( R ), LO( R ),
      :                    %VAL( CNF_PVAL( IPIN( G ) ) ), HI( G ),
-     :                    LO( G ), %VAL( CNF_PVAL( IPIN( B ) ) ), 
+     :                    LO( G ), %VAL( CNF_PVAL( IPIN( B ) ) ),
      :                    HI( B ), LO( B ),
      :                    RGBBAD, STATUS )
 
@@ -733,7 +733,7 @@
 *  Add a context report if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'COLCOMP_ERR', 'COLCOMP: Failed to create a '//
-     :                 'colour composite NDF from separate RGB NDFs.', 
+     :                 'colour composite NDF from separate RGB NDFs.',
      :                 STATUS )
       END IF
 

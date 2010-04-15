@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHU_NSPFMAT( NSFORMAT, NSFLAG, PRIFORMAT, STATUS) 
+     : CHU_NSPFMAT( NSFORMAT, NSFLAG, PRIFORMAT, STATUS)
 *+
 *  Name:
 *     CHU_NSPFMAT
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL CHU_NSPFMAT( NSFORMAT, NSFLAG, PRIFORMAT, STATUS) 
+*      CALL CHU_NSPFMAT( NSFORMAT, NSFLAG, PRIFORMAT, STATUS)
 *
 *  Description:
 *     Test a format against the allowed Non standard formats.
@@ -43,7 +43,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

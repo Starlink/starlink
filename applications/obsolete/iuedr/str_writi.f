@@ -42,19 +42,19 @@
 
 *   Import:
       BYTE CNTRL(MAXTOK)    ! control string
- 
+
       INTEGER IVALUE        ! integer value
       INTEGER MAXC          ! size of value
- 
+
 *   Import/Export:
       BYTE LINE(MAXC)       ! line to be modified
- 
+
       INTEGER POS           ! character position
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL FIXED         ! whether fixed point
       LOGICAL RIGHT         ! whether right justified

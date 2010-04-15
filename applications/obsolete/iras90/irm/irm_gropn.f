@@ -143,8 +143,8 @@
 
 *  Check status. If error, report and exit.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'IRM_GROPN_ERR1', 
-     :          'IRM_GROPN: Unable to open a graphic device properly.', 
+         CALL ERR_REP( 'IRM_GROPN_ERR1',
+     :          'IRM_GROPN: Unable to open a graphic device properly.',
      :                 STATUS )
          GOTO 999
       END IF
@@ -160,7 +160,7 @@
 
 *  If error happened, report and exit.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'IRM_GROPN_ERR2', 
+         CALL ERR_REP( 'IRM_GROPN_ERR2',
      :          'IRM_GROPN: Unable to obtain graphic workstation type.',
      :                 STATUS )
          GOTO 999

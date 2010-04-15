@@ -25,8 +25,8 @@
 #
 #     redirect
 #        If set to a non-empty string, this should be the name of another
-#        Helpcontrol widget.  In this case, invoking the Help button 
-#        associated with this widget will have the same effect as 
+#        Helpcontrol widget.  In this case, invoking the Help button
+#        associated with this widget will have the same effect as
 #        invoking the button associated with the named widget.
 #
 #     Helpcontrol also inherits all the appropriate public variables
@@ -116,7 +116,7 @@
 ########################################################################
 #  Private methods.
 ########################################################################
-       
+
 #-----------------------------------------------------------------------
       private method dohelp {} {
 #-----------------------------------------------------------------------
@@ -181,6 +181,6 @@
    proc helpcontrol { pathname args } {
       uplevel Helpcontrol $pathname $args
    }
-   
+
 
 # $Id$

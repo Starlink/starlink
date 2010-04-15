@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       INTEGER ICIDX              ! Colour index
 
@@ -89,7 +89,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK .OR.
      :     .NOT. PON_DEVOP( .TRUE., STATUS ) ) RETURN
-      
+
 *  Set the colour representation of a particular colour (pen)
 *  using RGB colour intensities.
       CALL PAR_GET0I( 'COLOUR', ICIDX, STATUS )

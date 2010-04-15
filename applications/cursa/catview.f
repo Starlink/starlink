@@ -15,8 +15,8 @@
 *        The global status.
 *  Description:
 *     catview is an application for browsing catalogues and selecting
-*     subsets from the command line.  It provides facilities to: 
-* 
+*     subsets from the command line.  It provides facilities to:
+*
 *     * list the columns in a catalogue,
 *
 *     * list the parameters and textual information from a catalogue,
@@ -274,7 +274,7 @@
 *       else if the action is 'SHOWSEL' then
 *         Display the selections which currently exist.
 *       else if the action is 'CHOSEL' then
-*         Choose an existing selection to become the current 
+*         Choose an existing selection to become the current
 *         selection.
 *       else if the action is 'SETSEL' then
 *         Create a new selection.
@@ -433,7 +433,7 @@ C         Currently sorted columns, ultimately also index columns.
      :  GUI,     ! Flag; is the application being driven from a GUI?
      :  CFLAG,   ! Flag; copy all or chosen columns to new catalogue?
      :  TFLAG,   ! Flag; copy header text to new catalogue?
-     :  BINSP,   ! Flag; how are histogram details specified? 
+     :  BINSP,   ! Flag; how are histogram details specified?
      :  NORML    ! Flag; is the histogram to be normalised?
       REAL
      :  BINDET   ! Histogram bin details (width or no. of bins).
@@ -631,7 +631,7 @@ C                 print4000, 'after PAR_CANCL'
             ELSE IF (ACTION .EQ. 'CHOSEL') THEN
 
 *
-*             Choose an existing selection to become the current 
+*             Choose an existing selection to become the current
 *             selection.
 
                CALL PAR_GET0I ('SELNO', SELNO, STATUS)
@@ -755,7 +755,7 @@ C             eventually indexed columns will also be added.
                CALL PAR_CANCL ('DECPL', STATUS)
 
                CALL CAP_GDCPL (DECPL, STATUS)
-                  
+
             ELSE IF (ACTION .EQ. 'STATS') THEN
 
 *

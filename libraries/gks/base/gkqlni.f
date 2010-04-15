@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1989
 *
- 
+
 *-------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -90,7 +90,7 @@ C# IL>=a, OL>=0
       IF(XL2(1) .GT. XL2(2)) IM2 = 2
       IF(XL1(IM1) .GT. XL2(3-IM2))GOTO 999
       IF(XL2(IM2) .GT. XL1(3-IM1))GOTO 999
- 
+
 *  Here bounding boxes DO intersect
 *     Do the two endpoints of the 2nd line occur on the same side
 *     of the first line?
@@ -150,7 +150,7 @@ C# IL>=a, OL>=0
         ENDIF
         GOTO 999
       ENDIF
- 
+
 *  Here the end points of the 2nd line occur at different sides of
 *  the first line.
 *     Is also true for the end points of the 1st w.r.t. the 2nd.
@@ -158,17 +158,17 @@ C# IL>=a, OL>=0
       SIDE4 = BX*EY - EX*BY
       IF((SIDE3 .GT. 0.0) .AND. (SIDE4 .GT. 0.0)) GOTO 999
       IF((SIDE3 .LT. 0.0) .AND. (SIDE4 .LT. 0.0)) GOTO 999
- 
+
 *  Here the lines must cross
       CROSS = .TRUE.
- 
+
 *  Find Crossing point
       WGT = SIDE1/(SIDE1-SIDE2)
       XC(1) = XL2(1) + WGT*(XL2(2)-XL2(1))
       YC(1) = YL2(1) + WGT*(YL2(2)-YL2(1))
       XC(2) = XC(1)
       YC(2) = YC(1)
- 
+
   999 CONTINUE
- 
+
       END

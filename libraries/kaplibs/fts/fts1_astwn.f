@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,18 +60,18 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER FC
-      INTEGER INDF 
+      INTEGER INDF
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -94,10 +94,10 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Indicate no warnings have yet been issued. */
-      WARNED = .FALSE. 
+      WARNED = .FALSE.
 
 *  Indicate there is no message to report yet.
-      REPORT = .FALSE. 
+      REPORT = .FALSE.
       MESS = ' '
       IAT = 0
 
@@ -108,10 +108,10 @@
 *  Search the FitsChan for cards containing messages issued by AST.
       DO WHILE( AST_FINDFITS( FC, 'ASTWARN', HEADER, .TRUE., STATUS ) )
 
-*  Extract the keyword value from the header card (minus delimiting 
+*  Extract the keyword value from the header card (minus delimiting
 *  quotes).
          VALUE = ' '
-         START = INDEX( HEADER, '''' ) 
+         START = INDEX( HEADER, '''' )
          IF( START .NE. 0 ) THEN
             HLEN = CHR_LEN( HEADER )
             IF( HEADER( HLEN : HLEN ) .EQ. '''' ) THEN
@@ -140,7 +140,7 @@
                IF( .NOT. WARNED )  THEN
                   IF( INDF .NE. NDF__NOID ) THEN
                      CALL NDF_MSG( 'NDF', INDF )
-                     CALL MSG_OUT( 'FTS1_ASTWN_MSG1', '''^NDF'':', 
+                     CALL MSG_OUT( 'FTS1_ASTWN_MSG1', '''^NDF'':',
      :                             STATUS )
                   END IF
                   WARNED = .TRUE.
@@ -164,7 +164,7 @@
          IF( .NOT. WARNED )  THEN
             IF( INDF .NE. NDF__NOID ) THEN
                CALL NDF_MSG( 'NDF', INDF )
-               CALL MSG_OUT( 'FTS1_ASTWN_MSG3', '''^NDF'': ', 
+               CALL MSG_OUT( 'FTS1_ASTWN_MSG3', '''^NDF'': ',
      :                       STATUS )
             END IF
             WARNED = .TRUE.

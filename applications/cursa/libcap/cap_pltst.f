@@ -306,7 +306,7 @@
          RADIUS = MAX(RADIUS, 4.8481368D-6)
 
 *
-*       Set the ranges for the viewport and window for the chart.  
+*       Set the ranges for the viewport and window for the chart.
 *       Note that the X axis is `flipped' in order to plot the
 *       Right Ascension increasing from right to left.
 

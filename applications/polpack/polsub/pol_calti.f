@@ -1,7 +1,7 @@
       SUBROUTINE POL_CALTI( NEL, IN1, IN2, F, OUT, STATUS )
 *+
 * Name:
-*    POL_CALTI 
+*    POL_CALTI
 
 *  Purpose:
 *     To calculate an F-factor corrected total intensity image.
@@ -39,7 +39,7 @@
 *
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     {enter_new_authors_here}
@@ -60,7 +60,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Primdat constants
-      
+
 *  Arguments Given:
       INTEGER NEL
       REAL IN1( NEL )
@@ -73,7 +73,7 @@
 *  Local Variables:
       INTEGER IEL                ! loop counter
       REAL RF                    ! reciprocal F
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -95,7 +95,7 @@
             OUT( IEL ) = IN1( IEL ) + IN2( IEL ) * RF
          ENDIF
       ENDDO
-         
+
 * Close down.
  99   CONTINUE
       END

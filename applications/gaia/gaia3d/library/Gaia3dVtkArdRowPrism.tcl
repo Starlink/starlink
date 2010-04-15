@@ -87,7 +87,7 @@ itcl::class ::gaia3d::Gaia3dVtkArdRowPrism {
    #  Given an ARD description of a row create an instance of this class.
    #  Make sure this passes the matches check first.
    public proc instance {desc} {
-      set coord [gaia3d::Gaia3dArdUtils::get_ard_args $desc] 
+      set coord [gaia3d::Gaia3dArdUtils::get_ard_args $desc]
       return [uplevel \#0 gaia3d::Gaia3dVtkArdRowPrism \#auto -coord $coord]
    }
 

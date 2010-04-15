@@ -13,14 +13,14 @@
      &QU_TRIPLOT,QAUTOLIM,QMAX,QMIN,UAUTOLIM,UMAX,UMIN)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  T R I P L O T _ I F A C E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C     TOP_STK (<), STK_TITLE (<),
 C     STK_NPTS (<), STK_LAMBDA (<),
@@ -39,15 +39,15 @@ C     LSTYLE (<), HIST (<), MARK (<),OUT_LU (<),
 C     QU_TRIPLOT (<), QAUTOLIM (<), QMAX (<), QMIN (<), UAUTOLIM (<)
 C     UMAX (<), UMIN (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
-C
-C  
 C
 C
-C The this is the triplot interface routine. A separate procedure is 
+C
+C
+C
+C The this is the triplot interface routine. A separate procedure is
 C required since there are several ways of calling the rouine.
 C
 C
@@ -71,7 +71,7 @@ C
       REAL STK_STOKES_QV(MAXPTS,MAXSPEC)
       REAL STK_STOKES_U(MAXPTS,MAXSPEC)
       REAL STK_STOKES_UV(MAXPTS,MAXSPEC)
-      CHARACTER*80 STK_TITLE(MAXSPEC) 
+      CHARACTER*80 STK_TITLE(MAXSPEC)
       INTEGER TOP_STK
 C
 C The current arrays
@@ -102,7 +102,7 @@ C
       REAL PARAMS(*)
 C
 C Plotting flags
-C 
+C
       LOGICAL BOX
       LOGICAL LROT
       LOGICAL CROT
@@ -123,7 +123,7 @@ C
 C
 C Plotting ranges
 C
-      REAL TMAX,TMIN 
+      REAL TMAX,TMIN
       REAL PMAX,PMIN
       REAL IMAX,IMIN
       REAL WMAX,WMIN
@@ -166,7 +166,7 @@ C
          ENDIF
       ENDIF
 C
-C Now go through the rest of the parameters. The first spectrum is 
+C Now go through the rest of the parameters. The first spectrum is
 C different (if box is set) since this sets up any autolimited
 C plotting ranges
 C

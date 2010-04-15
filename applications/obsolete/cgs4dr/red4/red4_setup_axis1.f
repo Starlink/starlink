@@ -1,5 +1,5 @@
 *+ RED4_SETUP_AXIS1
-      SUBROUTINE RED4_SETUP_AXIS1 (AXIS1, INDEX, AXIS1_DIM, 
+      SUBROUTINE RED4_SETUP_AXIS1 (AXIS1, INDEX, AXIS1_DIM,
      :   DCOLUMNS, DETINCR, DETNINCR, GLAMBDA, GDISP, STATUS)
 *    Description :
 *     This routine sets up the X axis array for a data set which is
@@ -9,7 +9,7 @@
 *     data set. The X axis array may be filled with pixel co-ordinates
 *     or wavelength values according to the values of GLAMBDA and GDISP.
 *    Invocation :
-*     CALL RED4_SETUP_AXIS1 (AXIS1, INDEX, AXIS1_DIM, DCOLUMNS, DETINCR, 
+*     CALL RED4_SETUP_AXIS1 (AXIS1, INDEX, AXIS1_DIM, DCOLUMNS, DETINCR,
 *    :   DETNINCR, GLAMBDA, GDISP, STATUS)
 *    Parameters :
 *     AXIS1( AXIS1_DIM )               = DOUBLE PRECISION( WRITE )
@@ -27,7 +27,7 @@
 *           The co-ordinate increment required per step in pixels
 *           (normally 1.0/NUMBER_STEPS, but can have other values)
 *     DETNINCR                         = INTEGER( READ )
-*           The number of detector positions (i.e. the oversampling 
+*           The number of detector positions (i.e. the oversampling
 *           factor).
 *     GLAMBDA                          = REAL( READ )
 *           The wavelength corresponding to pixel co-ordinate 31.0.
@@ -42,7 +42,7 @@
 *           Global status
 *    Method :
 *    Deficiencies :
-*     The Starlink convention on the labelling of axes, described in 
+*     The Starlink convention on the labelling of axes, described in
 *     SSN/22, states that the left hand side of the first bin should
 *     be labelled 0.0.
 *     However, the Figaro convention, described in the Figaro user guide,
@@ -68,7 +68,7 @@
 *      9-Nov-1990: Tentatively modified so that the axis is labelled
 *                  according to the Figaro co-ordinate convention.     (SMB)
 *     21-Nov-1990: GLAMBDA and GDISP parameters added, so this routine
-*                  can also be used to fill the axis1 array with 
+*                  can also be used to fill the axis1 array with
 *                  wavelength values. This same routine is used because
 *                  it is necessary to call it to fill the index array
 *                  anyway.                                             (SMB)
@@ -130,7 +130,7 @@
 *   Determine central pixel
       CP = REAL( DCOLUMNS / 2 )
 
-*   Determine if "supersampling" is being used (i.e. scanning the 
+*   Determine if "supersampling" is being used (i.e. scanning the
 *   detector over more than one pixel  to remove bad pixels).
 *   For normal operation this will be 1. For scanning over N pixels
 *   it will be N. (If DETNINCR is 1 there is no SUPERSAMPLING,
@@ -149,7 +149,7 @@
       OVERSAMPLING = DETNINCR / SUPERSAMPLING
 
 *   Calculate the X co-ordinate of the first bin in pixels, such that
-*   centre of the Nth group of NUMBER_STEPS bins will have X co-ordinate 
+*   centre of the Nth group of NUMBER_STEPS bins will have X co-ordinate
 *   REAL(N), which is the Figaro convention.
       FIRST_BIN = REAL( OVERSAMPLING + 1 ) / REAL( 2 * OVERSAMPLING )
 

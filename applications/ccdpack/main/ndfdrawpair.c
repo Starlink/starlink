@@ -13,11 +13,11 @@
 *     C extension to Tcl.
 
 *  Description:
-*     The ndfdrawpair command causes two NDFs or NDF Sets to be 
+*     The ndfdrawpair command causes two NDFs or NDF Sets to be
 *     drawn on the plotting device specified by the device parameter.
 *     The entirety of the plotting surface is used, and the routine
-*     can generate and cache pixel representations of the NDF in such a 
-*     way that repeatedly plotting the same images at different 
+*     can generate and cache pixel representations of the NDF in such a
+*     way that repeatedly plotting the same images at different
 *     positions is done quite efficiently.  The coordinate offset
 *     of each NDF is specified, and if there is any overlap of good
 *     pixels between the two, such pixels are drawn as the average of
@@ -47,49 +47,49 @@
 *        The factor by which the given frames should be magnified.
 *        Resampling is done into frameA/frameB but with a magnification of
 *        zoom added on, and a unit length in the resulting frame gives
-*        the size of one plotting pixel (though not necessarily one 
+*        the size of one plotting pixel (though not necessarily one
 *        screen pixel, which is determined by the size of the plotting
 *        device).
 *     ndfsetA = ndf-or-ndfset object
 *        The first NDF or NDF Set to plot.
 *     frameA = string
 *        Indicates the WCS frame into which the first NDF should be
-*        resampled; may be a numerical frame index, a domain name, or 
+*        resampled; may be a numerical frame index, a domain name, or
 *        one of the special strings "CURRENT" or "BASE".
 *     xoffA = real
 *        X offset by which to translate the first NDF in frame coordinates.
 *     yoffA = real
 *        Y offset by which to translate the first NDF in frame coordinates.
 *     lopercA = real
-*        Percentile in the data of the first NDF to correspond to the 
+*        Percentile in the data of the first NDF to correspond to the
 *        lower colour index for plotting (0 <= lopercA <= hipercA <= 100).
 *     hipercA = real
-*        Percentile in the data of the first NDF to correspond to the 
+*        Percentile in the data of the first NDF to correspond to the
 *        upper colour index for plotting (0 <= lopercA <= hipercA <= 100).
 *     ndfsetB = ndf-or-ndfset object
 *        The second NDF or NDF Set to plot.
 *     frameB = string
 *        Indicates the WCS frame into which the second NDF should be
-*        resampled; may be a numerical frame index, a domain name, or 
+*        resampled; may be a numerical frame index, a domain name, or
 *        one of the special strings "CURRENT" or "BASE".
 *     xoffB = real
 *        X offset by which to translate the second NDF in frame coordinates.
 *     yoffB = real
 *        Y offset by which to translate the second NDF in frame coordinates.
 *     lopercB = real
-*        Percentile in the data of the second NDF to correspond to the 
+*        Percentile in the data of the second NDF to correspond to the
 *        lower colour index for plotting (0 <= lopercB <= hipercB <= 100).
 *     hipercB = real
-*        Percentile in the data of the second NDF to correspond to the 
+*        Percentile in the data of the second NDF to correspond to the
 *        upper colour index for plotting (0 <= lopercB <= hipercB <= 100).
 
 *  Usage:
-*     ndfdrawpair device xorigin yorigin xdev ydev zoom 
+*     ndfdrawpair device xorigin yorigin xdev ydev zoom
 *                 ndfsetA frameA xoffA yoffA lopercA hipercA
 *                 ndfsetB frameB xoffB yoffB lopercB hipercB
 
 *  Return Value:
-*     The return value is a count of the pixels in the overlap region 
+*     The return value is a count of the pixels in the overlap region
 *     which have contributions from both the NDFs.  Thus if a zero is
 *     returned, no pixels are shared between the two NDFs (though note
 *     this does not necessarily mean there is no overlap; there could
@@ -145,7 +145,7 @@
 
    Tcl_ObjCmdProc do_ndfdrawpair;
 
-/* Structure for passing arguments from driver routine to background 
+/* Structure for passing arguments from driver routine to background
    routine. */
 
    struct ndfdrawpair_args_t {
@@ -262,9 +262,9 @@
       }
 
 /* Extract and validate frame objects. */
-      if ( NdfGetIframesFromObj( interp, objv[ 8 ], ndfset[ 0 ], 
+      if ( NdfGetIframesFromObj( interp, objv[ 8 ], ndfset[ 0 ],
                                  iframes[ 0 ] ) != TCL_OK ||
-           NdfGetIframesFromObj( interp, objv[ 14 ], ndfset[ 1 ], 
+           NdfGetIframesFromObj( interp, objv[ 14 ], ndfset[ 1 ],
                                  iframes[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
       }
@@ -273,7 +273,7 @@
       if ( cpgopen( device ) <= 0 ) {
          result = Tcl_NewStringObj( "", 0 );
          Tcl_AppendObjToObj( result, objv[ 0 ] );
-         Tcl_AppendStringsToObj( result, 
+         Tcl_AppendStringsToObj( result,
                                  ": failed to open plotting device \"",
                                  device, "\"", (char *) NULL );
          Tcl_SetObjResult( interp, result );
@@ -283,7 +283,7 @@
 /* Query the plotting device for highest and lowest available colour indices. */
       cpgqcir( &locolour, &hicolour );
 
-/* We will not require any surrounding space for annotation, so instruct 
+/* We will not require any surrounding space for annotation, so instruct
    PGPLOT to use the entire device surface for plotting. */
       cpgsvp( 0.0, 1.0, 0.0, 1.0 );
 
@@ -304,18 +304,18 @@
       shrink = ( psize * zoom < 2.1 ) ? 1.0 : 1.0 / ( psize * zoom );
 
 /* Generate the scaled data array ready for plotting.
-   This wants to be done in the main process, since it may cache the 
+   This wants to be done in the main process, since it may cache the
    calculated data block in the NDF structure. */
       for ( i = 0; i < 2; i++ ) {
-         STARCALL( 
-            pixbloc[ i ] = getpixbloc( ndfset[ i ], iframes[ i ], 
-                                       zoom * shrink, loperc[ i ], hiperc[ i ], 
+         STARCALL(
+            pixbloc[ i ] = getpixbloc( ndfset[ i ], iframes[ i ],
+                                       zoom * shrink, loperc[ i ], hiperc[ i ],
                                        locolour, hicolour, badcolour, status );
          )
       }
 
-/* The rest of the task can be performed as an independent background 
-   process, since it may take a significant amount of time and we want 
+/* The rest of the task can be performed as an independent background
+   process, since it may take a significant amount of time and we want
    Tcl events to continue to be serviced. */
 
 /* Set up the arguments block for the rest of the processing. */
@@ -336,7 +336,7 @@
 
 /* Call the routine which will do the rest of the processing. */
 /* I was experimenting with doing this in a subprocess so that the Tcl
-   event loop was attended to during processing.  this is why 
+   event loop was attended to during processing.  this is why
    do_ndfdrawpair is implemented as a separate routine here.  It can
    be invoked in this way using the call:
       return tclbgcmd( (ClientData) do_ndfdrawpair, interp, 1, ov )
@@ -380,10 +380,10 @@
       double zoom = pargs->zoom;
 
       plotzoom = zoom * shrink;
-      
+
 /* Calculate the position and extent of the pixel array. */
       for ( i = 0; i < 2; i++ ) {
-         STARCALL( 
+         STARCALL(
             getbbox( ndfset[ i ], iframes[ i ], lbox[ i ], ubox[ i ], status );
          )
          lbox[ i ][ 0 ] += xoff[ i ];
@@ -394,7 +394,7 @@
 /* Store dimensions and positions of the pixel blocks in screen pixel
    coordinates.  This gives us integer values for the geometry which can
    be used in pixel-like contexts.  Although the PGPLOT routines mostly
-   require floating point numbers, it is easier to put things in the 
+   require floating point numbers, it is easier to put things in the
    right place if we use numbers which are in fact integers. */
          xpix[ i ] = ndfset[ i ]->plotarray->xdim;
          ypix[ i ] = ndfset[ i ]->plotarray->ydim;
@@ -402,7 +402,7 @@
          ypof[ i ] = zoom * shrink * lbox[ i ][ 1 ];
       }
 
-/* Start up PGPLOT.  We use the same invocations here as in the driver 
+/* Start up PGPLOT.  We use the same invocations here as in the driver
    routine. */
       if ( cpgopen( device ) <= 0 ) {
          Tcl_SetObjResult( interp,
@@ -416,12 +416,12 @@
 /* Begin PGPLOT buffering. */
       cpgbbuf();
 
-/* Plot both arrays to the graphics device.  Note fortran-like specification 
+/* Plot both arrays to the graphics device.  Note fortran-like specification
    of array indices to PGPLOT, and use of a fortran-like array in memory. */
       for ( i = 0; i < 2; i++ ) {
          cpgpixl( pixbloc[ i ], xpix[ i ], ypix[ i ],
                   1, xpix[ i ], 1, ypix[ i ],
-                  lbox[ i ][ 0 ] + 0.5 / plotzoom, 
+                  lbox[ i ][ 0 ] + 0.5 / plotzoom,
                   lbox[ i ][ 0 ] + ( xpix[ i ] - 0.5 ) / plotzoom,
                   lbox[ i ][ 1 ] + 0.5 / plotzoom,
                   lbox[ i ][ 1 ] + ( ypix[ i ] - 0.5 ) / plotzoom );
@@ -459,7 +459,7 @@
          int xhi = min( xpof[ 0 ] + xpix[ 0 ], xpof[ 1 ] + xpix[ 1 ] );
          int yhi = min( ypof[ 0 ] + ypix[ 0 ], ypof[ 1 ] + ypix[ 1 ] );
 
-/* Calculate the positioning of the overlap in frame coordinates. */ 
+/* Calculate the positioning of the overlap in frame coordinates. */
          oxlo = xlo / zoom / shrink;
          oxhi = xhi / zoom / shrink;
          oylo = ylo / zoom / shrink;
@@ -472,14 +472,14 @@
          ngood = 0;
          for ( y = ylo; y < yhi; y++ ) {
             for ( x = xlo; x < xhi; x++ ) {
-               dat0 = pixbloc[ 0 ][ x - xpof[ 0 ] + 
+               dat0 = pixbloc[ 0 ][ x - xpof[ 0 ] +
                                     ( y - ypof[ 0 ] ) * xpix[ 0 ] ];
                dat1 = pixbloc[ 1 ][ x - xpof[ 1 ] +
                                     ( y - ypof[ 1 ] ) * xpix[ 1 ] ];
 
 /* If both pixels are good, average them.  If one is bad, use the other one.
    If both are bad, write a bad result. */
-               dat = ( dat0 == badcolour ) 
+               dat = ( dat0 == badcolour )
                         ? dat1
                         : ( dat1 == badcolour )
                              ? dat0
@@ -506,7 +506,7 @@
 /* Free the workspace. */
          free( overp );
       }
- 
+
 /* End PGPLOT buffering. */
       cpgebuf();
 

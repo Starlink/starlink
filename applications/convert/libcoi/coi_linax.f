@@ -19,14 +19,14 @@
 *     keywords defining the axis must be present.  These keywords are
 *     CRVALn, the reference value; CRPIXn, the reference pixel to which
 *     the reference value corresponds; and CDELTn (the step size between
-*     axis values), or CDi_j (the axis rotation/scaling matrix).  If 
-*     they all exist for axis n, then an axis component is created and 
-*     filled with the appropriate values.  If any of CRVALn, or CRPIXn, 
+*     axis values), or CDi_j (the axis rotation/scaling matrix).  If
+*     they all exist for axis n, then an axis component is created and
+*     filled with the appropriate values.  If any of CRVALn, or CRPIXn,
 *     or either CDELTn and CDn_n are absent, and USEDEF=.FALSE., the
-*     missing keywords are assigned 1.0D0.  This option allows 
-*     conversion from the Multispec system, which omits these keywords. 
-*     When only some of the axes have defined centres, the remaining 
-*     axes are assigned pixel co-ordinates.  If CTYPEn is in the header 
+*     missing keywords are assigned 1.0D0.  This option allows
+*     conversion from the Multispec system, which omits these keywords.
+*     When only some of the axes have defined centres, the remaining
+*     axes are assigned pixel co-ordinates.  If CTYPEn is in the header
 *     it is used to assign a value to the nth axis's label component.
 *     If CUNITn is present, its value is stored in the nth axis's units
 *     component.
@@ -102,7 +102,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,7 +119,7 @@
       LOGICAL USEDEF
 
 *  Arguments Returned:
-      CHARACTER * ( * ) BUFFER 
+      CHARACTER * ( * ) BUFFER
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -143,7 +143,7 @@
                                  ! between axes before they are
                                  ! considered not to be parallel
       PARAMETER ( EPS = 1.0E-6 )
-      
+
 
 *  Local Variables:
       INTEGER BUFLEN             ! Character length of the multi-line
@@ -164,9 +164,9 @@
       LOGICAL GCRPIX             ! Got a CRPIX value?
       LOGICAL GCDELT             ! Got a CDELT value?
       INTEGER I                  ! Axis index in IRAF WCS
-      INTEGER IAT                ! Index at which to insert next 
+      INTEGER IAT                ! Index at which to insert next
                                  ! character
-      INTEGER J                  ! Axis index in NDF pixel co-ordinate 
+      INTEGER J                  ! Axis index in NDF pixel co-ordinate
                                  ! system
       INTEGER JMAX               ! Index of NDF axis parallel to current
                                  ! IRAF axis
@@ -198,7 +198,7 @@
 
 *  Start a new NDF context.
       CALL NDF_BEGIN
-      
+
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
 
@@ -222,7 +222,7 @@
 *  Read the header for the four axis parameters.
 *  =============================================
 *
-*  Note rotation by angles other than 90 degrees cannot be mapped on to 
+*  Note rotation by angles other than 90 degrees cannot be mapped on to
 *  an axis structure and requires a more-sophisticated astrometric
 *  system.
 
@@ -243,8 +243,8 @@
          MAXCD = -1.0
 
 *  Go through each pixel axis (i.e. each axis of the NDF) to find the
-*  one which is most nearly parallel to the current world co-ordinate 
-*  axis.  This is taken to be the axis with the largest absolute CDi_j 
+*  one which is most nearly parallel to the current world co-ordinate
+*  axis.  This is taken to be the axis with the largest absolute CDi_j
 *  value.
          GCD = .FALSE.
          DO J = 1, NDIM
@@ -273,7 +273,7 @@
                GCD = .TRUE.
             END IF
 
-*   Note the largest CD term for this world axis. 
+*   Note the largest CD term for this world axis.
             IF ( ABS( CD_I( J ) ) .GT. MAXCD ) THEN
                MAXCD = ABS( CD_I( J ) )
                JMAX = J
@@ -288,10 +288,10 @@
             DO J = 1, NDIM
                IF ( J .NE. JMAX ) THEN
 
-*  If we find another significant axis, the world co-ordinate axes are 
+*  If we find another significant axis, the world co-ordinate axes are
 *  not parallel to the NDF axes. In this case, leave the loop without
 *  creating any further AXIS structures. EPS should be a small constant
-*  value, but how small? 
+*  value, but how small?
                   NONPAR = ( ABS( CD_I( J ) ) .GT. MAXCD*EPS )
                   IF ( NONPAR ) GO TO 10
 
@@ -302,8 +302,8 @@
 *  We arrive here only if the CD matrix indicates that the NDF and world
 *  co-ordinate axes are parallel.
 
-*  If no CD matrix was obtained, attempt to get a value for CDELTi. 
-*  This is a scaling factor for values on the i'th world co-ordinate 
+*  If no CD matrix was obtained, attempt to get a value for CDELTi.
+*  This is a scaling factor for values on the i'th world co-ordinate
 *  axis.
          IF ( .NOT. GCD ) THEN
             KEYWRD = 'CDELT'//CNDIM( :NC )
@@ -338,7 +338,7 @@
 
 *  Decide the data type of the axis centres.
 *  =========================================
-         IF ( ( GCRVAL .AND. GCRPIX .AND. ( GCD .OR. GCDELT ) ) 
+         IF ( ( GCRVAL .AND. GCRPIX .AND. ( GCD .OR. GCDELT ) )
      :        .OR. USEDEF ) THEN
 
 *  Set the flag to indicate that at least one axis-centre array has been
@@ -358,7 +358,7 @@
                IF ( GCRVAL ) THEN
                   KEYWRD = 'CRVAL'//CNDIM( :NC )
                   CALL IMGKWC( IMDESC, KEYWRD, VALUE, ERR )
-               ELSE 
+               ELSE
                   VALUE = '1.0'
                END IF
 
@@ -386,7 +386,7 @@
                IF ( ABS( OFFSET ) .LT. VAL__EPSD ) THEN
                   ITYPE = '_REAL'
                ELSE
-                  
+
                   IF ( ABS( DELT / OFFSET ) .GT. DBLE( VAL__EPSR ) *
      :                 PRECF ) THEN
                      ITYPE = '_REAL'
@@ -401,18 +401,18 @@
             IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Map the centre array in the axis structure.
-               CALL NDF_AMAP( NDF, 'Centre', JMAX, '_REAL', 'WRITE', 
+               CALL NDF_AMAP( NDF, 'Centre', JMAX, '_REAL', 'WRITE',
      :                        PNTR, EL, STATUS )
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL KPG1_SSAZR( EL, DELT, OFFSET, 
+                  CALL KPG1_SSAZR( EL, DELT, OFFSET,
      :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
 
 *  Exponentiate a log-linear axis.
                   IF ( DTYPE .EQ. 1 )
-     :              CALL COI_ALOGR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :              CALL COI_ALOGR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                              STATUS )
 
 *  Unmap the axis array.
@@ -431,13 +431,13 @@
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL KPG1_SSAZD( EL, DELT, OFFSET, 
+                  CALL KPG1_SSAZD( EL, DELT, OFFSET,
      :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
 
 *  Exponentiate a log-linear axis.
                   IF ( DTYPE .EQ. 1 )
-     :              CALL COI_ALOGD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :              CALL COI_ALOGD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                              STATUS )
 
 *  Unmap the axis array.
@@ -461,7 +461,7 @@
 
 *  Write the label to the axis structure, using only the length actually
 *  required.
-               CALL NDF_ACPUT( LABEL( :NCL ), NDF, 'Label', JMAX, 
+               CALL NDF_ACPUT( LABEL( :NCL ), NDF, 'Label', JMAX,
      :                         STATUS )
             END IF
 
@@ -478,7 +478,7 @@
                NCU = CHR_LEN( UNITS )
 
 *  Write the units to the axis structure.
-               CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', JMAX, 
+               CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', JMAX,
      :                         STATUS )
             END IF
 
@@ -535,12 +535,12 @@
 
 *  Delete the axis structure if it is just the default created earlier.
   10  CONTINUE
-      IF ( NONPAR .OR. .NOT. DFAXIS ) CALL NDF_RESET( NDF, 'Axis', 
+      IF ( NONPAR .OR. .NOT. DFAXIS ) CALL NDF_RESET( NDF, 'Axis',
      :                                                STATUS )
 
   999 CONTINUE
 
 *  Close the new NDF context.
       CALL NDF_END( STATUS )
-      
+
       END

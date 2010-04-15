@@ -6,7 +6,7 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Add facilities for choosing a "standard" colour from a LabelMenu, 
+#     Add facilities for choosing a "standard" colour from a LabelMenu,
 #     or choose a bespoke colour using a swatch.
 
 #  Description:
@@ -193,7 +193,7 @@ itcl::class gaia::ColourLabelMenu {
    public variable change_cmd {}
 
    #  Whether to show the in menu customizer. Can only set once at
-   #  beginning. 
+   #  beginning.
    public variable show_custom 1
 
    #  Extra colours that should be included in the menu.

@@ -13,15 +13,15 @@
 *     CALL KPG1_DEBUG( VERB, PACK, STATUS )
 
 *  Description:
-*     This routine returns a logical flag indicating if a specified 
-*     applications package should report debug diagnostics. This is the 
-*     case if the environment variable <PACK>_DEBUG is defined (the value 
+*     This routine returns a logical flag indicating if a specified
+*     applications package should report debug diagnostics. This is the
+*     case if the environment variable <PACK>_DEBUG is defined (the value
 *     assigned to the environment variable is immaterial).
 
 *  Arguments:
 *     DEBUG = LOGICAL (Returned)
-*        Should the package run in debug mode? Returned .FALSE, if an 
-*        error has already occurred, or if this routine should fail for 
+*        Should the package run in debug mode? Returned .FALSE, if an
+*        error has already occurred, or if this routine should fail for
 *        any reason.
 *     PACK = CHARACTER * ( * ) (Given)
 *        The name of the package (eg "KAPPA", "POLPACK", etc).
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,13 +65,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PSX_ERR'          ! PSX error constants 
+      INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Arguments Returned:
       LOGICAL DEBUG
@@ -94,14 +94,14 @@
 *  Form the name of the environment variable.
       NAME = ' '
       IAT = 0
-      CALL CHR_APPND( PACK, NAME, IAT )      
-      CALL CHR_APPND( '_DEBUG', NAME, IAT )      
+      CALL CHR_APPND( PACK, NAME, IAT )
+      CALL CHR_APPND( '_DEBUG', NAME, IAT )
       CALL CHR_UCASE( NAME )
 
 *  Attempt to get the value of the environment variable.
       CALL PSX_GETENV( NAME( : IAT ), ENV, STATUS )
 
-*  If the environment variable was not defined, annul the error, and 
+*  If the environment variable was not defined, annul the error, and
 *  indicate that debug mode should not be used.
       IF( STATUS .EQ. PSX__NOENV ) THEN
          CALL ERR_ANNUL( STATUS )

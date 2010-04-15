@@ -1,6 +1,6 @@
-      SUBROUTINE SCULIB_COADD_REMOVE (N, IN_DATA, IN_VARIANCE, 
-     :  IN_QUALITY, INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, 
-     :  INCOADD_NUMBER, OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, 
+      SUBROUTINE SCULIB_COADD_REMOVE (N, IN_DATA, IN_VARIANCE,
+     :  IN_QUALITY, INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL,
+     :  INCOADD_NUMBER, OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL,
      :  OUTCOADD_NUMBER, VARIANCE)
 *+
 *  Name:
@@ -10,16 +10,16 @@
 *     remove exposure from coadded result
 
 *  Description:
-*     This routine removes an exposure from the input coadd and puts the 
+*     This routine removes an exposure from the input coadd and puts the
 *     result in the output coadd arrays. The input and output
-*     arrays can be the same. The coadd result is the average of exposures 
+*     arrays can be the same. The coadd result is the average of exposures
 *     remaining in the coadd. The coadd variance is calculated from
-*     the spread of the exposures about the mean if more than one exposure 
+*     the spread of the exposures about the mean if more than one exposure
 *     remains, 0 otherwise. Exposure pixels with bad quality are ignored.
 
 *  Invocation:
 *     CALL SCULIB_COADD_REMOVE (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
-*    :  INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
+*    :  INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER,
 *    :  OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
 *    :  VARIANCE)
 
@@ -33,7 +33,7 @@
 *     IN_QUALITY (N)          = INTEGER (Given)
 *           quality on input data
 *     INCOADD_DATA (N)        = REAL (Given)
-*           Input coadd. 
+*           Input coadd.
 *     INCOADD_VAR (N)         = REAL (Given)
 *           Input coadd variance.
 *     INCOADD_QUAL (N)        = INTEGER (Given)
@@ -41,7 +41,7 @@
 *     INCOADD_NUMBER (N)      = INTEGER (Given)
 *           Number of exposures coadded in input coadd.
 *     OUTCOADD_DATA (N)       = REAL (Returned)
-*           Output coadd. 
+*           Output coadd.
 *     OUTCOADD_VAR (N)        = REAL (Returned)
 *           Output coadd variance.
 *     OUTCOADD_QUAL (N)       = INTEGER (returned)
@@ -131,13 +131,13 @@
                OUTCOADD_QUAL(I) = 1
                OUTCOADD_NUMBER(I) = 0
                OUTCOADD_VAR(I) = 0.0
-            ELSE 
+            ELSE
 
 *  ..recover the sum of the data points and the sum of them squared
 
                SUM = INCOADD_DATA (I) * INCOADD_NUMBER (I)
-               SUMSQ = INCOADD_NUMBER (I) * INCOADD_DATA(I)**2 + 
-     :            INCOADD_NUMBER(I) * (INCOADD_NUMBER(I)-1) * 
+               SUMSQ = INCOADD_NUMBER (I) * INCOADD_DATA(I)**2 +
+     :            INCOADD_NUMBER(I) * (INCOADD_NUMBER(I)-1) *
      :            INCOADD_VAR (I)
 
 *  ..subtract the exposure from the coadd
@@ -151,10 +151,10 @@
 
                OUTCOADD_DATA (I) = SUM / OUTCOADD_NUMBER (I)
                IF (OUTCOADD_NUMBER(I) .GT. 1) THEN
-                  OUTCOADD_VAR (I) = 
+                  OUTCOADD_VAR (I) =
      :              (SUMSQ - OUTCOADD_NUMBER(I)*OUTCOADD_DATA(I)**2) /
      :              (OUTCOADD_NUMBER(I) * (OUTCOADD_NUMBER(I)-1))
-               ELSE 
+               ELSE
                   OUTCOADD_VAR (I) = 0.0
                END IF
             END IF

@@ -14,14 +14,14 @@
 
 *  Description:
 *     This routine draw a polyline between the supplied positions. These
-*     positions are presumed to refer to the (2D) Current coordinate Frame 
-*     in the supplied AST Plot. 
+*     positions are presumed to refer to the (2D) Current coordinate Frame
+*     in the supplied AST Plot.
 *
-*     If FAST is .TRUE., the supplied positions are transformed into 
-*     graphics coordinates, and the polyline is then drawn as a series 
-*     of straight line segments using PGPLOT directly. Drawing performed 
-*     with FAST = .TRUE. is buffered to increase efficiency. Call this 
-*     routine with N=0 to flush the buffer. 
+*     If FAST is .TRUE., the supplied positions are transformed into
+*     graphics coordinates, and the polyline is then drawn as a series
+*     of straight line segments using PGPLOT directly. Drawing performed
+*     with FAST = .TRUE. is buffered to increase efficiency. Call this
+*     routine with N=0 to flush the buffer.
 *
 *     If FAST is .FALSE., AST_CURVE is used to draw the polyline as a
 *     series of geodesic curves in the Current Frame of the Plot. This
@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,18 +142,18 @@
          GO TO 999
       END IF
 
-*  First deal with fast drawing. 
+*  First deal with fast drawing.
       IF( FAST ) THEN
 
 *  We need to flush the buffers if we have the maximum number of
 *  polylines stored, or if there is insufficient room to store the
 *  supplied positions, or if zero points have been supplied.
-         IF( ( NLBUF .EQ. MXL .OR. NPBUF + N .GT. MXP .OR. 
+         IF( ( NLBUF .EQ. MXL .OR. NPBUF + N .GT. MXP .OR.
      :         N .EQ. 0 ) .AND. NPBUF .GT. 0 )  THEN
 
 *  Transform the buffered positions using the inverse of the Plot to get
-*  positions in Graphics coordinates. 
-            CALL AST_TRANN( IPLOT, NPBUF, 2, MXP, XYDATA, .FALSE., 
+*  positions in Graphics coordinates.
+            CALL AST_TRANN( IPLOT, NPBUF, 2, MXP, XYDATA, .FALSE.,
      :                      2, MXP, XYDATP, STATUS )
 
 *  Initialise the index of the first position in the next polyline.
@@ -165,7 +165,7 @@
 *  Initially, the PGPLOT pen is up.
                DOWN = .FALSE.
 
-*  Loop round each transformed position in this polyline. Some of these may 
+*  Loop round each transformed position in this polyline. Some of these may
 *  be bad, so check for them.
                DO I = IP, IP + NBUF( L ) - 1
 
@@ -180,7 +180,7 @@
                         I0 = 0
                      END IF
 
-*  Increment the number of good positions, and store the single precision 
+*  Increment the number of good positions, and store the single precision
 *  X and Y values in suitable arrays for passing to PGPLOT.
                      I0 = I0 + 1
                      XRBUF( I0 ) = REAL( XYDATP( I, 1 ) )
@@ -208,11 +208,11 @@
 
 *  Reset the buffer pointers.
             NLBUF = 0
-            NPBUF = 0  
+            NPBUF = 0
 
          END IF
 
-*  Copy the positions into the buffer arrays, and store the number of 
+*  Copy the positions into the buffer arrays, and store the number of
 *  positions in this polyline (if any).
          IF( N .GT. 0 ) THEN
 
@@ -225,7 +225,7 @@
             NLBUF = NLBUF + 1
             NBUF( NLBUF ) = N
 
-         END IF                        
+         END IF
 
 *  Now deal with accurate (but slow) drawing.
       ELSE

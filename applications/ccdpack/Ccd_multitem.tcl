@@ -419,7 +419,7 @@
          if { $listno <= $haveboxes } {
             Ccd::multiscrollbox::label $listno $text
 
-#  Now need to restablish the scrollbar commands (these are destroyed by a 
+#  Now need to restablish the scrollbar commands (these are destroyed by a
 #  repack).
 	    ::$Oldthis configure -scrollbarplaces $scrollbarplaces
          } else {

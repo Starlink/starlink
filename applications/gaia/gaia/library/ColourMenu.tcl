@@ -193,7 +193,7 @@ itcl::class gaia::ColourMenu {
    public variable change_cmd {}
 
    #  Whether to show the in menu customizer. Can only set once at
-   #  beginning. 
+   #  beginning.
    public variable show_custom 1
 
    #  Extra colours that should be included in the menu.

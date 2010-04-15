@@ -1,5 +1,5 @@
-      SUBROUTINE SCULIB_UNPACK_JIGGLE (N_JIGGLES, N_BOLS, DEMOD, 
-     :  J_START, JIGGLE_COUNT, I_JIGGLE, J_JIGGLE, IDIM, JDIM, 
+      SUBROUTINE SCULIB_UNPACK_JIGGLE (N_JIGGLES, N_BOLS, DEMOD,
+     :  J_START, JIGGLE_COUNT, I_JIGGLE, J_JIGGLE, IDIM, JDIM,
      :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, J_END, STATUS)
 *+
 *  Name:
@@ -10,11 +10,11 @@
 
 *  Description:
 *     This routine unpacks the demodulated data from a switch onto a
-*     rectangular 2-d map. 
+*     rectangular 2-d map.
 *
-*        If status is good on entry the data and variance of the output map 
-*     will be initialised to `bad' values, the quality to 1. If there are 
-*     any data to unpack the routine will then attempt to do so. The method 
+*        If status is good on entry the data and variance of the output map
+*     will be initialised to `bad' values, the quality to 1. If there are
+*     any data to unpack the routine will then attempt to do so. The method
 *     used depends on whether the switch covered part/all of the entire jiggle
 *     pattern or contains data for several repeats of the jiggle pattern.
 *
@@ -24,10 +24,10 @@
 *     status returned. Otherwise, the datablock will be unpacked into the
 *     map as specified by the I_JIGGLE, J_JIGGLE arrays. Each map point
 *     just has its data, variance and quality copied from the demodulated
-*     data. 
+*     data.
 *
 *        When the data covers several repeats of the jiggle pattern, the
-*     routine will check that the jiggle index of the first point in the 
+*     routine will check that the jiggle index of the first point in the
 *     datablock is 1 and that the number of data points is an integer multiple
 *     of the size of the jiggle. If not, an error will be reported and bad
 *     status returned. Otherwise, the datablock will be unpacked into the
@@ -39,8 +39,8 @@
 *     1, or set to the demodulated variance otherwise.
 
 *  Invocation:
-*     CALL SCULIB_UNPACK_JIGGLE (N_JIGGLES, N_BOLS, DEMOD, 
-*    :  J_START, JIGGLE_COUNT, I_JIGGLE, J_JIGGLE, IDIM, JDIM, 
+*     CALL SCULIB_UNPACK_JIGGLE (N_JIGGLES, N_BOLS, DEMOD,
+*    :  J_START, JIGGLE_COUNT, I_JIGGLE, J_JIGGLE, IDIM, JDIM,
 *    :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, J_END, STATUS)
 
 *  Arguments:
@@ -165,7 +165,7 @@
 *  the datablock does not contain numbers for several repeats of the jiggle
 *  pattern. Check jiggle indices are OK, if so unpack data
 
-            IF ((J_START .LT. 1) .OR. 
+            IF ((J_START .LT. 1) .OR.
      :          (J_START+N_JIGGLES-1 .GT. JIGGLE_COUNT)) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP (' ', 'SCULIB_UNPACK_JIGGLE: bad '//
@@ -178,7 +178,7 @@
                   JM = J_JIGGLE (JIGGLE)
 
                   DO BOL = 1, N_BOLS
-                     MAP_DATA (IM,JM,BOL) = DEMOD (1,BOL,I)       
+                     MAP_DATA (IM,JM,BOL) = DEMOD (1,BOL,I)
                      MAP_VARIANCE (IM,JM,BOL) = DEMOD (2,BOL,I)
                      MAP_QUALITY (IM,JM,BOL) = NINT (DEMOD(4,BOL,I))
                   END DO
@@ -190,7 +190,7 @@
 
             END IF
 
-         ELSE  
+         ELSE
 
 *  datablock does contain several repeats of jiggle pattern. J_START should
 *  be 1 and there should be an integer number of repeats
@@ -204,7 +204,7 @@
             IF (MOD(N_JIGGLES,JIGGLE_COUNT) .NE. 0) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP (' ', 'SCULIB_UNPACK_JIGGLE: data '//
-     :           'for non-integral number of repeats of jiggle pattern', 
+     :           'for non-integral number of repeats of jiggle pattern',
      :           STATUS)
             END IF
 
@@ -218,14 +218,14 @@
                   IM = I_JIGGLE (JIGGLE)
                   JM = J_JIGGLE (JIGGLE)
 
-                  DO BOL = 1, N_BOLS   
+                  DO BOL = 1, N_BOLS
                      IF (NINT(DEMOD(4,BOL,I)) .EQ. 0) THEN
 
                         IF (MAP_DATA(IM,JM,BOL) .EQ. VAL__BADR) THEN
 
 *  an unset map point, just set it
 
-                           MAP_DATA (IM,JM,BOL) = DEMOD (1,BOL,I)       
+                           MAP_DATA (IM,JM,BOL) = DEMOD (1,BOL,I)
                            MAP_VARIANCE (IM,JM,BOL) = DEMOD (2,BOL,I)
                            MAP_QUALITY (IM,JM,BOL) = 1
 
@@ -237,23 +237,23 @@
 *  numbers store the sum of the squares of the data values in the variance
 *  array so that the variance can be calculated from the distribution
 *  about the mean at the end of the routine
- 
+
                            IF (MAP_QUALITY(IM,JM,BOL) .EQ. 1) THEN
                               MAP_VARIANCE (IM,JM,BOL) =
-     :                          MAP_DATA (IM,JM,BOL) **2 + 
+     :                          MAP_DATA (IM,JM,BOL) **2 +
      :                          DEMOD (1,BOL,I) **2
                            ELSE
-                              MAP_VARIANCE (IM,JM,BOL) = 
+                              MAP_VARIANCE (IM,JM,BOL) =
      :                          MAP_VARIANCE (IM,JM,BOL) +
      :                          DEMOD (1,BOL,I) **2
                            END IF
                            MAP_DATA (IM,JM,BOL) = MAP_DATA (IM,JM,BOL) +
-     :                       DEMOD (1,BOL,I)       
-                           MAP_QUALITY (IM,JM,BOL) = 
+     :                       DEMOD (1,BOL,I)
+                           MAP_QUALITY (IM,JM,BOL) =
      :                       MAP_QUALITY (IM,JM,BOL) + 1
 
                         END IF
-                     END IF    
+                     END IF
 
                   END DO
                END DO
@@ -268,11 +268,11 @@
      :                       MAP_QUALITY (I,J,BOL)
 
                            IF (MAP_QUALITY(I,J,BOL) .GT. 1) THEN
-                              MAP_VARIANCE (I,J,BOL) = 
-     :                          (MAP_VARIANCE(I,J,BOL) - 
+                              MAP_VARIANCE (I,J,BOL) =
+     :                          (MAP_VARIANCE(I,J,BOL) -
      :                          MAP_QUALITY(I,J,BOL) *
-     :                          MAP_DATA(I,J,BOL)**2) / 
-     :                          (MAP_QUALITY(I,J,BOL) * 
+     :                          MAP_DATA(I,J,BOL)**2) /
+     :                          (MAP_QUALITY(I,J,BOL) *
      :                          (MAP_QUALITY(I,J,BOL)-1))
                            END IF
 

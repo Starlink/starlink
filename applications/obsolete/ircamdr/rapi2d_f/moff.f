@@ -32,7 +32,7 @@
 *         True if a mask image is to be used to define the fixed bad pixels
 *     BADMASK  =  IMAGE( READ )
 *         Mask giving positions of fixed bad pixels within the images
-*         
+*
 *    Method :
 *
 *     Check for error on entry - return if not o.k.
@@ -58,8 +58,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'      
-      INCLUDE 'NDF_ERR' 
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -72,7 +72,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    IDIMS1( NDIMS ),    ! dimensions of first input image
      :    IDIMS2( NDIMS ),    !      "      " second  "     "
      :    BDIMS( NDIMS ),     !      "      " bad mask image
@@ -105,27 +105,27 @@
       END IF
 
 
-*    get first input image 
+*    get first input image
       CALL GETINP( 'INPIC1', LOCI1, STATUS )
 
 *    get second input image
       CALL GETINP( 'INPIC2', LOCI2, STATUS )
- 
+
 *    check for error before continuing
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array components of the input images
-         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ',
      :                  PNTRI1, NELEMENTS, STATUS )
 
-         CALL NDF_MAP( LOCI2, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI2, 'DATA', '_REAL', 'READ',
      :                  PNTRI2, NELEMENTS, STATUS )
 
 *       get dimensions of images
          CALL NDF_DIM( LOCI1, NDIMS, IDIMS1, NDIM, STATUS)
 
          CALL NDF_DIM( LOCI2, NDIMS, IDIMS2, NDIM, STATUS)
-      
+
 *       check for error before continuing
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -135,7 +135,7 @@
             CALL AIF_GET0I( 'NYOFF', 0, -(IDIMS2(2)-1), (IDIMS1(2)-1),
      :                       NYOFF, STATUS )
 
-*          get size of box about these nominal offsets that is to be 
+*          get size of box about these nominal offsets that is to be
 *          searched for the best fit - must be an odd integer
             CALL AIF_GODDN( 'BOXSIZE', 5, 1, 101, BOXSIZE, STATUS )
 
@@ -153,7 +153,7 @@
 
 *                check for error before mapping
                   IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *                   map the bad pixel mask
                      CALL NDF_MAP( LOCB, 'DATA', '_REAL', 'READ',
      :                              PNTRB, NELEMENTS, STATUS )
@@ -163,22 +163,22 @@
 *                   check for error before accessing working subroutine
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*                      call bad pixel handling version of working 
-*                      subroutine that calculates 
+*                      call bad pixel handling version of working
+*                      subroutine that calculates
 *                      the x,y spatial offset
-                        CALL MOFFXYBAD( %VAL( PNTRI1 ), IDIMS1(1), 
-     :                          IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1), 
-     :                          IDIMS2(2), NXOFF, NYOFF, BOXSIZE, 
+                        CALL MOFFXYBAD( %VAL( PNTRI1 ), IDIMS1(1),
+     :                          IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1),
+     :                          IDIMS2(2), NXOFF, NYOFF, BOXSIZE,
      :                          %VAL( PNTRB ), BDIMS(1), BDIMS(2),
      :                          BESTXOFF, BESTYOFF, STATUS )
 
-*                      next call the bad pixel version of the subroutine 
-*                      that calculates the d.c. sky offset from the first 
+*                      next call the bad pixel version of the subroutine
+*                      that calculates the d.c. sky offset from the first
 *                      to second image
-                        CALL MOFFDCBAD( %VAL( PNTRI1 ), IDIMS1(1), 
-     :                           IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1), 
-     :                           IDIMS2(2), BESTXOFF, BESTYOFF, 
-     :                           %VAL( PNTRB ), BDIMS(1), BDIMS(2), 
+                        CALL MOFFDCBAD( %VAL( PNTRI1 ), IDIMS1(1),
+     :                           IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1),
+     :                           IDIMS2(2), BESTXOFF, BESTYOFF,
+     :                           %VAL( PNTRB ), BDIMS(1), BDIMS(2),
      :                           DCOFF, STATUS )
 
 *                      write out the results on return
@@ -199,7 +199,7 @@
                         CALL PAR_PUT0I( 'YOFF', BESTYOFF, STATUS)
                         CALL PAR_PUT0R( 'DCOFF', DCOFF, STATUS)
 
-*                   end of 
+*                   end of
 *               if-no-error-before-calling-bad-pixel-subroutine check
                      END IF
 
@@ -212,16 +212,16 @@
 *             else no bad pixel handling was requested
                ELSE
 
-*                call the subroutine that does 
+*                call the subroutine that does
 *                the x,y spatial offset work
-                  CALL MOFFXYSUB( %VAL( PNTRI1 ), IDIMS1(1), 
+                  CALL MOFFXYSUB( %VAL( PNTRI1 ), IDIMS1(1),
      :               IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1), IDIMS2(2),
-     :               NXOFF, NYOFF, BOXSIZE, BESTXOFF, BESTYOFF, 
+     :               NXOFF, NYOFF, BOXSIZE, BESTXOFF, BESTYOFF,
      :               STATUS )
 
 *                calculate the d.c. sky offset using this x,y offset
-                  CALL MOFFDCSUB( %VAL( PNTRI1 ), IDIMS1(1), 
-     :               IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1), IDIMS2(2), 
+                  CALL MOFFDCSUB( %VAL( PNTRI1 ), IDIMS1(1),
+     :               IDIMS1(2), %VAL( PNTRI2 ), IDIMS2(1), IDIMS2(2),
      :               BESTXOFF, BESTYOFF, DCOFF, STATUS )
 
 *                write out the results on return

@@ -5,8 +5,8 @@ C     F I G _ C M P C H K
 C
 C     Checks that a given structure fulfils the Figaro requirements
 C     for a complex structure, namely that it should have both
-C     real and imaginary arrays, which should match in shape and size, 
-C     and that their dimensions should factorise in a way acceptable to 
+C     real and imaginary arrays, which should match in shape and size,
+C     and that their dimensions should factorise in a way acceptable to
 C     the FFT routines used.  The dimensions are returned by this routine.
 C
 C     Parameters -  (">" input, "<" output)
@@ -14,9 +14,9 @@ C
 C     (>) STRUCT   (Character) The DSA reference name of the structure,
 C                  case unimportant, may be padded at the end with
 C                  blanks.
-C     (>) MAXDIM   (Integer) The maximum number of dimensions.  
+C     (>) MAXDIM   (Integer) The maximum number of dimensions.
 C                  Usually set to 10.
-C     (<) NDIM     (Integer) The actual number of dimensions in the 
+C     (<) NDIM     (Integer) The actual number of dimensions in the
 C                  data.
 C     (<) DIMS     (Integer array DIMS(MAXDIM)) The dimensions of the
 C                  data.

@@ -104,7 +104,7 @@ C--------------------------------------------------------------------
 
       INTEGER*4 FUNCTION IFREEVM (IPTR)
 
-C  Routine to release an area of virtual memory NBYTES long 
+C  Routine to release an area of virtual memory NBYTES long
 C  at the address IPTR.
 C  Function returns the VMS status.
 

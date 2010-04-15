@@ -1,4 +1,4 @@
-      SUBROUTINE FTS1_DREAD ( LU, BLKSIZ, ACTSIZ, LINIT, BUFFER, 
+      SUBROUTINE FTS1_DREAD ( LU, BLKSIZ, ACTSIZ, LINIT, BUFFER,
      :                        OFFSET, RECORD, STATUS )
 *+
 *  Name:
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 *        Original version.
 *     1992 December (RDS):
 *        Modified for portability. It now finds the operating system
-*        and then either makes a sequential access read if being run 
+*        and then either makes a sequential access read if being run
 *        on the VAX or otherwise a direct access read. The current
 *        record number is stored as a local variable. This can be
 *        reset to one by setting the input argument LINIT to true.
@@ -124,7 +124,7 @@
                                ! on exit it is the number of bytes
                                ! copied from the current file block into
                                ! the FITS record
-      LOGICAL 
+      LOGICAL
      :  LINIT                  ! Zero the record number counter ?
 
       BYTE
@@ -155,9 +155,9 @@
      :  SYSNAM * ( 10 ),       ! Operating system
      :  VERSIO * ( 10 )        ! Sub-version of operating system
 
-      LOGICAL 
+      LOGICAL
      :  OVMS                   ! Is the operating system VMS or RSX ?
-      
+
 *  UNIX requires the FITS file to be opened with 'Direct access'.  This
 *  means that to keep track of which block is next we have to save a
 *  local variable (RECNUM). If a new file is to be read, RECNUM needs
@@ -201,7 +201,7 @@
 *       new block of data is read from the file.
 
          IF ( LEFT .EQ. 0 ) THEN
-            
+
             IF ( OVMS ) THEN
                READ( UNIT=LU, IOSTAT=IOERR )
      :                      ( BUFFER( I ), I = 1, ACTSIZ )

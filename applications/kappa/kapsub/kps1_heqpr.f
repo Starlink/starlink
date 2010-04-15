@@ -147,14 +147,14 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Global SSE definitions
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
- 
+
 *  Arguments Given:
       LOGICAL BAD
       INTEGER EL
@@ -163,16 +163,16 @@
       REAL RSHADE
       REAL MAXV
       REAL MINV
- 
+
 *  Arguments Returned:
       INTEGER PENS( 0:NINTS-1 )
       DOUBLE PRECISION X( 0:NINTS-1 )
       DOUBLE PRECISION Y( 0:NINTS-1 )
       INTEGER CUMUL( 0:NINTS-1 )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       DOUBLE PRECISION A         ! Coefficient in the expression
                                  ! relating colour to pen number
@@ -206,16 +206,16 @@
                                  ! for fit
       DOUBLE PRECISION XMIN      ! Pen number at the lowest point used
                                  ! for fit
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Report an error and return should the maximum and minimum be the
 *  same.
       IF ( MAXV .EQ. MINV ) THEN
@@ -224,47 +224,47 @@
      :     'KPS1_HEQPx: Maximum and minimum are equal.', STATUS )
          GOTO 999
       END IF
- 
+
       SHADE = DBLE( RSHADE )
- 
+
 *  Clear the histogram array.
       DO I = 0, NINTS-1, 1
          CUMUL( I ) = 0
       END DO
- 
+
 *  Create the cumulative histogram.
       CALL KPG1_GHSTR( BAD, EL, ARRAY, NINTS, .TRUE., MAXV, MINV,
      :                 CUMUL( 0 ), STATUS )
- 
+
 *  Set up data for least-squares fit.
       DO  I = 0, NINTS-1, 1
- 
+
 *  Save the pen numbers.
          X( I ) = NUM_RTOD( MINV ) + NUM_RTOD( ( MAXV-MINV ) ) *
      :            DBLE( I ) / DBLE( NINTS-1 )
- 
+
 *  Save the normalized cumulative-frequency chart.
          Y( I ) = DBLE( CUMUL( I ) ) / DBLE( CUMUL( NINTS-1 ) )
- 
+
       END DO
- 
+
 *    The fit is done between the 2% and 96% points of the
 *    cumulative frequency chart.
 *
 *    Find the 2% point (approximately).
       LOWER = 0
- 
+
       DO WHILE ( Y( LOWER ) .LT. 0.02 )
          LOWER = LOWER + 1
       END DO
- 
+
 *  Find the 96% point (approximately).
       UPPER = NINTS - 1
- 
+
       DO WHILE ( Y( UPPER ) .GT. 0.96 )
          UPPER = UPPER - 1
       END DO
- 
+
 *  If there are more than 20 points then do the fit.
       IF ( UPPER - LOWER .LT. 20 ) THEN
          STATUS = SAI__ERROR
@@ -274,37 +274,37 @@
      :     /'fit.  Choose a smaller dynamic range.', STATUS )
          GOTO 999
       END IF
- 
+
 *  For maximum accuracy normalize the pen numbers to the range 0 to 1.
       XMIN = X( LOWER )
       XMAX = X( UPPER )
- 
+
       DO  I = LOWER, UPPER, 1
          X( I ) = ( X( I ) - XMIN ) / ( XMAX - XMIN )
       END DO
- 
+
 *  Set to zero the tables into which the sums will be put.
       DO  I = 0, 12, 1
          SUM( I ) = 0.0D0
       END DO
- 
+
       DO  I = 0, 6, 1
          COEFF( 7, I ) = 0.0D0
       END DO
- 
+
 *  Form the sums of the powers of x (the pen numbers).
       DO  I = LOWER, UPPER, 1
          XJ = 1.0D0
- 
+
          DO  J = 0, 12, 1
- 
+
             SUM( J ) = SUM( J )+XJ
             IF ( J .LT. 7 ) COEFF( 7, J ) = COEFF( 7, J ) - Y( I ) * XJ
             XJ = XJ * X( I )
- 
+
          END DO
       END DO
- 
+
 *  Transfer the sums to the coefficients array ready for solving the
 *  linear simultaneous equations to obtain the coefficients of the
 *  polynomial.
@@ -313,23 +313,23 @@
             COEFF( J, I ) = SUM( J + I )
          END DO
       END DO
- 
+
 *  Do Gaussian elimination to calculate the polynomial coefficients.
       I = 0
- 
+
       DO WHILE ( I .LT. 7 )
- 
+
 *  Find the maximum value in the column.
          MAXVAL = ABS( COEFF( I, I ) )
          POS = I
- 
+
          DO J = I, 6, 1
             IF ( ABS( COEFF( I, J ) ) .GT. MAXVAL ) THEN
                MAXVAL = ABS( COEFF( I, J ) )
                POS = J
             END IF
          END DO
- 
+
 *  If the maximum value is greater than 1E-10 then do the operations on
 *  the row, otherwise stop the routine, as the results are going to be
 *  very inaccurate.
@@ -340,7 +340,7 @@
      :        /'the pens.', STATUS )
             GOTO 999
          END IF
- 
+
 *  Swap the present row with that containing the largest value.
          IF ( I .NE. POS ) THEN
             DO  J = 0, 7, 1
@@ -349,7 +349,7 @@
                COEFF( J, POS ) = TEMP
             END DO
          END IF
- 
+
 *  Eliminate the first I-1 variables.
          IF ( I .NE. 0 ) THEN
             DO  J = 0, I - 1, 1
@@ -359,97 +359,97 @@
                END DO
             END DO
          END IF
- 
+
 *  Divide throuought the Ith row by the Ith element, so that the Ith
 *  element becomes one.
          DO J = 7, I, -1
             COEFF( J, I ) = COEFF( J, I ) / COEFF( I, I )
          END DO
- 
+
 *  Point to the next row.
          I = I + 1
       END DO
- 
+
 *  Substitute back to obtain the coefficients.
       POLCO( 6 ) = -COEFF( 7, 6 )
- 
+
       DO I = 5, 0, -1
          POLCO( I ) = -COEFF( 7, I )
- 
+
          DO  J = 6, I+1, -1
             POLCO( I ) = POLCO( I ) - COEFF( J, I ) * POLCO( J )
          END DO
- 
+
       END DO
- 
+
 *  Assign colours to the pens.
       STEP = NUM_RTOD( MAXV - MINV )/( ( XMAX - XMIN ) *
      :       DBLE( NINTS - 1 ) )
- 
+
       XI = 0.0D0
- 
+
 *  Calculate the minimum value for the cumulative frequency chart.
       C0 = POLCO( 0 )
- 
+
 *  Even distribution.
       IF ( ABS( SHADE ) .LT. VAL__EPSD ) THEN
- 
+
 *  Assign colours to the pens in such a way that they are
 *  used in equal amounts in the displayed image.
          DO I = 0, NINTS-1, 1
- 
+
 *  Constrain the fit beyond the 2- and 96-per-cent limits.
             IF ( I .LT. LOWER ) THEN
                TEMP = 0.0D0
             ELSEIF ( I .GT. UPPER ) THEN
                TEMP = 1.0D0 - C0
             ELSE
- 
+
 *  Evaluate the polynomial fit to the normalised cumulative histogram,
 *  allowing for the offset.
                TEMP = ( POLCO( 0 ) + XI * ( POLCO( 1 ) + XI *
      :                ( POLCO( 2 ) + XI * ( POLCO( 3 ) + XI *
      :                ( POLCO( 4 ) + XI * ( POLCO( 5 ) + XI *
      :                ( POLCO( 6 ) ) ) ) ) ) ) ) - C0
- 
+
 *  Move to the next data value.
                XI = XI + STEP
             END IF
- 
+
 *  Assign colours to the pen numbers.
             PENS( I ) = MIN( MAX( INT( DBLE( NINTS ) * TEMP ), 0 ),
      :                  NINTS - 1 )
          END DO
- 
+
       ELSE
- 
+
 *  Assign colours to the pens such that the distribution required by
 *  the user is obtained.
          A = 1.0D0 - C0 - SHADE / 2.0
- 
+
          DO  I = 0, NINTS - 1, 1
- 
+
 *  Constrain the fit beyond the 2- and 96-per-cent limits.
             IF ( I .LT. LOWER ) THEN
                TEMP = 0.0D0
             ELSEIF ( I .GT. UPPER ) THEN
                TEMP = 1.0D0 - C0
             ELSE
- 
+
 *  Evaluate the polynomial fit to the normalised cumulative histogram,
 *  allowing for the offset.
                TEMP = ( POLCO( 0 ) + XI * ( POLCO( 1 ) + XI *
      :                ( POLCO( 2 ) + XI * ( POLCO( 3 ) + XI *
      :                ( POLCO( 4 ) + XI * ( POLCO( 5 ) + XI *
      :                ( POLCO( 6 ) ) ) ) ) ) ) ) - C0
- 
+
 *  Ensure that the fitted value lies in the physical region.
                TEMP = MIN( MAX ( 0.0D0, TEMP ), 1.0D0 - C0 )
- 
+
 *  Move to the next data value.
                XI = XI + STEP
             END IF
- 
+
 *  Assign the colours to the pens.  Solve the quadratic equation that
 *  arises from integrating the required cumulative histogram form, as
 *  given by the linear equation SHADE * PEN + C0 - SHADE/2.
@@ -457,9 +457,9 @@
      :                  + SQRT( A * A + 2.0D0 * SHADE * TEMP ) /
      :                  SHADE ) ), 0 ), NINTS - 1 )
          END DO
- 
+
       END IF
- 
+
  999  CONTINUE
- 
+
       END

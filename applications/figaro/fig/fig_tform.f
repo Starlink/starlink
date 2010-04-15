@@ -3,7 +3,7 @@ C+
 C
 C     F I G _ T F O R M
 C
-C     Rebin utility routine.  Given an x-value (RX) in the 
+C     Rebin utility routine.  Given an x-value (RX) in the
 C     rebinned data, calculates the corresponding wavelength
 C     and returns (X) the corresponding x-value in the original
 C     data.
@@ -28,7 +28,7 @@ C                Returned as the number of one of the bins used in
 C                the interpolation for X, and so probably a good
 C                starting place for the next call.
 C     (<) X      (Real) The x-value in the original data corresponding
-C                to the wavelength at bin RX in the rebinned data.  
+C                to the wavelength at bin RX in the rebinned data.
 C                This is also a bin number.
 C
 C     Common variables used -
@@ -44,13 +44,13 @@ C                - ie the dimension of WAVES
 C     (>) NBINR  (Integer) The number of bins in the rebinned array
 C                - ie the dimension of WAVESR
 C
-C     All common variables in 
+C     All common variables in
 C
 C     COMMON /REBIN_INFO/ UP,LOGS,LOGSR,NBIN,NBINR
 C
 C     Method -
 C
-C     The wavelength corresponding to RX is found by linear 
+C     The wavelength corresponding to RX is found by linear
 C     interpolation between the closest array elements in WAVESR.
 C     A search through WAVES, starting from IX, finds the nearest
 C     two values to that wavelength and X is then calculated by

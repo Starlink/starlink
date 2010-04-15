@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -166,7 +166,7 @@
  99   CONTINUE
 
 *  If an error has occurred report a message.
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETI( 'BLEN', BLEN )
          CALL ERR_REP( 'CCD1_WRIXYERR1',
      :      '  Cannot write output line internal buffer length '//

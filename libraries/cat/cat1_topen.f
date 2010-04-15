@@ -13,8 +13,8 @@
 *
 *     The matrix of possibilities for STATE and MODE is:
 *
-*     STATE = 'NEW', then 
-*       MODE = 'WRITE' is ok 
+*     STATE = 'NEW', then
+*       MODE = 'WRITE' is ok
 *       and MODE = 'READ' if forbidden.
 *
 *     STATE = 'OLD' then
@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -200,7 +200,7 @@ C3000       format(1x, '** parser intialised.')
          CI = CAT__NOID
 
 *
-*       Parse the combined catalogue name to obtain the genuine 
+*       Parse the combined catalogue name to obtain the genuine
 *       catalogue name, directory path and back-end type.
 
          CALL CAT1_CNMPR (CNAME, CATNAM, CATFIL, BCKTYP, EXTRA,
@@ -290,7 +290,7 @@ C3000       format(1x, '** parser intialised.')
 *             Attempt to open the catalogue using the specified STATE
 *             and mode.
 
-               IF (IMODE  .EQ. CAT1__MDWRT  .AND. 
+               IF (IMODE  .EQ. CAT1__MDWRT  .AND.
      :             ISTATE .EQ. CAT1__STNEW) THEN
                   CALL CAT0_CNEW (BCKTYP, CATNAM, CATFIL, EXTRA, CI,
      :              STATUS)

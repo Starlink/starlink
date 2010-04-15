@@ -22,8 +22,8 @@
 #
 #  Parameters:
 #     -i filename
-#       The script will use this as its input file, the specified file 
-#       should be a three-dimensional NDF.  By default the script will 
+#       The script will use this as its input file, the specified file
+#       should be a three-dimensional NDF.  By default the script will
 #       prompt for the input file.
 #
 #  Implementation Status:
@@ -56,7 +56,7 @@
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Added -i option.  Corrected the NDF name extraction when both the 
+#       Added -i option.  Corrected the NDF name extraction when both the
 #       file extension and an NDF section are supplied; this is via the new
 #       checkndf script that also checks for a degenerate third axis.
 #     {enter_further_changes_here}
@@ -127,7 +127,7 @@ if ( $status == 1 ) exit
 # Collapse the white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Setup the graphics window.
 gdclear device=${plotdev}
@@ -139,14 +139,14 @@ picdef "mode=cl fraction=[0.4,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="whitelight"
 
 picdef "mode=tr fraction=[0.6,0.5] device=${plotdev} nooutline"
-piclabel device=${plotdev} label="specone" 
+piclabel device=${plotdev} label="specone"
 
 picdef "mode=br fraction=[0.6,0.5] device=${plotdev} nooutline"
-piclabel device=${plotdev} label="spectwo" 
+piclabel device=${plotdev} label="spectwo"
 
 # Display the collapsed image.
 picsel label="whitelight" device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null
 
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================

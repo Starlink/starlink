@@ -14,16 +14,16 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL DTASK_ACT_SCHED ( REQUEST, ACTPTR, SEQ, SCHEDTIME, HANDLED, 
+*     CALL DTASK_ACT_SCHED ( REQUEST, ACTPTR, SEQ, SCHEDTIME, HANDLED,
 *     :  STATUS )
 
 *  Description:
-*       Check for the various reschedule codes that can be returned by 
+*       Check for the various reschedule codes that can be returned by
 *       an application.
 
 *  Arguments:
 *     REQUEST=INTEGER (given)
-*           Status returned from the application possibly specifying a 
+*           Status returned from the application possibly specifying a
 *           reschedule.
 *     ACTPTR=INTEGER (given)
 *           Pointer to the action in the action list.
@@ -44,16 +44,16 @@
 *                           subsidiary task (with timeout of SCHEDTIME).
 *
 *       If REQUEST is one of these, cancel any "old" timer associated
-*       with the action, increment the action counter and set HANDLED 
-*       true. In the case of ASTINT and MESSAGE, a new timer is started 
+*       with the action, increment the action counter and set HANDLED
+*       true. In the case of ASTINT and MESSAGE, a new timer is started
 *       if SCHEDTIME does not have the value INFINITE.
 *
 *       If REQUEST is not one of the above codes, the routine sets HANDLED
 *       to false and returns.
 
 *  Implementation Deficiencies:
-*       The timeout on ACT__ASTINT may cause backward compatability problems 
-*       if the ACT routine sets a reschedule time and returns ACT__ASTINT 
+*       The timeout on ACT__ASTINT may cause backward compatability problems
+*       if the ACT routine sets a reschedule time and returns ACT__ASTINT
 *       without expecting a timeout.
 
 *  Copyright:
@@ -84,9 +84,9 @@
 *     17-FEB-1991 (AAO::TJF):
 *        First insertion
 *     01-MAY-1991: revise INCLUDE files and add REQUEST argument
-*                  (REVAD::BDK) 
+*                  (REVAD::BDK)
 *     03-MAY-1991: use DTASK_CANTIM to cancel any outstanding timer
-*                  (REVAD::BDK) 
+*                  (REVAD::BDK)
 *     13-MAY-1991 (REVAD:BDK):
 *        Change comments
 *     13-OCT-1992 (RLVAD::AJC):
@@ -128,7 +128,7 @@
 *  Local Constants:
       INTEGER NOWAIT
       PARAMETER ( NOWAIT = 10) ! no wait defaults to 10ms Wait
- 
+
 *  Local Variables:
       INTEGER COUNT            ! Number of action subsidiary actions
 *.
@@ -143,7 +143,7 @@
 *
          CALL DTASK_CANTIM ( ACTPTR, STATUS )
          CALL DTASK_RESCHED ( ACTPTR, ACTCOUNT(ACTPTR), NOWAIT,
-     :     STATUS ) 
+     :     STATUS )
          ACTSEQ(ACTPTR) = SEQ + 1
 
       ELSE IF ( REQUEST .EQ. ACT__WAIT ) THEN
@@ -152,7 +152,7 @@
 *
          CALL DTASK_CANTIM ( ACTPTR, STATUS )
          CALL DTASK_RESCHED ( ACTPTR, ACTCOUNT(ACTPTR), SCHEDTIME,
-     :     STATUS ) 
+     :     STATUS )
          ACTSEQ(ACTPTR) = SEQ + 1
 
       ELSE IF ( REQUEST .EQ. ACT__ASTINT ) THEN
@@ -162,7 +162,7 @@
          CALL DTASK_CANTIM ( ACTPTR, STATUS )
          IF ( SCHEDTIME .NE. MESSYS__INFINITE ) THEN
             CALL DTASK_RESCHED ( ACTPTR, ACTCOUNT(ACTPTR), SCHEDTIME,
-     :        STATUS ) 
+     :        STATUS )
          ENDIF
          ACTSEQ(ACTPTR) = SEQ + 1
 
@@ -182,7 +182,7 @@
 *
          ELSE IF ( SCHEDTIME .NE. MESSYS__INFINITE ) THEN
             CALL DTASK_RESCHED ( ACTPTR, ACTCOUNT(ACTPTR), SCHEDTIME,
-     :        STATUS ) 
+     :        STATUS )
          ENDIF
          ACTSEQ(ACTPTR) = SEQ + 1
 

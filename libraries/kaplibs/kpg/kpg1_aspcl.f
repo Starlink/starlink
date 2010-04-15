@@ -15,15 +15,15 @@
 
 *  Description:
 *     This routine imposes clipping on a Plot (using the AST_CLIP routine)
-*     that restricts drawing to the regions that seem well bahaved. 
+*     that restricts drawing to the regions that seem well bahaved.
 *     Specifically, drawing is restricted to a rectangular region within
 *     the base Frame of the Plot that is determined by transforming the
-*     supplied PIXEL bounding box into the current Frame, then converting 
+*     supplied PIXEL bounding box into the current Frame, then converting
 *     it to the base Frame.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
-*        An AST pointer to the Plot. 
+*        An AST pointer to the Plot.
 *     LBND( * ) = INTEGER (Given)
 *        The lower pixel index bounds of the Plot in the PIXEL Frame.
 *     UBND( * ) = INTEGER (Given)
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,14 +64,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -100,7 +100,7 @@
       LOGICAL CLIP
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -120,8 +120,8 @@
 *  Convert the pixel index bounds to double precision pixel coordinate
 *  bounds.
          DO I = 1, NAXP
-            DLBND( I ) = DBLE( LBND( I ) ) - 1.0D0      
-            DUBND( I ) = DBLE( UBND( I ) ) 
+            DLBND( I ) = DBLE( LBND( I ) ) - 1.0D0
+            DUBND( I ) = DBLE( UBND( I ) )
          END DO
 
 *  Find the bounding box in the current Frame.
@@ -138,7 +138,7 @@
             CALL AST_MAPBOX( MAP, CLBND, CUBND, .FALSE., I, PLBND( I ),
      :                       PUBND( I ), XL, XU, STATUS )
 
-*  Ensure it does not extend beyond the supplied bounds. Also note if 
+*  Ensure it does not extend beyond the supplied bounds. Also note if
 *  it is any smaller than the supplied bounds (we do not need to apply
 *  any clipping otherwise).
             IF( PLBND( I ) .LT. DLBND( I ) ) THEN
@@ -158,12 +158,12 @@
             END IF
          END DO
 
-*  If any clipping is needed, convert it to the base Frame of the Plot and 
+*  If any clipping is needed, convert it to the base Frame of the Plot and
 *  then apply it.
          IF( CLIP ) THEN
             MAP = AST_GETMAPPING( IPLOT, IPIX, AST__BASE, STATUS )
             DO I = 1, 2
-               CALL AST_MAPBOX( MAP, PLBND, PUBND, .TRUE., I, 
+               CALL AST_MAPBOX( MAP, PLBND, PUBND, .TRUE., I,
      :                          BLBND( I ), BUBND( I ), XL, XU, STATUS )
             END DO
             CALL AST_CLIP( IPLOT, AST__BASE, BLBND, BUBND, STATUS )

@@ -33,7 +33,7 @@
 
 *  Notes:
 *     -  Use the related routine CCD1_MFREE only or not at all
-*     with this routine, do not mix calls. This routine must be 
+*     with this routine, do not mix calls. This routine must be
 *     called before CCD1_MFREE.
 *
 *     - If the pointer storage resources are exceeded then this will not
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,7 +147,7 @@
          FIRST = .FALSE.
       ELSE
 
-*  Look for a free slot in the 
+*  Look for a free slot in the
          SLOT = -1
          DO 2 I = 1, CCD1__MXPNT
             IF ( CCD1_MEMCM( I ) .EQ. -1 ) THEN

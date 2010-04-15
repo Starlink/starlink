@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,7 +86,7 @@
       DOUBLE PRECISION LONLST, LATLST ! Longitude and latitude of the
                                       ! last vertex
       DOUBLE PRECISION LONPNT, LATPNT ! Longitude and latitude of the
-                                      ! present vertex 
+                                      ! present vertex
 
 *.
 

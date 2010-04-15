@@ -1,6 +1,6 @@
       PROGRAM CIRSET
 *                      GKS Example Program 2.4
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GLSOLI, GLDASH
@@ -15,22 +15,22 @@
       REAL WIDTH(4)
       DATA LNTYPE/GLSOLI, GLDASH, GLSOLI, GLDASH/
       DATA WIDTH/1.0, 1.0, 2.0, 2.0/
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 * Set bundle representations
       DO 10 KPLI=1,4
          CALL GSPLR (1, KPLI, LNTYPE(KPLI), WIDTH(KPLI), 1)

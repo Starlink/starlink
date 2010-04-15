@@ -52,7 +52,7 @@
 *        evaluated.  If .FALSE., gamma is a free parameter of the fit,
 *        and the derived value is returned in argument GAMMA.
 *     POS( NXY, 2 ) = DOUBLE PRECISION (Given)
-*        Each line comprises the accurate x then y positions of a 
+*        Each line comprises the accurate x then y positions of a
 *        star centre.
 *     NXY = INTEGER (Given)
 *        The number of stars to be fitted.
@@ -108,7 +108,7 @@
 *        The global status.
 
 *  Notes:
-*     -  There is a routine for each numeric data type. The arrays ARRAY 
+*     -  There is a routine for each numeric data type. The arrays ARRAY
 *     and DATA supplied to the routine must have the data type specified.
 
 *  Copyright:
@@ -163,7 +163,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -252,7 +252,7 @@
                                  ! around a star
       INTEGER I0                 ! X pixel index nearest the star centre
       INTEGER ICOUNT             ! Number of bin values in DATA
-      INTEGER IMAX               ! X pixel upper index of region around 
+      INTEGER IMAX               ! X pixel upper index of region around
                                  ! a star
       INTEGER IMIN               ! X pixel lower index of region around
                                  ! a star
@@ -263,7 +263,7 @@
       INTEGER J                  ! Loop counter for pixels in the box
                                  ! around a star
       INTEGER J0                 ! Y pixel index nearest the star centre
-      INTEGER JMAX               ! Y pixel upper index of region around 
+      INTEGER JMAX               ! Y pixel upper index of region around
                                  ! a star
       INTEGER JMIN               ! Y pixel lower index of region around
                                  ! a star
@@ -271,7 +271,7 @@
       REAL RDASH                 ! Effective radius
       REAL RLIMIT                ! Radius limit in the minor axis
       REAL RSIG                  ! Reciprocal sigma
-      REAL S                     ! Sine of the orientation 
+      REAL S                     ! Sine of the orientation
       INTEGER STAR               ! Number of the star
       DOUBLE PRECISION SUMD      ! Sum of weighted data values
       DOUBLE PRECISION SUMDF     ! Sum of Gaussian weighted mode
@@ -327,7 +327,7 @@
 *  one.
             XC = REAL( POS( STAR, 1 ) ) - REAL( LBND( 1 ) - 1 )
             YC = REAL( POS( STAR, 2 ) ) - REAL( LBND( 2 ) - 1 )
-        
+
             I0 = NINT( MIN( MAX( -1.0E8, XC ), 1.0E8 ) )
             J0 = NINT( MIN( MAX( -1.0E8, YC ), 1.0E8 ) )
 

@@ -40,7 +40,7 @@
 *        must be positive.  The suggested default is the current value.
 *        [The first dimension of the NDF]
 *     OUT = FILENAME (Write)
-*        Name of the output direct-access unformatted file. 
+*        Name of the output direct-access unformatted file.
 
 *  Examples:
 *     ndf2da cluster cluster.dat
@@ -100,7 +100,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
       CHARACTER MACHIN * ( 24 )  ! Machine name
       INTEGER NBYTES             ! Number of bytes per value
       INTEGER NDF                ! Identifier for NDF
-      INTEGER NDIM               ! Number of dimensions 
+      INTEGER NDIM               ! Number of dimensions
       INTEGER NUMMAX             ! Maximum number of values per record
       CHARACTER NODE * ( 20 )    ! Node name
       INTEGER NUMPRE             ! Number of data values per record
@@ -160,7 +160,7 @@
 *  exist for the file to be an NDF.
       COMLIS = 'Data'
       COMLN = 4
-      
+
 *  If the Quality component exists, append it to component list.
       CALL NDF_STATE( NDF, 'Quality', THERE, STATUS )
       IF ( THERE ) THEN
@@ -173,7 +173,7 @@
          CALL CHR_APPND( ','//'Variance', COMLIS, COMLN )
       END IF
 
-*  Find which component to copy. 
+*  Find which component to copy.
       CALL PAR_CHOIC( 'COMP', 'Data', COMLIS( :COMLN ), .FALSE., COMP,
      :                 STATUS )
 
@@ -256,31 +256,31 @@
 *  Call a routine to write the data to the unformatted direct-access
 *  file; the selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_OUDAB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_OUDAD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_OUDAI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_OUDAR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_OUDAUB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAUB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_OUDAUW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAUW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_OUDAW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OUDAW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       END IF

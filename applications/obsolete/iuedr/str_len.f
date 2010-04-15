@@ -5,7 +5,7 @@
 *   Name:
 *      INTEGER FUNCTION str_LEN
 *
-*   Description: 
+*   Description:
 *      Find length of string.
 *
 *   Authors:

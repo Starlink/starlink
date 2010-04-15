@@ -13,12 +13,12 @@
 *     C function
 
 *  Invocation:
-*     void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, 
+*     void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
 *                      int mode, int *status )
 
 *  Arguments:
 *     indf = int (Given)
-*        An NDF identifier for the NDF containing the extension items 
+*        An NDF identifier for the NDF containing the extension items
 *        to be read. This should be a time series file spanned by
 *        (spectrum,receptor,time slice) axes. It should contain ACSIS and
 *        JCMTSTATE extensions.
@@ -29,10 +29,10 @@
 *        over-writes any existing data in the KeyMap or is appended to
 *        the end of any existing data.
 *
-*        1 - Copy all suitable arrays from the named extension into the 
+*        1 - Copy all suitable arrays from the named extension into the
 *        KeyMap, erasing any existing entries with the same name.
 *
-*        2 - Only copy extension items that already have an entry in the 
+*        2 - Only copy extension items that already have an entry in the
 *        KeyMap, appending the new values to the end of the existing
 *        values. An error is reported if new data cannot be found in the
 *        NDF for any of the existing entries in the KeyMap.
@@ -40,19 +40,19 @@
 *        An AST keyMap to hold the primitive array values read from the
 *        NDF extension.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
-*     This function copies values from a named NDF extension into the 
-*     supplied KeyMap. Each entry in the KeyMap has a key that is equal 
+*     This function copies values from a named NDF extension into the
+*     supplied KeyMap. Each entry in the KeyMap has a key that is equal
 *     to the name of the extension component, and a value that is a
 *     vectorised list of the values read from the extension component.
 *
 *     The named extension is searched for primitive array components
-*     that have a final trailing axis length equal to the length of the 
+*     that have a final trailing axis length equal to the length of the
 *     NDFs 3rd pixel axis. An additional constraint is that if "xname" is
-*     ACSIS, only arrays with at least 2 axes are used. Any such arrays are 
-*     vectorised and stored in the KeyMap, in the manner determined by the 
+*     ACSIS, only arrays with at least 2 axes are used. Any such arrays are
+*     vectorised and stored in the KeyMap, in the manner determined by the
 *     "mode" argument.
 
 *  Authors:
@@ -64,7 +64,7 @@
 *        Initial version.
 *     14-APR-2008 (DSB):
 *        Only copy ACSIS arrays that have at least 2 axes. This guards
-*        against problems if the number of time slices is equal to the 
+*        against problems if the number of time slices is equal to the
 *        number of detectors.
 *     {enter_further_changes_here}
 

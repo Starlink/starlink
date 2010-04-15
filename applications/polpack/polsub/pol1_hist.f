@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_HIST( EL, DATA, FRAC, NBIN, EXZERO, HIST, 
+      SUBROUTINE POL1_HIST( EL, DATA, FRAC, NBIN, EXZERO, HIST,
      :                      DMIN, DMAX, INIT, VALUE, STATUS )
 *+
 *  Name:
@@ -12,13 +12,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_HIST( EL, DATA, FRAC, NBIN, EXZERO, HIST, DMIN, DMAX, INIT, 
+*     CALL POL1_HIST( EL, DATA, FRAC, NBIN, EXZERO, HIST, DMIN, DMAX, INIT,
 *                     VALUE, STATUS )
 
 *  Description:
-*     This routine forms a normalised histogram of the supplied (good) data 
+*     This routine forms a normalised histogram of the supplied (good) data
 *     values, and returns an estimate of a specified percentile. The returned
-*     histogram can be used in subsequent calls to this routine, thus 
+*     histogram can be used in subsequent calls to this routine, thus
 *     removing the need to recalculate the histogram for each percentile.
 
 *  Arguments:
@@ -40,19 +40,19 @@
 *        should be 1.0.
 *     DMIN = REAL (Given and Returned)
 *        If DMIN is less than DMAX on entry, then it gives the lowest
-*        data value to be used in the histogram and is unchanged on exit. 
-*        Otherwise, the supplied value is ignored, and the value to use is 
-*        found by searching the supplied DATA array. and this value is 
+*        data value to be used in the histogram and is unchanged on exit.
+*        Otherwise, the supplied value is ignored, and the value to use is
+*        found by searching the supplied DATA array. and this value is
 *        returned on exit.
 *     DMAX = REAL (Given and Returned)
 *        If DMAX is greater than DMIN on entry, then it gives the highest
-*        data value to be used in the histogram and is unchanged on exit. 
-*        Otherwise, the supplied value is ignored, and the value to use is 
-*        found by searching the supplied DATA array. and this value is 
+*        data value to be used in the histogram and is unchanged on exit.
+*        Otherwise, the supplied value is ignored, and the value to use is
+*        found by searching the supplied DATA array. and this value is
 *        returned on exit.
 *     INIT = LOGICAL (Given and Returned)
 *        Should the histogram array be recalculated? If so, the histogram
-*        is calculated and stored in HIST. If not, the histogram supplied 
+*        is calculated and stored in HIST. If not, the histogram supplied
 *        in HIST is used. INIT is always returned .FALSE. on exit.
 *     VALUE = REAL (Returned)
 *        The data value below which the specified fraction (see FRAC) of
@@ -62,7 +62,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,7 +132,7 @@
          DO I = 1, EL
             D = DATA( I )
             IF( D .NE. VAL__BADR .AND. (
-     :          D .NE. 0.0 .OR. .NOT. EXZERO ) ) THEN        
+     :          D .NE. 0.0 .OR. .NOT. EXZERO ) ) THEN
 
 *  Update the limits.
                DMIN = MIN( DMIN, D )
@@ -145,7 +145,7 @@
 
 *  If no good data was found, return VAL__BADR.
       IF( DMAX .LT. DMIN ) THEN
-         VALUE = VAL__BADR 
+         VALUE = VAL__BADR
 
 *  If all data values were equal, return that value
       ELSE IF( DMAX .EQ. DMIN ) THEN
@@ -172,7 +172,7 @@
             DO I = 1, EL
                D = DATA( I )
                IF( D .NE. VAL__BADR .AND. (
-     :             D .NE. 0.0 .OR. .NOT. EXZERO ) ) THEN        
+     :             D .NE. 0.0 .OR. .NOT. EXZERO ) ) THEN
                   IBIN = INT( ( D - DMIN )/DELTA ) + 1
                   IF( IBIN .GE. 1 .AND. IBIN .LE. NBIN ) THEN
                      HIST( IBIN ) = HIST( IBIN ) + 1.0
@@ -211,7 +211,7 @@
 
          END DO
 
- 10      CONTINUE 
+ 10      CONTINUE
 
 *  If the target value was not reached, return the maximum data value.
          IF( ACCUM .LT. LFRAC ) THEN
@@ -219,7 +219,7 @@
 
 *  Otherwise, do linear interpolation to get the required value.
          ELSE IF( ACCUM .GT. PACCUM ) THEN
-            VALUE = DMIN + DELTA*( IBIN - 1 + 
+            VALUE = DMIN + DELTA*( IBIN - 1 +
      :                     ( LFRAC - PACCUM )/( ACCUM - PACCUM ) )
 
          ELSE IF( ACCUM .GT. PACCUM ) THEN

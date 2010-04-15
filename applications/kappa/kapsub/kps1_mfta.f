@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_MFTA( QUICK, ITYPE, INTERP, MXKNOT, NKNOT, FKNOT,
-     :                      AXIS, NRANGE, RANGES, USEVAR, IPVAR, USEMSK, 
+     :                      AXIS, NRANGE, RANGES, USEVAR, IPVAR, USEMSK,
      :                      MASK, DIMS, IPDAT, X, Z, W, NFIT, NGOOD,
      :                      KNOT, COEFF, NCOEF, SCALE, STATUS )
 *+
@@ -14,19 +14,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFTA( QUICK, ITYPE, INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-*                     NRANGE, RANGES, USEVAR, IPVAR, USEMSK, MASK, DIMS, 
+*     CALL KPS1_MFTA( QUICK, ITYPE, INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+*                     NRANGE, RANGES, USEVAR, IPVAR, USEMSK, MASK, DIMS,
 *                     IPDAT, X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
 *                     SCALE, STATUS )
 
 *  Description:
-*     This routine fits cubic B-splines to all lines of data that lie 
-*     parallel to a given axis, and lie within ranges along that axis. 
-*     It is essentially code lifted from MFITTREND to make the task 
+*     This routine fits cubic B-splines to all lines of data that lie
+*     parallel to a given axis, and lie within ranges along that axis.
+*     It is essentially code lifted from MFITTREND to make the task
 *     code more manageable and readable.
 
 *     It invokes KPS1_MFTx or KPS1_MFTQx for the supplied ITYPE data
-*     type to do the work.  The latter routine set is used for quick 
+*     type to do the work.  The latter routine set is used for quick
 *     processing when there are no bad pixels or weights (see QUICK).
 *     See these two routines for details of the various mapped arrays.
 
@@ -35,7 +35,7 @@
 *     The spline can be a smoothing or interpolation.  In the former
 *     case the knots are found automatically.  In the latter, the knots
 *     are set through FKNOT or spaced equally.
-*     
+*
 *     The spline coefficients and knots are returned in the COEFF and
 *     KNOT arrays respectively.
 
@@ -48,8 +48,8 @@
 *        The implementation HDS data type.
 *     INTERP = LOGICAL (Given)
 *        If set to true an interpolating least-squares spline is found
-*        and the NKNOT interior knots are equally spaced.  Otherwise a 
-*        smoothing spline is fit using a smoothing factor equal to the 
+*        and the NKNOT interior knots are equally spaced.  Otherwise a
+*        smoothing spline is fit using a smoothing factor equal to the
 *        number of data points; and the spline fit sets the knots.
 *        The order of polynomial to fit.  Starts at 0 for a constant.
 *     MXKNOT = INTEGER (Given)
@@ -71,10 +71,10 @@
 *     USEVAR = LOGICAL (Given)
 *        If .TRUE., then the variances will be used to weight the fits.
 *     IPVAR = INTEGER (Given)
-*        Pointer to the variances of the data, mapped using the type 
+*        Pointer to the variances of the data, mapped using the type
 *        ITYPE.  These will be used to weight the fits if USEVAR is true.
 *     USEMSK = LOGICAL (Given)
-*        If .TRUE. then the supplied mask (argument MASK) is used to 
+*        If .TRUE. then the supplied mask (argument MASK) is used to
 *        omit parts of the data from the fitting process.
 *     MASK( * ) = BYTE (Given)
 *        A mask in which bad values indicate that a given element of
@@ -85,15 +85,15 @@
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     IPDAT = INTEGER (Given)
-*        Pointer to the data to be fitted mapped with type ITYPE.  The 
+*        Pointer to the data to be fitted mapped with type ITYPE.  The
 *        fit will be subtracted from these data, if requested.
 *     X( DIMS( AXIS ) + 2, * ) = REAL (Returned)
 *        Workspace for the co-ordinates of ordered trends to fit.  The
 *        size of the second dimension of this should be the product of
 *        all the dimensions that are not the fit axis.
 *     Z( DIMS( AXIS ) + 2, * ) = REAL (Returned)
-*        Workspace for the values of ordered trends to fit.  The size of 
-*        the second dimension of this should be the product of all the 
+*        Workspace for the values of ordered trends to fit.  The size of
+*        the second dimension of this should be the product of all the
 *        dimensions that are not the fit axis.
 *     W( DIMS( AXIS ) + 2, * ) = REAL (Returned)
 *        Workspace for the co-ordinates of ordered trends to fit.  The
@@ -116,12 +116,12 @@
 *        all the dimensions that are not the fit axis.
 *     NCOEF( * ) = INTEGER (Returned)
 *        The number coefficents of the cubic B-splines for each trend.
-*        The dimension of this should be the product of all the 
+*        The dimension of this should be the product of all the
 *        dimensions that are not the fit axis.
 *     SCALE( * ) = REAL (Returned)
 *        The scale factors of ordered trends that were used to scale
-*        each trend vector to the -1 to +1 range.  The dimension of this 
-*        should be the product of all the dimensions that are not the 
+*        each trend vector to the -1 to +1 range.  The dimension of this
+*        should be the product of all the dimensions that are not the
 *        fit axis.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -208,47 +208,47 @@
       IF ( .NOT. QUICK ) THEN
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_MFTB( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
-     :                      USEMSK, MASK, DIMS, 
+     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
+     :                      USEMSK, MASK, DIMS,
      :                      %VAL( CNF_PVAL( IPDAT ) ),
-     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF, 
+     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
      :                      SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_MFTUB( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                       RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                       RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                       USEMSK, MASK, DIMS,
      :                       %VAL( CNF_PVAL( IPDAT ) ),
-     :                       X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF, 
+     :                       X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
      :                       SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_MFTD( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                      USEMSK, MASK, DIMS,
      :                      %VAL( CNF_PVAL( IPDAT ) ),
-     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF, 
+     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
      :                      SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_MFTI( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                      USEMSK, MASK, DIMS,
      :                      %VAL( CNF_PVAL( IPDAT ) ),
-     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF, 
+     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
      :                      SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_MFTR( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                      USEMSK, MASK, DIMS,
      :                      %VAL( CNF_PVAL( IPDAT ) ),
-     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF, 
+     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
      :                      SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_MFTW( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                      USEMSK, MASK, DIMS,
      :                      %VAL( CNF_PVAL( IPDAT ) ),
      :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
@@ -256,7 +256,7 @@
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_MFTUW( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
-     :                       RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                       RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                       USEMSK, MASK, DIMS,
      :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
@@ -264,55 +264,55 @@
          END IF
       ELSE
 
-*  As there are no variances, no bad values and no mask, we can use 
+*  As there are no variances, no bad values and no mask, we can use
 *  the fastest method.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_MFTQB( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                       NRANGE, RANGES, DIMS, 
-     %                       %VAL( CNF_PVAL( IPDAT ) ), 
-     :                       X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQB( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                       NRANGE, RANGES, DIMS,
+     %                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       X, Z, W, NFIT, NGOOD, KNOT,
      :                       COEFF, NCOEF, SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_MFTQUB( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                        NRANGE, RANGES, DIMS, 
-     :                        %VAL( CNF_PVAL( IPDAT ) ), 
-     :                        X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQUB( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                        NRANGE, RANGES, DIMS,
+     :                        %VAL( CNF_PVAL( IPDAT ) ),
+     :                        X, Z, W, NFIT, NGOOD, KNOT,
      :                        COEFF, NCOEF, SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_MFTQD( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                       NRANGE, RANGES, DIMS, 
-     :                       %VAL( CNF_PVAL( IPDAT ) ), 
-     :                       X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQD( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                       NRANGE, RANGES, DIMS,
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       X, Z, W, NFIT, NGOOD, KNOT,
      :                       COEFF, NCOEF, SCALE, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_MFTQI( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                       NRANGE, RANGES, DIMS, 
-     :                       %VAL( CNF_PVAL( IPDAT ) ), 
-     :                       X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQI( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                       NRANGE, RANGES, DIMS,
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       X, Z, W, NFIT, NGOOD, KNOT,
      :                       COEFF, NCOEF, SCALE, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_MFTQR( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                       NRANGE, RANGES, DIMS, 
-     :                       %VAL( CNF_PVAL( IPDAT ) ), 
-     :                       X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQR( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                       NRANGE, RANGES, DIMS,
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       X, Z, W, NFIT, NGOOD, KNOT,
      :                       COEFF, NCOEF, SCALE, STATUS )
-  
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_MFTQW( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                       NRANGE, RANGES, DIMS, 
-     :                       %VAL( CNF_PVAL( IPDAT ) ), 
-     :                       X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQW( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                       NRANGE, RANGES, DIMS,
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       X, Z, W, NFIT, NGOOD, KNOT,
      :                       COEFF, NCOEF, SCALE, STATUS )
 
         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_MFTQUW( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
-     :                        NRANGE, RANGES, DIMS, 
-     :                        %VAL( CNF_PVAL( IPDAT ) ), 
-     :                        X, Z, W, NFIT, NGOOD, KNOT, 
+            CALL KPS1_MFTQUW( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                        NRANGE, RANGES, DIMS,
+     :                        %VAL( CNF_PVAL( IPDAT ) ),
+     :                        X, Z, W, NFIT, NGOOD, KNOT,
      :                        COEFF, NCOEF, SCALE, STATUS )
          END IF
       END IF

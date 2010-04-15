@@ -78,85 +78,85 @@
 *     1986 Nov 12: Made a generic routine (RL.STAR::CUR).
 *
 *    Type Definitions :
- 
+
       IMPLICIT  NONE              ! no default typing allowed
- 
+
 *    Global constants :
- 
+
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE 'PRM_PAR'           ! PRIMDAT public constants
- 
+
 *    Import :
- 
+
       INTEGER
      :    DIMS
- 
+
       REAL
      :    INARR( DIMS ),
      :    THRLO,
      :    THRHI,
      :    NEWLO,
      :    NEWHI
- 
+
 *    Export :
- 
+
       REAL
      :    OUTARR( DIMS )
- 
+
 *    Status :
- 
+
       INTEGER  STATUS
- 
+
 *    Local variables :
- 
+
       INTEGER  J                  ! counter
- 
+
 *-
 *    check status on entry - return if not o.k.
- 
+
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *       loop round all pixels in input image
- 
+
          DO  J  =  1, DIMS
- 
+
 *          check for invalid pixel
- 
+
             IF ( INARR( J ) .EQ. VAL__BADR ) THEN
                OUTARR( J ) =  VAL__BADR
- 
+
 *          check input array value and act accordingly
- 
+
             ELSE IF ( INARR( J ) .GT. THRHI ) THEN
- 
+
 *             input pixel value is greater than upper threshold - set
 *             output pixel to given replacement value
- 
+
                OUTARR( J )  =  NEWHI
- 
+
             ELSE IF ( INARR( J ) .LT. THRLO ) THEN
- 
+
 *             input pixel value is less than lower threshold - set
 *             output pixel to given replacement value
- 
+
                OUTARR( J )  =  NEWLO
- 
+
             ELSE
- 
+
 *             input pixel value lies between thresholds - just copy
 *             it into output pixel
- 
+
                OUTARR( J )  =  INARR( J )
- 
+
 *          end of check to see where input pixel value lies in range
- 
+
             END IF
- 
+
 *       end of loop round all pixels
- 
+
          END DO
       END IF
- 
+
 *    end
- 
+
       END

@@ -24,7 +24,7 @@
 *   Update : D Terrett   930415  - Add input window id                 *
 ************************************************************************
 
-  
+
 !!  all coordinates are referred to the (0,0) bottom left origin
 !!  and are internally inverted for X Graphic Primitives
    ---------------------------------------------------------    */
@@ -49,20 +49,20 @@ typedef struct int_bar INT_BAR;
 struct      g_list      /* graphic display list element         */
     {
     int     geln;       /* element sequential no.               */
-    struct g_list  *next_gel; 
+    struct g_list  *next_gel;
                         /* next element pointer                 */
     int     color;      /* draw color                           */
     int     style;      /* draw style                           */
     int     np;         /* no. of points                        */
     int     *xl;        /* coordinates pointers                 */
-    int     *yl;  
+    int     *yl;
     };
 typedef struct g_list G_LIST;
 
 struct      t_list      /* text display list element            */
     {
     int     teln;       /* element sequential no.               */
-    struct t_list  *next_tel; 
+    struct t_list  *next_tel;
                         /* next element pointer                 */
     int     x0;         /* X position                           */
     int     y0;         /* Y position                           */
@@ -75,23 +75,23 @@ struct      t_list      /* text display list element            */
 typedef struct t_list T_LIST;
 
 struct      lut_data    /* lookup data structure                */
-    {                                                           
+    {
     int     lut_free;   /* lookup busy flag                     */
     int     lut_len;    /* lookup length                        */
     int     lutpix[256];/* indices into curlut cells            */
     int     lutr[256];  /* lookup Red data                      */
     int     lutg[256];  /* lookup Green data                    */
     int     lutb[256];  /* lookup Blue data                     */
-    };                                                          
+    };
 typedef struct lut_data LUT_DATA;
 
 struct      itt_data    /* ITT data structure                   */
-    {                                                           
+    {
     int     itt_def;    /* ITT defined flag                     */
     int     itt_len;    /* ITT length                           */
     int     ittlev[256];/* itt data                             */
     int     ittinv[256];/* inverse itt data                     */
-	};                                                          
+	};
 typedef struct itt_data ITT_DATA;
 
 struct      curs_data  /* cursors data structure                */
@@ -159,15 +159,15 @@ struct	    mem_data    /* memory data structure                */
                         /* 0 = bottom->top / 1 = top->bottom    */
     int     lut_id;     /* current lookup                       */
     int     itt_id;     /* current ITT                          */
-    struct g_list  *el_glist;  
+    struct g_list  *el_glist;
                        /* graphic display list pointer         */
     int     n_gel;      /* total no. of graphic elements        */
-    struct g_list  *g_last_el; 
+    struct g_list  *g_last_el;
                         /* last graphic element pointer         */
-    struct t_list  *el_tlist;  
+    struct t_list  *el_tlist;
                         /* text display list pointer            */
     int     n_tel;      /* total no. of text elements           */
-    struct t_list  *t_last_el; 
+    struct t_list  *t_last_el;
                         /* last text element pointer            */
     float   x_scroll;   /* x scroll position                    */
     float   y_scroll;   /* y scroll position                    */
@@ -176,8 +176,8 @@ struct	    mem_data    /* memory data structure                */
                         /* X,Y fictitious scroll of enlarged    */
                         /* image due to zoom operation          */
                         /* effective                            */
-    float   zoom_xsc;  
-    float   zoom_ysc;   
+    float   zoom_xsc;
+    float   zoom_ysc;
                         /* new                                  */
     float   zoom_xsc_new;
     float   zoom_ysc_new;
@@ -260,7 +260,7 @@ NOSHARE struct      dev_data    /* device data structure   */
     }
     device [MAX_DEV];
 
-NOSHARE struct 
+NOSHARE struct
    {
    int     id;          /* current LUT id                      */
    int     nalloc;      /* number of cells allocated from X    */
@@ -272,7 +272,7 @@ NOSHARE struct
    int     lutb[256];   /* lookup Blue data                    */
    }
    curlut;
-    
+
 
 /* ----------------------------------------------------------- */
 
@@ -285,7 +285,7 @@ struct loc_data
    int      left_ls;    /* Loc left movement low speed def     */
    int      left_hs;    /*  "   "      "     high  "    "      */
    int      right_ls;   /* Loc right movement low speed def    */
-   int      right_hs;   /*  "   "       "     high  "   "      */ 
+   int      right_hs;   /*  "   "       "     high  "   "      */
    int      up_ls;      /* Loc up movement low speed def       */
    int      up_hs;      /*  "   "    "     high  "    "        */
    int      down_ls;    /* Loc down movement low speed def     */
@@ -302,9 +302,9 @@ struct evl_data
                         /* EVLT / EVLI / EVLR / EVLS           */
    int      def[2];     /* keys def for Toggle type evaluator  */
    int      min;        /* evaluator range                     */
-   int      max;        
+   int      max;
    int      ival;       /* evaluators value                    */
-   float    rval;  
+   float    rval;
    char     sval[32];
    };
 typedef struct evl_data EVL_DATA;
@@ -330,7 +330,7 @@ struct int_dev_data
                         /* triggers definition                 */
    };
 typedef struct int_dev_data INT_DEV_DATA;
-     
+
 
 NOSHARE struct int_struct
    {

@@ -17,12 +17,12 @@
 
 *  Arguments:
 *     indf = Grp * (Given)
-*        The NDF identifier. The NDF should already contains an ACSIS 
+*        The NDF identifier. The NDF should already contains an ACSIS
 *        extension. The ACSIS extension will be modified on exit.
 *     mask = int * (Given)
 *        Pointer to an array which defines which detectors to remove from
 *        the ACSIS extension. The length of the array should be equal to
-*        the number of detectors described by the ACSIS extension in the 
+*        the number of detectors described by the ACSIS extension in the
 *        supplied NDF. Each element should be zero if the corresponding
 *        detector is to be removed, and non-zero if it is to be retained.
 *     status = int * (Given and Returned)
@@ -87,7 +87,7 @@ void smf_maskacsis( int indf, int *mask, int *status ){
    hdsdim dims_out[ NDF__MXDIM ];
    int i;
    int j;
-   int maxis;                    
+   int maxis;
    int ndet_in;
    int ndet_out;
    int ndim;
@@ -126,9 +126,9 @@ void smf_maskacsis( int indf, int *mask, int *status ){
 /* Map the component. */
       datMapV( loc2, type, "READ", &pin, &el, status );
 
-/* If not already done, note the length of the mask array and count the number 
-   of non-zero values in the supplied mask. This will equal the number of 
-   detectors in the returned ACSIS extension. */      
+/* If not already done, note the length of the mask array and count the number
+   of non-zero values in the supplied mask. This will equal the number of
+   detectors in the returned ACSIS extension. */
       if( i == 0 ) {
          ndet_in = dims_in[ maxis ];
          for( j = 0; j < ndet_in; j++ ) {

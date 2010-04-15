@@ -29,7 +29,7 @@ and 'relative indents to current starfort indentation plus comment-column.")
 ;; Note that this is documented in the v18 manuals as being a string
 ;; of length one rather than a single character.
 ;; The code in this file accepts either format for compatibility.
-(defvar starfort-comment-indent-char ? 
+(defvar starfort-comment-indent-char ?
   "*Character to be inserted for Starfort comment indentation.
 Normally a space.")
 
@@ -83,7 +83,7 @@ to begin a continuation line.  Normally $.")
   (modify-syntax-entry ?, "." starfort-mode-syntax-table)
   (modify-syntax-entry ?\n ">" starfort-mode-syntax-table))
 
-(defvar starfort-mode-map () 
+(defvar starfort-mode-map ()
   "Keymap used in starfort mode.")
 
 (if starfort-mode-map
@@ -113,7 +113,7 @@ to begin a continuation line.  Normally $.")
 ;  (define-key starfort-mode-map "8" 'starfort-electric-line-number)
 ;  (define-key starfort-mode-map "9" 'starfort-electric-line-number)
 )
-
+
 (defvar starfort-mode-abbrev-table nil)
 (if starfort-mode-abbrev-table
     ()
@@ -163,11 +163,11 @@ to begin a continuation line.  Normally $.")
     (define-abbrev starfort-mode-abbrev-table  ";su"  "subroutine" nil)
     (define-abbrev starfort-mode-abbrev-table  ";ty"  "type" nil)
     (define-abbrev starfort-mode-abbrev-table  ";w"   "write" nil)))
-
+
 ;;;###autoload
 (defun starfort-mode ()
   "Major mode for editing starfort code.
-Tab indents the current starfort line correctly. 
+Tab indents the current starfort line correctly.
 `do' statements must not share a common `continue'.
 
 Type `;?' or `;\\[help-command]' to display a list of built-in abbrevs for Starfort keywords.
@@ -207,15 +207,15 @@ Variables controlling indentation style and extra features:
     character to be inserted in column 5 of a continuation line.
     (default $)
  starfort-comment-region
-    String inserted by \\[starfort-comment-region] at start of each line in 
+    String inserted by \\[starfort-comment-region] at start of each line in
     region.  (default \"c$$$\")
  starfort-electric-line-number
-    Non-nil causes line number digits to be moved to the correct column 
+    Non-nil causes line number digits to be moved to the correct column
     as typed.  (default t)
  starfort-startup-message
     Set to nil to inhibit message first time starfort-mode is used.
 
-Turning on Starfort mode calls the value of the variable starfort-mode-hook 
+Turning on Starfort mode calls the value of the variable starfort-mode-hook
 with no args, if that value is non-nil.
 \\{starfort-mode-map}"
   (interactive)
@@ -365,8 +365,8 @@ or on a new line inserted before this line if this line is not blank."
 
 (defun starfort-comment-region (beg-region end-region arg)
   "Comments every line in the region.
-Puts starfort-comment-region at the beginning of every line in the region. 
-BEG-REGION and END-REGION are args which specify the region boundaries. 
+Puts starfort-comment-region at the beginning of every line in the region.
+BEG-REGION and END-REGION are args which specify the region boundaries.
 With non-nil ARG, uncomments the region."
   (interactive "*r\nP")
   (let ((end-region-mark (make-marker)) (save-point (point-marker)))
@@ -388,9 +388,9 @@ With non-nil ARG, uncomments the region."
     (goto-char save-point)
     (set-marker end-region-mark nil)
     (set-marker save-point nil)))
-
+
 (defun starfort-abbrev-start ()
-  "Typing \";\\[help-command]\" or \";?\" lists all the starfort abbrevs. 
+  "Typing \";\\[help-command]\" or \";?\" lists all the starfort abbrevs.
 Any other key combination is executed normally." ;\\[help-command] is just a way to print the value of the variable help-char.
   (interactive)
   (let (c)
@@ -413,7 +413,7 @@ Any other key combination is executed normally." ;\\[help-command] is just a way
 The ruler is defined by the value of starfort-column-ruler.
 The key typed is executed unless it is SPC."
   (interactive)
-  (momentary-string-display 
+  (momentary-string-display
    starfort-column-ruler (save-excursion (beginning-of-line) (point))
    nil "Type SPC or any command to erase ruler."))
 
@@ -458,7 +458,7 @@ except that ] is never special and \ quotes ^, - or \."
       (skip-chars-backward " \t")
       (insert (or arg last-command-char))
       (starfort-indent-line))))
-
+
 (defun beginning-of-starfort-subprogram ()
   "Moves point to the beginning of the current starfort subprogram."
   (interactive)
@@ -478,13 +478,13 @@ except that ] is never special and \ quotes ^, - or \."
     (forward-line 1)))
 
 (defun mark-starfort-subprogram ()
-  "Put mark at end of starfort subprogram, point at beginning. 
+  "Put mark at end of starfort subprogram, point at beginning.
 The marks are pushed."
   (interactive)
   (end-of-starfort-subprogram)
   (push-mark (point))
   (beginning-of-starfort-subprogram))
-  
+
 (defun starfort-previous-statement ()
   "Moves point to beginning of the previous starfort statement.
 Returns 'first-statement if that statement is the first
@@ -505,7 +505,7 @@ non-comment Starfort statement in the file, and nil otherwise."
     (cond ((and continue-test
 		(not not-first-statement))
 	   (message "Incomplete continuation statement."))
-	  (continue-test	
+	  (continue-test
 	   (starfort-previous-statement))
 	  ((not not-first-statement)
 	   'first-statement))))
@@ -524,7 +524,7 @@ non-comment Starfort statement in the file, and nil otherwise."
  		    (looking-at (concat "[ \t]*"  comment-start-skip)))))
     (if (not not-last-statement)
  	'last-statement)))
-
+
 (defun starfort-indent-line ()
   "Indents current starfort line based on its contents and on previous lines."
   (interactive)
@@ -615,7 +615,7 @@ non-comment Starfort statement in the file, and nil otherwise."
 			 (not (= icol starfort-minimum-statement-indent)))
  		    (message "Warning: `end' not in column %d.  Probably an unclosed block." starfort-minimum-statement-indent))))))
     (if iscom icol (max starfort-minimum-statement-indent icol))))
-
+
 (defun starfort-current-line-indentation ()
   "Indentation of current line, ignoring Starfort line number or continuation.
 This is the column position of the first non-whitespace character

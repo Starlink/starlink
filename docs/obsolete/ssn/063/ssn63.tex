@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 \markright{SSN/63.1}
 \setlength{\textwidth}{160mm}
@@ -40,9 +40,9 @@ SwitchStream (IPSS) costs real money. Some users either do not appreciate
 this or do not care and have been known to clock up rather large quarterly
 bills. This software package allows a system manager to determine {\bf who} has
 used PAD to call {\bf where} and (most importantly) {\bf how much} it has cost.
-The system manager can then take appropriate action - either charging the 
+The system manager can then take appropriate action - either charging the
 individuals, warning them to use the facility with more care or even denying
-access to a greedy user to one or more sites. 
+access to a greedy user to one or more sites.
 
 \section {Different approaches to PAD auditing}
 
@@ -54,7 +54,7 @@ streamlined approach is not possible due to the lack of {\bf accurate}
  information
 {\bf available} to system managers. This package has been in use at Cambridge
 for many months now and has proven invaluable in determining from which grants
-our depressingly large PSS bill should be paid. 
+our depressingly large PSS bill should be paid.
 
 There are two main ways to tackle the problem of auditing PAD calls.
 
@@ -74,18 +74,18 @@ calls to each site. Unfortunately, this breakdown does {\bf not} indicate which 
 your users has made which calls. {\it This is the root of most of the problems
 associated with PAD auditing.} If the username were included, then a modified
 version of NET\_\/EXEC.EXE would be sufficient to allow accurate PSS billing to
-individual users. 
+individual users.
 
 \item The second method is to monitor the calls on-site and produce your own
-breakdown of the calls. This has a number of advantages: 
+breakdown of the calls. This has a number of advantages:
 
 \begin{itemize}
 
-\item This breakdown will include the username of the caller. 
+\item This breakdown will include the username of the caller.
 
-\item You are not relying on a third party to send you a breakdown. 
+\item You are not relying on a third party to send you a breakdown.
 
-\item You can get a breakdown whenever you like rather than 
+\item You can get a breakdown whenever you like rather than
 waiting for the Network Executive breakdown every quarter.
 
 \item Auditing of JANET calls is also possible.
@@ -96,27 +96,27 @@ However, the on-site method has one major disadvantage -- the costs as
 calculated from on-site accounting do not tally with those charged by the
 Network Executive (i.e. with the costs that really count). The reason for
 this is that the volume (V) and duration (D) of the calls as recorded
-on-site and those recorded at the gateway often differ: 
+on-site and those recorded at the gateway often differ:
 
 \begin{enumerate}
 
-\item 
+\item
 V \& D can differ since there is a minimum call charge and hence for short
 calls, the gateway figures will appear greater.  One can accommodate for this
 in software but the situation is further complicated by the fact that the minimum
 charge is only implemented if the call is successful. If the call fails,
 then BT only charges for the resources actually used. The information
 required to determine if the call was successful or not is {\bf not} recorded by
-the on-site call monitor. 
+the on-site call monitor.
 
-\item 
+\item
 To {\bf some} sites there is a systematic error between the volume of traffic V
 recorded locally and at the gateway. For example, in the sample data supplied
 with this package one can see that the volume of the calls to IAC
 that is recorded locally is 30\% to 45\% greater than that recorded at the
 gateway. For AAOEPP and SDC the equivalent figures are 20\% to 35\% and up to 10\%
-respectively. The cause of this differential has yet to be determined but is     
-under investigation. However, this problem can be worked around 
+respectively. The cause of this differential has yet to be determined but is
+under investigation. However, this problem can be worked around
 by normalising the local accounts w.r.t. the Network Executive accounts
 (see Section 5).
 
@@ -127,7 +127,7 @@ Executive breakdown includes the cost of file transfers (including mail) as
 well as that of remote logins. If you also wish to charge for this type of
 network use then you should use Peter Allan's CBS\_\/ACCOUNTS package for
 on-site logging of this facility. Also some calls are discounted between
-certain times and on certain days but this could be allowed for in software. 
+certain times and on certain days but this could be allowed for in software.
 
 \end{enumerate}
 
@@ -141,7 +141,7 @@ and common sense) to charge users very accurately for their calls.
 
 All of the files initially supplied in this package (except SSN63.TEX) should
 reside in the directory PADAUDIT\_\/DIR. The sample files are all for June 1989
-for the  Cambridge Starlink node. 
+for the  Cambridge Starlink node.
 
 All symbols and logical names required for this package are set up in
 the files SSC:STARTUP.COM and SSC:LOGIN.COM.
@@ -155,22 +155,22 @@ the files SSC:STARTUP.COM and SSC:LOGIN.COM.
 
 \item [SSN63.TEX] This document.
 
-\item [NET\_\/EXEC.IN]                     
+\item [NET\_\/EXEC.IN]
 
-Breakdown of PSS calls from RAL 
+Breakdown of PSS calls from RAL
 with header and trailing information
 removed. Input for NET\_\/EXEC.EXE.
-A sample file is included in this 
+A sample file is included in this
 package.
 
 \item [NET\_\/EXEC.EXE]
 
 Takes the Network Executive breakdown
 NET\_\/EXEC.IN as input and produces a file
-called NET\_\/EXEC.OUT which lists 
-the total costs of calls to each of 
-the sites that are 
-listed in TARGET\_\/SITES.LIS. 
+called NET\_\/EXEC.OUT which lists
+the total costs of calls to each of
+the sites that are
+listed in TARGET\_\/SITES.LIS.
 
 \item [NET\_\/EXEC.OUT]
 
@@ -187,13 +187,13 @@ astronomical sites to get you started.
 
 \item [PAD\_\/ACCOUNTS.COM]
 
-Extracts the PAD accounting information 
+Extracts the PAD accounting information
 from your on-site accounts and runs
 PAD\_\/ACCOUNTS.EXE to produce PAD.DAT
 ready for auditing with PAD\_\/AUDIT.EXE
 (OPAD\_\/AUDIT.EXE for older accounts).
 This command procedure also deletes the
-temporary files it creates when they are 
+temporary files it creates when they are
 no longer needed.
 
 \item [PAD\_\/ACCOUNTS.EXE]
@@ -213,19 +213,19 @@ to test out PAD\_\/AUDIT.
 \item[PAD\_\/AUDIT.EXE]
 
 An interactive program which allows one to
-interrogate PAD.DAT (the output from 
+interrogate PAD.DAT (the output from
 PAD\_\/ACCOUNTS.EXE).
 
 \item [OPAD\_\/AUDIT.EXE]
 
 An interactive program which allows one to
-interrogate PAD.DAT (the output from 
+interrogate PAD.DAT (the output from
 PAD\_\/ACCOUNTS.EXE). This old version is
 for accounts from before June 1989.
 
 \item [PAD\_\/AUDIT.LOG]
 
-Log file to which PAD\_\/AUDIT.EXE 
+Log file to which PAD\_\/AUDIT.EXE
 (and OPAD\_\/AUDIT.EXE) output is
 directed. A sample file is provided.
 
@@ -251,14 +251,14 @@ traffic and destination of the call.
 
 \begin{enumerate}
 
-\item {\bf Activate on-site PAD accounting on the node which runs your 
+\item {\bf Activate on-site PAD accounting on the node which runs your
 CBS software.}
 
 This should be done as soon as possible. On-site PAD accounting cannot take
 place until you have done this. To do this you simply run
 NET\$DIR:PADCONFIG.EXE. This is fully explained in section 4.2 of the CBS
 V5.0 installation and management guide. In brief, the first question asked
-is 
+is
 
 \begin{quote} \tt
 Accounting is OFF
@@ -268,37 +268,37 @@ Do you want to change this ?
 
 
 Answer ``YES'' to this question and take the defaults on all the others. The
-defaults in PADCONFIG.EXE are the current settings. 
+defaults in PADCONFIG.EXE are the current settings.
 
-\item {\bf Arrange for the Network Executive Breakdown to be sent to you 
+\item {\bf Arrange for the Network Executive Breakdown to be sent to you
 each quarter}.
 
 Mail JNET@UK.AC.RUTHERFORD.GEC-B and ask them to send you a breakdown of
 your PSS bill every quarter. You may need to remind them a couple of weeks
 after the invoice arrives on your administrator's desk. If they sound
 confused, ask them to send you a breakdown like the one Bill Jenkins sends
-out for account CAAS (Cambridge astronomy). 
+out for account CAAS (Cambridge astronomy).
 
 \item {\bf Reduce Network Executive breakdown to cost per site.}
 
 When the breakdown arrives, edit out the header information and any trailing
 information and write out to a file called NET\_\/EXEC.IN. An example file is
-included in this package. 
+included in this package.
 
 Review the sites in TARGET\_\/SITES.LIS and make any necessary additions
 applicable for your site. You can use NET\$DIR:NETAUTH to compile a list of
-sites which can be called from your site via your local PSS gateway. 
+sites which can be called from your site via your local PSS gateway.
 
 Run NET\_\/EXEC.EXE via the global symbol NET\_\/EXEC. The total cost per site (and
 the total cost of all calls) will be written to NET\_\/EXEC.OUT. The total cost at
 the bottom should tally with the cost on the invoice that your administrator
 receives. If your total is less, then calls are being made to sites which you
 have not included in TARGET\_\/SITES.LIS. Take a closer look through your
-NETAUTH\_\/DATABASE.ATH using NETAUTH.EXE. 
+NETAUTH\_\/DATABASE.ATH using NETAUTH.EXE.
 
 Remember that these totals also include the cost of file transfers and that
 these usages of the network are of course NOT recorded in the local PAD
-accounts. 
+accounts.
 
 
 \item {\bf Extract local accounting information from VMS accounts.}
@@ -309,48 +309,48 @@ run on each node in your cluster, you will be left with files of the form
 mmmyy\_\/ACCOUNTS.DAT (e.g. APR89\_\/ACCOUNTS.DAT) which contains accounting
 information for the entire month. You must now extract the PAD accounting
 information from the accounting file mmmyy\_\/ACCOUNTS.DAT for the node on
-which CBS is running. This can be done with the command 
+which CBS is running. This can be done with the command
 
 \begin{quote} \tt
-\$ ACC/BINARY/TYPE=(USER)/OUTPUT=FOR001.DAT mmmyy\_\/ACCOUNTS.DAT 
+\$ ACC/BINARY/TYPE=(USER)/OUTPUT=FOR001.DAT mmmyy\_\/ACCOUNTS.DAT
 \end{quote}
 
 Note that there is a bug in the V5.0 version of ACC.EXE such that the
 /TYPE=(USER) does not function. The old V4 version of ACC.EXE should be
 substituted in SYS\$COMMON:[SYSEXE]. As of VMS 5.1, this problem still
-remains. 
+remains.
 
 The important information (the username, volume, duration and destination
 associated with each call) should then be extracted and output into a
 formatted file called PAD.DAT (sorted in order of username) using the
 program PAD\_\/ACCOUNTS.EXE. This is a slightly modified version of Peter
 Allan's PAD\_\/READ program. It has been modified to work with CBS V5 and also
-to sort the accounts by username, as required by the PAD\_\/AUDIT program. 
+to sort the accounts by username, as required by the PAD\_\/AUDIT program.
 
-Simply typing PAD\_\/ACCOUNTS will perform all of these stages 
+Simply typing PAD\_\/ACCOUNTS will perform all of these stages
 for you and tidy up the temporary files created, leaving you just with
 PAD.DAT ready to use with PAD\_\/AUDIT.EXE. It is recommended that you maintain
 a collection of the PAD.DAT files by copying PAD.DAT to mmmyy.PAD in case
 you need to return at some point in the future for another auditing session
 (i.e. once the bill comes in and you want to discover who clocked up half
-your budget logging into AAOCBN). 
+your budget logging into AAOCBN).
 
 \item {\bf Run PAD\_\/AUDIT interrogation program}
 
 Run PAD\_\/AUDIT via the global symbol PAD\_\/AUDIT. This is a self explanatory,
 interactive program which allows one to interrogate PAD.DAT. Once the breakdown
 of the calls has arrived from JNET@UK.AC.RUTHERFORD.GEC-B and you have reduced
-it to the level of cost of calls to each site using NET\_\/EXEC.EXE, then you 
+it to the level of cost of calls to each site using NET\_\/EXEC.EXE, then you
 will need to determine what fraction of the total is attributable to each user.
 If possible, you should append together the three PAD.DAT files for the three
-months covered by the Network Executive breakdown and 
+months covered by the Network Executive breakdown and
 
 \begin{quote} \tt
-\$ SORT PAD.DAT PAD.DAT 
+\$ SORT PAD.DAT PAD.DAT
 \end{quote}
 
 Each PAD.DAT is already sorted in order of username (as expected by
-PAD\_\/AUDIT.EXE) by PAD\_\/ACCOUNTS.EXE but the combined file must be resorted. 
+PAD\_\/AUDIT.EXE) by PAD\_\/ACCOUNTS.EXE but the combined file must be resorted.
 
 PAD\_\/AUDIT first prompts in the top window for a site name and then a
 username. In general you should take the default wildcard for username to
@@ -367,7 +367,7 @@ should audit all of the sites which are listed in NET\_\/EXEC.OUT as having
 cost you money. A couple of minutes spent comparing NET\_\/EXEC.OUT and
 PAD\_\/AUDIT.LOG is usually sufficient to allow PSS billing to individual users
 to take place. At this stage you should bear in mind that NET\_EXEC.OUT
-includes file transfer costs in addition to remote logins whereas 
+includes file transfer costs in addition to remote logins whereas
 PAD\_AUDIT.LOG include only the latter. Hence the costs to a site
 as given in NET\_EXEC.OUT may be greater than those given in PAD\_AUDIT.LOG.
 
@@ -380,8 +380,8 @@ and PHOENIX (plus strictly all the other allowable combinations up to a
 maximum of 11 characters).
 
 Finally, this package has already allowed to the author to catch a would-be
-hacker. A user was found to have called a large number of JANET sites 
-with sequential DTE numbers for short durations. The user has now been 
+hacker. A user was found to have called a large number of JANET sites
+with sequential DTE numbers for short durations. The user has now been
 cured of this habit.
 
 \end{enumerate}
@@ -422,10 +422,10 @@ cured of this habit.
 As mentioned in Section 1, there is currently a discrepancy between
 the volume of traffic associated with a call to some sites recorded by the
 Network Executive and that recorded in the local accounts.
-The reason for this differential is under investigation and a 
+The reason for this differential is under investigation and a
 modified release of this package will be released when a robust
-workaround is found. In the meantime, it is necessary to 
-multiply the cost to a site attributed to user X (as given in 
+workaround is found. In the meantime, it is necessary to
+multiply the cost to a site attributed to user X (as given in
 PAD\_AUDIT.LOG) by the ratio of the total cost to that site
 given in NET\_EXEC.OUT and that given in PAD\_AUDIT.LOG. This
 `fix' assumes that there is no non--PAD traffic to that site
@@ -433,11 +433,11 @@ which, of course, may not be true. However, even in the worst cases,
 reasonably accurate PAD billing is still possible.
 
 Any bug reports, suggestions or queries concerning this package should be
-sent to CAVAD::CAC. 
+sent to CAVAD::CAC.
 
 \newpage
 
-\appendix 
+\appendix
 
 \section{PSS and IPSS Charges BEFORE 1st June 1989}
 
@@ -446,8 +446,8 @@ SwitchStream  (PSS) and the International Packet SwitchStream (IPSS) up to
 1st June 1989. The charges are calculated on the basis of  both  time  and
 the amount  of  information sent, in Kilosegments.  One segment is a packet
 of information that can hold up to 64 bytes of data.  Thus if you were to
-send 65 bytes of data you would use 2 segments. 
- 
+send 65 bytes of data you would use 2 segments.
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular} {||l|l|l||}
@@ -461,21 +461,21 @@ N. America          &    3.7500p / 30 secs   &    2.250p / 5 segments  \\
 Rest of world       &    4.5000p / 30 secs   &    2.700p / 5 segments  \\
 \hline
 \end{tabular}
-\end{center} 
+\end{center}
 \end{table}
 
   A PSS/IPSS accounting unit is one segment (up to 64  characters)  or
   that duration of call which would cost the same.
- 
+
   This duration is 3.6 seconds (Volume charge / Duration  charge)  for
   all destinations.
- 
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular} {||l|c||}
 \hline
 Destination   &  Cost(pence)/Unit \\
-\hline 
+\hline
 U.K. Full rate       &    0.030 \\
 U.K. Disc rate       &    0.020 \\
 Europe               &    0.180 \\
@@ -483,18 +483,18 @@ N. America           &    0.450 \\
 Rest of world        &    0.540 \\
 \hline
 \end{tabular}
-\end{center} 
+\end{center}
 \end{table}
 
   The cost of a call is (Duration(seconds)/3.6 + segments)  multiplied
   by the cost per unit.  This does not include V.A.T.
- 
+
   British Telecom have introduced a  minimum  charge  for  all  call
   attempts except  those  which  fail  because of their network.  This
   will be the cost of transmitting 5 segments of data for  30  seconds
   for all  IPSS  calls  and  the  cost of 50 segments plus appropriate
   duration charge for U.K.  calls.
- 
+
   All U.K.  calls between 1800 and 0800 plus  Sundays,  Christmas  and
   New Years day are charged at the discount rate.
 
@@ -506,23 +506,23 @@ Rest of world        &    0.540 \\
 This appendix gives the charging  rates  for  making  calls  to  the Packet
 SwitchStream  (PSS) and the International Packet SwitchStream (IPSS) AFTER
 1st June 1898.
- 
+
 British Telecom  introduced  a  different  pricing  structure  for  all
 international calls  from  the 1st June 1989, whereby all international
 calls will be charged in 1 segment steps (previously 5) with a  minimum
 charge of  10 segments.  The charge for international call duration has
 been removed,  however,  thus   benefitting   those   users   who   are
 transferring small amounts of data over relatively long periods.
- 
+
 There is a minimum charge for all call attempts except those which fail
 because of  public  network  faults.   This  will  be   the   cost   of
 transmitting 10  segments of data for all IPSS calls and the cost of 50
 segments plus appropriate duration charge for U.K.  calls.
- 
+
 All U.K.  calls between 1800 and 0800 plus Sundays, Christmas  day  and
 New Years  day  are  charged  at  the  discount rate.  Please note that
 Saturday charges are not discounted.
- 
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular} {||l|c|c||}
@@ -536,13 +536,13 @@ N. America           &   No Charge           &    0.70 p / 1 segment  \\
 Rest of world        &   No Charge           &    0.82 p / 1 segment   \\
 \hline
 \end{tabular}
-\end{center} 
+\end{center}
 \end{table}
 
  An accounting unit on the JANET PSS Gateways is one segment (up  to  64
  characters) or  that  duration of call which would cost the same.  i.e.
  3.6 secs.  (for UK calls only from 1st June 1989.)
- 
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular} {||l|c||}
@@ -556,17 +556,17 @@ N. America        &       0.700 \\
 Rest of World     &       0.820 \\
 \hline
 \end{tabular}
-\end{center} 
+\end{center}
 \end{table}
 
 The cost of a UK call is
 (Duration in seconds/3.6 + segments) multiplied by cost per unit.  This
 does not include V.A.T.
- 
+
 The cost of an international call is segments multiplied  by  cost  per
 unit.
-All of these prices  exclude VAT but the output from PAD\_\/AUDIT.EXE adds 
-VAT at 15\%. 
+All of these prices  exclude VAT but the output from PAD\_\/AUDIT.EXE adds
+VAT at 15\%.
 
 \newpage
 
@@ -584,7 +584,7 @@ Column   & Usage \\
 41$\rightarrow$80           &       Comments (not used)         \\
 \hline
 \end{tabular}
-\end{center} 
+\end{center}
 \end{table}
 
 Note: The IPSS volume charge is in pence per 5 segments.
@@ -605,11 +605,11 @@ Column   & Usage   \\
 41$\rightarrow$80        &          Comments (not used)           \\
 \hline
 \end{tabular}
-\end{center} 
+\end{center}
 \end{table}
 
 \noindent Note: The IPSS volume charge is in pence per segment.
       The IPSS duration charge no longer exists.
 
 
-\end{document} 
+\end{document}

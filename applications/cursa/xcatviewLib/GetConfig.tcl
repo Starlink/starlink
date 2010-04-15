@@ -6,7 +6,7 @@ proc GetConfig { } {
 #  option is whether or not to echo commands sent to the A-task to
 #  the error and message window.  Note that the current value is used
 #  as the default.
-#  
+#
 #  Given
 #    none.
 #
@@ -66,7 +66,7 @@ proc GetConfig { } {
 #   --------------------
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -259,7 +259,7 @@ proc GetConfig { } {
        -command {HelpText GetConfig_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getconfig.button.default -relief sunken -bd 1
@@ -361,7 +361,7 @@ proc GetConfig { } {
      tkwait variable getConfigButton
 
      if {$getConfigButton == "ok"} then {
-        set echoCommand    $echoGetConfig  
+        set echoCommand    $echoGetConfig
         set angleReformat  $angleGetConfig
         set quietMode      $quietGetConfig
      }

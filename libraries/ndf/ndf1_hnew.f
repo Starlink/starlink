@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,7 +123,7 @@
       CHARACTER * ( DAT__SZNAM ) OBJNAM ! New top-level object name
       INTEGER D1                 ! First character in directory name
       INTEGER D2                 ! Last character in directory name
-      INTEGER DOT                ! Position of final delimiting '.' 
+      INTEGER DOT                ! Position of final delimiting '.'
       INTEGER F1                 ! First character in file name
       INTEGER F2                 ! Last character in file name
       INTEGER N1                 ! First character in file name field
@@ -248,7 +248,7 @@
             LOC = DAT__NOLOC
          END IF
       END IF
-       
+
 *  If an error occurred, then annul the returned locator.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL DAT_ANNUL( LOC2, STATUS )

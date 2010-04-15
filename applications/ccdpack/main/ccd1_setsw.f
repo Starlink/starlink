@@ -15,14 +15,14 @@
 *                      NAMGRP, MAPSET, STATUS )
 
 *  Description:
-*     This routine returns information about how a group of NDFs is 
+*     This routine returns information about how a group of NDFs is
 *     grouped into Sets.
 *
 *     The NSET argument gives the number of distinct Sets in the input
 *     group of NDFs and ISET indicates which Set each one is a member of.
 *     NDFs are considered to be in the same Set for these
-*     purposes if (1) USESET is true, and the NDFs have (2) the same 
-*     non-blank Set Name attribute and (3) have a CCD_SET frame in their 
+*     purposes if (1) USESET is true, and the NDFs have (2) the same
+*     non-blank Set Name attribute and (3) have a CCD_SET frame in their
 *     WCS framesets.
 *
 *     If USESET is false or for other reasons none of the input
@@ -38,9 +38,9 @@
 *     NNDF = INTEGER (Given)
 *        The number of elements in the NDFGRP group.
 *     USESET = LOGICAL (Given and Returned)
-*        Whether Set-related information is being used.  If it is 
-*        initially set true but all the NDFs turn out to be 
-*        effectively members of distinct Sets then USESET will be 
+*        Whether Set-related information is being used.  If it is
+*        initially set true but all the NDFs turn out to be
+*        effectively members of distinct Sets then USESET will be
 *        set to false on exit.
 *     ISET( NNDF ) = INTEGER (Returned)
 *        For each of the NDFs in NDFGRP, the number of the Set of
@@ -58,7 +58,7 @@
 *     IMEMOF( NNDF + 1 ) = INTEGER (Returned)
 *        The first NSET + 1 elements of this array are pointers into
 *        the IMEM array by set number.  Thus elements IMEMOF( I ) ..
-*        IMEMOF( I + 1 ) - 1 inclusive are the set numbers of the 
+*        IMEMOF( I + 1 ) - 1 inclusive are the set numbers of the
 *        NDFs comprising Set I.  If USESET is false, it will be returned
 *        as 1, 2, 3, .. NSET + 1.
 *        Taken together, IMEM and IMEMOF are a sort of inversion of ISET.
@@ -117,28 +117,28 @@
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
-      
+
 *  Arguments Given:
       INTEGER NDFGRP
       INTEGER NNDF
 
 *  Arguments Given and Returned:
       LOGICAL USESET
-      
+
 *  Arguments Returned:
       INTEGER ISET( * )
       INTEGER NSET
-      INTEGER IMEM( * ) 
+      INTEGER IMEM( * )
       INTEGER IMEMOF( * )
       INTEGER MAPSET( * )
       INTEGER NAMGRP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of character string
-      EXTERNAL CHR_LEN    
+      EXTERNAL CHR_LEN
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for writing out text
@@ -262,7 +262,7 @@
                      CALL CCD1_PSIZE( IWCS, JSET, PSIZE, STATUS )
 
 *  Now transform two points near the origin using the maybe-unit mapping.
-*  It's just possible that this region of the coordinate space is 
+*  It's just possible that this region of the coordinate space is
 *  illegal, in which case we'll get a spurious pass, but this seems
 *  very unlikely.
                      XP( 1 ) = 0D0
@@ -362,7 +362,7 @@
          IMEMOF( I ) = K
          DO J = 1, NNDF
             IF ( ISET( J ) .EQ. I ) THEN
-               IMEM( K ) = J 
+               IMEM( K ) = J
                K = K + 1
             END IF
          END DO

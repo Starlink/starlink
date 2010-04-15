@@ -9,11 +9,11 @@
 
 *  Description:
 *     This routine finds the zenith sky optical depth appropriate for the
-*     filter in front of each sub-instrument being used. If it cannot find 
-*     an optical depth for the required filter the routine will output a 
+*     filter in front of each sub-instrument being used. If it cannot find
+*     an optical depth for the required filter the routine will output a
 *     warning message and return an optical depth of 0.0.
 *
-*     The times and dates at which the optical depths were measured are also 
+*     The times and dates at which the optical depths were measured are also
 *     returned. If the optical depth for the required filter cannot be found
 *     then the date will be that at which the routine is run.
 
@@ -33,7 +33,7 @@
 *     SKY_TAUZ (N_SKY)               = REAL (Given)
 *           tauz for each possible filter
 *     SKY_DAY (N_SKY)                = DOUBLE PRECISION (Given)
-*           the date and time of the tauz measurement specified as day 
+*           the date and time of the tauz measurement specified as day
 *           number since 1st Jan.
 *     SUB_TAUZ (N_SUBS)              = REAL (Returned)
 *           tauz appropriate to sub-instruments
@@ -90,7 +90,7 @@
       INTEGER STATUS
 
 *  External references:
-      DOUBLE PRECISION SCULIB_DAY             ! time and date as day number 
+      DOUBLE PRECISION SCULIB_DAY             ! time and date as day number
                                               ! after 1st Jan
 
 *  Global variables:
@@ -129,7 +129,7 @@
                   END IF
 
                END DO
-   
+
             END IF
 
 *  see if tauz was found
@@ -146,9 +146,9 @@
 
             END IF
 
-         END DO          
+         END DO
 
       END IF
-           
+
 
       END

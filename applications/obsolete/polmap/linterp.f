@@ -1,21 +1,21 @@
       SUBROUTINE LINTERP(XS,XE,YS,YE,X,Y)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  L I N T E R P
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C XS (<), XE (<), YS (<), YE (<), X (<) ,Y (>)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C Linear interpolation
 C

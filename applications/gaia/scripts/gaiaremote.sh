@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
 exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #+
@@ -52,7 +52,7 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #-
 #.
 
-if { $argc == 0 } { 
+if { $argc == 0 } {
    puts "Usage: gaiaremote gaia_command"
    exit
 }
@@ -68,7 +68,7 @@ lassign [connect_to_gaia] gaia_fd created_instance
 
 #  Send the command and output any result.
 set result [eval send_to_gaia $gaia_fd $argv]
-if { $result != {} } { 
+if { $result != {} } {
     puts stderr "gaiaremote: $result"
 }
 close $gaia_fd

@@ -15,7 +15,7 @@
 *    Author :
 *     Alan Wood (STADAT::ARW) Esther Gershuny (RAL::EJG)
 *    History :
-*     25-Feb-1992: Original 
+*     25-Feb-1992: Original
 *    Type definitions :
       implicit none
 *    Global constants :
@@ -30,7 +30,7 @@
      :  5,                     ! C = character
      :  4,                     ! D = double
      :  7,                     ! O = RA-like quantity in radians
-     :  6,                     ! P = radians 
+     :  6,                     ! P = radians
      :  8,                     ! Q = DEC-like quantity in radians
      :  3,                     ! R = real
      :  2/                     ! I = integer

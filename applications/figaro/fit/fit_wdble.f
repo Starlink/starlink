@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ W D B L E
 C
-C     Writes a double precision keyword into a FITS header.  Assumes 
+C     Writes a double precision keyword into a FITS header.  Assumes
 C     FIT_INIT has been called to initialise the header routines.
 C
 C     Parameters -  (">" input, "<" output)

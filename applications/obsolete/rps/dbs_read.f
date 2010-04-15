@@ -4,20 +4,20 @@
 *	7/29/93	P. Brisco	Explicitly typed "J".
 **********************************************************************
       SUBROUTINE DBS_READ( REF_NO , RECN , IERROR )
- 
+
 *  Calling Arguments
 
       INTEGER RECN	! In	Number of record wanted.
      & ,      REF_NO	! 	Reference of data set.
       INTEGER IERROR	! Out	Error indicator.
- 
+
 *  Global Variables
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_iof.inc'
       INCLUDE 'com_dbs_rec.inc'
 
 *  Local Variable
-      INTEGER I,J,RECTMP		
+      INTEGER I,J,RECTMP
 c------------------------------------------------------------------------------
       RECTMP = ((RECN-1)*NRECORDS(REF_NO))+1
       I = 1

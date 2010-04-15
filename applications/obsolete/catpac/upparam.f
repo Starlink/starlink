@@ -25,7 +25,7 @@
 *     by setting the relevant flag
 
 *  Usage:
-*     UPPARAM INPUT NAME [NAMEFLG] [NEWNAME] [FORMFLG] [FORMAT] 
+*     UPPARAM INPUT NAME [NAMEFLG] [NEWNAME] [FORMFLG] [FORMAT]
 *     [VALFLG] [VALUE] [COMFLG] [COMMENT]
 
 *  ADAM Parameters:
@@ -56,11 +56,11 @@
 *        New comment to be associated with the parameter.
 
 *  Example:
-*     UPPARAM TEST CLASS FORMFLG=T FORMAT=I2 
+*     UPPARAM TEST CLASS FORMFLG=T FORMAT=I2
 
 *  Notes:
 *     The value of a parameter is always a character string. The format
-*     determines how the value should be interpreted. An error will be reported 
+*     determines how the value should be interpreted. An error will be reported
 *     if the value and format become inconsistent.
 
 *  Authors:
@@ -74,7 +74,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

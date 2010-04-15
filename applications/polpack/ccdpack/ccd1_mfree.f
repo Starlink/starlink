@@ -35,7 +35,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -117,7 +117,7 @@
          END IF
       ELSE
 
-*  Try to release the memory associated with this pointer. If overflow has 
+*  Try to release the memory associated with this pointer. If overflow has
 *  occurred then release and decrement overflow count if the pointer isn't
 *  located in the common block.
          LOCATE = .FALSE.
@@ -130,7 +130,7 @@
             END IF
  2       CONTINUE
  3       CONTINUE
-         IF ( .NOT. LOCATE ) THEN 
+         IF ( .NOT. LOCATE ) THEN
             CALL PSX_FREE( POINT, STATUS )
             IF ( CCD1_OVER .GT. 0 ) THEN
                CCD1_OVER = CCD1_OVER - 1

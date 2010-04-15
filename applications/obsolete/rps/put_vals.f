@@ -13,7 +13,7 @@
 *-
 
       I=0
- 
+
       DO J=LIMITS(1),LIMITS(2)
          I=I+1
          CALL DBS_PUTC(REFDB,J,VAL(I),IERR)

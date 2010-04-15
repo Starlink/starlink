@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, 
+      SUBROUTINE KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR,
      :                       MAPS, IWCSR, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, MAPS, 
+*     CALL KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, MAPS,
 *                      IWCSR, STATUS )
 
 *  Description:
@@ -40,9 +40,9 @@
 *        pixel_out Mapping for each input NDF. The array should have the
 *        same number of elements as the supplied group of input NDFs (IGRP).
 *        The "pixel coordinates" used as input and output by these Mappings
-*        have integral values at the centre of each pixel. Note, this is 
-*        different to the usual Starlink convention for pixel coordinates 
-*        which has integral values at the edges of each pixel, but it is the 
+*        have integral values at the centre of each pixel. Note, this is
+*        different to the usual Starlink convention for pixel coordinates
+*        which has integral values at the edges of each pixel, but it is the
 *        convention required by AST_REBINSEQ.
 *     IWCSR = INTEGER (Returned)
 *        The WCS FrameSet from the reference NDF.
@@ -80,7 +80,7 @@
 *     6-OCT-2005 (DSB):
 *        Added ShiftMaps to returned Mappings because AST_REBINSEQ
 *        requires "pixel" coords to have integer values at the centre
-*        of pixels, but Starlink pixel coords have integer value at 
+*        of pixels, but Starlink pixel coords have integer value at
 *        pixel corners.
 *     9-MAY-2006 (DSB):
 *        Correct number of axes in input NDF.
@@ -89,7 +89,7 @@
 *        pixel bounds (used to use floor/ceil, now uses nint).
 *     20-DEC-2006 (DSB):
 *        Back out of the 1-DEC-2006 changes since the floor/ceil approach
-*        was right after all, since the pixel coordinate system used by 
+*        was right after all, since the pixel coordinate system used by
 *        "maps" has integer values at the *centre* of each pixel (not the
 *        edges as normal in Starlink sw).
 *     19-JUN-2007 (DSB):
@@ -100,7 +100,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,7 +112,7 @@
 
 *  Arguments Given:
       INTEGER INDFR
-      INTEGER IGRP 
+      INTEGER IGRP
       INTEGER NDIM
 
 *  Arguments Returned:
@@ -148,7 +148,7 @@
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
       INTEGER J                  ! Axis count
       INTEGER LBND1( NDF__MXDIM )! Lower bounds of input NDF
-      INTEGER NDIM1              ! No. of pixel axes in input NDF 
+      INTEGER NDIM1              ! No. of pixel axes in input NDF
       INTEGER NFRM               ! No. of Frames in input NDF FrameSet
       INTEGER SM                 ! ShiftMap pointer
       INTEGER SIZE               ! No. of input NDFs
@@ -168,7 +168,7 @@
 *  the output NDF.
       CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
 
-*  Check the inverse transformation is available. 
+*  Check the inverse transformation is available.
       IF( .NOT. AST_GETL( IWCSR, 'TranInverse', STATUS ) ) THEN
 
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -178,7 +178,7 @@
             CALL NDF_MSG( 'NDF', INDFR )
             CALL ERR_REP( 'KPS1_WMOS0_ERR1', 'Cannot use ^NDF as the '//
      :                    'reference NDF.', STATUS )
-            
+
             CALL MSG_SETC( 'DOM', DOMLST )
             CALL ERR_REP( 'KPS1_WMOS0_ERR1', 'The inverse WCS '//
      :                    'transformation (from ^DOM to PIXEL '//
@@ -205,7 +205,7 @@
          CALL NDG_NDFAS( IGRP, I, 'Read', INDF1, STATUS )
 
 *  We do not use variances if any input NDF has no Variance component.
-         IF( USEVAR ) CALL NDF_STATE( INDF1, 'VARIANCE', USEVAR, 
+         IF( USEVAR ) CALL NDF_STATE( INDF1, 'VARIANCE', USEVAR,
      :                                STATUS )
 
 *  Get the WCS FrameSet from the current input NDF.
@@ -218,25 +218,25 @@
          NFRM = AST_GETI( IWCS1, 'NFRAME', STATUS )
 
 *  Store the list of preferences for the alignment Frame Domain (current
-*  FRAME in the input NDF, followed by PIXEL). KPG1_ASMRG always uses the 
-*  Domain of the second FrameSet (IWCSR) first, so we do not need to include 
+*  FRAME in the input NDF, followed by PIXEL). KPG1_ASMRG always uses the
+*  Domain of the second FrameSet (IWCSR) first, so we do not need to include
 *  it in this list.
          DOMLST = ' '
          IAT = 0
-         CALL CHR_APPND( AST_GETC( IWCS1, 'DOMAIN', STATUS ), DOMLST, 
+         CALL CHR_APPND( AST_GETC( IWCS1, 'DOMAIN', STATUS ), DOMLST,
      :                   IAT )
          CALL CHR_APPND( ',PIXEL', DOMLST, IAT )
 
 *  Merge the reference WCS FrameSet into this NDFs WCS FrameSet, aligning
-*  them in a suitable Frame (the current Frame of IWCSR by preference, or 
+*  them in a suitable Frame (the current Frame of IWCSR by preference, or
 *  the first possible domain in the above list otherwise).
-         CALL KPG1_ASMRG( IWCS1, IWCSR, DOMLST( : IAT ), .TRUE., 4, 
+         CALL KPG1_ASMRG( IWCS1, IWCSR, DOMLST( : IAT ), .TRUE., 4,
      :                    STATUS )
 
 *  Get the simplified Mapping from input pixel Frame to reference (i.e.
 *  output) pixel Frame.
-         MAPS( I ) = AST_GETMAPPING( IWCS1, IPIX1, 
-     :                               IPIXR + NFRM, STATUS ) 
+         MAPS( I ) = AST_GETMAPPING( IWCS1, IPIX1,
+     :                               IPIXR + NFRM, STATUS )
 
 *  Create a ShiftMap which shifts pixel coords by 0.5 of a pixel in order
 *  to put integer values at the centre of the pixel (as required by AST_REBINSEQ).
@@ -256,7 +256,7 @@
 	 SM = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
 	 MAPS( I ) = AST_CMPMAP( MAPS( I ), SM, .TRUE., ' ', STATUS )
 
-*  Simplify the total Mapping.	 
+*  Simplify the total Mapping.
          MAPS( I ) = AST_SIMPLIFY( MAPS( I ), STATUS )
 
 *  Export the AST pointer to the parent AST context.
@@ -267,7 +267,7 @@
 *  each pixel. Note, this is different to the usual Starlink convention
 *  for pixel coordinates which has integral values at the edges of each
 *  pixel, but it is the convention required by AST_REBINSEQ.
-         CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, 
+         CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1,
      :                   STATUS )
          DO J = 1, NDIM1
             DLBND1( J ) = DBLE( LBND1( J ) ) - 0.5D0

@@ -319,7 +319,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
 
         /*  Access the quality information associated with this NDF (this is a
          *  copy not the actual mapped data and needs to be added to any output
-         *  NDFs. 
+         *  NDFs.
          */
         if ( ndfId != 0 ) {
             grab = F77_TRUE;
@@ -336,8 +336,8 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
 
         /*  If keep is true then record the contents of the image at the given
          *  bounds (this is assumed to be a bounding box of the region to be
-         *  replaced). 
-         */ 
+         *  replaced).
+         */
         if ( keep ) {
             if ( undoInfo.imagePtr != (void *) NULL ) {
                 cnfFree( (void *)undoInfo.imagePtr );
@@ -446,8 +446,8 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             /* Do the same for the quality component if necessary */
             if ( F77_ISTRUE( haveQual ) ) {
                 F77_IMPORT_POINTER( fqual, qual );
-                copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, 
-                                 (void *) qual, 0, info->nx, 
+                copyWorktoImage( BYTE_IMAGE, (void *)qualPtr,
+                                 (void *) qual, 0, info->nx,
                                  xs1, ys1, xs2, ys2 );
             }
         }
@@ -492,7 +492,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                 }
 
                 /*  Free the quality we're holding from the last call to
-                 *  rtd1_aqual. 
+                 *  rtd1_aqual.
                  */
                 if ( qualPtr != NULL ) {
                     grab = F77_FALSE;

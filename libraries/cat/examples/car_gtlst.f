@@ -1,19 +1,19 @@
 *+  CAR_GTLST - List values of named columns for objects in catalogue.
-      SUBROUTINE CAR_GTLST (CI, HEADER, NUMBER, NUMLEN, BUFLEN, 
-     :  NUMFLD, NAMEA, FIA, UNITS, MODE, FLUNIT, CWIDTH, SPACE, 
-     :  STATUS)      
+      SUBROUTINE CAR_GTLST (CI, HEADER, NUMBER, NUMLEN, BUFLEN,
+     :  NUMFLD, NAMEA, FIA, UNITS, MODE, FLUNIT, CWIDTH, SPACE,
+     :  STATUS)
 *    Description :
 *     Lists the values of named columns for all the objects in
-*     a StarBase catalogue. The output is sent either to a user-defined 
+*     a StarBase catalogue. The output is sent either to a user-defined
 *     formatted file or to the environment, or both.
-*    Invocation : 
-*     CALL CAR_GTLST (CI, HEADER, NUMBER, NUMLEN, BUFLEN, NUMFLD, 
-*             NAMEA, FIA, UNITS, MODE, FILOUT, FLUNIT, CWIDTH, 
+*    Invocation :
+*     CALL CAR_GTLST (CI, HEADER, NUMBER, NUMLEN, BUFLEN, NUMFLD,
+*             NAMEA, FIA, UNITS, MODE, FILOUT, FLUNIT, CWIDTH,
 *             SPACE, STATUS)
 *    Parameters :
 *     CI               =  INTEGER (READ)
 *           input catalogue identifier
-*     HEADER           =  LOGICAL (READ) 
+*     HEADER           =  LOGICAL (READ)
 *           Header for output?
 *     NUMBER           =  LOGICAL (READ)
 *           Number output records?
@@ -32,7 +32,7 @@
 *     MODE             =  CHARACTER *(*) (READ)
 *           Output on SCREEN, FILE, or BOTH
 *     FLUNIT           =  INTEGER (READ)
-*           Unit number for output 
+*           Unit number for output
 *     CWIDTH (NUMFLD)  =  INTEGER (READ)
 *           Column width for output
 *     SPACE            =  INTEGER (READ)
@@ -54,7 +54,7 @@
 *         assemble list of units
 *         output the list to file and/or environment
 *       end if
-*       Do while (status ok) 
+*       Do while (status ok)
 *         attempt to read record
 *         if (ok) then
 *           initialise buffer
@@ -62,13 +62,13 @@
 *             update number
 *             add number to buffer
 *           end if
-*           for all fields  
+*           for all fields
 *             attempt to obtain value
 *             add value to output buffer
 *           end for
 *           output the buffer to file and/or environment
 *         end if
-*       end do  
+*       end do
 *     end if
 *    Deficiencies
 *    Bugs :
@@ -96,7 +96,7 @@
       INTEGER
      :  NUMFLD,             ! Number of fields
      :  CI,                 ! Identifier for input StarBase catalogue.
-     :  NUMLEN,             ! Length of string containing number   
+     :  NUMLEN,             ! Length of string containing number
      :  BUFLEN,             ! Length of output buffer
      :  FIA(NUMFLD),        ! Identifiers for required columns
      :  FLUNIT,             ! Unit number for output file
@@ -105,7 +105,7 @@
       CHARACTER
      :  NAMEA(NUMFLD)*(*),  ! Names of the required fields
      :  UNITS(NUMFLD)*(*),  ! Units of the required fields
-     :  MODE*(*)            ! Screen, file or both? 
+     :  MODE*(*)            ! Screen, file or both?
       LOGICAL
      :  HEADER,             ! Header required?
      :  NUMBER              ! Numbering required?
@@ -120,7 +120,7 @@
 *    Global variables :
 *    Local Constants :
 *    Local variables :
-      CHARACTER 
+      CHARACTER
      :  CATIN*(CAT__SZCNM),      ! Name of input catalogue.
      :  OMODE*(10),              ! Output mode for header.
      :  TITLE*(132),             ! String containing title.
@@ -136,7 +136,7 @@
      :  NAMLEN,        ! Length of catalogue name
      :  LCTITL,        ! Length of CTITLE (excl. trail. blanks)
      :  CURFLD,        ! Current field number
-     :  LENNAM,        ! Length of field name character string 
+     :  LENNAM,        ! Length of field name character string
      :  LENUNT,        ! Length of units character string
      :  LENVAL,        ! Length of value character string
      :  NUMREC         ! Record number
@@ -159,10 +159,10 @@ C        end do
 
 *       A header is required if output is going to the environment,
 *       or if the header flag has been set
-          IF (MODE .EQ. 'SCREEN' .OR. MODE .EQ. 'BOTH' 
+          IF (MODE .EQ. 'SCREEN' .OR. MODE .EQ. 'BOTH'
      :       .OR. HEADER) THEN
 
-*           If the mode is both, but a header is only required for 
+*           If the mode is both, but a header is only required for
 *           the environment, reset the mode for header output
               IF (MODE .EQ. 'BOTH' .AND. .NOT. HEADER) THEN
                   OMODE = 'SCREEN'
@@ -180,7 +180,7 @@ C        end do
                   CALL CHR_PUTC('List of named fields '/
      :              /'for catalogue ', TITLE, POS)
                   NAMLEN = CHR_LEN (CATIN)
-                  CALL CHR_PUTC (CATIN(1:NAMLEN), TITLE, 
+                  CALL CHR_PUTC (CATIN(1:NAMLEN), TITLE,
      :            POS)
                   CALL CHR_PUTC ('.', TITLE, POS)
 *               centre title
@@ -191,7 +191,7 @@ C        end do
 
 *               output the title to file and/or environment
                   CALL CAR_PTLST (CTITLE(1 : LCTITL), OMODE,
-     :              FLUNIT, STATUS)    
+     :              FLUNIT, STATUS)
               END IF
 
 *           output blank line between title and field names
@@ -204,23 +204,23 @@ C        end do
                   POS = NUMLEN - 4
                   CALL CHR_PUTC ('NUMBER', BUFFER, POS)
               END IF
-              
+
               DO CURFLD = 1, NUMFLD
                   LENNAM = CHR_LEN(NAMEA(CURFLD))
                   POS = POS + CWIDTH(CURFLD) + SPACE - LENNAM
                   CALL CHR_PUTC (NAMEA(CURFLD)(1:LENNAM), BUFFER, POS)
-              END DO     
+              END DO
 
 *           output the list to file and/or environment
-              CALL CAR_PTLST (BUFFER(1:POS), OMODE, FLUNIT, 
-     :          STATUS)    
+              CALL CAR_PTLST (BUFFER(1:POS), OMODE, FLUNIT,
+     :          STATUS)
 
 *           assemble list of units, right hand justify
               BUFFER = ' '
               POS = -1 * SPACE
               IF (NUMBER) THEN
-                  POS = NUMLEN + 2 
-              END IF 
+                  POS = NUMLEN + 2
+              END IF
               DO CURFLD = 1, NUMFLD
                   IF (UNITS(CURFLD) .NE. ' ') THEN
                       LENUNT = CHR_LEN(UNITS(CURFLD))
@@ -232,17 +232,17 @@ C        end do
                       CALL CHR_PUTC (UNITS(CURFLD)(1:LENUNT), BUFFER,
      :                  POS)
                   END IF
-              END DO     
+              END DO
 
 *           output the list to file and/or environment
-              CALL CAR_PTLST (BUFFER(1:POS), OMODE, FLUNIT, 
-     :          STATUS)    
+              CALL CAR_PTLST (BUFFER(1:POS), OMODE, FLUNIT,
+     :          STATUS)
 
           END IF
 
 
           NUMREC = 0
-          DO WHILE (STATUS .EQ. SAI__OK) 
+          DO WHILE (STATUS .EQ. SAI__OK)
 *           Attempt to read the next record
               NUMREC = NUMREC + 1
               CALL CAT_RGET (CI, NUMREC, STATUS)
@@ -281,23 +281,23 @@ C    :                  i10, i10, 2x, a10, 2x, i10)
 
 *                   add value to output buffer
                       POS = POS + CWIDTH(CURFLD) + SPACE - LENVAL
-                      CALL CHR_PUTC (VALUE(1:LENVAL), BUFFER, 
+                      CALL CHR_PUTC (VALUE(1:LENVAL), BUFFER,
      :                  POS)
 
                   END DO
 *               output the buffer to file and/or environment
-                  CALL CAR_PTLST (BUFFER(1:POS), MODE, FLUNIT, 
-     :              STATUS)    
+                  CALL CAR_PTLST (BUFFER(1:POS), MODE, FLUNIT,
+     :              STATUS)
 
-              END IF 
-          END DO  
+              END IF
+          END DO
 
           IF (STATUS .EQ. CAT__EOF  .OR.  STATUS .EQ. CAT__INVRW)
      :       THEN
               STATUS = SAI__OK
           END IF
 
-      END IF 
+      END IF
 
       END
 

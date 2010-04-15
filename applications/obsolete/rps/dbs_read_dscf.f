@@ -10,7 +10,7 @@
       SUBROUTINE DBS_READ_DSCF(REF_NO, IDSCF, POINTER )
       IMPLICIT NONE
 
- 
+
 * Calling Arguments
       INTEGER       REF_NO	! Reference number of data set.
       INTEGER IDSCF
@@ -22,7 +22,7 @@
       INCLUDE 'com_dbs_chars.inc'
       INCLUDE 'com_dbs_iof.inc'
       INCLUDE 'com_dbs_bytes.inc'
- 
+
 *  Local Variables
       INTEGER MAXFILES_PLUS1
       PARAMETER(MAXFILES_PLUS1=MAX_FILE_COUNT + 1)
@@ -36,7 +36,7 @@
      & ,    I, I1 , J , K , N	! Loop variables.
      & ,           NK , P1 , P2	! Temporary variables.
      & ,           SIZ         	! Array size.
-      CHARACTER*60 BLANK 
+      CHARACTER*60 BLANK
       integer LENC, NB		! length comment, dummy
       CHARACTER*1 COND_CHAR
       LOGICAL LOCL		! If Located logical field
@@ -47,7 +47,7 @@
 *  ________________________  Executable Code  ______________________________
       DO  J=1,60
          BLANK(J:J) = ' '
-      END DO 
+      END DO
 
       IF (POINTER .LE. 0) THEN
          recsize(ref_no) = 0    !   Set number of bytes to zero.

@@ -7,7 +7,7 @@ C-----------------------------------------------------------------------
 *   variable returned in R4. JDEF as for GETCH. DEF is the default for R4.
 *   FDEF is a format qualifier e.g.'F10,3', describing how the default is to
 *   be presented by the prompt. A null string for FDEF will suppress the
-*   presentation of the default value(s). 
+*   presentation of the default value(s).
 
       IMPLICIT  NONE
 

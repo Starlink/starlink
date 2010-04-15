@@ -1,34 +1,34 @@
       SUBROUTINE PAR_MIX0D( PARAM, DEFAUL, VMIN, VMAX, OPTS, NULL,
      :                        VALUE, STATUS )
- 
+
 *+
 *  Name:
 *     PAR_MIX0x
- 
+
 *  Purpose:
 *     Obtains from a parameter a character value from either a menu of
 *     options or within a numeric range.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_MIX0x( PARAM, DEFAUL, VMIN, VMAX, OPTS, NULL, VALUE,
 *                     STATUS )
- 
+
 *  Description:
 *     This routine obtains a scalar character value from a parameter.
 *     The value must be either:
- 
+
 *        o  one of a supplied list of acceptable values, with
 *           unambiguous abbreviations accepted; or
- 
+
 *        o  a numeric character string equivalent to a number, and the
 *           number must lie within a supplied range of acceptable
 *           values.
- 
+
 *     A dynamic default may be suggested.
- 
+
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter.
@@ -63,7 +63,7 @@
 *        returns with STATUS=PAR__NULL.  If NULL is .TRUE., the
 *        returned VALUE takes the value of DEFAUL and, if the MSG filtering
 *        level (see SUN/104) is 'verbose', a message informs the user of the
-*        value used for the parameter. The routine then returns with 
+*        value used for the parameter. The routine then returns with
 *        STATUS=SAI__OK.  This feature is intended for
 *        convenient handling of null values.  NULL should only be set
 *        to .TRUE. when the value of DEFAUL will always give a
@@ -76,7 +76,7 @@
 *        value of DEFAUL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types double precision,
 *     integer, and real: replace "x" in the routine name by D, I, or R
@@ -90,7 +90,7 @@
 *     numeric value is compared with the range of acceptable values
 *     defined by VMIN and VMAX.  A value satisfying these constraints
 *     is returned in VALUE and the routine exits.
- 
+
 *     The second stage searches for a match of the character value with
 *     an item in the menu.  This step adheres to the following rules.
 *        o  The value is converted to the data type specified by the
@@ -115,9 +115,9 @@
 *        satisfied, the user is told of the error, and is presented
 *        with the list of options, before being prompted for a new
 *        value.  This is not achieved through the MIN/MAX system.
-*        If a nearest match is selected, the user is informed unless the 
+*        If a nearest match is selected, the user is informed unless the
 *        MSG filtering level (see SUN/104) is 'quiet'.
- 
+
 *  Algorithm:
 *     -  Find whether an inclusion or exclusion range constraint is
 *     requested.
@@ -138,7 +138,7 @@
 *     the returned value to the suggested default.  When the bad status
 *     is PAR__NULL and the NULL flag is true, annul the error and
 *     output a message.  The loop is exited.
- 
+
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
@@ -149,12 +149,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -164,7 +164,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AJC: Alan J. Chipperfield   (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 January 8 (MJC):
 *        Original based on AIF_MIX0.
@@ -180,86 +180,86 @@
 *        Warn in MSG__VERB mode if NULL operates to adopt default.
 *        Prologue add Warn in MSG__NORM mode if nearest match adopted.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE            ! Switch off default typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Environment constants
       INCLUDE 'PAR_ERR'        ! Parameter-system error constants
       INCLUDE 'MSG_PAR'        ! Message-system constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * )
      :  DEFAUL,                ! Suggested default value
      :  PARAM,                 ! Parameter name corresponding to
                                ! variable VALUE
      :  OPTS                   ! List of possible options for VALUE
- 
+
       DOUBLE PRECISION
      :  VMIN,                  ! Minimum acceptable numeric value for
                                ! value to be obtained
      :  VMAX                   ! Maximum acceptable numeric value for
                                ! value to be obtained
- 
+
       LOGICAL                  ! True if:
      :  NULL                   ! Default value used when bad status is
                                ! returned by the parameter get.
- 
+
 *  Arguments Returned:
       CHARACTER * ( * )
      :  VALUE                  ! Character variable for which value is
                                ! to be obtained
- 
+
 *  Status:
       INTEGER STATUS           ! Global status
- 
+
 *  Local Variables:
       LOGICAL                  ! True if:
      :  EXCLUD,                ! The numeric range is an exclusion zone
      :  NOTOK,                 ! No acceptable value obtained
      :  NUMERC,                ! Supplied value or default is numeric
      :  SUGDEF                 ! Suggest a default
- 
+
       INTEGER
      :  NCD,                   ! Number of characters in the default
      :  NCV,                   ! Number of characters in the value
      :  PENALT                 ! Number of characters mismatched
- 
+
       CHARACTER
      :  DEF * ( 132 ),         ! The selected default from the list of
                                ! menu options or numeric value
      :  OPTION * ( 132 )       ! The selected option from the menu
- 
+
       DOUBLE PRECISION
      :  VAL                    ! Value obtained if the input is numeric
- 
+
 *.
- 
+
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Find whether the range is inclusive or exclusive depending on the
 *  polarity of the two values.
       EXCLUD = VMIN .GT. VMAX
- 
+
 *  Find whether or not there is a suggested default.
 *  =================================================
       SUGDEF = .FALSE.
- 
+
 *  By definition, the option cannot contain a blank value.
       IF ( DEFAUL .EQ. ' ' ) THEN
          DEF = ' '
       ELSE
- 
+
 *  Start a new error context.
          CALL ERR_MARK
- 
+
 *  Find whether the value is numeric or not.  Try to convert the
 *  dynamic default to the numeric data type.  If it fails the bad
 *  status must be annulled, and there is still no suggested default.
@@ -267,7 +267,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE
- 
+
 *  The dynamic default is numeric.  Determine whether or not a
 *  suggested default is required.
             IF ( EXCLUD ) THEN
@@ -275,24 +275,24 @@
             ELSE
                SUGDEF = VAL .GE. VMIN .AND. VAL .LE. VMAX
             END IF
- 
+
          END IF
- 
+
 *  Release the error context.
          CALL ERR_RLSE
- 
+
 *  Should the value be non-numeric or numeric outside the range, the
 *  next stage is to test the default against the menu.
          IF ( .NOT. SUGDEF ) THEN
- 
+
 *  Start a new error context.
             CALL ERR_MARK
- 
+
 *  See if the suggested default is in the menu.  Allow no mismatched
 *  characters.
             CALL PAR1_MENU( DEFAUL, OPTS, ',', 0, DEF, NCD, PENALT,
      :                      STATUS )
- 
+
 *  Look for an ambiguous default.  Add a contextual error report.
             IF ( STATUS .EQ. PAR__AMBIG ) THEN
                CALL MSG_SETC( 'DEF', DEFAUL )
@@ -300,67 +300,67 @@
                CALL ERR_REP( 'PAR_MIX0x_AMBIG',
      :           'Programming error.  The suggested default ^DEF '/
      :           /'for parameter ^PARAM is ambiguous.', STATUS )
- 
+
 *  Continue to use default as supplied when there has been an error.
                DEF = DEFAUL
- 
+
 *  There will be a bad status whenever the default is not one of the
 *  options.  We need to annul this error as it is expected, and merely
 *  tells us that no suggested default is wanted.
             ELSE IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
- 
+
 *  Continue to use default as supplied when there has been an error.
                DEF = DEFAUL
- 
+
 *  The default is an unambiguous menu item so record that there is a
 *  suggested default.  Use the unabbreviated option from the menu as
 *  the default.
             ELSE
                SUGDEF = .TRUE.
             END IF
- 
+
 *  Release the error context.
             CALL ERR_RLSE
- 
+
 *  Exit for the ambiguous case.
             IF ( STATUS .NE. SAI__OK ) GOTO 999
- 
+
 *  Use the same identifier for the default as if it were an item in the
 *  menu.
          ELSE
             DEF = DEFAUL
          END IF
       END IF
- 
+
 *  Set the actual default value.
       IF ( SUGDEF ) CALL PAR_DEF0C( PARAM, DEF, STATUS )
- 
+
 *  Obtain the value of the parameter.
 *  ==================================
- 
+
 *  Initialise NOTOK to start off the loop.
       NOTOK = .TRUE.
- 
+
 *  Start a new error context.
       CALL ERR_MARK
- 
+
 *  Repeat until an acceptable value is obtained or an error occurs.
   140 CONTINUE
          IF ( .NOT. ( NOTOK ) .OR. ( STATUS .NE. SAI__OK ) ) GOTO 200
- 
+
 *  Get a value from the parameter system.
          CALL PAR_GET0C( PARAM, VALUE, STATUS )
- 
+
 *  Check for an error.
          IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  Check if we have an acceptable value.
 *  =====================================
- 
+
 *  Start a new error context.
             CALL ERR_MARK
- 
+
 *  Find whether the value is numeric or not.  Try to convert the
 *  dynamic default to the numeric data type.  If it fails the bad
 *  status must be annulled, and there is still no suggested default.
@@ -369,7 +369,7 @@
                CALL ERR_ANNUL( STATUS )
                NUMERC = .FALSE.
             ELSE
- 
+
 *  The value is numeric.  Determine whether or not it satisifies the
 *  range constraint.
                NUMERC = .TRUE.
@@ -378,23 +378,23 @@
                ELSE
                   NOTOK = ( VAL .LT. VMIN ) .OR. ( VAL .GT. VMAX )
                END IF
- 
+
             END IF
- 
+
 *  Release the error context.
             CALL ERR_RLSE
- 
+
 *  Test if we already have the required value.
             IF ( NOTOK ) THEN
- 
+
 *  Permit one mistyped character in the value.
                CALL PAR1_MENU( VALUE, OPTS, ',', 1, OPTION, NCV,
      :                         PENALT, STATUS )
- 
+
 *  The value is not within the constraints, so make error reports
 *  including full information using tokens.
                IF ( STATUS .NE. SAI__OK ) THEN
- 
+
 *  Give details of the range limits for a numeric value.
                   IF ( NUMERC ) THEN
                      CALL MSG_SETC( 'PARAM', PARAM )
@@ -406,34 +406,34 @@
                      ELSE
                         CALL MSG_SETC( 'XCLD', 'in' )
                      END IF
- 
+
                      CALL ERR_REP( 'PAR_MIX0x_OUTR',
      :                 '^VALUE is outside the allowed range for '/
      :                 /'parameter ^PARAM.  Please give a value ^XCLD '/
      :                 /'the numeric range ^MIN to ^MAX, or an option '/
      :                 /'from the menu.', STATUS )
                   END IF
- 
+
 *  Make a contextual error report.
                   CALL MSG_SETC( 'PARAM', PARAM )
                   CALL ERR_REP( 'PAR_MIX0x_INVOPT',
      :              'Invalid selection for parameter ^PARAM.', STATUS )
- 
+
 *  Note that the error is flushed immediately as we are in a loop.
                   CALL ERR_FLUSH( STATUS )
- 
+
 *  Try again to obtain the value, so we must cancel the incorrect
 *  attempt.
                   CALL PAR_CANCL( PARAM, STATUS )
- 
+
 *  Reset the dynamic default value in the parameter system.
                   IF ( SUGDEF ) CALL PAR_DEF0C( PARAM, DEF, STATUS )
- 
+
 *  A valid option was chosen, so we can exit the loop.
                ELSE
                   VALUE = OPTION( :NCV )
                   NOTOK = .FALSE.
- 
+
 *  Warn the user that the nearest match was used.
                   IF ( PENALT .NE. 0 ) THEN
                      CALL MSG_SETC( 'VAL', VALUE )
@@ -444,17 +444,17 @@
                   END IF
                END IF
             END IF
- 
+
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *  Use the default value following an error.
          ELSE
- 
+
 *  Annul a null error to prevent an error report about null appearing.
 *  Create a message informing the user of what has happened.
             IF ( STATUS .EQ. PAR__NULL .AND. NULL ) THEN
                CALL ERR_ANNUL( STATUS )
- 
+
 *  Inform the user what has happened.
                CALL MSG_SETC( 'DEFAULT', DEF )
                CALL MSG_SETC( 'PARAM', PARAM )
@@ -462,27 +462,27 @@
      :           'A value of ^DEFAULT has been adopted '/
      :           /'for parameter ^PARAM.', STATUS )
             END IF
- 
+
 *  Set the returned value to the default.
             VALUE = DEF
- 
+
 *  Make the value uppercase.
             CALL CHR_UCASE( VALUE )
- 
+
 *  Terminate the loop.
             NOTOK = .FALSE.
- 
+
          END IF
- 
+
 *  Go to the head of the loop.
       GOTO 140
- 
+
 *  Come here when the main loop has been exited.
   200 CONTINUE
- 
+
 *  Release the new error context.
       CALL ERR_RLSE
- 
+
   999 CONTINUE
- 
+
       END

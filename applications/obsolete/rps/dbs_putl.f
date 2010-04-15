@@ -34,7 +34,7 @@
       IF (LOLD) THEN
 	LBYT = 'Y'
       ELSE
-	LBYT ='N' 
+	LBYT ='N'
       ENDIF
 
       I = START(FIELDNO, REF_NO)					! Do for each byte in field.

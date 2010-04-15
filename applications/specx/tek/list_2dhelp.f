@@ -48,7 +48,7 @@ C   Routine to list valid options on character page on VT100 or equivalent
       END DO
 
 *      CALL ISET_CURSOR (1,1)
-  
+
       RETURN
       END
 

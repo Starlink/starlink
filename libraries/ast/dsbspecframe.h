@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -127,7 +127,7 @@ typedef struct AstDSBSpecFrameVtab {
 
 } AstDSBSpecFrameVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -170,7 +170,7 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *, size_t, AstDSBSpecFrameVtab *,
                                        const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitDSBSpecFrameGlobals_( AstDSBSpecFrameGlobals * );
 #endif
 
@@ -259,7 +259,7 @@ astINVOKE(V,astTestDSBCentre_(astCheckDSBSpecFrame(this),STATUS_PTR))
 astINVOKE(V,astClearDSBCentre_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astSetDSBCentre(this,val) \
 astINVOKE(V,astSetDSBCentre_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
-				                                   
+
 #define astGetIF(this) \
 astINVOKE(V,astGetIF_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astTestIF(this) \
@@ -268,7 +268,7 @@ astINVOKE(V,astTestIF_(astCheckDSBSpecFrame(this),STATUS_PTR))
 astINVOKE(V,astClearIF_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astSetIF(this,val) \
 astINVOKE(V,astSetIF_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
-				                                   
+
 #define astGetSideBand(this) \
 astINVOKE(V,astGetSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astTestSideBand(this) \

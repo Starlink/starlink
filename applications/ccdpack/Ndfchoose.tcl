@@ -22,17 +22,17 @@
 #     ndfchoose pathname ndf ndf ?ndf ...? ?options?
 #        An NDF chooser object is constructed in the normal way; apart
 #        from any configuration options, all arguments are existing ndf
-#        or ndfset objects representing images which are to form the 
+#        or ndfset objects representing images which are to form the
 #        list amongst which the user can choose.  Images cannot
-#        be added to this list after construction time.  The images 
+#        be added to this list after construction time.  The images
 #        form an ordered list, and are subsequently referred to by
 #        index; the index of the first is 1, of the second is 2, etc.
 
 #  Public Methods:
 #     getpair
-#        Returns an ordered list of two image indices, indicating the pair 
+#        Returns an ordered list of two image indices, indicating the pair
 #        of images which is currently selected by the user.  An invalid
-#        ndfset is indicated by an empty string.  If the -validate 
+#        ndfset is indicated by an empty string.  If the -validate
 #        configuration variable has been specified, and the pair does
 #        not satisfy this criterion, then a single empty string will
 #        be returned.
@@ -55,8 +55,8 @@
 #           - index     -- Index of the image whose percentiles are required
 #
 #     preplot
-#        Prepares all the images so that subsequent selections will 
-#        be effective (almost) instantaneously rather than having to 
+#        Prepares all the images so that subsequent selections will
+#        be effective (almost) instantaneously rather than having to
 #        display the NDFs on demand (until a subsequent viewport
 #        reconfiguration - i.e. window resize - is done).
 #
@@ -67,7 +67,7 @@
 
 #  Public Variables (Configuration Options):
 #     choosepercentiles = boolean
-#        If true, the user will be able to manipulate the percentile 
+#        If true, the user will be able to manipulate the percentile
 #        cutoff used for NDF display.
 #
 #     choosewcsframe = boolean
@@ -75,7 +75,7 @@
 #        for the displayed NDFs.
 #
 #     percentiles = list
-#        A list containing two numbers between 0 and 100.  This is used 
+#        A list containing two numbers between 0 and 100.  This is used
 #        as a default percentile cutoff limit for NDF display, but the
 #        user can select different values for different images.
 #
@@ -93,7 +93,7 @@
 #           inactive:
 #              The viewer may not attempt to reflect changes in its
 #              configuration on the display.  The viewer will only enter
-#              this from the active status if a subsequent call of the 
+#              this from the active status if a subsequent call of the
 #              getpair method will return a valid pair.
 #           done:
 #              The viewer's work is done (e.g. the exit button has
@@ -105,18 +105,18 @@
 #        using the 'watchstatus' public variable.
 #
 #     validpair = string
-#        This gives an expression which indicates whether a pair is 
+#        This gives an expression which indicates whether a pair is
 #        valid or not.  Before use any occurrences of the sequences "%A"
 #        and "%B" are replaced by the indices of the first and second
 #        members of the pair respectively.  The string is then evaluated
 #        to give a boolean result determining whether the pair is valid
 #        or not.  The status variable will only change from "active" to
-#        "inactive" if the getpair method will return a pair which 
+#        "inactive" if the getpair method will return a pair which
 #        satisfies this criterion.
 #
 #     viewport = list
-#        The value of the viewport variable is a list of two integers, 
-#        being the width and height in pixels of the window in which 
+#        The value of the viewport variable is a list of two integers,
+#        being the width and height in pixels of the window in which
 #        each previewed image is displayed.
 
 #  Copyright:
@@ -155,7 +155,7 @@
 #     7-JUN-2001 (MBT):
 #        Modified to avoid unnecessary re-creation of GWM window.  This
 #        also leads to core dumps (GWM window lost by PGPLOT - I suspect,
-#        but can't prove, a bug in GWM or PGPLOT).  This can still 
+#        but can't prove, a bug in GWM or PGPLOT).  This can still
 #        happen however if you do a lot of chooser resizing.
 #     9-JUL-2001 (MBT):
 #        Added scrollbars to the tabsets, to accomodate many NDFs.
@@ -169,7 +169,7 @@
 #     The resizing of this widget is somewhat fragile; it will not cope
 #     with a window resize (WINCH) request while it is already handling
 #     one (attempting to do so results in a Tcl/Tk coredump for reasons
-#     I don't understand).  The widget therefore informs the window 
+#     I don't understand).  The widget therefore informs the window
 #     manager that the window should not be resized during the time
 #     it is dealing with resize requests.  Unfortunately, a few WMs
 #     (the only one I've seen is sawmill) do not respect this - sawmill
@@ -196,7 +196,7 @@
 
 #  Parse the arguments: any arguments before the first one starting with
 #  a minus sign are interpreted as ndfset objects, and any following are
-#  configuration options.  We happen to know that ndfset objects never 
+#  configuration options.  We happen to know that ndfset objects never
 #  start with a minus sign, so no ambiguities can arise.  Also validate
 #  that the arguments are what they ought to be.
          set ndfsetlist "<blank>"
@@ -228,7 +228,7 @@
          }
 
 #  Work out the maximum X and Y dimensions of any of the images.  These
-#  are required for working out relative sizes of displayed images - 
+#  are required for working out relative sizes of displayed images -
 #  only required if the user is not permitted to change the selected
 #  WCS frame.
          if { ! $choosewcsframe } {
@@ -247,7 +247,7 @@
          set inview(A) ""
          set inview(B) ""
 
-#  Set the list of all available FITS header lines.  Use those from the 
+#  Set the list of all available FITS header lines.  Use those from the
 #  first named NDF in the first NDF Set as an example.
          set allfits [ [ lindex $ndfsetlist 1 ] ndfdo 0 fitshead ]
 
@@ -303,7 +303,7 @@
          addcontrol $itk_component(done) action
 
 #  Construct the choosing area.  This is the business end of the widget
-#  and consists of two tabsets and two frames in which images can be 
+#  and consists of two tabsets and two frames in which images can be
 #  displayed.  Each window is drawn once for each of the images under the
 #  widget's control, and this window is mapped or unmapped in one of
 #  the frames by a geometry manager according to what the user selects.
@@ -340,7 +340,7 @@
                                 -tabpos $tabpos($slot) \
                                 -bevelamount 4 \
                                 -tabborders no \
-                                -command [ code $this ndfselect $slot ] 
+                                -command [ code $this ndfselect $slot ]
             }
             itk_component add tabscroll$slot {
                scrollbar $itk_component(tabframe$slot).sb \
@@ -381,7 +381,7 @@
                $itk_component(tabs$slot) add -label " "
             }
 
-#  Pack the ndf frames themselves and the controlling tabsets into the 
+#  Pack the ndf frames themselves and the controlling tabsets into the
 #  choosing area.
             pack $itk_component(tabframe$slot) -side $side($slot) \
                                                -fill y -anchor n
@@ -552,8 +552,8 @@
       private method ndfplotwindow { index } {
 #-----------------------------------------------------------------------
 #  This method returns the name of the window which contains the drawn
-#  NDF.  The argument may be either the numerical index of one of the 
-#  ndfs in the list, or a slot name (A or B).  In the latter case, a 
+#  NDF.  The argument may be either the numerical index of one of the
+#  ndfs in the list, or a slot name (A or B).  In the latter case, a
 #  suitable blank window will be returned.
 
 #  Prevent resize attempts during the plotting.  For reasons I don't
@@ -606,7 +606,7 @@
                                   $plotted($index,height) == $height ) } {
                set createwindow 0
 
-#  If it has the right shape, see if the image has been plotted with 
+#  If it has the right shape, see if the image has been plotted with
 #  all the right attributes; if so, we will not need to plot it again.
                if { $plotted($index,percs) == $percs && \
                     $plotted($index,wcsframe) == $wcsframe && \
@@ -616,7 +616,7 @@
 
 #  The window has the wrong shape; here we should destroy the existing
 #  one prior to creating a new one on which to replot the image.
-#  However, a bug somewhere (I'm fairly sure it's in the GWM driver 
+#  However, a bug somewhere (I'm fairly sure it's in the GWM driver
 #  of PGPLOT) can sometimes cause an error with the message
 #
 #      %PGPLOT, /gwm: lost PGPLOT window 1
@@ -633,7 +633,7 @@
             }
          }
 
-#  Set the name of the GWM component.  If we are creating a new GWM 
+#  Set the name of the GWM component.  If we are creating a new GWM
 #  widget here, ensure that it is a window name which has not been
 #  used before.
          if { $createwindow } {
@@ -661,8 +661,8 @@
                   waitpush "Drawing image [ $ndfset name ]"
 
 #  Work out the dimensions of the GWM widget.  Only attempt to adjust the
-#  sizes for consistency if there is no possibility of the user changing 
-#  the WCS frame out from under us, since this would make it difficult 
+#  sizes for consistency if there is no possibility of the user changing
+#  the WCS frame out from under us, since this would make it difficult
 #  to keep the relative sizes in step.
                   if { $choosewcsframe } {
                      set gwidth $width
@@ -741,7 +741,7 @@
                   -expand 1 -fill both
             }
 
-#  Store characteristics of this plot so that we know whether subsequent 
+#  Store characteristics of this plot so that we know whether subsequent
 #  plot requests are out of date.
             set plotted($index,width) $width
             set plotted($index,height) $height
@@ -761,10 +761,10 @@
 #-----------------------------------------------------------------------
       private method ndfinfowindow { index } {
 #-----------------------------------------------------------------------
-#  This method returns the name of a window which contains textual 
+#  This method returns the name of a window which contains textual
 #  annotations for the drawn image, i.e. its name, applicable FITS headers,
 #  etc.  The argument may be either the numerical index of one of the
-#  images in the list, or a slot name (A or B).  In the latter case, a 
+#  images in the list, or a slot name (A or B).  In the latter case, a
 #  suitable blank window will be returned.
 
 #  Validate the index argument.
@@ -803,7 +803,7 @@
             set dims ""
             set name ""
             set val ""
-            if { $isndfset } { 
+            if { $isndfset } {
                set name [ $ndfset name ]
                if { [ $ndfset nndf ] == 1 } {
                   foreach dim [ $ndfset ndfdo 0 bounds ] {
@@ -917,7 +917,7 @@
             eval pack $lws -side top -anchor w
             eval iwidgets::Labeledwidget::alignlabels $lws
 
-#  Store characteristics of this info window so that we know whether 
+#  Store characteristics of this info window so that we know whether
 #  subsequent info window requests are out of date.
             set noted($index,showfits) $showfits
 
@@ -932,7 +932,7 @@
          }
 
 #  Set the width of the window to that of the width of the NDF viewport.
-#  If these windows are not kept to the same width, a long label in 
+#  If these windows are not kept to the same width, a long label in
 #  this window (the info window) can lead to problems when resizing.
          $itk_component(info$index) configure -width [ lindex $viewport 0 ]
 
@@ -1049,7 +1049,7 @@
 #-----------------------------------------------------------------------
       private method fitsselect { } {
 #-----------------------------------------------------------------------
-#  This method interrogates the user to update the showfits private 
+#  This method interrogates the user to update the showfits private
 #  variable.
 
 #  If we haven't done this before, build the FITS selection window.
@@ -1078,7 +1078,7 @@
                   -hscrollmode none \
                   -vscrollmode dynamic \
                   -textfont fixed
-            } 
+            }
             eval $itk_component(fits_listbox) insert end $allfits
             pack $itk_component(fits_listbox) -fill x
 

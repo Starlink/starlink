@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_WALA3( MAP, LBNDX, UBNDX, LBNDY, UBNDY, ERRLIM, 
+      SUBROUTINE KPS1_WALA3( MAP, LBNDX, UBNDX, LBNDY, UBNDY, ERRLIM,
      :                       XAMAP, YAMAP, STATUS )
 *+
 *  Name:
@@ -35,23 +35,23 @@
 *
 *     The specification for FILL is:
 *
-*     SUBROUTINE FILL( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, JB1, 
+*     SUBROUTINE FILL( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, JB1,
 *                      JB2, XAMAP, YAMAP, STATUS )
 *
-*     where MAP, LBNDX, UBNDX, LBNDY, UBNDY, XAMAP and YAMAP have just the 
-*     same meaning as for the "real" subroutine KPS1_WALA3. The additional 
-*     arguments IB1, IB2, JB1, JB2 define the section of the output arrays 
+*     where MAP, LBNDX, UBNDX, LBNDY, UBNDY, XAMAP and YAMAP have just the
+*     same meaning as for the "real" subroutine KPS1_WALA3. The additional
+*     arguments IB1, IB2, JB1, JB2 define the section of the output arrays
 *     XAMAP and YAMAP which are to be filled.
 *
 *     FILL first transforms a grid of 9 points spread evenly over the
 *     section (IB1:IB2, JB1:JB2) of the output image, producing
-*     corresponding input pixel coordinates. The supplied Mapping is used 
-*     for this purpose. A linear transformation is then calculated between 
-*     the 9 corresponding positions using a least squares criterion. If the 
-*     maximum error introduced by this fit at the 9 test points is acceptably 
-*     small, then the fit is used to fill the specified section of the output 
-*     arrays, and the subroutine FILL returns. If the linear fit is not 
-*     acceptable then the specified section is divide into 4 quarters, and 
+*     corresponding input pixel coordinates. The supplied Mapping is used
+*     for this purpose. A linear transformation is then calculated between
+*     the 9 corresponding positions using a least squares criterion. If the
+*     maximum error introduced by this fit at the 9 test points is acceptably
+*     small, then the fit is used to fill the specified section of the output
+*     arrays, and the subroutine FILL returns. If the linear fit is not
+*     acceptable then the specified section is divide into 4 quarters, and
 *     FILL is called to fill each quarter in turn.
 
 *  Arguments:
@@ -114,7 +114,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,8 +138,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MAXENT             ! Max. no. of recursive entries to the 
-      PARAMETER ( MAXENT = 5 )   ! imaginary subroutine FILL 
+      INTEGER MAXENT             ! Max. no. of recursive entries to the
+      PARAMETER ( MAXENT = 5 )   ! imaginary subroutine FILL
 
 *  Local Variables:
       INTEGER
@@ -201,7 +201,7 @@
             XAMAP( I, J ) = AST__BAD
             YAMAP( I, J ) = AST__BAD
          END DO
-      END DO      
+      END DO
 
 *  Initialise the bounds of the area which is to be filled with X and Y
 *  coordinate values, to be the area of the whole output image.
@@ -236,9 +236,9 @@
      :                 JB1, JB2, XAMAP, YAMAP, XA, YA, XB, YB, NK,
      :                 ICOL, JROW, NBAD, STATUS )
 
-*  If none of the test point positions were bad, find the linear 
-*  transformation from (X,Y) coordinates in the output image to (X,Y) 
-*  coordinates in the input image, which minimises the sum of squared 
+*  If none of the test point positions were bad, find the linear
+*  transformation from (X,Y) coordinates in the output image to (X,Y)
+*  coordinates in the input image, which minimises the sum of squared
 *  residuals at the test points.
       IF( NBAD .EQ. 0 ) THEN
          IFIT = 4
@@ -277,7 +277,7 @@
                   YAMAP( I, J ) = YTERM + C( 5 )*X
                END DO
 
-            END DO    
+            END DO
 
 *  Do the last row (omitting the first and last columns).
             Y = DBLE( JB2 ) - 0.5D0
@@ -296,7 +296,7 @@
          END IF
 
 *  If all the test point positions were bad, fill the current section
-*  with bad values.            
+*  with bad values.
       ELSE IF( NBAD .EQ. NK ) THEN
 
          DO J = JB1, JB2
@@ -304,17 +304,17 @@
                XAMAP( I, J ) = AST__BAD
                YAMAP( I, J ) = AST__BAD
             END DO
-         END DO    
+         END DO
 
 *  Set a flag to indicate that the current section has been filled.
          FILLED = .TRUE.
 
       END IF
 
-*  If the current section has not yet been filled, it is divided into 
-*  four quarters and the recursive subroutine FILL re-entered to fill 
+*  If the current section has not yet been filled, it is divided into
+*  four quarters and the recursive subroutine FILL re-entered to fill
 *  each quarter in turn. Note, use of DO loops is avoided because jumps
-*  would need to be made out of and back into the DO loop, which may 
+*  would need to be made out of and back into the DO loop, which may
 *  cause problems with do loop termination criteria being lost. DO loops
 *  are therefore simulated using GO TO and CONTINUE statements.
       IF( .NOT. FILLED ) THEN
@@ -322,14 +322,14 @@
 *  If the max. number of entries has been reached, calculate the X
 *  and Y coordinates explicitly using the full projection mappings.
          IF( NENTRY .GT. MAXENT ) THEN
-            CALL KPS1_WALA5( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, 
+            CALL KPS1_WALA5( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2,
      :                       JB1, JB2, XAMAP, YAMAP, STATUS )
 
-*  Otherwise, divide the current section into four quarters and fill 
+*  Otherwise, divide the current section into four quarters and fill
 *  each quarter in turn using the recursive subroutine FILL. Note, use
-*  of DO loops is avoided because jumps would need to be made out of 
-*  and back into the DO loop, which may cause problems with do loop 
-*  termination criteria being lost. DO loops are therefore simulated 
+*  of DO loops is avoided because jumps would need to be made out of
+*  and back into the DO loop, which may cause problems with do loop
+*  termination criteria being lost. DO loops are therefore simulated
 *  using GO TO and CONTINUE statements.
          ELSE
 
@@ -337,13 +337,13 @@
 *           DO QROW = 1, 2
 
             QROW = 1
- 20         CONTINUE                  
+ 20         CONTINUE
 
 *  Loop round each quarter in the current row. This is equivalent to...
 *              DO QCOL = 1, 2
 
                QCOL = 1
- 30            CONTINUE                  
+ 30            CONTINUE
 
 *  Store the upper and lower Y bound of each quarter in the current row.
 *  The bounds of each quarter are determined by the positions of the
@@ -397,13 +397,13 @@
 
 *  End the simulated do loop for the quarters in the current row...
 *              END DO
-               
+
                QCOL = QCOL + 1
                IF( QCOL .LE. 2 ) GO TO 30
 
 *  End the simulated do loop for the rows of quarters...
 *           END DO
-               
+
             QROW = QROW + 1
             IF( QROW .LE. 2 ) GO TO 20
 
@@ -417,7 +417,7 @@
 *     RETURN
 
 *----------------------------------------------------------------------
-*  Reduce the number of active entries by one. 
+*  Reduce the number of active entries by one.
       NENTRY = NENTRY - 1
 
 *  If any active entries remain, restore the saved variable values for

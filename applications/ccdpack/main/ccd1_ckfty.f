@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine checks that the type of a single frame is equivalent
-*     to TYPE given the values of ACCEPT and IGNORE. The ACCEPT 
+*     to TYPE given the values of ACCEPT and IGNORE. The ACCEPT
 *     argument specifies the number of underscores up to which the name
 *     must be equivalent. IGNORE specifies how many underscores in the
 *     NDF type are ignored. So for instance if we have.
@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
 
 *  Try to get the type of the NDF.
       CALL CCG1_FCH0C( ID, 'FTYPE', FTYPE, OK, STATUS )
-      IF ( OK ) THEN 
+      IF ( OK ) THEN
 
 *  Find out the position of the ACCEPT'th underscore. If ACCEPT is 0
 *  then we don't have to check for any underscores. If ACCEPT is 1 we

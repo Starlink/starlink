@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -203,9 +203,9 @@ else
 
 if ((roixmin >= 0) && (roixmin < xmax) &&
     (roiymin >= 0) && (roiymin < ymax))
-   iirerr = IIRWRI_C (display, memid, *roiid, roixmin, roiymin, roixmax, 
+   iirerr = IIRWRI_C (display, memid, *roiid, roixmin, roiymin, roixmax,
              roiymax);
-   
+
 
 return(iirerr);
 }
@@ -298,9 +298,9 @@ else
    corner = roi->corner;
 roi_last_active = roi->corner;
 roi_rectangle (display, corner, x0, y0, x1, y1, roi->col);
- 
+
 roi->vis = lvis;
- 
+
 iirerr = II_SUCCESS;
 return(iirerr);
 }
@@ -393,17 +393,17 @@ roi = device[display].roi[roiid];
 if (inmemid == -1)
    {
 /* ROI is related to display */
-   
-   mem_dis_conv (display, roi->memid, roi->x_min, roi->y_min, 
+
+   mem_dis_conv (display, roi->memid, roi->x_min, roi->y_min,
                  &xmin, &ymin);
-   mem_dis_conv (display, roi->memid, roi->x_max, roi->y_max, 
+   mem_dis_conv (display, roi->memid, roi->x_max, roi->y_max,
                  &xmax, &ymax);
 
    *roixmin = xmin;
    *roiymin = ymin;
    *roixmax = xmax;
    *roiymax = ymax;
-   
+
    roixc = (*roixmax - *roixmin) / 2;
    roiyc = (*roiymax - *roiymin) / 2;
 
@@ -414,8 +414,8 @@ if (inmemid == -1)
       mem = conf->memory[i];
       if ((mem->mem_free != -1) && (mem->visibility == 1) &&
           (roixc >= (int)mem->x_scroll / mem->zoom) &&
-          (roiyc >= (int)mem->y_scroll / mem->zoom) && 
-          (roixc <= ((int)mem->x_scroll + mem->x_v_size) / mem->zoom) && 
+          (roiyc >= (int)mem->y_scroll / mem->zoom) &&
+          (roixc <= ((int)mem->x_scroll + mem->x_v_size) / mem->zoom) &&
           (roiyc <= ((int)mem->y_scroll + mem->y_v_size) / mem->zoom))
              {
              *outmemid = i;
@@ -433,9 +433,9 @@ else
       iirerr = ILLMEMID;
       return (iirerr);
       }
-   mem_dis_conv (display, roi->memid, roi->x_min, roi->y_min, 
+   mem_dis_conv (display, roi->memid, roi->x_min, roi->y_min,
                  &xmin, &ymin);
-   mem_dis_conv (display, roi->memid, roi->x_max, roi->y_max, 
+   mem_dis_conv (display, roi->memid, roi->x_max, roi->y_max,
                  &xmax, &ymax);
    dis_mem_conv (display, inmemid, xmin, ymin, roixmin, roiymin);
    dis_mem_conv (display, inmemid, xmax, ymax, roixmax, roiymax);
@@ -499,7 +499,7 @@ int IIRWRI_C ( int display, int memid, int roiid, int roixmin, int roiymin,
 int curconf , vis , vis0;
 int roixmind , roiymind , roixmaxd , roiymaxd;
 int iirerr;
-           
+
 CONF_DATA   *conf;
 MEM_DATA    *mem;
 ROI_DATA    *roi;
@@ -571,9 +571,9 @@ else
       iirerr = ILLMEMID;
       return(iirerr);
       }
-   dis_mem_conv (display , roi->memid , roixmind , roiymind , 
+   dis_mem_conv (display , roi->memid , roixmind , roiymind ,
                  &roi->x_min , &roi->y_min);
-   dis_mem_conv (display , roi->memid , roixmaxd , roiymaxd , 
+   dis_mem_conv (display , roi->memid , roixmaxd , roiymaxd ,
                  &roi->x_max , &roi->y_max);
    }
 

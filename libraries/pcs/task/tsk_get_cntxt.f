@@ -89,6 +89,6 @@
 *
 *    Simply copy the value from COMMON.
 *
-      CONTEXT = CURACTCONTEXT 
+      CONTEXT = CURACTCONTEXT
 
       END

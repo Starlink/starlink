@@ -27,7 +27,7 @@
 
       IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRQCI - No PGPLOT device open',
-     :   GRNODO) 
+     :   GRNODO)
          ICOL = 1
       ELSE
          ICOL = GRCCOL(GRCIDE)

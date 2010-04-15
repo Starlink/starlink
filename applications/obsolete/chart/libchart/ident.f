@@ -1,5 +1,5 @@
       SUBROUTINE IDENT(IDLIST,ARR,N, STATUS )
-      
+
 *+
 *   IDENT Finds which of the Bits in the Byte Array
 *   IDLIST is set.
@@ -34,7 +34,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       N = 0
       DO I=1,8*IDBYTE
          ARR(I)=0

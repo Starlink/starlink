@@ -24,14 +24,14 @@ C
 C     (>) NAME       (Fixed string,descr) The DTA_ system name of the
 C                    complex structure in question - ie the name of an
 C                    object of type 'CSTRUCT'.
-C     (>) ELEMENTS   (Integer,ref) The number of elements in the 
+C     (>) ELEMENTS   (Integer,ref) The number of elements in the
 C                    contracted structure array.
 C     (>) BASE_TYPE  (Integer,ref) Integer code for the type of array
 C                    used as the base array.  This should always be
 C                    SHORT_TYPE.  (see TYPE_CODE).
 C     (>) BASE_ARRAY (Integer,ref) The address of the base array.
 C     (>) TYPE_CODE  (Integer,ref) Integer code for the type of array
-C                    from which the contracted structure is to be produced.  
+C                    from which the contracted structure is to be produced.
 C                    This is the internal DSA_ system code (ie one of the
 C                    FLOAT_TYPE, INT_TYPE etc codes defined in the include
 C                    file DSA_TYPES.INC).  This routine assumes TYPE_CODE
@@ -45,7 +45,7 @@ C                    to generate the former.
 C     (!) STATUS     (Integer,ref) Status code.  If bad status is passed,
 C                    this routine will return immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Common variables internal to te DSA_ system.
 C
 C  External subroutines / functions used:
@@ -85,7 +85,7 @@ C+
      :                                       TYPE_CODE,ADDRESS,STATUS)
 C
       IMPLICIT NONE
-      
+
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters

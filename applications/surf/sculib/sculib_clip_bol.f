@@ -39,7 +39,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -82,7 +82,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -113,7 +113,7 @@
 
 *  Local Constants:
       INTEGER   SKYBIT               ! Sky Quality bit
-      PARAMETER (SKYBIT = 4)  
+      PARAMETER (SKYBIT = 4)
 
 *  Local Variables:
       DOUBLE PRECISION CLIPMAX     ! Max clipping level
@@ -142,8 +142,8 @@
 
 *  Find the statistics (Mean and standard deviation
 
-      CALL SCULIB_STATR(N_POS, REAL(N_SIGMA), SCUDATA, SCUQUAL, BADBIT, 
-     :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, 
+      CALL SCULIB_STATR(N_POS, REAL(N_SIGMA), SCUDATA, SCUQUAL, BADBIT,
+     :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
      :     %VAL(CNF_PVAL(SPNTR)), STATUS)
 
 *     Free memory
@@ -152,7 +152,7 @@
 
 *     Set the number of spikes to 0
       NSPIKES = 0
-      
+
 *  Loop over all data removing those points which are greater than nsigma
 
       IF (MEAN .NE. VAL__BADD .AND. STDEV.NE.VAL__BADD) THEN
@@ -177,7 +177,7 @@
             END IF
          END DO
 
-*  Turn on SKY bad bit 
+*  Turn on SKY bad bit
       BADBIT = SCULIB_BITON(BADBIT, SKYBIT)
 
 

@@ -10,7 +10,7 @@ C     Returns the DTA_ name for an element of a defined structure
 C
 C  Description:
 C     A structure definition file can equate element identifiers with
-C     the name of a specific element of the structure.  If such a 
+C     the name of a specific element of the structure.  If such a
 C     defined structure has been created and associated with a reference
 C     name, this routine will return the actual DTA_ system object name
 C     for the element corresponding to a specified element identifier
@@ -24,7 +24,7 @@ C     CALL DSA_ELEMENT_NAME (REF_NAME,ELEMENT_ID,OBJECT_NAME,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) REF_NAME      (Fixed string,descr) The reference name 
+C     (>) REF_NAME      (Fixed string,descr) The reference name
 C                       associated with the structure.
 C     (>) ELEMENT_ID    (Fixed string,descr) The element identifier.
 C     (<) OBJECT_NAME   (Fixed string,descr) The DTA_ system name for
@@ -59,7 +59,7 @@ C     (>) SYMBOL_STATE   (Integer array) States of symbols
 C     (>) SYMBOL_TYPE_FLAG(Integer array) Flags symbol defined for given type
 C     (>) SYMBOL_VALUES  (String array) Values of defined symbols
 C     (>) FULL_NAME      (Character) Full name of definition file
-C  
+C
 C  Subroutine / function details:
 C     ICH_FOLD      Convert string to upper case
 C     ICH_LEN       Position of last non-blank char in string
@@ -94,7 +94,7 @@ C     DSA_ system error codes
 C
       INCLUDE 'DSA_ERRORS'
 C
-C     DSA_ system common definition 
+C     DSA_ system common definition
 C
       INCLUDE 'DSA_COMMON'
 C
@@ -132,7 +132,7 @@ C
 C     Look up REF_NAME in common tables
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,TOP_LEVEL_NAME,LENGTH,
-     :                                                        STATUS) 
+     :                                                        STATUS)
       IF (STATUS.NE.0) GO TO 500      ! Error exit
 C
 C     See what file type we are looking for.

@@ -39,7 +39,7 @@ my @bbox = ( [ 10.0, -10.0, 290.0, 300.0 ],
 	     [ -300.0, -300.0, 500.0, 500.0 ],
 	     [ 1.0, 1.0, 1787.0, 447.0]
 	   );
-my @attrs = ( 'Grid=1,tickall=0', 
+my @attrs = ( 'Grid=1,tickall=0',
 	      'Grid=1,labelling=interior',
 	      'Grid=0' );
 
@@ -55,7 +55,7 @@ for my $i ( 0 .. $#headers ) {
 
   # Create a fitschan, read an object from it and dump the object
   # to standard output. The object should be a frameset if all is OK
-  my $fc = new Starlink::AST::FitsChan( 
+  my $fc = new Starlink::AST::FitsChan(
 		           source => sub { my $line = shift(@{$headers[$i]});
 					   chomp($line) if $line;
 					   $line;
@@ -84,7 +84,7 @@ for my $i ( 0 .. $#headers ) {
   print "# Native Encoding:\n";
   $fc->Annul();
 
-  # Create a Plot which maps the area specified by BBOX the Base Frame 
+  # Create a Plot which maps the area specified by BBOX the Base Frame
   # of the FrameSet onto the GBOX area in graphics coords.
   my $plot = new Starlink::AST::Plot( $fs, \@gbox, $bbox[$i],
 				      "title= A FITS test, tol = 0.01"

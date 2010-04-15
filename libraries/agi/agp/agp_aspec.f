@@ -10,7 +10,7 @@
 *     CALL AGP_ASPEC( AGINAM, GNS, SPEC, STATUS )
 
 *  Description:
-*     Returns the GNS device specification for a supplied AGI workstation 
+*     Returns the GNS device specification for a supplied AGI workstation
 *     name. If the application is linked with native PGPLOT through the
 *     agp_link_adam command, the native PGPLOT device specification can
 *     instead be returned by supplying .FALSE. for the GNS argument.
@@ -21,7 +21,7 @@
 *     AGINAM = CHARACTER*(*) (Given)
 *        The AGI workstation name. No abbreviations allowed.
 *     GNS = LOGICAL (Given)
-*        Supplied .TRUE. if the GNS device specification is required, and 
+*        Supplied .TRUE. if the GNS device specification is required, and
 *        .FALSE. if the native PGPLOT device specification is required.
 *        An error is reported if a native PGPLOT device specifications is
 *        requested but cannot be produced (e.g. because the application
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     31-OCT-2001 (DSB):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -84,7 +84,7 @@
       INTEGER CHR_LEN             ! Used length of a string
 
 *  Local Variables:
-      CHARACTER LTYPE*(AGP__SZANM)! Local copy of device type 
+      CHARACTER LTYPE*(AGP__SZANM)! Local copy of device type
       INTEGER F                   ! Index of first non-blank character
       INTEGER IAT                 ! Used length of a string
       INTEGER I                   ! Loop count
@@ -97,11 +97,11 @@
       SPEC = ' '
 
 *  Check status on entry
-      IF( STATUS .NE. SAI__OK ) RETURN 
+      IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Take an upper case copy of the supplied AGI name and remove
 *  spaces.
-      IF( AGINAM .NE. ' ' ) THEN 
+      IF( AGINAM .NE. ' ' ) THEN
          CALL CHR_FANDL( AGINAM, F, L )
          LTYPE = AGINAM( F:L )
          CALL CHR_RMBLK( LTYPE )
@@ -112,7 +112,7 @@
          UL = 1
       END IF
 
-*  Loop through the known devices, counting the number which match the 
+*  Loop through the known devices, counting the number which match the
 *  supplied AGI name.
       NMATCH = 0
       DO I = 1, AGP__NDEV

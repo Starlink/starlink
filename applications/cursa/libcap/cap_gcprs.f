@@ -49,7 +49,7 @@
 *     If the string is not entirely blank then
 *       Strip any leading or trailing delimiters.
 *       Examine the string to find the positions of any delimiters.
-*       Use the delimiters to calculate the starting and stoping 
+*       Use the delimiters to calculate the starting and stoping
 *       positions of any names in the string.
 *       for each component
 *         Check for the occurence of the delimiters ('{' and '}')
@@ -165,7 +165,7 @@
             CALL CHR_LDBLK (CMPLST)
 
 *
-*          Examine the string to find the number and positions of any 
+*          Examine the string to find the number and positions of any
 *          delimiters.
 
             DELIMS = 0
@@ -182,7 +182,7 @@
             END DO
 
 *
-*          Use the delimiters to calculate the starting and stoping 
+*          Use the delimiters to calculate the starting and stoping
 *          positions of any names in the string.
 
             START(1) = 1

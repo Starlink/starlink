@@ -141,7 +141,7 @@
 *
 
          IF (INDEX(OUTFIL,'.').EQ.0.AND.INDEX(OUTFIL,' ').GT.10)
-     :    THEN 
+     :    THEN
 
             CALL MSG_OUT('MESG3','File name too long',STATUS)
             FILE = 'IMAGE.LIS'
@@ -242,4 +242,4 @@
 
       ENDIF
 
-      END       
+      END

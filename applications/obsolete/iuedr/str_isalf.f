@@ -31,7 +31,7 @@
 
 *   External references:
       INTEGER str_INDEX     ! index of character in string
- 
+
       str_ISALF = str_INDEX('abcdefghijklmnopqrstuvwxyz\\', C).GT.0
 
       IF (.NOT.str_ISALF) THEN

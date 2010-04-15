@@ -14,7 +14,7 @@
 *     CALL CHI_XCREDUP( INPUT, ESTNUMENTS, OUTPUT, STATUS )
 *
 *  Description:
-*     Create a duplicate catalogue with the same columns but no entries. 
+*     Create a duplicate catalogue with the same columns but no entries.
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -42,7 +42,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,7 +82,7 @@
 *
 *    Create a catalogue with no entries.
 *
-      CALL CHI_CRECAT(OUTPUT, ESTNUMENTS, NUMCOLS, CNAMES, 
+      CALL CHI_CRECAT(OUTPUT, ESTNUMENTS, NUMCOLS, CNAMES,
      :    CFORMATS, CUNITS, CCOMMENTS, STATUS)
 *
       END

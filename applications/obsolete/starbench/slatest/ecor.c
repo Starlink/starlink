@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmecor(float qfoo,float qbar,int qbaz,int Q0,float 
+void sbmecor(float qfoo,float qbar,int qbaz,int Q0,float
 qfobar,float*q1,float*q2)
 #define qfoobar 1.4959787066e8f
 #define Q3 499.0047837f

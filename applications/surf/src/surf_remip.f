@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_REMIP( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This task calculates and removes the instrumental polarisation
 *     signal from SCUBA polarimeter data.
@@ -30,11 +30,11 @@
 *     polarisation, WP is the position angle of the wave plate and
 *     THETA is the (elevation dependant) position angle of the IP.
 *
-*     This is an approximation of 
+*     This is an approximation of
 *
 *       Actual flux = measured flux - mean flux * frac IP
 *
-*     where 
+*     where
 *
 *        IP = P * (1 + cos (4 WP - 2 THETA ) ),
 *
@@ -130,7 +130,7 @@
 *       matches the number of sub-instruments in the file.
 *     - The focal station of the instrument (THUMPER, SCUBA etc) is not
 *       taken into account when calculting the elevation of the individual
-*       pixels. The effect of array rotation on the elevation component is tiny. 
+*       pixels. The effect of array rotation on the elevation component is tiny.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -156,7 +156,7 @@
 
 *  Local Constants:
       CHARACTER * 10   TSKNAME  ! Name of task
-      PARAMETER (TSKNAME = 'REMIP') 
+      PARAMETER (TSKNAME = 'REMIP')
       INTEGER MAXDIM            ! Max dimensions of data array
       PARAMETER (MAXDIM = 4)
 
@@ -176,7 +176,7 @@
                                 ! dU3 Nasmyth coord of bolometers
       REAL    BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                 ! dU4 Nasmyth coord of bolometers
-      REAL    BOL_IP_DATA (8, SCUBA__NUM_CHAN, SCUBA__NUM_ADC) 
+      REAL    BOL_IP_DATA (8, SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                 ! IP measurements 1: P 2:SlopeP
                                 ! 3: Theta 4:SlopeTheta. The next four
                                 ! slots are for the corresponding variance
@@ -222,7 +222,7 @@
       DOUBLE PRECISION LAT_RAD  ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD ! latitude of telescope centre at MJD2
       INTEGER LBND(2)           ! Lower bounds of an NDF
-      DOUBLE PRECISION LONG_RAD ! longitude of telescope centre 
+      DOUBLE PRECISION LONG_RAD ! longitude of telescope centre
                                 ! (radians)
       DOUBLE PRECISION LONG2_RAD ! apparent RA of telescope centre at
                                 ! MJD2 (radians)
@@ -232,7 +232,7 @@
                                 ! centre (arcsec)
       REAL             MAP_Y    ! y offset of map centre from telescope
                                 ! centre (arcsec)
-      DOUBLE PRECISION MJD1     ! modified Julian day at which object 
+      DOUBLE PRECISION MJD1     ! modified Julian day at which object
                                 ! was at LAT,LONG for PLANET centre
                                 ! coordinate system
       DOUBLE PRECISION MJD2     ! modified Julian day at which object
@@ -271,9 +271,9 @@
       INTEGER RA2_PTR           ! pointer to .SCUCD.RA2
       LOGICAL REDUCE_SWITCH     ! Has REDUCE_SWITCH been run
       LOGICAL REMIP             ! Has REMIP already been run on the file
-      DOUBLE PRECISION ROTATION ! angle between apparent north and 
+      DOUBLE PRECISION ROTATION ! angle between apparent north and
                                 ! north of input coord system (radians,
-                                ! measured clockwise from input north) 
+                                ! measured clockwise from input north)
       REAL    RTEMP             ! Scratch real
       INTEGER RUN_NUMBER        ! run number of input file
       CHARACTER*15     SAMPLE_COORDS ! coordinate system of sample offsets
@@ -349,7 +349,7 @@
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
-      CALL MSG_OUTIF (MSG__NORM,' ', 
+      CALL MSG_OUTIF (MSG__NORM,' ',
      :     '^PKG: run ^RUN was a ^MODE observation '//
      :     'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
@@ -432,7 +432,7 @@
       ELSE
          LAT2_RAD = 0.0D0
          LONG2_RAD = 0.0D0
-         MJD2 = 0.0D0     
+         MJD2 = 0.0D0
       END IF
 
       IF ((CENTRE_COORDS .NE. 'AZ')  .AND.
@@ -447,7 +447,7 @@
       LAT_OBS = LAT_OBS * PI / 180.0D0
 
 *     telescope offset from telescope centre
-      
+
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'MAP_X',
      :     MAP_X, STATUS)
       MAP_X = MAP_X / REAL (R2AS)
@@ -528,7 +528,7 @@
 *     map the DEM_PNTR array and check its dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
 *     map the .SCUCD.LST_STRT array and check its dimensions
@@ -539,7 +539,7 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(LST_STRT_PTR)), 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(LST_STRT_PTR)),
      :                    UT1,
      :     RTEMP, RTEMP, STATUS)
 
@@ -552,7 +552,7 @@
       IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
          ABORTED = .TRUE.
       END IF
-      
+
 *     Print out information on observation
 
       CALL MSG_SETI ('N_E', N_EXPOSURES)
@@ -561,7 +561,7 @@
 
       IF (.NOT. ABORTED) THEN
          CALL MSG_SETC ('PKG', PACKAGE)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integration(s) in '//
      :        '^N_M measurement(s)', STATUS)
@@ -578,14 +578,14 @@
      :        'MEAS_NO', LAST_MEAS, STATUS)
 
          CALL MSG_SETC ('PKG', PACKAGE)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
      :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
@@ -597,7 +597,7 @@
 *  observation
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG_RAD, LAT_RAD, LONG2_RAD,
-     :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
+     :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS,
      :     %VAL(CNF_PVAL(LST_STRT_PTR)), UT1,
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
 
@@ -608,7 +608,7 @@
       IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
 
          CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
-     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT,
      :        JIGGLE_P_SWITCH, RTEMP, SAMPLE_COORDS, JIGGLE_X,
      :        JIGGLE_Y, STATUS)
 
@@ -631,7 +631,7 @@
 
 
 
-*     See if there is a WPLATE array in the SCUCD extension in the 
+*     See if there is a WPLATE array in the SCUCD extension in the
 *     The WPLATE array should contain the wave plate positions
 *     per measurement.
 
@@ -683,7 +683,7 @@
 *     The return array is then filled with the waveplate position
 *     angle in degrees
 
-      CALL SURFLIB_FILL_WPLATE(N_WP_POS, 
+      CALL SURFLIB_FILL_WPLATE(N_WP_POS,
      :                         %VAL(CNF_PVAL(SCUCD_WPLATE_PTR)),
      :     N_POS, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), %VAL(CNF_PVAL(WPLATE_PTR)),
@@ -714,7 +714,7 @@
             CALL CHR_APPND('/ipfile.dat', PATH, ITEMP)
          END IF
       END IF
-         
+
       CALL PAR_DEF0C('IPFILE',PATH, STATUS)
 
 *     Get the name of the IP file
@@ -726,7 +726,7 @@
       N_SUB = 0
       CALL SCULIB_GET_FITS_I (N_FITS, N_FITS, FITS, 'N_SUBS',
      :     N_SUB, STATUS)
-      
+
 *     Code copied from SCULIB_GET_SUB_INST
       STEMP = 'FILT_'
       IF (STATUS .EQ. SAI__OK) THEN
@@ -740,7 +740,7 @@
       END IF
 
 *     Now read it
-      
+
       CALL SURFLIB_READ_IPFILE(FD, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
      :     N_SUB, FILTERS, FAST_AXIS, BOL_IP_DATA, STATUS)
 
@@ -756,7 +756,7 @@
 
 *     set the default
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
-      
+
 *     OK, propagate the input ndf to the output
 
       CALL NDF_PROP (IN_NDF, 'Units,Axis,DATA,QUALITY,VARIANCE', 'OUT',
@@ -767,7 +767,7 @@
       CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
       CALL NDF_MAP(OUT_NDF, 'DATA', '_REAL', 'UPDATE', OUT_DATA_PTR,
      :     ITEMP, STATUS)
-      CALL NDF_MAP(OUT_NDF, 'VARIANCE', '_REAL', 'UPDATE', 
+      CALL NDF_MAP(OUT_NDF, 'VARIANCE', '_REAL', 'UPDATE',
      :     OUT_VARIANCE_PTR, ITEMP, STATUS)
 
 
@@ -776,11 +776,11 @@
 *     calculation since the array size is much smaller than the elevation effect
 
       CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAM, N_BOLS,
-     :     N_POS, 1, N_SWITCHES, N_EXPOSURES, 
-     :     N_INTEGRATIONS, N_MEASUREMENTS, 
+     :     N_POS, 1, N_SWITCHES, N_EXPOSURES,
+     :     N_INTEGRATIONS, N_MEASUREMENTS,
      :     1, N_EXPOSURES, 1, N_INTEGRATIONS, 1, N_MEASUREMENTS,
      :     1, N_FITS, FITS,
-     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :     %VAL(CNF_PVAL(LST_STRT_PTR)),
      :     ROTATION, SAMPLE_MODE,
      :     SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
@@ -794,7 +794,7 @@
      :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC,BOL_ADC,BOL_CHAN,
      :     BOL_DU3, BOL_DU4, .FALSE., 0.0D0,0.0D0,0.0,0.0,
      :     BOL_RA, BOL_DEC,
-     :     %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), .FALSE., 0,
      :     %VAL(CNF_PVAL(WPLATE_PTR)), BOL_IP_DATA,
      :     STATUS)
@@ -822,12 +822,12 @@
 
 
 *     Get locator to REDS extension (creating if necessary)
-      
+
       CALL NDF_XSTAT(OUT_NDF, 'REDS', THERE, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (THERE) THEN
-            CALL NDF_XLOC(OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+            CALL NDF_XLOC(OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC,
      :           STATUS)
          ELSE
             CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
@@ -850,7 +850,7 @@
 
 
 *     Create the output extension for the HWP angle
-      
+
       CALL NDF_PLACE (OUT_REDSX_LOC, 'WPLATE',PLACE, STATUS)
       LBND(1) = 1
       LBND(2) = 1
@@ -883,7 +883,7 @@
      :     ITEMP, STATUS)
       CALL NDF_MAP(WP_NDF,'VARIANCE','_REAL','WRITE',WP_VAR_PTR,
      :     ITEMP, STATUS)
-      
+
 
 *     We don't want to write all the angles to the output file
 *     at this time. Polarimetry is only interested in the
@@ -898,9 +898,9 @@
       CALL SURFLIB_CALC_POLPACK_ANGROT(
      :     N_POS, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), %VAL(CNF_PVAL(WPLATE_PTR)),
-     :     %VAL(CNF_PVAL(WP_DATA_PTR)), %VAL(CNF_PVAL(WP_VAR_PTR)), 
+     :     %VAL(CNF_PVAL(WP_DATA_PTR)), %VAL(CNF_PVAL(WP_VAR_PTR)),
      :     STATUS)
-      
+
 *     Unmap and annul the ANGROT NDF
       CALL NDF_UNMAP(WP_NDF,'*', STATUS)
       CALL NDF_ANNUL(WP_NDF, STATUS)

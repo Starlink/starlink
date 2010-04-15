@@ -115,7 +115,7 @@
 *
       ELSE
 *
-        PRINT *,'** WARNING: TOO MUCH DATA FOR ''POLYFIT1''.', 
+        PRINT *,'** WARNING: TOO MUCH DATA FOR ''POLYFIT1''.',
      +          NFIT, MAXFIT
         PRINT *,'** INTERSPERSED DATA WILL BE SKIPPED.'
         IGET = 1
@@ -222,7 +222,7 @@
 
 * Fit the polynomial
 
-          CALL POLYFIT1( NDATA, XDATA, YDATA, YSIGMA, YFIT, 
+          CALL POLYFIT1( NDATA, XDATA, YDATA, YSIGMA, YFIT,
      &    NPOLY, IFAIL)
           IF( IFAIL.NE.0 ) GOTO 999
 

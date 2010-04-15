@@ -14,15 +14,15 @@
 # Description:
 #    This primitive creates a Starlink small text-file (STL) catalogue.
 #    It contains the scxhema for the tabulated data made by FITGAUSS
-#    invocations in the DATACUBE package, such as in scripts peakmap and 
+#    invocations in the DATACUBE package, such as in scripts peakmap and
 #    velmap.  In addition to the regular headers there is a formatted
 #    comment line immediately before the BEGINTABLE presenting the column
-#    headings.  The co-ordinate and value units, if supplied, are recorded 
+#    headings.  The co-ordinate and value units, if supplied, are recorded
 #    in the header in each relevant field.  The name of the cube being
 #    analysed, if supplied, is recorded as a parameter of the table.
 #
 # Notes:
-#    -  The format for output values is 
+#    -  The format for output values is
 #    %6i %6i %12.5g %12.5g %12.5g %12.5g %12.5g %12.5g %12.5g %12.5g
 #    representing the followingf parameters; X abnd Y pixel indices,
 #    centre and its error, peak height and its error, FWHM and its error,
@@ -30,15 +30,15 @@
 #
 #  Parameters:
 #     -c units
-#       The units of the spectral co-ordinates used for the centre and FWHM 
-#       fields, and  their respective errors.  If not supplied, the UNITS 
+#       The units of the spectral co-ordinates used for the centre and FWHM
+#       fields, and  their respective errors.  If not supplied, the UNITS
 #       field of the schema will be not written for these fields.
 #     -f filename
 #       The name of the NDF being analysed.
 #     -l filename
 #       The name of the log file to contain the table of fit parameters.
 #     -v units
-#       The data value units used for the peak height and flux fields, and 
+#       The data value units used for the peak height and flux fields, and
 #       their respective errors.  If not supplied, the UNITS field of the
 #       table schema will be not written for these fields.
 #

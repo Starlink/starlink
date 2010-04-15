@@ -58,7 +58,7 @@
 *
 *    The maximum size of output line lengths.
 
-      INTEGER SGZ__SZOLN             ! Output to a data file (also used 
+      INTEGER SGZ__SZOLN             ! Output to a data file (also used
       PARAMETER (SGZ__SZOLN = 2000)  ! as internal buffer size).
 
       INTEGER SGZ__SZOPR             ! Output to a print file.

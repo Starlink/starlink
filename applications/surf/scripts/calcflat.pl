@@ -19,7 +19,7 @@ use NDF;
 use Term::ReadLine;
 
 # Deal with the simple command line arguments:
- 
+
 ($h) && do {
   print qq/
   Usage: calcflat  ndf radius
@@ -27,7 +27,7 @@ use Term::ReadLine;
     -h  \t Help
     ndf \t The HDS container to be analysed (output of BOLREBIN)
     radius\t Radius of the aperture in pixels
- 
+
 /;
   exit;
 };

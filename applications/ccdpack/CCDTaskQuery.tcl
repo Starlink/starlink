@@ -2,7 +2,7 @@ proc CCDTaskQuery { app param } {
 
 #+
 #  Name:
-#     CCDTaskQuery 
+#     CCDTaskQuery
 
 #  Purpose:
 #     Returns the value of an application parameter.
@@ -27,7 +27,7 @@ proc CCDTaskQuery { app param } {
 #  Global Variables:
 #     MONOLITH = array (read)
 #        This variable describes the known monoliths, the name of
-#        their executable, their status and the command name associated 
+#        their executable, their status and the command name associated
 #        with them. The elements have indices,
 #
 #           (name,location)        ! where the monolith executable is
@@ -36,7 +36,7 @@ proc CCDTaskQuery { app param } {
 #
 #        This also has an additional element (index) that is
 #        incremented to give unique tasknames to the monoliths (if
-#        they are killed timing problems mean that using the same name 
+#        they are killed timing problems mean that using the same name
 #        may fail)
 #     TASK = array (write)
 #        This variable holds the names of the available applications
@@ -96,9 +96,9 @@ proc CCDTaskQuery { app param } {
    set value ""
 
 #  Get the name of the monolith associated with this application.
-   if { [info exists TASK($app,monolith)] } { 
+   if { [info exists TASK($app,monolith)] } {
 
-#  If it exists get the parameter value. An error results if none are 
+#  If it exists get the parameter value. An error results if none are
 #  available so trap this as "".
       set task $MONOLITH($TASK($app,monolith),taskname)
       puts "Querying task $app about $param"
@@ -114,7 +114,7 @@ proc CCDTaskQuery { app param } {
       if { [string range $TASK($app,output) 0 1 ] != "!!" } {
          set value "$TASK($app,output)"
       }
-   } else { 
+   } else {
       CCDIssueError "Unknown application \"$app\" (programming error)"
    }
 

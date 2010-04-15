@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GTAXV( PARAM, MXVAL, EXACT, FRAME, IAXIS, AXVAL, 
+      SUBROUTINE KPG1_GTAXV( PARAM, MXVAL, EXACT, FRAME, IAXIS, AXVAL,
      :                       NVAL, STATUS )
 *+
 *  Name:
@@ -15,10 +15,10 @@
 
 *  Description:
 *     This routine obtains one or more formatted values for a specified axis
-*     from the environment, using a specified parameter. 
+*     from the environment, using a specified parameter.
 *
 *     If the string supplied for the parameter consists of a single colon,
-*     then a description of the Current co-ordinate Frame is displayed, 
+*     then a description of the Current co-ordinate Frame is displayed,
 *     together with an indication of the format required for each axis
 *     value, and a new parameter value is then obtained.
 
@@ -41,14 +41,14 @@
 *        parameter. On exit, holds the supplied axis value. No dynamic
 *        default is used if any of the supplied values is AST__BAD.
 *     NVAL = INTEGER (Returned)
-*        The number of values obtained using the parameter and returned in 
+*        The number of values obtained using the parameter and returned in
 *        AXVAL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  If a null (!) parameter value is supplied, the supplied value of
-*     AXVAL is returned, and the error is annulled if the AXVAL value is 
+*     AXVAL is returned, and the error is annulled if the AXVAL value is
 *     not equal to AST__BAD.
 *     -  AXVAL is left unchanged if an error has already occurred.
 *     -  AST__BAD is returned in AXVAL if an error occurs during this routine.
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -165,14 +165,14 @@
 *  able to use them as a dynamic default.
       IF( EXACT .AND. NGOOD .LT. MXVAL ) NGOOD = 0
 
-*  If good values has been supplied in AXVAL, format them and use them 
-*  as the dynamic default for the parameter. Otherwise, use PAR_UNSET 
+*  If good values has been supplied in AXVAL, format them and use them
+*  as the dynamic default for the parameter. Otherwise, use PAR_UNSET
 *  to ensure any previous dynamic default is cancelled.
       IF( NGOOD .GT. 0 ) THEN
          TEXT = ' '
          IAT = 0
          DO I = 1, NGOOD
-            CALL CHR_APPND( AST_FORMAT( FRAME, IAXIS, AXVAL( I ), 
+            CALL CHR_APPND( AST_FORMAT( FRAME, IAXIS, AXVAL( I ),
      :                                  STATUS ), TEXT, IAT )
             IAT = IAT + 1
          END DO
@@ -198,10 +198,10 @@
       CALL CHR_APPND( ')', ATT, IAT )
       FMT = AST_GETC( FRAME, ATT( : IAT ), STATUS )
 
-*  Loop until a set of valid axis values has been obtained from the user, or 
+*  Loop until a set of valid axis values has been obtained from the user, or
 *  an error occurs.
       LOOP = .TRUE.
-      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )       
+      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, TEXT, STATUS )
@@ -229,26 +229,26 @@
             CALL ERR_REP( 'KPG1_GTAXV_1', 'Blank value supplied for '//
      :                    'parameter %^PAR.', STATUS )
 
-*  Otherwise, if the supplied string is just a colon, display a description 
+*  Otherwise, if the supplied string is just a colon, display a description
 *  of the Frame, and the default format.
          ELSE IF( TEXT( F : L ) .EQ. ':' ) THEN
 
             TEXT = ' '
             IAT = 0
             IF( MXVAL .EQ. 1 ) THEN
-               CALL CHR_APPND( 'A value is required for axis', TEXT, 
+               CALL CHR_APPND( 'A value is required for axis', TEXT,
      :                         IAT )
             ELSE IF( EXACT ) THEN
                CALL CHR_PUTI( MXVAL, TEXT, IAT )
                IAT = IAT + 1
-               CALL CHR_APPND( 'values are required for axis', TEXT, 
+               CALL CHR_APPND( 'values are required for axis', TEXT,
      :                         IAT )
             ELSE
                CALL CHR_APPND( 'Up to', TEXT, IAT )
                IAT = IAT + 1
                CALL CHR_PUTI( MXVAL, TEXT, IAT )
                IAT = IAT + 1
-               CALL CHR_APPND( 'values are required for axis', TEXT, 
+               CALL CHR_APPND( 'values are required for axis', TEXT,
      :                         IAT )
             END IF
             IAT = IAT + 1
@@ -276,14 +276,14 @@
 *  Assume that the supplied parameter value was acceptable.
             LOOP = .FALSE.
 
-*  Read values for the axis, counting the number obtained. NC is the number 
+*  Read values for the axis, counting the number obtained. NC is the number
 *  of characters read by AST_UNFORMAT including trailing spaces.
             NVAL = 0
             DO WHILE( F .LE. L .AND. STATUS .EQ. SAI__OK )
                NC = AST_UNFORMAT( FRAME, IAXIS, TEXT( F : L ), AXV,
-     :                            STATUS ) 
+     :                            STATUS )
 
-*  If the supplied string was invalid, report an error. 
+*  If the supplied string was invalid, report an error.
                IF( NC .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
                   LOOP = .TRUE.
                   STATUS = SAI__ERROR
@@ -292,7 +292,7 @@
                   CALL MSG_SETC( 'TEXT', TEXT )
 
                   CALL ERR_REP( 'KPG1_GTAXV_2', 'Invalid ^LAB '//
-     :                          'value supplied in ''^TEXT''.', 
+     :                          'value supplied in ''^TEXT''.',
      :                          STATUS )
 
 *  Otherwise increment the number of axis values obtained, and store the
@@ -319,7 +319,7 @@
             END DO
 
 *  Report an error if too few values were obtained
-            IF( NVAL .LT. MXVAL .AND. EXACT .AND. 
+            IF( NVAL .LT. MXVAL .AND. EXACT .AND.
      :          STATUS .EQ. SAI__OK ) THEN
                LOOP = .TRUE.
                STATUS = SAI__ERROR
@@ -329,14 +329,14 @@
                CALL MSG_SETC( 'TEXT', TEXT )
 
                CALL ERR_REP( 'KPG1_GTAXV_2', 'Too few (i.e. less than'//
-     :                       ' ^M) ^LAB values supplied in ''^TEXT''.', 
+     :                       ' ^M) ^LAB values supplied in ''^TEXT''.',
      :                       STATUS )
             END IF
 
          END IF
 
-*  Loop if an error has occurred, unless it occurred within an infrastructure 
-*  library (except for errors reported by AST_UNFORMAT indicating bad text 
+*  Loop if an error has occurred, unless it occurred within an infrastructure
+*  library (except for errors reported by AST_UNFORMAT indicating bad text
 *  supplied by the user).
          IF( STATUS .EQ. SAI__ERROR .OR.
      :       STATUS .EQ. AST__UNFER ) LOOP = .TRUE.
@@ -360,7 +360,7 @@
             ELSE
                CALL MSG_SETI( 'M', MXVAL )
                CALL MSG_OUT( 'KPG1_GTAXV_M1', 'Please supply up to ^M'//
-     :                       ' ^LAB values for parameter %^PAR.', 
+     :                       ' ^LAB values for parameter %^PAR.',
      :                       STATUS )
             END IF
 

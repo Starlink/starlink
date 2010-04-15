@@ -14,14 +14,14 @@
 *     CALL PROJ_AITLMPTQK( PHI0, THETA0, L, M, GPAR, PHI, THETA, STATUS )
 
 *  Description:
-*     Uses a AIT projection 
-*     
+*     Uses a AIT projection
+*
 *     L is assumed to be positive to the east
 *     M is assumed to be positive to the north
 *
 *     Based on the AIPS implementation of these geometries - see
 *     AIPS memos 27 & 46 - Eric Greisen.
-*     
+*
 
 *  Arguments:
 *     PHI0 = DOUBLE PRECISION (Given)
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,7 +65,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ASTRO_PAR'        ! Standard astronomical parameters
       INCLUDE 'PROJ_PAR'         ! parameters for the proj routines
-                                 
+
 *  Arguments Given:
       DOUBLE PRECISION PHI0, THETA0, L, M, GPAR(3)
 
@@ -91,7 +91,7 @@
       AMP=L*L+M*M
 
 *  Only if all of the conditions are fulfilled will the projection be
-*  valid 
+*  valid
       STATUS=PROJ__UNDEFINED
       IF ( ABS(AMP).LE. D2PI*D2PI/2.5D0) THEN
          IF ( L.EQ.0D0 .AND. M.EQ.0D0 ) THEN
@@ -119,7 +119,7 @@
       ELSE
          STATUS=PROJ__BADLM
       END IF
-      
+
 
 
 *  make sure that PHI is in correct range

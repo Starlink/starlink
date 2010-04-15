@@ -55,9 +55,9 @@
 *        Use starutil to get strlcpy function.
 
 *  Notes:
-*     - This is for use from C only. 
+*     - This is for use from C only.
 *     - Use starutil's star_strlcat if you can not use the Starlink error
-*       system. 
+*       system.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -100,7 +100,7 @@
 size_t
 one_strlcpy( char * dest, const char * src, size_t size, int * status ) {
   size_t retval = 0;
-  
+
   if (dest) {
     dest[0] = '\0';
   }
@@ -133,6 +133,6 @@ one_strlcpy( char * dest, const char * src, size_t size, int * status ) {
        so just return the size that is actually relevant */
     retval = size - 1;
   }
-  
+
   return retval;
 }

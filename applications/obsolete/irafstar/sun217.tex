@@ -20,13 +20,13 @@ To extend the choice of data-reduction software for
 \htmladdnormallink{IRAF}{\IRAFURL}
 users, a system has been developed which enables applications written for the
 \htmladdnormallink{Starlink}{\STARURL}
-software environment to be run from the IRAF CL. 
-Data conversion between the IRAF image format and the Starlink Extensible 
-N-Dimensional Data Format (NDF) can be done without the need for additional 
+software environment to be run from the IRAF CL.
+Data conversion between the IRAF image format and the Starlink Extensible
+N-Dimensional Data Format (NDF) can be done without the need for additional
 conversion steps so IRAF and Starlink applications can be intermixed easily.
 \par
-This document assumes that the reader is familiar with running IRAF 
-applications, and describes in general terms how to install and run Starlink 
+This document assumes that the reader is familiar with running IRAF
+applications, and describes in general terms how to install and run Starlink
 applications for use with IRAF.
 Information about which application packages are available, and more specific
 information relating to particular packages may be found elsewhere.
@@ -62,7 +62,7 @@ information relating to particular packages may be found elsewhere.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -130,7 +130,7 @@ information relating to particular packages may be found elsewhere.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\texttt{\symbol{95}}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -222,12 +222,12 @@ information relating to particular packages may be found elsewhere.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -262,8 +262,8 @@ information relating to particular packages may be found elsewhere.
 \setcounter{page}{1}
 
 \section{\xlabel{introduction}Introduction}
-The UK 
-\htmladdnormallink{Starlink Project}{\STARURL} 
+The UK
+\htmladdnormallink{Starlink Project}{\STARURL}
 provides a collection of software to reduce and analyse astronomical data.
 \latexonly{Full details of the project and software available can be found at
 our web site, \texttt{http://www.starlink.ac.uk}.}
@@ -271,13 +271,13 @@ The software is described in a series of Starlink User Notes (SUN's), Starlink
 System Notes (SSN's), Starlink Guides (SG's) and Starlink Cookbooks (SC's),
 available in hardcopy or hypertext form.
 
-For some time 
+For some time
 Starlink application programs have been able to
-optionally read and write IRAF image ({\texttt{.imh}}) or FITS files instead 
+optionally read and write IRAF image ({\texttt{.imh}}) or FITS files instead
 of the standard Starlink
 \xref{Extensible N-Dimensional Data Format (NDF)}{sun33}{} files.
 Now a system has been developed to enable Starlink applications to be
-run from the 
+run from the
 \htmladdnormallink{IRAF}{\IRAFURL}
 CL, allowing applications written for the two different environments to be
 intermixed easily.
@@ -290,10 +290,10 @@ any problems or comments you may have. Please e-mail to The Starlink Software
 Librarian (\texttt{ussc@star.rl.ac.uk}).
 
 \section{\xlabel{setting_up}Setting Up}
-At Starlink sites, the Site Manager will have installed (or can be requested 
-to install) the necessary software and all required environment variables are 
-set when the \texttt{/star/etc/login} file is `sourced' \dash\ the normal way 
-for running any Starlink software. 
+At Starlink sites, the Site Manager will have installed (or can be requested
+to install) the necessary software and all required environment variables are
+set when the \texttt{/star/etc/login} file is `sourced' \dash\ the normal way
+for running any Starlink software.
 For other sites, consult the
 \htmlref{installation instructions}{installing}\latexonly{ in Appendix
 \ref{installing}} for advice on obtaining and installing the software.
@@ -316,7 +316,7 @@ cl> figaro
       abline      cspike      fwconv      imult       mask        soft
       adjoin      delobj      gauss       interp      maskext     spflux
 
-                           etc.. 
+                           etc..
 fi>
 \end{verbatim} \end{quote}
 and applications may be run.
@@ -333,13 +333,13 @@ cl> figdemo
 
 Starlink applications tend to have more parameters than IRAF applications but
 many of them will never require altering by the user.
-In most cases parameters will be handled as expected but, because of the 
-differences between the Starlink and IRAF parameter systems, there are a few 
-cases where the handling of parameters may surprise IRAF users. 
+In most cases parameters will be handled as expected but, because of the
+differences between the Starlink and IRAF parameter systems, there are a few
+cases where the handling of parameters may surprise IRAF users.
 These are discussed in the following sections.
 
 \subsection{\xlabel{data_format_conversion}Data Format Conversion}
-As a simple example, Figaro contains an application \texttt{istat} which 
+As a simple example, Figaro contains an application \texttt{istat} which
 provides statistics on an image file.
 \begin{quote} \begin{verbatim}
 fi> istat comwest
@@ -355,16 +355,16 @@ Sigma = 63.4732
 fi>
 \end{verbatim} \end{quote}
 
-Unless there is a genuine NDF ({\texttt{comwest.sdf}}) present, the application 
+Unless there is a genuine NDF ({\texttt{comwest.sdf}}) present, the application
 will attempt to open an IRAF image file, \texttt{comwest.imh} (or failing that
 a FITS file, \texttt{comwest.fit} or \texttt{comwest.fits}), use an
-\htmlref{automatic conversion process}{more_on_automatic_data_conversion} 
-to convert it to a temporary NDF file and process that to provide the 
+\htmlref{automatic conversion process}{more_on_automatic_data_conversion}
+to convert it to a temporary NDF file and process that to provide the
 statistics.
 
-Where applications create image files, IRAF image files will be created by 
+Where applications create image files, IRAF image files will be created by
 default.
-\latexonly{The automatic data conversion is discussed more in Section 
+\latexonly{The automatic data conversion is discussed more in Section
 \ref{more_on_automatic_data_conversion}.}
 
 Note that filenames must be specified explicitly for Starlink applications,
@@ -386,20 +386,20 @@ Sigma = 62.4827
 
 fi>
 \end{verbatim} \end{quote}
-\emph{Note that the subset indices must be 
+\emph{Note that the subset indices must be
 \xref{NDF-type indices}{sun33}{using_subscripts_to_access_ndf_sections}
-\latexonly{, as described in SUN/33,} but enclosed in \texttt{[]} rather than 
+\latexonly{, as described in SUN/33,} but enclosed in \texttt{[]} rather than
 \texttt{()}.}
 
-In the Starlink notation, omitting any of the bounds from the subscript 
-expression will cause the appropriate (lower or upper) bound of the NDF to be 
-used instead. 
-If the separating `:' is also omitted, then the lower and upper bounds of the 
-section will both be set to the same value, so that a single pixel will be 
+In the Starlink notation, omitting any of the bounds from the subscript
+expression will cause the appropriate (lower or upper) bound of the NDF to be
+used instead.
+If the separating `:' is also omitted, then the lower and upper bounds of the
+section will both be set to the same value, so that a single pixel will be
 selected for that dimension. Omitting the bounds entirely for a dimension (but
-still retaining the comma) will cause the entire extent of that dimension to 
+still retaining the comma) will cause the entire extent of that dimension to
 be used.
-Thus, 
+Thus,
 \begin{quote} \begin{verbatim}
 image[50:,64]
 \end{verbatim} \end{quote}
@@ -414,16 +414,16 @@ would specify the whole of line 64.
 In addition to the lower and upper bounds form in the example, the form
 \verb!c~e! will specify the centre and extent of a subset. For example:
 \begin{quote} \begin{verbatim}
-name[100~11,200~5] 
+name[100~11,200~5]
 \end{verbatim} \end{quote}
-would refer to an 11 $\times$ 5 pixel region of an image centred on pixel 
-(100, 200). 
+would refer to an 11 $\times$ 5 pixel region of an image centred on pixel
+(100, 200).
 The two forms can be combined in one subset specification.
 
 \subsection{\xlabel{dynamic_parameters}Dynamic Parameters}
-The \texttt{istat} parameters \texttt{ystart}, \texttt{yend}, \texttt{xstart} 
+The \texttt{istat} parameters \texttt{ystart}, \texttt{yend}, \texttt{xstart}
 and \texttt{xend} provide an alternative way of specifying a subset of an image
-so you could analyse the subset \texttt{comwest[50:200,100:250]} equally well 
+so you could analyse the subset \texttt{comwest[50:200,100:250]} equally well
 by:
 \begin{quote} \begin{verbatim}
 fi> istat comwest xstart=50 xend=200 ystart=100 yend=250
@@ -438,29 +438,29 @@ Sigma = 62.4827
 
 fi>
 \end{verbatim} \end{quote}
-(but note that the pixels indices here are relative to the whole image whereas 
+(but note that the pixels indices here are relative to the whole image whereas
 in the previous example they were relative to the subset).
 
 However, these parameters will usually require to be set to the lower and
 upper bounds for the particular image \dash\ values determined by the application
 at runtime \dash\ so they have to be treated as so-called
-\htmlref{`dynamic parameters'}{more_on_dynamic_parameters}. 
+\htmlref{`dynamic parameters'}{more_on_dynamic_parameters}.
 If a value is not specified on the command line, dynamic parameters
 will take a value suggested by the program at runtime (in this
-case the lower and upper bounds for the image) without reference to the value 
-of the corresponding IRAF parameter. Editing the values with \texttt{eparam} 
-will have no effect but the IRAF parameter will be set to the value actually 
+case the lower and upper bounds for the image) without reference to the value
+of the corresponding IRAF parameter. Editing the values with \texttt{eparam}
+will have no effect but the IRAF parameter will be set to the value actually
 used.
 
-A number of Figaro applications have these start and end of image parameters 
+A number of Figaro applications have these start and end of image parameters
 and they are always treated in the same way.
-\latexonly{Dynamic parameters are discussed more in Section 
-\ref{more_on_dynamic_parameters}.} 
+\latexonly{Dynamic parameters are discussed more in Section
+\ref{more_on_dynamic_parameters}.}
 
 \subsection{\xlabel{output_parameters}Output Parameters}
-Starlink applications sometimes make use of output parameters. 
-The values of the corresponding IRAF parameters will be updated after the 
-application has run. For example, \texttt{istat} writes the values calculated 
+Starlink applications sometimes make use of output parameters.
+The values of the corresponding IRAF parameters will be updated after the
+application has run. For example, \texttt{istat} writes the values calculated
 to output parameters as well as displaying them.
 \begin{quote} \begin{verbatim}
 fi> istat comwest
@@ -483,8 +483,8 @@ The documentation for applications will list their output parameters.
 
 \subsection{\xlabel{graphical_output}Graphical Output}
 For graphical and image display, Starlink packages do not use the normal IRAF
-\texttt{stdimage} with the \texttt{imtool} or \texttt{saoimage} systems. 
-Instead, the name of the desired device is given as a parameter to the 
+\texttt{stdimage} with the \texttt{imtool} or \texttt{saoimage} systems.
+Instead, the name of the desired device is given as a parameter to the
 application using a name from the Starlink
 \xref{Graphics Name Service}{sun57}{}\latexonly{ (see SUN/57)}.
 
@@ -501,11 +501,11 @@ so that it can be used by other applications.
 
 You can override the device specified by the \texttt{soft} task for subsequent
 applications by specifying a device parameter on the command line but not
-by editing in \texttt{eparam} (this is another example of a 
+by editing in \texttt{eparam} (this is another example of a
 \htmlref{`dynamic'}{dynamic_parameters}
 parameter).
 
-You can get a complete list of the devices available by using 
+You can get a complete list of the devices available by using
 \texttt{soft} as follows:
 \begin{quote} \begin{verbatim}
 fi> soft options+
@@ -525,43 +525,43 @@ x2overlay  X-overlay
 (SOftdev) Device to use for soft plots (xw):
 fi>
 \end{verbatim} \end{quote}
-Note that the names can be abbreviated to an unambiguous value so that 
+Note that the names can be abbreviated to an unambiguous value so that
 \texttt{xw} is short for \texttt{xwindows}.
 
 \subsection{\xlabel{boolean_parameters}Boolean Parameters}
-The \texttt{options} parameter of \texttt{soft} is an example of using a 
+The \texttt{options} parameter of \texttt{soft} is an example of using a
 boolean parameter.
-When running from IRAF CL, the values \texttt{yes} and \texttt{no} can be 
+When running from IRAF CL, the values \texttt{yes} and \texttt{no} can be
 given and, on the command line, \texttt{parname+} and \texttt{parname-} may be
-used as equivalents for \texttt{parname=yes} and \texttt{parname=no} in the 
+used as equivalents for \texttt{parname=yes} and \texttt{parname=no} in the
 normal way.
 
 However, in the Starlink environment, boolean parameters are known as logical
-parameters and may take the values \texttt{true} or \texttt{false} as 
-equivalents to \texttt{yes} or \texttt{no}. 
-The single letters \texttt{t}, \texttt{f}, \texttt{y} or \texttt{n} are also 
-accepted and case is not significant. 
-For logical parameters on the Starlink command line, 
-\texttt{parname} is equivalent to \texttt{parname=yes} and 
+parameters and may take the values \texttt{true} or \texttt{false} as
+equivalents to \texttt{yes} or \texttt{no}.
+The single letters \texttt{t}, \texttt{f}, \texttt{y} or \texttt{n} are also
+accepted and case is not significant.
+For logical parameters on the Starlink command line,
+\texttt{parname} is equivalent to \texttt{parname=yes} and
 \texttt{noparname} is equivalent to \texttt{parname=no}.
 This may be reflected in help text and messages or prompts but the IRAF rules
 must be applied when running from IRAF CL.
 
 \subsection{\xlabel{array_parameters}Array Parameters}
-The IRAF parameter corresponding to a Starlink vector or array parameter is 
+The IRAF parameter corresponding to a Starlink vector or array parameter is
 defined as type struct and its value must be given in the form supported by
-Starlink, \textit{e.g.}\ a 2 $\times$ 2 array might be given as 
+Starlink, \textit{e.g.}\ a 2 $\times$ 2 array might be given as
 \texttt{[[1,2][3,4]]}.
 The outermost \texttt{[]} may be omitted and elements can be
 separated by space or comma but, if separated by space on the command line,
 the whole lot must be enclosed in \texttt{""}.
 
-The Figaro contouring program \texttt{icont}, provides 
+The Figaro contouring program \texttt{icont}, provides
 an example of using a vector parameter (and the default graphics device set up
 by \texttt{soft}).
 
 If you want to specify the contour levels for \texttt{icont}, set
-parameter \texttt{byvalue} to \texttt{yes}, specify the number of contours 
+parameter \texttt{byvalue} to \texttt{yes}, specify the number of contours
 and give the required contour levels as a 1-D array. You will be prompted for
 other parameters which \texttt{icont} requires.
 \begin{quote} \begin{verbatim}
@@ -571,10 +571,10 @@ fi> icont comwest byvalue=yes contours=4 levels="50 100 150 200"
 (LABel) Label for plot: comwest
 fi>
 \end{verbatim} \end{quote}
-A contour plot of the \texttt{comwest} image will be displayed on the default 
+A contour plot of the \texttt{comwest} image will be displayed on the default
 graphics device.
 
-Don't worry about the capitalization of the first few characters of the 
+Don't worry about the capitalization of the first few characters of the
 parameter names in the prompts \dash\ this is historical from an early system
 of parameter name abbreviation. You can use the IRAF system of specifying the
 minimum unambiguous string. For example:
@@ -584,13 +584,13 @@ icont comwest b=yes c=4 le="50 100 150 200" a=yes hardc=no la=comwest
 would achieve the same result as the previous example.
 
 \subsection{\xlabel{the_indef_and_null_values}\label{indef_and_null}The INDEF and NULL Values}
-The Starlink parameter system allows parameters to be defined as NULL 
-(specified by a parameter value of \texttt{!}). 
+The Starlink parameter system allows parameters to be defined as NULL
+(specified by a parameter value of \texttt{!}).
 References to NULL and/or \texttt{!}\ may occur, particularly in error messages.
 
-IRAF will not in general accept \texttt{!}\ as a parameter value but if INDEF 
-is specified, it will get translated to \texttt{!}\ before being passed to the 
-Starlink application, thus setting the Starlink parameter to NULL. 
+IRAF will not in general accept \texttt{!}\ as a parameter value but if INDEF
+is specified, it will get translated to \texttt{!}\ before being passed to the
+Starlink application, thus setting the Starlink parameter to NULL.
 The precise effect of this depends upon the application but it is sometimes
 used to terminate the program and will often be treated as an error.
 
@@ -616,66 +616,66 @@ where \textit{subsystem}
 indicates where the error was detected. For example, \texttt{NDF\_OPEN:}
 indicates that the subroutine NDF\_OPEN detected the error; \texttt{SUBPAR:}
 indicates that the Starlink parameter system detected the error. There will
-often be a string of messages giving more precise information about what 
+often be a string of messages giving more precise information about what
 happened.
 
 \subsection{\xlabel{help}Help}
 Help is available for the Starlink applications using the \texttt{help} command
-in the normal way but in some cases the text may be oriented toward Starlink 
+in the normal way but in some cases the text may be oriented toward Starlink
 usage with use of NULL \textit{etc.}\ as
-\htmlref{already described}{indef_and_null}. 
-Similarly, displayed messages, particularly error messages, may appear slightly 
-strange to users familiar with IRAF applications but we hope that their meaning 
-will be obvious. 
+\htmlref{already described}{indef_and_null}.
+Similarly, displayed messages, particularly error messages, may appear slightly
+strange to users familiar with IRAF applications but we hope that their meaning
+will be obvious.
 
-Please contact The Starlink Software Librarian (\texttt{ussc@star.rl.ac.uk}) if 
+Please contact The Starlink Software Librarian (\texttt{ussc@star.rl.ac.uk}) if
 you have any problems.
 
 \section{\xlabel{for_starlink_users}For Starlink Users}
 If you are familiar with running applications in the Starlink environment, you
-should note that a number of commonly-used facilities are not available when 
+should note that a number of commonly-used facilities are not available when
 running from IRAF CL.
 \begin{description}
-\item[Special Keywords] The special keywords, PROMPT, RESET and ACCEPT 
-(\verb!\!) may not be given on the command line, nor ACCEPT (\verb!\!) in 
+\item[Special Keywords] The special keywords, PROMPT, RESET and ACCEPT
+(\verb!\!) may not be given on the command line, nor ACCEPT (\verb!\!) in
 response to a prompt.
 IRAF has its own ways of achieving similar effects.
 \item[MIN/MAX] `MIN' and `MAX' may not be specified as parameter values.
 Range information from the Starlink interface file will be inserted in the
 min and max positions for the corresponding IRAF parameter but there can be
 no other interaction between the two systems.
-\item[Parameter Help] The \texttt{?}\ and \texttt{??}\ responses may not be 
+\item[Parameter Help] The \texttt{?}\ and \texttt{??}\ responses may not be
 given to obtain help at parameter prompts.
 \item[Missing Applications] Some applications may not have been made available
-for IRAF. In particular, the help applications such as \texttt{FIGHELP} and 
+for IRAF. In particular, the help applications such as \texttt{FIGHELP} and
 \texttt{KAPHELP} are likely to be missing.
-\item[No VPATH] The Starlink \texttt{VPATH} mechanism is overridden so that 
-values are likely to be requested in IRAF which were not requested in the 
+\item[No VPATH] The Starlink \texttt{VPATH} mechanism is overridden so that
+values are likely to be requested in IRAF which were not requested in the
 Starlink environment. Furthermore, the default values may be different.
-\item[ABORT ({\texttt{!!}})] The abort response ({\texttt{!!}}) may not be 
-given in response to a parameter prompt. 
-If applications rely on this then specific solutions will be required when 
+\item[ABORT ({\texttt{!!}})] The abort response ({\texttt{!!}}) may not be
+given in response to a parameter prompt.
+If applications rely on this then specific solutions will be required when
 running from IRAF \dash\ consult the package documentation.
 \end{description}
 
 \section{\xlabel{more_on_automatic_data_conversion}\label{more_on_automatic_data_conversion}More on Automatic Data Conversion}
-The standard data format for Starlink applications is the 
+The standard data format for Starlink applications is the
 \xref{Extensible N-Dimensional Data Format (NDF)}{sun33}{}
 and the library of routines for handling NDFs has built-in facilities for
-converting between NDFs and other data formats (notably IRAF \texttt{.imh} 
-format and FITS) `on-the-fly'. 
-Applications using the NDF library can therefore read and write data files in 
+converting between NDFs and other data formats (notably IRAF \texttt{.imh}
+format and FITS) `on-the-fly'.
+Applications using the NDF library can therefore read and write data files in
 the foreign formats without a separate conversion step.
 The NDF conversion facilities are controlled by setting environment variables
 and are described fully in \xref{SSN/20}{ssn20}{}.
 
 \subsection{\xlabel{default_file_types}Default File Types}
 The default situation for Starlink applications running from IRAF CL is that
-given an input NDF filename, \textit{filename}, they will attempt to open a 
-genuine NDF file, \textit{filename}{\texttt{.sdf}}; failing that they will 
-attempt to open and convert an IRAF image file, 
-\textit{filename}{\texttt{.imh}} and, failing that, a FITS file, 
-\textit{filename}{\texttt{.fit}} or \textit{filename}{\texttt{.fits}}. 
+given an input NDF filename, \textit{filename}, they will attempt to open a
+genuine NDF file, \textit{filename}{\texttt{.sdf}}; failing that they will
+attempt to open and convert an IRAF image file,
+\textit{filename}{\texttt{.imh}} and, failing that, a FITS file,
+\textit{filename}{\texttt{.fit}} or \textit{filename}{\texttt{.fits}}.
 
 For output NDFs, the default is to produce IRAF image files automatically but
 you can change this with the command:
@@ -701,7 +701,7 @@ conversion system are set when the first Starlink package is loaded and will
 not be reset by loading other packages.
 
 \subsection{\xlabel{using_explicit_file_extensions}Using Explicit File Extensions}
-You can also specify filetypes (other than NDF) by giving a recognised 
+You can also specify filetypes (other than NDF) by giving a recognised
 extension on the filename. For example, if \texttt{wrndf} is a program which
 creates an NDF named by the `out' parameter, under the normal default conditions
 \begin{quote} \begin{verbatim}
@@ -714,11 +714,11 @@ fi> wrndf out=file.fits
 will produce a FITS file, \texttt{file.fits}.
 
 \subsection{\xlabel{some_pitfalls}Some Pitfalls}
-You should be aware that a few applications do not use the NDF library so 
-this conversion is not always possible. 
-Furthermore, some applications require or write components of NDFs which do 
-not exist in other formats and so get lost or are not available in the 
-conversion process. 
+You should be aware that a few applications do not use the NDF library so
+this conversion is not always possible.
+Furthermore, some applications require or write components of NDFs which do
+not exist in other formats and so get lost or are not available in the
+conversion process.
 In particular quality, variance and axis information may not be propagated
 correctly.
 
@@ -727,15 +727,15 @@ There is some discussion of these matters, with some possible solutions, under
 in SSN/20.
 
 Where components are lost in converting from NDF, you may be able
-to string together a sequence of Starlink applications starting and 
+to string together a sequence of Starlink applications starting and
 ending with IRAF-format files but using NDFs for intermediate processing.
 
-By default, conversion is done by the appropriate Starlink applications from 
+By default, conversion is done by the appropriate Starlink applications from
 the
 \xref{CONVERT}{sun55}{}
-package\latexonly{ described in SUN/55} \dash\ the default values of their 
-parameters are used (consult their documentation for more details). 
-If this does not suit your requirements, you can change the behaviour by 
+package\latexonly{ described in SUN/55} \dash\ the default values of their
+parameters are used (consult their documentation for more details).
+If this does not suit your requirements, you can change the behaviour by
 resetting the appropriate environment variables as detailed in
 \xref{SSN/20}{ssn20}{}.
 
@@ -743,30 +743,30 @@ Also note that currently the conversion process with
 \xref{\texttt{iraf2ndf}}{sun55}{IRAF2NDF}
 and
 \xref{\texttt{ndf2iraf}}{sun55}{NDF2IRAF},
-is subject to the limitations of the IRAF IMFORT library, \textit{i.e.}\ only 
+is subject to the limitations of the IRAF IMFORT library, \textit{i.e.}\ only
 IRAF short-integer and real datatype images can be handled.
 
 \section{\xlabel{more_on_dynamic_parameters}\label{more_on_dynamic_parameters}More on Dynamic Parameters}
 The Starlink software environment allows parameter default values to be
 calculated at runtime by the application or to be set to the value of
-`global' parameters set by other applications. 
+`global' parameters set by other applications.
 For correct operation of the applications
 it has been necessary for some parameters to take these default values without
-reference to the corresponding IRAF parameter value. 
+reference to the corresponding IRAF parameter value.
 In most cases you will not want to specify a value for these parameters
-anyway but the default can always be overridden by including the parameter on 
-the command line (but not by editing the parameter file with \texttt{eparam}). 
+anyway but the default can always be overridden by including the parameter on
+the command line (but not by editing the parameter file with \texttt{eparam}).
 In all cases the IRAF parameter value will be updated to the value actually
-used. 
+used.
 
 It is therefore possible that you might set a value in \texttt{eparam} but the
-application uses a different value. To minimise this risk, the prompt string 
-as displayed by \texttt{eparam} and \texttt{lparam} will be prefixed with 
+application uses a different value. To minimise this risk, the prompt string
+as displayed by \texttt{eparam} and \texttt{lparam} will be prefixed with
 `{\texttt{*!\ }}' to indicate that the parameter is dynamic.
 
 \section{\xlabel{final_note}Final Note}
 Users of Starlink applications from IRAF need not be too concerned with the
-details of how the system works. If you are interested, it was described by 
+details of how the system works. If you are interested, it was described by
 Dave Terrett in
 \htmladdnormallink{Starlink Bulletin 16}
 {http://www.starlink.ac.uk/bulletin/95dec/95dec.html}
@@ -775,7 +775,7 @@ and the way in which packages are set up is described in
 It is probably sufficient to know that communications between CL and the task
 are intercepted by an adaptor process which does such things as changing data
 values between IRAF and Starlink (ADAM) format, and handling parameters in
-an appropriate way before passing the messages on.  
+an appropriate way before passing the messages on.
 
 
 \appendix
@@ -784,18 +784,18 @@ an appropriate way before passing the messages on.
 \subsection{\xlabel{general}General}
 No special privileges are required to install Starlink software. Installation
 is a two-stage process. First the software item is built in a source directory
-and then the built files are moved (`installed' in Starlink parlance) to 
-directories beneath a top-level Starlink installation directory using 
-\texttt{make}. 
-At Starlink sites, this top-level directory is \texttt{/star} but it can be 
-anywhere, defined for \texttt{make} by the environment variable 
+and then the built files are moved (`installed' in Starlink parlance) to
+directories beneath a top-level Starlink installation directory using
+\texttt{make}.
+At Starlink sites, this top-level directory is \texttt{/star} but it can be
+anywhere, defined for \texttt{make} by the environment variable
 \texttt{INSTALL}.
 
-\emph{ N.B. `\texttt{/star}' is used in the examples below to indicate this 
+\emph{ N.B. `\texttt{/star}' is used in the examples below to indicate this
 top-level \texttt{INSTALL} directory and should be substituted appropriately.}
 
-Makefiles are provided with targets \texttt{build}, \texttt{install}, 
-\texttt{unbuild}, \texttt{deinstall} \textit{etc.}\ but software will usually 
+Makefiles are provided with targets \texttt{build}, \texttt{install},
+\texttt{unbuild}, \texttt{deinstall} \textit{etc.}\ but software will usually
 be obtained in a ready-built form, probably via the
 \htmladdnormallink{Starlink Software Store}{\STORE}\latexonly{\footnote{\STORE}}
 which handles the whole installation process with just a few prompts to the
@@ -808,9 +808,9 @@ that you are obtaining ready-built systems.
 This document is written assuming that the Starlink applications to be run are
 part of a larger package, Figaro or KAPPA for example.
 
-The IRAF-special files associated with Starlink packages (the 
-\textit{package}{\texttt{.cl}} and \texttt{.par} files \textit{etc.}) will be 
-installed in directory \texttt{/star/iraf/{\textit{package}}}, where 
+The IRAF-special files associated with Starlink packages (the
+\textit{package}{\texttt{.cl}} and \texttt{.par} files \textit{etc.}) will be
+installed in directory \texttt{/star/iraf/{\textit{package}}}, where
 \textit{package} is the package (Software Item) name in lower case.
 
 In the long run these files will be part of the normal Starlink installation
@@ -819,45 +819,45 @@ a separate item.
 
 \subsection{\xlabel{other_required_software_items}Other Required Software Items}
 Most Starlink application packages will require certain other Starlink software
-items to be installed. For ease of installation and operation, all Starlink 
-software should be installed beneath the same top-level \texttt{INSTALL} 
+items to be installed. For ease of installation and operation, all Starlink
+software should be installed beneath the same top-level \texttt{INSTALL}
 directory.
 
 The required items are:
 \begin{description}
-\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability 
+\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability
 infrastructure\latexonly{ (see SSN/35)}. IRAFSTAR
 will be required by any Starlink application being run from IRAF CL but does
-not include any applications itself. 
-\item[\xref{TCLSYS}{sun200}{}] This is the Starlink distribution of 
+not include any applications itself.
+\item[\xref{TCLSYS}{sun200}{}] This is the Starlink distribution of
 \htmladdnormallink{Tcl}{\TCLURL}
-and associated items\latexonly{ (see SUN/200)}. 
+and associated items\latexonly{ (see SUN/200)}.
 Tcl is used by IRAFSTAR which expects it to be the Starlink distribution
-installed in \texttt{/star}. 
-If you already have Tcl installed elsewhere, you may not need this Starlink 
-item, but you will need to check the versions and will have to set the 
+installed in \texttt{/star}.
+If you already have Tcl installed elsewhere, you may not need this Starlink
+item, but you will need to check the versions and will have to set the
 TCL\_LIBRARY environment variable appropriately.
 \item[\xref{STARTCL}{sun186}{}] Starlink Tcl extensions \dash\ includes the
 TCL/GWM Xdisplay Widget\latexonly{ (see SUN/186)}.
 \item[RUNTIME] Miscellaneous items of software required by most applications
 at runtime.
-\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the 
+\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the
 automatic data-conversion facilities are to be used\latexonly{ (see SUN/55)}.
-\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during 
+\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during
 installation of Starlink software\latexonly{ (see SUN/188)}.
 \end{description}
 
 \subsection{\xlabel{making_starlink_known_to_iraf}Making Starlink Known to IRAF}
 The preferred way of defining new external packages for IRAF is to edit
-the \texttt{hlib\$extern.pkg} file. To define Starlink packages, add entries as 
+the \texttt{hlib\$extern.pkg} file. To define Starlink packages, add entries as
 follows:
 \begin{quote} \begin{verbatim}
 reset   starlink            = /star/iraf/
 \end{verbatim} \end{quote}
-and add `{\texttt{,starlink\$irafstar/helpdb.mip}}' to the \texttt{helpdb} 
+and add `{\texttt{,starlink\$irafstar/helpdb.mip}}' to the \texttt{helpdb}
 definition.
 
-Then add definitions for the Starlink applications packages in use. 
+Then add definitions for the Starlink applications packages in use.
 For example:
 \begin{quote} \begin{verbatim}
 reset   figaro            = starlink$figaro/
@@ -865,7 +865,7 @@ task    figaro.pkg        = figaro$figaro.cl
 \end{verbatim} \end{quote}
 and add `{\texttt{,figaro\$helpdb.mip}}' to the \texttt{helpdb} definition.
 
-If you do not have access to the \texttt{hlib\$extern.pkg} file, the above 
+If you do not have access to the \texttt{hlib\$extern.pkg} file, the above
 commands can be added to your \texttt{login.cl} file. In that case, the
 \texttt{helpdb} definition can be extended by a command like:
 \begin{quote} \begin{verbatim}
@@ -873,30 +873,30 @@ reset helpdb = (envget("helpdb") // ",figaro$helpdb.mip")
 \end{verbatim} \end{quote}
 
 \subsection{\xlabel{environment_variables}Environment Variables}
-Certain environment variables must be set for the inter-operability system to 
-run correctly. At Starlink sites all this will be done by 
+Certain environment variables must be set for the inter-operability system to
+run correctly. At Starlink sites all this will be done by
 \begin{quote} \begin{verbatim}
 % source /star/etc/login
 \end{verbatim} \end{quote}
 normally done from your \texttt{.login} file.
 
-If you have to set them yourself, remember that \texttt{/star} here should be 
+If you have to set them yourself, remember that \texttt{/star} here should be
 replaced by the top-level Starlink installation directory at your site.
 
 \begin{description}
-\item[PATH] The Starlink binaries directories must be added to your 
+\item[PATH] The Starlink binaries directories must be added to your
 \texttt{PATH}.
 \begin{quote} \begin{verbatim}
 % setenv PATH ${PATH}:/star/bin/startcl:/star/bin
 \end{verbatim} \end{quote}
 
-\item[TCL\_LIBRARY] must be set to the directory containing the 
+\item[TCL\_LIBRARY] must be set to the directory containing the
 architecture-independent Tcl files for your installation.
 \begin{quote} \begin{verbatim}
 % setenv TCL_LIBRARY /star/lib/tcl7.6
 \end{verbatim} \end{quote}
-This step is unnecessary if your \texttt{/star} directory really is 
-\texttt{/star} 
+This step is unnecessary if your \texttt{/star} directory really is
+\texttt{/star}
 and you are using the Starlink distribution of Tcl.
 
 \item[CONVERT\_DIR] must be set to the binaries directory of
@@ -905,8 +905,8 @@ the CONVERT package.
 % setenv CONVERT_DIR /star/bin/convert
 \end{verbatim} \end{quote}
 
-\item[ADAM\_USER] which defines where the Starlink environment 
-parameter files will be created, is set to \texttt{home\$uparm} within the 
+\item[ADAM\_USER] which defines where the Starlink environment
+parameter files will be created, is set to \texttt{home\$uparm} within the
 package startup scripts.
 
 \end{description}

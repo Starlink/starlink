@@ -1,5 +1,5 @@
       SUBROUTINE POL1_CM1RR( STACK, NPIX, NLINES, VARS, METH, MINPIX,
-     :                       NSIGMA, RESULT, RESVAR, WRK1, WRK2, PP, 
+     :                       NSIGMA, RESULT, RESVAR, WRK1, WRK2, PP,
      :                       COVEC, NMAT, NCON, POINT, USED, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL POL1_CM1RR( STACK, NPIX, NLINES, VARS, METH, MINPIX,
-*                      NSIGMA, RESULT, RESVAR, WRK1, WRK2, PP, COVEC, 
+*                      NSIGMA, RESULT, RESVAR, WRK1, WRK2, PP, COVEC,
 *                      NMAT, NCON, POINT, USED, STATUS )
 
 *  Description:
@@ -89,7 +89,7 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -150,9 +150,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Unless we are dowing a simple weighted mean, derive the 
-*  variance-covariance matrix for the order statistics of a 
-*  normal popl with up to NLINE members. This also sets up the 
+*  Unless we are dowing a simple weighted mean, derive the
+*  variance-covariance matrix for the order statistics of a
+*  normal popl with up to NLINE members. This also sets up the
 *  scale factor for converting mean variances to median variances.
       IF( METH .NE. 'MEAN' ) THEN
           CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, STATUS )
@@ -168,7 +168,7 @@
 *  Weighted median...
       ELSE IF ( METH .EQ. 'MEDIAN' ) THEN
          CALL CCG_MD1R( .TRUE., NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
-     :                  COVEC, RESULT, RESVAR, WRK1, WRK2, POINT, USED, 
+     :                  COVEC, RESULT, RESVAR, WRK1, WRK2, POINT, USED,
      :                  NCON, NBAD, STATUS )
 
 *  Sigma clipped mean...

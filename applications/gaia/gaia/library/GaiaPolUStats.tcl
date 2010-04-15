@@ -11,13 +11,13 @@
 
 #  Description:
 #     This class calculates statistics for the selected vectors and
-#     displays them within a page of the main notebook. Each time a new 
-#     selection is made, the page is updated to hold the new statistics. In 
-#     fact, the calculation of new statistics is only performed immediately 
-#     if this page is currently visible, otherwise the calculations are 
-#     postponed until the page becomes visible. This avoids spending 
+#     displays them within a page of the main notebook. Each time a new
+#     selection is made, the page is updated to hold the new statistics. In
+#     fact, the calculation of new statistics is only performed immediately
+#     if this page is currently visible, otherwise the calculations are
+#     postponed until the page becomes visible. This avoids spending
 #     unnecessary time calculating statistics which may never be seen.
-    
+
 #  Invocations:
 #
 #        GaiaPolUStats object_name [configuration options]
@@ -84,7 +84,7 @@ itcl::class gaia::GaiaPolUStats {
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -93,7 +93,7 @@ itcl::class gaia::GaiaPolUStats {
       set created_ 0
 
 #  Set defaults
-      reset 
+      reset
    }
 
 #  Destructor:
@@ -101,7 +101,7 @@ itcl::class gaia::GaiaPolUStats {
    destructor {
 
 #  Annul any reference to the displayed GaiaPolCat.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          catch { set cat_ [$cat_ annull] }
       }
 
@@ -133,7 +133,7 @@ itcl::class gaia::GaiaPolUStats {
 public method clear {} {
 
 #  Annul any reference to the displayed GaiaPolCat.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          set cat_ [$cat_ annull]
       }
 
@@ -160,15 +160,15 @@ public method clear {} {
             }
             set nrow [llength $stats]
 
-#  Remove any columns which are no longer available from the list of columns 
-#  to be displayed. 
+#  Remove any columns which are no longer available from the list of columns
+#  to be displayed.
             checkCols
 
 #  Get the column headings to use. If blank, use all columns.
             set cols $values_($this,cols)
             if { $cols == "" } {
                set cols $useheads_
-            } 
+            }
 
 #  Add a column at the start for the row labels.
             set heads [lreplace $cols 0 -1 " "]
@@ -180,7 +180,7 @@ public method clear {} {
          }
 
 #  Configure the TableList.
-         $itk_component(table) config -height $nrow -headings $heads 
+         $itk_component(table) config -height $nrow -headings $heads
 
 #  Ensure all columns are visible.
          $itk_component(table) set_options $heads Show 1
@@ -191,9 +191,9 @@ public method clear {} {
 #  ------------------------------------------------------
    public method newStats { cat } {
 
-#  Save a reference to the supplied GaiaPolCat, annulling any 
+#  Save a reference to the supplied GaiaPolCat, annulling any
 #  reference to a previous GaiaPolCat first.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          $cat_ annull
       }
       set cat_ [$cat clone]
@@ -205,8 +205,8 @@ public method clear {} {
       set done_ 0
 
 #  If this page of the notebook is currently visible, calculate the new
-#  statistics immediately and display them. Otherwise, statistics will 
-#  be calculated when the page is next displayed. 
+#  statistics immediately and display them. Otherwise, statistics will
+#  be calculated when the page is next displayed.
       if { [winfo viewable $w_] } {
          calc
       }
@@ -220,7 +220,7 @@ public method clear {} {
 #  Get the data array
       set data [$cat getData]
 
-#  Get access to an array of row states (selected, unselected, deleted) 
+#  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
       upvar 0 [$cat getStates] states
 
@@ -251,23 +251,23 @@ public method clear {} {
       foreach icol $icols {
          set Count($icol) 0
       }
-   
+
       for {set i 0} {$i < $nrow} {incr i} {
          if { $states($i) == "S" } {
             incr prow
             set row [lindex $data $i]
             foreach icol $icols {
                set v [lindex $row $icol]
-   
+
                if { $Count($icol) == 0 } {
                   set Min($icol) $v
                   set Max($icol) $v
                   set Sum($icol) $v
-   
+
                   if { ![catch { set Sum2($icol) [expr $v*$v] } ] } {
                      incr Count($icol)
                   }
-   
+
                } elseif { ![catch { set sum0 [expr $Sum($icol) + $v]
                                     set sum20 [expr $Sum2($icol) + $v*$v] } ] } {
                   set Sum($icol) $sum0
@@ -275,7 +275,7 @@ public method clear {} {
                   if { $v < $Min($icol) } { set Min($icol) $v }
                   if { $v > $Max($icol) } { set Max($icol) $v }
                   incr Count($icol)
-   
+
                }
             }
 
@@ -287,11 +287,11 @@ public method clear {} {
             }
          }
       }
-      
-      set jcols ""   
+
+      set jcols ""
       foreach icol $icols {
          if { $Count($icol) > 0 } {
-            if { ![catch { set mean [expr $Sum($icol)/$Count($icol)] 
+            if { ![catch { set mean [expr $Sum($icol)/$Count($icol)]
                            set sig [expr sqrt( $Sum2($icol)/$Count($icol) - $mean*$mean)] }] } {
                set Mean($icol) $mean
                set Sigma($icol) $sig
@@ -303,7 +303,7 @@ public method clear {} {
                set Min($icol) ""
                set Max($icol) ""
                set Count($icol) 0
-            } 
+            }
          } else {
             lappend jcols ""
             set Mean($icol) ""
@@ -321,10 +321,10 @@ public method clear {} {
            [lsearch -exact $stats "Sigma-clipped maximum"] != -1 } {
 
          foreach icol $icols {
-            set CMean($icol) $Mean($icol) 
-            set CSigma($icol) $Sigma($icol) 
-            set CMax($icol) $Max($icol) 
-            set CMin($icol) $Min($icol) 
+            set CMean($icol) $Mean($icol)
+            set CSigma($icol) $Sigma($icol)
+            set CMax($icol) $Max($icol)
+            set CMin($icol) $Min($icol)
             set CCount($icol) $Count($icol)
          }
 
@@ -338,7 +338,7 @@ public method clear {} {
                   set CCount($icol) 0
                }
             }
-            
+
             for {set i 0} {$i < $nrow} {incr i} {
                if { $states($i) == "S" } {
                   incr prow
@@ -349,11 +349,11 @@ public method clear {} {
                         if { $v >= $lo($icol) && $v <= $hi($icol) } {
                            if { $CCount($icol) == 0 } {
                               set CSum($icol) $v
-                              set CSum2($icol) [expr $v*$v] 
+                              set CSum2($icol) [expr $v*$v]
                               set CMax($icol) $v
                               set CMin($icol) $v
                               set CCount($icol) 1
-                           } else {                        
+                           } else {
                               set CSum($icol) [expr $CSum($icol) + $v]
                               set CSum2($icol) [expr $CSum2($icol) + $v*$v]
                               if { $v < $CMin($icol) } { set CMin($icol) $v }
@@ -373,15 +373,15 @@ public method clear {} {
 
                }
             }
-         
+
             foreach icol $jcols {
                if { $icol != "" } {
                   if { $CCount($icol) > 0 } {
                      set CMean($icol) [expr $CSum($icol)/$CCount($icol)]
-                     set tmp [expr $CSum2($icol)/$CCount($icol) - $CMean($icol)*$CMean($icol)] 
+                     set tmp [expr $CSum2($icol)/$CCount($icol) - $CMean($icol)*$CMean($icol)]
                      if { $tmp > 0.0 } {
                         set CSigma($icol) [expr sqrt($tmp)]
-                     } else {                     
+                     } else {
                         set CSigma($icol) 0.0
                      }
                   } else {
@@ -464,7 +464,7 @@ public method clear {} {
             set stats $stats_
          }
 
-#  Remove any columns which are no longer available from the list of columns 
+#  Remove any columns which are no longer available from the list of columns
 #  to be displayed.
          checkCols
 
@@ -472,7 +472,7 @@ public method clear {} {
          set cols $values_($this,cols)
          if { $cols == "" } {
             set cols $useheads_
-         } 
+         }
 
 #  Find the indices within the catalogue of the required columns.
          set icols ""
@@ -486,7 +486,7 @@ public method clear {} {
 
 #  Calculate the statistics and update the values shown in the table.
          $itk_component(table) config -info [stats $cat_ $stats $icols]
-        
+
 #  Indicate that the required statistics have now been calculated.
          set done_ 1
 
@@ -551,7 +551,7 @@ public method clear {} {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
       if { $values_($this,niter) == "" } { set values_($this,niter) "3" }
       if { $values_($this,nsigma) == "" } { set values_($this,nsigma) "3" }
@@ -561,7 +561,7 @@ public method clear {} {
 
    }
 
-#  Unselect any columns previously selected using the column selection 
+#  Unselect any columns previously selected using the column selection
 #  dialog but which are not now available in the currently displayed catalogue.
 #  ---------------------------------------------------------------------
    public method checkCols {} {
@@ -570,7 +570,7 @@ public method clear {} {
 
 #  If the cols list is not blank, we need to check that each element in
 #  the list is a heading which is available in the currently displayed
-#  catalogue. Get a list of the good column names, and a list of the 
+#  catalogue. Get a list of the good column names, and a list of the
 #  bad column names.
       if { $cols != "" } {
          set badcols ""
@@ -583,7 +583,7 @@ public method clear {} {
             } else {
                lappend goodcols $col
             }
-         }            
+         }
 
 #  If any requested columns were not available in the current headings,
 #  update the common values_ array to hold only the available columns.
@@ -604,15 +604,15 @@ public method clear {} {
       if { $cat_ != "" } {
          set xhead [lindex $headings_ [$cat_ getXCol]]
          set yhead [lindex $headings_ [$cat_ getYCol]]
-   
+
          if { [$cat_ gotWcs] } {
             set rahead [lindex $headings_ [$cat_ getRaCol]]
             set dechead [lindex $headings_ [$cat_ getDecCol]]
          } else {
-            set rahead "" 
-            set dechead "" 
+            set rahead ""
+            set dechead ""
          }
-   
+
          set useheads_ ""
          foreach head $headings_ {
             if { $head != $xhead && $head != $yhead && $head != $rahead && $head != $dechead } {
@@ -664,7 +664,7 @@ public method clear {} {
 #  Ensure the table columns and rows are as required.
       tabConfig
 
-#  Update the statistics 
+#  Update the statistics
       set done_ 0
       if { [winfo viewable $w_] } {
          calc
@@ -679,7 +679,7 @@ public method clear {} {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -710,7 +710,7 @@ public method clear {} {
          set r -1
 
 #  Items to display header...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Items to display:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -744,10 +744,10 @@ public method clear {} {
          add_short_help $itk_component(stats) {Click to select which statistics to display}
 
 #  Vertical space
-         grid [frame $w_.space1 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace1] -row [incr r]
 
 #  Vector parameters...
-         itk_component add header2 { 
+         itk_component add header2 {
 	    LabelRule $w_.header2 -text "Parameters for N-sigma clipping:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
@@ -769,7 +769,7 @@ public method clear {} {
          grid $itk_component(niter) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(niter) {Number of iterations for the sigma clipping algorithm}
 
-#  Create a LabelEntry to set the number of standard deviations for N-sigma 
+#  Create a LabelEntry to set the number of standard deviations for N-sigma
 #  clipping
          itk_component add nsigma {
 	    LabelEntry $w_.nsigma -text "N-Sigma:" \
@@ -784,10 +784,10 @@ public method clear {} {
          add_short_help $itk_component(nsigma) {Number of standard deviations for the sigma clipping algorithm}
 
 #  Vertical space
-         grid [frame $w_.space2 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space2 -height $vspace1] -row [incr r]
 
 #  Vector parameters...
-         itk_component add header3 { 
+         itk_component add header3 {
 	    LabelRule $w_.header3 -text "Statistics for currently selected vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
@@ -800,14 +800,14 @@ public method clear {} {
          itk_component add table {
             ::util::TableList $w_.table -hscroll 1 -height 4 \
                                         -selectmode extended \
-                                        -exportselection 0 
+                                        -exportselection 0
          }
          grid $itk_component(table) -row $r -column 0 -columnspan $ncol -sticky nsew -padx $px
          add_short_help $itk_component(table) {Statistics for the currently selected vectors}
          tabConfig
 
 #  Vertical space
-         grid [frame $w_.space3 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space3 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -819,7 +819,7 @@ public method clear {} {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
       }
    }
@@ -855,7 +855,7 @@ public method clear {} {
 #  Check the currently selected statistics. Check all of them if the
 #  string is blank.
       if { $values_($this,stats) != "" } {
-         $d setOptions $values_($this,stats) 
+         $d setOptions $values_($this,stats)
       } else {
          $d allOptions
       }
@@ -903,7 +903,7 @@ public method clear {} {
 #  string is blank.
       checkCols
       if { $values_($this,cols) != "" } {
-         $d setOptions $values_($this,cols) 
+         $d setOptions $values_($this,cols)
       } else {
          $d allOptions
       }
@@ -968,7 +968,7 @@ public method clear {} {
 #  Thw window containing the progress bar
    itk_option define -pbar pbar PBar {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -998,13 +998,13 @@ public method clear {} {
        variable attr_
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 
@@ -1014,7 +1014,7 @@ public method clear {} {
 #  Array for passing around at global level. Indexed by ($this,param).
    common values_
 
-#  Name of stats selection dialog window. 
+#  Name of stats selection dialog window.
    common statselect_ .polstatselect
 
 #  End of class definition.

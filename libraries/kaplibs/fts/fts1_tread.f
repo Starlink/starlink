@@ -18,7 +18,7 @@
 *     This routine reads the byte stream from the FITS tape file
 *     and extracts a FITS record of 2880 bytes.  The blocksize of
 *     the tape file is arbitrary save that it be no more than the
-*     maximum FITS blocksize of 28800. 
+*     maximum FITS blocksize of 28800.
 
 *  Arguments:
 *     FD = INTEGER (Given)
@@ -69,12 +69,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -150,7 +150,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    There are two modes of operation: where the tape blocks are smaller
-*    than the FITS record length of 2880 bytes, or where the block 
+*    than the FITS record length of 2880 bytes, or where the block
 *    length is greater or equal to the FITS record.
 
 *    Tape blocks are at least as long as the FITS record length.
@@ -217,7 +217,7 @@
 *    ================================================
 
       ELSE
-             
+
 *       Find the number of bytes remaining in the tape block.
 
          LEFT = ACTSIZ - OFFSET
@@ -285,5 +285,5 @@
 *    End of the check for the mode.
 
       END IF
-            
+
       END

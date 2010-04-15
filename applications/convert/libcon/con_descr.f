@@ -126,7 +126,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT  NONE                ! No implicit typing
 
@@ -161,7 +161,7 @@
 *  Local constants:
       INTEGER   SZDESC              ! Size of descriptors
       PARAMETER( SZDESC = 72 )
-      INTEGER   MAXELS              ! Maximum size descriptor array 
+      INTEGER   MAXELS              ! Maximum size descriptor array
       PARAMETER( MAXELS = 4000 )
       CHARACTER * ( 1 ) APS         ! Apostrophe
       PARAMETER ( APS = '''' )
@@ -184,7 +184,7 @@
                                     ! MORE.FITS
       CHARACTER FVAL * ( 20 )       ! Accommodates FITS value
       INTEGER   I                   ! Loop variable
-      INTEGER   IAX                 ! Loop variable   
+      INTEGER   IAX                 ! Loop variable
       INTEGER   ISTAT               ! Local status value
       INTEGER   KOUNT               ! Loop variable
       INTEGER   LENVAL              ! Length of a character value
@@ -250,10 +250,10 @@
          VALUE = VALUES( KOUNT )
 
 *      Report the descriptor name and value.
-         IF ( WRDSCR ) THEN 
+         IF ( WRDSCR ) THEN
             CALL MSG_SETC( 'DSCNAME', DESCR )
             CALL MSG_SETC( 'VALUE', VALUE )
-            CALL MSG_OUT( 'CON_DESCR_DSCVL', 
+            CALL MSG_OUT( 'CON_DESCR_DSCVL',
      :        '^DSCNAME : ^VALUE', STATUS )
          END IF
 
@@ -515,7 +515,7 @@
                IF ( LOST ) THEN
                   FITSTR(31:32) =  '/ '
                   FITSTR(33:70) =  'Field width exceeded: value '/
-     :                             /'truncated' 
+     :                             /'truncated'
                END IF
             END IF
 

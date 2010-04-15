@@ -85,7 +85,7 @@
             CALL GRQREP('GRSCR', 'GQDWKA', IERR)
             GO TO 9999
          END IF
-      
+
 *   Go ahead if either the colour index table is dynamic or the display
 *   surface is empty so as to avoid causing the picture to be
 *   regenerated.

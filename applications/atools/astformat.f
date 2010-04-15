@@ -20,11 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This application displays character strings containing the formatted 
-*     (character) versions of coordinate values for a Frame axis. The 
-*     formatting applied is determined by the Frame's attributes and, in 
-*     particular, by any Format attribute string that has been set for the 
-*     axis. A suitable default format (based on the Digits attribute value) 
+*     This application displays character strings containing the formatted
+*     (character) versions of coordinate values for a Frame axis. The
+*     formatting applied is determined by the Frame's attributes and, in
+*     particular, by any Format attribute string that has been set for the
+*     axis. A suitable default format (based on the Digits attribute value)
 *     will be applied if necessary.
 
 *  Usage:
@@ -32,17 +32,17 @@
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF, FITS file or text file holding the Frame. If an NDF is 
-*        supplied, the current Frame of the WCS FrameSet will be used. If a 
-*        FITS file is supplied, the Frame corresponding to the primary axis 
+*        An NDF, FITS file or text file holding the Frame. If an NDF is
+*        supplied, the current Frame of the WCS FrameSet will be used. If a
+*        FITS file is supplied, the Frame corresponding to the primary axis
 *        descriptions will be used.
 *     AXIS = INTEGER (Read)
 *         The number of the Frame axis for which formatting is to be
 *         performed (axis numbering starts at 1 for the first axis).
 *     VALUE = GROUP (Read)
 *        A comma-separated list of floating point values to be formatted.
-*        A text file may be specified by preceeding the name of the file 
-*        with an up arrow character "^". If the supplied value ends with a 
+*        A text file may be specified by preceeding the name of the file
+*        with an up arrow character "^". If the supplied value ends with a
 *        minus sign, the user is re-prompted for additional values.
 *     RESULT = LITERAL (Read)
 *        The name of a text file in which to put the formatted axis
@@ -91,8 +91,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  External References:
       EXTERNAL AST_ISAFRAME
@@ -109,7 +109,7 @@
       LOGICAL LOG
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -120,8 +120,8 @@
      :                 STATUS )
 
 *  Get the axis index.
-      CALL PAR_GDR0I( 'AXIS', 1, 1, AST_GETI( THIS, 'NAXES', STATUS ), 
-     :                .FALSE., AXIS, STATUS ) 
+      CALL PAR_GDR0I( 'AXIS', 1, 1, AST_GETI( THIS, 'NAXES', STATUS ),
+     :                .FALSE., AXIS, STATUS )
 
 *  Get a group holding the input axis values.
       IGRP = GRP__NOID
@@ -134,7 +134,7 @@
          CALL ERR_ANNUL( STATUS )
       ELSE
 
-*  We delete any pre-existing file first. 
+*  We delete any pre-existing file first.
          CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
@@ -147,18 +147,18 @@
       DO I = 1, NP
 
 *  Get this element.
-         CALL GRP_GET( IGRP, I, 1, BUF, STATUS ) 
+         CALL GRP_GET( IGRP, I, 1, BUF, STATUS )
 
 *  Attempt to convert it to a double.
-         CALL CHR_CTOD( BUF, VALUE, STATUS ) 
+         CALL CHR_CTOD( BUF, VALUE, STATUS )
          IF( STATUS .NE. SAI__OK ) THEN
 
-            CALL ERR_BEGIN( STATUS )               
-            CALL GRP_INFOC( IGRP, I, 'NAME', FNAME, STATUS ) 
-            CALL ERR_END( STATUS )               
+            CALL ERR_BEGIN( STATUS )
+            CALL GRP_INFOC( IGRP, I, 'NAME', FNAME, STATUS )
+            CALL ERR_END( STATUS )
 
             CALL MSG_SETC( 'C', BUF )
-            IF( FNAME .EQ. ' ' ) THEN 
+            IF( FNAME .EQ. ' ' ) THEN
                CALL ERR_REP( 'ASTFORMAT_ERR1', 'Error reading '//
      :                       'string ''^C''.', STATUS )
             ELSE
@@ -170,7 +170,7 @@
          END IF
 
 *  Format the value.
-         BUF = AST_FORMAT( THIS, AXIS, VALUE, STATUS )  
+         BUF = AST_FORMAT( THIS, AXIS, VALUE, STATUS )
 
 *  Display it to the screen.
          CALL MSG_SETC( 'V', BUF )

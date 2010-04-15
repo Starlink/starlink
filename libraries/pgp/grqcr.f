@@ -20,7 +20,7 @@
 *
 *   Constants from GKS_PAR
 *      GREALI
-*   
+*
 *   D.L.Terrett  Starlink  Apr 1992
 *+
       IMPLICIT NONE
@@ -34,7 +34,7 @@
       INCLUDE 'GKS_PAR'
 
       INTEGER IERR
-      
+
       IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRQCR - No PGPLOT device open',
      :   GRNODO)

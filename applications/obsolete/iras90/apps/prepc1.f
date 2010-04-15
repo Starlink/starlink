@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,7 +80,7 @@
 *  Local variables:
       INTEGER I                  ! Do loop index.
       INTEGER J                  ! Do loop index.
-                                        
+
 *.
 
 *  Check inherited global status.
@@ -108,7 +108,7 @@
 
 *  Only apply scale and zero to valid pixels and keep bad pixels as bad.
                IF( IN( NX - I + 1 , J ) .NE. VAL__BADR ) THEN
-                  OUT( I, J ) = SCALE*IN( NX - I + 1, J ) 
+                  OUT( I, J ) = SCALE*IN( NX - I + 1, J )
      :                             + ZERO
                ELSE
                   OUT( I, J ) = VAL__BADR
@@ -124,7 +124,7 @@
 
 *  Only apply scale and zero to valid pixels and keep bad pixels as bad.
                IF( IN( I, NY - J + 1 ) .NE. VAL__BADR ) THEN
-                  OUT( I, J ) = SCALE*IN( I, NY - J + 1 ) 
+                  OUT( I, J ) = SCALE*IN( I, NY - J + 1 )
      :                             + ZERO
                ELSE
                   OUT( I, J ) = VAL__BADR
@@ -144,7 +144,7 @@
      :                          + ZERO
                ELSE
                   OUT( I, J ) = VAL__BADR
-               END IF 
+               END IF
 
             END DO
          END DO

@@ -25,7 +25,7 @@
 *     point spread functions with a supplied sky image. A group of
 *     input CRDD files are used to define the scan geometry required
 *     for the simulated scans. Note, no noise or positional errors are
-*     included in the simulated CRDD files. No VARIANCE or QUALITY 
+*     included in the simulated CRDD files. No VARIANCE or QUALITY
 *     components are included in the output CRDD files.
 
 *  Usage:
@@ -36,7 +36,7 @@
 *        Determines if history information is to be stored within the
 *        output CRDD files. See help on "History_in_IRAS90" for more
 *        information on history. The history information will contain
-*        the names of the input CRDD files, trial sky image, and 
+*        the names of the input CRDD files, trial sky image, and
 *        detector Point Spread Functions.      [current history setting]
 *     IN = NDF (Read)
 *        Specifies a group of input CRDD files. This should be in the
@@ -91,7 +91,7 @@
 *        output CRDD files.
 
 *  Notes:
-*     -  The waveband index of the data contained in the trial sky 
+*     -  The waveband index of the data contained in the trial sky
 *     image is recorded in the IRAS extension of each output CRDD file,
 *     within an integer component called SKYBAND.
 
@@ -126,7 +126,7 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Returns used length of a string.
-      LOGICAL CHR_SIMLR          ! True if 2 strings are equal apart 
+      LOGICAL CHR_SIMLR          ! True if 2 strings are equal apart
                                  ! from case.
 
 *  Local Constants:
@@ -229,7 +229,7 @@
 *  Get the conversion factor for converting input sky values to units of
 *  Jy/sr.
       IF( CHR_SIMLR( UNITS1, IRI__JPS ) ) THEN
-         SCALE1 = 1.0      
+         SCALE1 = 1.0
 
       ELSE IF( CHR_SIMLR( UNITS1, IRI__MJPS ) ) THEN
          SCALE1 = 1.0E6
@@ -275,13 +275,13 @@
      :                NCOUT, STATUS )
       CALL GRP_GETCC( IGRPB, 'COMMENT', COMC, STATUS )
 
-*  Get the prefix to use when constructing the names of NDFs holding 
-*  detector PSF. The supplied prefix is appended with the number of 
+*  Get the prefix to use when constructing the names of NDFs holding
+*  detector PSF. The supplied prefix is appended with the number of
 *  each detector (1 to 62) to get the name of the .SDF file holding
 *  that detectors PSF.
       CALL PAR_GET0C( 'PSF', PSFPRE, STATUS )
 
-*  Create a group in which element N holds the name of the NDF 
+*  Create a group in which element N holds the name of the NDF
 *  containing the PSF for detector N.
       CALL SIMCA0( PSFPRE, IGRPC, STATUS )
 
@@ -324,8 +324,8 @@
      :                   STATUS )
 
 *  Generate the simulated CRDD and store in the output NDF.
-         CALL SIMCA1( LBND1, UBND1, IP1, IDA1, SCALE1, IGRPC, INDF3, 
-     :                INDF4, RA0, DEC0, PWGSZX, PWGSZY, NX, NY, IPPWG, 
+         CALL SIMCA1( LBND1, UBND1, IP1, IDA1, SCALE1, IGRPC, INDF3,
+     :                INDF4, RA0, DEC0, PWGSZX, PWGSZY, NX, NY, IPPWG,
      :                IPPWG2, DGOOD, DUSED, STATUS )
 
 *  Store the waveband of the sky image in a component called SKYBAND of
@@ -333,13 +333,13 @@
          CALL NDF_XPT0I( BAND1, INDF4, 'IRAS', 'SKYBAND', STATUS )
 
 *  Update the HISTORY structure in the output NDF.
-         CALL SIMCA2( 'HISTORY', INDF4, INDF3, INDF1, IGRPC, DGOOD, 
+         CALL SIMCA2( 'HISTORY', INDF4, INDF3, INDF1, IGRPC, DGOOD,
      :                 DUSED, STATUS )
 
 *  Annul the NDF identifier for the input NDF.
          CALL NDF_ANNUL( INDF3, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDF_DELET( INDF4, STATUS )
@@ -381,8 +381,8 @@
 *  output CRDD files which were not succesfully created are replaced by
 *  strings starting with a comment character and identifying the output
 *  CRDD file which could not be produced.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRPB, 'SIMCRDD', 
-     :                                   STATUS )      
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRPB, 'SIMCRDD',
+     :                                   STATUS )
 
 *  Release resources used to hold information describing the PSFs.
  999  CONTINUE

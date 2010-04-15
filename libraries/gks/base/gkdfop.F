@@ -43,7 +43,7 @@
 
 *  Try the directory pointed to by the environment variable.
       FNAME = TRANS(:LNBLNK(TRANS))//NAME
-      OPEN(UNIT = LUN, IOSTAT = IOS, FILE = FNAME, 
+      OPEN(UNIT = LUN, IOSTAT = IOS, FILE = FNAME,
 #if HAVE_FC_OPEN_READONLY
      :       READONLY,
 #endif
@@ -64,7 +64,7 @@
             FNAME = TRANS(I1:I1+I2-2) // '/../etc' // NAME
             I1 = I1 + I2
          ENDIF
-         OPEN(UNIT = LUN, IOSTAT = IOS, FILE = FNAME, 
+         OPEN(UNIT = LUN, IOSTAT = IOS, FILE = FNAME,
 #if HAVE_FC_OPEN_READONLY
      :       READONLY,
 #endif

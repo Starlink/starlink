@@ -12,7 +12,7 @@
 *    Parameters :
 *
 *     INPIC  = IMAGE( READ )
-*           IMAGE structure containing 2-D array 
+*           IMAGE structure containing 2-D array
 *     XCENTRE = INTEGER( READ )
 *           X-Centre of annuli
 *     YCENTRE = INTEGER( READ )
@@ -36,7 +36,7 @@
 *
 *    History :
 *
-*     26-03-1990 : Original version 
+*     26-03-1990 : Original version
 *     20-Apr-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
 *     24-Jun-1994  Changed STR$ to CHR_ (SKL@JACH)
 *
@@ -45,8 +45,8 @@
 
 *    Global constants :
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
       INTEGER STATUS          ! global status parameter
@@ -63,8 +63,8 @@
      :  ODIMS( NDIMS ),       ! dimensions of output DATA_ARRAYs
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
-     :  PNTRI,                !    "     " input      " 
-     :  PNTRO,                !    "     " output     " 
+     :  PNTRI,                !    "     " input      "
+     :  PNTRO,                !    "     " output     "
      :	XCENTRE,              ! x centre of annuli
      :	YCENTRE,              ! y centre of annuli
      :	LEN2                  ! length of string variable
@@ -111,17 +111,17 @@
      :                         PNTRO, NELEMENTS, STATUS )
 
 *       get the x,y centre of radial study and width in arcsec
-         CALL AIF_GET0I( 'XCENTRE', 1, -10000, 10000, XCENTRE, 
+         CALL AIF_GET0I( 'XCENTRE', 1, -10000, 10000, XCENTRE,
      :	                 STATUS )
-         CALL AIF_GET0I( 'YCENTRE', 1, -10000, 10000, YCENTRE, 
+         CALL AIF_GET0I( 'YCENTRE', 1, -10000, 10000, YCENTRE,
      :	                 STATUS )
-         CALL AIF_GET0R( 'ECCENTRICITY', 0.0, 0.0, 0.999, ECCENTRICITY, 
+         CALL AIF_GET0R( 'ECCENTRICITY', 0.0, 0.0, 0.999, ECCENTRICITY,
      :	                 STATUS )
-         CALL AIF_GET0R( 'POSANG', 0.0, 0.0, 180.0, POSITION_ANGLE, 
+         CALL AIF_GET0R( 'POSANG', 0.0, 0.0, 180.0, POSITION_ANGLE,
      :	                 STATUS )
-         CALL AIF_GET0R( 'WIDTH', 5.0, 0.01, 100.0, WIDTH, 
+         CALL AIF_GET0R( 'WIDTH', 5.0, 0.01, 100.0, WIDTH,
      :	                 STATUS )
-         CALL AIF_GET0R( 'PLATSCAL', 1.0, 0.01, 20.0, PLATSCAL, 
+         CALL AIF_GET0R( 'PLATSCAL', 1.0, 0.01, 20.0, PLATSCAL,
      :	                 STATUS )
 
 *       get option to use bad value in compiling pixel list
@@ -140,7 +140,7 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          call subroutine to create radial cut image
-	    CALL ANNSTATSSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+	    CALL ANNSTATSSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :	                      ODIMS( 1), ODIMS( 2), %VAL( PNTRO),
      :	                      XCENTRE, YCENTRE, ECCENTRICITY,
      :	                      POSITION_ANGLE, WIDTH, PLATSCAL,

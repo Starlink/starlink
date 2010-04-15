@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -108,7 +108,7 @@
 *  External References:
       INTEGER CHR_LEN
 *  Local Constants:
-      CHARACTER DASH*1        ! Character for the 'end of description' 
+      CHARACTER DASH*1        ! Character for the 'end of description'
       PARAMETER (DASH = '-')  ! line.
 *  Local Variables:
       CHARACTER
@@ -123,7 +123,7 @@
      :  ENAME*(CAT__SZCMP+4), ! Name of the current vector element.
      :  FUNITS*(CAT__SZUNI),  ! Units of the current column.
      :  FTYPE*10,             ! (Character) data type of the current column.
-     :  FEXFMT*(CAT__SZEXF)   ! External format 
+     :  FEXFMT*(CAT__SZEXF)   ! External format
       INTEGER
      :  NAMLEN,  ! Length of NAMBUF (excl. trail. blanks).
      :  ENDLEN,  !   "    "  ENDBUF ( "  .   "  .   "   ).

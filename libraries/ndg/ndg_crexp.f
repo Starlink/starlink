@@ -13,30 +13,30 @@
 *     CALL NDG_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
 
 *  Description:
-*     The supplied group expression is parsed (using the facilities of 
-*     the GRP routine GRP_GROUP, see SUN/150) to produce a list of 
-*     explicit NDF names. No check is made to see if these NDFs exist 
+*     The supplied group expression is parsed (using the facilities of
+*     the GRP routine GRP_GROUP, see SUN/150) to produce a list of
+*     explicit NDF names. No check is made to see if these NDFs exist
 *     or not, and any wild-cards in the NDF names are ignored. The names
-*     are appended to the group identified by IGRP. If IGRP has the 
-*     value GRP__NOID on entry, then a new group is created and IGRP is 
+*     are appended to the group identified by IGRP. If IGRP has the
+*     value GRP__NOID on entry, then a new group is created and IGRP is
 *     returned holding the new group identifier.
 *
 *     If IGRP0 holds a valid group identifier on entry, then the group
 *     identified by IGRP0 is used as the basis for any modification
 *     element contained in the supplied group expression. If IGRP0 holds
-*     an invalid identifier (such as GRP__NOID) on entry then 
+*     an invalid identifier (such as GRP__NOID) on entry then
 *     modification elements are included literally in the output group.
 
 *  Arguments:
 *     GRPEXP = CHARACTER*(*) (Given)
-*        The group expression specifying the NDF names to be stored in 
+*        The group expression specifying the NDF names to be stored in
 *        the group.
 *     IGRP0 = INTEGER (Given)
 *        The GRP identifier for the group to be used as the basis for
-*        any modification elements. 
+*        any modification elements.
 *     IGRP = INTEGER (Given and Returned)
 *        The GRP identifier for the group to which the supplied NDF
-*        names are to be appended. 
+*        names are to be appended.
 *     SIZE = INTEGER (Returned)
 *        The total number of NDF names in the returned group.
 *     FLAG = LOGICAL (Returned)
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *        basis element.
 *     25-MAY-1999 (DSB):
 *        Modified to allow the basis group to be created directly by GRP,
-*        as well as by NDF (i.e. cater for possibility that no slave groups 
+*        as well as by NDF (i.e. cater for possibility that no slave groups
 *        exist).
 *     21-DEC-1999 (DSB):
 *        Modified to avoid copying structure from basis HDS files.
@@ -133,14 +133,14 @@
       CHARACTER ALTTYP*20          ! Second choice file type from NDF_FORMATS_OUT
       CHARACTER BN1*(GRP__SZNAM)   ! Supplied file base name
       CHARACTER DEFTYP*20          ! First choice file type from NDF_FORMATS_OUT
-      CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
-      CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path 
+      CHARACTER DIR*(GRP__SZNAM)   ! Directory path
+      CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path
       CHARACTER FMTOUT*(NDG__SZFMT)! List of output NDF formats
       CHARACTER NAME*(GRP__SZNAM)  ! Current name
-      CHARACTER PATH*(GRP__SZNAM)  ! HDS component path 
+      CHARACTER PATH*(GRP__SZNAM)  ! HDS component path
       CHARACTER SEC1*(GRP__SZNAM)  ! Supplied NDF section (ignored)
       CHARACTER SUF1*(GRP__SZNAM)  ! Supplied file suffix
-      CHARACTER TYP*(GRP__SZNAM)   ! File type 
+      CHARACTER TYP*(GRP__SZNAM)   ! File type
       CHARACTER TYPS( MXTYP )*(SZTYP)! Known foreign file types
       INTEGER ADDED              ! No. of names added to the group
       INTEGER I                  ! Loop count
@@ -168,7 +168,7 @@
       CALL ERR_MARK
 
 *  Get the current value of environment variable NDF_FORMATS_OUT.
-*  Annul the error and indicate native NDFs should be created if it is 
+*  Annul the error and indicate native NDFs should be created if it is
 *  not defined.
       CALL PSX_GETENV( 'NDF_FORMATS_OUT', FMTOUT, STATUS )
       IF( STATUS .EQ. PSX__NOENV ) THEN
@@ -223,12 +223,12 @@
 *  See if IGRP0 is a valid GRP identifier.
       CALL GRP_VALID( IGRP0, INGRP, STATUS )
 
-*  If the identifier is valid, find the size of the basis group and get 
+*  If the identifier is valid, find the size of the basis group and get
 *  identifiers for the associated groups holding the individual fields.
       IF( INGRP ) THEN
          CALL GRP_GRPSZ( IGRP0, INSIZE, STATUS )
          CALL GRP_OWN( IGRP0, IGRPD, STATUS )
-         IF( IGRPD .NE. GRP__NOID ) THEN 
+         IF( IGRPD .NE. GRP__NOID ) THEN
             CALL GRP_OWN( IGRPD, IGRPB, STATUS )
             CALL GRP_OWN( IGRPB, IGRPT, STATUS )
             CALL GRP_OWN( IGRPT, IGRPH, STATUS )
@@ -249,16 +249,16 @@
 *  the output NDF names.
       IF( GRPEXP( : 2 ) .EQ. 's/' ) THEN
          IF( .NOT. INGRP ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN 
+            IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'NDG_CREXP_ERR1', 'Output NDFs cannot be'//
      :                    ' specified using a regular expression '//
-     :                    'since no group of input NDFs is available.', 
+     :                    'since no group of input NDFs is available.',
      :                    STATUS )
             END IF
          ELSE
-            CALL NDG1_REGSB( GRPEXP( : MAX( 1, CHR_LEN( GRPEXP ) ) ), 
-     :                       IGRP0, IGRP, SIZE, STATUS )          
+            CALL NDG1_REGSB( GRPEXP( : MAX( 1, CHR_LEN( GRPEXP ) ) ),
+     :                       IGRP0, IGRP, SIZE, STATUS )
 
             IF( SIZE .LT. INSIZE .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
@@ -267,24 +267,24 @@
                   CALL MSG_SETI( 'INSZ', INSIZE )
                   CALL ERR_REP( 'NDG_CREXP_ERR2A', 'The supplied '//
      :                    'regular expression matched only ^SZ of '//
-     :                    'the ^INSZ input NDFs and so cannot be used.', 
-     :                          STATUS ) 
+     :                    'the ^INSZ input NDFs and so cannot be used.',
+     :                          STATUS )
                ELSE
                   CALL ERR_REP( 'NDG_CREXP_ERR2B', 'The supplied '//
      :                    'regular expression did not match the '//
-     :                    'input NDF and so cannot be used.', 
-     :                          STATUS ) 
+     :                    'input NDF and so cannot be used.',
+     :                          STATUS )
                END IF
 
             END IF
 
          END IF
 
-*  Otherwise, call GRP_GRPEX to append NDF names specified using the supplied 
+*  Otherwise, call GRP_GRPEX to append NDF names specified using the supplied
 *  group expresson, to the group. Any modification elements are based on
 *  the group holding the file base names.
       ELSE
-         CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG, 
+         CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG,
      :                   STATUS )
       END IF
 
@@ -380,7 +380,7 @@
                   CALL CHR_APPND( ALTTYP, NAME, IAT )
                ELSE IF( DEFTYP .NE. '.' ) THEN
                   CALL CHR_APPND( DEFTYP, NAME, IAT )
-               END IF               
+               END IF
 
             END IF
 
@@ -391,7 +391,7 @@
 
       END DO
 
-*  If an error occured, reset the group back to its original size if a 
+*  If an error occured, reset the group back to its original size if a
 *  group was supplied, or delete the group if no group was supplied.
 *  Ensure FLAG is returned .FALSE.
       IF( STATUS .NE. SAI__OK ) THEN

@@ -2,7 +2,7 @@
      :           IOUT,
      :           ARFILE,
      :           MAX_PERM_FTRS,
-     :           PREV, 
+     :           PREV,
      :           N_ORDERS,
      :           IDEN_FTR_POSITION,
      :           IDEN_FTR_WAVELENGTH,
@@ -29,7 +29,7 @@
 *    :     IOUT,
 *    :     ARFILE,
 *    :     MAX_PERM_FTRS,
-*    :     PREV, 
+*    :     PREV,
 *    :     N_ORDERS,
 *    :     IDEN_FTR_POSITION,
 *    :     IDEN_FTR_WAVELENGTH,
@@ -38,7 +38,7 @@
 *    :     FORDER,
 *    :     FSIGMA
 *    :     )
-      
+
 *  Arguments:
 *     IOUT = INTEGER (Given)
 *        Fortran unit number to be used.
@@ -82,7 +82,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              
+      IMPLICIT NONE
 
 *  Global constants:
       INCLUDE 'ECH_REPORT.INC'
@@ -95,13 +95,13 @@
       REAL iden_ftr_position(max_perm_ftrs,n_orders),
      :     iden_ftr_wavelength(max_perm_ftrs,n_orders),
      :   FSIGMA
-      
+
       CHARACTER*( * ) ARFILE
 
 *  Local Variables:
       REAL POSN
       REAL WAVE
-      
+
       INTEGER IBRACK
       INTEGER IDOT
       INTEGER NFILE

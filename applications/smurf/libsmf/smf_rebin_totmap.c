@@ -4,7 +4,7 @@
 *     smf_rebin_totmap
 
 *  Purpose:
-*     Get a Mapping from the spatial GRID axes in the input the spatial 
+*     Get a Mapping from the spatial GRID axes in the input the spatial
 *     GRID axes in the output.
 
 *  Language:
@@ -14,9 +14,9 @@
 *     C function
 
 *  Invocation:
-*     AstMapping *smf_rebin_totmap( smfData *data, dim_t itime, 
-*                                   AstSkyFrame *abskyfrm, 
-*                                   AstMapping *oskymap, int moving, 
+*     AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
+*                                   AstSkyFrame *abskyfrm,
+*                                   AstMapping *oskymap, int moving,
 *                                   int *status );
 
 *  Arguments:
@@ -25,23 +25,23 @@
 *     itime = dim_t (Given)
 *        The time slice index.
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the output cube. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
 *        spatial pixel coordinates in the output cube.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output cube.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
 *  Description:
-*     Get a Mapping from the spatial GRID axes in the input the spatial 
+*     Get a Mapping from the spatial GRID axes in the input the spatial
 *     GRID axes in the output, for a specified time slice.
 
 *  Authors:
@@ -112,16 +112,16 @@
 
 #define FUNC_NAME "smf_rebin_totmap"
 
-AstMapping *smf_rebin_totmap( smfData *data, dim_t itime, 
-			      AstSkyFrame *abskyfrm, 
-			      AstMapping *oskymap, int moving, 
+AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
+			      AstSkyFrame *abskyfrm,
+			      AstMapping *oskymap, int moving,
 			      int *status ){
 
 /* Local Variables */
    AstFrame *sf1 = NULL;       /* Pointer to copy of input current Frame */
    AstFrame *skyin = NULL;     /* Pointer to current Frame in input WCS FrameSet */
    AstFrame *skyout = NULL;    /* Pointer to output sky Frame in "fs" */
-   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
+   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */
    AstFrameSet *swcsin = NULL; /* Spatial WCS FrameSet for current time slice */
    AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
    AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
@@ -141,10 +141,10 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 /* Store a pointer to the input NDFs smfHead structure. */
    hdr = data->hdr;
 
-/* Get a FrameSet describing the spatial coordinate systems associated with 
-   the current time slice of the current input data file. The base frame in 
-   the FrameSet will be a 2D Frame in which axis 1 is detector number and 
-   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame 
+/* Get a FrameSet describing the spatial coordinate systems associated with
+   the current time slice of the current input data file. The base frame in
+   the FrameSet will be a 2D Frame in which axis 1 is detector number and
+   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
    smf_tslice_ast( data, itime, 1, status );
@@ -169,8 +169,8 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
      return NULL;
    }
 
-/* Get the current Frame from the input WCS FrameSet. If this is the first 
-   time slice, see if the current Frame is an AZEL Frame (it is assumed 
+/* Get the current Frame from the input WCS FrameSet. If this is the first
+   time slice, see if the current Frame is an AZEL Frame (it is assumed
    that all subsequent time slices will have the same system as the first). */
    skyin = astGetFrame( swcsin, AST__CURRENT );
    if( itime == 0 ) {
@@ -178,7 +178,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
       have_azel = system ? !strcmp( system, "AZEL" ) : 0;
    }
 
-/* Get a FrameSet containing a Mapping from the input sky system to the 
+/* Get a FrameSet containing a Mapping from the input sky system to the
    output absolute sky system. */
    fs = astConvert( skyin, abskyfrm, "" );
    if( fs == NULL ) {
@@ -186,7 +186,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "The spatial coordinate system in the "
                  "current input file is not compatible with the "
-                 "spatial coordinate system in the first input file.", 
+                 "spatial coordinate system in the first input file.",
                  status );
       }
       return NULL;
@@ -200,8 +200,8 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    if( moving ) {
      AstFrameSet* tempfs = NULL;
 
-/* Get the Mapping from AZEL (at the current input epoch) to the output sky 
-   system. If the input sky coordinate system is AZEL, then we already have 
+/* Get the Mapping from AZEL (at the current input epoch) to the output sky
+   system. If the input sky coordinate system is AZEL, then we already have
    the required FrameSet in "fs". */
       if( ! have_azel ) {
          sf1 = astCopy( skyin );
@@ -212,7 +212,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
          azel2usesys = astClone( fs );
       }
 
-/* Use this FrameSet to convert the telescope base position from (az,el) to 
+/* Use this FrameSet to convert the telescope base position from (az,el) to
    the requested system. */
       astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
                 &(hdr->state->tcs_az_bc2), 1, &a, &b );
@@ -252,16 +252,16 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
       fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
    }
 
-/* Get the mapping from the input grid coordinate system to the output sky 
+/* Get the mapping from the input grid coordinate system to the output sky
    system. */
    tmap1 = astGetMapping( swcsin, AST__BASE, AST__CURRENT );
    grid2sky = (AstMapping *) astCmpMap( tmap1, fsmap, 1, " " );
    tmap1 = astAnnul( tmap1 );
    fsmap = astAnnul( fsmap );
 
-/* The output from "grid2sky" now corresponds to the input to "oskymap", 
-   whether the target is moving or not. Combine the input GRID to output 
-   SKY Mapping with the output SKY to output pixel Mapping supplied in 
+/* The output from "grid2sky" now corresponds to the input to "oskymap",
+   whether the target is moving or not. Combine the input GRID to output
+   SKY Mapping with the output SKY to output pixel Mapping supplied in
    "oskymap". */
    result = (AstMapping *) astCmpMap( grid2sky, oskymap, 1, " " );
 

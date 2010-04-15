@@ -30,8 +30,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 * Status :
 
@@ -44,7 +44,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,	                ! locator for input data structure
      :    LOCO,	                ! locator for output data structure
      :    LOCO2,        	! locator for output data structure
@@ -136,7 +136,7 @@
 
 	CALL MSG_SETI( 'XDIM', ODIMS(1))
 	CALL MSG_SETI( 'YDIM', ODIMS(2))
-	CALL MSG_OUT( 'OUTPUT_DIMS', 
+	CALL MSG_OUT( 'OUTPUT_DIMS',
      :                'Output images are ^XDIM by ^YDIM pixels',
      :	              STATUS)
 
@@ -147,7 +147,7 @@
 
 *      create output image structures
 
-	CALL NDF_CREAT( 'OUTPIC', '_REAL', 2, LBND, ODIMS, LOCO, 
+	CALL NDF_CREAT( 'OUTPIC', '_REAL', 2, LBND, ODIMS, LOCO,
      :                   STATUS )
 	IF ( STATUS .NE. SAI__OK) THEN
 	  CALL NDF_ANNUL( LOCI, STATUS)
@@ -155,7 +155,7 @@
 	  RETURN
 	END IF
 
-	CALL NDF_CREAT( 'OUTPIC2', '_REAL', 2, LBND, ODIMS2, LOCO2, 
+	CALL NDF_CREAT( 'OUTPIC2', '_REAL', 2, LBND, ODIMS2, LOCO2,
      :                   STATUS )
 	IF ( STATUS .NE. SAI__OK) THEN
 	  CALL NDF_ANNUL( LOCI, STATUS)
@@ -186,8 +186,8 @@
 
 *      call subroutine to do binning and fill output image
 
-	CALL BINUP2D( IDIMS( 1), IDIMS( 2), %VAL( PNTRI), BINX, BINY, 
-     :	              ODIMS( 1), ODIMS( 2), %VAL( PNTRO), %VAL( PNTRO2), 
+	CALL BINUP2D( IDIMS( 1), IDIMS( 2), %VAL( PNTRI), BINX, BINY,
+     :	              ODIMS( 1), ODIMS( 2), %VAL( PNTRO), %VAL( PNTRO2),
      :	              STATUS)
 
 *      tidy up the input/output structures

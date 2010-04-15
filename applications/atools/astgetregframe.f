@@ -83,14 +83,14 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get an AST Object.
-      CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, IAST, 
+      CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, IAST,
      :                 STATUS )
 
 *  Get the required Frame.

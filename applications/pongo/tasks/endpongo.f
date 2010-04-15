@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
       INTEGER STATUS             ! Global status
 
 *  External references
-      EXTERNAL CHR_LEN  
+      EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Used length of string
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
@@ -102,11 +102,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the device is open.
-      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
-      
+      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
+
 *  Get the picture comment for AGI.
          CALL PAR_GET0C( 'COMMENT', COMMNT, STATUS )
-         AGICOM = 'PONGO: ' // 
+         AGICOM = 'PONGO: ' //
      :        COMMNT( : MAX( 1, MIN( 80, CHR_LEN( COMMNT ) ) ) )
 
 *  Save a data picture in the AGI database.

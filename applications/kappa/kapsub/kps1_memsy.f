@@ -33,10 +33,10 @@
 *        If equal to "CONSTANT" then a consatnt default model value is
 *        used.  Otherwise, file <20> is used to define the model.
 *     UPDATE = LOGICAL (Given)
-*        If .TRUE .then an output NDF is created afetr each iteration, 
+*        If .TRUE .then an output NDF is created afetr each iteration,
 *        otherwise no NDF is created until the routine finishes.
 *     EXTEND = LOGICAL (Given)
-*        If .TRUE. then the output NDF is to have analysis information 
+*        If .TRUE. then the output NDF is to have analysis information
 *        appended to it in the form of an extension called MEM2D.
 *     INDF = INTEGER (Given)
 *        The NDF identifier for the input image.
@@ -53,7 +53,7 @@
 *        Either GAUSSIAN or POISSON.  Indicates the type of noise
 *        statistics to be used in MEMSYS3.
 *     STDEV = REAL (Given)
-*        The initial estimate of the mean noise level in the input 
+*        The initial estimate of the mean noise level in the input
 *        image.
 *     ILEVEL = INTEGER (Given)
 *        The user information level.  If equal to zero, then no
@@ -172,7 +172,7 @@
       ELSE
          METHOD = 2
 
-      END IF      
+      END IF
 
       IF ( MODEL .NE. 'CONSTANT' ) METHOD = METHOD + 10
 
@@ -198,8 +198,8 @@
             END IF
 
 *  Call the main MEMSYS3 routine.
-            CALL MEM3( METHOD, 0, MEMRUN, 1, 1, 1.0, RATE, DEF, 0.0, 
-     :                 0.1, ALPHA, BETA, S, TEST, CHISQ, SIGMA, 
+            CALL MEM3( METHOD, 0, MEMRUN, 1, 1, 1.0, RATE, DEF, 0.0,
+     :                 0.1, ALPHA, BETA, S, TEST, CHISQ, SIGMA,
      :                 PROB, GOOD, OMEGA, ISTAT)
 
 *  Store the number of completed iterations.
@@ -213,65 +213,65 @@
 *  If termination not reached, indicate that MEMSYS3 is to continue
 *  the deconvolution.
             ELSE
-               MEMRUN = 1 
+               MEMRUN = 1
             END IF
 
 *  Give required diagnostics
             IF ( ILEVEL .GE. 1 ) THEN
-               CALL MSG_SETR( 'OMEGA', OMEGA )               
+               CALL MSG_SETR( 'OMEGA', OMEGA )
                CALL MSG_OUT( 'REPORT', '    OMEGA       : ^OMEGA',
      :                        STATUS )
             END IF
 
             IF ( ILEVEL .GE. 2 ) THEN
-               CALL MSG_SETR( 'S', S )               
+               CALL MSG_SETR( 'S', S )
                CALL MSG_OUT( 'REPORT', '    ENTROPY     : ^S', STATUS )
 
-               CALL MSG_SETR( 'PROB', PROB )               
+               CALL MSG_SETR( 'PROB', PROB )
                CALL MSG_OUT( 'REPORT', '    LOG(PROB)   : ^PROB',
      :                        STATUS )
 
-               CALL MSG_SETR( 'TEST', TEST )               
+               CALL MSG_SETR( 'TEST', TEST )
                CALL MSG_OUT( 'REPORT', '    TEST        : ^TEST',
      :                        STATUS )
 
-               CALL MSG_SETI( 'NTR', ME_NTR )               
+               CALL MSG_SETI( 'NTR', ME_NTR )
                CALL MSG_OUT( 'REPORT', '    NTRANS      : ^NTR',
      :                        STATUS )
             END IF
 
             IF ( ILEVEL .GE. 3 ) THEN
-               CALL MSG_SETR( 'ALPHA', ALPHA )               
+               CALL MSG_SETR( 'ALPHA', ALPHA )
                CALL MSG_OUT( 'REPORT', '    ALPHA       : ^ALPHA',
      :                        STATUS )
 
-               CALL MSG_SETR( 'CHISQ', CHISQ )               
+               CALL MSG_SETR( 'CHISQ', CHISQ )
                CALL MSG_OUT( 'REPORT', '    CHI SQUARED : ^CHISQ',
      :                        STATUS )
 
-               CALL MSG_SETR( 'GOOD', GOOD )               
+               CALL MSG_SETR( 'GOOD', GOOD )
                CALL MSG_OUT( 'REPORT', '    GOOD        : ^GOOD',
      :                        STATUS )
 
-               CALL MSG_SETR( 'SIGMA', SIGMA )               
+               CALL MSG_SETR( 'SIGMA', SIGMA )
                CALL MSG_OUT( 'REPORT', '    SIGMA       : ^SIGMA',
      :                        STATUS )
 
-               CALL MSG_SETI( 'ISTAT', ISTAT )               
+               CALL MSG_SETI( 'ISTAT', ISTAT )
                CALL MSG_OUT( 'REPORT', '    ISTAT       : ^ISTAT',
      :                        STATUS )
             END IF
 
 *  If required, write out the current reconstruction to disk.
             IF ( UPDATE ) THEN
-               CALL KPS1_MEMSA( PARAM, MODE, EXTEND, INDF, RATE, ALPHA, 
+               CALL KPS1_MEMSA( PARAM, MODE, EXTEND, INDF, RATE, ALPHA,
      :                          BETA, DEF, SIGMA, NITER, COMPIT,
      :                          ILEVEL, METHOD, STDEV, ISTAT, STATUS )
                IF ( STATUS. NE. SAI__OK ) GOTO 999
                MODE = 'UPDATE'
             END IF
 
-*  Do next MEMSYS3 iteration.      
+*  Do next MEMSYS3 iteration.
          END IF
       END DO
 
@@ -305,10 +305,10 @@
 
       END IF
 
-*  Write out the final reconstruction to disk, unless it has already 
+*  Write out the final reconstruction to disk, unless it has already
 *  been done.
       IF ( .NOT. UPDATE ) THEN
-         CALL KPS1_MEMSA( PARAM, MODE, EXTEND, INDF, RATE, ALPHA, BETA, 
+         CALL KPS1_MEMSA( PARAM, MODE, EXTEND, INDF, RATE, ALPHA, BETA,
      :                    DEF, SIGMA, NITER, COMPIT, ILEVEL, METHOD,
      :                    STDEV, ISTAT, STATUS )
       END IF

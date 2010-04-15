@@ -3,25 +3,25 @@
      &                STK_STOKES_UV,STK_LAMBDA,STK_TITLE,TOP_STK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     R D S T K
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), STK_NPTS (>), STK_STOKES_I (>), STK_STOKES_Q (>),
 C STK_STOKES_QV (>), STK_STOKES_U (>),
 C STK_STOKES_UV (>), STK_LAMBDA (>), STK_TITLE (>), TOP_STK (>),OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This routine reads in a stack of polarization spectra from disk.
@@ -65,7 +65,7 @@ C
       INTEGER APTR,NO_IN_SAVE
       INTEGER UPTR,QVPTR,UVPTR
       INTEGER NELM,NDF1,NDF2,NDF3,NDF4,NDF5,IPTR
-      CHARACTER*(DAT__SZLOC) PLOC,LOC      
+      CHARACTER*(DAT__SZLOC) PLOC,LOC
       INTEGER STATUS
 C
       STATUS = SAI__OK
@@ -89,7 +89,7 @@ C
       CALL HDS_START(STATUS)
       CALL HDS_OPEN(PATH,'READ',LOC,STATUS)
       CALL NDF_IMPRT(LOC,NDF1,STATUS)
-C 
+C
 C Map the arrays
 C
       CALL NDF_CGET(NDF1,'TITLE',STK_TITLE,STATUS)
@@ -126,7 +126,7 @@ C
      & %VAL(APTR),%VAL(IPTR),%VAL(QPTR),
      & %VAL(QVPTR),%VAL(UPTR),%VAL(UVPTR),TMP_STK_TITLE,OUT_LU)
       ENDIF
-       ELSE 
+       ELSE
        CALL WR_ERROR('Stack spectra are too big',OUT_LU)
       ENDIF
 C

@@ -15,7 +15,7 @@
 *     The tidying involves:-
 *      - calling CHR_CLEAN to remove non-printable characters.
 *      - replacing all HT (tab) characters by spaces.
-*      - truncating the string at the character before a COMCHAR character, if 
+*      - truncating the string at the character before a COMCHAR character, if
 *        present (the characters after COMCHAR are assumed to be comments).
 *
 
@@ -78,7 +78,7 @@
 *  Local Constants:
 
 *  Local variables:
-      INTEGER COMMENT           
+      INTEGER COMMENT
       INTEGER TAB
 
 *  Internal References:

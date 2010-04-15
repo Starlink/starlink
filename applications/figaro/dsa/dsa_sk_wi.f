@@ -34,7 +34,7 @@ C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
 C                      with the structure.
 C     (>) AXIS         (Integer,ref) The number of the axis in question.
-C     (<) EXIST        (Logical,ref) True if there is axis width data 
+C     (<) EXIST        (Logical,ref) True if there is axis width data
 C                      available.
 C     (<) SINGLE       (Logical,ref) True if the width data is a single,
 C                      constant, value.
@@ -44,7 +44,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ system.
 C
 C  External subroutines / functions used:
@@ -135,7 +135,7 @@ C
       CHARACTER NUMBER*12                   ! Formatted number
       CHARACTER OBJ_NAME*80                 ! DTA_ name of top level data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       LOGICAL   STRUCT                      ! Indicates object is a structure
       CHARACTER STRUCTURE_NAME*128          ! Full structure name from ref_name
 C
@@ -150,7 +150,7 @@ C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
-C     Get the name of the axis structure. 
+C     Get the name of the axis structure.
 C
       IF ((AXIS.LT.1).OR.(AXIS.GT.MAX_AXES)) THEN
          NUMBER=ICH_CI(AXIS)
@@ -165,7 +165,7 @@ C
          GO TO 500
       END IF
 C
-C     Generate the name of the data array and see if it exists.  
+C     Generate the name of the data array and see if it exists.
 C     First check explicitly for the possibility that it is a single
 C     value.
 C
@@ -177,7 +177,7 @@ C
 C        Doesn't exist at all
 C
          EXIST=.FALSE.
-      ELSE 
+      ELSE
 C
 C        Exists, one way or another.
 C
@@ -218,12 +218,12 @@ C
 C
          IF (.NOT.SINGLE) THEN
 C
-C           At this point, we know it exists and is not a scalar. 
-C       
+C           At this point, we know it exists and is not a scalar.
+C
             CALL DSA_ARRAY_EXIST(NAME(:LENGTH),EXIST,STATUS)
 C
 C           If it exists, get its dimensions and check them against those of
-C           the axis data array.  
+C           the axis data array.
 C
             IF ((STATUS.EQ.0).AND.EXIST) THEN
                CALL DSA_ARRAY_SIZE(NAME(:LENGTH),

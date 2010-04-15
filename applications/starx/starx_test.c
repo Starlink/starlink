@@ -13,7 +13,7 @@ int main()
 {
     Display *display;
     XVisualInfo visinfo, *vis;
-    int i, n; 
+    int i, n;
     char *classnames[6];
 
     for (i = 0; i < 6; i++)

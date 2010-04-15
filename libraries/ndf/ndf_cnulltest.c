@@ -109,7 +109,7 @@ int main( int argc, char *argv[] )
         printf( "Failed to get title from NDF\n" );
         status = SAI__ERROR;
         goto abort;
-    } 
+    }
     if ( status != SAI__OK ) {
         emsAnnul( &status );
     }
@@ -126,7 +126,7 @@ int main( int argc, char *argv[] )
     if ( strcmp( title, ndftitle ) == 0 ) {
         printf( "Failed to reget title from NDF\n" );
         goto abort;
-    } 
+    }
     if ( status != SAI__OK ) {
         emsAnnul( &status );
     }

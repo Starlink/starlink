@@ -14,10 +14,10 @@
 
 *  Description:
 *     The routine writes the extension-name metadata for long strings.
-*     In most cases this the regular EXTNAME keyword as defined in 
+*     In most cases this the regular EXTNAME keyword as defined in
 *     "Generalized extensions and blocking factors for FITS" by
 *     Grosbol et al. 1988, A&A Supp. Ser. 73, 359 will suffice.
-*     However, since the full component name can be longer than the 68 
+*     However, since the full component name can be longer than the 68
 *     characters that can be accommodated in the EXTNAME keyword, and
 *     it is not good practice to use the long-string CONTINUE convention
 *     for mandatory (or reserved) keywords, an alternative approach is
@@ -29,7 +29,7 @@
 *     record the full path.  EXTNAME is reset to '@EXTNAMEF' and
 *     keyword EXTVER set to the index of the current HDU.  The latter
 *     is required to avoid ambiguity should a user specify an extension
-*     by its EXTNAME name.  It also prevents fitsverify from issuing a 
+*     by its EXTNAME name.  It also prevents fitsverify from issuing a
 *     warning.
 
 *  Arguments:
@@ -38,7 +38,7 @@
 *     EXTNAM = CHARACTER * ( * ) (Given)
 *        The name of the structure.
 *     COMENT = CHARACTER * ( * ) (Given)
-*        The comment string for the EXTNAM.  If set to a blank string 
+*        The comment string for the EXTNAM.  If set to a blank string
 *        the following default comments will be used depending on the
 *        type of extension.
 *           Image         "Component"
@@ -85,7 +85,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -139,7 +139,7 @@
 *  Check that the EXTNAM header is not too long for a single header.
       NC = CHR_LEN( EXTNAM )
       IF ( NC .GT. FITSCH ) THEN
-      
+
 *  Write a dummy value for EXTNAME.
          CALL FTUKYS( FUNIT, 'EXTNAME', '@EXTNAMEF', ' ', FSTAT )
 
@@ -181,5 +181,5 @@
       END IF
 
   999 CONTINUE
-  
+
       END

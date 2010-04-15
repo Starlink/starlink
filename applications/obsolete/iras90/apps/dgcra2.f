@@ -19,7 +19,7 @@
 *     original input data array. Bad structures in the cleaned array
 *     which have width less than GLHWID are regarded as gliches. The
 *     input array is copied to the output array with the samples in the
-*     detected glitches set as BAD.  
+*     detected glitches set as BAD.
 
 *  Arguments:
 *     NSMP, NDET = INTEGER (Given)
@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
 
 *  Initially no sample in the output array has set as BAD.
       NBAD = 0
-      
+
 *  Processing the data in the input array row by row.
       DO I = 1, NDET
 
@@ -111,7 +111,7 @@
                IF ( K - J .LE. GLHWID ) THEN
                   IF ( K .EQ. J ) THEN
                      OUTDAT( K, I ) = VAL__BADR
-                     NBAD = NBAD + 1 
+                     NBAD = NBAD + 1
                   ELSE
                      DO L = J, K - 1
                         OUTDAT( L, I ) = VAL__BADR
@@ -131,7 +131,7 @@
 *  Carry on the search from the end of this structure.
                IF ( K .EQ. J ) THEN
                   J = K + 1
-               ELSE 
+               ELSE
                   J = K
                END IF
 

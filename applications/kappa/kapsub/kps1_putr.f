@@ -152,15 +152,15 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! Switch off the default typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAI Constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'PRM_PAR'          ! VAL__ Constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) LOC      ! Object locator
       INTEGER NDIM               ! Number of dimensions
@@ -172,28 +172,28 @@
                                  ! continuation lines
       LOGICAL LOGEXM             ! Output to go to the log file?
       INTEGER FD                 ! Log file's description
- 
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) LINE     ! Line to receive numbers
       INTEGER LENG               ! Current line length
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
       INTEGER CHR_SIZE           ! String size
- 
+
 *  Local Constants:
       INTEGER SZELIP             ! Size of ellipsis (...)
       PARAMETER( SZELIP=3 )
- 
+
       INTEGER MAXVAL             ! Maximum number of values that can be
                                  ! read
       PARAMETER( MAXVAL=100 )
- 
+
       INTEGER MAXSTR             ! Size of temporary string for number
       PARAMETER( MAXSTR=20 )
- 
+
 *  Local Variables:
       LOGICAL BAD                ! Current value is bad?
       LOGICAL BWTYPE             ! Data type is _BYTE, _UBYTE, _WORD, or
@@ -218,176 +218,176 @@
       CHARACTER * ( MAXSTR ) STR ! String to hold coded number
       REAL VALUES( MAXVAL )   ! Values
       CHARACTER * ( DAT__SZLOC ) VEC ! Vector locator
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Determine whether or not the data type requires special processing.
       BWTYPE = 'R' .EQ. 'B' .OR. 'R' .EQ. 'UB' .OR.
      :         'R' .EQ. 'W' .OR. 'R' .EQ. 'UW'
- 
+
 *  Initialise the level of indention.
       INDENT = LENG
- 
+
 *  Find the maximum length of the line.
       MXLENG = CHR_SIZE( LINE )
- 
+
 *  Read a limited part of the variable.
       NVALUE = MIN( MAXVAL, SIZE )
- 
+
 *  Start a new error context.
       CALL ERR_MARK
- 
+
 *  Obtain a scalar.
       IF ( NDIM .EQ. 0 ) THEN
          CALL DAT_GET( LOC, '_REAL', NDIM, DIMS, VALUES, STATUS )
- 
+
 *  or a vector.
       ELSE
- 
+
 *  Find a reasonable number to read in for the output.
          MXVAL = MIN( NVALUE, ( MXLENG - INDENT + 1 ) / 2 * NLINES )
- 
+
 *  Now read a limited part of the vector variable.
 *  ===============================================
- 
+
 *  Get a locator to the vectorised object.
          VEC = ' '
          CALL DAT_VEC( LOC, VEC, STATUS )
- 
+
 *  Obtain a slice of the chosen length.
          SLICE = ' '
          CALL DAT_SLICE( VEC, 1, 1, MXVAL, SLICE, STATUS )
- 
+
 *  Get the values in the slice.  Use the general routine throughout so
 *  as to obtain byte and word, signed and unsigned types.
          CALL DAT_GET( SLICE, '_REAL', 1, MXVAL, VALUES, STATUS )
          NVALUE = MXVAL
- 
+
 *  Tidy the locators after use.
          CALL DAT_ANNUL( SLICE, STATUS )
          CALL DAT_ANNUL( VEC, STATUS )
- 
+
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       END IF
- 
+
 *  Handle the error transparently.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL CHR_PUTC( '{undefined}', LINE, LENG )
       ELSE
- 
+
 *  Initialise counters.
          NOLINE = 1
          NOREAD = 0
- 
+
 *  Write the values to a buffer.
          DO I = 1, SIZE
- 
+
 *  Find the element to output.
             IVALUE = I - NOREAD
- 
+
 *  Has this element been read in?
             IF ( IVALUE .GT. NVALUE ) THEN
- 
+
 *  No, so increment the number read so far.
                NOREAD = NOREAD + NVALUE
- 
+
 *  Find a reasonable number to read in for trace output.
                MXVAL = MIN( MAXVAL, SIZE - NOREAD,
      :                 ( MXLENG - INDENT + 1 ) / 2 * NLINES )
- 
+
 *  Now read a limited part of the vector variable.
 *  ===============================================
- 
+
 *  Get a locator to the vectorised object.
                VEC = ' '
                CALL DAT_VEC( LOC, VEC, STATUS )
- 
+
 *  Obtain a slice of the chosen length.
                SLICE = ' '
                CALL DAT_SLICE( VEC, 1, NOREAD+1, NOREAD+MXVAL, SLICE,
      :                         STATUS )
- 
+
 *  Get the values in the slice.
                CALL DAT_GET( SLICE, '_REAL', 1, MXVAL, VALUES,
      :                       STATUS )
                NVALUE = MXVAL
- 
+
 *  Tidy the locators after use.
                CALL DAT_ANNUL( SLICE, STATUS )
                CALL DAT_ANNUL( VEC, STATUS )
- 
+
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *  Reset the element number within the slice.
                IVALUE = 1
             END IF
- 
+
 *  Test for a bad value.
             IF ( VALUES( IVALUE ) .EQ. VAL__BADR ) THEN
- 
+
 *  Use an asterisk to indicate a bad value.
                STR = '*'
                NCHAR = 1
             ELSE
- 
+
 *  Convert the numeric value to a string.  Note that since there are no
 *  conversions from the byte and word data types, these must be handled
 *  as integers.
                IF ( BWTYPE ) THEN
                   DUMMY = NUM_RTOI( VALUES( IVALUE ) )
                   CALL CHR_ITOC( DUMMY, STR, NCHAR )
- 
+
                ELSE IF ( 'R' .EQ. 'I' ) THEN
                   CALL CHR_ITOC( VALUES( IVALUE ), STR, NCHAR )
- 
+
                ELSE IF ( 'R' .EQ. 'R' ) THEN
                   CALL CHR_RTOC( VALUES( IVALUE ), STR, NCHAR )
- 
+
                ELSE IF ( 'R' .EQ. 'D' ) THEN
                   CALL CHR_DTOC( VALUES( IVALUE ), STR, NCHAR )
- 
+
                END IF
             END IF
- 
+
 *  Put the value into the buffer unless it overflows the line.
             CALL KPS1_PUTS( NDIM, DIMS, IVALUE, STR( 1:NCHAR ),
      :                      I .NE. SIZE, INDS, LINE, LENG, FULL,
      :                      STATUS )
- 
+
 *  Is the line full?
             IF ( FULL ) THEN
- 
+
 *  Yes, so will need to output the current line.
                CALL MSG_SETC( 'LINE', LINE( 1:LENG ) )
                CALL MSG_OUT( ' ', '^LINE', STATUS )
                IF ( LOGEXM )
      :            CALL FIO_WRITE( FD, LINE( 1:LENG ), STATUS )
- 
+
 *  Should values continue to a new line?
                IF ( NOLINE .NE. NLINES ) THEN
- 
+
 *  Start a new line indenting the requested amount.
                   LENG = INDNTC + 1
                   LINE = ' '
- 
+
 *  Increment the count of the number of output lines.
                   NOLINE = NOLINE + 1
- 
+
 *  Write the value that would not fit into previous line at the start
 *  of the new line.
                   CALL KPS1_PUTS( NDIM, DIMS, IVALUE, STR( 1:NCHAR ),
      :                            I .NE. SIZE, INDS, LINE, LENG,
      :                            FULL, STATUS )
                ELSE
- 
+
 *  The last value is not displayed if the line was full.  So decrement
 *  the count of the number of values and exit the loop.
                   IVALUE = I - 1
@@ -396,118 +396,118 @@
             END IF
          END DO
     1    CONTINUE
- 
+
 *  Are there end values to be output on a new line?
          IF ( IVALUE .NE. SIZE .AND. NOLINE .EQ. NLINES ) THEN
- 
+
 *  Start a new line.
             IF ( NLINES .GT. 1 ) INDENT = INDNTC + 1
             LINE = ' '
- 
+
 *  Determine whether or not further values are to be read in.
             IF ( SIZE .GT. NVALUE + NOREAD ) THEN
- 
+
 *  Find a reasonable number to read in for output.
                MXVAL = MIN( MAXVAL, ( MXLENG - INDENT + 1 ) / 2,
      :                      SIZE - IVALUE )
- 
+
 *  Get a slice containing the last few values.
 *  ===========================================
- 
+
 *  Get a locator to the vectorised object.
                VEC = ' '
                CALL DAT_VEC( LOC, VEC, STATUS )
- 
+
 *  Obtain a slice of the chosen length.
                SLICE = ' '
                CALL DAT_SLICE( VEC, 1, SIZE-MXVAL+1, SIZE, SLICE,
      :                         STATUS )
- 
+
 *  Get the values in the slice.
                CALL DAT_GET( SLICE, '_REAL', 1, MXVAL, VALUES,
      :                       STATUS )
                NVALUE = MXVAL
- 
+
 *  Tidy the locators after use.
                CALL DAT_ANNUL( SLICE, STATUS )
                CALL DAT_ANNUL( VEC, STATUS )
- 
+
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *  Modify the last value to new co-ordinates.
                IVALUE = IVALUE - NOREAD - SIZE + MXVAL
             ELSE
- 
+
 *  No more values are to be read in.
                IVALUE = IVALUE - NOREAD
             END IF
- 
+
 *  Loop from the last value.
             FULL = .FALSE.
             FVALUE = NVALUE
             CPOS = MXLENG
- 
+
 *  Search backwards until the line is full.
             DO WHILE ( FVALUE .GT. IVALUE .AND. .NOT. FULL )
- 
+
 *  Test for a bad value.
                IF ( VALUES( FVALUE ) .EQ. VAL__BADR ) THEN
- 
+
 *  Use an asterisk to indicate a bad value.
                   STR = '*'
                   NCHAR = 1
                   BAD = .TRUE.
                ELSE
- 
+
 *  Convert the numeric value to a string.  Note that since there are no
 *  conversions from the byte and word data types, these must be handled
 *  as integers.
                   IF ( BWTYPE ) THEN
                      DUMMY = NUM_RTOI( VALUES( FVALUE ) )
                      CALL CHR_ITOC( DUMMY, STR, NCHAR )
- 
+
                   ELSE IF ( 'R' .EQ. 'I' ) THEN
                      CALL CHR_ITOC( VALUES( FVALUE ), STR, NCHAR )
- 
+
                   ELSE IF ( 'R' .EQ. 'R' ) THEN
                      CALL CHR_RTOC( VALUES( FVALUE ), STR, NCHAR )
- 
+
                   ELSE IF ( 'R' .EQ. 'D' ) THEN
                      CALL CHR_DTOC( VALUES( FVALUE ), STR, NCHAR )
- 
+
                   END IF
                   BAD = .FALSE.
                END IF
- 
+
 *  Insert a comma unless it is the last value.
                IF ( FVALUE .NE. NVALUE ) THEN
                   NCHAR = NCHAR + 1
                   STR( NCHAR:NCHAR ) = ','
                END IF
- 
+
 *  Determine whether or not there is room to insert the string, with or
 *  without an ellipsis as necessary.
                IF ( ( INDENT .GT. CPOS-NCHAR+1 .AND.
      :                FVALUE .EQ. IVALUE + 1 ) .OR.
      :              ( INDENT + SZELIP + 1 .GT. CPOS-NCHAR ) ) THEN
- 
+
 *  There is no room.
                   FULL = .TRUE.
- 
+
 *  Ignore bad value as its character representation cannot be
 *  shortened.
                   IF ( .NOT. BAD ) THEN
- 
+
 *  Test whether ellipsis is needed.
                      IF ( FVALUE .GT. IVALUE ) THEN
- 
+
 *  Allow for the special case when there is no room to output last
 *  value at full precision...
                         IF ( FVALUE .EQ. NVALUE ) THEN
- 
+
 *  ... provided any text be output
                            IF ( INDENT+SZELIP+4 .LT. CPOS ) THEN
- 
+
 *  Convert the numeric value to a string.  Note that since there are no
 *  conversions from the byte and word data types, these must be handled
 *  as integers.
@@ -515,45 +515,45 @@
                                  DUMMY = NUM_RTOI( VALUES( FVALUE ) )
                                  CALL CHR_ITOC( DUMMY, LINE( 1 + SZELIP
      :                                          + INDENT:CPOS ), I )
- 
+
                               ELSE IF ( 'R' .EQ. 'I' ) THEN
                                  CALL CHR_ITOC( VALUES( FVALUE ),
      :                                          LINE( 1 + SZELIP +
      :                                          INDENT:CPOS ), I )
- 
+
                               ELSE IF ( 'R' .EQ. 'R' ) THEN
                                  CALL CHR_RTOC( VALUES( FVALUE ),
      :                                          LINE( 1 + SZELIP +
      :                                          INDENT:CPOS ), I )
- 
+
                               ELSE IF ( 'R' .EQ. 'D' ) THEN
                                  CALL CHR_DTOC( VALUES( FVALUE ),
      :                                          LINE( 1 + SZELIP +
      :                                          INDENT:CPOS ), I )
                               END IF
- 
+
 *  Insert the ellipsis into the output line.
                               LINE( INDENT:INDENT+SZELIP+1 ) = '... '
                            END IF
- 
+
 *  The column position is at the indentation point.
                            CPOS = INDENT
                         ELSE
- 
+
 *  Omit the value which will not fit into the available space and
 *  insert the ellipsis into the output line.
                            LINE( CPOS-SZELIP:CPOS ) = '... '
- 
+
 *  Move the column position left by the length of the ellipsis and the
 *  space.
                            CPOS = CPOS - SZELIP - 1
                         END IF
                      ELSE
- 
+
 *  Allow for the special case when there is no room to output last
 *  value at full precision, but without the ellipsis.
                         IF ( FVALUE .EQ. NVALUE ) THEN
- 
+
 *  Convert the numeric value to a string. Note that since there are no
 *  conversions from the byte and word data types, these must be handled
 *  as integers.
@@ -561,61 +561,61 @@
                               DUMMY = NUM_RTOI( VALUES( FVALUE ) )
                               CALL CHR_ITOC( DUMMY, LINE( INDENT:CPOS ),
      :                                       I )
- 
+
                            ELSE IF ( 'R' .EQ. 'I' ) THEN
                               CALL CHR_ITOC( VALUES( FVALUE ),
      :                                       LINE( INDENT:CPOS ), I )
- 
+
                            ELSE IF ( 'R' .EQ. 'R' ) THEN
                               CALL CHR_RTOC( VALUES( FVALUE ),
      :                                       LINE( INDENT:CPOS ), I )
- 
+
                            ELSE IF ( 'R' .EQ. 'D' ) THEN
                               CALL CHR_DTOC( VALUES( FVALUE ),
      :                                       LINE( INDENT:CPOS ), I )
                            END IF
- 
+
 *  The column position is at the indentation point.
                            CPOS = INDENT
                         END IF
                      END IF
- 
+
 *  End of the check for the current value being bad.
                   END IF
- 
+
                ELSE
- 
+
 *  Insert the string into the line.
                   LINE( CPOS - NCHAR + 1:CPOS ) = STR( 1:NCHAR )
- 
+
 *  Move the column position by the width of the added string.
                   CPOS = CPOS - NCHAR
                END IF
- 
+
 *  Decrement the element index as we are filling the line from the last
 *  value.
                FVALUE = FVALUE - 1
             END DO
- 
+
 *  See if the current position is at the indentation point.
             IF ( CPOS .GT. INDENT ) THEN
- 
+
 *  It is not so slide the text along for alignment at the indentation
 *  column.
                DO  I = CPOS + 1, MXLENG
                   LINE( I-CPOS+INDENT:I-CPOS+INDENT ) = LINE( I:I )
                END DO
- 
+
 *  Shorten the line length accordingly.
                MXLENG = MXLENG - CPOS + INDENT
             END IF
- 
+
             LENG = MXLENG
- 
+
          END IF
       END IF
- 
+
 *  Release the new error context.
       CALL ERR_RLSE
- 
+
       END

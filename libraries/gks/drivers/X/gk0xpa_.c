@@ -10,7 +10,7 @@
  *
  * Maintenance Log:
  * 20/09/88	TAW	Dummy routine.
- *   
+ *
 */
 
 #include <wwinfo.h>

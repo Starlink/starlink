@@ -47,14 +47,14 @@
 *      4-MAR-1991 (DSB):
 *        Name changed from RLFFT to KPG1_RLFFT.
 *     11-JAN-1993 (DSB):
-*        Converted to double precision and Included in IRM 
+*        Converted to double precision and Included in IRM
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -74,7 +74,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER IFAIL              ! NAG error status.
       INTEGER LIN                ! Line counter.
@@ -101,7 +101,7 @@
       DO LIN = 1, NLIN
 
          IFAIL = -1
-         CALL C06FAF( WORK( 1, LIN ), NPIX, OUT, IFAIL ) 
+         CALL C06FAF( WORK( 1, LIN ), NPIX, OUT, IFAIL )
 
          IF ( IFAIL .EQ. 0 .AND. (.NOT. FORWRD) ) THEN
             IFAIL = -1

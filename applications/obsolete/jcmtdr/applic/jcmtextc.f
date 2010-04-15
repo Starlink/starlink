@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -64,7 +64,7 @@
 
 *  Local Variables:
       LOGICAL STRUC              ! logical for testing structure
-                                 ! existence 
+                                 ! existence
       LOGICAL FAULT              ! T if want to signal Figaro error
       LOGICAL ERRORS             ! T if error array present in input data
       LOGICAL TAUINTERP          ! T if want to interpolate zenith extinction
@@ -73,14 +73,14 @@
       INTEGER DIMS (2)           ! size of each dimension
       INTEGER NELM               ! total number of elements in array
       INTEGER ADDRESS            ! DSA VM address
-      INTEGER SLOT               !   " slot 
+      INTEGER SLOT               !   " slot
       INTEGER INPTR              ! DSA pointer for input data
       INTEGER INEPTR             !    "      "      "    errors
       INTEGER OUTPTR             !    "      "     output data
       INTEGER OUTEPTR            !    "      "      "    errors
       INTEGER XAXPTR             !    "      "     input x axis
-      INTEGER YAXPTR             !    "      "      "    y axis 
-      INTEGER TAUPTR             !    "      "     zenith optical depth 
+      INTEGER YAXPTR             !    "      "      "    y axis
+      INTEGER TAUPTR             !    "      "     zenith optical depth
       INTEGER AIRPTR             !    "      "     airmass
       INTEGER LSTPTR             !    "      "     LST array
       INTEGER NPIXEL             ! number of input pixels
@@ -89,7 +89,7 @@
       INTEGER IGNORE             !
       REAL V2Y                   ! angle between `local' vertical and y offset
                                  ! axis (radians)
-      REAL X2Y                   ! angle between x and y offset axes 
+      REAL X2Y                   ! angle between x and y offset axes
                                  !   (anti-clockwise, radians)
       REAL TAU                   ! zenith optical depth at start of observation
       REAL ENDTAU                !    "       "      "     end
@@ -104,7 +104,7 @@
                                  ! data
       CHARACTER*(128) DTA_NAME   ! temp variable for holding DTA names
       CHARACTER*(128) POS_STRUC_NAME ! DTA name of position
-                                 ! structure 
+                                 ! structure
       CHARACTER*(128) LST_STRUC_NAME ! DTA name of LST
                                  ! structure
       CHARACTER*(128) TEL_STRUC_NAME ! DTA name of TEL structure
@@ -123,7 +123,7 @@
       STATUS = 0
       CALL DSA_OPEN (STATUS)
 
-*  get the input file 
+*  get the input file
 
       CALL DSA_INPUT ('IN', 'INPUT', STATUS)
 
@@ -229,7 +229,7 @@
 
 *  data of observation in modified Julian days
 
-      CALL JCMT_GETD (POS_STRUC_NAME, 'MJD_START', MJDSTART, 
+      CALL JCMT_GETD (POS_STRUC_NAME, 'MJD_START', MJDSTART,
      :   STATUS)
 
 *  get telescope parameters
@@ -253,7 +253,7 @@
       NY = DIMS(2)
 
       CALL DSA_USE_FLAGGED_VALUES ('OUT', STATUS)
-      CALL DSA_MAP_DATA ('OUT', 'UPDATE', 'FLOAT', ADDRESS, SLOT, 
+      CALL DSA_MAP_DATA ('OUT', 'UPDATE', 'FLOAT', ADDRESS, SLOT,
      :   STATUS)
       OUTPTR = DYN_ELEMENT(ADDRESS)
 
@@ -261,10 +261,10 @@
 
       CALL DSA_SEEK_ERRORS ('IN', ERRORS, STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('IN', 'READ', 'FLOAT', ADDRESS, SLOT, 
+         CALL DSA_MAP_ERRORS ('IN', 'READ', 'FLOAT', ADDRESS, SLOT,
      :      STATUS)
          INEPTR = DYN_ELEMENT (ADDRESS)
-         CALL DSA_MAP_ERRORS ('OUT', 'UPDATE', 'FLOAT', ADDRESS, SLOT, 
+         CALL DSA_MAP_ERRORS ('OUT', 'UPDATE', 'FLOAT', ADDRESS, SLOT,
      :      STATUS)
          OUTEPTR = DYN_ELEMENT (ADDRESS)
       END IF
@@ -300,10 +300,10 @@
       CALL DTA_CRVAR (DTA_NAME, 'struc', DSTAT)
       DIMS(1) = NX
       DIMS(2) = NY
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'AIRMASS.DATA_ARRAY', 2, DIMS, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'AIRMASS.DATA_ARRAY', 2, DIMS,
      :   DTA_NAME, DSTAT)
       CALL DTA_CRVAR (DTA_NAME, 'FLOAT', DSTAT)
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'AIRMASS.DATA_ARRAY', 0, 0, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'AIRMASS.DATA_ARRAY', 0, 0,
      :   DTA_NAME, DSTAT)
       CALL DTA_MUVARF (DTA_NAME, NPIXEL, ADDRESS, DSTAT)
       AIRPTR = DYN_ELEMENT (ADDRESS)
@@ -320,7 +320,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL JCMT_GET_AIRMASS (CENTRE_CRD, EPOCH, RACEN, DECCEN,
-     :      LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY, 
+     :      LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY,
      :      DYNAMIC_MEM (XAXPTR), DYNAMIC_MEM (YAXPTR),
      :      DYNAMIC_MEM (LSTPTR), FBAD, DYNAMIC_MEM (AIRPTR), STATUS)
       END IF
@@ -348,7 +348,7 @@
 
       CALL DTA_CRNAM (JCMT_DTA_NAME, 'TAU', 0, 0, DTA_NAME, DSTAT)
       CALL DTA_CRVAR (DTA_NAME, 'struc', DSTAT)
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'TAU.DATA_ARRAY', 2, DIMS, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'TAU.DATA_ARRAY', 2, DIMS,
      :   DTA_NAME, DSTAT)
       CALL DTA_CRVAR (DTA_NAME, 'FLOAT', DSTAT)
       CALL DTA_CRNAM (JCMT_DTA_NAME, 'TAU.DATA_ARRAY', 0, 0, DTA_NAME,
@@ -365,10 +365,10 @@
       END IF
 
 *  and fill it with interpolation between TAU and ENDTAU
-*  according to pixel LST 
+*  according to pixel LST
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_SETTAU (TAU, ENDTAU, TAUINTERP, NPIXEL, 
+         CALL JCMT_SETTAU (TAU, ENDTAU, TAUINTERP, NPIXEL,
      :      DYNAMIC_MEM(INPTR), FBAD,
      :      DYNAMIC_MEM(LSTPTR), DYNAMIC_MEM(TAUPTR), STATUS)
       END IF
@@ -376,7 +376,7 @@
 *  do the correction on the data
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_COREXTC (NPIXEL, DYNAMIC_MEM(AIRPTR), 
+         CALL JCMT_COREXTC (NPIXEL, DYNAMIC_MEM(AIRPTR),
      :     DYNAMIC_MEM(TAUPTR), DYNAMIC_MEM(INPTR), FBAD,
      :     DYNAMIC_MEM(OUTPTR), STATUS)
       END IF
@@ -385,8 +385,8 @@
 
       IF (ERRORS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL JCMT_COREXTC (NPIXEL, DYNAMIC_MEM(AIRPTR), 
-     :         DYNAMIC_MEM(TAUPTR), DYNAMIC_MEM(INEPTR), 
+            CALL JCMT_COREXTC (NPIXEL, DYNAMIC_MEM(AIRPTR),
+     :         DYNAMIC_MEM(TAUPTR), DYNAMIC_MEM(INEPTR),
      :         FBAD, DYNAMIC_MEM(OUTEPTR), STATUS)
          END IF
       END IF

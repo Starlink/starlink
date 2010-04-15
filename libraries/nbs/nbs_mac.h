@@ -43,7 +43,7 @@
 *  History:
 *     03-Feb-1986 (WFL):
 *        Original version
-*     17-Jul-1987 (WFL): 
+*     17-Jul-1987 (WFL):
 *        Change VERSION to 2 to correspond to change in the
 *           definition of ITEM_DESCRIPTOR.
 *     20-Jul-1987 (WFL):
@@ -68,14 +68,14 @@
 *        Add definition of _ADD_INTERLOCKED using _ADAWI; modify
 *          _CHMOVE to use _MOVC3
 *     07-Feb-1993 (DJA):
-*        Added argument processing macros 
+*        Added argument processing macros
 *     05-May-1993 (DJA):
 *        Removed _wait macro. Replaced by NBS_SLEEPMS.
 *     08-Mar-1994 (DJA):
 *        Added EXPORT_POINTER macro to export pointers to
 *        C and Fortran portably.
 *     08-Feb-1995 (DJA):
-*        Changed NBS__OK to SAI__OK 
+*        Changed NBS__OK to SAI__OK
 *     27-Jun-2004 (AA):
 *        Changed ifdef logic for building under Mac OSX
 *     {enter_further_changes_here}
@@ -107,7 +107,7 @@
 #undef MAX
 #undef MIN
 #endif
-                                                                
+
 #define MAX(i,j) ((i)>(j) ? (i) : (j))
 #define MIN(i,j) ((i)<(j) ? (i) : (j))
 #define ODD(i) (((i)&1) == 1)
@@ -232,10 +232,10 @@ if (!_ADAWI(1,(unsigned short *)(dptr))) (*(dptr))+=0x10000
 #define GENPTR_INTEGER_ARRAY(x)
 #define GENPTR_POINTER(x)
 
-#define TRAIL(x) 
+#define TRAIL(x)
 
 #define CF_C_ARG(x)     x
-#define CF_TRAIL(x)     
+#define CF_TRAIL(x)
 
 #define EXPORT_POINTER(sptr,dptr_addr) (*(dptr_addr)) = (sptr);
 

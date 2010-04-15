@@ -1,20 +1,20 @@
-      SUBROUTINE SCULIB_DIV_CALIBRATOR_2 (N_BOLS, N_POS, DATA, VARIANCE, 
+      SUBROUTINE SCULIB_DIV_CALIBRATOR_2 (N_BOLS, N_POS, DATA, VARIANCE,
      :  CALIBRATOR, QUALITY,STATUS)
 *+
 *  Name:
 *     SCULIB_DIV_CALIBRATOR_2
 
 *  Purpose:
-*     divides the mean of the calibrator signal into 
+*     divides the mean of the calibrator signal into
 *     the chop signal
 
 *  Description:
 *     This routine divides the calibrator signal into the chop signal and
-*     variance over an array of measurements. No division will occur if the 
+*     variance over an array of measurements. No division will occur if the
 *     measurement quality is bad or the square of the calibrator signal is zero.
 
 *  Invocation:
-*     CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS, N_POS, DATA, VARIANCE, 
+*     CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS, N_POS, DATA, VARIANCE,
 *    :  CALIBRATOR, QUALITY)
 
 *  Arguments:
@@ -24,7 +24,7 @@
 *              Number of positions measured
 *     DATA (N_BOLS,N_POS) = REAL (Given and returned)
 *              Demodulated data array
-*     VARIANCE (N_BOLS,N_POS)  
+*     VARIANCE (N_BOLS,N_POS)
 *                         = REAL (Given and returned)
 *              Variance on DATA
 *     CALIBRATOR (N_BOLS,N_POS)
@@ -130,7 +130,7 @@
             DO POS = 1, N_POS
                IF (QUALITY(BOL,POS) .EQ. 0) THEN
                   DATA (BOL,POS) = DATA (BOL,POS) / CAL_AVERAGE (BOL)
-                  VARIANCE (BOL,POS) = VARIANCE (BOL,POS) / 
+                  VARIANCE (BOL,POS) = VARIANCE (BOL,POS) /
      :              CAL_AVERAGE(BOL)**2
                END IF
             END DO

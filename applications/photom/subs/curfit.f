@@ -139,7 +139,7 @@
               CALL MSG_OUT( ' ', TEXT, STATUS )
 
 
-              A( K ) = TAB_BOTTOM( K ) + TAB_PERIOD( K ) + MOD( A( K ) 
+              A( K ) = TAB_BOTTOM( K ) + TAB_PERIOD( K ) + MOD( A( K )
      :                 - TAB_BOTTOM( K ), TAB_PERIOD( K ) )
             ELSE IF( A( K ) .GE. TAB_BOTTOM( K ) + TAB_PERIOD( K )) THEN
 
@@ -186,7 +186,7 @@
             CALL MSG_OUT(' ', TEXT, STATUS)
             WRITE(TEXT, '(''        # of points ='',I5)') POINTS
             CALL MSG_OUT(' ', TEXT, STATUS)
-            WRITE(TEXT, '(''        # of free parameters ='',I2)') 
+            WRITE(TEXT, '(''        # of free parameters ='',I2)')
      :            N_TERM
             CALL MSG_OUT(' ', TEXT, STATUS)
             WRITE(TEXT, '(''        # DOF ='',I3)') N_FREE

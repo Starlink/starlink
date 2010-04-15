@@ -60,13 +60,13 @@ f77_integer gk9sln_(npts, x, y)
 	      *y;		/* Y coordinates (In) */
 {
 static short
-    dashed[] = 			/* Broken line patterns,  similar to Sigmex */ 
+    dashed[] = 			/* Broken line patterns,  similar to Sigmex */
       {4,4,0},
-    dotted[] = 
+    dotted[] =
       {1,3,0},
     dash_dot[] =
       {4,3,1,3,0},
-    dash_dot_dot[] = 
+    dash_dot_dot[] =
       {4,3,1,3,1,3,0};
 
   static short
@@ -74,7 +74,7 @@ static short
     {
       dashed, dotted, dash_dot, dash_dot_dot
     };
-      
+
   static short			/* Cached line pattern (see header comments)*/
     cached_pattern[7];
 
@@ -88,7 +88,7 @@ static short
 
   extern char
     *malloc();			/* For allocating pixrect coordinate array */
-  
+
   struct pr_pos
     *points;			/* Pointer to pixrect coordinates */
 

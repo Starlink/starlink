@@ -1,8 +1,8 @@
-      SUBROUTINE JCMT_FAKE_DATA (FAKE_TYPE, XOFF, YOFF, PIXSIZE, 
+      SUBROUTINE JCMT_FAKE_DATA (FAKE_TYPE, XOFF, YOFF, PIXSIZE,
      :   NPIXEL, RACENTRE, DECCENTRE, RA, DEC, DATA, FBAD, STATUS)
 *+
 *  Name:
-*      JCMT_FAKE_DATA   
+*      JCMT_FAKE_DATA
 
 *  Purpose:
 *     generate fake data set
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL JCMT_FAKE_DATA (FAKE_TYPE, XOFF, YOFF, PIXSIZE, NPIXEL, 
+*      CALL JCMT_FAKE_DATA (FAKE_TYPE, XOFF, YOFF, PIXSIZE, NPIXEL,
 *     :   RACENTRE, DECCENTRE, RA, DEC, DATA, FBAD, STATUS)
 
 *  Description:
@@ -27,7 +27,7 @@
 *        The Dec offset of the Airy function required from the map centre
 *        (radians)
 *     PIXSIZE = DOUBLE PRECISION (Given)
-*        The size of the pixels in the map that would just fully sample the 
+*        The size of the pixels in the map that would just fully sample the
 *        the fake Airy function (radians)
 *     NPIXEL = INTEGER (Given)
 *        The number of pixels in the data
@@ -73,7 +73,7 @@
 
       DOUBLE PRECISION PDA_DBESJ1                 ! NAG Bessel function
 
-      
+
       CHARACTER*(*) FAKE_TYPE
       REAL XOFF, YOFF
       DOUBLE PRECISION PIXSIZE
@@ -92,7 +92,7 @@
       INTEGER IPIX                               ! DO loop
       INTEGER IFAIL                              ! PDA routine IFAIL
       INTEGER IGNORE                             !
-      REAL WT                                    ! value of weighting function 
+      REAL WT                                    ! value of weighting function
                                                  ! at output pixel
       DOUBLE PRECISION RPIX                      ! distance of current output
                                                  ! pixel from current input pixel
@@ -111,7 +111,7 @@
       END IF
 
 
-*  do the faking 
+*  do the faking
 
       IF (FAKE_TYPE .EQ. 'AIRY') THEN
 
@@ -120,9 +120,9 @@
 *  work out distance of pixel from centre, then corresponding
 *  value of Airy function. Airy function is such that would be fully
 *  sampled by measurements at PIXSIZE spacing.
- 
+
             RPIX = (RA(IPIX) - RACENTRE) * COS (DEC(IPIX))
-            RPIX = SQRT ((RPIX-XOFF)**2 + 
+            RPIX = SQRT ((RPIX-XOFF)**2 +
      :         (DEC(IPIX)-DECCENTRE-YOFF)**2)
             RPIX = RPIX / PIXSIZE
             XX = RPIX * DPI / (2.0D0)

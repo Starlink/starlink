@@ -62,42 +62,42 @@
       REAL VAL4                          ! Top right point.
 *-
 
-*                                                                               
-*    LINDAT contains the X,Y pairs of points to be interpolated.                  
-*                                                                               
+*
+*    LINDAT contains the X,Y pairs of points to be interpolated.
+*
 
-      DO I = 0,NPTS-1                                                             
+      DO I = 0,NPTS-1
 
-          IX1 = LINDAT(I,1)                                                     
-          IY1 = LINDAT(I,2)                                                     
-          IX2 = IX1 + 1                                                         
-          IY2 = IY1 + 1                                                         
+          IX1 = LINDAT(I,1)
+          IY1 = LINDAT(I,2)
+          IX2 = IX1 + 1
+          IY2 = IY1 + 1
 
-*                                                                               
-*       Get the four surrounding points in the data array.                           
-*                                                                               
+*
+*       Get the four surrounding points in the data array.
+*
 
-         VAL1 = DATA(IX1,IY1)                                                   
-         VAL2 = DATA(IX2,IY1)                                                   
-         VAL3 = DATA(IX1,IY2)                                                   
-         VAL4 = DATA(IX2,IY2)                                                   
+         VAL1 = DATA(IX1,IY1)
+         VAL2 = DATA(IX2,IY1)
+         VAL3 = DATA(IX1,IY2)
+         VAL4 = DATA(IX2,IY2)
 
-*                                                                               
-*       F & G are the fractional pixel displacements of the                         
-*       interpolation point.                                                         
-*                                                                               
+*
+*       F & G are the fractional pixel displacements of the
+*       interpolation point.
+*
 
-         F = LINDAT(I,1) - IX1                                                  
-         G = LINDAT(I,2) - IY1                                                  
+         F = LINDAT(I,1) - IX1
+         G = LINDAT(I,2) - IY1
 
-*                                                                               
-*       On exit , LINE will contain the array of interpolated               
-*       values ready for plotting. Bilinear interpolation is used.                         
-*                                                                               
+*
+*       On exit , LINE will contain the array of interpolated
+*       values ready for plotting. Bilinear interpolation is used.
+*
 
-         LINE(I) = F*(VAL2-VAL1) + F*G*(VAL1+VAL4-VAL2-VAL3)                    
-     :             + G*(VAL3-VAL1) + VAL1                                       
+         LINE(I) = F*(VAL2-VAL1) + F*G*(VAL1+VAL4-VAL2-VAL3)
+     :             + G*(VAL3-VAL1) + VAL1
 
-      ENDDO                                                                     
-                                                                               
-      END                                                                       
+      ENDDO
+
+      END

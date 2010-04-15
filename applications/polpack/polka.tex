@@ -270,7 +270,7 @@ single-beam mode each input frame contains only one image (the $O$ ray
 image), and the GUI controls related to the $E$ ray image are
 disabled. In dual-beam mode each input frame contains two images (the $O$
 and the $E$ ray images), either side-by-side or interlaced. If you are
-aligning non-polarimetric data, use single beam mode. 
+aligning non-polarimetric data, use single beam mode.
 
 In either mode, use of POLKA is divided into two stages. In the first
 stage, the user supplies all the information required to produce the
@@ -292,14 +292,14 @@ disconnected areas forming the mask.
 
 In single-beam mode, each input frame contains only one image (the $O$
 ray image). A single mask can still be supplied, however, to specify the
-usable area of the image. If not supplied, the mask area defaults to the 
+usable area of the image. If not supplied, the mask area defaults to the
 whole image.
 
 It is usually only necessary to identify the masks explicitly on a single
-input frame. Default masks for the other images are created automatically 
+input frame. Default masks for the other images are created automatically
 on the assumption that they are identical for all input Frames (i.e. that
-they do not move relative to the detector between frames). However, these 
-default masks can be edited if necessary by dragging, adding or deleting 
+they do not move relative to the detector between frames). However, these
+default masks can be edited if necessary by dragging, adding or deleting
 vertices.
 
 \subsection {\mylabel{POLKA_SKYSUB}Sky Subtraction}
@@ -327,16 +327,16 @@ the identification of the $O$ and $E$ ray masks).\footnote{In dual beam
 mode, separate sky areas must be identified for the $O$ and $E$ ray
 pictures. In single-beam mode, only $O$-ray sky areas are supplied.}
 Upon completion, these sky areas are extracted and cleaned by removing
-any small bright features. The \xref{KAPPA}{sun95}{} application 
-\xref{SURFIT}{sun95}{SURFIT} is then used to fit a polynomial surface 
-to the sky areas for each ray (the order of this surface may be controlled 
-by the user), and extrapolated to cover the rest of the output image. 
+any small bright features. The \xref{KAPPA}{sun95}{} application
+\xref{SURFIT}{sun95}{SURFIT} is then used to fit a polynomial surface
+to the sky areas for each ray (the order of this surface may be controlled
+by the user), and extrapolated to cover the rest of the output image.
 Finally, this fitted surface is subtracted from the output image.
 
 \end{enumerate}
 
 The effect of sky subtraction on an image can be previewed using the
-\htmlref{{\em Fit Sky}}{POLKA_FITSKY_EFFECT} item in the 
+\htmlref{{\em Fit Sky}}{POLKA_FITSKY_EFFECT} item in the
 \htmlref{{\em Effects}}{POLKA_EFFECTS_MENU} menu.
 
 \subsection{\mylabel{POLKA_ALIGNMENT}Image Alignment}
@@ -344,7 +344,7 @@ Alignment of the extracted, sky-subtracted images is based on the
 position of stars identified by the user within the images. The mapping
 between any pair of images is assumed to be a shift of origin plus an
 optional magnification. A rotation may also be included if POLKA is being
-run in single-beam mode. 
+run in single-beam mode.
 
 For non-polarimeter data, a full six co-efficient linear mapping may be
 used which can produce shift, magnification, rotation and shear.
@@ -361,16 +361,16 @@ The last stage in the processing is to create a data cube in which the
 z} axis holds the Stokes vector at every pixel. This stage is only
 performed if a value is specified for parameter \xref{OUT\_S}{sun223}{POLKA}
 when POLKA is run. The calculation of the Stokes vectors is performed by
-the POLPACK application \xref{POLCAL}{sun223}{POLCAL}. If necessary, 
+the POLPACK application \xref{POLCAL}{sun223}{POLCAL}. If necessary,
 POLCAL can be run again after POLKA has terminated, using the aligned
 intensity images created by POLKA as inputs. This may be useful, for
-instance, if you want to run POLCAL with a different set of parameters 
+instance, if you want to run POLCAL with a different set of parameters
 values to those used within POLKA.
 
 \section {\mylabel{POLKA_TUTORIAL}Tutorial}
 This is a click-by-click introduction to the use of POLKA, which aims to
 get you going with the minimum delay. It does not cover all possibilities,
-and assumes you have a relatively simple problem to solve. In particular, 
+and assumes you have a relatively simple problem to solve. In particular,
 it assumes that the sky background for each output image is to be
 estimated within a specified area of the corresponding input object frame
 (see \hyperref{here}{section }{}{POLKA_SKYSUB} if you wish to use
@@ -399,7 +399,7 @@ For further details, see the \htmlref{Dual-beam tutorial}{POLKA_DBEAM_TUT}.
 \subsubsection {Specifying the input and output images.}
 The first thing to do is to activate POLKA, specifying the input and
 output images, and the operation mode. For instance, if you
-want to process all images in the current directory matching the wild-card 
+want to process all images in the current directory matching the wild-card
 template {\bf m101\_?}, putting the output $O$-ray intensity images
 in {\bf m101\_a\_O}, {\bf m101\_b\_O}, etc, the output $E$-ray intensity
 images in {\bf m101\_a\_E}, {\bf m101\_b\_E}, etc, and the Stokes vector
@@ -417,7 +417,7 @@ specified by a comma-separated list of explicit names (eg {\bf
 m101\_a,m101\_b,m101\_c,m101\_d}), or by giving the name of a text file
 containing the names of the input images (in which case the text file
 name must be preceded by a hat ``\verb+^+'' character). The names of the
-output images may also be supplied as a list, or in two text files in a 
+output images may also be supplied as a list, or in two text files in a
 similar way.
 
 The POLKA Graphical User Interface is then constructed, which may take
@@ -430,8 +430,8 @@ aligned with the $O$ ray picture extracted from the first input image.
 Next, you should set up the options to be used. This is done by clicking
 on the \htmlref{{\em Options}}{POLKA_OPTIONS_MENU} menu button towards
 the top left of the GUI. A menu of options which can be used to customise
-the operation of POLKA is then displayed (the current option values are 
-shown in the \htmlref{status area}{POLKA_STATUS_AREA} below the image 
+the operation of POLKA is then displayed (the current option values are
+shown in the \htmlref{status area}{POLKA_STATUS_AREA} below the image
 display). The current option values may be saved by pressing the {\em
 Save Options} item at the bottom of the {\em Options} menu, in which case
 they become the default values for subsequent invocations of POLKA.
@@ -439,7 +439,7 @@ they become the default values for subsequent invocations of POLKA.
 \subsubsection {Identifying $O$-ray features in the first image.}
 The default scaling for the displayed image will usually result in the
 centres of star-like features being reasonably easy to locate. If this is
-not the case, use the \htmlref{{\em \% black}}{POLKA_BLACK} and 
+not the case, use the \htmlref{{\em \% black}}{POLKA_BLACK} and
 \htmlref{{\em \% not white}}{POLKA_NOT_WHITE} entry boxes
 in the \htmlref{{\em Display Controls}}{POLKA_DISPLAY_CONTROLS} box
 (to the left of the image) to adjust the scaling of the image. Also,
@@ -522,7 +522,7 @@ with the same label in different pictures are assumed to correspond to
 the same object on the sky. The label of any feature (whether a ``{\em
 Current}'' feature or a ``{\em Reference}'' feature) can be found by
 placing the cross-hair over the associated marker. The feature label
-will then be shown in the \htmlref{status area}{POLKA_STATUS_AREA} below 
+will then be shown in the \htmlref{status area}{POLKA_STATUS_AREA} below
 the image.
 
 When an $E$-ray feature is identified, a \htmlref{dialog
@@ -596,7 +596,7 @@ move a vertex, position the cross-hair over the vertex, press and hold
 the left mouse button, and move the cross-hair to the required position.
 The vertex will be dragged to the new location. To add an extra vertex,
 position the cross-hair over one of the edges of the polygon and click
-the left mouse button. To delete one or more vertices, draw a box around 
+the left mouse button. To delete one or more vertices, draw a box around
 them by clicking and dragging, and then press the \htmlref{{\em
 Delete}}{POLKA_DELETE} button.
 
@@ -604,9 +604,9 @@ If you want to use the same masks for several runs, you can save the $O$
 and $E$ ray masks to a text file on disk using the
 \htmlref{\emph{Dump/Masks Only}}{POLKA_DUMP} item in the
 \htmlref{\emph{File}}{POLKA_FILE_MENU} menu to save the mask geometry to
-a text file. On each subsequent run, you can restore these masks using the 
-\htmlref{\emph{Restore/Masks Only}}{POLKA_RESTORE} item in the \htmlref{\emph{File}}{POLKA_FILE_MENU} 
-menu. 
+a text file. On each subsequent run, you can restore these masks using the
+\htmlref{\emph{Restore/Masks Only}}{POLKA_RESTORE} item in the \htmlref{\emph{File}}{POLKA_FILE_MENU}
+menu.
 
 \subsubsection {Identifying the $E$-ray areas.}
 This section is only applicable to dual-beam data. If you have
@@ -654,8 +654,8 @@ the \htmlref{{\em Fit Sky}}{POLKA_FITSKY_EFFECT} item in the
 \htmlref{{\em Effects}}{POLKA_EFFECTS_MENU} menu. This will perform
 the fit to the sky background in the currently displayed image, using the
 current sky areas, and will display either the sky fit itself, or the sky
-subtracted data. Click on the 
-\htmlref{{\em Undo All}}{POLKA_UNDO_ALL_EFFECTS} item in the 
+subtracted data. Click on the
+\htmlref{{\em Undo All}}{POLKA_UNDO_ALL_EFFECTS} item in the
 \htmlref{{\em Effects}}{POLKA_EFFECTS_MENU} menu to restore the original
 displayed image.
 
@@ -683,7 +683,7 @@ Options}}{POLKA_OPTIONS_MENU} menu, and select the {\em Unzoomed} option.
 
 Next, select the {\em O-ray features} button in the box labelled
 \htmlref{{\em Current:}}{POLKA_CURRENT}. This tells POLKA that you are
-about to supply some $O$-ray feature positions. Also, select the 
+about to supply some $O$-ray feature positions. Also, select the
 {\em O-ray features} button in the box labelled
 \htmlref{{\em Reference:}}{POLKA_REFERENCE}. This will cause
 a set of green reference markers to be drawn at the positions of the
@@ -707,7 +707,7 @@ the \htmlref{{\em Draw Aligned}}{POLKA_DRAW_ALIGNED} button again. Since
 some features have now been identified in the new image, the mapping
 between the first image and the new image can be determined, and the
 entire set of green reference markers will be mapped into the coordinate
-frame of the displayed image. 
+frame of the displayed image.
 
 You should find that each green marker falls on top of an image feature
 in the new image. If this is not the case, you may have chosen the wrong
@@ -746,7 +746,7 @@ $OE$ mapping implied by these features will over-ride the default mapping
 inherited from the first image. To check the validity of an $OE$
 mapping, select the {\em E-ray features} button in the box labelled
 \htmlref{{\em Current:}}{POLKA_CURRENT}, the {\em O-ray features} button in
-the box labelled \htmlref{{\em Reference:}}{POLKA_REFERENCE}, and the 
+the box labelled \htmlref{{\em Reference:}}{POLKA_REFERENCE}, and the
 \htmlref{{\em Draw Aligned}}{POLKA_DRAW_ALIGNED} button. This will cause
 the $O$-ray features from the first image to be mapped into the $E$-ray
 frame of the new image, using the $OE$ mapping. If they are incorrectly
@@ -804,14 +804,14 @@ can be used to set the origin for each output image as follows:
 
 \begin{verbatim}
    % kappa
-   % setbound ndf='m101_a_O(1:,1:)' 
+   % setbound ndf='m101_a_O(1:,1:)'
 \end{verbatim}
 
-This will pad or trim the image {\bf m101\_a\_O} so that its bottom left 
+This will pad or trim the image {\bf m101\_a\_O} so that its bottom left
 corner is at pixel [1,1], leaving the top left corner unchanged.
 
 \section {\mylabel{POLKA_CONTROLS}A Tour of the Graphical User Interface}
-This section gives detailed descriptions of each control in the POLKA 
+This section gives detailed descriptions of each control in the POLKA
 Graphical User Interface. The controls are divided up into groups on the
 basis of their purpose and position with the interface.
 
@@ -820,27 +820,27 @@ The {\em File} menu provides access to commands which control
 temporary interruption of POLKA,
 termination of POLKA, and the creation of the output images. They are:
 
-\subsubsection {\mylabel{POLKA_DUMP}{\em Dump}} 
-Dumps information describing supplied features and masks to a text file 
-on disk which can be restore in a subsequent run of POLKA, using the 
+\subsubsection {\mylabel{POLKA_DUMP}{\em Dump}}
+Dumps information describing supplied features and masks to a text file
+on disk which can be restore in a subsequent run of POLKA, using the
 \htmlref{{\em Restore}}{POLKA_RESTORE} command. There are three
 options:
 
 \begin{description}
 
-\item [{\em Everything}] - Creates a new text file holding all the current 
-feature positions, masks, mappings, etc, for all images. This can be useful, 
-for instance, if you want to interrupt POLKA before the output data files 
-have been created. You may then re-start POLKA later on, and use the 
-\htmlref{{\em Restore}}{POLKA_RESTORE} command to restore the conditions 
-which existed when the dump file was created. 
+\item [{\em Everything}] - Creates a new text file holding all the current
+feature positions, masks, mappings, etc, for all images. This can be useful,
+for instance, if you want to interrupt POLKA before the output data files
+have been created. You may then re-start POLKA later on, and use the
+\htmlref{{\em Restore}}{POLKA_RESTORE} command to restore the conditions
+which existed when the dump file was created.
 
 \item [{\em Masks Only}] - Creates a new text file holding just the $O$
 and $E$ ray masks from the first (reference) image. This can be useful
 as a means of saving masks to be re-used in several different runs.
 
 \item [{\em Displayed image}] - Creates a new text file holding the
-feature positions, the $O$ and $E$ ray masks and the sky area masks from the 
+feature positions, the $O$ and $E$ ray masks and the sky area masks from the
 currently displayed image. This can be useful if you want to re-use the
 same image in several runs.
 
@@ -857,7 +857,7 @@ the \htmlref{{\em Save}}{POLKA_SAVE} command, and then closes down
 POLKA. The user is asked to confirm the operation once the output images
 have been saved.
 
-\subsubsection {\mylabel{POLKA_RESTORE}{\em Restore}} 
+\subsubsection {\mylabel{POLKA_RESTORE}{\em Restore}}
 This restores features lists, masks, mappings, etc, from a text file
 created earlier using the \htmlref{{\em Dump}}{POLKA_DUMP} command.
 \htmlref{{\em Restore}}{POLKA_RESTORE} command. There are three
@@ -876,12 +876,12 @@ file, then the extra images are left unchanged.
 file, and assigns them to all images, replacing any existing masks.
 
 \item [{\em Displayed Image}] - Restores feature positions, masks, and
-sky areas for the currently displayed image, replacing any existing values. 
+sky areas for the currently displayed image, replacing any existing values.
 
 \end{description}
 
 In either case, the file should have been created using the
-corresponding option in the \htmlref{{\em Dump}}{POLKA_DUMP} command. 
+corresponding option in the \htmlref{{\em Dump}}{POLKA_DUMP} command.
 
 \subsubsection {\mylabel{POLKA_SAVE}{\em Save}} Causes the output images to be
 created, based on the current set of image feature positions and area masks. If
@@ -900,7 +900,7 @@ the changing of information stored within POLKA. They are:
 
 \subsubsection {\mylabel{POLKA_CLEAR_ALL}{\em Clear All}} Causes all currently defined information to be
 erased. This includes all feature positions, masks and mappings. Use it
-if you make a real mess of things! It is equivalent to closing down POLKA 
+if you make a real mess of things! It is equivalent to closing down POLKA
 and starting it up again with the same options and input images.
 
 \subsubsection {\mylabel{POLKA_CLEAR_CURRENT}{\em Clear Current}} Causes the
@@ -949,10 +949,10 @@ Current:}}{POLKA_CURRENT}''. They may be edited or moved as usual
 \subsection {\mylabel{POLKA_OPTIONS_MENU}The {\em Options} Menu}
 The {\em Options} menu provides access to commands which control the
 various options which are available to customise the operation of POLKA.
-These options may also be set on the command line used to activate 
+These options may also be set on the command line used to activate
 POLKA. The menu items are:
 
-\subsubsection {\mylabel{POLKA_COLOURS}{\em Colours}} 
+\subsubsection {\mylabel{POLKA_COLOURS}{\em Colours}}
 This allows control of the colours used to represent various objects in
 the POLKA GUI. Upon selection, a menu of objects appear including:
 
@@ -1016,7 +1016,7 @@ input pixels.
 \item [Nearest Neighbour] - Use the value of the closest input pixel.
 \end{description}
 
-\subsubsection {\mylabel{POLKA_MAP_TYPES}{\em Mapping Types}} This displays a 
+\subsubsection {\mylabel{POLKA_MAP_TYPES}{\em Mapping Types}} This displays a
 list of the types of mappings which can be used to align the input
 images. Selecting the {\em O-E Mapping Type} entry (at the bottom of the
 menu) causes a similar menu to be posted which allows the selection of
@@ -1027,15 +1027,15 @@ The available mappings are all linear, the most general one being the
 
 \begin{eqnarray*}
 XX = C_{1} + C_{2}*X + C_{3}*Y \\
-YY = C_{4} + C_{5}*X + C_{6}*Y 
+YY = C_{4} + C_{5}*X + C_{6}*Y
 \end{eqnarray*}
 
 where the co-efficients $C_{1}$ to $C_{6}$ are all independent, and free
 to take any value ($(X,Y)$ are the supplied pixel coordinates, and
 $(XX,YY)$ are the corresponding mapped pixel coordinates). This type of
-mapping can produce shift, rotation, magnification and shear (i.e. the 
+mapping can produce shift, rotation, magnification and shear (i.e. the
 rotation may be different for the two axes). This is very general,
-and it is usually better to choose one of the other constrained linear 
+and it is usually better to choose one of the other constrained linear
 mappings. These allow
 combinations of shift, rotation and magnification, but no shear (i.e. the
 rotation is the same for both axes). In addition, the magnification
@@ -1051,7 +1051,7 @@ be used with non-polarimetric data.
 
 The constrained mappings are specified in terms of the shift, rotation and
 magnification which they produce. Using this description, the original
-axes are first rotated about their original origin. Each rotated axis is 
+axes are first rotated about their original origin. Each rotated axis is
 then magnified, and finally the origin is shifted.
 
 Each mapping type has several free parameters (shifts, rotations, etc)
@@ -1067,13 +1067,13 @@ Mapping parameters are evaluated only when a mapping is required to
 perform some operation. For instance, pressing the \htmlref{{\em Draw
 Aligned}}{POLKA_DRAW_ALIGNED} button will cause the parameters to be
 evaluated so that the selected reference features can be drawn
-aligned with the displayed image. Similarly, \htmlref{saving}{POLKA_SAVE} 
+aligned with the displayed image. Similarly, \htmlref{saving}{POLKA_SAVE}
 the output images, or using the \htmlref{{\em Mappings}}{POLKA_EDIT_MAPPINGS}
 item in the \htmlref{{\em Edit}}{POLKA_EDIT_MENU} menu, will cause the
 parameters to be evaluated. If the image features required to evaluate
 the parameters have not changed since the last time the mapping was used
 (i.e. if no new ones have been added or existing ones deleted), then the
-previous mapping parameters are used. If the required mapping parameters 
+previous mapping parameters are used. If the required mapping parameters
 cannot be evaluated (usually because the user has not yet identified
 sufficient image features), then the user is warned, and the selected
 operation is canceled.
@@ -1086,11 +1086,11 @@ marked as being out-of-date and will subsequently be re-calculated using
 the new mapping type when they are next accessed (eg when displaying
 aligned reference features or creating the output images).
 
-\subsubsection {\mylabel{POLKA_POLMODE}{\em polarimetry Mode}} This is used 
+\subsubsection {\mylabel{POLKA_POLMODE}{\em polarimetry Mode}} This is used
 to select circular or linear polarimetry mode, and it controls the
 contents of the final Stokes cube created when the output data files are
 saved. Note, circular polarization can only be measured in dual-beam mode.
-This option is disabled if Stokes vectors are not being produced. 
+This option is disabled if Stokes vectors are not being produced.
 
 \subsubsection {\mylabel{POLKA_SKYORDER}{\em Sky Order}} This is used to control
 the flexibility of the surfaces fitted to the sky background areas. It is
@@ -1101,13 +1101,13 @@ the input object frames. A value of zero results in a constant sky
 background value being used. A value of 1 results in a linear fit, etc.
 Higher values allow more flexibility in the fitted surface. The effect of
 using a particular order with the current sky areas can be previewed
-using the 
-\htmlref{{\em Fit Sky}}{POLKA_FITSKY_EFFECT} item in the 
+using the
+\htmlref{{\em Fit Sky}}{POLKA_FITSKY_EFFECT} item in the
 \htmlref{{\em Effects}}{POLKA_EFFECTS_MENU} menu.
 
 \subsubsection {\mylabel{POLKA_STATUS_ITEMS}{\em Status Items}} This is used to
 customise the contents of the \htmlref{status area}{POLKA_STATUS_AREA}
-shown below the image display area. Selecting this item will result in the 
+shown below the image display area. Selecting this item will result in the
 \htmlref{{\em Select status items}}{POLKA_STATUS_ITEMS_DIALOG} dialog
 box appearing.
 
@@ -1117,7 +1117,7 @@ menu. It may take one of the values:
 
 \begin{description}
 
-\item [Unzoomed] - Each new image is displayed so that it just fills the 
+\item [Unzoomed] - Each new image is displayed so that it just fills the
 image display area in at least one dimension. The previous scale factor
 and image centre are ignored.
 
@@ -1142,27 +1142,27 @@ will be subtracted from the output images, and the
 \htmlref{{\em Fit Sky}}{POLKA_FITSKY_EFFECT} item in the
 \htmlref{{\em Effects}}{POLKA_EFFECTS_MENU} menu is inoperative.
 
-\subsubsection {\mylabel{POLKA_DISPLAY_HELP_AREA}{\em Display Help Area}} 
+\subsubsection {\mylabel{POLKA_DISPLAY_HELP_AREA}{\em Display Help Area}}
 If this button is selected, then the POLKA GUI will include a
 \htmlref{help area}{POLKA_HELP_AREA} in which dynamic help information
 on the control under the pointer is displayed. Otherwise, the help area
 is not displayed.
 
-\subsubsection {\mylabel{POLKA_DISPLAY_STATUS_AREA}{\em Display Status Area}} 
+\subsubsection {\mylabel{POLKA_DISPLAY_STATUS_AREA}{\em Display Status Area}}
 If this button is selected, then the POLKA GUI will include a
 \htmlref{status area}{POLKA_HELP_AREA} in which information
-describing the current state (such as image names, options values, 
+describing the current state (such as image names, options values,
 feature labels, pointer co-ordinates, etc) is displayed. Otherwise, the
 status area is not displayed. The contents of this area may be customised
 using the \htmlref{{\em Status Items}}{POLKA_STATUS_ITEMS} entry in the
 \htmlref{{\em Options}}{POLKA_OPTIONS_MENU} menu.
 
-\subsubsection {\mylabel{POLKA_SAVE_OPTIONS}{\em Save Options}} 
+\subsubsection {\mylabel{POLKA_SAVE_OPTIONS}{\em Save Options}}
 If this menu item is selected, the current option values (together with
 the values shown in the \htmlref{{\em \% not white}}{POLKA_NOT_WHITE}
 and \htmlref{{\em \% black}}{POLKA_BLACK} controls) will be saved so that
 they become the default values for future invocations of
-POLKA.\footnote{The current values are passed back to the POLKA A-task 
+POLKA.\footnote{The current values are passed back to the POLKA A-task
 upon completion, and they are then stored in the A-tasks parameter file.}
 
 \subsection {\mylabel{POLKA_IMAGES_MENU}The {\em Images} Menu}
@@ -1202,48 +1202,48 @@ All}}{POLKA_UNDO_ALL_EFFECT} menu item.
 Effects applied to an image remain active until they are canceled using
 the \htmlref{{\em Undo}}{POLKA_UNDO_EFFECT} or
 \htmlref{{\em Undo All}}{POLKA_UNDO_ALL_EFFECTS} items in this menu. Thus
-if some effects are applied to an image and then a different input image 
-is selected (using the \htmlref{{\em Images}}{POLKA_IMAGES_MENU} menu), 
+if some effects are applied to an image and then a different input image
+is selected (using the \htmlref{{\em Images}}{POLKA_IMAGES_MENU} menu),
 the effects will still be in place when the original image is re-selected.
 
-\subsubsection {\mylabel{POLKA_ALIGN_EFFECT}{\em Align} } 
+\subsubsection {\mylabel{POLKA_ALIGN_EFFECT}{\em Align} }
 Re-displays the current image in alignment with another specified image.
 This can only be done if the image mappings for both images are
 available. All the positions associated with the re-aligned image are
 modified so that they refer to the coordinate frame of the second image.
 
 \subsubsection {\mylabel{POLKA_FILL_EFFECT}{\em Fill} }
-Replaces any bad pixels in the displayed image using either a constant 
+Replaces any bad pixels in the displayed image using either a constant
 value, or a smooth surface which is continuous with the surrounding good
 data.
 
-\subsubsection {\mylabel{POLKA_FILTER_EFFECT}{\em Filter} } 
+\subsubsection {\mylabel{POLKA_FILTER_EFFECT}{\em Filter} }
 Applies a high pass filter to the displayed image (i.e. removes any
 slowly varying background, leaving only features comparable to or smaller
-than a specified size). 
+than a specified size).
 
-\subsubsection {\mylabel{POLKA_FITSKY_EFFECT}{\em Fit Sky} } 
+\subsubsection {\mylabel{POLKA_FITSKY_EFFECT}{\em Fit Sky} }
 Estimates the sky background in the displayed image based on the current
 sky areas or supplied sky frames, using the same method used to fit the
 sky when creating the output data files. The displayed image may be
 replaced either by the fit itself, or by the difference between the
 currently displayed image and the fit. The fit is based on the current
-options values (such as \htmlref{{\em Sky Order}}{POLKA_SKYORDER}). 
+options values (such as \htmlref{{\em Sky Order}}{POLKA_SKYORDER}).
 
-\subsubsection {\mylabel{POLKA_LOG_EFFECT}{\em Log} } 
+\subsubsection {\mylabel{POLKA_LOG_EFFECT}{\em Log} }
 Takes the log (base 10) of the difference between each pixel value and the
 minimum pixel value in the displayed image.
 
-\subsubsection {\mylabel{POLKA_MATHS_EFFECT}{\em Maths} } 
-Combines images on the effects stack using an arbitrary algebraic expression 
-to combine the pixel values. It is based on the \xref{MATHS}{sun95}{MATHS} 
-application from \xref{KAPPA}{sun95}{}, which should be consulted for 
-details of the syntax of the expression. Within the expression, the token IA 
+\subsubsection {\mylabel{POLKA_MATHS_EFFECT}{\em Maths} }
+Combines images on the effects stack using an arbitrary algebraic expression
+to combine the pixel values. It is based on the \xref{MATHS}{sun95}{MATHS}
+application from \xref{KAPPA}{sun95}{}, which should be consulted for
+details of the syntax of the expression. Within the expression, the token IA
 refers to the currently displayed image, IB refers to the image before
 the previous effect was applied (if any), IC refers to the image before
 that, etc. An error is reported if images do not exist for any of the
 tokens in the expression (for instance, if you include token IB when no
-previous effects have been applied). 
+previous effects have been applied).
 
 As an example, suppose you have previously applied two other effects to
 the image, and give the expression:
@@ -1257,16 +1257,16 @@ both effects), IB refers to the image before the second effect was
 applied, and IC refers to the image before the first effect was supplied
 (i.e. the original image).
 
-Parameter tokens (PA, PB, etc) and sub-expression tokens (FA, FB, etc) should 
+Parameter tokens (PA, PB, etc) and sub-expression tokens (FA, FB, etc) should
 not be included in the expression.
 
-\subsubsection {\mylabel{POLKA_NEGATE_EFFECT}{\em Negate} } 
+\subsubsection {\mylabel{POLKA_NEGATE_EFFECT}{\em Negate} }
 Multiplies every pixel value in the displayed image by minus one.
 
 \subsubsection {\mylabel{POLKA_SMOOTH_EFFECT}{\em Smooth} }
 Applies Gaussian smoothing to the displayed image.
 
-\subsubsection {\mylabel{POLKA_STATS_EFFECT}{\em Stats} } 
+\subsubsection {\mylabel{POLKA_STATS_EFFECT}{\em Stats} }
 This effect does not produce any changes in the displayed image. Instead,
 a pop-up window is displayed containing statistics for the pixel values
 within the currently selected area of the displayed image. Note, you must
@@ -1274,33 +1274,33 @@ select an area before using this effect, by clicking and dragging across
 the image with the left mouse button. \hyperref{Go here}{See section
 }{}{POLKA_AREA_SELECTION} for further details on selecting areas.
 
-\subsubsection {\mylabel{POLKA_THRESHOLD_EFFECT}{\em Threshold} } 
+\subsubsection {\mylabel{POLKA_THRESHOLD_EFFECT}{\em Threshold} }
 Applies upper and lower limits to the pixel values in the displayed image.
-Out-of-bounds pixels can either be removed (i.e. set bad), or set to the 
+Out-of-bounds pixels can either be removed (i.e. set bad), or set to the
 corresponding limit value.
 
 \subsubsection {\mylabel{POLKA_SHOW_EFFECTS}{\em Show Effects} }
-Creates a dialog box containing a list of the effects applied to the 
+Creates a dialog box containing a list of the effects applied to the
 currently displayed image.
 
-\subsubsection {\mylabel{POLKA_UNDO_EFFECT}{\em Undo} } 
+\subsubsection {\mylabel{POLKA_UNDO_EFFECT}{\em Undo} }
 Removes the most recently applied effect from the currently displayed
 image.
 
-\subsubsection {\mylabel{POLKA_UNDO_ALL_EFFECTS}{\em Undo All} } 
+\subsubsection {\mylabel{POLKA_UNDO_ALL_EFFECTS}{\em Undo All} }
 Removes the all effects from the currently displayed image. The original
 image as supplied by the user is then displayed.
 
 \subsection {\mylabel{POLKA_HELP_MENU}The {\em Help} Menu}
-This menu provides access to the POLKA hyper-text help information. 
+This menu provides access to the POLKA hyper-text help information.
 \hyperref{Go here}{See section }{}{POLKA_USING_HELP} for more information
 on selecting which browser is to be used. This menu provides several preset
-access points for the help information. The {\em Pointer} item allows the 
-required help to be specified by pointing at a control on the GUI using the 
+access points for the help information. The {\em Pointer} item allows the
+required help to be specified by pointing at a control on the GUI using the
 mouse, and then pressing the left mouse button. A similar effect can be
 produced without using this option by positioning the pointer and then
 pressing the F1 button on the keyboard. The hyper-text help information
-may also be searched for specified keywords using the 
+may also be searched for specified keywords using the
 \htmlref{{\em Search for...}}{POLKA_HSEARCH} entry in the {\em Help} menu.
 
 \subsubsection {\mylabel{POLKA_HSEARCH}{\em Search for...}}
@@ -1349,8 +1349,8 @@ this mode are:
 \begin{itemize}
 
 \item Single click to identify an image feature. \hyperref{Go here}{See
-section }{}{POLKA_IDENTIFYING_FEATURES} for instructions on identifying 
-image features. 
+section }{}{POLKA_IDENTIFYING_FEATURES} for instructions on identifying
+image features.
 
 \item Click and drag to select an area of the image. \hyperref{Go here}{See
 section }{}{POLKA_AREA_SELECTION} for instructions on selecting areas.
@@ -1371,9 +1371,9 @@ the vertex, press and hold the left mouse button, and then move the
 pointer. The vertex and connecting edges will be moved with the pointer
 until the mouse button is released.
 
-\item To add another vertex to an existing polygon, position the pointer 
+\item To add another vertex to an existing polygon, position the pointer
 over the edge where the new vertex is required, and click the left mouse
-button. 
+button.
 
 \item To commence the definition of a new polygon, position the pointer
 away from any existing vertices or edges, and click the left mouse button.
@@ -1392,7 +1392,7 @@ create a polygon}{POLKA_MODE_1}'' mode. Adjacent vertices around the
 polygon are supplied by positioning the pointer and clicking the left
 mouse button. The polygon is closed when a vertex is given close to the
 first vertex, and the display area then reverts to ``\htmlref{Edit or
-create a polygon}{POLKA_MODE_1}'' mode. The available interactions in 
+create a polygon}{POLKA_MODE_1}'' mode. The available interactions in
 this mode are:
 
 \begin{itemize}
@@ -1417,11 +1417,11 @@ area}{POLKA_STATUS_AREA}, and becomes the currently selected entry in
 the list of labels within the {\em Select feature label} dialog box.
 Clicking the left mouse button then causes the currently selected label
 to be assigned to the new image feature. The display area then reverts to
-``\htmlref{Identify features}{POLKA_MODE_0}'' mode. 
+``\htmlref{Identify features}{POLKA_MODE_0}'' mode.
 The available interactions in this mode are:
 
 \begin{itemize}
-\item Position pointer over a feature to highlight the corresponding label 
+\item Position pointer over a feature to highlight the corresponding label
 in the list box.
 \item Click on a feature to close the dialog box and use the feature's label.
 \end{itemize}
@@ -1452,18 +1452,18 @@ result in the selected area of the image being re-displayed so that it
 fills the display window in at least one dimension. The button will then
 be disabled until another image area is selected. Several zoom operations
 may be applied in sequence, and may be undone in reverse sequence by
-repeated use of the \htmlref{{\em Unzoom}}{POLKA_UNZOOM} button. 
+repeated use of the \htmlref{{\em Unzoom}}{POLKA_UNZOOM} button.
 
 \subsubsection {\mylabel{POLKA_UNZOOM}The {\em Unzoom} Button}
-This button is enabled when one or more zoom or centre operations have 
+This button is enabled when one or more zoom or centre operations have
 been applied to the image. Single clicking on this button will undo the
 most recent zoom or centre operation, and double clicking will undo
 all zoom and centre operations.
 
 \subsubsection {\mylabel{POLKA_CENTRE}The {\em Centre} Button}
 This button is used to re-display the current image putting a specified
-position at the centre of the display window. When the button is pressed 
-the pointer or cross-hair will change to a circle within the image display 
+position at the centre of the display window. When the button is pressed
+the pointer or cross-hair will change to a circle within the image display
 area. Position this circular cursor at the position which is to be
 located at the centre of the display window, and press the left mouse
 button. The image will be re-displayed, and the circular cursor will
@@ -1492,7 +1492,7 @@ pressed, then the re-centring operation will be canceled.
 \item Otherwise, if an area has been selected by clicking and dragging
 over the image, then the area selection is canceled.
 
-\item Otherwise, if the user is in the process of 
+\item Otherwise, if the user is in the process of
 \htmlref{supplying a mask polygon}{POLKA_MODE_2} then the incomplete
 polygon is deleted, and the interaction mode within the display window
 reverts to ``\htmlref{Edit or create a polygon}{POLKA_MODE_1}''.
@@ -1567,16 +1567,16 @@ needed to align the output images.
 $E$-ray areas of the input image. These are also used to derive the mappings
 needed to align the output images.
 \item [$O$-ray mask] - This consists of one or more closed polygonal curves
-containing all the $O$-ray areas in the input image. 
+containing all the $O$-ray areas in the input image.
 \item [$E$-ray mask] - One or more closed polygonal curves
-containing all the $E$-ray areas in the input image. 
+containing all the $E$-ray areas in the input image.
 \item [$O$-ray sky area] - This consists of one or more closed polygonal curves
 containing the regions within the $O$-ray area in which the sky
-background is to be estimated. This button will be disabled if 
+background is to be estimated. This button will be disabled if
 separate sky frames were supplied when POLKA was run, or if the
 \htmlref{{\em Remove Sky}}{POLKA_REMOVE_SKY} entry in the \htmlref{{\em
 Options}}{POLKA_OPTIONS_MENU} menu is not selected.
-\item [$E$-ray sky area] - The $E$-ray sky areas - equivalent to the 
+\item [$E$-ray sky area] - The $E$-ray sky areas - equivalent to the
 {\em O-ray sky} button.
 \end{description}
 
@@ -1584,7 +1584,7 @@ Options}}{POLKA_OPTIONS_MENU} menu is not selected.
 The controls in this box control the display of ``reference objects''
 within the \htmlref{image display area}{POLKA_IMAGE_DISPLAY}. These
 objects cannot be modified, and are intended only to facilitate the location
-and labelling of the current objects selected in the box labelled 
+and labelling of the current objects selected in the box labelled
 ``\htmlref{{\em Current:}}{POLKA_CURRENT}''. Reference objects are
 shown in a different colour, and use a different marker to the current
 objects.
@@ -1624,7 +1624,7 @@ be displayed as reference object.
 Note, the ``{\em current}'' objects cannot also be used as ``{\em
 reference}'' objects, and one of the above buttons will in general be
 disabled to prevent this from happening. If the current reference objects are
-selected in the ``\htmlref{{\em Current:}}{POLKA_CURRENT}'' box, then the 
+selected in the ``\htmlref{{\em Current:}}{POLKA_CURRENT}'' box, then the
 reference objects will automatically revert to {\em None}.
 
 \subsubsection {\mylabel{POLKA_DRAW_ALIGNED}The {\em Draw Aligned} Button}
@@ -1658,7 +1658,7 @@ controls in the ``{\em Reference}'' box.
 
 \subsubsection {\mylabel{POLKA_ACCEPT}The {\em Accept} Button}
 Pressing this button causes an image feature to be identified for each
-of the displayed reference features. For each reference position, a search 
+of the displayed reference features. For each reference position, a search
 is made for a corresponding image feature, taking the displayed position of the
 reference feature as the initial guess. This is equivalent to the user
 positioning the pointer over each reference feature in turn and pressing
@@ -1693,7 +1693,7 @@ clicking over the \htmlref{image display area}{POLKA_IMAGE_DISPLAY}. It
 is used to assign a numerical label to the feature so that corresponding
 features in different images and rays can be identified. A specific object
 on the sky should be assigned the same label in all images and rays.
-Failure to do this will result in the mappings being inaccurate. 
+Failure to do this will result in the mappings being inaccurate.
 
 The dialog box does not appear if there are currently no image features
 identified in any image other than the displayed image. In this case a
@@ -1705,14 +1705,14 @@ OK} button (or just double-click on its entry in the list). An
 alternative way to select a feature label is to position the pointer over
 the feature's reference marker in the \htmlref{image display
 area}{POLKA_IMAGE_DISPLAY} and click the left mouse button. As the
-pointer is moved over features in the image, the corresponding label 
+pointer is moved over features in the image, the corresponding label
 is always highlighted in the list in the dialog box, and shown in the
 \htmlref{status area}{POLKA_STATUS_AREA}.
 
 Pressing the {\em New} button will assign a new (i.e. previously unused)
 label to the image feature.
 
-Pressing the {\em Cancel} button will close the dialog box and delete the 
+Pressing the {\em Cancel} button will close the dialog box and delete the
 candidate image feature.
 
 Pressing the {\em Help} button displays this information in a hyper-text
@@ -1736,7 +1736,7 @@ The mapping is described in two ways:
 
 \begin{itemize}
 \item In terms of the rotation, magnification and shift produced
-by the mapping on each axis. The original pixel co-ordinate frame 
+by the mapping on each axis. The original pixel co-ordinate frame
 is first rotated about its origin (the displayed rotations are measured
 clockwise, in degrees). Each axis is then magnified, and finally the
 origin is shifted.
@@ -1781,7 +1781,7 @@ user. The {\em Magnification} values are set to 1.0 and may not be changed.
 \item[Shift of origin and magnification] - Both the {\em Shift} and the X
 axis {\em Magnification} values may be changed. The Y axis {\em
 Magnification} value is automatically set to equal the X axis value and
-may not be changed by the user. The {\em Rotation} values are set to 0.0 and 
+may not be changed by the user. The {\em Rotation} values are set to 0.0 and
 may not be changed.
 
 \item[Shift of origin, rotation and magnification] - The  {\em Shift},
@@ -1809,7 +1809,7 @@ functions:
 
 \begin{description}
 \item [{\em OK}] - Saves the currently displayed mapping values so that
-they will be used in future to perform any required mappings. 
+they will be used in future to perform any required mappings.
 \item [{\em Clear}] - Clears all the mapping values so that the mapping
 becomes undefined. This button is disabled if the mapping is protected.
 \item [{\em Cancel}] - Restores the original mapping values, and closes
@@ -1918,14 +1918,14 @@ This hyper-text help information may be accessed in several ways:
 far right of the menu bar can be used to access various preset points in
 the help text.
 
-\item A description of a specific control in the GUI can be obtained by 
+\item A description of a specific control in the GUI can be obtained by
 positioning the pointer over the control, and pressing the F1
 button on the keyboard.
 
-\item A description of a specific control may also be obtained by clicking 
+\item A description of a specific control may also be obtained by clicking
 on the {\em Pointer...} entry in the \htmlref{{\em
 Help}}{POLKA_HELP_MENU} menu, positioning the cursor over the control,
-and clicking the left mouse button. 
+and clicking the left mouse button.
 
 \end{enumerate}
 
@@ -1937,18 +1937,18 @@ The \htmlref{{\em \% not white}}{POLKA_WHITE} and \htmlref{{\em \% black}}
 {POLKA_DISPLAY_CONTROLS} box (to the left of the image) can be used to
 change the data values corresponding to black and white in the displayed
 image. These first specifies the percentages of the displayed pixels
-which are to be shown as black, and the second gives the percentages of the 
+which are to be shown as black, and the second gives the percentages of the
 displayed pixels which are to be shown as grey (i.e. anything other than
 pure white). For instance, if you give values of 4 and 92 for these, then
 4 \% of the displayed pixels will be pure black, and 8 \% (i.e. $100-92$)
 will be pure white. The rest will be somewhere in between.
 
 Note, these values give percentages of the {\em displayed} pixels.
-Therefore, changing the pixels included in the display (for instance by 
+Therefore, changing the pixels included in the display (for instance by
 zooming, or changing the centre position) will in general change the data
 values corresponding to the specified percentages, resulting in a
 different grey-scale. To prevent this happening, the actual data values
-used for black and white can be locked at the current values using the 
+used for black and white can be locked at the current values using the
 \htmlref{{\em Lock Scaling}}{POLKA_LOCK_SCALING} button. If this is done,
 the {\em \% black} and {\em \% not white} widgets have no effect until the
 {\em Lock Scaling} button is released.
@@ -1961,7 +1961,7 @@ to be ``selected'' before the operation is used. A selected area is a
 rectangular region of the image, chosen by pressing the left mouse button
 over the image and then dragging the mouse while holding the button down.
 The area is marked by a box (the colour is normally red, but can be
-changed using the \htmlref{{\em Options}}{POLKA_OPTIONS_MENU} menu). 
+changed using the \htmlref{{\em Options}}{POLKA_OPTIONS_MENU} menu).
 
 Any operation which uses a selection box will remove it upon completion,
 but it may also be removed by pressing the \htmlref{{\em Cancel}}{POLKA_CANCEL}
@@ -1993,11 +1993,11 @@ feature position will be refined using a centroiding process.
 
 To facilitate identification of image features, the features from another
 image (or ray) can be displayed as \htmlref{reference}{POLKA_REFERENCE}
-markers. 
+markers.
 
 You will be required to supply a numerical label for the feature unless
 no other images yet have any features (in which case a label will be
-generated automatically). The simplest way to do this is to click on 
+generated automatically). The simplest way to do this is to click on
 the corresponding reference marker. The new feature will then inherit the
 label of the reference marker.
 
@@ -2017,13 +2017,13 @@ the sky. To do this, follow this procedure:
 
 \begin{enumerate}
 
-\item Process the first batch. Give your chosen reference image as the 
+\item Process the first batch. Give your chosen reference image as the
 first input image when specifying parameter IN, and give a null (!) value
 for parameter OUT\_S (we will create Stokes vectors later using POLCAL
 directly). Once you have identified all the feature positions, masks and
 sky areas in the reference image, save them in a file using the
 \htmlref{{\em Dump}} {POLKA_DUMP}/{\em Displayed Image} command in the
-\htmlref{{\em File}}{POLKA_FILE_MENU} menu. Then carry on to identify the 
+\htmlref{{\em File}}{POLKA_FILE_MENU} menu. Then carry on to identify the
 required features and masks in the other images, and create the
 aligned extracted images using the \htmlref{{\em File}}
 {POLKA_FILE_MENU}/{\em Exit} command as usual.
@@ -2048,8 +2048,8 @@ Polka.
 \end{enumerate}
 
 \subsection {\mylabel{POLKA_STOP_START}Stop and Re-start POLKA}
-Use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Everything} and 
-\htmlref{{\em Restore}}{POLKA_RESTORE}/{\em Everything} commands in the 
+Use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Everything} and
+\htmlref{{\em Restore}}{POLKA_RESTORE}/{\em Everything} commands in the
 \htmlref{{\em File}}{POLKA_FILE_MENU} menu. {\em Dump} creates a text file
 containing all the features positions, masks, mappings, etc, which you
 have supplied so far. After using {\em Dump}, you can use \htmlref{{\em
@@ -2061,13 +2061,13 @@ state it was in when the dump file was created.
 \subsection {\mylabel{POLKA_PREALIGNED_IMAGES}Use pre-aligned images}
 If your images are already in alignment (or nearly in alignment), then
 you do not need to identify feature positions, masks, etc, for every image.
-Instead, just identify features and masks within one of the images and then 
+Instead, just identify features and masks within one of the images and then
 use the {\em Transfer} command in the \htmlref{{\em Images}}{POLKA_IMAGES_MENU}
 menu to transfer them to the other images.
 
 \subsection {\mylabel{POLKA_EDITING_POLYGONS}Edit polygons}
 Polygons are displayed when one of the {\em mask} or {\em sky
-area} buttons is selected in the ``\htmlref{{\em Current:}}{POLKA_CURRENT}'' 
+area} buttons is selected in the ``\htmlref{{\em Current:}}{POLKA_CURRENT}''
 box). Completed polygons may be edited in any of the following ways:
 
 \begin{itemize}

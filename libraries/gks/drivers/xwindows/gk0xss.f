@@ -70,11 +70,11 @@
          IXSIZE = MIN( IUXS, IXXSP - 40)
       ELSE
          IXSIZE = DEFRX
-      END IF      
+      END IF
       CALL GK0XTL( 'YSIZE', IUYS )
       IF (IUYS.GT.0) THEN
          IYSIZE = MIN( IUYS, IXYSP - 30)
       ELSE
          IYSIZE = DEFRY
-      END IF      
+      END IF
       END

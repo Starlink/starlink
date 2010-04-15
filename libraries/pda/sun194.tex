@@ -51,7 +51,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -471,12 +471,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -527,7 +527,7 @@
    provides for both double and single precision, and the routines from
    DIERCKX exist only for single precision.
 
-{\em 
+{\em
    The hints for migration from NAG to this library are incomplete.
    Application programmers are encouraged to check these hints and to
    report on their experience in converting applications from NAG to
@@ -583,7 +583,7 @@
 \item Simann (PDA\_SA) is a Simulated Annealing algorithm written by
    William L.\ Goffe at the University of Southern Mississippi. It can
    be used freely for research, commercial distribution is not allowed.
-   Goffe highly recommends to run the 
+   Goffe highly recommends to run the
    algorithm with the test problem with different values for the
    parameters, before one tries it on a ``real'' problem. `The experience
    you gain will be quite helpful.'
@@ -591,13 +591,13 @@
    Texas as Austin. It can be used without restrictions.
 \end{itemize}
 
-The gridded 2-D polynomial surface fitting 
+The gridded 2-D polynomial surface fitting
 routines PDA\_DB2INK and PDA\_DB2VAL originated from Ronald
 Boisvert of the US National Bureau of Standards. They were
 part of CMLIB from CAMSUN.
 
-The ungridded 2-D surface fitting routines 
-PDA\_IDBVIP and PDA\_IDSFFT were originally 
+The ungridded 2-D surface fitting routines
+PDA\_IDBVIP and PDA\_IDSFFT were originally
 module TOMS526 of the TOMS library at NETLIB.
 
    Some routines are from the DIERCKX library. The author Paul Dierckx
@@ -633,7 +633,7 @@ module TOMS526 of the TOMS library at NETLIB.
 
    The terminal I/O and error handling have been reviewed. Since
    Starlink applications will often run under some environment which
-   results in them being 
+   results in them being
    detached from standard Fortran units, these areas have to be
    addressed and made compliant with Starlink methods of message and
    error handling.
@@ -667,15 +667,15 @@ module TOMS526 of the TOMS library at NETLIB.
    PDA\_UNCMND algorithm, in routines PDA\_D1FCND and PDA\_D2FCND. These
    are dummy routines and never actually called.
 
-The surface fitting routines PDA\_DB2INK and PDA\_DB2VAL call a 
-routine PDA\_DBVAL2. Originally, PDA\_DBVAL2 called XERROR when a 
-problem was encountered. These calls have been commented out. The 
-routine now sets variable {\tt IFAIL} appropriately instead. On exit from 
-PDA\_DB2INK and PDA\_DB2INK, {\tt STATUS} is set to 1 if the 
-{\tt IFAIL} value indicated that a serious fault had occurred. 
-{\tt STATUS} must have the 
+The surface fitting routines PDA\_DB2INK and PDA\_DB2VAL call a
+routine PDA\_DBVAL2. Originally, PDA\_DBVAL2 called XERROR when a
+problem was encountered. These calls have been commented out. The
+routine now sets variable {\tt IFAIL} appropriately instead. On exit from
+PDA\_DB2INK and PDA\_DB2INK, {\tt STATUS} is set to 1 if the
+{\tt IFAIL} value indicated that a serious fault had occurred.
+{\tt STATUS} must have the
 value 0 when the routines are called.
-  
+
 The surface fitting routines PDA\_IDBVIP and PDA\_IDSFFT, together
 with their support routines, have been modified to ensure that {\tt STATUS}
 is set to 1 if the internal error status variable {\tt ISTAT} indicates
@@ -821,7 +821,7 @@ be compared.
    % f77 program.f -L/star/lib `pda_link`
 \end{verbatim}
 
-   The {\tt pda\_link} and {\tt pda\_link\_adam} scripts results in your 
+   The {\tt pda\_link} and {\tt pda\_link\_adam} scripts results in your
    program being linked with the Starlink Error Message Service
 \xref{(EMS).}{ssn4}{}
    When an error report is to
@@ -923,29 +923,29 @@ be compared.
 \subsection{\xlabel{differences_between_nag_and_fftpack}Differences between NAG and FFTPACK}
 
 \begin{itemize}
-\item 
+\item
    FFTPACK expects and returns data in a different format to NAG.
-\item 
+\item
    FFTPACK includes initialisation routines (PDA\_RFFTI and PDA\_CFFTI) which
    should be called prior to the other routines, but which don't need to be
    called again until the size of the data array changes. There are no
    equivalent NAG initialisation routines. The main NAG FFT routines
    (e.g.\ C06FAF, etc.) do this initialisation each time they are called,
-   irrespective of the array size. 
-\item 
+   irrespective of the array size.
+\item
    FFTPACK has separate forward and backward transform routines, whereas
-   NAG only has forward routines (backward transforms are performed by 
+   NAG only has forward routines (backward transforms are performed by
    using complex conjugation with the forward transform). This means that
    there is probably no need to supply equivalents to the complex conjugation
    NAG routines (a trivial operation anyway).
-\item 
+\item
    FFTPACK can accept arrays of any length, whereas NAG puts some
    restrictions on the array length (no prime factor larger than 19 allowed
    in the array size, and the total number of prime factors must be less than
    21).
-\item 
+\item
    FFTPACK routines require a differently sized work space array.
-\item 
+\item
    FFTPACK has no error checking.
 \end{itemize}
 
@@ -957,7 +957,7 @@ be compared.
    FFTPACK store arrays of Fourier coefficients. In the following, the
    Fourier transform of an array of N data values is represented by a
    sequence of N complex values
-   [A0+i*B0], [A1+i*B1], ..., [A(N-1)+i*B(N-1)]. 
+   [A0+i*B0], [A1+i*B1], ..., [A(N-1)+i*B(N-1)].
 
    The differences are basically in the organisation of the Fourier
    coefficients within the returned array, and also in the
@@ -985,7 +985,7 @@ be compared.
    disadvantage is that the resulting Fourier transform array can be
    rather more difficult to use than if all the real and imaginary parts
    are stored explicitly. There are routines
-\htmlref{PDA\_DNAG2R}{PDA\_NAG2R} and 
+\htmlref{PDA\_DNAG2R}{PDA\_NAG2R} and
 \htmlref{PDA\_DR2NAG}{PDA\_R2NAG}
    to do in-situ conversions between NAG and FFTPACK format. Note, each
    of these routines divides the supplied values by SQRT(N), so
@@ -1042,7 +1042,7 @@ be compared.
    coefficients produced by PDA\_DRFFTF are numerically larger than the
    corresponding C06FAF coefficients by a factor of SQRT(N). There are
    subroutines
-\htmlref{PDA\_DNAG2C}{PDA\_NAG2C} and 
+\htmlref{PDA\_DNAG2C}{PDA\_NAG2C} and
 \htmlref{PDA\_DC2NAG}{PDA\_C2NAG}
    to convert between NAG and FFTPACK format. Successive calls to
    PDA\_DC2NAG and PDA\_DNAG2C will result in the original data being divided by
@@ -1304,14 +1304,14 @@ if necessary}
    and normalises them. You can either modify the way your application
    to use the FFTPACK format instead of the NAG format, or call the
 \htmlref{PDA\_DC2NAG}{PDA\_C2NAG}
-   routine to convert the FFTPACK results into NAG format. 
+   routine to convert the FFTPACK results into NAG format.
 
 \begin{verbatim}
       DOUBLE PRECISION X(N), Y(N), C(2*N)
       CALL PDA_DC2NAG( N, C, X, Y )
 \end{verbatim}
 
-   where C is the output from PDA\_DCFFTF, and X and Y hold the corresponding 
+   where C is the output from PDA\_DCFFTF, and X and Y hold the corresponding
    real and imaginary coefficients as returned by C06FCF.
 
    \end{itemize}
@@ -1594,11 +1594,11 @@ Interpolation and Fitting, Splines}
    given, not just the interior ones.
    Instead of weights PDA\_DEFC takes standard deviations (x,y,sigma) and uses
    1/sigma as weight. Evaluation of the function and its derivatives is
-   done by PDA\_DBVALU, integration by PDA\_DBSQAD. 
+   done by PDA\_DBVALU, integration by PDA\_DBSQAD.
 
    E02BBF and E02BCF evaluate an interpolating or fitting cubic spline
-   and its derivatives. They follow a call to E01BAF or E02BAF. 
-   This function is taken over by PDA\_DBVALU. 
+   and its derivatives. They follow a call to E01BAF or E02BAF.
+   This function is taken over by PDA\_DBVALU.
    E02BDF integrates an interpolating or fitting cubic spline. It
    follows a call to E01BAF or E02BAF. This function is taken over by
    PDA\_DBSQAD.
@@ -1610,7 +1610,7 @@ Interpolation and Fitting, Splines}
    While the other routines are from SLATEC and for double precision,
    PDA\_CURFIT is for single precision. Hence, PDA\_SPLEV, PDA\_SPLDER
    and PDA\_SPLINT should be used to evaluate the spline, its n-th derivative,
-   and its integral. 
+   and its integral.
 
 %    --------------------------------------------------------------------------
 
@@ -1677,7 +1677,7 @@ Interpolation and Fitting, Splines}
 
 \subsection{\xlabel{replacing_calls_to_e02baf}\label{m_e02baf}Replacing calls to E02BAF}
 
-{\em 
+{\em
    PDA\_DEFC has not yet been used anywhere to replace E02BAF. Thus the
    migration hints given here may contain errors or may be based on
    misunderstandings.
@@ -1869,7 +1869,7 @@ Interpolation and Fitting, Splines}
 
 \subsection{\xlabel{replacing_calls_to_e02bdf}Replacing calls to E02BDF}
 
-{\em 
+{\em
    PDA\_DBSQAD has not yet been used anywhere to replace E02BDF. Thus the
    migration hints given here may contain errors or may be based on
    misunderstandings.
@@ -2159,9 +2159,9 @@ The routines for this sort of application are:
    precision version (PDA\_CHE2R) is available.
 
 \item \htmlref{PDA\_BISPEV}{PDA\_BISPEV}
-   PDA\_BISPEV evaluates the bivariate spline approximation found by 
+   PDA\_BISPEV evaluates the bivariate spline approximation found by
    PDA\_SURFIT.
- 
+
 \item \htmlref{PDA\_DB2INK}{PDA\_DB2INK}
    PDA\_DB2INK determines a piecewise polynomial function that
    interpolates the two-dimensional gridded data. Users specify
@@ -2169,22 +2169,22 @@ The routines for this sort of application are:
    (optionally) the knot sequence.
 
    The interpolating  function  is  a  piecewise  polynomial
-   represented as a tensor product of one-dimensional  B-splines. 
+   represented as a tensor product of one-dimensional  B-splines.
 
-\item \htmlref{PDA\_DB2VAL}{PDA\_DB2VAL}   
+\item \htmlref{PDA\_DB2VAL}{PDA\_DB2VAL}
     PDA\_DB2VAL evaluates  the  tensor product piecewise  polynomial
-    interpolant constructed by the routine PDA\_DB2INK, or, 
-    alternatively evaluates one of its derivatives, at a given point. 
+    interpolant constructed by the routine PDA\_DB2INK, or,
+    alternatively evaluates one of its derivatives, at a given point.
     Function values returned are double precision.
 
 \item \htmlref{PDA\_IDBVIP}{PDA\_IDBVIP}
-     PDA\_IDBVIP performs bivariate interpolation when the 
+     PDA\_IDBVIP performs bivariate interpolation when the
      the data points are irregularly distributed in the x-y plane.
      Function values returned are single precision.
 
 \item \htmlref{PDA\_IDSFFT}{PDA\_IDSFFT}
-     PDA\_IDSFFT performs smooth surface fitting when the data points 
-     are irregularly distributed in the x-y plane. 
+     PDA\_IDSFFT performs smooth surface fitting when the data points
+     are irregularly distributed in the x-y plane.
      Function values returned are single precision.
 
 \item \htmlref{PDA\_SURFIT}{PDA\_SURFIT}
@@ -2194,18 +2194,18 @@ The routines for this sort of application are:
 \end{itemize}
 
 
-E02DAF calculates a 2-D bi-cubic spline interpolating surface 
+E02DAF calculates a 2-D bi-cubic spline interpolating surface
 for points from a regular grid. The routines E02DEF/E02DFF may then
 be used to compute values of the spline at the required location.
-This approach has has been replaced by using the routine pair PDA\_DB2INK 
+This approach has has been replaced by using the routine pair PDA\_DB2INK
 and PDA\_DB2VAL. No significant change in program performance
-was found. 
+was found.
 
 E02SAF provides a 2-D surface fit for data on an
-irregular spaced grid. The method employed is that of Renka and 
-Cline where the grid is used to construct a set of suitably 
-weighed equiangular triangles that (with appropriate weighting) 
-describe the surface. The interpolated value of the gridded data 
+irregular spaced grid. The method employed is that of Renka and
+Cline where the grid is used to construct a set of suitably
+weighed equiangular triangles that (with appropriate weighting)
+describe the surface. The interpolated value of the gridded data
 at any point within the grid is extracted by E02SBF. This pair of
 routines has been replaced using PDA\_IDBVIP with no significant change
 in program performance. During incomplete trials the routine PDA\_IDSFFT
@@ -2222,52 +2222,52 @@ E02DAF can be replaced with the following code.
       INTEGER MXY                     ! Size of the grid
       INTEGER ORD                     ! Order of polynomial used
 
-      DOUBLE PRECISION DVALUE         ! Interpolated value returned 
+      DOUBLE PRECISION DVALUE         ! Interpolated value returned
       DOUBLE PRECISION FV1(8,8)       ! Grid Z values
       DOUBLE PRECISION X1(8), Y1(8)   ! X,Y grid locations
       DOUBLE PRECISION XD, YD         ! X,Y coord for interpolation
- 
+
       DOUBLE PRECISION BCOEF(8,8)     ! Array used by PDA_DB2INK
       DOUBLE PRECISION TX(11),TY(11)  ! Array used by PDA_DB2INK
       DOUBLE PRECISION WORK(168)      ! Array used by PDA_DB2INK
- 
-*   Subroutine initial error values. 
+
+*   Subroutine initial error values.
       IFAIL=0
       STATUS=0
 
 *   Order of polynomial used in this example.
       ORD=3
- 
+
 *   Use value rather than differential.
       ID=0
 
 *   Size of data grid. 8x8 in this instance.
       MXY=8
-     
+
 *   Build the surface fit using the grid contents.
       CALL PDA_DB2INK(X1,MXY,Y1,MXY,FV1,MXY,
      :                ORD,ORD,TX,TY,BCOEF,
      :                WORK,IFAIL,STATUS)
- 
+
 
 *   If IFAIL=1 then okay to interpolate values.
       IF (IFAIL.EQ.1) THEN
-   
+
 *       Setup evaluation routine.
           IFAIL=0
           CALL PDA_DB2VAL(XD,YD,ID,ID,TX,TY,
      :                    MXY,MXY,ORD,ORD,BCOEF,WORK,
      :                    DVALUE,IFAIL,STATUS)
- 
+
       END IF
 \end{verbatim}
 
-In the example shown the value of the surface fitted is 
-calculated at a point defined by {\tt XD} and {\tt YD}. The 
-surface constructed is a 3rd order, polynomial and the value 
-returned by PDA\_DB2VAL is the surface value not its differential. 
-The example assumes that the array {\tt FV1()} already contains 
-values for the data at each of the grid points defined in 
+In the example shown the value of the surface fitted is
+calculated at a point defined by {\tt XD} and {\tt YD}. The
+surface constructed is a 3rd order, polynomial and the value
+returned by PDA\_DB2VAL is the surface value not its differential.
+The example assumes that the array {\tt FV1()} already contains
+values for the data at each of the grid points defined in
 arrays {\tt X1} and {\tt Y1}. The size of the work arrays is
 determined by the size of the grid required. The variable {\tt
 DVALUE} contains the interpolated value.
@@ -2275,7 +2275,7 @@ DVALUE} contains the interpolated value.
 
 \subsection{\xlabel{replacing_calls_to_e02saf}Replacing calls to E02SAF}
 
-It has been found in tests that the following code examples adequately 
+It has been found in tests that the following code examples adequately
 replace calls to E02SAF.
 
 \begin{verbatim}
@@ -2285,39 +2285,39 @@ replace calls to E02SAF.
       INTEGER  NDP                     ! Grid points
       INTEGER  NCP                     ! Not used
       INTEGER  NOP                     ! Size of returned array
-      INTEGER  IWK(2500)               ! Workspace    
+      INTEGER  IWK(2500)               ! Workspace
       REAL     WK(640)                 ! Workspace
       REAL     XD(80),YD(80),ZD(80)    ! Surface data
       REAL     XI(1),YI(1)             ! Extrap points
-      REAL     ZI(1,1)                 ! Results 
+      REAL     ZI(1,1)                 ! Results
 
 
 *   Set the error flag default values.
       ISTAT=0
       STATUS=0
- 
+
 *   Set mode and the grid positions (for PDA_IDBVIP).
       MD= 1
       NCP=2
       NOP=1
-               
-*   Call interpolation subroutine.      
-      CALL PDA_IDBVIP(MD,NCP,NDP,XD,YD,ZD,NOP,XI,YI, 
-     :                ZI,IWK,WK,ISTAT,STATUS)                       
+
+*   Call interpolation subroutine.
+      CALL PDA_IDBVIP(MD,NCP,NDP,XD,YD,ZD,NOP,XI,YI,
+     :                ZI,IWK,WK,ISTAT,STATUS)
 \end{verbatim}
 
-In the example shown, the value of the interpolated surface 
-at {\tt XI(1),YI(1)} is returned in the variable {\tt ZI(1,1)}. 
+In the example shown, the value of the interpolated surface
+at {\tt XI(1),YI(1)} is returned in the variable {\tt ZI(1,1)}.
 The surface is constructed using
-co-ordinate information from the arrays of {\tt XD()} and {\tt YD()}, 
+co-ordinate information from the arrays of {\tt XD()} and {\tt YD()},
 and surface values contained in the array {\tt ZD()}. The number
 of data points available to define the surface is {\tt NDP}.
 
-If several values are required from locations within the 
+If several values are required from locations within the
 irregular grid, the mode variable {\tt MD} should for the first
 point be set to 1 but may subsequently be 2. This
-significantly increases the execution speed. The size of the work 
-arrays is determined by the size of the grid required. 
+significantly increases the execution speed. The size of the work
+arrays is determined by the size of the grid required.
 
 Alternatively, the routine PDA\_IDSFFT may be used thus:
 
@@ -2327,19 +2327,19 @@ Alternatively, the routine PDA\_IDSFFT may be used thus:
       INTEGER  NDP                     ! Grid points
       INTEGER  NCP                     ! Not used
       INTEGER  NXI,NYI                 ! Output gird size
-      INTEGER  IWK(2500)               ! Workspace    
+      INTEGER  IWK(2500)               ! Workspace
       REAL     XD(80),YD(80),ZD(80)    ! Surface data
       REAL     XI(1),YI(1)             ! Extrap points
-      REAL     ZI(1,1)                 ! Results 
+      REAL     ZI(1,1)                 ! Results
       REAL     WK(640)                 ! Workspace
 
 *   Set the error flag default values.
       ISTAT=0
       STATUS=0
- 
+
 *   Set up the grid positions.
       NXI=1
-      NYI=1             
+      NYI=1
 
 *   Set mode and the grid positions (for PDA_IDBVIP).
       MD= 1
@@ -2347,25 +2347,25 @@ Alternatively, the routine PDA\_IDSFFT may be used thus:
 
 *         Call the surface fitting subroutine.
             CALL PDA_IDSFFT(MD,NCP,NDP,XD,YD,ZD,
-     :                      NXI,NYI,XI,YI,ZI,IWK, 
+     :                      NXI,NYI,XI,YI,ZI,IWK,
      :                      WK,ISTAT,STATUS)
-\end{verbatim} 
+\end{verbatim}
 
-In the example shown the surface is constructed from the irregular grid 
-information contained in arrays {\tt XD()/YD()} (location) and 
-{\tt ZD()} (surface value). Interpolated values calculated from the 
-fitted surface are returned in the {\tt ZI()} array at the co-ordinates 
+In the example shown the surface is constructed from the irregular grid
+information contained in arrays {\tt XD()/YD()} (location) and
+{\tt ZD()} (surface value). Interpolated values calculated from the
+fitted surface are returned in the {\tt ZI()} array at the co-ordinates
 specified by the data in the {\tt XI()} and {\tt YI()} arrays.
 
-If several values are required from locations within the 
+If several values are required from locations within the
 irregular grid, the mode variable {\tt MD} should for the first
 point be set to 1 but may subsequently be 2. This
-significantly increases the execution speed. The size of the work 
-arrays is determined by the size of the grid required. 
+significantly increases the execution speed. The size of the work
+arrays is determined by the size of the grid required.
 
 \subsection{\xlabel{replacing_calls_to_e02cbf}Replacing calls to E02CBF}
 The routine PDA\_CHE2D (or its single precision equivalent PDA\_CHE2R)
-can be used to replace E02CBF. The replacement is straightforward with most 
+can be used to replace E02CBF. The replacement is straightforward with most
 of the arguments being the same, albeit in a slightly different order.
 
 % -----------------------------------------------------------------------------
@@ -2404,7 +2404,7 @@ of the arguments being the same, albeit in a slightly different order.
    Simple constraints can be specified.
 
 \item \htmlref{PDA\_SUMSL}{PDA\_SUMSL} (module SUMSL from TOMS)\ \\
-   Minimises a general unconstrained objective function using  
+   Minimises a general unconstrained objective function using
    analytic gradients and a hessian approximation from secant update.
 
 \item \htmlref{PDA\_SUBPLX}{PDA\_SUBPLX} (module SUBPLEX from OPT/NETLIB)\ \\
@@ -2424,12 +2424,12 @@ of the arguments being the same, albeit in a slightly different order.
    For the programmer the differences are as follows:
 
 \begin{itemize}
-\item 
+\item
    For a least-squares fit, your merit function is a vector of residuals
    between measurements and current model guess.
    For a general minimisation your merit function is a scalar, basically
    you have to add up the squared residuals within your merit function.
-\item 
+\item
    Perhaps more important is the amount of workspace you have to
    provide to the fit algorithm. In least-squares fits this scales with
    n*m where n is the number of parameters to be fitted and m is the
@@ -2438,7 +2438,7 @@ of the arguments being the same, albeit in a slightly different order.
    minimisation does in principle not know that there is a spectrum with
    m pixels, and its workspace scales with the square of n, which is
    more or less constant for any given application.
-\item 
+\item
    Another difference is that least-squares fits tend to return the
    Jacobi matrix, the derivatives of each fit parameter with respect to
    each measurement. This is quite valuable if you want to know the
@@ -2458,23 +2458,23 @@ of the arguments being the same, albeit in a slightly different order.
    algorithm is the simulated annealing SIMANN.
 
 \begin{itemize}
-\item 
+\item
    PDA\_UNCMND is a general unconstrained minimisation using function values
    only. A quasi-Newton algorithm with line search is used.
-\item 
+\item
    PDA\_LMDIF/PDA\_LMDIF1 is an unconstrained least-squares minimisation using
    residuals only (no derivatives).
    A modified Levenberg-Marquardt algorithm is used, the Jacobian is
    calculated by a forward-difference approximation.
-\item 
+\item
    SIMANN is a simulated annealing algorithm. It uses function values
    only and can be used for non-smooth functions as well. It should also
    have a fair chance of getting out of local minima and going on to
    find the global minimum.
-\item 
+\item
    SUMSL is a general unconstrained minimisation using function values
    and gradients. A trusted regions algorithm is used.
-\item 
+\item
    SUBPLEX is a generalisation and improvement on the Simplex algorithm.
    It should be very robust with any function to minimise. But it should
    also be rather inefficient.
@@ -2693,7 +2693,7 @@ of the arguments being the same, albeit in a slightly different order.
    factoriser, namely PDA\_DGEFA. PDA\_DGEFS solves A * x = b where A is square.
    It can re-use a factorisation of A from a previous run, and in that
    sense supports the solution of A * X = B. Finally, PDA\_DBOLS solves the
-   over-determined problem A * x = b in the least-squares sense. 
+   over-determined problem A * x = b in the least-squares sense.
 
 %    --------------------------------------------------------------------------
 
@@ -3023,7 +3023,7 @@ The routine PDA\_COVMAT calculates the same statistics as G01DCF. To
 use it requires that you also supply the variance of the largest
 normal order statistic (see PDA\_V11) and that you increase the space
 required for the variance array. This is now a full array of values
-rather than a packed array. The following code shows how to convert 
+rather than a packed array. The following code shows how to convert
 this to the same form as output by the NAG routine:
 \begin{quote}
 \begin{verbatim}
@@ -3212,13 +3212,13 @@ pseudo-random numbers.
 
 \begin{verbatim}
 Description:
-   Subroutine pda_bispev evaluates on a grid (x(i),y(j)),i=1,...,mx; 
-   j=1,...,my a bivariate spline s(x,y) of degrees kx and ky, given in 
+   Subroutine pda_bispev evaluates on a grid (x(i),y(j)),i=1,...,mx;
+   j=1,...,my a bivariate spline s(x,y) of degrees kx and ky, given in
    the b-spline representation.
 
 Calling Sequence:
-   call pda_bispev( tx, nx, ty, ny, c, kx, ky, x, mx, y, my, z, wrk, lwrk, 
-                    iwrk, kwrk, ier ) 
+   call pda_bispev( tx, nx, ty, ny, c, kx, ky, x, mx, y, my, z, wrk, lwrk,
+                    iwrk, kwrk, ier )
 
 Input Parameters:
    tx    : Real array, length nx, which contains the position of the
@@ -3236,14 +3236,14 @@ Input Parameters:
 
    kx,ky : Integer values, giving the degrees of the spline.
 
-   x     : Real array of dimension (mx). Before entry x(i) must be set to 
-           the x co-ordinate of the i-th grid point along the x-axis. 
+   x     : Real array of dimension (mx). Before entry x(i) must be set to
+           the x co-ordinate of the i-th grid point along the x-axis.
            tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2,...,mx.
 
    mx    : Integer. On entry mx must specify the number of grid points along
            the x-axis. Mx >=1.
 
-   y     : Real array of dimension (my). Before entry y(j) must be set to 
+   y     : Real array of dimension (my). Before entry y(j) must be set to
            the y co-ordinate of the j-th grid point along the y-axis.
            ty(ky+1)<=y(j-1)<=y(j)<=ty(ny-ky), j=2,...,my.
 
@@ -3252,7 +3252,7 @@ Input Parameters:
 
    wrk   : Real array of dimension lwrk. Used as workspace.
 
-   lwrk  : Integer, specifying the dimension of wrk. 
+   lwrk  : Integer, specifying the dimension of wrk.
            lwrk >= mx*(kx+1)+my*(ky+1)
 
    iwrk  : Integer array of dimension kwrk. Used as workspace.
@@ -3260,8 +3260,8 @@ Input Parameters:
    kwrk  : Integer, specifying the dimension of iwrk. Kwrk >= mx+my.
 
 Output Parameters:
-   z     : Real array of dimension (mx*my). On successful exit z(my*(i-1)+j) 
-           contains the value of s(x,y) at the point 
+   z     : Real array of dimension (mx*my). On successful exit z(my*(i-1)+j)
+           contains the value of s(x,y) at the point
            (x(i),y(j)),i=1,...,mx;j=1,...,my.
 
    ier   : Integer error flag:
@@ -4353,7 +4353,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
 \sstroutine{
    PDA\_DB2INK
 }{
-   Determines the parameters of a 2-D, interpolation function for 
+   Determines the parameters of a 2-D, interpolation function for
    gridded data.
 }{
    \sstdiytopic{
@@ -4362,7 +4362,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
    CMLIB / CAMSUN
    }
    \sstimplementationstatus{
-   The warning messages are no longer printed. The same information 
+   The warning messages are no longer printed. The same information
    is returned in the argument IFAIL
    }
 }
@@ -4371,7 +4371,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
       SUBROUTINE PDA_DB2INK(X,NX,Y,NY,FCN,LDF,
      :                      KX,KY,TX,TY,BCOEF,
      :                      WORK,IFLAG,STATUS)
- 
+
 C***BEGIN PROLOGUE  DB2INK
 C***DATE WRITTEN   25 MAY 1982
 C***REVISION DATE  25 MAY 1982
@@ -4510,9 +4510,9 @@ C                      7 == NY out of range
 C                      8 == KY out of range
 C                      9 == Y not strictly increasing
 C                     10 == TY not non-decreasing
-C    
-C   STATUS   Integer. Starlink error status. 
-C  
+C
+C   STATUS   Integer. Starlink error status.
+C
 C***REFERENCES  CARL DE BOOR, A PRACTICAL GUIDE TO SPLINES,
 C                 SPRINGER-VERLAG, NEW YORK, 1978.
 C               CARL DE BOOR, EFFICIENT COMPUTER MANIPULATION OF TENSOR
@@ -4537,7 +4537,7 @@ C***END PROLOGUE  DB2INK
    CMLIB / CAMSUN
    }
    \sstimplementationstatus{
-   The warning messages are no longer printed. The same information 
+   The warning messages are no longer printed. The same information
    is returned in the argument IFAIL.
    }
 }
@@ -4628,7 +4628,7 @@ C   WORK    Double precision 1D array (size 3*max(KX,KY) + KY)
 C           A working storage array.
 C
 C   IFAIL   A returned error value.
-C   
+C
 C   RVALUE  The interpolated value.
 C
 C   STATUS  Integer. Starlink status report.
@@ -4640,7 +4640,7 @@ C***END PROLOGUE  DB2VAL
 \end{verbatim}
 
 %    ---------------------------------------------------------------->
- 
+
 \sstroutine{
    PDA\_DBESJ1
 }{
@@ -4817,7 +4817,7 @@ C***END PROLOGUE  DB2VAL
 \end{verbatim}
 
 %    --------------------------------------------------------------------------
- 
+
 
 \sstroutine{
    PDA\_DBOLS
@@ -5345,7 +5345,7 @@ C***END PROLOGUE  DB2VAL
 \end{verbatim}
 
     ---------------------------------------------------------------->
- 
+
 \sstroutine{
    PDA\_DBVALU
 }{
@@ -5493,7 +5493,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 \begin{verbatim}
-      SUBROUTINE PDA_DCOV (FCN, IOPT, M, N, X, FVEC, R, LDR, INFO, WA1, 
+      SUBROUTINE PDA_DCOV (FCN, IOPT, M, N, X, FVEC, R, LDR, INFO, WA1,
      +                     WA2, WA3, WA4, STATUS)
 ***BEGIN PROLOGUE  PDA_DCOV
 ***PURPOSE  Calculate the covariance matrix for a nonlinear data
@@ -6044,7 +6044,7 @@ C***END PROLOGUE  DB2VAL
    PDA\_DGEDI
 }{
    Determinant and inverse of a matrix using the factors
-   from PDA\_DGEFA. 
+   from PDA\_DGEFA.
 }{
    \sstdiytopic{
    Origin
@@ -8083,8 +8083,8 @@ C***END PROLOGUE  DB2VAL
    }
 }
 \begin{verbatim}
-      SUBROUTINE PDA_DQED( PDA_DQEDEV, MEQUA, NVARS, MCON, IND, BL, BU, 
-     :                     X, FJAC, LDFJAC, FNORM, IGO, IOPT, ROPT, 
+      SUBROUTINE PDA_DQED( PDA_DQEDEV, MEQUA, NVARS, MCON, IND, BL, BU,
+     :                     X, FJAC, LDFJAC, FNORM, IGO, IOPT, ROPT,
      :                     IWA, WA )
 
 ***BEGIN PROLOGUE  DQED
@@ -9347,7 +9347,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
    TOMS/NETLIB
    }
    \sstimplementationstatus{
-   The warning messages are no longer printed. The same information 
+   The warning messages are no longer printed. The same information
    is returned in the argument ISTAT.
    }
 }
@@ -9356,7 +9356,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
 c this subroutine performs bivariate interpolation when the pro-
 c jections of the data points in the x-y plane are irregularly
 c distributed in the plane.
- 
+
 c the input parameters are
 c     md  = mode of computation (must be 1, 2, or 3),
 c         = 1 for new ncp and/or new xd-yd,
@@ -9378,20 +9378,20 @@ c     xi  = array of dimension nip containing the x
 c           coordinates of the output points,
 c     yi  = array of dimension nip containing the y
 c           coordinates of the output points.
- 
+
 c the output parameter is
 c     zi  = array of dimension nip where interpolated z
 c           values are to be stored.
 c     istat = error message.
 c     status= Starlink error status
- 
+
 c the other parameters are
 c     iwk = integer array of dimension
 c              max0(31,27+ncp)*ndp+nip
 c           used internally as a work area,
 c     wk  = array of dimension 8*ndp used internally as a
 c           work area.
- 
+
 c the very first call to this subroutine and the call with a new
 c ncp value, a new ndp value, and/or new contents of the xd and
 c yd arrays must be made with md=1.  the call with md=2 must be
@@ -9403,17 +9403,17 @@ c and yi arrays.  between the call with md=2 or md=3 and its
 c preceding call, the iwk and wk arrays must not be disturbed.
 c use of a value between 3 and 5 (inclusive) for ncp is recom-
 c mended unless there are evidences that dictate otherwise.
- 
+
 c this subroutine calls the idcldp, idlctn, idpdrv, idptip, and
 c idtang subroutines.
 \end{verbatim}
 
 %    ---------------------------------------------------------------->
- 
+
 \sstroutine{
    PDA\_IDSFFT
 }{
-   Performs smooth surface fitting when the projections of the data 
+   Performs smooth surface fitting when the projections of the data
    points in the x-y plane are irregularly
    distributed in the plane.
 }{
@@ -9423,7 +9423,7 @@ c idtang subroutines.
    TOMS/NETLIB
    }
    \sstimplementationstatus{
-   The warning messages are no longer printed. The same information 
+   The warning messages are no longer printed. The same information
    is returned in the argument ISTAT.
    }
 }
@@ -9432,7 +9432,7 @@ c idtang subroutines.
 c this subroutine performs smooth surface fitting when the pro-
 c jections of the data points in the x-y plane are irregularly
 c distributed in the plane.
- 
+
 c the input parameters are
 c     md  = mode of computation (must be 1, 2, or 3),
 c         = 1 for new ncp and/or new xd-yd,
@@ -9456,21 +9456,21 @@ c     xi  = array of dimension nxi containing the x
 c           coordinates of the output grid points,
 c     yi  = array of dimension nyi containing the y
 c           coordinates of the output grid points.
- 
+
 c the output parameter is
 c     zi  = doubly-dimensioned array of dimension (nxi,nyi),
 c           where the interpolated z values at the output
 c           grid points are to be stored.
 c     istat = error message.
 c     status= Starlink error status
- 
+
 c the other parameters are
 c     iwk = integer array of dimension
 c              max0(31,27+ncp)*ndp+nxi*nyi
 c           used internally as a work area,
 c     wk  = array of dimension 5*ndp used internally as a
 c           work area.
- 
+
 c the very first call to this subroutine and the call with a new
 c ncp value, a new ndp value, and/or new contents of the xd and
 c yd arrays must be made with md=1.  the call with md=2 must be
@@ -9482,7 +9482,7 @@ c xi, and yi arrays.  between the call with md=2 or md=3 and its
 c preceding call, the iwk and wk arrays must not be disturbed.
 c use of a value between 3 and 5 (inclusive) for ncp is recom-
 c mended unless there are evidences that dictate otherwise.
- 
+
 c this subroutine calls the idcldp, idgrid, idpdrv, idptip, and
 c idtang subroutines.
 \end{verbatim}
@@ -10347,7 +10347,7 @@ c idtang subroutines.
       parallel to the third axis is transformed, etc. Each dimension is
       transformed in this way. Most of the complications in the code come
       from needing to work in an unknown number of dimensions. Two
-      addressing systems are used for each pixel; 1) the vector (i.e.\ 
+      addressing systems are used for each pixel; 1) the vector (i.e.\
       one-dimensional) index into the supplied arrays, and 2) the
       corresponding Cartesian pixel indices.
    }
@@ -11369,13 +11369,13 @@ wsave   a work array which must be dimensioned at least 2*n+15.
   For modifications to the algorithm and many details on its use,
   (particularly for econometric applications) see Goffe, Ferrier
   and Rogers, "Global Optimization of Statistical Functions with
-  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2, 
+  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2,
   Jan./Feb. 1994, pp. 65-100.
-  For more information, contact 
+  For more information, contact
               Bill Goffe
               Department of Economics and International Business
-              University of Southern Mississippi 
-              Hattiesburg, MS  39506-5072 
+              University of Southern Mississippi
+              Hattiesburg, MS  39506-5072
               (601) 266-4484 (office)
               (601) 266-4920 (fax)
               bgoffe@whale.st.usm.edu (Internet)
@@ -12041,7 +12041,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    \sstdiytopic{
    Reference
    }{
-     Dennis, J.E., and Mei, H.H.W. (1979), "Two new unconstrained 
+     Dennis, J.E., and Mei, H.H.W. (1979), "Two new unconstrained
      optimization algorithms which use function and gradient
      values", J. Optim. Theory Applic. 28, pp. 453-482.
    }
@@ -12052,11 +12052,11 @@ wsave   a work array which must be dimensioned at least 2*n+15.
      1                  uiparm, urparm, ufparm)
 
 
- Minimize general unconstrained objective function using analytic 
+ Minimize general unconstrained objective function using analytic
  gradient and hessian approx. from secant update.
 
  --------------------------  parameter usage  --------------------------
- 
+
   n........ (input) the number of variables on which  f  depends, i.e.,
                    the number of components in  x.
   d........ (input/output) a scale vector such that  d(i)*x(i),
@@ -12137,9 +12137,9 @@ wsave   a work array which must be dimensioned at least 2*n+15.
                    change to calcf and calcg.
   ufparm... (input) user external subroutine or function passed without
                    change to calcf and calcg.
- 
+
    ***  iv input values (from subroutine pda_deflt)  ***
- 
+
   iv(1)...  on input, iv(1) should have a value between 0 and 14......
               0 and 12 mean this is a fresh start.  0 means that
                    pda_deflt(2, iv, liv, lv, v)
@@ -12210,7 +12210,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
               fresh start or any changed v values on a restart.
               iv(parprt) = 0 means skip this printing.  default = 1.
   iv(prunit)... iv(21) is the output unit number on which all printing
-              is done.  iv(prunit) = 0 (the default) means suppress all 
+              is done.  iv(prunit) = 0 (the default) means suppress all
               printing.
   iv(solprt)... iv(22) = 1 means print out the value of x returned (as
               well as the gradient and the scale vector d).
@@ -12230,9 +12230,9 @@ wsave   a work array which must be dimensioned at least 2*n+15.
   iv(x0prt).... iv(24) = 1 means print the initial x and scale vector d
               (on a fresh start only).  iv(x0prt) = 0 means skip this
               printing.  default = 1.
- 
+
    ***  (selected) iv output values  ***
- 
+
   iv(1)........ on output, iv(1) is a return code....
               3 = x-convergence.  the scaled relative difference (see
                    v(reldx)) between the current parameter vector x and
@@ -12286,9 +12286,9 @@ wsave   a work array which must be dimensioned at least 2*n+15.
   iv(ngcall)... iv(30) is the number of gradient evaluations (calls on
               calcg).
   iv(niter).... iv(31) is the number of iterations performed.
- 
+
    ***  (selected) v input values (from subroutine pda_deflt)  ***
- 
+
   v(bias)..... v(43) is the bias parameter used in subroutine dbldog --
               see that subroutine for details.  default = 0.8.
   v(afctol)... v(31) is the absolute function convergence tolerance.
@@ -12343,9 +12343,9 @@ wsave   a work array which must be dimensioned at least 2*n+15.
               (i.e., the appendix to ref. 1) for details on v(i),
               i = decfac, incfac, phmnfc, phmxfc, rdfcmn, rdfcmx,
               tuner2, tuner3, tuner4, tuner5.
- 
+
    ***  (selected) v output values  ***
- 
+
   v(dgnorm)... v(1) is the 2-norm of (diag(d)**-1)*g, where g is the
               most recently computed gradient.
   v(dstnrm)... v(2) is the 2-norm of diag(d)*step, where step is the
@@ -12371,19 +12371,19 @@ wsave   a work array which must be dimensioned at least 2*n+15.
                    max(abs(d(i)*(x(i)-x0(i)), 1 .le. i .le. p) /
                       max(d(i)*(abs(x(i))+abs(x0(i))), 1 .le. i .le. p),
               where x = x0 + step.
- 
+
  -------------------------------  notes  -------------------------------
- 
+
    ***  algorithm notes  ***
- 
+
          this routine uses a hessian approximation computed from the
       bfgs update (see ref 3).  only a cholesky factor of the hessian
       approximation is stored, and this is updated using ideas from
       ref. 4.  steps are computed by the double dogleg scheme described
       in ref. 2.  the steps are assessed as in ref. 1.
- 
+
    ***  usage notes  ***
- 
+
          after a return with iv(1) .le. 11, it is possible to restart,
       i.e., to change some of the iv and v input values described above
       and continue the algorithm from the point where it was interrupt-
@@ -12404,9 +12404,9 @@ wsave   a work array which must be dimensioned at least 2*n+15.
          storage for g is allocated at the end of v.  thus the caller
       may make v longer than specified above and may allow calcg to use
       elements of g beyond the first n as scratch storage.
- 
+
    ***  portability notes  ***
- 
+
          the pda_sumsl distribution tape contains both single- and double-
       precision versions of the pda_sumsl source code, so it should be un-
       necessary to change precisions.
@@ -12433,25 +12433,25 @@ wsave   a work array which must be dimensioned at least 2*n+15.
       appear only in modules pda_itsum and pda_parck.  parameter statements
       appear nearly everywhere.)  these changes also add save state-
       ments for variables given machine-dependent constants by pda_rmdcon.
- 
+
    ***  references  ***
- 
+
   1.  dennis, j.e., gay, d.m., and welsch, r.e. (1981), algorithm 573 --
               an adaptive nonlinear least-squares algorithm, acm trans.
               math. software 7, pp. 369-383.
- 
+
   2.  dennis, j.e., and mei, h.h.w. (1979), two new unconstrained opti-
               mization algorithms which use function and gradient
               values, j. optim. theory applic. 28, pp. 453-482.
- 
+
   3.  dennis, j.e., and more, j.j. (1977), quasi-newton methods, motiva-
               tion and theory, siam rev. 19, pp. 46-89.
- 
+
   4.  goldfarb, d. (1976), factorized variable metric methods for uncon-
               strained optimization, math. comput. 30, pp. 796-811.
- 
+
    ***  general  ***
- 
+
       coded by david m. gay (winter 1980).  revised summer 1982.
       this subroutine was written in connection with research
       supported in part by the national science foundation under
@@ -12482,10 +12482,10 @@ Description:
    numbers w(i),i=1,...,m, subroutine pda_surfit determines a smooth
    bivariate spline approximation s(x,y) of degrees kx and ky on the
    rectangle xb <= x <= xe, yb <= y <= ye.
-   
+
    If iopt = -1 pda_surfit calculates the weighted least-squares spline
    according to a given set of knots.
-   
+
    If iopt >= 0 the total numbers nx and ny of these knots and their
    position tx(j),j=1,...,nx and ty(j),j=1,...,ny are chosen automatically
    by the routine. The smoothness of s(x,y) is then achieved by minimalizing
@@ -12494,27 +12494,27 @@ Description:
    smoothness is determined by the condition that f(p) = sum
    ((w(i)*(z(i)-s(x(i),y(i))))**2) be <= s, with s a given non-negative
    constant, called the smoothing factor.
-   
+
    The fit is given in the b-spline representation (b-spline coefficients
    c((ny-ky-1)*(i-1)+j),i=1,...,nx-kx-1;j=1,...,ny-ky-1) and can be
    evaluated by means of subroutine bispev.
 
 Calling Sequence:
-   call pda_surfit( iopt, m, x, y, z, w, xb, xe, yb, ye, kx, ky, s, nxest, 
-                    nyest, nmax, eps, nx, tx, ny, ty, c, fp, wrk1, lwrk1, 
+   call pda_surfit( iopt, m, x, y, z, w, xb, xe, yb, ye, kx, ky, s, nxest,
+                    nyest, nmax, eps, nx, tx, ny, ty, c, fp, wrk1, lwrk1,
                     wrk2, lwrk2, iwrk, kwrk, ier)
 
 Parameters:
    iopt  : Integer flag. On entry iopt must specify whether a weighted
            least-squares spline (iopt=-1) or a smoothing spline (iopt=0
-           or 1) must be determined. If iopt=0 the routine will start with 
+           or 1) must be determined. If iopt=0 the routine will start with
            an initial set of knots:
 
-   tx(i)=xb,tx(i+kx+1)=xe,i=1,...,kx+1;ty(i)=yb,ty(i+ky+1)=ye,i=1,...,ky+1. 
+   tx(i)=xb,tx(i+kx+1)=xe,i=1,...,kx+1;ty(i)=yb,ty(i+ky+1)=ye,i=1,...,ky+1.
 
-           If iopt=1 the routine will continue with the set of knots found 
-           at the last call of the routine. Attention: a call with iopt=1 
-           must always be immediately preceded by another call with iopt=1 
+           If iopt=1 the routine will continue with the set of knots found
+           at the last call of the routine. Attention: a call with iopt=1
+           must always be immediately preceded by another call with iopt=1
            or iopt=0. Unchanged on exit.
 
    m     : Integer. On entry m must specify the number of data points.
@@ -12532,7 +12532,7 @@ Parameters:
            be set to the i-th value in the set of weights. The w(i) must
            be strictly positive. Unchanged on exit.
 
-   xb,xe : Real values. On entry xb,xe,yb and ye must specify the 
+   xb,xe : Real values. On entry xb,xe,yb and ye must specify the
    yb,ye   boundaries of the rectangular approximation domain.
            xb<=x(i)<=xe,yb<=y(i)<=ye,i=1,...,m. Unchanged on exit.
 
@@ -12541,7 +12541,7 @@ Parameters:
            (kx=ky=3) splines. Unchanged on exit.
 
    s     : Real. On entry (in case iopt>=0) s must specify the smoothing
-           factor. S >=0. Unchanged on exit. For advice on the choice of 
+           factor. S >=0. Unchanged on exit. For advice on the choice of
            s see further comments
 
    nxest : Integer. Unchanged on exit.
@@ -12550,9 +12550,9 @@ Parameters:
            On entry, nxest and nyest must specify an upper bound for the
            number of knots required in the x- and y-directions respect.
            These numbers will also determine the storage space needed by
-           the routine. nxest >= 2*(kx+1), nyest >= 2*(ky+1). In most 
-           practical situation nxest = kx+1+sqrt(m/2), 
-           nyest = ky+1+sqrt(m/2) will be sufficient. See also further 
+           the routine. nxest >= 2*(kx+1), nyest >= 2*(ky+1). In most
+           practical situation nxest = kx+1+sqrt(m/2),
+           nyest = ky+1+sqrt(m/2) will be sufficient. See also further
            comments.
 
    nmax  : Integer. On entry nmax must specify the actual dimension of
@@ -12560,21 +12560,21 @@ Parameters:
            unchanged on exit.
 
    eps   : Real. On entry, eps must specify a threshold for determining the
-           effective rank of an over-determined linear system of equations. 
-           0 < eps < 1.  If the number of decimal digits in the computer 
-           representation of a real number is q, then 10**(-q) is a 
-           suitable value for eps in most practical applications. Unchanged 
+           effective rank of an over-determined linear system of equations.
+           0 < eps < 1.  If the number of decimal digits in the computer
+           representation of a real number is q, then 10**(-q) is a
+           suitable value for eps in most practical applications. Unchanged
            on exit.
 
-   nx    : Integer. Unless ier=10 (in case iopt >=0), nx will contain the 
+   nx    : Integer. Unless ier=10 (in case iopt >=0), nx will contain the
            total number of knots with respect to the x-variable, of the spline
-           approximation returned. If the computation mode iopt=1 is used, 
+           approximation returned. If the computation mode iopt=1 is used,
            the value of nx should be left unchanged between subsequent calls.
            In case iopt=-1, the value of nx should be specified on entry
 
-   tx    : Real array of dimension nmax. On successful exit, this array will 
+   tx    : Real array of dimension nmax. On successful exit, this array will
            contain the knots of the spline with respect to the x-variable,
-           i.e. The position of the interior knots tx(kx+2),...,tx(nx-kx-1) 
+           i.e. The position of the interior knots tx(kx+2),...,tx(nx-kx-1)
            as well as the position of the additional knots
            tx(1)=...=tx(kx+1)=xb and tx(nx-kx)=...=tx(nx)=xe needed for
            the b-spline representation. If the computation mode iopt=1 is
@@ -12583,19 +12583,19 @@ Parameters:
            used, the values tx(kx+2), ...tx(nx-kx-1) must be supplied by
            the user, before entry. See also the restrictions (ier=10).
 
-   ny    : Integer. Unless ier=10 (in case iopt >=0), ny will contain the 
+   ny    : Integer. Unless ier=10 (in case iopt >=0), ny will contain the
            total number of knots with respect to the y-variable, of the
            spline approximation returned. If the computation mode iopt=1
            is used, the value of ny should be left unchanged between
            subsequent calls. In case iopt=-1, the value of ny should be
            specified on entry
 
-   ty    : Real array of dimension nmax. On successful exit, this array 
+   ty    : Real array of dimension nmax. On successful exit, this array
            will contain the knots of the spline with respect to the
            y-variable, i.e. The position of the interior knots
            ty(ky+2),...,ty(ny-ky-1) as well as the position of the
            additional knots ty(1)=...=ty(ky+1)=yb and
-           ty(ny-ky)=...=ty(ny)=ye needed for the b-spline representation. 
+           ty(ny-ky)=...=ty(ny)=ye needed for the b-spline representation.
            If the computation mode iopt=1 is used, the values of ty(1),
            ...,ty(ny) should be left unchanged between subsequent calls.
            If the computation mode iopt=-1 is used, the values ty(ky+2),
@@ -12609,7 +12609,7 @@ Parameters:
    fp    : Real. Unless ier=10, fp contains the weighted sum of
            squared residuals of the spline approximation returned.
 
-   wrk1  : Real array of dimension (lwrk1). Used as workspace. If the 
+   wrk1  : Real array of dimension (lwrk1). Used as workspace. If the
            computation mode iopt=1 is used the value of wrk1(1) should be
  	   left unchanged between subsequent calls. On exit
  	   wrk1(2),wrk1(3),...,wrk1(1+(nx-kx-1)*(ny-ky-1)) will contain
@@ -12626,7 +12626,7 @@ Parameters:
              u = nxest-kx-1, v = nyest-ky-1, km = max(kx,ky)+1,
              ne = max(nxest,nyest), bx = kx*v+ky+1, by = ky*u+kx+1,
              if(bx.le.by) b1 = bx, b2 = b1+v-ky
-             if(bx.gt.by) b1 = by, b2 = b1+u-kx  
+             if(bx.gt.by) b1 = by, b2 = b1+u-kx
 
            then
              lwrk1 >= u*v*(2+b1+b2)+2*(u+v+km*(m+ne)+ne-kx-ky)+b2+1
@@ -12660,7 +12660,7 @@ Parameters:
           -1 : Normal return. The spline returned is an interpolating
                spline (fp=0).
 
-          -2 : Normal return. The spline returned is the weighted least 
+          -2 : Normal return. The spline returned is the weighted least
                squares polynomial of degrees kx and ky. In this extreme
                case fp gives the upper bound for the smoothing factor s.
 
@@ -12676,7 +12676,7 @@ Parameters:
                storage space, as specified by the parameters nxest and
                nyest. Probable causes - nxest or nyest too small. If these
                parameters are already large, it may also indicate that s is
-               too small. The approximation returned is the weighted 
+               too small. The approximation returned is the weighted
                least-squares spline according to the current set of knots.
                The parameter fp gives the corresponding weighted sum of
                squared residuals (fp>s).
@@ -12697,15 +12697,15 @@ Parameters:
 
            4 : Error. No more knots can be added because the number of
                b-spline coefficients (nx-kx-1)*(ny-ky-1) already exceeds
-               the number of data points m. Probable causes - either s or 
-               m too small. The approximation returned is the weighted 
+               the number of data points m. Probable causes - either s or
+               m too small. The approximation returned is the weighted
                least-squares spline according to the current set of knots.
                The parameter fp gives the corresponding weighted sum of
                squared residuals (fp>s).
 
            5 : Error. No more knots can be added because the additional
                knot would (quasi) coincide with an old one. Probable
-               causes - s too small or too large a weight to an inaccurate 
+               causes - s too small or too large a weight to an inaccurate
                data point. The approximation returned is the weighted
                least-squares spline according to the current set of knots.
                The parameter fp gives the corresponding weighted sum of
@@ -12799,7 +12799,7 @@ Further Comments:
    polynomial of degree kx in the variable x.
 
 Other Subroutines Required:
-   pda_fpback, pda_fpbspl, pda_fpsurf, pda_fpdisc, pda_fpgivs, pda_fprank, 
+   pda_fpback, pda_fpbspl, pda_fpsurf, pda_fpdisc, pda_fpgivs, pda_fprank,
    pda_fprati, pda_fprota, pda_fporde
 
 References:
@@ -13087,37 +13087,37 @@ Creation Date : may 1979
 
 \sloppy
 \begin{enumerate}
-\item 
+\item
    Investigate the functionality in NAG in a particular area as
    currently used by applications. Consult the NAG documentation for
    this.
-\item 
+\item
    Consider what functionality is actually necessary. This is often an
    abstraction from what NAG provides: Say, NAG may have a choice of
    routines or algorithms, or a set of NAG routines may be closely
    related.
-\item 
+\item
    Look at what is available in the Public Domain. Use the
 \htmladdnormallink{GAMS decision tree}
 {http://gams.nist.gov/cgi-bin/gams-serve}
    on the World Wide Web and give preference to SLATEC routines. Also give
    preference to double precision routines.
-\item 
+\item
    Make up your mind as to which routines from the Public Domain will be
    necessary and how they will cover completely and consistently a
    particular area of functionality. You will now have a list of one or
    a few user-callable routines that you want to incorporate into the
    library.
-\item 
+\item
    Down-load the code for each user-callable routine you picked. Make
    sure you get all code needed, including subsidiary routines. Use the
    `fullsource' anchor in GAMS. Check that the transfer was
    successful, Mosaic will not warn you if the final five per cent are
    missing.
-\item 
+\item
    Go through the single-file source code and change the routine names.
    Whenever possible the old names should just be preceded by `PDA\_'.
-\item 
+\item
    Split the full source into Fortran modules with `fsplit'.
 \item
    If the routine
@@ -13128,14 +13128,14 @@ Creation Date : may 1979
    subsidiaries PDA\_FDUMP, PDA\_J4SAVE, PDA\_XERABT, PDA\_XERCNT,
    PDA\_XERCTL, PDA\_XERHTL, PDA\_XERPRN, PDA\_XERPRT, PDA\_XERRWV,
    PDA\_XERSAV, PDA\_XERSVE, PDA\_XGETUA. Also remove PDA\_I1MACH.
-\item 
+\item
    Check if there are routine name conflicts with the existing library.
    Check if modules of the same name are compatible or identical. Remove
    the redundant routines.
-\item 
+\item
    Modify the error handling and message output.
    \begin{itemize}
-   \item 
+   \item
       If
 \htmlref{PDA\_XERMSG}{PDA\_XERMSG}
       is used to report and handle errors, an inherited
@@ -13155,29 +13155,29 @@ Creation Date : may 1979
       program. This does not and must not happen in this library. The
       code you down-loaded may rely on the abortion to have occurred, but
       the code that goes into this library must not rely on this.
-   \item 
+   \item
       If PDA\_XERROR is called, these calls should be re-directed to
 \htmlref{PDA\_XERMSG,}{PDA\_XERMSG}
       or avoided altogether. If using PDA\_XERMSG, review the routines
       accordingly.
-   \item 
+   \item
       The routines in this library are not allowed to execute STOP
       statements or to write messages to the `terminal'. They must
       instead return a status code indicating what went wrong or what
       message the caller may or may not want to pass on to the user.
-   \item 
+   \item
       You can introduce new calls to PDA\_XERMSG to issue error reports, but
       this is not encouraged.
    \end{itemize}
-\item 
+\item
    Register the new source files in the `makefile'. Also register any
    test programs. Test programs have capitalised
    names, library routines have lower-case names.
-\item 
+\item
    Modify pda\_test.f to make a trivial call to the user-callable routines
    that you introduced. pda\_test.f can be compiled and linked to see if all
    modules necessary are present, it cannot be executed.
-\item 
+\item
    Update the source of this document.
    \begin{itemize}
    \item Did you tap into a Public Domain package so far unused in the
@@ -13218,7 +13218,7 @@ values.
 \subsection{\xlabel{changes_from_version_0.3_to_0.4}Changes from version 0.3 to 0.4}
 
 \begin{itemize}
-\item The use of the higher level ERR and MSG error reporting libraries 
+\item The use of the higher level ERR and MSG error reporting libraries
 within PDA has been replaced by use of the lower level EMS library
 (see section \ref{LINKING}).
 

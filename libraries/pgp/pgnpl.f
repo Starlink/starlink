@@ -6,13 +6,13 @@ C.
 C
       INTEGER NMAX, N, NPL
 C
-C     Work out how many numerals there are in an integer for use with 
-C     format statements.   
+C     Work out how many numerals there are in an integer for use with
+C     format statements.
 C     e.g.  N=280 => NPL=3,   N=-3 => NPL=2
 C
 C     Input:
 C       NMAX   :   If > 0, issue a warning that N is going to
-C                  exceed the format statement field size if NPL 
+C                  exceed the format statement field size if NPL
 C                  exceeds NMAX
 C       N      :   Integer of interest
 C     Output:
@@ -28,7 +28,7 @@ C-------------------------------------------------------------------------
       END IF
       IF (N.LT.0) NPL = NPL + 1
 C
-      IF (NMAX.GT.0 .AND. NPL.GT.NMAX) 
+      IF (NMAX.GT.0 .AND. NPL.GT.NMAX)
      *  CALL GRWARN ('PGNPL: output conversion error likely; '
      *               //'number too big for format')
 C

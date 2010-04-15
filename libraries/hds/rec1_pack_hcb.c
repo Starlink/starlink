@@ -144,7 +144,7 @@
       ix_pdb = REC__MXSTK - 1;
       do {
          if ( ix_lrb >= 0 ) {
-            nb = pack_rec ( hcb->stk[ ix_lrb ], prec ); 
+            nb = pack_rec ( hcb->stk[ ix_lrb ], prec );
             if ( (hcb -> stk[ ix_lrb ].bloc < 0) |
                  ( byte + nb > 511 ) )
              {
@@ -157,7 +157,7 @@
              }
          }
          if ( ix_pdb >= 0 ) {
-            nb = pack_rec ( hcb->stk[ ix_pdb ], prec ); 
+            nb = pack_rec ( hcb->stk[ ix_pdb ], prec );
             if ( (hcb -> stk[ ix_pdb ].bloc < 0) |
                  ( byte + nb > 511 ) )
              {

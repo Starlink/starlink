@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_RDCAT( PARAM, CURFRM, KEYMAP, LABS, IWCS, NPOS, 
+      SUBROUTINE KPG1_RDCAT( PARAM, CURFRM, KEYMAP, LABS, IWCS, NPOS,
      :                       NAX, IPPOS, IPID, TITLE, NAME, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_RDCAT( PARAM, CURFRM, KEYMAP, LABS, IWCS, NPOS, NAX, 
+*     CALL KPG1_RDCAT( PARAM, CURFRM, KEYMAP, LABS, IWCS, NPOS, NAX,
 *                      IPPOS, IPID, TITLE, NAME, STATUS )
 
 *  Description:
@@ -26,23 +26,23 @@
 *        The name of the parameter to use.
 *     CURFRM = LOGICAL (Given)
 *        If .TRUE. the positions read from the catalogue are Mapped
-*        into the Current Frame of the associated FrameSet before being 
+*        into the Current Frame of the associated FrameSet before being
 *        returned. Otherwise, they are returned in the Base Frame.
 *     KEYMAP = INTEGER (Given)
 *        An AST pointer to an existing KeyMap, or AST__NULL. If a KeyMap
-*        is supplied, it should contain a vector valued entry called 
+*        is supplied, it should contain a vector valued entry called
 *        "COLNAMES" containing the names of one or more catalogue columns
 *        to be returned in the KeyMap. On exit, the KeyMap will contain
 *        the column values within a set of scalar entries. Each such
-*        entry will have a key of the form "<colname>_<row number>" 
+*        entry will have a key of the form "<colname>_<row number>"
 *        ("_1" for the first row). An error will be reported if the
 *        catalogue does not contain the requested columns.
 *     LABS = INTEGER (Given and Returned)
-*        A GRP identifier for a group containing the values in the LABEL 
+*        A GRP identifier for a group containing the values in the LABEL
 *        column. If the catalogue contains a LABEL column, then its values
-*        are appended to the end of the supplied group. If LABS holds 
+*        are appended to the end of the supplied group. If LABS holds
 *        GRP__NOID on entry, then a new GRP group is created and its
-*        identifier returned in LABS, but only if the catalogue contains 
+*        identifier returned in LABS, but only if the catalogue contains
 *        a LABEL column (otherwise the supplied value of GRP__NOID is
 *        retained on exit).
 *     IWCS = INTEGER (Returned)
@@ -55,7 +55,7 @@
 *        A pointer to a 2-dimensional DOUBLE PRECISION array holding the
 *        returned positions. Element (I,J) of this array gives axis J for
 *        position I. The first axis will have NPOS elements, and the
-*        second will have NAX elements. Should be released using PSX_FREE 
+*        second will have NAX elements. Should be released using PSX_FREE
 *        when no longer needed.
 *     IPID = INTEGER (Returned)
 *        A pointer to a 1-dimensional INTEGER array holding the integer
@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,7 +116,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
       INTEGER KEYMAP
 
 *  Arguments Given and Returned:
-      INTEGER LABS 
+      INTEGER LABS
 
 *  Arguments Returned:
       INTEGER IWCS
@@ -211,7 +211,7 @@
 *  Read AST Objects from the catalogue until a FrameSet is obtained, or no
 *  more Objects are left.
       DONE = .FALSE.
-      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
          CALL KPG1_RCATW( CI, IWCS, STATUS )
 
          IF( IWCS .NE. AST__NULL ) THEN
@@ -231,11 +231,11 @@
 *  by guessing at the column names in the catalogue.
       IF( IWCS .EQ. AST__NULL ) THEN
 
-*  Look for a floating point catalogue column with the name "RA". 
+*  Look for a floating point catalogue column with the name "RA".
          GOTRD = .FALSE.
          CALL CAT_TIDNT( CI, 'RA', GAXIS( 1 ), STATUS )
          IF( STATUS .EQ. SAI__OK ) THEN
-            CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
+            CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS )
             IF( DTYPE .EQ. CAT__TYPER .OR. DTYPE .EQ. CAT__TYPED ) THEN
                GOTRD = .TRUE.
             END IF
@@ -243,13 +243,13 @@
             CALL ERR_ANNUL( STATUS )
          END IF
 
-*  If found, look for a floating point catalogue column with the name "DEC". 
+*  If found, look for a floating point catalogue column with the name "DEC".
          IF( GOTRD ) THEN
             GOTRD = .FALSE.
             CALL CAT_TIDNT( CI, 'DEC', GAXIS( 1 ), STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
-               CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
-               IF( DTYPE .EQ. CAT__TYPER .OR. 
+               CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS )
+               IF( DTYPE .EQ. CAT__TYPER .OR.
      :             DTYPE .EQ. CAT__TYPED ) THEN
                   GOTRD = .TRUE.
                END IF
@@ -261,7 +261,7 @@
 *  If both RA and DEC columns were found, create a FrameSet holding a
 *  single SkyFrame.
          IF( GOTRD ) THEN
-            IWCS = AST_FRAMESET( AST_SKYFRAME( ' ', STATUS ), ' ', 
+            IWCS = AST_FRAMESET( AST_SKYFRAME( ' ', STATUS ), ' ',
      :                           STATUS )
 
 *  Ensure the axis symbols are RA and DEC since this is assumed later on.
@@ -272,7 +272,7 @@
 *  Epoch attribute of the SkyFrame.
             CALL CAT_TIDNT( CI, 'EPOCH', GAXIS( 1 ), STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
-               CALL CAT_TIQAC( GAXIS( 1 ), 'VALUE', EPOCH, STATUS ) 
+               CALL CAT_TIQAC( GAXIS( 1 ), 'VALUE', EPOCH, STATUS )
                CALL AST_SETC( IWCS, 'EPOCH', EPOCH, STATUS )
             ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -282,7 +282,7 @@
 *  Equinox attribute of the SkyFrame.
             CALL CAT_TIDNT( CI, 'EQUINOX', GAXIS( 1 ), STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
-               CALL CAT_TIQAC( GAXIS( 1 ), 'VALUE', EQN, STATUS ) 
+               CALL CAT_TIQAC( GAXIS( 1 ), 'VALUE', EQN, STATUS )
                CALL AST_SETC( IWCS, 'EQUINOX', EQN, STATUS )
             ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -292,12 +292,12 @@
 *  coords.
          ELSE
 
-*  Look for a floating point catalogue column with the name "X". 
+*  Look for a floating point catalogue column with the name "X".
             GOTXY = .FALSE.
             CALL CAT_TIDNT( CI, 'X', GAXIS( 1 ), STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
-               CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
-               IF( DTYPE .EQ. CAT__TYPER .OR. 
+               CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS )
+               IF( DTYPE .EQ. CAT__TYPER .OR.
      :             DTYPE .EQ. CAT__TYPED ) THEN
                   GOTXY = .TRUE.
                END IF
@@ -305,13 +305,13 @@
                CALL ERR_ANNUL( STATUS )
             END IF
 
-*  If found, look for a floating point catalogue column with the name "Y". 
-            IF( GOTXY ) THEN 
+*  If found, look for a floating point catalogue column with the name "Y".
+            IF( GOTXY ) THEN
                GOTXY = .FALSE.
                CALL CAT_TIDNT( CI, 'Y', GAXIS( 1 ), STATUS )
                IF( STATUS .EQ. SAI__OK ) THEN
-                  CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
-                  IF( DTYPE .EQ. CAT__TYPER .OR. 
+                  CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS )
+                  IF( DTYPE .EQ. CAT__TYPER .OR.
      :                DTYPE .EQ. CAT__TYPED ) THEN
                      GOTXY = .TRUE.
                   END IF
@@ -328,8 +328,8 @@
                NDIM = 2
                CALL CAT_TIDNT( CI, 'Z', GAXIS( 1 ), STATUS )
                IF( STATUS .EQ. SAI__OK ) THEN
-                  CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
-                  IF( DTYPE .EQ. CAT__TYPER .OR. 
+                  CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS )
+                  IF( DTYPE .EQ. CAT__TYPER .OR.
      :                DTYPE .EQ. CAT__TYPED ) THEN
                      NDIM = 3
                   END IF
@@ -338,7 +338,7 @@
                END IF
 
 *  Create the Frame with Domain GRID.
-               IWCS = AST_FRAMESET( AST_FRAME( NDIM, 'DOMAIN=GRID', 
+               IWCS = AST_FRAMESET( AST_FRAME( NDIM, 'DOMAIN=GRID',
      :                                         STATUS ),
      :                              ' ', STATUS )
 
@@ -348,9 +348,9 @@
                IF( NDIM .EQ. 3 ) THEN
                   CALL AST_SETC( IWCS, 'SYMBOL(3)', 'Z', STATUS )
                END IF
-   
+
             END IF
-   
+
          END IF
 
       END IF
@@ -370,12 +370,12 @@
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Loop round each Frame in the FrameSet, looking for a Frame with axis
-*  Symbols for which columns exist. The Base and Current Frames are checked 
+*  Symbols for which columns exist. The Base and Current Frames are checked
 *  first ( indices "-1" and "0" ).
       DO I = -1, AST_GETI( IWCS, 'NFRAME', STATUS )
 
-*  Get the index of the Frame to be checked next. Check the Base Frame first. 
-*  After the Base Frame has been checked, check the Current Frame, then check 
+*  Get the index of the Frame to be checked next. Check the Base Frame first.
+*  After the Base Frame has been checked, check the Current Frame, then check
 *  each subsequent Frame in order, jumping over the Base and Current Frames.
          IF( I .EQ. -1 ) THEN
             IFRM = IBASE
@@ -386,7 +386,7 @@
          ELSE IF( I .NE. IBASE .AND. I .NE. ICURR ) THEN
             IFRM = I
 
-         ELSE 
+         ELSE
             IFRM = AST__NOFRAME
 
          END IF
@@ -411,7 +411,7 @@
 *  Look for a catalogue column with this name.
                CALL CAT_TIDNT( CI, SYM, GAXIS( J ), STATUS )
 
-*  If not found, annul the error and pass on to the next Frame.               
+*  If not found, annul the error and pass on to the next Frame.
                IF( STATUS .EQ. CAT__NOCMP ) THEN
                   CALL ERR_ANNUL( STATUS )
                   GO TO 10
@@ -419,13 +419,13 @@
 
 *  Check the column contains floating point values. Pass on to the next
 *  Frame if it does not.
-               CALL CAT_TIQAI( GAXIS( J ), 'DTYPE', DTYPE, STATUS ) 
-               IF( DTYPE .NE. CAT__TYPER .AND. 
+               CALL CAT_TIQAI( GAXIS( J ), 'DTYPE', DTYPE, STATUS )
+               IF( DTYPE .NE. CAT__TYPER .AND.
      :             DTYPE .NE. CAT__TYPED ) GO TO 10
 
             END DO
 
-*  We only arrive here if a floating point column corresponding to each Frame 
+*  We only arrive here if a floating point column corresponding to each Frame
 *  Axis was found. Jump out of the Frame loop, retaining the details of
 *  the Frame which has just been checked.
             GO TO 20
@@ -465,7 +465,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the axis values from the catalogue columns into this array.
-      CALL KPG1_CTCPD( CI, NAX, GAXIS, NPOS, %VAL( CNF_PVAL( IPPOS ) ), 
+      CALL KPG1_CTCPD( CI, NAX, GAXIS, NPOS, %VAL( CNF_PVAL( IPPOS ) ),
      :                 STATUS )
 
 *  Get the Mapping from the Frame in which the positions are stored in
@@ -478,10 +478,10 @@
       END IF
 
       IF( IFRM .EQ. IREQ ) THEN
-         MAP = AST__NULL    
+         MAP = AST__NULL
 
       ELSE
-         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, IREQ, 
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, IREQ,
      :                                       STATUS ), STATUS )
 
          IF( AST_ISAUNITMAP( MAP, STATUS ) ) THEN
@@ -491,7 +491,7 @@
       END IF
 
 *  If a Mapping is required, transform the positions.
-      IF( MAP .NE. AST__NULL ) THEN 
+      IF( MAP .NE. AST__NULL ) THEN
 
 *  Save the pointer to the catalogue positions and the number of axes in
 *  the catalogue Frame in different local variables
@@ -504,15 +504,15 @@
          ELSE
             NAX = AST_GETI( IWCS, 'NIN', STATUS )
          END IF
- 
+
 *  Allocate memory to hold the returned positions in the requested Frame.
          CALL PSX_CALLOC( NPOS*NAX, '_DOUBLE', IPPOS, STATUS )
 
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
-         
+
 *  Map the positions.
-         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS, 
+         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS,
      :                   %VAL( CNF_PVAL( IPCAT ) ), .TRUE.,
      :                   NAX, NPOS, %VAL( CNF_PVAL( IPPOS ) ), STATUS )
 
@@ -533,7 +533,7 @@
 
 *  If it exists, check that it has type INTEGER.
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL CAT_TIQAI( GID, 'DTYPE', DTYPE, STATUS) 
+         CALL CAT_TIQAI( GID, 'DTYPE', DTYPE, STATUS)
 
 *  If not, issue a warning message and ignore the PIDENT column.
          IF( DTYPE .NE. CAT__TYPEI ) THEN
@@ -545,7 +545,7 @@
             GID = CAT__NOID
          END IF
 
-*  If the component was not found, annul the error, and assume monotonic 
+*  If the component was not found, annul the error, and assume monotonic
 *  position identifiers.
       ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -554,7 +554,7 @@
 
 *  Store the positions identifiers. Monotonic identifiers starting at 1
 *  are stored if no suitable PIDENT column was found in the catalogue.
-      CALL KPG1_CTCPI( CI, 1, GID, NPOS, %VAL( CNF_PVAL( IPID ) ), 
+      CALL KPG1_CTCPI( CI, 1, GID, NPOS, %VAL( CNF_PVAL( IPID ) ),
      :                 STATUS )
 
 *  Get an identifier for the TITLE parameter in the catalogue.
@@ -562,7 +562,7 @@
 
 *  If it exists, get its value.
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS) 
+         CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS)
 
 *  Otherwise, annul the error and return a blank string.
       ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
@@ -588,12 +588,12 @@
 *  of the supplied KeyMap.
       IF( KEYMAP .NE. AST__NULL ) THEN
 
-*  Get CAT column identifiers for all column names listed in the COLNAMES 
+*  Get CAT column identifiers for all column names listed in the COLNAMES
 *  entry.
-         NCNAM = MIN( MXDIM, AST_MAPLENGTH( KEYMAP, 'COLNAMES', 
+         NCNAM = MIN( MXDIM, AST_MAPLENGTH( KEYMAP, 'COLNAMES',
      :                                      STATUS ) )
          DO J = 1, NCNAM
-            IF( AST_MAPGETELEMC( KEYMAP, 'COLNAMES', J, COLNAM, 
+            IF( AST_MAPGETELEMC( KEYMAP, 'COLNAMES', J, COLNAM,
      :                           STATUS ) ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   CALL CAT_TIDNT( CI, COLNAM, GAXIS( J ), STATUS )
@@ -611,7 +611,7 @@
             END IF
          END DO
 
-*  Read the columns into the KeyMap. 
+*  Read the columns into the KeyMap.
          CALL KPG1_CTCPK( CI, NCNAM, GAXIS, NPOS, KEYMAP, STATUS )
 
       END IF

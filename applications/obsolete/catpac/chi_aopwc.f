@@ -24,7 +24,7 @@
 *    Authors :
 *     Alan Wood (STADAT::ARW) Esther Gershuny (rlvad::ejg)
 *    History :
-*     28-Feb-1992 - Original 
+*     28-Feb-1992 - Original
 *    Type definitions :
       implicit none
 *    Global constants :

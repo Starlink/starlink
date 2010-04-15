@@ -208,12 +208,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -256,9 +256,9 @@
 /* Macros */
 /* ====== */
 #if defined(astCLASS)
-#define AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN 50       
-#define AST__AXIS_AXISFORMAT_BUFF_LEN 127 
-#define AST__AXIS_GETAXISNORMUNIT_BUFF_LEN 127 
+#define AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN 50
+#define AST__AXIS_AXISFORMAT_BUFF_LEN 127
+#define AST__AXIS_GETAXISNORMUNIT_BUFF_LEN 127
 #define AST__AXIS_GETATTRIB_BUFF_LEN 50
 #endif
 
@@ -353,7 +353,7 @@ typedef struct AstAxisVtab {
 
 } AstAxisVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within the
    object.c file. */
@@ -361,9 +361,9 @@ typedef struct AstAxisVtab {
 typedef struct AstAxisGlobals {
    AstAxisVtab Class_Vtab;
    int Class_Init;
-   char GetDefaultFormat_Buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ];  
-   char AxisFormat_Buff[ AST__AXIS_AXISFORMAT_BUFF_LEN + 1 ];  
-   char GetAxisNormUnit_Buff[ AST__AXIS_GETAXISNORMUNIT_BUFF_LEN + 1 ];  
+   char GetDefaultFormat_Buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ];
+   char AxisFormat_Buff[ AST__AXIS_AXISFORMAT_BUFF_LEN + 1 ];
+   char GetAxisNormUnit_Buff[ AST__AXIS_GETAXISNORMUNIT_BUFF_LEN + 1 ];
    char GetAttrib_Buff[ AST__AXIS_GETATTRIB_BUFF_LEN + 1 ];
 } AstAxisGlobals;
 
@@ -399,7 +399,7 @@ AstAxis *astLoadAxis_( void *, size_t, AstAxisVtab *, const char *,
                        AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitAxisGlobals_( AstAxisGlobals * );
 #endif
 

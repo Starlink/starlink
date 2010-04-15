@@ -31,7 +31,7 @@
 *
 *    Method :
 *
-*     The user is prompted for the location of the input image 
+*     The user is prompted for the location of the input image
 *     structure and its DATA_ARRAY component is mapped in.
 *     From a defined set of possible options, a string is
 *     obtained which corresponds to one of the permissible
@@ -96,7 +96,7 @@
      :     NELEMENTS,          ! number of elements mapped by NDF_MAP
      :     PNTRI,              ! pointer to input image
      :     PNTRO,              !    "     " output  "
-     :     LOCI,               ! locator to input image structure  
+     :     LOCI,               ! locator to input image structure
      :     LOCO                !    "     " output  "       "
 
       REAL
@@ -121,7 +121,7 @@
       ENDIF
 
 *    initialise the valid and scalar input flags
-      VALID  =  .FALSE.      
+      VALID  =  .FALSE.
       FSCAL  =  .FALSE.
 
 *    loop until a valid input of some sort is obtained, aborting if
@@ -132,10 +132,10 @@
          CALL GETINP( 'INPUT', LOCI, STATUS )
 
 *       map its DATA_ARRAY component onto a pointer
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
-         CALL NDF_DIM( LOCI, NDIMS, DIMS, NDIM, STATUS) 
+         CALL NDF_DIM( LOCI, NDIMS, DIMS, NDIM, STATUS)
 
 *       check the status - if it is bad, then something went wrong with
 *       the processing of the input image. Depending on the value of
@@ -187,7 +187,7 @@
 *        COSD -  cosine (degrees)     ACOSD -  arccosine (degrees)
 *        TAND -  tangent (degrees)    ATAND -  arctangent (degrees)
 
-      OPTIONS  =  
+      OPTIONS  =
      : 'SIN,COS,TAN,SIND,COSD,TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND'
 
       CALL AIF_CHOIC( 'TRIGFUNC', OPTIONS, TRIGFUNC, STATUS )
@@ -203,15 +203,15 @@
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-            IF( TRIGFUNC .EQ. 'BAD' ) THEN     
+            IF( TRIGFUNC .EQ. 'BAD' ) THEN
 *             bad function requested
-               CALL MSG_OUT( 'TRIGS_BAD', 
+               CALL MSG_OUT( 'TRIGS_BAD',
      :          'Bad trig fn. passed - no result available',
      :                        STATUS )
 
             ELSEIF( TRIGFUNC .EQ. 'OUT' ) THEN
-               CALL MSG_OUT( 'TRIGS_OUT', 
-     :  'Input scalar was outside function range - no result available', 
+               CALL MSG_OUT( 'TRIGS_OUT',
+     :  'Input scalar was outside function range - no result available',
      :                       STATUS )
 
             ELSE
@@ -227,7 +227,7 @@
 
          ELSE
             CALL ERR_REP('ERR', 'Bad status after TRIGSCAL',
-     :                   STATUS)  
+     :                   STATUS)
          END IF
 
 *       clean up
@@ -239,12 +239,12 @@
          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, DIMS, LOCO, STATUS )
 
 *       map its DATA_ARRAY component onto a pointer
-         CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+         CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                  PNTRO, NELEMENTS, STATUS )
 
 
 *       now call the subroutine that does the actual work
-         CALL TRIGSUB( %VAL( PNTRI ), DIMS(1), DIMS(2), TRIGFUNC, 
+         CALL TRIGSUB( %VAL( PNTRI ), DIMS(1), DIMS(2), TRIGFUNC,
      :                    %VAL( PNTRO ), STATUS )
 
 *       on return, check for errors in TRIGSUB
@@ -252,19 +252,19 @@
          IF (STATUS .EQ. SAI__OK) THEN
 
             IF( TRIGFUNC .EQ. 'BAD' ) THEN     ! bad function requested
-               CALL MSG_OUT( 'TRIG_BAD', 
+               CALL MSG_OUT( 'TRIG_BAD',
      :       'Bad trig fn. passed - output array set equal to input',
      :                        STATUS )
 
             ELSEIF( TRIGFUNC .EQ. 'OUT' ) THEN
-               CALL MSG_OUT( 'TRIG_OUT', 
-     :       'At least one input pixel was outside function range', 
+               CALL MSG_OUT( 'TRIG_OUT',
+     :       'At least one input pixel was outside function range',
      :                       STATUS )
 
             END IF
          ELSE
             CALL ERR_REP('ERR', 'Bad status after TRIGSUB',
-     :                   STATUS)  
+     :                   STATUS)
          END IF
 
 *       tidy up input and output data structures

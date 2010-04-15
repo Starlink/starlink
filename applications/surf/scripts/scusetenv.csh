@@ -3,7 +3,7 @@
 #  Usage:   source scusetenv.csh <UTDATE>
 #
 #  Author: Tim Jenness (t.jenness@jach.hawaii.edu)
-#  
+#
 #  Full Starlink prologue is at the end
 #
 #  Current UTdate is the default
@@ -37,7 +37,7 @@ else
 endif
 
 # Echo setting up SURF for UT date $utdate
-echo Setting up SURF for UT date $utdate 
+echo Setting up SURF for UT date $utdate
 
 
 # Can set SCUBA_PREFIX
@@ -46,18 +46,18 @@ echo SCUBA_PREFIX set to $utdate
 
 # Now set DATADIR - this depends on our location
 # There are 3 possibilities. We are in Hilo, we are at the JCMT
-# or we are somewhere else. 
+# or we are somewhere else.
 #
 #
 # At the JCMT we need to set DATADIR to /jcmtarchive/UTdate
 # In this case the current UT date is the sensible choice
-# 
+#
 # In Hilo we need to set DATADIR to /scuba/Semester/UTdate/
 # In this case current UT is meaningless and an argument should be
 # used
 #
 # Somewhere else - we have no idea where DATADIR should be
-# so we do nothing 
+# so we do nothing
 
 # Use domainname to work out where we are
 
@@ -104,7 +104,7 @@ endif
 # Finally set ORAC_DATA_IN to be the same as DATADIR
 # Assuming DATADIR has been set
 
-if ($?DATADIR) then 
+if ($?DATADIR) then
   setenv ORAC_DATA_IN $DATADIR
   echo DATADIR has been set to $DATADIR
   echo ORAC_DATA_IN has also been set to this value
@@ -158,7 +158,7 @@ exit
 *      will not be set but SCUBA_PREFIX will be set.
 
 *  Implementation Status:
-*    This script should be sourced (not executed) since the 
+*    This script should be sourced (not executed) since the
 *    environment variables should be set after the script has been read.
 
 *  Authors:

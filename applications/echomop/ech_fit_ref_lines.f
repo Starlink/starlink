@@ -6,7 +6,7 @@
      :           LINE_POSITION,
      :           LINE_INTENSITY,
      :           CONTINUUM,
-     :           IORD, 
+     :           IORD,
      :           STATUS
      :          )
 *+
@@ -73,8 +73,8 @@
 *       were accepted with the reversed spectrum.  As a fudge I have
 *       changed the criterion for rejection to be that 'a fit cannot
 *       be found to either the data, or the reflected data'.  This
-*       accepts results in more lines being accepted - this is 
-*       important as some of the lines being rejected were valid and 
+*       accepts results in more lines being accepted - this is
+*       important as some of the lines being rejected were valid and
 *       their rejection made wavelength calibration difficult.  I
 *       suspect a problem in the gaussian fitter but do not have time
 *       to investigate.

@@ -1,14 +1,14 @@
-#include "sae_par.h" 
-#include "mers.h" 
-#include "ndf.h" 
-#include "star/ndg.h" 
-#include "star/kaplibs.h" 
-#include "star/grp.h" 
-#include "par.h" 
+#include "sae_par.h"
+#include "mers.h"
+#include "ndf.h"
+#include "star/ndg.h"
+#include "star/kaplibs.h"
+#include "star/grp.h"
+#include "par.h"
 #include "par_par.h"
 #include "prm_par.h"
-#include <math.h> 
-#include <string.h> 
+#include <math.h>
+#include <string.h>
 #include <stdio.h>
 
 F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
@@ -36,12 +36,12 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *  Description:
 *     This application creates a new NDF from an existing NDF by dividing
 *     the DATA component of the input NDF by the square root of its
-*     VARIANCE component. The DATA array in the output NDF thus measures 
-*     the signal to noise ratio in the input NDF. 
+*     VARIANCE component. The DATA array in the output NDF thus measures
+*     the signal to noise ratio in the input NDF.
 *
 *     Anomalously small variance values in the input can cause very
-*     large spurious values in the output signal to noise array. To avoid 
-*     this, pixels that have a variance value below a given threshold are 
+*     large spurious values in the output signal to noise array. To avoid
+*     this, pixels that have a variance value below a given threshold are
 *     set bad in the output NDF.
 
 *  Usage:
@@ -53,18 +53,18 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *        VARIANCE component.
 *     MINVAR = _REAL (Read)
 *        The minimum variance value to be used. Input pixels that have
-*        variance values smaller than this value will be set bad in the 
+*        variance values smaller than this value will be set bad in the
 *        output. The suggested default is determined by first forming a
 *        histogram of the logarithm of the input variance values. The highest
 *        peak is then found in this histogram. The algorithm then moves
 *        down from this peak towards lower variance values until the
-*        histogram has dropped to a value equal to the square root of 
+*        histogram has dropped to a value equal to the square root of
 *        the peak value, or a significant minimum is encountered in the
 *        histogram. The corresponding variance value is used as the
 *        suggested default. []
 *     OUT = NDF (Write)
-*        The output signal to noise NDF. The VARIANCE component of this NDF 
-*        will be filled with the value 1.0 (except that bad DATA values will 
+*        The output signal to noise NDF. The VARIANCE component of this NDF
+*        will be filled with the value 1.0 (except that bad DATA values will
 *        also have bad VARIANCE values).
 
 *  Copyright:
@@ -100,7 +100,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *     {enter_further_changes_here}
 
 *-
-*/      
+*/
 
    GENPTR_INTEGER(STATUS)
 
@@ -120,8 +120,8 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    double bin_width;         /* Width of a log10(var) histogram bin */
    double hmax;              /* Maximum log10(var) value in histogram */
    double hmin;              /* Minimum log10(var) value in histogram */
-   double maxv;              /* Maximum variance value */   
-   double minv;              /* Minimum variance value */   
+   double maxv;              /* Maximum variance value */
+   double minv;              /* Minimum variance value */
    double minvar;            /* Smallest usable Variance value */
    double target;            /* Square root of maximum bin polulation */
    int el;                   /* Number of array elements mapped */
@@ -150,7 +150,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    kpg1Rgndf( "IN", 1, 1, "", &grp, &size, STATUS );
    ndgNdfas( grp, 1, "READ", &indf, STATUS );
    grpDelet( &grp, STATUS );
-   
+
 /* Map the input Variance component as an array of doubles. */
    ndfMap( indf, "Variance", "_DOUBLE", "READ", (void *) &ipvin, &el, STATUS );
 
@@ -168,7 +168,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
             if( *vin < minv ) minv = *vin;
             if( *vin > maxv ) maxv = *vin;
          }
-      }            
+      }
 
 /* Report an error if there are no usable Variances */
       if( maxv < minv ) {
@@ -194,7 +194,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
                }
                hist[ ibin ]++;
             }
-         }            
+         }
 
 /* Find the bin with the largest population. */
          maxpop = -1;
@@ -220,7 +220,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
             } else if( hist[ ibin ] < minpop ) {
                minpop = hist[ ibin ];
                minbin = ibin;
-           
+
             } else if( minbin - ibin == 4 ) {
                minvar = pow( 10.0, ( minbin + 0.5 )*bin_width + hmin );
                break;
@@ -267,7 +267,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
             *dout = VAL__BADD;
             *vout = VAL__BADD;
          }
-      }            
+      }
 
       if( nbad >0 ) {
          msgBlank( STATUS );
@@ -286,7 +286,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 /* End the NDF context */
    ndfEnd( STATUS );
 
-/* If an error has occurred, issue another error report identifying the 
+/* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *STATUS != SAI__OK ) {
       errRep( "MAKESNR_ERR", "MAKESNR: Failed to create a signal-to-noise "

@@ -3,7 +3,7 @@ C%void cpgconb(const float *a, int idim, int jdim, int i1, int i2, \
 C% int j1, int j2, const float *c, int nc, const float *tr, \
 C% float blank);
 C+
-      SUBROUTINE PGCONB (A, IDIM, JDIM, I1, I2, J1, J2, C, NC, TR, 
+      SUBROUTINE PGCONB (A, IDIM, JDIM, I1, I2, J1, J2, C, NC, TR,
      1                   BLANK)
       INTEGER IDIM, JDIM, I1, I2, J1, J2, NC
       REAL    A(IDIM,JDIM), C(*), TR(6), BLANK
@@ -77,7 +77,7 @@ C
             GOTO (60,70,60,70), ICORN
 C
    60       XX = I+IDELT(ICORN+1)
-            YY = REAL(J+IDELT(ICORN)) + 
+            YY = REAL(J+IDELT(ICORN)) +
      1           DELTA*REAL(IDELT(ICORN+1)-IDELT(ICORN))
             GOTO 80
 C

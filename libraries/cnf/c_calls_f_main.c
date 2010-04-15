@@ -51,7 +51,7 @@ int main()
    DECLARE_CHARACTER(c1f,80);
    DECLARE_CHARACTER_ARRAY(caf,80,NC);
    DECLARE_INTEGER(nc);
-   
+
    char c;
    char c1c[81];
 
@@ -67,7 +67,7 @@ int main()
    printf( "--> This is a test of C calling FORTRAN\n" );
 
    /* Initialise fortran run time library */
-   cnfInitRTL( 0, NULL );  
+   cnfInitRTL( 0, NULL );
 
 /* Test the passing of int arguments */
    for( j=0 ; j<ni ; j++ )

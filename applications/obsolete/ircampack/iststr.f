@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -56,7 +56,7 @@
       CHARACTER PARAM*(*)
       LOGICAL LOG
       INTEGER FD
-    
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -76,7 +76,7 @@
 *  Get the string.
       CALL PAR_GET0C( PARAM, STRING, STATUS )
 
-*  If an error occurred (other than a parameter abort), annul the error and 
+*  If an error occurred (other than a parameter abort), annul the error and
 *  report a null.
       IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -86,7 +86,7 @@
 *  Otherwise, display the string and optionally log it.
       ELSE
          CALL CHR_FANDL( STRING, F, L )
-         IF( F .LE. L ) THEN 
+         IF( F .LE. L ) THEN
             CALL MSG_OUT( 'ISTSTR_MSG2', STRING( F : L ), STATUS )
             IF( LOG ) CALL FIO_WRITE( FD, STRING( F : L ), STATUS )
          ELSE

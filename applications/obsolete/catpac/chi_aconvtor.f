@@ -2,7 +2,7 @@
       subroutine chi_aconvtor(ed, rvalue, status)
 *    Description :
 *     Convert the value of an element to a real.
-*    
+*
 *    Invocation :
 *     CALL CHI_ACONVTOR(ED, RVALUE, STATUS)
 *    Parameters :
@@ -21,10 +21,10 @@
 *     Alan Wood (STADAT::ARW) Sid Wright  (UCL::SLW)
 *     Jon Fairclough (RAL::IPMAF)
 *    History :
-*     14-Feb-1992: Original.  
+*     14-Feb-1992: Original.
 *    Global constants :
       include 'sae_par'			! SAI Constants
-      include 'chi_par'	
+      include 'chi_par'
       include 'chipar_par'
 *    Import :
       integer ed			! element descriptor
@@ -41,13 +41,13 @@
       if (status .ne. SAI__OK) return
 *
 *    Get the field value according to its stored type and convert
-*    to the required type.  
+*    to the required type.
 *
          if (Etype(ed).eq.D_type) then
              rvalue = doubvals(ed)
          elseif (Etype(ed).eq.I_type) then
              rvalue = float(intvals(ed))
-         else 
+         else
              rvalue = realvals(ed)
          endif
       end

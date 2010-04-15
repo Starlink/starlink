@@ -168,7 +168,7 @@
 
 *  Hidden parameter statement, read back the details and create the
 *  parameter.
-               READ( LINE, 101 ) SKIP, NAME, DTYPE, CSIZE, UNITS, 
+               READ( LINE, 101 ) SKIP, NAME, DTYPE, CSIZE, UNITS,
      :                           EXTFMT, PRFDSP
  101           FORMAT( A2, A17, I3, I5, A22, A22, L2 )
                IF ( DTYPE .EQ. CAT__TYPEUB .OR. DTYPE .EQ. CAT__TYPEB )
@@ -219,7 +219,7 @@
 
 *  Write a textual line if found.
             ELSE IF ( LINE ( 1 : 2 ) .EQ. '#T' ) THEN
-               CALL CAT_PUTXT( CI, 'COMMENT', 
+               CALL CAT_PUTXT( CI, 'COMMENT',
      :                         LINE( 3 : CHR_LEN( LINE ) ), STATUS )
 
 *  Skip to next loop.
@@ -243,7 +243,7 @@
                IF ( NAME( : 6 ) .EQ. 'symbol' ) THEN
 
 *  Get length of symbol string and split into 68 character parts.
-                  VALLEN = CHR_LEN( VALUE ) 
+                  VALLEN = CHR_LEN( VALUE )
                   I = 1
                   DO 6 IAT = 1, VALLEN, 68
                      WRITE( NAME( 7:7 ), '(I1)' ) I
@@ -266,14 +266,14 @@
                         CALL ERR_ANNUL( STATUS )
 
 *  Create the parameter anyway. This will just have character format.
-                        CALL CAT_PPTSC( CI, NAME, VALUE, ' ', QI, 
+                        CALL CAT_PPTSC( CI, NAME, VALUE, ' ', QI,
      :                                  STATUS )
                      ELSE
 
 *  Parameter exists, just set the value (rely on internal conversion).
                         CALL ERR_MARK
                         CALL CAT_TATTC( QI, 'VALUE', VALUE, STATUS )
-                        IF ( STATUS .NE. SAI__OK ) 
+                        IF ( STATUS .NE. SAI__OK )
      :                       CALL ERR_ANNUL( STATUS )
                         CALL ERR_RLSE
                      END IF
@@ -281,7 +281,7 @@
                   ELSE
 
 *  If this ra_col or dec_col then record for format conversion.
-                     IF ( NAME .EQ. 'ra_col' ) THEN 
+                     IF ( NAME .EQ. 'ra_col' ) THEN
                         CALL CHR_CTOI( VALUE, RACOL, STATUS )
                         RACOL = RACOL + 1
                      ELSE IF ( NAME .EQ. 'dec_col' ) THEN
@@ -341,28 +341,28 @@
 *  Deal with possible degrees to radian conversion and sexagesimal
 *  formats.
       CALL FIO_READF( FI, LINE, STATUS )
-      IF ( RACOL .NE. -1 .AND. DECCOL .NE. -1 ) THEN 
+      IF ( RACOL .NE. -1 .AND. DECCOL .NE. -1 ) THEN
 
 *  Extract the RA and DEC strings.
          DO 7 I = 1, ICOL
             CALL GAI1_NXTAB( LINE, IAT, IEND, STATUS )
-            IF ( I .EQ. RACOL ) THEN 
+            IF ( I .EQ. RACOL ) THEN
 
 *  See if this is sexagesimal
-               CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL, RASEX, 
+               CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL, RASEX,
      :                          STATUS )
 
 *  See if units are RADIANS, in which case we need to convert.
                CALL CAT_TIQAC( COL( I ), 'UNITS', UNITS, STATUS )
-               IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN 
+               IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN
                   RARAD = .TRUE.
                ELSE
                   RARAD = .FALSE.
                END IF
-            ELSE IF ( I .EQ. DECCOL ) THEN 
-               CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL, DECSEX, 
+            ELSE IF ( I .EQ. DECCOL ) THEN
+               CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL, DECSEX,
      :                          STATUS )
-               IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN 
+               IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN
                   DECRAD = .TRUE.
                ELSE
                   DECRAD = .FALSE.
@@ -391,11 +391,11 @@
             DO 5 I = 1, ICOL
                CALL GAI1_NXTAB( LINE, IAT, IEND, STATUS )
                IF ( IEND .NE. 0 ) THEN
-                  IF ( I .EQ. RACOL ) THEN 
+                  IF ( I .EQ. RACOL ) THEN
 
 *  RA column, convert from sexigesimal or degrees.
-                     IF ( RASEX ) THEN 
-                        CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL, 
+                     IF ( RASEX ) THEN
+                        CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL,
      :                                   CONV, STATUS )
                      ELSE
                         CALL CHR_CTOD( LINE( IAT : IEND - 1 ), DVAL ,
@@ -403,11 +403,11 @@
                         IF ( RARAD ) DVAL = DVAL * PI / 180.0D0
                      END IF
                      CALL CAT_PUT0D( COL( I ), DVAL, .FALSE., STATUS )
-                  ELSE IF ( I .EQ. DECCOL ) THEN 
+                  ELSE IF ( I .EQ. DECCOL ) THEN
 
 *  DEC column, convert from sexigesimal or degrees.
-                     IF ( DECSEX ) THEN 
-                        CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL, 
+                     IF ( DECSEX ) THEN
+                        CALL GAI1_S2ANG( LINE( IAT : IEND - 1 ), DVAL,
      :                                   CONV, STATUS )
                      ELSE
                         CALL CHR_CTOD( LINE( IAT : IEND - 1 ), DVAL ,
@@ -426,14 +426,14 @@
 
 *  Missing field, or [EOD]?
                   IF ( LINE( 1:5 ) .NE. '[EOD]' ) THEN
-                     
+
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'LINE', NLINE )
                      CALL ERR_REP( ' ',
      :               'Data line no. ^LINE, contains too few fields',
      :                           STATUS )
                      GO TO 99
-                  ELSE 
+                  ELSE
                      OK = .FALSE.
                      GO TO 4
                   END IF

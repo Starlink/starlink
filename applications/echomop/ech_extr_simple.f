@@ -381,7 +381,7 @@
                 ARCSPEC( IWAVE ) = ARCSPEC( IWAVE ) /
      :                FLOAT( SKY_COUNT ) * FLOAT( OBJ_COUNT ) * PHOTON
                 ARCSIG( IWAVE ) = ARCSIG( IWAVE ) /
-     :                FLOAT( SKY_COUNT ) * FLOAT( OBJ_COUNT ) * 
+     :                FLOAT( SKY_COUNT ) * FLOAT( OBJ_COUNT ) *
      :                PHOTON * PHOTON
             END IF
 

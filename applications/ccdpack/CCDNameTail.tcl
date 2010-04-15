@@ -14,7 +14,7 @@
 
 #  Description:
 #     This function returns the last part (after the last ::) of a fully
-#     qualified name of a Tcl variable.  It does the same as 
+#     qualified name of a Tcl variable.  It does the same as
 #     the 'info namespace tail' command used to do in Itcl2.2/Tcl7.6,
 #     which command does not exist in Itcl3/Tcl8.
 

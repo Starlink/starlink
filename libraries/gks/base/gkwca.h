@@ -31,7 +31,7 @@
 
 #define KWCST	512
 
-extern struct 
+extern struct
 {
   f77_real	qwra[KNQWR];
 
@@ -84,7 +84,7 @@ extern struct
 		kchlt, ksgrq;
 } gkywca_;
 
-extern struct 
+extern struct
 {
   f77_character	ch[80];
   f77_character	cstr[KWCST];

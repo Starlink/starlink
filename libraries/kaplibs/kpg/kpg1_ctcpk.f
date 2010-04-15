@@ -13,8 +13,8 @@
 *     CALL KPG1_CTCPK( CI, NAX, GI, NEL, KEYMAP, STATUS )
 
 *  Description:
-*     This routine gets NEL values for a set of given CAT (see SUN/181) 
-*     columns, derived from rows 1 to NEL of a given catalogue, 
+*     This routine gets NEL values for a set of given CAT (see SUN/181)
+*     columns, derived from rows 1 to NEL of a given catalogue,
 *     selection, or index, and stores them in a KeyMap.
 
 *  Arguments:
@@ -25,8 +25,8 @@
 *        The number of columns from which values are to be read.
 *     GI( NAX ) = INTEGER (Given)
 *        The CAT identifiers for the column, expressions or parameters
-*        to be evaluated for rows 1 to NEL of the component identified 
-*        by CI. 
+*        to be evaluated for rows 1 to NEL of the component identified
+*        by CI.
 *     NEL = INTEGER (Given)
 *        The number of rows to copy.
 *     KEYMAP = INTEGER (Given)
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,14 +68,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'CAT_PAR'          ! CAT constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CAT_PAR'          ! CAT constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Arguments Given:
@@ -101,7 +101,7 @@
       INTEGER KLEN               ! Used length of KEY
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the buffer
@@ -118,16 +118,16 @@
          DO J = 1, NAX
 
 *  If this column ID is valid, get the column value.
-            IF ( GI( J ) .NE. CAT__NOID ) THEN 
+            IF ( GI( J ) .NE. CAT__NOID ) THEN
                CALL CAT_EGT0C( GI( J ), TEXT, NULL, STATUS )
-               
+
 *  Use a blank value if the value is null.
                IF( NULL ) THEN
                   TEXT = ' '
                   TLEN = 1
                ELSE
                   TLEN = MAX( 1, CHR_LEN( TEXT ) )
-               END IF                  
+               END IF
 
 *  If this column ID is null, store a blank value.
             ELSE
@@ -140,11 +140,11 @@
             CALL CAT_TIQAC( GI( J ), 'NAME', KEY, STATUS )
             KLEN = CHR_LEN( KEY )
             CALL CHR_APPND( '_', KEY, KLEN )
-            CALL CHR_PUTI( I, KEY, KLEN ) 
-            CALL CHR_UCASE( KEY( : KLEN ) ) 
- 
+            CALL CHR_PUTI( I, KEY, KLEN )
+            CALL CHR_UCASE( KEY( : KLEN ) )
+
 *  Add the entry to the KeyMap.
-            CALL AST_MAPPUT0C( KEYMAP, KEY( : KLEN ), TEXT( : TLEN ), 
+            CALL AST_MAPPUT0C( KEYMAP, KEY( : KLEN ), TEXT( : TLEN ),
      :                         ' ', STATUS )
 
 *  Clear the buffer

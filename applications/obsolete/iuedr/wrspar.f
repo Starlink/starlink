@@ -1,4 +1,4 @@
-      SUBROUTINE WRSPAR(FD, NAXIS1, NAXIS2, MBAD, QUAL, SBAD, LBAD, 
+      SUBROUTINE WRSPAR(FD, NAXIS1, NAXIS2, MBAD, QUAL, SBAD, LBAD,
      :                  QBAD, STATUS)
 
 *+
@@ -9,7 +9,7 @@
 *   Description:
 *      This writes the QUAL array from disk into the supplied program array.
 *      The QUAL elements are stored as a SPARSE array.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     IUEDR Vn. 1.0
 *      Paul Rees          22-SEP-88     IUEDR Vn. 2.0
@@ -37,7 +37,7 @@
       BYTE QBAD(MBAD)               ! data quality values
 
       INTEGER STATUS                ! status return
- 
+
 *   CMDATA:
       INCLUDE 'CMDATA'
 
@@ -53,7 +53,7 @@
          DO IS = SMIN(IL), SMAX(IL)
             IF (QUAL(IS, IL).NE.0) THEN
                IF (NBAD.GE.MBAD) THEN
-                  CALL ERROUT('Error: too many bad pixels\\', 
+                  CALL ERROUT('Error: too many bad pixels\\',
      :                STATUS)
                   RETURN
                END IF
@@ -65,7 +65,7 @@
 
             END IF
          END DO
-      END DO 
+      END DO
 
 *   Write to file
       WRITE (FD, IOSTAT = STATUS) (SBAD(I), I = 1, NBAD)

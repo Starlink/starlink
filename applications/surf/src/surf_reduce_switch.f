@@ -1,5 +1,5 @@
       SUBROUTINE SURF_REDUCE_SWITCH (STATUS)
-*+  
+*+
 *  Name:
 *     REDUCE_SWITCH
 
@@ -8,10 +8,10 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_REDUCE_SWITCH (STATUS)
 
@@ -20,7 +20,7 @@
 *        The global status
 
 *  Description:
-*     This application takes a SCUBA demodulated data file and splits the 
+*     This application takes a SCUBA demodulated data file and splits the
 *     data array up into its various `planes'; data, variance and quality.
 *     In addition, the application reduces the component switches of an
 *     exposure to give the exposure result. Optionally, the routine will
@@ -42,7 +42,7 @@
 *        value is constructed from the run number.
 *     SPIKE_LEVEL = INTEGER (Read)
 *        Number of spikes tolerated before marking data point bad.
-*        The default is that the sample should be marked bad if the 
+*        The default is that the sample should be marked bad if the
 *        transputers detected more than 5 spikes during a 1 second
 *        sample.
 *     SWITCH = INTEGER (Read)
@@ -50,7 +50,7 @@
 *        that all switches should be reduced. Default is 0.
 *     TARRAY = LOGICAL (Read)
 *        Controls whether the T_COLD parameters are read as an array
-*        of values (true) or read as a sequence of scalars (false) . 
+*        of values (true) or read as a sequence of scalars (false) .
 *        This parameter is useful if the command is to be run in batch mode.
 *        Default is false.
 *     T_COLD = REAL (Read)
@@ -70,7 +70,7 @@
 *  Examples:
 *     reduce_switch
 *        All parameters will be requested.
-*     reduce_switch test nosw 
+*     reduce_switch test nosw
 *        This will reduce the switch from input file test.sdf without dividing
 *        by the calibrator signal and tolerating up to 5 spikes in a 1 second
 *        sample. The output data will be written to nosw.sdf.
@@ -82,9 +82,9 @@
 *     specified by the DATADIR environment variable is searched. This means
 *     that the raw data does not have to be in the working directory.
 *     In addition 'IN' accepts a number. This number is converted to a demodulated
-*     data filename by prepending it with information specified in 
+*     data filename by prepending it with information specified in
 *     the SCUBA_PREFIX environment variable. This filename expansion only works
-*     for demodulated data (ie data containing '_dem_'). The '_dem_' is 
+*     for demodulated data (ie data containing '_dem_'). The '_dem_' is
 *     assumed and should not be present in $SCUBA_PREFIX.
 
 *  Authors:
@@ -93,12 +93,12 @@
 
 *  Algorithm:
 *     If status is good on entry, the routine reads the USE_CALIBRATOR
-*     parameter and opens the IN file. 
+*     parameter and opens the IN file.
 *        Some FITS items describing the observation are read from the
 *     input file and reported to the user. The history records are read
 *     and checked to see if REDUCE_SWITCH has already been run on this file,
 *     if it has an error will be reported.
-*        Next, a check is made that demodulated data really was kept during 
+*        Next, a check is made that demodulated data really was kept during
 *     the observation, demodulated files are used as `markers' to keep the
 *     run numbers up to date even if the observer chose not to keep
 *     the demodulated data, and this file could be one of those.
@@ -115,9 +115,9 @@
 *        Now the OUT file is opened and data arrays created in it to hold
 *     the data,variance and quality of the demodulated data. The `pointer'
 *     array in the OUT file has its dimensions modified to reflect the fact
-*     that the output arrays will contain data for individual exposures, 
+*     that the output arrays will contain data for individual exposures,
 *     integrations and measurements but not switches.
-*        Next, the routine cycles through the exposures, integrations and 
+*        Next, the routine cycles through the exposures, integrations and
 *     measurements in the data, calling SCULIB_FIND_SWITCH to find the
 *     start and end indices of each switch in the input array, then calling
 *     SCULIB_REDUCE_SWITCH to reduce the switches, then copying the reduced
@@ -242,7 +242,7 @@ c
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -304,7 +304,7 @@ c
                                        ! pointer to start of scratch calibrator
       INTEGER      DEMOD_CAL_VARIANCE_END
                                        ! pointer to end of scratch cal variance
-      INTEGER      DEMOD_CAL_VARIANCE_PTR 
+      INTEGER      DEMOD_CAL_VARIANCE_PTR
                                        ! pointer to start of scratch cal
                                        ! variance
       INTEGER      DEMOD_DATA_END      ! pointer to end of scratch data
@@ -362,16 +362,16 @@ c
       INTEGER      OUT_A_PTR           ! Pointer to AXIS
       INTEGER      OUT_NDF             ! NDF identifier of output file
       INTEGER      OUT_DAT_PTR         ! Pntr to data in output file
-      INTEGER      OUT_DATA_END        ! pointer to end data array 
-      INTEGER      OUT_DATA_PTR        ! pointer to output data array 
+      INTEGER      OUT_DATA_END        ! pointer to end data array
+      INTEGER      OUT_DATA_PTR        ! pointer to output data array
       INTEGER      OUT_DEM_PNTR_PTR    ! pointer to output .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
-                                       ! HDS locator of REDS extension in 
+                                       ! HDS locator of REDS extension in
                                        ! output file
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC ! Locator .FITS output
       INTEGER      OUT_QUL_PTR         ! Mapped output file quality
       INTEGER      OUT_QUALITY_END     ! end of qual array.
-      INTEGER      OUT_QUALITY_PTR     ! pointer to quality array in output 
+      INTEGER      OUT_QUALITY_PTR     ! pointer to quality array in output
       CHARACTER*(DAT__SZLOC) OUT_SCUBAX_LOC ! Locator .SCUBA output
       INTEGER      OUT_VAR_PTR         ! Pointer to output variance file
       INTEGER      OUT_VARIANCE_END    ! pointer to end of variance array
@@ -451,7 +451,7 @@ c
       END IF
       CALL DAT_GET1C (FITS_LOC, SCUBA__MAX_FITS, FITS, N_FITS, STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
@@ -467,11 +467,11 @@ c
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC('PKG', PACKAGE)
       IF (OBSERVING_MODE .NE. 'SKYDIP')THEN
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: run ^RUN was a ^MODE observation '//
      :        'of object ^OBJECT', STATUS)
       ELSE
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: run ^RUN was a ^MODE observation ', STATUS)
       END IF
 
@@ -485,7 +485,7 @@ c
          END IF
 
          REDUCE_SWITCH = .FALSE.
-   
+
          IF (NREC .GT. 0) THEN
             DO I = 1, NREC
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP, STATUS)
@@ -531,7 +531,7 @@ c
          ABORTED = .TRUE.
       END IF
 
-*  now find the chop function, switch mode and whether the internal 
+*  now find the chop function, switch mode and whether the internal
 *  calibrator was turned on
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CHOP_FUN',
@@ -602,7 +602,7 @@ c
 
       CALL NDF_SQMF(.FALSE., IN_NDF, STATUS)
 
-*  map the data array and check its dimensions 
+*  map the data array and check its dimensions
 
 *     Check the dimensions of the input data
 
@@ -612,7 +612,7 @@ c
 
          IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
 *     This is the number of skydip temperatures
-            EXPECTED_DIM1 =   SCUBA__N_TEMPS  
+            EXPECTED_DIM1 =   SCUBA__N_TEMPS
          ELSE IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
             EXPECTED_DIM1 = 5
          ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
@@ -647,7 +647,7 @@ c
       CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
 
       CALL SCULIB_GET_DEM_PNTR(4, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
 *  check that the number of switches matches the SWITCH_MODE
@@ -672,13 +672,13 @@ c
 
       IF (.NOT. ABORTED) THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_S '//
      :        'switch(es) in ^N_E exposure(s) in ^N_I integration(s) '//
      :        'in ^N_M measurement(s)', STATUS)
       ELSE
-       
-*  get the exposure, integration, measurement numbers at which the 
+
+*  get the exposure, integration, measurement numbers at which the
 *  abort occurred
 
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -689,19 +689,19 @@ c
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_S switch(es) in ^N_E exposure(s) in ^N_I '//
      :        'integration(s) in ^N_M measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
 
-      END IF 
+      END IF
 
 *     Do some non-SKYDIP stuff
 
@@ -717,37 +717,37 @@ c
 *     1:  Select 1st switch
 *     2:  Select 2nd switch
 *     3:  Select 3rd switch
-         
+
          SWITCH = 0
-      
+
          IF (N_SWITCHES .GT. 1) THEN
             CALL PAR_DEF0I('SWITCH', SWITCH, STATUS)
             CALL PAR_MINI('SWITCH', SWITCH, STATUS)
             CALL PAR_MAXI('SWITCH', N_SWITCHES, STATUS)
             CALL PAR_GET0I('SWITCH', SWITCH, STATUS)
          END IF
-         
+
 *  get some scratch memory and copy the different sections of the data array
 *  into it
 
          CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_DATA_PTR,
      :        DEMOD_DATA_END, STATUS)
-         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
      :        DEMOD_VARIANCE_PTR, DEMOD_VARIANCE_END, STATUS)
          CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
      :        DEMOD_CALIBRATOR_PTR, DEMOD_CALIBRATOR_END, STATUS)
-         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
      :        DEMOD_CAL_VARIANCE_PTR, DEMOD_CAL_VARIANCE_END, STATUS)
-         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB, 
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB,
      :        DEMOD_QUALITY_PTR, DEMOD_QUALITY_END, STATUS)
-         
+
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, EXPECTED_DIM1, N_POS,
-     :           SPIKE_LEVEL, %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           SPIKE_LEVEL, %VAL(CNF_PVAL(IN_DATA_PTR)),
      :           %VAL(CNF_PVAL(DEMOD_DATA_PTR)),
-     :           %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR)), 
+     :           %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(DEMOD_CALIBRATOR_PTR)),
-     :           %VAL(CNF_PVAL(DEMOD_CAL_VARIANCE_PTR)), 
+     :           %VAL(CNF_PVAL(DEMOD_CAL_VARIANCE_PTR)),
      :           %VAL(CNF_PVAL(DEMOD_QUALITY_PTR)),
      :           STATUS)
          END IF
@@ -756,7 +756,7 @@ c
 
 *     Propogating the input to the output results in an output NDF that
 *     is far bigger than needed (since the space is not given back). To
-*     get round this we first create a section of the required size and 
+*     get round this we first create a section of the required size and
 *     propogate that
 
 
@@ -792,7 +792,7 @@ c
       CALL CHR_APPND( CTEMP, OUTFILE, ITEMP)
 
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
-      
+
 
 *     Propogate the section to the output
 
@@ -808,7 +808,7 @@ c
 *     Since the number of positions in the output file can reduce by a
 *     factor of 2 or 3 (depending on the number of switches) it is
 *     more efficient (for space) to use a malloced array first and
-*     then copy the data to the output file. Note that this may not 
+*     then copy the data to the output file. Note that this may not
 *     be the most efficient use of memory or speed.
 
       OUT_DATA_PTR = 0
@@ -832,7 +832,7 @@ c
       UBND (2) = N_INTEGRATIONS
       UBND (3) = N_MEASUREMENTS
       CALL NDF_XLOC (OUT_NDF, 'SCUBA', 'UPDATE', OUT_SCUBAX_LOC, STATUS)
-      CALL CMP_MOD(OUT_SCUBAX_LOC, 'DEM_PNTR', '_INTEGER', NDIM, UBND, 
+      CALL CMP_MOD(OUT_SCUBAX_LOC, 'DEM_PNTR', '_INTEGER', NDIM, UBND,
      :     STATUS)
       CALL CMP_MAPV(OUT_SCUBAX_LOC, 'DEM_PNTR', '_INTEGER', 'WRITE',
      :     OUT_DEM_PNTR_PTR, ITEMP, STATUS)
@@ -852,21 +852,21 @@ c
 *     Need to get some scratch data to work with
          SLICE_PTR = 0
          SLICE_PTR_END = 0
- 
+
          CALL SCULIB_MALLOC (SCUBA__N_TEMPS * N_BOLS * N_INTEGRATIONS *
      :        VAL__NBR, SLICE_PTR, SLICE_PTR_END, STATUS)
-         
+
 *     Now calculate the skydip temperatures
 
          CALL SCULIB_CALC_SKYDIP_TEMPS(SCUBA__N_TEMPS, 0, N_FITS, FITS,
      :        'T_COLD', N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
-     :        N_BOLS, SCUBA__MAX_SUB, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :        BOL_CHAN, BOL_TYPE, BOL_ADC, 
+     :        N_BOLS, SCUBA__MAX_SUB, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
+     :        BOL_CHAN, BOL_TYPE, BOL_ADC,
      :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :        %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(OUT_DATA_PTR)),
-     :        %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :        %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :        %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
-     :        %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR)),
      :        AV_DATA, AV_VAR, AV_QUAL,
      :        %VAL(CNF_PVAL(SLICE_PTR)), STATUS)
 
@@ -880,7 +880,7 @@ c
 
 *     Now write the possibly modified FITS header back to the output
 
-         CALL NDF_XLOC (OUT_NDF, 'FITS', 'UPDATE', OUT_FITSX_LOC, 
+         CALL NDF_XLOC (OUT_NDF, 'FITS', 'UPDATE', OUT_FITSX_LOC,
      :        STATUS)
 
          CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
@@ -911,7 +911,7 @@ c
                      CALL MSG_SETI ('I', INTEGRATION)
                      CALL MSG_SETI ('M', MEASUREMENT)
                      CALL MSG_SETC('PKG', PACKAGE)
-                     CALL MSG_OUTIF (MSG__NORM,' ', 
+                     CALL MSG_OUTIF (MSG__NORM,' ',
      :                    '^PKG: no data for '//
      :                    'switch 1 in exp ^E, int ^I, meas ^M',
      :                    STATUS)
@@ -931,7 +931,7 @@ c
                         CALL MSG_SETI ('I', INTEGRATION)
                         CALL MSG_SETI ('M', MEASUREMENT)
                         CALL MSG_SETC('PKG', PACKAGE)
-                        CALL MSG_OUTIF (MSG__NORM, ' ', 
+                        CALL MSG_OUTIF (MSG__NORM, ' ',
      :                       '^PKG: no data for '//
      :                       'switch 2 in exp ^E, int ^I, meas ^M',
      :                       STATUS)
@@ -954,7 +954,7 @@ c
                         CALL MSG_SETI ('I', INTEGRATION)
                         CALL MSG_SETI ('M', MEASUREMENT)
                         CALL MSG_SETC('PKG', PACKAGE)
-                        CALL MSG_OUTIF (MSG__NORM,' ', 
+                        CALL MSG_OUTIF (MSG__NORM,' ',
      :                       '^PKG: no data for '//
      :                       'switch 3 in exp ^E, int ^I, meas ^M',
      :                       STATUS)
@@ -968,7 +968,7 @@ c
                   IF (.NOT. MISSING_SWITCH) THEN
 
 *  we, have data for all the switches in the exposure, find the number of
-*  data in the switch 
+*  data in the switch
 
                      N_SWITCH_POS = SWITCH1_END - SWITCH1_START + 1
 
@@ -1154,7 +1154,7 @@ c
                      ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
      :                 INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
                      CALL VEC_ITOI(.FALSE., 1, EXP_POINTER,
-     :                    %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR) + 
+     :                    %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR) +
      :                    ITEMP * VAL__NBI),
      :                    IERR, NERR, STATUS)
                      EXP_POINTER = EXP_POINTER + N_SWITCH_POS
@@ -1210,23 +1210,23 @@ c
 
       CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      :     OUT_QUL_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
      :     OUT_DAT_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
      :     OUT_VAR_PTR, ITEMP, STATUS)
 
-*     Copy the reduced data to the output array now that we know the 
+*     Copy the reduced data to the output array now that we know the
 *     correct size.
 *     This is made more complicated because the adjustable bounds are
 *     not from the last dimension if beams are involved.
 *     Its easier to use a small subroutine which I will add to the end
 *     of this code for the moment.
 
-      CALL SURF_LOCAL_COPY(N_BOLS, N_POS, UBND(3), 
+      CALL SURF_LOCAL_COPY(N_BOLS, N_POS, UBND(3),
      :                     %VAL(CNF_PVAL(OUT_DATA_PTR)),
-     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), EXP_POINTER-1,
-     :     %VAL(CNF_PVAL(OUT_DAT_PTR)), %VAL(CNF_PVAL(OUT_VAR_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_DAT_PTR)), %VAL(CNF_PVAL(OUT_VAR_PTR)),
      :     %VAL(CNF_PVAL(OUT_QUL_PTR)),
      :     STATUS)
 
@@ -1240,7 +1240,7 @@ c
          CALL NDF_XSTAT(OUT_NDF, 'REDS', THERE, STATUS)
 
          IF (THERE) THEN
-            CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+            CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC,
      :           STATUS)
          ELSE
             CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
@@ -1254,7 +1254,7 @@ c
       END IF
 
 * Write the axis info
-*     For PHOTOM observations there are 3 axes 
+*     For PHOTOM observations there are 3 axes
 *
 *     MAPS:    Axis 1: bolometers   2: Data
 *     PHOTOM:  Axis 1: Bolometers   2: Data   3: Beam
@@ -1284,7 +1284,7 @@ c
 
       END IF
 
-*     Deal with the integrations - SCAN/MAP doesnt use jiggles so I 
+*     Deal with the integrations - SCAN/MAP doesnt use jiggles so I
 *     have to think about that to work out how big a an integration is
 *     - probably use DEM_PNTR.
 *     SKYDIP will use measurements.
@@ -1326,7 +1326,7 @@ c
 
          IF (STATUS .EQ. SAI__OK) THEN
             ITEMP = 0
-            
+
 *     Read the JIGGLE_COUNT from the FITS header
 
             CALL SCULIB_GET_FITS_I (N_FITS, N_FITS, FITS,
@@ -1337,19 +1337,19 @@ c
 *     EXP_POINTER - 1 after removing the switches
 
             N_POS = EXP_POINTER - 1
- 
+
             NINTS = N_POS / JIGGLE_COUNT
             IF (NINTS * JIGGLE_COUNT .LT. N_POS) THEN
                NINTS = NINTS + 1
             END IF
-            
+
             DO I = 1, NINTS
-               NJIGGLE = MOD (N_POS - (I-1) * JIGGLE_COUNT, 
+               NJIGGLE = MOD (N_POS - (I-1) * JIGGLE_COUNT,
      :              JIGGLE_COUNT)
                IF (NJIGGLE .EQ. 0) THEN
                   NJIGGLE = JIGGLE_COUNT
                END IF
-               
+
                DO J = 1, NJIGGLE
                   RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
                   CALL SCULIB_CFILLR(1,RTEMP,
@@ -1357,8 +1357,8 @@ c
                   ITEMP = ITEMP + 1
                END DO
             END DO
-            
-         END IF  
+
+         END IF
 
          CALL NDF_ACPUT ('Integration', OUT_NDF, 'LABEL', 2, STATUS)
          CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
@@ -1368,16 +1368,16 @@ c
 
       IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
 
-         CALL NDF_CPUT('Raw data', OUT_NDF, 'LAB', STATUS) 
+         CALL NDF_CPUT('Raw data', OUT_NDF, 'LAB', STATUS)
          CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
          CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
-         
+
       ELSE
 
-         CALL NDF_CPUT('Sky temperature', OUT_NDF, 'LAB', STATUS) 
+         CALL NDF_CPUT('Sky temperature', OUT_NDF, 'LAB', STATUS)
          CALL NDF_CPUT('SKYDIP', OUT_NDF, 'Title', STATUS)
          CALL NDF_CPUT('Kelvin', OUT_NDF, 'UNITS', STATUS)
-         
+
       END IF
 
 
@@ -1410,7 +1410,7 @@ c
 * Unmap and annul
       CALL CMP_UNMAP (IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
       CALL CMP_UNMAP (OUT_SCUBAX_LOC, 'DEM_PNTR', STATUS)
-      
+
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (OUT_SCUBAX_LOC, STATUS)
 

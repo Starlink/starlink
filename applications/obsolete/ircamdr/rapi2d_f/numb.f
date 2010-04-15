@@ -5,7 +5,7 @@
 
 *    Description :
 *
-*     This routine counts the number of points in an image that have 
+*     This routine counts the number of points in an image that have
 *     an absolute value greater than the specified value
 *
 *    Parameters :
@@ -30,7 +30,7 @@
 *        Tidy up input image structure
 *     Endif
 *     Return
-*    
+*
 *    Authors :
 *
 *     Dave Baines (ROE::ASOC5)
@@ -55,8 +55,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'         ! global SSE parameters
-      INCLUDE 'NDF_PAR'         
-      INCLUDE 'NDF_ERR'         
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'PRM_PAR'         ! PRIMDAT constants
 
 *    Status :
@@ -65,7 +65,7 @@
 
 *    Local constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                 ! input image dimensionality
       PARAMETER ( NDIMS  =  2 ) ! 2-d arrays only
 
@@ -100,7 +100,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIMS, DIMS, NDIM, STATUS)
@@ -112,7 +112,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          call NUMBS to count up the values
-            CALL NUMBS( %VAL( PNTRI ), DIMS(1), DIMS(2), VALUE, NUMBER, 
+            CALL NUMBS( %VAL( PNTRI ), DIMS(1), DIMS(2), VALUE, NUMBER,
      :                  STATUS )
 
 *          write out the image dimensions and the number of pixels with

@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
       INTEGER IGRP               ! GRP group identifier
       INTEGER PRNTXT             ! Number of previous texts
       INTEGER SIZE               ! No. of elements in the group.
-                          
+
 *.
 
 *  Check inherited global status.
@@ -139,10 +139,10 @@
      :                   PEN( PRNTXT + 1 ), STATUS )
          END IF
       END IF
-      
+
 *  Delete the group.
       CALL GRP_DELET( IGRP, STATUS )
-      
+
 *  Give a context report if an error occurred.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'P', PFILE )
@@ -151,7 +151,7 @@
      :   'SWRIA3: Unable to read text specifications from file "$^F" '//
      :   '(parameter %^P)', STATUS )
       END IF
-      
+
 *  Cancel the value of the parameter.
       CALL PAR_CANCL( PFILE, STATUS )
 

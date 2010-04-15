@@ -38,7 +38,7 @@ C
       SRC=%LOC(FROM(1))
 #elif HAVE_INTRINSIC_LOC
       DST=LOC(TO(1))
-      SRC=LOC(FROM(1)) 
+      SRC=LOC(FROM(1))
 #else
       Do not have LOC or %LOC
 #endif

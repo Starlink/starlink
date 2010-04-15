@@ -93,7 +93,7 @@
 *     20-JUN-1994 (PDRAPER):
 *        Added check for device is open.
 *     2-MAY-1997 (PDRAPER):
-*        Added check and error message for valid projection. 
+*        Added check and error message for valid projection.
 *        Fixed so that end of circle is always reached.
 *     {enter_further_changes_here}
 
@@ -101,7 +101,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -114,8 +114,8 @@
 
 *  External References:
       EXTERNAL PON_DEVOP         ! PGPLOT device is open
-      LOGICAL PON_DEVOP 
-      
+      LOGICAL PON_DEVOP
+
 *  Local Variables:
       LOGICAL ACUTE              ! Determines whether the smaller or
                                  ! larger arc of the great circle is
@@ -137,11 +137,11 @@
 
 *  If device is open...
       IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
-         CALL PON_GETPROJ( 'PROJECTION', 'RACENTRE', 'DECCENTRE', 
+         CALL PON_GETPROJ( 'PROJECTION', 'RACENTRE', 'DECCENTRE',
      :                      PROJECTION, RA0, DEC0, STATUS )
-         IF ( PROJECTION .EQ. 1 ) THEN 
+         IF ( PROJECTION .EQ. 1 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'GT_CIRCLE_NONONE', 
+            CALL ERR_REP( 'GT_CIRCLE_NONONE',
      :'This command can only be used with projections', STATUS )
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 99

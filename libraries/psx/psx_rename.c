@@ -21,7 +21,7 @@
 *     INFIL = CHARACTER*(*) (Given)
 *        The name of the file to rename
 *     OUTFIL = CHARACTER*(*) (Given)
-*        The new name of the file 
+*        The new name of the file
 *     STATUS = INTEGER (Given & Returned)
 *        The global status.
 
@@ -73,7 +73,7 @@
 
 *-
 */
-      
+
 /*
  *  Include files
  */
@@ -89,7 +89,7 @@
  * Prototype the rename function in VMS
  */
 #if defined(VAX)
-F77_INTEGER_FUNCTION(lib$rename_file)( CHARACTER(arg1), CHARACTER(arg2) 
+F77_INTEGER_FUNCTION(lib$rename_file)( CHARACTER(arg1), CHARACTER(arg2)
                                        TRAIL(arg1) TRAIL(arg2) );
 #endif
 
@@ -116,7 +116,7 @@ F77_SUBROUTINE(psx_rename)( CHARACTER(infil), CHARACTER(outfil),
 
 #if defined(VAX)
   lstat = F77_EXTERNAL_NAME(lib$rename_file)( CHARACTER_ARG(infil),
-                  CHARACTER_ARG(outfil) 
+                  CHARACTER_ARG(outfil)
                   TRAIL_ARG(infil) TRAIL_ARG(outfil) );
 
   if ( lstat != 1 ) {

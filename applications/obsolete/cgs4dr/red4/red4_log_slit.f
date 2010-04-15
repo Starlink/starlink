@@ -28,7 +28,7 @@
       CHARACTER*132 LINE     ! Line to be written to the log file
       CHARACTER*80 STAMP     ! Time stamp
       REAL
-     :  XDIFF, YDIFF, 
+     :  XDIFF, YDIFF,
      :  DIFF,                ! The different between SLIT_ANGLE and zero
      :  DIFF180              ! The different between SLIT_ANGLE and 180.0
       INTEGER
@@ -60,14 +60,14 @@
       CALL RED4_TIME_STAMP( STAMP, STATUS )
 
 *    Put together a string describing the line shift and the slit angle to be written to the file
-      CALL CHR_FILL( ' ', LINE ) 
+      CALL CHR_FILL( ' ', LINE )
       CPOS = 0
       CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LINE, CPOS )
       CALL CHR_PUTC( 'Y difference = ', LINE, CPOS )
       CALL CHR_PUTR( YDIFF, LINE, CPOS )
       CALL CHR_PUTC( '; X difference = ', LINE, CPOS )
       CALL CHR_PUTR( XDIFF, LINE, CPOS )
-      CALL CHR_PUTC( '; so the slit angle = ', LINE, CPOS ) 
+      CALL CHR_PUTC( '; so the slit angle = ', LINE, CPOS )
       CALL CHR_PUTR( SLIT_ANGLE, LINE, CPOS )
       CALL CHR_PUTC( ' degrees', LINE, CPOS )
       CALL FIO_WRITE( LOG_UNIT, LINE(1:CPOS), STATUS )

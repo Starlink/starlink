@@ -9,12 +9,12 @@ C
 C     Function:
 C        Optimal extraction of a light curve from a time series image
 C
-C     Description:   
+C     Description:
 C        This command performs optimal extraction of a light curve of
 C        a star from a time series image, using an algorithm which is
 C        a 3 dimensional analogue of Horne's algorithm for optimal
 C        extraction of spectra from long slit data.
-C        The extraction is performed using a profile time series which is 
+C        The extraction is performed using a profile time series which is
 C        obtained using the TSPROFILE command.
 C
 C        This command is an alternative to CCDPHOT which performs the
@@ -27,16 +27,16 @@ C    (3) OUTPUT    (TSP, 2D)   The output photometry dataset.
 C    (4) LAMBDA    (Real)      Wavelength of observation (microns)
 C    (5) FLUXCAL   (Real)      Counts per Jansky
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         16/11/1991
 C
 C-
 C
 C  History:
-C    16/11/1991   Original Version.   JAB/JAC 
+C    16/11/1991   Original Version.   JAB/JAC
 C
 
 
@@ -60,7 +60,7 @@ C
       INTEGER NDIMS,DIMS(3)
       INTEGER WPTR
       REAL X,Y,RADIUS,LAMBDA,ZEROPT
-      CHARACTER*64 LABEL,UNITS      
+      CHARACTER*64 LABEL,UNITS
       INTEGER PNDIMS,PDIMS(3)
 
 *  Get the input file
@@ -158,8 +158,8 @@ C
       CALL DAT_ANNUL(OLOC,STATUS)
       END
 
-      
-      
+
+
       SUBROUTINE TSP_TSEXTRACT(NX,NY,NZ,FLUXCAL,IN,PROFILE,OUT,STATUS)
 *+
 *
@@ -209,11 +209,11 @@ C
 
 *  For all good points form sum of profile x input and sum
 *  of sqaure of profile
-                  IF (IN(IX,IY,IZ) .NE. VAL__BADR .AND. 
+                  IF (IN(IX,IY,IZ) .NE. VAL__BADR .AND.
      :              PROFILE(IX,IY,IZ) .NE. VAL__BADR) THEN
                       SUM=SUM+PROFILE(IX,IY,IZ)*IN(IX,IY,IZ)
                       SUM2=SUM2+PROFILE(IX,IY,IZ)*PROFILE(IX,IY,IZ)
-                  ENDIF 
+                  ENDIF
               ENDDO
           ENDDO
 
@@ -226,8 +226,8 @@ C
               OUT(IZ)=VAL__BADR
           ENDIF
 
-*  Apply flux calibration 
+*  Apply flux calibration
           OUT(IZ)=OUT(IZ)/FLUXCAL
-      ENDDO            
+      ENDDO
       END
 

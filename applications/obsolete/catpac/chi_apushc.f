@@ -3,7 +3,7 @@
       subroutine chi_apushc (string, stack, pointer, stacksize,
      :                              errstatus, status)
 *    Description :
-*     Push a character string onto the named stack.   The stack 
+*     Push a character string onto the named stack.   The stack
 *     pointer is first checked then incremented.
 *    Parameters :
 *     STRING = CHAR(INPUT)

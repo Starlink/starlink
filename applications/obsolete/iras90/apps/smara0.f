@@ -1,4 +1,4 @@
-      SUBROUTINE SMARA0( NPNT, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2, 
+      SUBROUTINE SMARA0( NPNT, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2,
      :                   POLY, LAST, FIRST, STATUS )
 *+
 *  Name:
@@ -11,12 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SMARA0( NPNT, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2, POLY, 
+*     CALL SMARA0( NPNT, X, Y, MARKTY, MKSIZ, X1, X2, Y1, Y2, POLY,
 *                  LAST, FIRST, STATUS )
 
 *  Description:
 *     This subroutine is used by SKYMARK to draw marks or a polyline, at
-*     the specified positions on the current graphic device surface. 
+*     the specified positions on the current graphic device surface.
 
 *  Arguments:
 *     NPNT = INTEGER (Given)
@@ -32,7 +32,7 @@
 *     POLY = LOGICAL (Given)
 *        True if a polyline is being drawn.
 *     LAST = LOGICAL (Given)
-*        If true then any partially completed polyline is closed by 
+*        If true then any partially completed polyline is closed by
 *        connecting the last and first points, but nothing else is done.
 *     FIRST = LOGICAL (Given and Returned)
 *        True if this is the first point in a polyline. Returned false.
@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -60,7 +60,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
-   
+
 *  Arguments Given:
       INTEGER NPNT
       DOUBLE PRECISION X( NPNT ), Y( NPNT )
@@ -94,11 +94,11 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If this is the first or last point and if a polyline was previously 
+*  If this is the first or last point and if a polyline was previously
 *  being built......
       IF( ( FIRST .OR. LAST ) .AND. PX .NE. VAL__BADR ) THEN
 
-*  Close the old polyline by joining it to the original point, and 
+*  Close the old polyline by joining it to the original point, and
 *  output it.
          CALL SGS_APOLY( PX, PY )
          CALL SGS_OPOLY
@@ -124,7 +124,7 @@
             IF( XX .NE. VAL__BADD .AND. YY .NE. VAL__BADD ) THEN
 
 *  Also check that the point is within the SGS zone.
-               IF( XX .GE. X1 .AND. XX .LE. X2 .AND. 
+               IF( XX .GE. X1 .AND. XX .LE. X2 .AND.
      :             YY .GE. Y1 .AND. YY .LE. Y2 ) THEN
 
 *  If a marker is required, draw it.

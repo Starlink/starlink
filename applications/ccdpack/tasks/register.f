@@ -49,7 +49,7 @@
 *     and then coded as new coordinate systems attached to NDFs.
 *     Normally, the new coordinate systems will be attached to the
 *     NDFs with which the lists are associated, but if the lists are
-*     not associated with NDFs then they can be attached to a named 
+*     not associated with NDFs then they can be attached to a named
 *     list of NDFs, or a single named one.  The new coordinate system
 *     is a copy of the Pixel coordinate system of the refernce image,
 *     and so is guaranteed to be a sensible one in which to resample.
@@ -85,7 +85,7 @@
 *           - 5 -- a full six parameter fit
 *           - 6 -- self defined function
 *
-*        If more than two position lists are provided, then only the 
+*        If more than two position lists are provided, then only the
 *        values 1-5 may be used.
 *        [5]
 *     FULL = _LOGICAL (Read)
@@ -167,8 +167,8 @@
 *        [TRUE]
 *     OUTDOMAIN = LITERAL (Read)
 *        The transformation information is written as a new coordinate
-*        system attached to the NDF.  This parameter gives the label 
-*        (domain) of the new coordinate system.  When the new 
+*        system attached to the NDF.  This parameter gives the label
+*        (domain) of the new coordinate system.  When the new
 *        coordinate system is added, any previously existing one with
 *        the same Domain will be removed.
 *
@@ -223,27 +223,27 @@
 *        [0.001]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether Set header information should
-*        be used in the registration.  If USESET is true, then 
+*        be used in the registration.  If USESET is true, then
 *        REGISTER will try to group position lists according to
 *        the Set Name attribute of the NDFs to which they are attached.
 *        All lists coming from NDFs which share the same (non-blank)
-*        Set Name attribute, and which have a CCD_SET coordinate 
+*        Set Name attribute, and which have a CCD_SET coordinate
 *        frame in their WCS component, will be grouped together and
 *        treated by the program as a single position list.  Images
 *        which have no associated position list but are in the same
 *        Set as ones which are successfully registered will have
 *        a suitable registration frame added too, based on their
 *        Set alignment relation to the registered Set member.
-*        Thus the assumption is made that the relative alignment of 
+*        Thus the assumption is made that the relative alignment of
 *        images within a Set is already known and has been fixed.
 *
 *        If USESET is false, all Set header information is ignored.
 *        If NDFNAMES is false, USESET will be ignored.  If the input
-*        NDFs have no Set headers, or if they have no CCD_SET frame 
+*        NDFs have no Set headers, or if they have no CCD_SET frame
 *        in their WCS components, the setting of USESET will make
 *        no difference.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 *     USEWCS = _LOGICAL (Read)
@@ -351,7 +351,7 @@
 *        factor. A solution for the values PA and PB is found using a
 *        general least-squares minimization technique. Starting values
 *        for PA and PB can be given using the parameters PA and PB.
-*        Since the fittype is 6, only two position lists may be 
+*        Since the fittype is 6, only two position lists may be
 *        registered in the same run.
 *
 *     register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
@@ -421,7 +421,7 @@
 *       are to be used for registration.
 *
 *       On exit, a new coordinate frame with a Domain as given by the
-*       OUTDOMAIN parameter will be inserted in the WCS component of 
+*       OUTDOMAIN parameter will be inserted in the WCS component of
 *       the input NDFs.  Taken together these contain the registration
 *       information and can be inspected using WCSEDIT.
 
@@ -490,10 +490,10 @@
 *     21-MAY-1999 (MBT):
 *        Added USEWCS parameter.
 *     1-NOV-1999 (MBT):
-*        Modified so that output is in units appropriate to Current 
+*        Modified so that output is in units appropriate to Current
 *        coordinate frame.
 *     12-NOV-1999 (MBT):
-*        Modified so that general transformations can be output into 
+*        Modified so that general transformations can be output into
 *        WCS components as MathMaps.
 *     15-NOV-1999 (MBT):
 *        Removed the possibility to write results as TRANSFORM structures.
@@ -684,7 +684,7 @@
          CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
       END IF
 
-*  See if we will use Set header information to group lists into 
+*  See if we will use Set header information to group lists into
 *  superlists.
       USESET = .FALSE.
       IF ( NDFS ) THEN
@@ -711,7 +711,7 @@
       END IF
 
 *  Find out which type of transformation the user requires.  If there
-*  are more than two input superlists then a fittype of 6 is not 
+*  are more than two input superlists then a fittype of 6 is not
 *  allowed.
  3    CONTINUE
       CALL PAR_GET0I( 'FITTYPE', IFIT, STATUS )
@@ -744,7 +744,7 @@
 *  Where are we going to store the transformations? If NDFNAMES is true
 *  then the we'll store them in the NDFs.  If NDFNAMES is not true then
 *  find out were the user would like them. The two options are: in NDFs
-*  (in which case a list of NDF names will be solicited using the 
+*  (in which case a list of NDF names will be solicited using the
 *  parameter 'IN'), or in a single container file.
       IF ( NDFS ) THEN
          PLACE = 'EACH'
@@ -840,7 +840,7 @@
          IF ( NRECS( I ) .LE. 0 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'LIST', I )
-            CALL ERR_REP( 'REGISTER_EMPTY', 
+            CALL ERR_REP( 'REGISTER_EMPTY',
      :                    'REGISTER: List ^LIST contains no points',
      :                    STATUS )
             GO TO 99
@@ -953,36 +953,36 @@
          DO I = 1, NSUP
             DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
                L = ILIS( J )
-               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ),
      :                         NREC( L ), NVAL( L ),
      :                         1, %VAL( CNF_PVAL( IPWX ) ), STATUS )
-               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ),
      :                         NREC( L ), NVAL( L ),
      :                         2, %VAL( CNF_PVAL( IPWY ) ), STATUS )
 
 *  Either just copy the coordinates or transform them using the WCS
 *  component of the associated NDF.
                IF ( USEWCS ) THEN
-                  CALL AST_TRAN2( MAPS( L ), NREC( L ), 
+                  CALL AST_TRAN2( MAPS( L ), NREC( L ),
      :                            %VAL( CNF_PVAL( IPWX ) ),
-     :                            %VAL( CNF_PVAL( IPWY ) ), .TRUE., 
+     :                            %VAL( CNF_PVAL( IPWY ) ), .TRUE.,
      :                            %VAL( CNF_PVAL( IPXT ) ),
      :                            %VAL( CNF_PVAL( IPYT ) ), STATUS )
-                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPXT ) ), 
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPXT ) ),
      :                             NREC( L ), IP,
      :                             %VAL( CNF_PVAL( IPX ) ), STATUS )
-                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPYT ) ), 
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPYT ) ),
      :                             NREC( L ), IP,
      :                             %VAL( CNF_PVAL( IPY ) ), STATUS )
                ELSE
-                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWX ) ), 
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWX ) ),
      :                             NREC( L ), IP,
      :                             %VAL( CNF_PVAL( IPX ) ), STATUS )
-                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWY ) ), 
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWY ) ),
      :                             NREC( L ), IP,
      :                             %VAL( CNF_PVAL( IPY ) ), STATUS )
                END IF
-               CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPIND( L ) ) ), 
+               CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPIND( L ) ) ),
      :                          NREC( L ), IP,
      :                          %VAL( CNF_PVAL( IPID ) ), STATUS )
                IP = IP + NREC( L )
@@ -991,14 +991,14 @@
 
 *  Do the first global transformation using the first positions
 *  as the reference set.
-         CALL CCD1_FITLM( %VAL( CNF_PVAL( IPX ) ), 
-     :                    %VAL( CNF_PVAL( IPY ) ), 
+         CALL CCD1_FITLM( %VAL( CNF_PVAL( IPX ) ),
+     :                    %VAL( CNF_PVAL( IPY ) ),
      :                    %VAL( CNF_PVAL( IPID ) ),
      :                    %VAL( CNF_PVAL( IPOK ) ), NRECS, NSUP, IPREFS,
-     :                    IFIT, TOLER, TR, %VAL( CNF_PVAL( IPXR ) ), 
+     :                    IFIT, TOLER, TR, %VAL( CNF_PVAL( IPXR ) ),
      :                    %VAL( CNF_PVAL( IPYR ) ),
-     :                    %VAL( CNF_PVAL( IPIDR ) ), 
-     :                    %VAL( CNF_PVAL( IPWX ) ), 
+     :                    %VAL( CNF_PVAL( IPIDR ) ),
+     :                    %VAL( CNF_PVAL( IPWX ) ),
      :                    %VAL( CNF_PVAL( IPWY ) ),
      :                    %VAL( CNF_PVAL( IPWID ) ), NOUT, RMS, STATUS )
 
@@ -1011,10 +1011,10 @@
             CALL CCD1_MSG( ' ', '  Offsets A and D are in image '//
      :                     'Current coordinate system units;', STATUS )
          ELSE
-            CALL CCD1_MSG( ' ', '  Offsets A and D are in in pixels;', 
+            CALL CCD1_MSG( ' ', '  Offsets A and D are in in pixels;',
      :                     STATUS )
          END IF
-         CALL CCD1_MSG( ' ', '  coefficients B, C, E and F are '// 
+         CALL CCD1_MSG( ' ', '  coefficients B, C, E and F are '//
      :                  'dimensionless.', STATUS )
 
 *  Report the coefficients themselves.
@@ -1049,18 +1049,18 @@
             IF ( USEWCS ) THEN
                CALL CCD1_MALL( NOUT, '_DOUBLE', IPXT, STATUS )
                CALL CCD1_MALL( NOUT, '_DOUBLE', IPYT, STATUS )
-               CALL AST_TRAN2( MAPS( IPREF ), NOUT, 
+               CALL AST_TRAN2( MAPS( IPREF ), NOUT,
      :                         %VAL( CNF_PVAL( IPXR ) ),
-     :                         %VAL( CNF_PVAL( IPYR ) ), .FALSE., 
+     :                         %VAL( CNF_PVAL( IPYR ) ), .FALSE.,
      :                         %VAL( CNF_PVAL( IPXT ) ),
      :                         %VAL( CNF_PVAL( IPYT ) ), STATUS )
             ELSE
                IPXT = IPXR
                IPYT = IPYR
             END IF
-            CALL CCD1_WRIXY( FDREFO, %VAL( CNF_PVAL( IPIDR ) ), 
+            CALL CCD1_WRIXY( FDREFO, %VAL( CNF_PVAL( IPIDR ) ),
      :                       %VAL( CNF_PVAL( IPXT ) ),
-     :                       %VAL( CNF_PVAL( IPYT ) ), 
+     :                       %VAL( CNF_PVAL( IPYT ) ),
      :                       NOUT, LINE, CCD1__BLEN,
      :                       STATUS )
 
@@ -1240,7 +1240,7 @@
 *  allowed when determining the best fit.
          CALL CCD1_MALL( NRECS( 1 ) + NRECS( 2 ), '_LOGICAL', IPOK,
      :                   STATUS )
-         CALL CCD1_RMULO( XPARNM, NXPAR, YPARNM, NYPAR, 
+         CALL CCD1_RMULO( XPARNM, NXPAR, YPARNM, NYPAR,
      :                    %VAL( CNF_PVAL( IPOK ) ),
      :                    UNIPAR, NUMUNI, STATUS )
          CALL CCD1_MFREE( IPOK, STATUS )
@@ -1259,10 +1259,10 @@
             NRECS( I ) = 0
             DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
                L = ILIS( J )
-               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ),
      :                         NREC( L ), NVAL( L ),
      :                         1, %VAL( CNF_PVAL( IPWX ) ), STATUS )
-               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ),
      :                         NREC( L ), NVAL( L ),
      :                         2, %VAL( CNF_PVAL( IPWY ) ), STATUS )
 
@@ -1270,9 +1270,9 @@
                IF ( USEWCS ) THEN
                   CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPXT, STATUS )
                   CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPYT, STATUS )
-                  CALL AST_TRAN2( MAPS( L ), NREC( L ), 
+                  CALL AST_TRAN2( MAPS( L ), NREC( L ),
      :                            %VAL( CNF_PVAL( IPWX ) ),
-     :                            %VAL( CNF_PVAL( IPWY ) ), .TRUE., 
+     :                            %VAL( CNF_PVAL( IPWY ) ), .TRUE.,
      :                            %VAL( CNF_PVAL( IPXT ) ),
      :                            %VAL( CNF_PVAL( IPYT ) ), STATUS )
                   IPWX = IPXT
@@ -1285,7 +1285,7 @@
      :                          %VAL( CNF_PVAL( IPXG( I ) ) ), STATUS )
                CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWY ) ), NREC( L ), IP,
      :                          %VAL( CNF_PVAL( IPYG( I ) ) ), STATUS )
-               CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPIND( I ) ) ), 
+               CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPIND( I ) ) ),
      :                          NREC( L ), IP,
      :                          %VAL( CNF_PVAL( IPIG( I ) ) ), STATUS )
                NRECS( I ) = NRECS( I ) + NREC( L )
@@ -1304,7 +1304,7 @@
          END IF
          CALL CCD1_FITG( FORMAP, 'X', 'Y', UNIPAR, NUMUNI, TOLER,
      :                   IPIG( IPREFS ), IPXG( IPREFS ), IPYG( IPREFS ),
-     :                   NRECS( IPREFS ), 
+     :                   NRECS( IPREFS ),
      :                   IPIG( OTHER ), IPXG( OTHER ), IPYG( OTHER ),
      :                   NRECS( OTHER ), FORVAL, STATUS )
 
@@ -1346,7 +1346,7 @@
                MAPTFM( I ) = AST_UNITMAP( 2, ' ', STATUS )
             ELSE
                CALL CCD1_GGMAP( FORMAP, INVMAP, UNIPAR, NUMUNI, FORVAL,
-     :                          INVVAL, FULL, SIMPFI, SIMPIF, 
+     :                          INVVAL, FULL, SIMPFI, SIMPIF,
      :                          MAPTFM( I ), STATUS )
             END IF
 
@@ -1369,7 +1369,7 @@
          CALL CCD1_GTWCS( ID, IWCS, STATUS )
       END IF
 
-*  Initialise the array of mappings between Set alignment and 
+*  Initialise the array of mappings between Set alignment and
 *  registration frames.
       IF ( USESET ) THEN
          DO I = 1, NSUP
@@ -1406,14 +1406,14 @@
 *  Get the original current frame index for future use.
          JCUR = AST_GETI( IWCS, 'Current', STATUS )
 
-*  Ensure the Current frame is the one relative to which we've got the 
+*  Ensure the Current frame is the one relative to which we've got the
 *  mapping.
          IF ( .NOT. USEWCS ) THEN
             CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
             CALL AST_SETI( IWCS, 'Current', JPIX, STATUS )
          END IF
-                     
-*  Add the new output frame, with the appropriate mapping, to the 
+
+*  Add the new output frame, with the appropriate mapping, to the
 *  WCS component of the NDF.  This will become the current frame.
          CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM( ISUP( I ) ),
      :                      FRREG, STATUS )
@@ -1468,7 +1468,7 @@
       END IF
 
 *  Now write registration frames to any NDFs which did not have
-*  associated position lists, but are members of the same Set as ones 
+*  associated position lists, but are members of the same Set as ones
 *  which we have managed to register.
       IF ( NDFS .AND. USESET .AND. PLACE .EQ. 'EACH' ) THEN
 
@@ -1503,7 +1503,7 @@
                CALL AST_ADDFRAME( IWCS, JSET, MAPSET( L ), FRREG,
      :                            STATUS )
                JREG = AST_GETI( IWCS, 'Current', STATUS )
-            ELSE 
+            ELSE
                JREG = AST__NOFRAME
             END IF
 

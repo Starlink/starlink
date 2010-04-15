@@ -65,7 +65,7 @@ proc BeginUF {} {
 #     IFILE (Read)
 #        Temporary file names created by UniqueFile are stored in stardemo's
 #        temporary STARDEMO_SCRATCH directory so that they are deleted when
-#        stardemo terminates. They have a name of the form stardem<i> where 
+#        stardemo terminates. They have a name of the form stardem<i> where
 #        <i> is an integer, which is different for each file and
 #        increases monotonically throughout the execution of stardemo. IFILE
 #        records the value of i used in the previous call to UniqueFile.
@@ -135,7 +135,7 @@ proc Blink {w option value1 value2 interval} {
 
 #  Globals:
 #     STOP_BLINK (Read and Write)
-#       If this is not null on entry then the blinking is stopped, and  
+#       If this is not null on entry then the blinking is stopped, and
 #       the option value is set to the value of STOP_BLINK (which is then
 #       reset to null).
 
@@ -175,7 +175,7 @@ proc Blink {w option value1 value2 interval} {
       if { $STOP_BLINK == "" } {
          $w configure $option $value1
          after $interval [list Blink $w $option $value2 $value1 $interval]
-      } { 
+      } {
          $w configure $option $STOP_BLINK
          set STOP_BLINK ""
       }
@@ -255,7 +255,7 @@ proc CheckMsg {action val} {
 # add it to the list (on a new line), and indicate an error has occurred.
    if { [regexp {^!+(.*)} $val match mess] } {
       if { [info exists ADAM_ERRORS] } {
-         if { [string length $mess] > 30 } { 
+         if { [string length $mess] > 30 } {
             set ADAM_ERRORS "$ADAM_ERRORS\n$mess"
          } {
             set ADAM_ERRORS "$ADAM_ERRORS $mess"
@@ -266,7 +266,7 @@ proc CheckMsg {action val} {
 
 # If the message is not an error message, append it as a new element to
 # the list stored in ATASK_OUTPUT.
-   } { 
+   } {
       append ATASK_OUTPUT "$val\n"
    }
 }
@@ -279,7 +279,7 @@ proc CheckRF {task} {
 #  Purpose:
 #     Check that the AMS rendevous file for a task still exists. If it
 #     does not (for some reason it seems to be occasionally deleted by
-#     the StarTcl system, turning the process into a zombie), then the 
+#     the StarTcl system, turning the process into a zombie), then the
 #     task is killed and re-loaded.
 
 #  Language:
@@ -289,7 +289,7 @@ proc CheckRF {task} {
 #     The task to be checked (previously loaded using LoadTask).
 
 #  Returned Value:
-#     Returns 1 if the rendevous file still exists, and zero if it 
+#     Returns 1 if the rendevous file still exists, and zero if it
 #     did not exist (in which case the task will have been re-loaded).
 
 #  Globals:
@@ -342,7 +342,7 @@ proc CheckRF {task} {
       set ret 1
    }
 
-   return $ret   
+   return $ret
 
 }
 
@@ -361,7 +361,7 @@ proc Confirm {message} {
 
 #  Arguments:
 #     message
-#       The message to display. 
+#       The message to display.
 
 #  Returned Value:
 #     Zero is returned if the operation should be cancelled, one is
@@ -419,7 +419,7 @@ proc Message {message} {
 
 #  Arguments:
 #     message
-#       The message to display. 
+#       The message to display.
 
 #  Globals:
 #     TOP (Read)
@@ -458,8 +458,8 @@ proc Message {message} {
    global TOP
    global env
 
-# If the top level window has not yet been created, message to standard 
-# output 
+# If the top level window has not yet been created, message to standard
+# output
    if { ![info exists TOP] } {
       puts $message
 
@@ -488,21 +488,21 @@ proc EndUF {context leave} {
 #     TCL
 
 #  Arguments:
-#     context 
+#     context
 #        A context identifier returned by BeginUF. All contexts contained
 #        with the specified context are also ended.
 #     leave
 #        A list of files which are to be escaped into the next higher
-#        context. 
+#        context.
 
 #  Globals:
-#     STARDEMO_SCRATCH 
-#       The path to the temporary directory used to store temporary images 
+#     STARDEMO_SCRATCH
+#       The path to the temporary directory used to store temporary images
 #       created by stardemo.
 #     IFILE (Read)
 #        Temporary file names created by UniqueFile are stored in stardemo's
 #        temporary STARDEMO_SCRATCH directory which is deleted when
-#        stardemo terminates. They have a name of the form stardem<i> where 
+#        stardemo terminates. They have a name of the form stardem<i> where
 #        <i> is an integer, which is different for each file and
 #        increases monotonically throughout the execution of stardemo. IFILE
 #        records the value of i used in the previous call to UniqueFile.
@@ -660,7 +660,7 @@ proc exit {args} {
 
 # Kill any new processes (i.e ones which are not in the list of KAPPA
 # processes which were active when stardemo started).
-   killNew 
+   killNew
 
 # Re-instate the original ADAM_USER and AGI_USER environment variables.
    if { $OLD_ADAM_USER != "" } {
@@ -737,7 +737,7 @@ proc FindHelp {x y} {
 #-
    global HELP_LABELS
 
-# Find the lowest level window at the given root coordinates.    
+# Find the lowest level window at the given root coordinates.
    set w [winfo containing $x $y]
 
 # Assume there is no label associated with this position.
@@ -831,7 +831,7 @@ proc GetParam {task param} {
 #     task
 #       The name of the task (eg "kapview").
 #     param
-#       The name of the parameter in the form "action:param" 
+#       The name of the parameter in the form "action:param"
 #       (eg "datapic:ncx1").
 
 #  Returned Value:
@@ -963,7 +963,7 @@ proc HelpArea {} {
 # Find the pixels in 2 characters.
          if { [scan $pixsize %d pxsiz] == 0 } {
             set pxsiz 14
-         }         
+         }
          set height [expr 2 * $pxsiz]
 
 # Create the frame to enclose the help text.
@@ -973,7 +973,7 @@ proc HelpArea {} {
 # Create a dummy frame with height but no width to act as a vertical strut.
 # Geometry propagation is turn off for this frame so that its requested
 # size will be retained even though nothing is put in the frame. This
-# strut is used to keep the help area the same size even if the message text 
+# strut is used to keep the help area the same size even if the message text
 # within it requires a narrower area.
          set HSTRUT [Strut $F4 $height]
 
@@ -987,7 +987,7 @@ proc HelpArea {} {
          set width [expr [winfo width .] - [winfo width $con]]
          set width [expr 0.95 * $width]
 
-# Create a message widget to display dynamic help information about 
+# Create a message widget to display dynamic help information about
 # the widget underneath the pointer.
          set HLAB [message $F4.lab -justify left -textvariable HELP \
                             -anchor w -font $HLP_FONT -width $width]
@@ -1013,7 +1013,7 @@ proc Helper {} {
 #     Helper
 
 #  Purpose:
-#     Selects the text to display in the help area. 
+#     Selects the text to display in the help area.
 
 #  Language:
 #     TCL
@@ -1023,7 +1023,7 @@ proc Helper {} {
 
 #  Globals:
 #     HELPS (Read)
-#        An array holding the help messages for all widgets, indexed by 
+#        An array holding the help messages for all widgets, indexed by
 #        widget name.
 #     HELP (Write)
 #        The text to be displayed in the help area.
@@ -1087,7 +1087,7 @@ proc Helper {} {
    after 10
 
 # Find the lowest level widget under the pointer.
-   set x [winfo pointerx .] 
+   set x [winfo pointerx .]
    set y [winfo pointery .]
    set w [winfo containing $x $y]
 
@@ -1120,14 +1120,14 @@ proc LoadTask {task file} {
 
 #  Arguments:
 #     task
-#      The name by which the task is to be known 
+#      The name by which the task is to be known
 #      (eg "kapview").
 #     file
-#      The file containing the executable image 
+#      The file containing the executable image
 #      (eg "/star/bin/kappa/kapview_mon").
 
 #  Notes:
-#     -  This procedure shuts down the whole application if the task 
+#     -  This procedure shuts down the whole application if the task
 #     cannot be loaded.
 
 #  Globals:
@@ -1183,8 +1183,8 @@ proc LoadTask {task file} {
       after 100
       incr count
       if {$count > 100} {
-         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
-         Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
+         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..."
+         Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..."
          catch {$task kill}
          exit 1
       }
@@ -1334,7 +1334,7 @@ proc MenuMotionBind {win y} {
    global MENUHELPS
 
 # Ignore separators and tearoffs
-   set mty [$win type @$y] 
+   set mty [$win type @$y]
    if { $mty != "separator" && $mty != "tearoff" } {
 
 # Get the label from the menu entry under the pointer.
@@ -1357,7 +1357,7 @@ proc GetParamED {task param} {
 #     GetParamED
 
 #  Purpose:
-#     Returns the value of an ATASK parameter substituing "E" exponents for 
+#     Returns the value of an ATASK parameter substituing "E" exponents for
 #     "D" exponents.
 
 #  Language:
@@ -1405,14 +1405,14 @@ proc GetParamED {task param} {
    regsub -nocase -all D [GetParam $task $param] E res
    return $res
 }
-    
+
 proc Obey {task action params args} {
 #+
 #  Name:
 #     Obey
 
 #  Purpose:
-#     Executes an ADAM application. 
+#     Executes an ADAM application.
 
 #  Language:
 #     TCL
@@ -1423,16 +1423,16 @@ proc Obey {task action params args} {
 #     action
 #       The name of the application (eg "display").
 #     params
-#       Any command line parameter assignments to pass to the 
-#       application. A blank string must be supplied if no 
+#       Any command line parameter assignments to pass to the
+#       application. A blank string must be supplied if no
 #       command line parameter assignments are needed.
 #     args
 #       o  If the optional string "noreport" is supplied, then any error
-#       messages generated by the action are not displayed. 
-#       o  If the name of a currently defined global variable is supplied, 
+#       messages generated by the action are not displayed.
+#       o  If the name of a currently defined global variable is supplied,
 #       then the variable is assumed to be a 1-D array, indexed by A-task
-#       parameter name. The associated values are the values to supply for 
-#       the A-task's parameters if they are prompted for. 
+#       parameter name. The associated values are the values to supply for
+#       the A-task's parameters if they are prompted for.
 #       o  The presence of any other non-blank value after "params" causes
 #       the whole TCL application to abort if the specified action
 #       does not complete succesfully.
@@ -1455,7 +1455,7 @@ proc Obey {task action params args} {
 #     ADAM_ERRORS (Write)
 #      The messages from the most recent ADAM application to fail.
 #     ATASK_OUTPUT (Write)
-#       Any non-error messages generated by the action are appended to 
+#       Any non-error messages generated by the action are appended to
 #       this list. Each message is stored as a new element in the list.
 #     STATUS (Write)
 #      The status string returned by the action.
@@ -1530,8 +1530,8 @@ proc Obey {task action params args} {
       } elseif { $args == "noreport" } {
          set report 0
 
-# Otherwise, abort on an error.         
-      } elseif { [lindex $args 0] != "" } { 
+# Otherwise, abort on an error.
+      } elseif { [lindex $args 0] != "" } {
          set abort 1
       }
    }
@@ -1554,7 +1554,7 @@ proc Obey {task action params args} {
 # messages are thrown away. Parameter requests are responded to by
 # sending a null (!) value. The variable STATUS is set when the
 # action completes.
-   set STATUS ""   
+   set STATUS ""
    $task obey $action $params -inform "CheckMsg $action %V" \
                       -endmsg {set STATUS "%S"} \
                       -paramreq $param_req
@@ -1572,7 +1572,7 @@ proc Obey {task action params args} {
          puts $LOGFILE_ID "\n$task $action $params..."
       }
 
-      set STATUS ""   
+      set STATUS ""
       $task obey $action $params -inform "CheckMsg $action %V" \
                          -endmsg {set STATUS "%S"} \
                          -paramreq $param_req
@@ -1630,17 +1630,17 @@ proc Pop {stack args} {
 
 #  Arguments:
 #     stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       On exit, the list holds one less element than on entry.
 #     args
 #        An optional argument giving the number of levels to pop off the
-#        stack. It defaults to 1. If it is supplied as -1, then the 
+#        stack. It defaults to 1. If it is supplied as -1, then the
 #        the first (bottom) entry is returned and the stack is emptied. If it
-#        is supplied as 0, then the top entry on the stack is returned, but 
+#        is supplied as 0, then the top entry on the stack is returned, but
 #        it is not removed from the stack.
 
 #  Returned Value:
-#     The required stack element, or an empty string if the supplied stack 
+#     The required stack element, or an empty string if the supplied stack
 #     was empty.
 
 #  Copyright:
@@ -1678,7 +1678,7 @@ proc Pop {stack args} {
 
    if { $args == "" } {
       set levels 1
-   } { 
+   } {
       set levels $args
    }
 
@@ -1692,7 +1692,7 @@ proc Pop {stack args} {
    } {
       set ret [lindex $stk [expr $levels - 1] ]
       set stk [lrange $stk $levels end]
-   } 
+   }
 
    return $ret
 }
@@ -1710,7 +1710,7 @@ proc Push {stack value} {
 
 #  Arguments:
 #     stack
-#       The name (NOT the value) of a global list variable holding the stack. 
+#       The name (NOT the value) of a global list variable holding the stack.
 #       On exit, the list holds one more element than on entry.
 #     value
 #       The value to be pushed onto stack.
@@ -1776,13 +1776,13 @@ proc SelectFont {font} {
 #     A specific font matching the the supplied pattern. The first
 #     matching font returned by xlsfonts is used, with the proviso that
 #     font families are searched in the following order:
-#        helvetica 
-#        lucida 
-#        fixed 
-#        clean 
-#        courier 
-#        times 
-#        charter 
+#        helvetica
+#        lucida
+#        fixed
+#        clean
+#        courier
+#        times
+#        charter
 #        new century schoolbook
 #
 #     A null string is returned if no matching font can be found belonging
@@ -1831,7 +1831,7 @@ proc SelectFont {font} {
 # Find the index of the first matching font in the current family. If
 # found, get the full font name and leave the loop.
          set i 0
-         while { $i > -1 } { 
+         while { $i > -1 } {
             set i [lsearch -regexp $fonts "^-\[^-\]+-$n" ]
             set rfont [lindex $fonts $i]
             if { ![catch "button .test -font $rfont"] } {
@@ -1846,7 +1846,7 @@ proc SelectFont {font} {
       }
 
 # If the xlsfonts command failed display the message.
-   } { 
+   } {
       Message "An error occurred using xlsfonts to list fonts...\n $fonts"
    }
 
@@ -1869,7 +1869,7 @@ proc Seq {com delay id count} {
 #     com
 #       The command to execute in the timed sequence.
 #     delay
-#       The number of milliseconds between executions of the 
+#       The number of milliseconds between executions of the
 #       command given by "com".
 #     id
 #       A string which can be used to identify the sequence.
@@ -1946,7 +1946,7 @@ proc SetHelp {widget help args} {
 #     widget
 #       The name of the widget (eg ".fr1.button").
 #     help
-#       The text to display. 
+#       The text to display.
 #     args
 #       An optional htx cross-reference label to be associated with the
 #       widget.
@@ -2000,9 +2000,9 @@ proc SetHelp {widget help args} {
       set HELP_LABELS($widget) $args
    }
 
-# Ensure that the displayed help text is up-to-date. 
-   Helper 
-   
+# Ensure that the displayed help text is up-to-date.
+   Helper
+
 }
 
 proc ShowHelp {label} {
@@ -2017,8 +2017,8 @@ proc ShowHelp {label} {
 #     TCL
 
 #  Arguments:
-#     label 
-#        A label into the polka document. 
+#     label
+#        A label into the polka document.
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -2054,7 +2054,7 @@ proc ShowHelp {label} {
 
    if { [info exists HELP_TEXT($label)] } {
       set mess $HELP_TEXT($label)
-      if { [string trim $mess] == "" } { 
+      if { [string trim $mess] == "" } {
          set mess "No help available."
       }
    } else {
@@ -2146,7 +2146,7 @@ proc UniqueFile {} {
 #     STARDEMO_SCRATCH (Read)
 #        The path to the STARDEMO_SCRATCH directory.
 #     IFILE (Read and Write)
-#        File names have a name of the form polka<i> where <i> is an 
+#        File names have a name of the form polka<i> where <i> is an
 #        integer, which is different for each file. IFILE
 #        records the value of i used in the previous call to this
 #        function. The first value of i considered is one greater than
@@ -2204,7 +2204,7 @@ proc WaitFor {name args} {
 #  Purpose:
 #     Pause the caller until a named global variable changes its value.
 #     Meanwhile, events are directed to a nominated "safe" window. This
-#     "freezes" the display so that further actions cannot be initiated by 
+#     "freezes" the display so that further actions cannot be initiated by
 #     the user
 
 #  Language:
@@ -2215,8 +2215,8 @@ proc WaitFor {name args} {
 #        The name (NOT the value) of the global variable to be watched.
 #     args
 #        An optional list argument. If supplied, the first element should
-#        be a command and the second element should be a time in milliseconds. 
-#        The supplied command will be executed after each period of the 
+#        be a command and the second element should be a time in milliseconds.
+#        The supplied command will be executed after each period of the
 #        specified time, until the variable is changed. If the delay time
 #        is not supplied it defaults to 100 milliseconds. If the suppleid
 #        command returns a zero value, then the loop is aborted prematurely.
@@ -2233,7 +2233,7 @@ proc WaitFor {name args} {
 #  Globals:
 #     SAFE (Read)
 #        The path to a window which can receive notifivcation of all events
-#        while we are waiting. This should be a window which ignores all 
+#        while we are waiting. This should be a window which ignores all
 #        events.
 
 #  Copyright:
@@ -2411,7 +2411,7 @@ proc CommentaryArea {} {
 
 # Create the frame to enclose the commentary text.
       set F3 [frame $TOP.com -relief groove -bd 2]
-      pack $F3 -fill both -expand 1 -padx 1m -pady 1m 
+      pack $F3 -fill both -expand 1 -padx 1m -pady 1m
 
 # The width is the requested width of the whole window.
       update idletasks
@@ -2424,7 +2424,7 @@ proc CommentaryArea {} {
 # Create a dummy frame with height but no width to act as a vertical strut.
 # Geometry propagation is turn off for this frame so that its requested
 # size will be retained even though nothing is put in the frame. This
-# strut is used to keep the area the same size even if the message text 
+# strut is used to keep the area the same size even if the message text
 # within it requires a narrower area.
       set HSTRUT [Strut $F3 $height]
 
@@ -2485,7 +2485,7 @@ proc LoadDemo {file} {
    if { [catch {set ret [LoadDemoC $file]} mess] } {
       Message "Error in demo file \"$file\": $mess"
       set ret 0
-   }     
+   }
 
    return $ret
 }
@@ -2510,20 +2510,20 @@ proc LoadDemoC {file} {
 
 # Loop round reading the contents of the file into a single list.
 # Ignore comment lines starting with a hash.
-      while { [gets $fd line] != -1 } {     
+      while { [gets $fd line] != -1 } {
          if { ![regexp {^ *#} $line ] } {
             append demo_text $line
             append demo_text " "
          }
       }
 
-#  Close the file.   
+#  Close the file.
       close $fd
 
       set CHECK_DEMO 1
       set DEMO_FILE $file
 
-      set i 0 
+      set i 0
       while { $i < [llength $demo_text] } {
          set name ""
          set ignore 0
@@ -2543,7 +2543,7 @@ proc LoadDemoC {file} {
                                {} 0 Yes No Cancel]
                if { $but == 0 } {
                   unset DEMO($name)
-                  set di [lsearch -exact $SELECTED_DEMOS $name] 
+                  set di [lsearch -exact $SELECTED_DEMOS $name]
                   if { $di != -1 } {
                      set SELECTED_DEMOS [lreplace $SELECTED_DEMOS $di $di]
                   }
@@ -2574,11 +2574,11 @@ proc LoadDemoC {file} {
             incr i
 
          } elseif { [string tolower $do] == "package" } {
-            Package $name [lindex $demo_text $i] 
+            Package $name [lindex $demo_text $i]
             incr i
 
          } {
-            Message "Illegal top-level component \"$do\" found in demo file $file" 
+            Message "Illegal top-level component \"$do\" found in demo file $file"
             break
          }
 
@@ -2662,7 +2662,7 @@ proc Demo {name body} {
    global DEMO_INFO
 
    set ret 1
-   
+
 # If the demo is to be executed, first load the global link texts,
 # and demo information for this demo.
    if { !$CHECK_DEMO } {
@@ -2683,7 +2683,7 @@ proc Demo {name body} {
 
          if { $element == "step" } {
             incr i
-         
+
          } elseif { $element == "env" } {
             incr i
 
@@ -2700,7 +2700,7 @@ proc Demo {name body} {
             incr i
             set DEMO_INFO [lindex $body $i]
 
-         } 
+         }
       }
    }
 
@@ -2724,7 +2724,7 @@ proc Demo {name body} {
             set ret 0
             break
          }
-         
+
       } elseif { $element == "env" } {
          incr i
          if { ![GetEnv [lindex $body $i]] } {
@@ -2734,18 +2734,18 @@ proc Demo {name body} {
 
       } elseif { $element == "link" } {
          incr i 2
-         
+
       } elseif { $element == "info" } {
          incr i
 
       } elseif { $element != "" } {
-         set mess "Illegal component \"$element\" found in demo $name" 
+         set mess "Illegal component \"$element\" found in demo $name"
          if { [info exists DEMO_FILE] } {
             if { $DEMO_FILE != "" } {
                append mess " (file $DEMO_FILE)"
             }
          }
-         Message $mess 
+         Message $mess
          set ret 0
          break
 
@@ -2756,7 +2756,7 @@ proc Demo {name body} {
       set DEMO($name) $body
    }
 
-   return $ret   
+   return $ret
 
 }
 
@@ -2766,12 +2766,12 @@ proc Step {demo body} {
 #     Step
 
 #  Purpose:
-#     Execute a single step in a demo. If CHECK_DEMO is set non-zero then 
+#     Execute a single step in a demo. If CHECK_DEMO is set non-zero then
 #     the syntax of the step is checked but it is not actually executed.
 #     A step consists of:
 #       - a command to be executed
 #       - some commentary text to be displayed describing the command
-#       - a pause to be waited after the command has been executed (given 
+#       - a pause to be waited after the command has been executed (given
 #         as a number of seconds)
 #       - etc.
 
@@ -2839,25 +2839,25 @@ proc Step {demo body} {
       for {set i 0} { $i < [llength $body] } {incr i} {
          set element [string tolower [lindex $body $i]]
          Diag "   $element"
-   
+
          if { $ABORT_DEMO } { break }
          if { $PAUSE_DEMO } { tkwait variable PAUSE_DEMO }
-   
+
          if { $element == "command" } {
             incr i
-   
+
          } elseif { $element == "text" } {
             incr i
-   
+
          } elseif { $element == "pause" } {
             incr i
-   
+
          } elseif { $element == "alpha" } {
             incr i
-   
+
          } elseif { $element == "head" } {
             incr i
-   
+
          } elseif { $element == "link" } {
             incr i
             set linkname [lindex $body $i]
@@ -2866,7 +2866,7 @@ proc Step {demo body} {
                set ret 0
                break
             }
-         } 
+         }
       }
 
       TextTags $CLAB step
@@ -2924,8 +2924,8 @@ proc Step {demo body} {
       } elseif { $element == "link" } {
          incr i 2
 
-      } { 
-         set mess "Illegal step component \"$element\" found in demo $demo" 
+      } {
+         set mess "Illegal step component \"$element\" found in demo $demo"
          if { [info exists DEMO_FILE] } {
             if { $DEMO_FILE != "" } {
                append mess " (file $DEMO_FILE)"
@@ -2952,7 +2952,7 @@ proc Step {demo body} {
 proc Package {demo body} {
 #+
 #  Name:
-#     Package 
+#     Package
 
 #  Purpose:
 #     Store information describing the package being demonstrated.
@@ -3003,12 +3003,12 @@ proc Package {demo body} {
 #-
    global DEMO_FILE
    global CHECK_DEMO
-   global PACKAGE 
+   global PACKAGE
    global SUN
-   global PACKAGE_DESCRIPTION 
-   global PACKAGE_VERSION 
-   global PACKAGE_EMAIL 
-   global PACKAGE_URL 
+   global PACKAGE_DESCRIPTION
+   global PACKAGE_VERSION
+   global PACKAGE_EMAIL
+   global PACKAGE_URL
    global PACKAGE_TITLE
 
    set ret 1
@@ -3022,12 +3022,12 @@ proc Package {demo body} {
          set element [string tolower [lindex $body $i]]
          incr i
 
-         if { $element == "name" } { 
-            set PACKAGE [lindex $body $i] 
+         if { $element == "name" } {
+            set PACKAGE [lindex $body $i]
             set PACKAGE_TITLE "The Starlink\n$PACKAGE package"
 
          } elseif { $element == "sun" } {
-            set SUN [lindex $body $i] 
+            set SUN [lindex $body $i]
 
          } elseif { $element == "info" } {
             set PACKAGE_DESCRIPTION [lindex $body $i]
@@ -3057,8 +3057,8 @@ proc Package {demo body} {
                exit
             }
 
-         } { 
-            set mess "Illegal package component \"$element\" found in demo $demo" 
+         } {
+            set mess "Illegal package component \"$element\" found in demo $demo"
             if { [info exists DEMO_FILE] } {
                if { $DEMO_FILE != "" } {
                   append mess " (file $DEMO_FILE)"
@@ -3081,7 +3081,7 @@ proc Command {command} {
 #     Command
 
 #  Purpose:
-#     Execute a single command in a demo. If CHECK_DEMO is set non-zero then 
+#     Execute a single command in a demo. If CHECK_DEMO is set non-zero then
 #     the command is not actually executed.
 
 #  Language:
@@ -3135,7 +3135,7 @@ proc Command {command} {
 
    Diag "      $command"
 
-   if { !$CHECK_DEMO && !$ABORT_DEMO } { 
+   if { !$CHECK_DEMO && !$ABORT_DEMO } {
 
       foreach var $ENV_VARS {
          set $var $env($var)
@@ -3156,7 +3156,7 @@ proc Text {text} {
 #     Text
 
 #  Purpose:
-#     Display commentary text for a single command in a demo. If CHECK_DEMO 
+#     Display commentary text for a single command in a demo. If CHECK_DEMO
 #     is set non-zero then the text is not actually displayed.
 
 #  Language:
@@ -3302,7 +3302,7 @@ proc Pause {time} {
 # Set a flag to indicate the demo is paused, and wait for its state to
 # change by ResumeDemo.
          set PAUSE_DEMO 1
-         tkwait variable PAUSE_DEMO 
+         tkwait variable PAUSE_DEMO
       }
    }
    return 1
@@ -3319,7 +3319,7 @@ proc Select {} {
     set top .select
     set topf [MakeDialog $top "Select demonstrations" 0]
 
-# Create and pack a frame for the "OK", "CLEAR ALL", "SET ALL", "RESET", 
+# Create and pack a frame for the "OK", "CLEAR ALL", "SET ALL", "RESET",
 # "CANCEL" and "HELP" buttons at the left hand side.
     set f3 [frame $topf.f3]
     pack $f3 -side left -fill y -padx 2m -expand 1
@@ -3340,12 +3340,12 @@ proc Select {} {
     set sc [scrollbar $topf.sc -command "$LB yview" -width 10]
     pack $LB $sc -side left -fill y -padx 1m -pady 1m
 
-# Enter all loaded demos into the listbox. 
+# Enter all loaded demos into the listbox.
     set demos [array names DEMO]
     foreach name $demos {
        $LB insert end $name
 
-# Add this demo to the listbox selection if it is currently selected 
+# Add this demo to the listbox selection if it is currently selected
        if { [lsearch -exact $SELECTED_DEMOS $name] != -1 } {
           $LB selection set end
        }
@@ -3507,7 +3507,7 @@ proc LoadFromFile {file} {
 #     TCL
 
 #  Arguments:
-#     file 
+#     file
 #        If supplied non-blank, then the demos are read from the specified
 #        file. Otherwise, the user is asked to supply a file name.
 
@@ -3550,13 +3550,13 @@ proc LoadFromFile {file} {
       set ok [OpenFile "r" "Demo file" "Give name of demo file to read:" file lfd]
       if { $ok } { close $lfd }
    } {
-      set ok 1 
+      set ok 1
    }
 
 # Only proceed if a file was opened.
    if { $ok } {
       set ret [LoadDemo $file]
-   } { 
+   } {
       set ret 0
    }
 
@@ -3641,9 +3641,9 @@ proc OpenFile {mode title text lfile lfd} {
       pack [label $topf.lab -text $text] -expand 1 -fill x -side top -pady 2m
    }
 
-# Create and pack an entry widget 
+# Create and pack an entry widget
    set ent [entry $topf.ent -width 40]
-   pack $ent -side top -expand 1 -fill x -pady 4m 
+   pack $ent -side top -expand 1 -fill x -pady 4m
 
 # Pre-load the current value of the file name (if not blank).
    if { [info exists file] && $file != "" } { $ent insert 0 $file }
@@ -3702,7 +3702,7 @@ proc OpenFile {mode title text lfile lfd} {
 # Now deal with cases where the file is to be written.
          } {
 
-# If the file already exists, get the user to confirm that it is 
+# If the file already exists, get the user to confirm that it is
 # OK to over-write it. If so, attempt to opne it for writing. Report any
 # error.
             if { ![file exists $file] || [Confirm "Over-write existing file \"$file\"?"] } {
@@ -3714,7 +3714,7 @@ proc OpenFile {mode title text lfile lfd} {
             }
          }
 
-# If the file was opened succesfully, indicate that the dialog box should be 
+# If the file was opened succesfully, indicate that the dialog box should be
 # closed.
          if { $ret } { set exit 1 }
 
@@ -3738,7 +3738,7 @@ proc Delete {} {
     set top .select
     set topf [MakeDialog $top "Delete demonstrations" 0]
 
-# Create and pack a frame for the "OK", "CLEAR ALL", "SET ALL", "RESET", 
+# Create and pack a frame for the "OK", "CLEAR ALL", "SET ALL", "RESET",
 # "CANCEL" and "HELP" buttons at the left hand side.
     set f3 [frame $topf.f3]
     pack $f3 -side left -fill y -padx 2m -expand 1
@@ -3759,7 +3759,7 @@ proc Delete {} {
     set sc [scrollbar $topf.sc -command "$LB yview" -width 10]
     pack $LB $sc -side left -fill y -padx 1m -pady 1m
 
-# Enter all loaded demos into the listbox. 
+# Enter all loaded demos into the listbox.
     set demos [array names DEMO]
     foreach name $demos { $LB insert end $name }
 
@@ -3803,7 +3803,7 @@ proc Delete {} {
           foreach i [$LB curselection] {
              set name [lindex $demos $i]
              unset DEMO($name)
-             set di [lsearch -exact $SELECTED_DEMOS $name] 
+             set di [lsearch -exact $SELECTED_DEMOS $name]
              if { $di != -1 } {
                 set SELECTED_DEMOS [lreplace $SELECTED_DEMOS $di $di]
              }
@@ -3824,7 +3824,7 @@ proc Run {} {
    global RUNNING_DEMO
    global SELECTED_DEMOS
    global ABORT_DEMO
-   global LOOPING  
+   global LOOPING
    global DOING
    global SELECT
    global RUN
@@ -3836,13 +3836,13 @@ proc Run {} {
    global TASK_FILE
    global HEADLINE
 
-#  Cancel the binding for Configure so that the configuration changes 
+#  Cancel the binding for Configure so that the configuration changes
 #  do not result in teh GWM display being re-created.
    set bs [bind . <Configure>]
    bind . <Configure> ""
 
-   $SELECT configure -state disabled   
-   $RUN configure -state disabled   
+   $SELECT configure -state disabled
+   $RUN configure -state disabled
    $NEXT configure -state normal
    $ABORT configure -state normal
    $PAUSE configure -state normal
@@ -3851,7 +3851,7 @@ proc Run {} {
    while { $first || $LOOPING } {
 
       foreach name $SELECTED_DEMOS {
-   
+
          set ABORT_DEMO 0
 
          SetCom ""
@@ -3874,7 +3874,7 @@ proc Run {} {
          set a 0
          after 2000 "set a 1"
          tkwait variable a
-   
+
          set HEADLINE ""
 
          set first 0
@@ -3885,7 +3885,7 @@ proc Run {} {
 
       if { $ABORT_DEMO == 1 } { break }
 
-   }      
+   }
 
    $SELECT configure -state normal
    $RUN configure -state normal
@@ -3901,7 +3901,7 @@ proc Run {} {
 proc Abort {} {
    global ABORT_DEMO
    global TIMED_PAUSE
-   global PAUSE_DEMO  
+   global PAUSE_DEMO
    global HEADLINE
 
    if { $PAUSE_DEMO } { ResumeDemo }
@@ -3915,7 +3915,7 @@ proc Abort {} {
 
 proc Next {} {
    global ABORT_DEMO
-   global PAUSE_DEMO  
+   global PAUSE_DEMO
    global HEADLINE
 
    if { $PAUSE_DEMO } { ResumeDemo }
@@ -3931,7 +3931,7 @@ proc PauseDemo {} {
    global PAUSE
    global TLEFT
    global PRESS
-  
+
 # Set a global flag which causes the demo procedures to pause, untill the
 # flag changes value again.
    set PAUSE_DEMO 1
@@ -4028,20 +4028,20 @@ proc Resize { init } {
    global CANHGT
    global DEVICE
    global DOING
-   
+
 #Message "Re-sizing image display"
 
-#  Cancel the binding for Configure so that the configuration changes 
+#  Cancel the binding for Configure so that the configuration changes
 #  produced by this procedure do not cause an infinite loop.
    set com [bind . <Configure>]
    bind . <Configure> ""
 
-# Get the new size for the GWM canvas item. 
-   update 
+# Get the new size for the GWM canvas item.
+   update
    set CANWID [expr [winfo width $CAN] - 8]
    set CANHGT [expr [winfo height $CAN] - 8]
 
-#  Erase the old GWM 
+#  Erase the old GWM
    $CAN delete $GWM
 
 #  Create the new GWM canvas.
@@ -4078,12 +4078,12 @@ proc SetCom {com args} {
 #  Enable the text widget.
    $CLAB configure -state normal
 
-# If required, remove the current contexts of the text widget, and return 
+# If required, remove the current contexts of the text widget, and return
 # the index of the first new character.
-   if { $args == "" } { 
+   if { $args == "" } {
       $CLAB delete 1.0 end
       set ret 1.0
-   } { 
+   } {
       set ret [$CLAB index end]
    }
 
@@ -4110,7 +4110,7 @@ proc AdamReset {} {
 
 #  Record the tasks which are to be re-instated later and then empty the
 #  currently list of active tasks.
-      set tasks $ADAM_TASKS 
+      set tasks $ADAM_TASKS
       set ADAM_TASKS ""
 
 #  Shutdown Startcl
@@ -4118,7 +4118,7 @@ proc AdamReset {} {
       fileevent $priv(PIPE) readable ""
       adam_reply $priv(RELAY_PATH) $priv(RELAY_MESSID) SYNC "" exit
       close $priv(PIPE)
-      unset priv 
+      unset priv
       rename exit {}
       rename adamtask.realExit exit
 
@@ -4136,7 +4136,7 @@ proc AdamReset {} {
       after 1000
 
 #  Start up Startcl
-      adamtask.init         
+      adamtask.init
       bind . <Destroy> ""
 
 #  Re-load the tasks.
@@ -4162,7 +4162,7 @@ proc Head {text} {
 
    Diag "      $text"
 
-   if { !$CHECK_DEMO && !$ABORT_DEMO } { 
+   if { !$CHECK_DEMO && !$ABORT_DEMO } {
       set HEADLINE $text
    }
 
@@ -4180,13 +4180,13 @@ proc Alpha {state} {
 
    if { !$CHECK_DEMO } {
 
-      if { $state == "on" } {   
-         MakeAlpha 
+      if { $state == "on" } {
+         MakeAlpha
 
-      } elseif { $state == "off" } {   
+      } elseif { $state == "off" } {
          if { [info exists AF] && [winfo exists $AF] } {
             wm withdraw $AF
-         } 
+         }
 
       } {
          if { [info exists DEMO_FILE] } {
@@ -4202,12 +4202,12 @@ proc Alpha {state} {
 }
 
 proc Info {} {
-   global PACKAGE 
+   global PACKAGE
    global PACKAGE_VERSION
    global PACKAGE_EMAIL
    global PACKAGE_URL
    global SUN
-   global PACKAGE_DESCRIPTION 
+   global PACKAGE_DESCRIPTION
 
    set mess ""
 
@@ -4231,7 +4231,7 @@ proc Info {} {
    if { $mess == "" } {
       Message "No further information is available."
    } {
-      ShowText "Package info" $mess global 
+      ShowText "Package info" $mess global
    }
 }
 
@@ -4241,13 +4241,13 @@ proc Link {scope name text} {
    global PACKAGE_LINKS
    global GLOBAL_LINKS
 
-   if { $scope == "global" } { 
+   if { $scope == "global" } {
       set GLOBAL_LINKS([string toupper $name]) $text
 
-   } elseif { $scope == "demo" } { 
+   } elseif { $scope == "demo" } {
       set DEMO_LINKS([string toupper $name]) $text
 
-   } elseif { $scope == "package" } { 
+   } elseif { $scope == "package" } {
       set PACKAGE_LINKS([string toupper $name]) $text
 
    } {
@@ -4267,16 +4267,16 @@ proc ShowLink {scope link} {
 
 # If this is a URL, display it.
    if { $scope == "url" } {
-      CCDShowHelp $link 
+      CCDShowHelp $link
 
 # If this is a link to an htx document, split the link up into doc and
 # label (delimited by a vertical bar), and display it.
    } elseif { $scope == "htx" } {
 
       if { [regexp {(.*)\|(.*)} $link match doc label] } {
-         ShowMe $doc $label 
+         ShowMe $doc $label
       } {
-         ShowMe $link 
+         ShowMe $link
       }
 
 #  Otherwise...
@@ -4290,17 +4290,17 @@ proc ShowLink {scope link} {
          if { [info exists GLOBAL_LINKS($link)] } {
             set mess $GLOBAL_LINKS($link)
          }
-   
+
       } elseif { $scope == "demo" } {
          if { [info exists DEMO_LINKS($link)] } {
             set mess $DEMO_LINKS($link)
          }
-   
+
       } elseif { $scope == "package" } {
          if { [info exists PACKAGE_LINKS($link)] } {
             set mess $PACKAGE_LINKS($link)
          }
-   
+
       } {
          if { [info exists STEP_LINKS($link)] } {
             set mess $STEP_LINKS($link)
@@ -4336,9 +4336,9 @@ proc ShowText {name mess scope args} {
 
 # Return if the window is already visible.
    set top ".$label"
-   if { [winfo exists $top] } { 
-      raise $top 
-      return 
+   if { [winfo exists $top] } {
+      raise $top
+      return
    }
 
 # Create the top level window for the dialogue box, and set its title.
@@ -4362,7 +4362,7 @@ proc ShowText {name mess scope args} {
       pack $but -side left -pady 2m -padx 4m
    }
 
-   pack $bf -side bottom 
+   pack $bf -side bottom
 
 # Create a scroll bar to scroll the text.
    set tf [frame $topf.tf -relief groove -bd 2]
@@ -4430,7 +4430,7 @@ proc DispText {widget text} {
          Pop TEXT_TAGS
 
 # For any other character...
-      } {      
+      } {
 
 # State 1 means "we are waiting for the first non-blank character
 # following an opening tag specifier". When found, store the non-blank
@@ -4452,17 +4452,17 @@ proc DispText {widget text} {
                set newtag [CheckTag $widget $tag]
                Push TEXT_TAGS $newtag
                set state 0
-            } {            
+            } {
                append tag $c
             }
 
-# State 0 means "we are copying simple text". Just append the character to the 
+# State 0 means "we are copying simple text". Just append the character to the
 # end of the current line of text.
          } {
             append line $c
          }
       }
-   } 
+   }
 
 # Display any remaining text.
    InsertText $widget $line ""
@@ -4536,7 +4536,7 @@ proc TextTags {widget scope} {
          $widget tag bind $link <Button> "ShowLink step $link"
          lappend tags $link
       }
-   }   
+   }
 
 # Package links are visible only from package scope.
    if { $scope == "package" } {
@@ -4544,9 +4544,9 @@ proc TextTags {widget scope} {
          $widget tag bind $link <Button> "ShowLink package $link"
          lappend tags $link
       }
-   }   
+   }
 
-# Set up bindings which cause the cursor and help text to change whenever 
+# Set up bindings which cause the cursor and help text to change whenever
 # text with a given tag is clicked on. Also set the colour of link text.
    foreach link $tags {
       $widget tag configure $link -foreground $LINKCOL
@@ -4569,7 +4569,7 @@ proc SetSpeed {logspeed} {
 }
 
 proc DemoInfo {} {
-   global DEMO_INFO 
+   global DEMO_INFO
    global RUNNING_DEMO
 
    if { $RUNNING_DEMO != "<idle>" } {
@@ -4609,7 +4609,7 @@ proc RemoveLinks {scope} {
 
    foreach link $tags {
       $CLAB tag configure $link -foreground black
-      $CLAB tag bind $link <Enter> "" 
+      $CLAB tag bind $link <Enter> ""
       $CLAB tag bind $link <Leave> ""
    }
 
@@ -4619,7 +4619,7 @@ proc Strut {w h} {
    set ret [frame $w.strut -width 0 -height $h]
    pack propagate $ret 0
    pack $ret -side left
-   return $ret 
+   return $ret
 }
 
 proc CheckTag {widget tag} {
@@ -4643,7 +4643,7 @@ proc InsertText {widget text tags} {
          if { ![catch {exec showme -n $SUN $label} mess] } {
             set htxtag [SetHtxTag $widget "htx:$SUN|$label"]
             if { $htxtag != "" } { lappend tags $htxtag }
-         } { 
+         } {
             Diag "Failed to find htx target $SUN $label - $mess"
          }
 
@@ -4653,7 +4653,7 @@ proc InsertText {widget text tags} {
             if { ![catch {exec showme -n $doc} mess] } {
                set htxtag [SetHtxTag $widget "htx:$doc"]
                if { $htxtag != "" } { lappend tags $htxtag }
-            } { 
+            } {
                Diag "Failed to find htx target $doc - $mess"
             }
          }
@@ -4669,7 +4669,7 @@ proc InsertText {widget text tags} {
       if { [llength $tags] > 0 } {
          $widget insert end $com3 $tags
       } {
-         $widget insert end $com3 
+         $widget insert end $com3
       }
    }
 }
@@ -4678,7 +4678,7 @@ proc SetHtxTag {widget tag} {
    global LINKCOL
    global NET
 
-# See if the supplied tag is a htx hyper-link, and if so, extract the htx 
+# See if the supplied tag is a htx hyper-link, and if so, extract the htx
 # document reference from within it.
    if { [regexp -nocase {htx:(.*)} $tag match doc] } {
 
@@ -4692,7 +4692,7 @@ proc SetHtxTag {widget tag} {
 # pressed over the tagged text.
          $widget tag bind $newtag <Button> "ShowLink htx $doc"
 
-# Set up bindings which cause the cursor and help text to change whenever 
+# Set up bindings which cause the cursor and help text to change whenever
 # text with this tag is clicked on. Also set the colour of link text.
          $widget tag configure $newtag -foreground $LINKCOL
          $widget tag bind $newtag <Enter> \
@@ -4721,7 +4721,7 @@ proc SetHtxTag {widget tag} {
 # pressed over the tagged text.
          $widget tag bind $newtag <Button> "ShowLink url $tag"
 
-# Set up bindings which cause the cursor and help text to change whenever 
+# Set up bindings which cause the cursor and help text to change whenever
 # text with this tag is clicked on. Also set the colour of link text.
          $widget tag configure $newtag -foreground $LINKCOL
          $widget tag bind $newtag <Enter> \
@@ -4754,7 +4754,7 @@ proc MakeAlpha {} {
    if { ![info exists AF] } {
 
 # Create the Frame.
-      set AF [toplevel .stardemoAlpha]      
+      set AF [toplevel .stardemoAlpha]
 
 # Create the scroll bar.
       set sc [scrollbar $AF.sc -command "$AF.lab yview" -width 15 -relief sunken]
@@ -4766,7 +4766,7 @@ proc MakeAlpha {} {
 
 # Pack the text widget and scroll par into the parent frame.
       pack $sc -side right -fill y
-      pack $ALPHATEXT -side left -fill both -expand 1 
+      pack $ALPHATEXT -side left -fill both -expand 1
 
 # Put the text window in the top right corner and make it the saem size
 # as the canvas.
@@ -4796,13 +4796,13 @@ proc ShowMe {doc args} {
    if { $args != "" } {
       if { ![catch {exec showme -n $doc $args} mess] } {
          set ret [CCDShowHelp $mess]
-      } { 
+      } {
          Diag "Failed to find document $doc (label $args) - $mess."
       }
    } {
       if { ![catch {exec showme -n $doc} mess] } {
          set ret [CCDShowHelp $mess]
-      } { 
+      } {
          Diag "Failed to find document $doc - $mess"
       }
    }
@@ -4820,7 +4820,7 @@ proc GetEnv {varnam} {
    Diag "      $varnam"
 
    if { [info exists env($varnam)] } {
-      lappend ENV_VARS $varnam 
+      lappend ENV_VARS $varnam
       set ret 1
    } {
       Message "Environment variable \"$varnam\" is not defined."
@@ -4889,10 +4889,10 @@ proc GetEnv {varnam} {
 #     22-MAR-1995 (PDRAPER):
 #        Added facility to use netscape (1.1) as well as Mosaic.
 #     29-JUN-1997 (DSB):
-#        Brought into POLPACK from CCDPACK. Calls to CCDIssueInfo changed 
+#        Brought into POLPACK from CCDPACK. Calls to CCDIssueInfo changed
 #        to Message. Check environment variable HTX_BROWSER instead of
 #        Tcl variable CCDbrowser to determine the browser to use.
-#        Supplied argument changed from a file name to a URL (and the 
+#        Supplied argument changed from a file name to a URL (and the
 #        netscape remote openFILE command changed to openURL).
 #     6-JUL-1998 (DSB):
 #        Modified to use HTX_BROWSER as supplied instead of only using
@@ -4908,12 +4908,12 @@ proc GetEnv {varnam} {
       global env
       global netscapepid
       global mosaicpid
-      
+
       set ret 1
 
 #  Check the browser to use. If HTX_BROWSER doesn't exist use Netscape.
 #  If it does, use it.
-      if { ! [info exists env(HTX_BROWSER)] } { 
+      if { ! [info exists env(HTX_BROWSER)] } {
          set CCDbrowser netscape
       } {
          set CCDbrowser $env(HTX_BROWSER)
@@ -4937,22 +4937,22 @@ proc GetEnv {varnam} {
 	       if { [catch {exec kill -USR1 $mosaicpid}] } {
 		  set mosaicpid 0
 	       }
-	    } 
+	    }
 	    if { $mosaicpid == 0 } {
 	       exec  $CCDbrowser $url &
 	    }
 	 }
 
 	 *[Nn]etscape* {
-	       
+
 #  Use Mozilla. This uses the NCAPIs methods as of netscape 1.1b1.
-#  Attempt to make browser goto the required page. If this fails then the 
+#  Attempt to make browser goto the required page. If this fails then the
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
 	    if { [catch {exec $CCDbrowser -remote openURL($url)} mess] } {
 	       set netscapepid 0
 	    }
-            if { $netscapepid == 0 } { 
+            if { $netscapepid == 0 } {
                if { [catch { set netscapepid [exec $CCDbrowser $url &]} mess] } {
                   Message "Failed to start $CCDbrowser - $mess"
                   set ret 0
@@ -4996,7 +4996,7 @@ proc GetEnv {varnam} {
 
 #  If not, kill the process
                if { $dokill } {
-                  catch "exec kill $pid" 
+                  catch "exec kill $pid"
                }
 
 #  Creak out of the process name loop.

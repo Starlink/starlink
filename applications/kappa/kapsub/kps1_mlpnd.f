@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_MLPND( NX, NY, DATA, VAR, USEVAR, SIGMA, ABSAXS, 
-     :                       NDISP, LBND, LINDX, YLOG, IPNOM, USE, 
-     :                       IPDAT, IPBAR, OFFSET, YB, YT, 
+      SUBROUTINE KPS1_MLPND( NX, NY, DATA, VAR, USEVAR, SIGMA, ABSAXS,
+     :                       NDISP, LBND, LINDX, YLOG, IPNOM, USE,
+     :                       IPDAT, IPBAR, OFFSET, YB, YT,
      :                       STATUS )
 *+
 *  Name:
@@ -14,26 +14,26 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPND( NX, NY, DATA, VAR, USEVAR, SIGMA, ABSAXS, 
-*                      NDISP, LBND, LINDX, YLOG, IPNOM, USE, 
+*     CALL KPS1_MLPND( NX, NY, DATA, VAR, USEVAR, SIGMA, ABSAXS,
+*                      NDISP, LBND, LINDX, YLOG, IPNOM, USE,
 *                      IPDAT, IPBAR, OFFSET, YB, YT, STATUS )
 
 *  Description:
 *     This routine finds the vertical position of each sample to be
 *     displayed by MLINPLOT, together with the higher and lower ends of
-*     the associated vertical error bar. The vertical positions are 
-*     returned in terms of a "nominal data value Frame". This is a 1D 
-*     Frame which is later mapped linearly onto the vertical dimension 
-*     of the screen. The nominal data value for a given pixel is equal 
+*     the associated vertical error bar. The vertical positions are
+*     returned in terms of a "nominal data value Frame". This is a 1D
+*     Frame which is later mapped linearly onto the vertical dimension
+*     of the screen. The nominal data value for a given pixel is equal
 *     to the actual pixel value plus the offset for the line.
 
 *  Arguments:
 *     NX = INTEGER (Given)
-*        The number of grid elements along the first axis of the data 
-*        array. 
+*        The number of grid elements along the first axis of the data
+*        array.
 *     NY = INTEGER (Given)
-*        The number of grid elements along the second axis of the data 
-*        array. 
+*        The number of grid elements along the second axis of the data
+*        array.
 *     DATA( NX, NY ) = DOUBLE PRECISION (Given)
 *        The 2D data array.
 *     VAR( NX, NY ) = DOUBLE PRECISION (Given)
@@ -44,7 +44,7 @@
 *        The number of standard deviations to be represented by each side
 *        of a vertical error bars.
 *     ABSAXS = INTEGER (Given)
-*        The index of the abscissa (horizontal) grid axis. This should be 1 
+*        The index of the abscissa (horizontal) grid axis. This should be 1
 *        or 2. The other axis is the ordinate (vertical) axis.
 *     NDISP = INTEGER (Given)
 *        The number of lines of data to be displayed.
@@ -60,9 +60,9 @@
 *     IPNOM = INTEGER (Given)
 *        A pointer to a 2D array of type DOUBLE PRECISION with bounds
 *        (ABSDIM, NDISP). Each row corresponds to the ABSDIM data
-*        values in the corresponding displayed line (1 to NDISP). Each 
-*        element in a row is the nominal GRID value at the centre of the 
-*        data value. 
+*        values in the corresponding displayed line (1 to NDISP). Each
+*        element in a row is the nominal GRID value at the centre of the
+*        data value.
 *     USE( NDISP ) = LOGICAL (Returned)
 *        Each flag is .TRUE. if the corresponding line contains any
 *        usable data. Line which have a USE value of .FALSE. should
@@ -70,13 +70,13 @@
 *     IPDAT = INTEGER (Returned)
 *        A pointer to a 2D array of type DOUBLE PRECISION with bounds
 *        (ABSDIM, NDISP). Each row corresponds to the ABSDIM data
-*        values in the corresponding displayed line (1 to NDISP). Each 
-*        element in a row is the nominal data value to be displayed. 
+*        values in the corresponding displayed line (1 to NDISP). Each
+*        element in a row is the nominal data value to be displayed.
 *     IPBAR = INTEGER (Returned)
 *        A pointer to a 3D array of type DOUBLE PRECISION with bounds
-*        (ABSDIM, 2, NDISP). Element (I,1,J) contains the lower limit for 
+*        (ABSDIM, 2, NDISP). Element (I,1,J) contains the lower limit for
 *        the error bar (data - sigma*std.devn) for element I of display
-*        line J. Element (I,2,J) contains the corresponding upper limit 
+*        line J. Element (I,2,J) contains the corresponding upper limit
 *        (data + sigma*std.devn).
 *     OFFSET( NDISP ) = DOUBLE PRECISION (Returned)
 *        The offset used with each curve.
@@ -95,40 +95,40 @@
 *        The supplied values are added on to the data values read from
 *        the NDF before displaying them.
 *     SPACE = LITERAL (Given)
-*        The value of this parameter specifies how the vertical offset for 
+*        The value of this parameter specifies how the vertical offset for
 *        each data curve is determined. It should be given one of
 *        the following values:
 *
-*        - "Average" -- The offsets are chosen automatically so that 
-*        the average data values of the curves are evenly spaced between 
+*        - "Average" -- The offsets are chosen automatically so that
+*        the average data values of the curves are evenly spaced between
 *        the upper and lower limits of the plotting area.  Any line-
 *        to-line striping is thus hidden and the amount of overlap of
 *        adjacent traces is minimised.
 *
-*        - "Constant" -- The offsets are chosen automatically so that 
-*        the zero points of the curves are evenly spaced between the upper 
+*        - "Constant" -- The offsets are chosen automatically so that
+*        the zero points of the curves are evenly spaced between the upper
 *        and lower limits of the plotting area.  The width of any line-
 *        to-line strip is constant, which could result in the curves
 *        becoming confused if the bias of a curve from its zero point is
 *        so large that it overlaps another curve.
 *
-*        - "Free" -- The offsets to use are obtained explicitly using 
+*        - "Free" -- The offsets to use are obtained explicitly using
 *        parameter OFFSET.
 *
 *        - "None" -- No vertical offsets are used. All curves are
 *        displayed with the same zero point.
 *
-*        The input can be abbreviated to an unambiguous length and 
+*        The input can be abbreviated to an unambiguous length and
 *        is case insensitive. ["Average"]
 *     YBOT = _DOUBLE (Read)
-*        The data value to place at the bottom end of the vertical axis. 
+*        The data value to place at the bottom end of the vertical axis.
 *        The dynamic default is the lowest data value to be displayed,
-*        after addition of the vertical offsets. The value supplied may be 
+*        after addition of the vertical offsets. The value supplied may be
 *        greater than or less than the value supplied for YTOP.
 *     YTOP = _DOUBLE (Read)
-*        The data value to place at the top end of the vertical axis. 
+*        The data value to place at the top end of the vertical axis.
 *        The dynamic default is the highest data value to be displayed,
-*        after addition of the vertical offsets. The value supplied may be 
+*        after addition of the vertical offsets. The value supplied may be
 *        greater than or less than the value supplied for YBOT.
 
 *  Copyright:
@@ -168,12 +168,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -201,13 +201,13 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER MXLIN              ! Max number of lines which can be handled
       PARAMETER ( MXLIN = 100 )
 
 *  Local Variables:
-      CHARACTER SPACE*8          ! Offset selection method 
-      DOUBLE PRECISION GAP       ! Nominal data value gap 
+      CHARACTER SPACE*8          ! Offset selection method
+      DOUBLE PRECISION GAP       ! Nominal data value gap
       DOUBLE PRECISION MARGIN    ! Margin for default YTOP and YBOT values
       DOUBLE PRECISION MAXRNG    ! Data range covered by all lines
       DOUBLE PRECISION MEAN( MXLIN ) ! Mean value in each line
@@ -262,7 +262,7 @@
       CALL PSX_CALLOC( ABSDIM*NDISP, '_DOUBLE', IPDAT, STATUS )
 
 *  Allocate memory for the error bars if necessary.
-      IF( USEVAR ) CALL PSX_CALLOC( 2*ABSDIM*NDISP, '_DOUBLE', IPBAR, 
+      IF( USEVAR ) CALL PSX_CALLOC( 2*ABSDIM*NDISP, '_DOUBLE', IPBAR,
      :                              STATUS )
 
 *  Abort if an error has occurred.
@@ -284,13 +284,13 @@
 *  Put the data to be displayed in the temporary work space, taking the
 *  log of the data if required. Statistics for the data are returned.
 *  Only pixels with valid horizontal positions are used.
-         CALL KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG, 
-     :                    %VAL( CNF_PVAL( IPNOM ) + BOFF ), 
+         CALL KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG,
+     :                    %VAL( CNF_PVAL( IPNOM ) + BOFF ),
      :                    %VAL( CNF_PVAL( IPDAT ) + BOFF ),
      :                    MN( I ), MX( I ), MEAN( I ), STATUS )
 
 *  Set a flag indicating if any good data was found for this line. Count
-*  the number of lines for which no good data was found. 
+*  the number of lines for which no good data was found.
          IF( MEAN( I ) .EQ. VAL__BADD ) THEN
             USE( I ) = .FALSE.
             NBAD = NBAD + 1
@@ -301,11 +301,11 @@
 *  If required, store the data values at the two ends of each vertical
 *  error bar. Also, update MN and MX to include the error bars.
             IF( USEVAR ) THEN
-               CALL KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX, 
-     :                          ABSAXS, YLOG, 
+               CALL KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX,
+     :                          ABSAXS, YLOG,
      :                          %VAL( CNF_PVAL( IPDAT ) + BOFF ),
-     :                          MN( I ), MX( I ), 
-     :                          %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ), 
+     :                          MN( I ), MX( I ),
+     :                          %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ),
      :                          STATUS )
 
             END IF
@@ -329,7 +329,7 @@
       IF( NUSE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPS1_MLPND_ERR2', 'No usable data found '//
-     :                 'within the range of the horizontal axis.', 
+     :                 'within the range of the horizontal axis.',
      :                 STATUS )
          GO TO 999
       END IF
@@ -337,13 +337,13 @@
 *  Warn the user if not all the lines could be displayed.
       IF( NBAD .EQ. 1 ) THEN
          CALL MSG_OUT( 'KPS1_MLPND_MSG1', '  One line contained no '//
-     :                 'usable data and will not be displayed.', 
+     :                 'usable data and will not be displayed.',
      :                 STATUS )
 
       ELSE IF( NBAD .GT. 1 ) THEN
          CALL MSG_SETI( 'NB', NBAD )
          CALL MSG_OUT( 'KPS1_MLPND_MSG2', '  ^NB lines contained no '//
-     :                 'usable data and will not be displayed.', 
+     :                 'usable data and will not be displayed.',
      :                 STATUS )
       END IF
 
@@ -376,7 +376,7 @@
          END DO
 
          IF( GAP .EQ. 0.0 ) THEN
-            IF( MAXRNG .GT. 0.0 ) THEN 
+            IF( MAXRNG .GT. 0.0 ) THEN
                GAP = MAXRNG/( NUSE -1 )
             ELSE
                GAP = 1.0
@@ -397,14 +397,14 @@
          GAP = 0.0D0
          DO I = 1, NDISP
             IF( USE( I ) ) THEN
-               IF( Y1 .NE. VAL__BADD ) GAP = MAX( GAP, 
+               IF( Y1 .NE. VAL__BADD ) GAP = MAX( GAP,
      :                                        Y1 - MN( I ) + MEAN( I ) )
                Y1 = MX( I ) - MEAN( I )
              END IF
          END DO
 
          IF( GAP .EQ. 0.0 ) THEN
-            IF( MAXRNG .GT. 0.0 ) THEN 
+            IF( MAXRNG .GT. 0.0 ) THEN
                GAP = MAXRNG/( NUSE -1 )
             ELSE
                GAP = 1.0
@@ -419,7 +419,7 @@
                   MEAN1 = MEAN( I )
                   OFFSET( I ) = 0.0D0
                ELSE
-                  OFFSET( I ) = DBLE( MEAN1 - MEAN( I ) + 
+                  OFFSET( I ) = DBLE( MEAN1 - MEAN( I ) +
      :                                ( IUSE - 1 )*GAP )
                END IF
 
@@ -445,15 +445,15 @@
 
       MARGIN = 0.05*( YT - YB )
       YB = YB - MARGIN
-      YT = YT + MARGIN   
+      YT = YT + MARGIN
 
       CALL PAR_DEF0D( 'YBOT', YB, STATUS )
       CALL PAR_DEF0D( 'YTOP', YT, STATUS )
-         
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get alternative values from the environment. Use default if null 
+*  Get alternative values from the environment. Use default if null
 *  parameter value was supplied.
       CALL PAR_GET0D( 'YBOT', YB, STATUS )
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
@@ -509,8 +509,8 @@
                IF( IUSE .EQ. 1 ) THEN
                   MEAN1 = MEAN( I )
                ELSE
-                  GAP = MIN( GAP, 
-     :                       ( YMAX - MX( I ) - MEAN1 + MEAN( I ) ) / 
+                  GAP = MIN( GAP,
+     :                       ( YMAX - MX( I ) - MEAN1 + MEAN( I ) ) /
      :                       DBLE( IUSE - 1 ) )
                END IF
                IUSE = IUSE + 1
@@ -536,7 +536,7 @@
 
       END IF
 
-*  If offsets are being used, add the offset onto each data array to get 
+*  If offsets are being used, add the offset onto each data array to get
 *  the corresponding nominal data values.
       IF( SPACE .NE. 'NONE' ) THEN
          DO I = 1, NDISP
@@ -544,17 +544,17 @@
 
                BOFF = ( I - 1 )*ABSDIM*VAL__NBD
 
-               CALL KPG1_CADDD( .TRUE., ABSDIM, 
+               CALL KPG1_CADDD( .TRUE., ABSDIM,
      :                          %VAL( CNF_PVAL( IPDAT ) + BOFF ),
-     :                          OFFSET( I ), 
+     :                          OFFSET( I ),
      :                          %VAL( CNF_PVAL( IPDAT ) + BOFF ), NERR,
      :                          STATUS )
 
                IF( USEVAR ) THEN
-                  CALL KPG1_CADDD( .TRUE., 2*ABSDIM, 
-     :                             %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ), 
+                  CALL KPG1_CADDD( .TRUE., 2*ABSDIM,
+     :                             %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ),
      :                             OFFSET( I ),
-     :                             %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ), 
+     :                             %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ),
      :                             NERR,
      :                             STATUS )
                END IF

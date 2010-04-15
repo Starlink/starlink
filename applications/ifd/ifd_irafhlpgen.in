@@ -85,7 +85,7 @@ puts $package_hd ""
 set line {}
 while {[string range $line 0 1] != "1 "} {
     set line [gets $package_hlp]
-    if { $line == ""} { 
+    if { $line == ""} {
 	if { [eof  $package_hlp] } {
 	    puts "Error: No level 1 help topics found - giving up"
 	    exit
@@ -132,7 +132,7 @@ while { ![eof  $package_hlp] } {
     } {
        puts "WARNING: No description"
        set line "$descrip"
-       set descrip {}       
+       set descrip {}
     }
 #  Add line for this task to the <package>.hd file.
 #  We don't have a src= entry as the source is not available.
@@ -192,7 +192,7 @@ while { ![eof  $package_hlp] } {
                   set box 0
                } {
                   puts $hlp $line
-               }          
+               }
             }
 	}
     }

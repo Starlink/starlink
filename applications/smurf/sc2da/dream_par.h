@@ -1,6 +1,6 @@
 /* dream_par.h - DREAM constants */
 
-/* 
+/*
    Authors :
     B.D.Kelly (bdk@roe.ac.uk)
    History:

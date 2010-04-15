@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -225,7 +225,7 @@
      :                         RUNXV .NE. 4.0 ) THEN
          MAP_VERSION = RVAXV
       ELSE IF ( ( RVAXV .LE. 0. .OR. RVAXV .GE. 4.0 )
-     :                         .AND. RUNXV .EQ. 4.0 ) THEN 
+     :                         .AND. RUNXV .EQ. 4.0 ) THEN
          MAP_VERSION = RUNXV
       ELSE
          WRITE( *, * ) 'File format version does not make sense.'
@@ -609,7 +609,7 @@
       CALL FIO_PUNIT( UNIT, STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
       CALL ERR_RLSE
-      
+
 *  Return.
       END
 
@@ -682,7 +682,7 @@
       INTEGER I, J, K, L
       INTEGER IST, IBST
 
-*  
+*
 
 *  Check each cube row. INDEX tells which spectrum to get, if any.
       DO 6 J = 1, NSTEP

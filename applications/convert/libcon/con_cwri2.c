@@ -8,7 +8,7 @@ F77_INTEGER_FUNCTION(con_cwri2)( BYTE_ARRAY(data), INTEGER(data_length) ){
 /*
  *  Name:
  *    con_cwri2
- 
+
  *  Purpose:
  *    Provides access to the C "fwrite" function from Fortran
  *    for a single CHARACTER.
@@ -27,7 +27,7 @@ F77_INTEGER_FUNCTION(con_cwri2)( BYTE_ARRAY(data), INTEGER(data_length) ){
  *  History:
  *    19-DEC-2000 (AJC):
  *       Use a byte array as argument
- */   
+ */
 
       GENPTR_BYTE_ARRAY(data)
       GENPTR_INTEGER(data_length)
@@ -43,4 +43,4 @@ F77_INTEGER_FUNCTION(con_cwri2)( BYTE_ARRAY(data), INTEGER(data_length) ){
       return( ret );
 
 }
- 
+

@@ -3360,7 +3360,7 @@
 *---------------------------------------------------------------------
 
 
-      WRITE(DWDT, REC=IREC, IOSTAT=IERR) 
+      WRITE(DWDT, REC=IREC, IOSTAT=IERR)
      :   KITEM(IBUF), KNEXT(IBUF), KMORE(IBUF),
      :  (KINT(J,IBUF)-KINT(J-1,IBUF),KREAL(J,IBUF)-KREAL(J-1,IBUF),
      :  (KDATA(I,IBUF), I = KINT(J-1,IBUF)+1, KINT(J,IBUF)),

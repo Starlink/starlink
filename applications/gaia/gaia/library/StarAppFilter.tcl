@@ -25,7 +25,7 @@
 #     gaFilters must have the following format:
 #
 #        Filter replace_image filter_binary_name \
-#           command_qualifier_string use_prefix  
+#           command_qualifier_string use_prefix
 #           output_image_name_modifier label
 #
 #     So for instance the KAPPA application BLOCK might be run
@@ -43,7 +43,7 @@
 #      use_prefix to 0 would result in a postfix).
 #
 #      The $env{KAPPA_DIR} variable is changed to the value of the
-#      KAPPA_DIR environment variable.  
+#      KAPPA_DIR environment variable.
 #
 #      Since replace is set to 1 (true) the currently displayed image
 #      will be erased and the output of this command will be displayed
@@ -104,7 +104,7 @@
 #  History:
 #     19-NOV-1996 (PWD):
 #        Original version.
-#     24-APR-1998 (ALLAN) 
+#     24-APR-1998 (ALLAN)
 #        Pass command line arguments to "clone" rather than use "after 500".
 #     {enter_further_changes_here}
 
@@ -123,15 +123,15 @@ itcl::class gaia::StarAppFilter {
    #  ------------
    constructor {gaia args} {
       global env gaia_dir
-      
+
       #  Record the name of the GAIA widget.
       set gaia_ $gaia
       set rtdimage_ [$gaia_ get_image]
       set rtdimage_ [$rtdimage_ get_image]
-      
+
       #  Evaluate any configuration options.
       eval configure $args
-      
+
       #  Look for the gaFilter files. First in gaia_dir and then
       #  in the HOME directory.
       if { [file readable $gaia_dir/.gaFilters] } {
@@ -146,7 +146,7 @@ itcl::class gaia::StarAppFilter {
             close $ios
          }
        }
-      
+
       # Check that we have some filters and create the menu to run
       # them if so.
       add_menu
@@ -155,7 +155,7 @@ itcl::class gaia::StarAppFilter {
       set namer_ [GaiaImageName \#auto]
 
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
@@ -237,12 +237,12 @@ itcl::class gaia::StarAppFilter {
 
          #  Set name of the "indata" variable to the name used by
          #  Starlink applications. Includes everything but the ".sdf"
-         #  extension. 
+         #  extension.
          set indata [$namer_ ndfname 0]
 
          #  Set the name of the "outdata" variable.
          set outdata [$namer_ modname $info_($id,prefix) $info_($id,output)]
-         
+
          #  Need to substitute $indata and $outdata, but still protect
          #  [] and form a proper list as an argument to runwith! So
          #  use keep things in a single string and do careful substitution.
@@ -300,7 +300,7 @@ itcl::class gaia::StarAppFilter {
 
    #  Object for image name nicities.
    protected variable namer_ {}
-   
+
    #  Common variables: (shared by all instances)
    #  -----------------
 

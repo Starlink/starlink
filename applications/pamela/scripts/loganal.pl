@@ -47,15 +47,15 @@ while(<LOG>){
 	$file = $1;
 
     }elsif(/^Readout noise =\s*(\S+)/){
-	
+
 	$readout{$file} = $1;
-	
+
     }elsif(/^(track|skymov|skyfit|profit|optext|extopt)/){
-	
+
 	$command = $1;
 
     }elsif($command eq "track" && /Chi-squared of fit =\s*(\S+)/){
-	
+
 	$track{$file}->{CHI} = $1;
 
     }elsif($command eq "track" && /RMS deviation =\s*(\S+) pixels/){
@@ -163,7 +163,7 @@ if(%skyfit){
     foreach $file (sort keys %skyfit){
 	my $ref = $skyfit{$file};
 	if(defined $ref->{RMS} && defined $ref->{REJ}){
-	    printf "  SKYFIT: file=%8s, mean RMS=%3.3f, number rejected=%5d\n", 
+	    printf "  SKYFIT: file=%8s, mean RMS=%3.3f, number rejected=%5d\n",
 	    $file,$ref->{RMS},$ref->{REJ};
 	}else{
 	    print "  Failed to find all skyfit parameters for file = $file\n";
@@ -176,7 +176,7 @@ if(%profit){
     foreach $file (sort keys %profit){
 	my $ref = $profit{$file};
 	if(defined $ref->{CHI} && defined $ref->{REJ}){
-	    printf "  PROFIT: file=%8s, final Chi**2=%4.4f, number rejected=%5d\n", 
+	    printf "  PROFIT: file=%8s, final Chi**2=%4.4f, number rejected=%5d\n",
 	    $file,$ref->{CHI},$ref->{REJ};
 	}else{
 	    print "  Failed to find all profit parameters for file = $file\n";

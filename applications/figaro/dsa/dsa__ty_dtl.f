@@ -51,7 +51,7 @@ C
 C  External subroutines / functions used:
 C     ICH_FOLD
 C
-C  Prior requirements:  
+C  Prior requirements:
 C     If REF_SLOT is non-zero the file it refers to must be open.
 C
 C  Support: Keith Shortridge, AAO
@@ -196,7 +196,7 @@ C
          IF (NDF) THEN
             STRUCT_TYPE='ARRAY'
             VARIANT='SIMPLE'
-         ELSE        
+         ELSE
             STRUCT_TYPE=' '
             VARIANT=' '
          END IF

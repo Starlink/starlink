@@ -88,12 +88,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,7 +117,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -172,37 +172,37 @@
             CALL ARY1_PTNB( BAD, NDIM, LBNDA, UBNDA,
      :                      %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB, LBNDD,
      :                      UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
             CALL ARY1_PTNUB( BAD, NDIM, LBNDA, UBNDA,
      :                       %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB,
      :                       LBNDD, UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL ARY1_PTND( BAD, NDIM, LBNDA, UBNDA,
      :                      %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB, LBNDD,
      :                      UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             CALL ARY1_PTNI( BAD, NDIM, LBNDA, UBNDA,
      :                      %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB, LBNDD,
      :                      UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             CALL ARY1_PTNR( BAD, NDIM, LBNDA, UBNDA,
      :                      %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB, LBNDD,
      :                      UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
             CALL ARY1_PTNW( BAD, NDIM, LBNDA, UBNDA,
      :                      %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB, LBNDD,
      :                      UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
             CALL ARY1_PTNUW( BAD, NDIM, LBNDA, UBNDA,
      :                       %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB,
      :                       LBNDD, UBNDD, HTYPE, LOC, DCE, STATUS )
- 
+
 *  Note if the data type string is not recognised.
          ELSE
             TYPOK = .FALSE.
@@ -219,7 +219,7 @@
      :   'Routine ^ROUTINE called with an invalid ATYPE argument ' //
      :   'of ''^BADATYPE'' (internal programming error).', STATUS )
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_PTN', STATUS )
 

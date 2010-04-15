@@ -1,21 +1,21 @@
-	SUBROUTINE XGROWSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT, 
+	SUBROUTINE XGROWSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT,
      :	                     STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
+	INTEGER
      :	  DIMSX,
      :	  DIMSY,
      :	  ODIMSX,
-     ;	  ODIMSY, 
+     ;	  ODIMSY,
      :	  STATUS,
      :	  J,
      :	  K
 
-	REAL 
-     :	  ARROUT( ODIMSX, ODIMSY), 
+	REAL
+     :	  ARROUT( ODIMSX, ODIMSY),
      :	  ARRIN( DIMSX, DIMSY)
 
 *      scan through all the input pixels ...

@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -154,7 +154,7 @@
 *  If one of the input values were bad, put both bad in the output
 *  arrays and set the returned bad pixel flag.
             ELSE
-               DOUT( I ) = VAL__BADD      
+               DOUT( I ) = VAL__BADD
                VOUT( I ) = VAL__BADD
                BAD = .TRUE.
             END IF
@@ -194,7 +194,7 @@
 *  If one of the input values were bad, put both bad in the output
 *  arrays and set the returned bad pixel flag.
             ELSE
-               DOUT( I ) = VAL__BADD      
+               DOUT( I ) = VAL__BADD
                VOUT( I ) = VAL__BADD
                BAD = .TRUE.
             END IF
@@ -235,7 +235,7 @@
 *  If one of the input values were bad, put both bad in the output
 *  arrays and set the returned bad pixel flag.
             ELSE
-               DOUT( I ) = VAL__BADD      
+               DOUT( I ) = VAL__BADD
                VOUT( I ) = VAL__BADD
                BAD = .TRUE.
             END IF

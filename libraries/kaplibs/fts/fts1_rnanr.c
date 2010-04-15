@@ -18,7 +18,7 @@
 *     in a vector of 32-bit IEEE-754 floating-point numbers to the
 *     standard _REAL bad-pixel value.  Also converted to the standard
 *     bad-pixel value are values who exponent is greater than maximum
-*     provided by the host machine.  
+*     provided by the host machine.
 
 *  Arguments:
 *     EL = INTEGER (Given)
@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *- */
-      
+
 /*  Global Constants: */
 # include <math.h>                     /* finite and isnan function declarations */
 # include "sae_par.h"                  /* Environment global constants */
@@ -80,13 +80,13 @@ F77_SUBROUTINE(fts1_rnanr)( INTEGER(el), REAL(buf), INTEGER(status) )
 /*. */
 
 /* Check global status. */
-    if ( *status != SAI__OK ) 
+    if ( *status != SAI__OK )
         return;
 
 /* Loop for every element of the array to be converted. */
     for ( i=0; i<*el; i++ ) {
 
-/* Check for not a number (NaN) or +/- Infinity, and assign 
+/* Check for not a number (NaN) or +/- Infinity, and assign
    the element the bad-pixel value if necessary. */
         if ( !finite( buf[ i ]) || isnan( buf[ i ] ) ) buf[ i ] = VAL__BADR;
     }

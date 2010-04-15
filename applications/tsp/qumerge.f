@@ -23,20 +23,20 @@ C    (1) QQ         (TSP, 1D)  The input Q dataset.
 C    (2) U          (TSP, 1D)  The input U dataset.
 C    (3) OUTPUT     (TSP, 1D)  The output merged dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         19/8/1988
 C
 C-
 C
 C  History:
-C    Aug/1987   Original Version.   JAB/AAO 
+C    Aug/1987   Original Version.   JAB/AAO
 C    27/2/1988   TSP Monolith version.  JAB/AAO
 C    19/8/1988   Prevent crash on null inputs.  JAB/AAO
 C
-     
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -68,7 +68,7 @@ C
 
       CALL DAT_CREAT('OUTPUT','ENDIF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
- 
+
 *  Copy Q data to output
 
       CALL TSP_COPY(QLOC,OLOC,STATUS)
@@ -106,7 +106,7 @@ C
       IF (DIMS(1) .NE. SIZE) THEN
          CALL MSG_OUT('MSG','Q and U Dimensions are different',STATUS)
          STATUS = USER__001
-      ENDIF         
+      ENDIF
 
 *  Map the two intensity arrays
 
@@ -135,9 +135,9 @@ C
          CALL TSP_QUMERGE(SIZE,%VAL(QPTR),%VAL(UPTR),%VAL(QSPTR),
      :      %VAL(USPTR),%VAL(QVPTR),%VAL(UVPTR),%VAL(OUSPTR),
      :      %VAL(OUVPTR),STATUS)
-      ENDIF            
+      ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(UVLOC,STATUS)
       CALL TSP_UNMAP(QVLOC,STATUS)
@@ -164,7 +164,7 @@ C
 *   QUMERGE command
 *
 *   Subroutine to do the merging of the data
-*       
+*
 *    Sum the intensities for the two datasets, and scale up the
 *    Stokes arrays and variances to be correct for the new intensity
 *
@@ -176,11 +176,11 @@ C
 *   (!)   QS     (Real array(SIZE))  The Q stokes parameter array
 *   (>)   US     (Real array(SIZE))  The U stokes parameter array
 *   (!)   QV     (Real array(SIZE))  The Q variance array
-*   (>)   UV     (Real array(SIZE))  The U variance array                           
+*   (>)   UV     (Real array(SIZE))  The U variance array
 *   (<)   OUS    (Real array(SIZE))  The output U stokes parameter array
 *   (<)   OUV    (Real array(SIZE))  The output U variance array
 *   (!)   STATUS (Integer)           Status value
-*   
+*
 *    Jeremy Bailey   19/8/1988
 *
 *   Modified:
@@ -208,7 +208,7 @@ C
 *  Zero initial values of summed intensities
          I1S = 0.0
          I2S = 0.0
-   
+
 *  Loop over all good points in data set summing the intensities
          DO I=1,SIZE
             IF (INT(I).NE.VAL__BADR .AND. IU(I).NE.VAL__BADR) THEN
@@ -220,25 +220,25 @@ C
 *  Determine scaling factor for Q data according to fraction of intensity
 *  in the Q dataset
 
-         NEWINT=I1S+I2S            
-         IF (I1S .GT. 0.0) THEN      
-            QFAC=NEWINT/I1S          
-         ELSE                           
-            QFAC=0.0                    
-         ENDIF                          
+         NEWINT=I1S+I2S
+         IF (I1S .GT. 0.0) THEN
+            QFAC=NEWINT/I1S
+         ELSE
+            QFAC=0.0
+         ENDIF
 
 *  Determine scaling factor for U data according to fraction of intensity
 *  in the U dataset
 
-         IF (I2S .GT. 0.0) THEN      
-            UFAC=NEWINT/I2S          
-         ELSE                           
-            UFAC=0.0                    
+         IF (I2S .GT. 0.0) THEN
+            UFAC=NEWINT/I2S
+         ELSE
+            UFAC=0.0
          ENDIF
 
 *  Loop over points scaling all the Stokes parameters according to the
-*  factors just determined. 
-                          
+*  factors just determined.
+
          DO I=1,SIZE
             IF (QS(I) .NE. VAL__BADR) QS(I)=QS(I)*QFAC
             IF (US(I) .NE. VAL__BADR) THEN

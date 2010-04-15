@@ -11,7 +11,7 @@
 
 *  Description:
 *     Find the maximum and minimum values in a double precision array.
- 
+
 *  Invocation:
 *     CALL SCULIB_RANGED( ARRAY, IST, IEN, VMAX, VMIN, STATUS)
 
@@ -58,7 +58,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
 

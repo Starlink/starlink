@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       INTEGER NC                 ! No. of attributes which have changed
       INTEGER ND                 ! No. of non-default attributes
 
-      LOGICAL                    ! Flags indicating which attributes 
+      LOGICAL                    ! Flags indicating which attributes
      :       CDIR,               ! have changed value since the previous
      :       CHGT,               ! text string.
      :       CJUST,
@@ -122,7 +122,7 @@
      :       CFONT,
      :       CPEN
 
-      LOGICAL                    ! Flags indicating which attributes 
+      LOGICAL                    ! Flags indicating which attributes
      :       DDIR,               ! are not at there default settings.
      :       DHGT,
      :       DJUST,
@@ -208,7 +208,7 @@
             CALL MSG_SETR( 'DX', DIRX )
             CALL MSG_SETR( 'DY', DIRY )
             CALL MSG_LOAD( ' ', 'DIRECTION, ^DX, ^DY', BUF, BLEN,
-     :                     STATUS )            
+     :                     STATUS )
             CALL FIO_WRITE( FID, BUF( : MIN( 80, BLEN ) ), STATUS )
          END IF
 
@@ -259,7 +259,7 @@
             CALL MSG_SETR( 'DX', DIRX )
             CALL MSG_SETR( 'DY', DIRY )
             CALL MSG_LOAD( ' ', 'DIRECTION, ^DX, ^DY', BUF, BLEN,
-     :                     STATUS )            
+     :                     STATUS )
             CALL FIO_WRITE( FID, BUF( : MIN( 80, BLEN ) ), STATUS )
          END IF
 
@@ -315,5 +315,5 @@
       SPEN = PEN
 
  999  CONTINUE
-      
+
       END

@@ -6,7 +6,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
 
@@ -17,7 +17,7 @@ extern CupidGC cupidGC;
 
 
 
-double cupidGCModel( int ndim, double *x, double *par, int what, 
+double cupidGCModel( int ndim, double *x, double *par, int what,
                      int newx, int newp, int *status ){
 /*
 *+
@@ -31,7 +31,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidGCModel( int ndim, double *x, double *par, int what, 
+*     double cupidGCModel( int ndim, double *x, double *par, int what,
 *                          int newx, int newp, int *status )
 
 *  Description:
@@ -51,11 +51,11 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *     par
 *        Pointer to an array holding the parameters which define the
 *        model to be evaluated. It is assumed that the supplied values
-*        are usable (e.g. width parameters are not zero, etc). How many of 
-*        these are used depends on the value of "ndim": if "ndim" is 1 only 
-*        elements 0 to 3 are used, if "ndim" is 2 only elements 0 to 6 are 
-*        used, if "ndim" is 3 all elements are used. All axis values are 
-*        represented in GRID pixels: 
+*        are usable (e.g. width parameters are not zero, etc). How many of
+*        these are used depends on the value of "ndim": if "ndim" is 1 only
+*        elements 0 to 3 are used, if "ndim" is 2 only elements 0 to 6 are
+*        used, if "ndim" is 3 all elements are used. All axis values are
+*        represented in GRID pixels:
 *
 *           par[0]: Intrinsic peak intensity of clump ("a0" in Stutski & Gusten)
 *           par[1]: Constant intensity offset ("b0" in Stutski & Gusten)
@@ -66,25 +66,25 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *           par[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
 *                   In rads, positive from +ve GRID1 axis to +ve GRID2 axis.
 *           par[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
-*           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
+*           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski &
 *                                                     Gusten)
-*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
+*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_0"
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
-*           par[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
+*           par[10]: Axis 1 of internal velocity gradient vector ("alpha_1"
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *
 *     what
 *        If negative, then the function value at "x" is returned.
-*        Otherwise, the partial derivative of the model value with 
+*        Otherwise, the partial derivative of the model value with
 *        respect to the parameter "par[what]" is returned.
 *     newx
-*        If zero, it is assumed that "x" is the same as on the previous 
-*        invocation of this function. This causes cached intermediate values 
+*        If zero, it is assumed that "x" is the same as on the previous
+*        invocation of this function. This causes cached intermediate values
 *        to be re-used, thus speeding things up. A non-zero value should
 *        be supplied if "x" is not the saem as on the previous invocation.
 *     newp
-*        If zero, it is assumed that "par" is the same as on the previous 
-*        invocation of this function. This causes cached intermediate values 
+*        If zero, it is assumed that "par" is the same as on the previous
+*        invocation of this function. This causes cached intermediate values
 *        to be re-used, thus speeding things up. A non-zero value should
 *        be supplied if "par" is not the saem as on the previous invocation.
 *     status
@@ -96,7 +96,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *  Notes:
 *     - Stutski & Gusten take account of instrumental smoothing only in so
 *     far as they increase the supplied clump FWHM. This implementation
-*     also reduces the peak value by a corresponding factor, since smoothing 
+*     also reduces the peak value by a corresponding factor, since smoothing
 *     will reduce the peak value in a clump. Thus par[ 0 ] represents the
 *     intrinsic peak value rather than the observed peak value.
 
@@ -168,7 +168,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
-/* If neccessary, re-calculate cached items which depend only on the values 
+/* If neccessary, re-calculate cached items which depend only on the values
    supplied in "par" (i.e. which do not depend on values supplied in "x"). */
    if( newp ) {
 
@@ -179,7 +179,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 /* The peak value factor (thsi takes account of the reduction in peak
    value caused by the instrumental smoothing). */
-      peakfactor_sq = t/dx0_sq;       
+      peakfactor_sq = t/dx0_sq;
 
 /* The rest are only calculated for 2 or 3 dimensions */
       if( ndim > 1 ) {
@@ -190,7 +190,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
          f5 = cupidGC.beam_sq/( par[ 5 ]*dx1_sq );
 
 /* The peak value factor */
-         peakfactor_sq *= t/dx1_sq;       
+         peakfactor_sq *= t/dx1_sq;
 
 /* Trig functions */
          cosv = cos( par[ 6 ] );
@@ -202,9 +202,9 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* The total FWHM in pixels on the velocity axis, squared. */
             t = par[ 8 ]*par[ 8 ];
             dv_sq = cupidGC.velres_sq + t;
-            peakfactor_sq *= t/dv_sq;       
+            peakfactor_sq *= t/dv_sq;
             f8 = cupidGC.velres_sq/( par[ 8 ]*dv_sq );
-         }     
+         }
       }
 
 /* The peak value */
@@ -246,7 +246,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* The rest is only calculated for 3 dimensions */
          if( ndim > 2) {
 
-/* Offset in pixels on the velocity axis of the supplied position from the 
+/* Offset in pixels on the velocity axis of the supplied position from the
    peak. */
             v_off = x[ 2 ] - par[ 7 ];
 
@@ -257,8 +257,8 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* The scalar value passed to the exp() function (excluding a factor of
    -4.ln(2) ) */
             em += vt_off*vt_off/dv_sq;
-     
-         }     
+
+         }
       }
 
 /* The Gaussian term in the model. */
@@ -280,7 +280,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    } else if( what == 1 ) {
       ret = 1.0;
 
-/* For all others, we evaluated the rate of change of "em" with respect to 
+/* For all others, we evaluated the rate of change of "em" with respect to
    the required parameter, and then finally convert this to the rate of
    change of the model value with respect to the required parameter. */
    } else {
@@ -321,18 +321,18 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
             demdp = VAL__BADD;
          }
 
-/* If there is a velocity axis, modify the 2D "demdp" value (if any) 
+/* If there is a velocity axis, modify the 2D "demdp" value (if any)
    appropriately. */
          if( ndim > 2 ) {
             if( what == 2 ) {
                demdp += 2*par[ 9 ]*vt_off/dv_sq;
-      
+
             } else if( what == 4 ) {
                demdp += 2*par[ 10 ]*vt_off/dv_sq;
-      
+
             } else if( what == 7 ) {
                demdp = -2*vt_off/dv_sq;
-      
+
             } else if( what == 8 ) {
                demdp = vt_off/dv_sq;
                demdp = -2*demdp*demdp*par[ 8 ];
@@ -345,10 +345,10 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
             }
          }
-      } 
+      }
 
-/* If we have a value for the rate of change of "em" with respect to the 
-   required parameter, convert it to the rate of change of the model value 
+/* If we have a value for the rate of change of "em" with respect to the
+   required parameter, convert it to the rate of change of the model value
    with respect to the required parameter, or report an error. */
       if( demdp != VAL__BADD ) {
          ret = -K*demdp;
@@ -356,13 +356,13 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* The clump size parameters (3, 5 and 8) affect the peak value of the
    clump because of the effect of instrumental smoothing. Add on
    appropriate terms. */
-         if( what == 3 ) {         
+         if( what == 3 ) {
             ret += f3;
 
-         } else if( what == 5 ) {         
+         } else if( what == 5 ) {
             ret += f5;
 
-         } else if( what == 8 ) {         
+         } else if( what == 8 ) {
             ret += f8;
          }
 
@@ -376,9 +376,9 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
                  "(^W) supplied for \"what\" (internal CUPID programming "
                  "error).", status );
       }
-   } 
+   }
 
 /* Return the required value */
-   return ret;   
+   return ret;
 
 }

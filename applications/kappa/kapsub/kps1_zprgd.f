@@ -103,31 +103,31 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE  'SAE_PAR'         ! Standard ADAM constants
       INCLUDE  'PRM_PAR'         ! PRIMDAT public constants
- 
+
 *  Arguments Given:
       INTEGER
      :  DIM1, DIM2,
      :  LBND( 2 ),
      :  UBND( 2 )
- 
+
       LOGICAL
      :  NOISE
- 
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION
      :  VAR( DIM1, DIM2 ),
      :  ARRAY( DIM1, DIM2 )
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER
      :  RLBND( 2 ),              ! Region lower bound
@@ -137,11 +137,11 @@
      :  FINSHP,                  ! Actual finish position for
                                  ! interpolation
      :  I, J, II, JJ             ! General counter variables
- 
+
       DOUBLE PRECISION
      :  TEMARR,                  ! A column-interpolated array value
      :  TEMVAR                   ! A column-interpolated variance
- 
+
       DOUBLE PRECISION
      :  DELARR,                  ! Increment in data value
      :  DELVAR,                  ! Increment in variance value
@@ -151,7 +151,7 @@
                                  ! line/column
      :  SEPAR                    ! Separation of the interpolation
                                  ! bounds
- 
+
       LOGICAL                    ! True if:
      :  LINES,                   ! Interpolate across lines
      :  SEDGE,                   ! Start pixel for interpolation lies
@@ -161,428 +161,428 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'     ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'     ! NUM definitions for conversions
- 
+
 *.
- 
+
 *    Check the inherited status.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Make sure that the bounds are in the correct order otherwise swap
 *    them.
- 
+
       RLBND( 1 ) = MIN( LBND( 1 ), UBND( 1 ) )
       RLBND( 2 ) = MIN( LBND( 2 ), UBND( 2 ) )
       RUBND( 1 ) = MAX( LBND( 1 ), UBND( 1 ) )
       RUBND( 2 ) = MAX( LBND( 2 ), UBND( 2 ) )
- 
+
 *    Determine if interpolation across lines is required.  See whether
 *    the line bounds span the whole array.
- 
+
       LINES = .NOT. ( RLBND( 2 ) .LE. 1 .OR. RUBND( 2 ) .GE. DIM2 )
- 
+
 *    First interpolate across lines:
 *    ===============================
- 
+
       IF ( LINES ) THEN
          DO  I =  RLBND( 1 ), RUBND( 1 )
- 
+
 *          Initialise STARTM and FINSHP.
- 
+
             STARTM = RLBND( 2 ) - 1
             FINSHP = RUBND( 2 ) + 1
- 
+
 *          See where the interpolation will start from.
- 
+
             SEDGE = .FALSE.
             IF ( STARTM .LE. 1 ) SEDGE = .TRUE.
- 
+
 *          The start position cannot be an invalid pixel.
- 
+
             DO WHILE ( ARRAY( I, STARTM ) .EQ. VAL__BADD .AND.
      :                .NOT. SEDGE )
- 
+
 *             Move start position back and check whether the bottom
 *             edge of the image has been encountered.
- 
+
                STARTM = STARTM - 1
                IF ( STARTM .LT. 1 ) THEN
                   SEDGE = .TRUE.
                   STARTM = 1
                END IF
             END DO
- 
+
 *          See where the interpolation will finish.
- 
+
             FEDGE = .FALSE.
             IF ( FINSHP .LE. 1 ) FEDGE = .TRUE.
- 
+
 *          The finish position cannot be an invalid pixel.
- 
+
             DO WHILE ( ARRAY( I, FINSHP ) .EQ. VAL__BADD .AND.
      :                 .NOT. FEDGE )
- 
+
 *             Move the finish position forwards and check whether the
 *             top edge of the image has been encountered.
- 
+
                FINSHP = FINSHP + 1
                IF ( FINSHP .GT. DIM2 ) THEN
                   FEDGE = .TRUE.
                   FINSHP = DIM2
                END IF
             END DO
- 
+
 *          If the line adjacent to the lines to be substituted is bad
 *          then make all pixels in the specified range bad.  This may
 *          overturned when looking in the other direction.  Note the
 *          variance is unchanged since no new value has been
 *          substituted.
- 
+
             IF ( SEDGE .AND. FEDGE ) THEN
                DO  J = RLBND( 2 ), RUBND( 2 )
                   ARRAY( I, J ) = VAL__BADD
                END DO
- 
+
 *          At the bottom edge of the image.
 *          ================================
- 
+
             ELSE IF ( SEDGE ) THEN
- 
+
                DO  J = RLBND( 2 ), RUBND( 2 )
- 
+
 *                Duplicate the data and variance.
- 
+
                   ARRAY( I, J ) = ARRAY( I, FINSHP )
                   VAR( I, J ) = VAR( I, FINSHP )
- 
+
 *                Add random Normal-distribution noise and bad pixels
 *                may be present.
- 
+
                   IF ( NOISE .AND. VAR( I, J ) .NE. VAL__BADD )
      :              CALL KPG1_NOISD( .TRUE., 1, VAR( I, J ),
      :                                 ARRAY( I, J ), STATUS )
                END DO
- 
+
 *          At the top edge of the image.
 *          =============================
- 
+
             ELSE IF ( FEDGE ) THEN
- 
+
                DO  J = RLBND( 2 ), RUBND( 2 )
- 
+
 *                Duplicate the data and variance.
- 
+
                   ARRAY( I, J ) = ARRAY( I, STARTM )
                   VAR( I, J ) = VAR( I, STARTM )
- 
+
 *                Add random Normal-distribution noise and bad pixels
 *                may be present.
- 
+
                   IF ( NOISE .AND. VAR( I, J ) .NE. VAL__BADD )
      :              CALL KPG1_NOISD( .TRUE., 1, VAR( I, J ),
      :                                 ARRAY( I, J ), STATUS )
                END DO
- 
+
 *          The line bounds are at neither edge of the image.
 *          =================================================
- 
+
             ELSE
- 
+
 *             Find the separation of the bounds.
- 
+
                SEPAR = DBLE( FINSHP - STARTM )
- 
+
 *             Find the intensity step per pixel over the gap.  Note the
 *             lack of factorisation to reduce the risk of an overflow.
- 
+
                DIFARR = ( NUM_DTOD( ARRAY( I, FINSHP ) ) / SEPAR ) -
      :                  ( NUM_DTOD( ARRAY( I, STARTM ) ) / SEPAR )
- 
+
 *             Similarly for the variance.  This is strictly not correct
 *             but should make little difference.
- 
+
                DIFVAR = ( NUM_DTOD( VAR( I, FINSHP ) ) / SEPAR ) -
      :                  ( NUM_DTOD( VAR( I, STARTM ) ) / SEPAR )
- 
+
                DO  J = RLBND( 2 ), RUBND( 2 )
- 
+
 *               Work out how far across the gap we are.
- 
+
                   JJ = J - STARTM
- 
+
 *                Find the shift in value and variance.
- 
+
                   DELARR = DIFARR * DBLE( JJ )
                   DELVAR = DIFVAR * DBLE( JJ )
- 
+
 *                Now add the step per pixel times the number of steps
 *                to the starting value to interpolate into the gap.
- 
+
                   ARRAY( I, J ) = ARRAY( I, STARTM ) +
      :                            NUM_DTOD( DELARR )
                   VAR( I, J ) = VAR( I, STARTM ) + NUM_DTOD( DELVAR )
- 
+
 *                Add random Normal-distribution noise and bad pixels
 *                may be present.
- 
+
                   IF ( NOISE .AND. VAR( I, J ) .NE. VAL__BADD )
      :              CALL KPG1_NOISD( .TRUE., 1, VAR( I, J ),
      :                                 ARRAY( I, J ), STATUS )
                END DO
             END IF
- 
+
 *       End of the loop for the columns.
- 
+
          END DO
- 
+
 *    End of the check for line interpolation.
- 
+
       END IF
- 
+
 *    Now repeat for the columns to be zapped:
 *    ========================================
- 
+
       IF ( .NOT. ( RLBND( 1 ) .LE. 1 .OR. RUBND( 1 ) .GE. DIM1 ) ) THEN
          DO  J = RLBND( 2 ), RUBND( 2 )
- 
+
 *          Initialise STARTM and FINSHP.
- 
+
             STARTM = RLBND( 1 ) - 1
             FINSHP = RUBND( 1 ) + 1
- 
+
 *          See where the interpolation will start from.
- 
+
             SEDGE = .FALSE.
             IF ( STARTM .LE. 1 ) SEDGE = .TRUE.
- 
+
 *          The start position cannot be an invalid pixel.
- 
+
             DO WHILE ( ARRAY( STARTM, J ) .EQ. VAL__BADD .AND.
      :                 .NOT. SEDGE )
- 
+
 *             Move the start position back and check whether the left
 *             edge of the image has been encountered.
- 
+
                STARTM = STARTM - 1
                IF ( STARTM .LT. 1 ) THEN
                   SEDGE = .TRUE.
                   STARTM = 1
                END IF
             END DO
- 
+
 *         See where the interpolation will finish.
- 
+
             FEDGE = .FALSE.
             IF ( FINSHP .LE. 1 ) FEDGE = .TRUE.
- 
+
 *          The finish position cannot be an invalid pixel.
- 
+
             DO WHILE ( ARRAY( FINSHP, J ) .EQ. VAL__BADD .AND.
      :                 .NOT. FEDGE )
- 
+
 *             Move the finish position forwards and check whether the
 *             right edge of the image has been encountered.
- 
+
                FINSHP = FINSHP + 1
                IF ( FINSHP .GT. DIM1 ) THEN
                   FEDGE = .TRUE.
                   FINSHP = DIM1
                END IF
             END DO
- 
+
 *          At the left edge of the image.
 *          ==============================
- 
+
             IF ( SEDGE ) THEN
- 
+
                DO  I = RLBND( 1 ), RUBND( 1 )
- 
+
 *                Duplicate the data so that the average of the two
 *                possible interpolations may be evaluated.
- 
+
                   TEMARR = ARRAY( STARTM, J )
                   TEMVAR = VAR( STARTM, J )
- 
+
 *                Add random Normal-distribution noise and bad pixels
 *                may be present.
- 
+
                   IF ( NOISE .AND. TEMVAR .NE. VAL__BADD )
      :              CALL KPG1_NOISD( .TRUE., 1, TEMVAR, TEMARR,
      :                                 STATUS )
- 
+
 *                If the interpolation across lines gave an undefined
 *                result or never happened, just use the value from
 *                interpolation across columns.
- 
+
                   IF ( ARRAY( I, J ) .EQ. VAL__BADD .OR.
      :                 .NOT. LINES ) THEN
                      ARRAY( I, J ) = TEMARR
- 
+
 *                Otherwise average the two interpolations.  Lack of
 *                factorisation is to prevent overflows.
- 
+
                   ELSE
                      ARRAY( I, J ) = ( TEMARR / 2.0D0 ) +
      :                               ( ARRAY( I, J ) / 2.0D0 )
                   END IF
- 
+
 *                Repeat for the variance.
- 
+
                   IF ( ARRAY( I, J ) .EQ. VAL__BADD .OR.
      :                 .NOT. LINES ) THEN
                      VAR( I, J ) = TEMVAR
- 
+
 *                Otherwise average the two interpolations.  Lack of
 *                factorisation is to prevent overflows.
- 
+
                   ELSE
                      VAR( I, J ) = ( TEMVAR / 2.0D0 ) +
      :                             ( VAR( I, J ) / 2.0D0 )
                   END IF
                END DO
- 
+
 *          At the right edge of the image.
 *          ===============================
- 
+
             ELSE IF ( FEDGE ) THEN
- 
+
                DO  I = RLBND( 1 ), RUBND( 1 )
- 
+
 *                Duplicate the data so that the average of the two
 *                possible interpolations may be evaluated.
- 
+
                   TEMARR = ARRAY( FINSHP, J )
                   TEMVAR = VAR( FINSHP, J )
- 
+
 *                Add random Normal-distribution noise and bad pixels
 *                may be present.
- 
+
                   IF ( NOISE .AND. TEMVAR .NE. VAL__BADD )
      :              CALL KPG1_NOISD( .TRUE., 1, TEMVAR, TEMARR,
      :                                 STATUS )
- 
+
 *                If the interpolation across lines gave an undefined
 *                result or never happened, just use the value from
 *                interpolation across columns.
- 
+
                   IF ( ARRAY( I, J ) .EQ. VAL__BADD .OR.
      :                 .NOT. LINES ) THEN
                      ARRAY( I, J ) = TEMARR
- 
+
 *                Otherwise average the two interpolations.  Lack of
 *                factorisation is to prevent overflows.
- 
+
                   ELSE
                      ARRAY( I, J ) = ( TEMARR / 2.0D0 ) +
      :                               ( ARRAY( I, J ) / 2.0D0 )
                   END IF
- 
+
 *                Repeat for the variance.
- 
+
                   IF ( ARRAY( I, J ) .EQ. VAL__BADD .OR.
      :                 .NOT. LINES ) THEN
                      VAR( I, J ) = TEMVAR
- 
+
 *                Otherwise average the two interpolations.  Lack of
 *                factorisation is to prevent overflows.
- 
+
                   ELSE
                      VAR( I, J ) = ( TEMVAR / 2.0D0 ) +
      :                             ( VAR( I, J ) / 2.0D0 )
                   END IF
                END DO
- 
+
 *          The column bounds are at neither edge of the image.
 *          ===================================================
- 
+
 *          If the column adjacent to the bad columns is bad there is no
 *          need to make all pixels in the specified range bad because
 *          the line interpolation may have produced defined values.
- 
+
             ELSE IF ( .NOT. ( SEDGE .AND. FEDGE ) ) THEN
- 
+
 *             So no edge effects to worry about.
- 
+
 *             Find the separation of the bounds.
- 
+
                SEPAR = DBLE( FINSHP - STARTM )
- 
+
 *             Find the intensity step per pixel over the gap.  Note the
 *             lack of factorisation to reduce the risk of an overflow.
- 
+
                DIFARR = ( NUM_DTOD( ARRAY( FINSHP, J ) ) / SEPAR ) -
      :                  ( NUM_DTOD( ARRAY( STARTM, J ) ) / SEPAR )
- 
+
 *             Similarly for the variance.  This is strictly not correct
 *             but should make little difference.
- 
+
                DIFVAR = ( NUM_DTOD( VAR( FINSHP, J ) ) / SEPAR ) -
      :                  ( NUM_DTOD( VAR( STARTM, J ) ) / SEPAR )
- 
+
                DO  I = RLBND( 1 ), RUBND( 1 )
- 
+
 *               Work out how far across the gap we are.
- 
+
                   II = I - STARTM
- 
+
 *                Find the shift in value and variance.
- 
+
                   DELARR = DIFARR * DBLE( II )
                   DELVAR = DIFVAR * DBLE( II )
- 
+
 *                Now add the step per pixel times the number of steps
 *                to the starting value to interpolate into the gap.
- 
+
                   TEMARR = ARRAY( STARTM, J ) + NUM_DTOD( DELARR )
                   TEMVAR = VAR( STARTM, J ) + NUM_DTOD( DELVAR )
- 
+
 *                Add random Normal-distribution noise and bad pixels
 *                may be present.
- 
+
                   IF ( NOISE .AND. TEMVAR .NE. VAL__BADD )
      :              CALL KPG1_NOISD( .TRUE., 1, TEMVAR, TEMARR,
      :                                 STATUS )
- 
+
 *                If the interpolation across lines gave an undefined
 *                result or never happened, just use the value from
 *                interpolation across columns.
- 
+
                   IF ( ARRAY( I, J ) .EQ. VAL__BADD .OR.
      :                 .NOT. LINES ) THEN
                      ARRAY( I, J ) = TEMARR
- 
+
 *                Otherwise average the two interpolations.  Lack of
 *                factorisation is to prevent overflows.
- 
+
                   ELSE
                      ARRAY( I, J ) = ( TEMARR / 2.0D0 ) +
      :                               ( ARRAY( I, J ) / 2.0D0 )
                   END IF
- 
+
 *                Repeat for the variance.
- 
+
                   IF ( ARRAY( I, J ) .EQ. VAL__BADD .OR.
      :                 .NOT. LINES ) THEN
                      VAR( I, J ) = TEMVAR
- 
+
 *                Otherwise average the two interpolations.  Lack of
 *                factorisation is to prevent overflows.
- 
+
                   ELSE
                      VAR( I, J ) = ( TEMVAR / 2.0D0 ) +
      :                             ( VAR( I, J ) / 2.0D0 )
                   END IF
                END DO
             END IF
- 
+
 *       End of the loop for the lines.
- 
+
          END DO
- 
+
 *    End of the check for column interpolation.
- 
+
       END IF
- 
+
 *    End and return
- 
+
       END

@@ -1026,7 +1026,7 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
 }
 
 
-int 
+int
 dat1_cvt_char(bad, nval, imp, exp, nbad)
 
 /*+

@@ -13,7 +13,7 @@
       call testn ('99   ')
       call testn ('   10  ')
       call testn (' 1 2 3 4 5 6 7 8 9 10 ')
-      
+
       call testc ('adjust')
       call testc ('disable')
       call testc ('help')
@@ -50,7 +50,7 @@
       call testc ('    ')
 
       end
-      
+
       subroutine testn (str)
 
       implicit none
@@ -61,12 +61,12 @@
 
       option = 0
       suboption = 0
-      
+
       call ech_parse_option (str, tok, option, suboption)
       write (*, '(a25," -> ",a1,":",2i4)'), str, tok, option, suboption
-      
+
       end
-      
+
       subroutine testc (str)
 
       implicit none
@@ -77,6 +77,6 @@
 
       call ech_parse_option (str, tok, option, suboption)
       write (*, '(a25," -> ",a1)'), str, tok
-      
+
       end
-      
+

@@ -1,4 +1,4 @@
-      SUBROUTINE PGEXTR( ID0, ID1, ID2, RDOWN, RUP, DDOWN, DUP, MDOWN, 
+      SUBROUTINE PGEXTR( ID0, ID1, ID2, RDOWN, RUP, DDOWN, DUP, MDOWN,
      :                   MUP, STATUS )
 *+
 *  Name:
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

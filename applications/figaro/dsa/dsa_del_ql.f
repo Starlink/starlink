@@ -1,5 +1,5 @@
 C+
-C                     D S A _ D E L E T E _ Q U A L I T Y 
+C                     D S A _ D E L E T E _ Q U A L I T Y
 C
 C  Routine name:
 C     DSA_DELETE_QUALITY
@@ -10,8 +10,8 @@ C
 C  Description:
 C     This routine completely removes the quality information structure
 C     (which may be a simple array or a structure, depending on the data
-C     data format) from a specified data structure. If the structure 
-C     does not contain a quality information structure, then this 
+C     data format) from a specified data structure. If the structure
+C     does not contain a quality information structure, then this
 C     routine does nothing. The quality array should not be mapped
 C     when this routine is called, and nor should the main data array.
 C     Note that this routine does no processing of the data - it merely
@@ -26,7 +26,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
@@ -84,7 +84,7 @@ C
       INTEGER   LENGTH                      ! Object name length
       CHARACTER OBJ_NAME*64                 ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     Return immediately on bad status
 C
@@ -96,7 +96,7 @@ C
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
 C     Look up the reference name in the tables.
-C          
+C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
 C
 C     Make sure the various arrays are not still mapped.
@@ -118,5 +118,5 @@ C
 C     Exit
 C
   500 CONTINUE
-C     
+C
       END

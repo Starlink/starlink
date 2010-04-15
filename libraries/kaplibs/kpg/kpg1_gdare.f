@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -202,15 +202,15 @@
             XRANGE = ( Y2 - Y1 ) * ASPECT
 
 *  Adjust the upper and/or lower X bound, depending on the justification.
-            IF( JUST( 2:2 ) .EQ. 'L' .OR. 
+            IF( JUST( 2:2 ) .EQ. 'L' .OR.
      :          JUST( 2:2 ) .EQ. 'l' ) THEN
                X2 = X1 + XRANGE
 
-            ELSE IF( JUST( 2:2 ) .EQ. 'R' .OR. 
+            ELSE IF( JUST( 2:2 ) .EQ. 'R' .OR.
      :               JUST( 2:2 ) .EQ. 'r' ) THEN
                X1 = X2 - XRANGE
 
-            ELSE 
+            ELSE
                XCEN = 0.5*( X1 + X2 )
                X1 = XCEN - 0.5 * XRANGE
                X2 = XCEN + 0.5 * XRANGE
@@ -224,15 +224,15 @@
             YRANGE = ( X2 - X1 ) / ASPECT
 
 *  Adjust the upper and/or lower Y bound, depending on the justification.
-            IF( JUST( 1:1 ) .EQ. 'B' .OR. 
+            IF( JUST( 1:1 ) .EQ. 'B' .OR.
      :          JUST( 1:1 ) .EQ. 'b' ) THEN
                Y2 = Y1 + YRANGE
 
-            ELSE IF( JUST( 1:1 ) .EQ. 'T' .OR. 
+            ELSE IF( JUST( 1:1 ) .EQ. 'T' .OR.
      :               JUST( 1:1 ) .EQ. 't' ) THEN
                Y1 = Y2 - YRANGE
 
-            ELSE 
+            ELSE
                YCEN = 0.5*( Y1 + Y2 )
                Y1 = YCEN - 0.5 * YRANGE
                Y2 = YCEN + 0.5 * YRANGE

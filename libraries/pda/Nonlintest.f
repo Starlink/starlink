@@ -24,7 +24,7 @@ C
 C
       LWA = 75
       NPRINT = 0
-C     
+C
 C     Set TOL to the square root of the machine precision.
 C     Unless high precision solutions are required,
 C     this is the recommended setting.
@@ -71,11 +71,11 @@ C     that is, if the user does not calculate the Jacobian.
      :     Y(9),Y(10),Y(11),Y(12),Y(13),Y(14),Y(15)
      :     /1.4E-1,1.8E-1,2.2E-1,2.5E-1,2.9E-1,3.2E-1,3.5E-1,3.9E-1,
      :     3.7E-1,5.8E-1,7.3E-1,9.6E-1,1.34E0,2.1E0,4.39E0/
-C     
+C
       IF (IFLAG .NE. 0) GO TO 5
-C     
+C
 C     Insert print statements here when NPRINT is positive.
-C     
+C
       RETURN
     5 CONTINUE
       DO 10 I = 1, M
@@ -87,7 +87,7 @@ C
  10   CONTINUE
       RETURN
       END
-      
+
       SUBROUTINE FCN2(IFLAG,M,N,X,FVEC,FJAC,LDFJAC)
 C
 C     This is the form of the FCN routine if IOPT=2,

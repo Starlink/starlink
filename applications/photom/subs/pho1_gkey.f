@@ -14,14 +14,14 @@
 
 *  Description:
 *     This routine searches a buffer containing the header card images
-*     from a FITS extension for a keyword NAME; and returns its value, 
-*     and the number of the card image within the buffer array that 
-*     contains the named keyword.  The search ends when the next end 
-*     of a header block, marked by the END keyword, is encountered 
-*     or the buffer is exhausted.  If the keyword is present THERE 
-*     is true, otherwise it is false. An error status will be returned 
-*     if the conversion to floating point fails. If a keyword is not 
-*     found then no error results and the argument VALUE remains 
+*     from a FITS extension for a keyword NAME; and returns its value,
+*     and the number of the card image within the buffer array that
+*     contains the named keyword.  The search ends when the next end
+*     of a header block, marked by the END keyword, is encountered
+*     or the buffer is exhausted.  If the keyword is present THERE
+*     is true, otherwise it is false. An error status will be returned
+*     if the conversion to floating point fails. If a keyword is not
+*     found then no error results and the argument VALUE remains
 *     unmodified.
 
 *  Arguments:

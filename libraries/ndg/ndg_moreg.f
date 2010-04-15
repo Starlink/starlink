@@ -14,9 +14,9 @@
 
 *  Description:
 *     Each extension within the supplied NDF is searched to see if it
-*     contains any NDFs. The paths to any such NDFs are appended to the 
-*     end of the supplied group (a new group is created if none is 
-*     supplied). NDF identifiers for particular members of the group can 
+*     contains any NDFs. The paths to any such NDFs are appended to the
+*     end of the supplied group (a new group is created if none is
+*     supplied). NDF identifiers for particular members of the group can
 *     be obtained using NDG_NDFAS.
 
 *  Arguments:
@@ -33,19 +33,19 @@
 
 *  Notes:
 *     -  The NDFs within the returned group are ordered by increasing
-*     depth within the supplied NDF. That is, if integer J is larger than 
+*     depth within the supplied NDF. That is, if integer J is larger than
 *     integer I, then the NDF stored at index I may contain the NDF
-*     stored at index J, but the reverse will never be true (i.e. the NDF 
+*     stored at index J, but the reverse will never be true (i.e. the NDF
 *     stored at index J will never contain the NDF stored at index I).
-*     -  Each element in the returned group contains a full specification 
+*     -  Each element in the returned group contains a full specification
 *     for an NDF. Several other groups are created by this routine, and
 *     are associated with the returned group by means of a GRP "owner-slave"
 *     relationship. These supplemental groups are automatically deleted
 *     when the returned group is deleted using GRP_DELET. The returned
-*     group should not be altered using GRP directly because corresponding 
+*     group should not be altered using GRP directly because corresponding
 *     changes may need to be made to the supplemental groups. Routines
 *     NDG_SETSZ, NDG_GTSUP and NDG_PTSUP are provided to manipulate the
-*     entire chain of groups. The full chain (starting from the head) is 
+*     entire chain of groups. The full chain (starting from the head) is
 *     as follows:
 *
 *        - NDF slice specifications
@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -104,7 +104,7 @@
 
 *  Arguments Given and Returned:
       INTEGER   IGRP
-      
+
 *  Arguments Returned:
       INTEGER   SIZE
 
@@ -222,7 +222,7 @@
       DO I = 1, NEXTN
 
 *  Get the name of the current NDF extension.
-         CALL NDF_XNAME( INDF, I, XNAME, STATUS )  
+         CALL NDF_XNAME( INDF, I, XNAME, STATUS )
 
 *  Get a locator for the extension.
          CALL NDF_XLOC( INDF, XNAME, 'READ', XLOC, STATUS )
@@ -231,11 +231,11 @@
          CALL DAT_STRUC( XLOC, STRUCT, STATUS )
          IF( STRUCT ) THEN
 
-*  Search the structure recursively for NDFs, adding paths for any found 
+*  Search the structure recursively for NDFs, adding paths for any found
 *  to the group. The NDFs are stored in order of increasing depth within
 *  the supplied NDF.
-            CALL NDG1_SDFEX( IGRP, .TRUE., IGRPD, IGRPB, IGRPT, IGRPH, 
-     :                       IGRPS, XLOC, DIR, NAM, TYP, SEC, FOUND, 
+            CALL NDG1_SDFEX( IGRP, .TRUE., IGRPD, IGRPB, IGRPT, IGRPH,
+     :                       IGRPS, XLOC, DIR, NAM, TYP, SEC, FOUND,
      :                       STATUS )
 
          END IF
@@ -244,8 +244,8 @@
          CALL DAT_ANNUL( XLOC, STATUS )
       END DO
 
-*  Update the SIZE argument to take account of the new group members 
-*  produced above. This needs to happen even if an error has been 
+*  Update the SIZE argument to take account of the new group members
+*  produced above. This needs to happen even if an error has been
 *  reported, so do it in a new error reporting context.
       CALL ERR_BEGIN( STATUS )
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
@@ -265,7 +265,7 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'N', INDF )
          CALL ERR_REP( 'NDG_MOREG_ERR2', 'Error searching for '//
-     :                 'extension NDFs contained within ''^N''.', 
+     :                 'extension NDFs contained within ''^N''.',
      :                 STATUS )
       END IF
 

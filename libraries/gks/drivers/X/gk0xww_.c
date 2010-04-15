@@ -86,10 +86,10 @@ f77_integer gk0xww_(function, key)
     };
 
   static char			/* Default cursor */
-    gks_cursor[] = 
+    gks_cursor[] =
     {
       WWXOR, 0, 0, 0, 0,
-      0, 16, 0, 16, 
+      0, 16, 0, 16,
       0377, 0200, 0377,    0, 0376,    0, 0374,    0,
       0376,    0, 0377,    0, 0357, 0200, 0307, 0300,
       0203, 0340,   01, 0360,    0, 0370,    0, 0174,
@@ -132,14 +132,14 @@ f77_integer gk0xww_(function, key)
     fbheight,			/* Height of window frame */
     wwborderwidth = 2;		/* Border width ww sets all windows with */
 
-  char   
+  char
     *fgets(),			/* For reading lines from the options file */
     *sprintf(),			/* For creating option_tag from KCID(KWKIX) */
     *getenv(),			/* To obtain value of option_tag,  if any */
     option_tag[7],		/* Option environment variable name */
     *option_file,		/* For the return value from getenv() */
     option_entry[81];		/* For lines from the option file */
-  
+
 
   if(*function == ICREAT)
   {
@@ -159,17 +159,17 @@ f77_integer gk0xww_(function, key)
 
       fbwidth = DisplayWidth(display, screen);
       fbheight = DisplayHeight(display, screen);
-    
+
       /*
        * Check that the workstation can be supported if it's a colour type.
-       * Monochrome workstations can always be opened. 
+       * Monochrome workstations can always be opened.
        */
 
       if(gkywdt_.kpci[wsid] > 2)
 	colour_fb = ( 1<<DisplayPlanes(display,screen)> 2);
-      
+
       if(needsclosing) XCloseDisplay(display);
-      
+
       if(gkywdt_.kpci[wsid] == 2 || (gkywdt_.kpci[wsid] > 2 && colour_fb))
       {
 	/*
@@ -254,7 +254,7 @@ f77_integer gk0xww_(function, key)
 	   * and reset as appropriate.  dd is initialised by the first call
 	   * to gk0xwwxget(),  so this is only done once dd is valid.
 	   */
-	  
+
 	  if(dd != (wwstate *)0)
 	    if(gkywdt_.kpci[wsid] > 2)
 	      dd->d_colours = 256;
@@ -346,7 +346,7 @@ f77_integer gk0xww_(function, key)
     ddbm = ddwin->w_bm;
   }
   else if(*function == IDELET)
-  { 
+  {
     /* Free window and collapse ww default pointers */
 
     gk0xwwfree(windows[*key]);

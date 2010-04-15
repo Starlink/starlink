@@ -1,15 +1,15 @@
 *+  CRED4_EXTRACT_SPC - Extracts a spectrum
-      SUBROUTINE CRED4_EXTRACT_SPC( INPUT, OUTPUT1, OUTPUT2, ASK, WAIT, 
-     :  LEXTRACTED, STATUS ) 
+      SUBROUTINE CRED4_EXTRACT_SPC( INPUT, OUTPUT1, OUTPUT2, ASK, WAIT,
+     :  LEXTRACTED, STATUS )
 *    Description :
-*     This routine instructs the RED4 task to extract a spectrum from an RG 
+*     This routine instructs the RED4 task to extract a spectrum from an RG
 *    Invocation :
-*     CALL CRED4_EXTRACT_SPC( INPUT, OUTPUT, ASK, WAIT, LEXTRACTED, STATUS ) 
+*     CALL CRED4_EXTRACT_SPC( INPUT, OUTPUT, ASK, WAIT, LEXTRACTED, STATUS )
 *    Parameters :
 *     INPUT     = CHARACTER*(*)( READ )
 *           The name of the reduced group to be polynomial fitted
 *     OUTPUT1   = CHARACTER*(*)( READ )
-*           The name of the resultant spectrum 
+*           The name of the resultant spectrum
 *     OUTPUT2   = CHARACTER*(*)( READ )
 *           The name of the resultant spectral image.
 *     ASK       = LOGICAL( READ )
@@ -72,7 +72,7 @@
       CALL MSG_SETC( 'INPUT', INPUT )
       CALL MSG_SETC( 'OUTPUT1', OUTPUT1 )
       CALL MSG_SETC( 'OUTPUT2', OUTPUT2 )
-      CALL MSG_OUT ( ' ', 
+      CALL MSG_OUT ( ' ',
      :  'Extracting spectrum from ^INPUT to '/
      :  /'^OUTPUT1 and ^OUTPUT2', STATUS )
 
@@ -95,7 +95,7 @@
 
             CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID, OUTVAL, STATUS )
 
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -166,7 +166,7 @@
          CALL TASK_OBEY( RED4_ALIAS, 'NODEXTRACT4', INVAL(1:CPOS),
      :      OUTVAL, RED4_PATH, RED4_MESSID, STATUS)
 
-*      Check that the action started OK, 
+*      Check that the action started OK,
          IF ( STATUS .NE. DTASK__ACTSTART ) THEN
 
             ERR_STATUS = STATUS
@@ -187,7 +187,7 @@
                CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :            OUTVAL, STATUS)
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN

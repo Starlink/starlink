@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASAGD( THIS, NPOINT, NCOORD_IN, INDIM, IN, 
+      SUBROUTINE KPG1_ASAGD( THIS, NPOINT, NCOORD_IN, INDIM, IN,
      :                       FORWARD, NCOORD_OUT, OUTDIM, OUT, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASAGD( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD, 
+*     CALL KPG1_ASAGD( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
 *                      NCOORD_OUT, OUTDIM, OUT, STATUS )
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *     This routine transforms AGI world co-ordinates to AGI data co-ordinates
 *     using the TRANSFORM structure associated with the current AGI
 *     picture. It is intended for use as a transformation routine by an
-*     AST IntraMap. 
+*     AST IntraMap.
 
 *  Arguments:
 *     THIS = INTEGER (Given)
@@ -45,7 +45,7 @@
 *        value of coordinate number COORD for input point number POINT
 *        is found in element IN(POINT,COORD).
 *     FORWARD = LOGICAL (Given)
-*        A .TRUE. value indicates that the forward coordinate transformation 
+*        A .TRUE. value indicates that the forward coordinate transformation
 *        is to be applied (from WORLD to DATA co-ordinates), while a .FALSE.
 *        value indicates that the inverse transformation should be used.
 *     NCOORD_OUT = INTEGER (Given)
@@ -66,9 +66,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes: 
-*     -  Bad input co-ordinates will be set to AST__BAD, but TRANSFORM uses 
-*     VAL__BADD to mark bad values. We assume here that VAL__BADD and 
+*  Notes:
+*     -  Bad input co-ordinates will be set to AST__BAD, but TRANSFORM uses
+*     VAL__BADD to mark bad values. We assume here that VAL__BADD and
 *     AST__BAD are the same.
 
 *  Copyright:
@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -134,10 +134,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Attempt to get the AGI identifier for the current picture.
-      CALL AGI_ICURP( IPIC, STATUS )      
+      CALL AGI_ICURP( IPIC, STATUS )
 
 *  If this failed, annul the error and report a more appropriate error.
-      IF( STATUS .NE. SAI__OK ) THEN 
+      IF( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_ASAGD_ERR', 'The mapping to the '//
      :                 'requested co-ordinate Frame uses information '//
@@ -145,19 +145,19 @@
      :                 'database.', STATUS )
          CALL ERR_REP( 'KPG1_ASAGD_ERR', 'This application does not '//
      :                 'have any graphics capabilities and so the '//
-     :                 'requested co-ordinate Frame cannot be used.', 
+     :                 'requested co-ordinate Frame cannot be used.',
      :                 STATUS )
       END IF
 
-*  Forward transformation. 
+*  Forward transformation.
       IF ( FORWARD ) THEN
-         CALL AGI_TWTDD( -1, NPOINT, IN( 1, 1 ), IN( 1, 2 ), 
-     :                   OUT( 1, 1 ), OUT( 1, 2 ), STATUS ) 
+         CALL AGI_TWTDD( -1, NPOINT, IN( 1, 1 ), IN( 1, 2 ),
+     :                   OUT( 1, 1 ), OUT( 1, 2 ), STATUS )
 
 *  Inverse transformation.
       ELSE
-         CALL AGI_TDDTW( -1, NPOINT, IN( 1, 1 ), IN( 1, 2 ), 
-     :                   OUT( 1, 1 ), OUT( 1, 2 ), STATUS ) 
+         CALL AGI_TDDTW( -1, NPOINT, IN( 1, 1 ), IN( 1, 2 ),
+     :                   OUT( 1, 1 ), OUT( 1, 2 ), STATUS )
       ENDIF
 
       END

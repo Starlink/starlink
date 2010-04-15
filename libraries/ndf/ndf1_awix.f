@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -151,7 +151,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -176,7 +176,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWIB',
      :                                            STATUS )
@@ -257,7 +257,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -315,7 +315,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -340,7 +340,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWIUB',
      :                                            STATUS )
@@ -421,7 +421,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -479,7 +479,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -504,7 +504,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWID',
      :                                            STATUS )
@@ -585,7 +585,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -643,7 +643,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -668,7 +668,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWII',
      :                                            STATUS )
@@ -749,7 +749,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -807,7 +807,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -832,7 +832,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWIR',
      :                                            STATUS )
@@ -913,7 +913,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -971,7 +971,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -996,7 +996,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWIW',
      :                                            STATUS )
@@ -1077,7 +1077,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1135,7 +1135,7 @@
          ELSE
             W = 1.0D0
          END IF
-            
+
 *  Ensure the result is positive.  If it can be stored without
 *  overflow, then assign it to the width array.
          IF ( W .LT. 0.0D0 ) W = - W
@@ -1160,7 +1160,7 @@
             END IF
          END IF
  1    CONTINUE
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWIUW',
      :                                            STATUS )

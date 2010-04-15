@@ -1,5 +1,5 @@
-      SUBROUTINE JCMT_RENKACLINE_REGRID (NPIX, ZIN, FBAD, X, Y, 
-     :   ZINCOPY, XCOPY, YCOPY, TRIANG, GRADS, NI, NJ, ICEN, JCEN, 
+      SUBROUTINE JCMT_RENKACLINE_REGRID (NPIX, ZIN, FBAD, X, Y,
+     :   ZINCOPY, XCOPY, YCOPY, TRIANG, GRADS, NI, NJ, ICEN, JCEN,
      :   XINC, YINC, XCEN, YCEN, ZOUT, STATUS)
 *+
 *  Name:
@@ -13,23 +13,23 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_RENKACLINE_REGRID (NPIX, ZIN, FBAD, X, Y, 
-*    :   ZINCOPY, XCOPY, YCOPY, TRIANG, GRADS, NI, NJ, ICEN, JCEN, 
+*     CALL JCMT_RENKACLINE_REGRID (NPIX, ZIN, FBAD, X, Y,
+*    :   ZINCOPY, XCOPY, YCOPY, TRIANG, GRADS, NI, NJ, ICEN, JCEN,
 *    :   XINC, YINC, XCEN, YCEN, ZOUT, STATUS)
 
 *  Description:
 *     This routine will regrid irregularly sampled data points onto a
 *     regular grid. The input data points do not need to be in any
-*     particular order. 
+*     particular order.
 *
 *     The method of resampling is to call the NAG routine E01SAF to generate
 *     a 2-d surface interpolating the scattered input data points, using the
 *     method of Renka and Cline. The constructed surface is continuous and has
 *     continuous first derivatives. The NAG routine E01SBF is then used to
 *     calculate the values of the interpolated surface at the positions
-*     required in the output mesh. 
+*     required in the output mesh.
 *
-*     Input pixels that are bad are ignored. Output pixels that are further 
+*     Input pixels that are bad are ignored. Output pixels that are further
 *     than 1 output pixel spacing from any input pixel are set bad, as are
 *     any that would have to be calculated by extrapolating the interpolated
 *     surface.
@@ -82,13 +82,13 @@
 *       8-OCT-1991 (REVAD::JFL): Bug fixed locating nearest output pixels
 *                                to input pixels
 *      11-NOV-1991 (REVAD::JFL): MAJOR bug fixed, RA offsets now corrected
-*                                for cos(dec) effect. 
+*                                for cos(dec) effect.
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -138,7 +138,7 @@
       DOUBLE PRECISION XX, YY                    ! co-ords of give output pixel
       DOUBLE PRECISION ZZ                        ! interpolated value of output
                                                  ! pixel
-      
+
 *   local data
 *.
 
@@ -234,7 +234,7 @@
                IF (ZOUT(IOUT,JOUT) .NE. FBAD) THEN
                   XX = DBLE(IOUT-ICEN) * XINC
                   IFAIL = 1
-*                  CALL E01SBF (PIX, XCOPY, YCOPY, ZINCOPY, TRIANG, 
+*                  CALL E01SBF (PIX, XCOPY, YCOPY, ZINCOPY, TRIANG,
 *     :               GRADS, XX, YY, ZZ, IFAIL)
                   IF (IFAIL .EQ. 0) THEN
                      ZOUT (IOUT, JOUT) = REAL(ZZ)

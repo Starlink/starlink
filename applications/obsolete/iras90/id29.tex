@@ -27,7 +27,7 @@
 % Add any \newcommand or \newenvironment commands here
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}} 
+\newcommand{\dgs}{\hbox{$^\circ$}}
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 % A kind of list item, like description, but with an easily adjustable
@@ -69,12 +69,12 @@ RUTHERFORD APPLETON LABORATORY\\
 \setlength{\parskip}{\medskipamount} \markright{\stardocname}
 \vspace{1cm}
 
-The {\small COLTEMP} application produces a colour temperature map and an 
+The {\small COLTEMP} application produces a colour temperature map and an
 optical depth map from two input surface brightness images in different
 wavebands. Temperatures in the range 10 $K$ to 10000 $K$ can be handled.
 
-The {\small COLCORR} application produces a colour corrected surface brightness 
-image from a temperature image and an optical depth image (previously produced 
+The {\small COLCORR} application produces a colour corrected surface brightness
+image from a temperature image and an optical depth image (previously produced
 by {\small COLTEMP}).
 
 \section{The Planck Function}
@@ -82,7 +82,7 @@ by {\small COLTEMP}).
 The intensity of radiation emitted by a blackbody in
 $erg.sec^{-1}.cm^{-2}.ster^{-1}.Hz^{-1}$ as a function of frequency $\nu$ (in
 $Hz$) and temperature $T$ (in $Kelvin$) is given by the Planck function
-$B(\nu,T)$: 
+$B(\nu,T)$:
 
 \begin{equation}
 \label{EQ:BB}
@@ -91,19 +91,19 @@ B( \nu, T ) = \frac{2h\nu^{3}/c^{2}}{e^{h\nu/kT}-1}
 
 where $h$ is Planck's constant ($6.626\times 10^{-27} erg.sec$), $k$ is
 Boltzmann's constant ($1.381\times 10^{-16} erg.deg^{-1}$) and $c$ is the
-velocity of light ($2.9979\times 10^{10} cm.sec^{-1}$). 
+velocity of light ($2.9979\times 10^{10} cm.sec^{-1}$).
 
 If the source is at a distance $D$ from a detector with area $A$, then the flux
 density emitted into a solid angle of $A/D^{2}$ steradians is collected by the
 detector. If the emitting area of the blackbody is $\sigma$, this flux density
 (in ergs per second per Hertz per square centimetre of collecting surface) is
-$f(\nu,T)$ where 
+$f(\nu,T)$ where
 
 \begin{eqnarray*}
 f( \nu, T ) = \frac{B( \nu, T ).\sigma.A/D^{2}}{A}
 \end{eqnarray*}
 
-which is just 
+which is just
 
 \begin{eqnarray*}
 f( \nu, T ) = B( \nu, T ).\sigma/D^{2}
@@ -112,7 +112,7 @@ f( \nu, T ) = B( \nu, T ).\sigma/D^{2}
 The solid angle of the source as seen from the detector is $\sigma/D^{2}$ and so
 the surface brightness of the source as seen at the detector is just equal to
 the Planck function $B(\nu,T)$. To obtain the surface brightness in units of
-$Jy/ster$, the Planck function is multiplied by a factor of $10^{29}$. 
+$Jy/ster$, the Planck function is multiplied by a factor of $10^{29}$.
 If $\nu$ is specified in the more convenient units of $10^{12}$ $Hz$, then
 equation \ref{EQ:BB} can be written as:
 
@@ -128,7 +128,7 @@ C_{1} & = & 10^{29}.2h.10^{36}/c^{2}\\
       & = & 1.474508 \times 10^{18}
 \end{eqnarray*}
 
-and 
+and
 
 \begin{eqnarray*}
 C_{2} & = & 10^{12}.h/k\\
@@ -141,13 +141,13 @@ emits $1.9 \times 10^{19}$ $Jy/ster$ at a wavelength of 50 $\mu$m (= $5.9958
 \times 10^{12}$ $Hz$). Dealing with such large numbers can introduce
 computational errors, and so {\small COLTEMP} works with flux densities in units
 of $10^{18}$ $Jy$ (an ``Exa-Jansky'', $EJy$). The constant $C_{1}$ then takes
-the value $1.474508$. 
+the value $1.474508$.
 
 The Planck function as described by equation \ref{EQ:BB3} can become difficult
 to compute if the term $C_{2}.\nu/T$ becomes too large (the exponential can
 result in over-flow), and in these cases ($C_{2}.\nu/T>20$) the following
 approximation is used (based on the fact that the $-1$ term in the denominator
-is insignificant with respect to the exponential term and so can be ignored): 
+is insignificant with respect to the exponential term and so can be ignored):
 
 \begin{equation}
 B( \nu, T ) = C_{1}.\nu^{3}.e^{-C_{2}.\nu/T}
@@ -159,7 +159,7 @@ The only source spectrum supported by {\small COLTEMP} at the moment is a
 by each elemental volume is considered to have a blackbody spectrum, but which
 then suffers extinction as it passes through the rest of the dust cloud, the
 extinction varying at different frequencies. The surface brightness received by
-the detector from such a cloud is $f( \nu, T )$, where: 
+the detector from such a cloud is $f( \nu, T )$, where:
 
 \begin{equation}
 \label{EQ:FD}
@@ -173,15 +173,15 @@ This optical depth is modeled by the expression:
 \tau(\nu) = (\nu/\nu_{c})^{\beta}
 \end{eqnarray*}
 
-where $\beta$ is the emissivity spectral index, and $\nu_{c}$ is the critical 
-frequency at which the optical depth is equal to unity. 
+where $\beta$ is the emissivity spectral index, and $\nu_{c}$ is the critical
+frequency at which the optical depth is equal to unity.
 
-{\small COLTEMP} assumes that the source of the extended emission is optically 
+{\small COLTEMP} assumes that the source of the extended emission is optically
 thin ($\tau \ll 1.0$) and so:
 \begin{eqnarray*}
 1-e^{-\tau} \approx \tau
 \end{eqnarray*}
-Thus 
+Thus
 \begin{equation}
 f( \nu, T ) = (\nu/\nu_{c})^{\beta}.B( \nu, T )
 \end{equation}
@@ -189,8 +189,8 @@ f( \nu, T ) = (\nu/\nu_{c})^{\beta}.B( \nu, T )
 \section{Flux Values Measured by IRAS}
 The survey detectors used by {\small IRAS} were sensitive over a wide pass-band,
 and so integrated the flux density of the source over a range of frequencies. If
-the spectral response of the entire {\small IRAS} system at frequency $\nu$ for 
-detectors in the $i$th waveband (i=1, 2, 3, 4 for 12, 25, 60 and 100 $\mu$m) is 
+the spectral response of the entire {\small IRAS} system at frequency $\nu$ for
+detectors in the $i$th waveband (i=1, 2, 3, 4 for 12, 25, 60 and 100 $\mu$m) is
 $R_{i}(\nu)$ then the measured flux, $F_{i}$ is:
 
 \begin{equation}
@@ -200,17 +200,17 @@ F_{i} = 10^{16}.\Omega.\int R_{i}(\nu).(\nu/\nu_{c})^{\beta}.B( \nu, T ).d\nu
 where $\Omega$ is the effective solid angle of the source. A factor of $10^{12}$
 is to take account of $\nu$ being in units of $10^{12}$ $Hz$, and a factor of
 $10^{4}$ converts the value of the expression from units of $EJy.Hz$ to
-$pW/m^{2}$ (the usual units for flux values in {\small IRAS90}). 
+$pW/m^{2}$ (the usual units for flux values in {\small IRAS90}).
 
 The values for the spectral response curves $R_{i}(\nu)$ are taken from the
 {\small IRAS} Catalogs and Atlases Explanatory Supplement, table II.C.5,
-``Relative system response''. 
+``Relative system response''.
 
 {\small COLTEMP} assumes that the effective solid angle of the source $\Omega$
 is just equal to the pixel area. This will not be the case for sources smaller
 than the pixel size, and so {\small COLTEMP} should only be used to derive
 information about {\em extended} emission. If $f_{i}$ is the flux per steradian
-in waveband $i$, then: 
+in waveband $i$, then:
 
 \begin{equation}
 \label{EQ:OBS}
@@ -225,7 +225,7 @@ $T$, and so a value must be assumed for one of them. Of these unknowns $\beta$
 is the least likely to vary across the image, and so the user is required to
 supply a value for $\beta$. The task is then to use equation \ref{EQ:OBS} to
 evaluate $T$ and $\nu_{c}$, given $\beta$ and two observed flux (per steradian)
-values (say $f_{i}$ and $f_{j}$). 
+values (say $f_{i}$ and $f_{j}$).
 
 The observations in the two wavebands ($i$ and $j$) are described by
 
@@ -244,9 +244,9 @@ Dividing the two equations gives:
 
 All the constants, including the $(1.0/\nu_{c})^{\beta}$ term in the integrands,
 have cancelled, resulting in the right hand side being a function of $T$ but not
-$\nu_{c}$. This function can be evaluated for various values of $T$ and a look 
+$\nu_{c}$. This function can be evaluated for various values of $T$ and a look
 up table created which gives temperature in terms of flux ratio $f_{i}/f_{j}$.
-This table is fitted with a cubic spline to enable intermediate flux ratios to 
+This table is fitted with a cubic spline to enable intermediate flux ratios to
 be used. Having obtained $T$, the critical frequency is given by:
 
 \begin{eqnarray*}
@@ -264,9 +264,9 @@ or
 \tau(\nu_{0}) = \frac{\nu_{0}^{\beta}.f_{i}}{10^{16}.\int R_{i}(\nu).\nu^{\beta}.B( \nu, T ).d\nu}
 \end{equation}
 
-The optical depth values stored in the output {\small NDF} by {\small COLTEMP} 
-are scaled by $10^{16}$ to avoid computational problems such as underflow. The 
-numbers thus stored represent optical depth in units of $10^{-16}$. With this 
+The optical depth values stored in the output {\small NDF} by {\small COLTEMP}
+are scaled by $10^{16}$ to avoid computational problems such as underflow. The
+numbers thus stored represent optical depth in units of $10^{-16}$. With this
 scaling the factor of $10^{16}$ goes from the above equation giving:
 
 \begin{equation}
@@ -280,7 +280,7 @@ data files, parameters, etc, and then calls lower level routines to do the
 calculations. It first calls {\small CTEMZ0} to set up the data describing the
 required cubic splines, and then calls {\small CTEMZ2} to store values in the
 output data files, using the input data files and the cubic splines found by
-{\small CTEMZ0}. 
+{\small CTEMZ0}.
 
 \subsection{Spline fitting - CTEMZ0}
 This routine uses {\small NAG} routines to find the knots and co-efficients
@@ -294,7 +294,7 @@ T & = & S_{1}( r )
 \end{eqnarray*}
 
 (where $i<j$). The second one, $S_{2}$, gives the flux per steradian seen in the
-shorter waveband as a function of temperature: 
+shorter waveband as a function of temperature:
 
 \begin{eqnarray*}
 f_{i} = S_{2}( T )
@@ -313,32 +313,32 @@ independent variable of the cubic spline, $S_{1}$. The range of ratio values
 covered by the cubic spline is returned for use in routine {\small CTEMZ2}. The
 second cubic spline, $S_{2}$, is then found by interpolating the flux per
 steradian values from the shorter waveband using the temperature values as the
-independent variable. 
+independent variable.
 
 \subsection{Calculation of observed model flux - CTEMZ1}
-The flux per steradian at a given temperature (assuming $\nu_{c}=10^{12}$ $Hz$) 
+The flux per steradian at a given temperature (assuming $\nu_{c}=10^{12}$ $Hz$)
 is calculated by routine {\small CTEMZ1}. The value returned by this routine is:
 
 \begin{eqnarray*}
 f_{i} = \int R_{i}(\nu).\nu^{\beta}.B( \nu, T ).d\nu
 \end{eqnarray*}
- 
-The integrand is evaluated at each frequency at which the spectral response 
-curve $R_{i}$ is tabulated in the {\em Exp. Supp.}. In addition, two extra 
+
+The integrand is evaluated at each frequency at which the spectral response
+curve $R_{i}$ is tabulated in the {\em Exp. Supp.}. In addition, two extra
 zero values are appended to the start and end of each response curve. A cubic
 spline is then fitted to the integrand values, and a {\small NAG} routine is
-used to evaluate the definite integral under the cubic spline. The user may 
+used to evaluate the definite integral under the cubic spline. The user may
 choose to modify the spectral response curves used in two ways:
 
 \begin{itemize}
-\item Each point in the curve may be shifted by a fixed amount (specified by the 
+\item Each point in the curve may be shifted by a fixed amount (specified by the
 user) in wavelength.
-\item Each response value may be multiplied by a fixed factor (specified by the 
+\item Each response value may be multiplied by a fixed factor (specified by the
 user).
 \end{itemize}
 
 These facilities can be used to investigate the effects of uncertainties in the
-response curves on the calculated temperatures and optical depths. 
+response curves on the calculated temperatures and optical depths.
 
 \subsection{Creation of output values - CTEMZ2}
 Only input pixel values which are positive and not {\em bad} are used. All other
@@ -351,10 +351,10 @@ If the ratio value is outside the allowed range then {\em bad} values are stored
 for temperature and optical depth. This temperature is then used to evaluate the
 observed model flux per steradian using cubic spline $S_{2}$. This is used
 within equation \ref{EQ:TAU} to evaluate the optical depth at the required
-frequency. 
+frequency.
 
 \section{Variances}
-Uncertainties in the calculated temperatures and optical depths are caused by 
+Uncertainties in the calculated temperatures and optical depths are caused by
 two effects:
 
 \begin{enumerate}
@@ -370,23 +370,23 @@ be shifted in wavelength by a fixed amount or scaled by a given factor before
 being used. The changes in the calculated temperatures and optical depths caused
 by doing this can be used to get some idea of the uncertainty in the
 temperatures and optical depths. The {\em Exp. Supp.} describes the expected
-uncertainties in the spectral response curves in paragraph C3 on page VI-28. 
+uncertainties in the spectral response curves in paragraph C3 on page VI-28.
 
 If both input {\small NDF}s have {\small VARIANCE} components then the variance
 values can be used to generate variances for the output temperatures and optical
-depths. If $\sigma^{2}_{i}$ is the variance in $f_{i}$ (a flux density per 
-steradian value from waveband $i$), then the variance in the ratio value $r$ 
+depths. If $\sigma^{2}_{i}$ is the variance in $f_{i}$ (a flux density per
+steradian value from waveband $i$), then the variance in the ratio value $r$
 ($=f_{i}/f_{j}$) is given by $\sigma^{2}_{r}$ where:
 
 \begin{eqnarray*}
-\frac{\sigma^{2}_{r}}{r^{2}} = \frac{\sigma^{2}_{i}}{f_{i}^{2}} + \frac{\sigma^{2}_{j}}{f_{j}^{2}} 
+\frac{\sigma^{2}_{r}}{r^{2}} = \frac{\sigma^{2}_{i}}{f_{i}^{2}} + \frac{\sigma^{2}_{j}}{f_{j}^{2}}
 \end{eqnarray*}
 
-This assumes that the noise is Gaussian and independent, which is not the case 
+This assumes that the noise is Gaussian and independent, which is not the case
 with {\small IRAS} noise, but it should still give a useful estimate.
 
-The uncertainty $\sigma_{r}$ in the ratio value can be converted into an 
-uncertainty $\sigma_{T}$ in the derived temperature by using the slope of the 
+The uncertainty $\sigma_{r}$ in the ratio value can be converted into an
+uncertainty $\sigma_{T}$ in the derived temperature by using the slope of the
 cubic spline $S_{1}$ which gives temperature as a function of ratio:
 
 \begin{eqnarray*}
@@ -394,24 +394,24 @@ cubic spline $S_{1}$ which gives temperature as a function of ratio:
 \end{eqnarray*}
 
 The optical depth (in units of $10^{-16}$) at frequency $\nu_{0}$ is $\tau_{0}$
-where: 
+where:
 
 \begin{eqnarray*}
 \tau_{0} = \nu_{0}^{\beta}.f_{i}/S_{2}( T )
 \end{eqnarray*}
 
 where $S_{2}$ is the cubic spline giving the observed flux in waveband $i$ as a
-function of temperature. The variance in $\tau_{0}$ is $\sigma^{2}_{\tau}$ 
+function of temperature. The variance in $\tau_{0}$ is $\sigma^{2}_{\tau}$
 where:
 
 \begin{eqnarray*}
-\frac{\sigma^{2}_{\tau}}{\tau^{2}} = \nu_{0}^{2\beta} .\left( 
-\frac{\sigma^{2}_{i}}{f_{i}^{2}}  + \frac{\sigma^{2}_{S_{2}}}{S_{2}^{2}} 
+\frac{\sigma^{2}_{\tau}}{\tau^{2}} = \nu_{0}^{2\beta} .\left(
+\frac{\sigma^{2}_{i}}{f_{i}^{2}}  + \frac{\sigma^{2}_{S_{2}}}{S_{2}^{2}}
 \right)
 \end{eqnarray*}
 
-The only unknown here is the uncertainty in the observed flux $\sigma_{S_{2}}$. 
-This can be derived from the uncertainty in the temperature $\sigma_{T}$ by 
+The only unknown here is the uncertainty in the observed flux $\sigma_{S_{2}}$.
+This can be derived from the uncertainty in the temperature $\sigma_{T}$ by
 using the slope of the cubic spline $S_{2}$:
 
 \begin{eqnarray*}
@@ -424,11 +424,11 @@ steradian observed at a given wavelength from a source of given spectrum,
 assuming the detectors are only sensitive to a single frequency. Normal surface
 brightness values (and flux density values) produced by {\small IRAS90} assume
 that the source flux density is proportional to wavelength. This is not the case
-for black or grey body sources, and so a correction needs to be made. 
+for black or grey body sources, and so a correction needs to be made.
 
-{\small COLCORR} works by taking in temperature and optical depth images 
-previously created by {\small COLTEMP}. These two images define the source 
-spectrum at every point in the image, and equation \ref{EQ:FD} can be used to 
+{\small COLCORR} works by taking in temperature and optical depth images
+previously created by {\small COLTEMP}. These two images define the source
+spectrum at every point in the image, and equation \ref{EQ:FD} can be used to
 evaluate the required flux density, $f$. The operation is a lot simpler if it
 is again assumed that the sources are optically thin, in which case:
 
@@ -440,16 +440,16 @@ The optical depth image produced by {\small COLTEMP} contains the optical depth
 at a given frequency $\nu_{0}$. If the user requires the colour corrected
 surface brightness at a different frequency, $\nu_{1}$, then the optical depth
 values need to be scaled to refer to $\nu_{1}$ rather than $\nu_{0}$. Equation
-\ref{EQ:TAUN} can be used to do this: 
+\ref{EQ:TAUN} can be used to do this:
 
 \begin{eqnarray*}
 \tau(\nu_{1}) = \tau(\nu_{0}) . \left(\frac{\nu_{1}}{\nu_{0}}\right)^{\beta}
 \end{eqnarray*}
 
-$\nu_{0}$ and $\beta$ are stored in the {\small IRAS} extension of the optical 
-depth image produced by {\small COLTEMP}. The values returned for the Planck 
-function $B(\nu, T)$ are in units of Exa-Janskys per steradian, and the stored 
-optical depth values are in units of $10^{-16}$, so the final expression for $f$ 
+$\nu_{0}$ and $\beta$ are stored in the {\small IRAS} extension of the optical
+depth image produced by {\small COLTEMP}. The values returned for the Planck
+function $B(\nu, T)$ are in units of Exa-Janskys per steradian, and the stored
+optical depth values are in units of $10^{-16}$, so the final expression for $f$
 is:
 
 \begin{eqnarray*}
@@ -478,11 +478,11 @@ $\sigma_{T}^{2}$ and $\sigma_{\tau}^{2}$, are supplied for $T$ and
 $\tau(\nu_{0})$. $\sigma_{f}^{2}$ is given by:
 
 \begin{eqnarray*}
-\sigma_{f}^{2} = \sigma_{\tau}^{2}.\left( \frac{\partial f}{\partial 
+\sigma_{f}^{2} = \sigma_{\tau}^{2}.\left( \frac{\partial f}{\partial
 \tau}\right)^{2} + \sigma_{T}^{2}.\left( \frac{\partial f}{\partial T}\right)^{2}
 \end{eqnarray*}
 
-Taking the partial derivative of equation \ref{EQ:CCOR} with respect to $\tau$ 
+Taking the partial derivative of equation \ref{EQ:CCOR} with respect to $\tau$
 gives:
 
 \begin{eqnarray*}
@@ -490,7 +490,7 @@ gives:
 \end{eqnarray*}
 
 and taking the partial derivative of equation \ref{EQ:CCOR} with respect to
-$T$ gives: 
+$T$ gives:
 
 \begin{eqnarray*}
 \frac{\partial f}{\partial T} = CC.\tau.\frac{\partial B}{\partial T}
@@ -504,7 +504,7 @@ Looking at equation \ref{EQ:BB3} gives:
 & = & \left(\frac{B}{\nu.T}\right)^{2}.\frac{C_{2}.e^{C_{2}.\nu/T}}{C_{1}}
 \end{eqnarray*}
 
-These equations allow the variance on the colour corrected surface brightness 
+These equations allow the variance on the colour corrected surface brightness
 values, $\sigma_{f}^{2}$, to be calculated.
 
 \end{document}

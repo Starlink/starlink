@@ -46,7 +46,7 @@
 #        If true, then the intention is to get an image file; if false
 #        the intention is to get any type of file.  Currently the
 #        difference is that if image is true any HDS container file
-#        which is encountered is passed to ndgexpand in order to 
+#        which is encountered is passed to ndgexpand in order to
 #        look inside it for NDF structures.
 
 #  Copyright:
@@ -134,10 +134,10 @@
 
 #  Labelled entry widget for the file filter. If CCDimportfilter
 #  is a list of length greater than 1 then need an option widget.
-      if { ! [info exists CCDimportfilter] } { 
+      if { ! [info exists CCDimportfilter] } {
          set CCDimportfilter ""
       }
-      if { [llength $CCDimportfilter] > 1 } { 
+      if { [llength $CCDimportfilter] > 1 } {
          CCDCcdWidget Filefilter filefilter \
             Ccd::option $Top.filter -text "File Filter:"
       } else {
@@ -164,7 +164,7 @@
 #  Widget configuration.
 #----------------------------------------------------------------------------
 
-#  Menubar. 
+#  Menubar.
 #  File items to cancel or accept window and exit interface.
       $Menu addcommand File {Close Window} "$Choice invoke Cancel"
       $Menu addcommand File {Accept Window} "$Choice invoke OK"
@@ -217,7 +217,7 @@
 #  Filefilter. Add binding to <Return> to invoke the file filter button.
 #  Also add all options if more than one.
       $Filefilter bind entry <Return> "$Choice invoke Filter;break"
-      if { [llength $CCDimportfilter] > 1 } { 
+      if { [llength $CCDimportfilter] > 1 } {
          foreach pair "$CCDimportfilter" {
             set name [lindex $pair 0]
             set type [lindex $pair 1]
@@ -329,7 +329,7 @@
       $Directory insert 0 $CCDcurrentdirectory
 
 #  Invoke the filter button to get first setup.
-      if { [llength $CCDimportfilter] > 1 } { 
+      if { [llength $CCDimportfilter] > 1 } {
          $Filefilter insert 0 [lindex [lindex $CCDimportfilter 0] 1]
       } else {
          $Filefilter insert 0 "$CCDimportfilter"

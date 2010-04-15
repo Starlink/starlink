@@ -105,7 +105,7 @@ C# IL>=a, OL>=0
 
 * Bring polyline attributes up-to-date
         IF (KSPLWK.NE.KGKSFN) THEN
-*          Setting transformation and clipping information as in GKS state 
+*          Setting transformation and clipping information as in GKS state
 *          list not required for Polyline because it has no geometric
 *          attributes.
            CALL GKCPLG
@@ -118,7 +118,7 @@ C# IL>=a, OL>=0
 
 * Bring polymarker attributes up-to-date
         IF (KSPMWK.NE.KGKSFN) THEN
-*          Setting transformation and clipping information as in GKS state 
+*          Setting transformation and clipping information as in GKS state
 *          list not required for polyline because it has no geometric
 *          attributes.
            CALL GKCPMG

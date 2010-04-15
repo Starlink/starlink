@@ -47,13 +47,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE parameters
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PAR
 
@@ -65,18 +65,18 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
-      CHARACTER * ( 10 ) FMT     ! Format statement 
+      CHARACTER * ( 10 ) FMT     ! Format statement
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Position of first non-blank character
       INTEGER LP                 ! Used length of input string
-      INTEGER STATUS             ! Local status value 
+      INTEGER STATUS             ! Local status value
 *.
 
 *  Set up the initial values.
       PARDBL = .FALSE.
 
 *  Use the standard character to double precision conversion routine.
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
       CALL CHR_FANDL( PAR, J, LP )
       CALL CHR_CTOD( PAR( J : LP ), VAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN

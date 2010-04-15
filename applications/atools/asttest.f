@@ -21,17 +21,17 @@
 
 *  Description:
 *     This application displays a logical value indicating whether a
-*     value has been explicitly set for one of an Object's attributes. 
+*     value has been explicitly set for one of an Object's attributes.
 *     This logical value is also written to an output parameter.
 
 *  Usage:
-*     asttest this attrib 
+*     asttest this attrib
 
 *  ADAM Parameters:
 *     ATTRIB = LITERAL (Read)
 *        A string containing the name of the attribute.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Object. If an NDF is supplied, 
+*        An NDF or text file holding the Object. If an NDF is supplied,
 *        the WCS FrameSet will be used.
 *     VALUE = _LOGICAL (Write)
 *        On exit, this holds a boolean value indicating if the attribute
@@ -89,7 +89,7 @@
       LOGICAL VAL
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

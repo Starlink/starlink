@@ -3,14 +3,14 @@ C+
 C
 C     B S M U L T
 C
-C     Multiplies a spectrum by a B star calibration spectrum - which 
-C     should be 1.0 except in regions where there are atmospheric 
+C     Multiplies a spectrum by a B star calibration spectrum - which
+C     should be 1.0 except in regions where there are atmospheric
 C     bands.  This routine differs from an ordinary multiplication (eg
 C     as in IMULT) since it includes a term for the correction due
 C     to the different air masses of the two objects.  This means
 C     that both the original spectrum and the B star spectrum must
 C     have valid .OBS.SECZ values.  If the spectrum to be multiplied
-C     is 2 dimensional, the same operation is repeated for each of 
+C     is 2 dimensional, the same operation is repeated for each of
 C     the spectra it contains.
 C
 C     Command parameters -
@@ -31,15 +31,15 @@ C
 C     6th May 1986   KS / AAO.  Now will accept an image for SPECT,
 C                    although it still expects BSTAR to be a single
 C                    spectrum.
-C     24th Aug 1987  DJA/ AAO.  Now uses DSA_ routines - some specs 
-C                    changed. Now uses DYN_ package for dynamic-memory 
+C     24th Aug 1987  DJA/ AAO.  Now uses DSA_ routines - some specs
+C                    changed. Now uses DYN_ package for dynamic-memory
 C                    handling.
 C     19th Dec 1990  JMS / AAO. Now works for 2D B Star Data.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     5th  Oct 1992  HME / UoE, Starlink. Changed INCLUDE. TABs removed.
 C     1st  May 1997  JJL / Soton, Starlink. Propogates the variances
-C     29th Jul 1997  MJCL / Starlink, UCL.  Initialised VEXIST to 
+C     29th Jul 1997  MJCL / Starlink, UCL.  Initialised VEXIST to
 C                    .FALSE.
 C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -51,7 +51,7 @@ C
 C     Local variables
 C
       REAL      BAIRM            ! The air mass for the B star
-      INTEGER   BDIM             ! Number of dimensions for the B-star 
+      INTEGER   BDIM             ! Number of dimensions for the B-star
                                  ! data
       REAL      BETA             ! See above
       INTEGER   BPTR             ! Dynamic-memory pointer to B-star data
@@ -71,7 +71,7 @@ C
       INTEGER   OSLOT            ! Map slot number for output data array
       LOGICAL   PISNB            ! Previous CNF pointer to B-star data
                                  ! new?
-      LOGICAL   PISNEW           ! Previous CNF pointer to output data 
+      LOGICAL   PISNEW           ! Previous CNF pointer to output data
                                  ! new?
       LOGICAL   PISNVB           ! Previous CNF pointer to B-star errors
                                  ! new?
@@ -80,12 +80,12 @@ C
       INTEGER   SAIRM            ! The air mass for the input spectrum
       INTEGER   STATUS           ! Running status for DSA_ routines
       INTEGER   TPTR             ! Temp dynamic-memory pointer
-      INTEGER   VBPTR            ! Dyn-memory pointer to B-star 
+      INTEGER   VBPTR            ! Dyn-memory pointer to B-star
                                  ! variances
       LOGICAL   VEXIST           ! Variances exist in both spectra?
-      INTEGER   VOPTR            ! Dyn-memory pointer to output 
+      INTEGER   VOPTR            ! Dyn-memory pointer to output
                                  ! variance array
-      INTEGER   VBSLOT           ! Map slot number of input B-star 
+      INTEGER   VBSLOT           ! Map slot number of input B-star
                                  ! variance
       INTEGER   VOSLOT           ! Map slot number for output variance
                                  ! array
@@ -126,7 +126,7 @@ C
       CALL DSA_GET_AIRMASS('BST','Mean',BAIRM,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Get name of OUTPUT file 
+C     Get name of OUTPUT file
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','SPECT',0,0,STATUS)
       IF (STATUS.NE.0) GOTO 500
@@ -149,7 +149,7 @@ C
       IF (STATUS.NE.0) GOTO 500
 C
 C     If the variance structure exists, map it.
-C   
+C
       IF (VEXIST) THEN
          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VOPTR,
      :                          VOSLOT,STATUS)
@@ -213,7 +213,7 @@ C+
 C
 C     F I G _ B S M U L T
 C
-C     Performs the actual multiplication of a spectrum by a B star 
+C     Performs the actual multiplication of a spectrum by a B star
 C     calibration spectrum, allowing for the difference in air mass.
 C
 C     Parameters -  (">" input, "<" output)
@@ -234,12 +234,12 @@ C     Common variables used - None
 C
 C     Subroutines / functions used - None
 C
-C     Algorithm - 
+C     Algorithm -
 C
-C     The result spectrum is calculated as 
+C     The result spectrum is calculated as
 C     RESULT(i)=SDATA(i)*(BDATA(i)**(SSECZ/BSECZ)**BETA)
 C     where BETA should be 0.5 for saturated lines, 1.0 for
-C     unsaturated lines, and the 'best' value for all lines, determined 
+C     unsaturated lines, and the 'best' value for all lines, determined
 C     by P.J.Young, is 0.55
 C                                           KS / CIT 10th April 1984
 C+

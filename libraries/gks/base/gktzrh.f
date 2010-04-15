@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -86,17 +86,17 @@ C# IL>=a, OL>=0
 *     removed.
 *
 *---------------------------------------------------------------------
- 
+
       NRE = 0
       NPEAK = 0
       NSLOPE = 0
       NTROGH = 0
       FOUND = .FALSE.
- 
+
 *     Check if edge table is empty
       IF(JETNXT(0) .EQ. 0) GOTO 999
       ETTOP = VY(IYETT(JETNXT(0)))
- 
+
       JPEAK(1) = 0
       JPEAK(2) = JETNXT(0)
 *
@@ -156,7 +156,7 @@ C# IL>=a, OL>=0
         ENDIF
   200 CONTINUE
   201 CONTINUE
- 
+
       IF(NPEAK .LT. 1)THEN
 *     No peaks found - invalid edge table
          CALL GKBUG (-2004,'GKTZRH')

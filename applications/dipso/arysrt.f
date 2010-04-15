@@ -4,7 +4,7 @@
 !
 !   Imports:
 !     ARY    real array(NR,n)  n>=NC
-!            ARY  is updated, the section bounded by NR & NC being 
+!            ARY  is updated, the section bounded by NR & NC being
 !            sorted on column IC
 !     NR     integer number of rows to be sorted
 !     NC     integer number of columns to be sorted
@@ -12,7 +12,7 @@
 !     CMD    invoking command character string
 !     OK     logical success flag
 !
-       SUBROUTINE ARYSRT 
+       SUBROUTINE ARYSRT
      : (ARY, NR, NC, IC, CMD, OK)
 
        IMPLICIT NONE
@@ -35,7 +35,7 @@
 
    10  CONTINUE
        SORTED = .TRUE.
-    
+
        DO 200 I = 2, NR
           IF (ARY(I,IC).LT.ARY(I-1,IC)) THEN
              SORTED = .FALSE.

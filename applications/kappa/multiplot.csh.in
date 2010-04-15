@@ -55,7 +55,7 @@
 
 #  Copyright:
 #     Copyright (C) 1995-1996, 2000 Central Laboratory of the Research
-#     Councils. 
+#     Councils.
 #     (C) 2007, 2008 Science and Technology Facilitties Council.
 #     All Rights Reserved.
 
@@ -113,7 +113,7 @@
        alias psmerge $STARLINK_DIR/bin/psmerge
     else if ( -e $KAPPA_DIR/../psmerge ) then
        alias psmerge $KAPPA_DIR/../psmerge
-    
+
 #  Check whether or not we have the Starlink psmerge.  This does
 #  not have a -h option.
     else
@@ -125,7 +125,7 @@
           echo "Only the restrictive system PSMERGE is available.  Script needs the Starlink version.  Aborting."
           exit
        endif
-    endif       
+    endif
 
 #  Initialize some shell variables.
     set xpic = 4

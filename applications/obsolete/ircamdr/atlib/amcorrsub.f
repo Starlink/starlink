@@ -1,4 +1,4 @@
-	SUBROUTINE AMCORRSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, 
+	SUBROUTINE AMCORRSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY,
      :	                      ARROUT, EXTVAL, AIRMASS, MAGICNO,
      :	                      FACTOR, STATUS)
 
@@ -6,17 +6,17 @@
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
-     :	  ODIMSX, 
-     :	  ODIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
+     :	  ODIMSX,
+     :	  ODIMSY,
      :	  STATUS,
      :	  J,
      :	  K
 
-	REAL 
-     :	  ARROUT( ODIMSX, ODIMSY), 
+	REAL
+     :	  ARROUT( ODIMSX, ODIMSY),
      :	  ARRIN( DIMSX, DIMSY),
      :	  EXTVAL,
      :	  AIRMASS,

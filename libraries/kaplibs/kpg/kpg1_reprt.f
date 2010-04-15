@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine dislays the supplied message using MSG_OUT (unless
-*     QUIET is .TRUE), and (if LOG is .TRUE.) writes out the same text 
+*     QUIET is .TRUE), and (if LOG is .TRUE.) writes out the same text
 *     to the file identified by FD.
 
 *  Arguments:
@@ -26,7 +26,7 @@
 *        Write the text to  a file?
 *     FD = INTEGER (Given)
 *        An FIO identifier for a file. If LOG is .TRUE., then the message
-*        is written to this file. 
+*        is written to this file.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +59,7 @@
 *     15-AUG-2001 (DSB):
 *        Original version.
 *     21-OCT-2009 (DSB):
-*        If there are no msg tokens in the text, avoid truncation by 
+*        If there are no msg tokens in the text, avoid truncation by
 *        internal MERS buffer length when writing text to log file.
 *     {enter_further_changes_here}
 
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,15 +99,15 @@
       IF( .NOT. QUIET ) CALL MSG_OUT( ' ', MESS, STATUS )
 
 *  If writing to the file...
-      IF( LOG ) THEN 
+      IF( LOG ) THEN
 
-*  If there are no msg tokens in the text, just write it out directly. 
+*  If there are no msg tokens in the text, just write it out directly.
 *  This avoids limitation imposed by the fixed length nature of some MERS
-*  internal buffers. 
+*  internal buffers.
          IF( INDEX( MESS, '^' ) .EQ. 0 ) THEN
             CALL FIO_WRITE( FD, MESS( : CHR_LEN( MESS ) ), STATUS )
- 
-*  Otherwise, get the expanded text of the message, and write it to the 
+
+*  Otherwise, get the expanded text of the message, and write it to the
 *  file.
          ELSE
             CALL MSG_LOAD( ' ', MESS, OPSTR, OPLEN, STATUS )

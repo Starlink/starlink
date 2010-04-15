@@ -1,5 +1,5 @@
 C-----------------------------------------------------------------------
-      
+
       SUBROUTINE CONVOL (CFUN, N, BUF, NQ)
 
 C   Routine to convolve data array in stack with function/array CFUN(N)

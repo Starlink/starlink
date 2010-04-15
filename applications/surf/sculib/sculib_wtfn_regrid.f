@@ -1,28 +1,28 @@
-      SUBROUTINE SCULIB_WTFN_REGRID( USEGRD, N_MAPS, N_PTS, WTFNRAD, 
-     :     WTFNRES, WEIGHTSIZE, SCALE, PXSIZE, 
-     :     NX_OUT,  NY_OUT,  I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, 
-     :     N_BOL, MAX_BOLS, DATA_PTR, VAR_PTR, 
-     :     XPOS_PTR, YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
+      SUBROUTINE SCULIB_WTFN_REGRID( USEGRD, N_MAPS, N_PTS, WTFNRAD,
+     :     WTFNRES, WEIGHTSIZE, SCALE, PXSIZE,
+     :     NX_OUT,  NY_OUT,  I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT,
+     :     N_BOL, MAX_BOLS, DATA_PTR, VAR_PTR,
+     :     XPOS_PTR, YPOS_PTR, OUT_DATA, OUT_VARIANCE,
      :     OUT_QUALITY, CONV_WEIGHT, STATUS )
 *+
 *  Name:
 *     SCULIB_WTFN_REGRID
- 
+
 *  Purpose:
 *     Regrid supplied data onto a rectangular grid
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SCULIB_WTFN_REGRID(USEGRD, N_MAPS, N_PTS, WTFNRAD, WTFNRES,
-*    :     WEIGHTSIZE, SCALE, PXSIZE, NX_OUT, NY_OUT, 
+*    :     WEIGHTSIZE, SCALE, PXSIZE, NX_OUT, NY_OUT,
 *    :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, N_BOL, MAX_BOLS,
-*    :     DATA_PTR, VAR_PTR, 
-*    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
+*    :     DATA_PTR, VAR_PTR,
+*    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE,
 *    :     OUT_QUALITY, CONV_WEIGHT,
 *    :     STATUS)
- 
+
 *  Description:
 *     This routine takes data with a variance array and x y positions
 *     and regrids it onto a rectangular grid using a weight function
@@ -35,8 +35,8 @@
 *     is a repeating pattern made up of copies of the transform of
 *     the map as a continuous function, each copied displaced from its
 *     neighbours by 1/dx, where dx is the sample spacing of the input points
-*     (assumed equal in x and y). Different copies of the 'continuous map' 
-*     transforms will overlap ('alias') if there is any power in the 
+*     (assumed equal in x and y). Different copies of the 'continuous map'
+*     transforms will overlap ('alias') if there is any power in the
 *     map at frequencies greater than 1/(2dx). It is not possible to unravel
 *     aliased spectra and this constraint leads to the Nyquist sampling
 *     criterion.
@@ -72,16 +72,16 @@
 *     computing time. However, a truncated Bessel function should work well on
 *     a large map, except near the edges. Edge effects can be removed by
 *     pretending that the map extends further - of course, this only works if
-*     you know what data the pretend map area should contain, i.e. zeros. 
+*     you know what data the pretend map area should contain, i.e. zeros.
 *     Another problem with a Bessel function arises from the fact that it does
-*     truncate the FT of the map sharply. If the data are good then there 
-*     should be nothing but noise power at the truncation radius and the 
+*     truncate the FT of the map sharply. If the data are good then there
+*     should be nothing but noise power at the truncation radius and the
 *     truncation of the FT should have no serious effect. However, if the data
-*     has spikes (power at all frequencies in the FT) or suffers from seeing 
-*     effects such that the data as measured DO have power beyond the 
+*     has spikes (power at all frequencies in the FT) or suffers from seeing
+*     effects such that the data as measured DO have power beyond the
 *     truncation radius, then this will cause ringing in the rebinned map.
-*     
-*     -[Gaussian:] 
+*
+*     -[Gaussian:]
 *     In fact, any function that is finite in frequency space will have
 *     infinite extent in image space (I think). As such they will all
 *     drag in some power from the aliased versions of the map transform
@@ -94,7 +94,7 @@
 *     as the Bessel function - such effects give rise to smoother
 *     defects in the rebinned map though the defects will still BE
 *     there.
- 
+
 *  Arguments:
 *     USEGRD = LOGICAL (Given)
 *       Use guard ring for final stage of rebin
@@ -148,11 +148,11 @@
 *        Contribution to each pixel
 *     STATUS = _INTEGER (Given & Returned)
 *        Global status
- 
+
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
- 
+
 
 *  Copyright:
 *     Copyright (C) 1997,1998,1999 Particle Physics and Astronomy
@@ -178,21 +178,21 @@
 *
 *     1997 April 4 (TIMJ)
 *        Extract from main tasks
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
- 
+
 *  Arguments Given:
       LOGICAL USEGRD
       INTEGER N_MAPS
@@ -233,7 +233,7 @@
       PARAMETER (TSKNAME = 'WTFN_REGRID')
       INTEGER MSG_LEV            ! Message output level
       PARAMETER (MSG_LEV = MSG__NORM)
- 
+
 *  Local Variables:
       INTEGER BOLWT_PTR          ! Bolometer weights
       INTEGER BOLWT_END          ! End of bolometer weights
@@ -279,7 +279,7 @@
 *     Start a timer
       T0 = SCULIB_SECNDS(0.0,STATUS)
       CALL MSG_SETC('PKG', TSKNAME)
-      CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Beginning regrid process', 
+      CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Beginning regrid process',
      :     STATUS)
 
 *     Enter phase 1 of regrid
@@ -287,10 +287,10 @@
 *     each output pixel
 
       DO I = 1, N_MAPS
-         CALL SCULIB_WTFN_REGRID_1 (WEIGHT(I), 
+         CALL SCULIB_WTFN_REGRID_1 (WEIGHT(I),
      :        %VAL(CNF_PVAL(DATA_PTR(I))),
      :        %VAL(CNF_PVAL(XPOS_PTR(I))), %VAL(CNF_PVAL(YPOS_PTR(I))),
-     :        N_PTS(I), DBLE(PXSIZE), NX_OUT, 
+     :        N_PTS(I), DBLE(PXSIZE), NX_OUT,
      :        NY_OUT, I_CENTRE, J_CENTRE, WEIGHTSIZE, SCALE,
      :        %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
      :        %VAL(CNF_PVAL(REGRID1_PTR)), STATUS)
@@ -323,12 +323,12 @@
                USEBOLWT = .TRUE.
             END IF
          END DO
-         
+
 *     Now create the bolometer weights array
          BOLWT_PTR = 0
          BOLWT_END = 0
          IF (USEBOLWT) THEN
-            
+
             CALL MSG_SETI('I',I)
             CALL MSG_OUT(' ','Using bolometer weights for map ^I',
      :           STATUS)
@@ -337,7 +337,7 @@
      :           BOLWT_END, STATUS)
 
 *     I know the positional data is read in for all bolometers
-*     and all times as a (N_BOL,N_POS) array. 
+*     and all times as a (N_BOL,N_POS) array.
 *     No bolometers are dropped en route so it is a simple case to
 *     add in the bolometer weights at this point
 *     The array is the wrong shape to simply copy in the data at one go.
@@ -371,7 +371,7 @@
          IF (USEBOLWT) CALL SCULIB_FREE('BOLWT',BOLWT_PTR, BOLWT_END,
      :        STATUS)
 
-      END DO 
+      END DO
 
 *  now add the output pixels with zero `total weight' into the
 *  convolution sum and calculate the final result
@@ -382,9 +382,9 @@
       CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Entering third rebin phase '//
      :     '(T = ^T1 seconds)', STATUS)
 
-      CALL SCULIB_WTFN_REGRID_3 (USEGRD, WTFNRES, PXSIZE, 
+      CALL SCULIB_WTFN_REGRID_3 (USEGRD, WTFNRES, PXSIZE,
      :     NX_OUT, NY_OUT,
-     :     I_CENTRE, J_CENTRE, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)), 
+     :     I_CENTRE, J_CENTRE, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
      :     OUT_DATA, OUT_VARIANCE,
      :     OUT_QUALITY, CONV_WEIGHT, WEIGHTSIZE, SCALE,
      :     WTFN, STATUS)

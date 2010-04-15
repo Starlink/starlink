@@ -13,8 +13,8 @@
 *     CALL NDF_GTSZD( INDF, COMP, SCALE, ZERO, STATUS )
 
 *  Description:
-*     The routine returns the scale and zero values associated with an 
-*     NDF array component. If the array is stored in simple or primitive 
+*     The routine returns the scale and zero values associated with an
+*     NDF array component. If the array is stored in simple or primitive
 *     form, then values of 1.0 and 0.0 are returned.
 
 *  Arguments:
@@ -30,8 +30,8 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the standard Fortran numerical data 
-*     types: integer, real and double precision. Replace the (lower case) "x" 
+*     - There is a routine for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case) "x"
 *     in the routine name by I, R or D as appropriate.
 
 *  Copyright:
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,7 +129,7 @@
 
 *  AXIS component:
 *  ==============
-*  Report an error, since this component has no scaling. 
+*  Report an error, since this component has no scaling.
          IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS', NDF__MINAB ) ) THEN
             STATUS = NDF__CNMIN
             CALL ERR_REP( 'NDF_GTSZD_AXI', 'Scale and zero values '//
@@ -160,7 +160,7 @@
             STATUS = NDF__CNMIN
             CALL ERR_REP( 'NDF_GTSZD_HIS', 'Scale and zero values '//
      :                    'cannot be obtained for an HISTORY '//
-     :                    'component (possible programming error).', 
+     :                    'component (possible programming error).',
      :                    STATUS )
 
 *  LABEL component:
@@ -231,7 +231,7 @@
          END IF
 
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -258,8 +258,8 @@
 *     CALL NDF_GTSZI( INDF, COMP, SCALE, ZERO, STATUS )
 
 *  Description:
-*     The routine returns the scale and zero values associated with an 
-*     NDF array component. If the array is stored in simple or primitive 
+*     The routine returns the scale and zero values associated with an
+*     NDF array component. If the array is stored in simple or primitive
 *     form, then values of 1.0 and 0.0 are returned.
 
 *  Arguments:
@@ -275,8 +275,8 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the standard Fortran numerical data 
-*     types: integer, real and double precision. Replace the (lower case) "x" 
+*     - There is a routine for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case) "x"
 *     in the routine name by I, R or D as appropriate.
 
 *  Copyright:
@@ -288,12 +288,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -312,7 +312,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -374,7 +374,7 @@
 
 *  AXIS component:
 *  ==============
-*  Report an error, since this component has no scaling. 
+*  Report an error, since this component has no scaling.
          IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS', NDF__MINAB ) ) THEN
             STATUS = NDF__CNMIN
             CALL ERR_REP( 'NDF_GTSZI_AXI', 'Scale and zero values '//
@@ -405,7 +405,7 @@
             STATUS = NDF__CNMIN
             CALL ERR_REP( 'NDF_GTSZI_HIS', 'Scale and zero values '//
      :                    'cannot be obtained for an HISTORY '//
-     :                    'component (possible programming error).', 
+     :                    'component (possible programming error).',
      :                    STATUS )
 
 *  LABEL component:
@@ -476,7 +476,7 @@
          END IF
 
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -503,8 +503,8 @@
 *     CALL NDF_GTSZR( INDF, COMP, SCALE, ZERO, STATUS )
 
 *  Description:
-*     The routine returns the scale and zero values associated with an 
-*     NDF array component. If the array is stored in simple or primitive 
+*     The routine returns the scale and zero values associated with an
+*     NDF array component. If the array is stored in simple or primitive
 *     form, then values of 1.0 and 0.0 are returned.
 
 *  Arguments:
@@ -520,8 +520,8 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the standard Fortran numerical data 
-*     types: integer, real and double precision. Replace the (lower case) "x" 
+*     - There is a routine for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case) "x"
 *     in the routine name by I, R or D as appropriate.
 
 *  Copyright:
@@ -533,12 +533,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -557,7 +557,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -619,7 +619,7 @@
 
 *  AXIS component:
 *  ==============
-*  Report an error, since this component has no scaling. 
+*  Report an error, since this component has no scaling.
          IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS', NDF__MINAB ) ) THEN
             STATUS = NDF__CNMIN
             CALL ERR_REP( 'NDF_GTSZR_AXI', 'Scale and zero values '//
@@ -650,7 +650,7 @@
             STATUS = NDF__CNMIN
             CALL ERR_REP( 'NDF_GTSZR_HIS', 'Scale and zero values '//
      :                    'cannot be obtained for an HISTORY '//
-     :                    'component (possible programming error).', 
+     :                    'component (possible programming error).',
      :                    STATUS )
 
 *  LABEL component:
@@ -721,7 +721,7 @@
          END IF
 
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

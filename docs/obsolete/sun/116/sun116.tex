@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -71,10 +71,10 @@ Maximum Entropy in  Astrophysics, see Narayan and Nityanada (Ann. Rev. A\&A,
 
 The resolution enhancement over images produced by the simple co-addition of
 data samples is bought at the cost of {\em much} greater CPU requirements. A
-typical run may take between 5 and 20 hours of CPU on a microVAX 3400, 
+typical run may take between 5 and 20 hours of CPU on a microVAX 3400,
 although this obviously depends on the amount of CRDD being mapped and the
-pixel size in the final image. It is usually a good idea to create a low 
-resolution image by the normal co-addition technique before going on to use 
+pixel size in the final image. It is usually a good idea to create a low
+resolution image by the normal co-addition technique before going on to use
 MEMCRDD. This can help to identify any likely problems that may crop up in the
 use of MEMCRDD, and give something with which to compare the MEMCRDD  results.
 
@@ -101,24 +101,24 @@ negative entropy value, the greater the deviation the  more negative the
 entropy.
 
 The other key quantity in the MEMSYS3 algorithm is the {\em likelihood}. This
-is  the probability that the observed data $D$ could have been generated from a 
+is  the probability that the observed data $D$ could have been generated from a
 given image $f$. The probability of $D$ given $f$  is written as $P( D \mid f
-)$ where the ``$\mid$'' character means ``given''. The likelihood is based on a 
-model of the noise statistics in the data, and on a model of the response 
-function of the experimental system. Given an image, the response model can be 
-used to generate the data which {\em would} have been observed (in the absence 
-of noise) if the true sky looked exactly like the given image. The noise model 
+)$ where the ``$\mid$'' character means ``given''. The likelihood is based on a
+model of the noise statistics in the data, and on a model of the response
+function of the experimental system. Given an image, the response model can be
+used to generate the data which {\em would} have been observed (in the absence
+of noise) if the true sky looked exactly like the given image. The noise model
 can then be used to find the probability that all the deviations of  this
 simulated data from the real data could be explained as noise. As an  example,
 if $F$ is the simulated data from some image $f$, and $D$ is the  corresponding
-real data, subject to Gaussian noise of standard deviation  $\sigma$, then 
+real data, subject to Gaussian noise of standard deviation  $\sigma$, then
 
 \begin{equation}
 P(D \mid f) = (2\pi\sigma^{2})^{-0.5}.e^{-(D-F)^{2}/2\sigma^{2}}
 \end{equation}
 
-What is needed to do the reconstruction is not $P( D \mid f)$ but 
-$P( f \mid D)$ i.e. the probability of the image $f$ given the data $D$. 
+What is needed to do the reconstruction is not $P( D \mid f)$ but
+$P( f \mid D)$ i.e. the probability of the image $f$ given the data $D$.
 Bayes theorem can be used to calculate $P( f \mid D )$ as follows:
 
 \begin{equation}
@@ -130,24 +130,24 @@ of  the data given $f$, and $P(D)$ (known as the data ``evidence'') is a
 constant  which normalises $P( f \mid D )$ to a sum of unity, and gives the
 probability of  the data.
 
-MEMSYS3 is an iterative algorithm, each iteration producing a new version of 
+MEMSYS3 is an iterative algorithm, each iteration producing a new version of
 the reconstruction image $f$. It starts with $f$ equal to the zero entropy
 image.  This gives a high prior probability, but will in general give a {\em
 very} low likelihood, thus the probability of the reconstruction $P(f \mid D)$
-will  also be low. Each successive iteration introduces more structure into the 
-reconstruction, moving it away from the entropy model and towards the data. As 
+will  also be low. Each successive iteration introduces more structure into the
+reconstruction, moving it away from the entropy model and towards the data. As
 this happens the prior probability goes down but the likelihood goes up. At
-some  point a peak occurs in the product of the two, and the corresponding 
-reconstruction is thus the most probable image. If the algorithm were to be 
+some  point a peak occurs in the product of the two, and the corresponding
+reconstruction is thus the most probable image. If the algorithm were to be
 continued beyond this peak the extra complexity introduced into the image would
 causes the  prior probability to drop faster than the likelihood is rising and
 so the overall  probability would go down. In practice, going beyond the peak
 results in noise  being interpreted as real structure.
 
-A crucial point to understand when interpreting MEMSYS3 results is that the 
-image returned is only the most probable. There could be other images only 
-{\em slightly} less probable than the one returned. In fact MEMSYS3 does, in 
-effect, keep track of the probability of {\em all} images. If inferences about 
+A crucial point to understand when interpreting MEMSYS3 results is that the
+image returned is only the most probable. There could be other images only
+{\em slightly} less probable than the one returned. In fact MEMSYS3 does, in
+effect, keep track of the probability of {\em all} images. If inferences about
 the reconstruction are to made (such as the integrated flux in some region)
 then all images should really be taken into account, weighting the
 contributions to the final answer by the probabilities $P( f \mid D)$. MEMSYS3
@@ -155,7 +155,7 @@ provides a facility to do just this. A mask image can be given which is
 multiplied by the reconstruction. The best estimate of the total data sum in
 the product is returned together with the standard deviation on the total data
 sum. This uncertainty represents the spread in values between the different
-plausible images. 
+plausible images.
 
 \section {The MEMCRDD program}
 This section describes the way in which MEMCRDD uses the MEMSYS3 package.
@@ -164,69 +164,69 @@ This section describes the way in which MEMCRDD uses the MEMSYS3 package.
 \label {SEC:NOISE}
 The MEMSYS3 Gaussian noise option is used (the other option is Poisson noise).
 MEMCRDD calculates an estimate of the standard deviation of each CRDD sample
-separately, to allow variations in the noise level across the image. These 
+separately, to allow variations in the noise level across the image. These
 noise levels can be calculated in two ways:
 \begin{enumerate}
 
-\item The noise on each sample is made up from two components; the ``field'' 
-noise which is constant for all samples from a given detector data stream, and 
-the ``source'' noise which is related to the flux level in each sample. The 
-variances of these two components are added to get the variance of the total 
-noise. 
+\item The noise on each sample is made up from two components; the ``field''
+noise which is constant for all samples from a given detector data stream, and
+the ``source'' noise which is related to the flux level in each sample. The
+variances of these two components are added to get the variance of the total
+noise.
 
-The field noise used for each detector data stream is the RMS value of 
-the residuals between the data stream and a smoothed form of the data stream. 
-Point sources are not included in this process. 
+The field noise used for each detector data stream is the RMS value of
+the residuals between the data stream and a smoothed form of the data stream.
+Point sources are not included in this process.
 
 The source noise takes account of the uncertainties in the detectors PSFs, and
 is given a variance which is a constant times the square of the sample value.
 This constant can be set by the user (see parameter K) but is defaulted to a
 value close to 5\% (the exact value depends on the IRAS wave band of the data
 and is based on the uncertainty quoted by IPAC for the detectors effective solid
-angles). 
+angles).
 
 \item The noise on each sample is made up of 4 components.
 \begin {itemize}
 \item The field noise, calculated as above.
-\item ``Correlated noise''. i.e. structure on a scale larger than a single 
+\item ``Correlated noise''. i.e. structure on a scale larger than a single
 sample which is {\em not} present in every coverage of a given region. The
 presence of correlated noise can be seen by forming low resolution maps of each
 HCON (or even each scan within an HCON) and comparing the overlapping regions.
 Low level background structure can often be seen in one coverage which is not
 there in another. The origin of such structure is not clear. Some will be due to
 solar system objects which can move between scans, and some will be due to
-residual striping. The low-pass electronic filter on board IRAS could also 
+residual striping. The low-pass electronic filter on board IRAS could also
 account for some of the correlated noise.
 
 The correlated noise is estimated as follows:
 \begin{itemize}
 
-\item A low resolution image is formed from all the input scans using a simple 
-co-addition algorithm. Features which are not present in all scans will be 
+\item A low resolution image is formed from all the input scans using a simple
+co-addition algorithm. Features which are not present in all scans will be
 attenuated in this image due to the averaging process.
 
-\item A set of low resolution images are formed in which each image contains 
-data from only one scan. 
+\item A set of low resolution images are formed in which each image contains
+data from only one scan.
 
 \item A set of images containing the squared residuals between each single-scan
 image and the all-scan image are formed. These residuals will be high for
 features which are present in the single-scan image but which are attenuated in
-the all-scan image. 
+the all-scan image.
 
-\item The OPUS routine is applied to each residual image to create something 
+\item The OPUS routine is applied to each residual image to create something
 which looks like a simulated data set, but in which each sample is actually
-an estimate of the mean variance between the single-scan image and the 
+an estimate of the mean variance between the single-scan image and the
 all-scan image over the area of the corresponding data sample.
 
 \end{itemize}
 
-\item The uncertainty caused by errors in the estimates of the detector Point 
+\item The uncertainty caused by errors in the estimates of the detector Point
 Spread Functions.
 \item The uncertainty caused by pointing errors.
 \end{itemize}
-The last two of these can only be calculated if an estimate of the high 
-resolution sky is already available. This leads to an ``iterative'' use of 
-MEMCRDD, in which the result from one run of MEMCRDD is used to refine the noise 
+The last two of these can only be calculated if an estimate of the high
+resolution sky is already available. This leads to an ``iterative'' use of
+MEMCRDD, in which the result from one run of MEMCRDD is used to refine the noise
 model in the next run (see parameter SKYIN).
 
 \end{enumerate}
@@ -245,19 +245,19 @@ component is included in the  complex model, and the MEMSYS3 automatic noise
 scaling feature is switched  off (see parameter METHOD).
 
 \subsection {The entropy model}
-The image used to define the entropy model can be given by the user in the form 
-of an EDRS image (see parameter MODEL). If no such image is provided a flat 
+The image used to define the entropy model can be given by the user in the form
+of an EDRS image (see parameter MODEL). If no such image is provided a flat
 model equal to the mean of the data is used.
 
 \subsection {The detector response functions}
-The generation of simulated IRAS data is done by convolving a given image with 
-a set of mean detector PSFs. The individual detector PSFs used are those 
-produced by Mehrdad Moshir at IPAC. These PSFs are contained in the 3 
+The generation of simulated IRAS data is done by convolving a given image with
+a set of mean detector PSFs. The individual detector PSFs used are those
+produced by Mehrdad Moshir at IPAC. These PSFs are contained in the 3
 dimensional image stacks IPAC1.BDF, IPAC2.BDF, IPAC3.BDF and IPAC4.BDF
-(for the 12, 25, 60 and 100 $\mu$m bands respectively) contained in the EDRSX 
+(for the 12, 25, 60 and 100 $\mu$m bands respectively) contained in the EDRSX
 directory.
-The way in which the detectors are grouped 
-to produce the mean PSFs can be controlled by the parameter DGROUPS. The 
+The way in which the detectors are grouped
+to produce the mean PSFs can be controlled by the parameter DGROUPS. The
 convolutions are done using Fourier transform techniques.
 
 \subsection {The Intrinsic Correlation Function}
@@ -280,28 +280,28 @@ entropy of the required reconstruction, MEMSYS3 maximising the entropy of the
 hidden image. The result is that the final reconstruction tends to be smooth on
 the scale of the ICF. MEMCRDD provides an option to use a Gaussian ICF. The
 user specifies the full width at half maximum of this Gaussian (see parameter
-FILTER). 
+FILTER).
 
 
 \section {How to run MEMCRDD}
 \label {SEC:RUN}
-Before using MEMCRDD, suitable input data must be obtained. The 
+Before using MEMCRDD, suitable input data must be obtained. The
 CRDD should
 first be extracted from the tape archives using program I\_SNIP\_CRDD (see SUN
-91), or a request should be sent to RLVAD::IRASMAIL for the required 
+91), or a request should be sent to RLVAD::IRASMAIL for the required
 data.
 Next the data should be destriped. There are several ways of doing this, the
-simplest being to put each scan through the I\_DESTRIPE program (see SUN 91). 
-However, since poor destriping can seriously degrade the quality of the final 
-high resolution image, it is usually advisable to use a more sophisticated 
+simplest being to put each scan through the I\_DESTRIPE program (see SUN 91).
+However, since poor destriping can seriously degrade the quality of the final
+high resolution image, it is usually advisable to use a more sophisticated
 destriping technique such as the iterative destriping technique based on the
 EDRSX program CRDDSAMPLE. Use of CRDDSAMPLE is described in the EDRSX Cookbook,
 contained in the on-line EDRSX help library.
 
 MEMCRDD is currently implemented to run under the Starlink INTERIM environment,
 and thus can be run either from DSCL or by using the RUNSTAR command. In view
-of the fact that MEMCRDD is usually run in batch (due to its large CPU time 
-requirements), and also in view of the large number of parameters associated 
+of the fact that MEMCRDD is usually run in batch (due to its large CPU time
+requirements), and also in view of the large number of parameters associated
 with the program, it is usually more convenient to use the RUNSTAR command. A
 convenient way of running MEMCRDD is as follows
 
@@ -312,9 +312,9 @@ calling it by any name which identifies the particular run (eg JOB1.CON,
 M51\_BIG.CON or whatever). Note, the name should have 8 or less characters.
 
 \item Edit the file, assigning values to the required parameters. Each line
-of the connection file starts with a parameter name followed by the parameter 
-type (recognised types are VALUE, FRAME(R), FRAME(W) or ERROR). The ``/'' 
-character is used to separate these fields, so a typical line in the 
+of the connection file starts with a parameter name followed by the parameter
+type (recognised types are VALUE, FRAME(R), FRAME(W) or ERROR). The ``/''
+character is used to separate these fields, so a typical line in the
 connection file could start with:
 
 \begin{verbatim}
@@ -322,19 +322,19 @@ connection file could start with:
 \end{verbatim}
 
 If the line consisted of nothing more than this, the user would receive a prompt
-for parameter CRDDF1 when the program was run. However, it is possible to put 
-the value to be assigned to the parameter into the connection file, and so 
-remove the need for the user to be prompted. This is very convenient for 
+for parameter CRDDF1 when the program was run. However, it is possible to put
+the value to be assigned to the parameter into the connection file, and so
+remove the need for the user to be prompted. This is very convenient for
 programs run in batch mode.
 To give a parameter a particular value, the
-value should be added to the end of the parameter type and terminated with 
+value should be added to the end of the parameter type and terminated with
 ``/''. For example,
 
 \begin{verbatim}
-   CRDDF1/FRAME(R)/ARP220_B3S2_DS/ 
+   CRDDF1/FRAME(R)/ARP220_B3S2_DS/
 \end{verbatim}
 
-would give the frame type parameter CRDDF1 the value ARP220\_B3S2\_DS. A null 
+would give the frame type parameter CRDDF1 the value ARP220\_B3S2\_DS. A null
 value can be specified for any parameter, e.g.
 
 \begin{verbatim}
@@ -349,7 +349,7 @@ between an exclamation mark and the end of the line is ignored when processing
 the file.
 
 For further information on specifying parameter values
-for all INTERIM programs see SUN4 section 5. 
+for all INTERIM programs see SUN4 section 5.
 
 \item Create a command file to contain the RUNSTAR command. This file will usually
 look something like:
@@ -371,11 +371,11 @@ SKY\_IMAGE to parameter SKYIN, the command line would be:
 \begin{verbatim}
    $ RUNSTAR JOB1/RATE=0.5/SKYIN=SKY_IMAGE
 \end{verbatim}
-Parameter values assigned in this way take priority over values stored in the 
+Parameter values assigned in this way take priority over values stored in the
 connection file.
 
-The above file containing the RUNSTAR command is submitted to batch using the 
-DCL SUBMIT command, e.g. if the file was called JOB1.COM, the command may 
+The above file containing the RUNSTAR command is submitted to batch using the
+DCL SUBMIT command, e.g. if the file was called JOB1.COM, the command may
 look like
 
 \begin{verbatim}
@@ -383,7 +383,7 @@ look like
 \end{verbatim}
 
 This would produce a log file in the users login directory called JOB1.LOG
-which would contain any numerical diagnostics the user had requested by 
+which would contain any numerical diagnostics the user had requested by
 selection of appropriate MEMCRDD parameter values.
 
 \end{enumerate}
@@ -401,18 +401,18 @@ be several  thousand blocks in extent.
 
 \item [BOXSIZE] - The size of the square area to be mapped, in arc-minutes. The
 final image will be slightly bigger than the requested box size, since a blank
-border must be added to the image to avoid wrap-around problems when smoothing 
+border must be added to the image to avoid wrap-around problems when smoothing
 the image.
 
-\item  [CRDDF1 - CRDDF20] - Up to 20 survey CRDD files to be mapped. These must 
-have been previously destriped. Poor destriping is a major cause of poor 
+\item  [CRDDF1 - CRDDF20] - Up to 20 survey CRDD files to be mapped. These must
+have been previously destriped. Poor destriping is a major cause of poor
 reconstructions. The limit of 20 is imposed to limit the amount of virtual
 memory needed to run MEMCRDD. The figure of 20 could be increased in future
-if available virtual memory quotas increase. If MEMCRDD crashes with a 
+if available virtual memory quotas increase. If MEMCRDD crashes with a
 mysterious "quota exceeded" message, it will probably mean that you need a
 higher page file quota. Ask your local manager if your quota can be raised.
 
-\item [DEC\_DEG] - The degrees field of the declination at the centre of the 
+\item [DEC\_DEG] - The degrees field of the declination at the centre of the
 mapped square.
 
 \item [DEC\_MIN] - The arc-minutes field of the declination at the centre of
@@ -423,9 +423,9 @@ the  mapped square.
 
 \item [HIRES] - The name of the output image.
 
-\item [RA\_HRS] - The hours field of the right ascension at the centre of the 
+\item [RA\_HRS] - The hours field of the right ascension at the centre of the
 
-\item [RA\_MINS] - The minutes field of the right ascension at the centre of the 
+\item [RA\_MINS] - The minutes field of the right ascension at the centre of the
 mapped square.
 
 \item [RA\_SECS] - The seconds field of the right ascension at the centre of
@@ -437,7 +437,7 @@ With these parameter values, MEMCRDD will use MEMSYS3 in ``Classic'' mode with
 automatic scaling of the initial noise values (calculated by the simple method
 described in section \ref {SEC:NOISE} ). For information about the meaning of
 all MEMCRDD parameters and suitable choices of value for each, see appendix
-\ref {APP:PARS}. 
+\ref {APP:PARS}.
 
 A DCL command procedure (called MEMJOB) exists for running MEMCRDD iteratively
 in order to use the more sophisticated noise model described in paragraph 2 of
@@ -449,13 +449,13 @@ the low resolution image to define the noise model (see parameter SKYIN). The
 map created by this run of MEMCRDD is then used to define the noise model in a
 further run. MEMCRDD is run repeatedly in this fashion for a maximum of six
 times. If the noise model converges before this, then the loop is left before
-six iterations have been completed. Finally, another run is performed in 
-CLASSIC (non-automatic) mode to produce the final map. 
+six iterations have been completed. Finally, another run is performed in
+CLASSIC (non-automatic) mode to produce the final map.
 
 To run MEMJOB, a local copy of MEMCRDD.CON should be obtained and values for
-the parameters BOXSIZE, CRDDF1-CRDDFn, DEC\_DEG, DEC\_MIN, DEC\_SEC, RA\_HRS, 
+the parameters BOXSIZE, CRDDF1-CRDDFn, DEC\_DEG, DEC\_MIN, DEC\_SEC, RA\_HRS,
 RA\_MINS, RA\_SECS should be edited into the local copy. MEMJOB is then
-initiated (usually from batch) by the DCL command 
+initiated (usually from batch) by the DCL command
 
 \begin{verbatim}
    $ @EDRSX:MEMJOB <name>
@@ -467,7 +467,7 @@ file type). The following files are produced:
 \begin{description}
 \item [\verb+<name>+\_LO.BDF] --- The low resololution image.
 \item [\verb+<name>+\_CO.BDF] --- The coverage image (see parameter COVER).
-\item [\verb+<name>+\_HIi.BDF (i=1-6)] --- The maps from each HISTORIC run of 
+\item [\verb+<name>+\_HIi.BDF (i=1-6)] --- The maps from each HISTORIC run of
 MEMCRDD.
 \item [\verb+<name>+\_NON.BDF] --- The final CLASSIC (non\_automatic) map.
 \item [\verb+<name>+\_AN.BDF] --- The analysis file from the final CLASSIC run.
@@ -492,8 +492,8 @@ selected by the parameter FUNCTION. In ANALYSE mode, the user supplies an
 
 \begin{itemize}
 \item An EDRS image containing a ``mask''. If $f_{j}$ is the $j$th pixel of
-the hi-res image generated by MEMCRDD, and $M_{j}$ is the $j$th pixel of the 
-supplied mask image, then an analysis consists of calculating $\rho$ and 
+the hi-res image generated by MEMCRDD, and $M_{j}$ is the $j$th pixel of the
+supplied mask image, then an analysis consists of calculating $\rho$ and
 $\delta\rho$ where:
 
 \begin{equation}
@@ -501,9 +501,9 @@ $\delta\rho$ where:
 \end{equation}
 
 and $\delta\rho$ is the standard deviation on $\rho$. $\rho$ is converted to  a
-flux measurement in units of Janskys by multiplying it by the solid angle of a 
-pixel. The total data sum in the supplied mask is also displayed, allowing the 
-user to calculate the effective solid angle in the mask and so convert the 
+flux measurement in units of Janskys by multiplying it by the solid angle of a
+pixel. The total data sum in the supplied mask is also displayed, allowing the
+user to calculate the effective solid angle in the mask and so convert the
 integrated flux to a mean surface brightness.
 
 \end{itemize}
@@ -518,18 +518,18 @@ mask image is  then used in the same way as a mask image supplied by the user.
 XY lists can be  generated by programs XYCUR, XYKEY etc.
 \end{itemize}
 
-A common use of a mask image is to calculate the total flux in some source 
-region after subtracting off a background surface brightness. An analysis 
-returns the total source flux $\rho$ with an error estimate $\delta\rho$. 
+A common use of a mask image is to calculate the total flux in some source
+region after subtracting off a background surface brightness. An analysis
+returns the total source flux $\rho$ with an error estimate $\delta\rho$.
 Comparison of these two quantities can determine if the source is ``real'' or
-if  it is an artifact of MEM. A mask to do this has the value 1.0 in the source 
-area, a value of $-\Delta$ in area used to define the background surface 
+if  it is an artifact of MEM. A mask to do this has the value 1.0 in the source
+area, a value of $-\Delta$ in area used to define the background surface
 brightness, and a value of zero everywhere else. $\Delta$ should be equal to
 the  ratio of the number of pixels in the source area to the number of pixels
 in the  background area. This ensures that the mask has a total data sum of
 zero.
 
-A DSCL command procedure has been written to create such a mask. It is called 
+A DSCL command procedure has been written to create such a mask. It is called
 MEMASK and is run by typing
 
 \begin{verbatim}
@@ -548,13 +548,13 @@ MEMASK then displays the hi-res image. The user is asked to use the cursor to
 define a polygonal area to use as the source region, and a polygonal area to use
 as the background region. It is allowable for this background region to
 intersect or contain the source region. When the mask has been created, the
-total data sum within the mask is displayed. This should be close to zero. 
+total data sum within the mask is displayed. This should be close to zero.
 
-Having created a mask image using MEMASK. MEMCRDD should be run again, using 
-the same connection file that was used to create the hi-res image and analysis 
-file. This run of MEMCRDD will take about the same time as a single MEMSYS3 
-iteration. As this can become considerable towards the end of a reconstruction, 
-it is recommended that it is done in batch. If the original .COM file used to 
+Having created a mask image using MEMASK. MEMCRDD should be run again, using
+the same connection file that was used to create the hi-res image and analysis
+file. This run of MEMCRDD will take about the same time as a single MEMSYS3
+iteration. As this can become considerable towards the end of a reconstruction,
+it is recommended that it is done in batch. If the original .COM file used to
 run MEMCRDD was:
 
 \begin{verbatim}
@@ -577,39 +577,39 @@ MEMCRDD and \verb+<mask>+ is the name of the mask generated by MEMASK. This
 
 \subsection {MEMCRDD diagnostics}
 \label {SEC:DIAG}
-If the ILEVEL parameter (see appendix \ref {APP:PARS} for information on ILEVEL 
+If the ILEVEL parameter (see appendix \ref {APP:PARS} for information on ILEVEL
 and all other MEMCRDD parameters) is given a value greater than or equal to 2,
 then the following diagnostic values are displayed after each MEMSYS3 iteration:
 
 \begin {description}
-\item [OMEGA] - This is the ``rescaled termination criterion''. The 
+\item [OMEGA] - This is the ``rescaled termination criterion''. The
 reconstruction is considered complete when OMEGA rises to close to 1.0.
-\item [ENTROPY] - The entropy of the current reconstruction. This will always 
-be negative, thus the maximum entropy image has the smallest 
+\item [ENTROPY] - The entropy of the current reconstruction. This will always
+be negative, thus the maximum entropy image has the smallest
 absolute value for ENTROPY.
 
-\item [TEST] - This indicates how far from the maximum entropy trajectory the 
-algorithm has strayed. The smaller the value of TEST the more accurately the 
+\item [TEST] - This indicates how far from the maximum entropy trajectory the
+algorithm has strayed. The smaller the value of TEST the more accurately the
 trajectory is being followed. Values approaching 1.0 are dangerous, and may
 well  cause MEMSYS3 to crash with a ``floating overflow'' message. If this
 happens the  RATE parameter should be lowered and MEMCRDD re-run. RATE controls
 the size of  the step each iteration can produce. Large steps can allow the
 algorithm to  wander from the trajectory.
 
-\item [CHI-SQ] - This is only displayed if METHOD is HISTORIC or MCM. It is the 
-normalised $\chi^{2}$ statistic for the current reconstruction. It should fall 
+\item [CHI-SQ] - This is only displayed if METHOD is HISTORIC or MCM. It is the
+normalised $\chi^{2}$ statistic for the current reconstruction. It should fall
 to close to 1.0 at termination. NB, reconstructions using the MCM method
 rarely reach a $\chi^{2}$ of 1.0.
-\item [Log(probability)] - This is only produced if METHOD is CLASSIC or 
-NONAUTO. It gives the data ``evidence'', that is, the log of the overall 
-probability of the 
-input data. The correct Bayesian reconstruction is the one which gives the 
-highest value for the evidence. The best values to use for MEMCRDD parameters 
-can in principle be found by re-running MEMCRDD many times with different 
-parameter values. The best values are the ones which maximise the evidence. 
+\item [Log(probability)] - This is only produced if METHOD is CLASSIC or
+NONAUTO. It gives the data ``evidence'', that is, the log of the overall
+probability of the
+input data. The correct Bayesian reconstruction is the one which gives the
+highest value for the evidence. The best values to use for MEMCRDD parameters
+can in principle be found by re-running MEMCRDD many times with different
+parameter values. The best values are the ones which maximise the evidence.
 This usually requires an impractically large amount of CPU time.
 
-\item [No. of transforms] - This is the number of times the transform routines 
+\item [No. of transforms] - This is the number of times the transform routines
 (OPUS and TROPUS) have been called. Each call to OPUS or TROPUS requires
 several  Fourier transform operations to be performed. The number of calls to
 OPUS and  TROPUS required to perform a single iteration varies with iteration
@@ -624,7 +624,7 @@ value, the value used for RATE is fixed at that value.
 
 \end {description}
 
-When and if the reconstruction is completed, the user is told by what factor 
+When and if the reconstruction is completed, the user is told by what factor
 MEMSYS3 chose to scale the initial noise values.
 
 \subsection {Structured background noise in the reconstruction}
@@ -636,20 +636,20 @@ been taken from the probability bubble of all images, rather than integrating
 over the entire bubble. The reconstruction image should not be seen as the
 ``result'' of the MEM analysis. The real results are obtained by using the
 inference facility as described in section \ref {SEC:INFER}. When this is done,
-the results are produced by integrating over the entire probability bubble. 
+the results are produced by integrating over the entire probability bubble.
 
 However, there are various methods that can be used to produce images which
-show  less structured noise in the background. None of them are likely to be 
-completely effective, but they can often reduce the level of the spurious 
+show  less structured noise in the background. None of them are likely to be
+completely effective, but they can often reduce the level of the spurious
 structure to some extent.
 
 \begin {itemize}
-\item Use an ``Intrinsic Correlation Function'' (ICF). See section \ref 
-{SEC:ICFA}. One of the axioms of  
-MEM is that there are no spatial correlations in the true sky. This is usually 
-not true, and ignoring such correlations can produce structured  noise in the 
-final reconstruction. Prior knowledge about spatial correlations can be 
-incorporated into MEM by use of an ICF. 
+\item Use an ``Intrinsic Correlation Function'' (ICF). See section \ref
+{SEC:ICFA}. One of the axioms of
+MEM is that there are no spatial correlations in the true sky. This is usually
+not true, and ignoring such correlations can produce structured  noise in the
+final reconstruction. Prior knowledge about spatial correlations can be
+incorporated into MEM by use of an ICF.
 
 Instead of maximising the entropy of the required reconstruction, the entropy
 of a ``hidden image'' is maximised. This hidden image is defined so that the
@@ -659,46 +659,46 @@ be applied to it. In effect, what this does is to pretend that the point spread
 function of each detector was more extended than it actually was. The final
 estimate of the hidden image is smoothed with the ICF to obtain the required
 reconstruction, thus encouraging smoothness in the final image on the scale of
-the ICF. 
+the ICF.
 
 MEMCRDD provides an option to use a Gaussian ICF. The user specifies the full
 width at half maximum of the ICF as the value for parameter FILTER. The best
 value for FILTER can be found by running MEMCRDD several times with different
 values and selecting the value which maximises the data evidence (see section
-\ref {SEC:DIAG}). 
+\ref {SEC:DIAG}).
 
-\item The presence of a large dynamic range in the input data seems to 
+\item The presence of a large dynamic range in the input data seems to
 exacerbate the background noise. Therefore removing bright sources from the
 input  data may help. Point sources can be removed by setting the DEGLIT
 parameter to  1.0. This causes MEMCRDD to treat point sources like glitches.
 This approach is  not always useful, since the region of interest is often
 associated with bright  sources.
 
-\item Background noise can be over-fitted due to limitations in the simple 
-noise model described in section \ref {SEC:NOISE}. MEMCRDD provides a facility 
-for using the second, more sophisticated noise model described in section \ref 
-{SEC:NOISE}. To do this, MEMCRDD must be run originally with the simple noise 
-model, and then re-run specifying the output image from the first run as the 
+\item Background noise can be over-fitted due to limitations in the simple
+noise model described in section \ref {SEC:NOISE}. MEMCRDD provides a facility
+for using the second, more sophisticated noise model described in section \ref
+{SEC:NOISE}. To do this, MEMCRDD must be run originally with the simple noise
+model, and then re-run specifying the output image from the first run as the
 value for parameter SKYIN. The calculation of pointing and PSF noise is based
 on  the output from the previous run. MEMCRDD should ideally be run several
 times,  giving the output from the previous run as the SKYIN value for the next
-run,  until the noise model converges (as shown by the noise model diagnostics 
+run,  until the noise model converges (as shown by the noise model diagnostics
 displayed before starting iteration 1 of the reconstruction process).
 
-\item It can happen that doing a ``noise loop'' as described above, can cause 
-the data evidence to drop rather than fall. This seems to be a manifestation of 
-the presence of correlated noise in the data, MEMSYS3 interprets this noise as 
-real structure and modifies the noise scaling factor to remove it from the 
-noise estimates. For this reason it is suggested that the automatic noise 
-scaling option be switched off by giving the value NONAUTO for the parameter 
+\item It can happen that doing a ``noise loop'' as described above, can cause
+the data evidence to drop rather than fall. This seems to be a manifestation of
+the presence of correlated noise in the data, MEMSYS3 interprets this noise as
+real structure and modifies the noise scaling factor to remove it from the
+noise estimates. For this reason it is suggested that the automatic noise
+scaling option be switched off by giving the value NONAUTO for the parameter
 METHOD.
 
-\item Another method which seems to decrease background noise, is to re-run 
+\item Another method which seems to decrease background noise, is to re-run
 MEMCRDD several times, modifying the default model to incorporate structure
 revealed in the previous run. The default model is normally a flat image, but
 the user can override this by specifying an image for the MODEL parameter. This
 image is then used as the default model.  In this way prior knowledge obtained
-about an image by running MEMCRDD, can be used in a further run of MEMCRDD. 
+about an image by running MEMCRDD, can be used in a further run of MEMCRDD.
 
 This can be thought of as follows; the first run of MEMCRDD, using a flat
 model, reconstructs the image assuming nothing about what structure it will
@@ -706,14 +706,14 @@ find in the image. This process reveals that (for instance) there is a bright
 source in the middle of the image. If MEMCRDD had known {\em a priori} that
 there was a source in the middle of the image, it would have been able to make
 a rather better job of the reconstruction. What is needed is some means of
-including this prior information in a second run of MEMCRDD. 
+including this prior information in a second run of MEMCRDD.
 
 One could for instance find the integrated flux of the source from the original
 reconstruction, and assume that the source was a {\em point} source with this
 flux. A model image could be created containing such a point source and MEMCRDD
 re-run using this model rather than the flat model. The source in the resulting
-image would be as close to a point source as possible within the constraints 
-of the data. 
+image would be as close to a point source as possible within the constraints
+of the data.
 
 Another method which seems to be successful to a certain extent, is to run
 MEMCRDD with a flat model and then create a new model in which each pixel is a
@@ -725,9 +725,9 @@ reconstruction than those corresponding to pixels with small entropy. Such a
 modified model can be produced at the end of a MEMCRDD run by specifying a
 value for the MODELOUT parameter. The new model is written to a file with the
 given name, and this image can be specified for parameter MODEL on a further
-run of MEMCRDD. 
+run of MEMCRDD.
 
-\item Reconstructions which have a zero background level show less background 
+\item Reconstructions which have a zero background level show less background
 noise than those with a large background level. Crudely, this can be thought of
 as being due to the fact that MEMSYS3 constrains the output pixel values to be
 positive. This means that negative going noise spikes cannot be produced on a
@@ -740,12 +740,12 @@ could for instance be calculated on the basis of the result from a previous run
 of MEMCRDD, by using the SKYSUB procedure in EDRSX, there are also many other
 possible ways. What ever background is used, it is added back onto the
 reconstruction at the end of the run. The used background is also subtracted
-from the default model at the start of the run. 
+from the default model at the start of the run.
 
 Subtracting a background can produce negative input data values. MEMSYS3 can
 cope  with this so long as the negative values are comparable with the noise.
 If there  are many large negative values, MEMSYS3 can fail to converge. For
-this reason  negative data values large than 1.0 sigma are not included in the 
+this reason  negative data values large than 1.0 sigma are not included in the
 reconstruction.
 
 \end {itemize}
@@ -754,28 +754,28 @@ Different combinations of these methods may work best for different fields.
 
 \section {``Floating overflow'' crashes}
 
-Due to the way the MEMSYS3 subroutine package is coded, it is possible for the 
+Due to the way the MEMSYS3 subroutine package is coded, it is possible for the
 MEMCRDD program to crash with a ``floating overflow''. This is usually caused
 by  the parameter RATE being too high for the given field. This can be verified
 by  checking that the diagnostic TEST went to a value greater than or about
 equal to  1.0. A remedy for this problem could be to re-run MEMCRDD giving RATE
 a value a  factor of 10 lower.
 
-\appendix 
+\appendix
 \section {MEMCRDD parameters}
 \label {APP:PARS}
 
-This appendix contains a list of all MEMCRDD parameters. For each parameter the 
+This appendix contains a list of all MEMCRDD parameters. For each parameter the
 following information is given:
 \begin{itemize}
 \item A symbol signifying how important it is that the user should be aware
 of the parameter. It varies from ``!!!'' meaning that the parameter is {\em
 very} important, to ``!'' meaning that it is unlikely that the supplied default
-will need to be changed. 
+will need to be changed.
 \item USE - What the parameter value is used for within MEMCRDD
 \item DEFAULT - The default value contained in the file EDRSX:MEMCRDD.CON.
-This value will be used unless the user explicitly specifies another value, 
-either on the RUNSTAR command line, or by producing an edited copy of 
+This value will be used unless the user explicitly specifies another value,
+either on the RUNSTAR command line, or by producing an edited copy of
 MEMCRDD.CON.
 \item RESTRICTIONS - Any restrictions on the values which can be given
 \item ADVICE - Advice on selecting suitable values for the parameter.
@@ -785,7 +785,7 @@ MEMCRDD.CON.
 {\Large {\bf AIM } (!)}
 \begin{description}
 \item [USE]:
-AIM controls how closely the data must be fitted before the result is 
+AIM controls how closely the data must be fitted before the result is
 considered acceptable (see the MEMSYS3 manual).
 A value of 1.0 corresponds to the ``most
 probable'' Classic result, or a normalised \chisq of 1.0 in Historic mode.
@@ -814,9 +814,9 @@ There is no default value. The user will be prompted for ANALIN if MEMCRDD
 is being run interactively.
 \item [RESTRICTIONS]:
 The BDF file specified for ANALIN must be an ANALOUT file generated on
-a previous run of MEMCRDD (see parameter ANALOUT). 
+a previous run of MEMCRDD (see parameter ANALOUT).
 \item [ADVICE]:
-A value for ANALIN is required only if the parameter FUNCTION is given the value 
+A value for ANALIN is required only if the parameter FUNCTION is given the value
 ANALYSIS or CONTINUE. For other functions, no value need be specified.
 \end {description}
 
@@ -827,18 +827,18 @@ ANALYSIS or CONTINUE. For other functions, no value need be specified.
 \item [USE]:
 ANALOUT specifies a BDF file to hold internal data used by MEMCRDD. These
 ``analysis'' files can be used to analyse the results of a MEMCRDD run or
-to continue a MEMCRDD run which was interrupted for any reason (see parameter 
-ANALIN). An analysis file is produced at the end of each MEMSYS3 iteration, 
+to continue a MEMCRDD run which was interrupted for any reason (see parameter
+ANALIN). An analysis file is produced at the end of each MEMSYS3 iteration,
 overwriting the file produced at the end of the previous iteration.
 \item [DEFAULT]:
 None.
 \item [RESTRICTIONS]:
-A null value for ANALOUT will result in no analysis file being created, 
+A null value for ANALOUT will result in no analysis file being created,
 otherwise a BDF file is created with the given name.
 \item [ADVICE]:
 Analysis files can be quite big, up to a maximum of about 12500 blocks.
 The size of an analysis file is hard to predict before running MEMCRDD because
-it depends on how the data samples are grouped. However, if the ILEVEL 
+it depends on how the data samples are grouped. However, if the ILEVEL
 parameter is
 set to 2 or more, then the percentage of internal memory used is displayed
 fairly early on in the initialisation (prior to the first MEMSYS3 iteration).
@@ -853,30 +853,30 @@ idea to create an analysis file on every run of MEMCRDD.
 {\Large {\bf BACKGRND} (!!)}
 \begin{description}
 \item [USE]:
-BACKGRND specifies a two dimensional image which is used to define a background 
+BACKGRND specifies a two dimensional image which is used to define a background
 level for the CRDD. Simulated CRDD is formed from this image and subtracted from
 the real CRDD before performing the reconstruction. Once the reconstruction is
 complete the background image specified by BACKGRND is added onto the final
-image before writing it to disk. The background image is also subtracted from 
+image before writing it to disk. The background image is also subtracted from
 the entropy model image before doing the reconstruction. Any CRDD samples which
-have a negative value bigger than the samples noise value after 
+have a negative value bigger than the samples noise value after
 subtraction of the background, are excluded from the mapping process.
 \item [DEFAULT]:
-The default for BACKGRND is a null value. If this default is not replaced, 
+The default for BACKGRND is a null value. If this default is not replaced,
 a flat image is generated and used. The value of this flat image is chosen to
 ensure that the minimum CRDD value being mapped ({\em after} background
 subtraction), is 5\% of the maximum CRDD value. This means that all CRDD values
-will be strictly positive. 
+will be strictly positive.
 \item [RESTRICTIONS]:
-The image specified for BACKGRND must be in EDRS format, and must correspond 
+The image specified for BACKGRND must be in EDRS format, and must correspond
 exactly to the same area of sky as the image being produced by the current
 MEMCRDD run. This means that such background images must be derived
-from the results of previous runs of MEMCRDD. 
-\item [ADVICE]: 
+from the results of previous runs of MEMCRDD.
+\item [ADVICE]:
 Usually, the null default will be OK. However, background noise in the final
 image can sometimes be reduced by supplying an image which fits the lower
 envelope of the data rather more closely than the 5\% value used by default.
-For instance, this could be done using the EDRSX:SKYSUB procedure, or any of 
+For instance, this could be done using the EDRSX:SKYSUB procedure, or any of
 the other EDRS/X facilities.
 \end {description}
 
@@ -890,14 +890,14 @@ images for all the band 1 (12 \micron) detectors.
 The default value is EDRSX:IPAC1. This uses the file IPAC1.BDF in the main
 EDRSX directory which contains the PSFs produced by Mehrdad Moshir at IPAC.
 \item [RESTRICTIONS]:
-If the user wishes to use any other PSFs, they must be stacked in conformance 
+If the user wishes to use any other PSFs, they must be stacked in conformance
 with the format of EDRSX:IPAC1.BDF. The author can provided details of this.
 \item [ADVICE]:
 The most common reason for over-riding the default is to allow several people
 to use MEMCRDD simultaneously. The EDRSX directory is protected in such a way as
 to prevent more than one process accessing the PSF stacks at any one time. To
 get round this the PSF stack can be copied to the users own disk space, and this
-copy specified for BAND1PSF instead of the default version. 
+copy specified for BAND1PSF instead of the default version.
 \end {description}
 
 
@@ -947,18 +947,18 @@ As for BAND1PSF.
 \item [USE]:
 This specifies the size of the final square image in arcmins. The box size given
 will be extended to produce a blank border round the final image to facilitate
-the convolutions which occur within MEMCRDD. This border has a width of 0.75 of 
+the convolutions which occur within MEMCRDD. This border has a width of 0.75 of
 the maximum diagonal size of all detectors being used (usually about 3 to 4
 arc-minutes).
 \item [DEFAULT]:
-The default for BOXSIZE is a null value. If a null value is given, then the 
-final image is rectangular and is the smallest size which will cover {\em all} 
+The default for BOXSIZE is a null value. If a null value is given, then the
+final image is rectangular and is the smallest size which will cover {\em all}
 the data in the input CRDD files.
 \item [RESTRICTIONS]:
-BOXSIZE must be at least four times the pixel size in the final image (see 
+BOXSIZE must be at least four times the pixel size in the final image (see
 parameter PIXSIZE).
 \item [ADVICE]:
-BOXSIZE and PIXSIZE should be selected to keep the total number of pixels in the 
+BOXSIZE and PIXSIZE should be selected to keep the total number of pixels in the
 image as small as possible, to reduce CPU requirements.
 \end {description}
 
@@ -966,7 +966,7 @@ image as small as possible, to reduce CPU requirements.
 {\Large {\bf CORFACT} (!)}
 \begin{description}
 \item [USE]:
-A factor by which to multiply the calculated correlated noise variances before 
+A factor by which to multiply the calculated correlated noise variances before
 use.
 \item [DEFAULT]:
 1.0
@@ -981,14 +981,14 @@ There will usually be no need to change this value.
 \begin{description}
 \item [USE]:
 COVER is only used in ``LORES'' mode (see parameter FUNCTION). It is used to
-specify a BDF which is to receive the coverage image. This image gives the 
+specify a BDF which is to receive the coverage image. This image gives the
 effective solid angle (in steradians) with which each pixel was observed. Thus,
 if many data samples cover a particular pixel then that pixel will have a high
 coverage value.
 \item [DEFAULT]:
 None.
 \item [RESTRICTIONS]:
-A value {\em must}  be given for this parameter if LORES mode is being used. 
+A value {\em must}  be given for this parameter if LORES mode is being used.
 The output is an EDRS image covering the same area as the Low-Res image (see
 parameter LORES).
 \item [ADVICE]:
@@ -1001,12 +1001,12 @@ None.
 \begin{description}
 \item [USE]:
 The parameters CRDDF1 to CRDDF20 are used to specify the input CRDD files
-containing the data to be reconstructed. If less than 20 scans are to be 
+containing the data to be reconstructed. If less than 20 scans are to be
 processed, the first null value marks the end of the list.
 \item [DEFAULT]:
 None.
 \item [RESTRICTIONS]:
-The files can be either standard SURVEY CRDD files (as produced by programs 
+The files can be either standard SURVEY CRDD files (as produced by programs
 I\_SNIP\_CRDD, I\_DESTRIPE, etc), or AO CRDD files read from IPAC footprints tapes.
 \item [ADVICE]:
 None.
@@ -1018,9 +1018,9 @@ None.
 \item [USE]:
 The parameters CRDOUT1 to CRDOUT20 are used to specify output CRDD files. They
 may be used in two situations, firstly if simulated CRDD is being generated
-(see parameter FUNCTION), secondly, if a dump of internal data files is 
+(see parameter FUNCTION), secondly, if a dump of internal data files is
 required (see parameter OPTION). The data which is written to parameter
-CRDOUTi corresponds to the data read from parameter CRDDFi (i.e. the pointing 
+CRDOUTi corresponds to the data read from parameter CRDDFi (i.e. the pointing
 information for each sample in the two CRDD files is the same).
 \item [DEFAULT]:
 None.
@@ -1034,20 +1034,20 @@ None.
 {\Large {\bf CROTA} (!!)}
 \begin{description}
 \item [USE]:
-CROTA specified the orientation of the final image. It gives the angle (in 
-degrees) between north and the negative direction of the second pixel 
-coordinate (i.e. downwards if the image is displayed as normal). It is 
-measured positive in the direction north through east. Thus a value of 180 
+CROTA specified the orientation of the final image. It gives the angle (in
+degrees) between north and the negative direction of the second pixel
+coordinate (i.e. downwards if the image is displayed as normal). It is
+measured positive in the direction north through east. Thus a value of 180
 will put north upwards and east to the left.
 \item [DEFAULT]:
-The default is a null value, which causes MEMCRDD to calculate an orientation 
+The default is a null value, which causes MEMCRDD to calculate an orientation
 which minimises the size of the final image. This is done to reduce run time.
-Correct RA and DEC values can still be obtained from such images as usual, by 
+Correct RA and DEC values can still be obtained from such images as usual, by
 using the RADEC program in EDRSX.
 \item [RESTRICTIONS]:
 The value must be in the range 0 - 360.
 \item [ADVICE]:
-Unless it is important that the final image has north upwards (for instance), 
+Unless it is important that the final image has north upwards (for instance),
 then the default null value should be left unchanged.
 \end {description}
 
@@ -1056,14 +1056,14 @@ then the default null value should be left unchanged.
 {\Large {\bf DATATYPE} (!)}
 \begin{description}
 \item [USE]:
-Specifies if the input CRDD files contain SURVEY or AO data. AO data must be in 
+Specifies if the input CRDD files contain SURVEY or AO data. AO data must be in
 ``footprints'' format.
 \item [DEFAULT]:
 SURVEY
 \item [RESTRICTIONS]:
 Must be either SURVEY or AO.
 \item [ADVICE]:
-At the moment there is no official support for the distribution AO CRDD 
+At the moment there is no official support for the distribution AO CRDD
 footprints data in the UK, but see appendix \ref{APP:AO} for an interim
 work-around.
 \end {description}
@@ -1074,7 +1074,7 @@ work-around.
 \item [USE]:
 The degrees field of the Declination of the required field centre. If this
 is given a non-integer value then it is assumed that it gives the entire DEC
-value. 
+value.
 \item [DEFAULT]:
 If the default value for parameter BOXSIZE is accepted, then the field centre
 is taken as the centre of {\em all} the available data. If the default for
@@ -1121,9 +1121,9 @@ This value controls the effectiveness of the deglitching applied to the data
 before reconstruction commences. Glitches are defined as spikes in the
 data which exceed the local noise level, and which are of duration less
 than the value of DEGLIT times the size of a point source. A value of zero will
-suppress all deglitching, whereas a value of 1.0 will give very strong 
-deglitching which will probably reject point sources as well. If the ILEVEL 
-parameter is set to 3 or more, then the number of samples rejected as glitches 
+suppress all deglitching, whereas a value of 1.0 will give very strong
+deglitching which will probably reject point sources as well. If the ILEVEL
+parameter is set to 3 or more, then the number of samples rejected as glitches
 form each input CRDD file is displayed.
 
 The deglitching is based on an iterative scheme in which the input detector data
@@ -1136,7 +1136,7 @@ value is used as the default value for the field noise in the corresponding data
 stream. Glitches are then identified by looking for blocks of adjacent rejected
 output pixels. Any such blocks with sizes less than or equal to DEGLIT times a
 point source width are rejected from the original input data. All other input
-data is retained in its original form. 
+data is retained in its original form.
 
 
 \item [DEFAULT]:
@@ -1145,7 +1145,7 @@ data is retained in its original form.
 Must be in the range 0.0 to 1.0.
 \item [ADVICE]:
 Setting DEGLIT to 1.0 can be useful if a map is required which does not
-include point sources. This can often reduce the noise in the background 
+include point sources. This can often reduce the noise in the background
 regions.
 \end {description}
 
@@ -1153,24 +1153,24 @@ regions.
 {\Large {\bf DGROUPS} (!)}
 \begin{description}
 \item [USE]:
-This parameter specifies which detectors are to be used. If the ILEVEL 
+This parameter specifies which detectors are to be used. If the ILEVEL
 parameter is set to 3 or more, then a list of the detector numbers
-in the input CRDD files is displayed just before prompting for DGROUPS. A list 
+in the input CRDD files is displayed just before prompting for DGROUPS. A list
 of integer values should be given for DGROUPS containing one value per detector
-in the input CRDD files. If the value corresponding to a given detector is zero, 
-then {\em all} data from that detector is excluded from the reconstruction. If 
-the same (non-zero) value is given for several detectors then a ``detector 
-group'' is defined and the same PSF is used for all detectors in the group. 
-The PSF used for the group is the mean of the PSFs of all detectors in the 
-group. For instance, if the input CRDD files contained 16 detectors (as is 
-usual), and if DGROUPS was given the value 
-{\tt 0,1,2,3,4,5,6,7,8,9,10,11,12,13,1,0} then the first and last detectors 
-would not be used, the second and fifteenth detectors would be processed using 
-a common PSF (the mean of the PSFs of the two detectors), and all other 
+in the input CRDD files. If the value corresponding to a given detector is zero,
+then {\em all} data from that detector is excluded from the reconstruction. If
+the same (non-zero) value is given for several detectors then a ``detector
+group'' is defined and the same PSF is used for all detectors in the group.
+The PSF used for the group is the mean of the PSFs of all detectors in the
+group. For instance, if the input CRDD files contained 16 detectors (as is
+usual), and if DGROUPS was given the value
+{\tt 0,1,2,3,4,5,6,7,8,9,10,11,12,13,1,0} then the first and last detectors
+would not be used, the second and fifteenth detectors would be processed using
+a common PSF (the mean of the PSFs of the two detectors), and all other
 detectors would be used, and processed using their own PSF.
 \item [DEFAULT]:
 The default is a null value which causes all detectors to be used, and grouped
-as follows (detectors identified by detector number, given in the IRAS 
+as follows (detectors identified by detector number, given in the IRAS
 Catalogs and Atlases Explanatory Supplement Fig. II.C.6):
 \begin{verbatim}
 
@@ -1192,7 +1192,7 @@ Catalogs and Atlases Explanatory Supplement Fig. II.C.6):
 
 \end{verbatim}
 The first group in each band contain the small edge detectors, the second group
-contain the medium sized edge detectors, and the third group contain the 
+contain the medium sized edge detectors, and the third group contain the
 full sized detectors.
 \item [RESTRICTIONS]:
 The list must contain the correct number of values, one per detector present.
@@ -1204,7 +1204,7 @@ None.
 {\Large {\bf ELEMENT} (!)}
 \begin{description}
 \item [USE]:
-ELEMENT is used in diagnostic mode. It allows the user to specify an element 
+ELEMENT is used in diagnostic mode. It allows the user to specify an element
 number within an internal image or data set.
 \item [DEFAULT]:
 None.
@@ -1225,7 +1225,7 @@ which is independent of signal strength. The value specified is the mean of the
 field noise in each detector. The actual field noise values used for each
 detector are obtained by scaling the supplied value by a factor dependant on the
 measured ``Noise Equivalent Flux Density'' for each detector (see the
-Explanatory Supplement Fig. IV.A.1). 
+Explanatory Supplement Fig. IV.A.1).
 \item [DEFAULT]:
 The default is zero which causes MEMCRDD to calculate a separate value
 for each detector data stream by applying a one dimensional high pass filter
@@ -1235,8 +1235,8 @@ the values calculated are displayed by MEMCRDD.
 The value must be greater than or equal to zero.
 \item [ADVICE]:
 The default value is usually OK . However, if the final image is noisy, it may
-be necessary to give a larger FIELD value. If parameter FUNCTION has value 
-SIMULATE then the default value of zero causes no noise to be added to the 
+be necessary to give a larger FIELD value. If parameter FUNCTION has value
+SIMULATE then the default value of zero causes no noise to be added to the
 simulated data.
 \end {description}
 
@@ -1259,17 +1259,17 @@ See parameters OPTION and UDIAG for more information about diagnostic mode.
 {\Large {\bf FILTER} (!!)}
 \begin{description}
 \item [USE]:
-FILTER specifies the full width at half maximum of a Gaussian Intrinsic 
-Correlation Function (see sections \ref {SEC:ICFA} and \ref {SEC:ICFB}), in 
+FILTER specifies the full width at half maximum of a Gaussian Intrinsic
+Correlation Function (see sections \ref {SEC:ICFA} and \ref {SEC:ICFB}), in
 units of arc-minutes. A value of zero causes no ICF to be used.
 \item [DEFAULT]:
 0.5 arcmins
 \item [RESTRICTIONS]:
 None
 \item [ADVICE]:
-Using an ICF encourages smoothness in the final image on the scale of the ICF. 
-The best value to use for FILTER could be found by running MEMCRDD several times 
-using different values, and selecting the value which gives the greatest 
+Using an ICF encourages smoothness in the final image on the scale of the ICF.
+The best value to use for FILTER could be found by running MEMCRDD several times
+using different values, and selecting the value which gives the greatest
 evidence value ( log(probability) ).
 \end {description}
 
@@ -1279,40 +1279,40 @@ evidence value ( log(probability) ).
 \item [USE]:
 Specifies what MEMCRDD is to do. There are several options:
 \begin{description}
-\item [HIRES] - Produce a high resolution image from scratch, using the 
-input CRDD files specified by parameters CRDDF1 to CRDDF20. 
+\item [HIRES] - Produce a high resolution image from scratch, using the
+input CRDD files specified by parameters CRDDF1 to CRDDF20.
 The method used to produce the hi-res image is specified by parameter METHOD.
-\item [LORES] - Produce a low resolution image by sample averaging. The detector 
+\item [LORES] - Produce a low resolution image by sample averaging. The detector
 PSFs are used to weight each sample. This is {\em much} faster than HIRES mode
 but slower than using I\_CRDD\_COMBINE.
-\item [SIMULATE] - Produce simulated CRDD. The user gives an image holding a 
+\item [SIMULATE] - Produce simulated CRDD. The user gives an image holding a
 trial sky, and a set of CRDD files. The sky is convolved with the detector
 PSFs and sampled at the position of each of the samples in the input CRDD files.
 The sampled values are written to the output CRDD files (CRDOUT1 - 20). Noise
-is added to the output CRDD as determined by parameters FIELD, XSCAN, INSCAN, 
+is added to the output CRDD as determined by parameters FIELD, XSCAN, INSCAN,
 and STRIPES.
-\item [CONTINUE] - Continues a HIRES run which was interrupted for any reason 
-(e.g. the batch queue CPU limit was reached, or the VAX went down). It is 
+\item [CONTINUE] - Continues a HIRES run which was interrupted for any reason
+(e.g. the batch queue CPU limit was reached, or the VAX went down). It is
 possible to restart the run using different values for the following parameters:
-AIM, HIRES, ILEVEL, LEVEL, LOGFILE, NITER, RATE, STOPFILE, TOL. It is 
-only possible to restart a run if the previous run generated an analysis file 
-(see parameters ANALOUT and ANALIN). If an analysis file is available it must be 
+AIM, HIRES, ILEVEL, LEVEL, LOGFILE, NITER, RATE, STOPFILE, TOL. It is
+only possible to restart a run if the previous run generated an analysis file
+(see parameters ANALOUT and ANALIN). If an analysis file is available it must be
 specified by parameter ANALIN.
-\item [ANALYSIS] - Allows the user to analyse the results from a non-HISTORIC run 
-of MEMCRDD (see parameter METHOD). An analysis file must be specified using 
-parameter ANALIN. The user can specify areas of the image, and the integrated 
-flux within that area is displayed together with the standard deviation on the 
+\item [ANALYSIS] - Allows the user to analyse the results from a non-HISTORIC run
+of MEMCRDD (see parameter METHOD). An analysis file must be specified using
+parameter ANALIN. The user can specify areas of the image, and the integrated
+flux within that area is displayed together with the standard deviation on the
 total flux. Each area takes a significant amount of CPU to process (roughly
 equivalent to a single classic iteration). The area may be specified either as
-an EDRS XY list (see parameter MASKPOLY) created using EDRS program XYCUR 
-for instance, or as an image (see parameter MASK). Care must be taken when 
-interpreting the results from this form of analysis, as the standard deviations 
+an EDRS XY list (see parameter MASKPOLY) created using EDRS program XYCUR
+for instance, or as an image (see parameter MASK). Care must be taken when
+interpreting the results from this form of analysis, as the standard deviations
 calculated depend on the form of the entropy model used (see the MEMSYS3 users
 manual). In general, if errors on integrated fluxes are required, MEMCRDD should
-be run using a flat model, such as is generated if the parameter MODEL is given 
+be run using a flat model, such as is generated if the parameter MODEL is given
 a null value.
 
-A second use of the ANALYSIS function is to allow an analysis file to be 
+A second use of the ANALYSIS function is to allow an analysis file to be
 examined internally. This is referred to as ``diagnostic mode'', and allows
 various operations to be performed on the data stored in the analysis file
 (see parameter OPTION).
@@ -1344,7 +1344,7 @@ See parameters OPTION and UDIAG for more information about diagnostic mode.
 {\Large {\bf HIRES} (!!!)}
 \begin{description}
 \item [USE]:
-This parameter is used to specify a BDF to receive the output high resolution 
+This parameter is used to specify a BDF to receive the output high resolution
 image. The image is in EDRS format.
 \item [DEFAULT]:
 None.
@@ -1358,9 +1358,9 @@ None.
 {\Large {\bf ILEVEL} (!)}
 \begin{description}
 \item [USE]:
-This is an integer value controlling how much information is displayed on the 
+This is an integer value controlling how much information is displayed on the
 users screen or written to the batch job log file. A value of 1 results in no
-information being displayed, value of 5 results in all information being 
+information being displayed, value of 5 results in all information being
 displayed. Information displayed at a lower value of ILEVEL is more likely to
 be of interest to the user.
 \item [DEFAULT]:
@@ -1377,11 +1377,11 @@ order to see what is happening inside MEMCRDD.
 \begin{description}
 \item [USE]:
 This specifies the in-scan uncertainty in the pointing data, in arcminutes.
-It is used to generate pointing noise estimates if a value for the SKYIN 
+It is used to generate pointing noise estimates if a value for the SKYIN
 parameter is given when FUNCTION=HIRES. It is also used to
 add pointing errors into simulated CRDD when FUNCTION=SIMULATE.
 \item [DEFAULT]:
-The default is a null value which causes MEMCRDD to use a value dependant on the 
+The default is a null value which causes MEMCRDD to use a value dependant on the
 IRAS band. The bands 1 to 4 have values of 0.05, 0.05, 0.1 and 0.1 respectively.
 \item [RESTRICTIONS]:
 The value must be positive or zero.
@@ -1393,12 +1393,12 @@ The default value should be OK.
 {\Large {\bf K } (!)}
 \begin{description}
 \item [USE]:
-This is the fractional uncertainty to assume in the effective solid angle values 
-for each detector. It is taken into account when calculating the uncertainties 
+This is the fractional uncertainty to assume in the effective solid angle values
+for each detector. It is taken into account when calculating the uncertainties
 in simulated data values.
 \item [DEFAULT]:
-The default is a null value, which causes the following default values to be 
-used for IRAS bands 1 to 4: 0.01, 0.01, 0.03, 0.04. These value are the band 
+The default is a null value, which causes the following default values to be
+used for IRAS bands 1 to 4: 0.01, 0.01, 0.03, 0.04. These value are the band
 averaged relative errors in the detector effective solid angles quoted by IPAC.
 \item [RESTRICTIONS]:
 The value must be positive.
@@ -1410,15 +1410,15 @@ None.
 {\Large {\bf LEVEL} (!)}
 \begin{description}
 \item [USE]:
-This controls the amount of diagnostic information which the MEMSYS3 package 
-generated. See the MEMSYS3 users manual for information on the legal values for 
-LEVEL. NB, LEVEL and ILEVEL function differently. LEVEL controls the MEMSYS3 
-diagnostics, ILEVEL controls the amount of information displayed by the rest 
+This controls the amount of diagnostic information which the MEMSYS3 package
+generated. See the MEMSYS3 users manual for information on the legal values for
+LEVEL. NB, LEVEL and ILEVEL function differently. LEVEL controls the MEMSYS3
+diagnostics, ILEVEL controls the amount of information displayed by the rest
 of MEMCRDD.
 \item [DEFAULT]:
 The default is a null value which suppresses all MEMSYS3 diagnostic information.
 \item [RESTRICTIONS]:
-See MEMSYS3 users manual. 
+See MEMSYS3 users manual.
 \item [ADVICE]:
 None.
 \end {description}
@@ -1427,7 +1427,7 @@ None.
 {\Large {\bf LOGFILE} (!)}
 \begin{description}
 \item [USE]:
-This parameter specifies a text file to receive any MEMSYS3 diagnostic 
+This parameter specifies a text file to receive any MEMSYS3 diagnostic
 information.
 \item [DEFAULT]:
 SYS\$OUTPUT. This causes information to go to the terminal screen if the user
@@ -1442,7 +1442,7 @@ None.
 {\Large {\bf LOOP} (!)}
 \begin{description}
 \item [USE]:
-Specifies if the user is to be repeatedly prompted for new MASKS when running in 
+Specifies if the user is to be repeatedly prompted for new MASKS when running in
 ANALYSIS mode (see parameter FUNCTION). If not, then the user specifies a single
 mask, and when complete, MEMCRDD terminates.
 \item [DEFAULT]:
@@ -1450,7 +1450,7 @@ NO
 \item [RESTRICTIONS]:
 YES,NO,TRUE or FALSE, or any abbreviation.
 \item [ADVICE]:
-Looping should only be used when running MEMCRDD interactively. Since it 
+Looping should only be used when running MEMCRDD interactively. Since it
 takes quite a long time to analyse a single mask, this won't usually be the case.
 \end {description}
 
@@ -1458,7 +1458,7 @@ takes quite a long time to analyse a single mask, this won't usually be the case
 {\Large {\bf LORES} (!!)}
 \begin{description}
 \item [USE]:
-Specifies the output BDF to receive the low resolution image when running in 
+Specifies the output BDF to receive the low resolution image when running in
 LORES mode (see parameter FUNCTION). The image is held in EDRS format.
 \item [DEFAULT]:
 None.
@@ -1472,24 +1472,24 @@ None.
 {\Large {\bf MASK } (!!)}
 \begin{description}
 \item [USE]:
-This is used when running in ANALYSIS mode (see parameter FUNCTION). It 
+This is used when running in ANALYSIS mode (see parameter FUNCTION). It
 determines the area of the high-res image to be integrated. Specifically, the
-high-res image is multiplied pixel-for-pixel with the mask image and the total 
-data sum of the product image is calculated (converted to Janskys), together 
+high-res image is multiplied pixel-for-pixel with the mask image and the total
+data sum of the product image is calculated (converted to Janskys), together
 with the standard deviation in the sum. The total data sum in the supplied mask
 is also displayed, allowing the user to calculate the effective solid angle in
-the mask and so convert the integrated flux to a mean surface brightness. 
+the mask and so convert the integrated flux to a mean surface brightness.
 
 \item [DEFAULT]:
 None.
 \item [RESTRICTIONS]:
-The image must be held in EDRS format, and must correspond pixel-for-pixel with 
+The image must be held in EDRS format, and must correspond pixel-for-pixel with
 the high-res image.
 \item [ADVICE]:
-A mask will typically be created by taking the high-res image, and setting 
-certain pixels to the value 1.0 and all other pixels to the value 0.0. This can 
-be done in various ways using EDRS. It is also possible to calculate a weighted 
-mean over a given area by lowering the mask value in the regions which are to 
+A mask will typically be created by taking the high-res image, and setting
+certain pixels to the value 1.0 and all other pixels to the value 0.0. This can
+be done in various ways using EDRS. It is also possible to calculate a weighted
+mean over a given area by lowering the mask value in the regions which are to
 receive lower weight.
 \end {description}
 
@@ -1497,19 +1497,19 @@ receive lower weight.
 {\Large {\bf MASKPOLY } (!)}
 \begin{description}
 \item [USE]:
-This is used when running in ANALYSIS mode (see parameter FUNCTION). It 
-determines the area of the high-res image to be integrated. 
-It specifies a BDF holding an XY list defining a polygonal area of a high-res 
-image. The total data sum within the polygon (converted to Janskys) is found 
+This is used when running in ANALYSIS mode (see parameter FUNCTION). It
+determines the area of the high-res image to be integrated.
+It specifies a BDF holding an XY list defining a polygonal area of a high-res
+image. The total data sum within the polygon (converted to Janskys) is found
 from the high-res image, together with the standard deviation of the sum.
 \item [DEFAULT]:
 None.
 \item [RESTRICTIONS]:
-The BDF must be a standard EDRS XY list, as produced by XYCUR or XYKEY (for 
+The BDF must be a standard EDRS XY list, as produced by XYCUR or XYKEY (for
 instance).
 \item [ADVICE]:
-The XY list would usually be created by displaying the high-res image on an 
-image display device and then using XYCUR to select the polygonal area to be 
+The XY list would usually be created by displaying the high-res image on an
+image display device and then using XYCUR to select the polygonal area to be
 summed over.
 \end {description}
 
@@ -1517,45 +1517,45 @@ summed over.
 {\Large {\bf METHOD} (!!!)}
 \begin{description}
 \item [USE]:
-Specifies the MEMSYS3 method to use when performing the reconstruction. See the 
+Specifies the MEMSYS3 method to use when performing the reconstruction. See the
 MEMSYS3 manual for more details. It can take one of the following values:
 \begin {description}
-\item [HISTORIC] - Runs MEMSYS3 in ``Historic'' mode. This is the algorithm used 
-by previous versions of the MEMSYS package, but which has been superceded by 
-the ``Classic'' algorithm in MEMSYS3. The final result is 
-an image which has an overall normalised \chisq value of 1.0 (if AIM has the default 
+\item [HISTORIC] - Runs MEMSYS3 in ``Historic'' mode. This is the algorithm used
+by previous versions of the MEMSYS package, but which has been superceded by
+the ``Classic'' algorithm in MEMSYS3. The final result is
+an image which has an overall normalised \chisq value of 1.0 (if AIM has the default
 value of 1.0). This mode is faster than the others, but is non-Bayesian and
 is not considered to be rigorously justifiable by Gull and Skilling.
-The results usually contain less fine detail than the classic results. It also 
-suffers from the fact that the more accurate samples are fitted more closely 
-than \chisq=1.0 and the less accurate samples are fitted less closely than 
-\chisq=1.0. Since there is a strong signal dependance in the 
-noise, this means that the background regions are over-fitted at the expense of 
-the source regions. It is not possible to ``analyse'' historic results (see 
+The results usually contain less fine detail than the classic results. It also
+suffers from the fact that the more accurate samples are fitted more closely
+than \chisq=1.0 and the less accurate samples are fitted less closely than
+\chisq=1.0. Since there is a strong signal dependance in the
+noise, this means that the background regions are over-fitted at the expense of
+the source regions. It is not possible to ``analyse'' historic results (see
 parameter FUNCTION).
-\item [CLASSIC] - Runs MEMSYS3 in ``classic automatic'' mode. The final result 
-is the ``most probable'' image (see MEMSYS3 manual). This method incorporates 
+\item [CLASSIC] - Runs MEMSYS3 in ``classic automatic'' mode. The final result
+is the ``most probable'' image (see MEMSYS3 manual). This method incorporates
 automatic noise scaling. That is, MEMSYS3 determines a single scaling factor to
 apply to all the sample noise estimates which maximises the likelihood that the
 given data could have been generated by observing the same sky area. Note that
-this is just a single scaling factor applied to {\em all} samples, the 
+this is just a single scaling factor applied to {\em all} samples, the
 sample-to-sample variation in noise level is thus not altered. CLASSIC results
-take much longer to produce and contain more fine detail than HISTORIC results. 
+take much longer to produce and contain more fine detail than HISTORIC results.
 Errors estimates can be produced from CLASSIC results by using  ``analyse''
 mode (see parameter FUNCTION).
-\item [NONAUTO] - Runs MEMSYS3 in ``classic non-automatic'' mode. This is the 
+\item [NONAUTO] - Runs MEMSYS3 in ``classic non-automatic'' mode. This is the
 same as CLASSIC except that there is no scaling of the input noise values. The
-value of the input noise scaling is in doubt since MEMSYS3 assumes that the 
-noise is uncorrelated, whereas in fact the noise in IRAS data can be strongly 
-correlated. Automatic mode seems to interpret this correlated noise as real 
+value of the input noise scaling is in doubt since MEMSYS3 assumes that the
+noise is uncorrelated, whereas in fact the noise in IRAS data can be strongly
+correlated. Automatic mode seems to interpret this correlated noise as real
 structure (see section \ref {SEC:NOISE}).
-\item [MCM] - {\bf This is NOT a Maximum Entropy Method!!} It is a simple 
-implementation of the ``Maximum Correlation Method'' for reconstructing images 
-from IRAS data 
-described by Aumann et al (Astronomical Journal  Vol.99, No.5, P.1674). It is 
-{\em much} faster than any MEMSYS3 method, but produces lower resolution images 
-with poorer fits to the data. The final images are much smoother than MEM 
-images. The results cannot be ``analysed''. It must be emphasised that this method 
+\item [MCM] - {\bf This is NOT a Maximum Entropy Method!!} It is a simple
+implementation of the ``Maximum Correlation Method'' for reconstructing images
+from IRAS data
+described by Aumann et al (Astronomical Journal  Vol.99, No.5, P.1674). It is
+{\em much} faster than any MEMSYS3 method, but produces lower resolution images
+with poorer fits to the data. The final images are much smoother than MEM
+images. The results cannot be ``analysed''. It must be emphasised that this method
 makes no use what-so-ever of the MEMSYS3 package.
 \end {description}
 \item [DEFAULT]:
@@ -1563,11 +1563,11 @@ CLASSIC
 \item [RESTRICTIONS]:
 Must be one of the above values, or an abbreviation.
 \item [ADVICE]:
-If using a simple noise model (i.e if a null value was specified for parameter 
+If using a simple noise model (i.e if a null value was specified for parameter
 SKYIN) then CLASSIC is probably the best method to use since the noise values
-will be uncertain. If the more sophisticated noise model option is used (based 
-on running  MEMCRDD several times, giving the output image as the SKYIN parameter 
-for the next run) then NONAUTO mode is best since the noise scaling provided by 
+will be uncertain. If the more sophisticated noise model option is used (based
+on running  MEMCRDD several times, giving the output image as the SKYIN parameter
+for the next run) then NONAUTO mode is best since the noise scaling provided by
 CLASSIC will tend to lower the noise values too much.
 \end {description}
 
@@ -1575,18 +1575,18 @@ CLASSIC will tend to lower the noise values too much.
 {\Large {\bf MODEL } (!)}
 \begin{description}
 \item [USE]:
-Specifies an image which is to be used as the default model in the 
+Specifies an image which is to be used as the default model in the
 reconstruction. The background image is subtracted from it before being used.
 \item [DEFAULT]:
-The default is a null value, which causes a flat model to be used with value 
+The default is a null value, which causes a flat model to be used with value
 equal to the mean of the input data (converted from flux to surface brightness).
 \item [RESTRICTIONS]:
 The image must be greater than the background at every point.
 \item [ADVICE]:
-It is usually a good idea to use the default flat image, especially if a 
-non-zero value was specified for FILTER or if an analysis is to be performed on 
+It is usually a good idea to use the default flat image, especially if a
+non-zero value was specified for FILTER or if an analysis is to be performed on
 the reconstruction. However, it seems that background structure can sometimes
-be reduced by specifying an image which is closer to the final reconstruction 
+be reduced by specifying an image which is closer to the final reconstruction
 (see parameter MODELOUT).
 \end {description}
 
@@ -1594,25 +1594,25 @@ be reduced by specifying an image which is closer to the final reconstruction
 {\Large {\bf MODELOUT } (!)}
 \begin{description}
 \item [USE]:
-MODELOUT specifies an image to receive a modified version of the default model 
+MODELOUT specifies an image to receive a modified version of the default model
 specified for parameter MODEL. Pixel $i$ of the new model is given by
 
 \begin {equation}
 m'_{i}=m_{i}+gain*(f_{i}-m_{i})*s_{i}/s_{max}
 \end {equation}
 
-where $m_{i}$, $f_{i}$ and $s_{i}$ are pixel $i$ of the old model, the 
-reconstruction, and the entropy map. $s_{max}$ is the maximum entropy value in 
+where $m_{i}$, $f_{i}$ and $s_{i}$ are pixel $i$ of the old model, the
+reconstruction, and the entropy map. $s_{max}$ is the maximum entropy value in
 the entropy map, and $gain$ is a factor used to reduce the change in
-the model when the entropy of all pixels is similar. 
+the model when the entropy of all pixels is similar.
 \item [DEFAULT]:
 None.
 \item [RESTRICTIONS]:
 None.
 \item [ADVICE]:
 The new model can be used in a further run of MEMCRDD, with the provisos
-mentioned under parameter MODEL. If this process is repeated the model will 
-eventually become sufficiently in agreement with the data, that MEMSYS3 sees no 
+mentioned under parameter MODEL. If this process is repeated the model will
+eventually become sufficiently in agreement with the data, that MEMSYS3 sees no
 evidence for any change from the model.
 \end {description}
 
@@ -1620,17 +1620,17 @@ evidence for any change from the model.
 {\Large {\bf NITER} (!!)}
 \begin{description}
 \item [USE]:
-The maximum number of iterations of the MEMSYS3 algorithm to perform. If the 
-reconstruction is not complete when NITER iterations have been performed. The 
+The maximum number of iterations of the MEMSYS3 algorithm to perform. If the
+reconstruction is not complete when NITER iterations have been performed. The
 current reconstruction is returned using parameter HIRES.
 \item [DEFAULT]:
 20
 \item [RESTRICTIONS]:
 None
 \item [ADVICE]:
-If the maximum number of iterations is exceeded, all is not lost! If an analysis 
-file was created (see parameter ANALOUT), then the process can be restarted from 
-where it left off by re-running MEMCRDD with parameter METHOD set to CONTINUE, 
+If the maximum number of iterations is exceeded, all is not lost! If an analysis
+file was created (see parameter ANALOUT), then the process can be restarted from
+where it left off by re-running MEMCRDD with parameter METHOD set to CONTINUE,
 and specifying a higher value for NITER.
 \end {description}
 
@@ -1638,16 +1638,16 @@ and specifying a higher value for NITER.
 {\Large {\bf NOISE\_OK} (!)}
 \begin{description}
 \item [USE]:
-An output parameter which is set to YES if the noise values used for the 
-reconstruction differed little from the noise values specified by the VARIN 
+An output parameter which is set to YES if the noise values used for the
+reconstruction differed little from the noise values specified by the VARIN
 parameter. When this happens, the noise model has converged.
 \item [DEFAULT]:
 None
 \item [RESTRICTIONS]:
 None
 \item [ADVICE]:
-This parameter is intended for use in command procedures which re-run MEMCRDD 
-several times to produce a refined noise model. The command procedure can look 
+This parameter is intended for use in command procedures which re-run MEMCRDD
+several times to produce a refined noise model. The command procedure can look
 at the value of NOISE\_OK after each run to see if another run is needed. E.g.
 \begin{verbatim}
 $!
@@ -1658,8 +1658,8 @@ $ RUNSTAR JOB1
 $!
 $! Check to see if the noise model has converged.
 $!
-$ IF F$TRNLNM("JOB1_NOISE_OK").NES."YES" 
-$    THEN 
+$ IF F$TRNLNM("JOB1_NOISE_OK").NES."YES"
+$    THEN
 $!
 $! If not, re-run MEMCRDD basing the noise model on the previous high res image.
 $!
@@ -1672,7 +1672,7 @@ $    ENDIF
 .. (etc) ..
 
 \end{verbatim}
-See section \ref {SEC:RUN} for a description of the use of ``command line'' 
+See section \ref {SEC:RUN} for a description of the use of ``command line''
 parameter assignments.
 \end {description}
 
@@ -1680,11 +1680,11 @@ parameter assignments.
 {\Large {\bf NTRIAL} (!)}
 \begin{description}
 \item [USE]:
-Specifies the maximum number of data simulations to be performed when 
-calculating the contribution to the noise due to pointing errors. For each input 
-sample, the image specified by parameter SKYIN is sampled up to NTRIAL times with 
-random Gaussian variations introduced into the position of the sample.The 
-spread in sample values is taken as the noise due to pointing. The FWHM of the 
+Specifies the maximum number of data simulations to be performed when
+calculating the contribution to the noise due to pointing errors. For each input
+sample, the image specified by parameter SKYIN is sampled up to NTRIAL times with
+random Gaussian variations introduced into the position of the sample.The
+spread in sample values is taken as the noise due to pointing. The FWHM of the
 Gaussian can be specified separately for the in-scan and cross-scan directions
 (see parameters INSCAN and XSCAN).
 \item [DEFAULT]:
@@ -1692,7 +1692,7 @@ Gaussian can be specified separately for the in-scan and cross-scan directions
 \item [RESTRICTIONS]:
 None
 \item [ADVICE]:
-A low value will speed up the calculation of the pointing noise, but will 
+A low value will speed up the calculation of the pointing noise, but will
 increase the uncertainty in the noise level.
 \end {description}
 
@@ -1701,8 +1701,8 @@ increase the uncertainty in the noise level.
 \begin{description}
 \item [USE]:
 Used in diagnostic mode, to specify an option from the menu of diagnostic tools.
-The menu is displayed if parameter UDIAG is set to a true value during an 
-analysis, and also on entry to every MEMSYS3 subroutine if the least significant 
+The menu is displayed if parameter UDIAG is set to a true value during an
+analysis, and also on entry to every MEMSYS3 subroutine if the least significant
 digit in the value of parameter LEVEL is 3.
 \item [DEFAULT]:
 None
@@ -1730,12 +1730,12 @@ None.\end {description}
 \item [USE]:
 PIXSIZE gives the size of the square pixels in the output image, in arc-minutes.
 \item [DEFAULT]:
-The default is a null value which causes the values 0.25, 0.25, 0.5, 1.0 to be 
+The default is a null value which causes the values 0.25, 0.25, 0.5, 1.0 to be
 used for data in the 12, 25, 60 and 100 $\mu$m wavebands.
 \item [RESTRICTIONS]:
 None.
 \item [ADVICE]:
-The smaller the pixel size, the longer MEMCRDD will take to run. 
+The smaller the pixel size, the longer MEMCRDD will take to run.
 \end {description}
 
 \rule{\textwidth}{0.3mm}
@@ -1748,7 +1748,7 @@ The default is 0.1, the quoted error on the IPAC PSFs.
 \item [RESTRICTIONS]:
 Must lie between 0.0 and 1.0.
 \item [ADVICE]:
-Increasing PSFERR will raise the noise estimates for the input data if a value 
+Increasing PSFERR will raise the noise estimates for the input data if a value
 was specified for parameter SKYIN.
 \end {description}
 
@@ -1758,7 +1758,7 @@ was specified for parameter SKYIN.
 \item [USE]:
 The hours field of the Right Ascension of the required field centre. If this
 is given a non-integer value then it is assumed that it gives the entire RA
-value. 
+value.
 \item [DEFAULT]:
 If the default value for parameter BOXSIZE is accepted, then the field centre
 is taken as the centre of {\em all} the available data. If the default for
@@ -1802,20 +1802,20 @@ None.
 {\Large {\bf RATE} (!!)}
 \begin{description}
 \item [USE]:
-RATE controls the maximum size of the step that can be taken towards the final 
-reconstruction by a single MEMSYS3 iteration. It should be of order 1. If a 
-negative value is given then the absolute value is used initially, but RATE is 
-then changed between iterations in an attempt to keep the TEST diagnostic between the 
-limits of 0.5 and 0.05 (see section \ref {SEC:DIAG}). If a positive value is 
-given for RATE, then the given value is used for all MEMSYS3 iterations without 
+RATE controls the maximum size of the step that can be taken towards the final
+reconstruction by a single MEMSYS3 iteration. It should be of order 1. If a
+negative value is given then the absolute value is used initially, but RATE is
+then changed between iterations in an attempt to keep the TEST diagnostic between the
+limits of 0.5 and 0.05 (see section \ref {SEC:DIAG}). If a positive value is
+given for RATE, then the given value is used for all MEMSYS3 iterations without
 change.
 \item [DEFAULT]:
--0.5. 
+-0.5.
 \item [RESTRICTIONS]:
 Must not be exactly zero.
 \item [ADVICE]:
-Values of RATE which are too high can allow the algorithm to wander from its 
-correct trajectory. This can sometimes cause MEMCRDD to crash with a ``floating 
+Values of RATE which are too high can allow the algorithm to wander from its
+correct trajectory. This can sometimes cause MEMCRDD to crash with a ``floating
 overflow'' message. If this happens try reducing RATE by a factor of ten.
 \end {description}
 
@@ -1836,18 +1836,18 @@ See parameters OPTION and UDIAG for more information on diagnostic mode.
 {\Large {\bf SKYIN} (!!)}
 \begin{description}
 \item [USE]:
-This parameter specifies an EDRS image holding an estimate of the sky to be 
-used to define the noise in the input CRDD caused by pointing errors and 
+This parameter specifies an EDRS image holding an estimate of the sky to be
+used to define the noise in the input CRDD caused by pointing errors and
  errors in the detector PSFs.
 \item [DEFAULT]:
-The default is a null value which causes a simple noise model to be used which 
+The default is a null value which causes a simple noise model to be used which
 does not contain any terms due to pointing or PSF errors, or any ``correlated''
 noise.
 \item [RESTRICTIONS]:
-The image must cover exactly the same area of the sky as the output image. 
+The image must cover exactly the same area of the sky as the output image.
 \item [ADVICE]:
-This image is usually the output from a previous run of MEMCRDD. Doing this sort 
-of ``noise loop'' can sometimes reduce the level of spurious background 
+This image is usually the output from a previous run of MEMCRDD. Doing this sort
+of ``noise loop'' can sometimes reduce the level of spurious background
 structure.
 \end {description}
 
@@ -1855,7 +1855,7 @@ structure.
 {\Large {\bf SPEED } (!)}
 \begin{description}
 \item [USE]:
-Controls the rate at which noise estimates change between 
+Controls the rate at which noise estimates change between
 successive runs of MEMCRDD when performing a ``noise loop'' (see section
 \ref {SEC:ICFB}). In fact the used variances $v_{k}$ are given by
 
@@ -1863,16 +1863,16 @@ successive runs of MEMCRDD when performing a ``noise loop'' (see section
 v_{k}=speed*t_{k}+(1.0-speed)*l_{k}
 \end {equation}
 
-where $t_{k}$ are the total variances calculated from the input CRDD and the 
-input SKYIN image (i.e. field noise + correlated noise + pointing noise + PSF 
-noise), and $l_{k}$ are last times variances. Thus if speed were set to zero, 
-the used variances would always be last times variances. 
+where $t_{k}$ are the total variances calculated from the input CRDD and the
+input SKYIN image (i.e. field noise + correlated noise + pointing noise + PSF
+noise), and $l_{k}$ are last times variances. Thus if speed were set to zero,
+the used variances would always be last times variances.
 \item [DEFAULT]:
 0.3
 \item [RESTRICTIONS]:
 Must be between 0.0 and 1.0.
 \item [ADVICE]:
-Reducing the speed increase the stability of the noise loop process. Too high a 
+Reducing the speed increase the stability of the noise loop process. Too high a
 value for speed can cause the process to oscillate.
 \end {description}
 
@@ -1881,12 +1881,12 @@ value for speed can cause the process to oscillate.
 {\Large {\bf SRCRATIO} (!)}
 \begin{description}
 \item [USE]:
-The correlated noise calculation is invalid near small sources. The values used 
+The correlated noise calculation is invalid near small sources. The values used
 in such areas are therefore extrapolated from the surrounding regions. SRCRATIO
-is used to define source areas for this purpose. Samples for which the 
-pointing noise exceeds SRCRATIO times the field noise are excluded from the 
-correlated noise calculation. Since pointing noise is required to do this, 
-correlated noise estimates can only be produced if a value is given for 
+is used to define source areas for this purpose. Samples for which the
+pointing noise exceeds SRCRATIO times the field noise are excluded from the
+correlated noise calculation. Since pointing noise is required to do this,
+correlated noise estimates can only be produced if a value is given for
 parameter SKYIN.
 \item [DEFAULT]:
 2.0
@@ -1900,12 +1900,12 @@ The default value should usually be OK.
 {\Large {\bf STOP } (!)}
 \begin{description}
 \item [USE]:
-If MEMCRDD is run interactively, the user can press CONTROL-C to halt the 
-program temporarily. The user is then put into diagnostic mode to examine the 
-contents of internal files, dump them to disk, etc. After the user leaves 
-diagnostic mode, STOP is prompted for. If a true value is given, then MEMCRDD 
-terminates in the same manner as when the iteration limit is reached (see 
-parameter NITER). If a false value is given for STOP, then MEMCRDD continues 
+If MEMCRDD is run interactively, the user can press CONTROL-C to halt the
+program temporarily. The user is then put into diagnostic mode to examine the
+contents of internal files, dump them to disk, etc. After the user leaves
+diagnostic mode, STOP is prompted for. If a true value is given, then MEMCRDD
+terminates in the same manner as when the iteration limit is reached (see
+parameter NITER). If a false value is given for STOP, then MEMCRDD continues
 with the next MEMSYS3 iteration.
 \item [DEFAULT]:
 None.
@@ -1919,22 +1919,22 @@ MEMCRDD is rarely run interactively.
 {\Large {\bf STOPFILE} (!!)}
 \begin{description}
 \item [USE]:
-It is possible that the user may want to stop a MEMCRDD job running in batch 
-without losing everything. After each iteration, MEMCRDD checks to see if a file 
-exists with the name specified for the STOPFILE parameter. If such a file does 
-exist then the program is terminated tidily in the same manner as if the 
-iteration limit had been reached. So if the user specifies a value of FRED.LIS 
-(say) for STOPFILE when the job is run, he can at any time create a file called 
-FRED.LIS which will cause MEMCRDD to terminate after the end of the current 
+It is possible that the user may want to stop a MEMCRDD job running in batch
+without losing everything. After each iteration, MEMCRDD checks to see if a file
+exists with the name specified for the STOPFILE parameter. If such a file does
+exist then the program is terminated tidily in the same manner as if the
+iteration limit had been reached. So if the user specifies a value of FRED.LIS
+(say) for STOPFILE when the job is run, he can at any time create a file called
+FRED.LIS which will cause MEMCRDD to terminate after the end of the current
 iteration.
 \item [DEFAULT]:
-The default is a null value which causes no file checks to be made between 
+The default is a null value which causes no file checks to be made between
 iterations.
 \item [RESTRICTIONS]:
 Must be a legal VMS file name.
 \item [ADVICE]:
-Note, the file is NOT deleted by MEMCRDD. Thus if the same job is re-submitted, 
-it would find the stop file on the first iteration and terminate immediately. 
+Note, the file is NOT deleted by MEMCRDD. Thus if the same job is re-submitted,
+it would find the stop file on the first iteration and terminate immediately.
 Always make sure you delete stop files after they have been finished with.
 \end {description}
 
@@ -1942,7 +1942,7 @@ Always make sure you delete stop files after they have been finished with.
 {\Large {\bf STRIPE} (!)}
 \begin{description}
 \item [USE]:
-The RMS spread in detector offsets to use when simulating data (see parameter 
+The RMS spread in detector offsets to use when simulating data (see parameter
 FUNCTION). This will introduce typical IRAS stripes into the simulated data.
 \item [DEFAULT]:
 0.0
@@ -1970,11 +1970,11 @@ Smaller values for TOL cause MEMCRDD to take much more CPU time.
 \begin{description}
 \item [USE]:
 This specified the cross-scan uncertainty in the pointing data, in arcminutes.
-It is used to generate pointing noise estimates if a value for the SKYIN 
+It is used to generate pointing noise estimates if a value for the SKYIN
 parameter is given when FUNCTION=HIRES. It is also used to
 add pointing errors into simulated CRDD when FUNCTION=SIMULATE.
 \item [DEFAULT]:
-The default is a null value which causes MEMCRDD to use a value dependant on the 
+The default is a null value which causes MEMCRDD to use a value dependant on the
 IRAS band. The bands 1 to 4 have values of 0.2, 0.2, 0.25 and 0.25 respectively.
 (see the IRAS Catalogs and Atlases Explanatory Supplement pages VII-6 and VII-7).
 \item [RESTRICTIONS]:
@@ -1988,16 +1988,16 @@ The default value should be OK.
 \begin{description}
 \item [USE]:
 UDIAG is only prompted for if parameter FUNCTION has the value ANALYSE.
-If UDIAG is given a true value then diagnostic mode is entered before performing 
-the analysis. This allows the user to examine the internal files, dump them to 
+If UDIAG is given a true value then diagnostic mode is entered before performing
+the analysis. This allows the user to examine the internal files, dump them to
 disk, etc.
 \item [DEFAULT]:
 NO.
 \item [RESTRICTIONS]:
 YES, NO, TRUE, FALSE or any abbreviation.
 \item [ADVICE]:
-In diagnostic mode the user is given a list of self explanatory options which 
-are selected using the parameter OPTION. The contents of internal files are 
+In diagnostic mode the user is given a list of self explanatory options which
+are selected using the parameter OPTION. The contents of internal files are
 described in the MEMSYS3 users manual.
 \end {description}
 
@@ -2006,11 +2006,11 @@ described in the MEMSYS3 users manual.
 \begin{description}
 \item [USE]:
 If parameter SKYIN has been given a value in order to continue a ``noise loop''
-(see section \ref {SEC:ICFB}), then VARIN should be given the name of the file 
-produced from the previous run of MEMCRDD, through the VAROUT parameter. This 
-file holds the variances used in the previous iteration, which are used to lag 
-the new variances calculated on the basis of the SKYIN image (see parameter 
-SPEED). If no file is given then the new variances are not lagged, and the 
+(see section \ref {SEC:ICFB}), then VARIN should be given the name of the file
+produced from the previous run of MEMCRDD, through the VAROUT parameter. This
+file holds the variances used in the previous iteration, which are used to lag
+the new variances calculated on the basis of the SKYIN image (see parameter
+SPEED). If no file is given then the new variances are not lagged, and the
 parameter SPEED is forced to take a value of 1.0.
 \item [DEFAULT]:
 A null value, causing no lagging of the variance values.
@@ -2024,14 +2024,14 @@ None.
 {\Large {\bf VAROUT} (!!)}
 \begin{description}
 \item [USE]:
-Specifies a BDF name to which will be written the variances used in the 
+Specifies a BDF name to which will be written the variances used in the
 current run of MEMCRDD. A null value causes no file to be produced.
 \item [DEFAULT]:
 A null value.
 \item [RESTRICTIONS]:
 None.
 \item [ADVICE]:
-If performing a ``noise loop'', the created file should be specified as the 
+If performing a ``noise loop'', the created file should be specified as the
 value for parameter VARIN on the next run of MEMCRDD.
 \end {description}
 
@@ -2047,7 +2047,7 @@ be followed in order to use footprints obtained at IPAC. This involves
 using the FITSIN application within KAPPA (see SUN/95) to read the
 footprint tapes into a set of data files in NDF format, and then using
 AOCRDD (within EDRSX) to convert these NDFs into BDFs which can be used
-by MEMCRDD. A further complication is introduced by the fact that the 
+by MEMCRDD. A further complication is introduced by the fact that the
 FITS GROUP format used at IPAC is non-standard. This means that a version
 of FITSIN specifically modified to handle IPAC footprints tapes must be used,
 rather than the KAPPA version of FITSIN. IPAC have made a decision to move
@@ -2070,7 +2070,7 @@ each detector data stream. The final destriped files are called
 \verb+<prefix>+\_BiLj\_DS.BDF  where \verb+<prefix>+ is the string supplied by
 the user in response to the prompt issued at the start, i is the band number (1
 to 4), and j is the leg number in the range 1 to the maximum number of legs.
-The leg number is equivalent to the scan number for a survey CRDD file. 
+The leg number is equivalent to the scan number for a survey CRDD file.
 
 To use these destriped AO CRDD files within MEMCRDD, the parameter DATATYPE
 should be given the value AO, and the CRDD file names should be assigned
@@ -2078,11 +2078,11 @@ to CRDDF1-CRDDFn in the normal way.
 
 \section{Changes since version 1 of this document}
 \begin {enumerate}
-\item The job name is now restricted to 8 characters (see section \ref 
+\item The job name is now restricted to 8 characters (see section \ref
 {SEC:RUN}).
 \item The command procedure MEMJOB has been released (see section \ref
 {SEC:RUN}). This makes it easier to use the more sophisticated noise model
-described in section \ref {SEC:NOISE}. 
+described in section \ref {SEC:NOISE}.
 \item An interim method of using Pointed Observation footprints data (available
 from IPAC) has been included (see appendix \ref {APP:AO}).
 \end{enumerate}

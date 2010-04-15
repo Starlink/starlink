@@ -43,13 +43,13 @@ strlen(qbar);qdog=*qbaz-1;QHELLO=0.0;QFULL=1;qfast=0;QBIG=1;
 qsmall=0;QgASp=Q6;while(QgASp!=q18){switch(QgASp){case Q6:
 switch(qfoo(QFRED,qbar,&qdog,&qcat,&QFISH)){case q1:QgASp=
 QBAD;break;case q2:QgASp=Q6;break;case qfoobar:QgASp=QMUM;
-break;case Q3:QgASp=qBuG;break;case q4:QgASp=q8;break;case 
-qfOBAz:QgASp=q7;break;case QQUUX:QgASp=Q15;break;case 
+break;case Q3:QgASp=qBuG;break;case q4:QgASp=q8;break;case
+qfOBAz:QgASp=q7;break;case QQUUX:QgASp=Q15;break;case
 qfoobaz:case Q5:QgASp=q16;break;default:QgASp=QEMPTY;}break;
 case q7:QFULL=-1;case q8:switch(qfoo(QFRED,qbar,&qdog,&qcat,
 &QFISH)){case q1:QgASp=QBAD;break;case q2:QgASp=q8;break;
-case qfoobar:QgASp=QMUM;break;case Q3:QgASp=qBuG;break;case 
-q4:case qfOBAz:case qfoobaz:case QQUUX:QgASp=q17;break;case 
+case qfoobar:QgASp=QMUM;break;case Q3:QgASp=qBuG;break;case
+q4:case qfOBAz:case qfoobaz:case QQUUX:QgASp=q17;break;case
 Q5:default:QgASp=QEMPTY;}break;case QBAD:QHELLO=QHELLO*1e1+
 QFISH;switch(qfoo(QFRED,qbar,&qdog,&qcat,&QFISH)){case q1:
 QgASp=QBAD;break;case q2:QgASp=Q13;break;case qfoobar:QgASp=
@@ -57,11 +57,11 @@ qDAd;break;case Q3:QgASp=qsilly;break;case q4:case qfOBAz:
 case qfoobaz:case QQUUX:QgASp=q12;break;case Q5:QgASp=Q13;
 break;default:QgASp=QEMPTY;}break;case qBuG:switch(qfoo(
 QFRED,qbar,&qdog,&qcat,&QFISH)){case q1:QgASp=QBUGGY;break;
-case q2:QgASp=qBuG;break;case qfoobar:case Q3:case q4:case 
+case q2:QgASp=qBuG;break;case qfoobar:case Q3:case q4:case
 qfOBAz:case qfoobaz:case QQUUX:QgASp=q17;break;case Q5:
 default:QgASp=QEMPTY;}break;case qsilly:switch(qfoo(QFRED,
-qbar,&qdog,&qcat,&QFISH)){case q1:QgASp=QBUGGY;break;case 
-qfoobar:QgASp=qDAd;break;case Q3:case q4:case qfOBAz:case 
+qbar,&qdog,&qcat,&QFISH)){case q1:QgASp=QBUGGY;break;case
+qfoobar:QgASp=qDAd;break;case Q3:case q4:case qfOBAz:case
 qfoobaz:case QQUUX:QgASp=q12;break;case q2:case Q5:QgASp=Q13
 ;break;default:QgASp=QEMPTY;}break;case QBUGGY:qsmall++;
 QHELLO=QHELLO*1e1+QFISH;QgASp=qsilly;break;case QMUM:QHELLO=
@@ -83,13 +83,13 @@ qsmall;if(qfast>=0){while(qfast>=10){QHELLO*=1e10;qfast-=10;
 }while(qfast>=1){QHELLO*=1e1;qfast--;}}else{while(qfast<=-10
 ){QHELLO/=1e10;qfast+=10;}while(qfast<=-1){QHELLO/=1e1;qfast
 ++;}}if(QFULL==1){*Q0=QHELLO;QOK=0;}else{*Q0=-QHELLO;QOK=-1;
-}case Q14:switch(qfoo(QFRED,qbar,&qdog,&qcat,&QFISH)){case 
+}case Q14:switch(qfoo(QFRED,qbar,&qdog,&qcat,&QFISH)){case
 q2:QgASp=Q14;break;case q1:case qfoobar:case Q3:case q4:case
  qfOBAz:case QQUUX:QgASp=qdisk;break;case qfoobaz:case Q5:
 QgASp=q18;break;default:QgASp=QEMPTY;}break;case qdisk:qdog
 --;QgASp=q18;break;case Q15:qdog--;case q16:QOK=1;QgASp=q18;
 break;case q17:qdog--;case QEMPTY:QOK=2;QgASp=q18;break;
-default:QgASp=QEMPTY;}}*qbaz=qdog+1;*qfobar=QOK;}static int 
+default:QgASp=QEMPTY;}}*qbaz=qdog+1;*qfobar=QOK;}static int
 qfoo(int QFRED,char*qbar,int*qdog,int*qcat,double*QFISH){int
  QBYE,QMAGIC;char q19;
 #define q20 (20)

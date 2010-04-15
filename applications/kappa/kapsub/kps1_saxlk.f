@@ -58,32 +58,32 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     2006 April 12 (MJC):
-*        Remove unused variables, including CNF_PVAL, and wrapped 
+*        Remove unused variables, including CNF_PVAL, and wrapped
 *        long lines.
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
- 
+
 *  Arguments Given:
       INTEGER INDF1
       INTEGER INDF2
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Constants:
       INTEGER NCCOMP             ! Number of character components
       PARAMETER ( NCCOMP = 2 )
       INTEGER NACOMP             ! Number of array components
       PARAMETER ( NACOMP = 3 )
- 
+
 *  Local Variables:
       CHARACTER ACOMPS( NACOMP )*( 8 ) ! AXIS array components
       CHARACTER CCOMPS( NCCOMP )*( 5 ) ! AXIS character components
@@ -108,19 +108,19 @@
       DATA ACOMPS / 'CENTRE', 'WIDTH', 'VARIANCE' /
 
 *.
- 
+
 *  Check the inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Reset the destination AXIS structures.
-      CALL NDF_RESET( INDF1, 'AXIS', STATUS ) 
+      CALL NDF_RESET( INDF1, 'AXIS', STATUS )
 
 *  Find the pixel bounds of the destination NDF.
-      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS ) 
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Take a section from the source NDF which matches the bounds of the
 *  destination NDF.
-      CALL NDF_SECT( INDF2, NDIM, LBND, UBND, INDF2S, STATUS ) 
+      CALL NDF_SECT( INDF2, NDIM, LBND, UBND, INDF2S, STATUS )
 
 *  Check each axis.
       DO IAX = 1, NDIM
@@ -129,21 +129,21 @@
          DO ICOMP = 1, NACOMP
             COMP = ACOMPS( ICOMP )
 
-*  Pass on if this axis does not have the a defined AXIS component in 
+*  Pass on if this axis does not have the a defined AXIS component in
 *  the source section.
-            CALL NDF_ASTAT( INDF2S, COMP, IAX, THERE, STATUS ) 
+            CALL NDF_ASTAT( INDF2S, COMP, IAX, THERE, STATUS )
             IF( THERE ) THEN
 
 *  Get the numeric type of the array.
-               CALL NDF_ATYPE( INDF2S, COMP, IAX, TYPE, STATUS ) 
+               CALL NDF_ATYPE( INDF2S, COMP, IAX, TYPE, STATUS )
 
 *  Map the source array.
-               CALL NDF_AMAP( INDF2S, COMP, IAX, TYPE, 'READ', IP2, EL, 
-     :                        STATUS ) 
+               CALL NDF_AMAP( INDF2S, COMP, IAX, TYPE, 'READ', IP2, EL,
+     :                        STATUS )
 
 *  Map the destination array.
-               CALL NDF_AMAP( INDF1, COMP, IAX, TYPE, 'WRITE', IP1, EL, 
-     :                        STATUS ) 
+               CALL NDF_AMAP( INDF1, COMP, IAX, TYPE, 'WRITE', IP1, EL,
+     :                        STATUS )
 
 *  Copy the source array to the destination array.
                CALL KPG1_COPY( TYPE, EL, IP2, IP1, STATUS )
@@ -155,27 +155,27 @@
          DO ICOMP = 1, NCCOMP
             COMP = CCOMPS( ICOMP )
 
-*  Pass on if this axis does not have the a defined AXIS component in 
+*  Pass on if this axis does not have the a defined AXIS component in
 *  the source section.
-            CALL NDF_ASTAT( INDF2S, COMP, IAX, THERE, STATUS ) 
+            CALL NDF_ASTAT( INDF2S, COMP, IAX, THERE, STATUS )
             IF( THERE ) THEN
 
 *  Get the value from the source NDF, and its length.
                CALL NDF_ACGET( INDF2S, COMP, IAX, VALUE, STATUS )
-               CALL NDF_ACLEN( INDF2S, COMP, IAX, VLEN, STATUS ) 
+               CALL NDF_ACLEN( INDF2S, COMP, IAX, VLEN, STATUS )
 
 *  Put it into destination NDF.
-               CALL NDF_ACPUT( VALUE( : VLEN ), INDF1, COMP, IAX, 
-     :                         STATUS ) 
+               CALL NDF_ACPUT( VALUE( : VLEN ), INDF1, COMP, IAX,
+     :                         STATUS )
 
             END IF
          END DO
 
 * Get the normalization flag for this axis from the source and put it
 *  into the destination.
-         CALL NDF_ANORM( INDF2S, IAX, NORM, STATUS ) 
+         CALL NDF_ANORM( INDF2S, IAX, NORM, STATUS )
          CALL NDF_ASNRM( NORM, INDF1, IAX, STATUS )
 
       END DO
- 
+
       END

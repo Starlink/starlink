@@ -7,7 +7,7 @@
 
       SUBROUTINE UREAD (LUN, RECORD, IREC, IRECL, IERR)
 
-C   Random access read on unit LUN. 
+C   Random access read on unit LUN.
 C   IRECL bytes of data read from record IREC (first record = #1)
 C   Returned into array RECORD
 

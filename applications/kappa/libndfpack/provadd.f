@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application modifies the provenance information stored in an
-*     NDF. It records a second specified NDF as a direct parent of the 
+*     NDF. It records a second specified NDF as a direct parent of the
 *     first NDF. If an NDF has more than one direct parent then this
 *     application should be run multiple times, once for each parent.
 
@@ -31,41 +31,41 @@
 *  ADAM Parameters:
 *     CREATOR = LITERAL (Read)
 *        A text identifier for the software that created the main NDF
-*        (usually the name of the calling application).  The format of 
+*        (usually the name of the calling application).  The format of
 *        the identifier is arbitrary, but the form "PACKAGE:COMMAND" is
 *        recommended.  If a null (!) value is supplied, no creator
 *        information is stored.  [!]
 *     ISROOT = _LOGICAL (Read)
-*        If TRUE, then the NDF given by parameter "PARENT" will be 
-*        treated as a root NDF.  That is, any provenance information 
+*        If TRUE, then the NDF given by parameter "PARENT" will be
+*        treated as a root NDF.  That is, any provenance information
 *        within PARENT describing its own parents is ignored.  If FALSE,
 *        then any provenance information within PARENT is copied into
-*        the main NDF.  PARENT is then only a root NDF only if it 
+*        the main NDF.  PARENT is then only a root NDF only if it
 *        contains no provenance information.  [FALSE]
 *     MORE = UNIV (Read)
 *        This is only accessed if a null value is supplied for parameter
 *        MORETEXT.  If supplied, it should be an HDS object containing
-*        arbitrary additional information about the parent NDF, and how 
-*        it was used in the creation of the main NDF.  This information 
-*        is stored with the provenance in the main NDF.  If a null (!) 
+*        arbitrary additional information about the parent NDF, and how
+*        it was used in the creation of the main NDF.  This information
+*        is stored with the provenance in the main NDF.  If a null (!)
 *        value is supplied no additional information is stored.  [!]
 *     MORETEXT = GROUP (Read)
-*        A group of "keyword=value" strings that give additional 
-*        information about the parent NDF, and how it was used in the 
-*        creation of the main NDF.  If supplied, this information is 
-*        stored with the provenance in the main NDF.  If a null (!) 
-*        value is supplied, then the MORE parameter will be used to 
-*        obtain this extra information instead of MORETEXT. 
+*        A group of "keyword=value" strings that give additional
+*        information about the parent NDF, and how it was used in the
+*        creation of the main NDF.  If supplied, this information is
+*        stored with the provenance in the main NDF.  If a null (!)
+*        value is supplied, then the MORE parameter will be used to
+*        obtain this extra information instead of MORETEXT.
 *
 *        The supplied value should be either a comma-separated list of
-*        strings, or the name of a text file preceded by an up-arrow 
-*        character "^", containing one or more comma-separated list of 
-*        strings.  Each string is either a "keyword=value" setting, or 
-*        the name of a text file preceded by an up-arrow character "^". 
-*        Such text files should contain further comma-separated lists 
-*        which will be read and interpreted in the same manner (any 
+*        strings, or the name of a text file preceded by an up-arrow
+*        character "^", containing one or more comma-separated list of
+*        strings.  Each string is either a "keyword=value" setting, or
+*        the name of a text file preceded by an up-arrow character "^".
+*        Such text files should contain further comma-separated lists
+*        which will be read and interpreted in the same manner (any
 *        blank lines or lines beginning with "#" are ignored).  Within a
-*        text file, newlines can be used as delimiters as well as 
+*        text file, newlines can be used as delimiters as well as
 *        commas.
 *
 *        Each individual setting should be of the form:
@@ -73,7 +73,7 @@
 *           <keyword>=<value>
 *
 *        where <keyword> is either a simple name, or a dot-delimited
-*        hierarchy of names (e.g. "camera.settings.exp=1.0").  The 
+*        hierarchy of names (e.g. "camera.settings.exp=1.0").  The
 *        <value> string should not contain any commas.  [!]
 *     NDF = NDF (Read and Write)
 *        The NDF which is to be modified.
@@ -128,7 +128,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       INCLUDE 'DAT_PAR'          ! HDS public constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDG_PAR'          ! NDG constants 
+      INCLUDE 'NDG_PAR'          ! NDG constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -147,7 +147,7 @@
       CHARACTER MORE*(DAT__SZLOC) ! Locator for MORE structure
       INTEGER INDF1              ! Identifier for NDF being modified
       INTEGER INDF2              ! Identifier for parent NDF
-      INTEGER IPROV              ! Identifier for provenance info 
+      INTEGER IPROV              ! Identifier for provenance info
       LOGICAL CNCLMR             ! Cancel the MORE parameter on exit?
       LOGICAL ISROOT             ! Is the parent an orphan?
 *.
@@ -170,9 +170,9 @@
 *  Attempt to get additional information first as a set of text strings
 *  using the MORETEXT parameter.
       CALL KPG1_GTMOR( 'MORETEXT', MORE, STATUS )
-       
-*  If a null value was supplied for MORETEXT, annul the error and 
-*  attempt to get the additional information directly as an HDS object 
+
+*  If a null value was supplied for MORETEXT, annul the error and
+*  attempt to get the additional information directly as an HDS object
 *  using parameter MORE.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -187,9 +187,9 @@
             CNCLMR = .TRUE.
          END IF
 
-      ELSE         
+      ELSE
          CNCLMR = .FALSE.
-      END IF      
+      END IF
 
 *  Obtain the creator string.
       IF( STATUS .EQ. SAI__OK ) THEN
@@ -211,7 +211,7 @@
       CALL NDG_PUTPROV( IPROV, INDF2, MORE, AST__NULL, ISROOT,
      :                  STATUS )
 
-*  Store the modified provenance information in the child NDF. 
+*  Store the modified provenance information in the child NDF.
       CALL NDG_WRITEPROV( IPROV, INDF1, .FALSE., STATUS )
 
 *  Arrive here if an error occurrs.

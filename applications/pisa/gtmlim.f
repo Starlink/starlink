@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -108,18 +108,18 @@
       PARAMETER ( AMNTHR = 0.0001 )
       REAL AMXTHR               ! APM maximum cross over value
       PARAMETER ( AMXTHR = 0.995 )
-      REAL AMNMIX               ! APM minimum mixture fraction 
+      REAL AMNMIX               ! APM minimum mixture fraction
       PARAMETER ( AMNMIX = 0.0 )
       REAL AMXMIX               ! APM maximum mixture fraction
       PARAMETER ( AMXMIX = 0.12 )
-      
+
 *  Local Variables:
       CHARACTER MODE*( 4 )      ! buffer to receive chosen option
       INTEGER NRET              ! number of values returned
       REAL SIGMA( 2 )           ! array to receive GSIGM range
       REAL THR( 2 )             ! array to receive CROSS range
       REAL MIX( 2 )             ! array to receive COMIX range
-      
+
 *.
 
 *  Check inherited global status.
@@ -132,7 +132,7 @@
       IF ( STATUS. EQ. SAI__OK ) THEN
 
 *  Check for valid return, must start with A, U or N
-         IF ( MODE( 1:1 ) .NE. 'A'  .AND.  MODE( 1:1 ) .NE. 'U' 
+         IF ( MODE( 1:1 ) .NE. 'A'  .AND.  MODE( 1:1 ) .NE. 'U'
      :        .AND.  MODE( 1:1 ) .NE. 'N' ) THEN
              CALL MSG_OUT( 'NOT_MODE', ' That is not a valid return.'//
      :                    ' Valid options are A(PM), U(SER) or N(ONE',

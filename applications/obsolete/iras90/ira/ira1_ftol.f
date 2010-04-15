@@ -196,24 +196,24 @@
 *  greater than the maximum value which can be printed for the field.
 *  For instance, an RA value of 2h 59m 31.8d with an RA tolerance of
 *  0h 2m 0s will result in the field values 2h 60m 0.0s. The 60m field
-*  in this case needs carrying forward to the hours field, producing 
-*  the correct value of 3h 0m 0.0s. First check the fractional seconds 
+*  in this case needs carrying forward to the hours field, producing
+*  the correct value of 3h 0m 0.0s. First check the fractional seconds
 *  field to ensure that its value does not extend beyond the number of
-*  decimal places returned in DP. If it does, increment the whole 
+*  decimal places returned in DP. If it does, increment the whole
 *  seconds field.
       IF( FIELDS( 4 ) .GE. 10**DP ) THEN
          FIELDS( 4 ) = FIELDS( 4 ) - 10**DP
          FIELDS( 3 ) = FIELDS( 3 ) + 1
       END IF
 
-*  Now check that the whole seconds field does not exceed 59. If so 
+*  Now check that the whole seconds field does not exceed 59. If so
 *  increment the minutes field.
       IF( FIELDS( 3 ) .GE. 60 ) THEN
          FIELDS( 3 ) = FIELDS( 3 ) - 60
          FIELDS( 2 ) = FIELDS( 2 ) + 1
       END IF
 
-*  Now check that the minutes field does not exceed 59. If so 
+*  Now check that the minutes field does not exceed 59. If so
 *  increment the hours/degrees field.
       IF( FIELDS( 2 ) .GE. 60 ) THEN
          FIELDS( 2 ) = FIELDS( 2 ) - 60

@@ -38,7 +38,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -60,10 +60,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Close and download all the loaded cataloge.
-* 
+*
       do cc = 1, CHP__MXASS
         if (.not.(opcatnames(cc) .eq. '9999') .and.
-     :      .not.(opcatsys(cc))) then 
+     :      .not.(opcatsys(cc))) then
         call chp_dloadcat(cc,status)
         endif
       enddo

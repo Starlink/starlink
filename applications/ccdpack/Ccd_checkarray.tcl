@@ -88,7 +88,7 @@
 #     deselect name
 #        Deselects the named button.
 #     sethelp name document label.
-#        Sets the context sensitive help information for the button 
+#        Sets the context sensitive help information for the button
 #        $name. $document should be the name of a HTML document and
 #        $label the label (HTML anchor) within the document that
 #        identifies the part to be displayed. If $name is "all" then
@@ -307,10 +307,10 @@
 
 #  Method for assigning context help to a button.
       method sethelp {name docname label} {
-         if { $name == "all" } { 
+         if { $name == "all" } {
 
 #  Request to bind all elements to this help.
-	    if { $nbutton > 0 } { 
+	    if { $nbutton > 0 } {
                foreach oneof [ array names Buttons ] {
 		  Ccd::base::sethelp \
 		     $Buttons($oneof) $docname $label

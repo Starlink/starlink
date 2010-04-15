@@ -23,7 +23,7 @@
 *        current number of components
 * Given in OPT_CMN:
 *    MAX_TIMES = INTEGER (Returned)
-*       
+*
 *    TIMES = INTEGER (Returned)
 *        iteration number
 *    MAX_CMP = INTEGER (Returned)
@@ -89,7 +89,7 @@
                else
                   ii = cmp
                end if
-               
+
 *  Copy over results from previous attempt
 
                guess_store(4,cmp,times) = guess_store(4,ii,last)

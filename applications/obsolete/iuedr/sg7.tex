@@ -41,7 +41,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -109,7 +109,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -186,12 +186,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -249,7 +249,7 @@ commissioning period). Two types of spectrograph exist: one uses a single
 spherical grating, producing low-dispersion spectra with a resolution of
 \begin{rawhtml}~6&Aring;\end{rawhtml}
 ; the other involves an \'{e}chelle grating as well, providing about
-60 spectral orders, and a resolution 
+60 spectral orders, and a resolution
 \begin{rawhtml}~0.1&Aring;.\end{rawhtml}
 Only the low-dispersion grating provides flux calibration because at the
 short-wavelength end the orders from the \'{e}chelle spectrum begin to overlap,
@@ -322,7 +322,7 @@ which, after a ``welcome'' message, gives a `\verb+>+' prompt.
 There is a moderately useful HELP facility, if rather slow. Each time IUEDR
 is run, a file \verb+session.lis+ is created which records all the input from
 the keyboard and output from the terminal. The command for reading the header
-is \xref{\verb+LISTIUE+}{sg3}{LISTIUE}, but unless its default parameters are 
+is \xref{\verb+LISTIUE+}{sg3}{LISTIUE}, but unless its default parameters are
 changed this will give just the initial ten lines of the first file.
 The most useful approach is to read all the headers, which can be done using
 
@@ -355,7 +355,7 @@ Where
 
 The \verb+-1+ response is unique to this command.  Much of what is produced is
 rubbish, and once \verb+LISTIUE+ has completed it is probably best
-to \xref{\verb+QUIT+}{sg3}{QUIT} from IUEDR and delete large sections from 
+to \xref{\verb+QUIT+}{sg3}{QUIT} from IUEDR and delete large sections from
 the \verb+session.lis+
 file before sending to a printer.  While the first ten lines are the most
 useful, important information is included at the tail of the IUESIPS files,
@@ -478,7 +478,7 @@ there is no substitute for going through the image systematically.  In this
 case, rather than using \xref{\verb+DRIMAGE+}{sg3}{DRIMAGE},
 \xref{\verb+CULIMITS+}{sg3}{CULIMITS}, and \xref{\verb+EDIMAGE+}{sg3}{EDIMAGE},
 it is probably simpler to ignore the \verb+CULIMITS+ stage and use the
-\xref{\verb+XL+}{sg3}{XL} and \xref{\verb+YL+}{sg3}{YL} parameters of 
+\xref{\verb+XL+}{sg3}{XL} and \xref{\verb+YL+}{sg3}{YL} parameters of
 \verb+DRIMAGE+\@. \verb+EDIMAGE+ works by
 changing the quality of all pixels within a box defined by the user using
 cursor hits at opposite corners of the box required.  The middle button of the
@@ -489,7 +489,7 @@ can thus be used to rectify mistakes.  The third button exits from
 
 \begin{htmlonly}
 Within all but those with the shortest exposures, there will be defects in the
-image that need to be quality-flagged, and which cannot be done automatically. 
+image that need to be quality-flagged, and which cannot be done automatically.
 This mostly involves cosmic-ray hits, which are usually distinguished from,
 say, emission lines by affecting far fewer pixels --- as well as often
 occupying the inter-order region.  A typical emission line is the geocoronal
@@ -515,7 +515,7 @@ can thus be used to rectify mistakes.  The third button exits from
 \end{htmlonly}
 
 Pixels defined ``bad'' in this way will be coloured yellow when the image is
-displayed with \xref{\verb+FLAG=TRUE+}{sg3}{FLAG}\@. Other colours may be 
+displayed with \xref{\verb+FLAG=TRUE+}{sg3}{FLAG}\@. Other colours may be
 present on the image:
 red signifies overexposed pixels, and blue those that fall outside the
 intensity range for plotting. There will also be a grid of green pixels, which
@@ -533,8 +533,8 @@ reseau marks.  It will then be necessary to re-run
 
 Extracting a low-resolution spectrum for a point-source is quite simple,
 since there is just a single order, and nothing more need be done than just
-typing the command \xref{\verb+TRAK+}{sg3}{TRAK}\@.  As well as extracting the 
-spectrum, it does a background subtraction from the surrounding region of the 
+typing the command \xref{\verb+TRAK+}{sg3}{TRAK}\@.  As well as extracting the
+spectrum, it does a background subtraction from the surrounding region of the
 image.  Ideally,
 the output pixel size should be changed from the default, but rather than
 going through the full array of parameters it can be done on a single line:
@@ -551,28 +551,28 @@ resolution of 6\AA\@.
 \end{latexonly}
 
 \begin{htmlonly}
-The default is \xref{\verb+GSAMP=1.414+}{sg3}{GSAMP}\@.  There is a fair 
+The default is \xref{\verb+GSAMP=1.414+}{sg3}{GSAMP}\@.  There is a fair
 amount of output to the
 terminal, most of which is unnecessary.  The resultant spectrum will be both
 flux and wavelength calibrated, with maximum signal-to-noise of
 \begin{rawhtml}~20\end{rawhtml} and resolution of 6\AA\@.
 \end{htmlonly}
 
-Plotting the spectrum may be done with \xref{\verb+PLFLUX+}{sg3}{PLFLUX}, 
+Plotting the spectrum may be done with \xref{\verb+PLFLUX+}{sg3}{PLFLUX},
 which will work unless
-the axes have been changed while using \xref{\verb+PLSCAN+}{sg3}{PLSCAN} 
+the axes have been changed while using \xref{\verb+PLSCAN+}{sg3}{PLSCAN}
 (see below), in which
 case \verb+PLFLUX PR+ is essential so that the plotting limits can be changed
 to something sensible.  However, a more useful procedure is to output it to
-\xref{DIPSO}{sun50}{} using \xref{\verb+OUTSPEC+}{sg3}{OUTSPEC} --- 
+\xref{DIPSO}{sun50}{} using \xref{\verb+OUTSPEC+}{sg3}{OUTSPEC} ---
 hitting the defaults except with
-\xref{\verb+OUTFILE+}{sg3}{OUTFILE}, which should probably be something less 
-opaque than the original image number.  Essential details of DIPSO will be 
+\xref{\verb+OUTFILE+}{sg3}{OUTFILE}, which should probably be something less
+opaque than the original image number.  Essential details of DIPSO will be
 given below.
 
 CAUTION: never hit $<$CTRL$>$-C, or $<$CTRL$>$-D, which will cause the loss of
 the data being analysed.
-To quit the program, type \xref{\verb+QUIT+}{sg3}{QUIT} or 
+To quit the program, type \xref{\verb+QUIT+}{sg3}{QUIT} or
 \xref{\verb+EXIT+}{sg3}{EXIT}\@.
 
 \subsection{Extended sources}
@@ -609,7 +609,7 @@ This is done in order to reduce the overheads during the observing, which arise
 from the time required to read down an image and prepare for the next one.
 Another reason may be that cosmic ray hits may affect a critical part of the
 spectrum, but there is enough remaining that is usable.  In both cases the
-\xref{\verb+AUTOSLIT+}{sg3}{AUTOSLIT} parameter needs to be set to false, 
+\xref{\verb+AUTOSLIT+}{sg3}{AUTOSLIT} parameter needs to be set to false,
 since the automatic
 extraction slit --- which is defined by the camera, resolution and aperture,
 as well as whether the source is extended and has a continuum --- is no longer
@@ -619,23 +619,23 @@ If the object is well centred in the aperture, it will be located at the
 position expected from the dispersion constants of the spectrograph.  For
 a point-source in low-dispersion it is not necessary to check this, but for
 unusual extractions it is vital.  This is done by using
-\xref{\verb+CGSHIFT+}{sg3}{CGSHIFT} on a cut across the spectrum, provided 
+\xref{\verb+CGSHIFT+}{sg3}{CGSHIFT} on a cut across the spectrum, provided
 by \xref{\verb+SCAN+}{sg3}{SCAN} and plotted using
-\xref{\verb+PLSCAN+}{sg3}{PLSCAN}\@.  
+\xref{\verb+PLSCAN+}{sg3}{PLSCAN}\@.
 \verb+CGSHIFT+ requires the location of the centroid of the
 spectrum by hand, which thus defines the zero-line.
 
 Three parameters follow once \verb+AUTOSLIT+ is set to false, whose values
 determine the new extraction.  In each case a pair of numbers is required
 unless one is the symmetric pair of the other, in which case only one need be
-entered.  \xref{\verb+GSLIT+}{sg3}{GSLIT} defines the limit of the spectrum 
-channel, so \verb+GSLIT=5+ is the equivalent of \verb+GSLIT=[-5,5]+ but 
+entered.  \xref{\verb+GSLIT+}{sg3}{GSLIT} defines the limit of the spectrum
+channel, so \verb+GSLIT=5+ is the equivalent of \verb+GSLIT=[-5,5]+ but
 \verb+GSLIT=[0,5]+
-would be an asymmetric extraction.  \xref{\verb+BSLIT+}{sg3}{BSLIT} sets the 
+would be an asymmetric extraction.  \xref{\verb+BSLIT+}{sg3}{BSLIT} sets the
 half-width of each
 background channel, so setting one of them to 0 enables only one to be
 used, which is useful for the two spectra within the same aperture.
-\xref{\verb+BDIST+}{sg3}{BDIST} specifies the distance of each background 
+\xref{\verb+BDIST+}{sg3}{BDIST} specifies the distance of each background
 channel from the centre.
 
 The flux calibration from this new extraction is not necessarily correct and
@@ -645,7 +645,7 @@ suffice to provide sensible values.
 
 \section{Analysing the spectrum with DIPSO}
 
-The \xref{Starlink User Note SUN/50}{sun50}{} is an excellent description of 
+The \xref{Starlink User Note SUN/50}{sun50}{} is an excellent description of
 DIPSO, and also
 provides a tutorial for first-time users.  Much of the information is also
 contained in an on-line HELP facility. However, brief details are given here
@@ -659,7 +659,7 @@ The package is entered simply by typing
 \end{verbatim}
 
 which gives a brief ``welcome'' and, like IUEDR, changes the prompt to `$>$'.
-Spectra produced by \xref{\verb+OUTMEAN+}{sg3}{OUTMEAN} within IUEDR can be 
+Spectra produced by \xref{\verb+OUTMEAN+}{sg3}{OUTMEAN} within IUEDR can be
 read in using
 \verb+SP0RD+, where the 0 represents the format selected within
 \verb+OUTMEAN+\@.  It is useful to push the data onto the stack so that it can
@@ -715,7 +715,7 @@ the correct procedure may not be so simple.  The reason is that the calibration
 lamp on IUE has few emission lines visible in low-resolution mode shortward of
 1480\AA , and none below 1380\AA\ --- so the 8\AA\ error may be because of a
 failure to correctly extrapolate the wavelength scale towards 1200\AA\@.
-Applying the constant shift may be done in 
+Applying the constant shift may be done in
 \xref{DIPSO}{sun50}{} by using \verb+XV+ to
 ascertain its value, followed by \verb+XADD+ or \verb+XSUB+\@.
 
@@ -737,7 +737,7 @@ the file from the directory or using \verb+POP+), and then use
 
 \begin{htmlonly}
 The flux calibration provided by IUEDR takes into account the temperature
-dependence (with the \xref{\verb+THDA+}{sg3}{THDA} parameter) and the gradual 
+dependence (with the \xref{\verb+THDA+}{sg3}{THDA} parameter) and the gradual
 loss of sensitivity
 over time (using the date given in \xref{\verb+READIUE+}{sg3}{READIUE})\@.
 However, it has recently
@@ -869,15 +869,15 @@ no absolute flux calibration, and providing an approximate one is something of
 a black art.
 \end{htmlonly}
 
-\xref{\verb+TRAK+}{sg3}{TRAK} is generally able to find the centroid of a 
+\xref{\verb+TRAK+}{sg3}{TRAK} is generally able to find the centroid of a
 low-dispersion
 spectrum without difficulty, but without guidance in high-dispersion the
-performance is unreliable.  Consequently, it is necessary to 
+performance is unreliable.  Consequently, it is necessary to
 \xref{\verb+SCAN+}{sg3}{SCAN} the
-spectrum, and use \xref{\verb+CGSHIFT+}{sg3}{CGSHIFT} to locate the peaks of 
+spectrum, and use \xref{\verb+CGSHIFT+}{sg3}{CGSHIFT} to locate the peaks of
 one of the orders.
 It is best to do this at the short-wavelength end, and
-\xref{\verb+CULIMITS+}{sg3}{CULIMITS} should probably be used with 
+\xref{\verb+CULIMITS+}{sg3}{CULIMITS} should probably be used with
 \xref{\verb+PLSCAN+}{sg3}{PLSCAN} to expand the plot to a useful scale.
 One flaw with \verb+CGSHIFT+ is that the shift used subsequently by \verb+TRAK+
 is the last one obtained: it does not take an average obtained from several
@@ -974,20 +974,20 @@ NORDER - Number of Echelle orders to be processed. /0/ > 4
  Spectrum Extraction Completed.
 \end{verbatim}
 
-The extracted orders, if saved (either be typing \xref{\verb+SAVE+}{sg3}{SAVE} 
+The extracted orders, if saved (either be typing \xref{\verb+SAVE+}{sg3}{SAVE}
 or by quitting
 the program) will appear on a \verb+_UES.sdf+ file.  It will appear
 order-by-order, and it is generally more useful to amalgamate them into a
 single spectrum.  First of all, however, it is necessary to correct the data
 for a ripple that originates in the \'{e}chelle grating itself.  This is done
-by using the eponymous routine \xref{\verb+BARKER+}{sg3}{BARKER}, 
+by using the eponymous routine \xref{\verb+BARKER+}{sg3}{BARKER},
 which is fully automatic (see
 Barker, P.K., 1984, {\it Astron.~J.}, {\bf 89}, 899).  The only parameter is
-\xref{\verb+ORDERS+}{sg3}{ORDERS}, 
+\xref{\verb+ORDERS+}{sg3}{ORDERS},
 which should be set to include all orders to be corrected.
 
 Converting the individual orders on a single scale involves the routine
-\xref{\verb+MAP+}{sg3}{MAP}, 
+\xref{\verb+MAP+}{sg3}{MAP},
 which takes into account the common-wavelength region of adjacent
 orders (for example, the geocoronal Lyman~$\alpha$ feature appears in both
 order 113 and 114, which can be seen on any image).
@@ -996,7 +996,7 @@ order 113 and 114, which can be seen on any image).
 To account for the order overlap, a first-order correction needs to be applied.
 The usual assumption is that the background region is contaminated by
 contributions from the two adjacent orders. At $\sim 1400$\AA\ the value of
-this halation correction, \xref{\verb+HALC+}{sg3}{HALC}, is zero, which is 
+this halation correction, \xref{\verb+HALC+}{sg3}{HALC}, is zero, which is
 included within the
 default parameters of IUEDR --- it is not necessary to change this.
 It rises linearly toward shorter wavelengths, and so needs to be defined at
@@ -1015,7 +1015,7 @@ To account for the order overlap, a first-order correction needs to be applied.
 The usual assumption is that the background region is contaminated by
 contributions from the two adjacent orders. At
 \begin{rawhtml}~1400\end{rawhtml}\AA\ the value of this halation correction,
-\xref{\verb+HALC+}{sg3}{HALC}, 
+\xref{\verb+HALC+}{sg3}{HALC},
 is zero, which is included within the default parameters of IUEDR
 --- it is not necessary to change this. It rises linearly toward shorter
 wavelengths, and so needs to be defined at one other point.  This is possible
@@ -1028,7 +1028,7 @@ for white dwarfs about 0.20: these are useful as initial values, but it will be
 necessary to iterate manually to find the optimum.
 \end{htmlonly}
 
-Consequently, \xref{\verb+BARKER+}{sg3}{BARKER} and \xref{\verb+MAP+}{sg3}{MAP} 
+Consequently, \xref{\verb+BARKER+}{sg3}{BARKER} and \xref{\verb+MAP+}{sg3}{MAP}
 should initially be used only on
 the orders containing the Lyman~$\alpha$ feature, combined with the two
 adjacent ones, until a satisfactory value of \verb+HALC+ is obtained.  It is
@@ -1064,10 +1064,10 @@ COVERGAP - Whether gaps can be filled by covering orders. /FALSE/ > <CR>
 The output spectrum can then be examined using
 \xref{\verb+PLMEAN+}{sg3}{PLMEAN}\@.  If the zero
 line passes through the base of the Lyman~$\alpha$ trough, then the value of
-\xref{\verb+HALC+}{sg3}{HALC} is acceptable; otherwise it will have to be 
+\xref{\verb+HALC+}{sg3}{HALC} is acceptable; otherwise it will have to be
 increased if the
 spectrum needs to be lifted, or lowered otherwise.  If \verb+HALC+ does need
-to be altered, then the \xref{\verb+SETD+}{sg3}{SETD}, 
+to be altered, then the \xref{\verb+SETD+}{sg3}{SETD},
 \xref{\verb+BARKER+}{sg3}{BARKER}, and \xref{\verb+MAP+}{sg3}{MAP}
 commands will have to be repeated until a satisfactory value is found.
 Occasionally, the Lyman~$\alpha$ is not saturated, which is obvious since the
@@ -1075,9 +1075,9 @@ profile is not flat at the base; a default value will have to be assumed.  This
 is not satisfactory, but is the best that can be done.
 
 Once \verb+HALC+ has been found, \verb+MAP+ can be run on the whole spectrum.
-Thus, \\xref{verb+ORDERS+}{sg3}{ORDERS} should be set to [125,66]\@.  
+Thus, \\xref{verb+ORDERS+}{sg3}{ORDERS} should be set to [125,66]\@.
 Although this full spectrum
-can be examined in IUEDR, it is much more convenient to output it to 
+can be examined in IUEDR, it is much more convenient to output it to
 \xref{DIPSO}{sun50}{}
 using \xref{\verb+OUTMEAN+}{sg3}{OUTMEAN}\@.
 
@@ -1091,7 +1091,7 @@ OUTFILE - Name of output file. /'LT5M.sdf'/ > <CR>
 
 \section{Examining a full IUE spectrum with DIPSO}
 
-There is no single command within \xref{DIPSO}{sun50}{} for displaying a 
+There is no single command within \xref{DIPSO}{sun50}{} for displaying a
 full IUE
 high-resolution spectrum on one page of output, but a procedure has been
 written to do this.  However, it is necessary to normalise the spectrum,
@@ -1132,7 +1132,7 @@ option {\tt CLASSKEY} will provide the code used.
 Two methods exist for examining spectra in the archive.  Low-resolution data
 are available on-line, also on STADAT, but it is necessary to use the LEI
 account.  The command needed is QUEST, which is described fully in
-\xref{SUN/20}{sun20}{}.  It is often necessary to analyse the original 
+\xref{SUN/20}{sun20}{}.  It is often necessary to analyse the original
 images, though,
 and this is unavoidable for high-resolution data.  For this, {\tt IUEDEARCH}
 should be used, described in \xref{SUN/58}{sun58}{}.

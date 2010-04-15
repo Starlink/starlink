@@ -41,7 +41,7 @@
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        A list of pixel co-ordinates, in groups of NDIM. 
+*        A list of pixel co-ordinates, in groups of NDIM.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
 *     LBINTB( NDIM ) = INTEGER (Given and Returned)
@@ -51,7 +51,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,7 +131,7 @@
      :        K,                 ! Loop count
      :        VA                 ! Vector address eqv to Cartesian pnt.
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        ALPHA,             ! Line parameter at pixel boundary
      :        END( ARD__MXDIM ), ! Indices of end pixel
      :        HILIM,             ! Largest usable line parameter
@@ -143,7 +143,7 @@
      :        PCC,               ! Pixel co-ord. at usable line start
      :        PCI                ! Pixel index at usable line start
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        PDC,               ! Pixel co-ord. at usable line end
      :        PDI,               ! Pixel index at usable line end
      :        PEC,               ! Pixel co-ord. at pixel boundary
@@ -168,7 +168,7 @@
 *  "end"). The first thing to do is to find the range of ALPHA which
 *  corresponds to the section of the line which lies within the bounds
 *  of the array. Loop round each axis.
-      DO I = 1, NDIM      
+      DO I = 1, NDIM
 
 *  Store the supplied pixel co-ordinates of the start and end of the
 *  line.
@@ -226,7 +226,7 @@
          PCC = PAC( I ) + INC( I )*LOLIM
 
 *  Find the corresponding pixel index.
-         PCI = DBLE( INT( PCC ) ) 
+         PCI = DBLE( INT( PCC ) )
          IF( PCI .LT. PCC ) PCI = PCI + 1
 
 *  Save it.
@@ -237,7 +237,7 @@
          PDC = PAC( I ) + INC( I )*HILIM
 
 *  Find the corresponding pixel index.
-         PDI = DBLE( INT( PDC ) ) 
+         PDI = DBLE( INT( PDC ) )
          IF( PDI .LT. PDC ) PDI = PDI + 1
 
 *  Save it.
@@ -269,7 +269,7 @@
             DO K = 1, NDIM
                PEC = PAC( K ) + INC( K )*ALPHA
 
-               PEI( K )  = DBLE( INT( PEC ) ) 
+               PEI( K )  = DBLE( INT( PEC ) )
                IF( PEI( K ) .LT. PEC*MARGIN ) PEI( K ) = PEI( K ) + 1
 
             END DO

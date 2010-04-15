@@ -18,8 +18,8 @@
 
 *  Description:
 *     This routine reads a line of an AST Object description from a GRP
-*     group, removing the first character if it is a "#" or a "!". It then 
-*     returns the line of text to the AST library using AST_PUTLINE. It is 
+*     group, removing the first character if it is a "#" or a "!". It then
+*     returns the line of text to the AST library using AST_PUTLINE. It is
 *     intended to be used as a source function with AST_CHANNEL.
 
 *  Arguments:
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,7 +90,7 @@
 
 *  Get the next line of text from the group.
       LINE = ' '
-      CALL GRP_GET( ASTGRP, ASTLN, 1, LINE, STATUS ) 
+      CALL GRP_GET( ASTGRP, ASTLN, 1, LINE, STATUS )
 
 *  If there are no more elements to be read, annul the error and return
 *  a negative line length.
@@ -98,7 +98,7 @@
          CALL ERR_ANNUL( STATUS )
          ASTLN = ASTLN - 1
          CALL AST_PUTLINE( ' ', -1, STATUS )
-         
+
 *  Otherwise...
       ELSE
 

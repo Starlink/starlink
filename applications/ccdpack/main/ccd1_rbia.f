@@ -35,7 +35,7 @@
 *        If the input NDFs were zeroed this array contains the zero
 *        level.
 *     NOISE( NNDF ) = DOUBLE PRECISION (Given)
-*        The noise estimates of the input NDFs. 
+*        The noise estimates of the input NDFs.
 *     CMODE = CHARACTER * ( * ) (Given)
 *        The combination mode used to combine the input NDFs.
 *     IMETH = INTEGER (Given)
@@ -75,7 +75,7 @@
 *     USEEXT = LOGICAL (Given)
 *        If true then NDF extension items have been used in preference
 *        to parameter values (in this cause RNOISE is assumed to be
-*        the variances obtained from each NDF). 
+*        the variances obtained from each NDF).
 *     DELETE = LOGICAL (Given)
 *        Whether the input NDFs should be deleted or not.
 *     STATUS = INTEGER (Given and Returned)
@@ -187,7 +187,7 @@
       IAT = 38
       CALL CHR_PUTC( 'Mean Value', BUFFER, IAT )
       IAT = 50
-      IF ( .NOT. USEEXT ) THEN 
+      IF ( .NOT. USEEXT ) THEN
          CALL CHR_PUTC( 'Noise Estimate', BUFFER, IAT )
       ELSE
          CALL CHR_PUTC( 'Readout Noise', BUFFER, IAT )

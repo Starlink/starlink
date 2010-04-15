@@ -1,4 +1,4 @@
-      SUBROUTINE COF_STYPE( NDF, COMP, TYPE, BITPIX, FMTCNV, ITYPE, 
+      SUBROUTINE COF_STYPE( NDF, COMP, TYPE, BITPIX, FMTCNV, ITYPE,
      :                      STATUS )
 *+
 *  Name:
@@ -17,7 +17,7 @@
 *  Description:
 *     This sets the data type for an NDF array component.  A preferred
 *     type value is used, unless the component is the QUALITY (in which
-*     case the routine returns without action). The type may also be 
+*     case the routine returns without action). The type may also be
 *     undefined, in which case the supplied FITS BITPIX defines the data
 *     type.
 
@@ -81,7 +81,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,5 +128,5 @@
          CALL NDF_STYPE( ITYPE, NDF, COMP, STATUS )
 
       END IF
- 
+
       END

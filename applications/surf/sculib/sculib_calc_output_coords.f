@@ -9,9 +9,9 @@
 *     of output coord system N relative to apparent N
 
 *  Description:
-*     This routine takes the apparent centre coords at the time of the 
+*     This routine takes the apparent centre coords at the time of the
 *     observation and converts them to the output coordinate system. In
-*     addition, the angle between the north direction in the output 
+*     addition, the angle between the north direction in the output
 *     coordinate frame and that in the apparent frame is calculated
 *     (measured anticlockwise from output north, in radians).
 
@@ -77,7 +77,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION LONG
-      DOUBLE PRECISION LAT 
+      DOUBLE PRECISION LAT
 
 *  Status:
       INTEGER          STATUS
@@ -93,7 +93,7 @@
       PARAMETER (DPI2 = DPI / 2.0D0)
 
 *  Local variables:
-      CHARACTER*10     COORD_TYPE             ! upper case version of 
+      CHARACTER*10     COORD_TYPE             ! upper case version of
                                               ! OUTPUT_COORDS
       DOUBLE PRECISION DTEMP                  ! scratch double
       DOUBLE PRECISION RA_2000, DEC_2000      ! RA,Dec J2000 FK5 coords of point
@@ -161,7 +161,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_CALC_OUTPUT_COORDS: can '//
-     :        'only handle RB, RJ, RD, GA and EQ coordinates', 
+     :        'only handle RB, RJ, RD, GA and EQ coordinates',
      :        STATUS)
          END IF
       END IF

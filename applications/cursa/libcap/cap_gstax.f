@@ -80,7 +80,7 @@ C2000    format(1x, 'axptr, elem, status: ', i20, i5, i10)
 *
 *       Compute the axis array.
 
-         CALL CAP_GCPAX (START, INCR, ELEM, %VAL(CNF_PVAL(AXPTR)), 
+         CALL CAP_GCPAX (START, INCR, ELEM, %VAL(CNF_PVAL(AXPTR)),
      :                   STATUS)
 
 *

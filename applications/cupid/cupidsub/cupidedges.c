@@ -24,10 +24,10 @@ void cupidEdges( float *mask, int nel, int dims[ 3 ], int skip[ 3 ],
 *     areas within the input array that hold a specified "on" value.
 *
 *     Each output pixel value is created in turn as follows: If the
-*     corresponding input pixel has the "on" value and is also 
+*     corresponding input pixel has the "on" value and is also
 *     completely surrounded by pixel with the "on" value, then the
-*     output pixel is set to the "off" value. If the input pixel has 
-*     the "on" value but has at least one neighbour that is not set to 
+*     output pixel is set to the "off" value. If the input pixel has
+*     the "on" value but has at least one neighbour that is not set to
 *     the "on" value, then the output pixel is set to the "on" value.
 *     If the input pixel is not set to the "on" value then the output is
 *     set to the "off" value.
@@ -40,9 +40,9 @@ void cupidEdges( float *mask, int nel, int dims[ 3 ], int skip[ 3 ],
 *     dims
 *        The number of pixels along each pixel axis of the arrays.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
-*        the array using a single 1D vector index and using nD coords. 
+*        the array using a single 1D vector index and using nD coords.
 *     on
 *        The on value.
 *     off
@@ -103,14 +103,14 @@ void cupidEdges( float *mask, int nel, int dims[ 3 ], int skip[ 3 ],
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* Get a pointer to the input pixel which would have GRID indices [0,0,0] 
+/* Get a pointer to the input pixel which would have GRID indices [0,0,0]
    if the array extended that far (in fact the first pixel in the
    input array has GRID indices [1,1,1]). */
    pin0 = mask - skip[ 0 ] - skip[ 1 ] - skip[ 2 ];
 
 /* Store a value used to indicate that a pixel was original on but is to
    be switched off. */
-   toggle = 0.5*VAL__MAXR;   
+   toggle = 0.5*VAL__MAXR;
 
 /* Loop round all elements of the mask. */
    iv = 0;
@@ -122,10 +122,10 @@ void cupidEdges( float *mask, int nel, int dims[ 3 ], int skip[ 3 ],
             if( mask[ iv ] != on ){
                mask[ iv ] = off;
 
-/* Otherwise, we need to determine if any of the neighbours of the pixel 
+/* Otherwise, we need to determine if any of the neighbours of the pixel
    are off. Loop round all pixels in the neighbourhood of the current pixel.
    This is a cube of 3x3x3 pixels, centred on the current pixel. Break
-   when a pixel is found that is not set to "on" or "toggle" (used to 
+   when a pixel is found that is not set to "on" or "toggle" (used to
    represent pixels that were originally on but which are to be turned
    off). Set a flag to indicate if the pixel should be set off. */
             } else {

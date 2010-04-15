@@ -40,7 +40,7 @@
 *     produced, in less time. However, the output images will have
 *     differing pixel origins which need to be taken into account when
 *     comparing the aligned images.
-*     
+*
 *     The output image values are formed by re-sampling the input image
 *     values using either nearest neighbour or bi-linear interpolation
 *     (see parameter METHOD). If the former method is used, then any
@@ -56,10 +56,10 @@
 *     ACC = REAL (Read)
 *        The positional accuracy required, as a a number of pixels. For
 *        highly non-linear projections, a recursive algorithm is used in
-*        which succesively smaller regions of the projection are fitted 
-*        with a least squares linear transformation. If such a 
-*        transformation results in a maximum positional error greater 
-*        than the value supplied for ACC (in pixels), then a smaller 
+*        which succesively smaller regions of the projection are fitted
+*        with a least squares linear transformation. If such a
+*        transformation results in a maximum positional error greater
+*        than the value supplied for ACC (in pixels), then a smaller
 *        region is used. High accuracy is paid for by larger run times.
 *                                                                  [0.5]
 *     CENTRE_LAT = LITERAL (Read)
@@ -179,7 +179,7 @@
 *        default values are calculated for each output NDF.
 
 *  Examples:
-*     SKYALIGN IMAGE1 IMAGE2 [-100,-10] [200,100] *_AL 
+*     SKYALIGN IMAGE1 IMAGE2 [-100,-10] [200,100] *_AL
 *        This example re-samples the image contained in IMAGE1 so that
 *        it is aligned with the image contained in IMAGE2, putting the
 *        output in IMAGE1_AL. The output image covers pixel coordinates
@@ -275,7 +275,7 @@
       CALL MSG_IFGET( STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...',
      :                IGRP1, SIZE, STATUS )
 
 *  Begin an NDF context.
@@ -296,7 +296,7 @@
          CALL IRA_IMPRT( INDFR, IDAR, STATUS )
          CALL IRA_SCSEP( IDAR, SCS, EPOCH, STATUS )
 
-*  If a null value was supplied, annul the error 
+*  If a null value was supplied, annul the error
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
@@ -374,7 +374,7 @@
      :                METHOD, STATUS )
 
 *  Get the positional accuracy required.
-      CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )      
+      CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )
       ERRLIM = MAX( 0.0001, ERRLIM )
 
 *  Abort if an error has occured.
@@ -410,7 +410,7 @@
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDF_DELET( INDF2, STATUS )
@@ -424,7 +424,7 @@
 *  Flush the error.
             CALL ERR_FLUSH( STATUS )
 
-*  Give a warning telling the user that no output NDF will be created 
+*  Give a warning telling the user that no output NDF will be created
 *  for the current input NDF.
             CALL GRP_GET( IGRP2, I, 1, NDFNAM, STATUS )
             CALL MSG_SETC( 'NDF', NDFNAM )
@@ -450,13 +450,13 @@
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Assign a group expression to the output parameter NDFLIST which
-*  specifies all the output NDFs. NDFLIST should normally be associated 
-*  with a suitable global parameter to cause its value to be passed on 
-*  to the next application.  The output parameter NDFLIST is not 
-*  advertised as a user parameter since users will normally not be 
-*  aware of the existence of global parameter, and so will not know 
+*  specifies all the output NDFs. NDFLIST should normally be associated
+*  with a suitable global parameter to cause its value to be passed on
+*  to the next application.  The output parameter NDFLIST is not
+*  advertised as a user parameter since users will normally not be
+*  aware of the existence of global parameter, and so will not know
 *  how to assign a value to it.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'SKYALIGN', 
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'SKYALIGN',
      :                                   STATUS )
 
 *  Annul the IRA identifier for the reference astrometry information.
@@ -476,7 +476,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -101,7 +101,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,14 +141,14 @@
       LOGICAL CMPKEY             ! Compound keyword flag
       LOGICAL CMPPST             ! Compound position keyword flag
       INTEGER CPOS               ! Column position for appending text
-      INTEGER ENDCAR             ! Card No. of End card 
+      INTEGER ENDCAR             ! Card No. of End card
       INTEGER EQLPSN             ! Position of the equal sign
-      LOGICAL HERE               ! Shows position name is in FITS array 
+      LOGICAL HERE               ! Shows position name is in FITS array
       INTEGER I, J               ! Do loop index
       INTEGER KEYLN              ! Used length of KEYNAM
       CHARACTER * ( HKEYLN ) KEYNAM ! A keyword
       INTEGER LSTCAR             ! Last card No. of FITS array
-      INTEGER NAMELN             ! Length of a keyword on a card 
+      INTEGER NAMELN             ! Length of a keyword on a card
       INTEGER OLDLST             ! Last card No. of old FITS array
       INTEGER PSTLN              ! Used length of PSTNAM
       CHARACTER * ( HKEYLN ) PSTNAM ! A position keyword
@@ -180,7 +180,7 @@
 
 *  Otherwise, the last element of FITS array is the last card.
       ELSE
-         OLDLST = NOLDCA 
+         OLDLST = NOLDCA
       END IF
 
 *  Set up two chains one of which links old FITS card from the first
@@ -191,12 +191,12 @@
       IARY1( OLDLST ) = 0
       CHAIN2 = OLDLST
       IARY2( OLDLST ) = OLDLST - 1
-      IARY2( 1 ) = 0 
+      IARY2( 1 ) = 0
       DO I = 2, MAX( 2, OLDLST - 1 )
-         IARY1( I ) = I + 1               
+         IARY1( I ) = I + 1
          IARY2( I ) = I - 1
       END DO
-      
+
 *  Initially, last card is the original last card.
 *  There is a special case when the first card is an END card.  In this
 *  case we want to write the new cards from the first card, and append
@@ -206,18 +206,18 @@
       ELSE
          LSTCAR = OLDLST
       END IF
-      
+
 *  Process new keywords one by one.
       DO I = 1, NKEY
 
-*  Convert it and its position name to its formal format.  
+*  Convert it and its position name to its formal format.
          KEYNAM = NAMES( I )
 
 *  Remove all blanks and convert it to upper case.
          CALL CHR_RMBLK( KEYNAM )
          CALL CHR_UCASE( KEYNAM )
          KEYLN = CHR_LEN( KEYNAM )
-            
+
 *  If the keyword is compound one, replace all '.' in the name with
 *  blanks.
          CMPKEY = INDEX( KEYNAM( : NAMELN ), '.' ) .NE. 0
@@ -229,7 +229,7 @@
 
 *  Check whether this keyword is a reserved one.  The names and lengths
 *  of the reserved keywords are stored in the FTS_PAR include file.
-         RESVED = .FALSE.       
+         RESVED = .FALSE.
          DO J = 1, FTS__NREKY
             IF ( KEYNAM( : KEYLN ) .EQ.
      :           FTS__REKEY( J )( : FTS__RKLEN( J ) ) ) RESVED = .TRUE.
@@ -237,7 +237,7 @@
 
 *  If the keyword is not blank, or reserved, process it.
          IF ( ( KEYLN .NE. 0 ) .AND. ( .NOT. RESVED ) ) THEN
-  
+
 *  Do the same for the position name.
             PSTNAM = PSTNS( I )
             CALL CHR_RMBLK( PSTNAM )
@@ -267,7 +267,7 @@
                      IF ( PSTNAM( : PSTLN ) .EQ.
      :                    FTSCAR( CARD )( : NAMELN ) ) HERE = .TRUE.
                   END DO
-                      
+
 *  If the position keyword is compound, ...
                ELSE
                   DO WHILE ( ( .NOT. HERE ) .AND. ( CARD .LT. OLDLST ) )
@@ -275,7 +275,7 @@
 
 *  Find the position of the equals sign '='.
                      EQLPSN = INDEX( FTSCAR( CARD ), '=' )
-                 
+
 *  Only consider those cards containing an equals sign.
                      IF ( EQLPSN .NE. 0 ) THEN
                         NAMELN = CHR_LEN( FTSCAR( CARD )( :EQLPSN -1 ) )
@@ -285,7 +285,7 @@
                   END DO
                END IF
             END IF
-      
+
 *  If the card is to be inserted in the middle of the old FITS card
 *  array, change the chains at the position to include it.
             IF ( HERE .AND. CARD .NE. CHAIN1 ) THEN
@@ -309,12 +309,12 @@
                IARY2( LSTCAR ) = CHAIN2
                CHAIN2 = LSTCAR
             END IF
-                     
+
 *  Check whether the new keyword already exists in the original FITS
 *  array. If so set the flag.
             CARD = 0
             THERE = .FALSE.
-      
+
 *  If the new key is not compound, ...
             IF ( .NOT. CMPKEY ) THEN
                DO WHILE( .NOT. THERE .AND. CARD .LT. OLDLST )
@@ -324,7 +324,7 @@
      :                 FTSCAR( CARD )( : NAMELN ) ) THERE = .TRUE.
                END DO
 
-*  If the new key is compound, ... 
+*  If the new key is compound, ...
             ELSE
                DO WHILE( .NOT. THERE .AND. CARD .LT. OLDLST )
                   CARD = CARD + 1
@@ -380,12 +380,12 @@
          IF ( EQLPSN .NE. 0 ) THEN
             RELOC = INDEX( FTSCAR( CARD ), '{relocated}' ) .NE. 0
             IF ( RELOC ) THEN
-            
+
 *  If the old card is in the middle of the chains, ...
                IF ( CARD .NE. CHAIN1 .AND. CARD .NE. CHAIN2 ) THEN
                   IARY1( IARY2( CARD ) ) = IARY1( CARD )
                   IARY2( IARY1( CARD ) ) = IARY2( CARD )
-                 
+
 *  If the old card is at the beginning of the chain 1 (end of chain 2),
 *  take the next one in the chain as the begin card for chain 1 and as
 *  the end card for chain 2.
@@ -398,9 +398,9 @@
 *  card for chain 2.
                ELSE IF ( CARD .EQ. CHAIN2 ) THEN
                   IARY1( IARY2( CARD ) ) = 0
-                  CHAIN2 = IARY1( CARD ) 
+                  CHAIN2 = IARY1( CARD )
                END IF
-            END IF      
+            END IF
          END IF
       END DO
 
@@ -425,5 +425,5 @@
          ACTNUM = ACTNUM + 1
          FTSCAR( ACTNUM ) = 'END'
       END IF
-      
+
       END

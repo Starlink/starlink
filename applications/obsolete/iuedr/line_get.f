@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE line_GET
 *
-*   Description: 
+*   Description:
 *      Get the contents of the internal buffer.
 *
 *   Authors:
@@ -35,7 +35,7 @@
 
 *   Import:
       INTEGER MAXC         ! maximum size of VALUE string
- 
+
 *   Export:
       BYTE VALUE(MAXC)     ! value string
 

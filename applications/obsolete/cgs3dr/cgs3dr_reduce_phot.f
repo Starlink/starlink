@@ -73,7 +73,7 @@
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT ('RUN_FILE', RUNFIL, STATUS)
 
-*    Determine dimensions of input. 
+*    Determine dimensions of input.
       CALL DSA_DATA_SIZE ('RUN_FILE', 4, NDIM, DIMS, ELEMENTS,
      : STATUS)
 
@@ -141,7 +141,7 @@
 
          RUNRED = SUTDATE(1:CHR_LEN(SUTDATE)) // '.dat'
          CALL MSG_SETC ('OUTFIL', RUNRED)
-         CALL MSG_OUT ( ' ', 
+         CALL MSG_OUT ( ' ',
      :        'ASCII output is to be found in ^OUTFIL', STATUS )
 
       END

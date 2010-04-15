@@ -62,14 +62,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
-                                 
+
 *  Arguments Given:
       INTEGER IGRP
       INTEGER IRA
@@ -84,14 +84,14 @@
       DOUBLE PRECISION  LON( MXNSCT, MXVTCE )
       DOUBLE PRECISION LAT( MXNSCT, MXVTCE )
       INTEGER INDEX
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       DOUBLE PRECISION SLA_DBEAR ! Position angle of the arc connecting
                                  ! two positions
-                                
+
 *  Local Variables:
       CHARACTER LTYPE*(GRP__SZNAM)! Set blank until a new keyword is
                                   ! found.
@@ -103,7 +103,7 @@
       DOUBLE PRECISION B1        ! Sky latitude of current vertex.
       DOUBLE PRECISION ANG       ! Position angle of the arc connecting
                                  ! two vertices
-      DOUBLE PRECISION DIST      ! Distance of two vertices 
+      DOUBLE PRECISION DIST      ! Distance of two vertices
 
       INTEGER IVERT              ! Index of current vertex.
       INTEGER LINDEX             ! Local copy of INDEX.
@@ -142,7 +142,7 @@
 
 *  Loop round until the next name is a keyword.
       DO WHILE( LTYPE .EQ. ' ' .AND. INDEX .LE. SIZE .AND.
-     :          STATUS .EQ. SAI__OK ) 
+     :          STATUS .EQ. SAI__OK )
 
 *  Abort if there is no room for any more vertices.
          IF( IVERT .EQ. MXVTCE ) THEN
@@ -186,7 +186,7 @@
 
 *  Loop round drawing each section of the polyline like a great circle
 *  arc.
-      DO IVERT = 2, NVTCE( NPOLY ) 
+      DO IVERT = 2, NVTCE( NPOLY )
 
 *  Save the coordinates of the next vertex.
          A1 = LON( NPOLY, IVERT )
@@ -208,5 +208,5 @@
          B0 = B1
 
       END DO
-      
+
       END

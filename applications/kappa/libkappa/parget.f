@@ -47,7 +47,7 @@
 *     the array index in parentheses.
 
 *  Usage:
-*     parget parname applic 
+*     parget parname applic
 
 *  ADAM Parameters:
 *     APPLIC = LITERAL (Read)
@@ -170,7 +170,7 @@
                                  ! object
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type of the object
       INTEGER WIDTH              ! Width of the screen in characters
-  
+
 *.
 
 *  Check the inherited status.
@@ -263,7 +263,7 @@
          END IF
 
 *  Find the number of elements associated with the object.
-         CALL DAT_SHAPE( LOCO, DAT__MXDIM, DIM, NDIM, STATUS ) 
+         CALL DAT_SHAPE( LOCO, DAT__MXDIM, DIM, NDIM, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Obtain and report a scalar value.

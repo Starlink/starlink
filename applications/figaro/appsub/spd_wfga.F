@@ -151,7 +151,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -432,9 +432,9 @@
 *  Register this pointer with CNF so that it can be used on 64bit machines.
       IUSER = NELM
 #if HAVE_PERCENTLOC
-      POINTR = CNF_PREG( %LOC(XDWC), ISREG ) 
+      POINTR = CNF_PREG( %LOC(XDWC), ISREG )
 #elif HAVE_INTRINSIC_LOC
-      POINTR = CNF_PREG( LOC(XDWC), ISREG ) 
+      POINTR = CNF_PREG( LOC(XDWC), ISREG )
 #else
       do not have LOC or %LOC
 #endif
@@ -561,7 +561,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -842,7 +842,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

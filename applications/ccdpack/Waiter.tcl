@@ -114,7 +114,7 @@
 #  Configure requested options.
          eval itk_initialize $args
 
-#  Position the window 
+#  Position the window
          update idletasks
          set xpos [ expr [ winfo rootx $master ] \
                        + [ winfo width $master ] / 2 \
@@ -156,10 +156,10 @@
 #  Restore the cursors of the affected windows.
          restorecursors
 
-#  Release the grab.  We need to do an update first, so that any pointer 
-#  events can get noticed by Tk and handed to this window before the 
+#  Release the grab.  We need to do an update first, so that any pointer
+#  events can get noticed by Tk and handed to this window before the
 #  window releases the grab.
-         update 
+         update
          grab release $waitwin
 
 #  Destroy the toplevel window.

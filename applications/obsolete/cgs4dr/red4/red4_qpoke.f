@@ -1,12 +1,12 @@
 *+  RED4_QPOKE - Poke a value into a bad pixel mask.
       SUBROUTINE RED4_QPOKE( DIM1, DIM2, IPOS, JPOS, QVAL, MASK, OQVAL,
-     :  STATUS ) 
+     :  STATUS )
 *    Description :
 *     This routine pokes the given element of a bad pixel mask
 *     with a new value. The old value is returned.
 *    Invocation :
 *      CALL RED4_QPOKE( DIM1, DIM2, IPOS, JPOS, QVAL, MASK, OQVAL,
-*     :  STATUS ) 
+*     :  STATUS )
 *    Parameters :
 *     DIM1                = INTEGER( READ )
 *           The first dimension of the MASK array

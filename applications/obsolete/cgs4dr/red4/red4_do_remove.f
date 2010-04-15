@@ -1,5 +1,5 @@
 *+  RED4_DO_REMOVE - Subtract integration from current co-added observation
-      SUBROUTINE RED4_DO_REMOVE( INTEGRATION, INTQUALITY, INTDIM1, 
+      SUBROUTINE RED4_DO_REMOVE( INTEGRATION, INTQUALITY, INTDIM1,
      :   INTDIM2, INDEX, INDDIM1, INDDIM2, DET_INDEX, DATA, VARIANCE,
      :   QUALITY, COADDS, DATADIM1, DATADIM2, STATUS )
 *    Description :
@@ -11,7 +11,7 @@
 *     The variances are re-calculated from the spread of values of the
 *     data remaining in the coadd
 *    Invocation :
-*      CALL RED4_DO_REMOVE( INTEGRATION, INTQUALITY, INTDIM1, 
+*      CALL RED4_DO_REMOVE( INTEGRATION, INTQUALITY, INTDIM1,
 *     :   INTDIM2, INDEX, INDDIM1, INDDIM2, DET_INDEX, DATA, VARIANCE,
 *     :   QUALITY, COADDS, DATADIM1, DATADIM2, STATUS )
 *    Parameters :

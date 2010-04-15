@@ -24,8 +24,8 @@
 
 #  Description:
 #     This script should be invoked by those building ADAM applications
-#     which use SUBPAR in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
+#     which use SUBPAR in order to generate the correct arguments for the
+#     compiler (or ld) command. The arguments generated are written to
 #     the standard output.
 
 #  Copyright:
@@ -67,7 +67,7 @@
 #     21-MAY-1998 (AJC):
 #        Add curses library for MISC
 #     16-AUG-2001 (AJC):
-#        Remove -ladam_adam -lmessys_adam 
+#        Remove -ladam_adam -lmessys_adam
 #     28-MAR-2005 (TIMJ):
 #        Curses library inserted by autoconf
 #     27-NOV-2008 (DSB):

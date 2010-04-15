@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_READBOLS (FILE, NUM_CHAN, NUM_ADC, BOL_TYPE, 
+      SUBROUTINE SCULIB_READBOLS (FILE, NUM_CHAN, NUM_ADC, BOL_TYPE,
      :  BOL_DU3, BOL_DU4, BOL_CALIB, BOL_THETA, BOL_A, BOL_B,
      :  BOL_QUAL, BOL_DAY, BOL_RUN, BOL_REF, STATUS)
 *+
@@ -22,9 +22,9 @@
 *      { short-wave array
 *        SETBOL name type du3 du4 calib theta a b qual day run ref
 *           "     ditto for other short-wave array bolometers   "
-*      { P1100  
+*      { P1100
 *        SETBOL name type du3 du4 calib theta a b qual day run ref
-*      { P1300   
+*      { P1300
 *        SETBOL name type du3 du4 calib theta a b qual day run ref
 *      { P2000
 *        SETBOL name type du3 du4 calib theta a b qual day run ref
@@ -62,7 +62,7 @@
 *     right of a { character in a line will be treated as comments and ignored.
 
 *  Invocation:
-*     CALL SCULIB_READBOLS (FILE, NUM_CHAN, NUM_ADC, BOL_TYPE, 
+*     CALL SCULIB_READBOLS (FILE, NUM_CHAN, NUM_ADC, BOL_TYPE,
 *    :  BOL_DU3, BOL_DU4, BOL_CALIB, BOL_THETA, BOL_A, BOL_B,
 *    :  BOL_QUAL, BOL_DAY, BOL_RUN, BOL_REF, STATUS)
 
@@ -173,7 +173,7 @@
       INTEGER         FUNIT           ! logical unit associated with FD
       INTEGER         IOSTAT          ! Fortran I/O status
       CHARACTER*132   LINE            ! buffer to hold line read from file
-      INTEGER         NWRD            ! number of words on bolometer definition 
+      INTEGER         NWRD            ! number of words on bolometer definition
                                       ! line
       INTEGER         START (MAX_WRD) ! index of beginnings of words in LINE
       INTEGER         STOP (MAX_WRD)  ! index of ends of words      "
@@ -222,13 +222,13 @@
             FINISHED = .TRUE.
          END IF
 
-*  loop through lines in file. 
+*  loop through lines in file.
 
          DO WHILE (.NOT. FINISHED)
 
 *  read a line. If an error occurs then terminate the loop. If the error is
 *  EOF then set status OK, otherwise output an error message and leave status
-*  bad. 
+*  bad.
 
             READ (FUNIT, 10, IOSTAT=IOSTAT) LINE
   10        FORMAT (A)
@@ -271,7 +271,7 @@
 
 *  break the line up into its component words, check it's the right `shape'
 
-                  CALL CHR_DCWRD (LINE, MAX_WRD, NWRD, 
+                  CALL CHR_DCWRD (LINE, MAX_WRD, NWRD,
      :              START, STOP, WORD, CHR_STATUS)
 
                   IF (CHR_STATUS .NE. 0) THEN
@@ -291,7 +291,7 @@
                      END IF
                   END IF
 
-*  decode the bolometer name 
+*  decode the bolometer name
 
                   IF (.NOT. ERROR) THEN
                      CALL SCULIB_BOLDECODE (WORD(2), ADC, CHAN, STATUS)
@@ -320,7 +320,7 @@
 *  convert DU3
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOR (WORD(4), BOL_DU3(CHAN, ADC), 
+                     CALL CHR_CTOR (WORD(4), BOL_DU3(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -330,9 +330,9 @@
                   END IF
 
 *  convert DU4
-   
+
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOR (WORD(5), BOL_DU4(CHAN, ADC), 
+                     CALL CHR_CTOR (WORD(5), BOL_DU4(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -344,7 +344,7 @@
 *  convert the calibration value
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOR (WORD(6), BOL_CALIB(CHAN, ADC), 
+                     CALL CHR_CTOR (WORD(6), BOL_CALIB(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -356,7 +356,7 @@
 *  convert theta, a and b
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOR (WORD(7), BOL_THETA(CHAN, ADC), 
+                     CALL CHR_CTOR (WORD(7), BOL_THETA(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -366,7 +366,7 @@
                   END IF
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOR (WORD(8), BOL_A(CHAN, ADC), 
+                     CALL CHR_CTOR (WORD(8), BOL_A(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -376,7 +376,7 @@
                   END IF
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOR (WORD(9), BOL_B(CHAN, ADC), 
+                     CALL CHR_CTOR (WORD(9), BOL_B(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -388,7 +388,7 @@
 *  convert the bolometer quality
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOI (WORD(10), BOL_QUAL(CHAN, ADC), 
+                     CALL CHR_CTOI (WORD(10), BOL_QUAL(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -400,7 +400,7 @@
 *  convert the bolometer day
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOD (WORD(11), BOL_DAY(CHAN, ADC), 
+                     CALL CHR_CTOD (WORD(11), BOL_DAY(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -412,7 +412,7 @@
 *  convert the run number
 
                   IF (.NOT. ERROR) THEN
-                     CALL CHR_CTOI (WORD(12), BOL_RUN(CHAN, ADC), 
+                     CALL CHR_CTOI (WORD(12), BOL_RUN(CHAN, ADC),
      :                 STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         ERROR = .TRUE.
@@ -438,8 +438,8 @@
             END IF
 
          END DO
-                     
-*  close the file 
+
+*  close the file
 
          CALL FIO_CLOSE (FD, STATUS)
 

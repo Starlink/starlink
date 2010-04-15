@@ -20,9 +20,9 @@
 #     initialisations of bindings, colours, script auto path etc.
 
 #  Notes:
-#     This interface requires that the extensions [incr Tcl], BLT and 
-#     TclADAM are available (built into the wish executable that invokes 
-#     this file). 
+#     This interface requires that the extensions [incr Tcl], BLT and
+#     TclADAM are available (built into the wish executable that invokes
+#     this file).
 
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.

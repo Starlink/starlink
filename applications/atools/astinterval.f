@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application creates a new Interval and optionally initialises
-*     its attributes. 
+*     its attributes.
 *
 *     The Interval class implements a Region which represents upper
 *     and/or lower limits on one or more axes of a Frame. For a point to
@@ -37,26 +37,26 @@
 *     astinterval frame lbnd ubnd unc options result
 
 *  ADAM Parameters:
-*     FRAME = LITERAL (Read) 
+*     FRAME = LITERAL (Read)
 *        An NDF or text file holding the Frame in which the region is defined.
-*        It must have exactly 2 axes. If an NDF is supplied, the current Frame 
+*        It must have exactly 2 axes. If an NDF is supplied, the current Frame
 *        in its WCS FrameSet will be used.
 *     LBND = GROUP (Read)
-*        A comma-separated list of floating point values to be used as the 
-*        lower limits on each axis. Set a value to "AST__BAD" to indicate that 
-*        the axis has no lower limit. There should be one element for each Frame 
+*        A comma-separated list of floating point values to be used as the
+*        lower limits on each axis. Set a value to "AST__BAD" to indicate that
+*        the axis has no lower limit. There should be one element for each Frame
 *        axis.
 *     UBND = GROUP (Read)
-*        A comma-separated list of floating point values to be used as the 
-*        upper limits on each axis. Set a value to "AST__BAD" to indicate that 
-*        the axis has no upper limit. There should be one element for each Frame 
+*        A comma-separated list of floating point values to be used as the
+*        upper limits on each axis. Set a value to "AST__BAD" to indicate that
+*        the axis has no upper limit. There should be one element for each Frame
 *        axis.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new Interval. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new Interval.
 *     RESULT = LITERAL (Read)
-*        An text file to receive the new Interval. 
-*     UNC = LITERAL (Read) 
+*        An text file to receive the new Interval.
+*     UNC = LITERAL (Read)
 *        An optional text file containing an existing Region which
 *        specifies the uncertainties associated with each point on the
 *        boundary of the Interval being created. The uncertainty at any
@@ -67,16 +67,16 @@
 *        is assumed to be the same for all points.
 *
 *        If supplied, the uncertainty Region must be either a Box, a Circle
-*        or an Ellipse. Alternatively, a null value (!) may be supplied, in 
-*        which case a default uncertainty is used equivalent to a box 
+*        or an Ellipse. Alternatively, a null value (!) may be supplied, in
+*        which case a default uncertainty is used equivalent to a box
 *        1.0E-6 of the size of the bounding box of the Interval being created.
 *
 *        The uncertainty Region has two uses: 1) when the astOverlap
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using astSimplify), the uncertainties are 
-*        used to determine if the transformed boundary can be accurately 
+*        subsequently simplified (using astSimplify), the uncertainties are
+*        used to determine if the transformed boundary can be accurately
 *        represented by a specific shape of Region.
 
 *  Copyright:
@@ -119,9 +119,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'CNF_PAR'          ! CNF constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! CNF constants
 
 *  Status:
       INTEGER STATUS
@@ -135,17 +135,17 @@
       INTEGER UNC
       INTEGER IGRP, IPLBND, IPUBND
       INTEGER NP, NAX
-      
+
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME,
      :                 STATUS )
 
 *  Get the number of axes in the Frame.
@@ -167,7 +167,7 @@
       END IF
 
 *  Read the values from the group into the memory.
-      CALL ATL1_GTOFL( IGRP, NAX, 1, %VAL( CNF_PVAL( IPLBND ) ), 
+      CALL ATL1_GTOFL( IGRP, NAX, 1, %VAL( CNF_PVAL( IPLBND ) ),
      :                 STATUS )
 
 *  Delete the group.
@@ -182,7 +182,7 @@
          CALL ERR_REP( 'ASTINTERVAL_ERR1', ' Number of upper bounds '//
      :                 '(^NP) and Frame axes (^NAX) differ.', STATUS )
       END IF
-      CALL ATL1_GTOFL( IGRP, NAX, 1, %VAL( CNF_PVAL( IPUBND ) ), 
+      CALL ATL1_GTOFL( IGRP, NAX, 1, %VAL( CNF_PVAL( IPUBND ) ),
      :                 STATUS )
       CALL GRP_DELET( IGRP, STATUS )
 
@@ -195,8 +195,8 @@
       END IF
 
 *  Create the required Interval.
-      RESULT = AST_INTERVAL( FRAME, %VAL( CNF_PVAL( IPLBND ) ), 
-     :                       %VAL( CNF_PVAL( IPUBND ) ), 
+      RESULT = AST_INTERVAL( FRAME, %VAL( CNF_PVAL( IPLBND ) ),
+     :                       %VAL( CNF_PVAL( IPUBND ) ),
      :                       UNC, ' ', STATUS )
 
 *  Store the required attribute values.

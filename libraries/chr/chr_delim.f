@@ -14,16 +14,16 @@
 
 *  Description:
 *     The given character string is examined to see if it contains a
-*     substring delimited by the character, DELIM. The indices of the 
-*     first and last characters of the substring are returned as 
+*     substring delimited by the character, DELIM. The indices of the
+*     first and last characters of the substring are returned as
 *     INDEX1 and INDEX2 respectively. If no occurrence of the specified
-*     delimiter is found, or if the only occurrence is the last 
-*     character of the string, then the indices are returned pointing 
-*     to the whole of the input string. If only one occurrence of the 
-*     delimiter is found and it is not the last character in the string, 
-*     INDEX1 will point to this position and INDEX2 will point to the 
-*     last character in the string. If there are more than two 
-*     of the occurrences of the delimiter character, INDEX1 will point 
+*     delimiter is found, or if the only occurrence is the last
+*     character of the string, then the indices are returned pointing
+*     to the whole of the input string. If only one occurrence of the
+*     delimiter is found and it is not the last character in the string,
+*     INDEX1 will point to this position and INDEX2 will point to the
+*     last character in the string. If there are more than two
+*     of the occurrences of the delimiter character, INDEX1 will point
 *     to the first occurrence and INDEX2 to the last occurrence.
 
 *  Arguments:
@@ -62,7 +62,7 @@
 *           The second index is set equal to the declared length of
 *           the string.
 *        else
-*           The second index is set to the position of the last 
+*           The second index is set to the position of the last
 *           occurrence.
 *        endif
 *     endif
@@ -76,12 +76,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -138,7 +138,7 @@
       IF ( ( DELIND .LE. 0 ) .OR. ( DELIND .EQ. SIZE ) ) THEN
 
 *     Delimiter character not found or delimiter character is
-*     last character in string. Set the first index to 1 and the 
+*     last character in string. Set the first index to 1 and the
 *     second index to the declared size of the string.
          INDEX1 = 1
          INDEX2 = SIZE

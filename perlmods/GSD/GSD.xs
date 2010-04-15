@@ -1,5 +1,5 @@
 /*        -*- C -*-
-  
+
   perl-GSD glue - 95% complete
                                         timj@jach.hawaii.edu
  					Time-stamp: <13 Jan 96 1322 timj>
@@ -21,13 +21,13 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
- 
+
 /* The array handling code can be included here */
- 
+
 /* Deal with the packing of perl arrays to C pointers */
- 
+
 #include "arrays/arrays.h"
- 
+
 /* comment this out if you are linking with libarrays.a separately */
 #include "arrays/arrays.c"
 
@@ -47,12 +47,12 @@ typedef char gsd_data;
 
 /* Translation of the old gsd_sys_location. This is the code from gsdGet1x.c
 */
- 
+
 static int nindex( int no_dims, int *bounds, int *subscripts )
 {
   int cell_count, i, j;
   int index;
- 
+
   index = subscripts[0];
   for ( i = no_dims; i >= 2; i-- )
     {  cell_count = subscripts[i-1] - 1;
@@ -70,7 +70,7 @@ MODULE = GSD     PACKAGE = GSD
 
 int
 gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_ptr)
-  char *	filename 
+  char *	filename
   float		version = NO_INIT
   char *	label = NO_INIT
   int		no_items = NO_INIT
@@ -83,7 +83,7 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
   PROTOTYPE: $$$$$$$$
   CODE:
     label = labelbuff; /* Point to some memory */
-    RETVAL = gsdOpenRead(filename, &version, label, &no_items, &fptr, 
+    RETVAL = gsdOpenRead(filename, &version, label, &no_items, &fptr,
              &file_dsc, &item_dsc, &data_ptr);
   OUTPUT:
    version
@@ -92,7 +92,7 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
    fptr
    file_dsc
    item_dsc
-   data_ptr  
+   data_ptr
    RETVAL
 
 # Internal routine since we need to close the file from the
@@ -103,7 +103,7 @@ gsdClose(fptr, file_dsc, item_dsc, data_ptr)
   GSDFILE *	fptr
   GSDFileDesc *	file_dsc
   GSDItemDesc *	item_dsc
-  gsd_data *	data_ptr 
+  gsd_data *	data_ptr
   PROTOTYPE: $$$$
   CODE:
     RETVAL = gsdClose(fptr, file_dsc, item_dsc, data_ptr );
@@ -121,14 +121,14 @@ gsdClose(fptr, file_dsc, item_dsc, data_ptr)
 int
 gsdFind(file_dsc, item_dsc, name, itemno, unit, type, array)
   GSDFileDesc *	file_dsc
-  GSDItemDesc *	item_dsc 
+  GSDItemDesc *	item_dsc
   char *		name
   int          		itemno = NO_INIT
   char *		unit = NO_INIT
   char 		type = NO_INIT
   char 		array = NO_INIT
   PREINIT:
-  char unitbuff[INQUNLEN]; 
+  char unitbuff[INQUNLEN];
   PROTOTYPE: $$$$$$$
   CODE:
     unit = unitbuff;
@@ -190,7 +190,7 @@ gsdGet0d(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 int
 gsdGet0i(file_dsc, item_dsc, data_ptr, itemno, dat_val)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int           itemno
   int 		dat_val = NO_INIT
@@ -261,7 +261,7 @@ gsdGet0w(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 int
 gsdGet0c(file_dsc, item_dsc, data_ptr, itemno, cdat_val)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *       data_ptr
   int           itemno
   char *	cdat_val = NO_INIT
@@ -273,11 +273,11 @@ gsdGet0c(file_dsc, item_dsc, data_ptr, itemno, cdat_val)
  OUTPUT:
  cdat_val
  RETVAL
-  
+
 int
 gsdInqSize(file_dsc, item_dsc, data_ptr, itemno,  dimnames, dimunits, dimvals, actdims, size)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   SV *	dimnames = NO_INIT
@@ -303,13 +303,13 @@ gsdInqSize(file_dsc, item_dsc, data_ptr, itemno,  dimnames, dimunits, dimvals, a
     ptrdimunt[i] = actdimunt[i];
   }
   /* Now actually run the command */
-  RETVAL = gsdInqSize(file_dsc, item_dsc, data_ptr, itemno, MAXDIMS, 
+  RETVAL = gsdInqSize(file_dsc, item_dsc, data_ptr, itemno, MAXDIMS,
            (char **) ptrdimnm, (char **) ptrdimunt, dimvals, &actdims, &size);
-  
-  /* unpack the integer array */ 
+
+  /* unpack the integer array */
   unpack1D( (SV*)ST(6), (void *)dimvals, 'i', actdims);
 
-  /* Copy the dim names and units to the relevant arrays */ 
+  /* Copy the dim names and units to the relevant arrays */
   for (i=0; i<actdims; i++) {
     av_store( (AV*) SvRV(ST(4)),i,newSVpv(ptrdimnm[i],0) );
     av_store( (AV*) SvRV(ST(5)),i,newSVpv(ptrdimunt[i],0) );
@@ -323,7 +323,7 @@ gsdInqSize(file_dsc, item_dsc, data_ptr, itemno,  dimnames, dimunits, dimvals, a
 int
 gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -340,7 +340,7 @@ gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
   last  = nindex( ndims, dimvals, end   );
   values = get_mortalspace(last  - first + 1,'d');
   RETVAL = gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, values, &actvals); 
+		    dimvals, start, end, values, &actvals);
   unpack1D( (SV*)ST(8), (void *)values, 'd', actvals);
  OUTPUT:
  actvals
@@ -349,7 +349,7 @@ gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 int
 gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -366,7 +366,7 @@ gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
   last  = nindex( ndims, dimvals, end   );
   values = get_mortalspace(last  - first + 1,'i');
   RETVAL = gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, values, &actvals); 
+		    dimvals, start, end, values, &actvals);
   unpack1D( (SV*)ST(8), (void *)values, 'i', actvals);
  OUTPUT:
   actvals
@@ -375,7 +375,7 @@ gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 int
 gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -392,7 +392,7 @@ gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
   last  = nindex( ndims, dimvals, end   );
   values = get_mortalspace(last  - first + 1,'f');
   RETVAL = gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, values, &actvals); 
+		    dimvals, start, end, values, &actvals);
   unpack1D( (SV*)ST(8), (void *)values, 'f', actvals);
  OUTPUT:
   actvals
@@ -401,7 +401,7 @@ gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 int
 gsdGet1c(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -419,7 +419,7 @@ gsdGet1c(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
   last  = nindex( ndims, dimvals, end   );
   values = malloc(16*(last-first+1));
   RETVAL = gsdGet1c(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, values, &actvals); 
+		    dimvals, start, end, values, &actvals);
   for (i=0; i<actvals; i++) {
     av_store( (AV*) SvRV(ST(8)),i,newSVpv(values+i*16,16) );
   }
@@ -438,7 +438,7 @@ gsdGet1c(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 int
 gsdGet1dp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, packed, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -456,7 +456,7 @@ gsdGet1dp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
   last  = nindex( ndims, dimvals, end   );
   pvals = get_mortalspace(last  - first + 1,'d');
   RETVAL = gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, (double *) pvals, &actvals); 
+		    dimvals, start, end, (double *) pvals, &actvals);
   sv_setpvn((SV*)ST(8), (char *)pvals, sizeof(double)*actvals);
  OUTPUT:
  actvals
@@ -465,7 +465,7 @@ gsdGet1dp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
 int
 gsdGet1ip(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, packed, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -483,7 +483,7 @@ gsdGet1ip(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
   last  = nindex( ndims, dimvals, end   );
   pvals = get_mortalspace(last  - first + 1,'i');
   RETVAL = gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, (int *) pvals, &actvals); 
+		    dimvals, start, end, (int *) pvals, &actvals);
   sv_setpvn((SV*)ST(8), (char *)pvals, sizeof(int)*actvals);
  OUTPUT:
  actvals
@@ -492,7 +492,7 @@ gsdGet1ip(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
 int
 gsdGet1rp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, packed, actvals)
   GSDFileDesc *     file_dsc
-  GSDItemDesc *     item_dsc 
+  GSDItemDesc *     item_dsc
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -510,7 +510,7 @@ gsdGet1rp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
   last  = nindex( ndims, dimvals, end   );
   pvals = get_mortalspace(last  - first + 1,'f');
   RETVAL = gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims,
-		    dimvals, start, end, (float *) pvals, &actvals); 
+		    dimvals, start, end, (float *) pvals, &actvals);
   sv_setpvn((SV*)ST(8), (char *)pvals, sizeof(float)*actvals);
  OUTPUT:
  actvals

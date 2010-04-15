@@ -132,7 +132,7 @@ char defname[12]="IDL2HDS_OUT";
       if ( argc == 3 )
          hdsname = argv[2]->value.str.s;
       else
-         hdsname = defname;         
+         hdsname = defname;
       strucname = hdsname;
 
       IDL_VarGetData( var, &nvals, &data, 0 );
@@ -142,7 +142,7 @@ char defname[12]="IDL2HDS_OUT";
       hdsNew( hdsname, strucname, hdstype, ndims, dims, &toploc, &status );
       if ( numtags ) {
 /* is a structure - invoke the structure handler */
-         hdsstructwrite( 
+         hdsstructwrite(
             toploc, data, taglist, numtags, ndims, dims, var, &status );
          retstringarray( taglist );
       } else {
@@ -161,14 +161,14 @@ char defname[12]="IDL2HDS_OUT";
    if ( status != SAI__OK ) {
       fstat = status;
       while ( status != SAI__OK ) {
-         emsEload( 
+         emsEload(
             param, &parlen, opstr, &oplen, &status );
-         if ( status != SAI__OK ) 
+         if ( status != SAI__OK )
             IDL_Message( IDL_M_NAMED_GENERIC, IDL_MSG_INFO, opstr );
       }
    }
    emsRlse();
 
 /*  That's it, return to the calling routine */
-   return;     
+   return;
 }

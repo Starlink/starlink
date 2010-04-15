@@ -1,6 +1,6 @@
 	SUBROUTINE POL_POLCAL( QVAL, UVAL, POL)
 
-*      Subroutine to calculate the percentage polarization from the Q and U 
+*      Subroutine to calculate the percentage polarization from the Q and U
 *      Stokes parameters
 
 *      Define local variables
@@ -9,7 +9,7 @@
      :	     QVAL,	! The input Q Stokes parameter value
      :	     UVAL	! The input U Stokes parameter value
 
-*      Calculate the square of the percentage polarization from the Q,U 
+*      Calculate the square of the percentage polarization from the Q,U
 *      Stokes parameters
 
 	POL = QVAL**2 + UVAL**2

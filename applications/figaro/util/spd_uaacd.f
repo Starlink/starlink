@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -148,7 +148,7 @@
          GO TO 500
       ENDIF
 
-*  We loop through a 7-D input array INDAT now, since this is 
+*  We loop through a 7-D input array INDAT now, since this is
 *  larger than OUTDAT. The array indices are N1 ... Ni ... N7.
 *  However we use 1-D arrays for addressing the array elements, the
 *  indices being IIND and OIND.

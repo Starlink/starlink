@@ -1,5 +1,5 @@
       SUBROUTINE TTYOUT( RESPONSE, STATUS )
-      
+
 *+
 *  Name:
 *     TTYOUT
@@ -21,7 +21,7 @@
 *  Arguments:
 *     RESPONSE = LOGICAL (Returned)
 *        Obtained from TTYHOLD call. Set to .FALSE. if user responds NO,
-*        or .TRUE. if YES. 
+*        or .TRUE. if YES.
 *     [argument_spec]...
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +124,7 @@
 
 *  Argument returned:
       LOGICAL RESPONSE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -138,7 +138,7 @@
      :        LNUM, K, LENG, J, L, IXC, IYC, MHAO, MINSAO, N, MDEGD,
      :        MINSD, NCAT, NS, NBAND, MRS, MDS, MAGV, MAGP, NHD, IDMNO,
      :        NUMID, N1SPEC, N2SPEC
-      REAL X, Y, XC, YC, XM, YM, SECSAO, SECSD, RMAG, RSECS, RMAGV, 
+      REAL X, Y, XC, YC, XM, YM, SECSAO, SECSD, RMAG, RSECS, RMAGV,
      :        RMAGP
       LOGICAL*1 IDLIST(IDBYTE), PRIVATE
       LOGICAL SET, NOSCAL
@@ -355,7 +355,7 @@
             ELSE
                WRITE (MVCHAR,932) RMAGV
                IF (SET(ID(IDBYTE,IP(J)),8)) THEN
-                  CHTEMP = MVCHAR(2:5)              
+                  CHTEMP = MVCHAR(2:5)
                   MVCHAR='('//CHTEMP//')'
                ENDIF
             ENDIF
@@ -423,4 +423,4 @@
       CALL TTYHOLD( RESPONSE, STATUS )
 201   CONTINUE     ! Exit point
       END
- 
+

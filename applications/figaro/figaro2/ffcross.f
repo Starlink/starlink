@@ -5,7 +5,7 @@ C     F F C R O S S
 C
 C     Main body of the Figaro FFCROSS function.  This is for use
 C     with some flat fields (notably IPCS) where there may be a bodily
-C     shift between the flat field and the data.  For each 
+C     shift between the flat field and the data.  For each
 C     cross-section in a given range, this routine calculates the
 C     cross-correlation between the flat field and the data.  It then
 C     calculates the average shift for each cross-section, as determined
@@ -14,10 +14,10 @@ C     individual cross-correlations, and calculates the shift given by
 C     that summed cross-correlation.  The idea is that the shift
 C     determined in this way can then be applied using ISHIFT.
 C
-C     Command parameters - 
+C     Command parameters -
 C
 C     IMAGE       (Character) The IMAGE to be compared with
-C                 the flat field. 
+C                 the flat field.
 C     FLAT        (Character) The FLAT field to be used.
 C                 The FLAT and IMAGE data arrays should have the same
 C                 dimensions.
@@ -56,19 +56,19 @@ C                                             KS / CIT 5th Oct 1983
 C     Modified:
 C
 C     6th May 1985.  KS / AAO.  Modified to allow for addition of
-C                    CFIT to parameters in call to FIG_CROSS. 
+C                    CFIT to parameters in call to FIG_CROSS.
 C    21st Oct  1988. JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
 C    21st Jan 1991.  JMS / AAO. Changed maximum allowed dimensions of
 C                    image to 2, and aborts if image is 1D. Added STATUS
-C                    checks and PAR_ABORT calls to support 
-C                    user-requested aborts. Modified calculation of 
+C                    checks and PAR_ABORT calls to support
+C                    user-requested aborts. Modified calculation of
 C                    SIGMA variable to handle negative values. Also,
 C                    modified FIG_CROSS to handle zero arrays.
 C    14th Feb 1991.  JMS / AAO. Set minimum X axis range to two pixels.
 C    25th Sep 1992.  HME / UoE, Starlink. INCLUDE changed. Call
-C                    PAR_WRUSER rather than DSA_WRUSER, FIG_SETERR 
+C                    PAR_WRUSER rather than DSA_WRUSER, FIG_SETERR
 C                    rather than SETERR, JTY_PEAKFIT rather than
 C                    PEAKFIT.
 C    30th Oct 1992.  HME / EIA, Starlink. Unused FAULT logical removed.
@@ -98,7 +98,7 @@ C
       INTEGER   BYTES            ! Bytes required for an array
       REAL      CENTER           ! Centre of peak
       LOGICAL   CFIT             ! True if continuum fit used
-      INTEGER   CFN              ! Pointer to workspace for the 
+      INTEGER   CFN              ! Pointer to workspace for the
                                  ! correlation function
       INTEGER   CFNSUM           ! Pointer to workspace for the
                                  ! correlation sum array
@@ -124,9 +124,9 @@ C
       INTEGER   IY               ! Loop variable
       INTEGER   IYEN             ! Last AXIS(2) element to be used
       INTEGER   IYST             ! First AXIS(2) element to be used
-      INTEGER   KZ(4)            ! Defines the cosine bell 
+      INTEGER   KZ(4)            ! Defines the cosine bell
       LOGICAL   LOG              ! If true, the individual shifts will
-                                 ! be logged 
+                                 ! be logged
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NDIMI            ! Image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
@@ -158,14 +158,14 @@ C
       REAL      YEN              ! Last AXIS(2) value to be used
       REAL      YST              ! First AXIS(2) value to be used
       REAL      ZPC              ! % of spectrum covered at each end by
-                                 ! cosine bell 
+                                 ! cosine bell
 
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -183,7 +183,7 @@ C     Ditto FLAT
 C
       CALL DSA_INPUT ('FLAT','FLAT',STATUS)
       IF (STATUS.NE.0) GOTO 500
-C     
+C
 C     Get sizes of both data arrays
 C
       CALL DSA_DATA_SIZE ('IMAGE',2,NDIMI,DIMS,NELM,STATUS)
@@ -230,7 +230,7 @@ C     The cross-correlation needs a lot of workspace, so grab that now.
 C
       BFLOAT=DSA_TYPESIZE('FLOAT',STATUS)
       CALL GEN_POWER2(NX0,NX)
-      
+
       CALL DSA_GET_WORK_ARRAY(NX0,'FLOAT',ARRAY0,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY(NX0,'FLOAT',ARRAY1,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',FT0,SLOT,STATUS)
@@ -273,7 +273,7 @@ C
      :               ISNEW,STATUS)
       BYTES=NX0*BFLOAT
       IF(STATUS.NE.0)GOTO 500
-        
+
       PISNFL = .FALSE.
       PISNIM = .FALSE.
       DO IY=IYST,IYEN
@@ -374,11 +374,11 @@ C
       CALL VAR_SETNUM('SHIFT',0,0,SHIFT,STATUS)
       CALL VAR_SETNUM('AVSHIFT',0,0,AVSHFT,STATUS)
 C
-C     Now, if required, create the output structure for the 
+C     Now, if required, create the output structure for the
 C     cross-correlation.
 C
       IF (RECORD) THEN
-         CALL DSA_COERCE_DATA_ARRAY('CORRL','FLOAT',1,NX,STATUS)   
+         CALL DSA_COERCE_DATA_ARRAY('CORRL','FLOAT',1,NX,STATUS)
          CALL DSA_MAP_DATA('CORRL','WRITE','FLOAT',CORPTR,SLOT,STATUS)
          BYTES=NX*BFLOAT
          IF(STATUS.NE.0)GOTO 500

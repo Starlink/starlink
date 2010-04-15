@@ -55,7 +55,7 @@ C
 C  Common variable details:
 C     (<) DTA_CODE     (Integer) Last DTA_ system failure status code.
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (!) FITS_OPEN     (Logical array) Indicates FITS processing begun for
 C                       this structure.
@@ -121,7 +121,7 @@ C
          CALL DTA_SZVAR (ARRAY_NAME,2,NDIM,DIMS,DTA_STATUS)
          IF (DTA_STATUS.EQ.0) THEN
 C
-C           It does exist, and we know how large it is, so we see if we 
+C           It does exist, and we know how large it is, so we see if we
 C           can find space for it in the FITS common buffer.
 C
             IF (NDIM.EQ.1) THEN

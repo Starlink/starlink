@@ -71,11 +71,11 @@
 itk::usual FITSLabelEntry {}
 
 itcl::class gaia::FITSLabelEntry {
-   
+
    #  Inheritances:
    #  -------------
    inherit util::LabelEntry
-   
+
    #  Constructor:
    #  ------------
    constructor {args} {
@@ -106,7 +106,7 @@ itcl::class gaia::FITSLabelEntry {
 
    #  Methods:
    #  --------
-   public method init {} { 
+   public method init {} {
       pack $itk_component(chooser) \
          -side $side_ -expand 0 -fill x -padx 1m -ipadx 1m
    }
@@ -129,7 +129,7 @@ itcl::class gaia::FITSLabelEntry {
    #  Protected variables: (available to instance)
    #  --------------------
    #  The FITSChooser used by this instance.
-   protected variable fitsChooser_ {} 
+   protected variable fitsChooser_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

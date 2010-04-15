@@ -11,9 +11,9 @@
 
 	  DO K = 1, DIMSX
 
-	    IF( K .GE. 1 .AND. K .LE. WDIMSX .AND. 
+	    IF( K .GE. 1 .AND. K .LE. WDIMSX .AND.
      :	        J .GE. 1 .AND. J .LE. WDIMSY .AND.
-     :	        NUM .GE. 1 .AND. 
+     :	        NUM .GE. 1 .AND.
      :	        NUM .LE. WDIMSZ) THEN
 
 	      WORK( K, J, NUM) = ARRIN( K, J)

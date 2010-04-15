@@ -8,7 +8,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int rec_locate_data( const struct HAN *han, INT_BIG length, 
+   int rec_locate_data( const struct HAN *han, INT_BIG length,
                         INT_BIG offset, char mode, unsigned char **pntr )
    {
 /*+                                                                         */
@@ -199,7 +199,7 @@ modified (possible programming error).",
 /* If the record's data are being modified, then pack the (possibly         */
 /* modified) Record Control Label back into the Control Domain.             */
       if ( modify ) rec1_pack_rcl( &rcl, cdom );
-      
+
 /* Release the Logical Record Block.                                        */
       if ( lrb != NULL ) rec_release_block( han->slot, han->rid.bloc );
 

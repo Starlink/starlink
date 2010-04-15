@@ -23,7 +23,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the
-C                       top level of the object to 
+C                       top level of the object to
 C                       be created (e.g. supplied by DAT_CREAT)
 C     (>) XSIZE		(Integer,ref) The size of the array to be created
 C                       in the X axis.
@@ -31,7 +31,7 @@ C     (>) YSIZE		(Integer,ref) The size of the array to be created
 C                       in the Y axis.
 C     (>) TSIZE         (Integer,ref) The size of the array to be created
 C                       in the time axis.
-C     (>) STOKES        (Fixed string,descr) A string specifying which 
+C     (>) STOKES        (Fixed string,descr) A string specifying which
 C                       Stokes parameters are to be included in the
 C                       structure. This must contain some combination
 C                       of the letters 'Q', 'U' and 'V'
@@ -53,7 +53,7 @@ C-
 C  Subroutine / function details:
 C
 C  History:
-C     19/10/1989   Original version.  JAB / JAC.                   
+C     19/10/1989   Original version.  JAB / JAC.
 C     15/3/1991    NDF version.   JAB/JAC
 C
       IMPLICIT NONE
@@ -70,13 +70,13 @@ C
 C
 C     Local variables
 C
-      CHARACTER*(DAT__SZLOC) PLOC      
+      CHARACTER*(DAT__SZLOC) PLOC
       INTEGER LOW(3),HIGH(3)
       INTEGER ID,PLACE,IDQ,IDU,IDV
 C
       IF (STATUS .EQ. SAI__OK) THEN
 
-*     Create the top level components 
+*     Create the top level components
 
           CALL NDF_BEGIN
           CALL NDF_PLACE(LOC,' ',PLACE,STATUS)

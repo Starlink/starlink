@@ -32,7 +32,7 @@
 #       Integrate into SMURF and add copyright and licence.
 #       Use smaller gaussian FWHM.
 #    2009-12-21 (DSB):
-#       Changed to use re-sampling (without flux conservation) rather than 
+#       Changed to use re-sampling (without flux conservation) rather than
 #       re-binning.
 #    2010-1-4 (DSB):
 #       Correct comment describing FWHM of Gaussian kernel.
@@ -129,7 +129,7 @@ endif
 $ATOOLS_DIR/astmatrixmap nin=$ndim nout=$ndim form=1 matrix="$matrix" \
                          options=! result=map.ast
 
-#  Get the FWHM for the gaussian kernel, 1/sqrt(2) of the Airy radius, 
+#  Get the FWHM for the gaussian kernel, 1/sqrt(2) of the Airy radius,
 #  and convert to input pixels.
 set fwhm = `$KAPPA_DIR/calc exp="(pa)/(sqrt(2.0)*pb)" pa=$airy \
                                                       pb=$insize`

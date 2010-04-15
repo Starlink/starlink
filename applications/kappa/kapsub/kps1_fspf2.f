@@ -356,7 +356,7 @@
 
 *  Otherwise put the appropriate coefficient into the store.
             NC = NC + 1
-            K = ( I - 1 ) * NYPAR + J 
+            K = ( I - 1 ) * NYPAR + J
             CHCOEF( K ) = WKS3( NC )
 
 *  Store the normalised variance from the covariance matrix.

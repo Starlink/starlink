@@ -1,7 +1,7 @@
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
-      SUBROUTINE ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
+      SUBROUTINE ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE,
      :                       YSIZE, CONT, MAXPTS, XY, DONE, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
+*     CALL ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE,
 *                      YSIZE, CONT, MAXPTS, XY, DONE, STATUS )
 
 *  Description:
@@ -41,12 +41,12 @@
 *        The number of pixel along the y axis in the sub-array to be contoured.
 *     CONT = INTEGER (Given)
 *        The contour level. If positive, the contour contains only those pixels
-*        with the specified pixel value. If zero, then the contour contains 
+*        with the specified pixel value. If zero, then the contour contains
 *        all pixels with non-zero values. If negative, the contour
 *        contains all pixels with a value greater than or equal to the
 *        absolute contour value.
 *     MAXPTS = INTEGER (Given)
-*        Maximum number of positions in each axis that define the locus of 
+*        Maximum number of positions in each axis that define the locus of
 *        a contour.
 *     XY( MAXPTS, 2 ) = DOUBLE PRECISION (Returned)
 *        Workspace to hold the X and Y positions of the contour.
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,11 +91,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! VAL constants
 
 *  Arguments Given:
@@ -127,12 +127,12 @@
       INTEGER J                  ! Loop counter through sub-array lines
       INTEGER JJ                 ! Y element numbers of current pixel in sub-array
       INTEGER JJ0                ! Y element numbers of first pixel in sub-array
-      INTEGER LSIDE              ! Index of the pixel edge to be drawn 
+      INTEGER LSIDE              ! Index of the pixel edge to be drawn
       INTEGER M                  ! Statement function dummy argument
       INTEGER N                  ! Statement function dummy argument
       INTEGER NPTS               ! Number of points in contour's locus
       INTEGER SIDE               ! Index of the pixel edge to be drawn next
-      INTEGER SIDE0              ! Index of the first drawn pixel edge 
+      INTEGER SIDE0              ! Index of the first drawn pixel edge
       INTEGER XUU                ! Upper X bound of plot area
       INTEGER YUU                ! Upper Y bound of plot area
       LOGICAL IN                 ! Is current pixel inside the contour?
@@ -147,7 +147,7 @@
      :                  N .GE. YLL .AND. N .LE. YUU )
 
       INSIDE( M, N ) = ( INIMG( M, N ) .AND. (
-     :                   ( ( CONT .EQ. 0  ) .AND. 
+     :                   ( ( CONT .EQ. 0  ) .AND.
      :                     ( ARRAY( M, N ) .NE. 0 ) ) .OR.
      :                   ( ( CONT .GT. 0  ) .AND.
      :                     ( ARRAY( M, N ) .EQ. CONT ) ) .OR.
@@ -160,7 +160,7 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Simplify the Plot. This adds a new Current Frame into the Plot, so note 
+*  Simplify the Plot. This adds a new Current Frame into the Plot, so note
 *  the index of the original Current Frame so that it can be re-instated later.
 *  This can help to speed up the drawing, and also avoids the possibility
 *  of the Mapping going via a Frame in which the positions are undefined.
@@ -170,11 +170,11 @@
 *  Initialise the store of cells done. The DONE flag is .TRUE. for pixels
 *  which are already known to be "on" a contour which has already been
 *  drawn. A pixel is "on" a contour if its right or top edge forms part
-*  of the contour. "A contour" in this context is a closed segment of 
+*  of the contour. "A contour" in this context is a closed segment of
 *  the curve enclosing the interior pixels. Note, a pixel which is "on" a
 *  contour is not necessarily "inside" the contour.
-      DO J = 0, YSIZE 
-         DO I = 0, XSIZE 
+      DO J = 0, YSIZE
+         DO I = 0, XSIZE
             DONE( I, J ) = .FALSE.
          END DO
       END DO
@@ -185,15 +185,15 @@
 
 #ifdef HAVE_PGPLOT
 *  Buffer all PGPLOT output produced while drawing the contour.
-      CALL PGBBUF 
+      CALL PGBBUF
 #endif
 
 *  Scan the rows and pixels of the sub-array to be contoured.
-      DO J = 0, YSIZE 
-         DO I = 0, XSIZE 
+      DO J = 0, YSIZE
+         DO I = 0, XSIZE
 
 *  If this pixel is known to be on a segment which has already been
-*  drawn, skip over it (otherwise the same segment contour would be drawn 
+*  drawn, skip over it (otherwise the same segment contour would be drawn
 *  again).
             IF( .NOT. DONE( I, J ) ) THEN
 
@@ -207,22 +207,22 @@
 
 *  Store flags indicating if this pixel, the one above, and the one to
 *  the right are inside the contour.
-               IN = INSIDE( IX, IY ) 
-               INR = INSIDE( IX + 1, IY ) 
-               INT = INSIDE( IX, IY + 1 ) 
+               IN = INSIDE( IX, IY )
+               INR = INSIDE( IX + 1, IY )
+               INT = INSIDE( IX, IY + 1 )
 
 *  If this pixel is inside the contour, and the the one to the right is
-*  not, of if this pixel is not inside the contour, and the the one to the 
-*  right is, the right edge of this pixel is on the contour. 
+*  not, of if this pixel is not inside the contour, and the the one to the
+*  right is, the right edge of this pixel is on the contour.
                IF( IN .NEQV. INR ) THEN
 
 *  Indicate that we should trace the contour out.
-                  TRACE = .TRUE.               
+                  TRACE = .TRUE.
 
 *  Save the indices (II,JJ) of the pixel which is "inside" the contour.
 *  Also indicate which edge of pixel (II,JJ) is part of the contour, and
 *  store the coords of the anti-clockwise end point (the start of the contour).
-                  IF( IN ) THEN 
+                  IF( IN ) THEN
                      II = I
                      SIDE = 3
                      XY( 1, 1 ) = DBLE( IX ) + 0.5D0
@@ -239,9 +239,9 @@
 *  Otherwise, if the top edge of this pixel is on the contour, indicate that we
 *  should trace the contour out.
                ELSE IF( IN .NEQV. INT ) THEN
-                  TRACE = .TRUE.               
+                  TRACE = .TRUE.
                   II = I
-                  IF( IN ) THEN 
+                  IF( IN ) THEN
                      JJ = J
                      SIDE = 2
                      XY( 1, 1 ) = DBLE( IX ) - 0.5D0
@@ -285,12 +285,12 @@
 *  Indicate that we now know that the pixel to the left is on the contour.
                      DONE( II - 1, JJ ) = .TRUE.
 
-*  If the pixel above this one is not inside, indicate that the top edge of 
+*  If the pixel above this one is not inside, indicate that the top edge of
 *  this pixel is to be drawn next.
                      IF( .NOT. INSIDE( IX, IY + 1 ) ) THEN
                         SIDE = 2
 
-*  Otherwise, if the pixel above and to the left of this one is not inside, 
+*  Otherwise, if the pixel above and to the left of this one is not inside,
 *  indicate that the left edge of the pixel above this one is to be drawn
 *  next.
                      ELSE IF( .NOT. INSIDE( IX - 1, IY + 1 ) ) THEN
@@ -298,8 +298,8 @@
                         SIDE = 1
 
 *  Otherwise, indicate that the bottom edge of the pixel above and to the
-*  left of this one is to be drawn next. 
-                     ELSE 
+*  left of this one is to be drawn next.
+                     ELSE
                         II = II - 1
                         JJ = JJ + 1
                         SIDE = 4
@@ -315,13 +315,13 @@
 *  Indicate that we now that the current pixel is on the contour.
                      DONE( II, JJ ) = .TRUE.
 
-*  If the pixel to the right of this one is not inside, indicate that the 
+*  If the pixel to the right of this one is not inside, indicate that the
 *  right edge of this pixel is to be drawn next.
                      IF( .NOT. INSIDE( IX + 1, IY ) ) THEN
                         SIDE = 3
 
-*  Otherwise, if the pixel above and to the right of this one is not inside, 
-*  indicate that the top edge of the pixel to the right of this one is to be 
+*  Otherwise, if the pixel above and to the right of this one is not inside,
+*  indicate that the top edge of the pixel to the right of this one is to be
 *  drawn next.
                      ELSE IF( .NOT. INSIDE( IX + 1, IY + 1 ) ) THEN
                         II = II + 1
@@ -329,7 +329,7 @@
 
 *  Otherwise, indicate that the left edge of the pixel above and to the
 *  right of this one is to be drawn next.
-                     ELSE 
+                     ELSE
                         II = II + 1
                         JJ = JJ + 1
                         SIDE = 1
@@ -345,13 +345,13 @@
 *  Indicate that we now that the current pixel is on the contour.
                      DONE( II, JJ ) = .TRUE.
 
-*  If the pixel below this one is not inside, indicate that the 
+*  If the pixel below this one is not inside, indicate that the
 *  bottom edge of this pixel is to be drawn next.
                      IF( .NOT. INSIDE( IX, IY - 1 ) ) THEN
                         SIDE = 4
 
-*  Otherwise, if the pixel below and to the right of this one is not inside, 
-*  indicate that the right edge of the pixel below this one is to be 
+*  Otherwise, if the pixel below and to the right of this one is not inside,
+*  indicate that the right edge of the pixel below this one is to be
 *  drawn next.
                      ELSE IF( .NOT. INSIDE( IX + 1, IY - 1 ) ) THEN
                         JJ = JJ - 1
@@ -359,14 +359,14 @@
 
 *  Otherwise, indicate that the top edge of the pixel below and to the
 *  right of this one is to be drawn next.
-                     ELSE 
+                     ELSE
                         II = II + 1
                         JJ = JJ - 1
                         SIDE = 2
                      END IF
 
 *  If the bottom edge of this pixel is to be drawn...
-                  ELSE 
+                  ELSE
 
 *  Extend the polyline to the clockwise (left) end of the bottom edge.
                      XY( NPTS, 1 ) = DBLE( IX ) - 0.5D0
@@ -375,13 +375,13 @@
 *  Indicate that we now the bottom pixel is on the contour.
                      DONE( II, JJ - 1 ) = .TRUE.
 
-*  If the pixel to the left of this one is not inside, indicate that the 
+*  If the pixel to the left of this one is not inside, indicate that the
 *  left edge of this pixel is to be drawn next.
                      IF( .NOT. INSIDE( IX - 1, IY ) ) THEN
                         SIDE = 1
 
-*  Otherwise, if the pixel below and to the left of this one is not inside, 
-*  indicate that the bottom edge of the pixel to the left of this one is to be 
+*  Otherwise, if the pixel below and to the left of this one is not inside,
+*  indicate that the bottom edge of the pixel to the left of this one is to be
 *  drawn next.
                      ELSE IF( .NOT. INSIDE( IX - 1, IY - 1 ) ) THEN
                         II = II - 1
@@ -389,7 +389,7 @@
 
 *  Otherwise, indicate that the right edge of the pixel below and to the
 *  left of this one is to be drawn next.
-                     ELSE 
+                     ELSE
                         II = II - 1
                         JJ = JJ - 1
                         SIDE = 3
@@ -402,8 +402,8 @@
                   IF( SIDE .EQ. LSIDE ) NPTS = NPTS - 1
 
 *  If the polyline buffer is now full, draw it and reset the buffer.
-                  IF( NPTS .EQ. MAXPTS ) THEN 
-                     CALL AST_POLYCURVE( IPLOT, NPTS, 2, MAXPTS, XY, 
+                  IF( NPTS .EQ. MAXPTS ) THEN
+                     CALL AST_POLYCURVE( IPLOT, NPTS, 2, MAXPTS, XY,
      :                                   STATUS )
                      XY( 1, 1 ) = XY( NPTS, 1 )
                      XY( 1, 2 ) = XY( NPTS, 2 )
@@ -413,7 +413,7 @@
 *  If we are back at the start, leave the loop. IF we have cancelled the
 *  previous point because it did not change direction, reinstate it to
 *  ensure that the contour is closed properly.
-                  IF( II .EQ. II0 .AND. JJ .EQ. JJ0 .AND. 
+                  IF( II .EQ. II0 .AND. JJ .EQ. JJ0 .AND.
      :                SIDE .EQ. SIDE0 ) THEN
                      IF( SIDE .EQ. LSIDE ) NPTS = NPTS + 1
                      TRACE = .FALSE.
@@ -422,8 +422,8 @@
                END DO
 
 *  Draw the polyline.
-               IF( NPTS .GT. 1 ) CALL AST_POLYCURVE( IPLOT, NPTS, 2, 
-     :                                               MAXPTS, XY, 
+               IF( NPTS .GT. 1 ) CALL AST_POLYCURVE( IPLOT, NPTS, 2,
+     :                                               MAXPTS, XY,
      :                                               STATUS )
 
             END IF
@@ -436,10 +436,10 @@
 
 #ifdef HAVE_PGPLOT
 *  Flush the buffer holding PGPLOT output produced while drawing this contour.
-      CALL PGEBUF 
+      CALL PGEBUF
 #endif
 
-*  Remove the Current Frame added by ARD1_ASSIM and re-instate the original 
+*  Remove the Current Frame added by ARD1_ASSIM and re-instate the original
 *  Current Frame.
       CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
       CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )

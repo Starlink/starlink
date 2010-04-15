@@ -1,19 +1,19 @@
 #!/bin/csh -f
 #
-# !!begin 
+# !!begin
 # !!title  WHT file separation script
 # !!author T.R. Marsh
 # !!created   01 January 2005
 # !!revised   08 December 2005
 # !!root   whtdiv
 # !!index  whtdiv.csh
-# !!descr  Shell script for dividing WHT data into aux, ISIS blue & red 
+# !!descr  Shell script for dividing WHT data into aux, ISIS blue & red
 # !!head1  Script for separating aux & ISIS blue/red data
 #
 # !!emph{whtdiv} divides AUX port and red and blue arm data from ISIS. It
 # expects these to be in sdf format and to have had 'fixhead' run on them.
 # It then uses hdstrace to list  It uses kappa's 'fitshead' to spot
-# the type of data and then sends off the files to sub-directories aux, 
+# the type of data and then sends off the files to sub-directories aux,
 # blue and red (!!emph{which should have been created beforehand!}).
 #
 # Arguments: just give a series of fits file names. The flag '-h' tries to cope
@@ -23,7 +23,7 @@
 #
 # You must first have made directories 'red', 'blue' and 'aux' before running this script.
 #
-# !!end 
+# !!end
 
 source $STARLINK_DIR/etc/cshrc
 source $STARLINK_DIR/etc/login
@@ -53,7 +53,7 @@ foreach file ($argv)
       hdstrace $file:r.more.pamela.instrument | grep 'Cass. aux. port' > /dev/null
       if( !( $status ) ) then
         mv -vf $file aux/.
-      else 
+      else
         hdstrace $file:r.more.pamela.instrument | grep 'ISIS blue arm' > /dev/null
         if( !( $status ) ) then
            mv -vf $file blue/.
@@ -62,7 +62,7 @@ foreach file ($argv)
           if( !( $status ) ) then
              mv -vf $file red/.
           else
-             echo "Could not recognise instrument of $file" 
+             echo "Could not recognise instrument of $file"
           endif
         endif
       endif
@@ -72,7 +72,7 @@ foreach file ($argv)
       hdstrace $file:r.more.pamela.detector | grep 'TEK2' > /dev/null
       if( !( $status ) ) then
         mv -vf $file aux/.
-      else 
+      else
         hdstrace $file:r.more.pamela.detector | grep 'EEV12' > /dev/null
         if( !( $status ) ) then
            mv -vf $file blue/.
@@ -81,7 +81,7 @@ foreach file ($argv)
           if( !( $status ) ) then
              mv -vf $file red/.
           else
-             echo "Could not recognise $file" 
+             echo "Could not recognise $file"
           endif
         endif
       endif

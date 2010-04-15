@@ -13,7 +13,7 @@ C     standard deviation.
 C
 C     Parameters -   (">" input, "<" output)
 C
-C     (>) IN     (Real array IN(NELM)) The input array 
+C     (>) IN     (Real array IN(NELM)) The input array
 C                (Note that IN may be multiply dimensioned
 C                in the calling program.  It is treated as
 C                1D here for efficiency and generality.)
@@ -65,7 +65,7 @@ C
       INTEGER  GOOD, BAD
       PARAMETER (BAD = 1, GOOD = 0)
 C
-C     Handle different quality methods separately.  
+C     Handle different quality methods separately.
 C
       IF (QUAL) THEN
 C

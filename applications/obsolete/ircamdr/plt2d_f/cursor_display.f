@@ -84,7 +84,7 @@
 	CALL PAR_GET0R( 'Y_CUR_REAL', YRPOS, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'CURSOR_DISPLAY : after PAR_GETs LAST CURSOR POSITION',
      :                  STATUS )
 	  RETURN
@@ -134,7 +134,7 @@
 	CALL PAR_PUT0R( 'Y_CUR_REAL', YRPOS, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'CURSOR_DISPLAY : after PAR_PUTs CURSOR REAL POSITION',
      :                  STATUS )
 	  RETURN
@@ -146,7 +146,7 @@
 	CALL PAR_PUT0I( 'Y_CUR_PIXEL', Y_PIXEL, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'CURSOR_DISPLAY : after PAR_PUTs CURSOR PIXEL POSITION',
      :                  STATUS )
 	  RETURN
@@ -155,7 +155,7 @@
 	CALL PAR_PUT0R( 'CURSOR_VALUE', CURSOR_VALUE, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'CURSOR_DISPLAY : after PAR_PUT CURSOR PIXEL VALUE',
      :                  STATUS )
 	  RETURN

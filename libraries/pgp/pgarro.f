@@ -4,9 +4,9 @@ C+
       SUBROUTINE PGARRO (X1, Y1, X2, Y2)
       REAL X1, Y1, X2, Y2
 C
-C Draw an arrow from the point with world-coordinates (X1,Y1) to 
-C (X2,Y2). The size of the arrowhead at (X2,Y2) is determined by 
-C the current character size set by routine PGSCH. The default size 
+C Draw an arrow from the point with world-coordinates (X1,Y1) to
+C (X2,Y2). The size of the arrowhead at (X2,Y2) is determined by
+C the current character size set by routine PGSCH. The default size
 C is 1/40th of the smaller of the width or height of the view surface.
 C The appearance of the arrowhead (shape and solid or open) is
 C controlled by routine PGSAH.

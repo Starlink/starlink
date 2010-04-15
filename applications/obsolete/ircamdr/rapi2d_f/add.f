@@ -119,7 +119,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the first structure
-         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ',
      :                  PNTRI1, NELEMENTS, STATUS )
 
 *       if no error then continue
@@ -153,7 +153,7 @@
 
 *                   if no error then continue
                      IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                      map a data array component
                         CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )
@@ -164,7 +164,7 @@
 *                         call working subroutine to add first data
 *                         array to second, result going into output
                            CALL ADDARR2D( %VAL(PNTRI1), %VAL(PNTRI2),
-     :                            %VAL(PNTRO), DIMS1(1), DIMS1(2), 
+     :                            %VAL(PNTRO), DIMS1(1), DIMS1(2),
      :                            STATUS )
 
 *                      end of if-no-error-before-accessing-pointers check

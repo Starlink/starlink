@@ -28,7 +28,7 @@ C                         properly.
 C     (>) ERROR           (Fixed string,descr) A string describing
 C                         the problem.
 C     (>) REF_NAME        (Fixed string,descr) The reference name
-C                         used to identify the structure.  
+C                         used to identify the structure.
 C     (>) ITEM            (Fixed string,descr) The name of the item
 C                         in question - (this is a FITS keyword).
 C     (!) STATUS          (Integer,ref) Status code.  If bad status is

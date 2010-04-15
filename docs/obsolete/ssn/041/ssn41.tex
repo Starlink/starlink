@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -159,10 +159,10 @@ Software submission is dealt with further in SGP/19.
 
 \item [A1 : HOMELESS FILES] ---
 Some files in the Collection are not associated with a specific software item.
-These contain such things as username lists, general documentation and 
+These contain such things as username lists, general documentation and
 management information.
-When new versions of these become available, store them in 
-{\tt [STAR.TEMP.PENDING]} until a new release is prepared, then include them 
+When new versions of these become available, store them in
+{\tt [STAR.TEMP.PENDING]} until a new release is prepared, then include them
 in that release.
 
 \item [A2 : HOMEWORK] ---
@@ -195,17 +195,17 @@ SSC's should be issued and implemented in numerical order, although several
 can be in preparation at any one time.
 
 If the item is an Optional item, the submitted files should be stored in a
-separate directory called {\tt [STAR.TEMP.SSCnX]} (and {\tt [STAR.TEMP.SSCnY]} 
+separate directory called {\tt [STAR.TEMP.SSCnX]} (and {\tt [STAR.TEMP.SSCnY]}
 if needed).
 This is because a Site Manager may choose not to implement this item and may
 therefore not want to copy it over a network.
-However, directory {\tt [STAR.TEMP.SSCn]} will be produced for every release 
+However, directory {\tt [STAR.TEMP.SSCn]} will be produced for every release
 because you need to add some files to those submitted and these are stored here.
 In some cases it is easier to implement the release if the submitted files are
-stored in subdirectories while the ones you add are stored in 
+stored in subdirectories while the ones you add are stored in
 {\tt [STAR.TEMP.SSCn]}.
 
-Site Managers should copy and implement {\em every}\, {\tt SSCn.COM} released; 
+Site Managers should copy and implement {\em every}\, {\tt SSCn.COM} released;
 even if they do not want the item itself.
 
 \item [A5 : SELECT FILES] ---
@@ -338,7 +338,7 @@ information about it.
 Enter the EVE editor using the special symbol,
 \begin{verbatim}
     $ SSCEVE SSCn.LIS
-    
+
     <DO> or GOLD-KP7
        Replace *** XXX
        A[ll]
@@ -373,7 +373,7 @@ This should contain a single line of text like:
 
 \item [A9 : FILE ATTRIBUTES] ---
 Check the protection code and owner for all files.
-The protection code should be {\tt (RWE,RWE,RE,RE)} for directories and 
+The protection code should be {\tt (RWE,RWE,RE,RE)} for directories and
 {\tt (RE,RWED,RE,RE)} for other files.
 The owner should be UIC = {\tt [STAR]}.
 However, there are files in the directories {\tt STARDISK:[STARSEC...]} that
@@ -400,19 +400,19 @@ For directory trees try:
     $ SET PROT=(S:RWE,O:RWE) [...]*.DIR
 \end{verbatim}
 See Vol. 3 System Management for details of the ACL editor.
-You can set the ownership (if you have {\tt SYSPRV} and {\tt BYPASS} 
+You can set the ownership (if you have {\tt SYSPRV} and {\tt BYPASS}
 privileges) by:
 \begin{verbatim}
     $ SET FILE/OWN *.*
 \end{verbatim}
 
 \item [A10 : FINAL CHECK] ---
-Purge {\tt [STAR.TEMP.SSCn\ldots]} and check the {\tt SSCn.LIS/COM} files 
+Purge {\tt [STAR.TEMP.SSCn\ldots]} and check the {\tt SSCn.LIS/COM} files
 carefully. Make sure no files are missing or superfluous.
 Note down the size of all directories in the release and note these in
 {\tt SSCn.LIS}.
-Make sure the size of the directory is described correctly in {\tt SSCn.LIS} 
-as this will give a remote manager confidence that he has copied the software 
+Make sure the size of the directory is described correctly in {\tt SSCn.LIS}
+as this will give a remote manager confidence that he has copied the software
 correctly or warn him that some files are missing.
 If errors are detected after release, issue corrections in new releases called
 {\tt SSCnA}, {\tt SSCnB}, {\em etc}.
@@ -484,9 +484,9 @@ as intended and works as it did for the person who submitted it.
 This does not imply that this person got it to work properly in the first place.
 
 \item [B4 : SSC FILES] ---
-Copy {\tt SSCn.LIS} into {\tt [STAR.TEMP]} and print out {\tt SSCn.COM} as 
-soon as you are satisfied that the SSC is in a satisfactory state for general 
-release. 
+Copy {\tt SSCn.LIS} into {\tt [STAR.TEMP]} and print out {\tt SSCn.COM} as
+soon as you are satisfied that the SSC is in a satisfactory state for general
+release.
 
 \item [B5 : SAVE SET] ---
 Produce the save set {\tt SSCn.BCK} which is to be copied by other sites.
@@ -498,7 +498,7 @@ To create the save set containing the release and compress, type the following:
 or explicitly
 \begin{verbatim}
     $ BACKUP [STAR.TEMP.SSCn...]*.* SSCn.BCK/SAVE
-    $ LZCMP -V SSCn.BCK SSCn.BCK  
+    $ LZCMP -V SSCn.BCK SSCn.BCK
 \end{verbatim}
 Do the same for {\tt [STAR.TEMP.SSCnX]} if it exists.
 Note the sizes of the save-sets in standard and compressed form, and add these
@@ -553,11 +553,11 @@ Any failed attempts to mail DECNET sites will be requeued for later.
 The procedure reports its progress and eventually lists the sites it was
 unable to contact over a 24 hour period.
 
-Because of a bug in the Batch Mailer, it does not handle mail to {\bf JANET} 
+Because of a bug in the Batch Mailer, it does not handle mail to {\bf JANET}
 sites correctly. Use {\em either} of the following methods:
 
 \begin{enumerate}
-\item Mail the release note to all the sites in {\tt [STAR.TEMP]SSC\_JANET.DIS} 
+\item Mail the release note to all the sites in {\tt [STAR.TEMP]SSC\_JANET.DIS}
 at one shot using the VMS MAIL command:
 \begin{verbatim}
     $ @CBSMAILER
@@ -569,7 +569,7 @@ at one shot using the VMS MAIL command:
 individually using VMS MAIL.
 This is a bit time consuming, but if a site is not reached, the returned
 message will always indicate which site was not reached.
-We use this method. 
+We use this method.
 \end{enumerate}
 
 JANET mail that cannot be sent will eventually be returned as `undelivered
@@ -577,9 +577,9 @@ mail' via the ftp\_manager.
 
 Messages from the Batch Mailer and ftp\_manager should be stored on-line in a
 mail `folder' called SSCn until the Batch Mailer has successfully reached all
-DECNET sites. Note sites which cannot be contacted and try them individually 
+DECNET sites. Note sites which cannot be contacted and try them individually
 later. Read and print the {\tt SSCn.LIS} from your own MAIL.
-Trim {\tt SSCn.LIS} and {\tt SSCn.COM} to A4 size and file in the 
+Trim {\tt SSCn.LIS} and {\tt SSCn.COM} to A4 size and file in the
 `STARLINK -- Operations' folder. When you are satisfied that all sites have been
 reached, delete the contents of MAIL `folder' {\tt SSCn}.
 
@@ -606,18 +606,18 @@ Any associated messages should be entered as replies to the relevant topic.
 
 A number of things need to be done after an SSC has been implemented.
 Some can be delayed until the end of a batch of releases; use your discretion.
-When printing files use the /NOFEED qualifier to save paper (or use the 
+When printing files use the /NOFEED qualifier to save paper (or use the
 {\tt PNF} command defined for {\tt STAR}), trim the output to A4 size and file.
 
 If you need to print a complete set of information files, the command
 procedure {\tt [STAR.TEMP]\-PRINT\_SSC\_DOC.COM} which will print them in three
-batches. 
+batches.
 
 \begin{description}
 
 \item [C1 : NEWS] ---
-If users will be noticeably affected by the release ({\em e.g.}\, they may 
-need to relink programs) add a message to the RAL user news system as follows 
+If users will be noticeably affected by the release ({\em e.g.}\, they may
+need to relink programs) add a message to the RAL user news system as follows
 (you need {\tt SYSPRV} privilege):
 \begin{verbatim}
     $ ADDNEWS
@@ -662,8 +662,8 @@ required by:
 \begin{verbatim}
     $ BACKUP SSCn.BCK/SAVE [*...]
 \end{verbatim}
-The release directory tree is usually retained for a few days after release 
-in case of problems. 
+The release directory tree is usually retained for a few days after release
+in case of problems.
 
 \item [C4 : DELETE SSC NOTICE] ---
 Delete {\tt [STAR.TEMP]SSCn.LIS} when every site on the distribution list has
@@ -698,15 +698,15 @@ This is an `unloaded' REXEC file. Update the file, and then load the new data:
       REXEC> EXIT
       $ @SIZES
 \end{verbatim}
-The command procedure (final step above) will print out sorted lists of the 
-software sizes in various categories. 
+The command procedure (final step above) will print out sorted lists of the
+software sizes in various categories.
 
 \item [C9 : DOCUMENT ANALYSIS] ---
 Update and print {\tt LDOCSDIR:ANALYSIS.LIS} containing the documentation
 analysis if a new document number or item has been released.
 
 \item [C10 : DOCUMENT MASTERS] ---
-If new documentation ({\em e.g.}\,SUN) has been released and masters have not 
+If new documentation ({\em e.g.}\,SUN) has been released and masters have not
 been supplied, prepare them yourself.
 For RUNOFF files the best current method of producing a master is to use the
 Sanders printer in the lineprinter room in `letter' mode (although some people
@@ -787,17 +787,17 @@ Jiffy bags are normally adequate.
 \item [C12 : DELETE SAVE SET] ---
 Copy SSC save-sets to {\tt DISK\$RLSSD1:\-[STAR]} for storage until a batch of
 10 SSCs is reached.
-Delete {\tt [STAR.TEMP]SSCn.BCK} and any optional save set one month after 
-its initial release to save disk space. 
+Delete {\tt [STAR.TEMP]SSCn.BCK} and any optional save set one month after
+its initial release to save disk space.
 All sites on the distribution list should be aware that this will be done
 without notice.
 Any site that hasn't copied the save sets within a month is delinquent and
 should be made to wait for recovery.
 
 \item [C13 : BACKUP] ---
-For safety, the SSC backup save-sets are archived to exabyte tape in batches 
-of ten SSCs. The procedure {\tt [STAR.TEMP]SSCBACK.COM} does this. 
-Copy the appropriate batch of save sets to {\tt DISK\$RLSSD1:[STAR]}. 
+For safety, the SSC backup save-sets are archived to exabyte tape in batches
+of ten SSCs. The procedure {\tt [STAR.TEMP]SSCBACK.COM} does this.
+Copy the appropriate batch of save sets to {\tt DISK\$RLSSD1:[STAR]}.
 Edit the procedure to change the tape save-set name and batch of save-sets
 appropriately.
 Load the backup tape in the exabyte drive and run the command procedure as a
@@ -912,8 +912,8 @@ SSC550  Directory size: 809 blocks (3 dirs, 26 files)
 
 Installation instructions:
 
-1.      Install a copy of directory DISK$SOFTDEV:[STAR.TEMP.SSC550] and give 
-        it the logical name SSCTEMP (include the device name if this is 
+1.      Install a copy of directory DISK$SOFTDEV:[STAR.TEMP.SSC550] and give
+        it the logical name SSCTEMP (include the device name if this is
         different from the device holding the Starlink software).
 
 2.      Execute the command procedure SSCTEMP:SSC550.COM.
@@ -924,8 +924,8 @@ Installation instructions:
 
                 $ DEFINE/SYSTEM GKS_IMAGE_ADAM GKS_DIR:GKS_IMAGE_ADAM.EXE
 
-4.      If you have the other GKS shareable images installed as known images, 
-        install GKS_IMAGE_ADAM.EXE and replace GKS_IMAGE.EXE on all nodes in 
+4.      If you have the other GKS shareable images installed as known images,
+        install GKS_IMAGE_ADAM.EXE and replace GKS_IMAGE.EXE on all nodes in
         your cluster:
 
                 $ MCR SYSMAN
@@ -936,7 +936,7 @@ Installation instructions:
                 SYSMAN> EXIT
                 $
 
-         Add an entry to your LSSC:STARTUP.COM to ensure the GKS images are 
+         Add an entry to your LSSC:STARTUP.COM to ensure the GKS images are
          installed with the rest of the installed images:
 
                 ADD GKS_DIR:GKS_IMAGE_ADAM.EXE /SHARED
@@ -946,7 +946,7 @@ Installation instructions:
         Remove the entry for GKS_DIR:GKSSHARE.EXE in the same section.
 
         Please NOTE: The modification to LSSC:STARTUP.COM regarding image
-        installation for GKS_IMAGE.EXE and GKS_WS_IMAGE.EXE should have 
+        installation for GKS_IMAGE.EXE and GKS_WS_IMAGE.EXE should have
         occurred at SSC546. The omission of this change has not effected GKS.
 
 5.      Rebuild the non-ADAM shareable image library:
@@ -964,7 +964,7 @@ Notes:
         PSX_IMAGE and *_ADAM) are now linked with EMG_IMAGE(_ADAM) as
         appropriate instead of ADAMSHARE and the EMS object Library.
 
-        This is a complete release of PSX, but the only changes that affect 
+        This is a complete release of PSX, but the only changes that affect
         users are that PSX_CALLOC and PSX_MALLOC now report how many bytes were
         being requested if they fail.
 
@@ -972,18 +972,18 @@ Notes:
 
         A VERSION.NUM file has been added to PSX at this release.
 
-2.      GKS 7.2 v1.0-1 corrects a DLT `cock up' (his  phrase, not mine!). There 
+2.      GKS 7.2 v1.0-1 corrects a DLT `cock up' (his  phrase, not mine!). There
         is no effect on users.
 
 
-Other files released in this SSC:               
+Other files released in this SSC:
 
         SSC:STARTUP.COM
 
 Information summaries updated:
 
-        DOCSDIR:  NEWS 
-        ADMINDIR: SSI 
+        DOCSDIR:  NEWS
+        ADMINDIR: SSI
 
 Martin Bly 07.01.92
 \end{verbatim}
@@ -998,7 +998,7 @@ Copy this to your local site and install the release.
 There may be an optional save set called {\tt SSCnX.BCK} in the same directory.
 This need not be copied if you do not want to install the software released
 (if this is an optional item).
-However, you should {\em always} copy {\tt SSCn.BCK} and run the command 
+However, you should {\em always} copy {\tt SSCn.BCK} and run the command
 procedure {\tt SSCn.COM} that it contains.
 Also, you should install updates in their numerical order since information
 files are updated in every release.
@@ -1035,7 +1035,7 @@ LZDCM before using BACKUP to recreate the directory.
 People of a nervous disposition may use the qualifiers /LOG and /VERIFY in the
 BACKUP command if this makes them feel happier.
 
-\item [IMPLEMENT]: Follow the implementation instructions in {\tt SSCn.LIS} 
+\item [IMPLEMENT]: Follow the implementation instructions in {\tt SSCn.LIS}
 (which you should already have available) to install the release.
 
 \item [CLEAN-UP]: Carry out any actions of the CLEAN-UP phase that you consider

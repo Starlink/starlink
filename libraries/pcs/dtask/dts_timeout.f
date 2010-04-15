@@ -1,4 +1,4 @@
-      SUBROUTINE DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS ) 
+      SUBROUTINE DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS )
 *+
 *  Name:
 *     DTASK_TIMEOUT
@@ -16,7 +16,7 @@
 *     CALL DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS )
 
 *  Description:
-*     Interpret a message from a timer. If necessary, activate the 
+*     Interpret a message from a timer. If necessary, activate the
 *     application.
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Unpack the details of the timeout from the VALUE string. If the 
+*     Unpack the details of the timeout from the VALUE string. If the
 *     timeout matches a currently active action, restart the OBEY.
 
 *  Copyright:
@@ -95,7 +95,7 @@
       EQUIVALENCE ( RESVAL, ASTVAL )
 *.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *   Unpack the timer identifier from the VALUE string.
 *
@@ -104,16 +104,16 @@
       COUNT =  ASTVAL - ( ACTPTR * 65536 )
       IF ( ( ACTPTR .GE. 1 ) .AND. ( ACTPTR .LE. DTASK__MAXACT ) ) THEN
 
-         IF ( ( ACTSTATE(ACTPTR) .EQ. DTASK__ACTIVE ) .AND. 
-     :     ( ACTCOUNT(ACTPTR) .EQ. COUNT ) .AND. 
+         IF ( ( ACTSTATE(ACTPTR) .EQ. DTASK__ACTIVE ) .AND.
+     :     ( ACTCOUNT(ACTPTR) .EQ. COUNT ) .AND.
      :     ( ACTTIM(ACTPTR) .NE. 0 ) ) THEN
 *
 *         The timer is expected.
 *
-            CALL SUBPAR_PUTPATH ( ACTPATH(ACTPTR), ACTMESSID(ACTPTR), 
+            CALL SUBPAR_PUTPATH ( ACTPATH(ACTPTR), ACTMESSID(ACTPTR),
      :        STATUS )
             CALL TASK_PUT_MESSINFO ( 0, 0, ' ', VALUE, 0,
-     :        MESSYS__RESCHED ) 
+     :        MESSYS__RESCHED )
 *
 *         Restart the OBEY.
 *

@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
-*                          dim_t itime_hi, AstSkyFrame *abskyfrm, 
+*                          dim_t itime_hi, AstSkyFrame *abskyfrm,
 *                          AstMapping *oskymap, int moving, int olbnd[ 2 ],
 *                          int oubnd[ 2 ], int *lut, int *status );
 
@@ -32,16 +32,16 @@
 *        The index of the last time slice to be included in the returned
 *        LUT.
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the output map. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output map to 2D
 *        spatial pixel coordinates in the output map.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output map.
 *     olbnd[ 2 ] = int (Given)
@@ -51,25 +51,25 @@
 *     lut = int * (Returned)
 *        Point to array in which to store the 1-d vector index within the
 *        output map, of every bolometer sample in the supplied time slice
-*        range. The first value is written to element 0. The last value 
+*        range. The first value is written to element 0. The last value
 *        is written to element "(itime_hi - itime_lo + 1)*nbolo - 1".
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
 *  Description:
 *     A full calculation of the input bolometer -> output grid Mapping is
-*     done at regularly spaced time slices, and used to generate the output 
+*     done at regularly spaced time slices, and used to generate the output
 *     map GRID (x,y) coords for every bolometer at each of these selected
-*     time slices. 
+*     time slices.
 *
-*     For other time slices, the output map GRID coords are estimated by 
-*     adding a constant offset onto all the bolo GRID coords from the 
+*     For other time slices, the output map GRID coords are estimated by
+*     adding a constant offset onto all the bolo GRID coords from the
 *     previous selected time slice. This constant offset is equal to the
 *     shift in boresight position, as measured in the output GRID
 *     coordinate system, from the previous selected time slice to the
 *     current time slice.
 *
-*     These output GRID coords are converted into 1-dimensional vector index 
+*     These output GRID coords are converted into 1-dimensional vector index
 *     within the output map, and stored in the returned LUT.
 
 *  Authors:
@@ -118,9 +118,9 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
 
-void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo, 
-                     dim_t itime_hi, AstSkyFrame *abskyfrm, 
-                     AstMapping *oskymap, int moving, int olbnd[ 2 ], 
+void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
+                     dim_t itime_hi, AstSkyFrame *abskyfrm,
+                     AstMapping *oskymap, int moving, int olbnd[ 2 ],
                      int oubnd[ 2 ], int *lut, int *status ) {
 
 /* Local Variables */
@@ -196,14 +196,14 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    some caclulations. */
    if( tstep > 1 ) {
 
-/* We need a Frame describing absolute tracking system coords. Take a 
+/* We need a Frame describing absolute tracking system coords. Take a
    copy of the supplied skyframe (to inherit obslat, obslon, epoch,
    etc), and then set its system to the tracking system. */
       trfrm = astCopy( abskyfrm );
-      astSetC( trfrm, "System", 
-               sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys, 
+      astSetC( trfrm, "System",
+               sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys,
                                       status ) );
-   
+
 /* Get the Mapping from the tracking system to the output (absolute, since
    abskyfrm is absolute) sky system. */
       fs = astConvert( trfrm, abskyfrm, " " );
@@ -213,21 +213,21 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                  "tracking system to output WCS system.", status );
       }
       tr2skyabs = astGetMapping( fs, AST__BASE, AST__CURRENT );
-   
+
 /* For moving targets, we also need a Frame describing offset sky
    coordinates in the output map, in which the reference point is the
-   current telescope base position. This will involve changing the 
+   current telescope base position. This will involve changing the
    SkyRef attribute of the Frame for every time slice, so take a
    copy of the supplied SkyFrame to avoid changing it. */
       if( moving ) {
          offsky = astCopy( abskyfrm );
          astSet( offsky, "SkyRefIs=Origin" );
-      } 
-   
+      }
+
 /* Create the Mapping from offsets within the output map sky coordinate
-   system output to map GRID coords to output map GRID coords. This uses a 
-   ShiftMap to convert from output PIXEL coords (produced by "oskymap") to 
-   output GRID coords. Note, if the target is moving, "oskymap" maps from 
+   system output to map GRID coords to output map GRID coords. This uses a
+   ShiftMap to convert from output PIXEL coords (produced by "oskymap") to
+   output GRID coords. Note, if the target is moving, "oskymap" maps from
    sky *offsets* to output map PIXEL coords. */
       shift[ 0 ] = 1.5 - olbnd[ 0 ];
       shift[ 1 ] = 1.5 - olbnd[ 1 ];
@@ -236,7 +236,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Allocate memory to hold the (x,y) output map grid coords at each bolo
    for a single time slice. */
-   outmapcoord = astMalloc( sizeof( *outmapcoord )*2*nbolo );      
+   outmapcoord = astMalloc( sizeof( *outmapcoord )*2*nbolo );
 
 /* Initialise boresight position for the benefit of the tstep == 1 case. */
    bsx = bsy = 0.0;
@@ -247,14 +247,14 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Loop round each time slice. */
    state = data->hdr->allState + itime_lo;
-   for( itime = itime_lo; itime <= itime_hi && *status == SAI__OK; 
+   for( itime = itime_lo; itime <= itime_hi && *status == SAI__OK;
         itime++,state++ ) {
 
 /* No need to get the boresight position if we are doing full
    calculations at every time slice. */
       if( tstep > 1 ) {
 
-/* Transform the current boresight and base (if moving) positions from  
+/* Transform the current boresight and base (if moving) positions from
    tracking coords to absolute output map sky coords. */
          xin[ 0 ] = state->tcs_tr_ac1;
          yin[ 0 ] = state->tcs_tr_ac2;
@@ -268,7 +268,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
          astTran2( tr2skyabs, np, xin, yin, 1, xout, yout );
 
 /* If the target is moving, find the offsets within the output map sky
-   coordinate system, from base to boresight at the current time slice. 
+   coordinate system, from base to boresight at the current time slice.
    These offsets become the new "boresight" position (in xin/yin). */
          if( moving ) {
 
@@ -285,7 +285,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* Annul the Mapping to avoid keep the number of AST objects to a minimum. */
             offmap = astAnnul( offmap );
 
-/* If the target is stationary, we can just use the absolute boresight 
+/* If the target is stationary, we can just use the absolute boresight
    position as it is. */
          } else {
             xin[ 0 ] = xout[ 0 ];
@@ -293,7 +293,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
          }
 
 /* Transform the above boresight position from output map sky coords to output
-   map GRID coords. */                         
+   map GRID coords. */
          astTran2( bsmap, 1, xin, yin, 1, &bsx, &bsy );
       }
 
@@ -303,12 +303,12 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* Record the time slice at which to do the next full calculation. */
          itime0 += tstep;
 
-/* Calculate the full bolometer to map-pixel transformation for the current 
+/* Calculate the full bolometer to map-pixel transformation for the current
    time slice */
          fullmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
                                      status );
 
-/* If succesful, use it to transform every bolometer position from bolo 
+/* If succesful, use it to transform every bolometer position from bolo
    GRID coords to output map GRID coords. */
          if( fullmap ) {
             astTranGrid( fullmap, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
@@ -321,7 +321,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* If we cannot determine a full Mapping for this time slice, move the
    node to the next time slice (otherwise we would loose all the data to
-   the next node), and set the boresight position bad to indicate we 
+   the next node), and set the boresight position bad to indicate we
    have no mapping for this time slice. */
          } else {
             itime0 = itime + 1;
@@ -346,7 +346,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
             x = *(px++) + dx;
             y = *(py++) + dy;
 
-/* Find the grid indices (minus one) of the output map pixel containing the 
+/* Find the grid indices (minus one) of the output map pixel containing the
    mapped bolo grid coords. One is subtracted in order to simplify the
    subsequent calculation of the vector index. */
             ox = (int) ( x - 0.5 );
@@ -354,11 +354,11 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Check it is within the output map */
             if( ox >= 0 && ox < odimx && oy >= 0 && oy < odimy ) {
-   
+
 /* Find the 1-dimensional vector index into the output array for this
    pixel and store in the next element of the returned LUT. */
                lut[ ilut++ ] = ox + oy*odimx;
-   
+
 /* Store a bad value for points that are off the edge of the output map. */
             } else {
                lut[ ilut++ ] = VAL__BADI;
@@ -377,7 +377,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    outmapcoord = astFree( outmapcoord );
 
 /* Export the WCS pointer in the data header since it will be annulled at
-   a higher level. Note the FrameSet pointer may be null if the last 
+   a higher level. Note the FrameSet pointer may be null if the last
    full calculation was for a slice with bad telescope data. */
    if( data->hdr->wcs ) astExport( data->hdr->wcs );
 

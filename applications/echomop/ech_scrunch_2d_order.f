@@ -218,7 +218,7 @@
 *  Local Variables:
       DOUBLE PRECISION AXMIN( 2 )
       DOUBLE PRECISION AXMAX( 2 )
-      
+
       REAL WAVE_BIN_START
       REAL WAVE_BIN_END
       REAL RAW_ERR

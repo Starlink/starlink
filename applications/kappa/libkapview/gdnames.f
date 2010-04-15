@@ -86,10 +86,10 @@
       CALL MSG_OUT( ' ', 'The following graphics devices are '//
      :              'available. The first column holds the GNS names,'//
      :              ' and the second the equivalent PGPLOT names (in '//
-     :              'parentheses). Either form can be used...', 
+     :              'parentheses). Either form can be used...',
      :              STATUS )
       CALL MSG_BLANK( STATUS )
-   
+
 *  Call PGLDEV to display the list of devices.
       CALL AGP_GDLST( STATUS )
 

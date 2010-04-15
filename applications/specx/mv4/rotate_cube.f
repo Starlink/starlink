@@ -116,7 +116,7 @@ C     map headers this actually stored, but we don't depend on it yet!)
       NPTS1 = NPTS(1)
       CALL POP
 
-C   Get some virtual memory for the new cube and initialize 
+C   Get some virtual memory for the new cube and initialize
 
       CALL MAKE_CUBE2 (NCUBE, NINDEX, NEW_CUBE_ADDRESS,
      &                 NEW_INDEX_ADDRESS, IFAIL)

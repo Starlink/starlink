@@ -23,8 +23,8 @@
 *     This application lists the FITS header stored in an NDF FITS
 *     extension.  The list may either be reported directly to you,
 *     or written to a text file.  The displayed list of headers can
-*     be augmented, if required, by the inclusion of FITS headers 
-*     representing the current World Coordinate System defined by the 
+*     be augmented, if required, by the inclusion of FITS headers
+*     representing the current World Coordinate System defined by the
 *     WCS component in the NDF (see Parameter ENCODING).
 
 *  Usage:
@@ -35,18 +35,18 @@
 *        If a non-null value is supplied, the NDF WCS component is used
 *        to generate a set of FITS headers describing the WCS, and these
 *        headers are added into the displayed list of headers (any WCS
-*        headers inherited from the FITS extension are first removed). 
-*        The value supplied for ENCODING controls the FITS keywords 
-*        that will be used to represent the WCS.  The value supplied 
+*        headers inherited from the FITS extension are first removed).
+*        The value supplied for ENCODING controls the FITS keywords
+*        that will be used to represent the WCS.  The value supplied
 *        should be one of the encodings listed in the "World Co-ordinate
 *        Systems" section below.  An error is reported if the WCS cannot
-*        be represented using the supplied encoding.  A trailing minus 
-*        sign appended to the encoding indicates that only the WCS 
-*        headers should be displayed (that is, the contents of the FITS 
-*        extension are not displayed if the encoding ends with a minus 
+*        be represented using the supplied encoding.  A trailing minus
+*        sign appended to the encoding indicates that only the WCS
+*        headers should be displayed (that is, the contents of the FITS
+*        extension are not displayed if the encoding ends with a minus
 *        sign).  Also see the FULLWCS parameter.  [!]
 *     FULLWCS = _LOGICAL (Read)
-*        Only accessed if ENCODING is non-null.  If TRUE, then all 
+*        Only accessed if ENCODING is non-null.  If TRUE, then all
 *        co-ordinate frames in the WCS component are written out.
 *        Otherwise, only the current Frame is written out.  [FALSE]
 *     IN = NDF (Read)
@@ -62,11 +62,11 @@
 *        reported to you.
 *     fitslist saturn fullwcs encoding=fits-wcs
 *        As above but it also lists the standard FITS world-co-ordinate
-*        headers derived from saturn's WCS component, provided such 
+*        headers derived from saturn's WCS component, provided such
 *        information exists.
 *     fitslist saturn fullwcs encoding=fits-wcs-
-*        As the previous example except that it only lists the standard 
-*        FITS world-co-ordinate headers derived from saturn's WCS 
+*        As the previous example except that it only lists the standard
+*        FITS world-co-ordinate headers derived from saturn's WCS
 *        component.  The headers in the FITS extension are not listed.
 *     fitslist ngc205 logfile=ngcfits.lis
 *        The contents of the FITS extension in NDF ngc205 are
@@ -83,20 +83,20 @@
 *        the system commonly used by IRAF.  It is described in the
 *        document "World Coordinate Systems Representations Within the
 *        FITS Format" by R.J. Hanisch and D.G. Wells, 1988, available by
-*        ftp from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
+*        ftp from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z.
 *
 *        "FITS-WCS" --- This is the FITS standard WCS encoding
 *        scheme described in the paper "Representation of celestial
 *        coordinates in FITS"
 *        (http://www.atnf.csiro.au/people/mcalabre/WCS/).  It is
 *        very similar to "FITS-IRAF" but supports a wider range of
-*        projections and co-ordinate systems. 
+*        projections and co-ordinate systems.
 *
 *        "FITS-WCS(CD)" --- This is the same as "FITS-WCS" except that
-*        the scaling and rotation of the data array is described by a 
+*        the scaling and rotation of the data array is described by a
 *        CD matrix instead of a PC matrix with associated CDELT values.
 *
-*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, 
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi,
 *        PCiiijjj, etc., as described in a previous (now superseded)
 *        draft of the above FITS world co-ordinate system paper by
 *        E.W.Greisen and M.Calabretta.
@@ -106,24 +106,24 @@
 *        (revised 9th September, 1994), available by ftp from
 *        fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z.  It is
 *        currently employed by the AIPS data-analysis facility (amongst
-*        others), so its use will facilitate data exchange with AIPS. 
+*        others), so its use will facilitate data exchange with AIPS.
 *        This encoding uses CROTAi and CDELTi keywords to describe axis
 *        rotation and scaling.
 *
-*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which 
+*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which
 *        allows the use of a wider range of celestial projections, as
 *        used by the AIPS++ project.
 *
-*        "FITS-CLASS" --- This uses the conventions of the CLASS 
+*        "FITS-CLASS" --- This uses the conventions of the CLASS
 *        project.  CLASS is a software package for reducing single-dish
-*        radio and sub-mm spectroscopic data.  It supports 
-*        double-sideband spectra.  See 
+*        radio and sub-mm spectroscopic data.  It supports
+*        double-sideband spectra.  See
 *        http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
 *
 *        "DSS" --- This is the system used by the Digital Sky Survey,
 *        and uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *
-*        "NATIVE" --- This is the native system used by the AST library 
+*        "NATIVE" --- This is the native system used by the AST library
 *        (see SUN/210) and provides a loss-free method for transferring
 *        WCS information between AST-based application.  It allows more
 *        complicated WCS information to be stored and retrieved than any
@@ -172,12 +172,12 @@
 *     2006 October 24 (MJC):
 *        Use modern commenting style.
 *     4-AUG-2009 (DSB):
-*        Added parameters ENCODING and FULLWCS, and modified to use an AST 
+*        Added parameters ENCODING and FULLWCS, and modified to use an AST
 *        FitsChan as a staging area for the displayed headers.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -208,7 +208,7 @@
       LOGICAL FULLWCS            ! Display all Frames?
       LOGICAL LOGF               ! The log file is open?
       LOGICAL SHOWEX             ! Show contents of the FITS extension?
-      LOGICAL THERE              ! Does the NDF have a FITS extension?     
+      LOGICAL THERE              ! Does the NDF have a FITS extension?
 *.
 
 *  Check the inherited global status.
@@ -233,7 +233,7 @@
      :                'FITS-PC,FITS-AIPS,FITS-AIPS++,FITS-CLASS,DSS,'//
      :                'FITS-WCS(CD),NATIVE,FITS-IRAF-,FITS-WCS-,'//
      :                'FITS-PC-,FITS-AIPS-,FITS-AIPS++-,FITS-CLASS-,'//
-     :                'DSS-,FITS-WCS(CD)-,NATIVE-', .FALSE., ENCOD, 
+     :                'DSS-,FITS-WCS(CD)-,NATIVE-', .FALSE., ENCOD,
      :                STATUS )
 
 *  If a null value was supplied for ENCODING, annul the error and set the
@@ -247,7 +247,7 @@
 *  the minus sign and set a flag indicating that the FITS extension should
 *  not be displayed.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         LN = CHR_LEN( ENCOD ) 
+         LN = CHR_LEN( ENCOD )
          IF( ENCOD( LN : LN ) .EQ. '-' ) THEN
             ENCOD( LN : LN ) = ' '
             SHOWEX = .FALSE.
@@ -261,7 +261,7 @@
       IF( SHOWEX ) THEN
          CALL NDF_XSTAT( NDF, 'FITS', THERE, STATUS )
          IF( THERE ) CALL KPG_GTFTS( NDF, FCHAN, STATUS )
-      END IF         
+      END IF
 
 *  If WCS information is to be displayed, ensure we have a FitsChan.
       IF( ENCOD .NE. ' ' ) THEN
@@ -270,7 +270,7 @@
 
 *  If we have a FitsChan (containing the contents of the FITS extension),
 *  attempt to read FrameSets from the header. We do not require the
-*  resulting objects, but this will delete from the FitsChan any WCS 
+*  resulting objects, but this will delete from the FitsChan any WCS
 *  keywords inherited from the FITS extension.
          IF( FCHAN .NE. AST__NULL ) THEN
             OBJ = AST_READ( FCHAN, STATUS )
@@ -285,7 +285,7 @@
          END IF
 
 *  Get the WCS FrameSet from the NDF.
-         CALL KPG1_GTWCS( NDF, IWCS, STATUS )  
+         CALL KPG1_GTWCS( NDF, IWCS, STATUS )
 
 *  If only the current coordinate system is required, remove all others
 *  from the FrameSet.
@@ -309,12 +309,12 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'ENC', ENCOD )
             CALL ERR_REP( ' ', 'Cannot convert the NDF WCS to FITS '//
-     :                    'using the ''^ENC'' encoding.', STATUS ) 
+     :                    'using the ''^ENC'' encoding.', STATUS )
          END IF
 
       END IF
 
-*  Skip to the end if there is nothing to display or an error has 
+*  Skip to the end if there is nothing to display or an error has
 *  occurred.
       IF( FCHAN .NE. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
 
@@ -323,7 +323,7 @@
          CALL ERR_MARK
          LOGF = .FALSE.
          CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 80, FD, STATUS )
-   
+
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE IF ( STATUS .EQ. SAI__OK ) THEN
@@ -334,12 +334,12 @@
 *  Tell MSG that it should not wrap at 79 characters since we know we
 *  are in blocks of 80.  Given that we can not query MSG for the current
 *  values it is difficult to ensure that we reset to the correct value.
-*  value.  We make a guess that we are not in STREAM mode and simply 
+*  value.  We make a guess that we are not in STREAM mode and simply
 *  re-enable formatted mode afterwards.
          CALL MSG_TUNE( 'STREAM', 1, STATUS )
 
 *  Reset the FitsChan so that the first card is the current card.
-         CALL AST_CLEAR( FCHAN, 'Card', STATUS )   
+         CALL AST_CLEAR( FCHAN, 'Card', STATUS )
 
 *  Loop round all cards in the FitsChan.
          DO WHILE( AST_FINDFITS( FCHAN, '%f', CARD, .TRUE., STATUS ) )

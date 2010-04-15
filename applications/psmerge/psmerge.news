@@ -7,7 +7,7 @@
  shifted independently.
 
  A description of the use of PSMERGE can be found in `PSMERGE - Encapsulated
- PostScript Handling Utility' (SUN/164).  There is a hypertext version 
+ PostScript Handling Utility' (SUN/164).  There is a hypertext version
  available (`showme sun164' or `findme psmerge').
 
  v1.0-7 now released under the GPL.

@@ -18,7 +18,7 @@ C     ARC         (Character) The file name of the arc spectrum - ie
 C                 the spectrum whose axis information is to be used.
 C
 C     OUTPUT      (Character) The file name for the resulting data
-C                 structure.  If this is the same as SPECTRUM, the 
+C                 structure.  If this is the same as SPECTRUM, the
 C                 axis data in SPECTRUM will be changed in situ.
 C
 C     Command keywords - None
@@ -61,7 +61,7 @@ C
 C     Check ARC axis data-array exists
 C
       CALL DSA_SEEK_AXIS('ARC',1,EXIST,STATUS)
-      IF(STATUS.NE.0)GOTO 500     
+      IF(STATUS.NE.0)GOTO 500
       IF(.NOT.EXIST)THEN
          CALL PAR_WRUSER('Arc has no axis data-array',STATUS)
          GOTO 500
@@ -71,7 +71,7 @@ C     Get size of axis data-array in Arc
 C
       CALL DSA_AXIS_SIZE('ARC',1,5,NDIM,DIMS,NELM,STATUS)
 C
-C     Create a new data structure modelled on SPECT, but with 
+C     Create a new data structure modelled on SPECT, but with
 C     the axis structure modelled on ARC.
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','SPECT',0,0,STATUS)

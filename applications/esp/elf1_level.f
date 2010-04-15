@@ -1,5 +1,5 @@
       SUBROUTINE ELF1_LEVEL(THRESH,XO,YO,ELEMS,ARRAY,
-     :                      PRANGE,RADIUS,STATUS)    
+     :                      PRANGE,RADIUS,STATUS)
 *+
 *  Name:
 *     ELF1_LEVEL
@@ -7,21 +7,21 @@
 *  Purpose:
 *     Provides an estimate of how far out from the image centre you must
 *     normally go before the average count is below the threshold level.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *     CALL ELF1_LEVEL(THRESH,XO,YO,ELEMS,ARRAY,PRANGE,
-*                     RADIUS,STATUS)    
+*                     RADIUS,STATUS)
 
 *  Description:
 *     Looks outward from the chosen origin location along lines separated by
 *     45 degrees. Determines how far along each of these lines you must
 *     look to reach a pixel count value below the threshold value.
-*     
+*
 *  Arguments:
-*     THRESH = REAL (Given) 
+*     THRESH = REAL (Given)
 *        Threshold pixel brightness value. Units counts.
 *     XO = REAL (Given)
 *        Suggested X co-ordinate for the galaxy centre.
@@ -116,8 +116,8 @@
       YI(6)=-1
       YI(7)=0
       YI(8)=-1
-     
-*   Find a distance from the galaxy which will be beyond the image 
+
+*   Find a distance from the galaxy which will be beyond the image
 *   bounds for every direction.
       FAR=INT(SQRT(1.*PRANGE(1)*PRANGE(1)+1.*PRANGE(2)*PRANGE(2)))
 
@@ -167,10 +167,10 @@
 
  40   CONTINUE
 
-*   Average estimates from the pairs of lines. 
+*   Average estimates from the pairs of lines.
       DO 60 I=1,4
 
-*      Average the result if a value was found for both lines 
+*      Average the result if a value was found for both lines
 *      of a pair.
          IF ((FOUND(I).GT.0).AND.(FOUND(I+4).GT.0)) THEN
 
@@ -198,7 +198,7 @@
       DO 70 I=1,4
 
 *      Check that a value was found for the current pair of diametrically
-*      opposed lines outward from the origin. 
+*      opposed lines outward from the origin.
          IF (FOUND(I).GT.0) THEN
 
 *         Add to the sum.
@@ -209,8 +209,8 @@
 
  70   CONTINUE
 
-*   Assign final value. 
-      IF (J.GT.0) THEN 
+*   Assign final value.
+      IF (J.GT.0) THEN
           RADIUS=SUM/REAL(J)
       ELSE
           RADIUS=-1.0

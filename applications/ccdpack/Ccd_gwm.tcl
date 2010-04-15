@@ -23,7 +23,7 @@
 #  Configuration Options:
 #        -gwmname name
 #
-#     Defines the GWM widget name (as recognised by GNS). Defaults to 
+#     Defines the GWM widget name (as recognised by GNS). Defaults to
 #     xwindows.
 #
 #        -redraw boolean
@@ -33,7 +33,7 @@
 #        -drawcommand command
 #
 #      A command to invoke when the widget is resized. This should restore
-#      the graphic context (i.e. re-draw the image to the new size and 
+#      the graphic context (i.e. re-draw the image to the new size and
 #      redraw any graphics).
 #
 #        -scrollregion bounds
@@ -63,7 +63,7 @@
 #
 #         -mincolours number
 #
-#      Minimum number of colours that are required. KAPPA lutcol 
+#      Minimum number of colours that are required. KAPPA lutcol
 #      requires 34 so this is the default value.
 
 #  Inheritance:
@@ -99,10 +99,10 @@
 #     method do args
 #        This method provides access to the canvas. The args are those
 #        you would use in a command to control the canvas.
-#     method zoom scale 
-#        Increases the size of the Gwm widget by the factor scale. This 
+#     method zoom scale
+#        Increases the size of the Gwm widget by the factor scale. This
 #        causes the widget to be destroyed and re-created at the new size.
-#        Consequently if will be blank unless a graphic context 
+#        Consequently if will be blank unless a graphic context
 #        restoring procedure has been registered.
 #     method sethelp docname label
 #        Sets the help associated with the widget.
@@ -232,7 +232,7 @@
       }
 
 #  Set the help to show for the whole canvas.
-      method sethelp { docname label } { 
+      method sethelp { docname label } {
          if { $exists } {
             Ccd::base::sethelp $Oldthis $docname $label
          }
@@ -313,7 +313,7 @@
             set state(afterId) [after 50 $Oldthis _autoscan]
          }
       }
-      
+
 #  Cancel auto repeat.
       method _cancelrepeat {} {
          after cancel $state(afterId)
@@ -446,7 +446,7 @@
 
 #  Number of colours. Changing this has no effect until a resize.
       public variable colours 64 { }
-      
+
 #  Minimum number of colours. KAPPA needs 34!
       public variable mincolours 34 { }
 

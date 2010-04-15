@@ -264,7 +264,7 @@
      :                               0.0,%VAL(CNF_PVAL(d_rptr)),
      :                               %VAL(CNF_PVAL(d_vptr)),
      :                               %VAL(CNF_PVAL(staptr)),
-     :                               %VAL(CNF_PVAL(d_mptr)),1,1, 
+     :                               %VAL(CNF_PVAL(d_mptr)),1,1,
      :                               VAL__BADR)
 
 *             Update trams, if the fitting didn't crash, and the answer

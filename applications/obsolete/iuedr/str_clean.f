@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE str_CLEAN
 *
-*   Description: 
+*   Description:
 *      Remove non-printable ASCII characters from string.
 *
 *   Authors:
@@ -20,7 +20,7 @@
 *         Final conversion to SGP/16 style.
 *
 *   Method:
-*      Assume an ASCII collating sequence. Set all non-printables to 
+*      Assume an ASCII collating sequence. Set all non-printables to
 *      BLANK in place.
 *
 *-
@@ -39,7 +39,7 @@
 
 *   Import/Export:
       BYTE STR(ARB)       ! string to be cleaned
- 
+
 *   External references:
       INTEGER str_LEN     ! string length
 

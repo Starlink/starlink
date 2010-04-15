@@ -42,18 +42,18 @@ c   See method.
 c
 c   Method
 c   ------
-c   
+c
 c   - The program obtains USEAXES to determine whether shift values are to
 c     be computed or read from a file.
 c   - The parameter FILES is obtained. This is an ASCII file containing the
-c     names of the images to be co-added. 
+c     names of the images to be co-added.
 c   - The parameter SHIFTS is obtained if USEAXES is FALSE. This is an ASCII
 c     file containing the relative pixel shifts of each of the images in the
 c     input file.
 c   - Each image is read in in turn, and the output file's properties are
 c     determined from the information gathered in this first pass. The rules
 c     are as follows:
-c     
+c
 c     o The output file size is the maximum in each dimension of the input
 c       images.
 c     o The output file type is determined by the type of the first file
@@ -66,13 +66,13 @@ c       and will expand to whatever size is necessary.
 c     o Each input file MUST have the same dimensionality as the base file.
 c     o If USEAXES is true, ALL axes must be present in ALL the images.
 c       Further, logarithmic axes are disallowed and axes with units other
-c       than that of the base file also cause program abortion. 
-c     o All axis data must increase monotonically with index (if it doesn't, 
+c       than that of the base file also cause program abortion.
+c     o All axis data must increase monotonically with index (if it doesn't,
 c       use AXFLIP or SETAXES to make it so).
 c     o All axis data must be on the same scale as the base file (ie the ratio
 c
 c                        (end - start + 1) / no.of pixels
-c                              
+c
 c       must be the same for each respective axis.)
 c     o Quality or error arrays will appear in the output iff each input
 c       file contains them, otherwise they will be ignored. Similarly
@@ -87,7 +87,7 @@ c     unused dimension). If AVERAGE is true, a count is maintained for each
 c     pixel in the image. The file is closed after use, freeing up the slot
 c     for the next file.
 c
-c   - If AVERAGE is true, the mean pixel values are computed in the final 
+c   - If AVERAGE is true, the mean pixel values are computed in the final
 c     image.
 c
 c   - If USEAXES is true, the output axes are scaled accordingly.
@@ -120,8 +120,8 @@ c     DSA_UNMAP
 c     DSA_WRUSER
 c
 c   GEN Library:
-c     GEN_FILL  
-c   
+c     GEN_FILL
+c
 c   ICH Library:
 c     ICH_CI
 c     ICH_FOLD
@@ -309,7 +309,7 @@ c
           call dsa_wruser('Error opening shift file.\\n')
           go to 999
         end if
-      end if       
+      end if
 c
 c   Initialise some property variables
 c
@@ -354,7 +354,7 @@ c
           go to 999
 c
         else
-c 
+c
           call dsa_named_input('image',image(nfiles),status)
           if (status.ne.0) go to 999
           call dsa_data_size('image',10,ndim(nfiles),tempdims,
@@ -381,7 +381,7 @@ c
             btype = type
             if (btype.ne.'SHORT') then
               btype = 'FLOAT'
-            else 
+            else
               if (verbose) then
                 call dsa_wruser('%ADDND-W-RNDERR  ')
                 call dsa_wruser('Data type SHORT may incur rounding')
@@ -404,7 +404,7 @@ c
               odims(i) = max(odims(i),dims(nfiles,i))
             end do
 c
-          end if ! (nfiles...)            
+          end if ! (nfiles...)
 c
 c    Get axis data if required for shifts
 c
@@ -416,7 +416,7 @@ c
                 call dsa_wruser('Dimension #'//ich_ci(i))
                 call dsa_wruser(' has no axis data.\\n')
                 go to 999
-              else 
+              else
                 call dsa_get_axis_info('image',i,1,units,1,
      &                                  logaxis,status)
                 call ich_fold(units)
@@ -430,8 +430,8 @@ c
                     call dsa_wruser(ich_ci(i)//'.\\n')
                     go to 999
                   end if ! (units...)
-                end if ! (nfiles...) 
-c             
+                end if ! (nfiles...)
+c
                 if (logaxis.ne.0.0D0) then
                   call dsa_wruser('%ADDND-E-LOGAXIS  ')
                   call dsa_wruser('No logarithmic axes allowed!\\n')
@@ -484,7 +484,7 @@ c
           else
             call dsa_seek_flagged_values('image',bad,status)
             if (bad) nbad = nbad + 1
-          end if 
+          end if
           call dsa_seek_errors('image',err,status)
           if (err) nerr = nerr + 1
 c
@@ -493,7 +493,7 @@ c
           call dsa_close_structure('image',status)
           if (status.ne.0) go to 999
 c
-        end if 
+        end if
 c
       end do ! while
       close(unit=file_lu,iostat=status)
@@ -503,9 +503,9 @@ c
       if (.not. useaxes) then
         nshifts = 0
         done = .false.
-        do while (.not.done) 
+        do while (.not.done)
           nshifts = nshifts + 1
-          read(shift_lu,*,iostat=status) 
+          read(shift_lu,*,iostat=status)
      &                        (shift(nshifts,i), i=1,nbdim)
           if (status .eq. EOF) then
             nshifts = nshifts - 1
@@ -517,7 +517,7 @@ c
             end if
             done = .true.
             status = 0
-          else 
+          else
             if (status .ne. 0) then
               call dsa_wruser('%ADDND-E-IOERR ')
               call dsa_wruser('I/O error reading shift file.\\n')
@@ -526,10 +526,10 @@ c
           end if ! (status.eq.EOF)
         end do ! while
         close(unit=shift_lu,iostat=status)
-      end if ! (.not.useaxes) 
-c     
+      end if ! (.not.useaxes)
+c
 c   Process the quality and error information
-c 
+c
       quality = (nqual .eq. nfiles)
       if (quality.and.verbose) then
         call dsa_wruser('Output file will have a quality array\\n')
@@ -567,7 +567,7 @@ c
             shift(i,j) = int((axstart(i,j)-axmin(j))/bstep(j))
           end do
         end do
-      end if  
+      end if
 c
 c   Compute final output dimensions
 c
@@ -625,7 +625,7 @@ c
       do i = 1,nbdim
         noelm = noelm * odims(i)
       end do
-      obytes = noelm * dsa_typesize(btype,status) 
+      obytes = noelm * dsa_typesize(btype,status)
 c
 c   Allocate workspace for averaging if needed and clear
 c
@@ -649,7 +649,7 @@ c
       if (error) then
         call dsa_map_errors('output','write',btype,address,
      &                       oeslot,status)
-        if (status .ne. 0) go to 999 
+        if (status .ne. 0) go to 999
         oeptr = dyn_element(address)
         call gen_fill(obytes,0,dynamic_mem(oeptr))
       end if
@@ -701,7 +701,7 @@ c
         end if
 c
 c   Add the cube to the total
-c       
+c
         if (btype .eq. 'SHORT') then
           if (badpix) then
             call addnd_wq(
@@ -713,7 +713,7 @@ c
      &           magic_short,shift(i,1),shift(i,2),shift(i,3),
      &           shift(i,4),shift(i,5),shift(i,6),
      &           average,dynamic_mem(wptr))
-          else 
+          else
             call addnd_w(
      &          dynamic_mem(inptr),dims(i,1),dims(i,2),
      &          dims(i,3),dims(i,4),dims(i,5),dims(i,6),
@@ -736,7 +736,7 @@ c
      &           magic_float,shift(i,1),shift(i,2),shift(i,3),
      &           shift(i,4),shift(i,5),shift(i,6),
      &           average,dynamic_mem(wptr))
-          else 
+          else
             call addnd_r(
      &          dynamic_mem(inptr),dims(i,1),dims(i,2),
      &          dims(i,3),dims(i,4),dims(i,5),dims(i,6),
@@ -809,11 +809,11 @@ c
       end if
 c
 999   continue
-      call dsa_close(status)   
+      call dsa_close(status)
       end
 
 *******************************************************************************
-      
+
       subroutine addnd_info(name,ndim,dims,type)
       integer    ndim
       integer    dims(10)

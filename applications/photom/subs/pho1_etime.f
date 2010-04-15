@@ -16,7 +16,7 @@
 *       This routine attempts to return an exposure time for an
 *       image. Where the time is derived from is determined by the value
 *       of the argument EXSRC. EXSRC should be one the values:
-* 
+*
 *          - HDS
 *          - CONSTANT
 *          - HEADER
@@ -24,7 +24,7 @@
 *        HDS: a fully qualified HDS path to the required object within
 *        the NDF should be given as CETIME. For instance if the exposure
 *        time is stored in the CCDPACK extension of an NDF, under the
-*        item ETIME then a suitable return would be: 
+*        item ETIME then a suitable return would be:
 *
 *           - more.ccdpack.etime
 *
@@ -109,7 +109,7 @@
       ETIME = 1.0
 
 *  Branch according to the work we need to do.
-      IF ( EXSRC .EQ. 'HDS' ) THEN 
+      IF ( EXSRC .EQ. 'HDS' ) THEN
 
 *  Old method of HDS path first. Get a locator to the NDF.
          CALL NDF_LOC( INDF, 'READ', ALOC, STATUS )
@@ -125,50 +125,50 @@
             CALL DAT_CLONE( BLOC, ALOC, STATUS )
             CALL DAT_ANNUL( BLOC, STATUS )
  1       CONTINUE
-      
+
 *   Extract the exposure time
          CALL DAT_GET0R( ALOC, ETIME, STATUS )
          CALL DAT_ANNUL( ALOC, STATUS )
 
 *   If there are any problems then return an exposure time of 1
-      ELSE IF ( EXSRC .EQ. 'CONSTANT' ) THEN 
+      ELSE IF ( EXSRC .EQ. 'CONSTANT' ) THEN
 
 *  CETIME should just be an number.
          CALL CHR_CTOR( CETIME, ETIME, STATUS )
 
-      ELSE IF ( EXSRC .EQ. 'HEADER' ) THEN 
+      ELSE IF ( EXSRC .EQ. 'HEADER' ) THEN
 
 *  Stored in FITS headers. Need to check the NDF for the existence of
 *  this first.
          CALL NDF_XSTAT( INDF, 'FITS', EXISTS, STATUS )
-         IF ( EXISTS ) THEN 
+         IF ( EXISTS ) THEN
 
 *  Locate and map the extension.
             CALL NDF_XLOC( INDF, 'FITS', 'READ', ALOC, STATUS )
-            CALL DAT_MAPV( ALOC, '_CHAR*80', 'READ', PNTR, NREC, 
+            CALL DAT_MAPV( ALOC, '_CHAR*80', 'READ', PNTR, NREC,
      :                     STATUS )
 
 *  Attempt to find and decode the FITS header item. Note the trailing
 *  %VAL*( 80 ) is required when passing characters arrays via pointers
 *  on UNIX.
-            CALL PHO1_GKEY( NREC, %VAL( CNF_PVAL( PNTR ) ), CETIME, 
-     :                      EXISTS, ETIME, STATUS, 
+            CALL PHO1_GKEY( NREC, %VAL( CNF_PVAL( PNTR ) ), CETIME,
+     :                      EXISTS, ETIME, STATUS,
      :                      %VAL( CNF_CVAL( 80 ) ) )
 
-            IF ( STATUS .EQ. SAI__OK .AND. .NOT. EXISTS ) THEN 
+            IF ( STATUS .EQ. SAI__OK .AND. .NOT. EXISTS ) THEN
                ETIME = 1.0
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'ITEM', CETIME )
-               CALL ERR_REP( ' ', 
-     :              'Failed to locate header item: ^ITEM', STATUS ) 
+               CALL ERR_REP( ' ',
+     :              'Failed to locate header item: ^ITEM', STATUS )
             END IF
             CALL DAT_ANNUL( ALOC, STATUS )
          ELSE
-            STATUS = SAI__ERROR 
-            CALL ERR_REP( ' ', 'Image does not contain any headers', 
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Image does not contain any headers',
      :                    STATUS )
          END IF
-      ELSE 
+      ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'EXSRC', EXSRC )
          CALL ERR_REP( ' ', 'Unknown exposure time source: ^EXSRC',
@@ -178,8 +178,8 @@
 *   Print out the exposure time, if all has gone well.
       IF ( STATUS .NE. SAI__OK ) THEN
          ETIME = 1.0
-         CALL ERR_REP( ' ', 'Failed to get exposure time', STATUS ) 
-      ELSE 
+         CALL ERR_REP( ' ', 'Failed to get exposure time', STATUS )
+      ELSE
          WRITE( TEXT, '(''Exposure time = '', F7.2 )' ) ETIME
          CALL MSG_OUT( ' ', TEXT, STATUS )
       END IF

@@ -75,7 +75,7 @@
 *     the initial string from the initial cursor position.
 *     If the end of the initial string is not reached by the cursor,
 *     the characters after the final cursor position not included
-*     from the string. 
+*     from the string.
 *
 *---------------------------------------------------------------------
 *

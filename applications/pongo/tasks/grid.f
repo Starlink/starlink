@@ -62,7 +62,7 @@
 *        in more detail in the section on projections.  Allowed values:
 *        "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF", "MERCATOR" and
 *        "STG".
-*        
+*
 *        This parameter is not specified on the command line. The value
 *        of the global parameter PONGO_PROJECTN is used. If
 *        PONGO_PROJECTN is not defined, the default value "NONE" is
@@ -71,7 +71,7 @@
 *        The centre of the projection in RA (i.e. the angle must be
 *        specified as hh:mm:ss.sss). This parameter is only required for
 *        PROJECTION values other than "NONE".
-*        
+*
 *         This parameter is not specified on the command line. The
 *         value of the global parameter PONGO_RACENTRE is used. If
 *         PONGO_RACENTRE is not defined, the default value "0" is used.
@@ -79,7 +79,7 @@
 *        The centre of the projection in declination (i.e. the angle
 *        must be specified as dd:mm:ss.sss). This parameter is only
 *        required for PROJECTION values other than "NONE".
-*        
+*
 *        This parameter is not specified on the command line. The value
 *        of the global parameter PONGO_DECCENTRE is used. If
 *        PONGO_DECCENTRE is not defined, the default value "0" is used.
@@ -117,7 +117,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,7 +129,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL PON_DEVOP 
+      EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT is opened
 
 *  Local Variables:
@@ -181,22 +181,22 @@
       CALL PAR_GET0D( 'THESTEP', THESTEP, STATUS )
 
 *  Get the projection type and centre.
-      CALL PON_GETPROJ( 'PROJECTION', 'RACENTRE', 'DECCENTRE', 
+      CALL PON_GETPROJ( 'PROJECTION', 'RACENTRE', 'DECCENTRE',
      :                   PROJECTION, RA0, DEC0, STATUS )
-      IF ( PROJECTION .EQ. 1 ) THEN 
+      IF ( PROJECTION .EQ. 1 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'GRID_NONONE', 
+         CALL ERR_REP( 'GRID_NONONE',
      :'This command can only draw grids for projections, use the '//
      :'boxframe command for ordinary plots', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
+
 *  Find the current world coordinates in PGPLOT.
       CALL PGQWIN( XMINP, XMAXP, YMINP, YMAXP )
 
 *  Calculate the maximum step size in world coordinates that should be
 *  allowed so that the plot remains smooth.
-      FACT = 5 
+      FACT = 5
       INCR = 2.001
       DECR = 0.501D0
       ICOUNT = 0
@@ -217,30 +217,30 @@
 *  Calculate the longitude step.
         STEP=(THEMAX-THEMIN)/100
         THETA=THEMIN
-        CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0, PHI*DDEG2R, 
+        CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0, PHI*DDEG2R,
      :                      THETA*DDEG2R, LLAST, MLAST, LSTAT )
         ONCEMR = .FALSE.
         DO WHILE( THETA-THEMAX.LT.1D-6 .OR. ONCEMR )
            LSTAT = SAI__OK
 
 *  Calculate the projected coordinates.
-           CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0, PHI*DDEG2R, 
+           CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0, PHI*DDEG2R,
      :                         THETA*DDEG2R, L, M, LSTAT )
 
 *  If the coordinates are legal then.
            IF ( LSTAT.EQ.SAI__OK ) THEN
 
 *  Determine the step taken in projective coordinates.
-              LOS=MAX(ABS(L-LLAST),1D-15)     
+              LOS=MAX(ABS(L-LLAST),1D-15)
               MOS=MAX(ABS(M-MLAST),1D-15)
               LMDIST=SQRT(MOS*MOS+LOS*LOS)
 
-              IF(.NOT.DRAW 
-     :          .OR.  (SIGN(1D0,L)*SIGN(1D0,LLAST).LT.0 
+              IF(.NOT.DRAW
+     :          .OR.  (SIGN(1D0,L)*SIGN(1D0,LLAST).LT.0
      :                           .AND. LOS.GT.STEPMAX/2)
-     :          .OR.(SIGN(1D0,M)*SIGN(1D0,MLAST).LT.0 
+     :          .OR.(SIGN(1D0,M)*SIGN(1D0,MLAST).LT.0
      :                           .AND. MOS.GT.STEPMAX/2)
-     :          ) THEN 
+     :          ) THEN
 
 *   'Wrap around' projection case.
                  CALL PGMOVE(REAL(L), REAL(M))
@@ -275,7 +275,7 @@
 
 *   Just draw to this point.
                        CALL PGDRAW(REAL(L), REAL(M))
-                       LLAST=L             
+                       LLAST=L
                        MLAST=M
                     ENDIF
                  ENDIF
@@ -284,10 +284,10 @@
               DRAW=.FALSE.
            ENDIF
            THETA=THETA+STEP
-           IF ( THETA-THEMAX.GT.1D-6 .AND. .NOT. ONCEMR ) THEN 
+           IF ( THETA-THEMAX.GT.1D-6 .AND. .NOT. ONCEMR ) THEN
               THETA = THEMAX
               ONCEMR = .TRUE.
-           ELSE 
+           ELSE
               ONCEMR = .FALSE.
            END IF
         ENDDO
@@ -304,26 +304,26 @@
         ICOUNT=0
         STEP=(PHIMAX-PHIMIN)/100
         PHI=PHIMIN
-        CALL PROJ_CONVPTLM(PROJECTION-1, RA0, 
+        CALL PROJ_CONVPTLM(PROJECTION-1, RA0,
      :             DEC0, PHI*DDEG2R, THETA*DDEG2R,
      :             LLAST, MLAST, LSTAT )
         ONCEMR = .FALSE.
         DO WHILE(PHI-PHIMAX.LT.1D-6 .OR. ONCEMR)
            LSTAT = SAI__OK
-           CALL PROJ_CONVPTLM(PROJECTION-1, RA0, 
+           CALL PROJ_CONVPTLM(PROJECTION-1, RA0,
      :             DEC0, PHI*DDEG2R, THETA*DDEG2R, L, M, LSTAT )
 
            IF ( LSTAT .EQ.SAI__OK ) THEN
-              LOS=MAX(ABS(L-LLAST),1D-15)     
+              LOS=MAX(ABS(L-LLAST),1D-15)
               MOS=MAX(ABS(M-MLAST),1D-15)
               LMDIST=SQRT(MOS*MOS+LOS*LOS)
 
-              IF(.NOT.DRAW 
-     :          .OR.  (SIGN(1D0,L)*SIGN(1D0,LLAST).LT.0 
+              IF(.NOT.DRAW
+     :          .OR.  (SIGN(1D0,L)*SIGN(1D0,LLAST).LT.0
      :                           .AND. LOS.GT.STEPMAX/2)
-     :          .OR.(SIGN(1D0,M)*SIGN(1D0,MLAST).LT.0 
+     :          .OR.(SIGN(1D0,M)*SIGN(1D0,MLAST).LT.0
      :                           .AND. MOS.GT.STEPMAX/2)
-     :          ) THEN 
+     :          ) THEN
 
 *   'Wrap around' projection case.
                  CALL PGMOVE(REAL(L), REAL(M))
@@ -355,7 +355,7 @@
 
 *   Decrease step size.
                           PHI=PHI-STEP
-                          STEP=STEP*DECR 
+                          STEP=STEP*DECR
                           ICOUNT=ICOUNT+1
                        ELSEIF(LMDIST.LT.STPAMIN) THEN
 
@@ -377,10 +377,10 @@
               DRAW=.FALSE.
            ENDIF
            PHI=PHI+STEP
-           IF ( PHI-PHIMAX.GT.1D-6 .AND. .NOT. ONCEMR ) THEN 
+           IF ( PHI-PHIMAX.GT.1D-6 .AND. .NOT. ONCEMR ) THEN
               PHI = PHIMAX
               ONCEMR = .TRUE.
-           ELSE 
+           ELSE
               ONCEMR = .FALSE.
            END IF
         ENDDO

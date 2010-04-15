@@ -20,26 +20,26 @@
 *        The global status.
 
 *  Description:
-*     This application finds the distance between two points whose Frame  
+*     This application finds the distance between two points whose Frame
 *     coordinates are given. The distance calculated is that along
 *     the geodesic curve that joins the two points. The distance is
 *     displayed on the screen ("<bad>" is displayed if the distance
 *     cannot be calculated).
 *
 *     For example, in a basic Frame, the distance calculated will be
-*     the Cartesian distance along the straight line joining the two 
-*     points. For a more specialised Frame describing a sky coordinate 
-*     system, however, it would be the distance along the great circle 
-*     passing through two sky positions. 
+*     the Cartesian distance along the straight line joining the two
+*     points. For a more specialised Frame describing a sky coordinate
+*     system, however, it would be the distance along the great circle
+*     passing through two sky positions.
 
 *  Usage:
-*     astdistance this point1 point2 
+*     astdistance this point1 point2
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF, FITS file or text file holding the Frame. If an NDF is 
-*        supplied, the current Frame of the WCS FrameSet will be used. If a 
-*        FITS file is supplied, the Frame corresponding to the primary axis 
+*        An NDF, FITS file or text file holding the Frame. If an NDF is
+*        supplied, the current Frame of the WCS FrameSet will be used. If a
+*        FITS file is supplied, the Frame corresponding to the primary axis
 *        descriptions will be used.
 *     POINT1() = _DOUBLE (Read)
 *        An array with one element for each Frame axis (Naxes attribute)
@@ -102,7 +102,7 @@
       DOUBLE PRECISION POINT2( NDF__MXDIM )
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -116,8 +116,8 @@
       NC = AST_GETI( THIS, 'Naxes', STATUS )
 
 *  Get the two points.
-      CALL PAR_EXACD( 'POINT1', NC, POINT1, STATUS ) 
-      CALL PAR_EXACD( 'POINT2', NC, POINT2, STATUS ) 
+      CALL PAR_EXACD( 'POINT1', NC, POINT1, STATUS )
+      CALL PAR_EXACD( 'POINT2', NC, POINT2, STATUS )
 
 *  Get the distance.
       DIST = AST_DISTANCE( THIS, POINT1, POINT2, STATUS )

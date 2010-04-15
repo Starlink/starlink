@@ -1,6 +1,6 @@
 proc red4Package {taskname args} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -15,7 +15,7 @@ proc red4Package {taskname args} {
     set Red4Widgets(PK_LABEL) [label $frame.lb -text "Filename"]
     set Red4Widgets(PK_ENTRY) [entry $frame.en -width 40]
     pack $Red4Widgets(PK_LABEL) $Red4Widgets(PK_ENTRY) -in $frame -side left
-    $Red4Widgets(PK_ENTRY) insert end $Red4Widgets(RO) 
+    $Red4Widgets(PK_ENTRY) insert end $Red4Widgets(RO)
 
 # Bind the defaults button
    bind $Red4Widgets(PK_LABEL) <Button-2> "red4Update red4Package PK_ENTRY"

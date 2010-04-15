@@ -11,13 +11,13 @@
 
 *  Invocation:
 *     CALL SCULIB_LINEAR_WTINIT(WTFN, RES, STATUS)
- 
+
 *  Description:
-*     This is a FORTRAN version of the C transputer code. 
+*     This is a FORTRAN version of the C transputer code.
 *     Here is the C description:
-*     Initialise the array containing the weighting function for 
+*     Initialise the array containing the weighting function for
 *     linear interpolation.
-*     The weighting function is a cone, going from 1.0 at the centre to 
+*     The weighting function is a cone, going from 1.0 at the centre to
 *     0.0 at the edge. The look-up table represents a radial slice through the
 *     cone, tabulated to enable a look-up in terms of the square of the
 *     radius.
@@ -30,7 +30,7 @@
 *     RES = INTEGER (Given)
 *        Number of points per scale lenghth.
 *     STATUS = INTEGER (Given & Returned)
-*        Global status        
+*        Global status
 
 *  Authors:
 *     Tim Jenness (t.jenness@jach.hawaii.edu) - FORTRAN
@@ -52,34 +52,34 @@
 *
 
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  External constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       INTEGER STATUS
       INTEGER RES                        ! Resolution of lookup
- 
+
 *  Arguments Given & Returned:
       REAL WTFN(RES * RES)
- 
+
 *  Local variables:
       INTEGER I                          ! Counter
- 
+
 *  Local Data:
 
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
- 
+
       DO I = 1, RES * RES
- 
+
          WTFN(I) = 1.0 - SQRT(REAL(I-1)) / REAL(RES)
- 
+
       END DO
- 
+
       END
 

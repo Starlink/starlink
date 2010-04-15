@@ -9,7 +9,7 @@ C
 C     Function:
 C        Read AAO CCD Time Series data
 C
-C     Description:   
+C     Description:
 C        Read an AAO CCD time series data set from the raw figaro file
 C        and build a 3D TSP dataset.
 C
@@ -33,7 +33,7 @@ C
 C-
 C
 C  History:
-C    26/10/1989   Original Version.   JAB/JAC 
+C    26/10/1989   Original Version.   JAB/JAC
 C
 
 
@@ -57,7 +57,7 @@ C
       INTEGER DIMS(3)
       DOUBLE PRECISION MJD,PERIOD,D
       CHARACTER*64 COM,UTDATE,UTSTART
-  
+
 
 *  Get the Figaro file
       CALL PAR_GET0C('FIGARO',FNAME,STATUS)
@@ -69,7 +69,7 @@ C
 
 *  Get number of cycles
       IF (NDIM .EQ. 2) THEN
-         CALL DSA_GET_FITS_I('INPUT','CCD_NSW',0,NFRAMES,COM,STATUS)      
+         CALL DSA_GET_FITS_I('INPUT','CCD_NSW',0,NFRAMES,COM,STATUS)
       ELSE
          NFRAMES=DIMS(3)
       ENDIF
@@ -129,7 +129,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
       SUBROUTINE TSP_RCCDTS_COPY(N,NFRAMES,IN,OUT,MJD,PERIOD,TIME)
 *+
 *

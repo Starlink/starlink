@@ -15,7 +15,7 @@
 *  Description:
 *     This routine display the Plot Title at the top of the area covered
 *     by the Plot, but does not draw anything else (e.g. axes, tick
-*     marks, borders, labels, etc). It does not need the inverse 
+*     marks, borders, labels, etc). It does not need the inverse
 *     transformation from current to base Frame to be defined in the Plot.
 
 *  Arguments:
@@ -106,10 +106,10 @@
          TTL = AST_GETC( IPLOTT, 'Title', STATUS )
 
 *  The Mapping from GRAPHICS coords to the original current Frame may not
-*  be defined in both direction, so we set the current Frame to be the 
-*  GRAPHICS Frame. 
-         CALL AST_SETI( IPLOTT, 'Current', AST_GETI( IPLOTT, 'Base', 
-     :                                               STATUS ), 
+*  be defined in both direction, so we set the current Frame to be the
+*  GRAPHICS Frame.
+         CALL AST_SETI( IPLOTT, 'Current', AST_GETI( IPLOTT, 'Base',
+     :                                               STATUS ),
      :                  STATUS )
 
 *  Draw a border using invisble ink. This sets up the bounding box.
@@ -131,10 +131,10 @@
             CALL CHR_APPND( ATTR( I ), SATTR, IAT )
             CALL CHR_APPND( '(Strings)', SATTR, IAT )
 
-            CALL AST_SETR( IPLOTT, SATTR, AST_GETR( IPLOTT, TATTR, 
+            CALL AST_SETR( IPLOTT, SATTR, AST_GETR( IPLOTT, TATTR,
      :                                              STATUS ),
      :                     STATUS )
-         END DO   
+         END DO
 
 *  Determine if the Plot has a reversed Y axis (i.e.smallest Y value at
 *  the top). Then choose the Y value for the bottom edge of the Title.

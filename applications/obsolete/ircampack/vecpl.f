@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -188,7 +188,7 @@
                X = REAL( I ) - 0.5
 
 *  Skip over bad data values.
-               IF( VECMAG( I, J ) .NE. VAL__BADR .AND. 
+               IF( VECMAG( I, J ) .NE. VAL__BADR .AND.
      :             VECORN( I, J ) .NE. VAL__BADR ) THEN
 
 *  Calculate the length of the vector in units of pixels.
@@ -197,7 +197,7 @@
 *  Calculate the vector orientation, in radians.
                   VECANG = ANGFAC*VECORN( I, J ) + ANGROT
 
-*  Plot the vector.      
+*  Plot the vector.
                   CALL VECT( X, Y, JUST, VECLEN, VECANG, AHSIZE,
      :                       STATUS )
 
@@ -206,7 +206,7 @@
 
 *  Increment the count of plotted vectors.
                   NPLOT = NPLOT + 1
-      
+
                END IF
 
             END DO
@@ -224,7 +224,7 @@
          ELSE
             CALL MSG_SETI( 'NP', NPLOT )
             CALL MSG_OUT('VECPL_NPLT', '  ^NP vectors plotted', STATUS )
-         END IF      
+         END IF
 
          CALL MSG_BLANK( STATUS )
 

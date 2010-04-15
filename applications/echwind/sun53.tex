@@ -47,7 +47,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -115,7 +115,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -200,12 +200,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -292,13 +292,13 @@ items:
 \end{verbatim}
 
 The above example shows echwind set up for UES with the 31 echelle and the
-TEK chip, with Balmer lines plotted on the echellogram. If you press 
+TEK chip, with Balmer lines plotted on the echellogram. If you press
 \verb+<CR>+ after the lines prompt, no lines will be plotted.
 
-For the 'Graphic device/type' answer {\tt /xwin} or whatever is appropriate 
-for your terminal. Normally you should choose a terminal device type. Device 
+For the 'Graphic device/type' answer {\tt /xwin} or whatever is appropriate
+for your terminal. Normally you should choose a terminal device type. Device
 types which are output only, such as {\tt /ps}, will result in a plot file being
-created for the parameters which you have chosen, 
+created for the parameters which you have chosen,
 then the program will exit immediately.
 
 Full details of all parameters are given in section~\ref{Detailed Description}.
@@ -310,19 +310,19 @@ marking detector boxes, positioning to specified wavelengths and so on. To
 obtain the menu, press the middle or righthand mouse button.
 Now move the cursor to the item of your choice and then press
 any mouse button. The menu will disappear and whatever is necessary will
-happen --- this may involve having to respond to a prompt in the original 
+happen --- this may involve having to respond to a prompt in the original
 window.
 
 To exit from the program, select the EXIT menu option.
 
-Full details of all menu options are given in 
+Full details of all menu options are given in
 section~\ref{Detailed Description}.
 
 \section{Detailed Description}
 \label{Detailed Description}
 
 This section contains a detailed description of all of the facilities offered
-by ECHWIND. 
+by ECHWIND.
 
 \subsection{Selecting the Echelle Grating and Instrument: CONFIG, New ECHELLE}
 
@@ -361,7 +361,7 @@ The prompt for the detector name includes the list of supported detectors
 system-wide list in the {\tt \$ECHWIND\_HOME} directory.
 The default file for the system-wide detector list is {\tt detectors.dat}.
 In addition you can specify your own private list on
-startup by answering the DETLIST prompt. 
+startup by answering the DETLIST prompt.
 
 The list is read from a text file with a default file extension of {\tt .dat}.
 The file format is very simple: each line
@@ -389,7 +389,7 @@ sizes in mm, separated by a comma.
 It is common observing practice  to align the detector with the orders.
 This has the dual advantages that it makes it easy to extract orders
 without having to track them, and that you may get an extra complete order
-to fit onto the detector. 
+to fit onto the detector.
 
 You can select a new camera rotation angle from within the program by selecting
 the ``New ANGLE'' menu option. This prompts you for a new rotation
@@ -410,7 +410,7 @@ ANGLE'' menu option.}
 
 By default the detector will initially be placed at the origin of the
 dispersion and cross dispersion axes (about 4020\AA\, for the UES 31
-echelle, about 4120\AA\, for the UCLES 31 echelle). 
+echelle, about 4120\AA\, for the UCLES 31 echelle).
 
 You can select a new central wavelength from within the program by selecting
 the ``New WAVELENGTH'' menu option. This prompts you for a new central
@@ -437,18 +437,18 @@ single quotes (like a Fortran CHARACTER constant), as in
       4101.73 'D'
 \end{verbatim}
 
-You can select a new line list from within the program by selecting the ``Mark 
+You can select a new line list from within the program by selecting the ``Mark
 LINES'' menu option, which prompts you for a new line list. These lines will
 be plotted, and any existing lines from previous operations will remain
 plotted. The only way to delete plotted lines is to restart echwind.
 
-The line list file will be looked for in the local directory or in the explicit 
+The line list file will be looked for in the local directory or in the explicit
 directory given. Alternatively, you may prefix the file name with
-\verb+${ECHWIND_HOME}+. The release provides two lines list files in the 
-\verb+${ECHWIND_HOME}+ directory. They are {\tt balmer.dat} and 
-{\tt lines.dat} which are specified by 
+\verb+${ECHWIND_HOME}+. The release provides two lines list files in the
+\verb+${ECHWIND_HOME}+ directory. They are {\tt balmer.dat} and
+{\tt lines.dat} which are specified by
 \verb+${ECHWIND_HOME}balmer.dat+
-and \verb+${ECHWIND_HOME}lines.dat+ respectively. 
+and \verb+${ECHWIND_HOME}lines.dat+ respectively.
 
 The contents of \verb+${ECHWIND_HOME}balmer.dat+ are as follows:
 
@@ -503,7 +503,7 @@ ECHWIND supports the saving of spectrograph configurations in files for
 later reference. To save the current spectrograph configuration (or
 detector position, however you like to think of it), select the ``SAVE''
 menu option. This will mark the current position of the detector in green
-(like ``Mark BOX'') and will issue an appropriate prompt for the file name. 
+(like ``Mark BOX'') and will issue an appropriate prompt for the file name.
 Text files (which are ASCII files with a default file extension of
 .TXT) are created only for the first SAVE operation and are appended to for
 subsequent operations.
@@ -511,12 +511,12 @@ subsequent operations.
 The text file is of the form
 \begin{verbatim}
  ECHWIND V3.0
-  
-   Instrument: UES                 
-   Echelle: 31                  
-   Camera: LONG                
+
+   Instrument: UES
+   Echelle: 31
+   Camera: LONG
    No. of prisms:            3
-   Detector length:    40.67613    
+   Detector length:    40.67613
    Maximum wavelength:    4545.881      in order no:          126
    Minimum wavelength:    3634.631      in order no:          156
    Central Wavelength:    4013.619      in order no:          142

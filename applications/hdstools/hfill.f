@@ -23,7 +23,7 @@
 
 * Description :
 *    This application allows primitive data object of any shape and size to
-*    be filled with a single specified value. 
+*    be filled with a single specified value.
 *
 *    Every effort is made to convert the value to the required type,
 *    using HDS rules. Error DAT__CONER is reported if this is not possible.
@@ -48,7 +48,7 @@
 *       (assuming the slice specification is valid for OBJECT).
 *
 *    % hfill cfile.real '"a"'
-*       Fails as the value 'a' cannot be converted to _REAL. 
+*       Fails as the value 'a' cannot be converted to _REAL.
 *
 *    % hfill cfile.chars '" "'
 *       Writes a blank string into every element of component CHARS
@@ -174,7 +174,7 @@
                      CALL DAT_GET0I(VALOC,INTVAL,STATUS)
                      CALL DAT_MAPV(
      &                 OBJLOC,'_INTEGER', 'WRITE',OPTR,NVAL,STATUS)
-                     CALL ARR_INIT1I( INTVAL, NVAL, 
+                     CALL ARR_INIT1I( INTVAL, NVAL,
      :                                %VAL(CNF_PVAL(OPTR)), STATUS )
                   ENDIF
 
@@ -183,7 +183,7 @@
                   CALL DAT_GET0L(VALOC,LOGVAL,STATUS)
                   CALL DAT_MAPV(
      &              OBJLOC,'_LOGICAL','WRITE',OPTR,NVAL,STATUS)
-                  CALL ARR_INIT1L( LOGVAL, NVAL, %VAL(CNF_PVAL(OPTR)), 
+                  CALL ARR_INIT1L( LOGVAL, NVAL, %VAL(CNF_PVAL(OPTR)),
      :                             STATUS )
                ENDIF
 

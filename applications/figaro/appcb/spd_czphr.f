@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -321,7 +321,7 @@
 *           Copy back the contents from the copy into the reshaped NDF.
                IF ( TYPE .EQ. '_DOUBLE' ) THEN
                   CALL VEC_DTOD( .TRUE., RNELM,
-     :                           %VAL( CNF_PVAL( TPNTR(1) ) ), 
+     :                           %VAL( CNF_PVAL( TPNTR(1) ) ),
      :                           %VAL( CNF_PVAL( RPNTR(1) ) ), I, J,
      :                           STATUS )
                   CALL VEC_DTOD( .TRUE., RNELM,

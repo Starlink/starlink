@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ RUTHERFORD APPLETON LABORATORY\\
 \vspace{5mm}
 \begin{center}
 {\Large\bf \stardoctitle}
-\end{center}                            
+\end{center}
 \vspace{5mm}
 
 \setlength{\parskip}{0mm}
@@ -60,12 +60,12 @@ ULTRIX.  It is intended as a supplement to the existing Starlink user notes
 describing these packages and information found in those documents (which may
 include information about using the package on Unix) is not duplicated here.
 
-The software available at the time this document was issued is listed 
-in Tables~\ref{applications}, \ref{libraries} and \ref{utilities}. 
+The software available at the time this document was issued is listed
+in Tables~\ref{applications}, \ref{libraries} and \ref{utilities}.
 The timescale for issuing
 revisions of Starlink documents is such that there is likely to be more software
 available than is listed here; if so, a brief description can be found in the
-file 
+file
 
 \begin{quote}
 {\tt /star\-/man\-/sun118\_addendum}
@@ -91,7 +91,7 @@ TPOINT\dag  & Telescope pointing analysis   & SUN/100 \\
 \end{tabular}\]
 \end{table}
 
-\begin{table}[htb]\caption{Starlink libraries available on 
+\begin{table}[htb]\caption{Starlink libraries available on
 Unix}\label{libraries}
 \[\begin{tabular}{|l|l|l|}
 \hline
@@ -111,7 +111,7 @@ GRP       & Routines for managing groups of objects & SUN/150  \\
 GWM       & X Graphics Window Manager              & SUN/130 \\
 HDS       & Hierarchical Data System               & SUN/92  \\
 
-HELP      & Starlink portable HELP library         & SUN/124 \\             
+HELP      & Starlink portable HELP library         & SUN/124 \\
 IDI       & Image Display Interface                & SUN/65  \\
 NAG\dag   & Mathematical subroutine libraries      & SUN/28  \\
 NCAR      & NCAR Graphics Utilities                 & SUN/88  \\
@@ -134,7 +134,7 @@ Unix}\label{utilities}
 \hline
 Mnemonic &Name &User Note\\
 \hline
-A2PS        & Formats ascii files for printing on PostScript printers & \\                      
+A2PS        & Formats ascii files for printing on PostScript printers & \\
 ASTROM      & Basic Astrometry              & SUN/5  \\
 ASURV       & Astronomical survival statistics & SUN/13  \\
 COCO        & Celestial coordinate conversion & SUN/56 \\
@@ -154,7 +154,7 @@ XDISPLAY    & Easy use of remote X-Windows  & SUN/129 \\
 At present, the Unix Starlink Software requires that you use either
 the C-shell or a compatible shell.
 
-Before using any item of Starlink software on Unix it is necessary 
+Before using any item of Starlink software on Unix it is necessary
 to issue the command:
 
 \begin{quote}
@@ -163,8 +163,8 @@ to issue the command:
 
 \end{quote}
 
-This is analogous to the VMS \verb~@SSC:LOGIN~ 
-and should be added to your {\tt .login} file, {\it after} any of your 
+This is analogous to the VMS \verb~@SSC:LOGIN~
+and should be added to your {\tt .login} file, {\it after} any of your
 own entries in {\tt .login} that set environment variables.
 
 {\tt /star/etc/login} calls another file {\tt /star/etc/cshrc}. This file sets
@@ -176,14 +176,14 @@ up the aliases required to run certain applications and utilities. The command
 
 \end{quote}
 
-should be added to you {\tt .cshrc} file so that the aliases required to 
+should be added to you {\tt .cshrc} file so that the aliases required to
 run Starlink software are set up as each C--shell is created; environment
 variables set in the login shell by {\tt /star/etc/login} are propagated
 to child processes but the aliases set by {\tt /star/etc/cshrc} are not
-and hence it is necessary to run {\tt /star/etc/cshrc} for every 
+and hence it is necessary to run {\tt /star/etc/cshrc} for every
 process from which Starlink software is to be accessed.
 
-The effect of {\tt source /star/etc/login} 
+The effect of {\tt source /star/etc/login}
 on both the SUN and DECstation are given below.
 
 On a SUN:
@@ -234,20 +234,20 @@ to make access to these sub-directories automatic.
 
 Starlink manual pages can be accessed via the command {\tt sman} which
 functions in the same way as the Unix command {\tt man}. {\tt man} itself
-cannot be used directly to access Starlink manual pages in a portable 
-manner. 
+cannot be used directly to access Starlink manual pages in a portable
+manner.
 
 \section{Applications packages}
 
 Most applications packages have an initialisation script that must `sourced' to
 define aliases for individual applications. {\tt /star\-/etc\-/login} defines
 the package name (or a variant of it in cases where the package name is
-also the name of an application) as an alias that `sources' the script so 
+also the name of an application) as an alias that `sources' the script so
 that for example the command:
 \begin{quote}\tt
 daostart
 \end{quote}
-defines the commands {\tt daophot, allstar, daogrey, daoplot} and 
+defines the commands {\tt daophot, allstar, daogrey, daoplot} and
 {\tt daocurs} to run the corresponding
 DAOPHOT applications.
 
@@ -260,7 +260,7 @@ referenced in the table.
 
 \subsubsection{CCDPACK}
 
-The CCD data-reduction package CCDPACK is made available 
+The CCD data-reduction package CCDPACK is made available
 by typing:
 \begin{verbatim}
      ccdpack
@@ -301,7 +301,7 @@ The current release of DAOPHOT also includes the support programs {\tt daogrey,
 daoplot} and {\tt daocurs} in addition to {\tt daophot} and {\tt allstar},
 the programs which comprised the initial release.
 
-The package initialization command is 
+The package initialization command is
 \begin{quote}\tt
 daostart
 \end{quote}
@@ -311,10 +311,10 @@ daostart
 The Kernel Application Package (KAPPA) provides general--purpose applications.
 It is the backbone of the software reorganization around the ADAM environment
 and it applications integrate with other packages such as PHOTOM, PISA and
-CCDPACK. 
+CCDPACK.
 Further details can be found in SUN/95.
 
-The package initialization command is 
+The package initialization command is
 
 \begin{quote}\tt
 kappa
@@ -324,7 +324,7 @@ kappa
 \subsubsection{PHOTOM}
 
 PHOTOM, a Stellar Photometry Package is now available on Unix systems.
-The PHOTOM applications {\tt photom, photopt, photgrey} are made available 
+The PHOTOM applications {\tt photom, photopt, photgrey} are made available
 by typing:
 \begin{quote}\tt
 photomstart
@@ -336,9 +336,9 @@ See SUN/45 for details.
 The acronym PISA stands for Position, Intensity and Shape Analysis, and is
 the group name for a package of routines that deal with the location and
 parameterisation of objects on an image frame.
-PISA is fully documented in SUN/109. 
+PISA is fully documented in SUN/109.
 
-The PISA applications are made available 
+The PISA applications are made available
 by typing:
 \begin{quote}\tt
 pisa
@@ -351,7 +351,7 @@ The significant differences from the VMS version are:
 \begin{verbatim}
        pisagrey in drange device xpixs ypixs
 \end{verbatim}
-       {\tt drange} are the upper and lower data values and {\tt xpixs} and 
+       {\tt drange} are the upper and lower data values and {\tt xpixs} and
        {\tt ypixs}
        the range (in pixels) of the sub-set of the data which is to be
        displayed. This routine will be withdrawn when a generic
@@ -369,18 +369,18 @@ The significant differences from the VMS version are:
 \end{itemize}
 
 
-A demonstration of the package can be seen using the command 
-{\tt pisa\_demo} after typing {\tt pisa}). 
-This demonstration requires an image display device.  
+A demonstration of the package can be seen using the command
+{\tt pisa\_demo} after typing {\tt pisa}).
+This demonstration requires an image display device.
 (Use an empty directory and delete the files created afterwards.)
 
 \subsubsection{SPECDRE}
 
 SPECDRE is a package for spectroscopy data reduction and analysis.
 It fills the gap between Figaro and Kappa. Further details can be
-found in SUN/140. 
+found in SUN/140.
 
-The package initialization command is 
+The package initialization command is
 
 \begin{quote}\tt
 specdre
@@ -442,7 +442,7 @@ to compile and link a program with SGS you might use the command below:
 \begin{quote}\tt
 f77 sgsprog.f -o sgsprog -L/star/lib `sgs\_link`
 \end{quote}
-Note that the quotes surrounding {\tt sgs\_link} are grave accents (ASCII code 
+Note that the quotes surrounding {\tt sgs\_link} are grave accents (ASCII code
 60 hex).\footnote{The construct {\tt `sgs\_link`} results in the command {\tt
 sgs\_link} being executed and the output from the command replacing {\tt
 `sgs\_link`} on the command line. In this case {\tt sgs\_link} is a shell script
@@ -533,9 +533,9 @@ identifier as units 5 and 6 are pre-connected to the terminal by the Fortran
 I/O system.
 
 The X windows drivers ignores the connection identifier and always uses the
-environment variable {\tt DISPLAY} to connect to the X server. 
+environment variable {\tt DISPLAY} to connect to the X server.
 
-\paragraph{Error Handler} 
+\paragraph{Error Handler}
 
 The error handling routine ({\tt GERHND}) used by default reports errors via
 the Starlink error reporting system. All errors are have the same error value
@@ -549,8 +549,8 @@ An error handling routine that uses the standard error logging routine and
 therefore writes error messages to the GKS error channel can be used instead by
 including {\tt /star/lib/gerhnd.std.o} when building a program.
 
-\paragraph{Escapes} 
-There are two escape function supported, one for enabling a single 
+\paragraph{Escapes}
+There are two escape function supported, one for enabling a single
 user action to trigger
 both a locator and a choice input request and one for opening a workstation
 without clearing the display surface. They are described in {\tt
@@ -568,7 +568,7 @@ workstations, run the program {\tt /star\-/bin\-/examples\-/gnsrun}.
 X windows is the only supported IDI device; description files for the X servers
 listed in Table~\ref{servers} are stored in {\tt/star\-/etc}. The default
 behaviour of IDI programs is to assume that the X~server is of the same type as
-the machine on which the library was compiled ({\it i.e.\/} {\tt xsparc} on 
+the machine on which the library was compiled ({\it i.e.\/} {\tt xsparc} on
 a Sun and {\tt xdecst}
 on a DECstation). If this is not appropriate, a different X~server type can be
 selected by setting the environment variable {\tt IDI\_XDT} to the name of the
@@ -592,8 +592,8 @@ VAXstation       &xvaxes \\
 
 \subsubsection{NAG}
 
-At present the following NAG products are available on the Starlink Unix 
-systems. 
+At present the following NAG products are available on the Starlink Unix
+systems.
 
 
 \begin{table}[htb]\caption{NAG packages available on Unix}\label{NAG libraries}
@@ -615,7 +615,7 @@ you might type:
 {\tt f77 nagprog.f -o nagprog -L/star/lib -lnag }
 \end{quote}
 
-To link with NAG Single Precision library (available on SUN only), 
+To link with NAG Single Precision library (available on SUN only),
 include {\tt -lnagse}
 on the {\tt f77} command line. For example, to compile and link a NAG program
 you might type:
@@ -647,7 +647,7 @@ as for GKS.
 
 The metafile workstations are supported as output devices. Although a
 metafile can be plotted on any device, PGPLOT makes extensive use of GKS
-enquiry functions to tailor its behaviour. Because of this, the metafile 
+enquiry functions to tailor its behaviour. Because of this, the metafile
 must be
 ``targeted'' at a particular device in order that, for example, the individual
 strokes of thick lines are correctly spaced. The target device for a metafile
@@ -660,11 +660,11 @@ cgm\_output/target=tek\_4010
 \end{quote}
 The default target device is a 300~dpi black and white printer with A4 paper in
 landscape orientation.
- 
+
 The example programs normally reside in {\tt /star/bin/examples/pgplot}.
-However they may be 
-removed to save disk space. The source code is in {\tt 
-/star/starlink/lib/pgplot/examples} and the following commands will build an 
+However they may be
+removed to save disk space. The source code is in {\tt
+/star/starlink/lib/pgplot/examples} and the following commands will build an
 example program:
 
 \begin{quote}\tt
@@ -680,11 +680,11 @@ pgp\_link\_adam}.
 
 \subsubsection{SGS}
 
-The default choice device has been changed from device 1 to device zero (the 
+The default choice device has been changed from device 1 to device zero (the
 terminal keyboard) and the choice device string is initialized to all the
-letters of the alphabet in alphabetical order (so that A returns 1, B returns 
+letters of the alphabet in alphabetical order (so that A returns 1, B returns
 2 {\it etc.})
-                                                          
+
 The behaviour of the input routine {\tt SGS\_REQCU} has been changed slightly:
 \begin{itemize}
 \item A choice number is only returned if the current choice device is set to 0
@@ -717,14 +717,14 @@ For up-to-date information read the man page, that is, type:
 
 HELP was changed a few months after initial release. The routine
 HLP\_OUTHLP has been withdrawn and replaced by HLP\_HELP which has
-one extra argument. The change was needed to assist multi--platform 
+one extra argument. The change was needed to assist multi--platform
 applications and to avoid problems with shared libraries.
 
 \subsection{Starlink NEWS system}
 
 The command {\tt news -n} results in a listing of new news items.
-This latter command  should be included in system-wide login 
-files, thus all users should be given notice of new 
+This latter command  should be included in system-wide login
+files, thus all users should be given notice of new
 NEWS on login.
 Type {\tt news} to see the headings for all the available news items
 or {\tt news} {\sl item} for information on a particular item.
@@ -784,7 +784,7 @@ A man page describing how to use the package is available via the command
 ADAM programs can be compiled and/or linked with the {\tt alink} command. If
 a file has the suffix  {\tt .f}, then {\tt alink} will compile
 and link the program. If the file has the suffix of {\tt .o}, or
-none at all, then {\tt alink} just links the program. For example, 
+none at all, then {\tt alink} just links the program. For example,
 
 \begin{quote}\tt
 
@@ -792,21 +792,21 @@ alink test1.f
 
 \end{quote}
 
-will compile and link {\tt test1.f}. The resulting executable file is 
-called {\tt test1}. The link procedures for linking with additional 
-subroutine libraries 
-are called {\tt{\em xxx}\_link\_adam}, where {\em xxx\/} is usually 
+will compile and link {\tt test1.f}. The resulting executable file is
+called {\tt test1}. The link procedures for linking with additional
+subroutine libraries
+are called {\tt{\em xxx}\_link\_adam}, where {\em xxx\/} is usually
 the library acronym.
 
-To run the program {\tt test1}, you must have an interface file called 
-{\tt test1.ifl}. 
+To run the program {\tt test1}, you must have an interface file called
+{\tt test1.ifl}.
 Before running your first ADAM program, you must also create a sub-directory
 called {\tt adam} in your top--level directory {\tt i.e.}
 
 \begin{quote}\tt
- 
+
 mkdir \$HOME/adam
- 
+
 \end{quote}
 
 For further details on using the Unix version of ADAM, see SUN/144.

@@ -12,15 +12,15 @@
 
 #  Description:
 #     xlabel will modify a Latex
-#     document by adding \xlabel commands to each section and subsection 
-#     heading. This makes the heading usable as a target for a \xref 
+#     document by adding \xlabel commands to each section and subsection
+#     heading. This makes the heading usable as a target for a \xref
 #     cross-reference from another hypertext document.
 #
 #     The label names generated are produced from the LaTeX section heading
 #     by removing common font changing commands or emphasis such as \tt,
 #     \texttt, \ttfamily, \em and \emph, then folding to lower case, turning
-#     spaces into underscores, and eliminating non-alphanumeric characters. 
-#     If the generated name matches an existing xlabel name for the same 
+#     spaces into underscores, and eliminating non-alphanumeric characters.
+#     If the generated name matches an existing xlabel name for the same
 #     section, it is not repeated.
 #
 #     You may need to edit the resulting file a little for specific cases.
@@ -40,10 +40,10 @@
 
 #  Notes:
 #     Possible problems with the automatically generated \xlabels are:
-#     1. Duplicated names. Note that name clashes with automatically 
+#     1. Duplicated names. Note that name clashes with automatically
 #        generated \xlabels, such as those produced by the SST macros,
 #        will not be reported by xlabel.
-#     2. Null or gibberish names because of LaTeX commands included in 
+#     2. Null or gibberish names because of LaTeX commands included in
 #        the heading, or removal of non-alphanumeric characters.
 #     3. Possible need for xlabels on subsubsection etc. in addition to
 #        those on sections and subsections.

@@ -43,7 +43,7 @@
 *     Of the IRAF Mini World Co-ordinate System (MWCS) multispec
 *     formats, only two are currently supported:
 *       a) linear; and
-*       b) non-linear ftype=5, where the axis values are given 
+*       b) non-linear ftype=5, where the axis values are given
 *          explicitly.
 
 *  Copyright:
@@ -76,7 +76,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

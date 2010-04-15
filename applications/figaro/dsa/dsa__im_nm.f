@@ -12,7 +12,7 @@ C     This routine, given the reference slot number for a structure,
 C     returns the DTA system name of its imaginary array, should it
 C     contain one.  Whether or not the array actually exists is not
 C     the province of this routine, which is just a repository of
-C     naming information.  
+C     naming information.
 C
 C  Language:
 C     FORTRAN
@@ -47,7 +47,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C  History:
 C     1st  May 1990.   Original version.  KS / AAO.

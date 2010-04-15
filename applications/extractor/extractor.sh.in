@@ -1,5 +1,5 @@
 #!/bin/csh
-#+          
+#+
 #  Name:
 #     extractor.sh
 
@@ -13,8 +13,8 @@
 #     source extractor.csh
 
 #  Description:
-#     This procedure defines an alias for each EXTRACTOR command. The 
-#     string install_bin (upper-case) is replaced by the path of the 
+#     This procedure defines an alias for each EXTRACTOR command. The
+#     string install_bin (upper-case) is replaced by the path of the
 #     directory containing the package executable files when the package
 #     is installed.  The string help_dir (upper-case) is likewise replaced
 #     by the path to the directory containing the help files.

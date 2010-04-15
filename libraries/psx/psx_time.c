@@ -32,7 +32,7 @@
 *  References:
 *     -  POSIX standard (1988), section 4.5.1
 *     -  ANSI C standard (1989), section 4.12.2.4
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,8 +118,8 @@ F77_SUBROUTINE(psx_time)( INTEGER(nticks), INTEGER(status) )
       the space since in some cases time_t can be 64bit */
    if ( t > INT_MAX ) {
      *status = PSX__NOTIM;
-     psx1_rep_c( "PSX_TIME_INTEXCEEDED", 
-		 "Time exceeds largest value that can be stored in a Fortran integer", 
+     psx1_rep_c( "PSX_TIME_INTEXCEEDED",
+		 "Time exceeds largest value that can be stored in a Fortran integer",
 		 status );
    }
 

@@ -7,7 +7,7 @@
 #include "rec.h"
 #include "dat1.h"
 
-/* 
+/*
    Small routine to free a LOC structure (aka HDSLoc) previously
    allocated using dat1_alloc_lcp.
 

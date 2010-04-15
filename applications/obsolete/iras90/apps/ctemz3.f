@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,7 +94,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First set up the text of the history record for the output
-*  temperature map. 
+*  temperature map.
       CALL NDF_MSG( 'OUT', INDF3 )
       CALL MSG_LOAD( ' ', ' Colour temperature map ^OUT created from:',
      :               TEXT( 1 ), LENGTH, STATUS )
@@ -141,7 +141,7 @@
      :               TEXT( 1 ), LENGTH, STATUS )
 
 *  Put the text into a history record.
-         CALL IRM_HIST( PARAM, INDF4, 'IRAS90:COLTEMP', 9, TEXT, 
+         CALL IRM_HIST( PARAM, INDF4, 'IRAS90:COLTEMP', 9, TEXT,
      :                  STATUS )
       END IF
 

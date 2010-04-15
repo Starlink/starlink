@@ -21,11 +21,11 @@ C     CALL TSP_CREATE_1D (LOC,SIZE,STOKES,VI,VS,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) LOC		(Fixed string,descr) A locator to the 
+C     (>) LOC		(Fixed string,descr) A locator to the
 C                       top level of the object to
 C                       be created (e.g. supplied by DAT_CREAT)
 C     (>) SIZE		(Integer,ref) The size of the array to be created.
-C     (>) STOKES        (Fixed string,descr) A string specifying which 
+C     (>) STOKES        (Fixed string,descr) A string specifying which
 C                       Stokes parameters are to be included in the
 C                       structure. This must contain some combination
 C                       of the letters 'Q', 'U' and 'V'
@@ -71,7 +71,7 @@ C
 C
       IF (STATUS .EQ. SAI__OK) THEN
 
-*     Create the top level components 
+*     Create the top level components
 
           CALL NDF_BEGIN
           CALL NDF_PLACE(LOC,' ',PLACE,STATUS)

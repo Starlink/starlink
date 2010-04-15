@@ -162,11 +162,11 @@
 *     by removing samples which lie far from the current linear fit.
 *     The threshold for rejection is the value of parameter CLIP times
 *     the RMS residual from the current fit.  After rejecting these
-*     outlying samples, a new linear fit is found. This rejection 
-*     process is repeated until the RMS residual changes by less than 
-*     0.1% between iterations. The required output background surface 
-*     brightness (specified by parameter OUTBACK) is subtracted from 
-*     the final fit. This fit is converted back to the same units as 
+*     outlying samples, a new linear fit is found. This rejection
+*     process is repeated until the RMS residual changes by less than
+*     0.1% between iterations. The required output background surface
+*     brightness (specified by parameter OUTBACK) is subtracted from
+*     the final fit. This fit is converted back to the same units as
 *     the input CRDD to form the background estimate.
 
 *  Authors:
@@ -182,7 +182,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -285,7 +285,7 @@
       CALL IRM_GETQX( 'QEXP', QEXP, STATUS )
 
 *  Get the no. of standard deviations at which to reject data.
-      CALL PAR_GDR0R( 'CLIP', 3.0, 0.0, VAL__MAXR, .TRUE., CLIP, 
+      CALL PAR_GDR0R( 'CLIP', 3.0, 0.0, VAL__MAXR, .TRUE., CLIP,
      :                 STATUS )
 
 *  Get the required background surface brightness after background
@@ -339,7 +339,7 @@
       CALL PSX_MALLOC( VAL__NBR*WSIZE1, IPW5, STATUS )
 
 *  Initialise the IRC package.
-      CALL IRC_INIT( STATUS )      
+      CALL IRC_INIT( STATUS )
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -352,7 +352,7 @@
 
 *  Loop round each pair of input and output CRDD files...
       NOUT = 0
-      DO INDEX = 1, NCRDDF 
+      DO INDEX = 1, NCRDDF
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
@@ -382,7 +382,7 @@
      :                        STATUS )
             END IF
 
-         ELSE 
+         ELSE
             FIRST = .FALSE.
             BAND0 = BAND
 
@@ -438,7 +438,7 @@
                WSIZE1 = NEL
                CALL PSX_REALLOC( VAL__NBR*WSIZE1, IPW1, STATUS )
             END IF
-   
+
             IF( NDET .GT. WSIZE2 ) THEN
                WSIZE2 = NDET
                CALL PSX_REALLOC( VAL__NBR*WSIZE2, IPW2, STATUS )
@@ -465,7 +465,7 @@
                CALL PSX_REALLOC( VAL__NBR*WSIZE1, IPW4, STATUS )
                CALL PSX_REALLOC( VAL__NBR*WSIZE1, IPW5, STATUS )
             END IF
-   
+
             IF( NDET .GT. WSIZE2 ) THEN
                WSIZE2 = NDET
                CALL PSX_REALLOC( VAL__NBR*WSIZE2, IPW2, STATUS )
@@ -519,7 +519,7 @@
          CALL NDF_ANNUL( TNDF, STATUS )
          CALL NDF_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDF_DELET( INDF2, STATUS )
@@ -547,7 +547,7 @@
      :             ' could not be produced'
             CALL GRP_PUT( IGRP2, 1, TEXT, INDEX, STATUS )
 
-*  If no error has occurred, increment the no. of good output NDFs 
+*  If no error has occurred, increment the no. of good output NDFs
 *  produced.
          ELSE
             NOUT = NOUT + 1
@@ -562,8 +562,8 @@
 *  output CRDD files which were not succesfully created are replaced by
 *  strings starting with a comment character and identifying the output
 *  CRDD file which could not be produced.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'BACKCRDD', 
-     :                                   STATUS )      
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'BACKCRDD',
+     :                                   STATUS )
 
 *  Close down IRC.
  999  CONTINUE
@@ -578,7 +578,7 @@
       CALL PSX_FREE( IPW3, STATUS )
       CALL PSX_FREE( IPW4, STATUS )
       CALL PSX_FREE( IPW5, STATUS )
-      
+
 *  Delete the input and output groups.
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )

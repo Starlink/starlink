@@ -1,5 +1,5 @@
       SUBROUTINE str_LCASE(STR)
- 
+
 *+
 *
 *   Name:
@@ -33,12 +33,12 @@
 
 *   Import/Export:
       BYTE STR(ARB)       ! string to be converted
- 
+
 *   External references:
       BYTE str_LOWER      ! convert SWT character to lower case
- 
+
       INTEGER str_LEN     ! string length
- 
+
 *   Local variables:
       INTEGER I           ! loop index
       INTEGER NCHAR       ! character count

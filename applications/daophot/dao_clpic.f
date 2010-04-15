@@ -1,9 +1,9 @@
 **==clpic.spg  processed by SPAG 4.54K  at 14:22 on  4 Oct 1996
- 
+
 ************************************************************************
- 
+
       SUBROUTINE CLPIC(ENVIRO)
- 
+
 *+
 *  Name :
 *     CLPIC
@@ -54,45 +54,45 @@
 *-
 *  Type Definitions :
       IMPLICIT NONE
- 
+
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
- 
+
 *  Global variables :
       INCLUDE 'ndf_cmn'         ! Common blocks for NDF information
- 
+
 *  Arguments Given:
       CHARACTER*(*) ENVIRO
- 
+
 *  Local variables :
       INTEGER STATUS
 *.
- 
+
 *   Initialise the status variable.
       STATUS = SAI__OK
- 
+
 *   Close the file appropriate to the environment specified.
 *   ..."DATA" environment:
       IF ( ENVIRO.EQ.'DATA' ) THEN
          CALL NDF_ANNUL(NDF_IDATA,STATUS)
- 
+
 *   ..."COPY" environment:
       ELSE IF ( ENVIRO.EQ.'COPY' ) THEN
          CALL NDF_ANNUL(NDF_ICOPY,STATUS)
- 
+
 *   ...environment not known, so report an error:
       ELSE
          CALL TBLANK
          CALL MSG_OUT(' ','CLPIC - unknown environment: ',ENVIRO,STATUS)
       END IF
- 
+
 *   Report any errors.
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL TBLANK
          CALL ERR_REP(' ','CLPIC - error closing ',ENVIRO,'environment',
      :                STATUS)
       END IF
- 
+
 *   Exit routine.
       END

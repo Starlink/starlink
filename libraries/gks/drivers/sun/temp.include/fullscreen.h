@@ -18,7 +18,7 @@
  *
  * The original cursor and input mask are cached and later restored when the
  * the full screen access object is destroyed.
- * 
+ *
  * By definition there should only be one instance of window boundary violating
  * per process at any one time
  * (sunwindow will keep different processes straight) thus the existence of

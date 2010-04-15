@@ -9,8 +9,8 @@
 *  Invocation:
 *     CALL CAP_RPFMT (NAME, NXFMT; STATUS)
 *  Description:
-*     Replace the units and external display format for a column or 
-*     parameter.  The existing external display format is overwritten 
+*     Replace the units and external display format for a column or
+*     parameter.  The existing external display format is overwritten
 *     with a new one.
 *
 *     The units and external display format are only modified if the
@@ -146,7 +146,7 @@
 *       Report any error.
 
          IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_SETC ('NAME', NAME(1 : LENGTH))            
+            CALL MSG_SETC ('NAME', NAME(1 : LENGTH))
             CALL ERR_REP ('CAP_RPFMT_ERR', 'Failed to modify the '/
      :        /'units or external format for column ^NAME.', STATUS)
          END IF

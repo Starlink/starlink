@@ -18,7 +18,7 @@
 
 *  Arguments:
 *     ITEM = CHARACTER * ( * ) Given)
-*        The name of the option. An unambiguous abbreviation may be 
+*        The name of the option. An unambiguous abbreviation may be
 *        supplied. Case is ignored.
 *     INDX = INTEGER (Returned)
 *        The index into ACM_DROPT at which the options value is stored.
@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,11 +72,11 @@
       CHARACTER UCITEM*( MAXLEN ) ! Upper case copy of ITEM.
 
 *  Local Data:
-      DATA OPT / 'TEXT_SIZE', 
+      DATA OPT / 'TEXT_SIZE',
      :           'COORD_SIZE',
-     :           'TOLERANCE', 
+     :           'TOLERANCE',
      :           'LINES',
-     :           'LONG_GAP', 
+     :           'LONG_GAP',
      :           'LAT_GAP',
      :           'PEN1',
      :           'PEN2',

@@ -18,8 +18,8 @@
 *     VERSION item within the POLPACK extension. An extension is created
 *     if necessary. Any existing VERSION item is over-written.
 *
-*     Note, the version number is edited into this routine when the 
-*     POLPACK release is constructed. 
+*     Note, the version number is edited into this routine when the
+*     POLPACK release is constructed.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -29,7 +29,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
 *  Get a locator for it.
       CALL DAT_FIND( XLOC, 'VERSION', VLOC, STATUS )
 
-*  Store the version number. 
+*  Store the version number.
       CALL DAT_PUT0C( VLOC, VERS( : VLEN ), STATUS )
 
 *  Annull the locators.

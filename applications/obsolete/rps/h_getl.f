@@ -14,7 +14,7 @@
       LOGICAL	DEFIN		!	True if default supplied
       LOGICAL       DEFAULT     ! 	Default answer.
       LOGICAL LVALUE		! Out	Value returned
-      INTEGER STATUS		!	0: OK, 1: Exit from form, 
+      INTEGER STATUS		!	0: OK, 1: Exit from form,
 				!		2: Help required
 
 *  Functions
@@ -35,7 +35,7 @@
       LOGICAL       IERR        ! Error indicator.
 
 *  ________________________  Executable Code  ________________________________
- 
+
       I = 1
 
       LEN = MDH_ENDWORD( QUERY )

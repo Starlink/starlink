@@ -1,5 +1,5 @@
       SUBROUTINE POL1_CM3RR( STACK, NPIX, NLINES, VARS, METH, MINPIX,
-     :                       NSIGMA, RESULT, WRK1, WRK2, NCON, POINT, 
+     :                       NSIGMA, RESULT, WRK1, WRK2, NCON, POINT,
      :                       USED, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL POL1_CM3RR( STACK, NPIX, NLINES, VARS, METH, MINPIX,
-*                      NSIGMA, RESULT, WRK1, WRK2, NCON, POINT, 
+*                      NSIGMA, RESULT, WRK1, WRK2, NCON, POINT,
 *                      USED, STATUS )
 
 *  Description:
@@ -69,7 +69,7 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -119,7 +119,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables: 
+*  Local Variables:
       INTEGER NBAD
 *.
 
@@ -142,7 +142,7 @@
 *  Sigma clipped mean...
       ELSE IF ( METH .EQ. 'SIGMA' ) THEN
          CALL CCG_SC3R( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
-     :                  RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD, 
+     :                  RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
      :                  STATUS )
 
 *  Report an error if the method is not recognised.

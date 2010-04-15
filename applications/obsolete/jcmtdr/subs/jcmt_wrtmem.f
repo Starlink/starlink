@@ -1,5 +1,5 @@
-      SUBROUTINE JCMT_WRITE_MEM (LU, BINARY, NPIX, DATA, RA_POS_OFF, 
-     :   DEC_POS_OFF, RA_NEG_OFF, DEC_NEG_OFF, NOISE, PARALLACTIC, 
+      SUBROUTINE JCMT_WRITE_MEM (LU, BINARY, NPIX, DATA, RA_POS_OFF,
+     :   DEC_POS_OFF, RA_NEG_OFF, DEC_NEG_OFF, NOISE, PARALLACTIC,
      :   STATUS)
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_WRITE_MEM (LU, BINARY, NPIX, DATA, RA_POS_OFF, DEC_POS_OFF, 
+*     CALL JCMT_WRITE_MEM (LU, BINARY, NPIX, DATA, RA_POS_OFF, DEC_POS_OFF,
 *    :   RA_NEG_OFF, DEC_NEG_OFF, NOISE, PARALLACTIC, STATUS)
 
 *  Description:
 *
-     
+
 *  Arguments:
 *     LU                     = INTEGER (Given)
 *        LU of output file
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -83,7 +83,7 @@
 
 *  Local Variables:
       INTEGER I
-      
+
 *   local data
 *.
 
@@ -97,7 +97,7 @@
      :         RA_NEG_OFF(I), DEC_NEG_OFF(I), NOISE(I),
      :         PARALLACTIC(I)
          ELSE
-            WRITE (LU, '(7(1PE12.4))') DATA(I), RA_POS_OFF(I), 
+            WRITE (LU, '(7(1PE12.4))') DATA(I), RA_POS_OFF(I),
      :         DEC_POS_OFF(I), RA_NEG_OFF(I), DEC_NEG_OFF(I), NOISE(I),
      :         PARALLACTIC(I)
          END IF

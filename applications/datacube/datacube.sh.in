@@ -17,7 +17,7 @@
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2008 Science & Technology Facilities Council. 
+#     Copyright (C) 2008 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -177,7 +177,7 @@ cubehelp () {        ${DATACUBE_DIR}/datacube_help ${1+"$@"}; }
 #  Set DATACUBE_HELP.
 setenv DATACUBE_HELP   ${DATACUBE_DIR}/../../help/datacube/datacube
 
-#if ($#argv == 0 || $1 != "-quiet") then  
+#if ($#argv == 0 || $1 != "-quiet") then
       echo " "
       echo "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
       echo "    Support is available by emailing datacube@star.rl.ac.uk"

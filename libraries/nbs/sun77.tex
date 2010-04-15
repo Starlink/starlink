@@ -10,7 +10,7 @@
 %    08-Feb-90 - WFL - Version 2.3   (all files explicitly included)
 %    15-Feb-90 - WFL - Version 2.3.1 (all files explicitly included)
 %    20-Apr-93 - DJA - Version 2.4
-%     5-Nov-93 - DJA - Version 2.4.1 
+%     5-Nov-93 - DJA - Version 2.4.1
 %     2-Jun-94 - DJA - Version 2.4.2
 %    16-Aug-94 - DJA - Version 2.4.3
 %    14-Dec-94 - DJA - Version 2.5
@@ -30,7 +30,7 @@
 %------------------------------------------------------------------------------
 
 
-\documentclass[twoside,11pt]{article} 
+\documentclass[twoside,11pt]{article}
 \pagestyle{headings}
 
 %------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ contains all information necessary to use it.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -512,7 +512,7 @@ contains all information necessary to use it.
 %
 %  Section name:
 %    MAN_INTRO
-%                                 
+%
 %  Function:
 %    Macros used in the .TEX_INTRO file
 %
@@ -798,12 +798,12 @@ contains all information necessary to use it.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -898,7 +898,7 @@ WILLIAMLUPTON}''. An
       compromising efficiency and this restriction should be seen more as a way
       of preventing the noticeboard routines from being used for purposes for
       which they were not designed and for which better tools (such as
-      {\tt HDS}) exist. Note that this ``static'' restriction refers only to  
+      {\tt HDS}) exist. Note that this ``static'' restriction refers only to
       the creation of
       items in the noticeboard. It is always possible to change item shapes and
       values.
@@ -916,11 +916,11 @@ WILLIAMLUPTON}''. An
       as when it was saved.
 
       \subsection {C-callable Version} The {\tt NBS} routines have been %
-      implemented to make them easy to use from Fortran, and for this 
+      implemented to make them easy to use from Fortran, and for this
       reason all character strings are passed as standard Fortran character
-      arguments (address of {\tt VMS} descriptor on {\tt VMS}, character 
+      arguments (address of {\tt VMS} descriptor on {\tt VMS}, character
       pointer with trailing hidden length argument on most other architectures)
-      and all other parameters are passed by reference. 
+      and all other parameters are passed by reference.
 
       The routines are actually written in C and it
       would be unreasonable and wasteful to force C programmers to build
@@ -934,19 +934,19 @@ as C
       programs described in Appendix~\ref {Demonstration Programs} for examples
       of the use of this C-callable version.
 
-      \subsection {Portability to UNIX} 
+      \subsection {Portability to UNIX}
       {\tt NBS} V2.4 was the first version of {\tt NBS} to be fully portable
-      to UNIX -- V2.2 onwards was written portably but had several 
+      to UNIX -- V2.2 onwards was written portably but had several
       deficiencies and bugs. The shared memory services of UNIX System V
-      are sufficiently close to the {\tt VMS} global section system 
+      are sufficiently close to the {\tt VMS} global section system
       services to require only a small amount of conditionally compiled code
-      in the low-level ``create section'' and ``map section'' routines. 
+      in the low-level ``create section'' and ``map section'' routines.
       There are however two limitations which may affect users planning
-      to use the software on {\tt UNIX} platforms. 
+      to use the software on {\tt UNIX} platforms.
 
 \begin{itemize}
 \item The first and least serious is that {\tt UNIX} does not permit
-a process to have a shared memory segment mapped more than once 
+a process to have a shared memory segment mapped more than once
 the process's address space. {\tt NBS} has been written to take
 account of this and will always return the same address in a request
 to map a noticeboard once it is mapped the first time. It does however
@@ -958,14 +958,14 @@ the user supplied name into this integer. The algorithm for doing this
 is much improved in V2.5.5 but it is still not proof against different
 names mapping on to the same key value.
 \end{itemize}
-       
+
       \subsection {Status Conventions} All the {\tt NBS} routines use {%
 \tt ADAM} modified
       status conventions in that they will do nothing if status is not {%
 \tt NBS\_\_OK}
       (0) on entry. They can all optionally be called as functions, in which
       case the function value is the same as the returned status value. In
-      all cases where an {\tt NBS} routine is the source of the error, an 
+      all cases where an {\tt NBS} routine is the source of the error, an
       error report will be made using the error and message reporting service.
 
       \subsection {Terminology} These routines use the terminology ``item'' to
@@ -1000,7 +1000,7 @@ access those values.
 Suppose that we wish to create and access a simple noticeboard. We will
 use as an example a subset of the noticeboard that is maintained by the
 {\tt AUTOFIB} control software. The notation used is the same as that used by
-the {\tt NBTRACE} (Trace Noticeboard) program (see Section~\ref 
+the {\tt NBTRACE} (Trace Noticeboard) program (see Section~\ref
 {NBTRACE --- Trace Noticeboard Contents}) --- each structure entry is of the form:
 
 \begin {verbatim}
@@ -1202,7 +1202,7 @@ Map (find) the noticeboard.
 \item This is the first {\tt NBS} routine that a non-owner need call.
 \item It does no harm to make multiple calls to this routine, but each call will
 map the noticeboard into a new part of virtual memory (on {\tt VMS} only ---
-the {\tt UNIX} version will return the same virtual memory address) and will 
+the {\tt UNIX} version will return the same virtual memory address) and will
 return a different {\tt ID}.
 \item This {\tt TOPID} is {\em not} the same as the {\tt TOPSID} returned by
 the {\tt NBS\_BEGIN\_DEFINITION} routine. Static identifiers are used only
@@ -1246,18 +1246,18 @@ Put values to some of them.
 \item Normally one would get {\tt ID}s for the items of interest just after
 finding the noticeboard. Finding an item involves a search and is relatively
 slow, whereas putting and getting a value is very fast.
-\item The second parameter to {\tt NBS\_PUT\_VALUE} and {\tt NBS\_PUT\_CVALUE} 
+\item The second parameter to {\tt NBS\_PUT\_VALUE} and {\tt NBS\_PUT\_CVALUE}
 is a byte offset. You
 can use non-zero offsets to put a slice of the data associated with an item.
 The current size of an item's data is the high-water mark of all {\tt PUT}s.
 You can use {\tt NBS\_PUT\_SIZE} explicitly to set the size of an item's data.
 \item Because the {\tt NBS} routines don't use the type information, it is
 necessary to pass all values by reference. In Fortran this is the default
-passing mechanism for all variables except for character strings, hence the 
+passing mechanism for all variables except for character strings, hence the
 routine {\tt NBS\_PUT\_CVALUE} to handle this case.
-\item However, on {\tt VMS} {\em only} the {\tt \%REF} function enables the 
+\item However, on {\tt VMS} {\em only} the {\tt \%REF} function enables the
 user to pass the actual character pointer to {\tt NBS\_PUT\_VALUE}, and supply
-the length of the character string (or indeed, any other number) as the 
+the length of the character string (or indeed, any other number) as the
 maximum number of bytes to be read.
 \item The noticeboard is now in the same state as in the listing at the start
 of this section. If another process ran {\tt NBTRACE} at this stage, it would get
@@ -1302,12 +1302,12 @@ Alternatively get a pointer to the actual data in the noticeboard.
 \end{verbatim}
 
 \begin {itemize}
-\item The second parameter to {\tt NBS\_GET\_VALUE} and {\tt NBS\_GET\_CVALUE} 
-is a byte offset. You can use non-zero offsets to get a slice of the 
+\item The second parameter to {\tt NBS\_GET\_VALUE} and {\tt NBS\_GET\_CVALUE}
+is a byte offset. You can use non-zero offsets to get a slice of the
 data associated with an item.
-\item The length of the string passed into {\tt NBS\_GET\_CVALUE} serves 
+\item The length of the string passed into {\tt NBS\_GET\_CVALUE} serves
 the same purpose as the third argument to {\tt NBS\_GET\_VALUE} --- ie. it
-limits the amount of data that can be read. 
+limits the amount of data that can be read.
 \item It is not an {\tt NBS} error if an item contains fewer bytes than are
 being asked for.
 \item When accessing data directly via pointer, no checks are possible and the
@@ -1450,7 +1450,7 @@ allows the item or noticeboard to be lost regardless of whether any derived
 \subsection{Compiling}
 On both {\tt VMS} and {\tt UNIX} systems, FORTRAN source code may
 include {\tt NBS} error codes and {\tt NBS} public constants using
-the symbolic names {\tt NBS\_ERR} and {\tt NBS\_PAR} respectively. 
+the symbolic names {\tt NBS\_ERR} and {\tt NBS\_PAR} respectively.
 On {\tt VMS} these are logical names and {\tt UNIX} the appropriate
 symbolic links can be made in your current directory by typing,
 
@@ -1493,8 +1493,8 @@ options files cannot be nested).
 
 \subsection{Linking on {\tt UNIX}}
 
-The linking process on UNIX is even simpler than that of {\tt VMS}. To link 
-against the stand-alone version simply append a \verb+`nbs_link`+ to the 
+The linking process on UNIX is even simpler than that of {\tt VMS}. To link
+against the stand-alone version simply append a \verb+`nbs_link`+ to the
 compiler or loader command line.
 
 \begin {verbatim}
@@ -1797,10 +1797,10 @@ are the {\em lowest} measured values of {\tt CPU} microseconds:
 \begin {center}
 \begin {tabular}{||l|l|r|r|r||}
 \hline
-{\scriptsize Test} \# & {\scriptsize Test name} & {\scriptsize $\mu$VAX $ 3500$}  & 
+{\scriptsize Test} \# & {\scriptsize Test name} & {\scriptsize $\mu$VAX $ 3500$}  &
 {\scriptsize DEC Alpha AXP 3000/400 }& {\scriptsize SPARCstation 10 }\\ \hline
 0       & Define, save and find noticeboard & 820000    &  16666 & 16666 \\
-1       & Scalar assignment             & 1         &    0.1     &   -   \\  
+1       & Scalar assignment             & 1         &    0.1     &   -   \\
 2       & Put scalar                    & 36        &    2.0     &   1.6 \\
 3       & Get scalar                    & 34        &    1.9     &   1.0 \\
 4       & Move 10 longwords directly    & 17        &    0.3     &   0.6 \\
@@ -1852,7 +1852,7 @@ use of {\tt NBS}.
 \label{V2.5 New Features}
 The only major new feature in V2.5 is that the noticeboard listing
 program previously named {\tt ln} has been renamed to {\tt nbtrace} and
-is now installed during the NBS installation process. 
+is now installed during the NBS installation process.
 
 \subsection {Bug Fixes}
 
@@ -1860,17 +1860,17 @@ Two problems are fixed in V2.5.5. NBS has hitherto allocated the data for
 primitive noticeboard items using exactly the data size supplied in the
 item definition. In V2.5.5 this size is rounded up to a multiple of the
 size of a double precision number. This ensures that items composed of
-types likely to mapped using {\tt NBS\_GET\_POINTER} or 
+types likely to mapped using {\tt NBS\_GET\_POINTER} or
 {\tt nbc\_get\_pointer} will be correctly aligned.
 
 The second problem concerns the algorithm used to generate UNIX shared
 memory identifiers (4 byte integers) from memory section names. The method
-used in previous releases simply copied the values of the first three 
+used in previous releases simply copied the values of the first three
 characters into an integer. The new algorithm adds the value of each
 character code in the name shifted leftwards by a number of bits equal
 to its position in the string. This means that all the characters in the
 name are significant (only 16 are allowed, which means all the bits in the
-last character are significant if used), and that anagrams of names map 
+last character are significant if used), and that anagrams of names map
 on to different key values.
 
 \appendix
@@ -3901,11 +3901,11 @@ might result in the following
 
 \begin{verbatim}
     Noticeboard data not restored because it was not saved
-    STRUC    IFL (140)  
-       _CHAR    ENQ_DEV_DESCR   (0/132/0) 
-       _CHAR    ENQ_DEV_TYPE    (0/132/0) 
-       _CHAR    ENQ_VER_DATE    (0/132/0) 
-       _CHAR    ENQ_VER_NUM     (0/132/0) 
+    STRUC    IFL (140)
+       _CHAR    ENQ_DEV_DESCR   (0/132/0)
+       _CHAR    ENQ_DEV_TYPE    (0/132/0)
+       _CHAR    ENQ_VER_DATE    (0/132/0)
+       _CHAR    ENQ_VER_NUM     (0/132/0)
 \end{verbatim}
 
 and
@@ -3919,22 +3919,22 @@ that none of them are called {\tt X}).
 
 \begin{verbatim}
     Noticeboard data not restored because it was not saved
-    STRUC   FITS (15)       
-       DRT_STRUCT   ALT_OBS (3)     
-       DRT_STRUCT   COMMENT (2)     
-       DRT_STRUCT   HAEND (3)       
-       DRT_STRUCT   HASTART (3)     
-       DRT_STRUCT   INSTRUME (3)    
-       DRT_STRUCT   LAT_OBS (3)     
-       DRT_STRUCT   LONG_OBS (3)    
-       DRT_STRUCT   OBJECT (3)      
-       DRT_STRUCT   ORIGIN (3)      
-       DRT_STRUCT   RUN (3) 
-       DRT_STRUCT   SPEED (3)       
-       DRT_STRUCT   UTDATE (3)      
-       DRT_STRUCT   WINDOW (3)      
-       DRT_STRUCT   ZDEND (3)       
-       DRT_STRUCT   ZDSTART (3)	
+    STRUC   FITS (15)
+       DRT_STRUCT   ALT_OBS (3)
+       DRT_STRUCT   COMMENT (2)
+       DRT_STRUCT   HAEND (3)
+       DRT_STRUCT   HASTART (3)
+       DRT_STRUCT   INSTRUME (3)
+       DRT_STRUCT   LAT_OBS (3)
+       DRT_STRUCT   LONG_OBS (3)
+       DRT_STRUCT   OBJECT (3)
+       DRT_STRUCT   ORIGIN (3)
+       DRT_STRUCT   RUN (3)
+       DRT_STRUCT   SPEED (3)
+       DRT_STRUCT   UTDATE (3)
+       DRT_STRUCT   WINDOW (3)
+       DRT_STRUCT   ZDEND (3)
+       DRT_STRUCT   ZDSTART (3)
 \end{verbatim}
 
 When no item name is given, general information about the noticeboard's size

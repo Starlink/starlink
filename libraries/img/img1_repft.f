@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,13 +90,13 @@
 *  Arguments Given:
       INTEGER SLOT1
       INTEGER SLOT2
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
       INTEGER NOUT              ! Number of copied FITS records
- 
+
 *.
 
 *  Check inherited global status.
@@ -106,13 +106,13 @@
 *  of the new FITS block (freeing the existing memory first). This will
 *  be copied into the image when the IMG1_FREXT is called.
       CALL IMG1_CFREE( ECB_FTSP( SLOT2 ), STATUS )
-      CALL IMG1_CALLO( 80, ECB_FTSN( SLOT1 ), ECB_FTSP( SLOT2 ), 
+      CALL IMG1_CALLO( 80, ECB_FTSN( SLOT1 ), ECB_FTSP( SLOT2 ),
      :                 STATUS )
       ECB_FTSN( SLOT2 ) = ECB_FTSN( SLOT1 )
-      CALL IMG1_FTSCP( %VAL( CNF_PVAL( ECB_FTSP( SLOT1 ) ) ),  
+      CALL IMG1_FTSCP( %VAL( CNF_PVAL( ECB_FTSP( SLOT1 ) ) ),
      :                 ECB_FTSN( SLOT2 ),
-     :                 %VAL( CNF_PVAL( ECB_FTSP( SLOT2 ) ) ), 
-     :                 NOUT, STATUS, 
+     :                 %VAL( CNF_PVAL( ECB_FTSP( SLOT2 ) ) ),
+     :                 NOUT, STATUS,
      :                 %VAL( CNF_CVAL( 80 ) ), %VAL( CNF_CVAL( 80 ) ) )
       END
 * $Id$

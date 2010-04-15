@@ -101,7 +101,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -284,12 +284,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -380,20 +380,20 @@ for online web pages (either this document or the cookbook respectively).
 This application will transform JCMT map data into a tangent  plane
 image centred on a specified RA, Dec. The rebinning is performed by
 convolving the input data with a truncated Bessel function. It is
-similar but not identical to the NOD2 CONVERT function. 
+similar but not identical to the NOD2 CONVERT function.
 
 The width of the Bessel function used is such that it would just be
 fully  sampled by data points at the spacing of the pixels of the
 output  map. The pixel spacing of the output map is set to be the
 minimum  of the nominal pixel spacings of the input maps. To minimise
-edge  effects the Bessel function is truncated at a radius of 7 pixels 
-from its centre, and apodised over its outer third by a cosine 
+edge  effects the Bessel function is truncated at a radius of 7 pixels
+from its centre, and apodised over its outer third by a cosine
 function.
 
 In Fourier terms the method approximates to Fourier transforming the
 input dataset(s), multiplying the transform by a cylindrical top hat
 (the F.T. of the Bessel function), then transforming back into image
-space. 
+space.
 
 The application can read in up to 10 separate input datasets. The
 output map will be large enough to cover all the input data  points
@@ -408,7 +408,7 @@ The convolution assumes that all pixels outside the measured  area are
 zero. This will lower the brightness of objects that are  less than
 the radius of the convolution function (7 output pixels)  from the map
 edge, though the effect is only a few percent unless  the object is
-very close (2 or 3 pixels) to the edge. 
+very close (2 or 3 pixels) to the edge.
 
 \goodbreak
 
@@ -422,7 +422,7 @@ The parameters used are:
             PROMPT  "(INfile) The name of a file containing JCMT map data"
             TEXT   ---------------------------------------------------
                    The name of a file containing the map data. Giving
-                   END as the name of the file will finish the input 
+                   END as the name of the file will finish the input
                    sequence.
                    ---------------------------------------------------
 
@@ -432,12 +432,12 @@ The parameters used are:
             OPTIONS OUTPUT
             PROMPT  "(OUTput) The name of the file to contain the output map"
 
-         PARAMETER B1950 
-            TYPE    KEY 
-            NAME    B1(950) 
+         PARAMETER B1950
+            TYPE    KEY
+            NAME    B1(950)
             PROMPT "(B1950) make output coordinates B1950 equinox"
             TEXT   ---------------------------------------------------
-                   By default the application will transform the data 
+                   By default the application will transform the data
                    into a map whose centre and tangent plane offsets
                    are in the FK5 system with Julian 2000 equinox.
                    Setting B1950 to YES will give results in the FK4
@@ -458,10 +458,10 @@ The parameters used are:
             TYPE   CHAR
             PROMPT "(RA_centre) The RA of the centre of the output map"
             TEXT   ---------------------------------------------------
-                   The positions of the output map pixels will be 
-                   given in terms of a tangent plane offset in arcsec 
+                   The positions of the output map pixels will be
+                   given in terms of a tangent plane offset in arcsec
                    from a map centre specified by the user. This parameter
-                   specifies the RA of the centre, it must be input in 
+                   specifies the RA of the centre, it must be input in
                    hh mm ss.s format.
                    ---------------------------------------------------
 
@@ -469,10 +469,10 @@ The parameters used are:
             TYPE   CHAR
             PROMPT "(DEC_centre) The Dec. of the centre of the output map"
             TEXT   ---------------------------------------------------
-                   The positions of the output map pixels will be 
-                   given in terms of a tangent plane offset in arcsec 
+                   The positions of the output map pixels will be
+                   given in terms of a tangent plane offset in arcsec
                    from a map centre specified by the user. This parameter
-                   specifies the declination of the centre, it must be 
+                   specifies the declination of the centre, it must be
                    input in (sign)dd mm ss.s format.
                    ---------------------------------------------------
 \end{verbatim}
@@ -518,7 +518,7 @@ that with the nearest LST. The corrections are {\em added} to the azimuth
 and elevation of the pixels.
 
 On a VAX the required elements in the .PCORR structure can be created and
-set using the Figaro LET command (note that using LET to create an array 
+set using the Figaro LET command (note that using LET to create an array
 requires the last element of the array to be created first). On a Unix machine
 you will have to use the Figaro command CREOBJ to create the HDS objects and
 SETOBJ to give them values.
@@ -540,7 +540,7 @@ with the input datasets are not propagated.
 
 \subsection{\xlabel{IRAS_TAG}IRAS\_TAG}
 
-This application will append an IRAS astrometry structure to a 
+This application will append an IRAS astrometry structure to a
 rebinned map so that the IRAS90 package
 (\xref{SUN/161}{sun161}{}) can be used on it,
 for example to overlay coordinate grids, object positions, {\em etc}.
@@ -556,7 +556,7 @@ calculated, and multiplied by the estimated zenith  atmospheric
 extinction at the time of observation to give the  extinction optical
 depth along the line of sight. Multiplying the data point by the
 exponential of the optical depth gives  the value that would have been
-measured above the atmosphere. 
+measured above the atmosphere.
 
 The zenith optical depth is assumed to vary linearly with  time
 between the values given by the parameters TAU and ENDTAU.
@@ -597,7 +597,7 @@ The parameters used are:
             TEXT    --------------------------------------------------
                     The value of the zenith atmospheric extinction at
                     the end of the map observation. The zenith extinction
-                    for each pixel will be calculated assuming a linear 
+                    for each pixel will be calculated assuming a linear
                     gradient with time between the start and end values.
                     --------------------------------------------------
 \end{verbatim}
@@ -687,9 +687,9 @@ pixels will be set to a `bad' value.
 
 The application creates a JCMT-specific section in the file in which
 are stored parameters relating to the telescope, the environment and
-the way in which the map was made. 
+the way in which the map was made.
 
-If MAKEMAP fails to find important items in the GSD file, they will be 
+If MAKEMAP fails to find important items in the GSD file, they will be
 prompted for. If all else fails you can create, delete, rename or set
 individual items in the datafile using Figaro commands.
 On VMS the relevant commands are CROBJ, DELOBJ, RENOBJ and LET, on Unix
@@ -728,12 +728,12 @@ are:
                    value of parameter BINARY.
                    ---------------------------------------------------
 
-         PARAMETER B1950 
-            TYPE    KEY 
-            NAME    B1(950) 
+         PARAMETER B1950
+            TYPE    KEY
+            NAME    B1(950)
             PROMPT "(B1950) make output coordinates B1950 equinox"
             TEXT   ---------------------------------------------------
-                   By default the application will transform the data 
+                   By default the application will transform the data
                    into a map whose centre and tangent plane offsets
                    are in the FK5 system with Julian 2000 equinox.
                    Setting B1950 to YES will give results in the FK4
@@ -746,7 +746,7 @@ are:
             PROMPT "(BINARY) output data to unformatted file"
             TEXT   ---------------------------------------------------
                    YES will result in the output data being written to
-                   file <rootname>.BIN, NO will give ASCII numbers in 
+                   file <rootname>.BIN, NO will give ASCII numbers in
                    <rootname>.MEM.
                    ---------------------------------------------------
 
@@ -754,10 +754,10 @@ are:
             TYPE   CHAR
             PROMPT "(RA_centre) The RA of the centre of the output map"
             TEXT   ---------------------------------------------------
-                   The positions of the output map pixels will be 
-                   given in terms of a tangent plane offset in arcsec 
+                   The positions of the output map pixels will be
+                   given in terms of a tangent plane offset in arcsec
                    from a map centre specified by the user. This parameter
-                   specifies the RA of the centre, it must be input in 
+                   specifies the RA of the centre, it must be input in
                    hh mm ss.s format.
                    ---------------------------------------------------
 
@@ -765,10 +765,10 @@ are:
             TYPE   CHAR
             PROMPT "(DEC_centre) The Dec. of the centre of the output map"
             TEXT   ---------------------------------------------------
-                   The positions of the output map pixels will be 
-                   given in terms of a tangent plane offset in arcsec 
+                   The positions of the output map pixels will be
+                   given in terms of a tangent plane offset in arcsec
                    from a map centre specified by the user. This parameter
-                   specifies the declination of the centre, it must be 
+                   specifies the declination of the centre, it must be
                    input in (sign)dd mm ss.s format.
                    ---------------------------------------------------
 
@@ -1092,7 +1092,7 @@ STRUCT  < >
          JCEN           <_INTEGER>      46
          PIXSIZE        <_DOUBLE>       0.00001939254724
 
-! an array of FITS items that hold the names and weights of the files input 
+! an array of FITS items that hold the names and weights of the files input
 ! to the rebinning application, and the method of rebinning used.
 
       FITS(9)        <_CHAR*80>      'FILE_1  = 'RXA_146ERJ'         / Na...'

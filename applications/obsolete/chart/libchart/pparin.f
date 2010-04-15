@@ -49,7 +49,7 @@
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statements, with calls to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the READONLY specifier is used which is 
+*        porting, as the READONLY specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
       REAL NOMLW                 ! [local_variable_description]
       REAL RLWMIN                ! [local_variable_description]
       REAL RLWMAX                ! [local_variable_description]
-      INTEGER NPAR               ! 
+      INTEGER NPAR               !
       INTEGER NPOS               !
       INTEGER ILENG
       INTEGER GSTAT
@@ -185,7 +185,7 @@
                   IF ( STATUS .NE. SAI__OK .OR. FACTOR .LE. 0.0 ) THEN
                      ASPECT = .FALSE.
                      FACTOR = 1.0
-                     CALL ERR_ANNUL( STATUS )      
+                     CALL ERR_ANNUL( STATUS )
                      CALL ERR_RLSE
                   END IF
                ELSE
@@ -237,8 +237,8 @@
      :      RLWMAX, NPPLI )
             COLOUR = ( COLA .EQ. 1 ) .AND. ( NPPLI .GE. 5 )
             IF ( COLOUR ) THEN
-               CALL PAR_DEF0L( 'COLOUR', COLOUR, STATUS )      
-               CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )      
+               CALL PAR_DEF0L( 'COLOUR', COLOUR, STATUS )
+               CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )
             END IF
             IF ( ICON .EQ. 0 ) THEN
 * There used to be code here to Sort out if Device is Picture Oriented.
@@ -336,7 +336,7 @@
 *  and read them.
             CALL GETDEFLT( PARAMS, NPAR, 'COORDS', VAL2, NPOS , STATUS )
             L = CHR_LEN( VAL2 )
-            TEXT = VAL2( 1:L ) 
+            TEXT = VAL2( 1:L )
 
 * This statement
 *
@@ -347,7 +347,7 @@
       CALL FILEOPEN( 11, TEXT, 'OLD', ' ', ' ', .FALSE., 0, .TRUE.,
      :              STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 100
-      
+
 *  If the file opens then read the positions (but first read the
 *  equinox of the positions) and precess them.
 *
@@ -373,7 +373,7 @@
 
 *  If the file does not open, then set no-error box.
   100       CONTINUE
-            CALL ERR_FLUSH( STATUS ) 
+            CALL ERR_FLUSH( STATUS )
             CALL MSG_OUT( ' ', 'Failed to find the co-ordinates',
      :         STATUS)
             CALL MSG_OUT( ' ', 'of the error box vertices', STATUS )
@@ -393,7 +393,7 @@
          TEXT = VALUE( 1:L )
 
 * This statement :
-* 
+*
 *        OPEN ( UNIT=11, FILE=TEXT, STATUS='OLD', READONLY, ERR=400 )
 *
 * is replaced by the following call (see History) :
@@ -402,7 +402,7 @@
      :                 STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 400
 
-* 
+*
 *  First read the equinox of the positions.
          READ ( 11, '(A)' ) VAL2
          CALL CHR_CTOR( VAL2, EQ, STATUS )

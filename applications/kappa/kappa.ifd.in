@@ -186,7 +186,7 @@ package kappa {
             prompt {Title for output NDF}
             helpkey *
          }
- 
+
          parameter update {
             type _LOGICAL
             vpath DEFAULT
@@ -238,7 +238,7 @@ package kappa {
          alias {axla(bel)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter dim {
             position 3
             type _INTEGER
@@ -274,7 +274,7 @@ package kappa {
          alias {axun(its)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter dim {
             position 3
             type _INTEGER
@@ -1688,12 +1688,12 @@ package kappa {
          }
 
       }
-      
+
       action setaxis {
          alias {seta(xis)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter comp {
             position 4
             type LITERAL
@@ -2038,7 +2038,7 @@ package kappa {
          alias {setl(abel)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter label {
             position 2
             type LITERAL
@@ -2066,7 +2066,7 @@ package kappa {
          alias {setno(rm)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter anorm {
             type _LOGICAL
             vpath PROMPT
@@ -2481,7 +2481,7 @@ package kappa {
          alias {setu(nits)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter modify {
             position 3
             type _LOGICAL
@@ -2520,7 +2520,7 @@ package kappa {
          alias {setv(ar)}
 
          helplib {$KAPPA_HELP}
-   
+
          parameter comp {
             type LITERAL
             ppath CURRENT DEFAULT
@@ -2623,7 +2623,7 @@ package kappa {
             position 2
             type NDF
             access READ
-            ppath CURRENT 
+            ppath CURRENT
             prompt {Parent NDF}
             helpkey *
          }
@@ -3956,16 +3956,16 @@ package kappa {
          parameter ybot {
             type _REAL
             prompt {Minimum data value to display in each spectrum}
-            vpath DYNAMIC 
-            ppath DYNAMIC 
+            vpath DYNAMIC
+            ppath DYNAMIC
             helpkey *
          }
 
          parameter ytop {
             type _REAL
             prompt {Maximum data value to display in each spectrum}
-            vpath DYNAMIC 
-            ppath DYNAMIC 
+            vpath DYNAMIC
+            ppath DYNAMIC
             helpkey *
          }
 
@@ -4294,7 +4294,7 @@ package kappa {
 
          parameter number {
             size *
-                                 
+
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -4637,7 +4637,7 @@ package kappa {
             default FALSE
             helpkey *
         }
-         
+
 	 parameter blanksize {
             type _REAL
             vpath DEFAULT
@@ -5839,7 +5839,7 @@ package kappa {
             association <-GLOBAL.GRAPHICS_DEVICE
             helpkey *
          }
-        
+
         parameter full {
             type _LOGICAL
             vpath DEFAULT
@@ -6191,7 +6191,7 @@ package kappa {
             prompt {Offset value for each line }
             helpkey *
          }
-  
+
          parameter pens {
             type LITERAL
             vpath DEFAULT
@@ -7510,7 +7510,7 @@ package kappa {
             prompt {Name of graphics device}
             helpkey *
         }
- 
+
          parameter operands {
             size *
             type _INTEGER
@@ -7528,7 +7528,7 @@ package kappa {
             default AND
             helpkey *
         }
- 
+
          parameter option {
             position 3
             type LITERAL
@@ -8749,7 +8749,7 @@ package kappa {
          parameter ndatapix {
             position 3
             type _INTEGER
-            vpath DYNAMIC DEFAULT 
+            vpath DYNAMIC DEFAULT
             ppath DYNAMIC DEFAULT
             default 100
             prompt {Number of pixels on output data-value axis}
@@ -8780,7 +8780,7 @@ package kappa {
          parameter sigma {
             position 6
             type _DOUBLE
-            vpath DEFAULT 
+            vpath DEFAULT
             ppath CURRENT DEFAULT
             default !
             prompt {Standard deviation in input image}
@@ -9370,7 +9370,7 @@ package kappa {
 
       action collapse {
          alias {coll(apse)}
-         
+
          helplib {$KAPPA_HELP}
 
          parameter axis {
@@ -9825,7 +9825,7 @@ package kappa {
             prompt {Weight limit for good output pixels}
             helpkey *
          }
-  
+
          parameter xcentre {
             position 4
             type _INTEGER
@@ -10416,7 +10416,7 @@ package kappa {
             default 0.0
             helpkey *
          }
-   
+
          parameter title {
             type LITERAL
             vpath DEFAULT
@@ -10470,7 +10470,7 @@ package kappa {
             default 0.0
             helpkey *
          }
-   
+
          parameter cngrms {
             access WRITE
             type _DOUBLE
@@ -10479,7 +10479,7 @@ package kappa {
             default 0.0
             helpkey *
          }
-   
+
          parameter in {
             position 1
             type NDF
@@ -11652,7 +11652,7 @@ iraf! {
          alias {kste(st)}
 
          helplib {$KAPPA_HELP}
- 
+
          parameter comp {
             type LITERAL
             access UPDATE
@@ -11761,7 +11761,7 @@ iraf! {
             default 0.0D0
             helpkey *
          }
- 
+
       }
 
       action laplace {
@@ -13763,7 +13763,7 @@ iraf! {
          parameter pos {
             type LITERAL
             prompt {Position at which to calculate statistics}
-            vpath PROMPT 
+            vpath PROMPT
             ppath CURRENT
             helpkey *
         }
@@ -14353,7 +14353,7 @@ iraf! {
             prompt {Object whose value to return}
             helpkey *
         }
-         
+
       }
 
       action paste {
@@ -15861,7 +15861,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 1}
             helpkey *
          }
-              
+
          parameter poly2 {
             type FILENAME
             vpath PROMPT
@@ -15869,7 +15869,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 2}
             helpkey *
          }
-              
+
          parameter poly3 {
             type FILENAME
             vpath PROMPT
@@ -15877,7 +15877,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 3}
             helpkey *
          }
-              
+
          parameter poly4 {
             type FILENAME
             vpath PROMPT
@@ -15885,7 +15885,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 4}
             helpkey *
          }
-              
+
          parameter poly5 {
             type FILENAME
             vpath PROMPT
@@ -15893,7 +15893,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 5}
             helpkey *
          }
-              
+
          parameter poly6 {
             type FILENAME
             vpath PROMPT
@@ -15901,7 +15901,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 6}
             helpkey *
          }
-              
+
          parameter poly7 {
             type FILENAME
             vpath PROMPT
@@ -15909,7 +15909,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 7}
             helpkey *
          }
-              
+
          parameter poly8 {
             type FILENAME
             vpath PROMPT
@@ -15917,7 +15917,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 8}
             helpkey *
          }
-              
+
          parameter poly9 {
             type FILENAME
             vpath PROMPT
@@ -15925,7 +15925,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 9}
             helpkey *
          }
-              
+
          parameter poly10 {
             type FILENAME
             vpath PROMPT
@@ -15933,7 +15933,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 10}
             helpkey *
          }
-              
+
          parameter poly11 {
             type FILENAME
             vpath PROMPT
@@ -15941,7 +15941,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 11}
             helpkey *
          }
-              
+
          parameter poly12 {
             type FILENAME
             vpath PROMPT
@@ -15949,7 +15949,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 12}
             helpkey *
          }
-              
+
          parameter poly13 {
             type FILENAME
             vpath PROMPT
@@ -15957,7 +15957,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 13}
             helpkey *
          }
-              
+
          parameter poly14 {
             type FILENAME
             vpath PROMPT
@@ -15965,7 +15965,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 14}
             helpkey *
          }
-              
+
          parameter poly15 {
             type FILENAME
             vpath PROMPT
@@ -15973,7 +15973,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 15}
             helpkey *
          }
-              
+
          parameter poly16 {
             type FILENAME
             vpath PROMPT
@@ -15981,7 +15981,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 16}
             helpkey *
          }
-              
+
          parameter poly17 {
             type FILENAME
             vpath PROMPT
@@ -15989,7 +15989,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 17}
             helpkey *
          }
-              
+
          parameter poly18 {
             type FILENAME
             vpath PROMPT
@@ -15997,7 +15997,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 18}
             helpkey *
          }
-              
+
          parameter poly19 {
             type FILENAME
             vpath PROMPT
@@ -16005,7 +16005,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 19}
             helpkey *
          }
-              
+
          parameter poly20 {
             type FILENAME
             vpath PROMPT
@@ -16013,7 +16013,7 @@ iraf! {
             prompt {File holding co-ordinates defining polygon 20}
             helpkey *
          }
-              
+
          parameter quality {
             type _LOGICAL
             access READ
@@ -16253,7 +16253,7 @@ iraf! {
             default !
             helpkey *
         }
-            
+
       }
 
       action sqorst {
@@ -16281,7 +16281,7 @@ iraf! {
             prompt {Expansion factors for each axis}
             helpkey *
         }
-            
+
          parameter in {
             position 1
             type NDF
@@ -17144,8 +17144,8 @@ iraf! {
             position 1
             type LITERAL
             access READ
-            vpath DEFAULT 
-            ppath CURRENT 
+            vpath DEFAULT
+            ppath CURRENT
             default !
             prompt {The version string for comparison}
             helpkey *
@@ -18955,11 +18955,11 @@ iraf! {
    }
 
    command fitsedit {
-      obey {$KAPPA_DIR/fitsedit.csh}      
+      obey {$KAPPA_DIR/fitsedit.csh}
    }
 
    command fitshead {
-      obey {$KAPPA_DIR/fitshead.csh}      
+      obey {$KAPPA_DIR/fitshead.csh}
    }
 
    command outline {
@@ -19042,99 +19042,99 @@ iraf! {
 
    command transformer {
       obsolete { The transformer command has been retired to the KAPRH package---see SUN/239.  Use "regrid" instead. }
-   } 
+   }
 
    command traninvert {
       obsolete { The traninvert command has been retired to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command tranjoin {
       obsolete { The tranjoin command has been retired to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command tranmake {
       obsolete { The tranmake command has been retired to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command trantrace {
       obsolete { The trantrace command has been retired to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command idset {
       obsolete { The idset command has been retired to the KAPRH package---see SUN/239. Use "gdset" instead. }
-   } 
+   }
 
    command idclear {
       obsolete { The idclear command has been retired to the KAPRH package---see SUN/239.  Use "gdclear" instead. }
-   } 
+   }
 
    command idstate {
       obsolete { The idstate command has been retired to the KAPRH package---see SUN/239.  Use "gdstate" instead. }
-   } 
+   }
 
    command ovset {
       obsolete { The ovset command has been retired to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command ovclear {
       obsolete { The ovclear command has been retired to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command idinvisible {
       obsolete { The idinvisible command has been moved to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command idpazo {
       obsolete { The idpazo command has been moved to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command lutflip {
       obsolete { The lutflip command has been moved to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command luthilite {
       obsolete { The luthilite has been moved to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command lutrot {
       obsolete { The lutrot command has been moved to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command luttweak {
       obsolete { The luttweak command has been moved to the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command contover {
       obsolete { The contover command has been retired.  Use "contour clear=no" instead or use the contover command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command greyplot {
       obsolete { The greyplot command has been retired.  Use "display key=y" instead or use the greyplot command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command inspect {
       obsolete { The inspect command has been retired.  Use GAIA instead or use the inspect command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command mosaic {
       obsolete { The mosaic command has been retired.  Use ccdpack:makemos or use the mosaic command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command quilt {
       obsolete { The quilt command has been retired.  Use ccdpack:makemos or use the quilt command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command snapshot {
       obsolete { The snapshot command has been retired.  Use a utility such as gimp or xv or use the snapshot command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command turbocont {
       obsolete { The turbocont command has been retired.  Use "contour" instead or use the turbocont command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    command crelut {
       obsolete { The crelut command has been retired.  Use "lutedit" instead or use the crelut command in the KAPRH package---see SUN/239. }
-   } 
+   }
 
    icl {defhelp kappa $KAPPA_HELP 0}
 

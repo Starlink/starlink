@@ -3,25 +3,25 @@
      &                  STOKES_U,STOKES_UV,NPTS,IO_LU,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     P W R I T E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C FILENAME (<), TITLE (<), LAMBDA (<), STOKES_I (<),
 C STOKES_Q (<), STOKES_QV (<),
 C STOKES_U (<), STOKES_UV (<), NPTS (<), IO_LU (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This subroutine writes out a polarization spectrum from an ascii format

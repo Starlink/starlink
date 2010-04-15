@@ -13,8 +13,8 @@
 *     CALL NDG1_OPEN( NAME, PLACE, STATUS )
 
 *  Description:
-*     This routine returns an NDF place holder for a new NDF, ensuring that 
-*     any HDS container file or structures required to created the named 
+*     This routine returns an NDF place holder for a new NDF, ensuring that
+*     any HDS container file or structures required to created the named
 *     NDF exist. If they do not exist, they are created.
 
 *  Arguments:
@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 
 *  Arguments Given:
       CHARACTER NAME*(*)
-      
+
 *  Arguments Returned:
       INTEGER PLACE
 
@@ -81,7 +81,7 @@
 
 *.
 
-*  Initialise 
+*  Initialise
       PLACE = NDF__NOPL
 
 *  Check inherited global status.
@@ -91,7 +91,7 @@
       CALL ERR_BEGIN( STATUS )
 
 *  Attempt to get a place holder for the named NDF.
-      CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE, 
+      CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE,
      :               STATUS )
 
 *  If an error was reported, annul the error, check that the structure
@@ -100,7 +100,7 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL NDG1_CRPTH( NAME, STATUS )
-         CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE, 
+         CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE,
      :                  STATUS )
       END IF
 

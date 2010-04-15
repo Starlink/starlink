@@ -14,7 +14,7 @@
 #     source $ECHOMOP_DIR/echomop.csh
 #
 #  Description:
-#     This procedure starts the ECHOMOP package for use from the C shell by 
+#     This procedure starts the ECHOMOP package for use from the C shell by
 #     defining the aliases needed to execute each application.
 #
 #  Authors:
@@ -26,7 +26,7 @@
 #     18 Aug 1992 (hme):
 #        Original Version
 #     30 Nov 1995 (mjc):
-#        Stole some parts of Horst's FIGARO setup.     
+#        Stole some parts of Horst's FIGARO setup.
 #     {enter_changes_here}
 #
 #-

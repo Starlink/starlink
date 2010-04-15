@@ -8,8 +8,8 @@ C  Function:
 C     Fills an array of the specified type with a constant value
 C
 C  Description:
-C     Given the memory address for an array of specified type, this 
-C     routine fills the array with a constant value.  
+C     Given the memory address for an array of specified type, this
+C     routine fills the array with a constant value.
 C
 C  Language:
 C     FORTRAN
@@ -24,7 +24,7 @@ C     (>) ADDRESS     (Integer,ref) The address of the data array.
 C     (>) VALUE       (Double,ref) The constant value to be used.
 C     (>) TYPE        (Fixed string,descr) The type of the data array.
 C                     This must be one of 'FLOAT','INT',SHORT','REAL'
-C                     'BYTE', 'USHORT' or 'DOUBLE'.  Anything else is 
+C                     'BYTE', 'USHORT' or 'DOUBLE'.  Anything else is
 C                     ignored.
 C     (>) STATUS      (Integer,ref) Status code.  If bad status is
 C                     passed, this routine returns immediately.
@@ -52,7 +52,7 @@ C     24th Apr 1989.   Support for USHORT type added.  KS/AAO.
 C     31st Aug 1992.   No longer rely on CNV_.  HME / UoE, Starlink.
 C      1st Sep 1992.   Usused variable declarations removed. KS/AAO.
 C     24th Feb 1993.   No longer needs to include DSA_TYPES.INC KS/AAO.
-C     2005 June 3      Replace DYNAMIC_MEMORY with 
+C     2005 June 3      Replace DYNAMIC_MEMORY with
 C                      %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
 C                      addressing.  MJC / Starlink
 C+

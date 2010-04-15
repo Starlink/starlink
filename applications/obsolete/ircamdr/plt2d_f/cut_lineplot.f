@@ -19,7 +19,7 @@
 !        INCLUDE 'FIO_ERR'
 	INCLUDE 'PLT2DCOM'
 
-	INTEGER 
+	INTEGER
      :	  J,
      :	  CUT_MARKINC,
      :	  LUN,
@@ -27,7 +27,7 @@
      :	  NUMBER_POINTS,
      :	  STATUS
 
-	REAL 
+	REAL
      :    CUT_MAGNIF,
      :	  CUT_MARKSIZ,
      :	  CUT_VALUES( NUMBER_POINTS),
@@ -143,17 +143,17 @@
 
 	DO J = 1, NUMBER_POINTS
 
-	  X_VALUES( J) = XST + 
+	  X_VALUES( J) = XST +
      :	   ( X_VALUES( J) - X_LO)/( X_HI - X_LO)*( XEN - XST)
 
-	  CUT_VALUES( J) = YST + 
+	  CUT_VALUES( J) = YST +
      :	   ( CUT_VALUES( J) - Y_LO)/( Y_HI - Y_LO)*( YEN - YST)
 
 	END DO
 
-* test if user selected anything other than B,H or M and plot LINE 
+* test if user selected anything other than B,H or M and plot LINE
 
-	IF( CUT_LINETYPE .NE. 'B' .AND. 
+	IF( CUT_LINETYPE .NE. 'B' .AND.
      :	    CUT_LINETYPE .NE. 'H' .AND.
      :	    CUT_LINETYPE .NE. 'M') THEN
 
@@ -263,7 +263,7 @@
 
 	  DO J = 1, NUMBER_POINTS, CUT_MARKINC
 
-	    X_POS = X_VALUES( J) 
+	    X_POS = X_VALUES( J)
 	    Y_POS = MIN( CUT_VALUES( J), YEN)
 	    Y_POS = MAX( Y_POS, YST)
 	    CALL SGS_MARK( X_POS, Y_POS, MARKER_TYPE)

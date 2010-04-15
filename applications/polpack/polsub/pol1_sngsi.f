@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES, 
-     :                       DIN, DOUT, WORK, WGT, DMAX, DMIN, 
+      SUBROUTINE POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES,
+     :                       DIN, DOUT, WORK, WGT, DMAX, DMIN,
      :                       STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES, 
+*     CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES,
 *                      DIN, DOUT, WORK, WGT, DMAX, DMIN, STATUS )
 
 *  Description:
@@ -46,7 +46,7 @@
 *        The weights associated with the DOUT array. Currently all set to
 *        1.0, except for bad values which are set to 0.0.
 *     DMAX = REAL (Returned)
-*        The highest expected data value. 
+*        The highest expected data value.
 *     DMIN = REAL (Returned)
 *        The lowest expected data value.
 *     STATUS = INTEGER (Given and Returned)
@@ -54,7 +54,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,9 +125,9 @@
 
 *  Calculate the expected intensity value on the basis of the supplied
 *  Stokes vector.
-            WORK( I ) = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 ) 
+            WORK( I ) = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 )
      :                                      + K3*STOKES( I, 3 ) )
-             
+
 *  Store the squared difference between the above expected intensity and
 *  the intensity in the NDF,
             DOUT( I ) = ( WORK( I ) - DIN( I ) )**2

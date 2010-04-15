@@ -8,7 +8,7 @@ C  Function:
 C     Removes `flagged' data values from a data array
 C
 C  Description:
-C     This routine takes a data array of specified type that may 
+C     This routine takes a data array of specified type that may
 C     contain `flagged' data values.  These flagged values are replaced
 C     by harmless values - since flag values tend to be extreme values
 C     and liable to produce arithmetic errors if processed - and the

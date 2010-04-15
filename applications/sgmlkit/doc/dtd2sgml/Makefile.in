@@ -98,7 +98,7 @@ all:
 
 # This is the main target of this makefile
 #
-# The existence of this stamp file is tested by ../ssn70/Makefile -- 
+# The existence of this stamp file is tested by ../ssn70/Makefile --
 # do not rename!
 sgmltext.stamp: starlink-0.7.sgmltext programcode-0.7.sgmltext
 	touch sgmltext.stamp

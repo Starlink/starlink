@@ -15,7 +15,7 @@ f     AST_XMLCHAN
 *     operations. Writing an Object to an XmlChan (using
 c     astWrite) will, if the Object is suitable, generate an
 f     AST_WRITE) will, if the Object is suitable, generate an
-*     XML description of that Object, and reading from an XmlChan will 
+*     XML description of that Object, and reading from an XmlChan will
 *     create a new Object from its XML description.
 *
 *     Normally, when you use an XmlChan, you should provide "source"
@@ -23,10 +23,10 @@ c     and "sink" functions which connect it to an external data store
 c     by reading and writing the resulting XML text. These functions
 f     and "sink" routines which connect it to an external data store
 f     by reading and writing the resulting XML text. These routines
-*     should perform any conversions needed between external character 
-c     encodings and the internal ASCII encoding. If no such functions 
+*     should perform any conversions needed between external character
+c     encodings and the internal ASCII encoding. If no such functions
 f     encodings and the internal ASCII encoding. If no such routines
-*     are supplied, a Channel will read from standard input and write 
+*     are supplied, a Channel will read from standard input and write
 *     to standard output.
 
 *  Inheritance:
@@ -56,12 +56,12 @@ f     The XmlChan class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,12 +90,12 @@ f     The XmlChan class does not define any new routines beyond those
 *     simplifying things)
 *     - Document (including a complete description of what is and is not
 *     supported in the reference docs for the XmlFormat attribute).
-*     - Produce a schema describing the format which can in fact be read by 
+*     - Produce a schema describing the format which can in fact be read by
 *     AST.
-*     - Look at Jonathan McDowell's mini-STC schema (also STC stuff in 
+*     - Look at Jonathan McDowell's mini-STC schema (also STC stuff in
 *     spectral data model)
-*     - Web services. Read only: test STCs for overlap, test points for 
-*     inclusion/exclusion, plot a mask over an image, verification (can AST 
+*     - Web services. Read only: test STCs for overlap, test points for
+*     inclusion/exclusion, plot a mask over an image, verification (can AST
 *     read it & does it generate warnings?). Read/Write: convert FITS to STC,
 *     transform STC into a new coord system.
 *     - Add support for writing as well as reading
@@ -168,7 +168,7 @@ f     The XmlChan class does not define any new routines beyond those
    function. */
 #define STC_URI "urn:nvo-stc"
 
-/* Known IVOA Classes and attributes. When a new name is added, it may be 
+/* Known IVOA Classes and attributes. When a new name is added, it may be
    necessary to update the FindIVOAClass function. */
 #define STC_RESOURCE_PROFILE     "STCResourceProfile"
 #define SEARCH_LOCATION          "SearchLocation"
@@ -284,7 +284,7 @@ static const char *xformat[3] = { NATIVE_STRING, QUOTED_STRING, IVOA_STRING };
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->IsUsable_This = NULL; \
@@ -305,8 +305,8 @@ astMAKE_INITGLOBALS(XmlChan)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 /* An XmlChan pointer use to communicate with the IsUsable function. */
@@ -333,9 +333,9 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstXmlChan *astXmlChanForId_( const char *(*)( void ), 
-                           char *(*)( const char *(*)( void ), int * ), 
-                           void (*)( const char * ), 
+AstXmlChan *astXmlChanForId_( const char *(*)( void ),
+                           char *(*)( const char *(*)( void ), int * ),
+                           void (*)( const char * ),
                            void (*)( void (*)( const char * ), const char *, int * ),
                            const char *, ... );
 AstXmlChan *astXmlChanId_( const char *(* source)( void ),
@@ -458,7 +458,7 @@ static const char * GetXmlPrefix( AstXmlChan *, int * );
 /* Member functions. */
 /* ================= */
 
-static AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -472,7 +472,7 @@ static AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem,
 *                              AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -480,14 +480,14 @@ static AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     AllSky element. 
+*     AllSky element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA AllSky element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -523,7 +523,7 @@ static AstRegion *AllSkyReader( AstXmlChan *this, AstXmlElement *elem,
 }
 
 static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
-                                        AstFrame *frm, AstRegion *uncs[4], 
+                                        AstFrame *frm, AstRegion *uncs[4],
                                         int nanc, AstKeyMap **ancs, int *status ) {
 /*
 *  Name:
@@ -538,7 +538,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 *  Synopsis:
 *     #include "xmlchan.h"
 *     AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
-*                                      AstFrame *frm, AstRegion *uncs[4], 
+*                                      AstFrame *frm, AstRegion *uncs[4],
 *                                      int nanc, AstKeyMap **ancs, int *status )
 
 *  Class Membership:
@@ -554,14 +554,14 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 *     elem
 *        Pointer to the IVOA AstroCoordArea element. May be NULL, in
 *        which case a NullRegion is returned.
-*     frm 
+*     frm
 *        The Frame in which the returned Region is to be defined. If
-*        Units or reference values (Epoch, RestFreq, RefRA, etc) are not set 
+*        Units or reference values (Epoch, RestFreq, RefRA, etc) are not set
 *        for any axes, then they will be set by this function if possible.
 *     uncs
-*        Array holding pointers to the uncertainty Regions to be associated 
-*        with each of the four STC domains (space, time, spectral, redshift). 
-*        NULL should be suppied in any element for which no uncertainty is 
+*        Array holding pointers to the uncertainty Regions to be associated
+*        with each of the four STC domains (space, time, spectral, redshift).
+*        NULL should be suppied in any element for which no uncertainty is
 *        available.
 *     nanc
 *        Number of KeyMap pointers stored in "ancs"
@@ -570,8 +570,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 *        a KeyMap. Each one describes the ancilary information in an
 *        AstroCoords element associated with the AstroCoordsArea decribed
 *        by "region". Each KeyMap has elements with keys AST__STCERROR,
-*        AST__STCRES, AST__STCSIZE, AST__STCPIXSZ, AST__STCVALUE each of 
-*        which holds a pointer to a Region. 
+*        AST__STCRES, AST__STCSIZE, AST__STCPIXSZ, AST__STCVALUE each of
+*        which holds a pointer to a Region.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -594,7 +594,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    AstRegion **spec_list;
    AstRegion **space_list;
    AstRegion **time_list;
-   AstRegion *new;                 
+   AstRegion *new;
    AstRegion *reg;
    AstRegion *rred;
    AstRegion *rspec;
@@ -625,7 +625,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    int ianc;
    int ired;
    int ispace;
-   int ispec;          
+   int ispec;
    int itime;
    int k;
    int l;
@@ -636,9 +636,9 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    int nspace;
    int nspec;
    int ntime;
-   int paxis;                 
+   int paxis;
 
-   static const char *key[ 5 ] = { AST__STCERROR, 
+   static const char *key[ 5 ] = { AST__STCERROR,
                                    AST__STCRES,
                                    AST__STCSIZE,
                                    AST__STCPIXSZ,
@@ -657,8 +657,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 /* Otherwise, create a Region of suitable class. */
    } else {
 
-/* First identify the individual Frames within the supplied Frame. Current 
-   implementation for spatial axes is limited to celestial longitude and 
+/* First identify the individual Frames within the supplied Frame. Current
+   implementation for spatial axes is limited to celestial longitude and
    latitude. */
       space_frame = NULL;
       spec_frame = NULL;
@@ -736,16 +736,16 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             for( ispace = 0; ispace < nspace; ispace++ ) {
                name = astXmlGetName( scan->el[ 0 ][ ispace ] );
                if( !strcmp( name, "Sphere" ) ) {
-                  space_list[ ispace ] = SphereReader( this, 
-                                                       scan->el[ 0 ][ ispace ], 
+                  space_list[ ispace ] = SphereReader( this,
+                                                       scan->el[ 0 ][ ispace ],
                                                        space_frame, status );
                } else if( !strcmp( name, "PositionInterval" ) ) {
-                  space_list[ ispace ] = PositionIntervalReader( this, 
-                                                       scan->el[ 0 ][ ispace ], 
+                  space_list[ ispace ] = PositionIntervalReader( this,
+                                                       scan->el[ 0 ][ ispace ],
                                                        space_frame, status );
                } else if( !strcmp( name, "Region" ) ) {
-                  space_list[ ispace ] = StcRegionReader( this, 
-                                                       scan->el[ 0 ][ ispace ], 
+                  space_list[ ispace ] = StcRegionReader( this,
+                                                       scan->el[ 0 ][ ispace ],
                                                        space_frame, status );
                } else if( astOK ) {
                   astError( AST__INTER, "AstroCoordAreaReader(XmlChan): "
@@ -761,12 +761,12 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* If the spatial region is a single point we will use the point as the
    reference position for any SpecFrames which are created. If there is
-   just one spatial interval, and if it is bounded. and if the bounds are 
+   just one spatial interval, and if it is bounded. and if the bounds are
    equal on both axes, note the mean position. */
             if( nspace == 1 ){
                if( astGetBounded( space_list[ 0 ] ) ) {
                   astGetRegionBounds( space_list[ 0 ], lbnd, ubnd );
-                  if( astEQUAL( lbnd[ 0 ], ubnd[ 0 ] ) && 
+                  if( astEQUAL( lbnd[ 0 ], ubnd[ 0 ] ) &&
                       astEQUAL( lbnd[ 1 ], ubnd[ 1 ] ) ) {
                      space_val[ 0 ] = 0.5*( lbnd[ 0 ] + ubnd[ 0 ] );
                      space_val[ 1 ] = 0.5*( lbnd[ 1 ] + ubnd[ 1 ] );
@@ -781,33 +781,33 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
          time_list = astMalloc( sizeof(AstRegion *)*(size_t)ntime );
          if( time_list ) {
             for( itime = 0; itime < ntime; itime++ ) {
-               time_list[ itime ] = TimeIntervalReader( this, 
-                                                       scan->el[ 1 ][ itime ], 
+               time_list[ itime ] = TimeIntervalReader( this,
+                                                       scan->el[ 1 ][ itime ],
                                                        time_frame, status );
 
 /* Store any uncertainty region. Transfer the System and TimeOrigin
    values from the time region to the time uncertainty, if set. */
                if( uncs[ 1 ] ) {
 
-                  if( astTestSystem( time_frame ) && 
+                  if( astTestSystem( time_frame ) &&
                       astTestTimeOrigin( time_frame ) ) {
 
-                     sprintf( setting, "System=%s", 
+                     sprintf( setting, "System=%s",
                               astGetC( time_frame, "System" ) );
                      astRegSetAttrib( uncs[ 1 ], setting, NULL );
 
 
                      if( astTestUnit( time_frame, 0 ) ) {
                         old_units = astGetUnit( time_frame, 0 );
-                        old_units = astStore( NULL, old_units, 
+                        old_units = astStore( NULL, old_units,
                                               strlen( old_units ) + 1 );
                      } else {
                         old_units = NULL;
                      }
-                  
+
                      astSetUnit( time_frame, 0, astGetUnit( uncs[ 1 ], 0 ) );
 
-                     sprintf( setting, "TimeOrigin=%s", 
+                     sprintf( setting, "TimeOrigin=%s",
                               astGetC( time_frame, "TimeOrigin" ) );
                      astRegSetAttrib( uncs[ 1 ], setting, NULL );
 
@@ -824,7 +824,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                }
             }
 
-/* Use the mid point as the Epoch for all Frames which are created. If 
+/* Use the mid point as the Epoch for all Frames which are created. If
    either limit is not specified, use the specified limit. */
             if( ntime > 0 ){
                astGetRegionBounds( time_list[ 0 ], lbnd, ubnd );
@@ -836,7 +836,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                   }
                } else if( fabs( ubnd[ 0 ] ) != DBL_MAX && ubnd[ 0 ] != AST__BAD ){
                   time_val = ubnd[ 0 ];
-               } 
+               }
             }
          }
 
@@ -846,16 +846,16 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
          spec_list = astMalloc( sizeof(AstRegion *)*(size_t)nspec );
          if( spec_list ) {
             for( ispec = 0; ispec < nspec; ispec++ ) {
-               spec_list[ ispec ] = SpectralIntervalReader( this, 
-                                                       scan->el[ 2 ][ ispec ], 
+               spec_list[ ispec ] = SpectralIntervalReader( this,
+                                                       scan->el[ 2 ][ ispec ],
                                                        spec_frame, status );
 /* Store any uncertainty region.*/
                if( uncs[ 2 ] ) astSetUnc( spec_list[ ispec ], uncs[ 2 ] );
             }
 
 /* If the spectral region is a single point we will use the point as the
-   rest frequency for all RedShift Frames which are created. If there is just 
-   one spectral interval, and if it is bounded. and if the bounds are equal, 
+   rest frequency for all RedShift Frames which are created. If there is just
+   one spectral interval, and if it is bounded. and if the bounds are equal,
    note the mean spectral value. */
             if( nspec == 1 ){
                if( astGetBounded( spec_list[ 0 ] ) ) {
@@ -872,8 +872,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
          red_list = astMalloc( sizeof(AstRegion *)*(size_t)nred );
          if( red_list ) {
             for( ired = 0; ired < nred; ired++ ) {
-               red_list[ ired ] = RedshiftIntervalReader( this, 
-                                                       scan->el[ 3 ][ ired ], 
+               red_list[ ired ] = RedshiftIntervalReader( this,
+                                                       scan->el[ 3 ][ ired ],
                                                        red_frame, status );
 /* Store any uncertainty region.*/
                if( uncs[ 3 ] ) astSetUnc( red_list[ ired ], uncs[ 3 ] );
@@ -884,16 +884,16 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
          scan = FreeIVOAScan( scan, status );
 
 /* If the spatial regions cover only a single point, convert it to FK5
-   J2000 and use it as the reference position for any SpecFrames (spectral or 
-   redshift) unless values were inherited from the supplied Frame. If the 
-   supplied Frame did not contain set values for these attributes, set them 
+   J2000 and use it as the reference position for any SpecFrames (spectral or
+   redshift) unless values were inherited from the supplied Frame. If the
+   supplied Frame did not contain set values for these attributes, set them
    now. Use astRegSetAttrib which applies the attribute setting to both
    base and current Frame of the Region's FrameSet, and avoids re-mapping
    the current Frame. */
          if( astOK ) {
-            if( space_val[ 0 ] != AST__BAD && space_val[ 1 ] != AST__BAD ) { 
+            if( space_val[ 0 ] != AST__BAD && space_val[ 1 ] != AST__BAD ) {
 
-/* First need to convert to FK5 J2000 and format into a string for use with 
+/* First need to convert to FK5 J2000 and format into a string for use with
    astRegSetAttrib. Need to ensure that the Format and Digits attributes
    are set to values which will result in no loss of precision in the
    formatting and unformatting steps. */
@@ -924,25 +924,25 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                         astRegSetAttrib( spec_list[ ispec ], raset, NULL );
                         astRegSetAttrib( spec_list[ ispec ], decset, NULL );
                      }
-   
+
                      if( spec_frame ) {
                         astSetRefRA( (AstSpecFrame *) spec_frame, raref );
                         astSetRefDec( (AstSpecFrame *) spec_frame, decref );
                      }
                   }
-   
+
                   if( !red_frame || !astTestRefRA( red_frame ) ||
                                     !astTestRefDec( red_frame ) ) {
                      for( ired = 0; ired < nred; ired++ ) {
                         astRegSetAttrib( red_list[ ired ], raset, NULL );
                         astRegSetAttrib( red_list[ ired ], decset, NULL );
                      }
-   
+
                      if( red_frame ) {
                         astSetRefRA( (AstSpecFrame *) red_frame, raref );
                         astSetRefDec( (AstSpecFrame *) red_frame, decref );
                      }
-                  }               
+                  }
 
                   for( ianc = 0; ianc < nanc; ianc++ ) {
                      for( k = 0; k < 5; k++ ) {
@@ -965,11 +965,11 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                }
             }
 
-/* If a time region was specified, use a typical value as the epoch for 
-   all Frames. Call MakeMJD to convert "time_val" from the system of the 
+/* If a time region was specified, use a typical value as the epoch for
+   all Frames. Call MakeMJD to convert "time_val" from the system of the
    TimeFrame to an MJD (as required by the Frame Epoch attribute). Set
    the value in both the returned Region and the supplied Frame. */
-            if( time_val != AST__BAD ) { 
+            if( time_val != AST__BAD ) {
                fr = astRegFrame( time_list[ 0 ] );
                if( astIsATimeFrame( fr ) ) {
                   time_val = MakeMJD( (AstTimeFrame *) fr, time_val, status );
@@ -978,7 +978,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                             "supplied where TimeFrame expected (internal "
                             "AST programming error).", status, astGetClass( fr ) );
                }
-               fr = astAnnul( fr ); 
+               fr = astAnnul( fr );
 
                sprintf( buff, "epoch= MJD %.*g", DBL_DIG, time_val );
 
@@ -1018,10 +1018,10 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 /* If the spectral regions cover only a single point, format it with its
    units so that the astSetAttrib function can convert it to Hz and use
    it as the rest frequency for any redshift Frames. */
-            if( spec_val != AST__BAD && nred > 0 ) { 
+            if( spec_val != AST__BAD && nred > 0 ) {
 
                text = astGetUnit( spec_frame, 0 );
-               if( text ) sprintf( buff, "restfreq= %.*g %s", DBL_DIG, 
+               if( text ) sprintf( buff, "restfreq= %.*g %s", DBL_DIG,
                                    spec_val, text );
 
                if( !red_frame || !astTestRestFreq( red_frame ) ) {
@@ -1043,10 +1043,10 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             }
 
 /* Create Regions corresponding to every possible combination of interval
-   on each axis type, and assemble the union of these into a CmpRegion (if 
+   on each axis type, and assemble the union of these into a CmpRegion (if
    there is more than one). */
             sum = NULL;
-   
+
 /* Initialise indices of the sub-Frame intervals to use. */
             ispace = 0;
             itime = 0;
@@ -1064,10 +1064,10 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    extrusion is defined by an Interval. Spatial Regions are not
    restricted to Intervals and so any spatial Region must be the first
    Region to be included in the Prism (all the other axis types *are*
-   restricted to Intervals and so can be used to extrude the spatial 
+   restricted to Intervals and so can be used to extrude the spatial
    region). */
                reg = rspace ? astClone( rspace ) : NULL;
-   
+
 /* Now extrude this region (if any) into the time axis. */
                if( rtime ) {
                   if( reg ) {
@@ -1077,8 +1077,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                   } else {
                      reg = astClone( rtime );
                   }
-               }   
-   
+               }
+
 /* Now extrude this region (if any) into the spectral axis. */
                if( rspec ) {
                   if( reg ) {
@@ -1088,8 +1088,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                   } else {
                      reg = astClone( rspec );
                   }
-               }   
-   
+               }
+
 /* Now extrude this region (if any) into the redshift axis. */
                if( rred ) {
                   if( reg ) {
@@ -1099,8 +1099,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                   } else {
                      reg = astClone( rred );
                   }
-               }   
-   
+               }
+
 
 /* If a Prism was created, add it into the CmpRegion which holds the
    running sum of the union of all Prisms created so far. */
@@ -1133,14 +1133,14 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             tmp = astSimplify( sum );
             (void) astAnnul( sum );
             sum = tmp;
-   
-/* The axes in this sum Region may not be in the correct order or units (i.e 
+
+/* The axes in this sum Region may not be in the correct order or units (i.e
    in the order and units specified in the supplied Frame). So use
    astConvert to get a Mapping from the Frame represented by the sum
    Region to the supplied Frame. */
             fs = astConvert( sum, frm, "" );
             if( fs ) {
-   
+
 /* Unless the Mapping is a UnitMap, remap the sum Region into the
    supplied Frame using this Mapping. */
                map = astGetMapping( fs, AST__BASE, AST__CURRENT );
@@ -1149,10 +1149,10 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                } else {
                   new = astClone( sum );
                }
-   
+
                map = astAnnul( map );
                fs = astAnnul( fs );
-   
+
             } else if( astOK ) {
                astError( AST__INTER, "AstroCoordAreaReader(%s): Cannot "
                          "convert from supplied Frame to internal Frame (AST "
@@ -1175,27 +1175,27 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             cfrm = astAnnul( cfrm );
             sum = astAnnul( sum );
          }
-   
+
          if( space_list ) {
             for( i = 0; i < nspace; i++ ) space_list[ i ] = astAnnul( space_list[ i ]  );
             space_list = astFree( space_list );
          }
-   
+
          if( time_list ) {
             for( i = 0; i < ntime; i++ ) time_list[ i ] = astAnnul( time_list[ i ]  );
             time_list = astFree( time_list );
          }
-   
+
          if( spec_list ) {
             for( i = 0; i < nspec; i++ ) spec_list[ i ] = astAnnul( spec_list[ i ]  );
             spec_list = astFree( spec_list );
          }
-   
+
          if( red_list ) {
             for( i = 0; i < nred; i++ ) red_list[ i ] = astAnnul( red_list[ i ]  );
             red_list = astFree( red_list );
          }
-   
+
       }
 
       if( space_frame ) space_frame = astAnnul( space_frame );
@@ -1203,7 +1203,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
       if( spec_frame ) spec_frame = astAnnul( spec_frame );
       if( red_frame ) red_frame = astAnnul( red_frame );
 
-/* Get the ID attribute from the AstroCoordArea element and store in the 
+/* Get the ID attribute from the AstroCoordArea element and store in the
    returned Region. */
       id = astXmlGetAttributeValue( elem, "ID" );
       if( id ) astSetIdent( new, id );
@@ -1242,16 +1242,16 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function modifies the supplied Frame object to incorporate the
-*     effects of the supplied AstroCoords element. It may also return 
-*     Regions representing the bounds of the uncertainties in the four 
-*     component coordinate Frames, depending on the contents of the 
+*     effects of the supplied AstroCoords element. It may also return
+*     Regions representing the bounds of the uncertainties in the four
+*     component coordinate Frames, depending on the contents of the
 *     AstroCoords element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
-*        Pointer to the IVOA AstroCoords element. 
+*        Pointer to the IVOA AstroCoords element.
 *     frm
 *        The Frame object to modify.
 *     uncs
@@ -1262,7 +1262,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 *     anc
 *        Address of a location at which to store the pointer to a newly
 *        created KeyMap holding ancillary information describing the
-*        AstroCoords element in the form required by constructors of AST 
+*        AstroCoords element in the form required by constructors of AST
 *        Stc objects. A NULL pointer is returned if no usable ancillary
 *        information is found in the AstroCoords.
 *     status
@@ -1313,7 +1313,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    int unc;                      /* Any uncertainty Regions found? */
    int use;                      /* Use ancillary information? */
 
-   static const char *key[ 5 ] = { AST__STCERROR, 
+   static const char *key[ 5 ] = { AST__STCERROR,
                                    AST__STCRES,
                                    AST__STCSIZE,
                                    AST__STCPIXSZ,
@@ -1353,13 +1353,13 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
       sfrm = NULL;
       rfrm = NULL;
 
-/* Initialise pointers to KeyMaps holding ancillary data. */ 
+/* Initialise pointers to KeyMaps holding ancillary data. */
       panc = NULL;
       tanc = NULL;
       sanc = NULL;
       ranc = NULL;
 
-/* Allocate storage for an array of pointers to strings holding the Name 
+/* Allocate storage for an array of pointers to strings holding the Name
    value for each axis. Initialise them to a null string. */
       nax = astGetNaxes( frm );
       anames = astMalloc( sizeof( char * )*(size_t)nax );
@@ -1374,27 +1374,27 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
       axes[ 1 ] = 1;
       afrm = astPickAxes( frm, 2, axes, NULL );
       dom = astGetDomain( afrm );
-      isearth = dom && ( !strcmp( dom, "GEO_D" ) || 
+      isearth = dom && ( !strcmp( dom, "GEO_D" ) ||
                          !strcmp( dom, "GEO_C" ) );
 
       if( isearth || ( dom && !strcmp( dom, "SKY" ) ) ){
          astPrimaryFrame( frm, axis, &pfrm, &junk );
          if( scan->count[ 0 ] ) {
-            
+
 /* We currently also use SkyFrames to represent geographical long/lat used to
    describe observatory positions. These may have 3D positions, in which
    case we convert the 3D position to a 2D position by ignoring the 3rd axis
    value (height). See SpaceFrameReader. */
             el = MakePos2D( this, scan->el[ 0 ][ 0 ], status );
-                        
-/* Use the Position2D to create a Region describing the uncertainty in 
+
+/* Use the Position2D to create a Region describing the uncertainty in
    the space axes of the Frame. Also create a KeyMap holding Regions
    describing any ancillary information stored in the Position2D. */
             uncs[ 0 ] = Position2DReader( this, el, pfrm, pos, &panc, status );
             if( uncs[ 0 ] ) unc = 1;
             el = astXmlDelete( el );
 
-/* If ancillary information was returned, extract the Name element, and 
+/* If ancillary information was returned, extract the Name element, and
    store it twice (once for each axis) in the "names" array. */
             if( panc && astMapGet0C( panc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
@@ -1406,7 +1406,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 /* Increment the axis index. */
          axis += 2;
 
-/* If the supplied Frame has no sky frame, but we found a Position2D, then 
+/* If the supplied Frame has no sky frame, but we found a Position2D, then
    report a warning and ignore the Position2D. */
       } else if( scan->count[ 0 ] ) {
          sprintf( buff, "contains a <%s> which is not being used.",
@@ -1418,7 +1418,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 /* Indicate we do not yet have an epoch to use. */
       epoch = AST__BAD;
 
-/* Check to see if the Frame contains a time frame. It will be the next 
+/* Check to see if the Frame contains a time frame. It will be the next
    axis if it does. */
       afrm = astPickAxes( frm, 1, &axis, NULL );
       dom = astGetDomain( afrm );
@@ -1434,15 +1434,15 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
             tfrm = (AstTimeFrame *) gfrm;
          }
 
-/* Use any Time element to create a Region describing the uncertainty in the 
-   time axis of the Frame. Also create a KeyMap holding Regions describing 
+/* Use any Time element to create a Region describing the uncertainty in the
+   time axis of the Frame. Also create a KeyMap holding Regions describing
    any ancillary information stored in the Time element. */
          if( scan->count[ 1 ] ) {
             uncs[ 1 ] = TimeReader( this, scan->el[ 1 ][ 0 ], tfrm, &epoch,
                                     &tanc, status );
             if( uncs[ 1 ] ) unc = 1;
 
-/* If ancillary information was returned, extract the Name element, and 
+/* If ancillary information was returned, extract the Name element, and
    store it in the "names" array. */
             if( tanc && astMapGet0C( tanc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
@@ -1453,7 +1453,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 /* Increment the index of the next axis to use. */
          axis++;
 
-/* If the supplied Frame has no time frame, but we found a Time element, then 
+/* If the supplied Frame has no time frame, but we found a Time element, then
    report a warning and ignore the Time element. */
       } else if( scan->count[ 1 ] ) {
          Report( this, elem, WARNING, "contains a <Time> which is not needed", status );
@@ -1464,26 +1464,26 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    axis. */
       rf = AST__BAD;
 
-/* Check to see if the Frame contains a spectral frame. It will be the next 
+/* Check to see if the Frame contains a spectral frame. It will be the next
    axis if it does. */
       afrm = astPickAxes( frm, 1, &axis, NULL );
       dom = astGetDomain( afrm );
       if( dom && !strcmp( dom, "SPECTRUM" ) ){
          astPrimaryFrame( frm, axis, &sfrm, &junk );
 
-/* Use any Spectral to create a Region describing the uncertainty in the 
-   spectral axis of the Frame. If the Spectral contains a spectral value, the 
-   first value will be returned so that it can be used  as the rest frequency 
-   for any Redshift axis. It will be in units of Hz and will be AST__BAD if 
-   the Spectral did not contain any spectral values. Also create a KeyMap 
+/* Use any Spectral to create a Region describing the uncertainty in the
+   spectral axis of the Frame. If the Spectral contains a spectral value, the
+   first value will be returned so that it can be used  as the rest frequency
+   for any Redshift axis. It will be in units of Hz and will be AST__BAD if
+   the Spectral did not contain any spectral values. Also create a KeyMap
    holding Regions describing any ancillary information stored in the
    Spectral element. */
          if( scan->count[ 2 ] ) {
-            uncs[ 2 ] = SpectralReader( this, scan->el[ 2 ][ 0 ], sfrm, &rf, 
+            uncs[ 2 ] = SpectralReader( this, scan->el[ 2 ][ 0 ], sfrm, &rf,
                                         &sanc, status );
             if( uncs[ 2 ] ) unc = 1;
 
-/* If ancillary information was returned, extract the Name element, and 
+/* If ancillary information was returned, extract the Name element, and
    store it in the "names" array. */
             if( sanc && astMapGet0C( sanc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
@@ -1494,29 +1494,29 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 /* Increment the index of the next axis to use. */
          axis++;
 
-/* If the supplied Frame has no spectral frame, but we found a Spectral 
+/* If the supplied Frame has no spectral frame, but we found a Spectral
    element, then report a warning and ignore the Spectral element. */
       } else if( scan->count[ 2 ] ) {
          Report( this, elem, WARNING, "contains a <Spectral> which is not needed", status );
       }
       afrm = astAnnul( afrm );
 
-/* Check to see if the Frame contains a redshift frame. It will be the next 
+/* Check to see if the Frame contains a redshift frame. It will be the next
    axis if it does. */
       afrm = astPickAxes( frm, 1, &axis, NULL );
       dom = astGetDomain( afrm );
       if( dom && !strcmp( dom, "REDSHIFT" ) ){
          astPrimaryFrame( frm, axis, &rfrm, &junk );
 
-/* Use any Redshift to create a Region describing the uncertainty in the 
-   redshift axis of the Frame. Also create a KeyMap holding Regions describing 
+/* Use any Redshift to create a Region describing the uncertainty in the
+   redshift axis of the Frame. Also create a KeyMap holding Regions describing
    any ancillary information stored in the Redshift element. */
          if( scan->count[ 3 ] ) {
-            uncs[ 3 ] = RedshiftReader( this, scan->el[ 3 ][ 0 ], rfrm, 
+            uncs[ 3 ] = RedshiftReader( this, scan->el[ 3 ][ 0 ], rfrm,
                                         &ranc, status );
             if( uncs[ 3 ] ) unc = 1;
 
-/* If ancillary information was returned, extract the Name element, and 
+/* If ancillary information was returned, extract the Name element, and
    store it in the "names" array. */
             if( ranc && astMapGet0C( ranc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
@@ -1527,14 +1527,14 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
 /* Increment the index of the next axis to use. */
          axis++;
 
-/* If the supplied Frame has no redshift frame, but we found a Redshift 
+/* If the supplied Frame has no redshift frame, but we found a Redshift
    element, then report a warning and ignore the Redshift element. */
       } else if( scan->count[ 3 ] ) {
          Report( this, elem, WARNING, "contains a <Redshift> which is not needed", status );
       }
       afrm = astAnnul( afrm );
 
-/* Now assign fixed axis values (Epoch, RestFreq, etc) to the component 
+/* Now assign fixed axis values (Epoch, RestFreq, etc) to the component
    Frames of the supplied Frame. */
       if( epoch != AST__BAD ) {
          if( pfrm ) astSetEpoch( pfrm, epoch );
@@ -1544,14 +1544,14 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
          astSetEpoch( frm, epoch );
       }
 
-      if( sfrm && pfrm && astIsASpecFrame( sfrm ) && astIsASkyFrame( pfrm ) && 
+      if( sfrm && pfrm && astIsASpecFrame( sfrm ) && astIsASkyFrame( pfrm ) &&
           !isearth && pos[ 0 ] != AST__BAD && pos[ 1 ] != AST__BAD ) {
          astSetRefPos( sfrm, pfrm, pos[ 0 ], pos[ 1 ] );
       }
 
       if( rfrm && astIsASpecFrame( rfrm ) && rf != AST__BAD ) {
          astSetRestFreq( rfrm, rf );
-         if( pfrm && astIsASkyFrame( pfrm ) && !isearth && 
+         if( pfrm && astIsASkyFrame( pfrm ) && !isearth &&
              pos[ 0 ] != AST__BAD && pos[ 1 ] != AST__BAD ) {
             astSetRefPos( rfrm, pfrm, pos[ 0 ], pos[ 1 ] );
          }
@@ -1567,31 +1567,31 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
          for( i = 0; i < nax; i++ ) {
             if( !anames[ i ] ) anames[ i ] = astStore( NULL, "", 1 );
          }
-   
+
          for( i = 0; i < nax; i++ ) {
             if( empty && strlen( anames[ i ] ) > 0 ) {
                astMapPut1C( *anc, AST__STCNAME, nax, (const char **) anames, NULL );
                empty = 0;
             }
             anames[ i ] = astFree( anames[ i ] );
-         }      
-   
+         }
+
 /* Do each of the other items, all of which are described by a Region. */
          lo = 0.0;
          hi = 0.0;
-         for( i = 0; i < 5; i++ ) { 
-   
+         for( i = 0; i < 5; i++ ) {
+
 /* Initialise a flag indicating that we have not yet found any non-null
    information to store for this item. */
             use = 0;
-   
+
 /* Initialise a pointer to the Region describing the item extruded into
    all axes. */
             t = NULL;
-      
+
 /* If there is a positional Frame, determine the Region describing the
    intersection of the total Region with the position Frame. If none is
-   supplied use a zero width Interval as a flag that no information is 
+   supplied use a zero width Interval as a flag that no information is
    available. */
             if( pfrm ) {
                if( panc && astMapGet0A( panc, key[ i ], &o ) ) {
@@ -1601,9 +1601,9 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                   t = (AstRegion *) astInterval( pfrm, &lo, &hi, NULL, "", status );
                }
             }
-      
-/* If there is a time Frame, determine the Region describing the intersection 
-   of the total Region with the time Frame. If none is supplied use a zero 
+
+/* If there is a time Frame, determine the Region describing the intersection
+   of the total Region with the time Frame. If none is supplied use a zero
    width Interval as a flag that no information is available. */
             if( tfrm ) {
                if( tanc && astMapGet0A( tanc, key[ i ], &o ) ) {
@@ -1612,7 +1612,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                } else {
                   r = (AstRegion *) astInterval( tfrm, &lo, &hi, NULL, "", status );
                }
-      
+
 /* If there were earlier axes, extrude the current total region into the
    time axis, and use the extruded region as the new total region.*/
                if( t ) {
@@ -1620,14 +1620,14 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                   r = astAnnul( r );
                   (void) astAnnul( t );
                   t = tt;
-   
+
 /* If this is the first axis, use the region determined for this axis as
    the total Region.*/
                } else {
                   t = r;
                }
             }
-      
+
 /* Do the same for any spectral axis. */
             if( sfrm ) {
                if( sanc && astMapGet0A( sanc, key[ i ], &o ) ) {
@@ -1636,7 +1636,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                } else {
                   r = (AstRegion *) astInterval( sfrm, &lo, &hi, NULL, "", status );
                }
-      
+
                if( t ) {
                   tt = (AstRegion *) astPrism( t, r, "", status );
                   r = astAnnul( r );
@@ -1645,9 +1645,9 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                } else {
                   t = r;
                }
-      
+
             }
-      
+
 /* Do the same for any redshift axis. */
             if( rfrm ) {
                if( ranc && astMapGet0A( ranc, key[ i ], &o ) ) {
@@ -1656,7 +1656,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                } else {
                   r = (AstRegion *) astInterval( rfrm, &lo, &hi, NULL, "", status );
                }
-      
+
                if( t ) {
                   tt = (AstRegion *) astPrism( t, r, "", status );
                   r = astAnnul( r );
@@ -1666,7 +1666,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                   t = r;
                }
             }
-      
+
 /* If there is some non-null information for this item, replace the
    stored Frame with the Frame which has set Epoch/RefLat/etc, simplify the
    total Region and store it in the returned KeyMap. */
@@ -1679,7 +1679,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
             }
             if( t ) t = astAnnul( t );
          }
-   
+
 /* Return a NULL KeyMap pointer if the KeyMap is empty. */
          if( empty ) *anc = astAnnul( *anc );
       }
@@ -1708,10 +1708,10 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    }
 
 /* Return the result. */
-   return unc;     
+   return unc;
 }
 
-static AstObject *AstroCoordSystemReader( AstXmlChan *this, 
+static AstObject *AstroCoordSystemReader( AstXmlChan *this,
                                           AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -1725,7 +1725,7 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstObject *AstroCoordSystemReader( AstXmlChan *this, 
+*     AstObject *AstroCoordSystemReader( AstXmlChan *this,
 *                                        AstXmlElement *elem, int *status )
 
 *  Class Membership:
@@ -1733,13 +1733,13 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
 
 *  Description:
 *     This function makes a new AST Object from the supplied IVOA
-*     AstroCoordSystem element. This will be a Frame of some kind. 
+*     AstroCoordSystem element. This will be a Frame of some kind.
 *     If the AstroCoordSystem element contains only one sub-frame
 *     element, then the returned Frame will be of a suitable class
 *     to describe that sub-frame (SkyFrame, SpecFrame or TimeFrame).
 *     If the AstroCoordSystem element contains more than one sub-frame
-*     element, then the returned Frame will be a CmpFrame in which the 
-*     component Frames are in the order SpaceFrame, TimeFrame, 
+*     element, then the returned Frame will be a CmpFrame in which the
+*     component Frames are in the order SpaceFrame, TimeFrame,
 *     SpectralFrame, RedshiftFrame.
 
 *  Parameters:
@@ -1754,7 +1754,7 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
 *     A pointer to the new Object.
 
 *  Notes:
-*     - GenericCoordFrame sub-elements are currently ignored since it is not 
+*     - GenericCoordFrame sub-elements are currently ignored since it is not
 *     clear how they relate to the other sub-elements.
 
 */
@@ -1796,18 +1796,18 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
    if( scan ) {
 
 /* Create Frames from the found sub-elements */
-      comp[ 0 ] = scan->count[0] ? (AstFrame *) SpaceFrameReader( this, 
+      comp[ 0 ] = scan->count[0] ? (AstFrame *) SpaceFrameReader( this,
                                                    scan->el[ 0 ][ 0 ], status ) : NULL;
-      comp[ 1 ] = scan->count[1] ? (AstFrame *) TimeFrameReader( this, 
+      comp[ 1 ] = scan->count[1] ? (AstFrame *) TimeFrameReader( this,
                                                    scan->el[ 1 ][ 0 ], status ) : NULL;
-      comp[ 2 ] = scan->count[2] ? (AstFrame *) SpectralFrameReader( this, 
+      comp[ 2 ] = scan->count[2] ? (AstFrame *) SpectralFrameReader( this,
                                                    scan->el[ 2 ][ 0 ], status ) : NULL;
-      comp[ 3 ] = scan->count[3] ? (AstFrame *) RedshiftFrameReader( this, 
+      comp[ 3 ] = scan->count[3] ? (AstFrame *) RedshiftFrameReader( this,
                                                    scan->el[ 3 ][ 0 ], status ) : NULL;
 
 /* If more than one frame was obtained combine them into a CmpFrame. If
-   present, the Frames are stored in the order SpaceFrame, TimeFrame, 
-   SpectralFrame, RedshiftFrame. Shuffle the the higher elements of the 
+   present, the Frames are stored in the order SpaceFrame, TimeFrame,
+   SpectralFrame, RedshiftFrame. Shuffle the the higher elements of the
    "comp" array down to fill any NULL elements. */
       j = 0;
       for( i = 0; i < 4; i++ ) {
@@ -1818,24 +1818,24 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
 
 /* Fill any unused elements at the end with NULL. */
       for( ; j < 4; j++ ) comp[ j ] = NULL;
-   
+
 /* If no Frames were read issue a fatal error. */
       if( !comp[ 0 ] ) {
          Report( this, elem, FAILURE, "contains no usable coordinate axes", status );
-   
+
 /* If only one Frame was read return a clone of its pointer. */
       } else if( !comp[ 1 ] ) {
          new = astClone( comp[ 0 ] );
-   
+
 /* If two or more Frames were read, create a CmpFrame holding the Frames. */
       } else if( !comp[ 2 ] ) {
          new = (AstObject *) astCmpFrame( comp[ 0 ], comp[ 1 ], "", status );
-   
+
       } else if( !comp[ 3 ] ) {
          tmp = astCmpFrame( comp[ 0 ], comp[ 1 ], "", status );
          new = (AstObject *) astCmpFrame( tmp, comp[ 2 ], "", status );
          tmp = astAnnul( tmp );
-   
+
       } else {
          tmp = astCmpFrame( comp[ 0 ], comp[ 1 ], "", status );
          (void) astAnnul( comp[ 0 ] );
@@ -1844,12 +1844,12 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
          new = (AstObject *) astCmpFrame( tmp, comp[ 3 ], "", status );
          tmp = astAnnul( tmp );
       }
-   
-/* Get the ID attribute from the AstroCoordSystem element and store in the 
+
+/* Get the ID attribute from the AstroCoordSystem element and store in the
    returned Frame. */
       id = astXmlGetAttributeValue( elem, "ID" );
       if( id ) astSetIdent( new, id );
-   
+
 /* Free resources */
       for( i = 0; i < 4; i++ ) {
          if( comp[ i ] ) comp[ i ] = astAnnul( comp[ i ] );
@@ -1857,7 +1857,7 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
       scan = FreeIVOAScan( scan, status );
 
    }
-      
+
 /* Annul any returned Frame if an error has occurred. */
    if( !astOK ) new = astAnnul( new );
 
@@ -1865,7 +1865,7 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
    return new;
 }
 
-static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem, 
+static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstTimeFrame *frm, int *status ){
 /*
 *  Name:
@@ -1879,15 +1879,15 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem, 
+*     double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
 *                              AstTimeFrame *frm )
 
 *  Class Membership:
 *     XmlChan member function.
 
 *  Description:
-*     This function returns a double representing the time specified by 
-*     the supplied IVOA AstronTime element, converted into the system 
+*     This function returns a double representing the time specified by
+*     the supplied IVOA AstronTime element, converted into the system
 *     represented by the supplied Frame.
 
 *  Parameters:
@@ -1895,10 +1895,10 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA AstronTime element.
-*     frm 
+*     frm
 *        Pointer to the TimeFrame in which the returned value should be
 *        defined. Relevant attributes which are not set will be set by
-*        this function if possible. 
+*        this function if possible.
 
 *  Returned Value:
 *     The time value, in the system described by "frm".
@@ -1961,7 +1961,7 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
          if( !astTestTimeScale( frm ) ) astSetTimeScale( frm, ts );
       }
 
-/* If a JDTime element was found, get its value and set the TimeFrame System 
+/* If a JDTime element was found, get its value and set the TimeFrame System
    values. */
       time_type = astXmlGetName( scan->el[0][0] );
       if( !strcmp( "JDTime", time_type ) ) {
@@ -1996,9 +1996,9 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
       astSetD( cfrm, "TimeOrigin", val );
 
 /* If the supplied Frame has no set TimeOrigin, also use the value
-   obtained above as the TimeOrigin in "frm". Convert it into the supplied 
-   TimeFrame, and set it. Note zero is used as the axis value in cfrm 
-   because the relevant epoch is zero distance away from the cfrm 
+   obtained above as the TimeOrigin in "frm". Convert it into the supplied
+   TimeFrame, and set it. Note zero is used as the axis value in cfrm
+   because the relevant epoch is zero distance away from the cfrm
    TimeOrigin (set above). */
       if( !astTestTimeOrigin( frm ) ) {
 
@@ -2012,7 +2012,7 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
             sprintf( buff, "contains inconsistent timescale (%s)",
                      astGetC( cfrm, "timescale" ) );
             Report( this, elem, FAILURE, buff, status );
-         } 
+         }
       }
 
 /* If an TimeOffset element was found, get its value and the value of its
@@ -2040,7 +2040,7 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
          sprintf( buff, "contains inconsistent timescale (%s)",
                   astGetC( cfrm, "timescale" ) );
          Report( this, elem, FAILURE, buff, status );
-      } 
+      }
 
 /* Free resources. */
       cfrm = astAnnul( cfrm );
@@ -2081,7 +2081,7 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -2184,7 +2184,7 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
    }
 }
 
-static double AttrValueD( AstXmlChan *this, AstXmlElement *elem, 
+static double AttrValueD( AstXmlChan *this, AstXmlElement *elem,
                           const char *name, double def, int *status ) {
 /*
 *  Name:
@@ -2198,11 +2198,11 @@ static double AttrValueD( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     double AttrValueD( AstXmlChan *this, AstXmlElement *elem, 
+*     double AttrValueD( AstXmlChan *this, AstXmlElement *elem,
 *                        const char *name, double def, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function returns the value of a named attribute of an XML
@@ -2217,9 +2217,9 @@ static double AttrValueD( AstXmlChan *this, AstXmlElement *elem,
 *        Pointer to the XmlElement.
 *     name
 *        Pointer to a constant null-terminated character string
-*        containing the name of the required attribute value. 
+*        containing the name of the required attribute value.
 *     def
-*        If the supplied element does not have the requried attribute, then 
+*        If the supplied element does not have the requried attribute, then
 *        this value will be returned instead.
 *     status
 *        Pointer to the inherited status variable.
@@ -2236,7 +2236,7 @@ static double AttrValueD( AstXmlChan *this, AstXmlElement *elem,
    int nc;                       /* Number of characters read by astSscanf */
    int nf;                       /* Number of matching fields */
    int len;                      /* Length of attribute string */
-   
+
 /* Initialise. */
    result = def;
 
@@ -2246,7 +2246,7 @@ static double AttrValueD( AstXmlChan *this, AstXmlElement *elem,
 /* Get the attribute value as a string. */
    value = astXmlGetAttributeValue( elem, name );
 
-/* If the attribute exists, attempt to decode the string to give a double 
+/* If the attribute exists, attempt to decode the string to give a double
    value, checking that the entire string is read. */
    if( value ) {
       nc = 0;
@@ -2281,12 +2281,12 @@ static int AttrValueI( AstXmlChan *this, AstXmlElement *elem, const char *name,
 *                     int def )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
-*     This function returns the value of a named attribute of an XML element 
-*     as an integer value. A report is made if the attribute value is not 
-*     integer. The supplied default value is returned if the attribute is not 
+*     This function returns the value of a named attribute of an XML element
+*     as an integer value. A report is made if the attribute value is not
+*     integer. The supplied default value is returned if the attribute is not
 *     present.
 
 *  Parameters:
@@ -2296,9 +2296,9 @@ static int AttrValueI( AstXmlChan *this, AstXmlElement *elem, const char *name,
 *        Pointer to the XmlElement.
 *     name
 *        Pointer to a constant null-terminated character string
-*        containing the name of the required attribute value. 
+*        containing the name of the required attribute value.
 *     def
-*        If the supplied element does not have the requried attribute, then 
+*        If the supplied element does not have the requried attribute, then
 *        this value will be returned instead.
 
 *  Returned Value:
@@ -2313,7 +2313,7 @@ static int AttrValueI( AstXmlChan *this, AstXmlElement *elem, const char *name,
    int nc;                       /* Number of characters read by astSscanf */
    int nf;                       /* Number of matching fields */
    int len;                      /* Length of attribute string */
-   
+
 /* Initialise. */
    result = def;
 
@@ -2358,12 +2358,12 @@ static int AttrValueB( AstXmlChan *this, AstXmlElement *elem, const char *name,
 *                     int def, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
-*     This function returns the value of a named attribute of an XML element 
-*     as a boolean. A report is made if the attribute value is not 
-*     boolean. The supplied default value is returned if the attribute is not 
+*     This function returns the value of a named attribute of an XML element
+*     as a boolean. A report is made if the attribute value is not
+*     boolean. The supplied default value is returned if the attribute is not
 *     present.
 
 *  Parameters:
@@ -2373,9 +2373,9 @@ static int AttrValueB( AstXmlChan *this, AstXmlElement *elem, const char *name,
 *        Pointer to the XmlElement.
 *     name
 *        Pointer to a constant null-terminated character string
-*        containing the name of the required attribute value. 
+*        containing the name of the required attribute value.
 *     def
-*        If the supplied element does not have the requried attribute, then 
+*        If the supplied element does not have the requried attribute, then
 *        this value will be returned instead.
 *     status
 *        Pointer to the inherited status variable.
@@ -2394,7 +2394,7 @@ static int AttrValueB( AstXmlChan *this, AstXmlElement *elem, const char *name,
 /* Define the recognised true and false strings. */
    const char *true[ 5 ] = { "true", "TRUE", "yes", "YES", "1" };
    const char *false[ 5 ] = { "false", "FALSE", "no", "NO", "0" };
-   
+
 /* Initialise. */
    result = def;
 
@@ -2420,7 +2420,7 @@ static int AttrValueB( AstXmlChan *this, AstXmlElement *elem, const char *name,
          }
       }
 
-/* If not, see if the attribute value is equal to (or an abbreviation of) any 
+/* If not, see if the attribute value is equal to (or an abbreviation of) any
    of the false strings. */
       if( result == -1 ) {
          for( i = 0; i < 5; i++ ) {
@@ -2443,7 +2443,7 @@ static int AttrValueB( AstXmlChan *this, AstXmlElement *elem, const char *name,
    return result;
 }
 
-static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
                              AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -2457,7 +2457,7 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
 *                           AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -2465,14 +2465,14 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Box element. 
+*     Box element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Box element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -2585,7 +2585,7 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
          cfrm = astCopy( frm );
          astSetUnit( cfrm, 0, unit );
          astSetUnit( cfrm, 1, unit );
-   
+
 /* Create a Polygon within this modified Frame. */
          new = (AstRegion *) astPolygon( frm, 4, 4, pos, NULL, "", status );
 
@@ -2600,14 +2600,14 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
                if( strcmp( funit, unit ) ) astSetUnit( new, i, funit );
             } else {
                astSetUnit( frm, i, unit );
-            }          
-         }          
+            }
+         }
 
 /* Free resources */
          cfrm = astAnnul( cfrm );
       }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
 
@@ -2622,7 +2622,7 @@ static AstRegion *BoxReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -2636,7 +2636,7 @@ static AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem,
 *                              AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -2644,14 +2644,14 @@ static AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Circle element. 
+*     Circle element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Circle element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -2735,7 +2735,7 @@ static AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem,
          cfrm = astCopy( frm );
          astSetUnit( cfrm, 0, unit );
          astSetUnit( cfrm, 1, unit );
-   
+
 /* Create a Circle within this modified Frame. */
          new = (AstRegion *) astCircle( cfrm, 1, cen, &rad, NULL, "", status );
 
@@ -2750,15 +2750,15 @@ static AstRegion *CircleReader( AstXmlChan *this, AstXmlElement *elem,
                if( strcmp( funit, unit ) ) astSetUnit( new, i, funit );
             } else {
                astSetUnit( frm, i, unit );
-            }          
-         }          
+            }
+         }
 
 /* Free resources */
          cfrm = astAnnul( cfrm );
 
       }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
 
@@ -2840,7 +2840,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    }
 }
 
-static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
                                     AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -2862,14 +2862,14 @@ static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Constraint element. 
+*     Constraint element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Constraint element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. The Unit attribute is assumed to be set to "rad".
 *     status
@@ -2908,7 +2908,7 @@ static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
 /* If succesfull.. */
    if( scan ) {
 
-/* Get the vector and convert from 3D cartesian to a 2D long/lat centre 
+/* Get the vector and convert from 3D cartesian to a 2D long/lat centre
    position, in radians. */
       vec[0] = 1.0;
       vec[1] = 0.0;
@@ -2922,7 +2922,7 @@ static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
 /* Create the Circle. */
       new = (AstRegion *) astCircle( frm, 1, cen, &rad, NULL, "", status );
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
 
@@ -2937,7 +2937,7 @@ static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -2951,7 +2951,7 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
 *                              AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -2959,14 +2959,14 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Convex element. 
+*     Convex element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Convex element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -3013,7 +3013,7 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
       }
 
 /* Unless the supplied Frame is a SkyFrame (which handles the Unit
-   attribute unusually), take a copy of the supplied Frame and set its 
+   attribute unusually), take a copy of the supplied Frame and set its
    units to radians. */
       issky = astIsASkyFrame( frm );
       if( issky ) {
@@ -3025,7 +3025,7 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
       }
 
 /* Create Regions from all the component Constraint elements, and combine
-   them into nested CmpRegions, using the boolean AND operator to combine 
+   them into nested CmpRegions, using the boolean AND operator to combine
    them. */
       new = ConstraintReader( this, scan->el[0][0], cfrm, status );
       for( i = 1; i < scan->count[0]; i++ ) {
@@ -3046,7 +3046,7 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Get any fill factor from the element and assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       cfrm = astAnnul( cfrm );
       scan = FreeIVOAScan( scan, status );
@@ -3060,7 +3060,7 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
 }
 
 
-static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                            const char *unit, AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -3082,7 +3082,7 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Coord2VecInterval element. 
+*     Coord2VecInterval element.
 
 *  Parameters:
 *     this
@@ -3092,7 +3092,7 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
 *     unit
 *        A string holding the units in which the axis values are stored
 *        in the supplied element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -3142,7 +3142,7 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
       hilimit[0] = AST__BAD;
       hilimit[1] = AST__BAD;
       if( scan->count[1] ) ElemListD( this, scan->el[1][0], 2, hilimit, status );
-   
+
 /* Since the SkyFrame class does not have active Units we must handle it
    separately. */
       if( astIsASkyFrame( frm ) ) {
@@ -3159,7 +3159,7 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
 
 /* If at least one limit was found, create an Interval within the supplied
    Frame. Otherwise create a negated NullRegion. */
-         if( lolimit[ 0 ] != AST__BAD || lolimit[ 1 ] != AST__BAD || 
+         if( lolimit[ 0 ] != AST__BAD || lolimit[ 1 ] != AST__BAD ||
              hilimit[ 0 ] != AST__BAD || hilimit[ 1 ] != AST__BAD ) {
             new = (AstRegion *) astInterval( frm, lolimit, hilimit, NULL, "", status );
          } else {
@@ -3169,20 +3169,20 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
 /* Now handles Frames other than SkyFrames. */
       } else {
 
-/* Take a copy of the supplied Frame and set its Unit attribute to the 
+/* Take a copy of the supplied Frame and set its Unit attribute to the
    supplied value. */
          cfrm = astCopy( frm );
          astSetUnit( cfrm, 0, unit );
-   
+
 /* If at least one limit was found, create an Interval within this
    modified Frame. Otherwise create a negated NullRegion. */
-         if( lolimit[ 0 ] != AST__BAD || lolimit[ 1 ] != AST__BAD || 
+         if( lolimit[ 0 ] != AST__BAD || lolimit[ 1 ] != AST__BAD ||
              hilimit[ 0 ] != AST__BAD || hilimit[ 1 ] != AST__BAD ) {
             new = (AstRegion *) astInterval( cfrm, lolimit, hilimit, NULL, "", status );
          } else {
             new = (AstRegion *) astNullRegion( cfrm, NULL, "negated=1", status );
          }
-      
+
 /* If the supplied units differ from that of the supplied Frame, set the
    units in the Region to those of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the required units. If the supplied
@@ -3192,16 +3192,16 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
             if( strcmp( funit, unit ) ) astSetUnit( new, 0, funit );
          } else {
             astSetUnit( frm, 0, unit );
-         }          
+         }
 
 /* Free resources */
          cfrm = astAnnul( cfrm );
       }
-   
-/* Get any fill factor and lo/hi_include attributes from the element and 
+
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       scan = FreeIVOAScan( scan, status );
    }
@@ -3213,7 +3213,7 @@ static AstRegion *Coord2VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
    return new;
 }
 
-static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                            const char *unit, AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -3235,7 +3235,7 @@ static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Coord3VecInterval element. 
+*     Coord3VecInterval element.
 
 *  Parameters:
 *     this
@@ -3245,7 +3245,7 @@ static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
 *     unit
 *        A string holding the units in which the axis values are stored
 *        in the supplied element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -3297,11 +3297,11 @@ static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
       hilimit[2] = AST__BAD;
       if( scan->count[1] ) ElemListD( this, scan->el[1][0], 3, hilimit, status );
 
-/* Take a copy of the supplied Frame and set its Unit attribute to the 
+/* Take a copy of the supplied Frame and set its Unit attribute to the
    supplied value. */
       cfrm = astCopy( frm );
       astSetUnit( cfrm, 0, unit );
-   
+
 /* If at least one limit was found, create an Interval within this
    modified Frame. Otherwise create a negated NullRegion. */
       if( lolimit[ 0 ] != AST__BAD || lolimit[ 1 ] != AST__BAD ||
@@ -3312,7 +3312,7 @@ static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
       } else {
          new = (AstRegion *) astNullRegion( cfrm, NULL, "negated=1", status );
       }
-   
+
 /* If the supplied units differ from that of the supplied Frame, set the
    units in the Region to those of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the required units. If the supplied
@@ -3322,12 +3322,12 @@ static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
          if( strcmp( funit, unit ) ) astSetUnit( new, 0, funit );
       } else {
          astSetUnit( frm, 0, unit );
-      }          
-   
-/* Get any fill factor and lo/hi_include attributes from the element and 
+      }
+
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       cfrm = astAnnul( cfrm );
       scan = FreeIVOAScan( scan, status );
@@ -3340,7 +3340,7 @@ static AstRegion *Coord3VecIntervalReader( AstXmlChan *this, AstXmlElement *elem
    return new;
 }
 
-static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                              const char *unit, AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -3362,7 +3362,7 @@ static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *el
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     CoordScalarInterval element. 
+*     CoordScalarInterval element.
 
 *  Parameters:
 *     this
@@ -3372,7 +3372,7 @@ static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *el
 *     unit
 *        A string holding the units in which the axis values are stored
 *        in the supplied element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -3416,12 +3416,12 @@ static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *el
 /* Get the limits. */
       lolimit = scan->count[0] ? ElemValueD( this, scan->el[0][0], 0.0, status ) : AST__BAD;
       hilimit = scan->count[1] ? ElemValueD( this, scan->el[1][0], 0.0, status ) : AST__BAD;
-   
-/* Take a copy of the supplied Frame and set its Unit attribute to the 
+
+/* Take a copy of the supplied Frame and set its Unit attribute to the
    supplied value. */
       cfrm = astCopy( frm );
       astSetUnit( cfrm, 0, unit );
-   
+
 /* If at least one limit was found, create an Interval within this
    modified Frame. Otherwise create a negated NullRegion. */
       if( lolimit != AST__BAD || hilimit != AST__BAD ) {
@@ -3429,7 +3429,7 @@ static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *el
       } else {
          new = (AstRegion *) astNullRegion( cfrm, NULL, "negated=1", status );
       }
-   
+
 /* If the supplied units differ from that of the supplied Frame, set the
    units in the Region to those of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the required units. If the supplied
@@ -3439,12 +3439,12 @@ static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *el
          if( strcmp( funit, unit ) ) astSetUnit( new, 0, funit );
       } else {
          astSetUnit( frm, 0, unit );
-      }          
-   
-/* Get any fill factor and lo/hi_include attributes from the element and 
+      }
+
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       cfrm = astAnnul( cfrm );
       scan = FreeIVOAScan( scan, status );
@@ -3457,7 +3457,7 @@ static AstRegion *CoordScalarIntervalReader( AstXmlChan *this, AstXmlElement *el
    return new;
 }
 
-static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n, 
+static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
                       double *vals, int *status ) {
 /*
 *  Name:
@@ -3471,11 +3471,11 @@ static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n, 
+*     int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
 *                    double *vals, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function reads the content of the supplied element, converts its
@@ -3491,8 +3491,8 @@ static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
 *     elem
 *        Pointer to the XmlElement.
 *     n
-*        The maximum number of floating point values to read from the supplied 
-*        element. 
+*        The maximum number of floating point values to read from the supplied
+*        element.
 *     values
 *        Pointer to an array to hold the values read. This should have at
 *        least "n" elements. Any unused elements are left unchanged.
@@ -3508,7 +3508,7 @@ static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
    AstXmlContentItem *item;  /* Item no. "i" */
    char *text;               /* Pointer to string holding formatted item */
    char buff[200];           /* Message buffer */
-   const char *p;            /* Pointer to start of remaining text */   
+   const char *p;            /* Pointer to start of remaining text */
    const char *value;        /* Pointer to element value */
    double dval;              /* Value read from string */
    int i;                    /* Index of current item */
@@ -3529,7 +3529,7 @@ static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
 
 /* Loop through all content items within the supplied element. */
    nitem = astXmlGetNitem( elem );
-   for( i = 0; i < nitem; i++ ) {   
+   for( i = 0; i < nitem; i++ ) {
       item = astXmlGetItem( elem, i );
 
 /* If this is non-blank character data, attempt to read values from it. */
@@ -3574,7 +3574,7 @@ static int ElemListD( AstXmlChan *this, AstXmlElement *elem, int n,
                   break;
                }
             }
-         } 
+         }
 
 /* If this is not character data, nor a comment, issue a warning. */
       } else if( !astXmlCheckType( item, AST__XMLWHITE ) &&
@@ -3610,12 +3610,12 @@ static double ElemValueD( AstXmlChan *this, AstXmlElement *elem, double def, int
 *     double ElemValueD( AstXmlChan *this, AstXmlElement *elem, double def )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function reads the content of the supplied element, converts its
-*     contents to a floating point value and returns this value. A report is 
-*     made if the element value is not floating point. The supplied default 
+*     contents to a floating point value and returns this value. A report is
+*     made if the element value is not floating point. The supplied default
 *     value is returned if the element is not present.
 
 *  Parameters:
@@ -3637,7 +3637,7 @@ static double ElemValueD( AstXmlChan *this, AstXmlElement *elem, double def, int
    double result;                /* Value to be returned */
    int nc;                       /* Number of characters read by astSscanf */
    int ok;                       /* Value read OK? */
-   
+
 /* Initialise. */
    result = def;
 
@@ -3649,7 +3649,7 @@ static double ElemValueD( AstXmlChan *this, AstXmlElement *elem, double def, int
 
 /* Get the element value as a string. */
    value = astXmlGetValue( elem, 0 );
-     
+
 /* If succesful, convert the value to floating point. */
    if( value ) {
       nc = 0;
@@ -3667,7 +3667,7 @@ static double ElemValueD( AstXmlChan *this, AstXmlElement *elem, double def, int
    return result;
 }
 
-static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
                                  AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -3681,7 +3681,7 @@ static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
 *                               AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -3689,14 +3689,14 @@ static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Ellipse element. 
+*     Ellipse element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Ellipse element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -3759,7 +3759,7 @@ static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
       ElemListD( this, scan->el[1][0], 2, cen, status );
 
 /* Get the position angle. This is returned in the AST convention, i.e.
-   measured in radians from from +ve second axis through positive first 
+   measured in radians from from +ve second axis through positive first
    axis. */
       pa = PosAngleReader( this, scan->el[3][0], status );
 
@@ -3796,7 +3796,7 @@ static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
          cfrm = astCopy( frm );
          astSetUnit( cfrm, 0, unit );
          astSetUnit( cfrm, 1, unit );
-   
+
 /* Create a Ellipse within this modified Frame. */
          new = (AstRegion *) astEllipse( cfrm, 1, cen, rad, &pa, NULL, "", status );
 
@@ -3811,14 +3811,14 @@ static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
                if( strcmp( funit, unit ) ) astSetUnit( new, i, funit );
             } else {
                astSetUnit( frm, i, unit );
-            }          
-         }          
+            }
+         }
 
 /* Free resources */
          cfrm = astAnnul( cfrm );
       }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
 
@@ -3833,7 +3833,7 @@ static AstRegion *EllipseReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static double Error2PAReader( AstXmlChan *this, AstXmlElement *elem, 
+static double Error2PAReader( AstXmlChan *this, AstXmlElement *elem,
                               double *size, int *status ){
 /*
 *  Name:
@@ -3847,7 +3847,7 @@ static double Error2PAReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     double Error2PAReader( AstXmlChan *this, AstXmlElement *elem, 
+*     double Error2PAReader( AstXmlChan *this, AstXmlElement *elem,
 *                            double *size, int *status )
 
 *  Class Membership:
@@ -3869,7 +3869,7 @@ static double Error2PAReader( AstXmlChan *this, AstXmlElement *elem,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The position angle of the first error size, in radians, from positive 
+*     The position angle of the first error size, in radians, from positive
 *     second axis to positive first axis.
 
 */
@@ -3903,7 +3903,7 @@ static double Error2PAReader( AstXmlChan *this, AstXmlElement *elem,
       ElemListD( this, scan->el[0][0], 2, size, status );
 
 /* Get the position angle. This is returned in the AST convention, i.e.
-   measured in radians from from +ve second axis through positive first 
+   measured in radians from from +ve second axis through positive first
    axis. */
       pa = PosAngleReader( this, scan->el[1][0], status );
 
@@ -3942,7 +3942,7 @@ static void FillAndLims( AstXmlChan *this, AstXmlElement *elem, AstRegion *new, 
 
 *  Parameters:
 *     this
-*        Pointer to the XmlChan in which to store warnings. 
+*        Pointer to the XmlChan in which to store warnings.
 *     elem
 *        Pointer to the AstXmlElement to search.
 *     new
@@ -3964,7 +3964,7 @@ static void FillAndLims( AstXmlChan *this, AstXmlElement *elem, AstRegion *new, 
    ff = AttrValueD( this, elem, "fill_factor", AST__BAD, status );
    if( ff != AST__BAD ) astSetFillFactor( new, ff );
 
-/* Get the flags indicating if the limits are included in the interval. 
+/* Get the flags indicating if the limits are included in the interval.
    If either of the limits is not included in the interval, then make the
    Region open. Assume a default of true ("included") if the attribute is
    missing. */
@@ -4039,7 +4039,7 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name, int *st
 /* Check we have a container to search. */
    if( !this->container ) {
       astError( AST__INTER, "astRead(XmlChan): No container before reading "
-                "values for a %s (internal AST programming error).", status, 
+                "values for a %s (internal AST programming error).", status,
                 astXmlGetName( this->container ) );
    }
 
@@ -4063,12 +4063,12 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name, int *st
                if( !def || strcmp( def, TRUE ) ) {
 
 /* If this ATTR element has an XML attribute called NAME with
-   the required value (case-insensitive), we may have found a matching 
+   the required value (case-insensitive), we may have found a matching
    element. */
                    xmlname = astXmlGetAttributeValue( item, NAME );
                    if( xmlname && !Ustrcmp( xmlname, name, status ) ) {
 
-/* Ignore the attribute if it does not belong to the correct part of the 
+/* Ignore the attribute if it does not belong to the correct part of the
    object's class hierarchy. If it does, we have found the required
    attribute. */
                       definedby = astXmlGetAttributeValue( item, DEFINEDBY );
@@ -4087,7 +4087,7 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name, int *st
    return result;
 }
 
-static AstXmlElement *FindElement( AstXmlChan *this, AstXmlElement *elem, 
+static AstXmlElement *FindElement( AstXmlChan *this, AstXmlElement *elem,
                                    const char *name, int *status ) {
 /*
 *  Name:
@@ -4101,20 +4101,20 @@ static AstXmlElement *FindElement( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstXmlElement *FindElement( AstXmlChan *this, AstXmlElement *elem, 
+*     AstXmlElement *FindElement( AstXmlChan *this, AstXmlElement *elem,
 *                                 const char *name, int *status )
 
 *  Class Membership:
 *     XmlChan member function.
 
 *  Description:
-*     This function searches the content of the supplied element looking for 
+*     This function searches the content of the supplied element looking for
 *     an element with the supplied Name. No error is reported if the element
 *     is not found, but a Warning is issued if it found more than once.
 
 *  Parameters:
 *     this
-*        Pointer to the XmlChan in which to store warnings. 
+*        Pointer to the XmlChan in which to store warnings.
 *     elem
 *        Pointer to the AstXmlElement to search.
 *     name
@@ -4128,7 +4128,7 @@ static AstXmlElement *FindElement( AstXmlChan *this, AstXmlElement *elem,
 * Notes:
 *     - If the supplied element contains more than one element with the
 *     given name, the returned pointer locates the first element
-*     encountered with the required name, and a WARNING is issued that the 
+*     encountered with the required name, and a WARNING is issued that the
 *     second and subsequent elements will be ignored.
 
 */
@@ -4245,7 +4245,7 @@ static IVOAReader FindIVOAClass( AstXmlElement *elem, int *is_ivoa, int *status 
 /* Get the namespace URI for the element, and see if it contains
    sub-strings "STC" (or "stc") and "IVOA" (or "ivoa"). */
    uri = astXmlGetURI( elem );
-   if( uri ) { 
+   if( uri ) {
       stc = strstr( uri, "STC" );
       if( !stc ) stc = strstr( uri, "stc" );
       ivoa = strstr( uri, "IVOA" );
@@ -4255,7 +4255,7 @@ static IVOAReader FindIVOAClass( AstXmlElement *elem, int *is_ivoa, int *status 
       stc = NULL;
       ivoa = NULL;
    }
-   
+
 /* If it is a known IVOA namespace, proceed. */
    if( name && ( stc || ivoa ) ){
       *is_ivoa = 1;
@@ -4327,7 +4327,7 @@ static const char *FindNextIsA( AstXmlElement *elem, int start, int *status ) {
 *     This function searches the content of the specified element,
 *     starting at the item with the speicfied index, until it finds the
 *     next "isa" element. It returns the value of the "class" attribute
-*     of the found "isa" element, or the name of the supplied element 
+*     of the found "isa" element, or the name of the supplied element
 *     if no "isa" element is found.
 
 *  Parameters:
@@ -4358,7 +4358,7 @@ static const char *FindNextIsA( AstXmlElement *elem, int start, int *status ) {
 /* Loop round all items contained in the element, starting at the given
    index. */
    nitem = astXmlGetNitem( elem );
-   for( i = start; i < nitem; i++ ) {   
+   for( i = start; i < nitem; i++ ) {
       item = astXmlGetItem( elem, i );
 
 /* Check this item is an XmlElement with name ISA. */
@@ -4366,13 +4366,13 @@ static const char *FindNextIsA( AstXmlElement *elem, int start, int *status ) {
          if( astOK && !strcmp( astXmlGetName( item ), ISA ) ) {
 
 /* The returned string is the value of the "class" attribute of this
-   element. */ 
+   element. */
             result = astXmlGetAttributeValue( item, "class" );
 
 /* Report an error if the element does not have a class attribute. */
             if( !result && astOK ) {
                astError( AST__BADIN, "astRead(XmlChan): The tag %s "
-                         "does not include a \"class\" attribute.", status, 
+                         "does not include a \"class\" attribute.", status,
                          GetTag( (AstXmlObject *) item, 1, status ) );
             }
 
@@ -4449,7 +4449,7 @@ static AstXmlElement *FindObject( AstXmlChan *this, const char *name, int *statu
 /* Check we have a container to search. */
    if( !this->container ) {
       astError( AST__INTER, "astRead(XmlChan): No container before reading "
-                "values for a %s (internal AST programming error).", status, 
+                "values for a %s (internal AST programming error).", status,
                 astXmlGetName( this->container ) );
    }
 
@@ -4476,7 +4476,7 @@ static AstXmlElement *FindObject( AstXmlChan *this, const char *name, int *statu
                    xmlname = astXmlGetAttributeValue( item, LABEL );
                    if( xmlname && !Ustrcmp( xmlname, name, status ) ) {
 
-/* Ignore the element if it does not belong to the correct part of the 
+/* Ignore the element if it does not belong to the correct part of the
    object's class hierarchy. If it does, we have found the required
    object. */
                       definedby = astXmlGetAttributeValue( item, DEFINEDBY );
@@ -4495,8 +4495,8 @@ static AstXmlElement *FindObject( AstXmlChan *this, const char *name, int *statu
    return result;
 }
 
-static int FindString( int n, const char *list[], const char *test, 
-                       const char *text, const char *method, 
+static int FindString( int n, const char *list[], const char *test,
+                       const char *text, const char *method,
                        const char *class, int *status ){
 /*
 *  Name:
@@ -4510,7 +4510,7 @@ static int FindString( int n, const char *list[], const char *test,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     int FindString( int n, const char *list[], const char *test, 
+*     int FindString( int n, const char *list[], const char *test,
 *                     const char *text, const char *method, const char *class, int *status )
 
 *  Class Membership:
@@ -4537,7 +4537,7 @@ static int FindString( int n, const char *list[], const char *test,
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
-*     class 
+*     class
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
 *     status
@@ -4550,7 +4550,7 @@ static int FindString( int n, const char *list[], const char *test,
 *  Notes:
 *     -  A value of -1 is returned if an error has already occurred, or
 *     if this function should fail for any reason (for instance if the
-*     supplied option is not specified in the supplied list). 
+*     supplied option is not specified in the supplied list).
 
 */
 
@@ -4617,14 +4617,14 @@ static IVOAScan *FreeIVOAScan( IVOAScan *in, int *status ){
 
 /* Free the arrays holding the element pointers. */
       for( j = 0; j < in->n; j++ ) {
-         in->count[ j ] = 0;         
+         in->count[ j ] = 0;
          in->el[ j ] = astFree( in->el[ j ] );
       }
 
-/* Free the array holding the pointers to the arrays holding the element 
+/* Free the array holding the pointers to the arrays holding the element
    pointers. */
       in->el = astFree( in->el );
-   
+
 /* Free the array holding the number of element pointers stored. */
       in->count = astFree( in->count );
 
@@ -4659,8 +4659,8 @@ static void Geod( double lat, double lon, double *phi, double *lambda, int *stat
 
 *  Description:
 *     This function converts a position supplied as geocentric lat/lon at
-*     sea level into geodetic longitude, latitude. The algorithm is due to 
-*     Borkowski, and is described in the Explanatory Supplement to the 
+*     sea level into geodetic longitude, latitude. The algorithm is due to
+*     Borkowski, and is described in the Explanatory Supplement to the
 *     Astronomical Almanac (p206).
 
 *  Parameters:
@@ -4694,8 +4694,8 @@ static void Geod( double lat, double lon, double *phi, double *lambda, int *stat
    if( !astOK ) return;
 
 /* Convert the supplied geocentric lon/lat to terrestrial Cartesian
-   (x,y,z) values. The (x,y,z) system has origin at the centre of the 
-   earth, Z axis going through the north pole, X axis at (long,lat)=(0,0), 
+   (x,y,z) values. The (x,y,z) system has origin at the centre of the
+   earth, Z axis going through the north pole, X axis at (long,lat)=(0,0),
    and Y axis at (long,lat) = (E90,0). Assume an equatorial sea level
    position. */
    palSlaDcs2c( lon, lat, pos );
@@ -4718,7 +4718,7 @@ static void Geod( double lat, double lon, double *phi, double *lambda, int *stat
       sn = -1.0;
    }
 
-/* If the supplied position is on the polar axis, the returned values are 
+/* If the supplied position is on the polar axis, the returned values are
    trivial. We check this case because it corresponds to a singularity in
    the main algorithm. */
    r = sqrt( pos[ 0 ]*pos[ 0 ] + pos[ 1 ]*pos[ 1 ] );
@@ -4726,7 +4726,7 @@ static void Geod( double lat, double lon, double *phi, double *lambda, int *stat
       *lambda = 0.0;
       *phi = AST__DPIBY2;
 
-   } else {   
+   } else {
 
 /* The longitude is unchanged. */
       *lambda = lon;
@@ -4761,7 +4761,7 @@ static void Geod( double lat, double lon, double *phi, double *lambda, int *stat
    }
 }
 #undef FL
-#undef A0  
+#undef A0
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
@@ -4821,10 +4821,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the XmlChan structure. */
@@ -5009,14 +5009,14 @@ static char GetNextChar( void *data, int *status ) {
 *     char GetNextChar( void *data, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function returns the next character from the XML source,
 *     getting a new string if necessary.
 
 *  Parameters:
-*     data 
+*     data
 *        Pointer to a structure holding data needed to perform the read.
 *        This should be a pointer to the XmlChan being read. If NULL is
 *        supplied, then any internal resources are freed and a value of
@@ -5044,7 +5044,7 @@ static char GetNextChar( void *data, int *status ) {
 /* Get a pointer to the XmlChan. */
    this = (AstXmlChan *) data;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this);
 
 /* If a NULL pointer is supplied free any memory holding text already
@@ -5122,18 +5122,18 @@ static const char *GetTag( AstXmlObject *this, int opening, int *status ){
 *        Pointer to the XmlObject.
 *     opening
 *        Indicates which tag is to be returned; the start tag or the end
-*        tag. If non-zero the start tag is returned. Otherwise, the 
+*        tag. If non-zero the start tag is returned. Otherwise, the
 *        end tag is returned. If the supplied XmlObject has no end
-*        tag (i.e. if it is an empty element, or if it is not an element), 
+*        tag (i.e. if it is an empty element, or if it is not an element),
 *        then NULL is returned but no error is reported.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to a null terminated static string holding the tag. 
+*     Pointer to a null terminated static string holding the tag.
 
 *  Notes:
-*     - Empty elements are represented as an start tag of the form <.../>, 
+*     - Empty elements are represented as an start tag of the form <.../>,
 *     with no corresponding end tag.
 *     - NULL is returned if an error has already occurred, or if this
 *     function should fail for any reason.
@@ -5166,19 +5166,19 @@ static const char *GetTag( AstXmlObject *this, int opening, int *status ){
 
 /* If not, just use astXmlGetTag. */
       } else {
-         result = astXmlGetTag( this, opening );   
+         result = astXmlGetTag( this, opening );
       }
 
 /* If the object is not an element, just use astXmlGetTag. */
    } else {
-      result = astXmlGetTag( this, opening );   
+      result = astXmlGetTag( this, opening );
    }
 
 /* Return the result. */
    return result;
 }
 
-static AstRegion *IntersectionReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *IntersectionReader( AstXmlChan *this, AstXmlElement *elem,
                                       AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -5200,14 +5200,14 @@ static AstRegion *IntersectionReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Intersection region element. 
+*     Intersection region element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Intersection region element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -5246,7 +5246,7 @@ static AstRegion *IntersectionReader( AstXmlChan *this, AstXmlElement *elem,
    if( scan ) {
 
 /* Create Regions from all the component region elements, and combine
-   them into nested CmpRegions, using the boolean AND operator to combine 
+   them into nested CmpRegions, using the boolean AND operator to combine
    them. */
       new = RegionReader( this, scan->el[0][0], frm, status );
       for( i = 1; i < scan->count[0]; i++ ) {
@@ -5259,7 +5259,7 @@ static AstRegion *IntersectionReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Get any fill factor from the element and assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       scan = FreeIVOAScan( scan, status );
    }
@@ -5300,8 +5300,8 @@ static int IsUsable( AstXmlElement *elem, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     If an AST Object could be created from the supplied element, +1 is 
-*     returned. Otherwise, -1 is returned. Zero is returned if the supplied 
+*     If an AST Object could be created from the supplied element, +1 is
+*     returned. Otherwise, -1 is returned. Zero is returned if the supplied
 *     pointer is NULL.
 
 *  Notes:
@@ -5322,14 +5322,14 @@ static int IsUsable( AstXmlElement *elem, int *status ){
 /* Check the global error status, and the supplied pointer. */
    if ( !astOK || !elem ) return 0;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(NULL);
 
 /* Initialise */
    result = -1;
 
 /* See if the element is in a supported IVOA namespace, and has a reader
-   function for converting it to an AST object. If so, set the default 
+   function for converting it to an AST object. If so, set the default
    XmlFormat to IVOA, and set the result non-zero. */
    reader = FindIVOAClass( elem, &is_ivoa, status );
    if( is_ivoa ){
@@ -5337,7 +5337,7 @@ static int IsUsable( AstXmlElement *elem, int *status ){
       if( isusable_this ) isusable_this->formatdef = IVOA_FORMAT;
    }
 
-/* If the element is not an IVOA class, only proceed if the URI is not 
+/* If the element is not an IVOA class, only proceed if the URI is not
    defined, or if it the AST URI. */
    uri = astXmlGetURI( elem );
    if( result == -1 && ( !uri || !strcmp( uri, AST__XMLNS ) ) ) {
@@ -5347,7 +5347,7 @@ static int IsUsable( AstXmlElement *elem, int *status ){
       class = astXmlGetName( elem );
 
 /* Attempt to get the loader for a class of this name. If no loader exists an
-   error would normally be reported. Therefore we switch off error reporting 
+   error would normally be reported. Therefore we switch off error reporting
    before making this call. After the class we clear any error status and
    switch error reporting back on. If no error occurs whilst getting the
    loader, then the class name must be a valid AST class name and so return
@@ -5362,7 +5362,7 @@ static int IsUsable( AstXmlElement *elem, int *status ){
          }
          astReporting( oldrep );
       }
-  
+
 /* If the element is in no namespace, use the AST URI as the default
    namespace for it and its children. */
       if( !uri ) astXmlAddURI( elem, NULL, AST__XMLNS );
@@ -5433,22 +5433,22 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *elem, int *st
 
 /* If found, invoke the function to create the new AST object. */
       if( is_ivoa && reader ) {
-         new = ( *reader )( this, elem, status );      
+         new = ( *reader )( this, elem, status );
 
 /* IVOA reader functions do not remove used content as they are read
-   from the element (unlike AST native readers). Therefore empty the 
-   element of all content now to indicate that the element contained no 
+   from the element (unlike AST native readers). Therefore empty the
+   element of all content now to indicate that the element contained no
    unrecognised content. This prevents an error being reported. If there
    was in fact any unrecognised content, then an error will already have
    been reported. */
          nitem = astXmlGetNitem( elem );
          for( i = nitem - 1; i >= 0; i-- ) astXmlDelete( astXmlGetItem( elem, i ) );
 
-/* If not found, report an error. This should not happen since the IsUsable 
+/* If not found, report an error. This should not happen since the IsUsable
    function should already have checked that the element is usable. */
       } else if( astOK ){
          astError( AST__INTER, "astRead(XmlChan): MakeAstFromIVOA does not "
-                   "support IVOA class \"%s\" (internal AST programming error).", status, 
+                   "support IVOA class \"%s\" (internal AST programming error).", status,
                    astXmlGetName( elem ) );
       }
 
@@ -5464,7 +5464,7 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *elem, int *st
       loader = astGetLoader( class, status );
 
 /* If OK, save the pointer to the current container element, and indicate
-   that the supplied element is now to be used as the current container.   
+   that the supplied element is now to be used as the current container.
    The "current container" is the XML element from which values are being
    read. */
       if( astOK ) {
@@ -5472,15 +5472,15 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *elem, int *st
          this->container = (AstXmlParent *) elem;
 
 /* The "isa_class" item in the XmlChan structure contains a pointer to
-   the name of the class whose loader is currently being invoked. It is set 
+   the name of the class whose loader is currently being invoked. It is set
    by the loader itself as a side effect of calling the astReadClassData
    function. Initialise it to NULL to indicate that astReadClassData has
    not yet been called. */
          this->isa_class = NULL;
 
 /* Invoke the loader, which reads the Object definition from the
-   current XML container (i.e. the supplied XML element) and builds the 
-   Object. Supply NULL/zero values to the loader so that it will substitute 
+   current XML container (i.e. the supplied XML element) and builds the
+   Object. Supply NULL/zero values to the loader so that it will substitute
    values appropriate to its own class. */
          new = (*loader)( NULL, (size_t) 0, NULL, NULL, (AstChannel *)
                           this, status );
@@ -5514,11 +5514,11 @@ static double MakeMJD( AstTimeFrame *frm, double time, int *status ) {
 *     double MakeMJD( AstTimeFrame *frm, double time, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function converts the supplied time value from the system
-*     represented by the supplied TimeFrame into an absolute TBD MJD, 
+*     represented by the supplied TimeFrame into an absolute TBD MJD,
 *     in units of days.
 
 *  Parameters:
@@ -5538,8 +5538,8 @@ static double MakeMJD( AstTimeFrame *frm, double time, int *status ) {
 /* Local Variables: */
    AstFrameSet *fs;
    AstTimeFrame *cfrm;
-   double result;                
-   
+   double result;
+
 /* Initialise. */
    result = AST__BAD;
 
@@ -5554,7 +5554,7 @@ static double MakeMJD( AstTimeFrame *frm, double time, int *status ) {
    astSetTimeScale( cfrm, AST__TDB );
    astSetTimeOrigin( cfrm, 0.0 );
 
-/* Find the Mapping from the supplied TimeFrame to this TimeFrame. Use it to 
+/* Find the Mapping from the supplied TimeFrame to this TimeFrame. Use it to
    transform the supplied time value */
    fs = astConvert( frm, cfrm, "" );
    if( fs ) {
@@ -5632,7 +5632,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
 /* If the supplied element is not a Position3D just copy it. */
    if( strcmp( astXmlGetName( elem ), "Position3D" ) ) {
       new = (AstXmlElement *) astXmlCopy( elem );
- 
+
 /* Otherwise, we create a new Position2D and add required content to it. */
    } else {
 
@@ -5689,7 +5689,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
          if( scan->count[ 0 ] > 0 ) {
             el = astXmlAddElement( new, "Name", NULL );
             astXmlAddCharData( el, 0, astXmlGetValue( scan->el[ 0 ][ 0 ], 0 ) );
-         }            
+         }
 
 /* If this Position3D contains a Value which can be read, obtain it,
    format the first 2 values and store in the returned Position2D. */
@@ -5698,7 +5698,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
             el = astXmlAddElement( new, "Value2", NULL );
             sprintf( buff, "%.*g %.*g", DBL_DIG, pos[0], DBL_DIG, pos[1] );
             astXmlAddCharData( el, 0, buff );
-         }            
+         }
 
 /* If this Position3D contains an Error which can be read, obtain it,
    format the first 2 values and store in the returned Position2D. */
@@ -5707,7 +5707,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
             el = astXmlAddElement( new, "Error2", NULL );
             sprintf( buff, "%.*g %.*g", DBL_DIG, pos[0], DBL_DIG, pos[1] );
             astXmlAddCharData( el, 0, buff );
-         }            
+         }
 
 /* Free resources */
          scan = FreeIVOAScan( scan, status );
@@ -5719,7 +5719,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
 
 }
 
-static AstRegion *NegationReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *NegationReader( AstXmlChan *this, AstXmlElement *elem,
                                   AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -5741,14 +5741,14 @@ static AstRegion *NegationReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Negation region element. 
+*     Negation region element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Negation region element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -5789,7 +5789,7 @@ static AstRegion *NegationReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Get any fill factor from the element and assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       scan = FreeIVOAScan( scan, status );
    }
@@ -5801,7 +5801,7 @@ static AstRegion *NegationReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstObject *ObsDataLocationReader( AstXmlChan *this, 
+static AstObject *ObsDataLocationReader( AstXmlChan *this,
                                          AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -5815,7 +5815,7 @@ static AstObject *ObsDataLocationReader( AstXmlChan *this,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstObject *ObsDataLocationReader( AstXmlChan *this, 
+*     AstObject *ObsDataLocationReader( AstXmlChan *this,
 *                                       AstXmlElement *elem, int *status )
 
 *  Class Membership:
@@ -5823,7 +5823,7 @@ static AstObject *ObsDataLocationReader( AstXmlChan *this,
 
 *  Description:
 *     This function makes a new AST Object from the supplied IVOA
-*     ObsDataLocationReader element. 
+*     ObsDataLocationReader element.
 
 *  Parameters:
 *     this
@@ -5868,7 +5868,7 @@ static AstObject *ObsDataLocationReader( AstXmlChan *this,
 
 /* Read the observatory location, returning a Pointlist describing the
    observatory position (if possible), and modifiying the observation
-   Region by (if possible) assigning the observatory location to the 
+   Region by (if possible) assigning the observatory location to the
    ObsLon and ObsLat attributes of any SpecFrames in the Region, and the
    ObsLon and ObsLat attributes of any TimeFrames in the Region. */
       obs = ObservatoryLocationReader( this, scan->el[ 0 ][ 0 ], stc, status );
@@ -5886,7 +5886,7 @@ static AstObject *ObsDataLocationReader( AstXmlChan *this,
 }
 
 static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
-                                                AstXmlElement *elem, 
+                                                AstXmlElement *elem,
                                                 AstStcObsDataLocation *obs, int *status ){
 /*
 *  Name:
@@ -5901,7 +5901,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
 *  Synopsis:
 *     #include "xmlchan.h"
 *     AstPointList *ObservatoryLocationReader( AstXmlChan *this,
-*                                              AstXmlElement *elem, 
+*                                              AstXmlElement *elem,
 *                                              AstStcObsDataLocation *obs, int *status )
 
 *  Class Membership:
@@ -5981,7 +5981,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
       }
       km = astAnnul( km );
    }
-   stc = astAnnul( stc );   
+   stc = astAnnul( stc );
 
 /* Check the Region is a PointList. */
    if( !astIsAPointList( new ) && astOK ) {
@@ -5993,9 +5993,9 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
 
 /* If possible, we use the observatory location to set the value of the
    ObsLon and ObsLat attributes of any SpecFrames, and the ObsLon and
-   ObsLat attributes of any TimeFrames, in the supplied ObsDataLocation. 
-   For this to be possible, the PointList being returned must represent 
-   either geodetic or geocentric longitude/latitude. If it is geocentric, 
+   ObsLat attributes of any TimeFrames, in the supplied ObsDataLocation.
+   For this to be possible, the PointList being returned must represent
+   either geodetic or geocentric longitude/latitude. If it is geocentric,
    the values need to be converted to geodetic. */
    ps = astRegTransform( new, NULL, 1, NULL, &frm );
    ptr = astGetPoints( ps );
@@ -6018,7 +6018,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
                   astSetLabel( pfrm, 1, "Geodetic latitude" );
                   astSetDomain( pfrm, "GEO_D" );
                }
-   
+
             } else if( !strcmp( dom, "GEO_D" ) ){
                if( lambda == AST__BAD ) {
                   lambda = ptr[i][0];
@@ -6085,18 +6085,18 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *stat
 
 *  Description:
 *     This function writes the supplied text to the output sink,
-*     splitting it into lines of no more than "mxlen" characters, if 
+*     splitting it into lines of no more than "mxlen" characters, if
 *     required.
 
 *  Parameters:
 *     this
 *        A pointer to the XmlChan.
 *     text
-*        Pointer to the (potentially long) null terminated string to write 
+*        Pointer to the (potentially long) null terminated string to write
 *        out to the sink.
 *     mxlen
 *        The maximum allowed output line length. If zero, no limit is
-*        placed on the output line length and the supplied text is always 
+*        placed on the output line length and the supplied text is always
 *        written out as a single string.
 *     status
 *        Pointer to the inherited status variable.
@@ -6126,7 +6126,7 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *stat
       lastend = NULL;
       lastspace = NULL;
       len = 0;
-      linestart = (char *) text;   
+      linestart = (char *) text;
 
 /* Loop round each character in the text */
       while( *(++c ) ){
@@ -6141,7 +6141,7 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *stat
                quote = 0;
                lastend = c;
             }
-         }             
+         }
 
 /* Note the position of hte previous space. */
          if( isspace( *c ) ) lastspace = c;
@@ -6173,7 +6173,7 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *stat
 /* If we have a line break, output the current line. */
          if( breakat ) {
 
-/* Terminate the string, first saving the character which is replaced by the 
+/* Terminate the string, first saving the character which is replaced by the
    terminating zero so that it can be re-instated later. */
             tt = *breakat;
             *breakat = 0;
@@ -6181,12 +6181,12 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *stat
 /* Write out the newly terminated chunk. */
             astPutNextText( this, linestart );
 
-/* Move on to ths start of the next chunk, decrement the number of characters 
+/* Move on to ths start of the next chunk, decrement the number of characters
    remaining, and re-instate the character previously over-written by
    zero. */
             c = breakat;
             linestart = c;
-            *c = tt;                  
+            *c = tt;
             len = 0;
             quote = 0;
          }
@@ -6198,7 +6198,7 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *stat
    }
 }
 
-static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
                                  AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -6212,7 +6212,7 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
 *                               AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -6220,14 +6220,14 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Polygon element. 
+*     Polygon element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Polygon element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -6240,27 +6240,27 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
 */
 
 /* Local Variables: */
-   AstFrame *cfrm;       
-   AstMapping *map;      
-   AstRegion *new;       
-   IVOAScan *scan;       
-   const char *names[1]; 
-   const char *unit;     
-   const char *funit;    
-   double *pos;          
+   AstFrame *cfrm;
+   AstMapping *map;
+   AstRegion *new;
+   IVOAScan *scan;
+   const char *names[1];
+   const char *unit;
+   const char *funit;
+   double *pos;
    double *x0;
    double *y0;
    double lbnd[2];
    double ubnd[2];
    int axcon;
    int axlon;
-   int i;                
+   int i;
    int is_box;
    int is_sky;
    int laxcon;
-   int max[1];           
-   int min[1];           
-   int nv;               
+   int max[1];
+   int min[1];
+   int nv;
    int small[ 4 ];
 
 /* Initialise. */
@@ -6295,7 +6295,7 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
       nv = scan->count[0];
       pos = astMalloc( sizeof( double )*(size_t) (2*nv) );
 
-/* Read each vertex element in turn. Record whether or not the first 4 
+/* Read each vertex element in turn. Record whether or not the first 4
    vertices have <SmallCircles>. */
       x0 = pos;
       y0 = x0 + nv;
@@ -6347,24 +6347,24 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
          }
 
 /* If the first edge represents a constant axis value, see if the others
-   do too (ensuring that the axes which are held constant alternate). Also 
+   do too (ensuring that the axes which are held constant alternate). Also
    find the bounds of the box.*/
          if( is_box ) {
             for( i = 1; i < 4; i++ ) {
                if( is_sky && small[ i ] ) {
                   axcon = 1 - axlon;
-      
+
                } else if( astEQUAL( x0[ i ], x0[ i - 1 ] ) ) {
                   axcon = 0;
-      
+
                } else if( astEQUAL( y0[ i ], y0[ i - 1 ] ) ) {
                   axcon = 1;
-      
+
                } else {
                   is_box = 0;
                   break;
                }
-   
+
                if( axcon != 1 - laxcon ) {
                   is_box = 0;
                   break;
@@ -6383,14 +6383,14 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
                } else if( y0[ i ] < lbnd[1] ) {
                   lbnd[1] = y0[ i ];
                }
-   
+
                laxcon = axcon;
             }
          }
       }
 
 /* Since the SkyFrame class does not have active Units we must handle it
-   separately. The axis values have already been converted from the supplied 
+   separately. The axis values have already been converted from the supplied
    units (e.g. degrees) to radians. */
       if( is_sky ) {
 
@@ -6409,7 +6409,7 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
          cfrm = astCopy( frm );
          astSetUnit( cfrm, 0, unit );
          astSetUnit( cfrm, 1, unit );
-   
+
 /* Create the Polygon or Box within the SkyFrame. */
          if( is_box ) {
             new = (AstRegion *) astBox( cfrm, 1, lbnd, ubnd, NULL, "", status );
@@ -6428,14 +6428,14 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
                if( strcmp( funit, unit ) ) astSetUnit( new, i, funit );
             } else {
                astSetUnit( frm, i, unit );
-            }          
-         }          
+            }
+         }
 
 /* Free resources */
          cfrm = astAnnul( cfrm );
       }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
 
@@ -6470,7 +6470,7 @@ static double PosAngleReader( AstXmlChan *this, AstXmlElement *elem, int *status
 *     XmlChan member function.
 
 *  Description:
-*     This function reads the supplied PosANgle element and returns a value 
+*     This function reads the supplied PosANgle element and returns a value
 *     representing a position angle in the AST convention (radians from
 *     +ve second axis to +ve first axis).
 
@@ -6503,19 +6503,19 @@ static double PosAngleReader( AstXmlChan *this, AstXmlElement *elem, int *status
 /* Get the units attribute from the supplied element. These are the units
    of the above value. Default is degrees. */
    paunit = astXmlGetAttributeValue( elem, "unit" );
- 
+
 /* Convert the position angle to radians. */
    if( !paunit || !strcmp( paunit, "deg" ) ) {
       result *= AST__DD2R;
 
    } else if( !strcmp( paunit, "h" ) ) {
-      result *= 15*AST__DD2R;         
+      result *= 15*AST__DD2R;
 
    } else if( !strcmp( paunit, "arcmin" ) ) {
-      result *= AST__DD2R/60.0;         
+      result *= AST__DD2R/60.0;
 
    } else if( !strcmp( paunit, "arcsec" ) ) {
-      result *= AST__DD2R/3600.0;         
+      result *= AST__DD2R/3600.0;
 
    } else {
       sprintf( buff, "contains unusable angle units \"%s\"", paunit );
@@ -6529,7 +6529,7 @@ static double PosAngleReader( AstXmlChan *this, AstXmlElement *elem, int *status
    is "X". */
    ref = astXmlGetAttributeValue( elem, "reference" );
    if( !ref || !Ustrcmp( ref, "X", status ) ) {
-      result = AST__DPIBY2 - result;         
+      result = AST__DPIBY2 - result;
 
    } else if( Ustrcmp( ref, "Y", status ) && Ustrcmp( ref, "North", status ) ) {
       sprintf( buff, "contains unusable reference attribute \"%s\" "
@@ -6541,8 +6541,8 @@ static double PosAngleReader( AstXmlChan *this, AstXmlElement *elem, int *status
    return result;
 }
 
-static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem, 
-                                    AstFrame *frm, double *pos, 
+static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
+                                    AstFrame *frm, double *pos,
                                     AstKeyMap **anc, int *status ){
 /*
 *  Name:
@@ -6556,7 +6556,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 *                                  AstFrame *frm, double *pos, int axis,
 *                                  AstKeyMap **anc, int *status )
 
@@ -6566,7 +6566,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 *  Description:
 *     This function reads the supplied STC <Position2D> element, and uses it,
 *     if possible, to create the uncertainty associated with the spatial
-*     axis in the supplied Frame. 
+*     axis in the supplied Frame.
 
 *  Parameters:
 *     this
@@ -6578,7 +6578,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 *     pos
 *        Pointer to an array in which to return the spatial axis values
 *        represented by the supplied Position2D element. This array is
-*        returned filled with AST__BAD If the supplied Position2D element 
+*        returned filled with AST__BAD If the supplied Position2D element
 *        does not contain any axis values.
 *     anc
 *        Address of a location at which to put a pointer to a newly
@@ -6588,9 +6588,9 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 *        The value associated with the Name key is string containing
 *        the Name item from the Position2D. The value
 *        associated with each of the other keys is a pointer to a 2D Region
-*        within the supplied Frame, corresponding to the value, error, 
+*        within the supplied Frame, corresponding to the value, error,
 *        resolution, etc. Keys will not be present in the returned KeyMap
-*        if the corresponding item of ancillary information is not present 
+*        if the corresponding item of ancillary information is not present
 *        in the Position2D. A NULL pointer is returned if there is no
 *        ancillary information at all.
 *     status
@@ -6623,7 +6623,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
    int max[6];              /* Max allowed occurrences of each name */
    int min[6];              /* Min allowed occurrences of each name */
    int nword;               /* Number of words extracted from string */
-   
+
 /* Initialise */
    result = NULL;
    pos[ 0 ] = AST__BAD;
@@ -6660,7 +6660,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 /* Create a KeyMap to return holding ancilary info, and put the Name into
    it. */
       *anc = astKeyMap( "", status );
-      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME, 
+      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME,
                                   astXmlGetValue( scan->el[0][0], 0 ), NULL );
 
 /* Get the units attribute from the supplied element. These are the units
@@ -6682,7 +6682,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
          }
       }
 
-/* Since the SkyFrame class does not have active Units we must convert the 
+/* Since the SkyFrame class does not have active Units we must convert the
    axis values from the supplied units (e.g. degrees) to radians. Allow
    for different units on the two axes. */
       map1 = astUnitMapper( unit1, "rad", NULL, NULL );
@@ -6696,7 +6696,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
       }
 
 /* If this Position2D contains a Value which can be read, obtain it. Otherwise,
-   issue a warning. */ 
+   issue a warning. */
       if( scan->count[ 2 ] > 0 ) {
          ElemListD( this, scan->el[ 2 ][ 0 ], 2, pos, status );
 
@@ -6707,7 +6707,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
             astTran1( map1, 1, pos, 1, pos );
             astTran1( map2, 1, pos + 1, 1, pos + 1 );
          }
-            
+
 /* If this Position2D contains a value which cannot be used, issue a warning. */
          if( pos[ 1 ] == AST__BAD ) {
             Report( this, elem, WARNING, "contains an unreadable <Value>", status );
@@ -6753,10 +6753,10 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
                astTran1( map1, 1, hw, 1, hw );
                astTran1( map2, 1, hw + 1, 1, hw + 1 );
             }
-            
+
             if( hw[ 0 ] != AST__BAD ) hw[ 0 ] *= 0.5;
             if( hw[ 1 ] != AST__BAD ) hw[ 1 ] *= 0.5;
-   
+
 /* Create an Ellipse or Box to describe the error */
             cen[ 0 ] = 0.0;
             cen[ 1 ] = 0.0;
@@ -6800,10 +6800,10 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
                astTran1( map1, 1, hw, 1, hw );
                astTran1( map2, 1, hw + 1, 1, hw + 1 );
             }
-            
+
             if( hw[ 0 ] != AST__BAD ) hw[ 0 ] *= 0.5;
             if( hw[ 1 ] != AST__BAD ) hw[ 1 ] *= 0.5;
-   
+
 /* Create an Ellipse or Box to describe the resolution */
             cen[ 0 ] = 0.0;
             cen[ 1 ] = 0.0;
@@ -6848,10 +6848,10 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
                astTran1( map1, 1, hw, 1, hw );
                astTran1( map2, 1, hw + 1, 1, hw + 1 );
             }
-            
+
             if( hw[ 0 ] != AST__BAD ) hw[ 0 ] *= 0.5;
             if( hw[ 1 ] != AST__BAD ) hw[ 1 ] *= 0.5;
-   
+
 /* Create an Ellipse or Box to describe the size */
             cen[ 0 ] = 0.0;
             cen[ 1 ] = 0.0;
@@ -6896,10 +6896,10 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
                astTran1( map1, 1, hw, 1, hw );
                astTran1( map2, 1, hw + 1, 1, hw + 1 );
             }
-            
+
             if( hw[ 0 ] != AST__BAD ) hw[ 0 ] *= 0.5;
             if( hw[ 1 ] != AST__BAD ) hw[ 1 ] *= 0.5;
-   
+
 /* Create an Ellipse or Box to describe the pixsize */
             cen[ 0 ] = 0.0;
             cen[ 1 ] = 0.0;
@@ -6935,7 +6935,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 
 }
 
-static AstRegion *PositionIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *PositionIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                           AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -6949,7 +6949,7 @@ static AstRegion *PositionIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *PositionIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *PositionIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 *                                        AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -6957,17 +6957,17 @@ static AstRegion *PositionIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     PositionInterval element. 
+*     PositionInterval element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA PositionInterval element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit or System attribute is not set, this
-*        function will decide on the values to be used, and set these 
+*        function will decide on the values to be used, and set these
 *        values in the supplied Frame before returning.
 *     status
 *        Pointer to the inherited status variable.
@@ -7060,7 +7060,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstObject *Read( AstChannel *this_channel, int *status ) 
+*     AstObject *Read( AstChannel *this_channel, int *status )
 
 *  Class Membership:
 *     XmlChan member function (over-rides the astRead method
@@ -7100,9 +7100,9 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* First we construct an in-memory XML representation of the data source,
    by reading text up to the end of the first element encountered from
-   which an AST Object could be created. If the Skip attribute is zero, then 
-   an error is reported if there is any text prior to the start of the first 
-   usable element. If Skip is non-zero any initial text prior to the start 
+   which an AST Object could be created. If the Skip attribute is zero, then
+   an error is reported if there is any text prior to the start of the first
+   usable element. If Skip is non-zero any initial text prior to the start
    of the first usable element is ignored. */
    elem = ReadXmlText( this, status );
 
@@ -7203,18 +7203,18 @@ static void ReadClassData( AstChannel *this_channel, const char *class, int *sta
 
 /* Go through all the content elements within the current container and
    give them an extra attribute named "definedby" the value of which is
-   the name of the class which defines the associated AST attribute or 
+   the name of the class which defines the associated AST attribute or
    object. This is determined by the the "isa" elements - an element is
    "definedby" the class noted in the next following "isa" element, or by
    the class being loaded if there is no following "isa" element. */
 
-/* Find the first "isa" element and get the value of its "class" attribute. 
+/* Find the first "isa" element and get the value of its "class" attribute.
    If none is found the name of the class being loaded is used. */
       definedby = FindNextIsA( (AstXmlElement *) this->container, 0, status );
 
 /* Loop round all elements within the container. */
       nitem = astXmlGetNitem( this->container );
-      for( i = 0; astOK && i < nitem; i++ ) {   
+      for( i = 0; astOK && i < nitem; i++ ) {
          item = astXmlGetItem( this->container, i );
          if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
@@ -7296,7 +7296,7 @@ static double ReadDouble( AstChannel *this_channel, const char *name, double def
    const char *value;            /* Pointer to attribute value */
    double result;                /* Value to be returned */
    int nc;                       /* Number of characters read by astSscanf */
-   
+
 /* Initialise. */
    result = 0.0;
 
@@ -7309,12 +7309,12 @@ static double ReadDouble( AstChannel *this_channel, const char *name, double def
 /* Search the current container element for an ATTR element
    describing an AST attribute of the specified name. This call ignores
    ATTR elements which represent default values. No error is
-   reported if an ATTR element with the given name cannot be 
+   reported if an ATTR element with the given name cannot be
    found. */
    element = FindAttribute( this, name, status );
 
-/* If an element was found, attempt to decode the string to give a double 
-   value, checking that the entire string is read (and checking for the 
+/* If an element was found, attempt to decode the string to give a double
+   value, checking that the entire string is read (and checking for the
    magic string used to represent bad values). If this fails, then the
    wrong name has probably been given, or the input data are corrupt,
    so report an error. */
@@ -7342,7 +7342,7 @@ static double ReadDouble( AstChannel *this_channel, const char *name, double def
 /* Report an error if the attribute does not have a value. */
       } else {
          astError( AST__BADIN, "astRead(XmlChan): No value for attribute "
-                   "\"%s\" within element \"%s\".", status, name, 
+                   "\"%s\" within element \"%s\".", status, name,
                    GetTag( (AstXmlObject *) element, 1, status ) );
       }
 
@@ -7414,7 +7414,7 @@ static int ReadInt( AstChannel *this_channel, const char *name, int def, int *st
    const char *value;            /* Pointer to attribute value */
    int result;                   /* Value to be returned */
    int nc;                       /* Number of characters read by astSscanf */
-   
+
 /* Initialise. */
    result = 0;
 
@@ -7427,11 +7427,11 @@ static int ReadInt( AstChannel *this_channel, const char *name, int def, int *st
 /* Search the current container element for an ATTR element
    describing an AST attribute of the specified name. This call ignores
    ATTR elements which represent default values. No error is
-   reported if an ATTR element with the given name cannot be 
+   reported if an ATTR element with the given name cannot be
    found. */
    element = FindAttribute( this, name, status );
 
-/* If an element was found, attempt to decode the string to give a int 
+/* If an element was found, attempt to decode the string to give a int
    value, checking that the entire string is read. If this fails, then the
    wrong name has probably been given, or the input data are corrupt,
    so report an error. */
@@ -7454,7 +7454,7 @@ static int ReadInt( AstChannel *this_channel, const char *name, int def, int *st
 /* Report an error if the attribute does not have a value. */
       } else {
          astError( AST__BADIN, "astRead(XmlChan): No value for attribute "
-                   "\"%s\" within element \"%s\".", status, name, 
+                   "\"%s\" within element \"%s\".", status, name,
                    GetTag( (AstXmlObject *) element, 1, status ) );
       }
 
@@ -7467,7 +7467,7 @@ static int ReadInt( AstChannel *this_channel, const char *name, int def, int *st
    return result;
 }
 
-static AstObject *ReadObject( AstChannel *this_channel, const char *name, 
+static AstObject *ReadObject( AstChannel *this_channel, const char *name,
                               AstObject *def, int *status ) {
 /*
 *  Name:
@@ -7526,7 +7526,7 @@ static AstObject *ReadObject( AstChannel *this_channel, const char *name,
    AstXmlElement *element;       /* Pointer to element holding required value */
    AstObject *result;            /* Value to be returned */
    const char *isa_class;        /* Class currently being loaded */
-   
+
 /* Initialise. */
    result = NULL;
 
@@ -7625,7 +7625,7 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
    AstXmlElement *element;       /* Pointer to element holding required value */
    char *result;                 /* Value to be returned */
    const char *value;            /* Pointer to attribute value */
-   
+
 /* Initialise. */
    result = NULL;
 
@@ -7638,7 +7638,7 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
 /* Search the current container element for an ATTR element
    describing an AST attribute of the specified name. This call ignores
    ATTR elements which represent default values. No error is
-   reported if an ATTR element with the given name cannot be 
+   reported if an ATTR element with the given name cannot be
    found. */
    element = FindAttribute( this, name, status );
 
@@ -7648,12 +7648,12 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
       if( value ) {
          result = astStore( NULL, value, strlen( value ) + 1 );
 
-/* If the new default for XmlFormat has not yet been set, note if this 
+/* If the new default for XmlFormat has not yet been set, note if this
    element contained a "quoted" attribute. */
          if( this->formatdef == NATIVE_FORMAT ) {
             if( astXmlGetAttributeValue( element, QUOTED ) ) {
                this->formatdef = QUOTED_FORMAT;
-            }         
+            }
          }
 
 /* Remove the ATTR element from the container. */
@@ -7662,7 +7662,7 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
 /* Report an error if the attribute does not have a value. */
       } else {
          astError( AST__BADIN, "astRead(XmlChan): No value for attribute "
-                   "\"%s\" within element \"%s\".", status, name, 
+                   "\"%s\" within element \"%s\".", status, name,
                    GetTag( (AstXmlObject *) element, 1, status ) );
       }
 
@@ -7695,12 +7695,12 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this, int *status ){
 *     XmlChan member function.
 
 *  Description:
-*     This function constructs an in-memory XML representation of the data 
+*     This function constructs an in-memory XML representation of the data
 *     source by reading text up to the end of the first element encountered
-*     from which an AST Object could be constructed. If the Skip attribute is 
-*     zero, then an error is reported if there is any text prior to the start 
-*     of the first AST Object. If Skip is non-zero any initial text prior to 
-*     the start of the first usable element is ignored. 
+*     from which an AST Object could be constructed. If the Skip attribute is
+*     zero, then an error is reported if there is any text prior to the start
+*     of the first AST Object. If Skip is non-zero any initial text prior to
+*     the start of the first usable element is ignored.
 
 *  Parameters:
 *     this
@@ -7711,7 +7711,7 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this, int *status ){
 *  Returned Value:
 *     A pointer to the returned XmlElement. This should be annuled using
 *     astXmlAnnul when no longer needed. NULL is returned if the end of
-*     the source text is reached without finding a en element from which 
+*     the source text is reached without finding a en element from which
 *     an AST Object could be read.
 
 *  Notes:
@@ -7731,7 +7731,7 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this);
 
 /* Get the value of the Skip attribute. This indicates if we should skip
@@ -7739,13 +7739,13 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this, int *status ){
    AST object could be created. */
    skip = astGetSkip( this );
 
-/* Store a pointer to the XmlChan in a module variable so that the IsUsable function 
+/* Store a pointer to the XmlChan in a module variable so that the IsUsable function
    can access its properties. */
    isusable_this = this;
 
 /* Read characters from the XML source and return an XmlElement structure
    containing the first usable element encountered. */
-   result = astXmlReadDocument( &(this->readcontext), IsUsable, skip, 
+   result = astXmlReadDocument( &(this->readcontext), IsUsable, skip,
                                GetNextChar, this );
 
 /* Nullify the module variable for safety. */
@@ -7768,8 +7768,8 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
 *     ReCentreAnc
 
 *  Purpose:
-*     Re-centre the Regions describing ancillary information extracted 
-*     from an AstroCoords elements. 
+*     Re-centre the Regions describing ancillary information extracted
+*     from an AstroCoords elements.
 
 *  Type:
 *     Private function.
@@ -7779,7 +7779,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
 *     ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function recentres the Regions which describe ancillary
@@ -7796,9 +7796,9 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
 *        a KeyMap. Each one describes the ancilary information in an
 *        AstroCoords element associated with the AstroCoordsArea decribed
 *        by "region". Each KeyMap has elements with keys AST__STCERROR,
-*        AST__STCRES, AST__STCSIZE, AST__STCPIXSZ, AST__STCVALUE each of 
+*        AST__STCRES, AST__STCSIZE, AST__STCPIXSZ, AST__STCVALUE each of
 *        which holds a pointer to a Region. These Regions are modified on
-*        exit so that they are centred on a point which inside the supplied 
+*        exit so that they are centred on a point which inside the supplied
 *        Region.
 *     status
 *        Pointer to the inherited status variable.
@@ -7831,7 +7831,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
    int paxis;
    int time_axis;
 
-   static const char *key[ 5 ] = { AST__STCERROR, 
+   static const char *key[ 5 ] = { AST__STCERROR,
                                    AST__STCRES,
                                    AST__STCSIZE,
                                    AST__STCPIXSZ,
@@ -7848,11 +7848,11 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
    lbnd = astMalloc( sizeof( double )*(size_t) ndim );
    ubnd = astMalloc( sizeof( double )*(size_t) ndim );
    mid = astMalloc( sizeof( double )*(size_t) ndim );
-   if( mid ) { 
-      astGetRegionBounds( region, lbnd, ubnd ); 
+   if( mid ) {
+      astGetRegionBounds( region, lbnd, ubnd );
 
-/* Get a mid point, taking account of unbounded axes. Also find the index of 
-   the time axis (if any) in the supplied Region, and get the System and 
+/* Get a mid point, taking account of unbounded axes. Also find the index of
+   the time axis (if any) in the supplied Region, and get the System and
    TimeOrigin values for the time axis. */
       time_axis = -1;
       time_unit = NULL;
@@ -7886,7 +7886,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
    the ancillary regions. */
                if( astTestTimeOrigin( (AstTimeFrame *) pfrm ) ) {
                   sprintf( orgatt, "TimeOrigin(%d)", i + 1 );
-                  sprintf( orgset, "TimeOrigin(%d)=%s", i + 1, 
+                  sprintf( orgset, "TimeOrigin(%d)=%s", i + 1,
                            astGetC( pfrm, "TimeOrigin" ) );
                }
 
@@ -7895,7 +7895,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
    the ancillary regions. */
                if( astTestSystem( pfrm ) ) {
                   sprintf( sysatt, "System(%d)", i + 1 );
-                  sprintf( sysset, "System(%d)=%s", i + 1, 
+                  sprintf( sysset, "System(%d)=%s", i + 1,
                            astGetC( pfrm, "System" ) );
                }
 
@@ -7913,7 +7913,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
       } else {
          setting[ 0 ] = 0;
          epoch = AST__BAD;
-      }      
+      }
 
 /* Loop round each KeyMap. */
       for( j = 0; j < nanc; j++ ) {
@@ -7924,9 +7924,9 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
             if( astMapGet0A( ancs[ j ], key[ k ], &o ) ) {
                r = (AstRegion *) o;
 
-/* The System and TimeOrigin attributes of the STC Region are set when the 
-   AstroCoordArea is read. This occurs after the ancillary Coords Regions are 
-   created. Consequently, the ancillary Coords Regions may not have set 
+/* The System and TimeOrigin attributes of the STC Region are set when the
+   AstroCoordArea is read. This occurs after the ancillary Coords Regions are
+   created. Consequently, the ancillary Coords Regions may not have set
    System and/or TimeOrigin values.  So, for System and TimeOrigin, if
    the attribute is set in the supplied Region but not set in the ancillary
    Region, transfer the set value to the ancillary Region. */
@@ -7935,7 +7935,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
                      astRegSetAttrib( r, sysset, NULL );
 
                      old_unit = astGetUnit( r, time_axis );
-                     if( old_unit && time_unit && 
+                     if( old_unit && time_unit &&
                          strcmp( old_unit, time_unit ) ) {
                         if( !astTestUnit( r, time_axis ) ) {
                            old_unit = NULL;
@@ -7969,12 +7969,12 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
                         astMapPut0A( ancs[ j ], key[ k ], r2, NULL );
                         (void) astAnnul( r );
                         r = r2;
-                     } 
+                     }
                      map = astAnnul( map );
                      smap = astAnnul( smap );
                      fs = astAnnul( fs );
 
-/* Now set the epoch and re-centre.*/                   
+/* Now set the epoch and re-centre.*/
                      if( epoch != AST__BAD ) astRegSetAttrib( r, setting, NULL );
                      astRegCentre( r, mid, NULL, 0, AST__CURRENT );
                   }
@@ -7992,7 +7992,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
    frm = astAnnul( frm );
 }
 
-static AstObject *RedshiftFrameReader( AstXmlChan *this, 
+static AstObject *RedshiftFrameReader( AstXmlChan *this,
                                        AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -8082,7 +8082,7 @@ static AstObject *RedshiftFrameReader( AstXmlChan *this,
          sor = "Helio";
       } else if( astOK ){
          astError( AST__INTER, "RedshiftFrameReader(XmlChan): Unknown "
-                   "standard of rest %s (internal AST programming error).", status, 
+                   "standard of rest %s (internal AST programming error).", status,
                    sor );
       }
 
@@ -8107,23 +8107,23 @@ static AstObject *RedshiftFrameReader( AstXmlChan *this,
                     "redshift (z) but has non-optical <DopplerDefinition>", status );
          }
 
-/* Otherwise, get the value of the Doppler definition element, and translate 
+/* Otherwise, get the value of the Doppler definition element, and translate
    it to an AST value.*/
       } else {
          sys = astXmlGetValue( scan->el[1][0], 0 );
          if( !sys ) {
             Report( this, elem, FAILURE, "contains a <DopplerDefinition> "
                     "element which is not simply character data", status );
-   
+
          } else if( !strcmp( sys, "OPTICAL" ) ) {
             sys = "VOPT";
-   
+
          } else if( !strcmp( sys, "RADIO" ) ) {
             sys = "VRAD";
-   
+
          } else if( !strcmp( sys, "RELATIVISTIC" ) ) {
             sys = "VREL";
-   
+
          } else {
             Report( this, elem, FAILURE, "contains unsupported Doppler definition", status );
          }
@@ -8131,7 +8131,7 @@ static AstObject *RedshiftFrameReader( AstXmlChan *this,
 
 /* Create a suitable SpecFrame. */
       new = astSpecFrame( "Domain=REDSHIFT,System=%s,StdOfRest=%s", status, sys, sor);
-      
+
 /* If the SpectralFrame has a <Name> element use it as the SpecFrame title. */
       if( scan->count[2] ) astSetTitle( new, astXmlGetValue( scan->el[2][0], 0 ) );
 
@@ -8147,7 +8147,7 @@ static AstObject *RedshiftFrameReader( AstXmlChan *this,
    return (AstObject *) new;
 }
 
-static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                           AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -8161,7 +8161,7 @@ static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 *                                        AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -8169,17 +8169,17 @@ static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     RedshiftInterval element. 
+*     RedshiftInterval element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA RedshiftInterval element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit or System attribute is not set, this
-*        function will decide on the values to be used, and set these 
+*        function will decide on the values to be used, and set these
 *        values in the supplied Frame before returning.
 *     status
 *        Pointer to the inherited status variable.
@@ -8229,13 +8229,13 @@ static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
       sys = RedshiftSys( this, elem, &unit, 1, status );
 
 /* If no system has been set in the supplied Frame, set a default system
-   now (radio velocity if both units are present, dimensionaless redshift 
+   now (radio velocity if both units are present, dimensionaless redshift
    otherwise). */
       if( !astTestSystem( frm ) ) {
          astSetSystem( frm, sys );
 
 /* The ReddshiftSys function always returns AST__VRADIO if the velocity
-   is not dimensionless. In this case, if the supplied Frame has system 
+   is not dimensionless. In this case, if the supplied Frame has system
    explicitly set AST__VOPTICAL, we use the supplied Frame preference of
    optical/radio instead of the default returned by RedshiftSys. */
       } else if( sys != AST__REDSHIFT ) {
@@ -8243,11 +8243,11 @@ static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
          if( sys == AST__REDSHIFT ) sys = AST__VRADIO;
       }
 
-/* Take a copy of the supplied Frame and set its Units to the value found 
+/* Take a copy of the supplied Frame and set its Units to the value found
    above. */
       cfrm = astCopy( frm );
       astSetUnit( cfrm, 0, unit );
-   
+
 /* If at least one limit was found, create an Interval within this
    modified Frame. Otherwise create a negated NullRegion. */
       if( lolimit != AST__BAD || hilimit != AST__BAD ) {
@@ -8255,23 +8255,23 @@ static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
       } else {
          new = (AstRegion *) astNullRegion( cfrm, NULL, "negated=1", status );
       }
-   
+
 /* If the Units of this Region differs from that of the supplied Frame,
    set it to the Units of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the new Units. If the supplied
-   Frame had no set Units, set it to the units implied by the supplied 
+   Frame had no set Units, set it to the units implied by the supplied
    XML element. */
       if( astTestUnit( frm, 0 ) ) {
          funit = astGetUnit( frm, 0 );
          if( strcmp( funit, unit ) ) astSetUnit( new, 0, funit );
       } else {
          astSetUnit( frm, 0, unit );
-      }          
-   
-/* Get any fill factor and lo/hi_include attributes from the element and 
+      }
+
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       cfrm = astAnnul( cfrm );
       if( unit ) unit = astFree( unit );
@@ -8285,7 +8285,7 @@ static AstRegion *RedshiftIntervalReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
                                   AstFrame *frm, AstKeyMap **anc, int *status ){
 /*
 *  Name:
@@ -8299,7 +8299,7 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 *                                AstFrame *frm, AstKeyMap **anc, int *status )
 
 *  Class Membership:
@@ -8307,8 +8307,8 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function reads the supplied STC <Redshift> element, and uses it,
-*     if possible, to create the uncertainty associated with the redshift 
-*     axis in the supplied Frame. 
+*     if possible, to create the uncertainty associated with the redshift
+*     axis in the supplied Frame.
 
 *  Parameters:
 *     this
@@ -8323,11 +8323,11 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 *        from the Redshift. The keys identify the item of ancillary
 *        information (Name, Value, Error, Resolution, Size, Pixel Size).
 *        The value associated with the Name key is string containing
-*        the Name item from the Redshift. The value associated with each of 
-*        the other keys is a pointer to a 1D Region within the supplied 
-*        Frame, corresponding to the value, error, resolution, etc. Keys 
-*        will not be present in the returned KeyMap if the corresponding 
-*        item of ancillary information is not present in the Redshift. A 
+*        the Name item from the Redshift. The value associated with each of
+*        the other keys is a pointer to a 1D Region within the supplied
+*        Frame, corresponding to the value, error, resolution, etc. Keys
+*        will not be present in the returned KeyMap if the corresponding
+*        item of ancillary information is not present in the Redshift. A
 *        NULL pointer is returned if there is no ancillary information at all.
 *     status
 *        Pointer to the inherited status variable.
@@ -8391,10 +8391,10 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 /* Create a KeyMap to return holding ancilary info, and put the Name into
    it. */
       *anc = astKeyMap( "", status );
-      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME, 
+      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME,
                                   astXmlGetValue( scan->el[0][0], 0 ), NULL );
 
-/* Determine the units and system implied by the <Redshift> element. 
+/* Determine the units and system implied by the <Redshift> element.
    The returned system is AST__REDSHIFT if there is no unit attribute in
    the <Redshift> element, and is AST__VRADIO otherwise. */
       fsys = RedshiftSys( this, elem, &unit, 1, status );
@@ -8415,12 +8415,12 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* If the supplied Frame has no set units, set them now to the units of
    the Redshift element (if any, and if the redshift is not dimensionless). */
-      if( unit && fsys != AST__REDSHIFT && 
+      if( unit && fsys != AST__REDSHIFT &&
           astGetSystem( frm ) != AST__REDSHIFT && !astTestUnit( frm, 0 ) ) {
          astSetUnit( frm, 0, unit );
       }
 
-/* The values represented by the <Redshift> element may not be in the same 
+/* The values represented by the <Redshift> element may not be in the same
    system, units, etc as the supplied SpecFrame. We will need to be able to
    convert from one to the other, so create a SpecFrame describing the
    system and units used by the <Redshift> element. */
@@ -8429,7 +8429,7 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
       if( unit ) {
          astSetUnit( sf1, 0, unit );
          unit = astFree( unit );
-      }    
+      }
 
 /* Find the Mapping from Redshift value to the supplied SpecFrame value */
       fs = astConvert( sf1, frm, "" );
@@ -8476,12 +8476,12 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Redshift element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Redshift element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            result = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            result = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCERROR, result, NULL );
             r2 = astAnnul( r2 );
             r = astAnnul( r );
@@ -8505,12 +8505,12 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Redshift element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Redshift element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            r3 = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            r3 = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCRES, r3, NULL );
             r3 = astAnnul( r3 );
             r2 = astAnnul( r2 );
@@ -8535,12 +8535,12 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Redshift element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Redshift element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            r3 = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            r3 = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCSIZE, r3, NULL );
             r3 = astAnnul( r3 );
             r2 = astAnnul( r2 );
@@ -8565,19 +8565,19 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Redshift element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Redshift element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            r3 = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            r3 = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCPIXSZ, r3, NULL );
             r3 = astAnnul( r3 );
             r2 = astAnnul( r2 );
             r = astAnnul( r );
          }
       }
-   
+
 /* Free resources. */
       scan = FreeIVOAScan( scan, status );
       sf1 = astAnnul( sf1 );
@@ -8592,7 +8592,7 @@ static AstRegion *RedshiftReader( AstXmlChan *this, AstXmlElement *elem,
 
 }
 
-static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem, 
+static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
                                   char **unit, int report, int *status ){
 /*
 *  Name:
@@ -8607,7 +8607,7 @@ static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem, 
+*     AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
 *                                char **unit, int report, int *status )
 
 *  Class Membership:
@@ -8615,8 +8615,8 @@ static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function determines the redshift system described by the unit and
-*     vel_time_unit attributes in the supplied element. It optionally reports 
-*     an error if the units are not recognised. 
+*     vel_time_unit attributes in the supplied element. It optionally reports
+*     an error if the units are not recognised.
 
 *  Parameters:
 *     this
@@ -8629,7 +8629,7 @@ static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
 *        implied by the unit and vel_time_unit attributes. This string
 *        should be freed when no longer needed using astFree. A NULL
 *        pointer is returned if either of the two attributes (unit and
-*        vel_time_unit) is not found in the supplied element, or if an error 
+*        vel_time_unit) is not found in the supplied element, or if an error
 *        occurs.
 *     report
 *        If non-zero, then a failure is reported if the spectral system
@@ -8639,8 +8639,8 @@ static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
 
 *  Returned:
 *     The redshift system (radio velocity if both unit and vel_time_unit
-*     attributes are present in the supplied element, or dimensionaless 
-*     redshift otherwise). 
+*     attributes are present in the supplied element, or dimensionaless
+*     redshift otherwise).
 
 */
 
@@ -8693,12 +8693,12 @@ static AstSystemType RedshiftSys( AstXmlChan *this, AstXmlElement *elem,
       if( report ) Report( this, elem, FAILURE, "contains position units but not time units - assuming Z", status );
    }
 
-/* Return a default system (radio velocity if both units are present, 
+/* Return a default system (radio velocity if both units are present,
    dimensionless redshift otherwise). */
    return ( punit && tunit ) ? AST__VRADIO : AST__REDSHIFT;
 }
 
-static AstRegion *RegionReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *RegionReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -8727,7 +8727,7 @@ static AstRegion *RegionReader( AstXmlChan *this, AstXmlElement *elem,
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -8811,9 +8811,9 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element, int *sta
 
 *  Description:
 *     This function removes the specified element from the current
-*     container element, and then annuls the removed element. An error is 
-*     reported if the element being removed contains anything other than 
-*     comments, "isa" elements and blank character data (all contents should 
+*     container element, and then annuls the removed element. An error is
+*     reported if the element being removed contains anything other than
+*     comments, "isa" elements and blank character data (all contents should
 *     have been consumed by the process of reading the object).
 
 *  Parameters:
@@ -8838,7 +8838,7 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element, int *sta
 /* Check the global error status, and the supplied element. */
    if ( !astOK || !element ) return NULL;
 
-/* Check we have a container from which to remove the element. If so, 
+/* Check we have a container from which to remove the element. If so,
    check that the container is the elements parent. If so, remove the
    element from its parent container. */
    if( this->container ) {
@@ -8874,11 +8874,11 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element, int *sta
 /* Report the error. */
             if( astOK ) astError( AST__BADIN, "astRead(XmlChan): The following "
                                   "tag was not recognised as valid input within "
-                                  "a %s: %s", status, astXmlGetName( element ), 
+                                  "a %s: %s", status, astXmlGetName( element ),
                                   GetTag( (AstXmlObject *) item, 1, status ) );
             break;
          }
-               
+
 /* Character data is OK so long as it contains only white space */
       } else if( astXmlCheckType( item, AST__XMLBLACK ) ) {
          astError( AST__BADIN, "astRead(XmlChan): The following character "
@@ -8902,13 +8902,13 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element, int *sta
 
 /* Remove the element from its parent and the annul it. */
    astXmlRemoveItem( element );
-   astXmlAnnul( element );   
+   astXmlAnnul( element );
 
 /* Return a NULL pointer. */
    return NULL;
 }
 
-static void Report( AstXmlChan *this, AstXmlElement *elem, int severity, 
+static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
                     const char *msg, int *status ){
 /*
 *  Name:
@@ -8922,11 +8922,11 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 
 *  Synopsis:
 *     #include "channel.h"
-*     void Report( AstXmlChan *this, AstXmlElement *elem, int severity, 
+*     void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 *                  const char *msg, int *status )
 
 *  Class Membership:
-*     XmlChan member function 
+*     XmlChan member function
 
 *  Description:
 *     This function handles conditions which arise whilst interpreting
@@ -8940,7 +8940,7 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 *        WARNING (in which case the message is added to a list of
 *        warnings, but execution continues), or FAILURE, in which case
 *        an error is reported using astError, or RESET in which case any
-*        warnings stored in the XmlChan are removed ("elem" and "msg" are 
+*        warnings stored in the XmlChan are removed ("elem" and "msg" are
 *        ignored).
 *     msg
 *        A message describing the condition.
@@ -9013,21 +9013,21 @@ static IVOAScan *ScanIVOAElement( AstXmlChan *this, AstXmlElement *elem, int n,
 *     n
 *        The number of names supplied in "names"
 *     names
-*        An array holding pointers to strings giving the names of the known 
+*        An array holding pointers to strings giving the names of the known
 *        sub-elements. Each string may be either a single element name,
 *        or a set of element names separated by "|" (the string must
-*        also start and end with a "|"). If a set is supplied, then the 
-*        associated "min" and "max" values specify the minimum and maximum 
-*        total number of occurrences of all names in the set, and the 
-*        occurrence count stored in the returned structure gives the total 
+*        also start and end with a "|"). If a set is supplied, then the
+*        associated "min" and "max" values specify the minimum and maximum
+*        total number of occurrences of all names in the set, and the
+*        occurrence count stored in the returned structure gives the total
 *        number of occurrences of all names in the set.
 *     min
-*        An array holding the mimimum number of occrrences of each name within 
-*        the element being searched. Supplied in the same order as the names 
+*        An array holding the mimimum number of occrrences of each name within
+*        the element being searched. Supplied in the same order as the names
 *        themselves.
 *     max
-*        An array holding the maximum number of occrrences of each name within 
-*        the element being searched. Supplied in the same order as the names 
+*        An array holding the maximum number of occrrences of each name within
+*        the element being searched. Supplied in the same order as the names
 *        themselves.
 *     status
 *        Pointer to the inherited status variable.
@@ -9070,8 +9070,8 @@ static IVOAScan *ScanIVOAElement( AstXmlChan *this, AstXmlElement *elem, int n,
       result->el = astMalloc( sizeof(AstXmlElement **)*(size_t)n);
       if( result->el ) {
          for( j = 0; j < n; j++ ) {
-            result->count[ j ] = 0;         
-            result->el[ j ] = NULL;         
+            result->count[ j ] = 0;
+            result->el[ j ] = NULL;
          }
       }
    }
@@ -9086,8 +9086,8 @@ static IVOAScan *ScanIVOAElement( AstXmlChan *this, AstXmlElement *elem, int n,
 /* If it is not an XML element, it is not known. */
          if( !astXmlCheckType( item, AST__XMLELEM ) ) {
             known = 0;
-  
-/* If it is an element, get the name of the element. */         
+
+/* If it is an element, get the name of the element. */
          } else {
             name = astXmlGetName( item );
 
@@ -9109,7 +9109,7 @@ static IVOAScan *ScanIVOAElement( AstXmlChan *this, AstXmlElement *elem, int n,
                            known = 1;
                            break;
                         }
-                     }                                   
+                     }
                   }
                }
             }
@@ -9129,7 +9129,7 @@ static IVOAScan *ScanIVOAElement( AstXmlChan *this, AstXmlElement *elem, int n,
 
 /* If this content item was not known, issue a warning unless it is a comment
    or white space. */
-         if( !known && !astXmlCheckType( item, AST__XMLCOM ) && 
+         if( !known && !astXmlCheckType( item, AST__XMLCOM ) &&
                        !astXmlCheckType( item, AST__XMLWHITE ) ) {
             text = (char *) astXmlFormat( item );
             if( text ) {
@@ -9261,7 +9261,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
       } else {
          astError( AST__BADAT, "astSet(%s): Unknown XML format '%s' "
-                   "requested for a %s.", status, astGetClass( this ), setting + ival, 
+                   "requested for a %s.", status, astGetClass( this ), setting + ival,
                    astGetClass( this ) );
       }
 
@@ -9389,7 +9389,7 @@ static char *SourceWrap( const char *(* source)( void ), int *status ) {
    return result;
 }
 
-static AstObject *SpaceFrameReader( AstXmlChan *this, 
+static AstObject *SpaceFrameReader( AstXmlChan *this,
                                     AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -9410,7 +9410,7 @@ static AstObject *SpaceFrameReader( AstXmlChan *this,
 
 *  Description:
 *     This function makes a new AST Object from the supplied IVOA
-*     SpaceFrame element. 
+*     SpaceFrame element.
 
 *  Parameters:
 *     this
@@ -9483,13 +9483,13 @@ static AstObject *SpaceFrameReader( AstXmlChan *this,
             ignore_h = 1;
          }
 
-/* If the system is geodetic ignore any attributes specifying a reference 
+/* If the system is geodetic ignore any attributes specifying a reference
    spheroid. */
          if( isgeod && astXmlGetNattr( scan->el[0][0] ) > 0 ) {
             Report( this, elem, WARNING, "contains reference spheroid "
                     "(unsupported by AST - default values will be used)", status );
          }
-      }                  
+      }
 
 /* Check that the spatial axes are longitude/latitude */
       if( strcmp( "SPHERICAL", astXmlGetName( scan->el[3][0] ) ) ){
@@ -9592,7 +9592,7 @@ static AstObject *SpaceFrameReader( AstXmlChan *this,
    return (AstObject *) new;
 }
 
-static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem, 
+static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
                               const char *unit, int report, int *status ) {
 /*
 *  Name:
@@ -9606,14 +9606,14 @@ static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem, 
+*     AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
 *                            const char *unit, int report, int *status )
 
 *  Class Membership:
 *     XmlChan member function.
 
 *  Description:
-*     This function determines the spectral system described by a given units 
+*     This function determines the spectral system described by a given units
 *     string. It optionally reports an error if the string is not
 *     recognised.
 
@@ -9621,7 +9621,7 @@ static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
 *     this
 *        Pointer to the XmlChan. Only used if "report" is non-zero.
 *     elem
-*        Pointer to the IVOA element to which the unit relates. Only used 
+*        Pointer to the IVOA element to which the unit relates. Only used
 *        if "report" is non-zero.
 *     unit
 *        Pointer to the units string.
@@ -9645,9 +9645,9 @@ static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
    sys = AST__BADSYSTEM;
 
 /* Check inherited status */
-   if( !astOK ) return sys; 
+   if( !astOK ) return sys;
 
-/* See if a Mapping can be found from the supplied units to "Hz". If 
+/* See if a Mapping can be found from the supplied units to "Hz". If
    so, the supplied units are assumed to describe frequency. */
    map = astUnitMapper( unit, "Hz", NULL, NULL );
    if( map ) {
@@ -9662,15 +9662,15 @@ static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
 
 /* Otherwise, see if a Mapping can be found from the supplied units to
    "J" (Joule). If so, the supplied units are assumed to describe energy. */
-      } else {      
+      } else {
          map = astUnitMapper( unit, "J", NULL, NULL );
          if( map ) {
             sys = AST__ENERGY;
 
 /* Otherwise, see if a Mapping can be found from the supplied units to
-   "m^-1" (per metre). If so, the supplied units are assumed to describe 
+   "m^-1" (per metre). If so, the supplied units are assumed to describe
    wave number. */
-         } else {      
+         } else {
             map = astUnitMapper( unit, "m^-1", NULL, NULL );
             if( map ) {
                sys = AST__WAVENUM;
@@ -9689,9 +9689,9 @@ static AstSystemType SpecSys( AstXmlChan *this, AstXmlElement *elem,
 
 /* Return the result. */
    return sys;
-}   
+}
 
-static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
                                   AstFrame *frm, double *rf,
                                   AstKeyMap **anc, int *status ){
 /*
@@ -9706,7 +9706,7 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 *                                AstFrame *frm, double *rf,
 *                                AstKeyMap **anc, int *status )
 
@@ -9715,8 +9715,8 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function reads the supplied STC <Spectral> element, and uses it,
-*     if possible, to create the uncertainty associated with the spectral 
-*     axis in the supplied Frame. 
+*     if possible, to create the uncertainty associated with the spectral
+*     axis in the supplied Frame.
 
 *  Parameters:
 *     this
@@ -9735,11 +9735,11 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 *        from the Spectral. The keys identify the item of ancillary
 *        information (Name, Value, Error, Resolution, Size, Pixel Size).
 *        The value associated with the Name key is string containing
-*        the Name item from the Spectral. The value associated with each of 
-*        the other keys is a pointer to a 1D Region within the supplied 
-*        Frame, corresponding to the value, error, resolution, etc. Keys 
-*        will not be present in the returned KeyMap if the corresponding 
-*        item of ancillary information is not present in the Spectral. A 
+*        the Name item from the Spectral. The value associated with each of
+*        the other keys is a pointer to a 1D Region within the supplied
+*        Frame, corresponding to the value, error, resolution, etc. Keys
+*        will not be present in the returned KeyMap if the corresponding
+*        item of ancillary information is not present in the Spectral. A
 *        NULL pointer is returned if there is no ancillary information at all.
 *     status
 *        Pointer to the inherited status variable.
@@ -9805,14 +9805,14 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 /* Create a KeyMap to return holding ancilary info, and put the Name into
    it. */
       *anc = astKeyMap( "", status );
-      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME, 
+      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME,
                                   astXmlGetValue( scan->el[0][0], 0 ), NULL );
 
-/* The values represented by the <Spectral> element may not be in the same 
+/* The values represented by the <Spectral> element may not be in the same
    system,units, etc as the supplied SpecFrame. We will need to be able to
    convert from one to the other, so create a SpecFrame describing the
-   system and units used by the <Spectral> element. If the element does not 
-   have a unit attribute, assume the values are in the supplied SpecFrame 
+   system and units used by the <Spectral> element. If the element does not
+   have a unit attribute, assume the values are in the supplied SpecFrame
    system and units. */
       unit = astXmlGetAttributeValue( elem, "unit" );
       if( unit ) {
@@ -9832,7 +9832,7 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 
       } else {
          sf1 = astClone( frm );
-      }    
+      }
 
 /* Find the Mapping from Spectral value to the supplied SpecFrame value */
       fs = astConvert( sf1, frm, "" );
@@ -9846,7 +9846,7 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
       }
 
 /* If this Spectral contains a frequency Value which can be read, obtain
-   it. We will use the value to calculate the returned rest frequency. */ 
+   it. We will use the value to calculate the returned rest frequency. */
       if( scan->count[ 2 ] > 0 ) {
          name = astXmlGetName( scan->el[ 2 ][ 0 ] );
          if( name && !strcmp( name, "Value" ) ) {
@@ -9854,7 +9854,7 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Convert the value into the supplied SpecFrame system. Create an
    Interval describing it and store it in the returned ancillary keyMap.
-   Use an Interval rather than a PointList since an Interval can be used 
+   Use an Interval rather than a PointList since an Interval can be used
    within a Prism to extrude another Region, but a PointList cannot. */
             astTran1( map, 1, &v, 1, &tmp );
             r = (AstRegion *) astInterval( frm, &tmp, &tmp, NULL, "", status ) ;
@@ -9896,12 +9896,12 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Spectral element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Spectral element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            result = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            result = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCERROR, result, NULL );
             r2 = astAnnul( r2 );
             r = astAnnul( r );
@@ -9925,12 +9925,12 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Spectral element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Spectral element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            r3 = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            r3 = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCRES, r3, NULL );
             r3 = astAnnul( r3 );
             r2 = astAnnul( r2 );
@@ -9955,12 +9955,12 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Spectral element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Spectral element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            r3 = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            r3 = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCSIZE, r3, NULL );
             r3 = astAnnul( r3 );
             r2 = astAnnul( r2 );
@@ -9985,19 +9985,19 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
             ubnd[ 0 ] = 0.5*fabs( v );
             lbnd[ 0 ] = -ubnd[ 0 ];
 
-/* Create an Interval within the Frame represented by the Spectral element. 
-   Map it into the supplied Frame. Simplify it. Store in the returned 
+/* Create an Interval within the Frame represented by the Spectral element.
+   Map it into the supplied Frame. Simplify it. Store in the returned
    ancillary KeyMap. */
             r = (AstRegion *) astInterval( sf1, lbnd, ubnd, NULL, "", status );
-            r2 = astMapRegion( r, map, frm );                    
-            r3 = astSimplify( r2 );                    
+            r2 = astMapRegion( r, map, frm );
+            r3 = astSimplify( r2 );
             astMapPut0A( *anc, AST__STCPIXSZ, r3, NULL );
             r3 = astAnnul( r3 );
             r2 = astAnnul( r2 );
             r = astAnnul( r );
          }
       }
-   
+
 /* Free resources. */
       scan = FreeIVOAScan( scan, status );
       sf1 = astAnnul( sf1 );
@@ -10012,7 +10012,7 @@ static AstRegion *SpectralReader( AstXmlChan *this, AstXmlElement *elem,
 
 }
 
-static AstObject *SpectralFrameReader( AstXmlChan *this, 
+static AstObject *SpectralFrameReader( AstXmlChan *this,
                                        AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -10033,7 +10033,7 @@ static AstObject *SpectralFrameReader( AstXmlChan *this,
 
 *  Description:
 *     This function makes a new AST Object from the supplied IVOA
-*     SpectralFrame element. 
+*     SpectralFrame element.
 
 *  Parameters:
 *     this
@@ -10096,7 +10096,7 @@ static AstObject *SpectralFrameReader( AstXmlChan *this,
          sor = "Helio";
       } else if( astOK ){
          astError( AST__INTER, "SpectralFrameReader(XmlChan): Unknown "
-                   "standard of rest %s (internal AST programming error).", status, 
+                   "standard of rest %s (internal AST programming error).", status,
                    sor );
       }
 
@@ -10108,7 +10108,7 @@ static AstObject *SpectralFrameReader( AstXmlChan *this,
 
 /* Create a suitable SpecFrame. */
       new = astSpecFrame( "StdOfRest=%s", status, sor);
-      
+
 /* If the SpectralFrame has a <Name> element use it as the SpecFrame title. */
       if( scan->count[1] ) astSetTitle( new, astXmlGetValue( scan->el[1][0], 0 ) );
 
@@ -10123,7 +10123,7 @@ static AstObject *SpectralFrameReader( AstXmlChan *this,
    return (AstObject *) new;
 }
 
-static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                           AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -10137,7 +10137,7 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 *                                        AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -10145,17 +10145,17 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     SpectralInterval element. 
+*     SpectralInterval element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA SpectralInterval element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit or System attribute is not set, this
-*        function will decide on the values to be used, and set these 
+*        function will decide on the values to be used, and set these
 *        values in the supplied Frame before returning.
 *     status
 *        Pointer to the inherited status variable.
@@ -10211,7 +10211,7 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 /* Find the spectral system corresponding to these units. */
       } else {
          sys = SpecSys( this, elem, unit, 1, status );
-   
+
 /* Take a copy of the supplied Frame and set its System and Units to
    these values. Ensure the title is preserved. */
          cfrm = astCopy( frm );
@@ -10224,7 +10224,7 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
          astSetSystem( cfrm, sys );
          astSetUnit( cfrm, 0, unit );
          if( title ) astSetTitle( cfrm, title );
-   
+
 /* If at least one limit was found, create an Interval within this
    modified Frame. Otherwise create a negated NullRegion. */
          if( lolimit != AST__BAD || hilimit != AST__BAD ) {
@@ -10232,7 +10232,7 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
          } else {
             new = (AstRegion *) astNullRegion( cfrm, NULL, "negated=1", status );
          }
-   
+
 /* If the System of this Region differs from that of the supplied Frame,
    set it to the System of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the new System. If the supplied
@@ -10243,26 +10243,26 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
             if( fsys != sys ) astSetSystem( new, fsys );
          } else {
             astSetSystem( frm, sys );
-         }          
-   
+         }
+
 /* Do the same with the Units. */
          if( astTestUnit( frm, 0 ) ) {
             funit = astGetUnit( frm, 0 );
             if( strcmp( funit, unit ) ) astSetUnit( new, 0, funit );
          } else {
             astSetUnit( frm, 0, unit );
-         }          
-   
+         }
+
 /* Ensure the original titleis preserved. */
          if( title ) {
             astSetTitle( new, title );
             astSetTitle( frm, title );
          }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
          FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
          cfrm = astAnnul( cfrm );
          title = astFree( title );
@@ -10278,7 +10278,7 @@ static AstRegion *SpectralIntervalReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -10292,7 +10292,7 @@ static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
 *                              AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -10300,17 +10300,17 @@ static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Sphere element. 
+*     Sphere element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Sphere element.
-*     frm 
+*     frm
 *        Pointer to the Frame in which the returned Region should be
 *        defined. If the Unit or System attribute is not set, this
-*        function will decide on the values to be used, and set these 
+*        function will decide on the values to be used, and set these
 *        values in the supplied Frame before returning.
 *     status
 *        Pointer to the inherited status variable.
@@ -10402,7 +10402,7 @@ static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
       astSetUnit( cfrm, 0, unit );
       astSetUnit( cfrm, 1, unit );
       astSetUnit( cfrm, 2, unit );
-   
+
 /* Create a Circle within this modified Frame. */
       new = (AstRegion *) astCircle( cfrm, 1, cen, &rad, NULL, "", status );
 
@@ -10417,10 +10417,10 @@ static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
             if( strcmp( funit, unit ) ) astSetUnit( new, i, funit );
          } else {
             astSetUnit( frm, i, unit );
-         }          
-      }          
+         }
+      }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
 
@@ -10436,7 +10436,7 @@ static AstRegion *SphereReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstObject *StcMetadataReader( AstXmlChan *this, 
+static AstObject *StcMetadataReader( AstXmlChan *this,
                                      AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -10450,7 +10450,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstObject *StcMetadataReader( AstXmlChan *this, 
+*     AstObject *StcMetadataReader( AstXmlChan *this,
 *                                   AstXmlElement *elem, int *status )
 
 *  Class Membership:
@@ -10539,13 +10539,13 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
 /* Choose the KeyMap in which to save this item. */
          name = astXmlGetName( item );
          if( !strcmp( name, ASTRO_COORD_SYSTEM ) ){
-            map = map1; 
+            map = map1;
 
          } else if( !strcmp( name, ASTRO_COORD_AREA ) ){
-            map = map2; 
+            map = map2;
 
          } else if( !strcmp( name, ASTRO_COORDS ) ){
-            map = map3; 
+            map = map3;
 
          } else {
             map = NULL;
@@ -10558,10 +10558,10 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
             id = astXmlGetAttributeValue( (AstXmlElement *) item, "ID" );
             if( !id ) {
                id = "";
-               if( map != map3 ) {               
+               if( map != map3 ) {
                   Report( this, elem, WARNING, "has no ID attribute. Assuming"
                           "a null ID value", status );
-               } 
+               }
             }
 
 /* If the KeyMap already contains an object with this ID, issue a
@@ -10569,7 +10569,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
             if( astMapHasKey( map, id ) ) {
                if( map != map3 ) {
                   sprintf( buff, "contains two or more %s elements with the "
-                           "same ID (\"%s\"). Only the first one will be used", 
+                           "same ID (\"%s\"). Only the first one will be used",
                            name, id );
                   Report( this, elem, WARNING, buff, status );
                } else {
@@ -10577,11 +10577,11 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
                           "elements. Only the first one will be used", status );
                }
 
-/* Otherwise, save the index of the item in the KeyMap, using the ID as the 
+/* Otherwise, save the index of the item in the KeyMap, using the ID as the
    key. */
             } else {
                astMapPut0I( map, id, i, "" );
-            } 
+            }
          }
 
       } else {
@@ -10590,7 +10590,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
 
 /* If this content item was not used, issue a warning unless it is a comment
    or white space. */
-      if( !used && !astXmlCheckType( item, AST__XMLCOM ) && 
+      if( !used && !astXmlCheckType( item, AST__XMLCOM ) &&
                    !astXmlCheckType( item, AST__XMLWHITE ) ) {
          text = (char *) astXmlFormat( item );
          if( strlen( text ) > 30 ) text[ 30 ] = 0;
@@ -10612,10 +10612,10 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
    acs = NULL;
    aca = NULL;
    for( j = 0; j < narea; j++ ) {
-  
+
 /* Get the j'th key from "map2" (the ID associated with the j'th
-   AstroCoordArea found in the supplied element) and retrieve the value 
-   associated with this key (the index "i" into the content of the 
+   AstroCoordArea found in the supplied element) and retrieve the value
+   associated with this key (the index "i" into the content of the
    supplied element at which the j'th AstroCoordArea is stored). */
       astMapGet0I( map2, astMapKey( map2, j ), &i );
 
@@ -10632,7 +10632,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
                  "Assuming a null coord_system_id value", status );
       }
 
-/* Get the index within the supplied element of the AstroCoordSystem with this 
+/* Get the index within the supplied element of the AstroCoordSystem with this
    ID. Jump forward if no AstroCoordSystem with this id is available. */
       if( astMapGet0I( map1, id, &i ) ) {
 
@@ -10648,7 +10648,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
                  "ID \"%s\", but no such AstroCoordSystem is available "
                  "within the parent %s", id, stc_class );
          Report( this, aca, WARNING, buff, status );
-      } 
+      }
    }
 
 /* If we did not find a corresponding pair of AstroCoordSystem and
@@ -10670,8 +10670,8 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
       } else if( ncoord > 0 ) {
 
 /* Get the 1st key from "map3" (the ID associated with the 1st
-   AstroCoords found in the supplied element) and retrieve the value 
-   associated with this key (the index "i" into the content of the 
+   AstroCoords found in the supplied element) and retrieve the value
+   associated with this key (the index "i" into the content of the
    supplied element at which the 1st AstroCoords is stored). */
          astMapGet0I( map3, astMapKey( map3, 0 ), &i );
 
@@ -10688,7 +10688,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
                     "Assuming a null coord_system_id value", status );
          }
 
-/* Get the index within the supplied element of the AstroCoordSystem with this 
+/* Get the index within the supplied element of the AstroCoordSystem with this
    ID. Jump forward if no AstroCoordSystem with this id is available. */
          if( astMapGet0I( map1, id, &i ) ) {
 
@@ -10719,7 +10719,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
    } else {
       if( narea > 1 ) Report( this, elem, WARNING, "contains more than one "
                              "AstroCoordArea. Only one will be used", status );
-   
+
 /* Create a Frame from the ASTRO_COORD_SYSTEM. */
       frm = (AstFrame *) AstroCoordSystemReader( this, acs, status );
 
@@ -10733,10 +10733,10 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
       nanc = 0;
       ancs = NULL;
       for( j = 0; j < ncoord; j++ ) {
-  
+
 /* Get the j'th key from "map3" (the ID associated with the j'th
-   AstroCoords found in the supplied element) and retrieve the value 
-   associated with this key (the index "i" into the content of the 
+   AstroCoords found in the supplied element) and retrieve the value
+   associated with this key (the index "i" into the content of the
    supplied element at which the j'th AstroCoords is stored). */
          astMapGet0I( map3, astMapKey( map3, j ), &i );
 
@@ -10745,14 +10745,14 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
          aco = (AstXmlElement *) astXmlGetItem( elem, i );
 
 /* Get the "coord_system_id" attribute from this AstroCoords and compare it
-   with the ID of the AstrocCoordSys being used. If they match, incorporate 
-   the effects of the AstroCoords into the "frm" Frame and get a set of 4 
+   with the ID of the AstrocCoordSys being used. If they match, incorporate
+   the effects of the AstroCoords into the "frm" Frame and get a set of 4
    Regions representing the uncertainty within each of the 4 STC domains
    (space, time, spectral, redshift). */
          ido = astXmlGetAttributeValue( aco, "coord_system_id" );
          if( ido && !strcmp( id, ido ) ) {
             if( AstroCoordsReader( this, aco, frm, tuncs, &anc, status ) ) {
-               if( !gotunc ) {    
+               if( !gotunc ) {
                   uncs[ 0 ] = tuncs[ 0 ];
                   uncs[ 1 ] = tuncs[ 1 ];
                   uncs[ 2 ] = tuncs[ 2 ];
@@ -10809,7 +10809,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
                    "error).", status, stc_class );
       }
 
-/* Get the ID attribute from the supplied element and store in the 
+/* Get the ID attribute from the supplied element and store in the
    returned Object. */
       id = astXmlGetAttributeValue( elem, "ID" );
       if( id ) astSetIdent( stc, id );
@@ -10825,7 +10825,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
          for( i = 0; i < nanc; i++ ) ancs[ i ] = astAnnul( ancs[ i ] );
          ancs = astFree( ancs );
       }
-   } 
+   }
 
    map1 = astAnnul( map1 );
    map2 = astAnnul( map2 );
@@ -10835,7 +10835,7 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
    return (AstObject *) stc;
 }
 
-static AstRegion *StcRegionReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *StcRegionReader( AstXmlChan *this, AstXmlElement *elem,
                                 AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -10857,14 +10857,14 @@ static AstRegion *StcRegionReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Region element. 
+*     Region element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Region element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -10994,7 +10994,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    return result;
 }
 
-static AstObject *TimeFrameReader( AstXmlChan *this, 
+static AstObject *TimeFrameReader( AstXmlChan *this,
                                    AstXmlElement *elem, int *status ) {
 /*
 *  Name:
@@ -11015,7 +11015,7 @@ static AstObject *TimeFrameReader( AstXmlChan *this,
 
 *  Description:
 *     This function makes a new AST Object from the supplied IVOA
-*     TimeFrame element. 
+*     TimeFrame element.
 
 *  Parameters:
 *     this
@@ -11060,7 +11060,7 @@ static AstObject *TimeFrameReader( AstXmlChan *this,
    if( scan ) {
 
 /* Create a suitable TimeFrame. Set the timescale, but leave the other
-   attributes unset since they will not be known until an AstronTimeType 
+   attributes unset since they will not be known until an AstronTimeType
    is read. Except for unit. We set unit to "d" (day) because all the
    time form,ats supported by STC have "d" as the default unit. This
    avoids bad publicity which arises from presentin (say) MJD values in
@@ -11087,7 +11087,7 @@ static AstObject *TimeFrameReader( AstXmlChan *this,
    return (AstObject *) new;
 }
 
-static AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem,
                                       AstTimeFrame *frm, int *status ){
 /*
 *  Name:
@@ -11101,7 +11101,7 @@ static AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 *                                    AstTimeFrame *frm, int *status )
 
 *  Class Membership:
@@ -11109,16 +11109,16 @@ static AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     TimeInterval element. 
+*     TimeInterval element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA TimeInterval element.
-*     frm 
+*     frm
 *        Pointer to the TimeFrame in which the returned Region should be
-*        defined. 
+*        defined.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -11162,22 +11162,22 @@ static AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem,
    a negated NullRegion. */
       if( start != AST__BAD || stop != AST__BAD ) {
 
-/* Use the stop or start time (converted to an MJD) as the Epoch within the 
+/* Use the stop or start time (converted to an MJD) as the Epoch within the
    Frame. */
          if( start != AST__BAD ) {
             astSetEpoch( frm, MakeMJD( frm, start, status ) );
          } else if( stop != AST__BAD ) {
             astSetEpoch( frm, MakeMJD( frm, stop, status ) );
-         } 
+         }
          new = (AstRegion *) astInterval( frm, &start, &stop, NULL, "", status );
       } else {
          new = (AstRegion *) astNullRegion( frm, NULL, "negated=1", status );
       }
 
-/* Get any fill factor and lo/hi_include attributes from the element and 
+/* Get any fill factor and lo/hi_include attributes from the element and
    assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources. */
       scan = FreeIVOAScan( scan, status );
 
@@ -11190,7 +11190,7 @@ static AstRegion *TimeIntervalReader( AstXmlChan *this, AstXmlElement *elem,
    return new;
 }
 
-static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
                               AstTimeFrame *frm, double *epoch,
                               AstKeyMap **anc, int *status ){
 /*
@@ -11205,7 +11205,7 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem, 
+*     AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
 *                            AstTimeFrame *frm, double *epoch,
 *                            AstKeyMap **anc, int *status )
 
@@ -11214,8 +11214,8 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function reads the supplied STC <Time> element, and uses it,
-*     if possible, to create the uncertainty associated with the time 
-*     axis in the supplied Frame. 
+*     if possible, to create the uncertainty associated with the time
+*     axis in the supplied Frame.
 
 *  Parameters:
 *     this
@@ -11237,9 +11237,9 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
 *        The value associated with the Name key is string containing
 *        the Name item from the Time. The value
 *        associated with each of the other keys is a pointer to a 1D Region
-*        within the supplied Frame, corresponding to the value, error, 
+*        within the supplied Frame, corresponding to the value, error,
 *        resolution, etc. Keys will not be present in the returned KeyMap
-*        if the corresponding item of ancillary information is not present 
+*        if the corresponding item of ancillary information is not present
 *        in the Time. A NULL pointer is returned if there is no
 *        ancillary information at all.
 *     status
@@ -11302,19 +11302,19 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
 /* Create a KeyMap to return holding ancilary info, and put the Name into
    it. */
       *anc = astKeyMap( "", status );
-      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME, 
+      if( scan->count[0] > 0 ) astMapPut0C( *anc, AST__STCNAME,
                                   astXmlGetValue( scan->el[0][0], 0 ), NULL );
 
 /* Get any Unit attribute from the Time element. */
       unit = astXmlGetAttributeValue( elem, "unit" );
 
-/* We need to ensure the returned regions are mapped into units of "funit". 
-   If this is NULL it means that the returned regions are already in the 
+/* We need to ensure the returned regions are mapped into units of "funit".
+   If this is NULL it means that the returned regions are already in the
    required units. */
       funit = NULL;
 
-/* If the Time element has a unit attribute, we use it in preference to any 
-   units values in the supplied Frame. Take a copy of the time Frame and set 
+/* If the Time element has a unit attribute, we use it in preference to any
+   units values in the supplied Frame. Take a copy of the time Frame and set
    its Units to this values. Ensure the title is preserved. */
       if( unit && astChrLen( unit ) ) {
          cfrm = astCopy( frm );
@@ -11336,30 +11336,30 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
             }
          } else {
             astSetUnit( frm, 0, unit );
-         }          
+         }
 
       } else {
          cfrm = astClone( frm );
          title = NULL;
       }
 
-/* If this Time contains a Value which can be read, obtain it. Otherwise, 
-   issue a warning. We will use the value to calculate the returned epoch. */ 
+/* If this Time contains a Value which can be read, obtain it. Otherwise,
+   issue a warning. We will use the value to calculate the returned epoch. */
       if( scan->count[ 2 ] > 0 ) {
          value = AstronTimeReader( this, scan->el[ 2 ][ 0 ], cfrm, status );
          *epoch = MakeMJD( cfrm, value, status );
-         
-/* Ensure any relevant attribute values which were set by AstronTimeReader 
+
+/* Ensure any relevant attribute values which were set by AstronTimeReader
    within "cfrm" are transferred to "frm". */
          if( astTestTimeScale( cfrm ) ) astSetTimeScale( frm, astGetTimeScale( cfrm ) );
          if( astTestSystem( cfrm ) ) astSetSystem( frm, astGetSystem( cfrm ) );
          if( astTestUnit( cfrm, 0 ) ) astSetUnit( frm, 0, astGetUnit( cfrm, 0 ) );
          if( astTestTimeOrigin( cfrm ) ) astSetTimeOrigin( frm, astGetTimeOrigin( cfrm ) );
 
-/* Create a Interval from it and store in the returned ancillary KeyMap. If 
-   the units of this Frame differs from that of the supplied Frame, set it 
-   to the units of the supplied Frame. This will cause the encapsulated 
-   limits to be mapped into the new units. Ensure the original title is 
+/* Create a Interval from it and store in the returned ancillary KeyMap. If
+   the units of this Frame differs from that of the supplied Frame, set it
+   to the units of the supplied Frame. This will cause the encapsulated
+   limits to be mapped into the new units. Ensure the original title is
    preserved. Use an Interval rather than a PointList since an Interval
    can be used within a Prism to extrude another Region, but a PointList
    cannot. */
@@ -11394,7 +11394,7 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
    set it to the units of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the new units. */
             if( funit ) astSetUnit( result, 0, funit );
-   
+
 /* Ensure the original title is preserved. */
             if( title ) astSetTitle( result, title );
 
@@ -11428,7 +11428,7 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
    set it to the units of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the new units. */
             if( funit ) astSetUnit( r, 0, funit );
-   
+
 /* Ensure the original title is preserved. */
             if( title ) astSetTitle( r, title );
 
@@ -11462,7 +11462,7 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
    set it to the units of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the new units. */
             if( funit ) astSetUnit( r, 0, funit );
-   
+
 /* Ensure the original title is preserved. */
             if( title ) astSetTitle( r, title );
 
@@ -11496,7 +11496,7 @@ static AstRegion *TimeReader( AstXmlChan *this, AstXmlElement *elem,
    set it to the units of the supplied Frame. This will cause the
    encapsulated limits to be mapped into the new units. */
             if( funit ) astSetUnit( r, 0, funit );
-   
+
 /* Ensure the original title is preserved. */
             if( title ) astSetTitle( r, title );
 
@@ -11540,7 +11540,7 @@ static AstTimeScaleType TimeScaleReader( AstXmlChan *this, AstXmlElement *elem, 
 *     XmlChan member function.
 
 *  Description:
-*     This function returns a value representing the timescale specified by 
+*     This function returns a value representing the timescale specified by
 *     the supplied IVOA TimeScale element.
 
 *  Parameters:
@@ -11557,7 +11557,7 @@ static AstTimeScaleType TimeScaleReader( AstXmlChan *this, AstXmlElement *elem, 
 */
 
 /* Local Variables: */
-   AstTimeScaleType result; 
+   AstTimeScaleType result;
    char buff[ 80 ];
    const char *tstxt;
 
@@ -11614,7 +11614,7 @@ static AstTimeScaleType TimeScaleReader( AstXmlChan *this, AstXmlElement *elem, 
    return result;
 }
 
-static AstRegion *UnionReader( AstXmlChan *this, AstXmlElement *elem, 
+static AstRegion *UnionReader( AstXmlChan *this, AstXmlElement *elem,
                                AstFrame *frm, int *status ){
 /*
 *  Name:
@@ -11636,14 +11636,14 @@ static AstRegion *UnionReader( AstXmlChan *this, AstXmlElement *elem,
 
 *  Description:
 *     This function makes a new AST Region from the supplied IVOA
-*     Union region element. 
+*     Union region element.
 
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
 *     elem
 *        Pointer to the IVOA Union region element.
-*     frm 
+*     frm
 *        Pointer to the 2D Frame in which the returned Region should be
 *        defined. If the Unit attribute is not set, this function will
 *        set it to the value supplied in "unit" before returning.
@@ -11682,7 +11682,7 @@ static AstRegion *UnionReader( AstXmlChan *this, AstXmlElement *elem,
    if( scan ) {
 
 /* Create Regions from all the component region elements, and combine
-   them into nested CmpRegions, using the boolean OR operator to combine 
+   them into nested CmpRegions, using the boolean OR operator to combine
    them. */
       new = RegionReader( this, scan->el[0][0], frm, status );
       for( i = 1; i < scan->count[0]; i++ ) {
@@ -11695,7 +11695,7 @@ static AstRegion *UnionReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Get any fill factor from the element and assign to the returned Region. */
       FillAndLims( this, elem, new, status );
-   
+
 /* Free resources */
       scan = FreeIVOAScan( scan, status );
    }
@@ -11797,7 +11797,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *     XmlChan member function.
 
 *  Description:
-*     Returns 0 if there are no differences between the two strings, and 1 
+*     Returns 0 if there are no differences between the two strings, and 1
 *     otherwise. Comparisons are case blind.
 
 *  Parameters:
@@ -11814,7 +11814,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strcmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -11902,7 +11902,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strncmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -11952,7 +11952,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 
 }
 
-static int VertexReader( AstXmlChan *this, AstXmlElement *elem, double *x, 
+static int VertexReader( AstXmlChan *this, AstXmlElement *elem, double *x,
                          double *y, int *status ){
 /*
 *  Name:
@@ -11966,15 +11966,15 @@ static int VertexReader( AstXmlChan *this, AstXmlElement *elem, double *x,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     int VertexReader( AstXmlChan *this, AstXmlElement *elem, double *x, 
+*     int VertexReader( AstXmlChan *this, AstXmlElement *elem, double *x,
 *                       double *y )
 
 *  Class Membership:
 *     XmlChan member function.
 
 *  Description:
-*     This function reads a 2D position from the supplied IVOA Vertex 
-*     element. 
+*     This function reads a 2D position from the supplied IVOA Vertex
+*     element.
 
 *  Parameters:
 *     this
@@ -12028,7 +12028,7 @@ static int VertexReader( AstXmlChan *this, AstXmlElement *elem, double *x,
 
 /* Get any SmallCircle element. If it has a Pole issue a warning. */
       result = scan->count[ 1 ];
-      if( result ) { 
+      if( result ) {
          if( FindElement( this, scan->el[1][0], "Pole", status ) ) {
             Report( this, scan->el[1][0], WARNING, "contains a <Pole> "
                     "tag (poles are not supported by AST)", status );
@@ -12100,8 +12100,8 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
 /* If this is a top level object (i.e. if there is no container element),
    reset all the other values in the XmlChan for safety. */
    if( !this->container ) {
-      this->objectname = NULL;   
-      this->objectset = 1;       
+      this->objectname = NULL;
+      this->objectset = 1;
       this->objectcomment = NULL;
    }
 
@@ -12119,7 +12119,7 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
    current container (i.e. parent) element. */
    elem = astXmlAddElement( this->container, class, pref );
 
-/* If this is a top level container, store the namespace URI for 
+/* If this is a top level container, store the namespace URI for
    the element, either default or named depending on the value of
    XmlPrefix. */
    if( !this->container ) astXmlAddURI( elem, pref, AST__XMLNS );
@@ -12267,7 +12267,7 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
    written. */
       if( Use( this, set, helpful, status ) ) {
 
-/* Create a new XmlElement with a name of ATTR (and no namespace 
+/* Create a new XmlElement with a name of ATTR (and no namespace
    prefix), and add it into the current container (i.e. parent) element. */
          elem = astXmlAddElement( this->container, ATTR,
                                   astGetXmlPrefix( this ) );
@@ -12276,7 +12276,7 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
          astXmlAddAttr( elem, NAME, name, NULL );
 
 /* Format the value as a string and store it as the VALUE attribute.
-   Make sure "-0" isn't produced. Use a magic string to represent bad 
+   Make sure "-0" isn't produced. Use a magic string to represent bad
    values. */
          if( value != AST__BAD ) {
             (void) sprintf( buff, "%.*g", DBL_DIG, value );
@@ -12373,7 +12373,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
 
 /* Get the parent of the current container element. */
    if( this->container ) {
-      parent = astXmlGetParent( this->container );      
+      parent = astXmlGetParent( this->container );
 
 /* If the current container element has no parent, we have completed the
    construction of the in-memory XML representation of the AST object being
@@ -12390,7 +12390,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
             text = (char *) astXmlFormat( this->container );
          }
 
-/* Now, if we have any text, split it into separate lines. The end of a line 
+/* Now, if we have any text, split it into separate lines. The end of a line
    is indicated by a "\n" character in the text returned by astXmlFormat. */
          if( text ) {
 
@@ -12398,7 +12398,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
             mxlen = astGetXmlLength( this );
 
 /* Loop round locating each '\n' character in the string. Replace the
-   '\n' character by 0, so that the previous part of the string is then 
+   '\n' character by 0, so that the previous part of the string is then
    null terminated, and write it out using the astPutNextText method
    (splitting the text up into lines no longer than "mxlen"). */
             c = text;
@@ -12413,7 +12413,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
 /* Write out any text following the last '\n' character. */
             if( *c ) OutputText( this, c, mxlen, status );
 
-/* Free the memory holding the text and in-memory representations of the AST 
+/* Free the memory holding the text and in-memory representations of the AST
    Object. */
             text = astFree( (void *) text );
             astXmlRemoveItem( this->container );
@@ -12461,7 +12461,7 @@ static void WriteInt( AstChannel *this_channel, const char *name, int set, int h
 *  Synopsis:
 *     #include "xmlchan.h"
 *     void WriteInt( AstChannel *this, const char *name, int set, int helpful,
-*                    int value, const char *comment, int *status ) 
+*                    int value, const char *comment, int *status )
 
 *  Class Membership:
 *     XmlChan member function (over-rides the protected
@@ -12556,7 +12556,7 @@ static void WriteInt( AstChannel *this_channel, const char *name, int set, int h
    written. */
       if( Use( this, set, helpful, status ) ) {
 
-/* Create a new XmlElement with a name of ATTR (and no namespace 
+/* Create a new XmlElement with a name of ATTR (and no namespace
    prefix), and add it into the current container (i.e. parent) element. */
          elem = astXmlAddElement( this->container, ATTR,
                                   astGetXmlPrefix( this ) );
@@ -12660,9 +12660,9 @@ static void WriteIsA( AstChannel *this_channel, const char *class,
    information). */
       if ( this->write_isa || astGetFull( this ) > 0 ) {
 
-/* Create a new XmlElement with a name of "_isa" (and no namespace prefix), 
+/* Create a new XmlElement with a name of "_isa" (and no namespace prefix),
    and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, ISA, 
+         elem = astXmlAddElement( this->container, ISA,
                                   astGetXmlPrefix( this ) );
 
 /* Add a "class" attribute to this element containing the class name. */
@@ -12795,13 +12795,13 @@ static void WriteObject( AstChannel *this_channel, const char *name,
       if ( Use( this, set, helpful, status ) ) {
 
 /* Save the supplied name associated with the object being written so
-   that it is available for use within the following invocation of the 
+   that it is available for use within the following invocation of the
    WriteBegin method. The name is stored within the XmlChan structure
    (NULL is used to indicate "no name supplied"). */
          this->objectname = ( name && strlen( name ) ) ? name : NULL;
-      
+
 /* Also save the supplied comment and a flag indicating if the object is
-   set. These will be used by the WriteBegin method. They are stored within 
+   set. These will be used by the WriteBegin method. They are stored within
    the XmlChan structure. */
          this->objectset = set;
          this->objectcomment = comment;
@@ -12825,7 +12825,7 @@ static void WriteObject( AstChannel *this_channel, const char *name,
 
 }
 
-static void WriteString( AstChannel *this_channel, const char *name, int set, 
+static void WriteString( AstChannel *this_channel, const char *name, int set,
                          int helpful, const char *value, const char *comment, int *status ){
 /*
 *  Name:
@@ -12840,7 +12840,7 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
 *  Synopsis:
 *     #include "xmlchan.h"
 *     void WriteString( AstChannel *this, const char *name, int set, int helpful,
-*                       const char *value, const char *comment, int *status ) 
+*                       const char *value, const char *comment, int *status )
 
 *  Class Membership:
 *     XmlChan member function (over-rides the protected
@@ -12932,7 +12932,7 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
    written. */
       if( Use( this, set, helpful, status ) ) {
 
-/* Create a new XmlElement with a name of ATTR (and no namespace 
+/* Create a new XmlElement with a name of ATTR (and no namespace
    prefix), and add it into the current container (i.e. parent) element. */
          elem = astXmlAddElement( this->container, ATTR,
                                   astGetXmlPrefix( this ) );
@@ -12940,7 +12940,7 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
 /* Add a NAME attribute to this element containing the item name. */
          astXmlAddAttr( elem, NAME, name, NULL );
 
-/* If we are using QUOTED format, add an attribute to indicate that this is a 
+/* If we are using QUOTED format, add an attribute to indicate that this is a
    string value (mainly included for compatibility with JNIAST). */
          if( astGetXmlFormat( this ) == QUOTED_FORMAT ) {
             astXmlAddAttr( elem, QUOTED, TRUE, NULL );
@@ -13004,8 +13004,8 @@ f     affects the behaviour of the AST_WRITE routine  when
 *     XML representation.
 *
 *     The XmlChan class allows AST objects to be represented in the form
-*     of XML in several ways (conventions) and the XmlFormat attribute is 
-*     used to specify which of these should be used. The formatting options 
+*     of XML in several ways (conventions) and the XmlFormat attribute is
+*     used to specify which of these should be used. The formatting options
 *     available are outlined in the "Formats Available" section below.
 *
 *     By default, an XmlChan will attempt to determine which format system
@@ -13031,26 +13031,26 @@ f     affects the behaviour of the AST_WRITE routine  when
 *     information is included which allows client code to convert the
 *     XML into a form which can be read by a standard AST Channel. This
 *     extra information indicates which AST attribute values should be
-*     enclosed in quotes before being passed to a Channel. 
+*     enclosed in quotes before being passed to a Channel.
 *
-*     - "IVOA": This is a format that uses an early draft of the STC-X schema 
-*     developed by the International Virtual Observatory Alliance (IVOA - 
-*     see "http://www.ivoa.net/") to describe coordinate systems, regions, 
-*     mappings, etc. Support is limited to V1.20 described at 
+*     - "IVOA": This is a format that uses an early draft of the STC-X schema
+*     developed by the International Virtual Observatory Alliance (IVOA -
+*     see "http://www.ivoa.net/") to describe coordinate systems, regions,
+*     mappings, etc. Support is limited to V1.20 described at
 *     "http://www.ivoa.net/Documents/WD/STC/STC-20050225.html". Since the
 *     version of STC-X finally adopted by the IVOA differs in several
-*     significant respects from V1.20, this format is now mainly of 
+*     significant respects from V1.20, this format is now mainly of
 *     historical interest. Note, the alternative "STC-S" format (a
-*     simpler non-XML encoding of the STC metadata) is supported by the 
+*     simpler non-XML encoding of the STC metadata) is supported by the
 *     StcsChan class.
 
 *  Choice of Default Format;
 *     If the XmlFormat attribute of an XmlChan is not set, the default
 *     value it takes is determined by the presence of certain critical
-*     items within the document most recently read using 
+*     items within the document most recently read using
 c     astRead.
 f     AST_READ.
-*     The sequence of decision used to arrive at the default value is as 
+*     The sequence of decision used to arrive at the default value is as
 *     follows:
 *
 *     - If the previous document read contained any elements in any of the STC
@@ -13067,8 +13067,8 @@ f     AST_READ.
 *     over-rides this default behaviour.
 
 *  The IVOA Format:
-*     The IVOA support caters only for certain parts of V1.20 of the 
-*     draft Space-Time Coordinate (STC) schema (see 
+*     The IVOA support caters only for certain parts of V1.20 of the
+*     draft Space-Time Coordinate (STC) schema (see
 *     http://www.ivoa.net/Documents/WD/STC/STC-20050225.html). Note, this
 *     draft has now been superceded by an officially adopted version that
 *     differs in several significant respects from V1.20. Consequently,
@@ -13078,23 +13078,23 @@ f     AST_READ.
 *     or write STC information (note, this list is currently incomplete):
 *
 *     - Objects can currently only be read using this format, not written.
-*     - The AST object generated by reading an <STCMetadata> element will 
-*     be an instance of one of the AST "Stc" classes: StcResourceProfile, 
+*     - The AST object generated by reading an <STCMetadata> element will
+*     be an instance of one of the AST "Stc" classes: StcResourceProfile,
 *     StcSearchLocation, StcCatalogEntryLocation, StcObsDataLocation.
-*     - When reading an <STCMetadata> element, the axes in the returned 
+*     - When reading an <STCMetadata> element, the axes in the returned
 *     AST Object will be in the order space, time, spectral, redshift,
 *     irrespective of the order in which the axes occur in the <STCMetadata>
-*     element. If the supplied <STCMetadata> element does not contain all of 
-*     these axes, the returned AST Object will also omit them, but the 
-*     ordering of those axes which are present will be as stated above. If 
-*     the spatial frame represents a celestial coordinate system the 
-*     spatial axes will be in the order (longitude, latitude). 
+*     element. If the supplied <STCMetadata> element does not contain all of
+*     these axes, the returned AST Object will also omit them, but the
+*     ordering of those axes which are present will be as stated above. If
+*     the spatial frame represents a celestial coordinate system the
+*     spatial axes will be in the order (longitude, latitude).
 *     - Until such time as the AST TimeFrame is complete, a simple
-*     1-dimensional Frame (with Domain set to TIME) will be used to 
+*     1-dimensional Frame (with Domain set to TIME) will be used to
 *     represent the STC <TimeFrame> element. Consequently, most of the
 *     information within a <TimeFrame> element is currently ignored.
-*     - <SpaceFrame> elements can only be read if they describe a celestial 
-*     longitude and latitude axes supported by the AST SkyFrame class. The 
+*     - <SpaceFrame> elements can only be read if they describe a celestial
+*     longitude and latitude axes supported by the AST SkyFrame class. The
 *     space axes will be returned in the order (longitude, latitude).
 *     - Velocities associated with SpaceFrames cannot be read.
 *     - Any <GenericCoordFrame> elements within an <AstroCoordSystem> element
@@ -13105,10 +13105,10 @@ f     AST_READ.
 *     STCMetaData element is ignored.
 *     - Any <OffsetCenter> found within a <SpaceFrame> is ignored.
 *     - Any CoordFlavor element found within a <SpaceFrame> is ignored.
-*     - <SpaceFrame> elements can only be read if they refer to 
+*     - <SpaceFrame> elements can only be read if they refer to
 *     one of the following space reference frames: ICRS, GALACTIC_II,
 *     SUPER_GALACTIC, HEE, FK4, FK5, ECLIPTIC.
-*     - <SpaceFrame> elements can only be read if the reference 
+*     - <SpaceFrame> elements can only be read if the reference
 *     position is TOPOCENTER. Also, any planetary ephemeris is ignored.
 *     - Regions: there is currently no support for STC regions of type
 *     Sector, ConvexHull or SkyIndex.
@@ -13126,14 +13126,14 @@ f     AST_READ.
 *att--
 */
 astMAKE_CLEAR(XmlChan,XmlFormat,xmlformat,UNKNOWN_FORMAT)
-astMAKE_SET(XmlChan,XmlFormat,int,xmlformat,( 
-   value == NATIVE_FORMAT || 
-   value == IVOA_FORMAT || 
-   value == QUOTED_FORMAT ? value : 
+astMAKE_SET(XmlChan,XmlFormat,int,xmlformat,(
+   value == NATIVE_FORMAT ||
+   value == IVOA_FORMAT ||
+   value == QUOTED_FORMAT ? value :
    (astError( AST__BADAT, "astSetXmlFormat: Unknown XML formatting system %d "
               "supplied.", status, value ), UNKNOWN_FORMAT )))
 astMAKE_TEST(XmlChan,XmlFormat,( this->xmlformat != UNKNOWN_FORMAT ))
-astMAKE_GET(XmlChan,XmlFormat,int,0,(this->xmlformat == UNKNOWN_FORMAT ? 
+astMAKE_GET(XmlChan,XmlFormat,int,0,(this->xmlformat == UNKNOWN_FORMAT ?
                                 this->formatdef : this->xmlformat))
 
 /*
@@ -13151,17 +13151,17 @@ astMAKE_GET(XmlChan,XmlFormat,int,0,(this->xmlformat == UNKNOWN_FORMAT ?
 *     Integer.
 
 *  Description:
-*     This attribute specifies the maximum length to use when writing out 
+*     This attribute specifies the maximum length to use when writing out
 *     text through the sink function supplied when the XmlChan was created.
 *
-*     The number of characters in each string written out through the sink 
+*     The number of characters in each string written out through the sink
 *     function will not be greater than the value of this attribute (but
-*     may be less). A value of zero (the default) means there is no limit - 
+*     may be less). A value of zero (the default) means there is no limit -
 *     each string can be of any length.
 *
 f     Note, the default value of zero is unlikely to be appropriate when
 f     an XmlChan is used within Fortran code. In this case, XmlLength
-f     should usually be set to the size of the CHARACTER variable used to 
+f     should usually be set to the size of the CHARACTER variable used to
 f     receive the text returned by AST_GETLINE within the sink function.
 f     This avoids the possibility of long lines being truncated invisibly
 f     within AST_GETLINE.
@@ -13194,14 +13194,14 @@ astMAKE_TEST(XmlChan,XmlLength,( this->xmllength != -INT_MAX ))
 *     This attribute is a string which is to be used as the namespace
 *     prefix for all XML elements created as a result of writing an AST
 *     Object out through an XmlChan. The URI associated with the namespace
-*     prefix is given by the symbolic constant AST__XMLNS defined in 
+*     prefix is given by the symbolic constant AST__XMLNS defined in
 f     AST_PAR.
 c     ast.h.
 *     A definition of the namespace prefix is included in each top-level
 *     element produced by the XmlChan.
 *
 *     The default value is a blank string which causes no prefix to be
-*     used. In this case each top-level element will set the default 
+*     used. In this case each top-level element will set the default
 *     namespace to be the value of AST__XMLNS.
 
 *  Applicability:
@@ -13263,8 +13263,8 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->objectname = NULL;   /* Name of object being written */
    out->objectset = 1;       /* Is object being written set?*/
    out->objectcomment = NULL;/* Comment for object class being written */
-   out->readcontext = NULL;  /* XmlElement giving context for current read */ 
-   out->container = NULL;    /* XmlElement to which content will be added */ 
+   out->readcontext = NULL;  /* XmlElement giving context for current read */
+   out->container = NULL;    /* XmlElement to which content will be added */
    out->write_isa = 0;       /* Write out the next "IsA" item? */
    out->reset_source = 1;    /* A new line should be read from the source */
    out->isa_class = NULL;    /* Class being loaded */
@@ -13440,7 +13440,7 @@ f     RESULT = AST_XMLCHAN( SOURCE, SINK, OPTIONS, STATUS )
 *     operations. Writing an Object to an XmlChan (using
 c     astWrite) will, if the Object is suitable, generate an
 f     AST_WRITE) will, if the Object is suitable, generate an
-*     XML description of that Object, and reading from an XmlChan will 
+*     XML description of that Object, and reading from an XmlChan will
 *     create a new Object from its XML description.
 *
 *     Normally, when you use an XmlChan, you should provide "source"
@@ -13529,7 +13529,7 @@ f     necessary for the null routine AST_NULL (so long as the AST_PAR
 f     include file has been used).
 *     - If the external data source or sink uses a character encoding
 *     other than ASCII, the supplied source and sink functions should
-*     translate between the external character encoding and the internal 
+*     translate between the external character encoding and the internal
 *     ASCII encoding used by AST.
 *     - A null Object pointer (AST__NULL) will be returned if this
 *     function is invoked with the AST error status set, or if it
@@ -13555,7 +13555,7 @@ f     pointer.
    virtual function table as well if necessary. This interface is for
    use by other C functions within AST, and uses the standard "wrapper"
    functions included in this class. */
-   new = astInitXmlChan( NULL, sizeof( AstXmlChan ), !class_init, 
+   new = astInitXmlChan( NULL, sizeof( AstXmlChan ), !class_init,
                           &class_vtab, "XmlChan", source, SourceWrap,
                           sink, SinkWrap );
 
@@ -13605,8 +13605,8 @@ AstXmlChan *astXmlChanId_( const char *(* source)( void ),
 *     This function implements the external (public) C interface to the
 *     astXmlChan constructor function. Another function (astXmlChanForId)
 *     should be called to create an XmlChan for use within other languages.
-*     Both functions return an ID value (instead of a true C pointer) to 
-*     external users, and must be provided because astXmlChan_ has a variable 
+*     Both functions return an ID value (instead of a true C pointer) to
+*     external users, and must be provided because astXmlChan_ has a variable
 *     argument list which cannot be encapsulated in a macro (where this conversion would otherwise
 *     occur).
 *
@@ -13642,8 +13642,8 @@ AstXmlChan *astXmlChanId_( const char *(* source)( void ),
    virtual function table as well if necessary. This interface is for
    use by external C functions and uses the standard "wrapper"
    functions included in this class. */
-   new = astInitXmlChan( NULL, sizeof( AstXmlChan ), !class_init, 
-                         &class_vtab, "XmlChan", source, SourceWrap, 
+   new = astInitXmlChan( NULL, sizeof( AstXmlChan ), !class_init,
+                         &class_vtab, "XmlChan", source, SourceWrap,
                          sink, SinkWrap );
 
 /* If successful, note that the virtual function table has been
@@ -13824,7 +13824,7 @@ AstXmlChan *astXmlChanForId_( const char *(* source)( void ),
 
 /* Initialise the XmlChan, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitXmlChan( NULL, sizeof( AstXmlChan ), !class_init, 
+   new = astInitXmlChan( NULL, sizeof( AstXmlChan ), !class_init,
                          &class_vtab, "XmlChan", source, source_wrap,
                          sink, sink_wrap );
 
@@ -14007,8 +14007,8 @@ AstXmlChan *astInitXmlChan_( void *mem, size_t size, int init,
       new->objectname = NULL;   /* Name of object being written */
       new->objectset = 1;       /* Is object being written set?*/
       new->objectcomment = NULL;/* Comment for object class being written */
-      new->container = NULL;    /* XmlElement to which content will be added */ 
-      new->readcontext = NULL;  /* XmlElement giving context for current read */ 
+      new->container = NULL;    /* XmlElement to which content will be added */
+      new->readcontext = NULL;  /* XmlElement giving context for current read */
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmllength = -INT_MAX;/* Buffer length */
       new->xmlprefix = NULL;    /* Xml prefix */
@@ -14152,8 +14152,8 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
       new->objectname = NULL;   /* Name of object being written */
       new->objectset = 1;       /* Is object being written set?*/
       new->objectcomment = NULL;/* Comment for object class being written */
-      new->container = NULL;    /* XmlElement to which content will be added */ 
-      new->readcontext = NULL;  /* XmlElement giving context for current read */ 
+      new->container = NULL;    /* XmlElement to which content will be added */
+      new->readcontext = NULL;  /* XmlElement giving context for current read */
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmllength = -INT_MAX;/* Buffer length */
       new->xmlprefix = NULL;    /* Xml prefix */
@@ -14175,8 +14175,8 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
 /* --------- */
       text = astReadString( channel, "xmlfmt", UNKNOWN_STRING );
       if( strcmp( text, UNKNOWN_STRING ) ) {
-         new->xmlformat = FindString( MAX_FORMAT + 1, xformat, text, 
-                                     "the XmlChan component 'XmlFmt'", 
+         new->xmlformat = FindString( MAX_FORMAT + 1, xformat, text,
+                                     "the XmlChan component 'XmlFmt'",
                                      "astRead", astGetClass( channel ), status );
       } else {
          new->xmlformat = UNKNOWN_FORMAT;

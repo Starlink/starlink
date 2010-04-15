@@ -17,9 +17,9 @@
 *        The global status.
 
 *  Description:
-*     This routine displays statistics for pixels that lie within a 
-*     specified aperture of an NDF. The aperture can either be circular 
-*     (specified by parameters CENTRE and DIAM), or arbitrary (specified 
+*     This routine displays statistics for pixels that lie within a
+*     specified aperture of an NDF. The aperture can either be circular
+*     (specified by parameters CENTRE and DIAM), or arbitrary (specified
 *     by parameter ARDFILE). If the aperture is specified using parameters
 *     CENTRE and DIAM, then it must be either 1 or 2 dimensional.
 *
@@ -28,7 +28,7 @@
 *     - The total number of pixels within the aperture
 *     - The number of good pixels within the aperture
 *     - The total data sum within the aperture
-*     - The standard deviation on the total data sum (that is, the 
+*     - The standard deviation on the total data sum (that is, the
 *       square root of the sum of the individual pixel variances)
 *     - The mean pixel value within the aperture
 *     - The standard deviation on the mean pixel value (that is, the
@@ -37,17 +37,17 @@
 *     - The standard deviation of the pixel values within the aperture
 *
 *     If individual pixel variances are not available within the input NDF
-*     (i.e. if it has no VARIANCE component), then each pixel is assumed to 
-*     have a constant variance equal to the variance of the pixel values 
+*     (i.e. if it has no VARIANCE component), then each pixel is assumed to
+*     have a constant variance equal to the variance of the pixel values
 *     within the aperture. There is an option to weight pixels so that
-*     pixels with larger variances are given less weight (see parameter 
-*     WEIGHT). The statistics are displayed on the screen and written to 
+*     pixels with larger variances are given less weight (see parameter
+*     WEIGHT). The statistics are displayed on the screen and written to
 *     output parameters. They may also be written to a log file.
 *
-*     A pixel is included if its centre is within the aperture, and is not 
-*     included otherwise. This simple approach may not be suitable for 
-*     accurate aperture photometry, especially where the aperture diameter 
-*     is less than about ten times the pixel size. A specialist photometry 
+*     A pixel is included if its centre is within the aperture, and is not
+*     included otherwise. This simple approach may not be suitable for
+*     accurate aperture photometry, especially where the aperture diameter
+*     is less than about ten times the pixel size. A specialist photometry
 *     package should be used if accuracy, rather than speed, is paramount.
 
 *  Usage:
@@ -56,11 +56,11 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of an ARD file containing a description of the aperture.
-*        This allows apertures of almost any shape to be used. If a null 
-*        (!) value is supplied then the aperture is assumed to be circular 
-*        with centre and diameter given by parameters CENTRE and DIAM. ARD 
+*        This allows apertures of almost any shape to be used. If a null
+*        (!) value is supplied then the aperture is assumed to be circular
+*        with centre and diameter given by parameters CENTRE and DIAM. ARD
 *        files can be created either "by hand" using an editor, or using a
-*        specialist application should as KAPPA:ARDGEN. 
+*        specialist application should as KAPPA:ARDGEN.
 *
 *        The co-ordinate system in which positions within the ARD file are
 *        given should be indicated by including suitable COFRAME or WCS
@@ -73,21 +73,21 @@
 *        co-ordinates.  [!]
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the centre of the circular aperture. Only
-*        used if parameter ARDFILE is set to null. The position must be 
-*        given in the current co-ordinate Frame of the NDF (supplying 
+*        used if parameter ARDFILE is set to null. The position must be
+*        given in the current co-ordinate Frame of the NDF (supplying
 *        a colon ":" will display details of the current co-ordinate
-*        Frame). The position should be supplied as a list of formatted 
-*        axis values separated by spaces or commas. See also parameter 
+*        Frame). The position should be supplied as a list of formatted
+*        axis values separated by spaces or commas. See also parameter
 *        USEAXIS. The current co-ordinate Frame can be changed using
 *        KAPPA:WCSFRAME.
 *     DIAM = LITERAL (Read)
-*        The diameter of the circular aperture. Only used if parameter 
-*        ARDFILE is set to null. If the current co-ordinate Frame of the 
+*        The diameter of the circular aperture. Only used if parameter
+*        ARDFILE is set to null. If the current co-ordinate Frame of the
 *        NDF is a SKY Frame (e.g. RA and DEC), then the value should be
 *        supplied as an increment of celestial latitude (e.g. DEC). Thus,
 *        "10.2" means 10.2 arcseconds, "30:0" would mean 30 arcminutes,
 *        and "1:0:0" would mean 1 degree. If the current co-ordinate
-*        Frame is not a SKY Frame, then the diameter should be specified 
+*        Frame is not a SKY Frame, then the diameter should be specified
 *        as an increment along axis 1 of the current co-ordinate Frame.
 *        Thus, if the current Frame is PIXEL, the value should be given
 *        simply as a number of pixels.
@@ -111,37 +111,37 @@
 *        are available this is the RMS value of the standard deviations
 *        associated with each included pixel value. If variances are not
 *        available, it is the standard deviation of the pixel values
-*        divided by the square root of the number of good pixels in 
+*        divided by the square root of the number of good pixels in
 *        the aperture.
 *     SIGTOTAL = _DOUBLE (Write)
 *        The standard deviation on the total data sum.  Only created if
-*        variances are available this is the RMS value of the standard 
-*        deviations associated with each included pixel value.  If 
-*        variances are not available, it is the standard deviation of 
-*        the pixel values divided by the square root of the number of 
+*        variances are available this is the RMS value of the standard
+*        deviations associated with each included pixel value.  If
+*        variances are not available, it is the standard deviation of
+*        the pixel values divided by the square root of the number of
 *        good pixels in the aperture.
 *     TOTAL = _DOUBLE (Write)
 *        The total of the pixel values within the aperture.
 *     USEAXIS = GROUP (Read)
-*        USEAXIS is only accessed if the current co-ordinate Frame of 
-*        the NDF has too many axes. A group of strings should be 
-*        supplied specifying the axes which are to be used when 
-*        specifying the aperture using parameters ARDFILE, CENTRE and 
+*        USEAXIS is only accessed if the current co-ordinate Frame of
+*        the NDF has too many axes. A group of strings should be
+*        supplied specifying the axes which are to be used when
+*        specifying the aperture using parameters ARDFILE, CENTRE and
 *        DIAM.  Each axis can be specified using one of the following
 *        options.
 *
-*        - Its integer index within the current Frame of the input 
-*        NDF (in the range 1 to the number of axes in the current 
+*        - Its integer index within the current Frame of the input
+*        NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *        - Its symbol string such as "RA" or "VRAD".
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
 *        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
-*        A list of acceptable values is displayed if an illegal value is 
-*        supplied.  If a null (!) value is supplied, the axes with the 
-*        same indices as the two used pixel axes within the NDF are 
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the two used pixel axes within the NDF are
 *        used.  [!]
 *     WEIGHT = _LOGICAL (Read)
 *        If a TRUE value is supplied, and the input NDF has a VARIANCE
@@ -151,7 +151,7 @@
 *        The constant of proportionality is chosen so that the mean weight
 *        is unity. The pixel value and pixel variance are multiplied by
 *        the pixels weight before being used to calculate the statistics.
-*        The calculation of the statistics remains unchanged in all other 
+*        The calculation of the statistics remains unchanged in all other
 *        respects.  [FALSE]
 
 *  Examples:
@@ -159,15 +159,15 @@
 *        This calculates the statistics of the pixels within a circular
 *        aperture of NDF neb1. Assuming the current co-ordinate Frame of
 *        neb1 is PIXEL, the aperture is centred at pixel co-ordinates
-*        (13.5, 201.3) and has a diameter of 20 pixels. 
+*        (13.5, 201.3) and has a diameter of 20 pixels.
 *     aperadd neb1 "15:23:43.2 -22:23:34.2" "10:0"
 *        This also calculates the statistics of the pixels within a circular
 *        aperture of NDF neb1. Assuming the current co-ordinate Frame of
-*        neb1 is a SKY Frame describing RA and DEC, the aperture is centred 
+*        neb1 is a SKY Frame describing RA and DEC, the aperture is centred
 *        at RA 15:23:43.2 and DEC -22:23:34.2, and has a diameter of 10
 *        arcminutes.
 *     aperadd ndf=neb1 ardfile=outline.dat logfile=obj1
-*        This calculates the statistics of the pixels within an aperture 
+*        This calculates the statistics of the pixels within an aperture
 *        of NDF neb1 described within the file "outline.dat". The file
 *        contains an ARD description of the required aperture. The results
 *        are written to the log file "obj1".
@@ -189,7 +189,7 @@
 *     KAPPA: STATS, MSTATS, ARDGEN, ARDMASK, ARDPLOT, WCSFRAME.
 
 *  Implementation Status:
-*     -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE 
+*     -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE
 *     components of an NDF data structure.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -199,7 +199,7 @@
 *  Copyright:
 *     Copyright (C) 2001, 2003-2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -247,14 +247,14 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'MSG_PAR'          ! Message-system constants
-               
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER APTXT*80         ! Description of aperture
       CHARACTER DOM*30           ! Current Frame Domain
       CHARACTER TEXT*(GRP__SZNAM)! General text bufferName of ARD file
@@ -274,7 +274,7 @@
       INTEGER FDL                ! File descriptor
       INTEGER IAT                ! Used length of a string
       INTEGER IGRP               ! Group identifier
-      INTEGER INDF1              ! Identifier for the input NDF  
+      INTEGER INDF1              ! Identifier for the input NDF
       INTEGER INDF2              ! Identifier for NDF section containing aperture
       INTEGER IPDAT              ! Pointer to the data component of input NDF
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
@@ -313,7 +313,7 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain an identifier for the NDF structure to be examined.       
+*  Obtain an identifier for the NDF structure to be examined.
       CALL LPG_ASSOC( 'NDF', 'READ', INDF1, STATUS )
 
 *  Abort if an error has occurred.
@@ -322,13 +322,13 @@
 *  See if a circular aperture is to be used (in which case the NDF must
 *  be 2-d). Do this by seeing if the user has supplied an ARD file (in
 *  which case store a suitable ARD expression in TEXT which will cause
-*  the file to be read). If not, anull the error. 
+*  the file to be read). If not, anull the error.
       CALL FIO_ASSOC( 'ARDFILE', 'READ', 'LIST', 0, FDL, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL NDF_DIM( INDF1, NDF__MXDIM, DIM, NDIM, STATUS )
          ARD = .TRUE.
          TEXT( 1:1 ) = '^'
-         CALL FIO_FNAME( FDL, TEXT( 2: ), STATUS ) 
+         CALL FIO_FNAME( FDL, TEXT( 2: ), STATUS )
          CALL FIO_ANNUL( FDL, STATUS )
          APTXT = TEXT( 2: )
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
@@ -341,13 +341,13 @@
       CALL PAR_GET0L( 'WEIGHT', WEIGHT, STATUS )
 
 *  Get the WCS FrameSet and the bounds of the significant axes.
-      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., .TRUE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Get a pointer to the current Frame.
       CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  If an ARD file was supplied... 
+*  If an ARD file was supplied...
       IF( ARD ) THEN
 
 *  Create a GRP group holding the ARD description.
@@ -355,16 +355,16 @@
          CALL ARD_GRPEX( TEXT, GRP__NOID, IGRP, CONT, STATUS )
 
 *  Indicate that the ARD file can contain coords in any of the Frames
-*  contained in the NDFs WCS FrameSet. First set the current Frame of 
-*  the FrameSet to PIXEL to indicate that PIXEL is the default coord 
+*  contained in the NDFs WCS FrameSet. First set the current Frame of
+*  the FrameSet to PIXEL to indicate that PIXEL is the default coord
 *  system for positions in the ARD file.
          CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
          CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
          CALL ARD_WCS( IWCS, 'PIXEL', STATUS )
 
-*  If no ARD file was supplied, get the centre and diameter of the circular 
+*  If no ARD file was supplied, get the centre and diameter of the circular
 *  aperture, and construct a group holding an equivalent ARD description.
-      ELSE 
+      ELSE
 
 *  Get the CENTRE parameter value.
          CC( 1 ) = AST__BAD
@@ -377,7 +377,7 @@
             DAX = 1
          END IF
          DIAM= AST__BAD
-         CALL KPG1_GTAXV( 'DIAM', 1, .TRUE., CURFRM, DAX, DIAM, NVAL, 
+         CALL KPG1_GTAXV( 'DIAM', 1, .TRUE., CURFRM, DAX, DIAM, NVAL,
      :                    STATUS )
 
 *  Create the ARD description.
@@ -391,37 +391,37 @@
      :                   IAT )
          CALL CHR_APPND( ',', TEXT, IAT )
          IAT = IAT + 1
-         CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, 0.5*DIAM, STATUS ), 
+         CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, 0.5*DIAM, STATUS ),
      :                   TEXT, IAT )
          CALL CHR_APPND( ' )', TEXT, IAT )
 
 *  Put this text into a GRP group.
          CALL GRP_NEW( ' ', IGRP, STATUS )
-         CALL GRP_PUT( IGRP, 1, TEXT( : IAT ), 0, STATUS ) 
+         CALL GRP_PUT( IGRP, 1, TEXT( : IAT ), 0, STATUS )
          APTXT = TEXT( : IAT )
-          
-*  Store the WCS FrameSet. Since no COFRAME or WCS statements were included 
-*  in the ARD description above, positions will be interpreted as being in 
+
+*  Store the WCS FrameSet. Since no COFRAME or WCS statements were included
+*  in the ARD description above, positions will be interpreted as being in
 *  the current Frame of the WCS FrameSet.
          CALL ARD_WCS( IWCS, 'PIXEL', STATUS )
-          
+
       END IF
 
 *  Allocate the memory needed for the logical mask array.
-      CALL NDF_SIZE( INDF1, EL, STATUS ) 
+      CALL NDF_SIZE( INDF1, EL, STATUS )
       CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
-      
+
 *  Create the mask.  Value 2 should be used to represent pixels
 *  specified by the first keyword in the ARD description. TRCOEF is
 *  ignored because we have previously called ARD_WCS.
       REGVAL = 2
       CALL ARD_WORK( IGRP, NDIM, SLBND, SUBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), 
+     :               %VAL( CNF_PVAL( IPMASK ) ),
      :               LBNDI, UBNDI, LBNDE, UBNDE,
      :               STATUS )
-       
+
 *  Create a section from the input NDF which just encloses the aperture.
-      CALL NDF_SECT( INDF1, NDIM, LBNDI, UBNDI, INDF2, STATUS ) 
+      CALL NDF_SECT( INDF1, NDIM, LBNDI, UBNDI, INDF2, STATUS )
 
 *  Obtain the numeric type of the array, and map it.
       CALL NDF_TYPE( INDF2, 'DATA', TYPE, STATUS )
@@ -429,64 +429,64 @@
 
 *  If variances are available, map them.
       CALL NDF_STATE( INDF2, 'VARIANCE', VAR, STATUS )
-      IF( VAR ) CALL NDF_MAP( INDF2, 'VARIANCE', TYPE, 'READ', IPVAR, 
+      IF( VAR ) CALL NDF_MAP( INDF2, 'VARIANCE', TYPE, 'READ', IPVAR,
      :                        EL, STATUS )
 
 *  Copy the section of the mask array which just encloses the aperture
 *  into a new mask array.
       CALL PSX_CALLOC( EL, '_INTEGER', IPMSK2, STATUS )
-      CALL KPG1_CPNDI( NDIM, SLBND, SUBND, %VAL( CNF_PVAL( IPMASK ) ), 
+      CALL KPG1_CPNDI( NDIM, SLBND, SUBND, %VAL( CNF_PVAL( IPMASK ) ),
      :                 LBNDI, UBNDI,
      :                 %VAL( CNF_PVAL( IPMSK2 ) ), EL, STATUS )
 
-*  Calculate the required statistics. Call the appropriate routine for the 
+*  Calculate the required statistics. Call the appropriate routine for the
 *  data type.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_APADR( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADR( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_APADB( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADB( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_APADD( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADD( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_APADI( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADI( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_APADUB( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADUB( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                     %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_APADUW( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADUW( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                     %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_APADW( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+         CALL KPS1_APADW( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
-     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
@@ -531,12 +531,12 @@
          IAT = 12
          DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
          CALL CHR_APPND( DOM, TEXT, IAT )
-         IF( DOM .EQ. 'SKY' ) THEN 
+         IF( DOM .EQ. 'SKY' ) THEN
             CALL CHR_APPND( ' (', TEXT, IAT )
             CALL CHR_APPND( AST_GETC( CURFRM, 'SYSTEM', STATUS ),
      :                     TEXT, IAT )
 
-            IF( AST_GETD( CURFRM, 'EQUINOX', STATUS ) .LT. 1984.0 ) THEN 
+            IF( AST_GETD( CURFRM, 'EQUINOX', STATUS ) .LT. 1984.0 ) THEN
                CALL CHR_APPND( ' B', TEXT, IAT )
             ELSE
                CALL CHR_APPND( ' J', TEXT, IAT )
@@ -579,7 +579,7 @@
 
 *  Display the total pixel sum.
       TEXT = '  Total data sum                      :'
-      IAT = 41      
+      IAT = 41
       IF( TOT .NE. VAL__BADD ) THEN
          CALL CHR_PUTD( TOT, TEXT, IAT )
       ELSE
@@ -654,7 +654,7 @@
       CALL GRP_DELET( IGRP, STATUS )
 
 *  End the NDF context.
-      CALL NDF_END( STATUS )                              
+      CALL NDF_END( STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

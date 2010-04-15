@@ -70,7 +70,7 @@ c      call ast_flushmemory( 1 )
       if( status .eq. AST__BADIN ) then
          call err_annul( status )
          call err_rlse
-      else 
+      else
          call err_rlse
          call error( 'Failed to report error about "fred"', status )
       end if
@@ -83,7 +83,7 @@ c      call ast_flushmemory( 1 )
       km = ast_warnings( ch, status )
       if( km .eq. AST__NULL ) call error( 'No Warnings keymap', status )
       call asserti( 'Warnings mapsize', ast_mapsize( km, status ), 4,
-     :              status ) 
+     :              status )
 
       call asserta( obj, 'Class', 'Prism', status )
       call asserta( obj, 'Naxes', '4', status )
@@ -98,10 +98,10 @@ c      call ast_flushmemory( 1 )
       call ast_GetRegionBounds( obj, lbnd, ubnd, status )
       call ast_setc( obj, 'Format(1)', 'iso.2', status )
       call assertd( 'Time upper bounds', ubnd(1), VAL__MAXD, status )
-      call assertc( 'Time lower bound', 
+      call assertc( 'Time lower bound',
      :              ast_format( obj, 1, lbnd(1), status ),
      :              '1900-01-01 00:00:00.00', status )
-      call assertd( 'RA lower bound', lbnd(2), 2.50080939227851D0, 
+      call assertd( 'RA lower bound', lbnd(2), 2.50080939227851D0,
      :              status )
       call assertd( 'RA upper bound', ubnd(2), 2.6967811201606D0,
      :              status )
@@ -123,7 +123,7 @@ c      call ast_flushmemory( 1 )
       call readast( 'stcschan-test1-doc3.ast', sb, status )
       if( .not. ast_equal( obj, sb, status ) ) then
          call error( 'Object read from doc3 is not equal to the '//
-     :               'object read from file stcschan-test1-doc3.ast.', 
+     :               'object read from file stcschan-test1-doc3.ast.',
      :               status )
       end if
 
@@ -136,32 +136,32 @@ c      call ast_flushmemory( 1 )
       obj = ast_read( ch, status )
 
       call asserta( obj, 'Class', 'KeyMap', status )
-      call assert( 'Has PROPS entry', AST_MAPHASKEY( obj, 'PROPS', 
+      call assert( 'Has PROPS entry', AST_MAPHASKEY( obj, 'PROPS',
      :             status ), status )
-      call assert( 'Has COORDS entry', AST_MAPHASKEY( obj, 'COORDS', 
+      call assert( 'Has COORDS entry', AST_MAPHASKEY( obj, 'COORDS',
      :             status ), status )
 
       if( ast_mapget0a( obj, 'AREA', iobj, status ) ) then
          call readast( 'stcschan-test1-doc3.ast', sb, status )
          if( .not. ast_equal( iobj, sb, status ) ) then
             call error( 'AREA read from doc3 is not equal to the '//
-     :                  'object read from file stcschan-test1-doc3.ast', 
+     :                  'object read from file stcschan-test1-doc3.ast',
      :                  status )
          end if
       else
          call error( 'No AREA entry found', status )
-      end if      
+      end if
 
       if( ast_mapget0a( obj, 'PROPS', iobj, status ) ) then
          call readast( 'stcschan-test1-doc3-props.ast', sb, status )
          if( .not. ast_equal( iobj, sb, status ) ) then
             call error( 'PROPS read from doc3 is not equal to the '//
-     :            'object read from file stcschan-test1-doc3-props.ast', 
+     :            'object read from file stcschan-test1-doc3-props.ast',
      :            status )
          end if
       else
          call error( 'No PROPS entry found', status )
-      end if      
+      end if
 
 
 
@@ -174,52 +174,52 @@ c      call ast_flushmemory( 1 )
 
       iwrite = 0
       nobj = ast_write( ch, obj, status )
-      call asserti( 'N obj', nobj, 1, status ) 
+      call asserti( 'N obj', nobj, 1, status )
 
-      call assertc( 'line 1 3', buff(1), 
+      call assertc( 'line 1 3', buff(1),
      :              'TimeInterval TT geocenter 1996-01-01T00:00:00 '//
      :              '1996-01-01T00:30:00', status )
-      call assertc( 'line 2 3', buff(2), 
+      call assertc( 'line 2 3', buff(2),
      :              '   Time MJD 50814.0 Error 1.2 Resolution 0.8 '//
      :              'PixSize 1024.0', status )
-      call assertc( 'line 3 3', buff(3), 
+      call assertc( 'line 3 3', buff(3),
      :              'Union ICRS GEOCENTER ( ', status )
-      call assertc( 'line 4 3', buff(4), 
+      call assertc( 'line 4 3', buff(4),
      :              '      Circle 180 10 20 ', status )
-      call assertc( 'line 5 3', buff(5), 
+      call assertc( 'line 5 3', buff(5),
      :              '      Circle 190 10 20 ', status )
-      call assertc( 'line 6 3', buff(6), 
+      call assertc( 'line 6 3', buff(6),
      :              '      Intersection ( ', status )
-      call assertc( 'line 7 3', buff(7), 
+      call assertc( 'line 7 3', buff(7),
      :              '         Circle 120 -10 20 ', status )
-      call assertc( 'line 8 3', buff(8), 
+      call assertc( 'line 8 3', buff(8),
      :              '         Difference ( ', status )
-      call assertc( 'line 9 3', buff(9), 
+      call assertc( 'line 9 3', buff(9),
      :              '            Circle 130 -10 20 ', status )
-      call assertc( 'line 10 3', buff(10), 
+      call assertc( 'line 10 3', buff(10),
      :              '            Circle 115 -10 10 ', status )
-      call assertc( 'line 11 3', buff(11), 
+      call assertc( 'line 11 3', buff(11),
      :              '         ) ', status )
-      call assertc( 'line 12 3', buff(12), 
+      call assertc( 'line 12 3', buff(12),
      :              '      ) ', status )
-      call assertc( 'line 13 3', buff(13), 
+      call assertc( 'line 13 3', buff(13),
      :              '   ) ', status )
-      call assertc( 'line 14 3', buff(14), 
+      call assertc( 'line 14 3', buff(14),
      :              '   Position 179.0 -11.5 Error 0.000889 0.000889 '//
      :              'Resolution 0.001778', status )
-      call assertc( 'line 15 3', buff(15), 
+      call assertc( 'line 15 3', buff(15),
      :              '   Size 0.000333 0.000278 PixSize 0.000083 '//
      :              '0.000083', status )
-      call assertc( 'line 16 3', buff(16), 
+      call assertc( 'line 16 3', buff(16),
      :              'Spectral BARYCENTER 1420.4 unit MHz Resolution '//
      :              '10.0 ', status )
-      call assertc( 'line 17 3', buff(17), 
+      call assertc( 'line 17 3', buff(17),
      :              'RedshiftInterval BARYCENTER VELOCITY OPTICAL '//
      :              '200 2300 Redshift 300', status )
 
       call ast_end( status )
 
-      if( status .ne. sai__ok ) call err_rep( ' ', 'test1 failed.', 
+      if( status .ne. sai__ok ) call err_rep( ' ', 'test1 failed.',
      :                                        status )
 
       end
@@ -270,8 +270,8 @@ c      call ast_flushmemory( 1 )
 
       iwrite = 0
       nobj = ast_write( ch, reg, status )
-      call asserti( 'N obj', nobj, 1, status ) 
-      call asserti( 'iwrite', iwrite, 2, status ) 
+      call asserti( 'N obj', nobj, 1, status )
+      call asserti( 'iwrite', iwrite, 2, status )
       call assertc( 'line 1', buff(1), 'Ellipse ICRS TOPOCENTER '//
      :              '74.48451 28.64789 17.18873 5.729578', status )
       call assertc( 'line 2', buff(2), '   57.29578 Error 0.5729514 '//
@@ -286,7 +286,7 @@ c      call ast_flushmemory( 1 )
       if( obj .ne. AST__NULL ) then
          iwrite = 0
          nobj = ast_write( ch, obj, status )
-         call asserti( 'N obj 2', nobj, 1, status ) 
+         call asserti( 'N obj 2', nobj, 1, status )
 
          call assertc( 'line 1 2', buff(1), 'TimeInterval TT '//
      :                 'GEoCENTER 1996-01-01T00:00:00', status )
@@ -316,14 +316,14 @@ c      call ast_flushmemory( 1 )
          call assertc( 'line 9 2', buff(9), '   Resolution 0.7 '//
      :                 'PixSize 0.3', status )
 
-      else      
+      else
          write(*,*) 'No object read from doc 3'
       end if
 
 
       call ast_end( status )
 
-      if( status .ne. sai__ok ) call err_rep( ' ', 'test2 failed.', 
+      if( status .ne. sai__ok ) call err_rep( ' ', 'test2 failed.',
      :                                        status )
 
       end
@@ -484,7 +484,7 @@ c      call ast_flushmemory( 1 )
          call ast_putline( ' ', -1, status )
       end if
 
-      end        
+      end
 
 
 
@@ -502,10 +502,10 @@ c      call ast_flushmemory( 1 )
       integer status, l
       character line*300
 
-      call ast_getline( line, l, status ) 
+      call ast_getline( line, l, status )
       if( l .gt. 0 ) then
          if( iwrite .lt. 0 ) then
-            write(*,*) line( : l ) 
+            write(*,*) line( : l )
          else
             iwrite = iwrite + 1
             buff( iwrite ) = ' '
@@ -513,7 +513,7 @@ c      call ast_flushmemory( 1 )
          end if
       end if
 
-      end      
+      end
 
 
       subroutine asserta( obj, anam, asb, status )
@@ -548,7 +548,7 @@ c      call ast_flushmemory( 1 )
 
          i = 1
          blank = ' '
-         do while( val( i : i ) .eq. sb( i : i ) ) 
+         do while( val( i : i ) .eq. sb( i : i ) )
             i = i + 1
          end do
          blank( i : i ) = '^'
@@ -647,7 +647,7 @@ c      call ast_flushmemory( 1 )
       call ast_putline( buffer, len( buffer ), status )
       return
 
- 99   call ast_putline( buffer, -1, status )      
+ 99   call ast_putline( buffer, -1, status )
       end
 
 

@@ -94,7 +94,7 @@
 
 *  Related Applications:
 *     KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTTWEAK.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -109,7 +109,7 @@
 *        Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
 *        than n.
 *     1991 November 15 (MJC):
-*        Made exit trigger number 2.  Inceased maximum number of 
+*        Made exit trigger number 2.  Inceased maximum number of
 *        triggers to 64.
 *     1992 February 10 (MJC):
 *        Normalised the rotation displacement by the effective number
@@ -132,7 +132,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,7 +153,7 @@
 
       INTEGER NMEMAX             ! Maximum number of memories
       PARAMETER ( NMEMAX = 10 )
-     
+
 *  Local Variables:
 
       INTEGER
@@ -181,7 +181,7 @@
      :  NCONF,                   ! Configuration number
      :  NINTS( 1 ),              ! Number of LUT entries
      :  NLOC( 1 ),               ! Number of locators
-     :  NLUTE,                   ! Number of entries in the VLUT less 
+     :  NLUTE,                   ! Number of entries in the VLUT less
                                  ! the reserved pens.
      :  NMEM,                    ! Number of image memories
      :  NRESP,                   ! Number of reserved pens
@@ -433,7 +433,7 @@
 *    Read the current LUT, only storing what is possible.  The buffer
 *    is generous as most devices have no more than 256 levels.
 
-      NLUTE = MIN( NINTS( 1 ) - NRESP, CTM__MXPEN ) 
+      NLUTE = MIN( NINTS( 1 ) - NRESP, CTM__MXPEN )
       CALL IILRLT( DID, MEMID, NRESP, NLUTE, VLUT, IDSTAT )
 
 *    Abort if an error has occurred.  Note IDI does not use
@@ -527,7 +527,7 @@
          TRIGS( 1 ) = 0
          TRIGS( 2 ) = 0
          TRIGS( 3 ) = 0
-      
+
 *       Execute the LUT-rotation interactions.
 
          CALL IIIEIW( DID, TRIGS, IDSTAT )
@@ -566,7 +566,7 @@
             IF ( IDSTAT .NE. IDI__OK ) THEN
 
 *             Obtain a meaningful IDI error message.
- 
+
                CALL KPG1_IDERR( 'IILWLT_ERR', IDSTAT, STATUS )
                GOTO 999
             END IF
@@ -605,7 +605,7 @@
 
             PENDIS = PENDIS + REAL( XDISP ) * XSPFAC( XCORR ) * ROTSCL
 
-*          Rotate the LUT. 
+*          Rotate the LUT.
 *          ===============
 
 *          Only rotate when the locator has moved.
@@ -627,7 +627,7 @@
                   END DO
                END DO
 
-*             Write the rotated VLUT. 
+*             Write the rotated VLUT.
 *             =======================
 
 *             Only write to the unreserved portion of the VLUT.
@@ -639,7 +639,7 @@
                IF ( IDSTAT .NE. IDI__OK ) THEN
 
 *                Obtain a meaningful IDI error message.
- 
+
                   CALL KPG1_IDERR( 'IILWLT_ERR', IDSTAT, STATUS )
                   GOTO 999
                END IF
@@ -649,14 +649,14 @@
 
 *    Closedown sequence.
 *    ===================
-      
+
 *    Errors, either obtaining the device or because the device does not
 *    support the LUT-rotation operation, fall to this point.
 
  999  CONTINUE
 
       IF ( DEVCAN ) THEN
-      
+
 *       Close down IDI using the parameter system.
 
          CALL IDI_CANCL( 'DEVICE', STATUS )

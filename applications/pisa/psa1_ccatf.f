@@ -63,8 +63,8 @@
       INTEGER IVALS( NFLD )     ! Integer values
       REAL RVALS( NFLD )        ! Real values
       INTEGER INDEX, XPOS, YPOS, ! Column identifiers
-     :        INT, NPIX, PEAK, 
-     :        ELLIPT, ANGLE, SXX, 
+     :        INT, NPIX, PEAK,
+     :        ELLIPT, ANGLE, SXX,
      :        SYY, SXY
       INTEGER QIP               ! Parameter identifier
 
@@ -74,12 +74,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Add some parameters.
-      CALL CAT_PNEW0( CI, CAT__QITYP, 'CATSOURCE', CAT__TYPEC, QIP, 
+      CALL CAT_PNEW0( CI, CAT__QITYP, 'CATSOURCE', CAT__TYPEC, QIP,
      :                STATUS )
       CALL CAT_TATTI( QIP, 'CSIZE', 4, STATUS )
       CALL CAT_TATTC( QIP, 'VALUE', 'PISA', STATUS )
       CALL CAT_TATTC( QIP, 'COMM', 'Catalogue source', STATUS )
-      CALL CAT_PNEW0( CI, CAT__QITYP, 'KEYFIELD', CAT__TYPEC, QIP, 
+      CALL CAT_PNEW0( CI, CAT__QITYP, 'KEYFIELD', CAT__TYPEC, QIP,
      :                STATUS )
       CALL CAT_TATTI( QIP, 'CSIZE', 5, STATUS )
       CALL CAT_TATTC( QIP, 'VALUE', 'INDEX', STATUS )
@@ -135,12 +135,12 @@
       CALL CAT_TATTC( XPOS, 'COMM', 'X COORDINATE', STATUS )
       CALL CAT_TATTC( YPOS, 'COMM', 'Y COORDINATE', STATUS )
       CALL CAT_TATTC( INT, 'COMM', 'TOTAL INTENSITY OF OBJECT', STATUS )
-      CALL CAT_TATTC( NPIX, 'COMM', 'NUMBER OF PIXELS ABOVE THRESHOLD', 
+      CALL CAT_TATTC( NPIX, 'COMM', 'NUMBER OF PIXELS ABOVE THRESHOLD',
      :                STATUS )
       CALL CAT_TATTC( PEAK, 'COMM', 'PEAK INTENSITY', STATUS )
       CALL CAT_TATTC( ELLIPT, 'COMM', 'ELLIPTICITY', STATUS )
-      CALL CAT_TATTC( ANGLE, 'COMM', 
-     :                'ORIENTATION - ANTI CLOCKWISE FROM Y-AXIS', 
+      CALL CAT_TATTC( ANGLE, 'COMM',
+     :                'ORIENTATION - ANTI CLOCKWISE FROM Y-AXIS',
      :                STATUS )
       CALL CAT_TATTC( SXX, 'COMM', 'SECOND ORDER MOMENT 2,0', STATUS )
       CALL CAT_TATTC( SYY, 'COMM', 'SECOND ORDER MOMENT 0,2', STATUS )

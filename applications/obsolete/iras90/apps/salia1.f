@@ -26,7 +26,7 @@
 *     INDF1 = INTEGER (Given)
 *        The input NDF identifier.
 *     INDFR = INTEGER (Given)
-*        The reference NDF identifier. If NDF__NOID then no reference 
+*        The reference NDF identifier. If NDF__NOID then no reference
 *        NDF is recorded.
 *     SCS = CHARACTER * ( * ) (Given)
 *        The value of the COORDS parameter.
@@ -76,7 +76,7 @@
       DOUBLE PRECISION P( 8 )
       CHARACTER PROJ*(*)
       DOUBLE PRECISION EPOCH
-      CHARACTER METHOD*(*)      
+      CHARACTER METHOD*(*)
       INTEGER XY1( 2 )
       INTEGER XY2( 2 )
 
@@ -138,7 +138,7 @@
       ELSE
          CALL MSG_LOAD( ' ', '   XY1        = (null)', TEXT( 6 ),
      :                  LENGTH, STATUS )
-      END IF                  
+      END IF
 
 *  XY2...
       IF( XY2( 1 ) .NE. VAL__BADI ) THEN
@@ -149,7 +149,7 @@
       ELSE
          CALL MSG_LOAD( ' ', '   XY2        = (null)', TEXT( 7 ),
      :                  LENGTH, STATUS )
-      END IF                  
+      END IF
 
 
 *  If there was a reference NDF, record the no. of lines of text to be

@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_UINTERP( NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
-     :                         NPOINT, OFFSET, COORDS, PARAMS, FLAGS, 
+     :                         NPOINT, OFFSET, COORDS, PARAMS, FLAGS,
      :                         BADVAL, OUT, OUT_VAR, NBAD, STATUS )
 *+
 *  Name:
@@ -17,7 +17,7 @@
 *                        OUT, OUT_VAR, NBAD, STATUS )
 
 *  Description:
-*     This routine is passed via the FINTERP argument of the 
+*     This routine is passed via the FINTERP argument of the
 *     AST_RESAMPLEI function in order to perform sub-pixel interpolation
 *     during resampling of gridded data.
 *
@@ -43,7 +43,7 @@
 *        interpolated. This will be at least one.
 *     OFFSET( NPOINT ) = INTEGER (Given)
 *        For each interpolation point, this array will contain the
-*        offset from the start of the OUT array at which the interpolated 
+*        offset from the start of the OUT array at which the interpolated
 *        value should be stored. For example, the interpolated value for
 *        point number POINT should be stored in OUT(1+OFFSET(POINT)).
 *     COORDS( NPOINT, NDIM_IN ) = DOUBLE PRECISION (Given)
@@ -68,7 +68,7 @@
 *        values (see AST_RESAMPLE<X>).
 *     BADVAL = INTEGER (Given)
 *        This will be the same value as was given for the BADVAL
-*        argument of AST_RESAMPLE<X>. It should be used for identifying 
+*        argument of AST_RESAMPLE<X>. It should be used for identifying
 *        bad output values in the OUT array.
 *     OUT( * ) = INTEGER (Returned)
 *        An array into which the interpolated data values should be
@@ -77,14 +77,14 @@
 *        OFFSET array contains all necessary information about where
 *        each returned value should be stored.
 *
-*        In general, not all elements of this array may be used in any 
-*        particular invocation of the routine. Those which are not used 
+*        In general, not all elements of this array may be used in any
+*        particular invocation of the routine. Those which are not used
 *        should be returned unchanged.
 *     OUT_VAR( * ) = INTEGER (Returned)
 *        Not used.
 *     NBAD = INTEGER (Returned)
 *        This should return the number of interpolation points at
-*        which an output data value equal to BADVAL has been assigned 
+*        which an output data value equal to BADVAL has been assigned
 *        because no valid interpolated value could be obtained.  The maximum
 *        value that should be returned is NPOINT, and the minimum is
 *        zero (indicating that all output values were successfully
@@ -111,12 +111,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -159,10 +159,10 @@
 *           Set .FALSE. this routine.
 
 *  Arguments Given:
-      INTEGER NDIM_IN 
+      INTEGER NDIM_IN
       INTEGER LBND_IN( NDIM_IN )
       INTEGER UBND_IN( NDIM_IN )
-      INTEGER IN( * ) 
+      INTEGER IN( * )
       INTEGER IN_VAR( * )
       INTEGER NPOINT
       INTEGER OFFSET( NPOINT )
@@ -172,11 +172,11 @@
       INTEGER BADVAL
 
 *  Arguments Given and Returned:
-      INTEGER OUT( * ) 
+      INTEGER OUT( * )
 
 *  Arguments Returned:
-      INTEGER OUT_VAR( * ) 
-      INTEGER NBAD 
+      INTEGER OUT_VAR( * )
+      INTEGER NBAD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -185,10 +185,10 @@
       LOGICAL ARD1_INTR          ! Is the point an interior point?
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        UC( ARD__MXDIM )   ! User coords of current point
 
-      INTEGER 
+      INTEGER
      :        OFF,
      :        I,                 ! Point index
      :        J                  ! Axis index
@@ -217,20 +217,20 @@
             IF( UC( J ) .EQ. AST__BAD ) BAD = .TRUE.
          END DO
 
-         OFF = OFFSET( I ) 
+         OFF = OFFSET( I )
 
 *  If this position is unusable, increment the number of bad values.
-         IF( BAD ) THEN 
+         IF( BAD ) THEN
             NBAD = NBAD + 1
             OUT( 1 + OFF ) = BADVAL
 
 *  Otherwise, check to see if the point is within the region. If so,
 *  assign an interior value to the output value. If not, assign the
 *  exterior value (zero).
-         ELSE 
+         ELSE
             CALL AST_NORM( CMN_FRMC, UC, STATUS )
 
-            IF( ARD1_INTR( CMN_FRMC, CMN_TYPEC, NDIM_IN, CMN_NPARC, 
+            IF( ARD1_INTR( CMN_FRMC, CMN_TYPEC, NDIM_IN, CMN_NPARC,
      :                     PARAMS, UC, CMN_INIT, STATUS ) ) THEN
                OUT( 1 + OFF ) = CMN_RNDXC
             ELSE

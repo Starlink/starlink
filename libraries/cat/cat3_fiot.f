@@ -1,4 +1,4 @@
-      SUBROUTINE CAT3_FIOB (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOB (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -8,7 +8,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOB (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOB (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -19,7 +19,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -51,7 +51,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOB uses a passed length 
+*    put.  They are needed because FIOB uses a passed length
 *    character argument, whereas GVALB and PVALB necessarily use
 *    a fixed length character argument.
 
@@ -143,7 +143,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -166,7 +166,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALB (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALB (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALB, NULFLG, STATUS)
 
                VALUE = LVALB
@@ -178,7 +178,7 @@
 
                LVALB = VALUE
 
-               CALL CAT3_PVALB (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALB (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALB, NULFLG, STATUS)
             END IF
 
@@ -187,7 +187,7 @@
       END IF
 
       END
-      SUBROUTINE CAT3_FIOC (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOC (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -197,7 +197,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOC (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOC (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -208,7 +208,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -240,7 +240,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -294,7 +294,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOC uses a passed length 
+*    put.  They are needed because FIOC uses a passed length
 *    character argument, whereas GVALC and PVALC necessarily use
 *    a fixed length character argument.
 
@@ -316,7 +316,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -339,7 +339,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALC (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALC (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALC, NULFLG, STATUS)
 
                VALUE = LVALC
@@ -351,7 +351,7 @@
 
                LVALC = VALUE
 
-               CALL CAT3_PVALC (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALC (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALC, NULFLG, STATUS)
             END IF
 
@@ -360,7 +360,7 @@
       END IF
 
       END
-      SUBROUTINE CAT3_FIOD (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOD (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -370,7 +370,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOD (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOD (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -381,7 +381,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -413,7 +413,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -467,7 +467,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOD uses a passed length 
+*    put.  They are needed because FIOD uses a passed length
 *    character argument, whereas GVALD and PVALD necessarily use
 *    a fixed length character argument.
 
@@ -489,7 +489,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -512,7 +512,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALD (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALD (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALD, NULFLG, STATUS)
 
                VALUE = LVALD
@@ -524,7 +524,7 @@
 
                LVALD = VALUE
 
-               CALL CAT3_PVALD (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALD (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALD, NULFLG, STATUS)
             END IF
 
@@ -533,7 +533,7 @@
       END IF
 
       END
-      SUBROUTINE CAT3_FIOI (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOI (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -543,7 +543,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOI (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOI (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -554,7 +554,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -586,7 +586,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -640,7 +640,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOI uses a passed length 
+*    put.  They are needed because FIOI uses a passed length
 *    character argument, whereas GVALI and PVALI necessarily use
 *    a fixed length character argument.
 
@@ -662,7 +662,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -685,7 +685,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALI (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALI (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALI, NULFLG, STATUS)
 
                VALUE = LVALI
@@ -697,7 +697,7 @@
 
                LVALI = VALUE
 
-               CALL CAT3_PVALI (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALI (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALI, NULFLG, STATUS)
             END IF
 
@@ -706,7 +706,7 @@
       END IF
 
       END
-      SUBROUTINE CAT3_FIOL (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOL (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -716,7 +716,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOL (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOL (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -727,7 +727,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -759,7 +759,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -813,7 +813,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOL uses a passed length 
+*    put.  They are needed because FIOL uses a passed length
 *    character argument, whereas GVALL and PVALL necessarily use
 *    a fixed length character argument.
 
@@ -835,7 +835,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -858,7 +858,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALL (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALL (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALL, NULFLG, STATUS)
 
                VALUE = LVALL
@@ -870,7 +870,7 @@
 
                LVALL = VALUE
 
-               CALL CAT3_PVALL (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALL (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALL, NULFLG, STATUS)
             END IF
 
@@ -879,7 +879,7 @@
       END IF
 
       END
-      SUBROUTINE CAT3_FIOR (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOR (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -889,7 +889,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOR (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOR (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -900,7 +900,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -932,7 +932,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -986,7 +986,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOR uses a passed length 
+*    put.  They are needed because FIOR uses a passed length
 *    character argument, whereas GVALR and PVALR necessarily use
 *    a fixed length character argument.
 
@@ -1008,7 +1008,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -1031,7 +1031,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALR (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALR (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALR, NULFLG, STATUS)
 
                VALUE = LVALR
@@ -1043,7 +1043,7 @@
 
                LVALR = VALUE
 
-               CALL CAT3_PVALR (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALR (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALR, NULFLG, STATUS)
             END IF
 
@@ -1052,7 +1052,7 @@
       END IF
 
       END
-      SUBROUTINE CAT3_FIOW (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE, 
+      SUBROUTINE CAT3_FIOW (IOFLG, CIELM, FI, ELEM, ROWNO, VALUE,
      :  NULFLG, STATUS)
 *+
 *  Name:
@@ -1062,7 +1062,7 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT3_FIOW (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG; 
+*     CALL CAT3_FIOW (IOFLG, CIELM, FI, ELEM, ROWNO; VALUE, NULFLG;
 *       STATUS)
 *  Description:
 *     Get or put a value for a single field.
@@ -1073,7 +1073,7 @@
 *        .TRUE.  - get a value,
 *        .FALSE. - put a value.
 *     CIELM  =  INTEGER (Given)
-*        Array element in the catalogue common blocks corresponding to 
+*        Array element in the catalogue common blocks corresponding to
 *        the catalogue to be accessed.
 *     FI  =  INTEGER (Given)
 *        Identifier to the field to be put or got.
@@ -1105,7 +1105,7 @@
 *     This version kludges the handling of null values.  The appropriate
 *     Null value should be obtained from the column attributes.
 *
-*     Also, unsigned byte and unsigned word data types are not 
+*     Also, unsigned byte and unsigned word data types are not
 *     supported.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -1159,7 +1159,7 @@
 
 *
 *    The following variables hold a local copy of the value being got or
-*    put.  They are needed because FIOW uses a passed length 
+*    put.  They are needed because FIOW uses a passed length
 *    character argument, whereas GVALW and PVALW necessarily use
 *    a fixed length character argument.
 
@@ -1181,7 +1181,7 @@
          FITUNT = FUNT__CAT3(CIELM)
 
 *
-*       Attempt to determine: the number of the column, the FITS data type 
+*       Attempt to determine: the number of the column, the FITS data type
 *       of the column, the scaled flag and the scale factor and zero point.
 
          IF (FI .GT. 0  .AND.  FI .LE. NIDS__CAT1) THEN
@@ -1204,7 +1204,7 @@
 *
 *             Get a value from the FITS table.
 
-               CALL CAT3_GVALW (FITYPE, SFLAG, SCALE, ZERO, FITUNT, 
+               CALL CAT3_GVALW (FITYPE, SFLAG, SCALE, ZERO, FITUNT,
      :           COLNO, ELEM, ROWNO, LVALW, NULFLG, STATUS)
 
                VALUE = LVALW
@@ -1216,7 +1216,7 @@
 
                LVALW = VALUE
 
-               CALL CAT3_PVALW (FITYPE, FITUNT, COLNO, ELEM, ROWNO, 
+               CALL CAT3_PVALW (FITYPE, FITUNT, COLNO, ELEM, ROWNO,
      :           LVALW, NULFLG, STATUS)
             END IF
 

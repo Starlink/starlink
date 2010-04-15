@@ -20,25 +20,25 @@
 *
 * Arguments:
 *    GUESS_STORE(MAX_PARS,MAX_CMP,MAX_TIMES = REAL (Given)
-*       
+*
 *    TIMES = INTEGER (Given)
-*       
+*
 *    N_GAUSS = INTEGER (Given)
-*       
+*
 *    BOUNDS(MAX_PARS,MAX_CMP,MAX_TIMES,2) = REAL ARRAY (Given)
-*       
+*
 *    MAX_CMP = INTEGER (Given)
-*       
+*
 *    MAX_TIMES = INTEGER (Given)
-*       
+*
 *    RANK(MAX_CMP) = INTEGER ARRAY (Given)
 *
 *    LINK(MAX_CMP) = INTEGER ARRAY Workspace (Given)
-*       
+*
 *    SORT_CENTRES(MAX_CMP) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    SORTED(MAX_CMP) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 * History:
 *  Altered to use fig_nagerr, TNW 7/10/88
 *  Change to m01daf, 1/12/88

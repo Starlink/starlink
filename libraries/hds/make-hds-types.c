@@ -61,8 +61,8 @@
  *    GNU General Public License for more details.
  *
  *    You should have received a copy of the GNU General Public License
- *    along with this program (see SLA_CONDITIONS); if not, write to the 
- *    Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ *    along with this program (see SLA_CONDITIONS); if not, write to the
+ *    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  *    Boston, MA  02111-1307  USA
 
  *-
@@ -98,7 +98,7 @@
 # define  STD_INT_FMT "ld"
 #endif
 
-/* Definitions for 64-bits integers                                        */ 
+/* Definitions for 64-bits integers                                        */
 /* Use the standard int64_t if available                                   */
 /* Use 'long' if it is 8 bytes, else use 'long long'                       */
 

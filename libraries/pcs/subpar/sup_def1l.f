@@ -1,19 +1,19 @@
       SUBROUTINE SUBPAR_DEF1L ( NAMECODE, NVAL, VALUES, STATUS )
       IMPLICIT NONE
- 
+
 *+
 *  Name:
 *     SUBPAR_DEF1L
- 
+
 *  Purpose:
 *     Set dynamic default vector values.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_DEF1L ( NAMECODE, NVAL, VALUES, STATUS )
- 
+
 *  Description:
 *     Set default values for a vector primitive object associated with
 *     a Parameter.
@@ -38,7 +38,7 @@
 *     Therefore, PARDYN(1,-).GT.0 means space is allocated,
 *           and  PARDYN(3,-).GT.0 (=type) means the space is in use
 *           and  PARDYN(3,-).LT.0 (=-type) means the space is not in use.
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        code-number of the parameter
@@ -48,7 +48,7 @@
 *     VALUES(NVAL)=LOGICAL
 *        Array containing the default values .
 *     STATUS=INTEGER
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1986, 1990, 1992, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     10-DEC-1984 (BDK):
 *        Original
@@ -98,50 +98,50 @@
 *      1-MAR-1993 (AJC):
 *        Add INCLUDE DAT_PAR
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! SAI Constants
       INCLUDE 'DAT_PAR'
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'SUBPAR_ERR'
- 
- 
+
+
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter code-number
- 
+
       INTEGER NVAL                      ! number of values
- 
+
       LOGICAL VALUES(*)                 ! Vector to supply values
- 
+
 *    Status return :
       INTEGER STATUS			! Status Return
- 
- 
+
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
- 
+
+
 *  Local Variables:
- 
+
       INTEGER NDIMS                           ! number of dimensions 0 or 1
 
       INTEGER NVAL1                           ! adjusted number of values
- 
+
       INTEGER J                               ! loop counter
- 
+
       INTEGER START                           ! start pos in table
- 
+
       INTEGER FINISH                          ! end pos in table
- 
+
       INTEGER K                               ! index into VALUES
- 
+
 *.
- 
+
        IF (STATUS .NE. SAI__OK) RETURN
 
 *   Check for scalar indicator
@@ -156,7 +156,7 @@
 *   Store the values in COMMON if there are only a small number of them,
 *   and if the parameter has had defaults set before, the number and type
 *   are the same as previously.
-            
+
       IF (( NVAL1 .LE. 6 ) .AND. (PARDYN(1,NAMECODE) .GT. 0 ) .AND.
      :    ((PARDYN(2,NAMECODE) - PARDYN(1,NAMECODE)) .GE. NVAL1-1 )
      :      .AND. ((PARDYN(3,NAMECODE) .EQ. -SUBPAR__LOGICAL) .OR.
@@ -192,7 +192,7 @@
 *     Either there are more than 6 values or the default storage is full
          CALL SUBPAR_DEFNL
      :   ( NAMECODE, NDIMS, NVAL1, VALUES, NVAL1, STATUS )
- 
+
       ENDIF
- 
+
       END

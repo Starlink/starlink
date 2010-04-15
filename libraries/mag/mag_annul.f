@@ -2,20 +2,20 @@
 *+
 *  Name:
 *     MAG_ANNUL
- 
+
 *  Purpose:
 *     Annul tape descriptor, releasing any associated tape drive
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_ANNUL(TD, STATUS)
- 
+
 *  Description:
 *     Release the tape drive  associated with the tape descriptor.
 *     Annul tape descriptor but do not cancel the associated parameter.
- 
+
 *  Arguments:
 *     TD=INTEGER (Given)
 *        A variable containing the tape descriptor.
@@ -26,14 +26,14 @@
 *        If this variable is not SAI__OK on input, then the routine
 *        will still attempt to execute, but will return with STATUS
 *        set to the import value.
- 
+
 *  Algorithm:
 *     Check that the tape descriptor is valid, and is active and then
 *     release relevant table entries.
- 
+
 *  Implementation Deficiencies:
 *     Data-system enbedded files not yet supported.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1986, 1989, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -57,7 +57,7 @@
 *  Authors:
 *     Sid Wright (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     16-Apr-1983:  Original.  (UCL::SLW)
 *     15-Jul-1986:  HDS_CLOSE USRDEVDATA to match MAG1_GTMPL. (RAL::AJC)
@@ -74,33 +74,33 @@
 *        Add INCLUDE 'DAT_PAR'
 *        Add INCLUDE 'PAR_PAR'
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
-      INCLUDE 'PAR_PAR'          ! Parameter system constants 
+      INCLUDE 'PAR_PAR'          ! Parameter system constants
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
       INCLUDE 'MAGSCL_PAR'      ! MAG_SCL Constants
- 
+
 *  Arguments Given:
       INTEGER TD                ! tape descriptor
- 
+
 *  Arguments Returned:
- 
+
 *  Status:
       INTEGER STATUS            ! status return
- 
+
 *  Global Variables:
       INCLUDE 'MAGPA_SCL'       ! MAG Parameter Table
- 
+
 *  Local Variables:
       INTEGER TP                ! tape parameter descriptor
       INTEGER RTP               ! relative tape parameter descriptor
@@ -109,17 +109,17 @@
       LOGICAL START
       INTEGER BLOCK
       LOGICAL MOVED
- 
+
 *.
- 
- 
+
+
       ISTAT = STATUS
       STATUS = SAI__OK
- 
+
       CALL MAG1_CHKTD(TD, TP, RTP, STATUS)
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MAG_POS(TD, FILE, START, BLOCK, MOVED, STATUS)
-         IF ( MOVED ) CALL MAG1_WRTDS(PDLOC(RTP), FILE, START, BLOCK, 
+         IF ( MOVED ) CALL MAG1_WRTDS(PDLOC(RTP), FILE, START, BLOCK,
      :                                STATUS)
                               ! update the dataset if modified
          IF ( PDESC(RTP).NE.0 ) CALL MAG_CLOSE(PDESC(RTP), STATUS)
@@ -134,8 +134,8 @@
          PDESC(RTP) = 0
          PFREE(RTP) = .TRUE.
       END IF
- 
+
       IF ( ISTAT.NE.SAI__OK ) STATUS = ISTAT
- 
+
       RETURN
       END

@@ -39,7 +39,7 @@ C
 C     Modified:
 C
 C     30th Jul 1987  DJA / AAO. New DSA_ routines - some specs changed.
-C                    Modified dynamic memory handling, now uses DYN_ 
+C                    Modified dynamic memory handling, now uses DYN_
 C                    routines
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
@@ -77,7 +77,7 @@ C
       LOGICAL      EQUAL        ! See above
       LOGICAL      GRAPHOK      ! PG package status
       REAL         HIST(NH)     !
-      INTEGER      I            ! 
+      INTEGER      I            !
       INTEGER      IGNORE       ! Used to pass an ignorable status
       INTEGER      NDIM         ! Number of dimensions in data
       INTEGER      NELM         ! Total number of elements in data
@@ -85,13 +85,13 @@ C
       INTEGER      NX           ! Size of 1st dimension
       INTEGER      NY           ! Size of 2nd dimension (if present)
       LOGICAL      OK           !
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data 
+      INTEGER      OPTR         ! Dynamic-memory pointer to output data
                                 ! array
       INTEGER      OSLOT        ! Map slot number outputdata array
       INTEGER      STATUS       ! Running status for DSA_ routines
       REAL         VMAX         !
       REAL         VMIN         !
-      REAL         XVALS(NH)    ! 
+      REAL         XVALS(NH)    !
 C
 C     Initialisation of DSA_ routines
 C
@@ -227,7 +227,7 @@ C     (>) IN     (Real array IN(IX,IY)) The image data.
 C     (>) IX     (Integer) The first dimension of IN.
 C     (>) IY     (Integer) The second dimension of IN.
 C     (>) VMIN   (Real) The lowest limit of the range
-C                to be considered.  
+C                to be considered.
 C     (>) VMAX   (Real) The highest limit of the range
 C                to be considered.
 C     (>) NH     (Integer) The dimension of HIST.
@@ -279,7 +279,7 @@ C     (>) IN     (Real array IN(IX,IY)) The image data.
 C     (>) IX     (Integer) The first dimension of IN.
 C     (>) IY     (Integer) The second dimension of IN.
 C     (>) VMIN   (Real) The lowest limit of the range
-C                being considered. 
+C                being considered.
 C     (>) VMAX   (Real) The highest limit of the range
 C                being considered.
 C     (>) NH     (Integer) The dimension of HIST.

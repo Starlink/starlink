@@ -310,7 +310,7 @@ C    :                 i5, i5, i20)
                         SELRW__SGZ(SELS__SGZ) = NUMSEL
 
 *
-*                      Adopt this selection as the new current 
+*                      Adopt this selection as the new current
 *                      selection.
 
                         CSEL__SGZ = SELS__SGZ

@@ -98,4 +98,4 @@
       del=(delr+sin(2.0*(gamma-ech_gamma0)))*ech_fcam
 
       end
-                          
+

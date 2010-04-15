@@ -1,5 +1,5 @@
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_GEN.F    General display s/rs for Unix 
+C DS_GEN.F    General display s/rs for Unix
 C       ( These take no actions - just point to device specific s/rs)
 C
 C
@@ -11,7 +11,7 @@ C DS_SPEC_SDEF  Device specific defaults
 C DS_GTYPE      Get type of display
 C
 C DS_OVAL       Put oval on display overlay
-C DS_CROSS      Put cross on display overlay 
+C DS_CROSS      Put cross on display overlay
 C DS_LINE       Put line on overlay display
 C
 C DS_SCUR       Start the cursor
@@ -196,7 +196,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_CROSS -- Put cross on display overlay 
+C DS_CROSS -- Put cross on display overlay
 C
 C    alan penny                ral              1990-01-31
 
@@ -303,7 +303,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_GPCUR -- Get cursor position 
+C DS_GPCUR -- Get cursor position
 C
 C    alan penny                ral              1990-01-31
 
@@ -363,7 +363,7 @@ C DS_OVCUS -- Pan an oval cursor and get position
 C
 C    alan penny                ral              1990-01-31
 
-      subroutine ds_ovcus ( monitor, rx1, kc1, rx2, kc2, 
+      subroutine ds_ovcus ( monitor, rx1, kc1, rx2, kc2,
      +                      apang, elli, kt, kx, ky, kbut )
 
       implicit none
@@ -378,7 +378,7 @@ C    alan penny                ral              1990-01-31
 				!           5=cyan;6=mauve;7=tan;8=pink)
       real     apang		!i: Angle of oval aperture to X-axis in degrees
       real     elli		!i: Ellipticity of oval
-      integer  kt		!i: Change radii flag (0=no;1=inner;2=inner 
+      integer  kt		!i: Change radii flag (0=no;1=inner;2=inner
 				!           annulus;3=outer annulus)
       integer  kx		!o: Image Y position
       integer  ky		!o: Image X position
@@ -391,7 +391,7 @@ Cbegin
 
       if ( .not.DSSCUR ) call ds_scur					!Start cursor?
 
-      if ( DSTYPE.eq.4 ) call dsx_ovcus ( monitor, rx1, kc1, rx2, 
+      if ( DSTYPE.eq.4 ) call dsx_ovcus ( monitor, rx1, kc1, rx2,
      +                                    kc2, apang, elli,
      +                                    kt, kx, ky, kbut )
 
@@ -400,7 +400,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_PCUR -- Put cursor position 
+C DS_PCUR -- Put cursor position
 C
 C    alan penny                ral              1990-01-31
 
@@ -426,7 +426,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_PSCUR -- Put cursor at screen position 
+C DS_PSCUR -- Put cursor at screen position
 C
 C    alan penny                ral              1990-01-31
 
@@ -512,7 +512,7 @@ C  alan penny           ral                         1990-06-09
 
       integer	frames(2)	!i: Which image frames to blink
       real	period		!i: Blinking period
-      real	fraction	!i: 
+      real	fraction	!i:
 C--
 Cbegin
 
@@ -553,7 +553,7 @@ Cbegin
 
       if ( .not.DSOPEN ) return
 
-      if ( DSTYPE.eq.4 ) call dsx_acims ( im, mx, my, nxs, nxe, nys, 
+      if ( DSTYPE.eq.4 ) call dsx_acims ( im, mx, my, nxs, nxe, nys,
      +                                     nye, ix, iy, wrap )
 
 
@@ -587,7 +587,7 @@ Cbegin
 
       if ( .not.DSOPEN ) return
 
-      if ( DSTYPE.eq.4 ) call dsx_acimr ( im, mx, my, nxs, nxe, nys, 
+      if ( DSTYPE.eq.4 ) call dsx_acimr ( im, mx, my, nxs, nxe, nys,
      +                                     nye, ix, iy, wrap )
 
 
@@ -608,12 +608,12 @@ C DS_DODISP       Display image, scaled, titled
 C DS_DODISP(RS)   Display image, scaled, titled  (real:int*2)
 C DS_BOX          Put box on display overlay
 C DS_SPOT         Put spot on display overlay
-C DS_ACIM         Display part of actual (int*2/real)image 
+C DS_ACIM         Display part of actual (int*2/real)image
 C DS_GTCOMF       Get image compression factor and displayed image size
 C
 C DS_TIV          Translate image to screen coords
 C DS_TVI          Translate virtual to image coords
-C DS_VTYPE        Type posn, value 
+C DS_VTYPE        Type posn, value
 
 
 
@@ -712,7 +712,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_DISP -- Set up and display image 
+C DS_DISP -- Set up and display image
 C
 C  alan penny                  ral         1990 jan
 
@@ -725,7 +725,7 @@ C  alan penny                  ral         1990 jan
 
       integer        mx			!i: Image X size
       integer        my			!i: Image Y size
-      integer*2      im(2)		!i: Short Image	
+      integer*2      im(2)		!i: Short Image
       real           imr                !i: Real image
       character*(*)  type		!i: Image type ("REAL', 'SHORT' )
       integer        kopt		!i: 0=Flash,no type; 1=Flash; 2=Display
@@ -735,7 +735,7 @@ C--
 Cbegin
       dummy(1) = im(1)
       dummy(2) = im(2)
-      
+
       if ( type.eq.'REAL' ) then
          call ds_dispr ( imr, mx, my, kopt )
       elseif ( type.eq.'SHORT' ) then
@@ -751,7 +751,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_DISPR -- Set up and display real image 
+C DS_DISPR -- Set up and display real image
 C
 C  alan penny                  ral         1990 jan
 
@@ -764,7 +764,7 @@ C  alan penny                  ral         1990 jan
 
       integer   mx 			!i: Image X size
       integer   my			!i: Image Y size
-      real      im(mx,my)		!i: Image	
+      real      im(mx,my)		!i: Image
       integer   kopt			!i: 0=Flash,no type; 1=Flash; 2=Display
 C--
       logical wrap, bval
@@ -786,7 +786,7 @@ Cbegin
          pvhi = DSVMAX*BS + BZ
          call pargr ( pvlo )
          call pargr ( pvhi )
-         call printd ( 
+         call printd (
      +    'Suggested Display contrast: low = %f : high = %f' )
          call get2r ( 'VRANGE', pvlo, pvhi, .true., -1.0e10, 1.0e10 )
          DSVMIN = 0.0
@@ -807,11 +807,11 @@ Cbegin
 
       DSIXS = (real(DSSNX)/2.0) - 					!Get position in display
      +        (((real(DSNXE-DSNXS+1)-1.0)/real(DSCOMFX))/2.0) + 0.6
-      DSIYS = (real(DSSNY)/2.0) - 
+      DSIYS = (real(DSSNY)/2.0) -
      +        (((real(DSNYE-DSNYS+1)-1.0)/real(DSCOMFY))/2.0) + 0.6
-      if ( kopt.eq.2 ) call get2i ( 'IMPOSN', DSIXS, DSIYS, .true., 
+      if ( kopt.eq.2 ) call get2i ( 'IMPOSN', DSIXS, DSIYS, .true.,
      +                              -100000, 100000 )
-      
+
       wrap = .false.
       if ( kopt.eq.2 ) wrap = DSWRAP
       call ds_acimr ( im, mx, my, DSNXS, DSNXE, DSNYS, DSNYE, DSIXS,	!Display image
@@ -822,7 +822,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_DISPS -- Set up and display short image 
+C DS_DISPS -- Set up and display short image
 C
 C  alan penny                  ral         1990 jan
 
@@ -835,7 +835,7 @@ C  alan penny                  ral         1990 jan
 
       integer   mx 			!i: Image X size
       integer   my			!i: Image Y size
-      integer*2 im(mx,my)		!i: Image	
+      integer*2 im(mx,my)		!i: Image
       integer   kopt			!i: 0=Flash,no type; 1=Flash; 2=Display
 C--
       logical wrap, bval
@@ -858,7 +858,7 @@ Cbegin
          pvhi = DSVMAX*BS + BZ
          call pargr ( pvlo )
          call pargr ( pvhi )
-         call printd ( 
+         call printd (
      +    'Suggested Display contrast: low = %f : high = %f' )
          call get2r ( 'VRANGE', pvlo, pvhi, .true., -1.0e10, 1.0e10 )
          DSVMIN = 0.0
@@ -879,11 +879,11 @@ Cbegin
 
       DSIXS = (real(DSSNX)/2.0) - 					!Get position in display
      +        (((real(DSNXE-DSNXS+1)-1.0)/real(DSCOMFX))/2.0) + 0.5
-      DSIYS = (real(DSSNY)/2.0) - 
+      DSIYS = (real(DSSNY)/2.0) -
      +        (((real(DSNYE-DSNYS+1)-1.0)/real(DSCOMFY))/2.0) + 0.5
-      if ( kopt.eq.2 ) call get2i ( 'IMPOSN', DSIXS, DSIYS, .true., 
+      if ( kopt.eq.2 ) call get2i ( 'IMPOSN', DSIXS, DSIYS, .true.,
      +                              -100000, 100000 )
-      
+
       wrap = .false.
       if ( kopt.eq.2 ) wrap = DSWRAP
       call ds_acims ( im, mx, my, DSNXS, DSNXE, DSNYS, DSNYE, DSIXS,	!Display image
@@ -896,7 +896,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DS_IMGSCL -- Get array value scale for display (unscaled by  BS,BZ)
 C CL parameter accessed:-
-C    VRANGE             Low and high limits of the pixel value display range 
+C    VRANGE             Low and high limits of the pixel value display range
 C
 C    a j penny                    ral         1990 jan
 
@@ -938,7 +938,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DS_IMGSCLI -- Get integer array value scale for display (unscaled by  BS,BZ)
 C CL parameter accessed:-
-C    VRANGE             Low and high limits of the pixel value display range 
+C    VRANGE             Low and high limits of the pixel value display range
 C
 C    a j penny                    ral         1990 jan
 
@@ -977,11 +977,11 @@ Cbegin
 
       end
 
-    
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DS_IMGSCLR -- Get real array value scale for display (unscaled by  BS,BZ)
 C CL parameter accessed:-
-C    VRANGE             Low and high limits of the pixel value display range 
+C    VRANGE             Low and high limits of the pixel value display range
 C
 C    a j penny                    ral         1990 jan
       subroutine ds_imgsclr ( im, mx, my, kxs, kxe, kys, kye )
@@ -1023,7 +1023,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DS_IMGSCLS -- Get int*2 array value scale for display (unscaled by  BS,BZ)
 C CL parameter accessed:-
-C    VRANGE             Low and high limits of the pixel value display range 
+C    VRANGE             Low and high limits of the pixel value display range
 C
 C    a j penny                    ral         1990 jan
 
@@ -1181,7 +1181,7 @@ C--
 Cbegin
 
 
-      
+
       if ( type.eq.'REAL' ) then
          call ds_dodispr ( im, mx, my, kvr, title )
       elseif ( type.eq.'SHORT' ) then
@@ -1280,7 +1280,7 @@ C     a j penny                ral                  1990-05-07
 C--
 Cbegin
 
-      
+
       if ( .not.DSOPEN ) return
 
       call ds_line ( xs, ys, xe, ys, kc )
@@ -1310,7 +1310,7 @@ C     a j penny                ral                  1990-05-07
 C--
 Cbegin
 
-      
+
       if ( .not.DSOPEN ) return
 
       call ds_line ( x, y, x, y, kc )
@@ -1324,7 +1324,7 @@ C DS_ACIM -- Display part of actual image
 C
 C    alan penny           ral                       1990-02-01
 
-      subroutine ds_acim ( im, mx, my, type, nxs, nxe, nys, nye, 
+      subroutine ds_acim ( im, mx, my, type, nxs, nxe, nys, nye,
      +                      ix, iy, wrap )
 
       implicit none
@@ -1346,10 +1346,10 @@ Cbegin
 
 
       if ( type.eq.'REAL' ) then
-         call ds_acimr ( im, mx, my, nxs, nxe, nys, nye, 
+         call ds_acimr ( im, mx, my, nxs, nxe, nys, nye,
      +                   ix, iy, wrap )
       elseif ( type.eq.'SHORT' ) then
-         call ds_acims ( im, mx, my, nxs, nxe, nys, nye, 
+         call ds_acims ( im, mx, my, nxs, nxe, nys, nye,
      +                   ix, iy, wrap )
       else
          call printo ( ' ERROR: Programmer Error in S/R DS_ACIM' )
@@ -1379,7 +1379,7 @@ C  alan penny           ral                         1990-02-01
 				!   or ask (2)?
 C--
       integer lx, ly
-Cbegin   
+Cbegin
 
 
       lx = 1 + iabs(DSNXE-DSNXS+1-1)/DSSNX				!Scale image size to display size
@@ -1387,8 +1387,8 @@ Cbegin
       lx = max(lx,ly)
       ly = max(lx,ly)
 
-      if ( kopt.eq.2 .or. 
-     +     ((kopt.eq.1).and.((lx.ne.1).or.(ly.ne.1))) ) call get2i ( 
+      if ( kopt.eq.2 .or.
+     +     ((kopt.eq.1).and.((lx.ne.1).or.(ly.ne.1))) ) call get2i (
      +                           'IMCOMP', lx, ly, .true., 1, 1000 )
 
       DSCOMFX = lx
@@ -1416,10 +1416,10 @@ C--
 Cbegin
 
 
-      kxo = DSIXS + (kxi-DSNXS)/DSCOMFX		
+      kxo = DSIXS + (kxi-DSNXS)/DSCOMFX
       kyo = DSIYS + (kyi-DSNYS)/DSCOMFY
 
- 
+
       end
 
 
@@ -1449,7 +1449,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_VTYPE -- Type posn, value 
+C DS_VTYPE -- Type posn, value
 C
 C  alan penny             ral             1990 Jan
 
@@ -1571,7 +1571,7 @@ C    alan penny           ral                       1990-02-01
 C--
 Cbegin
 
-      
+
       LUT_NUM = nlut
 
       call ds_lutacol
@@ -1659,7 +1659,7 @@ C--
 Cbegin
 
 
-      if ( DSTYPE.eq.4 ) call dsx_lutput 
+      if ( DSTYPE.eq.4 ) call dsx_lutput
 
 
       end
@@ -1915,7 +1915,7 @@ Cbegin
                   enddo
                endif
             endif
-         enddo       
+         enddo
       enddo
 
       if ( kb.lt.ky ) then
@@ -1995,7 +1995,7 @@ Cbegin
       elseif ( jm.gt.NUMDCOL ) then
          if ( LUT_ENDS.eq.4 ) then
             do while ( jm.gt.NUMDCOL )
-               jm = jm - NUMDCOL 
+               jm = jm - NUMDCOL
             enddo
             do k = 1, 3
                col(k) = LUT_VAL(jm,k)
@@ -2027,7 +2027,7 @@ C   alan penny                  ral                        1991 Oct
       real      tcol(NUMDCOL,3)		!o: Temp LUT
 C--
       real st(3), en(3), rv
-      integer jb, k, ja 
+      integer jb, k, ja
 
 Cbegin
 
@@ -2142,7 +2142,7 @@ C--
       common /lutcomd/ lut_use
 Cbegin
 
-      
+
       if ( nlut.gt.15 ) return
 
       do k = 1, 25
@@ -2156,7 +2156,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_LOADLUT -- Load a LUT into LUT tables storage 
+C DS_LOADLUT -- Load a LUT into LUT tables storage
 C
 C
       subroutine ds_loadlut ( ip, kx, ky, nlut )
@@ -2168,7 +2168,7 @@ C
 
       real      ilut(25,6,15)
       common /lutcomd/ ilut
-C--      
+C--
 Cbegin
 
 
@@ -2183,17 +2183,17 @@ C
 C DS_P_INIT    Initialise window
 C DS_P_GTYPE   Get type of panel display
 C DS_P_DSET    Set up for image display
-C DS_P_CLOSE   Close window 
-C DS_P_PTTIT   Put image title on display 
-C DS_P_SCOL    Set line colour 
-C DS_P_SCUR    Start the cursor 
+C DS_P_CLOSE   Close window
+C DS_P_PTTIT   Put image title on display
+C DS_P_SCOL    Set line colour
+C DS_P_SCUR    Start the cursor
 C DS_P_SSCUR   Start the cursor (sections)
-C DS_P_GBOX    Get the cursor position 
+C DS_P_GBOX    Get the cursor position
 C DS_P_GSBOX   Get the box chosen (sections)
-C DS_P_ERASE   Erase display 
-C DS_P_LOAD    Load a panel 
+C DS_P_ERASE   Erase display
+C DS_P_LOAD    Load a panel
 C DS_P_SLOAD   Load a panel (sections)
-C DS_P_UNBHELP Relase the button help box 
+C DS_P_UNBHELP Relase the button help box
 C DS_P_SWITCH  Switch between panel and keyboard for option choice
 C DS_P_SWITCHS Switch between panel and keyboard for option choice (sections)
 
@@ -2202,10 +2202,10 @@ C DS_P_HX_HLOAD Load panel help box with help for chosen option
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_INIT -- Initialise panel 
+C DS_P_INIT -- Initialise panel
 C
 C  alan penny             ral          1990 jan
- 
+
       subroutine ds_p_init ( kx, ky, title, kdoh, ierr )
 
       implicit none
@@ -2221,7 +2221,7 @@ C--
 Cbegin
 
 
-      if ( PDSTYPE.eq.4 ) call dsx_p_init ( kx, ky, title, 
+      if ( PDSTYPE.eq.4 ) call dsx_p_init ( kx, ky, title,
      +                                      kdoh, ierr )
 
 
@@ -2250,7 +2250,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_DSET -- Set up panel for display 
+C DS_P_DSET -- Set up panel for display
 C
 C   alan penny                  ral                        1990-02-03
 
@@ -2271,7 +2271,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_CLOSE -- Close panel window 
+C DS_P_CLOSE -- Close panel window
 C
 C  alan penny             ral          1990 jan
 
@@ -2297,7 +2297,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_PTTIT -- Put image title on display 
+C DS_P_PTTIT -- Put image title on display
 C
 C    alan penny                ral              1990-01-31
 
@@ -2321,7 +2321,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_SCOL -- Set line colour 
+C DS_P_SCOL -- Set line colour
 C
 C    alan penny           ral                       1990-02-01
 
@@ -2347,7 +2347,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_SCUR -- Start the cursor 
+C DS_P_SCUR -- Start the cursor
 C
 C   alan penny                  ral                        1990-02-03
 
@@ -2397,7 +2397,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_GBOX -- Get the box chosen 
+C DS_P_GBOX -- Get the box chosen
 C
 C  alan penny             ral             1990 Jan
 
@@ -2446,7 +2446,7 @@ C  alan penny             ral             1990 Jan
       integer	     nh			 !i: No of help lines
       character*68   thelp(nh)		 !i: Help text
       integer        opt_num             !i: Number of options
-      character*12   opt_text(opt_num)   !i: Possible options  (ignores 
+      character*12   opt_text(opt_num)   !i: Possible options  (ignores
       character*68   opt_head(opt_num)   !i: Single line helps
       character*68   opt_help(6,opt_num) !i: Fuller helps
       character*(*)  title               !i: Panel title
@@ -2458,8 +2458,8 @@ Cbegin
 
       if ( .not.PDSOPEN ) return
 
-      if ( PDSTYPE.eq.4 ) call dsx_p_gsbox ( cmdlsts, hopt, nopt, 
-     +                    ktopt, ktdef, thelp, nh, opt_num, opt_text, 
+      if ( PDSTYPE.eq.4 ) call dsx_p_gsbox ( cmdlsts, hopt, nopt,
+     +                    ktopt, ktdef, thelp, nh, opt_num, opt_text,
      +                    opt_head, opt_help, title, hpaneldo, ierr )
 
 
@@ -2467,7 +2467,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_ERASE -- Erase display 
+C DS_P_ERASE -- Erase display
 C
 C    a j penny                    ral         1990 jan
 
@@ -2489,7 +2489,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_LOAD -- Load a panel 
+C DS_P_LOAD -- Load a panel
 C
 C    alan penny           ral                       1990-02-01
 
@@ -2512,7 +2512,7 @@ Cbegin
 
       end
 
-     
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DS_P_SLOAD -- Load a panel with sections
 C
@@ -2541,7 +2541,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DS_P_UNBHELP -- Relase the button help box 
+C DS_P_UNBHELP -- Relase the button help box
 C
 C    alan penny           ral                       1990-02-01
 
@@ -2697,8 +2697,8 @@ C    alan penny           ral                       1990-02-01
       implicit none
       include 'ST_DS_PANEL_INC'
 
-      character*68 thead		!i: One line description of option 
-      character*545 thelp		!i: Help text for option chosen 
+      character*68 thead		!i: One line description of option
+      character*545 thelp		!i: Help text for option chosen
 C--
 Cbegin
 
@@ -2710,7 +2710,7 @@ Cbegin
 
       end
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DSX_GENF.F     Fortran subroutines of X window displays   
+C DSX_GENF.F     Fortran subroutines of X window displays
 C
 C Contains:-
 C DSX_GCUR      Get cursor image posn on button (monitor posn,value) (X windows)
@@ -2938,8 +2938,8 @@ Cbegin
 
 
       jx = PNVPOSX							!Location to monitor posn
-      jy = PNVPOSY							! val in panel 
-      
+      jy = PNVPOSY							! val in panel
+
       call dsx_p_carea ( jx+15, jy+1, 70, 55, 0 )
       call dsx_p_puttxt ( 'X=', 2,   jx, jy+40, 9 )
       call dsx_p_puttxt ( 'Y=', 2, jx+2, jy+22, 9 )
@@ -3123,7 +3123,7 @@ C   alan penny                  ral                        1990-02-03
       include 'ST_DS_GEN_INC'
 
       logical   isimage         !i: Looking in the image (T) or panel (F)?
-      logical	down		!i: Flag to wait till button pressed 
+      logical	down		!i: Flag to wait till button pressed
 				!    (true) or all up (false)
       integer	kbut		!o: Which button pressed
       integer   kpx		!o: X screen position
@@ -3140,7 +3140,7 @@ Cbegin
 
          if ( istat.eq.0 ) then
            if ( down ) then
-              if ( kb(1).eq.1 .or. kb(2).eq.1 .or. kb(3).eq.1 ) loop = 
+              if ( kb(1).eq.1 .or. kb(2).eq.1 .or. kb(3).eq.1 ) loop =
      +                                                          .false.
               if ( kb(1).eq.1 ) kbut = 1
               if ( kb(2).eq.1 ) kbut = 2
@@ -3153,7 +3153,7 @@ Cbegin
          endif
          if ( loop ) call dsx_mswait ( 50 )					!Wait 50ms before looping
       enddo
-      
+
 
       end
 
@@ -3162,7 +3162,7 @@ C DSX_OVCUS -- Pan an oval cursor  (X windows)
 C
 C    alan penny           ral                       1990-02-01
 
-      subroutine dsx_ovcus ( monitor, rx1, kc1, rx2, kc2, 
+      subroutine dsx_ovcus ( monitor, rx1, kc1, rx2, kc2,
      +                       ang, elli, kopt, kxp, kyp, kbut )
 
       implicit none
@@ -3171,11 +3171,11 @@ C    alan penny           ral                       1990-02-01
       include 'virt.inc'
 
       logical  monitor		!i: Display pos,val on terminal/panel?
-      real     rx1		!i/o: Image pixel 'major axis' radius 
+      real     rx1		!i/o: Image pixel 'major axis' radius
       integer  kc1		!i: Colour (1=red;2=green;3=blue;4=yellow;
 				!    5=cyan;6=mauve;7=tan;8=pink;
 				!    9=black;10=white) (0=none)
-      real     rx2(2)		!i/o: Image pixel inner/outer annular 
+      real     rx2(2)		!i/o: Image pixel inner/outer annular
 				!     'major axis' radii
       integer  kc2		!i: Colour (1=red;2=green;3=blue;4=yellow;
 				!    5=cyan;6=mauve;7=tan;8=pink)
@@ -3204,7 +3204,7 @@ Cbegin
       pxo = DSCURPOSX							!Start cursor at last posn
       pyo = DSCURPOSY
       pxb = pxo
-      pyb = pyo 
+      pyb = pyo
 
       radx = 0.0
       if ( kc1.gt.0 ) radx = rx1
@@ -3265,7 +3265,7 @@ Cbegin
             if ( PDSOPEN ) call dsx_p_hstat ( 6 )
             if ( istat.eq.0 ) then
                if ( simple ) then
-                  call dsx_paintova ( pxo, pyo, rxo, ryo, px, py, 
+                  call dsx_paintova ( pxo, pyo, rxo, ryo, px, py,
      +                           rxa1, rya1, kc1, rxa2, rya2, kc2 )
                else
                   do k = 1, 181*3
@@ -3282,7 +3282,7 @@ Cbegin
                  call dsx_paintova ( pxo, pyo, rxo, ryo, px, py, rxa1,
      +                               rya1, -1, rxa2, rya2, -1 )
                else
-                 call dsx_paintovb ( kcx, kcy, -1, -1, pxo, pyo, rxo, 
+                 call dsx_paintovb ( kcx, kcy, -1, -1, pxo, pyo, rxo,
      +                               ryo )
               endif
             endif
@@ -3353,7 +3353,7 @@ Cbegin
                         call dsx_paintova ( pxo, pyo, rxo, ryo, px,
      +                       py, rxa1, rya1, kc1, rxa2, rya2, kc2 )
                      else
-                        call dsx_setell ( ang, elli, rx1, rx2, 
+                        call dsx_setell ( ang, elli, rx1, rx2,
      +                                    kcx, kcy )
                         do k = 1, 181*3
                            kcx(k) = kcxa(k) + pxo
@@ -3382,7 +3382,7 @@ Cbegin
       enddo
 
       if ( simple ) then						!Paint $
-         call dsx_paintova ( pxo, pyo, rxo, ryo, px, py, rxa1, rya1, 
+         call dsx_paintova ( pxo, pyo, rxo, ryo, px, py, rxa1, rya1,
      +                       -1, rxa2, rya2, -1 )
       else
          do k = 1, 181*3
@@ -3416,7 +3416,7 @@ C    alan penny           ral                       1990-02-01
       subroutine dsx_setell ( ang, elli, rx1, rx2, kcx, kcy )
 
       implicit none
-      include 'ST_DS_GEN_INC'      
+      include 'ST_DS_GEN_INC'
 
       real    ang		!i: angle
       real    elli		!i: Ellipticity
@@ -3491,8 +3491,8 @@ Cbegin
                kcy(k+ka) = dy*afy + dfy
             enddo
          enddo
-         kcx(((j-1)*181)+181) = kcx(((j-1)*181)+1) 
-         kcy(((j-1)*181)+181) = kcy(((j-1)*181)+1) 
+         kcx(((j-1)*181)+181) = kcx(((j-1)*181)+1)
+         kcy(((j-1)*181)+181) = kcy(((j-1)*181)+1)
 
       enddo
 
@@ -3508,7 +3508,7 @@ C    alan penny           ral                       1990-02-01
       subroutine dsx_zoom ( monitor, kopt, kopta )
 
       implicit none
-      include 'ST_DS_GEN_INC'      
+      include 'ST_DS_GEN_INC'
 
       logical monitor 		!i: Display posn, val on terminal/panel?
       integer kopt		!i: Zoom type (0=mouse control;1=reset to null)
@@ -3518,7 +3518,7 @@ C--
       logical more, isin, doit
 Cbegin
 
-     
+
       if ( kopt.eq.1 ) then
          DSZM = 1							!Reset to centre
          DSZPX = 1
@@ -3539,7 +3539,7 @@ Cbegin
                call printo ( 'ERROR: Cant do that' )
                return
             endif
-            if ( jsx.ge.1 .and. jsx.le.DSSNX .and. 
+            if ( jsx.ge.1 .and. jsx.le.DSSNX .and.
      +           jsy.ge.1 .and. jsy.le.DSSNY ) isin = .true.
          enddo
 
@@ -3552,7 +3552,7 @@ Cbegin
                   call printo ( 'ERROR: Cant do that' )
                   return
                endif
-               if ( jsx.ge.1 .and. jsx.le.DSSNX .and. 
+               if ( jsx.ge.1 .and. jsx.le.DSSNX .and.
      +              jsy.ge.1 .and. jsy.le.DSSNY ) isin = .true.
             enddo
          endif
@@ -3569,8 +3569,8 @@ Cbegin
          elseif ( (kbuta.eq.1 .and. kbutb.eq.2) .or.			!Get shift of display
      +            (kbuta.eq.2 .and. kbutb.eq.1) ) then
 
-            jsxa = jsx - (DSSNX/2) 
-            jsya = jsy - (DSSNY/2) 
+            jsxa = jsx - (DSSNX/2)
+            jsya = jsy - (DSSNY/2)
             doit = .false.
             if ( abs(jsxa).gt.(DSZM/2) ) then
                jd = 1 + int((abs(jsxa)-(DSZM/2))/DSZM)
@@ -3619,7 +3619,7 @@ Cbegin
 
          endif
          call dsx_p_hstat ( 0 )
- 
+
       enddo
 
       if ( kopta.eq.1 ) call printo ( 'End two-button zoom/pan' )
@@ -3671,7 +3671,7 @@ Cbegin
                      if ( kb(2).eq.1 ) kbut = 2
                      if ( kb(3).eq.1 ) kbut = 3
                   endif
-                  if ( kbut.ne.0 ) call dsx_waitbut ( .true., .false., 
+                  if ( kbut.ne.0 ) call dsx_waitbut ( .true., .false.,
      +                                            kbuta, kpx, kpy )
                endif
 
@@ -3679,7 +3679,7 @@ Cbegin
                if ( kbut.eq.2 ) iwait = max(16,(iwait/2))
                if ( kbut.eq.3 ) loopa = .false.
 
-               if ( loopa ) then						
+               if ( loopa ) then
                   call dsx_mswait ( iwait )
                   call dsx_updown ( kf )
                   if ( kf.eq.1 ) then
@@ -3689,7 +3689,7 @@ Cbegin
                   endif
                endif
             enddo
-           
+
          endif
 
          if ( kp.eq.1 .or. kp.eq.2 ) then
@@ -3736,7 +3736,7 @@ C    alan penny           ral                       1990-02-01
       character*(*) hopt(nopt)		!i: Headers for sections
       integer	    num			!i: Option list code number
 C--
-      integer   k, ks, ke, ksw(200), klw(200), 
+      integer   k, ks, ke, ksw(200), klw(200),
      +          kl, ka, jx, jy, jtot, jb
       integer lens
       external lens
@@ -3793,7 +3793,7 @@ Cbegin
       PNHPOSX = (jx-1)*91 + 4
       PNHPOSY = (jy-1)*26 + 4
       call dsx_p_hbox
-  
+
       jtot = jtot + 3							!Posn, Value box
       jx = 1 + (jtot-1)/PNNROW
       jy = PNNROW - (jtot-(jx-1)*PNNROW) + 1
@@ -3816,7 +3816,7 @@ C
 C  alan penny             ral             1990 Jan
 
       subroutine dsx_p_gsbox ( cmdlsts, hopt, nopt, ktopt, ktdef,
-     +                         thelp, nh, opt_num, opt_text, opt_head, 
+     +                         thelp, nh, opt_num, opt_text, opt_head,
      +                         opt_help, title, hpaneldo, ierr )
 
       implicit none
@@ -3834,12 +3834,12 @@ C  alan penny             ral             1990 Jan
       character*68   opt_head(opt_num)   !i: Single line helps
       character*68   opt_help(6,opt_num) !i: Fuller helps
       character*(*)  title		 !i: Panel title
-      logical        hpaneldo		 !i: Use help panel 
+      logical        hpaneldo		 !i: Use help panel
       integer        ierr    		 !o: Error flag (0=ok; 1=bad)
 C--
       logical loop, inbox
       real px, py, xs, xe, ys, ye, akx, aky
-      integer kx, ky, k, jcon(200), kww, ksw(200), klw(200), num, kl, 
+      integer kx, ky, k, jcon(200), kww, ksw(200), klw(200), num, kl,
      +        ka, ks, ke, kbb(3), istat
       character cmdlst*2000, textc*2000, ktopta*12
       integer lens
@@ -3888,7 +3888,7 @@ Cbegin
 
          call dsx_mswait ( 50 )
          call dsx_getcurpb ( .false., kx, ky, kbb, istat )
- 
+
          px = kx
          py = ky
 
@@ -3899,7 +3899,7 @@ Cbegin
             xs = PNX(k)
             ys = PNY(k)
             xe = xs + 86.0
-            ye = ys + 21.0 
+            ye = ys + 21.0
             if ( px.ge.xs .and. px.le.xe .and. py.ge.ys .and.
      +           py.le.ye ) then
                inbox = .true.
@@ -3921,11 +3921,11 @@ Cbegin
 
          if ( inbox ) then
             if ( ktopt.ne.ktopta .and. hpaneldo ) then
-               call hx_hload ( ktopt, opt_text, opt_head, opt_help, 
+               call hx_hload ( ktopt, opt_text, opt_head, opt_help,
      +                         opt_num )
             endif
          else
-            if ( kx.le.1 .or. kx.ge.PNSNX .or. ky.le.1 .or. 
+            if ( kx.le.1 .or. kx.ge.PNSNX .or. ky.le.1 .or.
      +           ky.ge.PNSNY ) then
                if ( ktopta.ne.' ' .and. hpaneldo ) then
                   call dsx_p_hx_load ( title )
@@ -3934,7 +3934,7 @@ Cbegin
             endif
          endif
 
-         if ( inbox .and. (kbb(1).eq.1 .or. kbb(2).eq.1 .or. 
+         if ( inbox .and. (kbb(1).eq.1 .or. kbb(2).eq.1 .or.
      +        kbb(3).eq.1) ) then
             loop = .false.
             if ( kww.eq.1 ) then
@@ -4062,7 +4062,7 @@ C--
 Cbegin
 
 
-      kxo = 1 + DSZM*(kxi-DSZPX)	
+      kxo = 1 + DSZM*(kxi-DSZPX)
       kyo = 1 + DSZM*(kyi-DSZPY)
 
 CX      PRINT*,'F VT_TVS i:', kxi,kyi,' o: ', kxo, kyo

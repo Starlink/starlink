@@ -88,7 +88,7 @@
 *     Attempt to get an identifier for the output catalogue.
 *     Get the number of rows in the input catalogue and set the
 *     number expected in the output catalogue.
-*     Get the name of the column the output catalogue is to be sorted 
+*     Get the name of the column the output catalogue is to be sorted
 *     on.
 *     Get the sort order required: ascending or descending.
 *     Determine what header text is to be copied.
@@ -129,7 +129,7 @@
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  ROWS,       ! No. of rows in the input catalogue.
@@ -216,7 +216,7 @@
 *       Create columns in the output catalogue corresponding to those in
 *       the input catalogue.
 
-         CALL CAP_CPSCO (CIIN, CIOUT, FISOR, ORDER, CAT__MXCOL, NUMCOL, 
+         CALL CAP_CPSCO (CIIN, CIOUT, FISOR, ORDER, CAT__MXCOL, NUMCOL,
      :    FIIN, FIOUT, STATUS)
 
 *
@@ -237,7 +237,7 @@
          CALL CAP_CPTAB (II, CIOUT, NUMCOL, FIIN, FIOUT, STATUS)
 
 *
-*       If required, copy any header text from the input catalogue to the 
+*       If required, copy any header text from the input catalogue to the
 *       output catalogue.
 
          IF (TEXT(1 : 1) .NE. 'N') THEN

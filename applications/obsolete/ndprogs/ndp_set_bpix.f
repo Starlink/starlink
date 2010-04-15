@@ -33,7 +33,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -56,7 +56,7 @@ C   01-FEB-1989   - Original program
 C
 C
 C+-----------------------------------------------------------------------------
-C                                      
+C
       IMPLICIT NONE
 C
 C     Functions used.

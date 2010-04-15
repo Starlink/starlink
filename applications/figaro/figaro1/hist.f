@@ -45,7 +45,7 @@ C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_CLEAN      ! Clip a string at first non-printing 
+      INTEGER ICH_CLEAN      ! Clip a string at first non-printing
                              ! character
       INTEGER ICH_ENCODE     ! Encodes a character string
 C
@@ -67,18 +67,18 @@ C
       DOUBLE PRECISION NITEMS(1)! Axis numeric items retrieved
       INTEGER   NNITEMS      ! Number of axis numeric items retrieved
       INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   SPTR         ! Dynamic memory pointer for histogram 
+      INTEGER   SPTR         ! Dynamic memory pointer for histogram
                              ! array
       INTEGER   STATUS       ! Running status for DSA_routines
       CHARACTER STRING*256   ! Used to format strings
-      INTEGER   STRLEN       ! Length of a string 
+      INTEGER   STRLEN       ! Length of a string
       CHARACTER UNITS*64     ! Units
       REAL      VALUE        ! NBINS as a REAL
-      REAL      VMAX         ! Value at the center of last histogram 
+      REAL      VMAX         ! Value at the center of last histogram
                              ! bin
       REAL      VMIN         ! Value at the center of first histogram
                              ! bin
-      INTEGER   XPTR         ! Dynamic memory pointer for histogram 
+      INTEGER   XPTR         ! Dynamic memory pointer for histogram
                              ! AXIS(1) array
 
 C
@@ -91,7 +91,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -104,9 +104,9 @@ C
       IF(STATUS.NE.0)GOTO 500
 C
 C     Open IMAGE file. (This is done with PAR_RDCHAR in order to
-C     retrieve the name of the image for insertion in the title of the 
-C     output file. DSA_GET_ACTUAL_NAME returns the FULL VMS name 
-C     including the disk, directory etc of the file and is therefore 
+C     retrieve the name of the image for insertion in the title of the
+C     output file. DSA_GET_ACTUAL_NAME returns the FULL VMS name
+C     including the disk, directory etc of the file and is therefore
 C     not really suitable.)
 C
       CALL DSA_INPUT ('IMAGE','IMAGE',STATUS)
@@ -146,7 +146,7 @@ C
       CALL PAR_WRUSER(STRING(:NEXT),STATUS)
       CALL PAR_WRUSER(' ',STATUS)
 C
-C     Get the min and max values for the histogram range, 
+C     Get the min and max values for the histogram range,
 C     and number of bins.  (The 65536 as max number of bins is
 C     quite arbitrary, as is the reset value.)
 C

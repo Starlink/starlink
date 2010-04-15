@@ -88,13 +88,13 @@ int main ( int argc, char *argv[] )
 
 /* Initialize the starting address. */
    iadr = 0;
- 
+
 /* Loop while OK status. */
    while ( ! jstat ) {
- 
+
    /* Save the current address for the report. */
       iw = iadr;
- 
+
    /* Read a record. */
       jstat = hlpHdread ( LBUF, &iadr, buf, &nc );
 

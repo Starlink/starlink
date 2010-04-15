@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
 exec @AWISH@ $0 ${1+"$@"}
 #+
@@ -17,12 +17,12 @@ exec @AWISH@ $0 ${1+"$@"}
 
 #  Command Line Arguments:
 #     demo: An optional name of a demonstration to be selected and run
-#     automatically. If no demo name is given on the command line, all 
-#     the demonstrations in the specified demo directory will be loaded 
-#     and selected, but they will not be run until the "Run" button in 
+#     automatically. If no demo name is given on the command line, all
+#     the demonstrations in the specified demo directory will be loaded
+#     and selected, but they will not be run until the "Run" button in
 #     the GUI is pressed.
 #
-#     -dir <demo_dir>: An optional argument giving the directory to be 
+#     -dir <demo_dir>: An optional argument giving the directory to be
 #     searched for demo scripts. If not supplied, $KAPPA_DIR is used.
 #
 #     -paging: If specified, causes each step in the demo commentary to
@@ -32,10 +32,10 @@ exec @AWISH@ $0 ${1+"$@"}
 #
 #     -loop: If specified, causes the selected demonstrations to be
 #     re-run immediately as soon as the last one finishes. If -noloop
-#     is specified, the system becomes idle when the final demo 
+#     is specified, the system becomes idle when the final demo
 #     completes, until the "Run" button is pressed. Default is "-loop".
 #
-#     -nonet: If specified, clicking on a text representing a remote url 
+#     -nonet: If specified, clicking on a text representing a remote url
 #     will not cause a web browser to be created to view the url. Use
 #     this option if there is no access to the net. Access to the net is
 #     assumed to be available by default.
@@ -101,7 +101,7 @@ exec @AWISH@ $0 ${1+"$@"}
    set GWMHEIGHT 0.7
 
 # Initialise stardemo global variables.
-   set ABORT_DEMO 0 
+   set ABORT_DEMO 0
    set ADAM_ERRORS ""
    set ADAM_TASKS ""
    set ATASK 0
@@ -115,7 +115,7 @@ exec @AWISH@ $0 ${1+"$@"}
    set ENV_VARS "DEMO_TEMP"
    set F3 ""
    set F4 ""
-   set HAREA 1 
+   set HAREA 1
    set HELP ""
    set HLAB ""
    set LINKCOL darkblue
@@ -132,8 +132,8 @@ exec @AWISH@ $0 ${1+"$@"}
    set PACKAGE_VERSION ""
    set PACKAGE_EMAIL ""
    set PACKAGE_URL ""
-   set PAGING 0 
-   set PAUSE_DEMO 0 
+   set PAGING 0
+   set PAUSE_DEMO 0
    set RUNNING_DEMO "<idle>"
    set SELECTED_DEMOS ""
    set SEQ_STOP ""
@@ -166,7 +166,7 @@ exec @AWISH@ $0 ${1+"$@"}
          incr i
          if { $i == $argc } {
             puts "No directory specified for -dir option."
-            set userr 1         
+            set userr 1
          } {
             set demodir [lindex $argv $i]
             if { ![file isdirectory $demodir] } {
@@ -185,13 +185,13 @@ exec @AWISH@ $0 ${1+"$@"}
          set PAGING 0
 
       } elseif { $arg == "-loop" } {
-         set LOOPING 1 
+         set LOOPING 1
 
       } elseif { $arg == "-noloop" } {
          set LOOPING 0
 
       } elseif { $arg == "-net" } {
-         set NET 1 
+         set NET 1
 
       } elseif { $arg == "-nonet" } {
          set NET 0
@@ -205,7 +205,7 @@ exec @AWISH@ $0 ${1+"$@"}
       } elseif { $autorun == "" } {
          set autorun $arg
 
-      } { 
+      } {
          puts "Unknown option \"$arg\"."
          set userr 1
       }
@@ -214,7 +214,7 @@ exec @AWISH@ $0 ${1+"$@"}
 
    }
 
-   if { $userr } { 
+   if { $userr } {
       puts {Usage: stardemo [demo] [-dir <demo_dir>] [-(no)paging] [-(no)loop]}
       exit
    }
@@ -223,7 +223,7 @@ exec @AWISH@ $0 ${1+"$@"}
    tk appname stardemo
 
 # Rename the "exit" command so that it calls a procedure which cleans up,
-# and then calls the built-in shut-down commands. This new exit command is 
+# and then calls the built-in shut-down commands. This new exit command is
 # called even if an exceptional exit occurs.
    rename exit tcl_exit
 
@@ -260,11 +260,11 @@ exec @AWISH@ $0 ${1+"$@"}
 
 
 
-   set px240 [expr round( 24.0 * $fac ) ]   
-   set px180 [expr round( 18.0 * $fac ) ]   
-   set px140 [expr round( 14.0 * $fac ) ]   
-   set px120 [expr round( 12.0 * $fac ) ]   
-   set px100 [expr round( 10.0 * $fac ) ]   
+   set px240 [expr round( 24.0 * $fac ) ]
+   set px180 [expr round( 18.0 * $fac ) ]
+   set px140 [expr round( 14.0 * $fac ) ]
+   set px120 [expr round( 12.0 * $fac ) ]
+   set px100 [expr round( 10.0 * $fac ) ]
 
    set HD_FONT [SelectFont "-*-*-bold-r-*-*-$px240-*-*-*-*-*-*-*"]
    set BIG_FONT [SelectFont "-*-*-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
@@ -279,7 +279,7 @@ exec @AWISH@ $0 ${1+"$@"}
    set TT_FONT [SelectFont "-*-helvetica-medium-r-*-*-$px140-*-*-*-*-*-*-*"]
    set BTT_FONT [SelectFont "-*-helvetica-bold-r-*-*-$px180-*-*-*-*-*-*-*"]
 
-# Try to stop problems with the AMS (ADAM Message System) rendevous files 
+# Try to stop problems with the AMS (ADAM Message System) rendevous files
 # by creating a new directory as ADAM_USER.
    if { [info exists env(ADAM_USER)] } {
       set OLD_ADAM_USER $env(ADAM_USER)
@@ -327,11 +327,11 @@ exec @AWISH@ $0 ${1+"$@"}
 # Record the process id's of any existing kappa processes. All new processes
 # are killed on exit, but processes active on entry are not killed.
    if { ![ catch {exec ps | grep kappa | grep -v grep | \
-                  awk {{print $1}} } OLDKAPPA ] } { 
+                  awk {{print $1}} } OLDKAPPA ] } {
       set OLDKAPPA {}
    }
 
-# Load the required ADAM monoliths. 
+# Load the required ADAM monoliths.
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa    $KAPPA_DIR/kappa_mon
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
@@ -358,17 +358,17 @@ exec @AWISH@ $0 ${1+"$@"}
    option add *font $FONT
 
 # Set the default font for radiobuttons and checkbuttons.
-   option add *Radiobutton.font $RB_FONT 
-   option add *Checkbutton.font $RB_FONT 
+   option add *Radiobutton.font $RB_FONT
+   option add *Checkbutton.font $RB_FONT
 
 # Set the default font for buttons and menus.
-   option add *Button.font $B_FONT 
-   option add *Menubutton.font $B_FONT 
-   option add *Menu.font $B_FONT 
+   option add *Button.font $B_FONT
+   option add *Menubutton.font $B_FONT
+   option add *Menu.font $B_FONT
 
 # Radiobuttons and Checkbuttons do not have a highlighted border.
-   option add *Radiobutton.highlightThickness 0 
-   option add *Checkbutton.highlightThickness 0 
+   option add *Radiobutton.highlightThickness 0
+   option add *Checkbutton.highlightThickness 0
 
 # Ensure that listbox entries are white on black when selected.
    option add *Listbox.selectForeground white
@@ -409,11 +409,11 @@ exec @AWISH@ $0 ${1+"$@"}
          set TOP [frame .top -relief raised -bd 2]
       }
 
-# Create a frame which goes at the top of the screen but contains nothing. 
+# Create a frame which goes at the top of the screen but contains nothing.
 # X events will be directed to this window during any pauses
 # (see procedure WaitFor). The window has no user controls and so is
-# "safe" (i.e. it will just ignore any button presses, mouse movements, etc). 
-# This ensures that new commands cannot be initiated by the user before 
+# "safe" (i.e. it will just ignore any button presses, mouse movements, etc).
+# This ensures that new commands cannot be initiated by the user before
 # previous ones have finished.
       set SAFE [frame $TOP.dummy ]
       pack $SAFE
@@ -436,12 +436,12 @@ exec @AWISH@ $0 ${1+"$@"}
       set demomenu [menu $demo.menu]
       SetHelp $demo ".  Menu of commands for controlling demonstrations..." STARDEMO_OPTIONS_MENU
       set HELP_TEXT(STARDEMO_DEMO_MENU) "Menu of commands for controlling demonstrations. Demonstrations can be selected, removed, executed, paused, aborted, etc."
-   
+
       set opts [menubutton $F1.opts -text Options -padx 1m -pady 1 -menu $F1.opts.menu -background $MENUBACK ]
       set OPTSMENU [menu $opts.menu]
       SetHelp $opts ".  Menu of commands to set up various options..." STARDEMO_OPTIONS_MENU
       set HELP_TEXT(STARDEMO_FILE_MENU) "Menu of commands for setting options which control how the demonstrations are run."
-   
+
       set help [menubutton $F1.help -text Help -padx 1m -pady 1 -menu $F1.help.menu -background $MENUBACK ]
       set helpmenu [menu $help.menu]
       SetHelp $help ".  Display further help information..." STARDEMO_HELP_MENU
@@ -477,10 +477,10 @@ display will not."
 # Add menu items to the File menu.
       $filemenu add command -label "Exit        " -command {Finish 1} -accelerator "Ctrl-e"
       $filemenu add command -label "Load        " -command {LoadFromFile ""} -accelerator "Ctrl-l"
-   
+
       MenuHelp $filemenu "Exit        " ".  Exit the application."
       MenuHelp $filemenu "Load        " ".  Load more demonstrations from disk."
-   
+
       bind . <Control-e> {Finish 1}
       bind . <Control-l> {LoadFromFile ""}
 
@@ -491,14 +491,14 @@ display will not."
       $demomenu add command -label "Abort       " -command {Abort} -accelerator "Ctrl-a"
       $demomenu add command -label "Next        " -command {Next} -accelerator "Ctrl-n"
       $demomenu add command -label "Pause       " -command {PauseDemo} -accelerator "Ctrl-p"
-   
+
       MenuHelp $demomenu "Select      " ".  Select the demonstrations to run."
       MenuHelp $demomenu "Delete      " ".  Delete demonstrations from the list of loaded demonstrations."
       MenuHelp $demomenu "Run         " ".  Start to run all the selected demonstrations running the beginning."
       MenuHelp $demomenu "Next        " ".  Start the next selected demonstration immediately."
       MenuHelp $demomenu "Abort       " ".  Abort the currently running demonstrations."
       MenuHelp $demomenu "Pause       " ".  Pause the currently running demonstration."
-   
+
       bind . <Control-s> {Select}
       bind . <Control-d> {Delete}
       bind . <Control-r> {Run}
@@ -509,12 +509,12 @@ display will not."
 # Add menu items to options menu.
       $OPTSMENU add checkbutton -label "Auto-looping " -variable LOOPING
       $OPTSMENU add checkbutton -label "Manual paging" -variable PAGING
-   
+
       MenuHelp $OPTSMENU "Auto-looping "  ".  Should the first selected demonstration be re-started when the final one has finished?"
       MenuHelp $OPTSMENU "Manual paging"  ".  Wait for a key to be pressed before moving on to the next step in the demonstration?"
 
 # Pack the menu buttons.
-      pack $file $demo $opts -side left 
+      pack $file $demo $opts -side left
       pack $help -side right
 
 # Create a label to display the current package command. Put it on the menu
@@ -530,9 +530,9 @@ display will not."
       pack $presslab -side left -anchor w -fill x -expand 1 -padx 2m
       SetHelp $presslab ".  Displays instructions during manual paging." STARDEMO_PRESSLAB
 
-# Set up the main frame (F2). It is made up from two columns arranged 
+# Set up the main frame (F2). It is made up from two columns arranged
 # horizontally...
-      set COL1 [frame $F2.col1 -bd 1]   
+      set COL1 [frame $F2.col1 -bd 1]
       set COL2 [frame $F2.col2 -bd 1]
       pack $COL1 -side left -fill y -anchor w -ipadx 1m -ipady 1m
       pack $COL2 -side left -fill both -expand 1
@@ -546,26 +546,26 @@ display will not."
 
       set conf1 [frame $con1.f1 -background $MENUBACK]
       set label1 [label $conf1.label1 -textvariable PACKAGE_TITLE -font \
-                        $BIG_FONT -relief groove -bd 2 -background $WHITEBACK -height 3]   
+                        $BIG_FONT -relief groove -bd 2 -background $WHITEBACK -height 3]
       SetHelp $label1 ".  The name of the package being demonstrated." STARDEMO_PACKAGE_DESC
 
       set package [button $conf1.pkg -text "Info" -padx 1m -pady 1 -command Info -background $MENUBACK]
       SetHelp $package ".  Click to see further information about the package being demonstrated." STARDEMO_PACKAGE
       pack $label1 -side top -pady 1m -padx 2m -ipadx 2m -ipady 1m
       pack $package -side top -pady 1m -padx 2m -pady 1m
-   
+
       set conf2 [frame $con1.conf2 -background $MENUBACK]
-      set label2 [label $conf2.label2 -text "Current demonstration:" -background $MENUBACK]   
-      set label3 [label $conf2.label3 -textvariable RUNNING_DEMO -background $MENUBACK -relief groove -bd 2]   
+      set label2 [label $conf2.label2 -text "Current demonstration:" -background $MENUBACK]
+      set label3 [label $conf2.label3 -textvariable RUNNING_DEMO -background $MENUBACK -relief groove -bd 2]
       SetHelp $label3 ".  Displays the name of the currently running demonstration (\"<idle>\" is displayed if no demonstration is currently running). Click for more information on the demo. " STARDEMO_NAME
 
       bind $label3 <Button> {DemoInfo}
 
       pack $label2 -side top
       pack $label3 -side top -expand 1 -fill x -padx 1m
-   
-      pack $conf1 $conf2 -side top 
-   
+
+      pack $conf1 $conf2 -side top
+
       pack $con1 -side top -pady 1m -padx 2m -ipady 1m -fill x -expand 1
 
 #  Row 1 of buttons...
@@ -601,7 +601,7 @@ display will not."
       pack $ABORT $NEXT $PAUSE -side left -pady 1m -padx 2m -expand 1 -fill x -anchor c
 
 #  Pack all the rows of buttons.
-      pack $con2a $con2b -side top -anchor n 
+      pack $con2a $con2b -side top -anchor n
 
 #  Radio buttons etc to control looping.
       set con3 [frame $con.con3 -relief groove -bd 2]
@@ -613,10 +613,10 @@ display will not."
       set RB_HALT [radiobutton $con3.noloop -text "Halt when finished" \
                     -anchor nw -value 0 -variable LOOPING ]
       SetHelp $RB_HALT ".  Click to halt when the final selected demonstration has finished." STARDEMO_HALT
-   
+
       pack [label $con3.lbl -text "Looping:" -justify left] $RB_LOOP $RB_HALT \
            -side top -anchor nw -fill both -expand 1 -padx 2m
-   
+
       pack $con3 -side top -ipady 1m -pady 1m -padx 2m -expand 1 -fill x
 
 #  Radio buttons to control paging.
@@ -632,12 +632,12 @@ display will not."
                     -anchor nw -value 0 -variable PAGING \
                     -command "$SPEED configure -state normal"]
       SetHelp $RB_AUTO ".  Click to make the demonstration display each page for a fixed time before moving on to the next. Pressing any key will cause the next page to be displayed immediately." STARDEMO_PAGING
-   
+
       set RB_MANUAL [radiobutton $con4.manual -text "Manual paging" \
                     -anchor nw -value 1 -variable PAGING \
                     -command "$SPEED configure -state disabled"]
       SetHelp $RB_MANUAL ".  Click to make the demonstration pause indefinitely after each page, moving on only when a key is pressed." STARDEMO_PAGING
-   
+
       pack [label $con4.lbl -text "Paging:" -justify left] $RB_AUTO $RB_MANUAL $SPEED \
            -side top -anchor nw -fill both -expand 1 -padx 2m
 
@@ -645,7 +645,7 @@ display will not."
       pack [label $con4.lbl3 -text "Slow" -font $S_FONT] -side right
       pack [label $con4.lbl4 -text "Speed" -justify center -font $S_BFONT] \
            -side right -expand 1 -fill x
-   
+
       pack $con4 -side top -ipady 1m -padx 2m -pady 1m -expand 1 -fill x
 
 # Create the help area.
@@ -661,8 +661,8 @@ display will not."
 # Create the commentary area.
       CommentaryArea
 
-# Get the size of the canvas. 
-      update 
+# Get the size of the canvas.
+      update
 
       set CANWID [winfo width $CAN]
       set CANHGT [winfo height $CAN]
@@ -687,11 +687,11 @@ display will not."
 # colour map should be used.
          if { !$usingnewcmap } {
             destroy $TOP
-            set usingnewcmap 1 
+            set usingnewcmap 1
             set F3 ""
             set F4 ""
             set HLAB ""
-            set HAREA 1 
+            set HAREA 1
 
 # If we failed while using a private colour map, give up.
          } {

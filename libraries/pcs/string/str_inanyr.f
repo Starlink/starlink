@@ -13,12 +13,12 @@
 *     POSITION = STRING_INANYR ( STRING, CHOICE )
 
 *  Description:
-*     Finds the position of the last character in STRING which matches 
+*     Finds the position of the last character in STRING which matches
 *     none of the characters in CHOICE.
 
 *  Algorithm:
-*     Each character of STRING is compared with the characters in CHOICE 
-*     until a mismatch is found, or STRING is exhausted, starting with the 
+*     Each character of STRING is compared with the characters in CHOICE
+*     until a mismatch is found, or STRING is exhausted, starting with the
 *     last character of STRING and working towards its start.
 
 *  Copyright:
@@ -55,7 +55,7 @@
 
 *  Result:
 *     POSITION = INTEGER
-*           The value returned is the position in STRING at which the 
+*           The value returned is the position in STRING at which the
 *           rightmost character mismatch occurs.
 *           If no mismatch found, then POSITION is set to zero.
 

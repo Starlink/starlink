@@ -68,12 +68,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -177,7 +177,7 @@
 
 *  Initialize the new names to be blank.
          CALL GRP1_SETC( FSTNEW, NEWSIZ, NEWSIZ,
-     :                   %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
+     :                   %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
      :                   ' ', STATUS,
      :                   %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
@@ -225,11 +225,11 @@
 *  ...and store the information in the group.
          IF( CMN_GSIZE( SLOT ) .GT. 0 ) THEN
             CALL GRP1_IPUT( INDX,
-     :             CMN_GSIZE( SLOT ), 
+     :             CMN_GSIZE( SLOT ),
      :             %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
-     :             %VAL( CNF_PVAL( CMN_LVPNT( SLOT ) ) ), 
+     :             %VAL( CNF_PVAL( CMN_LVPNT( SLOT ) ) ),
      :             %VAL( CNF_PVAL( CMN_INPNT( SLOT ) ) ),
-     :             %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ), 
+     :             %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ),
      :             %VAL( CNF_PVAL( CMN_MIPNT( SLOT ) ) ),
      :             NAME, LEVEL, IFILE, MODGP, MODIN, STATUS,
      :             %VAL( CNF_CVAL( GRP__SZNAM ) ) )

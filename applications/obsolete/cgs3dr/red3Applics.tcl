@@ -221,7 +221,7 @@ proc red3_cgs3_det {} {
       cgs3drClear
       cgs3drInform "Red3Applics error : Failed to get DETECTOR parameter!"
     } else {
-      set params "INPUT=$g1 DETECTOR=$g5 STARTSCAN=$g3 ENDSCAN=$g4 OUTPUT=$g2" 
+      set params "INPUT=$g1 DETECTOR=$g5 STARTSCAN=$g3 ENDSCAN=$g4 OUTPUT=$g2"
       $Red3Task obey cgs3_det "${params}" -inform "cgs3drInform %V"
     }
   }
@@ -311,7 +311,7 @@ proc red3_adjoin3 {} {
       cgs3drClear
       cgs3drInform "Red3Applics error : Failed to get OUTPUT parameter!"
     } else {
-      set params "INPUT=$g1 SPECTRUM1=$g2 OUTPUT=$g3" 
+      set params "INPUT=$g1 SPECTRUM1=$g2 OUTPUT=$g3"
       $Red3Task obey adjoin3 "${params}" -inform "cgs3drInform %V"
     }
   }
@@ -367,7 +367,7 @@ proc red3_extract3 {} {
       cgs3drClear
       cgs3drInform "Red3Applics error : Failed to get SPECTRUM parameter!"
     } else {
-      set params "IMAGE=$g1 YSTART=$g2 YEND=$g3 SPECTRUM=$g4" 
+      set params "IMAGE=$g1 YSTART=$g2 YEND=$g3 SPECTRUM=$g4"
       $Red3Task obey extract3 "${params}" -inform "cgs3drInform %V"
     }
   }

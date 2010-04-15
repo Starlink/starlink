@@ -21,7 +21,7 @@
 
 *  Description:
 *     Create a new catalogue that contains entries from a catalogue
-*     that pass some selection criteria. The criteria should be a legal 
+*     that pass some selection criteria. The criteria should be a legal
 *     CATPAC Parser expression.
 
 *  Usage:
@@ -52,7 +52,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

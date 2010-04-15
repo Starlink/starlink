@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,7 +105,7 @@
 *  Arguments Returned:
       DOUBLE PRECISION FVECC( M )
       INTEGER IFAIL
-      
+
 *  Local Variables:
       INTEGER STATUS             ! Local status
 
@@ -116,21 +116,21 @@
 
 *  Add the current parameter estimates to the input array prior to
 *  transformation.
-      CALL CCD1_ITRA( XC, %VAL( CNF_PVAL( CCD1_IPX ) ), 
+      CALL CCD1_ITRA( XC, %VAL( CNF_PVAL( CCD1_IPX ) ),
      :                %VAL( CNF_PVAL( CCD1_IPY ) ),
      :                CCD1_NDXY, CCD1_NREC, CCD1_NPAR + 2, .FALSE.,
      :                %VAL( CNF_PVAL( CCD1_IPPIN ) ), STATUS )
 
 *  Transform the data.
        CALL TRN_TRND( .FALSE., CCD1_NREC, CCD1_NPAR + 2, CCD1_NREC,
-     :                %VAL( CNF_PVAL( CCD1_IPPIN ) ), 
+     :                %VAL( CNF_PVAL( CCD1_IPPIN ) ),
      :                CCD1_IDTR, CCD1_NREC, 2,
      :                %VAL( CNF_PVAL( CCD1_IPPO ) ), STATUS )
 
 *  Now form the differences.
-      CALL CCD1_LSFUNS( %VAL( CNF_PVAL( CCD1_IPX ) ), 
+      CALL CCD1_LSFUNS( %VAL( CNF_PVAL( CCD1_IPX ) ),
      :                  %VAL( CNF_PVAL( CCD1_IPY ) ),
-     :                  %VAL( CNF_PVAL( CCD1_IPPO ) ), 
+     :                  %VAL( CNF_PVAL( CCD1_IPPO ) ),
      :                  CCD1_NREC, FVECC, STATUS )
 
       END

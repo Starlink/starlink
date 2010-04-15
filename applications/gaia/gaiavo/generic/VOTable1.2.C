@@ -43,7 +43,7 @@
 namespace votable_12
 {
   // anyTEXT
-  // 
+  //
 
   const anyTEXT::any_sequence& anyTEXT::
   any () const
@@ -77,19 +77,19 @@ namespace votable_12
 
 
   // astroYear
-  // 
+  //
 
 
   // ucdType
-  // 
+  //
 
 
   // arrayDEF
-  // 
+  //
 
 
   // encodingType
-  // 
+  //
 
   encodingType::
   encodingType (value v)
@@ -126,7 +126,7 @@ namespace votable_12
   encodingType& encodingType::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_encodingType_literals_[v]);
 
     return *this;
@@ -134,7 +134,7 @@ namespace votable_12
 
 
   // dataType
-  // 
+  //
 
   dataType::
   dataType (value v)
@@ -171,7 +171,7 @@ namespace votable_12
   dataType& dataType::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_dataType_literals_[v]);
 
     return *this;
@@ -179,11 +179,11 @@ namespace votable_12
 
 
   // precType
-  // 
+  //
 
 
   // yesno
-  // 
+  //
 
   yesno::
   yesno (value v)
@@ -220,7 +220,7 @@ namespace votable_12
   yesno& yesno::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_yesno_literals_[v]);
 
     return *this;
@@ -228,7 +228,7 @@ namespace votable_12
 
 
   // MIN
-  // 
+  //
 
   const MIN::value_type& MIN::
   value () const
@@ -286,7 +286,7 @@ namespace votable_12
 
 
   // MAX
-  // 
+  //
 
   const MAX::value_type& MAX::
   value () const
@@ -344,7 +344,7 @@ namespace votable_12
 
 
   // OPTION
-  // 
+  //
 
   const OPTION::OPTION1_sequence& OPTION::
   OPTION1 () const
@@ -420,7 +420,7 @@ namespace votable_12
 
 
   // VALUES
-  // 
+  //
 
   const VALUES::MIN_optional& VALUES::
   MIN () const
@@ -622,7 +622,7 @@ namespace votable_12
 
 
   // LINK
-  // 
+  //
 
   const LINK::ID_optional& LINK::
   ID () const
@@ -866,7 +866,7 @@ namespace votable_12
 
 
   // INFO
-  // 
+  //
 
   const INFO::DESCRIPTION_optional& INFO::
   DESCRIPTION () const
@@ -1176,7 +1176,7 @@ namespace votable_12
 
 
   // COOSYS
-  // 
+  //
 
   const COOSYS::ID_type& COOSYS::
   ID () const
@@ -1294,7 +1294,7 @@ namespace votable_12
 
 
   // DEFINITIONS
-  // 
+  //
 
   const DEFINITIONS::COOSYS_sequence& DEFINITIONS::
   COOSYS () const
@@ -1334,7 +1334,7 @@ namespace votable_12
 
 
   // FIELD
-  // 
+  //
 
   const FIELD::DESCRIPTION_optional& FIELD::
   DESCRIPTION () const
@@ -1770,7 +1770,7 @@ namespace votable_12
 
 
   // PARAM
-  // 
+  //
 
   const PARAM::value_optional& PARAM::
   value () const
@@ -1804,7 +1804,7 @@ namespace votable_12
 
 
   // GROUP
-  // 
+  //
 
   const GROUP::DESCRIPTION_optional& GROUP::
   DESCRIPTION () const
@@ -2060,7 +2060,7 @@ namespace votable_12
 
 
   // FIELDref
-  // 
+  //
 
   const FIELDref::ref_type& FIELDref::
   ref () const
@@ -2148,7 +2148,7 @@ namespace votable_12
 
 
   // PARAMref
-  // 
+  //
 
   const PARAMref::ref_type& PARAMref::
   ref () const
@@ -2236,7 +2236,7 @@ namespace votable_12
 
 
   // DATA
-  // 
+  //
 
   const DATA::TABLEDATA_optional& DATA::
   TABLEDATA () const
@@ -2348,7 +2348,7 @@ namespace votable_12
 
 
   // TABLEDATA
-  // 
+  //
 
   const TABLEDATA::TR_sequence& TABLEDATA::
   TR () const
@@ -2370,7 +2370,7 @@ namespace votable_12
 
 
   // TD
-  // 
+  //
 
   const TD::encoding_optional& TD::
   encoding () const
@@ -2404,7 +2404,7 @@ namespace votable_12
 
 
   // TR
-  // 
+  //
 
   const TR::TD_sequence& TR::
   TD () const
@@ -2456,7 +2456,7 @@ namespace votable_12
 
 
   // FITS
-  // 
+  //
 
   const FITS::STREAM_type& FITS::
   STREAM () const
@@ -2508,7 +2508,7 @@ namespace votable_12
 
 
   // BINARY
-  // 
+  //
 
   const BINARY::STREAM_type& BINARY::
   STREAM () const
@@ -2536,7 +2536,7 @@ namespace votable_12
 
 
   // STREAM
-  // 
+  //
 
   const STREAM::type_type& STREAM::
   type () const
@@ -2720,7 +2720,7 @@ namespace votable_12
 
 
   // TABLE
-  // 
+  //
 
   const TABLE::DESCRIPTION_optional& TABLE::
   DESCRIPTION () const
@@ -3048,7 +3048,7 @@ namespace votable_12
 
 
   // RESOURCE
-  // 
+  //
 
   const RESOURCE::DESCRIPTION_optional& RESOURCE::
   DESCRIPTION () const
@@ -3376,7 +3376,7 @@ namespace votable_12
 
 
   // type
-  // 
+  //
 
   type::
   type (value v)
@@ -3413,7 +3413,7 @@ namespace votable_12
   type& type::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_type_literals_[v]);
 
     return *this;
@@ -3421,7 +3421,7 @@ namespace votable_12
 
 
   // system
-  // 
+  //
 
   system::
   system (value v)
@@ -3458,7 +3458,7 @@ namespace votable_12
   system& system::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_system_literals_[v]);
 
     return *this;
@@ -3466,7 +3466,7 @@ namespace votable_12
 
 
   // type1
-  // 
+  //
 
   type1::
   type1 (value v)
@@ -3503,7 +3503,7 @@ namespace votable_12
   type1& type1::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_type1_literals_[v]);
 
     return *this;
@@ -3511,7 +3511,7 @@ namespace votable_12
 
 
   // type2
-  // 
+  //
 
   type2::
   type2 (value v)
@@ -3548,7 +3548,7 @@ namespace votable_12
   type2& type2::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_type2_literals_[v]);
 
     return *this;
@@ -3556,7 +3556,7 @@ namespace votable_12
 
 
   // actuate
-  // 
+  //
 
   actuate::
   actuate (value v)
@@ -3593,7 +3593,7 @@ namespace votable_12
   actuate& actuate::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_actuate_literals_[v]);
 
     return *this;
@@ -3601,7 +3601,7 @@ namespace votable_12
 
 
   // type3
-  // 
+  //
 
   type3::
   type3 (value v)
@@ -3638,7 +3638,7 @@ namespace votable_12
   type3& type3::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_type3_literals_[v]);
 
     return *this;
@@ -3646,7 +3646,7 @@ namespace votable_12
 
 
   // VOTABLE
-  // 
+  //
 
   const VOTABLE::DESCRIPTION_optional& VOTABLE::
   DESCRIPTION () const
@@ -3860,7 +3860,7 @@ namespace votable_12
 
 
   // version
-  // 
+  //
 
   version::
   version (value v)
@@ -3897,7 +3897,7 @@ namespace votable_12
   version& version::
   operator= (value v)
   {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
+    static_cast< ::xml_schema::nmtoken& > (*this) =
     ::xml_schema::nmtoken (_xsd_version_literals_[v]);
 
     return *this;

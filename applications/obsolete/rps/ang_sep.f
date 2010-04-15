@@ -91,7 +91,7 @@
 *       Author
 *         Koji Mukai   (1992 Dec 30), original version
 *-TO_XYZ
-        
+
         double precision alpha, delta, temp
 
         alpha = ra * pi_180

@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
 *  variable by forcing initialisation of variables in PNTR that are
 *  not of interest to the caller
       IF (NPNTR .NE. 4) THEN
-         DO I = NPNTR+1, 4 
+         DO I = NPNTR+1, 4
             PNTR( I ) = 0
          END DO
       END IF
@@ -162,7 +162,7 @@
      :                      %VAL( CNF_PVAL( PNTR( 3 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                      BAD, STATUS )
- 
+
 *  ...unsigned byte.
          ELSE IF ( UTYPE .EQ. '_UBYTE' ) THEN
             CALL NDF1_QMAUB( EL, QUAL, BADBIT, NPNTR,
@@ -171,7 +171,7 @@
      :                       %VAL( CNF_PVAL( PNTR( 3 ) ) ),
      :                       %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                       BAD, STATUS )
- 
+
 *  ...double precision.
          ELSE IF ( UTYPE .EQ. '_DOUBLE' ) THEN
             CALL NDF1_QMAD( EL, QUAL, BADBIT, NPNTR,
@@ -180,7 +180,7 @@
      :                      %VAL( CNF_PVAL( PNTR( 3 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                      BAD, STATUS )
- 
+
 *  ...integer.
          ELSE IF ( UTYPE .EQ. '_INTEGER' ) THEN
             CALL NDF1_QMAI( EL, QUAL, BADBIT, NPNTR,
@@ -189,7 +189,7 @@
      :                      %VAL( CNF_PVAL( PNTR( 3 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                      BAD, STATUS )
- 
+
 *  ...real.
          ELSE IF ( UTYPE .EQ. '_REAL' ) THEN
             CALL NDF1_QMAR( EL, QUAL, BADBIT, NPNTR,
@@ -198,7 +198,7 @@
      :                      %VAL( CNF_PVAL( PNTR( 3 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                      BAD, STATUS )
- 
+
 *  ...word.
          ELSE IF ( UTYPE .EQ. '_WORD' ) THEN
             CALL NDF1_QMAW( EL, QUAL, BADBIT, NPNTR,
@@ -207,7 +207,7 @@
      :                      %VAL( CNF_PVAL( PNTR( 3 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                      BAD, STATUS )
- 
+
 *  ...unsigned word.
          ELSE IF ( UTYPE .EQ. '_UWORD' ) THEN
             CALL NDF1_QMAUW( EL, QUAL, BADBIT, NPNTR,

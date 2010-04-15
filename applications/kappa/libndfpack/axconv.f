@@ -75,7 +75,7 @@
 
 *  History:
 *     22-JUN-1992 (RDS):
-*        Original version. 
+*        Original version.
 *     1992 November 26 (MJC):
 *        Brought up to KAPPA standards, and various improvements to the
 *        prologue.
@@ -103,14 +103,14 @@
 *  Local Variables:
       CHARACTER * (DAT__SZLOC) ADLOC ! Locator to the data_array in the
                                     ! axis
-      CHARACTER * (DAT__SZLOC) ALOC ! Locator to the axis structure 
+      CHARACTER * (DAT__SZLOC) ALOC ! Locator to the axis structure
       REAL BASE                     ! Value of the centre of the first
                                     ! pixel
       CHARACTER * (DAT__SZLOC) CLOC ! Locator to an individual axis
       CHARACTER * (DAT__SZLOC) DDLOC ! Locator to the data in the
                                     ! data array
       INTEGER DIMS( NDF__MXDIM )    ! Dimensions of the data array
-      INTEGER DPNTR                 ! Pointer to axis data array 
+      INTEGER DPNTR                 ! Pointer to axis data array
       CHARACTER * (DAT__SZLOC) LOC  ! Locator to the datafile
       INTEGER LP                    ! Loop counter
       INTEGER NDF                   ! NDF identifier
@@ -225,7 +225,7 @@
                CALL DAT_NEW1R( ADLOC, 'DATA', DIMS( LP ), STATUS )
 
 *  Map the data array.
-               CALL DAT_FIND( ADLOC, 'DATA', DDLOC, STATUS ) 
+               CALL DAT_FIND( ADLOC, 'DATA', DDLOC, STATUS )
                CALL DAT_MAPR( DDLOC, 'WRITE', 1, DIMS( LP ), DPNTR,
      :                        STATUS )
 
@@ -269,7 +269,7 @@
 
 *  Asterix sometimes writes the wrong object name in here, so check for
 *  this as well.
-               ELSE            
+               ELSE
                   CALL DAT_THERE( ADLOC, 'DIMENSION', THERE, STATUS )
                   IF ( THERE )
      :              CALL DAT_ERASE( ADLOC, 'DIMENSION', STATUS )
@@ -281,7 +281,7 @@
                   CALL DAT_ANNUL( ADLOC, STATUS )
                   GOTO 980
                END IF
- 
+
 *  Report what has happened.
                CALL MSG_SETI( 'IAXIS', LP )
                CALL MSG_OUTIF( MSG__NORM, 'AXCONV_PROGRESS',

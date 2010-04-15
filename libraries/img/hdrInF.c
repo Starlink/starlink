@@ -29,7 +29,7 @@
  *        'COMMENT' items often have many occurrences). The number of
  *        components may be queried using the HDR_NUMB routine.
  *     **value = float (Given and Returned)
- *        Pointers to array of values. These are unmodified if the 
+ *        Pointers to array of values. These are unmodified if the
  *        item doesn't exist.
  *     status = int * (Given and Returned)
  *        The global status.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +59,7 @@
  *     Fortran source of hdr_inr by the Perl script fcwrap.
  *     PDRAPER: Peter W. Draper (STARLINK - Durham University).
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     17-May-1996 (fcwrap):
  *        Original version
@@ -112,11 +112,11 @@ void hdrInF( char *param,
                      TRAIL_ARG(fparam)
                      TRAIL_ARG(fxname)
                      TRAIL_ARG(fitem) );
-  
+
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);
   F77_FREE_CHARACTER(fitem);
-  
+
   return;
 }
 

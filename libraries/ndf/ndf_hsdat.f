@@ -17,16 +17,16 @@
 *     history records added to an NDF (both default history records and
 *     those added using NDF_HPUT). If no date and time is set using
 *     this routine, then the curent date and time will be used. Any
-*     date and time established by a previous call to this function can be 
+*     date and time established by a previous call to this function can be
 *     removed by supplying a blank value for argument "DATE", in which
-*     case the current date and time will be used for subsequent history 
+*     case the current date and time will be used for subsequent history
 *     records.
 
 *  Arguments:
 *     DATE = CHARACTER * ( * ) (Given)
 *        The time and date to be used for subsequent history records, or
 *        blank to re-establish the default behaviour (i.e. to use the
-*        current time). The allowed formats are described later in the 
+*        current time). The allowed formats are described later in the
 *        "Date and Time Formats:" section.
 *     INDF = INTEGER (Given)
 *        NDF identifier.
@@ -46,7 +46,7 @@
 *
 *     - Gregorian Date and Time: Any calendar date (as above) but with
 *     a fraction of a day expressed as hours, minutes and seconds
-*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be 
+*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be
 *     separated by a space or by a "T" (as used by ISO8601 format).
 *
 *     - Modified Julian Date: With or without decimal places
@@ -74,12 +74,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,23 +98,23 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_CONST'        ! NDF private constants      
-      INCLUDE 'NDF_PAR'          ! NDF public constants      
-      INCLUDE 'DAT_PAR'          ! HDS public constants      
+      INCLUDE 'NDF_CONST'        ! NDF private constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'DAT_PAR'          ! HDS public constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
 *        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Write)
-*           The date/time to attach to the next history record to be 
-*           created, as a UTC Modified Julian Date. If negative, then 
+*           The date/time to attach to the next history record to be
+*           created, as a UTC Modified Julian Date. If negative, then
 *           the current time will be used.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
@@ -159,7 +159,7 @@
 *  If no error has occurred, store the MJD in the DCB.
          IF ( STATUS .EQ. SAI__OK ) DCB_HTIME( IDCB ) = MJD
       END IF
- 
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -37,7 +37,7 @@ C
       ELSE IF (Y1.EQ.Y2) THEN
          CALL GRWARN('invalid y limits in PGWNAD: Y1 = Y2.')
       ELSE
-         SCALE = MIN(PGXLEN(PGID)/ABS(X2-X1)/PGXPIN(PGID), 
+         SCALE = MIN(PGXLEN(PGID)/ABS(X2-X1)/PGXPIN(PGID),
      1               PGYLEN(PGID)/ABS(Y2-Y1)/PGYPIN(PGID))
          PGXSCL(PGID) = SCALE*PGXPIN(PGID)
          PGYSCL(PGID) = SCALE*PGYPIN(PGID)

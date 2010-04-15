@@ -1,7 +1,7 @@
       SUBROUTINE CAT1_TIDNT (CI, GNAME, GI, STATUS)
 *+
 *  Name:
-*     CAT1_TIDNT 
+*     CAT1_TIDNT
 *  Purpose:
 *     Get an identifier for a named pre-existing component.
 *  Language:
@@ -9,8 +9,8 @@
 *  Invocation:
 *     CALL CAT1_TIDNT (CI, GNAME; GI; STATUS)
 *  Description:
-*     Get an identifier for a named pre-existing component.  The 
-*     component may be of any type.  If the specified component could 
+*     Get an identifier for a named pre-existing component.  The
+*     component may be of any type.  If the specified component could
 *     not be found then GI is set to the null identifier.  If the
 *     specified component could not be found an error status is NOT
 *     raised.
@@ -36,7 +36,7 @@
 *     The name of an identifier is held as the value of the
 *     attribute 'NAME' of that identifier.  Finally, it is a rule,
 *     that a 'NAME' attribute will be of data type character.
-*     
+*
 *     Hence:
 *
 *     If the identifier is valid then
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

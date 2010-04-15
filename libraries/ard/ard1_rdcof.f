@@ -13,9 +13,9 @@
 *     CALL ARD1_RDCOF( NWCS, IGRP, AWCS, UWCS, STATUS )
 
 *  Description:
-*     This routine reads the supplied arguments to the COFRAME statement 
-*     and creates a FrameSet containing the single Frame decribed by the 
-*     COFRAME statement. 
+*     This routine reads the supplied arguments to the COFRAME statement
+*     and creates a FrameSet containing the single Frame decribed by the
+*     COFRAME statement.
 
 *  Arguments:
 *     NWCS = INTEGER (Given)
@@ -25,7 +25,7 @@
 *     AWCS = INTEGER (Given)
 *        An AST pointer to the application WCS FrameSet.
 *     UWCS = INTEGER (Returned)
-*        An AST pointer to the returned Object. AST__NULL is returned if 
+*        An AST pointer to the returned Object. AST__NULL is returned if
 *        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,15 +67,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Arguments Given:
       INTEGER NWCS
@@ -102,11 +102,11 @@
 *  Initialise returned pointer.
       UWCS = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the number of elements in the supplied group.
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS ) 
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
       IF( SIZE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = ARD__BADAR
          CALL ERR_REP( 'ARD1_RDCOF_ERR1', 'No arguments supplied.',
@@ -114,9 +114,9 @@
       END IF
 
 *  Get the first elment from the group.
-      CALL ARD1_GET( IGRP, 1, 1, TEXT, STATUS ) 
+      CALL ARD1_GET( IGRP, 1, 1, TEXT, STATUS )
 
-*  If there is a comma in it, the Frame Domain is the text before the 
+*  If there is a comma in it, the Frame Domain is the text before the
 *  first comma.
       DOMAIN = ' '
       COMMA = INDEX( TEXT, ',' )
@@ -147,7 +147,7 @@
       ELSE IF( DOMAIN .EQ. 'SPECTRUM' ) THEN
          FR = AST_SPECFRAME( ' ', STATUS )
 
-*  If the Domain is DSBSPECTRUM, create 
+*  If the Domain is DSBSPECTRUM, create
 *  a DSBSpecFrame.
       ELSE IF( DOMAIN .EQ. 'DSBSPECTRUM' ) THEN
          FR = AST_DSBSPECFRAME( ' ', STATUS )
@@ -158,7 +158,7 @@
          CALL AST_SETC( FR, 'DOMAIN', DOMAIN, STATUS )
       END IF
 
-*  Use any remaining text in the statement to assign values to Frame 
+*  Use any remaining text in the statement to assign values to Frame
 *  attributes.
       IF( COMMA .GT. 0 ) THEN
          CALL AST_SET( FR, TEXT( COMMA + 1 : ), STATUS )
@@ -166,7 +166,7 @@
 
 *  Use any other elements in the group.
       DO I = 2, SIZE
-         CALL ARD1_GET( IGRP, I, 1, TEXT, STATUS ) 
+         CALL ARD1_GET( IGRP, I, 1, TEXT, STATUS )
          CALL AST_SET( FR, TEXT, STATUS )
       END DO
 
@@ -193,7 +193,7 @@
 *  Add a context message if an error has been reported.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ARD1_RDCOF_ERR2', 'Unable to interpret a '//
-     :                 'COFRAME statement in an ARD expression.', 
+     :                 'COFRAME statement in an ARD expression.',
      :                 STATUS )
       END IF
 

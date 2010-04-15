@@ -1,13 +1,13 @@
 *+  CRED4_POLYFIT - Enhances the sky subtraction with a polynomial fit
       SUBROUTINE CRED4_POLYFIT( INPUT, OUTPUT, ASK, WAIT, LPOLYFITTED,
-     :  STATUS ) 
+     :  STATUS )
 *    Description :
 *     This routine instructs the RED4 task to fit a polynomial to
 *     data points taken from several sky areas within the INPUT group
 *     to make the OUTPUT group.
 *    Invocation :
 *     CALL CRED4_POLYFIT( INPUT, OUTPUT, ASK, WAIT, LPOLYFITTED,
-*     :  STATUS ) 
+*     :  STATUS )
 *    Parameters :
 *     INPUT     = CHARACTER*(*)( READ )
 *           The name of the reduced group to be polynomial fitted
@@ -88,13 +88,13 @@
 *   Issue a message to the user
       IF ( VERBOSE ) THEN
 
-         CALL MSG_OUT ( ' ', 
+         CALL MSG_OUT ( ' ',
      :     'Fitting sky polynomial ', VSTATUS )
          CLEN = MAX( 1, CHR_LEN ( INPUT ) )
          CALL MSG_SETC( 'INPUT', INPUT(1:CLEN) )
          CLEN = MAX( 1, CHR_LEN ( OUTPUT ) )
          CALL MSG_SETC( 'OUTPUT', OUTPUT(1:CLEN) )
-         CALL MSG_OUT ( ' ', 
+         CALL MSG_OUT ( ' ',
      :     'Input = ^INPUT   Output = ^OUTPUT', VSTATUS )
       ENDIF
 
@@ -115,9 +115,9 @@
 *       so if it has failed don't worry beyond printing a warning.
          IF ( RED4_ACTIVE ) THEN
 
-            CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL, 
+            CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL,
      :        STATUS)
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -192,7 +192,7 @@
          CALL TASK_OBEY( RED4_ALIAS, 'POLYFIT', INVAL(1:CPOS),
      :      OUTVAL, RED4_PATH, RED4_MESSID, STATUS)
 
-*      Check that the action started OK, 
+*      Check that the action started OK,
          IF ( STATUS .NE. DTASK__ACTSTART ) THEN
 
             ERR_STATUS = STATUS
@@ -213,7 +213,7 @@
                CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :            OUTVAL, STATUS)
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -240,7 +240,7 @@
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'ES', ERR_STATUS )
                      CALL ERR_REP (' ', 'CRED4_POLYFIT: '/
-     :                  /'Failed to polyfit the sky '/ 
+     :                  /'Failed to polyfit the sky '/
      :                  /'(Status = ^ES)', STATUS )
                   ENDIF
                ELSE

@@ -11,7 +11,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -122,7 +122,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     TMG: Tim Gledhill  (STARLINK)
 #     DSB: David S. Berry (STARLINK)
@@ -368,7 +368,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -391,7 +391,7 @@ package polpack {
           }
 
          parameter ndf {
-                        # Input NDF 
+                        # Input NDF
             position 1
             type NDF
             access READ
@@ -478,14 +478,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLEXP.IFL 
+#     POLEXP.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -526,14 +526,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLEXPX.IFL 
+#     POLEXPX.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -560,14 +560,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLEXT.IFL 
+#     POLEXT.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -789,7 +789,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
 #     DSB: David S. Berry (STARLINK)
@@ -857,7 +857,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -992,14 +992,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLIMP.IFL 
+#     POLIMP.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1061,14 +1061,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLIMPX.IFL 
+#     POLIMPX.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1102,7 +1102,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1422,7 +1422,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1742,7 +1742,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1785,14 +1785,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLSIM.IFL 
+#     POLSIM.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1840,14 +1840,14 @@ package polpack {
       }
 #+
 #  Name:
-#     POLSTACK.IFL 
+#     POLSTACK.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -1954,7 +1954,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -2160,7 +2160,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -2201,7 +2201,7 @@ package polpack {
 
 #  Copyright:
 #     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -2289,7 +2289,7 @@ package polpack {
    }
 
    command makecube {
-      obey {$POLPACK_DIR/makecube.csh}      
+      obey {$POLPACK_DIR/makecube.csh}
    }
 
    icl {defhelp kappa $KAPPA_HELP 0}

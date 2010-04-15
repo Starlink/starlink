@@ -7,7 +7,7 @@
 *     UPDATE_PARAM
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -21,7 +21,7 @@
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -86,9 +86,9 @@
 	COMMON / BOUNDARY_PAR / LO_A, HI_A
 	COMMON / CYCLIC_LIST / LIST_CYCLIC, TAB_PERIOD, TAB_BOTTOM
 	COMMON / BUG / DEBUG
-	
+
 	CHARACTER TEXT * ( MSG__SZMSG )
-	
+
 	INTEGER STATUS
 
 
@@ -125,7 +125,7 @@
 	         WRITE(TEXT, '(''@ Parameter #'', I2, '' was about'
      1           // ' to go off-limit'')') J
 	         CALL MSG_OUT(' ', TEXT, STATUS)
-     		 TEXT = 
+     		 TEXT =
      1           '  NOT UPDATING PARAMETERS DURING THIS ITERATION'
 	         CALL MSG_OUT(' ', TEXT, STATUS)
 
@@ -169,7 +169,7 @@
 	    END IF
 	  END IF
 	END DO
-	
+
 *   Rescale INCR_A if necessary
 
 	IF( M_RATIO .GE. 1.0 ) THEN
@@ -178,7 +178,7 @@
 
 	         WRITE(TEXT, '(''@ Changes in trial parameters are'
      1           // ' scaled down by '', E10.3)') SCALE
-	         CALL MSG_OUT(' ', TEXT, STATUS)	  
+	         CALL MSG_OUT(' ', TEXT, STATUS)
 
 	  End If
 	ELSE

@@ -9,7 +9,7 @@ C
 C     Function:
 C        Merge two time series datasets.
 C
-C     Description:                     
+C     Description:
 C        TMERGE merges two time series datasets covering different times
 C        but with the same number of wavelength channels, to form a single
 C        dataset. The files should be merged in their time order, i.e. INPUT1
@@ -22,27 +22,27 @@ C    (1) INPUT1     (TSP, 2D or 3D)  The first input dataset.
 C    (2) INPUT2     (TSP, 2D or 3D)  The second input dataset.
 C    (3) OUTPUT     (TSP, 2D or 3D)  The output merged dataset.
 C
-C     Support: 
+C     Support:
 C          Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C          31/10/1989
 C
 C-
 C
 C  History:
-C    Nov/1987   Original Version.   JAB/AAO 
+C    Nov/1987   Original Version.   JAB/AAO
 C    27/2/1988   TSP Monolith version.  JAB/AAO
 C    31/10/1989  Allow 3D data          JAB/JAC
 C
-     
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
 *  Status argument
-      INTEGER STATUS              
+      INTEGER STATUS
       INTEGER STAT1
 
 *  Data pointers
@@ -70,9 +70,9 @@ C
 *  Create output file
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
- 
+
 *  Copy dataset1 to output
-                                 
+
       CALL TSP_COPY(LOC1,OLOC,STATUS)
 
 *  Get size of first dataset
@@ -114,25 +114,25 @@ C
       ENDIF
 
 *  Form size of output dataset
-      NEWSIZE = SIZE1 + SIZE2   
+      NEWSIZE = SIZE1 + SIZE2
 
 *  Set up dimesions of output dataset
-                          
+
       DIMS(1) = DIMS1(1)
       IF (NDIMS .EQ. 2) THEN
-          DIMS(2) = NEWSIZE 
+          DIMS(2) = NEWSIZE
       ELSE
           DIMS(2) = DIMS1(2)
           DIMS(3) = NEWSIZE
-      ENDIF                       
+      ENDIF
 
-*  Resize output dataset                 
+*  Resize output dataset
       CALL TSP_RESIZE(OLOC,NDIMS,DIMS,STATUS)
 
 *  Copy the data from the second dataset into the output dataset
 
 *  Copy the Time axis data
-  
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *  Get time axis label and units
@@ -156,9 +156,9 @@ C
 *  Copy the time axis data
         IF (STATUS .EQ. SAI__OK) THEN
           CALL TSP_TMERGECPYD(SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
-        ENDIF             
+        ENDIF
 
-*  Unmap arrays          
+*  Unmap arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
 
@@ -173,9 +173,9 @@ C
 *  Copy the intensity data
         IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_TMERGECPY(SIZE,SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
-        ENDIF             
+        ENDIF
 
-*  Unmap arrays          
+*  Unmap arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
 
@@ -192,21 +192,21 @@ C
           CALL TSP_TMERGECPY(SIZE,SIZE2,NEWSIZE,%VAL(PTR1),%VAL(PTR2))
         ELSE
           CALL ERR_ANNUL(STATUS)
-        ENDIF                 
+        ENDIF
 
-*  Unmap the arrays      
+*  Unmap the arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         STATUS = SAI__OK
 
 *  Copy the Q Stokes data
-                   
-*  Get the Q stokes parameter  
-        CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)    
+
+*  Get the Q stokes parameter
+        CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
 
 *  Map the Q stokes data for the output dataset
         CALL TSP_MAP_DATA(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS                
+        STAT1 = STATUS
 
 *  Map the Q stokes data for the second dataset
         CALL TSP_GET_STOKES(LOC2,'Q',SLOC2,STATUS)
@@ -222,17 +222,17 @@ C
          ELSE
            CALL ERR_ANNUL(STAT1)
          ENDIF
-        ENDIF            
+        ENDIF
 
-*  Unmap the arrays           
+*  Unmap the arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
-                   
+
 *  Copy the Q Stokes Variance
-                   
-*  Map the Q stokes variance from the output array              
+
+*  Map the Q stokes variance from the output array
         CALL TSP_MAP_VAR(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS                           
+        STAT1 = STATUS
 
 *  Map the Q stokes variance from the second dataset
         CALL TSP_MAP_VAR(SLOC2,'READ',PTR2,ILOC2,STATUS)
@@ -247,23 +247,23 @@ C
          ELSE
           CALL ERR_ANNUL(STAT1)
          ENDIF
-        ENDIF                    
+        ENDIF
 
-*  Unmap the arrays   
+*  Unmap the arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         CALL DAT_ANNUL(SLOC,STATUS)
         CALL DAT_ANNUL(SLOC2,STATUS)
-        STATUS = SAI__OK                   
+        STATUS = SAI__OK
 
 *  Copy the U Stokes data
-                   
-*  Get the U stokes parameter      
+
+*  Get the U stokes parameter
         CALL TSP_GET_STOKES(OLOC,'U',SLOC,STATUS)
 
 *  Map the U stokes data from the output dataset
         CALL TSP_MAP_DATA(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS                
+        STAT1 = STATUS
 
 *  Map the U stokes data from the second dataset
         CALL TSP_GET_STOKES(LOC2,'U',SLOC2,STATUS)
@@ -279,18 +279,18 @@ C
          ELSE
           CALL ERR_ANNUL(STAT1)
          ENDIF
-        ENDIF            
+        ENDIF
 
-*  Unmap the arrays           
+*  Unmap the arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
-        STATUS = SAI__OK              
-     
+        STATUS = SAI__OK
+
 *  Copy the U Stokes Variance
-                 
-*  Map the U Stokes variance from the output dataset        
+
+*  Map the U Stokes variance from the output dataset
         CALL TSP_MAP_VAR(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS              
+        STAT1 = STATUS
 
 *  Map the U stokes variance from the second dataset
         CALL TSP_MAP_VAR(SLOC2,'READ',PTR2,ILOC2,STATUS)
@@ -305,23 +305,23 @@ C
          ELSE
           CALL ERR_ANNUL(STAT1)
          ENDIF
-        ENDIF                
+        ENDIF
 
-*  Unmap the arrays       
+*  Unmap the arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         CALL DAT_ANNUL(SLOC,STATUS)
         CALL DAT_ANNUL(SLOC2,STATUS)
-        STATUS = SAI__OK              
-     
+        STATUS = SAI__OK
+
 *  Copy the V Stokes data
-                   
-*  Get the V stokes parameter      
+
+*  Get the V stokes parameter
         CALL TSP_GET_STOKES(OLOC,'V',SLOC,STATUS)
 
 *  Map the V stokes data from the output dataset
         CALL TSP_MAP_DATA(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS               
+        STAT1 = STATUS
 
 *  Map the V stokes data from the second dataset
         CALL TSP_GET_STOKES(LOC2,'V',SLOC2,STATUS)
@@ -337,18 +337,18 @@ C
          ELSE
           CALL ERR_ANNUL(STAT1)
          ENDIF
-        ENDIF                 
+        ENDIF
 
-*  Unmap arrays      
+*  Unmap arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         STATUS = SAI__OK
-                   
+
 *  Copy the V Stokes Variance
-               
-*  Map the V stokes variance for the output dataset          
+
+*  Map the V stokes variance for the output dataset
         CALL TSP_MAP_VAR(SLOC,'UPDATE',PTR1,ILOC,STATUS)
-        STAT1 = STATUS              
+        STAT1 = STATUS
 
 *  Map the V stokes variance for the second dataset
         CALL TSP_MAP_VAR(SLOC2,'READ',PTR2,ILOC2,STATUS)
@@ -363,19 +363,19 @@ C
          ELSE
           CALL ERR_ANNUL(STAT1)
          ENDIF
-        ENDIF                
+        ENDIF
 
-*  Unmap the arrays       
+*  Unmap the arrays
         CALL TSP_UNMAP(ILOC,STATUS)
         CALL TSP_UNMAP(ILOC2,STATUS)
         CALL DAT_ANNUL(SLOC,STATUS)
         CALL DAT_ANNUL(SLOC2,STATUS)
         STATUS = SAI__OK
-           
+
       ENDIF
       CALL DAT_ANNUL(LOC1,STATUS)
       CALL DAT_ANNUL(LOC2,STATUS)
-      CALL DAT_ANNUL(OLOC,STATUS)        
+      CALL DAT_ANNUL(OLOC,STATUS)
 
 
       END
@@ -403,8 +403,8 @@ C
 *   Jeremy Bailey   15/8/1990
 *
 *   Modified:
-*       10/12/1991       
-*+    
+*       10/12/1991
+*+
 
 
       IMPLICIT NONE
@@ -414,8 +414,8 @@ C
       REAL IN(D1,D2),OUT(D1,DS)
 
 *  Local variables
-      INTEGER I,IS,J                  
-      
+      INTEGER I,IS,J
+
       IS = DS-D2
 
 *  Copy input into last D2 elements of output
@@ -449,9 +449,9 @@ C
 *   Jeremy Bailey   15/8/1990
 *
 *   Modified:
-*       10/12/1991       
+*       10/12/1991
 *
-*+    
+*+
 
 
       IMPLICIT NONE
@@ -462,7 +462,7 @@ C
 
 *  Local variables
       INTEGER I,IS,J
-                        
+
       IS = DS-D2
 
 *  Fill last D2 elements with zero
@@ -494,8 +494,8 @@ C
 *   Jeremy Bailey   15/8/1990
 *
 *   Modified:
-*       10/12/1991       
-*+    
+*       10/12/1991
+*+
 
 
       IMPLICIT NONE
@@ -506,7 +506,7 @@ C
 
 *  Local variables
       INTEGER I,IS
-                        
+
       IS = DS-D2
 
 *  Copy input into last D2 elements of output

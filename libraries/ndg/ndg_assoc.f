@@ -16,9 +16,9 @@
 *     A group expression is obtained from the environment using the
 *     supplied parameter. The expression is parsed (using the
 *     facilities of the GRP routine GRP_GROUP, see SUN/150) to produce
-*     a list of explicit names for existing NDFs which are appended to the 
+*     a list of explicit names for existing NDFs which are appended to the
 *     end of the supplied group (a new group is created if none is
-*     supplied). If an error occurs while parsing the group expression, the 
+*     supplied). If an error occurs while parsing the group expression, the
 *     user is re-prompted for a new group expression. NDF identifiers for
 *     particular members of the group can be obtained using NDG_NDFAS.
 
@@ -28,8 +28,8 @@
 *     VERB = LOGICAL (Given)
 *        If TRUE then errors which occur whilst accessing supplied NDFs
 *        are flushed so that the user can see them before re-prompting for
-*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP = INTEGER (Given and Returned)
 *        The identifier of the group in which the NDF names are to be
@@ -45,11 +45,11 @@
 *        The global status.
 
 *  Notes:
-*     -  Any file names containing wildcards or "[..]" globbing patterns are 
-*     expanded into a list of NDF names. The supplied strings are intepreted 
-*     by a shell (/bin/tcsh if it exists, otherwise /bin/csh, otherwise 
-*     /bin/sh), and so may contain shell meta-characters (e.g. twiddle, $HOME, 
-*     even command substitution and pipes - but pipe characters "|" need to 
+*     -  Any file names containing wildcards or "[..]" globbing patterns are
+*     expanded into a list of NDF names. The supplied strings are intepreted
+*     by a shell (/bin/tcsh if it exists, otherwise /bin/csh, otherwise
+*     /bin/sh), and so may contain shell meta-characters (e.g. twiddle, $HOME,
+*     even command substitution and pipes - but pipe characters "|" need to
 *     be escaped using a backslash "\" to avoid them being interpreted as GRP
 *     editing characters).
 *     -  Each supplied name may include an HDS path. For instance,
@@ -61,11 +61,11 @@
 *     object will be searched for NDF components. This search is
 *     recursive, in that any components of the specified object are also
 *     searched. The supplied name will be expanded into a group of names,
-*     one for each NDF found within the specified HDS object. Note, NDFs 
+*     one for each NDF found within the specified HDS object. Note, NDFs
 *     are not themselves searched for other NDFs. That is, the expanded
-*     group of names will not include any NDF which is contained within 
+*     group of names will not include any NDF which is contained within
 *     another NDF (i.e. NDFs which are stored as an extension item of
-*     another NDF are not included in the group). For instance, if the 
+*     another NDF are not included in the group). For instance, if the
 *     string "fred" is given, the HDS file fred.sdf will be searched for
 *     NDFs and the returned group will contain references for all NDFs
 *     found within fred.sdf.
@@ -82,28 +82,28 @@
 *     interpreted first as a globbing pattern. Thus "fred[12]" would
 *     match files with base names "fred1" and "fred2". If the pattern
 *     does not match any existing files, then the trailing "[..]" string
-*     is next interpreted as a foreign extension specifier. Thus if fred.fit 
+*     is next interpreted as a foreign extension specifier. Thus if fred.fit
 *     is a multi-extension FITS file, "fred[12]" would be interpreted as
 *     the twelth image extension in fred.fit only if files cannot be found
 *     with basenames "fred1" or "fred2".
 *     -  NDFs contained within HDS files are opened in order to ensure
-*     that they are valid NDFs. The user is notified if there are no 
-*     valid NDFs matching a supplied name, and they are asked to supply 
+*     that they are valid NDFs. The user is notified if there are no
+*     valid NDFs matching a supplied name, and they are asked to supply
 *     a replacement parameter value. No check is made that any foreign
 *     data files contain valid NDFs since this would involve a potentially
 *     expensive data conversion. So, for instance, "*.fit" could pick up
 *     FITS catalogues as well as FITS images. If a foreign data file does
 *     not contain a valid NDF, an error will be reported when the NDF is
 *     accessed using NDG_NDFAS.
-*     -  Each element in the returned group contains a full specification 
+*     -  Each element in the returned group contains a full specification
 *     for an NDF. Several other groups are created by this routine, and
 *     are associated with the returned group by means of a GRP "owner-slave"
 *     relationship. These supplemental groups are automatically deleted
 *     when the returned group is deleted using GRP_DELET. The returned
-*     group should not be altered using GRP directly because corresponding 
+*     group should not be altered using GRP directly because corresponding
 *     changes may need to be made to the supplemental groups. Routines
 *     NDG_SETSZ, NDG_GTSUP and NDG_PTSUP are provided to manipulate the
-*     entire chain of groups. The full chain (starting from the head) is 
+*     entire chain of groups. The full chain (starting from the head) is
 *     as follows:
 *
 *        - NDF slice specifications
@@ -116,13 +116,13 @@
 *     -  If an error is reported the group is returned unaltered. If
 *     no group is supplied, an empty group is returned.
 *     -  A null value (!) can be given for the parameter to indicate
-*     that no more NDFs are to be specified. The corresponding error 
+*     that no more NDFs are to be specified. The corresponding error
 *     is annulled before returning unless no NDFs have been added to
 *     the group.
-*     -  If the last character in the supplied group expression is 
-*     a colon (:), a list of the NDFs represented by the group 
+*     -  If the last character in the supplied group expression is
+*     a colon (:), a list of the NDFs represented by the group
 *     expression (minus the colon) is displayed, but none are
-*     actually added to the group. The user is then re-prompted for 
+*     actually added to the group. The user is then re-prompted for
 *     a new group expression.
 
 *  Copyright:
@@ -137,12 +137,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -157,7 +157,7 @@
 *     12-AUG-1992 (DSB):
 *        Original version.
 *     5-FEB-1993 (DSB):
-*        Facility added for listing files represented by a group 
+*        Facility added for listing files represented by a group
 *        expression by terminating the group expression with a colon.
 *     9-9-1999 (DSB):
 *        Improved the prologue.
@@ -193,7 +193,7 @@
 
 *  Arguments Given and Returned:
       INTEGER   IGRP
-      
+
 *  Arguments Returned:
       INTEGER   SIZE
       LOGICAL   FLAG
@@ -266,8 +266,8 @@
          END IF
       END IF
 
-*  If the last character is a colon remove it and set a flag 
-*  indicating that the names are to be listed but not included in the 
+*  If the last character is a colon remove it and set a flag
+*  indicating that the names are to be listed but not included in the
 *  returned group.
 *  Check for status and make sure that FIRST and LAST do not addres
 *  element 0 in the string
@@ -275,7 +275,7 @@
          CALL CHR_FANDL( GRPEXP, FIRST, LAST )
          IF (FIRST .NE. 0 .AND. LAST .NE. 0) THEN
             IF( GRPEXP( LAST : LAST ) .EQ. ':' ) THEN
-               LIST = .TRUE.      
+               LIST = .TRUE.
                GRPEXP( LAST : LAST ) = ' '
             ELSE
                LIST = .FALSE.
@@ -296,7 +296,7 @@
             CALL ERR_ANNUL( STATUS )
          END IF
 
-*  Set up a temporary bad inherited status which can be passed to 
+*  Set up a temporary bad inherited status which can be passed to
 *  ERR_REP.
          ISTAT = SAI__ERROR
 
@@ -314,7 +314,7 @@
 
 *  Report it, using the temporary (bad) inherited status.
             CALL MSG_SETC( 'NDF', STRING )
-            CALL ERR_REP( 'NDG_ASSOC_ERR1', '  Cannot access ^NDF', 
+            CALL ERR_REP( 'NDG_ASSOC_ERR1', '  Cannot access ^NDF',
      :                    ISTAT )
 
          END DO
@@ -333,7 +333,7 @@
 *  Indicate that the user should be re-prompted.
          AGAIN = .TRUE.
 
-*  If there was something wrong with the format of the supplied group 
+*  If there was something wrong with the format of the supplied group
 *  expression, indicate that the user is to re-prompted.
       ELSE IF( STATUS .EQ. GRP__BADME .OR.
      :         STATUS .EQ. GRP__DEEP .OR.
@@ -342,8 +342,8 @@
          AGAIN = .TRUE.
 
 *  If all went well, but the group expression ended in a colon,
-*  list the new names added to the group, and indicate that a new 
-*  group is required. Flush each report individually to avoid the 
+*  list the new names added to the group, and indicate that a new
+*  group is required. Flush each report individually to avoid the
 *  possibilioty of the EMS stack overflowing if many NDFs have
 *  been specified.
       ELSE IF( LIST .AND. STATUS .EQ. SAI__OK ) THEN
@@ -377,7 +377,7 @@
       END IF
 
 *  If the user is to be re-prompted...
-      IF( AGAIN ) THEN      
+      IF( AGAIN ) THEN
 
 *  Ask the user to give a new parameter value.
          CALL MSG_SETC( 'P', PARAM )
@@ -404,7 +404,7 @@
       END IF
 
 *  Register the returned group with NDG so that its contents will be
-*  appended to the end of any default history records written out by the 
+*  appended to the end of any default history records written out by the
 *  NDF library.
       IF( SIZE .GT. 0 ) CALL NDG_ADDGH( PARAM, IGRP, STATUS )
 
@@ -412,8 +412,8 @@
  999  CONTINUE
       CALL GRP_DELET( IGRP2, STATUS )
 
-*  If a null parameter value was given, annul the error. If no NDFS 
-*  have been added to the group re-report it with a more friendly 
+*  If a null parameter value was given, annul the error. If no NDFS
+*  have been added to the group re-report it with a more friendly
 *  message.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -422,7 +422,7 @@
             CALL MSG_SETC( 'P', PARAM )
             CALL ERR_REP( 'NDG_ASSOC_ERR3', 'A null group of NDFs was'//
      :                    ' given for parameter ^P.', STATUS )
-         END IF         
+         END IF
 
 *  If the parameter request was aborted, annul the error and re-report
 *  it with a more friendly message.

@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,7 +97,7 @@
       CALL ERR_MARK
 
 *  Open a new file.
-      CALL NDF_OPEN( DAT__ROOT, NAMEMP, 'WRITE', 'NEW', IDXNDF, 
+      CALL NDF_OPEN( DAT__ROOT, NAMEMP, 'WRITE', 'NEW', IDXNDF,
      :               MPLACE, STATUS )
 
 *  Create, map, initialise the index.
@@ -178,7 +178,7 @@
       CALL NDF_MAP(   POSNDF, 'DATA', '_REAL', 'WRITE/BAD',
      :   POSPTR, NPOINTS, STATUS )
 
-      CALL DAT_ANNUL( TLOC(3), STATUS )	
+      CALL DAT_ANNUL( TLOC(3), STATUS )
 
 * Find out current bounds of map for use when spectra are written to it
 * Find out lower bound just in case it is not equal to 1

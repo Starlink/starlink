@@ -86,7 +86,7 @@
 * ---- VMS only ------
 *     EXTERNAL TRAPC
 * --------------------
-     
+
 CD     PRINT *, '-- do_syscomm --   ierr=', ierr
 
       DO_SYSCOMM = .TRUE.
@@ -123,7 +123,7 @@ CD        PRINT *,' IF nesting increased -- ', IF_SKIP
           RETURN
         END IF
 
-*       What if we are already in the middle of an IF statement? 
+*       What if we are already in the middle of an IF statement?
 *       Save the information about that on the IF-stack
 
         IF_LEVEL = ISP
@@ -318,7 +318,7 @@ CD    PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
       ELSE IF (COMMAND.EQ.'SET-JOURNAL') THEN
         CALL GEN_YESNO ('Journal file on?', .FALSE., TEST, ISTAT)
         IF (TEST) THEN
-          CALL GEN_JNLON ('SPECX.spx', IERR) 
+          CALL GEN_JNLON ('SPECX.spx', IERR)
         ELSE
           CALL GEN_JNLOFF (IERR)
         END IF
@@ -435,15 +435,15 @@ CD    PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
 
           IF (TYPE.EQ.'I4') THEN
             CALL GEN_GETI4A2 (PROMPT(:ILS), %VAL(ADDR), LENGTH,
-     &                        ' ', %VAL(ADDR), RETLEN, ISTAT) 
+     &                        ' ', %VAL(ADDR), RETLEN, ISTAT)
 
           ELSE IF (TYPE.EQ.'R4') THEN
             CALL GEN_GETR4A2 (PROMPT(:ILS), %VAL(ADDR), LENGTH,
-     &                        ' ', %VAL(ADDR), RETLEN, ISTAT) 
+     &                        ' ', %VAL(ADDR), RETLEN, ISTAT)
 
           ELSE IF (TYPE.EQ.'R8') THEN
             CALL GEN_GETR8A2 (PROMPT(:ILS), %VAL(ADDR), LENGTH,
-     &                        ' ', %VAL(ADDR), RETLEN, ISTAT) 
+     &                        ' ', %VAL(ADDR), RETLEN, ISTAT)
 
           ELSE IF (TYPE.EQ.'L4') THEN
             CALL GEN_YESNO   (PROMPT(:ILS), %VAL(ADDR),

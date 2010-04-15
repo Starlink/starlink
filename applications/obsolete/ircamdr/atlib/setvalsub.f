@@ -1,6 +1,6 @@
 *+ SETVALSUB - sets pixels in array equal to value to another value
 
-      SUBROUTINE SETVALSUB( INARRAY, OUTARRAY, DIMS1, DIMS2, INVAL, 
+      SUBROUTINE SETVALSUB( INARRAY, OUTARRAY, DIMS1, DIMS2, INVAL,
      :                      OUTVAL, STATUS )
 
 *    Description :
@@ -95,7 +95,7 @@
             IF ( INARRAY( I, J) .GT. ( INVAL - TOLERANCE) .AND.
      :	         INARRAY( I, J) .LT. ( INVAL + TOLERANCE)) THEN
 
-*             input pixel value is to be changed - set output pixel to 
+*             input pixel value is to be changed - set output pixel to
 *             given replacement value
 
                OUTARRAY( I, J )  =  OUTVAL

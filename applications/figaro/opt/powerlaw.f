@@ -33,7 +33,7 @@
 *    N_PAR = INTEGER (Given)
 *        Number of parameters; should be 3
 *    NORMALIZATION_WAVE = DOUBLE PRECISION (Given)
-*       
+*
 
 *       XC(1) = Spectral Index
 *       XC(2) = Amplitude

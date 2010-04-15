@@ -25,7 +25,7 @@
       INCLUDE 'PGP_ERR'
 
 
-      IF (GRCIDE.LE.0) THEN 
+      IF (GRCIDE.LE.0) THEN
          CALL ERR_REP('GRNODO', 'GRQLW - No PGPLOT device open',
      :   GRNODO)
          ILW = 1

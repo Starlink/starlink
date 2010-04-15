@@ -5,7 +5,7 @@
 #include "sae_par.h"
 
 F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
-                                  INTEGER(status ) TRAIL(template) 
+                                  INTEGER(status ) TRAIL(template)
                                   TRAIL(test) ) {
 /*
 *+
@@ -27,14 +27,14 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
 
 *  Arguments:
 *     TEMPLT = CHARACTER*(*) (Given)
-*        The wild-card template. 
+*        The wild-card template.
 *     TEST = CHARACTER*(*) (Given)
 *        The test string to be compared to the template.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Returned Value:
-*     NDG1_MATCH = LOGICAL 
+*     NDG1_MATCH = LOGICAL
 *        .TRUE. if the test string matches the template.
 
 *  Copyright:
@@ -47,12 +47,12 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,8 +73,8 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
 
 *-
 */
-   GENPTR_CHARACTER(template) 
-   GENPTR_CHARACTER(test) 
+   GENPTR_CHARACTER(template)
+   GENPTR_CHARACTER(test)
    GENPTR_INTEGER(status)
 
 

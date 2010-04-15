@@ -61,7 +61,7 @@ extern void tek_posinput();
 * tek_ttyoutput(tdata, c)	output to tty
 * caddr_t tdata;
 * char c;
-* 
+*
 * tek_chfont(tdata, font)	change alph fonts
 * caddr_t tdata;
 * int font;

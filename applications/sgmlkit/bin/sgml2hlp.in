@@ -15,17 +15,17 @@
 #     Generate Starlink HLP file from SGML source.
 #
 #  <description>
-#     This program uses an appropriate downconverter to generate a 
+#     This program uses an appropriate downconverter to generate a
 #     Starlink HLP file from an SGML source document which conforms to
-#     the PROGRAMCODE DTD.  The resulting HLP file can be fed to the 
+#     the PROGRAMCODE DTD.  The resulting HLP file can be fed to the
 #     HLIB program to generate a .shl help library as per SUN/124.
 #
 #  <usage>
 #     <code>sgml2hlp routines.sgml >package.hlp</code>
 #
 #  <diytopic>Environment
-#     <p>The program requires that the environment variable 
-#     <code>STARLINK_SGML_DIR</code> is properly set, pointing to the root 
+#     <p>The program requires that the environment variable
+#     <code>STARLINK_SGML_DIR</code> is properly set, pointing to the root
 #     of the Starlink SGML kit.
 #
 #     <p>The following binaries must be in the path:
@@ -40,7 +40,7 @@
 #  <example>
 #  sgml2hlp routines.sgml > package.hlp
 #     <examplenote>
-#     The file <code>routines.sgml</code>, which should conform to the 
+#     The file <code>routines.sgml</code>, which should conform to the
 #     Programcode DTD, is processed to produce a <code>.hlp</code> file,
 #     which can be used directly by the HLP facility.
 #
@@ -114,6 +114,6 @@
       | $TBL \
       | $ROFF \
       | $SED -n '/@@@@ END OF TEXT @@@@/q;N;/^\n$/!P;D'
- 
+
 
 # $Id$

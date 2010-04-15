@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SPD_CZPD( INFO, VARUSE, GID, NMAX, N, NDF, AXIS, EOF, 
+*     CALL SPD_CZPD( INFO, VARUSE, GID, NMAX, N, NDF, AXIS, EOF,
 *        STATUS )
 
 *  Description:
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

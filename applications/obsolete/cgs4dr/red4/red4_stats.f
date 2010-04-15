@@ -78,7 +78,7 @@
       CALL DSA_DATA_SIZE( 'DATA', MAXDIM, NDIM, DIMS, NELM, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 
+        CALL ERR_REP( ' ',
      :    'Error while opening DSA and data structure', STATUS )
         GOTO 500
       ENDIF
@@ -90,7 +90,7 @@
         CALL DSA_SEEK_ERRORS( 'DATA', ERRORS, STATUS )
         IF ( .NOT. ERRORS ) THEN
           STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 
+          CALL ERR_REP( ' ',
      :       'The structure does not have an error array', STATUS )
           GOTO 500
         ENDIF
@@ -104,7 +104,7 @@
 *   Map the array
       DATA_PTR = 0
       IF ( PLANE .EQ. 'DATA' ) THEN
-         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT', 
+         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT',
      :      DATA_PTR, DATA_SLOT, STATUS )
       ELSE IF ( PLANE .EQ. 'ERRORS' ) THEN
          CALL DSA_MAP_ERRORS( 'DATA', 'READ', 'FLOAT',
@@ -113,11 +113,11 @@
 
 *   If it has quality information use it
       QUAL_PTR = 0
-      IF ( QUALITY ) CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE', 
+      IF ( QUALITY ) CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE',
      :   QUAL_PTR, QUAL_SLOT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 
+        CALL ERR_REP( ' ',
      :    'Error while mapping data, variance or quality array', STATUS )
         GOTO 500
       ENDIF
@@ -137,7 +137,7 @@
 
 *   Get the stats
       CALL RED4_GET_STATS( DIMS(1), DIMS(2), %val(DATA_PTR), %val(WORK_PTR),
-     :   QUALITY, %val(QUAL_PTR), WHOLE, ISTART, IEND, IINCR, JSTART, JEND, 
+     :   QUALITY, %val(QUAL_PTR), WHOLE, ISTART, IEND, IINCR, JSTART, JEND,
      :   JINCR, AUTOSCALE, HIGH, LOW, MEAN, SIGMA, MEDIAN, MODE, STATUS )
 
 *   Unmap the work array

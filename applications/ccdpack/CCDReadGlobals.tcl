@@ -59,7 +59,7 @@
 #        Changed to use sensible defaults for CCDimportfilter.
 #     29-AUG-1995 (PDRAPER):
 #        Changed to use .ccdpack in the current directory as the
-#        default. 
+#        default.
 #     3-JUL-2001 (MBT):
 #        Modified the arguments of CCDGetFileName.
 #     {enter_further_changes_here}
@@ -68,18 +68,18 @@
 #     {note_any_bugs_here}
 
 #-
-   
+
 #  Global parameters:
       global CCDimportfile
       global CCDimportexists
       global CCDimportfilter
-   
+
 #.
-   
+
 #  Get the name of a file to receive the current status.
       set CCDimportfile ".ccdpack"
-      if { [ info exists CCDimportfilter] } { 
-         set oldfilt $CCDimportfilter 
+      if { [ info exists CCDimportfilter] } {
+         set oldfilt $CCDimportfilter
       } else {
          set oldfilt "*"
       }

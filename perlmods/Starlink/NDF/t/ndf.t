@@ -22,7 +22,7 @@ my @lbnd = (1,1);
 err_begin($status);
 ndf_begin();
 
-# Create a new container file 
+# Create a new container file
 ndf_place(&NDF::DAT__ROOT, 'ndf_test', my $place, $status);
 is( $status, &NDF::SAI__OK, "check status ndf_place");
 

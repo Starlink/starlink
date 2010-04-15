@@ -12,8 +12,8 @@
 {     load $SPECDRE_DIR/specdre
 {
 {  Description:
-{     This procedure used to start the Specdre package for use from the 
-{     ICL command language defining the commands needed to execute each 
+{     This procedure used to start the Specdre package for use from the
+{     ICL command language defining the commands needed to execute each
 {     application.
 {     Since Specdre has been merged with Figaro, this procedure now tells
 {     the user to invoke Figaro.

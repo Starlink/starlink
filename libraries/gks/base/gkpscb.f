@@ -90,8 +90,8 @@ C# IL>=a, OL>=0
 *     candidate start points
       IFCAND = KNIL
       IRCAND = KNIL
- 
- 
+
+
       DO 200 IPAIR = 1,NCROSS/2
 *        Section of polygon inside of rectangle
          IFCROS = ICROSS
@@ -133,7 +133,7 @@ C# IL>=a, OL>=0
          ENDIF
          INDEXA = INDEX(ICROSS)
   200 CONTINUE
- 
+
   250 CONTINUE
       IF(IREV .GT. IVERT/2)THEN
 *        Reverse traversal on clipped polygon by selecting
@@ -149,7 +149,7 @@ C# IL>=a, OL>=0
       ELSE
 *        IF(IFCAND .NE. KNIL)ISTART = IFCAND
       ENDIF
- 
+
 *     Convert ISTART back to (0:NCROSS-1)
       ISTART = ISTART - 1
  999  CONTINUE

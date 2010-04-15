@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 \markright{SSN/48.1}
 \setlength{\textwidth}{160mm}
@@ -39,22 +39,22 @@ This situation is a fairly common one when you have two or more removable
 disk drives.
 This note covers backup and recovery in general terms, and details
 exactly what to do in the above mentioned case.
-                        
+
 When you do a full backup of a disk there are two possibilities: you can
 do a disk copy or backup the contents of the disk to a saveset.
 In the second case, the saveset can be on disk or tape, the only difference is
 speed.
 For example, to do a disk copy from DRA0: to DRA1: you must type:
 \begin{verbatim}
-    $ MOUNT/FOREIGN DRA1: 
+    $ MOUNT/FOREIGN DRA1:
     $ BACKUP/IMAGE/RECORD/verify/trunc DRA0: DRA1:
     $ DISMOUNT DRA1:
-\end{verbatim} 
+\end{verbatim}
 for a disk to disk copy, or:
 \begin{verbatim}
     $ BACKUP/IMAGE/RECORD/verify DRA0: DRA1:saveset_name/SAVE_SET
-\end{verbatim} 
-to make a saveset on disk. 
+\end{verbatim}
+to make a saveset on disk.
 
 The qualifiers in lower case are optional, but are recommended.
 You must not write protect the old disk (DRA0:), since the date of this
@@ -62,11 +62,11 @@ backup must be recorded on it.
 
 To make incremental backups to tape, one then does:
 \begin{verbatim}
-    $ MOUNT/FOREIGN MTA0: 
+    $ MOUNT/FOREIGN MTA0:
     $ BACKUP/RECORD/SINCE=BACKUP/JOURNAL=journal_file/VERIFY DRA0: -
        MTA0:incremental_saveset_name
     $ DISMOUNT MTA0:
-\end{verbatim} 
+\end{verbatim}
 This much is well known.
 The important part is recovering from a disk crash.
 If you are recovering from a full saveset plus incremental savesets, then
@@ -74,7 +74,7 @@ the VMS manual tells you what to do.
 It stresses that when recovering from the full saveset, you must use /RECORD
 so that the date that this backup was done is written to the new disk.
 If you are recovering from an exact copy of a disk then you must NOT use
-/RECORD as it will write today's date in the backup date field, and the 
+/RECORD as it will write today's date in the backup date field, and the
 recovery from the incremental backups will then not proceed correctly.
 It is this point that is vital and is very well hidden in the manuals.
 The sequence of operations to recover from a crash is:
@@ -87,7 +87,7 @@ The DEC manuals suggest that it is quicker to go through the tapes in reverse
 Let us consider a concrete example.
 
 A full backup copy of the disk USER1 is made on 2 March (first Monday in the
-month). 
+month).
 \begin{verbatim}
     $ BACKUP/IMAGE/VERIFY/RECORD/TRUNC DRA0: DRA1:
 \end{verbatim}

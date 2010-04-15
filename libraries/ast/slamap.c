@@ -55,12 +55,12 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,9 +103,9 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        Override astEqual.
 *     31-AUG-2007 (DSB):
 *        - Modify H2E and E2H conversion functions so that they convert to
-*        and from apparent (HA,Dec) rather than topocentric (HA,Dec) (i.e. 
+*        and from apparent (HA,Dec) rather than topocentric (HA,Dec) (i.e.
 *        include a correction for diurnal aberration). This requires an
-*        extra conversion argument holding the magnitude of the diurnal 
+*        extra conversion argument holding the magnitude of the diurnal
 *        aberration vector.
 *        - Correct bug in the simplification of adjacent AMP and MAP
 *        conversions.
@@ -215,7 +215,7 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->Eq_Cache = AST__BAD; \
@@ -233,8 +233,8 @@ astMAKE_INITGLOBALS(SlaMap)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 /* A cache used to store the most recent results from palSlaMappa in order
@@ -297,7 +297,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "slamap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     SlaMap member function (over-rides the astEqual protected
@@ -324,12 +324,12 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstSlaMap *that;        
-   AstSlaMap *this;        
-   const char *argdesc[ MAX_SLA_ARGS ]; 
-   const char *comment;      
-   int i, j;           
-   int nargs;                
+   AstSlaMap *that;
+   AstSlaMap *this;
+   const char *argdesc[ MAX_SLA_ARGS ];
+   const char *comment;
+   int i, j;
+   int nargs;
    int nin;
    int nout;
    int result;
@@ -354,9 +354,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two SlaMaps differ, it may still be possible 
-   for them to be equivalent. First compare the SlaMaps if their Invert 
-   flags are the same. In this case all the attributes of the two SlaMaps 
+/* If the Invert flags for the two SlaMaps differ, it may still be possible
+   for them to be equivalent. First compare the SlaMaps if their Invert
+   flags are the same. In this case all the attributes of the two SlaMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
             if( this->ncvt == that->ncvt ) {
@@ -365,7 +365,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   if( this->cvttype[ i ] != that->cvttype[ i ] ) {
                      result = 0;
                   } else {
-                     CvtString( this->cvttype[ i ], &comment, &nargs, 
+                     CvtString( this->cvttype[ i ], &comment, &nargs,
                                 argdesc, status );
                      for( j = 0; j < nargs; j++ ) {
                         if( !astEQUAL( this->cvtargs[ i ][ j ],
@@ -378,7 +378,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                }
             }
 
-/* If the Invert flags for the two SlaMaps differ, the attributes of the two 
+/* If the Invert flags for the two SlaMaps differ, the attributes of the two
    SlaMaps must be inversely related to each other. */
          } else {
 
@@ -388,7 +388,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -410,7 +410,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "slamap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SlaMap member function (over-rides the astGetObjSize protected
@@ -566,7 +566,7 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *st
 *        AST__SLA_SUPGAL( )
 *           Convert supergalactic coordinates to galactic.
 *        AST__HPCEQ( DATE, OBSX, OBSY, OBSZ )
-*           Convert Helioprojective-Cartesian coordinates to J2000.0 
+*           Convert Helioprojective-Cartesian coordinates to J2000.0
 *           equatorial. This is not a native SLALIB conversion, but is
 *           implemented by functions within this module. The DATE argument
 *           is the MJD defining the HPC coordinate system. The OBSX, OBSY
@@ -621,7 +621,7 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *st
    error. */
    if ( astOK && !cvt_string ) {
       astError( AST__SLAIN, "AddSlaCvt(%s): Invalid SLALIB sky coordinate "
-                "conversion type (%d).", status, astGetClass( this ), 
+                "conversion type (%d).", status, astGetClass( this ),
                 (int) cvttype );
    }
 
@@ -861,7 +861,7 @@ static const char *CvtString( int cvt_code, const char **comment,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-      
+
 /* Test for each valid code value in turn and assign the appropriate
    return values. */
    switch ( cvt_code ) {
@@ -1094,14 +1094,14 @@ static void Earth( double mjd, double earth[3], int *status ) {
 
 *  Synopsis:
 *     #include "slamap.h"
-*     void Earth( double mjd, double earth[3], int *status ) 
+*     void Earth( double mjd, double earth[3], int *status )
 
 *  Class Membership:
 *     SlaMap method.
 
 *  Description:
-*     This function returns the AST__HAEC position of the earth at the 
-*     specified time. See astSTPConv for a description of the AST__HAEC 
+*     This function returns the AST__HAEC position of the earth at the
+*     specified time. See astSTPConv for a description of the AST__HAEC
 *     coordinate systems.
 
 *  Parameters:
@@ -1165,7 +1165,7 @@ static void Hgc( double mjd, double mat[3][3], double offset[3], int *status ) {
 *  Description:
 *     This function returns a 3x3 matrix which rotates direction vectors
 *     given in the AST__HGC system to the AST__HAEC system at the
-*     specified date. It also returns the position of the origin of the 
+*     specified date. It also returns the position of the origin of the
 *     AST__HGC system as an AST__HAEC position. See astSTPConv for a
 *     description of these coordinate systems.
 
@@ -1203,7 +1203,7 @@ static void Hgc( double mjd, double mat[3][3], double offset[3], int *status ) {
    if ( !astOK ) return;
 
 /* Get a unit vector parallel to the solar north pole at the given date.
-   This vector is expressed in AST__HAEC coords. This is the Z axis of the 
+   This vector is expressed in AST__HAEC coords. This is the Z axis of the
    AST__HGC system. */
    SolarPole( mjd, zhg, status );
 
@@ -1220,14 +1220,14 @@ static void Hgc( double mjd, double mat[3][3], double offset[3], int *status ) {
 /* The HG X axis is perpendicular to both Z and Y, */
    palSlaDvxv( yhg, zhg, xhg );
 
-/* The HG X, Y and Z unit vectors form the columns of the required matrix. 
+/* The HG X, Y and Z unit vectors form the columns of the required matrix.
    The origins of the two systems are co-incident, so return the zero offset
    vector initialised earlier. */
    for( i = 0; i < 3; i++ ) {
       mat[ i ][ 0 ] = xhg[ i ];
       mat[ i ][ 1 ] = yhg[ i ];
       mat[ i ][ 2 ] = zhg[ i ];
-   } 
+   }
 
 }
 
@@ -1253,7 +1253,7 @@ static void Gsec( double mjd, double mat[3][3], double offset[3], int *status ) 
 *  Description:
 *     This function returns a 3x3 matrix which rotates direction vectors
 *     given in the AST__GSEC system to the AST__HAEC system at the
-*     specified date. It also returns the position of the origin of the 
+*     specified date. It also returns the position of the origin of the
 *     AST__GSEC system as an AST__HAEC position. See astSTPConv for a
 *     description of these coordinate systems.
 
@@ -1310,14 +1310,14 @@ static void Gsec( double mjd, double mat[3][3], double offset[3], int *status ) 
    pole[ 1 ] = 0.0;
    pole[ 2 ] = 1.0;
 
-/* Find the GSEC Y axis by taking the vector product of the X axis and 
-   the ecliptic north pole vector, and then normalize it into a unit 
+/* Find the GSEC Y axis by taking the vector product of the X axis and
+   the ecliptic north pole vector, and then normalize it into a unit
    vector. */
    palSlaDvxv( pole, xgs, ytemp );
    palSlaDvn( ytemp, ygs, &len );
 
 /* The GSEC Z axis is perpendicular to both X and Y axis, and forms a
-   right-handed system. The resulting vector will be of unit length 
+   right-handed system. The resulting vector will be of unit length
    since the x and y vectors are both of unit length, and are
    perpendicular to each other. It therefore does not need to be
    normalized.*/
@@ -1329,7 +1329,7 @@ static void Gsec( double mjd, double mat[3][3], double offset[3], int *status ) 
       mat[ i ][ 1 ] = ygs[ i ];
       mat[ i ][ 2 ] = zgs[ i ];
       offset[i] = earth[ i ];
-   } 
+   }
 
 }
 
@@ -1355,7 +1355,7 @@ static void Haec( double mjd, double mat[3][3], double offset[3], int *status ) 
 *  Description:
 *     This function returns a 3x3 matrix which rotates direction vectors
 *     given in the AST__HAEC system to the AST__HAEC system at the
-*     specified date. It also returns the position of the origin of the 
+*     specified date. It also returns the position of the origin of the
 *     AST__HAEC system as an AST__HAEC position. See astSTPConv for a
 *     description of these coordinate systems.
 
@@ -1407,7 +1407,7 @@ static void Haqc( double mjd, double mat[3][3], double offset[3], int *status ) 
 *  Description:
 *     This function returns a 3x3 matrix which rotates direction vectors
 *     given in the AST__HAQC system to the AST__HAEC system at the
-*     specified date. It also returns the position of the origin of the 
+*     specified date. It also returns the position of the origin of the
 *     AST__HAQC system as an AST__HAEC position. See astSTPConv for a
 *     description of these coordinate systems.
 
@@ -1450,7 +1450,7 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
 *     Hpcc
 
 *  Purpose:
-*     Returns matrix and offset for converting AST__HPCC positions to 
+*     Returns matrix and offset for converting AST__HPCC positions to
 *     AST__HAEC.
 
 *  Type:
@@ -1466,7 +1466,7 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
 *  Description:
 *     This function returns a 3x3 matrix which rotates direction vectors
 *     given in the AST__HPCC system to the AST__HAEC system at the
-*     specified date. It also returns the position of the origin of the 
+*     specified date. It also returns the position of the origin of the
 *     AST__HPCC system as an AST__HAEC position. See astSTPConv for a
 *     description of these coordinate systems.
 
@@ -1512,7 +1512,7 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
    if( !obs ) {
       Earth( mjd, earth, status );
       obs = earth;
-   } 
+   }
 
 /* We need to find unit vectors parallel to the HPCC (X,Y,Z) axes, expressed
    in terms of the AST__HAEC (X,Y,Z) axes. The HPCC X axis starts at the
@@ -1527,14 +1527,14 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
    pole vector. So find the solar north pole vector in AST__HAEC coords. */
    SolarPole( mjd, pole, status );
 
-/* Find the HPC Y axis by taking the vector product of the X axis and 
+/* Find the HPC Y axis by taking the vector product of the X axis and
    the solar north pole vector, and then normalize it into a unit vector.
    Note, HPC (X,Y,Z) axes form a left-handed system! */
    palSlaDvxv( xhpc, pole, ytemp );
    palSlaDvn( ytemp, yhpc, &len );
 
 /* The HPC Z axis is perpendicular to both X and Y axis, and forms a
-   left-handed system. The resulting vector will be of unit length 
+   left-handed system. The resulting vector will be of unit length
    since the x and y vectors are both of unit length, and are
    perpendicular to each other. It therefore does not need to be
    normalized.*/
@@ -1546,7 +1546,7 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
       mat[ i ][ 1 ] = yhpc[ i ];
       mat[ i ][ 2 ] = zhpc[ i ];
       offset[i] = obs[ i ];
-   } 
+   }
 
 }
 
@@ -1557,7 +1557,7 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3],
 *     Hprc
 
 *  Purpose:
-*     Returns matrix and offset for converting AST__HPRC positions to 
+*     Returns matrix and offset for converting AST__HPRC positions to
 *     AST__HAEC.
 
 *  Type:
@@ -1573,7 +1573,7 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3],
 *  Description:
 *     This function returns a 3x3 matrix which rotates direction vectors
 *     given in the AST__HPRC system to the AST__HAEC system at the
-*     specified date. It also returns the position of the origin of the 
+*     specified date. It also returns the position of the origin of the
 *     AST__HPRC system as an AST__HAEC position. See astSTPConv for a
 *     description of these coordinate systems.
 
@@ -1634,14 +1634,14 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3],
    pole vector. So find the solar north pole vector in AST__HAEC coords. */
    SolarPole( mjd, pole, status );
 
-/* Find the HPR Y axis by taking the vector product of the Z axis and 
+/* Find the HPR Y axis by taking the vector product of the Z axis and
    the solar north pole vector, and then normalize it into a unit vector.
    Note, HPR (X,Y,Z) axes form a left-handed system! */
    palSlaDvxv( pole, zhpr, ytemp );
    palSlaDvn( ytemp, yhpr, &len );
 
 /* The HPRC X axis is perpendicular to both Y and Z axis, and forms a
-   left-handed system. The resulting vector will be of unit length 
+   left-handed system. The resulting vector will be of unit length
    since the y and z vectors are both of unit length, and are
    perpendicular to each other. It therefore does not need to be
    normalized.*/
@@ -1653,7 +1653,7 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3],
       mat[ i ][ 1 ] = yhpr[ i ];
       mat[ i ][ 2 ] = zhpr[ i ];
       offset[ i ] = obs[ i ];
-   } 
+   }
 }
 
 static void J2000H( int forward, int npoint, double *alpha, double *delta, int *status ){
@@ -1675,7 +1675,7 @@ static void J2000H( int forward, int npoint, double *alpha, double *delta, int *
 *     SlaMap method.
 
 *  Description:
-*     This function converts the supplied dynamical J2000 equatorial coords 
+*     This function converts the supplied dynamical J2000 equatorial coords
 *     to ICRS (or vice-versa).
 
 *  Parameters:
@@ -1701,7 +1701,7 @@ static void J2000H( int forward, int npoint, double *alpha, double *delta, int *
    if ( !astOK ) return;
 
 /* Get the J2000 to ICRS rotation matrix (supplied by P.T. Wallace) */
-   palSlaDeuler( "XYZ", -0.0068192*AS2R, 0.0166172*AS2R, 0.0146000*AS2R, 
+   palSlaDeuler( "XYZ", -0.0068192*AS2R, 0.0166172*AS2R, 0.0146000*AS2R,
               rmat );
 
 /* Loop round all points. */
@@ -1715,14 +1715,14 @@ static void J2000H( int forward, int npoint, double *alpha, double *delta, int *
          palSlaDmxv( rmat, v1, v2 );
       } else {
          palSlaDimxv( rmat, v1, v2 );
-      }      
+      }
 
 /* Convert from 3-vector to (alpha,delta) */
       palSlaDcc2s( v2, alpha + i, delta + i );
    }
 }
 
-void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3], 
+void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3],
                    int out_sys, double out_obs[3], double out[3], int *status ){
 /*
 *+
@@ -1730,7 +1730,7 @@ void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3],
 *     astSTPConv1
 
 *  Purpose:
-*     Converts a 3D solar system position between specified STP coordinate 
+*     Converts a 3D solar system position between specified STP coordinate
 *     systems.
 
 *  Type:
@@ -1738,16 +1738,16 @@ void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3],
 
 *  Synopsis:
 *     #include "slamap.h"
-*     void astSTPConv1( double mjd, int in_sys, double in_obs[3], 
-*                       double in[3], int out_sys, double out_obs[3], 
+*     void astSTPConv1( double mjd, int in_sys, double in_obs[3],
+*                       double in[3], int out_sys, double out_obs[3],
 *                       double out[3] )
 
 *  Class Membership:
 *     Frame method.
 
 *  Description:
-*     This function converts a single 3D solar-system position from the 
-*     specified input coordinate system to the specified output coordinate 
+*     This function converts a single 3D solar-system position from the
+*     specified input coordinate system to the specified output coordinate
 *     system. See astSTPConv for a list of supported coordinate systems.
 
 *  Parameters:
@@ -1756,23 +1756,23 @@ void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3],
 *     in_sys
 *        The coordinate system in which the input positions are supplied.
 *     in_obs
-*        The position of the observer in AST__HAEC coordinates. This is only 
-*        needed if the input system is an observer-centric system. If this 
+*        The position of the observer in AST__HAEC coordinates. This is only
+*        needed if the input system is an observer-centric system. If this
 *        is not the case, a NULL pointer can be supplied. A NULL pointer
-*        can also be supplied to indicate that he observer is at the centre of 
+*        can also be supplied to indicate that he observer is at the centre of
 *        the earth at the specified date.
 *     in
-*        A 3-element array holding the input position. 
+*        A 3-element array holding the input position.
 *     out_sys
 *        The coordinate system in which the input positions are supplied.
 *     out_obs
-*        The position of the observer in AST__HAEC coordinates. This is only 
-*        needed if the output system is an observer-centric system. If this 
+*        The position of the observer in AST__HAEC coordinates. This is only
+*        needed if the output system is an observer-centric system. If this
 *        is not the case, a NULL pointer can be supplied. A NULL pointer
-*        can also be supplied to indicate that he observer is at the centre of 
+*        can also be supplied to indicate that he observer is at the centre of
 *        the earth at the specified date.
 *     out
-*        A 3-element array holding the output position. 
+*        A 3-element array holding the output position.
 
 *  Notes:
 *     - The "in" and "out" arrays may safely point to the same memory.
@@ -1798,8 +1798,8 @@ void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3],
 
 }
 
-void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3], 
-                  double *in[3], int out_sys, double out_obs[3], 
+void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
+                  double *in[3], int out_sys, double out_obs[3],
                   double *out[3], int *status ){
 /*
 *+
@@ -1807,7 +1807,7 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
 *     astSTPConv
 
 *  Purpose:
-*     Converts a set of 3D solar system positions between specified STP 
+*     Converts a set of 3D solar system positions between specified STP
 *     coordinate systems.
 
 *  Type:
@@ -1815,8 +1815,8 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
 
 *  Synopsis:
 *     #include "slamap.h"
-*     void astSTPConv( double mjd, int n, int in_sys, double in_obs[3], 
-*                      double *in[3], int out_sys, double out_obs[3], 
+*     void astSTPConv( double mjd, int n, int in_sys, double in_obs[3],
+*                      double *in[3], int out_sys, double out_obs[3],
 *                      double *out[3] )
 
 *  Class Membership:
@@ -1824,7 +1824,7 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
 
 *  Description:
 *     This function converts a set of 3D solar-system positions from
-*     the specified input coordinate system to the specified output 
+*     the specified input coordinate system to the specified output
 *     coordinate system.
 
 *  Parameters:
@@ -1834,10 +1834,10 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
 *        The coordinate system in which the input positions are supplied
 *        (see below).
 *     in_obs
-*        The position of the observer in AST__HAEC coordinates. This is only 
-*        needed if the input system is an observer-centric system. If this 
+*        The position of the observer in AST__HAEC coordinates. This is only
+*        needed if the input system is an observer-centric system. If this
 *        is not the case, a NULL pointer can be supplied. A NULL pointer
-*        can also be supplied to indicate that he observer is at the centre of 
+*        can also be supplied to indicate that he observer is at the centre of
 *        the earth at the specified date.
 *     in
 *        A 3-element array holding the input positions. Each of the 3
@@ -1848,14 +1848,14 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
 *        The coordinate system in which the input positions are supplied
 *        (see below).
 *     out_obs
-*        The position of the observer in AST__HAEC coordinates. This is only 
-*        needed if the output system is an observer-centric system. If this 
+*        The position of the observer in AST__HAEC coordinates. This is only
+*        needed if the output system is an observer-centric system. If this
 *        is not the case, a NULL pointer can be supplied. A NULL pointer
-*        can also be supplied to indicate that he observer is at the centre of 
+*        can also be supplied to indicate that he observer is at the centre of
 *        the earth at the specified date.
 *     out
 *        A 3-element array holding the output positions. Each of the 3
-*        elements should point to an array of "n" axis values. If in[3] is 
+*        elements should point to an array of "n" axis values. If in[3] is
 *        NULL, no values will be assigned to out[3].
 
 *  Notes:
@@ -1863,76 +1863,76 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
 *     - Output longitude values are always in the range 0 - 2.PI.
 
 *  Supported Coordinate Systems:
-*     Coordinate systems are either spherical or Cartesian, and are right 
-*     handed (unless otherwise indicated). Spherical systems use axis 0 for 
-*     longitude, axis 1 for latitude, and axis 2 for radius. Cartesian systems 
-*     use 3 mutually perpendicular axes; X is axis 0 and points towards the 
-*     intersection of the equator and the zero longitude meridian of the 
-*     corresponding spherical system, Y is axis 1 and points towards longitude 
-*     of +90 degrees, Z is axis 2 and points twowards the north pole. All 
-*     angles are in radians and all distances are in metres. The following 
+*     Coordinate systems are either spherical or Cartesian, and are right
+*     handed (unless otherwise indicated). Spherical systems use axis 0 for
+*     longitude, axis 1 for latitude, and axis 2 for radius. Cartesian systems
+*     use 3 mutually perpendicular axes; X is axis 0 and points towards the
+*     intersection of the equator and the zero longitude meridian of the
+*     corresponding spherical system, Y is axis 1 and points towards longitude
+*     of +90 degrees, Z is axis 2 and points twowards the north pole. All
+*     angles are in radians and all distances are in metres. The following
 *     systems are supported:
 *
-*     - AST__HAE: Heliocentric-aries-ecliptic spherical coordinates. Centred 
-*     at the centre of the sun. The north pole points towards the J2000 
-*     ecliptic north pole, and meridian of zero longitude includes the 
+*     - AST__HAE: Heliocentric-aries-ecliptic spherical coordinates. Centred
+*     at the centre of the sun. The north pole points towards the J2000
+*     ecliptic north pole, and meridian of zero longitude includes the
 *     J2000 equinox.
 *
-*     - AST__HAEC: Heliocentric-aries-ecliptic cartesian coordinates. Origin 
-*     at the centre of the sun. The Z axis points towards the J2000 ecliptic 
+*     - AST__HAEC: Heliocentric-aries-ecliptic cartesian coordinates. Origin
+*     at the centre of the sun. The Z axis points towards the J2000 ecliptic
 *     north pole, and the X axis points towards the J2000 equinox.
 *
 *     - AST__HAQ: Heliocentric-aries-equatorial spherical coordinates. Centred
-*     at the centre of the sun. The north pole points towards the FK5 J2000 
-*     equatorial north pole, and meridian of zero longitude includes the 
+*     at the centre of the sun. The north pole points towards the FK5 J2000
+*     equatorial north pole, and meridian of zero longitude includes the
 *     FK5 J2000 equinox.
 *
-*     - AST__HAQC: Heliocentric-aries-equatorial cartesian coordinates. Origin 
-*     at the centre of the sun. The Z axis points towards the FK5 J2000 
-*     equatorial north pole, and the X axis points towards the FK5 J2000 
+*     - AST__HAQC: Heliocentric-aries-equatorial cartesian coordinates. Origin
+*     at the centre of the sun. The Z axis points towards the FK5 J2000
+*     equatorial north pole, and the X axis points towards the FK5 J2000
 *     equinox.
 *
-*     - AST__HG: Heliographic spherical coordinates. Centred at the centre of 
-*     the sun. North pole points towards the solar north pole at the given 
-*     date. The meridian of zero longitude includes the sun-earth line at 
-*     the given date. 
+*     - AST__HG: Heliographic spherical coordinates. Centred at the centre of
+*     the sun. North pole points towards the solar north pole at the given
+*     date. The meridian of zero longitude includes the sun-earth line at
+*     the given date.
 *
-*     - AST__HGC: Heliographic cartesian coordinates. Origin at the centre of 
-*     the sun. The Z axis points towards the solar north pole at the given 
-*     date. The X axis is in the plane spanned by the Z axis, and the 
-*     sun-earth line at the given date. 
+*     - AST__HGC: Heliographic cartesian coordinates. Origin at the centre of
+*     the sun. The Z axis points towards the solar north pole at the given
+*     date. The X axis is in the plane spanned by the Z axis, and the
+*     sun-earth line at the given date.
 *
 *     - AST__HPC: Helioprojective-cartesian spherical coordinates. A
-*     left-handed system (that is, longitude increases westwards), centred 
-*     at the specified observer position. The intersection of the 
-*     zero-longitude meridian and the equator coincides with the centre of 
-*     the sun as seen from the observers position. The zero longitude 
-*     meridian includes the solar north pole at the specified date. 
-*
-*     - AST__HPCC: Helioprojective-cartesian cartesian coordinates. A
-*     left-handed system with origin at the specified observer position. The 
-*     X axis points towards the centre of the sun as seen from the observers 
-*     position. The X-Z plane includes the solar north pole at the specified 
-*     date. 
-*
-*     - AST__HPR: Helioprojective-radial spherical coordinates. A left-handed 
-*     system (that is, longitude increases westwards), centred at the 
-*     specified observer position. The north pole points towards the centre 
-*     of the sun as seen from the observers position. The zero longitude 
+*     left-handed system (that is, longitude increases westwards), centred
+*     at the specified observer position. The intersection of the
+*     zero-longitude meridian and the equator coincides with the centre of
+*     the sun as seen from the observers position. The zero longitude
 *     meridian includes the solar north pole at the specified date.
 *
-*     - AST__HPRC: Helioprojective-radial cartesian coordinates. A left-handed 
-*     system with origin at the specified observer position. The Z axis points 
-*     towards the centre of the sun as seen from the observers position. The 
+*     - AST__HPCC: Helioprojective-cartesian cartesian coordinates. A
+*     left-handed system with origin at the specified observer position. The
+*     X axis points towards the centre of the sun as seen from the observers
+*     position. The X-Z plane includes the solar north pole at the specified
+*     date.
+*
+*     - AST__HPR: Helioprojective-radial spherical coordinates. A left-handed
+*     system (that is, longitude increases westwards), centred at the
+*     specified observer position. The north pole points towards the centre
+*     of the sun as seen from the observers position. The zero longitude
+*     meridian includes the solar north pole at the specified date.
+*
+*     - AST__HPRC: Helioprojective-radial cartesian coordinates. A left-handed
+*     system with origin at the specified observer position. The Z axis points
+*     towards the centre of the sun as seen from the observers position. The
 *     X-Z plane includes the solar north pole at the specified date.
 *
-*     - AST__GSE: Geocentric-solar-ecliptic spherical coordinates. Centred at 
-*     the centre of the earth at the given date. The north pole points towards 
+*     - AST__GSE: Geocentric-solar-ecliptic spherical coordinates. Centred at
+*     the centre of the earth at the given date. The north pole points towards
 *     the  J2000 ecliptic north pole, and the meridian of zero longitude
 *     includes the Sun.
 *
-*     - AST__GSEC: Geocentric-solar-ecliptic cartesian coordinates. Origin at 
-*     the centre of the earth at the given date. The X axis points towards the 
+*     - AST__GSEC: Geocentric-solar-ecliptic cartesian coordinates. Origin at
+*     the centre of the earth at the given date. The X axis points towards the
 *     centre of sun, and the X-Z plane contains the J2000 ecliptic north
 *     pole. Since the earth may not be exactly in the mean ecliptic of
 *     J2000, the Z axis will not in general correspond exactly to the
@@ -1942,15 +1942,15 @@ void astSTPConv_( double mjd, int n, int in_sys, double in_obs[3],
    STPConv( mjd, 0, n, in_sys, in_obs, in, out_sys, out_obs, out, status );
 }
 
-static void STPConv( double mjd, int ignore_origins, int n, int in_sys, 
-                     double in_obs[3], double *in[3], int out_sys, 
+static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
+                     double in_obs[3], double *in[3], int out_sys,
                      double out_obs[3], double *out[3], int *status ){
 /*
 *  Name:
 *     STPConv
 
 *  Purpose:
-*     Convert a set of 3D solar system positions between specified STP 
+*     Convert a set of 3D solar system positions between specified STP
 *     coordinate systems.
 
 *  Type:
@@ -1958,8 +1958,8 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
 
 *  Synopsis:
 *     #include "slamap.h"
-*     void STPConv( double mjd, int ignore_origins, int n, int in_sys, 
-*                   double in_obs[3], double *in[3], int out_sys, 
+*     void STPConv( double mjd, int ignore_origins, int n, int in_sys,
+*                   double in_obs[3], double *in[3], int out_sys,
 *                   double out_obs[3], double *out[3], int *status ){
 
 *  Class Membership:
@@ -1967,7 +1967,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
 
 *  Description:
 *     This function converts a set of 3D solar-system positions from
-*     the specified input coordinate system to the specified output 
+*     the specified input coordinate system to the specified output
 *     coordinate system. See astSTPConv for a list of the available
 *     coordinate systems.
 
@@ -1984,10 +1984,10 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
 *     in_sys
 *        The coordinate system in which the input positions are supplied
 *     in_obs
-*        The position of the observer in AST__HAEC coordinates. This is only 
-*        needed if the input system is an observer-centric system. If this 
+*        The position of the observer in AST__HAEC coordinates. This is only
+*        needed if the input system is an observer-centric system. If this
 *        is not the case, a NULL pointer can be supplied. A NULL pointer
-*        can also be supplied to indicate that he observer is at the centre of 
+*        can also be supplied to indicate that he observer is at the centre of
 *        the earth at the specified date.
 *     in
 *        A 3-element array holding the input positions. Each of the 3
@@ -1998,10 +1998,10 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
 *        The coordinate system in which the input positions are supplied
 *        (see "Supported Coordinate Systems" below).
 *     out_obs
-*        The position of the observer in AST__HAEC coordinates. This is only 
-*        needed if the output system is an observer-centric system. If this 
+*        The position of the observer in AST__HAEC coordinates. This is only
+*        needed if the output system is an observer-centric system. If this
 *        is not the case, a NULL pointer can be supplied. A NULL pointer
-*        can also be supplied to indicate that he observer is at the centre of 
+*        can also be supplied to indicate that he observer is at the centre of
 *        the earth at the specified date.
 *     out
 *        A 3-element array holding the input positions. Each of the 3
@@ -2036,11 +2036,11 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
    double p[3];       /* Current position */
    double q[3];       /* New position */
    double radius;     /* Radius value */
-   int cur_sys;       /* Current system for output values */ 
+   int cur_sys;       /* Current system for output values */
    int i;             /* Loop count */
    int j;             /* Loop count */
-   int inCsys;        /* Input cartesian system */ 
-   int outCsys;       /* Output cartesian system */ 
+   int inCsys;        /* Input cartesian system */
+   int outCsys;       /* Output cartesian system */
    size_t nbyte;      /* Amount of memory to copy */
 
 /* Check the global error status. */
@@ -2055,7 +2055,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
       out2 = out[2];
    }
 
-/* Copy the input data to the output data and note that the output values 
+/* Copy the input data to the output data and note that the output values
    are currently in the same system as the input values. */
    memcpy ( out[ 0 ], in[ 0 ], nbyte );
    memcpy ( out[ 1 ], in[ 1 ], nbyte );
@@ -2063,7 +2063,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
       memcpy ( out2, in[ 2 ], nbyte );
    } else {
       for( i = 0; i < n; i++ ) out2[ i ] = AST__AU;
-   }   
+   }
    cur_sys = in_sys;
 
 /* Skip the next bit if the output values are now in the required system. */
@@ -2087,8 +2087,8 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
          inCsys = cur_sys;
       }
 
-/* Convert input spherical positions into the corresponding cartesian system, 
-   putting the results in the "out" arrays. Modify the input system 
+/* Convert input spherical positions into the corresponding cartesian system,
+   putting the results in the "out" arrays. Modify the input system
    accordingly. */
       if( cur_sys != inCsys ) {
          px = out[ 0 ];
@@ -2098,8 +2098,8 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
             p[ 0 ] = *px;
             p[ 1 ] = *py;
             p[ 2 ] = *pz;
-            if( p[ 0 ] != AST__BAD && 
-                p[ 1 ] != AST__BAD && 
+            if( p[ 0 ] != AST__BAD &&
+                p[ 1 ] != AST__BAD &&
                 p[ 2 ] != AST__BAD ) {
                 palSlaDcs2c( p[ 0 ], p[ 1 ], q );
                 *(px++) = q[ 0 ]*p[ 2 ];
@@ -2110,7 +2110,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
                *(py++) = AST__BAD;
                *(pz++) = AST__BAD;
             }
-         }      
+         }
 
          cur_sys = inCsys;
 
@@ -2142,63 +2142,63 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
    output cartesian system. */
       if( cur_sys != outCsys ) {
 
-/* Obtain an offset vector and a rotation matrix which moves positions from 
+/* Obtain an offset vector and a rotation matrix which moves positions from
    the current (Cartesian) system to the AST__HAEC system. The offset vector
-   returned by these functions is the AST__HAEC coordinates of the origin of 
-   the current system. The matrix rotates direction vectors from the current 
+   returned by these functions is the AST__HAEC coordinates of the origin of
+   the current system. The matrix rotates direction vectors from the current
    system to the AST__HAEC system. */
          if( cur_sys == AST__HGC ) {
             Hgc( mjd, mat1, off1, status );
-   
+
          } else if( cur_sys == AST__HAEC ) {
             Haec( mjd, mat1, off1, status );
-   
+
          } else if( cur_sys == AST__HAQC ) {
             Haqc( mjd, mat1, off1, status );
-   
+
          } else if( cur_sys == AST__GSEC ) {
             Gsec( mjd, mat1, off1, status );
-   
+
          } else if( cur_sys == AST__HPCC ) {
             Hpcc( mjd, in_obs, mat1, off1, status );
-   
+
          } else if( cur_sys == AST__HPRC ) {
             Hprc( mjd, in_obs, mat1, off1, status );
-   
+
          } else {
             astError( AST__INTER, "astSTPConv(SlaMap): Unsupported input "
                       "cartesian coordinate system type %d (internal AST "
                       "programming error).", status, cur_sys );
          }
- 
-/* Obtain an offset vector and a rotation matrix which moves positions from 
+
+/* Obtain an offset vector and a rotation matrix which moves positions from
    the required output Cartesian system to the AST__HAEC system. */
          if( outCsys == AST__HGC ) {
             Hgc( mjd, mat2, off2, status );
-   
+
          } else if( outCsys == AST__HAEC ) {
             Haec( mjd, mat2, off2, status );
-   
+
          } else if( outCsys == AST__HAQC ) {
             Haqc( mjd, mat2, off2, status );
-   
+
          } else if( outCsys == AST__GSEC ) {
             Gsec( mjd, mat2, off2, status );
-   
+
          } else if( outCsys == AST__HPCC ) {
             Hpcc( mjd, out_obs, mat2, off2, status );
-   
+
          } else if( outCsys == AST__HPRC ) {
             Hprc( mjd, out_obs, mat2, off2, status );
-   
+
          } else {
             astError( AST__INTER, "astSTPConv(SlaMap): Unsupported output "
                       "cartesian coordinate system type %d (internal AST "
                       "programming error).", status, outCsys );
          }
- 
+
 /* Invert the second matrix to get the matrix which rotates AST__HAEC coords
-   to the output cartesian system. This an be done simply by transposing it 
+   to the output cartesian system. This an be done simply by transposing it
    since all the matrices are 3D rotations. */
          for( i = 0; i < 3; i++ ) {
             for( j = 0; j < 3; j++ ) mat3[ i ][ j ] = mat2[ j ][ i ];
@@ -2206,24 +2206,24 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
 /* Find the offset in AST__HAEC coords from the origin of the output
    cartesian system to the origin of the current system. */
             off3[ i ] = off1[ i ] - off2[ i ];
-         }         
+         }
 
-/* Unless the origins are being ignored, use the above matrix to rotate the 
-   above AST__HAEC offset into the output cartesian system. If origins are 
+/* Unless the origins are being ignored, use the above matrix to rotate the
+   above AST__HAEC offset into the output cartesian system. If origins are
    being ignored, use an offset of zero. */
-         if( ignore_origins ) {         
-            off4[ 0 ] = 0.0;            
-            off4[ 1 ] = 0.0;            
-            off4[ 2 ] = 0.0;            
+         if( ignore_origins ) {
+            off4[ 0 ] = 0.0;
+            off4[ 1 ] = 0.0;
+            off4[ 2 ] = 0.0;
          } else {
             palSlaDmxv( mat3, off3, off4 );
          }
-         
+
 /* Concatentate the two matrices to get the matrix which rotates from the
    current system to the output cartesian system. */
          palSlaDmxm( mat3, mat1, mat4 );
 
-/* Use the matrix and offset to convert current positions to output 
+/* Use the matrix and offset to convert current positions to output
    cartesian positions. */
          px = out[ 0 ];
          py = out[ 1 ];
@@ -2234,8 +2234,8 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
             p[ 1 ] = *py;
             p[ 2 ] = *pz;
 
-            if( p[ 0 ] != AST__BAD && 
-                p[ 1 ] != AST__BAD && 
+            if( p[ 0 ] != AST__BAD &&
+                p[ 1 ] != AST__BAD &&
                 p[ 2 ] != AST__BAD ) {
                palSlaDmxv( mat4, p, q );
                *(px++) = q[ 0 ] + off4[ 0 ];
@@ -2246,7 +2246,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
                *(py++) = AST__BAD;
                *(pz++) = AST__BAD;
             }
-         }      
+         }
 
 /* Indicate that the output values are now in the required output
    cartesian system. */
@@ -2258,8 +2258,8 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
 /* Skip the next bit if the output values are now in the required system. */
    if( cur_sys != out_sys ) {
 
-/* The only reason why the output values may not be in the required output 
-   system is because the output system is spherical. Convert output Cartesian 
+/* The only reason why the output values may not be in the required output
+   system is because the output system is spherical. Convert output Cartesian
    positions to output spherical positions. */
       px = out[ 0 ];
       py = out[ 1 ];
@@ -2268,8 +2268,8 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
          p[ 0 ] = *px;
          p[ 1 ] = *py;
          p[ 2 ] = *pz;
-         if( p[ 0 ] != AST__BAD && 
-             p[ 1 ] != AST__BAD && 
+         if( p[ 0 ] != AST__BAD &&
+             p[ 1 ] != AST__BAD &&
              p[ 2 ] != AST__BAD ) {
              palSlaDvn( p, q, &radius );
              palSlaDcc2s( q, &lng, &lat );
@@ -2281,7 +2281,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
             *(py++) = AST__BAD;
             *(pz++) = AST__BAD;
          }
-      }      
+      }
    }
 
 /* If out[2] was supplied as null, free the memory used to hold third axis
@@ -2319,7 +2319,7 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -2609,7 +2609,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Loop through each transformation step in the SlaMap. */
          for ( icvt = icvt1; icvt != icvt2; icvt += inc ) {
 
-/* For simplicity, free any extra information stored with the conversion 
+/* For simplicity, free any extra information stored with the conversion
    step (it will be recreated as and when necessary). */
             slamap->cvtextra[ icvt ] = astFree( slamap->cvtextra[ icvt ] );
 
@@ -2794,7 +2794,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    they will cancel, so eliminate them both. */
                } else if ( ( PAIR_CVT( AST__SLA_SUBET, AST__SLA_ADDET ) ||
                              PAIR_CVT( AST__SLA_ADDET, AST__SLA_SUBET ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ], 
+                           EQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2805,7 +2805,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_FK45Z, AST__SLA_FK54Z ) ||
                              PAIR_CVT( AST__SLA_FK54Z, AST__SLA_FK45Z ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ], 
+                           EQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2816,7 +2816,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_HFK5Z, AST__SLA_FK5HZ ) ||
                              PAIR_CVT( AST__SLA_FK5HZ, AST__SLA_HFK5Z ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ], 
+                           EQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3187,8 +3187,8 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
 *     In addition the following strings may be supplied for more complex
 *     conversions which do not correspond to any one single SLALIB routine
 *     (DIURAB is the magnitude of the diurnal aberration vector in units
-*     of "day/(2.PI)", DATE is the Modified Julian Date of the observation, 
-*     and (OBSX,OBSY,OBZ) are the Heliocentric-Aries-Ecliptic cartesian 
+*     of "day/(2.PI)", DATE is the Modified Julian Date of the observation,
+*     and (OBSX,OBSY,OBZ) are the Heliocentric-Aries-Ecliptic cartesian
 *     coordinates, in metres, of the observer):
 *
 *     - "HPCEQ" (DATE,OBSX,OBSY,OBSZ): Convert Helioprojective-Cartesian coordinates to J2000.0 equatorial.
@@ -3203,7 +3203,7 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
 *     Note, the "H2E" and "E2H" conversions convert between topocentric
 *     horizon coordinates (azimuth,elevation), and apparent local equatorial
 *     coordinates (hour angle,declination). Thus, the effects of diurnal
-*     aberration are taken into account in the conversions but the effects 
+*     aberration are taken into account in the conversions but the effects
 *     of atmospheric refraction are not.
 
 *--
@@ -3249,11 +3249,11 @@ static void SolarPole( double mjd, double pole[3], int *status ) {
 *     SlaMap member function.
 
 *  Description:
-*     This function returns a unit vector along the solar north pole at 
+*     This function returns a unit vector along the solar north pole at
 *     the given date, in the AST__HAEC coordinate system.
 
 *  Parameters:
-*     mjd 
+*     mjd
 *        The date at which the solar north pole vector is required.
 *     pole
 *        An array holding the (X,Y,Z) components of the vector, in the
@@ -3262,13 +3262,13 @@ static void SolarPole( double mjd, double pole[3], int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Notes:
-*     -  AST__BAD will be returned for all components of the vector if this 
-*     function is invoked with the global error status set, or if it should 
+*     -  AST__BAD will be returned for all components of the vector if this
+*     function is invoked with the global error status set, or if it should
 *     fail for any reason.
 */
 
 /* Local Variables: */
-   double omega;      
+   double omega;
    double sproj;
    double inc;
    double t1;
@@ -3281,31 +3281,31 @@ static void SolarPole( double mjd, double pole[3], int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* First, we find the ecliptic longitude of the ascending node of the solar 
-   equator on the ecliptic at the required date. This is based on the 
-   equation in the "Explanatory Supplement to the Astronomical Alamanac", 
+/* First, we find the ecliptic longitude of the ascending node of the solar
+   equator on the ecliptic at the required date. This is based on the
+   equation in the "Explanatory Supplement to the Astronomical Alamanac",
    section "Physical Ephemeris of the Sun":
 
    Omega = 75.76 + 0.01397*T degrees
 
    Note, the text at the start of the chapter says that "T" is measured in
-   centuries since J2000, but the equivalent expression in Table 15.4 is 
+   centuries since J2000, but the equivalent expression in Table 15.4 is
    only consistent with the above equation if "T" is measured in days since
    J2000. We assume T is in days. The text does not explicitly say so,
    but we assume that this longitude value (Omega) is with respect to the
    mean equinox of J2000.0. */
    omega = 75.76 + 0.01397*( palSlaEpj(mjd) - 2000.0 );
 
-/* Convert this to the ecliptic longitude of the projection of the sun's 
+/* Convert this to the ecliptic longitude of the projection of the sun's
    north pole onto the ecliptic, in radians. */
    sproj = ( omega - 90.0 )*D2R;
 
 /* Obtain a unit vector parallel to the sun's north pole, in terms of
-   the required ecliptic (X,Y,Z) axes, in which X points towards ecliptic 
-   longitude/latitude ( 0, 0 ), Y axis points towards ecliptic 
-   longitude/latitude ( 90, 0 ) degrees, and Z axis points towards the 
-   ecliptic north pole. The inclination of the solar axis to the ecliptic 
-   axis (7.25 degrees) is taken from the "Explanatory Supplement" section 
+   the required ecliptic (X,Y,Z) axes, in which X points towards ecliptic
+   longitude/latitude ( 0, 0 ), Y axis points towards ecliptic
+   longitude/latitude ( 90, 0 ) degrees, and Z axis points towards the
+   ecliptic north pole. The inclination of the solar axis to the ecliptic
+   axis (7.25 degrees) is taken from the "Explanatory Supplement" section
    "The Physical Ephemeris of the Sun". */
    inc = 7.25*D2R;
    t1 = sin( inc );
@@ -3416,7 +3416,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    values. */
    ncoord_in = astGetNcoord( in );
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse transformation, according
@@ -3599,7 +3599,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         eq_cache = args[ 1 ];
                         ep_cache = args[ 0 ];
                         palSlaMappa( eq_cache, ep_cache, amprms_cache );
-                     }                        
+                     }
 
                      extra = astStore( NULL, amprms_cache,
                                        sizeof( double )*21 );
@@ -3634,7 +3634,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         eq_cache = args[ 0 ];
                         ep_cache = args[ 1 ];
                         palSlaMappa( eq_cache, ep_cache, amprms_cache );
-                     }                        
+                     }
 
                      extra = astStore( NULL, amprms_cache,
                                        sizeof( double )*21 );
@@ -3643,11 +3643,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
                   if ( forward ) {
                      TRAN_ARRAY(palSlaMapqkz( alpha[ point ], delta[ point ],
-                                           extra, 
+                                           extra,
                                            alpha + point, delta + point );)
                   } else {
                      TRAN_ARRAY(palSlaAmpqk( alpha[ point ], delta[ point ],
-                                          extra, 
+                                          extra,
                                           alpha + point, delta + point );)
 		  }
                }
@@ -3907,7 +3907,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   p[1] = delta;
                   p[2] = NULL;
 
-/* Convert the supplied positions to (or from) AST__HEQ, ignoring the 
+/* Convert the supplied positions to (or from) AST__HEQ, ignoring the
    distinction between the origin of the input and output systems (which
    is appropriate since we are considering points at an infinite distance
    from the observer). */
@@ -3953,7 +3953,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   p[1] = delta;
                   p[2] = NULL;
 
-/* Convert the supplied positions from (or to) AST__HEQ, ignoring the 
+/* Convert the supplied positions from (or to) AST__HEQ, ignoring the
    distinction between the origin of the input and output systems (which
    is appropriate since we are considering points at an infinite distance
    from the observer). */

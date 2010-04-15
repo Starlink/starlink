@@ -1,7 +1,7 @@
       SUBROUTINE CAT_TYFMT (DTYPE, CSIZE, STRING, POSN, STATUS)
 *+
 *  Name:
-*     CAT_TYFMT 
+*     CAT_TYFMT
 *  Purpose:
 *     Construct a character representation of a CAT data type.
 *  Language:
@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAT_TYFMT (DTYPE, CSIZE; STRING, POSN; STATUS)
 *  Description:
-*     Construct a character string representation of a CAT data 
+*     Construct a character string representation of a CAT data
 *     type and append it to a character string.
 *
 *     CAT data types are represented using an integer code (here
@@ -20,8 +20,8 @@
 *     identical to that used by HDS.
 *
 *     The constructed value is appended to the input string, starting
-*     at element POSN+1 of the input string (using the input value for 
-*     POSN).  On output POSN is set to the new length of the string 
+*     at element POSN+1 of the input string (using the input value for
+*     POSN).  On output POSN is set to the new length of the string
 *     (cf. the CHR routines).
 *
 *     If an illegal CAT data type is input, the assembled string
@@ -35,7 +35,7 @@
 *     CSIZE  =  INTEGER (Given)
 *         Size of a CAT character string.
 *     STRING  =  CHARACTER*(*) (Given and Returned)
-*         The character string into which the data type is to be 
+*         The character string into which the data type is to be
 *         appended.
 *     POSN  =  INTEGER (Given and Returned)
 *         The last non-blank element of STRING.  VALUE is inserted into
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

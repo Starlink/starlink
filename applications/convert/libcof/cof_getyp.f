@@ -23,13 +23,13 @@
 *
 *     The values are validated, and each may have up to one character
 *     mistyped.  An error report is made should an invalid value be
-*     supplied and the group cleared.  Unambiguous abbreviations may be 
+*     supplied and the group cleared.  Unambiguous abbreviations may be
 *     given.  A blank value (within quotes) is also permitted.  A null
 *     value (!) equates to a blank value.
 *
 *     If fewer than MAXVAL values are supplied, the missing values take
-*     the value of the last supplied type.  If more than MAXVAL values 
-*     are supplied, a SAI_ERROR STATUS is returned and the group 
+*     the value of the last supplied type.  If more than MAXVAL values
+*     are supplied, a SAI_ERROR STATUS is returned and the group
 *     deleted.
 
 *  Arguments:
@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
                CALL ERR_ANNUL( STATUS )
                CALL GRP_PUT1( GRPID, ' ', 0, STATUS )
             END IF
-            
+
 *  Cancel the parameter association in order to get more group values
 *  through the parameter, unless there are no more to obtain.
             IF ( CFLAG ) CALL PAR_CANCL( PARNAM, STATUS )
@@ -212,7 +212,7 @@
 *  Extend the group by duplication to give the same number of values
 *  as input files.  The last value is duplicated.
       ELSE IF ( NTYPE .LT. MAXVAL ) THEN
-        
+
 *  Obtain the last value.
          CALL GRP_GET( GRPID, NTYPE, 1, HTYPE, STATUS )
 

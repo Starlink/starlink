@@ -9,7 +9,7 @@ C
 C     Function:
 C        Insert a figaro frame into a time series image
 C
-C     Description:   
+C     Description:
 C        BUILD3D is used to create a time series image from a number
 C        of figaro images. Each invocation of BUILD3D inserts one frame
 C        into the time series. A new time series dataset can be created
@@ -22,7 +22,7 @@ C    (1) FIGARO     (Char)     The Figaro files to insert.
 C    (2) FRAME      (Integer)  The frame number at which to insert it.
 C    (3) NEW        (Logical)  TRUE to create a new time series.
 C    (4) OUTPUT     (TSP, 3D)  The output time series dataset.
-C        FRAMES     (Integer)  The number of frames in the time series. 
+C        FRAMES     (Integer)  The number of frames in the time series.
 C        UTDATE     (Char)     The UT date of the frame
 C        UT         (Char)     The UT time of the frame
 C
@@ -34,7 +34,7 @@ C-
 C
 C  History:
 C    19/10/1989   Original Version.   JAB/JAC
-C    27/10/1989   Obtain time from header  JAB/JAC 
+C    27/10/1989   Obtain time from header  JAB/JAC
 C    07/03/1992   Modify to insert one frame each time  JAB/AAO
 C
 
@@ -109,7 +109,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
       SUBROUTINE TSP_BUILD3D_COPY(N1,N2,N3,N,IN,OUT,MJD,TIME)
 *+
 *     Copy an input 2D frame into a slice of a 3D array, and
@@ -141,7 +141,7 @@ C
       TIME(N)=MJD
       END
 
-      
+
       SUBROUTINE TSP_BUILD3D_TIME(MJD,STATUS)
 
 *+
@@ -150,7 +150,7 @@ C
 *
 *   BUILD3D command
 *
-*   Get the MJD (Modified Julian Date) of a Figaro frame for use 
+*   Get the MJD (Modified Julian Date) of a Figaro frame for use
 *   by BUILD3D
 *
 *   First try to extract the necessary information from the FITS header
@@ -161,7 +161,7 @@ C
 *   If this fails ask the user for a UT date and time and convert these
 *   to an MJD.
 *
-*   Parameters: 
+*   Parameters:
 *
 *   (<)  MJD    (Double)  Modified Julian Date of the frame
 *   (!)  STATUS (Integer)  Status value
@@ -206,42 +206,42 @@ C
 
 *  If not found in header prompt user
           STATUS = SAI__OK
-          DO WHILE (.NOT. FINISHED)      
+          DO WHILE (.NOT. FINISHED)
 
-*  First get the UT date                       
-              CALL PAR_GET0C('UTDATE',UTDATE,STATUS)            
+*  First get the UT date
+              CALL PAR_GET0C('UTDATE',UTDATE,STATUS)
 
 *  And convert to MJD
-              CALL TCV_S2MJD(UTDATE,MJD,STATUS)                 
+              CALL TCV_S2MJD(UTDATE,MJD,STATUS)
 
 *  If there are errors cancel the parameter and try again
-              IF (STATUS .NE. SAI__OK) THEN                     
-                  STATUS = SAI__OK                              
-              ELSE                                              
-                  FINISHED  = .TRUE.                            
-              ENDIF                                             
-              CALL PAR_CANCL('UTDATE',STATUS)                   
-          ENDDO                                                 
-                                                                
-          FINISHED = .FALSE.                                    
-          DO WHILE (.NOT. FINISHED) 
+              IF (STATUS .NE. SAI__OK) THEN
+                  STATUS = SAI__OK
+              ELSE
+                  FINISHED  = .TRUE.
+              ENDIF
+              CALL PAR_CANCL('UTDATE',STATUS)
+          ENDDO
 
-*  Then get the UT time                            
-              CALL PAR_GET0C('UT',UTC,STATUS)                   
+          FINISHED = .FALSE.
+          DO WHILE (.NOT. FINISHED)
+
+*  Then get the UT time
+              CALL PAR_GET0C('UT',UTC,STATUS)
 
 *  And convert to fraction of a day
-              CALL TCV_S2TIME(UTC,D,STATUS)                     
+              CALL TCV_S2TIME(UTC,D,STATUS)
 
 *  If there are errors cancel the parameter and try again
-              IF (STATUS .NE. SAI__OK) THEN                     
-                  STATUS = SAI__OK                              
-              ELSE                                              
-                  FINISHED  = .TRUE.                            
-              ENDIF                                             
-              CALL PAR_CANCL('UT',STATUS)                       
-          ENDDO                                                 
+              IF (STATUS .NE. SAI__OK) THEN
+                  STATUS = SAI__OK
+              ELSE
+                  FINISHED  = .TRUE.
+              ENDIF
+              CALL PAR_CANCL('UT',STATUS)
+          ENDDO
 
 *  Combine date and time to give MJD
-          MJD = MJD+D                                           
+          MJD = MJD+D
       ENDIF
       END

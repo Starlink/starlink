@@ -6,7 +6,7 @@ C
 C     Raises the data in an image to a power of itself.  This can be
 C     used to multiply an image by itself (POWER=2.0) or to take the
 C     square root of an image (POWER=0.5), or may be used with an
-C     arbitrary power. Pixels whose value is such that the operation is 
+C     arbitrary power. Pixels whose value is such that the operation is
 C     illegal will give a zero result.
 C
 C     Command parameters -
@@ -33,7 +33,7 @@ C
 C     27 Oct 1988  JM / RAL. Modified to use DSA_ routines
 C                  Dynamic memory handling changed to use
 C                  DYN_ routines
-C     09 Jan 1991  JMS / AAO. Modified subroutine GEN_POWEREQ - 
+C     09 Jan 1991  JMS / AAO. Modified subroutine GEN_POWEREQ -
 C                  Now handles data arrays containing quality and
 C                  flagged information. Modified main routine so that
 C                  there is no need to use work arrays.
@@ -70,7 +70,7 @@ C
       REAL      FBAD             ! Flag value for 'FLOAT' data
       LOGICAL   FLAGS            ! True if image has flagged data values
       INTEGER   IPT              ! Holds the value returned by ICH_LEN
-      INTEGER   IGNORE           ! Value of status returned by 
+      INTEGER   IGNORE           ! Value of status returned by
                                  ! PAR_WRUSER
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
@@ -93,7 +93,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -118,7 +118,7 @@ C
 C
 C     Get output structure name
 C
-      CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',0,0,STATUS)      
+      CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',0,0,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     If the image had flagged data values, use them and get

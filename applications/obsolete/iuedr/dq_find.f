@@ -5,7 +5,7 @@
 *   Name:
 *      INTEGER FUNCTION dq_AND
 *
-*   Description: 
+*   Description:
 *      Look for the first zero dq_AND in data quality list.
 *
 *   Authors:
@@ -31,7 +31,7 @@
       INTEGER MASK           ! data quality mask to be found
       INTEGER NPOINT         ! number of dq in list
       INTEGER DQ(NPOINT)     ! list of dq to be searched
- 
+
 *   External references:
       INTEGER dq_AND         ! data quality AND operation
 

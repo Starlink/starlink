@@ -207,7 +207,7 @@
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_PAR'
-                         
+
 *  Global Variables:
       INCLUDE 'hlpcmd.inc'           ! KAPPA help I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
@@ -241,7 +241,7 @@
                                  ! trailing blanks
      :  GTHLPI,                  ! Routine for reading help command
      :  HLP_HELP,                ! Interactive help
-     :  PTHLPO                   ! Routine for outputting help 
+     :  PTHLPO                   ! Routine for outputting help
 
       EXTERNAL
      :  GTHLPI,                  ! Gets the help information
@@ -429,7 +429,7 @@
 
 *  Output enabled: write prompt, if any.
 
-            IF ( PROMPT .NE. '  ' ) 
+            IF ( PROMPT .NE. '  ' )
      :        WRITE ( LUTERM, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.
@@ -871,7 +871,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

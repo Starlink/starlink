@@ -55,7 +55,7 @@ C   appropriately.
         RETURN
       END IF
 
-*     Calculate position in grid with NE corner first, 
+*     Calculate position in grid with NE corner first,
 *     indexed in E-W rows, with declination decreasing.
 
       IROFF2 = NINT (2.0*XCELL)

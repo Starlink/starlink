@@ -728,7 +728,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
       /* correct TCS_TAI by half step time corrected to days */
       msgOutiff( msglev, "", INDENT "Missing TCS_TAI. Estimating using RTS_END and STEPTIME of %g sec.",
                  status, step);
-      step = 0.5 * step / SPD; 
+      step = 0.5 * step / SPD;
       if (*status == SAI__OK) {
         for (i=0; i < hdr->nframes; i++) {
           tmpState[i].tcs_tai = tmpState[i].rts_end - step;
@@ -740,7 +740,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
 
   /* Older data have BAD values for chop entries. For AZEL chopping we can easily fill in an estimate,
      but for TRACKING chops we will have to do some work. Only bother for CHOP observations */
-  if (*status == SAI__OK && hdr->swmode == SMF__SWM_CHOP && 
+  if (*status == SAI__OK && hdr->swmode == SMF__SWM_CHOP &&
       (tmpState[0].smu_az_chop_x == VAL__BADD || tmpState[0].smu_az_chop_y == VAL__BADD )) {
     msgOutif( msglev, "", INDENT "Blanked SMU_AZ_CHOP entries.", status );
 

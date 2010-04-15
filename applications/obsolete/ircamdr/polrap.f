@@ -9,7 +9,7 @@
 *     parsed, the requested A-task being called on successful matching
 *     of the input string with a valid task name.
 *
-*     This version of RAPI2D is for polarimetry reduction 
+*     This version of RAPI2D is for polarimetry reduction
 *
 *    Invocation :
 *
@@ -53,8 +53,8 @@
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE  'PAR_PAR'          ! necessary for non-VMS
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 
       INTEGER  STATUS             ! global status parameter
@@ -144,7 +144,7 @@
 
       ELSE IF ( NAME .EQ. 'POLSHOT' ) THEN
 
-*       CORRECTS the polarization image for shot-noise polarization 
+*       CORRECTS the polarization image for shot-noise polarization
 
          CALL POLSHOT ( STATUS )
 
@@ -176,11 +176,11 @@
 
 *       no such option exists
 
-        CALL MSG_OUT( 'RAP_ERR', 
-     :                'Thats quite impossible at the moment ...', 
+        CALL MSG_OUT( 'RAP_ERR',
+     :                'Thats quite impossible at the moment ...',
      :                 STATUS )
         CALL MSG_SETI( 'NAME', NAME)
-        CALL MSG_OUT( 'MESSAGE', 'Action requested was ^NAME', 
+        CALL MSG_OUT( 'MESSAGE', 'Action requested was ^NAME',
      :                 STATUS)
 
       END IF
@@ -188,5 +188,5 @@
 
 * End NDF context, release all locators and unmap arrays
       CALL NDF_END( STATUS )
- 
+
       END

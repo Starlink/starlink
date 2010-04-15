@@ -35,12 +35,12 @@
 *
 *     If the string ends in 'arcsec' then the routine attempts to
 *     extract the preceding floating point number, convert it from
-*     seconds of arc to radians and overwrite the string with the new 
+*     seconds of arc to radians and overwrite the string with the new
 *     value in radians.
 *
 *     If the string ends in 'arcmin' then the routine attempts to
 *     extract the preceding floating point number, convert it from
-*     minutes of arc to radians and overwrite the string with the new 
+*     minutes of arc to radians and overwrite the string with the new
 *     value in radians.
 *  Arguments:
 *     PDIST  =  CHARACTER*(*) (Given and Returned)

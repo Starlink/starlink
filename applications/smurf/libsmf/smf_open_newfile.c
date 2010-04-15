@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_open_newfile( const Grp * ingrp, int index, smf_dtype dtype,
 *                       int ndims, const int lbnd[], const inst ubnd[],
-*                       int flags, smfData ** data, 
+*                       int flags, smfData ** data,
 *                       int *status);
 
 *  Arguments:
@@ -186,7 +186,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       msgSeti( "NDIMS", ndims);
-      errRep( FUNC_NAME, 
+      errRep( FUNC_NAME,
 	      "Number of dimensions in output, ^NDIMS, is not in the range 1-4",	      status);
       return;
     }
@@ -197,7 +197,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   if ( datatype == NULL ) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Unsupported data type. Unable to open new file.", 
+      errRep( FUNC_NAME, "Unsupported data type. Unable to open new file.",
 	      status );
     }
   }
@@ -248,7 +248,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     return;
   }
 
-  file = smf_construct_smfFile( NULL, newndf, 0, isTstream, pname, 
+  file = smf_construct_smfFile( NULL, newndf, 0, isTstream, pname,
 				status );
   if ( file == NULL ) {
     if ( *status == SAI__OK ) {

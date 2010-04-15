@@ -44,22 +44,22 @@
 *    YLIM(2,LINE_COUNT) = DOUBLE PRECISION ARRAY (Returned)
 *        Y limits (for Chebyshev fitting)
 *    ARC(NSLCT,LINE_COUNT) = INTEGER*2 ARRAY (Returned)
-*       
+*
 *    W(NXP,LINE_COUNT) = DOUBLE PRECISION ARRAY (Returned)
 *        Weights
 *    ERR(NXP) = REAL ARRAY (Workspace)
-*       
+*
 *  Global variables:
 *    MXPARS = INTEGER (Given)
-*       
+*
 *    NYP = INTEGER (Given)
-*       
+*
 *    NXP = INTEGER (Given)
-*       
+*
 *    LINE_COUNT = INTEGER (Given)
 *        Number of lines
 *    NSLCT = INTEGER (Given)
-*       
+*
 *
 * History:
 *  T.N.Wilkins, Cambridge, 26/3/91 Mostly re-written

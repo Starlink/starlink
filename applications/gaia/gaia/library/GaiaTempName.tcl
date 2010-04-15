@@ -168,7 +168,7 @@ itcl::class gaia::GaiaTempName {
       return "${prefix}${unique}${type}"
    }
 
-   #  Check if the designated directory is writable and if not change the 
+   #  Check if the designated directory is writable and if not change the
    #  setting of GAIA_TEMP_DIR to TMPDIR or /tmp.
    protected proc check_writable_ {} {
       if { ! $writechecked_ } {

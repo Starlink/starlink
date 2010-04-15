@@ -1,21 +1,21 @@
 /*
  * gk9srl_.c --- module containing routines for handling locator input for
- * RAL GKS on the SUN workstations. 
+ * RAL GKS on the SUN workstations.
  *
  * Written by A C Arnold, University of Manchester Computer Graphics Unit,
  * Computer Building, Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x
- * 5405. 
+ * 5405.
  *
  * The routines should really map to GKS's FORTRAN common blocks to pick up
  * everything, but until I know how to do that I'll pass things as
- * parameters. It's also a single WS version. 
+ * parameters. It's also a single WS version.
  *
- * Maintenance log: 
+ * Maintenance log:
  *
  * ??? - created by ACA 26-Jan-1987 : Modified to be callable from GKS Replaced
  * su_initlocator by call to gkilc in su_reqlocator Added conversion to NDC
  * at end of su_reqlocator Various to support the above. Changed name to
- * gk9rlc. 
+ * gk9rlc.
  *
  *  26/02/87  PJWR  Corrected #includes for integration.
  *  18/03/87  TAW   Changed name to gk9srl_.
@@ -181,7 +181,7 @@ f77_integer gk9srl_(n, xndc, yndc)		/* request locator input */
         gk9soe(echoarea,"Locator device");
 	echoarea = ddbm->bm_box;
 
-	/* 
+	/*
 	 * Now save echo area window for deletion by gk9sce() and pop the
 	 * workstation window so events come from the display surface.
 	 */
@@ -218,7 +218,7 @@ f77_integer gk9srl_(n, xndc, yndc)		/* request locator input */
   static cu_off()		/* Blanks cursor for crosshair PETs */
 {
   static char			/* Blank, transparent cursor */
-    blank_cursor[41] = 
+    blank_cursor[41] =
     {
       WWOR, 0, 0, 0, 0,
       0, 16, 0, 16,

@@ -1,4 +1,4 @@
-      SUBROUTINE CAT1_SELCT (EI, REJFLG, CI, ROWS, NUMSEL, SELIST, 
+      SUBROUTINE CAT1_SELCT (EI, REJFLG, CI, ROWS, NUMSEL, SELIST,
      :  NUMREJ, REJIST, STATUS)
 *+
 *  Name:
@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -129,7 +129,7 @@
             CALL CAT_EGT0L (EI, EVAL, NULFLG, STATUS)
 
 *
-*          If the expression is true then increment the number of 
+*          If the expression is true then increment the number of
 *          selected rows and add the row to the list of selected rows.
 *
 *          Remember that the row number may be the number in a
@@ -144,7 +144,7 @@
             ELSE
 
 *
-*             The expression is false; increment the number of rejected 
+*             The expression is false; increment the number of rejected
 *             rows and, if appropriate, add the row to the list of
 *             rejected rows (again, converting it to an absolute row
 *             number).

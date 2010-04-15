@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_ANALYSE_PHOTOM_JIGGLE (PHOTOM_ANALYSIS,
-     :     BOL, N_BOLS, J_COUNT, JIGGLE_X, JIGGLE_Y, JDATA, VARIANCE, 
+     :     BOL, N_BOLS, J_COUNT, JIGGLE_X, JIGGLE_Y, JDATA, VARIANCE,
      :     QUALITY,RESULT_D, RESULT_V, RESULT_Q, A0, A1, X0, Y0, BADBIT,
      :     STATUS)
 *+
@@ -16,7 +16,7 @@
 *        If status is good on entry the routine checks that the data array
 *     holds data for the specified bolometer. If it does not an error
 *     message will be output and the bad status returned.
-*        All being well the routine will analyse the data by the method 
+*        All being well the routine will analyse the data by the method
 *      specified in PHOTOM_ANALYSIS:-
 *
 *     AVERAGE -    the `result' will be the mean of the jiggle points.
@@ -27,16 +27,16 @@
 *                  mean then a warning message will be output but good
 *                  status returned.
 *
-*     PARABOLA -   the routine will call SCULIB_FIT_2D_PARABOLA to fit a 
+*     PARABOLA -   the routine will call SCULIB_FIT_2D_PARABOLA to fit a
 *                  2-d parabola to the data and the `result' will be the
-*                  peak of the fitted curve. If the fit is good the results 
-*                  will be flat-fielded and reported to the user. Otherwise 
-*                  the result quality is set bad but good status will be 
+*                  peak of the fitted curve. If the fit is good the results
+*                  will be flat-fielded and reported to the user. Otherwise
+*                  the result quality is set bad but good status will be
 *                  returned.
 
 *  Invocation:
-*     CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (PHOTOM_ANALYSIS, BOL, N_BOLS, 
-*    :  J_COUNT, JDATA, VARIANCE, QUALITY, RESULT_D, RESULT_V, RESULT_Q, 
+*     CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (PHOTOM_ANALYSIS, BOL, N_BOLS,
+*    :  J_COUNT, JDATA, VARIANCE, QUALITY, RESULT_D, RESULT_V, RESULT_Q,
 *    :  BADBIT, STATUS)
 
 *  Arguments:
@@ -49,7 +49,7 @@
 *     J_COUNT                      = INTEGER (Given)
 *           the number of jiggles in the pattern
 *     JIGGLE_X                     = REAL (Given)
-*           x jiggle offsets 
+*           x jiggle offsets
 *     JIGGLE_Y                     = REAL (Given)
 *           y jiggle offsets
 *     JDATA (N_BOLS, J_COUNT)       = REAL (Given)
@@ -120,7 +120,7 @@
       REAL          JDATA (N_BOLS, J_COUNT)
       REAL          VARIANCE (N_BOLS, J_COUNT)
       BYTE          QUALITY (N_BOLS, J_COUNT)
-      BYTE          BADBIT   
+      BYTE          BADBIT
 
 *  Arguments Given & Returned:
 
@@ -144,10 +144,10 @@
       REAL         ALLOWED_BAD_FRAC     ! Fraction of bad data allowed
       PARAMETER (ALLOWED_BAD_FRAC = 0.3)! in a AVERAGE jiggle
       INTEGER      MAX_JIGGLE           ! max number of jiggle positions
-      PARAMETER (MAX_JIGGLE = 512)  
+      PARAMETER (MAX_JIGGLE = 512)
 
 *  Local variables:
-      CHARACTER*80 ANALYSIS             ! an uppercase copy of 
+      CHARACTER*80 ANALYSIS             ! an uppercase copy of
                                         ! PHOTOM_ANALYSIS
       REAL         GOODFRAC             ! Fraction of good data
       INTEGER      J                    ! jiggle number in DO loop
@@ -191,7 +191,7 @@
             N_GOOD    = 0
 
             DO J = 1, J_COUNT
-               IF (JDATA(BOL,J) .NE. VAL__BADR .AND. 
+               IF (JDATA(BOL,J) .NE. VAL__BADR .AND.
      :              NDF_QMASK(QUALITY(BOL,J), BADBIT)) THEN
                   N_GOOD = N_GOOD + 1
                   RESULT_D = RESULT_D + JDATA (BOL,J)
@@ -210,7 +210,7 @@
                RESULT_D = RESULT_D / REAL (N_GOOD)
                RESULT_V = RESULT_V / REAL (N_GOOD * N_GOOD)
                RESULT_Q = 0
-               
+
             ELSE
 
                RESULT_D = VAL__BADR
@@ -221,8 +221,8 @@
 
          ELSE IF (ANALYSIS .EQ. 'PARABOLA') THEN
 
-*  the `analysis' consists of fitting a parabola to the valid data for the 
-*  specified bolometer over the jiggle pattern 
+*  the `analysis' consists of fitting a parabola to the valid data for the
+*  specified bolometer over the jiggle pattern
 
 *  copy the jiggle result into 1-d arrays
 
@@ -234,9 +234,9 @@
 
             IF (STATUS .EQ. SAI__OK) THEN
                CALL SCULIB_FIT_2D_PARABOLA (J_COUNT, T_DATA, T_VARIANCE,
-     :              T_QUALITY, JIGGLE_X, JIGGLE_Y, A0, A1, X0, Y0, 
+     :              T_QUALITY, JIGGLE_X, JIGGLE_Y, A0, A1, X0, Y0,
      :              RESULT_D, RESULT_V, BADBIT, STATUS)
-               
+
                IF (STATUS .EQ. SAI__OK) THEN
                   RESULT_Q = 0
                ELSE

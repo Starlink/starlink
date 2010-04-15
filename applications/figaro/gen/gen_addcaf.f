@@ -7,7 +7,7 @@ C     Adds a real constant to a real array.
 C
 C     Parameters -   (">" input, "<" output)
 C
-C     (>) IN     (Real array IN(N)) The input array 
+C     (>) IN     (Real array IN(N)) The input array
 C                (Note that IN may be multiply dimensioned
 C                in the calling program.  It is treated as
 C                1D here for efficiency and generality.)

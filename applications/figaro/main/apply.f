@@ -67,7 +67,7 @@
 *  Include files:
 *   gr_inc
 *     Variables referenced from common = REAL (Workspace)
-*       
+*
 *    TERMINAL = LOGICAL (Workspace)
 *        If softcopy graphics device open
 *    HARDCOPY = LOGICAL (Workspace)

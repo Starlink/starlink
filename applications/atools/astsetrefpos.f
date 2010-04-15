@@ -20,19 +20,19 @@
 *        The global status.
 
 *  Description:
-*     This application sets the reference position of a SpecFrame 
-*     (specified by attributes RefRA and RefDec) using axis values 
-*     (in radians) supplied within the celestial coordinate system 
-*     represented by a supplied SkyFrame. 
+*     This application sets the reference position of a SpecFrame
+*     (specified by attributes RefRA and RefDec) using axis values
+*     (in radians) supplied within the celestial coordinate system
+*     represented by a supplied SkyFrame.
 
 *  Usage:
 *     astsetrefpos this frm lon lat result
 
 *  ADAM Parameters:
 *     FRM = LITERAL (Read)
-*        An NDF or text file holding the SkyFrame that describes the 
+*        An NDF or text file holding the SkyFrame that describes the
 *        coordinate system to which the LON and LAT parameter values refer.
-*        If an NDF is supplied, the current Frame of its WCS FrameSet will 
+*        If an NDF is supplied, the current Frame of its WCS FrameSet will
 *        be used. If a null (!) value is supplied, LON and LAT will be
 *        assumed to be FK5 J2000 right ascension and declination.
 *     LAT = LITERAL (Read)
@@ -43,11 +43,11 @@
 *        the system specified by FRM.
 *     RESULT = LITERAL (Read)
 *        An NDF or text file to receive the modified SpecFrame. If an NDF
-*        is supplied, the WCS FrameSet within the NDF will be replaced by 
-*        the new Object if possible (if it is a FrameSet in which the base 
+*        is supplied, the WCS FrameSet within the NDF will be replaced by
+*        the new Object if possible (if it is a FrameSet in which the base
 *        Frame has Domain GRID and has 1 axis for each NDF dimension).
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the SpecFrame. If an NDF is supplied, 
+*        An NDF or text file holding the SpecFrame. If an NDF is supplied,
 *        the current Frame in the WCS FrameSet will be used.
 
 *  Copyright:
@@ -114,7 +114,7 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -125,14 +125,14 @@
 
       IF( AST_ISAFRAMESET( THIS, STATUS ) ) THEN
          SFRM = AST_GETFRAME( THIS, AST__CURRENT, STATUS )
-      ELSE 
+      ELSE
          SFRM = AST_CLONE( THIS, STATUS )
       END IF
 
-      IF( .NOT. AST_ISASPECFRAME( SFRM, STATUS ) .AND. 
+      IF( .NOT. AST_ISASPECFRAME( SFRM, STATUS ) .AND.
      :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'CLASS', AST_GETC( SFRM, 'Class', STATUS ) )         
+         CALL MSG_SETC( 'CLASS', AST_GETC( SFRM, 'Class', STATUS ) )
          CALL ERR_REP( ' ', 'An AST ^CLASS was provided for parameter'//
      :                 ' THIS, but a SpecFrame was needed.', STATUS )
          GO TO 999
@@ -147,19 +147,19 @@
          CALL ERR_ANNUL( STATUS )
          UFRM = AST_SKYFRAME( ' ', STATUS )
 
-      ELSE 
+      ELSE
          IF( AST_ISAFRAMESET( FRM, STATUS ) ) THEN
             UFRM = AST_GETFRAME( FRM, AST__CURRENT, STATUS )
-         ELSE 
+         ELSE
             UFRM = AST_CLONE( FRM, STATUS )
          END IF
-   
-         IF( .NOT. AST_ISASKYFRAME( UFRM, STATUS ) .AND. 
+
+         IF( .NOT. AST_ISASKYFRAME( UFRM, STATUS ) .AND.
      :       STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETC( 'CLASS', AST_GETC( UFRM, 'Class', STATUS ) )
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'An AST ^CLASS was provided for '//
-     :                    'parameter FRM, but a SkyFrame was needed.', 
+     :                    'parameter FRM, but a SkyFrame was needed.',
      :                    STATUS )
             GO TO 999
          END IF
@@ -171,7 +171,7 @@
 
 *  Unformat them.
       ILON = AST_GETI( UFRM, 'LONAXIS', STATUS )
-      NC = AST_UNFORMAT( UFRM, ILON, LON, DLON, STATUS )         
+      NC = AST_UNFORMAT( UFRM, ILON, LON, DLON, STATUS )
       IF( NC .NE. LEN( LON ) .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'L', LON )
@@ -181,7 +181,7 @@
       END IF
 
       ILAT = AST_GETI( UFRM, 'LATAXIS', STATUS )
-      NC = AST_UNFORMAT( UFRM, ILAT, LAT, DLAT, STATUS )         
+      NC = AST_UNFORMAT( UFRM, ILAT, LAT, DLAT, STATUS )
       IF( NC .NE. LEN( LAT ) .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'L', LAT )

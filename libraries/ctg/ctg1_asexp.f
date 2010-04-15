@@ -1,4 +1,4 @@
-      SUBROUTINE CTG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, 
+      SUBROUTINE CTG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG,
      :                       STATUS )
 *+
 *  Name:
@@ -29,21 +29,21 @@
 
 *  Arguments:
 *     GRPEXP = CHARACTER * ( * ) (Given)
-*        The group expression specifying the catalogue names to be stored 
+*        The group expression specifying the catalogue names to be stored
 *        in the group.
 *     VERB = LOGICAL (Given)
-*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        If TRUE then errors which occur whilst accessing supplied catalogues
 *        are flushed so that the user can see them before re-prompting for
-*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP1 = INTEGER (Given)
-*        The identifier of a group to which the names of any 
+*        The identifier of a group to which the names of any
 *        inaccessable catalogues will be appended. The group should already
 *        have been created by a call to GRP_NEW, and should be deleted
-*        when no longer needed by a call to GRP_DELET. If IGRP1 is 
-*        supplied equal to symbolic constant GRP__NOID, then no 
-*        information is stored describing the bad catalogues. 
+*        when no longer needed by a call to GRP_DELET. If IGRP1 is
+*        supplied equal to symbolic constant GRP__NOID, then no
+*        information is stored describing the bad catalogues.
 *     IGRP2 = INTEGER (Given and Returned)
 *        The identifier of the group in which the catalogue names are to be
 *        stored. A new group is created if the supplied value is GRP__NOID.
@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -111,7 +111,7 @@
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( ESC = '\\' )    
+      PARAMETER( ESC = '\\' )
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
@@ -120,7 +120,7 @@
 
 *  Arguments Given and Returned:
       INTEGER IGRP2
-      
+
 *  Arguments Returned:
       INTEGER SIZE
       LOGICAL FLAG
@@ -133,7 +133,7 @@
       INTEGER SIZE0              ! Size of group on entry to this routine
 *.
 
-*  Ensure a .FALSE. value for FLAG is returned if an error has already 
+*  Ensure a .FALSE. value for FLAG is returned if an error has already
 *  occured.
       FLAG = .FALSE.
 
@@ -174,7 +174,7 @@
          FLAG = .FALSE.
       END IF
 
-*  Check the names added to the group as a result of the above call. 
+*  Check the names added to the group as a result of the above call.
 *  Each name may potentially be expanded into a list of names (eg because
 *  of wild-cards, etc). These are appended to the end of the group and the
 *  original name deleted. An error is reported if no accessable catalogues can

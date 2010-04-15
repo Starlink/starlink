@@ -17,14 +17,14 @@
 *     Create a new catalogue by joining two catalogues. The effect of the join
 *     is as follows. Consider a large catalogue that contains all the fields
 *     from the INPUT1 catalogue and all the fields from the INPUT2 catalogue.
-*     Into this catalogue put an entry for each combination of entries in 
-*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M 
+*     Into this catalogue put an entry for each combination of entries in
+*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M
 *     entries where N is the number of entries in the INPUT1 catalogue and
 *     M the number in the INPUT2 catalogue. Now search this catalogue for
 *     those entries that satisfy the given expression.
 *
 *     Another way of looking at join is to say. Take every entry in turn
-*     from catalogue INPUT1. Match this entry with every entry in 
+*     from catalogue INPUT1. Match this entry with every entry in
 *     catalogue INPUT2 and if the EXPRESSion in satisfied combine both entries
 *     to write to a new catalogue.
 *
@@ -42,13 +42,13 @@
 *        Global status.
 
 *  Notes:
-*     Joining two catalogues by taking every entry in turn from catalogue 
-*     INPUT1, matching this entry with every entry in catalogue INPUT2 
+*     Joining two catalogues by taking every entry in turn from catalogue
+*     INPUT1, matching this entry with every entry in catalogue INPUT2
 *     and then checking the result against the EXPRESSion is extremely
-*     time consumming. Applications that use this routine will run very 
+*     time consumming. Applications that use this routine will run very
 *     slowly when CHI_JOIN has to use this method of joining.
 *
-*     Both the input catalogues and the output catalogue are RESET to their 
+*     Both the input catalogues and the output catalogue are RESET to their
 *     first entries on exit from this routine.
 
 *  Anticipated Errors:
@@ -68,7 +68,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Parsing the criteria has two effects. It checks the criteria is
-*    a valid CHI expression and it eliminates any sexagesimal formats 
+*    a valid CHI expression and it eliminates any sexagesimal formats
 *    as part of the CONVERT function
 *
 *    ( Not required because xjoin uses CHI parser)
@@ -108,7 +108,7 @@
 *    Split the input1 name into database part and catname part.
 *
       call chi_splitname(input1, dbnames(1), catnames(1), status)
-* 
+*
 *    Split the input2 name into database part and catname part.
 *
       call chi_splitname(input2, dbnames(2), catnames(2), status)

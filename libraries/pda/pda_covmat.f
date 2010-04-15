@@ -29,7 +29,7 @@
 *        Exact value of the extreme variance V(1,1).
 *     EX1 = DOUBLE PRECISION (Given)
 *        Absolute expected value of the smallest order statistic from a
-*        size N sample. 
+*        size N sample.
 *     EX2 = DOUBLE PRECISION (Given)
 *        Absolute expected value of the second smallest order statistic
 *        from a size N sample.
@@ -37,7 +37,7 @@
 *        Sum of squares of expected values order statistics for a sample
 *        of size N.
 *     IFAULT = INTEGER (Returned)
-*        Failure indicator. Zero for success, otherwise N is out of 
+*        Failure indicator. Zero for success, otherwise N is out of
 *        bounds.
 
 *  Algorithm:
@@ -59,7 +59,7 @@
 *        Original version.
 *     20-FEB-1997 (PDRAPER):
 *        Added prologue, changed to use PDA_PPND16 and slight
-*        modifications to make output correspond more closely to 
+*        modifications to make output correspond more closely to
 *        that of equivalent NAG routine.
 *     {enter_changes_here}
 
@@ -188,7 +188,7 @@ c
          sum=sum+v(k,k)
  100  continue
       v(2,2)=half*(dble(n)-summ2-sum)
-*     PWD: added next line as it makes the output correspond with 
+*     PWD: added next line as it makes the output correspond with
 *          equivalent NAG routine for n=3.
       if ( n .eq. 3 ) v(2,2) = 2.0d0 * v(2,2)
       v(nsub1,nsub1)=v(2,2)

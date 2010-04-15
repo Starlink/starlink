@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -89,13 +89,13 @@ C# IL>=a, OL>=0
       JTZ(0) = 0
       JTZ(1) = JETNXT(0)
       JTZ(2) = JETNXT(JTZ(1))
- 
+
       FOUND = .FALSE.
 *
 *     Check for empty edge table
       IF((JTZ(1) .EQ. 0) .OR. (JTZ(2) .EQ. 0)) GOTO 999
- 
- 
+
+
 *     Remove all horizontal edges from top
       CALL GKTZRH (NV,VX,VY,VXETT,IYETT,IETB,JETNXT,NHRE,SLOPEF)
 *
@@ -113,6 +113,6 @@ C# IL>=a, OL>=0
          FOUND = (JTZ(1) .NE. 0)
          IF(FOUND) FOUND = (IYETT(JTZ(1)) .EQ. IYETT(JTZ(2)))
       ENDIF
- 
+
   999 CONTINUE
       END

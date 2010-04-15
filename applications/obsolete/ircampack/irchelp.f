@@ -42,7 +42,7 @@
 *           of four levels.
 *
 *     Once in the help library, it can be navigated in the same way
-*     as VMS help libraries.  CTRL/D to exit from any level, and <RET> 
+*     as VMS help libraries.  CTRL/D to exit from any level, and <RET>
 *     to move up a level in the hierarchy.
 
 *  Usage:
@@ -55,7 +55,7 @@
 *        Otherwise, the requested information is displayed and the application
 *        immediately terminates. [YES]
 *     LIBRARY = LITERAL (Read)
-*        The Starlink help library from which help text is to be 
+*        The Starlink help library from which help text is to be
 *        obtained.                                     [$IRCAMPACK_HELP]
 *     SUBSUBSUBTOPIC = LITERAL (Read)
 *        Subsubsubtopic for which help is to be given.             [" "]
@@ -102,7 +102,7 @@
 *  Local Variables:
       CHARACTER*19
      :  HLPTXT*80,             ! Composite command
-     :  LIBRAY*132,            ! Library name 
+     :  LIBRAY*132,            ! Library name
      :  TOPIC( MAXLEV )        ! Name of the topic required
 
       INTEGER
@@ -174,5 +174,5 @@
      :                 'IRCHELP: Error displaying help.',
      :                  STATUS )
       END IF
-      
+
       END

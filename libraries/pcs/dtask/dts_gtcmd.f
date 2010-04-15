@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,7 +119,7 @@
 *     If OK, save the pointer to check next time
          ELSE
             OLDPTR = CLPTR
-                     
+
          ENDIF
 
 *  Do next argument

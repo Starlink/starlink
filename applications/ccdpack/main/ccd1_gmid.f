@@ -36,7 +36,7 @@
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the spanning graph.
 *     HINODE = INTEGER (Given)
-*        The index of the highest-indexed node which may be in the 
+*        The index of the highest-indexed node which may be in the
 *        input graph.  The lowest is assumed to be 1.
 *     IP( N ) = INTEGER (Given and Returned)
 *        Workspace
@@ -58,13 +58,13 @@
 *        The total number of entries in input merged lists.
 *     TOLS( * ) = DOUBLE PRECISION (Given)
 *        Tolerances for deduplicating centroided points indexed by node.
-*        If two points in an image points are within this distance of 
-*        each other in both X and Y directions they should be considered 
-*        to refer to the same feature.  This might normally be a value 
-*        equivalent to about a pixel, but may be larger to accomodate 
-*        objects which are multi-peaked (for instance if they are only 
+*        If two points in an image points are within this distance of
+*        each other in both X and Y directions they should be considered
+*        to refer to the same feature.  This might normally be a value
+*        equivalent to about a pixel, but may be larger to accomodate
+*        objects which are multi-peaked (for instance if they are only
 *        faintly apparent above the background noise).  If equivalent
-*        points are known to have the same value every time the 
+*        points are known to have the same value every time the
 *        elements may be set to zero.
 *     OFFS( NEDGES + 1 ) = INTEGER (Given)
 *        The offsets of the start of the input lists which are
@@ -124,7 +124,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,7 +141,7 @@
       DOUBLE PRECISION X2( N )
       DOUBLE PRECISION Y2( N )
       DOUBLE PRECISION TOLS( * )
-      INTEGER OFFS( NEDGES + 1 ) 
+      INTEGER OFFS( NEDGES + 1 )
 
 *  Arguments Given and Returned:
       INTEGER IP( N )
@@ -200,12 +200,12 @@
  3    CONTINUE
 
 *  For each node...
-      DO 5 NODE = 1, HINODE 
+      DO 5 NODE = 1, HINODE
 
 *  Identify all the edges which have this node.
-         NPOS = 0 
+         NPOS = 0
          DO 6 EDGE = 1, NEDGES
-            IF ( GRAPH( 1, EDGE ) .EQ. NODE ) THEN 
+            IF ( GRAPH( 1, EDGE ) .EQ. NODE ) THEN
 
 *  Extend the list of pointers for positions associated with this node.
                DO 7 I = OFFS( EDGE ), OFFS( EDGE + 1 ) - 1
@@ -215,7 +215,7 @@
 *  And record which position list to look in.
                   IL( NPOS ) = 1
  7             CONTINUE
-            ELSE IF ( GRAPH( 2, EDGE ) .EQ. NODE ) THEN 
+            ELSE IF ( GRAPH( 2, EDGE ) .EQ. NODE ) THEN
 
 *  Extend the list of pointers for positions associated with this node.
                DO 8 I = OFFS( EDGE ), OFFS( EDGE + 1 ) - 1
@@ -226,7 +226,7 @@
                   IL( NPOS ) = 2
  8             CONTINUE
             END IF
- 6       CONTINUE         
+ 6       CONTINUE
 
 *  For each position associated with this node look for multiple
 *  occurrences.
@@ -243,16 +243,16 @@
             IDN = ID1( IP( I ) )
 
 *  Loop over all the other positions.
-            DO 10 J = I + 1, NPOS           
+            DO 10 J = I + 1, NPOS
 
 *  Only look at those with no current alias.
-                IF ( ID2( IP( J ) ) .EQ. 0 ) THEN 
+                IF ( ID2( IP( J ) ) .EQ. 0 ) THEN
 
 *  If this the same same position?
                   IF ( IL( J ) .EQ. 1 ) THEN             ! Use X1 and Y1
-                     IF ( ABS( XN - X1( IP( J ) ) ) 
+                     IF ( ABS( XN - X1( IP( J ) ) )
      :                    .LE. TOLS( NODE ) ) THEN
-                        IF ( ABS( YN - Y1( IP( J ) ) ) 
+                        IF ( ABS( YN - Y1( IP( J ) ) )
      :                       .LE. TOLS( NODE ) ) THEN
 
 *  Same position set alias to reference ID. If the identifier not the
@@ -263,7 +263,7 @@
                         END IF
                      END IF
                   ELSE                                   ! Use X2 and Y2
-                     IF ( ABS( XN - X2( IP( J ) ) ) 
+                     IF ( ABS( XN - X2( IP( J ) ) )
      :                    .LE. TOLS( NODE ) ) THEN
                         IF ( ABS( YN - Y2( IP( J ) ) )
      :                       .LE. TOLS( NODE ) ) THEN
@@ -282,7 +282,7 @@
  5    CONTINUE
 
 *  Finally set all aliased positions.
-      CHANGE = 0 
+      CHANGE = 0
       DO 11 I = 1, N
          IF ( ID2( I ) .NE. 0 ) THEN
             CHANGE = CHANGE + 1
@@ -298,5 +298,5 @@
 
 *  Iteration finished.
 
-      END 
+      END
 * $Id$

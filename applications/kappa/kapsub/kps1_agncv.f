@@ -71,13 +71,13 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       REAL XW                    ! X pixel co-ordinate
       REAL X1                    ! X pixel co-ordinate of the image
@@ -85,28 +85,28 @@
       REAL YW                    ! Y pixel co-ordinate
       REAL Y1                    ! Y pixel co-ordinate of the image
                                  ! bottom
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       CALL MSG_BLANK( STATUS )
       CALL MSG_OUT( 'KPS1_AGNCV_MSG1', 'Cursor position...', STATUS )
 
 *  Put the pixel co-ordinates into message tokens.
       CALL MSG_SETR( 'XVALW', XW )
       CALL MSG_SETR( 'YVALW', YW )
- 
+
 *  Display the current X and Y values.
       CALL MSG_OUT( 'KPS1_AGNCV_MSG3', '   Pixel co-ordinates: '/
      :              /'(^XVALW, ^YVALW)', STATUS )
       CALL MSG_BLANK( STATUS )
- 
+
 *  The following call achieves graphics/text synchronisation.
       CALL MSG_SYNC( STATUS )
- 
+
       END

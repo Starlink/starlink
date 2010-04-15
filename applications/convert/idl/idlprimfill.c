@@ -89,7 +89,7 @@ if ( *status != SAI__OK ) return;
 /* Get the number of bytes per element */
 /* and the HDS type in which to  map the data */
    idltype = datav->type;
- 
+
    switch (idltype) {
    case IDL_TYP_FLOAT:
       strcpy( type, "_REAL" );

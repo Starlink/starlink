@@ -26,7 +26,7 @@
 *     astpermaxes this perm result
 
 *  ADAM Parameters:
-*     PERM() = _INTEGER (Read) 
+*     PERM() = _INTEGER (Read)
 *        An array with one element for each axis of the Frame given
 *        by parameter THIS. This should list the axes in their new order,
 *        using the original axis numbering (which starts at 1 for the
@@ -34,7 +34,7 @@
 *     RESULT = LITERAL (Read)
 *        An text file or NDF to receive the modified Frame or FrameSet.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original FrameSet to which a 
+*        An NDF or text file holding the original FrameSet to which a
 *        new Frame is to be added. If an NDF is supplied, the current
 *        Frame of the WCS FrameSet will be used.
 
@@ -83,7 +83,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Status:
       INTEGER STATUS
@@ -96,22 +96,22 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame or FrameSet.
-      CALL KPG1_GTOBJ( 'THIS', 'Frame or FrameSet', AST_ISAFRAME, THIS, 
+      CALL KPG1_GTOBJ( 'THIS', 'Frame or FrameSet', AST_ISAFRAME, THIS,
      :                 STATUS )
 
 *  Get the permutation array.
       CALL PAR_EXACI( 'PERM', AST_GETI( THIS, 'NAXES', STATUS ),
-     :                PERM, STATUS )            
+     :                PERM, STATUS )
 
 *  Permute the axes of the Frame.
-      CALL AST_PERMAXES( THIS, PERM, STATUS ) 
+      CALL AST_PERMAXES( THIS, PERM, STATUS )
 
 *  Write the modified FrameSet out.
       CALL ATL1_PTOBJ( 'RESULT', 'THIS', THIS, STATUS )

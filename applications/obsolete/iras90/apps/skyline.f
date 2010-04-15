@@ -123,8 +123,8 @@
 *        for more information on available sky coordinate systems.
 *     LOGFILE = LITERAL (Read)
 *        The name of the log text file containing the information
-*        about the present plotted curves. See the NOTES section about 
-*        the format of this file. 
+*        about the present plotted curves. See the NOTES section about
+*        the format of this file.
 *     LON = LITERAL (Read)
 *        A longitude at the start of a curve, in the coordinate system
 *        specified by COORDS (eg if COORDS was EQUATORIAL, LON should
@@ -142,13 +142,13 @@
 *
 *        CURSOR - All positions are specified by cursor. This mode will
 *        only be available on graphic devices which support cursors.
-* 
+*
 *        KEYBOARD - Positions are specified in response to parameter
 *        prompts, using the keyboard.
 *
 *        FILE - Curves are drawn according to the specifications
 *        contained within a text file (see parameter FILE). This is
-*        referred to as "non-interactive" mode. The run-time default is 
+*        referred to as "non-interactive" mode. The run-time default is
 *        CURSOR if a cursor is available, and KEYBOARD otherwise.     []
 *     MSG_FILTER = LITERAL (Read)
 *        The level of information displayed on the users screen. This
@@ -162,19 +162,19 @@
 *
 *        ERASE - Select the curves to erase. This option will only
 *        be available on image_overlay devices.
-*         
+*
 *        SAVE - Save information describing the present drawing into a
 *        log file.
 *
 *        MODE - Change the source from which curve specifications are
 *        obtained.
 *
-*        PEN - Select a new SGS pen number. 
+*        PEN - Select a new SGS pen number.
 *
 *        EXIT - Exit the application
 *
 *        This parameter is only prompted for if parameter LOOP has a
-*        true value.                                              
+*        true value.
 *     PEN = INTEGER (Read)
 *        The pen number used to draw the curves.                     [1]
 *     TOLERANCE = INTEGER (Read)
@@ -196,25 +196,25 @@
 *
 *        POLYLINE - Draw poly-lines connecting specified sky positions
 *
-*        A null response will result in the routine terminating if LOOP 
-*        is false. If LOOP is true a value will be obtained for 
-*        parameter OPTION and the corresponding action will be 
+*        A null response will result in the routine terminating if LOOP
+*        is false. If LOOP is true a value will be obtained for
+*        parameter OPTION and the corresponding action will be
 *        performed.
 
 *  Examples:
 *     SKYLINE MODE=KEY LON=0 LAT=0 TYPE=PAR COORDS=GAL ARCLEN=0
-*        This causes a curve to be drawn over the displayed picture 
-*        corresponding to the galactic equator. MODE=KEY causes the 
-*        position supplied by parameters LON and LAT to be used in 
+*        This causes a curve to be drawn over the displayed picture
+*        corresponding to the galactic equator. MODE=KEY causes the
+*        position supplied by parameters LON and LAT to be used in
 *        preference to the cursor. COORDS=GAL causes the values supplied
-*        by LON and LAT to be interpreted as galactic coordinates. 
-*        ARCLEN=0 causes the entire length of the intersection of the 
+*        by LON and LAT to be interpreted as galactic coordinates.
+*        ARCLEN=0 causes the entire length of the intersection of the
 *        curve with the picture to be drawn (if any). TYPE=PAR specifies
-*        that a parallel (i.e. a line of constant latitude) is to be 
+*        that a parallel (i.e. a line of constant latitude) is to be
 *        drawn. LON=0 and LAT=0 causes the parallel to coincide with
-*        the galactic equator. Once the curve is drawn, the user will 
+*        the galactic equator. Once the curve is drawn, the user will
 *        be prompted for a new value for parameter LON. A null value
-*        should be given to exit the routine, and then a null value 
+*        should be given to exit the routine, and then a null value
 *        should also be given for the subsequent prompt for TYPE.
 
 *  Notes:
@@ -237,13 +237,13 @@
 *        o  If all else fails, the value of the IN parameter is
 *        cancelled, and the user is prompted for the NDF containing
 *        relevant astrometry information.
-*      
+*
 *     -  This routine can only be used to display curves for NDFs which
 *     contain astrometry information in the form used by the IRAS90
 *     package.
 *
 *     - The format of input and output text files is:
-*   
+*
 *        o The file is divided into comments and fields. Comments
 *        consist of strings commencing with a "#" character, and are
 *        considered to extend to the end of the line. Such comments are
@@ -290,7 +290,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -303,7 +303,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'AGI_PAR'          ! AGI_ constants
       INCLUDE 'AGI_ERR'          ! AGI_ error constants
-              
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -350,17 +350,17 @@
       INTEGER INFID              ! Input text file ID
       INTEGER IRA                ! ID for IRA system
       INTEGER LBNDI( 2 ),        ! Bounds of the picture in integer
-     :        UBNDI( 2 ) 
+     :        UBNDI( 2 )
       INTEGER LOPLEN             ! Length of loop option list
       INTEGER NGCRL              ! Number of great circle section drawn
       INTEGER NMERD              ! Number of Meridian sections drawn
       INTEGER NPARL              ! Number of Parallel sections drawn
       INTEGER NPOLY              ! Number of polylines drawn
       INTEGER NVTCE( MXNSCT )    ! Number of vertices of each polyline
-      INTEGER OUTFID             ! ID for output text file 
+      INTEGER OUTFID             ! ID for output text file
       INTEGER PEN                ! SGS pen number
-      INTEGER PICID1             ! ID for the original picture 
-      INTEGER PICID2             ! ID for the DATA picture 
+      INTEGER PICID1             ! ID for the original picture
+      INTEGER PICID2             ! ID for the DATA picture
       INTEGER TOL                ! Curve tolerance measurement
       INTEGER ZONE1              ! ID for original picture SGS zone.
       INTEGER ZONE2              ! ID for DATA picture SGS zone.
@@ -374,7 +374,7 @@
       LOGICAL OUTFIL             ! ID for output text file
 
       REAL  LBND( 2 ),           ! Bounds of the picture in pixels
-     :      UBND( 2 ) 
+     :      UBND( 2 )
 
 *.
 
@@ -384,7 +384,7 @@
 *  Get the level of message reporting and set the report filtering
 *  level accordingly.
       CALL MSG_IFGET( STATUS )
-            
+
 *  See if the user wants to loop round, performing multiple operations.
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
 
@@ -415,13 +415,13 @@
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_SETC( 'LAB', PICLAB )
          CALL MSG_OUTIF( MSG__NORM, 'SKYLINE_MSG1',
-     :                   '  DATA picture ^LAB ("^COM") being used', 
+     :                   '  DATA picture ^LAB ("^COM") being used',
      :                      STATUS )
       ELSE
          CALL MSG_SETC( 'COM', PICCOM )
          CALL MSG_OUTIF( MSG__NORM, 'SKYLINE_MSG2',
      :                   '  DATA picture "^COM" being used', STATUS )
-      END IF   
+      END IF
 
 *  Get the type of the graphic device.
       CALL IRM_GDTYP( 'SGS', GDTYPE, STATUS )
@@ -466,7 +466,7 @@
       LBND( 2 ) = REAL( LBNDI( 2 ) - 1 )
       UBND( 1 ) = REAL( UBNDI( 1 ) )
       UBND( 2 ) = REAL( UBNDI( 2 ) )
-      
+
 *  Get the sky coordinate system the user want to use, using the one
 *  in IRA structure as default.
       CALL IRA_SCSEP( IRA, SCS, EPOCH, STATUS )
@@ -485,11 +485,11 @@
          OPTMOD = 'KEYBOARD,FILE'
          MODE = 'KEYBOARD'
       END IF
-      
+
 *  Get the working mode.
       CALL PAR_CHOIC( 'MODE', DEFMOD, OPTMOD, .FALSE., MODE, STATUS )
       CALL PAR_CANCL( 'MODE', STATUS )
-           
+
 *  Initialise the number of curves has been drawn.
       NMERD = 0
       NPARL = 0
@@ -511,13 +511,13 @@
 
 *  Otherwise draw curves non-interactively.
       ELSE
-         CALL SLINA2( 'FILE', IRA, LBND, UBND,  
-     :                 MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, NPOLY, 
-     :                 NVTCE, MLON, MLAT, MSCTLN, PLON, PLAT, PSCTLN, 
-     :                 GLON, GLAT, GANG, GSCTLN, PLYLON, PLYLAT, 
+         CALL SLINA2( 'FILE', IRA, LBND, UBND,
+     :                 MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, NPOLY,
+     :                 NVTCE, MLON, MLAT, MSCTLN, PLON, PLAT, PSCTLN,
+     :                 GLON, GLAT, GANG, GSCTLN, PLYLON, PLYLAT,
      :                 STATUS )
       END IF
-      
+
 *  Set up the option list for the loop according to the type of the
 *  graphic device and the availability of cursor.
       OPTLOP = 'SAVE,PEN,CONTINUE,EXIT'
@@ -527,14 +527,14 @@
      :             CALL CHR_APPND( ',ERASE', OPTLOP, LOPLEN )
 
       LOPLEN = CHR_LEN( OPTLOP )
-      IF ( CURSOR ) CALL CHR_APPND( ',MODE', OPTLOP, LOPLEN ) 
+      IF ( CURSOR ) CALL CHR_APPND( ',MODE', OPTLOP, LOPLEN )
 
-*  Enter the loop until 'EXIT' is issued by the user or the number 
+*  Enter the loop until 'EXIT' is issued by the user or the number
 *  of all kinds of sections exceed the upper limit.
       EXIT = .NOT. LOOP
-      DO WHILE ( MIN( NMERD, NPARL, NGCRL, NPOLY ) .LE. MXNSCT .AND. 
+      DO WHILE ( MIN( NMERD, NPARL, NGCRL, NPOLY ) .LE. MXNSCT .AND.
      :          .NOT.EXIT .AND. STATUS .EQ. SAI__OK )
-      
+
 *  See what to do next.
          CALL PAR_CHOIC( 'OPTION', 'EXIT', OPTLOP, .FALSE., OPTION,
      :                   STATUS )
@@ -553,10 +553,10 @@
 
 *  Otherwise draw curves non-interactively.
             ELSE
-               CALL SLINA2( 'FILE', IRA, LBND, UBND,  
-     :                   MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, NPOLY, 
-     :                   NVTCE, MLON, MLAT, MSCTLN, PLON, PLAT, PSCTLN, 
-     :                   GLON, GLAT, GANG, GSCTLN, PLYLON, PLYLAT, 
+               CALL SLINA2( 'FILE', IRA, LBND, UBND,
+     :                   MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, NPOLY,
+     :                   NVTCE, MLON, MLAT, MSCTLN, PLON, PLAT, PSCTLN,
+     :                   GLON, GLAT, GANG, GSCTLN, PLYLON, PLYLAT,
      :                   STATUS )
 
             END IF
@@ -589,7 +589,7 @@
                   CALL AGI_ILAB( PICID2, PICLAB, STATUS )
                   CALL CHR_APPND( PICLAB, CMNT, IAT )
 
-                  CALL FIO_WRITE( OUTFID, CMNT( : MIN( 80, IAT ) ), 
+                  CALL FIO_WRITE( OUTFID, CMNT( : MIN( 80, IAT ) ),
      :                            STATUS )
                   CALL FIO_WRITE( OUTFID, ' ', STATUS )
 
@@ -600,7 +600,7 @@
                   CALL CHR_APPND( '  # Sky Coordinate System', CMNT,
      :                            IAT )
 
-                  CALL FIO_WRITE( OUTFID, CMNT( : MIN( 80, IAT ) ), 
+                  CALL FIO_WRITE( OUTFID, CMNT( : MIN( 80, IAT ) ),
      :                            STATUS )
                   CALL FIO_WRITE( OUTFID, ' ', STATUS )
 
@@ -609,7 +609,7 @@
      :                         NPARL, NGCRL, NPOLY, NVTCE, MLON, MLAT,
      :                         MSCTLN, PLON, PLAT, PSCTLN, GLON, GLAT,
      :                         GANG, GSCTLN, PLYLON, PLYLAT, STATUS )
-             
+
 *  Cancel the value associated with the parameter for the later use
                   CALL FIO_CANCL( 'LOGFILE', STATUS )
                END IF
@@ -627,12 +627,12 @@
 
 *  and there are something have been drawn, see what to erase.
             IF ( MAX( NMERD, NPARL, NGCRL, NPOLY ) .GT. 0 ) THEN
-               CALL SLINA4( 'ERASE', IRA, SCS, LBND, UBND, 
-     :                       MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, 
-     :                       NPOLY, NVTCE, MLON, MLAT, MSCTLN, PLON, 
-     :                       PLAT, PSCTLN, GLON, GLAT, GANG, GSCTLN, 
+               CALL SLINA4( 'ERASE', IRA, SCS, LBND, UBND,
+     :                       MXNSCT, MXVTCE, NMERD, NPARL, NGCRL,
+     :                       NPOLY, NVTCE, MLON, MLAT, MSCTLN, PLON,
+     :                       PLAT, PSCTLN, GLON, GLAT, GANG, GSCTLN,
      :                       PLYLON, PLYLAT, STATUS )
-      
+
 *  If nothing has been drawn, report the user.
             ELSE
                CALL MSG_OUTIF( MSG__NORM, 'SKYLINE_MSG4',
@@ -646,10 +646,10 @@
             CALL PAR_GET0I( 'PEN', PEN, STATUS )
             CALL IRA_DROPT( 'PEN2', DBLE( PEN ), STATUS )
             CALL PAR_CANCL( 'PEN', STATUS )
-      
+
 *  If exit is required, set the exit flag.
          ELSE IF ( OPTION( : 4 ) .EQ. 'EXIT' ) THEN
-            EXIT = .TRUE.  
+            EXIT = .TRUE.
          END IF
 
 *  Cancel the value of parameter OPTION to get the next action.
@@ -665,7 +665,7 @@
 
       CALL IRA_ANNUL( IRA, STATUS )
       CALL IRA_CLOSE( STATUS )
-      
+
 *  Set the current picture on entry as current and Close down the AGI
 *  and SGS.
       CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
@@ -681,5 +681,5 @@
      :               'SKYLINE: Error drawing curves in sky coordinates',
      :                 STATUS )
       END IF
-      
+
       END

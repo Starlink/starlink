@@ -12,7 +12,7 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
  *+
  *  Name:
  *    fopen
- 
+
  *  Purpose:
  *    Provides access to the C "fopen" function from fortran
 
@@ -39,12 +39,12 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +59,7 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
  *        Add prolog.
 
  *-
- */   
+ */
       GENPTR_CHARACTER(name)
       GENPTR_CHARACTER(access)
 
@@ -86,7 +86,7 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
          c_access = (char *) malloc( sizeof( char )*( access_length + 1 ) );
          if( c_access ){
             cnf_imprt( access, access_length, c_access );
- 
+
 
 /*  Call fopen to open the file */
 
@@ -96,14 +96,14 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
 /*  Free the storage used to hold the copy of the ACCESS argument. */
 
             free( c_access );
- 
+
          }
- 
+
 
 /*  Free the storage used to hold the copy of the NAME argument. */
 
          free( c_name );
- 
+
       }
 
 
@@ -113,12 +113,12 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
       if( fd ) {
          return( 1 );
 
-      } else { 
+      } else {
          return( 0 );
 
       }
 
-} 
+}
 
 
 
@@ -128,7 +128,7 @@ F77_INTEGER_FUNCTION(fclose)( void  ){
  *+
  *  Name:
  *    fclose
- 
+
  *  Purpose:
  *    Provides access to the C "fclose" function from fortran
 
@@ -140,7 +140,7 @@ F77_INTEGER_FUNCTION(fclose)( void  ){
  *       Status: 0 = failure, 1 = success
 
  *-
- */   
+ */
 
       if( fclose( fd ) ){
          return( 0 );
@@ -150,14 +150,14 @@ F77_INTEGER_FUNCTION(fclose)( void  ){
 
       }
 
-} 
+}
 
 F77_INTEGER_FUNCTION(fwriter)( REAL(data), INTEGER(n) ){
 /*
  *+
  *  Name:
  *    fwriter
- 
+
  *  Purpose:
  *    Provides access to the C "fwrite" function from fortran
  *    for REAL data
@@ -176,7 +176,7 @@ F77_INTEGER_FUNCTION(fwriter)( REAL(data), INTEGER(n) ){
  *        Status: 0 = failure, 1 = success
 
  *-
- */   
+ */
       GENPTR_REAL(data)
       GENPTR_INTEGER(n)
 
@@ -197,7 +197,7 @@ F77_INTEGER_FUNCTION(fwrited)( DOUBLE(data), INTEGER(n) ){
  *+
  *  Name:
  *    fwrited
- 
+
  *  Purpose:
  *    Provides access to the C "fwrite" function from fortran
  *    for DOUBLE data
@@ -216,7 +216,7 @@ F77_INTEGER_FUNCTION(fwrited)( DOUBLE(data), INTEGER(n) ){
  *        Status: 0 = failure, 1 = success
 
  *-
- */   
+ */
       GENPTR_DOUBLE(data)
       GENPTR_INTEGER(n)
 
@@ -237,7 +237,7 @@ F77_INTEGER_FUNCTION(fwritei)( INTEGER(data), INTEGER(n) ){
  *+
  *  Name:
  *    fwritei
- 
+
  *  Purpose:
  *    Provides access to the C "fwrite" function from fortran
  *    for INTEGER data
@@ -256,7 +256,7 @@ F77_INTEGER_FUNCTION(fwritei)( INTEGER(data), INTEGER(n) ){
  *        Status: 0 = failure, 1 = success
 
  *-
- */   
+ */
       GENPTR_INTEGER(data)
       GENPTR_INTEGER(n)
 
@@ -275,12 +275,12 @@ F77_INTEGER_FUNCTION(fwritec)( CHARACTER(data) TRAIL(data) ){
  *+
  *  Name:
  *    fwritec
- 
+
  *  Purpose:
  *    Provides access to the C "fwrite" function from fortran
  *    for CHARACTER data
 
- *  Notes: 
+ *  Notes:
  *    This routine forces the length of any string printed to be a multiple of 4.
 
  *  Invocation:
@@ -295,7 +295,7 @@ F77_INTEGER_FUNCTION(fwritec)( CHARACTER(data) TRAIL(data) ){
  *        Status: 0 = failure, 1 = success
 
  *-
- */   
+ */
       GENPTR_CHARACTER(data)
 
       unsigned int n=0;
@@ -323,7 +323,7 @@ F77_INTEGER_FUNCTION(fwritec)( CHARACTER(data) TRAIL(data) ){
 
 /*     Write out the appropriate C string terminator */
          switch (n)
-           {        
+           {
            case (1):
              fprintf( fd, "\n");
              break;

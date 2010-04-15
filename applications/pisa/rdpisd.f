@@ -3,7 +3,7 @@
      :                   A8, STATUS )
 *+
 *  Name:
-*     RDPIFD - READ PISA SIZE DATA 
+*     RDPIFD - READ PISA SIZE DATA
 
 *  Purpose:
 *     To read in a line of data from a PISASIZE type file, returning the
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -54,7 +54,7 @@
       INCLUDE 'FIO_ERR'          ! FIO system error codes
 
 *  Arguments Given:
-      INTEGER LI            
+      INTEGER LI
       CHARACTER*(*) BUF
 
 *  Arguments Returned:

@@ -23,7 +23,7 @@
 *     PCONRQ = CHARACTER * ( * ) (Given)
 *        Parameter CONFIRMREQ
 *     PDISFI = CHARACTER * ( * ) (Given)
-*        Parameter DISPLAYORFILE 
+*        Parameter DISPLAYORFILE
 *     PILEVE = CHARACTER * ( * ) (Given)
 *        Parameter MSG_FILTER
 *     PMAXLN = CHARACTER * ( * ) (Given)
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
 
 *  Get the interaction level
       CALL PAR_GET0I( PILEVE, ILEVEL, STATUS )
-      
+
 *  Set the page length according to the value of ILEVEL
       IF ( ILEVEL .GT. 2 ) THEN
 
@@ -123,7 +123,7 @@
 
 *  Menus will NOT be displayed therefore page is long
          MAXLEN = 15
-      
+
       END IF
 
 *  Initialise the IRAS Astrometry routines IRA

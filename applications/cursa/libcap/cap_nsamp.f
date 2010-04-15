@@ -123,7 +123,7 @@ C      INCLUDE 'SGZ_CMN'           ! StarGaze common block.
 *
 *          Create the list of row numbers to be selected.
 
-            CALL CAP_CRNSP (FREQ, NUMSEL, %VAL(CNF_PVAL(LSTPTR)), 
+            CALL CAP_CRNSP (FREQ, NUMSEL, %VAL(CNF_PVAL(LSTPTR)),
      :                      STATUS)
 
 *
@@ -148,7 +148,7 @@ C      INCLUDE 'SGZ_CMN'           ! StarGaze common block.
 *
 *          Create the selection.
 
-            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(LSTPTR)), CRIT, 
+            CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(LSTPTR)), CRIT,
      :        REJCAT, CI, SI, SIR, NUMREJ, STATUS)
 
 *

@@ -15,7 +15,7 @@ C     PIXELS (Numeric) The number of pixels by which the data is to be
 C            rotated.  A positive number indicates a shift towards
 C            higher pixel numbers.
 C
-C     OUTPUT (Character) The name of the result of the operation.  This 
+C     OUTPUT (Character) The name of the result of the operation.  This
 C            can be the same as for IMAGE.  If not, a new structure
 C            is created, with everything but the data a direct
 C            copy of the input.

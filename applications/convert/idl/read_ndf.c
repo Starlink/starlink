@@ -191,7 +191,7 @@ int oplen;              /* Length of error message */
          **  Fortran to C pointer conversion failed
          */
             status = SAI__ERROR;
-            errRep( " ", 
+            errRep( " ",
               "read_ndf: Fortran to C pointer conversion failed", &status );
 
          } else {
@@ -253,9 +253,9 @@ int oplen;              /* Length of error message */
 */
    fstat = status;
    while ( status != SAI__OK ) {
-      errLoad( 
+      errLoad(
          param, ERR__SZPAR, &parlen, opstr, ERR__SZMSG, &oplen, &status );
-      if ( status != SAI__OK ) 
+      if ( status != SAI__OK )
          printf( "%s %s\r\n", errn++?"! ":"!!", opstr );
    }
    errRlse();
@@ -309,7 +309,7 @@ double *pds, *pdd;
    case 1: /* Byte */
       pbs = (char *)source;
       pbd = (char *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pbs, &val__badub, sizeof(val__badub) ) )
             *pbd++ = *pbs++;
          else {
@@ -320,7 +320,7 @@ double *pds, *pdd;
    case 2: /* Short int */
       pss = (short int *)source;
       psd = (short int *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pss, &val__badw, sizeof(val__badw) ) )
             *psd++ = *pss++;
          else {
@@ -331,7 +331,7 @@ double *pds, *pdd;
    case 3: /* Integer */
       pis = (int *)source;
       pid = (int *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pis, &val__badi, sizeof(val__badi) ) )
             *pid++ = *pis++;
          else {
@@ -342,7 +342,7 @@ double *pds, *pdd;
    case 4: /* Float */
       pfs = (float *)source;
       pfd = (float *)dest;
-      while (npix--) 
+      while (npix--)
          if ( memcmp( pfs, &val__badr, sizeof(val__badr) ) )
             *pfd++ = *pfs++;
          else {

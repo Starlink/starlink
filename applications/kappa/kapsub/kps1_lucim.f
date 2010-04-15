@@ -45,7 +45,7 @@
 *     FILE_3( N ) = REAL (Given)
 *        The Fourier transform of the PSF (NOT the transposed PSF).
 *     FILE_4( N ) = REAL (Given)
-*        The observed data. 
+*        The observed data.
 *     FILE_8( N ) = REAL (Given)
 *        The data variances.
 *     FILE_1( N ) = REAL (Given and Returned)
@@ -54,7 +54,7 @@
 *        Supplied holding simulated data created from the supplied
 *        image in file 1.  Returned holding internal workings.
 *     FILE_2( N ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     FILE_5( N ) = REAL (Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -101,7 +101,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       INTEGER N
       INTEGER NPIX
@@ -111,7 +111,7 @@
       REAL FILE_3( N )
       REAL FILE_4( N )
       REAL FILE_8( N )
-      
+
 *  Arguments Given and Returned:
       REAL FILE_1( N )
       REAL FILE_7( N )
@@ -128,7 +128,7 @@
       INTEGER I                  ! Element count
       REAL S                     ! Simulated data value
       REAL V                     ! Variance value
-      
+
 *.
 
 *  Check the inherited global status.
@@ -138,15 +138,15 @@
 *  the real data value to the simulated data value).  The correction
 *  factors are stored in file 2.  Do it first using the Snyder
 *  modification in which the variance is added to both numerator and
-*  denominator. 
+*  denominator.
       IF ( SNYDER ) THEN
 
          DO I = 1, N
 
-            S = FILE_7( I ) 
-            D = FILE_4( I ) 
-            V = FILE_8( I ) 
-            
+            S = FILE_7( I )
+            D = FILE_4( I )
+            V = FILE_8( I )
+
             IF ( S .NE. VAL__BADR .AND. D .NE. VAL__BADR .AND.
      :          V .NE. VAL__BADR ) THEN
                FILE_2 ( I ) = ( D + V ) / ( S + V )
@@ -163,9 +163,9 @@
 
          DO I = 1, N
 
-            S = FILE_7( I ) 
-            D = FILE_4( I ) 
-            
+            S = FILE_7( I )
+            D = FILE_4( I )
+
             IF ( S .NE. VAL__BADR .AND. D .NE. VAL__BADR .AND.
      :          S .NE. 0.0 ) THEN
                FILE_2 ( I ) = D / S
@@ -178,7 +178,7 @@
          END DO
 
       END IF
-         
+
 *  Convolve the data correction factors with the transposed PSF.  Store
 *  the results back in internal file <2>.  This is an image of the mean
 *  correction factor at each image pixel.
@@ -187,9 +187,9 @@
 
 *  Multiply the current reconstruction by the mean correction factors
 *  to get the next estimate of the reconstructed image.
-      DO I = 1, N      
+      DO I = 1, N
 
-         IF ( FILE_1( I ) .NE. VAL__BADR .AND. 
+         IF ( FILE_1( I ) .NE. VAL__BADR .AND.
      :        FILE_2( I ) .NE. VAL__BADR ) THEN
 
             FILE_1( I ) = FILE_1( I ) * FILE_2( I )
@@ -201,5 +201,5 @@
          ENDIF
 
       END DO
-         
+
       END

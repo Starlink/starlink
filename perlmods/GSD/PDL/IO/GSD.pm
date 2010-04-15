@@ -13,7 +13,7 @@ PDL::IO::GSD - PDL module for reading JCMT GSD format files
 =head1 DESCRIPTION
 
 This module adds the ability to read James Clerk Maxwell telescope GSD
-format files into PDL. 
+format files into PDL.
 
 =cut
 
@@ -60,7 +60,7 @@ sub rgsd { PDL->rgsd(@_) }
 sub PDL::rgsd ($$) {  # Read an GSD format file into a PDL
 
   my $class = shift;
-  my $file = shift; 
+  my $file = shift;
 
   # Try to load the GSD::PDL library
   eval 'use GSD::PDL' unless $gsd_loaded++;

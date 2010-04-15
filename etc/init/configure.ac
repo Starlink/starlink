@@ -7,7 +7,7 @@ AC_PREREQ(2.50)
 dnl    Under OS X LD_LIBRARY_PATH is DYLD_LIBRARY_PATH.
 AC_CANONICAL_TARGET
 case "$target_os" in
-   *darwin*) 
+   *darwin*)
       AC_SUBST([LD_LIB_PATH],[DYLD_LIBRARY_PATH])
    ;;
    *)

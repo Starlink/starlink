@@ -4,13 +4,13 @@
      :                      INDO1, INDO2, STATUS )
 *+
 *  Name:
-*     CCD1_STAO             
+*     CCD1_STAO
 
 *  Purpose:
 *     Matches positions which are consistent with a simple offset.
 
 *  Language:
-*     Starlink Fortran 77   
+*     Starlink Fortran 77
 
 *  Invocation:
 *      CALL CCD1_STAO( ERROR, MAXDIS, XIN1, YIN1, INDI1, NREC1, XIN2,
@@ -119,10 +119,10 @@
 *        problem when still converging (the output offsets were not the
 *        ones used to select the positions).
 *     8-FEB-1999 (MBT):
-*        Modified to accept input index arrays rather than assuming 
+*        Modified to accept input index arrays rather than assuming
 *        input lists are stored in rank order.
 *     30-MAR-1999 (MBT):
-*        Modified to reject matches at greater displacements than 
+*        Modified to reject matches at greater displacements than
 *        MAXDIS.
 *     {enter_further_changes_here}
 
@@ -130,7 +130,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -174,7 +174,7 @@
       DOUBLE PRECISION YDMIN     ! Minimum Y difference
       INTEGER XBIN               ! Number bins required for X histogram
       INTEGER YBIN               ! Number bins required for Y histogram
-      INTEGER NBIN               ! Dummy 
+      INTEGER NBIN               ! Dummy
       INTEGER IPHIST             ! Pointer to histogram workspace
       INTEGER MODE               ! Number of bin in which histogram peaks
       DOUBLE PRECISION WIDTH     ! Width of histogram bin
@@ -203,7 +203,7 @@
       CALL CCD1_MALL( XBIN, '_INTEGER', IPHIST, STATUS )
       NBIN = XBIN
       CALL CCG1_MKHID( DIST, NREC1 * NREC2, .FALSE., 1, NBIN,
-     :                 %VAL( CNF_PVAL( IPHIST ) ), 
+     :                 %VAL( CNF_PVAL( IPHIST ) ),
      :                 MODE, XBIN, ZERO, WIDTH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -211,7 +211,7 @@
       XOFF = DBLE( MODE - 1 ) * WIDTH + ZERO
       CALL CCD1_MFREE( IPHIST, STATUS )
 
-*  Now do the same for the Y distances. 
+*  Now do the same for the Y distances.
       CALL CCD1_ALDIF( YIN1, NREC1, YIN2, NREC2, DIST, YDMAX, YDMIN,
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -223,7 +223,7 @@
 
 *  Produce histogram
       CALL CCG1_MKHID( DIST, NREC1 * NREC2, .FALSE., 1, NBIN,
-     :                 %VAL( CNF_PVAL( IPHIST ) ), 
+     :                 %VAL( CNF_PVAL( IPHIST ) ),
      :                 MODE, YBIN, ZERO, WIDTH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -245,7 +245,7 @@
          CALL CCD1_MXYO( XIN1, YIN1, INDI1, NREC1, XIN2, YIN2, INDI2,
      :                   NREC2, XOFF, YOFF, ERROR, XOUT1, YOUT1,
      :                   XOUT2, YOUT2, NOUT, INDO1, INDO2, STATUS )
-         IF ( NOUT .GT. 0 ) THEN 
+         IF ( NOUT .GT. 0 ) THEN
 
 *  Check for convergence, or last iteration.
             IF ( NOUT .EQ. NLAST .OR. NITER .EQ. 5 ) THEN
@@ -265,19 +265,19 @@
                CALL CCG1_MDIFD( .FALSE., YOUT1, YOUT2, NOUT, YOFF,
      :                          STATUS )
             END IF
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
+         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'CCD1_STAO1_ERR',
      :      '  Failed to match any positions ', STATUS )
          END IF
          GO TO 11
-      END IF     
+      END IF
 
 *  Check that we are within the range of acceptable displacements.
-      IF ( ( MAXDIS .NE. 0D0 ) .AND. 
+      IF ( ( MAXDIS .NE. 0D0 ) .AND.
      :     ( XOFF ** 2 + YOFF ** 2 .GT. MAXDIS ** 2 ) ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCD1_STAO1_MAXDISP', 
+         CALL ERR_REP( 'CCD1_STAO1_MAXDISP',
      :   '  Displacements too large for histogram mode', STATUS )
       END IF
 

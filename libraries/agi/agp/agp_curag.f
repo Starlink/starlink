@@ -13,7 +13,7 @@
 *  Description:
 *     This routine returns the AGI workstation name for the currently
 *     opened PGPLOT device, or a blank string if PGPLOT is not currently
-*     open. 
+*     open.
 *
 *  Arguments:
 *     AGINAM = CHARACTER*(*) (Returned)
@@ -29,12 +29,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
       CALL PGQINF( 'STATE', STRING, LENSTR )
       IF ( STRING( :LENSTR ) .NE. 'CLOSED' ) THEN
 
-*  If so, return the AGI workstation name stored in common by the 
+*  If so, return the AGI workstation name stored in common by the
 *  previous call to AGP1_PGBEG.
          AGINAM = AGP_CRAWN
 

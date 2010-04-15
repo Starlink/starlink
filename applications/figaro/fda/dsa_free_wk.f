@@ -14,9 +14,9 @@
 
 *  Description:
 *     When work space is obtained through a call to DSA_GET_WORKSPACE,
-*     or through a call to DSA_GET_WORK_ARRAY, a handle value (MSLOT) 
-*     is returned to identify the work space obtained. The work space 
-*     can be released through a call to DSA_FREE_WORKSPACE, specifying 
+*     or through a call to DSA_GET_WORK_ARRAY, a handle value (MSLOT)
+*     is returned to identify the work space obtained. The work space
+*     can be released through a call to DSA_FREE_WORKSPACE, specifying
 *     that slot number.
 
 *  Arguments:
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,7 +112,7 @@
 
 
       SUBROUTINE DSA1_FREWKS( MSLOT, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

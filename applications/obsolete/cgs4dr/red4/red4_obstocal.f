@@ -3,7 +3,7 @@
 *    Description :
 *     This routine converts an observation file name of the form
 *     Oyymmdd_oooo or ODIR:ROyymmdd_oooo into a calibration file name
-*     of the form CGS4_SEARCH:CAyymmdd_oooo. 
+*     of the form CGS4_SEARCH:CAyymmdd_oooo.
 *    Invocation :
 *     CALL RED4_OBSTOCAL( OBS_FILE, CAL_FILE, STATUS )
 *    Parameters :

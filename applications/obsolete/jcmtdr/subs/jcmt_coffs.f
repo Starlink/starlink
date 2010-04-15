@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_CALC_OFFSETS (NPIX, RA, DEC, RACEN, DECCEN, 
+      SUBROUTINE JCMT_CALC_OFFSETS (NPIX, RA, DEC, RACEN, DECCEN,
      :   RA_OFF, DEC_OFF, STATUS)
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_CALC_OFFSETS (NPIX, RA, DEC, RACEN, DECCEN, 
+*     CALL JCMT_CALC_OFFSETS (NPIX, RA, DEC, RACEN, DECCEN,
 *    :   RA_OFF, DEC_OFF, STATUS)
 
 *  Description:
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -76,7 +76,7 @@
       INTEGER I
       INTEGER SLA_STATUS
       DOUBLE PRECISION XI, ETA
-      
+
 *  Local data:
 *.
 
@@ -103,7 +103,7 @@
                CALL PAR_WRUSER ('  antistar on tangent plane', IGNORE)
             END IF
          END IF
-         
+
 *  convert offsets to arcsec
 
          RA_OFF (I) = XI / DAS2R

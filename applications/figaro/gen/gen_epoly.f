@@ -10,8 +10,8 @@ C     Parameters - (">" input, "<" output)
 C
 C     (>) VALUE   (Real) The value for which the polynomial is to
 C                 be evaluated.
-C     (>) COEFFS  (Real array COEFFS(NCOEFF) The 
-C                 coefficients of the polynomial, with the 
+C     (>) COEFFS  (Real array COEFFS(NCOEFF) The
+C                 coefficients of the polynomial, with the
 C                 constant term last.
 C     (>) NCOEFF  (Integer) The number of polynomial coefficients.
 C

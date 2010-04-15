@@ -1,6 +1,6 @@
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C   This is STARFLIB_ADAM.F
-C    
+C
 C  This contains the subroutines which the programmer uses to
 C  access ADAM specific cpabilities:-
 C
@@ -24,7 +24,7 @@ C             to a NDF and parameter
 C OPIMGR      Open an input 2d read-only generic image
 C OPIMGW      Open an output 2d write-only generic image
 C OPIM4G(RW)  Open an in/output 4d read-only/write-only generic image
-C OPTAB(RW)   Open an input read-only/output write-only  table 
+C OPTAB(RW)   Open an input read-only/output write-only  table
 C
 C   Work space:
 C
@@ -46,7 +46,7 @@ C
 C   Misc:
 C
 C AJRAN         Random number generator
-C AJSEED        Set seed for Random number generator 
+C AJSEED        Set seed for Random number generator
 C AJDATE        Return a string with date and time
 C CHARTO(ILR)   Convert character string to (integer:logical:real)
 C FILEBEG       Start up file access system (ndf space common block)
@@ -62,7 +62,7 @@ C**********************************
 C Subroutines in alpbetical order:-
 C
 C AJRAN       Random number generator
-C AJSEED      Set seed for Random number generator 
+C AJSEED      Set seed for Random number generator
 C AJDATE      Return a string with date and time
 C CANPAR      Cancel parameter name connection - actually cancel associtation
 C             to a NDF and parameter
@@ -87,7 +87,7 @@ C ISVMS       Is the computer running VMS?
 C OPIMGR      Open an input 2d read-only generic image
 C OPIMGW      Open an output 2d write-only generic image
 C OPIM4G(RW)  Open an in/output 4d read-only/write-only generic image
-C OPTAB(RW)   Open an input read-only/output write-only  table 
+C OPTAB(RW)   Open an input read-only/output write-only  table
 C PRINTO      Write a line out to the CL
 C PTDESCN     Write character strings into the header area of an opened file
 C PTDES(CIR)  Write a character string/integer/real into the header area of an opened file
@@ -125,7 +125,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AJSEED -- Set seed for Random number generator 
+C AJSEED -- Set seed for Random number generator
 C
 C   a j penny                    ral                 1991 Nov
 
@@ -175,7 +175,7 @@ Cbegin
 
       call psx_time ( nticks, status )
       call psx_ctime ( nticks, date_time, status )
- 
+
 
       end
 
@@ -204,7 +204,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( text.eq.' ' ) then
-      
+
          do n = 1, NDF_LIMIT                				!Cancel all current files
             istat = SAI__OK
             if ( NDF_NAME(n).ne.'-' ) then
@@ -341,7 +341,7 @@ Cbegin
       ierr = SAI__OK
       call chr_ctor ( ch, rv, ierr )
 
-  
+
       istat = 0
       if ( ierr.ne.SAI__OK ) istat = 1
 
@@ -355,13 +355,13 @@ C
 C    a j penny                 ral                  1990-07-09
 
       subroutine icopdes ( ifile, ofile, istat )
- 
+
       implicit none
       include 'DAT_PAR'
       include 'NDF_PAR'
       include 'SAE_PAR'
       include 'STARMAN_INC'
- 
+
       character*(*)     ifile           !i: Parameter name for input file
       character*(*)     ofile           !i: Parameter name for output file
       integer           istat           !o: Error flag (0=ok;1=bad)
@@ -371,13 +371,13 @@ C--
       character*(DAT__SZLOC) iloc,oloc,cloc, oloc2
       logical there, outth
 Cbegin
- 
- 
+
+
       if ( ST_FAILED ) return
- 
+
       istat = 0
       istata = SAI__OK
- 
+
       call ndf_exist ( ifile, 'READ', indf, istata )
       if ( indf.eq.NDF__NOID ) then
          istat = 1
@@ -389,23 +389,23 @@ Cbegin
          istat = 1
          return
       endif
- 
+
       call ndf_xstat ( indf, 'FITS', there, istata )    		!Check there is input FITS
       if ( there ) then
          call ndf_loc ( ondf, 'UPDATE', oloc, istata )
          call dat_find (oloc,'MORE',oloc2,istata)
- 
+
          call ndf_xstat ( ondf, 'FITS', outth, istata )  		!See if FITS there already
          if ( outth ) call dat_erase ( oloc2, 'FITS', istata ) 		!If it is delete it
- 
+
          call ndf_xloc ( indf, 'FITS', 'READ', iloc, istata ) 		!Get locator to input fits
          call dat_copy ( iloc, oloc2, 'FITS', istata )  		! Copy over
          call dat_annul ( oloc2, istata )
          call dat_annul ( oloc, istata )
          call dat_annul ( iloc, istata )
       endif
- 
-      call ndf_xstat ( indf, 'STARMAN', there, istata )			!Check input image 
+
+      call ndf_xstat ( indf, 'STARMAN', there, istata )			!Check input image
       if ( .not.there ) then						! has STARMAN extension - if not exit
          call printo ( 'No STARMAN extension in INPUT image' )
          call ndf_annul ( indf, istata )
@@ -413,21 +413,21 @@ Cbegin
          istat = 1
          return
       endif
- 
-      call ndf_xstat ( ondf, 'STARMAN', there, istata )			!See if output extension has 
+
+      call ndf_xstat ( ondf, 'STARMAN', there, istata )			!See if output extension has
       if ( .not.there ) then						! STARMAN EXT, if not create
          call ndf_xnew ( ondf, 'STARMAN', 'EXT', 0, 0, oloc, istata )
       else
          call ndf_xloc ( ondf, 'STARMAN', 'WRITE', oloc, istata )	!Write access means previous info deleted
       endif
- 
+
       call ndf_cget ( indf, 'TITLE', title, istata )                    !Copy in new label and title
-      call ndf_cget ( indf, 'LABEL', label, istata )                     
-      call ndf_cput ( title, ondf, 'TITLE', istata )                    
+      call ndf_cget ( indf, 'LABEL', label, istata )
+      call ndf_cput ( title, ondf, 'TITLE', istata )
       call ndf_cput ( label, ondf, 'LABEL', istata )
- 
+
       call ndf_xloc ( indf, 'STARMAN', 'READ', iloc, istata )           !Find locators to extensions
- 
+
       call dat_ncomp ( iloc, ncomp, istata )
       if ( ncomp.ge.2 ) then
          do i = 2, ncomp                                                !Copy extension
@@ -441,7 +441,7 @@ Cbegin
       call dat_annul ( oloc, istata )
       call ndf_annul ( indf, istata )
       call ndf_annul ( ondf, istata )
- 
+
       if ( istata.ne.SAI__OK ) then
          call printo ( ' ERROR: Error in copying descriptors from'//
      +                        ' one image to another.' )
@@ -505,7 +505,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       istata = SAI__OK
-      
+
       istat = 1
       call ndf_exist ( name, 'UPDATE', ndf, istata )
       if (ndf.eq.NDF__NOID) return
@@ -572,11 +572,11 @@ C--
       character*(DAT__SZLOC) nloc
       integer status
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
-   
+
       flag = .true.
 
       status = SAI__OK
@@ -590,10 +590,10 @@ Cbegin
       endif
       call err_rlse
 
-    
+
       end
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C FILE_PAR -- Writes the name of an HDS file to a parameter
 C
@@ -617,7 +617,7 @@ C  alan penny                  ral  1994 March
       include 'STARMAN_INC'
 
       character*(*) filename		!i: The name of the file
-      character*(*) parname		!i: Parameter name associated with 
+      character*(*) parname		!i: Parameter name associated with
 					!   the data object whose name is to be written
       integer       istat		!o: Error flag (0=ok; 1=bad)
 C--
@@ -651,7 +651,7 @@ C  Patrick Morris          leeds          1991 Dec
       include 'ST_ADAM_INC'
       include 'STARMAN_INC'
 
-      integer	n		!o : Available space, -1 no space 
+      integer	n		!o : Available space, -1 no space
 C--
       logical found
 Cbegin
@@ -670,14 +670,14 @@ Cbegin
           n = n + 1
           if ( n.gt.WORK_LIMIT ) then
              n = -1
-             found = .true. 
+             found = .true.
           else
              found = ( WS_NAME(n).eq.'-' )
           endif
       enddo
 
 
-      end 
+      end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -773,7 +773,7 @@ C--
       character text*50, atext*70
       character*500 intext
       integer istat, nvals, nloop, nmax, k
-      integer ks(1000),ke(1000) 
+      integer ks(1000),ke(1000)
       logical loop
 Cbegin
 
@@ -855,7 +855,7 @@ C--
       logical loop, isok
       integer nvals, istat, nloop, nmax, k, iv(5), iva
       character text*50, atext*70
-Cbegin      
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -960,7 +960,7 @@ C--
       integer nvals, istat, nloop, nmax, k
       character text*50, atext*70
       logical iv(5)
-Cbegin      
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -1044,7 +1044,7 @@ C--
       integer nvals, istat, nloop, nmax, k
       real rv(5), rva
       character  text*50, atext*70
-Cbegin      
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -1173,7 +1173,7 @@ Cbegin
       if ( ndf.eq.NDF__NOID ) return
       call ndf_xstat ( ndf, ext, there, istata )
       if ( there ) then
-         if ( ( dscr.eq.'TITLE' ) .or. ( dscr.eq.'LABEL') .or. 
+         if ( ( dscr.eq.'TITLE' ) .or. ( dscr.eq.'LABEL') .or.
      + 			( dscr.eq.'UNITS' ) ) then
 	    call ndf_cget ( ndf, dscr, cv, istata )
          else
@@ -1199,7 +1199,7 @@ Cbegin
 
 
       end
-                         
+
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -1338,7 +1338,7 @@ C  a j penny                     dao          1988-04-19
 
       character*(*)	file		!i: Parameter name for file
       integer		numd		!i: Number of descriptor
-      character*(*)	ext		!i: Name of extension 
+      character*(*)	ext		!i: Name of extension
       character*(*)	name		!o: Name of descriptor
       integer		istat		!o: 0 => ok;1 = failure
 C--
@@ -1476,7 +1476,7 @@ C--
       integer ierra, ierrb, ierrc, ierrd, num, iv
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       iv = INT_INVALI
@@ -1511,7 +1511,7 @@ C--
       integer ierra, ierrb, ierrc, ierrd, num
       real rv
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
@@ -1546,7 +1546,7 @@ C  alan penny              ral          1990 Jan
 C--
       integer ierra, ierrb, ierrc, ierrd, num, iv
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
@@ -1560,7 +1560,7 @@ Cbegin
 
       end
 
-              
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GTWRKG -- Open integer*2/integer*4/real*4 computer work space
 C
@@ -1568,7 +1568,7 @@ C  alan penny              ral          1990 Jan
 
       subroutine gtwrkg ( text, n, format, ip, ierr )
 
-      implicit none 
+      implicit none
       include 'SAE_PAR'
       include 'PSX_ERR'
       include 'ST_ADAM_INC'
@@ -1611,7 +1611,7 @@ Cbegin
       endif
 
       istat = SAI__OK
-       
+
       if ( ilen.gt.WS_NSIZE ) then
           call msg_setc( 'WST', text(1:ilen) )
           call printo ( ' ERROR: Programmer error in name size'//
@@ -1644,7 +1644,7 @@ Cbegin
              call psx_calloc ( n, iform, ip, istat )
          else
              call psx_malloc ( n*2, ip, istat )
-         endif 
+         endif
       endif
 
       if ( istat.ne.SAI__OK ) then
@@ -1658,7 +1658,7 @@ Cbegin
       else
           WS_NAME(next) = text(1:ilen)
           CPNTR(next) = ip
-          WS_COUNTER = WS_COUNTER + 1 
+          WS_COUNTER = WS_COUNTER + 1
       endif
 
 
@@ -1681,18 +1681,18 @@ C--
       character*132 sysname, nodename, release, version, machine, cv
       integer status
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
       status = SAI__OK
-      call psx_uname ( sysname, nodename, release, version, machine, 
+      call psx_uname ( sysname, nodename, release, version, machine,
      +                 status )
       call lowcase ( sysname, cv )
       flag = .false.
       if ( index(cv,'osf1').ne.0 ) flag = .true.
 
- 
+
       end
 
 
@@ -1707,29 +1707,29 @@ C   alan penny               ral         1990 Jan
       include 'SAE_PAR'
       include 'STARMAN_INC'
 
-      logical   flag		!o: .true. if is VMS; .false. if not 
+      logical   flag		!o: .true. if is VMS; .false. if not
 C--
       character*132 sysname, nodename, release, version, machine
       integer status
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
       status = SAI__OK
-      call psx_uname ( sysname, nodename, release, version, machine, 
+      call psx_uname ( sysname, nodename, release, version, machine,
      +                 status )
       flag = .false.
       if ( index(sysname,'VMS').ne.0 ) flag = .true.
       if ( index(sysname,'vms').ne.0 ) flag = .true.
 
- 
+
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMGR -- Open an input 2d read-only generic image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -1801,7 +1801,7 @@ Cbegin
             endif
             call err_load ( text, n, textc, i, istat )
          else
-            ierr = 1 
+            ierr = 1
             call printo ( ' ERROR: Cant open file because - ' )
             if ( istat.eq.NDF__ACDEN ) then
                call printo ( '   Image could not be accessed' )
@@ -1818,16 +1818,16 @@ Cbegin
             elseif ( istat.eq.NDF__DIMIN ) then
                call printo ( '   Image dimensions invalid' )
                call pargi ( ndim )
-               call printd ( 
+               call printd (
      +         '   Image has %d dimensions - should only have 2' )
                call printo ( ' ' )
             elseif ( istat.eq.NDF__XSDIM ) then
-               call printo ( 
+               call printo (
      +         '   Image dimensions too large - should only have 2' )
                call printo ( ' ' )
             else
                call err_rep ( ' ',  ' ERROR: ^status', istat )
-               call printo ( ' ERROR: Error on opening image' )  
+               call printo ( ' ERROR: Error on opening image' )
                call pargi ( istat )
                call printd ( '       - ADAM error number %d ' )
 
@@ -1843,7 +1843,7 @@ Cbegin
          if ( loop ) then
             istata = istat
             istat = SAI__OK
-            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +         call ndf_annul ( ndf, istat )
             call par_cancl ( name, istat )
          endif
@@ -1862,11 +1862,11 @@ Cbegin
             call printo ( 'No space left in NDF_NAME' )
          endif
       else
-         if (nloop.eq.(nmax+1)) call printo 
+         if (nloop.eq.(nmax+1)) call printo
      +                          (' ERROR: Too many failures')
          istata = istat
          istat = SAI__OK
-         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +      call ndf_annul ( ndf, istat )
          call par_cancl ( name, istat )
       endif
@@ -1874,10 +1874,10 @@ Cbegin
 
       end
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIMGW -- Open an output 2d write-only generic image 
-C  The parameter name is left attached 
+C OPIMGW -- Open an output 2d write-only generic image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -1901,7 +1901,7 @@ C    a j penny                 ral                  1988-07-10
       integer	    ierr		!o: Error 0=ok, 1=bad, 2=blank and ok
 C--
       logical loop
-      integer nloop, nmax, i, istat, istata, udims(2), ldims(2), 
+      integer nloop, nmax, i, istat, istata, udims(2), ldims(2),
      +        ndf, n
       character*(DAT__SZLOC) loc
       character*(NDF__SZTYP) ggtype
@@ -1918,7 +1918,7 @@ Cbegin
       if ( gtype.eq.'INT' )    ggtype = '_INTEGER'
       if ( gtype.eq.'SHORT' )  ggtype = '_WORD'
       if ( gtype.eq.'USHORT' ) ggtype = '_UWORD'
-      
+
       ldims(1) = 1
       ldims(2) = 1
       udims(1) = nx
@@ -1971,7 +1971,7 @@ Cbegin
                call printo ( texta )
             else
                call err_rep ( ' ',  ' ERROR: ^status', istat )
-               call printo ( ' ERROR: Error on opening image' )  
+               call printo ( ' ERROR: Error on opening image' )
                call pargi ( istat )
                call printd ( '       - ADAM error number %d ' )
                call printo ( '       Check in /star/include files' )
@@ -1987,7 +1987,7 @@ Cbegin
          if ( loop ) then
             istata = istat
             istat = SAI__OK
-            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +         call ndf_annul ( ndf, istat )
             call par_cancl ( name, istat )
          endif
@@ -2010,11 +2010,11 @@ Cbegin
             call printo ( 'No space left in NDF_NAME' )
          endif
       else
-         if (nloop.eq.(nmax+1)) call printo 
+         if (nloop.eq.(nmax+1)) call printo
      +                          (' ERROR: Too many failures')
          istata = istat
          istat = SAI__OK
-         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +      call ndf_annul ( ndf, istat )
          call par_cancl ( name, istat )
       endif
@@ -2023,8 +2023,8 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIM4GW -- Open an output 4d write-only generic image 
-C  The parameter name is left attached 
+C OPIM4GW -- Open an output 4d write-only generic image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -2050,7 +2050,7 @@ C    a j penny                 ral                  1988-07-10
       integer	    ierr		!o: Error 0=ok, 1=bad, 2=blank and ok
 C--
       logical loop
-      integer nloop, nmax, i, istat, istata, udims(4), ldims(4), 
+      integer nloop, nmax, i, istat, istata, udims(4), ldims(4),
      +        ndf, n
       character*(DAT__SZLOC) loc
       character*(NDF__SZTYP) ggtype
@@ -2067,7 +2067,7 @@ Cbegin
       if ( gtype.eq.'INT' )    ggtype = '_INTEGER'
       if ( gtype.eq.'SHORT' )  ggtype = '_WORD'
       if ( gtype.eq.'USHORT' ) ggtype = '_UWORD'
-      
+
       ldims(1) = 1
       ldims(2) = 1
       ldims(3) = 1
@@ -2120,12 +2120,12 @@ Cbegin
                call printo ( '   Image type impossible' )
             elseif ( istat.eq.NDF__DIMIN ) then
                 write ( texta,'(''   Invalid size:'',
-     +                   i7,'' x '',i7,'' x '',i7,'' x '',i7)' ) 
+     +                   i7,'' x '',i7,'' x '',i7,'' x '',i7)' )
      +                          nx, ny, nz, nt
                call printo ( texta )
             else
                call err_rep ( ' ',  ' ERROR: ^status', istat )
-               call printo ( ' ERROR: Error on opening image' )  
+               call printo ( ' ERROR: Error on opening image' )
                call pargi ( istat )
                call printd ( '       - ADAM error number %d ' )
                call printo ( '       Check in /star/include files' )
@@ -2141,7 +2141,7 @@ Cbegin
          if ( loop ) then
             istata = istat
             istat = SAI__OK
-            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +         call ndf_annul ( ndf, istat )
             call par_cancl ( name, istat )
          endif
@@ -2166,11 +2166,11 @@ Cbegin
             call printo ( 'No space left in NDF_NAME' )
          endif
       else
-         if (nloop.eq.(nmax+1)) call printo 
+         if (nloop.eq.(nmax+1)) call printo
      +                          (' ERROR: Too many failures')
          istata = istat
          istat = SAI__OK
-         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +      call ndf_annul ( ndf, istat )
          call par_cancl ( name, istat )
       endif
@@ -2181,7 +2181,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIM4GR -- Open an input read-only generic image up to 4 dimensions
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -2277,12 +2277,12 @@ Cbegin
      +         '    They are %d and should be between 2 and 4 ' )
                call printo ( ' ' )
             elseif ( istat.eq.NDF__XSDIM ) then
-               call printo ( 
+               call printo (
      +     '   Image dimensions too large - should be between 2 and 4' )
                call printo ( ' ' )
             else
                call err_rep ( ' ',  ' ERROR: ^status', istat )
-               call printo ( ' ERROR: Error on opening image' )  
+               call printo ( ' ERROR: Error on opening image' )
                call pargi ( istat )
                call printd ( '       - ADAM error number %d ' )
                call printo ( '       Check in /star/include files' )
@@ -2296,7 +2296,7 @@ Cbegin
 
          if ( loop ) then
             istat = SAI__OK
-            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +         call ndf_annul ( ndf, istat )
             call par_cancl ( name, istat )
          endif
@@ -2317,11 +2317,11 @@ Cbegin
             call printo ( 'No space left in NDF_NAME' )
          endif
       else
-         if (nloop.eq.(nmax+1)) call printo 
+         if (nloop.eq.(nmax+1)) call printo
      +                          (' ERROR: Too many failures')
          istata = istat
          istat = SAI__OK
-         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +      call ndf_annul ( ndf, istat )
          call par_cancl ( name, istat )
       endif
@@ -2329,10 +2329,10 @@ Cbegin
 
       end
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPTABR -- Open an input read-only table 
-C  The parameter name is left attached 
+C OPTABR -- Open an input read-only table
+C  The parameter name is left attached
 C
 C   alan penny                   ral         1990 Jan
 
@@ -2349,11 +2349,11 @@ C   alan penny                   ral         1990 Jan
       include 'STARMAN_INC'
 
       character name*(*)		!i: parameter name for table
-      integer   ip			!o: Pointer to table 
+      integer   ip			!o: Pointer to table
       integer   nx			!o: No of columns (inc 5 for name column)
       integer   ny			!o: No of rows
       logical	def			!i: if true, null reply acceptable
-      integer   ierr			!o: Error flag 0=ok; 1=bad; 2=blank 
+      integer   ierr			!o: Error flag 0=ok; 1=bad; 2=blank
 					!   and ok; 3 = already opened
 C--
       character*6 frtype
@@ -2362,10 +2362,10 @@ C--
       character*20 texta, textb, ver, nmach, nsys, sys, mach
       character*72 text
       logical  loop, type, chr_simlr, doit
-      integer  nloop, nmax, k, n, istat, istata, dim(2), ndf, 
+      integer  nloop, nmax, k, n, istat, istata, dim(2), ndf,
      +         icptr, ierra
       external chr_simlr
-Cbegin 
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -2454,7 +2454,7 @@ Cbegin
             call err_annul ( istat )
           elseif ( istat.ne.SAI__OK .and. istat.ne.PAR__NULL ) then	!Unknown error
             doit = .false.
-            call printo ( ' ERROR: Error on opening table ' )  
+            call printo ( ' ERROR: Error on opening table ' )
             call pargi ( istat )
             call printd ( '       - ADAM error number %d ' )
             call printo ( '       Check in /star/include files' )
@@ -2466,7 +2466,7 @@ Cbegin
             call err_annul ( istat )
             call printo ( ' ' )
          endif
-  
+
          if ( doit ) then						!Ok - Check dimensions and type
 	    nx = dim (1)
 	    ny = dim (2)
@@ -2477,7 +2477,7 @@ Cbegin
                call err_rep ( ' ',  ' ERROR: ^status', istat )
                call err_flush ( istat )
                call err_annul ( istat )
-            elseif ( .not.type .or. nx.lt.6 .or. ny.lt.1 ) then	
+            elseif ( .not.type .or. nx.lt.6 .or. ny.lt.1 ) then
                call printo (' ERROR: Not a proper table - or size '//
      +                    'wrong - Table could not be accessed' )
             else
@@ -2485,11 +2485,11 @@ Cbegin
                ierr = 0
             endif
          endif
-         
+
          if ( loop ) then
             istata = istat
             istat = SAI__OK
-            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +         call ndf_annul ( ndf, istat )
             call par_cancl ( name, istat )
          endif
@@ -2503,8 +2503,8 @@ Cbegin
          call gtdesc ( name, 'SYSNAME', sys, 'NO', k, ierra )
          call gtdesc ( name, 'MACHINE', mach, 'NO', k, ierra )  	!Get current machine + OS and file
 
-         if ( sys.ne.nsys .or. mach.ne.nmach ) then             	!NB Default is that the file was 
-                                                   			! not written on this machine or 
+         if ( sys.ne.nsys .or. mach.ne.nmach ) then             	!NB Default is that the file was
+                                                   			! not written on this machine or
             call ndf_loc ( ndf, 'READ', loc, istat )			! operating system
             call ndf_form ( ndf, 'DATA', form, istat )
 
@@ -2537,7 +2537,7 @@ Cbegin
          endif
 
       elseif ( ierr.eq.1 .or. ierr.eq.2 ) then
-         if ( nloop.eq.(nmax+1) ) call printo 
+         if ( nloop.eq.(nmax+1) ) call printo
      +                          (' ERROR: Too many failures')
          istata = istat
          istat = SAI__OK
@@ -2560,7 +2560,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPTABW -- Open an output write-only table
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -2583,7 +2583,7 @@ C    a j penny                 ral                  1988-07-10
       integer		ierr		!o: Error flag 0=ok;1=bad;2=blank and ok
 C--
       logical loop
-      integer nloop, nmax, istat, istata, iv, lbnd(2),ubnd(2), ndf, 
+      integer nloop, nmax, istat, istata, iv, lbnd(2),ubnd(2), ndf,
      +        k, n
       character*(DAT__SZLOC) loc
       character*(NDF__SZTYP) gtype
@@ -2647,7 +2647,7 @@ Cbegin
                call printo ( text//' - Cant open file ' )
             else
                call err_rep ( ' ',  ' ERROR: ^status', istat )
-               call printo ( ' ERROR: Error on opening table ' )  
+               call printo ( ' ERROR: Error on opening table ' )
                call pargi ( istat )
                call printd ( '       - ADAM error number %d ' )
                call printo ( '       Check in /star/include files' )
@@ -2656,7 +2656,7 @@ Cbegin
                call printo  ( ' ' )
                call err_flush ( istat )
                call printo ( ' ' )
-            endif   
+            endif
             ierr = 1
          else								!OK
             ierr = 0
@@ -2667,7 +2667,7 @@ Cbegin
          if ( loop ) then
             istata = istat
             istat = SAI__OK
-            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+            if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +         call ndf_annul ( ndf, istat )
             call par_cancl ( name, istat )
          endif
@@ -2693,11 +2693,11 @@ Cbegin
             call printo ( ' ERROR: No space left in NDF_NAME' )
          endif
       else
-         if (nloop.eq.(nmax+1)) call printo 
+         if (nloop.eq.(nmax+1)) call printo
      +                          (' ERROR: Too many failures')
          istata = istat
          istat = SAI__OK
-         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL ) 
+         if ( istata.ne.NDF__NOID .and. istata.ne.PAR__NULL )
      +      call ndf_annul ( ndf, istat )
          call par_cancl ( name, istat )
       endif
@@ -2758,7 +2758,7 @@ C    a j penny                 ral                  1990-01
       character*(*)	file		!i: Parameter name for file to write to
       character*(*)	name		!i: Name to give to value
       integer           n		!i: Number of values to write
-      character*(*)	cval(n)		!i: value to write 
+      character*(*)	cval(n)		!i: value to write
 C--
       integer istat, ndf, i(1), nchar, chr_size
       character*(DAT__SZLOC) loc
@@ -2809,7 +2809,7 @@ C    a j penny                 ral                  1990-01
 
       character*(*)	file		!i: Parameter name for file to write to
       character*(*)	name		!i: Name to give to value
-      character*(*)	cval 		!i: value to write 
+      character*(*)	cval 		!i: value to write
 C--
       integer istat, ndf
       logical there
@@ -2831,7 +2831,7 @@ Cbegin
         call dat_annul ( loc, istat )
       endif
 
-      if ( (name.eq.'TITLE') .or. (name.eq.'LABEL') .or. 
+      if ( (name.eq.'TITLE') .or. (name.eq.'LABEL') .or.
      +					(name.eq.'UNITS') ) then
 	 call ndf_cput ( cval, ndf, name, istat )
       else
@@ -2859,7 +2859,7 @@ C    a j penny                 ral                  1990-01
 
       character*(*)	file		!i: Parameter name for file to write to
       character*(*)	name		!i: Name to give to value
-      integer		ival 		!i: value to write 
+      integer		ival 		!i: value to write
 C--
       integer istat, ndf
       character*(DAT__SZLOC) loc
@@ -2903,7 +2903,7 @@ C    a j penny                 ral                  1990-01
 
       character*(*)	file		!i: Paramter name of file to write to
       character*(*)	name		!i: Name to give to value
-      real		rval 		!i: value to write 
+      real		rval 		!i: value to write
 C--
       integer istat, ndf
       character*(DAT__SZLOC) loc
@@ -2934,7 +2934,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PUTGI -- Put integer number(s) to the CL
-C   
+C
 C    a j penny                ral         1988-09-07
 
       subroutine putgi ( name, num, ival )
@@ -2962,7 +2962,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PUTGR -- Put real number(s) to the CL
-C   
+C
 C    a j penny                ral         1988-09-07
 
       subroutine putgr ( name, num, rval )
@@ -2999,7 +2999,7 @@ C  Patrick Morris          leeds          1991 Dec
       include 'ST_ADAM_INC'
       include 'STARMAN_INC'
 
-      integer	n		!o : Available space, -1 no space 
+      integer	n		!o : Available space, -1 no space
 C--
       logical found
 Cbegin
@@ -3018,7 +3018,7 @@ Cbegin
          n = n + 1
          if ( n.gt.NDF_LIMIT ) then
             n = -1
-            found = .true. 
+            found = .true.
          else
             found = ( NDF_NAME(n).eq.'-' )
          endif
@@ -3027,7 +3027,7 @@ Cbegin
       if ( n.gt.0 ) NDF_COUNTER = NDF_COUNTER + 1
 
 
-      end 
+      end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -3094,7 +3094,7 @@ C  alan penny              ral          1990 Jan
 
       subroutine wrkbeg ( )
 
-      implicit none 
+      implicit none
       include 'ST_ADAM_INC'
 
 C--
@@ -3117,11 +3117,11 @@ C
 C  alan penny              ral               1990 Jan
 C
       subroutine wrkcan ( text )
- 
+
       implicit none
       include 'ST_ADAM_INC'
       include 'SAE_PAR'
- 
+
       character*(*)	text	!i: Name of work space to cancel
 C--
       integer istat, n, lens, kl
@@ -3165,7 +3165,7 @@ Cbegin
 
       endif
 
-                            
+
       end
 
 
@@ -3184,7 +3184,7 @@ C AZEROZ        Load byte vector with zero
 C COPZZ         Copy part of a byte array into an area of a byte array
 C MOREHELP      See if more HELP is desired
 C XXTIME        Type out a message and the time
-       
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ABORS -- Bitwise Boolean OR of two short vectors
@@ -3232,7 +3232,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       do j = 1, n
-         if ( a(j).eq.ka .or. a(j).lt.INT_MINIR .or. 
+         if ( a(j).eq.ka .or. a(j).lt.INT_MINIR .or.
      +        a(j).gt.INT_MAXIR ) then
             b(j) = kb
          else
@@ -3263,7 +3263,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       do j = 1, n
-         if ( a(j).eq.ka .or. a(j).lt.INT_MINSR .or. 
+         if ( a(j).eq.ka .or. a(j).lt.INT_MINSR .or.
      +        a(j).gt.INT_MAXSR ) then
             b(j) = kb
          else
@@ -3597,7 +3597,7 @@ C COPZZ -- Copy part of a byte array into an area of a byte array
 C
 C    a j penny                ral                 88-08-12
 
-      subroutine copzz ( in, n, m, ixs, ixe, iys, iye, out, n1, m1, 
+      subroutine copzz ( in, n, m, ixs, ixe, iys, iye, out, n1, m1,
      +                   oxs, oys )
 
       implicit none
@@ -3627,7 +3627,7 @@ Cbegin
             if ( i.ge.1 .and. i.le.n .and. j.ge.1 .and. j.le.m ) then
                ox = oxs + i - ixs
                oy = oys + j - iys
-               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and. 
+               if ( ox.ge.1 .and. ox.le.n1 .and. oy.ge.1 .and.
      +              oy.le.m1 ) out(ox,oy) = in(i,j)
             endif
          enddo

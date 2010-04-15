@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL MAPCC8( XLO, YLO, XHI, YHI, RLO, RHI, PLO, PHI, POFFX, POFFY,
-*                  TOTWGT, PWGSZX, PWGSZY, PWGRID, DATVAL, DATOUT, 
+*                  TOTWGT, PWGSZX, PWGSZY, PWGRID, DATVAL, DATOUT,
 *                  WGTOUT, INSIDE, STATUS )
 
 *  Description:

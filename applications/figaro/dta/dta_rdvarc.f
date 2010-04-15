@@ -12,7 +12,7 @@ C
 C     (>) NAME     (Character) The name of the object from which
 C                  data is to be read. This should be in the
 C                  standard data system format, ie name
-C                  components separated by dots followed by 
+C                  components separated by dots followed by
 C                  optional dimensional information enclosed
 C                  in square brackets.  Ideally the name should
 C                  have been created by a call to DTA_CRVAR.
@@ -44,12 +44,12 @@ C     If a multi-dimensional array is being read from, then this
 C     should be thought of as an array of strings, and in this case
 C     STRING should also be an array of strings.  In this case, NITEM
 C     needs to be set to the number of strings to be transferred times the
-C     number of characters in each string of the data object (NOT the 
+C     number of characters in each string of the data object (NOT the
 C     length of STRING).  It is not possible (at the moment) to transfer
-C     a subset of a string. That is, the only transfers allowed are ones 
-C     where the first index specified in NAME (if any) is 1. The transfer 
-C     that takes place is similar to a Fortran string assignment between 
-C     the strings in the data structure (whose length is the first dimension 
+C     a subset of a string. That is, the only transfers allowed are ones
+C     where the first index specified in NAME (if any) is 1. The transfer
+C     that takes place is similar to a Fortran string assignment between
+C     the strings in the data structure (whose length is the first dimension
 C     of the original character array) and the string(s) passed as STRING.
 C-
 C     Functions / subroutines used -
@@ -112,7 +112,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Perform preliminary processing - check NAME, locate it
 C     in structures, get suitable locator for transfer.

@@ -99,12 +99,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -172,7 +172,7 @@
       IF (STATUS .EQ. CAT__OK) THEN
 C        print2000, angle, sep, plus, lead, units, nsgdiv, decpl
 C2000    format(1x, 'cat1_anfmt on entry: ',
-C    :     3x, 'angle: ', d12.6 / 
+C    :     3x, 'angle: ', d12.6 /
 C    :     3x, 'sep: ', i5 /
 C    :     3x, 'plus: ', l5 /
 C    :     3x, 'lead: ', l5 /
@@ -225,7 +225,7 @@ C    :     3x, 'decpl: ', i5 )
 
 *
 *       First compute the integer value, and sexagesimal subdivisions
-*       and the remainder, as required.  
+*       and the remainder, as required.
 
          IVALUE = INT(VALUE)
          REM = VALUE - DBLE(IVALUE)
@@ -363,7 +363,7 @@ C2002    format(1x, 'rem, round: ', 1pd12.6, l6)
          END IF
 
 *
-*       Initialise the buffer to contain the working copy of the 
+*       Initialise the buffer to contain the working copy of the
 *       sexagesimal angle.
 
          BUFFER = ' '
@@ -471,7 +471,7 @@ C2002    format(1x, 'rem, round: ', 1pd12.6, l6)
             END IF
          END IF
 
-*       If more than zero decimal places are required then append the 
+*       If more than zero decimal places are required then append the
 *       remainder, converted to a character string and expressed to the
 *       specified number of decimal places.
 

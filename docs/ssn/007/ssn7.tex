@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -55,22 +55,22 @@ RUTHERFORD APPLETON LABORATORY\\
 
 The purpose of this document is to ensure that all of the Starlink Sun systems
 are set up in a secure, logical and consistent fashion and
-that they do not begin to diverge from one another. One of the strengths of 
+that they do not begin to diverge from one another. One of the strengths of
 Starlink is that 90\% of a site manager's technical problems can be
 solved either simply by looking at how another Starlink system is set up or by
 asking other site managers. If all systems are set up nearly identically,
-then all managers will encounter the same problems but only one manager need 
+then all managers will encounter the same problems but only one manager need
 actually solve each problem. Solutions can be posted in the MAVAD::UNIX\_MANAGEMENT
-and RLVAD::SUN\_WORKSTATIONS VAXnotes conferences. The former conference 
+and RLVAD::SUN\_WORKSTATIONS VAXnotes conferences. The former conference
 has restricted access and hence sensitive matters such as security
 should be discussed there.
 
 It is assumed that the reader has a basic understanding of Sun system
-management and no attempt is made either to clarify Sun \& 
+management and no attempt is made either to clarify Sun \&
 UNIX\footnote{UNIX is a registered trademark of AT\&T Bell Laboratories in the
-United States and other countries} terminology 
+United States and other countries} terminology
 or to explain system management functions which are clearly described in
-the Sun documentation. The topics covered are those that apply directly to 
+the Sun documentation. The topics covered are those that apply directly to
 the Starlink systems and the particular way in which we need to install
 and use them; these topics are not covered in the Sun manuals.
 
@@ -92,7 +92,7 @@ and the others as dataless clients. You should also specify the
 server to be an NIS master and the other machines to be NIS clients.
 If you have spare local disk space (100Mb or so), you could keep
 {\tt /usr} locally and this would improve performance since you would
-not have to load these programs across the ethernet. However, this 
+not have to load these programs across the ethernet. However, this
 type of system, while more efficient, would require considerably more
 maintenance.
 
@@ -100,8 +100,8 @@ Systems purchased with an internal disk currently come with the latest
 version of SunOS installed on that disk. However, managers should still
 go through the customized installation rather than the quick installation.
 Quick Install only offers a choice of standard installations whereas
-the custom install allows you to customize each phase of the installation -- 
-from setting up the file systems to selecting the software categories to 
+the custom install allows you to customize each phase of the installation --
+from setting up the file systems to selecting the software categories to
 load. Furthermore, Quick Install cannot be used if you wish to set up a
 server, although upgrading to a server can be done manually.
 
@@ -112,9 +112,9 @@ filestore layout correct. If the layout is wrong then there may be little room
 for expansion, or the system may run slowly. Once the disk has been partitioned
 its geometry is fixed and it is time consuming to change.
 
-Colour workstations should have a swap partition size of {\bf at least} 
+Colour workstations should have a swap partition size of {\bf at least}
 24Mb of swap
-space, which should be at least 2Mb larger than the physical memory. 
+space, which should be at least 2Mb larger than the physical memory.
 A swap space of twice the physical memory should be used for systems
 with greater than 12Mb of RAM. Applications that process large arrays
 require enormous amounts of swap space so you should be generous
@@ -124,15 +124,15 @@ swap space is less than your physical memory, the extra memory will not
 be used (unlike under VMS) and hence it is vital that you correctly size
 your swap space both during installation and after memory upgrades.
 
-You should {\bf never} use the first cylinder on a disk in a swap partition 
+You should {\bf never} use the first cylinder on a disk in a swap partition
 (i.e. cylinder 0). The disk labelling information is held in the first sector
 or so. Regular file systems are smart enough not to use those sectors; swap
-files scribble everywhere. 
+files scribble everywhere.
 
 Be generous when allocating space to {\tt /usr}. Running out of space in {\tt
 /usr} later is a major inconvenience. Furthermore, you will need some free
 space in {\tt /usr} to allow you to build customized kernels (see Section 2.4). As a
-rule of thumb, add 10Mb to {\tt /usr} after allocating space for software options. 
+rule of thumb, add 10Mb to {\tt /usr} after allocating space for software options.
 
 A partition called {\tt /home} should be created on one of the disks for user login
 directories. If you have multiple disks, you should keep {\tt /home} on a different
@@ -145,11 +145,11 @@ from the command {\tt dkinfo} for each disk and keep them in a safe place.
 you will need this in order to re-create the original disk label that will
 be needed to allow you to recover lost information from dumps. Failure
 to re-create the label correctly can (and already has within Starlink) lead
-to data corruption. 
+to data corruption.
 
 \subsubsection{Optional software}
 
-During the SUNinstall procedure, you are asked what optional software you 
+During the SUNinstall procedure, you are asked what optional software you
 wish to install. The options listed in Table 1 should be installed.
 
 \begin{table}[htb]
@@ -187,12 +187,12 @@ Versatec                & No & Spooling support for Versatec\\
 \end{center}
 \end {table}
 
-The manual pages take up 8Mb and managers should consider only installing 
-them on one machine (usually the server) at each site. 
+The manual pages take up 8Mb and managers should consider only installing
+them on one machine (usually the server) at each site.
 
 Starlink strongly encourages the use of X-Windows rather than SunView for programming
-since SunView applications are non-portable. However, it is necessary to 
-install all the SunView programming options during SUNinstall so that 
+since SunView applications are non-portable. However, it is necessary to
+install all the SunView programming options during SUNinstall so that
 non-Starlink astronomical applications that use SunView can be built on your
 system.
 
@@ -210,32 +210,32 @@ Some SunOS upgrades are much more painful than VMS ones. One is often required
 to  effectively install a new system each time and hence it is vital that  you
 keep a copy of files that have been modified locally and put these back on the
 system after the upgrade. Such files include {\tt /etc/hosts}, {\tt
-/etc/passwd} and {\tt /etc/rc.local}. The SunOS documentation on installing 
-SunOS gives a list of files that should be saved. 
+/etc/passwd} and {\tt /etc/rc.local}. The SunOS documentation on installing
+SunOS gives a list of files that should be saved.
 
 It is clear that one must be careful where one puts local files. If
 possible, keep them out of the {\tt /} and {\tt /usr} partitions. Do not liberally scatter
 your files around these partitions. {\tt /} and {\tt /etc} may be equivalent to
 SYS\$MANAGER in VMS but you should aim to keep all of your local system
 management utilities and files elsewhere. If you must put them in {\tt /usr}, put
-them in {\tt /usr/local} and save this directory tree at upgrade time. 
+them in {\tt /usr/local} and save this directory tree at upgrade time.
 
-Modifications to the startup sequence should go in {\tt /etc/rc.local}. Such 
-modifications might include starting the screenblank process and the etherd 
+Modifications to the startup sequence should go in {\tt /etc/rc.local}. Such
+modifications might include starting the screenblank process and the etherd
 daemon.
 
 
 \subsection{Unbundled software}
 
-Unbundled software is SUNspeak for layered products.	
-Some unbundled software packages by default will spray files all over 
+Unbundled software is SUNspeak for layered products.
+Some unbundled software packages by default will spray files all over
 {\tt /usr}.
 However, many of these packages do give you the option to put the files
 elsewhere. Try to do this if possible, even though this may require you to
 modify your library, command, manual page and other path names and will make
 the initial installation take slightly longer. Unbundled software installed in
 {\tt /usr} will have to be reinstalled each time the operating system is upgraded and
-hence installing it elsewhere may save effort in the long run.  
+hence installing it elsewhere may save effort in the long run.
 Some pieces of software may cause problems if not
 installed in the default location. In the case of languages, it is trivial to
 re-install them after an upgrade and so managers should install these products
@@ -268,12 +268,12 @@ should be installed on your VAXcluster.
 
 \begin{itemize}
 
-\item   VMS/ULTRIX connection software 
+\item   VMS/ULTRIX connection software
 
 \end{itemize}
 
 The organization of the Starlink Software on UNIX systems  and the distribution
-mechanism for this software is discussed  in detail in SSN/66. 
+mechanism for this software is discussed  in detail in SSN/66.
 
 \subsection{Kernel Configuration}
 
@@ -316,29 +316,29 @@ be to use DECnet for communicating between the two types of system. Sun
 produce an unbundled product called SUNlink DNI that allows a Sun to emulate a
 DECnet end-node. However, the DECnet emulation is simplistic and likely to
 cause problems when we migrate to DECnet Phase V and hence it is recommended
-that you persuade users to use TCP/IP for all Sun/VAX communications. 
-DNI is only installed at Cambridge and Durham. 
+that you persuade users to use TCP/IP for all Sun/VAX communications.
+DNI is only installed at Cambridge and Durham.
 
 Each machine using TCP/IP requires an IP address (equivalent to a DECnet node
-number). IP addresses should be obtained from your local computing centre 
+number). IP addresses should be obtained from your local computing centre
 (or the equivalent), even if your Suns are isolated from the rest of your
-campus. At some point in the future, you are likely to be connected to 
+campus. At some point in the future, you are likely to be connected to
 a larger network and
 selecting unique numbers at this stage will avoid problems in the future.
 
 
 \subsubsection{Access to Suns}
 
-Sun systems do not support LAT so it is not possible to log directly on to 
+Sun systems do not support LAT so it is not possible to log directly on to
 a Sun from a terminal on a LAT-based terminal server such as a DECserver.
 There are a number of solutions to this problem. Different solutions
 have been adopted at different sites.
-                                 
+
 \begin{itemize}
 
 \item Log into a VAX which has UCX loaded and start a Telnet session
-from the VAX to the Sun. This is clearly an inefficient use of a VAX 
-login slot but 
+from the VAX to the Sun. This is clearly an inefficient use of a VAX
+login slot but
 will work at all sites.
 
 \item VT1000s support TCP/IP so it is possible to directly log into a Sun
@@ -348,9 +348,9 @@ with a Telnet session.
 and TCP/IP.
 
 \item It is possible to buy terminal servers that not only provide dual
-protocol support (LAT \& TCP/IP) but which can also act as transparent 
+protocol support (LAT \& TCP/IP) but which can also act as transparent
 protocol converter and allow you to log into a Sun ``directly'' from
-a LAT terminal server. 
+a LAT terminal server.
 
 \end{itemize}
 
@@ -361,10 +361,10 @@ However, here are some guidelines.
 
 \begin{enumerate}
 
-\item Manual pages should be installed on only one machine and served to the 
+\item Manual pages should be installed on only one machine and served to the
 others.
 
-\item {\tt /home} and partitions with applications software should be served to 
+\item {\tt /home} and partitions with applications software should be served to
 all other machines. These should be mounted with the following options:
 
 \begin{itemize}
@@ -374,7 +374,7 @@ all other machines. These should be mounted with the following options:
 \item hard -- it will continue to request until the server responds.
 This is necessary on a read/write file system but has the unfortunate
 side effect that if you try to access a NFS disk that is not currently
-available, your process will hang. This is a feature of SunOS 
+available, your process will hang. This is a feature of SunOS
 rather than a bug, but a required feature. Hard is the default.
 Mounting something soft,ro is sensible for non-vital file structures
 such as manual pages.
@@ -395,12 +395,12 @@ in process will hang and users will not be able to log in.
 \item The local disk on workstations used for {\tt /} and swap space should
 not be served to other machines.
 
-\item The local disks on workstations used for scratch space should 
+\item The local disks on workstations used for scratch space should
 not be served to other machines. The local scratch space is for use
 by users of that machine only. Data should be copied to the local
 scratch disk from the main Sun server disks, NFS served disks on a VAX or
 from tape and not left on the local scratch space indefinitely. You may wish to
-mount these 
+mount these
 disks read-only when you NFS mount them to allow users to copy data from the
 scratch disk of a machine on which they were previously working to a new
 location.
@@ -408,7 +408,7 @@ location.
 \end{enumerate}
 
 Managers must be aware of the difference between the two sorts of file
-systems on VMS disks that can be accessed from UNIX machines via the 
+systems on VMS disks that can be accessed from UNIX machines via the
 VMS/ULTRIX connection software. Firstly there is the VMS file system that
 resides on a Files-11 On-Disk Structure (ODS-2) disk. An example of this
 would be your usual VAX user files which can be accessed from the UNIX
@@ -419,10 +419,10 @@ file, which is an RMS data file, contains the file system parameters and
 directory structure for a UNIX file system. Individual UNIX files in this UNIX
 file system cannot be accessed from the VAX. There are a number of other
 differences between the two file systems that are described in length in the
-VMS/ULTRIX connection  documentation. 
+VMS/ULTRIX connection  documentation.
 
 Sites should utilize both VMS and UNIX filestore systems with their Suns.
-The VMS filestore is particularly useful for sharing source code and 
+The VMS filestore is particularly useful for sharing source code and
 allowing the development of UNIX code using VMS programming tools
 (e.g. EVE, VAXset etc.). The choice as to which file system to use for
 a particular set of files will depend on a number of considerations.
@@ -444,7 +444,7 @@ You may wish to use a Connection VMS file system for the following reasons:
 
 \begin{itemize}
 
-\item The situation requires extensive sharing of data between the host VAX and 
+\item The situation requires extensive sharing of data between the host VAX and
 your Suns (e.g. source code).
 
 \item The situation requires multiple versions of the files (the UNIX file system
@@ -459,7 +459,7 @@ insecure and uncontrolled environment. The automounter can be used to supply
 NFS partitions to users on demand. It allows users to mount remote file
 systems themselves in a secure and transparent manner. System administrators
 should determine if the automounter may be of use at their site. The
-automounter utility is described in detail in the Sun System and Network 
+automounter utility is described in detail in the Sun System and Network
 Administration manual.
 
 \subsubsection{Network Information Service (NIS)}
@@ -468,16 +468,16 @@ The Network Information Service (NIS), formerly known as Yellow Pages, is a
 distributed database lookup network service. NIS allows single copies of
 frequently updated files to be made available to many machines and avoids
 having to update the relevant files on every machine whenever there is a
-modification. Files affected by the NIS include {\tt /etc/passwd} and 
+modification. Files affected by the NIS include {\tt /etc/passwd} and
 {\tt /etc/hosts}.
 NIS is described in detail in the Sun System \& Network Administration manual.
 
 Sites with a single Sun need not implement NIS.
 Sites with 2 or more Suns should use NIS and have at least one NIS server.
-At sites where there is a SparcServer and a fleet of SparcStations, the 
-server should be the NIS master server. The addition of an NIS slave server 
-would provide some degree of redundancy if the master server 
-should fail, but the extra management required to set-up and 
+At sites where there is a SparcServer and a fleet of SparcStations, the
+server should be the NIS master server. The addition of an NIS slave server
+would provide some degree of redundancy if the master server
+should fail, but the extra management required to set-up and
 maintain this configuration is not considered worth the investment until
 managers have acquired more Sun expertise. New Sun
 managers have enough to do without worrying about the subtleties of NIS.
@@ -486,9 +486,9 @@ managers have enough to do without worrying about the subtleties of NIS.
 
 For the present, we are expecting users to continue to use the VAXcluster as
 their mailbox and hence there are only a few basic recommendations on
-configuring the mail system as yet. 
+configuring the mail system as yet.
 
-If you are running an NIS cluster, then you should set up your system so that 
+If you are running an NIS cluster, then you should set up your system so that
 mail sent to any host in the cluster can be read from any other host in that
 cluster (as with VAXclusters). The easiest way to make this possible is to
 mount the file server's mail directory on each of the clients. You will
@@ -505,14 +505,14 @@ clients
 
 \begin{verbatim}
 
-server:/var/spool/mail /var/spool/mail nfs rw,bg,intr,hard,secure 0 0 
+server:/var/spool/mail /var/spool/mail nfs rw,bg,intr,hard,secure 0 0
 
 \end{verbatim}
 
 \section{Security}
 
 Unix is infamous for having poor security. It would appear that, by
-default, Suns are relatively insecure compared with VAXes but it is possible to 
+default, Suns are relatively insecure compared with VAXes but it is possible to
 take a few simple steps to plug up the loopholes and make your system
 considerably more secure. At this time C2 level security is not considered
 worth implementing. The overheads in terms of both disk space (up to 5MB per
@@ -521,11 +521,11 @@ the gains in security. Secure NFS is also not considered necessary at present.
 
 \subsection{Basic security}
 
-ALL accounts MUST have passwords. There should be NO exceptions. 
-For maximum security, all passwords should be at least 6 characters long 
+ALL accounts MUST have passwords. There should be NO exceptions.
+For maximum security, all passwords should be at least 6 characters long
 (8 is the maximum number of characters that are used).
-New accounts should immediately be given passwords by the system 
-manager using: 
+New accounts should immediately be given passwords by the system
+manager using:
 
 \begin{verbatim}
 
@@ -533,16 +533,16 @@ manager using:
 
 \end{verbatim}
 
-{\tt /etc/passwd} is an ASCII file with a one-line entry for 
-each user. The different fields in the entry are described in the 
-Sun documentation. By default, this file is world readable. This is not 
+{\tt /etc/passwd} is an ASCII file with a one-line entry for
+each user. The different fields in the entry are described in the
+Sun documentation. By default, this file is world readable. This is not
 a serious security risk since only the encrypted passwords are stored. However,
 it does mean that details of accounts without a password are available to all
 users and hence it is vital that all accounts have an entry in the encrypted
-password field in {\tt /etc/passwd}. 
+password field in {\tt /etc/passwd}.
 
 Accounts currently not in use should be disabled by putting a * in the
-encrypted password field in {\tt /etc/passwd}. The following example 
+encrypted password field in {\tt /etc/passwd}. The following example
 {\tt /etc/passwd}
 illustrates these points:
 
@@ -571,20 +571,20 @@ Note that, in the above bogus example, username cac has an empty encrypted
 password field and hence no password. This is forbidden. Account dlt is
 currently disabled.
 
-You must be superuser to modify this file. You should always use the 
-{\tt /etc/vipw} command to modify {\tt /etc/passwd} since this locks the file and 
+You must be superuser to modify this file. You should always use the
+{\tt /etc/vipw} command to modify {\tt /etc/passwd} since this locks the file and
 ensures that no other modifications can be made (by another privileged
-user) until you are finished. 
+user) until you are finished.
 
-Managers should exploit the -x and -e qualifiers for {\tt passwd} to enable 
-password aging. 
+Managers should exploit the -x and -e qualifiers for {\tt passwd} to enable
+password aging.
 
 The security of a Sun workstation set up with the defaults can be compromised by any
 user who has access to the keyboard. This involves halting the  machine and
 booting up single user. This requires seven keystrokes and can quite literally
 be done with your eyes closed (the author tried it as a technical exercise).
 
-To prevent users gaining root access to a machine in this way without 
+To prevent users gaining root access to a machine in this way without
 giving the correct authorization, you must modify the file {\tt /etc/ttytab} as
 follows:
 
@@ -595,7 +595,7 @@ follows:
 #
 # name	getty				type		status	comments
 #
-console	"/usr/etc/getty std.9600"	sun		on local 
+console	"/usr/etc/getty std.9600"	sun		on local
 ttya	"/usr/etc/getty std.9600"	unknown		off local secure
 ttyb	"/usr/etc/getty std.9600"	unknown		off local secure
 tty00	"/usr/etc/getty std.9600"	unknown		off local secure
@@ -609,7 +609,7 @@ The only change is that the ``secure'' has been removed from the console
 entry. Secure in this instance refers to the notion that the terminal is
 ``secured'' away from straying hands i.e. under lock and key. This is clearly
 not the case with a common-user workstation. The effect of this
-modification is: 
+modification is:
 
 \begin{enumerate}
 
@@ -617,20 +617,20 @@ modification is:
    order to gain root privileges. Make sure that root does indeed have
    a password before removing the secure comment, otherwise when you
    boot single-user, the system will still prompt for a password which
-   you will be unable to give and hence you will not be able to 
+   you will be unable to give and hence you will not be able to
    complete the single-user boot.
 
-\item In multi-user mode root cannot log into the console. Instead it is 
-   necessary to log into a non-root account (e.g. your usual username) and 
+\item In multi-user mode root cannot log into the console. Instead it is
+   necessary to log into a non-root account (e.g. your usual username) and
    use the su command to gain root privileges. This might seem a nuisance
    but does ensure that the usernames used to access the root account
-   are recorded. Make sure that you have  added a non-root account before 
+   are recorded. Make sure that you have  added a non-root account before
    removing the secure comment on the console entry else you will not be able to
    get access to the root account  in multi-user mode.
 
 \end{enumerate}
 
-It is also possible to prevent access to the root account over the network 
+It is also possible to prevent access to the root account over the network
 by removing the local comment on the console entry.
 
 If you make any changes to {\tt /etc/ttytab}, you must notify the init process with
@@ -643,8 +643,8 @@ If you make any changes to {\tt /etc/ttytab}, you must notify the init process w
 
 to implement the changes on the running system.
 
-It is also possible to control which users can use the su command 
-by modifying the file {\tt /etc/groups}. To do this, add the following line 
+It is also possible to control which users can use the su command
+by modifying the file {\tt /etc/groups}. To do this, add the following line
 at the beginning of {\tt /etc/groups}.
 
 
@@ -655,35 +655,35 @@ wheel:*:0:djr,cac,dlt
 \end{verbatim}
 
 
-Now IF the secure comment is removed from the console entry in 
+Now IF the secure comment is removed from the console entry in
 {\tt /etc/ttytab},
 THEN only djr,cac and dlt can use the su command to become the superuser.
 
 \subsection{Network security}
 
 The method of network communication between UNIX machines depends whether
-the connection is to a trusted or non-trusted host. The commands to 
+the connection is to a trusted or non-trusted host. The commands to
 communicate with a trusted host may differ from those used to communicate with
-a non-trusted host. Trusted host commands are more analogous to commands 
+a non-trusted host. Trusted host commands are more analogous to commands
 used on a local machine (e.g. {\tt cp} \& {\tt rcp}) and simplify access by bypassing the
 password security check otherwise required. The VMS analogy to the trusted
 host is the proxy login.
 One can define which remote hosts and which users on those hosts are trusted.
 
 The file {\tt /etc/hosts.equiv} specifies the names of machines from which users
-are allowed to login ({\tt rlogin}), remote copy ({\tt rcp}) or 
+are allowed to login ({\tt rlogin}), remote copy ({\tt rcp}) or
 perform remote shell ({\tt rsh})
 functions. {\tt /etc/hosts.equiv} requires only machine hostnames as entries and
-allows a user on a machine registered in the file to login to the local machine  
+allows a user on a machine registered in the file to login to the local machine
 only if an entry for that specific user is found in {\tt /etc/passwd} on the
 local machine. If there is an entry for the specific user in {\tt /etc/passwd} but no
 entry for the machine of that user in {\tt /etc/hosts.equiv}, then the user will
-not be allowed to use the above commands. 
+not be allowed to use the above commands.
 Note that the symbol + is a wildcard i.e. anyone can rlogin without a password
 if there is an account with the same username on that machine.
 
- 
-The file $\sim${\tt USERNAME/.rhosts} may exist in the home directory of each user. Its 
+
+The file $\sim${\tt USERNAME/.rhosts} may exist in the home directory of each user. Its
 purpose is to allow a specific user to access a particular machine, but not
 just from any machine. Again, the user must also have an entry in the
 {\tt /etc/passwd} file of the machine used. Beware of having  a {\tt /.rhosts} file on your
@@ -693,20 +693,20 @@ your system as root.
 
 
 Unfortunately, if is necessary to use these mechanisms to access peripherals
-despite the potential security risk. For example, 
+despite the potential security risk. For example,
 it is necessary
 to use {\tt /.rhosts} in order to allow a system manager to dump partitions
-on a tapeless SparcStation disk to an Exabyte on a SparcServer (see 
+on a tapeless SparcStation disk to an Exabyte on a SparcServer (see
 Section 4.2).
 In this case, the author  recommends that you create
 {\tt /.rhosts} on the server and enter the SparcStation name in it just before doing
 the dump and remove the file immediately after.
-Similarly, at Cambridge, 
-{\tt /etc/hosts.equiv} on SUNDOG contains a + to allow all other machines 
+Similarly, at Cambridge,
+{\tt /etc/hosts.equiv} on SUNDOG contains a + to allow all other machines
 to print transparently on its laser printer. However, in this case it is
 possible to grant printing rights alone to a given machine by using the
-{\tt /etc/hosts.lpd} file instead of {\tt /etc/hosts.equiv}. If you do not trust a 
-machine's users but are willing to give them printing rights, use the 
+{\tt /etc/hosts.lpd} file instead of {\tt /etc/hosts.equiv}. If you do not trust a
+machine's users but are willing to give them printing rights, use the
 {\tt hosts.lpd}
 file.
 
@@ -716,11 +716,11 @@ file.
 
 At present there is no separate `APPLICATION FOR THE USE OF STARLINK' form required
 for users who wish to use the Starlink Sun systems, but only registered users
-of Starlink are permitted Sun accounts. 
+of Starlink are permitted Sun accounts.
 
 Usernames should follow normal Starlink conventions and preferably be identical
 to users' VMS usernames.
-Shared usernames are not permitted.  
+Shared usernames are not permitted.
 
 Before you start to add users to your system you should check with your local
 Ethernet manager if there is a restriction on which UID/GID numbers you should
@@ -730,58 +730,58 @@ Non-unique UID numbers are a major security risk when using NFS.
 Each user should have the login directory {\tt /home/USERNAME}
 (or {\tt /home2/USERNAME}).
 New user accounts should be given template {\tt .login} and {\tt .cshrc} files. These
-should contain a call to system wide versions of these files which set up 
-the environment variables and aliases necessary to allow the use of unbundled 
+should contain a call to system wide versions of these files which set up
+the environment variables and aliases necessary to allow the use of unbundled
 and other additional software packages. The system wide versions of these
 files should be {\tt /usr/local/.login} and {\tt /usr/local/.cshrc}. These should be
 called from {\tt USERNAME/.login} and {\tt USERNAME/.cshrc} respectively using the source command.
 
-It is probably worth spelling out the difference between {\tt .login} and 
+It is probably worth spelling out the difference between {\tt .login} and
 {\tt.cshrc}.
 {\tt .login} is read once by the system during the log in procedure. This file is
-normally used to set up any environment variables which will be available 
+normally used to set up any environment variables which will be available
 to all subsequent processes. Environment variables are independent of the
 shell being used. Paths are usually set up in {\tt .login}.
 {\tt .cshrc} is read by the system {\it each time}\, a `C-shell' is created.
-Shell variables and aliases are set up in {\tt .cshrc}. 
+Shell variables and aliases are set up in {\tt .cshrc}.
 
 The program {\tt /usr/etc/pwck} (available with the System V software option) should
 be used occasionally to ensure that the password file does not contain errors.
 
 \subsection{Dumping the file structure}
 
-Site managers should establish a dump (BACKUP in VMSspeak) schedule 
-to protect against accidental loss of file by user error and hardware failure. 
-On Sun systems with a large amount of local disk space, it will be necessary 
+Site managers should establish a dump (BACKUP in VMSspeak) schedule
+to protect against accidental loss of file by user error and hardware failure.
+On Sun systems with a large amount of local disk space, it will be necessary
 to establish a comprehensive dumping timetable. The following recommendations
-should be followed, although the details of how you implement them are 
-up to local AMCs. A variety of dump schemes are described in the 
-Sun System \& Network Administration manual. 
+should be followed, although the details of how you implement them are
+up to local AMCs. A variety of dump schemes are described in the
+Sun System \& Network Administration manual.
 
 \begin{itemize}
 
 \item Level 0 dumps should be taken every 4 to 6 weeks. This should be done
-in single-user mode, if possible, and preferably out of prime time. 
+in single-user mode, if possible, and preferably out of prime time.
 
-\item Incremental dumps should be made on partitions containing user files 
+\item Incremental dumps should be made on partitions containing user files
 at least once per week.
 
-\end{itemize} 
+\end{itemize}
 
 At sites where there are only one or two Suns, with small local disks, it is
 recommended that most user files be stored on VAXcluster disks and accessed via
-NFS. All users should still have a login directory {\tt /home/USERNAME} on a 
+NFS. All users should still have a login directory {\tt /home/USERNAME} on a
 local disk to allow normal use of the Sun (i.e. access to his or her
 {\tt .login}, {\tt .cshrc}
-and some local disk space) when the VAXcluster is down. Symbolic links 
-can be used to make VAX directories appear as subdirectories of 
+and some local disk space) when the VAXcluster is down. Symbolic links
+can be used to make VAX directories appear as subdirectories of
 {\tt /home/USERNAME}.
 This will ensure that user files are backed up as part of the VAX backup
 procedure. 0 level dumps only need then be made of the system files when
-necessary. 
-  
+necessary.
+
 One can only dump disk partitions and not NFS served file structures. Hence,
-to dump a partition on a local disk on a tapeless workstation, one must use 
+to dump a partition on a local disk on a tapeless workstation, one must use
 a remote tape device. An entry in {\tt .rhosts} of the remote machine is required
 to allow use of its tape drive (see Section 3.2).
 
@@ -820,7 +820,7 @@ cartridge).
 \end{enumerate}
 
 The UNIX {\tt dump} command will copy the whole or part of a partition to tape
-dependent on the level of backup chosen. A level 0 backup is a complete 
+dependent on the level of backup chosen. A level 0 backup is a complete
 copy of a single partition. Incremental backups may be at levels 1 through
 to 9. The {\tt dump} command will copy all files which have been altered since
 the last backup of the current or higher levels. For instance a level 3
@@ -832,7 +832,7 @@ dumps between full dumps, but allows the incremental tapes to be
 filestore. As time goes on, the lowest incremental dump tapes (usually level 1)
 will gradually become more and more full.
 
-Incremental dumping is only really necessary if you either have a large amount 
+Incremental dumping is only really necessary if you either have a large amount
 of disk space or are using a low capacity medium, such as tape cartridge.
 If you are using a Exabyte drive and have only a few disks, it is probably
 better to do full dumps all of the time. No firm recommendations are made here
@@ -843,11 +843,11 @@ dictated by your hardware and usage of your disks.
 
 By default, full accounting is switched off under SunOS. Connect time
 accounting is enabled by default and the accounting information is stored in the
-{\tt /var/adm/wtmp}. The presence of this file determines if this information 
-is recorded or not. 
+{\tt /var/adm/wtmp}. The presence of this file determines if this information
+is recorded or not.
 
 Process-time accounting is disabled by default. This accounting information is
-stored in {\tt /var/adm/acct}. To enable process accounting on your system you 
+stored in {\tt /var/adm/acct}. To enable process accounting on your system you
 must modify {\tt /etc/rc} and {\tt /var/spool/cron/crontabs/root} as follows:
 
 ***** {\tt /etc/rc} *****
@@ -875,15 +875,15 @@ must modify {\tt /etc/rc} and {\tt /var/spool/cron/crontabs/root} as follows:
 The function of each of these accounting programs is described in
 the SunOS System and Network Administration manual.
 
-The fields in the root crontab file are Minutes, Hours, Day of Month, 
+The fields in the root crontab file are Minutes, Hours, Day of Month,
 Month of Year, Day of Week and command to be executed.
-                              
+
 It is worth mentioning at this point the value of the crontab utility.
-It can be used to execute commands automatically at pre-defined times. The 
+It can be used to execute commands automatically at pre-defined times. The
 crontab utility gives you the functionality of a system jobs batch queue
 on a VAX, but with a more advanced scheduling system. All system managers
-should familiarize themselves with the crontab utility, which is described 
-in detail in the Sun documentation. 
+should familiarize themselves with the crontab utility, which is described
+in detail in the Sun documentation.
 
 Each month, a file {\tt /var/adm/acct/fiscal/fiscrptNN} (e.g. fiscrpt11)
 is created which contains the monthly usage report for the previous month
@@ -905,10 +905,10 @@ per minute.
 
 \item CONNECT (MINS): The amount of real time that the user is connected for.
 
-\item DISK BLOCKS: The average number of disk blocks (512 bytes) allocated to 
+\item DISK BLOCKS: The average number of disk blocks (512 bytes) allocated to
 the user.
 
-\item \# OF PROCS. Number of processes invoked by the user. 
+\item \# OF PROCS. Number of processes invoked by the user.
 
 \item \# OF SESSIONS: The number of times a user logged into the system.
 
@@ -922,18 +922,18 @@ was run to obtain the average number of DISK BLOCKS listed earlier.
 The file also contains a breakdown of usage of the system by command and a
 list of last login dates.
 
-Managers should be aware that the accounting system used by Starlink differs 
-slightly from that described in the Sun manuals. We only require a summary 
+Managers should be aware that the accounting system used by Starlink differs
+slightly from that described in the Sun manuals. We only require a summary
 of usage for each month rather than for each day. Furthermore, the accounting
-procedures that summarize usage each day destroy the original files which contain the 
-information needed to track down, for example, unauthorized usage of the 
+procedures that summarize usage each day destroy the original files which contain the
+information needed to track down, for example, unauthorized usage of the
 system. Hence, we simply run the ``daily'' accounting procedure once per
 month on the records for the whole month, followed by the monthly accounting
 procedure.
 
 During the month, the accounting information can be reviewed using the commands
 {\tt last} (last login), {\tt ac} (login accounting) \& {\tt sa} (system accounting).
-A full description of these can be found in the manual pages. However, it is 
+A full description of these can be found in the manual pages. However, it is
 worth noting the following options:
 
 \begin{itemize}
@@ -952,7 +952,7 @@ worth noting the following options:
 
 To enable printer accounting, you must amend the spooling control file
 {\tt /etc/printcap}, and ensure that the accounting file exists and has the correct
-owner and group. 
+owner and group.
 
 Add the following to the printer's printcap entry, using a different
 file name for each printer:
@@ -974,18 +974,18 @@ lp.acct can be any name you choose.
 
 The printer accounting information is logged in the file specified above.
 The information will be logged for any printer where such an entry exists.
-The program used to analyse the data is {\tt pac}, which will give the total 
+The program used to analyse the data is {\tt pac}, which will give the total
 number of jobs, pages printed and associated cost per user.
 
 \subsection{Quotas}
 
 The UNIX disk quota system should be used, where necessary, to control the
-amount of disk space used by each user in a given disk partition. The system 
+amount of disk space used by each user in a given disk partition. The system
 works on a hard partition basis, for both local and NFS partitions. The
 administrator must set up limits for each user on each partition on which
 quotas are to be applied.
 
-When configuring your kernels (see Section 2.4), make sure that you specify 
+When configuring your kernels (see Section 2.4), make sure that you specify
 OPTIONS QUOTA on each machine where quotas are to run, or where hard partitions
 exist to which quotas are to be applied i.e. even if they are to be mounted
 over NFS and will not use quotas locally.
@@ -998,7 +998,7 @@ i.e. not on an NFS client.
 
 The quotas file must be present in the top level of every partition for which
 quotas are to be used. The file holds details for this partition about all the
-users and their quotas. An empty quotas file can be created at the top level 
+users and their quotas. An empty quotas file can be created at the top level
 of each file system with the touch command.
 
 Quotas can be controlled using the {\tt edquota} command, as described in the Sun
@@ -1007,7 +1007,7 @@ about disk usage and limits.
 
 Please note that the use of the quota system has a high performance overhead.
 
-\subsection{Monitoring system performance} 
+\subsection{Monitoring system performance}
 
 The memory management system of UNIX is very similar to that of VMS. The main
 differences that a VAX/VMS system manager will notice are that:
@@ -1019,7 +1019,7 @@ even fewer as these parameters become dynamic and are modified by the system
 itself.
 
 \item The page and swap files are combined into a single swap space. Additional
-swap partitions and files may be added by the system administrator with the 
+swap partitions and files may be added by the system administrator with the
 {\tt swapon} command.
 
 \item One cannot limit the working set of individual processes or those owned
@@ -1029,22 +1029,22 @@ own processes with the {\tt limit} built--in function of {\tt csh}.
 \end {itemize}
 
 System administrators should monitor the performance of their systems and
-become familiar with {\tt vmstat} (report virtual memory statistics - 
-equivalent to \$ MONITOR), 
-{\tt pstat} (print system facts) and {\tt ps} (process status - equivalent to 
-\$ SHOW SYSTEM). 
+become familiar with {\tt vmstat} (report virtual memory statistics -
+equivalent to \$ MONITOR),
+{\tt pstat} (print system facts) and {\tt ps} (process status - equivalent to
+\$ SHOW SYSTEM).
 
 You should use the {\tt ps} command to identify processes that are using system
-resources unnecessarily. For example, workstations with only one ethernet 
-do not need to do dynamic routing. Instead, they can route statically by 
+resources unnecessarily. For example, workstations with only one ethernet
+do not need to do dynamic routing. Instead, they can route statically by
 commenting out the lines in {\tt /etc/rc.local} that startup the {\tt
 in.routed} daemon. Similarly, at present, the {\tt sendmail} daemon is not
 required if you have followed the recommendations in Section 2.6.
 
-System administrators should re-configure their kernels (see Section 2.4) 
+System administrators should re-configure their kernels (see Section 2.4)
 to free up unnecessarily allocated memory. The kernel is not swapped or paged
 and hence memory assigned to the kernel is fixed and unavailable for other
-applications to use. 
+applications to use.
 
 Fine tuning of the system can be done by editing the {\tt param.c} file that resides
 in the directory that is created when you run {\tt /etc/config} on your new kernel
@@ -1053,7 +1053,7 @@ it is drawn to your attention for interest. {\tt param.c} is equivalent to the
 parameter files such as PARAMS.DAT under VMS.
 
 As file systems fill up, performance will degrade owing to the difficulty of
-finding contiguous blocks for files. The messages produced by {\tt fsck} at 
+finding contiguous blocks for files. The messages produced by {\tt fsck} at
 boot time should be noted. If the fragmentation becomes greater than 2.5\%,
 it may be worthwhile doing a logical copy using {\tt tar} of the file system
 in single user mode, remaking the file system using {\tt newfs} and then
@@ -1087,7 +1087,7 @@ System administrators are urged to become familiar with the {\tt find} utility.
 It is particularly useful for periodic maintenance.
 
 \item Look out for ``odd'' devices in {\tt /dev}. These may be created if users
-specify the wrong device name for tape, for example. They can become 
+specify the wrong device name for tape, for example. They can become
 very large.
 
 \end{itemize}

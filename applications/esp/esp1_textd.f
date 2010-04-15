@@ -1,4 +1,4 @@
-       
+
 
       SUBROUTINE GRA1_TEXTD(FLAG,POINTS,XCO,YCO,CURCO,BACK,SIGMA,CONS,
      :                      GRAD,PSIZE,NUMBP,ZEROP,SLEN,
@@ -9,14 +9,14 @@
 
 *  Purpose:
 *     Displays the galaxy profiling results in text format.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL GRA1_TEXTD(FLAG,POINTS,XCO,YCO,CURCO,BACK,SIGMA,CONS,
 *                      GRAD,PSIZE,NUMBP,ZEROP,SLEN,
-*                      LOR,HIR,REG,STATUS)    
+*                      LOR,HIR,REG,STATUS)
 
 *  Description:
 *      Displays the text output from the program. This consists of
@@ -25,9 +25,9 @@
 *      over which data points were used in the 'fit' and also the origin
 *      image indices used.
 
-*  Arguments:               
+*  Arguments:
 *     FLAG = INTEGER (Given)
-*        Was a value found for the central pixel flag.                    
+*        Was a value found for the central pixel flag.
 *     POINTS = INTEGER (Given)
 *        Number of data points available.
 *     XCO = REAL (Given)
@@ -79,11 +79,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       CHARACTER *(80) CURCO           ! Current coordinates of origin
       INTEGER NUMBP(2)                ! Number of data points used for the
                                       ! radius/brightness fits
@@ -95,18 +95,18 @@
       REAL GRAD(2)                    ! The gradient term of the fits
                                       ! to radius versus brightness
       REAL HIR                        ! Upper limit of radius values used
-      REAL LOR                        ! Lower limit of radius values used 
+      REAL LOR                        ! Lower limit of radius values used
       REAL PSIZE                      ! The size of each pixel in
                                       ! arc seconds
-      REAL REG(2)                     ! Regression coefficient squared 
+      REAL REG(2)                     ! Regression coefficient squared
       REAL SIGMA                      ! Standard deviation of the background
-      REAL SLEN(2)                    ! Scale length values from the two  
+      REAL SLEN(2)                    ! Scale length values from the two
                                       ! fits i.e. spiral and elliptical
       REAL XCO                        ! X index of the origin
       REAL YCO                        ! Y index of the origin
       REAL ZEROP                      ! Zero point of the magnitude scale
-      
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -115,9 +115,9 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-     
+
 *  Display the extent of the data set available, the size
-*  in arc seconds this represents.     
+*  in arc seconds this represents.
       CALL MSG_BLANK(STATUS)
       CALL MSG_FMTI('VALUE','I5',POINTS)
       CALL MSG_OUT(' ','Number of data points:   ^VALUE ',STATUS)
@@ -137,7 +137,7 @@
 *  Display X and Y Current frame co-ordinates.
       CALL MSG_SETC('VALUE',CURCO)
       CALL MSG_OUT(' ','X and Y co-ordinates (Current): ^VALUE ',STATUS)
-   
+
 
 *  Display 'fit' information.
 
@@ -189,7 +189,7 @@
 
  9999 CONTINUE
 
-      END 
+      END
 
 
       SUBROUTINE SEC1_TEXTD(FLAG,NDF1,XCO,YCO,OCOUNT,BACK,SIGMA,CONS,
@@ -201,14 +201,14 @@
 
 *  Purpose:
 *     Displays the galaxy 'fit' results in text format.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL SEC1_TEXTD(FLAG,NDF1,XCO,YCO,OCOUNT,BACK,SIGMA,CONS,
 *                      GRAD,RLIM,PSIZE,COUNT,ZEROP,SLEN,
-*                      LOR,HIR,LBND,STATUS)    
+*                      LOR,HIR,LBND,STATUS)
 
 *  Description:
 *      Displays the text output from the program. This consists of
@@ -217,16 +217,16 @@
 *      over which data points were used in the 'fit' and also the origin
 *      image indices used.
 
-*  Arguments:               
+*  Arguments:
 *     FLAG = INTEGER (Given)
-*        Was a value found for the central pixel flag.                    
+*        Was a value found for the central pixel flag.
 *     NDF1 = INTEGER (Given)
 *        NDF identifier for the image.
 *     XCO = REAL (Given)
 *        The X index of the origin used. Units pixels.
 *     YCO = REAL (Given)
 *        The Y index of the origin used. Units pixels.
-*     OCOUNT = REAL (Given)  
+*     OCOUNT = REAL (Given)
 *        Count value fo the origin pixel. Units counts.
 *     BACK = REAL (Given)
 *        Background value found. Units counts.
@@ -273,12 +273,12 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER COUNT(2)                ! Number of data points used for the
                                       ! radius/brightness fits
       INTEGER FLAG                    ! Was the central pixel value found?
@@ -294,18 +294,18 @@
       REAL GRAD(2)                    ! The gradient term of the fits
                                       ! to radius versus brightness
       REAL HIR                        ! Upper limit of radius values used
-      REAL LOR                        ! Lower limit of radius values used 
+      REAL LOR                        ! Lower limit of radius values used
       REAL OCOUNT                     ! Count value for the origin pixel
       REAL PSIZE                      ! The size of each pixel in
                                       ! arc seconds
       REAL SIGMA                      ! Standard deviation of the background
-      REAL SLEN(2)                    ! Scale length values from the two  
+      REAL SLEN(2)                    ! Scale length values from the two
                                       ! fits i.e. spiral and elliptical
       REAL XCO                        ! X index of the origin
       REAL YCO                        ! Y index of the origin
       REAL ZEROP                      ! Zero point of the magnitude scale
-      
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -342,7 +342,7 @@
 *   Raw pixel count.
       VALUE=OCOUNT
       CALL MSG_FMTR('VALUE','F12.2',VALUE)
-      IF (FLAG.EQ.0) THEN   
+      IF (FLAG.EQ.0) THEN
          CALL MSG_OUT(' ','Pixel count (raw):        ^VALUE',STATUS)
          CALL PAR_PUT0R('OCOUNT',OCOUNT,STATUS)
       ELSE
@@ -352,7 +352,7 @@
 *   Background count subtracted.
       VALUE=OCOUNT-BACK
       CALL MSG_FMTR('VALUE','F12.2',VALUE)
-      IF (FLAG.EQ.0) THEN   
+      IF (FLAG.EQ.0) THEN
          CALL MSG_OUT(' ','Pixel count (subtracted): ^VALUE',STATUS)
       ELSE
          CALL MSG_OUT(' ','Pixel count (subtracted): ----',STATUS)
@@ -361,8 +361,8 @@
 *   In terms of standard deviation (sigma).
       IF (SIGMA.GT.0.0) THEN
          VALUE=(OCOUNT-BACK)/SIGMA
-         CALL MSG_FMTR('VALUE','F8.2',VALUE) 
-         IF (FLAG.EQ.0) THEN   
+         CALL MSG_FMTR('VALUE','F8.2',VALUE)
+         IF (FLAG.EQ.0) THEN
             CALL MSG_OUT(' ','Pixel count (sigma):          '//
      :                   '^VALUE',STATUS)
          ELSE
@@ -410,7 +410,7 @@
             CALL MSG_FMTR('VALUE','F8.4',VALUE)
             CALL MSG_OUT(' ','Central mag. ellipt: ^VALUE',STATUS)
          END IF
-           
+
 *      Peak surface brightness relative to the sky level.
          IF ((FLAG.EQ.0).AND.(BACK.NE.0.0)) THEN
             VALUE=LOG10(ABS((OCOUNT-BACK)/BACK))
@@ -419,12 +419,12 @@
             CALL PAR_PUT0R('ABOBEL',VALUE,STATUS)
          ELSE
             CALL MSG_OUT(' ','Above or below sky:  ----',STATUS)
-         END IF  
+         END IF
 
       END IF
- 
+
 *  Display the extent of the data set available, the size
-*  in arc seconds this represents.     
+*  in arc seconds this represents.
       CALL MSG_BLANK(STATUS)
       VALUE=(RLIM-1)*PSIZE
       CALL MSG_FMTI('VALUE','I5',RLIM)
@@ -433,7 +433,7 @@
      :             /'ie.^VALUE1"',STATUS)
 
 *  Display the range in arc seconds of the data points used.
-      VALUE=LOR       
+      VALUE=LOR
       VALUE1=HIR
       CALL MSG_FMTR('VALUE','F7.2',VALUE)
       CALL MSG_FMTR('VALUE1','F7.2',VALUE1)
@@ -465,4 +465,4 @@
 
  9999 CONTINUE
 
-      END 
+      END

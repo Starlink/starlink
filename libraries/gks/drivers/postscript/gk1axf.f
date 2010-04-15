@@ -41,7 +41,7 @@
       INCLUDE '../../include/gkwdt.cmn'
       INCLUDE '../../include/gkwkd.cmn'
       INCLUDE '../../include/gkxfd.cmn'
- 
+
 *  LOCALS
 *  ------
 *
@@ -62,7 +62,7 @@
 *           obtainable from PostScript. However, where an Adobe implementation
 *           of PostScript is mounted (LaserWriter, LaserWriter+, Linotron) font
 *           data can be taken from the so called "font metrics" files.
- 
+
 *           NOTE: Number and ordering of the device's built-in (hardware) fonts
 *           in the  WDT table can be changed at will, but the following must be
 *           observed:
@@ -75,7 +75,7 @@
 *                         consistent with the WDT changes.
 *
 *
- 
+
 *     Integer workspace offset parameters
       INTEGER    IFTINT,   IFTMAP
       PARAMETER (IFTINT=8, IFTMAP=11)
@@ -264,7 +264,7 @@
 *
 * --------------------------------------------------------------------
 *
- 
+
 *
 *  Obtain and validate Character Body Height.
 *
@@ -272,12 +272,12 @@
      :          QWCHHY(KWKIX)*QWCHHY(KWKIX) )
       RHT=AMAX1(QMNCHH(KWKIX),RHT)
       RHT=AMIN1(QMXCHH(KWKIX),RHT)
- 
+
 *
 *     Map the WDT font index to RCHW entry via heap array:
 *
       INDTXT = KHP(KHPXI(KWKDAT(IFTMAP,KWKIX))-KWTXFN(KWKIX)-1)
- 
+
 *
 *     If the font is known provide its details.
 *
@@ -296,7 +296,7 @@
 *        The font is not known locally - signal error.
          KERROR = -2004
       ENDIF
- 
- 
- 
+
+
+
       END

@@ -1,6 +1,6 @@
 proc red4Ext {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -31,7 +31,7 @@ proc red4Ext {taskname} {
     bind $Red4Widgets(SPC_LAB01) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_ENT01) <Button-2> "red4Update red4Ext SPC_ENT01"
     bind $Red4Widgets(SPC_ENT01) <Double-Button-2> "$Red4Widgets(SPC_ENT01) delete 0 end"
-    
+
 # Create, pack and bind algorithm and invert widgets
     set Red4Widgets(SPC_LAB02) [label $midtop.lb -text "Algorithm"]
     set f1 [radiobutton $midtop.f1 -text "Bright" -variable Red4Widgets(SPC_ALGORITHM) -value "BRIGHT"]
@@ -47,17 +47,17 @@ proc red4Ext {taskname} {
     bind $iv <Button-2> "red4Update red4Ext SPC_INVERT"
 
 # Create, pack and bind first extraction widget
-    set Red4Widgets(SPC_LAB04) [label $bottop.l1 -text "Start"]  
-    set Red4Widgets(SPC_LAB05) [label $bottop.l2 -text "End"]  
-    set Red4Widgets(SPC_LAB06) [label $bottop.l3 -text "Top Extraction Row" -width 20]  
+    set Red4Widgets(SPC_LAB04) [label $bottop.l1 -text "Start"]
+    set Red4Widgets(SPC_LAB05) [label $bottop.l2 -text "End"]
+    set Red4Widgets(SPC_LAB06) [label $bottop.l3 -text "Top Extraction Row" -width 20]
     set Red4Widgets(SPC_LAB07) [label $bottop.l4 -text " "]
     set Red4Widgets(SPC_ENT02) [entry $bottop.s1]
     set Red4Widgets(SPC_ENT03) [entry $bottop.e1]
     pack $Red4Widgets(SPC_LAB06) $Red4Widgets(SPC_LAB07) -in $bottop -side left -pady 2m
     pack $Red4Widgets(SPC_ENT03) $Red4Widgets(SPC_LAB05) $Red4Widgets(SPC_ENT02) $Red4Widgets(SPC_LAB04) \
       -in $bottop -side right -pady 2m
-    $Red4Widgets(SPC_ENT02) insert end $Red4Widgets(ENT_TRS) 
-    $Red4Widgets(SPC_ENT03) insert end $Red4Widgets(ENT_TRE) 
+    $Red4Widgets(SPC_ENT02) insert end $Red4Widgets(ENT_TRS)
+    $Red4Widgets(SPC_ENT03) insert end $Red4Widgets(ENT_TRE)
     bind $Red4Widgets(SPC_LAB04) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB05) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB06) <Button-2> "red4Update red4Ext ALL"
@@ -68,17 +68,17 @@ proc red4Ext {taskname} {
     bind $Red4Widgets(SPC_ENT03) <Double-Button-2> "$Red4Widgets(SPC_ENT03) delete 0 end"
 
 # Create, pack and bind second extraction widget
-    set Red4Widgets(SPC_LAB08) [label $basetop.l1 -text "Start"]  
-    set Red4Widgets(SPC_LAB09) [label $basetop.l2 -text "End"]  
-    set Red4Widgets(SPC_LAB10) [label $basetop.l3 -text "Middle Extraction Row" -width 20]  
+    set Red4Widgets(SPC_LAB08) [label $basetop.l1 -text "Start"]
+    set Red4Widgets(SPC_LAB09) [label $basetop.l2 -text "End"]
+    set Red4Widgets(SPC_LAB10) [label $basetop.l3 -text "Middle Extraction Row" -width 20]
     set Red4Widgets(SPC_LAB11) [label $basetop.l4 -text " "]
     set Red4Widgets(SPC_ENT04) [entry $basetop.s2]
     set Red4Widgets(SPC_ENT05) [entry $basetop.e2]
     pack $Red4Widgets(SPC_LAB10) $Red4Widgets(SPC_LAB11) -in $basetop -side left -pady 2m
     pack $Red4Widgets(SPC_ENT05) $Red4Widgets(SPC_LAB09) $Red4Widgets(SPC_ENT04) $Red4Widgets(SPC_LAB08) \
        -in $basetop -side right -pady 2m
-    $Red4Widgets(SPC_ENT04) insert end $Red4Widgets(ENT_MRS) 
-    $Red4Widgets(SPC_ENT05) insert end $Red4Widgets(ENT_MRE) 
+    $Red4Widgets(SPC_ENT04) insert end $Red4Widgets(ENT_MRS)
+    $Red4Widgets(SPC_ENT05) insert end $Red4Widgets(ENT_MRE)
     bind $Red4Widgets(SPC_LAB08) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB09) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB10) <Button-2> "red4Update red4Ext ALL"
@@ -89,9 +89,9 @@ proc red4Ext {taskname} {
     bind $Red4Widgets(SPC_ENT05) <Double-Button-2> "$Red4Widgets(SPC_ENT05) delete 0 end"
 
 # Create, pack and bind third extraction widget
-    set Red4Widgets(SPC_LAB12) [label $lbasetop.l1 -text "Start"]  
-    set Red4Widgets(SPC_LAB13) [label $lbasetop.l2 -text "End"]  
-    set Red4Widgets(SPC_LAB14) [label $lbasetop.l3 -text "Bottom Extraction Row" -width 20]  
+    set Red4Widgets(SPC_LAB12) [label $lbasetop.l1 -text "Start"]
+    set Red4Widgets(SPC_LAB13) [label $lbasetop.l2 -text "End"]
+    set Red4Widgets(SPC_LAB14) [label $lbasetop.l3 -text "Bottom Extraction Row" -width 20]
     set Red4Widgets(SPC_LAB15) [label $lbasetop.l4 -text " "]
     set Red4Widgets(SPC_ENT06) [entry $lbasetop.s3]
     set Red4Widgets(SPC_ENT07) [entry $lbasetop.e3]
@@ -127,7 +127,7 @@ proc red4Ext {taskname} {
         set Red4Widgets(ENT_BRS) [string trim [$Red4Widgets(SPC_ENT06) get]]
         set Red4Widgets(ENT_BRE) [string trim [$Red4Widgets(SPC_ENT07) get]]
 
-# Convert 0 to true/false 
+# Convert 0 to true/false
         set message "Extracting spectrum from $Red4Widgets(RG) into $Red4Widgets(SP) and $Red4Widgets(IS)"
         cgs4drInform $taskname $message
         if {$Red4Widgets(SPC_INVERT) == 0} {

@@ -199,7 +199,7 @@
 *        Added rename option.  Allowed more than one extension to be
 *        processed.
 *     3-SEP-1999 (DSB):
-*        Corrected description of DELETE option. Do not cancel parameters 
+*        Corrected description of DELETE option. Do not cancel parameters
 *        when not looping.
 *     31-OCT-2000 (DSB):
 *        Corrected use of trailing character string length arguments
@@ -319,7 +319,7 @@
 *  then performs the action requested by the user.
       RUNING = .TRUE.
 
-      DO WHILE ( STATUS .EQ. SAI__OK .AND. RUNING ) 
+      DO WHILE ( STATUS .EQ. SAI__OK .AND. RUNING )
 
 *  Obtain the option.  The first pass through must select and access
 *  an extension.
@@ -368,7 +368,7 @@
                   IF ( LOOP ) THEN
                      CALL MSG_SETC( 'TXNAME', XNAME )
                      CALL MSG_SETC( 'TXTYPE', XTYPE )
-                     CALL MSG_OUT( ' ', 'Creating new scalar '/ 
+                     CALL MSG_OUT( ' ', 'Creating new scalar '/
      :                 /'extension named ^TXNAME of type ^TXTYPE.',
      :                 STATUS )
                   END IF
@@ -427,7 +427,7 @@
             IF ( STATUS .EQ. SAI__OK .AND. NCOMP .GT. 0 .AND.
      :           LOOP ) THEN
                CALL MSG_SETC( 'TXNAME', XNAME )
-               CALL MSG_OUT( ' ', 'Warning.  Extension ^TXNAME '/ 
+               CALL MSG_OUT( ' ', 'Warning.  Extension ^TXNAME '/
      :                       /'is not empty.', STATUS )
                CALL PAR_GET0L( 'OK', VERIFY, STATUS )
             ELSE
@@ -529,7 +529,7 @@
 *  Character type.
                   IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
                      CALL NDF_XGT0C( INDF, XNAME, CNAME, CVALUE,
-     :                               STATUS ) 
+     :                               STATUS )
                      CALL MSG_SETC( 'TCNAME', CNAME )
                      CALL MSG_SETC( 'TCTYPE', CTYPE )
                      CALL MSG_SETC( 'TCVALUE', CVALUE )
@@ -539,7 +539,7 @@
 *  Logical type.
                   ELSE IF ( CTYPE .EQ. '_LOGICAL' ) THEN
                      CALL NDF_XGT0L( INDF, XNAME, CNAME, LVALUE,
-     :                               STATUS ) 
+     :                               STATUS )
                      CALL MSG_SETC( 'TCNAME', CNAME )
                      CALL MSG_SETC( 'TCTYPE', CTYPE )
                      CALL MSG_SETL( 'TLVALUE', LVALUE )
@@ -549,7 +549,7 @@
 *  Real type.  Allow for bad values.
                   ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                      CALL NDF_XGT0R( INDF, XNAME, CNAME, RVALUE,
-     :                               STATUS ) 
+     :                               STATUS )
                      CALL MSG_SETC( 'TCNAME', CNAME )
                      CALL MSG_SETC( 'TCTYPE', CTYPE )
                      IF ( RVALUE .EQ. VAL__BADR ) THEN
@@ -564,7 +564,7 @@
 *  Double-precision type.  Allow for bad values.
                   ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                      CALL NDF_XGT0D( INDF, XNAME, CNAME, DVALUE,
-     :                               STATUS ) 
+     :                               STATUS )
                      CALL MSG_SETC( 'TCNAME', CNAME )
                      CALL MSG_SETC( 'TCTYPE', CTYPE )
                      IF ( DVALUE .EQ. VAL__BADD ) THEN
@@ -579,7 +579,7 @@
 *  Integer types.  Allow for bad values.
                   ELSE
                      CALL NDF_XGT0I( INDF, XNAME, CNAME, IVALUE,
-     :                               STATUS ) 
+     :                               STATUS )
                      CALL MSG_SETC( 'TCNAME', CNAME )
                      CALL MSG_SETC( 'TCTYPE', CTYPE )
                      IF ( ( CTYPE .EQ. '_INTEGER' .AND.
@@ -641,7 +641,7 @@
 
 *  Change the value of a component within an NDF extension, or create
 *  a new component.
-                  
+
 *  Obtain the name for the component, and ensure this has worked.
             CALL PAR_GET0C( 'CNAME', CNAME, STATUS )
             CALL CHR_UCASE( CNAME )
@@ -667,7 +667,7 @@
                CALL MSG_OUT( ' ', '  ^TCNAME is a structure and '/
      :           /'cannot be assigned a value.', STATUS )
 
-            ELSE IF ( STATUS .EQ. SAI__OK .AND. CTHERE ) THEN 
+            ELSE IF ( STATUS .EQ. SAI__OK .AND. CTHERE ) THEN
 
 *  Obtain the size of the object to see whether it is scalar or an
 *  array.  Obtain its type too.
@@ -702,7 +702,7 @@
 
 *  Only proceed if everything is ok and the user has given the
 *  go-ahead.
-            IF ( STATUS .EQ. SAI__OK .AND. VERIFY ) THEN 
+            IF ( STATUS .EQ. SAI__OK .AND. VERIFY ) THEN
 
 *  Obtain the HDS primitive data type.
                CALL KPG1_GETYP( 'CTYPE', CTYPE, STATUS )
@@ -748,31 +748,31 @@
                   ELSE IF ( CTYPE .EQ. '_LOGICAL' ) THEN
                      CALL PAR_GET0L( 'CVALUE', LVALUE, STATUS )
                      CALL NDF_XPT0L( LVALUE, INDF, XNAME, CNAME,
-     :                               STATUS ) 
+     :                               STATUS )
 
 *  Double-precision type.
                   ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                      CALL PAR_GET0D( 'CVALUE', DVALUE, STATUS )
                      CALL NDF_XPT0D( DVALUE, INDF, XNAME, CNAME,
-     :                               STATUS ) 
+     :                               STATUS )
 
 *  Real type.
                   ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                      CALL PAR_GET0R( 'CVALUE', RVALUE, STATUS )
                      CALL NDF_XPT0R( RVALUE, INDF, XNAME, CNAME,
-     :                               STATUS ) 
+     :                               STATUS )
 
-*  Integer type. 
+*  Integer type.
                   ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                      CALL PAR_GET0I( 'CVALUE', IVALUE, STATUS )
                      CALL NDF_XPT0I( IVALUE, INDF, XNAME, CNAME,
-     :                               STATUS ) 
+     :                               STATUS )
 
 *  Other integer types.  Do not set up limits for the data value
 *  appropriate to the chosen data type, becuse this causes problems in
 *  the type converison for the literal parameter CVALUE.  If the user
 *  gives a bad value, the conversion will set the value to be bad.
-                  ELSE 
+                  ELSE
 
 *  Obtain the value.
                      CALL PAR_GET0I( 'CVALUE', IVALUE, STATUS )
@@ -863,7 +863,7 @@
      :                                  STATUS )
 
 *  Get all the values at one go for noloop mode.
-                     ELSE 
+                     ELSE
 
 *  Find the character length.
                         CALL CHR_CTOI( CTYPE( 7: ), CLEN, STATUS )
@@ -873,15 +873,15 @@
      :                                  WKLOC, STATUS )
 
 *  Obtain the requested number of values.
-                        CALL PAR_EXACC( 'CVALUE', EL, 
+                        CALL PAR_EXACC( 'CVALUE', EL,
      :                                  %VAL( CNF_PVAL( CPNTR ) ),
      :                                  STATUS, %VAL( CNF_CVAL( 6 ) ),
      :                                  %VAL( CNF_CVAL( CLEN ) ) )
 
 *  Write the array to the component.
-                        CALL DAT_PUTVC( CLOC, EL, 
+                        CALL DAT_PUTVC( CLOC, EL,
      :                                  %VAL( CNF_PVAL( CPNTR ) ),
-     :                                  STATUS, 
+     :                                  STATUS,
      :                                  %VAL( CNF_CVAL( DAT__SZLOC ) ),
      :                                  %VAL( CNF_CVAL( CLEN ) ) )
 
@@ -897,12 +897,12 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACL( 'CVALUE', EL, 
+                     CALL PAR_EXACL( 'CVALUE', EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVL( CLOC, EL, 
+                     CALL DAT_PUTVL( CLOC, EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
@@ -916,12 +916,12 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACD( 'CVALUE', EL, 
+                     CALL PAR_EXACD( 'CVALUE', EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVD( CLOC, EL, 
+                     CALL DAT_PUTVD( CLOC, EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
@@ -935,12 +935,12 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACR( 'CVALUE', EL, 
+                     CALL PAR_EXACR( 'CVALUE', EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVR( CLOC, EL, 
+                     CALL DAT_PUTVR( CLOC, EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
@@ -954,12 +954,12 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACI( 'CVALUE', EL, 
+                     CALL PAR_EXACI( 'CVALUE', EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVI( CLOC, EL, 
+                     CALL DAT_PUTVI( CLOC, EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
@@ -968,19 +968,19 @@
 *  Other integer types
 *  -------------------
 *
-                  ELSE 
+                  ELSE
 
 *  Obtain workspace for the array.
                      CALL PSX_CALLOC( EL, '_INTEGER', CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACI( 'CVALUE', EL, 
+                     CALL PAR_EXACI( 'CVALUE', EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.  The values will be converted to
 *  the appropriate type.
-                     CALL DAT_PUTVI( CLOC, EL, 
+                     CALL DAT_PUTVI( CLOC, EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
@@ -1009,7 +1009,7 @@
          ELSE IF ( OPTION .EQ. 'RENAME' ) THEN
 
 *  Rename a component within an NDF extension.
-                  
+
 *  Obtain the name for the component and ensure this has worked.
             CALL PAR_GET0C( 'CNAME', CNAME, STATUS )
             CALL CHR_UCASE( CNAME )
@@ -1018,7 +1018,7 @@
 *  type and seek verification from the user.
             CALL DAT_THERE( XLOC, CNAME, CTHERE, STATUS )
 
-            IF ( STATUS .EQ. SAI__OK .AND. CTHERE ) THEN 
+            IF ( STATUS .EQ. SAI__OK .AND. CTHERE ) THEN
 
 *  Obtain the name for the component and ensure this has worked.
                CALL PAR_GET0C( 'NEWNAME', NNAME, STATUS )
@@ -1047,13 +1047,13 @@
             RUNING = RUNING .AND. LOOP
          END IF
 
-*  If another loop will be performed, and we are looping, flush any error 
-*  messages, reset the status, and cancel any parameters which may need 
+*  If another loop will be performed, and we are looping, flush any error
+*  messages, reset the status, and cancel any parameters which may need
 *  to be reprompted for on the next pass.
          IF ( RUNING .AND. LOOP ) THEN
 
             IF ( STATUS .NE. PAR__ABORT ) THEN
-               IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS ) 
+               IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
             END IF
 
             IF ( FIRST ) THEN

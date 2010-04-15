@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *        variance value to ensure UNIX compatibility.
 *     17-JUL-2006 (DSB):
 *        Include "PRIMITIVE" as a valid Variant value (this variant is
-*        an internal flag used to indicate that the ARRAY structure will 
+*        an internal flag used to indicate that the ARRAY structure will
 *        be replaced at some point by a primitive array).
 *     {enter_further_changes_here}
 
@@ -93,7 +93,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -178,7 +178,7 @@
 *  supplying a default form of 'SIMPLE' if not.
                   ELSE
                      CALL DAT_THERE( DCB_LOC( IDCB ), 'VARIANT', THERE,
-     :                               STATUS ) 
+     :                               STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         IF ( .NOT. THERE ) THEN
                            DCB_FRM( IDCB ) = 'SIMPLE'
@@ -230,7 +230,7 @@
                                  IF ( CHR_SIMLR(
      :                                %VAL( CNF_PVAL( PNTR ) ),
      :                                'SIMPLE',
-     :                                %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'SIMPLE'
 
@@ -238,7 +238,7 @@
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SCALED',
-     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'SCALED'
 
@@ -246,7 +246,7 @@
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SPACED',
-     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'SPACED'
 
@@ -254,7 +254,7 @@
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SPARSE',
-     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'SPARSE'
 
@@ -262,7 +262,7 @@
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'POLYNOMIAL',
-     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'POLYNOMIAL'
 
@@ -270,7 +270,7 @@
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'PRIMITIVE',
-     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'PRIMITIVE'
 
@@ -287,7 +287,7 @@
      :                              'The VARIANT component in the ' //
      :                              'array structure ^ARRAY has an ' //
      :                              'invalid value of ''^BADVARIANT''.',
-     :                              STATUS ) 
+     :                              STATUS )
                                  END IF
                               END IF
                            END IF

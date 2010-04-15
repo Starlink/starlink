@@ -1,7 +1,7 @@
 
 * See gau2_pro for discussion
 
-      subroutine gau2_outim (modtyp, img, idx, xco, yco, x, c, 
+      subroutine gau2_outim (modtyp, img, idx, xco, yco, x, c,
      :     elems, n, p, l, gau2par, a, model, status)
 *+
 *   Description:
@@ -69,28 +69,28 @@
       integer status
 
 *   Arguments returned
-      real model(elems) 
+      real model(elems)
 
 *   Local variables
       integer ngaussians, i, j
       real total
       logical residuals
-      
-      
+
+
       if (status .ne. sai__ok) return
-      
+
       if (gau2par(gau2bg) .gt. 0) then ! we fitted the background
          ngaussians = l-1
       else
          ngaussians = l
       endif
-      
+
       residuals = modtyp .eq. gau2residual
 
 *   First call gau2_calc to get the contributions from the different
 *   gaussians.  We don't need the jacobian information, so pass 0 in the
 *   DA slot, and pass WHICH positive.
-      call gau2_calc (+1, n, p, l, x, 0, xco, yco, 
+      call gau2_calc (+1, n, p, l, x, 0, xco, yco,
      :     gau2par, a, %val(0))
 
 *   Now initialise the output array with bad values

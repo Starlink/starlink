@@ -2,13 +2,13 @@
  *+
  *  Name:
  *     hdrInD
- 
+
  *  Purpose:
  *     Reads double header items.
- 
+
  *  Language:
  *     ANSI C
- 
+
  *  Invocation:
  *     hdrInD( param,
  *             xname,
@@ -16,12 +16,12 @@
  *             comp,
  *             value,
  *             status )
- 
+
  *  Description:
  *     This C function sets up the required arguments and calls the
  *     Fortran subroutine hdr_ind.
  *     On return, values are converted back to C form if necessary.
- 
+
  *  Arguments:
  *     param = char * (Given)
  *        Parameter name of the image (case insensitive).
@@ -37,7 +37,7 @@
  *        The values. These are  unmodified if the item doesn't exist.
  *     status = int * (Given and Returned)
  *        The global status.
- 
+
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,14 +63,14 @@
  *     Fortran source of hdr_ind by the Perl script fcwrap.
  *     PDRAPER: Peter W. Draper (STARLINK - Durham University).
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     17-May-1996 (fcwrap):
  *        Original version
  *     22-May-1996 (PDRAPER):
  *        Changed to return array of doubles.
  *     {enter_changes_here}
- 
+
  *-
  */
 #include <string.h>
@@ -93,18 +93,18 @@ void hdrInD( char *param,
              int comp,
              double *value,
              int *status ) {
-  
+
   DECLARE_CHARACTER_DYN(fparam);
   DECLARE_CHARACTER_DYN(fxname);
   DECLARE_CHARACTER_DYN(fitem);
-  
+
   F77_CREATE_CHARACTER(fparam,strlen( param ));
   cnf_exprt( param, fparam, fparam_length );
   F77_CREATE_CHARACTER(fxname,strlen( xname ));
   cnf_exprt( xname, fxname, fxname_length );
   F77_CREATE_CHARACTER(fitem,strlen( item ));
   cnf_exprt( item, fitem, fitem_length );
-  
+
   F77_CALL(hdr_ind)( CHARACTER_ARG(fparam),
                      CHARACTER_ARG(fxname),
                      CHARACTER_ARG(fitem),
@@ -114,11 +114,11 @@ void hdrInD( char *param,
                      TRAIL_ARG(fparam)
                      TRAIL_ARG(fxname)
                      TRAIL_ARG(fitem) );
-  
+
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);
   F77_FREE_CHARACTER(fitem);
-  
+
   return;
 }
 

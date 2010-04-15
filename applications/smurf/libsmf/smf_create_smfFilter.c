@@ -146,14 +146,14 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
         if( template->hdr ) {
           /* Figure out length of a sample in order to calculate df */
           steptime = template->hdr->steptime;
-          
+
           if( *status == SAI__OK ) {
 
             /* Start an AST context */
             astBegin;
 
             /* Frequency step in Hz */
-            filt->df = 1. / (steptime * (double) filt->ntslice); 
+            filt->df = 1. / (steptime * (double) filt->ntslice);
 
             /* Create a new FrameSet containing a 2d base GRID frame */
 
@@ -164,17 +164,17 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
             specframe = astSpecFrame( "System=freq,Unit=Hz,StdOfRest=Topocentric" );
             cframe = astFrame( 1, "Domain=GRID" );
-            curframe2d = astCmpFrame( specframe, cframe, " " ); 
+            curframe2d = astCmpFrame( specframe, cframe, " " );
 
             /* The mapping from 2d grid coordinates to (frequency, coeff) is
                accomplished with a shift and a zoommap for the 1st dimension,
                and a unit mapping for the other */
 
             zshift = -1;
-            zshiftmapping = astShiftMap( 1, &zshift, " " ); 
+            zshiftmapping = astShiftMap( 1, &zshift, " " );
             scalemapping = astZoomMap( 1, filt->df, " " );
             specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
-            
+
             cmapping = astUnitMap( 1, " " );
 
             fftmapping = astCmpMap( specmapping, cmapping, 0, " " );
@@ -191,8 +191,8 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
         } else {
           *status = SAI__ERROR;
-          errRep( FUNC_NAME, 
-                  "No hdr associated with template, can't determine step time", 
+          errRep( FUNC_NAME,
+                  "No hdr associated with template, can't determine step time",
                   status );
         }
       }

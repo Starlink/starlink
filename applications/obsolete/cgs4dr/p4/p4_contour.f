@@ -83,7 +83,7 @@
 
 *    Map the data
       IF ( DISPLAY_PLANE( PORT ) .EQ. 'DATA' ) THEN
-         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT', 
+         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT',
      :      DATA_PTR, DATA_SLOT, STATUS )
 
 *    Or map the errors
@@ -109,7 +109,7 @@
 
 *    Map the quality array (for other pruposes)
       IF ( QUALITY ) THEN
-         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE', 
+         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE',
      :      QUAL_PTR, QUAL_SLOT, STATUS )
       ELSE
          QUAL_PTR = 0
@@ -121,10 +121,10 @@
 *    Get the minimum, maximum, mean and sigma
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL P4_GET_STATS( DIMS(1), DIMS(2), %val(DATA_PTR),
-     :   QUALITY, %val(QUAL_PTR), PLOT_WHOLE( PORT ), ISTART( PORT ), 
-     :   IEND( PORT ), 1, JSTART( PORT ), JEND( PORT ), 1, 
-     :   AUTOSCALE( PORT ), HIGH( PORT ), LOW( PORT ), MEAN( PORT ), 
-     :   SIGMA( PORT ), STATUS ) 
+     :   QUALITY, %val(QUAL_PTR), PLOT_WHOLE( PORT ), ISTART( PORT ),
+     :   IEND( PORT ), 1, JSTART( PORT ), JEND( PORT ), 1,
+     :   AUTOSCALE( PORT ), HIGH( PORT ), LOW( PORT ), MEAN( PORT ),
+     :   SIGMA( PORT ), STATUS )
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'P4_CONTOUR: '/
@@ -155,7 +155,7 @@
 
 *    First select basic viewport
       CALL P4_SELPORT( PORT, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'P4_CONTOUR: '/
      :      /'Unable to select desired viewport', STATUS )
@@ -173,10 +173,10 @@
 *    port is less than 2:1, then set up the window so that a unit is
 *    square. Otherwise fill the viewport with the window.
       IF ( ( SAME_UNITS ) .AND. ( ASPECT .LT. 2.0 ) ) THEN
-         CALL PGWNAD( XSTART( PORT ), XEND( PORT ), 
+         CALL PGWNAD( XSTART( PORT ), XEND( PORT ),
      :      YSTART( PORT ), YEND( PORT ) )
       ELSE
-         CALL PGWINDOW( XSTART( PORT ), XEND( PORT ), 
+         CALL PGWINDOW( XSTART( PORT ), XEND( PORT ),
      :      YSTART( PORT ), YEND( PORT ) )
       ENDIF
 
@@ -219,10 +219,10 @@
                CALL PGSCI( 15 )
             ENDIF
          ENDIF
-     
+
 *       Plot contours
          CALL PGCONT( %val( DATA_PTR ), DIMS(1), DIMS(2),
-     :      ISTART( PORT ), IEND( PORT ), JSTART( PORT ), 
+     :      ISTART( PORT ), IEND( PORT ), JSTART( PORT ),
      :      JEND( PORT ), ARRAY_CONTOURS(I), -1, TMATRIX )
 
          IF ( MOD( CSLS, 5 ) .EQ. 0 ) THEN
@@ -247,7 +247,7 @@
 *    Plot the ancillary bits if need be
       IF ( PLOT_AXES( PORT ) ) THEN
 
-         CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0, 
+         CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0,
      :      DEVICE_YOPT( PORT ), 0.0, 0 )
 
 *       Write the title
@@ -256,7 +256,7 @@
          IF ( TITLE( PORT ).EQ. 'A_U_T_O' ) THEN
             TLEN = CHR_LEN( DEFTITLE(PORT) )
             SLEN = CHR_LEN( SUBTITLE(PORT) )
-            CALL PGLABEL( XLABEL(PORT)(1:XLEN), YLABEL(PORT)(1:YLEN), 
+            CALL PGLABEL( XLABEL(PORT)(1:XLEN), YLABEL(PORT)(1:YLEN),
      :         DEFTITLE(PORT)(1:TLEN) )
             CALL PGMTEXT( 'T', 0.5, 0.5, 0.5, SUBTITLE(PORT)(1:SLEN) )
          ELSE

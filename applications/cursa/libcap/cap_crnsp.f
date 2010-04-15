@@ -40,7 +40,7 @@
      :  NUMSEL
 *  Arguments Returned:
       INTEGER
-     :  SELIST(NUMSEL) 
+     :  SELIST(NUMSEL)
 *  Status:
       INTEGER STATUS         ! Global status.
 *  Local Variables:

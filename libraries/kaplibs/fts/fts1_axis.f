@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -151,7 +151,7 @@
 
 *  Start a new NDF context.
       CALL NDF_BEGIN
-      
+
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDF, DAT__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -222,15 +222,15 @@
             IF ( RATIO .GT. DBLE( VAL__EPSR ) * PRECF ) THEN
 
 *  Map the centre array in the axis structure.
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR, 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR,
      :                        EL, STATUS )
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL KPG1_SSAZR( EL, DELT, OFFSET,
-     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
-               
+
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
                END IF
@@ -248,7 +248,7 @@
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL KPG1_SSAZD( EL, DELT, OFFSET,
-     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
 
 *  Unmap the axis array.
@@ -275,5 +275,5 @@
 
 *  Close the new NDF context.
       CALL NDF_END( STATUS )
-      
+
       END

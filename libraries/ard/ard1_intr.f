@@ -15,7 +15,7 @@
 *                         STATUS )
 
 *  Description:
-*     Returns .TRUE. if the supplied user position (UC) is within, or on 
+*     Returns .TRUE. if the supplied user position (UC) is within, or on
 *     the boundary of, the specified region. Only used for regions which
 *     have non-zero volume/area (eg box, circle, etc, but not line,
 *     column, etc).
@@ -39,8 +39,8 @@
 *        The global status.
 
 *  Returned Value:
-*     ARD1_INTR = LOGICAL 
-*        .TRUE. if the supplied user position (UC) is within, or on 
+*     ARD1_INTR = LOGICAL
+*        .TRUE. if the supplied user position (UC) is within, or on
 *        the boundary of, the specified region, and .FALSE. otherwise.
 
 *  Notes:
@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -107,7 +107,7 @@
 
 *  Local Variables:
       INTEGER
-     :      I,                   ! Axis index 
+     :      I,                   ! Axis index
      :      J                    ! Axis index
 
       DOUBLE PRECISION
@@ -122,15 +122,15 @@
       SAVE P1
 *.
 
-*  Initialize the returned value to indicate the point is within the 
+*  Initialize the returned value to indicate the point is within the
 *  region.
       ARD1_INTR = .TRUE.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  BOX: Parameters are the supplied user co-ordinates of the box 
-*  centre, followed by the lengths of the box sides in user co-ordinates. 
+*  BOX: Parameters are the supplied user co-ordinates of the box
+*  centre, followed by the lengths of the box sides in user co-ordinates.
 *  Box edges are always considered to be lines of constant axis values.
 *  These are not necessarily geodesics. If a side length is negative, the
 *  axis value must lie outside the specified range. This because (for
@@ -138,15 +138,15 @@
 *  than 1 and greater than 359.
       IF( TYPE .EQ. ARD__BOX ) THEN
          DO I = 1, NWCS
-            IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UC( I ), 
-     :                               STATUS ) ) .GT. 
+            IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UC( I ),
+     :                               STATUS ) ) .GT.
      :          0.5*ABS( PAR( I + NWCS ) ) ) THEN
                ARD1_INTR = .FALSE.
                GO TO 999
             END IF
          END DO
 
-*  POLYGON: Parameters are pairs of user co-ordinates, each being a vertex of 
+*  POLYGON: Parameters are pairs of user co-ordinates, each being a vertex of
 *  the polygon. 2-D only. Each edge is a geodesic.
       ELSE IF( TYPE .EQ. ARD__POL ) THEN
 
@@ -178,7 +178,7 @@
             ELSE
                ANG = ANG + ANG0
             END IF
-   
+
          END DO
 
  10      CONTINUE
@@ -193,12 +193,12 @@
 
 *  Find the distance from the test point to the circle centre.
 *  If it is less than or equal to the radius, the point is inside.
-         ARD1_INTR = ( AST_DISTANCE( FRM, PAR, UC, STATUS ) .LE. 
+         ARD1_INTR = ( AST_DISTANCE( FRM, PAR, UC, STATUS ) .LE.
      :                 PAR( NWCS + 1 ) )
 
 *  ELLIPSE: Parameters are the user co-ordinates of the centre of the ellipse,
-*  the half-lengths of the two axes of the ellipse, and the angle (in degrees) 
-*  between the first user axis and the first of the two ellipse axes. 
+*  the half-lengths of the two axes of the ellipse, and the angle (in degrees)
+*  between the first user axis and the first of the two ellipse axes.
 *  Rotation from the 1st to the 2nd axis is positive. 2D only.
       ELSE IF( TYPE .EQ. ARD__ELL ) THEN
 
@@ -228,8 +228,8 @@
             U = AST_ANGLE( FRM, UC, PAR, P1, STATUS )
 
 *  Do the test.
-            ARD1_INTR = ( ( COS( U )/PAR( 3 ) )**2 + 
-     :                    ( SIN( U )/PAR( 4 ) )**2 .LE. 
+            ARD1_INTR = ( ( COS( U )/PAR( 3 ) )**2 +
+     :                    ( SIN( U )/PAR( 4 ) )**2 .LE.
      :                    1.0/R**2 )
          END IF
 

@@ -1,17 +1,17 @@
-	SUBROUTINE FITSWHEAD( TAPEORDISK, MTCHAN, LUNO, DIMSX, DIMSY, 
-     :	                      BZERO, BSCALE, ARRAY, INST, PLATESCALE, 
-     :	                      OBSERVERS, ORIGIN, SOFTWARE, HEIGHT, LAT, 
-     :                        LONG, TELESCOPE, BIAS, CONF, MAX, MIN, 
-     :	                      DEC, AIRMASS, EQUINOX, EVENMEAN, EVENSTD, 
-     :	                      EXPO, FILTER, GAIN, GATE, LOCALTIME, MODE, 
-     :	                      COADDS, OBJECT, ODDMEAN, ODDSTD, 
-     :	                      OFFSETDEC, OFFSETRA, RA, READRATE, TEMP, 
-     :	                      TITLE, IMAGENAME, UT, HA, ST, FPX, FPY, 
-     :	                      FPZ, XHEAD_ARCSECPMM, XHEAD_DEC_ZERO, 
-     :	                      XHEAD_RA_ZERO, XHEAD_DEC, XHEAD_RA, 
+	SUBROUTINE FITSWHEAD( TAPEORDISK, MTCHAN, LUNO, DIMSX, DIMSY,
+     :	                      BZERO, BSCALE, ARRAY, INST, PLATESCALE,
+     :	                      OBSERVERS, ORIGIN, SOFTWARE, HEIGHT, LAT,
+     :                        LONG, TELESCOPE, BIAS, CONF, MAX, MIN,
+     :	                      DEC, AIRMASS, EQUINOX, EVENMEAN, EVENSTD,
+     :	                      EXPO, FILTER, GAIN, GATE, LOCALTIME, MODE,
+     :	                      COADDS, OBJECT, ODDMEAN, ODDSTD,
+     :	                      OFFSETDEC, OFFSETRA, RA, READRATE, TEMP,
+     :	                      TITLE, IMAGENAME, UT, HA, ST, FPX, FPY,
+     :	                      FPZ, XHEAD_ARCSECPMM, XHEAD_DEC_ZERO,
+     :	                      XHEAD_RA_ZERO, XHEAD_DEC, XHEAD_RA,
      :                        COMMENTS)
 
-* Subroutine to take the values defining an observation image and write them 
+* Subroutine to take the values defining an observation image and write them
 * to tape in a FITS format header.
 
 *     HISTORY
@@ -24,18 +24,18 @@
 
 
 
-	INTEGER 
+	INTEGER
      :	  MAXNVALS            ! maximum number of values in NVALS array
 
 	PARAMETER ( MAXNVALS = 2880)
 
-	BYTE 
+	BYTE
      :	  NVALS( MAXNVALS)    ! array for packed header values
 
-	INTEGER 
+	INTEGER
      :	  DIMSX,              ! X dimensions of current image
      :	  DIMSY,              ! Y dimensions of current image
-     :	  ENDCARD,            ! number of last card to contain END 
+     :	  ENDCARD,            ! number of last card to contain END
      :	  IJUNK,              ! temporary integer variable
      :	  LUNO,               ! lun for output disk fits file
      :	  LEN,                ! length of character string
@@ -50,7 +50,7 @@
 	PARAMETER ( MAXCARDS = 72)
 	PARAMETER ( MAXCHARS = 80)
 
-	REAL 
+	REAL
      :	  AIRMASS,            ! Airmass
      :	  BIAS,               ! Bias voltage on chip (mV)
      :	  BSCALE,             ! scale for conversion back to 32 bit data (DN)
@@ -116,7 +116,7 @@
      :	  ORIGIN*( *),        ! origin of observers
      :	  SOFTWARE*( *),      ! software written by
      :	  TAPEORDISK*( *),    ! write to tape or disk
-     :	  TELESCOPE*( *),     ! telescope name 
+     :	  TELESCOPE*( *),     ! telescope name
      :	  TITLE*( *),         ! title of observations
      :	  DATE1*2,            ! date day
      :	  DATE2*3,            ! date month
@@ -192,7 +192,7 @@
 	CARD( 8) = 'TELESCOP='
         CALL CHR_CLEAN( TELESCOPE )
         LEN = 0
-	CALL CHR_APPND( TELESCOPE, TELESCOPE, LEN) 
+	CALL CHR_APPND( TELESCOPE, TELESCOPE, LEN)
 	IF( LEN .LT. 8) THEN
 	  TELESCOPE( LEN+1:8) = ' '
 	  LEN = 8
@@ -204,11 +204,11 @@
 	CARD( 8) = CARD( 8)( 1:LEN) // ' ' // CJUNK
 	TEXT( 8) = ' / Telescope name'
 
-*      Instrument used 
+*      Instrument used
 	CARD( 9) = 'INSTRUME='
         CALL CHR_CLEAN( INST )
         LEN = 0
-	CALL CHR_APPND( INST, INST, LEN) 
+	CALL CHR_APPND( INST, INST, LEN)
 	IF( LEN .LT. 8) THEN
 	  INST( LEN+1:8) = ' '
 	  LEN = 8
@@ -230,11 +230,11 @@
 	TEXT( 10) = ' / Nominal arcseconds/pixel'
 
 *      Local contacts
-	CARD( 11) = 'CONTACTS=' 
+	CARD( 11) = 'CONTACTS='
         CALL CHR_CLEAN( CARD( 11) )
         LEN = 0
 	CALL CHR_APPND( CARD( 11), CARD( 11), LEN)
-	CARD( 11) = CARD( 11)( 1:LEN) // ' ' // 
+	CARD( 11) = CARD( 11)( 1:LEN) // ' ' //
      :	  CHAR( 39) // 'Mark Casali/Colin Aspin' // CHAR( 39)
 	TEXT( 11) = ' / Local contacts'
 
@@ -242,7 +242,7 @@
 	CARD( 12) = 'OBSERVER='
         CALL CHR_CLEAN( OBSERVERS )
         LEN = 0
-	CALL CHR_APPND( OBSERVERS, OBSERVERS, LEN) 
+	CALL CHR_APPND( OBSERVERS, OBSERVERS, LEN)
 	IF( LEN .LT. 8) THEN
 	  OBSERVERS( LEN+1:8) = ' '
 	  LEN = 8
@@ -258,7 +258,7 @@
 	CARD( 13) = 'OBSORIGI='
         CALL CHR_CLEAN( ORIGIN )
         LEN = 0
-	CALL CHR_APPND( ORIGIN, ORIGIN, LEN ) 
+	CALL CHR_APPND( ORIGIN, ORIGIN, LEN )
 	IF( LEN .LT. 8) THEN
 	  ORIGIN( LEN+1:8) = ' '
 	  LEN = 8
@@ -274,7 +274,7 @@
 	CARD( 14) = 'SOFTWARE='
         CALL CHR_CLEAN( SOFTWARE )
         LEN = 0
-	CALL CHR_APPND( SOFTWARE, SOFTWARE, LEN) 
+	CALL CHR_APPND( SOFTWARE, SOFTWARE, LEN)
 	IF( LEN .LT. 8) THEN
 	  SOFTWARE( LEN+1:8) = ' '
 	  LEN = 8
@@ -319,7 +319,7 @@
 	CARD( 18) = 'ARRAYTYP='
         CALL CHR_CLEAN( ARRAY )
         LEN = 0
-	CALL CHR_APPND( ARRAY, ARRAY, LEN) 
+	CALL CHR_APPND( ARRAY, ARRAY, LEN)
 	IF( LEN .LT. 8) THEN
 	  ARRAY( LEN+1:8) = ' '
 	  LEN = 8
@@ -335,7 +335,7 @@
 	CARD( 19) = 'CONFIGUR='
         CALL CHR_CLEAN( CONF )
         LEN = 0
-	CALL CHR_APPND( CONF, CONF, LEN) 
+	CALL CHR_APPND( CONF, CONF, LEN)
 	IF( LEN .LT. 8) THEN
 	  CONF( LEN+1:8) = ' '
 	  LEN = 8
@@ -351,7 +351,7 @@
 	CARD( 20) = 'MODE    ='
         CALL CHR_CLEAN( MODE )
         LEN = 0
-	CALL CHR_APPND( MODE, MODE, LEN) 
+	CALL CHR_APPND( MODE, MODE, LEN)
 	IF( LEN .LT. 8) THEN
 	  MODE( LEN+1:8) = ' '
 	  LEN = 8
@@ -363,7 +363,7 @@
 	CARD( 20) = CARD( 20)( 1:LEN) // ' ' // CJUNK
 	TEXT( 20) = ' / Observing mode'
 
-*      System gain 
+*      System gain
 	CARD( 21) = 'SYSTGAIN='
 	WRITE( CJUNK, '(F20.3)') GAIN
         CALL CHR_CLEAN( CARD( 21) )
@@ -372,7 +372,7 @@
 	CARD( 21) = CARD( 21)( 1:LEN) // ' ' // CJUNK
 	TEXT( 21) = ' / Electronic gain factor'
 
-*      Total gain 
+*      Total gain
 	CARD( 22) = 'ELPERDN ='
 	JUNK = 25.0
 	WRITE( CJUNK, '(F20.3)') JUNK
@@ -419,7 +419,7 @@
 *      Title of observation
         CALL CHR_CLEAN( TITLE )
         LEN = 0
-	CALL CHR_APPND( TITLE, TITLE, LEN) 
+	CALL CHR_APPND( TITLE, TITLE, LEN)
 	IF( LEN .LT. 8) THEN
 	  TITLE( LEN+1:8) = ' '
 	  LEN = 8
@@ -648,7 +648,7 @@
 	IF( DATE2 .EQ. 'OCT') RDATE2 = '10'
 	IF( DATE2 .EQ. 'NOV') RDATE2 = '11'
 	IF( DATE2 .EQ. 'DEC') RDATE2 = '12'
-	CJUNK = 
+	CJUNK =
      : CHAR( 39) // DATE1 // '/' // RDATE2 // '/' // DATE3 // CHAR( 39)
         CALL CHR_CLEAN( CARD( 47) )
         LEN = 0
@@ -882,7 +882,7 @@
 	      READ( CARD( JCARD)( JCHAR:JCHAR), '(A1)') NVALS( NVALSINDEX)
 	    ELSE
 
-*            Write header record to tape 
+*            Write header record to tape
 	      IF( TAPEORDISK( 1:1) .EQ. 'T') THEN
 	        JTAPE = MTWR( MTCHAN, NVALS, 1, 2880)
 	      ELSE
@@ -896,7 +896,7 @@
 	  END DO
 	END DO
 
-*      Write header record to tape 
+*      Write header record to tape
 	IF( TAPEORDISK( 1:1) .EQ. 'T') THEN
 	  JTAPE = MTWR( MTCHAN, NVALS, 1, 2880)
 	ELSE

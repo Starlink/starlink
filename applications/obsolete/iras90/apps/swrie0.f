@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -64,7 +64,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'SKY_PAR'          ! SKY_ constants
-                   
+
 *  Arguments Given:
       INTEGER FID
       CHARACTER*( * ) SCS
@@ -132,7 +132,7 @@
          CALL MSG_SETC( 'T', TXT( I ) )
          CALL MSG_LOAD( ' ', '^A,^B, "^T"', BUF, BLEN, STATUS )
          CALL FIO_WRITE( FID, BUF( : MIN( 80, BLEN ) ), STATUS )
-      
+
       END DO
- 
+
       END

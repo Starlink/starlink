@@ -91,10 +91,10 @@ int main ( int argc, char *argv[] )
 
 /* Initialize the command string. */
    ipline [ 0 ] = '\0';
- 
+
 /* Loop until terminate request. */
    for ( ; ; ) {
- 
+
    /* Get a command line. */
       if ( ( jstat = hlpInsub ( ipline, ": ", &l ) ) != 1 ) goto badinput;
 

@@ -9,7 +9,7 @@
  Bugfix release:
 
  o You can now select option 4.2 independently of option 4.1, on Linux
-   (this turned out to be a general option-parsing problem on Linux -- 
+   (this turned out to be a general option-parsing problem on Linux --
    it was impossible to select _any_ suboption).
  o New `parameter' version for echmenu: `echmenu version' reports the
    echomop version number and exits immediately.

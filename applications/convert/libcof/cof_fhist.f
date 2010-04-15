@@ -68,7 +68,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,7 +117,7 @@
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
          CALL COF_FIOER( FSTAT, 'COF_FHIST_ERR1', 'FTGHPS',
-     :                   'Error finding number of FITS keywords.', 
+     :                   'Error finding number of FITS keywords.',
      :                   STATUS )
          GOTO 999
       END IF

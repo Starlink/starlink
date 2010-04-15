@@ -2,24 +2,24 @@
 *+
 *  Name:
 *     MAG_ASSOC
- 
+
 *  Purpose:
 *     Open a tape device defined by a parameter and return a descriptor
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_ASSOC(DEVICE, MODE, TD, STATUS)
- 
+
 *  Description:
 *     Get a descriptor for a tape device specified by its parameter name.
- 
+
 *  Arguments:
 *     DEVICE=CHARACTER*(*) (Given)
 *        Expression specifying the name of a Tape Device Parameter.
 *     MODE=CHARACTER*(*) (Given)
-*        Expression specifying the access mode: 'READ', 'WRITE' or 
+*        Expression specifying the access mode: 'READ', 'WRITE' or
 *        'UPDATE' (read and write).
 *     TD=INTEGER (Returned)
 *        A Variable to contain the tape descriptor.
@@ -29,13 +29,13 @@
 *        will return without action.
 *        If the routine fails to complete, this variable will be set
 *        to an appropriate error number.
- 
+
 *  Algorithm:
 *     Use PAR_GET0C to get the Device or Logical Name of the tape
 *     drive.
 *     MAG_OPEN is used to assign a channel to the drive and return a
 *     tape descriptor.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1986, 1988, 1991, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *  Authors:
 *     Sid Wright  (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     16-Apr-1983:  Original.  (UCL::SLW)
 *     16-Jul-1986:  Retain locator to USRDEVDATA in MAGPA common
@@ -80,33 +80,33 @@
 *      1-OCT-1996 (AJC):
 *        Restore UPDATE mode
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! HDS DAT constants 
-      INCLUDE 'PAR_PAR'          ! Parameter system constants 
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'PAR_PAR'          ! Parameter system constants
       INCLUDE 'PAR_ERR'         ! PAR Errors
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
       INCLUDE 'MAG_ERR'         ! MAG Errors
       INCLUDE 'MAGSCL_PAR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) PNAME       ! Tape Parameter Name
       CHARACTER*(*) ACMODE      ! Tape access mode
- 
+
 *  Arguments Returned:
       INTEGER TD                ! Tape descriptor
 *    Status return :
       INTEGER STATUS            ! status return
- 
+
 *  External References:
       EXTERNAL CHR_SIMLR
       LOGICAL CHR_SIMLR
@@ -115,7 +115,7 @@
 *  Global Variables:
       INCLUDE 'MAGGO_SCL'       ! MAG Initialisation Switch
       INCLUDE 'MAGPA_SCL'       ! MAG Parameter Table
- 
+
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) LOC   ! locator to Tape dataset
       CHARACTER*(MAG__SZNAM) TAPE  ! Tape Device or Logical Name
@@ -124,14 +124,14 @@
       INTEGER FILE              ! current file number
       LOGICAL START             ! relative to start ?
       INTEGER BLOCK             ! current block number
- 
+
 *.
- 
- 
+
+
 C      print *,'mag_assoc:status,pname,acmode ',status,pname,acmode
 *    Allowed to execute ?
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *    Initialised ?
 C      print *,'mag_assoc:Magslp ', Magslp
       IF ( MAGSLP ) THEN
@@ -139,7 +139,7 @@ C      print *,'mag_assoc:Magslp ', Magslp
 C         print *,'mag_assoc:  mag_activ => status ', status
          IF ( STATUS.NE.SAI__OK ) RETURN
       END IF
- 
+
 *    Get a Tape descriptor
       CALL MAG1_GETTP(PNAME, TP, RTP, STATUS)
       IF ( STATUS.EQ.MAG__ISACT ) THEN
@@ -177,8 +177,8 @@ C         print *,'mag_assoc:  mag_activ => status ', status
          END DO
  1       CONTINUE
       END IF
- 
+
 C      print *,'mag_assoc:  => status ', status
- 
+
       RETURN
       END

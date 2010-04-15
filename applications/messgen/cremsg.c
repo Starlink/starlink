@@ -22,7 +22,7 @@
  *     A certain amount of flexibility is allowed. In particular, the
  *     message may be immediately before or immediately after the
  *     PARAMETER definition.
- *     
+ *
  *     CREMSG will produce the corresponding MESSGEN source file, optionally
  *     printing the lines produced.
 
@@ -30,8 +30,8 @@
  *     Options: One or more of:
  *              -v - Output diagnostic informations about messgen run
  *
- *     <files> - any number of message source error include file in 
- *               VMS MESSAGE format      
+ *     <files> - any number of message source error include file in
+ *               VMS MESSAGE format
 
  *  Authors:
  *     AJC: A.J. Chipperfield (STARLINK)
@@ -75,7 +75,7 @@ int verify=0;
 static void
 process_file(char *filename)
 {
-/* 
+/*
  * Process an error include file.
  */
     FILE *fp, *fp0;
@@ -213,13 +213,13 @@ process_file(char *filename)
               return;
            }
 
-/*       The PARAMETER line is OK - get the associated message 
+/*       The PARAMETER line is OK - get the associated message
          if it didn't precede the definitions */
            if ( message[0] == ' ' ) {
               if ( fgets(buffer, MAXLINE, fp) == NULL) {
                  fprintf( stderr, "Premature end of file\n" );
                  return;
-              } 
+              }
            } else {
               strcpy( buffer, message );
            }
@@ -235,7 +235,7 @@ process_file(char *filename)
               fprintf( stderr, "Message line doesn't follow PARAMETER\n" );
               return;
            }
-                                       
+
          } else {
 /*       It's not a PARAMETER statement. If it's not an INTEGER statement
          either, annul the last message. */

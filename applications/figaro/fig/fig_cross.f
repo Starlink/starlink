@@ -7,13 +7,13 @@ C
 C     Figaro utility routine.  Calculates the cross-correlation function
 C     of two spectra and fits the central peak, returning the relative
 C     shift between the two spectra and the width of the central peak.
-C     
+C
 C     Parameters -  (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (!) ARRAY0    (Real array ARRAY0(NX0)) Passed containing the first
 C                   of the two spectra.  Used as workspace as the data
-C                   has its continuum subtracted prior to being fourier 
-C                   transformed. 
+C                   has its continuum subtracted prior to being fourier
+C                   transformed.
 C     (!) ARRAY1    (Real array ARRAY1(NX0)) Passed containing the second
 C                   of the two spectra.  Modified as for ARRAY0.
 C     (>) NX0       (Integer) The number of elements in the two spectra.
@@ -24,7 +24,7 @@ C     (>) CFIT      (Logical) If false, disables the continuum fit normally
 C                   performed prior to application of the cosine bell.
 C     (>) ZPC       (Real) The percentage of the spectrum covered at each
 C                   end by a cosine bell prior to fourier transformation.
-C     (>) KZ        (Integer array KZ(4)).  Defines the cosine bell 
+C     (>) KZ        (Integer array KZ(4)).  Defines the cosine bell
 C                   used to filter the fourier transforms of the arrays.
 C                   The filter used will be zero at KZ(1) and KZ(4), and
 C                   will be 1. at KZ(2) and KZ(3).
@@ -38,10 +38,10 @@ C     (W) FTCFN     (Complex array FTCFN(NX)) Used to hold the fourier
 C                   transform of the correlation spectrum.
 C     (W) XV        (Real array XV(NX)) Used to hold the pixel values
 C                   for each spectrum for the fitting processes.
-C     (<) CFN       (Real array CFN(NX)) The correlation function. 
-C                   If NORM is true this is returned scaled so that 
-C                   the cross-correlation peak will have a value of 1. 
-C                   (This is approximate - the exact range will vary 
+C     (<) CFN       (Real array CFN(NX)) The correlation function.
+C                   If NORM is true this is returned scaled so that
+C                   the cross-correlation peak will have a value of 1.
+C                   (This is approximate - the exact range will vary
 C                   slightly with the KZ values)
 C     (<) SHIFT     (Real) The shift of the peak of the correlation
 C                   function from the zero point.
@@ -56,7 +56,7 @@ C                                              KS / CIT 3rd Oct 1983
 C     Modified:
 C
 C     6th May 1985.  KS / AAO.  CFIT parameter added.
-C     21st Jan 1991. JMS / AAO. Test for zero spectra added - these could 
+C     21st Jan 1991. JMS / AAO. Test for zero spectra added - these could
 C                    crashes in SUBCONT and other places.
 C     18th Feb 1999. TDCA / RAL. Minor style changes.
 C     26th May 1999. TDCA / RAL. Size of array now passed to JTY_FFT2C.
@@ -175,7 +175,7 @@ C
       CALL JTY_FLIP(NX,CFN)
 c     print4000, 'after filtering and transforming back'
 C
-C     If required, Scale the cross-correlation to the approx 
+C     If required, Scale the cross-correlation to the approx
 C     range 0 - 1
 C
       IF (NORM) THEN

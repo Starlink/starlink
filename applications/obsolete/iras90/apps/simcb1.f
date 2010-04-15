@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -173,7 +173,7 @@
 *  relating to the detectors PSF is to be returned to the calling
 *  routine.
       ELSE
-      
+
 *  Find the slot number (if any) which holds information about this
 *  detector.
          SLOT = SLOTS( DETNO )
@@ -181,11 +181,11 @@
 *  If information relating to the PSF for this detector is already
 *  stored in the PSF arrays, get the information out of the arrays and
 *  return it.
-         IF( SLOT .NE. 0 ) THEN      
-            LBND( 1 ) = PSFLBN( 1, SLOT )               
-            UBND( 1 ) = PSFUBN( 1, SLOT )               
-            LBND( 2 ) = PSFLBN( 2, SLOT )               
-            UBND( 2 ) = PSFUBN( 2, SLOT )               
+         IF( SLOT .NE. 0 ) THEN
+            LBND( 1 ) = PSFLBN( 1, SLOT )
+            UBND( 1 ) = PSFUBN( 1, SLOT )
+            LBND( 2 ) = PSFLBN( 2, SLOT )
+            UBND( 2 ) = PSFUBN( 2, SLOT )
             C(1) = PSFC( 1, SLOT )
             C(2) = PSFC( 2, SLOT )
             C(3) = PSFC( 3, SLOT )
@@ -243,7 +243,7 @@
                PSFUBN( 1, NEXT ) = UBND( 1 )
                PSFLBN( 2, NEXT ) = LBND( 2 )
                PSFUBN( 2, NEXT ) = UBND( 2 )
-               PSFPNT( NEXT ) = PNTR            
+               PSFPNT( NEXT ) = PNTR
 
 *  Store the detector number associated with this slot.
                PSFDET( NEXT ) = DETNO
@@ -258,7 +258,7 @@
                IF( NEXT .GT. NSLOTS ) NEXT = 1
 
             END IF
-      
+
          END IF
 
       END IF

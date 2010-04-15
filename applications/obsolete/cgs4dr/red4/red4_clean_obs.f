@@ -2,7 +2,7 @@
       SUBROUTINE RED4_CLEAN_OBS (STATUS)
 *    Description :
 *     This routine will take any file with data and error arrays and set
-*     the quality to bad over those points of the array where the 
+*     the quality to bad over those points of the array where the
 *     data is less than a certain number times the error. It is designed
 *     for cleaning up flat-field observations and will set unilluminated
 *     areas of the array to "bad".
@@ -22,7 +22,7 @@
 *     20-Nov-1989: Kludge removed from GEN_CLEANE by making it more
 *                  general. The kludge is now in this routine !   (SMB)
 *      9-Mar-1990: Remove the kludge by allowing the minimum
-*                  acceptable data value to be specified as 
+*                  acceptable data value to be specified as
 *                  parameter. MAXDIM parameter added and set to 3.
 *                  (Arrays were originally dimensioned to 10).    (SMB)
 *     24-Apr-1990: Because of memory corruption problems, the
@@ -104,8 +104,8 @@
             ELSE
 
 *            Find the size of the data array.
-               CALL DSA_DATA_SIZE ('DATA', MAXDIM, NDIM, DIMS, 
-     :            NELM, STATUS) 
+               CALL DSA_DATA_SIZE ('DATA', MAXDIM, NDIM, DIMS,
+     :            NELM, STATUS)
 
 *            Tell DSA that a quality array will be used to flag bad values.
                CALL DSA_USE_QUALITY ('DATA', STATUS)
@@ -126,13 +126,13 @@
 *           signal to noise ratio.
                IF ( STATUS .EQ. ADAM__OK ) THEN
 
-                  CALL GEN_CLEANV( NELM, %val(DATA_DATA), 
+                  CALL GEN_CLEANV( NELM, %val(DATA_DATA),
      :              %val(DATA_VAR), %val(DATA_QUAL), CUT,
      :              TLOW, .TRUE., .FALSE., 0.0 )
                ENDIF
 
 *            If everything has been successful, record the fact that
-*            this observation has been CLEANed in the .FITS 
+*            this observation has been CLEANed in the .FITS
 *            structure of the observation file, and record the S/N
 *            cut and TLOW used.
                CALL DSA_PUT_FITS_C( 'DATA', 'COMMENT',
@@ -148,7 +148,7 @@
          CALL DSA_CLOSE( STATUS )
       ELSE
 
-*      The input parameters could not be obtained. 
+*      The input parameters could not be obtained.
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_CLEAN_OBS: '/
      :     /'Error obtaining input parameters', STATUS )

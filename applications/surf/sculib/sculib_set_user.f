@@ -18,8 +18,8 @@
 *      - USER (1) = J_TEL
 *      - USER (2) = J_ATM
 *      - USER (3) = not used
-*      - USER (4:M+3)      = the measured airmasses 
-*      - USER (M+4:2M+3)   = the measured sky temperatures 
+*      - USER (4:M+3)      = the measured airmasses
+*      - USER (M+4:2M+3)   = the measured sky temperatures
 *      - USER (2M+4:3M+3)  = the errors on the measured sky temperatures
 
 
@@ -103,7 +103,7 @@
       USER (1) = DBLE (J_TEL)
       USER (2) = DBLE (J_ATM)
 
-      DO I = 1, N_MEASUREMENTS 
+      DO I = 1, N_MEASUREMENTS
          USER (I+3) = DBLE (AIRMASS(I))
          USER (I+3+N_MEASUREMENTS) = DBLE (J_MEAS_D(I))
          USER (I+3+2*N_MEASUREMENTS) = DBLE (J_MEAS_V(I))

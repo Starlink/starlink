@@ -87,44 +87,44 @@
 *        prefix.
 *     ENCODINGS = LITERAL (Read)
 *        Determines which FITS keywords should be used to define the
-*        world co-ordinate systems to be stored in the NDF's WCS 
+*        world co-ordinate systems to be stored in the NDF's WCS
 *        component.  The allowed values (case-insensitive) are:
 *
 *        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and is the
 *           system commonly used by IRAF. It is described in the document
-*           "World Coordinate Systems Representations Within the FITS Format" 
+*           "World Coordinate Systems Representations Within the FITS Format"
 *           by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
-*           fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
+*           fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z.
 *
 *        "FITS-WCS" --- This is the proposed FITS standard WCS encoding scheme
-*           described in the paper "Representation of celestial coordinates 
+*           described in the paper "Representation of celestial coordinates
 *           in FITS" (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).
 *           It is very similar to FITS-IRAF but supports a wider range of
-*           projections and co-ordinate systems. Once the standard has been 
-*           agreed, this encoding should be understood by any FITS-WCS 
-*           compliant software and it is likely to be adopted widely for FITS 
-*           data in future. 
+*           projections and co-ordinate systems. Once the standard has been
+*           agreed, this encoding should be understood by any FITS-WCS
+*           compliant software and it is likely to be adopted widely for FITS
+*           data in future.
 *
-*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, PCiiijjj, 
-*           etc, as described in a previous (now superceded) draft of the 
-*           above FITS world co-ordinate system paper by E.W.Greisen and 
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, PCiiijjj,
+*           etc, as described in a previous (now superceded) draft of the
+*           above FITS world co-ordinate system paper by E.W.Greisen and
 *           M.Calabretta.
 *
 *        "FITS-AIPS" --- This uses conventions described in the document
-*           "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen 
-*           (revised 9th September, 1994), available by ftp from 
-*           fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is currently 
-*           employed by the AIPS data analysis facility, so its use will 
-*           facilitate data exchange with AIPS. This encoding uses CROTAi 
+*           "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen
+*           (revised 9th September, 1994), available by ftp from
+*           fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is currently
+*           employed by the AIPS data analysis facility, so its use will
+*           facilitate data exchange with AIPS. This encoding uses CROTAi
 *           and CDELTi keywords to describe axis rotation and scaling.
 *
-*        "DSS" --- This is the system used by the Digital Sky Survey, and 
+*        "DSS" --- This is the system used by the Digital Sky Survey, and
 *           uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *
 *        "NATIVE" --- This is the native system used by the AST library (see
 *           SUN/210) and provides a loss-free method for transferring WCS
 *           information between AST-based application. It allows more
-*           complicated WCS information to be stored and retrieved than any of 
+*           complicated WCS information to be stored and retrieved than any of
 *           the other encodings.
 *
 *        A comma-separated list of up to six values may be supplied,
@@ -218,7 +218,7 @@
 *        catalogue name in the FITS header.
 
 *  Examples:
-*     fitsin mt=/dev/rmt/1n files=[2-4,9] auto prefix=ccd nofmtcnv 
+*     fitsin mt=/dev/rmt/1n files=[2-4,9] auto prefix=ccd nofmtcnv
 *        This reads files 2, 3, 4, and 9 from the FITS tape on
 *        device /dev/rmt/1n.  The output NDF names will be ccd2, ccd3,
 *        ccd4, and ccd9 (assuming there are no groups).  The data will
@@ -312,7 +312,7 @@
 *        -  An AXIS component will be stored in the NDF if the CRVALn
 *        keyword is present.  (n is the number of the dimension.)  If
 *        the CRPIXn keyword is absent it defaults to 1, and likewise
-*        for the CDELTn keyword.  The value of CRTYPEn is made the label 
+*        for the CDELTn keyword.  The value of CRTYPEn is made the label
 *        of the axis structure.
 *     -  For groups format, a new NDF is created for each data array.
 *     The name of the NDF of the second and subsequent data arrays is
@@ -452,7 +452,7 @@
 *        Added REWIND parameter to control initial rewinding.  Linux
 *        usage enabled.
 *     18-FEB-1998 (DSB):
-*        Call to FTS1_GKEYL had arguments THERE and NOCCUR swapped, causing 
+*        Call to FTS1_GKEYL had arguments THERE and NOCCUR swapped, causing
 *        a segmentation violation.
 *     9-JUN-1998 (DSB):
 *        Added support for WCS component.
@@ -493,7 +493,7 @@
                                ! blocking factor of ten
      :  MAXCOD,                ! No. of known AST encodings.
      :  MAXHDR,                ! Maximum number of header sections in a
-                               ! sub-file, including dummy header 
+                               ! sub-file, including dummy header
                                ! sections before the extension *with* data
      :  MXCARD,                ! Maximum number of card images per block
      :  MXFILE,                ! Maximum size of input file list
@@ -535,7 +535,7 @@
                                ! section in the sub-file
      :  HPNTR( 1 ),            ! Pointer to array to store the header
                                ! cards for the sub-file
-     :  HSTART( MAXHDR ),      ! Start card number of each header 
+     :  HSTART( MAXHDR ),      ! Start card number of each header
                                ! section of the sub-file in the full
                                ! header
      :  LAST,                  ! Last tape file in a sequence
@@ -562,19 +562,19 @@
                                ! the block has been fully processed)
      :  OLDMAP,                ! The value of the HDS MAP tuning
                                ! parameter on entry to this routine
-     :  PARAMS( MXPARM ),      ! Numerical values of parameters 
-                               ! associated with a group-format array, 
+     :  PARAMS( MXPARM ),      ! Numerical values of parameters
+                               ! associated with a group-format array,
                                ! note this assumes a BITPIX of no more
                                ! 32 (4 bytes per value)
      :  PCOUNT,                ! The number of parameter values
                                ! preceeding each data array
-     :  RCPNTR,                ! Pointer to FITS record  
-     :  RCPNTD,                ! Descriptor for FITS record 
+     :  RCPNTR,                ! Pointer to FITS record
+     :  RCPNTD,                ! Descriptor for FITS record
      :  SIZE,                  ! Total size of the data array
      :  SUBFIL,                ! Number of the FITS sub file
-     :  WHDIM( 1 )             ! Size of the structure to store the 
+     :  WHDIM( 1 )             ! Size of the structure to store the
                                ! header cards
-      INTEGER 
+      INTEGER
      :  NENCOD,                ! No. of of WCS encodings supplied
      :  ADDED,                 ! Number of items added to a group
      :  ENCGRP                 ! Group identifier of ENCODINGS
@@ -620,7 +620,7 @@
      :  VALID,                 ! A locator is valid
      :  VMS                    ! Operating system is VMS
 
-      LOGICAL 
+      LOGICAL
      :  CFLAG                  ! Group requires further input ?
 
       REAL
@@ -657,7 +657,7 @@
      :  RCLOC,                 !   FITS record
      :  TLOC                   !   temporary header
 
-      CHARACTER*(GRP__SZNAM)   ! 
+      CHARACTER*(GRP__SZNAM)   !
      :  ENCODS( MAXCOD )       ! AST encodings for WCS component
 *.
 
@@ -748,7 +748,7 @@
 *  Abort if there has been an error.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get a group from parameter ENCODINGS holding the AST encodings to use 
+*  Get a group from parameter ENCODINGS holding the AST encodings to use
 *  when creating the WCS component from the FITS header.
       CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
       CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
@@ -933,7 +933,7 @@
 
                DO FN = FIRST, LAST
 
-*                Get the character version of the file number for 
+*                Get the character version of the file number for
 *                passing to routines that handle both disk and tape.
 
                   CALL CHR_ITOC( FN, CFN, NCF )
@@ -1005,16 +1005,16 @@
 *                   Read first header block and check for error.
 *                   This is needed to obtain the blocksize.
 
-                     CALL MAG_READ( MT, BLKSIZ, 
+                     CALL MAG_READ( MT, BLKSIZ,
      :                              %VAL( CNF_PVAL( BFPNTR ) ),
      :                              ACTSIZ, STATUS )
 
 *                   Obtain the first FITS record from the tape buffer.
 
                      CALL FTS1_TREAD( MT, BLKSIZ, ACTSIZ,
-     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                %VAL( CNF_PVAL( BFPNTR ) ),
      :                                OFFSET,
-     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                %VAL( CNF_PVAL( RCPNTR ) ),
      :                                STATUS )
 
 *                   Do not want to process further files if we
@@ -1099,8 +1099,8 @@
                   END IF
 
 *                Process the header blocks.  OFFSET is updated.
- 
-                  CALL FTS1_PHEAD( BFPNTR, RCPNTR, 
+
+                  CALL FTS1_PHEAD( BFPNTR, RCPNTR,
      :                             %VAL( CNF_PVAL( RCPNTD ) ),
      :                             'TAPE', MT, TLOC, BLKSIZ, MAXHDR,
      :                             .NOT. AUTO, ACTSIZ, OFFSET, CURREC,
@@ -1135,7 +1135,7 @@
 *                value.
 
                   IF ( SUBFIL .EQ. 1 ) THEN
-                     CALL FTS1_GKEYL( WHDIM( 1 ), 
+                     CALL FTS1_GKEYL( WHDIM( 1 ),
      :                                %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                                HSTART( 1 ), 'EXTEND', 1, THERE,
      :                                GEXTND, COMENT, NKC, STATUS,
@@ -1149,13 +1149,13 @@
 *                This is not the most efficient method to obtain
 *                selected descriptor values, but, in the main, the
 *                important descriptors will be in the early cards.
-*                Efficiency has been sacrificed for more-structured and 
+*                Efficiency has been sacrificed for more-structured and
 *                flexible code.
 
 *                Check that the mandatory descriptors are present.
 
                   CALL FTS1_MANDH( SUBFIL .EQ. 1, WHDIM( 1 ),
-     :                             %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                             HSTART( NHEADS ),
      :                             BITPIX, NDIM, DIMS, DARRAY, NONSDA,
      :                             SIZE, STATUS, %VAL( CNF_CVAL( 1 ) ) )
@@ -1208,7 +1208,7 @@
 
                   IF ( LOGHDR ) THEN
 
-                     CALL FTS1_HDLOG( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+                     CALL FTS1_HDLOG( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                                FD, CFN,
      :                                SUBFIL, NHEADS, HDNUM, STATUS,
      :                                %VAL( CNF_CVAL( 1 ) ) )
@@ -1231,7 +1231,7 @@
 
 *                   Obtain the extension's name.
 
-                     CALL FTS1_GKEYC( WHDIM( 1 ), 
+                     CALL FTS1_GKEYC( WHDIM( 1 ),
      :                                %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                                HSTART( NHEADS ), 'XTENSION', 1,
      :                                THERE, EXTNAM, COMENT, NKC,
@@ -1266,9 +1266,9 @@
      :                                   LOGHDR, FD, CFN, SUBFIL,
      :                                   PREFIX, AUTO, BLKSIZ, ACTSIZ,
      :                                   BFPNTR, OFFSET, CURREC,
-     :                                   RCPNTR, STATUS, 
+     :                                   RCPNTR, STATUS,
      :                                   %VAL( CNF_CVAL( 1 ) ) )
-     
+
                      END IF
 
                      IF ( STATUS .EQ. PAR__ABORT ) THEN
@@ -1353,11 +1353,11 @@
 
                   CALL FTS1_DTYPE( DARRAY, NONSDA, BITPIX,
      :                             HSTART( NHEADS ), WHDIM( 1 ),
-     :                             %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                             MXPARM, NDIM,
      :                             DIMS, BSCALE, BZERO, BLANK, BADPIX,
-     :                             IEEE, GCOUNT, PCOUNT, PTYPE, PSCALE, 
-     :                             PZERO, STATUS, 
+     :                             IEEE, GCOUNT, PCOUNT, PTYPE, PSCALE,
+     :                             PZERO, STATUS,
      :                             %VAL( CNF_CVAL( 1 ) ) )
 
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -1460,7 +1460,7 @@
 *                data conversions and blank-pixel removal.
 *                =====================================================
 
-                  CALL FTS1_NDF( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+                  CALL FTS1_NDF( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                           BFPNTR, RCPNTR,
      :                           AUTO, 'OUT', 'TAPE', MT, VMS, LENDIA,
      :                           SIZE, NDIM, DIMS, BPV, EFMTCV, FORMTI,
@@ -1470,7 +1470,7 @@
      :                           LOGHDR, FD, CFN, SUBFIL, GEXTND,
      :                           WHDIM( 1 ), HSTART( NHEADS ), NENCOD,
      :                           ENCODS, BLKSIZ, ACTSIZ, OFFSET, CURREC,
-     :                           NEXT, PARAMS, STATUS, 
+     :                           NEXT, PARAMS, STATUS,
      :                           %VAL( CNF_CVAL( 80 ) ) )
 
 *                Test for exit.
@@ -1499,12 +1499,12 @@
 *                   is blank, or when a tape mark is encountered.
 
                      CALL FTS1_TREAD( MT, BLKSIZ, ACTSIZ,
-     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                %VAL( CNF_PVAL( BFPNTR ) ),
      :                                OFFSET,
-     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                %VAL( CNF_PVAL( RCPNTR ) ),
      :                                STATUS )
 
-                     IF ( .NOT. FTS1_BLCAR( %VAL( CNF_PVAL( RCPNTD ) ) ) 
+                     IF ( .NOT. FTS1_BLCAR( %VAL( CNF_PVAL( RCPNTD ) ) )
      :                    .AND.
      :                    STATUS .EQ. SAI__OK ) THEN
 
@@ -1587,7 +1587,7 @@
 
       CALL DAT_VALID( TLOC, VALID, STATUS )
       IF ( VALID ) CALL AIF_ANTMP( TLOC, STATUS )
- 
+
 *    Close down the NDF system.
 
       CALL NDF_END( STATUS )

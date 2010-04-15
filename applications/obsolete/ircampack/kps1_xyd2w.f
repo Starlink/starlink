@@ -22,10 +22,10 @@
 *  Arguments:
 *     SCALE( 2 ) = DOUBLE PRECISION (Given)
 *        The scale factors in the linear relationships between axis
-*        co-ordinates and pixel co-ordinates. 
+*        co-ordinates and pixel co-ordinates.
 *     OFFSET( 2 ) = DOUBLE PRECISION (Given)
 *        The offsets in the linear relationships between axis
-*        co-ordinates and pixel co-ordinates. 
+*        co-ordinates and pixel co-ordinates.
 *     NVERT = INTEGER (Given)
 *        The number of vertices specified.
 *     XVERT( NVERT ) = REAL (Given and Returned)
@@ -42,7 +42,7 @@
 *
 *        where PIXEL is a pixel co-ordinate for the I'th dimension, and
 *        DATA is the corresponding axis co-ordinate.
-  
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error if either of the scale factors are zero.
-      IF( ABS( SCALE( 1 ) ) .LE. VAL__SMLD .OR. 
+      IF( ABS( SCALE( 1 ) ) .LE. VAL__SMLD .OR.
      :    ABS( SCALE( 2 ) ) .LE. VAL__SMLD ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPS1_XYD2W_ERR1', 'Pixels have zero size '//

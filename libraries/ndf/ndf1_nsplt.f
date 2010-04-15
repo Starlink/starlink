@@ -97,14 +97,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -153,7 +153,7 @@
          ELSE
             CALL HDS_SPLIT( NAME( N1 : N2 ), F1, F2, P1, P2, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *  Correct the path name extent returned for the starting position of
 *  the search.
                P1 = P1 + N1 - 1
@@ -195,7 +195,7 @@
                GO TO 2
             END IF
  1       CONTINUE
- 2       CONTINUE           
+ 2       CONTINUE
 
 *  If a missing right parenthesis is detected, then report an error.
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -229,7 +229,7 @@
             END IF
          END IF
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_NSPLT', STATUS )
 

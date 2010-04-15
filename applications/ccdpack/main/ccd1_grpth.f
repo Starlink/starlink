@@ -19,12 +19,12 @@
 *     and finds the best path (subgraph) from one node to another.
 *     As currently implemented, "best" means the one with the smallest
 *     number of edges, and if there is a tie, the one with the smallest
-*     sum of edge weights is chosen, where the weight is an integer 
+*     sum of edge weights is chosen, where the weight is an integer
 *     associated with each edge, is chosen.
 
 *  Arguments:
 *     GRAPH( 4, NEDGE ) = INTEGER (Given)
-*        A set of edges, with node numbers at positions (1,*) and (2,*) 
+*        A set of edges, with node numbers at positions (1,*) and (2,*)
 *        and weights at positions (3,*).  Note that for the purpose of
 *        this routine, a small weight is preferable. The fourth
 *        position is unused and present for compatibility with other
@@ -40,12 +40,12 @@
 *        Workspace.  The second dimension should be at least the number
 *        of distinct nodes represented in the graph.
 *     WORK2( * ) = INTEGER (Given and Returned)
-*        Workspace.  Its dimension should be at least the number of 
+*        Workspace.  Its dimension should be at least the number of
 *        distinct nodes represented in the graph.
 *     PATH( 4, * ) = INTEGER (Returned)
 *        A set of NSTEP edges from GRAPH for which PATH(1,1) = NODE1,
-*        PATH(2,NSTEP) = NODE2, and PATH(2,N-1) = PATH(1,N) for 
-*        N = 2..NSTEP.  The second dimension should be at least the 
+*        PATH(2,NSTEP) = NODE2, and PATH(2,N-1) = PATH(1,N) for
+*        N = 2..NSTEP.  The second dimension should be at least the
 *        number of distinct nodes represented in the graph.
 *     NSTEP = INTEGER (Returned)
 *        The number of edges in PATH.
@@ -95,13 +95,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
-      
+
 *  Arguments Given:
       INTEGER NEDGE
       INTEGER GRAPH( 4, NEDGE )
       INTEGER NODE1
       INTEGER NODE2
-      
+
 *  Arguments Given and Returned.
       INTEGER WORK( 4, * )
       INTEGER WORK2( * )
@@ -109,7 +109,7 @@
 *  Arguments Returned:
       INTEGER PATH( 4, * )
       INTEGER NSTEP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -153,7 +153,7 @@
          GO TO 99
       END IF
 
-*  Recursion level begins at unity. 
+*  Recursion level begins at unity.
       STEP = 1
 
 *  To start with we will be looking for an edge containing the starting
@@ -181,13 +181,13 @@
             MATCH = .FALSE.
          END IF
 
-*  If we have found a node of interest, check whether it forms a 
+*  If we have found a node of interest, check whether it forms a
 *  successful path, or whether it is bound to fail.
          IF ( MATCH ) THEN
             SUCCES = .FALSE.
             FAIL = .FALSE.
 
-*  If the destination node is at the other end of this edge, we have 
+*  If the destination node is at the other end of this edge, we have
 *  found a successful candidate path.
             IF ( WORK( 2, STEP ) .EQ. NODE2 ) THEN
                SUCCES = .TRUE.
@@ -214,20 +214,20 @@
                END IF
             ELSE
 
-*  Check whether we have encountered the node at the other end of this 
-*  edge so far in this path.  
+*  Check whether we have encountered the node at the other end of this
+*  edge so far in this path.
                CYCLIC = .FALSE.
                DO 14 J = 1, STEP - 1
-                  CYCLIC = ( WORK( 1, J ) .EQ. WORK( 2, STEP ) ) 
+                  CYCLIC = ( WORK( 1, J ) .EQ. WORK( 2, STEP ) )
      :                     .OR. CYCLIC
  14            CONTINUE
                FAIL = CYCLIC
             END IF
 
 *  If investigation of this edge is not conclusive, and the path
-*  is not longer than the best candidate yet, recurse further 
+*  is not longer than the best candidate yet, recurse further
 *  into it.
-            IF ( .NOT. ( SUCCES .OR. FAIL ) .AND. 
+            IF ( .NOT. ( SUCCES .OR. FAIL ) .AND.
      :         ( .NOT. DONE .OR. STEP .LE. NSTEP ) ) THEN
                NODEC = WORK( 2, STEP )
                WORK2( STEP ) = I

@@ -91,7 +91,7 @@ c *** find ellipse radius of pt
   500 continue
 c *** now find limiting intensity
       if(icirc.eq.1)then
-	parm(1)=accum(10)	
+	parm(1)=accum(10)
 	return
       endif
       if(parm(1).lt.0.0)then

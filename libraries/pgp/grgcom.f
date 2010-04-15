@@ -4,7 +4,7 @@
 *       G R G C O M     (GKS emulation of GRPCKG)
 *     - - - - - - - -
 *
-*   Read with prompt from user's terminal      
+*   Read with prompt from user's terminal
 *
 *   Given
 *      PROMPT   c     Prompt String
@@ -13,14 +13,14 @@
 *      GRGCOM   i     1 if successful, 0 if an error occurs
 *      STRING   c     String read from terminal
 *      L        i     Length of string
-*      
+*
 *   D.L.Terrett  Starlink  Apr 1991
 *+
       IMPLICIT NONE
 
       INTEGER L
       CHARACTER*(*) STRING, PROMPT
-      
+
       INTEGER ISTAT, I
 
 *  Print prompt

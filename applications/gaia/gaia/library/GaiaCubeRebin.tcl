@@ -223,7 +223,7 @@ itcl::class gaia::GaiaCubeRebin {
          set keep_units_ ""
       }
 
-      #  Create name for the new cube, needs to be different to the 
+      #  Create name for the new cube, needs to be different to the
       #  currently displayed one.
       incr count_
       set output_name_ [gaia::GaiaTempName::make_name \

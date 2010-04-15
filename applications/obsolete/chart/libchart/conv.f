@@ -40,7 +40,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (K.EQ.1) ASECS = ARG/RDSA
       IF (K.EQ.2) ASECS = ARG/RDST
       FAC = 10**N

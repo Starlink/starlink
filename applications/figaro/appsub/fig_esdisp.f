@@ -12,7 +12,7 @@ C     This routine is the interactive display routine that displays
 C     a subset of the spectrum obtained by collapsing the corrected
 C     echellogram in the spectral direction.  It then allows the user
 C     to indicate which cross-sections should be used for the sky
-C     and object for the various orders.  
+C     and object for the various orders.
 C
 C  Language:
 C     FORTRAN
@@ -40,7 +40,7 @@ C                      should be 1 or -1 (if it's wrong, the '<' and '>'
 C                      commands work backwards, but that's all.
 C     (<) MINORD       (Integer,ref) The lowest order number selected.
 C     (<) MAXORD       (Integer,ref) The highest order number selected.
-C     (<) SKY          (Logical,ref) True if there were sky orders 
+C     (<) SKY          (Logical,ref) True if there were sky orders
 C                      selected.
 C     (!) ORDERS       (Integer array,ref) Array used to record selections.
 C                      Each element corresponds to a cross-section of the
@@ -90,7 +90,7 @@ C
       LOGICAL   AUTO            ! Indicates data is to be autoscaled
       LOGICAL   CARRYON         ! Controls main loop through spectrum
       INTEGER   CEN             ! Last cross-section in selected range
-      CHARACTER CHR             ! Character hit by user 
+      CHARACTER CHR             ! Character hit by user
       INTEGER   CODE            ! Status value from FIG_COUNT_ORD
       INTEGER   CST             ! First cross-section in selected range
       LOGICAL   GOTCHR          ! True if char entered instead of 'return'
@@ -479,7 +479,7 @@ C
             ELSE IF ((CHR.EQ.'H').OR.(CHR.EQ.'?')) THEN
 C
 C              '?' or 'H' - Output help information
-C 
+C
                CALL FIG_HELP('echselect',IGNORE)
                GOTCHR=.FALSE.
                CHR=STRING(1:1)
@@ -493,7 +493,7 @@ C
                CHR=STRING(1:1)
                LOOP=.FALSE.
             ELSE IF (CHR.EQ.'A') THEN
-C   
+C
 C              'A' revert to autoscaling
 C
                AUTO=.TRUE.
@@ -531,5 +531,5 @@ C
             END IF
          END DO
       END DO
-C               
+C
       END

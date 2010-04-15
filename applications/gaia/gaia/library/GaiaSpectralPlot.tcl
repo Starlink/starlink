@@ -310,7 +310,7 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       add_menu_short_help $Options {Error length} \
          {Length of error bars, multiple of standard deviation}
-      
+
       #  Choose a frequency for the error bars.
       $Options add cascade -label "Error frequency" \
          -menu [menu $Options.errorfreq]

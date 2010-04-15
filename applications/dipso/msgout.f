@@ -8,7 +8,7 @@
 
 *  Language:
 *     Starlink Fortran 77
-      
+
 *  Invocation:
 *     CALL MSGOUT( COMM, MESS, BELL, STATUS )
 
@@ -46,7 +46,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Global Variables:
       LOGICAL BEEP               ! Is a beep allowed?
       COMMON /BEEP/ BEEP
@@ -71,6 +71,6 @@
       CALL MSG_OUT( ' ', '^MESS', STATUS )
 
 *  If required, ring the bell and issue a new line.
-      IF( BELL .AND. BEEP ) CALL MSG_BELL( STATUS )      
+      IF( BELL .AND. BEEP ) CALL MSG_BELL( STATUS )
 
       END

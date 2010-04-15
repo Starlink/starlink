@@ -21,7 +21,7 @@
 
 *  Arguments:
 *     REQUEST=INTEGER (given)
-*           The REQUEST from the application for action by the 
+*           The REQUEST from the application for action by the
 *           fixed-part.
 *     STATUS=INTEGER
 

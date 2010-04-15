@@ -17,7 +17,7 @@
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2008 Science & Technology Facilities Council. 
+#     Copyright (C) 2008 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -127,16 +127,16 @@ alias datacube_test   source ${DATACUBE_DIR}/datacube_demo.csh
 alias add             ${KAPPA_DIR}/add
 alias calc            ${KAPPA_DIR}/calc
 alias cadd            ${KAPPA_DIR}/cadd
-alias cdiv            ${KAPPA_DIR}/cdiv 
+alias cdiv            ${KAPPA_DIR}/cdiv
 alias chpix           ${KAPPA_DIR}/chpix
 alias collapse        ${KAPPA_DIR}/collapse
 alias clinplot        ${KAPPA_DIR}/clinplot
 alias compave         ${KAPPA_DIR}/compave
 alias contour         ${KAPPA_DIR}/contour
 alias cursor          ${KAPPA_DIR}/cursor
-alias display         ${KAPPA_DIR}/display 
+alias display         ${KAPPA_DIR}/display
 alias gdclear         ${KAPPA_DIR}/gdclear
-alias linplot         ${KAPPA_DIR}/linplot 
+alias linplot         ${KAPPA_DIR}/linplot
 alias lutcol          ${KAPPA_DIR}/lutable mapping=linear coltab=colour
 alias lutgrey         ${KAPPA_DIR}/lutable mapping=linear coltab=grey
 alias lutspec         ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut
@@ -174,7 +174,7 @@ alias cubehelp        ${DATACUBE_DIR}/datacube_help
 #  Set DATACUBE_HELP.
 setenv DATACUBE_HELP   ${DATACUBE_DIR}/../../help/datacube/datacube
 
-#if ($#argv == 0 || $1 != "-quiet") then  
+#if ($#argv == 0 || $1 != "-quiet") then
       echo " "
       echo "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
       echo "    Support is available by emailing datacube@star.rl.ac.uk"

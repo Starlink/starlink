@@ -25,7 +25,7 @@
 *     5-MAR-1993 (Andrew Broderick (AJJB)):
 *        STATUS argument added to all calls to routines within Chart
 *        which did'nt already have one.
-*        
+*
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INCLUDE 'MAIN'
@@ -40,7 +40,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *   Find out the length of a page
 *

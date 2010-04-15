@@ -77,7 +77,7 @@
 *     1992 August 19 (MJC):
 *        Rewrote the description, added usage and implementation status.
 *     1993 January 5 (PDRAPER):
-*        Extract kaphelp system from KAPPA and converted for 
+*        Extract kaphelp system from KAPPA and converted for
 *        CCDPACK use. As few changes as possible made.
 *     05-NOV-1996 (PDRAPER):
 *        Converted to PHOTOMHELP.

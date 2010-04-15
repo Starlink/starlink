@@ -124,7 +124,7 @@
 *         values.
 *         If ok then
 *           Set the number of matches to zero.
-*           For every row in the range of rows in the secondary (and while 
+*           For every row in the range of rows in the secondary (and while
 *           the status is ok)
 *             Get the coordinates for the current secondary row.
 *             If the secondary coordinates are not null then
@@ -183,12 +183,12 @@
 *     The change of 18/8/99 fixed the following inconsistency in counting
 *     and reporting multiple matches:
 *
-*     'In the CURSA application CATPAIR, the reporting of multiple 
+*     'In the CURSA application CATPAIR, the reporting of multiple
 *     matches in  the primary and secondary catalogues is slightly
 *     confusing. When multiple matches are found in the secondary for one
 *     object in the primary, the number of multiple matches by which the
 *     total NSMULT is incremented is the total number of matches found in
-*     the secondary for that object, whereas when multiple matches are 
+*     the secondary for that object, whereas when multiple matches are
 *     found in the primary for one object in the secondary, the number of
 *     multiple matches by which the total NPMULT is incremented is the
 *     excess of matches above one found in the primary for that object.'
@@ -243,7 +243,7 @@
      :  NPAIR,
      :  PRMPR(MAXPR),
      :  SECPR(MAXPR),
-     :  PMULT(MAXPR), 
+     :  PMULT(MAXPR),
      :  SMULT(MAXPR),
      :  NPRNUL,
      :  NPMULT,
@@ -433,7 +433,7 @@ C    :           3x, i6, 1pd16.7, 1pd16.7, i6, i6, i10)
                                  CALL MSG_SETI ('MMATCH', MMATCH)
                                  CALL MSG_SETI ('CURPRM', CURPRM)
 
-                                 CALL MSG_OUT (' ', 
+                                 CALL MSG_OUT (' ',
      :                             'Warning: maximum permitted '/
      :                             /'^MMATCH matches exceeded for '/
      :                             /'primary row ^CURPRM.', STATUS)

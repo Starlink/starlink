@@ -24,7 +24,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 *                            double rms, int *nlevels, int *status )
 
 *  Description:
-*     This function obtains a series of contour levels at which the 
+*     This function obtains a series of contour levels at which the
 *     ClumpFind algorithm will search for peaks.
 
 *  Parameters:
@@ -43,8 +43,8 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array containing "*nlevels"
-*     floating point contour values. It should be freed using astFree 
-*     when no longer needed. 
+*     floating point contour values. It should be freed using astFree
+*     when no longer needed.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -142,7 +142,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
          ihi--;
       }
 
-/* Otherwise, use contour levels at increments of DELTAT, starting at 
+/* Otherwise, use contour levels at increments of DELTAT, starting at
    TLOW. */
    } else {
 
@@ -161,7 +161,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 
 /* Otherwise, use 2*RMS as the default. */
       } else {
-         cdelta = 2.0*rms; 
+         cdelta = 2.0*rms;
 
 /* Get the contour interval using the above default. */
          cdelta = cupidConfigRMS( config, "DELTAT", rms, cdelta, status );
@@ -177,7 +177,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
                ret[ i ]= clevel;
                clevel += cdelta;
             }
-         } 
+         }
       }
    }
 

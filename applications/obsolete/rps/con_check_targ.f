@@ -18,11 +18,11 @@
 *   Output :
       CHARACTER*1 XTYPE						! R(eturn), E(xit) or Q(uit)
       INTEGER FIELD_NO						!Field number being referenced.
- 
+
 *  Global Variables
       INCLUDE 'com_form_qual.inc'
       INCLUDE 'com_form_points.inc'		! Gives Constraints field
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -73,7 +73,7 @@
       CHARACTER*42 MESE2/'R(eturn) to form, E(xit) or Q(uit)         '/
 
 *  __________________________ Executable Code __________________________________
- 
+
       FIELD_NO=DBS_FIELDNO(REF_NO,'TARGET.NAME')
       CVAL=DBS_GETC(REF_NO,FIELD_NO)
       IF(MDH_ENDWORD(CVAL).EQ.0)THEN
@@ -134,7 +134,7 @@
       END IF
       IF ((IVAL .GT. 1).AND.(.NOT.DBS_GETL(REF_NO,FLD_CONSTRAINTS))) THEN
          MESSAGE = 'time critical flag - not set'
-         GOTO 10      
+         GOTO 10
       END IF
 
 
@@ -151,10 +151,10 @@
                goto 10
             END IF
          END IF
-         IF (WFC_FILTER(I).NE.'S1 ' .AND. WFC_FILTER(I) .NE. 'S2 ' .AND. 
-     &            WFC_FILTER(I).NE.'S1A' .AND. WFC_FILTER(I) .NE. 'S1B' .AND. 
-     &            WFC_FILTER(I).NE.'S2A' .AND. WFC_FILTER(I) .NE. 'S2B' .AND. 
-     &            WFC_FILTER(I).NE.'P1 ' .AND. WFC_FILTER(I) .NE. 'P2 ' .AND. 
+         IF (WFC_FILTER(I).NE.'S1 ' .AND. WFC_FILTER(I) .NE. 'S2 ' .AND.
+     &            WFC_FILTER(I).NE.'S1A' .AND. WFC_FILTER(I) .NE. 'S1B' .AND.
+     &            WFC_FILTER(I).NE.'S2A' .AND. WFC_FILTER(I) .NE. 'S2B' .AND.
+     &            WFC_FILTER(I).NE.'P1 ' .AND. WFC_FILTER(I) .NE. 'P2 ' .AND.
      &            WFC_FILTER(I) .NE.'OPQ' .AND. WFC_FILTER(I) .NE. '   ') THEN
             MESSAGE = 'Invalid WFC filter code'
             GOTO 10
@@ -194,7 +194,7 @@
          QUAL_TARGET(QTARGET) = .FALSE.
       END IF
       GOTO 20
- 
+
 10    CONTINUE
       XTYPE = CON_CHECK_ERR(MESID,MESSAGE)
       QUAL_TARGET(QTARGET) = .FALSE.

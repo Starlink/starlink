@@ -27,7 +27,7 @@
 % Add any \newcommand or \newenvironment commands here
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}} 
+\newcommand{\dgs}{\hbox{$^\circ$}}
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 % A kind of list item, like description, but with an easily adjustable
@@ -240,7 +240,7 @@ DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 \vspace{5mm}
 
 \setlength{\parskip}{0mm} \tableofcontents
-\setlength{\parskip}{\medskipamount} \markright{\stardocname} \newpage 
+\setlength{\parskip}{\medskipamount} \markright{\stardocname} \newpage
 
 \section{Introduction}
 
@@ -308,7 +308,7 @@ CCDPACK} packages can be started in a similar way using the commands
 of the information contained in this document, in a hierarchical
 VMS-like form. It can be accessed in several ways:
 
-\begin {itemize} 
+\begin {itemize}
 
 \item The command \verb+irchelp+ will put you into the help library at
 the top level. You can then navigate through the help library.
@@ -352,7 +352,7 @@ file \verb+f123.sdf+ contains a dark frame, then the command:
 
 \small
 \begin{verbatim}
-      % cleaner in=f123 out=f123c clip="[4,4,4]" box="[5,5]" 
+      % cleaner in=f123 out=f123c clip="[4,4,4]" box="[5,5]"
 \end{verbatim}
 \normalsize
 
@@ -785,14 +785,14 @@ No colour is used.
 \begin{description}
 \item [IRCHELP] - Gives help about {\small IRCAMPACK}
 \item [TNORM] - Normalises a group of frames to unit total exposure time
-\item [IRCAMSET] - Displays and sets global parameters used by {\small 
+\item [IRCAMSET] - Displays and sets global parameters used by {\small
 IRCAMPACK}
 \item [POLZAP] - Manually removes blemishes from four intensity frames
 \item [POLSKY] - Subtracts constant sky backgrounds from four intensity frames
 \item [POLSMOOTH] - Applies Gaussian smoothing to four intensity frames
 \item [POLCAL] - Calculates polarisation parameters from four intensity frames
 \item [POLMAPC] - Overlays a polarisation map on a total intensity contour plot
-\item [POLMAPD] - Overlays a polarisation map on a total intensity greyscale 
+\item [POLMAPD] - Overlays a polarisation map on a total intensity greyscale
 image
 \end{description}
 
@@ -1136,7 +1136,7 @@ image
             of four levels.
 
       Once in the help library, it can be navigated in the same way
-      as VMS help libraries.  CTRL/D to exit from any level, and 
+      as VMS help libraries.  CTRL/D to exit from any level, and
       $<$RET$>$ to move up a level in the hierarchy.
    }
    \sstusage{
@@ -1187,9 +1187,9 @@ image
 }{
    \sstdescription{
       The user supplies four input intensity images at half-wave plate
-      intervals of 22.5\dgs. Images are created holding total intensity, 
-      percentage polarisation and polarisation angle. Pixels are set bad 
-      in these images if the standard deviation of the pixel value is 
+      intervals of 22.5\dgs. Images are created holding total intensity,
+      percentage polarisation and polarisation angle. Pixels are set bad
+      in these images if the standard deviation of the pixel value is
       greater than the limits supplied by parameters MAXPERR and MAXTERR.
    }
    \sstusage{
@@ -1258,7 +1258,7 @@ image
          the clipping of values with large errors cannot be performed.
 
          \sstitem
-         This script is an easy-to-use interface to the 
+         This script is an easy-to-use interface to the
          applications CALPOL and ERRCLIP. More versatility is available
          by using CALPOL and ERRCLIP directly.
 
@@ -1332,7 +1332,7 @@ image
          output NDFS from a previous application or script.
 
          \sstitem
-         This routine is based on applications TURBOCONT (in KAPPA) 
+         This routine is based on applications TURBOCONT (in KAPPA)
          and VECPLOT.
       }
    }

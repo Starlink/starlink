@@ -70,7 +70,7 @@
 *     09-01-1986 : Added blank option (again) (REVA::MJM)
 *     14-01-1986 : Added option to display or store the star
 *                : parameters if GS option chosen (REVA::MJM)
-*     04-04-1987 : Added option of noisy data with a defined sigma 
+*     04-04-1987 : Added option of noisy data with a defined sigma
 *                : about a defined mean (NM) (UKTH::MJM)
 *     10-Mar-94    Changed DAT-, CMP_ calls to NDF_ (SKL@JACH)
 *     15-AUG-1994 Changed input DIM arguments for MANYG, CREFRAMESUB (SKL@JACH)
@@ -82,7 +82,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'            ! global SSE constants
-      INCLUDE 'NDF_PAR'            
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'
 
 *    Status :
@@ -96,7 +96,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  LOCO,           ! output data structure
      :  IDIMS( NDIMS ), ! dimensions of input DATA_ARRAY
      :  NELEMENTS,      ! number of elements mapped
@@ -125,7 +125,7 @@
       CHARACTER*3
      :  DISTRIB         ! stellar radial distribution -
                         ! FIX = Fixed distance
-                        ! RSQ = one over radius squared 
+                        ! RSQ = one over radius squared
 
       CHARACTER*80
      :  FILENAME        ! filename to be used for output of
@@ -133,7 +133,7 @@
 
       LOGICAL
      :  BADPIX,         ! true if bad pixels to be included
-     :  BADCOL,         ! true if bad column  "  "     "   
+     :  BADCOL,         ! true if bad column  "  "     "
      :  DISPLAY,        ! true if star parameters to be displayed
      :  SCREEN          ! true if parameters displayed on screen
                         ! false if output wanted to file
@@ -149,7 +149,7 @@
          RETURN
       END IF
 
-*    get size of array to be generated 
+*    get size of array to be generated
 
       CALL AIF_GET0I( 'XDIM', 256, 1, 512, IDIMS( 1 ), STATUS )
       CALL AIF_GET0I( 'YDIM', 256, 1, 512, IDIMS( 2 ), STATUS )
@@ -163,17 +163,17 @@
       CALL MSG_OUT( 'MESSAGE', 'GS = Gaussian stars', STATUS)
       CALL MSG_OUT( 'MESSAGE', 'RR = Random 0-1', STATUS)
       CALL MSG_OUT( 'MESSAGE', 'RL = Random Min-Max,', STATUS)
-      CALL MSG_OUT( 'MESSAGE', 'NM = Noise with Sigma about mean', 
+      CALL MSG_OUT( 'MESSAGE', 'NM = Noise with Sigma about mean',
      :  STATUS)
-      CALL MSG_OUT( 'MESSAGE', 'RP = Poisson noise about mean', 
+      CALL MSG_OUT( 'MESSAGE', 'RP = Poisson noise about mean',
      :  STATUS)
       CALL MSG_OUT( 'MESSAGE', 'RA = Ramp across image', STATUS)
       CALL MSG_OUT( 'MESSAGE', 'FL = Flat', STATUS)
       CALL MSG_OUT( 'MESSAGE', 'BL = Blank', STATUS)
 
-*    get type of data to be generated 
+*    get type of data to be generated
 
-      CALL AIF_CHOIC( 'TYPED', 'GS,RR,RL,NM,RP,RA,FL,BL', TYPED, 
+      CALL AIF_CHOIC( 'TYPED', 'GS,RR,RL,NM,RP,RA,FL,BL', TYPED,
      :                 STATUS )
 
 *    force input string to upper case
@@ -211,7 +211,7 @@
 
 *       if so, then get the fraction to be set bad
          IF( BADPIX ) THEN
-            CALL AIF_GET0R( 'FRACTION', 0.01, 0.0, 1.0, 
+            CALL AIF_GET0R( 'FRACTION', 0.01, 0.0, 1.0,
      :                       FRACTION, STATUS )
          END IF
 
@@ -235,7 +235,7 @@
          END IF
 
 
-      ELSE IF( TYPED .EQ. 'RR' ) THEN         
+      ELSE IF( TYPED .EQ. 'RR' ) THEN
                                             ! random between 0 and 1
          HIGH  =  1.0
          LOW   =  0.0
@@ -244,7 +244,7 @@
          DIRN  =  0
 
 
-      ELSE IF( TYPED .EQ. 'RL' ) THEN      
+      ELSE IF( TYPED .EQ. 'RL' ) THEN
                                         ! random between set limits
          CALL PAR_GET0R( 'LOW', LOW, STATUS )
          CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
@@ -264,7 +264,7 @@
          LOW   =  0.0
          DIRN  =  0
 
-      ELSE IF( TYPED .EQ. 'RP' ) THEN      
+      ELSE IF( TYPED .EQ. 'RP' ) THEN
                                         ! Poisson noise about mean
          CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
 
@@ -274,7 +274,7 @@
          DIRN  =  0
 
 
-      ELSE IF( TYPED .EQ. 'RA' ) THEN        
+      ELSE IF( TYPED .EQ. 'RA' ) THEN
                                         ! ramp across image
          CALL PAR_GET0R( 'LOW', LOW, STATUS )
          CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
@@ -284,7 +284,7 @@
          SIGMA =  0.0
 
 
-      ELSE IF( TYPED .EQ. 'FL' ) THEN        
+      ELSE IF( TYPED .EQ. 'FL' ) THEN
                                         ! flat all over image
          CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
 
@@ -306,7 +306,7 @@
         RETURN
       END IF
 
-*    now create output IMAGE type data structure with DATA_ARRAY 
+*    now create output IMAGE type data structure with DATA_ARRAY
 *    component; also create and get value for DATA_LABEL component
 
       CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, LOCO, STATUS )
@@ -317,7 +317,7 @@
 
 *    map output DATA_ARRAY component
 
-      CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :               PNTRO, NELEMENTS, STATUS )
 
 
@@ -326,14 +326,14 @@
 
       IF( TYPED .EQ. 'GS' ) THEN
 
-         CALL MANYG( IDIMS(1), IDIMS(2), %VAL( PNTRO ), MAX, MIN, 
-     :               SKY, NSTARS, SCALE, SEEING, DISTRIB, BADPIX, 
-     :               FRACTION, BADCOL, DISPLAY, SCREEN, FILENAME, 
+         CALL MANYG( IDIMS(1), IDIMS(2), %VAL( PNTRO ), MAX, MIN,
+     :               SKY, NSTARS, SCALE, SEEING, DISTRIB, BADPIX,
+     :               FRACTION, BADCOL, DISPLAY, SCREEN, FILENAME,
      :               STATUS )
 
       ELSE
 
-         CALL CREFRAMESUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ), TYPED, 
+         CALL CREFRAMESUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ), TYPED,
      :                     MEAN, SIGMA, HIGH, LOW, DIRN, STATUS )
 
       ENDIF

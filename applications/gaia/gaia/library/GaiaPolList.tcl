@@ -11,8 +11,8 @@
 
 #  Description:
 #     This class implements an extendable list of GaiaPolObjects, in which
-#     one entry is nominated as the current entry. 
-#    
+#     one entry is nominated as the current entry.
+#
 #  Invocations:
 #
 #        GaiaPolList object_name [configuration options]
@@ -42,8 +42,8 @@
 #                already at the first entry.
 #        get{}:  Returns a clone of the current entry GaiaPolObject, or a
 #                blank string if the list is empty.
-#        add{ GaiaPolObject }: Truncates the list at the current object, 
-#                and then appends a clone of the supplied GaiaPolObject 
+#        add{ GaiaPolObject }: Truncates the list at the current object,
+#                and then appends a clone of the supplied GaiaPolObject
 #                to the end of the list. The new entry becomes the current
 #                entry.
 #        getCurrent{}: Returns the index of the current entry, or -1 if
@@ -106,9 +106,9 @@ itcl::class gaia::GaiaPolList {
 #  ============
    constructor {} {
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolList" } {
          init
@@ -127,19 +127,19 @@ itcl::class gaia::GaiaPolList {
 
 #  Initializer:
 #  ============
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolList constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolList constructor using a user-supplied
 #  argument list.
    protected method init {args} {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class.
-      set current_ -1    
+      set current_ -1
       set stack_ ""
       set mxlen_ ""
-      
+
    }
 
 #  Public methods:
@@ -150,9 +150,9 @@ itcl::class gaia::GaiaPolList {
       set ret "GaiaPolList:\n"
       for {set i 0} {$i < [llength $stack_] } {incr i} {
          if { $i == $current_ } {
-            append ret "--> " 
+            append ret "--> "
          } else {
-            append ret "    " 
+            append ret "    "
          }
          append ret [eval [lindex $stack_ $i] toString] "\n"
       }
@@ -187,11 +187,11 @@ itcl::class gaia::GaiaPolList {
                   incr current_ -1
                }
 
-#  Modify the index of the current entry so that it will refer 
+#  Modify the index of the current entry so that it will refer
 #  to the new entry.
                incr current_
 
-#  If there are entries above the original current entry, first annul the 
+#  If there are entries above the original current entry, first annul the
 #  object references, and then truncate the list to remove the references.
                if { $current_ < [llength $stack_] } {
                   foreach obj [lrange $stack_ $current_ end] {
@@ -205,9 +205,9 @@ itcl::class gaia::GaiaPolList {
             }
          }
       }
-   }   
+   }
 
-#  Returns a cloned reference for the "current" entry in the stack, or a 
+#  Returns a cloned reference for the "current" entry in the stack, or a
 #  null string if the stack is empty.
 #  ------------------------------------------------------------------
    public method get {} {
@@ -224,7 +224,7 @@ itcl::class gaia::GaiaPolList {
 #  ------------------------------------------------------------------
    public method last {} {
       set ret 1
-      if { $current_ >= 0 } { 
+      if { $current_ >= 0 } {
          if { $current_ < [llength $stack_] - 1 } {
             set ret 0
          }
@@ -245,7 +245,7 @@ itcl::class gaia::GaiaPolList {
    }
 
 #  This method increments the index of the current entry in the stack
-#  so long as the current entry is not already the last entry. It returns 
+#  so long as the current entry is not already the last entry. It returns
 #  1 if the current enry was changed, and zero otherwise.
 #  ------------------------------------------------------------------
    public method next {} {
@@ -259,7 +259,7 @@ itcl::class gaia::GaiaPolList {
    }
 
 #  This method decrements the index of the current entry in the stack
-#  so long as the current entry is not already the first entry. It returns 
+#  so long as the current entry is not already the first entry. It returns
 #  1 if the current enry was changed, and zero otherwise.
 #  ------------------------------------------------------------------
    public method prev {} {
@@ -282,7 +282,7 @@ itcl::class gaia::GaiaPolList {
       foreach obj $stack_ {
          $obj annull
       }
-      set current_ -1    
+      set current_ -1
       set stack_ ""
    }
 
@@ -301,12 +301,12 @@ itcl::class gaia::GaiaPolList {
 #  Public data members:
 #  ====================
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
 #  Index within the "stack_" list, of the current entry.
-      variable current_ -1    
+      variable current_ -1
 
 #  A list containing the object names or values in the stack.
       variable stack_ ""
@@ -316,7 +316,7 @@ itcl::class gaia::GaiaPolList {
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

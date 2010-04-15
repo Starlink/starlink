@@ -32,7 +32,7 @@
 *     sources to extract data from other archive files if required.
 *     Finally it prepares files containing details of IRAS survey CRDD
 *     data to be extracted by the succeeding program, EXCRDD.
-*     
+*
 *  ADAM Parameters:
 *     AUGMENTNAME = _CHAR (Read)
 *        Name of source to be augmented with size and wavebands.
@@ -51,26 +51,26 @@
 *     DATATYPE = LITERAL (Read)
 *        (The facility that requires this is not available in FINDCRDD
 *        version 1.0).
-*        
+*
 *        Type of survey data required: 0 = Don't know, 2 = PASS 2 CRDD
 *        on tape, 3 = PASS 3 CRDD on exobyte.
 *     DELETESONAME  = LITERAL (Read)
 *        Name of the source to be deleted. If more than one source with
 *        this name is present then each one is offered for deletion.
-*        
+*
 *        If the user enters ! to this prompt no more sources are to be
 *        deleted.
 *     DISPLAYORFILE = LITERAL (Read)
 *        Controls whether certain information is displayed at the
 *        terminal or written to a file.
-*        
+*
 *        The types of information affected are:-
-*        
+*
 *        Lists of sources prepared by selecting L from a menu,
-*        
+*
 *        Details of source regions which may fall partly outside plate
 *           boundaries.
-*           
+*
 *        The options are:-
 *        - D = Display on terminal
 *        - F = File
@@ -83,7 +83,7 @@
 *     EDITSOURCENAME = LITERAL (Read)
 *        Name of the source to be edited. If more than one source with
 *        this name is present then each one is offered for editing.
-*        
+*
 *        If the user enters ! to this prompt no more sources are to be
 *        edited.
 *     INSCAN = _REAL (Read)
@@ -92,7 +92,7 @@
 *     INSOURCEFILE1 = FILENAME (Read)
 *        Name of a file from which source positions are to be read. It
 *        will have been created in this or a previous run of FINDCRDD.
-*        
+*
 *        If the user enters ! to this prompt no file is read and the
 *        user is returned to the menu.
 *     MAINCHOICE = LITERAL (Read)
@@ -102,7 +102,7 @@
 *        - Q = Exit FINDCRDD
 *        [I]
 *     MENU11CHOICE = LITERAL (Read)
-*        Users choice from 'Select data to use' menu within the Input 
+*        Users choice from 'Select data to use' menu within the Input
 *        Source Positions option:-
 *        - N = Input new list of sources,
 *        - C = Modify current list,
@@ -111,11 +111,11 @@
 *        - P = Change number of lines displayed on a page
 *        - R = Return to main menu,
 *        - Y = Accept selected source list.
-*        
+*
 *        If the user enters ! to this prompt the menu is redisplayed.
 *        [N].
 *     MENU12CHOICE = LITERAL (Read)
-*        Users choice from 'Edit source list' menu within the Input 
+*        Users choice from 'Edit source list' menu within the Input
 *        source positions option:-
 *        - A = Add new sources to current list,
 *        - E = Edit data in current list of sources,
@@ -124,7 +124,7 @@
 *        - P = Change number of lines displayed on a page
 *        - C = Change coordinate system in which position is entered,
 *        - Y = Accept source list.
-*        
+*
 *        If the user enters ! to this prompt the menu is redisplayed.
 *        [Y]
 *     MENU2CHOICE = LITERAL (Read)
@@ -136,7 +136,7 @@
 *        - P = Change number of lines displayed on a page
 *        - R = Return to main menu
 *        - Y = Accept source list
-*        
+*
 *        If the user enters ! to this prompt the menu is redisplayed
 *     MSG_FILTER = _INTEGER (Read)
 *        Controls whether menus are displayed and updated source lists
@@ -150,28 +150,28 @@
 *     NEXTPAGE = _LOGICAL (Read)
 *        Press return to display next page of source listing, scan
 *        listing etc.
-*        
+*
 *        If the user enters N or ! to this prompt the next page will not
 *        be displayed and the user will be returned to the menu.
 *        [Y]
 *     OFFEDGEFILE = FILENAME (Read)
 *        Name of a file to contain details of sources which may have
 *        some of the required region off the edge of the plate.
-*        
+*
 *        The default name of this file is generated automatically as
 *        'source name'_OFFEDGE ( or the corresponding lower case on a
 *        UNIX machine) and offered to the user.
 *     OUTDESCFILE = FILENAME (Read)
 *        Name of a file to contain messages about plate files created
 *        and tapes to be used in subsequent EXCRDD runs.
-*        
+*
 *        The name of this file is generated automatically as
 *        FINDCRDD_PLATES_REQ. ( or the corresponding lower case on a
-*        UNIX machine) 
+*        UNIX machine)
 *     OUTSOURCEFILE1 = FILENAME (Read)
 *        Name of file in which to save source positions created in
 *        input or edit source positions.
-*        
+*
 *        If the user enters ! to this prompt no file will be saved.
 *     OUTSOURCEFILE2 = FILENAME (Read)
 *        Name of file in which to save source positions created in
@@ -188,10 +188,10 @@
 *        the user wants to return to the Size and Wavebands Menu to add
 *        them. If set .FALSE. those sources for which there is either no
 *        inscan length, or no wavebands required will not be processed.
-*     SOURCECOORD1 = _CHAR (Read) 
+*     SOURCECOORD1 = _CHAR (Read)
 *        First coordinate of source position in current coordinate
 *        system. The formats available for both coordinates, are:-
-*        
+*
 *        Equatorial:-
 *        -   Style 1 :- RA = 12hrs 3m 0.02s  DEC = -33deg 23m 0.0s
 *        -   Style 2 :- 12h 3m 0.02s  -33d 23m 0.0s
@@ -199,7 +199,7 @@
 *        -   Style 4 :- 12 03 0.02  -33 23 00.0
 *        -   Style 5 :- 12.050006  -33.383333  (fractional values in hrs
 *                                              (RA) or deg (Dec))
-*                                              
+*
 *        Ecliptic:-
 *        -   Style 1 :- ELONG= 12deg 3m 0.02s  ELAT= -33deg 23m 0.0s
 *        -   Style 2 :- 12deg 3m 0.02s  -33d 23m 0.0s
@@ -208,7 +208,7 @@
 *        -   Style 4 :- 12 03 0.02  -33 23 00.0
 *        -   Style 5 :- 12.050006  -33.383333  (fractional values in
 *                                               degrees)
-*                                               
+*
 *        Galactic:-
 *        -   Style 1 :- GLONG= 12deg 3m 0.02s  GLAT= -33deg 23m 0.0s
 *        -   Style 2 :- 12deg 3m 0.02s  -33d 23m 0.0s
@@ -217,12 +217,12 @@
 *        -   Style 4 :- 12 03 0.02  -33 23 00.0
 *        -   Style 5 :- 12.050006  -33.383333  (fractional values in
 *                                               degrees)
-*                                               
+*
 *        See SOURCECOORDSYS for changing coordinate system
-*     SOURCECOORD2 = _CHAR (Read) 
+*     SOURCECOORD2 = _CHAR (Read)
 *        Second coordinate of source position in current coordinate
 *        system. See SOURCECOORD1 for the formats available.
-*        
+*
 *        See SOURCECOORDSYS for changing coordinate system
 *     SOURCECOORDSYS = LITERAL (Read)
 *        The identifier of the coordinate system the user wants to make
@@ -249,9 +249,9 @@
 *        (up to 40 chars). [SOURCENAME]
 *     SPFARCHFILE = FILENAME (Read)
 *        The name of the SPFARCH SDF file
-*        [FINDCRDD_DIR:NEWSPFARCH]      
+*        [FINDCRDD_DIR:NEWSPFARCH]
 *
-*        
+*
 *  Notes:
 *     -  No ADAM parameter is given for the OUTPUT HDS FILE. An output
 *     HDS file is generated for each plate, containing information on
@@ -275,7 +275,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -313,7 +313,7 @@
 *  Display program identifying message
       CALL MSG_OUT( ' ', '                    FINDCRDD Version 1.0',
      : STATUS )
-      
+
 *  Initialisation of any systems that require initialisation, error
 *  message contexts etc.
       CALL FIND24( 'CONFIRMREQ', 'DISPLAYORFILE', 'MSG_FILTER',
@@ -329,9 +329,9 @@
 *  If the option is select_from_menu, M.
 *  *********************************************************************
       IF ( (MMENU .EQ. 'M') .AND. (STATUS .EQ. SAI__OK) ) THEN
-      
+
          CALL FIND30( ILEVEL, 'MAINCHOICE', MMENU, STATUS )
-      
+
       END IF
 
 *  FIND30 displays a menu of:-
@@ -340,7 +340,7 @@
 *      Q = Exit FINDCRDD
 *  and prompts the user to select an option
 *  The character representing the option selected is returned in MMENU.
-           
+
 
 ************************************************************************
 * MAIN MENU OPTION I
@@ -349,20 +349,20 @@
 
       IF ( (MMENU .EQ. 'I') .AND. (STATUS .EQ. SAI__OK) ) THEN
 
-         CALL FIND25( CONREQ, DISFIL, ILEVEL, 
+         CALL FIND25( CONREQ, DISFIL, ILEVEL,
      :   'CONFIRMADDEDIT','CONFIRMDELETE', 'DELETESONAME',
      :   'DISPLAYORFILE', 'EDITSOURCENAME', 'INSOURCEFILE1',
      :   'PAGELENGTH', 'MENU11CHOICE', 'MENU12CHOICE', 'NEXTPAGE',
      :   'OUTSOURCEFILE1','SOURCECOORD1', 'SOURCECOORD2',
      :   'SOURCECOORDSYS',
-     :   'SOURCELISTFILE', 'SOURCENAME', 'SOURCETITLE', 
+     :   'SOURCELISTFILE', 'SOURCENAME', 'SOURCETITLE',
      :   MAXLEN, MMENU, STATUS )
 
       END IF
-      
+
 *  FIND25 allows the user to select a source list to modify and to
 *  input, edit or delete source information.
-*     
+*
 *  FIND25 first asks the user to choose a source list to edit with the
 *  menu:-
 *       SELECT DATA TO USE MENU
@@ -380,7 +380,7 @@
 *  If the user selects something other than a new source list, and
 *  having done such checking as he needs, he accepts the source list,
 *  He will be given the edit source list menu
-*  
+*
 *    EDIT SOURCE LIST MENU
 *    A = Add new sources to current list
 *    E = Edit data in current list of sources
@@ -404,9 +404,9 @@
 *  The positions of the sources in 1950 equatorial coordinates are
 *  found. The details of the sources in both sets of coordinates, and
 *  any other details input in, for example, the survey data option may
-*  be stored in a file. 
+*  be stored in a file.
 
- 
+
 ************************************************************************
 * MAIN MENU OPTION S
 *    Find Survey Data ( this prepares a set of files for EXCRDD )
@@ -423,7 +423,7 @@
 *     for a scan to be needed from it.
 *     Preparing an HDS file for each plate, to be read in by EXCRDD
 *     telling it what data needs to be extracted from the plate.
-*  
+*
 
 ************************************************************************
 *  Add region size and wavebands required
@@ -435,7 +435,7 @@
      :   'CROSSCAN', 'DISPLAYORFILE', 'INSCAN',
      :   'PAGELENGTH', 'MENU2CHOICE',
      :   'NEXTPAGE', 'OUTSOURCEFILE2', 'RETURNSWMENU',
-     :   'SOURCELISTFILE', 
+     :   'SOURCELISTFILE',
      :   MAXLEN, MMENU, STATUS )
 
       END IF
@@ -482,7 +482,7 @@
 *
 *  FIND16 finds the plate required for each source.
 *  For each Source the program:-
-*     
+*
 *  Calculates the plate number for source.
 *
 *  Finds out whether details of the plate are already stored.
@@ -520,26 +520,26 @@
 *  FIND20 tests each observation to see whether it is within the
 *  area required for each source position, and part of it called a scan
 *  should be stored for extraction.
-*  
+*
 *  The subroutine uses the SPFARCH file which contains details of
 *  position for each observation in the mission. The positions given
 *  are estimates and therefore differ sightly from those of the Survey
 *  Boresight file. This means that positions are sufficiently accurate
 *  for scan selection but EXCRDD has to obtain more refined positions
 *  for further processing.
-*  
+*
 *     For each SOP
 *        For each source
 *           Find whether the source was far away enough from the Sun
 *           at the time of the SOP for the satellite possibly to have
 *           looked close to the source.
-*           If this criterion is passed then:-           
+*           If this criterion is passed then:-
 *           For each observation within the SOP.
 *              Find whether the observation passes through the required
 *              region around the source position.
 *              If the scan meets this criterion then store details of
 *              the part of the observation required (scan) in a list
-*              of scans. 
+*              of scans.
 
 ************************************************************************
 *  The following section is not yet implemented
@@ -567,7 +567,7 @@
          CALL FIND29( 'OUTDESCFILE', MMENU, STATUS )
 
       END IF
-*  
+*
 *     FIND29 creates the HDS output files which can be read by the
 *     Boresight Survey Data Extraction Program, EXCRDD.
 *
@@ -601,7 +601,7 @@
 
 * Tidying up of initialised systems etc.
       CALL FIND14( STATUS )
-     
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'FINDCRDD_ERR',

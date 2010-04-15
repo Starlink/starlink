@@ -7,7 +7,7 @@
 *    Description :
 *
 *     This routine adds an image into a (usually larger) ouput image,
-*     and is used in mosaicing arrays together. The offset of the 
+*     and is used in mosaicing arrays together. The offset of the
 *     small array relative to the large one is given. For each pixel
 *     of the small array, the value of that pixel is added to the
 *     input value of the corresponding pixel in the big array, but
@@ -29,9 +29,9 @@
 *     IDIMS( 2 )  =  INTEGER( READ )
 *          Dimensions of input image
 *     XOFFSET  =  INTEGER( READ )
-*          x offset of image from bottom left 
+*          x offset of image from bottom left
 *     YOFFSET  =  INTEGER( READ )
-*          y offset of image from bottom left 
+*          y offset of image from bottom left
 *     OUT( ODIMS( 1 ), ODIMS( 2 ) )  =  REAL( UPDATE )
 *          Data array containing merged image
 *     MASK( ODIMS( 1 ), ODIMS( 2 ) )  =  REAL( UPDATE )
@@ -80,7 +80,7 @@
       INTEGER
      :    IDIMSX,             ! dimensions of input image
      :    IDIMSY,             ! dimensions of input image
-     :    XOFFSET,                ! x offset of image 
+     :    XOFFSET,                ! x offset of image
      :    YOFFSET,                ! y    "    "   "
      :    ODIMSX,              ! dimensions of output image
      :    ODIMSY              ! dimensions of output image

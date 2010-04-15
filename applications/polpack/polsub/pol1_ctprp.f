@@ -14,13 +14,13 @@
 
 *  Description:
 *     This routine creates a new catalogue using the supplied environment
-*     parameter, and initializes its columns and parameters to match 
-*     those of a supplied existing catalogue. 
+*     parameter, and initializes its columns and parameters to match
+*     those of a supplied existing catalogue.
 *
-*     At the moment, the CAT library reports errors if you try to store 
-*     textual information in a FITS file before any rows have been written 
+*     At the moment, the CAT library reports errors if you try to store
+*     textual information in a FITS file before any rows have been written
 *     to the catalogue. For this reason, the textual information should
-*     be stored after all rows have been written, just before the catalogue 
+*     be stored after all rows have been written, just before the catalogue
 *     is closed. See POL1_CLCAT.
 
 *  Arguments:
@@ -35,7 +35,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,7 +94,7 @@
 *  Initialise.
       CI2 = CAT__NOID
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create the output catalogue.
@@ -108,58 +108,58 @@
 
 *  Get an identifier for the next parameter
          J = J + 1
-         CALL CAT_TNDNT( CI1, CAT__QITYP, J, GI1, STATUS )      
+         CALL CAT_TNDNT( CI1, CAT__QITYP, J, GI1, STATUS )
 
 *  Abort the loop if not found.
          IF( GI1 .EQ. CAT__NOID ) THEN
             DONE = .TRUE.
          ELSE
 
-*  Create a  parameter with the same name, comment and value in the output 
+*  Create a  parameter with the same name, comment and value in the output
 *  catalogue.
-            CALL CAT_TIQAC( GI1, 'NAME', NAME, STATUS ) 
-            CALL CAT_TIQAI( GI1, 'DTYPE', DTYPE, STATUS ) 
-            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS ) 
+            CALL CAT_TIQAC( GI1, 'NAME', NAME, STATUS )
+            CALL CAT_TIQAI( GI1, 'DTYPE', DTYPE, STATUS )
+            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS )
 
             IF( DTYPE .EQ. CAT__TYPEB ) THEN
-               CALL CAT_TIQAB( GI1, 'VALUE', BVAL, STATUS ) 
-               CALL CAT_PPTSB( CI2, NAME, BVAL, COMM, GI2, STATUS) 
+               CALL CAT_TIQAB( GI1, 'VALUE', BVAL, STATUS )
+               CALL CAT_PPTSB( CI2, NAME, BVAL, COMM, GI2, STATUS)
 
             ELSE IF( DTYPE .EQ. CAT__TYPEW ) THEN
-               CALL CAT_TIQAW( GI1, 'VALUE', WVAL, STATUS ) 
-               CALL CAT_PPTSW( CI2, NAME, WVAL, COMM, GI2, STATUS) 
+               CALL CAT_TIQAW( GI1, 'VALUE', WVAL, STATUS )
+               CALL CAT_PPTSW( CI2, NAME, WVAL, COMM, GI2, STATUS)
 
             ELSE IF( DTYPE .EQ. CAT__TYPEI ) THEN
-               CALL CAT_TIQAI( GI1, 'VALUE', IVAL, STATUS ) 
-               CALL CAT_PPTSI( CI2, NAME, IVAL, COMM, GI2, STATUS) 
+               CALL CAT_TIQAI( GI1, 'VALUE', IVAL, STATUS )
+               CALL CAT_PPTSI( CI2, NAME, IVAL, COMM, GI2, STATUS)
 
             ELSE IF( DTYPE .EQ. CAT__TYPER ) THEN
-               CALL CAT_TIQAR( GI1, 'VALUE', RVAL, STATUS ) 
-               CALL CAT_PPTSR( CI2, NAME, RVAL, COMM, GI2, STATUS) 
+               CALL CAT_TIQAR( GI1, 'VALUE', RVAL, STATUS )
+               CALL CAT_PPTSR( CI2, NAME, RVAL, COMM, GI2, STATUS)
 
             ELSE IF( DTYPE .EQ. CAT__TYPED ) THEN
-               CALL CAT_TIQAD( GI1, 'VALUE', DVAL, STATUS ) 
-               CALL CAT_PPTSD( CI2, NAME, DVAL, COMM, GI2, STATUS) 
+               CALL CAT_TIQAD( GI1, 'VALUE', DVAL, STATUS )
+               CALL CAT_PPTSD( CI2, NAME, DVAL, COMM, GI2, STATUS)
 
             ELSE IF( DTYPE .EQ. CAT__TYPEL ) THEN
-               CALL CAT_TIQAL( GI1, 'VALUE', LVAL, STATUS ) 
-               CALL CAT_PPTSL( CI2, NAME, LVAL, COMM, GI2, STATUS) 
+               CALL CAT_TIQAL( GI1, 'VALUE', LVAL, STATUS )
+               CALL CAT_PPTSL( CI2, NAME, LVAL, COMM, GI2, STATUS)
 
             ELSE IF( DTYPE .EQ. CAT__TYPEC ) THEN
-               CALL CAT_TIQAC( GI1, 'VALUE', CVAL, STATUS ) 
-               CALL CAT_PPTSC( CI2, NAME, CVAL, COMM, GI2, STATUS) 
-               CALL CAT_TIQAI( GI2, 'CSIZE', CSIZE, STATUS ) 
-               CALL CAT_TATTI( GI2, 'CSIZE', MIN( CSIZE, MXCSIZ ), 
-     :                         STATUS ) 
+               CALL CAT_TIQAC( GI1, 'VALUE', CVAL, STATUS )
+               CALL CAT_PPTSC( CI2, NAME, CVAL, COMM, GI2, STATUS)
+               CALL CAT_TIQAI( GI2, 'CSIZE', CSIZE, STATUS )
+               CALL CAT_TATTI( GI2, 'CSIZE', MIN( CSIZE, MXCSIZ ),
+     :                         STATUS )
             END IF
 
 *  Set the external format string for the parameter, if it is defined in
 *  the input.
-            IF( STATUS .EQ. SAI__OK ) THEN 
-               CALL CAT_TIQAC( GI1, 'EXFMT', EXFMT, STATUS ) 
-               IF( STATUS. EQ. SAI__OK ) THEN 
-                  CALL CAT_TATTC( GI2, 'EXFMT', EXFMT, STATUS ) 
-               ELSE 
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIQAC( GI1, 'EXFMT', EXFMT, STATUS )
+               IF( STATUS. EQ. SAI__OK ) THEN
+                  CALL CAT_TATTC( GI2, 'EXFMT', EXFMT, STATUS )
+               ELSE
                   CALL ERR_ANNUL( STATUS )
                END IF
             END IF
@@ -179,7 +179,7 @@
 
 *  Get an identifier for the next column.
          J = J + 1
-         CALL CAT_TNDNT( CI1, CAT__FITYP, J, GI1, STATUS )      
+         CALL CAT_TNDNT( CI1, CAT__FITYP, J, GI1, STATUS )
 
 *  Abort the loop if not found.
          IF( GI1 .EQ. CAT__NOID ) THEN
@@ -188,38 +188,38 @@
 
 *  Create a column in the output catalogue with the same attributes.
 *  Take care to check for the possibility of attributes not existing.
-            CALL CAT_TIQAC( GI1, 'NAME', NAME, STATUS ) 
-            CALL CAT_TIQAI( GI1, 'DTYPE', DTYPE, STATUS ) 
+            CALL CAT_TIQAC( GI1, 'NAME', NAME, STATUS )
+            CALL CAT_TIQAI( GI1, 'DTYPE', DTYPE, STATUS )
 
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL CAT_TIQAI( GI1, 'CSIZE', CSIZE, STATUS ) 
+            CALL CAT_TIQAI( GI1, 'CSIZE', CSIZE, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
                CSIZE = 0
                CALL ERR_ANNUL( STATUS )
             END IF
 
-            CALL CAT_TIQAC( GI1, 'UNITS', UNITS, STATUS ) 
+            CALL CAT_TIQAC( GI1, 'UNITS', UNITS, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
                UNITS = ' '
                CALL ERR_ANNUL( STATUS )
             END IF
 
-            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS ) 
+            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
                COMM = ' '
                CALL ERR_ANNUL( STATUS )
             END IF
-   
-            CALL CAT_TIQAC( GI1, 'EXFMT', EXFMT, STATUS ) 
+
+            CALL CAT_TIQAC( GI1, 'EXFMT', EXFMT, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
                EXFMT = ' '
                CALL ERR_ANNUL( STATUS )
             END IF
 
 *  Create the output column.
-            CALL CAT_CNEWS( CI2, NAME, DTYPE, CSIZE, UNITS, EXFMT, 
-     :                      COMM, GI2, STATUS ) 
+            CALL CAT_CNEWS( CI2, NAME, DTYPE, CSIZE, UNITS, EXFMT,
+     :                      COMM, GI2, STATUS )
 
 *  Release the identifiers.
             CALL CAT_TRLSE( GI1, STATUS )

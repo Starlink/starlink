@@ -1,18 +1,18 @@
-      SUBROUTINE SCULIB_SET_DATA_UB (USE_THIS, N_BOLS, N_POS, 
+      SUBROUTINE SCULIB_SET_DATA_UB (USE_THIS, N_BOLS, N_POS,
      :     N_BEAM, MASK, BVALUE, IN_DATA, STATUS)
 *+
 *  Name:
 *     SCULIB_SET_DATA_UB
 
 *  Purpose:
-*     set data to a byte value given a byte mask 
+*     set data to a byte value given a byte mask
 
 *  Language:
 *     Starlink Fortran 77
-*  
+*
 
 *  Invocation:
-*     CALL SCULIB_SET_DATA_UB(USE_THIS, N_BOLS, N_POS, N_BEAM, 
+*     CALL SCULIB_SET_DATA_UB(USE_THIS, N_BOLS, N_POS, N_BEAM,
 *    :  MASK, BVALUE, IN_DATA, STATUS)
 
 
@@ -114,7 +114,7 @@
                IF (MASK(BOL,POS) .NE. 0) THEN
 
                   DO BEAM = 1, N_BEAM
-*       Dont set BAD pixels                        
+*       Dont set BAD pixels
                      IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
                         IN_DATA(BOL, POS, BEAM) = BVALUE
                      END IF
@@ -132,7 +132,7 @@
                IF (MASK(BOL, POS) .EQ. 0) THEN
 
                   DO BEAM = 1, N_BEAM
-*     Dont set BAD pixels                        
+*     Dont set BAD pixels
                      IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
                         IN_DATA(BOL, POS, BEAM) = BVALUE
                      END IF

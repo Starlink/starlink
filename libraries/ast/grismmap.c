@@ -14,17 +14,17 @@ f     AST_GRISMMAP
 *     A GrismMap is a specialised form of Mapping which transforms
 *     1-dimensional coordinates using the spectral dispersion equation
 *     described in FITS-WCS paper III "Representation of spectral
-*     coordinates in FITS". This describes the dispersion produced by 
+*     coordinates in FITS". This describes the dispersion produced by
 *     gratings, prisms and grisms.
 *
-*     When initially created, the forward transformation of a GrismMap 
+*     When initially created, the forward transformation of a GrismMap
 *     transforms input "grism parameter" values into output wavelength
 *     values. The "grism parameter" is a dimensionless value which is
-*     linearly related to position on the detector. It is defined in FITS-WCS 
-*     paper III as "the offset on the detector from the point of intersection 
+*     linearly related to position on the detector. It is defined in FITS-WCS
+*     paper III as "the offset on the detector from the point of intersection
 *     of the camera axis, measured in units of the effective local length".
-*     The units in which wavelength values are expected or returned is 
-*     determined by the values supplied for the GrismWaveR, GrismNRP and 
+*     The units in which wavelength values are expected or returned is
+*     determined by the values supplied for the GrismWaveR, GrismNRP and
 *     GrismG attribute: whatever units are used for these attributes will
 *     also be used for the wavelength values.
 
@@ -35,7 +35,7 @@ f     AST_GRISMMAP
 *     In addition to those attributes common to all Mappings, every
 *     GrismMap also has the following attributes:
 *
-*     - GrismNR: The refractive index at the reference wavelength 
+*     - GrismNR: The refractive index at the reference wavelength
 *     - GrismNRP: Rate of change of refractive index with wavelength
 *     - GrismWaveR: The reference wavelength
 *     - GrismAlpha: The angle of incidence of the incoming light
@@ -58,12 +58,12 @@ f     The GrismMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -163,7 +163,7 @@ void astClear##attribute##_( Ast##class *this, int *status ) { \
 \
 /* Invoke the required method via the virtual function table. */ \
    (**astMEMBER(this,class,Clear##attribute))( this, status ); \
-}   
+}
 
 /*
 *  Name:
@@ -305,7 +305,7 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0;
@@ -320,8 +320,8 @@ astMAKE_INITGLOBALS(GrismMap)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 static char getattrib_buff[ 101 ];
@@ -396,7 +396,7 @@ static void SetGrismTheta( AstGrismMap *, double, int * );
 
 /* Member functions. */
 /* ================= */
-static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2, 
+static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
                              int inv2, int *status ){
 /*
 *
@@ -411,7 +411,7 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2, 
+*     AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 *                           int inv2, int *status )
 
 *  Class Membership:
@@ -436,7 +436,7 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the merged Mapping if the supplied Mappings can be merged, 
+*     A pointer to the merged Mapping if the supplied Mappings can be merged,
 *     NULL otherwise.
 
 */
@@ -485,7 +485,7 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
              EQUAL( astGetGrismEps( gmap ), astGetGrismEps( gmap2 )) &&
              EQUAL( astGetGrismTheta( gmap ), astGetGrismTheta( gmap2 )) ){
 
-/* If so, check that the GrismMaps are applied in opposite senses. If so 
+/* If so, check that the GrismMaps are applied in opposite senses. If so
    we can cancel the two GrismMaps, so return a UnitMap. */
             if( inv1 != inv2 ) ret = (AstMapping *) astUnitMap( 1, "", status );
          }
@@ -499,18 +499,18 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
    Mapping is a ZoomMap. */
          if( !inv1 ) {
 
-/* Indicate that any merged Mapping to be created later will not need to 
+/* Indicate that any merged Mapping to be created later will not need to
    be inverted. */
             invert_result = 0;
 
 /* See if the second Mapping is a ZoomMap, and if so, get the zoom
-   factor. If the Invert attribute in the ZoomMap is not set to the 
-   required value, invert the zoom factor. This gives us the required 
+   factor. If the Invert attribute in the ZoomMap is not set to the
+   required value, invert the zoom factor. This gives us the required
    *forward* transformation. */
             if( !strcmp( "ZoomMap", astGetClass( map2 ) ) ) {
                z = astGetZoom( (AstZoomMap *) map2 );
                if( astGetInvert( map2 ) != inv2 && z != 0.0 ) z = 1.0/z;
-            }                   
+            }
          }
       }
 
@@ -519,26 +519,26 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
       gmap = (AstGrismMap *) map2;
 
 /* We can merge the GrismMap with the first Mapping if the GrismMap has
-   been inverted (i.e. if the wavelength output produced by the first 
+   been inverted (i.e. if the wavelength output produced by the first
    Mapping is fed as input to the inverted GrismMap), and if the first
    Mapping is a ZoomMap. */
       if( inv2 ) {
 
 /* It is easier to consider pairs of Mappings in which an un-inverted
-   GrismMap is followed by a ZoomMap (as in the above case). For this 
-   reason, we invert the Mappings here, so that the merged Mapping created 
-   later will be in the inverse of the required Mapping. Indicate that the 
+   GrismMap is followed by a ZoomMap (as in the above case). For this
+   reason, we invert the Mappings here, so that the merged Mapping created
+   later will be in the inverse of the required Mapping. Indicate that the
    merged Mapping will therefore need to be inverted before being returned. */
          invert_result = 1;
 
-/* See if the first Mapping is a ZoomMap. If so, get the zoom factor. If the 
-   Invert attribute in the ZoomMap is not set to the opposite of the required 
-   value, invert the zoom factor. This gives us the required *inverse* 
+/* See if the first Mapping is a ZoomMap. If so, get the zoom factor. If the
+   Invert attribute in the ZoomMap is not set to the opposite of the required
+   value, invert the zoom factor. This gives us the required *inverse*
    transformation. */
          if( !strcmp( "ZoomMap", astGetClass( map1 ) ) ) {
             z = astGetZoom( (AstZoomMap *) map1 );
             if( astGetInvert( map1 ) == inv1 && z != 0.0 ) z = 1.0/z;
-         }                   
+         }
       }
    }
 
@@ -556,10 +556,10 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
       nrp = astGetGrismNRP( ret );
       waver = astGetGrismWaveR( ret );
 
-/* The above code ensures that z is the zoom factor from the wavelength 
-   produced by the forward GrismMap to the final (modified) wavelength units. 
-   Set the new GrismMap attribute values. GrismG, GrismNRP and GrismWaveR have 
-   units of length and are scaled to represent new length units using the 
+/* The above code ensures that z is the zoom factor from the wavelength
+   produced by the forward GrismMap to the final (modified) wavelength units.
+   Set the new GrismMap attribute values. GrismG, GrismNRP and GrismWaveR have
+   units of length and are scaled to represent new length units using the
    zoom factor found above. */
       g /= z;
       nrp /= z;
@@ -622,28 +622,28 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    this = (AstGrismMap *) this_object;
 
 /* Check the attribute name and clear the appropriate attribute. */
-   if ( !strcmp( attrib, "grismnr" ) ) { 
+   if ( !strcmp( attrib, "grismnr" ) ) {
       astClearGrismNR( this );
 
-   } else if ( !strcmp( attrib, "grismnrp" ) ) { 
+   } else if ( !strcmp( attrib, "grismnrp" ) ) {
       astClearGrismNRP( this );
 
-   } else if ( !strcmp( attrib, "grismwaver" ) ) { 
+   } else if ( !strcmp( attrib, "grismwaver" ) ) {
       astClearGrismWaveR( this );
 
-   } else if ( !strcmp( attrib, "grismalpha" ) ) { 
+   } else if ( !strcmp( attrib, "grismalpha" ) ) {
       astClearGrismAlpha( this );
 
-   } else if ( !strcmp( attrib, "grismg" ) ) { 
+   } else if ( !strcmp( attrib, "grismg" ) ) {
       astClearGrismG( this );
 
-   } else if ( !strcmp( attrib, "grismm" ) ) { 
+   } else if ( !strcmp( attrib, "grismm" ) ) {
       astClearGrismM( this );
 
-   } else if ( !strcmp( attrib, "grismeps" ) ) { 
+   } else if ( !strcmp( attrib, "grismeps" ) ) {
       astClearGrismEps( this );
 
-   } else if ( !strcmp( attrib, "grismtheta" ) ) { 
+   } else if ( !strcmp( attrib, "grismtheta" ) ) {
       astClearGrismTheta( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
@@ -666,7 +666,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     GrismMap member function (over-rides the astEqual protected
@@ -693,8 +693,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstGrismMap *that;        
-   AstGrismMap *this;        
+   AstGrismMap *that;
+   AstGrismMap *this;
    int nin;
    int nout;
    int result;
@@ -719,9 +719,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two GrismMaps differ, it may still be possible 
-   for them to be equivalent. First compare the GrismMaps if their Invert 
-   flags are the same. In this case all the attributes of the two GrismMaps 
+/* If the Invert flags for the two GrismMaps differ, it may still be possible
+   for them to be equivalent. First compare the GrismMaps if their Invert
+   flags are the same. In this case all the attributes of the two GrismMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
@@ -739,7 +739,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                 result = 1;
              }
 
-/* If the Invert flags for the two GrismMaps differ, the attributes of the two 
+/* If the Invert flags for the two GrismMaps differ, the attributes of the two
    GrismMaps must be inversely related to each other. */
          } else {
 
@@ -749,7 +749,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -816,7 +816,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -830,56 +830,56 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
-   if ( !strcmp( attrib, "grismnr" ) ) { 
+   if ( !strcmp( attrib, "grismnr" ) ) {
       dval = astGetGrismNR( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismnrp" ) ) { 
+   } else if ( !strcmp( attrib, "grismnrp" ) ) {
       dval = astGetGrismNRP( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismwaver" ) ) { 
+   } else if ( !strcmp( attrib, "grismwaver" ) ) {
       dval = astGetGrismWaveR( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismalpha" ) ) { 
+   } else if ( !strcmp( attrib, "grismalpha" ) ) {
       dval = astGetGrismAlpha( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismg" ) ) { 
+   } else if ( !strcmp( attrib, "grismg" ) ) {
       dval = astGetGrismG( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismm" ) ) { 
+   } else if ( !strcmp( attrib, "grismm" ) ) {
       dval = astGetGrismM( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismeps" ) ) { 
+   } else if ( !strcmp( attrib, "grismeps" ) ) {
       dval = astGetGrismEps( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
-   } else if ( !strcmp( attrib, "grismtheta" ) ) { 
+   } else if ( !strcmp( attrib, "grismtheta" ) ) {
       dval = astGetGrismTheta( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
@@ -926,7 +926,7 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name, int *status
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -972,7 +972,7 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name, int *status
    vtab->GetGrismWaveR = GetGrismWaveR;
    vtab->SetGrismWaveR = SetGrismWaveR;
    vtab->TestGrismWaveR = TestGrismWaveR;
- 
+
    vtab->ClearGrismAlpha = ClearGrismAlpha;
    vtab->GetGrismAlpha = GetGrismAlpha;
    vtab->SetGrismAlpha = SetGrismAlpha;
@@ -1187,7 +1187,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    i1 = -1;
    i2 = -1;
 
-/* See if the GrismMap can be merged with the Mappings on either side of it 
+/* See if the GrismMap can be merged with the Mappings on either side of it
    in the list. This can only be done in series for a GrismMap. */
 /* ===================================================================== */
    if( series ) {
@@ -1196,7 +1196,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
       class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
 
-/* Set a flag indicating that we have not yet found a neighbour with which 
+/* Set a flag indicating that we have not yet found a neighbour with which
    the GrismMap can be merged. */
       merged_map = NULL;
 
@@ -1220,7 +1220,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
 
 /* If either neighbour has passed these checks, replace the pair of
-   Mappings which have been merged with the single merged Mapping returned 
+   Mappings which have been merged with the single merged Mapping returned
    above. */
       if( merged_map ) {
 
@@ -1318,28 +1318,28 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    in "nc" to check that the entire string was matched. Once a value
    has been obtained, use the appropriate method to set it. */
 
-   if (  nc = 0, ( 1 == astSscanf( setting, "grismnr= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   if (  nc = 0, ( 1 == astSscanf( setting, "grismnr= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismNR( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismnrp= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismnrp= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismNRP( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismwaver= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismwaver= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismWaveR( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismalpha= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismalpha= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismAlpha( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismg= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismg= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismG( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismm= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismm= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismM( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismeps= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismeps= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismEps( this, dval );
 
-   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismtheta= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) { 
+   } else if (  nc = 0, ( 1 == astSscanf( setting, "grismtheta= %lf %n", &dval, &nc ) ) && ( nc >= len ) ) {
       astSetGrismTheta( this, dval );
 
 /* If the attribute is still not recognised, pass it on to the parent
@@ -1404,28 +1404,28 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    this = (AstGrismMap *) this_object;
 
 /* Check the attribute name and clear the appropriate attribute. */
-   if ( !strcmp( attrib, "grismnr" ) ) { 
+   if ( !strcmp( attrib, "grismnr" ) ) {
       result = astTestGrismNR( this );
 
-   } else if ( !strcmp( attrib, "grismnrp" ) ) { 
+   } else if ( !strcmp( attrib, "grismnrp" ) ) {
       result = astTestGrismNRP( this );
 
-   } else if ( !strcmp( attrib, "grismwaver" ) ) { 
+   } else if ( !strcmp( attrib, "grismwaver" ) ) {
       result = astTestGrismWaveR( this );
 
-   } else if ( !strcmp( attrib, "grismalpha" ) ) { 
+   } else if ( !strcmp( attrib, "grismalpha" ) ) {
       result = astTestGrismAlpha( this );
 
-   } else if ( !strcmp( attrib, "grismg" ) ) { 
+   } else if ( !strcmp( attrib, "grismg" ) ) {
       result = astTestGrismG( this );
 
-   } else if ( !strcmp( attrib, "grismm" ) ) { 
+   } else if ( !strcmp( attrib, "grismm" ) ) {
       result = astTestGrismM( this );
 
-   } else if ( !strcmp( attrib, "grismeps" ) ) { 
+   } else if ( !strcmp( attrib, "grismeps" ) ) {
       result = astTestGrismEps( this );
 
-   } else if ( !strcmp( attrib, "grismtheta" ) ) { 
+   } else if ( !strcmp( attrib, "grismtheta" ) ) {
       result = astTestGrismTheta( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
@@ -1524,7 +1524,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Determine the numbers of points from the input PointSet and obtain
    pointers for accessing the input and output coordinate values. */
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse mapping,
@@ -1583,7 +1583,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                sinbeta = map->k2*value_in - map->k1;
                if( sinbeta < -1.0 || sinbeta > 1.0 ) {
                   ptr_out[ 0 ][ point ] = AST__BAD;
-               } else {  
+               } else {
                   ptr_out[ 0 ][ point ] = tan( asin( sinbeta ) - map->k3 );
                }
             }
@@ -1612,11 +1612,11 @@ static void UpdateConstants( AstGrismMap *this, int *status ){
 *     void UpdateConstants( AstGrismMap *this, int *status )
 
 *  Class Membership:
-*     GrismMap member function 
+*     GrismMap member function
 
 *  Description:
 *     This function re-calculates the constants used within the
-*     transformation on the basis of the current values of the 
+*     transformation on the basis of the current values of the
 *     GrismMap attributes. It should be called whenever a new value is
 *     set for an attribute, or an attribute is cleared.
 
@@ -1648,11 +1648,11 @@ static void UpdateConstants( AstGrismMap *this, int *status ){
    nr = astGetGrismNR( this );
    nrp = astGetGrismNRP( this );
    wave_r = astGetGrismWaveR( this );
-   alpha = astGetGrismAlpha( this ); 
-   g = astGetGrismG( this );     
-   m = astGetGrismM( this );     
-   eps = astGetGrismEps( this );   
-   theta = astGetGrismTheta( this );   
+   alpha = astGetGrismAlpha( this );
+   g = astGetGrismG( this );
+   m = astGetGrismM( this );
+   eps = astGetGrismEps( this );
+   theta = astGetGrismTheta( this );
 
 /* Re-calculate the constants. */
    coseps = cos( eps );
@@ -1699,7 +1699,7 @@ static void UpdateConstants( AstGrismMap *this, int *status ){
 *     Double precision.
 
 *  Description:
-*     This attribute holds refractive index of the grism material at the 
+*     This attribute holds refractive index of the grism material at the
 *     reference wavelength (given by attribute GrismWaveR). The default
 *     value is 1.0.
 
@@ -1730,11 +1730,11 @@ astMAKE_TEST(GrismMap,GrismNR,( this->nr != AST__BAD ))
 *     Double precision.
 
 *  Description:
-*     This attribute holds the rate of change of the refractive index of the 
-*     grism material with respect to wavelength at the reference wavelength 
-*     (given by attribute GrismWaveR). The default value is 0.0 (the 
-*     appropriate value for a pure grating disperser with no prism). The 
-*     units of this attribute should be consistent with those of attributes 
+*     This attribute holds the rate of change of the refractive index of the
+*     grism material with respect to wavelength at the reference wavelength
+*     (given by attribute GrismWaveR). The default value is 0.0 (the
+*     appropriate value for a pure grating disperser with no prism). The
+*     units of this attribute should be consistent with those of attributes
 *     GrismWaveR and GrismG.
 
 *  Applicability:
@@ -1764,8 +1764,8 @@ astMAKE_TEST(GrismMap,GrismNRP,( this->nrp != AST__BAD ))
 *     Double precision.
 
 *  Description:
-*     This attribute holds reference wavelength. The default value is 
-*     5000 (Angstrom). The units of this attribute should be consistent with 
+*     This attribute holds reference wavelength. The default value is
+*     5000 (Angstrom). The units of this attribute should be consistent with
 *     those of attributes GrismNRP and GrismG.
 
 *  Applicability:
@@ -1889,7 +1889,7 @@ astMAKE_TEST(GrismMap,GrismM,( this->m != INT_MAX ))
 *  Description:
 *     This attribute holds the angle (in radians) between the normal to
 *     the grating or exit prism face, and the dispersion plane. The
-*     dispersion plane is the plane spanned by the incoming and outgoing 
+*     dispersion plane is the plane spanned by the incoming and outgoing
 *     ray. The default value is 0.0.
 
 *  Applicability:
@@ -1921,8 +1921,8 @@ astMAKE_TEST(GrismMap,GrismEps,( this->eps != AST__BAD ))
 *  Description:
 *     This attribute gives the angle of incidence of light of the
 *     reference wavelength (given by attribute GrismWaveR) onto the
-*     detector. Specifically, it holds the angle (in radians) between 
-*     the normal to the detector plane and an incident ray at the reference 
+*     detector. Specifically, it holds the angle (in radians) between
+*     the normal to the detector plane and an incident ray at the reference
 *     wavelength. The default value is 0.0.
 
 *  Applicability:
@@ -2071,17 +2071,17 @@ f     RESULT = AST_GRISMMAP( OPTIONS, STATUS )
 *     A GrismMap is a specialised form of Mapping which transforms
 *     1-dimensional coordinates using the spectral dispersion equation
 *     described in FITS-WCS paper III "Representation of spectral
-*     coordinates in FITS". This describes the dispersion produced by 
+*     coordinates in FITS". This describes the dispersion produced by
 *     gratings, prisms and grisms.
 *
-*     When initially created, the forward transformation of a GrismMap 
+*     When initially created, the forward transformation of a GrismMap
 *     transforms input "grism parameter" values into output wavelength
 *     values. The "grism parameter" is a dimensionless value which is
-*     linearly related to position on the detector. It is defined in FITS-WCS 
-*     paper III as "the offset on the detector from the point of intersection 
+*     linearly related to position on the detector. It is defined in FITS-WCS
+*     paper III as "the offset on the detector from the point of intersection
 *     of the camera axis, measured in units of the effective local length".
-*     The units in which wavelength values are expected or returned is 
-*     determined by the values supplied for the GrismWaveR, GrismNRP and 
+*     The units in which wavelength values are expected or returned is
+*     determined by the values supplied for the GrismWaveR, GrismNRP and
 *     GrismG attribute: whatever units are used for these attributes will
 *     also be used for the wavelength values.
 
@@ -2133,7 +2133,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the GrismMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitGrismMap( NULL, sizeof( AstGrismMap ), !class_init, 
+   new = astInitGrismMap( NULL, sizeof( AstGrismMap ), !class_init,
                           &class_vtab, "GrismMap" );
 
 /* If successful, note that the virtual function table has been
@@ -2214,7 +2214,7 @@ AstGrismMap *astGrismMapId_( const char *options, ... ) {
 
 /* Initialise the GrismMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitGrismMap( NULL, sizeof( AstGrismMap ), !class_init, 
+   new = astInitGrismMap( NULL, sizeof( AstGrismMap ), !class_init,
                           &class_vtab, "GrismMap" );
 
 /* If successful, note that the virtual function table has been

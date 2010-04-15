@@ -8,7 +8,7 @@
 #
 #     Description.
 #     This class provides a mega-widget which will display two NDF
-#     Sets and allow the user to overlay them interactively, thus 
+#     Sets and allow the user to overlay them interactively, thus
 #     specifying an offset between the two.  The offset chosen by
 #     the user can be retrieved by the caller.
 
@@ -31,14 +31,14 @@
 #        user, update the display with respect to user actions, etc.
 #        Prior to this call, the visual state of the object will
 #        probably be inconsistent with the configuration options which
-#        have been passed to it.  This method should normally be called 
+#        have been passed to it.  This method should normally be called
 #        only after a pair of images has been loaded in using loadndf.
 #
 #     clearpoints
 #        Removes all the points from the position lists and the canvas.
 #
 #     deactivate
-#        After a call to this method, the user may no longer interact 
+#        After a call to this method, the user may no longer interact
 #        with the widget to add points etc.
 #
 #     loadndf slot ndf ?frame? ?percs? ?maxcanv? ?fillwin?
@@ -48,13 +48,13 @@
 #           - ndf      -- An ndf or ndfset object
 #           - frame    -- The frame into which to resample the NDFs before
 #                         plotting.  If absent, the current frame is used.
-#           - percs    -- If present, this is a two-element list giving the 
+#           - percs    -- If present, this is a two-element list giving the
 #                         percentile bounds between which the display of the
 #                         NDF should be made.  If absent, a default is used.
-#           - maxcanv  -- If given and non-zero, the GWM widget will not 
+#           - maxcanv  -- If given and non-zero, the GWM widget will not
 #                         be more than maxcanv pixels in either direction.
 #           - fillwin  -- If true, the zoom factor will be increased until
-#                         the display is as big as it can be without 
+#                         the display is as big as it can be without
 #                         exceeding the displayed size of the window.
 #
 #     maxcanvas
@@ -62,16 +62,16 @@
 #        the height of a GWM item big enough to hold the two currently
 #        loaded images just after the two loadndf calls at the current
 #        zoom factor.  This may not be the same that given by the most
-#        recently created GWM item, which is what we would get if we 
-#        just inherited the Gwmview maxcanvas method, since the two 
-#        images may overlap or be far from each other when this is called. 
+#        recently created GWM item, which is what we would get if we
+#        just inherited the Gwmview maxcanvas method, since the two
+#        images may overlap or be far from each other when this is called.
 #
 #     offset
 #        Returns a two-element list giving the X and Y position of the
 #        origin of the B image in CURRENT frame coordinates of the A image.
 #
 #     overlapping
-#        Returns a boolean value indicating whether the two images 
+#        Returns a boolean value indicating whether the two images
 #        have a non-empty overlap as currently offset.
 #
 #     points slot frame
@@ -95,7 +95,7 @@
 #  Public Variables (Configuration Options):
 #     info = string
 #        Gives a string which will be displayed somewhere in the window
-#        near each displayed NDF Set.  The following substitutions will be 
+#        near each displayed NDF Set.  The following substitutions will be
 #        made before the string is displayed:
 #           - %N  -- Full name
 #           - %n  -- Shortened name (e.g. without full path)
@@ -158,8 +158,8 @@
 #     8-MAR-2001 (MBT):
 #        Upgraded for use with Sets.
 #     19-JUL-2001 (MBT):
-#        Added centroidig, and moved position marking methods into 
-#        this widget from Gwmview (this widget gets two Markercontrol 
+#        Added centroidig, and moved position marking methods into
+#        this widget from Gwmview (this widget gets two Markercontrol
 #        widgets to do the work).
 #     {enter_further_changes_here}
 
@@ -177,7 +177,7 @@
 ########################################################################
    constructor { args } {
 
-#  Initialise some of the slot-indexed arrays, so we don't have to keep 
+#  Initialise some of the slot-indexed arrays, so we don't have to keep
 #  testing for their non-existence before they have been set.
       foreach slot { A B } {
          set ndfset($slot) ""
@@ -224,7 +224,7 @@
 #  Split the info panel into two parts.
       foreach slot { A B } {
          itk_component add infofrm$slot {
-            frame $itk_component(info).frm$slot 
+            frame $itk_component(info).frm$slot
          }
          itk_component add info$slot {
             label $itk_component(infofrm$slot).info$slot
@@ -232,7 +232,7 @@
       }
       pack $itk_component(infofrmA) $itk_component(infofrmB) \
            -side left -fill x -expand 1
-      pack $itk_component(infoA) 
+      pack $itk_component(infoA)
       pack $itk_component(infoB)
 
 #  Process initial configuration options.
@@ -371,7 +371,7 @@
             set ycanv [ winfo height $canvwin ]
 
 #  If the displayed size is smaller than the size of the scrolledcanvas
-#  widget (but not necessarily than the canvas itself), enlarge it 
+#  widget (but not necessarily than the canvas itself), enlarge it
 #  until it takes up the available space.
             set enlarge 0
             while { $fillwin } {
@@ -403,14 +403,14 @@
             }
             set zoom [ zoominc $zoom $enlarge ]
 
-#  We may have to iterate the following steps, shrinking the zoom each 
-#  time, if they result in requiring a GWM canvas which exceeds the 
+#  We may have to iterate the following steps, shrinking the zoom each
+#  time, if they result in requiring a GWM canvas which exceeds the
 #  requested maximum dimensions.
             set shrink 0
             while { 1 && $enlarge <= 0 } {
                set z [ zoominc $zoom $shrink ]
 
-#  Set the initial offset.  The images should be adjacent to each other 
+#  Set the initial offset.  The images should be adjacent to each other
 #  with a little gap in between.
                set xoff(A) [ expr 0 - $xlo(A) ]
                set yoff(A) [ expr 0 - $ylo(A) ]
@@ -425,7 +425,7 @@
                                 [ max [ expr $yhi(A) - $ylo(A) ] \
                                       [ expr $yhi(B) - $yhi(B) ] ] ]
 
-#  Reduce the zoom level (if it will go any smaller) and try again if 
+#  Reduce the zoom level (if it will go any smaller) and try again if
 #  necessary.
                if { $maxcanv > 0 && [ max $xsize $ysize ] > $maxcanv } {
                   incr shrink -1
@@ -553,8 +553,8 @@
 
 #  Only attempt to display if we are in the active status and have two
 #  images to display.
-         if { $status != "active" || ! $present(A) || ! $present(B) } { 
-            return 
+         if { $status != "active" || ! $present(A) || ! $present(B) } {
+            return
          }
 
 #  Only attempt display if characteristics have changed from the last time
@@ -568,7 +568,7 @@
               $displayed(B,xoff) != $xoff(B) || \
               $displayed(A,yoff) != $yoff(A) || \
               $displayed(B,yoff) != $yoff(B) || \
-              $displayed(zoomfactor) != $zoomfactor } { 
+              $displayed(zoomfactor) != $zoomfactor } {
 
 #  This may be time-consuming.  Post a waiting message.
             waitpush "Drawing images"
@@ -609,7 +609,7 @@
             makegwm $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ]
 
 #  Create polygons on the canvas for both images.  This both provides
-#  visual feedback for the user and makes it easier to identify 
+#  visual feedback for the user and makes it easier to identify
 #  positions on the canvas.
             foreach slot { A B } {
                for { set i 0 } { $i < $nndf($slot) } { incr i } {
@@ -625,7 +625,7 @@
                           -fill \{\} -outline green -tags image$slot
                }
             }
-         
+
 #  Draw the images onto the GWM.
             set overlap [ \
                ndfdrawpair [ gwmname ]/GWM \
@@ -806,13 +806,13 @@
       public variable markstyleA {} {
 #-----------------------------------------------------------------------
       }
-         
+
 
 #-----------------------------------------------------------------------
       public variable markstyleB {} {
 #-----------------------------------------------------------------------
       }
-         
+
 
 
 ########################################################################
@@ -821,7 +821,7 @@
 
 #  Instance Variables.
 
-#  The following are arrays indexed by slot, i.e. "A" or "B", according 
+#  The following are arrays indexed by slot, i.e. "A" or "B", according
 #  to which NDF they refer to.
       private variable infodata        ;# Array holding substitution strings
       private variable fullname        ;# Full name of NDF Set

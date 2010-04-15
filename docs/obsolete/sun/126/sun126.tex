@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article}     
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -209,12 +209,12 @@ keypad and the QWERTY keyboard, but the EDT keypad emulation provides identical
 functions. Remember that if you are at a VT200 terminal but have it configured
 as a VT100, then these extra keys will not perform as advertised. Just to
 confuse matters, Pericom terminals have the PF and F nomenclature reversed, so
-take care.}; 
+take care.};
 at this point, commands can be entered at the {\tt Command:} prompt that
 appears below the numbered buffer list. Note however that although all EVE and
 \STEve\ commands can be entered on the command line, many commonly used
 commands have been assigned to various quick and easy keystroke combinations.
-When entering commands at the {\tt Command:} prompt, they may be abbreviated 
+When entering commands at the {\tt Command:} prompt, they may be abbreviated
 to the smallest unique initial string. If an abbreviation is not unique, the
 editor will display the possible choices and prompt for the command name again.
 
@@ -225,7 +225,7 @@ This is one of several ways to access help information in \STEve\ (see Section
 \subsection{A Typical Session}
 
 One of the most useful features that \STEve\ provides is the numbered buffer
-list. As already mentioned, \STEve\ maintains a list of user buffers just below 
+list. As already mentioned, \STEve\ maintains a list of user buffers just below
 the buffer status line. If you have just entered the editor, your current
 buffer name will be listed here with a number `1' next to it. To get an idea of
 the facility, read in another file. To do this type \gold\ \keyname{G} and
@@ -235,7 +235,7 @@ between buffers is now very easy. Simply typing \gold\ \keyname{1} will move
 you back to the first buffer, and typing \gold\ \keyname{2} will move back to
 the second buffer. \STEve\ will maintain a numbered list of up to nine buffers
 and allow you to move between them by typing \gold\ followed by the appropriate
-buffer number. 
+buffer number.
 
 If you are editing in a DECterm window or from a VT1200 terminal there is
 additional mouse support for selecting buffers in the buffer list. Simply place
@@ -249,10 +249,10 @@ two, type \gold\ \keyname{=}. To move between the buffers type \gold\
 back to one window type \gold\ \keyname{=} again.
 
 There are a few enhancements provided by \STEve\ that are useful if you are
-writing a \LaTeX\ file. You can invoke \LaTeX\ from within the editor by typing 
+writing a \LaTeX\ file. You can invoke \LaTeX\ from within the editor by typing
 \keyname{CTRL} \keyname{L}. The first time you invoke \LaTeX\ in an editing
-session causes a subprocess to be spawned\footnote{Subsequent invocations use 
-the existing subprocess and so start up much quicker.}  
+session causes a subprocess to be spawned\footnote{Subsequent invocations use
+the existing subprocess and so start up much quicker.}
 and the current buffer contents are written to a temporary file
 and processed by \LaTeX . In the event of an error during this processing,
 \STEve\ will display the line number where it thinks the error is and the
@@ -293,14 +293,14 @@ between 80 and 132 column screen width. Associated with this are the keys
 \gold\ \keyname{$\rhd$} and \gold\ \keyname{$\lhd$} wich allow you to move
 `horizontally' within a buffer.
 
-Finally (for this tutorial) there is the Compile command (abbreviated to 
+Finally (for this tutorial) there is the Compile command (abbreviated to
 \keyname{CTRL} \keyname{F} which allows you to compile FORTRAN (or VAX C) code
 from within \STEve. The compiler is chosen from the filetype extension of the
 file you are editing. If errors occur during compilation they are displayed in
 an error window. You can compile a selected range of code (for instance a
 subroutine) if you prefer. Remember that this facility does not rename
 temporary files on successful completion, and you must recompile your corrected
-code when you leave the editor. 
+code when you leave the editor.
 
 Check Section 3.1 for other useful keystroke combinations; it's also worth
 checking out the complete command listings in the Appendices as there may be
@@ -353,12 +353,12 @@ are shown in {\bf bold face}.
 
 \item \keyname{F14} toggles between INSERT and OVERSTRIKE editing modes
 
-\item \keyname{CTRL} \keyname{V} allows the addition of control characters to 
+\item \keyname{CTRL} \keyname{V} allows the addition of control characters to
       the buffer.
       Useful for sending escape sequences to printers etc. Equivalent to
       the {\tt QUOTE} command.
 
-\item {\bf \gold\ \keyname{S} invokes the Starlink Spell Checker from within 
+\item {\bf \gold\ \keyname{S} invokes the Starlink Spell Checker from within
       the editor.
       Allows you to check the spelling on the text in the current buffer or a
       selected range of text.}
@@ -379,23 +379,23 @@ are shown in {\bf bold face}.
 \item {\bf \gold\ \keyname{=} toggles between one and two windows on the screen.
       (c.f. {\tt TWO WINDOWS} and {\tt ONE WINDOW} commands). }
 
-\item {\bf \gold\ \keyname{$\bigtriangleup$} and \gold\ 
+\item {\bf \gold\ \keyname{$\bigtriangleup$} and \gold\
        \keyname{$\bigtriangledown$} switch
        between two windows on the screen (c.f. {\tt OTHER WINDOW} command).}
 
-\item {\bf \gold\ \keyname{W} writes the current buffer to disk using the 
+\item {\bf \gold\ \keyname{W} writes the current buffer to disk using the
        existing filename.}
 
-\item {\bf \gold\ \keyname{G} gets a file and creates a new buffer which 
+\item {\bf \gold\ \keyname{G} gets a file and creates a new buffer which
        becomes the current buffer.}
 
-\item {\bf \gold\ \keyname{L} displays the current line length in the message 
+\item {\bf \gold\ \keyname{L} displays the current line length in the message
        window.}
 
-\item {\bf \gold\ \keyname{C} displays the current column number in the 
+\item {\bf \gold\ \keyname{C} displays the current column number in the
        message window.}
 
-\item {\bf \gold\ \keyname{D} copies a current date string into the current 
+\item {\bf \gold\ \keyname{D} copies a current date string into the current
        buffer.}
 
 \item {\bf \gold\ \keyname{T} shows the current time in the message window.}
@@ -406,10 +406,10 @@ are shown in {\bf bold face}.
 \item {\bf \keyname{CTRL} \keyname{A} \ sets the left margin to the current
       cursor position.}
 
-\item {\bf \keyname{F17} toggles between Box insert mode and normal insert 
+\item {\bf \keyname{F17} toggles between Box insert mode and normal insert
        mode.}
 
-\item {\bf \keyname{F18} matches a character (c.f. SET MATCHING command) and 
+\item {\bf \keyname{F18} matches a character (c.f. SET MATCHING command) and
        \gold\ \keyname{F18} unmatches a character (c.f. SET NOMATCHING
        command).}
 
@@ -430,13 +430,13 @@ prompt.
 
 You can access informational topics on general editor issues as well as
 specific command and key help. Just press \keyname{DO} and enter {\tt HELP} at
-the {\tt Command:} prompt. This displays a list of topics, and gives 
+the {\tt Command:} prompt. This displays a list of topics, and gives
 instructions on how to get specific or informational help.
 
 Don't forget you can get help on any or all keys by pressing
 \gold\ \keyname{HELP} (c.f. {\tt HELP KEYS} command). This will prepare and
 display a complete list of defined keys (a similar, but edited list appears in
-Appendix \ref{key_defs} of this document). You are then prompted to press the 
+Appendix \ref{key_defs} of this document). You are then prompted to press the
 key(s) you want help on.
 
 For instant help on any particular key, then press \gold\ \keyname{PF2} , and
@@ -444,7 +444,7 @@ you will be prompted to press the key you want help on. A brief description of
 the particular key function or associated command is displayed in the message
 window without affecting the current windows.
 
-And finally Appendix \ref{deceve} of this document lists all the available 
+And finally Appendix \ref{deceve} of this document lists all the available
 help topics in standard EVE.
 
 \subsection{Customizing it Yourself}
@@ -455,7 +455,7 @@ customize the editing environment. There is also the ability for users to
 create their own section files. This is discouraged as it results in users
 having to keep large section files ($>$ 1200 blocks) in their filespace, and
 the use of personal section files is much less efficient than using a common
-system-wide section file. 
+system-wide section file.
 
 For more details. refer to the descriptions of command and initialization file
 usage (and default logical names you can assign to them) in the VMS General
@@ -503,7 +503,7 @@ cccccccccccccccccccccccccc \= cccccccccccccccccccccccccc \= cccccccccccccccccccc
 \section{\STEve\ Command Reference}
 \label{command_reference}
 
-This appendix contains a more detailed reference to all the \STEve\ commands. 
+This appendix contains a more detailed reference to all the \STEve\ commands.
 Almost all of the following information is contained in the on-line \STEve\
 help, accessible from within the editor.
 
@@ -636,7 +636,7 @@ cccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
   Users should note that this facility is used only for checking code. The
   editor will not preserve the compiled code but will delete the temporary
   files associated with the procedure. The edited code is written
-  on exit (unless the user {\tt QUIT}s the editing session), and the user 
+  on exit (unless the user {\tt QUIT}s the editing session), and the user
   must then compile again.
 
 \begin{description}
@@ -700,15 +700,15 @@ COPY DATE \> SHOW TIME \\
 \medskip
   Map one of the buffers listed in the buffer map on to the current
   window. Equivalent to \gold\ \keyname{$<n>$} (where n is one of the numeric
-  keys (1 to 9) across the top of the QWERTY keyboard) used to select buffer n 
-  in the buffer map. Alternatively a mouse can be used to select a buffer for 
+  keys (1 to 9) across the top of the QWERTY keyboard) used to select buffer n
+  in the buffer map. Alternatively a mouse can be used to select a buffer for
   editing sessions carried out from a DECterm or VT1200 window. Simply place
   the mouse pointer over the desired buffer name and click Mouse Button 1
   (MB1).
   \begin{itemize}
   \item The buffer map is displayed by default and is just below the status
         line of the lowest window on the screen.
-  \item If \gold\ \keyname{$<n>$} is typed and buffer n does not exist, the user 
+  \item If \gold\ \keyname{$<n>$} is typed and buffer n does not exist, the user
         is prompted for a file to get.
   \item Where appropriate, place mouse pointer over desired buffer name and
         click Mouse Button 1 (MB1).
@@ -739,7 +739,7 @@ SET MAPPING  \> SET NOMAPPING \\
   of the current buffer (ranges are not allowed). If an error occurs,
   then the cursor is placed in the LaTeX buffer at the line where the
   error occured (on a best efforts basis!). On success the temporary output
-  files are renamed to the filename associated with the buffer containing the 
+  files are renamed to the filename associated with the buffer containing the
   \LaTeX\ code. This action can be turned off be the command SET LATEX NOSAVE
   (\gold\ \keyname{F19}).
 
@@ -978,7 +978,7 @@ cccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
 
 \medskip
   Mapping in \STEve\ allows the editor to create and maintain a numbered
-  list of user buffers. In addition the \gold\ \keyname{$<n>$} keys as 
+  list of user buffers. In addition the \gold\ \keyname{$<n>$} keys as
   described below are
   defined with this command to allow quick and easy movement between
   multiple buffers. Enabled by default. Mouse support is also provided for

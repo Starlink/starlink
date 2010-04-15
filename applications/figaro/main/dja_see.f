@@ -32,17 +32,17 @@
 *    INSTANT = INTEGER (Given)
 *        fits to be done now
 *    NNEW = INTEGER (Given)
-*       
+*
 *    NOLD = INTEGER (Given)
-*       
+*
 *    NFAILED = INTEGER (Given)
-*       
+*
 *    MASKEDOUT = INTEGER (Given)
-*       
+*
 *    DECCNTR(*) = INTEGER ARRAY (Given)
 *        Fit model
 *    STATUS = INTEGER (Given)
-*       
+*
 * Global variables:
 *    D_TLPTR = INTEGER (Given)
 *        Pointer to channels bound of current line (include file

@@ -50,7 +50,7 @@
  *  Constructor: initialize empty table.
  */
 GaiaQueryResult::GaiaQueryResult()
-    : QueryResult(), assume_degrees_( 0 ) 
+    : QueryResult(), assume_degrees_( 0 )
 {
     //  Do nothing.
 }
@@ -103,9 +103,9 @@ int GaiaQueryResult::getPos( int row, WorldOrImageCoords& pos ) const
  *
  *  Overrides circularCompareRow of QueryResult to use GaiaWorldCoords.
  */
-int GaiaQueryResult::circularCompareRow( const TabTable& table, int row, 
-                                         const AstroQuery& q, int mag_col, 
-                                         int* search_cols ) 
+int GaiaQueryResult::circularCompareRow( const TabTable& table, int row,
+                                         const AstroQuery& q, int mag_col,
+                                         int* search_cols )
 {
     // get value for mag, if there is one
     if (mag_col != -1 && (q.mag1() != 0.0 || q.mag2() != 0.0)) {
@@ -121,7 +121,7 @@ int GaiaQueryResult::circularCompareRow( const TabTable& table, int row,
             if (entry_->isWcs()) {
                 char* ra;
                 char* dec;
-                if (table.get(row, entry_->ra_col(), ra) != 0 
+                if (table.get(row, entry_->ra_col(), ra) != 0
                     || table.get(row, entry_->dec_col(), dec) != 0)
                     return 1;
                 p = GaiaWorldCoords(ra, dec, 0, entry_->equinox(), 1);
@@ -129,7 +129,7 @@ int GaiaQueryResult::circularCompareRow( const TabTable& table, int row,
             else if (entry_->isPix()) {
                 // get x,y
                 double x, y;
-                if (table.get(row, entry_->x_col(), x) != 0 
+                if (table.get(row, entry_->x_col(), x) != 0
                     || table.get(row, entry_->y_col(), y) != 0)
                     return 1;
                 p = ImageCoords(x, y);
@@ -157,14 +157,14 @@ int GaiaQueryResult::circularCompareRow( const TabTable& table, int row,
             double d, d1, d2;
             int j, j1, j2;
             if (sscanf(tableValue, "%lf", &d) == 1
-                && sscanf(minValues[i], "%lf", &d1) == 1 
+                && sscanf(minValues[i], "%lf", &d1) == 1
                 && sscanf(maxValues[i], "%lf", &d2) == 1) {
                 // compare as double
                 if (d < d1 || d > d2)
                     return 1;  // no match
             }
             else if (sscanf(tableValue, "%d", &j) == 1
-                && sscanf(minValues[i], "%d", &j1) == 1 
+                && sscanf(minValues[i], "%d", &j1) == 1
                 && sscanf(maxValues[i], "%d", &j2) == 1) {
                 // compare as int
                 if (j < j1 || j > j2)
@@ -178,6 +178,6 @@ int GaiaQueryResult::circularCompareRow( const TabTable& table, int row,
             }
         }
     }
-    
+
     return 0;                   // a match
 }

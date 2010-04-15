@@ -8,7 +8,7 @@ proc qmanEnterEndGroup {taskname} {
 
 # Check that the group number is valid
     if {[qmanCheckEntry $QmanWidgets(GROUP_NUMBER) "The group number"] != 0} {return}
- 
+
 # Disable all buttons except the interrupt button
     cgs4drCursor pirate orange black
     grab $QmanWidgets(INTERRUPT)

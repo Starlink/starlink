@@ -86,7 +86,7 @@ C   WORK    Double precision 1D array (size 3*max(KX,KY) + KY)
 C           A working storage array.
 C
 C   IFAIL   A returned error value.
-C   
+C
 C   RVALUE  The interpolated value.
 C
 C   STATUS  Integer. Starlink status report.
@@ -122,9 +122,9 @@ C     SAVE ILOY    ,  INBVX
 C
 C
 C***FIRST EXECUTABLE STATEMENT
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.0) RETURN   
+      IF (STATUS.NE.0) RETURN
 
 *   Clear interpolated value.
       RVALUE=0.0D0
@@ -150,5 +150,5 @@ C***FIRST EXECUTABLE STATEMENT
 
 *   Set up the status value.
       IF (IFAIL.NE.0) STATUS=1
-      
+
       END

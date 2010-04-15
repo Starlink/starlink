@@ -15,17 +15,17 @@
 *                  TXT, NTXT, STATUS )
 
 *  Description:
-*     This subroutine writes the text strings to the specified sky 
+*     This subroutine writes the text strings to the specified sky
 *     positions in the current SGS zone. The user will be prompted for
 *     the next position after each writting until a null is given.
 
 *  Arguments:
 *     PLON = CHARACTER*( * ) (Given)
 *        The name of the parameter used to get the longitude of the sky
-*        positions from the user. 
+*        positions from the user.
 *     PLAT = CHARACTER*( * ) (Given)
 *        The name of the parameter used to get the latitude of the sky
-*        positions from the user. 
+*        positions from the user.
 *     IRA = INTEGER (Given)
 *        The ID of the IRA system of the displayed image NDF
 *     SCS = CHARACTER*( * ) (Given)
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-                                
+
 *  Arguments Given:
       CHARACTER*( * ) PLON, PLAT
       INTEGER IRA
@@ -116,7 +116,7 @@
             CALL ERR_ANNUL( STATUS )
 
 *  If a valid position is obtained, write the text to the position.
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN     
+         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get its image coordinate.
             CALL IRA_TRANS( 1, LON( NTXT + 1 ), LAT( NTXT + 1 ),
@@ -137,7 +137,7 @@
                CALL PAR_GET0C( PTXT, TXT( NTXT + 1 ), STATUS )
 
 *  If null is supplied, no text will be written at this position but not
-*  exit.       
+*  exit.
                IF ( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
 
@@ -145,7 +145,7 @@
                ELSE IF( STATUS .EQ. SAI__OK ) THEN
                   NTXT = NTXT + 1
                   TXTLN = CHR_LEN( TXT( NTXT ) )
-                  CALL SGS_TX( REAL( X ), REAL( Y ), 
+                  CALL SGS_TX( REAL( X ), REAL( Y ),
      :                         TXT( NTXT )( : TXTLN ) )
                   CALL SGS_FLUSH
 
@@ -155,14 +155,14 @@
                END IF
 
             END IF
-      
+
 *  Cancel the value of parameter for next use.
             CALL PAR_CANCL( PTXT, STATUS )
          END IF
-      
+
 *  Cancel the values of the parameters for next use
          CALL PAR_CANCL( PLON, STATUS )
          CALL PAR_CANCL( PLAT, STATUS )
       END DO
-      
+
       END

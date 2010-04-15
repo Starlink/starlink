@@ -3,25 +3,25 @@
      &                TITLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
-C    X G R I D 
+C    X G R I D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), LAMBDA (>), STOKES_I (>), STOKES_Q (>),
 C STOKES_QV (>), STOKES_U (>), STOKES_UV (>), NPTS (>),
 C TITLE (>), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Creates an evenly spaced x grid
 C
@@ -98,5 +98,5 @@ C
        STOKES_UV(I)=0.
       ENDDO
       TITLE='Grid'
-666   CONTINUE  
+666   CONTINUE
       END

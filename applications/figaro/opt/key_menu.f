@@ -70,7 +70,7 @@
       data curfac/1.0/
       data refs/1,2,4,3,6,5,11,12,18,21/
       data refs2/1,2,4,3,6,5,10,11,17,12/
-      
+
       if(status.ne.SAI__OK) return
  1    continue
       factor = curfac

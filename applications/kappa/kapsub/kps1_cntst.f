@@ -61,7 +61,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -86,17 +86,17 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the next list of AST Attribute settings from the group. 
+*  Get the next list of AST Attribute settings from the group.
       CALL GRP_GET( IGRP, IPEN, 1, PENDEF, STATUS )
 
-*  Loop round each comma-delimited attribute in the definitions, translating 
+*  Loop round each comma-delimited attribute in the definitions, translating
 *  colour names and any defined synonyms, and storing it in the Plot.
       IF( PENDEF .NE. ' ' ) THEN
          J1 = 1
          DO WHILE( J1 .LE. GRP__SZNAM .AND. STATUS .EQ. SAI__OK )
             J2 = J1
             CALL CHR_FIND( PENDEF, ',', .TRUE., J2 )
-            CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE., 
+            CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE.,
      :                       .TRUE., IPLOT, BADAT, STATUS )
             J1 = J2 + 1
          END DO

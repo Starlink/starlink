@@ -1,4 +1,4 @@
-*+  LOCATE - locates the centroid of a star-like image feature in a 2-d 
+*+  LOCATE - locates the centroid of a star-like image feature in a 2-d
 *            array
 
       SUBROUTINE LOCATE ( INARR, DIM1, DIM2, XINIT, YINIT, SEARCH,
@@ -83,7 +83,7 @@
 *             of the x marginal array is empty then
 *              Make current bin very large
 *           Else
-*             Normalise the current y bin value with apropriate sign 
+*             Normalise the current y bin value with apropriate sign
 *               depending on whether data are positive or negative
 *               w.r.t. background pixels
 *           Endif
@@ -91,7 +91,7 @@
 *             of the y marginal array is empty then
 *              Make current bin very large
 *           Else
-*             Normalise the current y bin value with apropriate sign 
+*             Normalise the current y bin value with apropriate sign
 *               depending on whether data are positive or negative
 *               w.r.t. background pixels
 *           Endif
@@ -127,7 +127,7 @@
 *                   both x and y
 *              Endif
 *              Work out the shift of the current position from the
-*                starting position 
+*                starting position
 *              If the maximum allowable shift has been exceeded then
 *                 Reset the x,y position back to the initial
 *                   values, set an error status and report the error
@@ -159,7 +159,7 @@
 *     13-01-1986 : First Rapi2d implementation - direct copy from
 *                : Rodney Warren-Smith's EDRS routine of same name.
 *                : (REVA::MJM)
-*     1986 Aug 14: Completed prologue, partially conformed to Starlink 
+*     1986 Aug 14: Completed prologue, partially conformed to Starlink
 *                  programming standards (RL.STAR::CUR).
 *     1986 Sep 4 : Renamed parameters section to arguments, applied
 *                  bad-pixel handling via global constants rather
@@ -239,9 +239,9 @@
      :  JPOSN,                 ! y   "    "    "       "     "     "
      :  NXAV( SRCHMX ),        ! Used to count additions to x profile
      :  NYAV( SRCHMX ),        !   "   "   "       "      " y    "
-     :  NTH,                   ! Value used to determine background 
+     :  NTH,                   ! Value used to determine background
                                ! level - Nth smallest number taken
-     :  I, J, K, L, M          ! Counters 
+     :  I, J, K, L, M          ! Counters
 
       REAL
      :  XLAST,                 ! x co-ord worked out in last iteration
@@ -280,7 +280,7 @@
 *          WRITE(*,*) ' DEBUG --- --- --- POSTVE = ', POSTIV
 *          WRITE(*,*) ' DEBUG --- --- --- MXSHFT = ', MXSHFT
 *          WRITE(*,*) ' DEBUG --- --- --- MXITER = ', MAXITE
-          
+
 *    Initialise the FINSHD flag
 
       FINSHD  =  .FALSE.
@@ -361,7 +361,7 @@
                         YAV( J )  = YAV( J ) + INARR( IPOSN, JPOSN )
                         NXAV( I ) = NXAV( I ) + 1
                         NYAV( J ) = NYAV( J ) + 1
-                  
+
                      END IF
                   END IF
 
@@ -441,7 +441,7 @@
          CALL NTHMIN( YAV, NSAMPL, NTH, STACK, STATUS )
          YBACK  =  STACK( 1 )
 
-*       Now initialise the sums used for forming the centroids. 
+*       Now initialise the sums used for forming the centroids.
 
          XNUMER  =  0.0
          XDENOM  =  0.0
@@ -523,8 +523,8 @@
      :        STATUS )
             FINSHD  =  .TRUE.
 
-         ELSE 
-  
+         ELSE
+
             IF ( .NOT. XEVAL ) THEN
 
 *             no data in the x profile - set the x position to be the
@@ -554,7 +554,7 @@
             END IF
 
 *          now work out the shift of the current position from the
-*          starting position 
+*          starting position
 
             SHIFT  =  SQRT( (XFINAL-XINIT)**2 + (YFINAL-YINIT)**2 )
 
@@ -611,7 +611,7 @@
 
 *    bottom of iteration do-loop
 
-      END DO               
+      END DO
 *      WRITE(*,*) ' DEBUG --- --- --- STATUS = ', STATUS
 *      WRITE(*,*) ' DEBUG --- --- --- Leaving LOCATE()'
 

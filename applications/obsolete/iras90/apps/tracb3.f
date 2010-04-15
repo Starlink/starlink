@@ -1,5 +1,5 @@
       SUBROUTINE TRACB3( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
-     :                   NDISP, OFFSET, DTINDX, SCALE, IDC, 
+     :                   NDISP, OFFSET, DTINDX, SCALE, IDC,
      :                   X, Y, NERTRC, NERSMP, FOUND, STATUS )
 *+
 *  Name:
@@ -13,14 +13,14 @@
 
 *  Invocation:
 *     CALL TRACB3( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
-*                  NDISP, OFFSET, DTINDX, SCALE, IDC, 
+*                  NDISP, OFFSET, DTINDX, SCALE, IDC,
 *                  X, Y, NERTRC, NERSMP, FOUND, STATUS )
 
 *  Description:
 *     The routine finds the trace and the sample of an NCAR (AUTOGRAPH)
-*     display which is vertically nearest to a given point and retunes 
-*     the trace index and sample index. If such trace and sample are 
-*     not found, a logical flag will returned. 
+*     display which is vertically nearest to a given point and retunes
+*     the trace index and sample index. If such trace and sample are
+*     not found, a logical flag will returned.
 *
 *     The curves in the display are scaled to the required units and
 *     have an offset added to vertically displace them.
@@ -56,7 +56,7 @@
 *     Y = REAL (Given)
 *        The y position of the given point in data coordinate.
 *     NERTRC = INTEGER (Returned)
-*        The index of the displayed trace which is nearest to the given 
+*        The index of the displayed trace which is nearest to the given
 *        point in the display.
 *     NERSMP = INTEGER (Returned)
 *        The index of the sample which is nearest to the given point.
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,10 +140,10 @@
 
 *  Initialise the minimum distance from the given point to traces.
       MDIST = VAL__MAXR
-      
+
 *  No nearest trace and sample are found initially.
       FOUND = .FALSE.
-      
+
 *  Find a detector which has a sample nearest to the given positon.
       DO  I = 1, NDISP
 
@@ -157,32 +157,32 @@
 *  Find the sample index of the given point on the ith trace.
          INDEX1 = DTINDX( I )
          INDEX2 = DTINDX( I )
-         CALL IRC_OFFST( IDC, REAL( BSMP ), INDEX1, INDEX2, 
+         CALL IRC_OFFST( IDC, REAL( BSMP ), INDEX1, INDEX2,
      :                   RINSCN, SMP2, STATUS )
          SMP = NINT( SMP2 )
 
 *  If the sample found is inside the scan segment of the trace,
          IF ( SMP .LT. ESMP .AND. SMP .GT. BSMP ) THEN
 
-*  And the sample is valid, set the found flag. 
+*  And the sample is valid, set the found flag.
             IF ( DETDAT( SMP, DTINDX( I ) ) .NE. VAL__BADR .AND.
-     :           SCALE( I ) .NE. VAL__BADR ) THEN 
+     :           SCALE( I ) .NE. VAL__BADR ) THEN
                FOUND = .TRUE.
 
-*  Get the scaled data value at this sample and its distance in the 
-*  display from the given point. 
+*  Get the scaled data value at this sample and its distance in the
+*  display from the given point.
                DATVAL = SCALE( I ) * DETDAT( SMP, DTINDX( I ) )
                YDIST = ABS( Y - OFFSET( I ) - DATVAL )
 
 *  Note down the trace and sample indices which is nearest to the point.
                IF ( MDIST .GT. YDIST ) THEN
                   MDIST = YDIST
-                  NERTRC = I 
+                  NERTRC = I
                   NERSMP = SMP
                END IF
             END IF
          END IF
-      END DO 
+      END DO
 
 *  If no nearest trace and sample are found, report a message before
 *  exit.

@@ -122,7 +122,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -161,7 +161,7 @@
 *  default.
       CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN,MEAN,TRIMMED,MODE,'//
      :                'SIGMA,THRESHOLD,MINMAX,BROADENED,CLIPMED,'//
-     :                'FASTMED', 
+     :                'FASTMED',
      :                .FALSE., METH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -198,12 +198,12 @@
      :       ( METH .EQ. 'MODE' ) .OR.
      :       ( METH .EQ. 'SIGMA' ) .OR.
      :       ( METH .EQ. 'THRESHOLD' ) .OR.
-     :       ( METH .EQ. 'MINMAX' )  .OR. 
+     :       ( METH .EQ. 'MINMAX' )  .OR.
      :       ( METH .EQ. 'CLIPMED' ) ) ) THEN
 
 *  Loop until an acceptable set of weights has been obtained.
          CALL ERR_MARK
- 1       CONTINUE        
+ 1       CONTINUE
          CALL PAR_EXACR( 'WEIGHTS', MAXWT, WEIGHT, STATUS )
 
 *  Interpret a null value as indicating that no external weights are to
@@ -241,19 +241,19 @@
 
 *  Trimmed mean: get the trimming fraction.
       IF ( METH .EQ. 'TRIMMED' ) THEN
-         CALL PAR_GDR0R( 'ALPHA', 0.2, 0.001, 0.5, .FALSE., ALPHA, 
+         CALL PAR_GDR0R( 'ALPHA', 0.2, 0.001, 0.5, .FALSE., ALPHA,
      :                   STATUS )
 
 *  Sigma clipping: get the number of standard deviations to clip at.
       ELSE IF ( ( METH .EQ. 'MODE' ) .OR.
      :          ( METH .EQ. 'SIGMA' ) .OR.
      :          ( METH .EQ. 'CLIPMED' ) ) THEN
-         CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA, 
+         CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA,
      :                   STATUS )
 
 *  Iterative sigma clipping: get the maximum number of iterations.
          IF ( METH .EQ. 'MODE' ) THEN
-            CALL PAR_GDR0I( 'NITER', 10, 1, 100, .FALSE., NITER, 
+            CALL PAR_GDR0I( 'NITER', 10, 1, 100, .FALSE., NITER,
      :                      STATUS )
          ELSE
             NITER = 1
@@ -261,9 +261,9 @@
 
 *  Applying threshold cuts: get the range of values.
       ELSE IF ( METH .EQ. 'THRESHOLD' ) THEN
-         CALL PAR_GDR0R( 'MIN', NUM__MINR, NUM__MINR, NUM__MAXR, 
+         CALL PAR_GDR0R( 'MIN', NUM__MINR, NUM__MINR, NUM__MAXR,
      :                   .FALSE., RMIN, STATUS )
-         CALL PAR_GDR0R( 'MAX', NUM__MAXR, RMIN, NUM__MAXR, 
+         CALL PAR_GDR0R( 'MAX', NUM__MAXR, RMIN, NUM__MAXR,
      :                   .FALSE., RMAX, STATUS )
       END IF
 

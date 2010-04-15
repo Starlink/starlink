@@ -10,10 +10,10 @@ C
 C  Description:
 C     Given the name of a data object, this routine splits it into a
 C     file part and a structure part, returning the full filename and
-C     the structure name. Figaro allows a data object to be specified as 
+C     the structure name. Figaro allows a data object to be specified as
 C     a filename followed optionally by the name of an object that is part
-C     of the hierarchical structure held in the file.  For example, on VMS 
-C     an object name might be '[.SUBDIR]FILE.Z.DATA' where .Z.DATA is the 
+C     of the hierarchical structure held in the file.  For example, on VMS
+C     an object name might be '[.SUBDIR]FILE.Z.DATA' where .Z.DATA is the
 C     name of the object in the file and '[.SUBDIR]FILE' specifies the name
 C     of the file, which would expand into a full filename as returned by
 C     this routine such as 'DISK$DATA:[USER.SUBDIR]FILE.DST;1'. Under UNIX
@@ -27,18 +27,18 @@ C     seated to be changed. So there have to be conventions to deal with
 C     the case where a file extension needs to be specified explicitly.
 C     There is also the question of the possible use of version numbers
 C     in file names. Note that this routine is concerned entirely with the
-C     parsing of the file and structure specifications; although it may 
+C     parsing of the file and structure specifications; although it may
 C     need to check on the existence of files in order to resolve
 C     ambiguities in the parsing, it does not concern itself with the
 C     question of whether or not the system will actually be able to open
-C     the file whose name it returns. 
+C     the file whose name it returns.
 C
 C     This routine calls a system-dependent routine, DSAZ_FNAME, to do
 C     most of the actual work for it, since most of the file-handling
 C     that is required involves machine-specific code that may not
 C     even compile on other machines. There are versions of DSAZ_FNAME
 C     for all the supported systems, and the conventions each uses for
-C     delaing with explicit extensions and version numbers are to be 
+C     delaing with explicit extensions and version numbers are to be
 C     found in the comments for those system-dependent routines.
 C
 C  Language:
@@ -51,7 +51,7 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) OBJECT       (Fixed string,descr) The name of the data object.
 C     (>) NEW          (Logical)  True if it is intended that a new file
-C                      will eventually be created.  
+C                      will eventually be created.
 C     (>) DEFEXT       (Fixed string,descr) If NEW is true, then DEFEXT
 C                      can be used to force the use of a specific file
 C                      extension.  This should be the extension to be used
@@ -65,7 +65,7 @@ C                      sensitive, FILENAME will be folded to upper case,
 C                      otherwise it will be as supplied in OBJECT.
 C     (<) STRUCT       (Fixed string,descr) The structure part of the name,
 C                      including the initial '.'  STRUCT will be in upper case.
-C     (!) STATUS       (Integer,ref) Status code.  If bad status (non-zero) is 
+C     (!) STATUS       (Integer,ref) Status code.  If bad status (non-zero) is
 C                      passed to it this routine will return immediately.
 C
 C  External variables used:  None.
@@ -171,7 +171,7 @@ C
          CALL DSA_DEFEXTS(2,DEFEXTS,NEXTS)
       END IF
 C
-C     Use the system-dependent routine DSAZ_FNAME to do most of the 
+C     Use the system-dependent routine DSAZ_FNAME to do most of the
 C     work.  Note that this routine does not report any errors, so
 C     we have to do that for it. About the only error it can find is
 C     a parsing error - most real errors will be found when the system
@@ -193,7 +193,7 @@ C        possibility of differing default extensions, report that.
 C
          IF (ALTFILE.NE.' ') THEN
             CALL DSA_WRUSER('Note: The specification "')
-            CALL DSA_WRUSER(OBJECT(:ICH_LEN(OBJECT))) 
+            CALL DSA_WRUSER(OBJECT(:ICH_LEN(OBJECT)))
             CALL DSA_WRUSER('" could specify either of the files:')
             CALL DSA_WRFLUSH
             CALL DSA_WRUSER(FILENAME(:ICH_LEN(FILENAME)))
@@ -208,7 +208,7 @@ C
       END IF
 C
 C     There is another check we have to perform. If NEW is set, we guarantee
-C     that we will return the name of a file that does not exist. However, 
+C     that we will return the name of a file that does not exist. However,
 C     under some systems, DSAZ_FNAME will not be able to make that guarantee
 C     of the file name it produces (under UNIX, for example, if file version
 C     numbers are not being used). In that case, we need to generate a temporary
@@ -218,7 +218,7 @@ C
          IF (GEN_EXIST(FILENAME(:ICH_LEN(FILENAME)))) THEN
 C
 C           It does exist, we do need a temporary name. First find a common
-C           slot in which to record it. (MAX_TEMP_NAMES is as large as 
+C           slot in which to record it. (MAX_TEMP_NAMES is as large as
 C           MAX_FILES, so we know there will be an available slot).
 C
             DO I=1,MAX_TEMP_NAMES
@@ -231,7 +231,7 @@ C
             FILE_REAL_NAMES(NAME_SLOT)=FILENAME
             NAME_USED(NAME_SLOT)=.TRUE.
 C
-C           Now work out a suitable temporary name. We try to keep it in the 
+C           Now work out a suitable temporary name. We try to keep it in the
 C           same directory as the original file - looking for ']' or '/'
 C           to delimit the file name is a bit crude - ideally a system-
 C           dependent routine would do this for us.
@@ -258,7 +258,7 @@ C
                LENAME=ICH_LEN(FILENAME)
                FILENAME(LENAME+1:)='.tmp'
                LENAME=LENAME+4
-               EXISTS=GEN_EXIST(FILENAME(:LENAME)) 
+               EXISTS=GEN_EXIST(FILENAME(:LENAME))
                INAME=INAME+1
             END DO
             FILE_TEMP_NAMES(NAME_SLOT)=FILENAME

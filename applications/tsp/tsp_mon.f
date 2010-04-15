@@ -86,11 +86,11 @@
           CALL DISPLAY(STATUS)
       ELSE IF (NAME .EQ. 'RCCDTS') THEN
           CALL RCCDTS(STATUS)
-      ELSE IF (NAME .EQ. 'SKYSUB') THEN 
+      ELSE IF (NAME .EQ. 'SKYSUB') THEN
           CALL SKYSUB(STATUS)
-      ELSE IF (NAME .EQ. 'CCDPHOT') THEN 
+      ELSE IF (NAME .EQ. 'CCDPHOT') THEN
           CALL CCDPHOT(STATUS)
-      ELSE IF (NAME .EQ. 'CCDPOL') THEN 
+      ELSE IF (NAME .EQ. 'CCDPOL') THEN
           CALL CCDPOL(STATUS)
       ELSE IF (NAME .EQ. 'TLIST') THEN
           CALL TLIST(STATUS)
@@ -148,6 +148,6 @@
           CALL IRISAPC(STATUS)
       ELSE IF (NAME .EQ. 'IRISPOLC') THEN
           CALL IRISPOLC(STATUS)
-      ENDIF                         
+      ENDIF
       CALL NDF_END(STATUS)
       END

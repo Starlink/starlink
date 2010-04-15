@@ -30,7 +30,7 @@
 
 *   Import:
       BYTE BVALUE         ! byte value
- 
+
 *   Export:
       INTEGER IVALUE     ! integer value
 

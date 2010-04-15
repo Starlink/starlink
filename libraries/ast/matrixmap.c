@@ -41,12 +41,12 @@ f     The MatrixMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@ f     The MatrixMap class does not define any new routines beyond those
 *     28-JAN-1998 (DSB):
 *        Bug fix in astMtrMult: the matrix (forward or inverse) used for
 *        the "a" MatrixMap was determined by the Invert flag of the other
-*        ("this") MatrixMap.        
+*        ("this") MatrixMap.
 *     14-APR-1998 (DSB):
 *        Bug fix in Dump. Previously, matrix elements with value AST__BAD
 *        were explicitly written out. Now they are not written out, since
@@ -100,9 +100,9 @@ f     The MatrixMap class does not define any new routines beyond those
 *     22-FEB-1999 (DSB):
 *        Changed logic of MapMerge to avoid infinite looping.
 *     5-MAY-1999 (DSB):
-*        More corrections to MapMerge: Cleared up errors in the use of the 
-*        supplied invert flags, and corrected logic for deciding which 
-*        neighbouring Mapping to swap with. 
+*        More corrections to MapMerge: Cleared up errors in the use of the
+*        supplied invert flags, and corrected logic for deciding which
+*        neighbouring Mapping to swap with.
 *     16-JUL-1999 (DSB):
 *        Fixed memory leaks in MatWin and MapMerge.
 *     8-JAN-2003 (DSB):
@@ -110,15 +110,15 @@ f     The MatrixMap class does not define any new routines beyond those
 *        method.
 *     11-SEP-2003 (DSB):
 *        Increased tolerance on checks for unit matrices within
-*        CompressMatrix. Now uses sqrt(DBL_EPSILON)*diag (previously was 
+*        CompressMatrix. Now uses sqrt(DBL_EPSILON)*diag (previously was
 *        DBL_EPSILON*DIAG ).
 *     10-NOV-2003 (DSB):
 *        Modified functions which swap a MatrixMap with another Mapping
 *        (e.g. MatSwapPerm, etc), to simplify the returned Mappings.
 *     13-JAN-2003 (DSB):
-*        Modified the tolerance used by CompressMatrix when checking for 
+*        Modified the tolerance used by CompressMatrix when checking for
 *        zero matrix elements. Old system compared each element to thre
-*        size of the diagonal, but different scalings on different axes could 
+*        size of the diagonal, but different scalings on different axes could
 *        cause this to trat as zero values which should nto be treated as
 *        zero.
 *     23-APR-2004 (DSB):
@@ -136,7 +136,7 @@ f     The MatrixMap class does not define any new routines beyond those
 *     15-MAR-2006 (DSB):
 *        Override astEqual.
 *     15-MAR-2009 (DSB):
-*        MapSplit: Only create the returned Mapping if it would have some 
+*        MapSplit: Only create the returned Mapping if it would have some
 *        outputs. Also, do not create the returned Mapping if any output
 *        depends on a mixture of selected and unselected inputs.
 *     16-JUL-2009 (DSB):
@@ -210,9 +210,9 @@ static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, 
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(MatrixMap)
@@ -293,13 +293,13 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 *                  int *simpler, int *status )
 
 *  Class Membership:
-*     MatrixMap member function 
+*     MatrixMap member function
 
 *  Description:
 *     This function returns a flag indicating if the pair of supplied
-*     Mappings could be replaced by an equivalent pair of Mappings from the 
+*     Mappings could be replaced by an equivalent pair of Mappings from the
 *     same classes as the supplied pair, but in reversed order. Each pair
-*     of Mappings is considered to be compunded in series. The supplied 
+*     of Mappings is considered to be compunded in series. The supplied
 *     Mapings are not changed in any way.
 
 *  Parameters:
@@ -312,7 +312,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 *        mapping to be used, and a non-zero value causes the inverse
 *        mapping to be used.
 *     inv2
-*        The invert flag to use with map2. 
+*        The invert flag to use with map2.
 *     simpler
 *        Addresss of a location at which to return a flag indicating if
 *        the swapped Mappings would be intrinsically simpler than the
@@ -352,14 +352,14 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    ret = 0;
    *simpler = 0;
 
-/* Temporarily set the Invert attributes of both Mappings to the supplied 
+/* Temporarily set the Invert attributes of both Mappings to the supplied
    values. */
    invert[ 0 ] = astGetInvert( map1 );
    astSetInvert( map1, inv1 );
 
    invert[ 1 ] = astGetInvert( map2 );
    astSetInvert( map2, inv2 );
-   
+
 /* Get the classes of the two mappings. */
    class1 = astGetClass( map1 );
    class2 = astGetClass( map2 );
@@ -384,17 +384,17 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
          ret = 1;
 
 /* If it is a PermMap, the Mappings can be swapped so long as:
-   1) all links between input and output axes in the PermMap are 
-   bi-directional. This does not preclude the existence of unconnected 
-   axes, which do not have links (bi-directional or otherwise). 
+   1) all links between input and output axes in the PermMap are
+   bi-directional. This does not preclude the existence of unconnected
+   axes, which do not have links (bi-directional or otherwise).
    2) The MatrixMap is square, and invertable.
-   3) If the permMap is applied first, then each output of the PermMap 
-      which is assigned a constant value must correspond to a "scaling" row 
+   3) If the permMap is applied first, then each output of the PermMap
+      which is assigned a constant value must correspond to a "scaling" row
       and column in the MatrixMap. I.e. if PermMap output axis "i" is
       assigned a constant value, then row i and column i of the following
-      MatrixMap must contain only zeros, EXCEPT for the diagonal term (row 
-      i, column i) which must be non-zero. If the Mappings are in the other 
-      order, then the same applies to PermMap input axes assigned a constant 
+      MatrixMap must contain only zeros, EXCEPT for the diagonal term (row
+      i, column i) which must be non-zero. If the Mappings are in the other
+      order, then the same applies to PermMap input axes assigned a constant
       value. */
 
 /* Check the other Mapping is a PermMap, and that the MatrixMap is square
@@ -470,7 +470,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
                }
             }
 
-/* Now deal with the cases where the PermMap is applied second, so the inputs 
+/* Now deal with the cases where the PermMap is applied second, so the inputs
    of the PermMap are fed into the MatrixMap in the inverse direction. */
             if( ret && ( nomat == map2 ) ) {
 
@@ -502,7 +502,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
             if( ret ) {
 
 /* If the PermMap preceeds the WinMap, this will be the case if the PermMap
-   has more outputs than inputs. If the WinMap preceeds the PermMap, this 
+   has more outputs than inputs. If the WinMap preceeds the PermMap, this
    will be the case if the PermMap has more inputs than outputs. */
                *simpler = ( nomat == map1 ) ? nout > nin : nin > nout;
             }
@@ -519,7 +519,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    supplied MatrixMaps. */
    astSetInvert( map1, invert[ 0 ] );
    astSetInvert( map2, invert[ 1 ] );
-   
+
 /* Return the answer. */
    return astOK ? ret : 0;
 }
@@ -587,7 +587,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
       nrow = astGetNout( this );
    }
 
-/* Store the number of diagonal elements in the matrix. This is the 
+/* Store the number of diagonal elements in the matrix. This is the
    minimum of the number of rows and columns. */
    if( ncol < nrow ){
       ndiag = ncol;
@@ -595,13 +595,13 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
       ndiag = nrow;
    }
 
-/* If the MatrixMap is already stored in UNIT form, it cannot be compressed 
+/* If the MatrixMap is already stored in UNIT form, it cannot be compressed
    any further. */
    if( this->form == UNIT){
       return;
 
 /* Otherwise, if the MatrixMap is stored in DIAGONAL form, it could be
-   compressed into a UNIT MatrixMap if all the supplied element values are 
+   compressed into a UNIT MatrixMap if all the supplied element values are
    one. */
    } else if( this->form == DIAGONAL ){
       new_form = UNIT;
@@ -620,7 +620,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
          this->form = UNIT;
       }
 
-/* Otherwise, a full MatrixMap has been supplied, but this could be stored 
+/* Otherwise, a full MatrixMap has been supplied, but this could be stored
    in a unit or diagonal MatrixMap if the element values are appropriate. */
    } else {
       new_form = FULL;
@@ -630,7 +630,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
       colmax = astMalloc( ncol*sizeof( double ) );
       if( colmax ) {
          for( j = 0; j < ncol; j++ ) {
-            colmax[ j ] = 0.0;      
+            colmax[ j ] = 0.0;
             i = j;
             for( k = 0; k < nrow; k++ ) {
                mval = (this->f_matrix)[ i ];
@@ -649,7 +649,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
       rowmax = astMalloc( nrow*sizeof( double ) );
       if( rowmax ) {
          for( k = 0; k < nrow; k++ ) {
-            rowmax[ k ] = 0.0;      
+            rowmax[ k ] = 0.0;
             i = k*ncol;
             for( j = 0; j < ncol; j++ ) {
                mval = (this->f_matrix)[ i ];
@@ -675,7 +675,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
 
 /* Store a pointer to the next matrix element. */
          a = this->f_matrix;
-  
+
 /* Loop through all the rows in the forward matrix array. */
          for( k = 0; k < nrow; k++ ) {
 
@@ -686,25 +686,25 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
                if( *a == AST__BAD ) {
                   new_form = FULL;
 
-/* Otherwise, if this is a diagonal term, check its value. If it is not one, 
-   then the matrix cannot be a unit matrix, but it could still be a diagonal 
+/* Otherwise, if this is a diagonal term, check its value. If it is not one,
+   then the matrix cannot be a unit matrix, but it could still be a diagonal
    matrix. */
                } else {
                   if( j == k ) {
                      if( *a != 1.0 && new_form == UNIT ) new_form = DIAGONAL;
 
-/* If this is not a diagonal element, and the element value is not zero, 
+/* If this is not a diagonal element, and the element value is not zero,
    then the matrix is not a diagonal matrix. Allow a tolerance of
    SQRT(DBL_EPSILON) times the largest value in the same row or column as
    the current matrix element. That is, an element must be insignificant
-   to both its row and its column to be considered as effectively zero. 
+   to both its row and its column to be considered as effectively zero.
    Replace values less than this limit with zero. */
                   } else {
                      mval = fabs( *a );
                      if( mval <= rowmax[ k ] &&
                          mval <= colmax[ j ] ) {
 
-/* If the element will change value, set a flag indicating that the inverse 
+/* If the element will change value, set a flag indicating that the inverse
    matrix needs to be re-calculated. */
                         if( *a != 0.0 ) new_inv = 1;
 
@@ -713,7 +713,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
 
                      } else {
                         new_form = FULL;
-                     }             
+                     }
                   }
                }
             }
@@ -724,14 +724,14 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
       colmax = astFree( colmax );
       rowmax = astFree( rowmax );
 
-/* If it can be compressed into a UNIT MatrixMap, change the storage form and 
+/* If it can be compressed into a UNIT MatrixMap, change the storage form and
    free the arrays holding the element values. */
       if( new_form == UNIT ) {
          this->f_matrix = (double *) astFree( (void *)( this->f_matrix ) );
          this->i_matrix = (double *) astFree( (void *)( this->i_matrix ) );
          this->form = UNIT;
 
-/* Otherwise, if it can be compressed into a DIAGONAL MatrixMap, copy the 
+/* Otherwise, if it can be compressed into a DIAGONAL MatrixMap, copy the
    diagonal elements from the full forward matrix into a newly allocated
    array, use this array to replace the forward matrix array in the MatrixMap,
    create a new inverse matrix, and change the storage form. */
@@ -778,7 +778,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     MatrixMap member function (over-rides the astEqual protected
@@ -805,11 +805,11 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstMatrixMap *that;        
-   AstMatrixMap *this;        
+   AstMatrixMap *that;
+   AstMatrixMap *this;
    double *that_matrix;
    double *this_matrix;
-   int i;           
+   int i;
    int nin;
    int nout;
    int result;
@@ -863,7 +863,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
             } else {
                this_matrix = this->i_matrix;
             }
-   
+
             if( astGetInvert( that ) ) {
                that_matrix = that->f_matrix;
             } else {
@@ -887,7 +887,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          CompressMatrix( that, status );
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -914,7 +914,7 @@ static void ExpandMatrix( AstMatrixMap *this, int *status ){
 *     MatrixMap member function.
 
 *  Description:
-*     If the supplid MatrixMap is stored in a compressed form (i.e no 
+*     If the supplid MatrixMap is stored in a compressed form (i.e no
 *     element values if it is a unit matrix, diagonal elements only
 *     if it is a diagonal matrix), it is expanded into a full MatrixMap
 *     in which all elements are stored.
@@ -956,7 +956,7 @@ static void ExpandMatrix( AstMatrixMap *this, int *status ){
       ndiag = ncol;
    } else {
       ndiag = nrow;
-   }   
+   }
 
 /* Allocate arrays to hold the full forward and inverse matrices. */
    fmat = (double *) astMalloc( sizeof( double )*(size_t)( nrow*ncol ) );
@@ -976,7 +976,7 @@ static void ExpandMatrix( AstMatrixMap *this, int *status ){
             imat[ i*( nrow + 1 ) ] = 1.0;
          }
 
-/* If a diagonal MatrixMap was supplied, copy the diagonal terms from 
+/* If a diagonal MatrixMap was supplied, copy the diagonal terms from
    the supplied MatrixMap. */
       } else if( this->form == DIAGONAL ){
          for( i = 0; i < ndiag; i++ ) {
@@ -1001,13 +1001,13 @@ static void ExpandMatrix( AstMatrixMap *this, int *status ){
       fmat = (double *) astFree( (void *) fmat );
       imat = (double *) astFree( (void *) imat );
    }
-   
+
    return;
 
 }
 
-static int FindString( int n, const char *list[], const char *test, 
-                       const char *text, const char *method, 
+static int FindString( int n, const char *list[], const char *test,
+                       const char *text, const char *method,
                        const char *class, int *status ){
 /*
 *  Name:
@@ -1021,7 +1021,7 @@ static int FindString( int n, const char *list[], const char *test,
 
 *  Synopsis:
 *     #include "matrix.h"
-*     int FindString( int n, const char *list[], const char *test, 
+*     int FindString( int n, const char *list[], const char *test,
 *                     const char *text, const char *method, const char *class, int *status )
 
 *  Class Membership:
@@ -1048,7 +1048,7 @@ static int FindString( int n, const char *list[], const char *test,
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
-*     class 
+*     class
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
 *     status
@@ -1061,7 +1061,7 @@ static int FindString( int n, const char *list[], const char *test,
 *  Notes:
 *     -  A value of -1 is returned if an error has already occurred, or
 *     if this function should fail for any reason (for instance if the
-*     supplied option is not specified in the supplied list). 
+*     supplied option is not specified in the supplied list).
 
 */
 
@@ -1140,7 +1140,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *     MatrixMap member function.
 
 *  Description:
-*     Returns 0 if there are no differences between the two strings, and 1 
+*     Returns 0 if there are no differences between the two strings, and 1
 *     otherwise. Comparisons are case blind.
 
 *  Parameters:
@@ -1155,7 +1155,7 @@ static int Ustrcmp( const char *a, const char *b, int *status ){
 *  Notes:
 *     -  This function does not consider the sign of the difference between
 *     the two strings, whereas "strcmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
+*     -  This function attempts to execute even if an error has occurred.
 
 */
 
@@ -1234,7 +1234,7 @@ void astInitMatrixMapVtab_(  AstMatrixMapVtab *vtab, const char *name, int *stat
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1325,37 +1325,37 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
 *     MatrixMap member function.
 
 *  Description:
-*     This function returns a pointer to a matrix holding the inverse of 
-*     the supplied matrix, or a NULL pointer if the inverse is not defined. 
+*     This function returns a pointer to a matrix holding the inverse of
+*     the supplied matrix, or a NULL pointer if the inverse is not defined.
 *     The memory to store the inverse matrix is allocated internally, and
 *     should be freed using astFree when no longer required.
 *
-*     The correspondence between a full matrix and its inverse is only 
-*     unique if the matrix is square, and so a NULL pointer is returned if 
-*     the supplied matrix is not square. 
+*     The correspondence between a full matrix and its inverse is only
+*     unique if the matrix is square, and so a NULL pointer is returned if
+*     the supplied matrix is not square.
 
 *  Parameters:
 *     form
-*        The form of the MatrixMap; UNIT, DIAGONAL or FULL.      
+*        The form of the MatrixMap; UNIT, DIAGONAL or FULL.
 *     nrow
 *        Number of rows in the supplied matrix.
 *     ncol
 *        Number of columns in the supplied matrix.
 *     matrix
 *        A pointer to the input matrix. Elements should be stored in row
-*        order (i.e. (row 1,column 1 ), (row 1,column 2 )... (row 2,column 1), 
+*        order (i.e. (row 1,column 1 ), (row 1,column 2 )... (row 2,column 1),
 *        etc).
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to the output matrix. 
+*     Pointer to the output matrix.
 
 *  Notes:
 *     -  A NULL pointer is returned if a unit matrix is supplied.
 *     -  A NULL pointer will be returned if this function is invoked with the
 *     global error status set, or if it should fail for any reason.
-*     -  No error is reported if the inverse is not defined. 
+*     -  No error is reported if the inverse is not defined.
 */
 
 /* Local Variables: */
@@ -1375,7 +1375,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
 
 /* Return a NULL pointer if the input matrix is NULL. */
    if( !matrix ) return NULL;
-   
+
 /* If a unit matrix map has been supplied, return NULL. */
    if( form == UNIT ){
       return NULL;
@@ -1383,7 +1383,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
 /* If a diagonal matrix has been supplied, allocate an array to hold
    the diagonal terms of the inverse matrix. Store the reciprocal
    of the input matrix diagonal terms in it. If any of the input diagonal
-   terms are zero or BAD, set the associated elements of the inverse matrix 
+   terms are zero or BAD, set the associated elements of the inverse matrix
    BAD. */
    } else if( form == DIAGONAL ){
       if( nrow > ncol ) {
@@ -1391,7 +1391,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
       } else {
          ndiag = nrow;
       }
-      
+
       out = (double *) astMalloc( sizeof( double )*(size_t)ndiag );
 
       if( out ) {
@@ -1403,9 +1403,9 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
                out[ i ] = AST__BAD;
             }
          }
-      } 
+      }
 
-/* If a full matrix has been supplied, initialise the returned pointer. */      
+/* If a full matrix has been supplied, initialise the returned pointer. */
    } else {
       out = NULL;
 
@@ -1433,7 +1433,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
 
 /* The SLALIB function which inverts the matrix also applies the inverse
    matrix to a vector. We are not interested in the vector in this
-   instance, but we still have to provide one for SLALIB to use. Allocate 
+   instance, but we still have to provide one for SLALIB to use. Allocate
    memory for the vector. */
             vector = (double *) astMalloc( sizeof(double)*(size_t) nrow );
 
@@ -1441,7 +1441,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
             if( astOK ){
                for ( i=0; i<nrow; i++ ) vector[i] = 0.0;
 
-/* Obtain work space and attempt to invert the matrix using SLALIB, then 
+/* Obtain work space and attempt to invert the matrix using SLALIB, then
    free the work space. */
                iw = (int *) astMalloc( sizeof(int)*(size_t) nrow );
                if( astOK ) palSlaDmat( nrow, out, vector, &det, &sing, iw );
@@ -1449,16 +1449,16 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
 
             }
 
-/* If the matrix could not be inverted, free the memory used to hold the 
+/* If the matrix could not be inverted, free the memory used to hold the
    square matrix, and return the NULL pointer. */
             if ( !astOK || sing != 0 ){
                out = (double *) astFree( (void *) out );
             }
 
 /*  Free the memory used to hold the vector. */
-            vector = (double *) astFree( (void *) vector );      
+            vector = (double *) astFree( (void *) vector );
          }
-      } 
+      }
    }
 
 /* Return the pointer. */
@@ -1649,7 +1649,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Get the number of input and output axes for the MatrixMap. Swap these
    if the supplied invert flag is not the same as the Invert attribute of
    the Mapping. */
-   if( ( invert && !( *invert_list )[ where ] ) || 
+   if( ( invert && !( *invert_list )[ where ] ) ||
        ( !invert && ( *invert_list )[ where ] ) ) {
       nout = astGetNin( ( *map_list )[ where ] );
       nin = astGetNout( ( *map_list )[ where ] );
@@ -1665,14 +1665,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    map2 = NULL;
    mm = (AstMatrixMap *) ( *map_list )[ where ];
 
-/* If the MatrixMap is a square unit matrix, it can be replaced by a 
+/* If the MatrixMap is a square unit matrix, it can be replaced by a
    UnitMap. */
    if( mm->form == UNIT && nin == nout ){
       map2 = (AstMapping *) astUnitMap( nin, "", status );
 
 /* If the MatrixMap is a square diagonal matrix with equal diagonal
    terms, then it can be replaced by a ZoomMap. */
-   } else if( mm->form == DIAGONAL && nin == nout && 
+   } else if( mm->form == DIAGONAL && nin == nout &&
               mm->f_matrix && mm->i_matrix &&
              (mm->f_matrix)[ 0 ] != AST__BAD ){
       zoom = 1;
@@ -1694,8 +1694,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
    }
 
-/* If the MatrixMap can be replaced, annul the MatrixMap pointer in the 
-   list and replace it with the new Mapping pointer, and indicate that the 
+/* If the MatrixMap can be replaced, annul the MatrixMap pointer in the
+   list and replace it with the new Mapping pointer, and indicate that the
    forward transformation of the returned Mapping should be used. */
    if( map2 ){
       (void) astAnnul( ( *map_list )[ where ] );
@@ -1704,7 +1704,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Return the index of the first modified element. */
       result = where;
-         
+
 /* If the MatrixMap itself could not be simplified, see if it can be merged
    with the Mappings on either side of it in the list. */
 /*==========================================================================*/
@@ -1743,9 +1743,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          }
 
 /* Only some PermMaps can be merged with (those which have consistent
-   forward and inverse mappings). If this is not one of them, set nclass 
+   forward and inverse mappings). If this is not one of them, set nclass
    NULL to indicate this. */
-         if( nclass && !strcmp( nclass, "PermMap" ) && 
+         if( nclass && !strcmp( nclass, "PermMap" ) &&
              !PermOK( ( *map_list )[ (i1==where)?i2:i1 ], status ) ) nclass = NULL;
 
 /* If the MatrixMap can merge with one of its neighbours, create the merged
@@ -1759,11 +1759,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
             } else if( !strcmp( nclass, "ZoomMap" ) ){
                if( i1 == where ){
-                  newmm = MatZoom( (AstMatrixMap *)( *map_list )[ i1 ], 
+                  newmm = MatZoom( (AstMatrixMap *)( *map_list )[ i1 ],
                                    (AstZoomMap *)( *map_list )[ i2 ],
                               ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], status );
                } else {
-                  newmm = MatZoom( (AstMatrixMap *)( *map_list )[ i2 ], 
+                  newmm = MatZoom( (AstMatrixMap *)( *map_list )[ i2 ],
                                    (AstZoomMap *)( *map_list )[ i1 ],
                            ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], status );
                }
@@ -1771,11 +1771,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
             } else if( !strcmp( nclass, "PermMap" ) ){
                if( i1 == where ){
-                  newmm = MatPerm( (AstMatrixMap *)( *map_list )[ i1 ], 
+                  newmm = MatPerm( (AstMatrixMap *)( *map_list )[ i1 ],
                                    (AstPermMap *)( *map_list )[ i2 ],
                            ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, status );
                } else {
-                  newmm = MatPerm( (AstMatrixMap *)( *map_list )[ i2 ], 
+                  newmm = MatPerm( (AstMatrixMap *)( *map_list )[ i2 ],
                                    (AstPermMap *)( *map_list )[ i1 ],
                            ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, status );
                }
@@ -1789,13 +1789,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If succesfull... */
             if( astOK ){
 
-/* Annul the first of the two Mappings, and replace it with the merged 
-   MatrixMap. Also set the invert flag. */ 
+/* Annul the first of the two Mappings, and replace it with the merged
+   MatrixMap. Also set the invert flag. */
                (void) astAnnul( ( *map_list )[ i1 ] );
                ( *map_list )[ i1 ] = (AstMapping *) newmm;
                ( *invert_list )[ i1 ] = invert;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
                (void) astAnnul( ( *map_list )[ i2 ] );
                for ( i = i2 + 1; i < *nmap; i++ ) {
@@ -1817,9 +1817,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the MatrixMap could not merge directly with either of its neighbours,
    we consider whether it would be worthwhile to swap the MatrixMap with
    either of its neighbours. This can only be done for certain classes
-   of Mapping (WinMaps and some PermMaps), and will usually require both 
-   Mappings to be modified (unless they are commutative). The advantage of 
-   swapping the order of the Mappings is that it may result in the MatrixMap 
+   of Mapping (WinMaps and some PermMaps), and will usually require both
+   Mappings to be modified (unless they are commutative). The advantage of
+   swapping the order of the Mappings is that it may result in the MatrixMap
    being adjacent to a Mapping with which it can merge directly on the next
    invocation of this function, thus reducing the number of Mappings
    in the list. */
@@ -1828,20 +1828,20 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Set a flag if we could swap the MatrixMap with its higher neighbour. "do2"
    is returned if swapping the Mappings would simplify either of the Mappings. */
             if( where + 1 < *nmap ){
-               swaphi = CanSwap(  ( *map_list )[ where ], 
+               swaphi = CanSwap(  ( *map_list )[ where ],
                                   ( *map_list )[ where + 1 ],
-                                  ( *invert_list )[ where ], 
+                                  ( *invert_list )[ where ],
                                   ( *invert_list )[ where + 1 ], &do2, status );
             } else {
                swaphi = 0;
                do2 = 0;
             }
 
-/* If so, step through each of the Mappings which follow the MatrixMap, 
-   looking for a Mapping with which the MatrixMap could merge directly. Stop 
+/* If so, step through each of the Mappings which follow the MatrixMap,
+   looking for a Mapping with which the MatrixMap could merge directly. Stop
    when such a Mapping is found, or if a Mapping is found with which the
-   MatrixMap could definitely not swap. Note the number of Mappings which 
-   separate the MatrixMap from the Mapping with which it could merge (if 
+   MatrixMap could definitely not swap. Note the number of Mappings which
+   separate the MatrixMap from the Mapping with which it could merge (if
    any). */
             nstep2 = -1;
             if( swaphi ){
@@ -1858,8 +1858,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      break;
                   }
 
-/* If there is no chance that we can swap with this Mapping, leave the loop 
-   with -1 for the number of steps to indicate that no merging is possible. 
+/* If there is no chance that we can swap with this Mapping, leave the loop
+   with -1 for the number of steps to indicate that no merging is possible.
    MatrixMaps can swap with WinMaps and some permmaps. */
                   if( strcmp( nclass, "WinMap" ) &&
                       strcmp( nclass, "PermMap" ) ) {
@@ -1873,9 +1873,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Do the same working forward from the MatrixMap towards the start of the map
    list. */
             if( where > 0 ){
-               swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
+               swaplo = CanSwap(  ( *map_list )[ where - 1 ],
                                   ( *map_list )[ where ],
-                                  ( *invert_list )[ where - 1 ], 
+                                  ( *invert_list )[ where - 1 ],
                                   ( *invert_list )[ where ], &do1, status );
             } else {
                swaplo = 0;
@@ -1906,7 +1906,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Choose which neighbour to swap with so that the MatrixMap moves towards the
    nearest Mapping with which it can merge. */
-            if( do1 || ( 
+            if( do1 || (
                 nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ) ){
                nclass = class1;
                i1 = where - 1;
@@ -1921,16 +1921,16 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                nclass = NULL;
             }
 
-/* If there is a target Mapping in the list with which the MatrixMap could 
-   merge, consider replacing the supplied Mappings with swapped Mappings to 
+/* If there is a target Mapping in the list with which the MatrixMap could
+   merge, consider replacing the supplied Mappings with swapped Mappings to
    bring the MatrixMap closer to the target Mapping. */
             if( nclass ){
 
-/* It is possible that the neighbouring Mapping with which we are about to 
+/* It is possible that the neighbouring Mapping with which we are about to
    swap could also merge with the target Mapping. When the neighbouring
-   Mapping is reconsidered it may well swap the pair back to put itself nearer 
-   the target Mapping. We need to be careful not to end up in an infinite loop 
-   in which the pair of neighbouring Mappings are constantly swapped backwards 
+   Mapping is reconsidered it may well swap the pair back to put itself nearer
+   the target Mapping. We need to be careful not to end up in an infinite loop
+   in which the pair of neighbouring Mappings are constantly swapped backwards
    and forwards as each attempts to put itself closer to the target Mapping.
    To prevent this, we only swap the pair of Mappings if the neighbouring
    Mapping could not itself merge with the target Mapping. Check to see
@@ -1989,7 +1989,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If we have a Mapping to swap with... */
                   if( nclass ) {
 
-/* Take copies of the Mapping and Invert flag arrays so we do not change 
+/* Take copies of the Mapping and Invert flag arrays so we do not change
    the supplied values. */
                      mc[ 0 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[0] );
                      mc[ 1 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[1] );
@@ -2010,23 +2010,23 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
                      if( astGetClass( smc0 ) == astGetClass( mc[0] ) &&
                          astGetClass( smc1 ) == astGetClass( mc[1] ) ) {
-      
+
                         mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
                         mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
 
 /* If one or both of the swapped Mappings could be simplified, then annul
-   the supplied Mappings and return the swapped mappings, storing the index 
+   the supplied Mappings and return the swapped mappings, storing the index
    of the first modified Mapping. */
                      } else {
                         (void ) astAnnul( ( (*map_list) + i1 )[0] );
                         (void ) astAnnul( ( (*map_list) + i1 )[1] );
-      
+
                         ( (*map_list) + i1 )[0] = mc[ 0 ];
                         ( (*map_list) + i1 )[1] = mc[ 1 ];
-      
+
                         ( (*invert_list) + i1 )[0] = ic[ 0 ];
                         ( (*invert_list) + i1 )[1] = ic[ 1 ];
-      
+
                         result = i1;
                         break;
                      }
@@ -2067,39 +2067,39 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 *     inherited from the Mapping class).
 
 *  Description:
-*     This function creates a new Mapping by picking specified inputs from 
+*     This function creates a new Mapping by picking specified inputs from
 *     an existing MatrixMap. This is only possible if the specified inputs
 *     correspond to some subset of the MatrixMap outputs. That is, there
 *     must exist a subset of the MatrixMap outputs for which each output
 *     depends only on the selected MatrixMap inputs, and not on any of the
 *     inputs which have not been selected. In addition, outputs that are
 *     not in this subset must not depend on any selected inputs. If these
-*     conditions are not met by the supplied MatrixMap, then a NULL Mapping 
+*     conditions are not met by the supplied MatrixMap, then a NULL Mapping
 *     is returned.
 
 *  Parameters:
 *     this
-*        Pointer to the MatrixMap to be split (the MatrixMap is not actually 
+*        Pointer to the MatrixMap to be split (the MatrixMap is not actually
 *        modified by this function).
 *     nin
 *        The number of inputs to pick from "this".
 *     in
 *        Pointer to an array of indices (zero based) for the inputs which
 *        are to be picked. This array should have "nin" elements. If "Nin"
-*        is the number of inputs of the supplied MatrixMap, then each element 
+*        is the number of inputs of the supplied MatrixMap, then each element
 *        should have a value in the range zero to Nin-1.
 *     map
 *        Address of a location at which to return a pointer to the new
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be different to "nin"). A NULL pointer will be
-*        returned if the supplied MatrixMap has no subset of outputs which 
+*        returned if the supplied MatrixMap has no subset of outputs which
 *        depend only on the selected inputs.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
-*     elements in this array will equal the number of outputs for the 
+*     elements in this array will equal the number of outputs for the
 *     returned Mapping. Each element will hold the index of the
 *     corresponding output in the supplied MatrixMap. The array should be
 *     freed using astFree when no longer needed. A NULL pointer will
@@ -2153,7 +2153,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 
 /* Check the supplied input indices are usable. */
       ok = 1;
-      for( i = 0; i < nin; i++ ) {             
+      for( i = 0; i < nin; i++ ) {
          if( in[ i ] < 0 || in[ i ] >= ncol ) {
             ok = 0;
             break;
@@ -2179,7 +2179,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
             mat = this->i_matrix;
          } else {
             mat = this->f_matrix;
-         }      
+         }
 
 /* We cannot create the require Mapping if the matrix is undefined. */
          if( !mat || !astOK ) {
@@ -2193,7 +2193,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
             iel = 0;
             for( irow = 0; irow < nrow; irow++ ) {
 
-/* Indicate that this output (i.e. row of the matrix) depends on neither 
+/* Indicate that this output (i.e. row of the matrix) depends on neither
    selected nor unselected inputs as yet. */
                sel = 0;
                unsel = 0;
@@ -2212,7 +2212,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 
 /* Is input "icol" one of the selected inputs? */
                      isel = 0;
-                     for( i = 0; i < nin; i++ ) {             
+                     for( i = 0; i < nin; i++ ) {
                         if( in[ i ] == icol ) {
                            isel = 1;
                            break;
@@ -2225,7 +2225,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
                         sel = 1;
                      } else  {
                         unsel = 1;
-                     }                     
+                     }
                   }
                }
 
@@ -2280,7 +2280,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    return result;
 }
 
-static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1, 
+static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
                              int inv2, int *status ){
 /*
 *  Name:
@@ -2294,16 +2294,16 @@ static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1, 
+*     AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
 *                           int inv2, int *status )
 
 *  Class Membership:
-*     MatrixMap member function 
+*     MatrixMap member function
 
 *  Description:
 *     This function creates a new MatrixMap which performs a mapping
-*     equivalent to applying the two supplied MatrixMaps in series, in the 
-*     directions specified by the "invert" flags (the Invert attributes of 
+*     equivalent to applying the two supplied MatrixMaps in series, in the
+*     directions specified by the "invert" flags (the Invert attributes of
 *     the supplied MatrixMaps are ignored).
 
 *  Parameters:
@@ -2316,7 +2316,7 @@ static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
 *        mapping to be used, and a non-zero value causes the inverse
 *        mapping to be used.
 *     inv2
-*        The invert flag to use with map2. 
+*        The invert flag to use with map2.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -2326,7 +2326,7 @@ static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
 *  Notes:
 *     -  The forward direction of the returned MatrixMap is equivalent to the
 *     combined effect of the two supplied MatrixMap, operating in the
-*     directions specified by "inv1" and "inv2". 
+*     directions specified by "inv1" and "inv2".
 *     -  A null pointer will be returned if this function is invoked with the
 *     global error status set, or if it should fail for any reason.
 */
@@ -2347,7 +2347,7 @@ static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
 
    invert[ 1 ] = astGetInvert( map2 );
    astSetInvert( map2, inv2 );
-   
+
 /* Create a new MatrixMap by multiplying them together. */
    result = astMtrMult( (AstMatrixMap *) map1, (AstMatrixMap *) map2 );
 
@@ -2355,7 +2355,7 @@ static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
    supplied MatrixMaps. */
    astSetInvert( map1, invert[ 0 ] );
    astSetInvert( map2, invert[ 1 ] );
-   
+
 /* If an error has occurred, annull the returned MatrixMap. */
    if( !astOK ) result = astAnnul( result );
 
@@ -2363,7 +2363,7 @@ static AstMatrixMap *MatMat( AstMapping *map1, AstMapping *map2, int inv1,
    return result;
 }
 
-static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv, 
+static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
                               int pinv, int mat1, int *status ){
 /*
 *  Name:
@@ -2377,17 +2377,17 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv, 
+*     AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
 *                            int pinv, int mat1, int *status )
 
 *  Class Membership:
-*     MatrixMap member function 
+*     MatrixMap member function
 
 *  Description:
 *     This function creates a new MatrixMap which performs a mapping
-*     equivalent to applying the two supplied Mappings in series in the 
-*     directions specified by the "invert" flags (the Invert attributes of 
-*     the supplied MatrixMaps are ignored). 
+*     equivalent to applying the two supplied Mappings in series in the
+*     directions specified by the "invert" flags (the Invert attributes of
+*     the supplied MatrixMaps are ignored).
 
 *  Parameters:
 *     mm
@@ -2401,7 +2401,7 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
 *     pinv
 *        The invert flag to use with pm.
 *     mat1
-*        If non-zero, then "mm" is applied first followed by "pm". Otherwise, 
+*        If non-zero, then "mm" is applied first followed by "pm". Otherwise,
 *        "pm" is applied first followed by "mm".
 *     status
 *        Pointer to the inherited status variable.
@@ -2412,7 +2412,7 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
 *  Notes:
 *     -  The forward direction of the returned MatrixMap is equivalent to the
 *     combined effect of the two supplied Mappings, operating in the
-*     directions specified by "pinv" and "minv". 
+*     directions specified by "pinv" and "minv".
 *     -  A null pointer will be returned if this function is invoked with the
 *     global error status set, or if it should fail for any reason.
 */
@@ -2438,7 +2438,7 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
 /* Initialise the returned pointer. */
    result = NULL;
 
-/* Temporarily set the Invert attributes of both Mappings to the supplied 
+/* Temporarily set the Invert attributes of both Mappings to the supplied
    values. */
    old_minv = astGetInvert( mm );
    astSetInvert( mm, minv );
@@ -2454,7 +2454,7 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
 /* We first represent the PermMap as a MatrixMap containing elements with
    values zero or one. Each row of this matrix is obtained by transforming a
    unit vector along each axis using the inverse PermMap. Allocate memory
-   to hold the matrix array, and create a PointSet holding the unit 
+   to hold the matrix array, and create a PointSet holding the unit
    vectors. */
    matrix = (double *) astMalloc( sizeof( double )*(size_t)( nax*nax ) );
 
@@ -2526,14 +2526,14 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
 *     void MatPermSwap( AstMapping **maps, int *inverts, int imm )
 
 *  Class Membership:
-*     WinMap member function 
+*     WinMap member function
 
 *  Description:
 *     A list of two Mappings is supplied containing a PermMap and a
-*     MatrixMap. These Mappings are annulled, and replaced with 
+*     MatrixMap. These Mappings are annulled, and replaced with
 *     another pair of Mappings consisting of a PermMap and a MatrixMap
 *     in the opposite order. These Mappings are chosen so that their
-*     combined effect is the same as the original pair of Mappings. 
+*     combined effect is the same as the original pair of Mappings.
 
 *  Parameters:
 *     maps
@@ -2545,7 +2545,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
 
 *  Notes:
 *     -  There are restictions on the sorts of PermMaps which can be
-*     swapped with a MatrixMap -- see function CanSwap. It is assumed 
+*     swapped with a MatrixMap -- see function CanSwap. It is assumed
 *     that the supplied MatrixMap and PermMap satisfy these requirements.
 
 */
@@ -2629,9 +2629,9 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
             row = outperm[ i ];
             if( row >= 0 && row < nin ) {
 
-/* Permute the row of the supplied matrix which feeds the corresponding 
-   PermMap input axis (i.e. axis outperm[k] ) using the forward PermMap. 
-   Store zeros for any output axes which are assigned constants. This forms 
+/* Permute the row of the supplied matrix which feeds the corresponding
+   PermMap input axis (i.e. axis outperm[k] ) using the forward PermMap.
+   Store zeros for any output axes which are assigned constants. This forms
    row i of the new MatrixMap. */
                out_el = out_mat + nout*i;
                for( k = 0; k < nout; k++ ){
@@ -2653,7 +2653,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
                      *(out_el++) = 0.0;
                   } else {
                      *(out_el++) = 1.0;
-                  }               
+                  }
                }
             }
          }
@@ -2665,7 +2665,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
    changed now, since they will no longer be scaled by the inverse
    MatrixMap. CanSwap ensures that the inverse MatrixMap produces a
    simple scaling for constant axes, so we change the PermMap constant
-   to be the constant AFTER scaling by the inverse MatrixMap. 
+   to be the constant AFTER scaling by the inverse MatrixMap.
 
    Consider each input axis of the PermMap. */
          for( i = 0; i < nin; i++ ) {
@@ -2673,7 +2673,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
 /* If this input is assigned a constant value... */
             if( inperm[ i ] < 0 ) {
 
-/* Divide the supplied constant value by the corresponding diagonal term 
+/* Divide the supplied constant value by the corresponding diagonal term
    in the supplied MatrixMap. */
                c = consts[ -inperm[ i ] - 1 ];
                if( c != AST__BAD ) {
@@ -2697,9 +2697,9 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
             row = inperm[ i ];
             if( row >= 0 && row < nout ) {
 
-/* Permute the row of the supplied matrix which feeds the corresponding 
-   PermMap output axis (i.e. axis inperm[k] ) using the inverse PermMap. 
-   Store zeros for any input axes which are assigned constants. This forms 
+/* Permute the row of the supplied matrix which feeds the corresponding
+   PermMap output axis (i.e. axis inperm[k] ) using the inverse PermMap.
+   Store zeros for any input axes which are assigned constants. This forms
    row i of the new MatrixMap. */
                out_el = out_mat + nin*i;
                for( k = 0; k < nin; k++ ){
@@ -2721,7 +2721,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
                      *(out_el++) = 0.0;
                   } else {
                      *(out_el++) = 1.0;
-                  }               
+                  }
                }
             }
          }
@@ -2733,7 +2733,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
    changed now, since they will no longer be scaled by the forward
    MatrixMap. CanSwap ensures that the forward MatrixMap produces a
    simple scaling for constant axes, so we change the PermMap constant
-   to be the constant AFTER scaling by the forward MatrixMap. 
+   to be the constant AFTER scaling by the forward MatrixMap.
 
    Consider each output axis of the PermMap. */
          for( i = 0; i < nout; i++ ) {
@@ -2741,8 +2741,8 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
 /* If this output is assigned a constant value... */
             if( outperm[ i ] < 0 ) {
 
-/* Multiple the supplied constant value by the corresponding diagonal term in 
-   the supplied MatrixMap. */         
+/* Multiple the supplied constant value by the corresponding diagonal term in
+   the supplied MatrixMap. */
                c = consts[ -outperm[ i ] - 1 ];
                if( c != AST__BAD ) {
                   matel = matrix[ i*( nout + 1 ) ];
@@ -2771,7 +2771,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
 /* Ensure the supplied MatrixMap is stored back in compressed form. */
    CompressMatrix( mm, status );
 
-/* Re-instate the original value of the Invert attribute of the supplied 
+/* Re-instate the original value of the Invert attribute of the supplied
    PermMap. */
    astSetInvert( pm, old_pinv );
 
@@ -2787,9 +2787,9 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
       smmnew = astSimplify( mmnew );
       mmnew = astAnnul( mmnew );
 
-/* Store a pointer to the new PermMap in place of the supplied MatrixMap. This 
+/* Store a pointer to the new PermMap in place of the supplied MatrixMap. This
    PermMap should be used in its forward direction. */
-      maps[ imm ] = (AstMapping *) spmnew; 
+      maps[ imm ] = (AstMapping *) spmnew;
       inverts[ imm ] = astGetInvert( spmnew );
 
 /* Annul the supplied matrixMap. */
@@ -2799,7 +2799,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
    its forward direction. */
       maps[ 1 - imm ] = (AstMapping *) smmnew;
       inverts[ 1 - imm ] = astGetInvert( smmnew );
-   }      
+   }
 
 /* Return. */
    return;
@@ -2821,15 +2821,15 @@ static void MatWin( AstMapping **maps, int *inverts, int imm, int *status ){
 *     void MatWin( AstMapping **maps, int *inverts, int imm, int *status )
 
 *  Class Membership:
-*     WinMap member function 
+*     WinMap member function
 
 *  Description:
 *     A list of two Mappings is supplied containing a WinMap and a
-*     MatrixMap. These Mappings are annulled, and replaced with 
+*     MatrixMap. These Mappings are annulled, and replaced with
 *     another pair of Mappings consisting of a WinMap and a MatrixMap
 *     in the opposite order. These Mappings are chosen so that their
-*     combined effect is the same as the original pair of Mappings. 
-*     The scale factors in the returned WinMap are always unity (i.e. 
+*     combined effect is the same as the original pair of Mappings.
+*     The scale factors in the returned WinMap are always unity (i.e.
 *     the differences in scaling get absorbed into the returned
 *     MatrixMap).
 
@@ -2884,7 +2884,7 @@ static void MatWin( AstMapping **maps, int *inverts, int imm, int *status ){
 
 /* Get copies of the shift and scale terms used by the WinMap. This
    also returns the number of axes in the WinMap. */
-   nin = astWinTerms( wm, &a, &b );   
+   nin = astWinTerms( wm, &a, &b );
 
 /* Create a diagonal MatrixMap holding the scale factors from the
    supplied WinMap. */
@@ -2903,13 +2903,13 @@ static void MatWin( AstMapping **maps, int *inverts, int imm, int *status ){
    the MatrixMap. */
    if( imm == 1 ){
 
-/* Multiply the diagonal matrix holding the WinMap scale factors by the 
-   supplied matrix. The resulting MatrixMap is the one to return in the 
+/* Multiply the diagonal matrix holding the WinMap scale factors by the
+   supplied matrix. The resulting MatrixMap is the one to return in the
    map list. */
       m2 = astMtrMult( m1, mm );
 
 /* Transform the position given by the shift terms from the supplied
-   WinMap using the supplied MatrixMap to get the shift terms for 
+   WinMap using the supplied MatrixMap to get the shift terms for
    the returned WinMap. */
       pset2 = astTransform( mm, pset1, 1, NULL );
 
@@ -2918,24 +2918,24 @@ static void MatWin( AstMapping **maps, int *inverts, int imm, int *status ){
    } else {
 
 /* Multiply the supplied MatrixMap by the diagonal matrix holding scale
-   factors from the supplied WinMap. The resulting MatrixMap is the one to 
+   factors from the supplied WinMap. The resulting MatrixMap is the one to
    return in the map list. */
       m2 = astMtrMult( mm, m1 );
 
 /* Transform the position given by the shift terms from the supplied
-   WinMap using the inverse of the returned MatrixMap to get the shift 
+   WinMap using the inverse of the returned MatrixMap to get the shift
    terms for the returned WinMap. */
       pset2 = astTransform( m2, pset1, 0, NULL );
 
    }
 
-/* Re-instate the original value of the Invert attributes of the supplied 
+/* Re-instate the original value of the Invert attributes of the supplied
    Mappings. */
    astSetInvert( wm, old_winv );
    astSetInvert( mm, old_minv );
 
 /* Get pointers to the shift terms for the returned WinMap. */
-   ptr2 = astGetPoints( pset2 ); 
+   ptr2 = astGetPoints( pset2 );
 
 /* Create the returned WinMap, initially with undefined corners. The number of
    axes in the WinMap must equal the number of shift terms. */
@@ -2985,7 +2985,7 @@ static void MatWin( AstMapping **maps, int *inverts, int imm, int *status ){
    return;
 }
 
-static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv, 
+static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
                               int zinv, int *status ){
 /*
 *  Name:
@@ -2999,17 +2999,17 @@ static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv, 
+*     AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
 *                            int zinv, int *status )
 
 *  Class Membership:
-*     MatrixMap member function 
+*     MatrixMap member function
 
 *  Description:
 *     This function creates a new MatrixMap which performs a mapping
-*     equivalent to applying the two supplied Mappings in series in the 
-*     directions specified by the "invert" flags (the Invert attributes of 
-*     the supplied MatrixMaps are ignored). 
+*     equivalent to applying the two supplied Mappings in series in the
+*     directions specified by the "invert" flags (the Invert attributes of
+*     the supplied MatrixMaps are ignored).
 
 *  Parameters:
 *     mm
@@ -3031,7 +3031,7 @@ static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
 *  Notes:
 *     -  The forward direction of the returned MatrixMap is equivalent to the
 *     combined effect of the two supplied Mappings, operating in the
-*     directions specified by "zinv" and "minv". 
+*     directions specified by "zinv" and "minv".
 *     -  A null pointer will be returned if this function is invoked with the
 *     global error status set, or if it should fail for any reason.
 */
@@ -3052,7 +3052,7 @@ static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
 /* Initialise the returned pointer. */
    result = NULL;
 
-/* Temporarily set the Invert attributes of both Mappings to the supplied 
+/* Temporarily set the Invert attributes of both Mappings to the supplied
    values. */
    old_minv = astGetInvert( mm );
    astSetInvert( mm, minv );
@@ -3063,7 +3063,7 @@ static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
 /* Get the number of rows in the MatrixMap (i.e. the number of output
    axes). */
    nrow = astGetNout( mm );
-   
+
 /* Get the zoom factor implemented by the ZoomMap. Invert it if necessary
    since astGetZoom does not take account of the Invert setting.  */
    zfac = astGetZoom( zm );
@@ -3126,14 +3126,14 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
 *     a pointer to a new MatrixMap holding the product "a x this".
 *
 *     The number of columns in the "a" matrix must match the number of
-*     rows in the "this" matrix. The number of rows in the returned 
+*     rows in the "this" matrix. The number of rows in the returned
 *     MatrixMap is equal to the number of rows in "a", and the number of
 *     columns is the same as the number of rows in "this".
 
 *  Parameters:
 *     this
 *        Pointer to the first MatrixMap.
-*     a 
+*     a
 *        Pointer to a second MatrixMap.
 
 *  Returned Value:
@@ -3185,14 +3185,14 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
    if( !astGetTranForward( this ) ){
       astError( AST__MTRML, "astMtrMult(%s): Cannot find the product of 2 "
                 "MatrixMaps- the first MatrixMap has no forward transformation.", status,
-                astClass(this) ); 
+                astClass(this) );
       return NULL;
    }
 
    if( !astGetTranInverse( this ) ){
       astError( AST__MTRML, "astMtrMult(%s): Cannot find the product of 2 "
                 "MatrixMaps- the second MatrixMap has no forward transformation.", status,
-                astClass(this) ); 
+                astClass(this) );
       return NULL;
    }
 
@@ -3205,7 +3205,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
    if( ncol_a != nrow_this && astOK ){
       astError( AST__MTRML, "astMtrMult(%s): Number of rows in the first "
                 "MatrixMap (%d) does not equal number of columns in the "
-                "second MatrixMap (%d).", status, astClass(this), nrow_this, ncol_a ); 
+                "second MatrixMap (%d).", status, astClass(this), nrow_this, ncol_a );
       return NULL;
    }
 
@@ -3220,7 +3220,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
    stored explicitly, even if the matrix is a unit or diagonal matrix). */
    ExpandMatrix( this, status );
 
-/* Store pointers to the current forward matrices (taking into 
+/* Store pointers to the current forward matrices (taking into
    account the current states of the Mapping inversion flags ). */
    this_matrix = astGetInvert( this ) ? this->i_matrix : this->f_matrix;
    a_matrix = astGetInvert( a ) ? a->i_matrix : a->f_matrix;
@@ -3235,7 +3235,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
       if( a->form == UNIT ){
 
 /* Copy the required number of rows from "this" to "new". */
-         (void) memcpy( (void *) new_matrix, (const void *) this_matrix, 
+         (void) memcpy( (void *) new_matrix, (const void *) this_matrix,
                          sizeof(double)*(size_t)( minrow*ncol_this ) );
 
 /* If there are insufficient rows in "this", append some zero-filled rows. */
@@ -3262,7 +3262,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
                   this_val = this_matrix[ i ];
                   if( this_val != AST__BAD ){
                      new_matrix[ i ] = this_val*factor;
-                  } else {                  
+                  } else {
                      new_matrix[ i ] = AST__BAD;
                   }
                   i++;
@@ -3291,7 +3291,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
 
 /* Initialise a pointer to the next element in the product matrix. */
          new_val = new_matrix;
-         
+
 /* Get a pointer to the start of each row of the "a" matrix. */
          for( row = 0; row < nrow_a; row++ ){
             a_row = a_matrix + ncol_a*row;
@@ -3322,8 +3322,8 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
       }
 
 /* Create the new MatrixMap. */
-      new = astInitMatrixMap( NULL, sizeof( AstMatrixMap ), !class_init, 
-                              &class_vtab, "MatrixMap", ncol_this, nrow_a, 
+      new = astInitMatrixMap( NULL, sizeof( AstMatrixMap ), !class_init,
+                              &class_vtab, "MatrixMap", ncol_this, nrow_a,
                               FULL, new_matrix );
 
 /* If possible, compress the new MatrixMap by removing off-diagonal zero
@@ -3342,7 +3342,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
 
 }
 
-static AstMatrixMap *MtrRot( AstMatrixMap *this, double theta, 
+static AstMatrixMap *MtrRot( AstMatrixMap *this, double theta,
                              const double axis[], int *status ){
 /*
 *+
@@ -3357,16 +3357,16 @@ static AstMatrixMap *MtrRot( AstMatrixMap *this, double theta,
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     AstMatrixMap *astMtrRot( astMatrixMap *this, double theta, 
+*     AstMatrixMap *astMtrRot( astMatrixMap *this, double theta,
 *                              const double axis[] )
 
 *  Class Membership:
 *     MatrixMap method.
 
 *  Description:
-*     This function creates a new MatrixMap which is a copy of "this", 
-*     rotated by a specified angle. It can only be used on MatrixMaps which 
-*     have either 2 or 3 output coordinates. In the 3-D case, the rotation 
+*     This function creates a new MatrixMap which is a copy of "this",
+*     rotated by a specified angle. It can only be used on MatrixMaps which
+*     have either 2 or 3 output coordinates. In the 3-D case, the rotation
 *     is about an arbitrary axis passing through the origin.
 
 *  Parameters:
@@ -3375,16 +3375,16 @@ static AstMatrixMap *MtrRot( AstMatrixMap *this, double theta,
 *     theta
 *        The angle by which to rotate the matrix, in radians. If the matrix
 *        is applied to a 2-D vector position, the resulting vector is
-*        rotated clockwise about the origin (i.e. from the positive direction 
-*        of the second axis to the positive direction of the first axis). If 
-*        the vector positions are three dimensional, the rotation is clockwise 
-*        when looking along the vector given by "axis". Note, "theta" measures 
-f        when looking along the vector given by AXIS. Note, THETA measures 
-*        the movemement of the vectors relative to a fixed reference frame. 
-*        Alternatively, the reference frame can be thought of as rotating by 
+*        rotated clockwise about the origin (i.e. from the positive direction
+*        of the second axis to the positive direction of the first axis). If
+*        the vector positions are three dimensional, the rotation is clockwise
+*        when looking along the vector given by "axis". Note, "theta" measures
+f        when looking along the vector given by AXIS. Note, THETA measures
+*        the movemement of the vectors relative to a fixed reference frame.
+*        Alternatively, the reference frame can be thought of as rotating by
 *        (-theta) relative to the fixed vectors.
 *     axis
-*        A 3-D vector specifying the axis of rotation. This parameter is 
+*        A 3-D vector specifying the axis of rotation. This parameter is
 *        ignored if the output from MatrixMap is 2-dimensional.
 
 *  Returned Value:
@@ -3419,7 +3419,7 @@ f        when looking along the vector given by AXIS. Note, THETA measures
    costh = cos( theta );
    sinth = sin( theta );
 
-/* Return without changing the MatrixMap if the rotation angle is a 
+/* Return without changing the MatrixMap if the rotation angle is a
    multiple of 360 degrees. */
    if ( costh == 1.0 ) return new;
 
@@ -3430,45 +3430,45 @@ f        when looking along the vector given by AXIS. Note, THETA measures
 /* First do rotation of a plane about the origin. */
    if( nrow == 2 ){
 
-/* Ensure that the MatrixMap is stored in full form rather than 
+/* Ensure that the MatrixMap is stored in full form rather than
    compressed form. */
       ExpandMatrix( new, status );
 
-/* Form the 2x2 forward rotation matrix. Theta is the clockwise angle 
+/* Form the 2x2 forward rotation matrix. Theta is the clockwise angle
    of rotation. */
       rotmat[0] = costh;
       rotmat[1] = sinth;
       rotmat[2] = -sinth;
       rotmat[3] = costh;
 
-/*  Post-multiply the current forward matrix (depending on whether or not 
-    the MatrixMap has been inverted) by the forward rotation matrix. */      
-      if( !astGetInvert( new ) ){  
+/*  Post-multiply the current forward matrix (depending on whether or not
+    the MatrixMap has been inverted) by the forward rotation matrix. */
+      if( !astGetInvert( new ) ){
          SMtrMult( 1, 2, ncol, rotmat, new->f_matrix, work, status );
       } else {
          SMtrMult( 1, 2, ncol, rotmat, new->i_matrix, work, status );
       }
-       
-/* Now form the 2x2 inverse rotation matrix (the diagonal elements 
+
+/* Now form the 2x2 inverse rotation matrix (the diagonal elements
    don't change). */
       rotmat[1] = -sinth;
       rotmat[2] = sinth;
-       
-/*  Pre-multiply the current inverse matrix (depending on whether or 
-    not the MatrixMap has been inverted) by the inverse rotation matrix. */      
-      if( !astGetInvert( new ) ){ 
+
+/*  Pre-multiply the current inverse matrix (depending on whether or
+    not the MatrixMap has been inverted) by the inverse rotation matrix. */
+      if( !astGetInvert( new ) ){
          SMtrMult( 0, ncol, 2, rotmat, new->i_matrix, work, status );
       } else {
          SMtrMult( 0, ncol, 2, rotmat, new->f_matrix, work, status );
       }
 
-/*  See if the matrix can be stored as a UNIT or DIAGONAL matrix. */      
+/*  See if the matrix can be stored as a UNIT or DIAGONAL matrix. */
       CompressMatrix( new, status );
 
-/* Now do rotation of a volume about an axis passing through the origin. */   
+/* Now do rotation of a volume about an axis passing through the origin. */
    } else if( nrow == 3 ){
 
-/* Find the length of the axis vector. Report an error if it has zero 
+/* Find the length of the axis vector. Report an error if it has zero
    length or has not been supplied. */
       if( axis ) {
          axlen2 = axis[0]*axis[0] + axis[1]*axis[1] + axis[2]*axis[2];
@@ -3477,11 +3477,11 @@ f        when looking along the vector given by AXIS. Note, THETA measures
       }
       if( axlen2 <= 0.0 ) {
          astError( AST__MTRAX, "astMtrRot(%s): NULL or zero length "
-                   "axis vector supplied.", status, astClass(new) ); 
+                   "axis vector supplied.", status, astClass(new) );
       }
       axlen = sqrt( axlen2 );
-   
-/* Ensure that the MatrixMap is stored in full form rather than 
+
+/* Ensure that the MatrixMap is stored in full form rather than
    compressed form. */
       ExpandMatrix( new, status );
 
@@ -3495,7 +3495,7 @@ f        when looking along the vector given by AXIS. Note, THETA measures
       f = a*axis[1]*axis[2];
       g = as*axis[0];
 
-/* Form the 3x3 forward rotation matrix. Theta is the clockwise angle 
+/* Form the 3x3 forward rotation matrix. Theta is the clockwise angle
    of rotation looking in the direction of the axis vector. */
       rotmat[0] = a*axis[0]*axis[0] + costh;
       rotmat[1] = b - c;
@@ -3507,15 +3507,15 @@ f        when looking along the vector given by AXIS. Note, THETA measures
       rotmat[7] = f + g;
       rotmat[8] = a*axis[2]*axis[2] + costh;
 
-/*  Post-multiply the current forward matrix (depending on whether or not 
-    the MatrixMap has been inverted) by the forward rotation matrix. */      
-      if( !astGetInvert( new ) ){  
+/*  Post-multiply the current forward matrix (depending on whether or not
+    the MatrixMap has been inverted) by the forward rotation matrix. */
+      if( !astGetInvert( new ) ){
          SMtrMult( 1, 3, ncol, rotmat, new->f_matrix, work, status );
       } else {
          SMtrMult( 1, 3, ncol, rotmat, new->i_matrix, work, status );
       }
-       
-/* Now form the 3x3 inverse rotation matrix (the diagonal elements 
+
+/* Now form the 3x3 inverse rotation matrix (the diagonal elements
    don't change). */
       rotmat[1] = b + c;
       rotmat[2] = d - e;
@@ -3523,16 +3523,16 @@ f        when looking along the vector given by AXIS. Note, THETA measures
       rotmat[5] = f + g;
       rotmat[6] = d + e;
       rotmat[7] = f - g;
-       
-/* Pre-multiply the current inverse matrix (depending on whether or 
-   not the MatrixMap has been inverted) by the inverse rotation matrix. */      
-      if( !astGetInvert( new ) ){  
+
+/* Pre-multiply the current inverse matrix (depending on whether or
+   not the MatrixMap has been inverted) by the inverse rotation matrix. */
+      if( !astGetInvert( new ) ){
          SMtrMult( 0, ncol, 3, rotmat, new->i_matrix, work, status );
       } else {
          SMtrMult( 0, ncol, 3, rotmat, new->f_matrix, work, status );
       }
 
-/*  See if the matrix can be stored as a UNIT or DIAGONAL matrix. */      
+/*  See if the matrix can be stored as a UNIT or DIAGONAL matrix. */
       CompressMatrix( new, status );
 
 /* Report an error if the matrix is not suitable for rotation. */
@@ -3543,12 +3543,12 @@ f        when looking along the vector given by AXIS. Note, THETA measures
 
 /* Delete the new MatrixMap if an error has occurred. */
    if( !astOK ) new = astDelete( new );
-   
+
    return new;
-   
+
 }
 
-static void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+static void PermGet( AstPermMap *map, int **outperm, int **inperm,
                      double **consts, int *status ){
 /*
 *  Name:
@@ -3562,11 +3562,11 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+*     void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *                   double **const, int *status )
 
 *  Class Membership:
-*     MatrixMap member function 
+*     MatrixMap member function
 
 *  Description:
 *     This function returns axis permutation and constants arrays which can
@@ -3585,7 +3585,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *        released using astFree when no longer needed.
 *     consts
 *        An address at which to return a popinter to an array of doubles
-*        holding the constants array. The array should be released using 
+*        holding the constants array. The array should be released using
 *        astFree when no longer needed.
 *     status
 *        Pointer to the inherited status variable.
@@ -3639,7 +3639,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
    pset2 = astPointSet( 2, nout, "", status );
 
 /* Set up the two input positions to be [0,1,2...] and [-1,-1,-1,...]. The
-   first position is used to enumerate the axes, and the second is used to 
+   first position is used to enumerate the axes, and the second is used to
    check for constant axis values. */
    ptr1 = astGetPoints( pset1 );
    if( astOK ){
@@ -3667,7 +3667,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
    of the appropriate input axis will be in the mapped first position. */
          op = ptr2[ i ][ 0 ];
 
-/* If the output axis value is assigned a constant value, the result of 
+/* If the output axis value is assigned a constant value, the result of
    mapping the two different input axis values will be the same. */
          cn = ptr2[ i ][ 1 ];
          if( op == cn ) {
@@ -3678,14 +3678,14 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
             outprm[ i ] = -( nc + 1 );
             nc++;
 
-/* If the output axis values are different, then the output axis value 
+/* If the output axis values are different, then the output axis value
    must be copied from the input axis value. */
          } else {
             outprm[ i ] = (int) ( op + 0.5 );
          }
       }
    }
-    
+
 /* Now do the same thing to determine the input permutation array. */
    if( astOK ){
       for( i = 0; i < nout; i++ ){
@@ -3745,11 +3745,11 @@ static int PermOK( AstMapping *pm, int *status ){
 *     int PermOK( AstMapping *pm, int *status )
 
 *  Class Membership:
-*     PermMap member function 
+*     PermMap member function
 
 *  Description:
 *     This function returns a flag indicating if the supplied PermMap
-*     could be merged with a MatrixMap. For thios to be possible, the 
+*     could be merged with a MatrixMap. For thios to be possible, the
 *     PermMap must have the same number of input and output axes, and the
 *     inverse and forward mappings must be consistent.
 
@@ -3853,38 +3853,38 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 *     from the Mapping class ).
 
 *  Description:
-*     This function returns the rate of change of a specified output of 
-*     the supplied Mapping with respect to a specified input, at a 
-*     specified input position. 
+*     This function returns the rate of change of a specified output of
+*     the supplied Mapping with respect to a specified input, at a
+*     specified input position.
 
 *  Parameters:
 *     this
 *        Pointer to the Mapping to be applied.
 *     at
-*        The address of an array holding the axis values at the position 
-*        at which the rate of change is to be evaluated. The number of 
-*        elements in this array should equal the number of inputs to the 
+*        The address of an array holding the axis values at the position
+*        at which the rate of change is to be evaluated. The number of
+*        elements in this array should equal the number of inputs to the
 *        Mapping.
 *     ax1
-*        The index of the Mapping output for which the rate of change is to 
+*        The index of the Mapping output for which the rate of change is to
 *        be found (output numbering starts at 0 for the first output).
 *     ax2
 *        The index of the Mapping input which is to be varied in order to
-*        find the rate of change (input numbering starts at 0 for the first 
+*        find the rate of change (input numbering starts at 0 for the first
 *        input).
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The rate of change of Mapping output "ax1" with respect to input 
-*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     The rate of change of Mapping output "ax1" with respect to input
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be
 *     calculated.
 
 */
 
 /* Local Variables: */
    AstMatrixMap *map;
-   double *matrix; 
+   double *matrix;
    double result;
 
 /* Check inherited status */
@@ -3893,7 +3893,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 /* Get a pointer to the MatrixMap structure. */
    map = (AstMatrixMap *) this;
 
-/* Get a pointer to the array holding the required matrix elements, according 
+/* Get a pointer to the array holding the required matrix elements, according
    to whether the MatrixMap has been inverted. */
    if( !astGetInvert( this ) ) {
       matrix = map->f_matrix;
@@ -3917,27 +3917,27 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 
    } else {
       result = 0.0;
-   }      
+   }
 
 /* Return the result. */
    return result;
 }
 
-static void SMtrMult( int post, int m, int n, const double *mat1, 
+static void SMtrMult( int post, int m, int n, const double *mat1,
                         double *mat2, double *work, int *status ){
 /*
 *  Name:
 *     SMtrMult
- 
+
 *  Purpose:
 *     Multiply a square matrix and a non-square matrix.
- 
+
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     void SMtrMult( int post, int m, int n, const double *mat1, 
+*     void SMtrMult( int post, int m, int n, const double *mat1,
 *                    double *mat2, double *work, int *status )
 
 *  Class Membership:
@@ -3948,7 +3948,7 @@ static void SMtrMult( int post, int m, int n, const double *mat1,
 *     the square matrix pointed to by "mat1". If "post" is 1, then:
 *
 *        mat2 -> mat1*mat2  (mat1 is mxm and mat2 is mxn)
-* 
+*
 *     If "post" is zero, then:
 *
 *        mat2 -> mat2*mat1  (mat1 is nxn and mat2 is mxn)
@@ -3964,12 +3964,12 @@ static void SMtrMult( int post, int m, int n, const double *mat1,
 *     n
 *        The number of columns in mat2.
 *     mat1
-*        The multiplier matrix. It must be square of size m or n, depending 
+*        The multiplier matrix. It must be square of size m or n, depending
 *        on "post".
 *     mat2
 *        The multiplicand matrix.
 *     work
-*        Pointer to work space containing room for m doubles (if "post" 
+*        Pointer to work space containing room for m doubles (if "post"
 *        is 1), or n doubles (if "post" is 0).
 *     status
 *        Pointer to the inherited status variable.
@@ -3993,22 +3993,22 @@ static void SMtrMult( int post, int m, int n, const double *mat1,
 
 /* Do nothing if mat2 is NULL */
    if ( mat2 ){
-   
+
 /* First deal with cases where the supplied matrix is post-multiplied
-   (i.e. the returned matrix is mat1*mat2). */   
+   (i.e. the returned matrix is mat1*mat2). */
       if( post ){
-      
-/* Loop round each column of the output matrix, storing a pointer to 
+
+/* Loop round each column of the output matrix, storing a pointer to
    the start of the corresponding column of mat2. */
          for( j=0; j<n; j++ ){
             mat2_col = mat2 + j;
 
-/* Loop round each row of the output matrix, storing a pointer to 
+/* Loop round each row of the output matrix, storing a pointer to
    the start of the corresponding row of mat1. */
             for( i=0; i<m; i++ ){
                mat1_row = mat1 + i*m;
 
-/* Get the dot product of the corresponding row from mat1 and the 
+/* Get the dot product of the corresponding row from mat1 and the
    corresponding column from mat2 and store it in the work array. */
                dot = 0.0;
                for( k=0; k<m; k++ ) {
@@ -4024,26 +4024,26 @@ static void SMtrMult( int post, int m, int n, const double *mat1,
                work[ i ] = dot;
             }
 
-/* Copy the values stored in the work array to the current column of 
+/* Copy the values stored in the work array to the current column of
    the output matrix. */
             for( i=0; i<m; i++ ) mat2_col[ i*n ] = work[ i ];
          }
-      
+
 /* Now deal with cases where the supplied matrix is pre-multiplied
-   (i.e. the returned matrix is mat2*mat1). */   
+   (i.e. the returned matrix is mat2*mat1). */
       } else {
 
-/* Loop round each row of the output matrix, storing a pointer to 
+/* Loop round each row of the output matrix, storing a pointer to
    the start of the corresponding row of mat2. */
          for( i=0; i<m; i++ ){
             mat2_row = mat2 + i*n;
 
-/* Loop round each column of the output matrix, storing a pointer to 
+/* Loop round each column of the output matrix, storing a pointer to
    the start of the corresponding column of mat1. */
             for( j=0; j<n; j++ ){
                mat1_col = mat1 + j;
 
-/* Get the dot product of the corresponding row from mat2 and the 
+/* Get the dot product of the corresponding row from mat2 and the
    corresponding column from mat1 and store it in the work array. */
                dot = 0.0;
                for( k=0; k<n; k++ ) {
@@ -4059,16 +4059,16 @@ static void SMtrMult( int post, int m, int n, const double *mat1,
                work[ j ] = dot;
             }
 
-/* Copy the values stored in the work array to the current row of 
+/* Copy the values stored in the work array to the current row of
    the output matrix. */
             for( j=0; j<n; j++ ) mat2_row[ j ] = work[ j ];
          }
       }
    }
- 
+
    return;
 
-}   
+}
 
 static int GetTranForward( AstMapping *this, int *status ) {
 /*
@@ -4087,7 +4087,7 @@ static int GetTranForward( AstMapping *this, int *status ) {
 *     int GetTranForward( AstMapping *this, int *status )
 
 *  Class Membership:
-*     MatrixMap member function (over-rides the astGetTranForward method 
+*     MatrixMap member function (over-rides the astGetTranForward method
 *     inherited from the Mapping class).
 
 *  Description:
@@ -4101,7 +4101,7 @@ static int GetTranForward( AstMapping *this, int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Zero if the forward coordinate transformation is not defined, or 1 if it 
+*     Zero if the forward coordinate transformation is not defined, or 1 if it
 *     is.
 
 *  Notes:
@@ -4126,7 +4126,7 @@ static int GetTranForward( AstMapping *this, int *status ) {
 /* All unit MatrixMaps are defined in both directions. */
    if( map->form == UNIT ) {
       result = 1;
-   
+
 /* Otherwise, check that the appropriate array is defined in the
    MatrixMap. */
    } else {
@@ -4169,7 +4169,7 @@ static int GetTranInverse( AstMapping *this, int *status ) {
 *     int GetTranInverse( AstMapping *this, int *status )
 
 *  Class Membership:
-*     MatrixMap member function (over-rides the astGetTranInverse method 
+*     MatrixMap member function (over-rides the astGetTranInverse method
 *     inherited from the Mapping class).
 
 *  Description:
@@ -4183,7 +4183,7 @@ static int GetTranInverse( AstMapping *this, int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Zero if the inverse coordinate transformation is not defined, or 1 if it 
+*     Zero if the inverse coordinate transformation is not defined, or 1 if it
 *     is.
 
 *  Notes:
@@ -4208,7 +4208,7 @@ static int GetTranInverse( AstMapping *this, int *status ) {
 /* All unit MatrixMaps are defined in both directions. */
    if( map->form == UNIT ) {
       result = 1;
-   
+
 /* Otherwise, check that the appropriate array is defined in the
    MatrixMap. */
    } else {
@@ -4326,19 +4326,19 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    calculations needed to generate the output coordinate values. */
 
 /* Determine the numbers of points and coordinates per point from the input
-   and output PointSets and obtain pointers for accessing the input and 
+   and output PointSets and obtain pointers for accessing the input and
    output coordinate values. */
    ncoord_in = astGetNcoord( in );
    ncoord_out = astGetNcoord( result );
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse mapping, according to the
    direction specified and whether the mapping has been inverted. */
    if ( astGetInvert( map ) ) forward = !forward;
 
-/* Get a pointer to the array holding the required matrix elements, according 
+/* Get a pointer to the array holding the required matrix elements, according
    to the direction of mapping required. */
    if ( forward ) {
       matrix = map->f_matrix;
@@ -4354,30 +4354,30 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       if( map->form == FULL ){
 
 /* Loop to apply the matrix to each point in turn, checking for
-   (and propagating) bad values in the process. The matrix elements are 
-   accessed sequentially in row order. The next matrix element to be 
-   used is identified by a pointer which is initialised to point to the 
+   (and propagating) bad values in the process. The matrix elements are
+   accessed sequentially in row order. The next matrix element to be
+   used is identified by a pointer which is initialised to point to the
    first element of the matrix prior to processing each point. */
          for ( point = 0; point < npoint; point++ ) {
             matrix_element = matrix;
 
-/* Each output co-ordinate value is created by summing the product of the 
-   corresponding input co-ordinates and the elements of one row of the 
+/* Each output co-ordinate value is created by summing the product of the
+   corresponding input co-ordinates and the elements of one row of the
    matrix. */
             for ( out_coord = 0; out_coord < ncoord_out; out_coord++ ) {
                sum = 0.0;
 
                for ( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
 
-/*  Check the current input coordinate value and the current matrix element.  
+/*  Check the current input coordinate value and the current matrix element.
     If the coordinate value is bad, then the output value will also be
     bad unless the matrix element is zero. That is, a zero matrix element
     results in the input coordinate value being ignored, even if it is bad.
     This prevents bad input values being propagated to output axes which
-    are independant of the bad input axis. A bad matrix element always results 
-    in the output value being bad. In either of these cases, break out of the 
-    loop, remembering to advance the pointer to the next matrix element so 
-    that it points to the start of the next row ready for doing the next 
+    are independant of the bad input axis. A bad matrix element always results
+    in the output value being bad. In either of these cases, break out of the
+    loop, remembering to advance the pointer to the next matrix element so
+    that it points to the start of the next row ready for doing the next
     output coordinate. */
                   if ( ( ptr_in[ in_coord ][ point ] == AST__BAD &&
                                          (*matrix_element) != 0.0 ) ||
@@ -4387,7 +4387,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      break;
 
 /*  If the input coordinate and the current matrix element are both
-    valid, increment the sum by their product, and step to the next matrix 
+    valid, increment the sum by their product, and step to the next matrix
     element pointer If we arrive here with a bad input value, then the
     matrix element must be zero, in which case the running sum is left
     unchanged. */
@@ -4415,22 +4415,22 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
          } else {
             nax = ncoord_out;
          }
-   
+
 /* For unit matrices, copy the input axes to the corresponding output axes. */
          if( map->form == UNIT ){
             for( out_coord = 0; out_coord < nax; out_coord++ ) {
-               (void) memcpy( ptr_out[ out_coord ], 
+               (void) memcpy( ptr_out[ out_coord ],
                               (const void *) ptr_in[ out_coord ],
                               sizeof( double )*(size_t)npoint );
             }
 
-/* For diagonal matrices, scale each input axis using the appropriate 
+/* For diagonal matrices, scale each input axis using the appropriate
    diagonal element from the matrix, and store in the output. */
          } else {
             for( out_coord = 0; out_coord < nax; out_coord++ ){
                diag_term = matrix[ out_coord ];
-               outdata = ptr_out[ out_coord ];            
-               indata = ptr_in[ out_coord ];            
+               outdata = ptr_out[ out_coord ];
+               indata = ptr_in[ out_coord ];
 
                if( diag_term != AST__BAD ){
                   for( point = 0; point < npoint; point++ ){
@@ -4439,7 +4439,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         *(outdata++) = diag_term*val;
                      } else {
                         *(outdata++) = AST__BAD;
-                     } 
+                     }
                   }
 
                } else {
@@ -4449,7 +4449,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                }
             }
          }
-         
+
 /* If there are any remaining output axes, fill the first one with zeros. */
          if( nax < ncoord_out ){
             outdata = ptr_out[ nax ];
@@ -4486,7 +4486,7 @@ static int ScalingRowCol( AstMatrixMap *map, int axis, int *status ){
 *     int ScalingRowCol( AstMatrixMap *map, int axis, int *status )
 
 *  Class Membership:
-*     MatrixMap member function 
+*     MatrixMap member function
 
 *  Description:
 *     This function returns a flag indicating if a MatrixMap presents a
@@ -4525,7 +4525,7 @@ static int ScalingRowCol( AstMatrixMap *map, int axis, int *status ){
    if( map->form != FULL ){
       ret = 1;
 
-/* If a full matrix has been supplied... */      
+/* If a full matrix has been supplied... */
    } else {
 
 /* Assume the row/column gives a unit mapping. */
@@ -4549,7 +4549,7 @@ static int ScalingRowCol( AstMatrixMap *map, int axis, int *status ){
             break;
          }
          el++;
-      }         
+      }
 
 /* Check that all elements of the "axis"th column are effectively zero, except
    for the "axis"th element which must be non-zero. */
@@ -4566,7 +4566,7 @@ static int ScalingRowCol( AstMatrixMap *map, int axis, int *status ){
                break;
             }
             el += ncol;
-         }         
+         }
       }
    }
 
@@ -4659,16 +4659,16 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
       } else {
          nel = nin*nout;
       }
-      
+
 /* Store the forward matrix elements in the output MatrixMap. */
       out->f_matrix = (double *) astStore( NULL, (void *) in->f_matrix,
-                                           sizeof( double )*(size_t) nel ); 
+                                           sizeof( double )*(size_t) nel );
 
 /* Store the inverse matrix elements (if defined) in the output
    MatrixMap. */
       if( in->i_matrix ){
          out->i_matrix = (double *) astStore( NULL, (void *) in->i_matrix,
-                                              sizeof( double )*(size_t) nel ); 
+                                              sizeof( double )*(size_t) nel );
       }
 
 /* If an error has occurred, free the output MatrixMap arrays. */
@@ -4793,11 +4793,11 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    re-calculated when the MatrixMap is read back in. Note BAD values are
    not written out as the AST__BAD value may differ on different machines.
    If a matrix element is not found when reading the matrix back in
-   again (in astLoadMatrixMap), then it is assigned a default value of 
+   again (in astLoadMatrixMap), then it is assigned a default value of
    AST__BAD. */
    if( this->f_matrix ){
       for( el = 0; el < nel; el++ ){
-         if( (this->f_matrix)[ el ] != AST__BAD ) {      
+         if( (this->f_matrix)[ el ] != AST__BAD ) {
             (void) sprintf( buff, "M%d", el );
             astWriteDouble( channel, buff, 1, 1, (this->f_matrix)[ el ],
                             "Forward matrix value" );
@@ -4806,7 +4806,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    }
 
 /* The matrix storage form. */
-   astWriteString( channel, "Form", 1, 1, Form[ this->form ], 
+   astWriteString( channel, "Form", 1, 1, Form[ this->form ],
                    "Matrix storage form" );
 
 /* Undefine macros local to this function. */
@@ -4820,7 +4820,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(MatrixMap,Mapping)
 astMAKE_CHECK(MatrixMap)
 
-AstMatrixMap *astMatrixMap_( int nin, int nout, int form, 
+AstMatrixMap *astMatrixMap_( int nin, int nout, int form,
                              const double matrix[], const char *options, int *status, ...){
 /*
 *++
@@ -4836,10 +4836,10 @@ f     AST_MATRIXMAP
 
 *  Synopsis:
 c     #include "matrixmap.h"
-c     AstMatrixMap *astMatrixMap( int nin, int nout, int form, 
+c     AstMatrixMap *astMatrixMap( int nin, int nout, int form,
 c                                 const double matrix[],
 c                                 const char *options, ... )
-f     RESULT = AST_MATRIXMAP( NIN, NOUT, FORM, MATRIX, OPTIONS, STATUS ) 
+f     RESULT = AST_MATRIXMAP( NIN, NOUT, FORM, MATRIX, OPTIONS, STATUS )
 
 *  Class Membership:
 *     MatrixMap constructor.
@@ -4957,7 +4957,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the MatrixMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitMatrixMap( NULL, sizeof( AstMatrixMap ), !class_init, 
+   new = astInitMatrixMap( NULL, sizeof( AstMatrixMap ), !class_init,
                            &class_vtab, "MatrixMap", nin, nout, form, matrix);
 
 /* If successful, note that the virtual function table has been
@@ -4979,7 +4979,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstMatrixMap *astMatrixMapId_( int nin, int nout, int form, const double matrix[], 
+AstMatrixMap *astMatrixMapId_( int nin, int nout, int form, const double matrix[],
                                const char *options, ... ) {
 /*
 *  Name:
@@ -4993,9 +4993,9 @@ AstMatrixMap *astMatrixMapId_( int nin, int nout, int form, const double matrix[
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     AstMatrixMap *astMatrixMapId_( int nin, int nout, int form, 
-*                                    const double matrix[], const char *options, 
-*                                    ... ) 
+*     AstMatrixMap *astMatrixMapId_( int nin, int nout, int form,
+*                                    const double matrix[], const char *options,
+*                                    ... )
 
 *  Class Membership:
 *     MatrixMap constructor.
@@ -5061,7 +5061,7 @@ AstMatrixMap *astMatrixMapId_( int nin, int nout, int form, const double matrix[
 
 AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
                                  AstMatrixMapVtab *vtab, const char *name,
-                                 int nin, int nout, int form, 
+                                 int nin, int nout, int form,
                                  const double *matrix, int *status ) {
 /*
 *+
@@ -5170,8 +5170,8 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
 /* Report an error if a NULL matrix was supplied, unless a unit MatrixMap
    has been requested. */
    if( form < 2 && !matrix ){
-      astError( AST__MTRMT, "astInitMatrixMap(%s): NULL matrix supplied.", status, 
-                name ); 
+      astError( AST__MTRMT, "astInitMatrixMap(%s): NULL matrix supplied.", status,
+                name );
 
    } else {
 
@@ -5186,13 +5186,13 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
 
 /* Initialise the MatrixMap data. */
 /* ---------------------------- */
-/* If a unit MatrixMap is being created, then no additional storage is 
+/* If a unit MatrixMap is being created, then no additional storage is
    required. */
          if( form > 1 ){
             nel = 0;
             used_form = UNIT;
-      
-/* If a diagonal MatrixMap is being created, then memory is needed to hold 
+
+/* If a diagonal MatrixMap is being created, then memory is needed to hold
    the diagonal terms. */
          } else if( form == 1 ){
             if( nin < nout ){
@@ -5202,7 +5202,7 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
             }
             used_form = DIAGONAL;
 
-/* If a full MatrixMap is being created, then memory is needed to hold 
+/* If a full MatrixMap is being created, then memory is needed to hold
    all the terms. */
          } else {
             nel = nin*nout ;
@@ -5211,7 +5211,7 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
 
 /* Allocate memory for the forward matrix, storing the supplied matrix
    values in it. */
-         fmat = (double *) astStore( NULL, (void *) matrix, 
+         fmat = (double *) astStore( NULL, (void *) matrix,
                                      sizeof(double)*(size_t)nel );
 /* Replace any NaNs by AST__BAD */
          for( i = 0; i < nel; i++ ) {
@@ -5224,7 +5224,7 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
 /* Store the matrix arrays. */
          new->form = used_form;
          new->f_matrix = fmat;
-         new->i_matrix = imat;      
+         new->i_matrix = imat;
 
 /* Attempt to compress the MatrixMap into DIAGONAL or UNIT form. */
          CompressMatrix( new, status );
@@ -5367,7 +5367,7 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
       astReadClassData( channel, "MatrixMap" );
 
 /* Now obtain the Matrix storage form from this list. */
-      form = astReadString( channel, "form", Form[FULL] ); 
+      form = astReadString( channel, "form", Form[FULL] );
       new->form = FindString( 3, Form, form, "the MatrixMap component 'Form'",
                               "astRead", astGetClass( channel ), status );
       form = astFree( (void *) form );
@@ -5375,13 +5375,13 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
 /* Find the number of elements stored for each matrix. */
       nin = astGetNin( (AstMapping *) new );
       nout = astGetNout( (AstMapping *) new );
-   
+
       if( new->form == FULL ){
          nel = nin*nout;
-   
+
       } else if( new->form == DIAGONAL ){
          nel = MIN( nin, nout );
-   
+
       } else {
          nel = 0;
       }
@@ -5394,7 +5394,7 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
 
 /* The forward matrix. */
       if( new->f_matrix ){
-         def = 0; 
+         def = 0;
 
          for( el = 0; el < nel; el++ ){
             (void) sprintf( buff, "m%d", el );
@@ -5437,7 +5437,7 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-AstMatrixMap *astMtrRot_( AstMatrixMap *this, double theta, 
+AstMatrixMap *astMtrRot_( AstMatrixMap *this, double theta,
                                 const double axis[], int *status ){
    if( !astOK ) return NULL;
    return (**astMEMBER(this,MatrixMap,MtrRot))( this, theta, axis, status );

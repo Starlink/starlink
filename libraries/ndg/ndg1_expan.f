@@ -14,21 +14,21 @@
 *     CALL NDG1_EXPAN( TEMPLT, VERB, IGRP, NFMT, FMT, FOUND, STATUS )
 
 *  Description:
-*     The supplied wild-card template is expanded into a list of file 
-*     names, which are appended to the supplied group. 
+*     The supplied wild-card template is expanded into a list of file
+*     names, which are appended to the supplied group.
 *
 *     The ambiguity between HDS component paths and file types is solved
 *     here by returning only the HDS file in the returned group. For
-*     instance, the template "datafile.fit" will match either a FITS file 
-*     called "datafile.fit" or an HDS file called "datafile.sdf" containing 
+*     instance, the template "datafile.fit" will match either a FITS file
+*     called "datafile.fit" or an HDS file called "datafile.sdf" containing
 *     a ".fit" component. If the current directory contains both of these
-*     files, then only "datafile.sdf" will be added to the returned group. 
+*     files, then only "datafile.sdf" will be added to the returned group.
 *
 *     Each combination of directory and basename is included only once in
 *     the returned group. If the supplied template matches files with the
 *     same directory/basename but with different file types, then only
-*     the file with the highest priority file type is returned (i.e. 
-*     the .sdf file if available, or the file type which is closest to 
+*     the file with the highest priority file type is returned (i.e.
+*     the .sdf file if available, or the file type which is closest to
 *     the start of NDF_FORMATS_IN otherwise).
 
 *  Arguments:
@@ -37,12 +37,12 @@
 *     VERB = LOGICAL (Given)
 *        If TRUE then errors which occur whilst accessing supplied NDFs
 *        are flushed so that the user can see them before re-prompting for
-*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP = INTEGER (Given)
 *        An identifier for the group to which the expanded names should
-*        be appended. On exit, this group is at the end of a chain of 
+*        be appended. On exit, this group is at the end of a chain of
 *        groups connected by a GRP "owner-slave" relationship. The other
 *        groups is the chain hold individual fields  from the full NDF
 *        specification. The full chain (starting from the head) is as
@@ -110,7 +110,7 @@
 *        Added support for foreign extension specifiers.
 *     28-FEB-2001 (DSB):
 *        Assume trailing "[.]" strings are glob patterns, unless they
-*        result in no matching files, in which case assume they are 
+*        result in no matching files, in which case assume they are
 *        foreign extension specifiers.
 *     11-MAR-2004 (PWD):
 *        Increased the size of all local character strings to
@@ -154,7 +154,7 @@
       INTEGER IGRP
       INTEGER NFMT
       CHARACTER FMT( * )*(*)
-      
+
 *  Arguments Returned:
       LOGICAL FOUND
 
@@ -185,7 +185,7 @@
       CHARACTER HDSPATH*(2048)     ! Path to HDS component including file and directory
       CHARACTER LOC*(DAT__SZLOC)   ! Locator for top-level object
       CHARACTER NAM*(GRP__SZNAM)   ! File base name field
-      CHARACTER PATH*(GRP__SZNAM)  ! Data path 
+      CHARACTER PATH*(GRP__SZNAM)  ! Data path
       CHARACTER REST*(GRP__SZNAM)  ! The remaining text after the file spec
       CHARACTER SEARCH*(MXSRCH)    ! The total search string
       CHARACTER SEC*(GRP__SZNAM)   ! File NDF/HDS section
@@ -288,7 +288,7 @@
       CALL CHR_FANDL( TEMPLT, F, L )
 
 *  If the first and last characters are backwards quotes, just search for
-*  files matching the template as supplied. This allows for shell command 
+*  files matching the template as supplied. This allows for shell command
 *  substitution to be included in the supplied string.
       IF( TEMPLT( F : F ) .EQ. '`' .AND.
      :    TEMPLT( L : L ) .EQ. '`' ) THEN
@@ -297,11 +297,11 @@
 *  Indicate that duplicate file names should not be purged.
          PURGE = .FALSE.
 
-*  Otherwise, we escape any embedded spaces in the template so that the 
+*  Otherwise, we escape any embedded spaces in the template so that the
 *  shell script used by one_find_file will interpret the spaces as part
 *  of the file path. We do not escape spaces within the NDF section
 *  identifier (if any) since this would confuse the NDF library. So we
-*  stop checking for spaces when the first "(" or "." character is 
+*  stop checking for spaces when the first "(" or "." character is
 *  encountered.
       ELSE
          J = INDEX( TEMPLT, '.' ) - 1
@@ -329,7 +329,7 @@
 *  Split the template into directory, basename, suffix and section.
          CALL NDG1_FPARS( TMPLT2 ( : J ), DIR, BN, SUF, SEC, STATUS )
 
-*  Take copies of the file base name and suffix so that the originals 
+*  Take copies of the file base name and suffix so that the originals
 *  are not changed by the following code.
          BNM = BN
          SUFF = SUF
@@ -337,17 +337,17 @@
 *  First, we look for any ".sdf" files with the given directory path
 *  and file basename, ignoring the file suffix since "fred.fit" could refer
 *  to component ".fit" within file fred.sdf. Any "[..]" string at the
-*  start of the suffix is interpreted as a glob pattern, and is 
+*  start of the suffix is interpreted as a glob pattern, and is
 *  transferred to the end of the basename.
          CALL NDG1_FORXT( SUFF, F, L, STATUS )
          IF( F .LE. L .AND. F .EQ. 1 ) THEN
             IAT = CHR_LEN( BNM )
             CALL CHR_APPND( SUFF( F : L ), BNM, IAT )
-            SUFF( F : L ) = ' ' 
+            SUFF( F : L ) = ' '
             CALL CHR_RMBLK( SUFF )
          END IF
 
-*  Store matching file specs in IGRP2, and "the rest" (i.e. file suffix 
+*  Store matching file specs in IGRP2, and "the rest" (i.e. file suffix
 *  - so long as it is not a simple wild-card ".*" - and section) in IGRP3.
          REST = ' '
          IAT = 0
@@ -359,16 +359,16 @@
          CALL CHR_APPND( DIR, FTEMP, IAT )
          CALL CHR_APPND( BNM, FTEMP, IAT )
          CALL CHR_APPND( NDG__NDFTP, FTEMP, IAT )
-   
+
          IF( IAT .GT. 0 ) THEN
-            CALL NDG1_APPEN( IGRP2, IGRP3, FTEMP( : IAT ), REST, 
+            CALL NDG1_APPEN( IGRP2, IGRP3, FTEMP( : IAT ), REST,
      :                       STATUS )
          END IF
 
 *  On the first pass through this "DO WHILE" loop, any trailing "[..]"
-*  string in the suffix is treated as a glob pattern. If this assumption 
-*  results in no files being found, we make a second pass through this 
-*  loop in whoch the trailing "[..]" string is interpreted as a foreign 
+*  string in the suffix is treated as a glob pattern. If this assumption
+*  results in no files being found, we make a second pass through this
+*  loop in whoch the trailing "[..]" string is interpreted as a foreign
 *  extension specifier.
          USEFXS = .TRUE.
          MORE = .TRUE.
@@ -376,7 +376,7 @@
             USEFXS = .NOT. USEFXS
             IF( USEFXS ) MORE = .FALSE.
 
-*  Take copies of the file base name and suffix so that the originals 
+*  Take copies of the file base name and suffix so that the originals
 *  are not changed by the following code.
             BNM = BN
             SUFF = SUF
@@ -384,28 +384,28 @@
 *  Indicate we have not yet found a foreign extension specifier.
             FXS = ' '
 
-*  See if there is a "[...]" string in the suffix. If not, pass on 
+*  See if there is a "[...]" string in the suffix. If not, pass on
 *  without modifying the file base name or suffix.
             CALL NDG1_FORXT( SUF, F, L, STATUS )
             IF( F .LE. L ) THEN
 
-*  If we are recognizing foreign extension specifiers, see if there is 
-*  a foreign extension specifier included in the suffix (a trailing 
-*  string enclosed in square brackets). If so, save it and remove it 
+*  If we are recognizing foreign extension specifiers, see if there is
+*  a foreign extension specifier included in the suffix (a trailing
+*  string enclosed in square brackets). If so, save it and remove it
 *  from the suffix.
-               IF( USEFXS ) THEN 
+               IF( USEFXS ) THEN
                   FXS = SUF( F : L )
-                  SUFF( F : L ) = ' ' 
+                  SUFF( F : L ) = ' '
                   CALL CHR_RMBLK( SUFF )
 
-*  If we are not recognizing foreign extension specifiers, any "[..]" 
+*  If we are not recognizing foreign extension specifiers, any "[..]"
 *  string in the suffix is assumed to be a glob pattern matching string.
 *  If the "[..]" string is at the start of the suffix then it really
 *  belongs at the end of the file base name. Transfer it.
                ELSE IF( F .EQ. 1 ) THEN
                   IAT = CHR_LEN( BNM )
                   CALL CHR_APPND( SUF( F : L ), BNM, IAT )
-                  SUFF( F : L ) = ' ' 
+                  SUFF( F : L ) = ' '
                   CALL CHR_RMBLK( SUFF )
 
                END IF
@@ -418,7 +418,7 @@
             CALL CHR_APPND( FXS, REST, IAT )
             CALL CHR_APPND( SEC, REST, IAT )
 
-*  From now on, if no suffix was given, use ".*" so that we pick up files 
+*  From now on, if no suffix was given, use ".*" so that we pick up files
 *  with any of the types included in NDF_FORMATS_IN. But indicate that
 *  duplicate files with different file types should be purged.
             IF( SUFF .EQ. ' ' ) THEN
@@ -450,14 +450,14 @@
                   CALL CHR_APPND( DIR, FTEMP, IAT )
                   CALL CHR_APPND( BNM, FTEMP, IAT )
                   CALL CHR_APPND( FMT( IFMT ), FTEMP, IAT )
-            
+
                   IF( IAT .GT. 0 .AND. MXSRCH - SLEN .GT. IAT ) THEN
                      CALL CHR_APPND( FTEMP( : IAT ), SEARCH, SLEN )
                      SLEN = SLEN + 1
                   ENDIF
-   
+
                END IF
-   
+
             END DO
 
 *  Get a list of all matching files, appending them to IGRP2. If the
@@ -466,7 +466,7 @@
             IF( SLEN .GT. 0 ) THEN
                CALL GRP_GRPSZ( IGRP2, G2SIZ0, STATUS )
 
-               CALL NDG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), REST, 
+               CALL NDG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), REST,
      :                          STATUS )
 
                CALL GRP_GRPSZ( IGRP2, G2SIZ, STATUS )
@@ -489,7 +489,7 @@
      :                 '''^T''.', STATUS )
       END IF
 
-*  Get the original value of the HDS "SHELL" tuning parameter. 
+*  Get the original value of the HDS "SHELL" tuning parameter.
       CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )
 
 *  Abort if an error has occurred.
@@ -498,10 +498,10 @@
 *  Begin a new error context.
       CALL ERR_BEGIN( STATUS )
 
-*  Set the HDS "SHELL" tuning parameters to stop HDS trying to interpret 
-*  shell metacharacters within the filename. We can do this because any 
+*  Set the HDS "SHELL" tuning parameters to stop HDS trying to interpret
+*  shell metacharacters within the filename. We can do this because any
 *  shell metacharacters will already have been interpreted within
-*  NDG1_APPEN. The benefit of setting SHELL thus is that HDS mis-interprets 
+*  NDG1_APPEN. The benefit of setting SHELL thus is that HDS mis-interprets
 *  spaces within file names, resulting in HDS_FIND reporting an error if
 *  the file spec ontains any spaces.
       CALL HDS_TUNE( 'SHELL', -1, STATUS )
@@ -579,8 +579,8 @@
 
 *  See if it contains any NDFs. If so, the details to the NDFs are stored
 *  in the returned groups.
-               CALL NDG1_SDFEX( IGRP, .FALSE., IGRPD, IGRPB, IGRPT, 
-     :                          IGRPH, IGRPS, LOC, DIR, NAM, TYP, SLICE, 
+               CALL NDG1_SDFEX( IGRP, .FALSE., IGRPD, IGRPB, IGRPT,
+     :                          IGRPH, IGRPS, LOC, DIR, NAM, TYP, SLICE,
      :                          FOUND, STATUS )
 
             END IF
@@ -590,7 +590,7 @@
 
 *  If the file could not be opened as an HDS container file, annul the
 *  error.
-         ELSE     
+         ELSE
             IF( CHR_SIMLR(TYP, DAT__FLEXT) .AND. VERB ) THEN
                CALL ERR_FLUSH( STATUS )
             ELSE
@@ -625,7 +625,7 @@
                IF( SLICE .NE. ' ' ) THEN
                   OK = .FALSE.
                   CALL CHR_FANDL( SLICE, F, L )
-                  IF( SLICE( F : F ) .EQ. '(' .AND. 
+                  IF( SLICE( F : F ) .EQ. '(' .AND.
      :                SLICE( L : L ) .EQ. ')' ) THEN
                      IF( F + 1 .LE. L - 1 ) THEN
                         IF( INDEX( SLICE( F + 1 : L - 1 ), ')' ) .EQ. 0
@@ -633,7 +633,7 @@
      :                      INDEX( SLICE( F + 1 : L - 1 ), '(' ) .EQ. 0
      :                    ) THEN
                              OK = .TRUE.
-                             CALL CHR_APPND( SLICE( F : L ), STORED, 
+                             CALL CHR_APPND( SLICE( F : L ), STORED,
      :                                       IAT )
                         END IF
                      END IF
@@ -656,7 +656,7 @@
             END IF
          END IF
 
-*  Annul or flush any error which has occurred so that any remaining names 
+*  Annul or flush any error which has occurred so that any remaining names
 *  can be checked.
          IF( STATUS .NE. SAI__OK ) THEN
             IF( VERB ) THEN
@@ -669,7 +669,7 @@
       END DO
 
 *  End the error context started before the loop.
-      CALL ERR_END( STATUS )         
+      CALL ERR_END( STATUS )
 
 *  Return to the old HDS SHELL tuning setting.
       CALL ERR_BEGIN( STATUS )
@@ -678,7 +678,7 @@
 
 *  Purge the returned groups of matching files (i.e. file with the same
 *  directory and basename but differing file types).
-      IF( PURGE ) CALL NDG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, 
+      IF( PURGE ) CALL NDG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH,
      :                            IGRPS, SIZE0 + 1, NFMT, FMT, STATUS )
 
 *  Delete the temporary groups.

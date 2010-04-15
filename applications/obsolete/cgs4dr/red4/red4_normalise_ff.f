@@ -97,7 +97,7 @@
 *   Check the parameters has been obtained successfully.
       IF ( STATUS .EQ. ADAM__OK ) THEN
 
-*      Check the normalisation method required and obtain any 
+*      Check the normalisation method required and obtain any
 *      parameters relevant to each method.
          IF ( NORM_METHOD .EQ. 'POLYFIT' ) THEN
 
@@ -164,18 +164,18 @@
      :        ADDRESS, QUAL_SLOT,  STATUS )
             QUAL_PTR = ADDRESS
             CALL DSA_DATA_SIZE( 'OUTPUT', MAXDIM, NDIM, DIMS, NELM,
-     :        STATUS ) 
+     :        STATUS )
 
 *         Obtain some workspace for the normalisation routine
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', ADDRESS, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', ADDRESS,
      :        SPECTRUM_SLOT, STATUS )
             SPECTRUM_PTR = ADDRESS
-            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'INT', ADDRESS, 
+            CALL DSA_GET_WORK_ARRAY( DIMS(1), 'INT', ADDRESS,
      :        SUM_SLOT, STATUS )
             SUM_PTR = ADDRESS
 
 *         Normalise the data using the method specified.
-*         (Note that if there have been any errors DSA will have already 
+*         (Note that if there have been any errors DSA will have already
 *         reported them).
             IF ( NORM_METHOD .EQ. 'POLYFIT' ) THEN
 
@@ -239,7 +239,7 @@
             CALL DSA_PUT_FITS_C( 'OUTPUT', 'NORMALIS', 'Yes', ' ',
      :        STATUS )
 
-*         Close DSA. (This routine will unmap all the workspace mapped 
+*         Close DSA. (This routine will unmap all the workspace mapped
 *         above).
             CALL DSA_CLOSE( STATUS )
          END IF

@@ -221,10 +221,10 @@ C projection centered on Declination (latitude) 0, Right Ascension
 C (longitude) 0. The data are defined at 2-degree intervals in both
 C coordinates. We thus need a data array dimensioned 181 by 91; the
 C array index runs from -90 to +90 in declination (91 elements) and
-C from -180 to +180 in right ascension (181 elements). The data at -180 
-C and +180 must be identical, of course, but they need to be duplicated 
+C from -180 to +180 in right ascension (181 elements). The data at -180
+C and +180 must be identical, of course, but they need to be duplicated
 C in the array as these two longitudes appear on opposite sides of the
-C map. 
+C map.
 C-----------------------------------------------------------------------
       REAL  RPDEG
       PARAMETER (RPDEG=3.1415926/180.0)
@@ -233,9 +233,9 @@ C-----------------------------------------------------------------------
       REAL Q(181,91), C(9)
       EXTERNAL PLCAIT
 C
-C Call PGENV to create a rectangular window of 4 x 2 units. This is 
+C Call PGENV to create a rectangular window of 4 x 2 units. This is
 C the bounding rectangle of the plot. The JUST argument is 1
-C to get equal scales in x and y.  
+C to get equal scales in x and y.
 C
       CALL PGBBUF
       CALL PGENV(-2.0, 2.0, -1.0, 1.0, 1, -2)
@@ -247,7 +247,7 @@ C
      1            'Hammer-Aitoff Equal-Area Projection of the Sphere')
       CALL PGSCH(1.0)
 C
-C Draw 7 lines of constant longitude at longitude 0, 60, 120, ..., 
+C Draw 7 lines of constant longitude at longitude 0, 60, 120, ...,
 C 360 degrees. Each line is made up of 90 straight-line segments.
 C
       DO 20 J=1,7
@@ -259,7 +259,7 @@ C
           CALL PGLINE(91,XC,YC)
    20 CONTINUE
 C
-C Draw 5 lines of constant latitude at latitudes -60, -30, 0, 30, 
+C Draw 5 lines of constant latitude at latitudes -60, -30, 0, 30,
 C 60 degrees. Each line is made up of 360 straight-line segments.
 C
       DO 40 J=1,5
@@ -274,7 +274,7 @@ C
 C
 C Compute the data to be contoured. In practice the data might be read
 C in from an external file. In this example the data are computed: they
-C are the galactic latitudes of the points on the sphere. Thus the 
+C are the galactic latitudes of the points on the sphere. Thus the
 C contours will be lines of constant galactic latitude.
 C
       DO 60 J=1,91
@@ -318,7 +318,7 @@ C-----------------------------------------------------------------------
           CALL PGDRAW(XWORLD, YWORLD)
       END IF
       END
- 
+
       SUBROUTINE AITOFF(B,L,X,Y)
 C-----------------------------------------------------------------------
 C Hammer-Aitoff projection.
@@ -341,10 +341,10 @@ C latitude and longitude (GLAT, GLONG).
 C
 C Arguments:
 C  RA, DEC (input): 1950.0 RA and Dec (radians).
-C  GLAT, GLONG (output): galactic latitude and longitude 
+C  GLAT, GLONG (output): galactic latitude and longitude
 C      (degrees).
 C
-C Reference: e.g., D. R. H. Johnson and D. R. Soderblom, A. J. v93, 
+C Reference: e.g., D. R. H. Johnson and D. R. Soderblom, A. J. v93,
 C  p864 (1987).
 C-----------------------------------------------------------------------
       REAL RA, RRA, DEC, RDEC, CDEC, R(3,3), E(3), G(3)

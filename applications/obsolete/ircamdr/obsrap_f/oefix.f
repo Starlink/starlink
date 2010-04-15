@@ -43,7 +43,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  IDIMS_1( NDIMS ),  ! dimensions of input DATA_ARRAY
      :  ODIMS( NDIMS ),    ! dimensions of output DATA_ARRAY
      :  PNTRI,	     	   ! pointer to input DATA_ARRAY component
@@ -117,7 +117,7 @@
 *
 * call subroutine to do work ...
 *
-	CALL OEFIXSUB( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRI), 
+	CALL OEFIXSUB( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRI),
      :                 %VAL( PNTRO), STATUS)
 *
 * tidy up the input/output structures

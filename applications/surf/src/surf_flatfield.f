@@ -4,17 +4,17 @@
 *     FLATFIELD
 
 *  Purpose:
-*     Flatfield demodulated SCUBA data 
+*     Flatfield demodulated SCUBA data
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_FLATFIELD( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
@@ -29,8 +29,8 @@
 
 *  ADAM parameters:
 *     IN = NDF (Read)
-*        The name of the NDF containing the demodulated data to be 
-*        flatfielded. This file should already have been run through the 
+*        The name of the NDF containing the demodulated data to be
+*        flatfielded. This file should already have been run through the
 *        REDUCE_SWITCH application.
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
@@ -45,12 +45,12 @@
 *     SURF: CHANGE_FLAT, SCUQUICK
 
 *  Algorithm:
-*        The data array of the IN file should have dimensions (N_BOLS,N_POS) 
-*     for most observing modes, where N_BOLS was the number of bolometers 
-*     measured and N_POS the number of times they were measured. In PHOTOM 
-*     mode the data array will have dimensions (N_BOLS,N_POS,3), where the 
-*     last dimension reflects the 3 different reduction algorithms used by 
-*     the REDUCE_SWITCH application depending which `beam' the bolometer was 
+*        The data array of the IN file should have dimensions (N_BOLS,N_POS)
+*     for most observing modes, where N_BOLS was the number of bolometers
+*     measured and N_POS the number of times they were measured. In PHOTOM
+*     mode the data array will have dimensions (N_BOLS,N_POS,3), where the
+*     last dimension reflects the 3 different reduction algorithms used by
+*     the REDUCE_SWITCH application depending which `beam' the bolometer was
 *     assumed to be working in.
 *        The identities of the bolometers taking the data are read from the
 *     .MORE.SCUBA.BOL_CHAN and .MORE.SCUBA.BOL_ADC arrays in the IN file
@@ -117,10 +117,10 @@ c Revision 1.5  1996/10/31  18:22:55  timj
 c Added modern Starlink header.
 c
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -252,7 +252,7 @@ c
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM,' ', 
+      CALL MSG_OUTIF (MSG__NORM,' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
@@ -300,7 +300,7 @@ c
          END IF
       END IF
 
-*  get the number of bolometers and the name of the flatfield 
+*  get the number of bolometers and the name of the flatfield
 
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOL, STATUS)
@@ -338,7 +338,7 @@ c
                CALL MSG_SETI ('DIM2', DIM(2))
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: main data '//
-     :           'array has bad dimensions (^NDIM) ^DIM1, ^DIM2', 
+     :           'array has bad dimensions (^NDIM) ^DIM1, ^DIM2',
      :           STATUS)
             END IF
          END IF
@@ -358,7 +358,7 @@ c
       DIMX (1) = SCUBA__NUM_CHAN
       DIMX (2) = SCUBA__NUM_ADC
 
-      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIMX, BOL_CALB, 
+      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIMX, BOL_CALB,
      :     DIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -376,7 +376,7 @@ c
          END IF
       END IF
 
-      CALL CMP_GETNI (IN_SCUBAX_LOC, 'BOL_QUAL', NDIM, DIMX, BOL_QUAL, 
+      CALL CMP_GETNI (IN_SCUBAX_LOC, 'BOL_QUAL', NDIM, DIMX, BOL_QUAL,
      :     DIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -394,7 +394,7 @@ c
          END IF
       END IF
 
-      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN',
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -408,7 +408,7 @@ c
       END IF
 
 
-      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_ADC', 
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_ADC',
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -427,7 +427,7 @@ c
 
 *     set the default
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
-      
+
 
 *  OK, propagate the input ndf to the output
 
@@ -443,22 +443,22 @@ c
      :  ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'UPDATE', OUT_V_PTR,
      :  ITEMP, STATUS)
- 
+
 * Bad bit mask
       CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
-*  flatfield the data 
+*  flatfield the data
 
       CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_SETC ('FLAT', FLAT)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: applying flatfield from ^FLAT', STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
-     :     %VAL(CNF_PVAL(OUT_D_PTR)), %VAL(CNF_PVAL(OUT_V_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_D_PTR)), %VAL(CNF_PVAL(OUT_V_PTR)),
      :     %VAL(CNF_PVAL(OUT_Q_PTR)),
-     :     BOL_CHAN, BOL_ADC, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :     BOL_CHAN, BOL_ADC, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
      :     BOL_CALB, BOL_QUAL, STATUS)
       END IF
 
@@ -476,5 +476,5 @@ c
       CALL NDF_ANNUL (OUT_NDF, STATUS)
 
       CALL NDF_END (STATUS)
- 
+
       END

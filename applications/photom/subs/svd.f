@@ -1,6 +1,6 @@
 ************************************************************************
 
-	SUBROUTINE SVD_COMP( MATRIX, DIM_X, DIM_Y, 
+	SUBROUTINE SVD_COMP( MATRIX, DIM_X, DIM_Y,
      :                       SIZE_X, SIZE_Y, W, V, STATUS )
 
 *+
@@ -8,7 +8,7 @@
 *     SVD_COMP
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -25,7 +25,7 @@
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -52,7 +52,7 @@
 
 *  Global Constants:
         INCLUDE 'SAE_PAR'         ! Standard SAE constants
- 
+
 	INTEGER BUFF_SIZE
 	PARAMETER( BUFF_SIZE = 32 )	! Maximum anticipated value of size_Y
 
@@ -67,7 +67,7 @@
 	REAL NORM
 	REAL C, F, G, H, S, X, Y, Z
 	INTEGER I, J, K, L, LOOP, N
-        
+
         INTEGER STATUS
 
 	IF ( STATUS .NE. SAI__OK ) RETURN
@@ -76,13 +76,13 @@
             STATUS  =  SAI__ERROR
             CALL ERR_REP( 'ERR_SVD_TOLARGE',
      :        'SVD: Unacceptable size', STATUS )
-            GOTO 99 
+            GOTO 99
         ELSE IF ( SIZE_Y .GT. BUFF_SIZE )THEN
             STATUS  =  SAI__ERROR
             CALL ERR_REP( 'ERR_SVD_TOBIG',
      :        'SVD: matrix too big', STATUS )
-            GOTO 99 
-        ENDIF               
+            GOTO 99
+        ENDIF
 
 *    Householder reduction to bidiagonal form
 
@@ -269,9 +269,9 @@
                 STATUS  =  SAI__ERROR
                 CALL ERR_REP( 'ERR_SVD_CONVERGENCE',
      :             'SVD: No convergence in 30 iterations ', STATUS )
-                GOTO 99 
-            ENDIF                
-            
+                GOTO 99
+            ENDIF
+
 	    X = W( L ) 		! Shift from bottom 2-by-2 minor
 	    N = K - 1
 	    Y = W( N )
@@ -282,7 +282,7 @@
 	    G = SQRT( F * F + 1.0 )
 	    F = ( ( X - Z ) * ( X + Z )
      1			+ H * ( Y / ( F + SIGN( G, F ) ) - H ) ) / X
-     
+
 *     Next QR transformation
 
 	    C = 1.0
@@ -340,10 +340,10 @@
 
 *+
 *  Name :
-*     SV_BCSB 
+*     SV_BCSB
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -352,11 +352,11 @@
 *     CALL SV_BCSB( U, W, V, DIM_X, DIM_Y, SIZE_X, SIZE_Y, B )
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -392,7 +392,7 @@
 
 	REAL SUM, WORK( BUFF_SIZE ), MAX_W, MIN_W
 	INTEGER I, J, K
-	
+
 *    ZERO the small W's
 
 	MAX_W = W( 1 )
@@ -434,7 +434,7 @@
 *     SVD_REC
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -443,11 +443,11 @@
 *     CALL SVD_REC( U, W, V, DIM_X, DIM_Y, SIZE_X, SIZE_Y )
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -497,7 +497,7 @@
     	  DO J = 1, SIZE_Y
     	    WORK( I, J ) = 0.0
     	    DO K = 1, SIZE_Y
-    	      WORK( I, J ) = 
+    	      WORK( I, J ) =
      :           WORK( I, J ) + V( J, K ) * W( K ) * U( I, K )
     	    END DO
     	  END DO

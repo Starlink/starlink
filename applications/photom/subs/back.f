@@ -47,13 +47,13 @@
 *     USEMSK = LOGICAL (Given)
 *        Flag to indicate use of mask
 *     NXL = INTEGER (Given)
-*        X value for lower integration limit 
+*        X value for lower integration limit
 *     NXH = INTEGER (Given)
-*        X value for upper integration limit 
+*        X value for upper integration limit
 *     NYL = INTEGER (Given)
-*        Y value for lower integration limit 
+*        Y value for lower integration limit
 *     NYH = INTEGER (Given)
-*        Y value for upper integration limit 
+*        Y value for upper integration limit
 *     VALUES( * ) = REAL (Given)
 *        Work space array for storing sky values
 *     NV = INTEGER (Given and Returned)
@@ -96,7 +96,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 

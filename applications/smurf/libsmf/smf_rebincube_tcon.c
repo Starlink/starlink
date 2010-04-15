@@ -31,7 +31,7 @@
 *        Address of location at which to store the effective exposure
 *        time for the time slice.
 *     tcon = double * (Returned)
-*        Address of location at which to store the conversion factor from 
+*        Address of location at which to store the conversion factor from
 *        Tsys value to Variance for spectra form the specified time slice.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
@@ -41,7 +41,7 @@
 
 *  Description:
 *     Returns the total and effective exposure times for the current time
-*     slice (described by the supplied header structure)a time slice, and 
+*     slice (described by the supplied header structure)a time slice, and
 *     a pointer to the start of the Tsys array for the time slice.
 
 *  Authors:
@@ -90,8 +90,8 @@
 
 #define FUNC_NAME "smf_rebincube_tcon"
 
-const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon, 
-                                  float *texp, float *teff, double *tcon, 
+const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon,
+                                  float *texp, float *teff, double *tcon,
                                   int *status ){
 
 /* Local Variables */

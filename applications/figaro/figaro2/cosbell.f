@@ -10,10 +10,10 @@ C     other data with the same dimensions) using IMULT.
 C
 C     Command parameters -
 C
-C     SPECTRUM (Character) The name of the structure containing the 
+C     SPECTRUM (Character) The name of the structure containing the
 C              template data.
 C
-C     BELLPC   (Numeric) The percentage of the data that is to be 
+C     BELLPC   (Numeric) The percentage of the data that is to be
 C              covered by the rising (or falling) part of the cosine
 C              bell.
 C
@@ -46,7 +46,7 @@ C
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
       INTEGER      NX            ! Size of first image dimension
-      INTEGER      OPTR          ! Dynamic-memory pointer to output data 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER      OSLOT         ! Map slot number output data array
       REAL         PERCENT       ! See BELLPC above
@@ -106,7 +106,7 @@ C
 C     F I G _ 1 D C O S B
 C
 C     Generates a 1-dimensional data array that is zero at each end,
-C     1 for most of the central section, with a certain percentage 
+C     1 for most of the central section, with a certain percentage
 C     at each end apodised using a cosine bell.
 C
 C     Parameters -  (">" input, "<" output, "!" modified)
@@ -160,7 +160,7 @@ C
 C     F I G _ 2 D C O S B
 C
 C     Generates a 2-dimensional data array that is zero at each end,
-C     1 for most of the central section, with a certain percentage 
+C     1 for most of the central section, with a certain percentage
 C     at each end apodised using a cosine bell.
 C
 C     Parameters -  (">" input, "<" output, "!" modified)

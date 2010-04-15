@@ -7,7 +7,7 @@
 *    CALL FH_FUNC(IFLAG,M,N,XC,RC,AJC,LJC,MIW,LIW,WN,NIW)
 
 * Purpose:
-*  Evaluate the residuals and their first derivatives for double with 
+*  Evaluate the residuals and their first derivatives for double with
 *  fixed height ratio.
 *
 * Description
@@ -27,9 +27,9 @@
 *   LJC = INTEGER (Given)
 *        =M
 *   LIW = INTEGER (Given)
-*       
+*
 *   NIW = INTEGER (Given)
-*       
+*
 *   RC(M) = DOUBLE PRECISION ARRAY (Returned)
 *        Residuals of fit?
 *   AJC(LJC,N) = DOUBLE PRECISION ARRAY (Returned)
@@ -38,7 +38,7 @@
 *        If not equal to 0, derivatives calculated
 *   MIW(LIW) = INTEGER ARRAY (Not used)
 *   WN(NIW) = DOUBLE PRECISION ARRAY (Not used)
-* History:     
+* History:
 *    TNW 25/10/90 Weighting added (had only applied to SK before!)
 *
       implicit none

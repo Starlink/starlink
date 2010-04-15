@@ -6,7 +6,7 @@ C    J.D. Scargle, (1982), Astrophys. J., 263:835.
 C
       IMPLICIT NONE
 C Imports:
-      INTEGER NPT                               ! no. datapairs 
+      INTEGER NPT                               ! no. datapairs
       DOUBLE PRECISION X(NPT), Y(NPT)           ! (x,y) datapairs
       DOUBLE PRECISION PMASK    ! proportion of data to be endmasked either end
       DOUBLE PRECISION FRLO                     ! lower end of frequency range
@@ -16,12 +16,12 @@ C Exports:
       REAL FR(*)                                ! array of frequencies
       REAL PER(*)                               ! array of Periodogram values
       INTEGER NFR                               ! number of (fr,win) pairs
-      LOGICAL OK                                ! success flag 
+      LOGICAL OK                                ! success flag
 C Local:
       DOUBLE PRECISION DX                       ! x-spacings
       DOUBLE PRECISION DXMIN                    ! smallest X-spacing
-      DOUBLE PRECISION FRMAX                    ! pseudo-Nyquist frequency 
-      DOUBLE PRECISION FREQ                     ! holds doub. prec. frequencies 
+      DOUBLE PRECISION FRMAX                    ! pseudo-Nyquist frequency
+      DOUBLE PRECISION FREQ                     ! holds doub. prec. frequencies
       DOUBLE PRECISION FRQ2                     ! holds twice angular freq.
       DOUBLE PRECISION SINSUM                   ! sum of sine terms
       DOUBLE PRECISION COSSUM                   ! sum of cosine terms
@@ -31,8 +31,8 @@ C Local:
       DOUBLE PRECISION ODSUM                    ! sum of "odd terms"
       DOUBLE PRECISION TAU                      ! delay term
       DOUBLE PRECISION TPI                      ! two-times-pi
-      PARAMETER ( TPI = 6.2831853072D+00 ) 
-      INTEGER NFRMAX                        ! maximum size of FR and WIN arrays 
+      PARAMETER ( TPI = 6.2831853072D+00 )
+      INTEGER NFRMAX                        ! maximum size of FR and WIN arrays
       PARAMETER ( NFRMAX = 20000 )
       INTEGER I, J                              ! do-loop variables
       OK = .TRUE.
@@ -54,7 +54,7 @@ C
         IF (DX .LT. DXMIN) DXMIN = DX
       ENDDO
 C
-C  Evaluate the Pseudo-Nyquist frequency. This is set equal to half the 
+C  Evaluate the Pseudo-Nyquist frequency. This is set equal to half the
 C reciprocal of the smallest X-spacing
 C
       IF ( DXMIN .GT. 1.0D-10 )THEN
@@ -70,7 +70,7 @@ C
      :  '(''   PDGRAM:  too many frequencies specified'')')
         OK = .FALSE.
         RETURN
-      ENDIF      
+      ENDIF
       DO I = 1,NFR
         FREQ = FRLO + DFR * DBLE( I-1 )
         FR(I) = REAL( FREQ )
@@ -92,10 +92,10 @@ C  Evaluate TAU.
           TAU = TAU / DBLE(NPT)
         ENDIF
 C  Accumulate sums.
-        SSQSUM = 0.0D+00 
-        CSQSUM = 0.0D+00 
-        EVSUM = 0.0D+00 
-        ODSUM = 0.0D+00 
+        SSQSUM = 0.0D+00
+        CSQSUM = 0.0D+00
+        EVSUM = 0.0D+00
+        ODSUM = 0.0D+00
         DO J = 1,NPT
           SSQSUM = SSQSUM + DSIN( FREQ * (X(J)-TAU) )**2
           CSQSUM = CSQSUM + DCOS( FREQ * (X(J)-TAU) )**2
@@ -108,6 +108,6 @@ C  Calculate Periodogram for frequency FREQ
         ELSE
           PER(I) = 0.5 * REAL( EVSUM**2/CSQSUM )
         ENDIF
-      ENDDO 
+      ENDDO
       RETURN
       END

@@ -17,14 +17,14 @@
 
 *  Arguments:
 *     data = smfData* (Given)
-*        Pointer to smfData struct 
+*        Pointer to smfData struct
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     Search for MAPCOORD and free resources.
 *
-*     
+*
 *  Authors:
 *     Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -90,7 +90,7 @@ void smf_close_mapcoord( smfData *data, int *status ) {
   /* We are freeing resources so we should not return if status
      is bad. Instead we should be defensive and check pointers
      before dereferencing them. */
-  
+
   if( data ) {
     file = data->file;
 
@@ -98,7 +98,7 @@ void smf_close_mapcoord( smfData *data, int *status ) {
       /* annul mapcoord NDF if it exists (frees memory used by LUT) */
       if( file->mapcoordid != NDF__NOID ) {
 	ndfAnnul( &(file->mapcoordid), status );
-	
+
 	if( *status == SAI__OK ) {
 	  data->lut = NULL;
 	} else {

@@ -151,7 +151,7 @@
 
 static smfData *
 smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
-                               const smfData *refdata, const char hdspath[], 
+                               const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status );
 

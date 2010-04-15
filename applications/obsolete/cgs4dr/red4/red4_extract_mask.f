@@ -107,16 +107,16 @@
 
 *            Open the mask template file CGS4_TEMPLATES:MASK_TEMPLATE.DST
 *            and use this as a basis for creating the new mask structure
-               CALL DSA_NAMED_INPUT( 'MASK_TEMP', 
+               CALL DSA_NAMED_INPUT( 'MASK_TEMP',
      :            MASK_TEMPLATE, STATUS )
                CALL DSA_NAMED_OUTPUT( 'MASK', MASK,
      :           'MASK_TEMP', 0, 0, STATUS )
 
 *            Check that the sizes of the data arrays contained in these
 *            structures match up. (If any do not, a bad status will
-*            be returned). 
+*            be returned).
 *            (Note that the actual dimensions of the data arrays are not
-*            checked to be the same, so for example a 62x58 mask can be 
+*            checked to be the same, so for example a 62x58 mask can be
 *            applied to a 58x62 data structure. Perhaps this check should
 *            be included).
                CALL DSA_MATCH_SIZES( 'DATA', 'MASK', STATUS )
@@ -162,20 +162,20 @@
                ELSE
 
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 'RED4_EXTRACT_MASK: Error '/ 
+                  CALL ERR_REP( ' ', 'RED4_EXTRACT_MASK: Error '/
      :              /'creating mask and mapping data', STATUS )
                END IF
             ELSE
 
                STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 'RED4_EXTRACT_MASK: Data '/ 
+               CALL ERR_REP( ' ', 'RED4_EXTRACT_MASK: Data '/
      :           /'structure does not contain a quality array ',
      :           STATUS )
             END IF
          ELSE
 
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'RED4_EXTRACT_MASK: Error opening '/ 
+            CALL ERR_REP( ' ', 'RED4_EXTRACT_MASK: Error opening '/
      :        /'DSA and data structures', STATUS )
          END IF
 

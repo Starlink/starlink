@@ -95,7 +95,7 @@ proc raise { window { above "" } } {
 #  DEBUG: track all puts.
 #rename ::puts ::puts_orig
 #proc ::puts {args} {
-#   for { set i [info level] } { $i > -1 } { incr i -1 } { 
+#   for { set i [info level] } { $i > -1 } { incr i -1 } {
 #      ::puts_orig "$i: [info level $i]"
 #   }
 #   eval ::puts_orig $args
@@ -106,7 +106,7 @@ proc raise { window { above "" } } {
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Set the place for locating all external files.
-if { [info exists env(GAIA_DIR)] } { 
+if { [info exists env(GAIA_DIR)] } {
    set gaia_dir $env(GAIA_DIR)
    set gaia_help $gaia_dir/../../help/gaia
 }
@@ -117,7 +117,7 @@ if { [info exists env(GAIA_DIR)] } {
 #  (missing .sdfs).
 if { $argc >= 1 } {
    set image [lindex $argv 0]
-   
+
    #  If first argument doesn't start with a '-' then its an image,
    #  otherwise no image has been given and we just get on with it.
    if { ! [string match {-*} $image] } {
@@ -126,7 +126,7 @@ if { $argc >= 1 } {
       #  Set the HDU, this will be removed from the name, if needed.
       set hdu [.namer fitshdunum]
       if { $hdu != 0 } {
-         lappend argv "-hdu" 
+         lappend argv "-hdu"
          lappend argv "$hdu"
          incr argc 2
       }
@@ -140,7 +140,7 @@ if { $argc >= 1 } {
 #  See if this is the tabbed interface.
 set usetabbed 0
 set tindex [lsearch -exact $argv "-tabbedgaia"]
-if { $tindex != -1 } { 
+if { $tindex != -1 } {
    incr tindex
    set usetabbed [lindex $argv $tindex]
 }
@@ -169,7 +169,7 @@ if { [info exists env(NDF_FORMATS_IN)] } {
    set new_types [split $env(NDF_FORMATS_IN) ","]
    foreach pair $new_types {
       regexp {([^\(]*).([^\)]*)} $pair dummy name type
-      if { $name != "NDF" && $type != ".fits" && $type != ".fit" && 
+      if { $name != "NDF" && $type != ".fits" && $type != ".fit" &&
            $type != ".fts" && $name != "GIF" && $name != "TIFF" } {
          lappend file_types [list $name\($type\) *${type}]
       }

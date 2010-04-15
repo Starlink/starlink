@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE line_WRITS
 *
-*   Descritpion 
+*   Descritpion
 *      Encode string value into internal buffer under format control.
 *
 *   Authors:

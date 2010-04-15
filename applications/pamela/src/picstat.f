@@ -60,7 +60,7 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE', 'READ',IMAGE, STATUS)
       CALL NDF_BOUND(IMAGE,2,LBND,UBND,NDIM,STATUS)
@@ -105,7 +105,7 @@ C
          IF(NREG.LE.0) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP(' ','No regions loaded',STATUS)
-         ELSE 
+         ELSE
             CALL MSG_SETI('NREG',NREG)
             IF(NREG.EQ.1) THEN
                CALL MSG_OUT(' ','^NREG region loaded.',STATUS)
@@ -122,14 +122,14 @@ C
          CALL PAR_GDR0I('NBIN', 100, 1, 400,.FALSE.,NBIN,STATUS)
       END IF
 C
-C     Map 
+C     Map
 C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
       CALL NDF_TEMP(PLACE, STATUS)
       CALL NDF_NEW('_INTEGER',2,LBND,UBND,PLACE,WORK,STATUS)
       CALL NDF_MAP(WORK,'Data','_INTEGER','WRITE',WPTR,EL,STATUS)
 C
-      CALL PIC_STAT(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(WPTR)), 
+      CALL PIC_STAT(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(WPTR)),
      :              NXS, NYS, XLO, YLO,
      &     REGION, NREG, CLIP, PLOT, RANGE, NBIN, DEVICE, MEAN,
      &     MEDVAL, STATUS)
@@ -140,13 +140,13 @@ C
       CALL PAR_PUT0R('PIC_MEDIAN',MEDVAL,STATUS)
       CALL NDF_END(STATUS)
       RETURN
-      END	
+      END
 
-      SUBROUTINE PIC_STAT(DATA, MASK, NXS, NYS, XLO, YLO, 
-     &     REGION, NREG, CLIP, PLOT, RANGE, NBIN, DEVICE, 
+      SUBROUTINE PIC_STAT(DATA, MASK, NXS, NYS, XLO, YLO,
+     &     REGION, NREG, CLIP, PLOT, RANGE, NBIN, DEVICE,
      &     MEAN, MEDVAL, STATUS)
 C
-C     Computes simple statistics on pixels in a data section 
+C     Computes simple statistics on pixels in a data section
 C     DATA(NXS,NYS) with lower left corner XLO, YLO.
 C
 C
@@ -196,12 +196,12 @@ C
                   SUM1 = SUM1 + VAL
                   IF(VAL.LT.PMIN) THEN
                      IXMIN = IX+XLO-1
-                     IYMIN = IY+YLO-1              
+                     IYMIN = IY+YLO-1
                      PMIN  = VAL
                   END IF
                   IF(VAL.GT.PMAX) THEN
                      IXMAX = IX+XLO-1
-                     IYMAX = IY+YLO-1              
+                     IYMAX = IY+YLO-1
                      PMAX  = VAL
                   END IF
                END IF
@@ -379,7 +379,7 @@ C
             NLO  = 0
 C
 C     Accumulate histogram
-C     
+C
             DO L = 1, MAXHIST
                HIST(L) = 0.
             END DO
@@ -404,7 +404,7 @@ C
             END DO
 C
 C     Make into CDF
-C     
+C
             NSUM = NLO
             DO I = 1, MAXHIST
                NSUM    = NSUM + NINT(HIST(I))
@@ -415,8 +415,8 @@ C
                L = L + 1
             END DO
             NEWD1 = D1 + (D2-D1)*REAL(L-1)/REAL(MAXHIST)
-            NEWD2 = D1 + (D2-D1)*REAL(L  )/REAL(MAXHIST) 
-            D1    = NEWD1      
+            NEWD2 = D1 + (D2-D1)*REAL(L  )/REAL(MAXHIST)
+            D1    = NEWD1
             D2    = NEWD2
          END DO
          MEDVAL = (D1+D2)/2.

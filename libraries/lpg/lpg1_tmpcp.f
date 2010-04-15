@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,7 +79,7 @@
 *           be open by the NDF system. In this case the temporary NDF
 *           is copied to the requested position once the application has
 *           finished.  The TMPLST group holds adjacent pairs of file
-*           specs; the first one in each pair is the spec of the temporary 
+*           specs; the first one in each pair is the spec of the temporary
 *           output NDF, the second is the spec of the requested output NDF.
 
 *  Status:
@@ -91,12 +91,12 @@
       INTEGER I                  ! Index of current element
       INTEGER INDF1              ! Identifier for temporary output NDF
       INTEGER INDF2              ! Identifier for requested output NDF
-      INTEGER JUNK               ! Un-used argument   
+      INTEGER JUNK               ! Un-used argument
       INTEGER PLACE2             ! Placeholder for requested output NDF
       INTEGER SIZGRP             ! No. of elements in the group
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin a new NDF context.
@@ -123,7 +123,7 @@
          CALL NDF_OPEN( DAT__ROOT, REQSPC, 'UPDATE', 'UNKNOWN', INDF2,
      :                  PLACE2, STATUS )
          IF( INDF2 .NE. NDF__NOID ) THEN
-            CALL NDF_DELET( INDF2, STATUS ) 
+            CALL NDF_DELET( INDF2, STATUS )
 
 *  Now open a new NDF in the place of the original NDF.
             CALL NDF_OPEN( DAT__ROOT, REQSPC, 'WRITE', 'NEW', JUNK,
@@ -134,10 +134,10 @@
          CALL NDF_COPY( INDF1, PLACE2, INDF2, STATUS )
 
 *  Annul the requested NDF identifiers.
-         CALL NDF_ANNUL( INDF2, STATUS ) 
+         CALL NDF_ANNUL( INDF2, STATUS )
 
 *  Delete the temporary NDF.
-         CALL NDF_DELET( INDF1, STATUS ) 
+         CALL NDF_DELET( INDF1, STATUS )
 
       END DO
 

@@ -3,22 +3,22 @@
      &                 LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
-C   
+C Subroutine:
+C
 C        I S F I T 2
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), STOKES_I (><), STOKES_Q (><), STOKES_QV (><), STOKES_U (><),
 C STOKES_UV (><), TITLE (>), LAMBDA (<), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C
 C Performs a least-squares fit of a Serkowski law to the current array
@@ -121,14 +121,14 @@ C
       ENDIF
       IF (CP(I).EQ.'u') THEN
        UMAX = PV(I)/100.
-       IF (.NOT.PCONST(I)) THEN 
+       IF (.NOT.PCONST(I)) THEN
         MFIT = MFIT+1
         LISTA(MFIT) = 2
        ENDIF
       ENDIF
       IF (CP(I).EQ.'w') THEN
        WMAX = PV(I)
-       IF (.NOT.PCONST(I)) THEN 
+       IF (.NOT.PCONST(I)) THEN
         MFIT = MFIT+1
         LISTA(MFIT) = 3
        ENDIF
@@ -205,10 +205,10 @@ C     &           LISTA,MFIT,COV,ALP,NALP,CHI2,LSFUN2,OK)
        STOKES_U(I) = REAL(UMAX*EXP(-K*(LOG(WMAX/LAMBDA(I))**2)))
        STOKES_QV(I) = 0.
        STOKES_UV(I) = 0.
-      ENDDO       
+      ENDDO
       TITLE='Serkowski fit'
       GOTO 666
-      
+
 555   CONTINUE
       CALL WR_ERROR('Cannot read parameter',OUT_LU)
 

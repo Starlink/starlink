@@ -13,7 +13,7 @@
 *     CALL KPG1_NDFNM( INDF, NAME, NMLEN, STATUS )
 
 *  Description:
-*     Gets the full path to the supplied NDF, then removes any directory 
+*     Gets the full path to the supplied NDF, then removes any directory
 *     path from the start, and return the resulting string.
 *
 *     Note, Unix file names are assumed.

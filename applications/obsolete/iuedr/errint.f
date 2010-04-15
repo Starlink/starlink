@@ -20,7 +20,7 @@
 *         Conversion to SGP/16 style.
 *
 *   Method:
-*      The integer is coded in concise format. Just direct the text 
+*      The integer is coded in concise format. Just direct the text
 *      to STDERR.
 *
 *-

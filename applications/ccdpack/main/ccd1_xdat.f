@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine extracts data from an input array and writes it
-*     to an output array, discarding the first two columns and 
+*     to an output array, discarding the first two columns and
 *     transposing it.
 
 *  Arguments:
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
          DO J = 1, NREC
             OUT( I - 2, J ) = IN( J, I )
          END DO
-      END DO 
+      END DO
 
       END
 * $Id$

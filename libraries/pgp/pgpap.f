@@ -1,4 +1,4 @@
-C*PGPAP -- change the size of the view surface 
+C*PGPAP -- change the size of the view surface
 C%void cpgpap(float width, float aspect);
 C+
       SUBROUTINE PGPAP (WIDTH, ASPECT)
@@ -8,9 +8,9 @@ C This routine changes the size of the view surface ("paper size") to a
 C specified width and aspect ratio (height/width), in so far as this is
 C possible on the specific device. It is always possible to obtain a
 C view surface smaller than the default size; on some devices (e.g.,
-C printers that print on roll or fan-feed paper) it is possible to 
+C printers that print on roll or fan-feed paper) it is possible to
 C obtain a view surface larger than the default.
-C 
+C
 C This routine should be called either immediately after PGBEG or
 C immediately before PGPAGE. The new size applies to all subsequent
 C images until the next call to PGPAP.

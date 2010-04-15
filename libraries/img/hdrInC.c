@@ -17,7 +17,7 @@
  *     Fortran subroutine hdr_in.
  *     On return, values are converted back to C form if necessary.
  *
- *     See the hdr_inc documentation for what the subroutine does. 
+ *     See the hdr_inc documentation for what the subroutine does.
 
  *  Arguments:
  *     param = char * (Given)
@@ -31,7 +31,7 @@
  *        'COMMENT' items often have many occurrences). The number of
  *        components may be queried using the HDR_NUMB routine.
  *     value = char * (Given and Returned)
- *        Pointer to first element of an array of chars. 
+ *        Pointer to first element of an array of chars.
  *        These are unmodified if the items doesn't exist.
  *     value_length = int (Given)
  *        Length of the elements of array pointed to by value.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -155,7 +155,7 @@ void hdrInC( char *param,
 
   ptr1 = fvalue;
   ptr2 = value;
-  for( i=0; i<nparam; i++ ) { 
+  for( i=0; i<nparam; i++ ) {
     cnf_imprt( ptr1, fvalue_length, ptr2 );
     ptr1 += fvalue_length;
     ptr2 += value_length;

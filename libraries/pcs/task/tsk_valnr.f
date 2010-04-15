@@ -76,23 +76,23 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       INTEGER NDIMS        ! number of dimensions of the given array
- 
+
       INTEGER DIMS(NDIMS)  ! the dimensions of the given array
- 
+
       REAL RVALS(1:*) ! the given array, treated as a vector
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING ! the returned string
- 
+
 *  Status:
       INTEGER STATUS
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       CALL TASK_ENCNR ( NDIMS, DIMS, RVALS, STRING, STATUS )
- 
+
       END

@@ -7,7 +7,7 @@ C
 C     F I G _ R E B I N 2 D
 C
 C     Rebins a two-dimensional array according to a given set of
-C     transformations.  
+C     transformations.
 C
 C     Parameters -  (">" input, "!" modified, "<" output)
 C
@@ -36,20 +36,20 @@ C     (>) YLOG    (Logical) True if the data is to be rebinned
 C                 logarithmicaly in y.
 C     (>) NCXY    (Integer) The first dimension of XCOEFF.  The number
 C                 of y-terms in the transformation.
-C     (>) NCXX    (Integer) The second dimension of XCOEFF.  The 
+C     (>) NCXX    (Integer) The second dimension of XCOEFF.  The
 C                 number of x-terms in the transformation.
 C     (>) XCOEFF  (Double precision XCOEFF(NCXY,NCXX)) Gives the
 C                 coefficients for the x-transformation from pixel
 C                 number in DATA to the result coordinate values for
 C                 RESULT.  That is, the X coordinate value (X') for
-C                 pixel position X,Y is given by the polynomial 
+C                 pixel position X,Y is given by the polynomial
 C                 X'=Cncxx*X**(NCXX-1)+...C2*X+C1 where the Cs are
 C                 Cn=XCOEFF(NCXY,n)*Y**(NCXX-1)+...+XCOEFF(1,n)
 C                 Note that this means that the coefficients giving
 C                 the constant terms in the polynomials are the
 C                 higher numbered elements.  This is possibly a
 C                 little unusual.  Note also that for the purposes of
-C                 this routine, the first pixel of an array is 
+C                 this routine, the first pixel of an array is
 C                 regarded as covering the range 0.0 to 1.0
 C     (>) NCYY    (Integer) The first dimension of YCOEFF.
 C     (>) NCYX    (Integer) The second dimension of YCOEFF.
@@ -65,7 +65,7 @@ C     (>) NDX     (Integer) To improve the accuracy of the rebinning,
 C                 each original pixel will be split in X into NDX
 C                 pixels, and each of these will be rebinned separately.
 C                 This also allows interpolation of the original data to
-C                 be performed.  
+C                 be performed.
 C     (>) NDY     (Integer) Like NDY, but in Y.
 C     (>) MODE    (Integer) Not used if both NDX and NDY are 1.
 C                 Specifies the interpolation to be used to redistribute
@@ -75,7 +75,7 @@ C                 0 => equal distribution - assume data is flat over
 C                 pixel.
 C                 1 => fit 2d parabola (Z=a*x**2+b*y**2+c*x*y+d*x+e*y+f)
 C                 to the local 9 pixels and use result to interpolate.
-C     (>) EXTRA   (Real, perhaps an array) Reserved for use for any 
+C     (>) EXTRA   (Real, perhaps an array) Reserved for use for any
 C                 parameters that may be needed by other values of MODE
 C                 in future versions.
 C     (!) PX      (Real PX(NX+1,2)) Workspace.
@@ -107,7 +107,7 @@ C     8th April 1987   KS / AAO.  GEN_SFIT2D is now FIG_SFIT2D - call
 C                      modified.
 C     18th March 1993  HME / UoE, Starlink.  GEN_POLY2D requires this
 C                      routine to supply a work space. Calls changed.
-C     2005 June 1      MJC / Starlink Use CNF_PVAL for pointers to 
+C     2005 June 1      MJC / Starlink Use CNF_PVAL for pointers to
 C                      mapped data.
 C+
       IMPLICIT NONE
@@ -123,7 +123,7 @@ C
       DOUBLE PRECISION XCOEFF(NCXY,NCXX),YCOEFF(NCYY,NCYX)
 C
 C     Functions
-C     
+C
       REAL GEN_POLY2D
 C
 C     Local variables
@@ -212,7 +212,7 @@ C
 C
 C     Initialise the picture x,y pixel location arrays
 C     Note: The four loops used here look messy, but are faster
-C     than a set of tests within one loop. The only differences 
+C     than a set of tests within one loop. The only differences
 C     concern whether the logarithmic versions of the position
 C     functions are used or not.  The PX values give the transformed
 C     X values for the lowest valued corner of the pixel, ditto the
@@ -312,7 +312,7 @@ C
       IF ((NDX.LE.1).AND.(NDY.LE.1)) FLAT=.TRUE.
       SAME=.FALSE.
 C
-C     L1,2 are the indices in PX,PY of the locations of the 
+C     L1,2 are the indices in PX,PY of the locations of the
 C     present and next row position data.
 C
       L1=1
@@ -575,7 +575,7 @@ C
                END IF
             END IF
          END IF
-C        
+C
 C        End loop through rows
 C
       END DO
@@ -585,11 +585,11 @@ C
       CALL DSA_FREE_WORKSPACE(SLOT,STATUS)
 C
 C     END of program
-C 
+C
 C     ----------------------------------------------------------------
 C
 C     APPENDIX A - Nomenclature for the calculation of the transformed
-C                  coordinates of the corners of the sub-pixels.  
+C                  coordinates of the corners of the sub-pixels.
 C
 C     The transformed coordinates of each corner of the pixel itself
 C     are calculated directly by polynomial evaluation, giving the
@@ -640,7 +640,7 @@ C     top surface determined by the data distribution over the pixel)
 C     covering each result pixel, and adding that number to the result
 C     pixel.  This calculation is NOT atempted by this program.
 C
-C     In the simplest (and fastest!) case, with NDX and NDY both 1, 
+C     In the simplest (and fastest!) case, with NDX and NDY both 1,
 C     the program assumes that each input pixel maps onto the result
 C     array as a non-rotated rectangle.  The X and Y positions of the
 C     sides are taken as the average of the X and Y positions of the
@@ -651,14 +651,14 @@ C     covers each result pixel.
 C
 C     If NDX and/or NDY are greater than 1, the calculation is basically
 C     the same, except that the input pixel is sub-divided into NDX by
-C     NDY sub-pixels first.  It is then the sub-pixels that are 
+C     NDY sub-pixels first.  It is then the sub-pixels that are
 C     assumed to map in a rectangular and non-rotated way into the
 C     result array.  As NDX and NDY increase so do a) the CPU time
 C     used, and b) the goodness of the approximation of the set of
 C     non-rotated rectangles to the actual general quadrilateral.  If
 C     MODE is 0, the surface of the data is assumed to be flat over the
 C     pixel and each of the sub-pixels is simply given 1/(NDX*NDY) of
-C     the data in the input pixel.  
+C     the data in the input pixel.
 C
 C     If MODE is 1, a 2D parabola is fitted
 C     to the local 9 input pixels and the value of the parabola at the

@@ -100,14 +100,14 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Magic-value constants
- 
+
 *  Arguments Given:
       REAL FILL
       INTEGER NCOLI
@@ -116,80 +116,80 @@
       INTEGER NLINO
       REAL IN( NCOLI, NLINI )
       LOGICAL ZERO
- 
+
 *  Arguments Returned:
       REAL OUT( NCOLO, NLINO )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       INTEGER J                  ! Pixel count
       INTEGER K                  ! Line count
       LOGICAL PADLIN             ! Columns are to be padded at the end
                                  ! of each line?
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Jump forward if output is to be filled with zeros.
       IF ( .NOT. ZERO ) THEN
- 
+
          PADLIN = NCOLO .GT. NCOLI
- 
+
 *  Loop for each pixel in the unpadded or trimmed array.
          DO K = 1, MIN( NLINI, NLINO )
             DO J = 1, MIN( NCOLI, NCOLO )
- 
+
 *  The Fourier transform cannot handle the magic values so replace them
 *  with the fill value.
                IF ( IN( J, K ) .EQ. VAL__BADR ) THEN
                   OUT( J, K ) = FILL
- 
+
 *  Just copy the value across to the padded array.
                ELSE
                   OUT( J, K ) = IN( J, K )
- 
+
                END IF
- 
+
             END DO
- 
+
 *  Extend the line where necessary.
             IF ( PADLIN ) THEN
                DO J = NCOLI + 1, NCOLO
- 
+
 *  Pad the the output array with the fill value.
                   OUT( J, K ) = FILL
- 
+
                END DO
             END IF
- 
+
          END DO
- 
+
 *  Now pad the remaining lines to their full number of columns in
 *  the output array if there are any.
          IF ( NLINO .GT. NLINI ) THEN
             DO K = NLINI + 1, NLINO
                DO J = 1, NCOLO
- 
+
 *  Pad with the filling value.
                   OUT( J, K ) = FILL
- 
+
                END DO
             END DO
          END IF
- 
+
 *  Now deal with case where output is filled with zeros.
       ELSE
- 
+
          DO K = 1, NLINO
             DO J = 1, NCOLO
                OUT( J, K ) = 0.0E0
             END DO
          END DO
- 
+
       END IF
- 
+
       END

@@ -70,7 +70,7 @@
 *
 *   Sizes for MESSYS variables
 *
-      INTEGER MESSYS__MXTRANS     ! maximum number of active 
+      INTEGER MESSYS__MXTRANS     ! maximum number of active
       PARAMETER ( MESSYS__MXTRANS = 32 ) !transactions
 
       INTEGER MESSYS__MXPATH      ! maximum number of open paths
@@ -125,7 +125,7 @@
       PARAMETER ( MESSYS__NULL_P = 0 )
 
 *
-*   Possible 'states' of a PATH. Note MESSYS__NULL_P doubles as one of 
+*   Possible 'states' of a PATH. Note MESSYS__NULL_P doubles as one of
 *   these.
 *
       INTEGER MESSYS__PART_P      ! partially installed path state

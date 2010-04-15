@@ -4,8 +4,8 @@
 *     WCSCONVERTER <in file> <encoding> <out file> <attrs>
 
 *  Description:
-*     Reads a FrameSet from "in file" (as a FITS header if possible, 
-*     otherwise as an AST dump of a FrameSet), and writes out the 
+*     Reads a FrameSet from "in file" (as a FITS header if possible,
+*     otherwise as an AST dump of a FrameSet), and writes out the
 *     FrameSet to "out file" using the specified encoding.
 
 *  Parameters:
@@ -53,7 +53,7 @@
          WRITE(*,'(A,I6)') 'Set ObjectCaching VALUE is ',OC
       END IF
 
-* 
+*
 * Create a FitsChan to store the FITS headers.
 *
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
@@ -85,9 +85,9 @@
 
  10   CLOSE( 10 )
 
-* 
+*
 * Set the value of CDMatrix, unless it has already been set.
-* 
+*
       IF( .NOT. AST_TEST( FC, 'CDMATRIX', STATUS ) ) THEN
          CDM = AST_GETL( FC, 'CDMATRIX', STATUS )
          CALL AST_SETL( FC, 'CDMATRIX', CDM, status )
@@ -110,7 +110,7 @@
          CHAN = AST_CHANNEL( SOURCE, AST_NULL, ' ', STATUS )
          OBJECT = AST_READ( CHAN, STATUS )
          CALL AST_ANNUL( CHAN, STATUS )
-         CLOSE( 10 )          
+         CLOSE( 10 )
       END IF
 
 *
@@ -140,7 +140,7 @@
      :                    encoding( : chr_len(encoding ) ),' format.'
             END IF
             CALL AST_ANNUL( CHAN, STATUS )
-            CLOSE( 10 )          
+            CLOSE( 10 )
 
          ELSE
             OPEN( UNIT=10, FILE=OFILE, STATUS='NEW' )
@@ -157,12 +157,12 @@
      :                    encoding( : chr_len(encoding ) ),' format.'
             ELSE
                CALL AST_CLEAR( FC, 'CARD', STATUS )
-               DO WHILE( AST_FINDFITS( FC, '%f', LINE, .TRUE., 
+               DO WHILE( AST_FINDFITS( FC, '%f', LINE, .TRUE.,
      :                   STATUS ) )
                  WRITE(10,'(A)') LINE( : 80 )
                END DO
             END IF
-            CLOSE( 10 )          
+            CLOSE( 10 )
 
             CALL AST_ANNUL( FC, STATUS )
 

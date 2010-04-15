@@ -40,7 +40,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,17 +79,17 @@
         call chi_gnents( input, numents, status )
         call chi_credup( input, numents, output, status )
 *
-*    Loop through the input catalogue until the end reading the data and 
+*    Loop through the input catalogue until the end reading the data and
 *    copying the data.
 *
           call chi_reset(input, status)
 *
         do entscount = 1, numents
 *
-          call chi_gdnac(input,cnames,numcols,charvals,doubvals, 
+          call chi_gdnac(input,cnames,numcols,charvals,doubvals,
      :         intvals,logvals,realvals,coltypes,nulls,status )
 *
-          call chi_putent( output,cnames,numcols,1,charvals,doubvals, 
+          call chi_putent( output,cnames,numcols,1,charvals,doubvals,
      :           intvals,logvals,realvals,coltypes,nulls,status )
         enddo
 *

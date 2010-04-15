@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_PGCUR( INFO, MESS, NACT, ACTDES, KEYS, X1, X2, Y1,
-     :                       Y2, EXACT, X0, Y0, MAXPNT, RBMODE, LINE, 
+     :                       Y2, EXACT, X0, Y0, MAXPNT, RBMODE, LINE,
      :                       BOX, MARK, IPLOT, X, Y, ACT, NPNT, STATUS )
 *+
 *  Name:
@@ -12,16 +12,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PGCUR( INFO, MESS, NACT, ACTDES, KEYS, X1, X2, Y1, Y2, 
-*                      EXACT, X0, Y0, MAXPNT, RBMODE, LINE, BOX, MARK, 
+*     CALL KPG1_PGCUR( INFO, MESS, NACT, ACTDES, KEYS, X1, X2, Y1, Y2,
+*                      EXACT, X0, Y0, MAXPNT, RBMODE, LINE, BOX, MARK,
 *                      IPLOT, X, Y, ACT, NPNT, STATUS )
 
 *  Description:
-*     This routine uses the PGPLOT cursor to get a set of positions in the 
+*     This routine uses the PGPLOT cursor to get a set of positions in the
 *     world co-ordinate system of the current PGPLOT window. If a position
 *     is given outside the box specified by X1, X2, Y1, Y2, then a
 *     warning is issued and the position is ignored. The allowable box
-*     can extend outside the PGPLOT viewport (extrapolated world 
+*     can extend outside the PGPLOT viewport (extrapolated world
 *     co-ordinates are returned for positions outside the viewport).
 *
 *     The routine returns when any one of the following occurs:
@@ -29,7 +29,7 @@
 *     1) The maximum number of positions have been given (see MAXPNT).
 *     2) The right mouse button, "X" or "." is pressed (but only if
 *        KEYS contains "X" or "."). The cursor position is not returned.
-*     3) The key/button specified by EXACT is pressed. The cursor position 
+*     3) The key/button specified by EXACT is pressed. The cursor position
 *        IS returned.
 
 *  Arguments:
@@ -45,42 +45,42 @@
 *        Short descriptions of each action. Ignored if INFO is .FALSE.
 *        Examples: "select a point", "exit", "mark a star". etc.
 *     KEYS = CHARACTER * ( * ) (Given)
-*        A string of NACT unique characters. These are the keyboard keys 
-*        which must be pressed to select the corresponding action. Note, case 
-*        is insignificant, but trailing spaces are significant. The left, 
-*        middle and right mouse buttons are represented by the upper case 
-*        characters A, D and X respectively (this is imposed by PGPLOT). A 
-*        dot (".") is considered equivalent to an X (i.e. the right mouse 
-*        button). In addition, due to problems in the GKS version of PGPLOT, 
-*        a space (" ") is considered equivalent to an A (i.e. left mouse 
+*        A string of NACT unique characters. These are the keyboard keys
+*        which must be pressed to select the corresponding action. Note, case
+*        is insignificant, but trailing spaces are significant. The left,
+*        middle and right mouse buttons are represented by the upper case
+*        characters A, D and X respectively (this is imposed by PGPLOT). A
+*        dot (".") is considered equivalent to an X (i.e. the right mouse
+*        button). In addition, due to problems in the GKS version of PGPLOT,
+*        a space (" ") is considered equivalent to an A (i.e. left mouse
 *        button).
 *
 *        The "X" and "." keys (or equivalently the right mouse button) are
-*        special in that (if they are included in KEYS) they cause the routine 
-*        to exit without adding the cursor position to the list of returned 
+*        special in that (if they are included in KEYS) they cause the routine
+*        to exit without adding the cursor position to the list of returned
 *        positions. If KEYS includes neither "X" nor ".", then presses of
 *        "X", "." or the right mouse button are ignored.
 *     X1 = REAL (Given)
-*        World co-ord X at lower left corner of region in which positons 
+*        World co-ord X at lower left corner of region in which positons
 *        may be entered.
 *     X2 = REAL (Given)
-*        World co-ord X at upper right corner of region in which positons 
-*        may be entered. If X1 and X2 are equal then no restrictions are 
+*        World co-ord X at upper right corner of region in which positons
+*        may be entered. If X1 and X2 are equal then no restrictions are
 *        placed on the region in which positions may be given.
 *     Y1 = REAL (Given)
-*        World co-ord Y at lower left corner of region in which positons 
+*        World co-ord Y at lower left corner of region in which positons
 *        may be entered.
 *     Y2 = REAL (Given)
-*        World co-ord Y at upper right corner of region in which positons 
-*        may be entered. If Y1 and Y2 are equal then no restrictions are 
+*        World co-ord Y at upper right corner of region in which positons
+*        may be entered. If Y1 and Y2 are equal then no restrictions are
 *        placed on the region in which positions may be given.
 *     EXACT = REAL (Given)
 *        The index of an exit action. If the corresponding key/button press
 *        is made, then the cursor position is added to the list of returned
-*        positions and the routine then exits. Zero can be supplied if this 
-*        facility is not required. Note, if KEYS contains "X" or "." then 
-*        the routine also exits (WITHOUT adding the cursor position to the 
-*        returned list) if "X", "." or the right mouse button is pressed. 
+*        positions and the routine then exits. Zero can be supplied if this
+*        facility is not required. Note, if KEYS contains "X" or "." then
+*        the routine also exits (WITHOUT adding the cursor position to the
+*        returned list) if "X", "." or the right mouse button is pressed.
 *     X0 = REAL (Given )
 *        The X world co-ordinate of the initial cursor position.
 *        Ignored if VAL__BADR.
@@ -92,7 +92,7 @@
 *        before exiting.
 *     RBMODE = INTEGER (Given)
 *        The form of the rubber band which connects the cursor to the
-*        previous position. Rubber bands are not available when using the 
+*        previous position. Rubber bands are not available when using the
 *        GKS version of PGPLOT:
 *           0 - do not use a rubber band.
 *           1 - use a straight-line rubber band.
@@ -109,13 +109,13 @@
 *        The plotting attributes are specified by the CURVES(...) attributes
 *        of the supplied Plot (see IPLOT).
 *     BOX = INTEGER (Given)
-*        If non-zero then a horizontal box is drawn between each position. 
+*        If non-zero then a horizontal box is drawn between each position.
 *        The plotting attributes are specified by the BORDER(...) attributes
 *        of the supplied Plot (see IPLOT).
 *     MARK = INTEGER (Given)
 *        If -31 or larger, then a marker is drawn at each position. The
 *        type of marker is given by the specific value (see PGPLOT routine
-*        PGPT). The plotting attributes are specified by the MARKERS(...) 
+*        PGPT). The plotting attributes are specified by the MARKERS(...)
 *        attributes of the supplied Plot (see IPLOT).
 *     IPLOT = INTEGER (Given)
 *        Defines the plotting styles for any graphics (see LINE, BOX and
@@ -126,11 +126,11 @@
 *     Y( MAXPNT ) = REAL (Returned)
 *        Elements 1 to NPNT hold the selected X positions.
 *     ACT( MAXPNT ) = INTEGER (Returned)
-*        Elements 1 to NPNT hold the indices of the actions for each 
+*        Elements 1 to NPNT hold the indices of the actions for each
 *        selected point. In range 1 to NACT.
 *     NPNT = INTEGER (Returned)
-*        The number of positions given by the user (this includes the 
-*        position at which the action specified by EXACT was pressed - 
+*        The number of positions given by the user (this includes the
+*        position at which the action specified by EXACT was pressed -
 *        if it was. It does not include the position at which "X", "." or
 *        the right mouse button was pressed).
 *     STATUS = INTEGER (Given and Returned)
@@ -145,12 +145,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -173,7 +173,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -236,15 +236,15 @@
       REAL LX2                   ! X at right end of line to be drawn
       REAL LY1                   ! Y at upper end of line to be drawn
       REAL LY2                   ! Y at lower end of line to be drawn
-      REAL XG                    ! X at given position      
-      REAL XMAX                  ! Maximum acceptable X at given position      
-      REAL XMIN                  ! Minimum acceptable X at given position      
-      REAL YG                    ! Y at given position      
-      REAL YMAX                  ! Maximum acceptable Y at given position      
-      REAL YMIN                  ! Minimum acceptable Y at given position      
+      REAL XG                    ! X at given position
+      REAL XMAX                  ! Maximum acceptable X at given position
+      REAL XMIN                  ! Minimum acceptable X at given position
+      REAL YG                    ! Y at given position
+      REAL YMAX                  ! Maximum acceptable Y at given position
+      REAL YMIN                  ! Minimum acceptable Y at given position
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error and abort if the length of the KEYS string is not the
@@ -282,7 +282,7 @@
             LKEYS( I : I ) = 'a'
          ELSE IF( KEY .EQ. '.' ) THEN
             LKEYS( I : I ) = 'x'
-         END IF         
+         END IF
 
       END DO
 
@@ -305,7 +305,7 @@
             TEXT = '    To '
             IAT = 7
             CALL CHR_APPND( ACTDES( I ), TEXT, IAT )
-   
+
             KEY = LKEYS( I : I )
 
             IF( KEY .EQ. 'a' .OR. KEY .EQ. ' ' ) THEN
@@ -325,10 +325,10 @@
                CALL CHR_APPND( ' press "', TEXT, IAT )
                CALL CHR_APPND( KEY, TEXT, IAT )
                CALL CHR_APPND( '"', TEXT, IAT )
-            END IF         
-   
+            END IF
+
             CALL MSG_OUT( 'KPG1_PGCUR_3', TEXT, STATUS )
-   
+
          END DO
 
          CALL MSG_BLANK( STATUS )
@@ -354,9 +354,9 @@
       ELSE
          RESTR = .FALSE.
       END IF
-      
-*  If a Plot was supplied we need to establish the require PGPLOT plotting 
-*  attributes. 
+
+*  If a Plot was supplied we need to establish the require PGPLOT plotting
+*  attributes.
       IF( IPLOT .NE. AST__NULL ) THEN
 
 *  First count the number  of plotting elements being used.
@@ -374,7 +374,7 @@
                CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
             ELSE IF( BOX .NE. 0 ) THEN
                CALL KPG1_PGSTY( IPLOT, 'BORDER', .TRUE., ATTR, STATUS )
-            ELSE 
+            ELSE
                CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
             END IF
 
@@ -396,16 +396,16 @@
       END IF
 
 *  Get the length of any required lines.
-      IF( LINE .EQ. 2 ) THEN      
+      IF( LINE .EQ. 2 ) THEN
          IF( Y1 .EQ. Y2 ) THEN
-            CALL PGQWIN( LX2, LX2, LY1, LY2 ) 
+            CALL PGQWIN( LX2, LX2, LY1, LY2 )
          ELSE
             LY1 = Y1
             LY2 = Y2
          END IF
-      ELSE IF( LINE .EQ. 3 ) THEN      
+      ELSE IF( LINE .EQ. 3 ) THEN
          IF( X1 .EQ. X2 ) THEN
-            CALL PGQWIN( LX2, LX2, LY1, LY2 ) 
+            CALL PGQWIN( LX2, LX2, LY1, LY2 )
          ELSE
             LX1 = X1
             LX2 = X2
@@ -420,28 +420,28 @@
 
 *  Loop round getting positions.
       LOOP = .TRUE.
-      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
 *  Get a position using a straight line rubber band.
          IF( LRBMOD .EQ. 1 ) THEN
             IF( POSN .NE. 0 ) THEN
-               OK = PGBAND( 1, POSN, XG, YG, XG, YG, CG ) 
+               OK = PGBAND( 1, POSN, XG, YG, XG, YG, CG )
             ELSE
-               OK = PGBAND( 0, 0, 0.0, 0.0, XG, YG, CG ) 
+               OK = PGBAND( 0, 0, 0.0, 0.0, XG, YG, CG )
             END IF
 
 *  Get a position using a rectangular box rubber band.
          ELSE IF( LRBMOD .EQ. 2 ) THEN
             IF( POSN .NE. 0 ) THEN
-               OK = PGBAND( 2, POSN, XG, YG, XG, YG, CG ) 
+               OK = PGBAND( 2, POSN, XG, YG, XG, YG, CG )
             ELSE
-               OK = PGBAND( 0, 0, 0.0, 0.0, XG, YG, CG ) 
+               OK = PGBAND( 0, 0, 0.0, 0.0, XG, YG, CG )
             END IF
 
 *  Get a position using no rubber band.
          ELSE
-            OK = PGBAND( 0, POSN, XG, YG, XG, YG, CG ) 
-         END IF         
+            OK = PGBAND( 0, POSN, XG, YG, XG, YG, CG )
+         END IF
 
 *  From now on use the requested rubber band mode.
          LRBMOD = RBMODE
@@ -449,7 +449,7 @@
 *  We now have an anchor point (the position just entered).
          POSN = 1
 
-*  The GKS version of PGPLOT has a few oddities reqgarding mouse buttons. 
+*  The GKS version of PGPLOT has a few oddities reqgarding mouse buttons.
 *  Native PGPLOT returns A, D or X if the left, middle or right mouse
 *  button is pressed, without error. But GKS PGPLOT returns, CHAR(32),
 *  CHAR(13) and CHAR(0) instead. Further, an error is reported if the right
@@ -458,7 +458,7 @@
 *  See if PGPLOT reported an error.
          CALL ERR_STAT( STATUS )
 
-*  If an error was reported, and CHAR(0) as returned, annull the error 
+*  If an error was reported, and CHAR(0) as returned, annull the error
 *  and assume the right mouse button was pressed.
          IF( STATUS .NE. SAI__OK .AND. ICHAR( CG ) .EQ. 0 ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -487,7 +487,7 @@
 *  press is ignored otherwise).
          IF( CG .EQ. 'x' ) THEN
             OK = 0
-            LOOP = ( INDEX( LKEYS, 'x' ) .EQ. 0 ) 
+            LOOP = ( INDEX( LKEYS, 'x' ) .EQ. 0 )
          END IF
 
 *  If required, check that the position is within the acceptable region.
@@ -519,17 +519,17 @@
                   LOOP = .FALSE.
                END IF
 
-*  Draw a line through this position if required. Set up the plotting 
+*  Draw a line through this position if required. Set up the plotting
 *  attributes first if required.
                IF( LINE .NE. 0 ) THEN
                   IF( RESATT ) THEN
-                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, 
+                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR,
      :                                STATUS )
                   END IF
 
 *  If required, draw a line joining this point to the previous point, but
 *  only if this is not the first point.
-                  IF( ( LINE .EQ. -1 .OR. LINE .EQ. 1 ) .AND. 
+                  IF( ( LINE .EQ. -1 .OR. LINE .EQ. 1 ) .AND.
      :                NPNT .GT. 1 ) THEN
                      CALL PGMOVE( X( NPNT - 1 ), Y( NPNT - 1 ) )
                      CALL PGDRAW( XG, YG )
@@ -549,7 +549,7 @@
 *  R-instate the original drawing attributes if something else is to be
 *  drawn.
                   IF( RESATT ) THEN
-                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., 
+                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE.,
      :                                ATTR, STATUS )
                   END IF
 
@@ -560,7 +560,7 @@
                IF( BOX .NE. 0 .AND. NPNT .GT. 1 ) THEN
 
                   IF( RESATT ) THEN
-                     CALL KPG1_PGSTY( IPLOT, 'BORDER', .TRUE., ATTR, 
+                     CALL KPG1_PGSTY( IPLOT, 'BORDER', .TRUE., ATTR,
      :                                STATUS )
                   END IF
 
@@ -571,7 +571,7 @@
                   CALL PGDRAW( XG, YG )
 
                   IF( RESATT ) THEN
-                     CALL KPG1_PGSTY( IPLOT, 'BORDER', .FALSE., ATTR, 
+                     CALL KPG1_PGSTY( IPLOT, 'BORDER', .FALSE., ATTR,
      :                                STATUS )
                   END IF
 
@@ -582,14 +582,14 @@
                IF( MARK .GT. -32 ) THEN
 
                   IF( RESATT ) THEN
-                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, 
+                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR,
      :                                STATUS )
                   END IF
 
                   CALL PGPT( 1, XG, YG, MARK )
 
                   IF( RESATT ) THEN
-                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .FALSE., ATTR, 
+                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .FALSE., ATTR,
      :                                STATUS )
                   END IF
 
@@ -603,7 +603,7 @@
          IF( .NOT. LOOP .AND. LINE .GT. 0 ) THEN
             IF( NPNT .GT. 2 ) THEN
                IF( RESATT ) THEN
-                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, 
+                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR,
      :                             STATUS )
                END IF
 
@@ -611,7 +611,7 @@
                CALL PGDRAW( X( NPNT ), Y( NPNT ) )
 
                IF( RESATT ) THEN
-                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, 
+                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR,
      :                             STATUS )
                END IF
 
@@ -620,8 +620,8 @@
 
       END DO
 
-*  If a Plot was supplied we may need to re-establish the original PGPLOT 
-*  plotting attributes. 
+*  If a Plot was supplied we may need to re-establish the original PGPLOT
+*  plotting attributes.
       IF( IPLOT .NE. AST__NULL .AND. .NOT. RESATT ) THEN
          IF( LINE .NE. 0 ) THEN
             CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, STATUS )

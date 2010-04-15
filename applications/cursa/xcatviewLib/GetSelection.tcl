@@ -116,7 +116,7 @@ proc GetSelection selectionList {
       -command {HelpText GetSelection_help}
 
 #
-#  Pack the buttons into their frame with a default border around 
+#  Pack the buttons into their frame with a default border around
 #  the OK button.
 
     frame .getselection.buttonFrame.default -relief sunken -bd 1
@@ -131,7 +131,7 @@ proc GetSelection selectionList {
       -padx 3m -pady 2m -ipadx 1m
     pack .getselection.buttonFrame.help -side top -expand 1 \
       -padx 3m -pady 2m -ipadx 1m
- 
+
 #
 #  Pack this frame into the window.
 
@@ -151,7 +151,7 @@ proc GetSelection selectionList {
        }
     }
 
-#    
+#
 #  Withdraw the window, then update all the geometry information
 #  so we know how big it wants to be, then centre the window in
 #  parent and de-iconify it.

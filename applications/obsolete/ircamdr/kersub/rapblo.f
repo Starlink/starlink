@@ -1,6 +1,6 @@
 
 *+  RAPBLO - performs a rapid 2-D block smooth on a 2-D array
-      SUBROUTINE RAPBLO( NPIX, DIMS1, DIMS2, ARRIN, ARROUT, ROLL, 
+      SUBROUTINE RAPBLO( NPIX, DIMS1, DIMS2, ARRIN, ARROUT, ROLL,
      :  RMARGE, STATUS )
 *    Description :
 *     Each pixel in the 2-D output array ARROUT is the mean of the NPIX by NPIX
@@ -113,7 +113,7 @@
                ROLL( X, Y ) = ARRIN( X, 1 )
             ENDDO
          ENDDO
- 
+
 *       put the 2nd to ( NPIX-FIRST ) rows of the data array into the
 *       ( FIRST+1 ) to NPIX rows of the 2-D buffer
          DO Y = FIRST+1, NPIX
@@ -129,7 +129,7 @@
 
             RMARGE( X ) = 0.0
          ENDDO
- 
+
 *       calculate the totals for each column
          DO Y = 1, NPIX
             DO X = 1, DIMS1
@@ -197,7 +197,7 @@
                SUM = SUM + RMARGE( X+HNPIX ) - RMARGE( X-HNPIX1 )
                ARROUT( X, Y ) = SUM / AREA
             ENDDO
- 
+
             DO X = DIMS1-HNPIX+1, DIMS1
 
 *             righthand edge of data array so replicate last column
@@ -207,5 +207,5 @@
             ENDDO
          ENDDO
       ENDIF
- 
+
       END

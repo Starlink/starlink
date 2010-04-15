@@ -15,11 +15,11 @@
 *  Description:
 *     This routine copies the AST attributes which determine the colour,
 *     style, width, font and size. If IN is non-blank, then the
-*     attributes are copied from the element given by IN, to the 
-*     element given by OUT - the original values of these attributes for 
+*     attributes are copied from the element given by IN, to the
+*     element given by OUT - the original values of these attributes for
 *     element OUT are returned in ATTRS. If IN is blank, then the
-*     values supplied in ATTRS are copied to the element given by OUT - 
-*     the original values of these attributes for element OUT are again 
+*     values supplied in ATTRS are copied to the element given by OUT -
+*     the original values of these attributes for element OUT are again
 *     returned in ATTRS.
 
 *  Arguments:
@@ -33,8 +33,8 @@
 *     ATTRS( 5 ) = REAL (Given and Returned)
 *        The entry values are ignored unless IN is blank, in which case
 *        the entry values should be the colour, width, style, size and font
-*        attribute values to associate with element OUT. On exit, the 
-*        original colour, width, style, size and font attribute values 
+*        attribute values to associate with element OUT. On exit, the
+*        original colour, width, style, size and font attribute values
 *        associated with element OUT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
 
 *  Local Variables:
       CHARACTER FULLATT*40       ! Fully qualified attribute name
-      CHARACTER ATROOT( 5 )*7    ! Root name of attribute 
+      CHARACTER ATROOT( 5 )*7    ! Root name of attribute
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of string
       REAL NEWVAL                ! New attribute value

@@ -64,7 +64,7 @@
 #include <stdio.h>
 
 int main () {
-      
+
   /*  Local Variables: */
   const char path[] = "hds_ctest";
   int status = DAT__OK;
@@ -101,7 +101,7 @@ int main () {
   datNew( loc1, "DATA_ARRAY", "_INTEGER", 2, dim, &status );
   datNew1C( loc1, "ONEDCHAR", 14, 3, &status );
   datNew1D( loc1, "ONEDD", 2, &status );
-  
+
   /* Populate */
   datFind( loc1, "ONEDCHAR", &loc2, &status );
   datPutVC( loc2, 3, chararr, &status );
@@ -173,7 +173,7 @@ int main () {
       }
   }
   datUnmap(loc2, &status);
- 
+
   /* Annul */
   datAnnul( &loc2, &status );
 

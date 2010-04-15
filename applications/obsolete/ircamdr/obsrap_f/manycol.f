@@ -33,8 +33,8 @@
 *    Global constants :
 
 	INCLUDE  'SAE_PAR'          ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -47,7 +47,7 @@
 
 *    Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,           ! input data structure
      :    LOCO,           ! OUTPUT data structure
      :    DIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
@@ -58,7 +58,7 @@
      :    PNTRO,          ! pointer to output DATA_ARRAY component
      :    NCOLS           ! number of colour tables combined
 
-	REAL 
+	REAL
      :    INPVAL( 3, 256, 10)  ! colour values
 
 
@@ -78,7 +78,7 @@
 
 *        tell user which colour table is being asked for
 	  CALL MSG_SETI( 'NUM', J)
-	  CALL MSG_OUT( 'MESSAGE', 'Input COLOUR TABLE number ^NUM', 
+	  CALL MSG_OUT( 'MESSAGE', 'Input COLOUR TABLE number ^NUM',
      :                   STATUS)
 
 *        get locator to the input IMAGE type data structure
@@ -102,11 +102,11 @@
 	      ELSE
                 CALL MSG_SETI( 'XDIM', DIMS( 1 ) )
                 CALL MSG_SETI( 'YDIM', DIMS( 2 ) )
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	          'Error, Input image dimensions invalid ^XDIM, ^YDIM',
      :             STATUS)
 	        CALL MSG_OUT( 'MESSAGE',
-     :	             'Colour table should be 3 by 256 in size ...', 
+     :	             'Colour table should be 3 by 256 in size ...',
      :               STATUS)
 	        GOTO 100
 	      END IF

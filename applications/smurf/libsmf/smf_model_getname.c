@@ -24,7 +24,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     
+*
 
 *  Notes:
 
@@ -116,7 +116,7 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
   case SMF__AST:
     retval = "ast";
     break;
-    
+
   case SMF__COM:
     retval = "com";
     break;
@@ -152,7 +152,7 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
   default:
     retval = "nul";
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Invalid smf_modeltype given.", status);        
+    errRep( "", FUNC_NAME ": Invalid smf_modeltype given.", status);
   }
 
   return retval;

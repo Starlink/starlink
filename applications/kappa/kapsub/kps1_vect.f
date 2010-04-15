@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_VECT( INK, X, Y, JUST, VECLEN, VECANG, AHSIZE, 
+      SUBROUTINE KPS1_VECT( INK, X, Y, JUST, VECLEN, VECANG, AHSIZE,
      :                      X1, X2, Y1, Y2, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_VECT( INK, X, Y, JUST, VECLEN, VECANG, AHSIZE, X1, X2, 
+*     CALL KPS1_VECT( INK, X, Y, JUST, VECLEN, VECANG, AHSIZE, X1, X2,
 *                     Y1, Y2, STATUS )
 
 *  Description:
@@ -28,7 +28,7 @@
 *        The x component of the vectors reference position, in the
 *        current PGPLOT window.
 *     Y = REAL (Given)
-*        The y component of the vectors reference position, in the 
+*        The y component of the vectors reference position, in the
 *         current PGPLOT window.
 *     JUST = CHARACTER * ( * ) (Given)
 *        Specifies the disposition of the vector with respect to the
@@ -51,16 +51,16 @@
 *        current PGPLOT window.  No arrowhead is drawn if a zero or negative
 *        value is supplied.
 *     X1 = REAL (Given and Returned)
-*        The lowest X value in the bounding box. Modified on exit to include 
+*        The lowest X value in the bounding box. Modified on exit to include
 *        the drawn vector.
 *     X2 = REAL (Given and Returned)
-*        The highest X value in the bounding box. Modified on exit to include 
+*        The highest X value in the bounding box. Modified on exit to include
 *        the drawn vector.
 *     Y1 = REAL (Given and Returned)
-*        The lowest Y value in the bounding box. Modified on exit to include 
+*        The lowest Y value in the bounding box. Modified on exit to include
 *        the drawn vector.
 *     Y2 = REAL (Given and Returned)
-*        The highest Y value in the bounding box. Modified on exit to include 
+*        The highest Y value in the bounding box. Modified on exit to include
 *        the drawn vector.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -96,7 +96,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,17 +147,17 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Store the COS and SIN of the vector orientation.
-      SINANG = SIN( VECANG ) 
-      COSANG = COS( VECANG ) 
+      SINANG = SIN( VECANG )
+      COSANG = COS( VECANG )
 
 *  Find the x and y components of the vector.
       VECX = -VECLEN * SINANG
-      VECY = VECLEN * COSANG 
+      VECY = VECLEN * COSANG
 
 *  Note the position of the point of the arrowhead.
       IF ( JUST .EQ. 'CENTRE' ) THEN
          AX0 = X + 0.5 * VECX
-         AY0 = Y + 0.5 * VECY 
+         AY0 = Y + 0.5 * VECY
       ELSE IF ( JUST .EQ. 'START' ) THEN
          AX0 = X + VECX
          AY0 = Y + VECY
@@ -184,7 +184,7 @@
 *  Calculate the co-ordinates of the end of the first arrow stroke by
 *  multiplying by the rotation matrix.
          AX2 = AX0 + AHSIZE * ( SINANG * COSA - COSANG * SINA )
-         AY2 = AY0 - AHSIZE * ( SINANG * SINA + COSANG * COSA ) 
+         AY2 = AY0 - AHSIZE * ( SINANG * SINA + COSANG * COSA )
 
 *  Draw the first arrow stroke.
          CALL PGMOVE( AX0, AY0 )
@@ -192,8 +192,8 @@
 
 *  Calculate the co-ordinates of the end of the second arrow stroke by
 *  multiplying by the rotation matrix.
-         AX3 = AX0 + AHSIZE * ( SINANG * COSA + COSANG * SINA ) 
-         AY3 = AY0 - AHSIZE * ( -SINANG * SINA + COSANG * COSA ) 
+         AX3 = AX0 + AHSIZE * ( SINANG * COSA + COSANG * SINA )
+         AY3 = AY0 - AHSIZE * ( -SINANG * SINA + COSANG * COSA )
 
 *  Draw the second arrow stroke.
          CALL PGMOVE( AX0, AY0 )

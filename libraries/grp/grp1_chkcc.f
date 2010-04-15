@@ -31,7 +31,7 @@
 *        Should the escape character be used?
 
 *  Returned Value:
-*     GRP1_CHKCC = LOGICAL 
+*     GRP1_CHKCC = LOGICAL
 *        Should the character with index INDEX within STRING be treated
 *        as a GRP control character of type CC?
 
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
 *.
 
 *  Compare the specified character.
-      GRP1_CHKCC = ( STRING( INDEX: INDEX ) .EQ. CC ) 
+      GRP1_CHKCC = ( STRING( INDEX: INDEX ) .EQ. CC )
 
 *  Return immediately if the character does not match, or if it is the
 *  first character in the string, or if escape characters are not being
@@ -103,7 +103,7 @@
 
 *  The control character is escaped if it is preceeded by an odd number
 *  of escape characters.
-         GRP1_CHKCC = ( MOD( NESC, 2 ) .EQ. 0 ) 
+         GRP1_CHKCC = ( MOD( NESC, 2 ) .EQ. 0 )
 
       END IF
 

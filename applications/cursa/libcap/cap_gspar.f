@@ -16,7 +16,7 @@
 *  Algorithm:
 *     If the catalogue is open then
 *       Output the title.
-*       Do while there are more parameters to be output and the user 
+*       Do while there are more parameters to be output and the user
 *       wishes to continue
 *         Attempt to get a new parameter identifier.
 *         If the status is ok and the identifier is not null then

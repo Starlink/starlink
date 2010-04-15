@@ -155,168 +155,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, 
+     :                           HAVCV, EXPOSE,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, SATVAL, 
+     :                           HAVCV, EXPOSE, SATVAL,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, 
+     :                           HAVCV, EXPOSE,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, SATVAL, 
+     :                           HAVCV, EXPOSE, SATVAL,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UBCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UBCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UBCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE
@@ -327,168 +327,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_BCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_BCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_BCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE
@@ -499,168 +499,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_WCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_WCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_WCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE
@@ -671,168 +671,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, 
+     :                           HAVCV, EXPOSE,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, SATVAL, 
+     :                           HAVCV, EXPOSE, SATVAL,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, 
+     :                           HAVCV, EXPOSE,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                           %VAL( CNF_PVAL( IPVIN ) ),
-     :                           %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                           %VAL( CNF_PVAL( IPDCAL ) ),
      :                           %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                           HAVCV, EXPOSE, SATVAL, 
+     :                           HAVCV, EXPOSE, SATVAL,
      :                           %VAL( CNF_PVAL( IPDOUT ) ),
-     :                           %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                           %VAL( CNF_PVAL( IPVOUT ) ),
      :                           NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_UWCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_UWCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_UWCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE
@@ -843,168 +843,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_ICLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_ICSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_ICSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE
@@ -1015,168 +1015,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE
@@ -1187,168 +1187,168 @@
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, 
+     :                          HAVCV, EXPOSE,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                          %VAL( CNF_PVAL( IPDCAL ) ),
      :                          %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                          HAVCV, EXPOSE, SATVAL, 
+     :                          HAVCV, EXPOSE, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the scaled subtractions. If saturations are
 *  present then these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCLD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, 
+     :                         HAVCV, EXPOSE,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DCSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDCAL ) ), 
+     :                         %VAL( CNF_PVAL( IPDCAL ) ),
      :                         %VAL( CNF_PVAL( IPVCAL ) ), HAVDV,
-     :                         HAVCV, EXPOSE, SATVAL, 
+     :                         HAVCV, EXPOSE, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE

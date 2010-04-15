@@ -86,15 +86,15 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP public constants
-      
+
 *  Arguments Given:
       CHARACTER PARAM1*(*)
       CHARACTER PARAM2*(*)
-      
+
 *  Arguments Given and Returned:
       INTEGER IGRP
       INTEGER NREG
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -125,11 +125,11 @@
          GO TO 999
       END IF
 
-*  Obtain the operator for combining the regions.  Cancel the current 
+*  Obtain the operator for combining the regions.  Cancel the current
 *  value of the parameter, ready for next time.
       CALL PAR_CHOIC( PARAM1, 'AND', 'NOT,AND,OR,XOR,EQV', .FALSE.,
      :                OPER, STATUS )
-      CALL PAR_CANCL( PARAM1, STATUS )      
+      CALL PAR_CANCL( PARAM1, STATUS )
 
 *  Add dots before and after the operator to conform with ARD syntax.
 *  Also add a leading space so that the operator can be used as a
@@ -151,12 +151,12 @@
      :                    /'one region defined.', STATUS )
             GO TO 999
          END IF
-         
+
 *  Obtain a pair of indices for the regions to be combined.  Cancel the
 *  current value of the parameter, ready for next time.
          REGS( 1 ) = NREG - 1
          REGS( 2 ) = NREG
-         CALL PAR_GDR1I( PARAM2, 2, REGS, 1, NREG, .FALSE., REGS, 
+         CALL PAR_GDR1I( PARAM2, 2, REGS, 1, NREG, .FALSE., REGS,
      :                   STATUS )
          CALL PAR_CANCL( PARAM2, STATUS )
 
@@ -167,7 +167,7 @@
             GO TO 999
          END IF
 
-*  Ensure that the region indices are in increasing order. 
+*  Ensure that the region indices are in increasing order.
          IF ( REGS( 1 ) .GT. REGS( 2 ) ) THEN
             ITEMP = REGS( 1 )
             REGS( 1 ) = REGS( 2 )
@@ -202,7 +202,7 @@
             CALL GRP_PUT( IGRP, 1, ' ', I, STATUS )
             I = I + 1
             CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
-         END DO      
+         END DO
 
 *  The start of a new region has been reached.  Increment the region
 *  index.
@@ -245,7 +245,7 @@
                   TEXT = 'FINISHED'
                END IF
 
-            END DO      
+            END DO
 
          END IF
 
@@ -253,7 +253,7 @@
          CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
          CALL GRP_GET( IGRP, SIZE, 1, TEXT, STATUS )
          LTEXT = CHR_LEN( TEXT )
-         TEXT( LTEXT + 1 : ) = ' )' 
+         TEXT( LTEXT + 1 : ) = ' )'
          CALL GRP_PUT( IGRP, 1, TEXT, SIZE, STATUS )
 
 *  Reduce the number of regions by 1.
@@ -264,7 +264,7 @@
 
 *  Obtain the index for the regions to be inverted.  Cancel the current
 *  value of the parameter, ready for next time.
-         REGS( 1 ) = NREG 
+         REGS( 1 ) = NREG
          CALL PAR_GDR0I( PARAM2, REGS( 1 ), 1, NREG, .FALSE.,
      :                   REGS( 1 ),  STATUS )
          CALL PAR_CANCL( PARAM2, STATUS )
@@ -305,7 +305,7 @@
                   TEXT = 'FINISHED'
                END IF
 
-            END DO      
+            END DO
 
          END IF
 
@@ -313,7 +313,7 @@
          CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
          CALL GRP_GET( IGRP, SIZE, 1, TEXT, STATUS )
          LTEXT = CHR_LEN( TEXT )
-         TEXT( LTEXT + 1 : ) = ' )' 
+         TEXT( LTEXT + 1 : ) = ' )'
          CALL GRP_PUT( IGRP, 1, TEXT, SIZE, STATUS )
 
       END IF
@@ -327,6 +327,6 @@
 *  Delete the original group and return the identifier for the new
 *  group.
       CALL GRP_DELET( IGRP, STATUS )
-      IGRP = IGRP2      
-      
+      IGRP = IGRP2
+
       END

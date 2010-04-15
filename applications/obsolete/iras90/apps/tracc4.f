@@ -41,7 +41,7 @@
 *     BDET = INTEGER (Given)
 *        Begin index of the detector of the input CRDD data array.
 *     EDET = INTEGER (Given)
-*        End index of the detector of the input CRDD data array.  
+*        End index of the detector of the input CRDD data array.
 *     INSCN( BSMP : ESMP, BDET : EDET ) = REAL (Given)
 *        The in-scan distance of each sample of each CRDD data trace.
 *     DETDAT( BSMP : ESMP, BDET : EDET ) = REAL (Given)
@@ -81,8 +81,8 @@
 *        filled with zeros before being used.
 *     MASK( BSMP : ESMP, BDET : EDET ) = REAL (Given and Returned)
 *        A mask indicating the selected samples; those which fall
-*        within the selected box are returned equal to VAL__BADR. The 
-*        others are returned unchanged if INIT = .FALSE., and are 
+*        within the selected box are returned equal to VAL__BADR. The
+*        others are returned unchanged if INIT = .FALSE., and are
 *        returned equal to zero if INIT = .TRUE.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -162,7 +162,7 @@
       INTEGER SAMP               ! The current sample numbner.
       INTEGER SAMP1              ! The sample number at the first
                                  ! corner.
-      INTEGER SAMP2              ! The sample number at the second 
+      INTEGER SAMP2              ! The sample number at the second
                                  ! corner.
       INTEGER TRACE              ! The current trace number.
       INTEGER TRACE1             ! The trace containing the first
@@ -214,19 +214,19 @@
       CALL SGS_SARTX( ASPCT )
       CALL SGS_STXJ( 'BC' )
       CALL SGS_TX( 0.5, -0.17, 'Position the cursor at a corner of the')
-      CALL SGS_TX( 0.5, -0.17 - 1.5 * TEXTHT, 
+      CALL SGS_TX( 0.5, -0.17 - 1.5 * TEXTHT,
      :            'box containing the required data and press any key' )
 
 *  Flush out the messages.
       CALL SGS_FLUSH
-      
+
 *  Enable the cursor.
       CALL SGS_CUVIS( .TRUE. )
 
 *  Initially put the cursor at the centre of the grid window
       UX1 = 0.5 * ( XLMT( 1 ) + XLMT( 2 ) )
       UY1 = 0.5 * ( YLMT( 1 ) + YLMT( 2 ) )
-            
+
 *  Get cursor position.
       CALL SNX_CURS( UX1, UY1, NKEY )
 
@@ -242,8 +242,8 @@
 
 *  Find the trace index and sample index which is closest to the cursor.
       CALL TRACB3( BSMP, ESMP, BDET, EDET, INSCN, DETDAT, NDISP, OFFSET,
-     :             DTINDX, SCALE, IDC, UX1, UY1, TRACE1, SAMP1, FOUND, 
-     :             STATUS ) 
+     :             DTINDX, SCALE, IDC, UX1, UY1, TRACE1, SAMP1, FOUND,
+     :             STATUS )
 
 *  If the trace was not found, or an error occurred, quit.
       IF ( .NOT. FOUND .OR. STATUS .NE. SAI__OK ) GO TO 999
@@ -266,15 +266,15 @@
 *  Clear the area used to display instructions.
       CALL SGS_CLRBL( -0.55, 1.2, -0.5, -0.13 )
 
-*  Write instruction messages to the graphic device, asking the user 
+*  Write instruction messages to the graphic device, asking the user
 *  to specify the second corner.
       CALL SGS_TX( 0.5, -0.15, 'Position the cursor at the diagonally')
-      CALL SGS_TX( 0.5, -0.15 - 1.5 * TEXTHT, 
+      CALL SGS_TX( 0.5, -0.15 - 1.5 * TEXTHT,
      :             'opposite corner and press any key' )
 
 *  Flush out the messages.
       CALL SGS_FLUSH
-      
+
 *  Enable the cursor.
       CALL SGS_CUVIS( .TRUE. )
 
@@ -295,8 +295,8 @@
 
 *  Find the trace index and sample index which is closest to the cursor.
       CALL TRACB3( BSMP, ESMP, BDET, EDET, INSCN, DETDAT, NDISP, OFFSET,
-     :             DTINDX, SCALE, IDC, UX2, UY2, TRACE2, SAMP2, FOUND, 
-     :             STATUS ) 
+     :             DTINDX, SCALE, IDC, UX2, UY2, TRACE2, SAMP2, FOUND,
+     :             STATUS )
 
 *  If the trace was not found, or an error occurred, quit.
       IF ( .NOT. FOUND .OR. STATUS .NE. SAI__OK ) GO TO 999
@@ -319,7 +319,7 @@
 *  Clear the area used to display instructions.
       CALL SGS_CLRBL( -0.55, 1.2, -0.5, -0.13 )
 
-*  Get the in-scan offset from the first to the second corner, in 
+*  Get the in-scan offset from the first to the second corner, in
 *  radians.
       DY = IRA__AM2R*( UX2 - UX1 )
 
@@ -351,7 +351,7 @@
 *  Get the detector index for this trace.
          DET = DTINDX( TRACE )
 
-*  Find the sample from this detector which is at zero in-scan offset 
+*  Find the sample from this detector which is at zero in-scan offset
 *  from the starting sample.
          CALL IRC_OFFST( IDC, REAL( SAMP1 ), DET1, DET, 0.0, RSAMP1,
      :                   STATUS )
@@ -366,9 +366,9 @@
          HISAMP = MIN( ESMP, MAX( NINT( RSAMP1 ), NINT( RSAMP2 ) ) )
 
 *  Redraw the curve through the selected samples using the supplied pen.
-         CALL TRACB9( BSMP, ESMP, INSCN( BSMP, DET ), 
-     :                DETDAT( BSMP, DET ), LOSAMP, HISAMP, 0.0, 
-     :                OFFSET( TRACE ), SCALE( TRACE ), 0.0, XLMT, YLMT, 
+         CALL TRACB9( BSMP, ESMP, INSCN( BSMP, DET ),
+     :                DETDAT( BSMP, DET ), LOSAMP, HISAMP, 0.0,
+     :                OFFSET( TRACE ), SCALE( TRACE ), 0.0, XLMT, YLMT,
      :                XORDER, 0, PEN2, STATUS )
 
 *  Abort if an error has occurred.
@@ -379,7 +379,7 @@
             MASK( SAMP, DET ) = VAL__BADR
          END DO
 
-      END DO      
+      END DO
 
 *  Flush any outstanding graphics.
       CALL SGS_FLUSH

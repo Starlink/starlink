@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1988
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -57,7 +57,7 @@ C# IL>=a, OL>=0
 *     JV1,JV2  Vertex Indices for Second Edge
 *     NV       Number of Vertices
 *     RXMIN,RXMAX,RYMIN,RYMAX   Bounding box of First Edge
- 
+
       INTEGER IV1,IV2, JV1,JV2, ISTART,IEND, JSTART,JEND, NV, IP, JP
       REAL    RXMIN,RXMAX,RYMIN,RYMAX, EIX(2),EIY(2), EJX(2),EJY(2)
       REAL    DM(2)
@@ -68,7 +68,7 @@ C# IL>=a, OL>=0
 *
 *---------------------------------------------------------------------
 *
- 
+
 *     Check validity of number of vertices (mean per polygon at least 3)
 *                                      (at most length of vertex arrays)
       NV = IPOLY(NPOLY)
@@ -81,7 +81,7 @@ C# IL>=a, OL>=0
          CALL GKBUG (-2004,'GKPSQX')
          GOTO 999
       ENDIF
- 
+
 *     Count self-intersections in each polygon
       NEX = 0
       ISTART = 1
@@ -154,7 +154,7 @@ C# IL>=a, OL>=0
          ENDIF
          ISTART = IPOLY(IP) + 1
   130 CONTINUE
- 
+
 *     If several polygons, count interpolygon edge intersections
       IF(NPOLY .GE. 2)THEN
          ISTART = 1
@@ -186,8 +186,8 @@ C# IL>=a, OL>=0
             ISTART = IPOLY(IP) + 1
   320   CONTINUE
       ENDIF
- 
+
   999 CONTINUE
- 
+
       RETURN
       END

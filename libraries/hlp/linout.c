@@ -42,7 +42,7 @@ int hlpLinout ( int ( * outsub ) ( char* ),
 */
 {
    int l, ito, ifrom;
- 
+
 
 /* Useful length of string. */
    l = (int) strlen ( hlpTrim ( buffer ) );

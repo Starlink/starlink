@@ -1,5 +1,5 @@
 
-*+  MANIC - Conversion of STARLINK images from one format to another 
+*+  MANIC - Conversion of STARLINK images from one format to another
       SUBROUTINE MANIC( STATUS )
 *    Description :
 *     To write all or part of a 1, 2 or 3 dimensional STARLINK image to an
@@ -9,21 +9,21 @@
 *     being written to an output image; or a 1 or 2 dimensional image may be
 *     grown to more dimensions to fill an output image. Many output images,
 *     each of a different configuration if required, may be extracted from a
-*     single input image with one call to the routine. 
+*     single input image with one call to the routine.
 *    Parameters :
 *     INPUT      = IMAGE( READ )
 *           Data structure holding the input image
 *     ONDIM      = INTEGER( READ )
-*           Dimensionality of the output image 
+*           Dimensionality of the output image
 *     XLIMITS(2) = INTEGER( READ )
 *           The X-axis window on the input image to be used in forming the
-*           output image 
+*           output image
 *     YLIMITS(2) = INTEGER( READ )
 *           The Y-axis window on the input image to be used in forming the
-*           output image 
+*           output image
 *     ZLIMITS(2) = INTEGER( READ )
 *           The Z-axis window on the input image to be used in forming the
-*           output image 
+*           output image
 *     XRANGE(2)  = INTEGER( READ )
 *           The X-axis range for summation in the input image in forming the
 *           output image
@@ -98,7 +98,7 @@
 *     15/08/1981 : Original version    (RGO::CDP)
 *     30/03/1983 : Amended  version    (RGO::RW)
 *     21/02/1984 : Revised SSE version (ROE::ASOC5)
-*     11-MAR-94    Changed DAT_, CMP_ to NDF_ (SKL@JACH) 
+*     11-MAR-94    Changed DAT_, CMP_ to NDF_ (SKL@JACH)
 *     15-Jul-1994  Changed feeding of dimensions to MAxTOx routines
 *                  so that routines will still compile (SKL@JACH)
 *
@@ -225,7 +225,7 @@
 *                map the output DATA_ARRAY component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :              PNTRO, NELEMENTS, STATUS )
-            
+
 *                check for error
                   IF( STATUS .EQ. SAI__OK ) THEN
 
@@ -237,47 +237,47 @@
 
                      ELSEIF( CASE .EQ. 2 ) THEN
 
-                        CALL COPY2D( SDIMS(1), SDIMS(2), 
+                        CALL COPY2D( SDIMS(1), SDIMS(2),
      :                    %VAL( PNTRI ), %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 3 ) THEN
 
-                        CALL COPY3D( SDIMS(1), SDIMS(2), SDIMS(3), 
+                        CALL COPY3D( SDIMS(1), SDIMS(2), SDIMS(3),
      :                    %VAL( PNTRI ), %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 4 ) THEN
 
-                        CALL MA3TO2( MODE, SDIMS(1), SDIMS(2), 
+                        CALL MA3TO2( MODE, SDIMS(1), SDIMS(2),
      :                    SDIMS(3), %VAL( PNTRI ), ODIMS(1), ODIMS(2),
      :                    %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 5 ) THEN
 
-                        CALL MA3TO1( MODE, SDIMS(1), SDIMS(2), 
+                        CALL MA3TO1( MODE, SDIMS(1), SDIMS(2),
      :                    SDIMS(3), %VAL( PNTRI ), ODIMS(1),
      :                    %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 6 ) THEN
 
-                        CALL MA2TO3( MODE, SDIMS(1), SDIMS(2), 
+                        CALL MA2TO3( MODE, SDIMS(1), SDIMS(2),
      :                    %VAL( PNTRI ), ODIMS(1), ODIMS(2), ODIMS(3),
      :                    %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 7 ) THEN
 
-                        CALL MA2TO1( MODE, SDIMS(1), SDIMS(2), 
+                        CALL MA2TO1( MODE, SDIMS(1), SDIMS(2),
      :                    %VAL( PNTRI ), ODIMS(1),
      :                    %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 8 ) THEN
 
-                        CALL MA1TO3( MODE, SDIMS(1), %VAL( PNTRI ), 
+                        CALL MA1TO3( MODE, SDIMS(1), %VAL( PNTRI ),
      :                    ODIMS(1), ODIMS(2), ODIMS(3),
      :                    %VAL( PNTRO ), STATUS )
 
                      ELSEIF( CASE .EQ. 9 ) THEN
 
-                        CALL MA1TO2( MODE, SDIMS(1), %VAL( PNTRI ), 
+                        CALL MA1TO2( MODE, SDIMS(1), %VAL( PNTRI ),
      :                    ODIMS(1), ODIMS(2),
      :                    %VAL( PNTRO ), STATUS )
                      ENDIF

@@ -84,13 +84,13 @@ datCopy(const HDSLoc * locator1,
 *     24-NOV-2000 (BKM):
 *        Under Linux changes to mapped files are written directly to disk but
 *        NOT reflected in the (buffered) sequential access - flush the FCB
-*        if we change modes.    
+*        if we change modes.
 *     17-MAY-2002 (BKM):
 *        Make int a pure C routine.
 *     24-NOV-2000 (BKM):
 *        Under Linux changes to mapped files are written directly to disk but
 *        NOT reflected in the (buffered) sequential access - flush the FCB
-*        if we change modes.    
+*        if we change modes.
 *     14-JUN-2005 (BKM):
 *        Fix copying from 32<>64bit locators
 *     15-NOV-2005 (TIMJ):

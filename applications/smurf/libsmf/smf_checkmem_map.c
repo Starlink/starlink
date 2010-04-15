@@ -34,7 +34,7 @@
 *     This function estimates the amount of memory required for the ouput map
 *     based on the DATA, VARIANCE, WEIGHTS and EXP_TIME arrays sizes given
 *     their data-types and the lbnd/ubnd ranges. If this amount of memory
-*     (necessary) exceeds available, SMF__NOMEM status is set. 
+*     (necessary) exceeds available, SMF__NOMEM status is set.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -100,7 +100,7 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Check inputs */  
+  /* Check inputs */
   if( !lbnd ) {
     *status = SAI__ERROR;
     errRep("FUNC_NAME", "NULL lbnd supplied", status);
@@ -132,9 +132,9 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
     /* Determine memory required by all arrays with mapsize
        elements. smurf_makemap always needs double precision arrays
        for MAP, VARIANCE, WEIGHTS, EXP_TIME  */
-    
+
     total = 4*sizeof(double)*mapsize;
-    
+
     if( rebin ) {
       /* For method=rebin we also need space for weights3d */
       total += 2*sizeof(double)*mapsize;
@@ -148,8 +148,8 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
       *status = SMF__NOMEM;
       msgSeti("REQ",total/SMF__MB);
       msgSeti("AVAIL",available/SMF__MB);
-      errRep("FUNC_NAME", 
-	     "Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb", 
+      errRep("FUNC_NAME",
+	     "Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb",
 	     status);
     }
 
@@ -159,5 +159,5 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
     }
 
   }
-    
+
 }

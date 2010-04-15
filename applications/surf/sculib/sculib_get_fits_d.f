@@ -39,7 +39,7 @@
 *     VALUE                = DOUBLE PRECISION (Returned)
 *           the value of the FITS keyword
 *     STATUS               = INTEGER (Given and returned)
-*           global status 
+*           global status
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -121,7 +121,7 @@
          DO WHILE (LOOPING)
             I = I + 1
 
-*  the FITS keyword name should be in first part of the string, immediately 
+*  the FITS keyword name should be in first part of the string, immediately
 *  in front of the =
 
             IPOS = INDEX (FITS(I),'=')
@@ -152,16 +152,16 @@
                   END IF
                END IF
             END IF
-                              
+
 *  break out of loop if we've found a value, reached the end of the FITS
 *  array, or if an error has occured
-   
-            IF ((VALUE .NE. VAL__BADD).OR. 
+
+            IF ((VALUE .NE. VAL__BADD).OR.
      :          (STATUS .NE. SAI__OK) .OR.
      :          (I .EQ. N_FITS))      THEN
                LOOPING = .FALSE.
             END IF
-                      
+
          END DO
 
          IF (STATUS .NE. SAI__OK) THEN
@@ -171,7 +171,7 @@
             CALL ERR_REP (' ', '^LINE', STATUS)
          END IF
       END IF
- 
+
 *  check that a value for the parameter was found
 
       IF (VALUE .EQ. VAL__BADD) THEN
@@ -182,5 +182,5 @@
      :        'FITS item ^NAME', STATUS)
          END IF
       END IF
-     
+
       END

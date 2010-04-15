@@ -23,16 +23,16 @@ C                                          JAB / AAO  14th July 1986
 C     Modified:
 C
 C     15th July 1986  KS / AAO. Minor changes so routine will work
-C                     on data with more than 1 dimension.  
+C                     on data with more than 1 dimension.
 C     22nd July 1986  KS / AAO. Modified to work with absolute rather
 C                     than percentage error values.
 C     13th Aug  1987  DJA/ AAO. Revised DSA_ routines - some specs changed.
 C                     Now uses DYN_ package for dynamic memory handling.
 C                     Changed inconsistent variable naming. The variables for
-C                     the first spectrum are numbered 1, until they are 
+C                     the first spectrum are numbered 1, until they are
 C                     superceded by the OUTPUT vars.  and those of the
 C                     second 2 : after the output filename is obtained, the
-C                     names are prefixed with an 'O'. 
+C                     names are prefixed with an 'O'.
 C      8th Dec  1990  JAB / JAC. Use Data Quality.
 C      1st Mar  1991  JAB / JAC. Rewrite subroutine performing the combine.
 C      2nd Apr  1991  JMS / AAO. Added the correction, made by KS, on the use
@@ -168,7 +168,7 @@ C     QSPEC2    (Byte array QSPEC2(N) - The quality of the second spectrum
 C
 C     Modified -
 C
-C     22nd July 1986.  KS / AAO.  Now expects absolute error values 
+C     22nd July 1986.  KS / AAO.  Now expects absolute error values
 C                      rather than percentage errors.
 C      8th Dec 1990.   JAB / JAC.  Use quality arrays.
 C      1st Mar 1991.   JAB / JAC.  Use variance rather than errors.
@@ -186,7 +186,7 @@ C
       REAL SPEC1(N), VSPEC1(N), SPEC2(N), VSPEC2(N)
       BYTE QSPEC1(N), QSPEC2(N)
 C
-C     Local variables      
+C     Local variables
 C
       INTEGER STATUS,I
       REAL WT1,WT2
@@ -209,7 +209,7 @@ C
             VSPEC1(I)=VSPEC2(I)
             QSPEC1(I)=0
          ELSE IF (QSPEC2(I) .NE. 0) THEN
-C   
+C
 C     Nothing to do - Spectrum 1 is the output (even if its quality is bad)
 C
             CONTINUE
@@ -217,7 +217,7 @@ C
 C
 C     If no error array on one or other spectrum just form average
 C
-            SPEC1(I) = (SPEC1(I)+SPEC2(I))/2.0 
+            SPEC1(I) = (SPEC1(I)+SPEC2(I))/2.0
          ELSE IF ((VSPEC1(I) .EQ. FUNKNOWN_IN) .OR.
      :       (VSPEC2(I) .EQ. FUNKNOWN_IN)) THEN
 C
@@ -268,5 +268,5 @@ C     Form combined variance
 C
             VSPEC1(I) = 1.0/(WT1+WT2)
          END IF
-      END DO            
+      END DO
       END

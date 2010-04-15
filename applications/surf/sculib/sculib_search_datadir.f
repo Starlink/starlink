@@ -52,15 +52,15 @@
 *     fails then we change to $DATADIR (if defined) and then try to open
 *     the PARAM name or the reconstructed name. I should try resetting the
 *     parameter with a PUT except that the stupid system puts up a prompt
-*     when I try. We do remember to change back to the 
+*     when I try. We do remember to change back to the
 *     current working directory afterwards. Note that the parameter is already
-*     defined so the user is not asked twice :-). 
+*     defined so the user is not asked twice :-).
 *     Should probably read the environment variables before starting the loop.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -75,7 +75,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -139,17 +139,17 @@
 
 
       DO WHILE (TRYING)
- 
+
          CALL NDF_EXIST(PARAM, 'READ', INDF, STATUS)
 
-*     Jump out of loop if 
+*     Jump out of loop if
          IF (STATUS .EQ. PAR__NULL .OR.
      :        STATUS .EQ. PAR__ABORT) THEN
 
             TRYING = .FALSE.
- 
+
 *  The file could be in DATADIR or it could have been specified as a number
- 
+
          ELSE IF (INDF .EQ. NDF__NOID) THEN
 
 *     First check to see if a number was given
@@ -184,11 +184,11 @@
                      OUTFILE = PREFIX
                      IPOSN = CHR_LEN(OUTFILE)
                      CALL CHR_APPND(DEMOD, OUTFILE, IPOSN)
-                     
+
 *     Now convert the string to 4 digits with leading zeroes
-                     
+
                      WRITE (CTEMP, '(I4.4)') SCANNO
-                     
+
                      CALL CHR_APPND(CTEMP, OUTFILE, IPOSN)
 
                   ELSE
@@ -199,11 +199,11 @@
                      CALL MSG_SETC('PRE', PREFIX_ENV)
                      CALL ERR_REP(' ', '^TASK: Error reading the '//
      :                    '^PRE environment variable.', STATUS)
-                     
+
                      CALL MSG_SETC('PRE', PREFIX_ENV)
                      CALL ERR_REP(' ', ' Numbers can only be '//
      :                    'specified in conjunction with ^PRE', STATUS)
-                  
+
 *     Reset FINDNUM since we havent got a valid filename
 *     We have to remember that this name is not a valid filename
 
@@ -232,7 +232,7 @@
 
 *       If we havent found it we have to look in DATADIR
 
-               IF (STATUS .NE. SAI__OK) THEN 
+               IF (STATUS .NE. SAI__OK) THEN
                   CALL ERR_ANNUL(STATUS)
                   INDF = NDF__NOID
                ELSE
@@ -252,7 +252,7 @@
 
 *     Read the DATADIR environment variable
                CALL PSX_GETENV('DATADIR', DATA_DIR, STATUS)
- 
+
 *     Find the current directory
                ISTAT = GETCWD(CWD)
 
@@ -269,9 +269,9 @@
 
 *     First we try opening the reconstructed file
                         IF (STATUS .EQ. SAI__OK) THEN
-                           CALL NDF_FIND(DAT__ROOT, OUTFILE, INDF, 
+                           CALL NDF_FIND(DAT__ROOT, OUTFILE, INDF,
      :                          STATUS)
-                           IF (STATUS .NE. SAI__OK) 
+                           IF (STATUS .NE. SAI__OK)
      :                          CALL ERR_ANNUL(STATUS)
                         END IF
 
@@ -284,7 +284,7 @@
 *     Now we remember to change back to our first directory
                      ISTAT = CHDIR(CWD)
 
-*     Always check system calls. 
+*     Always check system calls.
                      IF (ISTAT .NE. 0) THEN
                         IF (STATUS .EQ. SAI__OK) STATUS = SAI__ERROR
                         CALL ERR_REP(' ','Could not change back '//
@@ -329,7 +329,7 @@
          ELSE
             TRYING = .FALSE.
          END IF
- 
+
         IF (TRYING) THEN
 
            IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
@@ -340,8 +340,8 @@
            CALL PAR_CANCL(PARAM, STATUS)
         END IF
 
-         
+
       END DO
 
-      END 
+      END
 

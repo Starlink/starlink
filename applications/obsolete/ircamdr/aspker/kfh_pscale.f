@@ -6,7 +6,7 @@
       IMPLICIT NONE
 *    Local variables :
       INTEGER PXDIM
-
+
       INTEGER PYDIM
       INTEGER AXDIM
       INTEGER AYDIM
@@ -48,7 +48,7 @@
 
          DO I = 1,PXDIM
 
-            PATCH(I,PYDIM+1-J) = 
+            PATCH(I,PYDIM+1-J) =
      :       MIN(MAX(NINT((A(I+1,J+1)-IMLO)/(IMHI-IMLO)*255.0),0),255)
 
          END DO

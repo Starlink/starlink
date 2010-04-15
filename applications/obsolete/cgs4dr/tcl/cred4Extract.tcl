@@ -11,7 +11,7 @@ proc cred4Extract {taskname} {
     cgs4drCursor pirate orange black
     .cred4Dialogue config -cursor {arrow green black}
 
-# Middle-Right contains Extract Nodded Spectrum Parameters 
+# Middle-Right contains Extract Nodded Spectrum Parameters
     set midtop [frame $frame.mid]
     set bottop [frame $frame.bot]
     set basetop [frame $frame.bas]
@@ -23,8 +23,8 @@ proc cred4Extract {taskname} {
     set f2 [radiobutton $midtop.f2 -text "Faint" -variable Cred4Widgets(SPC_ALGORITHM) -value "FAINT"]
     set iv [checkbutton $midtop.we -text "Invert" -variable Cred4Widgets(SPC_INVERT)]
     set l4 [label $midtop.l4 -text " "]
-    pack $label $f1 $f2 $l4 -in $midtop -side left 
-    pack $iv -in $midtop -side right 
+    pack $label $f1 $f2 $l4 -in $midtop -side left
+    pack $iv -in $midtop -side right
     set Cred4Widgets(SPC_ALGORITHM) [string trim [string toupper [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.algorithm]]]
     set Cred4Widgets(SPC_INVERT) [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.invert]
     bind $label <Button-2> "cred4Update cred4Extract ALL"
@@ -38,14 +38,14 @@ proc cred4Extract {taskname} {
     bind $f2 <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
     bind $iv <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
 
-    set l1 [label $bottop.l1 -text "Start"]  
-    set l2 [label $bottop.l2 -text "End"]  
-    set l3 [label $bottop.l3 -text "Top Extraction Row" -width 20]  
+    set l1 [label $bottop.l1 -text "Start"]
+    set l2 [label $bottop.l2 -text "End"]
+    set l3 [label $bottop.l3 -text "Top Extraction Row" -width 20]
     set l4 [label $bottop.l4 -text " "]
     set Cred4Widgets(SPC_ROW1S) [entry $bottop.s1 -relief sunken -bd 2]
     set Cred4Widgets(SPC_ROW1E) [entry $bottop.e1 -relief sunken -bd 2]
-    pack $l3 $l4 -in $bottop -side left 
-    pack $Cred4Widgets(SPC_ROW1E) $l2 $Cred4Widgets(SPC_ROW1S) $l1 -in $bottop -side right 
+    pack $l3 $l4 -in $bottop -side left
+    pack $Cred4Widgets(SPC_ROW1E) $l2 $Cred4Widgets(SPC_ROW1S) $l1 -in $bottop -side right
     $Cred4Widgets(SPC_ROW1S) delete 0 end
     $Cred4Widgets(SPC_ROW1S) insert end [string trim [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.row1s]]
     $Cred4Widgets(SPC_ROW1E) delete 0 end
@@ -65,14 +65,14 @@ proc cred4Extract {taskname} {
     bind $l3 <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
     bind $l4 <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
 
-    set l1 [label $basetop.l1 -text "Start"]  
-    set l2 [label $basetop.l2 -text "End"]  
-    set l3 [label $basetop.l3 -text "Middle Extraction Row" -width 20]  
+    set l1 [label $basetop.l1 -text "Start"]
+    set l2 [label $basetop.l2 -text "End"]
+    set l3 [label $basetop.l3 -text "Middle Extraction Row" -width 20]
     set l4 [label $basetop.l4 -text " "]
     set Cred4Widgets(SPC_ROW2S) [entry $basetop.s1 -relief sunken -bd 2]
     set Cred4Widgets(SPC_ROW2E) [entry $basetop.e1 -relief sunken -bd 2]
-    pack $l3 $l4 -in $basetop -side left 
-    pack $Cred4Widgets(SPC_ROW2E) $l2 $Cred4Widgets(SPC_ROW2S) $l1 -in $basetop -side right 
+    pack $l3 $l4 -in $basetop -side left
+    pack $Cred4Widgets(SPC_ROW2E) $l2 $Cred4Widgets(SPC_ROW2S) $l1 -in $basetop -side right
     $Cred4Widgets(SPC_ROW2S) delete 0 end
     $Cred4Widgets(SPC_ROW2S) insert end [string trim [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.row2s]]
     $Cred4Widgets(SPC_ROW2E) delete 0 end
@@ -92,14 +92,14 @@ proc cred4Extract {taskname} {
     bind $l3 <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
     bind $l4 <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
 
-    set l1 [label $lbasetop.l1 -text "Start"]  
-    set l2 [label $lbasetop.l2 -text "End"]  
-    set l3 [label $lbasetop.l3 -text "Bottom Extraction Row" -width 20]  
+    set l1 [label $lbasetop.l1 -text "Start"]
+    set l2 [label $lbasetop.l2 -text "End"]
+    set l3 [label $lbasetop.l3 -text "Bottom Extraction Row" -width 20]
     set l4 [label $lbasetop.l4 -text " "]
     set Cred4Widgets(SPC_ROW3S) [entry $lbasetop.s1 -relief sunken -bd 2]
     set Cred4Widgets(SPC_ROW3E) [entry $lbasetop.e1 -relief sunken -bd 2]
-    pack $l3 $l4 -in $lbasetop -side left 
-    pack $Cred4Widgets(SPC_ROW3E) $l2 $Cred4Widgets(SPC_ROW3S) $l1 -in $lbasetop -side right 
+    pack $l3 $l4 -in $lbasetop -side left
+    pack $Cred4Widgets(SPC_ROW3E) $l2 $Cred4Widgets(SPC_ROW3S) $l1 -in $lbasetop -side right
     $Cred4Widgets(SPC_ROW3S) delete 0 end
     $Cred4Widgets(SPC_ROW3S) insert end [string trim [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.row3s]]
     $Cred4Widgets(SPC_ROW3E) delete 0 end

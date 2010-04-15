@@ -1,5 +1,5 @@
 C+
-      SUBROUTINE GEN_MULCAFE (NELM, CONST, INDATA, OUTDATA, INQUAL, 
+      SUBROUTINE GEN_MULCAFE (NELM, CONST, INDATA, OUTDATA, INQUAL,
      :   OUTQUAL, INVAR, OUTVAR, QUAL, FLAGS, FBAD, VARIANCES)
 C
 C     G E N _ M U L C A F E
@@ -11,14 +11,14 @@ C
 C     (>) NELM   (Integer) The number of elements of INDATA.
 C     (>) CONST  (Real) The constant by which all the
 C                elements of INDATA are to be multiplied.
-C     (>) INDATA (Real array INDATA(NELM)) The input array 
+C     (>) INDATA (Real array INDATA(NELM)) The input array
 C                (Note that INDATA may be multiply dimensioned
 C                in the calling program.  It is treated as
 C                1D here for efficiency and generality.)
 C     (<) OUTDATA(Real array OUTDATA(NELM)) The result of the
 C                multiplication.  Note that any of the IN-OUT
 C                pairs may be the same array
-C     (>) INQUAL (Byte array INQUAL(NELM)). Quality array 
+C     (>) INQUAL (Byte array INQUAL(NELM)). Quality array
 C                associated with INDATA
 C     (<) OUTQUAL Same for OUTDATA
 C     (>) INVAR  (Real array INVAR(NELM)) Variance array
@@ -43,7 +43,7 @@ C
       INTEGER NELM
       LOGICAL QUAL, FLAGS, VARIANCES
       BYTE INQUAL(NELM), OUTQUAL(NELM)
-      REAL CONST, INDATA(NELM), OUTDATA(NELM), INVAR(NELM), 
+      REAL CONST, INDATA(NELM), OUTDATA(NELM), INVAR(NELM),
      :   OUTVAR(NELM)
       REAL FBAD
 

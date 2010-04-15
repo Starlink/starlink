@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL SPD_FABBD( MNDF, COMP, LINNAM, LABFRQ, CMPTYP, NPARA,
-*        PARTYP, STATUS ) 
+*        PARTYP, STATUS )
 
 *  Description:
 *     This routine changes the decsription of a component in the result
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,7 +110,7 @@
       INTEGER SPD_FDABI          ! Get an array element
 
 *  Local Data:
-      DATA CTYPE / XT9C1, XT9C2, XT9C3, XT9C4, XT9C5, XT9C6 / 
+      DATA CTYPE / XT9C1, XT9C2, XT9C3, XT9C4, XT9C5, XT9C6 /
       DATA PTYPE / XT9P1 /
 
 *.

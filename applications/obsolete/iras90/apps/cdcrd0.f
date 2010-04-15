@@ -16,7 +16,7 @@
 
 *  Description:
 *     This subroutine coadds the crossing traces and put the result
-*     to a data array of an output NDF at the specified position. 
+*     to a data array of an output NDF at the specified position.
 
 *  Arguments:
 *     SCNLEN = INTEGER (Given)
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,7 +80,7 @@
       INTEGER HLFLEN             ! Half length of the crossing traces
       INTEGER ICRS, ISMP         ! Do loop indices
       INTEGER NCDSMP             ! Number samples in coadding
-      REAL TOTWGT                ! Total weight             
+      REAL TOTWGT                ! Total weight
 *.
 
 *  Check inherited global status.
@@ -90,7 +90,7 @@
       DO ISMP = BSMP, ESMP
          OUTDAT( ISMP, BINDX ) = VAL__BADR
       END DO
-       
+
 *  Get the half length of the crossing trace.
       HLFLEN = SCNLEN / 2
 
@@ -108,24 +108,24 @@
      :        WGHT( HLFLEN + 1, ICRS ) .NE. VAL__BADR ) THEN
             OUTDAT( SMPPOS, BINDX ) = OUTDAT( SMPPOS, BINDX ) +
      :             DATA( HLFLEN + 1, ICRS ) * WGHT( HLFLEN + 1, ICRS )
-            TOTWGT = TOTWGT + WGHT( HLFLEN + 1, ICRS ) 
-            NCDSMP = NCDSMP + 1        
+            TOTWGT = TOTWGT + WGHT( HLFLEN + 1, ICRS )
+            NCDSMP = NCDSMP + 1
          END IF
       END DO
-      
+
 *  If no sample take part into coadding, set the result as bad.
       IF ( NCDSMP .EQ. 0 ) THEN
          OUTDAT( SMPPOS, BINDX ) = VAL__BADR
       ELSE
          OUTDAT( SMPPOS, BINDX ) = OUTDAT( SMPPOS, BINDX ) / TOTWGT
       END IF
-      
+
 *  Process other samples one by one.
       DO ISMP = 1, HLFLEN
 
 *  Go forward.
          IF ( SMPPOS + ISMP .LE. ESMP ) THEN
-            OUTDAT( SMPPOS + ISMP, BINDX ) = 0.0 
+            OUTDAT( SMPPOS + ISMP, BINDX ) = 0.0
             NCDSMP = 0
             TOTWGT = 0.0
             DO ICRS = 1, NCROS
@@ -140,7 +140,7 @@
      :                           DATA( HLFLEN + 1 + ISMP, ICRS ) *
      :                           WGHT( HLFLEN + 1 + ISMP, ICRS )
                   NCDSMP = NCDSMP + 1
-                  TOTWGT = TOTWGT + WGHT( HLFLEN + 1 + ISMP, ICRS ) 
+                  TOTWGT = TOTWGT + WGHT( HLFLEN + 1 + ISMP, ICRS )
                END IF
             END DO
 
@@ -150,12 +150,12 @@
             ELSE
                OUTDAT( SMPPOS + ISMP, BINDX ) =
      :               OUTDAT( SMPPOS + ISMP, BINDX ) / TOTWGT
-            END IF  
+            END IF
          END IF
-      
+
 *  Go backward.
          IF ( SMPPOS - ISMP .GE. BSMP ) THEN
-            OUTDAT( SMPPOS - ISMP, BINDX ) = 0.0 
+            OUTDAT( SMPPOS - ISMP, BINDX ) = 0.0
             NCDSMP = 0
             TOTWGT = 0.0
             DO ICRS = 1, NCROS
@@ -180,7 +180,7 @@
             ELSE
                OUTDAT( SMPPOS - ISMP, BINDX ) =
      :               OUTDAT( SMPPOS - ISMP, BINDX ) / TOTWGT
-            END IF 
+            END IF
          END IF
       END DO
 

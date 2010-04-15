@@ -181,7 +181,7 @@ itcl::class gaia::StarArdColumn {
    #  ----------------------
 
    #  Position of the column in pixel coordinates.
-   public variable x {1} { 
+   public variable x {1} {
       if { [winfo exists $X_] } {
          $X_ configure -value $x
          lassign [canvas_coord $x 1] xs ys
@@ -192,7 +192,7 @@ itcl::class gaia::StarArdColumn {
 
    #  Protected variables: (available to instance)
    #  --------------------
-   
+
    #  Column position entry widget.
    protected variable X_ {}
 

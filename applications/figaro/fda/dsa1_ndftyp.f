@@ -62,12 +62,12 @@
 *        Moved NDF_TYPES as it contains DATA statements.
 *        Temporary hardwire of number of TYPES as 7.
 *     {enter_further_changes_here}
-      
+
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
 
 
       SUBROUTINE DSA1_DSATYP( NDFTYP, TYPE, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -139,7 +139,7 @@
       INTEGER I                  ! Loop index
       CHARACTER * ( 6 ) TYPEUC   ! Given type in upper case
       CHARACTER * ( NDF__SZTYP ) NDF_TYPES( 7 )
-      
+
       INCLUDE 'DSA_TYPES'        ! DSA data types and their sizes
 
       DATA NDF_TYPES

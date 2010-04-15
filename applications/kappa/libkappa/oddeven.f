@@ -18,16 +18,16 @@
 
 *  Description:
 *     This application forms a smoothed signal for a one-dimensional NDF
-*     whose elements have oscillating biases.  It averages the signal 
+*     whose elements have oscillating biases.  It averages the signal
 *     levels of alternating pixels.  Both elements must be good and not
-*     deviate from each other by more than a threshold for the averaging 
+*     deviate from each other by more than a threshold for the averaging
 *     to take place.
 
-*     This application is intended for images exhibiting alternating 
+*     This application is intended for images exhibiting alternating
 *     patterns in columns or rows, the so called odd-even noise, arising
-*     from electronic interference or readout through different 
+*     from electronic interference or readout through different
 *     channels.  However, you must supply a vector collapsed along the
-*     unaffected axis, such that the vector exhibits the pattern.  See 
+*     unaffected axis, such that the vector exhibits the pattern.  See
 *     task COLLAPSE using the Mode or Median estimators.  The smoothed
 *     image is then subtracted from the supplied vector to yield the
 *     odd-even pattern.
@@ -44,7 +44,7 @@
 *     THRESH = _DOUBLE (Read)
 *        The maximum difference between adjacent elements for the
 *        averaging filter to be applied.  This allows anomalous pixels
-*        to be excluded.  If null, !, is given, then there is no limit.  
+*        to be excluded.  If null, !, is given, then there is no limit.
 *        [!]
 *     TITLE = LITERAL (Read)
 *        The title of the output NDF.  A null (!) value means using the
@@ -74,7 +74,7 @@
 *     appropriate.
 
 *  Copyright:
-*     Copyright (C) 2006 Central Laboratory of the Research Councils. 
+*     Copyright (C) 2006 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -103,7 +103,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -184,7 +184,7 @@
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,Quality,Variance', 'OUT', 
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,Quality,Variance', 'OUT',
      :               NDFO, STATUS )
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
@@ -229,12 +229,12 @@
 *  threshold calling the routine of the appropriate data type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_OEAR( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ),
-     :                   THRESH, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                   THRESH, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ),
      :                   NCHANG, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_OEAD( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ),
-     :                   DTHRES, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                   DTHRES, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ),
      :                   NCHANG, STATUS )
 
       END IF
@@ -251,5 +251,5 @@
       CALL NDF_END( STATUS )
 
 *  End the routine.
-      
+
       END

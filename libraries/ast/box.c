@@ -11,14 +11,14 @@ c     astBox
 f     AST_BOX
 
 *  Description:
-*     The Box class implements a Region which represents a box with sides 
-*     parallel to the axes of a Frame (i.e. an area which encloses a given 
+*     The Box class implements a Region which represents a box with sides
+*     parallel to the axes of a Frame (i.e. an area which encloses a given
 *     range of values on each axis). A Box is similar to an Interval, the
 *     only real difference being that the Interval class allows some axis
 *     limits to be unspecified. Note, a Box will only look like a box if
 *     the Frame geometry is approximately flat. For instance, a Box centred
 *     close to a pole in a SkyFrame will look more like a fan than a box
-*     (the Polygon class can be used to create a box-like region close to a 
+*     (the Polygon class can be used to create a box-like region close to a
 *     pole).
 
 *  Inheritance:
@@ -44,12 +44,12 @@ f     The Box class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@ f     The Box class does not define any new routines beyond those
 *        Improve astSimplify algorithm.
 *     6-JUN-2007 (DSB):
 *        Change the iterating algorithm in MakeGrid so that it uses
-*        pixel index rather than axis value. This is more robust against 
+*        pixel index rather than axis value. This is more robust against
 *        rounding errors.
 *     9-OCT-2007 (DSB):
 *        - Fix bug in RegBaseMesh that could cause incorrect meshes for 2D
@@ -84,9 +84,9 @@ f     The Box class does not define any new routines beyond those
 *     12-JUL-2009 (DSB):
 *        Modify Simplify so that if a Box can be split into two
 *        simpler components and then joined together into a Prism, it
-*        does so. This is because being able to express a Region in 
+*        does so. This is because being able to express a Region in
 *        its current Frame is more important than having the simplest
-*        possible structure. 
+*        possible structure.
 *class--
 */
 
@@ -152,12 +152,12 @@ static void (* parent_clearclosed)( AstRegion *, int * );
 static void (* parent_setunc)( AstRegion *, AstRegion *, int * );
 static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
 static void (* parent_resetcache)( AstRegion *, int * );
- 
+
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Box)
@@ -249,7 +249,7 @@ void BoxPoints( AstBox *this, double *centre, double *corner, int *status) {
 *     this
 *        Pointer to the Box.
 *     centre
-*        A pointer to an array in which to return the centre position of 
+*        A pointer to an array in which to return the centre position of
 *        the Box, in the base Frame of the encapsulated FrameSet.
 *     corner
 *        A pointer to an array in which to return the position of a corner
@@ -263,7 +263,7 @@ void BoxPoints( AstBox *this, double *centre, double *corner, int *status) {
 */
 
 /* Local Variables: */
-   AstPointSet *pset;        
+   AstPointSet *pset;
    double **ptr;
    int nc;
    int i;
@@ -397,7 +397,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
 *     AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *status )
 
 *  Class Membership:
-*     Box member function 
+*     Box member function
 
 *  Description:
 *     This function finds the best fitting Box through a given mesh of points.
@@ -425,7 +425,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
 */
 
 /* Local Variables: */
-   AstBox *result; 
+   AstBox *result;
    double **ptr;
    double *axval;
    double *blbnd;
@@ -468,7 +468,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
    nc = astGetNcoord( mesh );
 
 /* Get pointers to the axis values. */
-   ptr = astGetPoints( mesh );   
+   ptr = astGetPoints( mesh );
 
 /* Allocate work space. */
    lbnd = astMalloc( sizeof( double )*(size_t) nc );
@@ -483,7 +483,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
    if( axval ) {
 
 /* Get the bounding box of the uncertainty region. */
-      astGetRegionBounds( unc, lbnd, ubnd ); 
+      astGetRegionBounds( unc, lbnd, ubnd );
 
 /* We fit the box one axis at a time. */
       for( ic = 0; ic < nc; ic++ ) {
@@ -497,8 +497,8 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
          d = 0.0;
          axval[ 0 ] = org;
          for( ip = 1; ip < np; ip++, p++ ) {
-            dinc = astAxDistance( frm, ic + 1, p0, *p );        
-            if( dinc != AST__BAD ) {   
+            dinc = astAxDistance( frm, ic + 1, p0, *p );
+            if( dinc != AST__BAD ) {
                d += dinc;
                if( d < lb ) lb = d;
                if( d > ub ) ub = d;
@@ -513,17 +513,17 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
 
 /* Now scan the list of axis values again, looking for values which are
    "close to" either lower or upper bound. These will be the points which
-   are on the faces of the box which are orthogonal to the current axis. Here 
-   "close to" means within 20 times the uncertainty associated with this 
-   axis, or one tenth of the box size (which ever is smaller). We find the 
+   are on the faces of the box which are orthogonal to the current axis. Here
+   "close to" means within 20 times the uncertainty associated with this
+   axis, or one tenth of the box size (which ever is smaller). We find the
    mean and standard deviation of such "close" values, and then do a
-   single sigma-clipping iteration (at 3-sigma) to get rid of any values 
+   single sigma-clipping iteration (at 3-sigma) to get rid of any values
    which are on one of the other faces of the box. */
 
          lim = 20*( ubnd[ ic ] - lbnd[ ic ] );
          lim2 = 0.1*( ub - lb );
          if( lim2 < lim ) lim = lim2;
-         
+
          sxl = 0.0;
          sxl2 = 0.0;
          nxl = 0;
@@ -645,10 +645,10 @@ static void Cache( AstBox *this, int lohi, int *status ){
 *     void Cache( AstRegion *this, int lohi, int *status )
 
 *  Class Membership:
-*     Box member function 
+*     Box member function
 
 *  Description:
-*     This function uses the PointSet stored in the parent Region to calculate 
+*     This function uses the PointSet stored in the parent Region to calculate
 *     some intermediate values which are useful in other methods. These
 *     values are stored within the Box structure.
 
@@ -665,7 +665,7 @@ static void Cache( AstBox *this, int lohi, int *status ){
 /* Local Variables: */
    AstFrame *frm;
    AstPointSet *pset;
-   AstRegion *unc;  
+   AstRegion *unc;
    double **ptr;
    double *centre;
    double *extent;
@@ -687,19 +687,19 @@ static void Cache( AstBox *this, int lohi, int *status ){
    nc = astGetNin( ((AstRegion *)this)->frameset );
 
 /* Allocate memory to store the half-width of the box on each axis. */
-   extent = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+   extent = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
 /* Allocate memory to store the half-width of the box on each axis,
    taking account of the current shrink factor stored in this->shrink. */
-   shextent = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+   shextent = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
 /* Allocate memory to store the centre of the box on each axis. */
-   centre = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+   centre = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
 /* Allocate memory to store the high and low bounds taking account of the
    shrink factor. */
-   hi = (double *) astMalloc( sizeof( double )*(size_t) nc );   
-   lo = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+   hi = (double *) astMalloc( sizeof( double )*(size_t) nc );
+   lo = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
 /* Memory to store the uncertainty bounding box */
    lbnd_unc = astMalloc( sizeof( double)*(size_t) nc );
@@ -765,16 +765,16 @@ static void Cache( AstBox *this, int lohi, int *status ){
 
 /* If we are dealing with an unnegated closed Box or a negated open
    Box, ensure that the box does not have zero width on any axis. We do
-   this by ensuring that the shrunk extent on all axes is at least half the 
+   this by ensuring that the shrunk extent on all axes is at least half the
    width  of the bounding box of the uncertainty Region. */
          if(  astGetNegated( this ) != astGetClosed( this ) ) {
 
 /* Get the bounding box of the uncertainty Region in the base Frame of
    the supplied Box. */
             unc = astGetUncFrm( this, AST__BASE );
-            astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+            astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
 
-/* Ensure the shrunk extents are at least half the width of the uncertainty 
+/* Ensure the shrunk extents are at least half the width of the uncertainty
    bounding box. */
             for ( i = 0; i < nc; i++ ) {
                wid = 0.5*( ubnd_unc[ i ] - lbnd_unc[ i ] );
@@ -806,7 +806,7 @@ static void Cache( AstBox *this, int lohi, int *status ){
 
 }
 
-static double *GeoCorner( AstFrame *frm, int nc, double *centre, 
+static double *GeoCorner( AstFrame *frm, int nc, double *centre,
                           double *geolen, double *corner, int *status ){
 /*
 *  Name:
@@ -821,11 +821,11 @@ static double *GeoCorner( AstFrame *frm, int nc, double *centre,
 
 *  Synopsis:
 *     #include "box.h"
-*     double *GeoCorner( AstFrame *frm, int nc, double *centre, 
+*     double *GeoCorner( AstFrame *frm, int nc, double *centre,
 *                        double *geolen, double *corner, int *status )
 
 *  Class Membership:
-*     Box member function 
+*     Box member function
 
 *  Description:
 *     This function returns the corner position that is implied by the
@@ -865,12 +865,12 @@ static double *GeoCorner( AstFrame *frm, int nc, double *centre,
    double *p2;
    double *p3;
    double *pt;
-   double *result; 
+   double *result;
    double *work1;
    double *work2;
    double off;
    double off0;
-   int i;            
+   int i;
 
 /* Initialise */
    result = corner;
@@ -906,8 +906,8 @@ static double *GeoCorner( AstFrame *frm, int nc, double *centre,
 /* Loop round offsetting along each side of the box. */
       for( i = 0; i < nc; i++ ) {
 
-/* In the p2 array put the axis values at a point which is offset 
-   slightly along the current axis away from the current "corner" 
+/* In the p2 array put the axis values at a point which is offset
+   slightly along the current axis away from the current "corner"
    position (p1). */
          memcpy( p2, p1, sizeof( double )*nc );
 
@@ -922,7 +922,7 @@ static double *GeoCorner( AstFrame *frm, int nc, double *centre,
          p2[ i ] += off;
 
 /* Offset away from the current corner position (p1) towards the position
-   found above (p2), moving by the geodesic distance supplied for this axis. 
+   found above (p2), moving by the geodesic distance supplied for this axis.
    Put the resulting axis values in p3. */
          astOffset( frm, p1, p2, geolen[ i ], p3 );
 
@@ -942,7 +942,7 @@ static double *GeoCorner( AstFrame *frm, int nc, double *centre,
    return result;
 }
 
-static double *GeoLengths( AstFrame *frm, int nc, double *centre, 
+static double *GeoLengths( AstFrame *frm, int nc, double *centre,
                            double *corner, double *geolen, int *status ){
 /*
 *  Name:
@@ -956,11 +956,11 @@ static double *GeoLengths( AstFrame *frm, int nc, double *centre,
 
 *  Synopsis:
 *     #include "box.h"
-*      double *GeoLengths( AstFrame *frm, int nc, double *centre, 
+*      double *GeoLengths( AstFrame *frm, int nc, double *centre,
 *                          double *corner, double *geolen, int *status )
 
 *  Class Membership:
-*     Box member function 
+*     Box member function
 
 *  Description:
 *     This function returns half the geodesic distance along each edge of
@@ -974,30 +974,30 @@ static double *GeoLengths( AstFrame *frm, int nc, double *centre,
 *     centre
 *        Pointer to an array holding rhe box centre axis values.
 *     corner
-*        Pointer to an array holding the axis values at the corner 
-*        position. 
+*        Pointer to an array holding the axis values at the corner
+*        position.
 *     geolen
-*        Pointer to an array in which to return the geodesic distances 
-*        corresponding to each half axis of the box. If this is NULL a 
-*        new array is allocated and a pointer to it returned as the 
+*        Pointer to an array in which to return the geodesic distances
+*        corresponding to each half axis of the box. If this is NULL a
+*        new array is allocated and a pointer to it returned as the
 *        function value.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to the array holding the geodesic half-dimensions of the box. 
-*     If a non-NULL value is supplied for parameter "corner", then the same 
-*     value will be returned as the function value. Otherwise, the 
-*     returned value will be a pointer to a newly allocated array that 
+*     Pointer to the array holding the geodesic half-dimensions of the box.
+*     If a non-NULL value is supplied for parameter "corner", then the same
+*     value will be returned as the function value. Otherwise, the
+*     returned value will be a pointer to a newly allocated array that
 *     should be freed using astFree when no longer needed.
 
 */
 
 /* Local Variables: */
-   double *result; 
+   double *result;
    double *p1;
    double *p2;
-   int i;            
+   int i;
 
 /* Initialise */
    result = geolen;
@@ -1056,7 +1056,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "box.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astGetObjSize protected
@@ -1098,12 +1098,12 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object, status );
 
-   result += astTSizeOf( this->extent );  
+   result += astTSizeOf( this->extent );
    result += astTSizeOf( this->shextent );
-   result += astTSizeOf( this->centre );  
-   result += astTSizeOf( this->lo );      
-   result += astTSizeOf( this->hi );      
-   result += astTSizeOf( this->geolen );      
+   result += astTSizeOf( this->centre );
+   result += astTSizeOf( this->lo );
+   result += astTSizeOf( this->hi );
+   result += astTSizeOf( this->geolen );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
@@ -1142,7 +1142,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1258,7 +1258,7 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *                   double *ubnd, int np_axis, int iaxis, double axval, int *status )
 
 *  Class Membership:
-*     Box member function 
+*     Box member function
 
 *  Description:
 *     This function creates an evenly sampled grid covering a given
@@ -1282,8 +1282,8 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *        volume to be sampled.
 *     np_axis
 *        The number of samples along each axis (except the axis specified
-*        by "iaxis"). The first sample (sample 0) for each axis will be at 
-*        the lower bound given in "lbnd" and the last sample (sample 
+*        by "iaxis"). The first sample (sample 0) for each axis will be at
+*        the lower bound given in "lbnd" and the last sample (sample
 *        "np_axis-1") will be at the upper bound given in "ubnd".
 *     iaxis
 *        The index of an axis which has constant value in the volume.
@@ -1319,8 +1319,8 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
    step = astMalloc( sizeof( double )*(size_t) naxes );
    if( astOK ) {
 
-/* For every axis, set up the step size, initialise the current position to 
-   the lower bound, and store a modified upper limit which includes some 
+/* For every axis, set up the step size, initialise the current position to
+   the lower bound, and store a modified upper limit which includes some
    safety marging to allow for rounding errors. */
       for( i = 0; i < naxes; i++ ) {
          step[ i ] = ( ubnd[ i ] - lbnd[ i ] )/(np_axis-1);
@@ -1348,7 +1348,7 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
                ptr[ i ][ ipp ] = lbnd[ i ] + pi[ i ]*step[ i ];
             }
          }
-         ipp++;      
+         ipp++;
 
 /* We now move the current position on to the next sample */
          i = 0;
@@ -1557,18 +1557,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          i1 = where - 1;
          map = ( *map_list )[ where - 1 ];
          if( astIsARegion( map ) ) {
-            new = (AstMapping *) MergeBox( oldbox, (AstRegion *) map, 0, 
+            new = (AstMapping *) MergeBox( oldbox, (AstRegion *) map, 0,
                                            status );
          }
       }
 
-/* If this did not produced a merged Region, attempt to merge the Box with its 
+/* If this did not produced a merged Region, attempt to merge the Box with its
    upper neighbour (if any). */
       if( !new && where < *nmap - 1 ) {
          i1 = where;
          map = ( *map_list )[ where + 1 ];
          if( astIsARegion( map ) ) {
-            new = (AstMapping *) MergeBox( oldbox, (AstRegion *) map, 1, 
+            new = (AstMapping *) MergeBox( oldbox, (AstRegion *) map, 1,
                                            status );
          }
       }
@@ -1576,13 +1576,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If succesfull... */
       if( new ){
 
-/* Annul the first of the two Mappings, and replace it with the merged 
-   Region. Also clear the invert flag. */ 
+/* Annul the first of the two Mappings, and replace it with the merged
+   Region. Also clear the invert flag. */
          (void) astAnnul( ( *map_list )[ i1 ] );
          ( *map_list )[ i1 ] = new;
          ( *invert_list )[ i1 ] = 0;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
          (void) astAnnul( ( *map_list )[ i1 + 1 ] );
          for ( i = i1 + 2; i < *nmap; i++ ) {
@@ -1608,14 +1608,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst, 
+static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
                             int *status ) {
 /*
 *  Name:
 *     MergeBox
 
 *  Purpose:
-*     Attempt to merge a Box with another Region to form a Region of higher 
+*     Attempt to merge a Box with another Region to form a Region of higher
 *     dimensionality.
 
 *  Type:
@@ -1623,14 +1623,14 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 
 *  Synopsis:
 *     #include "box.h"
-*     AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst, int *status ) 
+*     AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst, int *status )
 
 *  Class Membership:
 *     Box member function.
 
 *  Description:
 *     This function attempts to combine the supplied Regions together
-*     into a Region of higher dimensionality. 
+*     into a Region of higher dimensionality.
 
 *  Parameters:
 *     this
@@ -1695,9 +1695,9 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 /* Check the local error status. */
    if ( !astOK ) return result;
 
-/* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. In addition, in order to 
-   merge, either both Regions must have a defined uncertainty, or neither 
+/* Get the Closed attributes of the two Regions. They must be the same in
+   each Region if we are to merge the Regions. In addition, in order to
+   merge, either both Regions must have a defined uncertainty, or neither
    Region must have a defined Uncertainty. */
    if( astGetClosed( this ) == astGetClosed( reg ) &&
        astTestUnc( this ) == astTestUnc( reg ) ) {
@@ -1709,37 +1709,37 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 /* Get the number of axes in the two supplied Regions. */
       nax_reg = astGetNaxes( reg );
       nax_this = astGetNaxes( this );
-   
+
 /* If the Regions can be combined, get the number of axes the
    combination will have. */
       nax = nax_reg + nax_this;
-   
+
 /* Get the base Frames from the two Region FrameSets, and combine them
    into a single CmpFrame that will be used to create any new Region. */
       frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
       frm_reg = astGetFrame( reg->frameset, AST__BASE );
-   
+
       if( boxfirst ) {
          bfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
       } else {
          bfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
       }
-   
+
       frm_this = astAnnul( frm_this );
       frm_reg = astAnnul( frm_reg );
-   
+
 /* Indicate we do not yet have a merged Region. */
       new = NULL;
-   
+
 /* First attempt to merge with another Box. The result will be a Box. Both
    Boxes must be un-negated. */
       if( astIsABox( reg ) && !neg_this && !neg_reg ) {
-   
+
 /* Allocate memory to store the centre and corner of the returned Box. */
          centre = astMalloc( sizeof( double )*(size_t) nax );
          corner = astMalloc( sizeof( double )*(size_t) nax );
-   
-/* Copy the centres and corners from the supplied Boxes into the above 
+
+/* Copy the centres and corners from the supplied Boxes into the above
    arrays, in the requested order. */
          if( boxfirst ) {
             astBoxPoints( this, centre, corner );
@@ -1748,23 +1748,23 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
             astBoxPoints( reg, centre, corner );
             astBoxPoints( this, centre + nax_reg, corner + nax_reg );
          }
-   
+
 /*  Create the new Box, initially with no uncertainty. */
-         new = (AstRegion *) astBox( bfrm, 0, centre, corner, NULL, "", 
+         new = (AstRegion *) astBox( bfrm, 0, centre, corner, NULL, "",
                                      status );
-   
+
 /* Free resources .*/
          centre = astFree( centre );
          corner = astFree( corner );
-   
-/* Now attempt to merge with an Interval. The result will be an Interval. 
+
+/* Now attempt to merge with an Interval. The result will be an Interval.
    Both Intervals must be un-negated. */
       } else if( astIsAInterval( reg )  && !neg_this && !neg_reg ) {
-   
+
 /* Allocate memory to store the bounds of the returned Interval. */
          lbnd = astMalloc( sizeof( double )*(size_t) nax );
          ubnd = astMalloc( sizeof( double )*(size_t) nax );
-   
+
 /* Copy the centre and corner from the supplied Box into the required part
    of the above arrays. */
          if( boxfirst ) {
@@ -1796,13 +1796,13 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
          }
 
 /*  Create the new Interval, initially with no uncertainty. */
-         new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "", 
+         new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "",
                                           status );
-   
+
 /* Free resources .*/
          lbnd = astFree( lbnd );
          ubnd = astFree( ubnd );
-   
+
 /* Now attempt to merge with a NullRegion. The result will be an
    Interval. The NullRegion must be negated and the Box must not. */
       } else if( astIsANullRegion( reg ) && !neg_this && neg_reg ) {
@@ -1810,7 +1810,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 /* Allocate memory to store the bounds of the returned Interval. */
          lbnd = astMalloc( sizeof( double )*(size_t) nax );
          ubnd = astMalloc( sizeof( double )*(size_t) nax );
-   
+
 /* Copy the centre and corner from the supplied Box into the required part
    of the above arrays. */
          if( boxfirst ) {
@@ -1847,7 +1847,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
             }
 
 /*  Create the new Interval, initially with no uncertainty. */
-            new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "", 
+            new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "",
                                              status );
          }
 
@@ -1855,10 +1855,10 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
          lbnd = astFree( lbnd );
          ubnd = astFree( ubnd );
 
-/* Now attempt to merge with a PointList. The result will be a PointList. 
+/* Now attempt to merge with a PointList. The result will be a PointList.
    Both Regions must be un-negated. */
       } else if( astIsAPointList( reg ) && !neg_this && !neg_reg ) {
-   
+
 /* We can only do this if the Box has zero width on each axis (i.e.
    represents a point). Get the Box centre and corner. */
          centre = astMalloc( sizeof( double )*(size_t) nax_this );
@@ -1874,19 +1874,19 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 /* Set "ok" to zero if the Box does not have zero width on any axis. Here
    "zero width" means a width less than half the uncertainty on the axis. */
          if( astOK ) {
-   
+
             ok = 1;
             for( i = 0; i < nax_this; i++ ) {
-               if( fabs( centre[ i ] - corner[ i ] ) > 
+               if( fabs( centre[ i ] - corner[ i ] ) >
                    0.25*fabs( ubnd[ i ] - lbnd[ i ] ) ) {
                   ok = 0;
                   break;
                }
             }
-   
+
 /* If the Box is a point, we go on to create a new PointList. */
             if( ok ) {
-   
+
 /* Get a PointSet holding the axis values in the supplied PointList data.
    Also get the number of points in the PointSet and pointers to the arrays
    holding the axis values. */
@@ -1898,7 +1898,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
     with the extra required axes. Get pointers to its axis arrays. */
                pset_new = astPointSet( npnt, nax, "", status );
                ptr_new = astGetPoints( pset_new );
-                
+
 /* Copy the PointList axis values into the new PointSet, and then include
    the extra axis values defined by the Box to each point. */
                if( astOK ) {
@@ -1907,18 +1907,18 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
                      p = ptr_reg[ j ];
                      q = ptr_new[ boxfirst ? nax_this + j : j ];
                      for( i = 0; i < npnt; i++ ) *(q++) = *(p++);
-                  }   
+                  }
 
                   for( j = 0; j < nax_this; j++ ) {
                      p = centre + j;
                      q = ptr_new[ boxfirst ? j : nax_reg + j ];
                      for( i = 0; i < npnt; i++ ) *(q++) = *p;
-                  }   
+                  }
 
 /*  Create the new PointList, initially with no uncertainty. */
-                  new = (AstRegion *) astPointList( bfrm, pset_new, NULL, 
+                  new = (AstRegion *) astPointList( bfrm, pset_new, NULL,
                                                     "", status );
-               }   
+               }
 
 /* Free resources .*/
                pset_new = astAnnul( pset_new );
@@ -1943,7 +1943,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
    astRegOverlay has not changed this. */
          astClearNegated( new );
 
-/* If both the supplied Regions have uncertainty, assign the new Region an 
+/* If both the supplied Regions have uncertainty, assign the new Region an
    uncertainty. */
          if( astTestUnc( this ) && astTestUnc( reg ) ) {
 
@@ -1975,27 +1975,27 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
    into a single CmpFrame. */
          frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__CURRENT );
          frm_reg = astGetFrame( reg->frameset, AST__CURRENT );
-      
+
          if( boxfirst ) {
             cfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
          } else {
             cfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
          }
-      
-/* Get the base -> current Mappings from the two Region FrameSets, and 
+
+/* Get the base -> current Mappings from the two Region FrameSets, and
    combine them into a single parallel CmpMap that connects bfrm and cfrm. */
-         map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE, 
+         map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE,
                                    AST__CURRENT );
          map_reg = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
-      
+
          if( boxfirst ) {
-            bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "", 
+            bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "",
                                               status );
          } else {
-            bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "", 
+            bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "",
                                               status );
          }
-      
+
 /* Map the new Region into the new current Frame. */
          result = astMapRegion( new, bcmap, cfrm );
 
@@ -2028,7 +2028,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
             fac_reg = (double)msz_reg/(double)astGetMeshSize( reg );
 
 /* The MeshSize of the returned Returned is the default value scaled by
-   the product of the two ratios found above. */ 
+   the product of the two ratios found above. */
             astSetMeshSize( result, fac_this*fac_reg*astGetMeshSize( result ) );
 
 /* Re-instate the original MeshSize values for the supplied Regions (if
@@ -2062,7 +2062,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     RegBaseBox
 
 *  Purpose:
-*     Returns the bounding box of an un-negated Region in the base Frame of 
+*     Returns the bounding box of an un-negated Region in the base Frame of
 *     the encapsulated FrameSet.
 
 *  Type:
@@ -2077,7 +2077,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     method inherited from the Region class).
 
 *  Description:
-*     This function returns the upper and lower axis bounds of a Region in 
+*     This function returns the upper and lower axis bounds of a Region in
 *     the base Frame of the encapsulated FrameSet, assuming the Region
 *     has not been negated. That is, the value of the Negated attribute
 *     is ignored.
@@ -2088,12 +2088,12 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     ubnd
 *        Pointer to an array in which to return the upper axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     status
 *        Pointer to the inherited status variable.
@@ -2135,7 +2135,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 *     RegBaseGrid
 
 *  Purpose:
-*     Return a PointSet containing points spread through the volume of a 
+*     Return a PointSet containing points spread through the volume of a
 *     Region.
 
 *  Type:
@@ -2151,7 +2151,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 
 *  Description:
 *     This function returns a PointSet containing a set of points spread
-*     through the volume of the supplied Box. The points refer to the base 
+*     through the volume of the supplied Box. The points refer to the base
 *     Frame of the encapsulated FrameSet.
 
 *  Parameters:
@@ -2197,7 +2197,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 /* Check the local error status. */
    if ( !astOK ) return NULL;
 
-/* If the Region structure contains a pointer to a PointSet holding 
+/* If the Region structure contains a pointer to a PointSet holding
    a previously created grid, return it. */
    if( this->basegrid ) {
       result = astClone( this->basegrid );
@@ -2233,14 +2233,14 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
          }
 
 /* Now deal with boxes with more than 1 axis. The algorithm uses the
-   astRegBaseMesh method to create a boundary mesh covering the box. 
+   astRegBaseMesh method to create a boundary mesh covering the box.
    The box is then shrunk slightly and a new boundary mesh created, which
    is appended to the first mesh. This process of shrinking the box and
-   appending the new boundary mesh is continued until the box has zero 
+   appending the new boundary mesh is continued until the box has zero
    size. The final mesh represents the required volume grid like a series
-   of "onion skins". We reduce the MeshSize attribute each time prior to 
-   calling the astRegBaseMesh method in order to retain a roughly constant 
-   density of points throughout the final grid, and so that the final number 
+   of "onion skins". We reduce the MeshSize attribute each time prior to
+   calling the astRegBaseMesh method in order to retain a roughly constant
+   density of points throughout the final grid, and so that the final number
    of points in the grid is close to "np". */
       } else {
 
@@ -2249,7 +2249,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
    and the number of axes in the Region. */
          k1 = naxes;
          for( ii = 0; ii < naxes; ii++ ) k1 *= 2;
-   
+
          is = 1;
          for( m = 2; m < 100; m++ ) {
             if( is*k1 >= np ) {
@@ -2289,7 +2289,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
             }
 
 /* Free resources. */
-            ps = astAnnul( ps ); 
+            ps = astAnnul( ps );
          }
 
 /* Unshrink the Box. */
@@ -2323,7 +2323,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *     RegBaseMesh
 
 *  Purpose:
-*     Return a PointSet containing a mesh of points on the boundary of a 
+*     Return a PointSet containing a mesh of points on the boundary of a
 *     Region in its base Frame.
 
 *  Type:
@@ -2349,7 +2349,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to the PointSet. The axis values in this PointSet will have 
+*     Pointer to the PointSet. The axis values in this PointSet will have
 *     associated accuracies derived from the accuracies which were
 *     supplied when the Region was created.
 
@@ -2408,7 +2408,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* If the Region structure contains a pointer to a PointSet holding 
+/* If the Region structure contains a pointer to a PointSet holding
    a previously created mesh, return it. */
    if( this->basemesh ) {
       result = astClone( this->basemesh );
@@ -2448,11 +2448,11 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
                ptr[ i ][ 0 ] = 0.5*( lbnd[ 0 ] + ubnd[ 0 ] );
             }
          }
-             
+
 /* Otherwise, first deal with 1-D boxes. */
       } else if( naxes == 1 ) {
 
-/* The boundary of a 1-D box consists of 2 points - the two extreme values. 
+/* The boundary of a 1-D box consists of 2 points - the two extreme values.
    Create a PointSet to hold 2 1-D values, and store the extreme values. */
          result = astPointSet( 2, 1, "", status );
          ptr = astGetPoints( result );
@@ -2476,8 +2476,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
          c[ 4 ][ 0 ] = lbnd[ 0 ];
          c[ 4 ][ 1 ] = lbnd[ 1 ];
 
-/* See if we can assume that the frame has flat geometry. This is the case 
-   if both axes belong to simple Frames, or are 1D, but may not be the case 
+/* See if we can assume that the frame has flat geometry. This is the case
+   if both axes belong to simple Frames, or are 1D, but may not be the case
    if either axis does not belong to a simple Frame that has more than 1
    axis. */
          astPrimaryFrame( frm, 0, &pfrm0, &paxis );
@@ -2493,16 +2493,16 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
             flat = 0;
          }
 
-/* Our choice of distribution of points depends on whether the axes have the 
-   same units or not. If the axes have the same units, or if they share the 
-   same primary Frame, then we assume that the axes span some space in which 
-   a single "distance" is defined. If not, (e.g. for a Frame representing 
-   frequency in Hz on one axis - typical value 1.0E10, and slit position in 
-   metres on the other axis - typical value 1.0E-2) we assume that "distance" 
-   is defined differently for each axis. The primary frame requirement is 
-   because some classes of Frame (e.g. SkyFrame) have a defined distance, 
-   even though the Units attributes for its axes may differ (since Units 
-   refers to the external representation - e.g. hours and degrees for a 
+/* Our choice of distribution of points depends on whether the axes have the
+   same units or not. If the axes have the same units, or if they share the
+   same primary Frame, then we assume that the axes span some space in which
+   a single "distance" is defined. If not, (e.g. for a Frame representing
+   frequency in Hz on one axis - typical value 1.0E10, and slit position in
+   metres on the other axis - typical value 1.0E-2) we assume that "distance"
+   is defined differently for each axis. The primary frame requirement is
+   because some classes of Frame (e.g. SkyFrame) have a defined distance,
+   even though the Units attributes for its axes may differ (since Units
+   refers to the external representation - e.g. hours and degrees for a
    SkyFrame - rather than the internal representation). */
          if( astOK && !strcmp( astGetUnit( frm, 0 ), astGetUnit( frm, 1 ) ) ) {
             metric = 1;
@@ -2510,15 +2510,15 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
             metric = ( pfrm0 == pfrm1 );
          }
 
-/* If we have a usable metric, distribute the points according to the aspect 
+/* If we have a usable metric, distribute the points according to the aspect
    ratio of the box (i.e. the shorter box sides gets fewer points). */
          if( metric ){
 
 /* Find the approximate geodesic length of each edge of the box. Since
    the edges of the box may not correspond to single geodesic (e.g. a
-   line of constant latitude is not a geodesic), we do this by testing 
+   line of constant latitude is not a geodesic), we do this by testing
    a set of points along each edge of the box and finding the total of the
-   geodesic distances between each pair of adjacent points. Initialise the 
+   geodesic distances between each pair of adjacent points. Initialise the
    total length round all edges. */
             total_len = 0.0;
 
@@ -2547,7 +2547,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
                   p0[ 0 ] = p1[ 0 ] + dx;
                   p0[ 1 ] = p1[ 1 ] + dy;
 
-/* Increment the length of the edge by the geodesic distance from this point 
+/* Increment the length of the edge by the geodesic distance from this point
    to the previous point. If the Frame is flat, this is simple (given that we
    know that one of dx and dy must be zero). */
                   if( flat ) {
@@ -2568,10 +2568,10 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
             if( total_len > 0.0 ) {
                ppd = np / total_len;
 
-/* Use this, with the geodesic length of each edge found above, to find the 
-   number of points to put along each edge of the boundary, and update the 
-   total number of points to use. In the returned boundary we put a point at 
-   the start of each edge but not at the end (since the end of one edge will 
+/* Use this, with the geodesic length of each edge found above, to find the
+   number of points to put along each edge of the boundary, and update the
+   total number of points to use. In the returned boundary we put a point at
+   the start of each edge but not at the end (since the end of one edge will
    be the start of the next edge). */
                np = 0;
                for( iedge = 0; iedge < 4; iedge++ ) {
@@ -2603,7 +2603,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
          ptr = astGetPoints( result );
          if( astOK ) {
 
-/* Initialise pointers to the first element for each axis in the returned 
+/* Initialise pointers to the first element for each axis in the returned
    PointSet. */
             ax = ptr[ 0 ];
             ay = ptr[ 1 ];
@@ -2661,11 +2661,11 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
             for( iaxis = 0; iaxis < naxes; iaxis++ ) {
 
 /* First do the upper face for this axis. */
-               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis, 
+               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis,
                                ubnd[ iaxis ], status );
 
 /* Now do the lower face for this axis. */
-               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis, 
+               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis,
                                lbnd[ iaxis ], status );
             }
 
@@ -2695,7 +2695,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 
 }
 
-static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axes, 
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axes,
                                int *status ){
 /*
 *  Name:
@@ -2710,7 +2710,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axe
 
 *  Synopsis:
 *     #include "box.h"
-*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes,
 *                             int *status )
 
 *  Class Membership:
@@ -2718,8 +2718,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axe
 *     method inherited from the Region class).
 
 *  Description:
-*     This function attempts to return a Region that is spanned by selected 
-*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     This function attempts to return a Region that is spanned by selected
+*     axes from the base Frame of the encapsulated FrameSet of the supplied
 *     Region. This may or may not be possible, depending on the class of
 *     Region. If it is not possible a NULL pointer is returned.
 
@@ -2769,7 +2769,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axe
 
 /* Get the uncertainty Region (if any) within the base Frame of the supplied
    Region, and select the required axes from it. If the resulting Object
-   is not a Region, annul it so that the returned Region will have no 
+   is not a Region, annul it so that the returned Region will have no
    uncertainty. */
    if( astTestUnc( this_region ) ) {
       bunc = astGetUncFrm( this_region, AST__BASE );
@@ -2805,8 +2805,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axe
    }
 
 /* Free resources */
-   frm = astAnnul( frm );      
-   bfrm = astAnnul( bfrm );      
+   frm = astAnnul( frm );
+   bfrm = astAnnul( bfrm );
    if( unc ) unc = astAnnul( unc );
    cen = astFree( cen );
    cor = astFree( cor );
@@ -2818,7 +2818,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axe
    return result;
 }
 
-static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
+static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
                           int index, int ifrm, int *status ){
 /*
 *  Name:
@@ -2832,7 +2832,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
 *  Synopsis:
 *     #include "box.h"
-*     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
+*     double *RegCentre( AstRegion *this, double *cen, double **ptr,
 *                        int index, int ifrm, int *status )
 
 *  Class Membership:
@@ -2848,7 +2848,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *        Pointer to the Region.
 *     cen
 *        Pointer to an array of axis values, giving the new centre.
-*        Supply a NULL value for this in order to use "ptr" and "index" to 
+*        Supply a NULL value for this in order to use "ptr" and "index" to
 *        specify the new centre.
 *     ptr
 *        Pointer to an array of points, one for each axis in the Region.
@@ -2857,11 +2857,11 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *        is NULL.
 *     index
 *        The index of the point within the arrays identified by "ptr" at
-*        which is stored the coords for the new centre position. Only used 
+*        which is stored the coords for the new centre position. Only used
 *        if "cen" is NULL.
 *     ifrm
-*        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
-*        position is supplied and returned in the base or current Frame of 
+*        Should be AST__BASE or AST__CURRENT. Indicates whether the centre
+*        position is supplied and returned in the base or current Frame of
 *        the FrameSet encapsulated within "this".
 *     status
 *        Pointer to the inherited status variable.
@@ -2874,8 +2874,8 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *     NULL pointer is returned.
 
 *  Notes:
-*    - Some Region sub-classes do not have a centre. Such classes will report 
-*    an AST__INTER error code if this method is called with either "ptr" or 
+*    - Some Region sub-classes do not have a centre. Such classes will report
+*    an AST__INTER error code if this method is called with either "ptr" or
 *    "cen" not NULL. If "ptr" and "cen" are both NULL, then no error is
 *    reported if this method is invoked on a Region of an unsuitable class,
 *    but NULL is always returned.
@@ -2904,7 +2904,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Get a pointer to the Box structure. */
    this = (AstBox *) this_region;
 
-/* First ensure cached information (which includes the centre coords) 
+/* First ensure cached information (which includes the centre coords)
    is up to date. */
    Cache( this, 0, status );
 
@@ -2912,7 +2912,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    ncb = astGetNin( this_region->frameset );
    ncc = astGetNout( this_region->frameset );
 
-/* If the centre coords are to be returned, return either a copy of the 
+/* If the centre coords are to be returned, return either a copy of the
    base Frame centre coords, or transform the base Frame centre coords
    into the current Frame. First ensure cached information (which
    includes the centre coords) is up to date. */
@@ -2923,7 +2923,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
          result = astStore( NULL, this->centre, sizeof( double )*ncb );
       }
 
-/* Otherwise, we store the supplied new centre coords and return a NULL 
+/* Otherwise, we store the supplied new centre coords and return a NULL
    pointer. */
    } else {
 
@@ -2933,7 +2933,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Check pointers can be used safely */
       if( astOK ) {
 
-/* If the centre position was supplied in the current Frame, find the 
+/* If the centre position was supplied in the current Frame, find the
    corresponding base Frame position... */
          if( ifrm == AST__CURRENT ) {
             if( cen ) {
@@ -2960,7 +2960,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
                axval = cen ? cen[ ic ] : ptr[ ic ][ index ];
                if( axval != AST__BAD ) bc[ ic ] = axval;
             }
-         }            
+         }
 
 /* Find the coordinates at the new box corner. */
          frm = astGetFrame( this_region->frameset, AST__BASE );
@@ -3015,7 +3015,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 *  Description:
 *     This function returns a flag indicating if the supplied set of
-*     points all fall on the boundary of the given Box. 
+*     points all fall on the boundary of the given Box.
 *
 *     Some tolerance is allowed, as specified by the uncertainty Region
 *     stored in the supplied Box "this", and the supplied uncertainty
@@ -3025,12 +3025,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *     this
 *        Pointer to the Box.
 *     pset
-*        Pointer to the PointSet. The points are assumed to refer to the 
+*        Pointer to the PointSet. The points are assumed to refer to the
 *        base Frame of the FrameSet encapsulated by "this".
 *     unc
 *        Pointer to a Region representing the uncertainties in the points
-*        given by "pset". The Region is assumed to represent the base Frame 
-*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed 
+*        given by "pset". The Region is assumed to represent the base Frame
+*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed
 *        if NULL is supplied.
 *     mask
 *        Pointer to location at which to return a pointer to a newly
@@ -3060,12 +3060,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    AstRegion *tunc;             /* Uncertainity Region from "this" */
    double **ptr;                /* Pointer to axis values in "ps2" */
    double *large;               /* A corner position in the larger Box */
-   double *lbnd_tunc;           /* Lower bounds of "this" uncertainty Region */ 
-   double *lbnd_unc;            /* Lower bounds of supplied uncertainty Region */ 
+   double *lbnd_tunc;           /* Lower bounds of "this" uncertainty Region */
+   double *lbnd_unc;            /* Lower bounds of supplied uncertainty Region */
    double *p;                   /* Pointer to next axis value */
    double *small;               /* A corner position in the smaller Box */
-   double *ubnd_tunc;           /* Upper bounds of "this" uncertainty Region */ 
-   double *ubnd_unc;            /* Upper bounds of supplied uncertainty Region */ 
+   double *ubnd_tunc;           /* Upper bounds of "this" uncertainty Region */
+   double *ubnd_unc;            /* Upper bounds of supplied uncertainty Region */
    double *wid;                 /* Widths of "this" border */
    int i;                       /* Axis index */
    int j;                       /* Point index */
@@ -3086,7 +3086,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Ensure cached information is up to date. */
    Cache( this, 0, status );
 
-/* Get the number of base Frame axes in the Box, and check the supplied 
+/* Get the number of base Frame axes in the Box, and check the supplied
    PointSet has the same number of axis values per point. */
    frm = astGetFrame( this_region->frameset, AST__BASE );
    nc = astGetNaxes( frm );
@@ -3097,7 +3097,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                 astGetNcoord( pset ), nc );
    }
 
-/* Get the number of axes in the uncertainty Region and check it is the 
+/* Get the number of axes in the uncertainty Region and check it is the
    same as above. */
    if( unc && astGetNaxes( unc ) != nc && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axes (%d) "
@@ -3106,28 +3106,28 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                 astGetNaxes( unc ), nc );
    }
 
-/* We now find the maximum distance on each axis that a point can be from the 
-   boundary of the Box for it still to be considered to be on the boundary. 
+/* We now find the maximum distance on each axis that a point can be from the
+   boundary of the Box for it still to be considered to be on the boundary.
    First get the Region which defines the uncertainty within the Box being
    checked (in its base Frame), and get its bounding box. */
-   tunc = astGetUncFrm( this, AST__BASE );      
+   tunc = astGetUncFrm( this, AST__BASE );
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
-   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc );
 
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box. */
    if( unc ) {
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
-      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
    } else {
       lbnd_unc = NULL;
       ubnd_unc = NULL;
    }
 
 /* The required border width for each axis is half of the total width of
-   the two bounding boxes. Use a zero sized box "unc" if no box was supplied. */   
+   the two bounding boxes. Use a zero sized box "unc" if no box was supplied. */
    wid = astMalloc( sizeof( double )*(size_t) nc );
    large = astMalloc( sizeof( double )*(size_t) nc );
    small = astMalloc( sizeof( double )*(size_t) nc );
@@ -3143,8 +3143,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
          }
       }
 
-/* Create two new Boxes, one of which is larger than "this" by the widths 
-   found above, and the other of which is smaller than "this" by the widths 
+/* Create two new Boxes, one of which is larger than "this" by the widths
+   found above, and the other of which is smaller than "this" by the widths
    found above. */
       for( i = 0; i < nc; i++ ) {
          large[ i ] = this->centre[ i ]  + this->extent[ i ]*this->shrink + wid[ i ];
@@ -3176,7 +3176,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Check all the resulting points, setting mask values for all of them. */
          if( astOK ) {
-   
+
 /* Initialise the mask elements on the basis of the first axis values */
             result = 1;
             p = ptr[ 0 ];
@@ -3243,7 +3243,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
                      int *status ){
 /*
 *+
@@ -3269,7 +3269,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 *     Region, if possible. The required positions are indicated by a
 *     supplied list of scalar parameter values in the range zero to one.
 *     Zero corresponds to some arbitrary starting point on the boundary,
-*     and one corresponds to the end (which for a closed region will be 
+*     and one corresponds to the end (which for a closed region will be
 *     the same place as the start).
 
 *  Parameters:
@@ -3282,7 +3282,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 *     dist
 *        Pointer to an array of "n" scalar parameter values in the range
 *        0 to 1.0.
-*     ptr 
+*     ptr
 *        A pointer to an array of pointers. The number of elements in
 *        this array should equal tthe number of axes in the Frame spanned
 *        by the Region. Each element of the array should be a pointer to
@@ -3308,7 +3308,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    double ubnd[ 2 ];
    int i;
    int ncur;
-   int result;         
+   int result;
 
 /* Initialise */
    result = 0;
@@ -3323,7 +3323,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    if( result && n > 0 ) {
 
 /* We first determine the required positions in the base Frame of the
-   Region, and then transform them into the current Frame. Get the 
+   Region, and then transform them into the current Frame. Get the
    base->current Mapping, and the number of current Frame axes. */
       map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
 
@@ -3387,9 +3387,9 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
       if( bpset ) {
          cpset = astPointSet( n, ncur, " ", status );
          astSetPoints( cpset, ptr );
-   
+
          (void) astTransform( map, bpset, 1, cpset );
-   
+
          cpset = astAnnul( cpset );
          bpset = astAnnul( bpset );
       }
@@ -3422,7 +3422,7 @@ static void ResetCache( AstRegion *this, int *status ){
 *     inherited from the parent Region class).
 
 *  Description:
-*     This function clears cached information from the supplied Region 
+*     This function clears cached information from the supplied Region
 *     structure.
 
 *  Parameters:
@@ -3595,11 +3595,11 @@ static double SetShrink( AstBox *this, double shrink, int *status ){
 *     double SetShrink( AstBox *this, double shrink, int *status );
 
 *  Class Membership:
-*     Box method 
+*     Box method
 
 *  Description:
-*     Boxes can be shrunk from their original size by calling this function. 
-*     The original shrink factor is 1.0. This function should be used for 
+*     Boxes can be shrunk from their original size by calling this function.
+*     The original shrink factor is 1.0. This function should be used for
 *     assigning new values to since it also re-calculates Cahced information
 *     which depends on the current shrink factor.
 
@@ -3652,29 +3652,29 @@ static void SetUnc( AstRegion *this, AstRegion *unc, int *status ){
 *     void SetUnc( AstRegion *this, AstRegion *unc, int *status )
 
 *  Class Membership:
-*     Box method (over-rides the astSetUnc method inherited from the 
+*     Box method (over-rides the astSetUnc method inherited from the
 *     Region class).
 
 *  Description:
-*     Each Region (of any class) can have an "uncertainty" which specifies 
+*     Each Region (of any class) can have an "uncertainty" which specifies
 *     the uncertainties associated with the boundary of the Region. This
-*     information is supplied in the form of a second Region. The uncertainty 
-*     in any point on the boundary of a Region is found by shifting the 
-*     associated "uncertainty" Region so that it is centred at the boundary 
-*     point being considered. The area covered by the shifted uncertainty 
-*     Region then represents the uncertainty in the boundary position. 
+*     information is supplied in the form of a second Region. The uncertainty
+*     in any point on the boundary of a Region is found by shifting the
+*     associated "uncertainty" Region so that it is centred at the boundary
+*     point being considered. The area covered by the shifted uncertainty
+*     Region then represents the uncertainty in the boundary position.
 *     The uncertainty is assumed to be the same for all points.
 *
 *     The uncertainty is usually specified when the Region is created, but
-*     this function allows it to be changed at any time. 
+*     this function allows it to be changed at any time.
 
 *  Parameters:
 *     this
 *        Pointer to the Region which is to be assigned a new uncertainty.
 *     unc
-*        Pointer to the new uncertainty Region. This must be either a Box, 
-*        a Circle or an Ellipse. A deep copy of the supplied Region will be 
-*        taken, so subsequent changes to the uncertainty Region using the 
+*        Pointer to the new uncertainty Region. This must be either a Box,
+*        a Circle or an Ellipse. A deep copy of the supplied Region will be
+*        taken, so subsequent changes to the uncertainty Region using the
 *        supplied pointer will have no effect on the Region "this".
 *     status
 *        Pointer to the inherited status variable.
@@ -3802,8 +3802,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    nin = astGetNin( map );
    nout = astGetNout( map );
 
-/* If the Mapping from base to current Frame is a PermMap, we now explicitly 
-   how to swap the axes of the Box to produce either a new Box or an 
+/* If the Mapping from base to current Frame is a PermMap, we now explicitly
+   how to swap the axes of the Box to produce either a new Box or an
    Interval. */
    if( astIsAPermMap( map ) ){
 
@@ -3833,9 +3833,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* Set flags indicating that the Box can be simplified, and does not result
    in a NullRegion or an Interval. */
-         simpler = 1; 
-         isNull = 0; 
-         isInterval = 0; 
+         simpler = 1;
+         isNull = 0;
+         isInterval = 0;
 
 /* Check each output (which corresponds to an axis in the current Frame
    of the Box). */
@@ -3851,7 +3851,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                lbnd[ ic ] = constants[ (-feed) - 1 ];
                ubnd[ ic ] = constants[ (-feed) - 1 ];
 
-/* If this output is fed the constant AST__BAD (i.e. does not depend on any of 
+/* If this output is fed the constant AST__BAD (i.e. does not depend on any of
    the inputs), then the output axis is unbounded and we will consequently
    create an Interval rather than a Box. */
             } else if( feed >= nin ) {
@@ -3885,8 +3885,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* If this input is fed a constant (i.e. does not depend on any of the
    outputs), then we must check that this constant is within the range of
-   axis values covered by the Box. If not then the simplified Box represents 
-   a slice through the coordinate system which does not pass through the 
+   axis values covered by the Box. If not then the simplified Box represents
+   a slice through the coordinate system which does not pass through the
    original Box. In this case the simplified Region is a NullRegion
    instead of a Box. */
             if( feed < 0 ) {
@@ -3900,7 +3900,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                   isNull = ( k < lb || k > ub );
                }
 
-/* If this input is fed the constant AST__BAD (i.e. does not depend on any of 
+/* If this input is fed the constant AST__BAD (i.e. does not depend on any of
    the outputs), then the input axis is unbounded and will consequently
    extend beyond the Box. In this case the simplified Region will be a
    NullRegion. */
@@ -3911,7 +3911,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    relationship is bi-directional. If it is not, we cannot simplify the
    Box. */
             } else if( outperm[ feed ] != ic ) {
-               simpler = 0; 
+               simpler = 0;
                break;
             }
          }
@@ -3927,10 +3927,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Get the Frame represented by the Region. */
             frm = astGetFrame( new->frameset, AST__CURRENT );
 
-/* We can now replace the original Region with the simplified Region so annul 
+/* We can now replace the original Region with the simplified Region so annul
    the original pointer. */
             new = astAnnul( new );
- 
+
 /* Create a new Region of the required class. */
             if( isNull ) {
                new = (AstRegion *) astNullRegion( frm, unc, "", status );
@@ -3959,7 +3959,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       lbnd = astFree( lbnd );
       ubnd = astFree( ubnd );
 
-/* If the Mapping from base to current Frame is not a PermMap or a UnitMap, we 
+/* If the Mapping from base to current Frame is not a PermMap or a UnitMap, we
    attempt to simplify the Box by re-defining it within its current Frame.
    Transforming the box from its base to its current FRame may result in
    the region no longer being a box. We test this by transforming a set of
@@ -3975,8 +3975,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Get the Region describing the positional uncertainty within the Box in
    its current Frame. */
       unc = astGetUncFrm( new, AST__CURRENT );
- 
-/* Find the best fitting box (defined in the current Frame) through these 
+
+/* Find the best fitting box (defined in the current Frame) through these
    points */
       newbox = BestBox( frm, mesh, unc, status );
 
@@ -4014,9 +4014,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             box = (AstBox *) new;
             Cache( box, 0, status );
 
-/* For a "normal" right handed coordinate system, rotation from the positive 
+/* For a "normal" right handed coordinate system, rotation from the positive
    first axis to the positive second axis is anti-clockwise. But for left
-   handed coordinate systems, it's the opposite. Determine if the required 
+   handed coordinate systems, it's the opposite. Determine if the required
    system is left or right handed by looking at the default values for
    the Direction attribute. If the default values are equal, then the
    system is right handed - otherwise it is left handed. We need to clear
@@ -4043,7 +4043,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* The Mapping may change the handedness of the axes. That is, the
    Mapping may reverse one axis without reversing the other. This will be
-   the case if the determinant of the Jacobian matrix of the Mapping is 
+   the case if the determinant of the Jacobian matrix of the Mapping is
    negative. Get the determinant. If it is negative, reverse the
    handedness of the axes. */
             rxx = astRate( map, box->centre, 0, 0 );
@@ -4060,13 +4060,13 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             if( right_handed ) {
                ptr1[ 0 ][ 0 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
-   
+
                ptr1[ 0 ][ 1 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
-   
+
                ptr1[ 0 ][ 2 ] = box->centre[ 0 ] + box->extent[ 0 ];
                ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
-   
+
                ptr1[ 0 ][ 3 ] = box->centre[ 0 ] + box->extent[ 0 ];
                ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
@@ -4074,13 +4074,13 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             } else {
                ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
-   
+
                ptr1[ 0 ][ 2 ] = box->centre[ 0 ] - box->extent[ 0 ];
                ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
-   
+
                ptr1[ 0 ][ 1 ] = box->centre[ 0 ] + box->extent[ 0 ];
                ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
-   
+
                ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
                ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
             }
@@ -4114,7 +4114,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
          ps1 = astAnnul( ps1 );
          ps2 = astAnnul( ps2 );
-      } 
+      }
 
 /* If we have yet been able to produce a simpler region, we now try
    splitting the Box into two separate Boxes defined in separate
@@ -4143,7 +4143,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
    map = astAnnul( map );
 
-/* If any simplification could be performed, copy Region attributes from 
+/* If any simplification could be performed, copy Region attributes from
    the supplied Region to the returned Region, and return a pointer to it.
    If the supplied Region had no uncertainty, ensure the returned Region
    has no uncertainty. Otherwise, return a clone of the supplied pointer. */
@@ -4266,11 +4266,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    pset_tmp = astRegTransform( reg, in, 0, NULL, &frm );
 
 /* Determine the numbers of points and coordinates per point from the base
-   Frame PointSet and obtain pointers for accessing the base Frame and output 
+   Frame PointSet and obtain pointers for accessing the base Frame and output
    coordinate values. */
    npoint = astGetNpoint( pset_tmp );
    ncoord_tmp = astGetNcoord( pset_tmp );
-   ptr_tmp = astGetPoints( pset_tmp );      
+   ptr_tmp = astGetPoints( pset_tmp );
    ncoord_out = astGetNcoord( result );
    ptr_out = astGetPoints( result );
 
@@ -4290,7 +4290,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* The logic used to combine axis values for negated and un-negated boxes
    is different. For negated boxes, a position is in the region if *any
    one* axis is not "close" to the box centre. */
-      if( neg ) {   
+      if( neg ) {
 
 /* Loop round each point */
          for ( point = 0; point < npoint; point++ ) {
@@ -4311,7 +4311,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Otherwise check the current axis value, depending on whether the
    boundary is included in the Region or not. Break as soon as an axis
    value is found which is outside the box limits (i.e. in the Region). */
-               } else if( !astAxIn( frm, coord, box->lo[ coord ], box->hi[ coord ], 
+               } else if( !astAxIn( frm, coord, box->lo[ coord ], box->hi[ coord ],
                                     axval, !closed ) ) {
                   ok = 1;
                   break;
@@ -4349,7 +4349,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Otherwise check the current axis value, depending on whether the
    boundary is included in the Region or not. Break as soon as an axis
    value is found which is outside the box limits (i.e. outside the Region). */
-               } else if( !astAxIn( frm, coord, box->lo[ coord ], box->hi[ coord ], 
+               } else if( !astAxIn( frm, coord, box->lo[ coord ], box->hi[ coord ],
                                     axval, closed ) ) {
                   ok = 0;
                   break;
@@ -4438,17 +4438,17 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 
 /* Copy dynamic memory contents */
    nax = astGetNin( ((AstRegion *) in)->frameset );
-   out->extent = astStore( NULL, in->extent, 
+   out->extent = astStore( NULL, in->extent,
                            sizeof( double )*(size_t)nax );
-   out->centre = astStore( NULL, in->centre, 
+   out->centre = astStore( NULL, in->centre,
                            sizeof( double )*(size_t)nax );
-   out->shextent = astStore( NULL, in->shextent, 
+   out->shextent = astStore( NULL, in->shextent,
                            sizeof( double )*(size_t)nax );
-   out->lo = astStore( NULL, in->lo, 
+   out->lo = astStore( NULL, in->lo,
                            sizeof( double )*(size_t)nax );
-   out->hi = astStore( NULL, in->hi, 
+   out->hi = astStore( NULL, in->hi,
                            sizeof( double )*(size_t)nax );
-   out->geolen = astStore( NULL, in->geolen, 
+   out->geolen = astStore( NULL, in->geolen,
                            sizeof( double )*(size_t)nax );
 }
 
@@ -4562,7 +4562,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(Box,Region)
 astMAKE_CHECK(Box)
 
-AstBox *astBox_( void *frame_void, int form, const double point1[], 
+AstBox *astBox_( void *frame_void, int form, const double point1[],
                  const double point2[], AstRegion *unc, const char *options, int *status, ...) {
 /*
 *++
@@ -4578,7 +4578,7 @@ f     AST_BOX
 
 *  Synopsis:
 c     #include "box.h"
-c     AstBox *astBox( AstFrame *frame, int form, const double point1[], 
+c     AstBox *astBox( AstFrame *frame, int form, const double point1[],
 c                     const double point2[], AstRegion *unc,
 c                     const char *options, ... )
 f     RESULT = AST_BOX( FRAME, FORM, POINT1, POINT2, UNC, OPTIONS, STATUS )
@@ -4590,14 +4590,14 @@ f     RESULT = AST_BOX( FRAME, FORM, POINT1, POINT2, UNC, OPTIONS, STATUS )
 *     This function creates a new Box and optionally initialises its
 *     attributes.
 *
-*     The Box class implements a Region which represents a box with sides 
-*     parallel to the axes of a Frame (i.e. an area which encloses a given 
+*     The Box class implements a Region which represents a box with sides
+*     parallel to the axes of a Frame (i.e. an area which encloses a given
 *     range of values on each axis). A Box is similar to an Interval, the
 *     only real difference being that the Interval class allows some axis
 *     limits to be unspecified. Note, a Box will only look like a box if
 *     the Frame geometry is approximately flat. For instance, a Box centred
 *     close to a pole in a SkyFrame will look more like a fan than a box
-*     (the Polygon class can be used to create a box-like region close to a 
+*     (the Polygon class can be used to create a box-like region close to a
 *     pole).
 
 *  Parameters:
@@ -4610,8 +4610,8 @@ f     FRAME = INTEGER (Given)
 c     form
 f     FORM = INTEGER (Given)
 *        Indicates how the box is described by the remaining parameters.
-*        A value of zero indicates that the box is specified by a centre 
-*        position and a corner position. A value of one indicates that the 
+*        A value of zero indicates that the box is specified by a centre
+*        position and a corner position. A value of one indicates that the
 *        box is specified by a two opposite corner positions.
 c     point1
 f     POINT1( * ) = DOUBLE PRECISION (Given)
@@ -4636,36 +4636,36 @@ f        An array with one element for each Frame axis
 *        box.
 c     unc
 f     UNC = INTEGER (Given)
-*        An optional pointer to an existing Region which specifies the 
-*        uncertainties associated with the boundary of the Box being created. 
-*        The uncertainty in any point on the boundary of the Box is found by 
-*        shifting the supplied "uncertainty" Region so that it is centred at 
+*        An optional pointer to an existing Region which specifies the
+*        uncertainties associated with the boundary of the Box being created.
+*        The uncertainty in any point on the boundary of the Box is found by
+*        shifting the supplied "uncertainty" Region so that it is centred at
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
 *        boundary position. The uncertainty is assumed to be the same for
 *        all points.
 *
-*        If supplied, the uncertainty Region must be of a class for which 
-*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
-*        or be a Prism containing centro-symetric component Regions. A deep 
-*        copy of the supplied Region will be taken, so subsequent changes to 
-*        the uncertainty Region using the supplied pointer will have no 
-*        effect on the created Box. Alternatively, 
-f        a null Object pointer (AST__NULL) 
-c        a NULL Object pointer 
-*        may be supplied, in which case a default uncertainty is used 
+*        If supplied, the uncertainty Region must be of a class for which
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.)
+*        or be a Prism containing centro-symetric component Regions. A deep
+*        copy of the supplied Region will be taken, so subsequent changes to
+*        the uncertainty Region using the supplied pointer will have no
+*        effect on the created Box. Alternatively,
+f        a null Object pointer (AST__NULL)
+c        a NULL Object pointer
+*        may be supplied, in which case a default uncertainty is used
 *        equivalent to a box 1.0E-6 of the size of the Box being created.
 *
-*        The uncertainty Region has two uses: 1) when the 
+*        The uncertainty Region has two uses: 1) when the
 c        astOverlap
-f        AST_OVERLAP 
+f        AST_OVERLAP
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using 
+*        subsequently simplified (using
 c        astSimplify),
 f        AST_SIMPLIFY),
-*        the uncertainties are used to determine if the transformed boundary 
+*        the uncertainties are used to determine if the transformed boundary
 *        can be accurately represented by a specific shape of Region.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
@@ -4747,8 +4747,8 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstBox *astBoxId_( void *frame_void, int form, const double point1[], 
-                   const double point2[], void *unc_void, const char *options, 
+AstBox *astBoxId_( void *frame_void, int form, const double point1[],
+                   const double point2[], void *unc_void, const char *options,
                    ... ) {
 /*
 *  Name:
@@ -4762,8 +4762,8 @@ AstBox *astBoxId_( void *frame_void, int form, const double point1[],
 
 *  Synopsis:
 *     #include "box.h"
-*     AstBox *astBoxId_( AstFrame *frame, int form, const double point1[], 
-*                        const double point2[], AstRegion *unc, 
+*     AstBox *astBoxId_( AstFrame *frame, int form, const double point1[],
+*                        const double point2[], AstRegion *unc,
 *                        const char *options, ... )
 
 *  Class Membership:
@@ -4839,7 +4839,7 @@ AstBox *astBoxId_( void *frame_void, int form, const double point1[],
    return astMakeId( new );
 }
 
-AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab, 
+AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
                      const char *name, AstFrame *frame, int form,
                      const double point1[], const double point2[],
                      AstRegion *unc, int *status ) {
@@ -4856,7 +4856,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 
 *  Synopsis:
 *     #include "box.h"
-*     AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab, 
+*     AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 *                         const char *name, AstFrame *frame, int form,
 *                         const double point1[], const double point2[],
 *                         AstRegion *unc )
@@ -4902,33 +4902,33 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 *        A pointer to the Frame in which the region is defined.
 *     form
 *        Indicates how the box is described by the remaining parameters.
-*        A value of zero indicates that the box is specified by a centre 
-*        position and a corner position. A value of one indicates that the 
+*        A value of zero indicates that the box is specified by a centre
+*        position and a corner position. A value of one indicates that the
 *        box is specified by a two opposite corner positions.
 *     point1
-*        An array of double, with one element for each Frame axis (Naxes 
-*        attribute). If "form" is zero, this array should contain the 
-*        coordinates at the centre of the box. If "form" is one, it should 
-*        contain the coordinates at the corner of the box which is diagonally 
+*        An array of double, with one element for each Frame axis (Naxes
+*        attribute). If "form" is zero, this array should contain the
+*        coordinates at the centre of the box. If "form" is one, it should
+*        contain the coordinates at the corner of the box which is diagonally
 *        opposite the corner specified by "point2".
 *     point2
-*        An array of double, with one element for each Frame axis (Naxes 
+*        An array of double, with one element for each Frame axis (Naxes
 *        attribute) containing the coordinates at any of the corners of
 *        the box.
 *     unc
 *        A pointer to a Region which specifies the uncertainty in the
 *        supplied positions (all points on the boundary of the new Box
-*        being initialised are assumed to have the same uncertainty). A NULL 
-*        pointer can be supplied, in which case default uncertainties equal to 
-*        1.0E-6 of the dimensions of the new Box's bounding box are used. 
-*        If an uncertainty Region is supplied, it must be either a Box, a 
+*        being initialised are assumed to have the same uncertainty). A NULL
+*        pointer can be supplied, in which case default uncertainties equal to
+*        1.0E-6 of the dimensions of the new Box's bounding box are used.
+*        If an uncertainty Region is supplied, it must be either a Box, a
 *        Circle or an Ellipse, and its encapsulated Frame must be related
 *        to the Frame supplied for parameter "frame" (i.e. astConvert
-*        should be able to find a Mapping between them). Two positions 
-*        the "frame" Frame are considered to be co-incident if their 
+*        should be able to find a Mapping between them). Two positions
+*        the "frame" Frame are considered to be co-incident if their
 *        uncertainty Regions overlap. The centre of the supplied
-*        uncertainty Region is immaterial since it will be re-centred on the 
-*        point being tested before use. A deep copy is taken of the supplied 
+*        uncertainty Region is immaterial since it will be re-centred on the
+*        point being tested before use. A deep copy is taken of the supplied
 *        Region.
 
 *  Returned Value:
@@ -4964,14 +4964,14 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
    pset = astPointSet( 2, nc, "", status );
    ptr = astGetPoints( pset );
 
-/* Copy the supplied coordinates into the PointSet, checking that no bad 
+/* Copy the supplied coordinates into the PointSet, checking that no bad
    values have been supplied. */
    for( i = 0; astOK && i < nc; i++ ) {
       if( point1[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
                    "undefined at point 1 of the box.", status, name, i + 1 );
          break;
-      } 
+      }
       if( point2[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
                    "undefined at point 2 of the box.", status, name, i + 1 );
@@ -4993,7 +4993,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 
 /* Initialise a Region structure (the parent class) as the first component
    within the Box structure, allocating memory if necessary. */
-      new = (AstBox *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab, 
+      new = (AstBox *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab,
                                       name, frame, pset, unc );
 
       if ( astOK ) {
@@ -5001,12 +5001,12 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 /* Initialise the Box data. */
 /* ------------------------ */
          new->shrink = 1.0;
-         new->extent = NULL;  
+         new->extent = NULL;
          new->shextent = NULL;
-         new->centre = NULL;  
-         new->lo = NULL;      
-         new->hi = NULL;      
-         new->geolen = NULL;      
+         new->centre = NULL;
+         new->lo = NULL;
+         new->hi = NULL;
+         new->geolen = NULL;
          new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Box. */
@@ -5021,7 +5021,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
    return new;
 }
 
-AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab, 
+AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
                      const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -5036,7 +5036,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 
 *  Synopsis:
 *     #include "box.h"
-*     AstBox *astLoadBox( void *mem, size_t size, AstBoxVtab *vtab, 
+*     AstBox *astLoadBox( void *mem, size_t size, AstBoxVtab *vtab,
 *                         const char *name, AstChannel *channel )
 
 *  Class Membership:
@@ -5150,12 +5150,12 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 
 /* Initialise Box data */
       new->shrink = 1.0;
-      new->extent = NULL;  
+      new->extent = NULL;
       new->shextent = NULL;
-      new->centre = NULL;  
-      new->lo = NULL;      
-      new->hi = NULL;      
-      new->geolen = NULL;      
+      new->centre = NULL;
+      new->lo = NULL;
+      new->hi = NULL;
+      new->geolen = NULL;
       new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Box. */
@@ -5179,7 +5179,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
    same interface. */
 
 
-void astBoxPoints_( AstBox *this, double *centre, double *corner, 
+void astBoxPoints_( AstBox *this, double *centre, double *corner,
                     int *status) {
    if ( !astOK ) return;
    (**astMEMBER(this,Box,BoxPoints))( this, centre, corner, status );

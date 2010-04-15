@@ -25,7 +25,7 @@
 *     headers as a native encoding. This should then be accessed using a
 *     FITS channel with appropriate filters. The image data is not
 *     returned (this should be accessed using the NDF identifier by
-*     another routine). 
+*     another routine).
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
@@ -153,7 +153,7 @@
       INTEGER NDIM              ! Number of NDF dimensions
       INTEGER PLACE             ! NDF placeholder (not used)
       LOGICAL FIRST             ! TRUE when seeking first significant
-                                ! dimension. 
+                                ! dimension.
 *.
 
 *  Set the global status.
@@ -167,7 +167,7 @@
 
 *  Special case is .sdf.something (like a compressed foreign
 *  datatype). Need to preserve the whole name in this case.
-         IF ( INDEX( NAME, '.sdf.' ) .EQ. 0 ) THEN 
+         IF ( INDEX( NAME, '.sdf.' ) .EQ. 0 ) THEN
             DO 1 I = IAT, MAX( IAT + 4, NAMLEN - 4 )
                NAME( I : I ) = NAME( I + 4  : I + 4 )
  1          CONTINUE
@@ -176,7 +176,7 @@
          ELSE
             IAT = NAMLEN
          END IF
-      ELSE 
+      ELSE
          IAT = NAMLEN
       END IF
       IF ( IAT .EQ. 0 ) THEN
@@ -198,12 +198,12 @@
             IF ( NDIM .EQ. 2 ) THEN
                NX = DIM( 1 )
                NY = DIM( 2 )
-            ELSE 
+            ELSE
                NX = 1
                NY = 1
                FIRST = .TRUE.
                DO 2 I = 1, NDIM
-                  IF ( DIM( I ) .GT. 1 .AND. FIRST ) THEN 
+                  IF ( DIM( I ) .GT. 1 .AND. FIRST ) THEN
                      NX = DIM( I )
                      FIRST = .FALSE.
                   ELSE

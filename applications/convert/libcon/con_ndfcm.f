@@ -28,7 +28,7 @@
 *     HEADER( NCARD ) = CHARACTER * 80 (Given)
 *        The buffer containing the header card images.
 *     SCARD = INTEGER (Given)
-*        The number of the card from where searches will begin, and 
+*        The number of the card from where searches will begin, and
 *        copying of the headers to the FITS extension.   Therefore
 *        NCARD - SCARD + 1 headers will appear in the extension. This
 *        argument is needed because the headers make contain a dummy
@@ -36,7 +36,7 @@
 *     FITSEX = LOGICAL (Given)
 *        If true, the headers are written to the FITS extension.
 *     NDF = INTEGER (Given)
-*        Identifier of the NDF to which to write the additional 
+*        Identifier of the NDF to which to write the additional
 *        components and the FITS extension.
 *     STATUS = INTEGER (Given)
 *        Global status value.
@@ -70,7 +70,7 @@
 
 *  History:
 *     1992 September 17 (MJC):
-*        Original version based on FTS1_NDFCM. 
+*        Original version based on FTS1_NDFCM.
 *     2001 August 30 (AJC):
 *        Correct CON_GKEYC arguments.
 *     2009 June 29 (MJC):

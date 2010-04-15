@@ -1,6 +1,6 @@
-      SUBROUTINE SCULIB_1D2_JIGGLE (BOL, N_BOLS, J_START, N_JIG, 
-     :  J_REPEAT, J_COUNT, J_DATA, J_VARIANCE, J_QUALITY, IDIM, 
-     :  JDIM, I_JIGGLE, J_JIGGLE, DATA_2D, VARIANCE_2D, QUALITY_2D, 
+      SUBROUTINE SCULIB_1D2_JIGGLE (BOL, N_BOLS, J_START, N_JIG,
+     :  J_REPEAT, J_COUNT, J_DATA, J_VARIANCE, J_QUALITY, IDIM,
+     :  JDIM, I_JIGGLE, J_JIGGLE, DATA_2D, VARIANCE_2D, QUALITY_2D,
      :  STATUS)
 *+
 *  Name:
@@ -18,15 +18,15 @@
 *     ONE run through the jiggle pattern or for several REPEATS of
 *     the entire pattern. In the first case, the routine copies the
 *     input data into the appropriate part of the 2-d image. In the
-*     second, the 2-d datum for a given pixel will be the average of the 
+*     second, the 2-d datum for a given pixel will be the average of the
 *     input values for it, and the variance will calculated from the
 *     spread of input points around the mean unless only one input point
 *     contributed, in which case the input variance will be used.
 
 *  Invocation:
-*     CALL SCULIB_1D2_JIGGLE (BOL, N_BOLS, J_START, N_JIG, 
-*    :  J_REPEAT, J_COUNT, J_DATA, J_VARIANCE, J_QUALITY, IDIM, 
-*    :  JDIM, I_JIGGLE, J_JIGGLE, DATA_2D, VARIANCE_2D, QUALITY_2D, 
+*     CALL SCULIB_1D2_JIGGLE (BOL, N_BOLS, J_START, N_JIG,
+*    :  J_REPEAT, J_COUNT, J_DATA, J_VARIANCE, J_QUALITY, IDIM,
+*    :  JDIM, I_JIGGLE, J_JIGGLE, DATA_2D, VARIANCE_2D, QUALITY_2D,
 *    :  STATUS)
 
 *  Arguments:
@@ -177,11 +177,11 @@
 
                DO JIG = 1, N_JIG
                   J = JIG - 1 + J_START
-                  DATA_2D (I_JIGGLE(J), J_JIGGLE(J)) = 
+                  DATA_2D (I_JIGGLE(J), J_JIGGLE(J)) =
      :              J_DATA (BOL, JIG)
                   VARIANCE_2D (I_JIGGLE(J), J_JIGGLE(J)) =
      :              J_VARIANCE (BOL, JIG)
-                  QUALITY_2D (I_JIGGLE(J), J_JIGGLE(J)) = 
+                  QUALITY_2D (I_JIGGLE(J), J_JIGGLE(J)) =
      :              J_QUALITY (BOL, JIG)
                END DO
             END IF
@@ -191,7 +191,7 @@
 *  the whole jiggle pattern was measured J_REPEAT times. The output data
 *  should be the mean of the input for each pixel, the variance will be
 *  calculated from the spread of input values about the mean unless there
-*  is only one point contributing, in which case its variance will be 
+*  is only one point contributing, in which case its variance will be
 *  copied to the output. Note that the output quality array is
 *  used to keep count of the number of input values that contribute to
 *  each output pixel.
@@ -231,7 +231,7 @@
                            VARIANCE_2D (I,J) = VARIANCE_2D (I,J) +
      :                       J_DATA (BOL,JPOS) **2
                         END IF
-                        DATA_2D (I,J) = DATA_2D (I,J) + 
+                        DATA_2D (I,J) = DATA_2D (I,J) +
      :                    J_DATA (BOL,JPOS)
                      END IF
 
@@ -243,12 +243,12 @@
                DO J = 1, JDIM
                   DO I = 1,IDIM
                      IF (QUALITY_2D (I,J) .GT. 0) THEN
-                        DATA_2D (I,J) = DATA_2D (I,J) / 
+                        DATA_2D (I,J) = DATA_2D (I,J) /
      :                    REAL (QUALITY_2D (I,J))
                         IF (QUALITY_2D (I,J) .GT. 1) THEN
                            VARIANCE_2D (I,J) = (VARIANCE_2D (I,J) -
-     :                       REAL (QUALITY_2D(I,J)) * 
-     :                       DATA_2D(I,J)**2) / 
+     :                       REAL (QUALITY_2D(I,J)) *
+     :                       DATA_2D(I,J)**2) /
      :                       REAL (QUALITY_2D(I,J) *
      :                       (QUALITY_2D(I,J)-1))
                         END IF

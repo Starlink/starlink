@@ -1,4 +1,4 @@
- 
+
        SUBROUTINE DECIMATE(IFONT,X,APPEND,NAPPEND,IEXP)
        CHARACTER CEXP*3
        CHARACTER S2*3
@@ -11,7 +11,7 @@
           XMANT = ABS(XMANT)
           NEGATIVE = .TRUE.
        ENDIF
- 
+
        IEXP = 0
        DO 100 WHILE ((LOG10(XMANT).GT.1.0) .OR. (LOG10(XMANT).LT.0.0))
           IF (XMANT.GE.1.0) THEN
@@ -22,7 +22,7 @@
              IEXP = IEXP - 1
           ENDIF
   100  CONTINUE
- 
+
        IF (NEGATIVE) THEN
           XMANT = -XMANT
        ENDIF

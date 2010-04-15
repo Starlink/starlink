@@ -24,7 +24,7 @@ C     (>) IORD    (Integer) The order to be used for interpolation.
 C                 This can be 0 => linear, 1 => cubic, 2 => quintic,
 C                 3 => septic (sic).
 C     (>) SPECT   (Real array SPECT(NELM)) The resulting 1D array.
-C     
+C
 C     Common variables used - None
 C
 C                                        KS / CIT 22nd March 1984
@@ -41,7 +41,7 @@ C
       INTEGER I
       REAL DELTAX, DELTAY, DX, DY, XBLC, XTRC, YBLC, YTRC
 C
-C     Get the end values 
+C     Get the end values
 C
       XBLC=ENDS(1)
       YBLC=ENDS(2)

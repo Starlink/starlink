@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -56,17 +56,17 @@ RUTHERFORD APPLETON LABORATORY\\
 \section{SUMMARY}
 This is a {\it complete} release of ADAM available as either a {\it full}
 or {\it mini-release}.
-The change most obvious to users is that the graphics environment level 
+The change most obvious to users is that the graphics environment level
 routines now use the Graphics Workstation Name Service (GNS) to define graphics
-devices. 
-This may require operational changes (see Section 3.1). 
+devices.
+This may require operational changes (see Section 3.1).
 DEVDATASET is now used only for magnetic tape devices.
 
 The release also contains bug fixes and minor enhancements to other facilities,
 most notably the switch to the EMS based MSG and ERR facilities.
 
 It will not generally be necessary to re-link tasks for this release but tasks
-must be re-linked to make use of the increased command line length (see 
+must be re-linked to make use of the increased command line length (see
 Section 3.3).
 
 The full release requires about 43000 blocks of disk storage and includes a
@@ -75,7 +75,7 @@ The mini-release requires about 13500 blocks and allows the system to be run
 and tasks to be developed.
 
 \section{INSTALLATION}
-Full installation instructions are given in SSN/44 and the Starlink Software 
+Full installation instructions are given in SSN/44 and the Starlink Software
 Change Notice.
 
 \section{NEW FEATURES IN THIS RELEASE}
@@ -83,9 +83,9 @@ Change Notice.
 \subsection{SGS and GKS}
 \begin{itemize}
 \item The subroutines GKS\_ASSOC and SGS\_ASSOC now use the Graphics
-Workstation Name Service (GNS) to translate user-friendly names into GKS 
-workstation type and connection identifier. 
-DEVDATASET is no longer used for graphics devices. 
+Workstation Name Service (GNS) to translate user-friendly names into GKS
+workstation type and connection identifier.
+DEVDATASET is no longer used for graphics devices.
 This may result in the user-friendly names of some devices being changed, but
 it is possible to retain the old names by specifying them as logical
 names (see SUN/57).
@@ -98,7 +98,7 @@ bringing it into line with the recommendations of SUN/104.
 \item ADAM\_DIR:DEVICE7.PRC and DEVICE7.SDF have graphics device definitions
 removed.
 DEVICE7.PRC is also renamed DEVICE7.ICL.
-\item CRPDEV is removed from the directories and from the system `build' 
+\item CRPDEV is removed from the directories and from the system `build'
 procedures.
 \end{itemize}
 \end{itemize}
@@ -109,11 +109,11 @@ the ADAMGRAPH7 shared image transfer vector.
 
 \subsection{SUBPAR}
 \begin{itemize}
-\item The maximum length of a command line which may be handled by SUBPAR 
-and MESSYS has been increased to 444 characters (ICL still imposes a limit 
+\item The maximum length of a command line which may be handled by SUBPAR
+and MESSYS has been increased to 444 characters (ICL still imposes a limit
 of 300).
 (SUBPAR\_CMDLINE)
-\item The modifications provided by John Fairclough to improve number to 
+\item The modifications provided by John Fairclough to improve number to
 character conversion have been incorporated.
 (SUBPAR\_GET0C)
 \item SUBPAR\_\_MAXLIMS, the size of the `data lists' in the SUBPAR common
@@ -124,12 +124,12 @@ block, has been increased from 300 to 350.
 PTH\_LEN and MSG\_LEN have been increased to  accommodate a 512-byte message
 so that longer command lines may be passed. This allows a message `value'
 of 444 bytes.
-(MES\-DEFNS\-.FOR and DDMSG\-.FOR) 
+(MES\-DEFNS\-.FOR and DDMSG\-.FOR)
 
-This change required the re-compilation of the DTASK, TASK, ADAM, 
-UFACE (standard, ICL and SMS), SUBPAR, SMS and ANT libraries. 
+This change required the re-compilation of the DTASK, TASK, ADAM,
+UFACE (standard, ICL and SMS), SUBPAR, SMS and ANT libraries.
 Any other tasks which include MESDEFNS will need to be re-compiled.
- 
+
 \subsection{MESSYS V2}
 \begin{itemize}
 \item PTH\_LEN and MSG\_LEN have been increased as for Version 1 MESSYS.
@@ -154,10 +154,10 @@ The MSG and ERR libraries have been removed from the ADAM directories.
 
 \subsection{HDS}
 The shared image is built with the latest version of the HDS kernel library
-available at RAL. 
-It contains major internal revisions but should be functionally the same as 
+available at RAL.
+It contains major internal revisions but should be functionally the same as
 previous versions, apart from an additional subroutine, DAT\_WHERE.
-{\em This version has not yet been released}, therefore any attempt to rebuild 
+{\em This version has not yet been released}, therefore any attempt to rebuild
 the system must take this into account, possibly removing DAT\_WHERE from the
 transfer vector.
 
@@ -231,8 +231,8 @@ The following document has been withdrawn:
 \item[AED/14] {\it Using the MSG and ERR Systems}
 \end{description}
 
-The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have 
-been updated. 
+The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have
+been updated.
 
 \section{BUGS FIXED}
 \subsection{ICL}
@@ -251,13 +251,13 @@ will now be passed to ADAM tasks.
 \subsection{Command line parsing -- LEX}
 \begin{itemize}
 \item A bug, which caused command lines to be mis-interpreted if they contained
-specifiers of the form `\verb%keyword=#%', where `\verb%#%' could be various 
+specifiers of the form `\verb%keyword=#%', where `\verb%#%' could be various
 non-alphanumeric characters, has been fixed. (LEX\-\_CMDSET)
 \end{itemize}
 
 \subsection{LINKNOSHR}
-LINKNOSHR.OPT, used by the `noshareable' linking procedures has been 
-corrected to remove MSP\_SHR which will not be required until the Version 2 
+LINKNOSHR.OPT, used by the `noshareable' linking procedures has been
+corrected to remove MSP\_SHR which will not be required until the Version 2
 message system is in use.
 
 A further problem involving the ARGS\_FUDGE PSECT has also been corrected.
@@ -268,7 +268,7 @@ An bug in the string concatenation routine has been fixed.
 
 \section{CLEANUP}
 \subsection{Candidates for Removal}
-The temporary alternative names CHR\_STRDEC and CHR\_LDBLNK for routines 
+The temporary alternative names CHR\_STRDEC and CHR\_LDBLNK for routines
 CHR\_DCWRD and CHR\_LDBLK will be removed in the next release.
 
 \end{document}

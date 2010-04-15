@@ -1,7 +1,7 @@
 	SUBROUTINE POL_CALPT( IDIMS1, IDIMS2, IMAGE_1, IMAGE_2, IMAGE_3,
-     :	                      IMAGE_4, ELDN, ODIMS1, ODIMS2, Q_IMAGE, 
-     :	                      U_IMAGE, P_IMAGE, T_IMAGE, I_IMAGE, 
-     :	                      PI_IMAGE, UPI_IMAGE, PE_IMAGE, TE_IMAGE, 
+     :	                      IMAGE_4, ELDN, ODIMS1, ODIMS2, Q_IMAGE,
+     :	                      U_IMAGE, P_IMAGE, T_IMAGE, I_IMAGE,
+     :	                      PI_IMAGE, UPI_IMAGE, PE_IMAGE, TE_IMAGE,
      :                        STATUS)
 
 * Subroutine to calculate the polarization and position angle image from the
@@ -44,7 +44,7 @@
 *          pass each pixel value to the subroutine that calculates Q, U, P,
 *         THETA, TOTAL INTENSITY POLARIZED INTENSITY and ERROR IMAGES
 
-	    CALL POL_STOKESCAL( IMAGE_1( K, J), IMAGE_3( K, J), 
+	    CALL POL_STOKESCAL( IMAGE_1( K, J), IMAGE_3( K, J),
      :	                        Q_IMAGE( K, J))
 
 	    CALL POL_STOKESCAL( IMAGE_2( K, J), IMAGE_4( K, J),
@@ -60,10 +60,10 @@
 	    CALL POL_THETACAL( Q_IMAGE( K, J), U_IMAGE( K, J),
      :	                       T_IMAGE( K, J))
 
-	    CALL POL_PICAL( P_IMAGE( K, J), I_IMAGE( K, J), 
+	    CALL POL_PICAL( P_IMAGE( K, J), I_IMAGE( K, J),
      :	                    PI_IMAGE( K, J))
 
-	    CALL POL_UPICAL( P_IMAGE( K, J), I_IMAGE( K, J), 
+	    CALL POL_UPICAL( P_IMAGE( K, J), I_IMAGE( K, J),
      :	                     UPI_IMAGE( K, J))
 
 	    CALL POL_ERRCAL( IMAGE_1( K, J), IMAGE_2( K, J),

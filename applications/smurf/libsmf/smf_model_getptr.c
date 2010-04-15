@@ -98,19 +98,19 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
   if (*status != SAI__OK) return NULL;
 
   switch( type ) {
-    
+
   case SMF__COM:
     retval = (smf_calcmodelptr) &smf_calcmodel_com;
     break;
-    
+
   case SMF__EXT:
     retval = (smf_calcmodelptr) &smf_calcmodel_ext;
     break;
-    
+
   case SMF__NOI:
     retval = (smf_calcmodelptr) &smf_calcmodel_noi;
     break;
-    
+
   case SMF__DKS:
     retval = (smf_calcmodelptr) &smf_calcmodel_dks;
     break;
@@ -126,9 +126,9 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
   default:
     msgSetc( "NM", smf_model_getname(type, status) );
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME 
+    errRep( "", FUNC_NAME
             ": Invalid smf_modeltype given (^NM), or no function available.",
-	   status);        
+	   status);
   }
 
   return retval;

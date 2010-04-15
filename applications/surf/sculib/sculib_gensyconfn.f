@@ -5,7 +5,7 @@
 *     SCULIB_GENSYCONFN
 
 *  Purpose:
-*     Generate a convolution function which will set to zero the 
+*     Generate a convolution function which will set to zero the
 *     spatial frequencies with no signal in Dual Beam maps.
 
 
@@ -30,10 +30,10 @@
 *     the sum of 2 functions, the first being 1 everywhere, the second
 *     being -1 at the points to be zeroed. The convolution function required
 *     is the sum of the inverse FTs of these two functions. The inverse
-*     FT of the first function is simply a delta function at the origin, 
+*     FT of the first function is simply a delta function at the origin,
 *     that of the second is a series of negative spikes with the first at the
 *     origin and the others separated by the chop spacing.
-*        
+*
 *     The convolution function must cover the map even when the centre of
 *     the function is at the left or right hand end of the map. Hence the
 *     convolution function must be twice the length of the raw map.
@@ -41,17 +41,17 @@
 *     Since the raw data is not sampled such that the chop spacing is an
 *     integer number of samples, the actual convolution function must be
 *     rebinned onto the sample mesh by sinc interpolation.
-*     
+*
 *     Otherwise the only tricky part of the algorithm is the need to normalise
-*     the two component functions such that in the Fourier domain the 
+*     the two component functions such that in the Fourier domain the
 *     addition of the 2 functions does result in zeroes at the desired points.
 *     This is most easily achieved by concentrating on the zero spatial
-*     frequency which is just the sum of all the points in each of the 2 
-*     functions. The first function is a delta function set to 1, so the 
-*     sum of that function is 1. The sum of the second function is that of 
-*     all the points in the convolution function from its centre to one end, 
+*     frequency which is just the sum of all the points in each of the 2
+*     functions. The first function is a delta function set to 1, so the
+*     sum of that function is 1. The sum of the second function is that of
+*     all the points in the convolution function from its centre to one end,
 *     a length that corresponds to the map size. This is the length to be
-*     used because, in the Fourier domain, the width of the sample to be 
+*     used because, in the Fourier domain, the width of the sample to be
 *     set to zero is 1/map_size.
 *
 *  Arguments:
@@ -87,7 +87,7 @@
 *      3-MAY-1991 (REVAD::JFL): Comments and description updated.
 *     12-OCT-1995 (jfl@roe.ac.uk): Renamed to SCULIB_GENSYCONFN.
 *      6-JAN-1997 (jfl@roe.ac.uk): Changed calculation of SUMT, added in
-*                                  contribution from more delta functions 
+*                                  contribution from more delta functions
 *                                  beyond the ends of the convolution
 *                                  function range.
 *     {enter_changes_here}
@@ -96,13 +96,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
-      
+
 *  Arguments Given:
       REAL BSEP, PIXSEP
       INTEGER NPIX
@@ -139,7 +139,7 @@
 *  because function is symmetric about central pixel.
 
       NCFN = NPIX*2 - 1
-      
+
 *  the beam separation in map pixels
 
       PIXBSEP = BSEP / PIXSEP
@@ -168,7 +168,7 @@
          DO J = 1, NDELTA
 
 *  ...add its contribution to this element of the convolution function by
-*  sinc interpolation 
+*  sinc interpolation
 
             SUM = SUM + SCULIB_SINC(DX-B1)
             B1 = B1 + PIXBSEP

@@ -4,20 +4,20 @@ C
 C     F I G _ F R A C A V
 C
 C     Given two arrays, generates a result array whose elements
-C     are a weighted average of the input arrays. 
+C     are a weighted average of the input arrays.
 C
 C     Parameters -   (">" input, "<" output)
 C
-C     (>) INPUT1    (Double precision array INPUT1(NELM)) 
+C     (>) INPUT1    (Double precision array INPUT1(NELM))
 C                   The 1st input array.
-C     (>) INPUT2    (Double precision array INPUT2(NELM)) 
+C     (>) INPUT2    (Double precision array INPUT2(NELM))
 C                   The 2nd input array.
 C     (>) NELM      (Integer) The number of elements in each array.
 C     (>) FRAC      (Real) The weighting fraction.  The output is
 C                   calculated as OUTPUT=INPUT1+(INPUT2-INPUT1)*FRAC,
 C                   so FRAC=.5 gives an average, FRAC=1. gives
 C                   OUTPUT=INPUT2, FRAC=0. gives OUTPUT=INPUT1.
-C     (<) OUTPUT    (Double precision array OUTPUT(NELM)) The output 
+C     (<) OUTPUT    (Double precision array OUTPUT(NELM)) The output
 C                   array.
 C
 C     Note that any of the arrays may be the same.

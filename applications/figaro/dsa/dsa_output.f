@@ -10,16 +10,16 @@ C
 C  Description:
 C     DSA_OUTPUT gets the value of a specified Figaro parameter.  The
 C     parameter should give the name of a data structure object - either
-C     just a file name, eg DISK:[DIR]FILE, or a structured name combining 
+C     just a file name, eg DISK:[DIR]FILE, or a structured name combining
 C     a file name with the name of a structure within that file, eg
 C     DISK$DATA:[DIR.SUBDIR]FILE.DATA_STRUCTURE.  This structure is then,
-C     opened for output, being associated with a specified reference name.  
+C     opened for output, being associated with a specified reference name.
 C     If the structure object is already known to the DSA system, having
 C     been opened already, then that already open structure will be used,
-C     unless the call explicitly specifies that a new structure is to be 
-C     created.  If the structure object is not already open, a new one will 
-C     be created, based on another - already opened - whose reference name 
-C     is supplied.  If no basis name is supplied (ie is passed as blank), 
+C     unless the call explicitly specifies that a new structure is to be
+C     created.  If the structure object is not already open, a new one will
+C     be created, based on another - already opened - whose reference name
+C     is supplied.  If no basis name is supplied (ie is passed as blank),
 C     then an empty data structure will be created.
 C
 C  Language:
@@ -33,7 +33,7 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME       (Fixed string,descr) The reference name to be
 C                        associated with the opened data object.
-C     (>) PARM_NAME      (Fixed string, descr) The name of the Figaro 
+C     (>) PARM_NAME      (Fixed string, descr) The name of the Figaro
 C                        parameter giving the name of the data object.
 C     (>) BASIS_NAME     (Fixed string,descr) The reference name of the
 C                        already opened data object to serve as the basis
@@ -41,21 +41,21 @@ C                        for the output.  Can be blank, in which case
 C                        an empty structure will be created, if needed.
 C     (>) BASIS_FLAGS    (Integer,ref) Flags that control the use made of
 C                        the basis object.  Those used at present are:
-C                        bit 0:  If set, data and axis structures are not to 
-C                        be copied. This usually implies that the new 
-C                        structure will have differently dimensioned data 
+C                        bit 0:  If set, data and axis structures are not to
+C                        be copied. This usually implies that the new
+C                        structure will have differently dimensioned data
 C                        arrays which will be created by routines such as
 C                        DSA_RESHAPE_AXIS, DSA_RESHAPE_DATA.
 C     (>) DETAIL_FLAGS   (Integer,ref) Flags that control other details of
 C                        the structure opening.  Those used at present are:
 C                        bit 0: If set, creation of a new data structure is
 C                        forced, even if one of the same name is already
-C                        known to the system. 
+C                        known to the system.
 C                        Note that bit 0 is the least significant bit.
 C     (!) STATUS         (Integer,ref) Status code.  If a bad status value
 C                        is passed, this routine returns immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables internal to the DSA system.
 C
 C  External subroutines / functions used:
@@ -113,7 +113,7 @@ C
       INTEGER ICH_FOLD, ICH_LEN
 C
 C     DSA_ system error codes
-C 
+C
       INCLUDE 'DSA_ERRORS'
 C
 C     Local variables
@@ -130,7 +130,7 @@ C
       CHARACTER STRUCTURE_NAME*80               ! Name of input structure
       CHARACTER STRING*80                       ! Local string storage
 C
-C     DSA system common 
+C     DSA system common
 C
       INCLUDE 'DSA_COMMON'
 C

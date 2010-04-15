@@ -48,7 +48,7 @@
 *    CHAN2(NYP) = REAL ARRAY (Returned)
 *       Right trams
 *    PEAKS(4000) = REAL ARRAY (Workspace)
-*       
+*
 *    HPFY(IN) = REAL ARRAY (Workspace)
 *        High-pass filtered version of Y
 *    STATUS = INTEGER (Given and Returned)

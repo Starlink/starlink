@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     dream = smf_construct_smfDream( smfData *data, size_t nvert, 
-*                                     size_t nsampcycle, const int *jigvert, 
+*     dream = smf_construct_smfDream( smfData *data, size_t nvert,
+*                                     size_t nsampcycle, const int *jigvert,
 *                                     const double *jigpath, int * status );
 
 *  Arguments:
@@ -123,8 +123,8 @@
 
 #define FUNC_NAME "smf_construct_smfDream"
 
-smfDream *smf_construct_smfDream( smfData *data, size_t nvert, 
-				  size_t nsampcycle, const int *jigvert, 
+smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
+				  size_t nsampcycle, const int *jigvert,
 				  const double *jigpath, int * status ) {
 
   /* Local variables */
@@ -157,7 +157,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
   if ( !(data->file->isTstream) ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, 
+      errRep( FUNC_NAME,
 	      "Input data not time series unable to construct smfDream", status);
       return NULL;
     }
@@ -200,18 +200,18 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 	       in a circular loop because the weights data do not
 	       satisfy the condition for reading and storing them in a
 	       smfDream. */
-	    smf_open_file( wtgrp, 1, "READ", SMF__NOCREATE_HEAD, &wtdata, 
+	    smf_open_file( wtgrp, 1, "READ", SMF__NOCREATE_HEAD, &wtdata,
 			   status );
 	    if ( *status == SAI__OK ) {
 	      /* Get locator to DREAM parameters */
-	      drmloc = smf_get_xloc( wtdata, "DREAM", "DREAM_WEIGHTS", "READ", 0, 
+	      drmloc = smf_get_xloc( wtdata, "DREAM", "DREAM_WEIGHTS", "READ", 0,
 				     NULL, status);
 	      if ( drmloc != NULL ) {
 		/* Open each NDF, copy contents into smfDream */
 		/* First, the grid weights array */
-		ndfid = smf_get_ndfid(drmloc, "GRIDWTS", "READ", "OLD", "", 0, 
+		ndfid = smf_get_ndfid(drmloc, "GRIDWTS", "READ", "OLD", "", 0,
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, 
+		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE,
                               &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0] * (griddata->dims)[1]);
@@ -225,7 +225,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		}
 
 		/* Then the inverse matrix */
-		ndfid = smf_get_ndfid(drmloc, "INVMATX", "READ", "OLD", "", 0, 
+		ndfid = smf_get_ndfid(drmloc, "INVMATX", "READ", "OLD", "", 0,
 				      NULL, NULL, status);
 		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, &griddata, status);
 		if ( griddata != NULL ) {
@@ -240,7 +240,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		}
 
 		/* Now for the gridpts array */
-		ndfid = smf_get_ndfid(drmloc, "GRIDEXT", "READ", "OLD", "", 0, 
+		ndfid = smf_get_ndfid(drmloc, "GRIDEXT", "READ", "OLD", "", 0,
 				      NULL, NULL, status);
 		smf_open_ndf( ndfid, "READ", weightsfile, SMF__INTEGER, &griddata, status);
 		if ( griddata != NULL ) {
@@ -249,7 +249,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		  gridxmax = gridiptr[1];
 		  gridymin = gridiptr[2];
 		  gridymax = gridiptr[3];
-		  dream->ngrid = (gridxmax - gridxmin + 1) * 
+		  dream->ngrid = (gridxmax - gridxmin + 1) *
 		    (gridymax - gridymin + 1);
 		  k = 0;
 		  for ( jy=gridymin; jy<=gridymax; jy++ ) {
@@ -263,15 +263,15 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		}
 		/* And finally, read the size of the grid step */
 		wtfile = wtdata->file;
-		ndfXgt0d( wtfile->ndfid, "DREAM", "GRID_SIZE", &dream->gridstep, 
+		ndfXgt0d( wtfile->ndfid, "DREAM", "GRID_SIZE", &dream->gridstep,
 			  status );
 		/* Annul locator, close file */
 		datAnnul( &drmloc, status );
 	      } else {
 		if ( *status == SAI__OK ) {
 		  *status = SAI__ERROR;
-		  errRep(FUNC_NAME, 
-			 "Unable to obtain locator to DREAM extension in weights file", 
+		  errRep(FUNC_NAME,
+			 "Unable to obtain locator to DREAM extension in weights file",
 			 status);
 		}
 	      }
@@ -279,7 +279,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 	    } else {
 	      /* If we fail to open the file, can we assume we're trying
 		 to create it? */
-	      msgOutif(MSG__VERB," ", 
+	      msgOutif(MSG__VERB," ",
 		       "Could not open the weights file - maybe we're creating it?",
 		       status);
 	      errAnnul( status );

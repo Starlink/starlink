@@ -12,7 +12,7 @@
 *     CALL CAT5_RDTBL (FILE, SKIP, ROWS, NUMCOL, FDTYPA, FCSIZA, FSCLFA,
 *       FSCALA, FZEROA, FPOSNA, FANGLA, FNANGL, FPTRA, FPTRNA, STATUS)
 *  Description:
-*     Read in a free-format table of values.  The values are read from 
+*     Read in a free-format table of values.  The values are read from
 *     the external file and held in local arrays.
 *  Arguments:
 *     FILE  =  CHARACTER (Given)
@@ -89,12 +89,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -188,7 +188,7 @@
 *
 *          Read through the records constituting the table.
 
-            DO ROW = 1, ROWS               
+            DO ROW = 1, ROWS
                READ(FUNIT, 2000, IOSTAT=LSTAT) BUFFER
                CALL CAT1_IOERR (LSTAT, STATUS)
 
@@ -227,14 +227,14 @@ C5001                   format(1x, 'CAT5_RDTBL - fldlst(curfld): ', a )
      :                      FLDLST(CURFLD) .EQ. '<NULL>'  .OR.
      :                      FLDLST(CURFLD) .EQ. '?') THEN
                            CALL CAT5_STAEL (ROWS,
-     :                       ROW, .TRUE., 
+     :                       ROW, .TRUE.,
      :                       %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                         ELSE
 
 *
 *                         Attempt to obtain the value for the field.
 
-                           CALL CAT5_GTVAL (FLDLST(CURFLD), 
+                           CALL CAT5_GTVAL (FLDLST(CURFLD),
      :                       FDTYPA(CURCOL), FCSIZA(CURCOL),
      :                       FSCLFA(CURCOL),
      :                       FSCALA(CURCOL), FZEROA(CURCOL),

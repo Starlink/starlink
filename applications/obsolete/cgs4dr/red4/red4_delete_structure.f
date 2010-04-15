@@ -7,7 +7,7 @@
 *     been produced to simplify the high-level code by removing the
 *     frequently used low level DTA calls and checks.
 *    Invocation :
-*      CALL RED4_DELETE_STRUCTURE( NAME, STATUS ) 
+*      CALL RED4_DELETE_STRUCTURE( NAME, STATUS )
 *    Parameters :
 *     NAME          = CHARACTER*(*)( READ )
 *        The DTA address of the structure to be deleted.

@@ -15,7 +15,7 @@
 
 *  Defer error reporting
       CALL ERR_MARK
-            
+
       STATUS = SAI__OK
       CALL GNS_GTN( NAME, LNAME, STATUS)
       IF (LNAME.GT.0) THEN

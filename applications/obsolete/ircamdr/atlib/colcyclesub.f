@@ -6,7 +6,7 @@
 
 	INTEGER  STATUS             ! global status parameter
 
-	INTEGER 
+	INTEGER
      :    DIMS( 2 ),      ! dimensions of input DATA_ARRAY
      :	  I,
      :	  J,
@@ -15,7 +15,7 @@
      :    NBIN,
      :    NCYCLES         ! number of cycles
 
-	REAL 
+	REAL
      :    INPVAL( 3, 256),  ! colour values
      :	  junk( 3, 256),
      :    OUTVAL( 3, 256)   ! colour values

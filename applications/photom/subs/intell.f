@@ -33,13 +33,13 @@
 *     GS = INTEGER (Given)
 *        Size of grid array
 *     NXL = INTEGER (Given)
-*        X value for lower integration limit 
+*        X value for lower integration limit
 *     NXH = INTEGER (Given)
-*        X value for upper integration limit 
+*        X value for upper integration limit
 *     NYL = INTEGER (Given)
-*        Y value for lower integration limit 
+*        Y value for lower integration limit
 *     NYH = INTEGER (Given)
-*        Y value for upper integration limit 
+*        Y value for upper integration limit
 *     SATURE = REAL (Given)
 *        User supplied saturation level
 *     CODE = CHARACTER (Returned)
@@ -75,7 +75,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 

@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_ELL( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2,
-     :                     NPAR, D, PAR, B, LBEXTB, UBEXTB, LBINTB, 
+     :                     NPAR, D, PAR, B, LBEXTB, UBEXTB, LBINTB,
      :                     UBINTB, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_ELL( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR, 
+*     CALL ARD1_ELL( FRM, RINDEX, LBND1, UBND1, LBND2, UBND2, NPAR, D, PAR,
 *                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -20,10 +20,10 @@
 *     supplied interior bounding box to the exterior value 0.
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
-*     supplied parameters. The supplied parameters are the user 
-*     co-ordinates of the ellipse centre, the lengths of the two ellipse 
-*     axes (in user co-ordinates), and the angle from the user X axis to 
-*     the first ellipse axis (in degrees, measured +ve from user +X to 
+*     supplied parameters. The supplied parameters are the user
+*     co-ordinates of the ellipse centre, the lengths of the two ellipse
+*     axes (in user co-ordinates), and the angle from the user X axis to
+*     the first ellipse axis (in degrees, measured +ve from user +X to
 *     user +Y).
 
 *  Arguments:
@@ -43,10 +43,10 @@
 *        The size of the PAR array.
 *     D( 6 ) = DOUBLE PRECISION (Given)
 *        The coefficients of the user->pixel mapping. The mapping is:
-*        P1 = D0 + D1*U1 + D2*U2 
-*        P2 = D3 + D4*U1 + D5*U2 
+*        P1 = D0 + D1*U1 + D2*U2
+*        P2 = D3 + D4*U1 + D5*U2
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        Region parameters. 
+*        Region parameters.
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( 2 ) = INTEGER (Given and Returned)
@@ -65,7 +65,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( 2 ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,11 +138,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :  AA1,                     ! First ellipse axis projected on Xp
      :  AA2,                     ! First ellipse axis projected on Yp
-     :  ANG1,                    ! An angle 
-     :  ANG2,                    ! An angle 
+     :  ANG1,                    ! An angle
+     :  ANG2,                    ! An angle
      :  BB1,                     ! Second ellipse axis projected on Xp
      :  BB2,                     ! Second ellipse axis projected on Yp
      :  COSA,                    ! Cosine of supplied orientation
@@ -177,7 +177,7 @@
      :  RL,                      ! Real lower bound used on 2nd axis
      :  RU,                      ! Real uper bound used on 2nd axis
      :  UBND( 2 )                ! Mask upper bounds
-  
+
 *.
 
 *  Check inherited global status.
@@ -213,15 +213,15 @@
       X0 = D( 1 ) + D( 2 )*PAR( 1 ) + D( 3 )*PAR( 2 )
       Y0 = D( 4 ) + D( 5 )*PAR( 1 ) + D( 6 )*PAR( 2 )
 
-*  We need to take account of any difference in the scales of the axes in 
-*  the user coordinate system (eg if users coords are RA/DEC, then a given 
+*  We need to take account of any difference in the scales of the axes in
+*  the user coordinate system (eg if users coords are RA/DEC, then a given
 *  arc-distance will in general correspond to different increments along
 *  the RA and DEC axes). Find the axis along which distances are specified
 *  in keyword argument lists.
       CALL ARD1_DSTAX( FRM, AXIS, STATUS )
 
 *  Find the increment along the other axis which corresponds to the
-*  length of the first or second ellipse axis. The conversion is performed 
+*  length of the first or second ellipse axis. The conversion is performed
 *  at the ellipse centre. Find the ratio of the axis scales.
       IF( PAR( 3 ) .NE. 0.0 ) THEN
          CALL ARD1_SCALE( FRM, PAR, PAR( 3 ), 3 - AXIS, SDIST, STATUS )
@@ -231,12 +231,12 @@
          F = SDIST/PAR( 4 )
       END IF
 
-*  Modify the D( 2 ) and D( 5 ) terms to describe a coord system in which 
+*  Modify the D( 2 ) and D( 5 ) terms to describe a coord system in which
 *  the first axis is on the same scale as the second axis.
       D2 = D( 2 )*F
       D5 = D( 5 )*F
 
-*  Store the sine and cosine of the orientation of the ellipse in user 
+*  Store the sine and cosine of the orientation of the ellipse in user
 *  co-ordinates.
       SINA = SIN( PAR( 5 )*ARD__DTOR )
       COSA = COS( PAR( 5 )*ARD__DTOR )
@@ -282,14 +282,14 @@
 *  Loop round the range of rows covered by the ellipse.
       DO IY = LBINTB( 2 ), UBINTB( 2 )
 
-*  Find the displacement from the ellipse centre to the centre of the 
+*  Find the displacement from the ellipse centre to the centre of the
 *  current row.
          Y = DBLE( IY ) - 0.5 - Y0
 
 *  See if this row intersects the ellipse.
-         IF( ABS( Y ) .LE. YRANGE ) THEN 
+         IF( ABS( Y ) .LE. YRANGE ) THEN
 
-*  If so, find the X pixel co-ordinate values at which the row 
+*  If so, find the X pixel co-ordinate values at which the row
 *  intersects the ellipse.
             ANG1 = ASIN( Y/YRANGE )
             X1 = XRANGE*SIN( ANG1 + ANG2 ) + X0
@@ -303,7 +303,7 @@
             END IF
 
 *  Find the corresponding pixel indices. IX1 is the lower pixel index
-*  bound and IX2 is the upper pixel index bound. 
+*  bound and IX2 is the upper pixel index bound.
             T = X1 + 0.5
             IX1 = INT( T )
             IF( T .GT. 0.0D0 .AND. DBLE( IX1 ) .NE. T ) IX1 = IX1 + 1
@@ -321,9 +321,9 @@
             UBINTB( 1 ) = MAX( UBINTB( 1 ), IX2 )
 
 *  Assign the supplied value to all pixels on the current row between
-*  the pixel index bounds just found. 
+*  the pixel index bounds just found.
             DO IX = IX1, IX2
-               B( IX, IY ) = RINDEX               
+               B( IX, IY ) = RINDEX
             END DO
 
 *  Update the bounds of the real bounding box on the second axis.

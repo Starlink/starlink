@@ -15,7 +15,7 @@
       INTEGER STATUS                        ! Global status
 *    Global variables :
       INCLUDE 'P4COM.INC'                   ! P4 common block
-*    Local variables : 
+*    Local variables :
       INTEGER ICOUNT                        ! A counter
 *-
 

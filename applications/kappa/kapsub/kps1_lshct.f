@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LSHCT( NPOS, IDS, FIRST, LAST, STEP, NDISP, 
+      SUBROUTINE KPS1_LSHCT( NPOS, IDS, FIRST, LAST, STEP, NDISP,
      :                       STATUS )
 *+
 *  Name:
@@ -69,7 +69,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -99,7 +99,7 @@
 
 *  Check each identifier.
       DO I = 1, NPOS
-         IF( IDS( I ) .GE. FIRST .AND. 
+         IF( IDS( I ) .GE. FIRST .AND.
      :       IDS( I ) .LE. LAST .AND.
      :       MOD( IDS( I ) - FIRST, STEP ) .EQ. 0 ) NDISP = NDISP + 1
       END DO

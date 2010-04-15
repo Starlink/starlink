@@ -583,8 +583,8 @@ and the \htmladdnormallink{earlier SExtractor user document}{sex1_doc.ps}.})
 in much the same way, although with
 \htmlref{some restrictions}{implementation_notes}
 \latex{(see Section~\ref{implementation_notes})}. The \SExtractor\ home page
--- \htmladdnormallink{\texttt{\SExtractorURL}}{\SExtractorURL} -- 
-offers more information, such as a link to the 
+-- \htmladdnormallink{\texttt{\SExtractorURL}}{\SExtractorURL} --
+offers more information, such as a link to the
 \htmladdnormallink{\textit{SExtractor for Dummies}}{\DUMMIESURL}.
 
 This document describes how to run \EXTRACTOR, and includes
@@ -792,7 +792,7 @@ Note that if the \texttt{-c} option is omitted, file
 specify it explicitly.
 
 A patch has been applied to \SExtractor\ that allows you to read a specific
-extension of an MEF file (normally you process all the extensions). 
+extension of an MEF file (normally you process all the extensions).
 To process an image stored in the first extension you should use the format:
 \begin{quote}
 \texttt{\% sex \textit{image'[1]'} [-c \textit{configuration-file}]}
@@ -1058,24 +1058,24 @@ A minor update to \EXTRACTOR\ with the following changes:
      % $EXTRACTOR_DIR/sex mef_file.fits'[1]'
  \end{verbatim}
  \end{quote}
- would process the first extension. MEF files input to 
+ would process the first extension. MEF files input to
  \SExtractor\ should contain a primary image.
 
 \subsection{Version 1.4-2}
 
  This is a minor release of \EXTRACTOR. The most significant change
- is an update to SExtractor version 2.2.2. 
+ is an update to SExtractor version 2.2.2.
 
 \subsection{Version 1.4-3}
 
- This is a minor release of \EXTRACTOR\ to fix a problem writing out 
+ This is a minor release of \EXTRACTOR\ to fix a problem writing out
  RA and Dec values (this effected \EXTRACTOR\ only, not \SExtractor).
 
  \EXTRACTOR\ is now released under the GNU General Public License.
 
 \subsection{Version 2.3}
 
- \EXTRACTOR\ has been updated to work with \SExtractor\ 2.3.2. 
+ \EXTRACTOR\ has been updated to work with \SExtractor\ 2.3.2.
  This updates the native \SExtractor\ command to include Large File Support
  and full support for MEFs. The native MEF support differs to that previously
  available in that it scans a complete MEF file in a single pass, so this
@@ -1105,9 +1105,9 @@ A minor update to \EXTRACTOR\ with the following changes:
  number of dimensions, provided that only two dimensions are significant.
  This means it's now possible to run \EXTRACTOR\ on a plane of a cube:
  \begin{quote}
- \begin{verbatim}   
+ \begin{verbatim}
        extractor cube'(,,1)'
- \end{verbatim}   
+ \end{verbatim}
  \end{quote}
 
  \EXTRACTOR\ has also been changed to avoid converting all data to single
@@ -1256,7 +1256,7 @@ installed default preferences file.
 CATALOG_NAME    test.cat        # name of the output catalog
 CATALOG_TYPE     ASCII_HEAD     # NONE,ASCII,ASCII_HEAD, ASCII_SKYCAT,
                                 # ASCII_VOTABLE, FITS_1.0 or FITS_LDAC
-PARAMETERS_NAME  $EXTRACTOR_DIR/config/default.param  
+PARAMETERS_NAME  $EXTRACTOR_DIR/config/default.param
                                 # name of the file containing catalog contents
 
 #------------------------------- Extraction ----------------------------------
@@ -1267,7 +1267,7 @@ DETECT_THRESH   1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 ANALYSIS_THRESH 1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 
 FILTER           Y              # apply filter for detection (Y or N)?
-FILTER_NAME      $EXTRACTOR_DIR/config/default.conv   
+FILTER_NAME      $EXTRACTOR_DIR/config/default.conv
                                 # name of the file containing the filter
 
 DEBLEND_NTHRESH 32              # Number of deblending sub-thresholds
@@ -1296,7 +1296,7 @@ PIXEL_SCALE      1.0            # size of pixel in arcsec (0=use FITS WCS info)
 #------------------------- Star/Galaxy Separation ----------------------------
 
 SEEING_FWHM     1.2             # stellar FWHM in arcsec
-STARNNW_NAME     $EXTRACTOR_DIR/config/default.nnw    
+STARNNW_NAME     $EXTRACTOR_DIR/config/default.nnw
                                 # Neural-Network_Weight table filename
 
 #------------------------------ Background -----------------------------------

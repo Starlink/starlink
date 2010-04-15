@@ -1,5 +1,5 @@
 **==clfile.spg  processed by SPAG 4.54K  at 14:22 on  4 Oct 1996
- 
+
 ************************************************************************
       SUBROUTINE CLFILE(IFILE)
       IMPLICIT NONE

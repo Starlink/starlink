@@ -357,14 +357,14 @@ itcl::class gaia::GaiaSpecWriter {
                set tsys [format "%.4f" $tsys]
                $specaccessor fitswrite TSYS $tsys "System temp" "numeric"
             }
-            
+
             set trx [$cubeaccessor getdoubleproperty ACSIS \
                         "TRX\($p1,$p2\)"]
             if { $trx != "BAD" } {
                set trx [format "%.4f" $trx]
                $specaccessor fitswrite TRX $trx "Receiver temp" "numeric"
             }
-            
+
             #  The exposure time is ACS_EXPOSURE(==ton)+
             #  ACS_OFFEXPOSURE(==toff).
             set ton [$cubeaccessor getdoubleproperty JCMTSTATE \
@@ -376,13 +376,13 @@ itcl::class gaia::GaiaSpecWriter {
                $specaccessor fitswrite EXTIME $exptime "Exposure time" \
                   "numeric"
             }
-            
+
             #  Attempt to determine the pointing information.
             set rawacsis [add_acsis_coords_ \
                              $cubeaccessor $specaccessor $p1 $p2]
          }
       }
-      
+
       #  Not a timeseries cube could be a SMURF/ACSIS cube. In
       #  that case we can get the exposure time, plus the TSYS.
       if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
@@ -409,7 +409,7 @@ itcl::class gaia::GaiaSpecWriter {
                   set tsys [format "%.4f" $tsys]
                   $specaccessor fitswrite TSYS $tsys "System temp" "numeric"
                }
-               
+
                set exptime [$cubeaccessor getdoubleproperty SMURF \
                                "EXP_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
                if { $exptime != "BAD" } {
@@ -417,7 +417,7 @@ itcl::class gaia::GaiaSpecWriter {
                   $specaccessor fitswrite EXTIME $exptime "Exposure time" \
                      "numeric"
                }
-               
+
                set efftime [$cubeaccessor getdoubleproperty SMURF \
                                "EFF_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
                if { $efftime != "BAD" } {
@@ -428,7 +428,7 @@ itcl::class gaia::GaiaSpecWriter {
             }
          }
       }
-      
+
       if { ! $rawacsis } {
          #  Record the world coordinates of this position. These
          #  document the extraction for other applications. Note we fall

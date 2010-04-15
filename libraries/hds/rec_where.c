@@ -10,7 +10,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int rec_where( const struct HAN *han, INT_BIG length, 
+   int rec_where( const struct HAN *han, INT_BIG length,
                   INT_BIG offset, INT_BIG *bloc, INT_BIG *bytoff )
    {
 /*+                                                                         */
@@ -83,7 +83,7 @@
 
 /* Check the inherited global status.                                       */
       if ( !_ok( hds_gl_status ) ) return hds_gl_status;
-               
+
 /* Find the Logical Record Block containing the record.                     */
       rec_locate_block( han->slot, han->rid.bloc, 'R', &lrb );
 

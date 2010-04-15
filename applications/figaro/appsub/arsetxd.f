@@ -3,7 +3,7 @@ C+
 C
 C     A R S E T X D
 C
-C     Fills the double precision x-value array for the arc with 
+C     Fills the double precision x-value array for the arc with
 C     the wavelengths given by the wavelength polynomial.  This is
 C     just a double precision version of ARSETX.
 C
@@ -13,7 +13,7 @@ C     (>) NX      (Integer) The number of x-values
 C     (>) COEFFS  (Double precision array COEFFS(ORDER)) The
 C                 wavelength coefficients.
 C     (>) ORDER   (Integer) The number of wavelength coeffs.
-C     (<) XDVALS  (Double precision array XDVALS(NX)) The array 
+C     (<) XDVALS  (Double precision array XDVALS(NX)) The array
 C                 to be filled.
 C
 C     Functions / subroutines used -

@@ -20,8 +20,8 @@
 *        The global status.
 
 *  Description:
-*     Update the information associated with a field in a catalogue. The 
-*     field has a name, format, unit, null value and comment. Any of these 
+*     Update the information associated with a field in a catalogue. The
+*     field has a name, format, unit, null value and comment. Any of these
 *     can be updated by setting the relevant flag
 
 *  Usage:
@@ -74,7 +74,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

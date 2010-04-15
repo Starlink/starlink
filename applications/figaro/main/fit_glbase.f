@@ -48,7 +48,7 @@
 *    DECCNTR(BACK_MODEL) = INTEGER ARRAY (Given and returned)
 *        Model for back The folowing are used by this
 *                   routine = INTEGER (Given and returned)
-*       
+*
 *                        2 - Cubic spline interpolation
 *                        3 - Chebyshev polynomial fit, carried out now
 *                        4 - Chebyshev polynomial fit, coefficients

@@ -10,8 +10,8 @@
       INTEGER SKY__DFFNT     ! Default text font
       INTEGER SKY__DFPEN     ! Default text pen
 
-      PARAMETER ( 
-     :  SKY__DFDR1 = 0.0, 
+      PARAMETER (
+     :  SKY__DFDR1 = 0.0,
      :  SKY__DFDR2 = 1.0,
      :  SKY__DFHT = 0.02,
      :  SKY__DFRTO = 0.66667,

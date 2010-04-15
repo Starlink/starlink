@@ -18,8 +18,8 @@
 *     deleted, together with all lower level components. If the object
 *     to be deleted does not have a parent object, then an error occurs.
 *
-*     This routine attempts to execute even if status is set bad on 
-*     entry, although no further error reports are made if an error 
+*     This routine attempts to execute even if status is set bad on
+*     entry, although no further error reports are made if an error
 *     should occur in this case.
 
 *  Arguments:

@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_PLOTN( IWCS, DOMAIN, IPICD, QUIET, IPLOT, NFRM, 
+      SUBROUTINE KPG1_PLOTN( IWCS, DOMAIN, IPICD, QUIET, IPLOT, NFRM,
      :                       STATUS )
 *+
 *  Name:
@@ -20,11 +20,11 @@
 *     aligned.
 *
 *     On exit, the current PGPLOT viewport corresponds to area occupied by
-*     the DATA picture. The bounds of the PGPLOT window produce a world 
-*     co-ordinate system within the viewport corresponding to the Base 
-*     Frame in the returned Plot (i.e. millimetres from the bottom left 
+*     the DATA picture. The bounds of the PGPLOT window produce a world
+*     co-ordinate system within the viewport corresponding to the Base
+*     Frame in the returned Plot (i.e. millimetres from the bottom left
 *     corner of the view surface - NOT pixel coordinates). Note, this is
-*     different to the world co-ordinate system stored in the AGI database 
+*     different to the world co-ordinate system stored in the AGI database
 *     with the DATA picture.
 
 *  Arguments:
@@ -33,7 +33,7 @@
 *        and Base Frames are unchanged on exit.
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        The Domain in which AGI world co-ordinates within the specified
-*        DATA picture live. Alignment of the Plot and FrameSet will be 
+*        DATA picture live. Alignment of the Plot and FrameSet will be
 *        attampted in this Domain if it is not possible in the Current
 *        Frame of the FrameSet.
 *     IPICD = INTEGER (Given)
@@ -42,7 +42,7 @@
 *        Suppress message identifying the Domain in which alignment occurs?
 *     IPLOT = INTEGER (Returned)
 *        An AST pointer to the new Plot. Returned equal to AST__NULL if
-*        an error occurs. 
+*        an error occurs.
 *     NFRM = INTEGER (Returned)
 *        A  Frame with index I in the supplied FrameSet (IWCS) will have index
 *        ( I + NFRM ) in the returned Plot (IPLOT). Returned equal to zero
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,12 +117,12 @@
       IPLOT = AST__NULL
       NFRM = 0
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the DATA picture does not have a Plot stored with it, KPG1_GDGET
 *  will create a default Plot containing a GRAPHIS Frame, and a Frame
-*  corresponding to AGI world co-ordinates. The AGI world co-ordinate 
+*  corresponding to AGI world co-ordinates. The AGI world co-ordinate
 *  Frame is normally just a default 2-D Frame with Domain AGI_WORLD, but
 *  we can over-ride this by supplying an alternative Frame containing
 *  more appropriate attribute settings. If we do not know the Domain of the
@@ -148,7 +148,7 @@
 *  use a default 2D Frame with the specified Domain name.
          IF( FRM .EQ. AST__NULL ) THEN
             FRM = AST_FRAME( 2, ' ', STATUS )
-            CALL AST_SETC( FRM, 'DOMAIN', DOMAIN( : CHR_LEN( DOMAIN ) ), 
+            CALL AST_SETC( FRM, 'DOMAIN', DOMAIN( : CHR_LEN( DOMAIN ) ),
      :                     STATUS )
          END IF
 

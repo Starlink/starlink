@@ -18,7 +18,7 @@
 *     Adds new sources to an empty new source list, or an existing
 *     list.
 *     The pointer to the next free space in source common is updated.
-*     The user is asked for a new source name. 
+*     The user is asked for a new source name.
 *     This is truncated to 8 characters and changed to upper case, as
 *     well as being checked that it is a valid prefix for a file name.
 *     The routine FIND02 is called to add details of source position
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,15 +152,15 @@
             CALL MSG_OUT( ' ', 'There is no room for more sources'//
      :      'Please complete the processing for these sources'//
      :      ' and rerun the program to enter more sources ', STATUS )
-            
+
          ELSE
-      
+
 *  Display a heading to indicate new source
             CALL MSG_OUT( ' ', 'Next Source ', STATUS )
 
 *  Start of loop which checks that the users source name is a valid file
 *  name
- 200        CONTINUE 
+ 200        CONTINUE
 
 *  *********************************************************************
 *  Ask user for new source name
@@ -169,18 +169,18 @@
 
 *  Change the source name to upper case
             CALL CHR_UCASE( SONAME(SOPOS) )
-      
+
 *  Cancel the parameter so that a new value is obtained next time
 *  through this section
             CALL PAR_CANCL( PSNAME, STATUS )
 
 *  Check whether the parameter was abort !!
             IF ( STATUS .EQ. PAR__ABORT ) RETURN
-      
+
 *  Check whether the source name was ! indicating that the user wants to
 *  terminate the input of new sources
             IF ( STATUS .NE. PAR__NULL ) THEN
-      
+
 *  Check that the source name is a valid file name and give warning
 *  and re input if not
                IF ( .NOT. CHR_ISNAM( SONAME( SOPOS ) ) ) THEN
@@ -194,11 +194,11 @@
 *  *********************************************************************
                CALL FIND02( CONREQ, ILEVEL, MAXLEN, .TRUE., PCONAD,
      :         PSCOR1, PSCOR2, PSCOSY, PSNAME, PSTITL, SCS, SOPOS,
-     :         STATUS ) 
+     :         STATUS )
 
 *  Check the status on return from FIND02
                IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Go to the begining of the next new source loop
                GO TO 100
 
@@ -224,7 +224,7 @@
 *  End if for if next source name is par__null indicating no more new
 *  sources
             END IF
-                  
+
 *  End if for check that there is room for more sources
          END IF
 
@@ -232,5 +232,5 @@
 *  edit source list menu
          MENU = 'M'
 
-      
+
       END

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <limits.h>
 
-void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
+void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
                  int skip[3], int naxis, CupidPixelSet **clumps,
                  int *status ){
 /*
@@ -20,7 +20,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
+*     void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *                      int skip[3], int naxis, CupidPixelSet **clumps,
 *                      int *status )
 
@@ -30,7 +30,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     the PixelSet that has the closest peak pixel. This is the method
 *     used by the IDL implementation of ClumpFind available on Jonathan
 *     Williams web site for carving up merged clumps. It differs from the
-*     "friends-of-friends" algorithm described in the original Williams et 
+*     "friends-of-friends" algorithm described in the original Williams et
 *     al ApJ paper.
 
 *  Parameters:
@@ -48,19 +48,19 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with 1's.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords.
 *        Unused trailing elements should be filled with zero.
 *     naxis
-*        Determines which adjoining pixels are considered to be "neighbours" 
-*        of a specified central pixel. Should be in the range 1 to "ndim". 
+*        Determines which adjoining pixels are considered to be "neighbours"
+*        of a specified central pixel. Should be in the range 1 to "ndim".
 *        For a pixel to be considered to be a neighbour of another pixel,
-*        the two pixels must be no more than 1 pixel away along no more than 
+*        the two pixels must be no more than 1 pixel away along no more than
 *        "naxis" axes.
 *     clumps
-*        Array holding pointers to all previously defined PixelSets, such 
-*        that a pointer to the PixelSet with index value "i" is stored at 
+*        Array holding pointers to all previously defined PixelSets, such
+*        that a pointer to the PixelSet with index value "i" is stored at
 *        element "i" of the "clumps" array.
 *     status
 *        Pointer to the inherited status value.
@@ -130,7 +130,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    PointSet is not adjacent to any other clumps. */
    if( *status != SAI__OK || ps->nneb == 0 ) return;
 
-/* The supplied PixelSet contains a list of the indices of all adjoining 
+/* The supplied PixelSet contains a list of the indices of all adjoining
    clumps. This list may contain multiple occurences of any given index,
    so first sort the list into increasing order (bubblesort). */
    nebs = ps->nebs;
@@ -150,7 +150,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    }
 
 /* Now remove multiple instances of each clump index. */
-   j = 0;   
+   j = 0;
    for( i = 1; i < ps->nneb; i++ ) {
       if( nebs[ i ] != nebs[ j ] ) nebs[ ++j ] = nebs[ i ];
    }
@@ -159,10 +159,10 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 /* Get the index value of the source PixelSet. */
    old_index = ps->index;
 
-/* Get a pointer to the first pixel in the source PixelSet bounding box. If 
-   the data  has less than 3 axes, the unused upper and lower bounds will be 
-   set to [1,1] and so we can always pretend there are 3 axes. */ 
-   v = ipa + ( ps->lbnd[ 0 ] - 1 ) + ( ps->lbnd[ 1 ] - 1 )*skip[ 1 ] + 
+/* Get a pointer to the first pixel in the source PixelSet bounding box. If
+   the data  has less than 3 axes, the unused upper and lower bounds will be
+   set to [1,1] and so we can always pretend there are 3 axes. */
+   v = ipa + ( ps->lbnd[ 0 ] - 1 ) + ( ps->lbnd[ 1 ] - 1 )*skip[ 1 ] +
              ( ps->lbnd[ 2 ] - 1 )*skip[ 2 ];
 
 /* Loop round the pixels in the source PixelSet bounding box. */
@@ -191,7 +191,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
                for( i = 0; i < ps->nneb; i++ ) {
                   iclump = nebs[ i ];
 
-/* Find the squared distance from the current pixel to the peak pixel in the 
+/* Find the squared distance from the current pixel to the peak pixel in the
    current adjoining clump. */
                   p = clumps[ iclump ]->peak;
                   d = p[ 0 ] - ix;
@@ -209,7 +209,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
                }
 
 /* Transfer the pixel to the new PixelSet. */
-               cupidCFAddPixel( ipa, clumps[ iclumpmin ], iv, x, VAL__MIND, 
+               cupidCFAddPixel( ipa, clumps[ iclumpmin ], iv, x, VAL__MIND,
                                 edge, status );
             }
 

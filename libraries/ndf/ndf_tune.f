@@ -27,12 +27,12 @@
 
 *  Notes:
 *     The following tuning parameters are currently available:
-*     - 'AUTO_HISTORY': Controls whether to include an empty History 
-*     component in NDFs created using NDF_NEW or NDF_CREAT. If the 
-*     tuning parameter is zet to zero (the default), no History 
-*     component will be included in the new NDFs. If the tuning 
+*     - 'AUTO_HISTORY': Controls whether to include an empty History
+*     component in NDFs created using NDF_NEW or NDF_CREAT. If the
+*     tuning parameter is zet to zero (the default), no History
+*     component will be included in the new NDFs. If the tuning
 *     parameter is zet non-zero, a History component will be added
-*     automatically to the new NDFs. 
+*     automatically to the new NDFs.
 *     - 'DOCVT': Controls whether to convert foreign format data files
 *     to and from native NDF format for access (using the facilities
 *     described in SSN/20). If DOCVT is set to 1 (the default), and the
@@ -81,16 +81,16 @@
 *     value is set.
 *     -  'PXT...': Controls whether a named NDF extension should be
 *     propagated by default when NDF_PROP or NDF_SCOPY is called. The
-*     name of the extension should be appended to the string "PXT" to 
+*     name of the extension should be appended to the string "PXT" to
 *     form the complete tuning parameter name. Thus the tuning parameter
 *     PXTFITS would control whether the FITS extension is propagated by
 *     default. If the value for the parameter is non-zero, then the
-*     extension will be propagated by default. If the value for the 
-*     parameter is zero, then the extension will not be propagated by 
+*     extension will be propagated by default. If the value for the
+*     parameter is zero, then the extension will not be propagated by
 *     default. The default established by this tuning parameter can be
 *     over-ridden by specifying the extension explicitly within the CLIST
 *     argument when calling NDF_PROP or NDF_SCOPY. The default value for
-*     all "PXT..." tuning parameters is 1, meaning that all extensions 
+*     all "PXT..." tuning parameters is 1, meaning that all extensions
 *     are propagated by default.
 
 *  Copyright:
@@ -103,12 +103,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -141,7 +141,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -258,10 +258,10 @@
 
 *  Automatic History creation flag.
 *  ================================
-*  If AUTO_HISTORY was specified, then set the automatic history creation 
+*  If AUTO_HISTORY was specified, then set the automatic history creation
 *  flag appropriately.
          ELSE IF ( NDF1_SIMLR( TPAR, 'AUTO_HISTORY', NDF__MINAB ) ) THEN
-            TCB_AUTOHISTORY = ( VALUE .NE. 0 ) 
+            TCB_AUTOHISTORY = ( VALUE .NE. 0 )
 
 *  Show data conversions flag.
 *  ==========================
@@ -351,7 +351,7 @@
      :                    STATUS )
          END IF
       END IF
- 
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -360,6 +360,6 @@
      : 'tuning parameter.',
      :                 STATUS )
          CALL NDF1_TRACE( 'NDF_TUNE', STATUS )
-      END IF      
+      END IF
 
       END

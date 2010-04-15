@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,7 +119,7 @@
 
 *  Copy the data type to the UTYPE variable and check it is not
 *  truncated.
-      UTYPE = TYPE       
+      UTYPE = TYPE
       TYPOK = UTYPE .EQ. TYPE
 
 *  If OK, then convert to upper case.
@@ -133,32 +133,32 @@
          IF ( UTYPE .EQ. '_BYTE' ) THEN
             CALL NDF1_V2SB( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                      STATUS )
- 
+
 *  ...Unsigned byte data.
          ELSE IF ( UTYPE .EQ. '_UBYTE' ) THEN
             CALL NDF1_V2SUB( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                       STATUS )
- 
+
 *  ...Double precision data.
          ELSE IF ( UTYPE .EQ. '_DOUBLE' ) THEN
             CALL NDF1_V2SD( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                      STATUS )
- 
+
 *  ...Integer data.
          ELSE IF ( UTYPE .EQ. '_INTEGER' ) THEN
             CALL NDF1_V2SI( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                      STATUS )
- 
+
 *  ...Real data.
          ELSE IF ( UTYPE .EQ. '_REAL' ) THEN
             CALL NDF1_V2SR( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                      STATUS )
- 
+
 *  ...Word data.
          ELSE IF ( UTYPE .EQ. '_WORD' ) THEN
             CALL NDF1_V2SW( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                      STATUS )
- 
+
 *  ...Unsigned word data.
          ELSE IF ( UTYPE .EQ. '_UWORD' ) THEN
             CALL NDF1_V2SUW( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,

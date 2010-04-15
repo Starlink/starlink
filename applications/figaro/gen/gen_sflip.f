@@ -61,7 +61,7 @@ C
 C     Local variables
 C
       INTEGER I                  ! Loop index
-      INTEGER IVAL               ! Large integer 
+      INTEGER IVAL               ! Large integer
 C
 C     The flipping of the sign bit works as follows:
 C

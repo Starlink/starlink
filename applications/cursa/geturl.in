@@ -42,7 +42,7 @@ fi
 #        http://www.roe.ac.uk/acdwww/cursa/home.html and show the header
 #        (which is usually hidden) at the start of the page.
 #
-#  Notes: 
+#  Notes:
 #     Proxy server configuration. Uses the standard command-line script
 #     variable "http_proxy" to define a proxy server. Set this when needed.
 #
@@ -77,7 +77,7 @@ proc getPage { url } {
 
 #  Proc to set the proxy server.
 proc configProxy { http_proxy } {
-   
+
    #  Split http://server:port/ into parts and configure http.
    if { [regexp {(?:http://)?([[:alnum:].-]+)(?::(\d+))?} $http_proxy -> \
             proxyHost proxyPort] } {

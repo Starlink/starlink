@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,7 +68,7 @@
       INTEGER EL                 ! Number of elements in the data array
       INTEGER LBND( 2 ), UBND( 2 ) ! Bounds of the NDF data array
       INTEGER NDIM               ! Number of the data array dimension
-                                
+
 
 *.
 
@@ -77,7 +77,7 @@
 
 *  Map the underlying NDF.
       CALL NDF_MAP( NDF, 'Data', '_REAL', 'READ', PNTR, EL, STATUS )
-      
+
 *  Get the bounds of the NDF.
       CALL NDF_BOUND( NDF, 2, LBND, UBND, NDIM, STATUS )
 

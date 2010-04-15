@@ -1,6 +1,6 @@
-      SUBROUTINE ARD_GTWCS( IGRP, NDIM, IWCS, STATUS ) 
-*+ 
-*  Name: 
+      SUBROUTINE ARD_GTWCS( IGRP, NDIM, IWCS, STATUS )
+*+
+*  Name:
 *     ARD_GTWCS
 
 *  Purpose:
@@ -10,12 +10,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD_GTWCS( IGRP, NDIM, IWCS, STATUS ) 
+*     CALL ARD_GTWCS( IGRP, NDIM, IWCS, STATUS )
 
 *  Description:
 *     This routine returns an AST pointer for a FrameSet describing the
-*     relationship between the user co-ordinate system used by the 
-*     supplied ARD description, and the pixel coordinate Frame of the 
+*     relationship between the user co-ordinate system used by the
+*     supplied ARD description, and the pixel coordinate Frame of the
 *     FrameSet stored by the most recent call to ARD_WCS.
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *        The number of pixl axes in the mask array.
 *     IWCS = INTEGER (Returned)
 *        An AST pointer to the FrameSet. The base Frame will be the pixel
-*        coordinate Frame in the FrameSet supplied via the most recent 
+*        coordinate Frame in the FrameSet supplied via the most recent
 *        call to ARD_WCS. The current Frame will be the user co-ordinate
 *        system specified by the supplied ARD description.
 
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,7 +88,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :  DLBND( ARD__MXDIM ),     ! Lower bounds of pixel coords
      :  DUBND( ARD__MXDIM )      ! Upper bounds of pixel coords
 
@@ -98,7 +98,7 @@
      :  IPOPND                   ! operand stack
 
       INTEGER
-     :  AWCS,                    ! WCS Frameset supplied by application 
+     :  AWCS,                    ! WCS Frameset supplied by application
      :  SZEXPR,                  ! Size of supplied algebraic expression
      :  SZOPND                   ! Size of operand stack
 
@@ -124,11 +124,11 @@
       END IF
 
 *  Create an AST FrameSet describing the known coordinate Frames. The
-*  base Frame of this FrameSet will be pixel coords within the pixel 
-*  mask, and the current Frame will be "Application co-ordinates" (i.e. 
+*  base Frame of this FrameSet will be pixel coords within the pixel
+*  mask, and the current Frame will be "Application co-ordinates" (i.e.
 *  the default user coordinate system). This Frame wil have Domain ARDAPP.
-*  The FrameSet may also contain other Frames specified using the ARD_WCS 
-*  routine. 
+*  The FrameSet may also contain other Frames specified using the ARD_WCS
+*  routine.
       CALL ARD1_APWCS( NDIM, VAL__BADR, AWCS, STATUS )
 
 *  Get work space to hold the algebraic Boolean expression
@@ -153,7 +153,7 @@
 *  included in the ARD description. The returned expression corresponds
 *  to the ARD description as supplied (i.e. no implicit .OR.s are
 *  inserted).
-      CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
+      CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, IPOPND,
      :                 SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Free resources
@@ -165,7 +165,7 @@
       CALL AST_EXPORT( IWCS, STATUS )
 
 *  Arrive here if an error occurs.
- 999  CONTINUE    
+ 999  CONTINUE
 
 *  End the AST context.
       CALL AST_END( STATUS )
@@ -173,7 +173,7 @@
 *  If an error has occured, give a context message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ARD_GTWCS_ERR1', 'ARD_GTWCS: Unable to get '//
-     :                 'the WCS FrameSet from an ARD description.', 
+     :                 'the WCS FrameSet from an ARD description.',
      :                 STATUS )
       END IF
 

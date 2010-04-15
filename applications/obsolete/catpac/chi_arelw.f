@@ -70,13 +70,13 @@
 *          endif
 *        enddo
 *     endif
-*    Authors : 
-*     Alan Wood (STADAT::ARW) Esther Gershuny (rlvad::ejg) 
-*    History : 
-*     12-Feb-1992: Original 
-*    Type Definitions : 
-      IMPLICIT NONE 
-*    Global constants : 
+*    Authors :
+*     Alan Wood (STADAT::ARW) Esther Gershuny (rlvad::ejg)
+*    History :
+*     12-Feb-1992: Original
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
       include 'sae_par'
       include 'chi_par'
       include 'chipar_par'
@@ -132,7 +132,7 @@
       j= Rstart(rd)
       do while (j.le.Rend(rd) .and. status.eq.SAI__OK)
 *
-*   constant just put it onto the working stack according to it's output type 
+*   constant just put it onto the working stack according to it's output type
         if (Xlist(j).lt.0) then
            wptr= wptr+1
            Wqual(wptr)= Xqual(j)
@@ -152,7 +152,7 @@
               in = chr_len(wcval(wptr))
 190           continue
 *
-*   catalogue element convert from it's input type to it's output type and 
+*   catalogue element convert from it's input type to it's output type and
 *   put on a the workink stack.
 *
         elseif (Xlist(j).eq.0) then

@@ -19,19 +19,19 @@
 *     so that the returned array looks like the equivalent array returned
 *     by NAG routine C06FAE.
 *
-*     The real and imaginary co-efficients produced by PDA_RFFTF are numerically 
-*     larger than the corresponding C06FAE co-efficients by a factor of 
+*     The real and imaginary co-efficients produced by PDA_RFFTF are numerically
+*     larger than the corresponding C06FAE co-efficients by a factor of
 *     SQRT( NP ), and are ordered differently. Both routines return A0
 *     (the zeroth real term, i.e. the DC level in the array) in element 1.
 *     PDA_RFFTF then has corresponding real and imaginary terms in adjacent
 *     elements, whereas C06FAE has all the real terms together, followed by
 *     all the imaginary terms (in reverse order):
 *
-*        PDA_RFFTF :  A0,    A1, B1,     A2, B2,     A3, B3,   ... 
+*        PDA_RFFTF :  A0,    A1, B1,     A2, B2,     A3, B3,   ...
 *        C06FAE:      A0,    A1, A2, A3, ...,        ..., B3, B2, B1
 *
 *     The zeroth imaginary term (B0) always has the value zero and so is
-*     not stored in the array. Care has to be taken about the parity of the 
+*     not stored in the array. Care has to be taken about the parity of the
 *     array size. If it is even, then there is one more real term than
 *     there is imaginary terms (excluding A0), i.e. if NP = 10, then the
 *     co-efficients are stored as follows:
@@ -73,25 +73,25 @@
 
 *  Arguments Given and Returned:
       REAL R( NP )
-      
+
 *  Local Variables:
       REAL
      :        FAC,               ! Normalisation factor
      :        TMP                ! Temporary storage for imaginary term
 
-      INTEGER 
+      INTEGER
      :        IB,                ! Index of current imaginary term.
      :        J                  ! Loop count
-   
+
 *.
 
 *  Store the normalisation factor
       FAC = 1.0/SQRT( REAL( NP ) )
 
-*  Loop round each of the imaginary terms in reverse order. Save each 
+*  Loop round each of the imaginary terms in reverse order. Save each
 *  one in a temporary variable. Even sized FFTPACK arrays end in with
 *  a real term, whereas odd sized arrays end with an imaginary term
-*  (which doesn't need to be moved). Use integer division to achieve 
+*  (which doesn't need to be moved). Use integer division to achieve
 *  the required effect.
       DO IB = 2*( ( NP + 1 )/2 ) - 1, 3, -2
          TMP = R( IB )

@@ -49,5 +49,5 @@
       IMPLICIT NONE
 
       CALL SGS_WLIST(6)
-      
+
       END

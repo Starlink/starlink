@@ -1,4 +1,4 @@
-*+  QMAN_READ_REC - Reads a record 
+*+  QMAN_READ_REC - Reads a record
       SUBROUTINE QMAN_READ_REC( STATUS )
 *    Invocation :
 *     CALL QMAN_READ_REC( STATUS )
@@ -17,7 +17,7 @@
 *    Global variables :
       INCLUDE 'QMAN_GLOBAL.PAR'       ! QMAN common block
       INCLUDE 'QMAN_COMMON.BLK'       ! QMAN global parameter constants
-*    External references : 
+*    External references :
       INTEGER CHR_LEN                 ! Function to find used length of string
 *    Local variables :
       CHARACTER*( MSG_VAL_LEN ) CTEMP ! Temporary record

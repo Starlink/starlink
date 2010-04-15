@@ -1,9 +1,9 @@
-      SUBROUTINE KPS1_CENBT( INDF, CERROR, MAP1, MAP2, MAP3, RFRM, NPOS, 
-     :                       NAXR, NAXIN, INPOS, GOTID, ID, LOGPOS, FDL, 
-     :                       QUIET, NSIM, NDIMS, SLBND, SUBND, SEARCH, 
-     :                       POSTVE, GUESS,MXSHFT, MXITER, OUTCO, FDO, 
-     :                       TOLER, TITLE, NSIMW, ERROR, PIXPOS, REPPOS, 
-     :                       PIXSIM, REPSIM, STATUS ) 
+      SUBROUTINE KPS1_CENBT( INDF, CERROR, MAP1, MAP2, MAP3, RFRM, NPOS,
+     :                       NAXR, NAXIN, INPOS, GOTID, ID, LOGPOS, FDL,
+     :                       QUIET, NSIM, NDIMS, SLBND, SUBND, SEARCH,
+     :                       POSTVE, GUESS,MXSHFT, MXITER, OUTCO, FDO,
+     :                       TOLER, TITLE, NSIMW, ERROR, PIXPOS, REPPOS,
+     :                       PIXSIM, REPSIM, STATUS )
 *+
 *  Name:
 *     KPS1_CENBT
@@ -15,12 +15,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CENBT( INDF, CERROR, MAP1, MAP2, MAP3, RFRM, NPOS, 
-*                      NAXR, NAXIN, INPOS, GOTID, ID, LOGPOS, FDL, QUIET, 
-*                      NSIM, NDIMS, SLBND, SUBND, SEARCH, POSTVE, 
+*     CALL KPS1_CENBT( INDF, CERROR, MAP1, MAP2, MAP3, RFRM, NPOS,
+*                      NAXR, NAXIN, INPOS, GOTID, ID, LOGPOS, FDL, QUIET,
+*                      NSIM, NDIMS, SLBND, SUBND, SEARCH, POSTVE,
 *                      GUESS, MXSHFT, MXITER, OUTCO, FDO, TOLER, TITLE,
-*                      NSIMW, ERROR, PIXPOS, REPPOS, PIXSIM, REPSIM, 
-*                      STATUS ) 
+*                      NSIMW, ERROR, PIXPOS, REPPOS, PIXSIM, REPSIM,
+*                      STATUS )
 
 *  Description:
 *     This routine finds the accurate centroids of a batch of image
@@ -35,61 +35,61 @@
 *     non-interactive modes such as "File" or "Catalogue".
 
 *  Arguments:
-*     INDF = INTEGER (Given) 
+*     INDF = INTEGER (Given)
 *        The input NDF.
-*     CERROR = INTEGER (Given) 
+*     CERROR = INTEGER (Given)
 *        Should the error on the centroid positions be found and dislayed?
 *        This requires the DNF to have a variance component.
-*     MAP1 = INTEGER (Given) 
+*     MAP1 = INTEGER (Given)
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the PIXEL Frame of the NDF.
-*     MAP2 = INTEGER (Given) 
+*     MAP2 = INTEGER (Given)
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
-*     MAP3 = INTEGER (Given) 
+*     MAP3 = INTEGER (Given)
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the reporting Frame.
-*     RFRM = INTEGER (Given) 
-*        A pointer to the reporting Frame (i.e. the Frame in which 
-*        positions are to be reported). 
-*     NPOS = INTEGER (Given) 
+*     RFRM = INTEGER (Given)
+*        A pointer to the reporting Frame (i.e. the Frame in which
+*        positions are to be reported).
+*     NPOS = INTEGER (Given)
 *        The number of centroid positions to be found.
-*     NAXR = INTEGER (Given) 
+*     NAXR = INTEGER (Given)
 *        The number of axes in the reporting Frame.
-*     NAXIN = INTEGER (Given) 
+*     NAXIN = INTEGER (Given)
 *        The number of axes in the Frame in which the initial guess
 *        positions are supplied.
-*     INPOS( NPOS, NAXIN ) = DOUBLE PRECISION (Given) 
+*     INPOS( NPOS, NAXIN ) = DOUBLE PRECISION (Given)
 *        The initial guesses at the centroid positions. These should be
 *        in the co-ordinate system defined by MAP1 and MAP3.
 *     GOTID = LOGICAL (Given)
 *        If TRUE then the position identifiers supplied in ID are used.
 *        Otherwise identifiers equal to the position index are used.
-*     ID( NPOS ) = INTEGER (Given) 
+*     ID( NPOS ) = INTEGER (Given)
 *        A set of integer identifiers for the supplied positions. These
 *        are displayed with the centroid positions. Only accessed if
 *        GOTID is .TRUE.
-*     LOGPOS = LOGICAL (Given) 
+*     LOGPOS = LOGICAL (Given)
 *        Should the results be written to a log file?
-*     FDL = INTEGER (Given) 
+*     FDL = INTEGER (Given)
 *        The file descriptor for the log file. Ignored if LOGPOS is
 *        .FALSE.
-*     QUIET = INTEGER (Given) 
+*     QUIET = INTEGER (Given)
 *        If .FALSE., the results are written to standard output. If .TRUE.
 *        nothing is written to standard output.
 *     NSIM = INTEGER (Given)
 *        The number of simulated positions to use when estimating the
 *        errors on the centroid positions.
-*     NDIMS = INTEGER (Given) 
+*     NDIMS = INTEGER (Given)
 *        The number of significant axes in the NDF (i.e. axes spanning
 *        more than a single pixel).
-*     SLBND( NDIMS ) = INTEGER (Given) 
+*     SLBND( NDIMS ) = INTEGER (Given)
 *        The lower pixel index bounds of the significant axes of the NDF.
-*     SUBND( NDIMS ) = INTEGER (Given) 
+*     SUBND( NDIMS ) = INTEGER (Given)
 *        The UPER pixel index bounds of the significant axes of the NDF.
-*     SEARCH( NDIMS ) = INTEGER (Given) 
+*     SEARCH( NDIMS ) = INTEGER (Given)
 *        The dimensions of the search box to use when estimating the
-*        centroid position, in pixels. Each value must be odd and lie 
+*        centroid position, in pixels. Each value must be odd and lie
 *        in the range 3--51.
 *     POSTVE = LOGICAL (Given)
 *        True if image features are positive above the background.
@@ -102,30 +102,30 @@
 *     MXITER = INTEGER  (Given)
 *        Maximum number of iterations to be used.  At least one
 *        iteration will be performed even if this is less than one.
-*     OUTCO = LOGICAL (Given) 
+*     OUTCO = LOGICAL (Given)
 *        Should the pixel co-ordinates of the centroids be written to an
 *        output text file?
-*     FDO = INTEGER (Given) 
+*     FDO = INTEGER (Given)
 *        Teh file descriptor for the output text file. Ignored if OUTCO
 *        is .FALSE.
 *     TOLER = REAL (Given)
 *        Accuracy required in the centroid position.
-*     TITLE = CHARACTER * ( * ) (Given) 
+*     TITLE = CHARACTER * ( * ) (Given)
 *        A title to display before the first position.
-*     NSIMW = INTEGER (Given) 
+*     NSIMW = INTEGER (Given)
 *        The first dimension of the PIXSIM and REPSIM work arrays. This
 *        should be at least equal to NSIM*NPOS.
-*     ERROR( NPOS, NAXR ) = DOUBLE PRECISION (Returned) 
+*     ERROR( NPOS, NAXR ) = DOUBLE PRECISION (Returned)
 *        The errors on the centroid positions, given in the reporting
 *        Frame.
-*     PIXPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Returned) 
+*     PIXPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Returned)
 *        The centroid positions, given in the PIXEL Frame of the NDF.
-*     REPPOS( NPOS, NAXR ) = DOUBLE PRECISION (Returned) 
+*     REPPOS( NPOS, NAXR ) = DOUBLE PRECISION (Returned)
 *        The centroid positions, given in the reporting Frame.
-*     PIXSIM( NSIMW, NDIMS ) = DOUBLE PRECISION (Returned) 
+*     PIXSIM( NSIMW, NDIMS ) = DOUBLE PRECISION (Returned)
 *        A work array to hold the PIXEL Frame co-ordinates at each
 *        simulated centroid position.
-*     REPSIM( NSIMW, NAXR ) = DOUBLE PRECISION (Returned) 
+*     REPSIM( NSIMW, NAXR ) = DOUBLE PRECISION (Returned)
 *        A work array to hold the reporting Frame co-ordinates at each
 *        simulated centroid position.
 *     STATUS = INTEGER (Given and Returned)
@@ -167,7 +167,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -179,35 +179,35 @@
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
-      INTEGER INDF 
-      LOGICAL CERROR 
-      INTEGER MAP1 
-      INTEGER MAP2 
-      INTEGER MAP3 
-      INTEGER RFRM 
-      INTEGER NPOS 
-      INTEGER NAXIN 
+      INTEGER INDF
+      LOGICAL CERROR
+      INTEGER MAP1
+      INTEGER MAP2
+      INTEGER MAP3
+      INTEGER RFRM
+      INTEGER NPOS
+      INTEGER NAXIN
       INTEGER NAXR
       DOUBLE PRECISION INPOS( NPOS, NAXIN )
       LOGICAL GOTID
       INTEGER ID( NPOS )
-      LOGICAL LOGPOS 
-      INTEGER FDL 
-      LOGICAL QUIET 
+      LOGICAL LOGPOS
+      INTEGER FDL
+      LOGICAL QUIET
       INTEGER NSIM
-      INTEGER NDIMS 
+      INTEGER NDIMS
       INTEGER SLBND( NDIMS )
       INTEGER SUBND( NDIMS )
       INTEGER SEARCH( NDIMS )
-      LOGICAL POSTVE 
+      LOGICAL POSTVE
       LOGICAL GUESS
       REAL MXSHFT( NDIMS )
-      INTEGER MXITER 
-      LOGICAL OUTCO 
-      INTEGER FDO 
-      REAL TOLER 
+      INTEGER MXITER
+      LOGICAL OUTCO
+      INTEGER FDO
+      REAL TOLER
       CHARACTER TITLE*(*)
-      INTEGER NSIMW 
+      INTEGER NSIMW
 
 *  Arguments Returned:
       DOUBLE PRECISION ERROR( NPOS, NAXR )
@@ -246,7 +246,7 @@
       INTEGER WDIM( NDF__MXDIM ) ! Dimensions of area used for variance
       LOGICAL OK                 ! Is this position OK?
       LOGICAL VERB               ! Flush errors instead of annulling them?
-      REAL EFINAL( NDF__MXDIM )  ! Pixel coords at simulated centroid position 
+      REAL EFINAL( NDF__MXDIM )  ! Pixel coords at simulated centroid position
       REAL INIT( NDF__MXDIM )    ! Pixel coords at initial guess position
       REAL PFINAL( NDF__MXDIM )  ! Pixel coords at genuine centroid position
 *.
@@ -268,11 +268,11 @@
      :                 'to map pixel positions into the Current '//
      :                 'co-ordinate Frame is not defined.', STATUS )
 
-      ELSE IF( GUESS .AND. 
+      ELSE IF( GUESS .AND.
      :         .NOT. AST_GETL( MAP3, 'TRANFORWARD', STATUS ) ) THEN
          CALL MSG_OUT( 'KPS1_CENBT_MSG1','The Mapping required '//
      :                 'to map the supplied positions into the '//
-     :                 'Current co-ordinate Frame is not defined.', 
+     :                 'Current co-ordinate Frame is not defined.',
      :                 STATUS )
          CALL MSG_OUT( 'KPS1_CENBT_MSG2','The supplied positions '//
      :                 'will not be reported!!', STATUS )
@@ -294,8 +294,8 @@
       CALL PSX_CALLOC( SEL*51*NDIMS, '_REAL', IPW2, STATUS )
 
 *  Transform the supplied positions to the PIXEL Frame of the NDF.
-      CALL AST_TRANN( MAP1, NPOS, NAXIN, NPOS, INPOS, .TRUE., NDIMS, 
-     :                NPOS, PIXPOS, STATUS ) 
+      CALL AST_TRANN( MAP1, NPOS, NAXIN, NPOS, INPOS, .TRUE., NDIMS,
+     :                NPOS, PIXPOS, STATUS )
 
 *  Choose the data type in which to process the data.
       CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
@@ -326,72 +326,72 @@
             END IF
          END DO
 
-*  If any axis has a bad value in the initial position, add a bad position 
+*  If any axis has a bad value in the initial position, add a bad position
 *  to the array of centroid positions.
          IF( .NOT. OK ) THEN
             DO J = 1, NDIMS
                PIXPOS( I, J ) = AST__BAD
             END DO
 
-*  If the initial position is good, find the centroid and add it to the 
+*  If the initial position is good, find the centroid and add it to the
 *  array of centroid positions.
          ELSE
 
 *  Call the subroutine that does the actual work for the required data type.
 *  The position is returned in pixel co-ordinates.
             IF( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_LOCTI( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTI( NDIMS, SLBND, SUBND,
      :                          %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_LOCTR( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTR( NDIMS, SLBND, SUBND,
      :                          %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_LOCTD( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTD( NDIMS, SLBND, SUBND,
      :                          %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_LOCTW( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTW( NDIMS, SLBND, SUBND,
      :                          %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_LOCTUW( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTUW( NDIMS, SLBND, SUBND,
      :                           %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_LOCTB( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTB( NDIMS, SLBND, SUBND,
      :                          %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_LOCTUB( NDIMS, SLBND, SUBND, 
+               CALL KPG1_LOCTUB( NDIMS, SLBND, SUBND,
      :                           %VAL( CNF_PVAL( IPDIN ) ),
-     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, 
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
@@ -406,7 +406,7 @@
 *  If the position could not be found...
             IF( STATUS .NE. SAI__OK ) THEN
 
-*  If we are processing more than one position, cancel the error so that 
+*  If we are processing more than one position, cancel the error so that
 *  remaining positions can be processed. For a single position, we retian
 *  the error status.
                IF( NPOS .GT. 1 ) THEN
@@ -414,7 +414,7 @@
 *  If we are in verbose mode, add a context report and flush the message.
 *  Otherwise, just annul the message.
                   IF( VERB ) THEN
-                     IF( GOTID ) THEN 
+                     IF( GOTID ) THEN
                         CALL MSG_SETI( 'ID', ID( I ) )
                      ELSE
                         CALL MSG_SETI( 'ID', I )
@@ -437,22 +437,22 @@
             ELSE
                DO J = 1, NDIMS
                   IF( PFINAL( J ) .NE. VAL__BADR ) THEN
-                     PIXPOS( I, J ) = DBLE( PFINAL( J ) )                  
+                     PIXPOS( I, J ) = DBLE( PFINAL( J ) )
                   ELSE
                      PIXPOS( I, J ) = AST__BAD
                   END IF
                END DO
-  
+
             END IF
-      
+
          END IF
 
       END DO
 
 *  We now have an array holding all the centroid positions in pixel
 *  co-ordinates. Transform them to the reporting Frame.
-      CALL AST_TRANN( MAP2, NPOS, NDIMS, NPOS, PIXPOS, .TRUE., NAXR, 
-     :                NPOS, REPPOS, STATUS ) 
+      CALL AST_TRANN( MAP2, NPOS, NDIMS, NPOS, PIXPOS, .TRUE., NAXR,
+     :                NPOS, REPPOS, STATUS )
 
 *  Now estimate the error on these centroid positions if required.
 *  ===============================================================
@@ -462,7 +462,7 @@
          CALL PSX_CALLOC( SEL, ITYPE, IPW1, STATUS )
 
 *  Map the variance array from the NDF.
-         CALL NDF_MAP( INDF, 'Variance', ITYPE, 'READ', IPVIN, EL, 
+         CALL NDF_MAP( INDF, 'Variance', ITYPE, 'READ', IPVIN, EL,
      :                 STATUS )
 
 *  Abort if an error has occurred.
@@ -487,17 +487,17 @@
                END IF
             END DO
 
-*  If any pixel axis has a bad value at the centroid position, ignore 
+*  If any pixel axis has a bad value at the centroid position, ignore
 *  the position.
             IF( OK ) THEN
 
-*  Find the bounds of the area which will be used to determine the 
-*  variance of the centroid position. We need to make a separate copy 
-*  of this area so that noise can be added into it. The bounds of the 
+*  Find the bounds of the area which will be used to determine the
+*  variance of the centroid position. We need to make a separate copy
+*  of this area so that noise can be added into it. The bounds of the
 *  area are such as to cover a search box at the maximum allowed shift
 *  from the final centroid position found above.
                DO J = 1, NDIMS
-                  VUBND( J ) = INT( PFINAL( J ) + 0.5 ) + WDIM( J )/2 
+                  VUBND( J ) = INT( PFINAL( J ) + 0.5 ) + WDIM( J )/2
                   VLBND( J ) = VUBND( J ) - WDIM( J ) + 1
                END DO
 
@@ -510,101 +510,101 @@
 
 *  Copy the required area from the data array to the workspace, and
 *  add gaussian noise.
-                     CALL KPS1_CENAI( NDIMS, SLBND, SUBND, 
-     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAI( NDIMS, SLBND, SUBND,
+     :                                %VAL( CNF_PVAL( IPDIN ) ),
      :                                %VAL( CNF_PVAL( IPVIN ) ),
-     :                                VLBND, VUBND, 
+     :                                VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-      
+
 *  Find the new centroid after the noise has been added. The position is
 *  returned in pixel co-ordinates.
-                     CALL KPG1_LOCTI( NDIMS, VLBND, VUBND, 
+                     CALL KPG1_LOCTI( NDIMS, VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
-     :                                MXITER, TOLER, SEL, EFINAL, 
+     :                                PFINAL, SEARCH, POSTVE, MXSHFT,
+     :                                MXITER, TOLER, SEL, EFINAL,
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Now do the same for the other data types.
                   ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-                     CALL KPS1_CENAR( NDIMS, SLBND, SUBND, 
-     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAR( NDIMS, SLBND, SUBND,
+     :                                %VAL( CNF_PVAL( IPDIN ) ),
      :                                %VAL( CNF_PVAL( IPVIN ) ),
-     :                                VLBND, VUBND, 
+     :                                VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTR( NDIMS, VLBND, VUBND, 
+                     CALL KPG1_LOCTR( NDIMS, VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
-     :                                MXITER, TOLER, SEL, EFINAL, 
+     :                                PFINAL, SEARCH, POSTVE, MXSHFT,
+     :                                MXITER, TOLER, SEL, EFINAL,
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
                   ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPS1_CENAD( NDIMS, SLBND, SUBND, 
-     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAD( NDIMS, SLBND, SUBND,
+     :                                %VAL( CNF_PVAL( IPDIN ) ),
      :                                %VAL( CNF_PVAL( IPVIN ) ),
-     :                                VLBND, VUBND, 
+     :                                VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTD( NDIMS, VLBND, VUBND, 
+                     CALL KPG1_LOCTD( NDIMS, VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
-     :                                MXITER, TOLER, SEL, EFINAL, 
+     :                                PFINAL, SEARCH, POSTVE, MXSHFT,
+     :                                MXITER, TOLER, SEL, EFINAL,
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
-  
+
                   ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-                     CALL KPS1_CENAW( NDIMS, SLBND, SUBND, 
-     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAW( NDIMS, SLBND, SUBND,
+     :                                %VAL( CNF_PVAL( IPDIN ) ),
      :                                %VAL( CNF_PVAL( IPVIN ) ),
-     :                                VLBND, VUBND, 
+     :                                VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTW( NDIMS, VLBND, VUBND, 
+                     CALL KPG1_LOCTW( NDIMS, VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
-     :                                MXITER, TOLER, SEL, EFINAL, 
+     :                                PFINAL, SEARCH, POSTVE, MXSHFT,
+     :                                MXITER, TOLER, SEL, EFINAL,
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
-  
+
                   ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL KPS1_CENAUW( NDIMS, SLBND, SUBND, 
-     :                                 %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAUW( NDIMS, SLBND, SUBND,
+     :                                 %VAL( CNF_PVAL( IPDIN ) ),
      :                                 %VAL( CNF_PVAL( IPVIN ) ),
-     :                                 VLBND, VUBND, 
+     :                                 VLBND, VUBND,
      :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 STATUS )
-                     CALL KPG1_LOCTUW( NDIMS, VLBND, VUBND, 
-     :                                 %VAL( CNF_PVAL( IPW1 ) ), 
+                     CALL KPG1_LOCTUW( NDIMS, VLBND, VUBND,
+     :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 PFINAL, SEARCH,
-     :                                 POSTVE, MXSHFT, MXITER, TOLER, 
-     :                                 SEL, EFINAL, 
+     :                                 POSTVE, MXSHFT, MXITER, TOLER,
+     :                                 SEL, EFINAL,
      :                                 %VAL( CNF_PVAL( IPW2 ) ),
      :                                 STATUS )
-  
+
                   ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL KPS1_CENAB( NDIMS, SLBND, SUBND, 
-     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAB( NDIMS, SLBND, SUBND,
+     :                                %VAL( CNF_PVAL( IPDIN ) ),
      :                                %VAL( CNF_PVAL( IPVIN ) ),
-     :                                VLBND, VUBND, 
+     :                                VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTB( NDIMS, VLBND, VUBND, 
+                     CALL KPG1_LOCTB( NDIMS, VLBND, VUBND,
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
-     :                                MXITER, TOLER, SEL, EFINAL, 
+     :                                PFINAL, SEARCH, POSTVE, MXSHFT,
+     :                                MXITER, TOLER, SEL, EFINAL,
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
-  
+
                   ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL KPS1_CENAUB( NDIMS, SLBND, SUBND, 
-     :                                 %VAL( CNF_PVAL( IPDIN ) ), 
+                     CALL KPS1_CENAUB( NDIMS, SLBND, SUBND,
+     :                                 %VAL( CNF_PVAL( IPDIN ) ),
      :                                 %VAL( CNF_PVAL( IPVIN ) ),
-     :                                 VLBND, VUBND, 
+     :                                 VLBND, VUBND,
      :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 STATUS )
-                     CALL KPG1_LOCTUB( NDIMS, VLBND, VUBND, 
-     :                                 %VAL( CNF_PVAL( IPW1 ) ), 
+                     CALL KPG1_LOCTUB( NDIMS, VLBND, VUBND,
+     :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 PFINAL, SEARCH,
-     :                                 POSTVE, MXSHFT, MXITER, TOLER, 
-     :                                 SEL, EFINAL, 
+     :                                 POSTVE, MXSHFT, MXITER, TOLER,
+     :                                 SEL, EFINAL,
      :                                 %VAL( CNF_PVAL( IPW2 ) ),
      :                                 STATUS )
 
@@ -616,11 +616,11 @@
                      GO TO 999
                   END IF
 
-*  If the simulated position was not found, annul the error so that the 
-*  remaining positions can be processed, and store a bad simulated position 
+*  If the simulated position was not found, annul the error so that the
+*  remaining positions can be processed, and store a bad simulated position
 *  in the work array.
                   IF( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_ANNUL( STATUS )     
+                     CALL ERR_ANNUL( STATUS )
                      DO J = 1, NDIMS
                         PIXSIM( ISIM, J ) = AST__BAD
                      END DO
@@ -647,14 +647,14 @@
 
          END DO
 
-*  Transform all the simulated positions from pixel co-ordinats into the 
-*  reporting Frame. We do them all in a single batch to minimise 
+*  Transform all the simulated positions from pixel co-ordinats into the
+*  reporting Frame. We do them all in a single batch to minimise
 *  the time spent transforming points.
-         CALL AST_TRANN( MAP2, ISIM - 1, NDIMS, NSIMW, PIXSIM, .TRUE., 
-     :                   NAXR, NSIMW, REPSIM, STATUS ) 
+         CALL AST_TRANN( MAP2, ISIM - 1, NDIMS, NSIMW, PIXSIM, .TRUE.,
+     :                   NAXR, NSIMW, REPSIM, STATUS )
 
 
-*  Initialise the index of the next simulated position to be read from 
+*  Initialise the index of the next simulated position to be read from
 *  the work arrays.
          ISIM = 1
 
@@ -692,14 +692,14 @@
 *  Do each reporting Frame axis.
                   DO J = 1, NAXR
 
-*  Check the simulated and centroid positions are good in the reporting 
+*  Check the simulated and centroid positions are good in the reporting
 *  Frame.
                      IF( REPSIM( ISIM, J ) .NE. AST__BAD .AND.
      :                   REPPOS( I, J ) .NE. AST__BAD ) THEN
 
 *  If so, increment the running sums for this axis.
                         NVAL( J ) = NVAL( J ) + 1
-                        SUM( J ) = SUM( J ) + ( REPSIM( ISIM, J ) - 
+                        SUM( J ) = SUM( J ) + ( REPSIM( ISIM, J ) -
      :                                          REPPOS( I, J ) )**2
                      END IF
 
@@ -718,7 +718,7 @@
                   IF( NVAL( J ) .GE. 3 ) THEN
 
 *  Calculate the RMS error on this axis.
-                     ERROR( I, J ) = SQRT( SUM( J ) / 
+                     ERROR( I, J ) = SQRT( SUM( J ) /
      :                                     DBLE( NVAL( J ) - 1 ) )
 
 *  Store bad values if there were insufficient simulated positions.
@@ -738,11 +738,11 @@
 *  ======================
 
 *  If the user wants to see the original guess positions, transform them to
-*  the reporting Frame of the NDF. We no longer neeed the contents of the 
+*  the reporting Frame of the NDF. We no longer neeed the contents of the
 *  REPSIM array, so we can put the results in REPSIM.
       IF( GUESS ) THEN
-         CALL AST_TRANN( MAP3, NPOS, NAXIN, NPOS, INPOS, .TRUE., 
-     :                   NAXR, NSIMW, REPSIM, STATUS ) 
+         CALL AST_TRANN( MAP3, NPOS, NAXIN, NPOS, INPOS, .TRUE.,
+     :                   NAXR, NSIMW, REPSIM, STATUS )
       END IF
 
 *  Display the header.
@@ -755,19 +755,19 @@
          ELSE
             IDENT = I
          END IF
-         CALL KPS1_CENSH( CERROR, RFRM, NPOS, IDENT, LOGPOS, FDL, 
-     :                    QUIET, NDIMS, NAXR, GUESS, OUTCO, FDO, 
-     :                    NSIMW, ERROR, PIXPOS, REPPOS, REPSIM, I, 
-     :                    STATUS ) 
+         CALL KPS1_CENSH( CERROR, RFRM, NPOS, IDENT, LOGPOS, FDL,
+     :                    QUIET, NDIMS, NAXR, GUESS, OUTCO, FDO,
+     :                    NSIMW, ERROR, PIXPOS, REPPOS, REPSIM, I,
+     :                    STATUS )
       END DO
 
 *  A final blank line.
       IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
       IF( LOGPOS ) CALL FIO_WRITE( FDL, ' ', STATUS )
 
-*  Now write the last position out to the output parameters. 
-*  The formatted axis value for axis 1 is written to XCEN, and 
-*  the formatted axis value for axis 2 is written to YCEN. The 
+*  Now write the last position out to the output parameters.
+*  The formatted axis value for axis 1 is written to XCEN, and
+*  the formatted axis value for axis 2 is written to YCEN. The
 *  complete set of axis values (separated by spaces) is written to
 *  CENTRE.
       IAT = 0
@@ -777,14 +777,14 @@
          AXVAL = AST_FORMAT( RFRM, J, REPPOS( NPOS, J ), STATUS )
 
          IF( J .EQ. 1 ) THEN
-            CALL PAR_PUT0C( 'XCEN', AXVAL( : CHR_LEN( AXVAL ) ), 
+            CALL PAR_PUT0C( 'XCEN', AXVAL( : CHR_LEN( AXVAL ) ),
      :                      STATUS )
 
          ELSE IF( J .EQ. 2 ) THEN
-            CALL PAR_PUT0C( 'YCEN', AXVAL( : CHR_LEN( AXVAL ) ), 
+            CALL PAR_PUT0C( 'YCEN', AXVAL( : CHR_LEN( AXVAL ) ),
      :                      STATUS )
 
-         END IF         
+         END IF
 
          CALL CHR_APPND( AXVAL, LINE, IAT )
          IAT = IAT + 1
@@ -797,25 +797,25 @@
       IF( CERROR ) THEN
          IAT = 0
          LINE = ' '
-   
+
          DO J = 1, NAXR
             AXVAL = AST_FORMAT( RFRM, J, ERROR( NPOS, J ), STATUS )
-   
+
             IF( J .EQ. 1 ) THEN
-               CALL PAR_PUT0C( 'XERR', AXVAL( : CHR_LEN( AXVAL ) ), 
+               CALL PAR_PUT0C( 'XERR', AXVAL( : CHR_LEN( AXVAL ) ),
      :                         STATUS )
-   
+
             ELSE IF( J .EQ. 2 ) THEN
-               CALL PAR_PUT0C( 'YERR', AXVAL( : CHR_LEN( AXVAL ) ), 
+               CALL PAR_PUT0C( 'YERR', AXVAL( : CHR_LEN( AXVAL ) ),
      :                         STATUS )
-   
-            END IF         
-   
+
+            END IF
+
             CALL CHR_APPND( AXVAL, LINE, IAT )
             IAT = IAT + 1
-   
+
          END DO
-   
+
          CALL PAR_PUT0C( 'ERROR', LINE( : IAT ), STATUS )
 
       END IF

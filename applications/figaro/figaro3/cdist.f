@@ -10,11 +10,11 @@ C     in that it consists simply of applying a shift in Y to the
 C     data for each column of the image.  The shift is determined
 C     separately for each column from the polynomial fitted by SDIST.
 C     If the SDIST analysis was for more than one spectrum, the
-C     correction is what might be termed '1.5-dimensional' - the 
+C     correction is what might be termed '1.5-dimensional' - the
 C     data is only redistributed within columns, but the amount of
 C     shift varies along each column in a manner determined by fitting
 C     a low order polynomial to the results of evaluating the
-C     polynomials that SDIST fitted to each spectrum.  The 1.5D 
+C     polynomials that SDIST fitted to each spectrum.  The 1.5D
 C     algorithm actually reduces to the 1D case when there is only one
 C     spectrum, but it simplifies things to think of them as distinct
 C     cases.
@@ -22,7 +22,7 @@ C
 C     Command parameters -
 C
 C     IMAGE    (Character) The name of the image to be corrected.
-C 
+C
 C     YSTART   (Numeric) The first Y value to be used.
 C
 C     YEND     (Numeric) The last Y value to be used.  Using YSTART
@@ -36,8 +36,8 @@ C
 C     MAXDEGY  (Numeric) The maximum degree polynomial to fit to the
 C              spectral positions in the case where there is more
 C              than one spectrum covered by the SDIST analysis.
-C              
-C     Command keywords - 
+C
+C     Command keywords -
 C
 C     ROTATE   If specified, the image to be corrected will be rotated
 C              prior to the application of the correction.  This
@@ -46,7 +46,7 @@ C              correction, but at the expense of the overheads of the
 C              rotation itself.
 C
 C     User variables - None
-C 
+C
 C     Input files -
 C
 C     SDIST.DAT contains the results of the fit(s), as written by
@@ -54,12 +54,12 @@ C               SDIST, in a format treated as follows -
 C
 C               3 header lines, all beginning with '*'
 C               One line giving the number of spectra traced, in the
-C               format 20X,I5.  
-C               Then, for each spectrum traced, one record giving 
+C               format 20X,I5.
+C               Then, for each spectrum traced, one record giving
 C               the spectrum number, and the leftmost and rightmost
-C               pixels covered by the trace, in format 
+C               pixels covered by the trace, in format
 C               11X,I5,17X,I5,4X,I5, then 1 record giving the average
-C               Y value in the spectrum, in format 16X,F13.7, 
+C               Y value in the spectrum, in format 16X,F13.7,
 C               which is followed by 3 records giving the 11
 C               polynomial coefficients for the fit, in 3D23.16.
 C               Coefficients are given constant first, with any unused
@@ -73,11 +73,11 @@ C                    added.
 C      7th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
 C                    changed.  Now uses DYN_ routines for dynamic-memory
 C                    handling.
-C      5th May 1988  KS / AAO.  FLOAT replaced by DBLE in one call to 
+C      5th May 1988  KS / AAO.  FLOAT replaced by DBLE in one call to
 C                    GEN_EPOLYD.  Bug pointed out by CKL/CIT.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
-C     29th Mar 1991  KS / AAO. Fixed bug that was messing up the result 
+C     29th Mar 1991  KS / AAO. Fixed bug that was messing up the result
 C                    image outside the Y bounds specified (ie if only
 C                    a subset wqas corrected) if ROTATE was specified.
 C                    Maximum number of spectra increased to 50 to match
@@ -107,28 +107,28 @@ C     Maximum number of spectra that can be used
 C
       INTEGER MAXSPEC
       PARAMETER (MAXSPEC=50)
-C    
+C
 C     Local variables
 C
       DOUBLE PRECISION COEFFS(11,MAXSPEC) !
-      INTEGER      DEGREES(MAXSPEC)! 
+      INTEGER      DEGREES(MAXSPEC)!
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       INTEGER      DPTR          ! Dynamic-memory pointer to data array
       INTEGER      FILE          ! Logical unit number of the input file
       LOGICAL      FOPEN         ! Logical unit number for input data
-      INTEGER      I             ! 
+      INTEGER      I             !
       INTEGER      IGNORE        ! Used to pass ignorable status
       INTEGER      INVOKE        ! Used to invoke functions
-      INTEGER      ISPECT        ! 
-      INTEGER      IYEN          ! 
-      INTEGER      IYST          ! 
+      INTEGER      ISPECT        !
+      INTEGER      IYEN          !
+      INTEGER      IYST          !
       INTEGER      J             !
       INTEGER      MAXD          ! Maximum degree of polynomial to fit
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NBYTES        ! Number of bytes taken by 1 x-section
       INTEGER      NELM          ! Total number of elements in data
-      INTEGER      NEXT          ! 
-      INTEGER      NPIX          ! 
+      INTEGER      NEXT          !
+      INTEGER      NPIX          !
       INTEGER      NSPECT        !
       INTEGER      NX            ! Size of 1st dimension
       INTEGER      NY            ! Size of 2nd dimension (if present)
@@ -189,7 +189,7 @@ C
       DO ISPECT=1,NSPECT
          READ (FILE,'(/16X,F13.7)',ERR=310,END=310,IOSTAT=STATUS)
      :      YPOSNS(ISPECT)
-         READ (FILE,'(3D23.16)',ERR=310,END=310,IOSTAT=STATUS) 
+         READ (FILE,'(3D23.16)',ERR=310,END=310,IOSTAT=STATUS)
      :      (COEFFS(J,ISPECT),J=1,11)
       END DO
       GO TO 320
@@ -279,9 +279,9 @@ C
 C     If the data array is to be rotated, do that now.  Note that the
 C     routines FIG_CDIS1D, FIG_CDIS2D have separate input and output
 C     arrays, and they do not copy data that they don't correct
-C     (outside the Y range specified) from input to output.  If we want 
-C     something sensible to appear in the uncorrected range - if we are 
-C     not correcting the whole range - we should make sure that the 
+C     (outside the Y range specified) from input to output.  If we want
+C     something sensible to appear in the uncorrected range - if we are
+C     not correcting the whole range - we should make sure that the
 C     output array contains a copy of the input we are going to give it.
 C     (This only affects the rotated case - in the non-rotated case the
 C     input and output arrays are the same.)
@@ -322,7 +322,7 @@ C        - note that all we really know is where they are, not where
 C        they should be.  But we can guess..
 C
          CALL FIG_YPGUES(NSPECT,YPOSNS,NX,COEFFS,DEGREES,YBEST)
-C 
+C
 C        Now perform the correction
 C
          CALL FIG_CDIS2D(%VAL(CNF_PVAL(DPTR)),NX,NY,ROTATE,IYST,IYEN,
@@ -414,7 +414,7 @@ C
          SARRAY(I)=-GEN_EPOLYD(DBLE(I),RCOEFF,DEGREE+1)
       END DO
 C
-      END 
+      END
 C+
       SUBROUTINE FIG_CDIS1D(IN,NX,NY,ROTATE,IYST,IYEN,SARRAY,WORK,OUT)
 C
@@ -438,7 +438,7 @@ C                 IN can be the same array in the calling routine.
 C
 C     Common variables used - None
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     FIG_REBIN   (FIG_ package) Rebin data, in this case by shifting.
 C
@@ -482,7 +482,7 @@ C
             IBASE=(IX*NY)+1
             DO IY=IYST,IYEN
                IWPT=IWPT+1
-               WORK(IWPT)=IN(IBASE-IY)       ! equivalent to IN(IX,IY) 
+               WORK(IWPT)=IN(IBASE-IY)       ! equivalent to IN(IX,IY)
             END DO
          ELSE
             DO IY=IYST,IYEN
@@ -543,9 +543,9 @@ C     It may be obvious from the diagram above that if * represents
 C     IN(IX,IY) in the original unrotated image, then its position
 C     in the rotated image is going to be given by (IX-1)*NY + (NY-IY+1)
 C     which is (elements in rows up to the row containing *) + (position
-C     in row containing *), which reduces to (IX*NY)+1-IY which is 
+C     in row containing *), which reduces to (IX*NY)+1-IY which is
 C     the expression IBASE-IY used in the code.  Similarly, consideration
-C     of what happens when OUT is rotated AFTER this routine runs leads 
+C     of what happens when OUT is rotated AFTER this routine runs leads
 C     to the expression (NX-IX)*NY+IY for the location of the element
 C     which is destined to become OUT(IX,IY).
 C
@@ -553,7 +553,7 @@ C
 C+
       SUBROUTINE FIG_YPGUES(NSPECT,YPOSNS,NX,COEFFS,DEGREES,YBEST)
 C
-C     F I G _ Y P G U E S 
+C     F I G _ Y P G U E S
 C
 C     Given the average Y positions for the spectra analysed by
 C     SDIST, and the polynomials it fitted to them, estimates the
@@ -578,7 +578,7 @@ C                  be centered in Y.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_EPOLYD   (GEN_ package) Evaluate a double precision polynomial
 C     GEN_REVR8    ( "     "    ) Reverse a double precision array.
@@ -588,7 +588,7 @@ C     Modified:
 C
 C     4th April 1985.  KS / AAO.  Coeffs were being used in wrong order.
 C                      Call to GEN_REVR8 introduced.
-C     5th May 1988.    KS / AAO.  FLOAT replaced by DBLE in call to 
+C     5th May 1988.    KS / AAO.  FLOAT replaced by DBLE in call to
 C                      GEN_EPOLYD.  Bug pointed out by CKL/CIT.
 C+
       IMPLICIT NONE
@@ -748,7 +748,7 @@ C     Loop through columns
 C
       DO IX=1,NX
 C
-C        Fill up arrays with polynomial positions for spectra 
+C        Fill up arrays with polynomial positions for spectra
 C        and correct positions.
 C
          DO IS=1,NSPECT
@@ -788,7 +788,7 @@ C        its top half filled with the correct positions - these are fed
 C        to FIG_REBIN as 'wavelength' arrays to force the desired
 C        rebinning.  WORK2 has its first half filled with the original
 C        data and its top half is used for the rebinned data).  For
-C        more details about access to rotated data, and an explanation 
+C        more details about access to rotated data, and an explanation
 C        of the expression used for IBASE, see FIG_CDIS1D.
 C
          NOFF=(IYEN-IYST+1)

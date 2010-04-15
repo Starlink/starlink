@@ -14,12 +14,12 @@
 *     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, STATUS )
 
 *  Description:
-*     The AST FrameSet (see SUN/210) describing the coordinate systems 
+*     The AST FrameSet (see SUN/210) describing the coordinate systems
 *     of the supplied NDF is obtained. Any Frames which can be generated
-*     automatically are removed from this FrameSet (i.e. the PIXEL Frame, 
+*     automatically are removed from this FrameSet (i.e. the PIXEL Frame,
 *     and also the AXIS Frame if it is equivalent to the PIXEL Frame). If
-*     more than one Frame (i.e. the GRID frame) remains, a FITS header is 
-*     created containing desriptions (known as "encodings") of the FrameSet. 
+*     more than one Frame (i.e. the GRID frame) remains, a FITS header is
+*     created containing desriptions (known as "encodings") of the FrameSet.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)
@@ -27,9 +27,9 @@
 *     INDF = INTEGER (Given)
 *        The NDF identifier.
 *     ENCOD = CHARACTER * ( * ) (Given)
-*        The encoding to use. If this is blank, then a default encoding 
+*        The encoding to use. If this is blank, then a default encoding
 *        is chosen based on the contents of the FITS extension. The
-*        supplied string should be a recognised AST encoding such as 'DSS', 
+*        supplied string should be a recognised AST encoding such as 'DSS',
 *        'FITS-WCS', 'NATIVE', etc (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding in the header?
@@ -78,7 +78,7 @@
 *     11-APR-2000 (DSB):
 *        Updated description of ENCOD argument.
 *     12-FEB-2003 (DSB):
-*        Reduce the value of the FitsDigits attribute from 20 to 10 
+*        Reduce the value of the FitsDigits attribute from 20 to 10
 *        to avoid lots of spurious decimal places.
 *     20-MAY-2003 (DSB):
 *        Issue warning if WCS headers cannot be produced.
@@ -89,7 +89,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,10 +135,10 @@
 *  Begin as AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Create an AST FitsChan. This is an object which acts as a buffer to 
+*  Create an AST FitsChan. This is an object which acts as a buffer to
 *  hold a set of FITS header cards to be used by other AST routines.
 *  Setting FitsDigits to a negative value ensures that FitsChan never
-*  uses more than the number of digits allowed by the FITS standard when 
+*  uses more than the number of digits allowed by the FITS standard when
 *  formatting floating point values.
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, 'FITSDIGITS=-10', STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -173,15 +173,15 @@
 
 *  Add this header into the FitsChan. If an error occurs, annul the
 *  error, and continue to process any remaining headers.
-         ELSE 
+         ELSE
             CALL AST_PUTFITS( FC, HEADER, 1, STATUS )
             IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          END IF
       END DO
 
 *  Now export any WCS information from the NDF into the FitsChan. This
-*  may over-write any WCS information which already existed in the 
-*  FITSIO header on entry. Only modify the supplied FITSIO header if at 
+*  may over-write any WCS information which already existed in the
+*  FITSIO header on entry. Only modify the supplied FITSIO header if at
 *  least one Object was written to the FitsChan.
       IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, STATUS ) .GE. 1 ) THEN
 
@@ -208,9 +208,9 @@
             END IF
          END DO
 
-*  If the NDF has a WCS component but it could not be written out, issue a 
+*  If the NDF has a WCS component but it could not be written out, issue a
 *  warning.
-      ELSE 
+      ELSE
 
          CALL NDF_STATE( INDF, 'WCS', THERE, STATUS )
          IF( THERE ) THEN
@@ -218,21 +218,21 @@
                CALL MSG_SETC( 'ENC', ENCOD )
                CALL MSG_OUT( 'COF_FPWCS_MSG1', '  WARNING: Unable '//
      :                       'to export WCS information using the '//
-     :                       'specified FITS encoding ''^ENC''.', 
+     :                       'specified FITS encoding ''^ENC''.',
      :                       STATUS )
             ELSE
                CALL MSG_OUT( 'COF_FPWCS_MSG2', '  WARNING: Unable '//
      :                       'to export WCS information using any '//
-     :                       'of the supported FITS encodings.', 
+     :                       'of the supported FITS encodings.',
      :                       STATUS )
             END IF
 
          END IF
       END IF
 
-*  Jump to here if an error occurs. 
+*  Jump to here if an error occurs.
   999 CONTINUE
-      
+
 *  End the AST context.
       CALL AST_END( STATUS )
 

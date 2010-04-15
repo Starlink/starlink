@@ -1,4 +1,4 @@
-      SUBROUTINE RDSPAR(FD, NAXIS1, NAXIS2, NBAD, QUAL, SBAD, LBAD, 
+      SUBROUTINE RDSPAR(FD, NAXIS1, NAXIS2, NBAD, QUAL, SBAD, LBAD,
      :                  QBAD, STATUS)
 
 *+
@@ -9,7 +9,7 @@
 *   Description:
 *      This reads the QUAL array from disk into the supplied program array.
 *      The QUAL elements are stored as a SPARSE array.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     IUEDR Vn. 1.0
 *      Paul Rees          22-SEP-88     IUEDR Vn. 2.0
@@ -26,10 +26,10 @@
       INTEGER NAXIS1                ! size of axis1
       INTEGER NAXIS2                ! size of axis2
       INTEGER NBAD                  ! number of bad pixels
- 
+
 *   Import-Export:
       BYTE QUAL(NAXIS1, NAXIS2)     ! QUAL array
- 
+
 *   Export:
       BYTE QBAD(NBAD)               ! data quality values
 

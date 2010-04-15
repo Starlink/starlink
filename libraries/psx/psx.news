@@ -28,7 +28,7 @@ v0.4:
      Added PSX__NOMEM to psx_err
      Added TEST_PUTENV
      Add makefile targets for individual test programs
-     
+
 v0.3:
      PSX_CALLOC added BYTE, WORD, UBYTE, UWORD
      PSX_ASCTIME #include string.h
@@ -36,7 +36,7 @@ v0.3:
      SUN121 update
      TEST_ALLOC new types
      TEST_GETENV remove SYS$SCRATCH
- 
+
 v0.2:
 
      Added PSX_GMTIME.
@@ -47,7 +47,7 @@ v0.2:
      Add shared library for Linux.
      Update SUN/121 including removal of VMS references.
  v0.1-4:
-     Memory leaks in PSX_GETENV which occur when an attempt is made to 
+     Memory leaks in PSX_GETENV which occur when an attempt is made to
      translate an environment variable which does not exist have been
      fixed.
 
@@ -58,18 +58,18 @@ v0.2:
 
      In addition, the PSX_FREE routine now attempts to free memory
      even if its STATUS argument is set to an error value (previously
-     it did not, which could potentially lead to memory leaks). 
+     it did not, which could potentially lead to memory leaks).
 
  v0.1-2:
 
-     PSX has been rereleased to provide a hypertext version of the document 
-     SUN/121 (`showme sun121' or `findme psx').  An ambiguity in the 
-     description of the behaviour of the PSX_LOCALTIME routine in Year 2000 
-     has been clarified.  
+     PSX has been rereleased to provide a hypertext version of the document
+     SUN/121 (`showme sun121' or `findme psx').  An ambiguity in the
+     description of the behaviour of the PSX_LOCALTIME routine in Year 2000
+     has been clarified.
 
      There are no changes to the PSX source at this release.
 
- v0.1-1:  
+ v0.1-1:
 
      New makefile, mk script (Mk V).
 

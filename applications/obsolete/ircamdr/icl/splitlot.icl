@@ -30,7 +30,7 @@ proc splitlot
         return
       end if
     else
-      im = ffpre & dummy & ffsuf 
+      im = ffpre & dummy & ffsuf
     end if
     obeyw rapi2d shsize (im) \
     getpar glob shsize_xdim (xdim)
@@ -48,7 +48,7 @@ proc splitlot
     y2 = 1
     x2z = xdim-x1z
     y2z = int(ydim/2.0+0.5)
-    out = im & "b" 
+    out = im & "b"
     print "Splitting image " (im) " ... quadrant bottom-right= b" (out)
     print "  X,Y start = " (x2) "," (y2) " - X,Y size = " (x2z) "x" (y2z)
     obeyw rapi2d PICKIM (im) (x2) (y2) (x2z) (y2z) (out) \
@@ -57,7 +57,7 @@ proc splitlot
     y3 = y1z+1
     x3z = int(xdim/2.0+0.5)
     y3z = ydim-y1z
-    out = im & "c" 
+    out = im & "c"
     print "Splitting image " (im) " ... quadrant top-left = c" (out)
     print "  X,Y start = " (x3) "," (y3) " - X,Y size = " (x3z) "x" (y3z)
     obeyw rapi2d PICKIM (im) (x3) (y3) (x3z) (y3z) (out) \
@@ -66,7 +66,7 @@ proc splitlot
     y4 = y1z+1
     x4z = xdim-x1z
     y4z = ydim-y1z
-    out = im & "d" 
+    out = im & "d"
     print "Splitting image " (im) " ... quadrant top-right= d" (out)
     print "  X,Y start = " (x4) "," (y4) " - X,Y size = " (x4z) "x" (y4z)
     obeyw rapi2d PICKIM (im) (x4) (y4) (x4z) (y4z) (out) \

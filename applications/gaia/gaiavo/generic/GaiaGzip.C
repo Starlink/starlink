@@ -69,7 +69,7 @@ namespace gaia {
 
         /*  Allocate the initial quantity of memory suggested. */
         outbuf = (char *) malloc( outbufsz ? outbufsz : inbufsz );
-        compressor.decompress( inbuf, insize, outbuf, outsize, 
+        compressor.decompress( inbuf, insize, outbuf, outsize,
                                Compress::GZIP_COMPRESS );
         outbufsz = (size_t) outsize;
     }

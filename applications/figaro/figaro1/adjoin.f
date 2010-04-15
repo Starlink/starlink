@@ -185,7 +185,7 @@ C
       IF ( .NOT. EASY ) THEN
          IF ( XIST )
      :     XIST = .NOT. GEN_CHKNSF( %VAL(CNF_PVAL(A_PTR)), NX )
-         IF ( XIST1) 
+         IF ( XIST1)
      :     XIST1 = .NOT. GEN_CHKNSF( %VAL(CNF_PVAL(A_PTR)), NX1 )
          EASY = (.NOT. XIST) .AND. (.NOT. XIST1)
       END IF

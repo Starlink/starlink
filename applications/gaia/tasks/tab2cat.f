@@ -28,7 +28,7 @@
 *     information to automatically regenerate the data types etc. of the
 *     fields. If this isn't the case then an attempt is made to
 *     re-generate much of the information about data types (see
-*     GAI1_T2CG). 
+*     GAI1_T2CG).
 
 *  Usage:
 *     TAB2CAT IN OUT
@@ -111,7 +111,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  CAT says a bit too much at times. Quiet it down (formatting warnings
-*  mostly). 
+*  mostly).
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  Now attempt to open the output catalogue. This will fail if the
@@ -125,13 +125,13 @@
 
 *   Exit in error.
  99   CONTINUE
-      IF ( CI .NE. CAT__NOID ) THEN 
+      IF ( CI .NE. CAT__NOID ) THEN
          CALL CAT_TRLSE( CI, STATUS )
       END IF
-      IF ( INOPN ) THEN 
+      IF ( INOPN ) THEN
          CALL FIO_CLOSE( IFD, STATUS )
       END IF
-      
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'CAT2TAB',

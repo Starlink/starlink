@@ -17,7 +17,7 @@
 *        The global status.
 
 *  Description:
-*     This application replaces bad values in a NDF with a smooth 
+*     This application replaces bad values in a NDF with a smooth
 *     function which matches the surrounding data.  It can fill
 *     arbitrarily shaped regions of bad values within n-dimensional
 *     arrays.
@@ -28,7 +28,7 @@
 *     boundary conditions.
 
 *  Usage:
-*     fillbad in out [niter] [size] 
+*     fillbad in out [niter] [size]
 
 *  ADAM Parameters:
 *     BLOCK = _INTEGER (Read)
@@ -60,9 +60,9 @@
 *     SIZE( ) = _REAL (Read)
 *        The initial scale lengths in pixels to be used in the first
 *        iteration, along each axis.  If fewer values are supplied than
-*        pixel axes in the NDF, the last value given is repeated for 
-*        the remaining axes.  The size 0 means no fitting across a 
-*        dimension.  For instance, [0,0,5] would be appropriate if the 
+*        pixel axes in the NDF, the last value given is repeated for
+*        the remaining axes.  The size 0 means no fitting across a
+*        dimension.  For instance, [0,0,5] would be appropriate if the
 *        spectra along the third dimension of a cube are independent,
 *        and the replacement values are to be derived only within each
 *        spectrum.
@@ -98,8 +98,8 @@
 *       requirements, and no variance information will be used or
 *       propagated.
 *     fillbad in=speccube out=speccube_fill size=[0,0,128] iter=5
-*       Suppose NDF speccube is a spectral imaging cube with the 
-*       spectral axis third.  This example replaces the bad pixels by 
+*       Suppose NDF speccube is a spectral imaging cube with the
+*       spectral axis third.  This example replaces the bad pixels by
 *       valid values derived from the surrounding good pixel values
 *       within each spectrm, using an initial scale length of 128
 *       channels, iterating five times.  The filled NDF is called
@@ -113,9 +113,9 @@
 *     -  The algorithm is based on the relaxation method of repeatedly
 *     replacing each bad pixel with the mean of its two nearest
 *     neighbours along each pixel axis.  Such a method converges to the
-*     required solution, but information about the good regions only 
-*     propagates at a rate of about one pixel per iteration into the 
-*     bad regions, resulting in slow convergence if large areas are to 
+*     required solution, but information about the good regions only
+*     propagates at a rate of about one pixel per iteration into the
+*     bad regions, resulting in slow convergence if large areas are to
 *     be filled.
 *
 *     This application speeds convergence to an acceptable function by
@@ -170,7 +170,7 @@
 *     -  An error results if the input NDF has no bad values to replace.
 *     -  The progress of the iterations is reported at the normal
 *     reporting level.  The format of the output is slightly different
-*     if the scale lengths vary with pixel axis; an extra axis column 
+*     if the scale lengths vary with pixel axis; an extra axis column
 *     is included.
 
 *  Related Applications:
@@ -224,7 +224,7 @@
 *  History:
 *     1995 April 16 (MJC):
 *        Original version.  Some of the documentation was derived from
-*        R.F. Warren-Smith's EDRS manual. 
+*        R.F. Warren-Smith's EDRS manual.
 *     21-MAY-1998 (DSB):
 *        Check that input variances are not all bad or zero, and ignore
 *        them if they are.
@@ -242,7 +242,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -259,7 +259,7 @@
 *  Local Constants:
       INTEGER DEFSIZ             ! Default maximum dimension when
                                  ! blocking
-      PARAMETER ( DEFSIZ = 512 )   
+      PARAMETER ( DEFSIZ = 512 )
 
       BYTE BADBIT                ! The value the bad-bits mask of the output
       PARAMETER ( BADBIT = 0 )   ! NDF is set to after processing.
@@ -273,7 +273,7 @@
       LOGICAL BLOCK              ! Process in blocks?
       DOUBLE PRECISION CNGMAX    ! Maximum change of value at last iteration
       DOUBLE PRECISION CNGRMS    ! RMS change at last iteration per block
-      DOUBLE PRECISION CNGSUM    ! Some of weighted square changes at last 
+      DOUBLE PRECISION CNGSUM    ! Some of weighted square changes at last
                                  ! iteration
       CHARACTER*13 COMP          ! The array component(s) of NDF
       INTEGER DIM( NDF__MXDIM )  ! Size of the image in each dimension
@@ -289,8 +289,8 @@
       DOUBLE PRECISION MAXCNG    ! Maximum change of value at last iteration
       INTEGER MNVP               ! Index of min variance value
       INTEGER MXVP               ! Index of max variance value
-      INTEGER NBAD               ! Number of bad values replaced in a block 
-      INTEGER NBLOCK             ! Number of blocks the array is divided into 
+      INTEGER NBAD               ! Number of bad values replaced in a block
+      INTEGER NBLOCK             ! Number of blocks the array is divided into
                                  ! for processing
       INTEGER NDFBI              ! NDF identifier for input image block
       INTEGER NDFBO              ! NDF identifier for output image block
@@ -299,9 +299,9 @@
       INTEGER NITER              ! Number of iterations
       INTEGER NSIZE              ! Number of scale lengths supplied
       INTEGER NVBAD              ! Number of bad variance values
-      INTEGER PNTRI( 2 )         ! Pointer to the mapped data and variance of 
+      INTEGER PNTRI( 2 )         ! Pointer to the mapped data and variance of
                                  ! the input image
-      INTEGER PNTRO( 2 )         ! Pointer to the mapped data and variance of 
+      INTEGER PNTRO( 2 )         ! Pointer to the mapped data and variance of
                                  ! the output image
       INTEGER PNTW1              ! Pointer to work space
       INTEGER PNTW2              ! Pointer to work space
@@ -380,7 +380,7 @@
 *  Allow for variance information.
 *  ===============================
 
-*  Check the state of variance component of the NDF.      
+*  Check the state of variance component of the NDF.
       CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
 
 *  See if output NDF is to have a VARIANCE component, provided the
@@ -435,7 +435,7 @@
 
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.
-      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO,
      :               STATUS )
 
 *  Set an appropriate numeric type for the output arrays.
@@ -478,7 +478,7 @@
 *  If blocking, tell the user which block is being done.
          IF( BLOCK ) THEN
             CALL MSG_BLANKIF( MSG__NORM, STATUS )
- 
+
             DO II = 1, IDIM
                CALL MSG_SETI( 'SEC', LBND( II ) )
                CALL MSG_SETC( 'SEC', ':' )
@@ -505,7 +505,7 @@
          IF( VAR ) THEN
 
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_MXMNR( .TRUE., EL, 
+               CALL KPG1_MXMNR( .TRUE., EL,
      :                          %VAL( CNF_PVAL( PNTRI( 2 ) ) ), NVBAD,
      :                          RMXV, RMNV, MXVP, MNVP, STATUS )
 
@@ -515,14 +515,14 @@
                   DMXV = VAL__BADD
                END IF
 
-            ELSE 
-               CALL KPG1_MXMND( .TRUE., EL, 
+            ELSE
+               CALL KPG1_MXMND( .TRUE., EL,
      :                          %VAL( CNF_PVAL( PNTRI( 2 ) ) ), NVBAD,
      :                          DMXV, DMNV, MXVP, MNVP, STATUS )
             END IF
 
 *  If an error occurred above (eg if all variance values are bad), annull
-*  the error and ignore the variances. 
+*  the error and ignore the variances.
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                VAR = .FALSE.
@@ -560,7 +560,7 @@
 *  Perform the filtering.
 *  ======================
 
-*  Reset the smoothing size for this block.  The scale length is 
+*  Reset the smoothing size for this block.  The scale length is
 *  modified in the infill routines below.
          DO II = 1, IDIM
             SIZEF( II ) = SIZE( II )
@@ -570,23 +570,23 @@
 *  threshold calling the routine of the appropriate data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_BAFNR( IDIM, DIM, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
-     :                       NITER, SIZEF, CNGMAX, CNGRMS, NBAD, 
+     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
+     :                       NITER, SIZEF, CNGMAX, CNGRMS, NBAD,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                       %VAL( CNF_PVAL( PNTW1 ) ),
-     :                       %VAL( CNF_PVAL( PNTW2 ) ), 
+     :                       %VAL( CNF_PVAL( PNTW2 ) ),
      :                       %VAL( CNF_PVAL( PNTW3 ) ),
      :                       %VAL( CNF_PVAL( PNTW4 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_BAFND( IDIM, DIM, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
-     :                       NITER, SIZEF, CNGMAX, CNGRMS, NBAD, 
+     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
+     :                       NITER, SIZEF, CNGMAX, CNGRMS, NBAD,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                       %VAL( CNF_PVAL( PNTW1 ) ),
-     :                       %VAL( CNF_PVAL( PNTW2 ) ), 
+     :                       %VAL( CNF_PVAL( PNTW2 ) ),
      :                       %VAL( CNF_PVAL( PNTW3 ) ),
      :                       %VAL( CNF_PVAL( PNTW4 ) ), STATUS )
 
@@ -613,10 +613,10 @@
       RMSCNG = SQRT( CNGSUM / DBLE( TOTBAD ) )
 
 *  Output the RMS change at the last iteration.
-      CALL PAR_PUT0D( 'CNGRMS', RMSCNG, STATUS )   
+      CALL PAR_PUT0D( 'CNGRMS', RMSCNG, STATUS )
 
 *  Output the maximum change at the last iteration.
-      CALL PAR_PUT0D( 'CNGMAX', MAXCNG, STATUS )   
+      CALL PAR_PUT0D( 'CNGMAX', MAXCNG, STATUS )
 
 *  Set the bad-pixel flags to indicate that there are no longer any bad
 *  pixels.
@@ -643,5 +643,5 @@
       END IF
 
 *  End the routine.
-      
+
       END

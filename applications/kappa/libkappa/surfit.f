@@ -56,7 +56,7 @@
 *        background.  If you supply only one value, it is used for
 *        both dimensions.  The minimum value is 2.  The maximum may be
 *        constrained by the number of polynomial terms, such that in
-*        each direction there are at least as many bins as terms.  If a 
+*        each direction there are at least as many bins as terms.  If a
 *        null (!) value is supplied, the value used is such that 32 bins
 *        are created along each axis.  [!]
 *     CLIP() = _REAL (Read)
@@ -69,7 +69,7 @@
 *        values: "Mean" for the mean value, "Ksigma" for the mean with
 *        kappa-sigma clipping; "Mode" for the mode, and "Median" for
 *        the median.  "Mode" is only available when there are at least
-*        twelve pixels in a bin.  If a null (!) value is supplied, 
+*        twelve pixels in a bin.  If a null (!) value is supplied,
 *        "Median" is used if there are fewer than 6 values in a bin, and
 *        "Mode" is used otherwise.  [!]
 *     EVALUATE = LITERAL (Read)
@@ -153,7 +153,7 @@
 *     component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.
 *
 *     For further details of the CHEBYSHEV variant see SGP/38.  The
-*     CHEBYSHEV variant includes the fitting variance for each 
+*     CHEBYSHEV variant includes the fitting variance for each
 *     coefficient.
 *
 *     The BSPLINE variant structure is provisional.  It contain the
@@ -162,7 +162,7 @@
 *     restore the original values after spline evaluation recorded in
 *     component SCALE.  All of these components have type _REAL.
 *
-*     Also stored in the SURFACEFIT extension is the r.m.s. deviation 
+*     Also stored in the SURFACEFIT extension is the r.m.s. deviation
 *     of data values compared with the fit (component RMS); and the
 *     co-ordinate system component COSYS, set to "GRID".
 
@@ -186,7 +186,7 @@
 *        each bin is the mean after clipping twice at 2 then once at
 *        3 standard deviations.
 *     surfit in=irasorion out=sback evaluate=all fittype=s knots=7
-*        This calculates the surface fit to the two-dimensional NDF 
+*        This calculates the surface fit to the two-dimensional NDF
 *        called irasorion.  The fit is evaluated at every pixel and the
 *        resulting array stored in the NDF called sback.  A spline with
 *        seven knots along each axis is used to fit the surface.
@@ -195,7 +195,7 @@
 *     KAPPA: ARDMASK, FITSURFACE, MAKESURFACE, REGIONMASK.
 
 *  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, QUALITY, 
+*     -  This routine correctly processes the AXIS, DATA, QUALITY,
 *     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
 *     Any input VARIANCE is ignored.
 *     -  Processing of bad pixels and automatic quality masking are
@@ -207,7 +207,7 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 1998, 2000, 2004 Central Laboratory of the
-*     Research Councils. 
+*     Research Councils.
 *     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -249,9 +249,9 @@
 *        like application FITSURFACE.
 *     2007 July 3 (MJC):
 *        Use singular value decomposition to solve the normal
-*        equations and to provide the variances of the polynomial 
+*        equations and to provide the variances of the polynomial
 *        coefficients, stored in the SURFACEFIT extension.  Writes a
-*        SURFACEFIT structure for bi-cubic spline fitting.  
+*        SURFACEFIT structure for bi-cubic spline fitting.
 *     2007 December 20 (MJC):
 *        Add GENVAR parameter and evaluate pixel-by-pixel variance.
 *     2008 January 5 (MJC):
@@ -320,7 +320,7 @@
 
 
       INTEGER MXWORK             ! Maximum number of work arrays
-      PARAMETER ( MXWORK = 15 )  ! obtained 
+      PARAMETER ( MXWORK = 15 )  ! obtained
 
       INTEGER NDIM               ! Dimensionality of arrays
       PARAMETER ( NDIM = 2 )     ! two-dimensional only
@@ -342,9 +342,9 @@
                                  ! along each axis
       INTEGER BINMIN( NDIM )     ! Minimum number of pixels in a bin
                                  ! along each axis
-      REAL BINNED( MXBIN, MXBIN ) ! Binned data or weights used for 
+      REAL BINNED( MXBIN, MXBIN ) ! Binned data or weights used for
                                  ! logging
-      INTEGER BINPTR             ! Mnemonic pointer to workspace for a 
+      INTEGER BINPTR             ! Mnemonic pointer to workspace for a
                                  ! bin of pixels
       INTEGER BINSIZ             ! The number of pixels in a bin
       CHARACTER * ( 132 ) BUFFER ! Buffer for writing to the logfile
@@ -410,7 +410,7 @@
       INTEGER MPTR               ! Pointer to SVD V matrix
       INTEGER NBIN               ! No. of bins with defined statistics
       INTEGER NC                 ! Character column counter
-      INTEGER NCI                ! Character column counter of image 
+      INTEGER NCI                ! Character column counter of image
                                  ! names
       INTEGER NCLIP              ! Number of clips of the data
       INTEGER NCLIPF             ! Number of clips of the fitted binned
@@ -464,7 +464,7 @@
       INTEGER SIWPTR             ! Mnemonic pointer to spline workspace
       INTEGER SLWPTR             ! Mnemonic pointer to spline workspace
       INTEGER SWPTR              ! Mnemonic pointer to spline workspace
-      INTEGER TBNPTR             ! Mnemonic pointer to workspace for a 
+      INTEGER TBNPTR             ! Mnemonic pointer to workspace for a
                                  ! bin of pixels after thresholding
       REAL THRLO                 ! Lower threshold
       REAL THRHI                 ! Upper threshold
@@ -681,7 +681,7 @@
 
 *  Obtain more parameters.
 *  =======================
-*  
+*
 *  Get the estimator type.  The mode-finding algorithm needs at least
 *  six points to derive the mode.
       IF ( BINSIZ .GE. 6 ) THEN
@@ -1000,8 +1000,8 @@
 *  subroutine calls with several pointers passed, and so it is quite
 *  easier to mix them up via array indices.  X for x position, Y for y
 *  position, Z for the data, W for the weights, G for general workspace
-*  RES for the residuals, and FIT for storing the fitted data.  The 
-*  existing array names are used because they are easier for the 
+*  RES for the residuals, and FIT for storing the fitted data.  The
+*  existing array names are used because they are easier for the
 *  creation and annulling the workspace.
       XPTR = WPNTR( 1 )
       YPTR = WPNTR( 2 )
@@ -1135,7 +1135,7 @@
 *  Map the input and output arrays.
 *  ================================
 
-*  Map the input data array.  The binning routines take a _REAL array 
+*  Map the input data array.  The binning routines take a _REAL array
 *  as input but generate _REAL or _DOUBLE vectors.
       CALL KPG1_MAP( NDFI, 'Data', '_REAL', 'READ', PNTRI, EL, STATUS )
 
@@ -1158,48 +1158,48 @@
 *  implementation type.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          IF ( LOTHRS .OR. HITHRS ) THEN
-            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
      :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
-     :                       %VAL( CNF_PVAL( TBNPTR ) ), 
-     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( TBNPTR ) ),
+     :                       %VAL( CNF_PVAL( XPTR ) ),
      :                       %VAL( CNF_PVAL( YPTR ) ),
-     :                       %VAL( CNF_PVAL( ZPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          ELSE
-            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
      :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
      :                       DUMMY,
-     :                       %VAL( CNF_PVAL( XPTR ) ), 
-     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( XPTR ) ),
+     :                       %VAL( CNF_PVAL( YPTR ) ),
      :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          END IF
 
 *  Spline is single precision.
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
- 
+
          IF ( LOTHRS .OR. HITHRS ) THEN
-            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
      :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
-     :                       %VAL( CNF_PVAL( TBNPTR ) ), 
-     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( TBNPTR ) ),
+     :                       %VAL( CNF_PVAL( XPTR ) ),
      :                       %VAL( CNF_PVAL( YPTR ) ),
-     :                       %VAL( CNF_PVAL( ZPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          ELSE
-            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
      :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
      :                       DUMMY,
-     :                       %VAL( CNF_PVAL( XPTR ) ), 
-     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( XPTR ) ),
+     :                       %VAL( CNF_PVAL( YPTR ) ),
      :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          END IF
@@ -1227,7 +1227,7 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
-     :               NBIN, %VAL( CNF_PVAL( XPTR ) ), 
+     :               NBIN, %VAL( CNF_PVAL( XPTR ) ),
      :               %VAL( CNF_PVAL( YPTR ) ),
      :               %VAL( CNF_PVAL( ZPTR ) ), BINNED, STATUS )
 
@@ -1243,7 +1243,7 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
-     :               NBIN, %VAL( CNF_PVAL( XPTR ) ), 
+     :               NBIN, %VAL( CNF_PVAL( XPTR ) ),
      :               %VAL( CNF_PVAL( YPTR ) ),
      :               %VAL( CNF_PVAL( WPTR ) ), BINNED, STATUS )
 
@@ -1262,7 +1262,7 @@
          DYMIN = 0.5D0
          DYMAX = DBLE( DIMS( 2 ) ) + 0.5D0
 
-*  Map work arrays (MPCOEF x MPCOEF) in size to hold the covariance 
+*  Map work arrays (MPCOEF x MPCOEF) in size to hold the covariance
 *  matrix, and a work array used by routine KPS1_FSPF2 below.
          CALL PSX_CALLOC( MPCOEF * MPCOEF, '_DOUBLE', CPTR, STATUS )
          CALL PSX_CALLOC( MPCOEF * MPCOEF, '_DOUBLE', MPTR, STATUS )
@@ -1278,13 +1278,13 @@
 *  coefficients.
             CALL KPS1_FSPF2( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
      :                       FIRST, NBIN, MPCOEF, MAXBIN,
-     :                       %VAL( CNF_PVAL( XPTR ) ), 
-     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( XPTR ) ),
+     :                       %VAL( CNF_PVAL( YPTR ) ),
      :                       %VAL( CNF_PVAL( ZPTR ) ),
-     :                       %VAL( CNF_PVAL( WPTR ) ), 
-     :                       %VAL( CNF_PVAL( NEQPTR ) ), 
+     :                       %VAL( CNF_PVAL( WPTR ) ),
+     :                       %VAL( CNF_PVAL( NEQPTR ) ),
      :                       %VAL( CNF_PVAL( MPTR ) ),
-     :                       %VAL( CNF_PVAL( CPTR ) ), 
+     :                       %VAL( CNF_PVAL( CPTR ) ),
      :                       CHCOEF, VARIAN, NCOEF, STATUS )
 
             FIRST = .FALSE.
@@ -1294,17 +1294,17 @@
 
 *  Evaluate the surface at each bin and obtain the RMS error and the
 *  residuals of the fit.
-            CALL KPS1_FSPE2( NBIN, %VAL( CNF_PVAL( XPTR ) ), 
+            CALL KPS1_FSPE2( NBIN, %VAL( CNF_PVAL( XPTR ) ),
      :                       %VAL( CNF_PVAL( YPTR ) ),
-     :                       %VAL( CNF_PVAL( ZPTR ) ), 
-     :                       DXMIN, DXMAX, DYMIN, DYMAX, 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
+     :                       DXMIN, DXMAX, DYMIN, DYMAX,
      :                       NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF,
-     :                       %VAL( CNF_PVAL( FITPTR ) ), 
+     :                       %VAL( CNF_PVAL( FITPTR ) ),
      :                       %VAL( CNF_PVAL( RESPTR ) ), DRMS, STATUS )
 
 *  Determine the maximum absolute residual.
-            CALL KPG1_MXMND( BAD, NBIN, %VAL( CNF_PVAL( RESPTR ) ), 
-     :                       NINVAL, MAXMUM, MINMUM, MAXPOS, MINPOS, 
+            CALL KPG1_MXMND( BAD, NBIN, %VAL( CNF_PVAL( RESPTR ) ),
+     :                       NINVAL, MAXMUM, MINMUM, MAXPOS, MINPOS,
      :                       STATUS )
             RSMAX = MAX( ABS( MAXMUM ), ABS( MINMUM ) )
             RMS = SNGL( DRMS )
@@ -1332,11 +1332,11 @@
 *  Remove deviant bins from the fit by deriving the residuals to the
 *  fit.
                NELM = NBIN
-               CALL KPS1_SUCLD( NELM, %VAL( CNF_PVAL( FITPTR ) ), 
+               CALL KPS1_SUCLD( NELM, %VAL( CNF_PVAL( FITPTR ) ),
      :                          RMS, CLIPF( M+1 ),
-     :                          %VAL( CNF_PVAL( XPTR ) ), 
+     :                          %VAL( CNF_PVAL( XPTR ) ),
      :                          %VAL( CNF_PVAL( YPTR ) ),
-     :                          %VAL( CNF_PVAL( ZPTR ) ), 
+     :                          %VAL( CNF_PVAL( ZPTR ) ),
      :                          %VAL( CNF_PVAL( WPTR ) ), NBIN,
      :                          STATUS )
 
@@ -1363,22 +1363,22 @@
          IF ( ALL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Evaluate the polynomial for each pixel a line at time.
-            CALL KPS1_SUPEV( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUPEV( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
-     :                       MCHOEF, CHCOEF, NCOEF, 
+     :                       MCHOEF, CHCOEF, NCOEF,
      :                       %VAL( CNF_PVAL( LINPTR ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
          ELSE
 
 *  Evaluate the polynomial at the bin corners, and obtain the pixel
 *  values by bi-linear interpolation.
-            CALL KPS1_SUPEI( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUPEI( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
      :                       NYPAR, MCHOEF, CHCOEF, NCOEF,
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
          END IF
 
@@ -1386,7 +1386,7 @@
 *  named SURFACEFIT.  The coefficients will be stored in a structure
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
-         CALL KPS1_FSWPE( NDFO, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, 
+         CALL KPS1_FSWPE( NDFO, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
      :                    NYPAR, MCHOEF, CHCOEF, VARIAN, SNGL( RSMAX ),
      :                    RMS, 'GRID', STATUS )
 
@@ -1415,14 +1415,14 @@
 *  Fit the bi-cubic-spline surface to the binned array.
             CALL KPS1_SUSF( NXKNOT, NYKNOT, XMIN, XMAX, YMIN, YMAX,
      :                      MTKNOT, FIRST, NWS, NLWS, NIWS, MAXBIN,
-     :                      %VAL( CNF_PVAL( XPTR ) ), 
-     :                      %VAL( CNF_PVAL( YPTR ) ), 
+     :                      %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
      :                      %VAL( CNF_PVAL( ZPTR ) ),
-     :                      %VAL( CNF_PVAL( WPTR ) ), 
+     :                      %VAL( CNF_PVAL( WPTR ) ),
      :                      %VAL( CNF_PVAL( GPTR ) ), NBIN,
-     :                      XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ), 
+     :                      XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ),
      :                      %VAL( CNF_PVAL( SLWPTR ) ),
-     :                      %VAL( CNF_PVAL( SIWPTR ) ), 
+     :                      %VAL( CNF_PVAL( SIWPTR ) ),
      :                      COEFF, NCOEF, SCALE, STATUS )
 
             FIRST = .FALSE.
@@ -1445,16 +1445,16 @@
 *  Evaluate the surface at each bin and obtain the rms error of the
 *  fit. -1 prevent re-scaling because clipping below needs to work with
 *  the scaled fit (if there has been any scaling).
-            CALL KPS1_SUSEB( %VAL( CNF_PVAL( XPTR ) ), 
-     :                       %VAL( CNF_PVAL( YPTR ) ), 
+            CALL KPS1_SUSEB( %VAL( CNF_PVAL( XPTR ) ),
+     :                       %VAL( CNF_PVAL( YPTR ) ),
      :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       NELM, NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF,
      :                       COEFF, DSCALE, %VAL( CNF_PVAL( FITPTR ) ),
      :                       %VAL( CNF_PVAL( RESPTR ) ), RMS, STATUS )
 
 *  Determine the maximum absolute residual.
-            CALL KPG1_MXMNR( BAD, NELM, %VAL( CNF_PVAL( RESPTR ) ), 
-     :                       NINVAL, RMAX, RMIN, MAXPOS, MINPOS, 
+            CALL KPG1_MXMNR( BAD, NELM, %VAL( CNF_PVAL( RESPTR ) ),
+     :                       NINVAL, RMAX, RMIN, MAXPOS, MINPOS,
      :                       STATUS )
             RSMAX = DBLE( MAX( ABS( RMAX ), ABS( RMIN ) ) )
 
@@ -1486,11 +1486,11 @@
 
 *  Remove deviant bins from the fit by deriving the residuals to the
 *  fit.
-               CALL KPS1_SUCLR( NELM, %VAL( CNF_PVAL( FITPTR ) ), 
+               CALL KPS1_SUCLR( NELM, %VAL( CNF_PVAL( FITPTR ) ),
      :                          RMS, CLIPF( M+1 ),
-     :                          %VAL( CNF_PVAL( XPTR ) ), 
+     :                          %VAL( CNF_PVAL( XPTR ) ),
      :                          %VAL( CNF_PVAL( YPTR ) ),
-     :                          %VAL( CNF_PVAL( ZPTR ) ), 
+     :                          %VAL( CNF_PVAL( ZPTR ) ),
      :                          %VAL( CNF_PVAL( WPTR ) ), NBIN,
      :                          STATUS )
 
@@ -1517,22 +1517,22 @@
          IF ( ALL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Evaluate the polynomial for each pixel a line at time.
-            CALL KPS1_SUSEV( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUSEV( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF, COEFF,
      :                       SCALE, NPOINT, %VAL( CNF_PVAL( PANPTR ) ),
-     :                       %VAL( CNF_PVAL( LINPTR ) ), 
+     :                       %VAL( CNF_PVAL( LINPTR ) ),
      :                       %VAL( CNF_PVAL( SEVPTR ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
          ELSE
 
 *  Evaluate the polynomial at the bin corners, and obtain the pixel
 *  values by bi-linear interpolation.
-            CALL KPS1_SUSEI( DIMS( 1 ), DIMS( 2 ), 
+            CALL KPS1_SUSEI( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, NXKNOT, NYKNOT, XKNOT, YKNOT,
-     :                       NCOEF, COEFF, SCALE, 
+     :                       NCOEF, COEFF, SCALE,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
          END IF
@@ -1545,7 +1545,7 @@
 *  named SURFACEFIT.  The coefficients will be stored in a structure
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
-         CALL KPS1_FSWSE( NDFO, NXKNOT, NYKNOT, XKNOT, YKNOT, MCHOEF, 
+         CALL KPS1_FSWSE( NDFO, NXKNOT, NYKNOT, XKNOT, YKNOT, MCHOEF,
      :                    COEFF, SCALE, SNGL( RSMAX ), RMS, 'GRID',
      :                    STATUS )
 

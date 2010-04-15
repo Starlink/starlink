@@ -140,7 +140,7 @@ smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
     da->nheat = nheat;
     da->flatmeth = flatmeth;
   } else {
-    msgOutif(MSG__VERB," ", 
+    msgOutif(MSG__VERB," ",
 	     "Unable to allocate memory for new smfDA", status);
     return NULL;
   }

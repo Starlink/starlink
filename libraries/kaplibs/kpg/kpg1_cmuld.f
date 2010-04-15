@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     KPG1_CMULD
- 
+
 *  Purpose:
 *     Multiply each element of a vectorised double precision array by a
 *     constant.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPG1_CMULD( BAD, EL, A, CONST, B, NBAD, STATUS )
- 
+
 *  Description:
 *     The routine multiplies each element of a vectorised double
 *     precision array by a constant to produce a new double precision
 *     array. Bad value checking is performed if required.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether to check for bad values in the input array.
@@ -33,7 +33,7 @@
 *        Number of bad values in the output array B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  This routine is intended for processing double precision data
 *     only. There is a related generic routine for processing other data
@@ -41,7 +41,7 @@
 *     -  This routine will handle numerical errors (i.e. overflow) by
 *     assigning the appropriate "bad" value to affected output array
 *     elements.
- 
+
 *  Copyright:
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1996, 2004 Central Laboratory of the Research
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     17-APR-1990 (RFWS):
 *        Original version.
@@ -84,34 +84,34 @@
 *     2004 Oct 1 (TIMJ):
 *        No longer use NUM_ERROR directly
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
- 
+
 *  Global Variables:
- 
+
 *  Arguments Given:
       LOGICAL BAD
       INTEGER EL
       DOUBLE PRECISION A( EL )
       DOUBLE PRECISION CONST
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION B( EL )
       INTEGER NBAD
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
@@ -120,26 +120,26 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop counter for array elements
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Establish a numerical error handler and initialise the error flag
 *  and error count.
       CALL NUM_HANDL( NUM_TRAP )
       CALL NUM_CLEARERR()
       NBAD = 0
- 
+
 *  No bad values present:
 *  =====================
       IF ( .NOT. BAD ) THEN
- 
+
 *  Multiply the array by the constant.
          DO 1 I = 1, EL
             B( I ) = CONST * A( I )
- 
+
 *  Check for numerical errors (i.e. overflow). If present, then assign
 *  a bad value to the output array element and count the error. Reset
 *  the numerical error flag.
@@ -149,17 +149,17 @@
                CALL NUM_CLEARERR()
             END IF
  1       CONTINUE
- 
+
 *  Bad values present:
 *  ==================
       ELSE
- 
+
 *  If the input array element is bad, then so is the output element.
          DO 2 I = 1, EL
             IF ( A( I ) .EQ. VAL__BADD ) THEN
                B( I ) = VAL__BADD
                NBAD = NBAD + 1
- 
+
 *  Otherwise, multiply by the constant, again checking for numerical
 *  errors.
             ELSE
@@ -172,8 +172,8 @@
             END IF
  2       CONTINUE
       END IF
- 
+
 *  Remove the numerical error handler.
       CALL NUM_REVRT
- 
+
       END

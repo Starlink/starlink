@@ -2,7 +2,7 @@
 #  include <config.h>
 #endif
 
-/*+HDSGROUP.C-*/                                       
+/*+HDSGROUP.C-*/
 
 /* Include files */
 #include <ctype.h>               /* Character classification                */
@@ -52,7 +52,7 @@ hdsLink(const HDSLoc *locator,
 
    _call(dat1_import_loc( locator, &lcp ));
    data = &lcp->data;
-   
+
 /* Save the group specification.        */
 
    _call( hds1_check_group( &group, data->group ) )
@@ -205,7 +205,7 @@ hds1_check_group(struct DSC *group,
  *        DAT__GRPIN if the string does not conform to the syntax of a group
  *                   specification.
  */
- 
+
    char *txt = (char *) group->body;
    short len = group->length;
    int   n   = 0;

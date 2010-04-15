@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-	
+
 *  Set error reportin level
       CALL EMS_MARK
 
@@ -140,7 +140,7 @@
 *  If it is a full pathname - use it as is
       IF (INDEX (ARGV0, '/') .NE. 0) THEN
          EXENAM = ARGV0
-            	
+
 *  Otherwise find the full name of the executable
       ELSE
          CALL SUBPAR_FIFIL ( 'PATH', ARGV0, ' ', 'x',
@@ -152,7 +152,7 @@
 
       ENDIF
 
-      IF ( STATUS .EQ. SAI__OK ) THEN         
+      IF ( STATUS .EQ. SAI__OK ) THEN
 *     Find the name part of the file description
          EXELEN = CHR_LEN( EXENAM )
          STNM = STRING_IANYR( EXENAM(1:EXELEN), '/' ) + 1
@@ -206,7 +206,7 @@
                   IFC = .TRUE.
                   IFNAM = EXENAM(1:ENDNM)//'.ifc'
 
-               ELSE 
+               ELSE
 
                   CALL PSX_ACCESS( EXENAM(1:ENDNM)//'.ifl',
      :                 'R', ACCIFL, REASON, STATUS )
@@ -222,7 +222,7 @@
                      STATUS = SUBPAR__IFNF
                      CALL EMS_SETC( 'TSKNAM', TSKNAM )
                      CALL EMS_REP( 'SUP_TSKNM1',
-     :                    'Interface file for ^TSKNAM not found', 
+     :                    'Interface file for ^TSKNAM not found',
      :                    STATUS )
 
                   END IF
@@ -237,11 +237,11 @@
                ENDIF
 
             ENDIF
-            
+
          ENDIF
 
       ENDIF
-      
+
       CALL EMS_RLSE
 
       END

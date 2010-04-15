@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
 *  Check that PGPLOT is open
       IF ( .NOT. PON_DEVOP( .TRUE., STATUS ) ) GO TO 99
 
-*  Set the current values as the dynamic defaults and get the actual 
+*  Set the current values as the dynamic defaults and get the actual
 *  values.
       CALL PAR_DEF0R( 'XMIN', XMIN, STATUS )
       CALL PAR_DEF0R( 'XMAX', XMAX, STATUS )

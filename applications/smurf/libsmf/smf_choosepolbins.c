@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     ptime = smf_choosepolbins( Grp *igrp, int size, float binsize, 
-*                                float binzero, AstFrameSet *wcsout2d, 
+*     ptime = smf_choosepolbins( Grp *igrp, int size, float binsize,
+*                                float binzero, AstFrameSet *wcsout2d,
 *                                int *npbin, double **pangle, int *status )
 
 *  Arguments:
@@ -25,58 +25,58 @@
 *     binsize = float (Given)
 *        The size of each angle bin, in radians. If this is zero, then
 *        all time slices are put into a single bin, which is given an
-*        angle value of AST__BAD, and a NULL pointer is returned as the 
+*        angle value of AST__BAD, and a NULL pointer is returned as the
 *        function value.
 *     binzero = float (Given)
 *        The angle at the centre of the first bin, in radians. A value of
-*        zero corresponds to north in the celestial co-ordinate system 
+*        zero corresponds to north in the celestial co-ordinate system
 *        specified by "wcsout2d".
 *     wcsout2d = AstFrameSet * (Given)
 *        A pointer to the FrameSet describing the relationship between
 *        2D GRID and 2D SKY coordinates in the output cube.
 *     npbin = int * (Returned)
-*        Pointer to an int in which to return the number of polarisation 
+*        Pointer to an int in which to return the number of polarisation
 *        angle bins used.
 *     pangle = double ** (Returned)
-*        Pointer to a location at which to return a pointer to a newly 
-*        allocated array of doubles. Memory for this array is allocated 
-*        within this function. The array will have "*npbin" elements holding 
+*        Pointer to a location at which to return a pointer to a newly
+*        allocated array of doubles. Memory for this array is allocated
+*        within this function. The array will have "*npbin" elements holding
 *        the polarisation angle associated with each bin. This is the angle
-*        (in radians) from north in the current Frame of "wcsout2d", to the 
-*        effective analyser axis. Positive rotation is in the same sense as 
-*        rotation from the first spatial pixel axis to the second spatial 
+*        (in radians) from north in the current Frame of "wcsout2d", to the
+*        effective analyser axis. Positive rotation is in the same sense as
+*        rotation from the first spatial pixel axis to the second spatial
 *        pixel axis.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
 *  Returned Value:
-*     Pointer to an array with an element for every input NDF, or NULL. Each 
-*     element holds a pointer to another array that has an element for each 
-*     polarisation angle bin. Each of these elements holds a pointer to an 
-*     array of ints which are the zero-based indices for the time slices that 
-*     contain data for the polarisatiom angle from the input NDF. The length 
-*     of these final arrays is unspecified, but a value of VAL__MAXI will be 
+*     Pointer to an array with an element for every input NDF, or NULL. Each
+*     element holds a pointer to another array that has an element for each
+*     polarisation angle bin. Each of these elements holds a pointer to an
+*     array of ints which are the zero-based indices for the time slices that
+*     contain data for the polarisatiom angle from the input NDF. The length
+*     of these final arrays is unspecified, but a value of VAL__MAXI will be
 *     stored to mark the end of each array. A NULL pointer is returned if
 *     no input NDFs contain any valid POL_ANG values.
 
 *  Description:
-*     This function examines the POL_ANG values stored in the JCMTSTATE 
-*     extension in each input NDF (each time slice in the NDF has its own 
-*     POL_ANG value). These values are converted to position angles within 
-*     the celestial co-ordinate system given by "skyfrm". A set of bins is 
-*     then determined that cover the range of position angle values. The 
-*     angle associated with each bin is returned, together with lists of the 
+*     This function examines the POL_ANG values stored in the JCMTSTATE
+*     extension in each input NDF (each time slice in the NDF has its own
+*     POL_ANG value). These values are converted to position angles within
+*     the celestial co-ordinate system given by "skyfrm". A set of bins is
+*     then determined that cover the range of position angle values. The
+*     angle associated with each bin is returned, together with lists of the
 *     time slices from each input NDF that contribute to each angle bin.
 *
-*     The memory allocated within this function should be freed using a call 
+*     The memory allocated within this function should be freed using a call
 *     to smf_freepolbins.
 *
-*     If no POL_ANG values are available in the input NDFs, then all time 
-*     slices are assigned to a single bin that is given a "pangle" value of 
-*     AST__BAD, and a NULL pointer is returned as the function value. If one 
-*     or more POL_ANG values are available in the input NDFs, then any time 
-*     slices that do not have a valid POL_ANG value are excluded from the 
-*     returned list of time slices to be used. 
+*     If no POL_ANG values are available in the input NDFs, then all time
+*     slices are assigned to a single bin that is given a "pangle" value of
+*     AST__BAD, and a NULL pointer is returned as the function value. If one
+*     or more POL_ANG values are available in the input NDFs, then any time
+*     slices that do not have a valid POL_ANG value are excluded from the
+*     returned list of time slices to be used.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -132,7 +132,7 @@
 #include "smurf_par.h"
 
 int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
-                          AstFrameSet *wcsout2d, int *npbin, double **pangle, 
+                          AstFrameSet *wcsout2d, int *npbin, double **pangle,
                           int *status ){
 
 /* Local Variables */
@@ -178,18 +178,18 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    if( *status != SAI__OK ) return result;
 
 /* Begin an AST context. */
-   astBegin;   
+   astBegin;
 
 /* If no bin size has been provided assign all time slices to a single
    bin with angle vaue AST__BAD and return a NULL pointer. */
    if( binsize <= 0.0 || binsize == AST__BAD ) goto L999;
 
-/* Get a pointer to the current Frame in the supplied FrameSet (this will be a 
+/* Get a pointer to the current Frame in the supplied FrameSet (this will be a
    SkyFrame). */
    cfrm = astGetFrame( wcsout2d, AST__CURRENT );
 
-/* Take a copy of the current Frame in the supplied FrameSet. We will later 
-   modify its attributes so that it describes the frame in which the POL_BIN 
+/* Take a copy of the current Frame in the supplied FrameSet. We will later
+   modify its attributes so that it describes the frame in which the POL_BIN
    angles are specified. */
    polfrm = astCopy( cfrm );
 
@@ -226,10 +226,10 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 /* Increment the total number of input time slices. */
       ntime += (data->dims)[ 2 ];
 
-/* Get the co-ordinate system in which the half-wave plate angles are 
-   given. This is specified by the POL_CRD FITS Header. Get its value, 
+/* Get the co-ordinate system in which the half-wave plate angles are
+   given. This is specified by the POL_CRD FITS Header. Get its value,
    passing on if no value is available in the current NDF. */
-      if( astGetFitsS( hdr->fitshdr, "POL_CRD", &polcrd ) && 
+      if( astGetFitsS( hdr->fitshdr, "POL_CRD", &polcrd ) &&
           astChrLen( polcrd ) > 0 ) {
 
 /* Allocate an array to to store the POL_ANG values for each time slice. */
@@ -247,14 +247,14 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                *(p++) = VAL__BADD;
 
 /* Otherwise, we need to convert the stored value to the spatial co-ordinate
-   system of the output cube. Handle each support POL_CRD system (currently 
+   system of the output cube. Handle each support POL_CRD system (currently
    only AZEL). */
             } else if( !strcmp( polcrd, "AZEL" ) ) {
 
 /* Modify the attributes of "polfrm" so that it describes AZEL
    coordinates at the epoch of the current time slice. */
-               astSet( polfrm, "System=AZEL,Epoch=MJD %.*g", DBL_DIG, 
-                       state->tcs_tai + 32.184/SPD ); 
+               astSet( polfrm, "System=AZEL,Epoch=MJD %.*g", DBL_DIG,
+                       state->tcs_tai + 32.184/SPD );
 
 /* Get a Mapping (actually a FrameSet) from AZEL coords to the output sky
    coordinate system. */
@@ -266,18 +266,18 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    The effective analyser is a rotating analyser that would have the same
    effect as the combination of fixed analyser and half wave plate that
    is present in the actual polarimeter. We record the effective analyser
-   position, because otherwise we would have to record the positions of both 
+   position, because otherwise we would have to record the positions of both
    the  halfwave plate and the fixed analyser. Since the analyser is
    fixed at the elevation axis (or so we assume), and the elevation axis
    rotates on the sky through the course of the observation, the fixed
    analyser also rotates on the sky. But POLPACK requires a fixed
    reference direction. So we choose north in the output sky frame as the
    fixed reference direction and record the effective analyser position with
-   respect to north. The following assumes the POL_ANG value is measured 
+   respect to north. The following assumes the POL_ANG value is measured
    from EL through AZ, in degrees. */
                point1[ 0 ] = state->tcs_az_bc1;
                point1[ 1 ] = state->tcs_az_bc2;
-               (void) astOffset2( polfrm, point1, 
+               (void) astOffset2( polfrm, point1,
                                   AST__DPI/2 - 2.0*AST__DD2R*state->pol_ang,
                                   AST__DD2R/3600.0, point2 );
 
@@ -298,7 +298,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                point3[ 1 ] = yout[ 0 ] + AST__DD2R/3600.0;
                ang = astAngle( cfrm, point1, point2, point3 );
 
-/* If we have not yet done so, see if rotation from grid axis 1 to grid axis 
+/* If we have not yet done so, see if rotation from grid axis 1 to grid axis
    2 in the output is in the same sense as rotation from north to east. */
                if( rot == -1 ) {
 
@@ -316,7 +316,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                   point2[ 1 ] = yin[ 0 ];
                   point3[ 0 ] = xin[ 2 ];
                   point3[ 1 ] = yin[ 2 ];
-                  if( ang * astAngle( astGetFrame( wcsout2d, AST__BASE ), 
+                  if( ang * astAngle( astGetFrame( wcsout2d, AST__BASE ),
                                       point1, point2, point3 ) < 0 ) {
                      rot = 1;
                   } else {
@@ -324,8 +324,8 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                   }
                }
 
-/* If good, negate the value if necessary, ensure the value is in the range 
-   0->2.PI, store it, and increment the number of usable POL_ANG values found 
+/* If good, negate the value if necessary, ensure the value is in the range
+   0->2.PI, store it, and increment the number of usable POL_ANG values found
    so far. */
                if( ang != AST__BAD ) {
                   if( rot ) ang = -ang;
@@ -345,7 +345,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 /* Report an error for an unknown POL_CRD system. */
             } else if( *status == SAI__OK ) {
                *status = SAI__ERROR;
-               msgSetc( "POLCRD", polcrd );            
+               msgSetc( "POLCRD", polcrd );
                smf_smfFile_msg( data->file, "NDF", 1, "<unknown file>", status);
                errRep( "", "Unrecognised value '^POLCRD' for POL_CRD "
                        "header in ^NDF.", status );
@@ -363,10 +363,10 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 /* We now have arrays holding the effective analyser angle for every time
    slice of every input NDF, with respect to north in the output sky
    co-ordinate system. We now assign each time slice to an angle bin. The
-   first bin (bin zero) start at the angle given by "binzero" and extends 
+   first bin (bin zero) start at the angle given by "binzero" and extends
    east for the angular size given by "binsize". All bins are equal sized
-   and abut without overlap. If fewer that 10% of all time slices have usable 
-   POL_ANG values, issue a warning and skip to the end so that all time 
+   and abut without overlap. If fewer that 10% of all time slices have usable
+   POL_ANG values, issue a warning and skip to the end so that all time
    slices are assined to the same bin. */
    if( nang < 0.1*ntime ) {
       msgOut( "", "Warning: less than 10% of the input data has usable "
@@ -432,7 +432,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
          } else {
             angcnt[ i ] = -1;
          }
-      }           
+      }
 
 /* The "angsum" array is now the required "pangle" array so return it. */
       *pangle = angsum;
@@ -452,7 +452,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
          r = astMalloc( sizeof(*r) * (*npbin) );
          result[ ifile ] = r;
 
-/* Initialise the pointers to the arrays that hold the time slices indices 
+/* Initialise the pointers to the arrays that hold the time slices indices
    and the bin populations. */
          if( r ) {
             for( ibin = 0; ibin < *npbin; ibin++ ) {
@@ -485,11 +485,11 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 /* Store the current time slice index at the end of the list,
    incrementing the population at the same time. */
                   if( r[ ibin ] ) r[ ibin ][ pop[ ibin ]++ ] = itime;
-               }                     
+               }
             }
          }
 
-/* Add a final element to each list of time slice indices holding VAL__MAXI. 
+/* Add a final element to each list of time slice indices holding VAL__MAXI.
    This marks the end of the list. */
          if( r ) {
             for( ibin = 0; ibin < *npbin; ibin++ ) {
@@ -527,7 +527,7 @@ L999:;
    }
 
 /* End the AST context. */
-   astEnd;   
+   astEnd;
 
 /* Return the result. */
    return result;

@@ -115,7 +115,7 @@
 
 *     Append the package name
       CALL CHR_APPND(PACKAGE, STRING, IPOSN)
-      
+
 *     Append a space and a 'V'
       CALL CHR_APPND(' V', STRING, IPOSN)
 

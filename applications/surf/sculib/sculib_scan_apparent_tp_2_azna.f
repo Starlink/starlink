@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_SCAN_APPARENT_TP_2_AZNA(OUT_COORDS, N_POS, 
+      SUBROUTINE SCULIB_SCAN_APPARENT_TP_2_AZNA(OUT_COORDS, N_POS,
      :     N_BOL, ELEVATION, PAR_ANGLE,
      :     BOL_DEC, BOL_RA, STATUS)
 *+
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(OUT_COORDS, N_POS, 
+*     CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(OUT_COORDS, N_POS,
 *    :     N_BOL, ELEVATION, PAR_ANGLE,
 *    :     BOL_DEC, BOL_RA, STATUS)
 
 *  Description:
-*     This routine calculates the NA/AZ offsets from tangent plane 
+*     This routine calculates the NA/AZ offsets from tangent plane
 *     offsets for SCAN map data.
 
 *  Arguments:
@@ -63,9 +63,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,7 +110,7 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 * Check the OUT_COORDS
- 
+
       IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC ('COORDS', OUT_COORDS)
@@ -126,7 +126,7 @@
          Q = PAR_ANGLE(I)
 
 *       Check that the elevation is valid
-         IF ( E .NE. VAL__BADD .AND. Q .NE. VAL__BADD 
+         IF ( E .NE. VAL__BADD .AND. Q .NE. VAL__BADD
      :        .AND. STATUS .EQ. SAI__OK) THEN
 
             SIN_Q = SIN ( Q )
@@ -139,20 +139,20 @@
                DO BOL = 1, N_BOL
 
 *     Calculate the Az and El offsets
-                  
-                  DAZ = - BOL_RA(BOL, I) * COS_Q 
+
+                  DAZ = - BOL_RA(BOL, I) * COS_Q
      :                 + BOL_DEC(BOL, I) * SIN_Q
-                  
+
                   DEL =   BOL_RA(BOL, I) * SIN_Q
      :                 + BOL_DEC(BOL, I) * COS_Q
 
-*       Calculate the NA offsets                  
-                  
+*       Calculate the NA offsets
+
                   IF (OUT_COORDS .EQ. 'NA') THEN
 
                      DX = DAZ * COS_E - DEL * SIN_E
                      DY = DAZ * SIN_E + DEL * COS_E
-                     
+
                   ELSE
                      DX = DAZ
                      DY = DEL

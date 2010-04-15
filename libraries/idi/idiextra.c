@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,7 +112,7 @@
 
 /* Package definitions */
 
-#include    "device.dep" 
+#include    "device.dep"
 #include    "idi.h"
 #include    "idi_err.h"
 #include    "iii.h"
@@ -794,7 +794,7 @@ if ( f0 == 1 )
       ima = XCreateImage( display_id, visual, dpth, ZPixmap,
                           0, (char*)pacbm, bm[n].x_size, bm[n].y_size, 8, 0 );
       XSetPlaneMask( display_id, gcpix, mem->pm_mask );
-      XPutImage( display_id, pixmap_id, gcpix, ima, 0, 0, 
+      XPutImage( display_id, pixmap_id, gcpix, ima, 0, 0,
                  bm[n].x_coord, bm[n].y_coord, ima->width, ima->height) ;
 
 /* Release the bitmap memory */
@@ -1130,7 +1130,7 @@ if ( f0 == 1 )
       ima = XCreateImage( display_id, visual, dpth, ZPixmap,
                           0, (char*)pacbm, bm[n].x_size, bm[n].y_size, 8, 0 );
       XSetPlaneMask( display_id, gcpix, mem->pm_mask );
-      XPutImage( display_id, pixmap_id, gcpix, ima, 0, 0, 
+      XPutImage( display_id, pixmap_id, gcpix, ima, 0, 0,
                  bm[n].x_coord, bm[n].y_coord, ima->width, ima->height) ;
 
 /* Release the bitmap memory */
@@ -1255,7 +1255,7 @@ if ( f0 == 1 )
          ima = XCreateImage( display_id, visual, dpth, ZPixmap,
                             0, (char*)pacbm, bm[n].x_size, bm[n].y_size, 8, 0 );
          XSetPlaneMask( display_id, gcpix, mem->pm_mask );
-         XPutImage( display_id, pixmap_id, gcpix, ima, 0, 0, 
+         XPutImage( display_id, pixmap_id, gcpix, ima, 0, 0,
                     bm[n].x_coord, bm[n].y_coord, ima->width, ima->height) ;
 
 /* Release the bitmap memory */
@@ -1517,7 +1517,7 @@ MEM_DATA       *mem;
 BM_WINDOW      bm0;
 BM_WINDOW      bm1;
 Visual         *visual;
-int            bmsize; 
+int            bmsize;
 int            curconf;
 unsigned int   dpth;
 int            lmemid;
@@ -1565,15 +1565,15 @@ mem = conf->memory[lmemid];
 curbm = (unsigned char*)( mem->mmbm );
 pixmap_id = (Pixmap) mem->pm_id;
 
-/* Set source bitmap window (with Y inversion) */ 
+/* Set source bitmap window (with Y inversion) */
 bm0.x_coord = x0;
 bm0.y_coord = y0;
 bm0.x_size  = xs0;
 bm0.y_size  = ys0;
 
-/* Set target (display) bitmap window (with Y inversion) */    
+/* Set target (display) bitmap window (with Y inversion) */
 bm1.x_coord = x1;
-bm1.y_coord = mem->y_size - 
+bm1.y_coord = mem->y_size -
               ((device[display].dev_ysiz < (y1 + ys1)) ?
                device[display].dev_ysiz : (y1 + ys1));
 
@@ -1635,7 +1635,7 @@ else
 ima = XCreateImage( display_id, visual, dpth, ZPixmap,
                     0, (char*)pacbm, bm1.x_size, bm1.y_size, 8, 0 );
 XSetPlaneMask( display_id, gcpix, mem->pm_mask );
-XPutImage(display_id, pixmap_id, gcpix, ima, 0, 0, 
+XPutImage(display_id, pixmap_id, gcpix, ima, 0, 0,
           bm1.x_coord, bm1.y_coord, ima->width, ima->height) ;
 XFlush(display_id);
 
@@ -1729,7 +1729,7 @@ MEM_DATA       *mem;
 BM_WINDOW      bm0;
 BM_WINDOW      bm1;
 Visual         *visual;
-int            bmsize; 
+int            bmsize;
 int            curconf;
 unsigned int   dpth;
 int            i;
@@ -1778,7 +1778,7 @@ bm0.y_coord = y0;
 bm0.x_size = xs0;
 bm0.y_size = ys0;
 
-/* Set target (display) bitmap window (with Y inversion) */ 
+/* Set target (display) bitmap window (with Y inversion) */
 bm1.x_coord = x1;
 bm1.y_coord = mem->y_size -
               ((device[display].dev_ysiz < (y1 + ys1)) ?
@@ -1945,7 +1945,7 @@ void textrefr_p ( int display, int confn, int memid )
 *     textrefr_p
 *
 *  Purpose:
-*     Refresh text into pixmap 
+*     Refresh text into pixmap
 *
 *  Invocation:
 *     textrefr_p ( display, confn, memid );
@@ -2229,7 +2229,7 @@ if ( xor == 1 )
    {
 
 /* Draw the lines into the pixmap */
-   XSetLineAttributes( display_id, gcdraw, width, LineSolid, 
+   XSetLineAttributes( display_id, gcdraw, width, LineSolid,
                        CapButt, JoinMiter );
    XSetForeground( display_id, gcdraw, locol );
    XSetPlaneMask( display_id, gcdraw, mem->pm_mask );
@@ -2253,7 +2253,7 @@ else
    {
 
 /* Draw the lines into the pixmap */
-   XSetLineAttributes( display_id, gcpix, width, LineSolid, 
+   XSetLineAttributes( display_id, gcpix, width, LineSolid,
                        CapButt, JoinMiter );
    XSetForeground( display_id, gcpix, locol );
    XSetPlaneMask( display_id, gcpix, mem->pm_mask );
@@ -2487,10 +2487,10 @@ XSetFont( display_id, gcpix, font_info->fid );
 XSetForeground( display_id, gcpix, locol );
 XSetPlaneMask( display_id, gcpix, mem->pm_mask );
 XDrawString( display_id, pixmap_id, gcpix, x0, y0, txt, txtlen );
-if ( inwin ) 
+if ( inwin )
 {
    GWM_GetScroll( display_id, w_id, &gwm_x_off, &gwm_y_off );
-   XDrawString( display_id, w_id, gcpix, x0 + x_off + gwm_x_off, 
+   XDrawString( display_id, w_id, gcpix, x0 + x_off + gwm_x_off,
                 y0 + y_off + gwm_y_off, txt, txtlen );
 }
 XFreeFont( display_id, font_info );
@@ -2668,7 +2668,7 @@ void snap_pix ( int display, int colmode, int npixel, int xoff, int yoff,
 *     14-OCT-1992 (NE):
 *        Check memory visibilities
 *     16-MAR-1994 (DLT):
-*        Correct rounding 
+*        Correct rounding
 */
 
 {
@@ -3446,9 +3446,9 @@ mem->ebpackf = 0;
 mem->visibility = 1;
 mem->x_size = xdim;
 mem->y_size = ydim;
-mem->x_v_size = (device[display].dev_xsiz < mem->x_size) ? 
+mem->x_v_size = (device[display].dev_xsiz < mem->x_size) ?
                  device[display].dev_xsiz : mem->x_size;
-mem->y_v_size = (device[display].dev_ysiz < mem->y_size) ? 
+mem->y_v_size = (device[display].dev_ysiz < mem->y_size) ?
                  device[display].dev_ysiz : mem->y_size;
 mem->x_v_off = 0;
 mem->y_v_off = 0;
@@ -3456,7 +3456,7 @@ mem->depth  = mdepth;
 mem->type   = mtype;
 mem->x_woff   = 0;                        /* default I/O Transfer Window */
 mem->y_woff   = 0;
-mem->x_wdim   = mem->x_size;      
+mem->x_wdim   = mem->x_size;
 mem->y_wdim   = mem->y_size;
 mem->lut_id = 0;
 mem->itt_id = 0;
@@ -3493,7 +3493,7 @@ for (l = 0; l < mem->n_itt; l++)
       }
    mem->itt[l] = itt;
    itt = mem->itt[l];
-   itt->itt_def = 1;                   
+   itt->itt_def = 1;
    itt->itt_len = (int)rint (pow ( (double) 2. , (double) mem->depth ));
    for (m = 0; m < itt->itt_len; m++)
       {

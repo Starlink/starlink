@@ -21,7 +21,7 @@
 *  (!) STATUS  (Integer) status value
 *
 *   Jeremy Bailey   28/2/1988
-*    
+*
 *   Modified:
 *       11/12/1991
 *+
@@ -32,15 +32,15 @@
 *  Parameters
 
       INTEGER STRT,FIN,STATUS
-      DOUBLE PRECISION X(*),XN(*)               
+      DOUBLE PRECISION X(*),XN(*)
 
 *  Local variables
 
       DOUBLE PRECISION XS,XE,EPOCH,PERIOD
-      INTEGER ISTRT,IFIN,I 
+      INTEGER ISTRT,IFIN,I
       LOGICAL WHOLE
-                     
-      IF (STATUS .EQ. SAI__OK) THEN  
+
+      IF (STATUS .EQ. SAI__OK) THEN
 
 *  Get WHOLE parameter (use whole data set)
 
@@ -52,7 +52,7 @@
 *  If WHOLE is not TRUE prompt the user for the range to use
 
               CALL PAR_DEF0D('XSTART',X(STRT),STATUS)
-              CALL PAR_GET0D('XSTART',XS,STATUS)     
+              CALL PAR_GET0D('XSTART',XS,STATUS)
               CALL PAR_DEF0D('XEND',X(FIN),STATUS)
               CALL PAR_GET0D('XEND',XE,STATUS)
           ELSE
@@ -64,7 +64,7 @@
 *  X values for start and finish
 
           ISTRT = STRT
-          IFIN = FIN 
+          IFIN = FIN
           DO I=STRT,FIN-1
               IF (X(I) .LE. XS .AND. X(I+1) .GE. XS) THEN
                   ISTRT=I
@@ -74,10 +74,10 @@
               ENDIF
           ENDDO
           STRT = ISTRT
-          FIN = IFIN            
+          FIN = IFIN
 
 *  Get the EPOCH and PERIOD for phasing
- 
+
           CALL PAR_GET0D('EPOCH',EPOCH,STATUS)
           CALL PAR_GET0D('PERIOD',PERIOD,STATUS)
 

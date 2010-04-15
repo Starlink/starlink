@@ -50,7 +50,7 @@ NDF subroutine library for handling data.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -201,12 +201,12 @@ NDF subroutine library for handling data.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -245,10 +245,10 @@ NDF subroutine library for handling data.
 
 \subsection{What is this book about?}
 
-Put simply, this book is about helping you to write 
+Put simply, this book is about helping you to write
 your own data reduction software. This is achieved
 by showing you how to access and manipulate astronomical
-data files. 
+data files.
 
 \subsection{Why write my own software?}
 
@@ -261,7 +261,7 @@ task, especially for the inexperienced programmer.
 Alternatively, this book can be used by people who have an idea for a new
 data reduction algorithm.  They might even want to pass it on to a larger
 audience and want to be sure that it will work on a variety of machines
-with a wide variety of data formats. 
+with a wide variety of data formats.
 
 Before you go any further:
 
@@ -269,22 +269,22 @@ Before you go any further:
 {\fbox {\bf Make absolutely sure you {\em need}\, to write new software.}}
 \end{quote}
 
-Use the {\sf findme} command \xref{(SUN/188)}{sun188}{} to see if the job 
+Use the {\sf findme} command \xref{(SUN/188)}{sun188}{} to see if the job
 has already been done.
 Ask your site manager. Ask a Starlink programmer (you'll find their email
 addresses on the back of the Starlink Bulletin or on the Starlink home
 page). Above all, don't waste {\em your}\, valuable time on writing software
 that already exists.
- 
+
 \subsection{How this book works}
 
 This cookbook comes in two parts.
 
 The first part leads you through a series of examples of very simple
-programs which handle data files. 
+programs which handle data files.
 It tries to expose you to the absolute minimum
-of ``inside trickery'', 
-Much non-essential information is sacrificed 
+of ``inside trickery'',
+Much non-essential information is sacrificed
 to help you get basic jobs done quickly.
 
 The second part of this book delves a little deeper.  It takes an approach
@@ -326,10 +326,10 @@ After reading part two of this book, you'll be able to:
 This first section of the cookbook follows a tutorial style. Its aim is
 to get you creating very simple applications. Because of its tutorial
 style, more confident programmers might find it more useful to skip the
-explanatory text and go straight to the sample source codes.  
+explanatory text and go straight to the sample source codes.
 
 However, I recommend that even the experienced programmer should read the
-sections on {\sf interface files} and the {\sf alink} command. 
+sections on {\sf interface files} and the {\sf alink} command.
 
 \newpage
 
@@ -340,33 +340,33 @@ sections on {\sf interface files} and the {\sf alink} command.
 The programs used in this book, and those you will write yourself in the
 same style, make use of the {\it ADAM software environment}.  In a
 nutshell, this is a mechanism for bringing  lots of different
-facilities and giving the result a common look and feel. 
+facilities and giving the result a common look and feel.
 
 ADAM does a lot more than make things look pretty, but you'll be glad to
 know that there is no need to understand ADAM inside out to use this book.
 In fact, we'll hardly discuss ADAM at all. Suffice it to say that ADAM is
-there, providing the infrastructure you need to manipulate data files. 
+there, providing the infrastructure you need to manipulate data files.
 
        A program using the ADAM environment is usually referred
        to as an ADAM {\it task}. In practice, there are two types
        of ADAM task. {\it I-tasks} are used to perform jobs such
        as instrumentation control. They will not be referred to again in
-       this book. {\it A-tasks} are concerned with data reduction and 
+       this book. {\it A-tasks} are concerned with data reduction and
        analysis. It is these we will be concentrating on.
 
        A-tasks are often also called {\it applications}. This is the
        convention we will use for the rest of this book. After all
-       we are in the business of writing software which 
+       we are in the business of writing software which
        does {\em stuff}.
 
-       It is possible to group a collection of applications together in a 
+       It is possible to group a collection of applications together in a
        single package known as a {\it monolith}. Starlink packages
-       are often made in this way (e.g. Figaro). This helps to keep related 
+       are often made in this way (e.g. Figaro). This helps to keep related
        applications together. In the above example, one could package
-       both the {\sf log} and {\sf alog} applications together 
+       both the {\sf log} and {\sf alog} applications together
        into a simple package called {\sf logarithms}. Both {\sf log} and
        {\sf alog} would be used separately in the same way that each
-       application in {\sf Figaro} (or {\sf Kappa} etc) is run 
+       application in {\sf Figaro} (or {\sf Kappa} etc) is run
        separately. We will return to monoliths in part two of this book.
 
 \subsection{Interface files}
@@ -375,8 +375,8 @@ there, providing the infrastructure you need to manipulate data files.
        be given them by you or another user. Each piece of information
        required by the code is called a {\it parameter}.
 
-       Every ADAM application requires an {\it interface file} to provide 
-       information about the parameters required to 
+       Every ADAM application requires an {\it interface file} to provide
+       information about the parameters required to
        perform the job requested. This file also specifies the
        prompts the user receives when asked to input parameter values,
        and the type of value required.
@@ -395,15 +395,15 @@ A typical use of {\sf alink} might be:
    % alink prog.f -L/star/lib `img_link_adam`
 \end{verbatim}
 
-This command compiles and links the application source code. It 
+This command compiles and links the application source code. It
 also makes use of a Starlink library (in this case the IMG library).
-It's not too important that you understand how all this works just 
-now. 
+It's not too important that you understand how all this works just
+now.
 
 \subsection{Section summary}
 
-We've covered quite a bit of terminology in this section, so rather than 
-allow confusion to set in, let's review what's essential to know in 
+We've covered quite a bit of terminology in this section, so rather than
+allow confusion to set in, let's review what's essential to know in
 what we've seen so far:
 
 \begin{itemize}
@@ -419,7 +419,7 @@ called monoliths.
       {\em Note}\, -- The more experienced programmer might find the first
       couple of examples in this section worth skipping.
       In this section, you'll begin to write your own applications. We'll
-      start very slowly by looking at a traditional ``do nothing'' code. 
+      start very slowly by looking at a traditional ``do nothing'' code.
 
 \subsection{Example 1 -- A ``do nothing" code}
 
@@ -439,12 +439,12 @@ C This application does nothing. It is an inapplicable application.
 
       You'll need an interface file as well,
       despite the lack of code, as it is required by {\sf alink}.
-      Again, enter this with your text editor, but this time save it as {\sf 
+      Again, enter this with your text editor, but this time save it as {\sf
       nowt.ifl}
 
 \begin{quote}
 {\small
-\begin{verbatim} 
+\begin{verbatim}
 interface nowt
 endinterface
 \end{verbatim}
@@ -475,22 +475,22 @@ C This application does nothing. But at least you know it's friendly.
 }
 \end{quote}
 
-      {\bf Note that you can run {\sf alink} to 
+      {\bf Note that you can run {\sf alink} to
       recompile {\sf nowt.f} without changing the interface file. This is
       because the {\sf nowt} application still doesn't require any
       parameters to work.}
 
 \subsection{Example 2 -- Opening and closing files}
 
-Let's now progress to a code which opens a Starlink (.sdf) 
-data file. Enter the following 
+Let's now progress to a code which opens a Starlink (.sdf)
+data file. Enter the following
 code and save it as {\sf sesame.f}
 
 \begin{quote}
 {\small
 \begin{verbatim}
        SUBROUTINE SESAME(STATUS)
-C This application opens a file and promptly closes it again. 
+C This application opens a file and promptly closes it again.
        INTEGER NX, NY, IP, STATUS
        CALL IMG_IN('IN',NX,NY,IP,STATUS)
        CALL IMG_FREE('IN',STATUS)
@@ -508,8 +508,8 @@ interface SESAME
   parameter IN
     prompt 'Input Image'
   endparameter
-endinterface 
-\end{verbatim}       
+endinterface
+\end{verbatim}
 }
 \end{quote}
 
@@ -542,7 +542,7 @@ Firstly, we start the application with the usual
    SUBROUTINE SESAME(STATUS)
 \end{verbatim}
 
-It is a convention when writing ADAM applications to always have 
+It is a convention when writing ADAM applications to always have
 a subroutine (of the same name as the application) with
 an integer argument instead of the more familiar
 
@@ -550,8 +550,8 @@ an integer argument instead of the more familiar
    PROGRAM SESAME
 \end{verbatim}
 
-statement. Don't worry too much about why this should be the case. 
-The next line merely declares some variables. Now 
+statement. Don't worry too much about why this should be the case.
+The next line merely declares some variables. Now
 we get to:
 
 \begin{verbatim}
@@ -562,12 +562,12 @@ This line opens the file you told it to. It associates the file with a
 {\it parameter} called {\sf IN}. In order to get information about the
 parameter {\sf IN}, the application looked in the interface file. It was
 told that for this parameter it would need to prompt the user into
-providing a file name by using a message. 
+providing a file name by using a message.
 
 {\sf IMG\_IN} also found out some information about the image. Its size
 is returned via the arguments {\sf NX} and {\sf NY}.  The next variable
 ({\sf IP}) is a {\it pointer}. We will return to this concept in the next
-section.  {\sf STATUS} is used to check all is well. 
+section.  {\sf STATUS} is used to check all is well.
 
 The next call,
 
@@ -577,16 +577,16 @@ The next call,
 
 simply closes the image associated with the parameter {\sf IN} and tidies
 up. Applications which call more than one image must apply this call to
-all the images used. 
+all the images used.
 
 \subsection{About the IMG library}
 
 In the last section, we used two subroutine calls of the form {\sf CALL
 IMG\_} These subroutines are part of the {\it IMG library}. You can find
 out all about the facilities offered by IMG by reading
-\xref{SUN/160}{sun160}{}. 
+\xref{SUN/160}{sun160}{}.
 
-IMG is a collection of software designed to make the task of reading 
+IMG is a collection of software designed to make the task of reading
 astronomical data easy. It allows access to both the data itself and the
 header information contained within the files. It can be called from both
 Fortran and C codes (we will stick to the former) and forms part
@@ -596,16 +596,16 @@ any more discussion on it until later sections.
 
 When the {\sf alink} command was used in the last section,
 
-\begin{verbatim} 
+\begin{verbatim}
    % alink sesame.f -L/star/lib `img_link_adam`
 \end{verbatim}
 
 you explicitly told alink that you needed to link {\sf sesame.f} to
 the IMG library. {\bf You must make absolutely sure that every
 time you use the IMG library, you inform alink in this way!} This
-also goes for any other Starlink libraries you use (as we will do later 
+also goes for any other Starlink libraries you use (as we will do later
 on in this book).
- 
+
 \subsection{Really getting to your data (or data mapping)}
 
 Opening and closing files is fine, but what you really want to be able to
@@ -625,7 +625,7 @@ you don't need to know the ins and outs of how they work. Put simply, a
 pointer tells a piece of code where some information is kept in the memory
 of the machine. In the case of the applications we're going to be looking
 at in a minute, we'll use pointers to ``map'' how the data contained in a
-file is held in the memory of your machine. 
+file is held in the memory of your machine.
 
 \subsection{Putting it all together -- Complete applications}
 
@@ -645,7 +645,7 @@ C This program works out the mean, the minimum and the maximum
 C values in the data array of a file.
        INTEGER NX, NY, IP, STATUS, I, J
        REAL MIN, MAX, MEAN, SUM
-C       
+C
        CALL IMG_IN('IN',NX,NY,IP,STATUS)
        CALL DOSTAT(%VAL(IP),NX,NY,STATUS)
        CALL IMG_FREE('IN',STATUS)
@@ -672,7 +672,7 @@ C Now loop around all the points in the data
 C Print the results
        WRITE (*,*) 'The size of the image is ',NX,' by ',NY,' pixels'
        WRITE (*,*) ' '
-       WRITE (*,*) 'The mean of the image is ', SUM/REAL(NX*NY) 
+       WRITE (*,*) 'The mean of the image is ', SUM/REAL(NX*NY)
        WRITE (*,*) ''
        WRITE (*,*) 'The minimum and maximum are ',MIN,' and ',MAX
        END
@@ -687,7 +687,7 @@ NDF (i.e. .sdf) file of your choice.
 Let's have a careful look at how this code is constructed. The main body
 of the code consists of opening an image, calling a subroutine which does the
 actual work, followed by a call to close the image and clean up. You'll
-find this structure in a lot of Starlink software. It helps to keep the 
+find this structure in a lot of Starlink software. It helps to keep the
 code uncluttered and is easy to maintain, so we recommend that
 you try to stick to it.
 
@@ -698,21 +698,21 @@ to have some information about the size of the array right from the outset.
 There is no method of doing memory allocation ``on the fly''. (This is not
 true of Fortran~90, but let's restrict ourselves to using Fortran~77 for
 this guide). This just isn't practical for applications which have to deal
-with many different sizes of images. 
- 
+with many different sizes of images.
+
 The {\sf \%VAL} method makes the pointer (in this case {\sf IP}) look
 just like an array. What's more, it makes sure that the array is of the
 right size, in this case {\sf NX} by {\sf NY} pixels. This is not a
 feature of ``standard'' Fortran~77, but unless you hear otherwise, it
-should be OK on your machine. 
+should be OK on your machine.
 
 You'll see that when the subroutine \latex{\sf DOSTAT} inherits the
 {\sf \%VAL}, it does so with a ready-made array of real values. This way,
-there is no need to pre-define your array sizes. 
+there is no need to pre-define your array sizes.
 
 \subsection{Output from applications}
 
-When you want to write out a data file you want to do one of two things. 
+When you want to write out a data file you want to do one of two things.
 Either you want to write out the same data file you read in, presumably
 with some modification, or you want to create an entirely new file.
 The IMG library quite happily lets you do both. The next two codes
@@ -733,7 +733,7 @@ C below two thresholds to zero.
        READ (*,*) MAX
        WRITE (*,*) 'Enter the minimum data value permitted >'
        READ (*,*) MIN
-C 
+C
 C Make sure we haven't done anything really dumb
 C
        IF (MAX .LE. MIN) THEN
@@ -754,15 +754,15 @@ C the requested values.
 C
        CALL CLIPIT(%VAL(IP),NX,NY,MAX,MIN,NCLIP,STATUS)
 C
-C Let the user know how many pixels were reset. 
+C Let the user know how many pixels were reset.
 C
        WRITE (*,*) NCLIP,' values were reset.'
 C
-C Tidy up. 
+C Tidy up.
 C
        CALL IMG_FREE('IN',STATUS)
        END
-    
+
        SUBROUTINE CLIPIT(IMAGE,NX,NY,MIN,MAX,NCLIP,STATUS)
 C
        REAL IMAGE (NX,NY)
@@ -809,15 +809,15 @@ endinterface
 and compile it using {\sf alink}, remembering to link to the IMG library.
 
 You can check that your code has worked by using the {\sf stats} application
-from the last section. You should see how the reported maximum and 
-minimum data values have changed if you chose your clipping limits 
+from the last section. You should see how the reported maximum and
+minimum data values have changed if you chose your clipping limits
 appropriately.
 
 This code {\em modifies}\, your input file, i.e. no new file is created. This
 is often not the most useful form of output as, especially in data
 reduction, you might want to repeat a step with the original data many
-times. In such a case, it is more useful to preserve the input data and 
-create a new file from scratch. This next code demonstrates how this is 
+times. In such a case, it is more useful to preserve the input data and
+create a new file from scratch. This next code demonstrates how this is
 done using the {\sf IMG} library.
 
 \subsection{Example 5 -- Creating a new file}
@@ -830,7 +830,7 @@ Enter the following code for {\sf bigger.f}.
       SUBROUTINE BIGGER(STATUS)
 C
 C This program goes through two images pixel by pixel. It writes
-C the largest value of two pixels in the same parts of the two 
+C the largest value of two pixels in the same parts of the two
 C images to a third image. If the first two images are not the
 C same size then the program quits.
 C
@@ -875,7 +875,7 @@ C
 
 Notice how the code reads two distinct images in with a single statement.
 
-The interface file, {\sf bigger.ifl}, looks a little different to that 
+The interface file, {\sf bigger.ifl}, looks a little different to that
 which you have already seen:
 
 \begin{quote}
@@ -906,7 +906,7 @@ It is often very useful for an application to be able to access the header
 information within an NDF, e.g. to get the airmass, time, name of the
 source etc. The IMG library provides a number of simple routines which
 allow you to gain access to the header. The following example shows how an
-integer header item called {\sf ALT\_OBS} is read from the header. 
+integer header item called {\sf ALT\_OBS} is read from the header.
 
 \subsection{Example 6 -- Reading a header item}
 
@@ -922,7 +922,7 @@ C This simple code reads a header item.
         INTEGER NX         ! Number of X pixels
         INTEGER NY         ! Number of Y pixels
         INTEGER IP         ! Image pointer
-        INTEGER ALTOBS     ! Item to get 
+        INTEGER ALTOBS     ! Item to get
 C
         CALL IMG_IN('IN',NX,NY,IP,STATUS)
         CALL HDR_INI('IN','FITS','ALT_OBS',1,ALTOBS,STATUS)
@@ -935,7 +935,7 @@ C
 \end{quote}
 
 Interface file:
-  
+
 \begin{quote}
 {\small
 \begin{verbatim}
@@ -952,11 +952,11 @@ Note that this assumes that there really is an item called {\sf ALT\_OBS}
 in the header. To check this (and to find if you need to substitute
 something else in as a test) use the {\sf fitskeys} command in {\sf
 Figaro} to find out which items exist within the FITS header of your test
-files. 
+files.
 
 The above example read in an integer value.  {\sf HDR\_INR}, {\sf
 HDR\_INC}, {\sf HDR\_IND} and {\sf HDR\_INL} read in real, character,
-double precision and logical header items respectively. 
+double precision and logical header items respectively.
 
 Other {\sf HDR}routines include:
 
@@ -977,22 +977,22 @@ A full description of how to use these items can be found in the IMG manual
 \subsection{The Convert package}
 
 One major difficulty encountered by all astronomers at one time or another is
-the number of different formats data gets stored in. So far you have been 
-using NDF files. It would be very useful to have code which reads not 
+the number of different formats data gets stored in. So far you have been
+using NDF files. It would be very useful to have code which reads not
 only NDF files, but IRAF format files, GIFS, TIFFS, ASCII, FITS etc.
 
-Starlink has a conversion package (called Convert surprisingly) which 
+Starlink has a conversion package (called Convert surprisingly) which
 allows you to move either directly or indirectly from one format to another.
-See \xref{SUN/55}{sun55}{} for more information on the Convert 
+See \xref{SUN/55}{sun55}{} for more information on the Convert
 package.
 
 \subsection{Getting your code to read different file formats}
 
-Wouldn't it be great if you could write a piece of code like Convert 
-which could handle all these different formats? Guess what -- you already 
+Wouldn't it be great if you could write a piece of code like Convert
+which could handle all these different formats? Guess what -- you already
 have!
 
-{\bf By using the IMG library, you have unknowingly given yourself the 
+{\bf By using the IMG library, you have unknowingly given yourself the
 ability to access a whole range of other data formats.}
 
 \noindent
@@ -1019,14 +1019,14 @@ book to the following format of files:
 Try one of your codes on a file in a different format (after starting
 Convert of course). If you don't have any other format files, pick up some
 random junk from the World Wide Web. Alternatively, use Convert to change
-the format of a test NDF file into, for example, a GIF format file. 
+the format of a test NDF file into, for example, a GIF format file.
 
-If you have your own special format of data, \xref{SUN/55}{sun55}{} 
+If you have your own special format of data, \xref{SUN/55}{sun55}{}
 shows you how to add it to those which Convert can handle.
 
 \section{\xlabel{summary_of_part_one}Summary of part one}
 
-We've now finished part one of this book. You are now in a position 
+We've now finished part one of this book. You are now in a position
 to do the following with a whole range of data formats:
 
 \begin{itemize}
@@ -1039,14 +1039,14 @@ to do the following with a whole range of data formats:
 
 This might be sufficient for your needs. On the other hand, you will
 probably be aware that there is a lot more information contained within an
-NDF than ``just'' data. For example, we have not dealt with access to 
-statistical error and quality information stored within the file. 
+NDF than ``just'' data. For example, we have not dealt with access to
+statistical error and quality information stored within the file.
 
 The IMG library is part of a much larger collection of data access routines:
 the NDF library. In part two of this book, we switch to the latter method
 of data access so that we can deal with the above issues. If you already have
-enough information to complete your job, there is no strict requirement 
-to go further -- go get your stuff done. 
+enough information to complete your job, there is no strict requirement
+to go further -- go get your stuff done.
 
 \newpage
 
@@ -1057,11 +1057,11 @@ to go further -- go get your stuff done.
 In the second part of this book, we switch from the IMG library to the
 more advanced NDF data access library. We explore how the NDF library
 is able to access many more articles of information which can be
-stored within an NDF data file, such as error information and 
+stored within an NDF data file, such as error information and
 objects known as {\em extensions}.
 
 Later in this half of the book, a list of helpful resources for
-programmers is provided, along with some helpful hints for 
+programmers is provided, along with some helpful hints for
 writing applications.
 
 \newpage
@@ -1070,7 +1070,7 @@ writing applications.
 
 To illustrate the NDF library calls, let's change the code {\sf clip.f} so
 that the {\sf IMG} calls are replaced by {\sf NDF} calls. Enter the
-following code and save it as {\sf clip2.f}. 
+following code and save it as {\sf clip2.f}.
 
 \subsection{Example 7 -- Using NDF library calls to update an NDF}
 
@@ -1091,7 +1091,7 @@ C
       CALL NDF_BEGIN
 C
 C Associate the input NDF with some convenient label.
-C In this case, let's call it NDF1. We're also going to 
+C In this case, let's call it NDF1. We're also going to
 C access the file in such a way that it is UPDATEd.
 C
       CALL NDF_ASSOC('INPUT','UPDATE',NDF1,STATUS)
@@ -1109,7 +1109,7 @@ C Do the clipping.
 C
       CALL CLIPIT(NELM,%VAL(PTR1),MIN,MAX,STATUS)
 C
-C Close the NDF 
+C Close the NDF
 C
       CALL NDF_END(STATUS)
       END
@@ -1150,7 +1150,7 @@ endinterface
 }
 \end{quote}
 
-and compile it using 
+and compile it using
 
 \begin{quote}
 {\small
@@ -1161,8 +1161,8 @@ and compile it using
 \end{quote}
 
 noting the change in the library you're linking your code to. Try running
-the application and compare its performance with the one that used the IMG 
-library. You shouldn't notice any difference. 
+the application and compare its performance with the one that used the IMG
+library. You shouldn't notice any difference.
 
 {\bf Note that you can still access GIF, IRAF, ASCII etc formats just as
 you could with the IMG library. All you have to remember is to start
@@ -1171,7 +1171,7 @@ file formats than its name would suggest.}
 
 You'll probably notice that a lot of the methodology behind the
 NDF library is similar to that which we used for the IMG library in part one.
-We still label NDFs. We still map them with pointers. One change you 
+We still label NDFs. We still map them with pointers. One change you
 might have noticed is that when we mapped the NDF, we explicitly stated
 it was the {\em `Data'}\, structure we wanted to map. As we'll see
 later, we are not limited to this.
@@ -1192,10 +1192,10 @@ Code:
 \begin{verbatim}
        SUBROUTINE CREATE(STATUS)
 *
-* This code just makes an empty, square NDF 
+* This code just makes an empty, square NDF
 *
 * Parameters
-* 
+*
 * LBND = _INTEGER (Read)
 *  Lower Bounds
 *
@@ -1223,9 +1223,9 @@ Code:
        IF (STATUS .NE. SAI__OK) RETURN
 *
 * Read in the bounds of the NDF
-* 
-       CALL PAR_GET0I('LBND',LBND,STATUS)       
-       CALL PAR_GET0I('UBND',UBND,STATUS)       
+*
+       CALL PAR_GET0I('LBND',LBND,STATUS)
+       CALL PAR_GET0I('UBND',UBND,STATUS)
 *
 * Create the new NDF
 *
@@ -1274,36 +1274,36 @@ Running this code gives:
 {\small
 \begin{verbatim}
 % create
-LBND - Lower bound > 0 
+LBND - Lower bound > 0
 UBND - Upper bound > 100
 OUT - Output NDF > jon
 !! The NDF structure /home/TEST/jon has been
 !     released from the NDF_ system with its data component in an undefined
 !     state (possible programming error).
 !  NDF_END: Error ending an NDF context.
-!  Application exit status NDF__DUDEF, data component undefined    
+!  Application exit status NDF__DUDEF, data component undefined
 \end{verbatim}
 }
 \end{quote}
 
 This rather ghastly error merely means that the file is empty. Using {\sf
-hdstrace} to list the contents of the NDF gives: 
+hdstrace} to list the contents of the NDF gives:
 
 \begin{quote}
 {\small
 \begin{verbatim}
 JON  <NDF>
- 
+
    DATA_ARRAY     <ARRAY>         {structure}
       DATA(101,1)    <_REAL>         {undefined}
       ORIGIN(2)      <_INTEGER>      0,0
- 
+
 End of Trace.
 \end{verbatim}
 }
 \end{quote}
 
-Now let's see how we can begin to put information into the NDF. 
+Now let's see how we can begin to put information into the NDF.
 
 \subsection{Example 8b -- Putting a title into the NDF}
 
@@ -1314,16 +1314,16 @@ Code:
 \begin{verbatim}
        SUBROUTINE CREATE2(STATUS)
 *
-* This code just makes a square NDF with a Title Component 
+* This code just makes a square NDF with a Title Component
 *
-* Parameters   
+* Parameters
 *
 * LBND = _INTEGER (Read)
 *  Lower Bounds
 *
 * UBND =  _INTEGER (Read)
 *  Upper Bounds
-*      
+*
 * OUT = NDF (Read)
 *  Output NDF
 *
@@ -1348,9 +1348,9 @@ Code:
        IF (STATUS .NE. SAI__OK) RETURN
 *
 * Read in the bounds of the NDF
-* 
-       CALL PAR_GET0I('LBND',LBND,STATUS)       
-       CALL PAR_GET0I('UBND',UBND,STATUS)       
+*
+       CALL PAR_GET0I('LBND',LBND,STATUS)
+       CALL PAR_GET0I('UBND',UBND,STATUS)
 *
 * Create the new NDF
 *
@@ -1406,21 +1406,21 @@ endinterface
 \end{verbatim}
 }
 \end{quote}
-    
-Again, on running this code, a warning is reported. However, 
+
+Again, on running this code, a warning is reported. However,
 {\sf hdstrace} reports:
 
 \begin{quote}
 {\small
 \begin{verbatim}
 JON2  <NDF>
- 
+
    DATA_ARRAY     <ARRAY>         {structure}
       DATA(101,1)    <_REAL>         {undefined}
       ORIGIN(2)      <_INTEGER>      0,0
- 
+
    TITLE          <_CHAR*4>       'test'
- 
+
 End of Trace.
 \end{verbatim}
 }
@@ -1428,8 +1428,8 @@ End of Trace.
 
 \subsection{Example 8c -- Creating a data and variance array in an NDF}
 
-In this example, we put both a data array and variance array (we'll 
-mention these in more more detail in the next section) into the file. 
+In this example, we put both a data array and variance array (we'll
+mention these in more more detail in the next section) into the file.
 This is done purely by mapping them:
 
 \begin{quote}
@@ -1437,16 +1437,16 @@ This is done purely by mapping them:
 \begin{verbatim}
        SUBROUTINE CREATE3(STATUS)
 *
-* This code just makes a square NDF with a Title Component 
+* This code just makes a square NDF with a Title Component
 *
-* Parameters   
+* Parameters
 *
 * LBND = _INTEGER (Read)
 *  Lower Bounds
 *
 * UBND =  _INTEGER (Read)
 *  Upper Bounds
-*      
+*
 * OUT = NDF (Read)
 *  Output NDF
 *
@@ -1475,21 +1475,21 @@ This is done purely by mapping them:
 *
 * Read in the bounds of the NDF
 *
-       CALL PAR_GET0I('LBND',LBND,STATUS)       
-       CALL PAR_GET0I('UBND',UBND,STATUS)       
+       CALL PAR_GET0I('LBND',LBND,STATUS)
+       CALL PAR_GET0I('UBND',UBND,STATUS)
 *
 * Create the new NDF
 *
        CALL NDF_CREAT('OUT','_REAL',NDIM,LBND,UBND,INDF,STATUS)
 *
 * Reset the old title if there is one
-* 
+*
        CALL NDF_RESET(INDF,'Title',STATUS)
 *
 * Get the new title
 *
        CALL NDF_CINP('TITLE',INDF,'Title',STATUS)
-* 
+*
 * Work out the number of pixels
 *
        NPIX = (ABS(UBND-LBND))**2
@@ -1542,44 +1542,44 @@ endinterface
 }
 \end{quote}
 
-    
-Obviously an additional subroutine is needed to put useful values into 
+
+Obviously an additional subroutine is needed to put useful values into
 the arrays.
 
 \section{\xlabel{variances}Variances, bad pixels, and quality -- The art of error propagation}
 
 NDFs contain a lot more than just the data values. They contain so called
 {\em headers}, along with values such as Quality and Variance associated with
-each pixel. For some NDFs there is also axes information. 
- 
+each pixel. For some NDFs there is also axes information.
+
 The easiest way to take a look at what structures exist within an
-NDF is to use {\sf hdstrace}. 
+NDF is to use {\sf hdstrace}.
 A sample trace might produce an output such as:
 
 \begin{quote}
 {\small
 \begin{verbatim}
 F2  <NDF>
- 
+
    DATA_ARRAY     <ARRAY>         {structure}
       DATA(1021,200)  <_REAL>        41.46541,69.59,51.00168,48.32741,
                                      ... 169.1622,151.1605,150.1822,166.3774
       ORIGIN(2)      <_INTEGER>      1,1
       BAD_PIXEL      <_LOGICAL>      FALSE
- 
+
    TITLE          <_CHAR*8>       'FEIGE 34'
    UNITS          <_CHAR*9>       'ELECTRONS'
    VARIANCE       <ARRAY>         {structure}
       DATA(1021,200)  <_REAL>        521.5062,571.9399,534.9544,532.3478,
                                      ... 587.9011,556.7531,627.0024,590.9243
       ORIGIN(2)      <_INTEGER>      1,1
- 
+
    MORE           <EXT>           {structure}
       FITS(174)      <_CHAR*80>      'SIMPLE  =                    T','BI...'
-                                     ... '15TELE  =       
+                                     ... '15TELE  =
 ...','PACKEND','END'
       CCDPACK        <CCDPACK_EXT>   {structure}
-         DEBIAS         <_CHAR*24>      'Tue Apr 29 21:11:30 1997'End of 
+         DEBIAS         <_CHAR*24>      'Tue Apr 29 21:11:30 1997'End of
 Trace.
 \end{verbatim}
 }
@@ -1588,12 +1588,12 @@ Trace.
 We can see from this that there are arrays for both the data and the
 variances. There is also some FITS information, and the file has at some
 point been processed by CCDPACK. Let's write a new code that processes the
-variances in a similar way to how clip processed the data array. 
+variances in a similar way to how clip processed the data array.
 
 \subsection{Processing a variance array}
- 
-Let's illustrate the way in which the NDF library can handle variance 
-information by developing a simple application. In the following example, 
+
+Let's illustrate the way in which the NDF library can handle variance
+information by developing a simple application. In the following example,
 an image is searched for ``spikes'' which are potential cosmic ray events.
 
 When spikes are detected, the pixels are set to what is known as a
@@ -1606,7 +1606,7 @@ This means that the variance array {\em is no longer valid}. It is,
 therefore, not passed on to the output image. Guidelines for when
 components of an NDF should and should not be propagated are listed in
 \xref{SUN/33}{sun33}{}. We will deal with a case where the variance
-information {\em is}\, propagated later in this section. 
+information {\em is}\, propagated later in this section.
 
 \subsection{Example 9 -- A code which does not propagate the variance array}
 
@@ -1643,7 +1643,7 @@ Code:
       INTEGER NPIX      ! Number of pixels
       INTEGER INDF      ! Input NDF identifier
       INTEGER ONDF      ! Output NDF identifier
-      INTEGER IPNTR     ! Input NDF pointer 
+      INTEGER IPNTR     ! Input NDF pointer
       INTEGER OPNTR     ! Output NDF pointer
       INTEGER NDIM      ! Number of dimensions
       REAL THRESH       ! Threshold value
@@ -1661,7 +1661,7 @@ Code:
 *
       CALL PAR_GETOR('THRESH',THRESH,STATUS)
 *
-* Create a new output NDF. Model it on the old one. Propagate and 
+* Create a new output NDF. Model it on the old one. Propagate and
 * DATA information. The variances will NOT be propagated.
 *
 
@@ -1688,7 +1688,7 @@ Code:
       IMPLICIT NONE       ! No implicit typing
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'PRM_PAR'   ! Define BAD constants
-* 
+*
 * (>) - Given,  (<) - Output
 *
       REAL THRESH         ! (>) Threshold value
@@ -1737,7 +1737,7 @@ interface ZAPPER
   type _REAL
   prompt 'Threshold value'
  end parameter
- 
+
 endinterface
 \end{verbatim}
 }
@@ -1748,10 +1748,10 @@ number as well as filenames.
 
 The \latex{\sf hdstrace} application
 reveals that if the input NDF contained a variance array, it does not
-exist in the output NDF. This is because the 
+exist in the output NDF. This is because the
 {\sf NDF\_PROP} call did
 not explicitly list it. In order to get the variance array propagated
-through to the output, let's adapt the code and call it {\sf zapper2}. 
+through to the output, let's adapt the code and call it {\sf zapper2}.
 
 \subsection{Example 10 -- A code which DOES propagate the variance array}
 
@@ -1765,7 +1765,7 @@ This code propagates the variance array. Note you will need to copy the
 *
 * This routine zaps all pixels whose value goes above a certain
 * threshold defined by the user. A new NDF is propagated from the
-* old one. 
+* old one.
 *
 * Parameters
 *
@@ -1788,9 +1788,9 @@ This code propagates the variance array. Note you will need to copy the
       INTEGER NPIX      ! Number of pixels
       INTEGER INDF      ! Input NDF identifier
       INTEGER ONDF      ! Output NDF identifier
-      INTEGER IPNTR     ! Input NDF data pointer 
+      INTEGER IPNTR     ! Input NDF data pointer
       INTEGER OPNTR     ! Output NDF data pointer
-      INTEGER VIPNTR    ! Input NDF variance pointer 
+      INTEGER VIPNTR    ! Input NDF variance pointer
       INTEGER VOPNTR    ! Output NDF variance pointer
       INTEGER NDIM      ! Number of dimensions
       REAL THRESH       ! Threshold value
@@ -1800,7 +1800,7 @@ This code propagates the variance array. Note you will need to copy the
       IF (STATUS .NE. SAI__OK) RETURN
 *
 * Begin the NDF context
-* 
+*
       CALL NDF_BEGIN
 *
 * Obtain the input NDF. Find out how big it is in both dimensions
@@ -1812,7 +1812,7 @@ This code propagates the variance array. Note you will need to copy the
 *
       CALL PAR_GET0R('THRESH',THRESH,STATUS)
 *
-* Create a new output NDF. Model it on the old one. Propagate  
+* Create a new output NDF. Model it on the old one. Propagate
 * DATA and VARIANCES.
 *
       CALL NDF_PROP(INDF,'Data,Variance','OUT',ONDF,STATUS)
@@ -1840,7 +1840,7 @@ This code propagates the variance array. Note you will need to copy the
       IMPLICIT NONE       ! No implicit typing
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'PRM_PAR'   ! Define BAD constants
-* 
+*
 * (>) - Given,  (<) - Output
 *
       REAL THRESH         ! (>) Threshold value
@@ -1871,7 +1871,7 @@ Note that although the variance array was mapped, none of its values were
 changed in this simple application. The variance array was mapped and
 therefore allocated pointers (although this wasn't necessary to force the
 variance propagation). The interested reader might wish to try to adapt
-the call to {\sf ZAP} to fix the variance values using these pointers. 
+the call to {\sf ZAP} to fix the variance values using these pointers.
 
 \subsection{The Quality component}
 
@@ -1879,18 +1879,18 @@ In addition to the Data and Variance components, some NDFs also contain a
 {\em Quality}\, component.  The quality array is not usually accessed
 directly by the user. Instead, the processing of the Data and Variance
 arrays {\em automatically}\, takes into account the values in the Quality
-array unless the application explicitly accesses and maps the Quality 
+array unless the application explicitly accesses and maps the Quality
 array.
 
 Why bother with a Quality array when there is a variance array? The
 Quality value of a pixel can be used to describe its suitability for
 performing a particular task. For example, imagine a situation where
 photometry is performed on an object. The quality array could be set to
-one value for the object and another for the sky pixels. 
+one value for the object and another for the sky pixels.
 
-Manipulation of the Quality array is not commonly done in most 
-applications and so there will be no further discussion of it here. 
-\xref{SUN/33}{sun33}{} contains a full discussion of how to 
+Manipulation of the Quality array is not commonly done in most
+applications and so there will be no further discussion of it here.
+\xref{SUN/33}{sun33}{} contains a full discussion of how to
 access the Quality array.
 
 \subsection{Rules for propagation of variance arrays}
@@ -1900,11 +1900,11 @@ circumstances. For example, adding two NDFs together will result in new
 variances for the result. If these new variances are not calculated, the output
 NDF must not be allowed to contain a variance array. On the other hand, if a
 constant is added to an NDF, the variances can be passed on to the output with
-no calculations necessary. 
+no calculations necessary.
 
 The default used by the routine {\sf NDF\_PROP} is {\em not}\, to propagate
 the data, quality, or variance arrays. This explains why is was necessary
-to explicitly list what we wanted to propagate in the last example. 
+to explicitly list what we wanted to propagate in the last example.
 
 \section{\xlabel{ndf_extensions}NDF extensions}
 
@@ -1922,7 +1922,7 @@ virtually standard (e.g. a FITS header), or be specific to a particular
 instrument or software package (e.g. the IRAS extension).
 
 In this section, we deal with how to access and create extensions to
-NDF files. 
+NDF files.
 
 \subsection{Example 11 -- Reading an extension}
 
@@ -1937,7 +1937,7 @@ The following example reads in an IRAS extension:
 * If it is present, it reads and prints the OFFSET value
 *
        INTEGER STATUS               ! Global Status
-       INTEGER INDF                 ! NDF identifier 
+       INTEGER INDF                 ! NDF identifier
        INTEGER OFFSET               ! Item from the IRAS extension
        INCLUDE 'DAT_PAR'            ! Define DAT__SZLOC
        CHARACTER * (DAT__SZLOC) LOC ! Locator for the IRAS extension
@@ -1994,14 +1994,14 @@ endinterface
 
 Note that the call to {\sf CMP\_GET0I} should be replaced by {\sf
 CMP\_GET0R} for real numbers, {\sf CMP\_GET0D} for double precision numbers,
-{\sf CMP\_GET0L} for logical values, {\sf CMP\_GET0C} for character values. 
+{\sf CMP\_GET0L} for logical values, {\sf CMP\_GET0C} for character values.
 
 \subsection{Example 12 -- Creating a new extension}
 
 In the following example, a code is used to place the temperature of the CCD
-chip used during the observations into a new extension. In practice, many 
+chip used during the observations into a new extension. In practice, many
 more items could also be put there such as pixel scale, size, gain etc.
-These items can then be read and used by later applications as part of 
+These items can then be read and used by later applications as part of
 the data reduction process.
 
 \begin{quote}
@@ -2054,7 +2054,7 @@ the data reduction process.
 *
          CALL DAT_ANNUL(LOC,STATUS)
        ELSE
-         WRITE (*,*) 'CCD extension already present' 
+         WRITE (*,*) 'CCD extension already present'
        ENDIF
 *
 * Tidy up
@@ -2090,15 +2090,15 @@ endinterface
 
 \subsection{Monoliths}
 
-Sometimes it can be useful to group several applications together into 
-one package. The result is called a {\em monolith}. A monolith consists 
+Sometimes it can be useful to group several applications together into
+one package. The result is called a {\em monolith}. A monolith consists
 of a ``top level'' code which then calls the various applications as needed.
-The monolith also has its own interface file (whose structure is slightly 
-different from those of applications). The following monolith brings 
+The monolith also has its own interface file (whose structure is slightly
+different from those of applications). The following monolith brings
 together examples 8a, 8b, and 8c into a single package called {\sf newndf}.
 
 \subsection{Example 13 -- A monolith}
- 
+
 Code:
 
 \begin{quote}
@@ -2113,7 +2113,7 @@ Code:
        INCLUDE 'PAR_PAR'
        INTEGER STATUS
        CHARACTER * (PAR__SZNAM) ACTION
-*     
+*
        IF (STATUS .NE. SAI__OK) RETURN
 *
 * Get the action name
@@ -2136,7 +2136,7 @@ Code:
 }
 \end{quote}
 
-Note how the names of the three separate tasks are in CAPITAL LETTERS. 
+Note how the names of the three separate tasks are in CAPITAL LETTERS.
 Lower case will not work, even though the filenames of your applications
 usually are lower case. The corresponding interface file is:
 
@@ -2206,7 +2206,7 @@ interface CREATE3
   endparameter
 endinterface
 
-endmonolith    
+endmonolith
 \end{verbatim}
 }
 \end{quote}
@@ -2214,12 +2214,12 @@ endmonolith
 To compile the code, {\sf alink} is used thus:
 
 \begin{verbatim}
-   alink newndf.f create.f create2.f create3.f -L/star/lib `ndf_link_adam`  
+   alink newndf.f create.f create2.f create3.f -L/star/lib `ndf_link_adam`
 \end{verbatim}
 
-but one further stage is still required to get the monolith to work. Soft 
-links must be made from the monolithic executable to the names of the 
-tasks it contains. In other words, to get the above example to work you 
+but one further stage is still required to get the monolith to work. Soft
+links must be made from the monolithic executable to the names of the
+tasks it contains. In other words, to get the above example to work you
 must type:
 
 \begin{verbatim}
@@ -2228,21 +2228,21 @@ must type:
    ln -s newndf create3
 \end{verbatim}
 
-Most Starlink packages also use a script to set up aliases to these 
-soft links. For example, when Figaro is started, the user is really 
+Most Starlink packages also use a script to set up aliases to these
+soft links. For example, when Figaro is started, the user is really
 running a script called:
 
 \begin{verbatim}
    /star/bin/figaro/figaro.csh
 \end{verbatim}
- 
+
 \section{\xlabel{compiling_code_without_adam}Compiling code without ADAM}
 
 Throughout this book, the codes have been compiled using the ADAM software
 environment. While useful, it does not necessarily {\em have}\, to be the
 case. So called Standalone applications are independent of ADAM and have
 no interface files. They are compiled with the standard {\sf f77} command
-and flags rather than the {\sf alink} command. For example: 
+and flags rather than the {\sf alink} command. For example:
 
 \begin{verbatim}
    % alink myprog.f -L/star/lib `ndf_link_adam`
@@ -2254,7 +2254,7 @@ would be replaced by:
    % f77 myprog.f -L/star/lib `ndf_link` -o myprog
 \end{verbatim}
 
-Note, however, that there are some NDF routines which rely on the parameter 
+Note, however, that there are some NDF routines which rely on the parameter
 system. For more details, see Appendix 3 of \xref{SUN/33}{sun33}{}.
 
 \section{\xlabel{miscellaneous}Miscellaneous}
@@ -2266,9 +2266,9 @@ coordinate numbers of each pixel in the image, e.g. the wavelength scale
 of a spectrum. The issue of manipulating axes is complex and somewhat
 beyond the scope of this cookbook. There are already applications in
 existence which modify axis scales for tasks such as wavelength and flux
-calibration (such as those in Figaro). 
+calibration (such as those in Figaro).
 
-It is suggested that the reader who really {\em needs}\, to manipulate axes 
+It is suggested that the reader who really {\em needs}\, to manipulate axes
 consults the NDF programming manual directly \xref{(SUN/33)}{sun33}{}.
 
 \subsection{Starlink libraries}
@@ -2279,13 +2279,13 @@ individual flat fielding routine for every astronomer? One of the best
 ways to reduce the amount of duplication of effort is by using software
 {\em libraries}. These contain large amounts of code already written for
 you. For example, if you need to write a code which works out the Julian
-Date of an object, you can use the SLALIB Library. 
+Date of an object, you can use the SLALIB Library.
 
 You can think of these libraries as a bunch of subroutines scrunched up
 together in one big file. All you have to do to use them is to write a
 ``top layer'' of Fortran (or sometimes C) code to call them. In fact, this
 is what you've been doing throughout this book. The IMG and NDF libraries
-are called by the top layer of code which you write. 
+are called by the top layer of code which you write.
 
 {\bf Just like you had to link your application to the NDF and IMG
 libraries, you also have to link to any other libraries you call. Check
@@ -2294,13 +2294,13 @@ use alink appropriately.}
 
 There are a number of libraries available for you to use when writing your
 applications or packages. Starlink provides access to a number of them not
-covered in this book and they are listed in Appendix A of this book. 
+covered in this book and they are listed in Appendix A of this book.
 
 Note that Starlink no longer uses NAG libraries. The reason for this is
 that NAG is a commercial package and as such, cannot be freely
 distributed. The PDA library {\em can}\, be distributed freely. If you
 intend to pass your software on to other users, you might need to take the
-same approach. 
+same approach.
 
 \subsection{Hints for writing good applications}
 
@@ -2309,7 +2309,7 @@ There are two groups of people you need to think about in writing a
 who are going to use it. A code containing the slickest algorithms ever
 seen is no use to anyone if they can't understand the instructions! This
 can be avoided by paying attention to both your run time prompts and
-user documentation. 
+user documentation.
 
 The second, less obvious, group of people you need to cater for are those
 who support the code. If that person is you the author, then it is all too
@@ -2317,7 +2317,7 @@ tempting not to comment your code adequately. On the other hand the code
 might need to be passed on to a colleague. There is nothing worse for the
 useful lifetime of a package than giving the support team thousands of
 lines of uncommented, poorly structured code. Write your code to be as
-friendly to the programmer as it is to the user. 
+friendly to the programmer as it is to the user.
 
 \subsection{Documenting your code}
 
@@ -2331,28 +2331,28 @@ rule as to how to do this. It's partly a matter of taste but more a case
 of knowing your audience.
 Some advice is given in \xref{SGP/28}{sgp28}{}.
 
-Secondly, comment the source code. 
-Firstly and most importantly, the programmer must be shown how the code 
+Secondly, comment the source code.
+Firstly and most importantly, the programmer must be shown how the code
 works, i.e. ``what goes where'', ``this line does'' and ``this piece of
 code is commented out because it was both too slow and unaesthetic''.
 Don't be verbose (like some of the examples in this book have been),
 but make sure it's clear.
 
 Thirdly, there is online help. There are a number of Starlink facilities
-to help implement this. The {\sf HLP} package 
+to help implement this. The {\sf HLP} package
 helps develop your online support facilities.
 
 \subsection{Portability}
 
 At the time of writing, Fortran 90 is not yet easily portable from one
 platform to the next. It is recommended that the established  Fortran~77
-is used for writing applications for the time being. 
+is used for writing applications for the time being.
 
 \subsection{Submitting code to Starlink}
 
 Starlink welcomes software contributions from the astronomical community.
-If you feel you may have software to contribute to the Starlink Project, 
-please contact the Starlink Librarian ({\sf ussc@star.rl.ac.uk}) who 
+If you feel you may have software to contribute to the Starlink Project,
+please contact the Starlink Librarian ({\sf ussc@star.rl.ac.uk}) who
 will be glad to hear from you.
 
 \newpage
@@ -2365,7 +2365,7 @@ will be glad to hear from you.
 
 Convert -- {\em (Automatic) format conversion} - \xref{(SUN/55)}{sun55}{}
 
-Findme -- {\em Documentation search via a Web browser} - 
+Findme -- {\em Documentation search via a Web browser} -
 \xref{(SUN/188)}{sun188}{}
 
 FIO -- {\em Fortran file handling} - \xref{(SUN/143)}{sun143}{}
@@ -2379,10 +2379,10 @@ MEMSYS -- {\em Maximum entropy image reconstruction} -
 
 NDF -- {\em More advanced data access library} - \xref{(SUN/33)}{sun33}{}
 
-PDA -- {\em Public domain mathematical algorithms (as used by Starlink 
+PDA -- {\em Public domain mathematical algorithms (as used by Starlink
 Software)} - \xref{(SUN/194)}{sun194}{}
 
-Showme -- {\em Web-based document retriever} - \xref{(SUN/188)}{sun188}{} 
+Showme -- {\em Web-based document retriever} - \xref{(SUN/188)}{sun188}{}
 
 SLALIB -- {\em Positional and time information} - \xref{(SUN/67)}{sun67}{}
 
@@ -2400,7 +2400,7 @@ ADAM -- {\em Graphics programmer's guide} - \xref{(SUN/113)}{sun113}{}
 
 ADAM -- {\em Interface module, reference module} - \xref{(SUN/115)}{sun115}{}
 
-ADAM -- {\em Guide to writing instrumentation tasks} - 
+ADAM -- {\em Guide to writing instrumentation tasks} -
 \xref{(SUN/134)}{sun134}{}
 
 NDF -- {\em Adding format conversion facilities to NDF data} -
@@ -2414,7 +2414,7 @@ FIO/RIO -- {\em Fortran file I/O routines} - \xref{(SUN/143)}{sun143}{}
 
 FTNCHEK -- {\em A Fortran77 source-code checker} - \xref{(SUN/172)}{sun172}{}
 
-FORCHECK -- {\em Fortran verifier and programming aid} - 
+FORCHECK -- {\em Fortran verifier and programming aid} -
 \xref{(SUN/73)}{sun73}{}
 
 HDSTRACE -- {\em HDS data file listing}  - \xref{(SUN/102)}{sun102}{}
@@ -2436,7 +2436,7 @@ MERS (MSG and ERR) -- {\em Message and error reporting systems} -
 {\sf Application} -- A piece of software which operates on data to
 produce some desired result.
 
-{\sf C} -- A programming language used in some applications and libraries. 
+{\sf C} -- A programming language used in some applications and libraries.
 
 {\sf Extensions (or HDS extensions)} -- Components of an HDS (e.g. an
 NDF) file used to store additional information about data.
@@ -2449,7 +2449,7 @@ NDF) file used to store additional information about data.
 
 {\sf Header} --
 Information at the start of a file which describes the origins, components,
-and sometimes the history of the file. 
+and sometimes the history of the file.
 
 {\sf HDS} --
 The Hierarchical Data Structure file format. This allows many pieces of
@@ -2465,15 +2465,15 @@ information about the various parameters needed to use a code.
 {\sf Monolith} --
 A code which groups many applications together into a single package.
 
-{\sf NDF} -- N-dimensional data format. This is a way of storing many 
-different types of information in the same file. All Starlink Data Format 
+{\sf NDF} -- N-dimensional data format. This is a way of storing many
+different types of information in the same file. All Starlink Data Format
 files (.sdf files) are NDFs.
 
 {\sf NDF library} --
 A collection of routines used to access and manipulate all the various
 components of an NDF file.
 
-{\sf Package} -- A larger piece of software consisting of many small 
+{\sf Package} -- A larger piece of software consisting of many small
 applications.
 
 {\sf Parameters} -- Items of information which the code needs to run. These
@@ -2483,13 +2483,13 @@ are usually provided by the user.
 to the codes that manipulate them.
 
 {\sf Quality array} -- An array of values associated with all the pixels in
-a file which report on the status of the pixel e.g. good/bad. 
+a file which report on the status of the pixel e.g. good/bad.
 
 {\sf Starlink} -- The RAL-based organisation responsible for
 coordinating the UK astronomical computing effort.
 
 {\sf Variance array} -- An array of values associated with all the pixels in
-a file which correspond to the squared standard deviation of the data 
+a file which correspond to the squared standard deviation of the data
 value of those pixels.
 
 \end{document}

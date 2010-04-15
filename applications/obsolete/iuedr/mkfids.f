@@ -1,5 +1,5 @@
       SUBROUTINE MKFIDS(NPRINT, NEW, NAXIS1, NAXIS2, DATA, QUAL, STATUS)
- 
+
 *+
 *
 *   Name:
@@ -27,17 +27,17 @@
 
 *   Import:
       INTEGER NPRINT                     ! print level
- 
+
       LOGICAL NEW                        ! whether dataquality is new
- 
+
       INTEGER NAXIS1                     ! size of axis 1 (sample)
       INTEGER NAXIS2                     ! size of axis 2 (line)
- 
+
 *   Import-Export:
       INTEGER*2 DATA(NAXIS1, NAXIS2)     ! image
- 
+
       BYTE QUAL(NAXIS1, NAXIS2)          ! quality
- 
+
 *   Export:
       INTEGER STATUS                     ! status return
 
@@ -50,8 +50,8 @@
 *   Local variables:
       INTEGER DQ                         ! workable data quality value
       INTEGER IL                         ! loop index
-      INTEGER ILF                        ! 
-      INTEGER ILL                        ! 
+      INTEGER ILF                        !
+      INTEGER ILL                        !
       INTEGER IS                         ! loop index
       INTEGER ISF                        !
       INTEGER ISL                        !
@@ -68,7 +68,7 @@
          CALL PRTBUF( STATUS )
 
       END IF
- 
+
 *   Reset if not new
       IF (.NOT.NEW) THEN
 
@@ -96,7 +96,7 @@
  50      CONTINUE
 
       END IF
- 
+
 *   Reset data quality in whole image
       IF (NOFIDS) THEN
 
@@ -149,7 +149,7 @@
  100     CONTINUE
 
  200  CONTINUE
- 
+
 *   Print statistics
       IF (NPRINT.GT.0) THEN
 

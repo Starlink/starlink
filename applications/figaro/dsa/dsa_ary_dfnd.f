@@ -21,11 +21,11 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) NAME       (Fixed string,descr) The DTA_ system name of the
-C                    array in question.  
+C                    array in question.
 C     (<) DFINED     (Logical,ref) True if array contents are defined,
 C                    false otherwise.
 C     (!) STATUS     (Integer,ref) Returned status value.  If a non-zero
-C                    status value is passed, this routine returns 
+C                    status value is passed, this routine returns
 C                    immediately.
 C
 C  Prior requirements:
@@ -100,7 +100,7 @@ C
          IF (KNOWN) THEN
             CALL DTA_DFNED(ARRAY_NAME(:LENAME),DFINED,DTA_STATUS)
             IF (DTA_STATUS.NE.0) GO TO 500
-         ELSE 
+         ELSE
             STATUS=DSA__NOARRY
          END IF
       END IF

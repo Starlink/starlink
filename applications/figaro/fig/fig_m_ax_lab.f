@@ -11,7 +11,7 @@ C
 C     (>) WORD1   (Character) The 1st (ie leftmost) word
 C     (>) WORD2   (Character) The 2nd (right) word
 C     (<) LABEL   (Character) The combined string
-C     
+C
 C                                     DJA / AAO. 22nd July 1987
 C+
       IMPLICIT NONE

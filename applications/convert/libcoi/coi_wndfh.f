@@ -101,7 +101,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -227,7 +227,7 @@
             KEYWRD = 'LBOUND'//C( 1:NCHAR )
 
 *  Write the actual card.
-            CALL IMAKWI( IMDESC, KEYWRD, LBND( I ), 
+            CALL IMAKWI( IMDESC, KEYWRD, LBND( I ),
      :                   'Pixel origin along axis '//C, ISTAT )
          END DO
 
@@ -240,7 +240,7 @@
             GOTO 999
          END IF
       END IF
-         
+
 *  Process the title.
 *  ==================
 *
@@ -270,7 +270,7 @@
 
 *  Process the label.
 *  ==================
-*   
+*
 *  Determine whether or not there is a label present in the NDF.
       CALL NDF_STATE( NDF, 'LABEL', THERE, STATUS )
 
@@ -298,7 +298,7 @@
 
 *  Process the units.
 *  ==================
-*   
+*
 *  Determine whether or not there is a label present in the NDF.
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )
 

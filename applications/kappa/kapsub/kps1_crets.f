@@ -52,7 +52,7 @@
 
 *  Implementation Deficiencies:
 *     Poissonian noise is artificial. No checks are made that the ramps
-*     or random limits will not generate bad pixels. 
+*     or random limits will not generate bad pixels.
 
 *  Copyright:
 *     Copyright (C) 1985-1986, 1988-1989, 1992 Science & Engineering
@@ -76,7 +76,7 @@
 *     02111-1307, USA
 
 *  Authors:
-*     MJM: Mark McCaughrean 
+*     MJM: Mark McCaughrean
 *     MJC: Malcolm Currie (Starlink, RAL)
 *     AALLAN: Alasdair Allan (Starlink, University of Exeter)
 *     DSB: David S. Berry (STARLINK)
@@ -87,25 +87,25 @@
 *        First implemenation as aid in debugging A-tasks
 *     25-OCT-1985 (MJM):
 *        Modified to take blank frame option (REVA::MJM)
-*     10-DEC-1985 (MJM): 
+*     10-DEC-1985 (MJM):
 *        Modified to use POISSON subroutine (UKTH::MARK)
-*     13-AUG-1986 (MJC): 
-*        Renamed from CREFRAMESUB, completed the prologue, POISSON call 
+*     13-AUG-1986 (MJC):
+*        Renamed from CREFRAMESUB, completed the prologue, POISSON call
 *        revised and nearly conformed to Starlink programming standards
-*     04-SEP-1986 (MJC): 
-*        Renamed parameters section in prologue to arguments, completed 
-*        prologue and tidied 
-*     23-MAY-1988 (MJC): 
-*        Added normal noise option 
-*     27-JUL-1988 (MJC): 
+*     04-SEP-1986 (MJC):
+*        Renamed parameters section in prologue to arguments, completed
+*        prologue and tidied
+*     23-MAY-1988 (MJC):
+*        Added normal noise option
+*     27-JUL-1988 (MJC):
 *        Reordered do loops for RA mode L-R and R-L
-*     07-AUG-1989 (MJC): 
+*     07-AUG-1989 (MJC):
 *        Passed array dimensions as separate variables
-*     17-MAR-1992 (MJC): 
+*     17-MAR-1992 (MJC):
 *        Used portable random-number generation (RAL::CUR).
 *     26-AUG-2001 (AALLAN):
 *        Renamed subroutine to confirm to KAPPA standard
-*     01-SEP-2001 (AALLAN): 
+*     01-SEP-2001 (AALLAN):
 *        Changed BADCOL to an integer, added BADROW and handling of varainces
 *     02-SEP-2001 (AALLAN):
 *        Changed prologue to conform to Starlink standards
@@ -117,7 +117,7 @@
 *-
 
 *  Type definitions:
-      IMPLICIT  NONE           
+      IMPLICIT  NONE
 
 *  Global constants :
       INCLUDE 'SAE_PAR'        ! SSE global definitionsffssdaw
@@ -156,7 +156,7 @@
       REAL VAR                 ! Constant variance
 
 *.
- 
+
 *  Check the global inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
@@ -169,7 +169,7 @@
 
 *  Check for TYPED and fill array accordingly...
 *  Random between 0 and 1
-      IF( TYPED .EQ. 'RR' ) THEN            
+      IF( TYPED .EQ. 'RR' ) THEN
 
          VAR = 1.0/12.0
 
@@ -185,7 +185,7 @@
          END DO
 
 *  Random between limits
-      ELSE IF( TYPED .EQ. 'RL' ) THEN       
+      ELSE IF( TYPED .EQ. 'RL' ) THEN
 
          VAR =  ( HIGH - LOW )**2/12.0
 
@@ -202,7 +202,7 @@
          END DO
 
 *  Poissionian noise on mean - artificial at present - to be revised
-      ELSE IF ( TYPED .EQ. 'RP' ) THEN 
+      ELSE IF ( TYPED .EQ. 'RP' ) THEN
 
          DO  J  =  1, DIM2
             DO  I  =  1, DIM1
@@ -217,7 +217,7 @@
          END DO
 
 *  Ramp between limits
-      ELSE IF ( TYPED .EQ. 'RA' ) THEN     
+      ELSE IF ( TYPED .EQ. 'RA' ) THEN
 
 *  Ramp L - R
          IF ( DIRN .EQ. 1 ) THEN
@@ -274,7 +274,7 @@
          END IF
 
 *  Flat over whole array
-      ELSE IF ( TYPED .EQ. 'FL' ) THEN     
+      ELSE IF ( TYPED .EQ. 'FL' ) THEN
 
          DO  J  =  1, DIM2
             DO  I  =  1, DIM1

@@ -74,7 +74,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 
 *  Local Constants:
 
@@ -89,17 +89,17 @@
       CHARACTER*(HEDLEN) ARRAY(*)
       INTEGER NHEAD
       LOGICAL PMASK(*)
-      
+
 *  Arguments Given and Returned:
       INTEGER ICARD
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
       INTEGER FSTAT             ! FITS status
-      INTEGER I                 ! Loop counter      
-      
+      INTEGER I                 ! Loop counter
+
 *.
 
 *  Check inherited global status.

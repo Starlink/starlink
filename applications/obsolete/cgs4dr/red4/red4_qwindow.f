@@ -87,7 +87,7 @@
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
 *   Scan though the completely bad rows below the window at the
-*   bottom of the mask and set all the columns in these rows to "bad". 
+*   bottom of the mask and set all the columns in these rows to "bad".
       DO J = 1, JMIN-1
          DO I = 1, DIM1
 
@@ -118,7 +118,7 @@
       END DO
 
 *   Scan though the completely bad rows above the window at the
-*   top of the mask and set all the columns in these rows to "bad". 
+*   top of the mask and set all the columns in these rows to "bad".
       DO J = JMAX+1, DIM2
          DO I = 1, DIM1
 

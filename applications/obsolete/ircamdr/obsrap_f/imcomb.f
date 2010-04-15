@@ -14,7 +14,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -28,8 +28,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -51,8 +51,8 @@
      :  ODIMS( NDIMS ),        ! dimensions of output DATA_ARRAYs
      :  ACTDIM,                ! actual dimensions from NDF_DIM
      :  NELEMENTS,             ! number of elements mapped by NDF_MAP
-     :  PNTRI1,                !    "     " input      " 
-     :  PNTRI2,                !    "     " input      " 
+     :  PNTRI1,                !    "     " input      "
+     :  PNTRI2,                !    "     " input      "
      :  PNTRO,                 ! pointer to output DATA_ARRAY
      :	J,
      :	NUMAREA,
@@ -61,7 +61,7 @@
      :	XSZ( 100),
      :	YSZ( 100)
 
-    
+
 
 *-
 *      check for error on entry - return if not o.k.
@@ -92,7 +92,7 @@
             CALL NDF_DIM( LOCI2, NDIMS, DIMS2, ACTDIM, STATUS )
 
 *          test if input images are same size
-	    IF( DIMS1( 1) .EQ. DIMS2( 1) .AND. 
+	    IF( DIMS1( 1) .EQ. DIMS2( 1) .AND.
      :	        DIMS1( 2) .EQ. DIMS2( 2)) THEN
 
 *            set the output image dimensions
@@ -109,12 +109,12 @@
                 CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                        PNTRO, NELEMENTS, STATUS )
 
-*              check for error before getting other values region and 
+*              check for error before getting other values region and
 *	       accessing pointers
 	        IF( STATUS .EQ. SAI__OK ) THEN
 
-*                get the number of areas to be taken from image 2 and 
-*                start and size 
+*                get the number of areas to be taken from image 2 and
+*                start and size
 	          CALL PAR_GET0I( 'NUMAREA', NUMAREA, STATUS)
 	          DO J = 1, NUMAREA
 	            CALL PAR_GET0I( 'XST', XST( J), STATUS)
@@ -129,15 +129,15 @@
 	          END DO
 
 *		pass everything to the airmass correction routine
-		  CALL IMCOMBSUB( DIMS1( 1), DIMS1( 2), %VAL( PNTRI1), 
-     :	                          %VAL( PNTRI2), %VAL( PNTRO), NUMAREA, 
+		  CALL IMCOMBSUB( DIMS1( 1), DIMS1( 2), %VAL( PNTRI1),
+     :	                          %VAL( PNTRI2), %VAL( PNTRO), NUMAREA,
      :	                          XST, YST, XSZ, YSZ, STATUS)
 
 		END IF
 
 	      ELSE
 
-	        CALL MSG_OUT( 'ERR', 
+	        CALL MSG_OUT( 'ERR',
      :	          'ERROR, input images are different sizes!!', STATUS)
 
 	      END IF

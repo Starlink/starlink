@@ -1,7 +1,7 @@
       SUBROUTINE ANT_CFIND (TID, CNAME, CID, DTYPE, STATUS)
 *+
 *  Name:
-*     ANT_CFIND 
+*     ANT_CFIND
 *  Purpose:
 *     Find the identifier and datatype of a column or parameter.
 *  Language:
@@ -17,7 +17,7 @@
 *     CNAME  CHARACTER*(*) (ENTRY)
 *        Name of the column or parameter for which the identifier is
 *        to be found.  Column names may be either scalars or elements
-*        of vectors.  See the StarBase documentation for a 
+*        of vectors.  See the StarBase documentation for a
 *        specificiation of the syntax of vector elements.
 *     CID  INTEGER (EXIT)
 *        Identifier to the column or parameter.
@@ -56,12 +56,12 @@ C     double precision works because type conversion occurs.
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@ C     double precision works because type conversion occurs.
 
 *
 *       Attempt to obtain an identifier for the column, vector column
-*       element or parameter, and proceed if one was obtained 
+*       element or parameter, and proceed if one was obtained
 *       successfully.
 
          CALL CAT_TIDNT (TID, CNAME, CID, STATUS)
@@ -142,7 +142,7 @@ C     double precision works because type conversion occurs.
             END IF
 
 C
-C          If the item is a parameter then set its data type (as 
+C          If the item is a parameter then set its data type (as
 C          understood by the parser) to double precision.
 C          Welcome to Kludge City.  Please drive carefully; bugs on the
 C          road ahead.  Or maybe its just a really neat trick.

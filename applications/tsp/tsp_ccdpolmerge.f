@@ -1,7 +1,7 @@
       SUBROUTINE TSP_CCDPOLMERGE(SIZE,I1,I2,IO,QS,US,QV,UV,STATUS)
 *+
 *   Subroutine to do the merging of the data
-*       
+*
 *    Sum the intensities for the two datasets, and scale up the
 *    Stokes arrays and variances to be correct for the new intensity
 *
@@ -50,19 +50,19 @@
             ENDIF
          ENDDO
 
-         NEWINT=I1S+I2S                
+         NEWINT=I1S+I2S
 
 *  Determine scaling factor for Stokes parameters
-         IF (I1S .GT. 0.0) THEN          
-            QFAC=NEWINT/I2S              
-         ELSE                              
-            QFAC=0.0                       
-         ENDIF                             
-         IF (I1S .GT. 0.0) THEN          
-            UFAC=NEWINT/I1S              
-         ELSE                              
-            UFAC=0.0                       
-         ENDIF                             
+         IF (I1S .GT. 0.0) THEN
+            QFAC=NEWINT/I2S
+         ELSE
+            QFAC=0.0
+         ENDIF
+         IF (I1S .GT. 0.0) THEN
+            UFAC=NEWINT/I1S
+         ELSE
+            UFAC=0.0
+         ENDIF
          DO I=1,SIZE
 
 *  Scale up the Stokes parameters (if good data)

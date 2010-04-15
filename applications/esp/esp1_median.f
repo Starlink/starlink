@@ -67,16 +67,16 @@
       integer hi,lo,pei
       real pe                   ! Value of partitioning element
       real temp
-      
+
 *   Global symbols
       include 'SAE_PAR'
-      
-      
+
+
       if (status .ne. sai__ok) then
          esp1_median = 0.0
          goto 9999
       endif
-      
+
 *   First, copy the good elements of the array to the workspace
       l = 0
       do i=1,n
@@ -92,8 +92,8 @@
          esp1_median = 0.0
          goto 9999
       endif
-      
-*   Get middle index - median should be (v(l/2)+v(l/2+1))/2 if l is odd, 
+
+*   Get middle index - median should be (v(l/2)+v(l/2+1))/2 if l is odd,
 *   but this makes little difference as long as l >~ 100 or so.
       medind = (l+1)/2
 
@@ -101,12 +101,12 @@
       hi = l
 
       do while (hi-lo .gt. 1)
-         
-         pei = (lo+hi)/2        ! Index of pe in middle (more efficient 
+
+         pei = (lo+hi)/2        ! Index of pe in middle (more efficient
                                 ! if array already partly ordered?)
          pe = ws(pei)
 
-*      `Remove ws(pei) from the array' by overwriting it with ws(lo).  
+*      `Remove ws(pei) from the array' by overwriting it with ws(lo).
 *      Now deal only with array ws(lo+1..hi), which has pe missing.
          ws(pei) = ws(lo)
 
@@ -147,7 +147,7 @@
 *         side of the partitioning element, which should be swapped before
 *         trying again (i==j can only happen if there's an even number
 *         in the subarray, and ws(j)==pe).
-            if (i .ge. j) goto 100 ! LEAP OUT 
+            if (i .ge. j) goto 100 ! LEAP OUT
 *         Swap them
             temp = ws(i)
             ws(i) = ws(j)
@@ -156,13 +156,13 @@
  100     continue
 
 *      The partitioning element is notionally located _between_ ws(j)
-*      and ws(j+1).  Reinsert it by pushing ws(j) to ws(lo) and putting 
+*      and ws(j+1).  Reinsert it by pushing ws(j) to ws(lo) and putting
 *      ws(j)=pe
          ws(lo) = ws(j)
          ws(j) = pe
 *Assert: ws(lo..j-1) <= ws(j) <= ws(j+1..hi)
 *Assert: ...which implies ws(1..j-1) <= ws(j) <= ws(j+1..l)
-      
+
 *      Now concentrate on the partition which contains medind
          if (medind .le. j) hi = j
          if (j .le. medind) lo = j
@@ -175,7 +175,7 @@
       if (hi .eq. lo) then
          if (hi .ne. medind) then
             call err_rep (' ',
-     :           'esp1_median: assertion failed: hi.ne.medind', 
+     :           'esp1_median: assertion failed: hi.ne.medind',
      :           status)
             status = sai__error
             esp1_median = 0.0
@@ -190,7 +190,7 @@
          endif
       else
          call err_rep (' ',
-     :        'esp1_median: assertion failed: hi.ne.lo+1', 
+     :        'esp1_median: assertion failed: hi.ne.lo+1',
      :        status)
          status = sai__error
          esp1_median = 0.0
@@ -198,5 +198,5 @@
       endif
 
  9999 continue
-      
+
       end

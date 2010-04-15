@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -54,32 +54,32 @@ ROYAL OBSERVATORY EDINBURGH\\
 
 \section {Summary}
 
-The Unix version of the Adam low-level intercommunications library (MSP) 
-is specified and its implementation outlined. In addition the methods 
-for implementing the Adam requirement for timers and the relationship of 
+The Unix version of the Adam low-level intercommunications library (MSP)
+is specified and its implementation outlined. In addition the methods
+for implementing the Adam requirement for timers and the relationship of
 ICL with its terminal handling process are described.
 
 
 \section {Introduction}
 
-Preliminary Unix versions of ICL and intertask communications facilities 
-were delivered by RAL Informatics division to Starlink. During the week 
-6-10 December 1993, BKM visited ROE to deliver an alpha-release of the 
-resulting system and to carry out a comprehensive review of various 
-design decisions taken during its implementation. This document 
-summarises the result of this review, and the intention is to enable the 
+Preliminary Unix versions of ICL and intertask communications facilities
+were delivered by RAL Informatics division to Starlink. During the week
+6-10 December 1993, BKM visited ROE to deliver an alpha-release of the
+resulting system and to carry out a comprehensive review of various
+design decisions taken during its implementation. This document
+summarises the result of this review, and the intention is to enable the
 delivery of a beta-release of the system by 14 February 1994.
 
 \section {Problems with the alpha-release}
 
-The alpha version of unix MSP routes all messages via a server process. 
+The alpha version of unix MSP routes all messages via a server process.
 As compared with a direct task-to-task implementation, this doubles the
-message traffic and also (possibly more seriously) doubles the context 
-switching and the consequent "ungreed". There ARE advantages to the 
-method, in that it provides the nameserver facility required to enable 
+message traffic and also (possibly more seriously) doubles the context
+switching and the consequent "ungreed". There ARE advantages to the
+method, in that it provides the nameserver facility required to enable
 one Adam process to establish connections with another.
 
-The alpha version has certain undesirable features in the areas of 
+The alpha version has certain undesirable features in the areas of
 layering, meaning that
 
 \begin{itemize}
@@ -93,39 +93,39 @@ layering, meaning that
 
 \section {Adam Layering Principles}
 
-One principle which has proved very important in the past is that Adam 
-intertask communication is defined by the interface to the MESSYS 
-library. The actual implementation of MESSYS has changed from time to 
-time, and features such as networking have been added to it without 
+One principle which has proved very important in the past is that Adam
+intertask communication is defined by the interface to the MESSYS
+library. The actual implementation of MESSYS has changed from time to
+time, and features such as networking have been added to it without
 forcing changes to be made to the code outside the MESSYS layer.
 
-A corollary of this is that no Adam code outside MESSYS knows of the 
-existence (let alone the implementation) of MSP. (Note that in this 
+A corollary of this is that no Adam code outside MESSYS knows of the
+existence (let alone the implementation) of MSP. (Note that in this
 context, ADAMNET processes are inside the MESSYS layering.)
 
-This principle is emphasized when one considers that there is 
-speculation about switching to the DRAMA IMP library for low-level 
-communications at some time in the future. The conclusion is that the 
-implementation of the timer facility and of certain details of ICL 
+This principle is emphasized when one considers that there is
+speculation about switching to the DRAMA IMP library for low-level
+communications at some time in the future. The conclusion is that the
+implementation of the timer facility and of certain details of ICL
 should be changed.
 
 
 \section {MSP Specification}
 
-The MSP interface was specified at the AAO Workshop on Data Acquisition 
-Environments, 1985. The specification was based on a detailed analysis 
-of the requirements of an implementation layer beneath MESSYS. One 
-facility was added to MSP "in case it was needed". This facility is 
-represented by the MSP\_ENABLE\_AST function, which tells MSP that if a 
-message arrives on a certain message queue, then an AST should be 
-delivered to the queue owner. This facility has never been needed by 
-MESSYS, and therefore should be removed from the specification of unix 
+The MSP interface was specified at the AAO Workshop on Data Acquisition
+Environments, 1985. The specification was based on a detailed analysis
+of the requirements of an implementation layer beneath MESSYS. One
+facility was added to MSP "in case it was needed". This facility is
+represented by the MSP\_ENABLE\_AST function, which tells MSP that if a
+message arrives on a certain message queue, then an AST should be
+delivered to the queue owner. This facility has never been needed by
+MESSYS, and therefore should be removed from the specification of unix
 MSP.
 
-The VAX/VMS version of MESSYS is written in FORTRAN. The unix version 
-was translated to C by the programmers from RAL Informatics division. 
-This has an implication for the actual call arguments to the MSP 
-functions, and the obvious decision is to make them C-style arguments. 
+The VAX/VMS version of MESSYS is written in FORTRAN. The unix version
+was translated to C by the programmers from RAL Informatics division.
+This has an implication for the actual call arguments to the MSP
+functions, and the obvious decision is to make them C-style arguments.
 The resulting set of calls is as follows.
 
 \begin{verbatim}
@@ -188,7 +188,7 @@ void msp_send_message
 char msgbody[],     /* message to be sent (given) */
 int msglen,         /* length of message to be sent (given) */
 int sendq,          /* queue identifer to be used (given) */
-int replyq,         /* reply queue to be associated with the message 
+int replyq,         /* reply queue to be associated with the message
                        (given) */
 int *status         /* global status (given and returned) */
 );
@@ -199,24 +199,24 @@ int *status         /* global status (given and returned) */
 \section {MSP implementation}
 
 A prototype of MSP for Unix was implemented by John Cooke and reported
-at the 1991 Adam workshop. This took the approach of mapping the concept 
-of an MSP queue onto a Unix datagram socket. This results in a very 
-small system, as MSP simply becomes a wrap-around for the socket 
-library. The socket names (specifically the task names) are entered into 
-the filing system. Intrinsic message exchange was acceptably fast in 
-this system (3.5 msec for a one-way message on a SUN3/80) but queue 
-creation and deletion was unacceptably slow. An upgrade of this code 
-with optimisation achieved by simply caching deleted queues appears to 
+at the 1991 Adam workshop. This took the approach of mapping the concept
+of an MSP queue onto a Unix datagram socket. This results in a very
+small system, as MSP simply becomes a wrap-around for the socket
+library. The socket names (specifically the task names) are entered into
+the filing system. Intrinsic message exchange was acceptably fast in
+this system (3.5 msec for a one-way message on a SUN3/80) but queue
+creation and deletion was unacceptably slow. An upgrade of this code
+with optimisation achieved by simply caching deleted queues appears to
 be the best way forward in the short term.
 
 
 \section {Timer implementation}
 
-The implementation of the timer facility can be made independent of 
-intertask communication by having each task use its own timer. The basic 
-system facility used is the itimer facility, set to deliver a signal on 
-timer expiry. The rest of the timer is based on the implementation by 
-BKM of timers on the alpha Adam-unix release. The basic principle of 
+The implementation of the timer facility can be made independent of
+intertask communication by having each task use its own timer. The basic
+system facility used is the itimer facility, set to deliver a signal on
+timer expiry. The rest of the timer is based on the implementation by
+BKM of timers on the alpha Adam-unix release. The basic principle of
 operation is as follows.
 
 There is a data structure which holds a queue of wait-times. The
@@ -226,35 +226,35 @@ starts the itimer for the next interval on the queue. When the timer
 signals, the signal is caught by a signal handler which modifies the
 queue, restarts the itimer for the next interval, and executes an
 application-specific function whose address was stored on the queue with
-the wait-time. 
+the wait-time.
 
 
 \section {ICL terminal handling}
 
-The Unix version of ICL relies on a separate process to perform terminal 
-handling, and so has to perform terminal input and output via some form 
-of intertask communication. Currently there is one terminal handling 
-process for ICL, called ICL\_IO. An alternative handler, ICLmenus, is 
-under development. It is accepted as a requirement that the terminal 
-handler process should be specified as part of the command line which 
+The Unix version of ICL relies on a separate process to perform terminal
+handling, and so has to perform terminal input and output via some form
+of intertask communication. Currently there is one terminal handling
+process for ICL, called ICL\_IO. An alternative handler, ICLmenus, is
+under development. It is accepted as a requirement that the terminal
+handler process should be specified as part of the command line which
 initiates ICL.
 
-There are two aspects to the communications problem, corresponding to 
+There are two aspects to the communications problem, corresponding to
 the two directions of data flow.
 
-Messages into ICL (essentially ICL commands coming from the terminal 
-handler) have to be seen by ICL as Adam messages, which ICL waits for 
-using ADAM\_RECEIVE. This enables ICL to wait for receipt of 
+Messages into ICL (essentially ICL commands coming from the terminal
+handler) have to be seen by ICL as Adam messages, which ICL waits for
+using ADAM\_RECEIVE. This enables ICL to wait for receipt of
 communications both from the terminal handler and from Adam tasks.
 
-Messages into the terminal handler have to make it possible for the 
-handler to wait for receipt of messages from ICL or user input on the 
-terminal. In the case of ICL\_IO this is character input, for ICLmenus it 
+Messages into the terminal handler have to make it possible for the
+handler to wait for receipt of messages from ICL or user input on the
+terminal. In the case of ICL\_IO this is character input, for ICLmenus it
 is X events.
 
-The solution is that on startup the terminal handler initialises itself 
-into the Adam message system and performs ADAM\_RECEIVE. ICL uses 
-ADAM\_SENDONLY to send an OBEY to the terminal handler, which also sets 
+The solution is that on startup the terminal handler initialises itself
+into the Adam message system and performs ADAM\_RECEIVE. ICL uses
+ADAM\_SENDONLY to send an OBEY to the terminal handler, which also sets
 up a return route.
 
 ICL and the i/o process use a private pipe or socket for subsequent
@@ -262,12 +262,12 @@ communications from ICL to the terminal handler. This mechanism allows
 the use of select() or the setup of an X callback using XtAppAddInput().
 The i/o process sends commands to ICL using ADAM\_TRIGGER, putting the
 command in the "value string". This has the side effect of also allowing
-any Adam task to return a command to ICL. 
+any Adam task to return a command to ICL.
 
 \section {Conclusion}
 
-An acceptably straightforward route involving a limited amount of work 
-has been found for progressing from the alpha release of the Unix Adam 
+An acceptably straightforward route involving a limited amount of work
+has been found for progressing from the alpha release of the Unix Adam
 multitasking facilities.
 
 \end {document}

@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ RUTHERFORD APPLETON LABORATORY\\
 {\large\bf Starlink Project\\}
 {\large\bf \stardoccategory\ \stardocnumber}
 \begin{flushright}
-\stardocauthors\footnote{{\em Present Address:} 
+\stardocauthors\footnote{{\em Present Address:}
  {\sf Joint Astronomy Centre, 660 N A`oh\={o}k\={u} Place, University Park,
   Hilo HI 96720, USA.}}\\
 \stardocdate
@@ -59,11 +59,11 @@ RUTHERFORD APPLETON LABORATORY\\
 \subsection{Software Revision Levels}
 
 CGS4DR relies heavily upon ADAM and Figaro. The release described in this
-document requires, as a minimum, {\tt ADAM v2.0-1}, {\tt FIGARO v3.0-5} and 
-{\tt VMS v5.5-1.} If your software revision levels are below these, you 
-{\em must} upgrade before installing CGS4DR. 
+document requires, as a minimum, {\tt ADAM v2.0-1}, {\tt FIGARO v3.0-5} and
+{\tt VMS v5.5-1.} If your software revision levels are below these, you
+{\em must} upgrade before installing CGS4DR.
 
-Note also that CGS4DR comes shipped with a private version of SMSICL and 
+Note also that CGS4DR comes shipped with a private version of SMSICL and
 {\em will not} work with the {\sl Starlink} released version. Manager's
 need not take any action on this, the system will choose the correct version.
 It is hoped that {\sl Starlink} will make this version of ICL the default
@@ -72,7 +72,7 @@ in the near future.
 \subsection{Preferred Hardware}
 
 Ideally, the software should run on a single user VAXstation having
-at least 24Mb of main memory and a colour display but it will run on a 
+at least 24Mb of main memory and a colour display but it will run on a
 VT100-compatible terminal and display to any supported PGPLOT graphics device.
 
 \subsection{Disk Space}
@@ -103,17 +103,17 @@ CPU         & (none) & Enqlm    & 100  & Pgflquo  & 75000 \\
 
 \subsection{Reserved Nodenames}
 
-Note that any nodenames beginning with the characters {\tt IRT} are assumed 
-to be part of the UKIRT cluster and will invoke CGS4DR in `online' mode. 
-In general, users do not want to do this so you should rename any offending 
-nodes before installing the software. This may be the first time a software 
+Note that any nodenames beginning with the characters {\tt IRT} are assumed
+to be part of the UKIRT cluster and will invoke CGS4DR in `online' mode.
+In general, users do not want to do this so you should rename any offending
+nodes before installing the software. This may be the first time a software
 product has necessitated a DECnet change!
 
 \section{Installing the Software}
 
 \subsection{Unpacking the Software}
-The software will usually be distributed via a `Starlink Software Change' 
-notice. The top-level directory of the software must be called 
+The software will usually be distributed via a `Starlink Software Change'
+notice. The top-level directory of the software must be called
 {\tt [CGS4DR\_DEV]} to maintain compatability with the Hawai`i version.
 
 {\bf NB: Delete all previous copies of the CGS4DR system}.
@@ -124,7 +124,7 @@ Unpack the software into a suitable directory:
   $  BACKUP/LOG CGS4DR_V160.BCK/SAVE DISK$STAR:[*...]*.*.*/OWNER=ORIGINAL
 \end{verbatim}
 
-Then, define some system-wide logical names (and put them in 
+Then, define some system-wide logical names (and put them in
 {\tt LSSC:STARTUP.COM}):
 
 \begin{verbatim}
@@ -167,9 +167,9 @@ These defaults can be altered to suit your site by two methods:
 
 \begin{itemize}
 \item If you know a little about ICL you can add further defaults or modify the
-above queues. The file to edit is {\tt CGS4DR\_ROOT:[PRC]CGS4\_REDUCTION.ICL} 
-and the procedure to edit is called {\sf hardcopy\_entry}. If you don't feel 
-comfortable doing this, send me an e-mail and I'll include further options in 
+above queues. The file to edit is {\tt CGS4DR\_ROOT:[PRC]CGS4\_REDUCTION.ICL}
+and the procedure to edit is called {\sf hardcopy\_entry}. If you don't feel
+comfortable doing this, send me an e-mail and I'll include further options in
 a future release.
 \item If your generic postscript queue is called {\tt SYS\_POSTSCRIPT},
 you can {\tt \$ DEFINE/SYSTEM SYS\$POSTSCRIPT SYS\_POSTSCRIPT} and leave the
@@ -179,14 +179,14 @@ defaults in the software alone. This applies to {\tt SYS\$LASER}, too.
 If you have an inkjet hardcopy printer and have installed Clive Page's
 IKONPAINT software (SUN/71) this is another option you can enable in the
 menus. The file to edit is called {\tt CGS4DR\_ROOT:[SCT]CGS4\_REDUCTION.SCT}
-and, note that, comments begin with an {\tt *} character so just un-comment 
+and, note that, comments begin with an {\tt *} character so just un-comment
 the line (by removing the asterisk):
 
 \begin{verbatim}
   * option hardcopy_inkjet   switch  hardcopy_inkjet  hardcopy_inkjet
 \end{verbatim}
 
-Note that this facility is {\em not} guaranteed as the Joint Astronomy Centre 
+Note that this facility is {\em not} guaranteed as the Joint Astronomy Centre
 has no such plotter with which to test the software.
 
 \subsection{Old Noticeboard Files}
@@ -196,24 +196,24 @@ Prior to testing the installation, delete any files called
 Do {\em not} delete that file from within the CGS4DR tree!
 
 The reason for deleting the file is that a new one will be created which
-is backwards compatible with previous versions of the system. If there is 
-such a file already in your (current) default directory and you do {\em not} 
+is backwards compatible with previous versions of the system. If there is
+such a file already in your (current) default directory and you do {\em not}
 delete it, the software will fail
 to load properly and you will not be able to run CGS4DR.
 
 \subsection{Testing the Installation}
 
-No astronomical data is distributed with the software but it can be tested 
+No astronomical data is distributed with the software but it can be tested
 with the following keystrokes. First, fire up the software using:
 
 \begin{verbatim}
   $ CGS4DR  OFFLINE  SYS$SCRATCH:[SYSTEM]  POSTSCRIPT_L
 \end{verbatim}
 
-where {\tt SYS\$SCRATCH:[SYSTEM]} is a scratch directory. If you have a colour 
-workstation, you can replace {\tt POSTSCRIPT\_L} with {\tt XWINDOWS} or 
-something similar\footnote{The benefit of using {\tt XWINDOWS} or {\tt VWS} 
-is that the software will load a colour test image upon completion of the 
+where {\tt SYS\$SCRATCH:[SYSTEM]} is a scratch directory. If you have a colour
+workstation, you can replace {\tt POSTSCRIPT\_L} with {\tt XWINDOWS} or
+something similar\footnote{The benefit of using {\tt XWINDOWS} or {\tt VWS}
+is that the software will load a colour test image upon completion of the
 startup. This test image is a simple colour table ramp.}.
 If the CGS4DR software starts without error the display will show:
 
@@ -262,9 +262,9 @@ The data reduction queue is empty.
 \end{verbatim}
 
 This tells you that the DR system is not running (sic) and that the queue is
-empty (as it should be). Now position the cursor over the 
-{\tt CANCEL\_ALL\_QENTRIES} item using the (down) arrow 
-key and press {\tt ENTER}. The queue will be deleted; it should report that it 
+empty (as it should be). Now position the cursor over the
+{\tt CANCEL\_ALL\_QENTRIES} item using the (down) arrow
+key and press {\tt ENTER}. The queue will be deleted; it should report that it
 was already empty.
 
 Using the arrow keys position the cursor over {\tt PAUSE\_CONTINUE\_REDUCTION}
@@ -276,10 +276,10 @@ and press {\tt ENTER}. The message is:
 * No linearisation will be carried out *
 \end{verbatim}
 
-Exit the {\tt REDUCE} menu (using PF1)  and enter the {\tt ENGINEER} menu. 
-Enter the {\tt SOFTWARE\_TESTS} menu and select {\tt TASK\_STATUS}. Select 
-{\tt ALL} (for all tasks) and PF1 out of this menu thus setting the action 
-going. The software will report on the status of four tasks: CRED4, RED4, 
+Exit the {\tt REDUCE} menu (using PF1)  and enter the {\tt ENGINEER} menu.
+Enter the {\tt SOFTWARE\_TESTS} menu and select {\tt TASK\_STATUS}. Select
+{\tt ALL} (for all tasks) and PF1 out of this menu thus setting the action
+going. The software will report on the status of four tasks: CRED4, RED4,
 ENG4 and P4. The output will be similar to (for each task):
 
 \begin{verbatim}
@@ -290,17 +290,17 @@ Created by : Phil Daly, JACH::PND
 CRED4 Task : The uncached CRED4 task is OK
 \end{verbatim}
 
-All four tasks shoule be {\tt IDLE} and {\tt OK}. Enter the {\tt TASK\_RESET} 
-menu and select {\tt ALL} and PF1 out to start the action going. The software 
+All four tasks shoule be {\tt IDLE} and {\tt OK}. Enter the {\tt TASK\_RESET}
+menu and select {\tt ALL} and PF1 out to start the action going. The software
 will reset all tasks and produce a display (for each task) of the form:
 
 \begin{verbatim}
 Resetting CRED4 task
 \end{verbatim}
 
-Finally, select the {\tt LIST\_NOTICEBOARD} item and press {\tt ENTER}. The 
+Finally, select the {\tt LIST\_NOTICEBOARD} item and press {\tt ENTER}. The
 action will start straight away and report the contents of the DR noticeboard.
-It is important that no error is reported during this phase as that might 
+It is important that no error is reported during this phase as that might
 imply a corrupt noticeboard. Many items are output to the scrolling region
 of the SMS screen.
 
@@ -328,11 +328,11 @@ news item contained in {\tt CGS4DR\_COM:CGS4DR\_V160.NEWS.}
 
 \section{Running CGS4DR from a Sun Workstation}
 
-CGS4DR does {\em not} run under the Unix environment at the present time 
+CGS4DR does {\em not} run under the Unix environment at the present time
 ({\em i.e.} \stardocdate). That fact will not deter users from saying
 something like, `... but I have seen Joe Bloggs running it on a Sun'.
 
-CGS4DR {\em can} run on a Sun workstation when that workstation acts {\em 
+CGS4DR {\em can} run on a Sun workstation when that workstation acts {\em
 purely as an X-terminal}. The following is the JACH recipe to enable such a
 facility --- it probably will not work in the UK if TCP/IP names cannot  be
 resolved (but I have no way of telling!). It also relies on the DEC and  Sun
@@ -357,7 +357,7 @@ Now create a SunOS window on the Sun using MB3 and the {\tt PROGRAMS} option.
 The item to look for is {\tt SHELL ...} or similar.
 
 Mapping a Sun keyboard to a DECterm is performed using the distributed
-{\sf dk} and {\sf sk} images. If you do not have these, consult your 
+{\sf dk} and {\sf sk} images. If you do not have these, consult your
 system manager. The definitions should be something like:
 
 \begin{quote}
@@ -368,8 +368,8 @@ system manager. The definitions should be something like:
 }
 \end{quote}
 
-Clearly, the command {\tt dk} is designed to map a DECterm keyboard and 
-{\tt sk} will unmap it back to a Sun keyboard. For a Sun keyboard mapped as a 
+Clearly, the command {\tt dk} is designed to map a DECterm keyboard and
+{\tt sk} will unmap it back to a Sun keyboard. For a Sun keyboard mapped as a
 DECterm, the top row of keys on the auxiliary keypad become the arrow
 keys required by SMS. The mapping is:
 

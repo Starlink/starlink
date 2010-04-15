@@ -157,7 +157,7 @@
                END IF
             END IF
             REPORT_STRING =  ' Fitting function type set to ' //
-     :           TYPE( :CHR_LEN( TYPE ) ) // '.' 
+     :           TYPE( :CHR_LEN( TYPE ) ) // '.'
             CALL ECH_REPORT( 0, REPORT_STRING )
             WRITE ( REPORT_STRING, 1000 ) TYPE( :CHR_LEN( TYPE ) ),
      :                                    N_COEFFS

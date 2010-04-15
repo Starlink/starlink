@@ -15,15 +15,15 @@
 
 *  Description:
 *     This routine displays information from the DETAILS structure of
-*     a SURVEY_BSIGHT CRDD file on the terminal.  
+*     a SURVEY_BSIGHT CRDD file on the terminal.
 
 *  Arguments:
 *     IDC = INTEGER (Given)
 *        The IRC identifier for the astrometry structure.
 *     ROUTNE = EXTERNAL (Given)
 *        A routine to which is passed each line of text for display.
-*        It should have the same argument list as MSG__OUTIF (see 
-*        SUN/104), and should be declared EXTERNAL in the calling 
+*        It should have the same argument list as MSG__OUTIF (see
+*        SUN/104), and should be declared EXTERNAL in the calling
 *        routine.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,7 +108,7 @@
 *  If so, get a locator to the SUPPORT_INFO structure.
       IF( SUPP ) THEN
          CALL DAT_FIND( DLOC, 'SUPPORT_INFO', SLOC, STATUS )
-      
+
 *  Map each of the array components within SUPPORT_INFO.
          CALL CMP_MAPV( SLOC, 'UNC_PSI', '_REAL', 'READ', IPDP, NEL,
      :               STATUS )
@@ -128,7 +128,7 @@
      :                 %VAL( IPGLN ), CCM_BAND( IDC ), STATUS )
 
 *  Unmap the arrays and annull the locators.
-      IF( SUPP ) THEN 
+      IF( SUPP ) THEN
          CALL CMP_UNMAP( SLOC, 'UNC_PSI', STATUS )
          CALL CMP_UNMAP( SLOC, 'UNC_THETA', STATUS )
          CALL CMP_UNMAP( SLOC, 'GEOG_LAT', STATUS )

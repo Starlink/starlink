@@ -8,7 +8,7 @@ C  Description:
 C     SURFIT takes an image and fits bi-cubic splines to a series
 C     of knots calculated by averaging any valid data in the image
 C     over a range of pixels centered on each knot.  (Optionally, it
-C     can use the median value.) It then creates a new image from the 
+C     can use the median value.) It then creates a new image from the
 C     calculated fit.
 C
 C  Command parameters:
@@ -170,8 +170,8 @@ C  Description:
 C     This routine divides an image up into a number of panels.  Within
 C     each panel it calculates either the average value or the median of
 C     the data and treats the data as just having that value at the
-C     centre of the panel. It then performs a set of bi-cubic-spline 
-C     fits between these generated points, and then evaluates the fit 
+C     centre of the panel. It then performs a set of bi-cubic-spline
+C     fits between these generated points, and then evaluates the fit
 C     for each point of the original image.  The result is the output
 C     image.
 C
@@ -201,7 +201,7 @@ C                  should begin with 'M'.
 C     (>) MOSAIC   (Logical,ref) True if a mosaic rather than a fit is
 C                  to be generated.  This is mainly a debugging tool for
 C                  the application - it shows the data that gets fitted.
-C     (<) OUTPUT   (Real array, ref) The resulting image. 
+C     (<) OUTPUT   (Real array, ref) The resulting image.
 C                  OUTPUT(NX,NY).  INPUT and OUTPUT may be the same
 C                  array.
 C     (<) OK       (Logical,ref) Indicates if the fitting was OK, or
@@ -285,7 +285,7 @@ C
 C
 C     All these variables have the meaning used in the NAG documentation
 C     Note that PX/PY are the total number of knots in the axis
-C     directions, and so are 8 more than the number of internal knots.  
+C     directions, and so are 8 more than the number of internal knots.
 C
       PX = XPOINTS + 8
       PY = YPOINTS + 8
@@ -352,7 +352,7 @@ C
 C  Description:
 C     This is the routine that actually does the work for the SURFIT
 C     application.   It uses NAG, and like all NAG routines needs a
-C     huge number of work arrays.  These are obtained dynamically by 
+C     huge number of work arrays.  These are obtained dynamically by
 C     FIG_SURFIT and then passed to this routine.
 C
 C  Language:
@@ -583,7 +583,7 @@ C
          LAMDA(IX+4) = (XVAL-XMIN)/(XMAX-XMIN)
          XVAL = XVAL + XRANGE
       END DO
-      YVAL = 1.0 
+      YVAL = 1.0
       DO IY=1,YIKNOTS
          MU(IY+4) = (YVAL-YMIN)/(YMAX-YMIN)
          YVAL = YVAL + YRANGE

@@ -16,7 +16,7 @@
       INCLUDE 'zpidata.inc'
       REAL*8 DECLONG, DECLAT
       COMMON / ECL_COORD/ DECLONG, DECLAT	! Available from ROS_VIEW
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -32,7 +32,7 @@
       CHARACTER*12 CON_INT, MON_INT, PHAS_EPOCH, PHAS_PERIOD, YTEXT*3, NUM*2
 
 *  __________________________ Executable Code __________________________________
- 
+
       IF (REF_FORM .LE.0 ) THEN							! Open files if necessary
          CALL FORM_OPEN( 'R', IERR)
          IF (IERR .NE. 0) GOTO 90
@@ -41,7 +41,7 @@
       END IF
 
       FIELD_NO = DBS_FIELDNO(REF_FORM,'PROPOSAL.TITLE(1)' )
- 
+
       NTARGS = DBS_GETI(REF_FORM,FLD_NTARGETS)
       LINELOC = 197
       IF (MORE_SUMMARY) THEN								! on subsequent page
@@ -101,7 +101,7 @@
             ELSE IF (LCONTG) THEN
                FIELD_NO=DBS_FIELDNO(REF_TARGET,'NUMBER.INTERVALS')
                CON_INT=DBS_GETC(REF_TARGET,FIELD_NO)
-            
+
             ELSE IF (LPHASE) THEN
                FIELD_NO=DBS_FIELDNO(REF_TARGET,'EPOCH')
                PHAS_EPOCH=DBS_GETC(REF_TARGET,FIELD_NO)

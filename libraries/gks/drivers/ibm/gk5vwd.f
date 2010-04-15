@@ -1,6 +1,6 @@
 C# IL>=a, OL>=2
       SUBROUTINE GK5VWD(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -183,7 +183,7 @@ C# IL>=a, OL>=2
       REAL DR, DG, DB, DIFFS, MNDIFF
       INTEGER COL
       DATA PI /3.1459267/
- 
+
 *  Map RAL-GKS colours 0-15 to Versatec preset Colours
       DATA PREMAP /9, 1, 6, 7, 5, 4, 2, 3, 9, 15, 10, 11,
      :             12, 13, 14, 1/
@@ -205,12 +205,12 @@ C# IL>=a, OL>=2
 *     180   Specified function is not supported
 *
 *---------------------------------------------------------------------
- 
- 
- 
- 
+
+
+
+
 * Conditional GOTO on entrypoint code
- 
+
       GOTO (       10,  20,  30,  40,  50,  60,  70,  80,9999,
      :       100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
      :       200, 210, 220, 230, 240, 250, 260, 270, 280,9999,
@@ -221,7 +221,7 @@ C# IL>=a, OL>=2
      :       700, 710, 720, 730, 740, 750, 760, 770, 780, 790,
      :       800, 810,9999,9999,9999,9999,9999,9999,9999,9999,
      :      9999, 910, 920, 930) IENT
- 
+
       GOTO (1111,1111,9999,9999,9999,9999,9999,9999,9999,9999,
      :      1111,1111,1111,1330,1111,1111,1111,1370,1380,1111,
      :      1111,1410,1420,1111,1440,1111,1111,1111,1111,1111,
@@ -230,10 +230,10 @@ C# IL>=a, OL>=2
      :      1111,1710,1111,1111,1111,1111,1111,1111,1111,1790,
      :      1111,1810,1111,1111,1840,1850,1111,1111,1111,1111,
      :      1111,1111,1111,1111,1111,1111,1960,1970,1111) IENT-119
- 
+
       GOTO 9999
- 
- 
+
+
 * Open workstation
    10 CONTINUE
 * Set up workstation state list and workstation description table
@@ -243,7 +243,7 @@ C# IL>=a, OL>=2
         KDFM(KWKIX) = GBNIG
         KWIO(KWKIX) = GNO
         KIMRGM(KWKIX) = GSUPPD
- 
+
 * Erase screen
         FSTPAS = .TRUE.
 * open file to VERSATEC
@@ -275,9 +275,9 @@ C# IL>=a, OL>=2
 * Clear screen to set viewport
       CALL GK5VCL
       GOTO 9999
- 
- 
- 
+
+
+
 * Close workstation
    20 CONTINUE
       IF( KWI1.EQ.1 ) THEN
@@ -286,9 +286,9 @@ C# IL>=a, OL>=2
         CALL GK5VCS
       END IF
       GOTO 9999
- 
- 
- 
+
+
+
 * Clear workstation
    30 CONTINUE
       IF( KWI1.EQ.2 ) THEN
@@ -298,23 +298,23 @@ C# IL>=a, OL>=2
 *       CALL GK5XCL
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Redraw all segments on workstation
    40 CONTINUE
       KWDONE = KRFUSE
       GOTO 9999
- 
- 
- 
+
+
+
 * Update workstation
    50 CONTINUE
       KWDONE = KRFUSE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set deferral state
    60 CONTINUE
       KDFM(KWKIX) = KWI1
@@ -331,38 +331,38 @@ C# IL>=a, OL>=2
         KRGN = .TRUE.
       END IF
       GOTO 9999
- 
- 
- 
+
+
+
 * Do deferred output actions
    70 CONTINUE
       CALL GKIOBO(KIOSN,1,KDAT,NLEFT)
       KWI1 = KNFAUP(KWKIX)
       GOTO 9999
- 
- 
- 
+
+
+
 * Clear display surface
    80 CONTINUE
       IF (KWI1.EQ.GALWAY.OR.KDSMT(KWKIX).EQ.GNEMPT) CALL GK5VCL
       CALL GKWCLD
       GOTO 9999
- 
- 
- 
+
+
+
 * Message
   100 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Escape
   110 CONTINUE
       KERROR = 180
       GOTO 9999
- 
- 
- 
+
+
+
 * Polyline
 * The Versatec only allows 8 line colours when using PLOTS (see
 * Versatec manual page 4-46 PENCLR) and 31 Linewdiths when using
@@ -395,11 +395,11 @@ C# IL>=a, OL>=2
   122   CONTINUE
         CALL GKSTDA(KREALS,IOFF)
         END IF
- 
+
       GOTO 8888
- 
- 
- 
+
+
+
 * Polymarker
 * Because the utility GKMYTP uses the workstations Line drawing
 * routines (ie in this case GK5VFL & GK5VLN) then the same
@@ -427,16 +427,16 @@ C# IL>=a, OL>=2
         CALL GKSTDA(KREALS,IOFF)
       END IF
       GOTO 8888
- 
- 
- 
+
+
+
 * Text
 * At the momemt only STROKE precision available ... the routine
 * GK0CXF is written as it is used in the user end driver but
 * GK5VXC is not written so can't do char & string yet.
 * If precision needs CHAR or STRING? then GKXDWC will be required
 * along with two routines GK5VXF and GK5VXC. See the EXTERNAL statement
- 
+
 * NOTE : need to call GKXDWO with GK5VFL if colour index > 9.
 *        this could be a bit dodgey as it will produce gushings
 *        of data points and in some case dotty text eg if the
@@ -449,9 +449,9 @@ C# IL>=a, OL>=2
          CALL GKXDWO (NID, IDAT, GK5VLN)
       END IF
       GOTO 8888
- 
- 
- 
+
+
+
 * Fill area uses Versaplot TONE to shade in styles Solid, Hatch,
 * and pattern as this makes best use of the device whereas if
 * GKFILS is used it uses gushings of CPU time and is a nightmare.
@@ -472,9 +472,9 @@ C# IL>=a, OL>=2
       CALL GKSTDA( KREALS,IYFI )
       CALL GKSTDA( KREALS,IXFI )
       GOTO 8888
- 
- 
- 
+
+
+
 * Call GK5VCA to do cell array. It only outputs VERSAPLOT TONE patterns
 * which are not transformed.
   160 CONTINUE
@@ -483,14 +483,14 @@ C# IL>=a, OL>=2
 *
          CALL GK5VCA( KWI1,KWI2,KWI3,KWI4,KWI5,KWI6,IDAT )
       GOTO 8888
- 
- 
- 
+
+
+
 * GDP
   170 CONTINUE
       ENTRYP = 17
       IF (KCVIS.EQ.GINVIS)  GOTO 8888
- 
+
       IF (KWI1 .EQ. GARC) THEN
 * ARC - Make entry point for Polyline
          ENTRYP = 12
@@ -503,7 +503,7 @@ C# IL>=a, OL>=2
      :                250.0, GK5VLN, GK5VRO)
          END IF
       ELSE IF (KWI1 .EQ. GCHORD) THEN
- 
+
 * Since GDP CHORD use the current fill area attributes to draw
 * the Chord then it is better to use the fill area mechanism
 * via GK5VPA as it is far more efficient and doesn't use the
@@ -522,17 +522,17 @@ C# IL>=a, OL>=2
          IDX = 1
          CALL GKCRCS(GARC, NRD, RX, RY, 1, .FALSE.,
      :                20.0, GK5VGC, GK5VRO)
- 
+
          CALL GK5VPA (IDX, ARCPTX, ARCPTY, RADIUS, GCHORD)
- 
+
       ELSE IF (KWI1 .EQ. GPIE) THEN
 * Pie - need to call GKCIRC to calculate points for arc then
 * add the middle point and end point to the array of points
 * so the pie sector can be drawn using the fill area mechanism.
 * as this is more efficient than using GKCIRC because GKCIRC
 * in turn calls GKFILS which creates nightmares on the Versatec.
- 
- 
+
+
 * Calculate the centre point of circle for PIE.
          CALL GKSTAL (KREALS, 3, IXDP)
          IF (KERROR .NE. 0) GOTO 8888
@@ -572,7 +572,7 @@ C# IL>=a, OL>=2
 * Test if sector is  Convex (ie angle is < =  180 degrees or PI/180)
          RADIUS = SQRT ((AX - XCEN)*(AX - XCEN)
      :                + (AY - YCEN)*(AY - YCEN))
- 
+
          AXCX  = SQRT ((CX - AX)*(CX - AX) + (CY - AY)*(CY - AY)) / 2
          ANGLE = ASIN (AXCX / RADIUS)
          ANGLE = ANGLE * 2
@@ -582,7 +582,7 @@ C# IL>=a, OL>=2
          ELSE
             CALL GK5VPA (IDX, ARCPTX, ARCPTY, 0.0, GPIE)
          END IF
- 
+
       ELSE IF (KWI1 .EQ. GCIRCL) THEN
 * Special case for circle  - ie if fill area interior style
 * is SOLID or HOLLOW then call CIRCLE (Versaplot) directly
@@ -590,20 +590,20 @@ C# IL>=a, OL>=2
 * which in turn calls CIRCLE. Because i dont't make use
 * of the utility GKCIRC here (which transforms points from
 * world to device) i have to transform to device co-ords.
- 
+
 * NOTE : only the first eight colours are available
 *        using Versaplot CIRCLE so if a colour index > 8
 *        is specified then the utility GKCIRC will
 *        have to be called with GK5VFL.
- 
+
          GDPCOL = COLMAP (KWFACI (KWKIX))
- 
+
          CALL GKSTAL (KREALS, NRD, IXDP)
          IF (KERROR .NE. 0) GOTO 8888
          CALL GKSTAL (KREALS, NRD, IYDP)
          IF (KERROR .NE. 0) GOTO 8888
          CALL GKTWD (NRD, RX, RY, QSTACK(IXDP), QSTACK(IYDP))
- 
+
          RADIUS = SQRT ( (QSTACK(IXDP + 1) - QSTACK(IXDP)) * * 2 +
      :         (QSTACK(IYDP + 1) - QSTACK(IYDP)) * * 2)
          RAD = RADIUS
@@ -652,14 +652,14 @@ C# IL>=a, OL>=2
          END IF
          CALL GKSTDA (KREALS, IYDP)
          CALL GKSTDA (KREALS, IXDP)
- 
+
       ELSE
 *  GDP not valid for Versatec
          KERROR = 104
          GOTO 9999
       ENDIF
       GO TO 8888
- 
+
 * Set polyline attributes
   180 CONTINUE
       CALL GKDPLB
@@ -669,9 +669,9 @@ C# IL>=a, OL>=2
      :        KWLNTY(KWKIX) = GLSOLI
       IF (KWPLCI(KWKIX) .GE. KPCI(KWKIX)) KWPLCI(KWKIX) = 1
       GOTO 9999
- 
- 
- 
+
+
+
 * Set polymarker attributes
   190 CONTINUE
       CALL GKDPMB
@@ -681,15 +681,15 @@ C# IL>=a, OL>=2
      :           KWMKTY(KWKIX) = GAST
       IF (KWPMCI(KWKIX) .GE. KPCI(KWKIX)) KWPMCI(KWKIX) = 1
       GOTO 9999
- 
- 
- 
+
+
+
 * Set text attributes
   200 CONTINUE
       CALL GKDTXB
 * Need to check because individual settings won't have been checked.
       IF (KWTXCI(KWKIX) .GE. KPCI(KWKIX)) KWTXCI(KWKIX) = 1
- 
+
 *     done if stroke precision
       IF(KWTXPR(KWKIX).EQ.GSTRKP) GOTO 9999
       KWTXFN(KWKIX) = 1
@@ -697,7 +697,7 @@ C# IL>=a, OL>=2
       QWCHRX(KWKIX) = QWCHWX(KWKIX)
       QWCHRY(KWKIX) = QWCHWY(KWKIX)
       GOTO 9999
- 
+
 * Set fill area attributes
   210 CONTINUE
       CALL GKDFAB
@@ -710,7 +710,7 @@ C# IL>=a, OL>=2
       IF (KWFAIS(KWKIX) .EQ. GPATTR .AND.
      :   (KWFASI(KWKIX) .LT. 1 .OR. KWFASI(KWKIX) .GT. 40))
      :         KWFASI(KWKIX) = 1
- 
+
 *
 * VERSATEC has up to 256 colour TONES available. Currently (May 86),
 * the maximum number of Fill Area Bundles is 20. (eg KMXFAB). We
@@ -720,34 +720,34 @@ C# IL>=a, OL>=2
 *
       IF (KWFACI(KWKIX) .GE. KPCI(KWKIX)) KWFACI(KWKIX) = 1
       GOTO 9999
- 
- 
- 
+
+
+
 * Set pick identifier
   220 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set polyline representation
   230 CONTINUE
       INTA(1) = 5
       CALL GKSRPL(1,INTA,.TRUE.)
       GOTO 9999
- 
- 
- 
+
+
+
 * Set polymarker representation
   240 CONTINUE
       CALL GKSRPM(0,INTA,.TRUE.)
       GOTO 9999
- 
- 
- 
+
+
+
 * Set text representation
   250 CONTINUE
       IF( KWI3.EQ.GSTRKP ) THEN
- 
+
 *       Stroke Precision
 *       Make sure that fonts are available
         IF( KDBFLS.EQ.KFLNA ) THEN
@@ -761,7 +761,7 @@ C# IL>=a, OL>=2
   255   CONTINUE
         CALL GKSRTX(KFNTMX,KHFONT,IPREC,.FALSE.)
       ELSE
- 
+
 *       String or Char precision
 *      This part of the enrty point uses STROKE precision no
 *     matter what precision is specified ........ need to be changed?
@@ -770,16 +770,16 @@ C# IL>=a, OL>=2
         CALL GKSRTX(1,INTA,IPREC,.FALSE.)
       END IF
       GOTO 9999
- 
- 
- 
+
+
+
 * Set fill area representation
   260 CONTINUE
       CALL GKSRFA( .TRUE. )
       GOTO 9999
- 
- 
- 
+
+
+
 * Set pattern representation
 * Pattern  supported
 * Pattern is defined using two independent routines
@@ -789,16 +789,16 @@ C# IL>=a, OL>=2
 * processor time.
 *
   270 CONTINUE
- 
+
 * Check if pattern too big
- 
+
       IF (KWI6 .GT. 16 .OR. KWI7 .GT. 16) THEN
          KERROR = 91
          GOTO 9999
       END IF
- 
+
 * Check if colour indices valid
- 
+
       DO 272 J = KWI5, KWI5+KWI7-1
         DO 271 I = KWI4, KWI4+KWI6-1
           IF (IDAT((J-1)*KWI2+I).LT.0 .OR.
@@ -808,13 +808,13 @@ C# IL>=a, OL>=2
           END IF
   271   CONTINUE
   272 CONTINUE
- 
+
 * NOTE : need to rotate pattern as the versatec doesn't rotate
 * the pattern, so simply read in the pattern differently
 * ie if the rotation flag is set then pattern is read
 * starting from row KWI4 column KWI5
 * else from row KWI4 column KWI5+KWI7-1.
- 
+
       PATIDX = KWI1
       IDIMX = KWI6
       IDIMY = KWI7
@@ -831,16 +831,16 @@ C# IL>=a, OL>=2
   277       CONTINUE
   278    CONTINUE
       END IF
- 
+
 * convert and store pattern in LISPAT (global) for
 * future and present reference
       CALL GK5VPT
       PATDEF (PATIDX) = 1
       CALL GKSRPA (NID, IDAT)
       GOTO 9999
- 
- 
- 
+
+
+
 * Set colour representation
 * At RANDOM 2.0  RGB values are set to the nearest current value
 * in the colour table of the WDT file  -
@@ -857,10 +857,10 @@ C# IL>=a, OL>=2
          PR = INT(255.0 * QWR1 + 0.001)
          PG = INT(255.0 * QWR2 + 0.001)
          PB = INT(255.0 * QWR3 + 0.001)
- 
+
 * Check that colour is not foreground and White
          IF ( KWI1.EQ.1 .AND. PR+PG+PB .EQ. 765 ) THEN
- 
+
 * Check for primary colours
          ELSE IF ( PR.EQ.0   .AND. PG.EQ.0   .AND. PB.EQ.0 ) THEN
             COLMAP(KWI1) = PREMAP(1)
@@ -878,7 +878,7 @@ C# IL>=a, OL>=2
             COLMAP(KWI1) = PREMAP(7)
          ELSE IF ( PR.EQ.255 .AND. PG.EQ.255 .AND. PB.EQ.255 ) THEN
             COLMAP(KWI1) = PREMAP(8)
- 
+
          ELSE IF ( COLIDX .LT. MXCOL ) THEN
 * Increment colour index pointer and set colour
             COLIDX = COLIDX + 1
@@ -902,196 +902,196 @@ C# IL>=a, OL>=2
          ENDIF
 *        WRITE(LOGUNIT,'(A8,I4,A5,I4,I4,I4,A5,I4)')
 *    :         ' Colour:',KWI1,' RGB:',PR,PG,PB,' Map:',COLMAP(KWI1)
- 
+
       ENDIF
 * Ignore setting of Background
       GOTO 9999
- 
- 
- 
+
+
+
 * Normalisation transformation
   310 CONTINUE
       CALL GKWKC4
       GOTO 9999
- 
- 
- 
+
+
+
 * Set workstation window
   320 CONTINUE
       CALL GKSWKW
       GOTO 9999
- 
- 
- 
+
+
+
 * Set workstation viewport
   330 CONTINUE
       CALL GKSWKV
       GOTO 9999
- 
- 
- 
+
+
+
 * Segment entrypoints *
   410 CONTINUE
       CALL GKSGWK(IENT,.FALSE.)
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise locator
   610 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise stroke
   620 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise valuator
   630 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise choice
   640 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise pick
   650 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise string
   660 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set input operating modes
   670 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set input mode
   680 CONTINUE
       CALL GKSIPM
       GOTO 9999
- 
- 
- 
+
+
+
 * Request locator
   690 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Request stroke
   700 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Request valuator
   710 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Request choice
   720 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Request pick
   730 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Request string
   740 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample locator
   750 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample stroke
   760 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample valuator
   770 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample choice
   780 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample pick
   790 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample string
   800 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Flush device events
   810 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Write item to GKSM
   910 CONTINUE
       KERROR = 32
       GOTO 9999
- 
- 
- 
+
+
+
 * Get item type from GKSM
   920 CONTINUE
       KERROR = 34
       GOTO 9999
- 
- 
- 
+
+
+
 * Read item from GKSM
   930 CONTINUE
       KERROR = 34
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire everything *
  1111 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire polyline representation
  1330 CONTINUE
       IF (KWI2.EQ.GSET) THEN
@@ -1101,9 +1101,9 @@ C# IL>=a, OL>=2
         QWR1 = 1.0
       END IF
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire text representation
 C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
  1370 CONTINUE
@@ -1113,7 +1113,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       END IF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire text extent
 * --------------------------------------------------------------
@@ -1135,7 +1135,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *     RY(1-4): y-text extent
 *     QWR7   : x-concatenation point
 *     QWR8   : y-concatenation point
- 
+
 *     stroke precision
       IF (KWTXPR(KWKIX) .EQ. GSTRKP) THEN
         CALL GKXQXO(NID,IDAT,RX,RY)
@@ -1144,47 +1144,47 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *       baseline vector from ws Set text attributes entry
         CALL GKXQXC (NID,IDAT,QWCHRX(KWKIX),QWCHRY(KWKIX),
      :                  RX,RY,GK5VXF)
- 
+
       END IF
       GOTO 9999
- 
- 
- 
- 
+
+
+
+
 * Inquire list of pattern indices
  1410 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire pattern representation
  1420 CONTINUE
       CALL GKQWK (IENT, NID, IDAT, NRD, RX, RY, NCD, STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire colour representation
  1440 CONTINUE
       CALL GKQWK(IENT, NID, IDAT, NRD, RX, RY, NCD, STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire pick device state
  1510 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire workstation classification
  1710 CONTINUE
       KWI1 = GVECTR
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire text facilities ... on entry KWI1 specifies list element reque
 * Allow for string and char precision font (number 1) explicitly
  1790 CONTINUE
@@ -1194,13 +1194,13 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         GOTO 9999
       END IF
       IF( KWI1.GT.KFNTMX ) THEN
- 
+
 *       String or Char precision font
           IF( KWI1.EQ.KFNTMX+1 ) KWI3 = GSTRP
           IF( KWI1.EQ.KFNTMX+2 ) KWI3 = GCHARP
           KWI2 = GSTRKP
       ELSE
- 
+
 *       Stroke precision font
 *       Make sure that fonts are available
           IF( KDBFLS.EQ.KFLNA ) THEN
@@ -1234,9 +1234,9 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         END IF
       END IF
       GOTO 9999
- 
- 
- 
+
+
+
 * ---------------------------------------------------------------
 * Inquire Fill Area facilities
 * ---------------------------------------------------------------
@@ -1251,7 +1251,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *     KWI3   : number of available hatch styles
 *     KWI4   : Nth element of list of available hatch styles
 *     KWI5   : number of predefined fill area indices
- 
+
       IF ((KWI1.LE.0 .OR. KWI1.GT.4) .OR.
      : (KWI1 .EQ. 4 .AND. (KWI2 .LT. -10 .OR. KWI2 .GT. -1)))
      :THEN
@@ -1271,63 +1271,63 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         KWI1 = 4
       END IF
       GOTO 9999
- 
- 
- 
- 
+
+
+
+
 * Inquire predefined pattern representation
  1840 CONTINUE
       CALL GKQWK (IENT, NID, IDAT, NRD, RX, RY, NCD, STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire colour facilities
  1850 CONTINUE
       KWI2 = GCOLOR
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KWI1 = 257
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire default choice device data
  1960 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KWI4 = 9
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire default pick device data
  1970 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 *   Here after all output primitives to sort out buffering
  8888 CONTINUE
       KDSMT(KWKIX) = GNEMPT
       IF (KWIO(KWKIX).EQ.GYES) CALL GKIOBO(KIOSN,1,KDAT,NLEFT)
- 
+
  9999 CONTINUE
- 
+
       END
          SUBROUTINE GK5VIO
          INCLUDE (CHECKIBM)
- 
+
 *
 * Type of Routine: W/S
 * Author:          GMC
 *
- 
+
 *
 * PURPOSE OF ROUTINE
 *
 *
 * To open and initialise a file to the versatec 9242 colour printer
 *
- 
+
 *
 * Alogrithm
 *
@@ -1343,7 +1343,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *    already been transformed to device coords.
 * Call VPORT to set up viewport on the output medium (eg paper or foil)
 *
- 
+
 * XINC     - The X increment between output frames
 * YINC     - The Y increment between output frames
 * IFRAME   - The current frame
@@ -1361,13 +1361,13 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 * YBORDR   -  Y border for Header info
 * MNCOL    -  Minimum colour index for user
 *
- 
+
          INCLUDE (CMGKVHC)
          INCLUDE (PRGKDT)
          INCLUDE (PRGKWDT)
          INCLUDE (CMGKWDT)
          INCLUDE (CMGKWSL)
- 
+
 *
 * LOCALS
 *
@@ -1442,7 +1442,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
      :     VSQ/'VSQ'/, VLP/'VLP'/, VLS/'VLS'/, V/'V  '/
       DATA A0L, A0W / 1189.20, 840.89 /
       DATA B0L, B0W / 1414.21, 1000.00 /
- 
+
          IWIDTH = 0
          IDEPTH = 0
          FORM8 = BLNK8
@@ -1453,18 +1453,18 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          FILTYP = BLNK8
          DATE = BLNK8
          TIME = BLNK8
- 
+
       IF (FSTPAS) THEN
          INQUIRE( UNIT = IN9242,IOSTAT=IERROR )
          IF( IERROR.EQ.0 ) THEN
              READ( IN9242,*,END = 1500,ERR=1500 ) IWIDTH, IDEPTH,
      :              FORM8, FORID, FORDST, FILNAM, FILTYP, DATE, TIME
- 
+
 * Ignore swathe
              READ( IN9242,*,END = 1500,ERR=1500 ) IERROR
- 
+
 * Write Diagnostic Output to Listing file
- 
+
              WRITE(MONUNIT,*)
              WRITE(MONUNIT,*) ' File: ', FILNAM, FILTYP,
      :                   ' at ', DATE,' ', TIME
@@ -1480,7 +1480,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          FORM8 = PRVFRM
       END IF
  1500 CONTINUE
- 
+
 *
 * Set up frame width and depth, if problems set to default of 297
 *
@@ -1494,10 +1494,10 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *
          ORIENT = FORM8(4:4)
          ROT = .FALSE.
- 
+
          XINC = 15.0
          YINC = 15.0
- 
+
          IF (FORMS .EQ. V) THEN
             XWIDTH = FLOAT (IWIDTH)
             YDEPTH = FLOAT (IDEPTH)
@@ -1546,13 +1546,13 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
             XWIDTH = 297.0
             YDEPTH = 297.0
          END IF
- 
+
          IF( ORIENT.EQ.LAND ) THEN
              SAVE = XWIDTH
              XWIDTH = YDEPTH
              YDEPTH = SAVE
          END IF
- 
+
 *
 * Check ROT, and change X/YMAX
 *
@@ -1573,16 +1573,16 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
              IFROW = 1
              IFCOL = 0
          END IF
- 
+
 *  If Largest plot then set borders to zero, so Veiwport is OK.
- 
+
          IF ( FORMS .EQ. 'VLP' ) THEN
              XBORDR = 0.0
              YBORDR = 0.0
              XINC = 0.0
              YINC = 0.0
          ENDIF
- 
+
 *
 * The frame counter is set to 1. The first plot is on the first
 * row and in column 1
@@ -1592,57 +1592,57 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 * Set the RANGE to 10000 units
 * Use 10,000 so that CELL ARRAY on an Nx1 basis matches up at boundaries
 *
- 
+
          RANGE = 10000.0
- 
+
 *
 * Set up number of frames along X and Y
 *
          MFWID = (XMAX-XBORDR)/( XWIDTH+XINC )
          MFDEP = (YMAX-YBORDR)/( YDEPTH+YINC )
- 
+
 * Write Diagnostic Output to Listing file
- 
+
          WRITE(MONUNIT,*) ' Paper size: ', XMAX, YMAX, ' Rotate: ', ROT
          WRITE(MONUNIT,*) ' Picture size: ', XWIDTH, YDEPTH
          WRITE(MONUNIT,*) ' No of Pictures: ', MFWID,' by ', MFDEP
          WRITE(MONUNIT,*)
- 
+
 * Set space after monochrome plots using VPOPT as sometimes
 * the begining of a colour plot will overwrite a previous monochrome
 * plot at present (03/87).
- 
+
 * Set RPM controller Memory size
          CALL VPOPT ( 34, 0, 11000000.0, IERROR)
- 
+
 * Basic plotting units = mm
          CALL VPOPT ( 8, 0, 25.4, IERROR )
- 
+
 * Set space = 300mm after each copy (18/7/88)
          CALL VPOPT ( 23, 300, 0.0, IERROR)
- 
+
 * Set space = 300mm after each plot (18/7/88)
          CALL VPOPT ( 24, 300, 0.0, IERROR)
- 
+
 * Initialize Colour mode with default passes
          CALL VPOPT ( 101, 0, 0.0, IERROR )
- 
+
 * Invoke VRF Output flag
          CALL VPOPT ( 35, 1, 0.0, IERROR)
- 
+
 * Set rotation
          IF ( ROT ) CALL VPOPT ( 5, -1, 0.0, IERROR)
- 
+
 * Set Default Paper size
          REALA(1) = 0.0
          REALA(2) = XMAX
          REALA(3) = 0.0
          REALA(4) = YMAX
          CALL VPOPT ( 2, 0, REALA, IERROR)
- 
+
 * Initialise plotting
          CALL PLOTS ( 0, 0, 0 )
- 
+
       IF (FSTPAS) THEN
 *
 * Set up the Header information, read in from JOB9242 DATA file
@@ -1680,14 +1680,14 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
      :                    'ACROSS WIDTH IN COLUMNS',ANGLE,23 )
          END IF
          FSTPAS = .FALSE.
- 
+
       END IF
 *
 * Set up WINDOW depending on forms code orientation
 *
          IF( ORIENT.EQ.LAND ) THEN
              CALL WINDOW( 0.0,RANGE,0.0,(RANGE*YDEPTH/XWIDTH) )
- 
+
 *
 * Set up correct WDT device and raster values
 *
@@ -1703,7 +1703,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          END IF
          KDSRX( 1 ) = INT( QDSDX( 1 ) )
          KDSRY( 1 ) = INT( QDSDY( 1 ) )
- 
+
 * Set Gamma correction Factor = Removed
 *        ANGLE = 3.5
 *        CALL SGAMMA (ANGLE)
@@ -1722,13 +1722,13 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          RETURN
          END
         SUBROUTINE GK5VCS
- 
+
 *
 * Type of Routine: W/S
 * Author:          GMC
 *
- 
- 
+
+
 *
 * PURPOSE OF ROUTINE
 *
@@ -1736,7 +1736,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 * If monochrome output an extra plot to stop smudges
 *
 *
- 
+
 *   VRFCOM needed to Access colour passes VRFKNT(4)
 C
 C...  COMMON /VRFCOM/ - VRF COMMON VARIABLES
@@ -1760,24 +1760,24 @@ C
 *   I       -  Loop counter
 *   REALA   -  Array of 4 reals for VPOPT
 *
- 
+
       INTEGER IERROR, NCPASS, I
       REAL REALA(4)
- 
+
 *  Work out number of colour passes
- 
+
       NCPASS = 0
       DO 100 I = 1, 4
          IF ( VRFKNT(I) .GT. 0.0 ) NCPASS = NCPASS + 1
  100  CONTINUE
- 
+
 *  If Monocrome then print extra space
- 
+
       IF (NCPASS .EQ. 1) THEN
          WRITE(MONUNIT,*) ' Monochrome plot'
- 
+
 *   Close plot and generate a new one with default values
- 
+
          CALL PLOT (0.0, 0.0, 999)
          REALA(1) = 0.0
          REALA(2) = 100.0
@@ -1788,40 +1788,40 @@ C
 *   Set paper size
          CALL VPOPT (2, 0, REALA, IERROR)
          CALL PLOTS (0, 0, 0)
- 
+
 *   Draw a line across plot
- 
+
          CALL PLOT ( 0.0, 0.0, 3)
          CALL PLOT ( 0.0, YMAX, 2)
- 
+
       ENDIF
- 
+
       CALL PLOT (0.0, 0.0, 999)
- 
+
       RETURN
       END
          SUBROUTINE GK5VCL
          INCLUDE (CHECKIBM)
- 
+
 *
 * Type of Routine: W/S
 * Author:          GMC
 *
- 
+
 *
 * PURPOSE OF ROUTINE
 *
 * To clear the frame, ie do a frame advance
 *
- 
+
 *
 * Algorithm
 *
 * Check to see if frame can be plotted, if not close down
 *
- 
+
          INCLUDE (CMGKVHC)
- 
+
 *
 * LOCALS
 *
@@ -1830,10 +1830,10 @@ C
 *
          INTEGER MONUNIT
          PARAMETER (MONUNIT = 6)
- 
+
          REAL XSTART,XEND,YSTART,YEND
          REAL XRANGE,YRANGE
- 
+
          IFRAME = IFRAME+1
 * Check for Maximum number of Frames
          IF( IFRAME.GE.(MFWID*MFDEP) ) THEN
@@ -1843,7 +1843,7 @@ C
             CALL PLOT (0.0, 0.0, 999)
             CALL GK5VIO
          END IF
- 
+
          IF( ROT ) THEN
              IFROW = IFROW+1
              IF( IFROW.GT.MFWID ) THEN
@@ -1857,13 +1857,13 @@ C
                  IFCOL = 1
              END IF
          END IF
- 
+
          XSTART = (XWIDTH+XINC)*(IFROW-1) + XBORDR
          XEND = XSTART+XWIDTH
          YSTART = YMAX-(YDEPTH+YINC)*IFCOL - YBORDR
          YEND = YSTART+YDEPTH
          CALL VPORT( XSTART,XEND,YSTART,YEND )
- 
+
 * Set up box around plot if needed
 *
 *
@@ -1880,7 +1880,7 @@ C
                 XRANGE = RANGE
                 YRANGE = RANGE
             END IF
- 
+
             CALL PENCLR (1)
             CALL NEWPEN (1, 1)
 C
@@ -1898,7 +1898,7 @@ C
 *
 * (C) COPYRIGHT ICL & SERC  1986
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -1951,7 +1951,7 @@ C
 *  XS, YS   - Start point of line
 *  XSJ, YSJ   - Start point of for each box
 *  DX, DY   - Increment in X and Y if rotated
- 
+
          INTEGER IXPIX,IYPIX,NCOLS,IPATT
          REAL XSIZ, YSIZ
          INTEGER IROW,ICLM
@@ -1961,7 +1961,7 @@ C
          PARAMETER (NCOLS = 256)
 *
 *---------------------------------------------------------------------
- 
+
 * Transform X/YP to DX/YP
 *
 * Top left is point P = (QWR1,QWR2)
@@ -1971,7 +1971,7 @@ C
 * Thus, define each individual box with R as top right point,
 * and the Y coordinates of the bottom of the box as R(Y) - ANYBOX
 *
- 
+
       XP(1) = QWR3 - (QWR5 - QWR1)
       YP(1) = QWR4 - (QWR6 - QWR2)
       XP(2) = QWR1
@@ -1982,28 +1982,28 @@ C
       YP(4) = QWR4
       XP(5) = XP(1)
       YP(5) = XP(1)
- 
+
 *
 * Transform points, but leave clipping to VERSAPLOT TONE
 *
       CALL GKTWD(5,XP,YP,DXP,DYP)
- 
+
 * Set up ANXBOX and ANYBOX, the block X and Y sizes
- 
+
       XSIZ = ( DXP(3)-DXP(2) )/NXPIX
       YSIZ = ( DYP(2)-DYP(1) )/NYPIX
       DX = ( DXP(4)-DXP(3) ) / NXPIX
       DY = ( DYP(3)-DYP(2) ) / NYPIX
 * Output each row of raster
- 
+
       XS = DXP(2)
       YS = DYP(2)
       DO 200 IROW = 1,NYPIX
- 
+
             XSJ = XS + IROW*DX
             YSJ = YS - IROW*YSIZ
 * Output each pixel in the row
- 
+
              DO 100 ICLM = 1,NXPIX
                    XX(4) = XSJ + ICLM*XSIZ
                    YY(4) = YSJ + ICLM*DY
@@ -2013,23 +2013,23 @@ C
                    YY(2) = YY(1) + YSIZ
                    XX(3) = XX(2) + XSIZ
                    YY(3) = YY(2) + DY
- 
+
                    IPATT = COLMAP(MOD(ICOLAR(INDX+ICLM-1,INDY+IROW-1),
      :                                 NCOLS ))
- 
+
                    CALL TONFLG( -1 )
                    CALL TONCLR( IPATT )
                    CALL CONVEX( XX,YY,4 )
   100   CONTINUE
- 
+
   200 CONTINUE
- 
+
       END
       SUBROUTINE GK5VRO(X,Y,NXPIX,NYPIX,NXDIM,ICOLAR)
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -2081,29 +2081,29 @@ C
 * XX, YY - The vectors defining the block to VERSAPLOT TONE
 *
 *
- 
+
          INTEGER IX,IY,IXOK,IYOK,NXBOX,NYBOX,NCOLS,IPATT
          INTEGER IROW,ICLM
          REAL XX(4),YY(4)
          PARAMETER (NCOLS = 256,NXBOX=10,NYBOX=10)
 *
 *---------------------------------------------------------------------
- 
+
 * Set up IX,IY, XX, YY
- 
- 
- 
+
+
+
 * Output each row of raster
- 
+
       DO 200 IROW = 1,NYPIX
- 
+
 * Find if this row is to be output
- 
+
          IYOK = MOD( IY,NYBOX )
          IF( IYOK.EQ.0 ) THEN
- 
+
 * Output each pixel in the row
- 
+
              DO 100 ICLM = 1,NXPIX
                  IX = INT(X)
                  IY = INT(Y)
@@ -2115,47 +2115,47 @@ C
                  YY(3) = YY(2)
                  XX(4) = X
                  YY(4) = Y
- 
+
 * Find out if this column is to be source of block
- 
+
               IXOK = MOD( IX,NXBOX )
               IF( IXOK.EQ.0 ) THEN
- 
+
                    IPATT = COLMAP(MOD( ICOLAR(ICLM,IROW),NCOLS ))
- 
+
 * Set up 'white' level, VERSAPLOT TONE pattern 9
- 
+
                    CALL TONFLG( -1 )
                    CALL TONCLR( IPATT )
                    CALL CONVEX( XX,YY,4 )
               END IF
               X = X + 10
   100         CONTINUE
- 
+
          END IF
- 
+
          Y = Y - 10
   200 CONTINUE
- 
+
       END
       SUBROUTINE GK5VFL (N, X, Y)
- 
- 
- 
+
+
+
 * Purpose of routine
 * ------------------
 * To produce solid lines of different colours using the
 * Versatec TONE routine as this allows 256 colours to be
 * used , whilst PLOT only allows eight colours.
 *
- 
+
       INCLUDE (CHECKIBM)
       INCLUDE (PRGKS)
       INCLUDE (PRGKDT)
       INCLUDE (CMGKWCA)
       INCLUDE (CMGKWKD)
       INCLUDE (CMGKVHC)
- 
+
 *
 * LOCALS
 * ------
@@ -2164,7 +2164,7 @@ C
       INTEGER LCOL(9), I, TESTX1, TESTX2, TESTY1, TESTY2
       REAL PX(4), PY(4), X(N), Y(N), WIDTH
       REAL ANGLE, DISTX, DISTY, HWIDTH
- 
+
 *  Old Version of Random only
 *        need to map linewidth if it is > 2.0 as linewidths
 *        in the range 3.0 -> 7.0 don't correspond to linewidths
@@ -2181,7 +2181,7 @@ C
          IF (INT (WIDTH) .GT. 200) WIDTH = 200.0
       ELSE IF (ENTRYP .EQ. 13) THEN
          LCOLR = COLMAP(KWPMCI (KWKIX))
- 
+
          WIDTH = 1.0
       ELSE IF (ENTRYP .EQ. 14) THEN
          LCOLR = COLMAP(KWTXCI (KWKIX))
@@ -2195,10 +2195,10 @@ C
          LCOLR = 1
          WIDTH = 1.0
       END IF
- 
+
 *  If White then Don't draw
       IF (LCOLR .EQ. 9) WIDTH = 0.0
- 
+
       HWIDTH = WIDTH / 2
       DO 10 I = 1, N - 1
          TESTX1 = INT ( X (I + 1) * 10000)
@@ -2253,8 +2253,8 @@ C
   10  CONTINUE
       RETURN
       END
- 
- 
+
+
          SUBROUTINE GK5VLN( N,X,Y )
           INCLUDE (CHECKIBM)
           INCLUDE (PRGKS)
@@ -2271,7 +2271,7 @@ C
 * this routine is called if the colour index specified is
 * < =  8 or the linewidth is <= 31.0
 *
- 
+
 *
 * Arguments
 *
@@ -2280,7 +2280,7 @@ C
 *
          INTEGER N
          REAL X(N),Y(N)
- 
+
 *
 * LOCALS
 *
@@ -2324,7 +2324,7 @@ C
 * If WHITE set width to zero
 *
          IF (LCOLR .EQ. 9) WIDTH = 0.0
- 
+
          CALL PENCLR (INT(WIDTH), LCOLR)
          CALL NEWPEN( INT(WIDTH) )
 *
@@ -2341,7 +2341,7 @@ C
 *
 *  (C) COPYRIGHT ICL & SERC  1986
 *
- 
+
 *
 *   RUTHERFORD / ICL GKS SYSTEM
 *
@@ -2391,14 +2391,14 @@ C
    10   CONTINUE
         RETURN
         END
- 
- 
+
+
         SUBROUTINE GK5VCP (NEWPAT, COLPAS)
- 
+
 *
 *  (C) COPYRIGHT ICL & SERC  1986
 *
- 
+
 *
 *   RUTHERFORD / ICL GKS SYSTEM
 *
@@ -2469,14 +2469,14 @@ C
       PATLEN (PATIDX) = PATSIZ
       RETURN
       END
- 
- 
+
+
         SUBROUTINE GK5VPT
 *
       INCLUDE (CHECKIBM)
 *  (C) COPYRIGHT ICL & SERC  1986
 *
- 
+
 *
 *   RUTHERFORD / ICL GKS SYSTEM
 *
@@ -2521,7 +2521,7 @@ C
 *   ------------------
 *
          INCLUDE (CMGKVHC)
- 
+
 *
 *   LOCALS
 *   ------
@@ -2558,13 +2558,13 @@ C
   30  CONTINUE
       RETURN
       END
- 
- 
+
+
       SUBROUTINE GK5VGC (N, X, Y)
- 
- 
+
+
       INCLUDE (CHECKIBM)
- 
+
 * This is a diddy subroutine which is called by GKCRCS and
 * simply stores the data points of the requested polygon in
 * the global arrays ARCPTX & ARCPTY (indexed by IDX), instead
@@ -2573,7 +2573,7 @@ C
       REAL X(N), Y(N)
       INCLUDE (PRGKMC)
       INCLUDE (CMGKVHC)
- 
+
 *
 *   If not first line and a corner then add the corner point(s)
 *   Note this works for a single corner only
@@ -2596,7 +2596,7 @@ C
          ENDIF
 *
       ENDIF
- 
+
       DO 10 I = 1, N
          ARCPTX (IDX) = X (I)
          ARCPTY (IDX) = Y (I)
@@ -2609,20 +2609,20 @@ C
       ARCPTY (IDX) = ARCPTY (1)
       RETURN
       END
- 
+
          SUBROUTINE GK5VPA (N, X, Y, RADIUS, IGDP)
- 
+
          INCLUDE (CHECKIBM)
          INCLUDE (PRGKS)
          INCLUDE (PRGKDT)
          INCLUDE (CMGKWCA)
          INCLUDE (CMGKWKD)
          INCLUDE (CMGKVHC)
- 
+
 * GDP Parameters
       INTEGER GARC, GCHORD, GPIE, GCIRCL
       PARAMETER (GARC = -1,  GCHORD = -2, GPIE = -3, GCIRCL = -4)
- 
+
 *
 * Purpose
 *
@@ -2644,11 +2644,11 @@ C
 *
          INTEGER N, IGDP
          REAL X(N), Y(N), RADIUS
- 
+
          INTEGER I, J, GETPAT (16)
          INTEGER STYLE, FACI, IHATCH
          INTEGER  IPAT, PATSIZ
- 
+
       FACI = KWFACI (KWKIX)
       STYLE = KWFASI (KWKIX)
       IF ( FACI .EQ. 0) FACI = 1
@@ -2686,7 +2686,7 @@ C
      :                FACI, IGDP)
          END IF
       ELSE
- 
+
           CALL GK5VFI( N,X,Y, KWFAIS(KWKIX), STYLE,
      :                        FACI, IGDP)
       END IF
@@ -2737,7 +2737,7 @@ C
       PARAMETER (MNPAT = 1, MXPAT = 40, PATSIZ = 16)
       INTEGER MINHAT, MAXHAT
       PARAMETER (MINHAT = -10, MAXHAT = -1)
- 
+
       INTEGER IFASI, I, IFACI, IPAT, IPATTR, MINPAT, PAXPAT
       INTEGER HATCH(160), PATTN(64), IHATCH
       INTEGER HATLIS(10), HATROT(10)
@@ -2748,49 +2748,49 @@ C
       PARAMETER (GARC = -1,  GCHORD = -2, GPIE = -3, GCIRCL = -4)
       DATA HATCH /Z0000,Z0000,Z0000,Z0000,Z0000,Z0000,Z0000,Z0000,
      :            Z0000,Z0000,Z0000,Z0000,Z0000,Z0000,Z0000,ZFFFF,
- 
+
      :            Z8000,Z8000,Z8000,Z8000,Z8000,Z8000,Z8000,Z8000,
      :            Z8000,Z8000,Z8000,Z8000,Z8000,Z8000,Z8000,Z8000,
- 
+
      :            Z0001,Z0002,Z0004,Z0008,Z0010,Z0020,Z0040,Z0080,
      :            Z0100,Z0200,Z0400,Z0800,Z1000,Z2000,Z4000,Z8000,
- 
+
      :            Z8000,Z4000,Z2000,Z1000,Z0800,Z0400,Z0200,Z0100,
      :            Z0080,Z0040,Z0020,Z0010,Z0008,Z0004,Z0002,Z0001,
- 
+
      :            ZFFFF,Z0001,Z0001,Z0001,Z0001,Z0001,Z0001,Z0001,
      :            Z0001,Z0001,Z0001,Z0001,Z0001,Z0001,Z0001,Z0001,
- 
+
      :            Z8001,Z4002,Z2004,Z1008,Z0810,Z0420,Z0240,Z0180,
      :            Z0180,Z0240,Z0420,Z0810,Z1008,Z2004,Z4002,Z8001,
- 
+
      :            Z8001,Z4002,Z2004,Z1008,Z0810,Z0420,Z0240,ZFFFF,
      :            ZFFFF,Z0240,Z0420,Z0810,Z1008,Z2004,Z4002,Z8001,
- 
+
      :            ZFFFF,Z0001,ZFFFC,Z0003,Z0003,Z0003,Z0003,Z0003,
      :            Z0003,Z0003,Z0003,Z0003,Z0003,Z0003,Z0003,Z0003,
- 
+
      :            Z4002,ZB005,Z500B,Z2814,Z1428,Z0B50,Z05B0,Z02C0,
      :            Z0340,Z05B0,Z0B50,Z1428,Z2814,Z500B,ZB005,Z4002,
- 
+
      :            ZFFFF,Z0810,Z0420,Z0240,Z0240,Z0240,Z0240,Z0180,
      :            Z0180,Z0240,Z0240,Z0240,Z0240,Z0420,Z0810,Z1008 /
- 
+
       DATA PATTN /Z1C00,Z2200,Z4100,Z4100,Z4100,Z2200,Z1C00,Z0000,
      :            Z0041,Z0022,Z0014,Z0008,Z0014,Z0022,Z0041,Z0000,
- 
+
      :            Z1C00,Z2200,Z4100,Z4100,Z4100,Z2200,Z1C00,Z0000,
      :            Z0038,Z0044,Z0082,Z0082,Z0082,Z0044,Z0038,Z0000,
- 
+
      :            Z7F00,Z4100,Z5D00,Z5500,Z5D00,Z4100,Z7F00,Z0000,
      :            Z007F,Z0041,Z005D,Z0055,Z005D,Z0041,Z0075,Z0000,
- 
+
      :            Z001C,Z002B,Z004A,Z007F,Z004A,Z002B,Z001C,Z0000,
      :            Z1C00,Z2B00,Z4A00,Z7F00,Z4A00,Z2B00,Z1C00,Z0000 /
- 
+
       DATA HATLIS /-1, -2, -3, -4, -5, -6, -7, -8, -9, -10/
       DATA HATROT / 2,  1,  4,  3,  5,  6,  7,  8,  9,  10/
- 
+
 * NOTE : the Versatec manual is a bit unclear when describing
 * pattern fill. The characterristics of Pattern fill are :-
 * a.) if a pattern fill is defined using SETPAT & DEFPAT
@@ -2804,10 +2804,10 @@ C
 * The hatch styles in effect are psuedo defined each
 * time this routine is called as are the 4 patterns (1 - 4).
 *
- 
+
 * Check for INTROR being SOLID, and set the pattern.
 ** Note: The Aspects of fill area probably need to be set individual.
- 
+
       IFACI = COLMAP (FACI)
       IFASI = FASI
       IF (FAIS .EQ. GSOLID) THEN
@@ -2820,7 +2820,7 @@ C
          DO 5 I = 1, 10
            IF ( HATLIS (I) .EQ. FASI ) IFASI = I
    5     CONTINUE
- 
+
 * NOTE : as with pattern HATCH styles are not rotated by the
 * Versatec so if the hatch index is in the range 1 - 4 then
 * a different hatch style may have to be read in which will
@@ -2832,13 +2832,13 @@ C
 *       on a rotated plot ( honest ). ie. the lines are still
 *       facing the same direction but the plot arond them have
 *       changed 90 degrees. (hatch -5 to -10 are symmetrical)
- 
+
          IF ( ROT ) IFASI = HATROT (IFASI)
- 
+
          DO 10 IHATCH = 1, PATSIZ
             CURHAT(IHATCH) = HATCH ( (IFASI - 1) * PATSIZ + IHATCH )
   10     CONTINUE
- 
+
          CALL PENCLR (1, IFACI)
          CALL NEWPEN (1)
          CALL TONFLG (0)

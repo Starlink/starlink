@@ -21,7 +21,7 @@
 *  Arguments:
 *     FSET = INTEGER (Given)
 *        An AST pointer for a FrameSet containing the Frames to be
-*        searched. 
+*        searched.
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        The Domain name to be searched for.
 *     JFRM = INTEGER (Returned)
@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,7 +72,7 @@
 *  Initialise returned values.
       JFRM = AST__NOFRAME
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start an AST context.

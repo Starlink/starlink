@@ -91,7 +91,7 @@
 
 *  Arguments Returned:
       LOGICAL WAFOUN
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -112,18 +112,18 @@
 
 *  Check whether dynamic default is required
       IF ( NEEDDF ) THEN
-      
+
 *  *********************************************************************
 *  Create dynamic default string containg waveband identifiers for each
 *  waveband whose logical variable is set .TRUE.
 *  *********************************************************************
-      
+
 *  Create an empty dynamic default string
          WABDEF = '            '
 
 *  Set the string position variable to the start of the dynamic default
          IK=1
-      
+
 *  Set the at least one waveband is required flag to FALSE.
          WAFOUN = .FALSE.
 
@@ -138,7 +138,7 @@
 *  waveband identifier
             WAFOUN = .TRUE.
          END IF
-      
+
 *  For second waveband check whether the band is required
          IF ( SOWAB( 2 ) ) THEN
 
@@ -148,7 +148,7 @@
                WABDEF(IK:IK) = ','
                IK = IK + 1
             END IF
-      
+
 *  Load the waveband indentifier ( 25 ) into the dynamic default string
             WABDEF(IK:IK+1) = '25'
             IK = IK + 2
@@ -158,7 +158,7 @@
 *  waveband identifier
             WAFOUN = .TRUE.
          END IF
-      
+
 *  For third waveband check whether the band is required
          IF ( SOWAB( 3 ) ) THEN
 
@@ -168,7 +168,7 @@
                WABDEF(IK:IK) = ','
                IK = IK + 1
             END IF
-      
+
 *  Load the waveband indentifier ( 60 ) into the dynamic default string
             WABDEF(IK:IK+1) = '60'
             IK = IK + 2
@@ -178,7 +178,7 @@
 *  waveband identifier
             WAFOUN = .TRUE.
          END IF
-      
+
 *  For fourth waveband check whether the band is required
          IF ( SOWAB( 4 ) ) THEN
 
@@ -188,7 +188,7 @@
                WABDEF(IK:IK) = ','
                IK = IK + 1
             END IF
-      
+
 *  Load the waveband indentifier ( 100 ) into the dynamic default string
             WABDEF(IK:IK+2) = '100'
             WAFOUN = .TRUE.
@@ -200,16 +200,16 @@
 *  Set the character string as dynamic default for the bands required.
             CALL PAR_DEF0C( PBANDS, WABDEF, STATUS )
          ELSE
-         
+
 *  If wavebands have not been found set '12,25,60,100' as dynamic
 *  default for the bands required.
             WABDEF = '12,25,60,100'
             CALL PAR_DEF0C( PBANDS, WABDEF, STATUS )
 
          END IF
-      
+
       END IF
-      
+
 *  *********************************************************************
 *  Ask user for bands required as a string
 *  *********************************************************************
@@ -220,14 +220,14 @@
 
 *  If a default value is required for the wavebands parameter rather
 *  than a dynamic default set according to the waveband requirements for
-*  the source 
+*  the source
       IF ( .NOT. NEEDDF ) THEN
 
 *  Set '12,25,60,100' as dynamic default for the bands required.
          WABDEF = '12,25,60,100'
          CALL PAR_DEF0C( PBANDS, WABDEF, STATUS )
       END IF
-      
+
 *  Obtain the bands required from the user
       CALL PAR_GET0C( PBANDS, BANDS, STATUS )
 
@@ -237,7 +237,7 @@
 
 *  If parameter was not O.K. return
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  *********************************************************************
 *  Translate the bands required into logicals set .TRUE. for each band
 *  required, or .FALSE. if it is not required.
@@ -291,5 +291,5 @@
      :   ' to the prompt to return to menu ', STATUS )
          GO TO 100
       END IF
-            
+
       END

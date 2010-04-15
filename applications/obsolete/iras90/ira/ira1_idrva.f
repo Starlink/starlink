@@ -1,4 +1,4 @@
-      SUBROUTINE IRA1_IDRVA( VALUE, NAME, NC, XPOS, YPOS, STYLE, ACC, 
+      SUBROUTINE IRA1_IDRVA( VALUE, NAME, NC, XPOS, YPOS, STYLE, ACC,
      :                       CONTXT, STATUS )
 *+
 *  Name:
@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRA1_IDRVA( VALUE, NAME, NC, XPOS, YPOS, STYLE, ACC, 
+*     CALL IRA1_IDRVA( VALUE, NAME, NC, XPOS, YPOS, STYLE, ACC,
 *                      CONTXT, STATUS )
 
 *  Description:
-*     Does the work for IRA_DRVAL. 
+*     Does the work for IRA_DRVAL.
 
 *  Arguments:
 *     VALUE = DOUBLE PRECISION (Given)
@@ -366,7 +366,7 @@
 
 *  Plot the superscript unit symbol.
          CALL IRA1_USYM( WKID, UNIT( 1 ), REFX, REFY, TEXT,
-     :                   LTEXT - 1, TXTHGT, SUPSIZ, SUPOFF, UX, UY, 
+     :                   LTEXT - 1, TXTHGT, SUPSIZ, SUPOFF, UX, UY,
      :                   STATUS )
 
 *  Save the context.

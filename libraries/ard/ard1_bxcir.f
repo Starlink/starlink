@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BXCIR( FRM, NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
+*     CALL ARD1_BXCIR( FRM, NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX,
 *                      NPAR, D, PAR, B, STATUS )
 
 *  Description:
@@ -56,7 +56,7 @@
 *        ...
 *        Pn = ...
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        Parameters; user coords of circle centre, followed by the radius in 
+*        Parameters; user coords of circle centre, followed by the radius in
 *        user co-ordinates.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array (in vector form).
@@ -73,12 +73,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,14 +110,14 @@
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Arguments Given:
-      INTEGER FRM 
+      INTEGER FRM
       INTEGER NDIM
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
       INTEGER VALUE
       INTEGER NPAR
-      DOUBLE PRECISION D( * ) 
+      DOUBLE PRECISION D( * )
       DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Given and Returned:
@@ -138,13 +138,13 @@
      :        LLBOX( ARD__MXDIM ),! Local copy of LBOX
      :        LUBOX( ARD__MXDIM ),! Local copy of UBOX
      :        MDIM,              ! A dimension size in supplied array
-     :        P,                 ! No. of pixels in (N-1)-Dim. object 
+     :        P,                 ! No. of pixels in (N-1)-Dim. object
      :        RLBOX( ARD__MXDIM ),! Returned LBOX
      :        RUBOX( ARD__MXDIM ),! Returned UBOX
      :        VA,                ! Vector address within supplied array
      :        VAINC( ARD__MXDIM) ! VA increment between N-D objects
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        C( ARD__MXDIM*(1+ARD__MXDIM) ),! Inverse transformation
      :        PCO(ARD__MXDIM),   ! Pixel coordinates
      :        R2,                ! Square of pixel-centre distance
@@ -162,7 +162,7 @@
          RLBOX( I ) = VAL__MAXI
       END DO
 
-*  If the input box is null, return without doing anything.                  
+*  If the input box is null, return without doing anything.
       IF( LBOX( 1 ) .NE. VAL__MINI ) THEN
 
 *  Find the inverse of the supplied transformation (i.e. from pixel to
@@ -278,7 +278,7 @@
 *  If the index is now larger than the corresponding upper bound of the
 *  box...
             I = 1
-            DO WHILE( BINDEX( I ) .GT. LUBOX( I ) ) 
+            DO WHILE( BINDEX( I ) .GT. LUBOX( I ) )
 
 *  Reset the index to the corresponding lower bound.
                BINDEX( I ) = LLBOX( I )
@@ -295,11 +295,11 @@
 *  Increment the index for the next higher dimension.
                   I = I + 1
                   BINDEX( I ) = BINDEX( I ) + 1
-   
+
                END IF
-   
+
             END DO
-   
+
          END DO
 
       END IF
@@ -312,8 +312,8 @@
          LBOX( 1 ) = VAL__MINI
       ELSE
          DO I = 1, NDIM
-            UBOX( I ) = RUBOX( I ) 
-            LBOX( I ) = RLBOX( I ) 
+            UBOX( I ) = RUBOX( I )
+            LBOX( I ) = RLBOX( I )
          END DO
       END IF
 

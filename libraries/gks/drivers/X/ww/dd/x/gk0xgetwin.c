@@ -103,7 +103,7 @@ DDPUBLIC window *gk0xwingetx(size,label,flags)box size;char *label;int flags;{
 	jbm(icon)->jbm_jwindow = jiconp = STRUCTMALLOC(jwindow);
 	jiconp->jw_update.b_left = UNSET;
 	jiconp->jw_flags = JWICON;
-	jiconp->jw_xwindow = wmh.icon_window = 
+	jiconp->jw_xwindow = wmh.icon_window =
 	  XCreateWindow(WXD,jdd->jd_root,0,0,64,64,0/*borderwidth*/,
 		CopyFromParent/*depth*/,InputOutput,
 		CopyFromParent/*visual*/,what,

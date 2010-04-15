@@ -1,5 +1,5 @@
-      SUBROUTINE FIND18( OBPS, OBPSR, OBST1D, OBST2D, OBTH, 
-     :               SLCRSZ, SLPSI, SLTH, 
+      SUBROUTINE FIND18( OBPS, OBPSR, OBST1D, OBST2D, OBTH,
+     :               SLCRSZ, SLPSI, SLTH,
      :               TESTOK, OBPSHI, OBPSLO, SLCRHW, THDIFF, STATUS )
 *+
 *  Name:
@@ -16,14 +16,14 @@
 *     solar longitude and the observation satellite angles are at the
 *     epoch of the start of the SOP. The acceptance test is made wider
 *     to take account of these discrepancies.
-*     
+*
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIND18( OBPS, OBPSR, OBST1D, OBST2D, OBTH, 
-*     :               SLCRSZ, SLPSI, SLTH, 
+*     CALL FIND18( OBPS, OBPSR, OBST1D, OBST2D, OBTH,
+*     :               SLCRSZ, SLPSI, SLTH,
 *     :               TESTOK, OBPSHI, OBPSLO, SLCRHW, STATUS )
 
 *  Description:
@@ -46,7 +46,7 @@
 *     satellite angles are at the epoch of the start of the SOP.
 *     The acceptance test is made wider to take account of these
 *     discrepancies.
-*     
+*
 *     -  Calculate
 *           the absolute value of ( source theta - scan theta )
 *           and compare it with the crosscan half width.
@@ -68,30 +68,30 @@
 
 *  Arguments:
 *     OBPS = REAL (Given)
-*        Psi at start of observation     
+*        Psi at start of observation
 *     OBPSR = REAL (Given)
-*        Psi rate for observation      
+*        Psi rate for observation
 *     OBST1D = DOUBLE PRECISION (Given)
 *        Satcal time of start of observation double precision version.
 *     OBST2D = DOUBLE PRECISION (Given)
 *        Satcal time of end of observation double precision version.
 *     OBTH = REAL (Given)
-*        Theta for observation      
+*        Theta for observation
 *     SLCRSZ = REAL (Given)
 *        Source cross scan size in radians - this routine does not use
 *        common so SOCRSZ( ISOURC ) is supplied in this argument.
 *     SLPSI = REAL (Given)
-*        Source psi      
+*        Source psi
 *     SLTH = REAL (Given)
-*        Source theta      
+*        Source theta
 *     TESTOK = LOGICAL (Given and Returned)
-*        .TRUE. if test is passed      
+*        .TRUE. if test is passed
 *     OBPSHI = REAL (Returned)
-*        Highest Psi value in observation.      
+*        Highest Psi value in observation.
 *     OBPSLO = REAL (Returned)
-*        Lowest Psi value in observation.      
+*        Lowest Psi value in observation.
 *     SLCRHW = REAL (Returned)
-*        Source cross scan half width test size      
+*        Source cross scan half width test size
 *     THDIFF = REAL (Returned)
 *         The absolute value of ( the difference between the theta of
 *         the source and the observation theta )
@@ -119,7 +119,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                                
+
 *  Arguments Given:
       REAL OBPS
       REAL OBPSR
@@ -178,7 +178,7 @@
 *  the lower limit of the observation range is greater than zero
          IF ( OBPSLO .GE. 0.0 ) THEN
 
-*  Given that the observation psi lo is greater than zero 
+*  Given that the observation psi lo is greater than zero
 *  the source psi is within the range if:-
 *     observation psi lo < source psi <= observation psi hi.
             IF ( ( SLPSI .GE. OBPSLO ) .AND.
@@ -191,9 +191,9 @@
             END IF
          ELSE
 
-*  Given that the observation psi lo is less than zero 
+*  Given that the observation psi lo is less than zero
 *  the source psi is within the range if either:-
-*     observation psi lo + 2*pi < source psi <= 2*pi.  
+*     observation psi lo + 2*pi < source psi <= 2*pi.
             IF ( ( SLPSI .GE. ( OBPSLO + TWOPIR) ) .AND.
      :           ( SLPSI .LE. TWOPIR)  ) THEN
                TESTOK = .TRUE.

@@ -78,7 +78,7 @@
 #  If this is the first part do not append to any existing characters
 #  in line
       set templine [string trim $templine]
-      if { $append == "1" } { 
+      if { $append == "1" } {
          set line "$line $templine"
       } else {
          set line $templine
@@ -86,19 +86,19 @@
       set append 0
 
 #  Skip blank line.
-      if { $line != "" } { 
+      if { $line != "" } {
 
 #  Is this a complete comment line?
          set commentat [ string first "#" $line ]
-         if { $commentat == "-1" } { 
-            set commentat [string first "!" $line] 
+         if { $commentat == "-1" } {
+            set commentat [string first "!" $line]
          }
 
 #  If # or ! is at the start of the line skip it.
          if { $commentat != "0" } {
 
 #  Is the comment in-line?
-            if { $commentat != "-1" } { 
+            if { $commentat != "-1" } {
                set line [string range $line 0 [expr $commentat-1] ]
             }
             set line [string trim $line]

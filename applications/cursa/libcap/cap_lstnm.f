@@ -63,7 +63,7 @@
       INTEGER BUFSIZ        ! Size of the output buffer.
       PARAMETER (BUFSIZ = 75)
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  FI,       ! Column (or field) identifier.
      :  CURCOL,   ! Sequential number of the current column.
      :  NUMCOL,   ! Number of columns in the catalogue.

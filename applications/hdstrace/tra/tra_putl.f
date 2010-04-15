@@ -507,7 +507,7 @@
 
                         LINE( CPOS-SZELIP:CPOS ) = '... '
 
-*                      Move the column position left by the length of 
+*                      Move the column position left by the length of
 *                      the ellipsis and the space.
 
                         CPOS = CPOS - SZELIP - 1

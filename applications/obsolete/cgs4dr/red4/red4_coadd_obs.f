@@ -153,7 +153,7 @@
 *               out by the variance weighting. Only its sign will
 *               be significant).
                   OBS = DBLE( WEIGHT ) * DBLE( OBSDATA( I, J ) )
-                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) ) 
+                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) )
 
 *               Check the quality of the corresponding datum in the
 *               reduced group data array.
@@ -167,7 +167,7 @@
 
                      IF ( VARIANCE( I, J ) .GT. 0.0 ) THEN
 
-                        SUMINVAR = 1.0D0 / DBLE( VARIANCE( I, J ) ) 
+                        SUMINVAR = 1.0D0 / DBLE( VARIANCE( I, J ) )
                         SUM = DBLE( DATA( I, J ) ) * SUMINVAR
                      ELSE
 
@@ -213,9 +213,9 @@
 
                      VARIANCE( I, J ) = REAL( 1.0D0 / INSESQ )
 
-*                  As at least one good observation data value has been 
+*                  As at least one good observation data value has been
 *                  used, so this element in the reduced group array
-*                  is now good.  
+*                  is now good.
                      QUALITY(I,J) = GOOD
                   ELSE
 
@@ -243,7 +243,7 @@
 
 *               Extract the data and variance values from the observation array.
                   OBS = DBLE( WEIGHT ) * DBLE( OBSDATA( I, J ) )
-                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) ) 
+                  OVAR = DBLE( ABS( WEIGHT ) ) * DBLE( OBSVAR( I, J ) )
 
 *               Check the quality of the corresponding datum in the
 *               reduced group data array.
@@ -258,7 +258,7 @@
                      NUM  = COADDS( I, J )
                      SUM  = DBLE( NUM ) * DBLE( DATA( I, J ) )
                      VAR  = DBLE( NUM * NUM ) *
-     :                        DBLE( VARIANCE( I, J ) ) 
+     :                        DBLE( VARIANCE( I, J ) )
 
 *                  Add the observation value and variance to these.
                      SUM = SUM + OBS
@@ -285,7 +285,7 @@
                      SESQ = OVAR
                   END IF
 
-*               Ensure that rounding errors can never make the 
+*               Ensure that rounding errors can never make the
 *               standard error squared less than zero.
                   IF ( SESQ .LT. 0.0D0 ) THEN
 
@@ -298,9 +298,9 @@
                   DATA( I, J )     = REAL( MEAN )
                   VARIANCE( I, J ) = REAL( SESQ )
 
-*               As at least one good observation data value has been 
+*               As at least one good observation data value has been
 *               used, so this element in the reduced group array
-*               is now good. 
+*               is now good.
                   QUALITY(I,J) = GOOD
                ENDIF
             END DO

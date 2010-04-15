@@ -35,7 +35,7 @@
 *           is available on the chosen graphics workstation;
 *       2.  obtaining the bounds from the environment (in world
 *           co-ordinates of the reference picture);
-*       3.  or by giving a position and size for the new picture.  The 
+*       3.  or by giving a position and size for the new picture.  The
 *           position is specified by a two-character code. The first
 *           controls the vertical location, and may be "T", "B", or "C"
 *           to create the new picture at the top, bottom, or in the
@@ -44,7 +44,7 @@
 *           picture to the left, right, or in the centre respectively.
 *           Thus a code of "BR" will make a new picture in the
 *           bottom-right corner.  The size of the new picture along each
-*           axis may be specified either in centimetres, or as a 
+*           axis may be specified either in centimetres, or as a
 *           fraction of the corresponding axis of the reference picture.
 *           The picture may also be forced to have a specified aspect
 *           ratio.
@@ -118,20 +118,20 @@
 *        The number used to form the label for the first (bottom-left)
 *        picture in Array mode.  It cannot be negative. [1]
 *     LBOUND( 2 ) = _REAL (Read)
-*        BASEPIC co-ordinates of the lower bounds that defines the new 
+*        BASEPIC co-ordinates of the lower bounds that defines the new
 *        picture.  The BASEPIC co-ordinates of the bottom-left corner of
-*        the BASE picture are (0,0).  The shorter dimension of the BASE 
-*        picture has length 1.0, and the other axis has a length 
-*        greater than 1.0.  The suggested default is the top-right of 
+*        the BASE picture are (0,0).  The shorter dimension of the BASE
+*        picture has length 1.0, and the other axis has a length
+*        greater than 1.0.  The suggested default is the top-right of
 *        the current picture. (XY mode)
 *     MODE = LITERAL (Read)
 *        Method for selecting the new picture. The options are "Cursor"
 *        for cursor mode (provided the graphics device has one), "XY"
 *        to select x-y limits, and "Array" to create a grid of
-*        equal-sized FRAME pictures.  The remainder are locations 
-*        specified by two characters, the first corresponding to the 
-*        vertical position and the second the horizontal.  For the 
-*        vertical, valid positions are T(op), B(ottom), or C(entre); 
+*        equal-sized FRAME pictures.  The remainder are locations
+*        specified by two characters, the first corresponding to the
+*        vertical position and the second the horizontal.  For the
+*        vertical, valid positions are T(op), B(ottom), or C(entre);
 *        and for the horizontal the options are L(eft), R(ight), or
 *        C(entre).  ["Cursor"]
 *     OUTLINE = _LOGICAL (Read)
@@ -147,12 +147,12 @@
 *        last-used prefix.
 *     SIZE( 2 ) = _REAL (Read)
 *        The size of the new picture along both axes, in centimetres,
-*        applicable for modes other than Array, Cursor, and XY. If a 
-*        single value is given, it is used for both axes.  If a null 
-*        value (!) is given, then the size of the picture is determined 
+*        applicable for modes other than Array, Cursor, and XY. If a
+*        single value is given, it is used for both axes.  If a null
+*        value (!) is given, then the size of the picture is determined
 *        by parameter FRACTION. [!]
 *     UBOUND( 2 ) = _REAL (Read)
-*        BASEPIC co-ordinates of the upper bound that defines the new 
+*        BASEPIC co-ordinates of the upper bound that defines the new
 *        picture.  The BASEPIC co-ordinates of the bottom-left corner of
 *        the BASE picture are (0,0).  The shorter dimension of the BASE
 *        picture has length 1.0, and the other axis has a length greater
@@ -296,7 +296,7 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     2006 April 12 (MJC):
-*        Remove unused variables, correct punctuation, and wrapped 
+*        Remove unused variables, correct punctuation, and wrapped
 *        long lines.
 *     {enter_further_changes_here}
 
@@ -368,7 +368,7 @@
 
       CHARACTER
      :  CLBNUM*9,              ! Label number
-     :  AMES( 2 )*80,          ! Informational messages about use of 
+     :  AMES( 2 )*80,          ! Informational messages about use of
                                ! cursor
      :  LABEL*(DAT__SZNAM),    ! AGI picture label
      :  MODE*6,                ! Mode of determining the position and
@@ -420,7 +420,7 @@
 *  Open AGI database.
       CALL AGI_ASSOC( 'DEVICE', 'UPDATE', PICID, STATUS )
 
-*  Activate PGPLOT 
+*  Activate PGPLOT
       CALL AGP_ACTIV( STATUS )
 
 *  If the graphics device was not available, report the error and
@@ -478,9 +478,9 @@
       END IF
 
 *  PGPLOT resets the colour palette when the device is opened (which
-*  occurs when AGI creates the first PGPLOT viewport - above). 
-*  Therefore we need to re-instate the colour palette set by the user, 
-*  reading it from the HDS file kappa-palette.sdf in the users 
+*  occurs when AGI creates the first PGPLOT viewport - above).
+*  Therefore we need to re-instate the colour palette set by the user,
+*  reading it from the HDS file kappa-palette.sdf in the users
 *  adam directory.
       CALL KPG1_PLLOD( STATUS )
 
@@ -527,13 +527,13 @@
 *  points is required, the points will be marked.
          AMES( 1 ) = 'select a point'
          AMES( 2 ) = 'quit'
-         CALL KPG1_PGCUR( .TRUE., 'select 2 distinct points', 2, AMES, 
-     :                    ' .', X1E, X2E, Y1E, Y2E, 2, XIN, YIN, NPTS, 
-     :                    2, 0, 0, 1, AST__NULL, XP, YP, ACT, NP, 
+         CALL KPG1_PGCUR( .TRUE., 'select 2 distinct points', 2, AMES,
+     :                    ' .', X1E, X2E, Y1E, Y2E, 2, XIN, YIN, NPTS,
+     :                    2, 0, 0, 1, AST__NULL, XP, YP, ACT, NP,
      :                    STATUS )
 
 *  Look out for an abort, i.e. the number of points is not 2.  Copy from
-*  the arrays into the standard (to the rest of the application) 
+*  the arrays into the standard (to the rest of the application)
 *  variables.
          IF ( NP .GE. NPTS ) THEN
             X1 = MIN( XP( 1 ), XP( 2 ) )
@@ -541,8 +541,8 @@
             Y1 = MIN( YP( 1 ), YP( 2 ) )
             Y2 = MAX( YP( 1 ), YP( 2 ) )
 
-*  There is now a change from the graphics cursor operation to report 
-*  values on the text screen (assuming the device is a terminal).  In 
+*  There is now a change from the graphics cursor operation to report
+*  values on the text screen (assuming the device is a terminal).  In
 *  order for the message to appear in the correct plane, there must be
 *  a delay, so that the graphics system can complete its work before the
 *  (faster and independent) message system reports the cursor position.
@@ -604,7 +604,7 @@
          ELSE
 
 *  Find the length of the prefix.  The AGI label is restricted to the
-*  length of an HDS object name, so the maximum starting number in a 
+*  length of an HDS object name, so the maximum starting number in a
 *  label has to be derived.
             NCPRFX = CHR_LEN( PREFIX )
             MAXNO = INT( MIN( DBLE( VAL__MAXI ),
@@ -638,7 +638,7 @@
 
 *  Find the horizontal bounds of the new pictures.
          DO  I = 1, XPIC
-            XLIM( 2 * I - 1 ) = X1E + OFFS( 1 ) + XR * 
+            XLIM( 2 * I - 1 ) = X1E + OFFS( 1 ) + XR *
      :                          REAL( I - 1 ) / REAL( XPIC )
             XLIM( 2 * I ) = XLIM( 2 * I - 1 ) + SIZE( 1 )
          END DO
@@ -651,7 +651,7 @@
 *  Initialise the label numbering.
          IF ( LABELS ) LABNUM = START - 1
 
-*  Pictures must lie within the current picture, so the original 
+*  Pictures must lie within the current picture, so the original
 *  picture identifier and viewport must be selected.  These are either
 *  the BASE picture or the current picture on input.
          IF ( CURPIC ) THEN
@@ -695,7 +695,7 @@
                   CALL AGI_SELP( PICID, STATUS )
                END IF
 
-*  Store the first picture's identifier.  Otherwise, annul the 
+*  Store the first picture's identifier.  Otherwise, annul the
 *  identifier.
                IF ( I .EQ. 1 .AND. J .EQ. 1 ) THEN
                   PICIDO = PICIDP
@@ -722,12 +722,12 @@
                   CALL AGP_NVIEW( .FALSE., STATUS )
                END IF
 
-*  Optionally, draw a box around the new viewport. Do this once the 
+*  Optionally, draw a box around the new viewport. Do this once the
 *  reference picture has been made current to avoid PGPLOT clipping.
                IF ( BOX ) THEN
                   CALL PGSFS( 2 )
                   CALL PGRECT( X1, X2, Y1, Y2 )
-               END IF                  
+               END IF
 
 *  End of the loops used to form the array of pictures.
             END DO
@@ -738,7 +738,7 @@
 
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Get the bounds of the picture in millimetres, and convert to 
+*  Get the bounds of the picture in millimetres, and convert to
 *  centimetres.
          CALL PGQVP( 2, X1E, X2E, Y1E, Y2E )
          SZMAX( 1 ) = ( X2E - X1E )/10.0
@@ -755,12 +755,12 @@
 *  If values were obtained succesfully...
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Ensure we have 2 values.     
+*  Ensure we have 2 values.
             IF ( NSIZE .EQ. 1 ) SIZE( 2 ) = SIZE( 1 )
 
 *  Convert these sizes to fractions of the reference picture.
-            FRACT( 1 ) = SIZE( 1 ) / SZMAX( 1 )            
-            FRACT( 2 ) = SIZE( 2 ) / SZMAX( 2 )            
+            FRACT( 1 ) = SIZE( 1 ) / SZMAX( 1 )
+            FRACT( 2 ) = SIZE( 2 ) / SZMAX( 2 )
 
 *  Indicate that the aspect ratio is not to be changed.
             ASPECT = -1.0
@@ -821,7 +821,7 @@
          IF ( BOX ) THEN
             CALL PGSFS( 2 )
             CALL PGRECT( X1, X2, Y1, Y2 )
-         END IF                  
+         END IF
 
 *  Create the new viewport.
          CALL KPG1_PGCUT( X1, X2, Y1, Y2, STATUS )

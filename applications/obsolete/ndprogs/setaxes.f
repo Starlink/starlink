@@ -30,16 +30,16 @@ C   -----------------------------
 C   IMAGE   Name of the structure containing the axes to be modified.
 C           (character)(prompted for).
 C
-C   OUTPUT  Name of the structure containing the output image. May be the 
+C   OUTPUT  Name of the structure containing the output image. May be the
 C           same as IMAGE. (character)(prompted for).
 C
 C   AXKEY   Key to axes to be modified. (integer, array)(prompted for).
 C
 C   AXSTART Start calibration value for each axis. (real, array)
-C           (prompted for). 
+C           (prompted for).
 C
 C   AXEND   End calibration value for each axis. (real, array)
-C           (prompted for). 
+C           (prompted for).
 C
 C   AXLOG   Logarithmic flag for each axis. (integer, array)(prompted for).
 C
@@ -57,7 +57,7 @@ C
 C
 C   Method:
 C   -------
-C   - If OUTPUT is the same as IMAGE, the IMAGE structure is modified in 
+C   - If OUTPUT is the same as IMAGE, the IMAGE structure is modified in
 C     situ, i.e. a new version of the container file is not created.
 C   - NDP_SET_AXES prompts for the axes to be modified, and fills each with
 C     a linear or logarithmic scale between the required limits. A flag is
@@ -66,7 +66,7 @@ C
 C
 C   External functions & subroutines called:
 C   ----------------------------------------
-C   Library DSA 
+C   Library DSA
 C      DSA_CLOSE
 C      DSA_INPUT
 C      DSA_DATA_SIZE
@@ -86,7 +86,7 @@ C
 C   INCLUDE statements:
 C   -------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
-C                                             
+C
 C
 C   Extensions to FORTRAN 77:
 C   -------------------------
@@ -111,7 +111,7 @@ C+-----------------------------------------------------------------------------
 C
       IMPLICIT NONE
 C
-C     Functions.                                   
+C     Functions.
 C
       INTEGER   DYN_ELEMENT
 C
@@ -130,7 +130,7 @@ C
 C     Note NEW_FILE=0, i.e. a new data structure is NOT created.
 C
       INTEGER   NEW_FILE,NO_DATA
-      PARAMETER (NEW_FILE=0,NO_DATA=0)                           
+      PARAMETER (NEW_FILE=0,NO_DATA=0)
 C
       INCLUDE 'DYNAMIC_MEMORY'
 C
@@ -161,14 +161,14 @@ C
 C     Open file for OUTPUT.
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
-      IF(STATUS.NE.0)GO TO 500        
+      IF(STATUS.NE.0)GO TO 500
 C
 C     Map first axis. Unnecessary, but without this the program will not link!
 C
       CALL DSA_MAP_AXIS_DATA
      &  ('OUTPUT',1,'READ','FLOAT',ADDRESS,AXSLOT,STATUS)
       IF(STATUS.NE.0)GO TO 500
-      AXPTR=DYN_ELEMENT(ADDRESS)                 
+      AXPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Calibrate axis array(s).
 C
@@ -178,4 +178,4 @@ C     Tidy up and exit.
 C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
-      END           
+      END

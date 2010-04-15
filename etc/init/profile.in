@@ -186,10 +186,10 @@ else
      ;;
      *pc-apple-darwin*)
         export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
-     ;;         
+     ;;
      *86*-apple-darwin*)
         export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
-     ;;         
+     ;;
    esac
 fi
 
@@ -553,7 +553,7 @@ fi
 #   Extractor
 #
 
-if test -f ${bindir}/extractor/extractor.sh; then 
+if test -f ${bindir}/extractor/extractor.sh; then
    extractorsetup () { . $EXTRACTOR_DIR/extractor.sh; }
    extractsetup () { . $EXTRACTOR_DIR/extractor.sh; }
    extractor () { . $EXTRACTOR_DIR/extractor.sh; }

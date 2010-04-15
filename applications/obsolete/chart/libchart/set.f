@@ -14,5 +14,5 @@
       ENDIF
       SET = MOD(I/(2**(8-N)),2).EQ.1
       END
- 
- 
+
+

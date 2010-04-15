@@ -45,7 +45,7 @@
 
 *-
  */
-      
+
 /* Constant parameters */
 
 #define NBS_K_MAXNAME 16	/* Maximum number of characters in a name */

@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 use strict;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Starlink::PSF',
                'VERSION'        => '0.01',
                'PREREQ_PM'      => {

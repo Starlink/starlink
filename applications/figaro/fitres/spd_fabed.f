@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL SPD_FABED( MNDF, LINNAM, LABFRQ, CMPTYP, NPARA, PARTYP,
-*        COMP, STATUS ) 
+*        COMP, STATUS )
 
 *  Description:
 *     This routine finds a suitable component in the result structure of
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -243,7 +243,7 @@
          DO 7 I = 0, NPARA - 1
             CALL SPD_FDAAC( FPARA+I, FPARA+I,
      :                      %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
-     :                      PARTYP(I+1), STATUS, 
+     :                      PARTYP(I+1), STATUS,
      :                      %VAL(CNF_CVAL(XCLEN))  )
  7       CONTINUE
       END IF

@@ -42,7 +42,7 @@
 *     -  A value of zero may be given for the IAXIS argument. In this
 *     case, the results for all the NDF's axes will be combined in the
 *     same way as described above.
-*       
+*
 
 *  Algorithm:
 *     -  Check the axis number for validity.
@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -155,7 +155,7 @@
 
 *  Check the axis number for validity.
       CALL NDF1_VAN( IACB, IAXIS, .TRUE., IAX1, IAX2, STATUS )
-      
+
 *  Initialise the count of array names and the first array flag.
       NCOMP = 0
       FIRST = .TRUE.

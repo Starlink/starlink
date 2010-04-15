@@ -25,15 +25,15 @@
 *     calling this routine.
 *
 *     Any existing astrometry structure is first deleted from the NDF
-*     (in which ever extension it was found) before creating the new 
+*     (in which ever extension it was found) before creating the new
 *     one.
 *
 *  Arguments:
 *     IDA = INTEGER (Given)
-*        An IRA identifier for the astrometry information. 
+*        An IRA identifier for the astrometry information.
 *     INDF = INTEGER (Given)
 *        The identifier for the NDF in which the astrometry information
-*        is to be stored. 
+*        is to be stored.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -77,7 +77,7 @@
 *  Check that the IRA identifier is OK.
       CALL IRA1_CHECK( IDA, STATUS )
 
-*  Obtain an HDS locator to an empty astrometry structure within the 
+*  Obtain an HDS locator to an empty astrometry structure within the
 *  NDF (if an astrometry structure already exists, it is deleted first).
       CALL IRA1_ASNDF( INDF, LOC, STATUS )
 

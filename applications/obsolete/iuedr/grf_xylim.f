@@ -21,7 +21,7 @@
 *         Some restructuring and final conversion to SGP/16 style.
 *
 *   Method:
-*      
+*
 *
 *-
 

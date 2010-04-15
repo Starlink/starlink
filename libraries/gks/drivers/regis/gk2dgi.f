@@ -76,8 +76,8 @@
 *     provides prompt.
 *
 *-----------------------------------------------------------------------
- 
- 
+
+
 *   Work out character size
       SIZEX = KWKDAT(CHARWI,KWKIX)
       SIZEY = KWKDAT(CHARHI,KWKIX)
@@ -85,16 +85,16 @@
 *   Number of characters in echo area
       NECHOX=INT(  (REALA(KIPEXR)-REALA(KIPEXL))/SIZEX  )
       NECHOY=INT(  (REALA(KIPEYT)-REALA(KIPEYB))/SIZEY  )
- 
+
 *   Find last significant character (position will be NSIGS) in PROMPT
       DO 100 NSIGS=LEN(PROMPT),1,-1
         IF( PROMPT(NSIGS:NSIGS).NE.' ' ) GOTO 105
   100 CONTINUE
       NSIGS=0
- 
+
 *   Here, NSIGS has been set (=0 if all spaces)
   105 CONTINUE
- 
+
 *   Display string if we can (NECHOY is big enough) and if
 *   there are any significant characters in PROMPT. NLINES is the
 *   number of lines we have occupied so far.
@@ -106,7 +106,7 @@
           Y(1) = REALA(KIPEYT)-SIZEY-1.0
           CALL GK2DLN(1, X, Y)
       ENDIF
- 
+
 *   Set NSEE and move beam if we will be echoing
       IF( NECHOY.GE.1 ) THEN
           NSEE=NECHOX
@@ -119,7 +119,7 @@
       ELSE
           NSEE=0
       ENDIF
- 
+
 *   Decide whether echoing is needed, and get input
       IF (INTA(KIPE).EQ.GECHO.AND.NSEE.GE.72) THEN
          IOCISW = KIOEP
@@ -128,5 +128,5 @@
       ENDIF
       CALL GKIOCO(KIOSO, ' ', NLEFT)
       CALL GKIOCI(IOCISW, NSIGS, PROMPT, RETSTR, NOUT)
- 
+
       END

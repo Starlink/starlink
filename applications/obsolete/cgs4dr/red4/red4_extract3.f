@@ -32,7 +32,7 @@ C                                     KS / CIT 29th June 1984
 C     Modified:
 C
 C     8th July 1988  Rewritten to use DSA routines.  KS / AAO.
-C     18th July 1990 Rewritten to calculate average, errors, quality. 
+C     18th July 1990 Rewritten to calculate average, errors, quality.
 C                                                   JFL / JACH.
 C     2nd January 1991 Renamed to RED4_EXTRACT3, since this routine
 C                      is meinly for CGS3 data.     SMB / ROE.
@@ -43,7 +43,7 @@ C
 C     Functions
 C
       INTEGER GEN_BSEARCH
-C 
+C
 C     ADAM include files
 C
       INCLUDE 'ADAMDEFNS'
@@ -196,7 +196,7 @@ C
          ENDIF
       ENDIF
 C
-C     Get some workspace 
+C     Get some workspace
 C
       CALL DSA_GET_WORK_ARRAY (NX,'INT',NUMPTR,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',SUMPTR,SLOT,STATUS)

@@ -96,7 +96,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -181,7 +181,7 @@
 
 *  An invocation of the basic algorithm starts here.  Check the
 *  inherited status.
- 1    CONTINUE     
+ 1    CONTINUE
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the component information and write it out.  Do not write it
@@ -318,12 +318,12 @@
 
 *  Arrive back here after returning from a recursive invocation of the
 *  algorithm. Decrement the stack pointer.
- 4                               CONTINUE                       
+ 4                               CONTINUE
                                  STK = STK - 1
 
 
 *  Record whether or not this is the last object within the structure.
-                                 LAST = ICMP( STK ) .EQ. NCMP( STK ) 
+                                 LAST = ICMP( STK ) .EQ. NCMP( STK )
 
 *  When a structure is complete insert a blank line, unless there is
 *  already a blank line.  There is an exception, and that is after a
@@ -362,7 +362,7 @@
 *  element.
                         CALL DAT_ANNUL( LCELL( STK ), STATUS )
                         GO TO 2
-                   
+
                      END IF         ! End of loop
                   END IF
 

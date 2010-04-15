@@ -184,10 +184,10 @@ independently of KAPPA.}
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -263,8 +263,8 @@ independently of KAPPA.}
 % Frame attributes fount.  Need to find a way for these to stand out.
 % San serif doesn't work by default.  Also without the \rm the
 % san serif continues after \sstatt hyperlinks.  Extra braces
-% failed to prevent \sstattribute from using roman fount for its 
-% headings.  The current lash up appears to work, but needs further 
+% failed to prevent \sstattribute from using roman fount for its
+% headings.  The current lash up appears to work, but needs further
 % investigation or a TeX wizard.
 \newcommand{\sstatt}[1]{\sf #1}
 \begin{htmlonly}
@@ -331,7 +331,7 @@ independently of KAPPA.}
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -687,7 +687,7 @@ Software Librarian, {\tt ussc@star.rl.ac.uk}.
 
 Applications within KAPPA are split up into several groups (called
 ``monoliths'), with names such as {\tt kapview}, {\tt ndfpack} and
-(rather confusingly but at one time the only KAPPA monolith) 
+(rather confusingly but at one time the only KAPPA monolith)
 {\tt kappa}. The top-level routines for the
 applications in monolith {\tt xyz} are in the tar file {\tt
 \$KAPPA\_DIR/xyz\_sub.tar}. Each application may use some
@@ -783,7 +783,7 @@ removed by the \verb+kaplibs_dev remove+ command.
 
 \subsection{Linking with Native PGPLOT}
 The commands described above will link the application with the Starlink
-GKS version of the \xref{PGPLOT graphics library}{sun15}{}. If you wish 
+GKS version of the \xref{PGPLOT graphics library}{sun15}{}. If you wish
 to link with the {\em native} version of PGPLOT, then include the switch
 ``-nogks'' as follows:
 
@@ -801,11 +801,11 @@ related items to be removed.
 
 \section{Changes in Version 3.0}
 \begin{itemize}
-\item \xref{CTG}{sun262}{}, \xref{IRQ}{sun261}{}, and \xref{LPG}{sun263}{} 
+\item \xref{CTG}{sun262}{}, \xref{IRQ}{sun261}{}, and \xref{LPG}{sun263}{}
       libraries are no longer in KAPLIBS.  They are autonomous
       libraries each with its own documentation and link scripts.
 \item KPG1\_MVBDx added. It modifies an array index (such as produced by
-      \xref{PDA\_QSIAx}{sun194}{PDA_QSIAx}) to exclude indices that refer 
+      \xref{PDA\_QSIAx}{sun194}{PDA_QSIAx}) to exclude indices that refer
       to bad data values.
 \item KPG\_STOSx added.  It calculates accurate order statistics by
       sorting an array by means of an index, returning the median and
@@ -815,9 +815,9 @@ related items to be removed.
 \section{Changes in Version 2.8}
 \begin{itemize}
 
-\item KPG1\_BADBX added. It returns an NDF identifier for the smallest section 
+\item KPG1\_BADBX added. It returns an NDF identifier for the smallest section
       of a supplied NDF that encloses all the good data values in the NDF.
-\item KPG1\_BBOX$<$T$>$ added. It obtains the pixel bounding box of a given 
+\item KPG1\_BBOX$<$T$>$ added. It obtains the pixel bounding box of a given
      value within an $N$-dimensional data array.
 \item KPG1\_LIKE added. It obtains a section of an NDF that matches either
       the pixel or WCS shape of a given template NDF.
@@ -849,7 +849,7 @@ related items to be removed.
 \section{Changes in Version 2.7}
 \begin{itemize}
 \item A new routine LPG\_REPLA has been added. It controls a new option
-      which allows a single NDF to be used as both input and output for an 
+      which allows a single NDF to be used as both input and output for an
       ADAM task.  The default is for this option to be disabled.
 \end{itemize}
 

@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER NDIM               ! Dimensionality required of input NDF
       PARAMETER( NDIM = 2 )
 
@@ -139,7 +139,7 @@
 
 *  Generate the weight array.
       CALL FLA_WEIGH( DIM( 1 ), DIM( 2 ),
-     :                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                %VAL( CNF_PVAL( WPNTR ) ), NFIBRE, STATUS )
 

@@ -16,7 +16,7 @@ C     (!) STATUS  (Integer) The global status
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used 
+C     Functions / subroutines used
 C
 C     IOR, IAND, NOT - bitwise manipulation routines.
 C

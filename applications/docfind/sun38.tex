@@ -44,7 +44,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -112,7 +112,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -197,12 +197,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -254,22 +254,22 @@ the file so you can see if your site is up to date by comparing your
 site's file with the RAL file available via the WWW.
 
 An alternative approach is to consult file {\tt{/star/docs/subject\_lis}}.
-This is a Key-Word index to Starlink documentation which does not rely 
-only on document titles.  Once again, it is maintained up to date at RAL 
+This is a Key-Word index to Starlink documentation which does not rely
+only on document titles.  Once again, it is maintained up to date at RAL
 but other sites may lag behind.  The specified current date will tell all.
-{\tt{/star/docs/analysis\_lis}} is also centrally maintained.  This is a 
-list of the Starlink documents listed by which Software item is the main 
+{\tt{/star/docs/analysis\_lis}} is also centrally maintained.  This is a
+list of the Starlink documents listed by which Software item is the main
 subject of each document.
 
 The {\tt{docfind}} program has been developed to help users search this
-mass of information.  
+mass of information.
 
 \section{Use}
 
 The {\tt{docfind}} procedure searches the file {\tt{/star/docs/subject\_lis}}
 for a given key word and then searches the file {\tt{/star/docs/docs\_lis}}
-for the same key word in the titles of the Starlink documents.  This 
-technique is used since not all key words will appear in the titles of the 
+for the same key word in the titles of the Starlink documents.  This
+technique is used since not all key words will appear in the titles of the
 documents.
 
 To invoke {\tt{docfind}} simply type:
@@ -281,7 +281,7 @@ To invoke {\tt{docfind}} simply type:
 
 A search is executed for occurrences of {\tt{word}} in the files, and the
 results of the search stored in a temporary file.  This is then displayed
-using the Unix {\tt{more}} command.  The temporary file is deleted one the 
+using the Unix {\tt{more}} command.  The temporary file is deleted one the
 {\tt{more}} output is finished.
 
 \section{\xlabel{alternative_searching_utilities}\label{alternative_searching_utilities}Alternative searching utilities}
@@ -299,7 +299,7 @@ display.
 The first tool is the \xref{{\tt{findme}}}{sun188}{performing_keyword_searches}
 command, which may be used to search for information within documents.
 
-The second is the \xref{{\tt{showme}}}{sun188}{displaying_documents_by_name} 
+The second is the \xref{{\tt{showme}}}{sun188}{displaying_documents_by_name}
 command, which may be used to display a specific document.
 
 Full details of the HTX utilities can be found in \xref{SUN/188}{sun188}{}.

@@ -3,13 +3,13 @@
 *  Name:
 *     CAT6_STAE<t>
 *  Purpose:
-*     Set a specified element in a character array of column values. 
+*     Set a specified element in a character array of column values.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT6_STCAE (ROWS, CSIZE, ROW, VALUE; COLIST; STATUS)
 *  Description:
-*     Set a specified element in a character array of column values. 
+*     Set a specified element in a character array of column values.
 *  Arguments:
 *     ROWS  =  INTEGER (Given)
 *        Number of rows in the column.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

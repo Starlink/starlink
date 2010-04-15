@@ -55,7 +55,7 @@
 *                  CALIB_MODE, STANDARD_MODE, SPECIFIED_BIAS,
 *                  SPECIFIED_DARK, SPECIFIED_FLAT,
 *                  SPECIFIED_CALIB and SPECIFIED_STD
-*                  parameters, for DRIMP/5.1 and DRIMP/5.2.  
+*                  parameters, for DRIMP/5.1 and DRIMP/5.2.
 *                  MSG_VAL_LEN added.                         (SMB)
 *     17-Jul-1992: Add SUBTRACT_BIAS option                   (PND)
 *     12-Feb-1993: Conform to error strategy                  (PND)
@@ -87,7 +87,7 @@
       INTEGER ERR_STATUS            ! Temporary status for ERR_REP
 *-
 
-*    Return if status on entry is bad 
+*    Return if status on entry is bad
       IF (STATUS .NE. SAI__OK) RETURN
 
 *    Get the RED4 task alias
@@ -123,10 +123,10 @@
 *          so if it has failed don't worry beyond printing a warning.
             IF (RED4_ACTIVE) THEN
 
-               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, 
+               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :           OUTVAL, STATUS)
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -208,7 +208,7 @@
 
                   CALL CHR_PUTC( ' SPECIFIED_BIAS="', INVAL, CPOS )
                   CLEN = LEN( SPECIFIED_BIAS )
-                  CALL CHR_PUTC( SPECIFIED_BIAS(1:CLEN)//'"', 
+                  CALL CHR_PUTC( SPECIFIED_BIAS(1:CLEN)//'"',
      :              INVAL, CPOS )
                ENDIF
             ENDIF
@@ -229,7 +229,7 @@
 
                   CALL CHR_PUTC( ' SPECIFIED_DARK="', INVAL, CPOS )
                   CLEN = LEN( SPECIFIED_DARK )
-                  CALL CHR_PUTC( SPECIFIED_DARK(1:CLEN)//'"', 
+                  CALL CHR_PUTC( SPECIFIED_DARK(1:CLEN)//'"',
      :              INVAL, CPOS )
                ENDIF
             ENDIF
@@ -250,7 +250,7 @@
 
                   CALL CHR_PUTC( ' SPECIFIED_FLAT="', INVAL, CPOS )
                   CLEN = LEN( SPECIFIED_FLAT )
-                  CALL CHR_PUTC( SPECIFIED_FLAT(1:CLEN)//'"', 
+                  CALL CHR_PUTC( SPECIFIED_FLAT(1:CLEN)//'"',
      :              INVAL, CPOS )
                ENDIF
             ENDIF
@@ -273,7 +273,7 @@
                CALL CHR_PUTI( BOXSIZE, INVAL, CPOS )
             ENDIF
 
-            CALL TASK_OBEY (RED4_ALIAS, 'RED_INT', INVAL(1:CPOS), 
+            CALL TASK_OBEY (RED4_ALIAS, 'RED_INT', INVAL(1:CPOS),
      :         OUTVAL, RED4_PATH, RED4_MESSID, STATUS)
 
 *          check that the action started OK, if not set the REDUCTION_OK flag
@@ -298,10 +298,10 @@
 *             if necessary, wait for action to finish, check completion
                IF (WAIT) THEN
 
-                  CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, 
+                  CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :               OUTVAL, STATUS)
 
-                  RED4_ACTIVE = .FALSE. 
+                  RED4_ACTIVE = .FALSE.
 
                   IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
 

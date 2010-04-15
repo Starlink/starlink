@@ -163,7 +163,7 @@
      :     JSTAT)
            GO TO 9999
          END IF
- 
+
          IF (ISTATE.NE.GACTIV) CALL GACWK(IWTID(IWKID))
 
 *     Recalculate text attributes
@@ -194,4 +194,4 @@
  9999 CONTINUE
 
       END
-                                                      
+

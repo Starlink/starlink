@@ -6,7 +6,7 @@ C
 C     G E N _ S C A L E
 C
 C     Scales a floating point array. The input array may have
-C     any dimensions; it is treated here as linear in order to 
+C     any dimensions; it is treated here as linear in order to
 C     generate more efficient code.
 C
 C     Parameters -    (">" input, "<" output)
@@ -46,7 +46,7 @@ C
       INTEGER  GOOD, BAD
       PARAMETER (BAD = 1, GOOD = 0)
 C
-C     Handle different quality methods separately.  
+C     Handle different quality methods separately.
 C
       IF (QUAL) THEN
 C

@@ -46,20 +46,20 @@
 *     FILE_3( NPIX, NLIN ) = REAL (Given)
 *        The Fourier transform of the PSF.
 *     FILE_4( NPIX, NLIN ) = REAL (Given)
-*        The observed data. 
+*        The observed data.
 *     FILE_6( NPIX, NLIN ) = REAL (Given)
-*        The background data. 
+*        The background data.
 *     FILE_1( NPIX, NLIN ) = REAL (Given)
 *        The current reconstructed image.
 *     FILE_8( NPIX, NLIN ) = REAL (Given)
-*        The accuracy of each data value. 
+*        The accuracy of each data value.
 *     FILE_7( NPIX, NLIN ) = REAL (Returned)
 *        Returned holding the simulated data.
 *     FILE_2( NPIX, NLIN ) = REAL (Returned)
 *        Work space.  Returned holding the simulated data minus the
 *        background data.
 *     FILE_5( NPIX, NLIN ) = REAL (Returned)
-*        Work space. 
+*        Work space.
 *     XSQ = REAL( Returned)
 *        The normalised chi-squared value describing the deviation of
 *        the simulated data returned in file 7, from the observed data
@@ -108,7 +108,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       INTEGER N
       INTEGER NPIX
@@ -122,7 +122,7 @@
       REAL FILE_6( NPIX, NLIN )
       REAL FILE_1( NPIX, NLIN )
       REAL FILE_8( NPIX, NLIN )
-      
+
 *  Arguments Returned:
       REAL FILE_7( NPIX, NLIN )
       REAL FILE_2( NPIX, NLIN )
@@ -141,7 +141,7 @@
       INTEGER NVAL               ! No. of values summed in XSQ
       REAL S                     ! Simulated data value
       REAL V                     ! Variance value
-      
+
 *.
 
 *  Check the inherited global status.
@@ -153,20 +153,20 @@
             FILE_7( I, J ) = FILE_1( I, J )
          END DO
       END DO
-         
-*  Convolve file 7 (i.e. the current reconstruction) with the PSF. 
-      CALL KPS1_LUCSM( N, NPIX, NLIN, WLIM, .FALSE., FILE_3, 
+
+*  Convolve file 7 (i.e. the current reconstruction) with the PSF.
+      CALL KPS1_LUCSM( N, NPIX, NLIN, WLIM, .FALSE., FILE_3,
      :                 FILE_7, FILE_5, FILE_2, STATUS )
 
-*  Add the background data back on to get simulated data values. 
+*  Add the background data back on to get simulated data values.
       DO J = 1, NLIN
          DO I = 1, NPIX
 
             S = FILE_7( I, J )
-            B = FILE_6( I, J ) 
+            B = FILE_6( I, J )
 
             IF ( S .NE. VAL__BADR .AND. B .NE. VAL__BADR ) THEN
-               FILE_7( I, J ) = S + B 
+               FILE_7( I, J ) = S + B
 
             ELSE
                FILE_7( I, J ) = VAL__BADR
@@ -175,7 +175,7 @@
 
          END DO
       END DO
-         
+
 *  Initialise the chi-squared value, and the number of values which
 *  have contributed to it.
       XSQ = 0.0
@@ -184,10 +184,10 @@
 *  Form the chi-squared value, excluding the margins.
       DO J = 1 + YMARG, NLIN - YMARG
          DO I = 1 + XMARG, NPIX - XMARG
-         
-            S = FILE_7( I, J ) 
-            V = FILE_8( I, J ) 
-            D = FILE_4( I, J ) 
+
+            S = FILE_7( I, J )
+            V = FILE_8( I, J )
+            D = FILE_4( I, J )
 
             IF ( S .NE. VAL__BADR .AND. V.NE. VAL__BADR .AND.
      :           D .NE. VAL__BADR ) THEN
@@ -198,12 +198,12 @@
                   XSQ = XSQ + ( ( ABS( S - D ) ) **2 ) / DENOM
                   NVAL = NVAL + 1
                END IF
-                 
+
             END IF
 
          END DO
       END DO
-         
+
 *  Return the normalised chi-squared.
       IF ( NVAL .GT. 0 ) THEN
          XSQ = XSQ / NVAL

@@ -61,7 +61,7 @@
       pchain[ 2 ] = ( chain >> 16 ) & 0xff;
       pchain[ 3 ] = ( chain >> 24 ) & 0xff;
       if( hds_gl_64bit )
-      {      
+      {
          pchain[ 4 ] = ( chain >> 32 ) & 0xff;
          pchain[ 5 ] = ( chain >> 40 ) & 0xff;
          pchain[ 6 ] = ( chain >> 48 ) & 0xff;

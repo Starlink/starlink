@@ -13,20 +13,20 @@
 *     SUBROUTINE
 
 *  Description:
-*     Initialise for this mode of operation, then wait for incoming 
-*     messages. When one is received, identify the CONTEXT (GET, SET, 
-*     OBEY, CANCEL or CONTROL) and pass the message information to the 
+*     Initialise for this mode of operation, then wait for incoming
+*     messages. When one is received, identify the CONTEXT (GET, SET,
+*     OBEY, CANCEL or CONTROL) and pass the message information to the
 *     corresponding routine.
-*     If at all possible, recover from any error conditions and revert 
+*     If at all possible, recover from any error conditions and revert
 *     to waiting for more messages.
 
 *  Algorithm:
 *     Find the name of the process running the program, and use the name
 *     while initialising into the ADAM message and parameter systems.
 *     Then loop receiving instructions and acting on them.
-*     Receipt of a GET/SET/OBEY/CANCEL/CONTROL command starts a new 
-*     "transaction", identified by MESSID. The transaction and its 
-*     associated communications are closed-down when this task returns 
+*     Receipt of a GET/SET/OBEY/CANCEL/CONTROL command starts a new
+*     "transaction", identified by MESSID. The transaction and its
+*     associated communications are closed-down when this task returns
 *     the final message for the GET/SET/OBEY/CANCEL/CONTROL.
 
 *  Copyright:
@@ -117,7 +117,7 @@
 *        Use DTASK_COMSHUT
 *     07-JUN-1991: move error reporting at end of task inside the DO
 *                  loop. Change comments, change AKEY to NAME
-*                  (REVAD::BDK) 
+*                  (REVAD::BDK)
 *     10-JUN-1991: rewrite message receiving and handling section
 *                  (REVAD::BDK)
 *     07-APR-1992 (RLVAD::BKM):
@@ -171,9 +171,9 @@
       INTEGER MSGSTATUS                 ! status of received message
       INTEGER CONTEXT                   ! GET, SET, OBEY, CANCEL or CONTROL
       INTEGER MSGLEN                    ! Length of message value
-      CHARACTER*( 2*SUBPAR__NAMELEN + 1 ) NAME       
-                                        ! action keyword for OBEY, CANCEL and 
-                                        ! CONTROL, parameter keyword for 
+      CHARACTER*( 2*SUBPAR__NAMELEN + 1 ) NAME
+                                        ! action keyword for OBEY, CANCEL and
+                                        ! CONTROL, parameter keyword for
                                         ! GET and SET
       CHARACTER*(MESSYS__VAL_LEN) VALUE     ! command line parameter string
       INTEGER PATH                      ! path to commanding process
@@ -198,7 +198,7 @@
          CALL ERR_REP ( ' ', '^STAT', STATUS )
       ELSE
 *
-*      Initialise intertask communication (MESSYS), parameter system 
+*      Initialise intertask communication (MESSYS), parameter system
 *      (SUBPAR) and tasking support library (TASK)
 *
          CALL DTASK_INIT ( MYNAME, NLENGTH, STATUS )
@@ -247,7 +247,7 @@
 *         Incoming GET/SET/OBEY/CANCEL/CONTROL
 *
             CALL DTASK_GSOC ( DTASK_APPLIC, PATH, MESSID, CONTEXT, NAME,
-     :        VALUE, STATUS ) 
+     :        VALUE, STATUS )
 * TEMPORARY call (and routine) to fix a compiler bug on Alpha/OSF (31/07/95)
             CALL DTASK_DECBUG
          ELSE IF ( MSGSTATUS .EQ. MESSYS__EXTINT )  THEN
@@ -261,19 +261,19 @@
 *
 *         A timer has expired
 *
-            CALL DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS ) 
+            CALL DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS )
 
          ELSE IF ( MSGSTATUS .EQ. MESSYS__ASTINT ) THEN
 *
 *         A message has arrived from an AST routine
 *
-            CALL DTASK_ASTINT ( DTASK_APPLIC, NAME, VALUE, STATUS ) 
+            CALL DTASK_ASTINT ( DTASK_APPLIC, NAME, VALUE, STATUS )
 
          ELSE IF ( MSGSTATUS .EQ. MESSYS__KICK ) THEN
 *
 *         A message has come from this application
 *
-            CALL DTASK_KICK ( DTASK_APPLIC, NAME, VALUE, STATUS ) 
+            CALL DTASK_KICK ( DTASK_APPLIC, NAME, VALUE, STATUS )
 
 
 *         On Unix MSP errors are negative and may be reported in MSGSTATUS
@@ -282,7 +282,7 @@
 *         Check if message is from a subsidiary task
 *
             CALL DTASK_SUBSID ( DTASK_APPLIC, PATH, MESSID, CONTEXT,
-     :        NAME, MSGSTATUS, VALUE, STATUS ) 
+     :        NAME, MSGSTATUS, VALUE, STATUS )
 
          ELSE
             STATUS = MSGSTATUS

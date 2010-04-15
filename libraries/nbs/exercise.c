@@ -203,7 +203,7 @@ nbc_define_structure (topsid,"dummy_name","dummy_type",&sid,&status);
 report (expect_notdefining,"nbc_define_structure");
 nbc_define_primitive (topsid,"dummy_name","dummy_type",0,0,&sid,&status);
 report (expect_notdefining,"nbc_define_primitive");
-nbc_define_shape (topsid,2,dims2,&status);         
+nbc_define_shape (topsid,2,dims2,&status);
 report (expect_notdefining,"nbc_define_shape");
 nbc_end_definition ("dummy_name","create_noticeboard",&status);
 report (expect_notdefining,"nbc_end_definition");
@@ -226,11 +226,11 @@ report (expect_defining,"nbc_begin_definition");
 
 /* Create a primitive to permit generating errors when attempt to hang	    */
 /* structures off it.							    */
-    
+
 nbc_define_primitive (topsid,"prim_name_1","prim_type_1",2,256,&primsid,
 								    &status);
 report (expect_ok,"nbc_define_primitive at start of definition");
-                       
+
 /******************************************************************************/
 /* NBC_DEFINE_STRUCTURE                                                       */
 /******************************************************************************/
@@ -281,7 +281,7 @@ report (expect_ok,"nbc_define_primitive prim_name_4");
 nbc_define_primitive (strucsid,"prim_name_5","prim_type_5",2,4,&primsid,
 								    &status);
 report (expect_ok,"nbc_define_primitive prim_name_5");
-                                   
+
 /* Trigger some errors by attempting to define a primitive below a nil sid  */
 /* and below a primitive.						    */
 
@@ -390,7 +390,7 @@ nbc_restore_noticeboard ("exercise_2n","exercise_2",&status);
 report (expect_datanotsaved,"nbc_restore_noticeboard e2n");
 nbc_restore_noticeboard ("exercise_3n","exercise_3",&status);
 report (expect_ok,"nbc_restore_noticeboard e3n");
-                           
+
 /******************************************************************************/
 /* NBC_FIND_NOTICEBOARD                                                       */
 /******************************************************************************/
@@ -777,7 +777,7 @@ if (function == report_open)
    {
    if (strcmp (message,"") != 0)
       {
-      file = freopen (message,"w",stdout);  
+      file = freopen (message,"w",stdout);
       if (!file)
          file = stdout;	/* Questionable?				    */
       }

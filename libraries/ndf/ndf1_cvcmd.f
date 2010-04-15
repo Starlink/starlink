@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_CVCMD( FORFIL, IFMT, NDFLOC, NDFNAM, FROM, REPORT, 
+      SUBROUTINE NDF1_CVCMD( FORFIL, IFMT, NDFLOC, NDFNAM, FROM, REPORT,
      :                       DEF, CMD, LCMD, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_CVCMD( FORFIL, IFMT, NDFLOC, NDFNAM, FROM, REPORT, 
+*     CALL NDF1_CVCMD( FORFIL, IFMT, NDFLOC, NDFNAM, FROM, REPORT,
 *                      DEF, CMD, LCMD, STATUS )
 
 *  Description:
@@ -44,7 +44,7 @@
 *     DEF = LOGICAL (Returned)
 *        .TRUE. if the requested conversion command is defined.
 *     CMD = CHARACTER * ( ) (Returned)
-*        The conversion command. The supplied character variable should be at 
+*        The conversion command. The supplied character variable should be at
 *        least NDF__SZCVT characters long.
 *     LCMD = INTEGER (Returned)
 *        Number of characters written to CMD.
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -199,7 +199,7 @@
             END IF
 
          END IF
-      END IF 
+      END IF
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_CVCMD', STATUS )

@@ -32,7 +32,7 @@
   10	type *, 'Enter number of images (ODD) per side (1-15) : '
 	read( 5, *) numside
 
-	if( numside .eq. 1 .or. 
+	if( numside .eq. 1 .or.
      :	    numside .eq. 3 .or.
      :	    numside .eq. 5 .or.
      :	    numside .eq. 7 .or.

@@ -118,7 +118,7 @@
          Ccd::labent $Frame11.direct -text Directory:
 
 #  Labelled entry for file filter
-      if { [llength $CCDimagefilters] > 1 } { 
+      if { [llength $CCDimagefilters] > 1 } {
          CCDCcdWidget Filefilter filefilter \
             Ccd::option $Frame11.filter -text "File Filter:"
       } else {
@@ -167,7 +167,7 @@
          {Select import control table from existing files...}\
          "global CCDimportfile
           global CCDimportexists
-	  global CCDimportfilter 
+	  global CCDimportfilter
           set CCDimportexists 0
 	  set CCDimportfilter \"*.DAT\"
           CCDGetFileName $Topwin.getnames {Select import control table} 0
@@ -210,7 +210,7 @@
       $Filefilter bind entry <Return> "$Choice invoke Filter; break"
 
 #  If needed add the options for the different foreign file formats.
-      if { [llength $CCDimagefilters] > 1 } { 
+      if { [llength $CCDimagefilters] > 1 } {
          foreach pair "$CCDimagefilters" {
             set name [lindex $pair 0]
             set type [lindex $pair 1]
@@ -384,7 +384,7 @@
       }
 
 #  Invoke the filter button to get first setup.
-      if { [llength $CCDimagefilters] > 1 } { 
+      if { [llength $CCDimagefilters] > 1 } {
          $Filefilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
       } else {
          $Filefilter insert 0 "$CCDimagefilters"

@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_GET_MJD(N_FITS, FITS, LST_REF, MJD, EPOCH, 
+      SUBROUTINE SCULIB_GET_MJD(N_FITS, FITS, LST_REF, MJD, EPOCH,
      :     STARTUP_TIME, STATUS)
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_GET_MJD(N_FITS, FITS, LST_REF, MJD, EPOCH, 
+*     CALL SCULIB_GET_MJD(N_FITS, FITS, LST_REF, MJD, EPOCH,
 *    :      STARTUP_TIME, STATUS)
 
 *  Description:
@@ -20,7 +20,7 @@
 *     time taken before beginning the observation by comparing the
 *     LST stored in the header (written when the observation begins and
 *     before the telescope gets on source) and the reference LST supplied to
-*     the routine (which is assumed to be the LST when the data acquisition 
+*     the routine (which is assumed to be the LST when the data acquisition
 *     starts).
 
 *  Arguments:
@@ -30,7 +30,7 @@
 *        FITS values
 *     LST_REF = DOUBLE PRECISION (Given)
 *        Reference LST. This is the LST at which data acquisition
-*        begins. The MJD should be calculated for the start of 
+*        begins. The MJD should be calculated for the start of
 *        data taking rather than the time the telescope begain its
 *        slew. This number is normally read from the LST_STRT array
 *        and should be in radians. If a negative value or a zero
@@ -55,13 +55,13 @@
 *        Global status
 
 *  Notes:
-*     Uses the UTDATE and UTSTART and STSTART FITS headers. 
+*     Uses the UTDATE and UTSTART and STSTART FITS headers.
 *     These must be present.
 *     - The date must be stored in UTDATE in format YYYY:M:D
 *     - The time must be stored in UTSTART in format HH:MM:SS.SS
 *     - The MJD is calculated for the start of data taking rather
 *     than simply using the values stored in UTSTART. This is because
-*     there is always a delay between writing the FITS headers and 
+*     there is always a delay between writing the FITS headers and
 *     taking data.
 
 *  Authors:
@@ -87,9 +87,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,15 +153,15 @@
       STARTUP_TIME = 0.0
 
 *     Read fits values
-      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :     'UTDATE', UTDATE, STATUS)
-      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :     'UTSTART', UTSTART, STATUS)
 
       IF (CORRECT_SLEW) THEN
 *     =============== CALCULATE SLEW CORRECTION ===================
 
-         CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+         CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :        'STSTART', STSTART, STATUS)
          CALL SCULIB_DECODE_ANGLE(STSTART, LST_HDR, STATUS)
 
@@ -209,7 +209,7 @@
          ISTART = 1
          IEND = INDEX (UTSTART,':')
          IEND = MAX (ISTART,IEND)
-         CALL CHR_CTOI (UTSTART (ISTART:IEND-1), IHOUR, 
+         CALL CHR_CTOI (UTSTART (ISTART:IEND-1), IHOUR,
      :        CHR_STATUS)
          UTSTART (IEND:IEND) = ' '
          ISTART = IEND + 1

@@ -35,7 +35,7 @@
 *     choices of alignment types where first choices are not
 *     available.
 *
-*     The application operates on a set of NDFs, IN.  A list of 
+*     The application operates on a set of NDFs, IN.  A list of
 *     domains DOMAINS within which to align, in order of preference,
 *     is specified, and a reference NDF is denoted by REFPOS.  On
 *     successful completion, a new coordinate frame (which becomes
@@ -59,12 +59,12 @@
 *
 *     If the USESET parameter is true, then WCSREG will take account
 *     of alignment information stored in the CCDPACK Set header;
-*     this means that the alignment implied when images were 
+*     this means that the alignment implied when images were
 *     previously grouped into a Set can be guaranteed to be retained.
 *
 *     If the graph is not fully connected, a list of the existing
 *     subgraphs is output, and the program will normally terminate,
-*     however it can be made to continue with registration of the 
+*     however it can be made to continue with registration of the
 *     connected NDFs by setting the OVERRIDE parameter.
 
 *  Usage:
@@ -72,8 +72,8 @@
 
 *  ADAM Parameters:
 *     DOMAINS( * ) = LITERAL (Read)
-*        This parameter should be a list of frame domains, in order 
-*        of preference for achieving alignment.  Alignment paths 
+*        This parameter should be a list of frame domains, in order
+*        of preference for achieving alignment.  Alignment paths
 *        between NDFs are selected by shortness of path, but in case
 *        of a tie, those using domains nearest the start of this list
 *        are used by preference.  You should not normally include the
@@ -138,7 +138,7 @@
 *        [wcsreg.lis]
 *     OUTDOMAIN = LITERAL (Read)
 *        This gives the name of the domain for the new frame which is
-*        added to the WCS components of the NDFs on successful 
+*        added to the WCS components of the NDFs on successful
 *        completion.  If any frames in the same domain previously exist
 *        in the WCS component, they are removed.  The name is converted
 *        to upper case, and whitespace is removed.
@@ -149,7 +149,7 @@
 *        form connectable subsets of the IN list.  In this case, if this
 *        parameter is set FALSE, then the application will exit with an
 *        error message.  If it is set TRUE however, it will continue and
-*        insert new frames in those NDFs which can be reached from the 
+*        insert new frames in those NDFs which can be reached from the
 *        one indicated by REFPOS, making no change to the others, except
 *        to remove any frames in the domain OUTDOMAIN which already exist.
 *
@@ -158,26 +158,26 @@
 *        false, then it will be the same as IN unless the program fails).
 *        [FALSE]
 *     REFPOS = _INTEGER (Read)
-*        The position within the IN list which corresponds to the 
-*        reference NDF.  The registration frame is a copy of (and 
+*        The position within the IN list which corresponds to the
+*        reference NDF.  The registration frame is a copy of (and
 *        unitmapped to) the pixel frame of the reference NDF,
 *        and for each other NDF the program tries to find a path from
 *        it to the reference NDF going from one NDF to another only
 *        when they both have frames in the same one of the entries in
-*        the DOMAINS list. 
+*        the DOMAINS list.
 *        [1]
 *     USESET = _LOGICAL (Read)
-*        This parameter governs whether Set-based alignment 
-*        information in the NDFs, if it exists, should be used. 
-*        If it is set to true, then coordinate frames with the 
-*        domain CCD_SET will take precedence over all the ones named 
+*        This parameter governs whether Set-based alignment
+*        information in the NDFs, if it exists, should be used.
+*        If it is set to true, then coordinate frames with the
+*        domain CCD_SET will take precedence over all the ones named
 *        in the DOMAINS parameter.  In this case, if two of the NDFs
 *        both have a CCD_SET coordinate frame and also share the
 *        same Set Name attribute, the connection will be made in
 *        CCD_SET frame.  If no CCD_SET frames are present, this
 *        parameter has no effect.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 
@@ -200,7 +200,7 @@
 *        After this process, the NDFs can be presented to TRANNDF for
 *        resampling prior to making a mosaic.
 *
-*     wcsreg "obs1_*,obs2_*" outdomain=final 
+*     wcsreg "obs1_*,obs2_*" outdomain=final
 *            domains=[ccd_reg,inst_obs1,inst_obs2]
 *        NDFs with names starting 'obs1_' and 'obs2_' are aligned.
 *        Where they share CCD_REG coordinates this will be used for
@@ -213,7 +213,7 @@
 *
 *     wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 domains=!
 *        Here wcsreg is being used with a somewhat different intent.
-*        The images named are already fully aligned in their 
+*        The images named are already fully aligned in their
 *        current coordinates but executing this command has the effect of
 *        aligning them in a new coordinate system which is a copy of
 *        the pixel coordinate system of 'skyfr2'.  Since this has
@@ -221,7 +221,7 @@
 *        are suitable for resampling using TRANNDF.  Supposing that
 *        they were originally aligned in SKY coordinates they could
 *        not have been resampled by TRANNDF in their initial state,
-*        since the SKY coordinates have units of radians, which 
+*        since the SKY coordinates have units of radians, which
 *        are much too large compared to pixels.
 
 *  Behaviour of Parameters:
@@ -312,7 +312,7 @@
       INTEGER FRM                ! AST pointer to frame
       INTEGER I                  ! Loop variable
       INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers for input NDFs
-      INTEGER INGRP              ! GRP identifier for group IN 
+      INTEGER INGRP              ! GRP identifier for group IN
       INTEGER IPGRA              ! Pointer to graph array
       INTEGER IPWK1              ! Pointer to workspace array
       INTEGER IPWK2              ! Pointer to workspace array
@@ -373,7 +373,7 @@
          CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
  6    CONTINUE
       CALL CCD1_MSG( ' ', ' ', STATUS )
- 
+
 *  Determine whether we are to use Set header alignment information.
       CALL PAR_GET0L( 'USESET', USESET, STATUS )
 
@@ -393,7 +393,7 @@
       IF ( REFPOS .GT. NNDF .OR. REFPOS .LT. 1 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NNDF', NNDF )
-         CALL ERR_REP( 'WCSREG_BADREFPOS', 
+         CALL ERR_REP( 'WCSREG_BADREFPOS',
      :    'WCSREG: REFPOS must be in the range 1 to ^NNDF.', STATUS )
          GO TO 99
       END IF
@@ -432,14 +432,14 @@
       CALL CHR_RMBLK( OUTDM )
       CALL CHR_UCASE( OUTDM )
 
-*  Encode the list of domains as a comma-separated list in a single 
+*  Encode the list of domains as a comma-separated list in a single
 *  string.
       CALL CCD1_DLCAT( DMNS, NDMN, ',', DMNLST, STATUS )
 
 *  Report an error if the domain list is empty.
       IF ( DMNLST .EQ. ' ' .OR. STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'WCSREG_NODMNS', 
+         CALL ERR_REP( 'WCSREG_NODMNS',
      :        'WCSREG: Invalid domain list was specified.', STATUS )
          GO TO 99
       END IF
@@ -448,12 +448,12 @@
 *  It takes the value of the frameset's initial PIXEL-domain frame.
       CALL CCD1_FRDM( IWCS( REFPOS ), 'PIXEL', JREF, STATUS )
 
-*  Construct the output registration frame as a doctored copy of the 
+*  Construct the output registration frame as a doctored copy of the
 *  reference frame of the reference NDF.
       OUTFR = AST_COPY( AST_GETFRAME( IWCS( REFPOS ), JREF, STATUS ),
      :                  STATUS )
       CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
-      CALL AST_SETC( OUTFR, 'Domain', OUTDM( 1:CHR_LEN( OUTDM ) ), 
+      CALL AST_SETC( OUTFR, 'Domain', OUTDM( 1:CHR_LEN( OUTDM ) ),
      :               STATUS )
 
 *  Check that the reference NDF has at least one frame in the supplied
@@ -462,14 +462,14 @@
      :                     DMNLST, STATUS )
       IF ( FRM .EQ. AST__NULL ) THEN
 
-*  No frame with a domain in the domain list could be found in the 
+*  No frame with a domain in the domain list could be found in the
 *  reference NDF.  Output error message and exit with error status.
          CALL MSG_SETC( 'DMNLST', DMNLST )
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'WCSREG_NOREFDMN', 
+         CALL ERR_REP( 'WCSREG_NOREFDMN',
      : 'WCSREG: No frame in any of the domains ^DMNLST', STATUS )
          CALL NDF_MSG( 'IRNDF', INDF( REFPOS ) )
-         CALL ERR_REP( ' ', 
+         CALL ERR_REP( ' ',
      : '        could be found in the reference NDF ^IRNDF.', STATUS )
          GO TO 99
       END IF
@@ -478,7 +478,7 @@
       CALL AST_SETI( IWCS( REFPOS ), 'Current', JREF, STATUS )
 
 *  Treat the trivial case of a single NDF to be aligned specially.
-*  In this case no graph is constructed, but CCD1_GRPTH doesn't 
+*  In this case no graph is constructed, but CCD1_GRPTH doesn't
 *  actually use it for a path from one node to itself.
       IF ( NNDF .EQ. 1 ) THEN
          COMPL = .TRUE.
@@ -499,10 +499,10 @@
          CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK4, STATUS )
 
 *  Check the graph for completeness and report accordingly.
-         CALL CCD1_GRREP( %VAL( CNF_PVAL( IPGRA ) ), 
+         CALL CCD1_GRREP( %VAL( CNF_PVAL( IPGRA ) ),
      :                    NEDGE, NNDF, REFPOS,
-     :                    %VAL( CNF_PVAL( IPWK1 ) ), 
-     :                    %VAL( CNF_PVAL( IPWK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPWK1 ) ),
+     :                    %VAL( CNF_PVAL( IPWK2 ) ),
      :                    %VAL( CNF_PVAL( IPWK3 ) ),
      :                    %VAL( CNF_PVAL( IPWK4 ) ), COMPL, STATUS )
 
@@ -519,7 +519,7 @@
          CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
          IF ( .NOT. OVERRD ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'WCSREG_NOCOMPL', 
+            CALL ERR_REP( 'WCSREG_NOCOMPL',
      :'WCSREG: Graph incomplete: ' //
      :'not all the NDFs could be linked by WCS components.', STATUS )
             GO TO 99
@@ -542,12 +542,12 @@
 
 *  Find the best path through the graph from the Current frame of this
 *  frameset to the reference frame in the reference frameset.
-         CALL CCD1_GRPTH( %VAL( CNF_PVAL( IPGRA ) ), 
+         CALL CCD1_GRPTH( %VAL( CNF_PVAL( IPGRA ) ),
      :                    NEDGE, I, REFPOS, WORK, WORK2,
      :                    PATH, NSTEP( I ), STATUS )
 
 *  Check whether a successful path was found.
-         IF ( NSTEP( I ) .GT. 0 ) THEN 
+         IF ( NSTEP( I ) .GT. 0 ) THEN
 
 *  Use the path through the graph to find the mapping.
             CALL CCD1_PTHMP( IWCS, PATH, NSTEP( I ), DMNS, MAP, STATUS )
@@ -579,7 +579,7 @@
             WCSOUT = IWCS( I )
 
 *  Output failure message.
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      : '        ** No alignment path to reference NDF could be found',
      :                     STATUS )
          END IF
@@ -587,7 +587,7 @@
 *  Purge the frameset of any pre-existing frames in the output domain.
          CALL CCD1_DMPRG( WCSOUT, OUTDM, .TRUE., JNEW, STATUS )
 
-*  Ensure the output frameset has a Base frame in the GRID domain 
+*  Ensure the output frameset has a Base frame in the GRID domain
 *  (otherwise the NDF system will complain).
          CALL AST_SETI( WCSOUT, 'Base', 1, STATUS )
 
@@ -597,7 +597,7 @@
  4    CONTINUE
 
 *  Write the names of the successfully registered NDFs to a list.
-      CALL CCD1_LNAMM( 'NAMELIST', 1, NNDF, 
+      CALL CCD1_LNAMM( 'NAMELIST', 1, NNDF,
      :                 '# WCSREG - successfully registered NDF list',
      :                 INGRP, NSTEP, .TRUE., STATUS )
 
@@ -624,6 +624,6 @@
 
 *  Close down logging system.
       CALL CCD1_END( STATUS )
-      
+
       END
 * $Id$

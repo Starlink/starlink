@@ -1,5 +1,5 @@
-      SUBROUTINE NDF1_WPLIM( IWCS, NAX, LBNDD, UBNDD, VALUE1, VALUE2, 
-     :                       ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2, 
+      SUBROUTINE NDF1_WPLIM( IWCS, NAX, LBNDD, UBNDD, VALUE1, VALUE2,
+     :                       ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2,
      :                       LBND, UBND, STATUS )
 *+
 *  Name:
@@ -13,12 +13,12 @@
 
 *  Invocation:
 *     CALL NDF1_WPLIM( IWCS, NAX, LBNDD, UBNDD, VALUE1, VALUE2, ISPIX1,
-*                      ISPIX2, ISBND, ISDEF1, ISDEF2, LBND, UBND, 
+*                      ISPIX2, ISBND, ISDEF1, ISDEF2, LBND, UBND,
 *                      STATUS )
 
 *  Description:
 *     This routine accepts values which have been supplied as either
-*     pixel indices or WCS axis values in a NDF section specification, 
+*     pixel indices or WCS axis values in a NDF section specification,
 *     and calculates the corresponding NDF pixel-index bounds.
 
 *  Arguments:
@@ -31,16 +31,16 @@
 *     UBNDD( * ) = INTEGER (Given)
 *        Upper pixel index bounds for the NDF.
 *     VALUE1( NAX ) = DOUBLE PRECISION (Given)
-*        First value specifying the bound on each axis. 
+*        First value specifying the bound on each axis.
 *     VALUE2( NAX ) = DOUBLE PRECISION (Given)
-*        Second value specifying the bound on each axis. 
+*        Second value specifying the bound on each axis.
 *     ISPIX1( NAX ) = LOGICAL (Given)
 *        Whether VALUE1 is a pixel index (as opposed to a WCS value).
 *     ISPIX2( NAX ) = LOGICAL (Given)
 *        Whether VALUE2 is a pixel index (as opposed to a WCS value).
 *     ISBND( NAX ) = LOGICAL (Given)
 *        Whether VALUE1 and VALUE2 specify the lower and upper bounds
-*        directly (as opposed to specifying the centre and width). 
+*        directly (as opposed to specifying the centre and width).
 *     ISDEF1( NAX ) = LOGICAL (Given)
 *        Is the value supplied VALUE1 a default value?
 *     ISDEF2( NAX ) = LOGICAL (Given)
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     1-JUN-2007 (DSB):
 *        Original version.
 *     6-JUN-2007 (DSB):
-*        Correct conversion of pixel index "centre/width" values to 
+*        Correct conversion of pixel index "centre/width" values to
 *        upper/lower bounds. Also report an error if there is no overlap
 *        between the pixel and WCS boxes. Also, do not clip the supplied
 *        WCS box at the edges of hte NDF if no pixel limits were given.
@@ -108,7 +108,7 @@
 *        Avoid integer truncation when modifying pixel coordinate bounds.
 *     30-OCT-2009 (DSB):
 *        Changed to accomodate taking a 2D section from a 3D NDF in cases
-*        where the bounds on each of the two axes are specified using WCS 
+*        where the bounds on each of the two axes are specified using WCS
 *        values.
 *     20-NOV-2009 (DSB):
 *        Correct conversion from pixel coords bounds to pixel index
@@ -119,13 +119,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'PRM_PAR'          ! VAL_ constants
@@ -191,7 +191,7 @@
       INTEGER PNAX1
       INTEGER PNAX2
       INTEGER PPERM( NDF__MXDIM )
-      INTEGER TEMP                   
+      INTEGER TEMP
       INTEGER WBOX
       INTEGER WBOXP
       INTEGER WNAX1
@@ -206,15 +206,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Begin an AST context. 
+*  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the pixel->WCS Mapping. Note, the PIXEL Frame is always index 2.
       FSMAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
 
 *  Split this Mapping up into two parallel Mappings, one of which (MAP1)
-*  contains those inputs/outputs that have defined inverse transformations, 
-*  and the other of which (MAP2) contains those inputs/outputs that have no 
+*  contains those inputs/outputs that have defined inverse transformations,
+*  and the other of which (MAP2) contains those inputs/outputs that have no
 *  inverse transformations (either of these Mappings may be AST__NULL). In
 *  addition this returns a Mapping (MAP) that is equivalent to the supplied
 *  pixel->WCS Mapping except that it will always have a defined inverse
@@ -224,7 +224,7 @@
 *  the component Mappings.
       CALL NDF1_MPSPT( FSMAP, MAP, MAP1, MAP2, PPERM, WPERM, STATUS )
 
-*  Invert the Mappings so that their forward transformation goes from the 
+*  Invert the Mappings so that their forward transformation goes from the
 *  current Frame to the pixel Frame. Check that we are inverting a
 *  different Mapping each time, to avoid inverting the same Mapping twice.
       CALL AST_INVERT( MAP, STATUS )
@@ -251,14 +251,14 @@
 
 *  Initialise a box that encloses the required section of WCS space.
       DO I = 1, NWCS
-         WLBND( I ) = AST__BAD    
-         WUBND( I ) = AST__BAD    
+         WLBND( I ) = AST__BAD
+         WUBND( I ) = AST__BAD
       END DO
 
 *  Initialise a box that encloses the required section of PIXEL space.
       DO I = 1, NPIX
          DLBNDD( I ) = DBLE( LBNDD( I ) ) - 1.0D0
-         DUBNDD( I ) = DBLE( UBNDD( I ) ) 
+         DUBNDD( I ) = DBLE( UBNDD( I ) )
          PLBND( I ) = DLBNDD( I )
          PUBND( I ) = DUBNDD( I )
       END DO
@@ -286,14 +286,14 @@
                   CENPIX( J ) = 0.5*( UBNDD( I ) + LBNDD( I ) - 1 )
                END DO
 
-               CALL AST_TRANN( MAP, 1, NAX, 1, CENPIX, .FALSE., NWCS, 
+               CALL AST_TRANN( MAP, 1, NAX, 1, CENPIX, .FALSE., NWCS,
      :                         1, CENWCS, STATUS )
 
             END IF
 
             VALUE1( I ) = CENWCS( I )
             ISPIX1( I ) = .FALSE.
-            
+
          END IF
       END DO
 
@@ -305,11 +305,11 @@
       MIXED = .FALSE.
 
 *  We now set up the bounds of two boxes; PLBND/PUBND hold the bounds of
-*  a box in PIXEL coordinates, and WLBND/WUBND hold the bounds of a box 
+*  a box in PIXEL coordinates, and WLBND/WUBND hold the bounds of a box
 *  in WCS current Frame coordinates. Both boxes have edges parallel to
-*  their respective coordinate axes. Any WCS bounds in the supplied 
+*  their respective coordinate axes. Any WCS bounds in the supplied
 *  VALUE1/VALUE2 arrays are used to set the bounds of the corresponding
-*  axes of the WCS box. Any pixel index bounds in the supplied 
+*  axes of the WCS box. Any pixel index bounds in the supplied
 *  VALUE1/VALUE2 arrays are used to set the bounds of the corresponding
 *  axes of the PIXEL box. If any axis has no bounds then defaults are
 *  used that encompass the whole NDF. For PIXEL axes these default bounds
@@ -353,7 +353,7 @@
 
 *  Do the same for the upper bound.
             IF( ISPIX2( I ) ) THEN
-               PUBND( I ) = VALUE2( I ) 
+               PUBND( I ) = VALUE2( I )
             ELSE
                IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
                   STATUS = NDF__BNDIN
@@ -396,8 +396,8 @@
                   GO TO 999
                ELSE
                   DELTA = 0.5*VALUE2( I )
-                  PLBND( I ) = DLBNDD( I ) 
-                  PUBND( I ) = DUBNDD( I ) 
+                  PLBND( I ) = DLBNDD( I )
+                  PUBND( I ) = DUBNDD( I )
                   WLBND( I ) = VALUE1( I ) - DELTA
                   WUBND( I ) = VALUE1( I ) + DELTA
                   ALLPIX = .FALSE.
@@ -426,13 +426,13 @@
                WLBND( I ) = VALUE1( I )
 
 *  Use defaults for the upper and lower bounds of the pixel box.
-               PLBND( I ) = DLBNDD( I ) 
-               PUBND( I ) = DUBNDD( I ) 
+               PLBND( I ) = DLBNDD( I )
+               PUBND( I ) = DUBNDD( I )
             END IF
 
 *  If the bounds for this axis are specified by centre and width, and the
 *  centre is a pixel value but the the width is a WCS value...
-         ELSE 
+         ELSE
             IF( I .GT. NWCS .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = NDF__BNDIN
                CALL MSG_SETI( 'I', I )
@@ -464,21 +464,21 @@ c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NWCS)
 c      write(*,*) '   '
 
 *  If any centre/values bounds were specified in which the centre is
-*  given as a pixel value and the width as a WCS value, then we need 
-*  to convert the centre into a WCS value, so that we can get upper 
-*  and lower bounds. We need to do this before we find the default WCS 
+*  given as a pixel value and the width as a WCS value, then we need
+*  to convert the centre into a WCS value, so that we can get upper
+*  and lower bounds. We need to do this before we find the default WCS
 *  bounds since the WCS bounds depend on the pixel box.
       IF( MIXED ) THEN
          ALLPIX = .TRUE.
          MIXED = .FALSE.
-         
+
 *  Find the central positions in the pixel box.
          DO I = 1, NAX
             CENPIX( I ) = 0.5*( PLBND( I ) + PUBND( I ) )
          END DO
 
 *  Convert to WCS.
-         CALL AST_TRANN( MAP, 1, NPIX, 1, CENPIX, .FALSE., NWCS, 1, 
+         CALL AST_TRANN( MAP, 1, NPIX, 1, CENPIX, .FALSE., NWCS, 1,
      :                   CENWCS, STATUS )
 
 *  Rescan the supplied bounds looking for mixed mode centre/value  bounds.
@@ -504,15 +504,15 @@ c      write(*,*) '   '
                      ALLPIX = .FALSE.
 
 *  Store default bounds for the pixel box on this axis.
-                     PLBND( I ) = DLBNDD( I ) 
-                     PUBND( I ) = DUBNDD( I ) 
-                     
+                     PLBND( I ) = DLBNDD( I )
+                     PUBND( I ) = DUBNDD( I )
+
 *  If the centre was originally a WCS value, we have some WCS bounds.
                   ELSE
                      ALLPIX = .FALSE.
-                  END IF                     
+                  END IF
 
-*  If the width is a pixel value and the centre is a WCS value, we still 
+*  If the width is a pixel value and the centre is a WCS value, we still
 *  have a mixed mode bounds including WCS limits.
                ELSE IF( .NOT. ISPIX1( I ) ) THEN
                   ALLPIX = .FALSE.
@@ -542,15 +542,15 @@ c      write(*,*) '   '
 
 *  Indicate that we have not yet found any pixel index bounds
          ALLWCS = .TRUE.
-   
+
 *  Ensure the WCS box is complete by replacing any AST__BAD values by the
-*  appropriate limit that encompasses the whole pixel box. Check each WCS 
+*  appropriate limit that encompasses the whole pixel box. Check each WCS
 *  axis.
          DO I = 1, NWCS
 
 *  Pass on to the next axis if this WCS axis already has upper and lower
 *  bounds.
-            IF( WLBND( I ) .EQ. AST__BAD .OR. 
+            IF( WLBND( I ) .EQ. AST__BAD .OR.
      :          WUBND( I ) .EQ. AST__BAD ) THEN
 
 *  Indicate that at least one axis was specified by pixel index bounds.
@@ -567,7 +567,7 @@ c      write(*,*) '   '
                JJ = 0
                DO J = 1, NPIX
 
-                  IF( XU( J ) .NE. AST__BAD .AND. 
+                  IF( XU( J ) .NE. AST__BAD .AND.
      :                XL( J ) .NE. AST__BAD ) THEN
 
                      PRANGE = ABS( XU( J ) - XL( J ) )
@@ -580,13 +580,13 @@ c      write(*,*) '   '
                END DO
 
 *  Whether a WCS value is a "lower" or "upper" bound is determined not by
-*  the WCS values themselves but by which one gives the lower or upper 
+*  the WCS values themselves but by which one gives the lower or upper
 *  value on the corresponding pixel axis. Use this criterion to fill in
 *  values for which ever WCS bound has not been supplied.
                IF( WLBND( I ) .EQ. AST__BAD .AND. JJ .GT. 0 ) THEN
                   IF( XL( JJ ) .LT. XU( JJ ) ) THEN
                      WLBND( I ) = V1
-                  ELSE 
+                  ELSE
                      WLBND( I ) = V2
                   END IF
                END IF
@@ -594,7 +594,7 @@ c      write(*,*) '   '
                IF( WUBND( I ) .EQ. AST__BAD  .AND. JJ .GT. 0 ) THEN
                   IF( XL( JJ ) .GT. XU( JJ ) ) THEN
                      WUBND( I ) = V1
-                  ELSE 
+                  ELSE
                      WUBND( I ) = V2
                   END IF
                END IF
@@ -602,7 +602,7 @@ c      write(*,*) '   '
 
 *  The AST Box class knows nothing about axis normalisation. To avoid
 *  problems ensure that the upper and lower axis values are in the same
-*  "cycle". This applied particularly to RA values where the lower limit 
+*  "cycle". This applied particularly to RA values where the lower limit
 *  may have a value of (say) 359 degrees and the upper limit be (say) 2
 *  degrees. In this example the following code converts the upper limit
 *  to 361 degrees.
@@ -612,8 +612,8 @@ c      write(*,*) '   '
 
          END DO
 
-*  If any centre/width bounds remain in which the centre is a WCS value 
-*  and the width is a pixel value, then we need to convert them into 
+*  If any centre/width bounds remain in which the centre is a WCS value
+*  and the width is a pixel value, then we need to convert them into
 *  upper and lower bounds now, since this will not have been done earlier.
          IF( MIXED ) THEN
             ALLPIX = .TRUE.
@@ -624,7 +624,7 @@ c      write(*,*) '   '
             END DO
 
 *  Convert to pixel.
-            CALL AST_TRANN( MAP, 1, NWCS, 1, CENWCS, .TRUE., NPIX, 1, 
+            CALL AST_TRANN( MAP, 1, NWCS, 1, CENWCS, .TRUE., NPIX, 1,
      :                      CENPIX, STATUS )
 
 *  Rescan the supplied bounds looking for mixed mode centre/value  bounds.
@@ -642,7 +642,7 @@ c      write(*,*) '   '
                         IF( CENPIX( I ) .NE. AST__BAD ) THEN
                            ISPIX1( I ) = .TRUE.
                            VALUE1( I ) = CENPIX( I )
-   
+
                            DELTA = VALUE2( I )/2.0D0
                            PLBND( I ) = VALUE1( I ) - DELTA
                            PUBND( I ) = PLBND( I ) + VALUE2( I )
@@ -658,7 +658,7 @@ c                           PUBND( I ) = PLBND( I ) + VALUE2( I )
      :                   ' section are invalid.', STATUS )
 
                         END IF
-                     ELSE 
+                     ELSE
                         ALLPIX = .FALSE.
                      END IF
 
@@ -694,7 +694,7 @@ c      write(*,*) '   '
             END IF
 
 *  Define an AST Box within the subset of WCS axes that have an inverse
-*  transformation, using the bounds stored in WLBND/WUBND. we will use the 
+*  transformation, using the bounds stored in WLBND/WUBND. we will use the
 *  inverse transformation below to convert the box from WCS to pixel coords.
             WNAX1 = AST_GETI( MAP1, 'Nin', STATUS )
             DO I = 1, WNAX1
@@ -702,12 +702,12 @@ c      write(*,*) '   '
                WUBND1( I ) = WUBND( WPERM( I ) )
             END DO
             CFRM1 = AST_PICKAXES( CFRM, WNAX1, WPERM, JUNK, STATUS )
-            WBOX = AST_BOX( CFRM1, 1, WLBND1, WUBND1, AST__NULL, ' ', 
+            WBOX = AST_BOX( CFRM1, 1, WLBND1, WUBND1, AST__NULL, ' ',
      :                      STATUS )
 
 *  Map this region into the PIXEL Frame (we know that this will work
 *  since we have selected the axes that have the required inverse
-*  transformation). The resulting Region will (in general) be a rotated 
+*  transformation). The resulting Region will (in general) be a rotated
 *  box with curvi-linear edges.
             PNAX1 = AST_GETI( MAP1, 'Nout', STATUS )
             PFRM = AST_FRAME( PNAX1, 'Domain=PIXEL', STATUS )
@@ -729,22 +729,22 @@ c      write(*,*) '   '
                END DO
 
                PFRM = AST_FRAME( PNAX2, 'Domain=PIXEL', STATUS )
-               INTERV = AST_INTERVAL( PFRM, PLBND2, PUBND2, AST__NULL, 
+               INTERV = AST_INTERVAL( PFRM, PLBND2, PUBND2, AST__NULL,
      :                                ' ', STATUS )
                WBOXP = AST_PRISM( WBOXP, INTERV, ' ', STATUS )
 
             END IF
 
-*  Re-arrange the axes so that they correspond to the original order of pixel 
+*  Re-arrange the axes so that they correspond to the original order of pixel
 *  axes.
             CALL AST_PERMAXES( WBOXP, PPERM, STATUS )
 
-*  If all bounds were specified as WCS  values, find the bounds (in 
-*  PIXEL coords) of the above Box, and store in PLBND/PUBND. 
+*  If all bounds were specified as WCS  values, find the bounds (in
+*  PIXEL coords) of the above Box, and store in PLBND/PUBND.
             IF( ALLWCS ) THEN
                CALL AST_GETREGIONBOUNDS( WBOXP, PLBND, PUBND, STATUS )
 
-*  Otherwise, we restrict the returned section to the overlap of the WCS 
+*  Otherwise, we restrict the returned section to the overlap of the WCS
 *  and PIXEL boxes.
             ELSE
 
@@ -753,17 +753,17 @@ c      write(*,*) '   '
 *  unlimited.
                DO I = 1, NAX
                   IF( ISBND( I ) ) THEN
-                     IF( ISDEF1( I ) .OR. .NOT. ISPIX1( I ) ) 
+                     IF( ISDEF1( I ) .OR. .NOT. ISPIX1( I ) )
      :                                             PLBND( I ) = AST__BAD
-                     IF( ISDEF2( I ) .OR. .NOT. ISPIX2( I ) ) 
+                     IF( ISDEF2( I ) .OR. .NOT. ISPIX2( I ) )
      :                                             PUBND( I ) = AST__BAD
                   END IF
                END DO
 
-*  Define an AST Interval within the PIXEL Frame, using the bounds stored 
+*  Define an AST Interval within the PIXEL Frame, using the bounds stored
 *  in PLBND/PUBND.
                PFRM = AST_FRAME( NPIX, 'Domain=PIXEL', STATUS )
-               PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
+               PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ',
      :                              STATUS )
 
 c      write(*,*) 'F:'
@@ -775,11 +775,11 @@ c      write(*,*) '   '
 
 *  Now form a compound region that is the intersection of the two aboves
 *  Boxes (both now defined in the PIXEL Frame).
-               CMPREG = AST_CMPREGION( PBOX, WBOXP, AST__AND, ' ', 
+               CMPREG = AST_CMPREGION( PBOX, WBOXP, AST__AND, ' ',
      :                                 STATUS )
 
 *  Find the bounds (in PIXEL coords) of the compound Region, and store in
-*  PLBND/PUBND. 
+*  PLBND/PUBND.
                CALL AST_GETREGIONBOUNDS( CMPREG, PLBND, PUBND, STATUS )
 
 c      write(*,*) 'G:'
@@ -819,30 +819,30 @@ c      write(*,*) '   '
                PUBND( I ) = TEMP
             END IF
 
-*  Select the index of the pixel that contains the PUBND value. If PUBND is 
-*  exactly integer, the axis value is considered to be the upper edge of the 
+*  Select the index of the pixel that contains the PUBND value. If PUBND is
+*  exactly integer, the axis value is considered to be the upper edge of the
 *  upper bound.
-            INTPRT = INT( PUBND( I ) ) 
-            IF( ABS( PUBND( I ) - DBLE( INTPRT ) ) .LT. 
+            INTPRT = INT( PUBND( I ) )
+            IF( ABS( PUBND( I ) - DBLE( INTPRT ) ) .LT.
      :          100*VAL__EPSD ) THEN
                UBND( I ) = INTPRT
             ELSE IF( PUBND( I ) .GT. 0.0 ) THEN
                UBND( I ) = INTPRT + 1
-            ELSE 
-               UBND( I ) = INTPRT 
+            ELSE
+               UBND( I ) = INTPRT
             END IF
 
-*  Select the index of the pixel that contains the PLBND value. If PLBND is 
-*  exactly integer, the axis value is considered to be the lower edge of the 
-*  lower bound. 
-            INTPRT = INT( PLBND( I ) ) 
-            IF( ABS( PLBND( I ) - DBLE( INTPRT ) ) .LT. 
+*  Select the index of the pixel that contains the PLBND value. If PLBND is
+*  exactly integer, the axis value is considered to be the lower edge of the
+*  lower bound.
+            INTPRT = INT( PLBND( I ) )
+            IF( ABS( PLBND( I ) - DBLE( INTPRT ) ) .LT.
      :          100*VAL__EPSD ) THEN
                LBND( I ) = INTPRT + 1
             ELSE IF( PLBND( I ) .GT. 0.0 ) THEN
                LBND( I ) = INTPRT + 1
-            ELSE 
-               LBND( I ) = INTPRT 
+            ELSE
+               LBND( I ) = INTPRT
             END IF
 
 *  Ensure that any supplied pixel bounds are honoured exactly.
@@ -858,23 +858,23 @@ c      write(*,*) '   '
                NEXTRA = VALUE2( I ) - UBND( I ) + LBND( I ) - 1
                IF( NEXTRA .NE. 0 ) THEN
 
-*  We will expand the current interval by an equal number of pixels at each 
-*  end to achieve the requested width. 
+*  We will expand the current interval by an equal number of pixels at each
+*  end to achieve the requested width.
                   LBND( I ) = LBND( I ) - NEXTRA/2
                   UBND( I ) = UBND( I ) + NEXTRA/2
 
-*  In addition, if we are short by an odd number of pixels, we need to 
-*  expand one of the two ends by an extra pixel. 
+*  In addition, if we are short by an odd number of pixels, we need to
+*  expand one of the two ends by an extra pixel.
                   NEXTRA = NEXTRA - 2*( NEXTRA/2 )
                   IF( NEXTRA .NE. 0 ) THEN
 
-*  If the centre was specified as a pixel coordinate, we choose the end 
+*  If the centre was specified as a pixel coordinate, we choose the end
 *  which puts the central pixel closer to the centre of the interval.
                      IF( ISPIX1( I ) ) THEN
 
 *  If the central value is more positive than the interval centre, move
 *  the interval to more positive values.
-                        IF( 2*VALUE1( I ) .GT. 
+                        IF( 2*VALUE1( I ) .GT.
      :                      LBND( I ) - 1 + UBND( I ) ) THEN
 
 *  If the current width is too little, extend the upper bound.
@@ -914,7 +914,7 @@ c      write(*,*) '   '
 *  Arrive here if an error occurs.
  999  CONTINUE
 
-*  End the AST context. 
+*  End the AST context.
       CALL AST_END( STATUS )
 
 *  Call error tracing routine and exit.

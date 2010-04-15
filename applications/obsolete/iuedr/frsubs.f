@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE FRSUBS
 *
-*   Description: 
+*   Description:
 *      Release VM for subset - release VM for the components of the image
 *      subset used for extraction.
 *
@@ -27,7 +27,7 @@
       INTEGER Q_VM       ! address of QUAL array
       INTEGER R_VM       ! address of R array
       INTEGER W_VM       ! address of W array
- 
+
 *   Export:
       INTEGER STATUS     ! status return
 

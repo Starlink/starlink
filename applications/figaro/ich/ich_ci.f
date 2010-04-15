@@ -47,7 +47,7 @@ C
       INTEGER   I                         ! Loop variable
       INTEGER   IGNORE                    ! Dummy status value for write
       INTEGER   IST                       ! First non-blank character
-      CHARACTER WORK*11                   ! Work string 
+      CHARACTER WORK*11                   ! Work string
 C
 C     Format the number into the work string.
 C

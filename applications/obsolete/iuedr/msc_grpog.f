@@ -1,4 +1,4 @@
-      SUBROUTINE MSC_GRPOG(NU, U1, DU, NV, V1, DV, MAXP, XP, YP, NP, 
+      SUBROUTINE MSC_GRPOG(NU, U1, DU, NV, V1, DV, MAXP, XP, YP, NP,
      :                     STATUS)
 
 *+
@@ -27,20 +27,20 @@
 
       REAL*8 U1            ! start U-value
       REAL*8 DU            ! U-step
- 
+
       INTEGER NV         ! number of V grid points
- 
+
       REAL*8 V1            ! start V-value
       REAL*8 DV            ! V-step
- 
+
       INTEGER MAXP       ! maximum number of points in polygon
 
 *   Export:
       REAL*8 XP(MAXP)      ! x-coordinates
       REAL*8 YP(MAXP)      ! y-coordinates
- 
+
       INTEGER NP         ! actual number of points
-      INTEGER STATUS     ! status flag 
+      INTEGER STATUS     ! status flag
 *   Local variables:
       INTEGER IU         ! loop index
       INTEGER IV         ! loop index
@@ -57,7 +57,7 @@
       END IF
 
       NP = 0
- 
+
 *   (U0,V1) to (U0,VN+1)
       U = U1 - DU
       V = V1 - DV
@@ -70,7 +70,7 @@
          YP(NP) = V
 
  100  CONTINUE
- 
+
 *   (U1,VN+1) to (UN+1,VN+1)
       DO 200 IU = 1, NU + 1
 
@@ -80,7 +80,7 @@
          YP(NP) = V
 
  200  CONTINUE
- 
+
 *   (UN+1,VN) to (UN+1,V0)
       DO 300 IV = 1, NV + 1
 
@@ -90,7 +90,7 @@
          YP(NP) = V
 
  300  CONTINUE
- 
+
 *   (UN,V0) to (U0,V0)
       DO 400 IU = 1, NU + 1
 

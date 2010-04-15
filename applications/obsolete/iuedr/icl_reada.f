@@ -6,7 +6,7 @@
 
 *  Purpose:
 *     To prompt and recieve a reply.
-*     
+*
 
 *  Language:
 *     Starlink Fortran 77
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,10 +67,10 @@
 *  Arguments Returned:
       CHARACTER*(*) VAL
 *.
- 
+
       WRITE( *, 10 ) PR1(1:LEN1)
 10    FORMAT ( A, $ )
-      READ ( *, 20 ) VAL 
+      READ ( *, 20 ) VAL
 20    FORMAT ( A )
-      
+
       END

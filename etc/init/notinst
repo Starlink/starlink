@@ -1,7 +1,7 @@
 
 progname=${1}
 
-echo 
+echo
 echo "The ${progname} package/command is not installed or is not available."
 echo "Please contact your Site Manager if you would like it installed."
 echo

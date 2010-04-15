@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_AGNCP( IPLOT, ARDDEF, MXPNT, NPTS, X1, X2, Y1, Y2, 
+      SUBROUTINE KPS1_AGNCP( IPLOT, ARDDEF, MXPNT, NPTS, X1, X2, Y1, Y2,
      :                       INFO, XCUR, YCUR, NP, X, Y, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_AGNCP( IPLOT, ARDDEF, MXPNT, NPTS, X1, X2, Y1, Y2, INFO, 
+*     CALL KPS1_AGNCP( IPLOT, ARDDEF, MXPNT, NPTS, X1, X2, Y1, Y2, INFO,
 *                      XCUR, YCUR, NP, X, Y, STATUS )
 
 *  Description:
@@ -29,7 +29,7 @@
 *     MXPNT = INTEGER (Given)
 *        Maximum number of points which can be supplied.
 *     NPTS = INTEGER (Given)
-*        Number of points to be determined using the cursor. If ARDDEF is 
+*        Number of points to be determined using the cursor. If ARDDEF is
 *        'POLYGON', NPTS is ignored, and the user can supply up to MXPNT
 *        points.
 *     X1 = REAL (Given)
@@ -54,7 +54,7 @@
 *        Y co-ordinate of the position where the cursor will first
 *        appear.
 *     NP = INTEGER (Returned)
-*        Number of points obtained with the cursor.  
+*        Number of points obtained with the cursor.
 *     X( MXPNT ) = DOUBLE PRECISION (Returned)
 *        The axis 1 co-ordinates of the points measured by the cursor, in
 *        the current Frame of IPLOT.
@@ -108,12 +108,12 @@
 *  Arguments Given:
       INTEGER IPLOT
       CHARACTER ARDDEF*(*)
-      INTEGER MXPNT              
-      INTEGER NPTS                                                
+      INTEGER MXPNT
+      INTEGER NPTS
       REAL X1
-      REAL Y1                                           
+      REAL Y1
       REAL X2
-      REAL Y2                                         
+      REAL Y2
 
 *  Arguments Given and Returned:
       LOGICAL INFO
@@ -121,7 +121,7 @@
       REAL YCUR
 
 *  Arguments Returned:
-      INTEGER NP  
+      INTEGER NP
       DOUBLE PRECISION X( MXPNT )
       DOUBLE PRECISION Y( MXPNT )
 
@@ -141,7 +141,7 @@
       INTEGER NERR               ! Number of numerical errors
       INTEGER NP0                ! Original number of points before purging
 *.
- 
+
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -150,35 +150,35 @@
       ACTDES( 2 ) = 'exit'
 
       IF( ARDDEF .EQ. 'POLYGON' ) THEN
-         MAXPNT = MXPNT      
+         MAXPNT = MXPNT
          LINES = 1
       ELSE
          MAXPNT = MIN( NPTS, MXPNT )
          LINES = 0
       END IF
 
-      IF( MAXPNT .GT. 0 ) THEN 
+      IF( MAXPNT .GT. 0 ) THEN
 
          CALL PSX_CALLOC( MAXPNT, '_REAL', IPX, STATUS )
          CALL PSX_CALLOC( MAXPNT, '_REAL', IPY, STATUS )
          CALL PSX_CALLOC( MAXPNT, '_INTEGER', IPACT, STATUS )
 
-         CALL KPG1_PGCUR( INFO, ' ', 2, ACTDES, 'AX', X1, X2, Y1, Y2, 
+         CALL KPG1_PGCUR( INFO, ' ', 2, ACTDES, 'AX', X1, X2, Y1, Y2,
      :                    0, XCUR, YCUR, MAXPNT, 0, LINES, 0, 2, IPLOT,
-     :                    %VAL( CNF_PVAL( IPX ) ), 
-     :                    %VAL( CNF_PVAL( IPY ) ), 
+     :                    %VAL( CNF_PVAL( IPX ) ),
+     :                    %VAL( CNF_PVAL( IPY ) ),
      :                    %VAL( CNF_PVAL( IPACT ) ), NP,
      :                    STATUS )
          INFO = .FALSE.
 
 *  If any positions were obtained.
-         IF( NP .GT. 0 ) THEN 
- 
+         IF( NP .GT. 0 ) THEN
+
 *  Convert the single precision values to double precision values.
-            CALL VEC_RTOD( .FALSE., NP, %VAL( CNF_PVAL( IPX ) ), 
+            CALL VEC_RTOD( .FALSE., NP, %VAL( CNF_PVAL( IPX ) ),
      :                     X, IERR, NERR,
      :                     STATUS )
-            CALL VEC_RTOD( .FALSE., NP, %VAL( CNF_PVAL( IPY ) ), 
+            CALL VEC_RTOD( .FALSE., NP, %VAL( CNF_PVAL( IPY ) ),
      :                     Y, IERR, NERR,
      :                     STATUS )
 
@@ -191,8 +191,8 @@
      :             ABS( Y( I ) - Y( I - 1 ) ) .LT. 0.5 ) THEN
 
                   DO J = I, NP
-                     X( J - 1 ) = X( J )                
-                     Y( J - 1 ) = Y( J )                
+                     X( J - 1 ) = X( J )
+                     Y( J - 1 ) = Y( J )
                   END DO
                   NP = NP - 1
 

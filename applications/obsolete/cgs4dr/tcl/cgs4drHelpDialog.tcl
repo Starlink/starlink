@@ -48,12 +48,12 @@ proc cgs4drHelpDialog {w file} {
               } else {
                 label $w.top.r.msg$i -text "${line}" -fg red
               }
-              pack $w.top.r.msg$i -in $w.top.r -side top -anchor w 
+              pack $w.top.r.msg$i -in $w.top.r -side top -anchor w
               incr i
             }
           }
           break
-        } 
+        }
       }
       close $fid
       if {$k==0} {

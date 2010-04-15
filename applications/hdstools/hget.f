@@ -39,7 +39,7 @@
 *
 *    !bt3
 *      Item code   !- Returned type  !- Description !n
-*      !n 
+*      !n
 *      PRIMITIVE   !- _LOGICAL       !- True if Object primitive !n
 *      STRUCTURED  !- _LOGICAL       !- True if Object structured !n
 *      NDIM        !- _INTEGER       !- Dimensionality !n
@@ -66,8 +66,8 @@
 *    Internal parameters (ATTR and INDEX) are not saved in the task's
 *    parameter file. Their values can be written to HDS objects by
 *    specifying the name of an existing object of a suitable type on the
-*    command line. The object name must be preceded by @ for the ATTR 
-*    parameter but this is not necessary for INDEX (see Example 2). 
+*    command line. The object name must be preceded by @ for the ATTR
+*    parameter but this is not necessary for INDEX (see Example 2).
 
 * Examples:
 *    % hget 'numvec(2)' value
@@ -137,7 +137,7 @@
      :                       TYP_REAL, TYP_DP
         PARAMETER            ( TYP_INT = 1, TYP_CHAR = 2, TYP_LOG = 3,
      :                         TYP_REAL = 4, TYP_DP = 5 )
-        
+
       CHARACTER*40           VERSION
         PARAMETER            ( VERSION='HGET Version 3.0-0' )
 
@@ -279,7 +279,7 @@
              IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          Get the min and max values and pixel indices
-               CALL ARR_PRANG1R( NELM, %VAL(CNF_PVAL(PTR)), 
+               CALL ARR_PRANG1R( NELM, %VAL(CNF_PVAL(PTR)),
      :                           INDMIN, MINVAL,
      :                        INDMAX, MAXVAL, STATUS )
 

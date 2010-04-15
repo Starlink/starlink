@@ -1,51 +1,51 @@
-	SUBROUTINE MED3D_MEDFIL( COUNTER, WDIMSX, WDIMSY, WDIMSZ, WORK, 
-     :	                         WLDIMSX, LWORK, DIMSX, DIMSY, ARROUT, 
-     :	                         VIEW, XPIX, YPIX, WHICH, SCALING, 
+	SUBROUTINE MED3D_MEDFIL( COUNTER, WDIMSX, WDIMSY, WDIMSZ, WORK,
+     :	                         WLDIMSX, LWORK, DIMSX, DIMSY, ARROUT,
+     :	                         VIEW, XPIX, YPIX, WHICH, SCALING,
      :	                         XST, XSZ, YST, YSZ, NORMALIZATION)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  COUNTER, 
-     :	  WDIMSX, 
-     :	  WDIMSY, 
-     :	  WDIMSZ, 
-     :	  WLDIMSX, 
-     :	  DIMSX, 
-     :	  DIMSY, 
-     :	  J, 
-     :	  K, 
-     :	  L, 
-     :	  I, 
-     :	  XPIX, 
-     :	  YPIX, 
-     :	  STATUS, 
-     :	  XST, 
-     :	  XSZ, 
-     :	  YST, 
+	INTEGER
+     :	  COUNTER,
+     :	  WDIMSX,
+     :	  WDIMSY,
+     :	  WDIMSZ,
+     :	  WLDIMSX,
+     :	  DIMSX,
+     :	  DIMSY,
+     :	  J,
+     :	  K,
+     :	  L,
+     :	  I,
+     :	  XPIX,
+     :	  YPIX,
+     :	  STATUS,
+     :	  XST,
+     :	  XSZ,
+     :	  YST,
      :	  YSZ
 
-	REAL 
-     :	  WORK( WDIMSX, WDIMSY, WDIMSZ), 
-     :	  ARROUT( DIMSX, DIMSY), 
-     :	  VALMIN, 
-     :	  VALMAX, 
-     :	  SUM, 
-     :	  MEAN, 
-     :	  MEDIAN, 
+	REAL
+     :	  WORK( WDIMSX, WDIMSY, WDIMSZ),
+     :	  ARROUT( DIMSX, DIMSY),
+     :	  VALMIN,
+     :	  VALMAX,
+     :	  SUM,
+     :	  MEAN,
+     :	  MEDIAN,
      :	  MODE
 
-	REAL*8 
+	REAL*8
      :	  LWORK( WLDIMSX)
 
-	CHARACTER*( *) 
+	CHARACTER*( *)
      :	  WHICH
 
-	LOGICAL 
-     :	  VIEW, 
-     :	  SCALING, 
+	LOGICAL
+     :	  VIEW,
+     :	  SCALING,
      :	  NORMALIZATION
 
 *      Set adam status variable
@@ -78,7 +78,7 @@
 
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-	        CALL MSG_OUT( 'MESSAGE', 'Raw view-pixel values ...', 
+	        CALL MSG_OUT( 'MESSAGE', 'Raw view-pixel values ...',
      :                    STATUS)
 
 	        DO I = 1, COUNTER
@@ -87,7 +87,7 @@
 	          CALL MSG_SETI( 'X', XPIX)
 	          CALL MSG_SETI( 'Y', YPIX)
 	          CALL MSG_SETR( 'VAL', SNGL( LWORK( I)))
-	          CALL MSG_OUT( 'MESSAGE', 
+	          CALL MSG_OUT( 'MESSAGE',
      :	     'Stack Image number ^NUM, pixel ^X,^Y, raw value = ^VAL',
      :       STATUS)
 
@@ -101,7 +101,7 @@
 	    CALL PDA_QSAD( COUNTER, LWORK )
 
 *          call subroutine to find median for the input LWORK
-	    CALL MED3D_CALMEDSUB( COUNTER, LWORK, VALMAX, VALMIN, SUM, 
+	    CALL MED3D_CALMEDSUB( COUNTER, LWORK, VALMAX, VALMIN, SUM,
      :	                      MEAN, MEDIAN, MODE)
 
 *          test if user wants to view the sorted LWORK etc ...
@@ -111,38 +111,38 @@
 
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-	        CALL MSG_OUT( 'MESSAGE', 
-     :                    'Maximum, Minimum MEDIAN values ...', 
+	        CALL MSG_OUT( 'MESSAGE',
+     :                    'Maximum, Minimum MEDIAN values ...',
      :	                  STATUS)
 
 	        CALL MSG_SETR( 'VAL1', VALMAX)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	         'Maximum value = ^VAL1',
      :	         STATUS)
 	        CALL MSG_SETR( 'VAL2', VALMIN)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	         'Minimum value = ^VAL2',
      :	         STATUS)
 
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-	        CALL MSG_OUT( 'MESSAGE', 'Statistics of MEDIANS ...', 
+	        CALL MSG_OUT( 'MESSAGE', 'Statistics of MEDIANS ...',
      :                    STATUS)
 
 	        CALL MSG_SETR( 'VAL3', SUM)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	         'Sum of values = ^VAL3',
      :	         STATUS)
 	        CALL MSG_SETR( 'VAL4', MEAN)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	         'Mean value    = ^VAL4',
      :	         STATUS)
 	        CALL MSG_SETR( 'VAL5', MEDIAN)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	         'Median value  = ^VAL5',
      :	         STATUS)
 	        CALL MSG_SETR( 'VAL6', MODE)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	         'Mode value    = ^VAL6',
      :	         STATUS)
 

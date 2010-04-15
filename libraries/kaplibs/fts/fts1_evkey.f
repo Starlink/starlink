@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,7 +164,7 @@
             IF ( FSPOS .LT. LENGTH ) THEN
 
 *  Locate the next fullstop in the compound keyword.
-               CALL CHR_TOCHR( '.', KEYWRD, .TRUE., FSPOS ) 
+               CALL CHR_TOCHR( '.', KEYWRD, .TRUE., FSPOS )
 
 *  Keywords are limited to eight characters.  Report an error but
 *  continue.

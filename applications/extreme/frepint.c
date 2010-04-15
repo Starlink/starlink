@@ -7,17 +7,17 @@
 *     Replace INTEGER by INTEGER*8 in Fortran 77.
 *
 *  Usage:
-*     frepint [ in [ out ] ] 
+*     frepint [ in [ out ] ]
 *
 *  Description:
 *     This program is a filter which takes FORTRAN 77 source code
 *     and modifies it so that INTEGER declarations are rewritten as
 *     `INTEGER * 8'.  It also attempts to warn if there are usages which
-*     might cause trouble given this change. 
+*     might cause trouble given this change.
 *
 *     Additionally, if there appear to be actual arguments to subroutines
 *     or functions which are literal integers, the program will attempt
-*     to replace them with symbolic constants, and to define these 
+*     to replace them with symbolic constants, and to define these
 *     constants in the declaration section of the module.  Thus the line
 *
 *        CALL SUB( X, 5, STATUS )
@@ -35,8 +35,8 @@
 *        PARAMETER ( INT__5 = 5 )
 *
 *     will be inserted in the declaration section of the module.
-*     The program will attempt to insert these declarations near an 
-*     INCLUDE statement, and if it cannot find one, it will write a 
+*     The program will attempt to insert these declarations near an
+*     INCLUDE statement, and if it cannot find one, it will write a
 *     warning to standard error, including the text of the declarations
 *     that it would have made.
 *
@@ -46,21 +46,21 @@
 *
 *     Some attention is paid to the aesthetic qualities of the output:
 *     line breaks are made, where possible, following the usage in, e.g.,
-*     KAPPA.  An attempt is made to copy the style of case usage from the 
+*     KAPPA.  An attempt is made to copy the style of case usage from the
 *     input.
 *
-*     No changes are made to comment lines so that, for instance, the 
+*     No changes are made to comment lines so that, for instance, the
 *     Arguments stanza of subroutine prologues will not have argument
 *     types modified from `INTEGER' to `INTEGER * 8'.
 *
-*     No change is made to references to INTEGER type in IMPLICIT 
+*     No change is made to references to INTEGER type in IMPLICIT
 *     statements.
 *
-*     The program will write a warning on standard error for certain 
+*     The program will write a warning on standard error for certain
 *     constructions in the code which are likely to cause trouble after
 *     the mass redeclaration of INTEGER as INTEGER*8 has occurred.
 *     These constructions are:
-*        - INTEGER * n declarations which already exist in the code 
+*        - INTEGER * n declarations which already exist in the code
 *          (these are not modified)
 *        - EQUIVALENCE statements
 *        - Use of INTEGER Specific names for standard intrinsic functions
@@ -71,8 +71,8 @@
 *          include an IMPLICIT NONE statement.
 *
 *  Notes:
-*     The program is not infallible at identifying function calls, which 
-*     it needs to do in order to replace integer literals, since they 
+*     The program is not infallible at identifying function calls, which
+*     it needs to do in order to replace integer literals, since they
 *     look like array references.  It uses the rule of thumb that it if
 *     the would-be function name contains an underscore it is a function,
 *     otherwise it is an array.
@@ -154,7 +154,7 @@
    };
 
 
-/* Get the next column from the current column and the character being 
+/* Get the next column from the current column and the character being
    output. */
 #define colchar(col,c) ( (c) == '\n' ? 1 : (col) + ( (c) == '\t' ? 8 : 1 ) )
 
@@ -205,7 +205,7 @@
 #define CONST long
 
    int ccmp( const void *a, const void *b ) {
-/* 
+/*
 *+
 *  Name:
 *     ccmp
@@ -214,9 +214,9 @@
 *     Comparison function for qsort() or bsearch().
 *-
 */
-      return *((CONST *) a) == *((CONST *) b) 
+      return *((CONST *) a) == *((CONST *) b)
                 ? 0
-                : *((CONST *) a) < *((CONST *) b) 
+                : *((CONST *) a) < *((CONST *) b)
                      ? -1
                      :  1;
    }
@@ -229,7 +229,7 @@
 *+
 *  Name:
 *     frepint
-* 
+*
 *  Purpose:
 *     Perform data processing for frepint program.
 *
@@ -245,7 +245,7 @@
 *-
 */
 
-/* Maximum number of distinct literal integer constants passed as actual 
+/* Maximum number of distinct literal integer constants passed as actual
    arguments in a module. */
 #define MAXCONSTARG 1024
 
@@ -280,7 +280,7 @@
       struct tokitem *tbuf = NULL;
 
 /* Get characters from the lex tokeniser.  As well as the token id which
-   is the return value of yylex, the global yylval points to the 
+   is the return value of yylex, the global yylval points to the
    characters which constituted this token, and the global ymatst points
    to the part of yylval where the syntactically significant part of
    that token begins. */
@@ -311,7 +311,7 @@
          t = tbuf[ i ].tokval;
          t1 = tbuf[ i + 1 ].tokval;
 
-/* INTEGER declaration to be changed.  Handle this token and any others 
+/* INTEGER declaration to be changed.  Handle this token and any others
    up till the next newline character. */
          if ( t == INTEGER && t1 != '*' ) {
 
@@ -320,12 +320,12 @@
    to the original source better. */
             inttok = tbuf + i;
             if ( t1 == IDENTIFIER ) {
-               constpref = islower( *(tbuf[ i + 1 ].strmat ) ) ? "int__" 
+               constpref = islower( *(tbuf[ i + 1 ].strmat ) ) ? "int__"
                                                                : "INT__";
             }
 
 /* Output the new text and spacing if required. */
-            for ( pc = " * 8"; c = *pc; pc++ ) 
+            for ( pc = " * 8"; c = *pc; pc++ )
                outchar( c );
             skipspc = 4;
             if ( ! isspace( *(tbuf[ i + 1 ].string) ) ) {
@@ -347,13 +347,13 @@
                      done = 1;
 
 /* Expanded line will fit into 72 characters.  Output the intervening
-   tokens, squashing up spaces to retain as much of the formatting as 
+   tokens, squashing up spaces to retain as much of the formatting as
    possible if we have the chance. */
-                     if ( col + nc + ( pc - tbuf[ j ].string ) 
+                     if ( col + nc + ( pc - tbuf[ j ].string )
                               - MINIMUM( nspc, skipspc ) <= 73 ) {
                         for ( k = i + 1; k <= j; k++ ) {
                            for ( qc = tbuf[ k ].string; c = *qc; qc++ ) {
-                              if ( c == ' ' && skipspc && 
+                              if ( c == ' ' && skipspc &&
                                    qc > tbuf[ k ].string && qc[ -1 ] == ' ' ) {
                                  skipspc--;
                               }
@@ -379,7 +379,7 @@
                      }
 
 /* Expanded line will not fit in 72 characters.  Output a linebreak right
-   after the INTEGER declaration and the rest of the line unchanged after 
+   after the INTEGER declaration and the rest of the line unchanged after
    it. */
                      else {
                         outchar( '\n' );
@@ -421,29 +421,29 @@
             if ( pre == '+' || pre == '-' ) pre = tbuf[ itok - 2 ].tokval;
 
 /* Only proceed if the constant looks like the whole of an actual argument. */
-            if ( ( pre == ',' || pre == '(' ) && 
+            if ( ( pre == ',' || pre == '(' ) &&
                  ( post == ',' || post == ')' ) ) {
-               
+
 /* Only proceed if the thing it's an argument of is a subroutine, or looks
    like it's probably a function call (the alternative is that it might be
    an array reference). */
                pctok = funcofarg( tbuf + itok );
-               if ( pctok[ -1 ].tokval == CALL || 
-                    ( pctok->tokval == IDENTIFIER && 
+               if ( pctok[ -1 ].tokval == CALL ||
+                    ( pctok->tokval == IDENTIFIER &&
                       strchr( pctok->strmat, '_' ) != NULL ) ) {
                   int col1;
                   int col2;
                   int indent;
                   int lastcol;
                   char fmt[ 20 ];
-                  char *cstr; 
+                  char *cstr;
                   CONST cval;
 
 /* Prepare the replacement text. */
                   cval = strtol( tbuf[ itok ].strmat, NULL, 10 );
                   sprintf( fmt, "%s%%ld", constpref );
 
-/* Work out whether there is enough space on this line for the modified 
+/* Work out whether there is enough space on this line for the modified
    text. */
                   col1 = col;
                   lastcol = 0;
@@ -456,16 +456,16 @@
                         }
                         col1 = colchar( col1, c );
                      }
-                     if ( ! lastcol && tbuf[ j ].tokval == LINE_END ) 
+                     if ( ! lastcol && tbuf[ j ].tokval == LINE_END )
                         lastcol = col1;
                   }
                   indent = 0;
 
 /* If we need a line break, work out how far it should be indented.  Find
-   out the column of the bracket enclosing this argument list, and try 
+   out the column of the bracket enclosing this argument list, and try
    that.  If that's too far, use an indent of 9, which must be OK. */
                   if ( lastcol + strlen( fmt ) - 3 > 72 || ! lastcol ) {
-                     for ( j = pctok - tbuf + 1;  
+                     for ( j = pctok - tbuf + 1;
                            tbuf[ j ].tokval != LINE_START && j >= 0; j-- );
                      col1 = 1;
                      for ( ; j <= pctok - tbuf + 1; j++ ) {
@@ -482,7 +482,7 @@
                   cstr = memok( malloc( strlen( tbuf[ itok ].string ) +
                                         strlen( fmt ) + indent ) );
                   qc = cstr;
-                  for ( pc = tbuf[ itok ].string; pc < tbuf[ itok ].strmat; ) 
+                  for ( pc = tbuf[ itok ].string; pc < tbuf[ itok ].strmat; )
                      *(qc++) = *(pc++);
                   if ( indent ) {
                      *(qc++) = '\n';
@@ -496,12 +496,12 @@
 /* Record the constant that we have referenced, so we can declare it at
    the appropriate place.  We check that we do not already have a record
    of it, and if not, insert it into the list of recorded constants and
-   resort it.  Make sure that we do not overflow the recording array, 
+   resort it.  Make sure that we do not overflow the recording array,
    which is static. */
                   if ( ! bsearch( &cval, constarg, nconstarg, sizeof( CONST ),
                                   ccmp ) ) {
                      if ( nconstarg >= MAXCONSTARG ) {
-                        fprintf( stderr, 
+                        fprintf( stderr,
                                  "%s: Too many literal integer constants - "
                                  "aborting.\n", name );
                         exit( 1 );
@@ -513,10 +513,10 @@
             }
          }
 
-/* INTEGER which already has an explicit length declared - generate a 
+/* INTEGER which already has an explicit length declared - generate a
    warning. */
          else if ( t == INTEGER && t1 == '*' ) {
-            fprintf( stderr, "%s: INTEGER*%s declaration not changed\n", 
+            fprintf( stderr, "%s: INTEGER*%s declaration not changed\n",
                              name, tbuf[ i + 2 ].strmat );
          }
 
@@ -529,14 +529,14 @@
    As well as the listed ones, there's also IDIM, but this is both a pretty
    common variable name and a pretty uncommon intrinsic to use, so we
    don't bother alerting about it here. */
-         else if ( t == IABS || t == ISIGN || t == MAX0 || t == AMAX0 || 
+         else if ( t == IABS || t == ISIGN || t == MAX0 || t == AMAX0 ||
                    t == MIN0 || t == AMIN0 ) {
             fprintf( stderr, "%s: INTEGER-specific intrinsic name %s\n",
                              name, tbuf[ i ].strmat );
          }
 
 /* Start of module - record the name. */
-         else if ( ( t == FUNCTION || t == SUBROUTINE || t == BLOCKDATA ) 
+         else if ( ( t == FUNCTION || t == SUBROUTINE || t == BLOCKDATA )
                 && ( t1 == IDENTIFIER ) ) {
             strcpy( modname, tbuf[ i + 1 ].strmat );
          }
@@ -546,18 +546,18 @@
             implicitnone = 1;
          }
 
-/* Include line - mark it for interpolating our own local constant 
-   definitions later.  If it includes a '*_DEC' or '*_DEF' file it is 
-   probably too late for constant declarations and definitions, so 
+/* Include line - mark it for interpolating our own local constant
+   definitions later.  If it includes a '*_DEC' or '*_DEF' file it is
+   probably too late for constant declarations and definitions, so
    rely on earlier ones.  We prefer a blank line immediately following,
    so it should end up at the end of the first stanza of include files. */
          else if ( i > 2 && tbuf[ i - 2 ].tokval == INCLUDE
                          && tbuf[ i - 1 ].tokval == STRING_CONSTANT
                          && tbuf[ i     ].tokval == LINE_END
-                         && strstr( tbuf[ i - 1 ].strmat, "_DEC" ) == NULL 
+                         && strstr( tbuf[ i - 1 ].strmat, "_DEC" ) == NULL
                          && strstr( tbuf[ i - 1 ].strmat, "_DEF" ) == NULL ) {
             if ( dclok ) {
-               if ( tbuf[ i + i ].tokval == BLANK_LINE ) 
+               if ( tbuf[ i + i ].tokval == BLANK_LINE )
                   outmark( &dclbuf );
             }
             else {
@@ -572,15 +572,15 @@
 /* Insert local constant definitions if appropriate. */
             if ( nconstarg ) {
 
-/* Write the new text, and the existing text of the token into which we 
-   will insert it, into a newly allocated buffer.  The address of a 
+/* Write the new text, and the existing text of the token into which we
+   will insert it, into a newly allocated buffer.  The address of a
    pointer to this buffer has already been indicated to the output routines
    so that it will be interpolated into the output stream at the right
    place. */
                char *leading;
                char *intstmt;
                char *parstmt;
-               char *cmnt = 
+               char *cmnt =
                   "\n*  Local constants for use as actual arguments:\n";
                int dblen = strlen( cmnt ) + nconstarg * 160;
 
@@ -592,7 +592,7 @@
                   intstmt = inttok->string;
                   parstmt = memok( malloc( strlen( intstmt ) + 3 ) );
                   qc = parstmt;
-                  for ( pc = inttok->string; pc < inttok->strmat; pc++ ) 
+                  for ( pc = inttok->string; pc < inttok->strmat; pc++ )
                      *(qc++) = *pc;
                   if ( isupper( *pc ) && isupper( *(pc + 1) ) )
                      strcpy( qc, "PARAMETER" );
@@ -606,7 +606,7 @@
                   intstmt = "INTEGER";
                   parstmt = "PARAMETER";
                }
-                  
+
 /* Allocate the buffer for the declaration statements. */
                dclbuf = memok( malloc( dblen ) );
                qc = dclbuf;
@@ -614,26 +614,26 @@
 /* Write an INTEGER declaration statement for each INT__ constant used. */
                qc += sprintf( qc, "%s", cmnt );
                for ( j = 0; j < nconstarg; j++ )
-                  qc += sprintf( qc, "%s%s * 8 %s%ld\n", 
-                                     leading, intstmt, constpref, 
+                  qc += sprintf( qc, "%s%s * 8 %s%ld\n",
+                                     leading, intstmt, constpref,
                                      (long) constarg[ j ] );
 
 /* Write a PARAMETER statement for each INT__ constant used. */
                for ( j = 0; j < nconstarg; j++ )
                   qc += sprintf( qc, "%s%s ( %s%ld = %ld )\n",
-                                     leading, parstmt, constpref, 
-                                     (long) constarg[ j ], 
+                                     leading, parstmt, constpref,
+                                     (long) constarg[ j ],
                                      (long) constarg[ j ] );
 
 /* Safety check - ought not to happen. */
                if ( qc - dclbuf > dblen ) {
-                  fprintf( stderr, "%s: Overflowed buffer - aborting\n", 
+                  fprintf( stderr, "%s: Overflowed buffer - aborting\n",
                                    name );
                   exit( 1 );
                }
 
 /* Local constant definitions are required, and there is a suitable place
-   to put them.  Write the declaration and definition statements at the 
+   to put them.  Write the declaration and definition statements at the
    end of the marked token. */
                if ( dclok ) {
                }
@@ -642,17 +642,17 @@
    to place them.  Issue a warning, including the text which could not
    be inserted. */
                else {
-                  fprintf( stderr, "%s: Nowhere to declare %s's", 
+                  fprintf( stderr, "%s: Nowhere to declare %s's",
                                    name, constpref );
                   if ( *modname ) fprintf( stderr, " in module %s", modname );
                   fprintf( stderr, "\n%s", dclbuf );
                   dclbuf = NULL;
                }
             }
-            
+
 /* Warn if we have not encountered an "IMPLICIT NONE" but should have done. */
             if ( ! implicitnone && *modname ) {
-               fprintf( stderr, "%s: No IMPLICIT NONE in module %s\n", 
+               fprintf( stderr, "%s: No IMPLICIT NONE in module %s\n",
                                 name, modname );
             }
             *modname = '\0';
@@ -664,7 +664,7 @@
             nconstarg = 0;
             inttok = NULL;
          }
-         
+
       }
 
    }
@@ -679,7 +679,7 @@
    void outmark( char **buf ) {
 /*
 *  Register that at this point in the output stream (the point that the
-*  outputs via outchar() have reached) the buffer pointed to by the 
+*  outputs via outchar() have reached) the buffer pointed to by the
 *  contents of buf should be output.
 */
       cinterp = buf;
@@ -700,7 +700,7 @@
       int i;
       for ( i = 0; i < cleng; i++ ) {
          putchar( cbuf[ i ] );
-         if ( i == iinterp && *cinterp != NULL ) 
+         if ( i == iinterp && *cinterp != NULL )
             for ( pc = *cinterp; c = *pc; pc++ )
                putchar( c );
       }

@@ -1,7 +1,7 @@
-      SUBROUTINE KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, 
-     :                       NPOS, NAXR, NAXIN, INPOS, GOTID, ID, LOGF, 
-     :                       FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
-     :                       FITREG, REFPOS, REFLAB, NPAR, FPAR, 
+      SUBROUTINE KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR,
+     :                       NPOS, NAXR, NAXIN, INPOS, GOTID, ID, LOGF,
+     :                       FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA,
+     :                       FITREG, REFPOS, REFLAB, NPAR, FPAR,
      :                       STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
+*     CALL KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS,
 *                      NAXR, NAXIN, INPOS, GOTID, ID, LOGF, FDL, FIXCON,
 *                      AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
 *                      REFLAB, NPAR, FPAR, STATUS )
@@ -22,18 +22,18 @@
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image
 *     beam features given initial guesses at their positions with
-*     optional constraints of some parameters.  The initial 
+*     optional constraints of some parameters.  The initial
 *     beam positions are obtained from a text file or catalogue.
 *     The routine also estimates the errors on the fitted parameters,
-*     and presents the results to a log file and the screen.  Amongst 
+*     and presents the results to a log file and the screen.  Amongst
 *     the results are the rms of the fit, the offset of the primary beam
 *     from a reference point, and the polar co-ordinates of secondary
 *     beams from the primary beam's location.
 *
 *     All the co-ordinates are converted to pixel co-ordinates
-*     before any fits are made and reported.  This enables the required 
-*     AST transformations to be applied to all positions in a single 
-*     call, minimising the time spent in the mapping routines.  This 
+*     before any fits are made and reported.  This enables the required
+*     AST transformations to be applied to all positions in a single
+*     call, minimising the time spent in the mapping routines.  This
 *     routine should be used in non-interactive modes of BEAMFIT
 *     such as "File" or "Catalogue".
 
@@ -52,7 +52,7 @@
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the reporting Frame.
 *     RFRM = INTEGER (Given)
-*        A pointer to the reporting Frame (i.e. the Frame in which 
+*        A pointer to the reporting Frame (i.e. the Frame in which
 *        positions are to be reported).
 *     VAR = LOGICAL (Given)
 *        If TRUE, use variance to weight the fit.
@@ -64,13 +64,13 @@
 *        The number of axes in the Frame in which the initial guess
 *        positions are supplied.
 *     INPOS( NPOS, NAXIN ) = DOUBLE PRECISION (Given)
-*        The beam positions that are one of four options: initial 
+*        The beam positions that are one of four options: initial
 *        guesses to be fit, fixed locations, or in the case of secondary
-*        beam positions separations in absolute or relative polar 
-*        co-ordinates.  The meaning depends on the settings of the 
+*        beam positions separations in absolute or relative polar
+*        co-ordinates.  The meaning depends on the settings of the
 *        fourth and sixth elements of argument FIXCON, and argument
 *        POLPAR.   All should be in the co-ordinate system defined by
-*        MAP1 and MAP3 (albeit transformed for polar co-ordinates). 
+*        MAP1 and MAP3 (albeit transformed for polar co-ordinates).
 *     GOTID = LOGICAL (Given)
 *        If TRUE then the position identifiers supplied in ID are used.
 *        Otherwise identifiers equal to the position index are used.
@@ -93,13 +93,13 @@
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
-*        The ratios of the secondary beam `sources' to the first beam. 
+*        The ratios of the secondary beam `sources' to the first beam.
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.
 *     SLBND( 2 ) = INTEGER (Given)
-*        The lower pixel index bounds of the significant axes of the 
+*        The lower pixel index bounds of the significant axes of the
 *        NDF.
 *     SUBND( 2 ) = INTEGER (Given)
-*        The upper pixel index bounds of the significant axes of the 
+*        The upper pixel index bounds of the significant axes of the
 *        NDF.
 *     FAREA = LOGICAL (Given)
 *        If .TRUE. then all pixels in the data array are used.  If
@@ -107,23 +107,23 @@
 *     FITREG( 2 ) = INTEGER (Given)
 *        The dimensions of the box to use when estimating the Gaussian
 *        in pixels.  The box is centred around each beam position.  Each
-*        value must be at least 9.  It is only accessed if FAREA is 
+*        value must be at least 9.  It is only accessed if FAREA is
 *        .FALSE.
 *     REFPOS( BF__NDIM ) = DOUBLE PRECISION (Given)
 *        The reference position measured in the current WCS Frame.  The
-*        offset of the primary beam with respect to this points is 
+*        offset of the primary beam with respect to this points is
 *        calculated, reported, and written to an output parameter.
 *     REFLAB = CHARACTER * (*) (Given)
-*        Label used to describe reference position in the output.   At 
+*        Label used to describe reference position in the output.   At
 *        present it should be either "map centre", if that was used in
 *        the absence of a reference position stored with the original
-*        dataset; or "sky reference position".  If another value is 
+*        dataset; or "sky reference position".  If another value is
 *        supplied, "reference position" will be used.
 *     NPAR = INTEGER (Given)
 *        The maximum number of fit parameters.
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
-*        On entry this is the fixed fit parameters.  Any free parameters 
-*        take the value VAL__BADD.  See KPS1_BFFN for a list of the 
+*        On entry this is the fixed fit parameters.  Any free parameters
+*        take the value VAL__BADD.  See KPS1_BFFN for a list of the
 *        parameters.
 *
 *        On exit it contains the coefficients of the fit in the PIXEL
@@ -166,7 +166,7 @@
 *     2007 February 28 (MJC):
 *        Original version.
 *     2007 April 27 (MJC):
-*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of 
+*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of
 *        multiple Gaussians,
 *     2007 May 11 (MJC):
 *        Pass constraint flags as an array to shorten the API.
@@ -174,7 +174,7 @@
 *        Support fixed separations.
 *     2007 May 22 (MJC):
 *        Call new KPS1_BFCRF to perform co-ordinate conversions of the
-*        results.  Tidy up removing superfluous code, and MXPOS and 
+*        results.  Tidy up removing superfluous code, and MXPOS and
 *        PIXPOS arguments.
 *     2007 May 29 (MJC):
 *        Make arguments the same type in MAX and MIN function calls.
@@ -182,13 +182,13 @@
 *        Use new APIs for calculating and reporting polar co-ordinates
 *        of secondary features.
 *     2007 June 4 (MJC):
-*        Second redesign: no longer are offsets supplied from BEAMFIT 
+*        Second redesign: no longer are offsets supplied from BEAMFIT
 *        itself through the OFFSET argument.  Thus locations read from
 *        a file or catalogue can be an initial guess or a fixed value,
-*        or in the case of secondary beams be separations from the 
+*        or in the case of secondary beams be separations from the
 *        primary.  Removed unused variables.
 *     2007 June 8 (MJC):
-*        Moved NPAR and FPAR to the end of the non-STATUS arguments (as 
+*        Moved NPAR and FPAR to the end of the non-STATUS arguments (as
 *        FPAR is modified.
 *     2007 June 15 (MJC):
 *        Added REFPOS argument, propagated through to other routines.
@@ -200,7 +200,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -309,7 +309,7 @@
      :                 'pixel Frame of the NDF is not defined.',
      :                 STATUS )
       END IF
-      
+
       IF ( .NOT. AST_GETL( MAP2, 'TRANFORWARD', STATUS ) ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPS1_BFFIL_ERR2','The Mapping required '//
@@ -381,17 +381,17 @@
       ELSE
          WAX = 1
       END IF
-                                    
+
 *  First convert the PIXEL co-ordinates of the primary beam centre to
 *  the reporting Frame.
-      CALL AST_TRANN( MAP2, 1, 2, BF__MXPOS, PIXPOS, .TRUE., BF__NDIM, 
+      CALL AST_TRANN( MAP2, 1, 2, BF__MXPOS, PIXPOS, .TRUE., BF__NDIM,
      :                2, FPOS, STATUS )
 
 *  The supplied fixed widths are in the current Frame's co-ordinates.
 *  For fitting we need these to be in pixels.
       IF ( FPAR( 3 ) .NE. VAL__BADD ) THEN
 
-*  Transform the centre and centre plus width from the PIXEL Frame 
+*  Transform the centre and centre plus width from the PIXEL Frame
 *  of the NDF to the reporting Frame.
          FPOS( 2, 1 ) = FPOS( 1, 1 )
          FPOS( 2, 2 ) = FPOS( 1, 2 )
@@ -449,7 +449,7 @@
          END DO
       END DO
 
-*  If the initial position is good, fit to the beam positions. 
+*  If the initial position is good, fit to the beam positions.
       IF ( OK ) THEN
 
 *  Specify the pixel bounds around the beam.
@@ -475,7 +475,7 @@
 
 *  Map the variance array.  Otherwise create a valid pointer.
             IF ( VAR ) THEN
-               CALL NDF_MAP( NDFS, 'Variance', '_DOUBLE', 'READ', 
+               CALL NDF_MAP( NDFS, 'Variance', '_DOUBLE', 'READ',
      :                       IPWV, EL, STATUS )
             ELSE
                IPWV = IPWD
@@ -507,7 +507,7 @@
 
 *  Convert the pixel coefficients to the reporting Frame, also
 *  changing the widths from standard deviations to FWHMs.
-            CALL KPS1_BFCRF( MAP2, IWCS, NAXR, NPOS, BF__NCOEF, FPAR, 
+            CALL KPS1_BFCRF( MAP2, IWCS, NAXR, NPOS, BF__NCOEF, FPAR,
      :                       SIGMA, RP, RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Find the offset of the primary beam with respect to the reference
@@ -528,11 +528,11 @@
                REFOFF( 2 ) = SQRT( OFFVAR )
             ELSE
                REFOFF( 2 ) = VAL__BADD
-            END IF            
+            END IF
 
 *  Log the results and residuals if required.
             CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
-     :                       NPOS, BF__NCOEF, RP, RSIGMA, REFOFF, 
+     :                       NPOS, BF__NCOEF, RP, RSIGMA, REFOFF,
      :                       REFLAB, POLAR, POLSIG, RMS, DTYPE, STATUS )
 
 *  Write primary beam's fit to output parameters.

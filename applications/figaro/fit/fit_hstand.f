@@ -9,7 +9,7 @@ C     the optional keywords BSCALE and BZERO.  This routine
 C     is merely a packaged set of calls to FIT_WLOG, FIT_WINT
 C     and FIT_WREAL, and the user may opt to use these directly
 C     (for example, to force SIMPLE=F, or to explicitly comment
-C     some of the keywords).  If this routine is used, it 
+C     some of the keywords).  If this routine is used, it
 C     should be called directly after FIT_INIT.  This routine is
 C     the same as FIT_HSTAN, except that the BSCALE and BZERO
 C     parameters are double precision.  This routine should be
@@ -29,11 +29,11 @@ C                   of the array axes.  The information in this
 C                   array is used to generate the keywords NAXIS1
 C                   through NAXISn.  If NAXIS=0, a dummy argument
 C                   should be provided.
-C     (>) BSCALE    (Double precision) Scale factor used to convert 
-C                   tape pixel values to true values.  (True = [tape * 
+C     (>) BSCALE    (Double precision) Scale factor used to convert
+C                   tape pixel values to true values.  (True = [tape *
 C                   BSCALE] + BZERO).  Will be omitted if set to zero.
-C     (>) BZERO     (Double pecision) Offset applied to true pixel 
-C                   values. See above.  Will be omitted if BSCALE set 
+C     (>) BZERO     (Double pecision) Offset applied to true pixel
+C                   values. See above.  Will be omitted if BSCALE set
 C                   to zero.
 C     (<) STATUS    (Integer) Return status.  0 => OK, non-zero values
 C                   imply a tape I/O error and may be decoded using

@@ -46,7 +46,7 @@
 *    Authors :
 *     Mark McCaughrean UoE (REVA::MJM)
 *    History :
-*     10-04-1986 : Original version - mainly copy from 
+*     10-04-1986 : Original version - mainly copy from
 *                : AIF_GODDN (REVA::MJM)
 *    Type Definitions :
       IMPLICIT NONE ! switch off default typing

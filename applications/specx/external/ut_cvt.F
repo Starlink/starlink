@@ -34,7 +34,7 @@ C        Unused RARAD, DECRAD
       REAL*8    PI
 
       DATA      TSYMS_OK  /.FALSE./
-      DATA      PI /3.141592654D0/ 
+      DATA      PI /3.141592654D0/
 
       SAVE      HOUR_ANGLE, UTD, JULIAN_DATE, SIDEREAL_TIME, TSYMS_OK
 
@@ -110,7 +110,7 @@ C        Unused RARAD, DECRAD
 
       AZ = AZ8 * 180./PI
       EL = EL8 * 180./PI
- 
+
       RETURN
       END
 

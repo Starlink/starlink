@@ -12,7 +12,7 @@ hidden proc ccdfork user_script output_script directory
 
 {   Language:
 {      ICL
-   
+
 {   Type of Module:
 {      ICL/C-shell script
 
@@ -29,8 +29,8 @@ hidden proc ccdfork user_script output_script directory
 
 {   ADAM Parameters:
 {      user_script = filename (read)
-{         The name of the script file which contains the 
-{         CCDPACK commands which are to be run in the background. 
+{         The name of the script file which contains the
+{         CCDPACK commands which are to be run in the background.
 {      output_script = filename (write)
 {         The name of the output script which will re-establish
 {         the current ADAM context and execute your command
@@ -38,14 +38,14 @@ hidden proc ccdfork user_script output_script directory
 {      directory = directory (write)
 {         The name of a directory in which to store the current
 {         ADAM context. If no value is given then a sub-directory
-{         of the current ADAM_USER parent is created. 
+{         of the current ADAM_USER parent is created.
 {         [adam_unique_string]
 
 {   Examples:
 {      ccdfork ccdred
 {      ! nice ccdpack_fork &
 {         In this example ccdfork saves the current ADAM parameter
-{         files and writes a script file named ccdpack_fork which 
+{         files and writes a script file named ccdpack_fork which
 {         will enable the ccdred script file to execute in the
 {         background. The output script ccdpack_fork is then run from
 {         the C-shell and nice'd into the background.
@@ -54,7 +54,7 @@ hidden proc ccdfork user_script output_script directory
 {      ! nice batch1 &
 {         As above except that the output script is now called
 {         batch1.
-{      
+{
 {      ccdfork ccdred batch2 /scratch/user/batch2
 {         As above except the output script is now called batch2
 {         and the ADAM parameter files are written to the directory
@@ -76,10 +76,10 @@ hidden proc ccdfork user_script output_script directory
 
 {  Check the input parameters.
    CCDdir=getenv("CCDPACK_DIR")
-   if CCDdir <> "" 
+   if CCDdir <> ""
       if undefined(user_script)
          print "You must supply the name of a command script"
-      else 
+      else
          if undefined(output_script)
             sh (CCDdir)/ccdfork (user_script)
          else

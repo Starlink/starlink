@@ -2,7 +2,7 @@
 *
       SUBROUTINE LCCELL( DIM1, DIM2, ARRAY, DIML, DIMU, DIMO1, DIMO2,
      :                   NCONT, CONT, SLIST, CLIST, LINK, FLAG,
-     :                   STATUS ) 
+     :                   STATUS )
 *
 *    Description :
 *
@@ -22,7 +22,7 @@
 *
 *     This is not a user-level routine and does not perform any
 *     validation on the argument values supplied.  It is optimised for
-*     efficient execution. 
+*     efficient execution.
 *
 *    Notes :
 *
@@ -31,10 +31,10 @@
 *     image is only sparsely covered by contour lines.  It is
 *     inefficient to perform an individual search through the entire
 *     image for every contour level, so this routine identifies all the
-*     contourable cells in an image in a single pass. 
+*     contourable cells in an image in a single pass.
 *
 *     (ii)  So that the contourable cells can be retrieved, they are
-*     associated together via a series of linked lists (one for each 
+*     associated together via a series of linked lists (one for each
 *     contour level).  Cells which are contourable at only a single
 *     level ("simple" cells) are linked into one of these lists, from
 *     which they may be retrieved without referring to any other cells
@@ -48,12 +48,12 @@
 *     considered potentially contourable at any level.  Crowded cells
 *     must be individually tested when contouring is actually
 *     performed, although the number of such cells is usually very
-*     small. 
+*     small.
 *
 *     (iv)  The majority of cells are usually blank (i.e. most of the
 *     image does not contain contour lines).  The number of cells which
 *     must be considered is therefore greatly reduced once this routine
-*     has been run. 
+*     has been run.
 *
 *     (v)  Note that the criterion of "contourability" does not mean
 *     that a contour line will necessarily pass through each contourable
@@ -65,7 +65,7 @@
 *
 *     (vi)  This routine also initialises a set of flag values
 *     associated with cells in the image.  One value (FLAG = 1) is used
-*     to identify cells which contain "bad" pixels.  These cells do not 
+*     to identify cells which contain "bad" pixels.  These cells do not
 *     appear in the linked lists, but may be encountered when
 *     contour-following is performed.  The flag value indicates that
 *     these cells are not to be contoured and that contour-following
@@ -78,22 +78,22 @@
 *     it being considered twice.  Crowded cells are not flagged in this
 *     routine because they may be contoured repeatedly (at different
 *     contour levels) and the flag value must therefore be
-*     re-initialised each time. 
+*     re-initialised each time.
 *
 *    Invocation :
 *
 *     CALL LCCELL( DIM1, DIM2, ARRAY, DIML, DIMU, DIMO1, DIMO2, NCONT,
-*                  CONT, SLIST, CLIST, LINK, FLAG, STATUS ) 
+*                  CONT, SLIST, CLIST, LINK, FLAG, STATUS )
 *
 *    Parameters :
 *
 *     DIM1 = INTEGER (given)
 *         The first dimension of the 2-dimensional image ARRAY being
-*           contoured. 
+*           contoured.
 *
 *     DIM2 = INTEGER (given)
 *         The second dimension of the 2-dimensional image ARRAY being
-*           contoured. 
+*           contoured.
 *
 *     ARRAY( DIMS1, DIMS2 ) = REAL (given)
 *         The 2-d data array.
@@ -101,7 +101,7 @@
 *     DIML( 2 ) = INTEGER (given)
 *         The lower dimension bounds for the image ARRAY region to be
 *           processed (the ARRAY indices of the bottom-left pixel in
-*           the bottom-left image cell to be considered). 
+*           the bottom-left image cell to be considered).
 *
 *     DIMU( 2 ) = INTEGER (given)
 *         The upper dimension bounds for the image ARRAY region to be
@@ -130,7 +130,7 @@
 *           simple contourable image cells for each contour level.
 *           SLIST( I ) returns the index of the (vectorised) LINK array
 *           element for the first simple contourable cell associated
-*           with contour level I (or zero if the list is empty). 
+*           with contour level I (or zero if the list is empty).
 *
 *     CLIST = INTEGER (returned)
 *         A pointer into the start of the linked list of crowded image
@@ -153,7 +153,7 @@
 *           indices returned are single numbers which regard LINK as a
 *           1-dimensional (vectorised) array.  Those LINK elements
 *           which are not associated with contourable cells are not
-*           altered by this routine. 
+*           altered by this routine.
 *
 *     FLAG( DIMO1, DIMO2 ) = INTEGER (returned)
 *         A array of flag values which are associated with image cells
@@ -177,7 +177,7 @@
 *     - Check inherited error status.
 *
 *     - Initialise the start-of-list pointers and the current contour
-*       level. 
+*       level.
 *
 *     - Scan through the rectangular region of the image specified,
 *       extracting the pixel values from the four corners of each cell.
@@ -242,7 +242,7 @@
       INTEGER CLIST            ! Start-of-list pointer for crowded cells
       INTEGER LINK( DIMO1 * DIMO2 )
                                ! Array of cell-to-cell links
-                               ! (vectorised) 
+                               ! (vectorised)
 
       INTEGER FLAG( DIMO1 * DIMO2 )
                                ! Array of cell flag values (vectorised)
@@ -257,7 +257,7 @@
       INTEGER Y                ! Y (2-dimensional) ARRAY index of the
                                ! bottom-left pixel in a cell
       INTEGER IPIXBL           ! (Vectorised) ARRAY index of the
-                               ! bottom-left pixel in a cell 
+                               ! bottom-left pixel in a cell
       INTEGER IPIXTL           ! Ditto, top-left pixel
       INTEGER CELL             ! (Vectorised) LINK and FLAG array index
                                ! for a cell
@@ -291,13 +291,13 @@
 *   Scan through each row of cells in the rectangular region of the
 *   image being considered.  This is done in reverse (i.e. moving in
 *   the - Y direction) as it results in a more pleasing plotting order
-*   for the contours. 
+*   for the contours.
       DO Y = DIMU( 2 ), DIML( 2 ), - 1
 
 
 *   Identify the first cell in the current row of the panel (ICELL is
 *   the index of the first cell's entry in the vectorised LINK and FLAG
-*   arrays). 
+*   arrays).
          ICELL = DIMO1 * ( Y - DIML( 2 ) ) + 1
 
 
@@ -308,8 +308,8 @@
 
 
 *   Scan through each cell in the current row of the rectangular image
-*   region being considered (i.e. moving in the + X direction). 
-*   Increment the vectorised image ARRAY pixel indices accordingly. 
+*   region being considered (i.e. moving in the + X direction).
+*   Increment the vectorised image ARRAY pixel indices accordingly.
          DO CELL = ICELL, ICELL + ( DIMU( 1 ) - DIML( 1 ) )
             IPIXBL = IPIXBL + 1
             IPIXTL = IPIXTL + 1
@@ -326,7 +326,7 @@
 *   Identify the lowest and highest pixel values in the current cell
 *   (LOPIX and HIPIX).  The following nested tests determine these with
 *   the minimum number of intercomparisons and assignments by explicitly
-*   considering all possible combinations of pixel values. 
+*   considering all possible combinations of pixel values.
             IF ( PIXBL .GE. PIXBR ) THEN
 
                IF ( PIXTR .GE. PIXTL ) THEN
@@ -433,7 +433,7 @@
 *      reason) if the next contour down does not exceed the lowest
 *      pixel value.  Note that the loop termination test is put at the
 *      end, since its outcome before the first iteration is already
-*      known. 
+*      known.
     1             CONTINUE
                      IF ( ICONT .EQ. 1 ) GO TO 3
                      IF ( CONT( ICONT - 1 ) .LE. LOPIX ) GO TO 3
@@ -445,7 +445,7 @@
 *   does not exceed the highest pixel value.  If there are no lower
 *   contours, then the cell is simple.  The cell is also simple if the
 *   next contour down does not exceed the lowest pixel value -
-*   otherwise it is crowded. 
+*   otherwise it is crowded.
                   IF ( ICONT .EQ. 1 ) THEN
                      SIMPLE = .TRUE.
                   ELSE
@@ -465,7 +465,7 @@
 *      (the most common case) and subsequent cells also have similar
 *      pixel values, then the first loop (i.e. the one above) will
 *      execute in future - this is slightly faster since it involves
-*      one less test. 
+*      one less test.
     2             CONTINUE
                      IF ( ICONT .EQ. NCONT ) GO TO 3
                      ICONT = ICONT + 1
@@ -477,7 +477,7 @@
 *   exceeds the lowest pixel value.  If there are no higher contours,
 *   then the cell is simple.  The cell is also simple if the next
 *   contour up exceeds the highest pixel value - otherwise it is
-*   crowded. 
+*   crowded.
                   IF ( ICONT .EQ. NCONT ) THEN
                      SIMPLE = .TRUE.
                   ELSE
@@ -534,7 +534,7 @@
                ELSE
                   LINK( CELL ) = CLIST
                   CLIST = CELL
-               END IF 
+               END IF
 
 
 *   This is an exit point to which execution is directed as soon as it

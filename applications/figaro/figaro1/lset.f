@@ -6,7 +6,7 @@ C
 C     This routine is the main body of LXSET,LYSET
 C
 C     LXSET is a fudging routine that sets the range of the first axis
-C     associated with a spectrum or image, given a start and end 
+C     associated with a spectrum or image, given a start and end
 C     wavelength and whether or not the wavelengths are to be scaled
 C     logarithmically.
 C
@@ -27,7 +27,7 @@ C     VEND       bin of the resulting data. WEND and VEND are used
 C                by  LXSET and LYSET respectively)
 C
 C     OUTPUT     (Character) The name of the result of the operation.
-C                This can be the same as for IMAGE.  If not, a new 
+C                This can be the same as for IMAGE.  If not, a new
 C                structure is created, with everything but the axis
 C                data a direct copy of the input.
 C

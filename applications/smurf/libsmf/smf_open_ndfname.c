@@ -15,10 +15,10 @@
 *  Invocation:
 *     smf_open_ndfname( const HDSLoc *loc, const char accmode[],
 *           const char filename[], const char extname[],
-*		        const char state[], const char dattype[], const int ndims, 
+*		        const char state[], const char dattype[], const int ndims,
 *		        const int lbnd[], const int ubnd[], const char datalabel[],
 *           const char dataunits[], const AstFrameSet * wcs,
-*           smfData **ndfdata, 
+*           smfData **ndfdata,
 *                       int *status);
 
 *  Arguments:
@@ -63,7 +63,7 @@
 *     DATA array mapped. Returns a NULL smfData on error.
 
 *  Notes:
-*     - Only the DATA component of the NDF extension is mapped. Including the VARIANCE 
+*     - Only the DATA component of the NDF extension is mapped. Including the VARIANCE
 *       and QUALITY components is not beyond the realms of possibility.
 
 *  Authors:
@@ -138,19 +138,19 @@
 
 #define FUNC_NAME "smf_open_ndfname"
 
-void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filename[], 
+void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filename[],
                        const char extname[], const char state[], const char dattype[],
                        const int ndims, const int lbnd[], const int ubnd[],
                        const char datalabel[], const char dataunits[],
                        const AstFrameSet* wcs,
-                       smfData **ndfdata, 
+                       smfData **ndfdata,
                        int *status) {
 
   /* Local variables */
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
   smf_dtype dtype;              /* Data type */
-  int flags = 0;                /* Flags for creating smfDA, smfFile and 
+  int flags = 0;                /* Flags for creating smfDA, smfFile and
 				   smfHead components in the output smfData */
   int i;
   int ndat;                     /* Number of elements mapped in the requested NDF */
@@ -181,8 +181,8 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   }
   ndfOpen( loc, extname, accmode, state, &ndfid, &place, status );
   if ( *status != SAI__OK ) {
-    errRep( FUNC_NAME, 
-	    "Call to ndfOpen failed: unable to obtain an NDF identifier", 
+    errRep( FUNC_NAME,
+	    "Call to ndfOpen failed: unable to obtain an NDF identifier",
 	    status );
     return;
   }
@@ -196,7 +196,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
       return;
     }
   }
-  
+
   /* Convert the data type string to SMURF dtype */
   smf_string_to_dtype ( dattype, &dtype, status );
 
@@ -235,7 +235,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 
   /* Allow for label, units and WCS to be written */
   if (updating) {
-    if (datalabel) ndfCput( datalabel, ndfid, "Label", status ); 
+    if (datalabel) ndfCput( datalabel, ndfid, "Label", status );
     if (dataunits) ndfCput( dataunits, ndfid, "Unit", status );
     if (wcs) {
       /* Take a copy of the input WCS and modify if necessary that
@@ -255,7 +255,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   }
 
   /* And populate the new smfData */
-  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, 
+  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype,
                                     datarr, 1, (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
                                     NULL, NULL, status );
 

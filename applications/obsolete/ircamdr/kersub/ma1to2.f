@@ -1,5 +1,5 @@
 *+  MA1TO2 - Subroutine to grow a 1-D image into a 2-D image
-      SUBROUTINE MA1TO2( MODE, IDIMS1, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+      SUBROUTINE MA1TO2( MODE, IDIMS1, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :                   STATUS )
 *    Description :
 *     The 1-dimensional input array, ARRIN, is "grown" into the 2-dimensional
@@ -80,7 +80,7 @@
          IF( MODE .EQ. 1 ) THEN
 
 *          input array forms X-axis of output and is replicated in Y direction
-            DO Y = 1, ODIMS2 
+            DO Y = 1, ODIMS2
 
                DO X = 1, ODIMS1
 
@@ -91,9 +91,9 @@
          ELSEIF( MODE .EQ. 2 ) THEN
 
 *          input array forms Y-axis of output and is replicated in X direction
-            DO Y = 1, ODIMS2 
+            DO Y = 1, ODIMS2
 
-               DO X = 1, ODIMS1 
+               DO X = 1, ODIMS1
 
                   ARROUT( X, Y ) = ARRIN( Y )
                ENDDO

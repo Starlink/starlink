@@ -3,23 +3,23 @@
 *+
 *  Name:
 *     SURFLIB_REM_TIMESERIES
- 
+
 *  Purpose:
 *     Remove a time series  from a 2D array
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_REM_TIMESERIES ( N_BOLS, N_POS,
 *    :     TIME_SER, TIME_VAR, IN_DATA, IN_VAR, STATUS)
- 
+
 *  Description:
 *     Remove a time series (Y data) from a 2D array where the
 *     second dimension corresponds to time. It is assumed that
-*     both the time series and the 2D array have the same 
+*     both the time series and the 2D array have the same
 *     number of points in time (N_POS)
- 
+
 *  Arguments:
 *     N_BOLS = INTEGER (Given)
 *       Number of bolometers in data array (x dimension)
@@ -38,9 +38,9 @@
 
 *  Authors:
 *     Tim Jenness (timj@jach.hawaii.edu)
- 
+
 *  Notes:
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -54,16 +54,16 @@
 *     Revision 1.1  1998/05/29 23:28:34  timj
 *     Initial revision
 *
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! For VAL__BAD
- 
+
 *  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_POS

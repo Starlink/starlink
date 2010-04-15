@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,38 +143,38 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Call the appropriate version of CCG1_DCN to count the values.
-      IF ( ITYPE .EQ. '_BYTE' ) THEN 
-         CALL CCG1_DCNB( %VAL( CNF_PVAL( ARRAY ) ), 
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         CALL CCG1_DCNB( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
-      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN 
-         CALL CCG1_DCNUB( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         CALL CCG1_DCNUB( %VAL( CNF_PVAL( ARRAY ) ),
      :                    NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
-      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN 
-         CALL CCG1_DCNW( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL CCG1_DCNW( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
-      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN 
-         CALL CCG1_DCNUW( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         CALL CCG1_DCNUW( %VAL( CNF_PVAL( ARRAY ) ),
      :                    NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN 
-         CALL CCG1_DCNI( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         CALL CCG1_DCNI( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN 
-         CALL CCG1_DCNR( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL CCG1_DCNR( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN 
-         CALL CCG1_DCND( %VAL( CNF_PVAL( ARRAY ) ), 
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL CCG1_DCND( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
@@ -185,7 +185,7 @@
          CALL MSG_SETC( 'TYPE', ITYPE )
          CALL ERR_REP( 'CCD1_DCON',
      :   '  CCD1_DCON: Unsupported data type (^TYPE).', STATUS )
-      
+
       END IF
 
       END

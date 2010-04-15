@@ -38,7 +38,7 @@
 *        ...
 *        Pn = ...
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        Parameters; user coords of box centre, followed by length of each 
+*        Parameters; user coords of box centre, followed by length of each
 *        side of the box (in user coords).
 *     LBINTB( NDIM ) = INTEGER (Returned)
 *        The lower bounds of the internal bounding box.
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,7 +97,7 @@
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER NPAR
-      DOUBLE PRECISION D( * ) 
+      DOUBLE PRECISION D( * )
       DOUBLE PRECISION PAR( NPAR )
 
 *  Arguments Returned:
@@ -117,7 +117,7 @@
      :     UPPER( ARD__MXDIM ),  ! At upper bound?
      :     CARRY                 ! Carry forward?
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :     PIXCO( ARD__MXDIM ),  ! Pixel coordinates for current corner
      :     USERCO( ARD__MXDIM )  ! User coordinates for current corner
 
@@ -132,10 +132,10 @@
          UBINTB( I ) = VAL__MINI
       END DO
 
-*  Initialise a set of flags (one for each axis) indicating if the 
+*  Initialise a set of flags (one for each axis) indicating if the
 *  corresponding co-ordinate is at its upper or lower bound. Set all
 *  axes to their lower bounds.
-      DO I = 1, NDIM      
+      DO I = 1, NDIM
          UPPER( I ) = .FALSE.
          USERCO( I ) = PAR( I ) - 0.5*PAR( NDIM + I )
       END DO
@@ -177,7 +177,7 @@
 *  If this "bit" is clear, set it, and store the upper bound. Indicate
 *  that no carry is required.
             ELSE
-               UPPER( I ) = .TRUE.            
+               UPPER( I ) = .TRUE.
                USERCO( I ) = PAR( I ) + 0.5*PAR( NDIM + I )
                CARRY = .FALSE.
 
@@ -193,7 +193,7 @@
          LBINTB( I ) = MAX( LBINTB( I ), LBND( I ) )
          UBINTB( I ) = MIN( UBINTB( I ), UBND( I ) )
 
-*  If the lower bound is higher than the upper bound, return with a 
+*  If the lower bound is higher than the upper bound, return with a
 *  null box
          IF( LBINTB( I ) .GT. UBINTB( I ) ) THEN
             LBINTB( 1 ) = VAL__MINI

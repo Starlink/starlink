@@ -1,10 +1,10 @@
 	PROGRAM FPP
 
-* Plot spectrum from free-format ascii file 
+* Plot spectrum from free-format ascii file
 
 	IMPLICIT NONE
 
-	INTEGER 
+	INTEGER
      :	  LUN,              ! Logical unit for open of data file
      :	  LUN2,             ! Logical unit for open of data file
      :	  NIDS,             ! Number of IDs to be written out
@@ -18,7 +18,7 @@
      :	  BNPTS,            ! Number of points with bad quality
      :	  J,                ! Incremental variable
      :	  L,                ! Incremental variable
-     :	  L1,               ! Filename length 
+     :	  L1,               ! Filename length
      :	  ERRNTH,           ! nth error bar plotted
      :	  ENPTS,            ! Number of error bars plotted
      :	  QUAL( 5000),       ! Quality array
@@ -164,13 +164,13 @@
 	    END IF
 	  END IF
 
-	END DO				 
+	END DO
 
 *      Here when data file is empty
   200	CONTINUE
 	TYPE *, ' '
 
-*      Close data file 
+*      Close data file
 	CLOSE( LUN)
 
 *      Decrement number of data points variable and tell user number
@@ -197,7 +197,7 @@
 *      Correct wavelength start variable to minimum
 	IF( WAVEST .LT. MINX) WAVEST = MINX
 
-*      Correct wavelength end variable to maximum 
+*      Correct wavelength end variable to maximum
 	IF( WAVEEN .GT. MAXX) WAVEEN = MAXX
 
 *      Tell user minimum and maximum and get values wanted
@@ -428,8 +428,8 @@
 	  END IF
 	  IF( CWHERE( 1:1) .NE. 'T' ) TYPE *, '  Data points plotted'
 	END IF
-     
-*      Plot error bars in Y 
+
+*      Plot error bars in Y
 	IF( ERRBP .EQ. 'Y') THEN
 	  CALL PGERRY( ENPTS, XE, YERU, YERL, 0.0)
 	  IF( CWHERE( 1:1) .NE. 'T' ) TYPE *, '  Data error bars plotted'
@@ -446,11 +446,11 @@
 	  DO L = 1, NIDS
 	    IF( IDSTRING( L)( 1:1) .EQ. '-') THEN
 	      CALL PGSCH( QSIZE*2)
-	      CALL PGPTEXT( ( XID( L)+JUNK), YID( L), 0.0, 0.0, 
+	      CALL PGPTEXT( ( XID( L)+JUNK), YID( L), 0.0, 0.0,
      :	                      IDSTRING( L)( 2:))
 	      CALL PGSCH( QSIZE)
 	    ELSE
-	      CALL PGPTEXT( ( XID( L)+JUNK), YID( L), 90.0, 0.0, 
+	      CALL PGPTEXT( ( XID( L)+JUNK), YID( L), 90.0, 0.0,
      :	                      IDSTRING( L))
 	    END IF
 	  END DO
@@ -464,7 +464,7 @@
 
 *      End plotting
 	CALL PGEND
-     
+
 *      Spawn print command
 	IF( CWHERE( 1:1) .EQ. 'Q' ) THEN
 	ELSE IF( CWHERE( 1:1) .EQ. 'P' ) THEN
@@ -474,4 +474,4 @@
 	  READ( 5, '(A)') DLINE
 	END IF
 
-	END 
+	END

@@ -37,11 +37,11 @@
 *     -  'SWSAA'    ISO, SWS instrument, auto-analysis product (SWAA)
 *     -  'LWSAA'    ISO, LWS instrument, auto-analysis product (LSAN)
 *     -  'CAMAA'    ISO, CAM instrument, auto-analysis products (CMxx)
-*     -  'INES '    IUE, INES spectra 
+*     -  'INES '    IUE, INES spectra
 *     -  'IUELI'    IUE, LILO or LIHI linearised flag image products
 *     -  'IUEMX'    IUE, MXLO extracted low-dispersion spectra product
 *     -  'IUEMH'    IUE, MXHI extracted high-dispersion spectra product
-*     -  'IUERI'    IUE, RILO or RIHI raw-image products 
+*     -  'IUERI'    IUE, RILO or RIHI raw-image products
 *     -  'IUESI'    IUE, SILO or SIHI resampled-image products
 *     -  'IUEVD'    IUE, VDLO or VDHI vector-displacement products
 *     -  'SMURF'    JCMT time-series processed by the SMURF package
@@ -109,7 +109,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -193,7 +193,7 @@
 *  Obtain the filename from the FILENAME keyword in the header.
       CALL COF_GKEYC( FUNIT, 'FILENAME', FILPRE, FILNAM, COMENT,
      :                STATUS )
-     
+
 *  Check for AAO MOS Data Format keyword in the header.
       CALL COF_GKEYC( FUNIT, 'AAOMOSFT', AAOPRE, AAOFTV, COMENT,
      :                STATUS )
@@ -257,7 +257,7 @@
 
 *  Only proceed if there there was no error.
          IF ( FSTAT .EQ. FITSOK ) THEN
-            
+
 *  Obtain the filename from the FILENAME keyword in the header.
             CALL COF_GKEYC( FUNIT, 'FILENAME', FILPRE, FILNAM, COMENT,
      :                      STATUS )
@@ -291,17 +291,17 @@
      :          TELESC .EQ. 'UKST' ) THEN
          CALL CHR_UCASE( INSTRU )
          IF ( INSPRE .AND. ( INSTRU .EQ. 'CCD_1' .OR.
-     :        INSTRU .EQ. '2DF' .OR. 
+     :        INSTRU .EQ. '2DF' .OR.
      :        INSTRU .EQ. '6DF' .OR.
-     :        INSTRU .EQ. 'AAOMEGA-2DF' .OR. 
+     :        INSTRU .EQ. 'AAOMEGA-2DF' .OR.
      :        INSTRU .EQ. 'FMOS' .OR.
-     :        INSTRU .EQ. 'AAOMEGA-IFU' .OR. 
+     :        INSTRU .EQ. 'AAOMEGA-IFU' .OR.
      :        INSTRU .EQ. 'SPIRAL' ) ) THEN
             NAME = 'AAO2DF'
          END IF
 
-      ELSE IF ( AAOPRE .AND. 
-     :          AAOFTV( 1:1 ) .NE. 'F' .AND. 
+      ELSE IF ( AAOPRE .AND.
+     :          AAOFTV( 1:1 ) .NE. 'F' .AND.
      :          AAOFTV( 1:1 ) .NE. 'f' ) THEN
           NAME = 'AAO2DF'
 
@@ -310,7 +310,7 @@
 
 *  Preliminary test.  May need to search through the extensions
 *  looking for an EXTNAME containing 'MORE.SMURF'.
-      ELSE IF ( TELPRE .AND. TELESC .EQ. 'JCMT' .AND. 
+      ELSE IF ( TELPRE .AND. TELESC .EQ. 'JCMT' .AND.
      :          INSPRE .AND. INSTRU .EQ. 'HARP'  ) THEN
          NAME = 'SMURF'
       END IF

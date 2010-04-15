@@ -7,7 +7,7 @@ C     ALASOUT takes data from a FIGARO spectrum and writes it to a file
 C     in ACSII format, suitable for input to ALAS (Absorption Line
 C     Analysis Software) as an 'Observed Profile File'.
 C     The user can select the X range to be transferred, ie to cover
-C     the desired line without too much extra spectrum.  This is 
+C     the desired line without too much extra spectrum.  This is
 C     important since ALAS has a limit of 300 channels for these input
 C     files (at least in version as per Starlink LUN/41.1).
 C     For each selected channel an output line is written to the
@@ -28,18 +28,18 @@ C                                J.G. Robertson   September 1985
 C     Modified:
 C
 C     22nd Apr 1986  KS / AAO.  Names of routines EXTRACT and CHUNK
-C                    changed to avoid conflict with other Figaro 
+C                    changed to avoid conflict with other Figaro
 C                    routines.
-C     27th Aug 1987  KS / AAO.  Revised DSA_ routines - some specs 
+C     27th Aug 1987  KS / AAO.  Revised DSA_ routines - some specs
 C                    changed. Now uses DYN routines for dynamic-memory
 C                    handling. Will no longer fail if data aren't FLOAT
-C                    or DOUBLE, as DSA_ routines force conversion. 
-C                    EXTRCT1 and CHUNK1 removed - their functions being 
-C                    performed by DSA_ routines much more tidily. Can 
-C                    no longer alter XSTART,XEND if range is too big, 
+C                    or DOUBLE, as DSA_ routines force conversion.
+C                    EXTRCT1 and CHUNK1 removed - their functions being
+C                    performed by DSA_ routines much more tidily. Can
+C                    no longer alter XSTART,XEND if range is too big,
 C                    this would never have worked before anyway!
-C     20th Dec 1990  JMS / AAO. Now prints from XSTART to XEND. Also 
-C                    fixed the array-dimensioning problem by using 
+C     20th Dec 1990  JMS / AAO. Now prints from XSTART to XEND. Also
+C                    fixed the array-dimensioning problem by using
 C                    dynamic memory.
 C     29th Sep 1992  HME / UoE, Starlink.  Lowercase extension .als for
 C                    ALAS file. INCLUDE changed. TABs removed. No RECL
@@ -81,9 +81,9 @@ C
       INTEGER      LEALAS        ! Length of output filename
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
-      INTEGER      NPIX          ! Number of array elements to be 
+      INTEGER      NPIX          ! Number of array elements to be
                                  ! transferred
-      INTEGER      NX            ! Size of the 1st dimension of the 
+      INTEGER      NX            ! Size of the 1st dimension of the
                                  ! input array
       INTEGER      NXX           ! Size of the x-axis array
       INTEGER      PDPOS         ! Position of '.' in output filename
@@ -93,7 +93,7 @@ C
       LOGICAL      XEXIST        ! Valid x-axis structure exists?
       INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data
                                  ! array
-      INTEGER      XSLOT         ! Map slot number of input x-axis data 
+      INTEGER      XSLOT         ! Map slot number of input x-axis data
                                  ! array
       REAL         XVEN          ! Value of last pixel in specified
                                  ! range
@@ -145,9 +145,9 @@ C
       END IF
       FOPEN=.TRUE.
 C
-C     Check that there is a valid X-axis array in the input file 
+C     Check that there is a valid X-axis array in the input file
 C
-      CALL DSA_SEEK_AXIS('SPECT',1,XEXIST,STATUS) 
+      CALL DSA_SEEK_AXIS('SPECT',1,XEXIST,STATUS)
       IF ((STATUS.NE.0).OR.(.NOT.XEXIST)) THEN
          CALL PAR_WRUSER(
      :      'Input file does not have valid X-array',IGNORE)

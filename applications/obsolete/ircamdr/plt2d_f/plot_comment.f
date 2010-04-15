@@ -71,7 +71,7 @@
 
 * check status on entry
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 'Error : PLOT_COMMENT : On entry', 
+          CALL ERR_REP('ERR', 'Error : PLOT_COMMENT : On entry',
      :                  STATUS )
 	  RETURN
 	END IF

@@ -64,7 +64,7 @@
 
 *  Examples:
 *     ccdnote '"Start of the NGC2261 CCD reduction - R filter"'
-*     ccdnote '"Reduction performed by Tel. E. Scope using data 
+*     ccdnote '"Reduction performed by Tel. E. Scope using data
 *     from the 1986 run"'
 *        In this example a record of the object and observer is entered
 *        into the current log file.

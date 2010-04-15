@@ -22,8 +22,8 @@
 *    Global constants :
 
 	INCLUDE 'SAE_PAR'
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -99,8 +99,8 @@
 
 *          call subroutine to do work
 
-	    CALL STEPIMSUB( DIMS(1), DIMS(2), %VAL( PNTRI), 
-     :	                    %VAL( PNTRO), STEPNUM, STEPBASE, STEPINT, 
+	    CALL STEPIMSUB( DIMS(1), DIMS(2), %VAL( PNTRI),
+     :	                    %VAL( PNTRO), STEPNUM, STEPBASE, STEPINT,
      :                      XMAX, XMIN, STATUS)
 
 *          tidy up output structure and workspace

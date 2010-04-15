@@ -7,7 +7,7 @@
 * In/Out
 	DOUBLE PRECISION TS2(*),TE2(*)	! Start/end MJDs for series 2 & merged
 	INTEGER		NW2		! # windows in series 2 & merged
- 
+
 * Modified version of TMERGE.
 *-
 * local
@@ -18,11 +18,11 @@
 	INTEGER 	STATE(240000), STEMP, ON, OFF
 	PARAMETER 	(ON=1, OFF=0)
 	PARAMETER	(MAXWIN = 60000)
- 
+
 * Form the i/p windows series into single vectors with alternating ON,OFF states
 	N1 = 2*NW1
 	N2 = 2*NW2
- 
+
 * Do Series 1
 	DO N = 1, NW1
 	  TC(2*N-1) = TS1(N)
@@ -30,7 +30,7 @@
 	  TC(2*N) = TE1(N)
 	  STATE(2*N) = OFF
 	ENDDO
- 
+
 * Do series 2
 	DO N=1, NW2
 	  TC((2*N-1)+N1) = TS2(N)
@@ -38,7 +38,7 @@
 	  TC(2*N+N1) = TE2(N)
 	  STATE(2*N+N1) = OFF
 	ENDDO
- 
+
 * Bubble sort the times - do states at the same time
 	NTOT = N1 + N2
 	DO J = 2, NTOT
@@ -52,7 +52,7 @@
 	      STATE(I-1) = STEMP
 	    ENDDO
 10	ENDDO
- 
+
 * Now do the clever bit - sort out the overlaps. (ie find the time intervals
 * of commonality between the two i/p series)
 	N12 = 0
@@ -76,14 +76,14 @@
 	    ENDIF
 	  ENDIF
 	ENDDO
- 
+
 * Form the processed list of alternating ON,OFFs into merged windows
 * Overwrite second input time series.
- 
+
 	NW2=MIN(N12/2,MAXWIN)
 	DO N=1,NW2
 	  TS2(N)=TC(2*N-1)
 	  TE2(N)=TC(2*N)
 	ENDDO
- 
+
 	END

@@ -46,7 +46,7 @@
 *     - If the array is stored in scaled form, then the mapped values
 *     will be the result of applying the approproate scale and zero terms
 *     to the elements of the underlying array.
-*     - Scaled arrays are read-only. An error will be reported if the array 
+*     - Scaled arrays are read-only. An error will be reported if the array
 *     is stored in scaled form and the access mode is UPDATE or WRITE.
 *     -  The result of mapping the QUALITY component with a data type
 *     other than '_UBYTE' is not defined and should not be used.
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

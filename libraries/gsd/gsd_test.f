@@ -11,12 +11,12 @@
 *     GSD library. There is a C version of this programme, which should
 *     be used instead for general use.
 *
-*     It simply opens a pre-determined file that should be in the 
+*     It simply opens a pre-determined file that should be in the
 *     distribution and writes a log file (gsd_test.lis) and a completion
 *     message (sent to STDOUT). It reads file obs_cbe_0043.gsd
 
 *  Compilation:
-*     It must be linked with the GSD library, and also with 
+*     It must be linked with the GSD library, and also with
 *     Starlink's CNF library, like:
 *       "f77 -g gsd_test.f -L/star/lib `gsd_link`"
 
@@ -25,26 +25,26 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
 *     02111-1307, USA
 
-*    Authors: 
+*    Authors:
 *     Jon Fairclough
 *     Horst Meyerdierks
 *     Tim Jenness (JAC, Hilo)
 *
-*    History: 
-*     11-Nov-1986 (JF): 
+*    History:
+*     11-Nov-1986 (JF):
 *         Original.
-*     06-Dec-1994: 
+*     06-Dec-1994:
 *         Ported to Unix, as tutorial.
 *     15-Dec-1999:
 *         Made into a test routine for the Starlink distribution
@@ -53,7 +53,7 @@
 
 * Copyright:
 *     Copyright (C) 1986-2005 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved. 
+*     All Rights Reserved.
 
 *.
 
@@ -129,7 +129,7 @@
 *
 *    Prompt for filename
 *      DO WHILE (FILELEN .LE. 0)
-*         CALL LIB$GET_FOREIGN(FILENAME, 'I : Name of GSD file > ', 
+*         CALL LIB$GET_FOREIGN(FILENAME, 'I : Name of GSD file > ',
 *     :                        FILELEN, FORCEPROMPT)
 *         FORCEPROMPT = 1
 *      ENDDO
@@ -141,12 +141,12 @@
 *      IF ( FILELEN .LE. 0 ) STOP 'Error: No file name given'
 *
 *    Open GSD file
-      CALL GSD_OPEN_READ(FILENAME, 
-     :                   FD,                         
-     :                   VERSION,                    
-     :                   LABEL,                      
+      CALL GSD_OPEN_READ(FILENAME,
+     :                   FD,
+     :                   VERSION,
+     :                   LABEL,
      :                   NITEM,
-     :                   STATUS)       
+     :                   STATUS)
 
       IF (STATUS .EQ. 0) THEN
 *
@@ -199,7 +199,7 @@
 *             conversion)
 *               CALL GSD_GET0C (GSDINDEX, CVALUE, STATUS)
 *
-*               WRITE (UNIT=LUN, FMT=1000) NAME, UNIT, TYPE, TABLE, 
+*               WRITE (UNIT=LUN, FMT=1000) NAME, UNIT, TYPE, TABLE,
 *     :                                    CVALUE
 *1000           FORMAT (T2, A15, T18, A10, T31, A1, T41, L1, T51, A25)
 *
@@ -236,18 +236,18 @@
             ELSE
 *
 *             Get the dimensional information on the array...
-               CALL GSD_INQ_SIZE (FD, NUMBER,                     
-     :                            GSD__MXDIM, DIMNAMES, DIMUNITS, 
+               CALL GSD_INQ_SIZE (FD, NUMBER,
+     :                            GSD__MXDIM, DIMNAMES, DIMUNITS,
      :                            DIMVALS, ACTDIMS, SIZE, STATUS)
 
-               WRITE (UNIT=LUN, FMT=2000) NAME, UNIT, TYPE, TABLE, 
+               WRITE (UNIT=LUN, FMT=2000) NAME, UNIT, TYPE, TABLE,
      :                                    SIZE, ACTDIMS
 2000           FORMAT (T2, A15, T18, A10, T31, A1, T41, L1, T51, 2I10)
                DO I = 1, ACTDIMS
-                  WRITE (UNIT=LUN, FMT=3000) DIMNAMES(I), 
+                  WRITE (UNIT=LUN, FMT=3000) DIMNAMES(I),
      :                                       DIMUNITS(I),
      :                                       DIMVALS(I)
-3000              FORMAT (T2, ' DIMNAMES = ', A15, 
+3000              FORMAT (T2, ' DIMNAMES = ', A15,
      :                        ' DIMUNITS = ', A10,
      :                        ' DIMVALS = ', I10)
                ENDDO
@@ -259,52 +259,52 @@
                TRANSFER_COUNT = 0
                END = 0
 *
-               DO WHILE (STATUS .EQ. 0 .AND. 
+               DO WHILE (STATUS .EQ. 0 .AND.
      :                   TRANSFER_COUNT .LT. TRANSFERS)
 *
                   TRANSFER_COUNT = TRANSFER_COUNT + 1
                   START = END + 1
                   END = MIN (SIZE, END + MAXTRANS)
 *
-*                  CALL GSD_GET1C (GSDINDEX, 1, SIZE, START, END, 
+*                  CALL GSD_GET1C (GSDINDEX, 1, SIZE, START, END,
 *     :                            CVALUES, ACTVALS, STATUS)
 *
-*                  WRITE (UNIT=LUN, FMT=4000) 
+*                  WRITE (UNIT=LUN, FMT=4000)
 *     :                  (CVALUES(I), I = 1, ACTVALS)
 *4000              FORMAT (1X, 3A)
 *
                   IF ( TYPE .EQ. 'B' ) THEN
-                     CALL GSD_GET1B (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1B (GSDINDEX, 1, SIZE, START, END,
      :                            BVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4001) (BVALUES(I), I = 1, ACTVALS)
 4001                 FORMAT (1X, 12(1X,I4,1X))
                   ELSE IF ( TYPE .EQ. 'L' ) THEN
-                     CALL GSD_GET1L (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1L (GSDINDEX, 1, SIZE, START, END,
      :                            LVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4002) (LVALUES(I), I = 1, ACTVALS)
 4002                 FORMAT (1X, 12(1X,L1,1X))
                   ELSE IF ( TYPE .EQ. 'W' ) THEN
-                     CALL GSD_GET1W (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1W (GSDINDEX, 1, SIZE, START, END,
      :                            WVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4003) (WVALUES(I), I = 1, ACTVALS)
 4003                 FORMAT (1X, 8(1X,I6,1X))
                   ELSE IF ( TYPE .EQ. 'I' ) THEN
-                     CALL GSD_GET1I (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1I (GSDINDEX, 1, SIZE, START, END,
      :                            IVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4004) (IVALUES(I), I = 1, ACTVALS)
 4004                 FORMAT (1X, 6(1X,I10,1X))
                   ELSE IF ( TYPE .EQ. 'R' ) THEN
-                     CALL GSD_GET1R (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1R (GSDINDEX, 1, SIZE, START, END,
      :                            RVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4005) (RVALUES(I), I = 1, ACTVALS)
 4005                 FORMAT (1X, 4(1X,G14.8,1X))
                   ELSE IF ( TYPE .EQ. 'D' ) THEN
-                     CALL GSD_GET1D (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1D (GSDINDEX, 1, SIZE, START, END,
      :                            DVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4006) (DVALUES(I), I = 1, ACTVALS)
 4006                 FORMAT (1X, 3(1X,G21.15,1X))
                   ELSE IF ( TYPE .EQ. 'C' ) THEN
-                     CALL GSD_GET1C (GSDINDEX, 1, SIZE, START, END, 
+                     CALL GSD_GET1C (GSDINDEX, 1, SIZE, START, END,
      :                            CVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4007) (CVALUES(I), I = 1, ACTVALS)
 4007                 FORMAT (1X, 4(1X,A16,1X))

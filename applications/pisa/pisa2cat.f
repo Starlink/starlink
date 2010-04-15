@@ -20,9 +20,9 @@
 *        The global status.
 
 *  Description:
-*     PISA2CAT converts PISAFIND and PISAPEAK results files into 
-*     catalogues. The output catalogues can be used by CURSA 
-*     or CATPAC applications. 
+*     PISA2CAT converts PISAFIND and PISAPEAK results files into
+*     catalogues. The output catalogues can be used by CURSA
+*     or CATPAC applications.
 
 *  Usage:
 *     pisa2cat datatype data cat
@@ -47,8 +47,8 @@
 *        [FIND]
 
 *  Notes:
-*     -  The output format of the catalogue can be manipulated by 
-*        changing the file extension. Without a file extension 
+*     -  The output format of the catalogue can be manipulated by
+*        changing the file extension. Without a file extension
 *        a binary FITS table is produced. If you add a ".sdf" extension
 *        then an HDS catalogue that can be used by CATPAC will
 *        be created.
@@ -66,10 +66,10 @@
 *  Examples:
 *     pisa2cat find pisafind.dat find
 *        This example converts the results file containing the object
-*        parameterisations from PISAFIND to FITS table format. It writes 
+*        parameterisations from PISAFIND to FITS table format. It writes
 *        the results to the file find.FIT
 *     pisa2cat peak pisapeak.dat peak.sdf
-*        This example converts the output from a run of PISAPEAK into 
+*        This example converts the output from a run of PISAPEAK into
 *        an HDS catalogue that can be used with the CATPAC applications.
 
 *  Authors:
@@ -109,7 +109,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Determine the type of PISA file we're dealing with.
-      CALL PAR_CHOIC( 'DATATYPE', 'FIND', 'FIND,SIZE,PEAK', .FALSE., 
+      CALL PAR_CHOIC( 'DATATYPE', 'FIND', 'FIND,SIZE,PEAK', .FALSE.,
      :                DTYPE, STATUS )
 
 *  Open the pisa data file.

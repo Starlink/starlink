@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  If the units are 'JY', the image is a PO FLUX.
       IF ( CHR_SIMLR( TEXT, 'JY' ) ) THEN
          FLUX = .TRUE.
-      
+
 *  Or if the units are 'JY/SR', image is a PO INTENSITY.
       ELSE IF ( CHR_SIMLR( TEXT, 'JY/SR' ) ) THEN
          FLUX = .FALSE.

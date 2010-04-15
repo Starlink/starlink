@@ -1,12 +1,12 @@
 *+  RED4_ADD_OBSERVATION - Add an observation to a reduced group file
       SUBROUTINE RED4_ADD_OBSERVATION( STATUS )
 *    Description :
-*     This routine applies a reduced observation belonging to a particular 
+*     This routine applies a reduced observation belonging to a particular
 *     group to a reduced group file. If the reduced group file does not
 *     exist, a new one is created and initialised. Reduced observations
-*     of type OBJECT are added to the contents of the reduced group 
+*     of type OBJECT are added to the contents of the reduced group
 *     file. Reduced observations of type SKY are subtracted from the
-*     contents of the reduced group file, after being optionally 
+*     contents of the reduced group file, after being optionally
 *     multiplied by a weighting factor indicated by the SKY_WT parameter.
 *     Observations may also be weighted according to their variance
 *     if observing conditions dictate.
@@ -14,11 +14,11 @@
 *
 *     A record of all the observations added is kept in the COADDS
 *     structure of the reduced group file. If this record shows that the
-*     specified observation has already been added, a warning message 
+*     specified observation has already been added, a warning message
 *     will be issued and it will not be added again.
 *
 *     The FITS header information from the first OBJECT observation is
-*     copied to the reduced group file. When subsequent OBJECT observations 
+*     copied to the reduced group file. When subsequent OBJECT observations
 *     are added, the header information is updated as follows :-
 *
 *     EXPOSED     - Value is accumulated (new = old + current)
@@ -35,7 +35,7 @@
 *     OBJECT observations making up the group.
 *
 *     A record of the total exposure time contributed from the SKY
-*     observations will be accumulated in a SKYEXP parameter, taking 
+*     observations will be accumulated in a SKYEXP parameter, taking
 *     into account any weighting factors used :-
 *
 *     SKYEXP      - Value is accumulated (new = old + current*SKY_WT)
@@ -67,7 +67,7 @@
 *     3. The variance weighting algorithm will work properly only for
 *        a series of consecutive OBJECT observations. If both OBJECT and
 *        SKY observations are reduced, different weights may be applied
-*        to OBJECT and SKY, and the data will not be properly 
+*        to OBJECT and SKY, and the data will not be properly
 *        sky-subtracted.
 *
 *     Because of these deficiencies, it is recommended that OBJECT and
@@ -229,11 +229,11 @@
 *               Convert the observation file name, together with the
 *               group number obtained above, into the name of the
 *               reduced group file.
-                  CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS ) 
+                  CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS )
 
 *               Check is this reduced group file exists.
                   DSA_STATUS = STATUS
-                  CALL DSA_SEEK_NAMED_STRUCTURE( GRPRED, EXIST, 
+                  CALL DSA_SEEK_NAMED_STRUCTURE( GRPRED, EXIST,
      :               DSA_STATUS )
 
 *               If this has worked, and the structure does not exist,
@@ -245,7 +245,7 @@
 
                      STATUS = SAI__ERROR
                      CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION: '/
-     :                 /'Error seeking CGS4 specific structure', 
+     :                 /'Error seeking CGS4 specific structure',
      :                 STATUS )
                   END IF
 
@@ -264,7 +264,7 @@
 
                      DSA_STATUS = STATUS
                      CALL DSA_OPEN( DSA_STATUS )
-                     CALL DSA_NAMED_INPUT( 'OBSRED', OBSRED, 
+                     CALL DSA_NAMED_INPUT( 'OBSRED', OBSRED,
      :                 DSA_STATUS )
                   END IF
 
@@ -327,23 +327,23 @@
 
 *               Check that the following conditions between the reduced
 *               observation and reduced group structure are satisfied:-
-*               (a) The data arrays are the same size (to ensure the 
+*               (a) The data arrays are the same size (to ensure the
 *                   same degree of oversampling has been used).
 *               (b) The data units are the same (to ensure some observations
 *                   haven't been normalised or transformed).
-*               (c) The X axis size and units are the same (to ensure 
+*               (c) The X axis size and units are the same (to ensure
 *                   that wavelength calibrated data is not added by accident).
 *               If all these conditions are not met, an error is generated.
                   CALL DSA_MATCH_SIZES( 'OBSRED', 'GRPRED', DSA_STATUS )
                   CALL DSA_MATCH_UNITS( 'OBSRED', 'GRPRED', DSA_STATUS )
-                  CALL DSA_MATCH_AXIS( 'OBSRED', 1, 'GRPRED', 1, 
+                  CALL DSA_MATCH_AXIS( 'OBSRED', 1, 'GRPRED', 1,
      :              DSA_STATUS )
 
 *               Open the COADDS structure within the reduced group file
                   CLEN = MAX( 1, CHR_LEN( GRPRED ) )
                   COADDS = GRPRED(1:CLEN) // '.MORE.CGS4_COADDS'
 
-                  CALL DSA_NAMED_INPUT( 'COADDS', COADDS, DSA_STATUS ) 
+                  CALL DSA_NAMED_INPUT( 'COADDS', COADDS, DSA_STATUS )
 
 *               Obtain the DTA address of the COADDED_OBS structure
 *               within the COADDS structure.
@@ -352,7 +352,7 @@
 
 *               Convert the observation name into its corresponding
 *               coadd structure name.
-                  IF ( DSA_STATUS .NE. ADAM__OK ) THEN 
+                  IF ( DSA_STATUS .NE. ADAM__OK ) THEN
 
                      CALL ERR_ANNUL( STATUS )
                   END IF
@@ -373,7 +373,7 @@
 *                     The observation has not already been applied.
 *                     We may now proceed with the actual processing
 *                     of the data.
-                        CALL RED4_ADD_OBSERVATION_2( OBSTYPE, 
+                        CALL RED4_ADD_OBSERVATION_2( OBSTYPE,
      :                    COADDED_OBS, COADD_NAME, VARIANCE_WT,
      :                    SKY_WT, STATUS )
 
@@ -396,7 +396,7 @@
                   STATUS = SAI__ERROR
                   CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION: '/
      :              /'This observation has not '/
-     :              /'been properly reduced - not added to group', 
+     :              /'been properly reduced - not added to group',
      :              STATUS )
                END IF
             ELSE
@@ -410,7 +410,7 @@
                CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION: '/
      :           /'Only OBJECT and SKY '/
      :           /'observations may be co-added into a group',
-     :           STATUS ) 
+     :           STATUS )
             END IF
          ELSE
 
@@ -431,7 +431,7 @@
      :        /'Second error closing DSA', STATUS )
          END IF
       ELSE
- 
+
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_ADD_OBSERVATION: '/
      :     /'Error obtaining %OBSFILE, '/

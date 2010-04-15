@@ -1,17 +1,17 @@
 C
 C======================================================================
 C
-C This is the mainline program, DAOPHOT.  
+C This is the mainline program, DAOPHOT.
 C
 C                OFFICIAL DAO VERSION: 1991 April 18
 C
 C The purposes of this snatch of code are threefold:
 C (1) to type out a message from the local DAOPHOT curator, letting
-C     the user know of any recent changes in the code; 
-C (2) to look for a file named 'daophot.opt' in the current default 
+C     the user know of any recent changes in the code;
+C (2) to look for a file named 'daophot.opt' in the current default
 C     directory and, if it is found, to read in values for the optional
-C     parameters [otherwise set them at default values]; and 
-C (3) to accept commands from the keyboard and call the appropriate 
+C     parameters [otherwise set them at default values]; and
+C (3) to accept commands from the keyboard and call the appropriate
 C     subroutines.
 C
 C
@@ -22,7 +22,7 @@ C
 *  History:
 *     19-Feb-1992 (NE)
 *       Updated the number of arguments in calls to RDHEAD (in APPEND) and
-*       MMM (in SKY). 
+*       MMM (in SKY).
 *     17-Mar-1995 (GJP)
 *       Replaced very negative, very large or very small numbers with
 *       their PRM_PAR equivalents.
@@ -37,7 +37,7 @@ C
 
       INTEGER NOPT, NCMD, MAXPSF, MAXEXP, MAXBOX, MAXSKY,
      .     MAXPAR
-      PARAMETER (NOPT=21, NCMD=23, MAXPSF=145, 
+      PARAMETER (NOPT=21, NCMD=23, MAXPSF=145,
      .     MAXEXP=6, MAXPAR=6, MAXBOX=13, MAXSKY=10000)
 C
 C Parameters
@@ -53,14 +53,14 @@ C IF ANY OF THE FOLLOWING THREE PARAMETERS IS CHANGED, IT MUST
 C ALSO BE CHANGED IN THE FILE CONTAINING THE ROUTINE GETPSF.
 C MAXPAR MUST BE CHANGED IN TWO PLACES IN THAT FILE.
 C
-C MAXPSF is the maximum size of the PSF arrays.  
+C MAXPSF is the maximum size of the PSF arrays.
 C
 C MAXEXP is the maximum number of PSF lookup tables allowed.
 C        MAXEXP must be at least 2, because I use PSF as scratch
-C        space in FIND.  
+C        space in FIND.
 C
 C MAXPAR is the maximum number of parameters allowed in the analytic
-C        part of the model PSF.  
+C        part of the model PSF.
 C
 C                End of WARNING
 C
@@ -134,21 +134,21 @@ C
      .            2., 0., 2., 2., 20., 35., 2.5, 1.5, 6.5, 9.5, 1.,
      .            100., 100., 1000000./
 C
-C   LBL contains parameter names for displaying on the terminal.  
+C   LBL contains parameter names for displaying on the terminal.
 C  OMIN and OMAX contain the minimum and maximum acceptable values for
 C       the parameters.
 C
-C Define the NCMD legal command names.  Note that since a command is 
+C Define the NCMD legal command names.  Note that since a command is
 C recognized by its first two letters, the first two letters of
 C each command must be unique.
 C
-      DATA CMD/ 'HELP', 'OPTION', 'MONITOR', 'NOMONITOR', 'SORT', 
-     .     'OFFSET', 'GROUP', 'SELECT', 'APPEND', 'EXIT', 'ATTACH', 
-     .     'LIST', 'SKY', 'FIND', 'PHOTOMETRY', 'PSF', 'PEAK', 
+      DATA CMD/ 'HELP', 'OPTION', 'MONITOR', 'NOMONITOR', 'SORT',
+     .     'OFFSET', 'GROUP', 'SELECT', 'APPEND', 'EXIT', 'ATTACH',
+     .     'LIST', 'SKY', 'FIND', 'PHOTOMETRY', 'PSF', 'PEAK',
      .     'NSTAR', 'SUB*', 'ADD*', 'DUMP', 'FUDGE', 'PICK'/
 C
 C
-C Set the generic type for workspace allocation.  This type must be 
+C Set the generic type for workspace allocation.  This type must be
 C large enough to be used for an INTEGER or for a REAL variable.
 C
       GENTYP = '_INTEGER'
@@ -167,7 +167,7 @@ C file is described as residing in logical device DAO:.  Therefore,
 C this logical device must have been defined before the program is run.
 C
 C Type out the news headlines from the message file, ask whether the
-C user wants to read further, and if he/she does, type out the 
+C user wants to read further, and if he/she does, type out the
 C messages.
 C
       OPTFIL = CASE('daophot.opt')
@@ -175,7 +175,7 @@ C
       CALL INFILE (2, MSGFIL, ISTAT)
       IF (ISTAT .LT. 0) GO TO 2010
 C
-C This little section reads in and types out the headlines.  A 
+C This little section reads in and types out the headlines.  A
 C question mark (?) in column 1 of the input marks the query whether the
 C user wishes to continue reading.
 C
@@ -194,10 +194,10 @@ C
 C
  1030 CALL GETYN (MSGLINE(2:K), ANSWER)
 C
-C Read the user's answer.  If it is 'Y' or 'y', continue reading in and 
-C typing out the message file, until another backslash encountered in 
-C column 1 marks the end of a section.  If the answer is anything 
-C except 'Y' or 'y', close the message file and go on to the next 
+C Read the user's answer.  If it is 'Y' or 'y', continue reading in and
+C typing out the message file, until another backslash encountered in
+C column 1 marks the end of a section.  If the answer is anything
+C except 'Y' or 'y', close the message file and go on to the next
 C section of the program.
 C
       IF (ANSWER .EQ. 'Y') GO TO 1010
@@ -208,7 +208,7 @@ C SECTION 2
 C
 C Set up the values of the optional parameters.
 C
-C (1) Call OPTION with OPTFIL = 'daophot.opt' to set initial values 
+C (1) Call OPTION with OPTFIL = 'daophot.opt' to set initial values
 C for the optional parameters.  If the file isn't there, the routine
 C will check that the default values (specified in the data statement
 C above) are valid, and return here with those values intact.
@@ -229,8 +229,8 @@ C
 C Accept and execute commands, one after another.
 C
 C The 22 commands currently defined are:  (1) HELP, (2) OPT, (3) MON,
-C (4) NOMON, (5) SORT, (6) OFFSET, (7) GROUP, (8) SELECT, (9) APPEND, 
-C (10) EXIT, (11) ATTACH, (12) LIST, (13) SKY, (14) FIND, (15) PHOT, 
+C (4) NOMON, (5) SORT, (6) OFFSET, (7) GROUP, (8) SELECT, (9) APPEND,
+C (10) EXIT, (11) ATTACH, (12) LIST, (13) SKY, (14) FIND, (15) PHOT,
 C (16) PSF, (17) PEAK, (18) NSTAR, (19) SUB*, (20) ADD*, (21) DUMP,
 C and (22) FUDGE.
 C
@@ -254,7 +254,7 @@ C
       IF (KEY .EQ. ICNVRT('HE')) THEN
 C
 C We use the ICNVRT function here, instead of just checking MSGLINE(1:2)
-C against the first two characters of each command, just in case the 
+C against the first two characters of each command, just in case the
 C user is using lower case letters.
 C
          CALL HELP (CMD, NCMD, CMDWK1, CMDWK2)
@@ -286,7 +286,7 @@ C
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP3 )
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP4 )
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP5 )
-         CALL SORTER(%VAL(CNF_PVAL(IP1)), MAXSTR*80, 
+         CALL SORTER(%VAL(CNF_PVAL(IP1)), MAXSTR*80,
      :               %VAL(CNF_PVAL(IP2)), %VAL(CNF_PVAL(IP3)),
      .        %VAL(CNF_PVAL(IP4)), %VAL(CNF_PVAL(IP5)), MAXSTR, OPT(11))
          CALL DAO_DEALL( IP5 )
@@ -298,13 +298,13 @@ C
       ELSE IF (KEY .EQ. ICNVRT('OF')) THEN
          CALL OFFSET
 C
-      ELSE IF (KEY .EQ. ICNVRT('SE')) THEN 
+      ELSE IF (KEY .EQ. ICNVRT('SE')) THEN
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP1 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP2 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
-         CALL DAOSLT (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+         CALL DAOSLT (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)),
      :                %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)),
      .        %VAL(CNF_PVAL(IP5)), MAXSTR )
          CALL DAO_DEALL( IP5 )
@@ -323,9 +323,9 @@ C
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP6 )
-         CALL PCKPSF (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+         CALL PCKPSF (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)),
      :                %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)),
-     .        %VAL(CNF_PVAL(IP5)), %VAL(CNF_PVAL(IP6)), 
+     .        %VAL(CNF_PVAL(IP5)), %VAL(CNF_PVAL(IP6)),
      :        MAXSTR, OPT(12), OPT(13))
          CALL DAO_DEALL( IP6 )
          CALL DAO_DEALL( IP5 )
@@ -344,13 +344,13 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('AT')) THEN
 C
-C This is an ATTACH command.  First, get the file name (if any) out of 
+C This is an ATTACH command.  First, get the file name (if any) out of
 C the command line.  Then allocate a non-specific work array - for various
 C tasks more workspace will be needed but enough of them require an
 C integer or real array the size of the image that it is efficient to
 C allocate one of those here.
 C
-C *** NOTE *** we allocate an _INTEGER array on the assumption that 
+C *** NOTE *** we allocate an _INTEGER array on the assumption that
 C the _INTEGER type is as large, or larger than, _REAL type.
 C
          FILE=' '
@@ -381,7 +381,7 @@ C
             CALL DAO_ALLOC( '_REAL', MAXSKY, IP1 )
             CALL DAO_ALLOC( '_REAL', MAXSKY, IP2 )
             CALL DAO_ALLOC( '_INTEGER', MAXSKY, IP3 )
-            CALL SKY (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+            CALL SKY (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)),
      :                %VAL(CNF_PVAL(IP3)), MAXSKY, OPT(4),
      .           SKYMN, SKYMED, SKYMOD, K)
             CALL DAO_DEALL( IP3 )
@@ -400,9 +400,9 @@ C
             CALL DAO_ALLOC( '_REAL', MAXBOX*NCOL, IP2 )
             CALL DAO_ALLOC( '_REAL', MAXBOX*MAXBOX, IP3 )
             CALL DAO_ALLOC( '_LOGICAL', MAXBOX*MAXBOX, IP4 )
-            CALL FIND(%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+            CALL FIND(%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)),
      :                %VAL(CNF_PVAL(IPWK)), %VAL(CNF_PVAL(IP3)),
-     .                %VAL(CNF_PVAL(IP4)), 
+     .                %VAL(CNF_PVAL(IP4)),
      :                NCOL*NROW, MAXBOX, NCOL, MAXSKY, OPT,
      .                NOPT)
             CALL DAO_DEALL( IP4 )
@@ -418,7 +418,7 @@ C
             K = MAXEXP/2
             MAX = MAXPSF*MAXPSF*K
             K = K+1
-            CALL PHOTSB (%VAL(CNF_PVAL(IPWK)), 
+            CALL PHOTSB (%VAL(CNF_PVAL(IPWK)),
      :                   PSF, PSF(1,1,K), MAX, NCOL, NROW,
      .           OPT(11))
          ELSE
@@ -433,8 +433,8 @@ C
             CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP5 )
             CALL GETPSF (%VAL(CNF_PVAL(IPWK)), NCOL, NROW, PAR, PSF,
-     .           %VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
-     :           %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)), 
+     .           %VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)),
+     :           %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)),
      :           %VAL(CNF_PVAL(IP5)),
      .           MAXSTR, OPT, NOPT)
             CALL DAO_DEALL( IP5 )
@@ -456,11 +456,11 @@ C
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP6 )
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP7 )
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP8 )
-            CALL GROUP (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+            CALL GROUP (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
      :                  %VAL(CNF_PVAL(IP1)),
-     .           %VAL(CNF_PVAL(IP2)), %VAL(CNF_PVAL(IP3)), 
+     .           %VAL(CNF_PVAL(IP2)), %VAL(CNF_PVAL(IP3)),
      :           %VAL(CNF_PVAL(IP4)), %VAL(CNF_PVAL(IP5)),
-     .           %VAL(CNF_PVAL(IP6)), %VAL(CNF_PVAL(IP7)), 
+     .           %VAL(CNF_PVAL(IP6)), %VAL(CNF_PVAL(IP7)),
      :           %VAL(CNF_PVAL(IP8)), MAXSTR, OPT(12),
      .           OPT(13))
             CALL DAO_DEALL( IP8 )
@@ -479,7 +479,7 @@ C
          IF (OPEN) THEN
             MAXB = (MAXPSF-7)/2
             CALL DAO_ALLOC( '_REAL', MAXB*MAXB, IP1 )
-            CALL DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+            CALL DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
      :                  %VAL(CNF_PVAL(IP1)),
      .           MAXB, OPT(11), OPT(12), OPT(19), OPT(20))
             CALL DAO_DEALL( IP1 )
@@ -489,7 +489,7 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('NS')) THEN
          IF (OPEN) THEN
-            CALL NSTAR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+            CALL NSTAR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
      :                  %VAL(CNF_PVAL(IPWK)),
      .           NCOL, NROW, OPT(11), OPT(12), OPT(19), OPT(20))
          ELSE
@@ -498,7 +498,7 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('SU')) THEN
          IF (OPEN) THEN
-            CALL SUBSTR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+            CALL SUBSTR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
      .           %VAL(CNF_PVAL(IPWK)), NCOL, NROW, OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
@@ -541,7 +541,7 @@ C
 C=======================================================================
 C
 C This subroutine produces a simple listing on the terminal of all of
-C the elements of the character vector CMD.  They are sorted into 
+C the elements of the character vector CMD.  They are sorted into
 C alphabetical order by the first two characters.
 C
 C             OFFICIAL DAO VERSION:  1991 April 18
@@ -596,7 +596,7 @@ C
 C=======================================================================
 C
 C This subroutine estimates an average sky value for a picture by taking
-C individual pixels scattered over the picture.  The brightness values 
+C individual pixels scattered over the picture.  The brightness values
 C are sorted, and the modal value is estimated using the MMM subroutine.
 C
 C               OFFICIAL DAO VERSION:  1991 April 18
@@ -625,7 +625,7 @@ C the maximum number of pixels that can be accomodated in the vector S.
 C
       ISTEP = NCOL*NROW/MAX+1
 C
-C Go through the disk file reading a row at a time and extracting every 
+C Go through the disk file reading a row at a time and extracting every
 C ISTEP-th pixel.  If ISTEP is not equal to 1, make sure that the
 C starting pixel for each row is staggered.
 C
@@ -660,7 +660,7 @@ C
 C Correct the number of arguments in the call to MMM
 C Nick Eaton, Durham University, 19 Feb 1992.
 C
-      CALL MMM (S, N, HIBAD, SKYMN, SKYMED, SKYMOD, SKYSIG, 
+      CALL MMM (S, N, HIBAD, SKYMN, SKYMED, SKYMOD, SKYSIG,
      .     SKYSKW)
       WRITE (6,610) SKYMOD, SKYSIG
   610 FORMAT (/' Approximate sky value for this frame =', F9.1/
@@ -677,7 +677,7 @@ C
 C
 C=======================================================================
 C
-C A simple subroutine to append two DAOPHOT stellar data files, 
+C A simple subroutine to append two DAOPHOT stellar data files,
 C omitting the superfluous file header.
 C
 C=======================================================================
@@ -699,7 +699,7 @@ C
       END IF
 C
   950 CALL INFILE (1, IFILE1, ISTAT)
-      IF ((IFILE1 .EQ. 'END OF FILE') .OR. 
+      IF ((IFILE1 .EQ. 'END OF FILE') .OR.
      .     (IFILE1 .EQ. 'GIVE UP')) THEN
          IFILE1 = ' '
          RETURN
@@ -766,7 +766,7 @@ C
       I1=-1
       CALL RDHEAD (2, I1, I2, I3, R1, R2, R3, R4, R5, R6, R7)
 C
-C RDHEAD will leave the pointer positioned at the top of the input 
+C RDHEAD will leave the pointer positioned at the top of the input
 C file's stellar data whether there was a header there or not.  Now
 C copy the remainder of the second input file verbatim into the output
 C file.
@@ -789,7 +789,7 @@ C
 C
 C=======================================================================
 C
-C This is a simple subroutine which selects groups within a certain 
+C This is a simple subroutine which selects groups within a certain
 C range of sizes from a group file, and puts them into a new group file.
 C
 C              OFFICIAL DAO VERSION: 1991 April 18
@@ -802,10 +802,10 @@ C
 *     17-Mar-1995 (GJP)
 *     Replaced very negative, very large or very small numbers
 *     with their PRM_PAR equivalents.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       INTEGER MAX
 C
 C MAX is the largest number of stars that can be held in working space.
@@ -848,7 +848,7 @@ C
          GO TO 950
       END IF
 C
-      CALL RDHEAD (2, NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1, 
+      CALL RDHEAD (2, NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, RONOIS, DUM)
       IF (NL .NE. 3) THEN
          CALL STUPID ('Not a group file.')
@@ -882,7 +882,7 @@ C
          MAGFIL = 'GIVE UP'
          GO TO 960
       END IF
-      CALL WRHEAD (3, 3, NCOL, NROW, 6, LOBAD, HIBAD, THRESH, AP1, 
+      CALL WRHEAD (3, 3, NCOL, NROW, 6, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, RONOIS, RADIUS)
       NGRP=0
       NTOT=0
@@ -968,7 +968,7 @@ C
 C
 C=======================================================================
 C
-C A trivial subroutine to type the brightness values in a small 
+C A trivial subroutine to type the brightness values in a small
 C subarray of the picture onto the terminal.
 C
 C            OFFICIAL DAO VERSION:  1991 April 18
@@ -981,10 +981,10 @@ C
 *     17-Mar-1995 (GJP)
 *     Replaced very negative, very large or very small numbers
 *     with their PRM_PAR equivalents.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
 C
       INTEGER NSQUARE, NCOL, NROW
       PARAMETER  (NSQUARE=21)
@@ -995,20 +995,20 @@ C
       REAL AMIN1, AMAX1
       INTEGER NINT
 C
-      
+
       REAL SIZE
       INTEGER NBOX, NHALF, LX, LY, ISTAT
       INTEGER I, J, N, NX, NY
 C
 C Parameter
 C
-C NSQUARE is the side of the largest square subarray that can be 
+C NSQUARE is the side of the largest square subarray that can be
 C         comfortably fit on the terminal screen.  NSQUARE = 21 is
 C         for 24-line terminals, to accomodate the array, a two-line
-C         header across the top, and and a query at the bottom.  In 
+C         header across the top, and and a query at the bottom.  In
 C         fact, if the user specifies SIZE = 21, then one of the header
 C         lines at the top will be lost.
-C         (Terminal must have 132-column capability to prevent 
+C         (Terminal must have 132-column capability to prevent
 C         wraparound.)
 C
 C
@@ -1027,7 +1027,7 @@ C
       IF ((COORDS(1) .LE. 0.5) .OR. (COORDS(2) .LE. 0.5)) RETURN
       IF ((NINT(COORDS(1)) .GT. NCOL) .OR.
      .     (NINT(COORDS(2)) .GT. NROW)) RETURN
-C 
+C
       LX = NINT(COORDS(1))-NHALF
       LY = NINT(COORDS(2))-NHALF
       NX = NINT(COORDS(1))+NHALF - LX + 1
@@ -1036,7 +1036,7 @@ C
 C
 C LX and LY are the lower limits of the box in X and Y; NX and NY are
 C the number of pixels in the box in X and Y.  They will have been
-C modified by RDARAY if the box would have extended outside the 
+C modified by RDARAY if the box would have extended outside the
 C picture.
 C
       WRITE (6,609) (I, I=LX,LX+NX-1)
@@ -1046,7 +1046,7 @@ C
 C
       N=0
       DO 1020 J=NY,1,-1
-      WRITE (6,611) LY+J-1, 
+      WRITE (6,611) LY+J-1,
      .     (NINT(AMAX1(-99999.,AMIN1(99999.,F(I,J)))), I=1,NX)
   611 FORMAT (1X, I4, ' |', 21I6)
       DO 1010 I=1,NX
@@ -1057,9 +1057,9 @@ C
       CALL QUICK (D, N, F)
 C
       IF (NBOX .LT. NSQUARE) CALL TBLANK
-      WRITE (6,612) NINT(AMAX1(-99999.,AMIN1(99999.,D(1)))), 
+      WRITE (6,612) NINT(AMAX1(-99999.,AMIN1(99999.,D(1)))),
      .     NINT(AMAX1(-99999.,AMIN1(99999.,
-     .     0.5*D((N+1)/2)+0.5*D((N/2)+1)))), 
+     .     0.5*D((N+1)/2)+0.5*D((N/2)+1)))),
      .     NINT(AMAX1(-99999.,AMIN1(99999.,D(N))))
   612 FORMAT(26X, 'Minimum, median, maximum: ', 3I7)
 C
@@ -1087,10 +1087,10 @@ C
 *     17-Mar-1995 (GJP)
 *     Replaced very negative, very large or very small numbers
 *     with their PRM_PAR equivalents.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       CHARACTER*133 LINE1, LINE2
       CHARACTER*30 FILE, SWITCH
       CHARACTER CASE*4
@@ -1153,14 +1153,14 @@ C
       COLMAX=VAL__MAXR
       ROWMAX=VAL__MAXR
       NL=-1
-      CALL RDHEAD (2, NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1, 
+      CALL RDHEAD (2, NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, READNS, FRAD)
 C
       IF (NL .LE. 0) GO TO 2000                     ! No header in input
 C
       ITEMS=6
       IF (FRAD .GT. 0.001) ITEMS=7
-      CALL WRHEAD (3, NL, NCOL, NROW, ITEMS, LOBAD, HIBAD, THRESH, 
+      CALL WRHEAD (3, NL, NCOL, NROW, ITEMS, LOBAD, HIBAD, THRESH,
      .     AP1, PHPADU, READNS, FRAD)
       COLMAX=FLOAT(NCOL)+0.5
       ROWMAX=FLOAT(NROW)+0.5
@@ -1218,7 +1218,7 @@ C taken with the same device.  Otherwise the scale and possibly the
 C orientation would be different, and a simple offset would not be a
 C good enough transformation.)
 C
-      IF ((X .LT. 0.5) .OR. (X .GT. COLMAX) .OR. (Y .LT. 0.5) .OR. 
+      IF ((X .LT. 0.5) .OR. (X .GT. COLMAX) .OR. (Y .LT. 0.5) .OR.
      .     (Y .GT. ROWMAX)) GO TO 2000
 C
       WRITE (LINE1(2:33),220) ID, X, Y, AMAG

@@ -204,7 +204,7 @@
 
 *  Loop through the other steps finding the sample corresponding to
 *  each. Store the detector index, and in-scan offset to each step from
-*  the first step. 
+*  the first step.
          DO I = 2, NSTEP
             FITDET( I ) = DETIN
             FDIST( I ) = ( I - 1 )*STEP
@@ -337,7 +337,7 @@
 *  Evaluate the cubic spline giving the in-scan distance at the centre
 *  of the sample, together with its first three derivatives.
          IFAIL = 1
-         CALL E02BCF( NCAP7, LAMDST, CDST, DBLE( SAMP ), 1, SDST, 
+         CALL E02BCF( NCAP7, LAMDST, CDST, DBLE( SAMP ), 1, SDST,
      :                IFAIL )
 
 *  Check the IFAIL value.

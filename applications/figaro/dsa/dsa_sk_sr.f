@@ -37,7 +37,7 @@ C
 C     (>) PARM_NAME       (Fixed string, descr) The parameter name.
 C     (<) EXIST           (Logical, ref) Returned true if the file
 C                         exists and if any specified structure exists
-C                         within the file.  
+C                         within the file.
 C     (<) STRUCTURE       (Fixed string,descr) The structure name.  This
 C                         can be just a file name, or it may have a sub-
 C                         structure name included as well, as in

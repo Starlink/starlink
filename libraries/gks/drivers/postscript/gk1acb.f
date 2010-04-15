@@ -39,7 +39,7 @@
 *  S       - Character variable, via which chunks of PostScript are sent for
 *            buffering.
 *
- 
+
 *     Integer workspace offset parameters
       INTEGER    ILNTYP,   IMKTYP,   IFASTY,   ICLIND
       PARAMETER (ILNTYP=1, IMKTYP=2, IFASTY=4, ICLIND=5)
@@ -64,14 +64,14 @@
 *
 *---------------------------------------------------------------------
 *
- 
+
 *     Initialise the flag
       CHANGE = .FALSE.
- 
+
 *
 *     See if locally stored copy of the clipping boundary needs updating.
 *
- 
+
 *     Lower left corner:
       IF(QWKDAT(ICLPXL,KWKIX).NE.QWCLXL(KWKIX)) THEN
          QWKDAT(ICLPXL,KWKIX) = QWCLXL(KWKIX)
@@ -82,7 +82,7 @@
          QWKDAT(ICLPYB,KWKIX) = QWCLYB(KWKIX)
          CHANGE = .TRUE.
       ENDIF
- 
+
 *     Upper right corner:
       IF(QWKDAT(ICLPXR,KWKIX).NE.QWCLXR(KWKIX)) THEN
          QWKDAT(ICLPXR,KWKIX) = QWCLXR(KWKIX)
@@ -93,7 +93,7 @@
          QWKDAT(ICLPYT,KWKIX) = QWCLYT(KWKIX)
          CHANGE = .TRUE.
       ENDIF
- 
+
 *
 *     If change has occurred change the clipping rectangle.
 *
@@ -102,20 +102,20 @@
 *     Start from a new line in the external file.
 *
          CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Restore to the original clipping rectangle to allow for enlarging as
 *     well as for shrinking of the clipping rectangle.
 *
- 
+
          CALL GKFOCO(KIOPB,'restore save ',IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Since restore will in effect reinstate all the graphics parameters
 *     to those at initialisation, must reset all the locally held graphics
 *     data (this will force the attributes refresh action as soon as any of
 *     the output primitives is called).
- 
+
          KWKDAT(ILNTYP,KWKIX) = KNIL
          KWKDAT(IMKTYP,KWKIX) = KNIL
          KWKDAT(IFASTY,KWKIX) = KNIL
@@ -126,11 +126,11 @@
          QWKDAT(IMKSZ, KWKIX) = QNIL
          QWKDAT(ICCHHT,KWKIX) = QNIL
          QWKDAT(ICCHAN,KWKIX) = QNIL
- 
+
 *
 *     Now send the new clipping rectangle vertices
 *
- 
+
          WRITE(S,110) QWKDAT(ICLPXL,KWKIX), QWKDAT(ICLPYB,KWKIX),
      :                QWKDAT(ICLPXL,KWKIX), QWKDAT(ICLPYT,KWKIX),
      :                QWKDAT(ICLPXR,KWKIX), QWKDAT(ICLPYT,KWKIX),
@@ -138,9 +138,9 @@
 *        the setclipbox procedure will establish the boundary
   110    FORMAT(8F11.3, ' setclipbox')
          CALL GKFOCO(KIOPB, S(1:99), IREM)
- 
+
       ENDIF
- 
- 
- 
+
+
+
       END

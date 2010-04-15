@@ -2,16 +2,16 @@
 *+
 *  Name:
 *     PAR_EXACx
- 
+
 *  Purpose:
 *     Obtains an exact number of values from a parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_EXACx( PARAM, NVALS, VALUES, STATUS )
- 
+
 *  Description:
 *     This routine obtains an exact number of values from a parameter
 *     and stores them in a vector.  If the number of values obtained
@@ -21,7 +21,7 @@
 *     additional values are required prior to these further reads.
 *     Should too many values be entered an error results and a further
 *     read is attempted.
- 
+
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter.
@@ -34,7 +34,7 @@
 *        be valid if STATUS is not set to an error value.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Algorithm:
 *     -  If the number of values is not positive then report the error
 *     and exit.
@@ -49,7 +49,7 @@
 *        error status.
 *     -  Supply the complete VALUES array back to the parameter system
 *     provided status is good.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types character,
 *     double precision, integer, logical, and real: replace "x" in the
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,7 +86,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AJC: Alan J. Chipperfield   (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 January 1 (MJC):
 *        Original version based on Steven Beard's and the author's
@@ -99,134 +99,134 @@
 *     1999 September 17 (AJC):
 *        Replace MSG_OUT by MSG_OUTIF( MSG__QUIET
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_new_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE            ! Switch off default typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Environment constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'MSG_PAR'        ! MSG constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * )
      :  PARAM                  ! Parameter name
- 
+
       INTEGER
      :  NVALS                  ! Number of values to obtain
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION
      :  VALUES( NVALS )        ! The values obtained from parameter
                                ! system
- 
+
 *  Status:
       INTEGER
      :  STATUS                 ! Global status
- 
+
 *  Local Variables:
       INTEGER
      :  NOBT,                  ! Number of values obtained in one
                                ! request
      :  NGOT,                  ! Number of values obtained so far
      :  NEEDED                 ! Number of values still needed
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Ensure that the number of values is positive.
       IF ( NVALS .GE. 1 ) THEN
- 
+
 *  Initialise the number of values obtained to zero and the number of
 *  values needed to the number of values requested.
          NGOT   = 0
          NEEDED = NVALS
- 
+
 *  Start a new error context.
          CALL ERR_MARK
- 
+
 *  Loop until no more values are needed or until an error occurs.
   100    CONTINUE
             IF ( ( NEEDED .LE. 0 ) .OR. ( STATUS .NE. SAI__OK ) )
      :        GOTO 180
- 
+
 *  Check if any more values are needed.
   120       CONTINUE
- 
+
 *  Obtain the values associated with the parameter, filling the array
 *  from the next element after those already obtained.  If too many
 *  values are given, the parameter system will report the error, and
 *  prompt for new values.
                CALL PAR_GETVD( PARAM, NEEDED, VALUES( NGOT + 1 ),
      :                           NOBT, STATUS )
- 
+
 *  Check the status returned.
                IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  Add the number of values obtained here to the number of values
 *  obtained altogether, and subtract the number of values obtained from
 *  the number of values needed.
                   NGOT = NGOT + NOBT
                   NEEDED = NEEDED - NOBT
- 
+
 *  If further values are still required then report this fact.
                   IF ( NEEDED .GT. 0 ) THEN
- 
+
                      CALL MSG_SETI( 'NEEDED', NEEDED )
                      IF ( NEEDED .EQ. 1 ) THEN
                         CALL MSG_SETC( 'WORDS', 'value is' )
                      ELSE
                         CALL MSG_SETC( 'WORDS', 'values are' )
                      END IF
-                     CALL MSG_OUTIF( MSG__QUIET, 'PAR_EXAC_NEEDED', 
+                     CALL MSG_OUTIF( MSG__QUIET, 'PAR_EXAC_NEEDED',
      :                 '^NEEDED more ^WORDS still needed.', STATUS )
- 
+
 *  Cancel the parameter for a retry.
                      CALL PAR_CANCL( PARAM, STATUS )
- 
+
                   END IF
- 
+
                ELSE
- 
+
 *  Some miscellaneous error has occurred.  Terminate the loop and exit
 *  with the error status.
                   NEEDED = 0
- 
+
                END IF
- 
+
 *  Go to the head of the loop if there are more values to be read.
                IF ( NEEDED .GT. 0 ) GOTO 120
- 
+
 *  Come here when the above loop exits.
- 
- 
+
+
 *  Go to the head of the main loop.
             GOTO 100
- 
+
 *  Come here when the main loop exits.
   180    CONTINUE
- 
+
 *  Release the new error context.
          CALL ERR_RLSE
- 
+
       ELSE
- 
+
 *  An error has occurred.
          STATUS = PAR__ERROR
          CALL MSG_SETC( 'PARAM', PARAM )
- 
+
 *  Non-physical number entered.  Report the error.
          CALL ERR_REP( 'PAR_EXACx_TOOFEW',
      :      'A non-positive number of values was requested for '/
      :      /'parameter ^PARAM. (Probable programming error.)', STATUS )
- 
+
       END IF
- 
+
       END

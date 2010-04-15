@@ -169,7 +169,7 @@ typedef struct _fontinfo{
 	struct _fontinfo *f_next;		/* next in circular list of fonts */
 	int		f_baseline;		/* >=0 num pixels under baseline */
 	int 		*f_junk;
-	
+
 }fontinfo;
 /*
  * define ftprint arguments that can be or-ed together
@@ -315,7 +315,7 @@ typedef union{
 #define EXBITMAP	0
 #define EXCURSOR	1
 #define EXGREY		2
-/* 
+/*
  * define ipset arguments can be one of these
  */
 #define IPON		1
@@ -323,7 +323,7 @@ typedef union{
 #define IPSAMPLE	3
 #define IPREQUEST	4
 #define IPNOKEY		5	/* get keyboard input from parent win too */
-#define IPRAW		6	/* shift, control and meta key transitions */ 
+#define IPRAW		6	/* shift, control and meta key transitions */
 /*
  * define line routine arguments can be one of these
  */
@@ -401,12 +401,12 @@ typedef struct _treeinfo{
 /*
  * define stack routine arguments can be one of these
  */
-#define WWPUSH		1	
+#define WWPUSH		1
 #define WWPUSHOFF	2
 #define WWPOP		3
 #define WWSET		4
 #define WWPUSHBUSY	5	/* custack */
-#define WWPUSHON	6	
+#define WWPUSHON	6
 /*
  * define bmdecode arguments can be one of these
  */
@@ -434,7 +434,7 @@ typedef struct _treeinfo{
 #define WWMAPPUT	02	/* copy char array to bitmap */
 #define WWMAPOK		04	/* boundary errors are ok */
 #define WWMAPTILE	010	/* tile from the source */
-/* 
+/*
  * define wwxget arguments can be these ored together
  */
 #define WWSIZEFROMUSER	01	/* get better size for window from user */

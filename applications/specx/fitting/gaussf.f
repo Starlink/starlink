@@ -84,7 +84,7 @@ C   calculate function at each point in x
           YHAT = YHAT+AMP*AEXP
 
 C   If IFL.NE.2 calculate derivatives also
- 
+
           IF(IFL.NE.2)   THEN
             QUOT   = (X(I)-POS)/WID
             DERIVA = AEXP

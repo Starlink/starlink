@@ -28,7 +28,7 @@ C# IL>=a, OL>=0
 *     19/01/87  DCS   IS conversion. Remove metafile index and get
 *                     text attributes from GKS State List.
 *     08/03/91  DCS   Corrected updating of the normalisation
-*                     transformation and clipping information - 
+*                     transformation and clipping information -
 *                     introduced section of code to set the
 *                     data as in GKS State List (S475).
 *

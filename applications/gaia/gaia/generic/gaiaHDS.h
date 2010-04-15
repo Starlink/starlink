@@ -1,6 +1,6 @@
 #ifndef _GAIAHDS_INCLUDED_
 #define _GAIAHDS_INCLUDED_
- 
+
 /*
  *  External prototypes and definitions for gaiaHDS.c.
  */

@@ -16,9 +16,9 @@
 *     A Gaussian weighting function
 *     The look up table is initialised such that one can access the
 *     weight directly given the square of the distance between the input
-*     and output pixel. 
+*     and output pixel.
 *     The scale length is taken to be radius at half-width-half-max
-*     The gaussian should go out to a radius of at least 3 scale 
+*     The gaussian should go out to a radius of at least 3 scale
 *     lengths (<0.2% of peak). Governed by the RADIUS argument
 *     The function is simply taken as
 *       F(x) = exp(-X**2)
@@ -98,7 +98,7 @@
       WTFN(1) = 1.0
       WTFN(SIZE + 1) = 0.0
       DO I = 2, SIZE
-     
+
 *     Distance as a fraction of the scale length all squared
          POS = REAL(I) *  SCAL_LENGTH_SQ  / REAL(FILTER_SQ)
 

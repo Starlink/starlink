@@ -125,7 +125,7 @@
 *  And the saturation value.
       IF ( SETSAT ) THEN
          CALL MSG_SETR( 'RFCR_SATVAL', REAL( SATVAL ) )
-         IF ( EXTSAT ) THEN 
+         IF ( EXTSAT ) THEN
             CALL CCD1_MSG( ' ', '  Saturation value: ^RFCR_SATVAL*',
      :                     STATUS )
          ELSE

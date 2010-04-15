@@ -125,7 +125,7 @@
 *  Zone size in metres
       XM=SMPN*(XV2-XV1)
       YM=SMPN*(YV2-YV1)
-                             
+
  9999 CONTINUE
 
       END

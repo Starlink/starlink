@@ -4,7 +4,7 @@
 *  22-Jul-1994 Changed LIB$, STR$ to CHR_ (SKL@JACH)
 * 26-Oct-1994 Changed MAGNIF from INT to REAL (SKL@JACH)
 *
-     
+
 	IMPLICIT NONE
 
         INCLUDE 'SAE_PAR'

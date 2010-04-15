@@ -44,7 +44,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 November 20 (MJC)
 *        Original version.
@@ -52,12 +52,12 @@
 *        Removed "      INCLUDE 'SAE_PAR'" and STATUS argument.
 *        Explicitly include common block PDA_SEEDY.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,9 +65,9 @@
       DOUBLE PRECISION R         ! The current deviate.
       COMMON /PDA_SEEDY/  R
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER SEED               ! Seed value
- 
+
 *  Local Variables:
       INTEGER ROOT               ! A valid version of the supplied seed
       DOUBLE PRECISION TWO28     ! Initial scale factor (2**28), i.e.
@@ -86,4 +86,4 @@
 *   Scale the integer seed value.
       R = DBLE( ROOT )/ TWO28
 
-      END 
+      END

@@ -17,7 +17,7 @@
 
 *  Description:
 *     Gets current action name. This simply involves copying the name
-*     from COMMON. 
+*     from COMMON.
 
 *  Arguments:
 *     NAME=CHARACTER*(*) (returned)

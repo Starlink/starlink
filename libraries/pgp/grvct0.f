@@ -6,18 +6,18 @@
 *
 *   Draw a line or a set of dots. This is the same as GRVECT, but without
 *   device selection. It can be used to draw a single line-segment, a
-*   continuous series of line segments, or one or more single dots (pixels). 
+*   continuous series of line segments, or one or more single dots (pixels).
 *
 *   Given
 *      MODE     i   If MODE=1, a series of line segments is drawn,
 *                   starting at the current position, moving to X(1),Y(1), ...
 *                   and ending at X(POINTS),Y(POINTS).
-*                   If MODE=2, the first vector is blanked, so the line starts 
+*                   If MODE=2, the first vector is blanked, so the line starts
 *                   at X(1),Y(1).
 *                   If MODE=3, a single dot is placed at each coordinate pair,
 *                   with no connecting lines.
 *      ABSXY    l   If TRUE, the coordinates are absolute device coordinates;
-*                   if FALSE, they are world coordinates and the scaling 
+*                   if FALSE, they are world coordinates and the scaling
 *                   transformation is applied.
 *      POINTS   i   The number of coordinate pairs.
 *      X, Y     r() The X and Y coordinates of the points.

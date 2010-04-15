@@ -49,7 +49,7 @@ C
    53       DO 60, I=1,ORD
               SAVE = ARRAY(I,K)
               ARRAY(I,K) = ARRAY(I,J)
-              ARRAY(I,J) = -SAVE   
+              ARRAY(I,J) = -SAVE
    60       CONTINUE
 C
 C  Accumulate elements of inverse matrix.
@@ -87,7 +87,7 @@ C
   113         DO 120, J=1,ORD
                 SAVE = ARRAY(K,J)
                 ARRAY(K,J) = -ARRAY(I,J)
-                ARRAY(I,J) = SAVE           
+                ARRAY(I,J) = SAVE
   120         CONTINUE
   130       CONTINUE
   140       RETURN

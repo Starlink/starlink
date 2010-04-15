@@ -24,12 +24,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,12 +64,12 @@
 *        ctype.h.
 *     10-FEB-2003 (DSB):
 *        Added facilities for detecting and tracing memory leaks. These
-*        are only included if AST is compiled with the -DDEBUG flag. 
+*        are only included if AST is compiled with the -DDEBUG flag.
 *     3-MAR-2004 (DSB):
 *        Modified astSscanf to avoid use of uninitialised values
 *        corresponding to "%n" fields in the format string.
 *     26-JAN-2004 (DSB):
-*        Modified astRealloc to clarify the nature of the returned pointer 
+*        Modified astRealloc to clarify the nature of the returned pointer
 *        (which is not a "Memory *"). Also correct issuing and deissuing
 *        of pointers in DEBUG code within astRealloc.
 *     16-FEB-2006 (DSB):
@@ -81,13 +81,13 @@
 *        controlled by AST tuning parameter MemoryCaching.
 *     2-MAR-2006 (DSB):
 *        Added astFlushMemory, and renamed the memory debugging functions.
-*        These are now conditionally compiled if the MEM_DEBUG macros is 
+*        These are now conditionally compiled if the MEM_DEBUG macros is
 *        defined (set by configuring AST with the --with-memdebug option).
 *        Also modified them to take into account MemoryCaching.
 *     24-MAY-2006 (DSB):
 *        Ensure that pointers to memory returned by this module are all
-*        aligned on 8 byte boundaries. This fixes problems with ualigned 
-*        memory access that could cause bus errors on Solaris. 
+*        aligned on 8 byte boundaries. This fixes problems with ualigned
+*        memory access that could cause bus errors on Solaris.
 *     26-MAY-2006 (DSB):
 *        Cast (void *) pointers to (char *) before doing arithmetic on
 *        them (changes supplied by Micah Johnson).
@@ -101,7 +101,7 @@
 *        Added astIsDynamic.
 *     24-OCT-2007 (DSB):
 *        Zero the size of memory blocks stored in the Cache so that an
-*        error will be reported if an attempt is made to free a memory 
+*        error will be reported if an attempt is made to free a memory
 *        block that has already been freed.
 *     25-OCT-2007 (DSB):
 *        Added astRemoveLeadingBlanks.
@@ -230,7 +230,7 @@
 *     dynamic
 *        Name of an "int" variable to recieve the result of the test.
 *        If the memory was allocated dynamically, a value of 1 is
-*        stored in this variable.  Otherwise, zero is stored and an error 
+*        stored in this variable.  Otherwise, zero is stored and an error
 *        results.
 
 *  Notes:
@@ -281,7 +281,7 @@
       } else { \
          dynamic = 1; \
       } \
-   } 
+   }
 
 
 
@@ -383,14 +383,14 @@ static int Next_ID = -1;
    usually be freed explicitly by AST). */
 static int Perm_Mem = 0;
 
-/* A "first in, last out" stack of Perm_Mem values used by nested 
+/* A "first in, last out" stack of Perm_Mem values used by nested
    astBeginPM/astEndPM contexts. */
 static int PM_Stack[ PM_STACK_MAXSIZE ];
 
 /* The number of values currently in the PM_Stack array. */
 static int PM_Stack_Size = 0;
 
-/* A pointer to a double linked list holding pointers to currently active 
+/* A pointer to a double linked list holding pointers to currently active
    memory blocks (i.e. memory blocks for which a pointer has been issued
    but not yet freed). This does not include the memory blocks in the
    Cache array (these are not considered to be active). */
@@ -418,7 +418,7 @@ static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 
 #endif
 
-/* Define macros for accessing all items of thread-safe global data 
+/* Define macros for accessing all items of thread-safe global data
    used by this module. */
 #ifdef THREAD_SAFE
 
@@ -436,8 +436,8 @@ static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 /* Create the global initialisation function. */
 astMAKE_INITGLOBALS(Memory)
 
-/* If thread safety is not needed, declare globals at static variables. */ 
-/* -------------------------------------------------------------------- */ 
+/* If thread safety is not needed, declare globals at static variables. */
+/* -------------------------------------------------------------------- */
 #else
 
 /* The size of a Memory header structure, padded to a multiple of 8
@@ -448,12 +448,12 @@ static size_t sizeof_memory = 0;
 /* A cache of allocated but currently unused memory block. This cache is
    maintained in order to avoid the overhead of continual calls to malloc to
    allocate small blocks of memory. The vast majority of memory blocks
-   allocated by AST are under 200 bytes in size. Each element in this array 
-   stores a pointer to the header for a free (i.e. allocated but currently 
-   unused) memory block. The size of the memory block (not including the 
-   Memory header) will equal the index at which the pointer is stored within 
-   "cache". Each free memory block contains (in its Memory header) a pointer 
-   to the header for another free memory block of the same size (or a NULL 
+   allocated by AST are under 200 bytes in size. Each element in this array
+   stores a pointer to the header for a free (i.e. allocated but currently
+   unused) memory block. The size of the memory block (not including the
+   Memory header) will equal the index at which the pointer is stored within
+   "cache". Each free memory block contains (in its Memory header) a pointer
+   to the header for another free memory block of the same size (or a NULL
    pointer if there are no other free memory blocks of the same size). */
 static Memory *cache[ MXCSIZE + 1 ];
 
@@ -576,10 +576,10 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
    return result;
 }
 
-static char *CheckTempStart( const char *template, const char *temp, 
+static char *CheckTempStart( const char *template, const char *temp,
                              const char *pattern,
-                             char *allowed, int *ntemp, int *allow, 
-                             int *min_nc, int *max_nc, int *start_sub, 
+                             char *allowed, int *ntemp, int *allow,
+                             int *min_nc, int *max_nc, int *start_sub,
                              int *end_sub, int *greedy, int *status ){
 /*
 *  Name:
@@ -592,10 +592,10 @@ static char *CheckTempStart( const char *template, const char *temp,
 *     Private function.
 
 *  Synopsis:
-*     char *CheckTempStart( const char *template, const char *temp, 
+*     char *CheckTempStart( const char *template, const char *temp,
 *                           const char *pattern,
-*                           char *allowed, int *ntemp, int *allow, 
-*                           int *min_nc, int *max_nc, int *start_sub, 
+*                           char *allowed, int *ntemp, int *allow,
+*                           int *min_nc, int *max_nc, int *start_sub,
 *                           int *end_sub, int *greedy, int *status )
 
 *  Description:
@@ -614,7 +614,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 *        Pointer to a buffer in which to store a string of characters
 *        that the leading temeplate field will match. A NULL pointer may
 *        be supplied in which case new memory will be allocated. The
-*        supplied memory is expanded as necessary, and a pointer to it is 
+*        supplied memory is expanded as necessary, and a pointer to it is
 *        returned as the function value.
 *     ntemp
 *        Address of an int in which to return the number of characters
@@ -622,25 +622,25 @@ static char *CheckTempStart( const char *template, const char *temp,
 *     allow
 *        Address of an int in which to return a flag which is non-zero if
 *        the returned string contains characters that are allowed in the
-*        test field, or zero if the returned string contains characters that 
+*        test field, or zero if the returned string contains characters that
 *        are disallowed in the test field.
 *     min_nc
-*        Address of an int in which to return the minimum number of 
-*        test characters that must belong to the returned set of 
+*        Address of an int in which to return the minimum number of
+*        test characters that must belong to the returned set of
 *        allowed characters.
 *     max_nc
-*        Address of an int in which to return the maximum number of 
-*        test characters that must belong to the returned set of 
+*        Address of an int in which to return the maximum number of
+*        test characters that must belong to the returned set of
 *        allowed characters.
 *     start_sub
 *        Address of an int in which to return a flag which is non-zero if
-*        the leading template field indicates the start of a field to be 
+*        the leading template field indicates the start of a field to be
 *        substituted. In this case the supplied "allowed" pointer is
 *        returned without change as the function value, "Min_nc" is
 *        returned as zero, and max_nc is returned as zero.
 *     end_sub
 *        Address of an int in which to return a flag which is non-zero if
-*        the leading template field indicates the end of a field to be 
+*        the leading template field indicates the end of a field to be
 *        substituted. In this case the supplied "allowed" pointer is
 *        returned without change as the function value, "Min_nc" is
 *        returned as zero, and limit is returned as zero.
@@ -655,11 +655,11 @@ static char *CheckTempStart( const char *template, const char *temp,
 *     string of characters that the leading temeplate field will match.
 *     This string should be released using astFree when no longer needed.
 *     If a NULL pointyer is returned, then all characters are allowed
-*     (or disallowed if "*allow" is zero). 
+*     (or disallowed if "*allow" is zero).
 
 *  Notes:
 *     - The returned value is also stored in the module variable
-*     sizeof_memory. 
+*     sizeof_memory.
 */
 
 /* Local Variables: */
@@ -705,7 +705,7 @@ static char *CheckTempStart( const char *template, const char *temp,
          } else {
             start = temp + 1;
          }
-     
+
 /* Get a pointer to the closing bracket. */
          end = strchr( temp, ']' );
 
@@ -742,12 +742,12 @@ static char *CheckTempStart( const char *template, const char *temp,
             result = astStore( allowed, " 	\n\r", 5 );
             result[ 4 ] = 0;
             if( temp[ 1 ] == 'S' ) *allow = 0;
-              
+
 /* Word characters... */
          } else if( temp[ 1 ] == 'w' || temp[ 1 ] == 'W' ) {
             result = astStore( allowed, "abcdefghijklmnopqrstuvwxyz"
                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_",
-                               64 );                                
+                               64 );
             result[ 63 ] = 0;
             if( temp[ 1 ] == 'W' ) *allow = 0;
 
@@ -782,7 +782,7 @@ static char *CheckTempStart( const char *template, const char *temp,
          if( temp[ *ntemp ] == '?' ){
             *greedy = 0;
             (*ntemp)++;
-         }             
+         }
 
       } else if( temp[ *ntemp ] == '+' ) {
          *min_nc = 1;
@@ -791,7 +791,7 @@ static char *CheckTempStart( const char *template, const char *temp,
          if( temp[ *ntemp ] == '?' ){
             *greedy = 0;
             (*ntemp)++;
-         }             
+         }
 
       } else if( temp[ *ntemp ] == '?' ) {
          *min_nc = 0;
@@ -821,7 +821,7 @@ static char *CheckTempStart( const char *template, const char *temp,
             start = NULL;
          }
 
-/* If the remaining string does not start with "{nnn}", use a minimum and 
+/* If the remaining string does not start with "{nnn}", use a minimum and
    maximum field length of 1. */
          if( !start ) {
             *min_nc = 1;
@@ -851,7 +851,7 @@ double astChr2Double_( const char *str, int *status ) {
 *     double astChr2Double( const char *str )
 
 *  Description:
-*     This function reads a double from the supplied null-terminated string, 
+*     This function reads a double from the supplied null-terminated string,
 *     ignoring leading and trailing white space. AST__BAD is ereturned
 *     without error if the string is not a numerical value.
 
@@ -863,7 +863,7 @@ double astChr2Double_( const char *str, int *status ) {
 *     The double value, or AST__BAD.
 
 *  Notes:
-*     -  A value of AST__BAD is returned if this function is invoked with 
+*     -  A value of AST__BAD is returned if this function is invoked with
 *     the global error status set or if it should fail for any reason.
 *-
 */
@@ -1041,7 +1041,7 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     char **astChrSplit_( const char *str, int *n ) 
+*     char **astChrSplit_( const char *str, int *n )
 
 *  Description:
 *     This function extracts all space-separated words form the supplied
@@ -1073,7 +1073,7 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
    const char *ws;
    int first;
    int state;
-   int wl;        
+   int wl;
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1084,7 +1084,7 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
    *n = 0;
 
 /* State 0 is "looking for the next non-white character which marks the
-   start of the next word". State 1 is "looking for the next white character 
+   start of the next word". State 1 is "looking for the next white character
    which marks the end of the current word". */
    state = 0;
 
@@ -1097,10 +1097,10 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
 
 /* If this is the terminating null or a space, and we are currently looking
    for the end of a word, allocate memory for the new word, copy the text
-   in, terminate it, extend the returned array by one element, and store 
+   in, terminate it, extend the returned array by one element, and store
    the new word in it. */
       if( !*p || isspace( *p ) ) {
-         if( state == 1 ) {      
+         if( state == 1 ) {
             wl = p - ws;
             w = astMalloc( wl + 1 );
             if( w ) {
@@ -1141,16 +1141,16 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     char **astChrSplitC( const char *str, char c, int *n ) 
+*     char **astChrSplitC( const char *str, char c, int *n )
 
 *  Description:
 *     This function extracts all sub-strings separated by a given
-*     character from the supplied string and returns them in an array 
+*     character from the supplied string and returns them in an array
 *     of dynamically allocated strings. The delimiter character itself
 *     is not included in the returned strings.
 *
 *     Delimiter characters that are preceeded by "\" are not used as
-*     delimiters but are included in the returned word instead (without 
+*     delimiters but are included in the returned word instead (without
 *     the "\").
 
 *  Parameters:
@@ -1232,7 +1232,7 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
          if( escaped ) {
             escaped = 0;
 
-/* If this character is a unescaped backslash, set a flag indicating that the 
+/* If this character is a unescaped backslash, set a flag indicating that the
    next character is escaped. */
          } else if( *p == '\\' ){
             escaped = 1;
@@ -1255,7 +1255,7 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
    return result;
 }
 
-char **astChrSplitRE_( const char *str, const char *regexp, int *n, 
+char **astChrSplitRE_( const char *str, const char *regexp, int *n,
                        const char **matchend, int *status ) {
 /*
 *+
@@ -1271,12 +1271,12 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 *  Synopsis:
 *     #include "memory.h"
 *     char **astChrSplitRE( const char *str, const char *regexp, int *n,
-*                           const char **matchend ) 
+*                           const char **matchend )
 
 *  Description:
-*     This function compares the supplied string with the supplied 
+*     This function compares the supplied string with the supplied
 *     regular expression. If they match, each section of the test string
-*     that corresponds to a parenthesised sub-string in the regular 
+*     that corresponds to a parenthesised sub-string in the regular
 *     expression is copied and stored in the returned array.
 
 *  Parameters:
@@ -1284,17 +1284,17 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 *        Pointer to the string to be split.
 *     regexp
 *        The regular expression. See "Template Syntax:" in the astChrSub
-*        prologue. Note, this function differs from astChrSub in that any 
+*        prologue. Note, this function differs from astChrSub in that any
 *        equals signs (=) in the regular expression are treated literally.
 *     n
-*        Address of an int in which to return the number of sub-strings 
+*        Address of an int in which to return the number of sub-strings
 *        returned.
 *     matchend
 *        A pointer to a location at which to return a pointer to the
-*        character that follows the last character within the supplied test 
-*        string that matched any parenthesises sub-section of "regexp". A 
-*        NULL pointer is returned if no matches were found. A NULL pointer 
-*        may be supplied if the location of the last matching character is 
+*        character that follows the last character within the supplied test
+*        string that matched any parenthesises sub-section of "regexp". A
+*        NULL pointer is returned if no matches were found. A NULL pointer
+*        may be supplied if the location of the last matching character is
 *        not needed.
 
 *  Returned Value:
@@ -1329,7 +1329,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 /* Check global status */
    if( !astOK ) return result;
 
-/* Call ChrSuber to do the work, saving the matching parts of the test 
+/* Call ChrSuber to do the work, saving the matching parts of the test
    string. */
    temp = ChrSuber( str, regexp, NULL, 0, 1, &result, n, matchend, status );
    if( temp ) {
@@ -1347,7 +1347,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 }
 
 char *ChrSuber( const char *test, const char *pattern, const char *subs[],
-                int nsub, int ignore_equals, char ***parts, int *npart, 
+                int nsub, int ignore_equals, char ***parts, int *npart,
                 const char **matchend, int *status ){
 /*
 *  Name:
@@ -1361,9 +1361,9 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 
 *  Synopsis:
 *     #include "memory.h"
-*     char *ChrSuber( const char *test, const char *pattern, 
+*     char *ChrSuber( const char *test, const char *pattern,
 *                     const char *subs[], int nsub, int ignore_equals,
-*                     char ***parts, int *npart, const char **matchend, 
+*                     char ***parts, int *npart, const char **matchend,
 *                     int *status )
 
 *  Description:
@@ -1376,21 +1376,21 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *        The template string. See "Template Syntax:" in the astChrSub
          prologue.
 *     subs
-*        An array of strings that are to replace the sections of the test 
-*        string that match each parenthesised sub-string in "pattern". The 
-*        first element of "subs" replaces the part of the test string that 
+*        An array of strings that are to replace the sections of the test
+*        string that match each parenthesised sub-string in "pattern". The
+*        first element of "subs" replaces the part of the test string that
 *        matches the first parenthesised sub-string in the template, etc.
 *
 *        If "nsub" is zero, then the "subs" pointer is ignored. In this
-*        case, and if parameter "ignore_equals" is zero, substitution strings 
-*        may be specified by appended them to the end of the "pattern" string, 
+*        case, and if parameter "ignore_equals" is zero, substitution strings
+*        may be specified by appended them to the end of the "pattern" string,
 *        separated by "=" characters
 *     nsub
 *        The number of substitution strings supplied in array "subs".
 *     ignore_equals
 *        If non-zero, any equals signs in the supplied pattern are
 *        treated literally, rather than being used to split the template
-*        from any substitution strigs. 
+*        from any substitution strigs.
 *     parts
 *        Address of a location at which to return a pointer to an array
 *        of character string pointers. The strings are the sub-sections
@@ -1401,10 +1401,10 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *        "parts" array. Ignored if "parts" is NULL.
 *     matchend
 *        A pointer to a location at which to return a pointer to the
-*        character that follows the last character within the supplied test 
-*        string that matched any parenthesises sub-section of "regexp". A 
-*        NULL pointer is returned if no matches were found. A NULL pointer 
-*        may be supplied if the location of the last matching character is 
+*        character that follows the last character within the supplied test
+*        string that matched any parenthesises sub-section of "regexp". A
+*        NULL pointer is returned if no matches were found. A NULL pointer
+*        may be supplied if the location of the last matching character is
 *        not needed.
 *     status
 *        Pointer to the inherited status variable.
@@ -1442,9 +1442,9 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 /* Check global status */
    if( !astOK ) return result;
 
-/* If required, split the total "pattern" string into sections, using 
-   (unescaped) "=" characters as the delimiter. The first section is the 
-   actual template, and each subsequent section (if any) holds a 
+/* If required, split the total "pattern" string into sections, using
+   (unescaped) "=" characters as the delimiter. The first section is the
+   actual template, and each subsequent section (if any) holds a
    substitution string. */
    if( ! ignore_equals ) {
       sections = astChrSplitC( pattern, '=', &nsec );
@@ -1482,8 +1482,8 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
       temp = temps[ i ];
       tlen = strlen( temp );
 
-/* If the template starts with "^" or "(^", remove the "^" character. 
-   Otherwise insert ".*?" at the start. Allocate three extra characters 
+/* If the template starts with "^" or "(^", remove the "^" character.
+   Otherwise insert ".*?" at the start. Allocate three extra characters
    in case we later need to add ".*?" to the end of the string. */
       if( temp[ 0 ] == '^' ) {
          template = astMalloc( tlen + 3 );
@@ -1491,7 +1491,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
             strcpy( template, temp + 1 );
             tlen--;
          }
-   
+
       } else if( temp[ 0 ] == '(' && temp[ 1 ] == '^') {
          template = astMalloc( tlen + 3 );
          if( template ) {
@@ -1499,7 +1499,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
             strcpy( template + 1, temp + 2 );
             tlen--;
          }
-   
+
       } else {
          template = astMalloc( tlen + 7 );
          if( template ) {
@@ -1511,7 +1511,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
          }
       }
 
-/* If the pattern ends with "$" or "$)", remove the "$" character. Otherwise 
+/* If the pattern ends with "$" or "$)", remove the "$" character. Otherwise
    insert ".*?" at the end. */
       if( template[ tlen - 1 ] == '$' ) {
          tlen--;
@@ -1531,7 +1531,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
       template[ tlen ] = 0;
 
 /* See if the test string matches the current template. */
-      result = ChrMatcher( test, test + strlen( test ), template, pattern, 
+      result = ChrMatcher( test, test + strlen( test ), template, pattern,
                            subs, nsub, 0, 1, parts, npart, matchend, status );
 
 /* Free resources. */
@@ -1570,7 +1570,7 @@ char *astChrSub_( const char *test, const char *pattern, const char *subs[],
 
 *  Synopsis:
 c     #include "memory.h"
-c     char *astChrSub( const char *test, const char *pattern, 
+c     char *astChrSub( const char *test, const char *pattern,
 c                      const char *subs[], int nsub )
 f     MATCH = AST_CHRSUB( TEST, PATTERN, RESULT, STATUS )
 
@@ -1588,13 +1588,13 @@ f     TEST = CHARACTER * ( * ) (Given)
 f     PATTERN = CHARACTER * ( * ) (Given)
 *        The template string. See "Template Syntax:" below.
 *     subs
-*        An array of strings that are to replace the sections of the test 
-*        string that match each parenthesised sub-string in "pattern". The 
-*        first element of "subs" replaces the part of the test string that 
+*        An array of strings that are to replace the sections of the test
+*        string that match each parenthesised sub-string in "pattern". The
+*        first element of "subs" replaces the part of the test string that
 *        matches the first parenthesised sub-string in the template, etc.
 *
 *        If "nsub" is zero, then the "subs" pointer is ignored. In this
-*        case, substitution strings may be specified by appended them to 
+*        case, substitution strings may be specified by appended them to
 *        the end of the "pattern" string, separated by "=" characters.
 *        Note, if you need to include a literal "=" character in the
 *        pattern, preceed it by an escape "\" character.
@@ -1620,7 +1620,7 @@ f     AST_CHRSUB = LOGICAL
 *     The template syntax is a minimal form of regular expression, The
 *     quantifiers allowed are "*", "?", "+", "{n}", "*?" and "+?" (the
 *     last two are non-greedy - they match the minimum length possible
-*     that still gives an overall match to the template). The only 
+*     that still gives an overall match to the template). The only
 *     constraints allowed are "^" and "$". The following atoms are allowed:
 *
 *     [chars]: Matches any of the specified characters.
@@ -1634,13 +1634,13 @@ f     AST_CHRSUB = LOGICAL
 *     \W: Matches anything but alphanumeric characters, and "_".
 *     \s: Matches white space.
 *     \S: Matches anything but white space.
-* 
-*     Note, minus signs ("-") within brackets have no special significance, 
+*
+*     Note, minus signs ("-") within brackets have no special significance,
 *     so ranges of characters must be specified explicitly.
 *
 *     Multiple template strings can be concatenated, using the "|"
 *     character to separate them. The test string is compared against
-*     each one in turn until a match is found. 
+*     each one in turn until a match is found.
 *
 c     Parentheses are used within each template to identify sub-strings
 c     that are to be replaced by the strings supplied in "sub".
@@ -1653,15 +1653,15 @@ f
 f     Parentheses are used within each template to identify sub-strings
 f     that are to be replaced by new strings. The new strings are
 f     specified by appended them to the end of the "pattern" string,
-f     separated by "=" characters. 
+f     separated by "=" characters.
 *
-c     Each element of "subs" 
+c     Each element of "subs"
 f     Each new string
-*     may contain a reference to a token of the 
-*     form "$1", "$2", etc. The "$1" token will be replaced by the part 
-*     of the test string that matched the first parenthesised sub-string 
-*     in "pattern". The "$2" token will be replaced by the part of the 
-*     test string that matched the second parenthesised sub-string in 
+*     may contain a reference to a token of the
+*     form "$1", "$2", etc. The "$1" token will be replaced by the part
+*     of the test string that matched the first parenthesised sub-string
+*     in "pattern". The "$2" token will be replaced by the part of the
+*     test string that matched the second parenthesised sub-string in
 *     "pattern", etc.
 *
 
@@ -1743,7 +1743,7 @@ void *astFree_( void *ptr, int *status ) {
       DeIssue( mem, status );
 #endif
 
-/* If the memory block is small enough, and the cache is being used, put it 
+/* If the memory block is small enough, and the cache is being used, put it
    into the cache rather than freeing it, so that it can be reused. */
       size = mem->size;
       if( use_cache && size <= MXCSIZE ) {
@@ -1754,7 +1754,7 @@ void *astFree_( void *ptr, int *status ) {
    The size of the block is implied by the Cache element it is stored in. */
          mem->size = (size_t) 0;
 
-/* Simply free other memory blocks, clearing the "magic number" and size 
+/* Simply free other memory blocks, clearing the "magic number" and size
    values it contains. This helps prevent accidental re-use of the memory. */
       } else {
          mem->magic = (unsigned long) 0;
@@ -1924,9 +1924,9 @@ int astIsDynamic_( const void *ptr, int *status ) {
 /* If needed, get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
-/* Derive a pointer to the memory header that precedes the 
-   supplied region of memory. */ 
-   isdynmem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY ); 
+/* Derive a pointer to the memory header that precedes the
+   supplied region of memory. */
+   isdynmem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
 
 /* Check if the "magic number" in the header is valid, returning non-zero
    if it is. */
@@ -2007,7 +2007,7 @@ void *astMalloc_( size_t size, int *status ) {
    to allocate the memory, including space for the header structure. */
    } else if ( size != (size_t ) 0 ) {
 
-/* If the cache is being used and a cached memory block of the required size 
+/* If the cache is being used and a cached memory block of the required size
    is available, remove it from the cache array and use it. */
       mem = ( size <= MXCSIZE ) ? cache[ size ] : NULL;
       if( use_cache && mem ) {
@@ -2016,7 +2016,7 @@ void *astMalloc_( size_t size, int *status ) {
          mem->size = (size_t) size;
 
 /* Otherwise, allocate a new memory block using "malloc". */
-      } else {      
+      } else {
          mem = MALLOC( SIZEOF_MEMORY + size );
 
 /* Report an error if malloc failed. */
@@ -2065,9 +2065,9 @@ void *astMalloc_( size_t size, int *status ) {
 }
 #undef ERRBUF_LEN
 
-static char *ChrMatcher( const char *test, const char *end, const char *template, 
-                         const char *pattern, const char *subs[], int nsub, 
-                         int ignore, int expdoll, char ***mres, int *mlen, 
+static char *ChrMatcher( const char *test, const char *end, const char *template,
+                         const char *pattern, const char *subs[], int nsub,
+                         int ignore, int expdoll, char ***mres, int *mlen,
                          const char **matchend, int *status ){
 /*
 *  Name:
@@ -2081,9 +2081,9 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
 
 *  Synopsis:
 *     #include "memory.h"
-*     char *ChrMatcher( const char *test, const char *end, const char *template, 
-*                       const char *pattern, const char *subs[], int nsub, 
-*                       int ignore, int expdoll, char ***mres, int *mlen, 
+*     char *ChrMatcher( const char *test, const char *end, const char *template,
+*                       const char *pattern, const char *subs[], int nsub,
+*                       int ignore, int expdoll, char ***mres, int *mlen,
 *                       const char **matchend, int *status )
 
 *  Description:
@@ -2100,7 +2100,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
 *        The user supplied "pattern" string (only used for error messages).
 *     subs
 *        An array of strings holding the values that are to be substituted
-*        into each parenthesised substring in "test". 
+*        into each parenthesised substring in "test".
 *     nsub
 *        The length of the subs arrays.
 *     ignore
@@ -2120,10 +2120,10 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
 *        returned "mres" array. Ignored if "mres" is NULL.
 *     matchend
 *        A pointer to a location at which to return a pointer to the
-*        character that follows the last character within the supplied test 
-*        string that matched any parenthesises sub-section of "regexp". A 
-*        NULL pointer is returned if no matches were found. A NULL pointer 
-*        may be supplied if the location of the last matching character is 
+*        character that follows the last character within the supplied test
+*        string that matched any parenthesises sub-section of "regexp". A
+*        NULL pointer is returned if no matches were found. A NULL pointer
+*        may be supplied if the location of the last matching character is
 *        not needed.
 *     status
 *        Pointer to the inherited status variable.
@@ -2171,7 +2171,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
    int nmatch;
    int npart;
    int partlen;
-   int reslen;      
+   int reslen;
    int start_sub;
    size_t stl;
 
@@ -2187,15 +2187,15 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
    result = NULL;
    allowed = NULL;
 
-/* Get memory for a set of pointers to copies of the test sub-strings that 
+/* Get memory for a set of pointers to copies of the test sub-strings that
    fall between the sub-strings being replaced. */
    parts = astMalloc( sizeof( char *)*(size_t) ( nsub + 1 ) );
 
-/* Get memory for a set of pointers to copies of the test sub-strings that 
+/* Get memory for a set of pointers to copies of the test sub-strings that
    match the parenthesised sub-strings in the template. */
    matches = astMalloc( sizeof( char *)*(size_t) nsub );
 
-/* Initialise pointers to the next test and template characters to read. */ 
+/* Initialise pointers to the next test and template characters to read. */
    a = test;
    b = template;
 
@@ -2218,12 +2218,12 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
    while( match && *a && *b ) {
 
 /* Examine the string at the start of the template string. This returns a
-   string of allowed (or disallowed) characters that the next test character 
-   can match, the number of template characters consumed, the minimum number 
+   string of allowed (or disallowed) characters that the next test character
+   can match, the number of template characters consumed, the minimum number
    of test characters that must match the allowed character set, and a flag
-   indicating if the number of matching test characters can exceed the 
+   indicating if the number of matching test characters can exceed the
    minimum number or must be exactly equal to the minimum number.  */
-      allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
+      allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow,
                                 &min_na, &max_na, &start_sub, &end_sub,
                                 &greedy, status );
       if( !astOK ) break;
@@ -2248,7 +2248,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
                          "missing ')'.", status, pattern );
                break;
-            } 
+            }
 
 /* Indicate that we are now in a substitution field. */
             in_sub = 1;
@@ -2265,7 +2265,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                   parts[ npart ][ partlen ] = 0;
                   npart++;
                }
-            }        
+            }
          }
 
 /* If the leading field in the template indicates the end of a
@@ -2285,7 +2285,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
             }
 
 /* We are no longer in a substitution field. */
-            in_sub = 0; 
+            in_sub = 0;
 
 /* If possible, store a copy of the test string that matched the
    substitution template. */
@@ -2298,15 +2298,15 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                   nmatch++;
                   if( matchend ) *matchend = a + 1;
                }
-            }        
+            }
 
 /* Record the start of the next test string part. */
             aa = a;
          }
 
 /* Otherwise, find how many characters at the front of the test string
-   match the leading field in the template. Find the number of leading 
-   characters in the test string that are contained in the set of 
+   match the leading field in the template. Find the number of leading
+   characters in the test string that are contained in the set of
    characters allowed by the leading field in the template. */
       } else {
          if( !allowed ) {
@@ -2343,9 +2343,9 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
          } else if( max_na > min_na ) {
             match = 0;
 
-/* If a greedy quantifier was used, try using a decreasing number of test 
-   characters, starting at the maximum allowed and decreasing down to the 
-   minimum, until a number is found which allows the rest of the string 
+/* If a greedy quantifier was used, try using a decreasing number of test
+   characters, starting at the maximum allowed and decreasing down to the
+   minimum, until a number is found which allows the rest of the string
    to be matched. */
             if( greedy ) {
                for( na = max_na; na >= min_na; na-- ) {
@@ -2354,13 +2354,13 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                   if( r ) {
                      match = 1;
                      r = astFree( r );
-                     break;                  
+                     break;
                   }
                }
 
-/* If a non-greedy quantifier was used, try using an increasing number of 
-   test characters, starting at the minimum allowed and increasing up to 
-   the maximum, until a number is found which allows the rest of the string 
+/* If a non-greedy quantifier was used, try using an increasing number of
+   test characters, starting at the minimum allowed and increasing up to
+   the maximum, until a number is found which allows the rest of the string
    to be matched. */
             } else {
                for( na = min_na; na <= max_na; na++ ) {
@@ -2369,7 +2369,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                   if( r ) {
                      match = 1;
                      r = astFree( r );
-                     break;                  
+                     break;
                   }
                }
             }
@@ -2396,7 +2396,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
          }
 
 /* We are no longer in a substitution field. */
-         in_sub = 0; 
+         in_sub = 0;
 
 /* If possible, store a copy of the test string that matched the
    substitution field. */
@@ -2409,7 +2409,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                nmatch++;
                if( matchend ) *matchend = a + 1;
             }
-         }        
+         }
 
          aa = a;
       }
@@ -2421,8 +2421,8 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
    if( !*a && *b && match ) {
 
       while( *b ) {
-         allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
-                                   &min_na, &max_na, &start_sub, &end_sub, 
+         allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow,
+                                   &min_na, &max_na, &start_sub, &end_sub,
                                    &greedy, status );
          b += nb;
          allowed = astFree( allowed );
@@ -2433,7 +2433,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
          }
       }
 
-   } 
+   }
 
 /* No match if either string was not used completely. */
    if( *a || *b ) match = 0;
@@ -2443,7 +2443,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
       astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
                 "missing ')'.", status, pattern );
       match = 0;
-   } 
+   }
 
 /* If we have a match, construct the returned string. */
    if( match && parts ) {
@@ -2457,7 +2457,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
             parts[ npart ][ partlen ] = 0;
             npart++;
          }
-      }        
+      }
 
 /* If required, expand  $1, $2, etc within the replacement strings. */
       if( expdoll) {
@@ -2571,7 +2571,7 @@ int astMemCaching_( int newval, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            
+   astDECLARE_GLOBALS
    int i;
    int result;
    Memory *mem;
@@ -2589,7 +2589,7 @@ int astMemCaching_( int newval, int *status ){
 
 /* Store the original value of the tuning parameter. */
    result = use_cache;
-   
+
 /* If a new value is to be set. */
    if( newval != AST__TUNULL ) {
 
@@ -2616,7 +2616,7 @@ int astMemCaching_( int newval, int *status ){
             if( !id_list ) {
                astError( AST__INTER, "astMemCaching: Cannot allocate %lu "
                          "bytes of memory", status, (unsigned long)(sizeof(int)*id_list_size) );
-            }            
+            }
 
             id_list_size = 0;
 
@@ -2641,7 +2641,7 @@ int astMemCaching_( int newval, int *status ){
             }
          }
 
-/* If we are displaying the IDs of memory blocks still in the cache, sort 
+/* If we are displaying the IDs of memory blocks still in the cache, sort
    them using a bubblesort algorithm, then display them. */
 #ifdef MEM_DEBUG
          if( id_list ) {
@@ -2662,7 +2662,7 @@ int astMemCaching_( int newval, int *status ){
                         t = id_list[ i ];
                         id_list[ i ] = id_list[ i + 1 ];
                         id_list[ i + 1 ] = t;
-                     } 
+                     }
                   }
                }
 
@@ -2751,7 +2751,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            
+   astDECLARE_GLOBALS
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
    char *errstat;                /* Pointer to system error message */
    int isdynamic;                /* Was memory allocated dynamically? */
@@ -2799,14 +2799,14 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 /* Otherwise, reallocate the memory. */
             } else {
 
-/* If the cache is being used, for small memory blocks, do the equivalent of 
+/* If the cache is being used, for small memory blocks, do the equivalent of
                mem = REALLOC( mem, SIZEOF_MEMORY + size );
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
                if( use_cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
                   result = astMalloc( size );
-                  if( result ) { 
+                  if( result ) {
                      if( mem->size < size ) {
                         memcpy( result, ptr, mem->size );
                      } else {
@@ -2839,7 +2839,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
                      astError( AST__NOMEM, "realloc: %s", status, errstat );
                      astError( AST__NOMEM, "Failed to reallocate a block of "
                                "memory to %ld bytes.", status, (long) size );
-   
+
 /* If successful, set the new "magic" value and size in the memory
    header and obtain a pointer to the start of the region of memory to
    be used by the caller. */
@@ -2861,7 +2861,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
    }
 
 /* Return the result. */
-   return result;   
+   return result;
 }
 #undef ERRBUF_LEN
 
@@ -2883,7 +2883,7 @@ void astRemoveLeadingBlanks_( char *string, int *status ) {
 
 *  Description:
 *     This function moves characters in the supplied string to the left
-*     in order to remove any leading white space. 
+*     in order to remove any leading white space.
 
 *  Parameters:
 *     string
@@ -2893,7 +2893,7 @@ void astRemoveLeadingBlanks_( char *string, int *status ) {
 */
 
 /* Local Variables: */
-   char *c, *d;              
+   char *c, *d;
 
 /* Check a string has been supplied. */
    if( string ){
@@ -3014,7 +3014,7 @@ static size_t SizeOfMemory( int *status ){
 
 *  Notes:
 *     - The returned value is also stored in the module variable
-*     sizeof_memory. 
+*     sizeof_memory.
 */
 
 /* Local Variables: */
@@ -3026,8 +3026,8 @@ static size_t SizeOfMemory( int *status ){
 /* Get the basic size of a Memory structure. */
    sizeof_memory = sizeof( Memory );
 
-/* Now increase the returned value to ensure it is a multiple of 8. Mask 
-   off all but the last 3 bits, xor with 0x7 to get the remainder, add 1 
+/* Now increase the returned value to ensure it is a multiple of 8. Mask
+   off all but the last 3 bits, xor with 0x7 to get the remainder, add 1
    to make it a multiple of 8 bytes. */
    sizeof_memory += ((sizeof_memory & 0x7) ? ((sizeof_memory & 0x7) ^ 0x7) + 1 : 0);
 
@@ -3054,7 +3054,7 @@ size_t astTSizeOf_( const void *ptr, int *status ) {
 
 *  Description:
 *     This function returns the size of a region of dynamically
-*     allocated memory, including the extra memory used to store 
+*     allocated memory, including the extra memory used to store
 *     the header information for the memory block (size and magic number).
 
 *  Parameters:
@@ -3094,7 +3094,7 @@ size_t astTSizeOf_( const void *ptr, int *status ) {
    the memory size from the header which precedes it. */
    if ( ptr ){
       IS_DYNAMIC( ptr, isdynamic );
-      if( isdynamic ) size = SIZEOF_MEMORY + 
+      if( isdynamic ) size = SIZEOF_MEMORY +
                              ( (Memory *) ( (char *) ptr - SIZEOF_MEMORY ) )->size;
    }
 
@@ -3307,7 +3307,7 @@ char **astStringArray_( const char *chars, int nel, int len, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     char **astStringArray( const char *chars, int nel, int len ) 
+*     char **astStringArray( const char *chars, int nel, int len )
 
 *  Description:
 *     This function turns an array of fixed-length character data into
@@ -3396,7 +3396,7 @@ s
       if( astOK ){
          in_str = chars;
          out_str = (char *) ( result + nel );
- 
+
 /* Loop to copy each string. */
          for ( i = 0; i < nel; i++ ) {
             (void) memcpy( out_str, in_str, (size_t) len );
@@ -3445,8 +3445,8 @@ size_t astChrLen_( const char *string, int *status ) {
 *        Pointer to the string.
 
 *  Returned Value:
-*     The number of characters in the supplied string, not including the 
-*     trailing newline, and any trailing white-spaces or non-printable 
+*     The number of characters in the supplied string, not including the
+*     trailing newline, and any trailing white-spaces or non-printable
 *     characters.
 
 *-
@@ -3527,8 +3527,8 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    int nptr;                /* Np. of pointers stored */
    int ret;                 /* The returned number of conversions */
    va_list args;            /* Variable argument list pointer */
-   void *fptr;              /* The next supplied pointer */ 
-   void *ptr[ VMAXFLD ];    /* Array of supplied pointers */ 
+   void *fptr;              /* The next supplied pointer */
+   void *ptr[ VMAXFLD ];    /* Array of supplied pointers */
 
 /* Initialise the variable argument list pointer. */
    va_start( args, fmt );
@@ -3552,14 +3552,14 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 /* Field specifiers are marked by a % sign. */
          if( *c == '%' ) {
 
-/* Look at the character following the % sign. Quit if the end of the string 
+/* Look at the character following the % sign. Quit if the end of the string
    has been reached. */
             c++;
             if( *c ) {
 
 /* If the % sign is followed by a "*" or another "%", then there will be no
    corresponding pointer in the variable argument list "args". Ignore such
-   field specifiers. */ 
+   field specifiers. */
                if( *c != '*' && *c != '%' ) {
 
 /* If possible store the corresponding pointer from the variable argument
@@ -3576,9 +3576,9 @@ int astSscanf_( const char *str, const char *fmt, ...) {
                      if( *c == 'n' ) *( (int *) ptr[ nptr - 1 ] ) = 0;
 
 	          } else {
-                     astError( AST__INTER, "astSscanf: Format string " 
+                     astError( AST__INTER, "astSscanf: Format string "
                                "'%s' contains more than %d fields "
-                               "(AST internal programming error).", status, 
+                               "(AST internal programming error).", status,
                                fmt, VMAXFLD );
                      break;
                   }
@@ -3610,7 +3610,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
       if( c && astOK ) {
 
 /* Take a copy of the supplied format string (excluding any trailing spaces). */
-         newfor = (char *) astStore( NULL, (void *) fmt, (size_t) lfor + 1 ); 
+         newfor = (char *) astStore( NULL, (void *) fmt, (size_t) lfor + 1 );
          if( newfor ) {
 
 /* Ensure the string is terminated (in case the supplied format string
@@ -3628,8 +3628,8 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    use vsscanf because it is not ANSI C. Instead, we list the pointers
    explicitly. */
             ret = sscanf( str, newfor, ptr[0], ptr[1], ptr[2], ptr[3],
-                          ptr[4], ptr[5], ptr[6], ptr[7], ptr[8], ptr[9], 
-                          ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], 
+                          ptr[4], ptr[5], ptr[6], ptr[7], ptr[8], ptr[9],
+                          ptr[10], ptr[11], ptr[12], ptr[13], ptr[14],
                           ptr[15], ptr[16], ptr[17], ptr[18], ptr[19] );
 
 /* Now look through the original format string for conversions specifiers.
@@ -3644,23 +3644,23 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 /* Field specifiers are marked by a % sign. */
                if( *c == '%' ) {
 
-/* Look at the character following the % sign. Quit if the end of the string 
+/* Look at the character following the % sign. Quit if the end of the string
    has been reached. */
                   c++;
                   if( *c ) {
 
 /* If the % sign is followed by a "*" or another "%", then there will be no
    corresponding pointer in the variable argument list "args". Ignore such
-   field specifiers. */ 
+   field specifiers. */
                      if( *c != '*' && *c != '%' ) {
 
 /* Get the supplied pointer corresponding to this field specifier. */
                         fptr = ptr[ iptr++ ];
 
-/* Increment the number of matched fields required. "%n" specifiers are not 
+/* Increment the number of matched fields required. "%n" specifiers are not
    included in the value returned by sscanf so skip over them. */
                         if( *c != 'n' ) {
-			   nfld++; 
+			   nfld++;
 
 /* If the % sign is followed by a "n", and was preceeded by a space, we
    may need to correct the returned character count. */
@@ -3676,7 +3676,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 /* For each space in "str" which follows, increment the returned count by
    one (so long as the original count is not zero or more than the length
    of the string - this is not foolproof, but I can't think of a better
-   check - all uses of %n in AST initialize the supplied count to zero 
+   check - all uses of %n in AST initialize the supplied count to zero
    before calling sscanf so a value fo zero is a safe (ish) bet that the
    supplied string doesn't match the supplied format). */
                               if( nc > 0 && nc < lstr ) {
@@ -3706,10 +3706,10 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    directly. */
       } else if( astOK ) {
          ret = sscanf( str, fmt, ptr[0], ptr[1], ptr[2], ptr[3],
-                       ptr[4], ptr[5], ptr[6], ptr[7], ptr[8], ptr[9], 
-                       ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], 
+                       ptr[4], ptr[5], ptr[6], ptr[7], ptr[8], ptr[9],
+                       ptr[10], ptr[11], ptr[12], ptr[13], ptr[14],
                        ptr[15], ptr[16], ptr[17], ptr[18], ptr[19] );
-      }      
+      }
    }
 
 /* Tidy up the argument pointer. */
@@ -3768,7 +3768,7 @@ void astActiveMemory_( const char *label ) {
       while( next ) {
          if( !next->perm ) printf( "%d ", next->id );
          next = next->next;
-      } 
+      }
    } else {
       printf("There are currently no active AST memory blocks.");
    }
@@ -3796,12 +3796,12 @@ void astWatchMemory_( int id ) {
 *  Description:
 *     This function forces astMemoryAlarm to be invoked when key
 *     operations are performed on a specified memory block. These key
-*     operations include; allocation, freeing, copying and cloning of 
-*     Objects, etc. 
-*  
+*     operations include; allocation, freeing, copying and cloning of
+*     Objects, etc.
+*
 *     astMemoryAlarm reports a message when called identifying the memory
 *     block and the action performed on it. When using a debugger, these
-*     events can be trapped and investigated by setting a debugger 
+*     events can be trapped and investigated by setting a debugger
 *     breakpoint in astMemoryAlarm_.
 
 *  Parameters:
@@ -3875,7 +3875,7 @@ void *astMemoryPtr_( int id ){
 *        The identifier for an active memory block.
 
 *  Returned Value:
-*     The pointer to the memory block. NULL is returned if no active memory 
+*     The pointer to the memory block. NULL is returned if no active memory
 *     with the given ID can be found. Note, this is always a genuine C
 *     pointer (even for public Object pointers).
 
@@ -3944,13 +3944,13 @@ void astMemoryUse_( const void *ptr, const char *verb, int *status ){
 *  Description:
 *     If the supplied memory block is being watched, astMemoryAlarm is
 *     called to report the use of the pointer. The reported text includes
-*     the supplied "verb". A memory block can be watched by calling 
+*     the supplied "verb". A memory block can be watched by calling
 *     astWatchMemory.
 
 *  Parameters:
 *     ptr
 *        A pointer to the memory block being used. The pointer must have
-*        been returned by one of the AST memory management functions (e.g. 
+*        been returned by one of the AST memory management functions (e.g.
 *        astMalloc, astRealloc, etc).
 *     verb
 *        A verb indicating what is being done to the pointer.
@@ -3961,7 +3961,7 @@ void astMemoryUse_( const void *ptr, const char *verb, int *status ){
    astGET_GLOBALS(NULL);
 
    if( ptr && astMemoryId( ptr ) == Watched_ID ) {
-      if( !Quiet_Use || !strcmp( verb, ISSUED ) || 
+      if( !Quiet_Use || !strcmp( verb, ISSUED ) ||
                         !strcmp( verb, FREED ) ) {
          astMemoryAlarm( verb );
       }
@@ -3993,16 +3993,16 @@ int astMemoryTune_( const char *name, int value, int *status ){
 *     name
 *        The name of the tuning parameter to query or set. Valid names are:
 *
-*        "Keep_ID": A boolean flag indicating if a new ID should be issued 
-*        for a cached memory block each time it is returned by astMalloc? 
-*        Otherwise, the same ID value is used throughtout the life of a 
+*        "Keep_ID": A boolean flag indicating if a new ID should be issued
+*        for a cached memory block each time it is returned by astMalloc?
+*        Otherwise, the same ID value is used throughtout the life of a
 *        memory block. Default is zero (false).
 *
 *        "List_Cache": A boolean flag which if non-zero (true) causes the
 *        ID of every memory block in the cache to be reported when the
 *        cache is emptied by astFlushMemory.
 *
-*        "Quiet_Use": A boolean flag controlling the number of reports issued 
+*        "Quiet_Use": A boolean flag controlling the number of reports issued
 *        when a memory block is being watched (see astWatchMemory). If
 *        non-zero (true), then the only events which are reported are the
 *        issuing of a memory block pointer by astMalloc or astRealloc,and
@@ -4027,17 +4027,17 @@ int astMemoryTune_( const char *name, int value, int *status ){
       if( astChrMatch( name, "Keep_ID" ) ) {
          result = Keep_ID;
          if( value != AST__TUNULL ) Keep_ID = value;
-         
+
       } else if( astChrMatch( name, "Quiet_Use" ) ) {
          result = Quiet_Use;
          if( value != AST__TUNULL ) Quiet_Use = value;
-         
+
       } else if( astChrMatch( name, "List_Cache" ) ) {
          result = List_Cache;
          if( value != AST__TUNULL ) List_Cache = value;
-         
+
       } else if( astOK ) {
-         astError( AST__TUNAM, "astMemoryTune: Unknown AST memory tuning " 
+         astError( AST__TUNAM, "astMemoryTune: Unknown AST memory tuning "
                    "parameter specified \"%s\".", status, name );
       }
    }
@@ -4062,13 +4062,13 @@ void astBeginPM_( int *status ) {
 *     astBeginPM
 
 *  Description:
-*     This function indicates that all memory allocations made by calls 
+*     This function indicates that all memory allocations made by calls
 *     to other functions in this module (e.g. astMalloc), up to the
-*     astEndPM call which matches the astBeginPM call,  will not usually 
+*     astEndPM call which matches the astBeginPM call,  will not usually
 *     be freed explicitly. Matching astBeginPM/astEndPM calls should be
 *     used to enclose all code which allocates memory which is never
 *     freed explitly by AST. Such memory allocations may be freed if
-*     required, using the astFlushMemory function (but note this should 
+*     required, using the astFlushMemory function (but note this should
 *     only be done once all use of AST by an application has finished).
 *
 *     Matching pairs of astBeginPM/astEndPM calls can be nested up to a
@@ -4079,15 +4079,15 @@ void astBeginPM_( int *status ) {
 
    LOCK_DEBUG_MUTEX;
 
-/* The global Perm_Mem flag indicates whether or not subsequent memory 
-   management functions in this module should store pointers to allocated 
+/* The global Perm_Mem flag indicates whether or not subsequent memory
+   management functions in this module should store pointers to allocated
    blocks in the PM_List array. Push the current value of this flag
    onto a stack, and set the value to 1. */
    if( PM_Stack_Size >= PM_STACK_MAXSIZE ){
       if( astOK ) {
          astError( AST__INTER, "astBeginPM: Maximum stack size has been "
                    "exceeded (internal AST programming error)." , status);
-      } 
+      }
 
    } else {
       PM_Stack[ PM_Stack_Size++ ] = Perm_Mem;
@@ -4113,7 +4113,7 @@ void astEndPM_( int *status ) {
 *     astEndPM
 
 *  Description:
-*     This function indicates the end of the block of permanent memory 
+*     This function indicates the end of the block of permanent memory
 *     allocations started by the matching call to astBeginPM. See
 *     astBeginPM for further details.
 
@@ -4122,14 +4122,14 @@ void astEndPM_( int *status ) {
 
    LOCK_DEBUG_MUTEX;
 
-/* The global Perm_Mem flag indicates whether or not subsequent memory 
-   management functions in this module should store pointers to allocated 
+/* The global Perm_Mem flag indicates whether or not subsequent memory
+   management functions in this module should store pointers to allocated
    blocks in the PM_List array. Pop the value from the top of this stack. */
    if( PM_Stack_Size == 0 ){
       if( astOK ) {
          astError( AST__INTER, "astEndPM: astEndPM called without "
                    "matching astBeginPM (internal AST programming error)." , status);
-      } 
+      }
 
    } else {
       Perm_Mem = PM_Stack[ --PM_Stack_Size ];
@@ -4155,21 +4155,21 @@ void astFlushMemory_( int leak, int *status ) {
 *     astFlushMemory( int leak );
 
 *  Description:
-*     This function should only be called once all use of AST by an 
-*     application has finished. It frees any allocated but currently 
-*     unused memory (stored in an internal cache of unused memory 
-*     pointers), together with any memory used permanently to store 
+*     This function should only be called once all use of AST by an
+*     application has finished. It frees any allocated but currently
+*     unused memory (stored in an internal cache of unused memory
+*     pointers), together with any memory used permanently to store
 *     internal AST state information.
 *
 *     It is not normally necessary to call this function since the memory
-*     will be freed anyway by the operating system when the application 
-*     terminates. However, it can be called if required in order to 
+*     will be freed anyway by the operating system when the application
+*     terminates. However, it can be called if required in order to
 *     stop memory management tools such as valgrind from reporting that
 *     the memory has not been freed at the end of an application.
 *
 *     In addition, if "leak" is non-zero this function will also report
-*     an error if any active AST memory pointers remain which have not 
-*     been freed (other than pointers for the cached and permanent 
+*     an error if any active AST memory pointers remain which have not
+*     been freed (other than pointers for the cached and permanent
 *     memory described above). Leakage of active memory blocks can be
 *     investigated using astActiveMemory and astWatchMemory.
 
@@ -4199,7 +4199,7 @@ void astFlushMemory_( int leak, int *status ) {
          FREE( Active_List );
       }
       Active_List = next;
-   } 
+   }
 
 /* Report an error if any active pointers remained. if an error has
    already occurred, use the existing status value. */
@@ -4254,7 +4254,7 @@ static void Issue( Memory *mem, int *status ) {
    astGET_GLOBALS(NULL);
 
 /* Store a unique identifier for this pointer. Unless global Keep_ID is
-   non-zero, a new identifier is used each time the pointer becomes active 
+   non-zero, a new identifier is used each time the pointer becomes active
    (i.e. each time it is remove from the cache or malloced). */
    if( !Keep_ID || mem->id < 0 ) mem->id = ++Next_ID;
 
@@ -4355,7 +4355,7 @@ void astStartTimer_( const char *file, int line, const char *name, int *status )
 *  Description:
 *     This function looks for a timer with the specified name within the
 *     current parent timer. If no timer with the given name is found, a
-*     new timer is created and initialised to zero. The current absolute 
+*     new timer is created and initialised to zero. The current absolute
 *     time (elapsed, user and system) is recorded in the timer. The new
 *     timer then becomes the current timer.
 
@@ -4398,9 +4398,9 @@ void astStartTimer_( const char *file, int line, const char *name, int *status )
    if( !found ) {
       t = astMalloc( sizeof( AstTimer ) );
       t->id = Timer_Count++;
-      t->et = 0; 
-      t->ut = 0; 
-      t->st = 0; 
+      t->et = 0;
+      t->ut = 0;
+      t->st = 0;
       t->nentry = 0;
       t->name = name;
       t->file = file;
@@ -4411,8 +4411,8 @@ void astStartTimer_( const char *file, int line, const char *name, int *status )
 
       if( Current_Timer ) {
          n = (Current_Timer->nchild)++;
-         Current_Timer->children = astGrow( Current_Timer->children, 
-                                            sizeof( AstTimer *), 
+         Current_Timer->children = astGrow( Current_Timer->children,
+                                            sizeof( AstTimer *),
                                             Current_Timer->nchild );
          Current_Timer->children[ n ] = t;
       }
@@ -4421,8 +4421,8 @@ void astStartTimer_( const char *file, int line, const char *name, int *status )
 /* Record the current absolute times (elapsed, user and system) within
    the new timer. */
    t->e0 = times(&buf);
-   t->u0 = buf.tms_utime;   
-   t->s0 = buf.tms_stime;   
+   t->u0 = buf.tms_utime;
+   t->s0 = buf.tms_stime;
 
 /* Increment the number of entries into the timer. */
    (t->nentry)++;
@@ -4503,14 +4503,14 @@ void astStopTimer_( int *status ) {
    AstTimer *flat;
    AstTimer *t;
    int i;
-   int nflat;     
+   int nflat;
    struct tms buf;
 
 /* Check inherited status. Also return if timers are currently disabled. */
    if( !Enable_Timers || !Current_Timer || *status != 0 ) return;
 
-/* Get the current absolute times, and thus find the elapsed times since the 
-   corresponding call to astStartTimer. Use these elapsed times to increment 
+/* Get the current absolute times, and thus find the elapsed times since the
+   corresponding call to astStartTimer. Use these elapsed times to increment
    the total times spent in the timer. */
    Current_Timer->et += ( times(&buf) - Current_Timer->e0 );
    Current_Timer->st += ( buf.tms_stime - Current_Timer->s0 );
@@ -4532,7 +4532,7 @@ void astStopTimer_( int *status ) {
       for( i = 0; i < nflat; i++,t++ ) {
          printf( "%s (%s:%d): ", t->name, t->file, t->line );
          printf( "elapsed=%ld ", (long int) t->et );
-/* 
+/*
          printf( "system=%ld ", (long int) t->st );
          printf( "user=%ld ", (long int) t->ut );
 */
@@ -4548,7 +4548,7 @@ void astStopTimer_( int *status ) {
    }
 }
 
-static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat, 
+static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
                               int *nflat, int *status ) {
 /*
 *  Name:
@@ -4566,8 +4566,8 @@ static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
 *                            int *nflat, int *status )
 
 *  Description:
-*     This routines reports to standard output the times spent in the 
-*     supplied timer. It then calls itself recursively to report the times 
+*     This routines reports to standard output the times spent in the
+*     supplied timer. It then calls itself recursively to report the times
 *     spent in each of the child timers of the supplied timer.
 *
 *     It also frees the memory used to hold the supplied timer.
@@ -4598,14 +4598,14 @@ static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
 /* Check inherited status */
    if( *status != 0 ) return NULL;
 
-/* Display a single line of text containing the times stored in the supplied 
+/* Display a single line of text containing the times stored in the supplied
    timer, preceeded by the requested number of spaces. */
    for( i = 0; i < ind; i++ ) printf(" ");
    printf( "%s (%s:%d): ", t->name, t->file, t->line );
 
    printf( "id=%d ", t->id );
    printf( "elapsed=%ld ", (long int) t->et );
-/* 
+/*
    printf( "system=%ld ", (long int) t->st );
    printf( "user=%ld ", (long int) t->ut );
 */
@@ -4615,9 +4615,9 @@ static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
    if( t->nchild ) printf("{");
    printf("\n");
 
-/* If there is more than one child, sort them into descending order of 
+/* If there is more than one child, sort them into descending order of
    elapsed time usage. */
-   if( t->nchild > 1 ) qsort( t->children, t->nchild, sizeof( AstTimer * ), 
+   if( t->nchild > 1 ) qsort( t->children, t->nchild, sizeof( AstTimer * ),
                               CompareTimers );
 
 /* Increment the indentation and call this function recursively to
@@ -4661,9 +4661,9 @@ static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
          *flat = astGrow( *flat, *nflat, sizeof( AstTimer ) );
          ft = (*flat) + i;
          ft->id = 0;
-         ft->et = t->et; 
-         ft->ut = t->ut; 
-         ft->st = t->st; 
+         ft->et = t->et;
+         ft->ut = t->ut;
+         ft->st = t->st;
          ft->nentry = t->nentry;
          ft->name = t->name;
          ft->file = t->file;
@@ -4675,9 +4675,9 @@ static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
 
 /* If found, increment the properites to include the supplied timer. */
       } else {
-         ft->et += t->et; 
-         ft->ut += t->ut; 
-         ft->st += t->st; 
+         ft->et += t->et;
+         ft->ut += t->ut;
+         ft->st += t->st;
          ft->nentry += t->nentry;
       }
    }

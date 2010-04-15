@@ -22,15 +22,15 @@
 *  Description:
 *     This application creates a plot of array value against position
 *     for a one-dimensional NDF.  The vertical axis of the plot
-*     represents array value, and the horizontal axis represents 
+*     represents array value, and the horizontal axis represents
 *     position.  These can be mapped in various ways on to the graphics
-*     surface (e.g. linearly, logarithmically); see parameters 
+*     surface (e.g. linearly, logarithmically); see parameters
 *     XMAP and YMAP).
 *
 *     The plot may take several different forms such as a
-*     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see 
+*     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see
 *     parameter MODE).  Errors on both the data values and the data
-*     positions may be represented in several different ways (see 
+*     positions may be represented in several different ways (see
 *     parameters ERRBAR and SHAPE).  The plotting style (colour, fonts,
 *     text size, etc) may be specified in detail using parameter STYLE.
 *
@@ -45,18 +45,18 @@
 *
 *     The input NDF may, for instance, contain a spectrum of data values
 *     against wavelength, or it may contain data values along a
-*     one-dimensional profile through an NDF of higher dimensionality.  
-*     In the latter case, the current co-ordinate Frame of the NDF may 
+*     one-dimensional profile through an NDF of higher dimensionality.
+*     In the latter case, the current co-ordinate Frame of the NDF may
 *     have more than one axis.  Any of the axes in the current
 *     co-ordinate Frame of the input NDF may be used to annotate the
-*     horizontal axis of the plot produced by this application. 
+*     horizontal axis of the plot produced by this application.
 *     Alternatively, the horizontal axis may be annotated with offset
 *     from the first array element measured within the current
 *     co-ordinate Frame of the NDF.  For instance, a one-dimensional
-*     slice through a two-dimensional image calibrated in RA/DEC could 
-*     be annotated with RA, or DEC, or offset from the first 
-*     element (in arc-minutes, degrees, etc.).  This offset is measured 
-*     along the path of the profile.  The choice of annotation for the 
+*     slice through a two-dimensional image calibrated in RA/DEC could
+*     be annotated with RA, or DEC, or offset from the first
+*     element (in arc-minutes, degrees, etc.).  This offset is measured
+*     along the path of the profile.  The choice of annotation for the
 *     horizontal axis is controlled by parameter USEAXIS.
 
 *  Usage:
@@ -64,64 +64,64 @@
 
 *  ADAM Parameters:
 *     ALIGN = _LOGICAL (Read)
-*        Controls whether or not the new data plot should be aligned 
-*        with an existing data plot.  If ALIGN is TRUE, the X axis 
-*        values of the new plot will be mapped into the co-ordinate 
+*        Controls whether or not the new data plot should be aligned
+*        with an existing data plot.  If ALIGN is TRUE, the X axis
+*        values of the new plot will be mapped into the co-ordinate
 *        system of the X axis in the existing plot before being used (if
-*        this is not possible an error is reported).  In this case, the 
+*        this is not possible an error is reported).  In this case, the
 *        XLEFT,  XRIGHT, YBOT, and YTOP parameters are ignored and the
-*        bounds of the existing plot are used instead.  If ALIGN is 
-*        FALSE, the new X axis values are used without change.  The 
+*        bounds of the existing plot are used instead.  If ALIGN is
+*        FALSE, the new X axis values are used without change.  The
 *        bounds of the new plot are specified using parameters XLEFT,
 *        XRIGHT, YBOT, and YTOP as usual, and these bounds are mapped
-*        to the edges of the existing picture.  The ALIGN parameter is 
-*        only accessed if parameter CLEAR is FALSE, and if there is 
+*        to the edges of the existing picture.  The ALIGN parameter is
+*        only accessed if parameter CLEAR is FALSE, and if there is
 *        another line plot within the current picture.  If a null (!)
 *        value is supplied, a value of TRUE will be used if and only if
-*        a mapping can be found between the existing and the new plots. 
+*        a mapping can be found between the existing and the new plots.
 *        A value of FALSE will be used otherwise.  [!]
 *     ALIGNSYS = LITERAL (Read)
-*        Only used if a TRUE value is supplied for parameter ALIGN. 
-*        It specifies the co-ordinate system in which the new plot and 
+*        Only used if a TRUE value is supplied for parameter ALIGN.
+*        It specifies the co-ordinate system in which the new plot and
 *        the existing plot are aligned (for further details see the
-*        description of the AlignSystem attribute in SUN/211). The supplied 
-*        name should be a valid co-ordinate system name for the horizontal 
-*        axis (see the description of the "System" attribute in SUN/211 
-*        for a list of these names). It may also take the special value 
-*        "Data", in which case alignment occurs in the co-ordinate system 
-*        represented by the current WCS Frame in the supplied NDF. If a 
+*        description of the AlignSystem attribute in SUN/211). The supplied
+*        name should be a valid co-ordinate system name for the horizontal
+*        axis (see the description of the "System" attribute in SUN/211
+*        for a list of these names). It may also take the special value
+*        "Data", in which case alignment occurs in the co-ordinate system
+*        represented by the current WCS Frame in the supplied NDF. If a
 *        null (!) value is supplied The alignment system is determined by
 *        the current value of AlignSystem attribute in the supplied NDF. ["Data"]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot.  If a null (!) value is supplied, the value used is 
+*        plot.  If a null (!) value is supplied, the value used is
 *        FALSE if the plot is being aligned with an existing plot (see
 *        parameter ALIGN), and TRUE otherwise.  Parameter USEAXIS
-*        determines the quantity used to annotated the horizontal axis. 
+*        determines the quantity used to annotated the horizontal axis.
 *        The width of the margins left for the annotation may be
 *        controlled using parameter MARGIN.  The appearance of the axes
 *        (colours, founts, etc.) can be controlled using the parameter
 *        STYLE.  [!]
 *     CLEAR = _LOGICAL (Read)
-*        If TRUE the current picture is cleared before the plot is 
+*        If TRUE the current picture is cleared before the plot is
 *        drawn.  If CLEAR is FALSE not only is the existing plot
 *        retained, but also the previous plot can be used to specify the
 *        axis limits (see parameter ALIGN).  Thus you can generate a
 *        composite plot within a single set of axes, say using different
-*        colours or modes to distinguish data from different datasets. 
-*        Note, alignment between the two plots is controlled by the 
+*        colours or modes to distinguish data from different datasets.
+*        Note, alignment between the two plots is controlled by the
 *        AlignSystem attribute of the data being displayed.  For
 *        instance, if you have an existing plot showing a spectrum
 *        plotted against radio velocity and you overlay another
 *        spectrum, also in radio velocity but with a different rest
 *        frequency, the appearance of the final plot will depend on the
 *        value of the AlignSystem attribute of the second spectrum.  If
-*        AlignSystem is "Wavelen" (this is the default) then the two 
-*        spectra will be aligned in wavelength, but if AlignSystem is 
-*        "vrad" they will be aligned in radio velocity.  There will be 
+*        AlignSystem is "Wavelen" (this is the default) then the two
+*        spectra will be aligned in wavelength, but if AlignSystem is
+*        "vrad" they will be aligned in radio velocity.  There will be
 *        no difference in effect between these two forms of alignment
-*        unless the rest frequency is different in the two spectra. 
-*        Likewise, the AlignStdOfRest attribute of the second spectrum 
+*        unless the rest frequency is different in the two spectra.
+*        Likewise, the AlignStdOfRest attribute of the second spectrum
 *        controls the standard of rest in which alignment occurs.
 *        These attributes (like all other attributes) may be examined
 *        and modified using WCSATTRIB.
@@ -139,7 +139,7 @@
 *        comprise either or both of the data and axis-centre errors,
 *        depending on what is available in the supplied dataset.  The
 *        parameter SHAPE controls the appearance of the error bars, and
-*        XSIGMA and YSIGMA control their lengths.  The ERRBAR parameter 
+*        XSIGMA and YSIGMA control their lengths.  The ERRBAR parameter
 *        is ignored unless the parameter COMP is set to "Data".  [FALSE]
 *     FREQ = _INTEGER (Read)
 *        The frequency at which error bars are to be plotted.  For
@@ -159,23 +159,23 @@
 *        If USEAXIS is not zero (i.e. if the horizontal axis is
 *        annotated with the value on one of the axes of the NDF's
 *        current co-ordinate Frame), then the displayed positions
-*        correspond to the two ends of the visible section of the 
+*        correspond to the two ends of the visible section of the
 *        horizontal axis.  The appearance of the key can be controlled
-*        using parameter KEYSTYLE.  If a null (!) value is supplied, a 
-*        key is produced if the current co-ordinate Frame of the 
+*        using parameter KEYSTYLE.  If a null (!) value is supplied, a
+*        key is produced if the current co-ordinate Frame of the
 *        supplied NDF has two or more axes, but no key is produced if it
 *        only has one axis.  [!]
 *     KEYSTYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style to 
-*        use for the key (see parameter KEY). 
+*        A group of attribute settings describing the plotting style to
+*        use for the key (see parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
+*        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be 
-*        read and interpreted in the same manner.  Attribute settings 
-*        are applied in the order in which they occur within the list, 
-*        with later settings overriding any earlier settings given for 
+*        should contain further comma-separated lists which will be
+*        read and interpreted in the same manner.  Attribute settings
+*        are applied in the order in which they occur within the list,
+*        with later settings overriding any earlier settings given for
 *        the same attribute.
 *
 *        Each individual attribute setting should be of the form:
@@ -185,18 +185,18 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section 
-*        "Plotting Attributes" in SUN/95 for a description of the 
-*        available attributes.  Any unrecognised attributes are ignored 
+*        defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the
+*        available attributes.  Any unrecognised attributes are ignored
 *        (no error is reported).  [current value]
 *     LMODE = LITERAL (Read)
 *        LMODE specifies how the defaults for parameters YBOT and YTOP
-*        (the  lower and upper limit of the vertical axis of the plot) 
-*        should be found.  The supplied string should consist of up to 
-*        three sub-strings, separated by commas.  The first sub-string 
-*        must specify the method to use.  If supplied, the other two 
-*        sub-strings should be numerical values as described below 
-*        (default values will be used if these sub-strings are not 
+*        (the  lower and upper limit of the vertical axis of the plot)
+*        should be found.  The supplied string should consist of up to
+*        three sub-strings, separated by commas.  The first sub-string
+*        must specify the method to use.  If supplied, the other two
+*        sub-strings should be numerical values as described below
+*        (default values will be used if these sub-strings are not
 *        provided).  The following methods are available.
 *
 *        - "Range" -- The minimum and maximum data values (including any
@@ -205,10 +205,10 @@
 *
 *        - "Extended" -- The minimum and maximum data values (including
 *        error bars) are extended by percentages of the data range,
-*        specified by the second and third sub-strings.  For instance, 
+*        specified by the second and third sub-strings.  For instance,
 *        if the value "Ex,10,5" is supplied, then the default for YBOT
-*        is set to the minimum data value minus 10% of the data range, 
-*        and the default for YTOP is set to the maximum data value plus 
+*        is set to the minimum data value minus 10% of the data range,
+*        and the default for YTOP is set to the maximum data value plus
 *        5% of the data range.  If only one value is supplied, the
 *        second value defaults to the supplied value.  If no values are
 *        supplied, both values default to "2.5".  Care should be taken
@@ -216,18 +216,18 @@
 *        the data range caused by this mode may result in the axis
 *        encompassing the value zero.
 *
-*        - "Percentile" -- The default values for YBOT and YTOP are set 
+*        - "Percentile" -- The default values for YBOT and YTOP are set
 *        to  the specified percentiles of the data (excluding error
-*        bars).  For  instance, if the value "Per,10,99" is supplied, 
+*        bars).  For  instance, if the value "Per,10,99" is supplied,
 *        then the default for YBOT is set so that the lowest 10% of the
 *        plotted points are  off the bottom of the plot, and the default
-*        for YTOP is set so that the highest 1% of the points are off 
+*        for YTOP is set so that the highest 1% of the points are off
 *        the top of the plot.  If only one value, p1, is supplied, the
-*        second value, p2, defaults to (100 - p1).  If no values are 
+*        second value, p2, defaults to (100 - p1).  If no values are
 *        supplied, the values default to "5,95".
 *
 *        - "Sigma" -- The default values for YBOT and YTOP are set to
-*        the specified numbers of standard deviations below and above 
+*        the specified numbers of standard deviations below and above
 *        the mean of the data.  For instance, if the value "sig,1.5,3.0"
 *        is supplied, then the default for YBOT is set to the mean of
 *        the data minus 1.5  standard deviations, and the default for
@@ -237,10 +237,10 @@
 *        "3.0".
 *
 *        The method name can be abbreviated to a single character, and
-*        is case insensitive.  The initial value is "Extended". 
+*        is case insensitive.  The initial value is "Extended".
 *        [current value]
 *     MARGIN( 4 ) = _REAL (Read)
-*        The widths of the margins to leave for axis annotation, given 
+*        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
 *        picture.  Four values may be given, in the order: bottom,
 *        right, top, left.  If fewer than four values are given, extra
@@ -252,8 +252,8 @@
 *     MARKER = _INTEGER (Read)
 *        This parameter is only accessed if parameter MODE is set to
 *        "Chain" or "Mark".  It specifies the symbol with which each
-*        position should be marked, and should be given as an integer 
-*        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a 
+*        position should be marked, and should be given as an integer
+*        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a
 *        dot, 2 gives a cross, 3 gives an asterisk, 7 gives a triangle.
 *        The value must be larger than or equal to -31.  [current value]
 *     MODE = LITERAL (Read)
@@ -261,7 +261,7 @@
 *        can take the following values.
 *
 *        - "Histogram" -- An histogram of the points is plotted in the
-*        style of a "staircase" (with vertical lines only joining the y 
+*        style of a "staircase" (with vertical lines only joining the y
 *        values and not extending to the base of the plot).  The
 *        vertical lines are placed midway between adjacent x positions.
 *
@@ -269,10 +269,10 @@
 *
 *        - "Point" -- A dot is plotted at each point.
 *
-*        - "Mark" -- Each point is marker with a symbol specified by 
+*        - "Mark" -- Each point is marker with a symbol specified by
 *        parameter MARKER.
 *
-*        - "Chain" -- A combination of "Line" and "Mark". 
+*        - "Chain" -- A combination of "Line" and "Mark".
 *
 *        - "Step" -- Each point is displayed as a horizontal line, whose
 *        length is specified by the axis width of the pixel.
@@ -284,14 +284,14 @@
 *        Specifies the way in which errors are represented.  SHAPE
 *        can take the following values.
 *
-*        - "Bars" -- Bars with serifs (i.e. cross pieces at each end) 
-*        are drawn joining the x error limits and the y error limits. 
-*        The plotting attribute "Size(ErrBars)" (see parameter STYLE) 
+*        - "Bars" -- Bars with serifs (i.e. cross pieces at each end)
+*        are drawn joining the x error limits and the y error limits.
+*        The plotting attribute "Size(ErrBars)" (see parameter STYLE)
 *        can be used to control the size of these serifs (the attribute
-*        value should be a magnification factor; 1.0 gives default 
+*        value should be a magnification factor; 1.0 gives default
 *        serifs).
 *
-*        - "Cross" -- San-serif bars are drawn joining the x-error 
+*        - "Cross" -- San-serif bars are drawn joining the x-error
 *        limits and the y-error limits.
 *
 *        - "Diamond" -- Adjacent error limits are joined to form an
@@ -299,25 +299,25 @@
 *
 *        The length of the error bars can be controlled using parameters
 *        XSIGMA and YSIGMA.  The colour, line width and line style used
-*        to draw them can be controlled using the plotting attributes 
-*        "Colour(ErrBars)", "Width(ErrBars)" and "Style(ErrBars)" (see 
+*        to draw them can be controlled using the plotting attributes
+*        "Colour(ErrBars)", "Width(ErrBars)" and "Style(ErrBars)" (see
 *        parameter STYLE).  SHAPE is only accessed when parameter ERRBAR
 *        is TRUE.  [current value]
 *     STYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style to 
+*        A group of attribute settings describing the plotting style to
 *        use when drawing the annotated axes, data values, and error
-*        markers.  The default for this parameter is its current value, 
-*        and so any value supplied for this parameter persists for all 
-*        future invocations of this application until a new value is 
-*        supplied.  If you want to make temporary changes to the 
-*        plotting style thatdo not persist then use the TEMPSTYLE 
+*        markers.  The default for this parameter is its current value,
+*        and so any value supplied for this parameter persists for all
+*        future invocations of this application until a new value is
+*        supplied.  If you want to make temporary changes to the
+*        plotting style thatdo not persist then use the TEMPSTYLE
 *        parameter.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
+*        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
 *        should contain further comma-separated lists which will be read
-*        and interpreted in the same manner.  Attribute settings are 
+*        and interpreted in the same manner.  Attribute settings are
 *        applied in the order in which they occur within the list, with
 *        later settings overriding any earlier settings given for the
 *        same attribute.
@@ -326,31 +326,31 @@
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> 
+*        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes.  All attributes will be
 *        defaulted if a null value (!) is supplied.  See section
 *        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). 
+*        available attributes.  Any unrecognised attributes are ignored
+*        (no error is reported).
 *
-*        The appearance of the data values is controlled by the 
-*        attributes Colour(Curves), Width(Curves), etc. (the synonym 
+*        The appearance of the data values is controlled by the
+*        attributes Colour(Curves), Width(Curves), etc. (the synonym
 *        Lines may be used in place of Curves).  The appearance of
 *        markers used if parameter MODE is set to "Point", "Mark" or
 *        "Chain" is controlled by Colour(Markers), Width(Markers), etc.
-*        (the synonym Symbols may be used in place of Markers).  The 
+*        (the synonym Symbols may be used in place of Markers).  The
 *        appearance of the error symbols is controlled using
-*        Colour(ErrBars), Width(ErrBars), etc. (see parameter SHAPE). 
+*        Colour(ErrBars), Width(ErrBars), etc. (see parameter SHAPE).
 *        [current value]
 *     TEMPSTYLE = LITERAL (Read)
-*        A group of extra attribute settings which modify the plotting 
-*        style specified by the STYLE parameter.  The default for this 
+*        A group of extra attribute settings which modify the plotting
+*        style specified by the STYLE parameter.  The default for this
 *        parameter is a null (!) value, which causes the plotting style
-*        specified by STYLE to be used without any changes.  Style 
-*        changes specified using TEMPSTYLE do not persist between 
+*        specified by STYLE to be used without any changes.  Style
+*        changes specified using TEMPSTYLE do not persist between
 *        invocations of this application.  If you want to make permanent
-*        changes to the default plotting style then use the STYLE 
+*        changes to the default plotting style then use the STYLE
 *        parameter.
 *
 *        See the description of the STYLE parameter for more information
@@ -359,27 +359,27 @@
 *        Specifies the quantity to be used to annotate the horizontal axis
 *        of the plot using one of the following options.
 *
-*        - An integer index of an axis within the current Frame of the 
+*        - An integer index of an axis within the current Frame of the
 *        input NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *
 *        - An axis symbol string such as "RA", or "VRAD".
 *
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
-*        sky longitude and latitude axes respectively.  Only those axis 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
 *        - The special value 0 (zero), asks for the distance along the
 *        profile from the centre of the first element in the supplied
-*        NDF to be used to annotate the axis.  This will be measured in 
+*        NDF to be used to annotate the axis.  This will be measured in
 *        the current co-ordinate Frame of the NDF.
 *
 *        The quantity used to annotate the horizontal axis must have a
-*        defined value at all points in the array, and must increase or 
+*        defined value at all points in the array, and must increase or
 *        decrease monotonically along the array.  For instance, if RA is
 *        used to annotate the horizontal axis, then an error will be
-*        reported if the profile passes through RA=0 because it will 
+*        reported if the profile passes through RA=0 because it will
 *        introduce a non-monotonic jump in axis value (from 0h to 24h,
 *        or 24h to 0h).  If a null (!) value is supplied, the value used
 *        is 1 if the current co-ordinate Frame in the NDF is
@@ -387,9 +387,9 @@
 *     XLEFT = LITERAL (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis.  If a null (!) value is supplied, the value used is the
-*        value for the first element in the supplied NDF (with a margin 
-*        to include any horizontal error bar).  The value supplied may 
-*        be greater than or less than the value supplied for XRIGHT.  A 
+*        value for the first element in the supplied NDF (with a margin
+*        to include any horizontal error bar).  The value supplied may
+*        be greater than or less than the value supplied for XRIGHT.  A
 *        formatted value for the quantity specified by parameter USEAXIS
 *        should be supplied.  See also parameter ALIGN.  [!]
 *     XMAP = LITERAL (Read)
@@ -399,7 +399,7 @@
 *        - "Pixel" -- The mapping is such that pixel index within the
 *        input NDF increases linearly across the plot.
 *
-*        - "Distance" -- The mapping is such that distance along the 
+*        - "Distance" -- The mapping is such that distance along the
 *        curve within the current WCS Frame of the input NDF increases
 *        linearly across the plot.
 *
@@ -413,25 +413,25 @@
 *        annotate the axis increases linearly across the plot.
 *
 *        - "Default" -- One of "Linear" or "log" is chosen
-*        automatically, depending on which one produces a more-even 
-*        spread of values on the plot. 
+*        automatically, depending on which one produces a more-even
+*        spread of values on the plot.
 *        ["Default"]
 *     XRIGHT = LITERAL (Read)
 *        The axis value to place at the right hand end of the horizontal
 *        axis.  If a null (!) value is supplied, the value used is the
-*        value for the last element in the supplied NDF (with a margin 
-*        to include any horizontal error bar).  The value supplied may 
-*        be greater than or less than the value supplied for XLEFT.  A 
+*        value for the last element in the supplied NDF (with a margin
+*        to include any horizontal error bar).  The value supplied may
+*        be greater than or less than the value supplied for XLEFT.  A
 *        formatted value for the quantity specified by parameter USEAXIS
 *        should be supplied.  See also parameter ALIGN.  [!]
 *     XSIGMA = LITERAL (Read)
-*        If horizontal error bars are produced (see parameter ERRBAR), 
-*        then XSIGMA gives the number of standard deviations that the 
+*        If horizontal error bars are produced (see parameter ERRBAR),
+*        then XSIGMA gives the number of standard deviations that the
 *        error bars are to represent.  [current value]
 *     YBOT = LITERAL (Read)
 *        The axis value to place at the bottom end of the vertical
 *        axis.  If a null (!) value is supplied, the value used is
-*        determined by parameter LMODE.  The value of YBOT may be 
+*        determined by parameter LMODE.  The value of YBOT may be
 *        greater than or less than the value supplied for YTOP.  If
 *        parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
@@ -445,39 +445,39 @@
 *
 *        - "Log" -- The data values are logged logarithmically on to the
 *        screen.  An error will be reported if the dynamic range of
-*        the axis is less than 100, or if the range specified by YTOP 
-*        and YBOT encompasses the value zero.  For this reason, care 
+*        the axis is less than 100, or if the range specified by YTOP
+*        and YBOT encompasses the value zero.  For this reason, care
 *        should be taken over the choice of value for parameter LMODE,
 *        since some choices could result in the Y range being extended
-*        so far that it encompasses zero. 
+*        so far that it encompasses zero.
 *
-*        - "ValueLog" -- This is similar to "Log" except that, instead 
+*        - "ValueLog" -- This is similar to "Log" except that, instead
 *        of mapping the data values logarithmically on to the screen,
-*        this option maps the log (base 10) of the data values linearly 
-*        on to the screen.  If this option is selected, the values 
-*        supplied for parameters YTOP and YBOT should be values for the 
-*        logarithm of the data value, not the data value itself. 
+*        this option maps the log (base 10) of the data values linearly
+*        on to the screen.  If this option is selected, the values
+*        supplied for parameters YTOP and YBOT should be values for the
+*        logarithm of the data value, not the data value itself.
 *        ["Linear"]
 *     YSIGMA = LITERAL (Read)
-*        If vertical error bars are produced (see parameter ERRBAR), 
-*        then YSIGMA gives the number of standard deviations that the 
+*        If vertical error bars are produced (see parameter ERRBAR),
+*        then YSIGMA gives the number of standard deviations that the
 *        error bars are to represent.  [current value]
 *     YTOP = LITERAL (Read)
 *        The axis value to place at the top end of the vertical
 *        axis.  If a null (!) value is supplied, the value used is
-*        determined by parameter LMODE.  The value of LTOP may be 
+*        determined by parameter LMODE.  The value of LTOP may be
 *        greater than or less than the value supplied for YBOT.  If
 *        parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
 *        See also parameter ALIGN.  [!]
 
 *  Examples:
-*     linplot spectrum 
+*     linplot spectrum
 *        Plots data values versus position for the whole of the
 *        one-dimensional NDF called spectrum on the current graphics
 *        device.  If the current co-ordinate Frame of the NDF is also
-*        one-dimensional, then the horizontal axis will be labelled 
-*        with values on axis 1 of the current co-ordinate Frame. 
+*        one-dimensional, then the horizontal axis will be labelled
+*        with values on axis 1 of the current co-ordinate Frame.
 *        Otherwise, it will be labelled with offset from the first
 *        element.
 *     linplot map(,100)
@@ -485,11 +485,11 @@
 *        two-dimensional NDF called map on the current graphics device.
 *     linplot spectrum(1:500) device=ps_l
 *        Plots data values versus position for the first 500 elements
-*        of the one-dimensional NDF called spectrum. The output goes to 
+*        of the one-dimensional NDF called spectrum. The output goes to
 *        a text file which can be printed on a PostScript printer.
 *     linplot ironarc v style="'title=Fe Arc variance,drawdsb=0'"
-*        Plots variance values versus position for the whole of the 
-*        one-dimensional NDF called ironarc on the current graphics 
+*        Plots variance values versus position for the whole of the
+*        one-dimensional NDF called ironarc on the current graphics
 *        device.  The plot has a title of "Fe Arc variance". If the
 *        data is from a dual sideband instrument, the image sideband
 *        would normally be annotated along the top edge of the plot, but
@@ -508,22 +508,22 @@
 *        screen.  The bottom of the vertical axis corresponds to a data
 *        value of 10.0 and the top corresponds to a data value of
 *        1000.0.
-*     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d 
-*             style=^my_sty 
-*        This plots the data values versus position for the dataset 
+*     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d
+*             style=^my_sty
+*        This plots the data values versus position for the dataset
 *        called xspec.  Each pixel is plotted as a point surrounded by
-*        diamond-shaped error bars.  The error bars are 3-sigma error 
-*        bars.  The plotting style is read from text file my_sty.  This 
+*        diamond-shaped error bars.  The error bars are 3-sigma error
+*        bars.  The plotting style is read from text file my_sty.  This
 *        could, for instance, contain strings such as: colour(err)=pink,
 *        colour(sym)=red, tickall=0, edge(2)=right.  These cause the
-*        error bars to be drawn in pink, the points to be drawn in red, 
+*        error bars to be drawn in pink, the points to be drawn in red,
 *        tick marks to be restricted to the labelled edges of the plot,
-*        and the vertical axis (axis 2) to be annotated on the 
+*        and the vertical axis (axis 2) to be annotated on the
 *        right-hand edge of the plot. The plotting style specified in
-*        file my_sty becomes the default plotting style for future 
+*        file my_sty becomes the default plotting style for future
 *        invocations of LINPLOT.
-*     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d 
-*             tempstyle=^my_sty 
+*     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d
+*             tempstyle=^my_sty
 *        This is the same as the previous example, except that the style
 *        specified in file my_sty does not become the default style for
 *        future invocations of LINPLOT.
@@ -531,28 +531,28 @@
 *        Plots data values versus pixel co-ordinate for the whole of
 *        the one-dimensional NDF called spectrum on the current graphics
 *        device.  The plot is drawn over any existing plot and inherits
-*        the bounds of the previous plot on both axes.  A warning will 
-*        be reported if the labels for the horizontal axes of the two 
+*        the bounds of the previous plot on both axes.  A warning will
+*        be reported if the labels for the horizontal axes of the two
 *        plots are different.
 *     linplot spectrum system="'system(1)=freq,unit(1)=GHz'"
-*        This example assumes that the current co-ordinate Frame of NDF 
-*        spectrum is a SpecFrame.  The horizontal axis (axis "1") is 
-*        labelled with frequency values, in units of GHz.  If the 
-*        SpecFrame represents some other system (such as wavelength, 
-*        velocity, energy), or has some other units, then the 
-*        conversion is done automatically.  Note, a SpecFrame is a 
-*        specialised class of Frame which knows how to do these 
+*        This example assumes that the current co-ordinate Frame of NDF
+*        spectrum is a SpecFrame.  The horizontal axis (axis "1") is
+*        labelled with frequency values, in units of GHz.  If the
+*        SpecFrame represents some other system (such as wavelength,
+*        velocity, energy), or has some other units, then the
+*        conversion is done automatically.  Note, a SpecFrame is a
+*        specialised class of Frame which knows how to do these
 *        conversions; the above command will fail if the current
 *        co-ordinate Frame in the NDF is a simple Frame (such as the
-*        AXIS Frame).  A SpecFrame can be created from an AXIS Frame 
+*        AXIS Frame).  A SpecFrame can be created from an AXIS Frame
 *        using application WCSADD.
 
 *  Notes:
 *     -  If the horizontal axis is described by a DSBSpecFrame (a
-*     description of the co-ordinates attached to a dual-sideband 
-*     spectrum) in the NDF's WCS FrameSet, then the unselected sideband 
+*     description of the co-ordinates attached to a dual-sideband
+*     spectrum) in the NDF's WCS FrameSet, then the unselected sideband
 *     will be annotated along the top edge of the plot.
-*     -  If no Title is specified via the STYLE parameter, then the 
+*     -  If no Title is specified via the STYLE parameter, then the
 *     Title component in the NDF is used as the default title for the
 *     annotated axes.  If the NDF does not have a Title component, then
 *     the default title is taken from current co-ordinate Frame in the
@@ -561,19 +561,19 @@
 *     -  Default axis errors and widths are used, if none are present in
 *     the NDF. The defaults are the constants 0 and 1 respectively.
 *     -  The application stores a number of pictures in the graphics
-*     database in the following order: a FRAME picture containing the 
-*     annotated axes, data plot, and optional key; a KEY picture to 
+*     database in the following order: a FRAME picture containing the
+*     annotated axes, data plot, and optional key; a KEY picture to
 *     store the key if present; and a DATA picture containing just the
 *     data plot.  Note, the FRAME picture is only created if annotated
-*     axes or a key has been drawn, or if non-zero margins were 
+*     axes or a key has been drawn, or if non-zero margins were
 *     specified using parameter MARGIN.  The world co-ordinates in the
-*     DATA picture will correspond to offset along the profile on the 
-*     horizontal axis, and data value (or logarithm of data value) on 
-*     the vertical axis.  On exit the current database picture for the 
+*     DATA picture will correspond to offset along the profile on the
+*     horizontal axis, and data value (or logarithm of data value) on
+*     the vertical axis.  On exit the current database picture for the
 *     chosen device reverts to the input picture.
 
 *  Related Applications:
-*     KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, 
+*     KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT,
 *     SPECGRID, SPLOT; SPLAT.
 
 *  Implementation Status:
@@ -617,7 +617,7 @@
 *     1-OCT-1998 (DSB):
 *        Original AST version, based on earlier version by MJC.
 *     8-DEC-1998 (DSB):
-*        Use the 1st *significant* axis when accessing AXIS structures 
+*        Use the 1st *significant* axis when accessing AXIS structures
 *        using NDF_A routines.
 *     6-SEP-1999 (DSB):
 *        USEAXIS changed so that "use offset" is indicated by supplying
@@ -625,7 +625,7 @@
 *     28-SEP-1999 (DSB):
 *        Added parameter LMODE.
 *     26-OCT-1999 (DSB):
-*        Change MARGIN to be a fraction of the current picture, not of 
+*        Change MARGIN to be a fraction of the current picture, not of
 *        the DATA picture.
 *     15-FEB-2000 (DSB):
 *        Modified for new KPG1_GTAXV argument list.
@@ -645,12 +645,12 @@
 *     7-JUN-2006 (DSB):
 *        - Ensure variable comments are contained on a singleline (to ease
 *        sorting).
-*        - Allow alignment with an existing DATAPLOT Frame even if it is 
+*        - Allow alignment with an existing DATAPLOT Frame even if it is
 *        not the current Frame.
 *     16-MAR-2007 (DSB):
 *        Added AlignSys parameter.
 *     19-MAR-2007 (DSB):
-*        Use both STYLE and TEMPSTYLE parameters within the call to 
+*        Use both STYLE and TEMPSTYLE parameters within the call to
 *        KPG1_PLTLN that plots the data curve.
 *     29-OCT-2008 (DSB):
 *        Ignore negative or zero values if an axis map is set to LOG.
@@ -685,14 +685,14 @@
       CHARACTER KEYLN1*( 80 )    ! First line of key text
       CHARACTER KEYLN2*( 80 )    ! Second line of key text
       CHARACTER MCOMP*( 8 )      ! Component to be mapped
-      CHARACTER NDFNAM*( 255 )   ! Full NDF specification 
+      CHARACTER NDFNAM*( 255 )   ! Full NDF specification
       CHARACTER TEXT*( 255 )     ! A general text string
       CHARACTER UNITS*( 20 )     ! Units of the data
       CHARACTER XMAP*( 8 )       ! How to map X axis on to the screen
       CHARACTER YMAP*( 8 )       ! How to map Y axis on to the screen
       DOUBLE PRECISION BL( 2 )   ! X/Y "W.w.want" at bottom-left corner
       DOUBLE PRECISION BLG( 2 )  ! X/Y "Uniform" at bottom-left corner
-      DOUBLE PRECISION BOX( 4 )  ! Bounds of DATA picture 
+      DOUBLE PRECISION BOX( 4 )  ! Bounds of DATA picture
       DOUBLE PRECISION DVAL      ! General double precision value
       DOUBLE PRECISION FN( NDF__MXDIM ) ! End pos. in current Frame
       DOUBLE PRECISION ST( NDF__MXDIM ) ! Start pos. in current Frame
@@ -706,9 +706,9 @@
       INTEGER DIAXIS             ! Default value for USEAXIS
       INTEGER DIM                ! Number of elements in the input array
       INTEGER DPFS               ! FrameSet for old & new DATAPLOT Frmes
-      INTEGER EL                 ! Number of mapped elements 
+      INTEGER EL                 ! Number of mapped elements
       INTEGER FREQ               ! Interval between error bars
-      INTEGER FSET               ! Pointer to FrameSet 
+      INTEGER FSET               ! Pointer to FrameSet
       INTEGER I                  ! General variable
       INTEGER IAT                ! No. of characters in a string
       INTEGER IAXFR              ! Index of effective AXIS Frame in IWCS
@@ -727,18 +727,18 @@
       INTEGER IPICK              ! AGI id. for the KEY picture
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
       INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
-      INTEGER IPSTEP             ! P'nter to x axis "w.w.want" widths 
-      INTEGER IPXBAR             ! P'nter to x err bar "w.w.want" limits 
+      INTEGER IPSTEP             ! P'nter to x axis "w.w.want" widths
+      INTEGER IPXBAR             ! P'nter to x err bar "w.w.want" limits
       INTEGER IPXCEN             ! P'nter to x centres in "w.w.want" Frm
       INTEGER IPXDAT             ! P'nter to supplied x axis centres
       INTEGER IPXVAR             ! P'nter to supplied x centre variances
-      INTEGER IPYBAR             ! P'nter to y err bar "w.w.want" limits 
+      INTEGER IPYBAR             ! P'nter to y err bar "w.w.want" limits
       INTEGER IPYCEN             ! P'nter to y values in "w.w.want" Frm
       INTEGER IPYDAT             ! Pointer to supplied y data values
       INTEGER IPYVAR             ! Pointer to supplied y data variances
       INTEGER ISHAPE             ! Identifier for error bar shape
       INTEGER IWCS               ! P'nter to the WCS FrameSet from NDF
-      INTEGER MAP                ! P'nter to "w.w.got->w.w.want" Mapping 
+      INTEGER MAP                ! P'nter to "w.w.got->w.w.want" Mapping
       INTEGER MONO               ! Gradient sign (0 = not monotonic)
       INTEGER MTYPE              ! PGPLOT marker type
       INTEGER NAX                ! No. of axes in current Frame
@@ -809,17 +809,17 @@
 *  Find which component to plot.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
 
-*  Obtain the units if present.  
+*  Obtain the units if present.
       CALL KPG1_DAUNI( INDF, MCOMP, UNITS, NCU, STATUS )
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
-*  present in the NDF's WCS component.  Modify it to ensure that the 
-*  Base, and PIXEL frames have one dimension.  All current Frame axes 
-*  are retained.  The NDF must have exactly one significant dimension 
+*  present in the NDF's WCS component.  Modify it to ensure that the
+*  Base, and PIXEL frames have one dimension.  All current Frame axes
+*  are retained.  The NDF must have exactly one significant dimension
 *  (i.e. axis spanning more than one pixel).  We do not check that the
 *  inverse Mapping is defined since the inverse will be implemented
 *  within KPS1_LPLFS by a look up table (if possible).
-      CALL KPG1_ASGET( INDF, NDIM, .TRUE., .FALSE., .FALSE., SDIM, 
+      CALL KPG1_ASGET( INDF, NDIM, .TRUE., .FALSE., .FALSE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Save the length of the significant axis.
@@ -829,7 +829,7 @@
       NAX = AST_GETI( IWCS, 'NAXES', STATUS )
 
 *  Get the simplified Mapping from GRID Frame to current Frame.
-      WCSMAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE, 
+      WCSMAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE,
      :                                       AST__CURRENT, STATUS ),
      :                       STATUS )
 
@@ -865,23 +865,23 @@
          END IF
       END IF
 
-*  If we got a value greater than zero, indicate that the horizontal 
+*  If we got a value greater than zero, indicate that the horizontal
 *  axis will not be annotated with distance from the starting point.
       IF( IAXIS .GT. 0 ) THEN
          DIST = .FALSE.
 
 *  If zero was supplied for USEAXIS, indicate that the horizontal axis
 *  should be annotated with distance from the starting point.
-      ELSE 
+      ELSE
          DIST = .TRUE.
 
 *  In general there is no way of knowing which axis to use to format
-*  distance values, but a good guess will be to select the latitude 
+*  distance values, but a good guess will be to select the latitude
 *  axis of the current Frame, if there is a latitude axis.  Otherwise
 *  use the first axis.  If this selection is inappropriate, the user can
 *  always request a specific format using the STYLE parameter.  See if
 *  there is an axis with the AsTime attribute set false.  Annul any
-*  errors which occur because an axis does not have the AsTime 
+*  errors which occur because an axis does not have the AsTime
 *  attribute.
          IAXIS = -1
 
@@ -902,14 +902,14 @@
       END IF
 
 *  If there is an axis structure in the NDF, get a mapping from the AXIS
-*  Frame to the GRID Frame.  If no AXIS structure exists NDF AXIS 
+*  Frame to the GRID Frame.  If no AXIS structure exists NDF AXIS
 *  routines will use a default one, but AST may use an AXIS Frame in the
-*  WCS component stored by a previous application.  Therefore, we use 
+*  WCS component stored by a previous application.  Therefore, we use
 *  the mapping from PIXEL Frame (the Frame corresponding to the default
-*  NDF AXIS structure) to GRID Frame if no AXIS structure is present.  
+*  NDF AXIS structure) to GRID Frame if no AXIS structure is present.
 *  This ensures that the mapping can be used to map Axis values returned
 *  by NDF_AMAP into GRID co-ordinates.
-      CALL NDF_STATE( INDF, 'AXIS', THERE, STATUS ) 
+      CALL NDF_STATE( INDF, 'AXIS', THERE, STATUS )
       IF( THERE ) THEN
          CALL KPG1_ASFFR( IWCS, 'AXIS', IAXFR, STATUS )
       ELSE
@@ -918,15 +918,15 @@
 
       AXMAP = AST_GETMAPPING( IWCS, IAXFR, AST__BASE, STATUS )
 
-*  If the base NDF has more than one pixel axis (e.g. if a 
+*  If the base NDF has more than one pixel axis (e.g. if a
 *  one-dimensional section from a two-dimensional NDF was supplied), we
-*  need to modify the above mapping to have one input corresponding to 
+*  need to modify the above mapping to have one input corresponding to
 *  the significant axis.
       NAXNDF = AST_GETI( AXMAP, 'NIN', STATUS )
       IF( NAXNDF .GT. 1 ) THEN
 
 *  Create a PermMap with 1 input and an output for each NDF pixel axis.
-*  Connect the one input to the output for the significant NDF 
+*  Connect the one input to the output for the significant NDF
 *  dimension.
          DO I = 1, NAXNDF
             PERM( I ) = 0
@@ -943,7 +943,7 @@
 
       END IF
 
-* Check the axis map is defined in both directions. 
+* Check the axis map is defined in both directions.
       IF( .NOT. AST_GETL( AXMAP, 'TRANFORWARD', STATUS ) .OR.
      :    .NOT. AST_GETL( AXMAP, 'TRANINVERSE', STATUS ) ) THEN
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -958,24 +958,24 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL PAR_CHOIC( 'XMAP', 'Default', 'Default,Linear,Log,Pixel,'//
      :                'Distance', .TRUE., XMAP, STATUS )
-      CALL PAR_CHOIC( 'YMAP', 'Linear', 'Linear,Log,ValueLog', .TRUE., 
+      CALL PAR_CHOIC( 'YMAP', 'Linear', 'Linear,Log,ValueLog', .TRUE.,
      :                YMAP, STATUS )
 
 *  Obtain a FrameSet containing three two-dimensional Frames.  In the
-*  Frame 1, axis 1 is the GRID co-ordinate with the supplied 
-*  one-dimensional array, and axis 2 is the raw data value.  This Frame 
+*  Frame 1, axis 1 is the GRID co-ordinate with the supplied
+*  one-dimensional array, and axis 2 is the raw data value.  This Frame
 *  corresponds to "what we've got".  In the Frame 3 (the current Frame),
 *  axis 1 is the value on the selected axis from the NDF's current Frame
-*  (or distance along the profile if DIST is .TRUE.), and axis 2 is the 
-*  raw (or logged if ymap=ValueLog) data value.  This Frame 
-*  corresponds to "what we want to see" and is given the Domain 
-*  "DATAPLOT".  Frame 2 (the Base Frame) is spanned by the axes which 
+*  (or distance along the profile if DIST is .TRUE.), and axis 2 is the
+*  raw (or logged if ymap=ValueLog) data value.  This Frame
+*  corresponds to "what we want to see" and is given the Domain
+*  "DATAPLOT".  Frame 2 (the Base Frame) is spanned by the axes which
 *  are to be mapped linearly or logarithmically on to the graphics
 *  surface.  Axis 1 will be determined by the setting of parameter XMAP,
-*  and axis 2 by the setting of YMAP.  This Frame corresponds to the 
+*  and axis 2 by the setting of YMAP.  This Frame corresponds to the
 *  "uniform" co-ordinate system, and is given the Domain AGI_WORLD.  A
-*  flag is returned if any of the required Mappings do not have an 
-*  inverse transformation.  
+*  flag is returned if any of the required Mappings do not have an
+*  inverse transformation.
       CALL  KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, XMAP, YMAP, MCOMP,
      :                  UNITS( : NCU ), NOINV, FSET, STATUS )
 
@@ -1006,13 +1006,13 @@
          END IF
 
 *  Obtain the spacing between points showing the error bars.
-         CALL PAR_GDR0I( 'FREQ', 1, 1, MAX( 1, DIM/2 ), .TRUE., FREQ, 
+         CALL PAR_GDR0I( 'FREQ', 1, 1, MAX( 1, DIM/2 ), .TRUE., FREQ,
      :                   STATUS )
 
       END IF
 
 *  Get the plotting mode.
-      CALL PAR_CHOIC( 'MODE', 'Line', 
+      CALL PAR_CHOIC( 'MODE', 'Line',
      :                'Histogram,Line,Point,Mark,Step,Chain',
      :                .FALSE., TEXT, STATUS )
 
@@ -1029,7 +1029,7 @@
          CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
       ELSE IF( TEXT .EQ. 'STEP' ) THEN
          IMODE = 4
-      ELSE 
+      ELSE
          IMODE = 5
          CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
       ENDIF
@@ -1041,28 +1041,28 @@
 *  =====================================================
 
 *  Map the NDF AXIS-centre values in double precision.
-      CALL NDF_AMAP( INDF, 'CENTRE', SDIM( 1 ), '_DOUBLE', 'READ', 
-     :               IPXDAT, EL, STATUS ) 
+      CALL NDF_AMAP( INDF, 'CENTRE', SDIM( 1 ), '_DOUBLE', 'READ',
+     :               IPXDAT, EL, STATUS )
 
 *  Allocate work space to hold the corresponding values to be displayed
 *  on the horizontal axis of the Plot.
       CALL PSX_CALLOC( EL, '_DOUBLE', IPXCEN, STATUS )
       FRXCEN = ( STATUS .EQ. SAI__OK )
 
-*  We only use variances on the X axis if error bars are required, and 
+*  We only use variances on the X axis if error bars are required, and
 *  if axis variances are available.
       IF( .NOT. ERRBAR ) THEN
          XVAR = .FALSE.
       ELSE
-         CALL NDF_ASTAT( INDF, 'VARIANCE', SDIM( 1 ), XVAR, STATUS ) 
+         CALL NDF_ASTAT( INDF, 'VARIANCE', SDIM( 1 ), XVAR, STATUS )
       END IF
 
-*  If X-axis variance values are required map them. 
+*  If X-axis variance values are required map them.
       IF( XVAR ) THEN
-         CALL NDF_AMAP( INDF, 'VARIANCE', SDIM( 1 ), '_DOUBLE', 'READ', 
-     :                  IPXVAR, EL, STATUS ) 
+         CALL NDF_AMAP( INDF, 'VARIANCE', SDIM( 1 ), '_DOUBLE', 'READ',
+     :                  IPXVAR, EL, STATUS )
 
-*  See how many standard deviations are to be used for a horizontal 
+*  See how many standard deviations are to be used for a horizontal
 *  error bar.
          CALL PAR_GET0R( 'XSIGMA', XSIGMA, STATUS )
          XSIGMA = ABS( XSIGMA )
@@ -1073,7 +1073,7 @@
          CALL MSG_OUT( 'LINPLOT_MSG1', '  Errors in position will be '//
      :                 'displayed as ^XS sigma errors.', STATUS )
 
-*  Allocate work space to hold the upper and lower limits of each 
+*  Allocate work space to hold the upper and lower limits of each
 *  horizontal error bar on the displayed horizontal axis.
          CALL PSX_CALLOC( EL*2, '_DOUBLE', IPXBAR, STATUS )
          FRXBAR = (STATUS .EQ. SAI__OK )
@@ -1088,15 +1088,15 @@
       IF( IMODE .EQ. 4 ) THEN
 
 *  Map the axis widths.
-         CALL NDF_AMAP( INDF, 'WIDTH', SDIM( 1 ), '_DOUBLE', 'READ', 
-     :                  IPAWID, EL, STATUS ) 
+         CALL NDF_AMAP( INDF, 'WIDTH', SDIM( 1 ), '_DOUBLE', 'READ',
+     :                  IPAWID, EL, STATUS )
 
 *  Allocate work space to hold the upper and lower limits of each
 *  horizontal step on the displayed horizontal axis.
          CALL PSX_CALLOC( EL*2, '_DOUBLE', IPSTEP, STATUS )
          FRSTEP = (STATUS .EQ. SAI__OK )
 
-*  Abort if an error has occurred. 
+*  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If each point is not being drawn as a step, store safe pointer
@@ -1107,8 +1107,8 @@
       END IF
 
 *  Map the component of the NDF which is to be plotted on the vertical
-*  axis, in double precision. 
-      CALL NDF_MAP( INDF, MCOMP, '_DOUBLE', 'READ', IPYDAT, EL, 
+*  axis, in double precision.
+      CALL NDF_MAP( INDF, MCOMP, '_DOUBLE', 'READ', IPYDAT, EL,
      :              STATUS )
 
 *  Allocate work space to hold the displayed Y-axis values (these may be
@@ -1116,7 +1116,7 @@
       CALL PSX_CALLOC( EL, '_DOUBLE', IPYCEN, STATUS )
       FRYCEN = (STATUS .EQ. SAI__OK )
 
-*  We only use variances on the Y axis if the data values being 
+*  We only use variances on the Y axis if the data values being
 *  displayed are from the NDF DATA component, and if error bars are
 *  required, and if variances are available.
       IF( MCOMP .NE. 'Data' .OR. .NOT. ERRBAR ) THEN
@@ -1125,12 +1125,12 @@
          CALL NDF_STATE( INDF, 'VARIANCE', YVAR, STATUS )
       END IF
 
-*  If Y-axis variance values are required map them. 
+*  If Y-axis variance values are required map them.
       IF( YVAR ) THEN
-         CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'READ', IPYVAR, EL, 
+         CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'READ', IPYVAR, EL,
      :                 STATUS )
 
-*  See how many standard deviations are to be used for a vertical error 
+*  See how many standard deviations are to be used for a vertical error
 *  bar.
          CALL PAR_GET0R( 'YSIGMA', YSIGMA, STATUS )
          YSIGMA = ABS( YSIGMA )
@@ -1154,15 +1154,15 @@
 
 *  Open the graphics device and database, and see if the plot is to be
 *  produced over an existing DATA picture.  If it is get a Plot for the
-*  existing DATA picture and merge the FrameSet created above with it 
+*  existing DATA picture and merge the FrameSet created above with it
 *  so that we have a Plot which can be used to draw the new data plot.
 *  ===================================================================
 
 *  Open the graphics device, allowing the user to choose whether or not
-*  to clear it.  If it is not cleared, the AGI identifier for any 
+*  to clear it.  If it is not cleared, the AGI identifier for any
 *  existing DATA picture (within the current picture) is returned in
 *  IPICD, and the corresponding AST Plot is returned in IPLOT.
-      CALL KPG1_PLOTA( AST__NULL, 'UNKNOWN', ' ', IPIC0, IPICD0, IPLOT, 
+      CALL KPG1_PLOTA( AST__NULL, 'UNKNOWN', ' ', IPIC0, IPICD0, IPLOT,
      :                 STATUS )
 
 *  Set a flag to indicate the new DATA picture should be created
@@ -1187,7 +1187,7 @@
 *  stored in the AlignSystem attribute of the current Frame in FSET.
             CALL KPG1_ALSYS( 'ALIGNSYS', FSET, IPLOT, 1, STATUS )
 
-*  Attempt to find a Mapping from the DATAPLOT Frame in the existing 
+*  Attempt to find a Mapping from the DATAPLOT Frame in the existing
 *  picture to the DATAPLOT Frame in the new picture.
             DPFS = AST_CONVERT( AST_GETFRAME( IPLOT, AST__CURRENT,
      :                                        STATUS ),
@@ -1200,7 +1200,7 @@
 
 *  We now decide whether to shift the X axis of the new DATAPLOT so that
 *  it aligns with the existing DATAPLOT.  Set a default of TRUE if a
-*  Mapping was found above, and FALSE if not.  Then allow the user to 
+*  Mapping was found above, and FALSE if not.  Then allow the user to
 *  change the default.
             CALL PAR_DEF0L( 'ALIGN', ( DPFS .NE. AST__NULL ), STATUS )
             CALL PAR_GET0L( 'ALIGN', ALIGN, STATUS )
@@ -1223,18 +1223,18 @@
                   GO TO 999
                END IF
 
-*  Save the index of the current Frame in the Plot. 
+*  Save the index of the current Frame in the Plot.
                ICURR0 = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
 *  Save the number of Frames in the existing Plot.
                NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
 
-*  Merge the new FrameSet into the existing Plot, aligning them in the 
+*  Merge the new FrameSet into the existing Plot, aligning them in the
 *  current Frame (i.e. the DATAPLOT Domain) using a UnitMap.
-               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, DPFS, FSET, 
-     :                            STATUS ) 
+               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, DPFS, FSET,
+     :                            STATUS )
 
-*  Save the indices within the Plot of the "what we've got" and "what 
+*  Save the indices within the Plot of the "what we've got" and "what
 *  we want" Frames relating to the original NDF.
                WWGOT = WWGOT + NFRM
                WWWANT = WWWANT + NFRM
@@ -1264,7 +1264,7 @@
                END IF
 
 *  Get the margin values, using a dynamic default of zero if no key or
-*  axes are being created (to avoid the unnecessary creation of FRAME 
+*  axes are being created (to avoid the unnecessary creation of FRAME
 *  pictures by KPG1_PLOTP).
                IF( .NOT. KEY .AND. .NOT. AXES ) THEN
                   CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
@@ -1293,7 +1293,7 @@
                IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Use the first value for any unspecified edges.
-               DO I = NMARG + 1, 4      
+               DO I = NMARG + 1, 4
                   MARGIN( I ) = MARGIN( 1 )
                END DO
 
@@ -1301,11 +1301,11 @@
 *  as the existing one. Also create a KEY picture if necessary.
                IF( KEY ) THEN
                   CALL KPG1_PLOTP( IPICD0, 'LINPLOT', MARGIN, 1, 'KEY',
-     :                             'B', KW, 0.0, 0.0D0, IPICD, IPICF, 
+     :                             'B', KW, 0.0, 0.0D0, IPICD, IPICF,
      :                             IPICK, STATUS )
                ELSE
                   CALL KPG1_PLOTP( IPICD0, 'LINPLOT', MARGIN, 0, ' ',
-     :                             ' ', 0.0, 0.0, 0.0D0, IPICD, IPICF, 
+     :                             ' ', 0.0, 0.0, 0.0D0, IPICD, IPICF,
      :                             IPICK, STATUS )
                END IF
 
@@ -1319,47 +1319,47 @@
      :                             STATUS )
 
 *  Map all the "what we've got" values into "what we want" values...
-               
+
 *  Data values and vertical error bar limits.
-               CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPYDAT ) ), 
-     :                          YVAR, .FALSE., ( YMAP .EQ. 'LOG' ), 
+               CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPYDAT ) ),
+     :                          YVAR, .FALSE., ( YMAP .EQ. 'LOG' ),
      :                          %VAL( CNF_PVAL( IPYVAR ) ), YSIGMA,
-     :                          AST__NULL, MAP,2, 
+     :                          AST__NULL, MAP,2,
      :                          %VAL( CNF_PVAL( IPYCEN ) ),
-     :                          %VAL( CNF_PVAL( IPYBAR ) ), 
+     :                          %VAL( CNF_PVAL( IPYBAR ) ),
      :                          TR( 2 ), BL( 2 ),
      :                          MONO, BAD, STATUS )
 
 *  The X-axis central values and horizontal error bar limits.
-               CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
+               CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ),
      :                          XVAR, .FALSE., ( XMAP .EQ. 'LOG' ),
-     :                          %VAL( CNF_PVAL( IPXVAR ) ), 
+     :                          %VAL( CNF_PVAL( IPXVAR ) ),
      :                          XSIGMA, AXMAP,
-     :                          MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                          MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ),
      :                          %VAL( CNF_PVAL( IPXBAR ) ),
      :                          TR( 1 ), BL( 1 ), MONO, BAD, STATUS )
- 
+
 *  If the mode is "STEP", we also do X-axis width limits.
                IF( IMODE .EQ. 4 ) THEN
-                  CALL KPS1_LPLLM( EL, 1, EL, 
+                  CALL KPS1_LPLLM( EL, 1, EL,
      :                             %VAL( CNF_PVAL( IPXDAT ) ), .TRUE.,
      :                             .TRUE., ( XMAP .EQ. 'LOG' ),
-     :                             %VAL( CNF_PVAL( IPAWID ) ), 
+     :                             %VAL( CNF_PVAL( IPAWID ) ),
      :                             0.5, AXMAP,
      :                             MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ),
-     :                             %VAL( CNF_PVAL( IPSTEP ) ), 
+     :                             %VAL( CNF_PVAL( IPSTEP ) ),
      :                             XSMAX, XSMIN, MONO,
      :                             BAD, STATUS )
                END IF
 
-*  Indicate that the entire supplied array is to be plotted (only part 
+*  Indicate that the entire supplied array is to be plotted (only part
 *  of it may actually be visible).
                ILO = 1
                IHI = DIM
 
             END IF
 
-         END IF        
+         END IF
 
       END IF
 
@@ -1372,14 +1372,14 @@
 *  bounds of this picture are specified by the user, with the bounds of
 *  the supplied data being used as the default picture bounds.
 
-      IF( .NOT. NEWPIC .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF( .NOT. NEWPIC .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Ensure the original current AGI picture is re-instated.
          CALL AGI_SELP( IPIC0, STATUS )
 
 *  We need to be able to transform points in both directions between the
 *  "what we want" Frame and the "uniform" Frame.  This requires all
-*  Mappings in the DATAPLOT FrameSet to be invertable.  Report an error 
+*  Mappings in the DATAPLOT FrameSet to be invertable.  Report an error
 *  if this is not the case.
          IF( NOINV ) THEN
             CALL MSG_SETC( 'LAB', AST_GETC( FSET, 'LABEL(1)', STATUS ) )
@@ -1394,22 +1394,22 @@
 
 *  Save the mapping from "what we've got" to "what we want" in the new
 *  DATAPLOT FrameSet.
-         MAP = AST_SIMPLIFY( AST_GETMAPPING( FSET, WWGOT, WWWANT, 
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( FSET, WWGOT, WWWANT,
      :                                       STATUS ),
      :                       STATUS )
 
 *  Find the limits of the axis-1 data value in the "what we want"
-*  Frame, including any required error bars.  This returns the central 
+*  Frame, including any required error bars.  This returns the central
 *  and extreme X-axis values for each error bar in the "what we want"
 *  Frame.
-         CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
-     :                    XVAR, .FALSE., ( XMAP .EQ. 'LOG' ), 
-     :                    %VAL( CNF_PVAL( IPXVAR ) ), 
+         CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ),
+     :                    XVAR, .FALSE., ( XMAP .EQ. 'LOG' ),
+     :                    %VAL( CNF_PVAL( IPXVAR ) ),
      :                    XSIGMA, AXMAP, MAP, 1,
-     :                    %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                    %VAL( CNF_PVAL( IPXCEN ) ),
      :                    %VAL( CNF_PVAL( IPXBAR ) ), TR( 1 ),
      :                    BL( 1 ), MONO, BAD, STATUS )
- 
+
 *  Report an error if either limit is bad.
          IF( ( TR( 1 ) .EQ. AST__BAD .OR. BL( 1 ) .EQ. AST__BAD ) .AND.
      :       STATUS .EQ. SAI__OK ) THEN
@@ -1424,13 +1424,13 @@
          IF( IMODE .EQ. 4 ) THEN
 
 *  Find the limits of the steps on axis 1 in the "what we want" Frame.
-*  This returns the central and extreme X-axis values for each step in 
+*  This returns the central and extreme X-axis values for each step in
 *  the "what we want" Frame.
-            CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
-     :                       .TRUE., .TRUE., ( YMAP .EQ. 'LOG' ), 
-     :                       %VAL( CNF_PVAL( IPAWID ) ), 
+            CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ),
+     :                       .TRUE., .TRUE., ( YMAP .EQ. 'LOG' ),
+     :                       %VAL( CNF_PVAL( IPAWID ) ),
      :                       0.5, AXMAP, MAP, 1,
-     :                       %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                       %VAL( CNF_PVAL( IPXCEN ) ),
      :                       %VAL( CNF_PVAL( IPSTEP ) ), XSMAX,
      :                       XSMIN, MONO, BAD, STATUS )
 
@@ -1451,7 +1451,7 @@
 *  the limits.
          IF( MONO .EQ. -1 ) THEN
             DVAL = BL( 1 )
-            BL( 1 ) = TR( 1 ) 
+            BL( 1 ) = TR( 1 )
             TR( 1 ) = DVAL
          END IF
 
@@ -1464,40 +1464,40 @@
             END IF
          END IF
 
-* If using a LOG x axis mapping, use a lower limit of 
+* If using a LOG x axis mapping, use a lower limit of
          IF( XMAP .EQ. 'LOG' .AND. BL( 1 ) .LE. 0.0 ) THEN
             BL( 1 ) = 1.0E-6*( TR( 1 ) - BL( 1 ) )
             IF( TR( 1 ) .LE. BL( 1 ) ) TR( 1 ) =  BL( 1 ) + 1.0
          END IF
 
-*  We now have the limits of the data on the X axis of the "what we 
-*  want" Frame.  Allow the user to override these limits. 
-         CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., FSET, 1, BL( 1 ), NVAL, 
+*  We now have the limits of the data on the X axis of the "what we
+*  want" Frame.  Allow the user to override these limits.
+         CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., FSET, 1, BL( 1 ), NVAL,
      :                    STATUS )
          CALL KPG1_GTAXV( 'XRIGHT', 1, .TRUE., FSET, 1, TR( 1 ), NVAL,
      :                    STATUS )
 
 *  Find the corresponding range of GRID indices.  Use an arbitrary value
-*  of 0.0 for the Y axis when doing this Mapping (any Y value will do 
+*  of 0.0 for the Y axis when doing this Mapping (any Y value will do
 *  since the axes are independent).
          BL( 2 ) = 0.0D0
          TR( 2 ) = 0.0D0
-         CALL AST_TRANN( MAP, 1, 2, 1, BL, .FALSE., 2, 1, BLG, STATUS ) 
-         CALL AST_TRANN( MAP, 1, 2, 1, TR, .FALSE., 2, 1, TRG, STATUS ) 
+         CALL AST_TRANN( MAP, 1, 2, 1, BL, .FALSE., 2, 1, BLG, STATUS )
+         CALL AST_TRANN( MAP, 1, 2, 1, TR, .FALSE., 2, 1, TRG, STATUS )
          ILO = MAX( 1, MIN( DIM, INT( MIN( BLG( 1 ), TRG( 1 ) ) ) ) )
-         IHI = MAX( 1, MIN( DIM, INT( 0.5D0 + 
+         IHI = MAX( 1, MIN( DIM, INT( 0.5D0 +
      :                                MAX( BLG( 1 ), TRG( 1 ) ) ) ) )
 
-*  Find the limits of the Y axis (axis 2) data value in the "what we 
-*  want" Frame, including any required error bars.  This returns the 
-*  central and extreme Y-axis values for each error bar in the "what we 
+*  Find the limits of the Y axis (axis 2) data value in the "what we
+*  want" Frame, including any required error bars.  This returns the
+*  central and extreme Y-axis values for each error bar in the "what we
 *  want" Frame.  The returned limits only include the data in the grid
 *  index range covered by the X axis.
-         CALL KPS1_LPLLM( EL, ILO, IHI, %VAL( CNF_PVAL( IPYDAT ) ), 
-     :                    YVAR, .FALSE., ( YMAP .EQ. 'LOG' ), 
-     :                    %VAL( CNF_PVAL( IPYVAR ) ), 
+         CALL KPS1_LPLLM( EL, ILO, IHI, %VAL( CNF_PVAL( IPYDAT ) ),
+     :                    YVAR, .FALSE., ( YMAP .EQ. 'LOG' ),
+     :                    %VAL( CNF_PVAL( IPYVAR ) ),
      :                    YSIGMA, AST__NULL, MAP, 2,
-     :                    %VAL( CNF_PVAL( IPYCEN ) ), 
+     :                    %VAL( CNF_PVAL( IPYCEN ) ),
      :                    %VAL( CNF_PVAL( IPYBAR ) ), TR( 2 ),
      :                    BL( 2 ), MONO, BAD, STATUS )
 
@@ -1512,9 +1512,9 @@
 *  Find suitable default values for YTOP and YBOT.
          BL( 2 ) = VAL__BADD
          TR( 2 ) = VAL__BADD
-         CALL KPG1_GRLM2( 'LMODE', EL, %VAL( CNF_PVAL( IPYCEN ) ), 
+         CALL KPG1_GRLM2( 'LMODE', EL, %VAL( CNF_PVAL( IPYCEN ) ),
      :                    %VAL( CNF_PVAL( IPXCEN ) ),
-     :                    YVAR, %VAL( CNF_PVAL( IPYBAR ) ), 
+     :                    YVAR, %VAL( CNF_PVAL( IPYBAR ) ),
      :                    BL( 2 ), TR( 2 ),
      :                    STATUS )
 
@@ -1527,15 +1527,15 @@
             END IF
          END IF
 
-* If using a LOG y axis mapping, use a lower limit of 
+* If using a LOG y axis mapping, use a lower limit of
          IF( YMAP .EQ. 'LOG' .AND. BL( 2 ) .LE. 0.0 ) THEN
             BL( 2 ) = 1.0E-6*( TR( 2 ) - BL( 2 ) )
             IF( TR( 2 ) .LE. BL( 2 ) ) TR( 2 ) =  BL( 2 ) + 1.0
          END IF
 
 *  We now have the limits of the data on the Y axis of the "what we
-*  want" Frame.  Allow the user to override these limits. 
-         CALL KPG1_GTAXV( 'YBOT', 1, .TRUE., FSET, 2, BL( 2 ), NVAL, 
+*  want" Frame.  Allow the user to override these limits.
+         CALL KPG1_GTAXV( 'YBOT', 1, .TRUE., FSET, 2, BL( 2 ), NVAL,
      :                    STATUS )
          CALL KPG1_GTAXV( 'YTOP', 1, .TRUE., FSET, 2, TR( 2 ), NVAL,
      :                    STATUS )
@@ -1543,7 +1543,7 @@
 *  If the Y axis will be logarithmic, ensure that the limits are of the
 *  same sign.
          IF( YMAP .EQ. 'LOG' ) THEN
-            IF( TR( 2 )*BL( 2 ) .LE. 0.0 ) THEN            
+            IF( TR( 2 )*BL( 2 ) .LE. 0.0 ) THEN
                CALL MSG_BLANK( STATUS )
                CALL MSG_OUT( ' ', '  Cannot use logarithmic mapping '//
      :                       'for the Y axis (parameter YMAP) since '//
@@ -1561,7 +1561,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See if a key giving the start and end positions of the profile is
-*  required. Default is yes if the NDF has more than one current-Frame 
+*  required. Default is yes if the NDF has more than one current-Frame
 *  axis.
          CALL PAR_DEF0L( 'KEY', ( NAX .GT. 1 ), STATUS )
          CALL PAR_GET0L( 'KEY', KEY, STATUS )
@@ -1583,7 +1583,7 @@
          END IF
 
 *  Get the margin values, using a dynamic default of zero if no key or
-*  axes are being created (to avoid the unnecessary creation of FRAME 
+*  axes are being created (to avoid the unnecessary creation of FRAME
 *  pictures by KPG1_PLOTP), and 0.15 otherwise.
          IF( .NOT. KEY .AND. .NOT. AXES ) THEN
             CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
@@ -1612,7 +1612,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Use the first value for any unspecified edges.
-         DO I = NMARG + 1, 4      
+         DO I = NMARG + 1, 4
             MARGIN( I ) = MARGIN( 1 )
          END DO
 
@@ -1627,10 +1627,10 @@
          BOX( 4 ) = TRG( 2 )
 
          IF( KEY ) THEN
-            CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 1, 'KEY', 'B', KW, 
+            CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 1, 'KEY', 'B', KW,
      :                       0.0, BOX, IPICD, IPICF, IPICK, STATUS )
          ELSE
-            CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 0, ' ', ' ', 0.0, 
+            CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 0, ' ', ' ', 0.0,
      :                       0.0, BOX, IPICD, IPICF, IPICK, STATUS )
          END IF
 
@@ -1655,26 +1655,26 @@
       CALL AST_SETL( IPLOT, 'LOGPLOT(1)', ( XMAP .EQ. 'LOG' ), STATUS )
       CALL AST_SETL( IPLOT, 'LOGPLOT(2)', ( YMAP .EQ. 'LOG' ), STATUS )
 
-*  Get the one-dimensional mappings which transform each of the 
+*  Get the one-dimensional mappings which transform each of the
 *  GRAPHICS Frame axes on to the corresponding "what we want" Frame
 *  axes.
       CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
 
 *  Map all the required axis values from "what we want" into GRAPHICS.
-      CALL AST_TRAN2( IPLOT, DIM, %VAL( CNF_PVAL( IPXCEN ) ), 
-     :                %VAL( CNF_PVAL( IPYCEN ) ), .FALSE., 
-     :                %VAL( CNF_PVAL( IPXCEN ) ), 
+      CALL AST_TRAN2( IPLOT, DIM, %VAL( CNF_PVAL( IPXCEN ) ),
+     :                %VAL( CNF_PVAL( IPYCEN ) ), .FALSE.,
+     :                %VAL( CNF_PVAL( IPXCEN ) ),
      :                %VAL( CNF_PVAL( IPYCEN ) ), STATUS )
 
-      IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, 
+      IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM,
      :                           %VAL( CNF_PVAL( IPXBAR ) ),
-     :                           .FALSE., %VAL( CNF_PVAL( IPXBAR ) ), 
+     :                           .FALSE., %VAL( CNF_PVAL( IPXBAR ) ),
      :                           STATUS )
 
 
-      IF( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2*DIM, 
+      IF( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2*DIM,
      :                           %VAL( CNF_PVAL( IPYBAR ) ),
-     :                           .FALSE., %VAL( CNF_PVAL( IPYBAR ) ), 
+     :                           .FALSE., %VAL( CNF_PVAL( IPYBAR ) ),
      :                           STATUS )
 
       IF( IMODE .EQ. 4 ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM,
@@ -1695,12 +1695,12 @@
       CALL NDF_MSG( 'NDF', INDF )
       CALL MSG_LOAD( ' ', '^NDF', NDFNAM, NC, STATUS )
 
-*  Save the Plot and data reference with the new DATA picture.  The 
+*  Save the Plot and data reference with the new DATA picture.  The
 *  Frame with index ICURR0 is made the current Frame for the Plot in
 *  the AGI database. Only add WCS to the picture if the graphics device
 *  was cleared on opening. This keeps the size of the database down.
-      IF( IPICD0 .EQ. -1 ) THEN 
-         CALL KPG1_PLOTS( IPLOT, IPICD, NDFNAM( : NC ), ICURR0, 
+      IF( IPICD0 .EQ. -1 ) THEN
+         CALL KPG1_PLOTS( IPLOT, IPICD, NDFNAM( : NC ), ICURR0,
      :                    'AGI_WORLD', 'DATAPLOT', STATUS )
       END IF
 
@@ -1710,7 +1710,7 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  See if annotated axes are required. The default is YES unles we are 
+*  See if annotated axes are required. The default is YES unles we are
 *  drawing over an existing DATA picture.
       CALL PAR_DEF0L( 'AXES', .NOT. NEWPIC, STATUS )
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
@@ -1728,30 +1728,30 @@
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
 *  Produce the data plot.
-      CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( CNF_PVAL( IPXCEN ) ), 
+      CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( CNF_PVAL( IPXCEN ) ),
      :                 %VAL( CNF_PVAL( IPYCEN ) ),
-     :                 XVAR, YVAR, %VAL( CNF_PVAL( IPXBAR ) ), 
+     :                 XVAR, YVAR, %VAL( CNF_PVAL( IPXBAR ) ),
      :                 %VAL( CNF_PVAL( IPYBAR ) ),
-     :                 %VAL( CNF_PVAL( IPSTEP ) ), 
+     :                 %VAL( CNF_PVAL( IPSTEP ) ),
      :                 'STYLE,TEMPSTYLE', IPLOT, IMODE, MTYPE,
      :                 ISHAPE, FREQ, 'KAPPA_LINPLOT', STATUS )
 
-*  Produce the Key. 
+*  Produce the Key.
 *  ================
 
 *  Only make the key if we have not aligned the picture with an
 *  existing DATAPLOT).
             IF( KEY .AND. AXES .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Get the bounds of the PGPLOT window (equivalent to the bounds of the 
+*  Get the bounds of the PGPLOT window (equivalent to the bounds of the
 *  DATA picture in the GRAPHICS Frame).
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  If the horizontal axis is annotated with distance from the centre of
 *  the first grid element in the supplied NDF, then the key indicates
-*  the position of the first and last grid elements within the 
+*  the position of the first and last grid elements within the
 *  n-dimensional current Frame of the input NDF.  Store the starting and
-*  ending GRID co-ordinates. 
+*  ending GRID co-ordinates.
          IF( DIST ) THEN
             BLG( 1 ) = 1.0D0
             TRG( 1 ) = DBLE( DIM )
@@ -1762,57 +1762,57 @@
 *  input NDF.
          ELSE
 
-*  Get the two-dimensional Mapping from GRAPHICS Frame to "What we've 
+*  Get the two-dimensional Mapping from GRAPHICS Frame to "What we've
 *  got" in the supplied NDF.
             MAP = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, WWGOT,
      :                                          STATUS ),
      :                          STATUS )
 
-*  Find the corresponding GRID co-ordinates.  Use an arbitrary value of 
+*  Find the corresponding GRID co-ordinates.  Use an arbitrary value of
 *  0.0 for the Y axis when doing this Mapping (any Y value will do since
 *  the axes are independent).
             BL( 1 ) = DBLE( X1 )
             BL( 2 ) = 0.0D0
             TR( 1 ) = DBLE( X2 )
             TR( 2 ) = 0.0D0
-  
-            CALL AST_TRANN( MAP, 1, 2, 1, BL, .TRUE., 2, 1, BLG, 
-     :                      STATUS ) 
-            CALL AST_TRANN( MAP, 1, 2, 1, TR, .TRUE., 2, 1, TRG, 
-     :                      STATUS ) 
+
+            CALL AST_TRANN( MAP, 1, 2, 1, BL, .TRUE., 2, 1, BLG,
+     :                      STATUS )
+            CALL AST_TRANN( MAP, 1, 2, 1, TR, .TRUE., 2, 1, TRG,
+     :                      STATUS )
 
          END IF
 
-*  Find the position in the current Frame of the supplied NDF 
+*  Find the position in the current Frame of the supplied NDF
 *  corresponding to these GRID co-ordinates.
-         CALL AST_TRANN( WCSMAP, 1, 1, 1, BLG( 1 ), .TRUE., NAX, 1, ST, 
-     :                   STATUS ) 
-         CALL AST_TRANN( WCSMAP, 1, 1, 1, TRG( 1 ), .TRUE., NAX, 1, FN, 
-     :                   STATUS ) 
+         CALL AST_TRANN( WCSMAP, 1, 1, 1, BLG( 1 ), .TRUE., NAX, 1, ST,
+     :                   STATUS )
+         CALL AST_TRANN( WCSMAP, 1, 1, 1, TRG( 1 ), .TRUE., NAX, 1, FN,
+     :                   STATUS )
 
 *  Note the X value at left hand edge of the DATA picture. The key text
 *  will be left justified here.
          TXTPOS( 1 ) = DBLE( X1 )
 
 *  Activate the KEY picture.  This returns a Plot for drawing in the
-*  picture. 
+*  picture.
          CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
 
 *  Add a copy of the current Frame from the NDF into the Plot so that
-*  its axis attributes (Format, Label, etc) are available when 
+*  its axis attributes (Format, Label, etc) are available when
 *  formatting the start and finish positions.  The new Frame becomes the
 *  current Frame in the Plot.
          DO I = 1, NDF__MXDIM
             PERM( I ) = 1
          END DO
 
-         CALL AST_ADDFRAME( IPLOTK, AST__BASE, 
-     :                      AST_PERMMAP( 2, PERM, NAX, PERM, 0.0D0, 
+         CALL AST_ADDFRAME( IPLOTK, AST__BASE,
+     :                      AST_PERMMAP( 2, PERM, NAX, PERM, 0.0D0,
      :                                   ' ', STATUS ),
      :                      AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                      STATUS )
 
-*  Set the style for plotting in the key picture. 
+*  Set the style for plotting in the key picture.
          CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Format the text for the first line of the key.
@@ -1851,7 +1851,7 @@
          UP( 1 ) = 0.0D0
          UP( 2 ) = 1.0D0
 
-*  Display the first line of text left justified within the top half of 
+*  Display the first line of text left justified within the top half of
 *  the key picture.
          CALL AST_TEXT( IPLOTK, KEYLN1, TXTPOS, UP, 'CL', STATUS )
 

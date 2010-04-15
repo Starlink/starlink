@@ -1,5 +1,5 @@
    proc CCDRecordDirectoryinMenu { menubar menu directory entry
-                                   choicebar button } { 
+                                   choicebar button } {
 #+
 #  Name:
 #     CCDRecordDirectoryinMenu

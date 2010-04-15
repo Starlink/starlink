@@ -4,14 +4,14 @@
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
-C    
+C Subroutine:
+C
 C      C O N S T _ B I N
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C TOP_STK (<), NPARAMS (<), PARAMS (<), STK_LAMBDA(<),
 C STK_STOKES_I (<), STK_STOKES_Q (<), STK_STOKES_QV (<),
@@ -19,8 +19,8 @@ C STK_STOKES_U (<), STK_STOKES_UV (<), STK_NPTS (<), STOKES_I(>),
 C STOKES_Q (<), STOKES_QV (<), STOKES_U (<), STOKES_UV (<),
 C LAMBDA (<), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
 C
 C Bins a stack entry polarization spectrum to bins of constant error size.
@@ -112,7 +112,7 @@ C
         LAMBDA(BIN_NO) = STK_LAMBDA(SPEC_BIN_NO,SP)
 C
 C If the error on the bin is too small include more...
-C 
+C
         DO WHILE (.NOT.BIG_ENOUGH)
          STOKES_I(BIN_NO) = STOKES_I(BIN_NO)+
      &           STK_STOKES_I(SPEC_BIN_NO,SP)
@@ -131,7 +131,7 @@ C
          IF (SPEC_BIN_NO.EQ.STK_NPTS(SP)) THEN
          BIG_ENOUGH = .TRUE.
          ELSE
-         BIG_ENOUGH = (SQRT(ABS(BIN_VAR)) .LT. 
+         BIG_ENOUGH = (SQRT(ABS(BIN_VAR)) .LT.
      &                         BIN_ERR*STOKES_I(BIN_NO)/100.)
          ENDIF
         ENDDO
@@ -151,4 +151,4 @@ C
        NPTS = BIN_NO-1
 C
 666    CONTINUE
-       END 
+       END

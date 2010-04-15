@@ -25,7 +25,7 @@
      has also been described in a Starlink Bulletin} article, December
      1995.
 
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

@@ -20,7 +20,7 @@
 
 *  Description:
 *     This subroutine is used by SKYLINE to store the information about
-*     the drawn curve sections into a text file. 
+*     the drawn curve sections into a text file.
 
 *  Arguments:
 *     FID = INTEGER (Given)
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

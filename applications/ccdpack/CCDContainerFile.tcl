@@ -69,7 +69,7 @@
 #  Global variables:
       global CCDndfcontainers
 
-#  If we've got a record of this one, return the name of the HDS 
+#  If we've got a record of this one, return the name of the HDS
 #  container file.
       if { [ array names CCDndfcontainers $ndfname ] == $ndfname } {
          return $CCDndfcontainers($ndfname)

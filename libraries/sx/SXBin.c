@@ -23,20 +23,20 @@ Error m_SXBin( Object *in, Object *out ){
 *     Realization
 
 *  Description:
-*     The SXBin module bins the "data" component of the "input" field into 
-*     the bins defined by the "connections" component of the "grid" field. 
+*     The SXBin module bins the "data" component of the "input" field into
+*     the bins defined by the "connections" component of the "grid" field.
 *     The input field can hold scattered or regularly gridded points, but
-*     the "data" component must depend on "positions". The "grid" field must 
-*     contain "connections" and "positions" components but need not contain 
-*     a "data" component. The input"data" component must be either TYPE_FLOAT 
+*     the "data" component must depend on "positions". The "grid" field must
+*     contain "connections" and "positions" components but need not contain
+*     a "data" component. The input"data" component must be either TYPE_FLOAT
 *     or TYPE_DOUBLE.
 *
 *     The "data" component in the "output" field contains either the mean
 *     or sum of the "input" data values falling within each connection, or
-*     the number of data values falling within each connection, as specified 
+*     the number of data values falling within each connection, as specified
 *     by "type".
 *
-*     When binning a regular grid into another regular grid, beware of the 
+*     When binning a regular grid into another regular grid, beware of the
 *     tendancy to produce artificial large scale structure representing the
 *     "beat frequency" of the two grids.
 
@@ -46,22 +46,22 @@ Error m_SXBin( Object *in, Object *out ){
 *     grid = field (Given)
 *        grid to define the bins [none]
 *     type = integer (Given)
-*        type of output values required: 0 - mean, 1 - sum, 
+*        type of output values required: 0 - mean, 1 - sum,
 *                                        2 - count [0]
 *     output = field (Returned)
 *        bined field
 
 *  Components:
-*     All components except the "data" component are copied from the "grid" 
-*     field. The output "data" component added by this module depends on 
+*     All components except the "data" component are copied from the "grid"
+*     field. The output "data" component added by this module depends on
 *     "connections". An "invalid connections" component is added if any output
-*     data values could not be calculated (e.g. if the mean is required of an 
+*     data values could not be calculated (e.g. if the mean is required of an
 *     empty bin).
 
 *  Examples:
-*     This example bins the scattered data described in "CO2.general" onto a 
+*     This example bins the scattered data described in "CO2.general" onto a
 *     regular grid, and displays it. SXBin is used to find the mean data
-*     value in each grid connection. 
+*     value in each grid connection.
 *
 *        input = Import("/usr/lpp/dx/samples/data/CO2.general")$
 *        frame17 = Select(input,17);
@@ -71,8 +71,8 @@ Error m_SXBin( Object *in, Object *out ){
 *        coloured = AutoColor(bin);
 *        Display(coloured,camera);
 *
-*     This example produces a grid containing an estimate of the density of 
-*     the scattered points (i.e. the number of points per unit area). The 
+*     This example produces a grid containing an estimate of the density of
+*     the scattered points (i.e. the number of points per unit area). The
 *     positions of the original scattered points are shown as dim grey
 *     circles. SXBin finds the number of input positions in each bin,
 *     Measure finds the area of each bin, and Compute divides the counts
@@ -107,12 +107,12 @@ Error m_SXBin( Object *in, Object *out ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -191,8 +191,8 @@ Error m_SXBin( Object *in, Object *out ){
       }
 
 
-/*  Remove (cull) all invalid positions and connections from the input. It is 
- *  necessary to take a copy of the input first, because the input object 
+/*  Remove (cull) all invalid positions and connections from the input. It is
+ *  necessary to take a copy of the input first, because the input object
  *  itself cannot be modified. */
 
       input = DXCopy( in[0], COPY_STRUCTURE );
@@ -229,7 +229,7 @@ Error m_SXBin( Object *in, Object *out ){
       }
 
 
-/*  Produce a copy of the "input" object to use as the output, replacing all 
+/*  Produce a copy of the "input" object to use as the output, replacing all
  *  fields within it with the grid field. Also form a linked list of Fpair
  *  structures describing the fields. */
 
@@ -247,7 +247,7 @@ Error m_SXBin( Object *in, Object *out ){
 
 /*  Go through the list of fields looking for fields which share the same
  *  positions component. */
-   
+
       more = 1;
       while( more ){
 
@@ -276,12 +276,12 @@ Error m_SXBin( Object *in, Object *out ){
             DXSetError( ERROR_DATA_INVALID, "positions component in \"input\" is not of type FLOAT." );
             goto error;
          }
-                     
+
          if( cat != CATEGORY_REAL ){
             DXSetError( ERROR_DATA_INVALID, "positions component in \"input\" is not of category REAL." );
             goto error;
          }
-                     
+
          if( rank > 1 ){
             DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"input\".", rank );
             goto error;
@@ -291,7 +291,7 @@ Error m_SXBin( Object *in, Object *out ){
             rank = 1;
             npindim = 1;
          }
-                     
+
          if( npindim < ndim ){
             DXSetError( ERROR_DATA_INVALID, "dimensionality of \"input\" (%d) is less than \"grid\" (%d).", npindim, ndim );
             goto error;
@@ -299,8 +299,8 @@ Error m_SXBin( Object *in, Object *out ){
 
 
 /*  Get a pointer to the positions values. */
-         
-         inpos = (float *) DXGetArrayData( inpos_array ); 
+
+         inpos = (float *) DXGetArrayData( inpos_array );
 
 
 /*  If the number of dimensions in the input positions is greater than the
@@ -330,10 +330,10 @@ Error m_SXBin( Object *in, Object *out ){
  *  go upto nbin. Positions returned holding an identifier of zero do
  *  not fall within the supplied grid. */
 
-         map = (Array) DXMap( (Object) inpos_array, (Object) interp, 
+         map = (Array) DXMap( (Object) inpos_array, (Object) interp,
                               NULL, NULL );
          map_ptr = (int *) DXGetArrayData( map );
-         
+
 
 /*  Find all fields which have the same positions tag and the same data
  *  type. */
@@ -359,10 +359,10 @@ Error m_SXBin( Object *in, Object *out ){
 
 
 /*  Store a pointer to the input data array, and its dimensionality. */
-         
-              indata[nfld-1] = (void *) DXGetArrayData( (Array) next->data ); 
+
+              indata[nfld-1] = (void *) DXGetArrayData( (Array) next->data );
               veclen[nfld-1] = next->datalen;
- 
+
 
 /*  Make a new array to hold the output data values. The output data will
  *  have the same dimensionality as the input data unless the required output
@@ -400,12 +400,12 @@ Error m_SXBin( Object *in, Object *out ){
  *  resulting bin values in the output data arrays. */
 
          if( dtype == TYPE_FLOAT ){
-            if( ! SXBinF( nfld, veclen, npos, (float **)indata, nbin, 
-                          (float **) outdata, map_ptr, work, outtype, 
+            if( ! SXBinF( nfld, veclen, npos, (float **)indata, nbin,
+                          (float **) outdata, map_ptr, work, outtype,
                           outbad ) ) goto error;
          } else {
-            if( ! SXBinD( nfld, veclen, npos, (double **)indata, nbin, 
-                          (double **) outdata, map_ptr, work, outtype, 
+            if( ! SXBinD( nfld, veclen, npos, (double **)indata, nbin,
+                          (double **) outdata, map_ptr, work, outtype,
                           outbad ) ) goto error;
          }
 
@@ -433,8 +433,8 @@ Error m_SXBin( Object *in, Object *out ){
 
 
 /*  Indicate that the data values are dependant on connections. */
- 
-               if( !DXSetComponentAttribute( next->outfld, "data", "dep", 
+
+               if( !DXSetComponentAttribute( next->outfld, "data", "dep",
                                         (Object) DXNewString("connections")) ) goto error;
 
 
@@ -449,7 +449,7 @@ Error m_SXBin( Object *in, Object *out ){
                DXEndField( next->outfld );
 
 
-/*  Increment the field index, and indicate that this input field has 
+/*  Increment the field index, and indicate that this input field has
  *  been done. */
 
                fld++;
@@ -462,11 +462,11 @@ Error m_SXBin( Object *in, Object *out ){
          }
 
 
-/*  Delete the array used to store the reduced dimensionality input positions 
+/*  Delete the array used to store the reduced dimensionality input positions
  *  (if used). */
 
          if( a ) {
-            DXDelete( (Object) a ); 
+            DXDelete( (Object) a );
             a = NULL;
          }
 
@@ -495,7 +495,7 @@ error:
 
       DXDelete( grid );
       DXDelete( input );
-      if( a ) DXDelete( (Object) a ); 
+      if( a ) DXDelete( (Object) a );
 
 
 /*  If all is OK, return the "output" object with a good status. */

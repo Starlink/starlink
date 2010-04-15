@@ -30,7 +30,7 @@
 *     MSG:
 *        MSG_OUT
 *     PAR:
-*        PAR_CANCL, PAR_CHOIC           
+*        PAR_CANCL, PAR_CHOIC
 
 *  Authors:
 *     DCP: Diana Parsons (IPMAF/RAL)
@@ -44,7 +44,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -62,7 +62,7 @@
 *  Arguments Given:
       INTEGER ILEVEL
       CHARACTER * ( * ) PMMENU
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) MMENU
 
@@ -88,5 +88,5 @@
 *  Cancel the parameter so that a new value is obtained next time
 *  through this section
       CALL PAR_CANCL( PMMENU, STATUS )
-      
+
       END

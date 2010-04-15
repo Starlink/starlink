@@ -1,36 +1,36 @@
 C+
 C                           I C H _ E N C O D E
-C      
+C
 C     Routine name:
 C           ICH_ENCODE
-C     
+C
 C     Function:
 C           Formats a REAL number into a character string
-C      
+C
 C     Decription:
-C           This routine formats a real variable into a character string 
-C           in a nice way; that is, if the number is an integer (within 
+C           This routine formats a real variable into a character string
+C           in a nice way; that is, if the number is an integer (within
 C           the integer 16 bit range), it will be printed as such, and
 C           'E' format will only be used if the number is particularly
-C           large or small.  Generally, an ordinary floating point format 
+C           large or small.  Generally, an ordinary floating point format
 C           will be used.
-C      
+C
 C     Language:
 C           FORTRAN:
-C      
+C
 C     Call:
 C           STATUS=ICH_ENCODE(FIELD,VALUE,IPTR,IDECC,NPTR)
-C      
+C
 C     Parameters:      (">" input, "<" output)
-C      
-C          (>) FIELD   (Fixed string, descr) The character string into 
+C
+C          (>) FIELD   (Fixed string, descr) The character string into
 C                      which VALUE is to be encoded.
 C          (>) VALUE   (Real, ref) The number to be encoded
 C          (>) IPTR    (Integer, ref) quantity giving the number of
 C                      the first byte in FIELD (starting at 1) into
 C                      which the ASCII encoded value is to be written.
 C          (>) IDDEC   (Integer, ref) One less than the number of
-C                      significant figures to be aimed at if a floating 
+C                      significant figures to be aimed at if a floating
 C                      point output format is used.  This is the number of
 C                      decimal places used in an E format (although the
 C                      routine tries to avoid E format, and will print eg
@@ -39,22 +39,22 @@ C                      than 5).
 C          (<) NPTR    (Integer, ref) Variable in which ENCODE
 C                      returns the number of the next available character
 C                      in FIELD.
-C      
+C
 C     Returns:         (if called as a function)
-C      
+C
 C          (<) STATUS  (Integer, function value) Return code.
 C                      0 => OK,
 C                      1 => Not enough character positions left in FIELD.
-C      
+C
 C     External variables used: None
-C      
+C
 C     External routines used: None
-C      
+C
 C     Authors: K. Shortridge,
 C              H. Meyerdierks.
-C          
+C
 C     Date: 26th Aug 1992
-C      
+C
 C     Note:
 C           This routine is not intended to give precise control over
 C           formats.  The intention is that it will always produce a
@@ -67,7 +67,7 @@ C           INTEGER FUNCTION ICH_ENCODE(FIELD,VALUE,IPTR,IDECC,NPTR)
 C           CHARACTER*(*) FIELD
 C           INTEGER IPTR,NPTR,IDECC
 C           REAL VALUE
-C      
+C
 C     Keywords:
 C           Strings, free-format, encode
 C-
@@ -75,7 +75,7 @@ C     Modifications:
 C           19th July 1983.  Original VAX version.  KS / UCL, based on
 C                            an Interdata program by Tony Hewer, UCL.
 C           24th July 1986.  Complete re-write to use Fortran internal
-C                            I/O.  Use of IDECC changed slightly - it 
+C                            I/O.  Use of IDECC changed slightly - it
 C                            used to be the number of decimal places,
 C                            meaning that with IDECC=3 a number such as
 C                            0.02345 would output as 0.023, whereas it
@@ -103,12 +103,12 @@ C
       INTEGER   LSTSIG                    ! Last significant fract. digit
       INTEGER   NDEC                      ! Formatted # of decimal places
       INTEGER   NLOG                      ! Integer log of value
-      CHARACTER WORK*13                   ! Work string 
-      CHARACTER WORK2*13                  ! Work string 
+      CHARACTER WORK*13                   ! Work string
+      CHARACTER WORK2*13                  ! Work string
       LOGICAL   USE_FLOAT                 ! Floating point format needed
       REAL      VLOG                      ! Log of value
 C
-C     See if we can get away with using an integer format.  
+C     See if we can get away with using an integer format.
 C
       LASTCH=LEN(WORK)
       USE_FLOAT=.TRUE.
@@ -121,7 +121,7 @@ C
       END IF
       IF (USE_FLOAT) THEN
 C
-C        We need a floating point format.  See if we will need to 
+C        We need a floating point format.  See if we will need to
 C        use an 'E' type format.
 C
          IF (VALUE.EQ.0.0) THEN

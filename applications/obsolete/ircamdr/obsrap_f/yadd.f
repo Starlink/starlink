@@ -1,5 +1,5 @@
 
-*+  YADD - adds up rows from an image and creates 1d slice 
+*+  YADD - adds up rows from an image and creates 1d slice
 
       SUBROUTINE YADD ( STATUS )
 
@@ -33,7 +33,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -48,8 +48,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -68,9 +68,9 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :	YSTART,               ! Y start for addition of rows
-     :	YSIZE,                ! Y size for addition of rows 
+     :	YSIZE,                ! Y size for addition of rows
      :  LOCI,                 ! locator for input IMAGE structure
      :  LOCO                  ! locator for output IMAGE structure
 
@@ -96,7 +96,7 @@
      :                  PNTRI, NELEMENTS, STATUS )
           CALL NDF_DIM( LOCI, NDIMS, DIMS, ACTDIM, STATUS )
 
-*        get the Y start,number of rows to be added in y 
+*        get the Y start,number of rows to be added in y
 
 	  CALL PAR_GET0I( 'YSTART', YSTART, STATUS)
 	  CALL PAR_GET0I( 'YSIZE', YSIZE, STATUS)
@@ -106,7 +106,7 @@
 *          test if the Ystart and Ysize are legal and within input image
 
 	    IF( YSTART .GE. 1 .AND. YSTART .LE. DIMS( 2) .AND.
-     :	        YSIZE  .GT. 1 .AND. ( YSTART+YSIZE-1) 
+     :	        YSIZE  .GT. 1 .AND. ( YSTART+YSIZE-1)
      :          .LE.  DIMS( 2)) THEN
 
 *            set the output image dimensions
@@ -116,7 +116,7 @@
 
 *            create the output image and get a title for it
 
-	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO, 
+	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO,
      :                      STATUS )
 
 *            check for error
@@ -133,8 +133,8 @@
 
 *                pass everything to the rapid median calculation routine
 
-	          CALL YADDSUB( DIMS(1), DIMS(2), %VAL( PNTRI), ODIMS(1), 
-     :	                        ODIMS(2), %VAL( PNTRO), YSTART, YSIZE, 
+	          CALL YADDSUB( DIMS(1), DIMS(2), %VAL( PNTRI), ODIMS(1),
+     :	                        ODIMS(2), %VAL( PNTRO), YSTART, YSIZE,
      :                          STATUS)
 
 	        END IF

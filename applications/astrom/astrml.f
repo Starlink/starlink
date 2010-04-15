@@ -963,7 +963,7 @@
 
 *     Julian epoch, UT date/time, or LST?
          IF (NFLD.EQ.1) THEN
-            
+
 *         Julian epoch, double
 *         Replace any plate epoch
             EPPCG=WORK(1)
@@ -1657,7 +1657,7 @@
       ELSE
          NSOLS=1
       END IF
-      
+
       IF (NSOLS.GT.MAXSOL) THEN
 *      Ooops -- this isn't right
          WRITE (LUR, '("Can''t happen!  NSOLS=",I3/"ABORTING")') NSOLS
@@ -2064,12 +2064,12 @@
      :                          F8.2," to",F8.2,
      :                          "  (std dev",SS,F6.2,")")')
      :                          DDI,DISTE,SIGDI
-*                        Write out the distortion coefficient DISTE 
+*                        Write out the distortion coefficient DISTE
 *                        in the units ASTROM uses (rad^{-2}) rather than the
 *                        units we carefully converted it to above (deg^{-2}),
-*                        since this will principally be used to control a 
+*                        since this will principally be used to control a
 *                        future invocation of ASTROM.
-                           WRITE (LUX, 1081) "q", DISTE, 
+                           WRITE (LUX, 1081) "q", DISTE,
      :                          "distortion, q (rad^{-2})"
                         ENDIF
                         DISTOR=DISTE
@@ -2086,7 +2086,7 @@
                   ELSE
 *                  If not FITDI, write q to the log anyway, so as to
 *                  propagate the value to the output.
-                     WRITE (LUX, 1081) "q", DISTE, 
+                     WRITE (LUX, 1081) "q", DISTE,
      :                    "distortion, q (rad^{-2})"
                   END IF
 
@@ -2245,7 +2245,7 @@
      :                  "> too long.  FITS writing abandoned")') FTPREF
                      IF (LUX.GT.0)
      :                    WRITE (LUX, '("ERROR 010 FITS filename <",a,
-     :                    "> too long.  FITS writing abandoned")') 
+     :                    "> too long.  FITS writing abandoned")')
      :                    FTPREF
 *                  Set FITSOP false to avoid coming this way again
                      FITSOP = .FALSE.
@@ -2253,7 +2253,7 @@
                   ENDIF
                   IF (FTI.EQ.1) THEN
 *                  Nothing there at all!?
-                     WRITE (LUS, 
+                     WRITE (LUS,
      :             '(" FITS filename blank!?  FITS writing abandoned")')
                      IF (LUX.GT.0) WRITE (LUX,
      :           '("ERROR 011 FITS filename blank. Writing abandoned")')
@@ -2263,7 +2263,7 @@
                   FTI=FTI-1
                   WRITE (FITSFN, '(A,i2.2,".fits")') FTPREF(:FTI), NSOL
                   FTI = INDEX (FITSFN, ' ')-1
-                  
+
 *               Right, now try opening the file, use a small, but, non-trivial
 *               size so it can be opened by viewing programs.
                   CALL FTGIOU (FTUNIT, FTSTAT)
@@ -2284,7 +2284,7 @@
 *               Write current date (should use FTGSTM, but that's not
 *               available in older versions of FITSIO)
                   CALL FTGSDT (IUTD,IUTMO,IUTY, FTSTAT)
-                  WRITE (FTWS, '(I4,"-",I2.2,"-",I2.2)') 
+                  WRITE (FTWS, '(I4,"-",I2.2,"-",I2.2)')
      :                 IUTY, IUTMO, IUTD
                   CALL FTPKYS (FTUNIT, 'DATE', FTWS,
      :                 'Date file was written', FTSTAT)
@@ -2297,7 +2297,7 @@
 *               Reuse the results of the sla_DCMPF call above.
                   WRITE (FTWS,'("ASTROM scale=",F6.2,
      :                 "as/px, nonperp=",
-     :                 F6.2,", angle=",F6.2,", inv=",L1)') 
+     :                 F6.2,", angle=",F6.2,", inv=",L1)')
      :                 SCALE, PERP/D2R, ORIENT/D2R,
      :                 (XSCALE*YSCALE.LT.0D0)
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
@@ -2381,7 +2381,7 @@
 *               Finish up
                   CALL FTCLOS (FTUNIT, FTSTAT)
                   CALL FTFIOU (FTUNIT, FTSTAT)
-                  
+
 *               Were there any errors?
                   IF (FTSTAT.NE.0) THEN
                      CALL FTGERR (FTSTAT,FTWS)
@@ -2391,7 +2391,7 @@
                      ENDDO
                      WRITE (LUS, '(" FITS error detected: ",a)')
      :                    FTWS(:FTI)
-                     IF (LUX.GT.0) 
+                     IF (LUX.GT.0)
      :                    WRITE (LUX, '("ERROR 013 FITS error: ",A)')
      :                    FTWS(:FTI)
                      CALL FTGMSG (FTWS)
@@ -2492,7 +2492,7 @@
      :                 "rrms in pixels"
                   WRITE (LUX, 1083) "nterms", NTERMS, "no. terms in fit"
 
-*               Write out the plate centre coordinates (RAPCX, DCPCX) 
+*               Write out the plate centre coordinates (RAPCX, DCPCX)
 *               in radians as well as sexagesimal.
                   CALL sla_DR2TF(1,sla_DRANRM(RAPCX),KSRA,IRAVEC)
 *               Because of the dranrm, KSRA is always '+'
@@ -2528,7 +2528,7 @@
             END IF
          END IF
 
-*      Indicate the end of the list of results for this fit.  
+*      Indicate the end of the list of results for this fit.
 *      The fit with NSOL=0 produces no output.
          IF (LUX.GT.0 .AND. NSOL.GT.0) THEN
             IF (FITOK) THEN
@@ -2884,7 +2884,7 @@
       WRITE (LUR,8994) FITERR,NSOL
       WRITE (LUS,8994) FITERR,NSOL
       IF (LUX.GT.0) WRITE (LUX,8894) FITERR, NSOL
-      
+
  8994 FORMAT (/1X,A/
      :        1X,'--------------- FIT',I2,
      :                                ' ABORTED ---------------')

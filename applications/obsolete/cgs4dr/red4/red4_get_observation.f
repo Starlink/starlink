@@ -15,17 +15,17 @@
 *     explicitly in another parameter. This observation is then used
 *     regardless of the suitability of its instrument settings (although
 *     a warning message is given if they are not suitable). Other values
-*     of the search mode parameter result in the index file being 
+*     of the search mode parameter result in the index file being
 *     searched for a suitable observation.
 *
 *     Having obtained an appropriate observation, the routine checks the
 *     RED4 common to see if that observation is already in common, if not
 *     it gets the appropriate amount of virtual memory and copies in the
-*     data, error and quality arrays from the observation. 
+*     data, error and quality arrays from the observation.
 *
 *     Note that this routine maintains four separate areas of virtual
 *     memory - areas for BIAS, DARK, FLAT and STANDARD. The same code is
-*     used to allocate and free these areas, but pointers to them are 
+*     used to allocate and free these areas, but pointers to them are
 *     stored in COMMON and copied when necessary.
 *
 *     On entry the parent observation file must have been opened as
@@ -105,7 +105,7 @@
 *                                      !   used if SEARCH_MODE is 'SPECIFIED'.
       CHARACTER*132 OBS_MATCH          ! String containing the names of the
 *                                      !   items which must match for an
-*                                      !   observation to be considered 
+*                                      !   observation to be considered
 *                                      !   suitable.
 *
       LOGICAL FITS_EXISTS              ! True if FITS item exists
@@ -119,7 +119,7 @@
       INTEGER DATA_VM                  ! virtual memory pointer to data array
       INTEGER VAR_VM                   ! ... same for variances
       INTEGER QUAL_VM                  ! ... same for quality
-      INTEGER NELM_VM                  ! number of elements mapped into virtual 
+      INTEGER NELM_VM                  ! number of elements mapped into virtual
 *                                            memory
 *
 *     --- Address, dimension, slot numbers, etc. for observation to be
@@ -256,7 +256,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Error obtaining %FLAT_MODE, '/
-     :        /'%SPECIFIED_FLAT and %FLAT_MATCH parameters.', STATUS ) 
+     :        /'%SPECIFIED_FLAT and %FLAT_MATCH parameters.', STATUS )
          END IF
       ELSE IF ( TYPE_REQUIRED .EQ. 'CALIBRATION' ) THEN
 
@@ -271,7 +271,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Error obtaining %CALIB_MODE, '/
-     :        /'%SPECIFIED_CALIB and %CALIB_MATCH parameters.', STATUS ) 
+     :        /'%SPECIFIED_CALIB and %CALIB_MATCH parameters.', STATUS )
          END IF
       ELSE IF ( TYPE_REQUIRED .EQ. 'STANDARD' ) THEN
 
@@ -288,12 +288,12 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Error obtaining %STANDARD_MODE, '/
      :        /'%SPECIFIED_STD, %STANDARD_MATCH and %AMTOLER '/
-     :        /'parameters.', STATUS ) 
+     :        /'parameters.', STATUS )
          END IF
       ELSE
 
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'TYPE_REQUIRED', TYPE_REQUIRED ) 
+         CALL MSG_SETC( 'TYPE_REQUIRED', TYPE_REQUIRED )
          CALL ERR_REP( ' ', 'RED4_GET_OBSERVATION: unknown '/
      :     /'observation type, ^TYPE_REQUIRED.', STATUS )
       END IF
@@ -315,20 +315,20 @@
 *         observation is not suitable.
             OBS_NAME = SPECIFIED_OBS
             CALL RED4_CHECK_OBSERVATION( OBSREF, TYPE_REQUIRED,
-     :        OBS_MATCH, AMTOLER, OBS_NAME, STATUS ) 
+     :        OBS_MATCH, AMTOLER, OBS_NAME, STATUS )
          ELSE
 
 *         A suitable observation should be searched for. OBS_NAME
 *         will be returned blank if no suitable observation could
 *         be found.
-            CALL RED4_SEEK_OBSERVATION( INDEX_FILE, OBSREF, 
-     :        TYPE_REQUIRED, SEARCH_MODE, OBS_MATCH, AMTOLER, 
-     :        OBS_NAME, STATUS ) 
+            CALL RED4_SEEK_OBSERVATION( INDEX_FILE, OBSREF,
+     :        TYPE_REQUIRED, SEARCH_MODE, OBS_MATCH, AMTOLER,
+     :        OBS_NAME, STATUS )
          END IF
       END IF
 
 *   Check everything has worked and that a suitable observation
-*   has been found. 
+*   has been found.
       IF ( (STATUS .EQ. SAI__OK) .AND. (OBS_NAME .NE. ' ') ) THEN
 
 *      Now check that observation isn't already in common, otherwise set
@@ -440,17 +440,17 @@
 *          the data quality method will be used for error handling.
             CALL RED4_CHECK_INPUT( OBS_NAME, STATUS )
             CALL DSA_NAMED_INPUT ('SEEK_OBS', OBS_NAME, STATUS)
-            CALL DSA_DATA_SIZE ('SEEK_OBS', MAXDIM, NDIM, DIMS, NELM, 
+            CALL DSA_DATA_SIZE ('SEEK_OBS', MAXDIM, NDIM, DIMS, NELM,
      :         STATUS)
             CALL DSA_USE_QUALITY ('SEEK_OBS', STATUS)
 
 *          Map in the data array, variance array and quality array
 *          associated with the required observation.
-            CALL DSA_MAP_DATA ('SEEK_OBS', 'READ', 'FLOAT', 
+            CALL DSA_MAP_DATA ('SEEK_OBS', 'READ', 'FLOAT',
      :         OBS_DATA, OBS_SLOT, STATUS)
-            CALL DSA_MAP_VARIANCE ('SEEK_OBS', 'READ', 'FLOAT', 
+            CALL DSA_MAP_VARIANCE ('SEEK_OBS', 'READ', 'FLOAT',
      :         OBS_VAR, OBS_V_SLOT, STATUS)
-            CALL DSA_MAP_QUALITY ('SEEK_OBS', 'READ', 'BYTE', 
+            CALL DSA_MAP_QUALITY ('SEEK_OBS', 'READ', 'BYTE',
      :         OBS_QUAL, OBS_Q_SLOT, STATUS)
 
 *          If the observation is a FLAT, then also find out if it
@@ -459,7 +459,7 @@
             IF (TYPE_REQUIRED .EQ. 'FLAT') THEN
 
                FITS_EXISTS = .FALSE.
-               CALL DSA_SEEK_FITS( 'SEEK_OBS', 'NORMALIS', 
+               CALL DSA_SEEK_FITS( 'SEEK_OBS', 'NORMALIS',
      :            FITS_EXISTS, COMMENT, ELEMENTS, STRLEN, STATUS )
 
                IF ( FITS_EXISTS )  THEN
@@ -496,7 +496,7 @@
                ELSE
                  FLAT_OVERSAMPLED = .FALSE.
                ENDIF
-               IF ( FLAT_OVERSAMPLED .AND. VERBOSE ) 
+               IF ( FLAT_OVERSAMPLED .AND. VERBOSE )
      :            CALL MSG_OUT( ' ', 'FLAT is OVERSAMPLED', STATUS )
             ENDIF
 
@@ -510,7 +510,7 @@
 
 *          Check size of current virtual memory allocation by comparing
 *          the number of elements of the previously mapped observation
-*          with the number of elements required for the current 
+*          with the number of elements required for the current
 *          observation. If the numbers match, the same virtual memory
 *          can be used. If the numbers don't match, the virtual memory
 *          needs to be freed and some more re-allocated.
@@ -524,32 +524,32 @@
 *                  The old virtual memory needs to be freed.
 *                  (Note that the same code below is used to free
 *                  the memory belonging to BIAS, DARK or FLAT frames,
-*                  depending upon the pointers recalled from the common 
+*                  depending upon the pointers recalled from the common
 *                  block.
 *                  Free the area used for the 4-byte DATA array
-*                  and check this has worked. 
+*                  and check this has worked.
                      CALL PSX_FREE( DATA_VM, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
                         STATUS = SAI__ERROR
-                        CALL ERR_REP (' ', 
+                        CALL ERR_REP (' ',
      :                     'Error freeing data VM', STATUS)
                      ENDIF
 
 *                  Free the area used for the 4-byte VARIANCE array
-*                  and check this has worked. 
+*                  and check this has worked.
                      CALL PSX_FREE( VAR_VM, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
                         STATUS = SAI__ERROR
-                        CALL ERR_REP (' ', 
+                        CALL ERR_REP (' ',
      :                     'Error freeing variance VM', STATUS)
                      ENDIF
 
 *                  Free the area used for the 1-byte QUALITY array
-*                  and check this has worked. 
+*                  and check this has worked.
                      CALL PSX_FREE( QUAL_VM, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
                         STATUS = SAI__ERROR
-                        CALL ERR_REP (' ', 
+                        CALL ERR_REP (' ',
      :                     'Error freeing quality VM', STATUS)
                      ENDIF
 
@@ -566,7 +566,7 @@
                   CALL GEN_FILL( FLOATSIZE*NELM, 0.0, %val(DATA_VM) )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 
+                     CALL ERR_REP (' ',
      :                  'Error getting data VM', STATUS)
                   ENDIF
 
@@ -576,7 +576,7 @@
                   CALL GEN_FILL( FLOATSIZE*NELM, 0.0, %val(VAR_VM) )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 
+                     CALL ERR_REP (' ',
      :                  'Error getting variance VM', STATUS)
                   ENDIF
 
@@ -586,7 +586,7 @@
                   CALL GEN_FILL( BYTESIZE*NELM, 0, %val(DATA_VM) )
                   IF ( STATUS .NE. SAI__OK ) THEN
                     STATUS = SAI__ERROR
-                    CALL ERR_REP (' ', 
+                    CALL ERR_REP (' ',
      :                  'Error getting quality VM', STATUS)
                   ENDIF
 
@@ -603,11 +603,11 @@
 *            Copy the data, variance and quality arrays which have
 *            been mapped from the observation into the areas of
 *            virtual memory allocated for them.
-               CALL GEN_MOVE( FLOATSIZE*NELM, 
+               CALL GEN_MOVE( FLOATSIZE*NELM,
      :           %val(OBS_DATA), %val(DATA_VM) )
-               CALL GEN_MOVE( FLOATSIZE*NELM, 
+               CALL GEN_MOVE( FLOATSIZE*NELM,
      :           %val(OBS_VAR),  %val(VAR_VM) )
-               CALL GEN_MOVE( BYTESIZE*NELM,  
+               CALL GEN_MOVE( BYTESIZE*NELM,
      :           %val(OBS_QUAL), %val(QUAL_VM) )
 
 *            Set the common block pointers appropriately, and
@@ -683,28 +683,28 @@
               CALL MSG_SETI( 'BQ', BIAS_QUAL )
               CALL MSG_SETI( 'BN', BIAS_NELM )
               CALL MSG_SETC( 'BF', CURRENT_BIAS )
-              CALL MSG_OUT( ' ', 'Current_BIAS=^BF, Data_ptr=^BD, 
+              CALL MSG_OUT( ' ', 'Current_BIAS=^BF, Data_ptr=^BD,
      :          Variance_ptr=^BV, Quality_ptr=^BQ, Nelms=^BN', STATUS )
               CALL MSG_SETI( 'DD', DARK_DATA )
               CALL MSG_SETI( 'DV', DARK_VAR )
               CALL MSG_SETI( 'DQ', DARK_QUAL )
               CALL MSG_SETI( 'DN', DARK_NELM )
               CALL MSG_SETC( 'DF', CURRENT_DARK )
-              CALL MSG_OUT( ' ', 'Current_DARK=^DF, Data_ptr=^DD, 
+              CALL MSG_OUT( ' ', 'Current_DARK=^DF, Data_ptr=^DD,
      :          Variance_ptr=^DV, Quality_ptr=^DQ, Nelms=^DN', STATUS )
               CALL MSG_SETI( 'FD', FLAT_DATA )
               CALL MSG_SETI( 'FV', FLAT_VAR )
               CALL MSG_SETI( 'FQ', FLAT_QUAL )
               CALL MSG_SETI( 'FN', FLAT_NELM )
               CALL MSG_SETC( 'FF', CURRENT_FLAT )
-              CALL MSG_OUT( ' ', 'Current_FLAT=^FF, Data_ptr=^FD, 
+              CALL MSG_OUT( ' ', 'Current_FLAT=^FF, Data_ptr=^FD,
      :          Variance_ptr=^FV, Quality_ptr=^FQ, Nelms=^FN', STATUS )
               CALL MSG_SETI( 'SD', STANDARD_DATA )
               CALL MSG_SETI( 'SV', STANDARD_VAR )
               CALL MSG_SETI( 'SQ', STANDARD_QUAL )
               CALL MSG_SETI( 'SN', STANDARD_NELM )
               CALL MSG_SETC( 'SF', CURRENT_STANDARD )
-              CALL MSG_OUT( ' ', 'Current_STANDARD=^SF, Data_ptr=^SD, 
+              CALL MSG_OUT( ' ', 'Current_STANDARD=^SF, Data_ptr=^SD,
      :          Variance_ptr=^SV, Quality_ptr=^SQ, Nelms=^SN', STATUS )
             ENDIF
 

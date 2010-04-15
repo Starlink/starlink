@@ -26,7 +26,7 @@ proc see num_obsele code_image
     send plt2d set cursor_image (name_image)
     send plt2d set name_image (name_image)
     print "NSIGMA plot of " (name_image) " on " (worknam)
-    obeyw plt2d nsigma (name_image) 
+    obeyw plt2d nsigma (name_image)
     send plt2d set cursor_cross 'YES'
     get plt2d platscal (platscal)
     if platscal = 1.0

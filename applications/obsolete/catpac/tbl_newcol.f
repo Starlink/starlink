@@ -1,4 +1,4 @@
-       SUBROUTINE TBL_NEWCOL( TBDSCR, CNAME, CUNITS, 
+       SUBROUTINE TBL_NEWCOL( TBDSCR, CNAME, CUNITS,
      +                         CFMT, CCOMMENT, DTYPE, STATUS )
 *+
 *  Name:
@@ -14,19 +14,19 @@
 
 
 *  Invocation:
-*     CALL TBL_NEWCOL( TBDSCR, CNAME, CUNITS, CFMT, CCOMMENT,  
+*     CALL TBL_NEWCOL( TBDSCR, CNAME, CUNITS, CFMT, CCOMMENT,
 *                      DTYPE, STATUS )
 
 
 *  Description:
-*     This routine is used to create the actual 
+*     This routine is used to create the actual
 *     column structure.After defining the column
 *     values can then be put into it.
 
 
 *  Arguments:
 *     TBDSCR = CHARACTER (Given)
-*        Similar to a pointer ,Only this is 
+*        Similar to a pointer ,Only this is
 *        a character which identifies the table
 *        i.e. used to immediately locate the
 *        position of the table.
@@ -43,25 +43,25 @@
 *        The global status.
 
 
-*  Notes: 
-*     -  This routine will return without action 
+*  Notes:
+*     -  This routine will return without action
 *        if on entry the STATUS is not SAI__OK.
 *     -  The CNAME,CUNITS,CFMT  all
-*        hold information 
+*        hold information
 *        relating to the data column.
 
 *  Algorithm:
 *     -  Check STATUS , exit routine if not SAI__OK
 *     -  Create new column.
 *     -  Report an error if status not SAI__OK.
-*     -  Get the number of 
+*     -  Get the number of
 *        rows that need to be created.
 *     -  Report an error if status not SAI__OK.
 *     -  Get locator for the
 *        newly defined column.
 *     -  Report an error if status not SAI__OK.
-*     -  Create CUNITS,CFMT,NROWSW for 
-*        the new column.  
+*     -  Create CUNITS,CFMT,NROWSW for
+*        the new column.
 *     -  Report an error if status not SAI__OK.
 
 
@@ -82,7 +82,7 @@
 
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
@@ -93,7 +93,7 @@
 
 
 *  Arguments Given and Returned:
-      CHARACTER*(*) TBDSCR 
+      CHARACTER*(*) TBDSCR
       CHARACTER*(*) CNAME, CUNITS, DTYPE
       CHARACTER*(*) CFMT
       CHARACTER*(*) CCOMMENT
@@ -119,7 +119,7 @@
             STATUS = TBL__NOTTABLE
             GOTO 9999
         ENDIF
-         
+
 * Get COLUMNS structure
 
         CALL DAT_FIND( TBDSCR, 'COLUMNS', CLOC, STATUS)
@@ -129,7 +129,7 @@
         ELSEIF ( STATUS .NE. SAI__OK) THEN
              GOTO 9999
         ENDIF
-         
+
 * Get into structure and create column structure
 
         CALL DAT_NEW(CLOC, CNAME, 'COLUMN', 0, 0, STATUS)
@@ -144,7 +144,7 @@
         CALL DAT_SLICE( LOC, 1, 1, 1, SLOC, STATUS)
         DIMARR(1) = 1
         CALL DAT_MAP( SLOC, DTYPE, 'WRITE', 1, DIMARR, PTR, STATUS)
-        
+
         IF (    DTYPE(2:2) .EQ. 'I') THEN
             CALL TBL_PUTCVI( 0,        1, 1, %val(PTR))
         ELSEIF( DTYPE(2:2) .EQ. 'R') THEN

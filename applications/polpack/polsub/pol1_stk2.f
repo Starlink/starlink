@@ -16,7 +16,7 @@
 
 *  Description:
 *     This routine copies the values in the supplied array (IN) to
-*     the output arrays, re-arranging them so that they can be binned 
+*     the output arrays, re-arranging them so that they can be binned
 *     using POL1_CM1RR or POL1_CM3RR. The input values in each bin
 *     are stored as a single column in the output arrays. The number
 *     of columns in the output arrays is equal to the number of bins.
@@ -46,9 +46,9 @@
 *        The largest number of input positions in any one cell.
 *     TR( 6 ) = REAL (Given)
 *        The  coefficients of the transformation from (X,Y,Z) to cell indices.
-*        The X cell index for a position (X,Y) is given by 
-*        INT( TR( 1 ) + TR( 2 )*X ), the Y cell index is given by 
-*        INT( TR( 3 ) + TR( 4 )*Y ), the Z  cell index is given by 
+*        The X cell index for a position (X,Y) is given by
+*        INT( TR( 1 ) + TR( 2 )*X ), the Y cell index is given by
+*        INT( TR( 3 ) + TR( 4 )*Y ), the Z  cell index is given by
 *        INT( TR( 5 ) + TR( 6 )*Z ).
 *     OUT( NXBIN, NYBIN, NZBIN, MXCNT ) = INTEGER (Returned)
 *        The output data values. The first 3 axes span the cell
@@ -63,7 +63,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,25 +122,25 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the work array holding the number of input values stored in
-*  each output cell, to indicate that no input values have yet been stored 
-*  for any output cell. 
+*  each output cell, to indicate that no input values have yet been stored
+*  for any output cell.
       DO IZ = 1, NZBIN
          DO IY = 1, NYBIN
             DO IX = 1, NXBIN
-               WORK( IX, IY, IZ ) = 0  
+               WORK( IX, IY, IZ ) = 0
             END DO
          END DO
       END DO
 
 *  First do 3D data.
-      IF( SPEC ) THEN 
+      IF( SPEC ) THEN
 
 *  Go through each good input position.
          DO I = 1, NIN
-            X = XIN( I )    
+            X = XIN( I )
             Y = YIN( I )
             Z = ZIN( I )
-            IF( X .NE. VAL__BADR .AND. 
+            IF( X .NE. VAL__BADR .AND.
      :          Y .NE. VAL__BADR .AND.
      :          Z .NE. VAL__BADR ) THEN
 
@@ -157,14 +157,14 @@
                   J = WORK( IX, IY, IZ ) + 1
                   WORK( IX, IY, IZ ) = J
 
-*  Store the input data value on top of the column of values for the 
+*  Store the input data value on top of the column of values for the
 *  output cell.
                   IF( J .LE. MXCNT ) OUT( IX, IY, IZ, J ) = IN( I )
 
                END IF
 
             END IF
-   
+
          END DO
 
 *  Now do 2D data.
@@ -172,7 +172,7 @@
 
 *  Go through each good input position.
          DO I = 1, NIN
-            X = XIN( I )    
+            X = XIN( I )
             Y = YIN( I )
             IF( X .NE. VAL__BADR .AND. Y .NE. VAL__BADR ) THEN
 
@@ -187,14 +187,14 @@
                   J = WORK( IX, IY, 1 ) + 1
                   WORK( IX, IY, 1 ) = J
 
-*  Store the input data value on top of the column of values for the 
+*  Store the input data value on top of the column of values for the
 *  output cell.
                   IF( J .LE. MXCNT ) OUT( IX, IY, 1, J ) = IN( I )
 
                END IF
 
             END IF
-   
+
          END DO
 
       END IF

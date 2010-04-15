@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_REC( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR,
-     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_REC( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D, PAR, 
+*     CALL ARD1_REC( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D, PAR,
 *                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -44,7 +44,7 @@
 *        ...
 *        Pn = ...
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        A list of user co-ordinates, in groups of NDIM. 
+*        A list of user co-ordinates, in groups of NDIM.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( NDIM ) = INTEGER (Given and Returned)
@@ -63,7 +63,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -77,12 +77,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,7 +103,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,7 +138,7 @@
       INTEGER
      :        I                  ! Loop count
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        HW,                 ! Axis half width
      :        LPAR( ARD__MXDIM*2 )! Local parameters
 
@@ -162,7 +162,7 @@
       DO I = 1, NDIM
 
 *  Find the half width of the box on this axis.
-         HW = 0.5*AST_AXDISTANCE( FRM, I, PAR( I ), PAR( I + NDIM ), 
+         HW = 0.5*AST_AXDISTANCE( FRM, I, PAR( I ), PAR( I + NDIM ),
      :                            STATUS )
 
 *  Find the centre of the box on this axis.
@@ -175,7 +175,7 @@
 
 *  The parameters are now in the same format as those for a BOX region.
 *  Call the subroutine used to load a BOX region.
-      CALL ARD1_BOX( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D, 
+      CALL ARD1_BOX( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D,
      :               LPAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Jump here if an error occurs.

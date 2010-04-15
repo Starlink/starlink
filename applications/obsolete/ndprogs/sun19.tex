@@ -24,7 +24,7 @@ no instrument-specific features and can therefore be used in the
 analysis of other similar data.
 
 The term `image' as used in this note simply means a regular data
-array, which might be anything from a 1-D spectrum or profile to a 4-D 
+array, which might be anything from a 1-D spectrum or profile to a 4-D
 array consisting of several long-slit spectra with polarization vectors.
 
 }
@@ -35,10 +35,10 @@ array consisting of several long-slit spectra with polarization vectors.
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 
 % Add any document specific \newcommand or \newenvironment commands here
- 
+
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
- 
+
 \markright{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
@@ -65,7 +65,7 @@ array consisting of several long-slit spectra with polarization vectors.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -133,7 +133,7 @@ array consisting of several long-slit spectra with polarization vectors.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -217,12 +217,12 @@ array consisting of several long-slit spectra with polarization vectors.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -260,7 +260,7 @@ array consisting of several long-slit spectra with polarization vectors.
 \section{Introduction{\xlabel{introduction}}}
 \label{sec:introduction}
 
-This note describes NDPROGS v3.2 (the UNIX port); a set of programs which 
+This note describes NDPROGS v3.2 (the UNIX port); a set of programs which
 perform basic
 manipulation and display functions on images with up to six dimensions.
 The programs were written at the RGO, primarily for the
@@ -274,7 +274,7 @@ array consisting of several long-slit spectra with polarization
 vectors.
 
 The programs have been written in accordance with the methods and
-conventions of FIGARO (\xref{SUN/86}{sun86}{}). They will accept any 
+conventions of FIGARO (\xref{SUN/86}{sun86}{}). They will accept any
 FIGARO image, and
 an image created by them will be recognized by any FIGARO program which
 can handle the number of dimensions involved. Many of them duplicate
@@ -299,14 +299,14 @@ Another feature is the improved handling of 'SIMPLE' NDF data
 structures (\xref{SUN/33}{sun33}{}). These previously caused problems for some of the
 applications.
 
-This documentation has now been updated to reflect the move to 
+This documentation has now been updated to reflect the move to
 UNIX (from VMS) within the Starlink user base.
 
 \subsection{v3.1}
 
 \begin{itemize}
 
-\item There are five new applications, see section~\ref{sec:new}. 
+\item There are five new applications, see section~\ref{sec:new}.
 
 \item New options have been added to a few of the applications,
 increasing functionality of the package.
@@ -318,7 +318,7 @@ format.
 have now been removed. See the file {\tt BUGS.LIS} for details.
 
 \end {itemize}
- 
+
 \subsection{v3.0}
 
 \begin{itemize}
@@ -368,7 +368,7 @@ at the Unix shell prompt ({\tt \%}). If help is required, typing:
 \% ndprogshelp
 \end{quote}
 
-will provide a help system similar in style to that familiar to 
+will provide a help system similar in style to that familiar to
 VMS users and used with earlier versions of NDPROGS.
 
 NDPROGS may also be used from ICL (\xref{SG/5}{sg5}{}). Type:
@@ -409,9 +409,9 @@ pixels with the magic value (as defined in \xref{SGP/38}{sgp38}{}). Most of the
 routines will also test for the presence of quality and error arrays.
 There are a few points to note here:
 
-\begin{itemize} 
+\begin{itemize}
 
-\item With the current version of FIGARO (\xref{SUN/86}{sun86}{}), 
+\item With the current version of FIGARO (\xref{SUN/86}{sun86}{}),
 it is illegal to have {\em
 both} magic values and quality arrays in the same structure. Although
 it may be a future feature of FIGARO to relax this constraint, the
@@ -441,7 +441,7 @@ with DELOBJ, a standard FIGARO application.
 \item Non-zero elements in quality arrays are interpreted as ``this
 pixel contains bad data.'' The actual value has no significance.
 
-\end{itemize} 
+\end{itemize}
 
 For a discussion of the subroutine structure used to separate these
 cases, see section~\ref{sec:program}.
@@ -475,7 +475,7 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf ARITH1]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Arithmetic combination of an image or image subset with a scalar.
    \item[Parameters]:
       {\tt IMage STart ENd OPer VALue OUTput ERR\_ACT ERR\_VAL [WHole]}
@@ -483,37 +483,37 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf ARITH2]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Arithmetic combination of two images or image subsets.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage IMAGE1 STart ENd OPer OUTput ERR\_ACT ERR\_VAL [WHole]}
    \end{description}
 
 \item[\large\bf AXFLIP]:
    \begin{description}
-   \item[Function]: 
-      Reverses an image in one dimension and reverses the relevant axis array. 
+   \item[Function]:
+      Reverses an image in one dimension and reverses the relevant axis array.
 
       Currently handles 3-D images only; the FIGARO programs IREVX and IREVY
       may be used on 1-D and 2-D images.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage AXIS OUTput TUNE}
    \end{description}
 
 \item[\large\bf COLLAPSE]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Collapses an n-D image or image subset in one or more dimensions to
       create an (n-{\it c})-D image, where {\it c} is the number of collapsed
       dimensions.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage AXKEY STart ENd OUTput [WHole FLoat]}
    \end{description}
 
 \item[\large\bf DEPICT]:
    \begin{description}
-   \item[Function]: 
-      Plots a 2-D image or image subset in greyscale or colour on an image 
+   \item[Function]:
+      Plots a 2-D image or image subset in greyscale or colour on an image
       display device. Optional overplotting with contours of the same or
       another 2-D image; optional hardcopy.
    \item[Parameters]:
@@ -525,78 +525,78 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf DUMMY]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Creates a new structure containing a data array and axes initialized to
          specified values.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt OUTput NDIM SIZE AXKEY AXSTart AXENd AXLOG VALue EXTRA VALue\\
-      DTYpe ERRVal QVal [AXes]} 
+      DTYpe ERRVal QVal [AXes]}
    \end{description}
 
 \item[\large\bf HILITE]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Plots a 2-D image or image subset with a narrow colour table which moves
-      through the data range, so that all pixels with a particular value are 
-      illuminated at the same time. 
+      through the data range, so that all pixels with a particular value are
+      illuminated at the same time.
 
       Pixels not equal to the currently highlighted value are black. This is
       an effective way of finding the data values associated with features of
       interest.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd LOw HIgh PLACE MAG LABel SHOWS [WHole AXes\\
       RAMP DATA ERase]}
    \end{description}
 
 \item[\large\bf LOGIC1]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Bitwise logical combination of an {\tt INTEGER*2} image or image subset
       with a scalar.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd OPer VALue OUTput ERR\_ACT ERR\_VAL [WHole]}
    \end{description}
 
 \item[\large\bf LOGIC2]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Bitwise logical combination of two {\tt INTEGER*2} images.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage IMAGE1 STart ENd OPer OUTput ERR\_ACT ERR\_VAL [WHole]}
    \end{description}
 
 \item[\large\bf LOOK]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Displays the pixel values in a 2-D image or image subset.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STAPIX ENDPIX [AGAIN]}
    \end{description}
 
 \item[\large\bf MAGIC]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Replaces pixels of an image or image subset which are outside a
-      specified range with the magic value. Sets the bad pixel flag.            
-   \item[Parameters]: 
+      specified range with the magic value. Sets the bad pixel flag.
+   \item[Parameters]:
       {\tt IMage STart ENd LOw HIgh OUTput [WHole]}
    \end{description}
 
 \item[\large\bf MASK1]:
    \begin{description}
-   \item[Function]: 
-      Masking of an image or image subset with a scalar (MAX, MIN, various 
+   \item[Function]:
+      Masking of an image or image subset with a scalar (MAX, MIN, various
       replacements).
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd OPer VALue OUTput ERR\_ACT ERR\_VAL [WHole]}
    \end{description}
 
 \item[\large\bf MASK2]:
    \begin{description}
-   \item[Function]: 
-      Masking of one image or image subset with another (MAX, MIN, various 
+   \item[Function]:
+      Masking of one image or image subset with another (MAX, MIN, various
       replacements).
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage IMAGE1 STart ENd OPer OUTput ERR\_ACT ERR\_VAL [WHole]}
    \end{description}
 
@@ -622,10 +622,10 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf PEEK]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Displays the values of a specified image pixel and its immediate
       neighbours.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage PIXel [AGAIN]}
    \end{description}
 
@@ -634,7 +634,7 @@ More information on commands is available in the NDPROGS help library.
    \item[Function]:
       Displays spectra extracted from a ZXY-sorted SLDC. A range of XY
       coordinates is indicated with the cursor on a plot of a 2-D image
-      (derived from an XY plane of the SLDC). 
+      (derived from an XY plane of the SLDC).
 
       All the spectra extracted within the range are displayed together
       on a single plot. Optional hardcopy and output of spectra to data
@@ -646,20 +646,20 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf SETAXES]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Re-calibrates one or more of the axes of an image.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage OUTput AXKEY AXSTart AXENd AXLOG}
    \end{description}
 
 \item[\large\bf SMOOTH]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Smooths an image or image subset in one, two, or three dimensions
       by convolution with a top hat, Gaussian, or sinc function. v3.1
       now also has a Moffat function for 1-D images. Currently handles
       1-D, 2-D, and 3-D images only.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd SMOOTH FNDIM BOX WIDTHS OUTput [WHole]}
    \end{description}
 
@@ -672,7 +672,7 @@ More information on commands is available in the NDPROGS help library.
 
       The spectra are plotted alongside the image; their XY locations
       are shown with pointer lines. Optional hardcopy and output of
-      spectra to data structures.  
+      spectra to data structures.
    \item[Parameters]:
       {\tt IMage IMAGE1 SLOw SHIgh STart ENd LOw HIgh TABle LABel SLABel\\
       XPIX YPIX MAG NPLOTS BIN SPectrum [SCale WHole TWOCUR WRite]}
@@ -682,47 +682,47 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf SQUINT]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Displays the pixel values in a 2-D image or image subset, using
       alphanumeric characters to give a crude eight-level grey scale.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STAPIX ENDPIX [AGAIN]}
    \end{description}
 
 \item[\large\bf STATS]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Computes basic statistics of an image or image subset. Optionally
       checks and if necessary corrects the bad pixel flag.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd [WHole CHECK PASS2]}
    \end{description}
 
 \item[\large\bf SUBSET]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Creates a subset of an image.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd OUTput}
    \end{description}
 
 \item[\large\bf TRANSFORM]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Geometric transformation program for shifting, rotating, and
       resampling an image.
 
       The operations may be performed separately or in combination. New
       pixel values may be derived from from nearest neighbours or by
       linear interpolation. Currently handles 2-D and 3-D images only.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage SHIFT CENTRE ANGLE RESAMPLE INTERP AXKEY AXSTart AXENd\\
       AXLOG OUTput [AXes]}
    \end{description}
 
 \item[\large\bf TRANSPOSE]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Transposes the dimensions of an image by resequencing the data
       array and exchanging the relevant axis arrays.
 
@@ -731,13 +731,13 @@ More information on commands is available in the NDPROGS help library.
       example spectral line analysis in a TAURUS data cube. Currently
       handles 3-D images only; the FIGARO programs ROTATE, IREVX, and
       IREVY may be used on 2-D images.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage ORDER OUTput TUNE}
    \end{description}
 
 \item[\large\bf TYPECON]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Converts the data (and error) array of an image structure from
       any type to either {\tt INTEGER*2} or {\tt REAL}. Errors will
       occur on conversion to {\tt INTEGER*2} if any pixel values are
@@ -748,7 +748,7 @@ More information on commands is available in the NDPROGS help library.
       described in this note can use a CONTRACTed image instead of an
       {\tt INTEGER*2} image, but there will be a significant delay
       while the values are scaled back to their original range.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\bf IMage OUTput [SHort FLoat]}
    \end{description}
 
@@ -756,14 +756,14 @@ More information on commands is available in the NDPROGS help library.
 
 \item[\large\bf UNMAGIC]:
    \begin{description}
-   \item[Function]: 
+   \item[Function]:
       Replaces bad pixels in an image or image subset with an
-      appropriate value. 
+      appropriate value.
 
       New pixel values may be derived from the average of adjacent
       pixels or by linear interpolation.  Alternatively, all bad pixels
       may be replaced by the same constant.
-   \item[Parameters]: 
+   \item[Parameters]:
       {\tt IMage STart ENd INTERP MINADJ VALue OUTput [WHole]}
    \end{description}
 
@@ -779,7 +779,7 @@ ADDND is a program that performs co-adding of images, that is, it will use
 either axis information (if present) or user-specified values to align the
 images on a common set of axes, and then add them pixel-by-pixel. It will
 handle up to 16 images in one execution, and with careful use can be used to
-mosaic images in a basic manner. 
+mosaic images in a basic manner.
 
 \subsubsection{Scope}
 
@@ -811,12 +811,12 @@ The default value is $10^{-7}$.
 \end{itemize}
 
 The rules governing how the images are added are complex. If you need or wish
-to know more, then read the `method' section of the {\tt SOURCE\_COMMENTS} in 
-the HELP library.  
+to know more, then read the `method' section of the {\tt SOURCE\_COMMENTS} in
+the HELP library.
 
 \subsection{DEGAMMA}
 
-This is a program designed to remove statistically irrelevant data, for example 
+This is a program designed to remove statistically irrelevant data, for example
 cosmic ray events (hence the name). It works by looking for pixels that lie
 more than a prescribed number of standard deviations from the mean pixel value
 in the z-axis. For these pixels, neighbouring values are examined to see if
@@ -829,7 +829,7 @@ neighbours.
 \begin{itemize}
 \item 3D data only, sorted $(z,x,y)$. (This is because VMS pages were more
 efficiently in this order.) The cube is comprised of a number of frames of a 2D
-image, and can be built as described later.                                 
+image, and can be built as described later.
 \item Magic values, quality and error arrays all supported.
 \item Subsetting supported.
 \end{itemize}
@@ -862,7 +862,7 @@ neighbours.
 \item {\bf POSDEV.} Instructs DEGAMMA to only look for positive deviations from
 the mean.
 \item {\bf XYWEIGHT.} (Hidden.) This can be used to give higher (or lower)
-weighting for pixels in the `$x-y$' plane. 
+weighting for pixels in the `$x-y$' plane.
 \end{itemize}
 
 \subsubsection{Using DEGAMMA}
@@ -878,31 +878,31 @@ should be taken, though as you may accidentally destroy data if you are using
 data types other than FLOAT - it all depends upon what the values are. If in
 doubt, TYPECON each frame to FLOAT.
 \item Run STACK to produce a 3D datacube. Note: since the top or bottom images
-have one fewer neighbour than other images, the algorithm will be slightly less 
-efficient for those planes. Setting the DOEDGE parameter FALSE will exclude 
+have one fewer neighbour than other images, the algorithm will be slightly less
+efficient for those planes. Setting the DOEDGE parameter FALSE will exclude
 these frames from
 being processed, but if you know that one particular image is noisy, make sure
-that it isn't on the top or bottom.  
+that it isn't on the top or bottom.
 wish to clean up is {\em not} on the top or bottom plane of the cube.
 \item Run TRANSPOSE to order the planes $(z,x,y)$.
 \item It may be desirable to get rid of magic values if they appear in your
 cube. Although DEGAMMA handles magic values in a logical way, a saturated pixel
 could accidentally take on the magic value and confuse affairs. In this case,
-run UNMAGIC on your cube. 
+run UNMAGIC on your cube.
 \end{itemize}
 Once your data is in the correct form, run STATS to give you an idea of the
 sort of data values you can expect. This is best done in conjunction with
 running DEPICT on the individual frames so you can look for damaged areas. In
 particular, it is worthwhile noting that if an image is saturated (especially
 easy with SHORT data), DEGAMMA will work less efficiently, as it will find it
-harder to spot spurious pixels. 
+harder to spot spurious pixels.
 
 Having done all this, you can now run DEGAMMA. Run it with the VERBOSE flag set
 so that you can see what it's up to. Note: large images may have to be split
 into smaller chunks if there are memory restrictions. The first few parameters
 are standard. For DOEDGE, generally type NO! Hopefully, objects of interest
 will be in the centre of the field. Using DOEDGE can result in hundreds of dud
-pixels, especially when you have only 3 or 4 image planes. 
+pixels, especially when you have only 3 or 4 image planes.
 
 NNPIX is perhaps the most important parameter. It takes a value from $0$ to $6$
 and determines how many pixels surrounding the one currently being tested are
@@ -918,7 +918,7 @@ TOL determines if two pixels are to be considered `equal'. For example, if TOL
 is $20$ and two adjacent pixels have values $3452$ an $3460$ then these pixels
 are `equal', whilst if the second pixel has value $3500$ they are not. The
 value you enter for this parameter will depend upon several things, but mostly
-the deviation and data type. For example, with type SHORT, a mean pixel value 
+the deviation and data type. For example, with type SHORT, a mean pixel value
 of $20$, a deviation of $10$, a value of $1-5$ might be appropriate. It should
 generally be less than the deviation, but should be guided by the values of
 pixels {\em within} features rather than global statistics. For example, with
@@ -951,7 +951,7 @@ either interpolated from the surrounding values, or (if there aren't enough
 valued pixels around it) the mean pixel value.
 
 XYWEIGHT is a hidden parameter whose use could best be described as
-`unpredictable.' It's purpose is to say that an adjacent pixel in the 
+`unpredictable.' It's purpose is to say that an adjacent pixel in the
 image plane is more likely to be `real' data than an adjacent pixel lying above
 or below the image plane. A value of $1.0$ (default) says they are equally
 weighted. As it is increased, the weighting is pushed towards pixels in the
@@ -966,9 +966,9 @@ could therefore be useful for correcting pixels on the edges of the cube.
 
 DEGAMMA is a `hands-on' data filtering package that uses a simple but flexible
 approach to the rejection of spurious pixel values. Programs of
-this nature tend not to please all of the people all of the time, but even 
-with the default parameters, DEGAMMA will please at least some of the people 
-some of the time, which has to be something at least! 
+this nature tend not to please all of the people all of the time, but even
+with the default parameters, DEGAMMA will please at least some of the people
+some of the time, which has to be something at least!
 
 \subsection{SLICE3D}
 
@@ -1028,7 +1028,7 @@ result is a 3D stack of 2D images.
 the images to be co-added. It defaults to {\tt FILES.DAT}.
 \item {\bf JOIN.} The number of the axis the images are to be joined along.
 \item {\bf OUTPUT.} The name of the output image.
-\item {\bf PADVAL.} A value to pad images out with should they need to be 
+\item {\bf PADVAL.} A value to pad images out with should they need to be
 extended.
 \item {\bf SMALL.} This is a hidden parameter. It allows the user to set the
 value at which a floating-point number should be effectively considered zero.
@@ -1039,7 +1039,7 @@ used to align the cubes.
 \end{itemize}
 
 The rules for manipulating the images are quite involved. Should the user need
-or wish to know more, refer to the comments in the HELP library. 
+or wish to know more, refer to the comments in the HELP library.
 
 \subsection{STRETCH}
 
@@ -1050,7 +1050,7 @@ interpolation method.
 \subsubsection{Scope}
 
 \begin{itemize}
-\item Up to 3 dimensional data. 
+\item Up to 3 dimensional data.
 \item Magic values, error and quality arrays supported.
 \item Batch mode execution supported.
 \end {itemize}
@@ -1070,21 +1070,21 @@ linear).
 \section{Documentation{\xlabel{documentation}}}
 \label{sec:documentation}
 
-This document, SUN/19, replaces SUN/27 in terms of normal NDPROGS usage. 
+This document, SUN/19, replaces SUN/27 in terms of normal NDPROGS usage.
 
 \section{Scope of programs{\xlabel{scope}}}
 \label{sec:scope}
 
-Table 1 summarizes the present capability of each program with respect 
+Table 1 summarizes the present capability of each program with respect
 to several criteria. A dash means that the criterion is not relevant.
-`Image subset' indicates whether a subset of the image can be selected for 
+`Image subset' indicates whether a subset of the image can be selected for
 processing. `Magic values' indicates whether bad pixels can be distinguished
-from valid pixels by having a specific value.    
+from valid pixels by having a specific value.
 
 {\small
 \begin{table}[ht]
-\begin{center}                
-\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|} \hline                                  
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|} \hline
 Program & No. of & Data  & Image  & Magic  & Batch & Quality & Error \\
         & dims   & types & subset & values & mode  & Arrays & Arrays\\
 \hline
@@ -1143,13 +1143,13 @@ The structure is as follows:
 
 \begin{myquote}
 \begin{verbatim}
-    <RESULTS> 
+    <RESULTS>
         .Z
           .DATA   [NPAR,NPEAKS,NX,NY] FLOAT
           .ERRORS [NPAR,NPEAKS,NX,NY] FLOAT
-        .X      
+        .X
           .DATA   [NX]                FLOAT
-        .Y     
+        .Y
           .DATA   [NY]                FLOAT
 \end{verbatim}
 \end{myquote}
@@ -1174,7 +1174,7 @@ The additional information is:
 
 \begin{myquote}
 \begin{verbatim}
-   <RESULTS> 
+   <RESULTS>
      .<PROGRAM>
        .X        INT
        .Y        INT
@@ -1190,7 +1190,7 @@ The {\tt .<PROGRAM>} field is either {\tt PLOTS} or {\tt SPECTRUM}.
 The {\tt .X} and {\tt .Y} fields are the (pixel) co-ordinates of the
 extraction; {\tt .BIN} is the bin size; {\tt .MODE} is (for SPECTRUM) one of
 ``RECTANGLE'', ``POLYGON'' or ``PIXEL'', whilst (for PLOTS) is either of
-``RECTANGLE'' or ``POLYGON''. In PLOTS, details of the actual rectangle 
+``RECTANGLE'' or ``POLYGON''. In PLOTS, details of the actual rectangle
 or polygon are written to a separate data structure, named {\tt
 <file>\_DAT.DST}. This is to avoid swallowing disk space with superfluous data
 since PLOTS will output several spectra per extraction.
@@ -1199,7 +1199,7 @@ data is written to the structure:
 
 \begin{myquote}
 \begin{verbatim}
-   <RESULTS> 
+   <RESULTS>
      .
      .
      .
@@ -1211,7 +1211,7 @@ for a polygon, or
 
 \begin{myquote}
 \begin{verbatim}
-   <RESULTS> 
+   <RESULTS>
      .
      .
     .WIDTH  INT
@@ -1222,7 +1222,7 @@ for a polygon, or
 for a rectangle. The {\tt .MASK} field is an array of $0$'s and $1$'s, where
 $1$ represents a valid pixel and $0$ a pixel to omit in the averaging or
 extraction.
-              
+
 \section{Standard FIGARO programs{\xlabel{figaro}}}
 \label{sec:figaro}
 
@@ -1244,21 +1244,21 @@ If news of the latest developments is required, you might also try:
 \end{verbatim}
 \end{myquote}
 
-Refer to 
-\xref{SUN/86}{sun86}{} 
+Refer to
+\xref{SUN/86}{sun86}{}
 for more details.
 
-\section{Building NDPROGS{\xlabel{building}}} 
+\section{Building NDPROGS{\xlabel{building}}}
 \label{sec:building}
 
 Users of the Unix system are advised to install NDPROGS
-using the following instructions. 
+using the following instructions.
 
-NDPROGS is supplied as a compressed tar file: {\tt ndprogs.tar.Z}. To install 
+NDPROGS is supplied as a compressed tar file: {\tt ndprogs.tar.Z}. To install
 NDPROGS the file must be must be uncompressed and the contents extracted to a
 suitable directory.  On Starlink systems, this would be {\tt /star/ndprogs}.
 
-\begin{myquote} 
+\begin{myquote}
 \begin{verbatim}
 % mkdir /star/ndprogs ; cd /star/ndprogs
 % zcat /tmp/ndprogs.tar.Z | tar xvf -
@@ -1270,17 +1270,17 @@ operating system you are using. The example given below shows the value
 of SYSTEM needed to create a SunOS version of the software. The values
 required for other Starlink supported systems may be found in the files
 {\tt mk} and {\tt makefile}.
- 
+
 \begin{myquote}
 \begin{verbatim}
 % setenv SYSTEM sun4
 \end{verbatim}
 \end{myquote}
- 
+
 The UNIX 'make' facility may then be employed to generate NDPROGS in the
 current directory, clean up after itself and move the run system to the
 install directories:
- 
+
 \begin{myquote}
 \begin{verbatim}
 % setenv INSTALL /star
@@ -1289,15 +1289,15 @@ install directories:
 % ./mk install
 \end{verbatim}
 \end{myquote}
- 
+
 On Starlink systems, the necessary environment files and aliases will
 be automatically set up by the {\tt /star/etc/login} and {\tt /star/etc/cshrc}
-files on login, if NDPROGS is detected as being installed in 
+files on login, if NDPROGS is detected as being installed in
 {\tt /star/bin/ndprogs}.
- 
-If it isn't, you should set NDPROGS\_DIR and NDPROGS\_HELP as follows in your own 
+
+If it isn't, you should set NDPROGS\_DIR and NDPROGS\_HELP as follows in your own
 {\verb+ ~/.login+} file:
- 
+
 \begin{myquote}
 \begin{verbatim}
 setenv NDPROGS_DIR /star/bin/ndprogs
@@ -1317,10 +1317,10 @@ out the various programs. To run it, start up NDPROGS and type
 \end{verbatim}
 \end{myquote}
 
-At which point you should occupy yourself for between 5 and 20 minutes or 
-so! The end results are a displayed picture and a data structure. 
+At which point you should occupy yourself for between 5 and 20 minutes or
+so! The end results are a displayed picture and a data structure.
 If everything went
-to plan then the data structure should be full of $0$'s. The operations 
+to plan then the data structure should be full of $0$'s. The operations
 performed are as follows:
 \begin{itemize}
 \item Create a test image, $256\times 128\times 4$, with a quality array, error
@@ -1343,7 +1343,7 @@ type SHORT.
 \label{sec:generic}
 
 As mentioned in section~\ref{sec:features}, the n-D programs feature support for
-{\tt INTEGER*2} and {\tt REAL} data types and for magic values. These 
+{\tt INTEGER*2} and {\tt REAL} data types and for magic values. These
 requirements posed two interesting problems for the authors. Firstly, a
 subroutine with an {\tt INTEGER*2} declaration for the data array cannot
 handle {\tt REAL} data, and vice versa. Secondly, it would be most impractical
@@ -1351,9 +1351,9 @@ to test for the magic value at every pixel in a typical 3-D image (at least 16M
 for TAURUS) if it were known that magic values were absent. Things are also
 complicated by the mutual exclusivity of magic values and quality arrays.
 
-The chosen solution is to use a separate subroutine for each of the  
+The chosen solution is to use a separate subroutine for each of the
 possible cases. Since there is no point in writing several largely identical
-pieces of code, a single generic subroutine is provided, from which the  
+pieces of code, a single generic subroutine is provided, from which the
 variants are generated. More than one such generic subroutine may be present,
 each giving rise to its own set of variants.
 
@@ -1364,8 +1364,8 @@ way. (It is important that the GENERIC subroutines and the pure FORTRAN are not
 mixed. This will lead to ``multiply defined symbol" errors.)
 
 GENERIC scans the input file looking for certain tokens which are delimited
-by {\tt <>}. When it finds such a token, it replaces both the {\tt <>}'s and 
-the symbol with a string dependent on the token and values supplied to 
+by {\tt <>}. When it finds such a token, it replaces both the {\tt <>}'s and
+the symbol with a string dependent on the token and values supplied to
 GENERIC. The usual invocation in the current context for Unix is
 
 \begin{myquote}
@@ -1389,7 +1389,7 @@ C
       IMPLICIT NONE
 C
 C     Parameters
-C                                                       
+C
       CHARACTER*(*) OPER
       INTEGER       DIMS(10),NDIM,NELM,DIMS1(10),NDIM1,NELM1,
      &              STAPIX(6),ENDPIX(6)
@@ -1401,7 +1401,7 @@ C
                     OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
                     I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
 C
-CQ                  IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+CQ                  IF(OARRAY(OOFF).GT.MAGICVAL .AND.
 CQ   &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
                       OARRAY(OOFF)=OARRAY(OOFF)+ARRAY1(I1OFF)
 CQ                  ELSE
@@ -1413,9 +1413,9 @@ C
 \end{myquote}
 
 Above, the `{\tt CQ}' flags indicate lines which are only relevant when magic
-values are known to be present. The remaining code processes each pixel 
-regardless of its value. In the {\tt \_WQ} and {\tt \_RQ} variants of the 
-subroutine the flags would be removed, enabling the magic value test to be 
+values are known to be present. The remaining code processes each pixel
+regardless of its value. In the {\tt \_WQ} and {\tt \_RQ} variants of the
+subroutine the flags would be removed, enabling the magic value test to be
 performed. It is, alas, still up to the programmer to perform this task!
 
 There is often a problem with data types when we require to convert between
@@ -1450,43 +1450,43 @@ ARRAY(I) = DCV_ITO<T>(2)
 
 whereupon GENERIC will process the {\tt <T>} token as usual, and the compiler
 will process the necessary function calls as standard FORTRAN functions. There
-are functions for converting between all the types GENERIC recognizes. For 
-more information on GENERIC, refer to 
+are functions for converting between all the types GENERIC recognizes. For
+more information on GENERIC, refer to
 \xref{SUN/7}{sun7}{}.
 
 One point worth remembering is that IRAF also uses a program called generic.
-Whilst this is functionally similar to the Starlink version the two routines 
-are not compatible. Care should be taken to ensure that your path 
+Whilst this is functionally similar to the Starlink version the two routines
+are not compatible. Care should be taken to ensure that your path
 accesses the correct version.
 
 
 \section{Programming notes{\xlabel{notes}}}
 \label{notes}
 
-This section is for information only and is not intended to be a complete 
+This section is for information only and is not intended to be a complete
 programmer's guide. It is included in order to point out the similarities
-and differences between creating programs in standard FIGARO 
+and differences between creating programs in standard FIGARO
 (\xref{SUN/86}{sun86}{}) and in the
 n-D package. In practice, if any of the n-D programs requires correction
 or modification, a request should be sent to the Starlink Librarian.
 
 The FIGARO Programmer's Guide written by Keith Shortridge is available
-from Starlink as MUD/14. The programming section of 
-\xref{SUN/86}{sun86}{} also contains an 
-introduction to the subject of programming in FIGARO. Since the n-D package is 
-designed to be compatible with FIGARO, the instructions given in these 
+from Starlink as MUD/14. The programming section of
+\xref{SUN/86}{sun86}{} also contains an
+introduction to the subject of programming in FIGARO. Since the n-D package is
+designed to be compatible with FIGARO, the instructions given in these
 documents are all relevant, and as Keith puts it, `mostly' true.
 
 
 \subsection{Compilation and linking}
 
 All compilation and linking is best carried out under the control of
-{\tt mk} and {\tt makefile} provided with the compressed and {\tt tar}red 
+{\tt mk} and {\tt makefile} provided with the compressed and {\tt tar}red
 NDPROGS source code. As for normal installation, you will need
 to set up suitable values for the environmental variables {\tt INSTALL}
 {\tt SYSTEM} and {\tt NDPROGS\_HELP}.
 
-If changes are made to the source of any of the 
+If changes are made to the source of any of the
 applications NDPROGS may be simply regenerated using {\tt mk} and {\tt makefile}.
 
 If new applications are to be added, suitable additions must be made to
@@ -1496,25 +1496,25 @@ the following file:
 properly. Particular care must be taken to ensure include files
 are set up properly.
 
-{\tt ndprogs\_setup.csh} so that once built, the program is started up with the 
+{\tt ndprogs\_setup.csh} so that once built, the program is started up with the
 other NDPROGS applications.
 
 {\tt ifblock.inc} so that the ndprogs monolith knows the new application exists
 and will use it.
 
-{\tt ndprogshelp.hlp} so that the help system has some information on the new 
+{\tt ndprogshelp.hlp} so that the help system has some information on the new
 application.
 
-You will also need to create an appropriate interface file 
-{\tt application.ifl} for 
+You will also need to create an appropriate interface file
+{\tt application.ifl} for
 the new application.
 
 
 \subsection{Image graphics}
 \label{image}
 
-The n-D programs use the Starlink GKS version (\xref{SSN/39}{ssn39}{}) of PGPLOT 
-(\xref{SUN/15}{sun15}{}) for line and image 
+The n-D programs use the Starlink GKS version (\xref{SSN/39}{ssn39}{}) of PGPLOT
+(\xref{SUN/15}{sun15}{}) for line and image
 graphics. The calls to PGGRAY that existed in previous releases have been
 replaced by calls to PGPIXL (with suitable pre-processing) in order to link
 the programs with shareable libraries. In v3.1 the problem with some
@@ -1531,11 +1531,11 @@ INCLUDE 'NDP_SOURCE:NDP_QUALITY_MASK.INC'
 \end{verbatim}
 \end{myquote}
 
-which in v3.2 became 
+which in v3.2 became
 
 \begin{myquote}
 \begin{verbatim}
-ndp_quality_mask.inc; $(LINK) $? $@ 
+ndp_quality_mask.inc; $(LINK) $? $@
 \end{verbatim}
 \end{myquote}
 
@@ -1543,10 +1543,10 @@ in the v3.2 Unix makefile.
 
 This is in accordance with \xref{SGP/38}{sgp38}{} and Asterix conventions that different values
 in a quality array can flag different reasons for the pixel being void. The
-include file contains a mask {\tt BADBITS} of type {\tt BYTE} that should be 
-logically-ANDed with the quality value before testing. The file also defines 
-the necessary constants, all prefixed with {\tt Q\_}. These applications set 
-quality values to {\tt Q\_GOOD} or {\tt Q\_BAD} now, rather than $0$ or $1$. 
+include file contains a mask {\tt BADBITS} of type {\tt BYTE} that should be
+logically-ANDed with the quality value before testing. The file also defines
+the necessary constants, all prefixed with {\tt Q\_}. These applications set
+quality values to {\tt Q\_GOOD} or {\tt Q\_BAD} now, rather than $0$ or $1$.
 Thus a code snippet could look like
 
 \begin{myquote}
@@ -1560,16 +1560,16 @@ Thus a code snippet could look like
 \end{myquote}
 
 {\em All} NDPROGS applications will use this convention in the next release.
-In the short term, this should not prove a problem, as {\tt BADBITS} is 
+In the short term, this should not prove a problem, as {\tt BADBITS} is
 usually set to $11111111_{(2)}$.
 
 \subsection{Other changes}
 
 In this release of NDPROGS we no longer use {\tt .DEF} files to
 construct ``simple'' output structures. The use of the routine
-DSA\_SIMPLE\_OUTPUT greatly simplifies the task of building new files of any 
-type or dimension, containing quality or error arrays as well. Wherever 
-possible, it is recommended that programmers follow this guideline. See the 
+DSA\_SIMPLE\_OUTPUT greatly simplifies the task of building new files of any
+type or dimension, containing quality or error arrays as well. Wherever
+possible, it is recommended that programmers follow this guideline. See the
 sources for DUMMY or MOMENTS for examples.
 
 \end{document}

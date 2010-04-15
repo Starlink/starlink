@@ -2,7 +2,7 @@
      :                   STATUS )
 *+
 *  Name:
-*     RDPIPD - READ PISA PEAK DATA 
+*     RDPIPD - READ PISA PEAK DATA
 
 *  Purpose:
 *     To read in one line of data from an PISAPEAK results file.
@@ -17,7 +17,7 @@
 *  Description:
 *     The routine reads in one line of the PISAPEAK data in FIO file
 *     LI, returning the values. The lines are parsed using word
-*     extraction routines not via fortran formatting. 
+*     extraction routines not via fortran formatting.
 
 *  Arguments:
 *     LI = INTEGER (Given)
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -60,7 +60,7 @@
       INCLUDE 'FIO_ERR'          ! FIO system error codes
 
 *  Arguments Given:
-      INTEGER LI            
+      INTEGER LI
 
 *  Arguments Given and Returned:
       CHARACTER BUF * ( * )

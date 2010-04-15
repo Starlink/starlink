@@ -1,6 +1,6 @@
 proc red4FileStd {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -64,7 +64,7 @@ proc red4FileStd {taskname} {
     bind $Red4Widgets(FS_ENT05) <Double-Button-2> "$Red4Widgets(FS_ENT05) delete 0 end"
 
 # Show the dialog box
-    set bv [dialogShow .red4Dialogue .red4Dialogue] 
+    set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
       set Red4Widgets(RG)      [string trim [$Red4Widgets(FS_ENT01) get]]

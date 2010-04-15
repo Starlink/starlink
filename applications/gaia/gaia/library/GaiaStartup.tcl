@@ -845,7 +845,7 @@ itcl::class gaia::GaiaStartup {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  List of options that are handled. 
+   #  List of options that are handled.
    common options {
       always_merge
       autofit

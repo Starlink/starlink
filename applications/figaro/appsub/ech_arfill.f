@@ -2,7 +2,7 @@ C+
       SUBROUTINE ECH_ARFILL(OUTPUT,NX,NORDERS,F1,F2,FITS,
      :                          NFITS,NC,MLDATA,WTS,ORDER)
 C
-C     E C H _ A R F I L L 
+C     E C H _ A R F I L L
 C
 C     This subroutine fills the OUTPUT array with wavelength values by
 C     interpolating/extrapolating between/beyond the fitted orders.
@@ -17,18 +17,18 @@ C     (>) NORDERS (Integer)  The number of rows in the OUTPUT image.
 C     (>) OFITS   (Real Array OFITS(NOFITS))  The order numbers which
 C                 where are already filled with wavelengths on input.
 C     (>) NOFITS  (Integer)  The number of orders filled on input.
-C     (W) MLDATA  (Real Array MLDATA(NOFITS))  A Workspace array for 
+C     (W) MLDATA  (Real Array MLDATA(NOFITS))  A Workspace array for
 C                 the order number * lambda product, which will be fit
 C                 in order to calculate other lambda's and fill OUTPUT.
 C     (W) WTS     (Real Array WTS(NOFITS)) The weights to be applied to
-C                 the MLDATA points; this array is set to 1.0 
+C                 the MLDATA points; this array is set to 1.0
 C                 everywhere.
 C     (>) F1      (Integer)  The first order number in OUTPUT.
 C     (>) F2      (Integer)  The last order number in OUTPUT.
 C
 C     Subroutines / Functions used:
 C
-C        FIG_WXYFIT - (FIGARO) -- fits a polynomial to a set of points 
+C        FIG_WXYFIT - (FIGARO) -- fits a polynomial to a set of points
 C                 with adjustable weighting factors.
 C
 C        GEN_EPOLYD - (GEN_pckg) -- returns the double precision evalua-
@@ -64,7 +64,7 @@ C
 C     Determine direction of fit
 C
       IF (F1.LT.F2) THEN
-         DY=1   
+         DY=1
       ELSE
          DY=-1
       END IF

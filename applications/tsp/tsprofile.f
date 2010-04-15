@@ -9,8 +9,8 @@ C
 C     Function:
 C        Determine a spatial profile from a time series image
 C
-C     Description:   
-C        This command is used to generate a spatial profile time series 
+C     Description:
+C        This command is used to generate a spatial profile time series
 C        image which is a smoothed representation of the actual stellar
 C        profile. The profile can be used for subsequent optimal extraction
 C        of a light curve of the star using the TSEXTRACT command.
@@ -31,7 +31,7 @@ C
 C-
 C
 C  History:
-C    14/11/1991   Original Version.   JAB/JAC 
+C    14/11/1991   Original Version.   JAB/JAC
 C    15/11/1991   Remove use of variance.    JAB/JAC
 C
 
@@ -111,7 +111,7 @@ C     Maximum polynomial degree
 100   CONTINUE
       END
 
-      
+
 
       SUBROUTINE PROFILE_WORK(NX,NY,NZ,NA,I,RES,X,Y,W,A,R,XS,XE,
      :      YS,YE,DEGREE,NREJECT,STATUS)
@@ -141,7 +141,7 @@ C     (>) NREJECT (Integer) Number of points to reject from each fit
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     PDA_DPOLFT      (Starlink PDA library)  Fit Polynomial
 C
@@ -218,7 +218,7 @@ C     Sum good data
       ENDDO
 C
 C     Do polynomial fits along each row to give more accurate profile image
-C              
+C
 C
 C     Set up parameters needed for PDA_DPOLFT
 C
@@ -238,7 +238,7 @@ C
              IF (I(IX,IY,IZ) .NE. VAL__BADR) THEN
                 NGOOD = NGOOD+1
              ENDIF
-          ENDDO 
+          ENDDO
 C
 C     Set up arrays for polynomial fit to curent row.
 C     Note that the weight required by PDA_DPOLFT is 1/variance
@@ -269,16 +269,16 @@ C
 C
 C     Calculate residuals and delete worst point
 C
-              RMAX = -1D0                            
-              DO INDEX = 1,NGOOD                         
+              RMAX = -1D0
+              DO INDEX = 1,NGOOD
                   XCAP = (2D0*X(INDEX) - DX2)/DX
                   IFAIL=0
                   CALL PDA_DP1VLU(DEGREE,0,XCAP,VALUE,DUMMY,A,IFAIL)
-                  RCUR = ABS(Y(INDEX)-VALUE)         
-                  IF (RCUR .GT. RMAX) THEN          
-                      RMAX = RCUR                   
-                      IMAX = INDEX               
-                  ENDIF                          
+                  RCUR = ABS(Y(INDEX)-VALUE)
+                  IF (RCUR .GT. RMAX) THEN
+                      RMAX = RCUR
+                      IMAX = INDEX
+                  ENDIF
               ENDDO
               DO INDEX = IMAX,NGOOD-1
                  Y(INDEX)=Y(INDEX+1)
@@ -292,12 +292,12 @@ C
               EPS=0.0D0
               CALL PDA_DPOLFT(NGOOD,X,Y,W,DEGREE,NDEG,EPS,R,IFAIL,A,
      :                        STATUS)
-              IF (IFAIL .NE. 1) THEN                                  
+              IF (IFAIL .NE. 1) THEN
                   CALL MSG_SETI('IFAIL', IFAIL)
                   CALL MSG_OUT(' ','Error in PDA_DPOLFT - IFAIL=^IFAIL',
      :                         STATUS)
-                  GOTO 500                                            
-              ENDIF                                                   
+                  GOTO 500
+              ENDIF
           ENDDO
 C
 C    Replace data by fit
@@ -310,7 +310,7 @@ C
               IF (IFAIL .EQ. 0) THEN
                   IF (VALUE .LT. 0D0) VALUE=0D0
                   RES(IX,IY,IZ) = VALUE-I(IX,IY,IZ)
-                  I(IX,IY,IZ) = VALUE 
+                  I(IX,IY,IZ) = VALUE
               ELSE
                   CALL MSG_SETI('IFAIL',IFAIL)
                   CALL MSG_OUT(' ',
@@ -331,7 +331,7 @@ C
             DO IX=XS,XE
               IF (I(IX,IY,IZ) .NE. VAL__BADR) THEN
                   SUM = SUM+I(IX,IY,IZ)
-              ENDIF       
+              ENDIF
             ENDDO
           ENDDO
           DO IY=YS,YE

@@ -334,8 +334,8 @@ C                         .MODE[16] CHAR     'rectangle','polygon' or 'pixel'
 C                         .MASK     2D BYTE  mask array
 C                         .WIDTH    INT      Width of averaging rectangle
 C                         .HEIGHT   INT      Height "     "         "
-C                     }     
-C                   (GOLDJIL) 
+C                     }
+C                   (GOLDJIL)
 C
 C   25-NOV-1992   - Unix version. (GOLDJIL)
 C   02-OCT-1994   - Correct the initialisation of the mask array in
@@ -1034,7 +1034,7 @@ c
 c
 c   Unknown option
 c
-        else 
+        else
           call dsa_wruser('Unknown option.\\N')
         end if
       end do
@@ -1045,9 +1045,9 @@ c
       call pgend
       call dsa_close(status)
       end
- 
- 
- 
+
+
+
       subroutine magic_zap(qual,data,nx,ny,val)
       implicit none
 c
@@ -1072,9 +1072,9 @@ c
          end do
       end do
       end
- 
- 
- 
+
+
+
       subroutine spectrum_slabel
      &  (ximv,yimv,nplots,slabel)
 c
@@ -1111,9 +1111,9 @@ c
       call pglabel(slabel,' ',' ')
 c
       end
- 
- 
- 
+
+
+
       SUBROUTINE SPECTRUM_WRITE
      &  (ARRAY,SPAXIS,NELM,BADPIX,SPECNAME,
      &   X,Y,BIN,MODE,POLYGON,NX,NY,MASK,TWOCUR,
@@ -1166,7 +1166,7 @@ C
       DTA_STATUS = 0
       DIMS(1) = NX
       DIMS(2) = NY
-      NELM1 = NX*NY      
+      NELM1 = NX*NY
 C
 C     Create new structure
 C
@@ -1218,7 +1218,7 @@ C
       IF (DTA_STATUS .NE. 0) THEN
         CALL DTA_ERROR(DTA_STATUS,ERRMSG)
         CALL DSA_WRUSER(ERRMSG(:ICH_LEN(ERRMSG))//'\\N')
-        GO TO 500                         
+        GO TO 500
       END IF
 C
       IF (POLYGON) THEN
@@ -1285,10 +1285,10 @@ C
 C
 500   CONTINUE
       END
- 
- 
- 
- 
+
+
+
+
       subroutine get_polygon_mask(xrec,yrec,mask,nx,ny,
      &                            stapix,endpix,
      &                            xaxis,yaxis,start,
@@ -1330,7 +1330,7 @@ c
       integer   count             ! = k * winding number of region wrt point
       integer   pen               ! pgplot pen number
 c
-c   initialise mask 
+c   initialise mask
 c
       do j=1,ny
         do i=1,nx
@@ -1394,7 +1394,7 @@ c
           call pgdraw(xr,yr)
           closed = ((xi .eq. xpts(1)).and.(yi .eq. ypts(1)))
           if (closed) call dsa_wruser('Curve closed!\\n')
-        else                                    
+        else
 c
 c    Plot a point
 c
@@ -1402,7 +1402,7 @@ c
         end if
         npts = npts + 1
       end do ! while(...)
-c               
+c
 c   If the curve is not closed, close it!
 c
       if ((npts .gt. MAXPTS).and.(.not.closed)) then

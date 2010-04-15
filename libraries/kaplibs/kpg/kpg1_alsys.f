@@ -26,10 +26,10 @@
 *        value changed.
 *     FRM2 = INTEGER (Given)
 *        A pointer to an AST Frame. The System value from this Frame will
-*        be used as the AlignSystem value for FRM1 if the user supplied the 
+*        be used as the AlignSystem value for FRM1 if the user supplied the
 *        value "Data" for the parameter.
 *     AXIS = INTEGER (Given)
-*        The index (one or more) of a single axis within FRM1 which is to 
+*        The index (one or more) of a single axis within FRM1 which is to
 *        have its AlsignSystem value changed, or zero. If zero is
 *        supplied, the new AlignSystem value is applied to the whole Frame.
 *        Supplying an axis index allows a single Frame within a CmpFrame
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,55 +126,55 @@
       ELSE
          FRM2B = AST_CLONE( FRM2, STATUS )
       END IF
- 
+
 *  If the Frames are of different classes, they cannot be aligned in any
 *  system. Attempt to align them in order to see if there is any point in
 *  trying to change AlignSystem. */
       FS = AST_CONVERT( FRM1B, FRM2B, ' ', STATUS )
       IF( FS .NE. AST__NULL ) THEN
-         CALL AST_ANNUL( FS, STATUS ) 
+         CALL AST_ANNUL( FS, STATUS )
 
 *  Create attribute names that refers to the requested Frame axis.
          ATTR1 = 'AlignSystem'
          IAT1 =  11
          ATTR2 = 'System'
          IAT2 =  6
-         
+
          IF( AST_ISACMPFRAME( FRM1B, STATUS ) .AND.
      :       AST_ISACMPFRAME( FRM2B, STATUS ) .AND.
      :       AXIS .GT. 0 ) THEN
-         
+
             CALL CHR_PUTC( '(', ATTR1, IAT1 )
             CALL CHR_PUTI( AXIS, ATTR1, IAT1 )
             CALL CHR_PUTC( ')', ATTR1, IAT1 )
-         
+
             CALL CHR_PUTC( '(', ATTR2, IAT2 )
             CALL CHR_PUTI( AXIS, ATTR2, IAT2 )
             CALL CHR_PUTC( ')', ATTR2, IAT2 )
-         
+
          END IF
 
 *  Loop until we have a good value for the AlignSystem attribute.
          MORE = .TRUE.
-         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Get a value for the parameter.
             CALL PAR_GET0C( PARAM, VALUE, STATUS )
 
-*  If a null value was supplied, annul the error and exit, leaving the 
+*  If a null value was supplied, annul the error and exit, leaving the
 *  AlignSystem value in FRM1B unchanged.
             IF( STATUS .NE. SAI__OK ) THEN
                IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
                MORE = .FALSE.
 
-*  Otherwise, if "Data" was supplied (case-insensitive), then use the 
+*  Otherwise, if "Data" was supplied (case-insensitive), then use the
 *  System value from FRM2B.
             ELSE IF( CHR_SIMLR( VALUE, 'DATA' ) ) THEN
                VALUE = AST_GETC( FRM2B, ATTR2, STATUS )
             END IF
 
-*  If a value was obtained, attempt to use the value, but if an error occurs, 
-*  flush the error and the parameter and get a new value.         
+*  If a value was obtained, attempt to use the value, but if an error occurs,
+*  flush the error and the parameter and get a new value.
             IF( MORE ) THEN
                CALL AST_SETC( FRM1B, ATTR1, VALUE, STATUS )
                IF( STATUS .NE. SAI__OK ) THEN

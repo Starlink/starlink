@@ -13,8 +13,8 @@
 *     CALL CTG_CATCR( IGRP, INDEX, CI, STATUS )
 
 *  Description:
-*     The routine returns a CAT identifier for a new catalogue. The name 
-*     of the new catalogue is held at a given index within a given group. 
+*     The routine returns a CAT identifier for a new catalogue. The name
+*     of the new catalogue is held at a given index within a given group.
 *     It is equivalent to CAT_CREAT, except that any existing catalogue
 *     with the specified name is first deleted (unless the catalogue
 *     specification includes a FITS-extension specifier).
@@ -22,7 +22,7 @@
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the names of catalogues. This
-*        will often be created using CTG_CREAT, but groups created "by 
+*        will often be created using CTG_CREAT, but groups created "by
 *        hand" using GRP directly can also be used.
 *     INDEX = INTEGER (Given)
 *        The index within the group at which the name of the catalogue to be
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -77,7 +77,7 @@
       INCLUDE 'CAT_PAR'          ! CAT_ public constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'CTG_CONST'        ! CTG constants.
-                                  
+
 *  Arguments Given:
       INTEGER IGRP
       INTEGER INDEX
@@ -93,7 +93,7 @@
       CHARACTER DIR*(GRP__SZFNM) ! Directory path
       CHARACTER EXT*20           ! FITS extension specifier
       CHARACTER FILE*(GRP__SZFNM)! Full file name
-      CHARACTER NAME*(GRP__SZNAM)! Catalogue spec 
+      CHARACTER NAME*(GRP__SZNAM)! Catalogue spec
       CHARACTER TYP*20           ! File type
       INTEGER IAT                ! No. of used characters in FILE
 *.
@@ -111,7 +111,7 @@
 *  Get the required name.
       CALL GRP_GET( IGRP, INDEX, 1, NAME, STATUS )
 
-*  If the name could not be obtained, set the name blank and abort.     
+*  If the name could not be obtained, set the name blank and abort.
       IF ( STATUS .NE. SAI__OK ) THEN
          NAME = ' '
          GO TO 999
@@ -120,8 +120,8 @@
 *  Split the name into directory, basename, type and FITS extension.
       CALL CTG1_FPARS( NAME, DIR, BN, TYP, EXT, STATUS )
 
-*  Remove any existing file, so long as no FITS extension specified is 
-*  included in the name, 
+*  Remove any existing file, so long as no FITS extension specified is
+*  included in the name,
       IF( EXT .EQ. ' ' ) THEN
          FILE = ' '
          IAT = 0
@@ -150,12 +150,12 @@
          IF( NAME .NE. ' ' ) THEN
             CALL MSG_SETC( 'NAME', NAME )
             CALL ERR_REP( 'CTG_CATCR_ERR1', 'Unable to get a '//
-     :                    'catalogue identifier for ''^NAME''.', 
+     :                    'catalogue identifier for ''^NAME''.',
      :                    STATUS )
 
          ELSE
             CALL ERR_REP( 'CTG_CATCR_ERR2', 'Unable to get an '//
-     :                    'identifier for a new catalogue.', 
+     :                    'identifier for a new catalogue.',
      :                    STATUS )
 
          END IF

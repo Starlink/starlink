@@ -8,7 +8,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SCULIB_SKYFUNC(F, X, P, M)
 
@@ -23,12 +23,12 @@
 *
 *     This subroutine returns the theoretical value of the skydip
 *     for the given input parameters.
-*     
+*
 *         Jtheory = (1 - ETA_TEL) * J_TEL + ETA_TEL * J_ATM *
 *                   (1 - B * EXP (-TAU * Airmass(i))
 *
 *
-*           J_ATM = J_AMB * X_G 
+*           J_ATM = J_AMB * X_G
 *
 *             X_G = 1 + h1 * h2 * EXP (-TAU * Airmass(i) / X_Gconst)
 *         .             -------
@@ -63,9 +63,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -91,8 +91,8 @@
       DOUBLE PRECISION ETA_TEL           ! telescope transmission of fit
       DOUBLE PRECISION J_ATM             ! brightness temperature of atmosphere
       DOUBLE PRECISION J_AMB             ! brightness temp of ambient air
-      DOUBLE PRECISION J_TEL             ! brightness temperature of telescope 
-      DOUBLE PRECISION J_THEORY          ! theoretical sky brightness 
+      DOUBLE PRECISION J_TEL             ! brightness temperature of telescope
+      DOUBLE PRECISION J_THEORY          ! theoretical sky brightness
                                          ! temperature at airmass measured
       DOUBLE PRECISION TAU               ! zenith optical depth of fit
       DOUBLE PRECISION X_G               ! fudge factor
@@ -110,16 +110,16 @@
       AIRMASS_IN = DBLE(X)
 
       IF (ABS(TAU * AIRMASS_IN) .LT. 20.0D0) THEN
-         X_G = 1.0D0 + (H1 * H2 / J_AMB) * 
+         X_G = 1.0D0 + (H1 * H2 / J_AMB) *
      :        EXP (-TAU * AIRMASS_IN / X_GCONST)
-         
-         J_ATM = J_AMB * X_G 
-         
+
+         J_ATM = J_AMB * X_G
+
          J_THEORY = (1.0D0 - ETA_TEL) * J_TEL +
      :        ETA_TEL * J_ATM * (1.0D0 - B * EXP (-TAU * AIRMASS_IN))
       ELSE
          J_ATM = J_AMB
-         
+
          J_THEORY = (1.0D0 - ETA_TEL) * J_TEL +
      :        ETA_TEL * J_ATM
       END IF

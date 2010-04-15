@@ -40,7 +40,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -193,7 +193,7 @@
          IF ( NBYTES .NE. 4 ) THEN
             STATUS = SAI__ERROR
             CALL EMS_SETI( 'N', NBYTES)
-            CALL EMS_REP('HDS_TEST_ERR_PREC', 
+            CALL EMS_REP('HDS_TEST_ERR_PREC',
      :           'Precision of _REAL component != 4 (got ^N)', STATUS)
          END IF
       END IF
@@ -201,7 +201,7 @@
       CALL DAT_ANNUL( LOC3, STATUS )
 
 *  Now look for the string component
-      CALL DAT_FIND( LOC1, 'CHARTEST', LOC3, STATUS ) 
+      CALL DAT_FIND( LOC1, 'CHARTEST', LOC3, STATUS )
       CALL DAT_PREC( LOC3, NBYTES, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
          IF ( NBYTES .NE. CSIZE ) THEN
@@ -209,8 +209,8 @@
             CALL EMS_SETI( 'CMP1', CSIZE )
             CALL EMS_SETI( 'REF', CSIZE )
             CALL EMS_SETI( 'N', NBYTES )
-            CALL EMS_REP('HDS_TEST_ERR_PREC', 
-     :           'Precision of _CHAR*^CMP1 component != ^REF (got ^N)', 
+            CALL EMS_REP('HDS_TEST_ERR_PREC',
+     :           'Precision of _CHAR*^CMP1 component != ^REF (got ^N)',
      :           STATUS)
          END IF
       END IF
@@ -231,13 +231,13 @@
          CALL EMS_MARK()
          CALL DAT_MSG( 'LOCA', LOC3 )
          LSTAT = SAI__ERROR
-         CALL EMS_REP( 'XXX', 
+         CALL EMS_REP( 'XXX',
      :        'Not an error, test DAT_MSG: ^LOCA', LSTAT)
          CALL DAT_MSG( 'LOCB', LOC4 )
-         CALL EMS_REP( 'XXX', 
+         CALL EMS_REP( 'XXX',
      :        'Not an error, test DAT_MSG: ^LOCB', LSTAT)
          CALL DAT_MSG( 'LOCC', LOC7 )
-         CALL EMS_REP( 'XXX', 
+         CALL EMS_REP( 'XXX',
      :        'Not an error, test DAT_MSG: ^LOCC', LSTAT)
          CALL EMS_RLSE
       END IF
@@ -345,7 +345,7 @@
 *  Try HDS_FIND with a full filename, including the .sdf
       LPATH = PATH
       CALL HDS_FIND( DAT__ROOT, LPATH(:CHR_LEN(PATH))//
-     :               '.TSTRUCT.ARRAY(2,2)', 
+     :               '.TSTRUCT.ARRAY(2,2)',
      :               'READ', LOC3, STATUS )
       CALL DAT_GET0D( LOC3, DTEMP, STATUS )
       CALL DAT_ANNUL( LOC3, STATUS )
@@ -367,7 +367,7 @@
 
 *  Now try HDS_FIND without the extension
       CALL HDS_FIND( DAT__ROOT, LPATH(:CHR_LEN(PATH)-DAT__SZFLX)//
-     :               '.TSTRUCT.ARRAY(2,2)', 
+     :               '.TSTRUCT.ARRAY(2,2)',
      :               'READ', LOC3, STATUS )
       CALL DAT_GET0D( LOC3, DTEMP, STATUS )
       CALL DAT_ANNUL( LOC3, STATUS )
@@ -417,7 +417,7 @@
       END IF
 
 *  Remove file
-      CALL HDS_OPEN( PATHX, 'UPDATE', LOC1, STATUS )      
+      CALL HDS_OPEN( PATHX, 'UPDATE', LOC1, STATUS )
       CALL HDS_ERASE( LOC1, STATUS )
 
 *  Now try to con HDS_FIND with a component that actually does include .SDF
@@ -451,7 +451,7 @@
 
 *  Remove file
       CALL DAT_ANNUL( LOC1, STATUS )
-      CALL HDS_OPEN( PATH, 'UPDATE', LOC1, STATUS )      
+      CALL HDS_OPEN( PATH, 'UPDATE', LOC1, STATUS )
       CALL HDS_ERASE( LOC1, STATUS )
 
 
@@ -462,7 +462,7 @@
 
 *  Otherwise, report an error.
       ELSE
-         PRINT *, 'Sum = ',ISUM, ' expected ',ANSWER, 
+         PRINT *, 'Sum = ',ISUM, ' expected ',ANSWER,
      :      ' (status = ', STATUS, ')'
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
          CALL EMS_REP( 'HDS_TEST_ERR',
@@ -471,7 +471,7 @@
       END IF
 
       CALL EMS_END( STATUS )
-      
+
 *   Use non-standard but common exit() intrinsic
       CALL EXIT(EXITSTATUS)
 
@@ -518,7 +518,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -594,7 +594,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

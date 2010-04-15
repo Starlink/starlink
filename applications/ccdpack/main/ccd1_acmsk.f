@@ -131,13 +131,13 @@
             CALL ARD_GRPEX( BUFFER, GRP__NOID, MASKGR, FLAG, STATUS )
 
 *  See if a continuation line is required.
-            IF ( FLAG ) THEN 
+            IF ( FLAG ) THEN
                CALL PAR_CANCL( PARAM, STATUS )
             ELSE
                MORE = .FALSE.
             END IF
          ELSE
-            IF ( NENT .NE. 0 .AND. STATUS .EQ. PAR__NULL ) THEN 
+            IF ( NENT .NE. 0 .AND. STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
             END IF
             MORE = .FALSE.
@@ -146,7 +146,7 @@
       END IF
       CALL ERR_RLSE
 
-*  Retrieve first element as may need to see if this is a file (extract 
+*  Retrieve first element as may need to see if this is a file (extract
 *  now so that this string may be used as a context for any error messages).
       CALL GRP_GET( MASKGR, 1, 1, INFILE, STATUS )
 
@@ -188,7 +188,7 @@
                CALL CHR_PREFX( INDIR, INFILE, IAT )
                ID = GRP__NOID
                CALL ARD_GRPEX( INFILE, GRP__NOID, ID, FLAG, STATUS )
-            ELSE 
+            ELSE
 
 *  Assume single ARD expression.
                CALL ERR_ANNUL( STATUS )

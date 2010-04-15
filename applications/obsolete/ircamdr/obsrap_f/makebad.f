@@ -27,7 +27,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -42,8 +42,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -61,7 +61,7 @@
      :  DIMS( NDIMS ),        ! dimensions of input DATA_ARRAYs
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
-     :  PNTRI                 !    "     " input      " 
+     :  PNTRI                 !    "     " input      "
 
       REAL
      :  SIGMA                 ! sigma of cut for bad pixels
@@ -86,7 +86,7 @@
      :                  PNTRI, NELEMENTS, STATUS )
          CALL NDF_DIM( LOCI, NDIMS, DIMS, ACTDIM, STATUS )
 
-*       check for error 
+*       check for error
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *         ask user for sigma level for cut for bad pixels
@@ -96,7 +96,7 @@
 	   CALL PAR_GET0C( 'OUTFILE', OUTFILE, STATUS)
 
 *         pass everything to the work routine
-           CALL MAKEBADSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+           CALL MAKEBADSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :	                    SIGMA, OUTFILE, STATUS)
 
          END IF

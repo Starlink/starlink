@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_SCUPHOT( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *        This routine reduces the data for a single sub-instrument from a
 *     PHOTOM observation. For each bolometer used to look at the source the
@@ -28,11 +28,11 @@
 *        OUT file to hold the coadded data from all the integrations. If the
 *        jiggle pattern points fit a 2-d rectangular pattern then these data
 *        will be arranged as a 2-d map suitable for plotting as an image. A
-*        2-d parabola will be fitted to the coadded image and the results 
+*        2-d parabola will be fitted to the coadded image and the results
 *        written in ASCII form to FILE. If an irregular jiggle pattern is
 *        used the map will take the form of a 1-D strip.
 *      - Second, an ndf called <bolname>_peak (e.g. h7_peak) will be created
-*        in the OUT file to hold the fit results to the data for each 
+*        in the OUT file to hold the fit results to the data for each
 *        integration. The results stored are the fit peak, its variance and
 *        quality and they are held as a 1-d array suitable for plotting as
 *        a graph. The fit results are also written in ASCII form to FILE, as
@@ -48,7 +48,7 @@
 *        observed with H7 only H7 data will be stored). If ALLBOLS is set
 *        to true then all middle beam data is processed. This is useful
 *        for examining sky noise. Note that for 2 and 3 bolometer photometry
-*        ALLBOLS must be false to avoid weighting problems for the 
+*        ALLBOLS must be false to avoid weighting problems for the
 *        bolometers that were observed in the left or right beams.
 *     ANALYSIS = CHAR (Read)
 *        The method used to detemine peak. Allowed options are:
@@ -108,8 +108,8 @@
 *     observation.
 *        Next, the components of the main data array are mapped and their
 *     dimensions checked. All the component integrations of the observation
-*     are butted end to end in this array so the `pointer' array is also 
-*     mapped, containing the start and finish indices of each exposure. 
+*     are butted end to end in this array so the `pointer' array is also
+*     mapped, containing the start and finish indices of each exposure.
 *        The indices of the target bolometers in each `beam' are read from
 *     the input file together with the weights to be associated with the
 *     data from each. A search is made for the INT_QUALITY array in the
@@ -124,7 +124,7 @@
 *     wll be stored as a small map in a 2-d ndf in the OUT file, otherwise
 *     they will be stored as a 1-d vector.
 *        Next some scratch memory is obtained to hold the integration data
-*     for each target bolometer and the relevant data copied into it from 
+*     for each target bolometer and the relevant data copied into it from
 *     the IN data array.
 *        The name of the OUT file is read from the parameter and the file
 *     created. The routine cycles through the 3 possible beams that can
@@ -134,7 +134,7 @@
 *     to hold the fit results to the data for each integration. The weight
 *     to be given to this bolometer's data is stored in the REDS.BEAM_WT
 *     object in the MORE structure of each ndf.
-*        The routine cycles through the integrations taken and for each one, 
+*        The routine cycles through the integrations taken and for each one,
 *     if INT_QUALITY is 0, calls SCULIB_COADD to add it to the coadd result and
 *     SCULIB_FIT_2D_PARABOLA to fit a parabola to it. The fit results are
 *     themselves coadded. When all the integrations have been dealt with
@@ -150,7 +150,7 @@
 *     JFL: John Lightfoot (ROE)
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -263,7 +263,7 @@ c Change size of OUT to 132 characters
 c Probably lots of other things...
 c
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -335,7 +335,7 @@ c
       INTEGER          INT_D_END (SCUBA__MAX_BEAM)
                                        ! end of space holding integration data
       INTEGER          INT_D_PTR (SCUBA__MAX_BEAM)
-                                       ! start of space holding integration 
+                                       ! start of space holding integration
                                        ! data
       INTEGER          INT_OFFSET      ! offset of the start of an integration
                                        ! in the data array
@@ -393,10 +393,10 @@ c
       INTEGER          LAST_EXP        ! the number of the exposure being
                                        ! measured when the abort occurred
       INTEGER          LAST_INT        ! the number of the integration
-                                       ! being measured when the abort 
+                                       ! being measured when the abort
                                        ! occurred
       INTEGER          LAST_MEAS       ! the number of the measurement
-                                       ! being measured when the abort 
+                                       ! being measured when the abort
                                        ! occurred
       CHARACTER*15     LAT             ! the latitude of the telescope centre
       CHARACTER*15     LAT2            ! the second latitude of the telescope
@@ -507,7 +507,7 @@ c
                                        ! has already been run on the file
       INTEGER          PHOTBB          ! Loop index
       INTEGER          PHOT_BB (SCUBA__MAX_BEAM)
-                                       ! index of target bolometers in 
+                                       ! index of target bolometers in
                                        ! input data array
       INTEGER          PLACE           ! place holder for ndf in output file
       INTEGER          POS             ! measurement index in DO loop
@@ -524,7 +524,7 @@ c
       LOGICAL          SKY_ERROR       ! .TRUE. if SKY_ERROR application has
                                        ! been run on the data
       INTEGER          START_BOL       ! First bolometer
-      CHARACTER*80     STATE           ! the state of SCUCD when the 
+      CHARACTER*80     STATE           ! the state of SCUCD when the
                                        ! datafile was closed
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
@@ -551,11 +551,11 @@ c
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
-      
+
 *     Initialisation
       MAP_N_PTR = 0
       MAP_N_PTR_END = 0
-            
+
       USEFILE = .TRUE.
       PARABOLA = .TRUE.   ! Assume I can fit a parabola
 
@@ -600,7 +600,7 @@ c
                   REDUCE_SWITCH = .TRUE.
                ELSE IF (STEMP(:10) .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
-               ELSE IF (STEMP(:9) .EQ. 'SKY_ERROR' .OR. 
+               ELSE IF (STEMP(:9) .EQ. 'SKY_ERROR' .OR.
      :                 STEMP(:6) .EQ. 'REMSKY') THEN
                   SKY_ERROR = .TRUE.
                ELSE IF (STEMP(:6) .EQ. 'PHOTOM') THEN
@@ -608,7 +608,7 @@ c
                END IF
             END DO
          END IF
-         
+
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
@@ -652,7 +652,7 @@ c
      :           'contains too many FITS items', STATUS)
          END IF
       END IF
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
      :     STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
@@ -666,7 +666,7 @@ c
      :     OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
 
@@ -698,11 +698,11 @@ c
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation '//
      :     'of ^OBJECT', STATUS)
 
-*     get the sub-instrument and filter used 
+*     get the sub-instrument and filter used
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'SUB_1',
      :     SUB_INSTRUMENT, STATUS)
@@ -720,7 +720,7 @@ c
 
 *     coords of telescope centre
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'CENT_CRD', CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (CENTRE_COORDS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT',
@@ -771,7 +771,7 @@ c
                CALL MSG_SETI ('DIM3', DIM(3))
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: data array '//
-     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', 
+     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3',
      :              STATUS)
             END IF
          ELSE
@@ -784,7 +784,7 @@ c
                CALL MSG_SETI ('DIM2', DIM(2))
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: data array '//
-     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', 
+     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3',
      :              STATUS)
             END IF
          END IF
@@ -804,7 +804,7 @@ c
 *     map the DEM_PNTR array and check its dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
 *     unmap DEM_PNTR
@@ -825,11 +825,11 @@ c
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
       CALL MSG_SETC ('PKG', PACKAGE)
-         
+
 
 *     Everything okay
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
@@ -846,14 +846,14 @@ c
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        '^PKG: the observation should have '//
      :        'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
      :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUTIF (MSG__NORM, ' ', 
+         CALL MSG_OUTIF (MSG__NORM, ' ',
      :        ' - However, the observation was '//
      :        'ABORTED during exposure ^N_E of integration ^N_I '//
      :        'of measurement ^N_M', STATUS)
@@ -870,7 +870,7 @@ c
 
 
       IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
-     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN 
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
 *     get the target indices of the bolometers in the data array
          CALL CMP_GETVI (IN_SCUBAX_LOC, 'PHOT_BB', SCUBA__MAX_BEAM,
      :        PHOT_BB, NELM, STATUS)
@@ -894,7 +894,7 @@ c
 
 *     get the channel and ADC numbers of the bolometers used
 
-      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN',
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -907,7 +907,7 @@ c
          END IF
       END IF
 
-      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_ADC', 
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_ADC',
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -925,7 +925,7 @@ c
       WRITEMAP = .TRUE.
 
       CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
-     :     N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :     N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT,
      :     JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
      :     JIGGLE_Y, STATUS)
 
@@ -939,11 +939,11 @@ c
 *     from this routine.
 
          CALL SCULIB_CALC_GRID (JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :        XMIN, XMAX, XSPACE, UBND(1), YMIN, YMAX, YSPACE, 
+     :        XMIN, XMAX, XSPACE, UBND(1), YMIN, YMAX, YSPACE,
      :        UBND(2), IPOS, JPOS, STATUS)
 
 
-         IF (ABS(YSPACE) .LT. 1.0E-5 .AND. ABS(XSPACE) .LT. 1.0E-5) THEN 
+         IF (ABS(YSPACE) .LT. 1.0E-5 .AND. ABS(XSPACE) .LT. 1.0E-5) THEN
 *     Zero jiggle
 *     Lots of this is now done in SCULIB_CALC_GRID
             IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL (STATUS)
@@ -963,7 +963,7 @@ c
             IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
      :           OBSERVING_MODE .EQ. 'POLPHOT') THEN
 
-               CALL MSG_OUTIF (MSG__NORM, ' ', 
+               CALL MSG_OUTIF (MSG__NORM, ' ',
      :              '^PKG: No jiggle pattern was used. '//
      :              'No images will be stored', STATUS)
             ELSE
@@ -977,7 +977,7 @@ c
          ELSE IF (STATUS .NE. SAI__OK .OR.
      :           (ABS(XSPACE/YSPACE - 1.0) .GT. 0.001)) THEN
             IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL (STATUS)
-            
+
             N_OBSDIM = 1
             UBND (1) = JIGGLE_COUNT
             UBND(2) = 1
@@ -986,9 +986,9 @@ c
                IPOS(I) = I
                JPOS(I) = 1
             END  DO
-            
+
             CALL MSG_SETC('PKG', PACKAGE)
-            CALL MSG_OUTIF (MSG__NORM, ' ', 
+            CALL MSG_OUTIF (MSG__NORM, ' ',
      :           '^PKG: the jiggle pattern does '//
      :           'not fit a rectangular mesh, strip images will be '//
      :           'stored', STATUS)
@@ -997,14 +997,14 @@ c
 *     construct axes for 2D map
 
             N_OBSDIM = 2
-            
+
             DO I = 1, UBND (1)
                JIGGLE_2D_A1 (I) = XMIN + REAL (I-1) * XSPACE
             END DO
             DO I = 1, UBND (2)
                JIGGLE_2D_A2 (I) = YMIN + REAL (I-1) * YSPACE
             END DO
-            
+
          END IF
       END IF
 
@@ -1047,7 +1047,7 @@ c
             INT_Q_PTR(BEAM) = 0
             INT_Q_END(BEAM) = 0
 
-            CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM), 
+            CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM),
      :           INT_D_END(BEAM), STATUS)
             CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_V_PTR(BEAM),
      :           INT_V_END(BEAM), STATUS)
@@ -1059,7 +1059,7 @@ c
 
 *     Now fix PHOT_BB so that it gives me the bolometer I want
 *     PHOT_BB contains the bolometer number in this sub instrument
-*     Only 3 numbers and we only want to specify middle beam if 
+*     Only 3 numbers and we only want to specify middle beam if
 *     processing all of them
 
 *     If this is is not a PHOTOM observation I have to use ALLBOLS
@@ -1076,7 +1076,7 @@ c
       IF (ALL_BOLS) THEN
          PHOT_BB(1) = 0
          PHOT_BB(3) = 0
-         
+
          START_BOL = 1
          END_BOL   = N_BOLS
 
@@ -1126,7 +1126,7 @@ c
          DO BEAM = 1, SCUBA__MAX_BEAM
             IF (PHOT_BB(BEAM) .NE. 0) THEN
 
-*     copy the integration data from the relevant bolometer into the 
+*     copy the integration data from the relevant bolometer into the
 *     temporary space - clumsy method
 
                IF (STATUS .EQ. SAI__OK) THEN
@@ -1135,17 +1135,17 @@ c
      :                    N_BOLS + (PHOT_BB(BEAM) - 1)
                      OUT_OFFSET = POS - 1
 
-                     CALL VEC_RTOR(.FALSE., 1, 
+                     CALL VEC_RTOR(.FALSE., 1,
      :                             %VAL(CNF_PVAL(IN_D_PTR) + IN_OFFSET
-     :                    * VAL__NBR), 
+     :                    * VAL__NBR),
      :   %VAL(CNF_PVAL(INT_D_PTR(BEAM)) + OUT_OFFSET
      :                    * VAL__NBR), IERR, NERR, STATUS)
-                     CALL VEC_RTOR(.FALSE., 1, 
+                     CALL VEC_RTOR(.FALSE., 1,
      :                             %VAL(CNF_PVAL(IN_V_PTR) + IN_OFFSET
-     :                    * VAL__NBR), 
+     :                    * VAL__NBR),
      :   %VAL(CNF_PVAL(INT_V_PTR(BEAM)) + OUT_OFFSET
      :                    * VAL__NBR), IERR, NERR, STATUS)
-                     CALL VEC_UBTOUB(.FALSE., 1, 
+                     CALL VEC_UBTOUB(.FALSE., 1,
      :                               %VAL(CNF_PVAL(IN_Q_PTR) +
      :                    IN_OFFSET * VAL__NBUB),
      :                    %VAL(CNF_PVAL(INT_Q_PTR(BEAM)) + OUT_OFFSET *
@@ -1175,10 +1175,10 @@ c
 
                IF (PHOT_BB(BEAM) .NE. 0) THEN
 
-*     this sub-instrument / beam combination was used, so analyse 
+*     this sub-instrument / beam combination was used, so analyse
 *     and store the data
 
-                  CALL NDF_BEGIN 
+                  CALL NDF_BEGIN
 
 *     Only if I am writing the JIGGLE map
                   IF (WRITEMAP) THEN
@@ -1188,16 +1188,16 @@ c
                      CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
      :                    BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
                      NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
-                     
+
 *     Get an identifier to an NDF section of the input file
-                     CALL NDF_SECT(IN_NDF, N_OBSDIM, LBND, UBND, 
+                     CALL NDF_SECT(IN_NDF, N_OBSDIM, LBND, UBND,
      :                    SEC_NDF, STATUS)
 
                      CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
 
 *     Propogate from input NDF
-                     CALL NDF_SCOPY(SEC_NDF, 
-     :                    'TITLE,UNITS,NOEXTENSION(SCUBA,SCUCD)', 
+                     CALL NDF_SCOPY(SEC_NDF,
+     :                    'TITLE,UNITS,NOEXTENSION(SCUBA,SCUCD)',
      :                    PLACE, IBEAM, STATUS)
 
 *     Unmap the section
@@ -1215,7 +1215,7 @@ c
 *     initialise quality to bad
 
                      IF (STATUS .EQ. SAI__OK) THEN
-                        CALL SCULIB_CFILLB (NELM, 1, 
+                        CALL SCULIB_CFILLB (NELM, 1,
      :                                      %VAL(CNF_PVAL(MAP_Q_PTR)))
                      END IF
 
@@ -1225,7 +1225,7 @@ c
                         CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
      :                       'WRITE', TEMP_PTR, NELM, STATUS)
                         IF (STATUS .EQ. SAI__OK) THEN
-                           CALL SCULIB_NFILLR (JIGGLE_COUNT, 
+                           CALL SCULIB_NFILLR (JIGGLE_COUNT,
      :                          %VAL(CNF_PVAL(TEMP_PTR)))
                         END IF
                         CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
@@ -1233,14 +1233,14 @@ c
                         CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
      :                       'WRITE', TEMP_PTR, NELM, STATUS)
                         CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
-     :                       %VAL(CNF_PVAL(TEMP_PTR)), 
+     :                       %VAL(CNF_PVAL(TEMP_PTR)),
      :                       IERR, NERR, STATUS)
                         CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
-                        
+
                         CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
      :                       'WRITE', TEMP_PTR, NELM, STATUS)
                         CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
-     :                       %VAL(CNF_PVAL(TEMP_PTR)), 
+     :                       %VAL(CNF_PVAL(TEMP_PTR)),
      :                       IERR, NERR, STATUS)
                         CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
                      END IF
@@ -1257,7 +1257,7 @@ c
                         END IF
                         CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
      :                       0, 0, STATUS)
-                        CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT', 
+                        CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT',
      :                       BEAM_WEIGHT(BEAM), STATUS)
                         CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
                      END IF
@@ -1277,7 +1277,7 @@ c
                   CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
 
 *     Propogate units
-                  CALL NDF_SCOPY(SEC_NDF, 
+                  CALL NDF_SCOPY(SEC_NDF,
      :                 'LABEL,TITLE,UNITS,NOEXTENSION(SCUBA,SCUCD)',
      :                 PLACE, IPEAK, STATUS)
 
@@ -1296,7 +1296,7 @@ c
                   CALL NDF_AMAP (IPEAK, 'CENTRE', 1, '_INTEGER',
      :                 'WRITE', TEMP_PTR, NELM, STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_NFILLI (N_BITS, 
+                     CALL SCULIB_NFILLI (N_BITS,
      :                                   %VAL(CNF_PVAL(TEMP_PTR)))
                   END IF
                   CALL NDF_AUNMP (IPEAK, 'CENTRE', 1, STATUS)
@@ -1319,7 +1319,7 @@ c
                   END IF
 
 *     If samples then axes are different
-                  
+
                   IF (ANALYSIS_METHOD .EQ. 'SAMPLES') THEN
                      CALL NDF_ACPUT('Samples',IPEAK,'LABEL',1,STATUS)
                      CALL NDF_CPUT('Signal',IPEAK, 'LAB', STATUS)
@@ -1340,14 +1340,14 @@ c
                         CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
                         CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
                      END IF
-                     CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', 
+                     CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB',
      :                    STATUS)
                   END IF
 
 *     initialise quality to bad
 
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (NELM, 1, 
+                     CALL SCULIB_CFILLB (NELM, 1,
      :                                   %VAL(CNF_PVAL(PEAK_Q_PTR)))
                   END IF
 
@@ -1366,7 +1366,7 @@ c
                         INT_OFFSET = (NUM_INTS - 1) * JIGGLE_COUNT
 
 *     coadd the jiggle data for the integration into that for the measurement
-                        
+
                         CALL SCULIB_COADD (JIGGLE_COUNT,
      :                       %VAL(CNF_PVAL(INT_D_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBR),
@@ -1379,7 +1379,7 @@ c
      :                       MEAS_D(1,BEAM), MEAS_V(1,BEAM),
      :                       MEAS_Q(1,BEAM), MEAS_N(1,BEAM), BADBIT,
      :                       .TRUE., STATUS)
-                        
+
 *     derive the measured signal for this integration
 
                         CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
@@ -1390,24 +1390,24 @@ c
      :                       + INT_OFFSET*VAL__NBR),
      :                       %VAL(CNF_PVAL(INT_Q_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBUB),
-     :                       PEAK_D(NUM_INTS,BEAM), 
+     :                       PEAK_D(NUM_INTS,BEAM),
      :                       PEAK_V(NUM_INTS,BEAM),
      :                       PEAK_Q(NUM_INTS,BEAM), RTEMP, RTEMP,
      :                       PEAK_X(NUM_INTS,BEAM),
      :                       PEAK_Y(NUM_INTS,BEAM), BADBIT, STATUS)
-                           
+
 *     coadd the fitted peak into the running mean
 
-                        CALL SCULIB_COADD (1, 
-     :                       PEAK_D(NUM_INTS,BEAM), 
+                        CALL SCULIB_COADD (1,
+     :                       PEAK_D(NUM_INTS,BEAM),
      :                       PEAK_V(NUM_INTS,BEAM),
      :                       PEAK_Q(NUM_INTS,BEAM),
-     :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM), 
+     :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM),
      :                       MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
      :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM),
      :                       MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
      :                       BADBIT, .TRUE., STATUS)
-                        
+
                      END DO
                   END DO
 
@@ -1416,8 +1416,8 @@ c
                   IF (PARABOLA) THEN
                      CALL SCULIB_ANALYSE_PHOTOM_JIGGLE ('PARABOLA',
      :                    1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM), 
-     :                    MEAS_Q(1,BEAM), MEAS_1_D(BEAM), 
+     :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM),
+     :                    MEAS_Q(1,BEAM), MEAS_1_D(BEAM),
      :                    MEAS_1_V(BEAM), MEAS_1_Q(BEAM),
      :                    MEAS_1_A0(BEAM), MEAS_1_A1(BEAM),
      :                    MEAS_1_X(BEAM), MEAS_1_Y(BEAM),
@@ -1425,30 +1425,30 @@ c
                   END IF
 
 
-*     Only if I am writing the jiggle map               
+*     Only if I am writing the jiggle map
 
                   IF (WRITEMAP) THEN
 *     Initialise the scratch array for UNPACK_JIGGLE_SEPARATES
 
-                     CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI, 
+                     CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI,
      :                    MAP_N_PTR, MAP_N_PTR_END, STATUS)
-                     
+
 
 *     store the coadded measurement to the output map
 
                      IF (STATUS .EQ. SAI__OK) THEN
                         CALL SCULIB_UNPACK_JIGGLE_SEPARATES (
-     :                       JIGGLE_COUNT, 1, MEAS_D(1,BEAM), 
+     :                       JIGGLE_COUNT, 1, MEAS_D(1,BEAM),
      :                       MEAS_V(1,BEAM),
      :                       MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS,
-     :                       JPOS, UBND(1), UBND(2), 
+     :                       JPOS, UBND(1), UBND(2),
      :                       %VAL(CNF_PVAL(MAP_D_PTR)),
-     :                       %VAL(CNF_PVAL(MAP_V_PTR)), 
+     :                       %VAL(CNF_PVAL(MAP_V_PTR)),
      :                       %VAL(CNF_PVAL(MAP_Q_PTR)),
      :                       %VAL(CNF_PVAL(MAP_N_PTR)), ITEMP, BADBIT,
      :                       STATUS)
                      END IF
-                     
+
                      CALL SCULIB_FREE ('MAP_N', MAP_N_PTR,MAP_N_PTR_END,
      :                    STATUS)
                   END IF
@@ -1458,60 +1458,60 @@ c
 
                   IF (ANALYSIS_METHOD .EQ. 'SAMPLES') THEN
 
-                     CALL VEC_RTOR(.FALSE., N_BITS, 
+                     CALL VEC_RTOR(.FALSE., N_BITS,
      :                    %VAL(CNF_PVAL(INT_D_PTR(BEAM))),
-     :                    %VAL(CNF_PVAL(PEAK_D_PTR)), 
+     :                    %VAL(CNF_PVAL(PEAK_D_PTR)),
      :                    IERR, NERR, STATUS)
-                     CALL VEC_RTOR(.FALSE., N_BITS, 
+                     CALL VEC_RTOR(.FALSE., N_BITS,
      :                    %VAL(CNF_PVAL(INT_V_PTR(BEAM))),
-     :                    %VAL(CNF_PVAL(PEAK_V_PTR)), 
+     :                    %VAL(CNF_PVAL(PEAK_V_PTR)),
      :                    IERR, NERR, STATUS)
-                     CALL VEC_UBTOUB(.FALSE., N_BITS, 
+                     CALL VEC_UBTOUB(.FALSE., N_BITS,
      :                    %VAL(CNF_PVAL(INT_Q_PTR(BEAM))),
-     :                    %VAL(CNF_PVAL(PEAK_Q_PTR)), 
+     :                    %VAL(CNF_PVAL(PEAK_Q_PTR)),
      :                    IERR, NERR, STATUS)
 
 *     Now set the bad pixel mask from the input
-                     CALL NDF_SBB(BADBIT, IPEAK, STATUS)                      
+                     CALL NDF_SBB(BADBIT, IPEAK, STATUS)
 
                   ELSE
 *     Store the fitted peak
-                     CALL VEC_RTOR(.FALSE., 
+                     CALL VEC_RTOR(.FALSE.,
      :                    N_INTEGRATIONS * N_MEASUREMENTS,
-     :                    PEAK_D(1,BEAM), %VAL(CNF_PVAL(PEAK_D_PTR)), 
+     :                    PEAK_D(1,BEAM), %VAL(CNF_PVAL(PEAK_D_PTR)),
      :                    IERR, NERR,
      :                    STATUS)
-                     CALL VEC_RTOR(.FALSE., 
+                     CALL VEC_RTOR(.FALSE.,
      :                    N_INTEGRATIONS * N_MEASUREMENTS,
-     :                    PEAK_V(1,BEAM), %VAL(CNF_PVAL(PEAK_V_PTR)), 
+     :                    PEAK_V(1,BEAM), %VAL(CNF_PVAL(PEAK_V_PTR)),
      :                    IERR, NERR,
      :                    STATUS)
-                     CALL VEC_UBTOUB(.FALSE., 
+                     CALL VEC_UBTOUB(.FALSE.,
      :                    N_INTEGRATIONS * N_MEASUREMENTS,
-     :                    PEAK_Q(1,BEAM), %VAL(CNF_PVAL(PEAK_Q_PTR)), 
+     :                    PEAK_Q(1,BEAM), %VAL(CNF_PVAL(PEAK_Q_PTR)),
      :                    IERR, NERR,
      :                    STATUS)
 
 *     Write BIT MASK
 
-                     CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
+                     CALL NDF_SBB(OUTBAD, IPEAK, STATUS)
                      ISBAD = .FALSE.
                      DO I = 1, N_INTEGRATIONS * N_MEASUREMENTS
                         IF (PEAK_Q(I, BEAM).NE.0) ISBAD = .TRUE.
                      END DO
-                     
+
                      CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
 
 
                   END IF
 
-                  IF (WRITEMAP) CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
+                  IF (WRITEMAP) CALL NDF_SBB(OUTBAD, IBEAM, STATUS)
 
 *     close the ndfs opened in this ndf context
                   CALL NDF_UNMAP(IPEAK, '*', STATUS)
                   CALL NDF_ANNUL(IPEAK, STATUS)
-                  IF (WRITEMAP) THEN 
+                  IF (WRITEMAP) THEN
                      CALL NDF_UNMAP(IBEAM, '*', STATUS)
                      CALL NDF_ANNUL(IBEAM, STATUS)
                   END IF
@@ -1526,11 +1526,11 @@ c
 
          IF (USEFILE .AND. COUNT .EQ. 1 .AND. STATUS .EQ. SAI__OK) THEN
 
-            CALL SURF_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART, 
-     :           ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
-     :           CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
-     :           OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
-     :           SKY_ERROR, FD, STATUS) 
+            CALL SURF_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART,
+     :           ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER,
+     :           CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2,
+     :           OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA,
+     :           SKY_ERROR, FD, STATUS)
 
             IF (STATUS .EQ. PAR__NULL) THEN
                CALL ERR_ANNUL(STATUS)
@@ -1554,7 +1554,7 @@ c
 
       END DO
 
-      
+
 *     finish off
 
 *  close the file

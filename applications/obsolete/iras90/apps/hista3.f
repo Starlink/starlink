@@ -15,7 +15,7 @@
 *  Description:
 *     The supplied text is displayed on the terminal screen (subject to
 *     the conditional message filter level), and optionally logged to a
-*     text file. 
+*     text file.
 
 *  Arguments:
 *     SIZE = INTEGER ( Given )
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

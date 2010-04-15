@@ -1,5 +1,5 @@
       SUBROUTINE DTASK_SUBSID ( DTASK_APPLIC, PATH, MESSID, CONTEXT,
-     :  AKEY, MSGSTATUS, VALUE, STATUS ) 
+     :  AKEY, MSGSTATUS, VALUE, STATUS )
 *+
 *  Name:
 *     DTASK_SUBSID
@@ -15,11 +15,11 @@
 
 *  Invocation:
 *     CALL DTASK_SUBSID ( DTASK_APPLIC, PATH, MESSID, CONTEXT,
-*     :  AKEY, MSGSTATUS, VALUE, STATUS ) 
+*     :  AKEY, MSGSTATUS, VALUE, STATUS )
 
 *  Description:
-*     Check whether the message has come from a subsidiary task. If it 
-*     has, check what sort of message it is and either forward it or 
+*     Check whether the message has come from a subsidiary task. If it
+*     has, check what sort of message it is and either forward it or
 *     reactivate this application.
 
 *  Arguments:
@@ -114,7 +114,7 @@
       INTEGER ACTPTR                    ! action pointer
       CHARACTER*(MESSYS__TNAME) MYNAME  ! name of this task
       INTEGER NLENGTH                   ! actual length of MYNAME
-      CHARACTER*(MESSYS__TNAME) BADNAME ! name of task trying to 
+      CHARACTER*(MESSYS__TNAME) BADNAME ! name of task trying to
                                         ! communicate
       INTEGER MESLEN                    ! length of VALUE
       INTEGER ISTAT                     ! local status
@@ -168,7 +168,7 @@
 *
 *         Error in trying to forward messages.
 *
-            STATUS = SAI__OK 
+            STATUS = SAI__OK
             CALL TASK_REMOVE_MESSINFO ( PATH, MESSID, STATUS )
             CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, STATUS )
 
@@ -187,7 +187,7 @@
       ELSE
 *
 *      Not found in task list. Interpret it as bad status on received
-*      message 
+*      message
 *
          ISTAT = SAI__OK
          CALL DTASK_PRCNAM ( MYNAME, NLENGTH, ISTAT )
@@ -199,7 +199,7 @@
          IF ( ISTAT .NE. SAI__OK ) THEN
                   BADNAME = 'unknown'
          ENDIF
-         CALL MSG_SETC ( 'BADNAME', BADNAME )            
+         CALL MSG_SETC ( 'BADNAME', BADNAME )
          CALL MSG_SETC ( 'AKEY', AKEY )
          IF ( VALUE .EQ. ' ' ) THEN
             CALL ERR_REP ( ' ', 'From task ^BADNAME, action '//

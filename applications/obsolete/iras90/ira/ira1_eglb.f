@@ -1,4 +1,4 @@
-      SUBROUTINE IRA1_EGLB( NC, SCS, NLABS, MAXLAB, LABS, TOL, LBND, 
+      SUBROUTINE IRA1_EGLB( NC, SCS, NLABS, MAXLAB, LABS, TOL, LBND,
      :                      LAXMIN, STATUS )
 *+
 *  Name:
@@ -70,7 +70,7 @@
 *        ACM_DRVPO( 5 ) = REAL (Read)
 *           Values defining the area occupied by the text, in the
 *           order; (X,Y) at start of box, (X,Y) at end of box, height
-*           of box (perpendicular to the line joing start and end of 
+*           of box (perpendicular to the line joing start and end of
 *           box).
 
 *  Arguments Given:
@@ -182,7 +182,7 @@
      :                       CONTXT, STATUS )
 
 *  Update the lowest X coordinate covered by any coordinate value.
-            MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) - 
+            MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) -
      :             0.5*ACM_DRVPO( 5 )
             LAXMIN = MIN( LAXMIN, MINX )
 
@@ -246,7 +246,7 @@
      :                       CONTXT, STATUS )
 
 *  Update the lowest X coordinate covered by any coordinate value.
-            MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) - 
+            MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) -
      :             0.5*ACM_DRVPO( 5 )
             LAXMIN = MIN( LAXMIN, MINX )
 

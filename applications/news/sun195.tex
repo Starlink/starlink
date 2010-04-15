@@ -43,7 +43,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -112,7 +112,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -187,12 +187,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -243,7 +243,7 @@ to be listed alphabetically by title, rather than chronologically.  If
 you wish to bypass the topic listing and read a topic immediately,
 then it is possible to type {\tt news} {\it $<$ title $>$}.
 
-News items can be printed by typing {\tt p} or exported to a disk 
+News items can be printed by typing {\tt p} or exported to a disk
 file by typing {\tt e}. {\tt news -h} will give a brief help description.
 
 \subsection{New news items\xlabel{new_news_items}}
@@ -282,7 +282,7 @@ the news items are usually posted on Usenet.
 in column one of the text apart from the first line.
 
 \item Subtopics should commence with a numeral ``2'' in column one followed
-by a title. 
+by a title.
 
 \item Only two levels of news are readable by the {\tt news} program.
 
@@ -297,7 +297,7 @@ by a title.
 1 An Example News Item
                                                          Expires: 10/7/95
 
-This example news item demonstrates the format required for Starlink News 
+This example news item demonstrates the format required for Starlink News
 Items. The body of the text is restricted to 75 columns wide.  Numeral
  1 is excluded from the first column. Here I have indented it with a space.
 
@@ -310,8 +310,8 @@ All text after this point is included in the subtopic...
 2 This is another subtopic
 
 ...with its text in here.
-                                                      
-\end{verbatim}   
+
+\end{verbatim}
 \end{quote}
 
 \end{document}

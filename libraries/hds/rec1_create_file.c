@@ -450,7 +450,7 @@ name cannot be used to create a new container file.",
 /* Check for errors first                                               */
       if ( _ok( hds_gl_status ) )
       {
-         if ( exists ) 
+         if ( exists )
          {
 /*  unlink() allows us to delete a write-protected file if it is owned  */
 /*  by us. To work around this we first try to open the file for read/  */

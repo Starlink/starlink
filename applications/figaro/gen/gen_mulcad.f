@@ -7,7 +7,7 @@ C     Multiplies a double precision array by a constant.
 C
 C     Parameters -   (">" input, "<" output)
 C
-C     (>) IN     (Double precision array IN(N)) The input array 
+C     (>) IN     (Double precision array IN(N)) The input array
 C                (Note that IN may be multiply dimensioned
 C                in the calling program.  It is treated as
 C                1D here for efficiency and generality.)

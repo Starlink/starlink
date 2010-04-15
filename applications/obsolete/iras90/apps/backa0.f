@@ -41,7 +41,7 @@
 *        The input data.
 *     DATTMP( SLOW:SHIGH, DLOW:DHIGH ) = REAL (Given)
 *        A copy of the input data from which has been removed (by being
-*        set bad) any samples not satisying the users quality 
+*        set bad) any samples not satisying the users quality
 *        expression.
 *     NSIGMA = REAL (Given)
 *        The no. of standard deviations from the median at which data
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
       LOGICAL OK
       CHARACTER QNAME*(*)
       CHARACTER LOCS(5)*(*)
-      
+
 *  Arguments Returned:
       REAL DATOUT( SLOW:SHIGH, DLOW:DHIGH )
       LOGICAL BAD
@@ -132,14 +132,14 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER IRC_DETNO          ! Detector number corresponding to a 
+      INTEGER IRC_DETNO          ! Detector number corresponding to a
                                  ! given detector index.
 
 *  Local Constants:
       INTEGER MAXIT              ! Max. no. of iterations.
       PARAMETER( MAXIT = 20 )
 
-      REAL TARGET                ! Fractional change in median between 
+      REAL TARGET                ! Fractional change in median between
       PARAMETER( TARGET = 0.001 )! iterations for convergence.
 
 *  Local Variables:
@@ -154,7 +154,7 @@
 
       REAL BACK                  ! The offset for the current detector.
       REAL DATVAL                ! Data value.
-      REAL LRMS                  ! The RMS residual on the previous 
+      REAL LRMS                  ! The RMS residual on the previous
                                  ! iteration.
       REAL MEDIAN                ! The median surface brightness.
       REAL RMS                   ! An estimate of the noise in the
@@ -204,7 +204,7 @@
 
          END DO
 
-      END DO      
+      END DO
 
 *  Find the median surface brightness in the input data. Report an
 *  error if no good data is found.
@@ -221,11 +221,11 @@
 
 *  Form the RMS residual between the median value and the input data.
       SUMSQ = 0.0
-      
+
       DO DET = DLOW, DHIGH
          DO SAMP = SLOW, SHIGH
 
-            DATVAL = WORK1( SAMP, DET ) 
+            DATVAL = WORK1( SAMP, DET )
             IF( DATVAL. NE. VAL__BADR ) THEN
                SUMSQ = SUMSQ + ( MEDIAN - DATVAL )**2
             END IF
@@ -233,15 +233,15 @@
          END DO
       END DO
 
-      RMS = SQRT( SUMSQ/NGOOD0 ) 
+      RMS = SQRT( SUMSQ/NGOOD0 )
 
 *  Display the original RMS residual.
       CALL MSG_SETR( 'RMS', RMS )
       CALL MSG_OUTIF( MSG__VERB, 'BACKA0_MSG1',
-     :                '    Iteration 0: RMS residual is ^RMS', 
+     :                '    Iteration 0: RMS residual is ^RMS',
      :                STATUS )
 
-*  Loop round rejecting outlying samples from the median estimate, 
+*  Loop round rejecting outlying samples from the median estimate,
 *  until two succesive median estimates agree to withiin 0.1%
       ITER = 0
       LRMS = 0.0
@@ -249,7 +249,7 @@
       DO WHILE( ABS( ( RMS - LRMS )/( RMS + LRMS ) ) .GT. 0.5*TARGET
      :          .AND. ITER .LE. MAXIT .AND. STATUS .EQ. SAI__OK )
          ITER = ITER + 1
-         
+
 *  Store a copy of the input data at every point at which the residual
 *  between the input data and the median value is within the acceptable
 *  range. Store a bad value at all other points.
@@ -258,7 +258,7 @@
          DO DET = DLOW, DHIGH
             DO SAMP = SLOW, SHIGH
 
-               DATVAL = WORK1( SAMP, DET ) 
+               DATVAL = WORK1( SAMP, DET )
                IF( DATVAL. NE. VAL__BADR ) THEN
 
                   IF( ABS( DATVAL - MEDIAN ) .LT. THRESH ) THEN
@@ -289,14 +289,14 @@
 *  Save the previous RMS value.
          LRMS = RMS
 
-*  Form the RMS residual between the new median value and the input 
+*  Form the RMS residual between the new median value and the input
 *  data.
          SUMSQ = 0.0
-      
+
          DO DET = DLOW, DHIGH
             DO SAMP = SLOW, SHIGH
 
-               DATVAL = WORK1( SAMP, DET ) 
+               DATVAL = WORK1( SAMP, DET )
                IF( DATVAL. NE. VAL__BADR ) THEN
                   SUMSQ = SUMSQ + ( MEDIAN - DATVAL )**2
                END IF
@@ -304,14 +304,14 @@
             END DO
          END DO
 
-         RMS = SQRT( SUMSQ/NGOOD0 ) 
+         RMS = SQRT( SUMSQ/NGOOD0 )
 
 *  Display the current RMS residual.
          CALL MSG_SETI( 'I', ITER )
          CALL MSG_SETI( 'REJ', NGOOD0 - NGOOD )
          CALL MSG_SETR( 'RMS', RMS )
          CALL MSG_OUTIF( MSG__VERB, 'BACKA0_MSG2',
-     : '    Iteration ^I: RMS residual is ^RMS (^REJ values rejected)', 
+     : '    Iteration ^I: RMS residual is ^RMS (^REJ values rejected)',
      :                   STATUS )
 
       END DO
@@ -346,18 +346,18 @@
       REMOVE = MEDIAN - OUTBAC
 
 *  Initalise the flag used to indicate if there are any bad values in
-*  the output array.      
+*  the output array.
       BAD = .FALSE.
 
-*  If required, subtract a constant from every sample which 
+*  If required, subtract a constant from every sample which
 *  constant is converted from Mega-Janskys per steradian to the units
 *  of the input data.
-      IF( OUTTYP .EQ. 'DATA' ) THEN      
+      IF( OUTTYP .EQ. 'DATA' ) THEN
          DO DET = DLOW, DHIGH
             BACK = REMOVE/WORK2( DET )
-   
+
             DO SAMP = SLOW, SHIGH
-   
+
                DATVAL = DATIN( SAMP, DET )
                IF( DATVAL .NE. VAL__BADR ) THEN
                   DATOUT( SAMP, DET ) = DATVAL - BACK
@@ -365,19 +365,19 @@
                   DATOUT( SAMP, DET ) = VAL__BADR
                   BAD = .TRUE.
                END IF
-   
+
             END DO
-   
-         END DO      
+
+         END DO
 
 *  Otherwise, fill the output array with the background value (excluding
 *  samples which are bad in the input).
       ELSE
          DO DET = DLOW, DHIGH
             BACK = REMOVE/WORK2( DET )
-   
+
             DO SAMP = SLOW, SHIGH
-   
+
                DATVAL = DATIN( SAMP, DET )
                IF( DATVAL .NE. VAL__BADR ) THEN
                   DATOUT( SAMP, DET ) = BACK
@@ -385,10 +385,10 @@
                   DATOUT( SAMP, DET ) = VAL__BADR
                   BAD = .TRUE.
                END IF
-   
+
             END DO
-   
-         END DO      
+
+         END DO
 
       END IF
 

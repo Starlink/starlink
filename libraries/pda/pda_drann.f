@@ -1,4 +1,4 @@
-*  
+*
 *  Description from GAMS:
 *
 *  Standard normal generator with zero mean and unit standard deviation. Uses

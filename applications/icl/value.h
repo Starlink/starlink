@@ -21,9 +21,9 @@ typedef struct _value
 		char *string;		     /* TYPE_STRING, TYPE_EXCEPTION */
 		struct _symtab *symbols;     /* TYPE_SYMTAB */
 		struct _value (*function)(); /* TYPE_FUNCTION */
-		double (*dfunction)();	     /* TYPE_FUNCTION 
+		double (*dfunction)();	     /* TYPE_FUNCTION
 					      *  - distinguished by context */
-		int (*ifunction)();	     /* TYPE_FUNCTION 
+		int (*ifunction)();	     /* TYPE_FUNCTION
 					      *  - distinguished by context */
 		PORTPTR fp;		     /* TYPE_FILE */
 	} u;
@@ -91,7 +91,7 @@ extern int  isexception( value v );
 /*
  * Constructors
  */
-extern value value_real   ( double f ), 
+extern value value_real   ( double f ),
        value_integer( int i ),
        value_logical( int i ),
        value_string ( char *s ),
@@ -115,7 +115,7 @@ extern int integer_part ( value val  );
 extern int logical_part ( value val  );
 extern char *string_part( value val  );
 extern PORTPTR file_part( value val  );
-extern value  ((*(function_part  ( value val  )))()); 
+extern value  ((*(function_part  ( value val  )))());
 extern double ((*(dfunction_part ( value val  )))());
 extern int    ((*(ifunction_part ( value val  )))());
 extern struct _symtab *symboltable_part(value val);

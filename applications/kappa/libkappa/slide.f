@@ -21,12 +21,12 @@
 
 *  Description:
 *     The pixels of an NDF are shifted by a given number of pixels along
-*     each pixel axis.  The shift need not be an integer number of 
+*     each pixel axis.  The shift need not be an integer number of
 *     pixels, and pixel interpolation will be performed if necessary
-*     using the scheme selected by parameter METHOD.  The shifts to use 
+*     using the scheme selected by parameter METHOD.  The shifts to use
 *     are specified either by an absolute vector given by the ABS
 *     parameter or by the difference between a fiducial point and a
-*     standard object given by the FID and OBJ parameters respectively. 
+*     standard object given by the FID and OBJ parameters respectively.
 *     In each case the co-ordinates are specified in the NDF's pixel
 *     co-ordinate Frame.
 
@@ -36,7 +36,7 @@
 *  ADAM Parameters:
 *     ABS( ) = _DOUBLE (Read)
 *        Absolute shifts in pixels.  The number of values supplied must
-*        match the number of pixel axes in the NDF.  It is only used if 
+*        match the number of pixel axes in the NDF.  It is only used if
 *        STYPE="Absolute".
 *     FID( ) = _DOUBLE (Read)
 *        Position of the fiducial point in pixel co-ordinates.  The
@@ -45,7 +45,7 @@
 *     IN = NDF (Read)
 *        The NDF to be translated.
 *     METHOD = LITERAL (Read)
-*        The interpolation method used to perform the translation. 
+*        The interpolation method used to perform the translation.
 *        The following values are permitted:
 *
 *        -  "Nearest"   -- Nearest neighbour sampling.
@@ -92,16 +92,16 @@
 
 *  Examples:
 *     slide m31 m31_acc [3.2,2.3]
-*        The pixels in the NDF m31 are shifted by 3.2 pixels in X and 
+*        The pixels in the NDF m31 are shifted by 3.2 pixels in X and
 *        2.3 pixels in Y, and written to NDF m31_acc.  Linear
 *        interpolation  is used to produce the output data (and, if
 *        present, variance) array.
 *     slide m31 m31_acc [3.2,2.3] nearest
 *        The same as the previous example except that nearest-neighbour
 *        resampling is used.  This will be somewhat faster, but may
-*        result in features shifted by up to half a pixel. 
+*        result in features shifted by up to half a pixel.
 *     slide speca specb stype=rel fid=11.2 obj=11.7
-*        The pixels in the NDF speca are shifted by 0.5 (i.e. 
+*        The pixels in the NDF speca are shifted by 0.5 (i.e.
 *        11.7 - 11.2) pixels and the output NDF is written as specb.
 *     slide speca specb stype=abs abs=0.5
 *        This does just the same as the previous example.
@@ -110,7 +110,7 @@
 *     When performing the translation the pixels are resampled from
 *     the input grid to the output grid by default using linear
 *     interpolation.  For many purposes this default scheme will
-*     be adequate, but for greater control over the resampling 
+*     be adequate, but for greater control over the resampling
 *     process the METHOD and PARAMS parameters can be used.  Detailed
 *     discussion of the use of these parameters can be found in the
 *     "Sub-pixel Interpolation Schemes" section of the REGRID task
@@ -122,7 +122,7 @@
 *     It can thus be compared to the SETORIGIN command.
 *     -  Resampled axis centres that are beyond the bounds of the
 *     input NDF are given extrapolated values from the first (or last)
-*     pair of valid centres. 
+*     pair of valid centres.
 
 *  Related Applications:
 *     KAPPA: REGRID, SQORST, WCSADD.
@@ -132,7 +132,7 @@
 *     are propagated. TITLE is controlled by the TITLE parameter.  DATA,
 *     VARIANCE, AXIS and WCS are propagated after appropriate
 *     modification.  QUALITY component is also propagated if
-*     nearest-neighbour interpolation is being used. 
+*     nearest-neighbour interpolation is being used.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -170,7 +170,7 @@
 *        Original version.
 *     15-JAN-2002 (DSB):
 *        Modified so that positions are always obtained in pixel coords.
-*        Added propagation of QUALITY.  Also changed code to look more 
+*        Added propagation of QUALITY.  Also changed code to look more
 *        like REGRID.  Added propagation of the AXIS component.
 *     2005 October 13 (MJC):
 *        Replace bad axis centres arising during resampling with
@@ -178,7 +178,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -206,7 +206,7 @@
       CHARACTER STYPE * ( 16 )   ! Type of shift to be supplied
       DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input
                                  ! array
-      DOUBLE PRECISION FID( NDF__MXDIM ) ! Co-ordinates of fiducial 
+      DOUBLE PRECISION FID( NDF__MXDIM ) ! Co-ordinates of fiducial
                                  ! point
       DOUBLE PRECISION LPO       ! Lower bound in output array
       DOUBLE PRECISION OBJ( NDF__MXDIM ) ! Co-ordinates of standard
@@ -220,8 +220,8 @@
       DOUBLE PRECISION PT1O( NDF__MXDIM ) ! First output point
       DOUBLE PRECISION PT2I( NDF__MXDIM ) ! Second input point
       DOUBLE PRECISION PT2O( NDF__MXDIM ) ! Second output point
-      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector      
-      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input 
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector
+      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input
                                  ! array
       DOUBLE PRECISION TOL       ! Tolerance for linear transform
                                  ! approximation
@@ -309,25 +309,25 @@
 
 *  Get the absolute shift directly as the value of the ABS parameter.
       IF ( STYPE .EQ. 'ABSOLUTE' ) THEN
-         CALL PAR_EXACD( 'ABS', NDIM, SHIFT, STATUS ) 
+         CALL PAR_EXACD( 'ABS', NDIM, SHIFT, STATUS )
 
 *  Or get it as the difference between the FID and OBJ parameters.
       ELSE
 
 *  Get the co-ordinates of the fiducial point.
-         CALL PAR_EXACD( 'FID', NDIM, FID, STATUS ) 
+         CALL PAR_EXACD( 'FID', NDIM, FID, STATUS )
 
 *  Get the co-ordinates of the standard object.
-         CALL PAR_EXACD( 'OBJ', NDIM, OBJ, STATUS ) 
+         CALL PAR_EXACD( 'OBJ', NDIM, OBJ, STATUS )
 
-*  Set the shift as the difference between the two. 
+*  Set the shift as the difference between the two.
          DO I = 1, NDIM
             SHIFT( I ) = FID( I ) - OBJ( I )
          END DO
       END IF
 
 *  Construct a Mapping from input PIXEL to output PIXEL corresponding to
-*  the given shifts. 
+*  the given shifts.
       DO I = 1, NDIM
          PIA( I ) = 0D0
          PIB( I ) = 1D0
@@ -378,7 +378,7 @@
          INTERP = AST__BLOCKAVE
          NPARAM = 1
       END IF
-      CALL MSG_OUT( 'SLIDE_MSG1', '  Using ^M interpolation.', 
+      CALL MSG_OUT( 'SLIDE_MSG1', '  Using ^M interpolation.',
      :              STATUS )
 
 *  Get an additional parameter vector if required.
@@ -396,7 +396,7 @@
 *  Get the bounds of the output NDF.
 *  =================================
 
-*  Work out the bounds of an array which would contain the resampled 
+*  Work out the bounds of an array which would contain the resampled
 *  copy of the whole input array.
       DO I = 1, NDIM
          DLBNDI( I ) = DBLE( LBNDI( I ) - 1 )
@@ -433,7 +433,7 @@
       IF ( HASVAR ) THEN
          CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
       END IF
-      
+
 *  Store a suitably modified copy of the input WCS in the output.
       CALL KPG1_ASFIX( MAPIO, NDFI, NDFO, STATUS )
 
@@ -456,7 +456,7 @@
          CALL NDF_MAP( NDFO, 'VARIANCE', ITYPE, 'WRITE', IPVARO,
      :                 ELO, STATUS )
 
-*  Unless we already know of bad values in the Data component, see 
+*  Unless we already know of bad values in the Data component, see
 *  whether the Variance component may contain them.
          IF ( .NOT. BAD ) THEN
             CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
@@ -476,9 +476,9 @@
 *  =======================
 
 *  Since AST_RESAMPLE<X> requires the centre of pixels to be represented
-*  by integers (the LBND and UBND arrays) it is necessary to add a 
+*  by integers (the LBND and UBND arrays) it is necessary to add a
 *  half-pixel shift onto both ends of the Mapping prior to executing
-*  the resample.  First construct a Mapping which transforms minus a 
+*  the resample.  First construct a Mapping which transforms minus a
 *  half pixel in every input dimension.
       DO I = 1, NDIM
          PT1I( I ) = 0D0
@@ -507,76 +507,76 @@
 *  Perform the resampling according to data type.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          NBAD = AST_RESAMPLEB( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPDATI ) ),
      :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADB, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          NBAD = AST_RESAMPLEUB( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                          %VAL( CNF_PVAL( IPDATI ) ), 
+     :                          %VAL( CNF_PVAL( IPDATI ) ),
      :                          %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                          VAL__BADUB, NDIM, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          NBAD = AST_RESAMPLEW( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPDATI ) ),
      :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADW, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          NBAD = AST_RESAMPLEUW( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                          %VAL( CNF_PVAL( IPDATI ) ), 
+     :                          %VAL( CNF_PVAL( IPDATI ) ),
      :                          %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                          VAL__BADUW, NDIM, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          NBAD = AST_RESAMPLEI( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPDATI ) ),
      :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADI, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          NBAD = AST_RESAMPLER( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPDATI ) ),
      :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADR, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          NBAD = AST_RESAMPLED( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPDATI ) ),
      :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADD, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
       END IF
 
-*  We can set the bad pixels flag according to the bad pixel count 
+*  We can set the bad pixels flag according to the bad pixel count
 *  returned from AST_RESAMPLE<X>.
       BAD = NBAD .GT. 0
       CALL NDF_SBAD( BAD, NDFO, 'DATA', STATUS )
@@ -591,18 +591,18 @@
 
 *  Map the QUALITY array of the input and output NDFs. Note, QUALITY
 *  arrays should always be mapped as _UBYTE.
-         CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, ELI, 
+         CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, ELI,
      :                 STATUS )
          CALL NDF_MAP( NDFO, 'QUALITY', '_UBYTE', 'WRITE', IPQUAO, ELO,
      :                 STATUS )
 
 *  Do the resampling.
          NBAD = AST_RESAMPLEUB( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                          %VAL( CNF_PVAL( IPQUAI ) ), 
+     :                          %VAL( CNF_PVAL( IPQUAI ) ),
      :                          %VAL( CNF_PVAL( IPQUAI ) ), INTERP,
      :                          AST_NULL, PARAMS, 0, TOL, MAXPIX,
      :                          VAL__BADUB, NDIM, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( CNF_PVAL( IPQUAO ) ), 
+     :                          UBNDO, %VAL( CNF_PVAL( IPQUAO ) ),
      :                          %VAL( CNF_PVAL( IPQUAO ) ),
      :                          STATUS )
 
@@ -620,25 +620,25 @@
 
 *  Loop round each NDF axis which has a defined AXIS Centre array.
       DO I = 1, NDIM
-         CALL NDF_ASTAT( NDFI, 'Centre', I, HASAX, STATUS ) 
+         CALL NDF_ASTAT( NDFI, 'Centre', I, HASAX, STATUS )
          IF( HASAX ) THEN
 
 *  Modify the Mapping to select this axis at both ends.
             OUTPRM( I ) = 1
-            PMAP1 = AST_PERMMAP( 1, I, NDIM, OUTPRM, 0.0D0, ' ', 
+            PMAP1 = AST_PERMMAP( 1, I, NDIM, OUTPRM, 0.0D0, ' ',
      :                           STATUS )
             OUTPRM( I ) = 0
 
             PMAP2 = AST_COPY( PMAP1, STATUS )
             CALL AST_INVERT( PMAP2, STATUS )
 
-            MAPA = AST_CMPMAP( AST_CMPMAP( PMAP1, MAPHIO, .TRUE., ' ', 
+            MAPA = AST_CMPMAP( AST_CMPMAP( PMAP1, MAPHIO, .TRUE., ' ',
      :                                     STATUS ),
      :                         PMAP2, .TRUE., ' ', STATUS )
 
 *  Get the data type of the Centre array and map it in both input and
 *  output NDFs.
-            CALL NDF_ATYPE( NDFI, 'Centre', I, ITYPE, STATUS )      
+            CALL NDF_ATYPE( NDFI, 'Centre', I, ITYPE, STATUS )
 
             CALL NDF_AMAP( NDFI, 'Centre', I, ITYPE, 'READ', IPAI, ELI,
      :                     STATUS )
@@ -653,119 +653,119 @@
 *  extrapolating from the next interior pair.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
                NBAD = AST_RESAMPLEB( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADB, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADB, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
 
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAEB( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAEB( LBNDO( I ), UBNDO( I ),
      :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                             STATUS )
                END IF
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                NBAD = AST_RESAMPLEUB( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADUB, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADUB, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
-      
+
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAEUB( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAEUB( LBNDO( I ), UBNDO( I ),
      :                              %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                              STATUS )
                END IF
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                NBAD = AST_RESAMPLEW( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADW, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADW, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
 
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAEW( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAEW( LBNDO( I ), UBNDO( I ),
      :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                             STATUS )
                END IF
-      
+
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                NBAD = AST_RESAMPLEUW( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADUW, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADUW, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
-      
+
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAEUW( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAEUW( LBNDO( I ), UBNDO( I ),
      :                              %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                              STATUS )
                END IF
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                NBAD = AST_RESAMPLEI( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADI, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADI, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAEI( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAEI( LBNDO( I ), UBNDO( I ),
      :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                             STATUS )
                END IF
 
-      
+
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                NBAD = AST_RESAMPLER( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADR, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADR, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
 
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAER( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAER( LBNDO( I ), UBNDO( I ),
      :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                             STATUS )
                END IF
-      
+
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                NBAD = AST_RESAMPLED( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ),
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADD, 1, LBNDO( I ), 
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADD, 1, LBNDO( I ),
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
-     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
 
                IF ( NBAD .GT. 0 ) THEN
-                  CALL KPS1_SLAED( LBNDO( I ), UBNDO( I ), 
+                  CALL KPS1_SLAED( LBNDO( I ), UBNDO( I ),
      :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                             STATUS )
                END IF

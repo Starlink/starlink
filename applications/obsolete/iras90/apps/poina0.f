@@ -1,4 +1,4 @@
-      SUBROUTINE POINA0( PAUTO, PLOGFI, 
+      SUBROUTINE POINA0( PAUTO, PLOGFI,
      :                   AUTO, BANDLU, LOGFID, LOGREQ, STATUS )
 *+
 *  Name:
@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA0( PAUTO, PLOGFI, PMSGFL, 
+*     CALL POINA0( PAUTO, PLOGFI, PMSGFL,
 *                  AUTO, BANDLU, LOGFID, LOGREQ, STATUS )
 
 *  Description:
-*     This subroutine initaialises variables and parameters used by POINTCRDD 
+*     This subroutine initaialises variables and parameters used by POINTCRDD
 *     It obtains the MSG_FILTER parameter.
 *     It obtains the name of the log file and if the file is required, opens
 *     it and writes a header to it.
@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  Ask user for name of logfile, if the logfile name is entered as null
 *  the LOGREQ flag is set false, if a valid file name is given, the file
 *  is opened and LOGREQ returned TRUE.
-      CALL IRM_ASFIO( PLOGFI, 'WRITE', 'LIST', 80, LOGFID, LOGREQ, 
+      CALL IRM_ASFIO( PLOGFI, 'WRITE', 'LIST', 80, LOGFID, LOGREQ,
      :                STATUS )
 
 *  If the logfile is required display name of the logfile to the user

@@ -2,22 +2,22 @@
  *+
  *  Name:
  *     ems1Fthreadata
- 
+
  *  Purpose:
  *     Free thread specific data when thread exits.
- 
+
  *  Language:
  *     Starlink ANSI C
- 
+
  *  Invocation:
  *     void ems1Fthreaddata()
- 
+
  *  Description:
  *     This routine will be called when a thread exits and will release any
- *     resources allocated for that thread. If the thread error status is set 
+ *     resources allocated for that thread. If the thread error status is set
  *     then the error context will be merged into that of the global error
  *     table, so that the context can be reported.
- 
+
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
@@ -27,17 +27,17 @@
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PWD: Peter W. Draper (JAC, Durham University)
  *     {enter_new_authors_here}
@@ -46,10 +46,10 @@
  *     15-MAY-2008 (PWD):
  *        Original version.
  *     {enter_further_changes_here}
- 
+
  *  Bugs:
  *     {note_any_bugs_here}
- 
+
  *-
  */
 
@@ -72,7 +72,7 @@
 static pthread_mutex_t foo_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* The global error table. */
-extern ems_msgtab_t *ems_msgtab;     
+extern ems_msgtab_t *ems_msgtab;
 
 void ems1Fthreaddata( void *ptr )
 {
@@ -98,11 +98,11 @@ void ems1Fthreaddata( void *ptr )
 
         /*  Transfer all messages, one by one */
         for ( i = istart; i <= iend; i++ ) {
-            ems1Estor1( ems_msgtab, msgtab.msgpar[ i ], msgtab.msgpln[ i ], 
-                        msgtab.msgstr[ i ], msgtab.msglen[ i ], 
+            ems1Estor1( ems_msgtab, msgtab.msgpar[ i ], msgtab.msgpln[ i ],
+                        msgtab.msgstr[ i ], msgtab.msglen[ i ],
                         &msgtab.msgsta[ i ] );
         }
-        
+
         /*  Release mutex. */
         pthread_mutex_unlock( &foo_mutex );
     }

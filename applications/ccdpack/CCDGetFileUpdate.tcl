@@ -1,7 +1,7 @@
    proc CCDGetFileUpdate { namebox dirbox dirent filterent images } {
 #+
 #  Name:
-#     CCDGetFileUpdate 
+#     CCDGetFileUpdate
 
 #  Purpose:
 #     Updates the contents of the filename and directory name listboxes
@@ -31,14 +31,14 @@
 
 #  Implementation Status:
 #     The images argument is only treated specially for HDS container
-#     files.  It would be nice to have it do the same thing for 
+#     files.  It would be nice to have it do the same thing for
 #     Multi-Extension FITS files.  This is not easy however.
 
 #  Global Variables:
 #     CCDcurrentdirectory = string (read)
 #        Name of the current directory.
 #     CCDndfcontainers = array (write)
-#        An array giving the name of the HDS container file for each 
+#        An array giving the name of the HDS container file for each
 #        NDF which has been encountered (will only be affected if
 #        images is true).
 
@@ -85,44 +85,44 @@
 #.
 
 #  Delete present contents of listboxes.
-      $namebox clear 0 end 
-      $dirbox  clear 0 end 
+      $namebox clear 0 end
+      $dirbox  clear 0 end
 
 #  Get the current directory.
-      set moveto [$dirent get] 
+      set moveto [$dirent get]
 
 #  If this is ../ then get the real name. Check for special case of
 #  being at / (the root directory). Do not move up from this position.
-      if { $moveto == "../" } { 
+      if { $moveto == "../" } {
          set moveto [ file dirname $CCDcurrentdirectory ]
-      } 
+      }
 
 #  Expand . to the real directories.
-      if { $moveto == "." } { set moveto [pwd] } 
+      if { $moveto == "." } { set moveto [pwd] }
       set CCDcurrentdirectory $moveto
 
 #  First add ../ to the directory list so we can get up in the world.
-      $dirbox insert end "../" 
+      $dirbox insert end "../"
 
 #  Now add new contents expanding filespec to list of names. Test for the
 #  presence of directories, these go into the directory box.
-      if { $moveto != "/" } { set moveto "$moveto/" } 
+      if { $moveto != "/" } { set moveto "$moveto/" }
       set newfiles "$moveto[$filterent get]"
 
 #  Look for directories. These do not use the file filter.
       foreach name [lsort -dictionary [glob -nocomplain "$moveto*" ] ] {
-         if { [file isdirectory $name] } { 
+         if { [file isdirectory $name] } {
             $dirbox insert end $name
          }
-      } 
+      }
 
 #  Now for normal file which do need the file filter.
       foreach filename [lsort -dictionary [glob -nocomplain $newfiles ] ] {
-         if { ! [file isdirectory $filename] } { 
+         if { ! [file isdirectory $filename] } {
 
 #  In general use the filename as it is, but in the case where we are
 #  specifically looking for images, treat HDS container files specially
-#  by passing them to ndgexpand.  This may find zero, one or more 
+#  by passing them to ndgexpand.  This may find zero, one or more
 #  NDF structures in each file.
             if { $images && [ regsub {.sdf$} $filename "" clipped ] } {
                set supdatalist [ ndgexpand -sup $clipped ]
@@ -145,7 +145,7 @@
                $namebox insert end $shortname
             }
          }
-      } 
+      }
 
 #  Now set the current directory.
       $dirent clear 0 end

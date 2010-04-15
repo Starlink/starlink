@@ -4,7 +4,7 @@
 *     smf_resampcube_copy
 
 *  Purpose:
-*     Copy a single sky cube spectrum into the output time series cube 
+*     Copy a single sky cube spectrum into the output time series cube
 *     using nearest neighbour resampling.
 
 *  Language:
@@ -14,8 +14,8 @@
 *     C function
 
 *  Invocation:
-*     void smf_resampcube_copy( dim_t nchan, int *spectab, 
-*                               dim_t iv0, dim_t nxy, float *ddata, 
+*     void smf_resampcube_copy( dim_t nchan, int *spectab,
+*                               dim_t iv0, dim_t nxy, float *ddata,
 *                               float *in_data, int *status );
 
 *  Arguments:
@@ -23,9 +23,9 @@
 *        Number of spectral channels in the template time series cube.
 *     spectab = int * (Given)
 *        This array should have "nchan" elements, and each element should
-*        hold the integer index (zero-based) of the nearest neighbouring 
-*        sky cube channel. A value of -1 should flag time series channels 
-*        that do not have any corresponding sky cube channel. 
+*        hold the integer index (zero-based) of the nearest neighbouring
+*        sky cube channel. A value of -1 should flag time series channels
+*        that do not have any corresponding sky cube channel.
 *     iv0 = dim_t (Given)
 *        The index within the sky cube of the pixel corresponding to
 *        channel zero of the spectrum being copied.
@@ -39,7 +39,7 @@
 *        Pointer to the inherited status.
 
 *  Description:
-*     Copy a single spectrum from the sky cube to the output time series 
+*     Copy a single spectrum from the sky cube to the output time series
 *     cube using nearest neighbour resampling.
 
 *  Authors:
@@ -88,8 +88,8 @@
 
 #define FUNC_NAME "smf_resampcube_copy"
 
-void smf_resampcube_copy( dim_t nchan, int *spectab, 
-                          dim_t iv0, dim_t nxy, float *ddata, 
+void smf_resampcube_copy( dim_t nchan, int *spectab,
+                          dim_t iv0, dim_t nxy, float *ddata,
                           float *in_data, int *status ){
 
 /* Local Variables */
@@ -102,7 +102,7 @@ void smf_resampcube_copy( dim_t nchan, int *spectab,
 /* Loop round all spectral channels. */
    for( ichan = 0; ichan < nchan; ichan++, ddata++ ) {
 
-/* If this spectral channel has a valid spectral position in the sky cube, 
+/* If this spectral channel has a valid spectral position in the sky cube,
    add it into the output arrays. */
       if( spectab[ ichan ] >= 0 ) {
 

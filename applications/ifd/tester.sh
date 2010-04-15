@@ -7,7 +7,7 @@
 #     Automake test script for IFD package.
 
 #  Description:
-#     This is a short script which does regression tests on some of 
+#     This is a short script which does regression tests on some of
 #     the IFD scripts, comparing output against runs done previously.
 #     It is not exhaustive.  It was copied from the old-style Starlink
 #     IFD makefile.
@@ -16,7 +16,7 @@
 #     Zero for success, non-zero for failure.
 
 #  Notes:
-#     The tests will only run correctly if they are run *after* 
+#     The tests will only run correctly if they are run *after*
 #     installation, since the scripts source files in $(bindir) to work.
 #     This is not the way that make check normally works.
 

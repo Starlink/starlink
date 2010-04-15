@@ -70,7 +70,7 @@
 
 *    Just call CHR_ library routine to do conversion
 
-      OUTSTRING = INSTRING  
+      OUTSTRING = INSTRING
       CALL CHR_UCASE( OUTSTRING )
 
 *    That's it.

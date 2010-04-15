@@ -57,7 +57,7 @@
 *                 Mark the chosen point with a cross
 *                 Switch off first-point repeat
 *              Else
-*                 Describe next functions of the choice device and 
+*                 Describe next functions of the choice device and
 *                   locator
 *              Endif
 *           End repeat
@@ -279,7 +279,7 @@
 
                ELSE IF ( BUTTN1 .EQ. 1 ) THEN
 
-*                Show new meanings  
+*                Show new meanings
 
                   CALL MSG_OUT( 'CHOICE2', 'Get second point defining '/
      :              /'the region via the cursor', STATUS )
@@ -370,7 +370,7 @@
 
 *                Check that the points are distinct.
 
-                  IF ( ( XCUR01 .NE. XCUR02 ) .OR. 
+                  IF ( ( XCUR01 .NE. XCUR02 ) .OR.
      :                 ( YCUR01 .NE. YCUR02 ) ) THEN
 
 *                   Erasing the earlier cross.
@@ -425,7 +425,7 @@
 *          End of repeat until loop for second co-ordinate pair
 
             END DO
- 
+
 *       End of main repeat until loop
 
          END DO

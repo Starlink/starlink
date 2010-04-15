@@ -16,9 +16,9 @@ set nocheckpars
 { Get some semi-global variables
 red4_alias  = getenv("PID") & 'red4'
 red4_date   = getenv("RED4_DATE")
-red4_index  = '$CGS4_INDEX/cgs4_' & getenv("CGS4_DATE") & '.index' 
+red4_index  = '$CGS4_INDEX/cgs4_' & getenv("CGS4_DATE") & '.index'
 red4_format = getenv("CGS4_FORMAT")
- 
+
 {
 { Defstring the basic commands
 defstring red4_add_int obeyw (red4_alias) add_int
@@ -91,7 +91,7 @@ defstring set_obsbad obeyw (red4_alias) file_obs type='BAD'
 defstring bad_observation obeyw (red4_alias) file_obs type='BAD'
 defstring file_calibration obeyw (red4_alias) file_calib
 defstring file_calib obeyw (red4_alias) file_calib
-defstring file_observation obeyw (red4_alias) file_obs 
+defstring file_observation obeyw (red4_alias) file_obs
 defstring file_obs obeyw (red4_alias) file_obs type='WHATEVER_IT_IS'
 defstring array_tests analyze_array (red4_alias)
 
@@ -243,7 +243,7 @@ proc file_standard p1 p2 p3 p4 p5
   if UNDEFINED(p1)
     input 'Group (or reduced observation) to file as a standard?  > ' (obs)
   else
-    obs = p1  
+    obs = p1
   endif
   {
   { Get the effective temperature
@@ -288,7 +288,7 @@ proc calibrate p1 p2 p3 p4 p5 p6
   if UNDEFINED(p1)
     input 'Reduced observation to be calibrated?  > ' (obs)
   else
-    obs = p1  
+    obs = p1
   endif
   inobs = '$RODIR/' & SUBSTR( obs, INDEX(obs,'/')+1, LEN(obs) )
   spc   = '$RODIR/' & SUBSTR( obs, INDEX(obs,'/')+1, LEN(obs) ) & '_1d'

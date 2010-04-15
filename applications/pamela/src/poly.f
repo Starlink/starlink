@@ -37,7 +37,7 @@ C
       ELSE IF(N.EQ.11) THEN
         POLY=X*(X*(X*(X*(X*(X*(X*(X*(X*(X*A(11)+A(10))+A(9))+
      &  A(8))+A(7))+A(6))+A(5))+A(4))+A(3))+A(2))+A(1)
-      ELSE 
+      ELSE
         POLY=A(N)
         DO I=N-1,1,-1
           POLY = POLY*X + A(I)
@@ -88,7 +88,7 @@ C
         DPOLY=X*(X*(X*(X*(X*(X*(X*(X*(X*10*A(11)+9*A(10))+
      &  8*A(9))+7*A(8))+6*A(7))+5*A(6))+4*A(5))+3*A(4))+2*A(3))
      &  +A(2)
-      ELSE 
+      ELSE
         DPOLY=A(N)*DBLE(N-1)
         DO I=N-1,2,-1
           DPOLY = DPOLY*X + A(I)*DBLE(I-1)
@@ -138,7 +138,7 @@ C
       ELSE IF(I.EQ.10) THEN
         PLY=X*(X*(X*(X*(X*(X*(X*(X*(X*(X*A(1)+A(2))+A(3))+A(4))
      &  +A(5))+A(6))+A(7))+A(8))+A(9))+A(10))+A(11)
-      ELSE 
+      ELSE
         PLY=A(1)
         DO J=2,I+1
           PLY = X*PLY + A(J)

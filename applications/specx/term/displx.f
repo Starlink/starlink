@@ -62,7 +62,7 @@ C   Routine to list relevant data about XSCALE for each unmasked quadrant
         END IF
 
       END DO
-      
+
  1000 FORMAT ('  Quad.   Centre freq.   Increment',
      &        '                  Start        End'      /
      &        '             (GHz)         (MHz)  ',

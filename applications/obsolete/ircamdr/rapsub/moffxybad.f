@@ -2,9 +2,9 @@
 *+  MOFFXYBAD - calculates best fit offsets for a mosaic image pair - this
 *               subroutine uses a bad pixel mask to take care of bad pixels
 
-      SUBROUTINE MOFFXYBAD ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1, 
-     :                       DIMSB2, NXOFF, NYOFF, BOXSIZE, BADMASK, 
-     :                       BADDIMS1, BADDIMS2, BESTXOFF, BESTYOFF, 
+      SUBROUTINE MOFFXYBAD ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1,
+     :                       DIMSB2, NXOFF, NYOFF, BOXSIZE, BADMASK,
+     :                       BADDIMS1, BADDIMS2, BESTXOFF, BESTYOFF,
      :                       STATUS )
 
 *    Description :
@@ -85,13 +85,13 @@
      :    DIMSB1, DIMSB2,             !      "      " second  "     "
      :    NXOFF,                  ! nominal x offset from first to second
      :    NYOFF,                  !    "    y    "     "    "    "    "
-     :    BOXSIZE,                ! size of offset box to be searched 
+     :    BOXSIZE,                ! size of offset box to be searched
      :    BADDIMS1, BADDIMS2          ! dimensions of bad pixel mask
 
       REAL
      :    ARRAYA( DIMSA1, DIMSA2 ), ! first input image
      :    ARRAYB( DIMSB1, DIMSB2 ), ! second  "     "
-     :    BADMASK( BADDIMS1, BADDIMS2 )  ! bad pixel mask 
+     :    BADMASK( BADDIMS1, BADDIMS2 )  ! bad pixel mask
 
 *    Export :
 
@@ -135,7 +135,7 @@
       BESTYOFF =  NYOFF
       MINMSQ   =  1.0E30
 
-*    loop round all possible combinations of the likely offset 
+*    loop round all possible combinations of the likely offset
       DO  J  =  MINYOFF, MAXYOFF
          DO  I  =  MINXOFF, MAXXOFF
 
@@ -153,11 +153,11 @@
                   DO  II  =  1, DIMSA1 - I
 
 *                   check for bad pixels in either image
-                     IF ( BADMASK(II,JJ)     .EQ. 0 .AND. 
+                     IF ( BADMASK(II,JJ)     .EQ. 0 .AND.
      :                    BADMASK(II+I,JJ+J) .EQ. 0 ) THEN
 
 *                      add current square deviation to running total
-                        CURMSQ  =  CURMSQ + 
+                        CURMSQ  =  CURMSQ +
      :                      ((ARRAYB(II,JJ) - ARRAYA(II+I,JJ+J))**2)
 
 *                      increment valid pixel counter
@@ -180,11 +180,11 @@
                   DO  II  =  1, DIMSA1 - IP
 
 *                   check for bad pixels in either image
-                     IF ( BADMASK(II+IP,JJ+JP) .EQ. 0 .AND. 
+                     IF ( BADMASK(II+IP,JJ+JP) .EQ. 0 .AND.
      :                    BADMASK(II,JJ)       .EQ. 0 ) THEN
 
 *                      add current square deviation to running total
-                        CURMSQ  =  CURMSQ + 
+                        CURMSQ  =  CURMSQ +
      :                     ((ARRAYB(II+IP,JJ+JP) - ARRAYA(II,JJ))**2)
 
 *                      increment valid pixel counter
@@ -206,11 +206,11 @@
                   DO  II  =  1, DIMSA1 - I
 
 *                   check for bad pixels in either image
-                     IF ( BADMASK(II,JJ+JP) .EQ. 0 .AND. 
+                     IF ( BADMASK(II,JJ+JP) .EQ. 0 .AND.
      :                    BADMASK(II+I,JJ)  .EQ. 0 ) THEN
 
 *                      add current square deviation to running total
-                        CURMSQ  =  CURMSQ + 
+                        CURMSQ  =  CURMSQ +
      :                      ((ARRAYB(II,JJ+JP) - ARRAYA(II+I,JJ))**2)
 
 *                      increment valid pixel counter
@@ -232,11 +232,11 @@
                   DO  II  =  1, DIMSA1 - IP
 
 *                   check for bad pixels in either image
-                     IF ( BADMASK(II+IP,JJ) .EQ. 0 .AND. 
+                     IF ( BADMASK(II+IP,JJ) .EQ. 0 .AND.
      :                    BADMASK(II,JJ+J)  .EQ. 0 ) THEN
 
 *                      add current square deviation to running total
-                        CURMSQ  =  CURMSQ + 
+                        CURMSQ  =  CURMSQ +
      :                     ((ARRAYB(II+IP,JJ) - ARRAYA(II,JJ+J))**2)
 
 *                      increment valid pixel counter

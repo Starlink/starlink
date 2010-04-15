@@ -1,22 +1,22 @@
       SUBROUTINE TOLOWERC(STRING)
 C+
 C
-C Subroutine: 
-C     
+C Subroutine:
+C
 C    T O L O W E R C
 C
 C
 C Author: Ian Howarth
 C
-C Parameters: 
+C Parameters:
 C
 C STRING (><)
 C
-C History: 
-C  
-C 
+C History:
 C
-C  
+C
+C
+C
 C
 C
 C

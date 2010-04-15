@@ -86,23 +86,23 @@ C  Clear the data array
 
 C  Find indices to all arrays
 
-      CALL GSD_FIND (IFD, 'c13dat', 
+      CALL GSD_FIND (IFD, 'c13dat',
      &               NO, UNITS, TYPE, ARRAY, IND_DATA, STATUS)
       CALL GSD_FIND (IFD, 'C12SST',
      &               NO, UNITS, TYPE, ARRAY, IND_TSYS, STATUS)
-      CALL GSD_FIND (IFD, 'C12RT', 
+      CALL GSD_FIND (IFD, 'C12RT',
      &               NO, UNITS, TYPE, ARRAY, IND_TREC, STATUS)
-      CALL GSD_FIND (IFD, 'c12ttel', 
+      CALL GSD_FIND (IFD, 'c12ttel',
      &               NO, UNITS, TYPE, ARRAY, IND_TTEL, STATUS)
-      CALL GSD_FIND (IFD, 'c12tsky', 
+      CALL GSD_FIND (IFD, 'c12tsky',
      &               NO, UNITS, TYPE, ARRAY, IND_TSKY, STATUS)
-      CALL GSD_FIND (IFD, 'C12RF', 
+      CALL GSD_FIND (IFD, 'C12RF',
      &               NO, UNITS, TYPE, ARRAY, IND_RF, STATUS)
-      CALL GSD_FIND (IFD, 'C12FR', 
+      CALL GSD_FIND (IFD, 'C12FR',
      &               NO, UNITS, TYPE, ARRAY, IND_FR, STATUS)
-      CALL GSD_FIND (IFD, 'C12RF', 
+      CALL GSD_FIND (IFD, 'C12RF',
      &               NO, UNITS, TYPE, ARRAY, IND_RF, STATUS)
-      CALL GSD_FIND (IFD, 'C12CF', 
+      CALL GSD_FIND (IFD, 'C12CF',
      &               NO, UNITS, TYPE, ARRAY, IND_CF, STATUS)
 
 
@@ -141,8 +141,8 @@ CD    WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
 C    ..then convert to R.A. and Dec. offsets
 
       V2Y_RAD = 1.74533e-2 * V2Y                               ! Radians
-      X2Y_RAD = 1.74533e-2 * X2Y 
-      DRA     =   SIN (V2Y_RAD - X2Y_RAD) * X_OFFSET 
+      X2Y_RAD = 1.74533e-2 * X2Y
+      DRA     =   SIN (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + SIN (V2Y_RAD)           * Y_OFFSET
       DDEC    =   COS (V2Y_RAD - X2Y_RAD) * X_OFFSET
      &          + COS (V2Y_RAD)           * Y_OFFSET

@@ -5,7 +5,7 @@ C
 C     A R A U T O
 C
 C     This routine is a first attempt at introducing an automatic
-C     line finder into ARC.  It is relatively heavy-handed.  It 
+C     line finder into ARC.  It is relatively heavy-handed.  It
 C     looks at each pixel in turn, and if there is no line yet
 C     identified nearby, sees if it can find a peak in the region.
 C     If it can, it works out the wavelength of the line it has found
@@ -17,7 +17,7 @@ C     Parameters (">" input, "!" modified, workspace, "<" output)
 C
 C     (>) ZVALS     (Real array ZVALS(NX)) The arc spectrum.
 C     (>) NX        (Integer) The number of data values
-C     (>) SIGMA     (Real) The current sigma value. 
+C     (>) SIGMA     (Real) The current sigma value.
 C     (>) ARC1      (Real array ARC1(NLARCS)) Holds the wavelengths
 C                   for the first arc type.  Terminates with 0.
 C     (>) ARC2      (Real array ARC2(NLARCS)) The wavelengths for the
@@ -26,9 +26,9 @@ C     (>) ARC3      (Real array ARC3(NLARCS)) The wavelengths for the
 C                   third arc type.
 C     (>) NLARCS    (Integer) The dimension of the ARCn arrays.
 C     (>) NLMAX     (Integer) Maximum possible number of arc lines
-C     (>) NCOEFF    (Integer) The number of coefficients used for the 
+C     (>) NCOEFF    (Integer) The number of coefficients used for the
 C                   fit.
-C     (>) COEFFS    (Double precision array COEFFS(NC)) The 
+C     (>) COEFFS    (Double precision array COEFFS(NC)) The
 C                   coefficients of the current fit.
 C     (>) PARMS     (Real array PARMS(2)) Parameters controlling the
 C                   fit.  PARMS(1) is CHFACT, PARMS(2) is SIGFACT.
@@ -38,7 +38,7 @@ C     (!) CHANS     (Real array CHANS(NLMAX)) The centers of the
 C                   identified lines, in pixel numbers.
 C     (!) WAVES     (Real array WAVES(NLMAX)) The wavelengths of the
 C                   identified lines.
-C     (!) WEIGHTS   (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (!) WEIGHTS   (Real array WEIGHTS(NLMAX)) The weights for the
 C                   identified arc lines.
 C     (!) CLASS     (Integer array CLASS(NLMAX)) The class codes for
 C                   the identified arc lines.
@@ -123,7 +123,7 @@ C
             IF (STATUS.EQ.0) THEN
 C
 C              Calculate the wavelength and look for it in the three
-C              arc line lists.  Make sure this isn't the same as the 
+C              arc line lists.  Make sure this isn't the same as the
 C              last line we found (CENWAS)!
 C
                WAVEL=GEN_EPOLYD(DBLE(CENTER),COEFFS,NCOEFF)

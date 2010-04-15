@@ -36,7 +36,7 @@
 *             max and min
 *        Endif
 *     Endfor
-*     If max=min then 
+*     If max=min then
 *        Set NEWVAL = max and return immediately
 *        Set pixel to be deglitched to be NEWVAL
 *     Endif
@@ -109,7 +109,7 @@
      :    NUMBIN,              ! number of bins in histogram
      :    SIZVAL               ! size of valid pixel array
       PARAMETER( NUMBIN = 2048 )
-      PARAMETER( SIZVAL = 9 )  ! only looking at 3x3 box     
+      PARAMETER( SIZVAL = 9 )  ! only looking at 3x3 box
 
 *    Local variables :
 
@@ -191,7 +191,7 @@
       END DO
 
 *    check for max=min - return immediately with NEWVAL and central
-*    pixel set to max 
+*    pixel set to max
       IF ( MAXIMUM .EQ. MINIMUM ) THEN
          NEWVAL  =  MAXIMUM
          ARRAY( XCOORD, YCOORD ) = MAXIMUM

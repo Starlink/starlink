@@ -9,10 +9,10 @@ C     Maps one of the axis data arrays in a structure.
 C
 C  Description:
 C     This routine maps a specified axis array in a structure, returning
-C     a memory address that may be used to access it.   The whole array 
+C     a memory address that may be used to access it.   The whole array
 C     is mapped.  If there is in fact no axis data array, then a dummy
-C     array containing the values 1..N is generated and its address is 
-C     returned, unless the mapping is for write or update, in which case 
+C     array containing the values 1..N is generated and its address is
+C     returned, unless the mapping is for write or update, in which case
 C     such an array is created in the data structure and mapped.
 C
 C  Language:
@@ -25,7 +25,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) AXIS         (Integer,ref) The number of the axis in question.
 C                      Should be between 1 and 6.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
@@ -44,7 +44,7 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
@@ -173,13 +173,13 @@ C        array.
 C
 C        Look up the reference name in the tables and get the name
 C        of the axis data array in question.
-C          
+C
          CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
          CALL DSA__AXIS_DATA_NAME (REF_SLOT,AXIS,OBJ_NAME,LENGTH)
 C
          IF (EXIST) THEN
 C
-C           If it did exist, get its dimensions.  
+C           If it did exist, get its dimensions.
 C
             CALL DSA_AXIS_SIZE(REF_NAME,AXIS,MAX_AXES,NDIM,DIMS,
      :                                                    NELM,STATUS)
@@ -210,7 +210,7 @@ C
       ELSE
 C
 C        There is no axis data array, so we need to generate a dummy one.
-C        First, we need to know the dimensions of the main array.  We 
+C        First, we need to know the dimensions of the main array.  We
 C        will generate an array the length of the appropriate axis.
 C
          CALL DSA_DATA_SIZE (REF_NAME,MAX_AXES,NDIM,DIMS,NELM,STATUS)

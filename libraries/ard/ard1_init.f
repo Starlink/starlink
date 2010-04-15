@@ -26,12 +26,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -166,7 +166,7 @@
      :     CMN_OPS( ARD__LSM ), CMN_INSTR( ARD__LSM ),
      :     CMN_NARG( ARD__LSM )
 
-     :     /0,  0, 10, 10,  1,  1,  0, '"Load Supplied Mask"', 0 /   
+     :     /0,  0, 10, 10,  1,  1,  0, '"Load Supplied Mask"', 0 /
 
 *  "Load Keyword Region"...
       DATA CMN_OPL( ARD__LKR ), CMN_OPR( ARD__LKR ),
@@ -175,7 +175,7 @@
      :     CMN_OPS( ARD__LKR ), CMN_INSTR( ARD__LKR ),
      :     CMN_NARG( ARD__LKR )
 
-     :     /0,  0, 10, 10,  1,  1,  0, '"Load Keyword Region"', 1 /   
+     :     /0,  0, 10, 10,  1,  1,  0, '"Load Keyword Region"', 1 /
 
 *  "Null" (i.e. do nothing)...
       DATA CMN_OPL( ARD__NUL ), CMN_OPR( ARD__NUL ),
@@ -184,7 +184,7 @@
      :     CMN_OPS( ARD__NUL ), CMN_INSTR( ARD__NUL ),
      :     CMN_NARG( ARD__NUL )
 
-     :     /0,  0,  0,  0,  0,  0,  0, '"Null"', 0 /   
+     :     /0,  0,  0,  0,  0,  0,  0, '"Null"', 0 /
 
 *  Keyword symbols.
       DATA CMN_KWSYM( ARD__POI ) /'POINT'/

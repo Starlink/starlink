@@ -1,7 +1,7 @@
 
 #  This is a Bourne shell script.  In order to be POSIX-compliant, the
 #  first line must be blank.
- 
+
 #+
 #  Name:
 #     docfind
@@ -29,7 +29,7 @@
 #     Output a header message.
 #     Search the file containing the list of subjects for the keyword.
 #     Output some more header text.
-#     Do a multi-pipe operation on the file containing the list of 
+#     Do a multi-pipe operation on the file containing the list of
 #        Starlink documentation that:
 #     -  Retains lines between the ones containing "File" and
 #        "        AUTHORS";

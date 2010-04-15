@@ -92,7 +92,7 @@
 #  Now add the global contents.
          foreach param [lsort -dictionary [array names CCDglobalpars ]] {
             if { $CCDglobalpars($param) != "" &&
-                 ![string match *ZEROED $param] } { 
+                 ![string match *ZEROED $param] } {
                puts $fileid "$param = $CCDglobalpars($param)"
             }
          }

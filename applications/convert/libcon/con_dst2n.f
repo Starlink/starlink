@@ -15,15 +15,15 @@
 
 *  Description:
 *     This routine reads through a file in Figaro version 2 format.
-*     Objects that it finds whose function is understood---that is, 
+*     Objects that it finds whose function is understood---that is,
 *     those objects whose purpose has been documented (in the version
-*     2 Figaro structures document) will be converted to the 
-*     appropriate object in the output file, whose format corresponds 
-*     to that described in SGP/38 and which is used by Version 3 of 
-*     Figaro.  
+*     2 Figaro structures document) will be converted to the
+*     appropriate object in the output file, whose format corresponds
+*     to that described in SGP/38 and which is used by Version 3 of
+*     Figaro.
 *
 *     Non-standard objects will be copied to the .MORE.FIGARO extension.
-*     FITS items will be copied to the .MORE.FITS extension.  
+*     FITS items will be copied to the .MORE.FITS extension.
 
 *  Arguments:
 *     FIGFIL = CHARACTER * ( * ) (Given)
@@ -236,7 +236,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -260,7 +260,7 @@
 
 *  External Functions:
       INTEGER CHR_LEN            ! Length of a character string ignoring
-                                 ! trailing blanks  
+                                 ! trailing blanks
 *  Local Constants:
       INTEGER NDSTAX             ! Maximum number of axes in a DST.
       PARAMETER ( NDSTAX = 6 )
@@ -272,7 +272,7 @@
       CHARACTER*256 AXMOR        ! AXIS.MORE name
       CHARACTER*256 AXMORF       ! AXIS.MORE.FIGARO name
       CHARACTER*256 AXNAME       ! Axis structure element name
-      CHARACTER*256 AXOUT        ! Name of output axis 
+      CHARACTER*256 AXOUT        ! Name of output axis
       CHARACTER*256 AXOUTD       ! Name of output axis data array
       CHARACTER*256 AXOUTV       ! Name of output axis variance array
       CHARACTER*256 AXOUTW       ! Name of output axis width array
@@ -328,7 +328,7 @@
       CHARACTER*256 NDFPAT       ! Path to the NDF structure
       INTEGER NDIM               ! Number of dimensions
       LOGICAL NEEDAX             ! Axis data are present?
-      INTEGER NERR               ! Count of numerical errors 
+      INTEGER NERR               ! Count of numerical errors
       INTEGER NFITS              ! Number of FITS items
       INTEGER NMSTAT             ! Status from 1st-level call to
                                  ! DTA_NMVAR
@@ -349,7 +349,7 @@
                                  ! structure level in the path
       INTEGER PATHLO             ! Character column of the start of a
                                  ! structure level in the path
-      LOGICAL PRIM               ! Output data array has ! primitive form 
+      LOGICAL PRIM               ! Output data array has ! primitive form
                                  ! (as opposed to simple)
       LOGICAL QUPRES             ! .Z.QUALITY is present?
       REAL START                 ! Start value for creating axes arrays
@@ -389,12 +389,12 @@
 *   Note the the top-level name is not required.
       NSTR = CHR_LEN( NDFFIL )
       IF ( NLEV .EQ .1 ) THEN
-         CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ), 
+         CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ),
      :                    'NEW', 10, 'NDF', DSTAT )
          OUTNDF = 'OUTPUT'
          NPC = 6
       ELSE
-         CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ), 
+         CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ),
      :                    'OLD', 10, 'NDF', DSTAT )
          EPATH = PATH( INDEX( PATH, '.' ) : )
          OUTNDF = 'OUTPUT'//EPATH
@@ -451,11 +451,11 @@
 *  Determine which structures need to be created in the output NDF.
 *  ================================================================
 
-*  Before copying anything to the output structure we ascertain 
+*  Before copying anything to the output structure we ascertain
 *  a) what dimensionality is necessary for the OUTNDF.AXIS(N) structure,
-*  b) whether or not an OUTNDF.MORE structure is needed, 
-*  c) whether or not an OUTNDF.MORE.FITS structure is needed, 
-*  d) whether or not an OUTNDF.MORE.FIGARO structure is needed, 
+*  b) whether or not an OUTNDF.MORE structure is needed,
+*  c) whether or not an OUTNDF.MORE.FITS structure is needed,
+*  d) whether or not an OUTNDF.MORE.FIGARO structure is needed,
 *  e) and whether or not an OUTNDF.DATA_ARRAY structure is needed (in
 *  other words determine the form of the output data array).
 *
@@ -507,7 +507,7 @@
 
 *            If structure is an axis, an axis structure which matches
 *            the dimensionality of the main data array must be created.
-*            This logical variable is used to flag the need for this 
+*            This logical variable is used to flag the need for this
 *            structure.
                NEEDAX = .TRUE.
 
@@ -529,7 +529,7 @@
 
 *               Find the number of dimensions and whether or not it is a
 *               structure.
-                  CALL DTA_SZVAR( LEVEL1, DAT__MXDIM, NDIM, DIMS, 
+                  CALL DTA_SZVAR( LEVEL1, DAT__MXDIM, NDIM, DIMS,
      :                            DSTAT )
                   CALL DTA_STRUC( LEVEL1, STRUCT, DSTAT )
 
@@ -599,7 +599,7 @@
 *                  Test for the structure containing the data array.
                      IF ( NAME1 .EQ. 'Z' ) THEN
 
-*                     Data structure - only DATA, ERRORS, LABEL, 
+*                     Data structure - only DATA, ERRORS, LABEL,
 *                     UNITS, FLAGGED, QUALITY, and IMAGINARY are
 *                     standard objects, anything else goes into
 *                     .MORE.FIGARO.
@@ -673,10 +673,10 @@
 *      Report what has happened should something have gone wrong.
          IF ( DSTAT .NE. 0 ) THEN
             STATUS = DSTAT
-            CALL ERR_REP( 'DST2NDF_CRAXIS', 
-     :        'DST2NDF: Unable to create the output axis structure.', 
+            CALL ERR_REP( 'DST2NDF_CRAXIS',
+     :        'DST2NDF: Unable to create the output axis structure.',
      :        STATUS )
-            GOTO 500 
+            GOTO 500
          END IF
       END IF
 
@@ -689,7 +689,7 @@
          CALL ERR_REP('DST2NDF_CRD',
      :     'DST2NDF: Unable to create output .DATA_ARRAY structure.',
      :     STATUS)
-         GOTO 500 
+         GOTO 500
       END IF
 
 *   Create the .VARIANCE structure, if necessary.
@@ -701,7 +701,7 @@
          CALL ERR_REP('DST2NDF_CRV',
      :     'DST2NDF: Unable to create output .VARIANCE structure.',
      :     STATUS)
-         GOTO 500 
+         GOTO 500
       END IF
 
 *   Create the .MORE structure, if necessary.
@@ -713,7 +713,7 @@
          CALL ERR_REP('DST2NDF_CRM',
      :     'DST2NDF: Unable to create output .MORE structure.',
      :     STATUS)
-         GOTO 500 
+         GOTO 500
       END IF
 
 *   Create the .MORE.FIGARO structure, if necessary.
@@ -725,14 +725,14 @@
          CALL ERR_REP('DST2NDF_CRMF',
      :     'DST2NDF: Unable to create output .MORE.FIGARO structure.',
      :     STATUS)
-         GOTO 500 
+         GOTO 500
       END IF
 
 *   Main loop, processing each component in turn.
 *   =============================================
 
 *   Now we attempt to reformat everything else from the input structure
-*   according to SGP/38. 
+*   according to SGP/38.
       NMSTAT = 0
       IPOSN = 0
       DO WHILE ( NMSTAT .EQ. 0 )
@@ -836,17 +836,17 @@
 *                  wrong.
                      IF ( DSTAT .NE. 0 ) THEN
                         STATUS = DSTAT
-                        CALL ERR_REP( 'DST2NDF_MAPVAR', 
+                        CALL ERR_REP( 'DST2NDF_MAPVAR',
      :                    'DST2NDF: Error mapping the output variance '/
      :                    /'array.', STATUS )
                         GOTO 500
                      END IF
-                     
+
 *                  The errors in INPUT.Z.ERRORS are standard deviations.
 *                  Therefore square the values within OUTPUT.VARIANCE.
-                     CALL VEC_MULR( .TRUE., NDATA, 
+                     CALL VEC_MULR( .TRUE., NDATA,
      :                              %VAL( CNF_PVAL( IPTR ) ),
-     :                              %VAL( CNF_PVAL( IPTR ) ), 
+     :                              %VAL( CNF_PVAL( IPTR ) ),
      :                              %VAL( CNF_PVAL( IPTR ) ), IERR,
      :                              NERR, STATUS )
 
@@ -857,7 +857,7 @@
 *                  wrong.
                      IF ( DSTAT .NE. 0 ) THEN
                         STATUS = DSTAT
-                        CALL ERR_REP( 'DST2NDF_UMPVAR', 
+                        CALL ERR_REP( 'DST2NDF_UMPVAR',
      :                    'DST2NDF: Error unmapping the output '/
      :                    /'variance array.', STATUS )
                         GOTO 500
@@ -872,16 +872,16 @@
 
 *                  Create a structure .QUALITY of type QUALITY.
                      CALL DTA_CRVAR( OUTNDF( :NPC )//'.QUALITY',
-     :                               'QUALITY', DSTAT )  
+     :                               'QUALITY', DSTAT )
 
 *                  Create and assign a BADBITS item to indicate that 1
 *                  is the bad quality.
                      CALL DTA_CRVAR( OUTNDF( :NPC )/
      :                               /'.QUALITY.BADBITS', 'BYTE',
-     :                               DSTAT )  
+     :                               DSTAT )
                      BARRAY( 1 ) = 255
                      CALL DTA_WRVARB( OUTNDF( :NPC )/
-     :                                /'.QUALITY.BADBITS', 1, 
+     :                                /'.QUALITY.BADBITS', 1,
      :                                BARRAY, DSTAT )
 
 *                  Inquire the type of the input QUALITY array.
@@ -918,13 +918,13 @@
 *                     Report error conditions.
                         IF ( DSTAT .EQ. DTA_BADCON ) THEN
                            STATUS = DSTAT
-                           CALL ERR_REP( 'DST2NDF_CNVQUA', 
+                           CALL ERR_REP( 'DST2NDF_CNVQUA',
      :                       'DST2NDF: Error converting the quality '/
      :                       /'array to BYTE.', STATUS )
                            GOTO 500
                         ELSE IF ( DSTAT .NE. 0 ) THEN
                            STATUS = DSTAT
-                           CALL ERR_REP( 'DST2NDF_REAQUA', 
+                           CALL ERR_REP( 'DST2NDF_REAQUA',
      :                       'DST2NDF: Error reading the input '/
      :                       /'quality array.', STATUS )
                            GOTO 500
@@ -932,13 +932,13 @@
 
 *                     Map the output quality array.
                         CALL DTA_MUVARB( OUTNDF( :NPC )/
-     :                                   /'.QUALITY.QUALITY', 
+     :                                   /'.QUALITY.QUALITY',
      :                                   NDATA, OTQPTR, DSTAT )
 
 *                     Report error conditions.
                         IF ( DSTAT .NE. 0 ) THEN
                            STATUS = DSTAT
-                           CALL ERR_REP( 'DST2NDF_MAPQUA', 
+                           CALL ERR_REP( 'DST2NDF_MAPQUA',
      :                       'DST2NDF: Error mapping the output '/
      :                       /'quality array.', STATUS )
                            GOTO 500
@@ -954,7 +954,7 @@
                         CALL DTA_FRVAR( OUTNDF( :NPC )/
      :                                  /'.QUALITY.QUALITY', DSTAT )
                         IF ( DSTAT .NE. 0 ) THEN
-                           CALL ERR_REP( 'DST2NDF_UMPQUA ', 
+                           CALL ERR_REP( 'DST2NDF_UMPQUA ',
      :                      'DST2NDF: Error unmapping the output '/
      :                      /'quality array.', STATUS )
                            GOTO 500
@@ -981,19 +981,19 @@
 *                  NDF, and writing the value to it.
                      NDATA = CDIMS( 1 )
                      CALL DTA_RDVARC( LEVEL2, NDATA, STRING, DSTAT )
-                     CALL DTA_CRNAM( OUTNDF( :NPC ), NAME2, 0, 0, 
+                     CALL DTA_CRNAM( OUTNDF( :NPC ), NAME2, 0, 0,
      :                               NAMOUT, DSTAT )
                      CALL DTA_WRVARC( NAMOUT, NDATA, STRING, DSTAT )
 
 *               Test for the IMAGINARY component.
 *               =================================
                   ELSE IF ( NAME2 .EQ. 'IMAGINARY' ) THEN
-                     CALL MSG_OUT( ' ', 
-     :                 'WARNING: Imaginary data are not copied.', 
+                     CALL MSG_OUT( ' ',
+     :                 'WARNING: Imaginary data are not copied.',
      :                 STATUS )
-*                     CALL DTA_CYVAR( LEVEL2, 
+*                     CALL DTA_CYVAR( LEVEL2,
 *     :                               OUTNDF( :NPC )/
-*     :                               /'.DATA_ARRAY.IMAGINARY_DATA', 
+*     :                               /'.DATA_ARRAY.IMAGINARY_DATA',
 *     :                               DSTAT )
                      IF ( DSTAT .NE. 0 ) GOTO 400
 
@@ -1021,7 +1021,7 @@
      :                                  /'.MORE.FIGARO.Z', 'STRUCT',
      :                                  DSTAT )
                         MORFGZ = .TRUE.
-                     END IF                                           
+                     END IF
 
 *                  Copy the non-standard object to the FIGARO.Z
 *                  extension.
@@ -1037,7 +1037,7 @@
             ELSE IF ( NAME1 .EQ. 'OBS' ) THEN
 
 *            Loop through all the components of the OBS structure.
-               DO WHILE ( NMSTA1 .EQ. 0 ) 
+               DO WHILE ( NMSTA1 .EQ. 0 )
                   IPOSN1 = IPOSN1 + 1
 
 *               Inquire the IPOSN1th object's name.
@@ -1065,7 +1065,7 @@
      :                         NAME2 .EQ. 'TIME' ) THEN
                         CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
      :                                  /'.MORE.FIGARO.'//NAME2, DSTAT )
-                           
+
                      ELSE
 
 *                     Create the Figaro OBS extension for other
@@ -1114,7 +1114,7 @@
      :                         DSTAT )
 
 *            Loop through all the components of the axis structure.
-               DO WHILE ( NMSTA1 .EQ. 0 ) 
+               DO WHILE ( NMSTA1 .EQ. 0 )
                   IPOSN1 = IPOSN1 + 1
 
 *               Inquire the IPOSN1th object's name.
@@ -1135,14 +1135,14 @@
                         IF ( NDIM .EQ. 1 ) THEN
 
 *                        Create the full name of the output axis array.
-                           CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 0, 0, 
+                           CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 0, 0,
      :                                     AXOUTD, DSTAT )
 
 *                        Copy the axis data array (axis centres).
                            CALL DTA_CYVAR( LEVEL2, AXOUTD, DSTAT )
                            IF ( DSTAT .NE. 0 ) GOTO 400
 
-*                        Record that AXIS(IAXIS).DATA_ARRAY has been 
+*                        Record that AXIS(IAXIS).DATA_ARRAY has been
 *                        created.
                            AXTHER( IAXIS ) = .TRUE.
 
@@ -1155,16 +1155,16 @@
 *                        component names of the input and output
 *                        objects.
                            IF ( .NOT. AXMFEX( IAXIS ) ) THEN
-                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0,
      :                                        AXMOR, DSTAT )
                               CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
-                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0,
      :                                        AXMORF, DSTAT )
                               CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                           structure is created.
-                              AXMFEX( IAXIS ) = .TRUE. 
+                              AXMFEX( IAXIS ) = .TRUE.
                            END IF
 
 *                        Copy the non-standard data to
@@ -1198,7 +1198,7 @@
 
 *                        Create the full name of the output axis
 *                        variance array.
-                           CALL DTA_CRNAM( AXOUT, 'VARIANCE', 0, 0, 
+                           CALL DTA_CRNAM( AXOUT, 'VARIANCE', 0, 0,
      :                                     AXOUTV, DSTAT )
 
 *                     The axis variance array is not 1-dimensional so
@@ -1210,19 +1210,19 @@
 *                        component names of the input and output
 *                        objects.
                            IF ( .NOT. AXMFEX( IAXIS ) ) THEN
-                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0,
      :                                        AXMOR, DSTAT )
                               CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
-                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0,
      :                                        AXMORF, DSTAT )
                               CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                           structure is created.
-                              AXMFEX( IAXIS ) = .TRUE. 
+                              AXMFEX( IAXIS ) = .TRUE.
                            END IF
 
-*                        Copy the non-standard variance to 
+*                        Copy the non-standard variance to
 *                        OUTPUT.AXIS(n).MORE.FIGARO.VARIANCE.
                            CALL DTA_CRNAM( AXMORF, 'VARIANCE', 0, 0,
      :                                     AXOUTV, DSTAT )
@@ -1244,18 +1244,18 @@
                            IF ( DSTAT .NE. 0 ) THEN
                               STATUS = DSTAT
                               CALL MSG_SETI( 'AXNO', IAXIS )
-                              CALL ERR_REP( 'DST2NDF_MAPAVA', 
+                              CALL ERR_REP( 'DST2NDF_MAPAVA',
      :                          'DST2NDF: Error mapping output axis '/
-     :                          /'variance array in dimension ^AXNO.', 
+     :                          /'variance array in dimension ^AXNO.',
      :                          STATUS )
                               GOTO 500
                            END IF
 
 *                        Axis error arrays are converted from standard
 *                        deviations to variance in situ.
-                           CALL VEC_MULR( .TRUE., NDATA, 
+                           CALL VEC_MULR( .TRUE., NDATA,
      :                                    %VAL( CNF_PVAL( IPTR ) ),
-     :                                    %VAL( CNF_PVAL( IPTR ) ), 
+     :                                    %VAL( CNF_PVAL( IPTR ) ),
      :                                    %VAL( CNF_PVAL( IPTR ) ),
      :                                    IERR, NERR, STATUS)
 
@@ -1266,9 +1266,9 @@
                            IF ( DSTAT .NE. 0 ) THEN
                               STATUS = DSTAT
                               CALL MSG_SETI( 'AXNO', IAXIS )
-                              CALL ERR_REP( 'DST2NDF_UMPAVA', 
+                              CALL ERR_REP( 'DST2NDF_UMPAVA',
      :                          'DST2NDF: Error unmapping output axis '/
-     :                          /'variance array in dimension ^AXNO.', 
+     :                          /'variance array in dimension ^AXNO.',
      :                          STATUS )
                               GOTO 500
                            END IF
@@ -1283,7 +1283,7 @@
                         IF ( NDIM .EQ. 1 ) THEN
 
 *                        Create the full name of the output axis array.
-                           CALL DTA_CRNAM( AXOUT, 'WIDTH', 0, 0, 
+                           CALL DTA_CRNAM( AXOUT, 'WIDTH', 0, 0,
      :                                     AXOUTW, DSTAT )
 
 *                       Copy the axis width array.
@@ -1352,7 +1352,7 @@
                            IF ( DSTAT .NE. 0 ) THEN
                               STATUS = DSTAT
                               CALL MSG_SETI( 'AXNO', IAXIS )
-                              CALL ERR_REP( 'DST2NDF_MAPACEW', 
+                              CALL ERR_REP( 'DST2NDF_MAPACEW',
      :                          'DST2NDF: Error mapping the output '/
      :                          /'array of axis widths in dimension '/
      :                          /'^AXNO.', STATUS )
@@ -1362,7 +1362,7 @@
 *                       Fill array with the constant.
                            IF ( TYPE .EQ. 'FLOAT' ) THEN
                               CALL KPG1_FILLR( WIDTH, DIMS( IAXIS ),
-     :                                         %VAL( CNF_PVAL( IPTR ) ), 
+     :                                         %VAL( CNF_PVAL( IPTR ) ),
      :                                         STATUS )
                            ELSE
                               CALL KPG1_FILLD( DWIDTH, DIMS( IAXIS ),
@@ -1377,7 +1377,7 @@
                           IF ( DSTAT .NE. 0 ) THEN
                              STATUS = DSTAT
                              CALL MSG_SETI( 'AXNO', IAXIS )
-                             CALL ERR_REP( 'DST2NDF_UMPACEW', 
+                             CALL ERR_REP( 'DST2NDF_UMPACEW',
      :                         'DST2NDF: Error unmapping the output '/
      :                         /'array of axis widths in dimension '/
      :                         /'^AXNO.', STATUS )
@@ -1393,19 +1393,19 @@
 *                        component names of the input and output
 *                        objects.
                            IF ( .NOT. AXMFEX( IAXIS ) ) THEN
-                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0,
      :                                        AXMOR, DSTAT )
                               CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
-                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0,
      :                                        AXMORF, DSTAT )
                               CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                           structure is created.
-                              AXMFEX( IAXIS ) = .TRUE. 
+                              AXMFEX( IAXIS ) = .TRUE.
                            END IF
 
-*                        Copy the non-standard widths to 
+*                        Copy the non-standard widths to
 *                        OUTPUT.AXIS(n).MORE.FIGARO.WIDTH.
                            CALL DTA_CRNAM( AXMORF, 'WIDTH', 0, 0,
      :                                     AXOUTW, DSTAT )
@@ -1421,11 +1421,11 @@
      :                         NAME2 .EQ. 'UNITS' ) THEN
 
 *                     Inquire the dimensions of the object.
-                        CALL DTA_SZVAR( LEVEL2, DAT__MXDIM, NDIM, CDIMS, 
+                        CALL DTA_SZVAR( LEVEL2, DAT__MXDIM, NDIM, CDIMS,
      :                                  DSTAT )
 
 *                     Generate the full name of the output component.
-                        CALL DTA_CRNAM( AXOUT, NAME2, NDIM, CDIMS, 
+                        CALL DTA_CRNAM( AXOUT, NAME2, NDIM, CDIMS,
      :                                  NAMOUT, DSTAT )
 
 *                     Make the output structure.
@@ -1437,7 +1437,7 @@
 *                     done by reading the value, creating the named
 *                     object in the NDF, and writing the value to it.
                         CALL DTA_RDVARC( LEVEL2, NDATA, STRING, DSTAT )
-                        CALL DTA_CRNAM( AXOUT, NAME2, 0, 0, 
+                        CALL DTA_CRNAM( AXOUT, NAME2, 0, 0,
      :                                  NAMOUT, DSTAT )
                         CALL DTA_WRVARC( NAMOUT, NDATA, STRING, DSTAT )
                         IF ( DSTAT .NE. 0 ) GOTO 400
@@ -1450,21 +1450,21 @@
 *                     present in the NDF, by generating the full
 *                     component names of the input and output objects.
                         IF ( .NOT. AXMFEX( IAXIS ) ) THEN
-                           CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+                           CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0,
      :                                     AXMOR, DSTAT )
                            CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
-                           CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+                           CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0,
      :                                     AXMORF, DSTAT )
                            CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                        Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                        structure is created.
-                           AXMFEX( IAXIS ) = .TRUE. 
+                           AXMFEX( IAXIS ) = .TRUE.
                         END IF
 
-*                     Any non-standard objects are copied to 
+*                     Any non-standard objects are copied to
 *                     OUTPUT.AXIS(n).MORE.FIGARO.
-                        CALL DTA_CRNAM( AXMORF, NAME2, 0, 0, NAMOUT, 
+                        CALL DTA_CRNAM( AXMORF, NAME2, 0, 0, NAMOUT,
      :                                  DSTAT )
                         CALL DTA_CYVAR( LEVEL2, NAMOUT, DSTAT )
                         IF ( DSTAT .NE. 0 ) GOTO 400
@@ -1479,7 +1479,7 @@
 
 *            Loop through all the extensions.
                IKOUNT = 0
-               DO WHILE ( NMSTA3 .EQ. 0 ) 
+               DO WHILE ( NMSTA3 .EQ. 0 )
                   IKOUNT = IKOUNT + 1
 
 *               Obtain the component's name.
@@ -1488,7 +1488,7 @@
 *               Items stored in FIGARO.MORE structure copied to
 *               NDF.MORE.
                   IF ( NMSTA3 .EQ. 0 ) THEN
-                     CALL DTA_CYVAR( 'INPUT.MORE.'//MORNAM, 
+                     CALL DTA_CYVAR( 'INPUT.MORE.'//MORNAM,
      :                               OUTNDF( :NPC )//'.MORE.'//MORNAM,
      :                               DSTAT )
                   END IF
@@ -1499,7 +1499,7 @@
 *         ====================
             ELSE IF ( NAME1 .EQ. 'TABLE' ) THEN
 
-*            TABLE used for FIGARO SPIKETRUM routines. Copy this to 
+*            TABLE used for FIGARO SPIKETRUM routines. Copy this to
 *            .MORE.FIGARO.TABLE extension.
                CALL DTA_CYVAR( 'INPUT.TABLE', OUTNDF( :NPC )/
      :                         /'.MORE.FIGARO.TABLE', DSTAT )
@@ -1512,7 +1512,7 @@
 
 *            FITS items dealt with below.
                CONTINUE
- 
+
             ELSE
 
 *            Any other data objects are copied into .MORE.FIGARO
@@ -1661,7 +1661,7 @@
                         CALL CON_D2NFT( NAME, ' ', ' ', ' ', OUTNDF,
      :                                  NPC, .TRUE., ' ', NFITS,
      :                                  STATUS )
- 
+
                      END IF
                   END DO
 
@@ -1689,7 +1689,7 @@
 *            structure.
                CALL DTA_CRNAM( OUTNDF( :NPC ), 'AXIS', 1, IAXIS, AXOUT,
      :                         DSTAT )
-               CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 1, DIMS( IAXIS ), 
+               CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 1, DIMS( IAXIS ),
      :                         AXOUTD, DSTAT )
 
 *            Create an axis data array of the appropriate size.
@@ -1697,7 +1697,7 @@
 
 *            Generate the full name of the output axis data-array
 *            primitive component.
-               CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 0, 0, 
+               CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 0, 0,
      :                         AXOUTD, DSTAT )
 
 *            Map the newly created structure for update.
@@ -1708,7 +1708,7 @@
                IF ( DSTAT .NE. 0 ) THEN
                   STATUS = DSTAT
                   CALL MSG_SETI( 'AXNO', IAXIS )
-                  CALL ERR_REP( 'DST2NDF_MAPACE', 
+                  CALL ERR_REP( 'DST2NDF_MAPACE',
      :              'DST2NDF: Error mapping the output array of axis '/
      :              /'centres in dimension ^AXNO.', STATUS )
                   GOTO 500
@@ -1717,7 +1717,7 @@
 *            Fill array with 0.5, 1.5...
                START = 0.5
                INCREM = 1.0
-               CALL KPG1_SSAZR( DIMS( IAXIS ), INCREM, START, 
+               CALL KPG1_SSAZR( DIMS( IAXIS ), INCREM, START,
      :                          %VAL( CNF_PVAL( IPTR ) ), STATUS )
 
 *            Unmap the data array.
@@ -1727,12 +1727,12 @@
                IF ( DSTAT .NE. 0 ) THEN
                   STATUS = DSTAT
                   CALL MSG_SETI( 'AXNO', IAXIS )
-                  CALL ERR_REP( 'DST2NDF_UMPACE', 
+                  CALL ERR_REP( 'DST2NDF_UMPACE',
      :              'DST2NDF: Error unmapping the output array of '/
      :              /'axis centres in dimension ^AXNO.', STATUS )
                   GOTO 500
                END IF
-                     
+
             END IF
          END DO
       END IF

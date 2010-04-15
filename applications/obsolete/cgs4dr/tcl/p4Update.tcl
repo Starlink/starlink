@@ -23,7 +23,7 @@ proc p4Update {item value} {
     set P4Widgets(CSTYLE) COLOUR
     set P4Widgets(PLOT_AXES) 1
     set P4Widgets(PRE_ERASE_PLOT) 1
-  
+
   } elseif {[string trim ${item}] == "buildP4Widgets1"} {
     if {[string toupper [string trim ${value}]] == "ALL"} {
       set P4Widgets(PLOT_WHOLE) 1

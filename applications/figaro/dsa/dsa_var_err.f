@@ -85,7 +85,7 @@ C
 C
       CHR=TYPE(1:1)
       INVOKE=ICH_FOLD(CHR)
-C      
+C
       ERRORS=0
       IF (CHR.EQ.'B') THEN
          CALL DSA_SQRT_B (NELM,%VAL(CNF_PVAL(VAR_ADDR)),

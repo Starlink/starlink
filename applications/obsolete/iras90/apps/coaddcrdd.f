@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Coadd CRDD traces crossing specified positions.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -21,47 +21,47 @@
 
 *  Description:
 *     The application takes a group of CRDD NDF files of any form
-*     (Survey, AO, etc) and coadds the data traces for any detector which 
-*     crosses the specified expected point sources. Separate coadditions 
+*     (Survey, AO, etc) and coadds the data traces for any detector which
+*     crosses the specified expected point sources. Separate coadditions
 *     are carried out for each waveband for each source position.
 *
-*     Any input CRDD NDF files should have been destriped previously, in 
+*     Any input CRDD NDF files should have been destriped previously, in
 *     order to remove detector to detector differences in calibration.
 *
-*     The first stage of coadding is the selection of expected source 
-*     positions. All the reference positions associated with any of the 
-*     input CRDD NDFs will be taken as expected point sources by COADDCRDD. 
+*     The first stage of coadding is the selection of expected source
+*     positions. All the reference positions associated with any of the
+*     input CRDD NDFs will be taken as expected point sources by COADDCRDD.
 *     The user can also specify additional expected point source positions.
 *
-*     By default both the displayed reference positions, and any positions 
-*     of subsequent sources the user may want to enter, are specified in 
+*     By default both the displayed reference positions, and any positions
+*     of subsequent sources the user may want to enter, are specified in
 *     Equatorial(B1950) coordinates. If the user wants a different coordinate
-*     system  to be used he should enter the coordinate system he requires 
+*     system  to be used he should enter the coordinate system he requires
 *     as the COORDS parameter.
 *
 *     To enter additional expected point sources positions, the user should
-*     set the ADD_SOURCE parameter TRUE. He will then be prompted for the 
-*     name, title, longitude and latitude of each additional expected source 
+*     set the ADD_SOURCE parameter TRUE. He will then be prompted for the
+*     name, title, longitude and latitude of each additional expected source
 *     position in the given coordinate system. This facility enables the user
-*     to examine several positions close together using only one set of 
-*     extracted CRDD NDF files which cover all these positions. The user 
+*     to examine several positions close together using only one set of
+*     extracted CRDD NDF files which cover all these positions. The user
 *     should be aware that apparent point sources in a coadded trace, but not
 *     at the expected source position may be spurious. He should coadd
 *     the traces again using the apparent position as an expected position,
 *     to see whether this source is real.
 *
 *     The second stage is the selection and processing of the traces, this
-*     is carried out for each source at each wavelength. The processing 
+*     is carried out for each source at each wavelength. The processing
 *     consists of selecting those detector traces to be used, determining
 *     the weights to be applied to them, and aligning the trace correctly
 *     so that the correct samples are aligned at the expected point source.
-*     
+*
 *     By default, a detector scan is about 4.5 arcmin wide, see Explanatory
 *     Supplement Table II.C.3 for exact width of each detector, and if a
 *     source position falls within that field of view, the detector
 *     scan is regarded as a crossing scan and will be coadded with other
 *     crossing scans. The user can modify this criterion by selecting a
-*     non zero detector width extension, see parameter WIDEXT. 
+*     non zero detector width extension, see parameter WIDEXT.
 *
 *     When coadding, the detector data can be weighted according to a
 *     combination of one or two factors, dependant on the reliability of
@@ -79,98 +79,98 @@
 *     2. NEFD Weight: The data from each detector can also be weighted
 *        according to the noise equivalent flux density (NEFD) of the
 *        detector, obtained from Exp. Supp. Fig IV.A.1., so that the
-*        most noisy detectors have the lowest weighting. 
+*        most noisy detectors have the lowest weighting.
 *
 *     3. Equal weighting: All data from the crossing detectors
 *        contribute equally to the coadded result.
 *
 *     All above weighting schemes can be combined with a distance effect
-*     if required. If the distance effect is selected the weight(s) of a 
-*     data trace is taken to be the product of the weight(s) decided 
-*     from one of above schemes and a weight which is a Gaussian function 
+*     if required. If the distance effect is selected the weight(s) of a
+*     data trace is taken to be the product of the weight(s) decided
+*     from one of above schemes and a weight which is a Gaussian function
 *     of the distance of the trace centre from the expected source position.
-*     With this distance weight, the effect of the detector which crosses 
-*     the expected source at its edge can be reduced. The Gaussian function 
+*     With this distance weight, the effect of the detector which crosses
+*     the expected source at its edge can be reduced. The Gaussian function
 *     can have different width by specifying its value at the edges of the
-*     detectors, see parameter GVDTEG. If distance weighting is not required 
+*     detectors, see parameter GVDTEG. If distance weighting is not required
 *     the parameter DISTANCE should be set false.
 *
 *     When the input CRDD files have variance components, the default
-*     weighting will be 'distance-variance', otherwise the weighting 
+*     weighting will be 'distance-variance', otherwise the weighting
 *     will be 'distance-NEFD'.
 *
-*     For each crossing scan, a sequence of about 80.0 arcmin length is 
+*     For each crossing scan, a sequence of about 80.0 arcmin length is
 *     extracted centered on the expected source position, these are usually
-*     sufficient for source signal and noise estimation. Should a user feel 
-*     it is not adequate to his requirement, he can select another 
+*     sufficient for source signal and noise estimation. Should a user feel
+*     it is not adequate to his requirement, he can select another
 *     sequence length via parameter SCNLEN.
 *
 *     During coadding, the traces are aligned with the trace which is
 *     closest to the expected source position. This consists of two phases.
-*     The detector traces are reversed if they traversed the sky in the 
+*     The detector traces are reversed if they traversed the sky in the
 *     opposite direction to the direction of the closest scan. Then the
-*     samples are aligned so that the samples crossing the source position 
-*     coincide. The interpolation used when aligning the traces can be either 
-*     'nearest' or 'linear'. In nearest interpolation the sample nearest to 
+*     samples are aligned so that the samples crossing the source position
+*     coincide. The interpolation used when aligning the traces can be either
+*     'nearest' or 'linear'. In nearest interpolation the sample nearest to
 *     the source position is used as a central point. In linear interpolation
 *     the central value is a linear combination of the two samples closest
 *     to the source position and the values for each sample worked outwards
 *     from this centre is also a linear combination of the corresponding samples
-*     in the original trace. The user should note that although this then 
+*     in the original trace. The user should note that although this then
 *     aligns samples by their in-scan distance from the source point, it does
 *     not take account of the fact that scans may be crossing through the source
 *     at slightly different angles. Therefore the coadding may add signals that
-*     are in a slightly different position in the sky but at the same in-scan 
+*     are in a slightly different position in the sky but at the same in-scan
 *     distance from the source. The effect can be neglected except if looking
 *     for point sources not at the expected position, where they should be
 *     recoadded (see above).
 *
-*     If more than half of the samples in a crossing trace are bad, the trace 
+*     If more than half of the samples in a crossing trace are bad, the trace
 *     is discarded.
-* 
-*     The adjusted weighted samples are then coadded together. 
 *
-*     For each expected point source there will be one NDF file created 
-*     for each waveband where there was at least one detector which crossed 
-*     the source position. Each NDF will inherit the IRAS specific information 
-*     of the detector trace whose centre is closest to the expected source 
-*     position among all crossing traces coadded in that NDF. This means 
-*     that the position associated with each sample is likely to be very 
+*     The adjusted weighted samples are then coadded together.
+*
+*     For each expected point source there will be one NDF file created
+*     for each waveband where there was at least one detector which crossed
+*     the source position. Each NDF will inherit the IRAS specific information
+*     of the detector trace whose centre is closest to the expected source
+*     position among all crossing traces coadded in that NDF. This means
+*     that the position associated with each sample is likely to be very
 *     slightly wrong. The data will in fact refer to a tracelike series of
-*     positions passing through the source position and parallel to the 
+*     positions passing through the source position and parallel to the
 *     nearest detector trace, while the associated positional data will give
-*     in effect the position of the center of the nearest detector trace. The 
-*     maximum error in position caused by this effect will be half the width 
-*     of the detector (after allowance for the users width extension). 
-*     Thus more detector traces coadded gives a better result not only in 
-*     the data reliability, but also in the positional accuracy. And the 
-*     positional inaccuracy is only commensurate with the data inaccuracies 
+*     in effect the position of the center of the nearest detector trace. The
+*     maximum error in position caused by this effect will be half the width
+*     of the detector (after allowance for the users width extension).
+*     Thus more detector traces coadded gives a better result not only in
+*     the data reliability, but also in the positional accuracy. And the
+*     positional inaccuracy is only commensurate with the data inaccuracies
 *     caused by sampling at the edge of a detector.
 *
-*     The reason for the use of this nearest detector inheritance is that 
-*     it means that coadded NDF files can be processed by some other IRAS90 
+*     The reason for the use of this nearest detector inheritance is that
+*     it means that coadded NDF files can be processed by some other IRAS90
 *     applications, such as TRACECRDD in the same way as a normal CRDD NDF.
-*     But the user should be aware that some IRAS specific information, e.g. 
+*     But the user should be aware that some IRAS specific information, e.g.
 *     SOP, OBS and detector number, and such figures as cross scan distance
-*     reported by the applications may be irrelevant to data trace it contains. 
+*     reported by the applications may be irrelevant to data trace it contains.
 *     Thus TRACECRDD will report the correct reference position, a cross scan
-*     value and positions in 'get data value' that may be out by the half 
+*     value and positions in 'get data value' that may be out by the half
 *     detector width, an average point source profile for the waveband, and
 *     a detector number which is not applicable.
 *
 *     Users should also be aware that they should not use coadded scans in
 *     subsequent coadding or image preparation with eg MAPCRDD. This is because
-*     of two things, firstly the positional inaccuracies noted above, and 
+*     of two things, firstly the positional inaccuracies noted above, and
 *     secondly that since the coadded scan already contains processed weighting
 *     applying a second weighting is going to use the wrong weight values, and
 *     assume only accuracy appropriate for a single scan.
 *
 *     Under normal usage a logfile will be produced containing details of the
-*     crossing information which are not reported to the screen. 
+*     crossing information which are not reported to the screen.
 
 *  ADAM Parameters:
 *     ADD_SOURCE = LOGICAL (Read)
-*        When this is true the user is prompted to supply details of 
+*        When this is true the user is prompted to supply details of
 *        additional source positions.
 *     AUTOMATIC = LOGICAL (Read)
 *        When it has the value true, the application will run in the
@@ -181,24 +181,24 @@
 *     OUT = NDF (Read)
 *        The name of the output NDF file containing the coadded data
 *        trace for each expected point source. It will only be used when
-*        the application is running in non-automatic mode. If the 
+*        the application is running in non-automatic mode. If the
 *        application is running in automatic mode the default value will
 *        be "coadded_"sourcename"_b"waveband number eg coadded_wola_b3 .
 *     COORDS = LITERAL (Read)
 *        Sky coordinate system used to specify the additional expected
 *        point source positions. When reporting in the log file, this
 *        sky coordinate system will also be used to describe the crossed
-*        expected point source position. Valid values include ECLIPTIC, 
-*        EQUATORIAL and GALACTIC. See help on "Sky_coordinates" for more 
+*        expected point source position. Valid values include ECLIPTIC,
+*        EQUATORIAL and GALACTIC. See help on "Sky_coordinates" for more
 *        information on available sky coordinate systems.
 *        [current sky coordinate system]
 *     IN = NDF (Read)
 *        Specifies a group of input CRDD NDF files. This should be in the
 *        form of a group expression (see help on "Group_expressions").
-*        All files in the group should be from the same CRDD type, but can 
-*        be from different waveband. If an expected source is crossed by 
-*        the detector traces from the different wavebands, the coadding 
-*        will be performed for each waveband.  
+*        All files in the group should be from the same CRDD type, but can
+*        be from different waveband. If an expected source is crossed by
+*        the detector traces from the different wavebands, the coadding
+*        will be performed for each waveband.
 *     DISTANCE = _LOGICAL (Read)
 *        If it is true, the distance of the centre of a trace from the
 *        expected source position will be taken into account when
@@ -221,7 +221,7 @@
 *         NEAREST - The nearest neighborhood method is to be used.
 *
 *        The input can be abbreviated to an unambiguous length and is
-*        case insensitive. [LINEAR] 
+*        case insensitive. [LINEAR]
 *     LOGFILE = LITERAL (Read)
 *        The name of the logging file to contain the reporting of the
 *        crossing and related information for all expected point source
@@ -240,23 +240,23 @@
 *        source from a crossing trace to be coadded with the other
 *        crossing traces. [80.0]
 *     SOURCE_LAT = LITERAL (Read)
-*        The sky latitude of the additional expected source position,        
-*        in the coordinate system specified by the parameter COORDS 
-*        (eg if COORDS is EQUATORIAL then SOURCE_LAT should be given 
+*        The sky latitude of the additional expected source position,
+*        in the coordinate system specified by the parameter COORDS
+*        (eg if COORDS is EQUATORIAL then SOURCE_LAT should be given
 *         the Declination of the image centre). See help on
 *        "Sky_coordinates" for the formats allowed for this value.
 *        The application will keep prompting for the next expected
-*        source position until a null, '!', value is given to the 
-*        parameter SOURCE_NAME. 
+*        source position until a null, '!', value is given to the
+*        parameter SOURCE_NAME.
 *     SOURCE_LON = LITERAL (Read)
-*        The sky longitude of the additional expected source position, 
-*        in the coordinate system specified by the parameter COORDS 
+*        The sky longitude of the additional expected source position,
+*        in the coordinate system specified by the parameter COORDS
 *        (eg if COORDS is EQUATORIAL then source_LON should be given the
 *        Right Ascension of the image centre). See help on
 *        "Sky_coordinates" for the formats allowed for this value.
 *        The application will keep prompting for the next expected
-*        source position until a null, '!', value is given to the 
-*        parameter SOURCE_NAME. 
+*        source position until a null, '!', value is given to the
+*        parameter SOURCE_NAME.
 *     SOURCE_NAME = LITERAL (Read)
 *        The name of the additional expected sources specified by the
 *        user. The application will keep prompting for the name of the
@@ -266,11 +266,11 @@
 *        data trace. In the automation mode, the title of the NDF for a
 *        expected source will be created by the application by
 *        concatenating the string 'COADDCRDD:' and the source name. And
-*        hance this parameter will not be used in this mode. 
+*        hance this parameter will not be used in this mode.
 *     WEIGHT = LITERAL
 *        The weighting scheme used when coadding. It can take following
 *        values:
-*        
+*
 *          VARIANCE - Samples in the traces are weighted according to
 *                     the variance associated with them.
 *
@@ -284,13 +284,13 @@
 *     WIDEXT = _REAL (Read)
 *        The detector width extenion. With this parameter being non-
 *        zero, the detector width used by the application becomes
-*        DETWID + WIDEXT * DETWID, where DETWID is the width of the 
-*        detector (about 4.5 arcmin, see exp. suppl. Table II.C.3 for 
-*        its exact value for each detector), and if an expected source 
-*        position falls within the scan field of this width, the detecor 
+*        DETWID + WIDEXT * DETWID, where DETWID is the width of the
+*        detector (about 4.5 arcmin, see exp. suppl. Table II.C.3 for
+*        its exact value for each detector), and if an expected source
+*        position falls within the scan field of this width, the detecor
 *        trace is regarded as a crossing trace. It is recommended that if
-*        this parameter is to be used, its value should be selected 
-*        between 0.0 and -1.0 so that the detectors which see the soucre 
+*        this parameter is to be used, its value should be selected
+*        between 0.0 and -1.0 so that the detectors which see the soucre
 *        at the edge of their field of view will not be selected. [0.0]
 
 *  Authors:
@@ -306,7 +306,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -389,13 +389,13 @@
       CHARACTER*( IRA__SZSCS ) SCS
                                  ! Name of used sky coordinate system
       INTEGER SOP( MXCRDD )      ! SOP number of input CRDD files
-      CHARACTER*( 4 ) TYPE     ! Type returned from IRM_CRTYP 
+      CHARACTER*( 4 ) TYPE     ! Type returned from IRM_CRTYP
       INTEGER UBDTMP( 2 )        ! Upper bound of temporary arrays
       CHARACTER*( 8 ) WEIGHT     ! Specified weighting method
       INTEGER WTARY              ! ID of temp. weight array
       INTEGER WTPLCE             ! Placehold for temp. weight array
       INTEGER WPNT               ! Point to temp. weight
-      
+
 *.
 
 *  Check inherited global status.
@@ -412,7 +412,7 @@
       CALL NDF_BEGIN
 
 *  Get a group of CRDD NDF files from the environment.
-      CALL IRM_RDNDF( 'IN', MXCRDD, 1, ' ', GID, NCRDD, STATUS )           
+      CALL IRM_RDNDF( 'IN', MXCRDD, 1, ' ', GID, NCRDD, STATUS )
 
 *  If error status returned, exit.
       IF ( STATUS .NE. SAI__OK ) GOTO 990
@@ -420,12 +420,12 @@
 *  Initialise the IRC_ system.
       CALL IRC_INIT( STATUS )
 
-*  Get the NDF IDs and IRC IDs for all input CRDD files. 
+*  Get the NDF IDs and IRC IDs for all input CRDD files.
       DO I = 1, NCRDD
          CALL NDG_NDFAS( GID, I, 'READ', NDFID( I ), STATUS )
          CALL IRC_IMPRT( NDFID( I ), IRCID( I ), STATUS )
       END DO
-      
+
 *  If the input NDFs are all CRDD files, check that they are from the
 *  same type.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -441,22 +441,22 @@
 *  In case that not all input NDFs are CRDD files, report and exit.
       ELSE
          CALL ERR_REP( 'COADDCRDD_ERR2', 'Not all input NDFs are '/
-     :                /'CRDD NDF files', STATUS )    
+     :                /'CRDD NDF files', STATUS )
          GOTO 980
       END IF
-            
+
 *  Get the sky coordinate system to be used.
       CALL IRA_GTSCS( 'COORDS', .FALSE., SCS, STATUS )
 
 *  Extract and report the expected source positions associated with
 *  the input CRDD NDF files, and other IRAS information about the input
 *  CRDD files.
-      CALL CDCRA0( NCRDD, NDFID, IRCID, NSRCE, NAME, RA, DEC, BAND, 
+      CALL CDCRA0( NCRDD, NDFID, IRCID, NSRCE, NAME, RA, DEC, BAND,
      :             SOP, OBS, SCNDIR, STATUS )
 
 *  Get additional expected source positions.
-      CALL CDCRA1( 'ADD_SOURCE', 'SOURCE_NAME', 'SOURCE_LON', 
-     :             'SOURCE_LAT', SCS, MXSRCE, 
+      CALL CDCRA1( 'ADD_SOURCE', 'SOURCE_NAME', 'SOURCE_LON',
+     :             'SOURCE_LAT', SCS, MXSRCE,
      :             NSRCE, NAME, RA, DEC, LON, LAT, STATUS )
 
 *  Modify the detector width according the user specified width
@@ -465,7 +465,7 @@
 
 *  Get the scan length to be extracted.
       CALL PAR_GET0R( 'SCNLEN', LENGTH, STATUS )
-            
+
 *  If there is an error in parameter response
          IF ( STATUS .NE. SAI__OK ) GOTO 980
 
@@ -478,7 +478,7 @@
      :                /'file.', STATUS )
          GOTO 980
       END IF
-      
+
 *  Write the head of logging file.
       CALL FIO_WRITE( FID, ' ', STATUS )
       CALL FIO_WRITE( FID, '    *** COADDCRDD LOG FILE ***', STATUS )
@@ -486,7 +486,7 @@
 
 *  Create a new empty group to contain names of the output NDFs.
       CALL GRP_NEW( 'Coadded CRDD traces', OGID, STATUS )
-            
+
 *  Create temporary array to hold the crossing data and weight. From the
 *  structure of the IRAS focal plane, there are at most 3 crossing
 *  detector traces for each scan.
@@ -510,11 +510,11 @@
      :                /'scratch disk space', STATUS )
          GOTO 970
       END IF
-      
+
 *  Get the way to weight the crossing traces when coadding.
       CALL CDCRA3( 'WEIGHT', 'DISTANCE', 'GVDTEG', NCRDD, NDFID,
      :              WEIGHT, DIST, GVDTEG, STATUS )
-      
+
 *  Get the interpolation method used when alignning crossing traces.
       CALL PAR_CHOIC( 'INTER', 'LINEAR', 'LINEAR,NEAREST', .FALSE.,
      :                INTER, STATUS )
@@ -525,7 +525,7 @@
 *  Now exam the crossing of the expected sources one by one.
       DO ISRC = 1, NSRCE
          NTOTCR = 0
-      
+
 *  Write an entry for this source in the log file.
          CALL FIO_WRITE( FID, 'Source Name:     '//NAME( ISRC ),
      :                   STATUS )
@@ -536,29 +536,29 @@
          CALL FIO_WRITE( FID, 'Source position: '//LONST( : LONLN )/
      :                 /', '//LATST( : LATLN ), STATUS )
          CALL FIO_WRITE( FID, ' ', STATUS )
-            
+
 *  Check the crossing from each waveband.
-         DO IBND = 1, I90__BANDS 
+         DO IBND = 1, I90__BANDS
             NCROS = 0
 
 *  Convert the scan length to be extracted to odd sample numbers.
             SCNLEN = I90__SRATE( IBND ) * INT( LENGTH / I90__SPEED )
             SCNLEN = 1 + 2 * ( SCNLEN / 2 )
-      
+
 *  Check the file one by one.
             DO IFIL = 1, NCRDD
 
 *  Only do the check when the waveband of the file is the same as
 *  waveband under checking now.
                IF ( BAND( IFIL ) .EQ. IBND ) THEN
-      
+
 *  Find all crossings for this expected source from this file.
                   NCRSPR = NCROS
                   CALL CDCRA4( NDFID( IFIL ), IRCID( IFIL ), RA( ISRC ),
      :                         DEC( ISRC ), DETWID, MXCROS, NCROS,
      :                         CRSDTX, CRSDIS, CRSSMP, STATUS )
 
-*  Record the file index of the found crossings. 
+*  Record the file index of the found crossings.
                   DO I = NCRSPR + 1, NCROS
                      CRSFLX( I ) = IFIL
                   END DO
@@ -570,7 +570,7 @@
             IF ( NCROS .GT. 0 ) THEN
                CALL CDCRA5( NCROS, CRSFLX, CRSDTX, CRSDIS, CRSSMP,
      :                      STATUS )
-            
+
 *  Put the crossing trace sections and their weights to the temporary
 *  array, alignning the traces to the trace closest to the source.
                CALL CDCRA6( NCRDD, NDFID, IRCID, SCNDIR, INTER, WEIGHT,
@@ -585,31 +585,31 @@
                END IF
 
 *  Write the information about the crossings to the log file.
-               CALL CDCRA8( FID, GID, NCRDD, NDFID, IRCID, SCNDIR, 
-     :                      SOP, OBS, IBND, NCROS, CRSFLX, CRSDTX, 
-     :                      CRSDIS, CRSSMP, CRSFLG, STATUS )  
+               CALL CDCRA8( FID, GID, NCRDD, NDFID, IRCID, SCNDIR,
+     :                      SOP, OBS, IBND, NCROS, CRSFLX, CRSDTX,
+     :                      CRSDIS, CRSSMP, CRSFLG, STATUS )
 
 *  See if all crossing traces will be discarded.
                DISCD = .TRUE.
                DO I = 1, NCROS
                   IF ( CRSFLG( I ) .EQ. 2 ) DISCD = .FALSE.
                END DO
-      
+
 *  If not all crossing traces are discarded, create an NDF file to hold
 *  the coadded trace.
                IF ( ( .NOT.DISCD ) .AND. ( STATUS .EQ. SAI__OK ) ) THEN
-                  CALL CDCRA9( 'OUT', 'TITLE', AUTO, NAME( ISRC ), 
+                  CALL CDCRA9( 'OUT', 'TITLE', AUTO, NAME( ISRC ),
      :                          RA( ISRC ), DEC( ISRC ),
      :                          NDFID( CRSFLX( 1 ) ), IBND, CRSDTX( 1 ),
      :                          FID, OGID, OUTNDF, STATUS )
 
 *  Find the bounds of the output NDF.
                   CALL NDF_BOUND( OUTNDF, 2, LBND, UBND, NDIM, STATUS )
-      
+
 *  Map the data-array of the output NDF.
                   CALL NDF_MAP( OUTNDF, 'Data', '_REAL', 'WRITE', OPNT,
      :                          EL, STATUS )
-      
+
 *  Coadd the crossing and output the result to an NDF file.
                   CALL CDCRD0( SCNLEN, NCROS, %VAL( DPNT ),
      :                        %VAL( WPNT ), INT( CRSSMP( 1 ) ), CRSFLG,
@@ -627,19 +627,19 @@
                      CALL MSG_OUT('COADDCRDD_MSG',
      :               'Error in preparing current coadded scan '/
      :               /'- discarded',
-     :               STATUS )      
+     :               STATUS )
                   END IF
 
 *  If all crossing traces are discarded, reset the number of crossings.
                ELSE
                   NCROS = 0
                END IF
-      
+
 *  Record the total crossings.
                NTOTCR = NTOTCR + NCROS
-            END IF 
+            END IF
          END DO
-      
+
 *  If there is no crossing for this source, report to the user and write
 *  into log file.
          IF ( NTOTCR .EQ. 0 ) THEN
@@ -672,7 +672,7 @@
          CALL MSG_OUT( 'COADDCRDD_MSG3', 'Names of the created NDFs '/
      :                /'are in a text file (OUTNDF.DAT by default)',
      :                  STATUS )
-                         
+
       END IF
 
  970  CONTINUE
@@ -680,7 +680,7 @@
 *  Delete created groups.
       CALL GRP_DELET( GID, STATUS )
       CALL GRP_DELET( OGID, STATUS )
-      
+
 *  Release the templay work space.
       CALL ARY_ANNUL( DTARY, STATUS )
       CALL ARY_ANNUL( WTARY, STATUS )
@@ -695,8 +695,8 @@
       CALL IRC_CLOSE( STATUS )
 
 *  End the NDF context.
-      CALL NDF_END( STATUS )      
+      CALL NDF_END( STATUS )
 
  990  CONTINUE
-      
+
       END

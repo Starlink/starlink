@@ -7,7 +7,7 @@
 # set of integrations (generally groups of 10).
 # Have to do it in groups since a single data file contains
 # a number of different wave plate positions.
-# 
+#
 
 #  Authors:
 #     Tim Jenness (JAC)
@@ -32,11 +32,11 @@ my $status = GetOptions("sub=s","h","out=s");
 
 ($opt_h) && do {
 print qq{
-pol [-h] [-s sub] [-out outfile] (file|number) integrations/waveplate 
+pol [-h] [-s sub] [-out outfile] (file|number) integrations/waveplate
 
 extract polarimetry information from photometry file
 
- Args: 
+ Args:
    -h: help
    -s: sub-instrument (default 'lon')
        This is the string that goes between  oNN_ and _pht
@@ -52,7 +52,7 @@ exit;
 };
 
 # Get the location of KAPPA
- 
+
 if (defined $ENV{"KAPPA_DIR"}) {
   $kappa = $ENV{"KAPPA_DIR"};
 } else {
@@ -69,9 +69,9 @@ $term = new Term::ReadLine 'perl';
 
 # Read in the HDS name from the command line
 #  - if not there then ask for it
- 
+
 $file = shift;
- 
+
 unless (defined $file) {
   $prompt = "Please enter input file name: ";
   $file = $term->readline($prompt);
@@ -114,14 +114,14 @@ print "Using $int_per_wp integrations per waveplate\n";
 
 # First of all do a trace on the input file in order to find the name
 # of all the NDFs
- 
+
 $status = &NDF::SAI__OK;
 hds_open($file, 'READ', $loc, $status);
- 
+
 die "Unable to open $file\n" unless $status == &NDF::SAI__OK;
- 
+
 dat_ncomp($loc, $ncomp, $status);
- 
+
 @names = ();
 for $comp (1..$ncomp) {
   dat_index($loc, $comp, $nloc, $status);
@@ -129,9 +129,9 @@ for $comp (1..$ncomp) {
   dat_annul($nloc, $status);
   push(@names, $name) if $name =~ /_PEAK$/;
 }
- 
+
 dat_annul($loc, $status);
- 
+
 die "Error opening $file\n" unless $status == &NDF::SAI__OK;
 
 # Now we are ready to roll.
@@ -164,7 +164,7 @@ foreach $name (@names) {
   # Construct output file name if necessary
   # Use the bolometer name as well
   # and open the file. Treat $out as a root name.
-  
+
   $output_file = $root . "$bol"  . ".dat";
 
   print "Output filename is $output_file\n";
@@ -173,7 +173,7 @@ foreach $name (@names) {
 
   # print the first line of the header
   print OUT "$$hashref{OBJECT} $$hashref{WAVE_1} ${bol}_$$hashref{RUN} $$hashref{UTDATE}\n";
-  
+
   # Now need to find out how many integrations we have so that
   # we can split it into sections
 
@@ -185,31 +185,31 @@ foreach $name (@names) {
   #    ndf_size($indf, $npix, $status);
   $npix = $dim[0];
   ndf_annul($indf, $status);
-  
+
   # Now that I know the size print the second header line
   $nposplate = int($npix/$int_per_wp + 0.99);
   $ncycle = int($nposplate/16.0);
-  
+
   # Convert the time to hours
   (@times) = split(/:/,$$hashref{STSTART});
-  $lst = $times[0] + ($times[1] / 60) + ($times[2] / 3600); 
-  
+  $lst = $times[0] + ($times[1] / 60) + ($times[2] / 3600);
+
   print OUT "$nposplate $ncycle $$hashref{MEANRA} $$hashref{MEANDEC} $lst\n";
-  
+
   # Number of time round the loop depends on $npix
-  
+
   for ($i = 1; $i <= $npix; $i += $int_per_wp) {
     $start = $i;
     $end = $start + $int_per_wp - 1;
     $end = "" if $end > $npix;
-    
+
     # Find stats of section (using Kappa for now)
     $section = "$file.$name($start:$end)";
     $exstat = system("$kappa/stats '$section' > /dev/null");
-    
+
     ($mean) =  par_get("mean", "stats", \$status);
     ($sigma) = par_get("sigma", "stats", \$status);
-    
+
     print OUT "$mean   $sigma\n";
 
   }

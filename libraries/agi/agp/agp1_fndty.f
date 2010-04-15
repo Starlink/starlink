@@ -10,23 +10,23 @@
 *     CALL AGP1_FNDTY( TYPE, PFILE, GNS, ITYPE, STATUS )
 
 *  Description:
-*     Returns the index within the AGP common block arrays of the 
-*     specified GNS or PGPLOT device type. Reports an error if the 
+*     Returns the index within the AGP common block arrays of the
+*     specified GNS or PGPLOT device type. Reports an error if the
 *     device is not known.
 
 *  Arguments:
 *     TYPE = CHARACTER*(*) (Given)
-*        GNS or PGPLOT device type. Case insensitive. Unambiguous 
+*        GNS or PGPLOT device type. Case insensitive. Unambiguous
 *        abbreviations may be supplied. White space is ignored.
 *     PFILE = CHARACTER*(*) (Given)
 *        The PGPLOT file name associated with the device (ignored if GNS
-*        is .TRUE.). If this is blank the index of the first entry with 
-*        the requested device type is returned. Otherwise, the index of the 
-*        entry with the requested type *and* file name is returned. If no 
-*        entry with the requested file name can be found, the index of the 
+*        is .TRUE.). If this is blank the index of the first entry with
+*        the requested device type is returned. Otherwise, the index of the
+*        entry with the requested type *and* file name is returned. If no
+*        entry with the requested file name can be found, the index of the
 *        first entry with the requested device type is returned without error.
 *     GNS = LOGICAL (Given)
-*        Supplied .TRUE. if TYPE represents a GNS device type, and 
+*        Supplied .TRUE. if TYPE represents a GNS device type, and
 *        .FALSE. if it is a PGPLOT device type.
 *     ITYPE = INTEGER (Returned)
 *        The index of the device. Returned equal to zero if no match
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     31-OCT-2001 (DSB):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -89,8 +89,8 @@
       INTEGER CHR_LEN             ! Used length of a string
 
 *  Local Variables:
-      CHARACTER LTYPE*(AGP__SZGTY)! Local copy of device type 
-      CHARACTER CTYPE*(AGP__SZUSP)! Current device type 
+      CHARACTER LTYPE*(AGP__SZGTY)! Local copy of device type
+      CHARACTER CTYPE*(AGP__SZUSP)! Current device type
       CHARACTER CFILE*(AGP__SZPFN)! Current PGPLOT file name
       INTEGER F                   ! Index of first non-blank character
       INTEGER I                   ! Loop count
@@ -103,11 +103,11 @@
       ITYPE = 0
 
 *  Check status on entry
-      IF( STATUS .NE. SAI__OK ) RETURN 
+      IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Take an upper case copy of the supplied device type and remove
 *  spaces.
-      IF( TYPE .NE. ' ' ) THEN 
+      IF( TYPE .NE. ' ' ) THEN
          CALL CHR_FANDL( TYPE, F, L )
          LTYPE = TYPE( F:L )
          CALL CHR_RMBLK( LTYPE )
@@ -119,13 +119,13 @@
       END IF
 
 *  Loop through the known device types, counting the number which
-*  match the supplied type and file name. 
+*  match the supplied type and file name.
       NMATCH = 0
       DO I = 1, AGP__NDEV
 
 *  Get the next device type, GNS or PGPLOT as required, and PGPLOT file
 *  name. A blank PGPLOT file name means "match anything".
-         IF( GNS ) THEN 
+         IF( GNS ) THEN
             CTYPE = AGP_GTY( I )
             CFILE = ' '
          ELSE
@@ -136,19 +136,19 @@
 *  Convert to upper case so that the comparisons are case-insensitive.
          CALL CHR_UCASE( CTYPE )
 
-*  If the current device type string starts with the supplied device type 
+*  If the current device type string starts with the supplied device type
 *  string, we have a match for the device type.
          IF( INDEX( CTYPE, LTYPE( : UL ) ) .EQ. 1 ) THEN
 
 *  The file name matches if they are equal, or if one of them is blank.
 *  Note the index of the match, and increment the number of matches.
-            IF( PFILE .EQ. ' ' .OR. CFILE .EQ. ' ' .OR. 
+            IF( PFILE .EQ. ' ' .OR. CFILE .EQ. ' ' .OR.
      :          PFILE .EQ. CFILE ) THEN
                ITYPE = I
                NMATCH = NMATCH + 1
 
-*  If teh device matches exactly (i.e. it is not an abbreviation), we use 
-*  this match even if there have been earlier non-exact matches. So set 
+*  If teh device matches exactly (i.e. it is not an abbreviation), we use
+*  this match even if there have been earlier non-exact matches. So set
 *  NMATCH to 1 and leave the loop.
                IF( CTYPE( UL + 1 : ) .EQ. ' ' ) THEN
                   NMATCH = 1
@@ -166,7 +166,7 @@
          NMATCH = 0
          DO I = 1, AGP__NDEV
 
-            IF( GNS ) THEN 
+            IF( GNS ) THEN
                CTYPE = AGP_GTY( I )
             ELSE
                CTYPE = AGP_PTY( I )

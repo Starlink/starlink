@@ -5,7 +5,7 @@
 *     ADAMNET
 
 *  Purpose:
-*     ADAM networking program 
+*     ADAM networking program
 
 *  Language:
 *     Starlink C
@@ -14,10 +14,10 @@
 *     This program has to be run from the shell.
 
 *  Description:
-*     Implements the ADAM networking process. It interfaces the ADAM 
+*     Implements the ADAM networking process. It interfaces the ADAM
 *     intertask communication software on unix to TCP/IP, thereby
 *     allowing ADAM tasks on different machines to communicate with one
-*     another. 
+*     another.
 
 *  Algorithm:
 *     Initialize into the low-level intertask communication system
@@ -25,16 +25,16 @@
 *     processes on this machine (COMMAND_Q) and a pair of send/receive
 *     queues for communicating between an i/o signal handler and the
 *     main-line code (NETWORKR_Q, NETWORKS_Q).
-*     Connect to TCP/IP and declare the "well-known port number" for 
+*     Connect to TCP/IP and declare the "well-known port number" for
 *     ADAMNET.
 *     Set up a listen socket for an incoming connection request with an
 *     associated signal routine and declare an exit handler.
 *     Any network 'event' - either receipt of a connect request or
-*     receipt of an actual ADAM network message, results in the signal 
-*     handling routine being delivered. This uses MSP to write a message to 
+*     receipt of an actual ADAM network message, results in the signal
+*     handling routine being delivered. This uses MSP to write a message to
 *     the NETWORKS_Q. The main-line code then interprets the event.
-*     Any ADAM task on this machine which wants a message forwarding to 
-*     another machine does so by writing the message onto this processes 
+*     Any ADAM task on this machine which wants a message forwarding to
+*     another machine does so by writing the message onto this processes
 *     COMMAND_Q.
 
 *  Authors:
@@ -88,11 +88,11 @@ int main()
 
 /*  If OK, proceed */
 
-   if ( status == SAI__OK ) 
+   if ( status == SAI__OK )
    {
       ant_serve ( &status );
    }
-   else 
+   else
    {
       printf ( "adamnet: bad initialisation status = %d\n", status );
    }

@@ -24,13 +24,13 @@ C                  DATA and OUTPUT cannot be the same arrays.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used -  
+C     Subroutines / functions used -
 C
 C     GEN_MOVE     Fast transfer of bytes between two arrays
 C
 C                                             KS / AAO 8th Oct 1986
 C
-C     Note: In all honesty, it has to be said that this routine has 
+C     Note: In all honesty, it has to be said that this routine has
 C     only been properly tested in the NDIM=1 and NDIM=2 cases.
 C
 C     Modified:
@@ -51,7 +51,7 @@ C
       INTEGER ITO, NELM
 C
 C     Initial setup
-C   
+C
       DO IDIM=1,NDIM
          IDIMS(IDIM)=1
       END DO

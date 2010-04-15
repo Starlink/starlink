@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,7 +71,7 @@
 *        Back-tracked to allow some readonly access for input NDFs. This
 *        is determined by file protections.
 *     16-DEC-1996 (PDRAPER):
-*        Moved modification of extension size into modified block. 
+*        Moved modification of extension size into modified block.
 *        Uninitialized variables were breaking this code on Linux.
 *     20-APR-1999 (PDRAPER):
 *        Modified to use CNF_PVAL to deference C memory pointers.
@@ -121,7 +121,7 @@
       INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *           NDF identifiers
-      
+
 *  Arguments Given:
       INTEGER SLOT
       INTEGER ESLOT
@@ -148,8 +148,8 @@
 
 *  Check access available to the NDF.
          CALL NDF_ISACC( PCB_INDF( SLOT ), 'WRITE', CANMOD, STATUS )
-         IF ( CANMOD ) THEN 
-         
+         IF ( CANMOD ) THEN
+
 *  Need to re-access the NDF FITS block, make sure that it is big enough
 *  then copy the contents of the memory resident version into it.
             CALL DAT_ALTER( ECB_XLOC( SLOT, ESLOT ), 1,
@@ -158,10 +158,10 @@
      :                    'UPDATE', IPFITS, NFITS, STATUS )
 
 *  Now copy the FITS block.
-            CALL IMG1_FTSCP( %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), 
-     :                       NFITS, %VAL( CNF_PVAL( IPFITS  ) ), 
+            CALL IMG1_FTSCP( %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
+     :                       NFITS, %VAL( CNF_PVAL( IPFITS  ) ),
      :                       NOUT, STATUS,
-     :                       %VAL( CNF_CVAL( 80 ) ), 
+     :                       %VAL( CNF_CVAL( 80 ) ),
      :                       %VAL( CNF_CVAL( 80 ) ) )
 
 *  and unmap it.
@@ -173,7 +173,7 @@
 *  enlargement, so unused elements at the end are released, this is a
 *  sign that entries have been deleted).
             IF ( NOUT .NE. NFITS ) THEN
-               CALL DAT_ALTER( ECB_XLOC( SLOT, ESLOT ), 1, NOUT, 
+               CALL DAT_ALTER( ECB_XLOC( SLOT, ESLOT ), 1, NOUT,
      :                         STATUS )
             END IF
          ELSE

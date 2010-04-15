@@ -37,7 +37,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get the plotting task alias and initialise output string
-      CALL PAR_GET0C( 'P4_ALIAS', P4_ALIAS, STATUS ) 
+      CALL PAR_GET0C( 'P4_ALIAS', P4_ALIAS, STATUS )
       CALL PAR_GET0C( 'CONFIG_FILE', CONFIG_FILE, STATUS )
       CALL CHR_FILL( ' ', INVAL )
       CALL CHR_FILL( ' ', OUTVAL )
@@ -68,7 +68,7 @@
 
             CALL TASK_DONE( -1, P4_PATH, P4_MESSID, OUTVAL, STATUS )
 
-            P4_ACTIVE = .FALSE. 
+            P4_ACTIVE = .FALSE.
 
             IF ( STATUS.NE.DTASK__ACTCOMPLETE ) THEN
                IF ( STATUS.EQ.DTASK__ACTINFORM ) THEN
@@ -77,7 +77,7 @@
                   CALL MSG_SETI( 'ES', ERR_STATUS )
                   CALL ERR_REP( ' ', 'CRED4_RESTORE_PCONFIG: '/
      :                /'Failure reported from plot task '/
-     :               /'(Status = ^ES, message follows)', STATUS ) 
+     :               /'(Status = ^ES, message follows)', STATUS )
                   CALL MSG_SETC( 'OUTVAL', OUTVAL )
                   CALL ERR_REP( ' ', 'CRED4_RESTORE_PCONFIG: '/
      :               /'^OUTVAL', STATUS )
@@ -121,7 +121,7 @@
             IF ( WAIT ) THEN
 
                CALL TASK_DONE( -1, P4_PATH, P4_MESSID, OUTVAL, STATUS )
-               P4_ACTIVE = .FALSE. 
+               P4_ACTIVE = .FALSE.
 
                IF ( STATUS.NE.DTASK__ACTCOMPLETE ) THEN
                   IF ( STATUS.EQ.DTASK__ACTINFORM ) THEN

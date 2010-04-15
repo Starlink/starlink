@@ -5,7 +5,7 @@ C     A B C O N V  /  F L C O N V  /  I R C O N V
 C
 C     Converts a spectrum into AB magnitudes (ABCONV) or f-lambda
 C     units (ergs/sec/cm**2/A) (FLCONV), or W/m**2/um (IRCONV).
-C     The original units of the 
+C     The original units of the
 C     data may be Janskys, milli-Janskys, or micro-Janskys.  Other
 C     possibilities may be added later.
 C
@@ -13,7 +13,7 @@ C     Command parameters -
 C
 C     SPECTRUM The name of the structure containing the spectrum.
 C              currently used for the spectrum.  For FLCONV
-C              an x-axis data structure giving the wavelengths of the 
+C              an x-axis data structure giving the wavelengths of the
 C              data elements is also required.
 C
 C     OUTPUT   The name of the result of the operation.  This can
@@ -39,7 +39,7 @@ C     21 Feb 1991  HME / UoE.  Bug fix: Set flagged in output, if it
 C                  has no quality.
 C     05 Apr 1991  KS / AAO.  Merged with recent changes made at AAO,
 C                  trap confusing error message when units are blank,
-C                  give subroutines ABCONV_ prefix, trap too-complex X 
+C                  give subroutines ABCONV_ prefix, trap too-complex X
 C                  arrays.
 C     08 Sep 1992  HME / UoE, Starlink. Changed INCLUDE.
 C     15 Feb 1996  HME / UoE, Starlink. Convert to FDA:
@@ -146,7 +146,7 @@ C
          END IF
          FAULT=.TRUE.
          GO TO 500
-      END IF          
+      END IF
 C
 C     For FLCONV & IRCONV check on the units of the X data array, and on the
 C     dimensions of the array - we can only handle the simpler cases here,
@@ -184,7 +184,7 @@ C
                GO TO 500    ! Error exit
             END IF
          END IF
-      END IF               
+      END IF
 C
 C     Get output structure name
 C
@@ -202,7 +202,7 @@ C
       IF (STATUS.NE.0) GOTO 500
 C
 C     Map the errors
-C 
+C
       CALL DSA_SEEK_ERRORS('OUTPUT',ERRORS,STATUS)
       IF (ERRORS) THEN
           CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',EPTR,ESLOT,
@@ -219,7 +219,7 @@ C
 C
 C     Operate on the data. Note that these routines can operate
 C     on their data in situ.
-C 
+C
       IF (IRCO) THEN
          CALL ABCONV_IRCON(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(EPTR)),
      :                     NELM,NTYPE,%VAL(CNF_PVAL(XPTR)),NXELM,
@@ -376,7 +376,7 @@ C
 C     Functions / subroutines used - None
 C
 C     Note: The conversion from Jansky units is based on the relation
-C     FL=(2.998E-5/WAVELENGTH**2)*FV which holds if FV is in Janskys 
+C     FL=(2.998E-5/WAVELENGTH**2)*FV which holds if FV is in Janskys
 C
 C                                            KS / CIT 16th Jan 1985
 C     06-DEC-1990  JAB:
@@ -469,9 +469,9 @@ C     Functions / subroutines used - None
 C
 C     Note: The conversion from Jansky units is based on the relation
 C     FL=(2.998E-12/WAVELENGTH**2)*FV which holds if FV is in Janskys
-C     and wavelength is in microns. 
+C     and wavelength is in microns.
 C
-C                                     
+C
 C     06-DEC-1990  JAB:
 C        Original modified from FIG_FLCONV. Error handling.
 C     09-FEB-1991  HME:

@@ -16,7 +16,7 @@
 *     This routine obtains  group of strings using the specified
 *     parameter, and returns them in a GRP group (see SUN/150).
 *
-*     The user specifies the strings by supplying a GRP group expression 
+*     The user specifies the strings by supplying a GRP group expression
 *     for the parameter value. If the final character in the supplied
 *     string is the group "flag character" (a minus sign by default), then
 *     the user is re-prompted for another group expression, and the strings
@@ -25,18 +25,18 @@
 *     which does not end with the continuation character, or a null value is
 *     supplied (which is annulled).
 *
-*     Normally, the "current value" for the parameter on exit would be 
-*     the final group expression. If more than one group expression was 
+*     Normally, the "current value" for the parameter on exit would be
+*     the final group expression. If more than one group expression was
 *     supplied, then this will not represent the entire group. For this
-*     reason, this routine concatenates all the group expressions supplied, 
-*     and stores the total group expression as the parameter value before 
-*     exiting. Since a new value is stored for the parameter, the parameter 
+*     reason, this routine concatenates all the group expressions supplied,
+*     and stores the total group expression as the parameter value before
+*     exiting. Since a new value is stored for the parameter, the parameter
 *     should ne be given an access mode of READ in the interface file.
 *
 *     If a null value is supplied the first time the parameter value is
-*     obtained, then the PAR__NULL status is returned, and SIZE is returned 
-*     as zero (a valid GRP identifier is still returned however). If a null 
-*     value is supplied on a subsequent access to the parameter, then the 
+*     obtained, then the PAR__NULL status is returned, and SIZE is returned
+*     as zero (a valid GRP identifier is still returned however). If a null
+*     value is supplied on a subsequent access to the parameter, then the
 *     PAR__NULL status is annulled, and the group is returned containing
 *     any values obtained earlier.
 
@@ -45,8 +45,8 @@
 *        The name of the parameter to use.
 *     IGRP = INTEGER (Given and Returned)
 *        The group to use. If this is GRP__NOID then a new group is
-*        created with default control characters and its identifier is 
-*        returned. If the group already exists, its contents are discarded 
+*        created with default control characters and its identifier is
+*        returned. If the group already exists, its contents are discarded
 *        before adding new strings.
 *     SIZE = INTEGER (Returned)
 *        The total size of the returned group. Returned equal to zero if an
@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     18-MAR-1998 (DSB):
 *        Original version.
 *     6-OCT-2009 (DSB):
-*        Use SUBPAR_CURSAV to save the concatenated group expression rather 
+*        Use SUBPAR_CURSAV to save the concatenated group expression rather
 *        than SUBPAR_PUTNAME.
 *     {enter_changes_here}
 
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -133,7 +133,7 @@
 *  Initialise the pointer to the returned group size
       SIZE = 0
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If a null identifier was supplied, create a new group with default
@@ -147,8 +147,8 @@
       END IF
 
 *  Get the demimiter and flag control characters for the group.
-      CALL GRP_GETCC( IGRP, 'DELIMITER', DC, STATUS ) 
-      CALL GRP_GETCC( IGRP, 'FLAG', FC, STATUS ) 
+      CALL GRP_GETCC( IGRP, 'DELIMITER', DC, STATUS )
+      CALL GRP_GETCC( IGRP, 'FLAG', FC, STATUS )
 
 *  Initialise the total group expression given so far.
       GRPEXP = ' '
@@ -165,12 +165,12 @@
       DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
 
 *  Get the group of strings from the environment.
-         CALL GRP_GROUP( PARAM, GRP__NOID, IGRP, SIZE, ADDED, 
+         CALL GRP_GROUP( PARAM, GRP__NOID, IGRP, SIZE, ADDED,
      :                   CFLAG, STATUS )
 
-*  If succesful, increment the number of group expressions obtained, and get 
-*  the group expression supplied for the parameter as an uninterpreted text 
-*  string. 
+*  If succesful, increment the number of group expressions obtained, and get
+*  the group expression supplied for the parameter as an uninterpreted text
+*  string.
          IF( STATUS .EQ. SAI__OK ) THEN
             NEXP = NEXP + 1
             CALL SUBPAR_GETNAME( IPAR, TEXT, STATUS )
@@ -185,12 +185,12 @@
 *  Get the used length of the string.
                TLEN = CHR_LEN( TEXT )
 
-*  If the group expression was flagged, replace the last non-blank character 
+*  If the group expression was flagged, replace the last non-blank character
 *  with a delimiter character if it is a flag character.
                IF( CFLAG .AND. TEXT( TLEN : TLEN ) .EQ. FC ) THEN
                   TEXT( TLEN : TLEN ) = DC
                END IF
-               
+
 *  Find out how much of the text can be added to the total group
 *  expression.
                TLEN = MIN( TLEN, MXGEX - IAT )
@@ -235,7 +235,7 @@
 
       END IF
 
-*  If more than one group expression was supplied, store the total group 
+*  If more than one group expression was supplied, store the total group
 *  expression as the current value for the parameter. Do not do this is
 *  the total group expression consists of a single flag character.
       IF( NEXP .GT. 1 .AND. IAT .GT. 0 ) THEN
@@ -248,7 +248,7 @@
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
 *  Register the returned group with NDG so that its contents will be
-*  appended to the end of any default history records written out by the 
+*  appended to the end of any default history records written out by the
 *  NDF library.
       CALL NDG_ADDGH( PARAM, IGRP, STATUS )
 

@@ -100,31 +100,31 @@
 
 *  Call the appropriate subtraction routine by type.
       IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_CMLTUB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTUB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                     %VAL( CNF_PVAL( IPOUT ) ),
      :                     NERR, STATUS )
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_CMLTB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    NERR, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_CMLTUW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTUW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                     %VAL( CNF_PVAL( IPOUT ) ),
      :                     NERR, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_CMLTW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    NERR, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_CMLTI( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTI( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    NERR, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_CMLTR( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTR( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    NERR, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_CMLTD( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL, 
+         CALL CCG1_CMLTD( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    NERR, STATUS )
       ELSE

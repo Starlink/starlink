@@ -38,7 +38,7 @@
 *     LAT ( MXNSCT ) = DOUBLE PRECISION (Given and Returned)
 *        The latitude of the begin position of the section drawn.
 *     ANG ( MXNSCT ) = DOUBLE PRECISION (Given and Returned)
-*        The position angle of the great circle section drawn. 
+*        The position angle of the great circle section drawn.
 *     SCT ( MXNSCT ) = DOUBLE PRECISION (Given and Returned)
 *        The length of the section.
 *     INDEX = INTEGER (Given and Returned)
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -71,7 +71,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
-                                 
+
 *  Arguments Given:
       INTEGER IGRP
       INTEGER IRA
@@ -115,16 +115,16 @@
       CALL IRA_CTOD( NAMES( 1 ), NAMES( 2 ), SCS, LON( NGCRL + 1 ),
      :               LAT( NGCRL + 1 ), STATUS )
 
-*  The third should be the position angle at the start of the curve. 
+*  The third should be the position angle at the start of the curve.
 *  Convert it to a floating point value, storing it at the end of the
-*  returned array. 
+*  returned array.
       CALL CHR_CTOD( NAMES( 3 ), ANG( NGCRL + 1 ), STATUS )
 
 *  Convert to radians.
       ANG( NGCRL + 1 ) = ANG( NGCRL + 1 )*IRA__DTOR
 
-*  The fourth should be the arc-length of the curve, in degrees. 
-*  Convert it to a floating point value, storing it at the end of the 
+*  The fourth should be the arc-length of the curve, in degrees.
+*  Convert it to a floating point value, storing it at the end of the
 *  returned array.
       CALL CHR_CTOD( NAMES( 4 ), SCT( NGCRL + 1 ), STATUS )
 
@@ -142,5 +142,5 @@
          NGCRL = NGCRL + 1
          INDEX = INDEX + 4
       END IF
-      
+
       END

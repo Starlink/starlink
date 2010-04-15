@@ -11,7 +11,7 @@ c *** MEDIAN  performs median filtering on array xbuf
       if(npt.gt.8192)stop ' too many points in data array'
       if((nfilt/2)*2.eq.nfilt)nfilt=nfilt+1
       nfo2p1=nfilt/2+1
-c *** set first and last edges equal 
+c *** set first and last edges equal
       il=nfilt/2
       ilow=max0(3,nfilt/4)
       ilow=(ilow/2)*2+1

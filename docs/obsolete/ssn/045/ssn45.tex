@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -72,13 +72,13 @@ This is a `complete' release of ADAM -- its main features are:
 %------------------------------------------------------------------------------
 
 \section{INSTALLATION}
-Full installation instructions are given in SSN/44 and the Starlink Software 
+Full installation instructions are given in SSN/44 and the Starlink Software
 Change Notice.
 
-{\em Note that there has been a change in the significance of the version 
-numbering system. The absence of a hyphen no longer implies a complete 
-release -- it implies functional changes. 
-The presence of a hyphen implies a release consisting only of bug fixes or 
+{\em Note that there has been a change in the significance of the version
+numbering system. The absence of a hyphen no longer implies a complete
+release -- it implies functional changes.
+The presence of a hyphen implies a release consisting only of bug fixes or
 other minor changes.}
 
 The full system requires about 37000 blocks of disk storage and includes a
@@ -89,9 +89,9 @@ requires about 1200 blocks and allows tasks to be run and  developed.
 \section{NEW FEATURES OF THE PARAMETER SYSTEM}
 
 \subsection{Augmented PAR Library}
-PAR will in future be a separate Starlink Software Item described in 
+PAR will in future be a separate Starlink Software Item described in
 SUN/114.
-In preparation for this, ADAM tasks will link with a separate 
+In preparation for this, ADAM tasks will link with a separate
 PAR\_IMAGE\_ADAM shareable library.
 
 In addition to new routines supporting the MIN/MAX system described below,
@@ -100,11 +100,11 @@ which has been in use by KAPPA and other applications for some time, will
 be included in the new PAR library.
 
 As a temporary measure, A version of the PAR library (including a
-PAR\_IMAGE\_ADAM.EXE) supporting the MIN/MAX system but not the other PAR 
+PAR\_IMAGE\_ADAM.EXE) supporting the MIN/MAX system but not the other PAR
 enhancements is retained in this release --
-it will be removed at the next release. 
+it will be removed at the next release.
 
-See also APPLOG.COM, DIR.COM and LOGICAL.COM changes described in 
+See also APPLOG.COM, DIR.COM and LOGICAL.COM changes described in
 Section \ref{procs}.
 
 \subsection{The MIN/MAX System}
@@ -116,25 +116,25 @@ used.
 Tasks will use the system via the PAR interface -- for details of the
 new routines, see SUN/114.
 
-The following points relate to the way the underlying parameter 
+The following points relate to the way the underlying parameter
 system, SUBPAR, implements the system:
 \begin{itemize}
 \item Minimum/maximum values are set by the routines
 \begin{quote} \begin{verbatim}
-   SUBPAR_MINt( NAMECODE, VALUE, STATUS ) 
-or SUBPAR_MAXt( NAMECODE, VALUE, STATUS ) 
+   SUBPAR_MINt( NAMECODE, VALUE, STATUS )
+or SUBPAR_MAXt( NAMECODE, VALUE, STATUS )
 \end{verbatim} \end{quote}
 where: \verb%t% is R, D, I or C,\\
 \hspace*{12mm} \verb%NAMECODE% is the index to the parameter,\\
 and \hspace{4mm} \verb%VALUE% has the type corresponding with \verb%t%.
 
-The PAR library contains corresponding PAR routines which use the 
+The PAR library contains corresponding PAR routines which use the
 parameter name rather than the namecode.
 \item MIN and MAX values must be convertible to the type of the parameter and
 must be within any RANGE set by the interface file.
-\item The SUBPAR\_GET0x routines will check any obtained parameter values 
-against limits defined by any specified MIN/MAX values and/or any specified 
-lower or upper RANGE values. 
+\item The SUBPAR\_GET0x routines will check any obtained parameter values
+against limits defined by any specified MIN/MAX values and/or any specified
+lower or upper RANGE values.
 The ASCII collating sequence is used in comparing CHARACTER values.
 \item If a minimum value is greater than the maximum value, the parameter must
 NOT lie between them.
@@ -142,25 +142,25 @@ NOT lie between them.
 command line (either positional or keyword=), in response to a prompt, or in
 a `SEND task SET parameter value' command.
 If a dynamic MIN/MAX value has been set when the parameter value is  `got' it
-will be used. 
-If there is no dynamic MIN/MAX value, any specified RANGE values will be used 
-instead. 
-If no minimum/maximum value has been specified, an error is reported and a 
+will be used.
+If there is no dynamic MIN/MAX value, any specified RANGE values will be used
+instead.
+If no minimum/maximum value has been specified, an error is reported and a
 prompt issued for another value.
 \item MIN and MAX values will be cancelled at the end of each task invocation.
-If required, they may also be cancelled explicitly during a task invocation 
-by calling a new subroutine, SUBPAR\_UNSET, which can also unset dynamic 
+If required, they may also be cancelled explicitly during a task invocation
+by calling a new subroutine, SUBPAR\_UNSET, which can also unset dynamic
 defaults. Again there is a PAR version of this routine.
 \end{itemize}
 (New: SUBPAR\_MAXC, \_MAX.GEN, \_MINC, \_MIN.GEN, \_UNSET, \_RANGEC/D/I/R,
 \_MNMX)\\
-Modified: SUBPAR\_CMDLINE, \_CMDPAR, \_DEACT, \_HDSIN, \_FETCHC/D/I/R, 
+Modified: SUBPAR\_CMDLINE, \_CMDPAR, \_DEACT, \_HDSIN, \_FETCHC/D/I/R,
 \_LIMITC/D/I/R, \_LOADIFC, \_LDIFC0, \_LDIFC1, SUBPAR\_CMN)
 
 \subsection{Parameter States}
-Parameter states are not part of the parameter system interface but for 
-special purposes the PAR\_STATE routine can access them. 
-There have been a number of changes to possible states which may affect any 
+Parameter states are not part of the parameter system interface but for
+special purposes the PAR\_STATE routine can access them.
+There have been a number of changes to possible states which may affect any
 tasks using PAR\_STATE.
 Additional parameter states are defined to implement the MIN/MAX system and
 to properly differentiate between SUBPAR\_\_ACCEPT and SUBPAR\_\_ACCPR.
@@ -173,24 +173,24 @@ For more details, see Appendix \ref{states}.\\
 
 \subsection{Command Line Syntax}
 \subsubsection{The ACCEPT Keyword}
-The ACCEPT command-line keyword will now only affect parameters 
-which would otherwise be prompted for. 
+The ACCEPT command-line keyword will now only affect parameters
+which would otherwise be prompted for.
 Previously it would completely override the VPATH --
 that behaviour is now obtained by combining ACCEPT and PROMPT.
 
-It is now also possible to put an individual parameter into an `accept' state 
+It is now also possible to put an individual parameter into an `accept' state
 by specifying  `\verb%keyword=\%' (where \verb%keyword% is the keyword of the
 parameter) on the command line. The presence or absence
-of any additional RESET or PROMPT keywords will determine the precise state 
+of any additional RESET or PROMPT keywords will determine the precise state
 entered.\\
 (New: SUBPAR\_ACCPT1,\_ACCPT)\\
 (Retired: SUBPAR\_ACCPR))\\
-(Modified: SUBPAR\_PAR, SUBPAR\_CMDLINE, \_FINDHDS, \_GETNAME, \_HDSIN, 
+(Modified: SUBPAR\_PAR, SUBPAR\_CMDLINE, \_FINDHDS, \_GETNAME, \_HDSIN,
 \_INPUT, \_RESET, \_FRPOMPT, \_STATE)
 
 \subsubsection{Null (!) on the Command Line}
-The null value will now be accepted on the command line (either positional or 
-as keyword=!) and and the `value' in an ICL `SEND task SET parameter value' 
+The null value will now be accepted on the command line (either positional or
+as keyword=!) and and the `value' in an ICL `SEND task SET parameter value'
 command.\\
 (SUBPAR\_CMDLINE, \_CMDPAR)
 
@@ -198,17 +198,17 @@ command.\\
 uses ! to introduce end of command line comments.}
 
 \subsubsection{Abbreviation of Special Keywords}
-The undocumented abbreviations ACC, RES and PR for the special keywords 
+The undocumented abbreviations ACC, RES and PR for the special keywords
 ACCEPT, RESET and PROMPT are no longer permitted as they have caused
-confusion and no-one seems to use them. A proper scheme for abbreviating 
+confusion and no-one seems to use them. A proper scheme for abbreviating
 keywords is in future plans.\\
 (SUBPAR\_CMDLINE)
 \subsection{Listing Parameters}
-A new subroutine, SUBPAR\_INDEX, has been provided to enable a list of 
-parameters names for the current A-task to be obtained. 
-The routine accepts a namecode identifying one of the parameters and returns 
-a namecode identifying the next parameter. A given namecode of 0 will start 
-the sequence and namecode 0 will be returned when there are no more 
+A new subroutine, SUBPAR\_INDEX, has been provided to enable a list of
+parameters names for the current A-task to be obtained.
+The routine accepts a namecode identifying one of the parameters and returns
+a namecode identifying the next parameter. A given namecode of 0 will start
+the sequence and namecode 0 will be returned when there are no more
 parameters for the action.
 The name of the parameter identified by a namecode may by obtained by calling
 subroutine SUBPAR\_PARNAME, which has been updated to report errors.\\
@@ -220,10 +220,10 @@ circumstances.}\\
 A number of changes have been made to improve the portability of the system
 and to avoid problems due to dependencies between libraries which are
 hierarchically incorrect and lead to problems when building the complete
-ADAM system from scratch. 
+ADAM system from scratch.
 \begin{itemize}
 \item An additional include file, SUBPAR\_PARERR, has been created
-to define, for SUBPAR internal use only, those PAR errors such as PAR\_\_NULL 
+to define, for SUBPAR internal use only, those PAR errors such as PAR\_\_NULL
 and PAR\_\_ABORT which SUBPAR must set.\\
 (New: SUBPAR\_PARERR,  Modified: LOGICAL.COM, numerous subroutines)
 \item An additional include file SUBPAR\_SYS, has been created to define some
@@ -234,7 +234,7 @@ SUBPAR\_SYS is included by SUBPAR\_CMN.\\
 (New: SUBPAR\_SYS.FOR; Modified: SUBPAR\_CMN.FOR)
 \item Several new error codes are defined in SUBPAR\_ERR to replace other
 packages codes which were being set by SUBPAR. They are:
-\begin{itemize} 
+\begin{itemize}
 \item SUBPAR\_\_ERROR instead of PAR\_\_ERROR.\\
 (SUBPAR\_CURLOC,\_CURNAME,\_CURVAL,\_HDSDEF,\_HDSDYN,\_VALASS)
 \item SUBPAR\_\_ICACM instead of PAR\_\_ICACM.\\
@@ -252,7 +252,7 @@ included by including SAE\_PAR on Unix.
 for MESERRS.\\
 (SUBPAR\_\_SYNC,\_PROMPTCL,\_WRITE)
 \item The output routine used with the help system has been changed to use
-SUBPAR\_WRMSG for consistency with the standard output system. 
+SUBPAR\_WRMSG for consistency with the standard output system.
 This also makes the routine common to VMS and Unix systems.\\
 (SUBPAR\_OPUT)
 \item Symbolic constants, notably DAT\_\_SZLOC are used in defining the SUBPAR
@@ -275,7 +275,7 @@ separate routines.
 
 \subsection{Task Control}
 SUBPAR\_ACTDCL has been modified to return the name of the task to
-DTASK\_DCLTASK when the task is being run from the shell. 
+DTASK\_DCLTASK when the task is being run from the shell.
 (DTASK\_DCLTASK is changed accordingly.)
 This will allow a new style of monolith to be run from the Unix shell
 For more details, see Section \ref{monoliths}.
@@ -350,20 +350,20 @@ PARSECON routines\footnote{With the exception of PARSECON\_FINDACT which is
 called by DTASK\_REMOVE\_ACTION}.
 \item[ADAM\_IMAGE\_ADAM] Containing ADAM, MESSYS and UTIL.
 \end{description}
-Procedures and transfer vectors for building the images are kept in 
+Procedures and transfer vectors for building the images are kept in
 [ADAM.LIB.SHARE] and the images themselves in [ADAM.RELEASE.EXE].
 
 The shareable image library, ADAMSHRLIB, which is searched by all the ADAM
-task linking procedures (ALINK, ILINK {\em etc.}), has been altered to include 
-the DATPAR, ADAM, SUBPAR and ADAMGRAPH7 shareable images but not ADAMSHARE. 
-ADAMSHARE now contains only dummy transfer vectors which allow tasks already 
-linked with it to continue working but will not allow anything to be 
+task linking procedures (ALINK, ILINK {\em etc.}), has been altered to include
+the DATPAR, ADAM, SUBPAR and ADAMGRAPH7 shareable images but not ADAMSHARE.
+ADAMSHARE now contains only dummy transfer vectors which allow tasks already
+linked with it to continue working but will not allow anything to be
 linked with it from now on.
 Any shareable images which were linked explicitly with ADAMSHARE/SHARE should
 in future be linked with ADAMSHRLIB/LIB or the individual shareable images
 required.
 
-The PAR shareable image is now picked up via the STAR\-\_LINK\-\_ADAM link 
+The PAR shareable image is now picked up via the STAR\-\_LINK\-\_ADAM link
 options file which is now included in {\em all} ADAM task link procedures.
 If a non-standard version of this is used, it must be altered appropriately.
 
@@ -378,7 +378,7 @@ A number of changes have been made in the interests of allowing, as far as
 possible, the same code to be used on both Unix and VMS systems. This requires
 stricter rules about package hierarchy.
 \begin{itemize}
-\item The name of the task, as determined by SUBPAR\_GTCMD,  is now returned 
+\item The name of the task, as determined by SUBPAR\_GTCMD,  is now returned
 from SUBPAR\_ACTDCL to DTASK\_DCLTASK.
 The name, rather than \verb%'RUN'%, is then passed on to DTASK\_OBEY.
 On Unix, this allows new-style monolith to be run from the Unix shell.
@@ -409,7 +409,7 @@ application development
 \end{itemize}
 
 \subsection{FIO/RIO}
-As forewarned at release V2.0-2, the FIO/RIO libraries have now been removed 
+As forewarned at release V2.0-2, the FIO/RIO libraries have now been removed
 from the ADAM release.
 For details of how to use FIO/RIO now, see SUN/143.
 
@@ -419,7 +419,7 @@ For details of how to use FIO/RIO now, see SUN/143.
 \item[Link Procedures] All link procedures, including ILINK, DLINK and CDLINK,
 will now use the STAR\_LINK\_ADAM link options file to pick up the PAR library.
 
-{\em If you are using a non-standard version of STAR\_LINK\_ADAM, you must 
+{\em If you are using a non-standard version of STAR\_LINK\_ADAM, you must
 ensure that it will in future pick up the PAR library.}
 
 For more information, see Section \ref{shares} and SUN/44 Section 6.
@@ -436,7 +436,7 @@ updated in line with the new version.}
 \item[ADAMSTART.COM] The ADAM startup procedure is changed as follows:
 \begin{itemize}
 \item The version number is set to `2.1'.
-\item A symbol, BETA, is defined and will be added to the ADAM version number 
+\item A symbol, BETA, is defined and will be added to the ADAM version number
 in displays and in setting the logical name ADAM\$\_VERSION.
 This will be used to label Beta releases as Version 2.1\_Beta for example.
 \end{itemize}
@@ -444,14 +444,14 @@ This will be used to label Beta releases as Version 2.1\_Beta for example.
 \item[ADAMSHARE] See Section \ref{shares}
 \item[ADAMSHRLIB7] See Section \ref{shares}
 \item[APPLOG.COM]
-The procedure  for setting up process logical names for application 
+The procedure  for setting up process logical names for application
 development have been changed as follows:
 \begin{itemize}
-\item MESSYS\_PAR is now defined. 
+\item MESSYS\_PAR is now defined.
 \item PAR\_DEV is obeyed if it is defined; if not, PAR include files are
 picked up from ADAM\_INC.
 \end{itemize}
-\item[DIR.COM] The procedure for defining ADAM system directories has been 
+\item[DIR.COM] The procedure for defining ADAM system directories has been
 changed to use a SYSTEM logical name PAR\_DIR if it is defined; if not,
 [ADAM.LIB.PAR] is used.
 \item[LOGICAL.COM] The procedure for defining logical names required for
@@ -479,12 +479,12 @@ last ADAM release.
 \begin{itemize}
 \item APN/6 -- The PAR Library
 \end{itemize}
-\item The ADAM\_CHANGES help library has been updated 
+\item The ADAM\_CHANGES help library has been updated
 with the information contained in this document. The information for earlier
 releases is
 retained in the library.
 \item The summaries, 0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS in
-ADAM\-\_DOCS, have been updated. 
+ADAM\-\_DOCS, have been updated.
 \end{itemize}
 
 \section{BUGS FIXED}
@@ -492,7 +492,7 @@ ADAM\-\_DOCS, have been updated.
 \subsection{SUBPAR}
 The following bugs have been corrected:
 \begin{itemize}
-\item Suggested values which were arrays of type \_DOUBLE were displayed 
+\item Suggested values which were arrays of type \_DOUBLE were displayed
 incorrectly.\\
 (SUBPAR\_CURVAL, \_VALASS)
 \item `=' was not accepted in a string given in response to a prompt.\\
@@ -508,14 +508,14 @@ For example 2DF became 2EF.
 \subsection{PARSECON}
 A bug which prevented task names in INTERFACE or MONOLITH statements in the
 interface file being of the form `D' or `E' possibly followed by
-an integer, has been corrected. The mod also fixes a problem on Suns whereby a 
+an integer, has been corrected. The mod also fixes a problem on Suns whereby a
 single-letter name could not be specified.\\
 (PARSECON\_TOKTYP)
 
 \subsection{UFACE}
 A modification to only send the used part of a message buffer, got lost at
 ADAM V2.0-3. This has been restored in the ICL, SMS and ADAMCL versions of
-UFACE. 
+UFACE.
 ICL and SMSICL have been re-linked to include the change.\\(UFACE\_SEND)
 
 \subsection{ICL}
@@ -543,7 +543,7 @@ to ICL now works correctly (ICLIO).
 \item Error messages are now annulled if the error is handled by an ICL
 exception handler (ICLPROC, ICLMAIN).
 \item The ICL prompt may now be changed in a startup file (ICLMAIN).
-\item PRIMDAT error codes returned from tasks are now translated 
+\item PRIMDAT error codes returned from tasks are now translated
 (LINK\_ICL.COM).
 \item The Portable Help library is now correctly linked (LINK\_ICL.COM).
 \end{itemize}
@@ -559,7 +559,7 @@ changed.
 
 \section{PROPOSED DEVELOPMENTS}
 \subsection{Parameter System}
-It is proposed to introduce a scheme allowing abbreviation of keywords given 
+It is proposed to introduce a scheme allowing abbreviation of keywords given
 on the command line.
 \subsection{STRING}
 The STRING library is being considered for removal. It seems appropriate that
@@ -583,12 +583,12 @@ ignore VPATH - prompt if new value required.\\
 routine.\\
 & SUBPAR\_\_EOL    &= 4  &Unused.\\
 {*} &SUBPAR\_\_RESET  &= 5  &Ignore CURRENT on VPATH or PPATH.\\
-{*} &SUBPAR\_\_ACCEPT &= 6  &Take suggested value if a prompt would otherwise 
+{*} &SUBPAR\_\_ACCEPT &= 6  &Take suggested value if a prompt would otherwise
 be issued.\\
 & SUBPAR\_\_RESACC &= 7  &Combine RESET and ACCEPT.\\
 & SUBPAR\_\_FPROMPT &= 8 &Ignore VPATH and issue a prompt.\\
 & SUBPAR\_\_RESPROM &= 9 & Combine RESET and FPROMPT.\\
-{*} &SUBPAR\_\_MAX    &= 10 &Use MAX value for this parameter but value not 
+{*} &SUBPAR\_\_MAX    &= 10 &Use MAX value for this parameter but value not
 yet requested.\\
 {*} &SUBPAR\_\_MIN    &= 11  & Use MIN value for this parameter but value
 not yet requested.\\
@@ -600,7 +600,7 @@ Note that the value of SUBPAR\_\_ACCPR has changed.
 
 
 \subsection{State Classification}
-For convenience in documentation {\em etc.} the states may be grouped. 
+For convenience in documentation {\em etc.} the states may be grouped.
 Note that a given state may be in more than one group.
 
 \begin{description}
@@ -617,14 +617,14 @@ SUBPAR\_\_ACTIVE, SUBPAR\_\_MIN, SUBPAR\_\_MAX, \\
 SUBPAR\_\_NULL
 
 The parameter `value' to be used has been specified. In the case of MIN and
-MAX, the actual value is obtained when the PAR\_GETx routine is called -- 
+MAX, the actual value is obtained when the PAR\_GETx routine is called --
 the parameter will then move into SUBPAR\_\_ACTIVE state.
 
 \item[The `Accept' States]
 SUBPAR\_\_ACCEPT, SUBPAR\_\_ACCPR, SUBPAR\_\_RESACC, \\
 SUBPAR\_\_RESACCPR
 
-If a prompt would otherwise occur and there is a suggested value, it will be 
+If a prompt would otherwise occur and there is a suggested value, it will be
 used; if there is no suggested value, the prompt will be issued.
 
 \item[The `Reset' States]
@@ -642,7 +642,7 @@ The VPATH is ignored and a prompt issued (or suggested value taken).
 \item[The `Cancelled' State]
 SUBPAR\_\_CANCEL
 
-This state is entered if pkg\_CANCEL is called for the parameter. 
+This state is entered if pkg\_CANCEL is called for the parameter.
 When a parameter is in the cancelled state:
 \begin{itemize}
 \item A further request for a parameter value will result in a prompt,
@@ -654,17 +654,17 @@ regardless of anything (including NOPROMPT) on the VPATH.
 \subsection{Setting Accept States}
 Existing Methods:
 \begin{description}
-\item[ACCEPT or $\backslash$ on the command line] - May be used alone, or in 
-combination with RE\-SET and/or PROMPT, to set all unset parameters into one 
+\item[ACCEPT or $\backslash$ on the command line] - May be used alone, or in
+combination with RE\-SET and/or PROMPT, to set all unset parameters into one
 of the ACCEPT states.
-\item[$\backslash$ in response to a prompt] - Takes the suggested value for 
-this parameter and sets all remaining unset parameters into one of the ACCEPT 
+\item[$\backslash$ in response to a prompt] - Takes the suggested value for
+this parameter and sets all remaining unset parameters into one of the ACCEPT
 states (depends on whether RESET and/or PROMPT were set on the command line).
 \end{description}
 New Method:
 \begin{description}
-\item[keyword=$\backslash$ or keyword=ACCEPT on  the command line] - May be 
-used alone, or in combination with RESET and/or PROMPT, to set the specified 
+\item[keyword=$\backslash$ or keyword=ACCEPT on  the command line] - May be
+used alone, or in combination with RESET and/or PROMPT, to set the specified
 parameter into one of the ACCEPT states.
 (SUBPAR\_CMDLINE)
 \end{description}
@@ -678,7 +678,7 @@ Existing Methods:
 \end{itemize}
 New Methods:
 \begin{itemize}
-\item Specify ! as the parameter `value' on the command line (either positional 
+\item Specify ! as the parameter `value' on the command line (either positional
 or as keyword=!).\\
 {\em Note that this is not available when running tasks direct from DCL as DCL
 uses ! to introduce end of command line comments.}

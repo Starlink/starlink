@@ -7,7 +7,7 @@
 
 *  Purpose:
 *     Sets up the messages that are to be displayed with the cursor to
-*     tell the user how to operate it and what input is currently being 
+*     tell the user how to operate it and what input is currently being
 *     requested.
 
 *  Language:
@@ -18,7 +18,7 @@
 
 
 *  Description:
-*     Depending on the value of POINT the routine assigns values to two 
+*     Depending on the value of POINT the routine assigns values to two
 *     character arrays. These are then used by subroutine ELF1_PRPCUR to
 *     inform the user what is required. Also assigns value to NITERMS and
 *     NIMGMS to define how many lines of text there are in each message.
@@ -29,7 +29,7 @@
 *     TERMES(4) = CHARACTER*80 (Returned)
 *        Messages if device is a terminal.
 *     IMGMES(4) = CHARACTER*80 (Returned)
-*        Messages if device is an image display. 
+*        Messages if device is an image display.
 *     NTERMS = INTEGER (Returned)
 *        Number of lines of terminal text.
 *     NIMGMS = INTEGER (Returned)
@@ -54,7 +54,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
+
 *  Arguments Given:
       INTEGER POINT                   ! Defines which message is required
 
@@ -68,10 +68,10 @@
                                       ! messages
       INTEGER NTERMS                  ! Number of lines of terminal messages
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                               
+*  Local Variables:
 
 *.
 
@@ -79,57 +79,57 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
       IF ((POINT.EQ.1).OR.(POINT.EQ.0)) THEN
- 
+
          TERMES(1)='Select the centre of the galaxy to be profiled.'
          IMGMES(1)=TERMES(1)
- 
+
          TERMES(2)='Keyboard "2" key:   Quit the program.'
          IMGMES(2)=TERMES(2)
- 
-         TERMES(3)='Keyboard "." key:   Select the galaxy.' 
+
+         TERMES(3)='Keyboard "." key:   Select the galaxy.'
          IMGMES(3)=TERMES(3)
- 
+
          TERMES(4)='Keyboard "1" key:   Show the cursor co-ordinates.'
          IMGMES(4)='Mouse left button:  Show the cursor co-ordinates.'
- 
+
       END IF
- 
+
 *   Select a point defining the maximum permitted radius.
       IF (POINT.EQ.2) THEN
- 
+
          TERMES(1)='Indicate the outer limit of the galaxy.'
          IMGMES(1)=TERMES(1)
- 
+
          TERMES(2)='Keyboard "2" key:   Quit the program.'
          IMGMES(2)=TERMES(2)
- 
+
          TERMES(3)='Keyboard "." key:   Select the outer limit of the'/
      :             /' galaxy.'
          IMGMES(3)=TERMES(3)
- 
+
          TERMES(4)='Keyboard "1" key:   Show the cursor co-ordinates.'
          IMGMES(4)='Mouse left button:  Show the cursor co-ordinates.'
- 
+
       END IF
- 
+
 *   Select a point defining the quadrant in which a graph should be
 *   displayed.
       IF (POINT.EQ.6) THEN
- 
+
          TERMES(1)='Select a point defining the quadrant of the window'/
      :             /' in which to plot.'
          IMGMES(1)=TERMES(1)
- 
+
          TERMES(2)='Keyboard "2" key:   Quit the program.'
          IMGMES(2)=TERMES(2)
- 
+
          TERMES(3)='Keyboard "." key:   Select the quadrant.'
          IMGMES(3)=TERMES(3)
- 
+
          TERMES(4)=' '
-         IMGMES(4)=' ' 
- 
-      END IF 
+         IMGMES(4)=' '
+
+      END IF
 
       NTERMS=4
       NIMGMS=4
@@ -145,7 +145,7 @@
 
 *  Purpose:
 *     Sets up the messages that are to be displayed with the cursor to
-*     tell the user how to operate it and what input is currently being 
+*     tell the user how to operate it and what input is currently being
 *     requested.
 
 *  Language:
@@ -156,7 +156,7 @@
 
 
 *  Description:
-*     Depending on the value of POINT the routine assigns values to two 
+*     Depending on the value of POINT the routine assigns values to two
 *     character arrays. These are then used by subroutine ELP1_PRPCUR to
 *     inform the user what is required. Also assigns value to NITERMS and
 *     NIMGMS to define how many lines of text there are in each message.
@@ -167,7 +167,7 @@
 *     TERMES(4) = CHARACTER*80 (Returned)
 *        Messages if device is a terminal.
 *     IMGMES(4) = CHARACTER*80 (Returned)
-*        Messages if device is an image display. 
+*        Messages if device is an image display.
 *     NTERMS = INTEGER (Returned)
 *        Number of lines of terminal text.
 *     NIMGMS = INTEGER (Returned)
@@ -192,7 +192,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
+
 *  Arguments Given:
       INTEGER POINT                   ! Defines which message is required
 
@@ -206,10 +206,10 @@
                                       ! messages
       INTEGER NTERMS                  ! Number of lines of terminal messages
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                               
+*  Local Variables:
 
 *.
 
@@ -225,7 +225,7 @@
          TERMES(2)='Keyboard "2" key:   Quit the program.'
          IMGMES(2)=TERMES(2)
 
-         TERMES(3)='Keyboard "." key:   Select the galaxy.' 
+         TERMES(3)='Keyboard "." key:   Select the galaxy.'
          IMGMES(3)=TERMES(3)
 
          TERMES(4)='Keyboard "1" key:   Show the cursor co-ordinates.'
@@ -251,7 +251,7 @@
 
       END IF
 
-*   Select a point defining the quadrant in which a graph should be 
+*   Select a point defining the quadrant in which a graph should be
 *   displayed.
       IF (POINT.EQ.6) THEN
 
@@ -283,7 +283,7 @@
 
 *  Purpose:
 *     Sets up the messages that are to be displayed with the cursor to
-*     tell the user how to operate it and what input is currently being 
+*     tell the user how to operate it and what input is currently being
 *     requested.
 
 *  Language:
@@ -293,7 +293,7 @@
 *     CALL GAU1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
 
 *  Description:
-*     Depending on the value of POINT the routine assigns values to two 
+*     Depending on the value of POINT the routine assigns values to two
 *     character arrays. These are then used by subroutine GAU1_PRPCUR to
 *     inform the user what is required. Also assigns value to NITERMS and
 *     NIMGMS to define how many lines of text there are in each message.
@@ -304,7 +304,7 @@
 *     TERMES(4) = CHARACTER*80 (Returned)
 *        Messages if device is a terminal.
 *     IMGMES(4) = CHARACTER*80 (Returned)
-*        Messages if device is an image display. 
+*        Messages if device is an image display.
 *     NTERMS = INTEGER (Returned)
 *        Number of lines of terminal text.
 *     NIMGMS = INTEGER (Returned)
@@ -329,7 +329,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
+
 *  Arguments Given:
       INTEGER POINT                   ! Defines which message is required
 
@@ -343,10 +343,10 @@
                                       ! messages
       INTEGER NTERMS                  ! Number of lines of terminal messages
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                               
+*  Local Variables:
 
 *.
 
@@ -362,7 +362,7 @@
          TERMES(2)='Left mouse button:        Select location.'
          IMGMES(2)=TERMES(2)
 
-         TERMES(3)='Middle mouse button:      Show cursor coordinates.' 
+         TERMES(3)='Middle mouse button:      Show cursor coordinates.'
          IMGMES(3)=TERMES(3)
 
          TERMES(4)='Right button or CTRL-C:  Quit selection.'
@@ -379,7 +379,7 @@
          TERMES(2)='Left mouse button:        Select location.'
          IMGMES(2)=TERMES(2)
 
-         TERMES(3)='Middle mouse button:      Show cursor coordinates.' 
+         TERMES(3)='Middle mouse button:      Show cursor coordinates.'
          IMGMES(3)=TERMES(3)
 
          TERMES(4)='Right button or CTRL-C:  Quit selection.'
@@ -391,7 +391,7 @@
       NIMGMS=4
 
       END
-       
+
 
       SUBROUTINE SEC1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
 *+
@@ -400,7 +400,7 @@
 
 *  Purpose:
 *     Sets up the messages that are to be displayed with the cursor to
-*     tell the user how to operate it and what input is currenlty being 
+*     tell the user how to operate it and what input is currenlty being
 *     requested.
 
 *  Language:
@@ -411,7 +411,7 @@
 
 
 *  Description:
-*     Depending on the value of POINT the routine assigns values to two 
+*     Depending on the value of POINT the routine assigns values to two
 *     character arrays. These are then used by subroutine SEC1_PRPCUR to
 *     inform the user what is required. Also assigns value to NITERMS and
 *     NIMGMS to define how many lines of text there are in each message.
@@ -422,7 +422,7 @@
 *     TERMES(4) = CHARACTER*80 (Returned)
 *        Messages if device is a terminal.
 *     IMGMES(4) = CHARACTER*80 (Returned)
-*        Messages if device is an image display. 
+*        Messages if device is an image display.
 *     NTERMS = INTEGER (Returned)
 *        Number of lines of terminal text.
 *     NIMGMS = INTEGER (Returned)
@@ -447,7 +447,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
+
 *  Arguments Given:
       INTEGER POINT                   ! Defines which message is required
 
@@ -461,10 +461,10 @@
                                       ! messages
       INTEGER NTERMS                  ! Number of lines of terminal messages
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                               
+*  Local Variables:
 
 *.
 
@@ -518,7 +518,7 @@
          IMGMES(4)='Mouse left button:  Show the cursor co-ordinates.'
       END IF
 
-*   Select a point defining the quadrant in which a graph should be 
+*   Select a point defining the quadrant in which a graph should be
 *   displayed.
       IF (POINT.EQ.6) THEN
          TERMES(1)='Select a point defining the quadrant of the window'/

@@ -58,12 +58,12 @@
       INTEGER
      :  I            ! array index
 *-
- 
+
 *   check for error on entry
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       STATUS = SAI__ERROR
       CALL ERR_REP('LOG_ERR','Makes no sense to scale a LOGICAL'//
      :     ' array', STATUS)
- 
+
       END

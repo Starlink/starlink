@@ -10,13 +10,13 @@ C
 C  Description:
 C     DSA_WRUSER outputs a message string to the user, buffering it until
 C     either a line's worth of output has been received or until a string
-C     containing a newline code (`backslash n', as in C's printf) is 
+C     containing a newline code (`backslash n', as in C's printf) is
 C     received.  A call to DSA_WRFLUSH outputs any buffered messages that
 C     have been written using DSA_WRUSER but not yet sent to the user, and is
 C     exactly the same as making a call to DSA_WRUSER with a string consisting
-C     solely of a 'backslash n' sequence. Output is through the Figaro 
-C     parameter system (the routine PAR_WRUSER). Using this routine allows a 
-C     program to avoid the need for backslash characters in its code - 
+C     solely of a 'backslash n' sequence. Output is through the Figaro
+C     parameter system (the routine PAR_WRUSER). Using this routine allows a
+C     program to avoid the need for backslash characters in its code -
 C     something that some UNIX compilers treat as escape characters.
 C
 C  Language:
@@ -31,7 +31,7 @@ C  External variables used: None.
 C
 C  External subroutines / functions used:  DSA_WRUSER
 C
-C  Prior requirements:  
+C  Prior requirements:
 C     DSA_OPEN should have been called to initialise the DSA_ system.
 C
 C  Support: Keith Shortridge, AAO

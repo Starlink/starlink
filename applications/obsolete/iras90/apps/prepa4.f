@@ -49,7 +49,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,9 +120,9 @@
      :       TYPE .EQ. IRI__ISFD .OR.
      :       TYPE .EQ. IRI__ISRJ ) TYPE = IRI__ISSA
 
-*  Check that the type is one of the recognised types. Otherwise, use 
+*  Check that the type is one of the recognised types. Otherwise, use
 *  IRI__NONAM.
-         IF( TYPE .NE. IRI__CPC .AND.      
+         IF( TYPE .NE. IRI__CPC .AND.
      :       TYPE .NE. IRI__SKYFL .AND.
      :       TYPE .NE. IRI__GALPL .AND.
      :       TYPE .NE. IRI__ALLSK .AND.
@@ -140,7 +140,7 @@
      :                      STATUS )
             TYPE = IRI__NONAM
 
-         END IF      
+         END IF
 
       END IF
 

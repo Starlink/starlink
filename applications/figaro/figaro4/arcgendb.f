@@ -125,7 +125,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -133,7 +133,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -342,7 +342,7 @@
 
 *  Close input file.
       CALL FIO_CANCL( 'IN', STATUS )
-      CALL NDF_END( STATUS )      
+      CALL NDF_END( STATUS )
 
 *  Return.
       END

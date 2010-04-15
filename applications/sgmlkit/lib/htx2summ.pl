@@ -13,12 +13,12 @@
 #
 #  Description:
 #     This script gathers information from various places, but
-#     principally the .htx file, in order to write a summary file 
+#     principally the .htx file, in order to write a summary file
 #     containing the structure of a starlink document, conforming to
 #     the Starlink Summary DTD.
 #
 #     It makes use of the htx.index file and the html files themselves.
-#     The htx.index file contains almost all the information which 
+#     The htx.index file contains almost all the information which
 #     is required, but it lacks the sectioning structure (i.e. which
 #     of the html files represent sections, which subsections, etc).
 #     It therefore makes a cursory examination of each html file
@@ -29,18 +29,18 @@
 #     It also, optionally, examines the corresponding latex file.
 #     The only purpose of this is to try to work out where normal
 #     sectioning finishes and appendix sectioning begins (and hence
-#     where to place the APPENDICES start tag in the summary).  
+#     where to place the APPENDICES start tag in the summary).
 #     If no latex file is specified it assumes all sections are
-#     normal ones.  It can only guarantee to get the appendix 
+#     normal ones.  It can only guarantee to get the appendix
 #     placement right if there is an explicit \xlabel command in the
 #     section preceeding and in the one succeeding the \appendix command
 #     in the latex.  If this is not the case, it will warn on standard
 #     error that placement may be incorrect.
 #
-#     Finally, it reads the $STARLINK/docs/docs_lis file to find the 
+#     Finally, it reads the $STARLINK/docs/docs_lis file to find the
 #     principal authors of the document.  Absence of this file, or of
 #     an appropriate entry in this file, is logged to standard error,
-#     but is not fatal.  In this case, an empty AUTHOR element is 
+#     but is not fatal.  In this case, an empty AUTHOR element is
 #     written to the summary file.
 #
 #     A summary file is printed on standard output.
@@ -48,7 +48,7 @@
 #  Command line arguments:
 #     htxdir
 #        This is the name of a directory containing the HTX document.
-#        It must contain an htx.index file, and the html files 
+#        It must contain an htx.index file, and the html files
 #        referred to therein.
 #     latexfile (optional)
 #        This is the name of the latex file corresponding to the
@@ -95,9 +95,9 @@
 #  Try to find out where the appendices start in the latex document.
 #  The method of doing this is quite crude (to do better would require
 #  rather clever parsing of the LaTeX which we wish to avoid).
-#  We record the id of the last \xlabel command which occurs in the 
+#  We record the id of the last \xlabel command which occurs in the
 #  latex before the (first) \appendix command and the first one which
-#  occurs after it.  This could of course be confused by \newcommands 
+#  occurs after it.  This could of course be confused by \newcommands
 #  or putting these inside verbatims etc, and it also relies on having
 #  enough explicit \xlabels.  Too bad.
       my( $appendices ) = 0;
@@ -146,7 +146,7 @@
 #  Read and parse htx.index file.  This relies of course on the htx.index
 #  file having the right format.
       my( $indexfile ) = "htx.index";
-      open( IDX, $indexfile ) 
+      open( IDX, $indexfile )
          or die( "Failed to open $indexfile in $htxdir\n" );
       my( $doctitle );
       my( $topfile, %xlabels, %sectitles, %ids );
@@ -163,16 +163,16 @@
             }
          }
 
-#  Exported label.  In treating xlabels, we take care not 
+#  Exported label.  In treating xlabels, we take care not
 #  to repeat them, since IDs have to be unique in SGML; we keep track
 #  of which have been used so far using the %ids hash.
-#  A multiply-defined \xlabel in the latex source is in any case a 
+#  A multiply-defined \xlabel in the latex source is in any case a
 #  bug, so that disregarding subsequent occurrences is certainly the
 #  right thing to do.  However, some manipulation of the \xlabel
-#  argument (using the namify() function) is done to yield an ID value, 
+#  argument (using the namify() function) is done to yield an ID value,
 #  since there are restrictions on what SGML likes for IDs.  This may
-#  map two different \xlabel arguments to the same ID value (in 
-#  particular case is folded) which would have the unfortunate effect 
+#  map two different \xlabel arguments to the same ID value (in
+#  particular case is folded) which would have the unfortunate effect
 #  of ignoring legitimately different \xlabels.
          elsif ( $ctrl eq '<' && $arg && $file =~ /^node\d+.html/ ) {
             my( $idkey ) = namify( $arg );
@@ -189,7 +189,7 @@
          }
 
 #  (Sub)*section title.  We can only make sense of this if the filename
-#  is of the expected format ('node123.html'), since otherwise it is 
+#  is of the expected format ('node123.html'), since otherwise it is
 #  impossible to place the sections in order.  In this case (which will
 #  not result from normal use of latex2html) we just have to ignore
 #  the file, and warn the user accordingly.
@@ -242,7 +242,7 @@
       $authors ||= "<author></author>\n";
 
 #  Output initial information.
-      print( 
+      print(
          "<!DOCTYPE documentsummary PUBLIC '$dtdname'>\n",
          "<documentsummary urlpath='$urlprefix$topfile' ",
                           "urllinkpolicy='explicit'>\n",
@@ -261,7 +261,7 @@
       my( $app_done ) = 0;
       my( $file );
       my( $lastel ) = '';
-      my( @files ) = 
+      my( @files ) =
          sort( { ( $a =~ /node(\d+)/ )[ 0 ] <=> ( $b =~ /node(\d+)/ )[ 0 ] }
                keys( %sectitles ) );
       foreach $file ( @files ) {
@@ -283,7 +283,7 @@
          }
          else {
 
-#  Open file and read it for long enough to find out the level of the 
+#  Open file and read it for long enough to find out the level of the
 #  first heading (H[1-6]) element.
 #  The pattern used here is not guaranteed to match all or only heading
 #  start tags but it matches actual star2html behaviour and is probably
@@ -299,9 +299,9 @@
             close( HTML );
 
 #  Map html heading level to summary DTD element gi.  Levels greater
-#  than 3 are ignored; an H4 could be translated into a subsubsubsect 
+#  than 3 are ignored; an H4 could be translated into a subsubsubsect
 #  but since they correspond to \paragraph commands in the latex, which
-#  aren't really numbered anyway, this is probably going to cause 
+#  aren't really numbered anyway, this is probably going to cause
 #  more trouble than it's worth.
             $element = ( $level == 1 ) && 'sect'
                     || ( $level == 2 ) && 'subsect'
@@ -314,7 +314,7 @@
 
 #  Find out if we should output an APPENDICES element before the next
 #  SECT element (including this one).
-            $app_now ||= 
+            $app_now ||=
                grep( ( $_ eq $firstid_postapp ), @xlabels );
 
 #  If it looks like it's time to output an APPENDICES element, then do so.
@@ -339,13 +339,13 @@
 
          if ( $element =~ /sect/ ) {
 
-#  If we are about to output a SUBSUBSECT and the last element 
+#  If we are about to output a SUBSUBSECT and the last element
 #  was a SECT, then we need to interpolate a dummy SUBSECT element.
             if ( $lastel eq 'sect' && $element eq 'subsubsect' ) {
                print( "<subsect><title>\n" );
             }
 
-#  Output tag for (sub)*section.  
+#  Output tag for (sub)*section.
             print( "<$element" );
             if ( @xlabels ) {
                my( $xlabel ) = shift( @xlabels );
@@ -397,5 +397,5 @@
       $id = uc( $id );                     #  Fold to upper case
       return( $id );
    }
-      
+
 

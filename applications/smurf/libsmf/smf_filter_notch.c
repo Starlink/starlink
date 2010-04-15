@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_filter_notch( smfFilter *filt, const double f_low[], 
+*     smf_filter_notch( smfFilter *filt, const double f_low[],
 *                       const double f_high[], size_t n, int *status );
 
 *  Arguments:
@@ -99,7 +99,7 @@
 
 #define FUNC_NAME "smf_filter_notch"
 
-void smf_filter_notch( smfFilter *filt, const double f_low[], 
+void smf_filter_notch( smfFilter *filt, const double f_low[],
                        const double f_high[], size_t n, int *status ) {
 
   size_t i;             /* Loop counter */
@@ -139,7 +139,7 @@ void smf_filter_notch( smfFilter *filt, const double f_low[],
       iedge_low = smf_get_findex( f_high[i], filt->df, filt->dim, status );
       iedge_high = smf_get_findex( f_low[i], filt->df, filt->dim, status );
     }
-    
+
     if( *status == SAI__OK ) {
       /* Since we're zero'ing a continuous piece of memory, just use memset */
 

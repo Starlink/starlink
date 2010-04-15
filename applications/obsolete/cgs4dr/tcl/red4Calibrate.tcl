@@ -1,6 +1,6 @@
 proc red4Calibrate {taskname lamp} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
    global env
    global Red4Widgets
@@ -141,14 +141,14 @@ proc red4Calibrate {taskname lamp} {
 # Divide by 000 and file as a calibration
    set message "Changing from angstroms to microns"
    cgs4drInform $taskname $message
-   set param "image=$Red4Widgets(CA) factor=10000.0 output=$Red4Widgets(CA)" 
+   set param "image=$Red4Widgets(CA) factor=10000.0 output=$Red4Widgets(CA)"
    figaro1 obey xcdiv "$param" -inform "cgs4drInform $taskname %V" -endmsg {set xcd_done 1}
    tkwait variable xcd_done
 
 # Now file it as a calibration
    set message "Filing $Red4Widgets(CA) as a calibration"
    cgs4drInform $taskname $message
-   set param "observation=$Red4Widgets(OB) change_label=TRUE newlabel='Wavelength' newunits='Microns'" 
+   set param "observation=$Red4Widgets(OB) change_label=TRUE newlabel='Wavelength' newunits='Microns'"
    $taskname obey file_calib "$param" -inform "cgs4drInform $taskname %V" -endmsg {set cal_done 1}
    tkwait variable cal_done
 

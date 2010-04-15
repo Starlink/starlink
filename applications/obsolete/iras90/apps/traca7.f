@@ -1,6 +1,6 @@
-      SUBROUTINE TRACA7( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT, 
+      SUBROUTINE TRACA7( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT,
      :                   UNITS, AREF, BREF, COORDS, NDISP, DET, DTINDX,
-     :                   SCALE, XLMT, YLMT, TITLE, SCNDIR, COLOUR, 
+     :                   SCALE, XLMT, YLMT, TITLE, SCNDIR, COLOUR,
      :                   AVERAG, OFMTHD, FLAGS, OFFSET, STATUS )
 *+
 *  Name:
@@ -9,27 +9,27 @@
 *  Purpose:
 *     Draw the CRDD data traces display.
 
-*  Language:             
+*  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACA7( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT, 
+*     CALL TRACA7( BSMP, ESMP, BDET, EDET, INSCN, XSCN, DETDAT,
 *                  UNITS, AREF, BREF, COORDS, NDISP, DET, DTINDX,
-*                  SCALE, XLMT, YMAX, TITLE, SCNDIR, COLOUR,  
+*                  SCALE, XLMT, YMAX, TITLE, SCNDIR, COLOUR,
 *                  AVERAG, OFMTHD, FLAGS, OFFSET, STATUS )
 
 *  Description:
 *     This routine draw the CRDD data traces in the specified units
-*     in the current SGS zone. Each trace has a specified offset to 
+*     in the current SGS zone. Each trace has a specified offset to
 *     seperate it from other traces.
-*     
+*
 *     The input data are the unscaled original data read in from the
 *     CRDD file, that is, they are not in the specified units given by
 *     UNITS. The argument SCALE gives the values needed to scale the
 *     data to the specified units.  The OFFSET gives the already scaled
 *     offset for each trace. Therefore the displayed values are
 *     SCALE*DETDAT+OFFSET.
-* 
+*
 *     The traces are in-line labelled with its detector number. The
 *     horizontal axis gives the in-scan distance from the reference
 *     position in arcmins. The right hand side vertical axis gives the
@@ -41,7 +41,7 @@
 *     well. The value of the offsets of the data traces and the
 *     cross-scan distances from the reference position of each trace
 *     are displayed in a table at the top-left corner of the zone.
-*     
+*
 *     Before calling this routine, a graphic device must be opened.
 *
 *     After drawing, the graphic system is switched from NCAR to
@@ -74,7 +74,7 @@
 *        The sky latitude of the reference position.
 *     COORDS = CHARACTER * ( * ) (Given)
 *        The sky coordinate system used to specify the reference
-*        positon. 
+*        positon.
 *     NDISP = INTEGER (Given)
 *        The number of detectors to be displayed.
 *     DET( NDISP ) = INTEGER (Given)
@@ -83,16 +83,16 @@
 *        Detector indices whose data is to be displayed.
 *     SCALE( NDISP ) = REAL (Given)
 *        The scaling factor for converting the data of each trace from
-*        original units to displayed units. 
+*        original units to displayed units.
 *     XLMT( 2 ) = REAL (Given)
-*        The lower and upper limits of the display in X axis (in-scan) 
+*        The lower and upper limits of the display in X axis (in-scan)
 *        direction in arcmins north of the reference position.
 *     YLMT( 2 ) = REAL (Given)
 *        The lower and upper limits of the y axis in the display.
 *     TITLE = CHARACTER * ( * ) (Given)
 *        Title of the plot.
 *     SCNDIR = LOGICAL (Given)
-*        If it is true, the scan is from north to south, otherwise, 
+*        If it is true, the scan is from north to south, otherwise,
 *        from south to north.
 *     COLOUR = LOGICAL (Given)
 *        It is true if current graphic device supports colour graphics,
@@ -100,7 +100,7 @@
 *     AVERAG( BDET : EDET ) = REAL (Given)
 *        The average unscale data values of each detector data.
 *     OFMTHD = INTEGER (Given)
-*        It specifies the one of three ways to offset the traces 
+*        It specifies the one of three ways to offset the traces
 *        when display. It can take following values:
 *
 *           0 :'FREE' offset.
@@ -108,13 +108,13 @@
 *           1 :'CONSTANT' offset.
 *
 *           2 :'AVERAGE' offset.
-* 
+*
 *     FLAGS( 8 ) = LOGICAL (Given)
 *        Flags indicating if each part of the display is required.
 *     OFFSET( NDISP ) = REAL (Given and Returned)
 *        If the traces are to be offset in the way of 'FREE', it is a
 *        given argument containing the offsets for each data trace. For
-*        other offset methods, it is a returned argument containing the 
+*        other offset methods, it is a returned argument containing the
 *        offset of each data trace in the display.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -137,7 +137,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,7 +147,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PRM_PAR'          ! PRM_ constants
-                                
+
 *  Arguments Given:
       INTEGER BSMP
       INTEGER ESMP
@@ -233,7 +233,7 @@
       REAL Y1                    ! Lower Y limit of grid window
       REAL Y2                    ! Upper Y limit of grid window
       REAL YTEMP                 ! A temporary y position.
-                                
+
 *.
 
 *  Check inherited global status.
@@ -245,7 +245,7 @@
       Y1 = 0.24
       Y2 = 0.94
 
-*  Set the number of major tick marks on axis.      
+*  Set the number of major tick marks on axis.
       MAJTIC( 1 ) = 4.0
       MAJTIC( 2 ) = 4.0
 
@@ -263,7 +263,7 @@
          ELSE
             INLBPS( I ) = -1.0
          END IF
-     
+
 *  Construct the character strings.
          CALL CHR_ITOC( DET( I ), STR, NSTR )
          INLAB( I ) = '#'//STR( : NSTR )
@@ -273,7 +273,7 @@
 *  If the way to offset the traces is not 'FREE', calculate the offset
 *  for each trace.
       IF( OFMTHD .NE. 0 ) THEN
-         CALL TRACB1( OFMTHD, BDET, EDET, NDISP, DTINDX, YLMT, 
+         CALL TRACB1( OFMTHD, BDET, EDET, NDISP, DTINDX, YLMT,
      :                AVERAG, SCALE, OFFSET, STATUS )
       END IF
 
@@ -282,13 +282,13 @@
       EL = NDISP*(ESMP - BSMP + 1 )
       CALL PSX_CALLOC( EL, '_REAL', XPNTR, STATUS )
       CALL PSX_CALLOC( EL, '_REAL', YPNTR, STATUS )
-      
+
 *  Put the trace to be drawn into temproray work space.
       CALL TRACB2( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
      :             NDISP, DTINDX, SCALE, OFFSET, XLMT,
      :             %VAL( YPNTR ), %VAL( XPNTR ), STATUS )
 
-*  If the scan is from north to south, set the mapping order for 
+*  If the scan is from north to south, set the mapping order for
 *  in-scan coordinates to horizontal axis as increasing from right
 *  to left so that the south is always at the left.
       IF ( SCNDIR ) THEN
@@ -320,18 +320,18 @@
          END DO
       END IF
 
-*  Set the colour of title, axis labels, numeric labels and tick marks 
+*  Set the colour of title, axis labels, numeric labels and tick marks
 *  as pen 1.
       TITPEN = 1
       ALBPEN = 1
       NLBPEN = 1
       TCKPEN = 1
-      
+
 *  Construct x label and y label of the display.
       IF( FLAGS( 2 ) ) THEN
          XLAB = 'Arcmins from reference position'
          XLABLN = CHR_LEN( XLAB )
-      ELSE         
+      ELSE
          XLAB = ' '
          XLABLN = 1
       END IF
@@ -339,7 +339,7 @@
       IF( FLAGS( 3 ) ) THEN
          YLAB = UNITS
          YLABLN = CHR_LEN( YLAB )
-      ELSE         
+      ELSE
          YLAB = ' '
          YLABLN = 1
       END IF
@@ -348,12 +348,12 @@
       TITLN = CHR_LEN( TITLE )
 
 *  Draw the data traces.
-      CALL IRM_MLINE( ESMP - BSMP + 1, NDISP, .FALSE., %VAL( XPNTR ), 
-     :                %VAL( YPNTR ), XORDER, 0, PEN, .TRUE., X1, X2, 
-     :                Y1, Y2, AXSPEN, TITLE( :TITLN ), TITPEN, 
+      CALL IRM_MLINE( ESMP - BSMP + 1, NDISP, .FALSE., %VAL( XPNTR ),
+     :                %VAL( YPNTR ), XORDER, 0, PEN, .TRUE., X1, X2,
+     :                Y1, Y2, AXSPEN, TITLE( :TITLN ), TITPEN,
      :                XLAB( :XLABLN ), YLAB( : YLABLN ), 1.2*TEXTHT,
      :                ALBPEN, INLAB, INLBPS, INLPEN, -1, -1, XLMT, YLMT,
-     :               .FALSE., .FALSE., .TRUE., .FALSE., MAJTIC, MINTIC, 
+     :               .FALSE., .FALSE., .TRUE., .FALSE., MAJTIC, MINTIC,
      :                0.015, .TRUE., TCKPEN, NLBPEN, .TRUE., STATUS )
 
 *  Get the grid y coordinate for each trace offset.
@@ -411,10 +411,10 @@
 
 *  Draw the left and right mark for the Ith trace, if the mark is in the
 *  plotting box
-         IF ( OFFGY( I ) .GE. 0.0 .AND. OFFGY( I ) .LE. 1.0 ) THEN 
+         IF ( OFFGY( I ) .GE. 0.0 .AND. OFFGY( I ) .LE. 1.0 ) THEN
 
 *  Right hand edge...
-            IF( FLAGS( 5 ) ) CALL SGS_LINE( 1.0 - OFFLEN, OFFGY( I ), 
+            IF( FLAGS( 5 ) ) CALL SGS_LINE( 1.0 - OFFLEN, OFFGY( I ),
      :                                      1.0, OFFGY( I ) )
 
 *  Left hand edge (with trace number)...
@@ -436,11 +436,11 @@
 
          DO I = 1, NDISP
             OFFTAB( I + 1 )( 1 : 1 ) = '#'
-            CALL CHR_ITOC( DET( NDISP - I + 1 ), 
+            CALL CHR_ITOC( DET( NDISP - I + 1 ),
      :                     OFFTAB( I + 1 )( 2 : ), NCHAR )
 
             IF( SCALE( I ) .NE. VAL__BADR ) THEN
-               CALL CHR_RTOC( OFFSET( NDISP - I + 1 ), 
+               CALL CHR_RTOC( OFFSET( NDISP - I + 1 ),
      :                        OFFTAB( NDISP + 2 + I ), NCHAR )
             ELSE
                OFFTAB( NDISP + 2 + I ) = ' (dead) '
@@ -452,7 +452,7 @@
          END DO
 
 *  Display the offset table.
-         CALL IRM_TABLE( ' ', NDISP + 1, 3, OFFTAB( 1 ), -0.5, 
+         CALL IRM_TABLE( ' ', NDISP + 1, 3, OFFTAB( 1 ), -0.5,
      :                   -0.05, 0.4, 1.0, .TRUE., 1, YTEMP,  STATUS )
 
       ELSE
@@ -475,7 +475,7 @@
          CALL SGS_TX( -0.5, YTEMP, 'Reference Position:' )
 
 *  Write the sky coordinates of the reference position.
-         CALL TRACC1( AREF, BREF, -0.5 + 2.0*TEXTHT, 
+         CALL TRACC1( AREF, BREF, -0.5 + 2.0*TEXTHT,
      :                YTEMP - 2.5*TEXTHT, COORDS, STATUS )
 
       END IF

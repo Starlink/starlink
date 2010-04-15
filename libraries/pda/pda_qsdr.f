@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -95,7 +95,7 @@
       INTEGER R                 ! Right pointer element in sub-file
       INTEGER RR( MXSTK )       ! Stack for right sub-file limits
       INTEGER STK               ! Recursion stack pointer
-      
+
 *.
 
 *  Initialise.
@@ -118,7 +118,7 @@
             L = LL( STK )
             R = RR( STK )
 
-*  Find a suitable partition value (the median of three possible 
+*  Find a suitable partition value (the median of three possible
 *  elements) by performing an elementary exchange sort.
             I1 = L
             I2 = ( L + R ) / 2
@@ -138,7 +138,7 @@
                I2 = I3
                I3 = ITMP
             END IF
-            
+
 *  Store the partition value.
             XPART = X( I2 )
 
@@ -155,13 +155,13 @@
             IF ( X( I ) .GT. XPART ) THEN
                I = I + 1
                GO TO 3
-            END IF           
+            END IF
 
  4          CONTINUE             ! Start of 'DO WHILE' loop
             IF ( X( J ) .LT. XPART ) THEN
                J = J - 1
                GO TO 4
-            END IF           
+            END IF
 
 *  Exchange pairs of values when necessary by interchanging their
 *  values.

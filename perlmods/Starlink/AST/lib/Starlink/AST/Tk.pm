@@ -58,7 +58,7 @@ $VERSION = '2.00';
 # Constants describing locations in the external array
 use constant EXT_ATTR => 9;
 
-# reference height for characters as a fraction of the 
+# reference height for characters as a fraction of the
 # full height/width of the display
 use constant DEFAULT_CHAR_HEIGHT => 1 / 40;
 
@@ -152,7 +152,7 @@ my %Text_Anchors = (
 
 =item B<_GFlush>
 
-This function ensures that the display device is up-to-date, by flushing 
+This function ensures that the display device is up-to-date, by flushing
 any pending graphics to the output device.
 
    my $status = _GFlush( $w );
@@ -372,17 +372,17 @@ sub _GMark {
 
 =item B<_GText>
 
-This function displays a character string $text at a given position using 
+This function displays a character string $text at a given position using
 a specified justification and up-vector.
 
    my $status = _GText( $text, $x, $y, $just, $upx, $upy );
 
-where $x is the reference x coordinate, $y is the reference y coordinate, 
+where $x is the reference x coordinate, $y is the reference y coordinate,
 and where $just is a character string which specifies the location within
 the text string which is to be placed at the reference position given by x
 and y. The first character may be 'T' for "top", 'C' for "centre", or 'B'
 for "bottom", and specifies the vertical location of the reference position.
-Note, "bottom" corresponds to the base-line of normal text. Some characters 
+Note, "bottom" corresponds to the base-line of normal text. Some characters
 (eg "y", "g", "p", etc) descend below the base-line. The second  character
 may be 'L' for "left", 'C' for "centre", or 'R'  for "right", and specifies
 the horizontal location of the  reference position. If the string has less
@@ -478,7 +478,7 @@ sub _GText {
 This function returns two values (one for each axis) which scale
 increments on the corresponding axis into a "normal" coordinate system in
 which: The axes have equal scale in terms of (for instance) millimetres
-per unit distance, X values increase from left to right and the Y values 
+per unit distance, X values increase from left to right and the Y values
 increase from bottom to top.
 
    my ( $status, $alpha, $beta ) = _GScales( $w )
@@ -519,13 +519,13 @@ sub _GScales {
 
 =item B<_GTxExt>
 
-This function returns the corners of a box which would enclose the 
-supplied character string if it were displayed using astGText. The 
+This function returns the corners of a box which would enclose the
+supplied character string if it were displayed using astGText. The
 returned box INCLUDES any leading or trailing spaces.
 
    my ( $status, $xb, $yb ) = _GTxExt( $w, $text, $x, $y, $just, $upx, $upy);
 
-where $x is the reference x coordinate, $y is the reference y coordinate, 
+where $x is the reference x coordinate, $y is the reference y coordinate,
 and where $justification is a character string which specifies the
 location within the text string which is to be placed at the reference
 position given by x and y. The first character may be 'T' for "top", 'C'
@@ -533,9 +533,9 @@ for "centre", or 'B' for "bottom", and specifies the vertical location of
 the reference position. Note, "bottom" corresponds to the base-line of
 normal text. Some characters  (eg "y", "g", "p", etc) descend below the
 base-line. The second  character may be 'L' for "left", 'C' for "centre",
-or 'R'  for "right", and specifies the horizontal location of the 
+or 'R'  for "right", and specifies the horizontal location of the
 reference position. If the string has less than 2 characters then 'C' is
-used for the missing characters. 
+used for the missing characters.
 
 And $upx is the x component of the up-vector for the text, in graphics
 world coordinates. If necessary the supplied value should be negated to
@@ -644,7 +644,7 @@ value is converted to an integer value if necessary before use.
 
    my ( $status, $old_value ) = _GAttr( $w, $attr, $value, $prim );
 
-Where $attr is an integer value identifying the required attribute. 
+Where $attr is an integer value identifying the required attribute.
 The following symbolic values are defined in the AST grf.h:
 
            GRF__STYLE  - Line style.
@@ -653,12 +653,12 @@ The following symbolic values are defined in the AST grf.h:
            GRF__FONT   - Character font.
            GRF__COLOUR - Colour index.
 
-$value is a new value to store for the attribute. If this is 
+$value is a new value to store for the attribute. If this is
 AST__BAD no value is stored, and $old_value is a scalar containing
-the old attribute value, if this is NULL no value is returned. 
+the old attribute value, if this is NULL no value is returned.
 
-Finally $prim is the sort of graphics primitive to be drawn with 
-the new attribute. Identified by the following values defined in 
+Finally $prim is the sort of graphics primitive to be drawn with
+the new attribute. Identified by the following values defined in
 AST's grf.h:
 
            GRF__LINE
@@ -770,18 +770,18 @@ sub _CooBox {
 
    my $width = $canvas->cget( '-width' );
    my $height = $canvas->cget( '-height' );
-   
+
    my $xleft  = $xglo*$width;
    my $xright = $xglo*$width + $xphi;
    my $ybottom = $yghi*$height;
    my $ytop    = $yghi*$height - $yphi;
-   
+
    #print "# width = $width, height = $height\n";
    #print "# Gbox $xglo,$xghi,$yglo,$yghi\n";
    #print "# Pbox $xplo,$xphi,$yplo,$yphi\n";
    #print "# xleft = $xleft, xright = $xright\n";
    #print "# ytop = $ytop, ybottom = $ybottom\n";
-   
+
    return ($xleft,$xright,$ybottom,$ytop);
 }
 
@@ -797,17 +797,17 @@ sub _CooTranslate {
 
    my $width = $canvas->cget( '-width' );
    my $height = $canvas->cget( '-height' );
-   
+
    my $x = $xf*$width;
    my $y = (1 - $yf)*$height;
 
    #print "# _CooTranslate( $xf, $yf )\n";
    #print "# width = $width, height = $height\n";
    #print "# Gbox $xglo,$xghi,$yglo,$yghi\n";
-   #print "# Pbox $xplo,$xphi,$yplo,$yphi\n";      
+   #print "# Pbox $xplo,$xphi,$yplo,$yphi\n";
    #print "# X $xf -> $x\n# Y $yf -> $y\n\n";
    return ( $x, $y );
-}   
+}
 
 
 # Given the attributes hash and the primitive type,
@@ -1156,7 +1156,7 @@ sub tk {
 
   # register callbacks
   $self->GExternal( \@external );
-  $self->GFlush(\&Starlink::AST::Tk::_GFlush);  
+  $self->GFlush(\&Starlink::AST::Tk::_GFlush);
   $self->GLine(\&Starlink::AST::Tk::_GLine);
   $self->GMark(\&Starlink::AST::Tk::_GMark);
   $self->GText(\&Starlink::AST::Tk::_GText);
@@ -1167,7 +1167,7 @@ sub tk {
   $self->GCap(\&Starlink::AST::Tk::_GCap);
 
 
-  return 1; 
+  return 1;
 }
 
 1;

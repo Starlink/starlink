@@ -1,30 +1,30 @@
       SUBROUTINE ICADD(NPARAMS,PARAMS,STOKES_I,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
-C     I C A D D 
+C     I C A D D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<),PARAMS (<), STOKES_I (><), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C  Adds a constant value to the Stokes I array of the current spectrum.
 C
 C
 C-
 
-      IMPLICIT NONE 
+      IMPLICIT NONE
       INTEGER NPTS,I,OUT_LU,NPARAMS
       REAL STOKES_I(*),PARAMS(*)
       LOGICAL OK

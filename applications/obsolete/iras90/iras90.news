@@ -20,14 +20,14 @@ SUN 165, the IRAS90 Programmers Guide has been updated to describe the
 changes in the way source code and documentation can be accessed.
 
 In the future we intend to provide a service over the network to a VAX in
-the Space Data Centre at RAL. This will enable the user to extract CRDD data 
+the Space Data Centre at RAL. This will enable the user to extract CRDD data
 and ISSA plates online from optical disk, and transfer data to the local
 node for processing. This facility will also support the usage of the
 IRAS90 VAX only software. There will be further details of this via the news
 when it has been set up.
 
 In the meanwhile, users requiring data which they cannot obtain locally
-should mail    
+should mail
                   irasmail@star.rl.ac.uk
 
 The Internet Number for this machine is 130.246.32.76

@@ -1,23 +1,23 @@
       INTEGER FUNCTION TRULEN(STRING)
 *+
-*         FUNCTION TRULEN 
+*         FUNCTION TRULEN
 *
-*   It gives the actual length of a  string,  ignoring  any  trailing 
-*   spaces  and  null  characters. It should be noted that the result 
-*   returned in TRULEN as the value of this function  is  an  INTEGER 
-*   and must be typed as such in the calling segment. 
+*   It gives the actual length of a  string,  ignoring  any  trailing
+*   spaces  and  null  characters. It should be noted that the result
+*   returned in TRULEN as the value of this function  is  an  INTEGER
+*   and must be typed as such in the calling segment.
 *
 *   Gets
 *   ----
-*      STRING    CHAR     - This is the  text  string,  of  arbitrary 
-*                           length, whose length is to be found 
+*      STRING    CHAR     - This is the  text  string,  of  arbitrary
+*                           length, whose length is to be found
 *
 *   Returns
 *   -------
 *      TRULEN    Integer  - The length of the string.
 *
 *   Written by K F Hartley at RGO on 8/12/81
-*   K F Hartley RGO 11-JUN-82 
+*   K F Hartley RGO 11-JUN-82
 *-
       CHARACTER*(*) STRING
       CHARACTER*1 NULL

@@ -17,7 +17,7 @@
 *     ANSI C
 
 *  Description:
-*     If the geocentric coordinates are given, use those to calculate 
+*     If the geocentric coordinates are given, use those to calculate
 *     telpos. Otherwise try to determine telpos from the telescope name.
 
 *  Arguments:
@@ -93,19 +93,19 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
 
   double height;        /* Height above sea-level (metres) */
   double lat;           /* Latitude (rad) */
-  double lon;           /* West Longitude (rad) */ 
+  double lon;           /* West Longitude (rad) */
   char retname[41];     /* Returned name of the telescope */
   char name[11];      /* name for supplied buffer */
 
   if (*status != SAI__OK) return;
 
-  /* Calculate telpos from obsgeo if given. We could have used a 
-     FitsChan to do this conversion (this keeping all the geocentric-geodetic 
-     conversion code in one place), if it were not for the fact that 
-     the observatory altitude is required in addition to the longitude 
+  /* Calculate telpos from obsgeo if given. We could have used a
+     FitsChan to do this conversion (this keeping all the geocentric-geodetic
+     conversion code in one place), if it were not for the fact that
+     the observatory altitude is required in addition to the longitude
      and latitude (FitsChan does not generate an altitude value). */
-  if( obsgeo != NULL && obsgeo[ 0 ] != AST__BAD && 
-                        obsgeo[ 1 ] != AST__BAD && 
+  if( obsgeo != NULL && obsgeo[ 0 ] != AST__BAD &&
+                        obsgeo[ 1 ] != AST__BAD &&
                         obsgeo[ 2 ] != AST__BAD ) {
      smf_geod( obsgeo, &lat, &height, &lon );
 
@@ -122,7 +122,7 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Telescope name was not recognized.", status );
     }
-    
+
   /* Otherwise, report an error. */
   } else {
     *status = SAI__ERROR;

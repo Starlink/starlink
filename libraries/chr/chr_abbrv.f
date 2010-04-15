@@ -4,7 +4,7 @@
 *     CHR_ABBRV
 
 *  Purpose:
-*     Return whether two strings are equal apart from case, 
+*     Return whether two strings are equal apart from case,
 *     permitting abbreviations.
 
 *  Language:
@@ -15,8 +15,8 @@
 
 *  Description:
 *     Returns a logical result indicating whether two strings
-*     are the same, apart from case. In assessing this, the first 
-*     string is allowed to be an abbreviation of the second string, 
+*     are the same, apart from case. In assessing this, the first
+*     string is allowed to be an abbreviation of the second string,
 *     as long as it contains a specified minimum number of characters.
 
 *  Arguments:
@@ -26,13 +26,13 @@
 *        The second string.
 *     NCHAR = INTEGER (Given)
 *        The minimum number of characters to which the first string may
-*        be abbreviated (a smaller number will be accepted if there are 
+*        be abbreviated (a smaller number will be accepted if there are
 *        actually fewer than NCHAR characters in STR2).
 
 *  Returned Value:
 *     CHR_ABBRV = LOGICAL
 *        Whether the two strings match after allowing for case and
-*        abbreviation of the first string to no less than NCHAR 
+*        abbreviation of the first string to no less than NCHAR
 *        characters.
 
 *  Algorithm:
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

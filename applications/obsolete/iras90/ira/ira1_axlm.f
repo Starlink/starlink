@@ -1,5 +1,5 @@
       SUBROUTINE IRA1_AXLM( IDA, SCS, ALAX, BLAX, ACEN, GAPLON, IMHI,
-     :                      IMLO, LABELS, TICKLE, LBND, UBND, ACC, 
+     :                      IMLO, LABELS, TICKLE, LBND, UBND, ACC,
      :                      LAXMIN, STATUS )
 *+
 *  Name:
@@ -17,11 +17,11 @@
 
 *  Description:
 *     If LABELS is true, this routine produces longitude labels placed
-*     at equal intervals along a specified parallel. Also, if the 
-*     drawing of lines has been supressed using the LINES graphics 
-*     option (see routine IRA_DROPT), it produces short tick marks at 
-*     regular intervals along the parallel. Each of these tick marks 
-*     is actually a short section of a meridian intersecting the 
+*     at equal intervals along a specified parallel. Also, if the
+*     drawing of lines has been supressed using the LINES graphics
+*     option (see routine IRA_DROPT), it produces short tick marks at
+*     regular intervals along the parallel. Each of these tick marks
+*     is actually a short section of a meridian intersecting the
 *     parallel.
 
 *  Arguments:
@@ -91,7 +91,7 @@
 *        ACM_DRVPO( 5 ) = REAL (Read)
 *           Values defining the area occupied by the text, in the
 *           order; (X,Y) at start of box, (X,Y) at end of box, height
-*           of box (perpendicular to the line joing start and end of 
+*           of box (perpendicular to the line joing start and end of
 *           box).
 
 *  Arguments Given:
@@ -126,7 +126,7 @@
       INTEGER          I         ! Loop count
       INTEGER          IMER      ! Index of labelled meridian.
       REAL             LENGTH
-      REAL             MINX      ! Min. X coord. covered by value just 
+      REAL             MINX      ! Min. X coord. covered by value just
                                  ! drawn.
       CHARACTER        NAME*(IRA__SZSCS)! Full SCS name.
       INTEGER          NBREAK
@@ -175,12 +175,12 @@
          CALL IRA_NORM( ALAB, BLAX, STATUS )
 
 *  Draw a short section of the meridian, centred on the labelled
-*  parallel. 
+*  parallel.
          CALL IRA_DRMER( IDA, ALAB, BLAX - 0.5*TICKLE, TICKLE, SCS,
      :                   LBND, UBND, STATUS )
 
 *  Get information about the breaks in the curve just drawn.
-         CALL IRA_DRBRK( IRA__MXBRK, OUT, BREAK, VBREAK, NBREAK, 
+         CALL IRA_DRBRK( IRA__MXBRK, OUT, BREAK, VBREAK, NBREAK,
      :                   LENGTH, STATUS )
 
 *  Find the mid point of the meridian section.
@@ -206,7 +206,7 @@
      :                             ACC, CONTXT, STATUS )
 
 *  Update the lowest X coordinate covered by any coordinate value.
-                  MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) - 
+                  MINX = MIN( ACM_DRVPO( 1 ), ACM_DRVPO( 3 ) ) -
      :                   0.5*ACM_DRVPO( 5 )
                   LAXMIN = MIN( LAXMIN, MINX )
 

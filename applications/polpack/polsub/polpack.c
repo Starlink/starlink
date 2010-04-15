@@ -1,4 +1,4 @@
-/* 
+/*
 *  Name:
 *     polpack.c
 *
@@ -7,7 +7,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 
@@ -39,7 +39,7 @@
 #define DTOR 0.017453292519943295769
 
 #define PACK_DIR "POLPACK_DIR"
-#define CVAL_LENGTH 80   
+#define CVAL_LENGTH 80
 
 extern F77_SUBROUTINE(cat_rapnd)( INTEGER(ciout), INTEGER(status) );
 extern F77_SUBROUTINE(cat_put0c)( INTEGER(gid), CHARACTER(val), LOGICAL(no), INTEGER(status) TRAIL(val) );
@@ -64,19 +64,19 @@ static void GetIVar( const char *, int *, int * );
 static void GetRVar( const char *, float *, int * );
 static char *cstring( const char *, int, int * );
 
-F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3), 
+F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         INTEGER(DPI), LOGICAL(HAREA),
                         LOGICAL(SAREA), INTEGER(PSF),
                         CHARACTER(SI), INTEGER(FIT),
                         INTEGER(OEFIT), CHARACTER(LOGFIL),
-                        CHARACTER(BADCOL), CHARACTER(CURCOL), 
-                        CHARACTER(REFCOL), CHARACTER(SELCOL), 
-                        CHARACTER(VIEW), REAL(PLO), REAL(PHI), 
+                        CHARACTER(BADCOL), CHARACTER(CURCOL),
+                        CHARACTER(REFCOL), CHARACTER(SELCOL),
+                        CHARACTER(VIEW), REAL(PLO), REAL(PHI),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
                         INTEGER(SKYPAR), INTEGER(IGRP4), LOGICAL(DBEAM),
-                        CHARACTER(MODE), LOGICAL(POL), CHARACTER(REFIN), 
-                        INTEGER(STATUS) 
+                        CHARACTER(MODE), LOGICAL(POL), CHARACTER(REFIN),
+                        INTEGER(STATUS)
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) TRAIL(REFIN) ){
@@ -89,10 +89,10 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 *  Description:
 *     This C function executes the POLKA Tcl script in a child process.
-*     Values for various user preferences are communicated to the Tcl 
+*     Values for various user preferences are communicated to the Tcl
 *     script by storing settings for various Tcl variables in a temporary
-*     text file whose name is passed to the script. When the Tcl script 
-*     terminates, the (potentially modified) options values are read back 
+*     text file whose name is passed to the script. When the Tcl script
+*     terminates, the (potentially modified) options values are read back
 *     from this file and passed back to the caller.
 
 *  Parameters:
@@ -100,10 +100,10 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        The GRP identifier for the group holding the input image names
 *        to pass to the TCL script.
 *     IGRP2 = INTEGER (Given)
-*        The GRP identifier for the group holding the O-ray output image 
+*        The GRP identifier for the group holding the O-ray output image
 *        names to pass to the TCL script.
 *     IGRP3 = INTEGER (Given)
-*        The GRP identifier for the group holding the E-ray output image 
+*        The GRP identifier for the group holding the E-ray output image
 *        names to pass to the TCL script. Ignored in single-beam mode.
 *     DPI = INTEGER (Given)
 *        The screen dots per inch to use. If a zero or negative value
@@ -145,8 +145,8 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     XHAIR = LOGICAL (Given and Returned)
 *        Is a cross-hair required over the image display area?
 *     XHRCOL = CHARACTER (Given and Returned)
-*        The colour with which to draw the cross-hair (if required). The 
-*        supplied variable should be long enough to receive the longest 
+*        The colour with which to draw the cross-hair (if required). The
+*        supplied variable should be long enough to receive the longest
 *        colour name.
 *     STHLP = LOGICAL (Given)
 *        Should a hyper-text browser be created automatically at start-up
@@ -168,7 +168,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     MODE = CHARACTER (Given and Returned)
 *        The type of polarisation being measured; Linear or Circular.
 *     POL = LOGICAL (Given)
-*        Are we processing polarimeter data? This controls the types of 
+*        Are we processing polarimeter data? This controls the types of
 *        mappings available.
 *     REFIN = CHARACTER (Given)
 *        The name of the reference image. If blank, then the first image
@@ -260,14 +260,14 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    if( *STATUS != SAI__OK ) return;
 
 /* Get a unique temporary file name. This file is used to pass values to
-   the Polka Tcl script. All this complication is needed to avoid the 
-   warning message generated by the linker on RH 7 Linux resulting from 
+   the Polka Tcl script. All this complication is needed to avoid the
+   warning message generated by the linker on RH 7 Linux resulting from
    the use of the simpler "tmpnam" function. */
    strcpy( file_name, "doplkaAXXXXXX" );
    fd1 = mkstemp( file_name );
    if( fd1 == -1 ){
       *STATUS = SAI__ERROR;
-      errRep( " ", "Unable to create a temporary \"doplkaA\" file name.", 
+      errRep( " ", "Unable to create a temporary \"doplkaA\" file name.",
               STATUS );
       return;
    } else {
@@ -282,7 +282,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       *STATUS = SAI__ERROR;
       errRep( " ", "Unable to create a temporary file using \"fopen\".", STATUS );
       return;
-   } 
+   }
 
 /* If a reference image was supplied store its name, in the "in_list"
    variable. Also set REFONLY to indicate that the first image in
@@ -347,7 +347,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 /* If a positive value has been supplied, store the screen dots per inch
    to use in TCL variable "dpi". */
-   if ( *DPI > 0 ) { 
+   if ( *DPI > 0 ) {
       SetIVar( fd, "dpi", *DPI, STATUS );
    }
 
@@ -393,7 +393,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    fd2 = mkstemp( outfile_name );
    if( fd2 == -1 ){
       *STATUS = SAI__ERROR;
-      errRep( " ", "Unable to create a temporary \"doplkaB\" file name.", 
+      errRep( " ", "Unable to create a temporary \"doplkaB\" file name.",
               STATUS );
       return;
    } else {
@@ -406,18 +406,18 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    output and error to the temporary file chosen above). The one and only
    argument to the script is the name of the file containing the variable
    values. Also, set the variable POLPACK_DIR to the directory path. */
-   dir = (char *) Envir( PACK_DIR, STATUS );      
+   dir = (char *) Envir( PACK_DIR, STATUS );
    if( *STATUS == SAI__OK ){
       script = (char *) malloc( (size_t) ( strlen( dir )
-                                           + strlen( "/Polka.tcl " )  
-                                           + strlen( file_name ) 
-                                           + strlen( " 1>" )  
-                                           + strlen( outfile_name ) 
-                                           + strlen( " 2>&1" ) 
+                                           + strlen( "/Polka.tcl " )
+                                           + strlen( file_name )
+                                           + strlen( " 1>" )
+                                           + strlen( outfile_name )
+                                           + strlen( " 2>&1" )
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
-         errRep( " ", "Failed to allocate memory for full TCL script name.", 
+         errRep( " ", "Failed to allocate memory for full TCL script name.",
                  STATUS );
       } else {
          strcpy( script, dir );
@@ -437,7 +437,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    if( *STATUS == SAI__OK ){
       (void) system( script );
 
-/* Attempt to open the file containing the standard output and error from 
+/* Attempt to open the file containing the standard output and error from
    the TCL script. */
       fd = fopen( outfile_name, "r" );
 
@@ -532,7 +532,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                if( grp4 ) {
                   (void) GetSVar( value, MODE, MODE_length, STATUS );
                }
-            } 
+            }
          }
       }
 /* Close the communications file. */
@@ -564,7 +564,7 @@ static const char *Envir( const char *var, int *STATUS ){
 *     Get an environment variable.
 
 *  Description:
-*     A pointer to the a string holding the value of the specified 
+*     A pointer to the a string holding the value of the specified
 *     environment variable is returned. A NULL pointer is returned an an
 *     error is reported if the variable does not exist.
 
@@ -572,7 +572,7 @@ static const char *Envir( const char *var, int *STATUS ){
 *     var
 *        The variable name.
 *     STATUS
-*        A pointer to the global status value. 
+*        A pointer to the global status value.
 
 */
    const char *ret;
@@ -580,7 +580,7 @@ static const char *Envir( const char *var, int *STATUS ){
 
    if( *STATUS != SAI__OK || !var ) return NULL;
 
-   ret = getenv( var );      
+   ret = getenv( var );
    if( !ret ) {
       *STATUS = SAI__ERROR;
       sprintf( mess, "Failed to get environment variable \"%s\".", var );
@@ -603,7 +603,7 @@ static void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS )
 *     using the supplied file identifier. If "list" is non-zero a Tcl
 *     list is created (or extended if it already exists).
 
-*     
+*
 */
 
    if( *STATUS != SAI__OK ) return;
@@ -630,7 +630,7 @@ static char *GetName( Grp *grp, int i, int *STATUS ) {
 *     Gets an element out of a GRP group.
 
 *  Description:
-*     This function returns a pointer to a null-terminated C string holding 
+*     This function returns a pointer to a null-terminated C string holding
 *     an element of a supplied GRP group, converted to upper case.
 
 *  Parameters:
@@ -642,9 +642,9 @@ static char *GetName( Grp *grp, int i, int *STATUS ) {
 *        The inherited status.
 
 *  Returned Value:
-*     A pointer to a string holding the element. This string should not 
+*     A pointer to a string holding the element. This string should not
 *     be modified or freed by the caller.
-*     
+*
 */
 
 /* Local Variables */
@@ -660,7 +660,7 @@ static char *GetName( Grp *grp, int i, int *STATUS ) {
    return ( *STATUS == SAI__OK ) ? buffer : NULL;
 }
 
-static void SetSVar( FILE *interp, const char *var, const char *string, 
+static void SetSVar( FILE *interp, const char *var, const char *string,
                int len, int *STATUS ) {
 /*
 *  Name:
@@ -685,7 +685,7 @@ static void SetSVar( FILE *interp, const char *var, const char *string,
 *        null.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    char *buf;
@@ -742,7 +742,7 @@ static int GetSVar( const char *val, char *string, int len, int *STATUS ) {
 *        The length of the F77 string.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    int n;
@@ -778,7 +778,7 @@ static void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
 *        The value to store.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    char text[80];
@@ -786,7 +786,7 @@ static void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Format the integer value and store the resulting string in the 
+/* Format the integer value and store the resulting string in the
    Tcl variable. */
    sprintf( text, "%d", val );
    SetVar( interp, (char *) var, text, 0, STATUS );
@@ -813,7 +813,7 @@ static void SetRVar( FILE *interp, const char *var, float val, int *STATUS ) {
 *        The value to store.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    char text[80];
@@ -847,7 +847,7 @@ static void SetLVar( FILE *interp, const char *var, LOGICAL(valptr), int *STATUS
 *        A pointer to the value to store.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    GENPTR_LOGICAL(val)
@@ -856,7 +856,7 @@ static void SetLVar( FILE *interp, const char *var, LOGICAL(valptr), int *STATUS
    if( *STATUS != SAI__OK ) return;
 
 /* Store the value. */
-   SetVar( interp, (char *) var, ( F77_ISTRUE(*valptr) ? "1" : "0" ), 
+   SetVar( interp, (char *) var, ( F77_ISTRUE(*valptr) ? "1" : "0" ),
            0, STATUS );
 
 }
@@ -876,7 +876,7 @@ static void GetLVar( const char *val, LOGICAL(valptr), int *STATUS ) {
 *        A pointer to the F77 variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    GENPTR_LOGICAL(val)
@@ -907,7 +907,7 @@ static void GetRVar( const char *val, float *valptr, int *STATUS ) {
 *        A pointer to the variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    char mess[81];
@@ -939,7 +939,7 @@ static void GetIVar( const char *val, int *valptr, int *STATUS ) {
 *        A pointer to the variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    char mess[81];
@@ -992,21 +992,21 @@ static char *split( char *buf ){
          if( isspace( (int) *ret ) ){
             *ret = 0;
             end_name = 1;
-         } 
+         }
 
       } else {
          if( isspace( (int) *ret ) ){
             *ret = 0;
          } else {
             break;
-         } 
+         }
       }
    }
 
-   return ret;   
+   return ret;
 }
 
-F77_SUBROUTINE(pol1_tclex)( CHARACTER(FILE), INTEGER(STATUS) 
+F77_SUBROUTINE(pol1_tclex)( CHARACTER(FILE), INTEGER(STATUS)
                             TRAIL(FILE) ){
 /*
 *  Name:
@@ -1022,7 +1022,7 @@ F77_SUBROUTINE(pol1_tclex)( CHARACTER(FILE), INTEGER(STATUS)
 
 *  Parameters:
 *     FILE = CHARACTER * ( * ) (Given)
-*        The name of file containing a Tcl script to be executed in the 
+*        The name of file containing a Tcl script to be executed in the
 *        interpreter.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
@@ -1114,7 +1114,7 @@ F77_SUBROUTINE(pol1_tcldl)( INTEGER(STATUS) ){
 /* Arguments: */
    GENPTR_INTEGER(STATUS)
 
-/* Just delete any interpreted. Do not check the inherited status since 
+/* Just delete any interpreted. Do not check the inherited status since
    this is a clean up function. */
    if( interp ) {
       Tcl_DeleteInterp( interp );
@@ -1133,7 +1133,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
 *     Obtains the value of a Tcl list element from a Tcl interpreter.
 
 *  Description:
-*     This C function obtains the value of a Tcl list element from a Tcl 
+*     This C function obtains the value of a Tcl list element from a Tcl
 *     interpreter created earlier (e.g. using POL1_TCLEX). Note, this is
 *     slow for large lists!!!
 
@@ -1178,7 +1178,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
    char mess[128];
 
 /* Check the inherited status */
-   *NC = 0;   
+   *NC = 0;
    if( *STATUS != SAI__OK ) return;
 
 /* Do nothing if no interpreter is available. */
@@ -1188,7 +1188,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
       varnam = cstring( VARNAM, VARNAM_length, STATUS );
       if ( varnam ) {
 
-/* For a string holding a Tcl command which returns the value of the 
+/* For a string holding a Tcl command which returns the value of the
    required list element, or scalar. */
          if( *ELEM > -1 ) {
             sprintf( buf, "lindex $%s %d", varnam, *ELEM );
@@ -1197,7 +1197,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
          }
 
 /* Execute this Tcl command. */
-         code = Tcl_Eval( interp, buf ); 
+         code = Tcl_Eval( interp, buf );
 
 /* Check for error in the tcl script */
          if( code != TCL_OK ){
@@ -1231,7 +1231,7 @@ static char *cstring( const char *fstring, int len, int *STATUS ) {
 *     terminated copy of an F77 string.
 
 *  Description:
-*     This function returns a pointer to dynaically allocated memory 
+*     This function returns a pointer to dynaically allocated memory
 *     holding a null terminated copy of an F77 string. The pointer should
 *     be freed using free() when no longer needed.
 
@@ -1242,7 +1242,7 @@ static char *cstring( const char *fstring, int len, int *STATUS ) {
 *        The length of the f77 string to be stored.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+*
 */
 
    char mess[81];
@@ -1280,8 +1280,8 @@ static char *cstring( const char *fstring, int len, int *STATUS ) {
 
 
 F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
-                            INTEGER_ARRAY(COLID), INTEGER_ARRAY(COLTYP), 
-                            INTEGER(RAGID), INTEGER(DECGID), INTEGER(CIOUT), 
+                            INTEGER_ARRAY(COLID), INTEGER_ARRAY(COLTYP),
+                            INTEGER(RAGID), INTEGER(DECGID), INTEGER(CIOUT),
                             INTEGER(STATUS) TRAIL(FILNAM) ){
 /*
 *  Name:
@@ -1291,7 +1291,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 *     Read the data from the specified Tcl file.
 
 *  Description:
-*     This C function reads the row/column data stored in the tcl variable 
+*     This C function reads the row/column data stored in the tcl variable
 *     data_ in the supplied Tcl file, and copies it into a CAT catalogue.
 *     It is implemented in a very low level way to avoid copying the data
 *     into a big dynamic array, which is very slow for large data arrays.
@@ -1307,7 +1307,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 *        should be assigned the value -1. All columns are assumed to be
 *        floating point. The precision of each is given by PREC.
 *     COLTYP( NCOL ) = INTEGER (Given)
-*        The data type for each column; 0 = integer, 1 = single precision, 
+*        The data type for each column; 0 = integer, 1 = single precision,
 *        2 = double precision, 3 = string.
 *     RAGID = INTEGER (Given)
 *        The CAT identifier for the RA column. Set to -1 if there is no
@@ -1398,12 +1398,12 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
             n = fread( (void *) buf, 1, 81, fd );
             if( !n ) break;
 
-/* If we have not yet the string "set data_", check the current buffer now. 
+/* If we have not yet the string "set data_", check the current buffer now.
    We have to take care because the string may be split across two buffers. */
             if( !ok ) {
 
-/* The pointer to the next character to be tested is initialised to the 
-   start of the buffer. We have not yet found the required key string 
+/* The pointer to the next character to be tested is initialised to the
+   start of the buffer. We have not yet found the required key string
    ("set data_"). */
                p = buf;
                found = 0;
@@ -1411,11 +1411,11 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 /*  Check every character in the buffer */
                while( *p ) {
 
-/* pkey points to the next key character to be searched for. See if the 
+/* pkey points to the next key character to be searched for. See if the
    current buffer character matches the netx key character. */
                   if( *p == *pkey ){
 
-/* If so, move on to search for the next key character. If the end of the 
+/* If so, move on to search for the next key character. If the end of the
    key string has been reached, we have dound the string. Move p on so that it points to the first character after the key string, and leave the loop. */
                      pkey++;
                      if( ! *pkey ){
@@ -1424,7 +1424,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
                         break;
                      }
 
-/* If the current buffer character differs from the next key character, 
+/* If the current buffer character differs from the next key character,
    reset the next required key character back to the first character in the key string. */
                   } else {
                      pkey = key;
@@ -1432,7 +1432,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
                   p++;
                }
 
-/*  If we have not yet found the key string, loop round for a new buffer. 
+/*  If we have not yet found the key string, loop round for a new buffer.
     Otherwise, indicate that we can now continue to read column values. */
                if( !found ){
                   continue;
@@ -1443,19 +1443,19 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
             } else {
                p = buf;
             }
-         } 
+         }
 
 /*  Count how many usable characters there are at the start of the
     remaining part of the buffer. */
          use = strcspn( p, " \\\n\"{}" );
-   
+
 /*  If any, copy them to the text buffer. */
          if( use ) {
             memcpy( q, p, use );
             p += use;
             q += use;
          }
-   
+
 /*  If we are still within the buffer, store the value in the text
     buffer in the current row buffer for the output catalogue. */
          if( *p ){
@@ -1466,50 +1466,50 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 /* Check the column is required. */
                if( gid != -1 ) {
 
-/* Get the column type; 0 = integer, 1 = single precision, 2 = double 
+/* Get the column type; 0 = integer, 1 = single precision, 2 = double
    precision, 3 = string. */
                   type = COLTYP[nc];
 
-/* Convert RA and DEC values from hours/degs to radians as required by the 
+/* Convert RA and DEC values from hours/degs to radians as required by the
    CAT library, and store in single or double precision. */
                   if( gid == *RAGID || gid == *DECGID ) {
-                     if( type == 1 ) {  
+                     if( type == 1 ) {
                         if( sscanf( txtbuf, "%lf", &dval ) == 0 ) break;
                         dval *= DTOR;
                         F77_CALL(cat_put0d)( INTEGER_ARG(&gid), DOUBLE_ARG(&dval),
-                                       LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                                       LOGICAL_ARG(&no), INTEGER_ARG(STATUS) );
 
-                     } else if( type == 2 ) {  
+                     } else if( type == 2 ) {
                         if( sscanf( txtbuf, "%f", &rval ) == 0 ) break;
                         rval *= DTOR;
                         F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&rval),
-                                       LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                                       LOGICAL_ARG(&no), INTEGER_ARG(STATUS) );
                      }
 
 /* Write out integer column values. */
                   } else if( type == 0 ) {
                      if( sscanf( txtbuf, "%d", &ival ) == 0 ) break;
                      F77_CALL(cat_put0i)( INTEGER_ARG(&gid), INTEGER_ARG(&ival),
-                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) );
 
 /* Write out single precision column values. */
                   } else if( type == 1 ) {
                      if( sscanf( txtbuf, "%f", &rval ) == 0 ) break;
                      F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&rval),
-                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) );
 
 /* Write out double precision column values. */
                   } else if( type == 2 ) {
                      if( sscanf( txtbuf, "%lf", &dval ) == 0 ) break;
                      F77_CALL(cat_put0d)( INTEGER_ARG(&gid), DOUBLE_ARG(&dval),
-                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) );
 
 /* Write out string column values. */
                   } else {
                      cnfExprt( txtbuf, cval, cval_length );
-                     F77_CALL(cat_put0c)( INTEGER_ARG(&gid), 
-                                       CHARACTER_ARG(cval), LOGICAL_ARG(&no), 
-                                       INTEGER_ARG(STATUS) TRAIL_ARG(cval) ); 
+                     F77_CALL(cat_put0c)( INTEGER_ARG(&gid),
+                                       CHARACTER_ARG(cval), LOGICAL_ARG(&no),
+                                       INTEGER_ARG(STATUS) TRAIL_ARG(cval) );
                   }
                   if( *STATUS != SAI__OK ) break;
                }
@@ -1517,17 +1517,17 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 
 /* Write out the row buffer when it is full. */
                if( nc == *NCOL ) {
-                  F77_CALL(cat_rapnd)( INTEGER_ARG(CIOUT), INTEGER_ARG(STATUS) ); 
+                  F77_CALL(cat_rapnd)( INTEGER_ARG(CIOUT), INTEGER_ARG(STATUS) );
                   if( *STATUS != SAI__OK ) break;
                   nc = 0;
                }
 
             }
             q = txtbuf;
-   
+
 /*  Skip forward to the next usable character */
             p += strspn( p, " \\\n\"{}" );
-   
+
          }
 
       }

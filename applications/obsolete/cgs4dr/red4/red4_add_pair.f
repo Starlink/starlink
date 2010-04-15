@@ -1,7 +1,7 @@
 *+  RED4_ADD_PAIR - Combine observation into pair in reduced group file
       SUBROUTINE RED4_ADD_PAIR( STATUS )
 *    Description :
-*     This routine combines a reduced observation belonging to a particular 
+*     This routine combines a reduced observation belonging to a particular
 *     group into a pair of observations. If this is the first observation
 *     of the pair, its name is simply remembered until next time. If this
 *     is the second observation, the SKY member of the pair is subtracted
@@ -23,11 +23,11 @@
 *
 *     A record of all the observations added is kept in the COADDS
 *     structure of the reduced group file. If this record shows that the
-*     specified observation has already been added, a warning message 
+*     specified observation has already been added, a warning message
 *     will be issued and it will not be added again.
 *
 *     The FITS header information from the first OBJECT observation is
-*     copied to the reduced group file. When subsequent OBJECT observations 
+*     copied to the reduced group file. When subsequent OBJECT observations
 *     are added, the header information is updated as follows :-
 *
 *     EXPOSED     - Value is accumulated (new = old + current)
@@ -44,7 +44,7 @@
 *     OBJECT observations making up the group.
 *
 *     A record of the total exposure time contributed from the SKY
-*     observations will be accumulated in a SKYEXP parameter, taking 
+*     observations will be accumulated in a SKYEXP parameter, taking
 *     into account any weighting factors used :-
 *
 *     SKYEXP      - Value is accumulated (new = old + current*SKY_WT)
@@ -268,11 +268,11 @@
 *               Convert the observation file name, together with the
 *               group number obtained above, into the name of the
 *               reduced group file.
-                  CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS ) 
+                  CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS )
 
 *               Check is this reduced group file exists.
                   DSA_STATUS = STATUS
-                  CALL DSA_SEEK_NAMED_STRUCTURE( GRPRED, EXIST, 
+                  CALL DSA_SEEK_NAMED_STRUCTURE( GRPRED, EXIST,
      :              DSA_STATUS )
 
 *               If this has worked, and the structure does not exist,
@@ -308,26 +308,26 @@
                      CALL DSA_OPEN( DSA_STATUS )
                      CALL RED4_CHECK_INPUT( OBSRED, STATUS )
                      CALL DSA_NAMED_INPUT( 'OBSRED', OBSRED,
-     :                 DSA_STATUS ) 
+     :                 DSA_STATUS )
                   END IF
 
 *               Open the reduced group file.
                   CALL RED4_CHECK_INPUT( GRPRED, STATUS )
                   CALL DSA_NAMED_INPUT( 'GRPRED', GRPRED,
-     :              DSA_STATUS ) 
+     :              DSA_STATUS )
 
 *               Check that the following conditions between the reduced
 *               observation and reduced group structure are satisfied:-
-*               (a) The data arrays are the same size (to ensure the 
+*               (a) The data arrays are the same size (to ensure the
 *                   same degree of oversampling has been used).
 *               (b) The data units are the same (to ensure some observations
 *                   haven't been normalised or transformed).
-*               (c) The X axis size and units are the same (to ensure 
+*               (c) The X axis size and units are the same (to ensure
 *                   that wavelength calibrated data is not added by accident).
 *               If all these conditions are not met, an error is generated.
-                  CALL DSA_MATCH_SIZES( 'OBSRED', 'GRPRED', DSA_STATUS ) 
-                  CALL DSA_MATCH_UNITS( 'OBSRED', 'GRPRED', DSA_STATUS ) 
-                  CALL DSA_MATCH_AXIS( 'OBSRED', 1, 'GRPRED', 1, 
+                  CALL DSA_MATCH_SIZES( 'OBSRED', 'GRPRED', DSA_STATUS )
+                  CALL DSA_MATCH_UNITS( 'OBSRED', 'GRPRED', DSA_STATUS )
+                  CALL DSA_MATCH_AXIS( 'OBSRED', 1, 'GRPRED', 1,
      :               DSA_STATUS )
 
 *               Close the observation file.
@@ -343,13 +343,13 @@
 *               Obtain the DTA address of the COADDED_OBS structure
 *               within the COADDS structure.
                   CALL DSA_SPECIFIC_STRUCTURE( 'COADDS',
-     :               'COADDED_OBS', 'UPDATE', COADDED_OBS, DSA_STATUS ) 
+     :               'COADDED_OBS', 'UPDATE', COADDED_OBS, DSA_STATUS )
 
                   IF ( DSA_STATUS .NE. ADAM__OK ) THEN
 
                      STATUS = SAI__ERROR
                      CALL ERR_REP( ' ', 'RED4_ADD_PAIR: '/
-     :                 /'Second error seeking CGS4 specific structure', 
+     :                 /'Second error seeking CGS4 specific structure',
      :                 STATUS )
                   END IF
 
@@ -458,7 +458,7 @@
      :                                /'variance.', STATUS )
                                  END IF
 
-                                 IF ( ABS(SKY_WT-1.0) 
+                                 IF ( ABS(SKY_WT-1.0)
      :                                .GT. 0.0001 ) THEN
 
                                     CALL MSG_SETR( 'SKY_WT', SKY_WT )
@@ -486,7 +486,7 @@
                               ELSE IF ( OBSTYPE .EQ. 'SKY' ) THEN
 
                                  CALL DSA_GET_FITS_I( 'GRPRED',
-     :                              'NSKY', 0, NSKY, COMMENT, 
+     :                              'NSKY', 0, NSKY, COMMENT,
      :                              DSA_STATUS )
 
                                  NSKY = NSKY + 1
@@ -519,13 +519,13 @@
      :                             'OBJECT' ) THEN
 
                                  CALL DSA_GET_FITS_I( 'GRPRED',
-     :                             'NOBJ', 0, NOBJ, COMMENT, 
+     :                             'NOBJ', 0, NOBJ, COMMENT,
      :                             DSA_STATUS )
 
                                  NOBJ = NOBJ - 1
 
                                  CALL DSA_PUT_FITS_I( 'GRPRED',
-     :                             'NOBJ', NOBJ, ' ', 
+     :                             'NOBJ', NOBJ, ' ',
      :                             DSA_STATUS )
                               ELSE IF ( LAST_OBSERVATION_TYPE .EQ.
      :                                  'SKY' ) THEN
@@ -537,7 +537,7 @@
                                  NSKY = NSKY - 1
 
                                  CALL DSA_PUT_FITS_I( 'GRPRED',
-     :                             'NSKY', NSKY, ' ', 
+     :                             'NSKY', NSKY, ' ',
      :                             DSA_STATUS )
                               END IF
 
@@ -549,9 +549,9 @@
      :                          /'Current observation ^OBSFILE is of '/
      :                          /'type ^OBSTYPE', STATUS )
 
-                              CALL MSG_SETC( 'LAST_NAME', 
+                              CALL MSG_SETC( 'LAST_NAME',
      :                          LAST_OBSERVATION_NAME )
-                              CALL MSG_SETC( 'LAST_TYPE', 
+                              CALL MSG_SETC( 'LAST_TYPE',
      :                          LAST_OBSERVATION_TYPE )
                               CALL ERR_REP( ' ', 'RED4_ADD_PAIR: '/
      :                          /'Last observation '/
@@ -561,12 +561,12 @@
                               CALL ERR_REP( ' ', 'RED4_ADD_PAIR: '/
      :                          /'There should '/
      :                          /'be one OBJECT and one SKY in '/
-     :                          /'this pair', STATUS ) 
+     :                          /'this pair', STATUS )
 
                            END IF
                        ELSE
 
-*                        The current observation is merely the first in a 
+*                        The current observation is merely the first in a
 *                        new pair. Issue a message and remember its name
 *                        and type.
                            CALL MSG_SETC( 'OBSFILE', OBSFILE )
@@ -631,7 +631,7 @@
      :           /'^OBSTYPE', STATUS )
                CALL ERR_REP( ' ', 'RED4_ADD_PAIR: '/
      :           /'Only OBJECT and SKY '/
-     :           /'observations may be co-added into groups', STATUS ) 
+     :           /'observations may be co-added into groups', STATUS )
             END IF
          ELSE
 

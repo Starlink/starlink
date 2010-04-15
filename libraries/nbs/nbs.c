@@ -521,7 +521,7 @@ static int timeout_interval = 100; /* Number of ms to wait between tries */
 static int world_write = NO; /* Whether the world can write to noticeboards */
 static int increment_modify = YES; /* Whether to increment MODIFIED on PUT */
 static int check_modify = YES; /* Whether to check MODIFIED on GET */
-
+
 /*
 *  Section name:
 *     NBS_TUNE
@@ -552,7 +552,7 @@ static int check_modify = YES; /* Whether to check MODIFIED on GET */
 *     For those parameters which are numeric values, they use the value of the
 *     first type.
 */
-
+
 /*
 *+
 *  Name:
@@ -613,8 +613,8 @@ static int check_modify = YES; /* Whether to check MODIFIED on GET */
 *  Arguments:
 *     NAME = CHARACTER*(*) (Given)
 *        The name of the parameter to alter. See the above list. Can be
-*        abbreviated so long as it remains unambiguous but this is not 
-*        recommended because new parameters may be supported in the future. 
+*        abbreviated so long as it remains unambiguous but this is not
+*        recommended because new parameters may be supported in the future.
 *        Case is not significant.
 *     VALUE = INTEGER (Given)
 *        The value that the parameter is to take.
@@ -728,7 +728,7 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
       }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -780,8 +780,8 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
 *        whose parameter value is to be altered.
 *     NAME = CHARACTER*(*) (Given)
 *        The name of the parameter to alter. See the above list. Can be
-*        abbreviated so long as it remains unambiguous but this is not 
-*        recommended because new parameters may be supported in the future. 
+*        abbreviated so long as it remains unambiguous but this is not
+*        recommended because new parameters may be supported in the future.
 *        Case is not significant.
 *     VALUE = INTEGER (Given)
 *        The value that the parameter is to take.
@@ -899,7 +899,7 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
       }
    return (*status);
 }
-
+
 /*
 *  Section name:
 *     NBS_DEFINITION
@@ -918,7 +918,7 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
 *     else copied to a noticeboard.
 *
 */
-
+
 /*
 *+
 *  Name:
@@ -946,7 +946,7 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
 
 *  Arguments:
 *     SID = INTEGER (Returned)
-*        Static identifier of the top-level of the noticeboard. This should 
+*        Static identifier of the top-level of the noticeboard. This should
 *        be used in subsequent calls to the NBS_DEFINE_* routines.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
@@ -1127,7 +1127,7 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -1219,7 +1219,7 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 
 *-
 */
-int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name), 
+int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
                            RW_CHARACTER(type), item_id *sid,
                            W_INTEGER(status) TRAIL(name) TRAIL(type) )
 {
@@ -1340,7 +1340,7 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -1573,7 +1573,7 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -1707,7 +1707,7 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -1746,15 +1746,15 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
 *  Arguments:
 *     NAME = CHARACTER*(*) (Given)
 *        If OPTION is DEFINITION_SAVE or NOTICEBOARD_SAVE, the name of the
-*        file to write the definition or definition plus data to (with a 
-*        default file type of .NBD). Otherwise (OPTION is CREATE_NOTICEBOARD) 
+*        file to write the definition or definition plus data to (with a
+*        default file type of .NBD). Otherwise (OPTION is CREATE_NOTICEBOARD)
 *        the name of the noticeboard to create.
 *     OPTION = CHARACTER*(*) (Given)
-*        Option that governs whether the noticeboard definition or definition 
-*        plus data is saved to a file or whether the noticeboard is simply 
+*        Option that governs whether the noticeboard definition or definition
+*        plus data is saved to a file or whether the noticeboard is simply
 *        created on the spot without being associated with a file. Can be
-*        abbreviated so long as it remains unambiguous but this is not 
-*        recommended because new options may be supported in the future. Case 
+*        abbreviated so long as it remains unambiguous but this is not
+*        recommended because new options may be supported in the future. Case
 *        is not significant. Possible values are:
 *
 *            DEFINITION_SAVE => Save the definition to a file that
@@ -1819,7 +1819,7 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
 *        NBS_WRITE_FILE         Write a noticeboard definition file
 *     C RTL:
 *        GETPID                 Get process ID
-*        STRNCPY                Copy one string to another up to a specified 
+*        STRNCPY                Copy one string to another up to a specified
 *                               limit
 
 *  Prior Requirements:
@@ -1943,7 +1943,7 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -1973,10 +1973,10 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
 
 *  Arguments:
 *     NAME = CHARACTER*(*) (Given)
-*        The name to give the noticeboard (and thus the name of the 
+*        The name to give the noticeboard (and thus the name of the
 *        noticeboard).
 *     SAVE_NAME = CHARACTER*(*) (Given)
-*        The name of the file from which to read the definition (with a 
+*        The name of the file from which to read the definition (with a
 *        default file type of .NBD)
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
@@ -2125,7 +2125,7 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -2158,7 +2158,7 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *     NAME = CHARACTER*(*) (Given)
 *        The name to give the noticeboard.
 *     SAVE_NAME = CHARACTER*(*) (Given)
-*        The name of the file from which to read the definition (with a 
+*        The name of the file from which to read the definition (with a
 *        default file type of .NBD)
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
@@ -2308,7 +2308,7 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -2455,7 +2455,7 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *  Section name:
 *     NBS_FIND
@@ -2477,7 +2477,7 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
 *     information pertaining to it can in fact be accessed using standard C
 *     structures.
 */
-
+
 /*
 *+
 *  Name:
@@ -2725,7 +2725,7 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -2805,7 +2805,7 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 *     NBS:
 *        NBS_STRIMP         	Import a string, converting to upper-case
 *     C RTL:
-*        STRNCMP        	Compare one string with another up to 
+*        STRNCMP        	Compare one string with another up to
 *                               specified limit
 
 *  Prior Requirements:
@@ -2900,7 +2900,7 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -3042,7 +3042,7 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
    }
    return (*status);
 }
-
+
 /*
 *  Section name:
 *     NBS_LOSE
@@ -3065,7 +3065,7 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
 *     chance of using an item ID to access a non-existent noticeboard), but
 *     this can be overridden.
 */
-
+
 /*
 *+
 *  Name:
@@ -3096,10 +3096,10 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
 *     ID = INTEGER (Given)
 *        Identifier of the top-level of the noticeboard.
 *     OPTION = CHARACTER*(*) (Given)
-*        Option that governs whether to check that there are no identifiers 
-*        currently derived from this one. Can be abbreviated so long as it 
+*        Option that governs whether to check that there are no identifiers
+*        currently derived from this one. Can be abbreviated so long as it
 *        remains unambiguous but this is not recommended because new options
-*        may be supported in the future. Case is not significant. Possible 
+*        may be supported in the future. Case is not significant. Possible
 *        values are{:}
 *
 *            FORCE => Unmap the noticeboard regardless of whether there
@@ -3216,7 +3216,7 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -3247,10 +3247,10 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
 *     ID = INTEGER (Given)
 *        Identifier of the item which is to be lost.
 *     OPTION = CHARACTER*(*) (Given)
-*        Option that governs whether to check that there are no identifiers 
-*        currently derived from this one. Can be abbreviated so long as it 
+*        Option that governs whether to check that there are no identifiers
+*        currently derived from this one. Can be abbreviated so long as it
 *        remains unambiguous but this is not recommended because new options
-*        may be supported in the future. Case is not significant. Possible 
+*        may be supported in the future. Case is not significant. Possible
 *        values are{:}
 *
 *            FORCE => Unmap the item regardless of whether there
@@ -3371,7 +3371,7 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
    }
    return (*status);
 }
-
+
 /*
 *  Section Name:
 *     NBS_PUT
@@ -3437,7 +3437,7 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
 *     processes (although the user-supplied routine may of course do this
 *     itself).
 */
-
+
 /*
 *+
 *  Name:
@@ -3525,7 +3525,7 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
 *     16-Feb-1988 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -3630,7 +3630,7 @@ int NBS_PUT_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(nbytes),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -3731,7 +3731,7 @@ IF_OK {
 
 return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -3801,7 +3801,7 @@ return (*status);
 *     16-Feb-1988 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -3897,7 +3897,7 @@ int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -3964,7 +3964,7 @@ int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
 *     23-Jul-1988 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -4053,7 +4053,7 @@ int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -4115,7 +4115,7 @@ int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -4181,7 +4181,7 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -4215,8 +4215,8 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
 *     ID = INTEGER (Given)
 *        Identifier of the item for which a trigger routine is to be specified.
 *     TRIGGER = EXTERNAL (Given)
-*        The address of the routine to call whenever the item is updated. 
-*        From FORTRAN, declare it as EXTERNAL. Pass zero (requires %VAL(0) 
+*        The address of the routine to call whenever the item is updated.
+*        From FORTRAN, declare it as EXTERNAL. Pass zero (requires %VAL(0)
 *        from FORTRAN) to disable the facility).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
@@ -4250,7 +4250,7 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
 *     06-Feb-1990 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -4311,7 +4311,7 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -4375,7 +4375,7 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 
 *-
 */
-
+
 /*
 *+
 *  Name:
@@ -4426,9 +4426,9 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *     BYTE_ARRAY = BYTE(*) (Returned)
 *        User's buffer into which bytes will be got.
 *     ACTBYTES = INTEGER (Returned)
-*        Actual number of values associated with the item. This may be 
-*        greater than OFFSET + MAXBYTES but no more than MAXBYTES bytes 
-*        will be copied into the user's buffer.  
+*        Actual number of values associated with the item. This may be
+*        greater than OFFSET + MAXBYTES but no more than MAXBYTES bytes
+*        will be copied into the user's buffer.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
 *        	NBS__NILID	  => NIL ID
@@ -4463,7 +4463,7 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -4478,7 +4478,7 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *-
 */
 int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
-                    RW_BYTE_ARRAY(byte_array), W_INTEGER(actbytes), 
+                    RW_BYTE_ARRAY(byte_array), W_INTEGER(actbytes),
                     W_INTEGER(status) )
 {
   GENPTR_INTEGER(id)
@@ -4564,7 +4564,7 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -4594,9 +4594,9 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
 *     STRING = CHARACTER*(*) (Returned)
 *        Users string buffer into which item bytes will be got.
 *     ACTBYTES = INTEGER (Returned)
-*        Actual number of values associated with the item. This may be 
-*        greater than OFFSET + LEN(STRING) but no more than LEN(STRING) bytes 
-*        will be copied into the user's buffer.  
+*        Actual number of values associated with the item. This may be
+*        greater than OFFSET + LEN(STRING) but no more than LEN(STRING) bytes
+*        will be copied into the user's buffer.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
 *        	NBS__NILID	  => NIL ID
@@ -4608,7 +4608,7 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
 *     No C version of this routine is supplied because C strings are
 *     by convention null terminated. As NBS_GET_CVALUE writes new
 *     string data, its correct functioning in the C case would rely on
-*     the unwarranted assumption that sufficient space existed in the 
+*     the unwarranted assumption that sufficient space existed in the
 *     destination string for the data to be written. By forcing the use
 *     of NBS_GET_VALUE in this case, the user must at least state the
 *     destination length explicitly.
@@ -4655,7 +4655,7 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
 */
 #ifndef c_string
 int NBS_GET_CVALUE ( R_INTEGER(id), R_INTEGER(offset),
-                     RW_CHARACTER(string), W_INTEGER(actbytes), 
+                     RW_CHARACTER(string), W_INTEGER(actbytes),
                      W_INTEGER(status) TRAIL(string) )
 {
   GENPTR_INTEGER(id)
@@ -4665,14 +4665,14 @@ int NBS_GET_CVALUE ( R_INTEGER(id), R_INTEGER(offset),
   GENPTR_INTEGER(status)
 
 IF_OK {
-  return NBS_GET_VALUE( id, offset, &string_length, (F77_BYTE_TYPE *) string, 
+  return NBS_GET_VALUE( id, offset, &string_length, (F77_BYTE_TYPE *) string,
                  actbytes, status );
   }
 
   return 0;
 }
 #endif
-
+
 /*
 *+
 *  Name:
@@ -4713,22 +4713,22 @@ IF_OK {
 *     ID = INTEGER (Given)
 *        Identifier of the item from which the shape is to be got.
 *     MAXDIMS = INTEGER (Given and returned)
-*        On entry, size of the DIMS array. On exit the maximum number 
+*        On entry, size of the DIMS array. On exit the maximum number
 *        of dimensions that this item can have.
 *     DIMS = INTEGER(*) (Returned)
 *        Returned dimensions.
 *     ACTDIMS = INTEGER (Returned)
-*        Actual number of dimensions associated with the item. This may 
-*        be greater than MAXDIMS but no more than MAXDIMS values will be 
+*        Actual number of dimensions associated with the item. This may
+*        be greater than MAXDIMS but no more than MAXDIMS values will be
 *        copied into the DIMS array.
 *     MAXBYTES = INTEGER (Given)
 *        Size in bytes of the user's buffer.
 *     BYTE_ARRAY = BYTE(*) (Returned)
 *        User's buffer into which bytes will be got.
 *     ACTBYTES = INTEGER (Returned)
-*        Actual number of values associated with the item. This may be 
-*        greater than OFFSET + MAXBYTES but no more than MAXBYTES bytes 
-*        will be copied into the user's buffer.  
+*        Actual number of values associated with the item. This may be
+*        greater than OFFSET + MAXBYTES but no more than MAXBYTES bytes
+*        will be copied into the user's buffer.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
 *        	NBS__NILID	  => NIL ID
@@ -4762,7 +4762,7 @@ IF_OK {
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -4854,7 +4854,7 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -4925,7 +4925,7 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
 *     09-Feb-1990 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -4979,7 +4979,7 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5017,7 +5017,7 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
 
 *  Arguments:
 *     ID = INTEGER (Given)
-*        Identifier of the item for which the pointer to its modified count 
+*        Identifier of the item for which the pointer to its modified count
 *        is to be got.
 *     POINTER = INTEGER (Returned)
 *        The address of the item's modified count.
@@ -5052,7 +5052,7 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
 *     09-Feb-1990 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5066,7 +5066,7 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
 
 *-
 */
-int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer, 
+int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
                                W_INTEGER(status) )
 {
   GENPTR_INTEGER(id)
@@ -5106,7 +5106,7 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5136,7 +5136,7 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
 
 *  Arguments:
 *     ID = INTEGER (Given)
-*        Identifier of the item for which to determine whether it has been 
+*        Identifier of the item for which to determine whether it has been
 *        updated since the last call on its behalf.
 *     UPDATED = INTEGER (Returned)
 *         Whether updated (1) or not (0).
@@ -5171,7 +5171,7 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
 *     09-Feb-1990 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5229,7 +5229,7 @@ int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5287,7 +5287,7 @@ int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5340,7 +5340,7 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5395,7 +5395,7 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5410,7 +5410,7 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
 
 *-
 */
-int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name), 
+int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
                    W_INTEGER(status) TRAIL(name) )
 {
   GENPTR_INTEGER(id)
@@ -5446,7 +5446,7 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5501,7 +5501,7 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5552,7 +5552,7 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5611,7 +5611,7 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5669,7 +5669,7 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5725,7 +5725,7 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5774,7 +5774,7 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5800,7 +5800,7 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
 *     ID = INTEGER (Given)
 *        Identifier of the item whose parent is to be got.
 *     PARENT = INTEGER (Returned)
-*        Identifier of item's parent. If the item has no parent then 
+*        Identifier of item's parent. If the item has no parent then
 *        a NIL ID will be returned.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
@@ -5833,7 +5833,7 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5885,7 +5885,7 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -5906,7 +5906,7 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
 
 *  Arguments:
 *     ID = INTEGER (Given)
-*        Identifier of the item whose number of children is to be got. 
+*        Identifier of the item whose number of children is to be got.
 *     CHILDREN = INTEGER (Returned)
 *        Number of children.
 *     STATUS = INTEGER (Given and returned)
@@ -5941,7 +5941,7 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
 *     16-Feb-1988 (WFL):
 *        Original version.
 *     22-Mar-1993 (DJA):
-*        Added error reporting. 
+*        Added error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -5996,7 +5996,7 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:
@@ -6036,7 +6036,7 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 *        so long as it remains unambiguous but this is not recommended because
 *        new items may be supported in the future. Case is not significant.
 *     VALUE = Depends on NAME (Returned)
-*        The item's value. Declared as pointer to integer, but may be 
+*        The item's value. Declared as pointer to integer, but may be
 *        coerced to pointer to real.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
@@ -6070,7 +6070,7 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 *     07-Feb-1990 (WFL):
 *        Original version.
 *     31-Mar-1993 (DJA):
-*        Added error reporting and updated string handling. SAVE_NAME 
+*        Added error reporting and updated string handling. SAVE_NAME
 *        option removed to NBS_GET_CINFO.
 *     {enter_changes_here}
 
@@ -6162,7 +6162,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
    }
    return (*status);
 }
-
+
 /*
 *+
 *  Name:

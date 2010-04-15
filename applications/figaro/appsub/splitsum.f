@@ -2,14 +2,14 @@ C+
       FUNCTION SPLITSUM(SUM,FRAC,YVALS,CVALS,XVALS,NSEG,NL,NH,SIGN,
      :  STATUS)
 C
-C     Computes X value for which area from NL up to this X 
+C     Computes X value for which area from NL up to this X
 C     value is FRAC times total area (SUM).
 C     So for FRAC = 0.5 this gives the median.
 C     Linear interpolation to get fractional "channel".
 C     SUM = total sum of 1 - YVALS/CVALS over NL to NH
 C     NML = highest channel s.t.sum from NL to NML is .LE. FRAC*SUM.
 C     EXES = (sum from NL to NML+1) - FRAC*SUM
-C     EXCH = fraction of channel NML+1 required to be added to sum to 
+C     EXCH = fraction of channel NML+1 required to be added to sum to
 C            to NML to get total exactly = FRAC*SUM
 C     SIGN is set to -1.0 for emission lines; +1.0 for normal absorption
 C            line case
@@ -39,7 +39,7 @@ C
       ELSE
          EXCH=0.
       END IF
-      ACH=(XVALS(NSEG)-XVALS(1))/(NSEG-1.) 
+      ACH=(XVALS(NSEG)-XVALS(1))/(NSEG-1.)
       XMED=XVALS(NML) + ACH*(EXCH+0.5)
       IF(XMED.LT.(XVALS(NML)+0.5*ACH).OR.XMED.GT.(XVALS(NML+1)+0.5*ACH))
      :                                                              THEN

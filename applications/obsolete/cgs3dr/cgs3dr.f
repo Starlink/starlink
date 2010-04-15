@@ -30,13 +30,13 @@
 
       IF (NAME .EQ. 'INIT') THEN
          CALL CGS3DR_INIT (STATUS)
-      
+
       ELSE IF (NAME .EQ. 'SETPAR') THEN
          CALL CGS3DR_SETPAR (STATUS)
-      
+
       ELSE IF (NAME .EQ. 'SHOPAR') THEN
          CALL CGS3DR_SHOPAR (STATUS)
-      
+
       ELSE IF (NAME .EQ. 'REDUCE_RUN') THEN
          CALL CGS3DR_REDUCE_RUN (STATUS)
 

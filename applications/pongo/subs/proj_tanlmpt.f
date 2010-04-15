@@ -13,14 +13,14 @@
 *     CALL PROJ_TANLMPT( PHI0, THETA0, L, M, PHI, THETA, STATUS )
 
 *  Description:
-*     Uses a TAN projection 
-*     
+*     Uses a TAN projection
+*
 *     L is assumed to be positive to the east
 *     M is assumed to be positive to the north
 *
 *     Based on the AIPS implementation of these geometries - see
 *     AIPS memos 27 & 46 - Eric Greisen.
-*     
+*
 
 *  Arguments:
 *     PHI0 = DOUBLE PRECISION (Given)
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -63,7 +63,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ASTRO_PAR'        ! Standard astronomical parameters
       INCLUDE 'PROJ_PAR'         ! parameters for the proj routines
-                                 
+
 *  Arguments Given:
       DOUBLE PRECISION PHI0, THETA0, L, M
 
@@ -96,7 +96,7 @@
          THETAT=ATAN(COS(PHIT-PHI0)*(M*COS0+SIN0)/TEMP)
          STATUS=SAI__OK
       END IF
-      
+
 
 
 *  make sure that PHI is in correct range

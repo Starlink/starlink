@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -213,7 +213,7 @@
                         END IF
                         CALL ERR_RLSE
                      END IF
-                     
+
 *  Determine the type which the component should have.
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         IF ( 'C' .EQ. 'C' ) THEN
@@ -282,7 +282,7 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -397,7 +397,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -508,7 +508,7 @@
                         END IF
                         CALL ERR_RLSE
                      END IF
-                     
+
 *  Determine the type which the component should have.
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         IF ( 'D' .EQ. 'C' ) THEN
@@ -577,7 +577,7 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -692,7 +692,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -803,7 +803,7 @@
                         END IF
                         CALL ERR_RLSE
                      END IF
-                     
+
 *  Determine the type which the component should have.
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         IF ( 'I' .EQ. 'C' ) THEN
@@ -872,7 +872,7 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -987,7 +987,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1098,7 +1098,7 @@
                         END IF
                         CALL ERR_RLSE
                      END IF
-                     
+
 *  Determine the type which the component should have.
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         IF ( 'L' .EQ. 'C' ) THEN
@@ -1167,7 +1167,7 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -1282,7 +1282,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1393,7 +1393,7 @@
                         END IF
                         CALL ERR_RLSE
                      END IF
-                     
+
 *  Determine the type which the component should have.
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         IF ( 'R' .EQ. 'C' ) THEN
@@ -1462,7 +1462,7 @@
             END IF
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

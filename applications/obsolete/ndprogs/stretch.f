@@ -29,7 +29,7 @@ c   IMAGE1      Name of image to be scaled
 c   IMAGE2      Name of image whose dimensions will determine the scaling
 c   OUTPUT      Name of output structure
 c   INTERP      Type of interpolation to be used.
-c   
+c
 c   Keywords
 c   --------
 c   VERBOSE     Make the program more talkative.
@@ -37,7 +37,7 @@ c
 c   Method
 c   ------
 c   - Two data structures are prompted for and opened. They must both have
-c     the same dimensionality but differing dimensions. The first is the 
+c     the same dimensionality but differing dimensions. The first is the
 c     image to be stretched, the second one defines the size of the stretched
 c     array.
 c   - Various checks are made to see if the two images are compatible.
@@ -125,7 +125,7 @@ c
       real              gen_elemf
 c
 c   Variables
-c   
+c
       integer           address         ! Address of dynamic memory element
       integer           axptr           ! Pointer to IMAGE1 axis array
       integer           axslot          ! Slot number for axis array
@@ -142,7 +142,7 @@ c
       integer           im1slot         ! Slot number for above
       character         info*64         ! For dsa_simple_output
       integer           interp          ! 0=piecewise constant, 1=linear
-      character         junk*64         ! Temporary text buffer 
+      character         junk*64         ! Temporary text buffer
       integer           ndim1           ! No. of dims of IMAGE1
       integer           ndim2           !  "   "  "   "  IMAGE2
       integer           nelm1           ! No of elements in IMAGE1
@@ -188,7 +188,7 @@ c
 
 c
 c   Obtain stats for image1
-c    
+c
       call ndp_get_image_info('image1',.true.,.true.,type,badpix,status)
       if (status .ne. 0) go to 999
 
@@ -233,7 +233,7 @@ c
         call dsa_wruser('%STRETCH-E-NODIFF  ')
         call dsa_wruser('Images are dimensioned indentically\\n')
         go to 999
-      end if  
+      end if
 c
 c   Check for quality and error arrays
 c
@@ -325,7 +325,7 @@ c
             call stretch_1d_r(dynamic_mem(eptr),dynamic_mem(oeptr),
      &                        dims(1),odims(1),interp)
           end if
-   
+
         else
 
           call stretch_1d_w(dynamic_mem(im1ptr),dynamic_mem(optr),
@@ -336,7 +336,7 @@ c
           end if
 
         end if
-     
+
         if (qual) then
           call stretch_1d_b(dynamic_mem(qptr),dynamic_mem(oqptr),
      &                      dims(1),odims(1),0)
@@ -352,7 +352,7 @@ c
             call stretch_2d_r(dynamic_mem(eptr),dynamic_mem(oeptr),
      &                        dims(1),dims(2),odims(1),odims(2),interp)
           end if
-   
+
         else
 
           call stretch_2d_w(dynamic_mem(im1ptr),dynamic_mem(optr),
@@ -380,7 +380,7 @@ c
             call stretch_3d_r(dynamic_mem(eptr),dynamic_mem(oeptr),
      &                        dims(1),odims(1),interp)
           end if
-   
+
         else
 
           call stretch_3d_w(dynamic_mem(im1ptr),dynamic_mem(optr),
@@ -394,7 +394,7 @@ c
 
         end if
 
-        if (qual) then 
+        if (qual) then
           call stretch_3d_b(dynamic_mem(qptr),dynamic_mem(oqptr),
      &                      dims(1),dims(2),dims(3),
      &                      odims(1),odims(2),odims(3),0)
@@ -423,7 +423,7 @@ c
           start = gen_elemf(dynamic_mem(axptr),1)
           end = gen_elemf(dynamic_mem(axptr),dims(i))
           call stretch_do_axis(dynamic_mem(oaxptr),start,end,odims(i))
-            
+
           call dsa_unmap(oaxslot,status)
           call dsa_unmap(axslot,status)
         end if
@@ -459,7 +459,7 @@ c
       end do
 *
       return
-      end 
+      end
 
 *******************************************************************************
 
@@ -468,7 +468,7 @@ c
 * Purpose:
 *   Return the fractional part of the argument.
 * Argument:
-*   > x    real   
+*   > x    real
 *******************************************************************************
       real x
 *

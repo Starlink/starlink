@@ -9,7 +9,7 @@ C     the optional keywords BSCALE and BZERO.  This routine
 C     is merely a packaged set of calls to FIT_WLOG, FIT_WINT
 C     and FIT_WREAL, and the user may opt to use these directly
 C     (for example, to force SIMPLE=F, or to explicitly comment
-C     some of the keywords).  If this routine is used, it 
+C     some of the keywords).  If this routine is used, it
 C     should be called directly after FIT_INIT.
 C
 C     Parameters -   (">" input, "<" output)

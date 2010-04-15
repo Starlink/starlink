@@ -33,8 +33,8 @@ C
 C
 C     We define TIO__ENDOFTAPE here. This is a bit messy. The original
 C     VAX-specific TIO routines did not intend anyone to test for specific
-C     status values, and so no TIO error code include file was produced. 
-C     You were supposed to use routines such as TIO_EOF to check for 
+C     status values, and so no TIO error code include file was produced.
+C     You were supposed to use routines such as TIO_EOF to check for
 C     specific conditions. But there was no TIO_EOT test defined, and so
 C     this routine had to make use of the fact that the VAX TIO implementation
 C     returned VMS system status codes, and could include the SSDEF include

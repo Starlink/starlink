@@ -13,7 +13,7 @@
       INCLUDE 'SAE_PAR'
 *    Status :
       INTEGER STATUS             ! Global status
-*    Global variables : 
+*    Global variables :
       INCLUDE 'RED4_COMMON.INC'  ! RED4 common block
       INCLUDE 'RED4_ENG.INC'     ! RED4 (engineering) common block
 *    External references :
@@ -32,7 +32,7 @@
 
 *   If a log file is alread open, close it
       IF ( LOG_OPEN ) CALL FIO_CLOSE( LOG_UNIT, STATUS )
- 
+
 *   Open the file
       CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'APPEND', 'LIST', 132, LOG_UNIT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN

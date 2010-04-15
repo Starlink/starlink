@@ -26,7 +26,7 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
 *
 *  Purpose:
 *     Find a window
-*     
+*
 *  Language:
 *     C
 *
@@ -46,9 +46,9 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
 *        Window id
 *
 *  Algorithm:
-*     The root window of the display is searched for a property with 
-*     the name GWM_<name>. The value of this property is taken to be 
-*     the window id and the window itself is checked for a property 
+*     The root window of the display is searched for a property with
+*     the name GWM_<name>. The value of this property is taken to be
+*     the window id and the window itself is checked for a property
 *     called GWM_name whose value matches the window name.
 *
 *  Copyright:
@@ -60,12 +60,12 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,13 +94,13 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
     unsigned long nitems, bytes_after;
     int (*prev_handler)();
 
-/*	  
+/*
 **  Convert the window name to a property atom and get its value from the
 **  root window
-*/	  
+*/
     prop_name = malloc( strlen((char*)name) + 5 );
     if ( !prop_name ) return GWM_MEM_ALLOC;
-    
+
     (void)strcpy( prop_name, "GWM_");
     (void)strcat( prop_name, (char*)name );
     atom = XInternAtom( display, prop_name, True );
@@ -109,13 +109,13 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
     status = XGetWindowProperty( display, DefaultRootWindow( display ) , atom,
 	0, 32, False, XA_WINDOW, &actual_type, &actual_format, &nitems,
 	&bytes_after, (unsigned char**)(&win_ptr));
-    if ( status || (nitems == 0) ) 
+    if ( status || (nitems == 0) )
     {
 	if (win_ptr != NULL) XFree( win_ptr );
 	return GWM_WIN_NOEXIST;
     }
 
-/*    
+/*
 **  Now check that the window is an GWM window
 **
 **  If the window no longer exists this will generate an X lib error

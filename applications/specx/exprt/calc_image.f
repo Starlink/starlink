@@ -60,7 +60,7 @@
 *  Ok, go...
 
 *     Work out TOTAL radial velocity used when the data were taken.
-*     Assume that as with JCMT the LSR correction is applied to bring 
+*     Assume that as with JCMT the LSR correction is applied to bring
 *     the spectrum centre to the chosen frequency in the source frame.
 
       USE_VELS = (VSL.ne.0.D0 .or. VES.ne.0.D0 .or. VTE.ne.0.D0)
@@ -120,11 +120,11 @@ CD    PRINT *, '   telluric centre freq from vels = ', FCEN_T
 *     Correct the telluric frequency to other sideband
 
       DF = + 2.D3 * (LOFREQ(NQ)-FCEN_T)
-      WRITE (6, 
+      WRITE (6,
      &     '('' Sector '',I2.1,'' : New I.F. = '', F11.6, '' GHz'')',
      &       IOSTAT=IERR) NQ, DF/2.D3
 
-*     Correct back to offset frequency in *source* frame using appropriate 
+*     Correct back to offset frequency in *source* frame using appropriate
 *     velocity scaling law (RADIO, OPTICAL or RELATIVISTIC).
 
       CALL SETXDOPP   (DF, 1, VFRAME, VDEF,

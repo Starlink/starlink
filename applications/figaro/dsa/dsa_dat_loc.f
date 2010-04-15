@@ -40,7 +40,7 @@ C
 C  External variables used: None.
 C
 C  External subroutines / functions used:
-C     DSA_REF_SLOT, DSA_WRUSER, DSA_GET_ACTUAL_NAME, DTA_DWVAR, 
+C     DSA_REF_SLOT, DSA_WRUSER, DSA_GET_ACTUAL_NAME, DTA_DWVAR,
 C     DSA__DATA_NAME, ICH_LEN
 C
 C  Prior requirements:
@@ -87,7 +87,7 @@ C
       INTEGER   IGNORE                      ! Dummy status value
       INTEGER   LENGTH                      ! Length of structure name
       CHARACTER NAME*80                     ! DTA_ name for exposure time
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*80                ! Full name of structure
 C
 C     DSA system error codes

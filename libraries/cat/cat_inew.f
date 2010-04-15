@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -147,7 +147,7 @@
             IF (ORDER .EQ. CAT__ASCND  .OR.  ORDER .EQ. CAT__DSCND) THEN
 
 *
-*             Check that the disposition of the index is 'TEMP' 
+*             Check that the disposition of the index is 'TEMP'
 *             (temporary).  Currently on temporary indices are supported.
 
                IF (DISP .EQ. 'TEMP') THEN
@@ -173,7 +173,7 @@ C    :              1x, 'rows: ', i10 / )
                   CALL CAT1_CRTAR (ROWS, '_INTEGER', SORPTR, STATUS)
 
 *
-*                Create temporary work space required by the sorting 
+*                Create temporary work space required by the sorting
 *                routine.
 
                   CALL CAT1_CRTAR (ROWS, '_INTEGER', NULPTR, STATUS)
@@ -188,9 +188,9 @@ C                 print2000, ci, fi, rows, status
 C2000             format(1x, 'before call to CAT1_GNSRT ' /
 C    :              1x, 'ci, fi, rows, status: ', i5, i5, i5, i20)
 
-                  CALL CAT1_GNSRT (CI, FI, ROWS, ORDER, 
+                  CALL CAT1_GNSRT (CI, FI, ROWS, ORDER,
      :                             %VAL(CNF_PVAL(NULPTR)),
-     :              %VAL(CNF_PVAL(VALPTR)), %VAL(CNF_PVAL(COLPTR)), 
+     :              %VAL(CNF_PVAL(VALPTR)), %VAL(CNF_PVAL(COLPTR)),
      :              %VAL(CNF_PVAL(SEQPTR)),
      :              %VAL(CNF_PVAL(SORPTR)), STATUS)
 
@@ -220,7 +220,7 @@ C    :              1x, 'ci, fi, rows, status: ', i5, i5, i5, i20)
      :                    STATUS)
                         CALL CAT1_ADDAI (II, 'NUMSEL', .FALSE., ROWS,
      :                    STATUS)
-                        CALL CAT1_ADDAC (II, 'COMM', .FALSE., 
+                        CALL CAT1_ADDAC (II, 'COMM', .FALSE.,
      :                    'Temporary index.', STATUS)
                         CALL CAT1_ADDAI (II, 'PTR', .FALSE., SORPTR,
      :                    STATUS)

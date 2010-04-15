@@ -43,7 +43,7 @@
 *       RCHRX           Character up x-vector
 *       RCHRY           Character up y_vector
 *       RCHRL           Character up vector length
- 
+
 *
 *  Offsets in KWKDAT workspace
 *
@@ -67,7 +67,7 @@
 *     Pen position is unknown after text output.
 *
 * --------------------------------------------------------------------
- 
+
       RCHH=FLOAT(KWKDAT(CHARHI,KWKIX))
       RCHW=FLOAT(KWKDAT(CHARWI,KWKIX))
       RCENX=RCHW/2.0

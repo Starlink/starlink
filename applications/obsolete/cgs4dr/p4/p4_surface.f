@@ -25,12 +25,12 @@
       INCLUDE 'COLOURS.INC'                   ! Colours common block
 *    Local Constants :
       INTEGER MAXDIM                          ! max number of dimensions
-      PARAMETER ( MAXDIM = 3 )            
+      PARAMETER ( MAXDIM = 3 )
 *    Local variables :
       CHARACTER*12 COLOUR
       LOGICAL SAME_UNITS                      ! T if axis units are the same
       LOGICAL ERRORS                          ! T if want to plot errors
-      LOGICAL QUALITY                         ! T if want to plot quality 
+      LOGICAL QUALITY                         ! T if want to plot quality
       INTEGER SLEN                            ! Length of string
       INTEGER TLEN                            ! Length of string
       INTEGER XLEN                            ! Length of string
@@ -87,7 +87,7 @@
 
 *    Map the data
       IF ( DISPLAY_PLANE( PORT ) .EQ. 'DATA' ) THEN
-         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT', 
+         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT',
      :      DATA_PTR, DATA_SLOT, STATUS )
 
 *    Or map the errors
@@ -117,7 +117,7 @@
 
 *    Map the quality
       IF ( QUALITY ) THEN
-         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE', 
+         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE',
      :      QUAL_PTR, QUAL_SLOT, STATUS )
       ELSE
          QUAL_PTR = 0
@@ -125,7 +125,7 @@
 
 *    Map the errors
       IF ( ERRORS ) THEN
-         CALL DSA_MAP_ERRORS( 'DATA', 'READ', 'FLOAT', 
+         CALL DSA_MAP_ERRORS( 'DATA', 'READ', 'FLOAT',
      :      E_PTR, E_SLOT, STATUS )
       ELSE
          E_PTR = 0
@@ -137,10 +137,10 @@
 *    Get the maximum, minimum, mean and sigma (resetting the X/YSTEP)
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL P4_GET_STATS( DIMS(1), DIMS(2), %val(DATA_PTR),
-     :     QUALITY, %val(QUAL_PTR), PLOT_WHOLE( PORT ), ISTART( PORT ), 
-     :     IEND( PORT ), 1, JSTART( PORT ), JEND( PORT ), 1, 
-     :     AUTOSCALE( PORT ), HIGH( PORT ), LOW( PORT ), MEAN( PORT ), 
-     :     SIGMA( PORT ), STATUS ) 
+     :     QUALITY, %val(QUAL_PTR), PLOT_WHOLE( PORT ), ISTART( PORT ),
+     :     IEND( PORT ), 1, JSTART( PORT ), JEND( PORT ), 1,
+     :     AUTOSCALE( PORT ), HIGH( PORT ), LOW( PORT ), MEAN( PORT ),
+     :     SIGMA( PORT ), STATUS )
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'P4_SURFACE: '/
@@ -175,7 +175,7 @@
       ENDIF
 
 *    Save the viewport limits
-      AXSTART( PORT ) = VXSTART( PORT ) 
+      AXSTART( PORT ) = VXSTART( PORT )
       AXEND( PORT)    = VXEND( PORT )
       AYSTART( PORT ) = VYSTART( PORT )
       AYEND( PORT )   = VYEND( PORT )
@@ -183,7 +183,7 @@
 *    Setup the window
       YSTART( PORT ) = (HIGH(PORT)+LOW(PORT))*0.5 - (HIGH(PORT)-LOW(PORT))*1.5
       YEND( PORT )   = (HIGH(PORT)+LOW(PORT))*0.5 + (HIGH(PORT)-LOW(PORT))*1.5
-      CALL PGWINDOW( XSTART( PORT ), XEND( PORT ), 
+      CALL PGWINDOW( XSTART( PORT ), XEND( PORT ),
      :   YSTART( PORT ), YEND( PORT ) )
 
 *    Calculate offset between lines
@@ -217,14 +217,14 @@
 
 *       Plot the line, using errors and quality if present
 *       NO xshift at prsent, though this would be easy to add
-         CALL P4_LINE( DIMS( 1 ), ISTART( PORT ), IEND( PORT ), 
+         CALL P4_LINE( DIMS( 1 ), ISTART( PORT ), IEND( PORT ),
      :      %val( AXIS1_PTR ), %val( DS_PTR ), %val( ES_PTR ),
      :      %val( QS_PTR ), ERRORS, QUALITY, 0.0, YSHIFT, STATUS )
 
 *       Decrement YSHIFT and adjust colour value
          YSHIFT = YSHIFT - YINCREMENT
          CVAL = CVAL + 1
-         IF ( CVAL .GT. 15 ) CVAL = 2                      
+         IF ( CVAL .GT. 15 ) CVAL = 2
       ENDDO
 
 *    Restore colour
@@ -251,7 +251,7 @@
          CPOS = CHR_LEN( RH1LABEL(PORT) )
          CALL PGMTEXT( 'R', 2.2, 0.5, 0.5, RH1LABEL(PORT)(1:SLEN) )
       ENDIF
-                                                    
+
 *    If OK, then set C_PLOT_OK to say that there is a valid plot in this port
       IF ( STATUS .EQ. SAI__OK ) THEN
          PLOT_OK( PORT ) = .TRUE.

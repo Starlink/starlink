@@ -13,11 +13,11 @@
 *     errBegin( int * status );
 
 *  Description:
-*     Begin a new error reporting environment by marking a new error 
+*     Begin a new error reporting environment by marking a new error
 *     reporting context and then resetting the status argument to SAI__OK.
-*     If errBegin is called with the status argument set to an error 
-*     value, a check is made to determine if there are any messages 
-*     pending output in the current context: if there are none, an 
+*     If errBegin is called with the status argument set to an error
+*     value, a check is made to determine if there are any messages
+*     pending output in the current context: if there are none, an
 *     error report to this effect is made on behalf of the calling
 *     application.
 
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

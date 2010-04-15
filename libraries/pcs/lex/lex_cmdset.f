@@ -214,7 +214,7 @@
       CALL LEX_SET(25,TABLE,LIT,'"','"',QUOTE,0,F,F,F,F,' ',S)
 
 *  QUOTE state - if another ' is seen output a single quote and
-*                return to LIT state. On any other character 
+*                return to LIT state. On any other character
 *                backspace and set STRING action
 
       CALL LEX_SET(25,TABLE,QUOTE,C0,C127,0,LEX__STRING,T,F,F,F,' ',S)
@@ -324,7 +324,7 @@
      : S)
       CALL LEX_SET(25,TABLE,ABRACKET,')',')',AMBIG,0,F,T,F,F,' ',S)
       CALL LEX_SET(25,TABLE,ABRACKET,' ',' ',0,LEX__AMBIG,F,F,F,F,' ',S)
-      CALL LEX_SET(25,TABLE,ABRACKET,C9,C9,0,LEX__AMBIG,F,F,F,F,' ',S)  
+      CALL LEX_SET(25,TABLE,ABRACKET,C9,C9,0,LEX__AMBIG,F,F,F,F,' ',S)
 
 *  ARRAY state - first array component expected
 
@@ -361,8 +361,8 @@
       CALL LEX_SET(25,TABLE,KBRACKET,C0,C127,KBRACKET,0,F,T,F,F,' ',
      : S)
       CALL LEX_SET(25,TABLE,KBRACKET,')',')',KAMBIG,0,F,T,F,F,' ',S)
-      CALL LEX_SET(25,TABLE,KBRACKET,' ',' ',KEND,0,F,F,F,F,' ',S)  
-      CALL LEX_SET(25,TABLE,KBRACKET,C9,C9,KEND,0,F,F,F,F,' ',S)  
+      CALL LEX_SET(25,TABLE,KBRACKET,' ',' ',KEND,0,F,F,F,F,' ',S)
+      CALL LEX_SET(25,TABLE,KBRACKET,C9,C9,KEND,0,F,F,F,F,' ',S)
 
 *  KEND state - end of KAMBIG due to space or tab, look for an equals sign
 *               in which case it is a keyword

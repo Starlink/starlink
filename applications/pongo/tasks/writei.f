@@ -2,23 +2,23 @@
 *+
 *  Name:
 *     WRITEI
- 
+
 *  Purpose:
 *     Write information to an output file.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Description:
 *     Write specified information concerning the current data-set to an
 *     output file.
 
 *  Usage:
-*     writei action file 
- 
+*     writei action file
+
 *  ADAM Parameters:
 *     ACTION = _CHAR (Read and Write)
 *        The type of information to be written. This may be one of the
@@ -72,17 +72,17 @@
 *     EY = _LOGICAL (Read and Write)
 *        If TRUE, the EYCOL data area will be output.
 *        [FALSE]
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     10-APR-1990 (JBVAD::PAH):
 *        Original version.
@@ -95,30 +95,30 @@
 *     23-FEB-1995 (PDRAPER):
 *        Changed to write variable formats on OSF/1.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
       INCLUDE 'AGI_PAR'          ! AGI global constants
- 
+
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! PONGO global data
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Constants:
       INTEGER NCMDS              ! Number of actions
       PARAMETER ( NCMDS = 3 )
- 
+
 *  External References:
       EXTERNAL INTCMD
       INTEGER INTCMD             ! Converts string into representative
@@ -137,14 +137,14 @@
       CHARACTER * ( 40 ) COMHED
       CHARACTER * ( 30 ) FMT
       CHARACTER * ( 132 ) OUTBUF ! Output buffer
-  
+
       LOGICAL EXW
       LOGICAL EYW
       LOGICAL XW
       LOGICAL YW
       LOGICAL ZW
       LOGICAL OPEN               ! Output file is open
-      
+
       INTEGER BASEID             ! AGI base picture ID
       INTEGER I                  ! Counter
       INTEGER ICMD               ! Command number
@@ -152,13 +152,13 @@
       INTEGER FD                 ! File descriptor
       INTEGER LITEM
       INTEGER PICID              ! AGI picture ID
- 
-      
+
+
 *  Local Data:
       DATA COMMANDS /'LABLST', 'DATA', 'AGIPIC', ' ' /
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -179,7 +179,7 @@
          CALL ERR_REP( 'WRITEI_NOCMD', 'Action not recognised.',
      :                 STATUS )
       ELSE IF ( ICMD .EQ. 2 ) THEN
- 
+
 *     Write the data out.
          CALL PON_ASFIO( 'FILE', 'WRITE', 'LIST', 132, FD, OPEN,
      :                   STATUS )
@@ -225,11 +225,11 @@
             CALL PAR_CANCL( 'FILE', STATUS )
          END IF
       ELSE IF ( ICMD.EQ.3 ) THEN
- 
+
 *  Save the current AGI picture in the database. Note that there is no
 *  checking on the user giving sensible values here - this is done in
 *  the interface file.
-         IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
+         IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
             CALL PAR_GET0C( 'AGINAME', AGINAM, STATUS )
             CALL PAR_GET0C( 'AGICOMMENT', COMMENT, STATUS )
             CALL PAR_GET0C( 'AGILABEL', AGILAB, STATUS )
@@ -243,7 +243,7 @@
             CALL AGI_END( -1, STATUS )
          END IF
       ELSE
- 
+
 *     Write the 'labels' out.
          CALL PON_ASFIO( 'FILE', 'WRITE', 'LIST', 0, FD, OPEN, STATUS )
 
@@ -252,7 +252,7 @@
          DO 100 I = 1, ILABPTR
 
             IF ( LABLST( I )( 1 : 1 ) .EQ. 'L' ) THEN
-               WRITE( OUTBUF, 
+               WRITE( OUTBUF,
      :            '( X, ''PTEXT'', X, 2( E16.9, X ), F7.2, X, ' //
      :            'F4.2, '' ~'' )' ) XLABAN( I ), YLABAN( I ),
      :            LABANG( I ), LABJUST( I )
@@ -279,7 +279,7 @@
      :                         STATUS )
             END IF
  100     CONTINUE
-      
+
 *        CALL FIO_WRITE( FD, 'END PROC', STATUS )
 
          IF ( OPEN ) THEN
@@ -288,7 +288,7 @@
          END IF
       END IF
 
-*  Abort. 
+*  Abort.
  200  CONTINUE
 
 *  Check the returned Fortran I/O status and act.
@@ -297,11 +297,11 @@
          CALL ERR_FIOER( 'IOERR', IOERR )
          CALL ERR_REP( 'WRITEI_FORT', 'Fortran error: ^IOERR', STATUS )
          CALL FIO_CANCL( 'FILE', STATUS )
-      END IF 
+      END IF
 
 *  Check the returned status and report a contextual error message if
 *  necessary.
-      IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'WRITEI_END', 
+      IF ( STATUS .NE. SAI__OK ) CALL ERR_REP( 'WRITEI_END',
      :                              'WRITEI: Unable to write ' //
      :                              'information to the output file.',
      :                              STATUS )

@@ -1,5 +1,5 @@
 
-*+  MFNEXT - gets next image and offsets in sequence for mosaic from file 
+*+  MFNEXT - gets next image and offsets in sequence for mosaic from file
 
       SUBROUTINE MFNEXT ( LUN, PARAM, LOC, OFFSET, STATUS )
 
@@ -79,8 +79,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'    
-      INCLUDE  'NDF_ERR' 
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Import :
 
@@ -88,7 +88,7 @@
      :    LOC,                    ! locator to image structure
      :    LUN                     ! unit number associated with open file
 
-      CHARACTER*80     
+      CHARACTER*80
      :    PARAM                   ! parameter to be associated with image
 
 *    Export :
@@ -133,7 +133,7 @@
       CALL NDF_EXIST( 'CURPIC', 'READ', LOC, STATUS )
 
 *    check for error on return
-      IF ( (LOC .EQ. NDF__NOID) .OR. 
+      IF ( (LOC .EQ. NDF__NOID) .OR.
      :      (STATUS .NE. SAI__OK) ) GOTO 999
 
 *    return

@@ -11,20 +11,20 @@ c     astNormMap
 f     AST_NORMMAP
 
 *  Description:
-*     The NormMap class implements a Mapping which normalises coordinate 
-*     values using the 
+*     The NormMap class implements a Mapping which normalises coordinate
+*     values using the
 c     astNorm function
 f     AST_NORM routine
 *     of a supplied Frame. The number of inputs and outputs of a NormMap
 *     are both equal to the number of axes in the supplied Frame.
 *
 *     The forward and inverse transformation of a NormMap are both
-*     defined but are identical (that is, they do not form a real inverse 
+*     defined but are identical (that is, they do not form a real inverse
 *     pair in that the inverse transformation does not undo the
-*     normalisation, instead it reapplies it). However, the 
+*     normalisation, instead it reapplies it). However, the
 c     astSimplify
 f     AST_SIMPLIFY
-*     function will replace neighbouring pairs of forward and inverse 
+*     function will replace neighbouring pairs of forward and inverse
 *     NormMaps by a single UnitMap.
 
 *  Inheritance:
@@ -48,12 +48,12 @@ f     The NormMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -122,9 +122,9 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(NormMap)
@@ -187,7 +187,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "normmap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     NormMap member function (over-rides the astEqual protected
@@ -214,8 +214,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstNormMap *that;        
-   AstNormMap *this;        
+   AstNormMap *that;
+   AstNormMap *this;
    int result;
 
 /* Initialise. */
@@ -242,7 +242,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -280,7 +280,7 @@ void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -353,7 +353,7 @@ void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name, int *status )
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -367,8 +367,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     NormMap member function (over-rides the astManageLock protected
@@ -376,7 +376,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -395,21 +395,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -583,13 +583,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstFrame *frm1;
    AstFrame *frm2;
    AstMapping *smap;
-   AstNormMap *map;  
-   AstNormMap *nmap1;  
-   AstNormMap *nmap2;  
+   AstNormMap *map;
+   AstNormMap *nmap1;
+   AstNormMap *nmap2;
    int cancel;
-   int map_inv;      
-   int nax;           
-   int result;       
+   int map_inv;
+   int nax;
+   int result;
 
 /* Initialise. */
    result = -1;
@@ -617,7 +617,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       (void) astAnnul( ( *map_list )[ where ] );
       ( *map_list )[ where ] = (AstMapping *) astNormMap( (AstFrame *) smap, "", status );
       result = where;
-    
+
 /* The only other simplication which can be performed is to cancel a NormMap
    with its own inverse in series. */
    } else if( series ) {
@@ -631,7 +631,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Check the Invert flags are opposite */
          if( ( *invert_list )[ where ] != ( *invert_list )[ where - 1 ] ) {
             nmap1 = map;
-            nmap2 = (AstNormMap *) ( *map_list )[ where - 1 ];             
+            nmap2 = (AstNormMap *) ( *map_list )[ where - 1 ];
 
 /* Check the encapsulated Frames are equal. */
             frm1 = nmap1->frame;
@@ -642,7 +642,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
 
 /* Likewise consider the upper neighbour. */
-      if( cancel == -1 && where + 1 < *nmap && 
+      if( cancel == -1 && where + 1 < *nmap &&
           astIsANormMap( ( *map_list )[ where + 1 ] ) ) {
 
          if( ( *invert_list )[ where ] != ( *invert_list )[ where + 1 ] ) {
@@ -701,7 +701,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 *     inherited from the Mapping class).
 
 *  Description:
-*     This function creates a new Mapping by picking specified inputs from 
+*     This function creates a new Mapping by picking specified inputs from
 *     an existing NormMap. This is only possible if the specified inputs
 *     correspond to some subset of the NormMap outputs. That is, there
 *     must exist a subset of the NormMap outputs for which each output
@@ -711,27 +711,27 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 
 *  Parameters:
 *     this
-*        Pointer to the NormMap to be split (the NormMap is not actually 
+*        Pointer to the NormMap to be split (the NormMap is not actually
 *        modified by this function).
 *     nin
 *        The number of inputs to pick from "this".
 *     in
 *        Pointer to an array of indices (zero based) for the inputs which
 *        are to be picked. This array should have "nin" elements. If "Nin"
-*        is the number of inputs of the supplied NormMap, then each element 
+*        is the number of inputs of the supplied NormMap, then each element
 *        should have a value in the range zero to Nin-1.
 *     map
 *        Address of a location at which to return a pointer to the new
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be different to "nin"). A NULL pointer will be
-*        returned if the supplied NormMap has no subset of outputs which 
+*        returned if the supplied NormMap has no subset of outputs which
 *        depend only on the selected inputs.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
-*     elements in this array will equal the number of outputs for the 
+*     elements in this array will equal the number of outputs for the
 *     returned Mapping. Each element will hold the index of the
 *     corresponding output in the supplied NormMap. The array should be
 *     freed using astFree when no longer needed. A NULL pointer will
@@ -770,7 +770,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 /* Create a new NormMap from this. */
       *map = (AstMapping *) astNormMap( frm2, "", status );
 
-/* The returned list of output axes is a copy the supplied list of input 
+/* The returned list of output axes is a copy the supplied list of input
    axes. */
       result = astStore( NULL, in, sizeof( int )*(size_t) nin );
 
@@ -808,31 +808,31 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 *     from the Mapping class ).
 
 *  Description:
-*     This function returns the rate of change of a specified output of 
-*     the supplied Mapping with respect to a specified input, at a 
-*     specified input position. 
+*     This function returns the rate of change of a specified output of
+*     the supplied Mapping with respect to a specified input, at a
+*     specified input position.
 
 *  Parameters:
 *     this
 *        Pointer to the Mapping to be applied.
 *     at
-*        The address of an array holding the axis values at the position 
-*        at which the rate of change is to be evaluated. The number of 
-*        elements in this array should equal the number of inputs to the 
+*        The address of an array holding the axis values at the position
+*        at which the rate of change is to be evaluated. The number of
+*        elements in this array should equal the number of inputs to the
 *        Mapping.
 *     ax1
-*        The index of the Mapping output for which the rate of change is to 
+*        The index of the Mapping output for which the rate of change is to
 *        be found (output numbering starts at 0 for the first output).
 *     ax2
 *        The index of the Mapping input which is to be varied in order to
-*        find the rate of change (input numbering starts at 0 for the first 
+*        find the rate of change (input numbering starts at 0 for the first
 *        input).
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The rate of change of Mapping output "ax1" with respect to input 
-*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     The rate of change of Mapping output "ax1" with respect to input
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be
 *     calculated.
 
 */
@@ -860,12 +860,12 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
 *     from the Mapping class).
 
 *  Description:
-*     This function searches the supplied Mapping (which may be a 
-*     compound Mapping such as a CmpMap) for any component Mappings 
+*     This function searches the supplied Mapping (which may be a
+*     compound Mapping such as a CmpMap) for any component Mappings
 *     that are instances of the AST Region class. It then creates a new
 *     Mapping from which all Regions have been removed. If a Region
 *     cannot simply be removed (for instance, if it is a component of a
-*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap
 *     in the returned Mapping.
 *
 *     The implementation provided by the NormMap class invokes the
@@ -910,8 +910,8 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
    if( this->frame == newfrm ) {
       result = astClone( this );
 
-/* Otherwise, we need to create a new NormMap to return. We take a deep 
-   copy of the supplied NormMap and then modify the Frame so that we 
+/* Otherwise, we need to create a new NormMap to return. We take a deep
+   copy of the supplied NormMap and then modify the Frame so that we
    retain any extra information in the supplied NormMap. */
    } else {
       new = astCopy( this );
@@ -1016,7 +1016,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    values. */
    ncoord_in = astGetNcoord( in );
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
    work = astMalloc( sizeof( double )* ncoord_in );
 
@@ -1079,7 +1079,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 *     void
 
 *  Notes:
-*     -  This constructor makes a deep copy, including a copy of the 
+*     -  This constructor makes a deep copy, including a copy of the
 *     Frame within the NormMap.
 */
 
@@ -1178,9 +1178,9 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    NormMap class.  Accompany these with appropriate comment strings,
    possibly depending on the values being written.*/
 
-/* Frame. */ 
+/* Frame. */
 /* ------ */
-   astWriteObject( channel, "Frame", 1, 1, this->frame, 
+   astWriteObject( channel, "Frame", 1, 1, this->frame,
                    "Frame defining the normalisation" );
 }
 
@@ -1216,26 +1216,26 @@ f     RESULT = AST_NORMMAP( FRAME, OPTIONS, STATUS )
 *     This function creates a new NormMap and optionally initialises its
 *     attributes.
 *
-*     A NormMap is a Mapping which normalises coordinate values using the 
+*     A NormMap is a Mapping which normalises coordinate values using the
 c     astNorm function
 f     AST_NORM routine
 *     of the supplied Frame. The number of inputs and outputs of a NormMap
 *     are both equal to the number of axes in the supplied Frame.
 *
 *     The forward and inverse transformation of a NormMap are both
-*     defined but are identical (that is, they do not form a real inverse 
+*     defined but are identical (that is, they do not form a real inverse
 *     pair in that the inverse transformation does not undo the
-*     normalisation, instead it reapplies it). However, the 
+*     normalisation, instead it reapplies it). However, the
 c     astSimplify
 f     AST_SIMPLIFY
-*     function will replace neighbouring pairs of forward and inverse 
+*     function will replace neighbouring pairs of forward and inverse
 *     NormMaps by a single UnitMap.
 
 *  Parameters:
 c     frame
 f     FRAME = INTEGER (Given)
 *        A pointer to the Frame which is to be used to normalise the
-*        supplied axis values. 
+*        supplied axis values.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional

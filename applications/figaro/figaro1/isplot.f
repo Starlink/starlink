@@ -16,7 +16,7 @@ C     but SPLOT does not attempt to spool it off for printing.
 C
 C     Command parameters -
 C
-C     IMAGE       The data to be plotted.  This should have a 
+C     IMAGE       The data to be plotted.  This should have a
 C               two dimensional data structure. If there
 C                 is an x-axis component this will be used to
 C                 give the x-axis.  If not, the x-axis will just
@@ -35,14 +35,14 @@ C     OFFSET      A bias to be added to each successive cross-section
 C                 to offset it from the previous one.  Normally, this
 C                 will be allowed to default, unless it is explicitly
 C                 specified in the command line.
-C     LABEL       A label for the plot.  
+C     LABEL       A label for the plot.
 C     COLOUR      The colour for the plot (only meaningful for the
 C                 Grinnell - later may be extended to map onto
 C                 different line types).  The axes are always white.
-C    
+C
 C     Command keywords -
 C
-C     AUTOSCALE   The program is to work out the values for HIGH 
+C     AUTOSCALE   The program is to work out the values for HIGH
 C                 and LOW, using the maximum and minimum values
 C                 in the data over the specified range.
 C     WHOLE       The program is to plot the whole of each cross-section
@@ -59,7 +59,7 @@ C     (>) SOFT    Specifies the device and type to be used for soft
 C                 plots.  See the SOFT command for more details.
 C     (>) HARD    Specifies the device and type to be used for hard
 C                 plots.  See the HARD command for more details.
-C     (<) TVDIM   is set to 1 if a single spectrum is plotted, to 
+C     (<) TVDIM   is set to 1 if a single spectrum is plotted, to
 C                 2 otherwise.
 C     (<) TVYST   is set to the starting y-value for the plot.
 C     (<) TVYEN   is set to the final y-value for the plot.
@@ -141,7 +141,7 @@ C
       REAL      HIGHD            !
       INTEGER   INVOKE           ! Used to invoke functions
       INTEGER   INCY             ! +1 for normal plots, -1 for reverse
-      INTEGER   IPTR             ! 
+      INTEGER   IPTR             !
       LOGICAL   ISNEW            ! Is address new to CNF?
       INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
@@ -156,15 +156,15 @@ C
       REAL      LOW              ! Minimum Y-value for a plot
       REAL      MAGNITUDE        !
       INTEGER   MSPEC            !
-      INTEGER   NDD              ! Dimensionality of input data 
+      INTEGER   NDD              ! Dimensionality of input data
                                  ! structure
       INTEGER   NDELM            ! Total number of elements in the data
-      INTEGER   ND1              ! Total number of elements per 
+      INTEGER   ND1              ! Total number of elements per
                                  ! x-section
       INTEGER   ND2              ! Total number of cross-sections
       INTEGER   NEXT             ! ICH_KEY arguement - ignored
       INTEGER   NSPECT           ! Number of x-sections to be plotted
-      REAL      OFFSET           ! 
+      REAL      OFFSET           !
       LOGICAL   PISNEW           ! Previous CNF pointer to data new?
       REAL      RESET            !
       LOGICAL   REVERS           ! TRUE if REVERSE is specified
@@ -272,8 +272,8 @@ C       HIGH is then calculated on the basis of the following relation:
 C       if m is the cross-section number containing the data that will
 C       reach the highest in the plot, and Y is the maximum value in
 C       that cross-section, then OFFSET=(HIGH-LOW)/(IYEN-IYST+1) and
-C       HIGH = OFFSET*(M-1)+Y-LOW, which can be solved for HIGH for 
-C       each cross-section in turn, and the highest resulting value is 
+C       HIGH = OFFSET*(M-1)+Y-LOW, which can be solved for HIGH for
+C       each cross-section in turn, and the highest resulting value is
 C       used.
 C
 C     Clear up previous CNF pointer if new.
@@ -337,7 +337,7 @@ C
       CALL PAR_RDKEY('AXES',.TRUE.,AXES)
       CALL PAR_RDKEY('ERASE',.TRUE.,ERASE)
 C
-C     Get the label for the plot - 
+C     Get the label for the plot -
 C
       CALL PAR_RDCHAR('LABEL',' ',LABEL)
 C
@@ -362,7 +362,7 @@ C
          CKEY=1
       END IF
 C
-C     Check for 'HARD' 
+C     Check for 'HARD'
 C
       HARD=.FALSE.
       CALL PAR_RDKEY('HARDCOPY',.FALSE.,HARD)
@@ -474,7 +474,7 @@ C     (>) CKEY     (Integer) The GRPCKG code (0..7) for the colour
 C                  of the plot.
 C     (!) XVST     (Real) The actual x-start value for the plot.
 C     (!) XVEN     (Real) The actual x-end value for the plot.
-C                  Note: XVST and XVEN are modified if SLANT is 
+C                  Note: XVST and XVEN are modified if SLANT is
 C                  set, in order to accomodate the extra space needed.
 C     (W) WORK     (Real array WORK(IXEN-IXST+1)) Workspace.
 C     (<) STATUS   (Integer) Returns plot status.
@@ -502,7 +502,7 @@ C     17th Sep 1993  HME / UoE, Starlink.  Correct call to PGHI2D.
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL AXES,ERASE
       INTEGER IY1,IY2,IXST,IXEN,NX,NY,SLANT,STATUS,CKEY
@@ -524,7 +524,7 @@ C
       INTEGER WHITE
       PARAMETER (WHITE=1)
 C
-C     Ordinary plot.  Open plot. 
+C     Ordinary plot.  Open plot.
 C
       IF (ERASE) THEN
          STATUS=PGBEGIN(0,DEVICE,1,1)

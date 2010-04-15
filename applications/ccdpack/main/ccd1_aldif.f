@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -115,7 +115,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initial output array counter and maximum and minimum differencences.
-      N = 0 
+      N = 0
       DIFMAX = VAL__MIND
       DIFMIN = VAL__MAXD
 

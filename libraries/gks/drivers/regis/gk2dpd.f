@@ -60,13 +60,13 @@
       DO 100 NSIGS=LEN(ST),1,-1
         IF( ST(NSIGS:NSIGS).NE.' ' ) GOTO 105
   100 CONTINUE
- 
+
 *   Here, all characters are spaces
       NSIGS=0
- 
+
 *   Here, NSIGS has been set
   105 CONTINUE
- 
+
 *
 *  Simulate a text window by setting the text cursor to ILEFT,ITOP
 *  and setting the terminal into NOWRAP mode

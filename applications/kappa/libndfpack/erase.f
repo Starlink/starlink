@@ -52,13 +52,13 @@
 *        $AGI_USER/agi_restar.sdf.
 
 *  Related Applications:
-*     Figaro: CREOBJ, DELOBJ, RENOBJ; HDSTOOLS: HCREATE, HDELETE, 
+*     Figaro: CREOBJ, DELOBJ, RENOBJ; HDSTOOLS: HCREATE, HDELETE,
 *     HRENAME.
 
 *  Copyright:
 *     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research 
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
 *        Council.
 *     All Rights Reserved.
 
@@ -95,13 +95,13 @@
 *        Sorted the variable declarations.
 *     2006 July 14 (MJC):
 *        Cancel the OBJECT parameter to prevent the locator count from
-*        incrementing.  Test for DAT__OBJNF as DAT_EXIST returns this 
+*        incrementing.  Test for DAT__OBJNF as DAT_EXIST returns this
 *        instead of the documented PAR__ERROR should the object not
-*        exist.  Added HDSTOOLS to Related Applications.  
+*        exist.  Added HDSTOOLS to Related Applications.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -215,12 +215,12 @@
          END IF
       END IF
 
-*  DAT_EXIST creates a parameter object named the same as the component 
-*  and when the monolith checks for open locators it doesn't know to 
+*  DAT_EXIST creates a parameter object named the same as the component
+*  and when the monolith checks for open locators it doesn't know to
 *  filter this locator.  Hence cancel the parameter before this check
 *  happens.
       CALL DAT_CANCL( 'OBJECT', STATUS )
-      
+
 *  Close the error context.
       CALL ERR_RLSE
 

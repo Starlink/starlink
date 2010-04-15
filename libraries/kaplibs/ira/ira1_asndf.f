@@ -13,16 +13,16 @@
 *     CALL IRA1_ASNDF( INDF, LOC, STATUS )
 
 *  Description:
-*     This routine returns an HDS locator to an empty astrometry 
-*     structure (AS) stored in a given NDF. The AS is stored in an NDF 
-*     extension (identified by global variable ACM_XNAME) which must 
-*     already exist. An error is returned if the extension does not 
-*     exist. The name of the AS itself is held in global variable 
-*     ACM_ASNAME. Both extension name and AS name can be set up by 
-*     calling IRA_LOCAT. The default values (set up by IRA_INIT) are 
+*     This routine returns an HDS locator to an empty astrometry
+*     structure (AS) stored in a given NDF. The AS is stored in an NDF
+*     extension (identified by global variable ACM_XNAME) which must
+*     already exist. An error is returned if the extension does not
+*     exist. The name of the AS itself is held in global variable
+*     ACM_ASNAME. Both extension name and AS name can be set up by
+*     calling IRA_LOCAT. The default values (set up by IRA_INIT) are
 *     an extension name of "IRAS", and an AS name of "ASTROMETRY".
 *
-*     If the NDF already contains an astrometry structure (at any 
+*     If the NDF already contains an astrometry structure (at any
 *     location) it is deleted before creating the new one.
 
 *  Arguments:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,7 +112,7 @@
          CALL DAT_ANNUL( XLOC, STATUS )
       END IF
 
-*  See if the NDF extension specified by IRA_LOCAT exists. If not, 
+*  See if the NDF extension specified by IRA_LOCAT exists. If not,
 *  report an error.
       CALL NDF_XSTAT( INDF, ACM_XNAME, EXISTS, STATUS )
       IF( .NOT. EXISTS .AND. STATUS .EQ. SAI__OK ) THEN
@@ -123,7 +123,7 @@
          GO TO 999
       END IF
 
-*  If it does, get a locator to the NDF extension. 
+*  If it does, get a locator to the NDF extension.
       CALL NDF_XLOC( INDF, ACM_XNAME, 'UPDATE', XLOC, STATUS )
 
 *  See if the extension is a structure. If not, report an error.

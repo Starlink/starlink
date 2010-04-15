@@ -25,7 +25,7 @@
 *     end if
 *     Attempt to output the line.
 *     Increment the line number.
-*     If titles are being generated and the line number is greater than 
+*     If titles are being generated and the line number is greater than
 *     the number of lines per page then
 *       Reset the line number.
 *     end if
@@ -73,8 +73,8 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
 *
-*       If titles are being generated and the line count is zero then 
-*       throw a page: Increment the page number, output the title and reset 
+*       If titles are being generated and the line count is zero then
+*       throw a page: Increment the page number, output the title and reset
 *       the line number to the number of lines in the title.
 *
 *       Note that ASCII character 12 is a form feed.  embedding a form
@@ -148,7 +148,7 @@
          FLNCT__SGZ = FLNCT__SGZ + 1
 
 *
-*       If titles are being generated and more than a pageful of lines 
+*       If titles are being generated and more than a pageful of lines
 *       have been output then reset the line number.
 
          IF (FTABL__SGZ  .EQ.  SGZ__FFULL  .AND.

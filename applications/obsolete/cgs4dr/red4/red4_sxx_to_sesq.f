@@ -1,5 +1,5 @@
 *+  RED4_SXX_TO_SESQ - Convert meanX, sumX**2 and N into standard error squared
-      SUBROUTINE RED4_SXX_TO_SESQ( XMEAN, SXX, NELM, NADDS, SESQ, 
+      SUBROUTINE RED4_SXX_TO_SESQ( XMEAN, SXX, NELM, NADDS, SESQ,
      :   STATUS )
 *    Description :
 *     This routine calculates the "standard error squared" for each
@@ -24,7 +24,7 @@
 *     SESQ( NELM )   = REAL( WRITE )
 *           The "standard error squared" for the data.
 *    Method :
-*     The algorithm used is described by P.R.Bevington, 1969. "Data 
+*     The algorithm used is described by P.R.Bevington, 1969. "Data
 *     Reduction and Error Analysis for the Physical Sciences", p.19.
 *     The variance is divided by NADDS to obtain standard error squared.
 *    Deficiencies :
@@ -107,7 +107,7 @@
          END DO
       ELSE
 
-*      The number of coadds is less that 1. Return a zero standard 
+*      The number of coadds is less that 1. Return a zero standard
 *      error squared array.
          DO I = 1, NELM
 

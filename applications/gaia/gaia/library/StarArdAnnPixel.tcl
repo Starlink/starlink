@@ -119,7 +119,7 @@ itcl::class gaia::StarArdAnnPixel {
 
    #  Create the annulus.
    private method create_annulus_ {args} {
-      if { $show_annulus } { 
+      if { $show_annulus } {
          set annulus_id_ [eval $canvas create rectangle $coords \
                              -outline $deselected_colour]
          redraw_annulus_

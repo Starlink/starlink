@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
 *     22-JAN-1998 (DSB):
 *        Supplied message is now expanded before being assigned to an MSG
 *        token. This allows the supplied message to contain references to
-*        other (pre-defined) message tokens. 
+*        other (pre-defined) message tokens.
 *     1-FEB-2000 (DSB):
 *        Enclose MSG_LOAD call in a new error reporting environment.
 *     11-SEP-2000 (DSB):
@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
 
 *  Do not check the inherited global status.
 
-*  Get the expanded message first so that substitutions occur for any 
+*  Get the expanded message first so that substitutions occur for any
 *  embedded message tokens.
       CALL MSG_LOAD( ' ', MESSGE, OPSTR, OPLEN, STATUS )
 
@@ -195,6 +195,6 @@
          END IF
 
       END IF
-      
+
   999 CONTINUE
       END

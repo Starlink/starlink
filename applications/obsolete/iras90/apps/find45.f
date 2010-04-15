@@ -8,7 +8,7 @@
 *     To display a report comparing the area required for a source with
 *     that available on the plate containing the source reference
 *     position. This is used to report possible off edge sources to the
-*     user. 
+*     user.
 
 *  Language:
 *     Starlink Fortran 77
@@ -27,7 +27,7 @@
 *     opportunity of also requesting a file output.
 *     In each case the user is first warned that the source area
 *     used in this comparison is determined on a worst case assumption.
-    
+
 *  Arguments:
 *     DECHIS = REAL (Given)
 *        High Dec value for source area
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,7 +106,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-                                      
+
 *  Arguments Given:
       REAL DECHIS
       REAL DECLOS
@@ -122,14 +122,14 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-  
+
 *  External References:
       EXTERNAL CHR_ISNAM
       LOGICAL CHR_ISNAM          ! CHR routine to test whether the
                                  ! string is a valid filename
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! CHR routine to find the length of
-                                 ! a string 
+                                 ! a string
 
 *  Local Variables:
       CHARACTER * ( FIO__SZMOD ) ACMODE ! Access mode for FIO
@@ -146,8 +146,8 @@
       DOUBLE PRECISION DELOPD    ! Doubl DEC Low plate
       CHARACTER * ( IRA__SZFSC ) DELOSC    ! Char DEC Low source
       DOUBLE PRECISION DELOSD    ! Doubl DEC Low source
-      INTEGER FD                 ! File descriptor obtained from FIO 
-      INTEGER LENNAM             ! Length of the source name 
+      INTEGER FD                 ! File descriptor obtained from FIO
+      INTEGER LENNAM             ! Length of the source name
       CHARACTER * ( 30 ) MACHIN  ! Name of the hardware of the computer
       LOGICAL NEXTPA             ! Output of a parameter which triggers
                                  ! next page of display
@@ -183,7 +183,7 @@
 *  For both terminal and file output call subroutine to generate a
 *  string containing the source name and coordinate system
                   CALL FIND10( SOPOS, STNAME, STATUS )
-      
+
 *  For both terminal and file output translate the 1950 coordinate
 *  positions for both source and plate HI's and LOW's to character
 *  strings.
@@ -191,7 +191,7 @@
 *  First make double precision copies of the source and plate HI's and
 *  LOW's
       RAHISD = DBLE ( RAHIS )
-      DEHISD = DBLE ( DECHIS )      
+      DEHISD = DBLE ( DECHIS )
       RALOSD = DBLE ( RALOS )
       DELOSD = DBLE ( DECLOS )
       RAHIPD = DBLE ( PLHIRA( PLPOS ) )
@@ -200,7 +200,7 @@
       DELOPD = DBLE ( PLLODE( PLPOS ) )
 
 *  Then use IRA_CTOD to translate then into character strings
-      SCS = 'EQUATORIAL(B1950)        ' 
+      SCS = 'EQUATORIAL(B1950)        '
       CALL IRA_DTOC( RAHISD, DEHISD, SCS, 4, RAHISC, DEHISC, STATUS)
       CALL IRA_DTOC( RALOSD, DELOSD, SCS, 4, RALOSC, DELOSC, STATUS)
       CALL IRA_DTOC( RAHIPD, DEHIPD, SCS, 4, RAHIPC, DEHIPC, STATUS)
@@ -229,10 +229,10 @@
      :            ' File(F), Both(B), Neither(!)', STATUS )
                   CALL PAR_CHOIC( PDISFI, 'D', 'D,F,B', .FALSE.,
      :            DISFIL, STATUS )
-      
+
 *  Cancel the parameter for next time through
                   CALL PAR_CANCL( PDISFI, STATUS )
-      
+
 *  If the user enters abort !! return from the subroutine
                   IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -250,7 +250,7 @@
 *  End if for if not B,D or F (or null)
                END IF
             END IF
-         END IF     
+         END IF
 
 *  *********************************************************************
 *  If DISFIL is B ( both) or D ( display) display output to terminal
@@ -286,7 +286,7 @@
          CALL MSG_FMTC( 'C4', 'A6', PLID( PLPOS ) )
          CALL MSG_OUT( ' ', ' From Plate number ^I1 on tape id  ^C4 ',
      :   STATUS )
-      
+
 *  Output region size heading
          CALL MSG_OUT( ' ', ' ', STATUS )
          CALL MSG_OUT( ' ', ' ', STATUS )
@@ -327,9 +327,9 @@
 *  If DISFIL is D ( display only) offer the user the opportunity to
 *  output to file as well.
 *  ********************************************************************
-   
+
          IF ( DISFIL .EQ. 'D' ) THEN
-      
+
 *  To obtain a printable file of the display the user may enter F to the
 *  display or file parameter, if he doesn't he should enter !
             CALL PAR_DEF0C( PDISFI, 'F', STATUS )
@@ -337,10 +337,10 @@
      :      'For a filed output of this display enter F, else enter !'
      :      , STATUS )
             CALL PAR_CHOIC( PDISFI, 'F', 'F', .FALSE., DISFIL, STATUS )
-      
+
 *  Cancel the parameter for next time through
             CALL PAR_CANCL( PDISFI, STATUS )
-      
+
 *  If the user enters abort !! return from the subroutine
             IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -354,13 +354,13 @@
 *  If DISFIL is 'B' then use nextpage prompt to hold display until the
 *  user wants to move on
          ELSE
-         
+
 *  Ask user if he wants the next page
             CALL PAR_GET0L( PNEXTP, NEXTPA, STATUS )
 
 *  Cancel the parameter for next time through
             CALL PAR_CANCL( PNEXTP, STATUS )
-          
+
 *  If the user enters abort !! return from the subroutine
             IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -369,9 +369,9 @@
                CALL ERR_ANNUL( STATUS )
                GO TO 300
             END IF
-      
+
          END IF
-      
+
 *  End if for if DISFIL is terminal or both
       END IF
 
@@ -389,14 +389,14 @@
 *  Start of loop which checks that the users file name is a valid file
 *  name
  200     CONTINUE
-      
+
 *  Generate a suitable dynamic default file name for the off edge file
          LENNAM = CHR_LEN( SONAME( SOPOS ) )
          OFFNAM(1:LENNAM)  = SONAME( SOPOS )
          OFFNAM( LENNAM + 1 : LENNAM + 9) = '_OFFEDGE'
          OFFNAM( LENNAM + 10: 16) = '      '
 
-*  Determine the operating system being used 
+*  Determine the operating system being used
          CALL PSX_UNAME( SYSNAM, NODENM, RELEAS, VERSON, MACHIN,
      :   STATUS )
 
@@ -426,7 +426,7 @@
      :      STATUS )
             GO TO 200
          END IF
-      
+
 *  If the user enters abort !! return from the subroutine
          IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -437,10 +437,10 @@
             CALL ERR_ANNUL( STATUS )
             CALL MSG_OUT( ' ', ' The source off edge details will'//
      :      ' not be saved, but you can continue processing',STATUS )
-            
+
 *  If a valid file name is supplied by the user then open file
          ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *  Open the off edge file
             CALL FIO_OPEN( OFFIL, ACMODE, 'FORTRAN', RECSZ,
      :      FD, STATUS )
@@ -471,7 +471,7 @@
             WRITE( BUFFER( 3 )(39:51), '(A12)' ) SOCO2( SOPOS )
             WRITE( BUFFER( 3 )(56:61), '(F5.1)' ) AMINSC
             WRITE( BUFFER( 3 )(63:68), '(F5.1)' ) AMCROS
-      
+
 * 9999       FORMAT ( A1, A16, 3X, A12, 4X, A12, 4X, F5.1, 1X, F5.1 )
 *  Output source identifier message
             CALL FIO_WRITE( FD, BUFFER( 3 ), STATUS )
@@ -480,7 +480,7 @@
             BUFFER( 1 ) = '                                  '
             CALL FIO_WRITE( FD, BUFFER( 1 ), STATUS )
             BUFFER( 2 ) = ' From Plate number         on tape id     '
-            WRITE( BUFFER( 2 )(19:23), '(I5)' ) PLNUM( PLPOS )  
+            WRITE( BUFFER( 2 )(19:23), '(I5)' ) PLNUM( PLPOS )
             WRITE( BUFFER( 2 )(40:45), '(A6)' ) PLID( PLPOS )
             CALL FIO_WRITE( FD, BUFFER( 2 ), STATUS )
 
@@ -531,15 +531,15 @@
 *  Check whether there was an error message , indicated by the STATUS
 *  from ERR_STAT not SAI__OK, and flush the message, which sets the
 *  status to SAI__OK. The net result is that the STATUS should be O.K.
-*  on exit from this block 
+*  on exit from this block
                CALL ERR_STAT( STATUS )
                IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
-            
+
             END IF
-      
-*  Close the file 
+
+*  Close the file
             CALL FIO_CLOSE( FD, STATUS )
-      
+
          END IF
 
 *  End if for if DISFIL is file or both
@@ -548,8 +548,8 @@
 *  If any parameter is entered as null at any point the program GO TO's
 *  here
  300  CONTINUE
-      
+
 *  Restore the correct value of DISFIL
       DISFIL = TEMPDF
-        
+
       END

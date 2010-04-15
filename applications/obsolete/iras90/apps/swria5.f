@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
       INTEGER I                  ! Do loop index
       INTEGER TXTLN              ! Used length of a text string
       DOUBLE PRECISION X, Y      ! Image coordinate of a position
-                           
+
 *.
 
 *  Check inherited global status.

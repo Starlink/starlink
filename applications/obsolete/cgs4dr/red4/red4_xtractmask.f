@@ -13,7 +13,7 @@
 *    Invocation :
 *      CALL RED4_XTRACTMASK( DIM1, DIM2, MASKI, IYST, IYEN, OPER,
 *     :  MASKS, STATUS )
-*    Parameters 
+*    Parameters
 *     DIM1                  = INTEGER( READ )
 *           First dimension 2-D mask, and dimension of 1-D mask.
 *     DIM2                  = INTEGER( READ )
@@ -93,7 +93,7 @@
             MASKS(I) = GOOD
          END DO
 
-*      Scan through the appropriate rows of the input mask. If any 
+*      Scan through the appropriate rows of the input mask. If any
 *      columns are found BAD, the corresponding column in the output
 *      mask must also be BAD.
          DO J = IYST, IYEN
@@ -117,7 +117,7 @@
             MASKS(I) = BAD
          END DO
 
-*      Scan through the appropriate rows of the input mask. If any 
+*      Scan through the appropriate rows of the input mask. If any
 *      columns are found GOOD, the corresponding column in the output
 *      mask must also be GOOD.
          DO J = IYST, IYEN

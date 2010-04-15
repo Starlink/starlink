@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,12 +111,12 @@
 
 *  Find the X and Y components of the vector.
       VECX = -VECLEN*SINANG
-      VECY = VECLEN*COSANG 
+      VECY = VECLEN*COSANG
 
 *  Note the position of the point of the arrow head.
       IF( JUST .EQ. 'CENTRE' ) THEN
          AX = X + 0.5*VECX
-         AY = Y + 0.5*VECY 
+         AY = Y + 0.5*VECY
       ELSE IF( JUST .EQ. 'START' ) THEN
          AX = X + VECX
          AY = Y + VECY

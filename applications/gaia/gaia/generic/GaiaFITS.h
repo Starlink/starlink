@@ -40,7 +40,7 @@ int GaiaFITSHPut( StarFitsIO *fitsio, const char *keyword, const char *value,
                   const char *comment, const char *type );
 
 /* Create a FITS file from a data array and a WCS */
-int GaiaFITSCreate( const char* filename, void *data, 
+int GaiaFITSCreate( const char* filename, void *data,
                     AstFrameSet *wcs, int bitpix, double bscale,
                     double bzero, long blank, const char *object,
                     const char *units, int naxis, long naxes[] );

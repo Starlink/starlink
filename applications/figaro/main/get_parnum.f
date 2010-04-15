@@ -29,7 +29,7 @@
 *        "           "       14-MAY-1990 Checking of array moved to
 *                            MAP_RES
 *        "           "       30-MAY-1991 DSA_WRUSER replaced PAR_WRUSER
-*        "        Durham,    7-APR-1993 Use tnw_index so works on 
+*        "        Durham,    7-APR-1993 Use tnw_index so works on
 *                            DECStation
 *        "        Durham,    30-APR-1993 Use chr_index
 *-

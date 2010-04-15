@@ -22,7 +22,7 @@
 *     variables in the common block IRM_COM which are set by IRM_STPEN.
 *
 *     To use this routine, it must be linked explicitly with the user
-*     program to override the default version in NCAR library.       
+*     program to override the default version in NCAR library.
 
 *  Arguments:
 *     See section 3.24.2 of AUTOGRAPH document.
@@ -40,7 +40,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,7 +65,7 @@
 *  Initialise the inherited status to a good value.
       STATUS = SAI__OK
 
-*  If the variables in common block has been assigned values, 
+*  If the variables in common block has been assigned values,
 *  use the data. Otherwise do nothing.
       CALL IRM_IATTR( 'STDAT', 0, IVAL, LVAL, STATUS )
       IF ( LVAL ) THEN
@@ -110,7 +110,7 @@
             CALL GSTXCI( IVAL )
 
          END IF
-      
+
       END IF
 
 *  If an error has occurred, flush it.

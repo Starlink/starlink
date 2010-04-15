@@ -62,7 +62,7 @@
 *   TNW: 20/11/89 Made to use plot_line
 *   TNW: 3/90 PGPLOT version
 *   TNW: 1-8/7/91 Changes for new results structure
-*   TNW: 3/9/91 Workspace obtained in plot_line. Only consider 
+*   TNW: 3/9/91 Workspace obtained in plot_line. Only consider
 *        successful or NAG-error fits
 *   TNW: 8/1/93 Bug fixes.
 *-

@@ -60,7 +60,7 @@ C	COMPUTE ERROR OF INTERCEPT AND SLOPE
 C
         IF ( N .GT. 2 ) THEN
           S = SQRT(SSRES/(FLOAT(N) - 2.))
-        ELSE 
+        ELSE
           S = 0.0
         ENDIF
 	SIGA = S*SQRT(1./FLOAT(N) + XAVE*XAVE/SXX)

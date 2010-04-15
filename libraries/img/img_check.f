@@ -33,12 +33,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IMG_CONST'        ! IMG constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      
+
 *  Global Variables:
       INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
 *        PCB_PARAM( IMG__MXPAR ) = CHARACTER * ( IMG__SZPAR ) (Read)
@@ -75,18 +75,18 @@
 *        PCB_PNTR( IMG__MXPAR) = INTEGER (Read)
 *           Pointers to the 'DATA' components of the NDFs. Set to
 *           IMG_NOPTR when released.
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Loop variable
-      
+
 *.
 
 *  Start an error block.
       CALL ERR_BEGIN( STATUS )
-      
+
 *  Loop over all the slots in the PCB block and look for any non-blank
 *  parameters.
       DO 1 I = 1, IMG__MXPAR
@@ -99,7 +99,7 @@
      :'  Slot ^SLOT is in use by parameter ^PARAM', STATUS )
 
 *  Get the name of the NDF and write this out also.
-            IF ( PCB_INDF( I ) .NE. NDF__NOID ) THEN 
+            IF ( PCB_INDF( I ) .NE. NDF__NOID ) THEN
                CALL NDF_MSG( 'NDF', PCB_INDF( I ) )
                CALL MSG_OUT( ' ',
      :'  ...and references NDF ^NDF', STATUS )

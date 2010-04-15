@@ -83,8 +83,8 @@
             IF ( FITS_DETNINCR .EQ. 1 ) THEN
 
 *             Open the mask temporry file CGS4_MASKS:MASK_yymmdd_TEMPLATE.DST
-               CALL DSA_NAMED_OUTPUT( 'MASK', MASK, 'INPUT', 
-     :            0, 0, STATUS ) 
+               CALL DSA_NAMED_OUTPUT( 'MASK', MASK, 'INPUT',
+     :            0, 0, STATUS )
 
 *             Map the variance array of input and the data array of output
                CALL DSA_MAP_VARIANCE( 'INPUT', 'READ', 'FLOAT',
@@ -95,7 +95,7 @@
                MASK_PTR = ADDRESS
 
 *             Write the error array from input to data array of output
-               CALL RED4_CRE_ERROR_MASK2 ( NX, NY, %val(INPUT_PTR), 
+               CALL RED4_CRE_ERROR_MASK2 ( NX, NY, %val(INPUT_PTR),
      :            %val(MASK_PTR), STATUS )
 
 *             Check this has worked
@@ -110,7 +110,7 @@
 
                   STATUS = SAI__ERROR
                   CALL ERR_REP( ' ', 'RED4_CRE_ERROR_MASK: '/
-     :               /'Failed to create mask or '/ 
+     :               /'Failed to create mask or '/
      :               /'map data arrays', STATUS )
                END IF
             ELSE
@@ -131,7 +131,7 @@
 *       Close DSA
          CALL DSA_CLOSE( STATUS )
       ELSE
- 
+
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_CRE_ERROR_MASK: '/
      :     /'Failed to get %INPUT or %MASK', STATUS )

@@ -6,14 +6,14 @@ C
 C     Applies the set of polynomial fits determind by IARC to
 C     an image, re-binning each cross-section of the image to
 C     either a linear or logarithmic wavelength scale.  ISCRUNCH
-C     uses the results from a single 2D arc fit as performed by 
+C     uses the results from a single 2D arc fit as performed by
 C     IARC to get the channel/wavelength relation.  ISCRUNI uses
 C     two such fits, and performs a linear interpolation between
 C     the two.
 C
 C     The routine can either conserve flux or the mean value
 C     of the data.  Conserving flux is appropriate where the data is
-C     actually in flux units (photons/sec, for example), but not when 
+C     actually in flux units (photons/sec, for example), but not when
 C     the data is in units of flux per unit wavelength (AB magnitudes,
 C     Janskys, etc). Consider the case where each input bin maps to two
 C     output bins; if the data is in flux units - photon counts, for
@@ -28,7 +28,7 @@ C     Command parameters -
 C
 C     IMAGE      (Character) Image to be scrunched.
 C     FILE       (Character) File containing results of 2D arc fit
-C                as produced by IARC.  If no extension supplied, 
+C                as produced by IARC.  If no extension supplied,
 C                .IAR is assumed.
 C     FILE2      (Character) ISCRUNI only. Second file containing
 C                IARC results.
@@ -37,7 +37,7 @@ C                between the two sets of wavelength information.
 C                Value used=
 C                    (File value)+(File2 value - File value)*FRACTION
 C     WSTART     (Numeric) The wavelength of the CENTER of the first
-C                bin of the resulting scrunched spectrum.  
+C                bin of the resulting scrunched spectrum.
 C     WEND       (Numeric) The wavelength of the CENTER of the final
 C                bin of the resulting scrunched spectrum.  If WEND is
 C                less than WSTART, then SCRUNCH assumes that it is the
@@ -51,7 +51,7 @@ C                effect.
 C     BINS       (Numeric) The number of bins for the resulting
 C                spectrum.
 C     OUTPUT     (Character) Name of resulting image.  Note that an
-C                image cannot be scrunched into itself, so a new output 
+C                image cannot be scrunched into itself, so a new output
 C                file will always be created.
 C
 C     Command keywords -
@@ -69,29 +69,29 @@ C
 C                                         KS / CIT 22nd June 1984
 C     Modified:
 C
-C     20th Dec 1984 KS/AAO Now creates an AXIS(1) structure if one 
-C                   doesn't exist.  Bug causing 2D AXIS(1) arrays to be 
+C     20th Dec 1984 KS/AAO Now creates an AXIS(1) structure if one
+C                   doesn't exist.  Bug causing 2D AXIS(1) arrays to be
 C                   created now fixed.
-C     13th Aug 1985 KS/AAO Bug in 'LOG' mode fixed.  AXIS(1) units and 
+C     13th Aug 1985 KS/AAO Bug in 'LOG' mode fixed.  AXIS(1) units and
 C                   label now generated in output file.
 C     30th Mar 1987 KS/AAO Now works internally in double precision,
-C                   to improve results at high dispersion.  Use of WEND 
+C                   to improve results at high dispersion.  Use of WEND
 C                   as an increment value introduced, along with
 C                   INCREMENT and FINAL keywords - same as for SCRUNCH.
-C                   Keywords MEAN and FLUX (always confusing) replaced 
-C                   by DENSITY - which program now tries to guess at - 
+C                   Keywords MEAN and FLUX (always confusing) replaced
+C                   by DENSITY - which program now tries to guess at -
 C                   this is the same scheme as that used by FSCRUNCH.
 C     12th Sep 1989 JM / RAL. Modified to use DSA_ routines.  Dynamic-
 C                   memory handling changed to use DYN_ routines.
-C     23rd Nov 1989 KS/AAO. Long term bug in ISCRUNI (was using same 
-C                   file for both coefficient sets) fixed.  Introduced 
-C                   use of DYN_INCREMENT to tidy up dynamic-memory 
+C     23rd Nov 1989 KS/AAO. Long term bug in ISCRUNI (was using same
+C                   file for both coefficient sets) fixed.  Introduced
+C                   use of DYN_INCREMENT to tidy up dynamic-memory
 C                   handling slightly. FIG_RD2DRC removed from this file
-C                   - now in separate library.  PAR_ABORT calls 
+C                   - now in separate library.  PAR_ABORT calls
 C                   scattered about the code as well.
 C     17th Dec 1990 KS/AAO. Somewhere, the speed of light had got lost!
-C                   Now set to the correct value.  Also, SJM's bug fix 
-C                   for the declaration of GEN_EPOLYD incorporated in 
+C                   Now set to the correct value.  Also, SJM's bug fix
+C                   for the declaration of GEN_EPOLYD incorporated in
 C                   FIG_WGEN/2.
 C     23nd Sep 1992 HME / UoE, Starlink.  INCLUDE changed. Lowercase
 C                   extension .iar.
@@ -110,8 +110,8 @@ C
 C     Functions
 C
       INTEGER DSA_TYPESIZE
-      INTEGER ICH_CLEAN     
-      INTEGER ICH_LEN      
+      INTEGER ICH_CLEAN
+      INTEGER ICH_LEN
       INTEGER ICH_FOLD
       LOGICAL GEN_EXIST
       LOGICAL PAR_ABORT
@@ -125,7 +125,7 @@ C
       CHARACTER COMMAND*8        ! Figaro command name
       INTEGER   CPTR1            ! Dynamic-memory pointer for workspace
       INTEGER   CPTR2            ! Dynamic-memory pointer for workspace
-      LOGICAL   DEFDEN           ! Assume data units flux/unit 
+      LOGICAL   DEFDEN           ! Assume data units flux/unit
                                  ! wavelength?
       DOUBLE PRECISION DELTA     ! Wavelength increment
       DOUBLE PRECISION DWEND     ! Final wavelength
@@ -133,12 +133,12 @@ C
       INTEGER   DIMS(2)          ! Image dimensions
       LOGICAL   FAULT            ! True if non-DSA fault occurs
       CHARACTER FILE*132         ! File containing IARC results
-      CHARACTER FILE2*132        ! Second file containing IARC results 
+      CHARACTER FILE2*132        ! Second file containing IARC results
                                  ! (ISCRUNI)
       LOGICAL   FINAL            ! True if  WEND is a final value
       LOGICAL   FLUX             ! Conserve flux?
       LOGICAL   FLUXDEN          ! Mean value of data to be conserved?
-      REAL      FRACT            ! Fractional weight give to first .IAR 
+      REAL      FRACT            ! Fractional weight give to first .IAR
                                  ! file
       INTEGER   FSTAT            ! Status for FIG routines
       INTEGER   I                ! Loop variable
@@ -154,11 +154,11 @@ C
       LOGICAL   LINEAR           ! Use linear interp.for rebinning?
       LOGICAL   LOGW             ! Wavelengths in WAVES are logarithmic?
       LOGICAL   LOGWR            ! Data are rebinned logarithmically?
-      INTEGER   IMODE            ! Selects mode of transfer for input 
-                                 ! bins 
-      INTEGER   IQUAD            ! Equals 0 for lin. interp. non-zero 
+      INTEGER   IMODE            ! Selects mode of transfer for input
+                                 ! bins
+      INTEGER   IQUAD            ! Equals 0 for lin. interp. non-zero
                                  ! for quadratic
-      INTEGER   NADD             ! No. of input bins added to form one 
+      INTEGER   NADD             ! No. of input bins added to form one
                                  ! output bin
       CHARACTER NAME*132         ! Filename
       INTEGER   NBINR            ! Number of elements (bins) in rebinned
@@ -170,7 +170,7 @@ C
       INTEGER   NELEMD           ! Number of 'DOUBLE' workspace array
                                  ! elements
       DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
-      INTEGER   NNITEMS          ! Number of axis numeric items 
+      INTEGER   NNITEMS          ! Number of axis numeric items
                                  ! retrieved
       INTEGER   NX               ! First dimension of image
       INTEGER   NY               ! Second dimension of image
@@ -186,7 +186,7 @@ C
       LOGICAL   SCRUNI           ! True if Figaro command is ISCRUNI
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       REAL      SSKEW            ! No. of bins the input array is to be
-                                 ! shifted 
+                                 ! shifted
       INTEGER   STATUS           ! Running status for DSA routines
       CHARACTER STRING*64        ! Used to format user messages
       INTEGER   TPTR             ! Temporary dynamic mem pointer
@@ -195,7 +195,7 @@ C
       REAL      WEND             ! End wavelength
       INTEGER   WIPTR            ! Dynamic-memory pointer for workspace
       REAL      WMAX             ! Maximum wavelength of first .IAR file
-      REAL      WMAX2            ! Maximum wavelength of second .IAR 
+      REAL      WMAX2            ! Maximum wavelength of second .IAR
                                  ! file
       REAL      WMIN             ! Minimum wavelength of first .IAR file
       REAL      WMIN2            ! Minimum wavelength of second .IAR
@@ -217,7 +217,7 @@ C
 C     Velocity of light in Km/sec
 C
       DATA C/299792.458/
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -293,14 +293,14 @@ C
 C     Get workspace.  Need two arrays to hold wavelength values - one
 C     input and one output, input NX elements, output NBINR elements.
 C     Also need one (for ISCRUNCH) or two (for ISCRUNI) coefficient
-C     arrays, each NY*11.  
+C     arrays, each NY*11.
 C
       NELEMD=NX+NBINR+NY*11
       IF (SCRUNI) NELEMD=NELEMD+NY*11
       CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',WIPTR,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY(NBINR,'DOUBLE',WOPTR,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY(NY*11,'DOUBLE',CPTR1,SLOT,STATUS)
-      IF (SCRUNI) 
+      IF (SCRUNI)
      :  CALL DSA_GET_WORK_ARRAY(NY*11,'DOUBLE',CPTR2,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
@@ -359,7 +359,7 @@ C
 C     If it is an incremental value, calculate the final wavelength
 C     Otherwise, calculate the incremental value, which we will need
 C     to determine the precision needed for the output array.
-C    
+C
       IF (INCREM) THEN
          DELTA=DWEND
          IF (.NOT.LOGWR) THEN
@@ -537,7 +537,7 @@ C                the Y dimension of the image the coefficients apply to.
 C     (>) COEFFS (Double precision COEFFS(11,NY)) The coefficients.
 C                For each row, the constant term is the last non-zero
 C                term.
-C     (<) WARRAY (Double precision array WARRAY(NX)) The resulting 
+C     (<) WARRAY (Double precision array WARRAY(NX)) The resulting
 C                wavelengths.
 C
 C     Common variables used -  None
@@ -556,7 +556,7 @@ C                       on a SUN.  Thanks, SJM.)
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       INTEGER IY,NX,NY
       DOUBLE PRECISION COEFFS(11,NY), WARRAY(NX)
@@ -591,7 +591,7 @@ C     arc coefficients.  For each element, the value from the first
 C     set of coeffients (Val1) and from the second set (Val2) is
 C     calculated, and the value used is given by
 C     Value = Val1 + (Val2 - Val1) * FRACT
-C     where FRACT is the parameter passed to this routine.  
+C     where FRACT is the parameter passed to this routine.
 C
 C     Parameters -   (">" input, "<" output)
 C
@@ -604,11 +604,11 @@ C                 the Y dimension of the image the coefficients apply to.
 C     (>) FRACT   (Real) The value used to control the interpolation
 C                 between the two sets of coefficients.  See above.
 C     (>) COEFFS  (Double precision COEFFS(11,NY)) The first set of
-C                 coefficients.  For each row, the constant term is the 
+C                 coefficients.  For each row, the constant term is the
 C                 last non-zero term.
 C     (>) COEFFS2 (Double precision COEFFS2(11,NY)) The second set of
 C                 coefficients.  Constant term as for COEFFS.
-C     (<) WARRAY  (Double precision array WARRAY(NX)) The resulting 
+C     (<) WARRAY  (Double precision array WARRAY(NX)) The resulting
 C                 wavelengths.
 C
 C     Common variables used -  None
@@ -627,7 +627,7 @@ C                       on a SUN.  Thanks, SJM.)
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       INTEGER IY,NX,NY
       REAL    FRACT

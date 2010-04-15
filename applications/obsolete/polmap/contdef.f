@@ -1,22 +1,22 @@
       SUBROUTINE CONTDEF(NPARAMS,PARAMS,CONT_ST,CONT_EN,NZONES,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     C O N T D E F
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), CONT_ST (>), CONT_EN (>), NZONES (>)
 C OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C This subroutine lets the user define some continuum bins (either
 C by including them on the command line or by defining them interactively
@@ -31,7 +31,7 @@ C The command parameters
 C
       INTEGER NPARAMS
       REAL PARAMS(*)
-C 
+C
 C The continuum bin ranges
 C
       REAL CONT_ST(*)
@@ -89,4 +89,4 @@ C
        NZONES = NZONES-1
       ENDIF
 666   CONTINUE
-      END        
+      END

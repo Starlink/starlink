@@ -15,7 +15,7 @@
 *  Description:
 *     The nominal pixel dimensions stored in the astrometry information
 *     identified by IDA are returned.
-     
+
 *  Arguments:
 *     IDA = INTEGER (Given)
 *        An IRA identifier for the astrometry information.

@@ -6,13 +6,13 @@
 *
 *  Type of routine:  (Part of) workstation driver
 *
-*  Author:           DLT          
-*                
+*  Author:           DLT
+*
       INCLUDE '../../include/check.inc'
 *
 *  PURPOSE OF THE ROUTINE
 *  ----------------------
-*     Encodes an integer 
+*     Encodes an integer
 *
 *  ARGUMENTS
 *  ---------
@@ -25,7 +25,7 @@
 *
 *
 *--------------------------------------------------------------------
-      INTEGER I1,I2               
+      INTEGER I1,I2
 
       NC = 1
       I1 = ABS(I)

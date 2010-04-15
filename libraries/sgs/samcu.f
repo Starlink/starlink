@@ -122,7 +122,7 @@
      :      (WINDO(4) - WINDO(3)) + WINDO(3)
       END IF
 
-*  Set new cursor position                                
+*  Set new cursor position
       CALL sgs_SETCU(X,Y)
 
  9999 CONTINUE

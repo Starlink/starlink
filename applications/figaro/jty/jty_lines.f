@@ -17,7 +17,7 @@
 *              5.  Slope of continuum (counts / pixel)
 *              6.  Significance of line in "sigma"
 * **************************CONVENTION******************************
-* The first element of the array is taken to be pixel 0.0 to 1.0, 
+* The first element of the array is taken to be pixel 0.0 to 1.0,
 * that is, its centroid is at pixel 0.5.
 * ******************************************************************
 * IEND    = number of end pixels to avoid

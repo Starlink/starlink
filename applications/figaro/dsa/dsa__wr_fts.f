@@ -65,7 +65,7 @@ C
 C  External variables used: None.
 C
 C  External subroutines / functions used:
-C     DSA_POST_PUT_FITS, DTA_SZVAR, DTA_WRVARB, DTA_WRVARD, DTA_WRVARF, 
+C     DSA_POST_PUT_FITS, DTA_SZVAR, DTA_WRVARB, DTA_WRVARD, DTA_WRVARF,
 C     DTA_WRVARI, DTA_WRVARS, DTA_WRVARC, ICH_LEN, ICH_CI, ICH_CD, ICH_CF
 C
 C  Prior requirements:
@@ -79,7 +79,7 @@ C-
 C  Subroutine / function details:
 C     DSA_POST_PUT_FITS     Test DTA_ status after write to FITS structure
 C     DTA_SZVAR             Get size of a data object
-C     DTA_WRVAR{x}          Write an item to a data object 
+C     DTA_WRVAR{x}          Write an item to a data object
 C     ICH_LEN               Position o flast non-blank char in string
 C     ICH_C{x}              Format a number into a character stirng
 C
@@ -402,10 +402,10 @@ C
          END IF
       ELSE
 C
-C        Original Figaro format.  If no buffering required, write out data 
-C        value and check status. Otherwise put into buffer slot entry - will 
+C        Original Figaro format.  If no buffering required, write out data
+C        value and check status. Otherwise put into buffer slot entry - will
 C        be written out when structure is closed.  If this is a buffered
-C        string, we append any comment (we don't really expect one) to the 
+C        string, we append any comment (we don't really expect one) to the
 C        value string.
 C
          IF (STRING.EQ.0) THEN

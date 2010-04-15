@@ -25,7 +25,7 @@
 *     to a four digit year. The windowing is identical to that used
 *     by SLALIB (SUN/67):
 *        00-49, interpreted as 2000-2049
-*        50-99, interpreted as 1950-1999   
+*        50-99, interpreted as 1950-1999
 
 *  Authors:
 *     Rachael Padman (MRAO)
@@ -38,7 +38,7 @@
 *        Original version
 *     19 Nov 1993 (hme):
 *        Remove TABs.
-*     27 Oct 1999 (rpt): 
+*     27 Oct 1999 (rpt):
 *        Y2K fix replace adding 1900 with window.
 *     30 Dec 1999 (timj):
 *        Change windowing to match slalib (<50 is 2000)

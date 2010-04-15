@@ -14,8 +14,8 @@
 *     CALL POL1_IMPRT( NFITS, FITS, FD, FNAME, XLOC, STATUS )
 
 *  Description:
-*   This routine reads and interprets the contents of the import control 
-*   table using the supplied file descriptor. Values are stored in the 
+*   This routine reads and interprets the contents of the import control
+*   table using the supplied file descriptor. Values are stored in the
 *   supplied HDS structure for any valid POLPACK extenson items defined
 *   by the control table. References to FITS keywords within the control
 *   table are resolved by searching the supplied array of FITS header
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Read the FITS header cards into an AST FitsChan. A FitsChan provides a
-*  convenient tool for searching FITS cards, determining their data types, 
+*  convenient tool for searching FITS cards, determining their data types,
 *  and converting between data types.
       FCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
       DO I = 1, NFITS
@@ -122,7 +122,7 @@
       ILINE = 0
       IGRP1 = GRP__NOID
       IGRP2 = GRP__NOID
-      DO WHILE( STATUS .EQ. SAI__OK .AND. .NOT. EOF ) 
+      DO WHILE( STATUS .EQ. SAI__OK .AND. .NOT. EOF )
 
 *  Read a logical line from the file. This may be made up of several
 *  physical lines concatenated together. Concatenation is indicated by a
@@ -140,13 +140,13 @@
 
 *  CCD1_RDLIN removes leading spaces, so the first space in the line
 *  marks the end of the first word.
-            SPACE = INDEX( BUFFER, ' ' ) 
+            SPACE = INDEX( BUFFER, ' ' )
 
 *  Ignore blank lines (shouldn't be any of these).
             IF( SPACE .GT. 1 ) THEN
 
 *  Report an error if the rest of the line is blank.
-               IF( SPACE + 1 .GT. BUFLEN .AND. 
+               IF( SPACE + 1 .GT. BUFLEN .AND.
      :             STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'POL1_IMPR_ERR1','Incomplete '//
@@ -158,21 +158,21 @@
                CALL CHR_UCASE( BUFFER( : SPACE - 1 ) )
 
 *  See if the first word is the name of a legal POLPACK extension item.
-               CALL POL1_KNEXT( BUFFER( : SPACE - 1 ), OK, TYPE, 
+               CALL POL1_KNEXT( BUFFER( : SPACE - 1 ), OK, TYPE,
      :                          STATUS )
 
 *  If so, evaluate the expression and store a value for the extension item.
                IF( OK ) THEN
-                  CALL POL1_XEVAL( BUFFER( : SPACE - 1 ), 
+                  CALL POL1_XEVAL( BUFFER( : SPACE - 1 ),
      :                             BUFFER( SPACE + 1 : BUFLEN ),
      :                             TYPE, XLOC, FCHAN, IGRP1,
      :                             IGRP2, STATUS )
 
 *  Delete any groups holding explicit FITS keyword declarations for the
 *  expression just evaluated.
-                  IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, 
+                  IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1,
      :                                                       STATUS )
-                  IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, 
+                  IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2,
      :                                                       STATUS )
 
 *  If the first word is not the name of a legal POLPACK extension item,
@@ -190,24 +190,24 @@
  10               CONTINUE
 
 *  If so, assume the line is an explicit FITS keyword declaration to be
-*  used in the next expression. The remainder of the line should correspond 
+*  used in the next expression. The remainder of the line should correspond
 *  to a FITS keyword name. Store the keyword and data type in two GRP groups.
                   IF( OK ) THEN
 
                      IF( IGRP1 .EQ. GRP__NOID ) THEN
                         CALL GRP_NEW( 'HDS data types', IGRP1, STATUS )
                         CALL GRP_NEW( 'FITS keywords', IGRP2, STATUS )
-                     END IF                        
+                     END IF
 
                      CALL CHR_RMBLK( BUFFER( : SPACE - 1 ) )
                      CALL CHR_UCASE( BUFFER( : SPACE - 1 ) )
-                     CALL GRP_PUT( IGRP1, 1, BUFFER( : SPACE - 1 ), 0, 
+                     CALL GRP_PUT( IGRP1, 1, BUFFER( : SPACE - 1 ), 0,
      :                             STATUS )
 
                      CALL CHR_RMBLK( BUFFER( SPACE + 1 : BUFLEN ) )
                      CALL CHR_UCASE( BUFFER( SPACE + 1 : BUFLEN ) )
-                     CALL GRP_PUT( IGRP2, 1, 
-     :                             BUFFER( SPACE + 1 : BUFLEN ), 0, 
+                     CALL GRP_PUT( IGRP2, 1,
+     :                             BUFFER( SPACE + 1 : BUFLEN ), 0,
      :                             STATUS )
 
 *  If the first word is not a legal HDS data type, report an error.
@@ -215,7 +215,7 @@
                      STATUS = SAI__ERROR
                      CALL ERR_REP( 'POL1_IMPR_ERR2','Line does not '//
      :                             'start with a supported HDS data'//
-     :                             ' type or POLPACK extension item.', 
+     :                             ' type or POLPACK extension item.',
      :                             STATUS )
                      GO TO 999
 
@@ -240,12 +240,12 @@
          IF( FNAME .NE. ' ' ) THEN
             CALL MSG_SETC( 'TAB', FNAME )
             CALL ERR_REP( 'POL1_IMPRT_ERR3', 'Error at or before line'//
-     :                    ' ^LINE of import control table ''^TAB'':', 
+     :                    ' ^LINE of import control table ''^TAB'':',
      :                    STATUS )
 
          ELSE
             CALL ERR_REP( 'POL1_IMPRT_ERR4', 'Error at or before line'//
-     :                    ' ^LINE of the default import control table:', 
+     :                    ' ^LINE of the default import control table:',
      :                    STATUS )
          END IF
 

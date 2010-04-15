@@ -35,17 +35,17 @@
 *       KPG1_GETASTNPS()
 *       KPG1_GETASTING()
 *       KPG1_GETASTOUG()
-*       KPG1_GETASTDSB() 
-*       KPG1_GETASTFIT() 
-*       KPG1_GETASTPLN() 
-*       KPG1_GETASTBLE() 
-*       KPG1_GETASTX1() 
-*       KPG1_GETASTX2() 
-*       KPG1_GETASTY1() 
-*       KPG1_GETASTY2() 
+*       KPG1_GETASTDSB()
+*       KPG1_GETASTFIT()
+*       KPG1_GETASTPLN()
+*       KPG1_GETASTBLE()
+*       KPG1_GETASTX1()
+*       KPG1_GETASTX2()
+*       KPG1_GETASTY1()
+*       KPG1_GETASTY2()
 
 *  Notes:
-*     Since the routines are only 3 lines long, they are all in 
+*     Since the routines are only 3 lines long, they are all in
 *     a single file with minimal comment wrapper. Types of the argument
 *     for SET methods match the type in the common block.
 
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

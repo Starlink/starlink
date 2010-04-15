@@ -18,11 +18,11 @@
 *     This routine converts an ISO LWS AN product stored in a FITS
 *     binary table into a four-dimensonal NDF.  The NDF contains data
 *     and variance arrays, and has a quality array: the detector number
-*     is stored in the first-four bits and the scan direction in the 
-*     fifth bit.  The first two dimensions are the spatial bins, next is 
-*     the wavelength axis, and the fourth is the scan count.  The 
-*     wavelength axis comprises all the distinct values found in the LWS 
-*     AN file.  The remaining columns (save the filler) are written to 
+*     is stored in the first-four bits and the scan direction in the
+*     fifth bit.  The first two dimensions are the spatial bins, next is
+*     the wavelength axis, and the fourth is the scan count.  The
+*     wavelength axis comprises all the distinct values found in the LWS
+*     AN file.  The remaining columns (save the filler) are written to
 *     an LWSAN extension.  The primary HDU headers may be written to the
 *     standard FITS airlock extension.  See the "Notes" for further
 *     details.
@@ -37,11 +37,11 @@
 *        The NDF identifier of the output NDF.
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
-*        extension. 
+*        extension.
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -105,7 +105,7 @@
 *        Original version.
 *     2000 September 12 (AJC):
 *        Make NAXES a genuine array (was 2) in call to FTGSVJ to
-*        prevent a crash on Alphas with CFITSIO.  Use CNF_PVAL for 
+*        prevent a crash on Alphas with CFITSIO.  Use CNF_PVAL for
 *        safety.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routine instead of its cloned CON equivalent.
@@ -118,7 +118,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -270,7 +270,7 @@
       DO I = 1, NFIELD
          USED( I ) = .FALSE.
       END DO
-  
+
 *  Define the shape of the NDF.
 *  ============================
 
@@ -346,7 +346,7 @@
       USED( COLNUM ) = .TRUE.
 
 *  Obtain the scan count indices from this column.
-      CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADI, 
+      CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADI,
      :             %VAL( CNF_PVAL( SPNTR ) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
@@ -385,7 +385,7 @@
       USED( COLNUM ) = .TRUE.
 
 *  Obtain the wavelengths from this column.
-      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, 
+      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR,
      :             %VAL( CNF_PVAL( WAPNTR ) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
@@ -402,7 +402,7 @@
       USED( COLNUM ) = .TRUE.
 
 *  Obtain the wavelength errors from this column.
-      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, 
+      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR,
      :             %VAL( CNF_PVAL( WEPNTR ) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
@@ -427,8 +427,8 @@
 
 *  Call the routine to count and store the unique wavelengths.
       CALL COF_LWS1( NOBS, VAL__EPSR, %VAL( CNF_PVAL( WAPNTR ) ),
-     :               %VAL( CNF_PVAL( WEPNTR ) ), NWAVEL, 
-     :               %VAL( CNF_PVAL( RWPNTR ) ), 
+     :               %VAL( CNF_PVAL( WEPNTR ) ), NWAVEL,
+     :               %VAL( CNF_PVAL( RWPNTR ) ),
      :               %VAL( CNF_PVAL( REPNTR ) ),
      :               %VAL( CNF_PVAL( IPNTR ) ), STATUS )
 
@@ -567,13 +567,13 @@
 
 *  Form the weighted mean flux and errors, and the quality.
       CALL COF_LWS2( FUNIT, NDF, LBND( 1 ), UBND( 1 ), LBND( 2 ),
-     :               UBND( 2 ), NWAVEL, LBND( 4 ), UBND( 4 ), NOBS, 
+     :               UBND( 2 ), NWAVEL, LBND( 4 ), UBND( 4 ), NOBS,
      :               NFIELD, %VAL( CNF_PVAL( XPNTR ) ),
      :               %VAL( CNF_PVAL( YPNTR ) ),
-     :               %VAL( CNF_PVAL( WIPNTR ) ), 
+     :               %VAL( CNF_PVAL( WIPNTR ) ),
      :               %VAL( CNF_PVAL( SPNTR ) ),
      :               %VAL( CNF_PVAL( PNTR(1) ) ),
-     :               %VAL( CNF_PVAL( PNTR(2) ) ), 
+     :               %VAL( CNF_PVAL( PNTR(2) ) ),
      :               %VAL( CNF_PVAL( QPNTR(1) ) ), USED,
      :               %VAL( CNF_PVAL( FPNTR ) ),
      :               %VAL( CNF_PVAL( FEPNTR ) ),
@@ -656,19 +656,19 @@
                ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                   CALL FTGCVI( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADW,
      :                         %VAL( CNF_PVAL( EXPNTR ) ), BAD, FSTAT )
-      
+
                ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADI,
      :                         %VAL( CNF_PVAL( EXPNTR ) ), BAD, FSTAT )
-      
+
                ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                   CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR,
      :                         %VAL( CNF_PVAL( EXPNTR ) ), BAD, FSTAT )
-      
+
                ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGCVD( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADD,
      :                         %VAL( CNF_PVAL( EXPNTR ) ), BAD, FSTAT )
-      
+
                END IF
 
 *  Tidy the locator to the component.

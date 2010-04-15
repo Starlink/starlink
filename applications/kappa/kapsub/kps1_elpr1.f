@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_ELPR1( NX, NY, PA, RATIO, NSTEP, RSTEP, RMIN, WID,
-     :                       XC, YC, PA1, PA2, USESEC, REGVAL, IGRP, 
+     :                       XC, YC, PA1, PA2, USESEC, REGVAL, IGRP,
      :                       REGIND, REGCEN, REGWID, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_ELPR1( NX, NY, PA, RATIO, NSTEP, RSTEP, RMIN, WID, XC,
-*                      YC, PA1, PA2, USESEC, REGVAL, IGRP, REGIND, 
+*                      YC, PA1, PA2, USESEC, REGVAL, IGRP, REGIND,
 *                      REGCEN, REGWID, STATUS )
 
 *  Description:
@@ -72,7 +72,7 @@
 *        annulus.
 *     REGVAL = INTEGER (Given)
 *        The value which will be passed to subroutine ARD_WORK as the
-*        value to use to represent the first region included in the 
+*        value to use to represent the first region included in the
 *        ARD description.
 *     IGRP = INTEGER (Returned)
 *        A GRP identifier for a group containing the ARD description.
@@ -85,9 +85,9 @@
 *        integer values which subroutine ARD_WORK uses to represent
 *        each region.
 *     REGCEN( NSTEP ) = REAL (Returned)
-*        The radial distance to the centre of each annulus, in pixels. 
+*        The radial distance to the centre of each annulus, in pixels.
 *     REGWID( NSTEP ) = REAL (Returned)
-*        The width of each annulus, in pixels. 
+*        The width of each annulus, in pixels.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -125,7 +125,7 @@
 *     3-AUG-1998 (DSB):
 *        Corrected logic for creating sectors of larger than 180 degrees.
 *     6-DEC-2004 (DSB):
-*        Write first polgon vertex out on same line as the POLY keyword 
+*        Write first polgon vertex out on same line as the POLY keyword
 *        (this is a work around for a bug in ARD).
 *     {enter_further_changes_here}
 
@@ -137,7 +137,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP__ constants
-      
+
 *  Arguments Given:
       INTEGER NX
       INTEGER NY
@@ -153,18 +153,18 @@
       REAL PA2
       LOGICAL USESEC
       INTEGER REGVAL
-      
+
 *  Arguments Returned:
       INTEGER IGRP
       INTEGER REGIND( * )
       REAL REGCEN( NSTEP )
       REAL REGWID( NSTEP )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      REAL RTOD                  ! Factor to convert radians to degrees 
+      REAL RTOD                  ! Factor to convert radians to degrees
       PARAMETER ( RTOD = 57.29578 )
       REAL PI                    ! Pi
       PARAMETER ( PI = 3.1415927 )
@@ -172,7 +172,7 @@
       PARAMETER ( TWOPI = 2.0*PI )
       REAL PIBY2                 ! Pi by 2
       PARAMETER ( PIBY2 = 0.5*PI )
-      
+
 *  Local Variables:
       REAL CENTRE                ! Major axis radius of annulus centre
       INTEGER CURVAL             ! ARD mask value for current region
@@ -193,7 +193,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create the GRP group in which to store the ARD description.
-      CALL GRP_NEW( 'ARD DESCRIPTION', IGRP, STATUS )      
+      CALL GRP_NEW( 'ARD DESCRIPTION', IGRP, STATUS )
 
 *  Initialise the value which will be used by ARD_WORK to represent
 *  the `current' region.
@@ -205,7 +205,7 @@
       WRITE( TEXT, * ) 'OFFSET(', XC, ',', YC, ')'
       CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
-*  If the ARD description is to describe the intersection of the 
+*  If the ARD description is to describe the intersection of the
 *  annuli with the sector specified by PA1 and PA2...
       IF( USESEC ) THEN
 
@@ -219,13 +219,13 @@
 
 *  Add 2PI onto PA2 until it is larger than PA1.
          LPA2 = PA2
-         DO WHILE( LPA2 .LE. PA1 ) 
+         DO WHILE( LPA2 .LE. PA1 )
             LPA2 = LPA2 + TWOPI
          END DO
 
 *  Start a Polygon ARD region. The sector polygon starts at the profile
 *   centre.
-         CALL GRP_PUT( IGRP, 1, 'POLY( 0.0, 0.0', 0, STATUS )         
+         CALL GRP_PUT( IGRP, 1, 'POLY( 0.0, 0.0', 0, STATUS )
 
 *  Next point is the end of radius number 1 .
          WRITE( TEXT, * ) R*COS( PA1 ), ',', R*SIN( PA1 )
@@ -258,7 +258,7 @@
 
 *  Find the major-axis radius of the centre of the outer-most annulus.
       CENTRE = RMIN + REAL( NSTEP - 1 ) * RSTEP + HWID
-      
+
 *  Loop round each annulus, from the outer most to the inner-most.  ARD
 *  will assume that implicit .OR. operators exist between each pair of
 *  keywords.
@@ -294,9 +294,9 @@
          IF ( WID .LT. RSTEP ) THEN
 
 *  Produe an ARD description for the annulus.
-            WRITE( TEXT, * ) '( ELLIPSE( 0.0, 0.0, ', OMAJ, ',', 
+            WRITE( TEXT, * ) '( ELLIPSE( 0.0, 0.0, ', OMAJ, ',',
      :                       OMIN, ',', RTOD * PA, ') .AND. .NOT. ',
-     :                       'ELLIPSE( 0.0, 0.0, ', IMAJ, ',', 
+     :                       'ELLIPSE( 0.0, 0.0, ', IMAJ, ',',
      :                       IMIN, ',', RTOD * PA, ') )'
 
 *  Increment the current mask value to take account of the second
@@ -312,7 +312,7 @@
          END IF
 
 *  Store the ARD description for this annulus.
-         CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )      
+         CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
 *  Find the major axis radius of the centre of the next annulus.
          CENTRE = CENTRE - RSTEP
@@ -320,14 +320,14 @@
       END DO
 
 *  Close the parentheses opened after the original POLY keyword).
-      CALL GRP_PUT( IGRP, 1, ')', 0, STATUS )      
+      CALL GRP_PUT( IGRP, 1, ')', 0, STATUS )
 
 *  If the width and step are equal, we now need to blank out the inside
 *  of the inner-most ellipse.
       IF ( WID .GE. RSTEP ) THEN
          WRITE( TEXT, * ) ' .AND. .NOT. ELLIPSE( 0.0, 0.0, ', IMAJ,
      :                    ',', IMIN, ',', RTOD*PA, ')'
-         CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )      
+         CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
       END IF
 
       END

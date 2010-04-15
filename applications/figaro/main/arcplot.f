@@ -4,23 +4,23 @@
 *+
 *  Name:
 *     ARCPLOT
-      
+
 *  Purpose:
 *     Plot arc dispersion information and control fitting
-      
+
 *  Language:
 *     Starlink Fortran 77
-      
+
 *  Invocation:
 *     CALL ARCPLOT(XPLOT,YPLOT,COEFF,RESULTS,WAVES,ARC,RESVAR,XSECT,IOPT
 *           ,ERROR,WEIGHT,ORDER,LINNAM,POLYDATA,POLYTAB,USENAGERR,
 *           STATUS)
-      
+
 *  Description:
 *     Plots of the dispersion relation and residuals on the fit are
 *    made, and the user can alter the settings, request another fit,
 *    etc.
-      
+
 *  Arguments:
 *     XPLOT = REAL ARRAY (Given)
 *        X axis array data
@@ -69,7 +69,7 @@
 *     AJH: A.J.Holloway (Manchester)
 *     ACD: A C Davenhall (Edinburgh)
 *     {enter_new_authors_here}
-      
+
 *  History:
 *     26-AUG-1993 (TNW):
 *        Original version.
@@ -88,12 +88,12 @@
 *     18-DEC-2000 ACD:
 *        Removed the spurious argument NBAD in the calls to GR_RANGE.
 *     {enter_changes_here}
-      
+
 *  Bugs:
 *     {note_any_bugs_here}
-      
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
       INCLUDE 'PRM_PAR'
@@ -201,7 +201,7 @@
 
       CALL GR_SOFT(STATUS)
 
-* Get position of centres      
+* Get position of centres
 
       PPOSD = GET_PARNUM('Centre_1')
       PPOSC = GET_PARNUM('Contincent')
@@ -211,21 +211,21 @@
       NXSECT = XSECT
       K1 = ORDER + 1
       TABLE = ERROR.NE.SAI__OK
-      
+
       LOOP = STATUS.EQ.SAI__OK
       DO WHILE(LOOP)
-         
+
 *  Start plots, with order indicator
-         
+
          CALL PGBBUF
          CALL PGPAGE
-         
+
 * First indicate order
-         
+
          CALL SLIDER('ORDER','D',LIST(1,1),ORDER,OLDVAL)
-         
+
 *  Then whether we're using weights
-         
+
          CALL PGVPORT(WEIX1,WEIX2,WEIY1,WEIY2)
          CALL PGWINDOW(0.0,1.0,0.0,1.0)
          CALL PGSCI(1)
@@ -277,21 +277,21 @@
          ENDIF
 
          IF(SPDIM1.GT.1) THEN
-            
+
 *  Then current xsect
-            
+
             CALL SLIDER('XSECT','D',LIST(1,2),NXSECT,OLDVAL)
          ENDIF
          NWLIST = 0
          IF(.NOT.TABLE) THEN
             DO I = 1, K1 - 1
-               DCOEFF(I) = COEFF(I) * REAL(K1 - I) 
+               DCOEFF(I) = COEFF(I) * REAL(K1 - I)
            ENDDO
             CALL EPOLYA(WAVDIM,K1-1,DCOEFF,XPLOT,YPLOT)
             CALL GR_RANGE(YPLOT,1,WAVDIM,YMIN,YMAX,STATUS)
-            
+
 * First plot, of calculated dispersion against position
-            
+
             CALL PGVPORT(XMAIN1,XMAIN2,0.53,0.96)
             CALL PGWINDOW(XPLOT(1),XPLOT(WAVDIM),YMIN,YMAX)
             CALL PGBOX('BCNST',0.0,0,'BCNST',0.0,0)
@@ -309,9 +309,9 @@
             ENDDO
             CALL PGMTEXT('T',0.5,0.5,0.5,'Latest fit (dispersion)')
             CALL PGMTEXT('T',0.5,1.0,1.0,'Hit ? for help')
-            
+
 * 2nd plot, of residuals
-            
+
             CALL GR_RANGE(YPLOT,1,COUNT,YMIN,YMAX,STATUS)
             YVMAX = 0.45
             CALL PGVPORT(XMAIN1,XMAIN2,YVMIN,YVMAX)
@@ -355,13 +355,13 @@
             CALL PGDRAW(XPLOT(WAVDIM),0.0)
             CALL PGSLS(1)
          ELSE
-            
+
 * There was a problem with the fitting, so we have to provide user
 * interaction without the dispersion plots, etc. Also can be selected if
 * required.
-            
+
 * Write list of lines to plotting device
-            
+
             YVMAX = 0.95
             CALL PGVPORT(XMAIN1,XMAIN2,YVMIN,YVMAX)
             XMIN = 0.0
@@ -426,7 +426,7 @@
 *    Indicate if the current data is unuseable for continuity-corrected
 * data, but could be used for original data
 
-* CHANGE I to LINE               
+* CHANGE I to LINE
                IF(POLYDATA.AND.ARC(1,LINE).EQ.ARC_ORIG)THEN
                   CALL PGSCI(0)
                   CALL PGRECT(0.83,0.84,Y-0.2,Y-0.5)
@@ -459,9 +459,9 @@
                CALL TEST_AREAS(NWLIST,4,WLIST,X,Y,ID2)
             ENDIF
             IF(ID.EQ.1) THEN
-               
+
 *  Change current order
-               
+
                OLDVAL = ORDER
                Y = YTEST0 * (YVMAX - YVMIN)/(ORBY2 - ORBY1)
                YTEST = Y*(ORDMAX+0.5)-0.5
@@ -476,7 +476,7 @@
                ORDER = MIN(ORDER,IORDMAX)
                CALL SLIDER('ORDER','M',LIST(1,1),ORDER,OLDVAL)
             ELSE IF((ID.EQ.2).AND.(SPDIM1.GT.1)) THEN
-               
+
 *  Change current cross-section
 
                OLDVAL = NXSECT
@@ -486,7 +486,7 @@
                   NXSECT = NXSECT - 1
                ELSE IF(YTEST.GT.(REAL(SPDIM1)+0.5)) THEN
                   NXSECT = NXSECT + 1
-               ELSE 
+               ELSE
                   NXSECT = NINT(YTEST)
                ENDIF
                NXSECT = MIN(SPDIM1,MAX(1,NXSECT))
@@ -682,9 +682,9 @@
             ELSE
                IF(.NOT.TABLE) THEN
                   IF(CUR.EQ.'P') THEN
-                     
+
 *  Purge line from list
-                     
+
                      TDIST = VAL__MAXR
                      DO I = 1, LINE_COUNT
                         DIST = ABS(RESULTS(PPOS,I,XSECT) - X)
@@ -702,9 +702,9 @@
                      CALL PGPOINT(1,RESULTS(PPOS,LINE,XSECT),YPLOT(LINE)
      :                    ,0)
                   ELSE IF(CUR.EQ.'R') THEN
-                     
+
 *    Return line to list
-                     
+
                      TDIST = VAL__MAXR
                      DO I = 1, LINE_COUNT
                         DIST = ABS(RESULTS(PPOS,I,XSECT) - X)

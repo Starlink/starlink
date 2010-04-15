@@ -1,6 +1,6 @@
 #!/stardev/bin/tclsh8.2
 
-#+ 
+#+
 #  resolvename.tcl
 #
 #  Example script to find the coordinates a named object.

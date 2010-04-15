@@ -163,19 +163,19 @@
       CALL MSG_SETI( 'UBND1', UBND( 1 ) )
       CALL MSG_SETI( 'LBND2', LBND( 2 ) )
       CALL MSG_SETI( 'UBND2', UBND( 2 ) )
-      CALL MSG_OUT( ' ', 
+      CALL MSG_OUT( ' ',
      : '  Input image bounds: (^LBND1:^UBND1,^LBND2:^UBND2)', STATUS )
       CALL MSG_BLANK( STATUS )
       CALL MSG_SETI( 'XDIM', XDIMS )
       CALL MSG_SETI( 'YDIM', YDIMS )
-      CALL MSG_OUT( ' ', '  Autocropped image size: ^XDIM,^YDIM', 
+      CALL MSG_OUT( ' ', '  Autocropped image size: ^XDIM,^YDIM',
      :              STATUS )
       CALL MSG_SETI( 'LBNDS1', LBNDS( 1 ) )
       CALL MSG_SETI( 'UBNDS1', UBNDS( 1 ) )
       CALL MSG_SETI( 'LBNDS2', LBNDS( 2 ) )
       CALL MSG_SETI( 'UBNDS2', UBNDS( 2 ) )
-      CALL MSG_OUT( ' ', 
-     : '  Autocropped image bounds: (^LBNDS1:^UBNDS1,^LBNDS2:^UBNDS2)', 
+      CALL MSG_OUT( ' ',
+     : '  Autocropped image bounds: (^LBNDS1:^UBNDS1,^LBNDS2:^UBNDS2)',
      :     STATUS )
       CALL MSG_BLANK( STATUS )
       IF ( XDIM .EQ. XDIMS .AND. YDIM .EQ. YDIMS ) THEN

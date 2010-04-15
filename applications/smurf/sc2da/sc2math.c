@@ -94,23 +94,23 @@ int *status             /* global status (given and returned) */
       ngrid :
        During a cycle the SMU describes a cyclic path through pixel points.
        Within the total area of the path ngrid pixel points are defined.
-       These points are at average bolometer distances and should lie on a 
+       These points are at average bolometer distances and should lie on a
        rectangular (but almost square) grid.
        ngrid should be a square.
       npath = nvert * smu_samples
        nvert    - The number of vertices visited by the SMU
        smu_samples - The number of samples taken between two vertices of
-                     the SMU pattern. 
+                     the SMU pattern.
        sample_t - The sample interval in msec.
- 
-      For each of the npath points in the path coefficients {Bij} are PSF 
+
+      For each of the npath points in the path coefficients {Bij} are PSF
       values following from the distances to each pixel point.
-      The coefficients {Aij} are the {Bij} values convolved with the 
+      The coefficients {Aij} are the {Bij} values convolved with the
       Impulse response function.
- 
+
      The ngrid pixel points are defined relative to the centre bolometer
      position.
- 
+
    Authors :
     H.W. van Someren Greve (greve@astron.nl)
 
@@ -187,7 +187,7 @@ int *status             /* global status (given and returned) */
          numbad++;
       }
    }
-   
+
 /* Calculate the pixel equation coefficients.
    It is assumed that all bolometer time constants are the same !! */
 
@@ -210,7 +210,7 @@ int *status             /* global status (given and returned) */
 /* Put in gridwts all the sky grid weights for all measurements with a
    single bolometer */
 
-   sc2math_interpwt ( npath, ngrid, conv_shape, conv_sig, sample_t, tbol, 
+   sc2math_interpwt ( npath, ngrid, conv_shape, conv_sig, sample_t, tbol,
      jiggrid, gridpts, *gridwts, status );
 
 /* Calculate the size of the sky map which includes all the grid points
@@ -234,7 +234,7 @@ int *status             /* global status (given and returned) */
 
 /* generate the parameters of one problem equation at a time and collect
    them into the normal equation array */
-   
+
    bolnum = -1;
 
    for ( j=0; j<nboly; j++ )
@@ -243,7 +243,7 @@ int *status             /* global status (given and returned) */
       {
          if ( qual[nbolx*j + i] == 0 )
 	 {
-	 
+
             bolnum++;
 
 /* Set the flag corresponding to the zero point of this bolometer */
@@ -304,14 +304,14 @@ int *status             /* global status (given and returned) */
    if ( err == -1 )
    {
       *status = DITS__APP_ERROR;
-      sprintf ( errmess, 
+      sprintf ( errmess,
         "sc2math_calcmapwt: Can't invert matrix, not positive definite" );
       ErsRep ( 0, status, errmess );
    }
    else if ( err == 1 )
    {
       *status = DITS__APP_ERROR;
-      sprintf ( errmess, 
+      sprintf ( errmess,
         "sc2math_calcmapwt: Can't invert matrix, loss of significance" );
       ErsRep ( 0, status, errmess );
    }
@@ -336,8 +336,8 @@ int *status             /* global status (given and returned) */
     Calculate mean and dispersion in a single pass.
    History :
     01Aug2007 : original (bdk)
-    29Jun2008 : fix calculation of sigma (bdk) 
-    22Jul2008 : move into sc2math library (bdk)   
+    29Jun2008 : fix calculation of sigma (bdk)
+    22Jul2008 : move into sc2math library (bdk)
 */
 {
    int count;              /* count of number used in mean */
@@ -388,8 +388,8 @@ int *status             /* global status (given and returned) */
 
 /*+ sc2math_choles - Factorize symmetric positive definite matrix */
 
-void sc2math_choles 
-( 
+void sc2math_choles
+(
 int n,         /* Dimension of the matrix (given) */
 double a[],    /* Square matrix of NxN values.
                   Only the lower-left triangle is given and returned.
@@ -507,7 +507,7 @@ int *ierr      /* Error code
 
 /*+ sc2math_cholesky - Invert matrix according to the Cholesky method */
 
-void sc2math_cholesky 
+void sc2math_cholesky
 (
 int nunkno,     /* The number of unknowns (given) */
 double lmat[],  /* The lower left triangle of the equation matrix.
@@ -531,7 +531,7 @@ int *err        /* Possible error code in factorizing the matrix (returned) */
     is the Determinant of matrix {aij}.
 
     First factorize the matrix in CHOLES.
-    If the matrix is not a proper positive definite matrix, this becomes 
+    If the matrix is not a proper positive definite matrix, this becomes
     apparent in CHOLES during the factorization process.
     Then do the inversion on the transformed matrix in INVPDM.
 
@@ -560,7 +560,7 @@ int *err        /* Possible error code in factorizing the matrix (returned) */
    {
       nlist = nunkno;
       if ( nunkno > 9 ) nlist = 9;
-      printf ( 
+      printf (
         "sc2math_cholesky: Top %d low left triangle of the factorized matrix\n",
         nlist );
       ofs = 1;
@@ -598,7 +598,7 @@ int *status             /* global status (given and returned) */
     outliers.
    History :
     01Aug2007 : original (bdk)
-    13Aug2007 : make into more general utility (bdk) 
+    13Aug2007 : make into more general utility (bdk)
     17Aug2007 : trap very small sigma (ie noise-free data) (bdk)
     22Jul2008 : move into sc2math library (bdk)
 */
@@ -633,7 +633,7 @@ int *status             /* global status (given and returned) */
       {
          for ( k=0; k<num; k++ )
          {
-            if ( ( datacopy[k] != VAL__BADD ) && 
+            if ( ( datacopy[k] != VAL__BADD ) &&
               ( fabs ( datacopy[k] - *mean ) > sigfac*sigma ) )
             {
                datacopy[k] = VAL__BADD;
@@ -651,7 +651,7 @@ int *status             /* global status (given and returned) */
 
 /*+ sc2math_conval - Calculate a value of the convolution function */
 
-double sc2math_conval 
+double sc2math_conval
 (
 int conv_shape,     /* Code for convolution function (given) */
 double conv_sig,    /* Convolution function parameter (given) */
@@ -785,7 +785,7 @@ int *status         /* global status (given and returned) */
       w = s1 * s2;
    }
      /* bessel tapered */
-   /*   else if ( conv_shape == 4 ) 
+   /*   else if ( conv_shape == 4 )
    {
 
       s = sqrt ( dx*dx + dy*dy );
@@ -806,8 +806,8 @@ int *status         /* global status (given and returned) */
    else
    {
       *status = DITS__APP_ERROR;
-      sprintf ( errmess, 
-        "sc2math_conval: Convolution function %d not implemented\n", 
+      sprintf ( errmess,
+        "sc2math_conval: Convolution function %d not implemented\n",
 	conv_shape );
       ErsRep ( 0, status, errmess );
       w = 0.0;
@@ -829,19 +829,19 @@ int *status       /* global status (given and returned) */
 )
 
 /*   Method :
-      Put into each output value the sum of the input values weighted by 
+      Put into each output value the sum of the input values weighted by
       the filter.
      Author :
       B.D.Kelly (REVAD::BDK)
      History :
-      30.06.1993: original, based loosely on JCMTDR_CONVOLVE 
+      30.06.1993: original, based loosely on JCMTDR_CONVOLVE
                   (REVAD::BDK)
 */
 
 {
    int endfilt;      /* convolution limit */
    int j;            /* index to output array */
-   int joff;         /* position in input array corresponding to start 
+   int joff;         /* position in input array corresponding to start
                          of filter */
    int k;            /* index to filter */
    int startfilt;    /* convolution limit */
@@ -855,7 +855,7 @@ int *status       /* global status (given and returned) */
    {
       sum = (double) 0.0;
 
-/*   Set range of convolution to prevent k and inpos from going outside 
+/*   Set range of convolution to prevent k and inpos from going outside
      their array bounds */
 
       startfilt = filtmid - j;
@@ -870,7 +870,7 @@ int *status       /* global status (given and returned) */
          endfilt = filtlen;
       }
 
-/*   Calculating joff is a small optimisation not done by the compiler 
+/*   Calculating joff is a small optimisation not done by the compiler
      */
 
       joff = j - filtmid;
@@ -887,8 +887,8 @@ int *status       /* global status (given and returned) */
 
 /*+ sc2math_cubfit - fit a set of values with a cubic */
 
-void sc2math_cubfit 
-( 
+void sc2math_cubfit
+(
 int npts,                 /* number of data points (given) */
 double *x,                /* observed values (given) */
 double *y,                /* observed values (given) */
@@ -914,11 +914,11 @@ int *status               /* global status (given and returned) */
    int despike;            /* flag for spike removal */
    int nterms;             /* number of combined waveforms */
    static double standard_waves[1024*3];   /* values of standard waveforms */
-   double standard_weights[1024]; /* if y[j] is not to be used, 
+   double standard_weights[1024]; /* if y[j] is not to be used,
                             standard_weights[j] = 0.0, otherwise
                             standard_weights[j] = 1.0 */
-   double used_weights[1024];  /* if y[j] was not used, 
-                                 used_weights[j] = 0.0, otherwise 
+   double used_weights[1024];  /* if y[j] was not used,
+                                 used_weights[j] = 0.0, otherwise
                                  used_weights[j] = 1.0  */
    double fitted_y[1024];  /* combined waveform computed from the fit */
    int nbad;              /* number of points rejected as suspected
@@ -947,7 +947,7 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_eq0  - Make equation matrix */
 
-void sc2math_eq0 
+void sc2math_eq0
 (
 int nunkno,        /* The number of unknowns (given) */
 double lcoef[],    /* The known values (given) */
@@ -955,7 +955,7 @@ double lmat[]      /* equation matrix (given and returned) */
 )
 
 /* Description :
-    This routine makes the square equation matrix with the sum 
+    This routine makes the square equation matrix with the sum
     coefficients of a least squares solution.
     The routine is called in a loop per observed point with the
     NUNKNO coefficients for that point.
@@ -967,14 +967,14 @@ double lmat[]      /* equation matrix (given and returned) */
     especially if the LCOEF vector contains mostly zeroes.
 
     lcoef contains the known coefficients of the
-    least square equation, for example for a polynomial the vector 
+    least square equation, for example for a polynomial the vector
     contains the values : 1.0, X, X**2, X**3, etc.
 
     Only the lower left part of lmat (the equation matrix) is made
     because the equation matrix is symmetrical.
-    So this is a 1 dimensional array of dimension NUNKNO*(NUNKNO+1)/2 
+    So this is a 1 dimensional array of dimension NUNKNO*(NUNKNO+1)/2
     which must be cleared before the first call of this routine.
- 
+
    Authors :
     W.N. Brouw  (wbrouw@csiro.au)
 
@@ -1431,7 +1431,7 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_get_cycle - Return data for a single measurement cycle */
 
-void sc2math_get_cycle 
+void sc2math_get_cycle
 (
 int cur_cycle,    /* current cycle number (given) */
 int nsam_cycle,   /* number of samples per cycle (given) */
@@ -1494,7 +1494,7 @@ int *status          /* global status (given and returned) */
 
 /* Description :
     Search for the minimum and maximum grid offsets in X and Y.
- 
+
    Authors :
     B.D.Kelly (bdk@roe.ac.uk)
 
@@ -1505,7 +1505,7 @@ int *status          /* global status (given and returned) */
 
 {
    int j;                     /* Bolometer location */
-      
+
 
    if ( !StatusOkP(status) ) return;
 
@@ -1529,7 +1529,7 @@ int *status          /* global status (given and returned) */
 
 /*+ sc2math_interpwt - Calculate the weight matrix for spatial interpolation */
 
-void sc2math_interpwt 
+void sc2math_interpwt
 (
 int npath,           /* Nr of rows (given) */
 int ngrid,           /* Nr of columns (given) */
@@ -1554,14 +1554,14 @@ int *status          /* (given and returned) */
           | 0 | 1 | 2 | 3 | 4 | ..........................|ngrid-1|
           +-------------------------------------------------------+
      0    | This row contains ngrid weights for point 0.          |
-     1    | This row contains ngrid weights for point 1.          | 
+     1    | This row contains ngrid weights for point 1.          |
      .    |                                                       |
      .    |                                                       |
      i    | This row contains ngrid weights for point i.          |
      .    |                                                       |
   npath-1 | This row contains ngrid weights for the last point.   |
           +-------------------------------------------------------+
-      
+
 
     Make the weight coefficients for each sample and for each grid point.
     depending on the SMU position, the distances to each grid point, and
@@ -1676,7 +1676,7 @@ int *status          /* (given and returned) */
 
 /* Get all pixel weights of pixel j (column) in array wtcol
    for Njiggle cycles. These are stored in wtcol, in such a way that
-   the 1st nirf values (length of the Impulse response function) 
+   the 1st nirf values (length of the Impulse response function)
    remain empty. */
 
       k = j;                          /* Column for pixel j in wtpix */
@@ -1732,7 +1732,7 @@ int *status          /* (given and returned) */
    if ( sc2math_trace(2) )
    {
       printf ( "Normalized coefficient matrix with Impulse Response (output)\n" );
-      printf ( 
+      printf (
         " row    0     1     2     3     4     5     6     7     8     SUM\n" );
       for ( n=0; n<ngrid; n++ )
       {
@@ -1741,7 +1741,7 @@ int *status          /* (given and returned) */
       for ( j=0; j<npath; j++ )
       {
          x = 0.0;
-         i = j * ngrid;                    
+         i = j * ngrid;
          for ( n=0; n<ngrid; n++ )
          {
             x = x + b[i+n];
@@ -1754,7 +1754,7 @@ int *status          /* (given and returned) */
          }
          printf ( " %e\n", x );
       }
-      printf ( 
+      printf (
         "    ------------------------------------------------------------\n" );
       printf ( "   SUM" );
       for ( n=0; n<ngrid; n++ )
@@ -1768,7 +1768,7 @@ int *status          /* (given and returned) */
 
 /*+ sc2math_invpdm - Invert positive definite matrix */
 
-void sc2math_invpdm 
+void sc2math_invpdm
 (
 int n,       /* Dimension of the matrix (given) */
 double a[]   /* Square Matrix with NxN points.
@@ -1967,11 +1967,11 @@ int *status             /* global status (given and returned) */
    }
    else
    {
-      sprintf ( errmess, "sc2math_jig2grid: invalid subarray name %s", 
+      sprintf ( errmess, "sc2math_jig2grid: invalid subarray name %s",
         subname );
       *status = DITS__APP_ERROR;
       ErsRep ( 0, status, errmess );
-      
+
    }
 }
 
@@ -1993,7 +1993,7 @@ const double wt[],    /* weights (given) */
 double *grad,         /* slope (returned) */
 double *cons,         /* offset (returned) */
 int *status           /* global status (given and returned) */
-)                                       
+)
 /* Description :
     Simple least-squares fit of a straight line. In general the weights
     are expected to be 1.0 or 0.0, allowing points to be ignored.
@@ -2112,7 +2112,7 @@ int *status
    int n;                    /* loop counter */
    int ngrid;                /* number of points in grid for a bolometer */
    int numbad;               /* number of bad bolometers */
-   int nunkno;               /* number of unknowns in solution */ 
+   int nunkno;               /* number of unknowns in solution */
    int outheight;            /* height of output map */
    int outwid;               /* width of output map */
    double *par;              /* Pointer to parameters of problem eqn. */
@@ -2163,7 +2163,7 @@ int *status
 
    if ( maxmap >= outwid*outheight )
    {
-   
+
       dims[0] = outwid;
       dims[1] = outheight;
 
@@ -2182,7 +2182,7 @@ int *status
 
 /* generate the parameters of one problem equation at a time and collect
    them into the normal equation array */
-   
+
       bolnum = -1;
 
       for ( j=0; j<nboly; j++ )
@@ -2191,7 +2191,7 @@ int *status
          {
 	    if ( qual[nbolx*j + i] == 0 )
 	    {
-	    
+
                bolnum++;
 
 /* Set the flag corresponding to the zero point of this bolometer */
@@ -2220,10 +2220,10 @@ int *status
 /* Combine the measurement for this bolometer at this path point into the
    measurement vector */
 
-                  sc2math_vec ( nunkno, par, psbuf[k*nbolx*nboly+j*nbolx+i], 
+                  sc2math_vec ( nunkno, par, psbuf[k*nbolx*nboly+j*nbolx+i],
 		    kvec, &lssum );
 if ( bolnum==660 )
-  printf ( "bolnum = %d  frame = %d psbuf = %e\n", 
+  printf ( "bolnum = %d  frame = %d psbuf = %e\n",
   bolnum, k, psbuf[k*nbolx*nboly+j*nbolx+i] );
 /* Unset the weight for all the sky grid points relevant at this path point
    of this bolometer */
@@ -2249,7 +2249,7 @@ if ( bolnum==660 )
 
 /* Solve for the pixel values and their rms values */
 
-      sc2math_sol ( nunkno, nframes*actbol, invmat, kvec, lssum, &lme, 
+      sc2math_sol ( nunkno, nframes*actbol, invmat, kvec, lssum, &lme,
         sme, sint );
 
 /* Extract the intensities - sint and sme contain both the solved
@@ -2354,7 +2354,7 @@ int *status        /* global status (given and returned) */
       sumdiffsq = (double) 0.0;
       for ( j=roundper; j<maxlen-roundper; j++ )
       {
-         diff = signal[j] - 
+         diff = signal[j] -
            ( signal[j-roundper] + signal[j+roundper] ) / (double)2.0;
          sumdiff += diff;
          sumdiffsq += diff * diff;
@@ -2372,8 +2372,8 @@ int *status        /* global status (given and returned) */
       sigma = (double) sqrt ( (double) sigma / (double) fnum );
       if ( worstval > ( (double)4.0 * sigma ) )
       {
-         signal[worstpos] = 
-           ( signal[worstpos-roundper] + signal[worstpos+roundper] ) / 
+         signal[worstpos] =
+           ( signal[worstpos-roundper] + signal[worstpos+roundper] ) /
            (double)2.0;
          (*nbad)++;
          badscan[worstpos] = (char) 1;
@@ -2387,10 +2387,10 @@ int *status        /* global status (given and returned) */
 
 /*+  sc2math_matinv - invert a symmetric matrix */
 
-void sc2math_matinv 
-( 
+void sc2math_matinv
+(
 int norder,            /* degree of matrix (given) */
-double array[10][10],  /* given matrix, its inverse is returned 
+double array[10][10],  /* given matrix, its inverse is returned
                          (given and returned) */
 double *det,           /* determinant of ARRAY (returned) */
 int *status            /* global status (given and returned) */
@@ -2398,9 +2398,9 @@ int *status            /* global status (given and returned) */
 
 /*   Method :
       Invert a symmetric matrix and calculate its determinant.
-      Taken from "Data reduction and error analysis for the physical 
+      Taken from "Data reduction and error analysis for the physical
       sciences", P.R.Bevington.
-      example: the inverse of 
+      example: the inverse of
                    1  2  3
                    2  1  1
                    3  1  2
@@ -2415,7 +2415,7 @@ int *status            /* global status (given and returned) */
       30.11.1988:  original (REVAD::BDK)
       02.02.1990:  rationalise names (REVAD::BDK)
       01.04.1992:  version for SCUSP library (REVAD::BDK)
-      11.10.1993:  use the "+="-style construction, and test on a VAX 
+      11.10.1993:  use the "+="-style construction, and test on a VAX
                    against the example given in Method (REVAD::BDK)
      endhistory
 */
@@ -2445,7 +2445,7 @@ int *status            /* global status (given and returned) */
       {
          for ( j=k; j<norder; j++ )
          {
-            if ( fabs(armax) <= fabs(array[j][i]) ) 
+            if ( fabs(armax) <= fabs(array[j][i]) )
             {
                armax = array[j][i];
                ik[k] = i;
@@ -2456,7 +2456,7 @@ int *status            /* global status (given and returned) */
 
 /*   Interchange rows and columns to put armax in array[k][k] */
 
-      if ( armax == 0.0 ) 
+      if ( armax == 0.0 )
       {
          *det = (double) 0.0;
          return;
@@ -2464,7 +2464,7 @@ int *status            /* global status (given and returned) */
 
       i = ik[k];
 
-      if ( i > k ) 
+      if ( i > k )
       {
          for ( j=0; j<norder; j++ )
          {
@@ -2476,7 +2476,7 @@ int *status            /* global status (given and returned) */
 
       j = jk[k];
 
-      if ( j > k ) 
+      if ( j > k )
       {
          for ( i=0; i<norder; i++ )
          {
@@ -2490,7 +2490,7 @@ int *status            /* global status (given and returned) */
 
       for ( i=0; i<norder; i++ )
       {
-         if ( i != k) 
+         if ( i != k)
          {
             array[k][i] = -array[k][i] / armax;
          }
@@ -2498,11 +2498,11 @@ int *status            /* global status (given and returned) */
 
       for ( i=0; i<norder; i++ )
       {
-         if ( i != k ) 
+         if ( i != k )
          {
             for ( j=0; j<norder; j++ )
             {
-               if ( j != k ) 
+               if ( j != k )
                {
                   array[j][i] += array[k][i] * array[j][k];
                }
@@ -2512,7 +2512,7 @@ int *status            /* global status (given and returned) */
 
       for ( j=0; j<norder; j++ )
       {
-         if ( j != k ) 
+         if ( j != k )
          {
             array[j][k] /= armax;
          }
@@ -2529,7 +2529,7 @@ int *status            /* global status (given and returned) */
    {
       j = ik[k];
 
-      if ( j > k ) 
+      if ( j > k )
       {
          for ( i=0; i<norder; i++ )
          {
@@ -2541,7 +2541,7 @@ int *status            /* global status (given and returned) */
 
       i = jk[k];
 
-      if ( i > k ) 
+      if ( i > k )
       {
          for ( j=0; j<norder; j++ )
          {
@@ -2552,12 +2552,12 @@ int *status            /* global status (given and returned) */
       }
 
    }
- 
+
 }
 
 /*+ sc2math_msv - Multiply matrix with column vector */
 
-void sc2math_msv 
+void sc2math_msv
 (
 int m,        /* Number of unknowns (given) */
 double s[],   /* Lower left triangle of a symmetric matrix of MxM (given) */
@@ -2614,7 +2614,7 @@ double x[]    /* Vector with dimension M with the result (returned) */
 
 /*+ sc2math_pathwts - Pixel weights for SMU path */
 
-void sc2math_pathwts 
+void sc2math_pathwts
 (
 int conv_shape,       /* Code for convolution function (given) */
 double conv_sig,      /* Convolution function parameter (given) */
@@ -2703,34 +2703,34 @@ int *status           /* global status (given and returned) */
 
 /*+ sc2math_recurfit - fit a set of values with outlier rejection */
 
-void sc2math_recurfit 
-( 
+void sc2math_recurfit
+(
 int despike,            /* flag for spike removal (given) */
 int npts,               /* number of data points (given) */
 int nterms,             /* number of combined waveforms (given) */
 double *standard_waves,   /* values of standard waveforms (given) */
-double *standard_weights, /* if volts[j] is not to be used, 
+double *standard_weights, /* if volts[j] is not to be used,
                             standard_weights[j] = 0.0, otherwise
                             standard_weights[j] = 1.0 (given) */
 double *volts,            /* observed values (given) */
-double *used_weights,     /* if volts[j] was not used, 
-                            used_weights[j] = 0.0, otherwise 
+double *used_weights,     /* if volts[j] was not used,
+                            used_weights[j] = 0.0, otherwise
                             used_weights[j] = 1.0 (returned) */
-double *fitted_volts,     /* combined waveform computed from the fit 
+double *fitted_volts,     /* combined waveform computed from the fit
                             (returned) */
 double *coeffs,           /* coefficients of fit (returned) */
 double *variances,        /* variances of fit (returned) */
 int *nbad,              /* number of points rejected as suspected
                             "spikes" (returned) */
-int *status             /* status must be 0 on entry. 
+int *status             /* status must be 0 on entry.
                             If no valid fit was found, SAI__ERROR is
                             returned (given and returned) */
 )
 
 /*   Method :
-      The observed waveform is assumed to be a linear combination of the 
+      The observed waveform is assumed to be a linear combination of the
       standard waveforms :
-        volts[i] = coeffs[0] + coeffs[1] * standard_waves[0][i] + 
+        volts[i] = coeffs[0] + coeffs[1] * standard_waves[0][i] +
                    coeffs[2] * standard_waves[1][i] + .....
       The problem is solved by multiple linear regression. It is assumed
       that volts may contain bad values - ie "spikes", so after the fit
@@ -2744,10 +2744,10 @@ int *status             /* status must be 0 on entry.
      History :
       01.12.1988: original (REVAD::BDK)
       02.02.1990: rationalise names (REVAD::BDK)
-      01.04.1992: return CALIB_AMP and CHOP_AMP separately, separate 
+      01.04.1992: return CALIB_AMP and CHOP_AMP separately, separate
                   import and export WEIGHTS arrays (REVAD::BDK)
       07.10.1992: return CALIB_VAR and CHOP_VAR (REVAD::BDK)
-      11.05.1993: add despike, change threshold to 3.5 sigma 
+      11.05.1993: add despike, change threshold to 3.5 sigma
                   (REVAD::BDK)
       16.10.1995: make despike ignore zero-weight points (BDK)
       28.02.2005: generalise SCUBA demodulation algorithm for SCUBA-2
@@ -2780,7 +2780,7 @@ int *status             /* status must be 0 on entry.
       used_weights[i] = standard_weights[i];
    }
 
-/*   Repeatedly fit the data until no more outlying values are rejected 
+/*   Repeatedly fit the data until no more outlying values are rejected
      or the data seem too bad. */
 
    done = 0;
@@ -2792,7 +2792,7 @@ int *status             /* status must be 0 on entry.
 /*   Perform fit */
 
       fitcnt++;
-      sc2math_regres ( npts, nterms, standard_waves, volts, 
+      sc2math_regres ( npts, nterms, standard_waves, volts,
         used_weights, fitted_volts, &a0, a, &sigma0, sigmaa, r,
         &rmul, &chisqr, &ftest, &noise, status );
 
@@ -2809,7 +2809,7 @@ int *status             /* status must be 0 on entry.
             {
                if ( used_weights[i] != (double)0.0 )
                {
-                  if ( fabs ( (double)volts[i] - (double)fitted_volts[i] ) 
+                  if ( fabs ( (double)volts[i] - (double)fitted_volts[i] )
                     > ( 3.5 * noise ) )
                   {
                      used_weights[i] = (double) 0.0;
@@ -2863,8 +2863,8 @@ int *status             /* status must be 0 on entry.
 
 /*+  sc2math_regres - multiple linear regression fit */
 
-void sc2math_regres 
-( 
+void sc2math_regres
+(
 int npts,      /* number of data points (given) */
 int nterms,    /* number of combined waveforms (given) */
 double *x,       /* values of standard waveforms (given) */
@@ -2876,7 +2876,7 @@ double *a,       /* coefficients of fit (returned) */
 double *sigma0,  /* standard deviation of A0 (returned) */
 double *sigmaa,  /* array of standard deviations for coefficients
                    (returned) */
-double *r,       /* array of linear correlation coefficients 
+double *r,       /* array of linear correlation coefficients
                    (returned) */
 double *rmul,    /* multiple linear correlation coefficient (returned) */
 double *chisqr,  /* reduced chi square for fit (returned) */
@@ -2885,16 +2885,16 @@ double *perr,    /* probable error in deviation of a single point from
                    the fit (returned) */
 int *status    /* status must be OK on entry
                    on exit, STATUS = OK => fit ok
-                   STATUS = DITS__APP_ERROR => exact fit (no noise) 
+                   STATUS = DITS__APP_ERROR => exact fit (no noise)
                    (given and returned) */
 )
 
 /*   Method :
-      Make a multiple linear regression fit to data with a specified 
-      function which is linear in coefficients. It is assumed that all 
-      weights are 1.0 or 0.0, points with weight 0.0 being totally 
+      Make a multiple linear regression fit to data with a specified
+      function which is linear in coefficients. It is assumed that all
+      weights are 1.0 or 0.0, points with weight 0.0 being totally
       ignored.
-      Taken from "Data reduction and error analysis for the physical 
+      Taken from "Data reduction and error analysis for the physical
       sciences", P.R.Bevington.
      Authors :
       B.D.Kelly (REVAD::BDK)
@@ -2902,7 +2902,7 @@ int *status    /* status must be OK on entry
       29.11.1988: original (REVAD::BDK)
       02.02.1990: rationalise names (REVAD::BDK)
       01.04.1992: use SAI errors, make part of SCUSP (REVAD::BDK)
-      12.10.1993: fix various one-off errors, use += -style syntax 
+      12.10.1993: fix various one-off errors, use += -style syntax
                   (REVAD::BDK)
      endhistory
 */
@@ -2981,13 +2981,13 @@ int *status    /* status must be OK on entry
       sigma += weight[i] * ( y[i] - ymean ) * ( y[i] - ymean );
       for ( j=0; j<nterms; j++ )
       {
-         sigmax[j] += weight[i] * 
+         sigmax[j] += weight[i] *
            ( x[j*npts+i] - xmean[j] ) * ( x[j*npts+i] - xmean[j] );
-         r[j] += weight[i] * ( x[j*npts+i] - xmean[j] ) * 
+         r[j] += weight[i] * ( x[j*npts+i] - xmean[j] ) *
            ( y[i] - ymean );
          for ( k=0; k<=j; k++ )
          {
-            array[k][j] += weight[i] * 
+            array[k][j] += weight[i] *
               ( x[j*npts+i] - xmean[j] ) * ( x[k*npts+i] - xmean[k] );
          }
       }
@@ -2998,7 +2998,7 @@ int *status    /* status must be OK on entry
 
    for ( j=0; j<nterms; j++ )
    {
-      sigmax[j] = 
+      sigmax[j] =
         (double) sqrt ( (double) sigmax[j] / (double) free1 );
       r[j] /= ( free1 * sigmax[j] * sigma );
       for ( k=0; k<=j; k++ )
@@ -3012,7 +3012,7 @@ int *status    /* status must be OK on entry
 
    sc2math_matinv ( nterms, array, &det, status );
 
-   if ( fabs ( (double) det ) < EPS ) 
+   if ( fabs ( (double) det ) < EPS )
    {
       *a0 = (double) 0.0;
       *sigma0 = (double) 0.0;
@@ -3044,7 +3044,7 @@ int *status    /* status must be OK on entry
       for ( i=0; i<npts; i++ )
       {
          yfit[i] += (*a0);
-         chisq += weight[i] * ( y[i] - yfit[i] ) * 
+         chisq += weight[i] * ( y[i] - yfit[i] ) *
            ( y[i] - yfit[i] );
       }
 
@@ -3056,14 +3056,14 @@ int *status    /* status must be OK on entry
 
       for ( j=0; j<nterms; j++ )
       {
-         sigmaa[j] = array[j][j] * (*chisqr) / 
+         sigmaa[j] = array[j][j] * (*chisqr) /
            ( free1 * sigmax[j] * sigmax[j] );
          sigmaa[j] = (double) sqrt ( (double) sigmaa[j] );
          *rmul += a[j] * r[j] * sigmax[j] / sigma;
       }
 
       freej = (double) nterms;
-      *ftest = ( (*rmul) / freej ) / ( ( (double) 1.0 - (*rmul) ) 
+      *ftest = ( (*rmul) / freej ) / ( ( (double) 1.0 - (*rmul) )
         / freen );
       *rmul = (double) sqrt ( (double) *rmul );
       *sigma0 = (double) 1.0 / sum;
@@ -3086,20 +3086,20 @@ int *status    /* status must be OK on entry
 
 void sc2math_remsine
 (
-int phase,        /* position in scan corresponding to zero phase 
+int phase,        /* position in scan corresponding to zero phase
                       of the superimposed sine (given) */
 double period,      /* period in samples of the sine wave (given) */
 int scanlen,      /* length of scan (given) */
-double *scan,       /* the time series of measurements (given and 
+double *scan,       /* the time series of measurements (given and
                       returned) */
 double *amplitude,  /* amplitude of the sine wave (returned) */
 int *status       /* global status (given and returned) */
 )
 
 /*  Method :
-     Given the phase and period of the sine wave, multiply the scan 
-     by the matching sine of unit amplitude and sum the result. This 
-     gives the amplitude of the sine in the data. Subtract the 
+     Given the phase and period of the sine wave, multiply the scan
+     by the matching sine of unit amplitude and sum the result. This
+     gives the amplitude of the sine in the data. Subtract the
      calculated sine from the data.
     Author :
      B.D.Kelly (REVAD::BDK)
@@ -3119,7 +3119,7 @@ int *status       /* global status (given and returned) */
    rad = (double) ( 2.0 * 3.14159 ) / (double)period;
    for ( j=0; j<scanlen; j++ )
    {
-     *amplitude += scan[j] * 
+     *amplitude += scan[j] *
         (double) sin ( ( (double) j - (double) phase ) * rad );
    }
    *amplitude = (double) 2.0 * ( *amplitude / (double)scanlen );
@@ -3128,7 +3128,7 @@ int *status       /* global status (given and returned) */
 
    for ( j=0; j<scanlen; j++ )
    {
-     scan[j] -= *amplitude * 
+     scan[j] -= *amplitude *
        (double) sin ( ( (double) j - (double) phase ) * rad );
    }
 
@@ -3154,23 +3154,23 @@ double *r     /* Response value (returned) */
 
     Ix=        0123456.....Wdim......................................
     Input      FFFFFFF.....F   FFFF..FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-    Ix=Wdim    WWWWWWW.....W 
-    Ix=Wdim+1  .WWWWWWW.....W 
-    Ix=Wdim+2  ..WWWWWWW.....W 
-    Ix=Wdim+3  ...WWWWWWW.....W 
+    Ix=Wdim    WWWWWWW.....W
+    Ix=Wdim+1  .WWWWWWW.....W
+    Ix=Wdim+2  ..WWWWWWW.....W
+    Ix=Wdim+3  ...WWWWWWW.....W
     ..........
-    Ix=Wdim+n  .........................................WWWWWWW.....W 
-           
-    The minimum value of IX must be >= Wdim-1, else the index in the F 
-    function will be negative at the start. 
+    Ix=Wdim+n  .........................................WWWWWWW.....W
+
+    The minimum value of IX must be >= Wdim-1, else the index in the F
+    function will be negative at the start.
     This must be checked in the calling routine.
     The maximum value of IX is equal to the dimension of F (Fdim) plus Wdim.
     Fdim does'nt have to be known in this routine.
     Usually this function is called for Fdim successive values, ranging
     from Wdim to Wdim+Fdim.
- 
+
     The array W must have at least a size of Wdim.
- 
+
     The response value should be normalized in the calling routine !
 
 
@@ -3202,7 +3202,7 @@ double *r     /* Response value (returned) */
 /*+ sc2math_setcal - set flatfield calibration for a bolometer */
 
 void sc2math_setcal
-( 
+(
 int nboll,               /* total number of bolometers (given) */
 int bol,                 /* number of current bolometer (given) */
 int numsamples,          /* number of data samples (given) */
@@ -3262,12 +3262,12 @@ int *status              /* global status (given and returned) */
 
    if ( calval[bol+nboll] > calval[bol] )
    {
-      sc2math_setcalinc ( nboll, bol, mean, ncal, heat, calval, lincal, 
+      sc2math_setcalinc ( nboll, bol, mean, ncal, heat, calval, lincal,
         status );
    }
    else if ( calval[bol+nboll] < calval[bol] )
    {
-      sc2math_setcaldec ( nboll, bol, mean, ncal, heat, calval, lincal, 
+      sc2math_setcaldec ( nboll, bol, mean, ncal, heat, calval, lincal,
         status );
    }
    else
@@ -3281,7 +3281,7 @@ int *status              /* global status (given and returned) */
 /*+ sc2math_setcaldec - set decreasing flatfield calibration */
 
 void sc2math_setcaldec
-( 
+(
 int nboll,               /* total number of bolometers (given) */
 int bol,                 /* number of current bolometer (given) */
 const double dvalue,     /* representative data number (given) */
@@ -3293,7 +3293,7 @@ int *status              /* global status (given and returned) */
 )
 
 /*  Description :
-     Given calibration measurements plus a representative data number, 
+     Given calibration measurements plus a representative data number,
      select the section of the calibration which matches the data number and
      determine a suitable interpolation formula for calibrating the
      actual measurents.
@@ -3316,19 +3316,19 @@ int *status              /* global status (given and returned) */
    if ( !StatusOkP(status) ) return;
 
 
-/* Choose interpolation point from calibration tables 
+/* Choose interpolation point from calibration tables
    Note the tables are assumed to be in increasing order of power,
    decreasing order of data number */
 
    if ( dvalue >= calval[bol] )
    {
-      lincal[1] = ( heat[1] - heat[0] ) / 
+      lincal[1] = ( heat[1] - heat[0] ) /
         ( calval[bol+nboll] - calval[bol] );
       lincal[0] = heat[1] - lincal[1] * calval[bol+nboll];
    }
    else if ( dvalue <= calval[bol+(ncal-1)*nboll] )
    {
-      lincal[1] = ( heat[ncal-1] - heat[ncal-2] ) / 
+      lincal[1] = ( heat[ncal-1] - heat[ncal-2] ) /
         ( calval[bol+(ncal-1)*nboll] - calval[bol+(ncal-2)*nboll] );
       lincal[0] = heat[ncal-1] - lincal[1] * calval[bol+(ncal-1)*nboll];
    }
@@ -3338,7 +3338,7 @@ int *status              /* global status (given and returned) */
       {
          if ( calval[bol+j*nboll] < dvalue )
          {
-            lincal[1] = ( heat[j] - heat[j-1] ) / 
+            lincal[1] = ( heat[j] - heat[j-1] ) /
               ( calval[bol+j*nboll] - calval[bol+(j-1)*nboll] );
             lincal[0] = heat[j] - lincal[1] * calval[bol+j*nboll];
             break;
@@ -3352,7 +3352,7 @@ int *status              /* global status (given and returned) */
 /*+ sc2math_setcalinc - set increasing flatfield calibration */
 
 void sc2math_setcalinc
-( 
+(
 int nboll,               /* total number of bolometers (given) */
 int bol,                 /* number of current bolometer (given) */
 const double dvalue,     /* representative data number (given) */
@@ -3364,7 +3364,7 @@ int *status              /* global status (given and returned) */
 )
 
 /*  Description :
-     Given calibration measurements plus a representative data number, 
+     Given calibration measurements plus a representative data number,
      select the section of the calibration which matches the data number and
      determine a suitable interpolation formula for calibrating the
      actual measurents.
@@ -3387,19 +3387,19 @@ int *status              /* global status (given and returned) */
    if ( !StatusOkP(status) ) return;
 
 
-/* Choose interpolation point from calibration tables 
+/* Choose interpolation point from calibration tables
    Note the tables are assumed to be in increasing order of power,
    increasing order of data number */
 
    if ( dvalue <= calval[bol] )
    {
-      lincal[1] = ( heat[1] - heat[0] ) / 
+      lincal[1] = ( heat[1] - heat[0] ) /
         ( calval[bol+nboll] - calval[bol] );
       lincal[0] = heat[1] - lincal[1] * calval[bol+nboll];
    }
    else if ( dvalue >= calval[bol+(ncal-1)*nboll] )
    {
-      lincal[1] = ( heat[ncal-1] - heat[ncal-2] ) / 
+      lincal[1] = ( heat[ncal-1] - heat[ncal-2] ) /
         ( calval[bol+(ncal-1)*nboll] - calval[bol+(ncal-2)*nboll] );
       lincal[0] = heat[ncal-1] - lincal[1] * calval[bol+(ncal-1)*nboll];
    }
@@ -3409,7 +3409,7 @@ int *status              /* global status (given and returned) */
       {
          if ( calval[bol+j*nboll] > dvalue )
          {
-            lincal[1] = ( heat[j] - heat[j-1] ) / 
+            lincal[1] = ( heat[j] - heat[j-1] ) /
               ( calval[bol+j*nboll] - calval[bol+(j-1)*nboll] );
             lincal[0] = heat[j] - lincal[1] * calval[bol+j*nboll];
             break;
@@ -3428,8 +3428,8 @@ int *status              /* global status (given and returned) */
 
 void sc2math_sigmaclip
 (
-int type,             /* 0 for double sided clip, 
-                        >0 positive clip, 
+int type,             /* 0 for double sided clip,
+                        >0 positive clip,
                         <0 negative clip (given) */
 size_t np,            /* number of points (given) */
 const double x[],     /* X data (given) */
@@ -3542,8 +3542,8 @@ int *status           /* global status (given and returned) */
 
 /*+  sc2math_sinedemod - sine wave demodulate a signal */
 
-void sc2math_sinedemod 
-( 
+void sc2math_sinedemod
+(
 int length,          /* length of the signal array (given) */
 double *sine,          /* sine wave (given) */
 double *cosine,        /* cosine wave (given) */
@@ -3554,7 +3554,7 @@ int *status          /* global status (given and returned) */
 )
 
 /*   Method :
-      Demodulate by multiplying the given signal by sine and cosine and 
+      Demodulate by multiplying the given signal by sine and cosine and
       summing.
      Authors :
       B.D.Kelly (REVAD::BDK)
@@ -3588,7 +3588,7 @@ int *status          /* global status (given and returned) */
    }
    sumsine = (double)2.0 * sumsine / (double)length;
    sumcos = (double)2.0 * sumcos / (double)length;
-   *amplitude = (double) sqrt ( ( (double)sumsine*(double)sumsine 
+   *amplitude = (double) sqrt ( ( (double)sumsine*(double)sumsine
      + (double)sumcos*(double)sumcos ) );
    *phase = (double) atan2 ( (double) sumcos, (double) sumsine );
 }
@@ -3597,8 +3597,8 @@ int *status          /* global status (given and returned) */
 
 /*+ sc2math_smooth - apply smoothing kernel */
 
-void sc2math_smooth 
-( 
+void sc2math_smooth
+(
 int nweights,      /* number of values in kernel (given) */
 double weights[],  /* smoothing kernel (given) */
 int numvals,       /* number of values in dataset (given) */
@@ -3654,9 +3654,9 @@ int *status        /* global status (given and returned) */
 
 /*+ sc2math_smupath - Calculate the path positions of the SMU */
 
-void sc2math_smupath 
+void sc2math_smupath
 (
-int nvert,           /* number of vertices in the jiggle pattern, 
+int nvert,           /* number of vertices in the jiggle pattern,
                         implemented are :
                         =1 : No visit of points.
                         At the moment a circle but that does not work !
@@ -3686,7 +3686,7 @@ int *status          /* global status (given and returned) */
 
 /* Description :
     This routine calculates all the SMU positions during the cycle
-    This depends on the Jiggle Pattern, the SMU waveform, and the 
+    This depends on the Jiggle Pattern, the SMU waveform, and the
     overdimensioning factor.
 
    Authors :
@@ -3704,7 +3704,7 @@ int *status          /* global status (given and returned) */
    int np;                          /* nr of calculated points */
    int j;                           /* Loop variable */
    double anginc;                   /* Angle increment */
-   double t;                        /* time at a point in the path */      
+   double t;                        /* time at a point in the path */
    double vertxy[DREAM__MXVERT][2]; /* coordinates of jiggle vertices */
 
 
@@ -3823,7 +3823,7 @@ int *status         /* global status (given and returned) */
 
 /* Add a cycle */
 
-      jstart = ( (int)( (t + (double)nvert * vertex_t ) / vertex_t) ) 
+      jstart = ( (int)( (t + (double)nvert * vertex_t ) / vertex_t) )
         % nvert;
       offset = t + (double)nvert * vertex_t - (double)jstart * vertex_t;
    }
@@ -3832,7 +3832,7 @@ int *status         /* global status (given and returned) */
       jstart = ( (int)(t / vertex_t) ) % nvert;
       offset = t - (double)jstart * vertex_t;
    }
-   jend = ( jstart + 1 ) % nvert;   
+   jend = ( jstart + 1 ) % nvert;
 
 
    if ( movecode == 0 )
@@ -3852,7 +3852,7 @@ int *status         /* global status (given and returned) */
 
       mxv = sin ( M_PI / 4.0 ) + sin ( 3.0 * M_PI / 4.0 ) / 3.0;
       theta = ( -M_PI / 4.0 ) + offset * M_PI / vertex_t;
-      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 ) / ( 2.0 * mxv ) 
+      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 ) / ( 2.0 * mxv )
            + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
@@ -3862,11 +3862,11 @@ int *status         /* global status (given and returned) */
 
 /* 3 term not damped. */
 
-      mxv = sin ( M_PI / 6.0 ) + sin ( 3.0 * M_PI / 6.0 ) / 3.0 + 
-        sin ( 5.0 *M_PI / 6.0 ) / 5.0; 
+      mxv = sin ( M_PI / 6.0 ) + sin ( 3.0 * M_PI / 6.0 ) / 3.0 +
+        sin ( 5.0 *M_PI / 6.0 ) / 5.0;
 
       theta = ( -M_PI / 6.0 ) + offset * M_PI / vertex_t;
-      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 + 
+      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 +
            sin ( 5.0 * theta ) / 5.0 ) / ( 2.0 * mxv ) + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
@@ -3877,11 +3877,11 @@ int *status         /* global status (given and returned) */
 
 /* 4 term not damped. */
 
-      mxv = sin ( M_PI / 8.0 ) + sin ( 3.0 * M_PI / 8.0 ) / 3.0 + 
-        sin ( 5.0 * M_PI / 8.0 ) / 5.0 + sin ( 7.0 * M_PI / 8.0 ) / 7.0; 
+      mxv = sin ( M_PI / 8.0 ) + sin ( 3.0 * M_PI / 8.0 ) / 3.0 +
+        sin ( 5.0 * M_PI / 8.0 ) / 5.0 + sin ( 7.0 * M_PI / 8.0 ) / 7.0;
       theta = (-M_PI/8.0) + offset * M_PI / vertex_t;
-      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 + 
-        sin ( 5.0 * theta ) / 5.0 + sin ( 7.0 * theta ) / 7.0 ) 
+      frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 +
+        sin ( 5.0 * theta ) / 5.0 + sin ( 7.0 * theta ) / 7.0 )
         / ( 2.0 * mxv ) + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
@@ -3898,7 +3898,7 @@ int *status         /* global status (given and returned) */
       {
          frac =1.02 * ( ( sin(theta) + sin(3.0*theta) / 3.0 ) / (2.0*mxv) + 0.5 );
       }
-      else 
+      else
       {
          frac = 1.0;
       }
@@ -3915,10 +3915,10 @@ int *status         /* global status (given and returned) */
       theta = (-M_PI/6.0) + offset * M_PI / vertex_t;
       if ( theta < M_PI/6.0 )
       {
-         frac = ( sin(theta) + sin(3.0*theta) / 3.0 +  sin(5.0*theta) / 5.0 ) / 
+         frac = ( sin(theta) + sin(3.0*theta) / 3.0 +  sin(5.0*theta) / 5.0 ) /
            (2.0*mxv) + 0.5;
       }
-      else 
+      else
       {
          frac = 1.0;
       }
@@ -3931,15 +3931,15 @@ int *status         /* global status (given and returned) */
 
 /* 4 term flat end. */
 
-      mxv = sin(M_PI/8.0) + sin(3.0*M_PI/8.0) / 3.0 + 
+      mxv = sin(M_PI/8.0) + sin(3.0*M_PI/8.0) / 3.0 +
         sin(5.0*M_PI/8.0) / 5.0 + sin(7.0*M_PI/8.0) / 7.0;
       theta = -M_PI/8.0 + offset * M_PI / vertex_t;
       if ( theta < M_PI/8.0 )
       {
-         frac = ( sin(theta) + sin(3.0*theta) / 3.0 + sin(5.0*theta) / 5.0 + 
+         frac = ( sin(theta) + sin(3.0*theta) / 3.0 + sin(5.0*theta) / 5.0 +
            sin(7.0*theta) / 7.0 ) / (2.0*mxv) + 0.5;
       }
-      else 
+      else
       {
          frac = 1.0;
       }
@@ -3965,7 +3965,7 @@ int *status         /* global status (given and returned) */
       {
          frac = 0.098 + 0.116428571 * ( offset - 1.0 );
       }
-      else 
+      else
       {
          frac = 0.098 * offset;
       }
@@ -3976,7 +3976,7 @@ int *status         /* global status (given and returned) */
    else if ( movecode == 8 )
    {
 
-/* Experimental. 
+/* Experimental.
    This is an experimental wave form, which may change often..
    Now it is a cosine waveform from 0 to 1 in the full time. */
 
@@ -3990,7 +3990,7 @@ int *status         /* global status (given and returned) */
 
 /*+ sc2math_sol - Solution of least square fit */
 
-void sc2math_sol 
+void sc2math_sol
 (
 int nunkno,      /* The number of unknowns (given) */
 int nequ,        /* The number of observed points (given) */
@@ -4010,19 +4010,19 @@ double lsol[]    /* solved parameters of the Least Square Solution
     in which the known vector LVEC has been made.
 
     lmat is the lower left triangle of the inverted equation matrix.
-    This is a 1 dimensional array of dimension NUNKNO*(NUNKNO+1)/2 
+    This is a 1 dimensional array of dimension NUNKNO*(NUNKNO+1)/2
     which must be filled before the call of this routine.
 
-    lvec is an array containing the known vector, i.e. the vector 
+    lvec is an array containing the known vector, i.e. the vector
     containing sum terms with the observed values.
     The array must be filled before the call of this routine.
 
     lssum is the sum of the square of known terms.
-    The value must be filled before the call of this routine. 
-    The sum is used for determining the total quality of the least 
+    The value must be filled before the call of this routine.
+    The sum is used for determining the total quality of the least
     square solution.
-     
-    The solution vector (LSOL) is simply the matrix (LMAT) multiplication 
+
+    The solution vector (LSOL) is simply the matrix (LMAT) multiplication
     with the vector (LVEC), done in MSV.
     NEQU and LSSUM are only needed for calculating the rms values.
     These rms values can be calculated because of the least square fit
@@ -4079,7 +4079,7 @@ double lsol[]    /* solved parameters of the Least Square Solution
 /*+ sc2math_trace - provide a flag for debugging level */
 
 int sc2math_trace
-( 
+(
 int value       /* trace level (given) */
 )
 
@@ -4120,18 +4120,18 @@ int value       /* trace level (given) */
 
 /*+ sc2math_vec - Make known vector */
 
-void sc2math_vec 
+void sc2math_vec
 (
 int nunkno,        /* The number of unknowns (given) */
 double lcoef[],    /* The known values (given) */
 double lknow,      /* The measured point, or observed value (given) */
-double lvec[],     /* array to contain the known vector 
-                      (given and returned) */ 
+double lvec[],     /* array to contain the known vector
+                      (given and returned) */
 double *lssum      /* sum of the square of known terms (returned) */
 )
 
 /* Description :
-    This routine makes a sum of the known values for a least 
+    This routine makes a sum of the known values for a least
     squares solution.
     The routine is called in a loop per observed point.
     There should be >= observed points than NUNKNO.
@@ -4139,16 +4139,16 @@ double *lssum      /* sum of the square of known terms (returned) */
     factors are implicitly equal to 1.0.
 
      lcoef contains the known coefficients of the
-     least square equation, for example for a polynomial the vector 
+     least square equation, for example for a polynomial the vector
      contains the values : 1.0, X, X**2, X**3, etc.
 
-     lvec is an array containing the known vector, i.e. the vector 
+     lvec is an array containing the known vector, i.e. the vector
      containing sum terms with LKNOW.
      The array must be cleared before the first call of this routine.
 
      lssum is the sum of the square of known terms.
      The value must be cleared before the first call of this routine.
-     The sum is used later for determining the total quality of the 
+     The sum is used later for determining the total quality of the
      least square solution.
 
    Authors :
@@ -4177,8 +4177,8 @@ double *lssum      /* sum of the square of known terms (returned) */
 
 /*+  sc2math_wavegen - generate sine and cosine signals */
 
-void sc2math_wavegen 
-( 
+void sc2math_wavegen
+(
 double period,                 /* period in array elements (given) */
 int length,                  /* length of arrays (given) */
 double *sine,                  /* generated sine wave (returned) */
@@ -4187,7 +4187,7 @@ int *status                  /* global status (given and returned) */
 )
 
 /*   Method :
-      Calculate sine and cosine waves, zero phase occuring at the first 
+      Calculate sine and cosine waves, zero phase occuring at the first
       element, of the given period.
      Authors :
       B.D.Kelly (REVAD::BDK)

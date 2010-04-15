@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     int smf_fits_updateD( smfHead * hdr, const char * name, double value, 
+*     int smf_fits_updateD( smfHead * hdr, const char * name, double value,
 *                           const char * comment, int *status );
 
 *  Arguments:
@@ -78,7 +78,7 @@
 #include "smf.h"
 
 int
-smf_fits_updateD( smfHead * hdr, const char * name, double value, 
+smf_fits_updateD( smfHead * hdr, const char * name, double value,
                   const char * comment, int *status ) {
   int retval = 0;                 /* Return value */
   AstFitsChan * fits;             /* FitsChan to be modified */

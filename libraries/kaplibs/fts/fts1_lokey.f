@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
       INTEGER ISTAT              ! Local status
       INTEGER KEYLN              ! Used length of KEYNAM
       CHARACTER * ( HKEYLN ) KEYNAM ! A keyword
-      INTEGER NAMELN             ! Length of a keyword on a card 
+      INTEGER NAMELN             ! Length of a keyword on a card
       INTEGER NC                 ! Number of characters
       INTEGER NCK                ! Number of characters in the compound
                                  ! keyword
@@ -142,7 +142,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Convert it and its position name to its formal format.  
+*  Convert it and its position name to its formal format.
       KEYNAM = KEYWRD
 
 *  Remove all blanks and convert it to upper case.  Allow for the blank
@@ -185,7 +185,7 @@
 *  Return to start of 'DO WHILE' loop.
             GO TO 10
          END IF
-                      
+
 *  The position keyword is compound.
 *  =================================
       ELSE

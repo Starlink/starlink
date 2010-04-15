@@ -17,16 +17,16 @@ C     Parameters:
 C    (1) INPUT      (TSP, 1D)  The input dataset.
 C    (2) OUTPUT     (TSP, 1D)  The output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         27/4/1988
 C
 C-
 C
 C  History:
-C    27/4/1988   Original Version.   JAB/AAO 
+C    27/4/1988   Original Version.   JAB/AAO
 C    13/12/1991  Reverse the intensity variance   JAB/AAO
 C    13/12/1991  Don't fail if variance is not present for a Stokes
 C                        parameter      JAB/AAO
@@ -71,10 +71,10 @@ C
       IF (ACTDIM .NE. 1) THEN
           CALL MSG_OUT('OUT','Invalid Dimensions',STATUS)
           STATUS = USER__001
-      ENDIF             
-      SIZE = DIMS(1)               
+      ENDIF
+      SIZE = DIMS(1)
 
-*  Map the intensity data                  
+*  Map the intensity data
       CALL TSP_MAP_DATA(OLOC,'UPDATE',SPTR,DLOC,STATUS)
 
 *  Reverse the intensity data
@@ -97,7 +97,7 @@ C
 
 *  Unmap the intensity variance
       CALL TSP_UNMAP(DLOC,STATUS)
-           
+
 *  Find the Stokes parameters
       CALL TSP_STOKES(OLOC,NUM,QZ,UZ,VZ,STATUS)
       IF (QZ) THEN
@@ -114,7 +114,7 @@ C
           ENDIF
 
 *  Unmap the Q stokes data
-          CALL TSP_UNMAP(DLOC,STATUS)           
+          CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Map the Q stokes variance
           CALL TSP_MAP_VAR(SLOC,'UPDATE',SPTR,DLOC,STATUS)
@@ -127,7 +127,7 @@ C
           ENDIF
 
 *  Unmap the Q stokes variance
-          CALL TSP_UNMAP(DLOC,STATUS)           
+          CALL TSP_UNMAP(DLOC,STATUS)
           CALL DAT_ANNUL(SLOC,STATUS)
       ENDIF
       IF (UZ) THEN
@@ -144,7 +144,7 @@ C
           ENDIF
 
 *  Unmap the U stokes data
-          CALL TSP_UNMAP(DLOC,STATUS)           
+          CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Map the U stokes variance
           CALL TSP_MAP_VAR(SLOC,'UPDATE',SPTR,DLOC,STATUS)
@@ -157,7 +157,7 @@ C
           ENDIF
 
 *  Unmap the U stokes variance
-          CALL TSP_UNMAP(DLOC,STATUS)           
+          CALL TSP_UNMAP(DLOC,STATUS)
           CALL DAT_ANNUL(SLOC,STATUS)
       ENDIF
       IF (VZ) THEN
@@ -174,7 +174,7 @@ C
           ENDIF
 
 *  Unmap the V stokes data
-          CALL TSP_UNMAP(DLOC,STATUS)           
+          CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Map the V stokes variance
           CALL TSP_MAP_VAR(SLOC,'UPDATE',SPTR,DLOC,STATUS)
@@ -185,17 +185,17 @@ C
           ENDIF
 
 *  Unmap the V stokes variance
-          CALL TSP_UNMAP(DLOC,STATUS)           
+          CALL TSP_UNMAP(DLOC,STATUS)
           CALL DAT_ANNUL(SLOC,STATUS)
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL DAT_ANNUL(OLOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
 
        SUBROUTINE TSP_REVERSE(SIZE,S)
 *+
@@ -207,10 +207,10 @@ C
 *   Subroutine to reverse a spectrum in the wavelength direction by
 *   swapping points.
 *
-*   Parameters:       
+*   Parameters:
 *    (>)  SIZE  (Integer)            The number of spectral points
 *    (!)  S     (Real array(SIZE))   Array to be reversed
-*   
+*
 *   Jeremy Bailey   27/4/1988
 *
 *   Modified:
@@ -225,14 +225,14 @@ C
       REAL S(SIZE)
 
 *  Local variables
-      INTEGER I              
+      INTEGER I
       REAL X
 
 *  Loop over half the points, swapping each one with the corresponding
 *  'mirror image' point. If the array size is odd the middle point doesn't
 *  need swapping
 
-          DO I=1,SIZE/2        
+          DO I=1,SIZE/2
               X = S(I)
               S(I) = S(SIZE-I+1)
               S(SIZE-I+1) = X

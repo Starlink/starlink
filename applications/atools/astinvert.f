@@ -30,7 +30,7 @@
 *     RESULT = LITERAL (Read)
 *        An text file to receive the inverted Mapping.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Mapping. If an NDF is supplied, 
+*        An NDF or text file holding the Mapping. If an NDF is supplied,
 *        the Mapping from the base Frame of the WCS FrameSet to the
 *        current Frame will be used.
 
@@ -82,7 +82,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

@@ -46,9 +46,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
             ELSE
                FOCAL_STATION = 'RNASMYTH'
             END IF
-            
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'INS', INSTRUMENT )

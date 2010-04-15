@@ -16,12 +16,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -109,14 +109,14 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date,', STRING
       IF( IYEAR .GT. 1900 .AND. IYEAR .LE. 2099 .AND.
      $    MONTH .GE.    1 .AND. MONTH .LE.   12 .AND.
      $    IDAY  .GE.    0 .AND. IDAY  .LE.   31) THEN
-         DMJD = DBLE(367*(IYEAR-1900) + 275*MONTH/9 + IDAY + 18313 - 
+         DMJD = DBLE(367*(IYEAR-1900) + 275*MONTH/9 + IDAY + 18313 -
      $         7*(IYEAR+((MONTH+9)/12))/4)
       ELSE
          DATEBF = ' '
          WRITE(DATEBF, '(I5, I3, I3)', IOSTAT=LSTAT)
      $     IYEAR, MONTH, IDAY
          CALL ANT_ERRC ('ANT_STOMJD: invalid date,', DATEBF)
-C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY 
+C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
          STATUS = -9
          GO TO 999
       END IF
@@ -222,7 +222,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
          K = K + 1
          GO TO 10
       END IF
-20    IF(K .LE. LENT .AND. TEXT(K:K) .GE. '0' .AND. 
+20    IF(K .LE. LENT .AND. TEXT(K:K) .GE. '0' .AND.
      $                     TEXT(K:K) .LE. '9')  THEN
          IVAL = 10*IVAL + ICHAR(TEXT(K:K)) - ICZERO
          K = K + 1
@@ -235,15 +235,15 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
       INTEGER IMASK, K
       CHARACTER*(*) TEXT, WORD
 *IMASK  input  Sum of values to specify character types allowed in WORD:
-*              1=letter, 2=digit, 4=underscore, 8=dot, 16=colon, 
+*              1=letter, 2=digit, 4=underscore, 8=dot, 16=colon,
 *              32=#$+*-/<=>\|
-*TEXT   input  String to scan starting at position K, but note that 
+*TEXT   input  String to scan starting at position K, but note that
 *              any leading spaces will be skipped.
-*K      in/out On entry points to first character of TEXT to check, 
-*              returns pointing to terminator character (next invalid 
+*K      in/out On entry points to first character of TEXT to check,
+*              returns pointing to terminator character (next invalid
 *              character) or =1+LEN(TEXT) if remainder of TEXT is all valid.
 *WORD   output Returns string if found, else blank.
-*** restrictions: ASCII character set only, 
+*** restrictions: ASCII character set only,
 ***               uses IAND function for logical AND of integers.
 *-Author  Clive Page  1992-AUG-13
       INTEGER MASK(0:255), KSTART
@@ -251,7 +251,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
 *               ctrl       #$         +*       -   .  /   digits
       DATA MASK/32*0, 5*0, 2*32, 3*0, 2*32, 0, 32, 8, 32, 10*2,
      $ 16, 0, 3*32, 2*0, 26*1, 0, 32, 2*0, 4, 0, 26*1, 0, 32, 131*0/
-*       :     <=>        LETTER   \        _     letter   |      
+*       :     <=>        LETTER   \        _     letter   |
 *
 *If K is not a valid pointer initially just return all blanks
 *
@@ -296,7 +296,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
 *KPOS  in/out  Points to next char to check (but skips leading spaces)
 *              returns pointing to space that terminates the word.
 *WORD  output  Word, if line empty returns spaces.
-*Note: any set of characters enclosed in single/double quotes also counts 
+*Note: any set of characters enclosed in single/double quotes also counts
 * as a single word, and is returned with the enclosing quotes.
 *-Author  Clive Page  1992-JUN-24
       INTEGER LENT, KSTART, KQ
@@ -317,7 +317,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
 *Save starting position in KSTART, must point to non-space by now
       KSTART = KPOS
 *If first character is single or double quote then scan for matching one
-      IF(INDEX('"''',TEXT(KPOS:KPOS)) .NE. 0 .AND. 
+      IF(INDEX('"''',TEXT(KPOS:KPOS)) .NE. 0 .AND.
      $    KPOS .LT. LENT) THEN
          KQ = INDEX(TEXT(KSTART+1:), TEXT(KSTART:KSTART))
          IF(KQ .EQ. 0)THEN
@@ -370,7 +370,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
       END IF
       END
 
-*+ANT_SEX2D  Converts sexagesimal string (dd:mm:ss.s) to degrees 
+*+ANT_SEX2D  Converts sexagesimal string (dd:mm:ss.s) to degrees
       SUBROUTINE ANT_SEX2D(STRING, DVALUE, STATUS)
       CHARACTER STRING*(*)
       DOUBLE PRECISION DVALUE
@@ -379,7 +379,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
 *DVALUE output Double precision value converted to degrees/hours
 *STATUS in/out Inherited status
 *-Author  Clive Page  1993-JUL-21
-*Should now cope with sign before any numerical component, 
+*Should now cope with sign before any numerical component,
 * will also convert hh:mm:ss to hours.
       LOGICAL NEGATE, SKIP
       INTEGER K, IDEG
@@ -392,7 +392,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
       NEGATE = INDEX(STRING, '-') .NE. 0
       K = 1
 *Skip any leading sign or spaces
-10    IF(K .LT. LEN(STRING)) THEN 
+10    IF(K .LT. LEN(STRING)) THEN
          IF(SKIP(K)) THEN
             K = K + 1
             GO TO 10
@@ -402,7 +402,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
       CALL ANT_SCNINT(STRING, K, IDEG)
 *Skip terminator of this integer, then any more spaces or signs
       K = K + 1
-20    IF(K .LT. LEN(STRING)) THEN 
+20    IF(K .LT. LEN(STRING)) THEN
          IF(SKIP(K)) THEN
             K = K + 1
             GO TO 20
@@ -411,7 +411,7 @@ C        WRITE(*,*)'!ANT_STOMJD: invalid date', IYEAR, MONTH, IDAY
 *Minutes value could be integer or real, so could the seconds value
       CALL ANT_SCNDEC(STRING, K, RMIN)
       K = K + 1
-30    IF(K .LT. LEN(STRING)) THEN 
+30    IF(K .LT. LEN(STRING)) THEN
          IF(SKIP(K)) THEN
             K = K + 1
             GO TO 30
@@ -434,7 +434,7 @@ C        WRITE(*,*)'!ANT_SEX2D: bad mins/secs range ', STRING
       CHARACTER STRING*(*)
 *STRING    input    String of any length
 *LEN_TRIM  function Returns no of chars ignoring trailing spaces, but >0.
-***NOTE: for string of all spaces this function returns 1 not 0 so that 
+***NOTE: for string of all spaces this function returns 1 not 0 so that
 * a reference to STR(1:ANT_SLEN(STR)) is valid Fortran-77.
 * Otherwise similar to Fortran-90 intrinsic LEN_TRIM.
 *-Author Clive Page 1993-JUL-21
@@ -552,7 +552,7 @@ C              WRITE(*,*)'!ANT_STOI: bad hex digit', STRING
          ELSE IF(STRING(K:K) .EQ. 'O' .OR. STRING(K:K) .EQ. 'o') THEN
 *Octal value
 300         K = K + 1
-            DIGIT = ICHAR(STRING(K:K)) 
+            DIGIT = ICHAR(STRING(K:K))
             IF(DIGIT .GE. 48 .AND. DIGIT .LE. 55) THEN
                VALUE = 8*VALUE + DIGIT - 48
             ELSE IF(DIGIT .EQ. 32) THEN
@@ -567,7 +567,7 @@ C              WRITE(*,*)'!ANT_STOI: bad octal digit ', STRING
          ELSE IF(STRING(K:K) .EQ. 'B' .OR. STRING(K:K) .EQ. 'b') THEN
 *Binary value
 400         K = K + 1
-            DIGIT = ICHAR(STRING(K:K)) 
+            DIGIT = ICHAR(STRING(K:K))
             IF(DIGIT .GE. 48 .AND. DIGIT .LE. 49) THEN
                VALUE = 2*VALUE + DIGIT - 48
                IF(K .LT. L) GO TO 400
@@ -681,9 +681,9 @@ C        WRITE(*,*)'!ANT_STOL: bad logical ', STRING
       CHARACTER*(*) INSTR, OUTSTR
       INTEGER NOUT
 *INSTR  input  Character string.
-*OUTSTR output As input, but with leading and trailing spaces removed and 
+*OUTSTR output As input, but with leading and trailing spaces removed and
 *              any multiple embedded spaces converted to single space.
-*NOUT   output Number of significant characters copied to OUTSTR, 
+*NOUT   output Number of significant characters copied to OUTSTR,
 *              waning: returns 0 if INSTR is all blanks.
 *-Author   Clive Page   1991-SEP-10
       LOGICAL FIRST

@@ -1,5 +1,5 @@
 1 CNF_update
- 
+
  CNF Version 4.3
 
  o New function CNF_CVAL, this converts a Fortran integer into the
@@ -12,7 +12,7 @@
    C strings. Using this macro treats NULL C strings as a blank Fortran
    character string of size 1.
 
- o cnfCref now handles a request for a negative number of bytes in the 
+ o cnfCref now handles a request for a negative number of bytes in the
    same fashion as zero bytes. That is a string of size 1 is created.
 
  o cnfExprt now handles NULL input C strings by filling the output Fortran
@@ -48,9 +48,9 @@
  CNF Version 4.0-2 is released.
 
  The names of the C interface functions have been changed from the form
- cnf_xxxx to cnfXxxx (argument lists have not changed). Definitions in 
- f77.h (cnf.h) will handle this automatically during compilation but 
- programmers are encouraged to change the code. To cater for existing 
+ cnf_xxxx to cnfXxxx (argument lists have not changed). Definitions in
+ f77.h (cnf.h) will handle this automatically during compilation but
+ programmers are encouraged to change the code. To cater for existing
  compiled code or executables linked with the CNF shared library, drop-
  through routines with the old names are provided temporarily in the new
  libraries.

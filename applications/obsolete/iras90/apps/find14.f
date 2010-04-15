@@ -37,7 +37,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -62,7 +62,7 @@
 *  Close the IRAS Astrometry routines
       CALL IRA_CLOSE( STATUS )
 
-*  Close FIO 
+*  Close FIO
       CALL FIO_STOP( STATUS )
-      
+
       END

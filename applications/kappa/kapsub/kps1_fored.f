@@ -86,25 +86,25 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message-system constants
- 
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
- 
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION IN( M, N )
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION OUT( M, N )
       DOUBLE PRECISION WORK( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER J                  ! X-axis (column) counter
       INTEGER K                  ! Y-axis (line) counter
@@ -114,12 +114,12 @@
       INTEGER NHP1               ! n / 2 + 1
       INTEGER NM1H               ! ( n-1 ) / 2
       INTEGER NP1H               ! ( n+1 ) / 2
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set up frequently used constants.
       MHP1 = 1 + M / 2
       MP1H = ( M + 1 ) / 2
@@ -127,49 +127,49 @@
       NHP1 = 1 + N / 2
       NM1H = ( N - 1 ) / 2
       NP1H = ( N + 1 ) / 2
- 
+
 *  Give an informational message.
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'INFOREV1',
      :                'Doing inverse transformation', STATUS )
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
- 
+
 *  Swap the quadrants round so that zero frequencies are at the
 *  corners.
       DO K = 1, N
- 
+
          DO J = 1, MM1H
             WORK( J ) = IN( J, K )
          END DO
- 
+
          DO J = MP1H, M
             IN( J - MM1H, K ) = IN( J, K )
          END DO
- 
+
          DO J = 1, MM1H
             IN( J + MHP1, K ) = -WORK( J )
          END DO
- 
+
       END DO
- 
- 
+
+
       DO J = 1, M
- 
+
          DO K = 1, NM1H
             WORK( K ) = IN( J, K )
          END DO
- 
+
          DO K = NP1H, N
             IN( J, K - NM1H ) = IN( J, K )
          END DO
- 
+
          DO K = 1, NM1H
             IN( J, K + NHP1 ) = -WORK( K )
          END DO
- 
+
       END DO
- 
+
 *  Fourier transform the image.
       CALL KPG1_FFTBD( M, N, IN, WORK, OUT, STATUS )
- 
+
       END

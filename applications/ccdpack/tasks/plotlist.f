@@ -21,10 +21,10 @@
 
 *  Description:
 *     This routine draws a variety of markers (crosses, circles,
-*     squares etc.) on a graphics device at positions specified 
-*     in a series of position lists.  Before this application can be 
+*     squares etc.) on a graphics device at positions specified
+*     in a series of position lists.  Before this application can be
 *     run an image (or other graphical output such as a contour image)
-*     must have been displayed using a suitable routine such as 
+*     must have been displayed using a suitable routine such as
 *     KAPPA's DISPLAY (SUN/95) or CCDPACK's DRAWNDF.
 *
 *     For a more interactive display of markers on an Xwindows display,
@@ -55,8 +55,8 @@
 *        lists should be given. These may not use wildcards but may be
 *        specified using indirection (other CCDPACK position list
 *        processing routines will write the names of their results
-*        files into files suitable for use in this manner) the 
-*        indirection character is "^". 
+*        files into files suitable for use in this manner) the
+*        indirection character is "^".
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -151,7 +151,7 @@
 *        2.5) with a line thickness of 3.
 
 *  Notes:
-*     - Position list formats. 
+*     - Position list formats.
 *
 *       CCDPACK supports data in two formats.
 *
@@ -167,7 +167,7 @@
 *       on different images. Values in any other (trailing) columns are
 *       usually ignored.
 *
-*       EXTERNAL format - positions are specified using just an X and 
+*       EXTERNAL format - positions are specified using just an X and
 *       a Y entry and no other entries.
 *
 *          - Column 1: the X position
@@ -178,12 +178,12 @@
 *       Comments may be included in a file using the characters "#" and
 *       "!". Columns may be separated by the use of commas or spaces.
 *
-*     - NDF extension items. 
+*     - NDF extension items.
 *
-*       If NDFNAMES is TRUE then the item "CURRENT_LIST" of the 
-*       .MORE.CCDPACK structure of the input NDFs will be located 
-*       and assumed to contain the names of the lists whose positions 
-*       are to be plotted. 
+*       If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
+*       .MORE.CCDPACK structure of the input NDFs will be located
+*       and assumed to contain the names of the lists whose positions
+*       are to be plotted.
 
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
@@ -251,7 +251,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -271,7 +271,7 @@
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for readind data lines
-      CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list 
+      CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list
       CHARACTER * ( AST__SZCHR ) STYELS ! Plot style elements
       INTEGER CI1                ! Minimum allowed colour index
       INTEGER CI2                ! Maximum allowed colour index
@@ -287,7 +287,7 @@
       INTEGER JCURF              ! Frame index of Current frame of Frameset
       INTEGER JCURP              ! Frame index of Current frame of Plot
       INTEGER JPIXF              ! Frame index of Pixel frame of Frameset
-      INTEGER MTYPE              ! Marker type 
+      INTEGER MTYPE              ! Marker type
       INTEGER NDFGR              ! Input NDF group identifier
       INTEGER NLGR               ! Group of NDFs with no associated lists
       INTEGER NNOLIS             ! Number of NDFs with no associated lists
@@ -364,7 +364,7 @@
             CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
  7       CONTINUE
       END IF
- 
+
 *  See if device is to be cleared.
       CLEAR = .FALSE.
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
@@ -394,7 +394,7 @@
 *  Set the pen number to a sensible value for the current device.
       CALL PGQCOL( CI1, CI2 )
       IPEN = MAX( CI1, MIN( CI2, IPEN ) )
-      CALL PGSCI( IPEN )      
+      CALL PGSCI( IPEN )
 
 *  Get the marker thickness.
       CALL PAR_GET0I( 'THICK', THICK, STATUS )
@@ -411,7 +411,7 @@
      :               'Width(markers)=^THICK', STYELS, STYELL, STATUS )
 
 *  If we are not using NDFs construct a default AST Plot object aligned
-*  with the current AGI picture to do the plotting into.  Its Current 
+*  with the current AGI picture to do the plotting into.  Its Current
 *  frame will be in the PIXEL domain.
       IF ( .NOT. NDFS ) THEN
          FRM = AST_FRAME( 2, 'Domain=PIXEL', STATUS )
@@ -422,7 +422,7 @@
       END IF
 
 *  Now loop opening each position list then plotting its positions.
-      DO 9999 INDEX = 1, NOPEN 
+      DO 9999 INDEX = 1, NOPEN
 
 *  Get the name of the input list and open the file.
          CALL GRP_GET( FIOGR, INDEX, 1, FNAME, STATUS )
@@ -449,7 +449,7 @@
      :                  STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  If we are using NDFs construct an AST Plot object from the WCS 
+*  If we are using NDFs construct an AST Plot object from the WCS
 *  component of the NDF.
          IF ( NDFS ) THEN
 
@@ -468,7 +468,7 @@
 
 *  Now set the Current frame of the Plot to the frame which was in the
 *  PIXEL domain of the NDF.  Although the frame indices of PLOT will
-*  be different from those of FSET, we can use the fact that the 
+*  be different from those of FSET, we can use the fact that the
 *  Current frame is the same, and the relative positions are the same.
             JCURP = AST_GETI( PLOT, 'Current', STATUS ) + JPIXF - JCURF
             CALL AST_SETI( PLOT, 'Current', JCURP, STATUS )
@@ -485,14 +485,14 @@
          IF ( NVAL .GT. 0 ) THEN
 
 *  Map in the data.
-            IF ( NVAL .EQ. 2 ) THEN 
+            IF ( NVAL .EQ. 2 ) THEN
 
 *  X and Y positions only.
                CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC,
      :                          NVAL, STATUS )
                XYONLY = .TRUE.
             ELSE
-               CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPID, IPDAT, 
+               CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPID, IPDAT,
      :                         NREC, NVAL, STATUS )
                XYONLY = .FALSE.
             END IF
@@ -508,7 +508,7 @@
             END IF
 
 *  Draw the points.
-            CALL CCD1_DRAWA( PLOT, %VAL( CNF_PVAL( IPID ) ), 
+            CALL CCD1_DRAWA( PLOT, %VAL( CNF_PVAL( IPID ) ),
      :                       %VAL( CNF_PVAL( IPDAT ) ), NREC,
      :                       NVAL, MTYPE, STATUS )
 

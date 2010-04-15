@@ -4,9 +4,9 @@ C
 C     F W H M I T
 C
 C     The FWHM of the profile GZVALS, whose peak is at channel IP is
-C     returned. The difference in wavelenghts of the two positions 
-C     where the signal is below half that of the peak is taken as the 
-C     FWHM ( minus wavelength extent of one channel ). 
+C     returned. The difference in wavelenghts of the two positions
+C     where the signal is below half that of the peak is taken as the
+C     FWHM ( minus wavelength extent of one channel ).
 C
 C     Parameters - (">" input, "<" output )
 C
@@ -21,7 +21,7 @@ C                                               JRW / AAO February 1987
 C
 C     Modified:
 C       Original
-C        
+C
       IMPLICIT NONE
 C
 C     Parameters
@@ -36,9 +36,9 @@ C
 
       HH=0.5*ABS(GZVALS(IP))
 C
-C     From the line peak move leftwards testing points for value < 
+C     From the line peak move leftwards testing points for value <
 C     half of peak height
-C  
+C
       I=IP-1
 20    IF (I.LE.1) THEN
        LEF=GXVALS(1)
@@ -49,9 +49,9 @@ C
        GO TO 50
       END IF
       I=I-1
-      GO TO 20      
+      GO TO 20
 C
-C     Now from the line peak move rightwards testing points for 
+C     Now from the line peak move rightwards testing points for
 C     value < half of peak height
 C
 50    I=IP+1

@@ -1,4 +1,4 @@
-      SUBROUTINE DUMMY                                        
+      SUBROUTINE DUMMY
 C+
 C
 C   ---------
@@ -8,7 +8,7 @@ C
 C   Description
 C   -----------
 C   Creates a new structure containing a data array and axes. The data
-C   array may be of type BYTE, SHORT, or FLOAT, and may be filled with a 
+C   array may be of type BYTE, SHORT, or FLOAT, and may be filled with a
 C   specified value or with magic values. Error arrays and/or quality arrays
 C   can also be included.
 C
@@ -41,10 +41,10 @@ C
 C   AXKEY   Keys for axes to be calibrated. (integer, array)(prompted for).
 C
 C   AXSTART Start calibration value for each axis. (real, array)
-C           (prompted for). 
+C           (prompted for).
 C
 C   AXEND   End calibration value for each axis. (real, array)
-C           (prompted for). 
+C           (prompted for).
 C
 C   AXLOG   Keys for axes to be calibrated logarithmically.
 C           (integer, array)(prompted for).
@@ -60,7 +60,7 @@ C
 C   ERRVAL  Value to be assigned to the error array (float, prompted)
 C
 C   QVAL    Value to be assigned to the quality array (byte, prompted)
-C      
+C
 C   Keywords
 C   --------
 C   AXES    Instruction to calibrate the axes of the image.
@@ -72,15 +72,15 @@ C   Not relevant.
 C
 C
 C   Method
-C   ------ 
+C   ------
 C   - The dimensions, data type and the presence of magic values, quality
 C     arrays and error arrays are obtained from the user.
 C   - If it is required to calibrate the axes, the structure variable for
-C     axis calibration is set, and the axis number(s), start and end 
-C     value(s), and linear/logarithmic flag(s) are prompted for. The axes 
+C     axis calibration is set, and the axis number(s), start and end
+C     value(s), and linear/logarithmic flag(s) are prompted for. The axes
 C     are then calibrated.
 C   - Unless it is required to assign the magic value to every pixel, a
-C     specific value is prompted for. The data array is filled with the 
+C     specific value is prompted for. The data array is filled with the
 C     dummy value.
 C   - The bad data flag is set if the magic value was used.
 C   - A quality or error array is created if requested.
@@ -100,7 +100,7 @@ C      DSA_WRUSER
 C
 C   Library DYN:
 C      DYN_ELEMENT
-C   
+C
 C   Library GEN:
 C      GEN_CFILL
 C      GEN_FILL
@@ -125,10 +125,10 @@ C   Internal subroutines called
 C   ---------------------------
 C   DUMMY_FILL_W
 C
-C 
+C
 C   INCLUDE statements
 C   ------------------
-C   INCLUDE 'DYNAMIC_MEMORY'       
+C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
 C
@@ -139,7 +139,7 @@ C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
 C
 C   Possible future upgrades
-C   ------------------------ 
+C   ------------------------
 C   - Prompt for the label and units of each axis.
 C
 C
@@ -182,7 +182,7 @@ C
       INTEGER   ESLOT              ! Slot number for error array
       CHARACTER EXTRA*8            ! Quality/error/magic value string
       LOGICAL   FLOAT              ! Instruction to create FLOAT data array
-      INTEGER   I                  ! Loop counter   
+      INTEGER   I                  ! Loop counter
       CHARACTER INFO*32            ! DSA_SIMPLE_OUTPUT request string
       LOGICAL   MAGIC              ! Instruction to use the magic value
       INTEGER   NDIM               ! Dimensions of image
@@ -194,7 +194,7 @@ C
       REAL      PMIN               ! Minimum parameter value for PAR_RDVAL
       INTEGER   QPTR               ! Dynamic pointer to quality/error array
       INTEGER   QSLOT              ! Map slot number for quality/error array
-      LOGICAL   QUAL		   ! Flag for quality array creation	
+      LOGICAL   QUAL		   ! Flag for quality array creation
       BYTE      QVAL               ! Value for quality array
       LOGICAL   SHORT              ! Instruction to create SHORT data array
       REAL      SIZE(6)            ! Dimensions of image
@@ -212,28 +212,28 @@ C
 C
 C     Initialize
 C
-      STATUS=0     
+      STATUS=0
 C
 C     Open DSA system
 C
       CALL DSA_OPEN(STATUS)
-      IF(STATUS.NE.0)GO TO 500 
+      IF(STATUS.NE.0)GO TO 500
 C
 C     Get output structure name and open it
-C                              
+C
       CALL PAR_RDCHAR('OUTPUT',' ',OUTPUT)
       CALL DSA_OUTPUT('OUTPUT','OUTPUT',' ',1,1,STATUS)
       IF (STATUS .NE. 0) GO TO 500
-C                   
+C
 C     Get number of dimensions
-C                             
+C
       CALL PAR_RDVAL('NDIM',1.0,6.0,3.0,' ',DUMREAL)
-      NDIM=INT(DUMREAL)                            
+      NDIM=INT(DUMREAL)
 C
 C     Get image dimensions and compute number of elements
-C                   
+C
       DUMINT=MAX_INT
-      DO I=1,6     
+      DO I=1,6
         VMIN(I)=1.0
         VMAX(I)=REAL(DUMINT)
       END DO
@@ -245,7 +245,7 @@ C
       END DO
 C
 C     Get data type
-C                            
+C
       SHORT=.FALSE.
       FLOAT=.FALSE.
       BYTE=.FALSE.
@@ -257,7 +257,7 @@ C
       ELSE IF (TYPE(1:1) .EQ. 'F') THEN
         FLOAT = .TRUE.
         TYPE = 'FLOAT'
-      ELSE 
+      ELSE
         SHORT = .TRUE.
         TYPE = 'SHORT'
       END IF
@@ -275,8 +275,8 @@ C
       IF (ICH_DELIM(EXTRA,1,'Q') .NE. 0) QUAL = .TRUE.
       IF (ICH_DELIM(EXTRA,1,'E') .NE. 0) ERR = .TRUE.
 C
-C     Get pixel value for data array 
-C                                  
+C     Get pixel value for data array
+C
       IF(.NOT.MAGIC)THEN
         IF(SHORT)THEN
           PMIN=REAL(MIN_SHORT)
@@ -308,26 +308,26 @@ C
       END DO
       CALL DSA_SIMPLE_OUTPUT('OUTPUT',INFO,TYPE,NDIM,DIMS,STATUS)
 C
-C     Map OUTPUT data array 
+C     Map OUTPUT data array
 C
       CALL DSA_MAP_DATA('OUTPUT','WRITE',TYPE,ADDRESS,OSLOT,STATUS)
       IF(STATUS.NE.0)GO TO 500
-      OUTPTR=DYN_ELEMENT(ADDRESS)                 
+      OUTPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Find out whether axes are to be calibrated
-C                                               
+C
       AXES=.FALSE.
       CALL PAR_RDKEY('AXES',.FALSE.,AXES)
 C
 C     - if so, set structure variable for axis calibration
 C
-      IF(AXES)THEN         
+      IF(AXES)THEN
 C
 C     - calibrate axes
 C
         CALL NDP_SET_AXES('OUTPUT',DIMS,NDIM,STATUS)
         IF(STATUS.NE.0)GO TO 500
-      END IF     
+      END IF
 C
 C     Map and set up quality or error array if needed
 C
@@ -369,10 +369,10 @@ C
       END IF
 C
 C     Set bad pixel flag if appropriate
-C          
+C
       CALL NDP_SET_BAD_PIXEL('OUTPUT',.FALSE.,MAGIC,STATUS)
       CALL DSA_WRUSER('Done.\\n')
-C                                        
+C
 C     Tidy up and exit
 C
 500   CONTINUE

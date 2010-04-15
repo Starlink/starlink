@@ -3,7 +3,7 @@
 *    Description :
 *     This routine reads the information contained in CRED4 parameters
 *     and transfers it to variables stored in the common block. It may
-*     be used to initialise the variables from parameters, but should 
+*     be used to initialise the variables from parameters, but should
 *     not be used while data reduction is in progress.
 *    Invocation :
 *     CALL CRED4_READ_PARAMETERS( STATUS )
@@ -37,7 +37,7 @@
 *      2-Feb-1991: ADD_IN_PAIRS and ERRORS parameters added,
 *                  so that OBJECT and SKY observations can be
 *                  added together in pairs. It has been discovered
-*                  that the only way to sky-subtract reliably 
+*                  that the only way to sky-subtract reliably
 *                  is to add pairs in this way.                (UKIRT::SMB)
 *     27-Jun-1991: Add point_source_options                    (UKIRT::PND)
 *     27-JUn-1991: Correct bug where misc 'ERRORS' were being

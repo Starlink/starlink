@@ -28,15 +28,15 @@ C                 it is plotted. (It is implemented as a value
 C                 subtracted from both HIGH and LOW.)
 C                 (HIGH,LOW and BIAS are not required if the
 C                 AUTOSCALE keyword is specified.)
-C     LABEL       A label for the plot.  
-C    
+C     LABEL       A label for the plot.
+C
 C     Command keywords -
 C
-C     AUTOSCALE   The program is to work out the values for HIGH 
+C     AUTOSCALE   The program is to work out the values for HIGH
 C                 and LOW, using the maximum and minimum values
 C                 in the data over the specified range.
 C     WHOLE       The program is to display all of the spectrum.
-C     LINES       The plot is not done as a histogram, but as 
+C     LINES       The plot is not done as a histogram, but as
 C                 a 'join the dots' line plot.  (LSPLOT only)
 C
 C     User variables used:
@@ -44,7 +44,7 @@ C
 C     HARD        (Character) The device used for HARD plots.
 C
 C     Note:
-C     
+C
 C     The original version of LSPLOT used GKS 6.2 and the DIAGRAM
 C     package.  This has now been discontinued, and some of the
 C     functionality of DIAGRAM (the ability to specify the size of
@@ -61,7 +61,7 @@ C     Modified:
 C
 C     17 Jun 1985  KS / AAO.  ELSPLOT added.
 C     26 Jul 1985  KS / AAO.  Minor modification to message output
-C                  when NOSPOOL specified, to allow for new (VMS 4) 
+C                  when NOSPOOL specified, to allow for new (VMS 4)
 C                  version of Starlink rasteriser queue.
 C     12 Aug 1985  KS / AAO.  Now expects errors to be percentage
 C                  values rather than absolute values.
@@ -127,7 +127,7 @@ C
       LOGICAL   LINES            ! Value of keyword LINES
       REAL      LOW              ! Minimum Y-value for a plot
       DOUBLE PRECISION MAGNITUDE ! Flag TRUE if data in magnitudes
-      INTEGER   NDIM             ! Dimensionality of input data 
+      INTEGER   NDIM             ! Dimensionality of input data
                                  ! structure
       INTEGER   NDELM            ! Total number of elements in the data
       INTEGER   NX               ! X-dimension of data
@@ -189,7 +189,7 @@ C
       END IF
       PLOPEN=.TRUE.
 C
-C     Get size of plot (XSIZE,YSIZE) Note - PGQVP works in mm, 
+C     Get size of plot (XSIZE,YSIZE) Note - PGQVP works in mm,
 C     our parameters are in meters, and PGVSIZE works in inches!
 C
       CALL PGVSTAND
@@ -284,7 +284,7 @@ C     Check for LINES
 C
       IF (.NOT.ERRPLT) CALL PAR_RDKEY('LINES',.FALSE.,LINES)
 C
-C     Get the label for the plot - 
+C     Get the label for the plot -
 C
       CALL PAR_RDCHAR('LABEL',' ',PLAB)
       IF (PAR_ABORT()) GO TO 500   ! User requested abort
@@ -342,7 +342,7 @@ C
 C     Plots an array (ZVALS) against another array (XVALS).  It is
 C     assumed that these map element for element, and that the XVALS
 C     values represent the coordinates at the center of each 'bin'.
-C     This routine uses PGPLOT to plot in an viewport that is assumed 
+C     This routine uses PGPLOT to plot in an viewport that is assumed
 C     to be already open and defined.  It does not call PGEND.
 C
 C     Parameters -   (">" input, "<" output)
@@ -381,7 +381,7 @@ C     15th Sept 1988  Now uses PGPLOT instead of DIAGRAM.  KS/AAO.
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL LINES
       INTEGER IXST,IXEN,NX,STATUS
@@ -408,10 +408,10 @@ C     F I G _ L E X Z P L T
 C
 C     Plots an array (ZVALS) against another array (XVALS), as an error
 C     bar plot, with Y errors specified by a third array (ERRORS),
-C     and X error bars simply covering the space between the points. It 
+C     and X error bars simply covering the space between the points. It
 C     is assumed that these map element for element, and that the XVALS
 C     values represent the coordinates at the center of each 'bin'.
-C     This routine uses PGPLOT to plot in an viewport that is assumed 
+C     This routine uses PGPLOT to plot in an viewport that is assumed
 C     to be already open and defined.  It does not call PGEND.
 C
 C     Parameters -   (">" input, "<" output)
@@ -458,7 +458,7 @@ C     15th Sept 1988.  KS / AAO.  Rewritten to use PGPLOT instead of DIAGRAM
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL ERRUSE
       INTEGER IXST,IXEN,NX,STATUS

@@ -7,13 +7,13 @@
 
 	INTEGER  STATUS             ! global status parameter
 
-	INTEGER 
+	INTEGER
      :	  CURNUM,
      :	  J,
      :	  K,
      :    NCOLS           ! number of cycles
 
-	REAL 
+	REAL
      :	  CURCOL( 3, 256),
      :    INPVAL( 3, 256, 10)  ! colour values
 

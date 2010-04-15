@@ -42,7 +42,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -110,7 +110,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -194,12 +194,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -432,7 +432,7 @@ Sections~\ref{specfit}
    that make surprisingly much sense.
 
 \begin{verbatim}
-   PARNAME - Prompt text /Default/ > 
+   PARNAME - Prompt text /Default/ >
    PARNAME - Prompt text /Default/ > <Tab>
    PARNAME - Prompt text /Default/ > \
    PARNAME - Prompt text /Default/ > !!
@@ -653,7 +653,7 @@ Sections~\ref{specfit}
    may be in a number of printer files and each printout starts on a new
    page.  If you have done overlay plots on the screen and want the same
    on the printer, then you can use as graphics device an Encapsulated
-   PostScript device like {\tt epsf\_l}.  You still get a number 
+   PostScript device like {\tt epsf\_l}.  You still get a number
    of files, but they can be merged into one (without form feed) using
 {\tt\xref{psmerge}{sun164}{}}
    (cf.\ SUN/164).  Usually the output is a complete PostScript file
@@ -741,7 +741,7 @@ Sections~\ref{specfit}
 {\tt\htmlref{fitpoly}{FITPOLY}}
    will store their fit results in the Extension. In conjunction with
    the NDF sections
-(Section~\ref{slice}) 
+(Section~\ref{slice})
    you can work your way through the rows of a CCD long-slit spectrum,
    store each row's fit in the Extension and fill the result storage
    space. The collection of all fits is again an NDF (located in the
@@ -1288,7 +1288,7 @@ Specdre/\xref{KAPPA}{sun95}{}
    the interrelation {\it within any one} spectroscopic subset, not
    between different such subsets. That means we know only about
    interrelation along the spectroscopic axis (within a spectrum) but
-   not perpendicular to that axis (between spectra). 
+   not perpendicular to that axis (between spectra).
 
 \item{\tt .RESULTS} is an NDF-type structure with data and variance
    components and a number of extensions in the {\tt .MORE}
@@ -1557,7 +1557,7 @@ LVCHI  <NDF>
                DATA(32,37,150)  <_REAL>       -163.855,-163.855,-163.855,
                                               ... 28.35489,28.35489,28.35489
                ORIGIN(3)      <_INTEGER>      1,1,1
- 
+
             LABEL          <_CHAR*64>      'velocity'                       (6)
             UNITS          <_CHAR*64>      'km/s'                           (6)
          SPECWIDS       <NDF>           {structure}
@@ -1818,10 +1818,10 @@ LVCHI  <NDF>
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -2052,7 +2052,7 @@ LVCHI  <NDF>
    }
 
 %  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -3153,7 +3153,7 @@ LVCHI  <NDF>
          its default value of FALSE, the data are intensity in Jy/sr.
       }
       \sstexamplesubsection{
-         bbody 2.7 logar=true in=!\ xstart=0 xstep=0.05 
+         bbody 2.7 logar=true in=!\ xstart=0 xstep=0.05
            xend=6 xlabel=wavelength xunit=log(micron) out=out
       }{
          This calculates the black-body spectrum for 2.7 K. The spectrum
@@ -3163,7 +3163,7 @@ LVCHI  <NDF>
          are the logarithms of intensity in Jy/sr.
       }
       \sstexamplesubsection{
-         bbody 1e6 logar=true in=!\ xstart=-1 xstep=0.05 
+         bbody 1e6 logar=true in=!\ xstart=-1 xstep=0.05
          xend=2 xlabel=frequency xunit=log10(10**15*Hz) out=out
       }{
          This calculates the black-body spectrum for 1 million K. This
@@ -4666,7 +4666,7 @@ LVCHI  <NDF>
          plot device and ASCII log file are de-selected.
       }
       \sstexamplesubsection{
-         fitpoly in(,15)\ device=xw mask1=[2.0,2.3,3.4]\ mask2=[2.1,3.2,4.0]\ 
+         fitpoly in(,15)\ device=xw mask1=[2.0,2.3,3.4]\ mask2=[2.1,3.2,4.0]\
             order=2 comp=0 logfil=myfil
       }{
          Here IN is 2-D and the 15th row is selected as the 1-D input
@@ -4676,7 +4676,7 @@ LVCHI  <NDF>
          Extension. The plot device is xwindows.
       }
       \sstexamplesubsection{
-         fitpoly in(,20)\ device=xw mask1=[2.0,2.3,3.4]\ mask2=[2.1,3.2,4.0]\ 
+         fitpoly in(,20)\ device=xw mask1=[2.0,2.3,3.4]\ mask2=[2.1,3.2,4.0]\
             order=4 comp=2 logfil=myfil
       }{
          In a follow-up from the previous example, now the 20th row is
@@ -5746,8 +5746,8 @@ LVCHI  <NDF>
 .........x.......x.........................x.......x......... \\
 \ \\
 .....|1111111|2222222|.................|3333333|4444444|..... \\
-\ \\ 
-.....|1111111|............|333333333333333333333333333333333| \\ 
+\ \\
+.....|1111111|............|333333333333333333333333333333333| \\
 |222222222222222222222222222222222|............|4444444|.....
 \ \\
 }
@@ -6329,35 +6329,35 @@ LVCHI  <NDF>
          colours. The default colour representation is:
          \sstitemlist{
             \sstitem
-            0: Background,           
+            0: Background,
             \sstitem
             1: Foreground (default),
             \sstitem
-            2: Red,                  
+            2: Red,
             \sstitem
             3: Green,
             \sstitem
-            4: Blue,                 
+            4: Blue,
             \sstitem
             5: Cyan,
             \sstitem
-            6: Magenta,              
+            6: Magenta,
             \sstitem
             7: Yellow,
             \sstitem
-            8: Orange,               
+            8: Orange,
             \sstitem
             9: Green/Yellow,
             \sstitem
-            10: Green/Cyan,           
+            10: Green/Cyan,
             \sstitem
             11: Blue/Cyan,
             \sstitem
-            12: Blue/Magenta,         
+            12: Blue/Magenta,
             \sstitem
             13: Red/Magenta,
             \sstitem
-            14: Dark grey,            
+            14: Dark grey,
             \sstitem
             15: Light grey.
          }
@@ -6799,35 +6799,35 @@ LVCHI  <NDF>
          colours. The default colour representation is:
          \sstitemlist{
             \sstitem
-            0: Background,           
+            0: Background,
             \sstitem
             1: Foreground (default),
             \sstitem
-            2: Red,                  
+            2: Red,
             \sstitem
             3: Green,
             \sstitem
-            4: Blue,                 
+            4: Blue,
             \sstitem
             5: Cyan,
             \sstitem
-            6: Magenta,              
+            6: Magenta,
             \sstitem
             7: Yellow,
             \sstitem
-            8: Orange,               
+            8: Orange,
             \sstitem
             9: Green/Yellow,
             \sstitem
-            10: Green/Cyan,           
+            10: Green/Cyan,
             \sstitem
             11: Blue/Cyan,
             \sstitem
-            12: Blue/Magenta,         
+            12: Blue/Magenta,
             \sstitem
             13: Red/Magenta,
             \sstitem
-            14: Dark grey,            
+            14: Dark grey,
             \sstitem
             15: Light grey.
          }

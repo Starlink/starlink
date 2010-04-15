@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -123,7 +123,7 @@
 /* Package definitions */
 
 # include    "device.dep"
-# include    "kwm.h"   
+# include    "kwm.h"
 # include    "idi.h"
 # include    "idi_err.h"
 # include    "idistruct_e.h"
@@ -847,7 +847,7 @@ void smv ( int display, int memid )
 
 /* Local Variables */
 int    i, j, curconf, bmsize;
-unsigned int    dpth; 
+unsigned int    dpth;
 unsigned char   *curbm;
 
 int pippo, pippo1;
@@ -863,7 +863,7 @@ display_id = (Display*) device[display].vd_id;
 w_id       = (Window) device[display].wd_id;
 gcima      = (GC) device[display].gcima_id;
 screen     = XDefaultScreen(display_id);
-visual     = VisualOfWindow( display ); 
+visual     = VisualOfWindow( display );
 dpth       = XDisplayPlanes(display_id, screen);
 
 curconf = device[display].confid;
@@ -876,15 +876,15 @@ bm0.y_coord = ((mem->y_scroll + mem->y_size) < device[display].dev_ysiz) ? 0 :
                mem->y_scroll + mem->y_size - device[display].dev_ysiz;
 bm0.x_size  = mem->x_v_size;
 bm0.y_size  = mem->y_v_size;
-                            /* Set target (display) bitmap window    
-                             (with Y inversion)                */    
+                            /* Set target (display) bitmap window
+                             (with Y inversion)                */
 
 bm1.x_coord = ((int)(mem->x_scroll + device[display].x_scroll) > 0) ?
               (int)(mem->x_scroll + device[display].x_scroll) : 0;
-bm1.y_coord = device[display].dev_ysiz - mem->y_v_size - 
+bm1.y_coord = device[display].dev_ysiz - mem->y_v_size -
               (((int)(mem->y_scroll + device[display].y_scroll) > 0) ?
                (int)(mem->y_scroll + device[display].y_scroll) : 0);
-  
+
 
 
 curbm = mem->mmbm;
@@ -895,7 +895,7 @@ ima = XCreateImage( display_id, visual, dpth, ZPixmap,
 XFlush(display_id);
 
 XSetPlaneMask( display_id, gcima, mem->pm_mask );
-XPutImage(display_id, w_id, gcima, ima, bm0.x_coord, bm0.y_coord, 
+XPutImage(display_id, w_id, gcima, ima, bm0.x_coord, bm0.y_coord,
           bm1.x_coord, bm1.y_coord, ima->width, ima->height) ;
 
 return;
@@ -962,11 +962,11 @@ void smv_z ( int display, int memid, int zoom, int x0, int y0, int xs0,
 
 /* Local Variables */
 int    i, j, l, k;
-int    curconf, bmsize; 
+int    curconf, bmsize;
 
 unsigned char       *tmpbm0 , *tmpbm;
 unsigned char       *curbm0 , *curbm;
-unsigned int        dpth; 
+unsigned int        dpth;
 
 Pixmap  PicturePixmap ;
 
@@ -979,25 +979,25 @@ display_id = (Display*) device[display].vd_id;
 w_id       = (Window) device[display].wd_id;
 gcima      = (GC) device[display].gcima_id;
 screen     = XDefaultScreen(display_id);
-visual     = VisualOfWindow( display ); 
+visual     = VisualOfWindow( display );
 dpth       = XDisplayPlanes(display_id, screen);
 
 curconf = device[display].confid;
 conf = device [display].config[curconf];
 mem = conf->memory[memid];
 
-                            /* Set source bitmap window 
-                              (with Y inversion)	      */ 
+                            /* Set source bitmap window
+                              (with Y inversion)	      */
 
 bm0.x_coord = x0;
 bm0.y_coord = y0;
 bm0.x_size  = xs0;
 bm0.y_size  = ys0;
-                            /* Set target (display) bitmap window    
-                             (with Y inversion)                */    
+                            /* Set target (display) bitmap window
+                             (with Y inversion)                */
 
 bm1.x_coord = x1;
-bm1.y_coord = device[display].dev_ysiz - 
+bm1.y_coord = device[display].dev_ysiz -
               ((device[display].dev_ysiz < (y1 + ys1)) ?
                device[display].dev_ysiz : (y1 + ys1));
 bm1.x_size = xs0 * zoom;
@@ -1033,7 +1033,7 @@ ima = XCreateImage( display_id, visual, dpth, ZPixmap,
 XFlush(display_id);
 
 XSetPlaneMask( display_id, gcima, mem->pm_mask );
-XPutImage(display_id, w_id, gcima, ima, 0, 0, 
+XPutImage(display_id, w_id, gcima, ima, 0, 0,
           bm1.x_coord, bm1.y_coord, ima->width, ima->height) ;
 
 XFlush(display_id);
@@ -1107,8 +1107,8 @@ void smv_uz ( int display, int memid, int zoom, int x0, int y0, int xs0,
 int        i , j , curconf ,bmsize;
 
 unsigned char       *tmpbm0 , *tmpbm;
-unsigned char       *curbm;                 
-unsigned int        dpth; 
+unsigned char       *curbm;
+unsigned int        dpth;
 
 BM_WINDOW  bm0 , bm1;
 CONF_DATA  *conf;
@@ -1119,14 +1119,14 @@ display_id = (Display*) device[display].vd_id;
 w_id       = (Window) device[display].wd_id;
 gcima      = (GC) device[display].gcima_id;
 screen     = XDefaultScreen(display_id);
-visual     = VisualOfWindow( display ); 
+visual     = VisualOfWindow( display );
 dpth       = XDisplayPlanes(display_id, screen);
 
 curconf = device[display].confid;
 conf = device [display].config[curconf];
 mem = conf->memory[memid];
 
-                       /*       Set source bitmap window 
+                       /*       Set source bitmap window
                                  (with Y inversion)      */
 
 bm0.x_coord = x0;
@@ -1134,17 +1134,17 @@ bm0.y_coord = y0;
 bm0.x_size = xs0;
 bm0.y_size = ys0;
 
-                       /* Set target (display) bitmap window 
-                             (with Y inversion)		 */ 
+                       /* Set target (display) bitmap window
+                             (with Y inversion)		 */
 
 bm1.x_coord = x1;
-bm1.y_coord = device[display].dev_ysiz - 
+bm1.y_coord = device[display].dev_ysiz -
               ((device[display].dev_ysiz < (y1 + ys1)) ?
                device[display].dev_ysiz : (y1 + ys1));
 bm1.x_size = xs0 / zoom;
 bm1.y_size = ys0 / zoom;
 
-                       /* Copy main memory bitmap to display bitmap */ 
+                       /* Copy main memory bitmap to display bitmap */
 
 
 bmsize = bm1.x_size * bm1.y_size;
@@ -1166,7 +1166,7 @@ ima = XCreateImage( display_id, visual, dpth, ZPixmap,
 XFlush(display_id);
 
 XSetPlaneMask( display_id, gcima, mem->pm_mask );
-XPutImage(display_id, w_id, gcima, ima, 0, 0, 
+XPutImage(display_id, w_id, gcima, ima, 0, 0,
           bm1.x_coord, bm1.y_coord, ima->width, ima->height) ;
 XFlush(display_id);
 
@@ -1228,13 +1228,13 @@ XSetWindowAttributes wind_attrib;
 XEvent event;
 
 INTER_DATA     *intdata;
-INT_DEV_DATA   *intdev;                 
+INT_DEV_DATA   *intdev;
 TRG_DATA       *trg;
 LOC_DATA       *loc;
 CURS_DATA      *curs;
 ROI_DATA       *roi;
 
-shift_pr  =  0 ;      
+shift_pr  =  0 ;
 
 intdev = int_struct.int_dev[1];
 trg         = intdev->trg[3-3];
@@ -1254,7 +1254,7 @@ display_id = (Display*) device[display].vd_id;
 w_id       = (Window) device[display].wd_id;
 
 wind_attrib.event_mask = StructureNotifyMask;
-inwin = XCreateWindow( display_id, w_id, 0, 0, 
+inwin = XCreateWindow( display_id, w_id, 0, 0,
     device[display].dev_xsiz, device[display].dev_ysiz, 0, 0,
     InputOnly, CopyFromParent, CWEventMask, &wind_attrib );
 XMapWindow( display_id, inwin);
@@ -1280,7 +1280,7 @@ for (i = 0; i < device[display].n_inter; i++)
                XSelectInput (display_id ,inwin ,inter_mask[display]);
                XFlush (display_id);
                break;
-   
+
             case II_KEYB:
                inter_mask[display] |= KeyReleaseMask;
                inter_mask[display] |= KeyPressMask;
@@ -1289,7 +1289,7 @@ for (i = 0; i < device[display].n_inter; i++)
                XSelectInput (display_id ,inwin ,inter_mask[display]);
                XFlush (display_id);
                break;
-   
+
             }
 /* Update the locator position if a cursor is in use */
          if ( intdata->obj_type == II_CURSOR )
@@ -1313,7 +1313,7 @@ for (i = 0; i < device[display].n_inter; i++)
       case II_EVLI:
       case II_EVLS:
       case II_EVLT:
-   
+
          evl0 = intdata->int_id;
          get_evl (evl0 , &interactor_id , &evl_id);
          intdev = int_struct.int_dev[interactor_id];
@@ -1324,19 +1324,19 @@ for (i = 0; i < device[display].n_inter; i++)
                XSelectInput (display_id ,inwin ,inter_mask[display]);
                XFlush (display_id);
                break;
-   
+
             case II_KEYB:
                inter_mask[display] |= KeyPressMask;
                inter_mask[display] |= KeyReleaseMask;
                XSelectInput (display_id ,inwin ,inter_mask[display]);
                XFlush (display_id);
                break;
-   
+
             }
          break;
 
       case II_TRG:
-         
+
          trg0 = intdata->int_id;
          get_trg (trg0 , &interactor_id , &trg_id);
          intdev = int_struct.int_dev[interactor_id];
@@ -1347,14 +1347,14 @@ for (i = 0; i < device[display].n_inter; i++)
                XSelectInput (display_id ,inwin ,inter_mask[display]);
                XFlush (display_id);
                break;
-   
+
             case II_KEYB:
                inter_mask[display] |= KeyReleaseMask;
                inter_mask[display] |= KeyPressMask;
                XSelectInput (display_id ,inwin ,inter_mask[display]);
                XFlush (display_id);
                break;
-   
+
             }
          break;
       }
@@ -1425,7 +1425,7 @@ inter_mask[display] |= KeyReleaseMask;
 inter_mask[display] |= KeyPressMask;
 do
    {
-   status = XCheckWindowEvent( display_id, device[display].inwin, 
+   status = XCheckWindowEvent( display_id, device[display].inwin,
         inter_mask[display], &event );
    }
 while( status );
@@ -1500,7 +1500,7 @@ display_id = (Display*) device[display].vd_id;
 w_id       = (Window) device[display].wd_id;
 
 wind_attrib.event_mask = StructureNotifyMask;
-inwin = XCreateWindow( display_id, w_id, 0, 0, 
+inwin = XCreateWindow( display_id, w_id, 0, 0,
     device[display].dev_xsiz, device[display].dev_ysiz, 0, 0,
     InputOnly, CopyFromParent, CWEventMask, &wind_attrib );
 XMapWindow( display_id, inwin);
@@ -1630,7 +1630,7 @@ display_id = (Display*) device[display].vd_id;
 w_id       = (Window) device[display].wd_id;
 
 
-XWindowEvent (display_id, device[display].inwin, inter_mask[display], 
+XWindowEvent (display_id, device[display].inwin, inter_mask[display],
     &evw_data);
 
 position[0] = (short)evw_data.xcrossing.x;
@@ -1639,7 +1639,7 @@ position[1] = (short)evw_data.xcrossing.y;
 *data       = evw_data.xcrossing.detail;
 
 if ( *type == (short) KeyPress )
-   {                       
+   {
 
 /* If arrow key pressed with shift key then change to high speed */
    if ( shift_pr > 0)
@@ -1656,9 +1656,9 @@ if ( *type == (short) KeyPress )
 
 /* Remember if shift key pressed */
    if ( *data == key_shift_l )
-      shift_pr = 1;        
+      shift_pr = 1;
    else if ( *data == key_shift_r )
-      shift_pr = 2;        
+      shift_pr = 2;
    }
 
 /* Forget if shift key released */
@@ -1765,14 +1765,14 @@ switch (intdev->descr)
             }
          else
             {
-            if ((abs(loc->x_pos - pos[0]) < LOCX_SLIP) && 
+            if ((abs(loc->x_pos - pos[0]) < LOCX_SLIP) &&
                 (abs(loc->y_pos - (device[display].dev_ysiz - 1 - pos[1])) <
                  LOCY_SLIP))
                {
                loc->x_pos = pos[0];
                loc->y_pos = device[display].dev_ysiz - 1 - pos[1];
                *f0 = 1;
-               }   
+               }
             }
          }
       break;
@@ -1799,13 +1799,13 @@ switch (intdev->descr)
             dy = -1;
          else if (ev_data == (short)loc->down_hs)
             dy = -loc->hs_fact;
-      
+
          else
             return;
 
          loc->x_pos += dx * zf;
          loc->y_pos += dy * zf;
-         *f0 = 1;   
+         *f0 = 1;
 /*                 static values to be used by Get_Locator_Displacement */
          LOC_X[loc_id] = loc->x_pos;
          LOC_Y[loc_id] = loc->y_pos;
@@ -1888,7 +1888,7 @@ switch (intdev->descr)
       switch (evl->type)
          {
          case II_EVLT:   /*  T evaluator */
-         
+
             if ((ev_type == KeyPress) &&
                 (ev_data == (short) evl->def[0]))
 
@@ -1928,13 +1928,13 @@ switch (intdev->descr)
                   sscanf (sval , "%d", &evl->ival);
                else
                   sscanf (sval , "%f", &evl->rval);
-            
+
                *f0 = 1;
                }
             break;
 
          case II_EVLS: /*   S evaluator */
- 
+
             if ((ev_type == KeyPress) &&
                 (ev_data >= (short) ALNUM_MIN) &&
                 (ev_data <= (short) ALNUM_MAX))
@@ -1952,7 +1952,7 @@ switch (intdev->descr)
                   }
                sval[i] = '\0';
                strcpy (evl->sval , sval);
-            
+
                *f0 = 1;
                }
             break;
@@ -2022,30 +2022,30 @@ switch (intdev->descr)
       switch (trigger->def)
          {
          case MOUSE_LEFT:
-            if ((ev_type == ButtonPress) && 
+            if ((ev_type == ButtonPress) &&
                 ((ev_data & 0xFF) == MOUSE_LEFT))
                *f0 = 1;
-            break;               
+            break;
          case MOUSE_MIDDLE:
-            if ((ev_type == ButtonPress) && 
+            if ((ev_type == ButtonPress) &&
                 ((ev_data & 0xFF) == MOUSE_MIDDLE))
                *f0 = 1;
-            break;               
+            break;
          case MOUSE_RIGHT:
-            if ((ev_type == ButtonPress) && 
+            if ((ev_type == ButtonPress) &&
                 ((ev_data & 0xFF) == MOUSE_RIGHT))
                *f0 = 1;
-            break;               
+            break;
          }
-     
+
    break;
 
    case II_KEYB:
-      if ((ev_type == KeyPress) && 
+      if ((ev_type == KeyPress) &&
           (ev_data == (short)trigger->def))
          *f0 = 1;
-   break;               
-   }      
+   break;
+   }
 
 
 return;
@@ -2117,16 +2117,16 @@ w_id       = (Window) device[display].wd_id;
 *idierr = VDM_INQ (device[display].devtyp, &xoff, &yoff, &xdim, &ydim);
 if (*idierr != II_SUCCESS)
    return;
-   
+
 curconf = device[display].confid;
 conf = device [display].config[curconf];
 mem = conf->memory[memid];
 itt = mem->itt[mem->itt_id];
-   
+
 ihdim = xdim / curlut.len;
 barxdim = ihdim * curlut.len;
 barydim = bardim;
-      
+
 if (vis == 1)                        /*  Visibility = 1 */
    {
    if (device[display].bar.created == 0)
@@ -2134,7 +2134,7 @@ if (vis == 1)                        /*  Visibility = 1 */
       screen = XDefaultScreen (display_id);
       white = XWhitePixel (display_id, screen);
       black = XBlackPixel (display_id, screen);
-      
+
       wnd = XCreateSimpleWindow (display_id, w_id, 0, 0, barxdim, barydim, 1,
                                  black, white);
       gc = XCreateGC (display_id, wnd, 0, 0);
@@ -2144,7 +2144,7 @@ if (vis == 1)                        /*  Visibility = 1 */
       XMapRaised (display_id, wnd);
       XSetWindowColormap (display_id, wnd, cmap);
       XFlush (display_id);
-      
+
       for (i = 0; i < curlut.len; i++)
          {
          icol = curlut.lutpix[itt->ittlev[i]];
@@ -2162,7 +2162,7 @@ if (vis == 1)                        /*  Visibility = 1 */
       XMapRaised (display_id, wnd);
       XSetWindowColormap (display_id, wnd, cmap);
       XFlush (display_id);
-      
+
       for (i = 0; i < curlut.len; i++)
          {
          icol = curlut.lutpix[itt->ittlev[i]];
@@ -2530,19 +2530,19 @@ curso0[0].x2 = x1 - 1;
 curso0[0].y2 = y0;
 
 curso0[1].x1 = x1;
-curso0[1].y1 = y0; 
-curso0[1].x2 = x1; 
+curso0[1].y1 = y0;
+curso0[1].x2 = x1;
 curso0[1].y2 = y1 - 1;
 
 curso0[2].x1 = x1;
-curso0[2].y1 = y1; 
-curso0[2].x2 = x0 - 1; 
-curso0[2].y2 = y1; 
+curso0[2].y1 = y1;
+curso0[2].x2 = x0 - 1;
+curso0[2].y2 = y1;
 
-curso0[3].x1 = x0; 
-curso0[3].y1 = y1 - 1; 
-curso0[3].x2 = x0; 
-curso0[3].y2 = y0 + 1; 
+curso0[3].x1 = x0;
+curso0[3].y1 = y1 - 1;
+curso0[3].x2 = x0;
+curso0[3].y2 = y0 + 1;
 
 nsegments = 4 ;
 
@@ -2677,7 +2677,7 @@ XAllocColor (display_id, cmap, &xcol);
 
 if (xor == 1)
    {
-   XSetLineAttributes (display_id, gcdraw, width, LineSolid, 
+   XSetLineAttributes (display_id, gcdraw, width, LineSolid,
 			CapButt, JoinMiter );
    XSetForeground( display_id, gcdraw, xcol.pixel);
    XSetPlaneMask( display_id, gcdraw, mem->pm_mask );
@@ -2685,7 +2685,7 @@ if (xor == 1)
    }
 else
    {
-   XSetLineAttributes (display_id, gcima, width, LineSolid, 
+   XSetLineAttributes (display_id, gcima, width, LineSolid,
 			CapButt, JoinMiter );
    XSetForeground( display_id, gcima, xcol.pixel);
    XSetPlaneMask( display_id, gcima, mem->pm_mask );
@@ -2803,7 +2803,7 @@ Colormap ColormapOfWindow (display)
 *+
 *  Name:
 *     colormap ColormapOfWindow (int display)
-*     
+*
 *  Purpose:
 *     Return the colormap associated with a window
 *
@@ -2811,7 +2811,7 @@ Colormap ColormapOfWindow (display)
 *     cmap = ColormapOfWindow ( display);
 *
 *  Description:
-*     
+*
 *
 *  Arguments:
 *     display = int
@@ -2850,7 +2850,7 @@ Visual *VisualOfWindow (display)
 *+
 *  Name:
 *     visual VisualOfWindow (int display)
-*     
+*
 *  Purpose:
 *     Return the visual associated with a window
 *
@@ -2858,7 +2858,7 @@ Visual *VisualOfWindow (display)
 *     visual = VisualOfWindow ( display);
 *
 *  Description:
-*     
+*
 *
 *  Arguments:
 *     display = int

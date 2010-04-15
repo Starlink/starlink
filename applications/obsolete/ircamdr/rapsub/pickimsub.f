@@ -2,7 +2,7 @@
 *+  PICKIMSUB - creates an output image from a subset of another
 
       SUBROUTINE PICKIMSUB ( INARRAY, IDIMS1, IDIMS2, XSTART, XFINISH,
-     :                       YSTART, YFINISH, OUTARRAY, ODIMS1, ODIMS2, 
+     :                       YSTART, YFINISH, OUTARRAY, ODIMS1, ODIMS2,
      :                       STATUS )
 
 *    Description :

@@ -1,4 +1,4 @@
-      SUBROUTINE SMARA1( PFILE, PEPOCH, SCS, IRA, MAXPNT, X, Y, LON, 
+      SUBROUTINE SMARA1( PFILE, PEPOCH, SCS, IRA, MAXPNT, X, Y, LON,
      :                   LAT, NPNT, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SMARA1( PFILE, PEPOCH, SCS, IRA, MAXPNT, X, Y, LON, LAT, 
+*     CALL SMARA1( PFILE, PEPOCH, SCS, IRA, MAXPNT, X, Y, LON, LAT,
 *                  NPNT, STATUS )
 
 *  Description:
@@ -24,7 +24,7 @@
 *        Name of the parameter used to get the input file from the
 *        environment.
 *     PEPOCH = CHARACTER (Given)
-*        Name of the parameter used to get the epoch at which the 
+*        Name of the parameter used to get the epoch at which the
 *        input coordinates were determined.
 *     SCS = CHARACTER (Given)
 *        The sky coordinate system in use.
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -166,8 +166,8 @@
       END IF
 
 *  Get the first element from the group, and convert to upper case.
-*  The first element may specify the coordinate system to which the 
-*  values stored in the file refer (or it may be the first numerical 
+*  The first element may specify the coordinate system to which the
+*  values stored in the file refer (or it may be the first numerical
 *  coordinate value).
       CALL GRP_GET( IGRP, 1, 1, COORDS, STATUS )
       CALL CHR_UCASE( COORDS )
@@ -176,10 +176,10 @@
 *  system.
       CALL IRA_GETEQ( COORDS, EQU, BJ, NAME, STATUS )
 
-*  If it is not a valid sky coordinate system, annul the error and 
+*  If it is not a valid sky coordinate system, annul the error and
 *  re-report a more helpful message.
       IF( STATUS .EQ. IRA__BADSC ) THEN
-         CALL ERR_ANNUL( STATUS )      
+         CALL ERR_ANNUL( STATUS )
          CALL CHR_CTOR( COORDS, TEST, STATUS )
 
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -203,10 +203,10 @@
 
       END IF
 
-*  If the input coordinates system is different to the requested output 
+*  If the input coordinates system is different to the requested output
 *  coordinate system, get the epoch of the obvservations.
       IF( COORDS .NE. SCS ) THEN
-         CALL PAR_DEF0D( PEPOCH, IRA__IRJEP, STATUS ) 
+         CALL PAR_DEF0D( PEPOCH, IRA__IRJEP, STATUS )
          CALL PAR_GET0D( PEPOCH, EPOCH, STATUS )
          CALL PAR_CANCL( PEPOCH, STATUS )
       END IF
@@ -222,9 +222,9 @@
 
 *  Increment the number of input positions.
          NPNT = NPNT + 1
-            
+
 *  Convert the coordinates from text to floating point format.
-         CALL IRA_CTOD( TEXT( 1 ), TEXT( 2 ), COORDS, LON( NPNT ), 
+         CALL IRA_CTOD( TEXT( 1 ), TEXT( 2 ), COORDS, LON( NPNT ),
      :                  LAT( NPNT ), STATUS )
 
 *  Abort if an error has occurred.
@@ -242,7 +242,7 @@
          CALL IRA_TRANS( NPNT, LON, LAT, .FALSE., SCS, IRA, X, Y,
      :                   STATUS )
       END IF
-      
+
 *  Delete the group.
  999  CONTINUE
 

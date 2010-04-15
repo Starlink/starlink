@@ -48,12 +48,12 @@ C
 
       CALL DSA_OPEN(STATUS)
 C
-C     Get the name of the input file 
+C     Get the name of the input file
 C
       CALL PAR_GET0C ('IMAGE',INPUT,STATUS)
       CALL DSA_NAMED_INPUT ('INPUT',INPUT,STATUS)
 C
-C     Determine dimensions of input. 
+C     Determine dimensions of input.
 C
       CALL DSA_DATA_SIZE ('INPUT',2,NDIM,DIMS,ELEMENTS,STATUS)
       IF (NDIM .NE. 2) THEN
@@ -81,7 +81,7 @@ C
          CALL DSA_MAP_VARIANCE ('INPUT','UPDATE','FLOAT',IVPTR,SLOT,
      :      STATUS)
       ENDIF
-  
+
       IF (STATUS .EQ. SAI__OK) THEN
          FINISHED = .FALSE.
          DO WHILE (.NOT.FINISHED)
@@ -93,7 +93,7 @@ C
             IF (STATUS .EQ. SAI__OK) THEN
                IF (BAD_CYCLE .GT. 0) THEN
 C
-C     Set them bad, and fill the corresponding data and variance areas 
+C     Set them bad, and fill the corresponding data and variance areas
 C     with zeros
 C
                   OFFSET = (BAD_CYCLE-1) * NWAVE

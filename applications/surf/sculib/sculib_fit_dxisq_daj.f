@@ -8,9 +8,9 @@
 *     calculate gradient in chi-squared with `a'
 
 *  Description:
-*     If status is good on entry this routine will calculate the gradient in 
-*     the chi-squared of the fit with variation in fit parameter J. It does 
-*     this numerically by calling the supplied routine XISQ_ROUTINE to 
+*     If status is good on entry this routine will calculate the gradient in
+*     the chi-squared of the fit with variation in fit parameter J. It does
+*     this numerically by calling the supplied routine XISQ_ROUTINE to
 *     calculate chi-squared for (A(J)+DELTA_AJ) and (A(J)-DELTA_AJ), then
 *     using the equation:-
 *
@@ -19,7 +19,7 @@
 *                                2.0 * DELTA_AJ
 *
 *     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is
-*     zero, 0.001. 
+*     zero, 0.001.
 
 *  Invocation:
 *     CALL SCULIB_FIT_DXISQ_DAJ (XISQ_ROUTINE, N, A, J, DXISQ_DAJ,
@@ -114,7 +114,7 @@
       CALL XISQ_ROUTINE (XISQM, N, A, STATUS)
 
       A(J) = A(J) + 2.0D0 * DELTA_AJ
-      CALL XISQ_ROUTINE (XISQP, N, A, STATUS) 
+      CALL XISQ_ROUTINE (XISQP, N, A, STATUS)
 
 *  calculate the differential and go back to original A(J)
 

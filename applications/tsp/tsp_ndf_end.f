@@ -49,7 +49,7 @@ C
 C     Local variables
 C
 C
-                             
+
       CALL NDF_END(STATUS)
       IF (STATUS .EQ. NDF__DUDEF) THEN
           CALL ERR_ANNUL(STATUS)

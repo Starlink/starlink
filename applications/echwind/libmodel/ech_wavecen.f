@@ -55,7 +55,7 @@
 *                    Find the two orders whose centres are nearest the input
 *                    gamma; find wavelength in both orders nearest to input
 *                    theta; choose best fit. (GXSEG0::MPF)
-*                    
+*
 *
 *   Type definitions :
 *
@@ -85,7 +85,7 @@
 *
 *   Local Constants :
 *
-      integer maxiter           ! maximum number of wavelength iterations 
+      integer maxiter           ! maximum number of wavelength iterations
       parameter (maxiter=50)
       real rad                  ! degrees per radian
       parameter (rad=57.29577951)

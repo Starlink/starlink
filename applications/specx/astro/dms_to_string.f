@@ -25,8 +25,8 @@ C  Functions
         IF (IDMS(I).LT.0) SIGN_DMS = '-'
       END DO
 
-      WRITE (STRING,'(A1,I2.1,2I3.2,''.'',I2.2)', IOSTAT=IERR) 
-     &                   SIGN_DMS, 
+      WRITE (STRING,'(A1,I2.1,2I3.2,''.'',I2.2)', IOSTAT=IERR)
+     &                   SIGN_DMS,
      &                   ABS(IDMS(1)), ABS(IDMS(2)),
      &                   ABS(IDMS(3)), ABS(IDMS(4))
 

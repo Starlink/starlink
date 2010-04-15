@@ -45,11 +45,11 @@
 *     the terms of the GNU General Public License as published by the Free Software
 *     Foundation; either version 2 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,but WITHOUT ANY
 *     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 *     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License along with
 *     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 *     Place,Suite 330, Boston, MA  02111-1307, USA
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
      :                 SCB_LINE( FIRST )( SCB_FC( FIRST ) :
      :                                    SCB_LC( FIRST ) ) // '" -',
      :              STATUS )
-      
+
 *  Add a help library reference if required.
       IF ( HELP ) THEN
          CALL SST_PUT( 3, '/TOPIC_STRING = "' //
@@ -163,7 +163,7 @@
          GO TO 99
       ENDIF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
+
 *  Form a routine description specification by concatenating the lines
 *  in the purpose section.
       NC = 0
@@ -181,7 +181,7 @@
 
 *  Output the description specification.
       CALL SST_PUT( 3, '/DESCRIPTION = "' // BUF( : NC ) // '" -',
-     :              STATUS )      
+     :              STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Locate the routine prologue's invocation section.
@@ -253,7 +253,7 @@
 
 *  Add a spacing line after the routine definition.
       CALL SST_PUT( 0, ' ', STATUS )
-      
+
 99    CONTINUE
       END
 * @(#)sst_trpak.f   1.1   94/12/05 11:31:36   96/07/05 10:27:28

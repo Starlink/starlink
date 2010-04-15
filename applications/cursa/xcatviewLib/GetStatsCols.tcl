@@ -127,7 +127,7 @@ proc GetStatsCols { } {
              set counter [expr $counter - 1]
              .getstatscols.box.selcols.selcolumns delete \
                 [lindex $DeletedColumns $counter]
-           } 
+           }
          } else {
             .getstatscols.box.selcols.selcolumns delete 0 end
          }
@@ -149,7 +149,7 @@ proc GetStatsCols { } {
       18.0m 14.0m  2.0m 14.0m  -fill black
 
 #
-#  Pack the buttons and arrow into their frame with a default border around 
+#  Pack the buttons and arrow into their frame with a default border around
 #  the OK button.
 
     frame .getstatscols.box.buttonFrame.default -relief sunken -bd 1
@@ -174,7 +174,7 @@ proc GetStatsCols { } {
       -padx 3m -pady 2m -ipadx 1m
     pack .getstatscols.box.buttonFrame.help    -side top -expand 1 \
       -padx 3m -pady 2m -ipadx 1m
- 
+
 #
 #  Pack this frame into the window.
 
@@ -403,7 +403,7 @@ proc GetStatsCols { } {
         }
 
 
-#    
+#
 #  Withdraw the window, then update all the geometry information
 #  so we know how big it wants to be, then centre the window in
 #  parent and de-iconify it.

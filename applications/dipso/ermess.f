@@ -15,7 +15,7 @@
      :       '' clouds allowed'',A)') COMND, MAXCL, 7
           ELSE
              WRITE (*,
-     :       '(''   ISINP_'',A1,'':  cloud does not exist'',A)') 
+     :       '(''   ISINP_'',A1,'':  cloud does not exist'',A)')
      :       COMND, 7
           ENDIF
        ELSE
@@ -29,7 +29,7 @@
      :       '' clouds allowed'')') COMND, MAXCL
           ELSE
              WRITE (*,
-     :       '(''   ISINP_'',A1,'':  cloud does not exist'')') 
+     :       '(''   ISINP_'',A1,'':  cloud does not exist'')')
      :       COMND
           ENDIF
        ENDIF

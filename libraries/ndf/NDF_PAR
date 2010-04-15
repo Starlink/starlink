@@ -24,12 +24,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     2-OCT-1998 (RFWS):
 *        Added the NDF__F77 and NDF__C constants.
 *     18-JUL-2000 (DSB):
-*        Increased NDF__SZHMX from 200 to 300 to keep it in step with 
+*        Increased NDF__SZHMX from 200 to 300 to keep it in step with
 *        MSG__SZMSG.
 *     {enter_further_changes_here}
 
@@ -110,7 +110,7 @@
 *  Maximum length of a history component date/time string.
       INTEGER NDF__SZHDT
       PARAMETER ( NDF__SZHDT = 24 )
-      
+
 *  Recommended length of a line of history text.
       INTEGER NDF__SZHIS
       PARAMETER ( NDF__SZHIS = 72 )

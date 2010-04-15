@@ -65,12 +65,12 @@ C
 C
 C     Local variables
 C
-      INTEGER   BDOUB            ! Number of bytes per item of type 
+      INTEGER   BDOUB            ! Number of bytes per item of type
                                  ! 'DOUBLE'
       INTEGER   DIMS(10)         ! Image dimensions
       LOGICAL   FAULT            ! Data are not valid complex structure
       REAL      HICUT            ! The low cutoff value for the filter
-      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary 
+      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary
                                  ! data
       REAL      LOWCUT           ! The low cutoff value for the filter
       INTEGER   NDIM             ! Number of image dimensions

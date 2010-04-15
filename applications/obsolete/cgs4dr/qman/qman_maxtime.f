@@ -20,7 +20,7 @@
       INCLUDE 'QMAN_COMMON.BLK'       ! Task common block
 *    Local variables :
       INTEGER ICOUNT                  ! Counter
-      DOUBLE PRECISION MAXDATE        ! Maximum date 
+      DOUBLE PRECISION MAXDATE        ! Maximum date
 *-
 
 *   Return immediately if status bad.

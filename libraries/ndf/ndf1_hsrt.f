@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,15 +62,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -121,12 +121,12 @@
 *  more to do.
          IF ( DCB_HLOC( IDCB ) .NE. DAT__NOLOC ) THEN
 
-*  Loop round all the history records. Get a locator to the record structure, 
-*  and read the formatted date/time string from it. Convert it to an MJD and 
-*  store in the first work array. Store its index in the second work array. 
+*  Loop round all the history records. Get a locator to the record structure,
+*  and read the formatted date/time string from it. Convert it to an MJD and
+*  store in the first work array. Store its index in the second work array.
 *  Annul the locator.
             DO I = 1, NREC
-               SUB( 1 ) = I 
+               SUB( 1 ) = I
                CALL DAT_CELL( DCB_HRLOC( IDCB ), 1, SUB, CELL, STATUS )
                CALL CMP_GET0C( CELL, 'DATE', DATE, STATUS )
                CALL NDF1_CHTIM( DATE, MJD, STATUS )
@@ -149,15 +149,15 @@
 *  can skip them. Assume, to begin with, that the array is now sorted.
                SORTED = .TRUE.
                DO I = 1, LAST
-                  
+
 *  Compare records I and I+1. If necessary, swap them so that the date
-*  associated with record I+1 is larger than the date associated with 
+*  associated with record I+1 is larger than the date associated with
 *  record I. If the pair need swapping indicate that we have not yet
-*  finished sorting the array. Also indicate that the records need 
+*  finished sorting the array. Also indicate that the records need
 *  re-ordering.
-                  IF( WORK1( WORK2( I ) ) .GT. 
+                  IF( WORK1( WORK2( I ) ) .GT.
      :                WORK1( WORK2( I + 1 ) ) ) THEN
-                     J = WORK2( I ) 
+                     J = WORK2( I )
                      WORK2( I ) = WORK2( I + 1 )
                      WORK2( I + 1 ) = J
                      SORTED = .FALSE.
@@ -167,7 +167,7 @@
                END DO
 
 *  The above loop will have caused the largest remaining time to bubble
-*  up to the end of the array, so we can decrement the number of records 
+*  up to the end of the array, so we can decrement the number of records
 *  remaining to be sorted.
                LAST = LAST - 1
             END DO
@@ -178,24 +178,24 @@
 
 *  Create a new records array of the required length.
                DIM( 1 ) = NREC
-               CALL DAT_NEW( DCB_HLOC( IDCB ), 'NEW_RECORDS', 
+               CALL DAT_NEW( DCB_HLOC( IDCB ), 'NEW_RECORDS',
      :                       'HIST_REC', 1, DIM, STATUS )
-               CALL DAT_FIND( DCB_HLOC( IDCB ), 'NEW_RECORDS', 
+               CALL DAT_FIND( DCB_HLOC( IDCB ), 'NEW_RECORDS',
      :                        NEWLOC, STATUS )
 
 *  Copy all items from the old array to the new array, in the correct
 *  order.
                DO I = 1, NREC
-                  SUB( 1 ) = I 
+                  SUB( 1 ) = I
                   CALL DAT_CELL( NEWLOC, 1, SUB, CELL1, STATUS )
                   SUB( 1 ) = WORK2( I )
-                  CALL DAT_CELL( DCB_HRLOC( IDCB ), 1, SUB, CELL2, 
+                  CALL DAT_CELL( DCB_HRLOC( IDCB ), 1, SUB, CELL2,
      :                           STATUS )
                   CALL NDF1_HCOPY( CELL2, CELL1, STATUS )
                   CALL DAT_ANNUL( CELL1, STATUS )
                   CALL DAT_ANNUL( CELL2, STATUS )
                END DO
-       
+
 *  Annul the old array locator and erase the array.
                CALL DAT_ANNUL( DCB_HRLOC( IDCB ), STATUS )
                CALL DAT_ERASE( DCB_HLOC( IDCB ), 'RECORDS', STATUS )

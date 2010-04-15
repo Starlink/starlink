@@ -5,7 +5,7 @@
 *   Name:
 *      REAL*8 FUNCTION LWRITF
 *
-*   Description: 
+*   Description:
 *      LWR ITF correction from IUE3.FOR.
 *
 *   History:
@@ -37,7 +37,7 @@
 *   Import:
       REAL*8 WV           ! pixel wavelength
       REAL*8 FN           ! pixel FN = TN - 2000 (GPHOT)
- 
+
 *   Export:
 *     float lwritf      ! correct pixel FN
 
@@ -47,15 +47,15 @@
 
 *   Initialisations:
       REAL*8 FN0(12)      ! FN values for old (2nd) ITF
-      DATA FN0/0., 1382., 2441., 4805., 6044., 7127., 9530., 12089., 
+      DATA FN0/0., 1382., 2441., 4805., 6044., 7127., 9530., 12089.,
      :     14683., 17635., 20600., 25233./
 
       REAL*8 FNC(12)      ! FN values for new ITF
-      DATA FNC/0., 1205., 2193., 4533., 5842., 7062., 9706., 12455., 
+      DATA FNC/0., 1205., 2193., 4533., 5842., 7062., 9706., 12455.,
      :     15164., 17934., 20531., 25233./
 
       REAL*8 GRAD(12)     ! gradients between two ITFs
-      DATA GRAD/0.8719, 0.9330, 0.9898, 1.0565, 1.1265, 1.1003, 1.0742, 
+      DATA GRAD/0.8719, 0.9330, 0.9898, 1.0565, 1.1265, 1.1003, 1.0742,
      :     1.0443, 0.9383, 0.8759, 1.0149, 1.0/
 
 *   Find range in old ITF table.
@@ -69,7 +69,7 @@
       GO TO 100
 
  200  CONTINUE
- 
+
 *   Interpolate using tabulated gradient for chosen range
       JD = JU - 1
       LWRITF = FNC(JD) + (FN - FN0(JD))*GRAD(JD)

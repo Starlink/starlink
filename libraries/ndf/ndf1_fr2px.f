@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, ISBND, VALUE1, 
+      SUBROUTINE NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, ISBND, VALUE1,
      :                       VALUE2, FRAME1, FRAME2, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, ISBND, VALUE1, VALUE2, 
+*     CALL NDF1_FR2PX( NAX, NDIM, NLBND, NUBND, ISBND, VALUE1, VALUE2,
 *                      FRAME1, FRAME2, STATUS )
 
 *  Description:
@@ -32,14 +32,14 @@
 *        directly (i.e. .TRUE. ==> a ':' separator was given or
 *        implied, whereas .FALSE. ==> a '~' separator was given).
 *     VALUE1( NAX ) = DOUBLE PRECISION (Given and returned)
-*        First value specifying the bound on each axis. 
+*        First value specifying the bound on each axis.
 *     VALUE2( NAX ) = DOUBLE PRECISION (Given and returned)
-*        Second value specifying the bound on each axis. 
+*        Second value specifying the bound on each axis.
 *     FRAME1( NAX ) = LOGICAL (Given and returned)
-*        0 ==> VALUE1 is to be interpreted as a WCS or axis coordinate 
+*        0 ==> VALUE1 is to be interpreted as a WCS or axis coordinate
 *        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     FRAME2( NAX ) = LOGICAL (Given and returned)
-*        0 ==> VALUE2 is to be interpreted as a WCS or axis coordinate 
+*        0 ==> VALUE2 is to be interpreted as a WCS or axis coordinate
 *        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,7 +74,7 @@
 *     15-OCT-2009 (DSB):
 *        Modify the handling of upper and lower bounds so that a lower
 *        fraction bound of 0.0 results in the lower pixel index bound
-*        being used, and an upper fraction bound of 1.0 results in the 
+*        being used, and an upper fraction bound of 1.0 results in the
 *        upper pixel index bound being used.
 *     {enter_changes_here}
 
@@ -82,13 +82,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
@@ -141,7 +141,7 @@
 
 *  Convert the upper bound, rounding down to the next lower pixel centre.
             IF( FRAME2( I ) .EQ. 2 ) THEN
-               VALUE2( I ) = NINT( VALUE2( I )*A + B ) 
+               VALUE2( I ) = NINT( VALUE2( I )*A + B )
                FRAME2( I ) = 1
             END IF
 

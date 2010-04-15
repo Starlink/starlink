@@ -4,7 +4,7 @@ extern Display   *VD_ID; 		/* Display identifier */
 extern Colormap  CM_ID;			/* Default colour map identifier */
 extern unsigned long PC_ID[256];	/* Colour indexes pointers */
 extern XColor    COLOUR[256];		/* Colours */
- 
+
 extern char      BY_PC_ID[256];		/* Byte equivalents of PC_ID */
 
 extern Bool      OWNCOL;		/* Use own colours in loading display LUT  */

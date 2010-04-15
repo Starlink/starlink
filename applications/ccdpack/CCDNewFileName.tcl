@@ -111,7 +111,7 @@
 #  Widget configuration.
 #----------------------------------------------------------------------------
 
-#  Menu. 
+#  Menu.
 #  File items to cancel or accept window and exit interface.
       $Menu addcommand File {Close Window} "$Choice invoke Cancel"
       $Menu addcommand File {Accept Window} "$Choice invoke OK"

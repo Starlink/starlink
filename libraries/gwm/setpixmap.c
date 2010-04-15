@@ -47,12 +47,12 @@ int GWM_SetPixmap( Display *display, Window win_id, Pixmap pix_id)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,10 +73,10 @@ int GWM_SetPixmap( Display *display, Window win_id, Pixmap pix_id)
 */
 {
     Atom atom;
-        
-/*	  
+
+/*
 **  Pixmap id.
-*/	  
+*/
     atom = XInternAtom(display, "GWM_pixmap", False );
 
     XChangeProperty( display, win_id, atom, XA_PIXMAP, 32, PropModeReplace,

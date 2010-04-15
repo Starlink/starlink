@@ -1,14 +1,14 @@
 *+  MFOPEN - does opening and initial reading from file for mosaic
 *            applications
 
-      SUBROUTINE MFOPEN ( FILNAM, PNINPI, FD, LOC, NUMBER, MAXI, 
+      SUBROUTINE MFOPEN ( FILNAM, PNINPI, FD, LOC, NUMBER, MAXI,
      :                    MINI, STATUS )
 
 *    Description :
 *
 *     This routine opens a file that contains information required to
 *     build up a mosaic image, i.e. the names and offsets of data
-*     arrays (in IMAGE structures) from a central one. 
+*     arrays (in IMAGE structures) from a central one.
 *
 *     The routine takes a filename and a parameter, opens the file,
 *     associates the parameter and a locator with the given central
@@ -145,7 +145,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :  NCHLIN                 ! maximum number of characters in a
                                ! an input record
       PARAMETER ( NCHLIN = 132 )
@@ -219,7 +219,7 @@
       ELSE
          NCV = SHRIEK - 1
       END IF
-      
+
 *    Write the image name to the input parameter.
 
       CALL AIF_PTFNM( PNINPI, CENTRAL( :NCV ), STATUS )
@@ -251,7 +251,7 @@
       ELSE
          NCV = SHRIEK - 1
       END IF
-      
+
 *    Extract integer number from the string
 
       CALL CHR_CTOI( BUFFER( :NCV ), NUMBER, STATUS )

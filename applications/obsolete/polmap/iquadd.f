@@ -2,24 +2,24 @@
      &                  STOKES_U,STOKES_UV,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
-C    I Q U A D D 
+C    I Q U A D D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), STOKES_I (><), STOKES_Q (><), STOKES_QV (><),
 C STOKES_U (><), STOKES_UV (><), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Adds a constant  I Q U vector to the current polarization spectrum.
 C
@@ -36,19 +36,19 @@ C-
       REAL STOKES_UV(*)
       LOGICAL OK
 C
-      IF (NPARAMS.EQ.0) THEN 
+      IF (NPARAMS.EQ.0) THEN
         CALL GET_PARAM('Stokes I',PARAMS(1),OK,OUT_LU)
         IF (.NOT.OK) GOTO 666
         NPARAMS=1
       ENDIF
 C
-      IF (NPARAMS.EQ.1) THEN 
+      IF (NPARAMS.EQ.1) THEN
         CALL GET_PARAM('Stokes Q (%)',PARAMS(2),OK,OUT_LU)
         IF (.NOT.OK) GOTO 666
         NPARAMS=2
       ENDIF
 C
-      IF (NPARAMS.EQ.2) THEN 
+      IF (NPARAMS.EQ.2) THEN
         CALL GET_PARAM('Stokes U (%)',PARAMS(3),OK,OUT_LU)
         IF (.NOT.OK) GOTO 666
         NPARAMS=3

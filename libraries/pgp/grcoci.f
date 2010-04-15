@@ -1,4 +1,4 @@
-	SUBROUTINE GRCOCI (A, IDIM, JDIM, I1, I2, J1, J2, A1, A2, 
+	SUBROUTINE GRCOCI (A, IDIM, JDIM, I1, I2, J1, J2, A1, A2,
      :                   ICIWH, ICIBL, MODE, ICIA)
 *+
 *     - - - - - - - -
@@ -13,16 +13,16 @@
 *      JDIM     i   The second dimension of array A.
 *      I1, I2   i   The inclusive range of the first index (I) to be plotted.
 *      J1, J2   i   The inclusive range of the second index (J) to be plotted.
-*      A1       r   The array value which is to appear the same as the 
+*      A1       r   The array value which is to appear the same as the
 *                   background
-*      A2       r   The array value which is to appear the same as the 
+*      A2       r   The array value which is to appear the same as the
 *                   foreground
 *      ICIBL    i   Colour index of background
 *      ICIWH    i   Colour index of foreground
 *      ICIA     r   Output colour index array
 *
 * N.B. Arguments are assumed to be valid (checked by PGGRAY).
-*      
+*
 *   D.L.Terrett  Starlink  Oct 1991
 *   D.L.Terrett  Starlink  Feb 1995
 *       Implement mode parameter for pgplot 5.0

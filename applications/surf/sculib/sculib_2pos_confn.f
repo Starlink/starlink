@@ -31,10 +31,10 @@
 *     same as the ideal function except at the problem points, where it is
 *     set to zero. This function consists of a series of delta functions
 *     separated by the chop spacing, the central 2 points being half the
-*     chop spacing on either side of the centre of the function. 
+*     chop spacing on either side of the centre of the function.
 *
 *     The function is normalised such that convolving this function with
-*     an original chop function of 2 delta functions of unit height will 
+*     an original chop function of 2 delta functions of unit height will
 *     give a delta function of height 1.
 *
 *    Don't understand what happens when UNBAL <> 1, but the code has left
@@ -45,9 +45,9 @@
 *     function must be twice the length of the raw map.
 *
 *     Since the raw data is not sampled such that the chop spacing is an
-*     integer number of samples, the actual convolution function must be 
+*     integer number of samples, the actual convolution function must be
 *     rebinned onto the sample mesh by sinc interpolation.
-*     
+*
 *     This routine is essentially a rewritten version of CONF22 from the
 *     RESTOR program in the NOD2 package by Haslam (1974) Astron.
 *     Astrophys. Suppl. 15 p333
@@ -97,13 +97,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR' 
-      
+      INCLUDE 'SAE_PAR'
+
 *  Arguments Given:
       REAL BSEP, PIXSEP
       INTEGER NPIX
@@ -142,11 +142,11 @@
 
       AUNBAL = ABS(UNBAL)
 
-*  convolution function must be twice size of map, odd number of points 
+*  convolution function must be twice size of map, odd number of points
 *  because function is symmetric about central pixel.
 
       NCFN = NPIX*2 - 1
-      
+
 *  the beam separation in map pixels
 
       PIXBSEP = BSEP / PIXSEP
@@ -169,7 +169,7 @@
          SUM = 0.0
          DX = REAL (I - NPIX)                ! position in pixels rel to centre
          B1 = PIXBSEP/2 - REAL(NDELTA/2) * PIXBSEP
-                                             ! position of first delta rel to 
+                                             ! position of first delta rel to
                                              ! centre
          ALPHA = 1.0
 
@@ -182,7 +182,7 @@
 
             ALPHA = ALPHA * AUNBAL
             IF (J .EQ. NPIX/2+1) ALPHA = 1.0
-            SUM = SUM + SIGN(ALPHA,UNBAL) * SCULIB_SINC(DX-B1) * 
+            SUM = SUM + SIGN(ALPHA,UNBAL) * SCULIB_SINC(DX-B1) *
      :           SIGN(1.0,B1)
             B1 = B1 + PIXBSEP
          END DO

@@ -43,7 +43,7 @@
 *     write an end-of-tape mark when closing a tape which was opened
 *     for writing. It is therefore not a good idea, for example, to
 *     rewind a tape before closing it, as the result is to put an EOT
-*     at the start of the tape! 
+*     at the start of the tape!
 
 *  References:
 *     - see manual pages - man 2 close
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -126,9 +126,9 @@ F77_SUBROUTINE(ioc_close) ( INTEGER(chan), INTEGER(status) )
 *     CALL IOC_OPEN( DEVICE, LEN_DEV, ACMODE, LEN_AC, CHAN, STATUS)
 
 *  Description:
-*     Invokes the low level open function to open the specified device 
+*     Invokes the low level open function to open the specified device
 *     for reading and/or writing, returning a channel number to be used
-*     by all subsequent tape accesses. 
+*     by all subsequent tape accesses.
 
 * Arguments:
 *     DEVICE = CHARACTER * ( * ) (Given)
@@ -142,7 +142,7 @@ F77_SUBROUTINE(ioc_close) ( INTEGER(chan), INTEGER(status) )
 *     ACMODE = CHARACTER * ( * ) (Given)
 *        A word starting with r or R will cause the tape to be opened
 *        for reading; one starting with w or W will cause it to be opened
-*        for writing. Anything else will allow read and write access, but 
+*        for writing. Anything else will allow read and write access, but
 *        this may be seen as an error on some devices.
 *     LEN_AC = INTEGER (Given)
 *        The length of the character string ACMODE.
@@ -267,8 +267,8 @@ F77_SUBROUTINE(ioc_open) ( CHARACTER(device), INTEGER(dev_1),
 *     CALL IOC_READ( CHAN, MAXVALS, BUFFER, ACTVALS, STATUS )
 
 *  Description:
-*     Invokes the low level read function to read a block from the tape 
-*     specified by chan. 
+*     Invokes the low level read function to read a block from the tape
+*     specified by chan.
 
 * Arguments:
 *     CHAN = INTEGER (Given)
@@ -290,7 +290,7 @@ F77_SUBROUTINE(ioc_open) ( CHARACTER(device), INTEGER(dev_1),
 
 *  Notes:
 *     If an error occurs whilst reading the block the number of bytes
-*     read is returned as -1; if a tape mark is read then the number of 
+*     read is returned as -1; if a tape mark is read then the number of
 *     bytes read is 0.
 
 *  References:
@@ -394,12 +394,12 @@ F77_SUBROUTINE(ioc_read) ( INTEGER(chan), INTEGER(maxvals),
 *        The Global status.
 
 *  Notes:
-*     It may sometimes be necessary to use this routine to clear a bad 
+*     It may sometimes be necessary to use this routine to clear a bad
 *     error status such as might arise by trying to backspace beyond the
 *     beginning of a tape.
 
 *     It tries to rewind the tape even if the input status is bad; if the
-*     rewind fails that status is reported, but otherwise it returns the 
+*     rewind fails that status is reported, but otherwise it returns the
 *     same status it was given.
 
 *  References:
@@ -450,7 +450,7 @@ F77_SUBROUTINE(ioc_rew) ( INTEGER(chan), INTEGER(status) )
    (void)ioctl(*chan, MTIOCGET, (char *)&stat);
 
 /* If the input status was good but rewind has created an
-   error, then set the new status return; 
+   error, then set the new status return;
    otherwise the status returned is the one received.
 */
    if (*status == SAI__OK && iret == -1)
@@ -483,7 +483,7 @@ F77_SUBROUTINE(ioc_rew) ( INTEGER(chan), INTEGER(status) )
 *     DIR = INTEGER (Given)
 *        Specifies the direction to be skipped. A positive value causes the
 *        tape to be positioned one block further away from the beginning of
-*        the tape (BOT). A negative values causes the tape to be positioned 
+*        the tape (BOT). A negative values causes the tape to be positioned
 *        one block nearer to the BOT.  A value of 0 is deemed to be an error
 *        as it is ambiguous.
 *     STATUS = INTEGER (Given and Returned)
@@ -601,7 +601,7 @@ F77_SUBROUTINE(ioc_skipb) ( INTEGER(chan), INTEGER(dir), INTEGER(status) )
 
 *  Description:
 *     Uses a Unix system ioctl to move the tape by one file. The result
-*     is to place it at the inter-block gap beyond the EOF (ie just before 
+*     is to place it at the inter-block gap beyond the EOF (ie just before
 *     it if going backwards or just after it if going forwards).
 
 * Arguments:
@@ -611,8 +611,8 @@ F77_SUBROUTINE(ioc_skipb) ( INTEGER(chan), INTEGER(dir), INTEGER(status) )
 *     DIR = INTEGER (Given)
 *        Specifies the direction to be skipped. A positive value causes the
 *        tape to be positioned just after the next file mark further away
-*        from the beginning of the tape(BOT). A negative values causes the 
-*        tape to be positioned just before the next file mark nearer to the 
+*        from the beginning of the tape(BOT). A negative values causes the
+*        tape to be positioned just before the next file mark nearer to the
 *        BOT.  A value of 0 is deemed to be an error as it is ambiguous.
 *     STATUS = INTEGER ( Returned)
 *        The Global status.
@@ -802,7 +802,7 @@ F77_SUBROUTINE(ioc_weof) ( INTEGER(chan), INTEGER(status) )
 
    int iret;                          /* return value from the ioctl        */
 
-/* Test for bad global status                                               */  
+/* Test for bad global status                                               */
    if (*status != SAI__OK) return;
 
 /* Set up the control codes for the ioctls and then invoke them.            */
@@ -841,8 +841,8 @@ F77_SUBROUTINE(ioc_weof) ( INTEGER(chan), INTEGER(status) )
 *     CALL IOC_WRITE( CHAN, NUMVALS, BUFFER, ACTVALS, STATUS )
 
 *  Description:
-*     Invokes the low level write function to write a block to the tape 
-*     specified by chan. 
+*     Invokes the low level write function to write a block to the tape
+*     specified by chan.
 
 * Arguments:
 *     CHAN = INTEGER (Given)
@@ -852,7 +852,7 @@ F77_SUBROUTINE(ioc_weof) ( INTEGER(chan), INTEGER(status) )
 *        The number of bytes to be written. It must be no larger than the
 *        size of BUFFER.
 *     BUFFER = BYTE ARRAY (Returned)
-*        Array which contains the NUMVALS bytes of data to be written to the 
+*        Array which contains the NUMVALS bytes of data to be written to the
 *        tape. In C BYTE variables are usually represented
 *        by CHARACTERs.
 *     ACTVALS = INTEGER (Returned)
@@ -930,7 +930,7 @@ F77_SUBROUTINE(ioc_write) ( INTEGER(chan), INTEGER(numvals),
       *status = SAI__OK;
 
 /* it is an error if the number of values written is not the
-   same as the number requested 
+   same as the number requested
  */
    if (nvals != *numvals)
       *status = MIO__IVBSZ;

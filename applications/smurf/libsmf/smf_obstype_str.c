@@ -88,7 +88,7 @@ const char * smf_obstype_str( smf_obstype type, int * status ) {
 
   /* Set a default value */
   const char * retval = NULL;
-  
+
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 

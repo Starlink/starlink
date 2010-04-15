@@ -16,7 +16,7 @@
 *     This routine extracts the version number from the VERSION component
 *     of the POLPACK extension in the supplied NDF. It then compares this
 *     version with the version supplied in VTEST. If the NDF was created
-*     by an earlier version of POLPACK than that indicated by VTEST, then 
+*     by an earlier version of POLPACK than that indicated by VTEST, then
 *     OK is returned false. Otherwise OK is returned true.
 
 *  Arguments:
@@ -34,7 +34,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,11 +68,11 @@
 *  Local Variables:
       CHARACTER VERS*20          ! Version string
       INTEGER M                  ! Major version number from NDF
-      INTEGER MT                 ! Smallest acceptable major version number 
+      INTEGER MT                 ! Smallest acceptable major version number
       INTEGER N                  ! Minor version number from NDF
-      INTEGER NT                 ! Smallest acceptable minor version number 
+      INTEGER NT                 ! Smallest acceptable minor version number
       INTEGER R                  ! Revision number from NDF
-      INTEGER RT                 ! Smallest acceptable revision number 
+      INTEGER RT                 ! Smallest acceptable revision number
 *.
 
 *  Initialise.
@@ -103,7 +103,7 @@
 
          IF( N .GT. NT ) THEN
             OK = .TRUE.
-   
+
          ELSE IF( N .EQ. NT ) THEN
             IF( R .GE. RT ) OK = .TRUE.
          END IF

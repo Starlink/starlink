@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,12 +65,12 @@
       DOUBLE PRECISION RESULT    ! Returned value from the NAG routine
 
 *.
- 
+
 *  Want a quiet error behaviour from NAG, so set the given failure flag,
 *  IFAIL, to unity.
       IFAIL = 1
       CALL E02BBF( NCAP7, KNOT, COEFF, X, RESULT, IFAIL )
- 
+
       IF ( IFAIL .EQ. 0 ) THEN
          PON_EVALSPLINE = RESULT
       ELSE
@@ -82,6 +82,6 @@
      :                    'NPOLY must be greater than 7.', STATUS )
          END IF
       END IF
- 
+
       END
 * $Id$

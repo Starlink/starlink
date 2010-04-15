@@ -33,11 +33,11 @@
 *        The NDF identifier of the output NDF.
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
-*        extension. 
+*        extension.
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -103,7 +103,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -225,7 +225,7 @@
       DO I = 1, NFIELD
          USED( I ) = .FALSE.
       END DO
-  
+
 *  Obtain the flux and store as the data array.
 *  =============================================
 
@@ -250,19 +250,19 @@
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL FTGCVI( FUNIT, COLNUM, 1, 1, EL, VAL__BADW,
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL FTGCVJ( FUNIT, COLNUM, 1, 1, EL, VAL__BADI,
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'IT', ITYPE )
@@ -326,7 +326,7 @@
          CALL PSX_MALLOC( EL * VAL__NBUB, WPNTR, STATUS )
          CALL FTGCVB( FUNIT, COLNUM, 1, 1, EL, VAL__BADUB,
      :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
-         CALL VEC_ABSUB( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+         CALL VEC_ABSUB( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   IERR, NERR, STATUS )
 
@@ -334,34 +334,34 @@
          CALL PSX_MALLOC( EL * VAL__NBW, WPNTR, STATUS )
          CALL FTGCVI( FUNIT, COLNUM, 1, 1, EL, VAL__BADW,
      :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
-         CALL VEC_ABSW( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+         CALL VEC_ABSW( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
-      
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBI, WPNTR, STATUS )
          CALL FTGCVJ( FUNIT, COLNUM, 1, 1, EL, VAL__BADI,
      :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
-         CALL VEC_ABSI( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+         CALL VEC_ABSI( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
-      
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBR, WPNTR, STATUS )
          CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
      :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
-         CALL VEC_ABSR( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+         CALL VEC_ABSR( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
-      
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBD, WPNTR, STATUS )
          CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
      :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
-         CALL VEC_ABSD( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+         CALL VEC_ABSD( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ),
      :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
-      
+
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'IT', ITYPE )
@@ -450,11 +450,11 @@
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
-      
+
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'IT', ITYPE )
@@ -550,29 +550,29 @@
 *  for the chosen type.
                IF ( CTYPE .EQ. '_UBYTE' ) THEN
                   CALL FTGCVB( FUNIT, COLNUM, 1, 1, EL, VAL__BADUB,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                   CALL FTGCVI( FUNIT, COLNUM, 1, 1, EL, VAL__BADW,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
-      
+
                ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGCVJ( FUNIT, COLNUM, 1, 1, EL, VAL__BADI,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
-      
+
                ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                   CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
-      
+
                ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
-      
+
                END IF
 
 *  Tidy the locator to the component.

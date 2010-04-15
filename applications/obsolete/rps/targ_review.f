@@ -4,31 +4,31 @@
 *---------------------------------------------------------------------------
       SUBROUTINE TARG_REVIEW
       IMPLICIT NONE
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'		! Filenames, ref nos.
       INCLUDE 'com_form_points.inc'
       INCLUDE 'com_form_qual.inc'
- 
+
       INCLUDE 'com_target.inc'
 c      DATA TARG_NO/90*0/
       DATA NTARGET /0/
- 
+
       LOGICAL SMG
       COMMON /SMG_KEEP/SMG
       INTEGER PBID,KPID
       COMMON /SMG_PANDK/ PBID, KPID
- 
-      INCLUDE 'aaa_dbs_params.inc'		! 
+
+      INCLUDE 'aaa_dbs_params.inc'		!
       INCLUDE 'com_dbs_iof.inc'		! Holds ARRAY, OPEN_TYPE
- 
+
       CHARACTER*64 END_MESSAGE
       COMMON /EXITEXT/ END_MESSAGE
- 
+
 *  Functions
       INTEGER FORM_GECHEK
       INTEGER MDH_ENDWORD
- 
+
 *  Local Variables
       INTEGER K,L,IERR, NCHAR, NCOM, IREC, ITARG
       INTEGER RECN
@@ -39,9 +39,9 @@ c      DATA TARG_NO/90*0/
       CHARACTER*38 MESS_CHNGE/'Format: ''C<irec>,<itarget>'' - re-enter'/
       CHARACTER*34 STRING
       CHARACTER*32 BLANK/'                                '/
-      CHARACTER*3 CTARG 
+      CHARACTER*3 CTARG
 *  Assume width is 80 chars
- 
+
 *  Executable Code
 
       DO K=1,90
@@ -61,7 +61,7 @@ c         QUAL_COVER = .FALSE.
 c      ELSE
 c         QUAL_COVER = .TRUE.
 c      END IF
- 
+
       STARTED_DISPLAY = .FALSE.
 10    CONTINUE
       CALL TARG_VIEW(IERR)
@@ -69,7 +69,7 @@ c      END IF
          END_MESSAGE = ' TARG REVIEW - Error reading File'
          GOTO 99
       END IF
-         WRITE(*,'(A/A)') '  Target List', 
+         WRITE(*,'(A/A)') '  Target List',
      &      ' Rec  Tar No.     Name ( * after Rec indicates Target error)'
          DO L=1,90
             K=TARG_NO(L)
@@ -79,15 +79,15 @@ c      END IF
                WRITE(*,'(1X,A)') STRING
             END IF
          END DO
- 
+
 20    CONTINUE
- 
+
          WRITE(*,'(/A)') ' Options - Dn      Delete record n'
          WRITE(*,'(A)') '           Cn,m    Rec n becomes Target m'
          WRITE(*,'(A)') '           R       Returns (or just <ret>)'
          WRITE(*,'(A,$)') 'Enter: '
          READ(*,'(A)') TEXT
- 
+
       NCHAR = MDH_ENDWORD(TEXT)
       IF (NCHAR.EQ.0 .OR. TEXT(:1) .EQ. 'R' .OR. TEXT(:1).EQ.'r') THEN
          GOTO 90
@@ -105,7 +105,7 @@ c      END IF
             ELSE
                CALL TARG_DELETE(IREC)					! Delete rec, update NTARGET
             END IF
- 
+
          ELSE IF(TEXT(:1) .EQ. 'C' .OR. TEXT(:1) .EQ. 'c') THEN
             NCOM = INDEX(TEXT,',')
             IF (NCOM.GT.0.AND.NCOM.LT.NCHAR) THEN
@@ -128,11 +128,11 @@ c      END IF
                GOTO 20
             END IF								! Option to alter Target List
          END IF
- 
+
          GOTO 10
       END IF
- 
+
 90    CONTINUE						! Exit point if screen set up
-99    CONTINUE      
- 
+99    CONTINUE
+
       END

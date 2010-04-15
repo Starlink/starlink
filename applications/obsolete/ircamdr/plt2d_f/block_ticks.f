@@ -43,7 +43,7 @@
 
 	  END DO
 
-	ELSE 
+	ELSE
 
 * loop for Y axis tick marks
 

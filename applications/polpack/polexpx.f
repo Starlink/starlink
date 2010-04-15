@@ -21,16 +21,16 @@
 
 *  Description:
 *     This application is not for general use. It is a version of POLEXP
-*     which is used within the polexp.csh script to export POLPACK 
-*     information during on-thr-fly data conversion. In this context, it 
-*     is known that only a single input file will be specified, and that 
-*     it will be a native NDF. We can therefore make big speed gains by 
+*     which is used within the polexp.csh script to export POLPACK
+*     information during on-thr-fly data conversion. In this context, it
+*     is known that only a single input file will be specified, and that
+*     it will be a native NDF. We can therefore make big speed gains by
 *     using NDF directtly instead of indirectly through the NDG library.
 *
 *     The default conversion table described in POLIMP is used.
 
 *  Usage:
-*     polexpx in 
+*     polexpx in
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -38,7 +38,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -92,11 +92,11 @@
       LOGICAL THERE              ! Does FITS extension exist?
       REAL    ANGROT             ! ACW angle from X axis to ref dir. in degrees
 
-      DATA FTNAM / 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :             'PPCKRAY',  'PPCKSTOK', 'PPCKT', 'PPCKEPS', 
+      DATA FTNAM / 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT',
+     :             'PPCKRAY',  'PPCKSTOK', 'PPCKT', 'PPCKEPS',
      :             'PPCKANLA', 'PPCKVERS' /,
 
-     :     ITNAM / 'FILTER',   'IMGID',    'WPLATE', 
+     :     ITNAM / 'FILTER',   'IMGID',    'WPLATE',
      :             'RAY',      'STOKES', 'T', 'EPS', 'ANLANG',
      :             'VERSION' /,
 
@@ -124,7 +124,7 @@
       CALL NDF_ASSOC( 'IN', 'UPDATE', INDF, STATUS )
 
 *  Get a locator to the POLPACK extension.
-      CALL NDF_XLOC( INDF, 'POLPACK', 'READ', POLLOC, STATUS ) 
+      CALL NDF_XLOC( INDF, 'POLPACK', 'READ', POLLOC, STATUS )
 
 *  See whether or not there is a FITS extension.
       CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
@@ -133,7 +133,7 @@
 *  If not, create one, Set its size to hold all the required POLPACK
 *  items, plus an END card and a PPCKANGR card.
          NCARD = NITEM + 2
-         CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, NCARD, FTSLOC, 
+         CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, NCARD, FTSLOC,
      :                  STATUS )
 
 *  Save the index within the list at which the first new card should be
@@ -153,7 +153,7 @@
          CALL DAT_SIZE( FTSLOC, NCARD, STATUS )
 
 *  See if the last card in the FITS extension is an END card. If so, the
-*  last card will be over-written by the first POLPACK card. Otherwise, new 
+*  last card will be over-written by the first POLPACK card. Otherwise, new
 *  cards will be added after the last card. Also set the new size required
 *  for the FITS extension, including the new cards being added, and an
 *  END card if one does not already exist.
@@ -162,7 +162,7 @@
          CALL DAT_ANNUL( CELLOC, STATUS )
 
          IF( CARD(:8) .EQ. 'END     ' ) THEN
-            ICARD = NCARD 
+            ICARD = NCARD
             NCARD = NCARD + NITEM + 1
          ELSE
             ICARD = NCARD + 1
@@ -170,7 +170,7 @@
          END IF
 
 *  Increase the size of the FITS extension to make room for the new cards.
-         CALL DAT_ALTER( FTSLOC, 1, NCARD, STATUS ) 
+         CALL DAT_ALTER( FTSLOC, 1, NCARD, STATUS )
 
 *  Map the FITS extension for UPDATE access.
          CALL DAT_MAPV( FTSLOC, '_CHAR*80', 'UPDATE', IPFITS, EL,
@@ -193,12 +193,12 @@
 *  variable in the argument list, so that subseqent string lengths get
 *  added after the "%val( 80 )".
          DO J = 1, NITEM
-            CALL POL1_SETFT( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ), 
-     :                       ITNAM( J ), FTNAM( J ), POLLOC, ICARD, 
-     :                       COMMNT( J ), NEW, STATUS, 
+            CALL POL1_SETFT( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ),
+     :                       ITNAM( J ), FTNAM( J ), POLLOC, ICARD,
+     :                       COMMNT( J ), NEW, STATUS,
      :                       %VAL( CNF_CVAL( 80 ) ) )
 
-*  If a new card was added, increment the index at which the next card will 
+*  If a new card was added, increment the index at which the next card will
 *  be written.
             IF( NEW ) THEN
                ICARD = ICARD + 1
@@ -206,14 +206,14 @@
 *  If an existing card was replaced, reduce the number of FITS cards
 *  used.
             ELSE
-               UCARD = UCARD - 1 
+               UCARD = UCARD - 1
             END IF
 
          END DO
 
-*  Now do the ANGROT item. This has to be handled separately since the 
-*  keyword value is derived from the POLANAL Frame in the WCS FrameSet, 
-*  instead of a component of the POLPACK extension. First get a pointer 
+*  Now do the ANGROT item. This has to be handled separately since the
+*  keyword value is derived from the POLANAL Frame in the WCS FrameSet,
+*  instead of a component of the POLPACK extension. First get a pointer
 *  to the FrameSet.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
@@ -227,10 +227,10 @@
 *  Store the ANGROT value in the FITS extension as keyword PPCKANGR.
          CALL POL1_STFTR( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ), ANGROT,
      :                    'PPCKANGR', ICARD, 'POLPACK: X-axis '//
-     :                    'to ref. direction in degs', NEW, 
+     :                    'to ref. direction in degs', NEW,
      :                    STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
-*  If a new card was added, increment the index at which the next card will 
+*  If a new card was added, increment the index at which the next card will
 *  be written.
          IF( NEW ) THEN
             ICARD = ICARD + 1
@@ -238,7 +238,7 @@
 *  If an existing card was replaced, reduce the number of FITS cards
 *  used.
          ELSE
-            UCARD = UCARD - 1 
+            UCARD = UCARD - 1
          END IF
 
       END IF
@@ -247,7 +247,7 @@
       CALL DAT_UNMAP( FTSLOC, STATUS )
 
 *  Ensure the FITS extension to no bigger than it needs to be.
-      CALL DAT_ALTER( FTSLOC, 1, UCARD, STATUS ) 
+      CALL DAT_ALTER( FTSLOC, 1, UCARD, STATUS )
 
 *  Add an END card to the end of the FITS extension.
       CALL DAT_CELL( FTSLOC, 1, UCARD, CELLOC, STATUS )

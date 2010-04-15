@@ -296,7 +296,7 @@
                CALL ECH_SET_PARAMETER( 'IDX_NUM_ORDERS', 'INT',
      :              FLOAT( IORD ), 0, ' ', STATUS )
                 IF ( .NOT. ECH_FATAL_ERROR( STATUS ) ) THEN
-                  CALL ECH_MODULE_INIT( 
+                  CALL ECH_MODULE_INIT(
      :                 OPTION_MODULE_NAME, STATUS )
                   IF ( .NOT. ECH_FATAL_ERROR( STATUS ) ) THEN
                      IF ( usr_tune_clone .EQ. 'NULL' ) THEN

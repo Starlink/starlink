@@ -43,7 +43,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,8 +81,8 @@
            call msg_setc('catname',incat)
            call msg_seti('numentries',numents)
            call msg_out('message 1',
-     : 'There are ^numentries entries in the ^catname catalogue', 
-     : status) 
+     : 'There are ^numentries entries in the ^catname catalogue',
+     : status)
          elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)
            call err_rep('message 2',

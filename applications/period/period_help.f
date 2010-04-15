@@ -1,21 +1,21 @@
-      
+
       SUBROUTINE PERIOD_HELP(COMMAND)
- 
+
 C=============================================================================
 C Routine to provide on-line help for PERIOD.
 C
 C Written by Vikram Singh Dhillon @LPO 17-March-1993.
 C
 C Added code to read the value of the environmental variable
-C PERIOD_HELP that defines the path to where the help files are 
+C PERIOD_HELP that defines the path to where the help files are
 C kept. Also, restructured the code somewhat.
 C
 C GJP June 1995
 C
 C=============================================================================
- 
+
       IMPLICIT NONE
- 
+
 C-----------------------------------------------------------------------------
 C  External References
 C  GJP June 1995
@@ -23,26 +23,26 @@ C-----------------------------------------------------------------------------
       INTEGER
      :  CHR_LEN                ! Length of character strings ignoring
                                ! trailing blanks
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_HELP declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER I, J
       LOGICAL PERIOD_PARSE
       CHARACTER*1 KEY
       CHARACTER*12 COMMAND
       CHARACTER*72 STRING
-       
+
 C-----------------------------------------------------------------------------
 C The name of the environmental variable defining the path to the help files
 C GJP June 1995
 C-----------------------------------------------------------------------------
 
-      CHARACTER*12 LIBNAM      
+      CHARACTER*12 LIBNAM
       PARAMETER ( LIBNAM = 'PERIOD_HELP' ) ! Env variable name
       CHARACTER*122 PATH                   ! Library path
-      CHARACTER*256 FNAME                  
+      CHARACTER*256 FNAME
       CHARACTER*8 MESS1
       CHARACTER*20 NAME1
       INTEGER NC1, NC2
@@ -51,12 +51,12 @@ C-----------------------------------------------------------------------------
 C-----------------------------------------------------------------------------
 C Declare data arrays.
 C-----------------------------------------------------------------------------
- 
- 
+
+
 C-----------------------------------------------------------------------------
 C Get the help file path - GJP June 1995
 C-----------------------------------------------------------------------------
- 
+
 C  Initialise strings.
       FNAME=' '
       MESS1=' '
@@ -68,14 +68,14 @@ C  Translate the environment variable/logical name.
       IF ( STATUS .NE. 0 ) THEN
          CALL PERIOD_WRITEBELL()
          WRITE (*, *) ' '
-         WRITE (*, *) '** ERROR: Problems encountered while' 
+         WRITE (*, *) '** ERROR: Problems encountered while'
          WRITE (*, *) '          looking at environmental variable'
          WRITE (*,*)  '          '//LIBNAM
          WRITE (*, *) ' '
          RETURN
        END IF
 
- 
+
 C-----------------------------------------------------------------------------
 C Help information.
 C-----------------------------------------------------------------------------
@@ -225,13 +225,13 @@ C-----------------------------------------------------------------------------
          NAME1='period_quit.hlp'
          GOTO 10
       END IF
-        
+
 C   Jump out point for help subject unknown.
-C   This is only reached when none of the above statements are 
+C   This is only reached when none of the above statements are
 C   satisfied.
       CALL PERIOD_WRITEBELL()
       WRITE (*, *) ' '
-      WRITE (*, *) '** ERROR: Help command ',COMMAND 
+      WRITE (*, *) '** ERROR: Help command ',COMMAND
       WRITE (*, *) '          has not been recognised.'
       WRITE (*, *) ' '
       RETURN
@@ -240,13 +240,13 @@ C   Open the required help file.
 10    CONTINUE
 
 C   Determine how much of the path string is used.
-      NC1=CHR_LEN(PATH)     
+      NC1=CHR_LEN(PATH)
 
 C   Determine how much of the file name string is used.
       NC2=CHR_LEN(NAME1)
 
 C   Construct output string and open the file.
-      FNAME=PATH(1:NC1)//'/'//NAME1(1:NC2)      
+      FNAME=PATH(1:NC1)//'/'//NAME1(1:NC2)
       OPEN (UNIT=10, FILE=FNAME, STATUS='OLD', ERR=4000)
 
 C      Read the file contents.
@@ -256,9 +256,9 @@ C      Read the file contents.
                WRITE (*, *) STRING
  20         CONTINUE
 
-C         Prompt at end of page.     
+C         Prompt at end of page.
             WRITE (*, *) ' '
-            WRITE (*, '(X,A,$)') 
+            WRITE (*, '(X,A,$)')
      :      '** OK: Please hit return to continue or q to quit... '
             READ (*, '(A)', ERR=3000) KEY
             CALL PERIOD_CASE(KEY, .TRUE.)
@@ -269,18 +269,18 @@ C         Prompt at end of page.
 
 C   Fall through location.
  3000 CONTINUE
-      CLOSE (UNIT=10) 
+      CLOSE (UNIT=10)
 
       WRITE (*, *) ' '
       WRITE (*, *) 'End of the HELP file!'
       WRITE (*, *) ' '
 
       RETURN
-      
+
 C   Jump out point if the help file could not be opened.
  4000 CONTINUE
       CALL PERIOD_WRITEBELL()
-      WRITE (*, *) '** ERROR: Could not open HELP file ',NAME1 
+      WRITE (*, *) '** ERROR: Could not open HELP file ',NAME1
       WRITE (*, *) ' '
       WRITE (*, *) 'Does environmental variable ',LIBNAM
       WRITE (*, *) 'have the right value? It is currently set to'
@@ -290,7 +290,7 @@ C   Jump out point if the help file could not be opened.
 
 C   Help file read aborted.
  5000 CONTINUE
-      CLOSE (UNIT=10) 
+      CLOSE (UNIT=10)
 
       WRITE (*, *) ' '
       WRITE (*, *) 'HELP file read aborted!!!'

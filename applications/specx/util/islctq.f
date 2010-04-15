@@ -23,7 +23,7 @@ C  If only one quadrant use it!
       IF (NQUAD.EQ.1)   THEN
         NQ = 1
 
-C  Else if more than one quadrant set for display/processing, 
+C  Else if more than one quadrant set for display/processing,
 C  indicate this with zero NQ
 
       ELSE IF (NMSK.GT.1)   THEN
@@ -31,13 +31,13 @@ C  indicate this with zero NQ
 
 C  No quadrants unmasked - use value of IQCEN (whether zero or not)
 
-      ELSE IF (NMSK.EQ.0)   THEN  
+      ELSE IF (NMSK.EQ.0)   THEN
         NQ = IQCEN
         PRINT *,'No unmasked quadrants ..Used centre quadrant ',NQ
 
 C  Only one quadrant unmasked - find out which and use it.
 
-      ELSE 
+      ELSE
         NQ = 1
         DO WHILE (MASK(NQ).EQ.0)
           NQ = NQ+1

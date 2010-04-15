@@ -1,6 +1,6 @@
       SUBROUTINE PHO1_GOPT( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
      :                      LVSTAR, LSKY, LSIGMA,
-     :                      LVSKY, LSKYMAG, PHOTON, LBIASLE, CLIP, 
+     :                      LVSKY, LSKYMAG, PHOTON, LBIASLE, CLIP,
      :                      SEE, CODE, LETIME, BUFFER, STATUS)
 
 *+
@@ -16,7 +16,7 @@
 *  Invocation :
 *     CALL PHO1_GOPT( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
 *     :               LVSTAR, LSKY, LSIGMA,
-*     :               LVSKY, LSKYMAG, PHOTON, LBIASLE, CLIP, 
+*     :               LVSKY, LSKYMAG, PHOTON, LBIASLE, CLIP,
 *     :               SEE, CODE, LETIME, BUFFER, STATUS)
 *
 *  Description :
@@ -77,7 +77,7 @@
       DOUBLE PRECISION PSKY     ! Corrected sky value
       CHARACTER * ( 9 ) CXCEN, CYCEN, CMAG, CERRMG
       CHARACTER * ( 11 ) CSKY, CSIG
-      DOUBLE PRECISION PADU, STAR, VSTAR, SKY, SIGMA, 
+      DOUBLE PRECISION PADU, STAR, VSTAR, SKY, SIGMA,
      :                 VSKY, SKYMAG, BIASLE, ETIME ! Local DBLE variables
 *.
 
@@ -110,17 +110,17 @@
 
 *   The magnitude error = (2.5/ln(10)) * (errsig/signal) which comes
 *   from differentiating the magnitude calculation. Check that the
-*   signal is not zero, otherwise set an error condition. If MAGS is 
+*   signal is not zero, otherwise set an error condition. If MAGS is
 *   FALSE then we do not want a magnitude conversion.
       FACTOR = 0.0
-      IF ( MAGS ) THEN 
+      IF ( MAGS ) THEN
          IF ( ABS( SIGNAL ) .GT. 1.0D-6 ) THEN
             FACTOR = ABS( ERRSIG / SIGNAL )
             ERRMAG = 1.08574D0 * FACTOR
          ELSE
             ERFLAG = .TRUE.
          ENDIF
-      ELSE 
+      ELSE
          ERRMAG = ERRSIG
       END IF
 
@@ -132,7 +132,7 @@
 *   Calculate the stars magnitude. A magnitude of skymag means that the
 *   star and sky are the same brightness. If the signal is negative then
 *   flag an error.
-      IF ( MAGS ) THEN 
+      IF ( MAGS ) THEN
          IF ( SIGNAL .GT. 0.0D0 ) THEN
             MAG = SKYMAG - 2.5D0 * LOG10( ABS( SIGNAL ) )
          ELSE
@@ -144,14 +144,14 @@
       ENDIF
 
 *   If there is no signal or an error has occured, give it a nominal value
-      IF ( MAGS ) THEN 
+      IF ( MAGS ) THEN
          IF ( ( FACTOR .GT. 1.0D0 ) .OR. ERFLAG ) THEN
             MAG = SKYMAG
             ERRMAG = 99.999D0
             CODE = '?'
          ENDIF
       ELSE
-         IF ( ERFLAG ) THEN 
+         IF ( ERFLAG ) THEN
             MAG = 0.0D0
             ERRMAG = 0.0D0
             CODE = '?'

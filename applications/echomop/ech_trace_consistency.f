@@ -634,7 +634,7 @@
      :            0.0, 0.0, options, 'LINES', status )
 
             ELSE
-             CALL ECH_PLOT_TRACES( nx, ny, IMAGE, n_orders, 
+             CALL ECH_PLOT_TRACES( nx, ny, IMAGE, n_orders,
      :            maximum_poly, polynomials, x_trace_coord,
      :            fit_work_xdouble, status )
              OPTIONS = GRPH_SET_COLOUR

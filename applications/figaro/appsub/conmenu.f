@@ -8,7 +8,7 @@ C     C O N M E N U
 C
 C     This is the menu command interpreter for continuum fitting.
 C     The command is read from the user input and the relevant parameter
-C     set or command executed. On return the start and length of the fitted 
+C     set or command executed. On return the start and length of the fitted
 C     continuum is set, the x and y values of the continuum points, and
 C     the array of indicators for continuum points ( excluding lines ).
 C
@@ -26,7 +26,7 @@ C     (=)  ORD     (Integer) Order of final polynomial fit
 C     (<)  ICONO   (Integer array) The array indicating points to be included
 C                  in the continuum fit
 C     (<)  CONVALS (Real array) The Y values of the CX continuum fitted points
-C     (<)  ZRESID  (Real array) The Y values of the residuals on the continuum 
+C     (<)  ZRESID  (Real array) The Y values of the residuals on the continuum
 C                  fit
 C     (=)  ITN     (Integer) Number of iterations for continuum point rejection
 C     (=)  SIG     (Real) Factor*sigma for continuum point rejection
@@ -80,7 +80,7 @@ C
       REAL XC,YC,VALUE,RMS(8),RMSN(8),NFAC,RAT,FERR(8),DUM(1)
       DOUBLE PRECISION A(8,8)
       CHARACTER*1 CC
-      CHARACTER*80  RESPON,STRING 
+      CHARACTER*80  RESPON,STRING
       LOGICAL LERR,LICON,CONDON
 C
 C     Set values for menu key
@@ -107,7 +107,7 @@ C        ORD    -    order of polynomial fit
 C        SIG    -    factor*sigma on fit for continuum point rejection
 C        ERR    -    factor*error on point for rejection from continuum fit
 C        ITN    -    number of iterations for continuum point rejection
-C        FIT    -    perform the polynomial fitting 
+C        FIT    -    perform the polynomial fitting
 C        GAU    -    proceed to Gaussian fitting ( continuum set )
 C
 20    CALL PAR_WRUSER('  ',STATUS)
@@ -149,7 +149,7 @@ C
           TCONO(I)=0
           CONVALS(I)=0.0
         END DO
-        
+
         DO I=1,100
 52        CALL PAR_WRUSER('Use cursor to indicate left edge '//
      :           'of line-free continuum section ',STATUS)
@@ -166,7 +166,7 @@ C         Check values of IA and IB to determine IB>IA and reasonable
 C
           IF (IA.GE.IB.OR.IA.LT.1.OR.IB.GT.NX) THEN
             CALL PAR_WRUSER('Edges of continuum section invalid',STATUS)
-            XC=XVALS(NX/2) 
+            XC=XVALS(NX/2)
             YC=ZVALS(NX/2)
             GO TO 52
           END IF
@@ -178,7 +178,7 @@ C
           END DO
         END DO
 C
-C     Check that there is at least 1 continuum point indicated in ICONO 
+C     Check that there is at least 1 continuum point indicated in ICONO
 C
 55      J=0
         DO I=1,NX
@@ -222,7 +222,7 @@ C
 
 60    IF (KEY.EQ.IORD) THEN
 C
-C       ORDER of polynomial fit 
+C       ORDER of polynomial fit
 C
         CALL PAR_CNPAR('ORD')
         CALL PAR_RDVAL('ORD',0.,7.,FLOAT(ORD),' ',VALUE)
@@ -240,7 +240,7 @@ C
 70    IF (KEY.EQ.ISIG) THEN
 C
 C       SIGMA * r.m.s. for rejection of points
-C   
+C
         CALL PAR_CNPAR('SIG')
         CALL PAR_RDVAL('SIG',0.,1000.,SIG,' ',VALUE)
         IF (PAR_ABORT()) GO TO 999
@@ -253,7 +253,7 @@ C
         IF (ERRUSE) THEN
 C
 C       Factor *ERROR on point for rejection from continuum fit
-C   
+C
           CALL PAR_CNPAR('ERR')
           CALL PAR_RDVAL('ERR',0.,1000.,ERR,' ',VALUE)
           IF (PAR_ABORT()) GO TO 999
@@ -287,19 +287,19 @@ C
 100   IF (KEY.EQ.FIT) THEN
 C
 C       Fit the continuum with a polynomial of order ORD. If no errors
-C       then with ITN iterations for rejection of points greater than 
+C       then with ITN iterations for rejection of points greater than
 C       SIG*r.m.s. from fitted continuum. If errors then ITN iterations
-C       with rejection of points greater than ERR*actual error from fitted 
+C       with rejection of points greater than ERR*actual error from fitted
 C       continuum
 C
 C       Copy values in ICONO to an array TCONO in which rejected
 C       discrepant continuum points are indicated
 C
-        DO I=ICST,ICST+CX-1,1 
+        DO I=ICST,ICST+CX-1,1
           TCONO(I)=ICONO(I)
         END DO
 C
-C       Ready for polynomial fitting. Check that continuum points 
+C       Ready for polynomial fitting. Check that continuum points
 C       indicated in ICONO
 C
         IF (.NOT.LICON) THEN
@@ -333,7 +333,7 @@ C
      : RMS,FAULT)
             IF (FAULT) GO TO 999
 C
-C           Write results to terminal  
+C           Write results to terminal
 C
             NREJ=0
             I=0
@@ -378,17 +378,17 @@ C
             WRITE(STRING,107,IOSTAT=IGNORE) NFAC
             CALL PAR_WRUSER(STRING(:35),STATUS)
           END IF
- 
+
           IF (LERR) THEN
-C 
+C
 C           Initialise FERR and RMSN
-C 
+C
             DO I=1,8
               FERR(I)=0.0
               RMSN(I)=0.0
             END DO
             CALL PAR_WRUSER('Fractional error on polynomial fit to '//
-     :                   'line-free continuum points',STATUS)                  
+     :                   'line-free continuum points',STATUS)
             STRING=' with rejection of points '
             INVOKE=ICH_ENCODE(STRING,ERR,27,7,NEXT)
             STRING(NEXT:)=' * error on observed values'
@@ -401,7 +401,7 @@ C
 C           Calculate the fractional error on fit in terms of the
 C           error on values for each order of polynomial with no
 C           point rejection initially
-C           
+C
             DO K=1,KORD,1
               CALL CONTFIT(NX,XVALS,ZVALS,CX,ICST,TCONO,KORD,A,CONVALS,
      :                       RMS,FAULT)
@@ -436,7 +436,7 @@ C
 C
 C             Calculate the fractional error on fit in terms of the
 C             error on values for each order of polynomial
-C 
+C
               DO K=1,KORD,1
                 NREJ=0
                 DO J=ICST,ICST+CX-1
@@ -491,7 +491,7 @@ C
         HIGHR=HIGHR + ABS(HIGHR-LOWR)/12.
         LOWR=LOWR - ABS(HIGHR-LOWR)/12.
 C
-C       Plot the resulting continuum with residuals 
+C       Plot the resulting continuum with residuals
 C
         ERASE=.TRUE.
         LCON=.TRUE.
@@ -510,12 +510,12 @@ C
 
 110   IF (KEY.EQ.GAU) THEN
 C
-C       Continuum fitting complete; ready to proceed to Gaussian fitting. 
+C       Continuum fitting complete; ready to proceed to Gaussian fitting.
 C       Check that continuum set.
 C
         IF (CONDON) THEN
 C
-C         If errors available but not used for point rejection then 
+C         If errors available but not used for point rejection then
 C         set ERR to zero
 C
           IF (ERRUSE.AND..NOT.LERR) THEN

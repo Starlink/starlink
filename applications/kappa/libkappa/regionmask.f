@@ -17,12 +17,12 @@
 *        The global status.
 
 *  Description:
-*     This routine masks out a region of an NDF by setting pixels to 
-*     the bad value, or to a specified constant value. The region to 
-*     be masked is specified within a text file (see Parameter REGION) 
-*     that should contain a description of the region in the form of an 
-*     "AST Region". This is the system used by the AST library for 
-*     describing regions (see SUN/211 or SUN/210). Such text files can, 
+*     This routine masks out a region of an NDF by setting pixels to
+*     the bad value, or to a specified constant value. The region to
+*     be masked is specified within a text file (see Parameter REGION)
+*     that should contain a description of the region in the form of an
+*     "AST Region". This is the system used by the AST library for
+*     describing regions (see SUN/211 or SUN/210). Such text files can,
 *     for instance, be created using the Starlink ATOOLS package (a
 *     high-level interface to the facilities of the AST library).
 
@@ -31,13 +31,13 @@
 
 *  ADAM Parameters:
 *     CONST = LITERAL (Given)
-*        The constant numerical value to assign to the region, or the 
+*        The constant numerical value to assign to the region, or the
 *        string "Bad".  ["Bad"]
 *     IN = NDF (Read)
 *        The name of the input NDF.
 *     INSIDE = _LOGICAL (Read)
-*        If a TRUE value is supplied, the constant value is assigned 
-*        to the inside of the region. Otherwise, it is assigned to the 
+*        If a TRUE value is supplied, the constant value is assigned
+*        to the inside of the region. Otherwise, it is assigned to the
 *        outside.  [TRUE]
 *     OUT = NDF (Write)
 *        The name of the output NDF.
@@ -51,9 +51,9 @@
 *        be reported if this is not possible.
 
 *  Examples:
-*     regionmask a1060 galaxies.txt a1060_sky 
+*     regionmask a1060 galaxies.txt a1060_sky
 *        This copies input NDF a1060 to the output NDF a1060_sky,
-*        setting pixels bad if they are contained within the Region 
+*        setting pixels bad if they are contained within the Region
 *        specified in text file "galaxies.txt".
 
 *  Related Applications:
@@ -111,20 +111,20 @@
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'NDF_PAR'          ! NDF constants
-               
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL AST_ISAREGION
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER CONTXT*40        ! Text version of constant value
       DOUBLE PRECISION CONST     ! The constant to assign
       DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! The shift for each axis
       INTEGER FSET               ! Region -> PIXEL FrameSet
       INTEGER I                  ! Lop count
-      INTEGER INDF1              ! Identifier for the source NDF  
+      INTEGER INDF1              ! Identifier for the source NDF
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IREG               ! AST Region
@@ -146,7 +146,7 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain an identifier for the NDF structure to be examined.       
+*  Obtain an identifier for the NDF structure to be examined.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Get an AST Region.
@@ -155,19 +155,19 @@
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
 
-*  We now try to get a region in which the axes are the same in number and 
-*  type (but not necessarily order - AST_CONVERT, called later, will take 
-*  account of any difference in axis order) as those spanned by the current 
-*  WCS Frame. 
+*  We now try to get a region in which the axes are the same in number and
+*  type (but not necessarily order - AST_CONVERT, called later, will take
+*  account of any difference in axis order) as those spanned by the current
+*  WCS Frame.
       CALL ATL_MATCHREGION( IREG, IWCS, NEWREG, STATUS )
 
-*  We need a Mapping from the co-ordinate system represented by the 
-*  Region to the pixel co-ordinate system of the NDF. The AST_COVNERT 
+*  We need a Mapping from the co-ordinate system represented by the
+*  Region to the pixel co-ordinate system of the NDF. The AST_COVNERT
 *  routine converts between current Frames, so we need to make the PIXEL
-*  Frame the current Frame in the NDFs WCS FrameSet. 
+*  Frame the current Frame in the NDFs WCS FrameSet.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
       CALL AST_SETI( IWCS, 'Current', IPIX, STATUS )
-      FSET = AST_CONVERT( NEWREG, IWCS, ' ', STATUS ) 
+      FSET = AST_CONVERT( NEWREG, IWCS, ' ', STATUS )
 
 *  Report an error and abort if the conversion was not defined.
       IF( FSET .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -188,13 +188,13 @@
          SHIFT( I ) = 0.5D0
       END DO
 
-      MAP = AST_CMPMAP( AST_GETMAPPING( FSET, AST__BASE, AST__CURRENT, 
+      MAP = AST_CMPMAP( AST_GETMAPPING( FSET, AST__BASE, AST__CURRENT,
      :                                  STATUS ),
-     :                  AST_SHIFTMAP( NAX, SHIFT, ' ', STATUS ), 
+     :                  AST_SHIFTMAP( NAX, SHIFT, ' ', STATUS ),
      :                  .TRUE., ' ', STATUS )
 
 *  Create the output NDF as a copy of the input NDF.
-      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
+      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS',
      :               'OUT', INDF2, STATUS )
 
 *  Get the string representing the constant value to assign.
@@ -204,7 +204,7 @@
 *  Get the appropriate numerical value from the string.
       IF( CONTXT .EQ. 'BAD' ) THEN
          CONST = VAL__BADD
-      ELSE 
+      ELSE
          CALL CHR_CTOD( CONTXT, CONST, STATUS )
       END IF
 
@@ -213,13 +213,13 @@
       CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
 *  First mask the Data array.
-      CALL KPS1_RMASK( INDF2, 'Data', NEWREG, MAP, INSIDE, CONST, 
+      CALL KPS1_RMASK( INDF2, 'Data', NEWREG, MAP, INSIDE, CONST,
      :                 STATUS )
 
 *  If the Variance array is defined, also mask the Variance array.
       CALL NDF_STATE( INDF2, 'Variance', VAR, STATUS )
       IF( VAR ) THEN
-         CALL KPS1_RMASK( INDF2, 'Variance', NEWREG, MAP, INSIDE, 
+         CALL KPS1_RMASK( INDF2, 'Variance', NEWREG, MAP, INSIDE,
      :                    CONST, STATUS )
       END IF
 
@@ -227,7 +227,7 @@
  999  CONTINUE
 
 *  End the NDF context.
-      CALL NDF_END( STATUS )                              
+      CALL NDF_END( STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

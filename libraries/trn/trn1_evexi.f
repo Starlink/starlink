@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
 
 *  History:
 *     17-AUG-1988:  Original version (DUVAD::RFWS)
-*     12-JAN-2006:  Added IDV, QIF and boolean operators. Moved LDBAD 
+*     12-JAN-2006:  Added IDV, QIF and boolean operators. Moved LDBAD
 *                   from label 35 to 37.
 *     {enter_further_changes_here}
 
@@ -210,7 +210,7 @@
      :           1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
      :          11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
      :          21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-     :          31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
+     :          31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
      :          41, 42, 43, 44, 45, 46 ) ( OPER - TRN_OP_MINOP + 1 )
 
 
@@ -631,7 +631,7 @@
         TOS = TOS - 1
         GO TO 100
 
- 
+
 *   TRN_OP_QIF - If-then-else function (like the C "a ? b : c" construct).
    36   CONTINUE
 
@@ -644,7 +644,7 @@
         END DO
         TOS = TOS - 2
         GO TO 100
- 
+
 *   TRN_OP_LDBAD - Load "bad" value on to stack.
    37   CONTINUE
         TOS = TOS + 1
@@ -668,7 +668,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_NE - .NE. operator
    39   CONTINUE
 
@@ -681,7 +681,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_GT - .GT. operator
    40   CONTINUE
 
@@ -694,7 +694,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_GE - .GE. operator
    41   CONTINUE
 
@@ -707,7 +707,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_LT - .LT. operator
    42   CONTINUE
 
@@ -720,7 +720,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_LE - .LE. operator
    43   CONTINUE
 
@@ -733,7 +733,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_OR - .OR. operator
    44   CONTINUE
 
@@ -747,7 +747,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_AND - .AND. operator
    45   CONTINUE
 
@@ -761,7 +761,7 @@
         END DO
         TOS = TOS - 1
         GO TO 100
- 
+
 *   TRN_OP_NOT - .NOT. operator
    46   CONTINUE
 
@@ -773,7 +773,7 @@
            END IF
         END DO
         GO TO 100
- 
+
 
 *   Control passes to here after each operation on the arithmetic stack
 *   is complete.

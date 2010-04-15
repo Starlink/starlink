@@ -4,7 +4,7 @@ C
 C     G E N _ S U P S E T
 C
 C     Given two two-dimensional arrays that overlap (in a nice simple
-C     way, with one element in one mapping directly onto one element 
+C     way, with one element in one mapping directly onto one element
 C     in the other), copies the data from the overlapping portion of
 C     the input array into the corresponding elements of the output
 C     array.  All other elements of the output array are set to zero.
@@ -17,7 +17,7 @@ C     (>) NY      (Integer) Second dimension of IN
 C     (>) NXOUT   (Integer) First dimension of OUT
 C     (>) NYOUT   (Integer) Second dimension of OUT
 C     (>) IXST    (Integer) X (first dimension) element number in OUT
-C                 on which element (1,1) of IN is mapped.  
+C                 on which element (1,1) of IN is mapped.
 C     (>) IYST    (integer) Y (second dimension) element number in
 C                 OUT on which element (1,1) of IN is mapped.  If the
 C                 overlap is such that the first element of IN does

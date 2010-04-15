@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Description:
- *     This include file contains the function prototypes for all 
+ *     This include file contains the function prototypes for all
  *     EMS C interface routines and defines EMS__VERSN to be the major
  *     version number
 
@@ -32,7 +32,7 @@
  *        V1.5 Added ems1_starf_c
  *     13-MAY-1999 (AJC):
  *        Added the emsXxx form of name
- *        and #define old_names = new_names 
+ *        and #define old_names = new_names
  *        Removed ems_tune/gtune/show/_c
  *        Added ems1_get_facility_error
  *     27-JUL-2001 (AJC):
@@ -80,19 +80,19 @@
 #endif
 
 /* Function Prototypes: */
-void emsAnnul( int *status );     
+void emsAnnul( int *status );
 
-void emsBegin( int *status );     
+void emsBegin( int *status );
 
-void emsEload( char *param,       
+void emsEload( char *param,
                int *parlen,
                char *opstr,
                int *oplen,
                int *status );
 
-void emsEnd( int * status );      
+void emsEnd( int * status );
 
-void emsErrno( const char *token, 
+void emsErrno( const char *token,
                int errval );
 
 void emsExpnd( const char *text,
@@ -102,25 +102,25 @@ void emsExpnd( const char *text,
                int *oplen,
                int *status );
 
-void emsFacer( const char *token, 
+void emsFacer( const char *token,
                int status );
 
-int emsGtune( const char *key,  
+int emsGtune( const char *key,
               int *status );
 
-void emsLevel( int *level );      
+void emsLevel( int *level );
 
-void emsMark( void );             
+void emsMark( void );
 
-void emsMload( const char *msg,   
+void emsMload( const char *msg,
                const char *text,
                char *opstr,
                int *oplen,
                int *status );
 
-void emsRenew( void );            
+void emsRenew( void );
 
-void emsRep( const char *err,     
+void emsRep( const char *err,
              const char *text,
              int *status );
 
@@ -132,48 +132,48 @@ void emsRepv( const char *err,
               const char *text, va_list args,
               int *status ) __attribute__((format (printf, 2, 0 )));
 
-void emsRlse( void );             
+void emsRlse( void );
 
 /* Gnu compiler can check for format consistency at compile time */
 void emsSet( const char *token,
              const char *format,
              ...) __attribute__((format (printf, 2, 3 )));
 
-void emsSetc( const char *token,  
+void emsSetc( const char *token,
               const char *cvalue );
 
-void emsSetnc( const char *token,  
+void emsSetnc( const char *token,
                const char *cvalue,
                int mxchar );
 
-void emsSetd( const char *token,  
+void emsSetd( const char *token,
               double dvalue );
 
-void emsSeti( const char *token,  
+void emsSeti( const char *token,
               int ivalue );
 
-void emsSeti64( const char *token,  
+void emsSeti64( const char *token,
                 int64_t ivalue );
 
-void emsSetl( const char *token,  
+void emsSetl( const char *token,
               int lvalue );
 
-void emsSetr( const char *token,  
+void emsSetr( const char *token,
               float rvalue );
 
-void emsSetp( const char *token,  
+void emsSetp( const char *token,
               void * pvalue );
 
-void emsSetu( const char *token,  
+void emsSetu( const char *token,
               unsigned int ivalue );
 
 void emsSetv( const char *token,
               const char *format,
               va_list args)  __attribute__((format (printf, 2, 0 )));
 
-void emsStat( int *status );      
+void emsStat( int *status );
 
-void emsSyser( const char *token, 
+void emsSyser( const char *token,
                int systat );
 
 int emsStune( const char *key,
@@ -181,16 +181,16 @@ int emsStune( const char *key,
               int *status );
 
 /*  Deprecated function. */
-void emsTune( const char *key, 
-              const int value, 
+void emsTune( const char *key,
+              const int value,
               int *status );
 
 /* Internal Functions */
 /* Not for general use */
-int ems1Starf( const char *envar,       
-               const char *relpath, 
-               const char *acmode, 
-               char **filename, 
+int ems1Starf( const char *envar,
+               const char *relpath,
+               const char *acmode,
+               char **filename,
                int *pathlen );
 
 void ems1_get_facility_error( unsigned int errcode,

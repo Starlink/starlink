@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -127,7 +127,7 @@ AstTemplateClass *astTemplateClassId_( >>> const char *, ... );
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstTemplateClass *astInitTemplateClass_( void *, size_t, int, 
+AstTemplateClass *astInitTemplateClass_( void *, size_t, int,
                                          AstTemplateClassVtab *,
                                          const char * >>> );
 
@@ -135,7 +135,7 @@ AstTemplateClass *astInitTemplateClass_( void *, size_t, int,
 void astInitTemplateClassVtab_( AstTemplateClassVtab *, const char * );
 
 /* Loader. */
-AstTemplateClass *astLoadTemplateClass_( void *, size_t, 
+AstTemplateClass *astLoadTemplateClass_( void *, size_t,
                                          AstTemplateClassVtab *,
                                          const char *, AstChannel *channel );
 #endif

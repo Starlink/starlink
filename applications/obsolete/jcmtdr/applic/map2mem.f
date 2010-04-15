@@ -33,14 +33,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                    ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'                ! Standard SAE constants
       INCLUDE 'ASTRO_PAR'
-                                 
+
 
 *  Dynamic memory include file - defines DYNAMIC_MEM
       INCLUDE 'DYNAMIC_MEMORY'
@@ -88,7 +88,7 @@
       INTEGER INPTR                    ! DSA pointer for input data array
       INTEGER INEPTR                   !    "       "      "   error array
       INTEGER XAXPTR                   !    "       "      "   x-axis
-      INTEGER YAXPTR                   !    "       "      " 
+      INTEGER YAXPTR                   !    "       "      "
       INTEGER NPIXEL                   ! number of pixels in input file
       INTEGER LSTPTR                   !  "     "      " input LST array
       INTEGER NCORR                    ! number of points in pointing correction
@@ -111,7 +111,7 @@
       INTEGER NSTRT                    ! needed by SLA string decoding routines
       INTEGER ITEMP                    !
       INTEGER IGNORE                   ! unimportant status
-      INTEGER FD                       ! FIO file descriptor 
+      INTEGER FD                       ! FIO file descriptor
       INTEGER LU                       ! logical unit of output file
       INTEGER NTICKS                   ! returned by PSX_TIME
       REAL FBAD                        ! value to flag bad pixel
@@ -130,7 +130,7 @@
       DOUBLE PRECISION EPOCH           ! Besselian epoch of input centre coords
       DOUBLE PRECISION JEPOCH          ! Julian epoch of input centre coords
       DOUBLE PRECISION RACEN           ! RA of map centre of output values
-      DOUBLE PRECISION DECCEN          ! Dec 
+      DOUBLE PRECISION DECCEN          ! Dec
       DOUBLE PRECISION MJDSTART        ! MJD of start of observations
       DOUBLE PRECISION MJDTEMP         !
       DOUBLE PRECISION LAT             ! Latitude of observatory (radians)
@@ -152,7 +152,7 @@
       CHARACTER*(128) DTA_NAME         ! temp variable for holding DTA names
       CHARACTER*(128) POS_STRUC_NAME   ! name of structure containing
                                        ! position related parameters
-      CHARACTER*(128) PLST_DTA_NAME    ! name of LST array in pointing 
+      CHARACTER*(128) PLST_DTA_NAME    ! name of LST array in pointing
                                        ! correction structure
       CHARACTER*(128) PDAZ_DTA_NAME    ! .. array containing az pointing
                                        !    correction
@@ -184,7 +184,7 @@
       IF (PAR_ABORT()) THEN
          FAULT = .TRUE.
          GOTO 500
-      END IF   
+      END IF
 
 *  Initialise DSA system, find size of variable types, bad values
 
@@ -202,16 +202,16 @@
          IF (PAR_ABORT()) THEN
             FAULT = .TRUE.
             GOTO 500
-         END IF   
+         END IF
       END IF
 
-*  open the input file 
+*  open the input file
 
       CALL DSA_NAMED_INPUT ('IN', INFILE, STATUS)
 
 *  check that the MORE.JCMT structure is there
 
-      CALL DTA_CRNAM ('IN', 'MORE.JCMT', 0, 0, JCMT_DTA_NAME, 
+      CALL DTA_CRNAM ('IN', 'MORE.JCMT', 0, 0, JCMT_DTA_NAME,
      :   DSTAT)
       CALL DTA_STRUC (JCMT_DTA_NAME, STRUC, DSTAT)
       IF (DSTAT.EQ.DTA_NOTFND .OR. .NOT. STRUC) THEN
@@ -232,14 +232,14 @@
       IF (DSTAT .EQ. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_WRUSER ('MAP2MEM - Input file is in '//
-     :        'time-sequence format. Use TS2MAP before MAP2MEM.', 
+     :        'time-sequence format. Use TS2MAP before MAP2MEM.',
      :        IGNORE)
          END IF
          FAULT = .TRUE.
          GOTO 500
       END IF
 
-*  Check the LST values are present 
+*  Check the LST values are present
 
       CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST', 0, 0, DTA_NAME,
      :   DSTAT)
@@ -255,7 +255,7 @@
 
 *  check position structure present
 
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'MAP', 0, 0, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'MAP', 0, 0,
      :   POS_STRUC_NAME, DSTAT)
       CALL DTA_STRUC (POS_STRUC_NAME, STRUC, DSTAT)
       IF (DSTAT.EQ.DTA_NOTFND .OR. .NOT. STRUC) THEN
@@ -269,7 +269,7 @@
 
 *  telescope structure name
 
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'TEL', 0, 0, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'TEL', 0, 0,
      :   TEL_STRUC_NAME, DSTAT)
       CALL DTA_STRUC (TEL_STRUC_NAME, STRUC, DSTAT)
       IF (DSTAT.EQ.DTA_NOTFND .OR. .NOT. STRUC ) THEN
@@ -290,7 +290,7 @@
 *  of the error.
 
       CALL DSA_DATA_SIZE ('IN', 2, NDIM, DIMS, NPIXEL, STATUS)
-      CALL DSA_MAP_DATA ('IN', 'READ', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_DATA ('IN', 'READ', 'FLOAT', ADDRESS,
      :   SLOT, STATUS)
       INPTR = DYN_ELEMENT(ADDRESS)
       NX = DIMS(1)
@@ -298,7 +298,7 @@
       IF (NY .LT. 1) NY = 1
       CALL DSA_SEEK_ERRORS ('IN', ERRORS, STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('IN', 'READ', 'FLOAT', ADDRESS, 
+         CALL DSA_MAP_ERRORS ('IN', 'READ', 'FLOAT', ADDRESS,
      :      SLOT, STATUS)
          INEPTR = DYN_ELEMENT (ADDRESS)
       ELSE
@@ -325,7 +325,7 @@
 
 *  map the LST array
 
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0,
      :   LST_DTA_NAME, DSTAT)
       CALL DTA_MRVARD (LST_DTA_NAME, NPIXEL, ADDRESS, DSTAT)
       LSTPTR = DYN_ELEMENT(ADDRESS)
@@ -404,7 +404,7 @@
 
 *  date of observation in modified Julian days
 
-      CALL JCMT_GETD (POS_STRUC_NAME, 'MJD_START', MJDSTART, 
+      CALL JCMT_GETD (POS_STRUC_NAME, 'MJD_START', MJDSTART,
      :   STATUS)
 
 *  get telescope parameters
@@ -420,7 +420,7 @@
             FAULT = .TRUE.
             GOTO 500
          END IF
-      END IF   
+      END IF
 
 *  and if it should be a binary output file
 
@@ -432,7 +432,7 @@
          END IF
       END IF
 
-*  exit if things have already gone wrong 
+*  exit if things have already gone wrong
 
       IF (STATUS .NE. SAI__OK) THEN
          FAULT = .TRUE.
@@ -469,20 +469,20 @@
       CALL DSA_GET_WORK_ARRAY (NPIXEL, 'FLOAT', ADDRESS, SLOT, STATUS)
       ETA_PTR = DYN_ELEMENT (ADDRESS)
 
-*  calculate the offsets (in arcsec) of the +ve and -ve beams in the 
-*  chopper coord system, with an x-axis increasing to the right. The L 
-*  beam is assumed to be the one on the left of the vertical when the 
+*  calculate the offsets (in arcsec) of the +ve and -ve beams in the
+*  chopper coord system, with an x-axis increasing to the right. The L
+*  beam is assumed to be the one on the left of the vertical when the
 *  chopper position angle is 90 degrees
 
       IF (TEL_BEAM .EQ. 'M') THEN
          IF (POS_BEAM .EQ. 'L') THEN
             POS_X = - 0.5 * CHOP_THROW * SIN (CHOP_PA)
-            POS_Y = - 0.5 * CHOP_THROW * COS (CHOP_PA) 
+            POS_Y = - 0.5 * CHOP_THROW * COS (CHOP_PA)
             NEG_X = - POS_X
             NEG_Y = - POS_Y
          ELSE IF (POS_BEAM .EQ. 'R') THEN
-            POS_X =  0.5 * CHOP_THROW * SIN (CHOP_PA) 
-            POS_Y =  0.5 * CHOP_THROW * COS (CHOP_PA) 
+            POS_X =  0.5 * CHOP_THROW * SIN (CHOP_PA)
+            POS_Y =  0.5 * CHOP_THROW * COS (CHOP_PA)
             NEG_X = - POS_X
             NEG_Y = - POS_Y
          END IF
@@ -511,9 +511,9 @@
             NEG_Y = - CHOP_THROW * COS (CHOP_PA)
          END IF
       END IF
-      
 
-*  calculate the ra and dec of the positive beam for each pixel. This 
+
+*  calculate the ra and dec of the positive beam for each pixel. This
 *  routine will output results in RA, dec at the epoch of the observation
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -541,13 +541,13 @@
 
       POINTING_CORRECTION = .FALSE.
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.LST', 0, 0, 
+         CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.LST', 0, 0,
      :      PLST_DTA_NAME, DSTAT)
          CALL DTA_SZVAR (PLST_DTA_NAME, 1, NDIM, NCORR, DSTAT)
          CALL DTA_MRVARD (PLST_DTA_NAME, NCORR, ADDRESS, DSTAT)
          IF ((DSTAT.EQ.0) .AND. (NCORR.GE.1)) THEN
             POINT_LSTPTR = DYN_ELEMENT (ADDRESS)
-            CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.D_AZ', 0, 0, 
+            CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.D_AZ', 0, 0,
      :         PDAZ_DTA_NAME, DSTAT)
             CALL DTA_MRVARF (PDAZ_DTA_NAME, NCORR, ADDRESS, DSTAT)
             IF (DSTAT .NE. 0) THEN
@@ -557,7 +557,7 @@
                POINT_DAZPTR = DYN_ELEMENT (ADDRESS)
                CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.D_ALT',
      :            0, 0, PDALT_DTA_NAME, DSTAT)
-               CALL DTA_MRVARF (PDALT_DTA_NAME, NCORR, ADDRESS, 
+               CALL DTA_MRVARF (PDALT_DTA_NAME, NCORR, ADDRESS,
      :            DSTAT)
                IF (DSTAT .NE. 0) THEN
                   CALL PAR_WRUSER ('MAP2MEM - error reading '//
@@ -565,7 +565,7 @@
                ELSE
                   POINT_DALTPTR = DYN_ELEMENT (ADDRESS)
                   POINTING_CORRECTION = .TRUE.
-               END IF      
+               END IF
             END IF
          ELSE
             DSTAT = 0
@@ -583,7 +583,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_WRUSER ('MAP2MEM - Applying pointing '//
      :        'corrections', IGNORE)
-            CALL JCMT_CORRECT_POINTING (NPIXEL, 
+            CALL JCMT_CORRECT_POINTING (NPIXEL,
      :         DYNAMIC_MEM (RAPOS_PTR),
      :         DYNAMIC_MEM (DECPOS_PTR),
      :         DYNAMIC_MEM (LSTPTR),
@@ -592,7 +592,7 @@
      :         DYNAMIC_MEM (POINT_DAZPTR),
      :         DYNAMIC_MEM (POINT_DALTPTR),
      :         STATUS)
-            CALL JCMT_CORRECT_POINTING (NPIXEL, 
+            CALL JCMT_CORRECT_POINTING (NPIXEL,
      :         DYNAMIC_MEM (RANEG_PTR),
      :         DYNAMIC_MEM (DECNEG_PTR),
      :         DYNAMIC_MEM (LSTPTR),
@@ -608,7 +608,7 @@
 *  +ve and negative beams
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_PARALLACTIC (NPIXEL, 
+         CALL JCMT_PARALLACTIC (NPIXEL,
      :      DYNAMIC_MEM (RAPOS_PTR), DYNAMIC_MEM (DECPOS_PTR),
      :      DYNAMIC_MEM (RANEG_PTR), DYNAMIC_MEM (DECNEG_PTR),
      :      DYNAMIC_MEM (LSTPTR), LAT,
@@ -627,9 +627,9 @@
       END IF
 
 *  also transform the map centre to B1950 if required
-  
+
       IF (STATUS .EQ. SAI__OK) THEN
-       
+
          IF (B1950) THEN
             IF (CENTRE_CRD .EQ. 'RB') THEN
                CALL SLA_PRECES ('FK4', EPOCH, 1950.0D0,
@@ -644,7 +644,7 @@
             END IF
          ELSE
             IF (CENTRE_CRD .EQ. 'RB') THEN
-               CALL SLA_PRECES ('FK4', EPOCH, 1950.0D0, 
+               CALL SLA_PRECES ('FK4', EPOCH, 1950.0D0,
      :            RACEN, DECCEN)
                CALL SLA_FK45Z (RACEN, DECCEN, 1950.0D0,
      :            RACEN, DECCEN)
@@ -668,7 +668,7 @@
             SYSTEM = 'RJ2000.0'
             CALL PAR_WRUSER ('Coordinates are FK5 J2000.0', IGNORE)
          END IF
- 
+
          CALL SLA_DR2TF (2, RACEN, SIGN, HMSF)
          STEMP = SIGN
          WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
@@ -683,7 +683,7 @@
          IF (PAR_ABORT()) THEN
             FAULT = .TRUE.
             GOTO 500
-         END IF   
+         END IF
          NSTRT = 1
          CALL SLA_DAFIN (STEMP1, NSTRT, RACEN, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
@@ -708,7 +708,7 @@
          IF (PAR_ABORT()) THEN
             FAULT = .TRUE.
             GOTO 500
-         END IF   
+         END IF
          NSTRT = 1
          CALL SLA_DAFIN (STEMP1, NSTRT, DECCEN, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
@@ -723,12 +723,12 @@
 *  calculate offsets of pixels from map centre
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_CALC_OFFSETS (NPIXEL, 
+         CALL JCMT_CALC_OFFSETS (NPIXEL,
      :      DYNAMIC_MEM (RAPOS_PTR), DYNAMIC_MEM (DECPOS_PTR),
      :      RACEN, DECCEN,
      :      DYNAMIC_MEM (RAPOS_OFF_PTR), DYNAMIC_MEM (DECPOS_OFF_PTR),
      :      STATUS)
-         CALL JCMT_CALC_OFFSETS (NPIXEL, 
+         CALL JCMT_CALC_OFFSETS (NPIXEL,
      :      DYNAMIC_MEM (RANEG_PTR), DYNAMIC_MEM (DECNEG_PTR),
      :      RACEN, DECCEN,
      :      DYNAMIC_MEM (RANEG_OFF_PTR), DYNAMIC_MEM (DECNEG_OFF_PTR),
@@ -743,7 +743,7 @@
          CALL FIO_OPEN (OUTFILE(:ICH_LEN(OUTFILE))//'.dbh', 'WRITE',
      :     'FORTRAN', 0, FD, STATUS)
          CALL FIO_UNIT (FD, LU, STATUS)
- 
+
          IF (STATUS .EQ. SAI__OK) THEN
             IF (BINARY) THEN
                EXTENSION = 'bin'
@@ -794,10 +794,10 @@
          CALL FIO_UNIT (FD, LU, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL JCMT_WRITE_MEM (LU, BINARY, NPIXEL, 
-     :        DYNAMIC_MEM (INPTR), DYNAMIC_MEM (RAPOS_OFF_PTR), 
-     :        DYNAMIC_MEM (DECPOS_OFF_PTR), 
-     :        DYNAMIC_MEM (RANEG_OFF_PTR), 
+            CALL JCMT_WRITE_MEM (LU, BINARY, NPIXEL,
+     :        DYNAMIC_MEM (INPTR), DYNAMIC_MEM (RAPOS_OFF_PTR),
+     :        DYNAMIC_MEM (DECPOS_OFF_PTR),
+     :        DYNAMIC_MEM (RANEG_OFF_PTR),
      :        DYNAMIC_MEM (DECNEG_OFF_PTR),
      :        DYNAMIC_MEM (INEPTR), DYNAMIC_MEM (ETA_PTR),
      :        STATUS)

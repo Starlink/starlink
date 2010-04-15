@@ -46,11 +46,11 @@
 *        for membership of class 2. [CLASS2.DAT]
 *     ELLIP = _LOGICAL (Read)
 *        If `true' then the ellipticities are used in the analysis. If
-*        `false' then they are excluded. Using ellipticities may 
+*        `false' then they are excluded. Using ellipticities may
 *        increase the weighting of some (small) round galaxies as stars.
 *        [TRUE]
 *     K = _INTEGER (Read)
-*        The number of nearest neighbours about the current values 
+*        The number of nearest neighbours about the current values
 *        which are to be used in classifying an object. The class
 *        used is the most frequently encountered in this range of
 *        objects. If classes 1 and 2 are equally frequent then the
@@ -89,7 +89,7 @@
 
 *  Notes:
 *     -  The seed objects are always returned in their initial classes.
-*     -  The maximum number of objects allowed in any input file is 
+*     -  The maximum number of objects allowed in any input file is
 *        10000
 
 
@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
 
 *  External functions:
       INTEGER CHR_LEN
-      EXTERNAL CHR_LEN           ! length of a string excluding 
+      EXTERNAL CHR_LEN           ! length of a string excluding
                                  ! trailing blanks
 
 *  Local constants:
@@ -139,8 +139,8 @@
       DOUBLE PRECISION  SXY(MAXENT)    ! intensity weighted radius
                                        ! (absolute value )
       INTEGER CLASS(MAXENT)      ! current class of object INDEX
-      INTEGER CLASS1(MAXENT)     ! current classes of the objects 
-      INTEGER CLASS2(MAXENT)     ! whose variables are stored in 
+      INTEGER CLASS1(MAXENT)     ! current classes of the objects
+      INTEGER CLASS2(MAXENT)     ! whose variables are stored in
       INTEGER CLASS3(MAXENT)     ! pratio, ibyp, ell and sxy
       INTEGER CLASS4(MAXENT)     ! respectively
       INTEGER I, J, L            ! loop variables
@@ -151,10 +151,10 @@
      :        IFS4,
      :        IFS5               ! FIO file descriptors
       INTEGER INDEX(MAXENT)      ! indices of objects
-      INTEGER INDEX1(MAXENT)     ! indices of ordered pratio objects 
-      INTEGER INDEX2(MAXENT)     ! indices of ordered ibyp objects 
-      INTEGER INDEX3(MAXENT)     ! indices of ordered ell objects 
-      INTEGER INDEX4(MAXENT)     ! indices of ordered sxyobjects 
+      INTEGER INDEX1(MAXENT)     ! indices of ordered pratio objects
+      INTEGER INDEX2(MAXENT)     ! indices of ordered ibyp objects
+      INTEGER INDEX3(MAXENT)     ! indices of ordered ell objects
+      INTEGER INDEX4(MAXENT)     ! indices of ordered sxyobjects
       INTEGER IPCL1, IPCL2, IPCL3, IPCL4 ! pointers to elements of arrays
       INTEGER IINDEX(MAXENT)      ! rank of ordering
       INTEGER ITER               ! current number of iterations
@@ -167,7 +167,7 @@
       INTEGER NITER              ! maximum number of interations to
                                  ! perform
       INTEGER NOBJ1              ! number of input objects
-      LOGICAL CHANGE             ! set when no more objects change class      
+      LOGICAL CHANGE             ! set when no more objects change class
       LOGICAL OPNF1,
      :        OPNF2,
      :        OPNF3,
@@ -209,9 +209,9 @@
 *  Assign these objects to their corresponding columns in main data
 *  note that '1' indicates class 1 objects, '-1' indicates unmodifyable
 *  class 1 objects. The same applies to class 2.
-      DO 5 I = 1, NCL1 
+      DO 5 I = 1, NCL1
          DO 4 J = 1, NOBJ1
-           IF( INDEX( J ) .EQ. INDEX1( I ) ) THEN 
+           IF( INDEX( J ) .EQ. INDEX1( I ) ) THEN
               CLASS( J ) = -1
            END IF
 4        CONTINUE
@@ -225,9 +225,9 @@
       CALL RDPIIN( IFS3, BUF, MAXENT, INDEX2, NCL2, STATUS )
 
 *  Assign objects classes using these indices.
-      DO 7 I = 1, NCL2 
+      DO 7 I = 1, NCL2
          DO 8 J = 1, NOBJ1
-           IF( INDEX( J ) .EQ. INDEX2( I ) ) THEN 
+           IF( INDEX( J ) .EQ. INDEX2( I ) ) THEN
               CLASS( J ) = -2
            END IF
 8        CONTINUE
@@ -249,7 +249,7 @@
         CLASS4(J) = CLASS(J)
 9     CONTINUE
 
-*  Sort the variables into ascending order, reorder the classes and 
+*  Sort the variables into ascending order, reorder the classes and
 *  indexes, accordingly. Note that the variables themselves are not
 *  actually sorted.
       CALL PDA_QSIAR( NOBJ1, PRATIO, IINDEX )
@@ -274,17 +274,17 @@
       CALL PAR_GET0I( 'NITER', NITER, STATUS )
       ITER = 0
 10001 CONTINUE
-        IF( ITER .LT. NITER ) THEN 
+        IF( ITER .LT. NITER ) THEN
           ITER = ITER + 1
 
 *  Look at indexes one at a time in main list then look for the
 *  equivalents in the sorted lists.
           CHANGE = .FALSE.
           DO 11 I = 1, NOBJ1
-             ICL1 = 0  
+             ICL1 = 0
              ICL2 = 0
              DO 12 J = 1, NOBJ1
-                IF( INDEX1( J ) .EQ. INDEX( I ) ) THEN 
+                IF( INDEX1( J ) .EQ. INDEX( I ) ) THEN
                    IPCL1 = J
 
 *  Radius ratio variable.
@@ -293,12 +293,12 @@
                    DO 13 L = MAX( 1, J - K ) , MIN( J + K, NOBJ1 )
                       IF( ABS( CLASS1( L ) ) .EQ. 1 ) THEN
                          ICL1 = ICL1 + 1
-                      ELSE IF ( ABS( CLASS1( L ) ) .EQ. 2 ) THEN 
+                      ELSE IF ( ABS( CLASS1( L ) ) .EQ. 2 ) THEN
                          ICL2 = ICL2 + 1
                       END IF
 13                 CONTINUE
                 END IF
-                IF( INDEX2( J ) .EQ. INDEX( I ) ) THEN 
+                IF( INDEX2( J ) .EQ. INDEX( I ) ) THEN
                    IPCL2 = J
 
 *  Intensity peak ratio variable.
@@ -307,12 +307,12 @@
                    DO 14 L = MAX( 1, J - K ) , MIN( J + K, NOBJ1 )
                       IF( ABS( CLASS2( L ) ) .EQ. 1 ) THEN
                          ICL1 = ICL1 + 1
-                      ELSE IF ( ABS( CLASS2( L ) ) .EQ. 2 ) THEN 
+                      ELSE IF ( ABS( CLASS2( L ) ) .EQ. 2 ) THEN
                          ICL2 = ICL2 + 1
                       END IF
 14                 CONTINUE
                 END IF
-                IF( INDEX3( J ) .EQ. INDEX( I ) ) THEN 
+                IF( INDEX3( J ) .EQ. INDEX( I ) ) THEN
                    IPCL3 = J
 
 *  Ellipticity variable.
@@ -322,14 +322,14 @@
                       DO 15 L = MAX( 1, J - K ) , MIN( J + K, NOBJ1 )
                          IF( ABS( CLASS3( L ) ) .EQ. 1 ) THEN
                             ICL1 = ICL1 + 1
-                         ELSE IF ( ABS( CLASS3( L ) ) .EQ. 2 ) THEN 
+                         ELSE IF ( ABS( CLASS3( L ) ) .EQ. 2 ) THEN
                             ICL2 = ICL2 + 1
                          END IF
 15                    CONTINUE
                    END IF
                 END IF
-                IF( INDEX4( J ) .EQ. INDEX( I ) ) THEN 
-                   IPCL4 = J 
+                IF( INDEX4( J ) .EQ. INDEX( I ) ) THEN
+                   IPCL4 = J
 
 *  Intensity weighted moment variable.
 *  Look neighbours ( +/- k ) add up contributions from assigned
@@ -337,20 +337,20 @@
                    DO 16 L = MAX( 1, J - K ) , MIN( J + K, NOBJ1 )
                       IF( ABS( CLASS4( L ) ).EQ. 1 ) THEN
                          ICL1 = ICL1 + 1
-                      ELSE IF ( ABS( CLASS4( L ) ) .EQ. 2 ) THEN 
+                      ELSE IF ( ABS( CLASS4( L ) ) .EQ. 2 ) THEN
                          ICL2 = ICL2 + 1
                       END IF
 16                 CONTINUE
                 END IF
 12           CONTINUE
 
-*  Assign new class for this object, if it is possible. 
-             IF( ICL1 .GT. 0 .OR. ICL2 .GT. 0 ) THEN 
+*  Assign new class for this object, if it is possible.
+             IF( ICL1 .GT. 0 .OR. ICL2 .GT. 0 ) THEN
 
 *  Have class to assign. If class has changed record this.
                 IF( CLASS( I ) .GE. 0 ) THEN
 
-*  Modifyable class, not one of the seed values. 
+*  Modifyable class, not one of the seed values.
                    IF( ICL2 .GT. ICL1 ) THEN
                       IF(CLASS( I ) .NE. 2 ) CHANGE =.TRUE.
                       CLASS( I ) = 2
@@ -374,7 +374,7 @@
           IF( CHANGE )  THEN
 
 *  Not iterated try again.
-             GO TO 10001  
+             GO TO 10001
           ELSE
 
 *  Iterated finish this section.
@@ -397,8 +397,8 @@
       ICL1 = 0
       ICL2 = 0
       DO 10 I = 1, NOBJ1
-         BUF = ' ' 
-         WRITE( BUF, 101 )INDEX( I ) 
+         BUF = ' '
+         WRITE( BUF, 101 )INDEX( I )
 101      FORMAT( 1X, I7 )
          IF ( ABS( CLASS( I ) ) .EQ. 1 ) THEN
             ICL1 = ICL1 + 1

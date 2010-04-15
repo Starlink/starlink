@@ -118,7 +118,7 @@
             IF ( ISTAT .NE. 0 ) THEN
                STATUS = PARSE__IFLOPN
                CALL EMS_SETC( 'FILE', IFLNAM )
-               CALL EMS_REP( 'PCN_OPENIFL1', 
+               CALL EMS_REP( 'PCN_OPENIFL1',
      :          'PARSECON: Failed to open interface file ^FILE',
      :           STATUS )
                CALL EMS_FIOER( 'FIOSTAT', ISTAT )
@@ -135,7 +135,7 @@
 *  No unit number available - report
       STATUS = PARSE__IFLOPN
       CALL EMS_SETC( 'FILE', IFLNAM )
-      CALL EMS_REP( 'PCN_OPENIFL3', 
+      CALL EMS_REP( 'PCN_OPENIFL3',
      : 'PARSECON: Failed to open interface file ^FILE', STATUS )
       CALL EMS_REP( 'PCN_OPENIFL4',
      : 'No Fortran unit numbers available', STATUS )

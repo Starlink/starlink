@@ -35,7 +35,7 @@
 *     BLNKVL = REAL
 *           Holds the value of DATA_BLANK or -32767.
 *     NINTS = INTEGER
-*           The number of greyscale intensities available 
+*           The number of greyscale intensities available
 *           on the chosen device.
 *     STATUS = INTEGER
 *           Value of the status on entering this subroutine.

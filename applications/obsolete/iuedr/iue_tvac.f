@@ -1,5 +1,5 @@
       SUBROUTINE IUE_TVAC(NPOINT, X)
- 
+
 *+
 *
 *   Name:
@@ -23,18 +23,18 @@
 
 *   Import:
       INTEGER NPOINT     ! number of wavelengths
- 
+
 *   Import-Export:
       REAL*8 X(NPOINT)     ! Vacuum Wavelengths
- 
+
 *   Local variables:
       INTEGER I          ! loop index
- 
+
 *   Internal references:
       REAL*8 CSCALE
       REAL*8 W
       CSCALE(W) = 1.0 - 1.0*2.871E-4*(1.0 + 5.67E5/W**2)
- 
+
       DO 100 I = 1, NPOINT
 
          IF (X(I).GT.1999.344) X(I) = X(I)/CSCALE(X(I))

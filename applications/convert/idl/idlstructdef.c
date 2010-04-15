@@ -7,7 +7,7 @@
 *
 * Language:
 *    C
-* 
+*
 * Invocation:
 *    Call from C
 *      struct = idlstructdef( sloc, status );
@@ -24,7 +24,7 @@
 *       A pointer to the created IDL structure definition
 *
 * Method:
-*    The HDS structure is analysed and a list of corresponding IDL tags 
+*    The HDS structure is analysed and a list of corresponding IDL tags
 *    created. The function IDL_MakeStruct is then called to create the
 *    structure. If the tag is itself a structure, this function is called
 *    recursively.
@@ -68,7 +68,7 @@
 *    29-FEB-2000 (AJC):
 *       Handle array of structures at top level
 *    22-NOV-2005 (TIMJ):
-*       Use modern HDS 
+*       Use modern HDS
 *    15-SEP-2008 (TIMJ):
 *       3 arg emsSetc is deprecated.
 *    {enter_further_changes_here}
@@ -179,7 +179,7 @@ if ( !ndims ) {
                tagdim += DAT__MXDIM + 1;
             } else
 /* scalar */
-               tags[i].dims = 0;         
+               tags[i].dims = 0;
 
 /* Set up the tag type */
             if (!strcmp(type, "_REAL")) {

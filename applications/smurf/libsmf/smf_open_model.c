@@ -44,10 +44,10 @@
 *     2007-06-13 (EC):
 *        Initial version.
 *     2007-06-14 (EC):
-*        Move file information to smfFile from smfData, 
+*        Move file information to smfFile from smfData,
 *        added file descriptor and file name.
 *     2007-06-25 (EC):
-*        Header length is now static / padded to multiple of pagesize 
+*        Header length is now static / padded to multiple of pagesize
 *     2007-08-20 (TIMJ):
 *        Use const char * mode
 *     2007-12-14 (EC):
@@ -106,15 +106,15 @@
 
 #define FUNC_NAME "smf_open_model"
 
-void smf_open_model( const Grp *igrp, int index, const char *mode, 
+void smf_open_model( const Grp *igrp, int index, const char *mode,
                      smfData **data, int *status ) {
-  
+
   void *buf=NULL;               /* Pointer to total container buffer */
   size_t buflen = 0;            /* datalen + headlen */
   size_t datalen=0;             /* Size of data buffer in bytes */
   int fd=0;                     /* File descriptor */
   smfDIMMHead head;             /* Header for the file */
-  size_t headlen=0;             /* Size of header in bytes */ 
+  size_t headlen=0;             /* Size of header in bytes */
   int mflags=0;                 /* bit flags for mmap */
   char name[GRP__SZNAM+1];      /* Name of container file */
   int oflags=0;                 /* bit flags for open */
@@ -139,12 +139,12 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
 
     if( (fd = open( name, oflags, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH )) == -1 ) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Unable to open model container file", status ); 
+      errRep( FUNC_NAME, "Unable to open model container file", status );
     } else {
-  
+
       /* Read the header */
-      
-      if( read( fd, &head, sizeof(head) ) == -1 ) { 
+
+      if( read( fd, &head, sizeof(head) ) == -1 ) {
 	*status = SAI__ERROR;
       	errRep( FUNC_NAME, "Unable to read container header",  status );
       }
@@ -160,11 +160,11 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
                        &buflen, status );
 
     /* map the entire file including the header */
-    if( (buf = mmap( 0, buflen, mflags, MAP_SHARED, fd, 0 ) ) 
+    if( (buf = mmap( 0, buflen, mflags, MAP_SHARED, fd, 0 ) )
 	== MAP_FAILED ) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Unable to map model container file", status ); 
-    } 
+      errRep( FUNC_NAME, "Unable to map model container file", status );
+    }
   }
 
   /* Allocate memory for empty smfdata and fill relevant parts */

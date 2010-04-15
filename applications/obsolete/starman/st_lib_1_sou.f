@@ -69,7 +69,7 @@ C
 C      a j penny                     stsci                1987-02-21
 
 
-      subroutine cvolume ( prof, domap, map, mx, my, mz, 
+      subroutine cvolume ( prof, domap, map, mx, my, mz,
      +                     mapnum, mapx, mapy, magnif, radius, vol )
 
       implicit none
@@ -88,7 +88,7 @@ C      a j penny                     stsci                1987-02-21
       real radius	 !i: Radius out to which to calculate volume
       real vol		 !o: Volume under profile, out to specified radius
 C--
-      real avol, fxa, fya, fxb, fyb, pa, rslim, xxa, xxb, 
+      real avol, fxa, fya, fxb, fyb, pa, rslim, xxa, xxb,
      +     yya, yyb, gg, pab, pac, dd, rr, dx, dy, x, y, val
       integer kradlim, j, ja, k
 Cbegin
@@ -268,7 +268,7 @@ C GETD -- Get x,y, and height out of a table, using the header code
 C
 C    It is assumed that if there is no 'X' or 'Y' headers, then
 C    the x,y is stored in columns 6,7 (the 1st data columns).
-C    If there is no 'H' header then the height is assumed to be in 
+C    If there is no 'H' header then the height is assumed to be in
 C    col number 'nhtcol' (and is set to 0.0 if there is no such col)
 C
 C    If there is no header for a particular value, the
@@ -301,7 +301,7 @@ C     a j penny                stsci                   1987-02-24
       integer  mapnumk		!i: Default map number
       integer  nhtcol		!i: Column number (-5) holding height
       real     profk(9)		!i: Default profile
-      logical  pboss		!i: Flag (true=use array; 
+      logical  pboss		!i: Flag (true=use array;
 				!   false=take std profile)
       real     prof(9)		!o: Output profile
       real     x		!o: X position
@@ -321,7 +321,7 @@ Cbegin
 
       h = 0.0								!Height
       if ( khead(3).eq.0 ) then
-         if ( nhtcol.ne.0 .and. nhtcol.ge.1 .and. nhtcol+5.le.tbvx ) 
+         if ( nhtcol.ne.0 .and. nhtcol.ge.1 .and. nhtcol+5.le.tbvx )
      +      h = tab(nhtcol+5,num)
       else
          h = tab(khead(3)+5,num)
@@ -358,8 +358,8 @@ C GET_MPROF -- Get the star profile from the profile file on disk
 
 C  a j penny                 stsci              1987-02-2
 
-      subroutine get_mprof ( file, ipinr, prof, mx, my, mz, magnif, 
-     +                       mapx, mapy, pbs, pbz, qbase, vol, 
+      subroutine get_mprof ( file, ipinr, prof, mx, my, mz, magnif,
+     +                       mapx, mapy, pbs, pbz, qbase, vol,
      +                       volrad, ierr )
 
       implicit none
@@ -378,7 +378,7 @@ C  a j penny                 stsci              1987-02-2
       real 		pbz		!o: Map X size
       real              qbase		!o: Wing profile base
       real 		vol		!o: Profile volume
-      real 		volrad		!o: Profile volume calced in this 
+      real 		volrad		!o: Profile volume calced in this
 					!   radius
       integer 		ierr		!o: Error flag (0=ok:1=bad file:
 					!               2=descriptor wrong)
@@ -408,7 +408,7 @@ Cbegin
       call opimsr ( file, ipinr, mx, lyma, .true., istat )	!Get image. If can't, return
       if ( ST_FAILED .or. istat.ne.0 ) then
          ierr = 1
-         return 
+         return
       endif
 
       call gtdesr ( file, 'BSCALE',   pbs,      1.0, istat )	!Get descriptors
@@ -510,7 +510,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popafi ( kdata, nx, ny, bs, kdo, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -548,7 +548,7 @@ Cbegin
 
 C  Set up parameters and check if ok
 
-      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co, 
+      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
      +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
@@ -562,9 +562,9 @@ C  Do the addition, for valid pixels in the right area, with scaling
       do k = lys, lye
          do j = lxs, lxe
            if ( kdo(j,k) ) then
-             call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+             call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                      sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                      domap, map, mx, my, mx, mapnum, mapx, 
+     +                      domap, map, mx, my, mx, mapnum, mapx,
      +                      mapy, magnif )
 
              val = real(kdata(j,k)) + val/bs
@@ -588,7 +588,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popami ( kdata, nx, ny, bs, inval, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -627,7 +627,7 @@ Cbegin
 C  Set up parameters and check if ok
 
       call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
-     +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx, 
+     +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
       if ( .not.ok ) then
@@ -640,9 +640,9 @@ C  Do the addition, for valid pixels in the desired area, with scaling
       do k = lys, lye
          do j = lxs, lxe
             if ( kdata(j,k).ne.inval ) then
-               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                        sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                        domap, map, mx, my, mx, mapnum, mapx, 
+     +                        domap, map, mx, my, mx, mapnum, mapx,
      +                        mapy, magnif )
                val = real(kdata(j,k)) + val/bs
                kdata(j,k)=nint(min(2147480000.0,max(-2147480000.0,val)))
@@ -665,7 +665,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popamr ( rdata, nx, ny, bs, rinval, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -704,7 +704,7 @@ Cbegin
 C  Set up parameters and check if ok
 
       call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
-     +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx, 
+     +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
       if ( .not.ok ) then
@@ -717,9 +717,9 @@ C  Do the addition, for valid pixels in the desired area, with scaling
       do k = lys, lye
          do j = lxs, lxe
             if ( rdata(j,k).ne.rinval ) then
-               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                        sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                        domap, map, mx, my, mx, mapnum, mapx, 
+     +                        domap, map, mx, my, mx, mapnum, mapx,
      +                        mapy, magnif )
                rdata(j,k) = rdata(j,k) + val/bs
             endif
@@ -741,7 +741,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popams ( kdata, nx, ny, bs, inval, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -780,7 +780,7 @@ Cbegin
 C  Set up parameters and check if ok
 
       call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
-     +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx, 
+     +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
       if ( .not.ok ) then
@@ -793,9 +793,9 @@ C  Do the addition, for valid pixels in the desired area, with scaling
       do k = lys, lye
          do j = lxs, lxe
             if ( kdata(j,k).ne.inval ) then
-               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                        sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                        domap, map, mx, my, mx, mapnum, mapx, 
+     +                        domap, map, mx, my, mx, mapnum, mapx,
      +                        mapy, magnif )
                val = real(kdata(j,k)) + val/bs
                kdata(j,k)=nint(min(32767.0,max(-32768.0,val)))
@@ -818,7 +818,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popsfi ( kdata, nx, ny, bs, kdo, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -856,7 +856,7 @@ Cbegin
 
 C  Set up parameters and check if ok
 
-      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co, 
+      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
      +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
@@ -870,9 +870,9 @@ C  Do the subtraction, for valid pixels in the right area, with scaling
       do k = lys, lye
          do j = lxs, lxe
            if ( kdo(j,k) ) then
-             call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+             call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                      sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                      domap, map, mx, my, mx, mapnum, mapx, 
+     +                      domap, map, mx, my, mx, mapnum, mapx,
      +                      mapy, magnif )
 
              val = real(kdata(j,k)) - val/bs
@@ -896,7 +896,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popsfr ( data, nx, ny, bs, kdo, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -934,7 +934,7 @@ Cbegin
 
 C  Set up parameters and check if ok
 
-      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co, 
+      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
      +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
@@ -948,9 +948,9 @@ C  Do the subtraction, for valid pixels in the right area, with scaling
       do k = lys, lye
          do j = lxs, lxe
            if ( kdo(j,k) ) then
-              call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+              call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                       sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                       domap, map, mx, my, mx, mapnum, mapx, 
+     +                       domap, map, mx, my, mx, mapnum, mapx,
      +                       mapy, magnif )
               data(j,k) = data(j,k) - val/bs
            endif
@@ -972,7 +972,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popsfs ( sdata, nx, ny, bs, kdo, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -1010,7 +1010,7 @@ Cbegin
 
 C  Set up parameters and check if ok
 
-      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co, 
+      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
      +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
@@ -1024,9 +1024,9 @@ C  Do the subtraction, for valid pixels in the right area, with scaling
       do k = lys, lye
          do j = lxs, lxe
             if ( kdo(j,k) ) then
-               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                        sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                        domap, map, mx, my, mx, mapnum, mapx, 
+     +                        domap, map, mx, my, mx, mapnum, mapx,
      +                        mapy, magnif )
                val = real(sdata(j,k)) - val/bs
                sdata(j,k) = nint(min(32767.0,max(-32768.0,val)))
@@ -1049,7 +1049,7 @@ C
 C   a.j.penny                   ral                    1988-08-06
 
       subroutine popsmr ( rdata, nx, ny, bs, rinval, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -1087,7 +1087,7 @@ Cbegin
 
 C  Set up parameters and check if ok
 
-      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co, 
+      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
      +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
@@ -1101,9 +1101,9 @@ C  Do the subtraction, for valid pixels in the right area, with scaling
       do k = lys, lye
          do j = lxs, lxe
             if ( rdata(j,k).ne.rinval ) then
-               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                        sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                        domap, map, mx, my, mx, mapnum, mapx, 
+     +                        domap, map, mx, my, mx, mapnum, mapx,
      +                        mapy, magnif )
                rdata(j,k) = rdata(j,k) - val/bs
             endif
@@ -1126,7 +1126,7 @@ C   a.j.penny                   ral                    1988-08-06
 
 
       subroutine popsms ( sdata, nx, ny, bs, inval, xp, yp, hp, prof,
-     +                    map, mx, my, mz, mapnum, 
+     +                    map, mx, my, mz, mapnum,
      +                    mapx, mapy, magnif, domap, ierr, kw )
 
       implicit none
@@ -1164,7 +1164,7 @@ Cbegin
 
 C  Set up parameters and check if ok
 
-      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co, 
+      call proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, co,
      +              si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp, nx,
      +              ny, ok )
       ierr = 0
@@ -1178,9 +1178,9 @@ C  Do the subtraction, for valid pixels in the right area, with scaling
       do k = lys, lye
          do j = lxs, lxe
             if ( sdata(j,k).ne.inval ) then
-               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,  
+               call profval ( val, j, k, xp, yp, hp, lx, ly, co, si,
      +                        sim, gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                        domap, map, mx, my, mx, mapnum, mapx, 
+     +                        domap, map, mx, my, mx, mapnum, mapx,
      +                        mapy, magnif )
                val = real(sdata(j,k)) - val/bs
                sdata(j,k) = nint(min(32767.0,max(-32768.0,val)))
@@ -1202,8 +1202,8 @@ C PROSET -- Set up values for s/r POP(AS)(FM)(SR)
 C
 C  a j penny              ral                1989-08-04
 
-      subroutine proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye, 
-     +                    co, si, sim, gx2, gy2, ap, hx2, hy2, qh, qr, 
+      subroutine proset ( xp, yp, hp, prof, lx, ly, lxs, lxe, lys, lye,
+     +                    co, si, sim, gx2, gy2, ap, hx2, hy2, qh, qr,
      +                    qp, nx, ny, ok )
 
       implicit none
@@ -1351,9 +1351,9 @@ C PROFVAL -- Calc profile value at a pixel.
 C
 C   a.j.penny                   stsCi                 1987-02-20
 
-      subroutine profval ( val, j, k, xp, yp, hp, lx, ly, co, si, sim, 
+      subroutine profval ( val, j, k, xp, yp, hp, lx, ly, co, si, sim,
      +                     gx2, gy2, ap, hx2, hy2, qh, qr, qp,
-     +                     domap, map, mx, my, mz, mapnum, mapx, mapy, 
+     +                     domap, map, mx, my, mz, mapnum, mapx, mapy,
      +                     magnif )
 
       implicit none
@@ -1459,12 +1459,12 @@ C  and std dev of the image background.
 C
 C   a j penny                   stsci             86-12-02
 
-      subroutine sky_0 ( im, gtype, nx, ny, inval, rinval, skylev, 
+      subroutine sky_0 ( im, gtype, nx, ny, inval, rinval, skylev,
      +                   skystd )
 
       implicit none
       include 'STARMAN_INC'
-  
+
       integer   nx		!i: Image X size
       integer   ny		!i: Image Y size
       integer*2 im(*)		!i: Input image
@@ -1477,7 +1477,7 @@ C--
 
       integer kgram(1000), kxc(2), kyc(2), nxbox, nybox, j, k, kl
       integer jl, istat, kmin, kbin, num, lmax, lmin, kv, iter
-      real rkgram(1000), aam1, astd1, aam, astd, xo, a, b, r, pow, 
+      real rkgram(1000), aam1, astd1, aam, astd, xo, a, b, r, pow,
      +     rva(1), rbin, rmin, rmax
       integer jfita(5,4)
       data jfita / 0, 1, 1, 0, 1,
@@ -1489,9 +1489,9 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      kxc(1) = 1 							!Get 1st background for 
+      kxc(1) = 1 							!Get 1st background for
       kxc(2) = min(50,nx)						! b.l.h. 50x50 box
-      kyc(1) = 1 
+      kyc(1) = 1
       kyc(2) = min(50,ny)
       if ( gtype.eq.'SHORT' ) then
          call ranges ( im, nx, ny, kxc, kyc, inval, aam1, astd1, istat )
@@ -1560,7 +1560,7 @@ Cbegin
       r = astd/(1.5*rbin)
       pow = 2.0
       do j = 2, 4
-         call gauss1r ( rkgram, rva, 1000, .false., 1, num, a, b, r, 
+         call gauss1r ( rkgram, rva, 1000, .false., 1, num, a, b, r,
      +           pow, xo, jfita(1,j), 0.004, 0.004, 20, 0.5, iter, 0 )
       enddo
       r = min(real(num),max(0.1,r))
@@ -1573,7 +1573,7 @@ Cbegin
          skystd = rbin*real(lmax-lmin)/4.0
       else
          do j = 2, 4
-            call gauss1r ( rkgram, rva, 1000, .false., lmin, lmax, a, 
+            call gauss1r ( rkgram, rva, 1000, .false., lmin, lmax, a,
      +      b, r, pow, xo, jfita(1,j), 0.004, 0.004, 20, 0.5, iter, 0 )
          enddo
          r = min(real(num),max(0.1,r))
@@ -1591,7 +1591,7 @@ C SKY_1R -- Find background and noise in boxes in a real image
 C
 C   a j penny                   stsci             86-12-02
 
-      subroutine sky_1r ( im, nx, ny, rinval, msky, asky, nxsky, nysky, 
+      subroutine sky_1r ( im, nx, ny, rinval, msky, asky, nxsky, nysky,
      +                    csky, bsky, nxsd, nysd, failed )
 
       implicit none
@@ -1601,16 +1601,16 @@ C   a j penny                   stsci             86-12-02
       real           im(nx,ny)			!i: Input image
       real           rinval			!i: Image (real) invalid number flag
       real           msky(nx,ny)		!o: Sky level
-      real           asky(nx,ny)		!o: Sky level + 1 std dev 
+      real           asky(nx,ny)		!o: Sky level + 1 std dev
       integer        nxsky, nysky		!i: No of sky boxes
       real           bsky(nxsky,nysky)		!o: Mean + 1 std dev in sky boxes
       real           csky(nxsky,nysky)		!o: Mean levels in sky boxes
       integer        nxsd			!i: X Size of sky boxes
       integer        nysd			!i: Y Size of sky boxes
-      logical        failed			!i/o: Failure flag. True = exit 
+      logical        failed			!i/o: Failure flag. True = exit
 C--
 
-      integer kgram(1024), kxc(2), kyc(2), j, k, istat, 
+      integer kgram(1024), kxc(2), kyc(2), j, k, istat,
      +        num, numbin, lmin, lmax, kv, kkmin, kkmax,
      +        iter, kxa, kxb, kya, kyb, ja, kk
       real rkgram(1024), aam, astd, a, b, r, xo, val, skylev, avtot,
@@ -1622,7 +1622,7 @@ C--
      +             0, 1, 1, 0, 0,
      +             0, 1, 1, 0, 1 /
 Cbegin
-    
+
 
       if ( ST_FAILED ) return
 
@@ -1685,8 +1685,8 @@ Cbegin
                         r = astd/(1.5*rbin)
                         pow = 2.0
                         do ja = 2, 4
-                           call gauss1r ( rkgram, rva, numbin, .false., 
-     +                          1, num, a, b, r, pow, xo, jfita(1,ja), 
+                           call gauss1r ( rkgram, rva, numbin, .false.,
+     +                          1, num, a, b, r, pow, xo, jfita(1,ja),
      +                          0.004, 0.004, 20, 0.5, iter,  0 )
                         enddo
                         r = min(real(numbin),max(0.1,r))
@@ -1698,8 +1698,8 @@ Cbegin
                           val = skylev + 1.5*rbin*real(kkmax-kkmin)/4.0
                         else
                            do ja = 2, 4
-                              call gauss1r ( rkgram, rva, numbin, 
-     +                        .false., kkmin, kkmax, a, b, r, pow, xo, 
+                              call gauss1r ( rkgram, rva, numbin,
+     +                        .false., kkmin, kkmax, a, b, r, pow, xo,
      +                        jfita(1,ja) ,0.004, 0.004, 20, 0.5,iter,0)
                            enddo
                            r = min(real(numbin),max(0.1,r))
@@ -1740,7 +1740,7 @@ C SKY_1S -- Find background and noise in boxes in a real image
 C
 C   a j penny                   stsci             86-12-02
 
-      subroutine sky_1s ( im, nx, ny, inval, msky, asky, nxsky, nysky, 
+      subroutine sky_1s ( im, nx, ny, inval, msky, asky, nxsky, nysky,
      +                    csky, bsky, nxsd, nysd, failed )
 
       implicit none
@@ -1750,13 +1750,13 @@ C   a j penny                   stsci             86-12-02
       integer*2      im(nx,ny)			!i: Input image
       integer        inval			!i: Image (real) invalid number flag
       real           msky(nx,ny)		!o: Sky level
-      real           asky(nx,ny)		!o: Sky level + 1 std dev 
+      real           asky(nx,ny)		!o: Sky level + 1 std dev
       integer        nxsky, nysky		!i: No of sky boxes
       real           bsky(nxsky,nysky)		!o: Mean + 1 std dev in sky boxes
       real           csky(nxsky,nysky)		!o: Mean levels in sky boxes
       integer        nxsd			!i: X Size of sky boxes
       integer        nysd			!i: Y Size of sky boxes
-      logical        failed			!i/o: Failure flag. True = exit 
+      logical        failed			!i/o: Failure flag. True = exit
 C--
 
       integer kgram(1024), kxc(2), kyc(2), j, k, istat, kmin, kmax,
@@ -1771,7 +1771,7 @@ C--
      +             0, 1, 1, 0, 0,
      +             0, 1, 1, 0, 1 /
 Cbegin
-    
+
 
       if ( ST_FAILED ) return
 
@@ -1834,8 +1834,8 @@ Cbegin
                         r = astd/(1.5*kbin)
                         pow = 2.0
                         do ja = 2, 4
-                           call gauss1r ( rkgram, rva, numbin, .false., 
-     +                          1, num, a, b, r, pow, xo, jfita(1,ja), 
+                           call gauss1r ( rkgram, rva, numbin, .false.,
+     +                          1, num, a, b, r, pow, xo, jfita(1,ja),
      +                          0.004, 0.004, 20, 0.5, iter,  0 )
                         enddo
                         r = min(real(numbin),max(0.1,r))
@@ -1847,8 +1847,8 @@ Cbegin
                           val = skylev + 1.5*kbin*real(kkmax-kkmin)/4.0
                         else
                            do ja = 2, 4
-                              call gauss1r ( rkgram, rva, numbin, 
-     +                        .false., kkmin, kkmax, a, b, r, pow, xo, 
+                              call gauss1r ( rkgram, rva, numbin,
+     +                        .false., kkmin, kkmax, a, b, r, pow, xo,
      +                        jfita(1,ja) ,0.004, 0.004, 20, 0.5,iter,0)
                            enddo
                            r = min(real(numbin),max(0.1,r))
@@ -1919,7 +1919,7 @@ Cbegin
       dx = xa - kxa
       dy = ya - kya
 
-      if ( kxa.lt.1 .and. kya.lt.1 ) then				!Do the interpolation for the 
+      if ( kxa.lt.1 .and. kya.lt.1 ) then				!Do the interpolation for the
          ksky = asky(1,1)						! cases at the corners, at the edges,
       elseif ( kxa.lt.1 .and. kya.ge.nysky ) then			! in the body
          ksky = asky(1,nysky)
@@ -1980,7 +1980,7 @@ Cbegin
       dx = xa - kxa
       dy = ya - kya
 
-      if ( kxa.lt.1 .and. kya.lt.1 ) then				!Do the interpolation for the 
+      if ( kxa.lt.1 .and. kya.lt.1 ) then				!Do the interpolation for the
          rsky = asky(1,1)						! cases at the corners, at the edges,
       elseif ( kxa.lt.1 .and. kya.ge.nysky ) then			! in the body
          rsky = asky(1,nysky)
@@ -2037,20 +2037,20 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C  STARFLIBV.F  
+C  STARFLIBV.F
 C
 C  It contains vector operations in the same format as the IRAF ones:-
 C
-C           
+C
 C AADD(DIRS)     Add two vectors to make a third. C = A + B
 C AADDK(DIRS)    Add constant to vector to make second B = A + K
 C AAVG(DIRS)     Mean and standard deviation of an array
 C ACHT(IRS:DIRS) Load a (real:int:short) array into a (dble:real:int:short) array
 C ACHVAL(IRS)    Change a particular value in elements in a (short:int:real) vector
 C ADIV(DIRS)     Divide array by another. C = A/B
-C ADIVK(DIRS)    Divide array by constant.  B = A/K 
+C ADIVK(DIRS)    Divide array by constant.  B = A/K
 C ALIM(DIRS)     Min and max of a vector
-C AMEDIAN(IRS)   Median of (int:real:short) vector 
+C AMEDIAN(IRS)   Median of (int:real:short) vector
 C AMOV(BDIRS)    Load an array into another  B = A
 C AMOVK(BDIRS)   Load a constant into an array  A = K
 C AMUL(DIRS)     Multiply two arrays C = A.B
@@ -2581,7 +2581,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ADIVKD -- Divides array by constant - double precision B=A/K 
+C ADIVKD -- Divides array by constant - double precision B=A/K
 C   a j penny                    dao	         1988-05-16
       subroutine adivkd ( a, k, b, n )
       implicit none
@@ -2596,7 +2596,7 @@ Cbegin
          b(j) = a(j)/k
       enddo
       end
-C ADIVKI -- Divides array by constant - integer B=A/K 
+C ADIVKI -- Divides array by constant - integer B=A/K
 C   a j penny                    dao	         1988-05-16
       subroutine adivki ( a, k, b, n )
       implicit none
@@ -2611,7 +2611,7 @@ Cbegin
          b(j) = a(j)/k
       enddo
       end
-C ADIVKR -- Divides array by constant - real B=A/K 
+C ADIVKR -- Divides array by constant - real B=A/K
 C   a j penny                    dao	         1988-05-16
       subroutine adivkr ( a, k, b, n )
       implicit none
@@ -2626,7 +2626,7 @@ Cbegin
          b(j) = a(j)/k
       enddo
       end
-C ADIVKS -- Divides array by constant - short integer B=A/K 
+C ADIVKS -- Divides array by constant - short integer B=A/K
 C   a j penny                    dao	         1988-05-16
       subroutine adivks ( a, k, b, n )
       implicit none
@@ -2718,7 +2718,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AMEDIANI -- Median of integer vector  
+C AMEDIANI -- Median of integer vector
 C
 C   alan penny             ral         1994 Nov
 
@@ -2730,7 +2730,7 @@ C   alan penny             ral         1994 Nov
       integer   n		!i: Data size
       integer   a(n)		!i/o: Data (sorted on exit)
       real      rm		!o: Median
-C--   
+C--
       integer k
 Cbegin
 
@@ -2760,7 +2760,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AMEDIANR -- Median of real vector  
+C AMEDIANR -- Median of real vector
 C
 C   alan penny             ral         1994 Nov
 
@@ -2772,7 +2772,7 @@ C   alan penny             ral         1994 Nov
       integer   n		!i: Data size
       real      a(n)		!i/o: Data (sorted on exit)
       real      rm		!o: Median
-C--   
+C--
       integer k
 Cbegin
 
@@ -2801,7 +2801,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AMEDIANS -- Median of short vector  
+C AMEDIANS -- Median of short vector
 C
 C   alan penny             ral         1994 Nov
 
@@ -2813,7 +2813,7 @@ C   alan penny             ral         1994 Nov
       integer   n		!i: Data size
       integer*2 a(n)		!i/o: Data (sorted on exit)
       real      rm		!o: Median
-C--   
+C--
       integer k
 Cbegin
 
@@ -3115,7 +3115,7 @@ Cbegin
       end
 
 C ANUMINCI -- Load increasing integer numbers (1,2,3,..) into array
-C   a j penny                    ral           1994 Nov      
+C   a j penny                    ral           1994 Nov
       subroutine anuminci ( a, n )
       implicit none
       integer		n	!i: No of points
@@ -3129,7 +3129,7 @@ Cbegin
       end
 
 C ANUMINCR -- Load increasing real numbers (1,2,3,..) into array
-C   a j penny                    ral           1994 Nov      
+C   a j penny                    ral           1994 Nov
       subroutine anumincr ( a, n )
       implicit none
       integer		n	!i: No of points
@@ -3143,7 +3143,7 @@ Cbegin
       end
 
 C ANUMINCS -- Load increasing short numbers (1,2,3,..) into array
-C   a j penny                    ral           1994 Nov      
+C   a j penny                    ral           1994 Nov
       subroutine anumincs ( a, n )
       implicit none
       integer		n	!i: No of points
@@ -3734,7 +3734,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) - b(j) 
+            c(j) = a(j) - b(j)
          else
             c(j) = ak
          endif
@@ -3755,7 +3755,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) - b(j) 
+            c(j) = a(j) - b(j)
          else
             c(j) = ak
          endif
@@ -3775,7 +3775,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) - b(j) 
+            c(j) = a(j) - b(j)
          else
             c(j) = ak
          endif
@@ -3796,7 +3796,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) - b(j) 
+            c(j) = a(j) - b(j)
          else
             c(j) = ak
          endif
@@ -3819,7 +3819,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) + b(j) 
+            c(j) = a(j) + b(j)
          else
             c(j) = ak
          endif
@@ -3840,7 +3840,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) + b(j) 
+            c(j) = a(j) + b(j)
          else
             c(j) = ak
          endif
@@ -3860,7 +3860,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) + b(j) 
+            c(j) = a(j) + b(j)
          else
             c(j) = ak
          endif
@@ -3881,7 +3881,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j) + b(j) 
+            c(j) = a(j) + b(j)
          else
             c(j) = ak
          endif
@@ -3904,7 +3904,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j)*b(j) 
+            c(j) = a(j)*b(j)
          else
             c(j) = ak
          endif
@@ -3925,7 +3925,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j)*b(j) 
+            c(j) = a(j)*b(j)
          else
             c(j) = ak
          endif
@@ -3945,7 +3945,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j)*b(j) 
+            c(j) = a(j)*b(j)
          else
             c(j) = ak
          endif
@@ -3966,7 +3966,7 @@ C--
 Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
-            c(j) = a(j)*b(j) 
+            c(j) = a(j)*b(j)
          else
             c(j) = ak
          endif
@@ -3990,7 +3990,7 @@ Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
             if ( b(j).ne.0d0 ) then
-               c(j) = a(j)/b(j) 
+               c(j) = a(j)/b(j)
             else
                c(j) = ak
             endif
@@ -4015,7 +4015,7 @@ Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
             if ( b(j).ne.0 ) then
-               c(j) = a(j)/b(j) 
+               c(j) = a(j)/b(j)
             else
                c(j) = ak
             endif
@@ -4039,7 +4039,7 @@ Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
             if ( b(j).ne.0.0 ) then
-               c(j) = a(j)/b(j) 
+               c(j) = a(j)/b(j)
             else
                c(j) = ak
             endif
@@ -4064,7 +4064,7 @@ Cbegin
       do j = 1, n
          if ( a(j).ne.ak .and. b(j).ne.bk ) then
             if ( b(j).ne.0 ) then
-               c(j) = a(j)/b(j) 
+               c(j) = a(j)/b(j)
             else
                c(j) = ak
             endif
@@ -4512,8 +4512,8 @@ C    This is STARFLIB_CHO.F
 C
 C    It contains s/rs for getting choices from the user:-
 C
-C SETUP_OPTION_S   Set up option in simple (key/panel) option choice 
-C SETUP_OPTION     Set up option in (key/panel) option choice 
+C SETUP_OPTION_S   Set up option in simple (key/panel) option choice
+C SETUP_OPTION     Set up option in (key/panel) option choice
 C GET_CHOICE       Get (key/panel) option choice
 C CHOICE_PANEL_SW  Change between keyboard/panel input
 
@@ -4531,13 +4531,13 @@ C HX_HLOAD         Put out help panel help on chosen option  (ignores case)
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SETUP_OPTION_S -- Set up option in simple (key/panel) option choice 
+C SETUP_OPTION_S -- Set up option in simple (key/panel) option choice
 C
 C   alan penny                      ral                    1993 Jul
 
-      subroutine setup_option_s ( ktopt, set_num, koutside, 
+      subroutine setup_option_s ( ktopt, set_num, koutside,
      +                            options, key_option, ncode )
-               
+
       implicit none
 
       character*12  ktopt             		!o: Chosen option
@@ -4551,13 +4551,13 @@ C--
 Cbegin
 
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    1, options, 'OPTIONS',
-     +                    'List of options', key_option, ncode, 
-     +                    0, 1, ' ',  
-     +                    0, ' ',      
-     +                    0, ' ',      
-     +                    0, ' ',      
+     +                    'List of options', key_option, ncode,
+     +                    0, 1, ' ',
+     +                    0, ' ',
+     +                    0, ' ',
+     +                    0, ' ',
      +                    0, 1, 1, ' ' )
 
 
@@ -4565,19 +4565,19 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SETUP_OPTION -- Set up option in (key/panel) option choice 
+C SETUP_OPTION -- Set up option in (key/panel) option choice
 C
 C   alan penny                      ral                    1993 Jul
 
-      subroutine setup_option ( ktopt, set_num, koutside, 
+      subroutine setup_option ( ktopt, set_num, koutside,
      +                          sect_num, sect_text, sect_head,
-     +                          title, option, ncode, 
-     +                          do_opt_text, opt_num, opt_text, 
-     +                          do_opt_head, opt_head, 
+     +                          title, option, ncode,
+     +                          do_opt_text, opt_num, opt_text,
+     +                          do_opt_head, opt_head,
      +                          do_opt_help, opt_help,
      +                          do_help_ext, help_num, help_text,
      +                          do_def_text, def_x, def_y, def_text )
-               
+
       implicit none
 
       include 'STARMAN_INC'
@@ -4600,7 +4600,7 @@ C   alan penny                      ral                    1993 Jul
       integer       do_opt_text			!i: Use option list? (0=no;1=yes)
       integer       opt_num			!i: Number of options (=1 if not use)
       character*(*) opt_text(opt_num)		!i: Options (= ' ' if not use)
-  
+
       integer       do_opt_head			!i: Use Headers? (0=no;1=yes)
       character*(*) opt_head(opt_num)		!i: Header describing option (= ' ' if not use)
 
@@ -4635,7 +4635,7 @@ Cbegin
          LOOPT_HELP = .true.
          KTDEF_HELP = ' '
          TBHELP     = ' '
-      
+
          CH_TITLE = ' '
          CH_OPTION = ' '
          CH_NCODE = 0
@@ -4660,7 +4660,7 @@ Cbegin
          CH_DEF_TEXT(1,1) = ' '
 
       endif
-      
+
       if ( set_num.eq.CH_NCODE ) return					!Check to see if needed
 
       if ( opt_num.gt.CH_MAX_OPT_NUM ) then
@@ -4776,7 +4776,7 @@ Cbegin
       if ( do_opt_text.eq.0 ) DOHPANEL = .false.
       if ( do_opt_help.eq.0 .and. do_opt_head.eq.0)DOHPANEL=.false.
 
-      CH_HELP_NUM = 2 
+      CH_HELP_NUM = 2
       CH_HELP_TEXT(1) = 'Option        Function'
       CH_HELP_TEXT(2) = '------        --------'
       if ( do_opt_text.eq.0 ) then
@@ -4855,8 +4855,8 @@ Cbegin
          CH_SECT_HEAD(k) = sect_head(k)
       enddo
 
-      if ( DOPANEL ) then						!Load panel 
-         call ds_p_sload ( CH_SECT_TEXT, CH_SECT_HEAD, CH_SECT_NUM, 
+      if ( DOPANEL ) then						!Load panel
+         call ds_p_sload ( CH_SECT_TEXT, CH_SECT_HEAD, CH_SECT_NUM,
      +                     CH_NCODE )
          call ds_p_pttit ( CH_TITLE )
          if ( DOHPANEL ) call ds_p_hx_load ( CH_TITLE )
@@ -4880,17 +4880,17 @@ Cbegin
 
 
       end
-  
+
 
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C GET_CHOICE -- Get (key/panel) option choice 
+C GET_CHOICE -- Get (key/panel) option choice
 C
 C   alan penny                      ral                    1993 Jul
 
       subroutine get_choice ( ktopt, kdohpanel )
- 
+
       implicit none
 
       include 'ST_DS_GEN_INC'
@@ -4919,19 +4919,19 @@ Cbegin
       kd = KTDEF_HELP
       if ( .not.CH_AUTOSTART ) then
          if ( DOPANEL ) then
-            call ds_p_gsbox ( CH_SECT_TEXT, CH_SECT_HEAD, CH_SECT_NUM, 
-     +                        ktopt, kd, CH_HELP_TEXT, CH_HELP_NUM, 
+            call ds_p_gsbox ( CH_SECT_TEXT, CH_SECT_HEAD, CH_SECT_NUM,
+     +                        ktopt, kd, CH_HELP_TEXT, CH_HELP_NUM,
      +                        CH_OPT_NUM, CH_OPT_TEXT, CH_OPT_HEAD,
      +                        CH_OPT_HELP, CH_TITLE, DOHPANEL, ierr )
          else
-            call get_option ( 'OPTION', CH_SECT_TEXT, CH_SECT_NUM, 
+            call get_option ( 'OPTION', CH_SECT_TEXT, CH_SECT_NUM,
      +                        ktopt, kd, CH_HELP_TEXT, CH_HELP_NUM )
             if ( ST_FAILED ) return
          endif
       endif
       KTDEF_HELP = kd
 
-      if ( kdohpanel.eq.1 .and. DOHPANEL ) call hx_hload ( ktopt, 
+      if ( kdohpanel.eq.1 .and. DOHPANEL ) call hx_hload ( ktopt,
      +            CH_OPT_TEXT, CH_OPT_HEAD, CH_OPT_HELP, CH_OPT_NUM )
 
 
@@ -4964,13 +4964,13 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET_OPTION -- Get name in option name list from user chosen option name
-C  User chooses from a list of option names, this s/r returns the number of 
-C  that option. If 'help' entered, help given. S/r cycles until a 'correct' 
+C  User chooses from a list of option names, this s/r returns the number of
+C  that option. If 'help' entered, help given. S/r cycles until a 'correct'
 C  reply is given.
 C
 C   alan penny               ral                       1990 Jan
 
-      subroutine get_option ( option, cmdlsts, nopt, ktopt, ktdefs, 
+      subroutine get_option ( option, cmdlsts, nopt, ktopt, ktdefs,
      +                        thelp, nh )
 
       implicit none
@@ -5016,7 +5016,7 @@ Cbegin
          if ( ktdef.eq.cmdlst(ks:ke) ) kdef = k
       enddo
 
-      do k = 1, 200							!Order of listing for 'not found' 
+      do k = 1, 200							!Order of listing for 'not found'
          jcon(k) = k							! is as input
       enddo
 
@@ -5077,8 +5077,8 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET_JOB -- Get number in option name list from user chosen option name
-C  User chooses from a list of option names, this s/r returns the number of 
-C  that option. If 'help' entered, help given. S/r cycles until a 'correct' 
+C  User chooses from a list of option names, this s/r returns the number of
+C  that option. If 'help' entered, help given. S/r cycles until a 'correct'
 C  reply is given.
 C
 C   alan penny               ral                       1990 Jan
@@ -5219,7 +5219,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C CH_SETUP -- Set up defaults before using choices 
+C CH_SETUP -- Set up defaults before using choices
 C
 C   a j penny                 ral                1994 April
 
@@ -5245,7 +5245,7 @@ C GCMDLST -- Squeeze command list and determine its character
 C
 C  a j penny                          dao              1988-04-19
 
-      subroutine gcmdlst ( cmdlsts, cmdlst, kdefs, kdef, kds, kde, 
+      subroutine gcmdlst ( cmdlsts, cmdlst, kdefs, kdef, kds, kde,
      +                     kl, num, jcon, ksw, klw )
 
 
@@ -5253,14 +5253,14 @@ C  a j penny                          dao              1988-04-19
       include 'STARMAN_INC'
 
       character*(*)	cmdlsts		!i: Input list
-      character*(*)	cmdlst		!o: List removed of blanks, 
+      character*(*)	cmdlst		!o: List removed of blanks,
 					!   multiple ':'s, etc
       integer		kdefs		!i: Input default option number
       integer		kdef		!o: Output default option number
       integer		kds		!o: Start of default option
       integer		kde		!o: End of default option
       integer		kl		!o: Character length of ouput command
-					!   list 
+					!   list
       integer		num		!o: Number of options in list
       integer		jcon(200)	!o: Alphabetical order of options
       integer		ksw(200)	!o: Start characters of options
@@ -5271,7 +5271,7 @@ C--
       external lens
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       kl = lens(cmdlsts)
@@ -5310,8 +5310,8 @@ Cbegin
          endif
          k = k + 1
       enddo
-            
-      if ( cmdlst(1:1).eq.':' ) then					!Remove lead or end ':'	
+
+      if ( cmdlst(1:1).eq.':' ) then					!Remove lead or end ':'
           do k = 1, kl-1
              cmdlst(k:k) = cmdlst(k+1:k+1)
           enddo
@@ -5321,7 +5321,7 @@ Cbegin
          cmdlst(kl:kl) = ' '
          kl = kl - 1
       endif
-         
+
       num = 0								!Find number of words
       do k = 1, kl
          if ( cmdlst(k:k).eq.':' ) num = num + 1
@@ -5377,7 +5377,7 @@ Cbegin
          enddo
          call sort2i ( kcon, jcon, num )
       enddo
-      
+
 
       end
 
@@ -5395,7 +5395,7 @@ C  a j penny                          dao              1988-04-19
 
       character*(*)	cmdlsts		!i: Input list
       character*(*)	cmdlst		!o: List removed of blanks, multiple ':'s, etc
-      integer		kl		!o: Character length of ouput command list 
+      integer		kl		!o: Character length of ouput command list
       integer		num		!o: Number of options in list
       integer		ksw(200)	!o: Start characters of options
       integer		klw(200)	!o: Character length of options
@@ -5405,7 +5405,7 @@ C--
       external lens
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       kl = lens(cmdlsts)
@@ -5444,8 +5444,8 @@ Cbegin
          endif
          k = k + 1
       enddo
-            
-      if ( cmdlst(1:1).eq.':' ) then					!Remove lead or end ':'	
+
+      if ( cmdlst(1:1).eq.':' ) then					!Remove lead or end ':'
           do k = 1, kl-1
              cmdlst(k:k) = cmdlst(k+1:k+1)
           enddo
@@ -5455,7 +5455,7 @@ Cbegin
          cmdlst(kl:kl) = ' '
          kl = kl - 1
       endif
-         
+
       num = 0								!Find number of words
       do k = 1, kl
          if ( cmdlst(k:k).eq.':' ) num = num + 1
@@ -5515,10 +5515,10 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      kl_x = kl_x + 1			
+      kl_x = kl_x + 1
       if ( kl_x.lt.nx .and. loopt ) then
          ok = .false.
-         do j = kl_y, ny 
+         do j = kl_y, ny
             if ( .not.ok .and. kopt.eq.kopta(kl_x,j) ) then
                ok = .true.
                kl_y = j
@@ -5548,7 +5548,7 @@ C   alan penny                        ral              1990-01-31
       include 'ST_CHOICE_INC'
 
       character*(*)   ktopt		!i: Chosen option
-      integer         nopt		!i: No of possible options 
+      integer         nopt		!i: No of possible options
       character*12    topt(nopt)	!i: Possible options  (ignores case)
       character*68    thead(nopt)	!i: Single line helps
       character*68    thelp(6,nopt)	!i: Fuller helps
@@ -5585,7 +5585,7 @@ C--
      + 'Pressing this button gets a type-out of the list of options ',
      + 'and also some general help on the options.',
      + 'This button also has a display of the -state- of the program.',
-     + 'WAITING = waiting for you to do something like press a button', 
+     + 'WAITING = waiting for you to do something like press a button',
      + 'Other messages are: WORKING HELPING PANNING ZOOMING ',
      + 'NOT YET    READY   ONE GOT. The meaning will be clear in use.' /
 
@@ -5625,7 +5625,7 @@ Cbegin
                kl = 2
             endif
             found = .true.
-         endif            
+         endif
       endif
 
       if ( found ) then
@@ -5643,9 +5643,9 @@ Cbegin
       enddo
       ohelp(545:545) = 'T'
 
-      
+
       do j = 1, 8
-         
+
          if ( found ) then
             if ( j.eq.1 ) then
                if ( kl.eq.0 ) then
@@ -5694,8 +5694,8 @@ C GTWRK(IRS)     Open (int:real:short) computer work space
 C OPIM(IRSU)R    Open an input 2d read-only (real:int*2:unsigned int*2:int) image
 C OPIM4ZR        Open an input 4d read-only real/int/int*2 image
 C OPIMZ(RW)      Open an input 2d read-only/write-only real or int*2 image
-C OPIM(IRS)W     Open an output 2d write-only (real:integer*2:integer) image 
-C OPIM4(IRS)W    Open an output 4d write-only (real:integer*2:integer) image 
+C OPIM(IRS)W     Open an output 2d write-only (real:integer*2:integer) image
+C OPIM4(IRS)W    Open an output 4d write-only (real:integer*2:integer) image
 C PUT(123)(IR)   Put (integer:real) (1:2:3) numbers to the CL
 
 
@@ -5703,7 +5703,7 @@ C PUT(123)(IR)   Put (integer:real) (1:2:3) numbers to the CL
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET1B -- Get a boolean value from the CL
 C
-C       a j penny              stsci                1987 oct 16 
+C       a j penny              stsci                1987 oct 16
 
       subroutine get1b ( param, bool, inbool )
 
@@ -5711,7 +5711,7 @@ C       a j penny              stsci                1987 oct 16
 
       character*(*) param	!i: Parameter name
       logical bool		!o: Boolean value got
-      logical inbool		!i: Default boolean value 
+      logical inbool		!i: Default boolean value
 C--
       logical bv(5)
       integer num
@@ -5730,7 +5730,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET1I -- Get 1 integer from CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get1i ( param, i1, in, imin, imax )
@@ -5744,7 +5744,7 @@ C   aj penny                        dao             1988-04-19
       integer       imax	!i: Max allowed value
 C--
       integer iv(5)
-Cbegin      
+Cbegin
 
 
       iv(1) = in
@@ -5757,7 +5757,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET2I -- Get 2 integers from the CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get2i ( param, i1, i2, def, imin, imax )
@@ -5772,7 +5772,7 @@ C   aj penny                        dao             1988-04-19
       integer       imax	!i: Max allowed value
 C--
       integer iv(5)
-Cbegin      
+Cbegin
 
 
       iv(1) = i1
@@ -5804,7 +5804,7 @@ C    a j penny                 dao                   1988-04-19
       integer       imax	!i: Max allowed value
 C--
       integer iv(5)
-Cbegin      
+Cbegin
 
 
       iv(1) = i1
@@ -5839,7 +5839,7 @@ C    a j penny                 ral                   1988-Nov
       integer       imax	!i: Max allowed value
 C--
       integer iv(5)
-Cbegin      
+Cbegin
 
 
       iv(1) = i1
@@ -5877,7 +5877,7 @@ C    a j penny                 ral                   1988-Nov
       integer       imax	!i: Max allowed value
 C--
       integer iv(5)
-Cbegin      
+Cbegin
 
 
       iv(1) = i1
@@ -5899,7 +5899,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET1R -- Get 1 real from CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get1r ( param, r1, rin, rmin, rmax )
@@ -5913,7 +5913,7 @@ C   aj penny                        dao             1988-04-19
       real          rmax	!i: Max allowed value
 C--
       real  rv(5)
-Cbegin      
+Cbegin
 
 
       rv(1) = rin
@@ -5927,7 +5927,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET2R -- Get 2 reals from the CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get2r ( param, r1, r2, def, rmin, rmax )
@@ -5942,7 +5942,7 @@ C   aj penny                        dao             1988-04-19
       real          rmax	!i: Max allowed value
 C--
       real rv(5)
-Cbegin      
+Cbegin
 
 
       rv(1) = r1
@@ -5958,7 +5958,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET3R -- Get 3 reals from the CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get3r ( param, r1, r2, r3, def, rmin, rmax )
@@ -5974,7 +5974,7 @@ C   aj penny                        dao             1988-04-19
       real          rmax	!i: Max allowed value
 C--
       real rv(5)
-Cbegin      
+Cbegin
 
 
       rv(1) = r1
@@ -5992,7 +5992,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET4R -- Get 4 reals from the CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get4r ( param, r1, r2, r3, r4, def, rmin, rmax )
@@ -6009,7 +6009,7 @@ C   aj penny                        dao             1988-04-19
       real          rmax	!i: Max allowed value
 C--
       real rv(5)
-Cbegin      
+Cbegin
 
 
       rv(1) = r1
@@ -6029,7 +6029,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GET5R -- Get 5 reals from the CL
 C
-C   aj penny                        dao             1988-04-19 
+C   aj penny                        dao             1988-04-19
 
 
       subroutine get5r ( param, r1, r2, r3, r4, r5, def, rmin, rmax )
@@ -6047,7 +6047,7 @@ C   aj penny                        dao             1988-04-19
       real          rmax	!i: Max allowed value
 C--
       real rv(5)
-Cbegin      
+Cbegin
 
 
       rv(1) = r1
@@ -6071,7 +6071,7 @@ C GTIMZD -- Get descriptors BSACLE, BZERO, INVAL, TITLE form a real or int*2 ima
 C
 C  alan penny              ral          1990 Jan
 
-      subroutine gtimzd ( name, gtype, bs, bz, inval, rinval, title, 
+      subroutine gtimzd ( name, gtype, bs, bz, inval, rinval, title,
      +                    ierr )
 
       implicit none
@@ -6087,7 +6087,7 @@ C  alan penny              ral          1990 Jan
       integer       ierr        !o: Error flag (0=ok)
 C--
 Cbegin
-        
+
 
       if ( gtype.eq.'SHORT') then
          call gtimsd ( name, bs, bz, inval, title, ierr )
@@ -6102,7 +6102,7 @@ Cbegin
 
 
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C GTWRKI -- Open integer*4 computer work space
@@ -6111,7 +6111,7 @@ C  alan penny              ral          1990 Jan
 
       subroutine gtwrki ( text, n, ip, ierr )
 
-      implicit none 
+      implicit none
 
       character*(*) text	!i: Name to give to work space
       integer       n		!i: Size to allocate (in words)
@@ -6134,7 +6134,7 @@ C  alan penny              ral          1990 Jan
 
       subroutine gtwrkr ( text, n, ip, ierr )
 
-      implicit none 
+      implicit none
 
       character*(*) text	!i: Name to give to work space
       integer       n		!i: Size to allocate (in words)
@@ -6157,7 +6157,7 @@ C  alan penny              ral          1990 Jan
 
       subroutine gtwrks ( text, n, ip, ierr )
 
-      implicit none 
+      implicit none
 
       character*(*) text	!i: Name to give to work space
       integer       n		!i: Size to allocate (in words)
@@ -6166,7 +6166,7 @@ C  alan penny              ral          1990 Jan
 C--
 Cbegin
 
-     
+
       call gtwrkg ( text, n, 'SHORT', ip, ierr )
 
 
@@ -6175,7 +6175,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMIR -- Open an input 2d read-only integer*4 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6206,10 +6206,10 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMRR -- Open an input 2d read-only real image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6243,7 +6243,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMSR -- Open an input 2d read-only integer*2 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6274,10 +6274,10 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMUR -- Open an input 2d read-only unsigned integer*2 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6312,7 +6312,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMZR -- Open an input 2d read-only real or integer*2 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6336,21 +6336,21 @@ Cbegin
 
       call opimgr ( name, ipin, nx, ny, gtype, def, ierr )
       if ( ST_FAILED ) return
-      if ( ierr.eq.0 .and. 
+      if ( ierr.eq.0 .and.
      +     gtype.ne.'REAL' .and. gtype.ne.'SHORT' ) then
          write ( text, '('' ERROR: Image type is: '',a)') gtype
          call printo ( text )
          call printo ( 'ERROR: Can only use REAL or SHORT images' )
          ierr = 3
       endif
-  
+
 
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIM4ZR -- Open an input 4d read-only real/int/integer*2 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6380,21 +6380,21 @@ Cbegin
       call opim4gr ( name, ipin, nx, ny, nz, nt, ndim, gtype,
      +                     def, ierr )
       if ( ST_FAILED ) return
-      if ( ierr.eq.0 .and. gtype.ne.'REAL' .and. 
+      if ( ierr.eq.0 .and. gtype.ne.'REAL' .and.
      +     gtype.ne.'INT' .and. gtype.ne.'SHORT' ) then
          write ( text, '(''ERROR: Image type is: '',a)') gtype
          call printo ( text )
          call printo ( 'ERROR: Can only use REAL, INT or SHORT images' )
          ierr = 3
       endif
-  
+
 
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIMZW -- Open an output 2d read-only real or integer*2 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6424,12 +6424,12 @@ Cbegin
       endif
 
 
-      end       
+      end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C OPIM4ZW -- Open an outnput 4d read-only real or integer*2 image
-C  The parameter name is left attached 
+C  The parameter name is left attached
 C
 C      alan penny             ral                1990 jan
 
@@ -6459,14 +6459,14 @@ Cbegin
       else
          call opim4gw ( name, gtype, ip, nx, ny, nz, nt,def,ierr)
       endif
-       
+
 
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIMIW -- Open an output 2d write-only integer*4 image 
-C  The parameter name is left attached 
+C OPIMIW -- Open an output 2d write-only integer*4 image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -6491,8 +6491,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIMRW -- Open an output 2d write-only real image 
-C  The parameter name is left attached 
+C OPIMRW -- Open an output 2d write-only real image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -6517,8 +6517,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIMSW -- Open an output 2d write-only integer*2 image 
-C  The parameter name is left attached 
+C OPIMSW -- Open an output 2d write-only integer*2 image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -6543,8 +6543,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIM4IW -- Open an output 4d write-only integer*4 image 
-C  The parameter name is left attached 
+C OPIM4IW -- Open an output 4d write-only integer*4 image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -6571,8 +6571,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIM4RW -- Open an output 4d write-only real image 
-C  The parameter name is left attached 
+C OPIM4RW -- Open an output 4d write-only real image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 
@@ -6599,8 +6599,8 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C OPIM4SW -- Open an output 4d write-only integer*2 image 
-C  The parameter name is left attached 
+C OPIM4SW -- Open an output 4d write-only integer*2 image
+C  The parameter name is left attached
 C
 C    a j penny                 ral                  1988-07-10
 

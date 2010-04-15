@@ -114,7 +114,7 @@ C
          ENDIF
       ENDIF
 C
-C     Look for quality, magic values, 
+C     Look for quality, magic values,
 C
       CALL DSA_SEEK_QUALITY ('SPECT', QUAL, STATUS)
       IF (.NOT. QUAL) THEN
@@ -157,7 +157,7 @@ C
       CALL DSA_MAP_DATA ('SPECT', 'READ', 'FLOAT', ADDRESS, D_SLOT,
      :   STATUS)
       D_PTR = ADDRESS
-      CALL DSA_MAP_AXIS_DATA ('SPECT', 1, 'READ', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_AXIS_DATA ('SPECT', 1, 'READ', 'FLOAT', ADDRESS,
      :   A_SLOT, STATUS)
       A_PTR = ADDRESS
       IF (QUAL) THEN
@@ -174,7 +174,7 @@ C
       CALL DSA_MAP_DATA ('SPECT1', 'READ', 'FLOAT', ADDRESS, D1_SLOT,
      :   STATUS)
       D1_PTR = ADDRESS
-      CALL DSA_MAP_AXIS_DATA ('SPECT1', 1, 'READ', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_AXIS_DATA ('SPECT1', 1, 'READ', 'FLOAT', ADDRESS,
      :   A1_SLOT, STATUS)
       A1_PTR = ADDRESS
       IF (QUAL) THEN
@@ -189,7 +189,7 @@ C
       ENDIF
 C
 C     Check the X order of the two files.  We try to put the one with
-C     the lower X values into the output spectrum first, to avoid the 
+C     the lower X values into the output spectrum first, to avoid the
 C     sorting overhead.  Check for an overlap in values.
 C
       IF (STATUS .EQ. ADAM__OK) THEN
@@ -261,7 +261,7 @@ C
          VO_PTR = ADDRESS
       ENDIF
 C
-C     Copy the input X arrays into the output X array.  
+C     Copy the input X arrays into the output X array.
 C
       IF (REVERSE) THEN
          IF (STATUS .EQ. ADAM__OK) THEN
@@ -277,7 +277,7 @@ C
 C
 C     See if we are going to have to sort the data.  If we are, get
 C     workspace for the sort vector, calculate it, and re-order the
-C     output X array.  The workspace obtained contains two arrays, 
+C     output X array.  The workspace obtained contains two arrays,
 C     one the sort vector and one the workspace needed by the indirect
 C     sorting routine GEN_FVSORT.
 C
@@ -352,5 +352,5 @@ C
 C
 C     Close everything down
 C
-      CALL DSA_CLOSE (STATUS) 
+      CALL DSA_CLOSE (STATUS)
       END

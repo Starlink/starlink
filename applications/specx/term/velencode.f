@@ -15,7 +15,7 @@
 
 *  Routine to encode contents of 'LSRFLG' given velocity frame
 *  and velocity law used to observe data: Must be consistent with
-*  longstanding usage. 
+*  longstanding usage.
 *
 *  The assumption is that the LO frequency offsets were made to
 *  bring a source *at velocity VRAD* in the nominated frame to the

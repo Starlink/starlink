@@ -8,7 +8,7 @@
 *     GRA1_LINRE
 
 *  Purpose:
-*     Determines a least squares linear fit for data in arrays X and Y. 
+*     Determines a least squares linear fit for data in arrays X and Y.
 *     This fit is used to calculate value for the scale length of the
 *     object if it was a spiral galaxy or elliptical galaxy.
 
@@ -18,7 +18,7 @@
 *  Invocation:
 *     CALL GRA1_LINRE(POINTS,LOWLIM,FTYPE,RRANGE,LOR,HIR,RESULT,
 *                     PSIZE,BACK,CONS,SLEN,NUMBP,REG,STATUS)
-                     
+
 *  Description:
 *     Uses a normal least squares method to determine the coefficients
 *     of a linear fit to the contents of arrays X and Y.
@@ -27,7 +27,7 @@
 *     POINTS = INTEGER (Given)
 *        Number of profiles available for the current galaxy.
 *     LOWLIM = REAL (Given)
-*        Number of arc seconds below which points are not included in 
+*        Number of arc seconds below which points are not included in
 *        the profile calculation of the scale lengths.
 *     FTYPE *(3) = CHARACTER (Returned)
 *        The record type found in the results file. ELF=ELLFOU,
@@ -77,12 +77,12 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'GRA_PAR'               ! GRAPHS constants
-                     
+
 *  Arguments Given:
       CHARACTER *(3) FTYPE            ! File header type
       LOGICAL RRANGE                  ! Select data points interactively?
       INTEGER POINTS                  ! Number of profiles available
-      REAL HIR                        ! The upper limit of radius requested  
+      REAL HIR                        ! The upper limit of radius requested
       REAL LOR                        ! The lower limit of radius requested
       REAL LOWLIM                     ! The lower radius limit
       REAL PSIZE                      ! Size of the pixels in arc secs
@@ -92,14 +92,14 @@
 *  Arguments Returned:
       INTEGER NUMBP(2)                ! Number of data points used
       REAL CONS(2)                    ! Constant of linear equation
-      REAL GRAD(2)                    ! Gradient of linear equation     
-      REAL REG(2)                     ! Regression coefficient squared 
+      REAL GRAD(2)                    ! Gradient of linear equation
+      REAL REG(2)                     ! Regression coefficient squared
       REAL SLEN(2)                    ! Scale length of the galaxy
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables: 
+*  Local Variables:
       INTEGER FLAG                    ! Problems with the regresssion flag
       INTEGER I                       ! Loop variable
       INTEGER LLI                     ! Lowest useable pixel index
@@ -111,7 +111,7 @@
       REAL NUMB                       ! Number of data points
       REAL SUMX                       ! Sum of X1 array
       REAL SUMY                       ! Sum of Y1 array
-      REAL TOT(7)                     ! Various total and summations used 
+      REAL TOT(7)                     ! Various total and summations used
                                       ! later.
       REAL TOTELL                     ! Total of ellipticity values
       REAL X                          ! Transformed raw data radius value
@@ -123,7 +123,7 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-                     
+
 *    Set up the automatic values for LOR and HIR radius limits.
       IF (RRANGE) THEN
 
@@ -136,15 +136,15 @@
          LLI=POINTS
          DO 100 I=POINTS,1,-1
             IF (RESULT(I,4).GE.LIMIT) LLI=I
- 100     CONTINUE 
+ 100     CONTINUE
 
-*      Deal with a very small number of points.    
+*      Deal with a very small number of points.
          IF (POINTS.LT.4) THEN
             LOR=RESULT(1,4)
             HIR=RESULT(POINTS,4)
          END IF
 
-*      Sufficient data points to allow the central limit to be imposed but not 
+*      Sufficient data points to allow the central limit to be imposed but not
 *      the outer limit value.
          IF (POINTS-LLI+1.EQ.3) THEN
             LOR=RESULT(LLI,4)
@@ -153,7 +153,7 @@
 
 *      Sufficient data points to allow the central limit to be imposed and
 *      also the outermost point to be ignored.
-         IF (POINTS-LLI+1.GT.3) THEN 
+         IF (POINTS-LLI+1.GT.3) THEN
             LOR=RESULT(LLI,4)
             HIR=RESULT(POINTS-1,4)
          END IF
@@ -170,14 +170,14 @@
          HIR=PSIZE*HIR
 
       END IF
-    
+
 *   Find the mean value of x and the sums of the x and y arrays.
 
 *   Set an error flag.
       FLAG=0
 
 *   Set the line fit values to zero.
-      DO 10 I=1,2 
+      DO 10 I=1,2
          GRAD(I)=0.0
          CONS(I)=0.0
  10   CONTINUE
@@ -203,7 +203,7 @@
                X=RESULT(I,4)*PSIZE
             END IF
             Y=LOG10(RESULT(I,5))
-       
+
 *         Only use the value if it is within the requested limits.
             IF ((X.GE.LOR).AND.(X.LE.HIR)) THEN
 
@@ -238,9 +238,9 @@
 
          END IF
 
-*      Calculate the squared sum of (x-xmean) 
+*      Calculate the squared sum of (x-xmean)
 *      and thereby the gradient and constant terms in the equation.
-     
+
 *      Set up the initial values for the sums.
          DO 99 I=1,7
             TOT(I)=0.0
@@ -256,13 +256,13 @@
                X=RESULT(I,4)*PSIZE
             END IF
             Y=LOG10(RESULT(I,5))
-      
+
 *         Check that the radius is within the range requested.
             IF ((X.GE.LOR).AND.(X.LE.HIR)) THEN
-              
-*            Generate the radius and brightness values.              
+
+*            Generate the radius and brightness values.
                IF (TYPE.EQ.2) X=X**(0.25)
-                    
+
 *            Calculate X deviations from the mean.
                TOT(1)=X-MNVX
                TOT(2)=TOT(2)+TOT(1)*TOT(1)
@@ -272,7 +272,7 @@
 
 *            Needed to calculate gradient later.
                TOT(3)=TOT(3)+TOT(1)*Y
-              
+
 *            Needed to calculate correlation.
                TOT(5)=TOT(5)+TOT(1)*TOT(1)
                TOT(6)=TOT(6)+TOT(4)*TOT(4)
@@ -297,7 +297,7 @@
                IF ((TYPE.EQ.1).AND.(GRAD(TYPE).NE.0.0)) THEN
                   SLEN(TYPE)=-LOG10(EXP(1.0))/GRAD(TYPE)
                ELSE
-                  SLEN(TYPE)=LOG10(EXP(1.0))/((-GRAD(TYPE))**(4.0))  
+                  SLEN(TYPE)=LOG10(EXP(1.0))/((-GRAD(TYPE))**(4.0))
                END IF
 
 *            Calculate regression.
@@ -310,14 +310,14 @@
                FLAG=3
 
             END IF
-     
+
          ELSE
 
 *      Raise an error flag if all the pixels had the same value.
             FLAG=2
 
          END IF
-        
+
  200  CONTINUE
 
 *   Display the reason that the linear regression failed.
@@ -329,19 +329,19 @@
 *      Too few data points found for a result to be calculated.
          IF (FLAG.EQ.1) THEN
             CALL MSG_OUT(' ','Not enough data points '//
-     :                       'were selected.',STATUS) 
+     :                       'were selected.',STATUS)
          END IF
 
 *      Not possible to calculate a meaningful slope.
          IF (FLAG.EQ.2) THEN
             CALL MSG_OUT(' ','The points selected had a '//
-     :                       'single value.',STATUS) 
+     :                       'single value.',STATUS)
          END IF
 
 *      Negative or zero scale length.
          IF (FLAG.EQ.3) THEN
             CALL MSG_OUT(' ','The scale length calculated '//
-     :                       'was not physically sensible.',STATUS) 
+     :                       'was not physically sensible.',STATUS)
          END IF
 
          CALL MSG_BLANK(STATUS)
@@ -349,17 +349,17 @@
       END IF
 
  9999 CONTINUE
-     
-      END       
 
- 
+      END
+
+
       SUBROUTINE HIS1_LINRE(X1,Y1,NUMDAT,GRAD,CONS,STATUS)
 *+
 *  Name:
 *     HIS1_LINRE
 
 *  Purpose:
-*     Determines a least squares linear fit for data in arrays X and Y. 
+*     Determines a least squares linear fit for data in arrays X and Y.
 
 *  Language:
 *     Starlink Fortran 77
@@ -404,7 +404,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
-                     
+
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
       REAL X1(HIS__CHORM)             ! Data points X1 value
@@ -412,12 +412,12 @@
 
 *  Arguments Returned:
       REAL CONS                       ! Constant of linear equation
-      REAL GRAD                       ! Gradient of linear equation     
+      REAL GRAD                       ! Gradient of linear equation
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                                          
+*  Local Variables:
       INTEGER I                       ! Loop variable
       REAL MNVX                       ! Mean value of X1 array
       REAL NUMB                       ! Number of data points
@@ -427,14 +427,14 @@
                                       ! the mean
       REAL TOT2                       ! Absolute X1 deviation squared
                                       ! sum
-      REAl TOT3                       ! Absolute X1 deviation 
+      REAl TOT3                       ! Absolute X1 deviation
                                       ! times Y1
 
 *.
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-   
+
       NUMB=REAL(NUMDAT)
 
 *   Find the mean value of x and the sums of the x and y arrays.
@@ -447,7 +447,7 @@
  500  CONTINUE
       MNVX=SUMX/NUMB
 
-*   Calculate the squared sum of (x-xmean) 
+*   Calculate the squared sum of (x-xmean)
 *   and thereby the gradient and constant terms in the equation.
       TOT1=0.0
       TOT2=0.0
@@ -470,19 +470,19 @@
          NUMDAT=0
          GOTO 9999
       END IF
- 
- 9999 CONTINUE
-     
-      END       
 
- 
+ 9999 CONTINUE
+
+      END
+
+
       SUBROUTINE HSB1_LINRE(X1,Y1,NUMDAT,STATUS,GRAD,CONS)
 *+
 *  Name:
 *     HSB1_LINRE
 
 *  Purpose:
-*     Determines a least squares linear fit for data in arrays X and Y. 
+*     Determines a least squares linear fit for data in arrays X and Y.
 
 *  Language:
 *     Starlink Fortran 77
@@ -527,7 +527,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HSB_PAR'               ! HSUB system variables
-                     
+
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
       REAL X1(HSB__CHORM)             ! Data points X1 value
@@ -535,12 +535,12 @@
 
 *  Arguments Returned:
       REAL CONS                       ! Constant of linear equation
-      REAL GRAD                       ! Gradient of linear equation     
+      REAL GRAD                       ! Gradient of linear equation
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                                          
+*  Local Variables:
       INTEGER I                       ! Loop variable
       REAL MNVX                       ! Mean value of X1 array
       REAL NUMB                       ! Number of data points
@@ -550,14 +550,14 @@
                                       ! the mean
       REAL TOT2                       ! Absolute X1 deviation squared
                                       ! sum
-      REAl TOT3                       ! Absolute X1 deviation 
+      REAl TOT3                       ! Absolute X1 deviation
                                       ! times Y1
 
 *.
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-   
+
       NUMB=REAL(NUMDAT)
 
 *   Find the mean value of x and the sums of the x and y arrays.
@@ -570,7 +570,7 @@
  500  CONTINUE
       MNVX=SUMX/NUMB
 
-*   Calculate the squared sum of (x-xmean) 
+*   Calculate the squared sum of (x-xmean)
 *   and thereby the gradient and constant terms in the equation.
       TOT1=0.0
       TOT2=0.0
@@ -593,19 +593,19 @@
          NUMDAT=0
          GOTO 9999
       END IF
- 
- 9999 CONTINUE
-     
-      END       
 
- 
+ 9999 CONTINUE
+
+      END
+
+
       SUBROUTINE LOB1_LINRE(X1,Y1,NUMDAT,GRAD,CONS,STATUS)
 *+
 *  Name:
 *     LOB1_LINRE
 
 *  Purpose:
-*     Determines a least squares linear fit for data in arrays X and Y. 
+*     Determines a least squares linear fit for data in arrays X and Y.
 
 *  Language:
 *     Starlink Fortran 77
@@ -652,7 +652,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system variables
-                     
+
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
       REAL X1(LOB__CHORM)             ! Data points X1 value
@@ -660,12 +660,12 @@
 
 *  Arguments Returned:
       REAL CONS                       ! Constant of linear equation
-      REAL GRAD                       ! Gradient of linear equation     
+      REAL GRAD                       ! Gradient of linear equation
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                                          
+*  Local Variables:
       INTEGER I                       ! Loop variable
       REAL MNVX                       ! Mean value of X1 array
       REAL NUMB                       ! Number of data points
@@ -675,14 +675,14 @@
                                       ! the mean
       REAL TOT2                       ! Absolute X1 deviation squared
                                       ! sum
-      REAl TOT3                       ! Absolute X1 deviation 
+      REAl TOT3                       ! Absolute X1 deviation
                                       ! times Y1
 
 *.
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-   
+
       NUMB=REAL(NUMDAT)
 
 *   Find the mean value of x and the sums of the x and y arrays.
@@ -695,7 +695,7 @@
  500  CONTINUE
       MNVX=SUMX/NUMB
 
-*   Calculate the squared sum of (x-xmean) 
+*   Calculate the squared sum of (x-xmean)
 *   and thereby the gradient and constant terms in the equation.
       TOT1=0.0
       TOT2=0.0
@@ -718,10 +718,10 @@
          NUMDAT=0
          GOTO 9999
       END IF
- 
+
  9999 CONTINUE
-     
-      END       
+
+      END
 
 
       SUBROUTINE SEC1_LINRE(LOR,HIR,NUMBER,SUMMAT,PSIZE,BACK,
@@ -731,7 +731,7 @@
 *     SEC1_LINRE
 
 *  Purpose:
-*     Determines a least squares linear fit for data in arrays X and Y. 
+*     Determines a least squares linear fit for data in arrays X and Y.
 *     This fit is used to calculate value for the scale length of the
 *     object if it was a spiral galaxy or elliptical galaxy.
 
@@ -794,13 +794,13 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'SEC_PAR'               ! SECTOR constants
-                     
+
 *  Arguments Given:
       INTEGER NUMDAT                  ! Number of data points
       REAL BACK                       ! The background count value
-      REAL HIR                        ! The upper limit of radius requested  
+      REAL HIR                        ! The upper limit of radius requested
       REAL LOR                        ! The lower limit of radius requested
-      REAL NUMBER(SEC__RESUL)         ! Number of pixels found at a given 
+      REAL NUMBER(SEC__RESUL)         ! Number of pixels found at a given
                                       ! distance from the galaxy centre
       REAL PSIZE                      ! Size of the pixels in arc secs
       REAL SUMMAT(SEC__RESUL)         ! Summed counts for all pixels at a
@@ -809,13 +809,13 @@
 *  Arguments Returned:
       INTEGER COUNT(2)                ! Number of data points used
       REAL CONS(2)                    ! Constant of linear equation
-      REAL GRAD(2)                    ! Gradient of linear equation     
+      REAL GRAD(2)                    ! Gradient of linear equation
       REAL SLEN(2)                    ! Scale length of the galaxy
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                               
+*  Local Variables:
       INTEGER FLAG                    ! Problems with the regresssion flag
       INTEGER I                       ! Loop variable
       INTEGER TYPE                    ! Defines the data transform type
@@ -827,7 +827,7 @@
                                       ! the mean
       REAL TOT2                       ! Absolute X1 deviation squared
                                       ! sum
-      REAL TOT3                       ! Absolute X1 deviation 
+      REAL TOT3                       ! Absolute X1 deviation
                                       ! times Y1
       REAL X                          ! Transformed raw data radius value
       REAL Y                          ! Transformed raw data pixel count
@@ -836,7 +836,7 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-   
+
 *   Find the mean value of x and the sums of the x and y arrays.
 
 *   Set an error flag.
@@ -854,9 +854,9 @@
 *      Loop through all the data points used.
          DO 500 I=1,NUMDAT
 
-*         Ignore all values of radius where no data was collected. 
+*         Ignore all values of radius where no data was collected.
            IF (NUMBER(I).GT.0.0) THEN
-           
+
 *            Ignore all radius values for which the mean pixel
 *            value was below background.
                IF ((SUMMAT(I)/NUMBER(I)-BACK).GT.0.0) THEN
@@ -878,16 +878,16 @@
                         X=((REAL(I)-1.)*PSIZE)**(0.25)
                      END IF
                      Y=LOG10(SUMMAT(I)/NUMBER(I)-BACK)
-  
+
 *                  Sum the X and Y values found (radius and brightness).
                       SUMX=SUMX+X
                       SUMY=SUMY+Y
 
                   END IF
-               
+
                END IF
 
-            END IF 
+            END IF
 
  500     CONTINUE
 
@@ -906,14 +906,14 @@
 
          END IF
 
-*      Calculate the squared sum of (x-xmean) 
+*      Calculate the squared sum of (x-xmean)
 *      and thereby the gradient and constant terms in the equation.
-     
+
 *      Set up the initial values for the sums.
          TOT1=0.0
          TOT2=0.0
          TOT3=0.0
-      
+
 *      Loop through all the data points used.
          DO 510 I=1,NUMDAT
 
@@ -928,8 +928,8 @@
 
 *               Check that the radius is within the range requested.
                   IF ((X.GE.LOR).AND.(X.LE.HIR)) THEN
-              
-*                  Generate the radius and brightness values.              
+
+*                  Generate the radius and brightness values.
                      IF (TYPE.EQ.1) THEN
                         X=(REAL(I)-1.)*PSIZE
                      ELSE
@@ -964,7 +964,7 @@
                IF ((TYPE.EQ.1).AND.(GRAD(TYPE).NE.0.0)) THEN
                   SLEN(TYPE)=-LOG10(EXP(1.0))/GRAD(TYPE)
                ELSE
-                  SLEN(TYPE)=LOG10(EXP(1.0))/((-GRAD(TYPE))**(4.0))  
+                  SLEN(TYPE)=LOG10(EXP(1.0))/((-GRAD(TYPE))**(4.0))
                END IF
             ELSE
 
@@ -972,14 +972,14 @@
                FLAG=3
 
             END IF
-     
+
          ELSE
 
 *      Raise an error flag if all the pixels had the same value.
             FLAG=2
 
          END IF
- 
+
  200  CONTINUE
 
 *   Display the reason that the linear regression failed.
@@ -991,19 +991,19 @@
 *      Too few data points found for a result to be calculated.
          IF (FLAG.EQ.1) THEN
             CALL MSG_OUT(' ','Not enough data points '//
-     :                       'were selected.',STATUS) 
+     :                       'were selected.',STATUS)
          END IF
 
 *      Not possible to calculate a meaningful slope.
          IF (FLAG.EQ.2) THEN
             CALL MSG_OUT(' ','The points selected had a '//
-     :                       'single value.',STATUS) 
+     :                       'single value.',STATUS)
          END IF
 
 *      Negative or zero scale length.
          IF (FLAG.EQ.3) THEN
             CALL MSG_OUT(' ','The scale length calculated '//
-     :                       'was not physically sensible.',STATUS) 
+     :                       'was not physically sensible.',STATUS)
          END IF
 
          CALL MSG_BLANK(STATUS)
@@ -1011,5 +1011,5 @@
       END IF
 
  9999 CONTINUE
-     
-      END       
+
+      END

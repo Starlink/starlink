@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -155,7 +155,7 @@
       CALL MSG_SETR( 'X', REAL( XX( 8 ) - XX( 6 ) ) )
       CALL MSG_SETR( 'Y', REAL( YY( 7 ) - YY( 9 ) ) )
       CALL MSG_SETC( 'N', CNAME( 6 ) )
-      CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG5', 
+      CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG5',
      :                '    ^N   ^X x ^Y pixels', STATUS )
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
@@ -165,7 +165,7 @@
       CALL MSG_SETI( 'X3', NINT( XX( 3 ) + 0.5D0 ) )
       CALL MSG_SETI( 'Y3', NINT( YY( 3 ) + 0.5D0 ) )
       CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG6',
-     :               '    Image section      :   ( ^X1:^X3, ^Y1:^Y3 )', 
+     :               '    Image section      :   ( ^X1:^X3, ^Y1:^Y3 )',
      :                STATUS )
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
@@ -175,7 +175,7 @@
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_SETC( 'SCS', SCS )
-      CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG7', 
+      CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG7',
      :                '  Sky coordinates (^SCS):', STATUS )
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
@@ -186,12 +186,12 @@
             CALL MSG_SETC( 'A', ATEXT )
             CALL MSG_SETC( 'B', BTEXT )
             CALL MSG_SETC( 'N', CNAME( I ) )
-            CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG8', 
+            CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG8',
      :                      '    ^N   ^A,  ^B', STATUS )
          ELSE
 
             CALL MSG_SETC( 'N', CNAME( I ) )
-            CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG9', 
+            CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG9',
      :                      '    ^N   (undefined)', STATUS )
 
          END IF
@@ -211,11 +211,11 @@
          CALL MSG_SETR( 'X', REAL( ABS( DISTX ) *IRA__R2AM ) )
          CALL MSG_SETR( 'Y', REAL( ABS( DISTY ) *IRA__R2AM ) )
          CALL MSG_SETC( 'N', CNAME( 6 ) )
-         CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG10', 
+         CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG10',
      :                   '    ^N   ^X x ^Y arc-minutes', STATUS )
       ELSE
          CALL MSG_SETC( 'N', CNAME( 6 ) )
-         CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG11', 
+         CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG11',
      :                   '    ^N   (undefined)', STATUS )
       ENDIF
 

@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine searches the supplied Plot for ROI Frames (see
-*     ATL_AXTRM). For each ROI Frame found, it creates a new Plot 
-*     that covers just the region of graphics coords occupied by the 
+*     ATL_AXTRM). For each ROI Frame found, it creates a new Plot
+*     that covers just the region of graphics coords occupied by the
 *     ROI. These new Plots are returned in an AST KeyMap.
 
 *  Arguments:
@@ -23,7 +23,7 @@
 *        The supplied Plot to search for ROI Frames.
 *     RPLOTS = INTEGER (Returned)
 *        An AST KeyMap holding the Plots associated with the ROI Frames.
-*        The key used to identify each Plot within the KeyMap is the Domain 
+*        The key used to identify each Plot within the KeyMap is the Domain
 *        name of the corresponding ROI Frame.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,12 +82,12 @@
 *  Local Variables:
       CHARACTER*(AST__SZCHR) DOM          ! Domain attribute for a Frame
       CHARACTER*(AST__SZCHR) IDENT        ! Ident attribute for a Frame
-      DOUBLE PRECISION RLBND( ATL__MXDIM )! Region lower bounds   
-      DOUBLE PRECISION RUBND( ATL__MXDIM )! Region upper bounds   
+      DOUBLE PRECISION RLBND( ATL__MXDIM )! Region lower bounds
+      DOUBLE PRECISION RUBND( ATL__MXDIM )! Region upper bounds
       INTEGER FRM              ! Pointer to a Frame in Plot
       INTEGER I                ! General variable
       INTEGER IFRM             ! Index of Frame in Plot
-      INTEGER IPLOT2           ! Pointer to copy of supplied Plot 
+      INTEGER IPLOT2           ! Pointer to copy of supplied Plot
       INTEGER IPLOTR           ! Pointer to Plot for a Region of interest
       INTEGER JFRM             ! Index of Frame in Plot
       INTEGER NFRM             ! Number of Frames in Plot
@@ -104,7 +104,7 @@
       RPLOTS = AST_KEYMAP( ' ', STATUS )
 
 *  See if each ROI is to have a grid or not. We arrange that a grid is
-*  drawn only if one has been explicitly requested (ROI Regions can 
+*  drawn only if one has been explicitly requested (ROI Regions can
 *  produce anomolous bad coords arounds the edges, thus causing the
 *  default value for Grid to become non-zero).
       IF( AST_TEST( IPLOT, 'GRID', STATUS ) ) THEN
@@ -146,7 +146,7 @@
 
 *  Pass on unless this Frame is a Region with a Domain that begins with
 *  "ROI"
-         IF( AST_ISAREGION( FRM, STATUS ) )  THEN         
+         IF( AST_ISAREGION( FRM, STATUS ) )  THEN
             DOM = AST_GETC( FRM, 'Domain', STATUS )
             IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
                NREG = NREG + 1
@@ -158,7 +158,7 @@
                   IDENT = AST_GETC( IPLOT2, 'Ident', STATUS )
                   IF( IDENT .EQ. DOM ) THEN
 
-*  If this is the first ROI, fix the gaps between major ticks so that 
+*  If this is the first ROI, fix the gaps between major ticks so that
 *  all ROIs use the same value. If the user specified a gap, then it
 *  will already be set so do nothing. Otherwise, clear the attribute,
 *  then get the default value and set it as the current value.
@@ -178,7 +178,7 @@
                      END IF
 
 *  Create a new Plot that covers just the corresponding Region.
-                     CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
+                     CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND,
      :                                         STATUS )
                      CALL ATL_CUTPL( IPLOT2, IFRM, RLBND, RUBND,
      :                               IPLOTR, STATUS )
@@ -190,7 +190,7 @@
                      END IF
 
 *  Store the Plot in the returned KeyMap.
-                     CALL AST_MAPPUT0A( RPLOTS, IDENT, IPLOTR, ' ', 
+                     CALL AST_MAPPUT0A( RPLOTS, IDENT, IPLOTR, ' ',
      :                                  STATUS )
 
 *  Annul the Plot pointer.

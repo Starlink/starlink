@@ -1,6 +1,6 @@
       SUBROUTINE
      : CHP_ADDP( INPUT, PNAME, PFORMAT, PUNIT, PCOMMENT,
-     : PPREFDIS, PARDES, PARRSHP, PARRDIM, 
+     : PPREFDIS, PARDES, PARRSHP, PARRDIM,
      : CHARVAL, PTRVAL, STATUS)
 *+
 *  Name:
@@ -18,14 +18,14 @@
 *
 *  Description:
 *     Add a new parameter to a catalogue. A parameter consist of a name and
-*     some combination of the following:- format, unit, comment, preferred 
+*     some combination of the following:- format, unit, comment, preferred
 *     display flag, parameter designation, character value and pointer value.
 *     A parameters value is either a character string that can be interpreted
 *     using the format or a pointer to an array or structure.
 *
 *     PARDES is the parameter designation.
 *
-*     PARDES = 1 This is a scalar parameter. The parameter value is a 
+*     PARDES = 1 This is a scalar parameter. The parameter value is a
 *     character string CHP__SZCVAL long in CHARVAL. You must provide a valid
 *     PFORMAT to interpret the value. PTRVAL is ignored.
 *
@@ -35,12 +35,12 @@
 *     all ignored.
 *
 *     PARDES = 3 This is an array parameter. You must provide a pointer
-*     to the array and its associated information in PTRVAL. You must provide 
+*     to the array and its associated information in PTRVAL. You must provide
 *     a valid PFORMAT to display the elements of the array. CHARVAL is ignored.
 *
-*     PARDES = 4 This is a scalar parameter. The parameter value is a 
+*     PARDES = 4 This is a scalar parameter. The parameter value is a
 *     long length character string. You must provide a pointer
-*     to the parameter character string and its associated information in 
+*     to the parameter character string and its associated information in
 *     PTRVAL.
 *     You must provide a valid PFORMAT to display the string. CHARVAL is
 *     ignored.
@@ -73,10 +73,10 @@
 *        Global status.
 
 *  Notes:
-*     CHP_ADDP will not overwrite an existing parameter a parameter already 
+*     CHP_ADDP will not overwrite an existing parameter a parameter already
 *     exists error will be reported.
 *
-*     If the parameter can not be created an insufficient privilege to update 
+*     If the parameter can not be created an insufficient privilege to update
 *     error will be reported.
 *
 *     Always remember to release any allocated virtual memory.
@@ -99,7 +99,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -169,7 +169,7 @@
         PParrdim(cd,pd,7) = parrdim(7)
         PPcharval(cd,pd) = charval
         PPptrval(cd,pd) = ptrval
-      else 
+      else
         status = CHP__PAREXISTS
       endif
       END

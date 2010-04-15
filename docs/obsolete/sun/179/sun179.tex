@@ -45,7 +45,7 @@ CCL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 \markright{\stardocname}
 
 \newpage
-\section{Introduction} 
+\section{Introduction}
 
 IRAF is a powerful and comprehensive environment for reducing and
 analyzing optical astronomical data.  The system was developed by the
@@ -148,7 +148,7 @@ Volume 1A contains:
 Volume 2B, the ``cookbook'', contains documents
 describing various packages in IRAF. For example, the document on the
 CCD reduction package, {\tt CCDRED}, is included as is a document on
-the spectroscopy package {\tt ONEDSPEC}. 
+the spectroscopy package {\tt ONEDSPEC}.
 
 Starlink MUD/154, the STScI {\it STSDAS Users Guide}\/, contains a useful
 introduction to IRAF which is well worth reading. The rest of the
@@ -158,7 +158,7 @@ later in this document for more about this package and other packages
 that can be added to IRAF.
 
 \subsection*{WWW Documentation}
- 
+
 IRAF now maintain a World\,Wide\,Web (WWW) home page via which
 the user may obtain the latest copies of the IRAF FAQ, the IRAF newsletter,
 bug reports and other documentation. This may be accessed via URL
@@ -171,7 +171,7 @@ Format'' (although there is no ``New IRAF Format'' yet) and it consists of
 two files. One file contains header information such as image
 dimensions and any lines of FITS type information from the original
 observation, and has a {\tt .imh} suffix. The other file contains the
-actual data values and has a {\tt .pix} suffix. 
+actual data values and has a {\tt .pix} suffix.
 
 The header file contains the full pathname of the pixel file so the
 pixel file can be in a different directory or even on a separate
@@ -213,7 +213,7 @@ bye}'' unloads the most recently loaded package.
 There are documents available describing some of the individual
 packages in Volume 2A of the {\it IRAF User Handbook}\/ (MUD/105,
 the ``cookbook'' volume) while the STSDAS package is described
-in the {\it STSDAS User Guide}\/ (Starlink MUD/154). 
+in the {\it STSDAS User Guide}\/ (Starlink MUD/154).
 
 \section{Running IRAF for the First Time}
 
@@ -223,7 +223,7 @@ this and then move to that directory. You now need to type ``{\tt mkiraf}'' to
 set things up. This creates a file called {\tt login.cl} and a
 subdirectory to your IRAF directory called {\tt uparm}. The former is
 an initialization file for IRAF and the latter is a directory used for
-storing parameter information such as default values for commands. 
+storing parameter information such as default values for commands.
 
 You will need to edit {\tt login.cl} so that the variable {\tt home}
 contains your correct disk name for your IRAF home directory. You will
@@ -298,9 +298,9 @@ setting terminal type to vt100...
     what is new in the version of the system you are using.   The following
     commands or packages are currently defined:
 
-      apropos     images.     noao.       proto.      system.     
-      dataio.     language.   obsolete.   softools.   tables.     
-      dbms.       lists.      plot.       stsdas.     utilities.  
+      apropos     images.     noao.       proto.      system.
+      dataio.     language.   obsolete.   softools.   tables.
+      dbms.       lists.      plot.       stsdas.     utilities.
 cl> images
       blkavg        geomap        imdelete      imstack       median
       blkrep        geotran       imdivide      imstatistics  minmax
@@ -310,7 +310,7 @@ cl> images
       fit1d         imarith       imlintran     laplace       sections
       fmedian       imcombine     imrename      lineclean     shiftlines
       fmode         imcopy        imshift       listpixels    tv.
-      gauss         imdebug.      imslice       magnify       
+      gauss         imdebug.      imslice       magnify
 im> imstat r136
 #               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
                  r136    262144     1.659     1.698        0.       27.
@@ -326,7 +326,7 @@ im> lpar imarith
     (calctype = "")             Calculation data type
      (verbose = no)             Print operations?
        (noact = no)             Print operations without performing them?
-        (mode = "ql")           
+        (mode = "ql")
 im> imarith r136 - 1.659 new_image
 im> imstat new_image
 #               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
@@ -377,10 +377,10 @@ the directory in which you started.
 
 \section{The IRAF FAQ}
 
-The single simplest piece of advice for users of IRAF is that they 
+The single simplest piece of advice for users of IRAF is that they
 should obtain a copy of the excellent IRAF FAQ (Frequently Asked Questions)
 file without delay.  This document, available both from NOAO
-(where it is maintained) 
+(where it is maintained)
 and from the Starlink IRAF Support programmer, contains a wealth
 of information and usually provides a solution to user queries.
 It is a good idea to have a copy permanently available in the terminal room
@@ -400,7 +400,7 @@ task does not have an output parameter for storing the mean value of
 the image, but it is possible to write the output to a file using the
 UNIX-like redirection abilities of the {\tt cl} and then read in only the
 parts we are interested in. This is done in the script {\tt doit.cl}
-which is shown below. 
+which is shown below.
 
 The commands below are typed into a file called {\tt doit.cl}, but before we
 can run the script we must tell IRAF that it is a ``foreign task''. The
@@ -443,7 +443,7 @@ i= fscan (list,s1,x,y,z)
 # Use imarith to subtract y from the image.
 imarith ("star_cluster","-",y,"new_image")
 
-# Look at statistics of new image to see if it 
+# Look at statistics of new image to see if it
 # worked.
 imstat ("new_image")
 
@@ -490,7 +490,7 @@ is discarded, as are all of the variables read from the second line
 apart from the mean value which is stored in the real type variable
 {\tt y}. This
 is used in the {\tt imarith} task and subtracted from the input image to
-yield a new image. 
+yield a new image.
 
 Quoted parameters are passed to the tasks as they are; the brackets
 around some of the parameter lists indicate that the {\tt cl} language is
@@ -540,9 +540,9 @@ display tools for IRAF were quite good: there was an image display
 tool called {\tt imtool} and a graphics display window called
 {\tt gterm}. X window versions of these tools called {\tt ximtool} and
 {\tt xgterm} have been under development in NOAO for some time,
-and the final versions are expected in one of the next IRAF releases. 
-Alternatively, the {\it SAOimage}\/ program may be used to display 
-images from IRAF. Simply start up {\tt saoimage} on the same machine that 
+and the final versions are expected in one of the next IRAF releases.
+Alternatively, the {\it SAOimage}\/ program may be used to display
+images from IRAF. Simply start up {\tt saoimage} on the same machine that
 you are running IRAF on:  an appropriate command line would be:
 
 {\tt saoimage -quiet -imtool \&}
@@ -590,7 +590,7 @@ below.
 \begin{verbatim}
 ftp>cd iraf/v210/SOS4
 250 CWD command successful.
-ftp> ls -l   
+ftp> ls -l
 200 PORT command successful.
 150 ASCII data connection for /bin/ls (131.251.45.11,1901).
 total 5068
@@ -615,7 +615,7 @@ drwxr-xr-x  2 root         1024 Nov 21  1992 nb.sos4.spc
 226 ASCII Transfer complete.
 
 \end{verbatim}
-} 
+}
 
 The README file contains a brief guide to installing IRAF, while more
 complete instructions can be found in {\tt suniraf.ps.Z}, which is the
@@ -673,51 +673,51 @@ Finally, before you can put IRAF on your system, you must have around
 {\bf 83\,Mbytes} of disk space available to receive it.
 
 \section{IRAF Directory Structure}
- 
-Some users have experienced difficulties when changing from one site running 
+
+Some users have experienced difficulties when changing from one site running
 IRAF to another. There are a number of potential reasons for this, among which
 is differences in directory structure. Clearly, the flexibility with which
 IRAF can be installed (in particular for sites with several versions of the
 software installed) is very useful to system managers. However, if possible,
 care should be taken to minimise unnecessary differences between sites by
 sticking to the IRAF default choices.
- 
+
 The recommended structure is to have "some directory" (in the IRAF documentation
-examples {\tt /iraf}, but {\tt /iraf} can just as easily be a symbolic link to 
-any directory for the iraf files, so keep this consistent to avoid problems) 
+examples {\tt /iraf}, but {\tt /iraf} can just as easily be a symbolic link to
+any directory for the iraf files, so keep this consistent to avoid problems)
 for all of the IRAF directories.  These would be e.g.
- 
+
 {\footnotesize
 \begin{verbatim}
- 
+
 /iraf/iraf                   - the iraf source tree (i.e. the as.* files)
 /iraf/irafbin                - a directory for the bin directories
 /iraf/irafbin/bin.sparc      - core system SunOS sparc binaries (the ib.*)
 /iraf/irafbin/noao.bin.sparc - NOAO package sparc binaries
 /iraf/extern                 - a directory for external pkgs (e.g. TABLES)
- 
+
 \end{verbatim}
 }
- 
+
 Even on cross mounted disks an {\tt /iraf} symbolic link would still allow the
-path {\tt /iraf/iraf} to be valid on all machines even if the files were elsewhere.  
+path {\tt /iraf/iraf} to be valid on all machines even if the files were elsewhere.
 The {\tt irafbin} structure above means that the symbolic links used in the
 IRAF tree for the bin directories will be correct when the distribution
 files are unpacked.
- 
-Users needing to know what the path is they can find the 
+
+Users needing to know what the path is they can find the
 definition in the {\tt /usr/include/iraf.h} file for that system, since
-this should be on all systems running IRAF (because the install script 
+this should be on all systems running IRAF (because the install script
 should be run on all nodes) it works even if there's no IRAF login account
-on that machine.  
- 
- 
+on that machine.
+
+
 \section{Using IRAF on Alpha Hardware}
 
 Paul Collison, the Starlink system manager at Oxford, has spent some
-time working with and modifying the STScI port of IRAF for DEC Alpha 
+time working with and modifying the STScI port of IRAF for DEC Alpha
 machines. As a result of this he has prepared a document LSN/1.1 (OXF)
-describing much of what he (and some of his users) have done. This 
+describing much of what he (and some of his users) have done. This
 document will be of great use to system managers with Alpha systems.
 
 Further information of the use of IRAF at Oxford can be obtained from the
@@ -732,7 +732,7 @@ means. Starlink can produce a tape, the STScI
 can send you a tape if you pay some transport costs or
 there is a network archive from which you can obtain the files at any
 time of day or night. The Internet address of this site is
-``stsci.edu'', and the Internet number is {\tt 130.167.1.2}. 
+``stsci.edu'', and the Internet number is {\tt 130.167.1.2}.
 
 You can
 log on to the archive using ftp with the anonymous login procedure
@@ -765,20 +765,20 @@ address for any problems you may have with the software. They are
 usually pretty fast at responding, but do bear in mind the time
 difference between the UK and Baltimore or Tucson.
 
-Starlink also provides user support for IRAF. This currently 
-takes the form of one of the contract Application Programmers being 
+Starlink also provides user support for IRAF. This currently
+takes the form of one of the contract Application Programmers being
 available to answer IRAF queries as they arise. This
 programmer is also a good
-source of new copies of the IRAF FAQ -- probably the single most useful 
+source of new copies of the IRAF FAQ -- probably the single most useful
 IRAF document.
 
 \begin{verbatim}
-   iraf@noao.edu            Address for IRAF problems and queries 
-   iraf-request@noao.edu    Address for ordering IRAF 
-   hotseat@stsci.edu        Address for STSDAS problems 
-   rsdc@cfa.harvard.edu     Address for PROS queries  
-   ussc@star.rl.ac.uk       Starlink software librarian  
-   pmc@astro.ox.ac.uk       Paul Collison, author of LSN/1.1 (OXF) 
+   iraf@noao.edu            Address for IRAF problems and queries
+   iraf-request@noao.edu    Address for ordering IRAF
+   hotseat@stsci.edu        Address for STSDAS problems
+   rsdc@cfa.harvard.edu     Address for PROS queries
+   ussc@star.rl.ac.uk       Starlink software librarian
+   pmc@astro.ox.ac.uk       Paul Collison, author of LSN/1.1 (OXF)
    gjp@astro.cf.ac.uk       Starlink IRAF user support
 \end{verbatim}
 

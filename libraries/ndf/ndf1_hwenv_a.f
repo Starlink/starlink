@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,15 +96,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'MSG_PAR'          ! MSG_ public constants
       INCLUDE 'PAR_PAR'          ! PAR_ public constants
 
@@ -114,7 +114,7 @@
 *           Text length for the current history record.
 *        DCB_HUMOD( NDF__MXDCB ) = INTEGER (Read)
 *           History recording update mode.
-      
+
 *  Arguments Given:
       INTEGER IDCB
       CHARACTER * ( * ) APPN
@@ -236,7 +236,7 @@
 *  Expand the message text.
                         CALL MSG_LOAD( ' ', FMT, MSG, LMSG, STATUS )
                         IF ( STATUS .EQ. SAI__OK ) THEN
-       
+
 *  Convert any non-printing characters to blanks and re-evaluate the
 *  expanded text length.
                            CALL CHR_CLEAN( MSG( : LMSG ) )
@@ -318,8 +318,8 @@
 
 *  Return to process the next parameter.
             GO TO 1
-         END IF        
- 3       CONTINUE        
+         END IF
+ 3       CONTINUE
 
 *  Transfer any remaining text from BUF to the output buffer and
 *  perform a final flush.

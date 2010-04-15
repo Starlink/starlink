@@ -13,19 +13,19 @@
 
 *  Invocation:
 *     CALL SLINC0( PNLOG, PNLAT, PNARC, MODE, IRA, SCS, LBND, UBND,
-*                  MXNSCT, NMERD, MLON, MLAT, MARCLN, STATUS ) 
+*                  MXNSCT, NMERD, MLON, MLAT, MARCLN, STATUS )
 
 *  Description:
 *     This subroutine is used to draw sections of meridians
-*     interactively. The user will be continuously prompted for the 
-*     new values to specify next meridian section until a null '!' 
+*     interactively. The user will be continuously prompted for the
+*     new values to specify next meridian section until a null '!'
 *     response is given by the user or in cursor mode, a position
 *     outside the image is specified by the cursor. A meridian section
 *     is specified by the sky coordinate of its begin position and its
 *     length.  When the length supplied by the user is a zero, the
 *     subroutine will draw a longest meridian section over the image
 *     passing the given begin position. The spcifications of the ploted
-*     sections are appended to the ones on entry and returned.  
+*     sections are appended to the ones on entry and returned.
 
 *  Arguments:
 *     PNLON = CHARACTER (Given)
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
-                                               
+
 *  Arguments Given:
       CHARACTER*( * ) PNLON
       CHARACTER*( * ) PNLAT
@@ -127,7 +127,7 @@
          GO TO 999
       END IF
 
-      
+
 *  Enter a do loop until a null response is obtained or the position
 *  specified by the cursor outside the zone, or the number of meridian
 *  sections has been drawn exceed the uplimit.
@@ -137,7 +137,7 @@
 
 *  If working in keyboard mode, getting the begin position of the
 *  meridian sections from the keyboard.
-         IF ( MODE( : 8 ) .EQ. 'KEYBOARD' ) THEN      
+         IF ( MODE( : 8 ) .EQ. 'KEYBOARD' ) THEN
             CALL IRA_GETCO( PNLON, PNLAT,
      :                      ' at the start of the meridian arc',
      :                      SCS, .FALSE., LON, LAT, STATUS )
@@ -148,7 +148,7 @@
                EXIT = .TRUE.
                CALL ERR_ANNUL( STATUS )
             END IF
-      
+
 *  Otherwise get the begin position from the cursor.
          ELSE
 
@@ -164,9 +164,9 @@
 
 *  If the cursor position is outside the image, set the exit flag.
             IF ( OUT ) EXIT = .TRUE.
-      
+
          END IF
-      
+
 *  IF not exit and no other error, draw the section. And record the
 *  specification.
          IF ( .NOT.EXIT .AND. STATUS .EQ. SAI__OK ) THEN
@@ -188,7 +188,7 @@
 
 *  Draw the curve.
                CALL IRA_DRMER( IRA, LON, LAT, SCT, SCS, LBND, UBND,
-     :                         STATUS ) 
+     :                         STATUS )
             END IF
 
 *  If a section is drawn successfully, flush out the drawing and
@@ -213,5 +213,5 @@
       END DO
 
  999  CONTINUE
-      
+
       END

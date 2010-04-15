@@ -2,21 +2,21 @@
 *+
 *  Name:
 *     SUBPAR_HDSIN
- 
+
 *  Purpose:
 *     Get input from a user and return a locator to it.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_HDSIN ( NAMECODE, ACCESS, LOC, STATUS )
- 
+
 *  Description:
 *     The user is prompted for input, and a character-string reply is
 *     received. This is used to determine the value of the parameter
 *     and a locator to the parameter is returned
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        pointer to a parameter
@@ -25,7 +25,7 @@
 *     LOC=CHARACTER*(DAT__SZLOC) (returned)
 *        locator to the stored data
 *     STATUS=INTEGER
- 
+
 *  Algorithm:
 *     Pre-parse to replace directory specs in [] to ones in <>
 *     A preliminary parse of the string is used to determine whether
@@ -33,7 +33,7 @@
 *     it is interpreted as an array. The string is then parsed using
 *     the LEX parser, an action code is returned for each item and
 *     used to determine how the parameter value should be intepreted.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1986, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 1999, 2000 Central Laboratory of the Research Councils.
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     JAB: J A Bailey (AAO)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     26-SEP-1984 (BDK):
 *        Original
@@ -146,11 +146,11 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -158,28 +158,28 @@
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'LEX_ERR'
       INCLUDE 'LEX_PAR'
- 
+
 *  Arguments Given:
       INTEGER NAMECODE          ! pointer to a parameter
       CHARACTER*(*) ACCESS      ! access required to the HDS structure
- 
+
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC) LOC  ! locator to the stored data
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *    External routines :
       INTEGER CHR_LEN
- 
+
 *  Local Constants:
       INTEGER MCLENGTH           ! maximum length of string
       PARAMETER (MCLENGTH=444)
       CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
- 
+
 *  External Functions:
       CHARACTER*(DAT__SZGRP) SUBPAR_PARGP           ! HDS group name
       EXTERNAL SUBPAR_PARGP
@@ -204,35 +204,35 @@
 *  Local Data:
       DATA POSTYPES /'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
      :   '_LOGICAL' /
- 
+
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set an error context
       CALL EMS_MARK
- 
+
 *  Get input from user
       CALL SUBPAR_INPUT( NAMECODE, VALUE, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  Add  space and CR at end of string for LEX
 *  space to terminate tokens correctly and CR to terminate line
          ENDLINE = CHR_LEN( VALUE ) + 2
- 
+
          IF ( ENDLINE .GT. 2 ) THEN
- 
+
 *        Add space CR at end of line
             COMMAND = VALUE(1:ENDLINE-2)//' '//CHAR(13)
- 
+
 *  Find out if there is more than one item in the list
 *  by means of a preliminary parse of the string
- 
+
             NPARS = 0
             LEVEL = 0
-            CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION, 
+            CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION,
      :                       STRING, SLEN, STATUS )
- 
+
 *      If the first item is a quoted string or [, the value cannot be an
 *      unquoted multi-word value, even for a parameter of type CHAR, therefore
 *      set SINGLE false; otherwise it is set true.
@@ -242,14 +242,14 @@
             ELSE
                SINGLE = .FALSE.
             END IF
- 
+
 *      Get the declared type of the parameter
             TYPE = MOD( PARTYPE(NAMECODE), 10 )
- 
+
 *      For types other than CHAR (and for CHAR if the first item of the value
 *      was a quoted string or [)
             IF ( ( TYPE .NE. SUBPAR__CHAR ) .OR. .NOT. SINGLE ) THEN
- 
+
 *        check if there is more than one item - an item possibly having the
 *        form of a bracketed array.
 *        Only count until more than one
@@ -264,44 +264,44 @@
      :            .OR. ( ACTION .EQ. LEX__KAMBIG )
      :            .OR. ( ACTION .EQ. LEX__DOUBLE ) ) THEN
                      IF ( LEVEL .EQ. 0 ) NPARS = NPARS + 1
- 
+
 *           If '[' maintain the level count
                   ELSE IF ( ACTION .EQ. LEX__STARR ) THEN
                      LEVEL = LEVEL + 1
 *              and count open brackets at the top level
                      IF ( LEVEL .EQ. 1 ) NPARS = NPARS + 1
- 
+
 *           If ']' maintain the level count
                   ELSE IF ( ACTION .EQ. LEX__ENDARR ) THEN
                      LEVEL = LEVEL - 1
                   END IF
- 
+
 *           Get next item
-                  CALL LEX_CMDLINE( .FALSE., COMMAND(1:ENDLINE), ACTION, 
+                  CALL LEX_CMDLINE( .FALSE., COMMAND(1:ENDLINE), ACTION,
      :                             STRING, SLEN, STATUS )
                END DO
             END IF
- 
+
 *  Reset status in case it changed
- 
+
             CALL EMS_ANNUL( STATUS )
- 
+
 *  If more than one item add the outer brackets to intepret as an array
- 
+
             IF ( NPARS .GT. 1 ) THEN
                COMMAND = '['//VALUE(1:ENDLINE-2)//']'//CHAR(13)
                ENDLINE = ENDLINE + 1
             END IF
- 
- 
+
+
 *  initiate parse
- 
+
             CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION,
      :                       STRING, SLEN, STATUS )
- 
+
 *        If OK, process the string obtained
             IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *   By this time, unbracketed arrays have been bracketed so, unless it
 *   is the start of an array or a quoted string or a forced name, the whole
 *   line may be treated as one string
@@ -313,11 +313,11 @@
                   SLEN = ENDLINE - 2
 *           The action can remain unchanged
                END IF
- 
+
 *   First deal with the ambiguous action codes
                IF ( ( ACTION .EQ. LEX__AMBIG )
      :         .OR. ( ACTION .EQ. LEX__KAMBIG ) ) THEN
- 
+
 *              String or Name or Logical Constant or MIN/MAX
 *              Get an upper case copy of the string for testing against MIN/MAX
                   USTRING = STRING(1:SLEN)
@@ -335,7 +335,7 @@
 *                 and check if done
                      IF ( STATUS .EQ. SAI__OK ) THEN
 *                    if so, obtain the locator.
-                        CALL DAT_CLONE( PARLOC(2,NAMECODE), LOC, 
+                        CALL DAT_CLONE( PARLOC(2,NAMECODE), LOC,
      :                               STATUS )
                         CALL HDS_LINK( LOC, SUBPAR_PARGP(NAMECODE),
      :                              STATUS )
@@ -365,13 +365,13 @@
                         ELSE
                            STRING = 'F'
                         END IF
- 
+
                      ELSE
 *                    Not valid logical constant
 *                    Interpret as a name
                         ACTION = LEX__NAME
                      END IF
- 
+
 *              Otherwise, if type is CHAR, assume we have a string
                   ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
                      ACTION = LEX__STRING
@@ -381,14 +381,14 @@
                   ELSE
                      ACTION = LEX__NAME
                   END IF
- 
+
                END IF
- 
- 
+
+
                IF ( ACTION .EQ. LEX__NAME ) THEN
 
 *           Name (e.g. HDS or device name)
-                  CALL SUBPAR_GETHDS( NAMECODE, STRING(1:SLEN), ACCESS, 
+                  CALL SUBPAR_GETHDS( NAMECODE, STRING(1:SLEN), ACCESS,
      :                               LOC, STATUS )
 
                ELSE IF ( ( ACTION .EQ. LEX__STRING )
@@ -402,40 +402,40 @@
 *           will do any necessary conversion
                      CALL SUBPAR_STORE0( NAMECODE, ACTION, STRING, SLEN,
      :                                   LOC, STATUS )
- 
+
                ELSE IF ( ACTION .EQ. LEX__STARR ) THEN
 *   Array
-                  CALL SUBPAR_ARRAY( NAMECODE, COMMAND(1:ENDLINE), LOC, 
+                  CALL SUBPAR_ARRAY( NAMECODE, COMMAND(1:ENDLINE), LOC,
      :                              STATUS )
- 
+
 *   At this stage, any ACTION other than 0 is an error
 *   ACTION 0 may have been set by MIN/MAX recognised earlier
                ELSE IF ( ACTION .NE. 0 ) THEN
 
                   STATUS = SUBPAR__CMDSYER
                   CALL EMS_SETC( 'STRING', STRING(1:SLEN) )
-                  CALL EMS_REP( 'SUP_HDSIN3', 
+                  CALL EMS_REP( 'SUP_HDSIN3',
      :                   'SUBPAR: Input line syntax error /^STRING/'
      :                   , STATUS )
- 
+
                END IF
- 
- 
+
+
 *   Change to a SUBPAR error code
                IF ( STATUS .EQ. LEX__INVCHAR ) THEN
                   STATUS = SUBPAR__CMDSYER
-                  CALL EMS_REP( 'SUP_HDSIN4', 
+                  CALL EMS_REP( 'SUP_HDSIN4',
      :           'SUBPAR: Syntax error in parsing given parameter '//
      :           'value', STATUS )
                END IF
- 
+
             END IF
 
          END IF
- 
+
       END IF
- 
+
 *   Release the error context
       CALL EMS_RLSE
- 
+
       END

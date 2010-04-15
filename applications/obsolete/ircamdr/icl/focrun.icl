@@ -69,7 +69,7 @@ proc focrun ost oen oda
       send plt2d set cursor_image (st2mda)
       send plt2d set name_image (st2mda)
       print "NSIGMA plot of " (st2mda) " on " (worknam)
-      obeyw plt2d nsigma (st2mda) 
+      obeyw plt2d nsigma (st2mda)
       if iflag = 0
         iflag = 1
         send plt2d set cursor_cross 'YES'

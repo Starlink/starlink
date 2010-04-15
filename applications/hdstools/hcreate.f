@@ -26,15 +26,15 @@
 
 * Description:
 *    Creates an HDS data object of specified type and dimensions.  It
-*    will either create a completely new container file or a new object 
+*    will either create a completely new container file or a new object
 *    within an existing structure. An existing container file will be
 *    overwritten but an existing component within a file will not.
 *
 *    By default the object created will be a scalar (dimension 0). If
 *    you want to create an object of different shape then either
 *    supply the dimensions on the command line or force prompting with
-*    the PROMPT keyword. 
-* 
+*    the PROMPT keyword.
+*
 *    Primitives are not given values and this action must be
 *    performed subsequently by HMODIFY, HFILL or HCOPY.
 
@@ -44,10 +44,10 @@
 *    whereas the latter contain collections of other objects, structured
 *    or primitive.
 *    The valid primitive types recognised by HDS are:
-* 
+*
 *    !bt3
 *    Type         !- Equiv Fortran     !- Range !n
-*    !n 
+*    !n
 *    _LOGICAL     !- LOGICAL*4         !- .TRUE., .FALSE. !n
 *    _UBYTE       !- not supported     !- 0..255 !n
 *    _BYTE        !- BYTE              !- -128..127 !n
@@ -61,7 +61,7 @@
 *
 *    Any type not in the above list will be assumed to be a structured
 *    type.
- 
+
 * Examples:
 *    % hcreate file1 _integer '[10,25]'
 *       Creates an HDS container file, file1, containing a 10x25 _INTEGER

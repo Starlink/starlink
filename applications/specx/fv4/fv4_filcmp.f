@@ -36,7 +36,7 @@
 *     09 Dec 1993 (hme):
 *        Fix bug whereby scans were not reported to list file if they
 *        stayed in place.
-*     10 May 1995 (rpt): 
+*     10 May 1995 (rpt):
 *        Added support for ISEQ and FILHD
 *     {enter_further_changes_here}
 
@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       IF ( IFAIL .NE. 0 ) GO TO 500
 
 *  Get information from file header.
-      CALL FV4_FILINF( IFILE, IFAIL ) 
+      CALL FV4_FILINF( IFILE, IFAIL )
       IF ( IFAIL .NE. 0 ) THEN
          IFAIL = 38
          GO TO 500
@@ -108,16 +108,16 @@
       RPOS(4)  =  99999.0
 
       IF ( NSCAN .GT. MXSCAN ) THEN
-         CALL GEN_GETI4A( '(Listing) Scan range (low,high)? (All)', 
+         CALL GEN_GETI4A( '(Listing) Scan range (low,high)? (All)',
      :                    RSCAN, 2, ' ', RSCAN, JDEF)
          IF ( RSCAN(1) .GT. RSCAN(2) ) THEN
             IDUM = RSCAN(1)
             RSCAN(1) = RSCAN(2)
             RSCAN(2) = IDUM
          ENDIF
-      
+
          CALL GEN_GETR4A(
-     :         '(Listing) Offset limits (xlo, xhi, ylo, yhi)? (None)', 
+     :         '(Listing) Offset limits (xlo, xhi, ylo, yhi)? (None)',
      :                    RPOS, 4, ' ', RPOS, JDEF)
          IF ( RPOS(1) .GT. RPOS(2) ) THEN
             RDUM = RPOS(1)
@@ -208,7 +208,7 @@
 
 *           Report to list file.
                IF (ISCAN .GE. RSCAN(1) .AND. ISCAN .LE. RSCAN(2)) THEN
-                  CALL FV4_SPECIX( TLOC(2), JSCAN, RPOS, 1, ILOUT, 
+                  CALL FV4_SPECIX( TLOC(2), JSCAN, RPOS, 1, ILOUT,
      :                 IFAIL, STATUS )
                ENDIF
                CALL DAT_ANNUL(  TLOC(2), STATUS )
@@ -227,7 +227,7 @@
                CALL DAT_FIND(   ICLOC,   'MORE',  TLOC(1), STATUS )
                CALL DAT_FIND(   TLOC(1), 'SPECX', TLOC(2), STATUS )
                IF (ISCAN .GE. RSCAN(1) .AND. ISCAN .LE. RSCAN(2)) THEN
-                  CALL FV4_SPECIX( TLOC(2), JSCAN, RPOS, 1, ILOUT, 
+                  CALL FV4_SPECIX( TLOC(2), JSCAN, RPOS, 1, ILOUT,
      :                 IFAIL, STATUS )
                ENDIF
                CALL DAT_ANNUL(  TLOC(2), STATUS )

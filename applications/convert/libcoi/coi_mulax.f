@@ -107,7 +107,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -182,7 +182,7 @@
       CHARACTER * ( VAL__SZD ) WORDS( MAXWRD ) ! spec1 sub parameters
       CHARACTER * ( 70 ) UNITS   ! Axis units
       DOUBLE PRECISION Z         ! Redshift
- 
+
 *.
 
 *  Check the inherited global status.
@@ -279,7 +279,7 @@
       IF ( DTYPE .EQ. 0 .OR. DTYPE .EQ. 1 ) THEN
 
 *  It's linear.  The fourth and fifth words given the start wavelength
-*  and offset.  
+*  and offset.
          CALL CHR_CTOD( WORDS( 4 ), OFFSET, STATUS )
          CALL CHR_CTOD( WORDS( 5 ), DELT, STATUS )
 
@@ -293,12 +293,12 @@
 
 *  Test status before accessing the pointer.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL KPG1_SSAZD( EL, DELT, OFFSET, 
+            CALL KPG1_SSAZD( EL, DELT, OFFSET,
      :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *  Exponentiate a log-linear axis.
             IF ( DTYPE .EQ. 1 )
-     :        CALL COI_ALOGR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :        CALL COI_ALOGR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                        STATUS )
 
 *  Unmap the axis array.
@@ -332,7 +332,7 @@
 *  Extract the array values and place them in the axis centres for the
 *  first axis.
             CALL COI_FILAX( MIN( EL, NVALUE ), VALUE( CPOS:BUFLEN-8 ),
-     :                      Z, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                      Z, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                      STATUS )
 
 *  Unmap the axis array.
@@ -392,14 +392,14 @@
 *  Evaluate the Chebyshev-polynomial at each axis centre.
                IF ( FTYPE .EQ. 1 ) THEN
                   CALL COI_CHEVD( ORDER, DCOEF, DPMIN, DPMAX, Z, EL,
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
 
                ELSE IF ( FTYPE .EQ. 2 ) THEN
 
 *  Evaluate the Legendre polynomial at each axis centre.
                   CALL COI_LEGED( ORDER, DCOEF, DPMIN, DPMAX, Z, EL,
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
                END IF
 
@@ -432,14 +432,14 @@
 *  Evaluate the Chebyshev-polynomial at each axis centre.
                IF ( FTYPE .EQ. 1 ) THEN
                   CALL COI_CHEVR( ORDER, COEF, PMIN, PMAX, REAL( Z ),
-     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
 
                ELSE IF ( FTYPE .EQ. 2 ) THEN
 
 *  Evaluate the Legendre polynomial at each axis centre.
                   CALL COI_LEGER( ORDER, COEF, PMIN, PMAX, REAL( Z ),
-     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
                END IF
 
@@ -509,14 +509,14 @@
 *  Evaluate the cubic spline at each axis centre.
                IF ( FTYPE .EQ. 3 ) THEN
                   CALL COI_SP3ED( NPIECE, DCOEF, DPMIN, DPMAX, Z, EL,
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
 
                ELSE IF ( FTYPE .EQ. 4 ) THEN
 
 *  Evaluate the linear spline at each axis centre.
                   CALL COI_SP1ED( NPIECE, DCOEF, DPMIN, DPMAX, Z, EL,
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
                END IF
 
@@ -549,14 +549,14 @@
 *  Evaluate the cubic spline at each axis centre.
                IF ( FTYPE .EQ. 3 ) THEN
                   CALL COI_SP3ER( NPIECE, COEF, PMIN, PMAX, REAL( Z ),
-     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
 
                ELSE IF ( FTYPE .EQ. 4 ) THEN
 
 *  Evaluate the linear spline at each axis centre.
                   CALL COI_SP1ER( NPIECE, COEF, PMIN, PMAX, REAL( Z ),
-     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                            STATUS )
                END IF
 

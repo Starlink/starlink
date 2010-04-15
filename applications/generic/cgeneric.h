@@ -94,7 +94,7 @@
 *             #include "mygenerics.cgen"
 *             #undef CGEN_CODE_TYPE
 *
-*          Which generates code for double and int routines when 
+*          Which generates code for double and int routines when
 *          the C file is compiled.
 *
 *        - Use the generic routines. The function names will

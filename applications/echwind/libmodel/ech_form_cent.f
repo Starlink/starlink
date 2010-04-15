@@ -220,5 +220,5 @@
 *   Calculate the slit rotation angle.
 *
       call ech_slitangle(gamma4, slit_angle, status)
- 
+
       end

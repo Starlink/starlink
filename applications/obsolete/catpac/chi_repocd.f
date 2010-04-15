@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_REPOCD( INPUT, CNAME, CFORMAT,  
+     : CHI_REPOCD( INPUT, CNAME, CFORMAT,
      : CUNIT, CCOMMENT, STATUS)
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHI_REPOCD( INPUT, CNAME, CFORMAT, 
+*     CALL CHI_REPOCD( INPUT, CNAME, CFORMAT,
 *     CUNIT, CCOMMENT, STATUS )
 *
 *  Description:
@@ -50,7 +50,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
       if (dbname .eq. 'HDS') then
         call chi_xrepocd(input, cname, cformat, cunit,
      :  ccomment, status)

@@ -1,5 +1,5 @@
-      SUBROUTINE SURFLIB_CALC_CHOPPED_IMAGE( NBEAMS, CHOP_THR, CHOP_PA, 
-     :     DIM1, DIM2, IN_DATA, OUT_DATA, USEVAR, IN_VAR, OUT_VAR, 
+      SUBROUTINE SURFLIB_CALC_CHOPPED_IMAGE( NBEAMS, CHOP_THR, CHOP_PA,
+     :     DIM1, DIM2, IN_DATA, OUT_DATA, USEVAR, IN_VAR, OUT_VAR,
      :     STATUS)
 *+
 *  Name:
@@ -10,10 +10,10 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
-*     CALL SURFLIB_CALC_CHOPPED_IMAGE( NBEAMS, CHOP_THR, CHOP_PA, 
-*    :     DIM1, DIM2, IN_DATA, OUT_DATA, USEVAR, IN_VAR, OUT_VAR, 
+*     CALL SURFLIB_CALC_CHOPPED_IMAGE( NBEAMS, CHOP_THR, CHOP_PA,
+*    :     DIM1, DIM2, IN_DATA, OUT_DATA, USEVAR, IN_VAR, OUT_VAR,
 *    :     STATUS)
 
 *  Description:
@@ -22,7 +22,7 @@
 *     calculates a middle-beam dual-beam map by
 *     calculating the difference between the left and right
 *     beams for each pixel in the map.
-*     
+*
 *     When NBEAMS=3 a triple beam map is constructed where the central
 *     beam is the difference between the central beam and the average of
 *     the positions a chop distance away on either side.
@@ -87,14 +87,14 @@
 
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
- 
+
 *  Arguments Given:
       REAL    CHOP_THR
       REAL    CHOP_PA
@@ -115,7 +115,7 @@
 *  Local Constants:
       REAL    PI
       PARAMETER (PI = 3.14159265359)
- 
+
 *  Local variables:
       REAL    CFRAC             ! fractional chop distance from middle to left
       INTEGER DX                ! X Chop offset
@@ -178,14 +178,14 @@
             RX = X + DX
             RY = Y - DY
 
-*     Calculate the flux at each beam remembering that 
+*     Calculate the flux at each beam remembering that
 *     bad pixels and pixels outside the bounds have flux 0
 *     and variance zero
 
 *     Left flux
             IF (LX .LT. 1 .OR. LX .GT. DIM1 .OR.
      :           LY .LT. 1 .OR. LY .GT. DIM2 ) THEN
-               L_FLUX = 0.0 
+               L_FLUX = 0.0
                L_VAR  = 0.0
             ELSE
                L_FLUX = IN_DATA(LX,LY)
@@ -201,7 +201,7 @@
 
             IF (RX .LT. 1 .OR. RX .GT. DIM1 .OR.
      :           RY .LT. 1 .OR. RY .GT. DIM2 ) THEN
-               R_FLUX = 0.0 
+               R_FLUX = 0.0
                R_VAR  = 0.0
             ELSE
                R_FLUX = IN_DATA(RX,RY)
@@ -217,7 +217,7 @@
 *     The middle beam flux is then simply the difference between
 *     the left and the right
             IF (NBEAMS .EQ. 2) THEN
-               
+
                OUT_DATA(X,Y) = L_FLUX - R_FLUX
                IF (USEVAR) OUT_VAR(X,Y)  = L_VAR + R_VAR
 
@@ -231,7 +231,7 @@
                ELSE
                   OUT_DATA(X,Y) = IN_DATA(X,Y) - ((L_FLUX + R_FLUX)/2.0)
                END IF
-               
+
                IF (USEVAR) THEN
                   IF (IN_VAR(X,Y) .EQ. VAL__BADR) THEN
                      OUT_VAR(X,Y) = VAL__BADR

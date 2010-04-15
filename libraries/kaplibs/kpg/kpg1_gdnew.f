@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_GDNEW( COMMNT, MARGIN, NP, PNAME, PSIDE,
-     :                       PSIZE, SASPEC, BOX, IPICD, IPICF, IPIC, 
+     :                       PSIZE, SASPEC, BOX, IPICD, IPICF, IPIC,
      :                       STATUS )
 *+
 *  Name:
@@ -12,32 +12,32 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GDNEW( COMMNT, MARGIN, NP, PNAME, PSIDE, PSIZE, 
+*     CALL KPG1_GDNEW( COMMNT, MARGIN, NP, PNAME, PSIDE, PSIZE,
 *                      SASPEC, BOX, IPICD, IPICF, IPIC, STATUS )
 
 *  Description:
 *     This routine returns identifiers for a new DATA picture together
-*     with various ancillary pictures in the graphics database. On exit, 
-*     the new DATA picture is the current AGI picture, and the PGPLOT 
+*     with various ancillary pictures in the graphics database. On exit,
+*     the new DATA picture is the current AGI picture, and the PGPLOT
 *     viewport matches the DATA picture.
 *
 *     A FRAME picture is only created if it would contain something other
 *     than the DATA picture (this is assumed to be the case if any
 *     ancillary pictures are requested, or if non-zero margins are requested
-*     around the DATA picture). If created, the FRAME picture has the 
-*     maximum possible size. The DATA picture is then created with a size 
-*     which allows all the requested ancillary pictures to be created within 
+*     around the DATA picture). If created, the FRAME picture has the
+*     maximum possible size. The DATA picture is then created with a size
+*     which allows all the requested ancillary pictures to be created within
 *     the FRAME picture.
 *
 *     Various environment parameters may be used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between application. 
+*     order to ensure conformity between application.
 
 *  Environment Parameters:
 *     FILL = _LOGICAL (Read)
-*        TRUE if the supplied aspect ratio (SASPEC) is to be ignored, 
-*        creating the largest possible DATA picture within the current 
-*        picture.  When FILL is FALSE, the DATA picture is created with 
+*        TRUE if the supplied aspect ratio (SASPEC) is to be ignored,
+*        creating the largest possible DATA picture within the current
+*        picture.  When FILL is FALSE, the DATA picture is created with
 *        the supplied aspect ratio. Not accessed if argument SASPEC is
 *        supplied equal to zero (i.e. (SASPEC .EQ. 0.0) implies FILL=YES)
 
@@ -52,27 +52,27 @@
 *        These should be supplied in the order bottom, right, top, left.
 *     NP = INTEGER (Given)
 *        The number of extra pictures to be included in the FRAME pictures
-*        (the DATA picture itself is not included in this list). Margins are 
-*        left round the DATA picture with widths given by MARGIN. Any extra 
-*        pictures are placed outside these margins, in positions described by 
-*        PSIDE and PSIZE. 
+*        (the DATA picture itself is not included in this list). Margins are
+*        left round the DATA picture with widths given by MARGIN. Any extra
+*        pictures are placed outside these margins, in positions described by
+*        PSIDE and PSIZE.
 *     PNAME( NP ) = CHARACTER * ( * ) (Given)
 *        The names to store in the AGI database with the NP extra pictures.
 *     PSIDE( NP ) = CHARACTER * 1 (Given)
 *        Each element of this array should be one of L, R, T or B. It
 *        indicates which side of the FRAME picture an extra picture is to be
 *        placed. For Left and Right, the extra picture occupies the full
-*        height of the DATA picture, margins, and any previously created 
-*        extra pictures. The picture is placed at the far Left or Right of 
-*        all previously created pictures. For Top or Bottom, the extra picture 
-*        occupies the full width of the DATA picture, margins, and any 
+*        height of the DATA picture, margins, and any previously created
+*        extra pictures. The picture is placed at the far Left or Right of
+*        all previously created pictures. For Top or Bottom, the extra picture
+*        occupies the full width of the DATA picture, margins, and any
 *        previously created extra pictures. The picture is placed at the top or
 *        bottom of all previously created pictures. Ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
-*        The size of each extra picture. For Left and Right pictures, this 
+*        The size of each extra picture. For Left and Right pictures, this
 *        is the width of the picture, and the value is given as a fraction
-*        of the width of the current picture. For Top and Bottom pictures, 
-*        it is the height of the picture, and it is given as a fraction of 
+*        of the width of the current picture. For Top and Bottom pictures,
+*        it is the height of the picture, and it is given as a fraction of
 *        the height of the current picture. Ignored if NP is zero.
 *     SASPEC = REAL (Given)
 *        The aspect ratio with which a new DATA picture should be created.
@@ -82,28 +82,28 @@
 *        the largest picture. The actual value used will depend on the
 *        value supplied for the FILL parameter (see above).
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
-*        The world coordinate bounds to give to the DATA picture if a new 
+*        The world coordinate bounds to give to the DATA picture if a new
 *        DATA picture is created. These should normally be pixel
-*        coordinates. The (x,y) coordinates of the bottom left corner should 
-*        be given in elements 1 and 2, and the (x,y) coordinates of the top 
-*        right corner should be given in elements 3 and 4. If the box has 
-*        zero area, then world coordinates are set to centimetres from the 
+*        coordinates. The (x,y) coordinates of the bottom left corner should
+*        be given in elements 1 and 2, and the (x,y) coordinates of the top
+*        right corner should be given in elements 3 and 4. If the box has
+*        zero area, then world coordinates are set to centimetres from the
 *        bottom left corner of the DATA picture.
 *     IPICD = INTEGER (Returned)
 *        An AGI identifier for the DATA picture.
 *     IPICF = INTEGER (Returned)
 *        An AGI identifier for the FRAME picture. The world co-ordinate
-*        system is inherited from the current picture on entry. If no 
-*        FRAME picture was created, then an AGI identifier for the current 
+*        system is inherited from the current picture on entry. If no
+*        FRAME picture was created, then an AGI identifier for the current
 *        picture is returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
 *        requested in ZSIDE and PSIZE. The world coordinate system for each
-*        picture is inherited from the FRAME picture. The actual size of a 
-*        picture may be less than the requested size if there is insufficient 
+*        picture is inherited from the FRAME picture. The actual size of a
+*        picture may be less than the requested size if there is insufficient
 *        room left in the FRAME picture to give it its requested size.
-*        Identifiers for pictures which would have zero size (i.e. fall 
-*        completely outside the FRAME picture) are returned equal to -1, 
+*        Identifiers for pictures which would have zero size (i.e. fall
+*        completely outside the FRAME picture) are returned equal to -1,
 *        but no error is reported.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -121,12 +121,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -145,7 +145,7 @@
 *     10-AUG-2000 (DSB):
 *        Modified to allow negative margins.
 *     23-AUG-2006 (DSB):
-*        When checking foir zero-sized boxes, include effects of truncation 
+*        When checking foir zero-sized boxes, include effects of truncation
 *        from double to single precision.
 *     {enter_changes_here}
 
@@ -153,7 +153,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -232,7 +232,7 @@
          IPIC( I ) = -1
       END DO
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Ensure the current PGPLOT viewport matches the current AGI picture.
@@ -251,7 +251,7 @@
 *  has set the FILL parameter TRUE, then use the aspect ratio which gives
 *  the largest DATA picture. Otherwise, use the supplied aspect ratio.
       IF( SASPEC .NE. 0.0 ) THEN
- 
+
          CALL PAR_GET0L( 'FILL', FILL, STATUS )
          IF( FILL ) THEN
             ASPECT = 0.0
@@ -267,8 +267,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the bounds of the area available for the DATA picture after
-*  taking account of the extra pictures and margins. To begin with, we 
-*  have the whole of the current picture available. FXL, etc, record 
+*  taking account of the extra pictures and margins. To begin with, we
+*  have the whole of the current picture available. FXL, etc, record
 *  the bounds of the area still available.
       FXL = CXL
       FYB = CYB
@@ -285,7 +285,7 @@
             FXR = MAX( FXL, FXR - ABS( PSIZE( I )*CXI ) )
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
             FYT = MAX( FYB, FYT - ABS( PSIZE( I )*CYI ) )
-         ELSE 
+         ELSE
             FYB = MIN( FYT, FYB + ABS( PSIZE( I )*CYI ) )
          END IF
 
@@ -344,7 +344,7 @@
 *  If the DATA picture is "wider" than the available space, use the full
 *  width of the available space, but only use the height required to give
 *  the correct aspect ratio.
-      ELSE 
+      ELSE
          DXR = FXR
          DXL = FXL
          DXI = DXR - DXL
@@ -355,7 +355,7 @@
 
       END IF
 
-*  Get the bounds of the area enclosing the ancillary pictures. To begin with, 
+*  Get the bounds of the area enclosing the ancillary pictures. To begin with,
 *  set the area bounds equal to the DATA picture bounds.
       SXL = DXL
       SXR = DXR
@@ -372,12 +372,12 @@
       DO I = 1, NP
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
-            SXL = SXL - ABS( PSIZE( I )*CXI ) 
+            SXL = SXL - ABS( PSIZE( I )*CXI )
          ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
             SXR = SXR + ABS( PSIZE( I )*CXI )
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
             SYT = SYT + ABS( PSIZE( I )*CYI )
-         ELSE 
+         ELSE
             SYB = SYB - ABS( PSIZE( I )*CYI )
          END IF
 
@@ -385,8 +385,8 @@
 
 *  These are the outer bounds of the outer ancillary pictures. If there
 *  are any large negative margins, it is possible for the DATA picture
-*  to extend outside the ancillary pictures. The FRAME picture needs to 
-*  enclose the DATA picture in all cases. 
+*  to extend outside the ancillary pictures. The FRAME picture needs to
+*  enclose the DATA picture in all cases.
       FXL = MIN( DXL, SXL )
       FXR = MAX( DXR, SXR )
       FYB = MIN( DYB, SYB )
@@ -416,18 +416,18 @@
       FYB = MAX( CYB + 0.001, FYB )
       FYT = MIN( CYT - 0.001, FYT )
 
-*  Ensure the area enclosing the ancillary pictures does not extend beyond 
+*  Ensure the area enclosing the ancillary pictures does not extend beyond
 *  the current picture.
       SXL = MAX( CXL + 0.001, SXL )
       SXR = MIN( CXR - 0.001, SXR )
       SYB = MAX( CYB + 0.001, SYB )
       SYT = MIN( CYT - 0.001, SYT )
 
-*  Store the FRAME picture, but only if the FRAME picture would contain 
-*  something other than the DATA picture. This is assumed to be so if 
-*  any ancillary pictures are being created, or if the margins around the 
+*  Store the FRAME picture, but only if the FRAME picture would contain
+*  something other than the DATA picture. This is assumed to be so if
+*  any ancillary pictures are being created, or if the margins around the
 *  DATA picture are positive.
-      IF( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR. 
+      IF( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR.
      :    MARGIN( 2 ) .GT. 0.0 .OR. MARGIN( 3 ) .GT. 0.0 .OR.
      :    MARGIN( 4 ) .GT. 0.0 ) THEN
 
@@ -453,14 +453,14 @@
          CALL AGI_ICURP( IPICF, STATUS )
       END IF
 
-*  Now go round and create the ancillary pictures in reverse order. 
+*  Now go round and create the ancillary pictures in reverse order.
 *  Initially the entire area found above is available.
       DO I = NP, 1, -1
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
             PXL = SXL
             PXR = MIN( SXR, SXL + ABS( PSIZE( I )*CXI ) )
-            PYB = SYB 
+            PYB = SYB
             PYT = SYT
 
             SXL = PXR
@@ -468,7 +468,7 @@
          ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
             PXL = MAX( SXL, SXR - ABS( PSIZE( I )*CXI ) )
             PXR = SXR
-            PYB = SYB 
+            PYB = SYB
             PYT = SYT
 
             SXR = PXL
@@ -481,7 +481,7 @@
 
             SYT = PYB
 
-         ELSE 
+         ELSE
             PXL = SXL
             PXR = SXR
             PYB = SYB
@@ -497,7 +497,7 @@
          PYB = MAX( CYB + 0.001, PYB )
          PYT = MIN( CYT - 0.001, PYT )
 
-*  Create a PGPLOT viewport for this picture and save it as a picture 
+*  Create a PGPLOT viewport for this picture and save it as a picture
 *  within the FRAME picture (but only if it has non-zero size). The world
 *  coordinate system is inherited from the FRAME picture.
          PXI = PXR - PXL
@@ -525,7 +525,7 @@
       DYB = MAX( CYB + 0.001, DYB )
       DYT = MIN( CYT - 0.001, DYT )
 
-*  Create a PGPLOT viewport for the DATA picture, and set its world 
+*  Create a PGPLOT viewport for the DATA picture, and set its world
 *  coordinate bounds to the supplied values. If the box defined by
 *  the bounds has zero size, use cm from the bottom left corner.
       IF( STATUS .EQ. SAI__OK ) THEN
@@ -549,11 +549,11 @@
          RBOX3 = REAL( BOX( 3 ) )
          RBOX4 = REAL( BOX( 4 ) )
 
-         IF( RBOX1 .NE. RBOX3 .AND. 
+         IF( RBOX1 .NE. RBOX3 .AND.
      :       RBOX2 .NE. RBOX4 ) THEN
             CALL PGSWIN( RBOX1, RBOX3, RBOX2, RBOX4 )
 
-*  Report an error if the zero box size was a consequence of the 
+*  Report an error if the zero box size was a consequence of the
 *  truncation from double to single precision.
          ELSE IF( RBOX1 .EQ. RBOX3 .AND.
      :            BOX( 1 ) .NE. BOX( 3 ) ) THEN
@@ -575,12 +575,12 @@
      :                    'too small.', STATUS )
             GO TO 999
 
-         ELSE 
-            CALL PGSWIN( 0.0, ( DXR - DXL )*ITOCM, 0.0, 
+         ELSE
+            CALL PGSWIN( 0.0, ( DXR - DXL )*ITOCM, 0.0,
      :                   ( DYT - DYB )*ITOCM )
          END IF
 
-*  Save the current viewport and the Plot as a new DATA picture within the 
+*  Save the current viewport and the Plot as a new DATA picture within the
 *  FRAME picture.
          CALL AGI_SELP( IPICF, STATUS )
          CALL AGP_SVIEW( 'DATA', COMMNT, IPICD, STATUS )

@@ -1,4 +1,4 @@
-      SUBROUTINE TRACA5( BSMP, ESMP,  BDET, EDET, INSCN, NDISP, DTINDX, 
+      SUBROUTINE TRACA5( BSMP, ESMP,  BDET, EDET, INSCN, NDISP, DTINDX,
      :                   PARAM, XLMT, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACA5( BSMP, ESMP,  BDET, EDET,  INSCN, NDISP, DTINDX, 
+*     CALL TRACA5( BSMP, ESMP,  BDET, EDET,  INSCN, NDISP, DTINDX,
 *                  PARAM, XLMT, STATUS )
 
 *  Description:
@@ -19,7 +19,7 @@
 *     a CRDD trace display.  The min. and max. in-scan distances is
 *     offered as default values of lower and upper limits,
 *     respectively.
-*     
+*
 *  Arguments:
 *     BSMP = INTEGER (Given)
 *        The begin of the sample index of the input CRDD data array.
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,13 +112,13 @@
          END DO
       END DO
 
-*  Set the default values for the x limit, considering the round-off 
+*  Set the default values for the x limit, considering the round-off
 *  error to make sure the default values are in the max and min range.
       DEFVAL( 2 ) = 0.999*MXMI( 2 ) + 0.001*MXMI( 1 )
       DEFVAL( 1 ) = 0.001*MXMI( 2 ) + 0.999*MXMI( 1 )
-  
+
 *  Get the user specified limits from the environment.
-      CALL PAR_GDR1R( PARAM, 2, DEFVAL, MXMI( 1 ), MXMI( 2 ), 
+      CALL PAR_GDR1R( PARAM, 2, DEFVAL, MXMI( 1 ), MXMI( 2 ),
      :               .FALSE., XLMT, STATUS )
 
 *  If the values get from the enirovnment are in wrong order, swap them.

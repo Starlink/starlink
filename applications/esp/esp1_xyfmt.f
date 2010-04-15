@@ -73,7 +73,7 @@
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Convert input values to double precision, required for AST 
+*   Convert input values to double precision, required for AST
 *   transformation.
       X1=DBLE(XB)
       Y1=DBLE(YB)

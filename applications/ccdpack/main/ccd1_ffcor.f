@@ -149,161 +149,161 @@
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                          %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                          %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_RFFD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFFD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_RFSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_RFSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE
@@ -316,149 +316,149 @@
       ELSE IF ( FTYPE .EQ. '_DOUBLE' ) THEN
          IF ( DTYPE .EQ. '_UBYTE' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSUB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                          %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSB( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSUW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                          %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                          %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                          %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                          NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSW( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSR( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
             IF ( .NOT. SETSAT ) THEN
-               CALL CCG1_DFFD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFFD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                         %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
      :                         %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             ELSE
 
 *  Have saturated values
-               CALL CCG1_DFSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+               CALL CCG1_DFSD( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
-     :                          %VAL( CNF_PVAL( IPDFLT ) ), 
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
-     :                          HAVFV, SATVAL, 
+     :                          HAVFV, SATVAL,
      :                         %VAL( CNF_PVAL( IPDOUT ) ),
-     :                          %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
          ELSE

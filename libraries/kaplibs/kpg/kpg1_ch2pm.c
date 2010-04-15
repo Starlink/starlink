@@ -5,7 +5,7 @@
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_ch2pm)( CHARACTER(LOC), INTEGER(POLYMAP), 
+F77_SUBROUTINE(kpg1_ch2pm)( CHARACTER(LOC), INTEGER(POLYMAP),
                             INTEGER(STATUS) TRAIL(LOC) ) {
 /*
 *+
@@ -22,7 +22,7 @@ F77_SUBROUTINE(kpg1_ch2pm)( CHARACTER(LOC), INTEGER(POLYMAP),
 *     CALL KPG1_CH2PM( LOC, POLYMAP, STATUS )
 
 *  Description:
-*     This routine creates an AST PolyMap that implements the 
+*     This routine creates an AST PolyMap that implements the
 *     polynomial transformation described by a supplied Starlink
 *     POLYNOMIAL structure (see SGP/38).
 
@@ -39,8 +39,8 @@ F77_SUBROUTINE(kpg1_ch2pm)( CHARACTER(LOC), INTEGER(POLYMAP),
 *     (equivalent to the supplied POLYNOMIAL), but no inverse
 *     transformation.
 *     - Both CHEBYSHEV and SIMPLE variants of the POLYNOMIAL structure
-*     are supported. But currently only 1- or 2- dimensional Chebyshev 
-*     polynomials can be handled. An error is reported for Chebyshev 
+*     are supported. But currently only 1- or 2- dimensional Chebyshev
+*     polynomials can be handled. An error is reported for Chebyshev
 *     polynomials of higher dimensionality.
 
 *  Copyright:
@@ -52,12 +52,12 @@ F77_SUBROUTINE(kpg1_ch2pm)( CHARACTER(LOC), INTEGER(POLYMAP),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

@@ -24,7 +24,7 @@
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*        
+*
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     {enter_new_authors_here}
@@ -40,7 +40,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

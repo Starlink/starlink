@@ -50,7 +50,7 @@ C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -76,7 +76,7 @@ C
           IF (V) NUM = NUM+1
           CALL DAT_ANNUL(PLOC,STATUS)
           CALL DAT_ANNUL(MLOC,STATUS)
-          
+
       END IF
 C
       END

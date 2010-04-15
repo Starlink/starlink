@@ -168,16 +168,16 @@
 *        Whether to use Set header information or not.  If USESET is
 *        false then any Set header information will be ignored.
 *        If USESET is true, then input files will be considered in
-*        groups; a separate calibration frame will be constructed 
+*        groups; a separate calibration frame will be constructed
 *        for each group of corresponding input frames (i.e. those
-*        sharing the same Set Index attribute).  If this results in 
-*        multiple output calibration files, they will be written as 
+*        sharing the same Set Index attribute).  If this results in
+*        multiple output calibration files, they will be written as
 *        separate NDFs into a single HDS container file.
-*        If no Set header information is present in the input files, 
+*        If no Set header information is present in the input files,
 *        then calibration is done on all the input files together,
 *        so USESET can usually be safely set to TRUE.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 *     TYPE = LITERAL (Read)
@@ -251,7 +251,7 @@
 *     The intrinsic default behaviour of the application may be
 *     restored by using the RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO, LOGFILE and USESET) have global values. 
+*     Certain parameters (LOGTO, LOGFILE and USESET) have global values.
 *     These global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
@@ -484,7 +484,7 @@
 
 *  Write a header unless this is the only subgroup.
          IF ( NSUB .GT. 1 ) THEN
-            CALL CCD1_SETHD( KEYGRP, ISUB, 
+            CALL CCD1_SETHD( KEYGRP, ISUB,
      :                       'Producing calibration master', 'Index',
      :                       STATUS )
          END IF
@@ -612,7 +612,7 @@
 
 *  If we can sensibly do so, create a Set header in the output.  If all
 *  the input NFDs in this subgroup have the same (non-zero) Set Index,
-*  then use that as the Set Index of the output NDF.  In that case, 
+*  then use that as the Set Index of the output NDF.  In that case,
 *  use the name of the output NDF itself as the Set Name attribute.
          IF ( SINDEX .NE. CCD1__BADSI ) THEN
             CALL CCD1_SETWR( NDFOUT, OUTNAM, SINDEX, AST__NOFRAME,
@@ -662,7 +662,7 @@
             DO 3 I = 1, NNDF
 
 *  Get the current chunk for each data_array.
-               CALL NDF_CHUNK( STACK( I ), MXPIX, ICHUNK, NDFCUR, 
+               CALL NDF_CHUNK( STACK( I ), MXPIX, ICHUNK, NDFCUR,
      :                         STATUS )
 
 *  Map this section in.
@@ -704,22 +704,22 @@
             IF ( HAVVAR ) THEN
                IF ( PTYPE .EQ. '_REAL' ) THEN
                   CALL CCG1_CM1RR( %VAL( CNF_PVAL( IPDWRK ) ), EL, NNDF,
-     :                             %VAL( CNF_PVAL( IPVWRK ) ), 
+     :                             %VAL( CNF_PVAL( IPVWRK ) ),
      :                             IMETH, MINPIX, NITER,
      :                             NSIGMA, ALPHA, RMIN, RMAX,
-     :                             %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                             %VAL( CNF_PVAL( IPDOUT ) ),
      :                             %VAL( CNF_PVAL( IPVOUT ) ), WRK1,
-     :                             WRK2, WRK3, 
+     :                             WRK2, WRK3,
      :                             %VAL( CNF_PVAL( IPWRK4 ) ), NWRK4,
      :                             NCON, POINT, USED, STATUS )
                ELSE IF ( PTYPE .EQ. '_DOUBLE ' ) THEN
                   CALL CCG1_CM1DD( %VAL( CNF_PVAL( IPDWRK ) ), EL, NNDF,
-     :                             %VAL( CNF_PVAL( IPVWRK ) ), 
+     :                             %VAL( CNF_PVAL( IPVWRK ) ),
      :                             IMETH, MINPIX, NITER,
      :                             NSIGMA, ALPHA, RMIN, RMAX,
-     :                             %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                             %VAL( CNF_PVAL( IPDOUT ) ),
      :                             %VAL( CNF_PVAL( IPVOUT ) ), WRK1,
-     :                             WRK2, WRK3, 
+     :                             WRK2, WRK3,
      :                             %VAL( CNF_PVAL( IPWRK4 ) ), NWRK4,
      :                             NCON, POINT, USED, STATUS )
                END IF
@@ -727,17 +727,17 @@
 
 *  No variances just use inverse weights.
                IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPDWRK ) ), 
+                  CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPDWRK ) ),
      :                             EL, NNDF, INFACT,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, 
+     :                             RMIN, RMAX,
      :                             %VAL( CNF_PVAL( IPDOUT ) ), WRK1,
      :                             WRK2, NCON, POINT, USED, STATUS )
                ELSE IF ( PTYPE .EQ. '_DOUBLE ' ) THEN
-                  CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPDWRK ) ), 
+                  CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPDWRK ) ),
      :                             EL, NNDF, INFACT,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, 
+     :                             RMIN, RMAX,
      :                             %VAL( CNF_PVAL( IPDOUT ) ), WRK1,
      :                             WRK2, NCON, POINT, USED, STATUS )
                END IF

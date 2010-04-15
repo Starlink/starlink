@@ -7,7 +7,7 @@
      &                        MSTEP, NSTEP, XCELL, YCELL,
      &                        IFAIL)
 
-*  Routine to evaluate (X,Y) offsets of pixel centre (in cells). 
+*  Routine to evaluate (X,Y) offsets of pixel centre (in cells).
 *  Processing depends on whether there are an even or odd number
 *  of pixels on each map axis.
 

@@ -18,7 +18,7 @@
 *     a file is created with the specified name, and a header is
 *     written to it consisting of a comment line identifying SKYPOS as
 *     the creator of the file, and a line identifying the sort of
-*     coordinates which follow (this line is omitted if image 
+*     coordinates which follow (this line is omitted if image
 *     coordinates are being stored in the file).
 
 *  Arguments:
@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,6 +97,6 @@
             CALL FIO_WRITE( FD, '#  Image coordinates', STATUS )
          END IF
 
-      END IF         
+      END IF
 
       END

@@ -1,5 +1,5 @@
-/* 
-  File name: 
+/*
+  File name:
    wvmTau.c
 
   Description:
@@ -19,25 +19,25 @@
 	$Log: wvmTau.c,v $
 	Revision 1.8  2008/06/11 03:33:27  rkackley
 	Added tau2pwv function and tau_table lookup table (both supplied by J.Balfour).
-	
+
 	Revision 1.7  2006/07/14 19:05:28  rkackley
 	Corrected a typo in the calculation of const_c (code was using coefs_m1 when it should have been using coefs_c). Note that this bug did not affect the final tau value since const_c is arithmetically eliminated when the correction value is computed.
-	
+
 	Revision 1.6  2003/07/02 22:20:47  berndw
 	Just more tests
-	
+
 	Revision 1.5  2003/07/02 22:14:33  berndw
 	This is a test of cvs commit
-	
+
 	Revision 1.4  2003/05/13 23:36:16  mrippa
 	Fixed array index out of bounds exception
-	
+
 	Revision 1.3  2003/05/12 03:19:08  mrippa
 	Added another printf.
-	
+
 	Revision 1.2  2003/05/09 21:56:56  mrippa
 	We now compute the empirical tau model on the C side.
-	
+
 	Revision 1.1  2003/05/06 03:13:41  mrippa
 	Added wvmTau to convert pwv into tau value
 
@@ -55,7 +55,7 @@
 #include "wvmTau.h"
 #include "wvmCal.h"
 
-/* 
+/*
    Function:
 	pwv2tau converts millimeters of water vapor into a value
 	representing the optical depth seen at 225GHz relative to
@@ -76,7 +76,7 @@ double pwv2tau(double airMass, double mmH2O_a) {
 
   if (TAU_DEBUG > 4)
     printf("You gave me an airMass of %f and a pwv of %f\n", airMass, mmH2O_a);
-  
+
   /* If mmH2O_a is really bad just return crude conversion */
   if (mmH2O_a > MMH2O_MAX) {
     return mmH2O_a/21.0;
@@ -104,7 +104,7 @@ double pwv2tau(double airMass, double mmH2O_a) {
   }
 
   correction =  c1 - c2;
-  
+
   if (TAU_DEBUG > 5)
     printf("correction is: %f\n", correction);
 

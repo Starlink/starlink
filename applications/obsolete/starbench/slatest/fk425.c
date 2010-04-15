@@ -9,7 +9,7 @@ double qfobar,double q1,double*q2,double*qfoobar,double*Q3,
 double*q4,double*qfOBAz,double*qfoobaz){double QQUUX,Q5,
 QFRED,qdog,qcat,QFISH,QgASp,Q6,q7,q8,QBAD,qBuG,qsilly,QBUGGY
 ,QMUM,qDAd,q9,Q10,Q11,q12,Q13,Q14,qdisk,Q15;int q16,q17;
-double QEMPTY[3],q18[3];double QFULL[6],qfast[6];static 
+double QEMPTY[3],q18[3];double QFULL[6],qfast[6];static
 double qsmall=100.0*60.0*60.0*360.0/D2PI;double QBIG=1.0e-30
 ;double QOK=21.095;static double QHELLO[3]={-1.62557e-6,-
 0.31919e-6,-0.13843e-6};static double QBYE[3]={1.245e-3,-

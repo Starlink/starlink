@@ -153,7 +153,7 @@ datAlter(const HDSLoc    *locator,
 /*===============================*/
 /* DAT_RESET - Reset object state*/
 /*===============================*/
-int 
+int
 datReset( const HDSLoc *locator,
           int *status)
 {
@@ -297,7 +297,7 @@ if (!_ok(*status))\
 int
 datRenam(const HDSLoc *locator,
          const char *name_str,
-         int  *status) 
+         int  *status)
 {
 #undef context_name
 #undef context_message

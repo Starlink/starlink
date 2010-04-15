@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_dataOrder( smfData *data, int isTordered, *status ); 
+*     smf_dataOrder( smfData *data, int isTordered, *status );
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
@@ -130,14 +130,14 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   smf_dtype dtype;              /* Data array type */
   dim_t i;                      /* loop counter */
   int inPlace=0;                /* If set change array in-place */
-  dim_t j;                      /* loop counter */  
+  dim_t j;                      /* loop counter */
   dim_t k;                      /* loop counter */
   void *oldbuf=NULL;            /* Pointer to old buffer */
   int *oldlut=NULL;             /* Pointer to pointing LUT */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   void *newbuf=NULL;            /* Pointer to new buffer */
-  dim_t newdims[3];             /* Size of each dimension new buffer */ 
+  dim_t newdims[3];             /* Size of each dimension new buffer */
   int newlbnd[3];               /* New pixel origin */
   int *newlut=NULL;             /* Pointer to pointing LUT */
   dim_t ntslice;                /* Number of time slices */
@@ -165,13 +165,13 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* If value of isTordered matches current value in smfData return */
   if( data->isTordered == isTordered ) return;
-  
+
   /* Make sure we're looking at 3-dimensions of bolo data */
   if( data->ndims != 3 ) {
     *status = SMF__WDIM;
     msgSeti("NDIMS",data->ndims);
-    errRep( "", FUNC_NAME 
-           ": Don't know how to handle ^NDIMS dimensions, should be 3.", 
+    errRep( "", FUNC_NAME
+           ": Don't know how to handle ^NDIMS dimensions, should be 3.",
             status);
     return;
   }
@@ -179,7 +179,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* inPlace=1 if smfData was mapped! */
   if( data->file && (data->file->fd || data->file->ndfid) ) {
     inPlace = 1;
-  } 
+  }
 
   /* Calculate input data dimensions (before changing order) */
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, &bstr1, &tstr1,
@@ -213,8 +213,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
       if( i==2 ) {     /* If QUALITY unsigned char */
         dtype = SMF__UBYTE;
-      } else {         /* Otherwise get type from the smfData */ 
-        dtype = data->dtype;      
+      } else {         /* Otherwise get type from the smfData */
+        dtype = data->dtype;
       }
 
       /* Size of data type */
@@ -230,16 +230,16 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
         case SMF__INTEGER:
           for( j=0; j<ntslice; j++ ) {
             for( k=0; k<nbolo; k++ ) {
-              ((int *)newbuf)[j*tstr2+k*bstr2] = 
+              ((int *)newbuf)[j*tstr2+k*bstr2] =
                 ((int *)oldbuf)[j*tstr1+k*bstr1];
             }
           }
           break;
-          
+
         case SMF__FLOAT:
           for( j=0; j<ntslice; j++ ) {
             for( k=0; k<nbolo; k++ ) {
-              ((float *)newbuf)[j*tstr2+k*bstr2] = 
+              ((float *)newbuf)[j*tstr2+k*bstr2] =
                 ((float *)oldbuf)[j*tstr1+k*bstr1];
             }
           }
@@ -248,7 +248,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
         case SMF__DOUBLE:
           for( j=0; j<ntslice; j++ ) {
             for( k=0; k<nbolo; k++ ) {
-              ((double *)newbuf)[j*tstr2+k*bstr2] = 
+              ((double *)newbuf)[j*tstr2+k*bstr2] =
                 ((double *)oldbuf)[j*tstr1+k*bstr1];
             }
           }
@@ -257,7 +257,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
         case SMF__UBYTE:
           for( j=0; j<ntslice; j++ ) {
             for( k=0; k<nbolo; k++ ) {
-              ((unsigned char *)newbuf)[j*tstr2+k*bstr2] = 
+              ((unsigned char *)newbuf)[j*tstr2+k*bstr2] =
                 ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
             }
           }
@@ -266,7 +266,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
         default:
           msgSetc("DTYPE",smf_dtype_string(data, status));
           *status = SAI__ERROR;
-          errRep( "", FUNC_NAME 
+          errRep( "", FUNC_NAME
                   ": Don't know how to handle ^DTYPE type.", status);
         }
 
@@ -286,7 +286,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* If NDF associated with data, modify dimensions of the data */
   if( data->file && (data->file->ndfid != NDF__NOID) ) {
-    msgOutif(MSG__DEBUG, " ", FUNC_NAME 
+    msgOutif(MSG__DEBUG, " ", FUNC_NAME
              ": Warning - current implementation does not modify NDF "
              "dimensions to match re-ordered data array", status);
   }
@@ -305,10 +305,10 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
       if( inPlace ) {
         /* Copy newlut to oldlut */
-        memcpy( oldlut, newlut, ndata*sizeof(*newlut) );	
+        memcpy( oldlut, newlut, ndata*sizeof(*newlut) );
         /* Free newlut */
         newlut = smf_free( newlut, status );
-      } else {	
+      } else {
         /* Free oldlut */
         oldlut = smf_free( oldlut, status );
         /* Set pntr to newbuf */

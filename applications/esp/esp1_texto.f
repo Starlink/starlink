@@ -1,4 +1,4 @@
- 
+
 
       SUBROUTINE GAU1_TEXTO(NSOUR,ANGCON,ANGOFF,PSIZE,LBND,
      :     NDF1,PASS,passerrs,BACK,fitback,SIGMA,lsqfit,STATUS)
@@ -7,16 +7,16 @@
 *     GAU1_TEXTO
 
 *  Purpose:
-*     Puts the most recent source 'fit' results into a text format 
+*     Puts the most recent source 'fit' results into a text format
 *     ASCII output file.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL GAU1_TEXTO(NSOUR,ANGCON,ANGOFF,PSIZE,LBND,NDF1,PASS,
 *                      passerrs, BACK,fitback,SIGMA,lsqfit,STATUS)
-    
+
 *  Description:
 *     Creates a text file and places in it data for the profile generated.
 *
@@ -26,16 +26,16 @@
 *     The PSIZE parameter controls whether values are output as sigmas
 *     or FWHM, and in pixels or arcsecs
 
-*  Arguments:               
+*  Arguments:
 *     ANGCON= LOGICAL (Given)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.
-*     ANGOFF= REAL (Given) 
+*     ANGOFF= REAL (Given)
 *        Angular offset for position angles generated. Units degrees.
 *     PSIZE = REAL (Given)
 *        Pixel size in arcsec.  See psize in gau1_cmode for discussion
 *     NSOUR = INTEGER (Given)
-*        Number of sources. 
+*        Number of sources.
 *     LBND(2) = INTEGER (Given)
 *        Lower bound of the image.
 *     NDF1 = INTEGER (Given)
@@ -81,15 +81,15 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'MSG_PAR'               ! Parameter system constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
       INCLUDE 'PAR_ERR'
 
-*  Arguments Given:                         
-      LOGICAL ANGCON                  ! Angular rotation convention     
+*  Arguments Given:
+      LOGICAL ANGCON                  ! Angular rotation convention
       INTEGER LBND(NDF__MXDIM)        ! Lower limits of image world
                                       ! co-ordinate system
       INTEGER NDF1                    ! NDF indentifier
@@ -103,7 +103,7 @@
       logical lsqfit            ! did we use the least-squares fit?
       logical fitback           ! did we fit the background?
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -111,7 +111,7 @@
       CHARACTER *(80) TEXT            ! The heading
       CHARACTER *(80) LINE            ! FIO line output length
       CHARACTER *(MSG__SZMSG) NAME    ! NDF name
-      INTEGER FIOD                    ! Source parameters      
+      INTEGER FIOD                    ! Source parameters
       INTEGER I                       ! Temporary variable
       INTEGER J                       ! Temporary variable
       INTEGER NCHAR                   ! Length of output string
@@ -120,7 +120,7 @@
       logical newfmt            ! do we write a new-format output file?
 
       CHARACTER WIDA*5,WIDB*5,UNITLAB*2
-*   pass(i,5) and pass(i,6) are sigma in pixels.  
+*   pass(i,5) and pass(i,6) are sigma in pixels.
 *   Convert to arsecs (if PSIZE >= 1e-6) by multiplying by PSIZE
 *   Convert to FWHM (if PSIZE > 0) by multiplying by 2sqrt(2log(2))
       REAL SIZECONV		      ! Conversion factor sigma/px -> ?
@@ -131,7 +131,7 @@
 
 *   Find the file name.
 
-*   Determine the output text file name. If the file name chosen fails, 
+*   Determine the output text file name. If the file name chosen fails,
 *   the user is reprompted.  Note that FIO_ASSOC doesn't
 *   (currently) respect/recognise PAR__ABORT, but if and when it
 *   does, this code will do the right thing by leaving OPENF false.
@@ -143,10 +143,10 @@
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          OPENF = .TRUE.
       END IF
-      
+
 *   We couldn't open the file
       IF (.NOT. OPENF) GOTO 9999
-      
+
 *   Set the flags newfmt and showerrs, depending on the values of lsqfit
 *   and the elements of passerrs.  At present,
 *   showerrs=(lsqfit.or.passerrs(?)>0), and newfmt is redundant, but
@@ -213,7 +213,7 @@
          endif
          call fio_write (fiod, line(:nchar), status)
       endif
-         
+
 
 *   Output the standard deviation value that was used.
       NCHAR=0
@@ -276,7 +276,7 @@
      :     /'       '//WIDA//'/'//UNITLAB//'     '//WIDB//'/'/
      :     /UNITLAB//'      Peak ', LINE, NCHAR)
       CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
-     
+
 *   Calculate the pixel size conversion factor
       SIZECONV = 1.0
       IF (PSIZE.GT.0.0) THEN
@@ -287,7 +287,7 @@
 *      Display in units of arcsec, rather than pixels
          SIZECONV = SIZECONV * ABS(PSIZE)
       END IF
-     
+
 
 *   Display result for each source.
       DO 30 I=1,NSOUR
@@ -299,12 +299,12 @@
 
 *      Apply limits.
          IF (VALUE.GT.179.99)  VALUE=VALUE-180.
-         IF (VALUE.LT.-179.99) VALUE=VALUE+180.      
+         IF (VALUE.LT.-179.99) VALUE=VALUE+180.
 
 *      Indicate the current parameter values.
 *      Use G10.2 for the width values, so that we still get a decent
 *      number of sig.figs. if they're less than 1.  MSG_FMTR removes
-*      trailing spaces, messing up columns, so use internal writes 
+*      trailing spaces, messing up columns, so use internal writes
 *      to write the line
          WRITE(LINE,20),PASS(I,1),PASS(I,2),VALUE,
      :        PASS(I,5)*SIZECONV,PASS(I,6)*SIZECONV,PASS(I,4)
@@ -350,10 +350,10 @@
 *  Close down the file output.
       CALL FIO_CLOSE(FIOD,STATUS)
       CALL MSG_BLANK(STATUS)
- 
+
  9999 CONTINUE
 
-      END 
+      END
 
 
       SUBROUTINE GRA1_TEXTO(MODE,FILEN,REG,XCO,YCO,CURCO,SLEN,
@@ -364,27 +364,27 @@
 
 *  Purpose:
 *     Puts the most recent galaxy 'fit' results into a text format file.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL GRA1_TEXTO(MODE,FILEN,REG,XCO,YCO,CURCO,SLEN,
-*                      CONS,ZEROP,OPENF,FIOD2,EXCLAIM,STATUS)    
+*                      CONS,ZEROP,OPENF,FIOD2,EXCLAIM,STATUS)
 
 *  Description:
 *     Creates a text file (if required) and places in it data from the
 *     most recent galaxy profile/fit generated. The output values for
 *     radius are measured in pixels.
 
-*  Arguments:               
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        MODE=0 Open the text output file.
 *        MODE=1 Write the file header.
 *        MODE=2 Write the scale length values.
-*        MODE=3 Clode the output text file. 
+*        MODE=3 Clode the output text file.
 *     FILEN *(80) = CHARACTER (Given)
-*        Name of the text file being read. 
+*        Name of the text file being read.
 *     REG(2) = REAL (Given)
 *        Linear correlation coefficient squared.
 *     XCO = REAL (Given)
@@ -426,20 +426,20 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'GRA_PAR'               ! GRAPHS constants
       INCLUDE 'MSG_PAR'               ! MSG constants
 
-*  Arguments Given:         
+*  Arguments Given:
       CHARACTER *(80) CURCO           ! Current coordinates of galaxy
       CHARACTER *(80) FILEN           ! Image on which the galaxy was found
       INTEGER MODE                    ! Write a header or data?
       REAL CONS(2)                    ! The constant term of the fits
                                       ! to radius versus brightness
       REAL REG(2)                     ! LCC squared
-      REAL SLEN(2)                    ! Scale length values from the two  
+      REAL SLEN(2)                    ! Scale length values from the two
                                       ! fits i.e. spiral and elliptical
       REAL XCO                        ! X index of the origin
       REAL YCO                        ! Y index of the origin
@@ -447,10 +447,10 @@
 
 *  Arguments Given and Returned:
       LOGICAL EXCLAIM                 ! Was file name a '!'?
-      LOGICAL OPENF                   ! Was the output file created okay?      
+      LOGICAL OPENF                   ! Was the output file created okay?
       INTEGER FIOD2                   ! File identifier
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -469,12 +469,12 @@
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Determine the output text file name. If the file name chosen fails, 
+*   Determine the output text file name. If the file name chosen fails,
 *   the user is reprompted
-      IF (MODE.EQ.0) THEN 
+      IF (MODE.EQ.0) THEN
          CALL MSG_BLANK(STATUS)
-         OPENF=.FALSE.             
-         EXCLAIM=.FALSE.   
+         OPENF=.FALSE.
+         EXCLAIM=.FALSE.
          CALL ERR_MARK
          DO WHILE((.NOT.OPENF).AND.(.NOT.EXCLAIM)
      :             .AND.(STATUS.EQ.SAI__OK))
@@ -490,8 +490,8 @@
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Inform the user if a difficulty was encountered and that an
-*      an output file will not be used. 
-         IF (EXCLAIM) THEN  
+*      an output file will not be used.
+         IF (EXCLAIM) THEN
             CALL MSG_BLANK(STATUS)
             CALL MSG_OUT(' ','WARNING!!!',STATUS)
             CALL MSG_OUT(' ','No output text file created.',STATUS)
@@ -502,9 +502,9 @@
       END IF
 
 *   Inform the user if a difficulty was encountered and that an
-*   an output file will not be used. Otherwise add values to the 
+*   an output file will not be used. Otherwise add values to the
 *   output file.
-      IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.1)) THEN  
+      IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.1)) THEN
 
 *      Output a heading.
          NCHAR=0
@@ -532,12 +532,12 @@
       END IF
 
 *   Output scale length results and co-ordinates.
-      IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.2)) THEN   
-     
+      IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.2)) THEN
+
 *      Format X and Y Base frame co-ordinates.
          CALL MSG_FMTR('VALUE1','F9.2',XCO)
          CALL MSG_FMTR('VALUE2','F9.2',YCO)
-      
+
 *      Format X and Y Current frame co-ordinates.
          CALL CHR_DCWRD(CURCO,3,NWRDS,START,STOP,WORDS,STATUS)
          IF (NWRDS.EQ.2.AND.STOP(1)-START(1).LT.9.AND.
@@ -578,14 +578,14 @@
       END IF
 
 *   Close file.
-      IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.3)) THEN   
+      IF ((OPENF).AND.(STATUS.EQ.SAI__OK).AND.(MODE.EQ.3)) THEN
          CALL FIO_CLOSE(FIOD2,STATUS)
       END IF
 
  9999 CONTINUE
 
-      END 
-     
+      END
+
 
       SUBROUTINE LOB1_TEXTO(WHICH,NDF1,XCO,YCO,MODE,SDEV,
      :                      LBND,FIOD,OPENF,EXCLAIM,STATUS)
@@ -595,9 +595,9 @@
 *     LOB1_TEXTO
 
 *  Purpose:
-*     Puts the background calculation results into a text format 
+*     Puts the background calculation results into a text format
 *     ASCII output file.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -614,9 +614,9 @@
 *         WHICH=2  Save the results for the current location.
 *         WHICH=3  Close the file.
 
-*  Arguments:               
+*  Arguments:
 *     WHICH = INTEGER (Given)
-*        Used to show which part of the text file is to be created. 
+*        Used to show which part of the text file is to be created.
 *     NDF1 = INTEGER (Given)
 *        NDF identifier for the image.
 *     XCO = REAL (Given)
@@ -658,13 +658,13 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'LOB_PAR'               ! LOBACK constants
       INCLUDE 'MSG_PAR'               ! Parameter system constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER LBND(10)                ! Lower limits of image world
                                       ! co-ordinate system
       INTEGER NDF1                    ! NDF indentifier
@@ -676,12 +676,12 @@
       REAL XCO                        ! X index of the origin
       REAL YCO                        ! Y index of the origin
 
-*  Arguments Given and Returned:                              
+*  Arguments Given and Returned:
       LOGICAL EXCLAIM                 ! Was the file name a !
       LOGICAL OPENF                   ! Was a file created?
       INTEGER FIOD                    ! Output file identifier
-      
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -701,10 +701,10 @@
 *   Open the FIO file.
       IF (WHICH.EQ.1) THEN
 
-*      Determine the output text file name. If the file name chosen fails, 
+*      Determine the output text file name. If the file name chosen fails,
 *      the user is reprompted
-         OPENF=.FALSE.             
-         EXCLAIM=.FALSE.   
+         OPENF=.FALSE.
+         EXCLAIM=.FALSE.
          CALL ERR_MARK
          DO WHILE((.NOT.OPENF).AND.(.NOT.EXCLAIM)
      :             .AND.(STATUS.EQ.SAI__OK))
@@ -720,8 +720,8 @@
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Inform the user if a difficulty was encountered and that an
-*      an output file will not be used. 
-         IF (EXCLAIM) THEN  
+*      an output file will not be used.
+         IF (EXCLAIM) THEN
             CALL MSG_BLANK(STATUS)
             CALL MSG_OUT(' ','WARNING!!!',STATUS)
             CALL MSG_OUT(' ','No output text file created.',STATUS)
@@ -730,9 +730,9 @@
          END IF
 
 *      Inform the user if a difficulty was encountered and that an
-*      an output file will not be used. Otherwise add values to the 
+*      an output file will not be used. Otherwise add values to the
 *      output file.
-         IF (OPENF) THEN  
+         IF (OPENF) THEN
 
 *         Output a heading.
             NCHAR=0
@@ -789,7 +789,7 @@
 
          FTEXT='F8.1'
          IF (ABS(MODE(2)).GT.9.9E8) FTEXT='E14.5'
-         CALL MSG_FMTD('BACK2',FTEXT,MODE(2)) 
+         CALL MSG_FMTD('BACK2',FTEXT,MODE(2))
 
          FTEXT='F8.1'
          IF (ABS(MODE(3)).GT.9.9E8) FTEXT='E14.5'
@@ -827,7 +827,7 @@
 
  9999 CONTINUE
 
-      END 
+      END
 
 
       SUBROUTINE SEC1_TEXTO(NDF1,SUMMAT,NUMBER,XCO,YCO,BACK,
@@ -839,27 +839,27 @@
 
 *  Purpose:
 *     Puts the most recent galaxy 'fit' results into a text format file.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL SEC1_TEXTO(NDF1,SUMMAT,NUMBER,XCO,YCO,BACK,SIGMA,CONS,
-*                      RLIM,PSIZE,ZEROP,SLEN,LBND,FIOD2,EXCLAIM,STATUS)    
+*                      RLIM,PSIZE,ZEROP,SLEN,LBND,FIOD2,EXCLAIM,STATUS)
 
 *  Description:
 *     Creates a text file (if required) and places in it data from the
 *     most recent galaxy profile/fit generated. The output values for
 *     radius are measured in pixels.
 
-*  Arguments:               
+*  Arguments:
 *     NDF1 = INTEGER (Given)
 *        NDF identifier for the image.
 *     NUMBER(SEC__RESUL) = REAL (Given)
 *        The array containing the number of pixels found at a given
 *        distance from the required origin.
 *     SUMMAT(SEC__RESUL) = REAL (Given)
-*        The summation count for all the data points found at a given 
+*        The summation count for all the data points found at a given
 *        distance from the required origin (see NUMBER).
 *     XCO = REAL (Given)
 *        The X index of the origin used. Units pixels.
@@ -897,7 +897,7 @@
 *     (Original version)
 *     20-FEB-1997 (GJP)
 *     Output format modified.
- 
+
 *  Bugs:
 *     None known.
 
@@ -905,14 +905,14 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'SEC_PAR'               ! SECTOR variables
       INCLUDE 'MSG_PAR'               ! Parameter system constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER LBND(NDF__MXDIM)        ! Lower limits of image world
                                       ! co-ordinate system
       INTEGER RLIM                    ! The number of data points ie
@@ -927,7 +927,7 @@
       REAL PSIZE                      ! The size of each pixel in
                                       ! arc seconds
       REAL SIGMA                      ! Standard deviation of the background
-      REAL SLEN(2)                    ! Scale length values from the two  
+      REAL SLEN(2)                    ! Scale length values from the two
                                       ! fits i.e. spiral and elliptical
       REAL SUMMAT(SEC__RESUL)         ! Sum of the pixel counts for all pixels
                                       ! at a given distance from the origin
@@ -935,11 +935,11 @@
       REAL YCO                        ! Y index of the origin
       REAL ZEROP                      ! Zero point of the magnitude scale
 
-*  Arguments Given and Returned:                              
+*  Arguments Given and Returned:
       INTEGER FIOD2                   ! Output file output identifier
       LOGICAL EXCLAIM                 ! The file name was !?
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -956,10 +956,10 @@
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Determine the output text file name. If the file name chosen fails, 
+*   Determine the output text file name. If the file name chosen fails,
 *   the user is reprompted
-      OPENF=.FALSE.             
-      EXCLAIM=.FALSE.   
+      OPENF=.FALSE.
+      EXCLAIM=.FALSE.
       CALL ERR_MARK
       DO WHILE((.NOT.OPENF).AND.(.NOT.EXCLAIM)
      :          .AND.(STATUS.EQ.SAI__OK))
@@ -975,19 +975,19 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Inform the user if a difficulty was encountered and that an
-*   an output file will not be used. 
-      IF (EXCLAIM) THEN  
+*   an output file will not be used.
+      IF (EXCLAIM) THEN
          CALL MSG_BLANK(STATUS)
          CALL MSG_OUT(' ','WARNING!!!',STATUS)
          CALL MSG_OUT(' ','No output text file created.',STATUS)
          CALL MSG_BLANK(STATUS)
          GOTO 9999
       END IF
-      
+
 *   Inform the user if a difficulty was encountered and that an
-*   an output file will not be used. Otherwise add values to the 
+*   an output file will not be used. Otherwise add values to the
 *   output file.
-      IF ((OPENF).AND.(STATUS.EQ.SAI__OK)) THEN  
+      IF ((OPENF).AND.(STATUS.EQ.SAI__OK)) THEN
 
 *      Output a heading.
          NCHAR=0
@@ -1129,7 +1129,7 @@
 
 *            Magnitude relative to background.
                CALL CHR_PUTC(' ',LINE,NCHAR)
-               IF (SUMMAT(I)/NUMBER(I)-BACK.GT.0.0) THEN 
+               IF (SUMMAT(I)/NUMBER(I)-BACK.GT.0.0) THEN
                   TEMP=ZEROP-2.5*LOG10(SUMMAT(I)/NUMBER(I)-BACK)
                ELSE
                   TEMP=0.0
@@ -1153,7 +1153,7 @@
 
 *      Close down the file output.
          CALL FIO_CLOSE(FIOD2,STATUS)
- 
+
       ELSE
          CALL MSG_BLANK(STATUS)
          CALL MSG_OUT(' ','WARNING!!!',STATUS)
@@ -1165,7 +1165,7 @@
 
  9999 CONTINUE
 
-      END 
+      END
 
 
 
@@ -1178,9 +1178,9 @@
 *     ELP1_TEXTO
 *
 *  Purpose:
-*     Puts the most recent galaxy 'fit' results into a text format 
+*     Puts the most recent galaxy 'fit' results into a text format
 *     ASCII output file.
-*     
+*
 *  Language:
 *     Starlink Fortran 77
 *
@@ -1188,7 +1188,7 @@
 *      CALL ELP1_TEXTO(MODE,NDF1,VALIDP,ZEROP,
 *                      RESULT,RESNRES,RESNPOI,XCO,YCO,BACK,SIGMA,PSIZE,LBND,
 *                      ISELLPRO,
-*                      FIOD,EXCLAIM,STATUS)    
+*                      FIOD,EXCLAIM,STATUS)
 *
 *  Description:
 *     Creates a text file (if required) and places in it data from the
@@ -1202,9 +1202,9 @@
 *
 *     All radii values output are measured in pixels.
 *
-*  Arguments:               
+*  Arguments:
 *     MODE = INTEGER (Given)
-*        Used to show which part of the text file is to be created. 
+*        Used to show which part of the text file is to be created.
 *     NDF1 = INTEGER (Given)
 *        NDF identifier for the image.
 *     VALIDP = INTEGER (Given)
@@ -1264,7 +1264,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELP_PAR'               ! ELLPRO constants
@@ -1272,7 +1272,7 @@
       INCLUDE 'NDF_PAR'               ! NDF public constants
       INCLUDE 'PAR_ERR'		      ! PAR system constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER LBND(NDF__MXDIM)        ! Lower limits of image world
                                       ! co-ordinate system
       INTEGER MODE                    ! Defines which part of the file saving
@@ -1293,11 +1293,11 @@
       LOGICAL ISELLPRO		      ! Is this being called by ellpro?
 
 *  Arguments Given and Returned:
-      LOGICAL EXCLAIM                 ! Was an exclamation mark given 
+      LOGICAL EXCLAIM                 ! Was an exclamation mark given
                                       ! for the file name?
       INTEGER FIOD                    ! Output file FIO descriptor
-      
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *   Local constants:
@@ -1326,7 +1326,7 @@
 *      (currently) respect/recognise PAR__ABORT, but if and when it
 *      does, this code will do the right thing by leaving OPENF false.
          IF (MODE.EQ.0) CALL MSG_BLANK(STATUS)
-         
+
          OPENF = .FALSE.
          EXCLAIM = .FALSE.
          CALL FIO_ASSOC('OUT','WRITE','LIST',LINSIZ,FIOD,STATUS)
@@ -1336,7 +1336,7 @@
          ELSE IF (STATUS .EQ. SAI__OK) THEN
             OPENF = .TRUE.
          ENDIF
-         
+
 *      If we couldn't open the file for some reason, bail out
          IF (.NOT. OPENF) GOTO 9999
 
@@ -1368,7 +1368,7 @@
          CALL MSG_LOAD(' ','^NAME',NAME,NCHAR,STATUS)
          CALL CHR_CLEAN(NAME)
          CALL FIO_WRITE(FIOD,NAME(:NCHAR),STATUS)
-         
+
 *      Output the standard deviation value that was used.
          NCHAR=0
 
@@ -1407,7 +1407,7 @@
          CALL MSG_LOAD(' ','^X ^Y',LINE,NCHAR,STATUS)
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
          CALL AST_ANNUL(IWCS,STATUS)
-         
+
 *      Output the background value that was used.
          NCHAR=0
          CALL CHR_PUTC('## Background (counts): ',LINE,NCHAR)
@@ -1442,7 +1442,7 @@
          IF (ISELLPRO) THEN
 *         Write the statistic in column 10 rather than next to the
 *         `count'. The latter would be more logical, but confuses the
-*         graphs application. 
+*         graphs application.
             TEXT='X       Y     Points   MeanRad    Count     '//
      :           'PA    1/Ellipt     Dev  PPU    Statistic'
          ELSE
@@ -1474,7 +1474,7 @@
                TEXT='^X  ^Y    ^N   ^RAD  ^VAL  ^POS   ^ELL'//
      :              '  ^DEV  ^POI'
             ENDIF
-            
+
 *         Output the results in suitably formatted form.
             NCHAR=0
             CALL MSG_LOAD(' ',TEXT,NAME,J,STATUS)
@@ -1510,9 +1510,9 @@
             CALL MSG_FMTR('FDC3','F6.3',RESULT(15,I))
             CALL MSG_FMTR('FDS4','F6.3',RESULT(16,I))
             CALL MSG_FMTR('FDC4','F6.3',RESULT(17,I))
-            TEXT=' ^RAD   ^FDS1  ^FDC1  ^FDS2  ^FDC2'// 
+            TEXT=' ^RAD   ^FDS1  ^FDC1  ^FDS2  ^FDC2'//
      :           '  ^FDS3  ^FDC3  ^FDS4  ^FDC4'
- 
+
 *         Output the results in suitably formatted form.
             NCHAR=0
             CALL MSG_LOAD(' ',TEXT,NAME,NCHAR,STATUS)
@@ -1524,19 +1524,19 @@
 *      Add message describing storage units for radius.
          NCHAR=0
          TEXT='!! NOTE: Radii values are stored on file as semi-'/
-     :        /'major axis length' 
+     :        /'major axis length'
          CALL CHR_PUTC(TEXT,LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
          NCHAR=0
          TEXT='!!       measured in pixels but on screen as '/
-     :        /'equivalent radii in arc secs.' 
+     :        /'equivalent radii in arc secs.'
          CALL CHR_PUTC(TEXT,LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
 
 *      Add message describing position angle.
          NCHAR=0
          TEXT='!! NOTE: Position angles are stored on file with'/
-     :        /' origin upward and clockwise rotation positive.' 
+     :        /' origin upward and clockwise rotation positive.'
          CALL CHR_PUTC(TEXT,LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
 
@@ -1553,6 +1553,6 @@
 
  9999 CONTINUE
 
-      END 
+      END
 
 

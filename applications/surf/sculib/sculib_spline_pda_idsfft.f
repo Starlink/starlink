@@ -18,7 +18,7 @@
 *  Description:
 *     This routine provides a wrapper for the PDA_IDSFFT spline interpolation
 *     routine. The quirks of the algorithm are dealt with here so that
-*     SCULIB_SPLINE_REGRID does not have to know anything about the 
+*     SCULIB_SPLINE_REGRID does not have to know anything about the
 *     interpolation routine.
 
 *  Arguments:
@@ -58,7 +58,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -99,7 +99,7 @@
       INTEGER WK_END                             ! Pointer to End of WK
       INTEGER WK_PTR                             ! Pointer to REAL scratch array
 
-      
+
 *   local data
 *.
 
@@ -130,7 +130,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN,
-     :        1,1, X_IN(1), Y_IN(1), RTEMP, %VAL(CNF_PVAL(IWK_PTR)), 
+     :        1,1, X_IN(1), Y_IN(1), RTEMP, %VAL(CNF_PVAL(IWK_PTR)),
      :        %VAL(CNF_PVAL(WK_PTR)),
      :        ISTAT, STATUS)
 
@@ -146,7 +146,7 @@
             MODE = 2
 
             CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NX_OUT,
-     :           NY_OUT, X_OUT, Y_OUT, DATA_OUT, 
+     :           NY_OUT, X_OUT, Y_OUT, DATA_OUT,
      :           %VAL(CNF_PVAL(IWK_PTR)),
      :           %VAL(CNF_PVAL(WK_PTR)), ISTAT, STATUS)
 
@@ -162,6 +162,6 @@
 
       CALL SCULIB_FREE ('SPLINE_IWK', IWK_PTR, IWK_END, STATUS)
       CALL SCULIB_FREE ('SPLINE_WK', WK_PTR, WK_END, STATUS)
-      
+
 
       END

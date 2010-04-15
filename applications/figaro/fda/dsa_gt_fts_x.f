@@ -80,7 +80,7 @@
 
       SUBROUTINE DSA_GET_FITS_C( DSAREF, KEY, ELEM,
      :   VALUE, COMENT, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
       CALL CHR_UCASE( KEYUC )
 
 *  Given the keyword find a value string and the comment.
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), 
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
      :                  ISSTR, STATUS, %VAL(CNF_CVAL(80)) )
@@ -160,7 +160,7 @@
 
       SUBROUTINE DSA_GET_FITS_D( DSAREF, KEY, ELEM,
      :   VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -223,7 +223,7 @@
 
       SUBROUTINE DSA_GET_FITS_F( DSAREF, KEY, ELEM,
      :   VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -286,7 +286,7 @@
 
       SUBROUTINE DSA_GET_FITS_I( DSAREF, KEY, ELEM,
      :   VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -352,7 +352,7 @@
 
       SUBROUTINE DSA_GET_FITS_L( DSAREF, KEY, ELEM,
      :   VALUE, COMENT, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants

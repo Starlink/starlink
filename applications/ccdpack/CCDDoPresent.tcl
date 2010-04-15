@@ -69,16 +69,16 @@ proc CCDDoPresent {Top args} {
    if { [info exists CCDfilternames] } {
       set Fnames [split $CCDfilternames ", "]
    }
-   
+
 #  Do not proceed to present the files etc. if all isn't well.
    set proceed 1
-   
+
 #  Targets. Need at least one for each filter
    if { $CCDhaveframe(targets) } {
       foreach f $Fnames {
          set nt [CCDUpdateColourLists targets $Target($f) $f]
-         if { $nt == 0 } { 
-            if { $f == "NONE" } { 
+         if { $nt == 0 } {
+            if { $f == "NONE" } {
                CCDIssueInfo "You must supply some TARGET frames"
             } else {
                CCDIssueInfo "You must supply some TARGET($f) frames"
@@ -87,13 +87,13 @@ proc CCDDoPresent {Top args} {
          }
       }
    }
-   
+
 #  Flatfields. Same as targets.
    if { $CCDhaveframe(flatfields) } {
       foreach f $Fnames {
          set nf [CCDUpdateColourLists flatfields $Flat($f) $f]
-         if { $nf == 0 } { 
-            if { $f == "NONE" } { 
+         if { $nf == 0 } {
+            if { $f == "NONE" } {
                CCDIssueInfo "You must supply some FLAT frames"
             } else {
                CCDIssueInfo "You must supply some FLAT($f) frames"
@@ -102,51 +102,51 @@ proc CCDDoPresent {Top args} {
          }
       }
    }
-   
+
 #  Biases. These are colourless.
    if { $CCDhaveframe(biases) } {
       set CCDndfs(biases) [CCDCreateListofNames $Bias {} {}]
       set nb [$Bias size]
-      if { $nb == 0 } { 
+      if { $nb == 0 } {
          CCDIssueInfo "You must supply some BIAS frames"
          set proceed 0
       }
    }
-   
+
 #  Darks. These are colourless, but may have exposure factors.
    if { $CCDhaveframe(darks) } {
       set nd [CCDUpdateFactorLists darks $Dark]
-      if { $nd == 0 } { 
+      if { $nd == 0 } {
          CCDIssueInfo "You must supply some DARK frames"
          set proceed 0
       }
    }
-   
+
 #  Flashes. Same as darks
    if { $CCDhaveframe(flashes) } {
       set nf [CCDUpdateFactorLists flashes $Flash]
-      if { $nf == 0 } { 
+      if { $nf == 0 } {
          CCDIssueInfo {You must supply some FLASH frames}
          set proceed 0
       }
    }
-   
+
 #  Master Bias.
    if { $CCDhaveframe(master_biases) } {
       set CCDndfs(master_biases) [CCDCreateListofNames $Masterbias {} {}]
       set nb [$Masterbias size]
-      if { $nb == 0 } { 
+      if { $nb == 0 } {
          CCDIssueInfo "You must supply a MASTER BIAS frame"
          set proceed 0
       }
    }
-   
+
 #  Master flatfields.
    if { $CCDhaveframe(master_flats) } {
       foreach f $Fnames {
          set nf [CCDUpdateColourLists master_flats $Masterflat($f) $f]
-         if { $nf == 0 } { 
-            if { $f == "NONE" } { 
+         if { $nf == 0 } {
+            if { $f == "NONE" } {
                CCDIssueInfo "You must supply a MASTER FLAT frame"
             } else {
                CCDIssueInfo "You must supply some MASTER FLAT($f) frames"
@@ -155,32 +155,32 @@ proc CCDDoPresent {Top args} {
          }
       }
    }
-   
+
 #  Master Dark.
    if { $CCDhaveframe(master_darks) } {
       set CCDndfs(master_darks) [CCDCreateListofNames $Masterdark {} {}]
       set nb [$Masterdark size]
-      if { $nb == 0 } { 
+      if { $nb == 0 } {
          CCDIssueInfo "You must supply a MASTER DARK frame"
          set proceed 0
       }
    }
-   
+
 #  Master flash.
    if { $CCDhaveframe(master_flashes) } {
       set CCDndfs(master_flashes) [CCDCreateListofNames $Masterflash {} {}]
       set nb [$Masterflash size]
-      if { $nb == 0 } { 
+      if { $nb == 0 } {
          CCDIssueInfo "You must supply a MASTER FLASH frame"
          set proceed 0
       }
    }
 
 #  If all necessary conditions have been met, then present the frames.
-   if { $proceed } { 
+   if { $proceed } {
       eval CCDPresent $Top $args
       $Top kill $Top
- 
+
 #  Reset the lists of frames for possible next time.
       catch { unset Target }
       catch { unset Flat }

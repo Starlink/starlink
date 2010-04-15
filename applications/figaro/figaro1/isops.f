@@ -33,15 +33,15 @@ C              be the same as for IMAGE.  If not, a new structure
 C              is created, with everything but the data a direct
 C              copy of the input.
 C
-C     The command itself (IXSADD,IXSMUL, etc.) is used to 
+C     The command itself (IXSADD,IXSMUL, etc.) is used to
 C     differentiate between the possible operations.
 C
 C                                      KS / CIT 18th Feb 1983
 C
 C     Modified:
 C
-C     28th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs 
-C                    changed. Now uses DYN_ package for dynamic-memory 
+C     28th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs
+C                    changed. Now uses DYN_ package for dynamic-memory
 C                    handling. All WRUSERs converted to PAR_WRUSERs.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
@@ -79,13 +79,13 @@ C
       INTEGER      STATUS        ! Running status for DSA_ routines
       INTEGER      VDPTR         ! Dynamic-memory pointer to variance
                                  ! array
-      INTEGER      VDSLOT        ! Map slot number of input variance 
+      INTEGER      VDSLOT        ! Map slot number of input variance
                                  ! array
-      INTEGER      VOPTR         ! Dynamic-memory pointer to output 
-                                 ! variance 
+      INTEGER      VOPTR         ! Dynamic-memory pointer to output
+                                 ! variance
       LOGICAL      VEXIST        ! TRUE if variance exists in both files
       INTEGER      VOSLOT        ! Map slot number output variance array
-      INTEGER      VSPTR         ! Dynamic-memory pointer to spectrum 
+      INTEGER      VSPTR         ! Dynamic-memory pointer to spectrum
                                  ! variance
       INTEGER      VSSLOT        ! Map slot number of spectrum variance
       LOGICAL      XCOM          ! FIGARO command was an X one?

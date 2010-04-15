@@ -3,14 +3,14 @@ C+
      :                      PTRS,WORK1,WW,XX,YY,
      :                      COEFFS,M)
 C
-C     E C H _ A R C F I T 
+C     E C H _ A R C F I T
 C
 C     Performs a weighted least squares fit of order M to the NN data
 C     points in X and Y, returning a power series polynomial.
 C
 C     Parameters -  (">" input, "<" output)
 C
-C     (>) X      (Real array X(NN)) The X values of the points to 
+C     (>) X      (Real array X(NN)) The X values of the points to
 C                be fitted.
 C     (>) Y      (Real array Y(NN)) The Y values of the points to
 C                be fitted.
@@ -35,10 +35,10 @@ C     (>) M      (Integer) The order of the polynomial to be fitted.
 C
 C     Common variables used -  None
 C
-C     History - This routine is a new & generalized version of the Figaro 
+C     History - This routine is a new & generalized version of the Figaro
 C        routine WXYFIT, which was in turn a slight modification to the
 C        routine XYFIT, having the additional argument giving the weights
-C        of the points. XYFIT had a dubious pedigree, originating in a 
+C        of the points. XYFIT had a dubious pedigree, originating in a
 C        routine used in the IPCS Interdata software and lifted from one
 C        of the appendices in the IBM Fortran IV manual!  It was then used
 C        in Spica, with modifications made by all sorts of people.  At
@@ -52,10 +52,10 @@ C        and including WXYFIT.  Hence these routines needed to arbitrarily
 C        limit the number of points that could be handled.  The present
 C        routine, ECH_ARCFIT, gets around this number of pixel limitation
 C        by getting its workspace from the calling program, where the number
-C        of points ought to be known and so workspace can be dynamically 
+C        of points ought to be known and so workspace can be dynamically
 C        allocated and passed to the routine.  The use of PAR_WRUSER for
 C        output messages also makes WXYFIT and its decendent ECH_ARCFIT
-C        somewhat FIGARO-specific. 
+C        somewhat FIGARO-specific.
 C
 C                    -- most recently WXYFIT:  KS / AAO 5th Sept 1985
 C             ... converted into ECH_ARCFIT:  JKM / ESO 21. Nov. 1987
@@ -68,7 +68,7 @@ C                  with an unnecessary limitation on the number of
 C                  points that could be fit.  Comments changed to
 C                  reflect this new arrangement; program renamed
 C                  from WXYFIT to ECH_ARCFIT and appended to the
-C                  Figaro command ECHARC, version 1.0 (auto line 
+C                  Figaro command ECHARC, version 1.0 (auto line
 C                  identification for almost all orders).
 C     18 Apr 1995  HME / UoE, Starlink.  No longer use NAG, workspace is
 C                  longer now and measured by NN _and_ maximum degree of

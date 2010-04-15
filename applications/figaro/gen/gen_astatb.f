@@ -36,7 +36,7 @@ C
 C                                               KS / CIT  6th March 1983
 C     Modified:
 C
-C     19th March 1987.  KS / AAO. Double precision now used for total values 
+C     19th March 1987.  KS / AAO. Double precision now used for total values
 C                       in the internal calculations.
 C     6th April 1993.   HME / UoE, Starlink.  Handle bad values. Adaption
 C                       from GEN_ASTAT.

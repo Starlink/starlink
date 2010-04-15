@@ -16,7 +16,7 @@
 
       DOUBLE PRECISION STORE				!Location to store the passed double precision value in.
       CHARACTER*25 TEMP
- 
+
       INTEGER FIELD_LENGTH				!Length of field which precedes insertion.
       INTEGER BYTENO					!Byte number of preceding record.
       CHARACTER*6 FORMAT				!Format of field.

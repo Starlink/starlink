@@ -17,7 +17,7 @@
 *     is produced by smoothing the input image with the PSF.  This is
 *     done in Fourier space using the FFT of the PSF stored in file <3>.
 *     The input image will have a blank margin around it to reduce
-*     wrap-around effects at the image edges. 
+*     wrap-around effects at the image edges.
 
 *  Arguments:
 *     J = INTEGER (Given)
@@ -65,7 +65,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,7 +86,7 @@
 *  internal memory within common block /MECOMS/.  Area <3> holds the
 *  FFT of the PSF.
       IF ( C1_WEXT ) THEN
-         CALL KPS1_OP1( %VAL( CNF_PVAL( C1_IP( 3 ) ) ), 
+         CALL KPS1_OP1( %VAL( CNF_PVAL( C1_IP( 3 ) ) ),
      :                  %VAL( CNF_PVAL( C1_IP( J ) ) ),
      :                  %VAL( CNF_PVAL( C1_IP( K ) ) ) )
 
@@ -95,12 +95,12 @@
 *  images because of the need to have an integer number of buffers in
 *  each area).  This simulates a response function of zero at these
 *  pixels.
-         CALL KPS1_MEMFX( ME_MK * ME_NK, C1_NPX * C1_NLN, 
+         CALL KPS1_MEMFX( ME_MK * ME_NK, C1_NPX * C1_NLN,
      :                    %VAL( CNF_PVAL( C1_IP( K ) ) ) )
 
-      ELSE 
-         CALL KPS1_OP1( ME_ST( ME_KB( 3 ) ), ME_ST( ME_KB( J ) ), 
-     :                  ME_ST( ME_KB( K ) ) ) 
+      ELSE
+         CALL KPS1_OP1( ME_ST( ME_KB( 3 ) ), ME_ST( ME_KB( J ) ),
+     :                  ME_ST( ME_KB( K ) ) )
 
       END IF
 

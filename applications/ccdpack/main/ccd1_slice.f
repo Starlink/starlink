@@ -70,14 +70,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
-*  Arguments Given and Returned: 
+*  Arguments Given and Returned:
       CHARACTER NAME*(*)
 
 *  Arguments Returned:
@@ -112,14 +112,14 @@
          STOP = INDEX( NAME( START: ), ')' )
 
          IF( STOP .NE. 0 ) THEN
-            STOP = STOP + START - 1 
+            STOP = STOP + START - 1
 
             IF( STOP .EQ. NAMLEN ) THEN
                SLICE = NAME( START:STOP )
                NAME( START: ) = ' '
             END IF
 
-         END IF      
+         END IF
 
       END IF
 

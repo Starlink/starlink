@@ -19,9 +19,9 @@
 *     primary headers needs to be merged with columns in a binary table.
 *     of a series of observations.
 *
-*     Following these, but before the END card, come FITS header cards 
-*     containing the values of columns of the nominated row of the 
-*     binary table that have been unused to form the NDF.  These 
+*     Following these, but before the END card, come FITS header cards
+*     containing the values of columns of the nominated row of the
+*     binary table that have been unused to form the NDF.  These
 *     additional headers use the TTYPEn values as their keywords.
 *     If the primary header array supplied already contains such
 *     keywords, the existing values are overwritten.  The headers are
@@ -75,7 +75,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

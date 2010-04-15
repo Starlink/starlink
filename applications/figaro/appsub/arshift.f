@@ -25,7 +25,7 @@ C     (!) CHANS    (Real array CHANS(NLMAX)) The channel numbers of
 C                  the identified lines.
 C     (!) WAVES    (Real array WAVES(NLMAX)) The wavelengths of the
 C                  identified lines.
-C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (!) CLASS    (Integer array CLASS(NLMAX)) The class codes for
 C                  the identified arc lines.
@@ -58,7 +58,7 @@ C
       CHARACTER REPLY*64
 C
 C     Loop through the arc line list list trying to calculate
-C     the new centroids.  
+C     the new centroids.
 C
       DO I=1,NLID
          CENTR=CHANS(I)+SHIFT

@@ -7,10 +7,10 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of module:
 *     Global constants include file.
- 
+
 *  Description:
 *     This file contains the definitions of the global constants
 *     in required by SURF.
@@ -88,7 +88,7 @@
 *     Parameters governing the instrument itself
 
       INTEGER SCUBA__MAX_SUB                ! max number of sub-instruments
-      PARAMETER (SCUBA__MAX_SUB = 5)        
+      PARAMETER (SCUBA__MAX_SUB = 5)
 
       INTEGER SCUBA__NUM_ADC                ! number of A/D cards
       PARAMETER (SCUBA__NUM_ADC = 9)
@@ -103,7 +103,7 @@
       PARAMETER (SCUBA__MAX_POINT = 20)
 
 *     Has to be large enough to include all the files that we read in
-*     with REBIN (specified in MAX_FILE parameter in surf_rebin.f)      
+*     with REBIN (specified in MAX_FILE parameter in surf_rebin.f)
       INTEGER SCUBA__MAX_FITS               ! max number of FITS items in file
       PARAMETER (SCUBA__MAX_FITS = 356)
 

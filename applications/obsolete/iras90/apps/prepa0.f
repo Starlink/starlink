@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,7 +135,7 @@
          CALL ERR_REP( 'PREPA0_ERR1',
      :                 'PREPA0: Only ^S0 values given (^S required).',
      :                 STATUS )
-      
+
       ELSE IF( SIZE0 .GT. SIZE .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
 
@@ -145,18 +145,18 @@
          CALL ERR_REP( 'PREPA0_ERR2',
      :                'PREPA0: ^S0 values given (only ^S can be used).',
      :                 STATUS )
-      
+
       END IF
 
 *  If an error has occurred (other than a parameter request abort), add
-*  another report asking the user to supply a new group, flush the 
-*  error status, cancel the parameter value, set the group size to zero 
+*  another report asking the user to supply a new group, flush the
+*  error status, cancel the parameter value, set the group size to zero
 *  and return for a new group.
-      IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT .AND. 
+      IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT .AND.
      :    NBAD .LE. 4 ) THEN
          CALL ERR_REP( 'PREPA0_ERR3',
      :                 'PREPA0: Please give a new group of values.',
-     :                 STATUS )      
+     :                 STATUS )
          CALL ERR_FLUSH( STATUS )
          CALL PAR_CANCL( PARAM, STATUS )
          CALL GRP_SETSZ( IGRP, 0, STATUS )

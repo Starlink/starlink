@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GILST( LONUM, UPNUM, MAXLIN, PARAM, FLAG, NUMBER, 
+      SUBROUTINE KPG1_GILST( LONUM, UPNUM, MAXLIN, PARAM, FLAG, NUMBER,
      :                       NDISP, STATUS )
 *+
 *  Name:
@@ -44,7 +44,7 @@
 *        effect as just entering it once.
 *     FLAG( LONUM : UPNUM ) = INTEGER (Returned)
 *        A temporary flag array used to flag the number which has been
-*        selected. 
+*        selected.
 *     NUMBER( MAXLIN ) = INTEGER (Returned)
 *        The selected numbers.
 *     NDISP = INTEGER (Returned)
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,9 +118,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:          
+*  External References:
        INTEGER CHR_LEN           ! The used length of a string
-       
+
 *  Local Variables:
        INTEGER BERNGI            ! Begin number of a range
        LOGICAL BELG              ! Flag showing begin number is omitted
@@ -137,12 +137,12 @@
        CHARACTER * ( 128 ) SELIST ! The number specification string
        INTEGER SELN              ! Used length of string SELIST
        INTEGER TMP               ! A temporary buffer for swapping
-        
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Start a new error context.
       CALL ERR_MARK
 
@@ -165,7 +165,7 @@
 
 *  Check error, if so, exit.
          IF ( STATUS .NE. SAI__OK ) GOTO 999
-           
+
 *  The items of the string are separated by comma, extract them one
 *  be one until no element left.
          ITMBGN = 1
@@ -200,14 +200,14 @@
 *  Parse this element according to its type.
 *  =========================================
 
-*  If 'ALL' or '*' is specified, select all numbers between LONUM 
+*  If 'ALL' or '*' is specified, select all numbers between LONUM
 *  and UPNUM
             IF ( ( INDEX( 'ALL' , SCT( : SCTLN ) ) .EQ. 1 ) .OR.
      :           ( SCT( : SCTLN ) .EQ. '*' ) ) THEN
                DO J = LONUM, UPNUM
                   FLAG( J ) = 1
                END DO
-      
+
 *  If a range is defined, get its begin and end limits.
             ELSE IF ( INDEX( SCT, ':' ) .NE. 0 ) THEN
                CALL KPG1_RGLMT( SCT, ':', BERNGI, BELG, EDRNGI, EDLG,
@@ -246,7 +246,7 @@
                   BERNGI = EDRNGI
                   EDRNGI = TMP
                END IF
-      
+
 *  Set the flag for number between the range as 1.
                DO J = BERNGI, EDRNGI
                   FLAG( J ) = 1
@@ -270,7 +270,7 @@
 
 *  If the given number is outside selectable range, Output an error
 *  message, and go to error processing.
-               IF ( SCTNUM .LT. LONUM .OR. SCTNUM .GT. UPNUM ) THEN 
+               IF ( SCTNUM .LT. LONUM .OR. SCTNUM .GT. UPNUM ) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'LONUM', LONUM )
                   CALL MSG_SETI( 'UPNUM', UPNUM )
@@ -284,7 +284,7 @@
                FLAG( SCTNUM ) = 1
             END IF
 
-*  Go back to parse the next item until no more item left. 
+*  Go back to parse the next item until no more item left.
          END DO
 
 *  The selected numbers have been flagged; note these numbers in NUMBER.
@@ -310,7 +310,7 @@
             CALL PAR_CANCL( PARAM, STATUS )
             CALL ERR_FLUSH( STATUS )
             GOT = .FALSE.
-         END IF 
+         END IF
 
 *  Go back to re-input a number specification string.
       END DO

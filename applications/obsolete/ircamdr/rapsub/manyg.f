@@ -1,7 +1,7 @@
 
 *+  MANYG - generates a specified number of Gaussian stars in an image
 
-      SUBROUTINE MANYG ( IDIMS1, IDIMS2, IMAGE, MAX, MIN, SKY, NSTARS, 
+      SUBROUTINE MANYG ( IDIMS1, IDIMS2, IMAGE, MAX, MIN, SKY, NSTARS,
      :                   SCALE, SEEING, DISTRIB, BADPIX, FRACTION,
      :                   BADCOL, DISPLAY, SCREEN, FILENAME, STATUS )
 
@@ -15,7 +15,7 @@
 *
 *    Invocation :
 *
-*       CALL MANYG ( IDIMS, IMAGE, MAX, MIN, SKY, NSTARS, 
+*       CALL MANYG ( IDIMS, IMAGE, MAX, MIN, SKY, NSTARS,
 *     :              SCALE, SEEING, DISTRIB, BADPIX, FRACTION,
 *     :              BADCOL, DISPLAY, SCREEN, FILENAME, STATUS )
 *
@@ -58,7 +58,7 @@
 
 *    Import :
 
-      INTEGER                                      
+      INTEGER
      :    IDIMS1,             ! dimensions of image
      :    IDIMS2,             ! dimensions of image
      :    NSTARS                  ! number of stars to be generated
@@ -67,7 +67,7 @@
      :    MAX,                    ! maximum stellar intensity
      :    MIN,                    ! minimum    "        "
      :    SKY,                    ! sky background value to be used
-     :    SCALE,                  ! pixel scale in arcseconds   
+     :    SCALE,                  ! pixel scale in arcseconds
      :    SEEING,                 ! seeing in arcseconds
      :    FRACTION                ! fraction of bad pixels to be made
 
@@ -79,7 +79,7 @@
                                   ! stellar parameters
 
       LOGICAL
-     :    BADPIX,                 ! true if bad pixels to be included 
+     :    BADPIX,                 ! true if bad pixels to be included
      :    BADCOL,                 ! true if bad column to be included
      :    DISPLAY,                ! true if parameters to be output
      :    SCREEN                  ! true if output to be to screen
@@ -115,8 +115,8 @@
      :    SEED, TICKS             ! For random number seed
 
       INTEGER
-     :    BOX,                    ! half size of box round each star 
-                                  ! centre in which each pixel is set 
+     :    BOX,                    ! half size of box round each star
+                                  ! centre in which each pixel is set
                                   ! to the calculated Gaussian value
      :    UNITNUM                 ! unit number used for display
 
@@ -143,7 +143,7 @@
 
       UNITNUM = 0
 
-      PRINT *, IDIMS1, IDIMS2, MAX, MIN, SKY, NSTARS, 
+      PRINT *, IDIMS1, IDIMS2, MAX, MIN, SKY, NSTARS,
      :                   SCALE, SEEING, DISTRIB, BADPIX, FRACTION,
      :                   BADCOL, DISPLAY, SCREEN, FILENAME
 
@@ -233,7 +233,7 @@
          XFINISH  =  NINT( XPOS + ( BOX * FWHM ) )
          YSTART   =  NINT( YPOS - ( BOX * FWHM ) )
          YFINISH  =  NINT( YPOS + ( BOX * FWHM ) )
-       
+
 *       loop round the y dimension of the calculated box
          DO  L  =  YSTART, YFINISH
 
@@ -254,7 +254,7 @@
 
 *                   work out intensity at this point from Gaussian
 *                   profile formula
-                     INTENSITY  =  PEAK * 
+                     INTENSITY  =  PEAK *
      :  EXP( -( CURRX*CURRX + CURRY*CURRY ) / ( 2.0 * SIGMA * SIGMA ) )
 
 *                   add this intensity to any existing flux
@@ -264,7 +264,7 @@
                ENDDO
             ENDIF
          ENDDO
-      
+
 *    write out the stellar parameters if so requested
       IF ( DISPLAY ) THEN
          WRITE( UNITNUM, 100 )N, XPOS, YPOS, PEAK
@@ -285,7 +285,7 @@
 
 *    loop around all image pixels
       DO  J  =  1, IDIMS2
-         DO  I  =  1, IDIMS1 
+         DO  I  =  1, IDIMS1
 
 *          call the routine POISSON which takes a number and returns
 *          a semi-random number near the input according to a Poisson
@@ -340,7 +340,7 @@
 *       get a random column that is in the image
          VALUE   =  PDA_RAND(X)
          COLPOS  =  NINT( VALUE * IDIMS1 )
-         IF( COLPOS .EQ. 0 ) COLPOS = 1 
+         IF( COLPOS .EQ. 0 ) COLPOS = 1
 
 *       set all pixels in that column to zero
          DO  J  =  1, IDIMS2

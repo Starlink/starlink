@@ -51,7 +51,7 @@ C
       INTEGER  GOOD, BAD
       PARAMETER (BAD = 1, GOOD = 0)
 C
-C     Handle different quality methods separately.  
+C     Handle different quality methods separately.
 C
       IF (QUAL) THEN
 C
@@ -91,7 +91,7 @@ C
                ARRAY3(I)=ARRAY2(I)+ARRAY1(I)
                E3DATA(I)=E1DATA(I)+E2DATA(I)
             ENDDO
-         ELSE 
+         ELSE
             DO I=1,NELM
                ARRAY3(I)=ARRAY2(I)+ARRAY1(I)
             ENDDO

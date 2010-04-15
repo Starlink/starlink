@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -238,7 +238,7 @@ static void DrawSelectionBackground(
     font = HtmlGetFont(htmlPtr, p->base.style.font);
     if( font==0 ) return;
     if( p->base.type==Html_Text ){
-      xLeft = p->text.x - x + Tk_TextWidth(font, pBlock->z, 
+      xLeft = p->text.x - x + Tk_TextWidth(font, pBlock->z,
                                            htmlPtr->selStartIndex);
     }
   }
@@ -307,7 +307,7 @@ static void HtmlDrawRect(
     XFillRectangles(htmlPtr->display, drawable, gcDark, xrec, 1);
     for(i=0; i<depth && i<h/2; i++){
       XDrawLine(htmlPtr->display, drawable, gcLight, x+i, y+i, x+w-i-1, y+i);
-      XDrawLine(htmlPtr->display, drawable, gcDark, x+i, y+h-i-1, 
+      XDrawLine(htmlPtr->display, drawable, gcDark, x+i, y+h-i-1,
                  x+w-i-1, y+h-i-1);
     }
   }
@@ -361,7 +361,7 @@ void HtmlBlockDraw(
     }
     if( pBlock->base.flags & HTML_Selected ){
       HtmlLock(htmlPtr);
-      DrawSelectionBackground(htmlPtr, pBlock, drawable, 
+      DrawSelectionBackground(htmlPtr, pBlock, drawable,
                               drawableLeft, drawableTop);
       if( HtmlUnlock(htmlPtr) ) return;
     }
@@ -464,7 +464,7 @@ void HtmlBlockDraw(
                      x - 7 - drawableLeft, y - 8 - drawableTop, 7, 7);
             TestPoint(0);
             break;
-          
+
           case LI_TYPE_Enum_1:
           case LI_TYPE_Enum_A:
           case LI_TYPE_Enum_a:
@@ -477,7 +477,7 @@ void HtmlBlockDraw(
             Tk_DrawChars(htmlPtr->display,
                  drawable,
                  gc, font,
-                 zBuf, cnt, 
+                 zBuf, cnt,
                  x - w - drawableLeft, y - drawableTop);
             TestPoint(0);
             break;
@@ -486,7 +486,7 @@ void HtmlBlockDraw(
       case Html_HR: {
         int relief = htmlPtr->ruleRelief;
         switch( relief ){
-          case TK_RELIEF_RAISED: 
+          case TK_RELIEF_RAISED:
           case TK_RELIEF_SUNKEN:
             break;
           default:
@@ -504,7 +504,7 @@ void HtmlBlockDraw(
       case Html_TABLE: {
         int relief = htmlPtr->tableRelief;
         switch( relief ){
-          case TK_RELIEF_RAISED: 
+          case TK_RELIEF_RAISED:
           case TK_RELIEF_SUNKEN:
             break;
           default:
@@ -514,7 +514,7 @@ void HtmlBlockDraw(
         HtmlDrawRect(htmlPtr, drawable, src,
                            src->table.x - drawableLeft,
                            src->table.y - drawableTop,
-                           src->table.w, 
+                           src->table.w,
                            src->table.h,
                            src->table.borderWidth,
                            relief);
@@ -533,7 +533,7 @@ void HtmlBlockDraw(
         HtmlDrawRect(htmlPtr, drawable, src,
                          src->cell.x - drawableLeft,
                          src->cell.y - drawableTop,
-                         src->cell.w, 
+                         src->cell.w,
                          src->cell.h,
                          depth,
                          relief);
@@ -552,10 +552,10 @@ void HtmlBlockDraw(
                  drawable,
                  gc, font,
                  src->image.zAlt, strlen(src->image.zAlt),
-                 src->image.x - drawableLeft, 
+                 src->image.x - drawableLeft,
                  src->image.y - drawableTop);
           TestPoint(0);
-        }    
+        }
         break;
       default:
         TestPoint(0);
@@ -579,7 +579,7 @@ void HtmlDrawImage(
   int x, y;              /* where to place image on the drawable */
   int imageX, imageY;    /* \__  Subset of image that fits    */
   int imageW, imageH;    /* /    on the drawable              */
-                    
+
   imageTop = pElem->image.y - pElem->image.ascent;
   y = imageTop - drawableTop;
   if( imageTop + pElem->image.h > drawableBottom ){
@@ -615,7 +615,7 @@ void HtmlDrawImage(
     imageX = 0;
     TestPoint(0);
   }
-  Tk_RedrawImage(pElem->image.pImage->image, imageX, imageY, imageW, imageH, 
+  Tk_RedrawImage(pElem->image.pImage->image, imageX, imageY, imageW, imageH,
                  drawable, x, y);
   pElem->image.redrawNeeded = 0;
 }
@@ -749,10 +749,10 @@ static HtmlElement *FillOutBlock(HtmlWidget *htmlPtr, HtmlBlock *p){
           CANT_HAPPEN;
           break;
         }
-        if( y != pElem->text.y 
+        if( y != pElem->text.y
         ||  style.font != pElem->base.style.font
         ||  style.color != pElem->base.style.color
-        ||  (style.flags & STY_FontMask) 
+        ||  (style.flags & STY_FontMask)
               != (pElem->base.style.flags & STY_FontMask)
         ){
           go = 0;
@@ -782,7 +782,7 @@ static HtmlElement *FillOutBlock(HtmlWidget *htmlPtr, HtmlBlock *p){
         if( pElem->base.style.font != style.font ){
           pElem = pElem->pNext;
           go = 0;
-        }else if( (style.flags & STY_Preformatted)!=0 
+        }else if( (style.flags & STY_Preformatted)!=0
                   && (pElem->base.flags & HTML_NewLine)!=0 ){
           pElem = pElem->pNext;
           go = 0;

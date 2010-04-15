@@ -1,7 +1,7 @@
 
 *+  PIXDUPESUB - expands an image by pixel duplication
 
-      SUBROUTINE PIXDUPESUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY, 
+      SUBROUTINE PIXDUPESUB ( INARRAY, IDIMS1, IDIMS2, OUTARRAY,
      :                        ODIMS1, ODIMS2, EXPAND, STATUS )
 
 *    Description :
@@ -76,12 +76,12 @@
      :    EXPAND                   ! linear expansion factor to be used
 
       REAL
-     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array 
+     :    INARRAY( IDIMS1, IDIMS2 )    ! input data array
 
 *    Export :
 
       REAL
-     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array 
+     :    OUTARRAY( ODIMS1, ODIMS2 )   ! output data array
 
 *    Status :
 
@@ -109,8 +109,8 @@
 *    loop around all rows of the input array
       DO  J  =  1, IDIMS2
 
-*       calculate the starting and finishing y indices of the pixels 
-*       in the output image that will be formed from pixels with the 
+*       calculate the starting and finishing y indices of the pixels
+*       in the output image that will be formed from pixels with the
 *       current y index in the input image
 
          STARTROW  =  ( ( J - 1 ) * EXPAND ) + 1
@@ -126,7 +126,7 @@
             ENDCOL    =  STARTCOL + EXPAND - 1
 
 *          set a dummy variable to be the value of the pixel currently
-*          under duplication 
+*          under duplication
             CURRENT  =  INARRAY( I, J )
 
 *          loop round all the output pixels that are to have this value
@@ -142,6 +142,6 @@
 *    end of loop round all rows in input array
       END DO
 
-         
+
 *    end and return
       END

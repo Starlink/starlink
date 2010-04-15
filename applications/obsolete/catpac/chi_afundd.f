@@ -1,10 +1,10 @@
 *+  ADC_XFUNDD - Evaluate a numeric function
-      subroutine chi_afundd(fnumber, nargs, arg, value, status) 
-*    Description : 
+      subroutine chi_afundd(fnumber, nargs, arg, value, status)
+*    Description :
 *     Performs an evaluation of a numeric function to a DP result.
 *    Invocation
 *     CALL ADC_XFUNDD(FNUMBER, NARGS, ARG, VALUE, STATUS)
-*    Parameters : 
+*    Parameters :
 *     FNUMBER=INTEGER(INPUT)
 *           The number of the function
 *     NARGS=INTEGER(INPUT)
@@ -15,7 +15,7 @@
 *           Value of the expression
 *     STATUS=INTEGER(UPDATE)
 *           Status variable
-*    Method : 
+*    Method :
 *     Go to the function specified
 *     If another function value is calculated then
 *        Store it.
@@ -24,17 +24,17 @@
 *            evaluated in the same order.  This halves the time
 *            for the calculation of both longitude and latitude
 *            coordinates.
-*    Authors : 
+*    Authors :
 *     Jon Fairclough (RAL::IPMAF)
-*    History : 
+*    History :
 *     3-Feb-1985: Original
 *    20-Apr-1985: ADIFF and GRCIRC functions added. LOG10/LOG reversed
 *    17-May-1985: SUPGAL and GALSUP routines added
 *    27-Nov-1986: renamed from ADC_CALC1 distinguishing from ADC_XFUNDI
-*    Type Definitions : 
-      implicit none 
-*    Global constants : 
-      include 'SAE_PAR'                 ! SAI Symbolic Constants 
+*    Type Definitions :
+      implicit none
+*    Global constants :
+      include 'SAE_PAR'                 ! SAI Symbolic Constants
       include 'CHI_ERR'
       include 'CHIPAR_ERR'
       include 'CHI_PAR'
@@ -44,10 +44,10 @@
       integer fnumber
       integer nargs
       double precision arg(*)                ! Values
-*    Export 
+*    Export
       double precision value
-*    Status : 
-      integer status 
+*    Status :
+      integer status
 *    Global variables
       include 'CHIWRK_CMN'
 *    External references
@@ -60,7 +60,7 @@
       double precision dummy2
       double precision dummy3
       double precision dummy4
-*- 
+*-
 *    Begin
 *
       if (status .ne. SAI__OK) then
@@ -256,7 +256,7 @@
    37 call sla_pm    (arg(1), arg(2), arg(3), arg(4), arg(5),
      :                arg(6), arg(7), arg(8), dummy , value)
       ftsave(36) = dummy
-      ftflag(36) = .true.      
+      ftflag(36) = .true.
       goto 100
 *
    38 value = abs(arg(1) - arg(2))

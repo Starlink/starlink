@@ -7,14 +7,14 @@
      &QU_TRIPLOT,QAUTOLIM,QMAX,QMIN,UAUTOLIM,UMAX,UMIN)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   T R I P L O T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C BIN_ERR (<), IT (<), Q (<), U (<), QV (<), UV (<), WAVE (<),
 C NPTS (<), TMAX (<), TMIN (<), PMAX (<), PMIN (<), IMAX (<), IMIN (<),
@@ -25,12 +25,12 @@ C TLAB (<), PFLUX (<), PFMAX (<), PFMIN (<), PFAUTOLIM (<), LCOL (<),
 C LSTYLE (<), HIST (<), MARK (<), QU_TRIPLOT (<), QAUTOLIM (<), QMAX (<),
 C QMIN (<), UAUTOLIM (<), UMAX (<), UMIN (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C Plots the polarization spectrum in 'triplot' form:
@@ -49,7 +49,7 @@ C
       INTEGER NEW_NPTS
 C
 C The polarization spectrum
-C 
+C
       INTEGER NPTS
       REAL IT(*)
       REAL Q(*)
@@ -86,7 +86,7 @@ C
       LOGICAL CROT
       LOGICAL TAUTOLIM
       LOGICAL T_HI
-      LOGICAL T_LOW 
+      LOGICAL T_LOW
       LOGICAL POLY
       LOGICAL HIST
       LOGICAL MARK
@@ -168,7 +168,7 @@ C
           ENDIF
          ENDDO
       ENDIF
-         
+
 C
 C Set the PA range
 C
@@ -196,8 +196,8 @@ C
       ENDIF
       IF (QU_TRIPLOT) THEN
       CALL PGWINDOW(WMIN,WMAX,QMIN,QMAX)
-      ELSE  
-      CALL PGWINDOW(WMIN,WMAX,TMIN,TMAX) 
+      ELSE
+      CALL PGWINDOW(WMIN,WMAX,TMIN,TMAX)
       ENDIF
 C
 C Set up the line style for this plot
@@ -207,7 +207,7 @@ C
       ENDIF
       IF (BOX.AND.CROT) THEN
        LCOL = 1
-      ENDIF       
+      ENDIF
       IF ((.NOT.BOX).AND.LROT) THEN
        CALL PGQLS(LSTYLE)
        LSTYLE = MAX(1,MOD(LSTYLE+1,6))
@@ -225,7 +225,7 @@ C
       CALL PGSLS(1)
       CALL PGSCI(1)
       CALL PGBOX('BCST',0.0,0.0,'NBCST',0.0,0.0)
-      IF (QU_TRIPLOT) THEN 
+      IF (QU_TRIPLOT) THEN
       CALL PGMTEXT('L',2.5,0.5,0.5,'Stokes Q (%)')
        ELSE
       CALL PGMTEXT('L',2.5,0.5,0.5,TLAB)
@@ -303,16 +303,16 @@ C
         CALL GET_LIMITS(POLTEMP,WS_NEW,WE_NEW,PMAX,PMIN)
        ENDIF
       ENDIF
-      IF (PFLUX) THEN 
+      IF (PFLUX) THEN
       CALL PGVPORT(0.1,0.9,0.3,0.5)
-      ELSE 
+      ELSE
       CALL PGVPORT(0.1,0.9,0.4,0.65)
       ENDIF
        IF (QU_TRIPLOT) THEN
         CALL PGWINDOW(WMIN,WMAX,UMIN,UMAX)
         ELSE
         CALL PGWINDOW(WMIN,WMAX,PMIN,PMAX)
-      ENDIF 
+      ENDIF
       IF (BOX) THEN
        CALL PGSLS(1)
        CALL PGSCI(1)

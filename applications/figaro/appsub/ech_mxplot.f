@@ -11,9 +11,9 @@ C     and it assumes PGPBEGIN has already been called.  It calls PGEND.
 C
 C     Parameters -    (">" input, "<" output)
 C
-C     (>) XVAL      (Real array XVAL(NTOT)) The x-locations of the 
+C     (>) XVAL      (Real array XVAL(NTOT)) The x-locations of the
 C                   lines, assumed to be channel numbers.
-C     (>) ZVAL      (Real array MVAL(NTOT)) The y-locations of the 
+C     (>) ZVAL      (Real array MVAL(NTOT)) The y-locations of the
 C                   lines, assumed to be order numbers.
 C     (>) NTOT      (Integer) The number of lines possible.
 C     (>) NIDS      (Integer) The number of lines actually identified.

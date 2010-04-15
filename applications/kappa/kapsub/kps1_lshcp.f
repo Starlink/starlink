@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NCAX, LABIN, POS, 
+      SUBROUTINE KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NCAX, LABIN, POS,
      :                       ID, NDISP, SID, SPOS, LABOUT, STATUS )
 *+
 *  Name:
@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NCAX, LABIN, POS, ID, NDISP, 
+*     CALL KPS1_LSHCP( FIRST, LAST, STEP, NPOS, NCAX, LABIN, POS, ID, NDISP,
 *                      SID, SPOS, LABOUT, STATUS )
 
 *  Description:
-*     This routine copies positions and identifiers from the input 
+*     This routine copies positions and identifiers from the input
 *     arrays to the output arrays. Only positions with identifiers
 *     in the range FIRST to LAST (inclusive) are copied.
 
@@ -31,7 +31,7 @@
 *     NCAX = INTEGER (Given)
 *        The number of axes for the supplied positions.
 *     LABIN = INTEGER (Given)
-*        A GRP identifier for a group holding all the position labels. 
+*        A GRP identifier for a group holding all the position labels.
 *        Supplied equal to GRP__NOID if there are no labels.
 *     POS( NPOS, NCAX ) = DOUBLE PRECISION (Given)
 *        The supplied positions.
@@ -88,7 +88,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -136,7 +136,7 @@
       DO I = 1, NPOS
 
 *  If this position identifier is within the sipplied range...
-         IF( ID( I ) .GE. FIRST .AND. 
+         IF( ID( I ) .GE. FIRST .AND.
      :       ID( I ) .LE. LAST .AND.
      :       MOD( ID( I ) - FIRST, STEP ) .EQ. 0 ) THEN
 

@@ -14,10 +14,10 @@
 *     CALL KPG1_PGLUT( NCOL, COLS, LO, HI, NN, STATUS )
 
 *  Description:
-*     This routine stores new colour representations for a range of PGPLOT 
+*     This routine stores new colour representations for a range of PGPLOT
 *     colour indices. A list of NCOL colour representations is supplied.
 *     These are normalized so that the highest value produces full colour
-*     intensity. The first colour (1) is assigned to PGPLOT colour index LO, 
+*     intensity. The first colour (1) is assigned to PGPLOT colour index LO,
 *     and the last (NCOL) is assigned to PGPLOT colour index HI. The colour
 *     representations for the PGPLOT colour indices between LO and HI
 *     are formed by interpolation amonst the supplied NCOL colours, using
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,7 +118,7 @@
          TOP = MAX( COLS( 1, J ), MAX( COLS( 2, J ), COLS( 3, J ) ) )
       END DO
 
-*  If this is larger than 1, set up the normalization factor which 
+*  If this is larger than 1, set up the normalization factor which
 *  scales the TOP value to unity.
       IF( TOP .NE. 0 .AND. TOP .GT. 1.0 ) THEN
          NORM = 1.0/TOP
@@ -131,7 +131,7 @@
       IF( HI - LO + 1 .EQ. NCOL ) THEN
          J = 1
          DO  I = LO, HI
-            CALL PGSCR( I, NORM*COLS( 1, J ), NORM*COLS( 2, J ), 
+            CALL PGSCR( I, NORM*COLS( 1, J ), NORM*COLS( 2, J ),
      :                  NORM*COLS( 3, J ) )
             J = J + 1
          END DO
@@ -146,14 +146,14 @@
          IF ( NN ) THEN
 
 *  For all the specified PGPLOT colour indices
-            DO  I = LO, HI 
+            DO  I = LO, HI
 
 *  Calculate the nearest position in the input table.
-               J = MAX( 1, MIN( NCOL, 
+               J = MAX( 1, MIN( NCOL,
      :                  NINT( SCALE * REAL( I - LO ) ) + 1 ) )
 
 *  Set the colour representation.
-               CALL PGSCR( I, NORM*COLS( 1, J ), NORM*COLS( 2, J ), 
+               CALL PGSCR( I, NORM*COLS( 1, J ), NORM*COLS( 2, J ),
      :                     NORM*COLS( 3, J ) )
 
             END DO
@@ -162,10 +162,10 @@
          ELSE
 
 *  For all the specified PGPLOT colour indices
-            DO  I = LO, HI 
+            DO  I = LO, HI
 
 *  Calculate the fractional position in the input table.
-               FJ = SCALE * REAL( I - LO ) 
+               FJ = SCALE * REAL( I - LO )
 
 *  Find the corresponding RGB values.
                IF( FJ .LE. 1.0 ) THEN
@@ -183,11 +183,11 @@
                   J2 = J1 + 1
                   W2 = FJ - REAL( J1 )
                   W1 = 1.0 - W2
-                  R = W1*COLS( 1, J1 ) + W2*COLS( 1, J2 ) 
-                  G = W1*COLS( 2, J1 ) + W2*COLS( 2, J2 ) 
-                  B = W1*COLS( 3, J1 ) + W2*COLS( 3, J2 ) 
+                  R = W1*COLS( 1, J1 ) + W2*COLS( 1, J2 )
+                  G = W1*COLS( 2, J1 ) + W2*COLS( 2, J2 )
+                  B = W1*COLS( 3, J1 ) + W2*COLS( 3, J2 )
                END IF
- 
+
 *  Set the colour representation.
                CALL PGSCR( I, NORM*R, NORM*G, NORM*B )
 

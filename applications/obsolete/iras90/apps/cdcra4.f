@@ -18,7 +18,7 @@
 *     This subroutine is used to exam the detector traces of a CRDD NDF
 *     to see whether they cross the given source position. The detector
 *     index, the X-scan distance and the crossing sample number of
-*     crossing detector traces are retuened. 
+*     crossing detector traces are retuened.
 
 *  Arguments:
 *     NDF = INTEGER (Given)
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -63,7 +63,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_DAT'          ! IRAS90 package constants
       INCLUDE 'IRA_PAR'          ! IRA_ package constants
- 
+
 *  Arguments Given:
       INTEGER NDF, IRC
       DOUBLE PRECISION RA, DEC
@@ -80,7 +80,7 @@
 
 *  External References:
       INTEGER IRC_DETNO          ! Detector number of a given index
-                                 
+
 *  Local Variables:
       REAL CLSMP                 ! Crossing sample of each detector
       REAL CLZFP                 ! Focal plan Z distance of the source
@@ -104,12 +104,12 @@
          DET = IRC_DETNO( IRC, I, STATUS )
 
 *  Find the sample at which the detector is closest to the source and
-*  the X-scan distance of the boresight at that moment. 
+*  the X-scan distance of the boresight at that moment.
          CALL IRC_DCLAP( IRC, I, RA, DEC, CLSMP, CLZFP, STATUS )
 
 *  Get the X-scan distance of the detector at that moment.
          XDIST = CLZFP * REAL( IRA__RTOD ) * 60.0 - I90__DETZ( DET )
-      
+
 *  If this detector track cross the source, ...
          IF ( ABS( XDIST ) .LE. 0.5 * DETWID( DET ) ) THEN
 
@@ -117,14 +117,14 @@
 *  inside the sample bounds.
             IF ( CLSMP .GT. LBND( 1 ) .AND. CLSMP .LT. UBND( 1 ) ) THEN
                NCROS = NCROS + 1
-      
+
 *  Note its crossing sample, crossing distance, file index in the group
 *  and the detector index in the file.
                CRSDTX( NCROS ) = I
                CRSSMP( NCROS ) = CLSMP
                CRSDIS( NCROS ) = XDIST
             END IF
-         END IF     
+         END IF
       END DO
 
       END

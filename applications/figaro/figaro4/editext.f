@@ -30,7 +30,7 @@
 *     The verb can be LIST, CREATE, DELETE, SET, TYPE or SHAPE. The
 *     verb is case-insensitive. The length of the request is
 *     restricted to 130 characters.
-*     
+*
 *     There may or may not follow a second word specifying the
 *     structure affected. This can be any of the scalar structures in
 *     the Specdre Extension, i.e. SPECAXIS, RESTFRAME, INDEXREFR,
@@ -41,15 +41,15 @@
 *     vectors, their names are LINENAME, LABFREQ, COMPTYPE, NPARA,
 *     MASKL, MASKR, PARATYPE. The structure specification is
 *     case-insensitive.
-*     
+*
 *     Further words contain parameter values, usually one word per
 *     parameter. But if the last parameter is a string, it may
 *     consist of several words. No quotes are necessary.
-*     
+*
 *     There is only one LIST request, namely the sole word LIST. This
 *     will cause the complete Specdre Extension - except the contents of
 *     NDF arrays - to be listed to the log file or to the screen.
-*     
+*
 *     There are two possible CREATE requests.
 *     -  "CREATE" on its own will create an empty Specdre Extension,
 *        or fail if a Specdre Extension already exists.
@@ -71,7 +71,7 @@
 *        parameter, i.e. the seventh word. This word must convert to
 *        an integer greater than zero. "CREATE RESULTS" fails if the
 *        result NDF already exists.
-*     
+*
 *     "DELETE" on its own will delete the whole Specdre Extension.
 *     "DELETE struc" will delete the specified structure. This can be
 *     any of the NDF-type structures SPECVALS, SPECWIDS, COORD,
@@ -80,7 +80,7 @@
 *
 *     All SET request will create the Specdre Extension, even if the
 *     request is not recognised as a valid one.
-*     
+*
 *     "SET ndf-struct", where the second word specifies an NDF-type
 *     structure, will set the values of the specified structure to
 *     the default values. This does not work for COVRS, since it
@@ -112,7 +112,7 @@
 *        of the COORD1 NDF. Similarly for COORD2.
 *     -  "SET COORD1.UNITS unit1" will set the value of the units of
 *        the COORD1 NDF. Similarly for COORD2.
-*        
+*
 *     "SET scalar value" will convert the third word to a value and
 *     put it in the scalar structure specified by the second word.
 *     -  "SET SPECAXIS int" will try to convert the third word into
@@ -143,7 +143,7 @@
 *        an integer. This command will also create the Specdre
 *        Extension and frequency unit structure if they do not yet
 *        exist.
-*        
+*
 *     "SET vector element value" will change the value of the
 *     specified element in the specified vector. The vector must be
 *     one of the extensions of the result NDF. The result NDF must
@@ -332,7 +332,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -165,7 +165,7 @@
       CALL PAR_GDR0I( 'NUMBIN', 2048, 100, MAXBIN, .TRUE., NUMBIN,
      :                STATUS )
 
-*  Associate the input NDF. 
+*  Associate the input NDF.
 *  ========================
 
 *  Begin an NDF context.
@@ -209,51 +209,51 @@
 *  Process the array using the appropriate implementation data type.
 *  =================================================================
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_HSTQR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NUMBIN,
-     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    %VAL( CNF_PVAL( MPNTR ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_HSTQB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NUMBIN,
-     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    %VAL( CNF_PVAL( MPNTR ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_HSTQD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NUMBIN,
-     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    %VAL( CNF_PVAL( MPNTR ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_HSTQI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NUMBIN,
-     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    %VAL( CNF_PVAL( MPNTR ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_HSTQUB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQUB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     NUMBIN,
-     :                     %VAL( CNF_PVAL( HPNTR ) ), 
+     :                     %VAL( CNF_PVAL( HPNTR ) ),
      :                     %VAL( CNF_PVAL( MPNTR ) ),
      :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_HSTQUW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQUW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     NUMBIN,
-     :                     %VAL( CNF_PVAL( HPNTR ) ), 
+     :                     %VAL( CNF_PVAL( HPNTR ) ),
      :                     %VAL( CNF_PVAL( MPNTR ) ),
      :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_HSTQW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_HSTQW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NUMBIN,
-     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    %VAL( CNF_PVAL( MPNTR ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 

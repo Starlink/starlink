@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -115,7 +115,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +124,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
 
 *  Global Variables:
@@ -133,13 +133,13 @@
 *           Data object container file name.
 *        DCB_LOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Data object locator.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_ACC( NDF__MXACC, NDF__MXACB ) = LOGICAL (Write)
 *           Access control flags.
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       CHARACTER * ( * ) MODE

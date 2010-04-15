@@ -1,12 +1,12 @@
 #!@PERL@
 #
-#  Creates a new version of the file history.help containing an entry for 
-#  the CUPID on-line help file describing changes in each new version of 
-#  CUPID. The information read from the cupid.news file is merged with 
+#  Creates a new version of the file history.help containing an entry for
+#  the CUPID on-line help file describing changes in each new version of
+#  CUPID. The information read from the cupid.news file is merged with
 #  the existing history.help file to create the new version.
 
-# Read the cupid.news file to get a hash in which the key is the cupid 
-# version number and the value is the description of the associated changes. 
+# Read the cupid.news file to get a hash in which the key is the cupid
+# version number and the value is the description of the associated changes.
    open( INFILE, "<cupid.news" );
    while( $line = <INFILE> ){
       if( $line =~ /^ +Changes in +(.*): *$/ ) {
@@ -26,8 +26,8 @@
    }
    close( INFILE );
 
-# Likewise read the history.help file to get a hash in which the key is the 
-# cupid version number and the value is the description of the associated 
+# Likewise read the history.help file to get a hash in which the key is the
+# cupid version number and the value is the description of the associated
 # changes already contained in history.help.
    $prev_blank = 0;
    open( INFILE, "<history.help" );
@@ -82,6 +82,6 @@
       print OUTFILE "$news_changes{$key}";
 
    }
-   
+
    close( OUTFILE );
    system "mv history.temp history.help";

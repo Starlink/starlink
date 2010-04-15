@@ -201,7 +201,7 @@ C
          END IF
          IF (NSTAT.NE.0) THEN
             ACCESS='C'
-         ELSE 
+         ELSE
             IF (NSFIG.GT.7) THEN
                ACCESS='D'
             ELSE
@@ -221,13 +221,13 @@ C     Now we know how to treat the value, set it in the file.
 C
       IF (ACCESS.EQ.'C') THEN
          CALL DSA_PUT_FITS_C ('FITSFILE',KEYWORD,VALUE,COMMENT,STATUS)
-      ELSE IF (ACCESS.EQ.'L') THEN         
+      ELSE IF (ACCESS.EQ.'L') THEN
          CALL DSA_PUT_FITS_L ('FITSFILE',KEYWORD,LVALUE,COMMENT,STATUS)
-      ELSE IF (ACCESS.EQ.'I') THEN         
+      ELSE IF (ACCESS.EQ.'I') THEN
          CALL DSA_PUT_FITS_I ('FITSFILE',KEYWORD,IVALUE,COMMENT,STATUS)
-      ELSE IF (ACCESS.EQ.'F') THEN         
+      ELSE IF (ACCESS.EQ.'F') THEN
          CALL DSA_PUT_FITS_F ('FITSFILE',KEYWORD,FVALUE,COMMENT,STATUS)
-      ELSE IF (ACCESS.EQ.'D') THEN         
+      ELSE IF (ACCESS.EQ.'D') THEN
          CALL DSA_PUT_FITS_D ('FITSFILE',KEYWORD,DVALUE,COMMENT,STATUS)
       END IF
 C
@@ -236,4 +236,4 @@ C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
 C
-      END       
+      END

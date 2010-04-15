@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,8 +80,8 @@
                                 ! gaussian sigma can take
       REAL MINTHR, MAXTHR       ! Maximum and minimum values that
                                 ! fractional threshold can take
-      COMMON /PSA1_FITCM/ SD( FITSIZ ), XDAT( FITSIZ ), XCOR( FITSIZ ), 
-     :                    NPOINT, MINMIX, MAXMIX, MINSIG, MAXSIG, 
+      COMMON /PSA1_FITCM/ SD( FITSIZ ), XDAT( FITSIZ ), XCOR( FITSIZ ),
+     :                    NPOINT, MINMIX, MAXMIX, MINSIG, MAXSIG,
      :                    MINTHR, MAXTHR, NOTWEI
 
 * Local variables:
@@ -109,8 +109,8 @@
       CHANGE = LOG ( MAX( NOTZER, XC( 2 ) ) )
       XC1SQ = ( MAX( NOTZER, XC( 1 ) ) )**2
       COEF1 = -1.0D0 / XC1SQ
-      COEF2 = SQRT( MAX( 0.0D0, ( -4.0D0 * CHANGE / XC1SQ ) ) ) 
-      RADTHR = XC( 1 ) * SQRT( MAX( 0.0D0, -CHANGE )) 
+      COEF2 = SQRT( MAX( 0.0D0, ( -4.0D0 * CHANGE / XC1SQ ) ) )
+      RADTHR = XC( 1 ) * SQRT( MAX( 0.0D0, -CHANGE ))
 
 *  Do for all points in fit.
       DO 1 I = 1, M
@@ -136,7 +136,7 @@
          IF ( .NOT. NOTWEI ) THEN
             IF ( SD( I ) .GT. 0.0D0 ) THEN
                FVEC( I ) = FVEC( I ) / SD( I )
-            ELSE 
+            ELSE
                FVEC( I ) = 0.0D0
             END IF
          END IF

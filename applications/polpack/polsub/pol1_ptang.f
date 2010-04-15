@@ -20,9 +20,9 @@
 *     Frame has the same number of dimensions as the Base Frame. Axes 1
 *     and 2 of the POLANAL Frame are derived from axes 1 and 2 of the
 *     Base Frame by a rotation through angle ANGROT. This results in the
-*     anti-clockwise angle from the first axis of the Base Frame to the 
+*     anti-clockwise angle from the first axis of the Base Frame to the
 *     first axis of the POLANAL Frame being ANGROT.
-*     
+*
 *  Arguments:
 *     ANGROT = REAL (Given)
 *        The required ANGROT value, in degrees.
@@ -33,7 +33,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,10 +68,10 @@
       PARAMETER ( DTOR = 0.01745329251994329577 )
 
 *  Local Variables:
-      DOUBLE PRECISION ANGCOS  
+      DOUBLE PRECISION ANGCOS
       DOUBLE PRECISION ANGSIN
       DOUBLE PRECISION MAT( NDF__MXDIM*NDF__MXDIM )
-      INTEGER FRAME                  
+      INTEGER FRAME
       INTEGER I
       INTEGER ICURR
       INTEGER IPOLAN
@@ -94,7 +94,7 @@
 
 *  Remove any existing POLANAL Frame.
       IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, 'MINAXES=1, '//
-     :                   'MAXAXES=20', STATUS ), 'POLANAL', 
+     :                   'MAXAXES=20', STATUS ), 'POLANAL',
      :                   STATUS ) .NE. AST__NULL ) THEN
 
          IPOLAN = AST_GETI( IWCS, 'CURRENT', STATUS )
@@ -107,17 +107,17 @@
          ELSE IF( ICURR .EQ. IPOLAN ) THEN
             ICURR = AST__NOFRAME
          END IF
-   
+
       END IF
 
-*  Create a mapping from Base Frame coordinates, to a 2D cartesian coordinate 
+*  Create a mapping from Base Frame coordinates, to a 2D cartesian coordinate
 *  system in which the X axis is parallel to the reference direction
 *  specified by ANGROT. If the rotation is zero, this is just a unit mapping.
       IF( ANGROT .EQ. 0.0 ) THEN
          MAP = AST_UNITMAP( NDIM, ' ', STATUS )
 
 *  Otherwise, create a MatrixMap describing the rotation from Base Frame
-*  coordinates to reference frame coordinates. 
+*  coordinates to reference frame coordinates.
       ELSE
 
 *  Set the entire matrix to zero.

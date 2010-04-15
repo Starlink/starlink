@@ -13,7 +13,7 @@
       status = sai__ok
 
       f = ast_cmpframe( ast_specframe( ' ', status ),
-     :                  ast_skyframe( ' ', status ), ' ', status )          
+     :                  ast_skyframe( ' ', status ), ' ', status )
 
       perm( 1 )  = 3
       perm( 2 )  = 1
@@ -32,7 +32,7 @@
 
       m2 = ast_copy( m, status )
       call ast_invert( m2, status )
-      m3 = ast_simplify( ast_cmpmap( m, m2, .true., ' ', status ), 
+      m3 = ast_simplify( ast_cmpmap( m, m2, .true., ' ', status ),
      :                   status )
       if( .not. ast_isaunitmap( m3, status ) ) call stopit( 5, status )
 

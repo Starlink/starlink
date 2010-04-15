@@ -51,7 +51,7 @@ C     (!) NAME_USED     (Logical array) This name pair already in use.
 C
 C  History:
 C     28th Jun 1993.  Original version, KS/AAO.
-C        
+C
 C+
       SUBROUTINE DSA_REAL_NAME (FILE_NAME,REAL_NAME)
 C
@@ -66,7 +66,7 @@ C
       INCLUDE 'DSA_COMMON'
 C
 C     Local variables
-C    
+C
       INTEGER   ITEMP             ! Loop index through temp name tables
 C
 C     Look one by one at the list of files to be renamed. For each one
@@ -85,4 +85,4 @@ C
 C
       END
 
-            
+

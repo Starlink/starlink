@@ -2,38 +2,38 @@
 *+
 *  Name:
 *     SUBPAR_CMDPAR
- 
+
 *  Purpose:
 *     Set a parameter value based on a command string.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_CMDPAR ( NAMECODE, VALUE, STATUS )
- 
+
 *  Description:
 *     The character string VALUE is used to derive a value
 *     for a parameter.
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        pointer to a parameter
 *     VALUE=CHARACTER*(*)  (given)
 *        String to be used to derive value
 *     STATUS=INTEGER
- 
+
 *  Algorithm:
 *     A preliminary parse of the string is used to determine whether
 *     it is a single item or a list of items. If it is a list of items
 *     it is interpreted as an array. The string is then parsed using
 *     the LEX parser, an action code is returned for each item and
 *     used to determine how the parameter value should be written.
- 
+
 *  Implementation Deficiencies:
 *     Setting STATUS to SAI__OK is believed to be an error. The parameter
 *     may not have been set. This needs investigation. (AJC)
- 
+
 *  Copyright:
 *     Copyright (C) 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1998, 2000 Central Laboratory of the Research Councils.
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     19-JAN-1987 (JAB):
 *        revised error codes
@@ -109,16 +109,16 @@
 *        Remove the trapping of directories in [] - VMS requirement
 *        causes problems with GRP
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
- 
+
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -126,31 +126,31 @@
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'LEX_ERR'
       INCLUDE 'LEX_PAR'
- 
- 
+
+
 *  Arguments Given:
       INTEGER NAMECODE          ! pointer to a parameter
       CHARACTER*(*) VALUE       ! string used to derive value
- 
- 
+
+
 *  Status:
       INTEGER STATUS
- 
- 
+
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
 
 *  External routines:
       INTEGER CHR_LEN            ! used length of string
-      INTEGER STRING_IANYL       ! Index of character within string 
- 
+      INTEGER STRING_IANYL       ! Index of character within string
+
 
 *  Local Constants:
       INTEGER MCLENGTH           ! maximum length of string
       PARAMETER (MCLENGTH=200)
       CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
- 
+
 *  Local Variables:
       CHARACTER*(MCLENGTH+3) COMMAND  ! command string with SPACE CR added
       INTEGER ENDLINE             ! Position of end of command line
@@ -172,32 +172,32 @@
 *  Local Data:
       DATA POSTYPES /'_CHAR*132', '_REAL', '_DOUBLE', '_INTEGER',
      :   '_LOGICAL' /
- 
+
 *.
- 
- 
+
+
       IF (  STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set error context
       CALL EMS_MARK
- 
+
 *  Find length of command line (+2 for termination)
       ENDLINE = MIN( MCLENGTH, CHR_LEN(VALUE) ) + 2
- 
+
 *  If there is anything on the command line, process it
       IF ( ENDLINE.GT.2 ) THEN
- 
+
 *     Add a CR at end of command line
          COMMAND = VALUE(1:ENDLINE-2)//' '//CHAR(13)
- 
+
 *  Find out if there is more than one item in the list
 *  by means of a preliminary parse of the string
- 
+
          NPARS = 0
          LEVEL = 0
-         CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION, STRING, 
+         CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION, STRING,
      :                    SLEN, STATUS )
- 
+
 *      If the first item is a quoted string or [, the value cannot be an
 *      unquoted multi-word value, even for a parameter of type CHAR, therefore
 *      set SINGLE false; otherwise it is set true.
@@ -207,14 +207,14 @@
          ELSE
             SINGLE = .FALSE.
          END IF
- 
+
 *      Get the declared type of the parameter
          TYPE = MOD( PARTYPE(NAMECODE), 10 )
- 
+
 *      For types other than CHAR (and for CHAR if the first item of the value
 *      was a quoted string or [)
          IF ( ( TYPE .NE. SUBPAR__CHAR ) .OR. .NOT.SINGLE ) THEN
- 
+
 *        check if there is more than one item - an item possibly having the
 *        form of a bracketed array.
 *        Only count until more than one
@@ -229,38 +229,38 @@
      :         .OR. ( ACTION .EQ. LEX__KAMBIG )
      :         .OR. ( ACTION .EQ. LEX__DOUBLE ) ) THEN
                   IF ( LEVEL .EQ. 0 ) NPARS = NPARS + 1
- 
+
 *           If '[' maintain the level count
                ELSE IF ( ACTION .EQ. LEX__STARR ) THEN
                   LEVEL = LEVEL + 1
 *              and count open brackets at the top level
                   IF ( LEVEL .EQ. 1 ) NPARS = NPARS + 1
- 
+
 *           If ']' maintain the level count
                ELSE IF ( ACTION .EQ. LEX__ENDARR ) THEN
                   LEVEL = LEVEL - 1
                END IF
- 
+
 *           Get next item
-               CALL LEX_CMDLINE( .FALSE., COMMAND(1:ENDLINE), ACTION, 
+               CALL LEX_CMDLINE( .FALSE., COMMAND(1:ENDLINE), ACTION,
      :                          STRING, SLEN, STATUS )
             END DO
          END IF
- 
+
 *  Reset status in case it changed
- 
+
          CALL EMS_ANNUL( STATUS )
- 
+
 *  If more than one item add the outer brackets to intepret as an array
- 
+
          IF ( NPARS .GT. 1 ) COMMAND = '['//VALUE(1:ENDLINE-2)
      :                               //']'//CHAR(13)
- 
- 
+
+
 *  initiate parse
-         CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION, STRING, 
+         CALL LEX_CMDLINE( .TRUE., COMMAND(1:ENDLINE), ACTION, STRING,
      :                    SLEN, STATUS )
- 
+
 *   If OK, process the string
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -278,19 +278,19 @@
 *        Interpret as a string
                ACTION = LEX__STRING
             END IF
- 
- 
+
+
 *   First deal with the ambiguous action codes
             IF ( ( ACTION .EQ. LEX__AMBIG )
      :      .OR. ( ACTION .EQ. LEX__KAMBIG ) ) THEN
 *   String or Name or Logical Constant or MIN/MAX or !
- 
+
 *           Get an upper case copy of STRING
                USTRING = STRING(1:SUBPAR__NAMELEN)
                CALL CHR_UCASE( USTRING )
- 
+
 *           Check for MIN or MAX
-               IF ( ( USTRING(1:SLEN) .EQ. 'MAX' ) .OR. 
+               IF ( ( USTRING(1:SLEN) .EQ. 'MAX' ) .OR.
      :              ( USTRING(1:SLEN) .EQ. 'MIN' ) ) THEN
 
                   IF ( ( TYPE .EQ. SUBPAR__REAL )
@@ -313,13 +313,13 @@
                      END IF
 *                 No further action is required
                      ACTION = 0
- 
+
 *              Otherwise treat MIN/MAX as a name
                   ELSE
                      ACTION = LEX__NAME
- 
+
                   END IF
- 
+
 *           Check for NULL specifier
                ELSE IF ( STRING(1:SLEN) .EQ. '!' ) THEN
 *              Set null state - cancel any existing value first
@@ -327,7 +327,7 @@
                   PARSTATE(NAMECODE) = SUBPAR__NULL
 *              and no further action
                   ACTION = 0
- 
+
                ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
 *              Interpret as literal string
 *              Possibly multi-word
@@ -336,7 +336,7 @@
                      SLEN = ENDLINE - 2
                   END IF
                   ACTION = LEX__STRING
- 
+
                ELSE IF ( ( TYPE .EQ. SUBPAR__LOGICAL )
      :              .OR. ( TYPE .EQ. SUBPAR__NOTYPE ) ) THEN
 *              Attempt to convert the string to logical
@@ -352,13 +352,13 @@
                      ELSE
                         STRING = 'F'
                      END IF
- 
+
                   ELSE
 *                 Not valid logical constant
 *                 Interpret as a name
                      ACTION = LEX__NAME
                   END IF
- 
+
                ELSE
 *              Not one of the special cases
 *              Interpret as a  name
@@ -366,30 +366,30 @@
                END IF
 
             END IF
- 
- 
+
+
 *  Having resolved ambiguities, perform the required action
 
             IF ( ACTION .EQ. LEX__NAME ) THEN
 *  Name (e.g. HDS or device name or null specifier)
                CALL SUBPAR_PUTNAME( NAMECODE, STRING(1:SLEN), STATUS )
- 
+
 *   Primitive item (String, Integer, Real, Double Precision, Logical)
 *   All these can be handled by the same code as SUBPAR_PUT0C
 *   will do any necessary conversion
- 
+
             ELSE IF ( ( ACTION .EQ. LEX__STRING )
      :           .OR. ( ACTION .EQ. LEX__INTEGER )
      :           .OR. ( ACTION .EQ. LEX__REAL )
      :           .OR. ( ACTION .EQ. LEX__DOUBLE )
      :           .OR. ( ACTION .EQ. LEX__LOGICAL ) ) THEN
- 
+
 *  If parameter is internal cancel any previous HDS association
 *  and store the value
                IF ( PARVPATH(1,NAMECODE) .EQ. SUBPAR__INTERNAL ) THEN
                   CALL SUBPAR_CANCL( NAMECODE, STATUS )
                   CALL SUBPAR_PUT0C( NAMECODE, STRING(1:SLEN), STATUS )
- 
+
 *  If not internal create an HDS component of the same type as
 *  the parameter and put the value in it. If the parameter
 *  has a primitive type as defined in the interface file
@@ -397,7 +397,7 @@
 *  parsing of the string
                ELSE IF ( TYPE .GT. 5 ) THEN
                   STATUS = SUBPAR__IVPRTYPE
-                  CALL EMS_REP( 'SUP_CMDPAR1', 
+                  CALL EMS_REP( 'SUP_CMDPAR1',
      :                       'SUBPAR_CMDPAR: Invalid parameter type - '
      :                       //'system error', STATUS )
                ELSE
@@ -426,7 +426,7 @@
 *  Now create HDS component of the right type and store the value
                   CALL SUBPAR_CRINT( NAMECODE, HDSTYPE, 0, DIMS, LOC,
      :                              STATUS )
-                  CALL SUBPAR_PUT( LOC, HDSTYPE, 0, DIMS, 
+                  CALL SUBPAR_PUT( LOC, HDSTYPE, 0, DIMS,
      :                             STRING(1:SLEN), STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL SUBPAR_CANCL( NAMECODE, STATUS )
@@ -434,47 +434,47 @@
                   CALL DAT_ANNUL( LOC, STATUS )
 
                END IF
- 
- 
+
+
             ELSE IF ( ACTION .EQ. LEX__KEYWORD ) THEN
 *  Keyword
                STATUS = SUBPAR__CMDSYER
-               CALL EMS_REP( 'SUP_CMDPAR2', 
-     :                      'SUBPAR: unquoted ''='' is not allowed', 
+               CALL EMS_REP( 'SUP_CMDPAR2',
+     :                      'SUBPAR: unquoted ''='' is not allowed',
      :                      STATUS )
- 
+
             ELSE IF ( ACTION .EQ. LEX__STARR ) THEN
 *  Array
                CALL SUBPAR_ARRAY( NAMECODE, COMMAND(1:ENDLINE), LOC,
      :                           STATUS )
 *           The returned locator is not used
                IF ( STATUS .EQ. SAI__OK ) CALL DAT_ANNUL( LOC, STATUS )
- 
+
             ELSE IF ( ACTION .NE. 0 ) THEN
 *  At this stage, any other ACTION is an error
                STATUS = SUBPAR__CMDSYER
                CALL EMS_SETC( 'STRING', STRING(1:SLEN) )
-               CALL EMS_REP( 'SUP_CMDPAR3', 
-     :              'SUBPAR: Command line syntax error /^STRING/', 
+               CALL EMS_REP( 'SUP_CMDPAR3',
+     :              'SUBPAR: Command line syntax error /^STRING/',
      :              STATUS )
             END IF
 
          END IF
- 
+
          IF ( STATUS .EQ. LEX__ENDPARSE ) THEN
             CALL EMS_ANNUL( STATUS )
 
          ELSE IF ( STATUS .EQ. LEX__INVCHAR ) THEN
 *        Change to a SUBPAR error code if invalid character found
             STATUS = SUBPAR__CMDSYER
-            CALL EMS_REP( 'SUP_CMDPAR4', 
+            CALL EMS_REP( 'SUP_CMDPAR4',
      :          'SUBPAR: Syntax error in parsing given parameter value',
      :          STATUS )
          END IF
- 
+
       END IF
- 
+
 *  End error context
       CALL EMS_RLSE
- 
+
       END

@@ -6,7 +6,7 @@
 *    Description :
 *
 *     This routine takes the exponential to an input base of
-*     each pixel of an input image. The result goes into a 
+*     each pixel of an input image. The result goes into a
 *     new output image.
 *
 *    Invocation :
@@ -20,7 +20,7 @@
 *     BASE  =  REAL( READ )
 *         Base of exponential to be taken of each input image pixel
 *     OUTPIC  =  IMAGE( WRITE )
-*         Output image holding result of exponentiated image 
+*         Output image holding result of exponentiated image
 *     OTITLE  =  CHAR( READ )
 *         Title string for output image structure
 *
@@ -68,8 +68,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -83,7 +83,7 @@
 
       REAL
      :    MAXBASE,                ! maximum base allowed in exponentiation
-     :    MINBASE                 ! minimum   "     "     "       "   
+     :    MINBASE                 ! minimum   "     "     "       "
       PARAMETER( MAXBASE  =  1000 )
       PARAMETER( MINBASE  =  0.001 )
 
@@ -118,7 +118,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the input structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions of array
@@ -140,7 +140,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )
@@ -150,7 +150,7 @@
 
 *                   call working subroutine to exponentiate each pixel
 *                   of input image, result going into output image
-                     CALL EXPARR2D( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
+                     CALL EXPARR2D( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
      :                                BASE, %VAL( PNTRO ), STATUS )
 
 *                end of if-no-error-before-accessing-pointers check

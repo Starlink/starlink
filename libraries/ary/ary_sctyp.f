@@ -13,7 +13,7 @@
 *     CALL ARY_SCTYP( IARY, TYPE, STATUS )
 
 *  Description:
-*     The routine returns the numeric type of a scaled array as an 
+*     The routine returns the numeric type of a scaled array as an
 *     upper-case character string (e.g. '_REAL'). The returned type
 *     describes the values stored in the array, before they are unscaled
 *     using the associated scale and zero values. Use ARY_TYPE if you
@@ -28,7 +28,7 @@
 *        The global status.
 
 *  Notes:
-*     -  If the array is not stored in SCALED form, then this routine 
+*     -  If the array is not stored in SCALED form, then this routine
 *     returns the same type as the ARY_TYPE routine.
 *     -  The symbolic constant ARY__SZTYP may be used for declaring the
 *     length of a character variable which is to hold the numeric type
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
 *  Copy the numeric type string to the output argument.
          CALL ARY1_CCPY( DCB_TYP( IDCB ), TYPE, STATUS )
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

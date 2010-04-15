@@ -8,7 +8,7 @@ C
 C     ECHARC utility.  Displays on the graphics device a section of an
 C     arc spectrum, autoscaled, with space at the top for interactive
 C     line finding. Also displays any points already identified in this
-C     range.  Uses PGPLOT routines, and assumes that PGBEGIN has 
+C     range.  Uses PGPLOT routines, and assumes that PGBEGIN has
 C     already been called.  Does not call PGEND.
 C
 C     Parameters -    (">" input, "<" output)
@@ -23,13 +23,13 @@ C     (>) ZLAB      (Character) The z-label for the plot.
 C     (>) TLAB      (Character) The title for the plot.
 C     (>) NC        (Integer)  The dimension of COEFFS array.
 C     (>) COEFFS    (Double precision array COEFFS(NC)) The
-C                   current wavelength coefficients. 
+C                   current wavelength coefficients.
 C     (>) NCOEFF    (Integer) The number of coefficients used.
 C     (>) XS        (Logical) True if identified lines are to be
 C                   indicated only by an X instead of by wavelength.
-C     (>) CHANS     (Real array CHANS(NMAX)) The channels of the 
+C     (>) CHANS     (Real array CHANS(NMAX)) The channels of the
 C                   identified lines so far.
-C     (>) WAVES     (Real array WAVES(NMAX)) The wavelengths of the 
+C     (>) WAVES     (Real array WAVES(NMAX)) The wavelengths of the
 C                   identified lines so far.
 C     (>) CLASS     (Integer array CLASS(NMAX)) The class codes for
 C                   the identified lines.
@@ -89,7 +89,7 @@ C
 C
 C     Autoscale data, allowing 10% extra at the top. (And allow for
 C     the pathological case where there is no data at all!)
-C     ECHARC ... ASSUMES LOW=0.0, ALLOWS 55% SINCE LABELS VERTICAL 
+C     ECHARC ... ASSUMES LOW=0.0, ALLOWS 55% SINCE LABELS VERTICAL
 C
       CALL GEN_RANGEF(ZVALS,IXST,IXEN,HIGH,LOW)
       LOW=0.0

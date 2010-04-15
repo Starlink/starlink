@@ -1,5 +1,5 @@
       SUBROUTINE PHOTQ(NX, NY, Z, DQ, STATUS)
- 
+
 *+
 *
 *   Name:
@@ -29,7 +29,7 @@
 *   Implicit:
       IMPLICIT NONE
 
-*   Constants: 
+*   Constants:
       INTEGER IUEPIXEXT       ! IUE extrapolated pixel
       INTEGER IUEPIXSAT       ! IUE saturated pixel
       INTEGER IUEPIXTRN       ! IUE truncated ITF pixel
@@ -40,13 +40,13 @@
 *   Import:
       INTEGER NX              ! number of x-pixels
       INTEGER NY              ! number of y-pixels
- 
+
 *   Import-Export:
       INTEGER*2 Z(NX, NY)     ! image array
- 
+
 *   Export:
       BYTE DQ(NX, NY)         ! data quality array
- 
+
       INTEGER STATUS
 
 *   Local variables:
@@ -60,11 +60,11 @@
       QSAT = 0
       CALL DQ_WRPK(1, 2, 1, QSAT)
       CALL DQ_WRPK(1, IUEPIXSAT, 1, QSAT)
- 
+
 *   Data quality value for ITF extrapolation
       QEXT = 0
       CALL DQ_WRPK(1, IUEPIXEXT, 1, QEXT)
- 
+
 *   Decode pixel array
       DO IY = 1, NY
 

@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_ZPDEC( FNAME, FRM, TEXT, POS, NP, REGION, LINE, 
+      SUBROUTINE KPS1_ZPDEC( FNAME, FRM, TEXT, POS, NP, REGION, LINE,
      :                       OBJECT, OK, STATUS )
 *+
 *  Name:
@@ -11,29 +11,29 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_ZPDEC( FNAME, FRM, TEXT, POS, NP, REGION, LINE, OBJECT, 
+*     CALL KPS1_ZPDEC( FNAME, FRM, TEXT, POS, NP, REGION, LINE, OBJECT,
 *                      OK, STATUS )
 
 *  Description:
 *     This routine extracts field from a line of text read from a ZAPLIN
-*     steering file, classifies the type of region described by the 
-*     line, and returns the corresponding axis values in the supplied 
+*     steering file, classifies the type of region described by the
+*     line, and returns the corresponding axis values in the supplied
 *     Frame.
 
 *  Arguments:
 *     FNAME = CHARACTER * ( * ) (Given)
-*        The name of the text file from which the supplied text was 
+*        The name of the text file from which the supplied text was
 *        read.  Used only in error messages.
 *     FRM = INTEGER (Given)
-*        A pointer to the AST Frame to be used to unformat the axis 
+*        A pointer to the AST Frame to be used to unformat the axis
 *        values.
 *     TEXT = CHARACTER * ( * ) (Given)
-*        The text read from the file.  It should contain no leading 
+*        The text read from the file.  It should contain no leading
 *        spaces.
 *     POS( 2, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        On entry, this array should hold two typical positions on the
 *        image.  On exit, it holds the positions read from the text.
-*        The first index is position number, and the second index is 
+*        The first index is position number, and the second index is
 *        axis number.
 *     NP = INTEGER (Returned)
 *        The number of positions read from the line.  Allowed values
@@ -87,7 +87,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -167,7 +167,7 @@
             AX( 1 ) = 1
             AX( 2 ) = 1
 
-         ELSE 
+         ELSE
             LINE = .FALSE.
             REGION = .TRUE.
             OBJECT = 'rectangular region'
@@ -178,16 +178,16 @@
 *  Unformat the first field in the text.
          F = 1
          IAX = AX( 1 )
-         NC = AST_UNFORMAT( FRM, IAX, TEXT, AXVAL( 1 ), STATUS ) 
+         NC = AST_UNFORMAT( FRM, IAX, TEXT, AXVAL( 1 ), STATUS )
 
 *  If succesful, store the index of the next character to be read.
          IF( NC .GT. 0 ) THEN
-            F = F + NC 
+            F = F + NC
 
 *  Unformat the second field in the text.
             IAX = AX( 2 )
-            NC = AST_UNFORMAT( FRM, IAX, TEXT( F : ), AXVAL( 2 ), 
-     :                         STATUS ) 
+            NC = AST_UNFORMAT( FRM, IAX, TEXT( F : ), AXVAL( 2 ),
+     :                         STATUS )
 
 *  If succesful, store the index of the next character to be read.
             IF( NC .GT. 0 ) THEN
@@ -201,8 +201,8 @@
 
 *  Unformat the third field in the text.
                   IAX = 1
-                  NC = AST_UNFORMAT( FRM, 1, TEXT( F : ), POS( 2, 1 ), 
-     :                               STATUS ) 
+                  NC = AST_UNFORMAT( FRM, 1, TEXT( F : ), POS( 2, 1 ),
+     :                               STATUS )
 
 *  If succesful, store the index of the next character to be read.
                   IF( NC .GT. 0 ) THEN
@@ -210,20 +210,20 @@
 
 *  Unformat the fourth field in the text.
                      IAX = 2
-                     NC = AST_UNFORMAT( FRM, 2, TEXT( F : ), 
-     :                                  POS( 2, 2 ), STATUS ) 
+                     NC = AST_UNFORMAT( FRM, 2, TEXT( F : ),
+     :                                  POS( 2, 2 ), STATUS )
 
                   END IF
 
 *  If the text specifies a set of lines, store the axis values obtained
-*  above in the correct place (the other axis retains its suppled 
+*  above in the correct place (the other axis retains its suppled
 *  values).
                ELSE IF( LINE ) THEN
                   POS( 1, 2 ) = AXVAL( 1 )
                   POS( 2, 2 ) = AXVAL( 2 )
 
-*  If the text specifies a set of columns, store the axis values 
-*  obtained above in the correct place (the other axis retains its 
+*  If the text specifies a set of columns, store the axis values
+*  obtained above in the correct place (the other axis retains its
 *  supplied values).
                ELSE
                   POS( 1, 1 ) = AXVAL( 1 )
@@ -245,7 +245,7 @@
             CALL MSG_SETC( 'T', TEXT( F : ) )
             CALL MSG_OUT( 'KPS1_ZPDEC_MSG1', 'Failed to read a '//
      :                    'value for axis ^I (^L), from the '//
-     :                    'start of the text string ''^T''.', 
+     :                    'start of the text string ''^T''.',
      :                    STATUS )
          ELSE
             NP = 2

@@ -12,11 +12,11 @@ C
 C     Description:
 C        Divide a polarization spectrum by the intensity spectrum from another
 C        dataset. This can be used to divide data by a smooth spectrum star
-C        to remove atmospheric features. 
+C        to remove atmospheric features.
 C
-C        The intensity and Stokes parameters of the first spectrum are 
-C        divided by the intensity of the second spectrum. The variances are 
-C        also scaled accordingly. The spectrum being divided by is assumed 
+C        The intensity and Stokes parameters of the first spectrum are
+C        divided by the intensity of the second spectrum. The variances are
+C        also scaled accordingly. The spectrum being divided by is assumed
 C        to have no errors.
 C
 C     Parameters:
@@ -24,16 +24,16 @@ C    (1) INPUT1     (TSP, 1D)  The input spectrum to be divided.
 C    (2) INPUT2     (TSP, 1D)  The spectrum to divide by.
 C    (3) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         5/12/1991
 C
 C-
 C
 C  History:
-C    19/11/1990   Original Version.   JAB/AAO 
+C    19/11/1990   Original Version.   JAB/AAO
 C     5/12/1991   Handle bad values.  JAB/AAO
 C
 
@@ -54,9 +54,9 @@ C
       CHARACTER*(DAT__SZLOC) OLOC,ILOC,XLOC,DLOC,SLOC,CLOC,CDLOC
       CHARACTER*(DAT__SZLOC) CELOC,DELOC
       LOGICAL OK,QZ,UZ,VZ
-      INTEGER SIZE,NUM,STAT                                        
+      INTEGER SIZE,NUM,STAT
       LOGICAL ERROR1,ERROR2
-                         
+
 *  Get the Input data
 
       CALL DAT_ASSOC('INPUT1','READ',ILOC,STATUS)
@@ -64,7 +64,7 @@ C
 *  Access the calibration frame
 
       CALL DAT_ASSOC('INPUT2','READ',CLOC,STATUS)
-      
+
 *  Get the data size
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -78,7 +78,7 @@ C
              CALL MSG_OUT(' ','Error Mapping calibration data',STATUS)
              STATUS = USER__001
              GOTO 100
-         ENDIF        
+         ENDIF
 
 *  Get the output file
 
@@ -108,7 +108,7 @@ C
              CALL MSG_OUT(' ','Error Mapping data',STATUS)
              STATUS = USER__001
              GOTO 500
-         ENDIF        
+         ENDIF
 
 *  Map the variance array if there is one, otherwise map a dummy array
 
@@ -130,7 +130,7 @@ C
 *  Unmap the arrays
 
          CALL TSP_UNMAP(DELOC,STATUS)
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Calibrate the Stokes parameters, and variances if present
 
@@ -162,7 +162,7 @@ C
 *  Unmap the data
 
              CALL TSP_UNMAP(DELOC,STATUS)
-             CALL TSP_UNMAP(DLOC,STATUS)        
+             CALL TSP_UNMAP(DLOC,STATUS)
              CALL DAT_ANNUL(SLOC,STATUS)
          ENDIF
          IF (UZ) THEN
@@ -193,7 +193,7 @@ C
 
              CALL TSP_UNMAP(DELOC,STATUS)
              CALL TSP_UNMAP(DLOC,STATUS)
-             CALL DAT_ANNUL(SLOC,STATUS)        
+             CALL DAT_ANNUL(SLOC,STATUS)
          ENDIF
          IF (VZ) THEN
 
@@ -223,7 +223,7 @@ C
 
              CALL TSP_UNMAP(DELOC,STATUS)
              CALL TSP_UNMAP(DLOC,STATUS)
-             CALL DAT_ANNUL(SLOC,STATUS)        
+             CALL DAT_ANNUL(SLOC,STATUS)
          ENDIF
 
 *  Unmap arrays and annul locators
@@ -238,7 +238,7 @@ C
 100   CONTINUE
       END
 
-      
+
       SUBROUTINE TSP_DIVIDE(SIZE,I,IE,C)
 *+
 *     T S P _ D I V I D E

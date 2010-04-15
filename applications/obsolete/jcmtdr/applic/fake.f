@@ -38,14 +38,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ASTRO_PAR'
-                                 
+
 
 *  Dynamic memory include file - defines DYNAMIC_MEM
       INCLUDE 'DYNAMIC_MEMORY'
@@ -72,9 +72,9 @@
 *  Local Variables:
       LOGICAL FAULT                    ! logical to flag a Figaro fault
       LOGICAL STRUC                    ! logical for testing structure
-                                       ! existence 
+                                       ! existence
       LOGICAL ERRORS                   ! T if error array present in input data
-      LOGICAL B1950                    ! 
+      LOGICAL B1950                    !
       LOGICAL POINTING_CORRECTION      ! T if pointing correction structure is
                                        !   present in file
       INTEGER NDIM                     ! number of dimensions of array
@@ -88,14 +88,14 @@
       INTEGER ADDRESS                  ! DSA address
       INTEGER INPTR                    ! DSA pointer for input data array
       INTEGER XAXPTR                   !    "       "      "   x-axis
-      INTEGER YAXPTR                   !    "       "      " 
+      INTEGER YAXPTR                   !    "       "      "
       INTEGER RAPPTR                   ! DSA pointer to the derived list of
                                        ! observed right ascensions (J2000)
       INTEGER DECPPTR                  ! DSA pointer to the derived list of
                                        ! observed declinations (J2000)
       INTEGER OUTPTR                   ! DSA pointer to output array
       INTEGER LSTPTR                   ! DSA    "      " input LST array
-      INTEGER NCORR                    ! number of entries in pointing 
+      INTEGER NCORR                    ! number of entries in pointing
                                        !   correction description
       INTEGER POINT_LSTPTR             ! DSA pointer to LST array in pointing
                                        !   correction description
@@ -103,7 +103,7 @@
       INTEGER POINT_DALTPTR            !        "       alt       "      "
       INTEGER IGNORE                   ! returned by ICH_FOLD
       REAL FBAD                        ! value to flag bad pixel
-      REAL XOFF, YOFF                  ! offset from map centre of fake Airy 
+      REAL XOFF, YOFF                  ! offset from map centre of fake Airy
                                        ! disk
       REAL V2Y                         ! angle between vertical of local coords
                                        !   and y offset axis (anti-clockwise,
@@ -151,7 +151,7 @@
       STATUS = 0
       CALL DSA_OPEN (STATUS)
 
-*  get the input file 
+*  get the input file
 
       CALL DSA_INPUT ('IN', 'INPUT', STATUS)
 
@@ -186,7 +186,7 @@
 *  Needs to be done after we have worked out the size of the array
 
       CALL DSA_DATA_SIZE ('IN', 2, NDIM, DIMS, NELM, STATUS)
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0, DTA_NAME, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0, DTA_NAME,
      :   DSTAT)
       CALL DTA_MRVARD (DTA_NAME, NELM, ADDRESS, DSTAT)
       LSTPTR = DYN_ELEMENT(ADDRESS)
@@ -215,7 +215,7 @@
 
 *  telescope structure name
 
-      CALL DTA_CRNAM (JCMT_DTA_NAME, 'TEL', 0, 0, 
+      CALL DTA_CRNAM (JCMT_DTA_NAME, 'TEL', 0, 0,
      :   TEL_STRUC_NAME, DSTAT)
       CALL DTA_STRUC (TEL_STRUC_NAME, STRUC, DSTAT)
       IF (DSTAT.EQ.DTA_NOTFND .OR. .NOT. STRUC ) THEN
@@ -236,7 +236,7 @@
 *  map the main data array
 
       CALL DSA_DATA_SIZE ('IN', 2, NDIM, DIMS, NELM, STATUS)
-      CALL DSA_MAP_DATA ('IN', 'READ', 'FLOAT', ADDRESS, SLOT, 
+      CALL DSA_MAP_DATA ('IN', 'READ', 'FLOAT', ADDRESS, SLOT,
      :   STATUS)
       INPTR = DYN_ELEMENT(ADDRESS)
       NPIXEL = NELM
@@ -298,16 +298,16 @@
          FAULT = .TRUE.
          GOTO 500
       END IF
-      
+
 *  calculate the transformed list of ra and dec for each pixel in B1950
 *  coords
 
       B1950 = .TRUE.
       IF (STATUS .EQ. SAI__OK) THEN
          CALL JCMT_OFFSET2RADEC (CENTRE_CRD, EPOCH, RACEN, DECCEN,
-     :      LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY, 
-     :      DYNAMIC_MEM(XAXPTR), DYNAMIC_MEM(YAXPTR), 
-     :      DYNAMIC_MEM(LSTPTR), B1950, DYNAMIC_MEM(RAPPTR), 
+     :      LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT, NX, NY,
+     :      DYNAMIC_MEM(XAXPTR), DYNAMIC_MEM(YAXPTR),
+     :      DYNAMIC_MEM(LSTPTR), B1950, DYNAMIC_MEM(RAPPTR),
      :      DYNAMIC_MEM(DECPPTR), STATUS)
       ENDIF
 
@@ -323,14 +323,14 @@
             CALL SLA_FK54Z (RACEN, DECCEN, 1950.0D0, RACEN, DECCEN,
      :         DIGNORE, DIGNORE)
          END IF
-      END IF 
+      END IF
 
 *  search for pointing correction structure in file, and map the
 *  arrays if present
 
       POINTING_CORRECTION = .FALSE.
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.LST', 0, 0, 
+         CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.LST', 0, 0,
      :      PLST_DTA_NAME, DSTAT)
          CALL DTA_SZVAR (PLST_DTA_NAME, 1, NDIM, NCORR, DSTAT)
          CALL DTA_MRVARD (PLST_DTA_NAME, NCORR, ADDRESS, DSTAT)
@@ -346,7 +346,7 @@
                POINT_DAZPTR = DYN_ELEMENT (ADDRESS)
                CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.D_ALT',
      :            0, 0, PDALT_DTA_NAME, DSTAT)
-               CALL DTA_MRVARF (PDALT_DTA_NAME, NCORR, ADDRESS, 
+               CALL DTA_MRVARF (PDALT_DTA_NAME, NCORR, ADDRESS,
      :            DSTAT)
                IF (DSTAT .NE. 0) THEN
                   CALL PAR_WRUSER ('FAKE - error reading '//
@@ -354,7 +354,7 @@
                ELSE
                   POINT_DALTPTR = DYN_ELEMENT (ADDRESS)
                   POINTING_CORRECTION = .TRUE.
-               END IF      
+               END IF
             END IF
          END IF
       END IF
@@ -371,7 +371,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_WRUSER ('FAKE - Adding pointing corrections',
      :         IGNORE)
-            CALL JCMT_CORRECT_POINTING (NPIXEL, 
+            CALL JCMT_CORRECT_POINTING (NPIXEL,
      :         DYNAMIC_MEM (RAPPTR),
      :         DYNAMIC_MEM (DECPPTR),
      :         DYNAMIC_MEM (LSTPTR),
@@ -391,7 +391,7 @@
          END DO
       END IF
 
-*  open output structure. Force a new file to be created as this is a 
+*  open output structure. Force a new file to be created as this is a
 *  radical change.
 
       CALL DSA_OUTPUT ('OUT', 'OUTPUT', 'IN', 0, 1, STATUS)
@@ -404,7 +404,7 @@
 *  map the output data
 
       CALL DSA_MAP_DATA ('OUT', 'UPDATE', 'FLOAT', ADDRESS, SLOT,
-     :   STATUS) 
+     :   STATUS)
       OUTPTR = DYN_ELEMENT(ADDRESS)
 
 *  find out what sort of fake is required
@@ -435,8 +435,8 @@
 *  fake the data
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL JCMT_FAKE_DATA (FAKE_TYPE, XOFF, YOFF, PIXSPACE, 
-     :      NPIXEL, RACEN, DECCEN, DYNAMIC_MEM(RAPPTR), 
+         CALL JCMT_FAKE_DATA (FAKE_TYPE, XOFF, YOFF, PIXSPACE,
+     :      NPIXEL, RACEN, DECCEN, DYNAMIC_MEM(RAPPTR),
      :      DYNAMIC_MEM(DECPPTR), DYNAMIC_MEM(OUTPTR), FBAD, STATUS)
       END IF
 

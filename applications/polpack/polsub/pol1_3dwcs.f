@@ -16,14 +16,14 @@
 *     Intensity images supplied to POLCAL will have 3 axes if they hold
 *     spectropolarimetry data, and 2 axes otherwise. The output cube
 *     will have one more axis than the input images (corresponding to
-*     Stokes parameter). The "NDIM" argument gives the number of axes 
+*     Stokes parameter). The "NDIM" argument gives the number of axes
 *     in the output cube and will be 3 (for non-spectro data) or 4 (for
 *     spectropolarimeter data).
 *
-*     This routine finds all Frames with (NDIM-1) axes in the supplied 
-*     FrameSet and adds a third (or fourth if NDIM is 4) axis to them, 
-*     representing Stokes parameters. This axis is derived from the 
-*     third(fourth) axis of the Base Frame via a 1D UnitMap. It is assumed 
+*     This routine finds all Frames with (NDIM-1) axes in the supplied
+*     FrameSet and adds a third (or fourth if NDIM is 4) axis to them,
+*     representing Stokes parameters. This axis is derived from the
+*     third(fourth) axis of the Base Frame via a 1D UnitMap. It is assumed
 *     that the Base Frame of the FrameSet is a 3(4)-D GRID Frame.
 
 *  Arguments:
@@ -36,7 +36,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -68,7 +68,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER DOM*80   
+      CHARACTER DOM*80
       INTEGER CMPFRM
       INTEGER FRM
       INTEGER I
@@ -96,7 +96,7 @@
      :                   'SYMBOL(1)=STOKES,DOMAIN=STOKES', STATUS )
 
 *  Create a PermMap which has 2(3) inputs and 3(4) outputs, Axes 1 to
-*  2(3) are just copied between input and output. Output axis 3(4) is 
+*  2(3) are just copied between input and output. Output axis 3(4) is
 *  set to a constant value of 1.0.
       DO I = 1, NDIM0
          INPRM( I ) = I
@@ -105,13 +105,13 @@
 
       OUTPRM( NDIM ) = -1
 
-      STMAP = AST_PERMMAP( NDIM0, INPRM, NDIM, OUTPRM, 1.0D0, ' ', 
+      STMAP = AST_PERMMAP( NDIM0, INPRM, NDIM, OUTPRM, 1.0D0, ' ',
      :                     STATUS )
 
 *  Create a 1D UnitMap.
       UNMAP = AST_UNITMAP( 1, ' ', STATUS )
 
-*  Loop round all the Frame in the FrameSet, looking for 2(3)-D Frames. 
+*  Loop round all the Frame in the FrameSet, looking for 2(3)-D Frames.
 *  We use a DO WHILE loop rather than a simple DO loop because Frames will
 *  be added and removed from the FrameSet within the loop.
       J = 0
@@ -131,15 +131,15 @@
 *  Set the Domain for the new Frame.
             DOM = ' '
             IAT = 0
-            CALL CHR_APPND( AST_GETC( FRM, 'DOMAIN', STATUS ), DOM, 
+            CALL CHR_APPND( AST_GETC( FRM, 'DOMAIN', STATUS ), DOM,
      :                      IAT )
             CALL CHR_APPND( '-', DOM, IAT )
-            CALL CHR_APPND( AST_GETC( STFRM, 'DOMAIN', STATUS ), DOM, 
+            CALL CHR_APPND( AST_GETC( STFRM, 'DOMAIN', STATUS ), DOM,
      :                      IAT )
             CALL AST_SETC( CMPFRM, 'DOMAIN', DOM( : IAT ), STATUS )
 
-*  We now need the Mapping which connects this new 3(4)-D CmpFrame to the 
-*  3(4)-D Base Frame in the FrameSet. This is based on the Mapping from the 
+*  We now need the Mapping which connects this new 3(4)-D CmpFrame to the
+*  3(4)-D Base Frame in the FrameSet. This is based on the Mapping from the
 *  Base Frame to the existing 2(3)-D Frame. Get this Mapping.
             MAP1 = AST_GETMAPPING( IWCS, AST__BASE, J, STATUS )
 
@@ -150,9 +150,9 @@
 
 *  This Mapping now maps axes 1 to 2(3) in the Base Frame onto the 2(3)
 *  spatial axes. The UnitMap created earlier is used to map axis 3(4) in the
-*  Base Frame onto the new Stokes axis. Combine these two Mappings together 
+*  Base Frame onto the new Stokes axis. Combine these two Mappings together
 *  into a single CmpMap in parallel.
-            MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, UNMAP, .FALSE., ' ', 
+            MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, UNMAP, .FALSE., ' ',
      :                                       STATUS ), STATUS )
 
 *  Add the new 3/4-D Frame into the FrameSet, using this Mapping to connect

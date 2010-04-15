@@ -85,7 +85,7 @@ which have been referenced in this way.  }
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -502,12 +502,12 @@ which have been referenced in this way.  }
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -598,7 +598,7 @@ reference).
 \item [REF\_GET] --- Obtain a locator to a referenced object.
 \item [REF\_NEW] --- Create an empty reference object.
 \item [REF\_PUT] --- Put a reference into a reference object.
-\item [REF\_ANNUL] --- Annul a locator which may have been obtained 
+\item [REF\_ANNUL] --- Annul a locator which may have been obtained
 \emph{via} a reference.
 \end{description}
 
@@ -631,7 +631,7 @@ DATA                DATA_SETS
      .DATA_ARRAY    _REAL(1024)
   .SET3             SPECTRUM
      .AXIS1         REFERENCE_OBJ        Reference to DATA.SET1.AXIS1
-     .DATA_ARRAY    _REAL(1024)  
+     .DATA_ARRAY    _REAL(1024)
    -
   etc.
 \end{verbatim}
@@ -681,8 +681,8 @@ Programmers should not make use of this information; otherwise portability
 is compromised.
 
 A reference object is an HDS structure of type \verb%REFERENCE_OBJ% with
-two components, \texttt{FILE} and \texttt{PATH}, of type 
-\verb%_CHAR*(REF__SZREF)%\@.  \texttt{REF\_\_SZREF} is defined in the 
+two components, \texttt{FILE} and \texttt{PATH}, of type
+\verb%_CHAR*(REF__SZREF)%\@.  \texttt{REF\_\_SZREF} is defined in the
 \texttt{REF\_PAR} include file.
 
 \begin{description}

@@ -124,7 +124,7 @@
       (define-key GOLD-map   [find]          'repeat-complex-command)
       (define-key GOLD-map   [kp-0]          'open-line)
 ;      (define-key GOLD-map   [kp-f2]         'help-with-tutorial)
-      (define-key GOLD-map   [kp-f2]         help-map) 
+      (define-key GOLD-map   [kp-f2]         help-map)
       (define-key GOLD-map   [kp-1]          'edstar-toggle-case)
       (define-key GOLD-map   [kp-2]          'edstar-delete-eol)
       (define-key GOLD-map   [kp-4]          'edstar-goto-bottom)

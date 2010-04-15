@@ -57,7 +57,7 @@ Data Visualisation}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -153,7 +153,7 @@ Data Visualisation}
 
 
 %--------------------------------------------------------------------------
-%  \Macro - displays heading (macro name and classification), the "Name" 
+%  \Macro - displays heading (macro name and classification), the "Name"
 %           section, and the "Syntax" section.
 %
 %            Args: 1 - Macro name
@@ -177,7 +177,7 @@ Data Visualisation}
 
 
 %--------------------------------------------------------------------------
-%  \Module - displays heading (module name and classification), the "Name" 
+%  \Module - displays heading (module name and classification), the "Name"
 %            section, and the "Syntax" section.
 %
 %            Args: 1 - Module name
@@ -294,7 +294,7 @@ Data Visualisation}
                     \setlength{\labelsep}{0in}
                   }
        \nopagebreak
-       \item[{\normalsize\bf{#1}}\hfill] \makebox[1in]{} \par {\small{#2}} 
+       \item[{\normalsize\bf{#1}}\hfill] \makebox[1in]{} \par {\small{#2}}
     \end{list}
 }
 
@@ -383,7 +383,7 @@ Data Visualisation}
 
 \item [Description:]\mbox{}
 
-\nopagebreak{#4} 
+\nopagebreak{#4}
 
 \item [Modules:]\mbox{}
 
@@ -410,7 +410,7 @@ Data Visualisation}
 }
 
 \newcommand{\DemoWidget}[1]{
-   \mbox{$<$}{\small{\bf{#1}}}\mbox{$>$} 
+   \mbox{$<$}{\small{\bf{#1}}}\mbox{$>$}
 }
 \newcommand{\Cpanel}[1]{ ``{\small {\sf {#1}}}'' }
 \newcommand{\DemoPanel}[1]{\item [{\sf {#1}}]\mbox{}\par\vspace{-1mm}}
@@ -428,7 +428,7 @@ Data Visualisation}
 }
 
 %--------------------------------------------------------------------------
-%  \Macro - displays heading (macro name and classification), the "Name" 
+%  \Macro - displays heading (macro name and classification), the "Name"
 %           section, and the "Syntax" section.
 %
 %            Args: 1 - Macro name
@@ -440,20 +440,20 @@ Data Visualisation}
 \newcommand{\Macro}[5]{
    \subsection{\label{#1}\xlabel{#1}{#1} ~~~ {\em (a macro)}}
    \begin{description}
-   \item [{\bf Name:}] {#1} -- {#3} 
+   \item [{\bf Name:}] {#1} -- {#3}
    \end{description}
    \begin{description}
    \item [{\bf Category:}] {#2}
    \end{description}
    \begin{description}
-   \item [{\bf Syntax:}] {#4} = {#1}( {#5} ); 
+   \item [{\bf Syntax:}] {#4} = {#1}( {#5} );
    \end{description}
 }
 
 
 
 %--------------------------------------------------------------------------
-%  \Module - displays heading (module name and classification), the "Name" 
+%  \Module - displays heading (module name and classification), the "Name"
 %            section, and the "Syntax" section.
 %
 %            Args: 1 - Module name
@@ -465,13 +465,13 @@ Data Visualisation}
 \newcommand{\Module}[5]{
    \subsection{\label{#1}\xlabel{#1}{#1}}
    \begin{description}
-   \item [{\bf Name:}] {#1} -- {#3} 
+   \item [{\bf Name:}] {#1} -- {#3}
    \end{description}
    \begin{description}
-   \item [{\bf Category:}] {#2} 
+   \item [{\bf Category:}] {#2}
    \end{description}
    \begin{description}
-   \item [{\bf Syntax:}] {#4} = {#1}( {#5} ); 
+   \item [{\bf Syntax:}] {#4} = {#1}( {#5} );
    \end{description}
 }
 
@@ -597,7 +597,7 @@ Data Visualisation}
 %--------------------------------------------------------------------------
 %
 %  \DemoNet - Display a graphical representation of a section of a
-%             demonstration network. Note, each network should be 
+%             demonstration network. Note, each network should be
 %             held in two gifs called {demo name}_{section number}a.gif
 %             and {demo name}_{section number}b.gif. These gifs are
 %             displayed one on top of the other.
@@ -636,7 +636,7 @@ Data Visualisation}
 \end{description}
 
 \item [Description:]
-\nopagebreak{#4} 
+\nopagebreak{#4}
 \begin{description}
 \end{description}
 
@@ -661,7 +661,7 @@ Data Visualisation}
 }
 
 \newcommand{\DemoWidget}[1]{
-   $<${\bf{#1}}$>$ } 
+   $<${\bf{#1}}$>$ }
 }
 \newcommand{\Cpanel}[1]{ {\sf ``{#1}''} }
 \newcommand{\DemoPanel}[1]{\item [{\sf {#1}}]\mbox{}\par\vspace{-1mm}}
@@ -993,12 +993,12 @@ Data Visualisation}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -1017,7 +1017,7 @@ for the visualisation and display of many sorts of astronomical data. It is
 the package which Starlink recommends for the display of three-dimensional
 scalar and vector data.  DX is not available at all Starlink sites; your
 site manager should be able to advise on whether or not it is available at
-your site. 
+your site.
 
 This manual describes how to access DX and SX, the Starlink enhancements
 to DX. It also documents these enhancements.
@@ -1025,7 +1025,7 @@ to DX. It also documents these enhancements.
 This edition of the manual applies to version \DXversion of DX and
 describes version \SXversion of SX. If you have a later version of DX
 it may be necessary to re-build SX. Your site manager should be able to
-advise on this. 
+advise on this.
 
 % ? End of document abstract
 % -----------------------------------------------------------------------------
@@ -1079,7 +1079,7 @@ three-dimensional scalar and vector data. It has particularly good
 features for the display of three-dimensional vector data. DX is a
 commercial package produced and sold by IBM. It is not available at all
 Starlink sites. Your site manager should be able to advise on whether or
-not it is available at your site. If it is not available locally and you 
+not it is available at your site. If it is not available locally and you
 decide that you want to obtain a copy, Appendix~\ref{OBTAIN} outlines the
 procedure.
 
@@ -1136,9 +1136,9 @@ No special privileges or quotas are required to run DX. DX (and, indeed,
 visualisation software in general) tends to be quite profligate in its
 use of computing resources. Files containing generated images can
 require a significant amount of disk space, and in particular files
-containing animations can be extremely large. Generating visualisations is 
+containing animations can be extremely large. Generating visualisations is
 computationally intensive and can require substantial amounts of computer
-memory. Therefore it is sensible to run DX on the computer with the 
+memory. Therefore it is sensible to run DX on the computer with the
 fastest processor and largest physical memory to which you have convenient
 access.
 
@@ -1167,7 +1167,7 @@ The following message should appear on your command terminal:
 and a new window (technically the canvas for the DX visual programming
 editor) should appear. If DX fails to start properly then consult your
 site manager who should be able to advise. The most likely reason is
-that DX is not installed at your site. The Starlink extensions (SX) 
+that DX is not installed at your site. The Starlink extensions (SX)
 should be automatically available when you start DX, and you can verify
 this by clicking on `Import and Export' in the panel at the top left of
 the visual programming editor window, and then looking for some modules
@@ -1204,7 +1204,7 @@ command before starting DX:
 DX is a powerful and flexible tool capable of generating sophisticated
 visualisations of complex data. However, a necessary consequence of
 this complexity is that it is non-trivial to use and it is necessary to
-invest a certain amount of time to learn to use it effectively. 
+invest a certain amount of time to learn to use it effectively.
 DX is essentially a tool which allows you to write programs or scripts
 which generate some particular visualisation of a dataset. Though it is
 possible to use pre-existing DX programs, most of the time you will use
@@ -1246,8 +1246,8 @@ Table~\ref{DOCS}.
      Astronomy}\cite{SG8}  \\
    \\
 {\large\bf On-line sources of information} \\
-~~~ A variety of on-line sources of information about DX are available; 
- see SG/8 for a list. \\ 
+~~~ A variety of on-line sources of information about DX are available;
+ see SG/8 for a list. \\
    \\ \hline
 \end{tabular}
 
@@ -1316,7 +1316,7 @@ One possible route for learning to use DX is as follows.
 This section lists various hints and tips which you may find useful when
 using DX. Additional tips are available in the {\tt{README}} files
 supplied with DX. In a standard installation these files are in directory
-{\tt{/usr/lpp/dx}}. In a non-standard installation they will still be in 
+{\tt{/usr/lpp/dx}}. In a non-standard installation they will still be in
 the {\tt{dx}} directory, but this directory will have a different location
 in the host file system. The files available are:
 
@@ -1372,15 +1372,15 @@ in the host file system. The files available are:
 
   \item The caps-lock key seems to alter the interpretation of keys
    which are not normally subject to the caps-lock setting. For example,
-   you cannot delete a module icon from a network using 
+   you cannot delete a module icon from a network using
    {\tt{$<$control-delete$>$}} when the caps-lock key is on. {\it When using
    DX the caps-lock key should always be off.}
 
   \item When using DX on a Digital alpha, you may get an error message if you
    try to use the `Image' or `Display' modules, saying that `gethostname'
    has failed. This problem only seems to occur if your display (either
-   workstation or X-terminal) has no alias in the {\tt /etc/hosts} file 
-   (or the equivalent NIS file). Just having an entry giving the numerical 
+   workstation or X-terminal) has no alias in the {\tt /etc/hosts} file
+   (or the equivalent NIS file). Just having an entry giving the numerical
    IP address of the display is insufficient; it must also have an alias.
 
   \item Sometimes when DX is executed on a Sun running Solaris it crashes
@@ -1394,8 +1394,8 @@ in the host file system. The files available are:
 
   \begin{itemize}
 
-    \item Under Solaris, DX uses shared memory in 256Mb segments. 
-     The default configuration for Solaris only allows 1Mb shared 
+    \item Under Solaris, DX uses shared memory in 256Mb segments.
+     The default configuration for Solaris only allows 1Mb shared
      memory segments.  To allow DX to run, your site manager should
      log in as {\tt root}, and proceed as follows:
 
@@ -1415,7 +1415,7 @@ in the host file system. The files available are:
     \end{enumerate}
 
     \pagebreak[4]
-    \item There is insufficient swap space available on the 
+    \item There is insufficient swap space available on the
      workstation\footnote{There are various Unix commands for showing
      the amount of swap space, but unfortunately they vary between
      Digital Unix/alpha and Solaris/Sun systems. Some of the possibilities
@@ -1435,7 +1435,7 @@ in the host file system. The files available are:
      on a system of the given type. Of course, whether or not it is
      actually available on your system depends on how the system and
      your personal search path have been configured. If the command is not
-     immediately available in your search path then try prefixing the 
+     immediately available in your search path then try prefixing the
      command with the directory specification `{\tt /usr/sbin}'.
 
      Unfortunately the command which is available for both types of
@@ -1483,7 +1483,7 @@ in the host file system. The files available are:
     \item but do not allocate more than the total amount of swap space
      on your machine\footnotemark[\value{swapfoot}],
 
-    \item finally (but not least), other users will appreciate your 
+    \item finally (but not least), other users will appreciate your
      setting a small value!
 
   \end{itemize}
@@ -1495,11 +1495,11 @@ in the host file system. The files available are:
 
   \item If the `Image' module runs without error but seems to produce no
    image (or if the image is too large or too small for the window), try
-   resetting the image window by clicking anywhere inside it and then 
+   resetting the image window by clicking anywhere inside it and then
    pressing {\tt $<$control-f$>$}. The displayed object should be
    re-centred and re-sized within the window.
 
-   If the `Image' module repeatedly fails, generating X errors each time, 
+   If the `Image' module repeatedly fails, generating X errors each time,
    then it may be necessary to log out and re-start the X window session.
 
   \item If you are running DX from an X-terminal it will sometimes
@@ -1534,7 +1534,7 @@ in the host file system. The files available are:
   \end{quote}
 
    which causes the F14 button on an N-108LK keyboard to generate the
-   `End' KEYSYM. The tool {\tt xev} is useful for finding the key code 
+   `End' KEYSYM. The tool {\tt xev} is useful for finding the key code
    associated with a given key on any keyboard.
 
   \item If {\tt $<$control-delete$>$} does not delete modules from a
@@ -1574,7 +1574,7 @@ in the host file system. The files available are:
 \label{IMPORTING} \xlabel{IMPORTING} }
 
 There are two routes by which data in astronomical formats, such
-as the Starlink Extensible N-Dimensional Data Format (NDF; see 
+as the Starlink Extensible N-Dimensional Data Format (NDF; see
 \xref{SUN/33}{sun33}{}\cite{SUN33}), can be imported into DX. Either the
 data can be converted to DX format prior to starting DX or alternatively
 they can be accessed directly in their astronomical format from inside DX
@@ -1592,7 +1592,7 @@ Appendix~\ref{NDF2DX}) for converting a standard Starlink NDF data file
 into a format which can be accessed by DX. The output file generated is
 in the native DX format and it can be imported directly into DX.
 
-There are various options available for {\tt ndf2dx} 
+There are various options available for {\tt ndf2dx}
 but usually a Starlink NDF can be
 converted by simply typing:
 
@@ -1610,7 +1610,7 @@ accessed from within a DX visual program using the standard module
 
 The usual, or `native', method of storing an NDF dataset is as a file
 formatted using the Starlink Hierarchical Data System (HDS). However,
-in common with other Starlink applications, {\tt ndf2dx} can read 
+in common with other Starlink applications, {\tt ndf2dx} can read
 files in various other astronomical formats, such as FITS images, and
 interpret them as NDF datasets. By default {\tt ndf2dx} will only
 read HDS files. In order to configure it to recognise files in other
@@ -1657,7 +1657,7 @@ program by including SX macro {\tt SXReadNDF} (see Sections~\ref{SX} and
 read. Thus, if the data are to be accessed more than once (which will
 usually be the case) it is more efficient to perform the conversion
 prior to starting DX, as described in Section~\ref{PRIOR}, above.
-If the conversion is done from within DX then the same set of 
+If the conversion is done from within DX then the same set of
 alternative formats which are automatically available for prior
 conversions are also automatically available (see Table~\ref{FORMATS}).
 
@@ -1685,7 +1685,7 @@ documented in Appendix~B, {\it Importing Data: File Formats}, in the IBM
 
 Before importing a data file into DX you must first create a general
 format header file which describes the structure of the data file.
-There are several ways of creating this header file. 
+There are several ways of creating this header file.
 \xref{SC/2 {\it The Starlink Data Explorer Cookbook}}{sc2}{}\cite{SC2}
 gives a couple of examples. Section~4 of the IBM {\it
 QuickStart Guide}\cite{QUICKS} contains further examples; in particular
@@ -1696,7 +1696,7 @@ information which must be included in the general format header.
 
 \subsection{Formatted files}
 
-Once a suitable general format header file has been created, a formatted 
+Once a suitable general format header file has been created, a formatted
 file written by a Fortran program can be imported into DX using the
 standard module `Import'.
 
@@ -1739,9 +1739,9 @@ Once the header file has been created there are two ways to proceed.
 
   \item[Second method] ~
   \newline Create a general header file, including the name of the raw
-   Fortran data file, and then use the SX macro {\tt{SXReadFortran}} 
+   Fortran data file, and then use the SX macro {\tt{SXReadFortran}}
    (see Sections~\ref{SX} and \ref{MODMAC}) to import the unformatted
-   file directly into DX. The record control bytes are stripped 
+   file directly into DX. The record control bytes are stripped
    `on-the-fly' each time the data are read. Thus, if the data are
    to be accessed more than once (which will usually be the case) it
    is more efficient to perform the conversion prior to starting DX,
@@ -1802,9 +1802,9 @@ functionality and are written in C, whereas macros are scripts invoking
 several existing modules, though normally you will not be aware of these
 details. There are, however, some slight differences in the way modules
 and macros behave. For example, if you click on a macro and then select
-the `Open Selected Macros' item from the `Windows' menu it will expand 
-into a diagram showing its constituent components. Also the way that 
-on-line help is provided is slightly different. Because of these 
+the `Open Selected Macros' item from the `Windows' menu it will expand
+into a diagram showing its constituent components. Also the way that
+on-line help is provided is slightly different. Because of these
 differences the type of each item (module or macro) is indicated in its
 detailed documentation.
 
@@ -1839,7 +1839,7 @@ See Section~\ref{MODMAC} for a detailed description of each item.
 
   \item[SXPrint] -- creates a postscript version of a displayed image.
 
-  \item[SXProfile] -- creates a one-dimensional profile through a field 
+  \item[SXProfile] -- creates a one-dimensional profile through a field
    between two points.
 
   \item[SXRand] -- creates a set of random vectors.
@@ -2845,7 +2845,7 @@ module is fixed at ``general'').
 
 
 \ModuleSection{Description}{
-The \htmlref{\Modnam{SXReadNDF}}{SXReadNDF} macro imports data from a 
+The \htmlref{\Modnam{SXReadNDF}}{SXReadNDF} macro imports data from a
 Starlink NDF structure. It
 uses the {\tt \$SX\_DIR/ndf2dx} application.
 
@@ -2853,7 +2853,7 @@ The dependency of the data values in the NDF is specified by the
 \Param{positions} parameter.
 
 The conversion is done ``on-the-fly'' each time an NDF is accessed. As an
-alternatively to using the \htmlref{\Modnam{SXReadNDF}}{SXReadNDF} macro, the 
+alternatively to using the \htmlref{\Modnam{SXReadNDF}}{SXReadNDF} macro, the
 {\tt ndf2dx}
 application can be used to perform the conversion once, after which the
 \Modnam{import} module can be used to import the converted file.
@@ -3107,7 +3107,7 @@ are propagated to the output.
 \ModuleSection{Examples}{
 
 This example displays the {\tt watermolecule} field between bounds of \\
-\mbox{$[-1.0,-1.0,-1.0]$} and \mbox{$[1.0,1.0,0.0]$}. The \Modnam{ClipBox} 
+\mbox{$[-1.0,-1.0,-1.0]$} and \mbox{$[1.0,1.0,0.0]$}. The \Modnam{ClipBox}
 module could have been
 used to do this, but \Modnam{ClipBox} does not actually remove
 the excluded positions from the data set; it just tells the renderer not
@@ -4219,7 +4219,7 @@ This is the default.
 \item [``$a$'' ] -- causes all particles to be displayed as a glyph with size (and direction
 if $a$ is a vector) given by the $a$ quantity.
 
-\item [``\mbox{$[a,b,c]$}'' ] -- causes particles to be represented as 
+\item [``\mbox{$[a,b,c]$}'' ] -- causes particles to be represented as
 rocket glyphs with
 direction and length determined by the three quantities $a$, $b$ and $c$
 which should be scalar values.
@@ -5075,15 +5075,15 @@ This appendix describes {\tt ndf2dx} in detail.
 }{
    \sstdescription{
       NDF2DX converts a 1, 2 or 3 dimensional Starlink NDF
-      structure to a native format DX data file containing a single 
+      structure to a native format DX data file containing a single
       field with the following array components:
       \begin{description}
       \item [{\tt data}] -- This is copied from the DATA component of the
       NDF. It is given a ``dep'' attribute indicating whether the values
       in it are in one-to-one correspondence with the {\tt positions}
-      component, or the {\tt connections} component (see parameter DEP). Bad 
-      values are 
-      replaced by zero, and identified in the {\tt invalid positions} or 
+      component, or the {\tt connections} component (see parameter DEP). Bad
+      values are
+      replaced by zero, and identified in the {\tt invalid positions} or
       {\tt invalid connections} components. The created component is
       scalar and of type {\tt int}, {\tt float} or {\tt double},
       depending on the data type of the NDF.
@@ -5094,13 +5094,13 @@ This appendix describes {\tt ndf2dx} in detail.
       corresponding pixel co-ordinates. If the user indicates that
       the data are positions-dependent (see parameter DEP), then the
       {\tt positions} component holds the co-ordinates of the
-      NDF pixel centres. If the data are connections-dependent, then the 
-      {\tt positions} component holds the co-ordinates of the corners of 
+      NDF pixel centres. If the data are connections-dependent, then the
+      {\tt positions} component holds the co-ordinates of the corners of
       the NDF pixels. All positions are stored as {\tt float} values.
-      \item [{\tt connections}] -- This component identifies adjacent 
-      positions which can be connected together to form cubic cells. If the 
+      \item [{\tt connections}] -- This component identifies adjacent
+      positions which can be connected together to form cubic cells. If the
       data are connections-dependent then these cells correspond to NDF pixels.
-      Otherwise they form a grid in which each cell corner occurs at an NDF 
+      Otherwise they form a grid in which each cell corner occurs at an NDF
       pixel centre.
       \item [{\tt variance}] -- This is copied from the VARIANCE
       component of the NDF. It is given the same ``dep'' attribute as the
@@ -5109,13 +5109,13 @@ This appendix describes {\tt ndf2dx} in detail.
       replaced by zero and marked in the appropriate {\tt invalid ...}
       component.
       \item [{\tt invalid positions}] -- This is a list of indices into
-      the {\tt positions} component, identifying positions which have bad 
+      the {\tt positions} component, identifying positions which have bad
       DATA or VARIANCE values. It is of type {\tt integer}. It is not
       created if there are no bad values or if parameter PBAD is given
       the value FALSE or if the data are connections dependent (see
       parameter DEP).
       \item [{\tt invalid connections}] -- This is a list of indices into
-      the {\tt connections} component, identifying cells which have bad 
+      the {\tt connections} component, identifying cells which have bad
       DATA or VARIANCE values. It is of type {\tt integer}. It is not
       created if there are no bad values or if parameter PBAD is given
       the value FALSE or if the data are positions dependent (see
@@ -5128,7 +5128,7 @@ This appendix describes {\tt ndf2dx} in detail.
       the TITLE component of the NDF (or ``$<$undefined$>$'') if there is no TITLE
       component.
       \item [{\tt axis labels}] -- This is a string list containing one
-      string for each axis. Each string consists of the corresponding NDF AXIS 
+      string for each axis. Each string consists of the corresponding NDF AXIS
       LABEL component followed by the axis UNITS in parentheses. This
       attribute is used by the DX \Modnam{AutoAxes} module.
       \item [{\tt ndf\_label}] -- A string attribute holding the NDF LABEL
@@ -5136,7 +5136,7 @@ This appendix describes {\tt ndf2dx} in detail.
       \item [{\tt ndf\_units}] -- A string attribute holding the NDF UNITS
       component, or ``$<$undefined$>$'' if there is no UNITS component.
       \end{description}
-      
+
 
    }
    \sstusage{
@@ -5146,12 +5146,12 @@ This appendix describes {\tt ndf2dx} in detail.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The input NDF. 
+         The input NDF.
       }
       \sstsubsection{
          OUT = FILENAME (Write)
       }{
-         The output file, including ``{\tt .dx}'' suffix if required. Existing files 
+         The output file, including ``{\tt .dx}'' suffix if required. Existing files
          with the given name will be over-written.
       }
       \sstsubsection{
@@ -5163,13 +5163,13 @@ This appendix describes {\tt ndf2dx} in detail.
       \sstsubsection{
          DEP = LITERAL (Read)
       }{
-         The data dependency. This can be either ``connections'' or 
+         The data dependency. This can be either ``connections'' or
          ``positions'' (case insensitive, unambiguous abbreviations are allowed)
          Positions-dependent data values are considered to be instantaneous
          samples from a smoothly varying field, taken at the NDF pixel
          centres. Connections-dependent data values are considered to be
          values which describe the whole pixel volume (for instance, the
-         data values may be connection dependent if they represent the 
+         data values may be connection dependent if they represent the
          integral of a field over the pixel volume). DX interpolates
          smoothly in a position-dependent data array to find data values
          at un-tabulated positions, but uses the value of the cell in
@@ -5187,7 +5187,7 @@ This appendix describes {\tt ndf2dx} in detail.
          PBAD = LOGICAL (Read)
       }{
          If TRUE then an {\tt invalid connections} or {\tt invalid
-         positions} component will be added to the output field identifying 
+         positions} component will be added to the output field identifying
          any bad DATA or VARIANCE values in the input NDF. [YES]
       }
       \sstsubsection{
@@ -5205,7 +5205,7 @@ This appendix describes {\tt ndf2dx} in detail.
          ndf2dx jet jet.dx
       }{
          This example converts the NDF in file {\tt jet.sdf} into a
-         native DX structure in file {\tt jet.dx}. 
+         native DX structure in file {\tt jet.dx}.
       }
    }
 
@@ -5224,7 +5224,7 @@ This appendix describes {\tt ndf2dx} in detail.
 \section{Obtaining a Copy of DX \label{OBTAIN} \xlabel{OBTAIN} }
 
 DX is a commercial product produced and sold by IBM. There is no CHEST
-agreement for it, though there is an educational discount. As a guide 
+agreement for it, though there is an educational discount. As a guide
 the following prices applied at the time of writing (November 1995):
 
 \begin{center}
@@ -5239,16 +5239,16 @@ These prices are exclusive of VAT. A node-locked licence allows any
 number of concurrent invocations of DX on a single workstation (though
 most Starlink machines probably could not cope with multiple
 invocations). A floating licence allows only a single invocation at any
-instant, but it may be on any machine at your site. The licences permit 
-you to run the version that you have bought in perpetuity. However to 
+instant, but it may be on any machine at your site. The licences permit
+you to run the version that you have bought in perpetuity. However to
 obtain the next version you would need to buy an upgrade, which costs
 about \pounds 200.
 
 Normally sites will obtain a copy by including an item for DX in their
 annual bid submitted to Starlink. If the bid is successful a copy of
 DX will be bought. Alternatively, of course, a site could simply
-purchase a copy using local funds. In either case the person at Starlink 
-to contact in the first instance is C.A.~Clayton (e-mail {\tt 
+purchase a copy using local funds. In either case the person at Starlink
+to contact in the first instance is C.A.~Clayton (e-mail {\tt
 cac@star.rl.ac.uk}) who will supply the necessary details.
 
 

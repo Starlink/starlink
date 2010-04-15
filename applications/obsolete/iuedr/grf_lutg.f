@@ -18,7 +18,7 @@
 *         Final edit to merge with GRFSUB routines.
 *
 *   Method:
-*      Call (GKS) GSCR to set up the colour table. 
+*      Call (GKS) GSCR to set up the colour table.
 *
 *-
 

@@ -1,9 +1,9 @@
 1 KAPLIBS_library
                                              Expires: ???
 
-KAPLIBS is a package containing several Fortran subroutine libraries 
+KAPLIBS is a package containing several Fortran subroutine libraries
 which provide general purpose algorithms required by the KAPPA package,
-and which may be of use to anyone developing their own KAPPA-like 
+and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 3.0
@@ -11,20 +11,20 @@ Version 3.0
      to the MINPIX threshold.
    - CCG_CS1 and CCG_CS3 now return the clipped standard deviations
      instead of the clipped variances.
-   - CTG, IRQ, and LPG libraries are no longer in KAPLIBS.  They are 
+   - CTG, IRQ, and LPG libraries are no longer in KAPLIBS.  They are
      autonomous libraries each with its own documentation and link
      scripts.
    - KPG_BLONx added.  It smooths an n-dimensional image using box
-     mean filter (unlike KPG1_BLOCx which is limited to 
+     mean filter (unlike KPG1_BLOCx which is limited to
      two-dimensional data).
    - KPG_BMDNx added.  It smooths an n-dimensional array using a box
-     median filter (unlike KPG1_BMEDx which is limited to 
+     median filter (unlike KPG1_BMEDx which is limited to
      two-dimensional data).
    - kpg1Ch2pm added.  It creates an AST PolyMap that performs a
      polynomial transformation equivalent to a supplied Starlink
      POLYNOMIAL structure (Chebyshev and simple are both supported).
    - kpg1Chcof added.  It returns coefficients for a set of Starlink
-     POLYNOMIAL structures. 
+     POLYNOMIAL structures.
    - KPG_ENV0C added.  It reads a string value from an environment
      variable using a default value if the variable is undefined.
    - Further bug fixes and improvements to KPG1_FRAC:
@@ -44,7 +44,7 @@ Version 3.0
    - KPG_STOSx added.  It calculates accurate order statistics by
      sorting an array by means of an index, returning the median and
      optionally percentiles.
-   - Added C interfaces for KPG1_DARAD (kpg1Darad), KPG1_LOCTD 
+   - Added C interfaces for KPG1_DARAD (kpg1Darad), KPG1_LOCTD
      (kpg1Loctd), and KPG1_PIXSC (kpgPixsc).
 
 Version 2.8
@@ -56,7 +56,7 @@ Version 2.8
    - KPG1_WRCAT added. It writes a catalogue, exactly like KPG1_WRTAB,
      except that it allows an arbitrary set of extra columns to be supplied,
      specified via an AST KeyMap.
-   - KPG1_BADBX added. It returns an NDF identifier for the smallest section 
+   - KPG1_BADBX added. It returns an NDF identifier for the smallest section
      of a supplied NDF that encloses all the good data values in the NDF.
    - KPG1_BBOXx added. It obtains the pixel bounding box of a given value
      within an N-dimensional data array.
@@ -66,7 +66,7 @@ Version 2.8
      group into an AST keyMap.
    - Added KPG1_MXMNX, which provides a single interface to the
      existing generic KPG1_MXMN<T> routines.
-   - Added KPG1_CGET, which returns the value of an NDF character 
+   - Added KPG1_CGET, which returns the value of an NDF character
      component removing any AST or PGPLOT escape sequences.
    - The kaplibs_link script now works without attempting to load ADAM
      symbols.

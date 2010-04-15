@@ -5,14 +5,14 @@
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,SYMB,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   P M A T H
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), TOP_STK (<),
 C STK_STOKES_I (<), STK_STOKES_Q (<), STK_STOKES_QV (<),
@@ -21,12 +21,12 @@ C STK_NPTS (<), STOKES_I (>), STOKES_Q (>),
 C STOKES_QV (>), STOKES_U (>), STOKES_UV (>),
 C LAMBDA (>), NPTS (>), SYMB (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C Performs mathematical operations on two polarization spectra.
@@ -259,6 +259,6 @@ C
       IF (FPE.GT.0) THEN
        WRITE(OUT_LU,*) '!',FPE,' divide by zeros trapped'
       ENDIF
-C      
+C
 666   CONTINUE
       END

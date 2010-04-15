@@ -44,7 +44,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -75,7 +75,7 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Split the output name into database part and catname part.
 *
       call chi_splitname(output, outdbname, outcatname, status)

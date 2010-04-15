@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -51,9 +51,9 @@ RUTHERFORD APPLETON LABORATORY\\
 
 \section {Introduction}
 This document contains the specifications for a miscellaneous selection of
-utility subroutines which may be of use in several applications in the IRAS90 
-package. It contains a list of all the subroutines, giving a one line 
-description of what the subroutine does, and also the complete specification 
+utility subroutines which may be of use in several applications in the IRAS90
+package. It contains a list of all the subroutines, giving a one line
+description of what the subroutine does, and also the complete specification
 for each subroutine.
 
 
@@ -64,7 +64,7 @@ subroutines, on both VMS and UNIX systems. It is assumed that the IRAS90 package
 is installed as part of the Starlink Software Collection.
 
 \subsection{VMS}
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use the IRM package should start by issuing the commands:
 
 \begin{verbatim}
@@ -75,12 +75,12 @@ $ IRAS90_DEV
 \end{verbatim}
 
 These commands set up logical names related to all the IRAS90
-subsystems, including IRM. 
+subsystems, including IRM.
 
 To link a VMS ADAM application with the IRM package, the linker options file
 IRAS90\_LINK\_ADAM should be used. For example, to compile and link an ADAM
 application called PROG with the IRM library, the following commands should be
-used: 
+used:
 
 \begin{verbatim}
 $ ADAMSTART
@@ -88,29 +88,29 @@ $ ADAMDEV
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ ALINK PROG, IRAS90_LINK_ADAM/OPT 
+$ ALINK PROG, IRAS90_LINK_ADAM/OPT
 \end{verbatim}
 
 Stand-alone (i.e. non-ADAM) applications can be linked with the ``standalone''
 version of IRM. This version excludes the routines described in appendix
 \ref{APP:ADAM}. To do this the link options file IRAS90\_LINK should be used
 instead of IRAS90\_LINK\_ADAM. Thus to compile and link a stand-alone
-application with the IRM package, the following commands should be given: 
+application with the IRM package, the following commands should be given:
 
 \begin{verbatim}
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ LINK PROG, IRAS90_LINK/OPT 
+$ LINK PROG, IRAS90_LINK/OPT
 \end{verbatim}
 
 \subsection{UNIX}
 
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use the IRM package should do the following:
 
 \begin{enumerate}
-\item Execute the {\bf iras90} command. This sets up an alias for the 
+\item Execute the {\bf iras90} command. This sets up an alias for the
 {\bf iras90\_dev} command.
 
 \item Execute the {\bf iras90\_dev} command.  This sets up three
@@ -119,14 +119,14 @@ in the IRAS90 package, IRAS90\_LIB pointing to the directory in which
 the IRAS90 sub-system libraries are stored (including IRM), and
 IRAS90\_INC pointing to the directory which contains all the IRAS90
 include files. It also adds the {\bf bin} sub-directory of IRAS90\_DIR
-on to the end of the current value for the environment variable PATH. 
+on to the end of the current value for the environment variable PATH.
 
 \item If a UNIX application accesses any include files (such as
 IRM\_PAR) then it should be ensured that the files can be found by the
 compiler. All IRAS90 include files are contained in the directory
 pointed to by environment variable IRAS90\_INC (set up by {\bf
 iras90\_dev}, so a soft link to the IRM\_PAR file (for instance) can be
-set up with the command: 
+set up with the command:
 
 \verb+% ln -s $IRAS90_INC/irm_par IRM_PAR+\\
 
@@ -137,7 +137,7 @@ up a link for the include file SAE\_PAR (for instance) use the command:
 \verb+% ln -s /star/include/sae_par SAE_PAR+\\
 
 Soft links can be deleted (using the {\bf rm} command) when no longer needed.
-Note, soft links are only accessable in the directory from which the {bf ln} 
+Note, soft links are only accessable in the directory from which the {bf ln}
 command was issued.
 
 \item For ADAM applications the following {\bf alink} command should be used:
@@ -245,7 +245,7 @@ apostrophy (') in the above {\bf alink} command.
 \noteroutine{IRM\_LINR( DIS1, DIS2, VAL1, VAL2, OUT, STATUS )}
   {Perform a linear interpolation}
 \noteroutine{IRM\_LINTR( N, XA, YA, XB, YB, IFIT, C, MAXERR, RMSERR, STATUS )}
-  {Calculate a least squares linear transformation between two sets of 
+  {Calculate a least squares linear transformation between two sets of
    positions}
 \noteroutine{IRM\_LITRR( SCALE, OFFSET, STATUS )}
   {Store a linear transformation in the AGI database}
@@ -308,7 +308,7 @@ apostrophy (') in the above {\bf alink} command.
 \noteroutine{IRM\_TABLE( TITLE, NROW, NCOL TABLE, X1, X2, Y1, Y2,...)}
   {Draw a table at specify position with specify size}
 \noteroutine{IRM\_TD( STRING, IY, IM, ID, IHOUR, IMIN, SEC, MJD, STATUS )}
-  {Extract individual fields from a time and date string and convert 
+  {Extract individual fields from a time and date string and convert
    to a Modified Julian Date}
 \noteroutine{IRM\_TMENU( INMENU, INTITL, PARAM, ITEMNO, STATUS )}
   {Display a menu on user's terminal and get an item from it}
@@ -401,7 +401,7 @@ apostrophy (') in the above {\bf alink} command.
 
 \subsection {Handling Six Coefficient Linear Transformations}
 \noteroutine{IRM\_LINTR( N, XA, YA, XB, YB, IFIT, C, MAXERR, RMSERR, STATUS )}
-  {Calculate a least squares linear transformation between two sets of 
+  {Calculate a least squares linear transformation between two sets of
    positions}
 \noteroutine{IRM\_TRCON( C1, C2, C3, STATUS )}
   {Concatenate two linear transformations}
@@ -433,7 +433,7 @@ apostrophy (') in the above {\bf alink} command.
 \noteroutine{IRM\_SUBST( INSTR, OLD, NEW, ALL, OUTSTR, NSUB, STATUS )}
   {Substitute one substring for another}
 \noteroutine{IRM\_TD( STRING, IY, IM, ID, IHOUR, IMIN, SEC, MJD, STATUS )}
-  {Extract individual fields from a time and date string and convert 
+  {Extract individual fields from a time and date string and convert
    to a Modified Julian Date}
 \noteroutine{IRM\_CDESC( LEN, POINT, STATUS )}
   {Modify a pointer so that it can be used to pass character data}
@@ -490,7 +490,7 @@ apostrophy (') in the above {\bf alink} command.
 \noteroutine{IRM\_GETTD( PARAM, TIMDAT, MJD, STATUS )}
   {Get a date and time string from the environment}
 \noteroutine{IRM\_TD( STRING, IY, IM, ID, IHOUR, IMIN, SEC, MJD, STATUS )}
-  {Extract individual fields from a time and date string and convert 
+  {Extract individual fields from a time and date string and convert
    to a Modified Julian Date}
 
 
@@ -5837,17 +5837,17 @@ The STARLSE package (see SUN/105) provides facilities for initialising the VAX
 Language Sensitive Editor (LSE) to simplify the generation of Fortran
 code conforming to the Starlink programming standard (see SGP/16). One of the
 facilities provided by LSE is the automatic production of argument lists for
-subroutine calls. Templates for all the subroutines in the IRM package can be 
+subroutine calls. Templates for all the subroutines in the IRM package can be
 made available within LSE by performing the following steps (within LSE):
 \begin{enumerate}
 \item Issue the LSE command GOTO FILE/READ IRM\_DIR:IRM.LSE
 \item Issue the LSE command DO
 \item Issue the LSE command DELETE BUFFER
 \item Move to a buffer holding a .FOR of a .GEN file in the usual way.
-\item IRM subroutine templates are then available by typing in the name of an 
+\item IRM subroutine templates are then available by typing in the name of an
 IRM subroutine (or an abbreviation) and expanding it (CTRL-E).
 \item Help on the subroutine and its arguments can be obtained by placing the
-cursor at a point in the buffer at which the subroutine name has been entered 
+cursor at a point in the buffer at which the subroutine name has been entered
 and pressing GOLD-PF2.
 \end{enumerate}
 
@@ -5880,8 +5880,8 @@ IRM\_ makes calls to the following packages:
 \item [TRN\_] - The Starlink coordinate transformation package; see SUN/61.
 \end{description}
 
-Access to these packages, together with packages called from within these 
-packages, is necessary to use IRM. 
+Access to these packages, together with packages called from within these
+packages, is necessary to use IRM.
 
 \section {Changes Introduced in the Current Version of this Document}
 \label {SEC:CHANGES}
@@ -5890,22 +5890,22 @@ Changes introduced in version 12 of ID8:
 \begin{enumerate}
 \item IRM\_UNTIV ignores the supplied waveband index unless it is actually
 needed. An error ``CPC data cannot be handled'' is reported if a waveband index
-is needed but an illegal value was supplied. 
-\item IRM\_UNTIM only reports an error for CPC data if the conversion factor 
+is needed but an illegal value was supplied.
+\item IRM\_UNTIM only reports an error for CPC data if the conversion factor
 cannot be found. CPC waveband indices are returned with negative values.
 \item New routines IRM\_ELLIP, IRM\_GTCUN, IRM\_FILNM.
 \end{enumerate}
 
 Changes introduced in version 11 of ID8:
 \begin {enumerate}
-\item New routines: IRM\_SPAGE, IRM\_UNTIV, IRM\_RLFFT, IRM\_HMFFT, 
+\item New routines: IRM\_SPAGE, IRM\_UNTIV, IRM\_RLFFT, IRM\_HMFFT,
 IRM\_HMULT, IRM\_AGFND, IRM\_AGREF, IRM\_HMSG, IRM\_QCOL, IRM\_GTAST,
 IRM\_PTAST, IRM\_SKCUR, IRM\_LINTR, IRM\_READF
 \end {enumerate}
 
 Changes introduced in version 10 of ID8:
 \begin {enumerate}
-\item New routines: IRM\_RDNDF, IRM\_WRNDF, IRM\_TD, IRM\_GETTD, IRM\_ASFIO, 
+\item New routines: IRM\_RDNDF, IRM\_WRNDF, IRM\_TD, IRM\_GETTD, IRM\_ASFIO,
 IRM\_LISTN, IRM\_CDESC, IRM\_CPOIN, IRM\_GTHLP, IRM\_PTOUT, IRM\_PAGE,
 IRM\_BLOCR, IRM\_CFF2R, IRM\_MEDN, IRM\_QNTLR, IRM\_CLEAN, IRM\_GTBND,
 IRM\_FIT2, IRM\_LITRR, IRM\_SOLIN, IRM\_ANTSO, IRM\_IATTR, IRM\_COMNT,
@@ -5915,11 +5915,11 @@ IRM\_GKCMT, IRM\_GKEYC, IRM\_GKEYR
 \item Routine IRM\_UNTCV is now sensitive to the case of the supplied strings.
 \item Description of the use of IRM on UNIX machines included.
 \item STARLSE templates and help available for IRM subroutines.
-\item The VMS version of IRM is now released in the form of a sharable image 
-rather than an object library. Applications linked with the sharable image have 
-the advantage that they will not need to be {\em re}-linked when IRM is upgraded 
+\item The VMS version of IRM is now released in the form of a sharable image
+rather than an object library. Applications linked with the sharable image have
+the advantage that they will not need to be {\em re}-linked when IRM is upgraded
 in future. Note, the object library has been removed from the IRM system.
-\item The linking and development procedures have been modified to bring them 
+\item The linking and development procedures have been modified to bring them
 into line with Starlink standards (see SSN/8).
 \end {enumerate}
 

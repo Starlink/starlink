@@ -34,7 +34,7 @@
 *        Identifiers of XIN and YIN positions.
 *     OK( * ) = LOGICAL (Given)
 *        Array of flags indicating which elements of the inpout arrays
-*        are to be ignored (i.e. these positions are ok for merging). 
+*        are to be ignored (i.e. these positions are ok for merging).
 *     NXYIN( NLST )  = INTEGER (Given)
 *        The number entries for each input list, these values are
 *        entered in the same order as the appended positions.
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +124,7 @@
       DOUBLE PRECISION YSUM
       INTEGER IPNOW
       INTEGER NSAME
-      DOUBLE PRECISION XX      
+      DOUBLE PRECISION XX
       DOUBLE PRECISION YY
       INTEGER LAST
 
@@ -160,7 +160,7 @@
          DO 2 I = 1, NLST
             DO 3 J = 1, NXYIN( I )
                IP = IP + 1
-               IF ( OK ( IP ) ) THEN 
+               IF ( OK ( IP ) ) THEN
 
 *  Is the current identifier greater than the last.
                   IF ( IDIN( IP ) .GT. LAST ) THEN
@@ -180,7 +180,7 @@
 
 *  If a next identifier was located then look for all its occurences and
 *  form an average position.
-         IF ( MORE ) THEN 
+         IF ( MORE ) THEN
 
 *  Record this identifier for the next comparison.
             LAST = IDIN( IPNOW )
@@ -216,6 +216,6 @@
 
 *  End of `DO WHILE' return and test MORE.
          GO TO 1
-      END IF     
+      END IF
       END
 * $Id$

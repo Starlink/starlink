@@ -5,7 +5,7 @@
 /*+
  *  Name:
  *     RegionStats
- 
+
  *  Purpose:
  *     Include file that defines the RegionStats class.
 
@@ -13,7 +13,7 @@
  *     Copyright (C) 2001-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -29,10 +29,10 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     P.W. Draper (PWD)
-  
+
  *  History:
  *     23-JUL-2001 (PWD):
  *        Original version.
@@ -57,13 +57,13 @@ extern "C" {
 #define FITS_LONG long
 #endif
 
-class RegionStats 
+class RegionStats
 {
  public:
-    
+
     //  Constructor.
     RegionStats( const ImageIO imio );
-    
+
     //  Destructor
     virtual ~RegionStats();
 
@@ -105,7 +105,7 @@ class RegionStats
     int y0_;
     int x1_;
     int y1_;
-    
+
     //  Whether the image data is byte swapped (from the machine
     //  native form).
     int swap_;
@@ -130,37 +130,37 @@ class RegionStats
     inline char swapArrayVal( const char *arrayPtr, const int& span,
                               const int &ix, const int& iy )
         {
-            return arrayPtr[iy*span + ix]; 
+            return arrayPtr[iy*span + ix];
         }
-    
+
     inline unsigned char swapArrayVal( const unsigned char *arrayPtr,
-                                       const int& span, const int &ix, 
+                                       const int& span, const int &ix,
                                        const int& iy )
         {
-            return arrayPtr[iy*span + ix]; 
+            return arrayPtr[iy*span + ix];
         }
-    
+
     inline short swapArrayVal( const short *arrayPtr, const int& span,
                                const int &ix, const int& iy )
         {
-            return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]); 
+            return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]);
         }
-    
-    inline unsigned short swapArrayVal( const unsigned short *arrayPtr, 
-                                        const int& span, const int &ix, 
+
+    inline unsigned short swapArrayVal( const unsigned short *arrayPtr,
+                                        const int& span, const int &ix,
                                         const int& iy )
         {
-            return ntohs(arrayPtr[iy*span + ix]); 
+            return ntohs(arrayPtr[iy*span + ix]);
         }
-    
-    inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr, 
+
+    inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr,
                                    const int& span,
                                    const int &ix,
                                    const int& iy )
         {
-            return ntohl(arrayPtr[iy*span + ix]); 
+            return ntohl(arrayPtr[iy*span + ix]);
         }
-    
+
     inline float swapArrayVal( const float *arrayPtr, const int& span,
                                const int &ix, const int& iy )
         {
@@ -169,7 +169,7 @@ class RegionStats
             ret.raw = ntohl(ret.raw);
             return ret.typed;
         }
-    
+
     inline double swapArrayVal( const double *arrayPtr, const int& span,
                                 const int &ix, const int& iy )
         {
@@ -181,8 +181,8 @@ class RegionStats
             ret.raw[1] = ntohl( tmp );
             return ret.typed;
         }
-    
-    
+
+
     //  Test for a BAD pixel. XXX Note NDF specific doesn't check BLANK or NaN.
 #define GENERATE_BADPIXA( T, BADVAL ) \
    inline int badpix( const T *image, const int& span, \
@@ -195,7 +195,7 @@ class RegionStats
     GENERATE_BADPIXA(FITS_LONG, VAL__BADI);
     GENERATE_BADPIXA(float, VAL__BADF);
     GENERATE_BADPIXA(double, VAL__BADD);
-    
+
     //  Test for a BAD pixel, swapped version.
 #define GENERATE_SWAPBADPIXA( T, BADVAL ) \
    inline int swapBadpix( const T *image, const int& span, \
@@ -208,16 +208,16 @@ class RegionStats
     GENERATE_SWAPBADPIXA(FITS_LONG, VAL__BADI);
     GENERATE_SWAPBADPIXA(float, VAL__BADF);
     GENERATE_SWAPBADPIXA(double, VAL__BADD);
-    
+
     //  Data type dependent definitions, use overloaded members.
 #define DATA_TYPE char
 #include "RegionStatsTemplate.h"
 #undef DATA_TYPE
-    
+
 #define DATA_TYPE unsigned char
 #include "RegionStatsTemplate.h"
 #undef DATA_TYPE
-    
+
 #define DATA_TYPE short
 #include "RegionStatsTemplate.h"
 #undef DATA_TYPE

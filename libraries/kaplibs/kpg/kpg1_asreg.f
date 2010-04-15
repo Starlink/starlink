@@ -13,7 +13,7 @@
 *     CALL KPG1_ASREG( STATUS )
 
 *  Description:
-*     This routine registers all AST IntraMaps known to KAPPA. It should 
+*     This routine registers all AST IntraMaps known to KAPPA. It should
 *     be called before any AST routine which may use an IntraMap (such
 *     as a transformation routine, plotting routine, read/write routine,
 *     etc).
@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,11 +62,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Status:
       INTEGER STATUS             ! Global status

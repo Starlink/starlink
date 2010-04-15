@@ -13,7 +13,7 @@
 *     CALL PDA_QSAD( EL, X )
 
 *  Description:
-*     The routine uses the QUICKSORT algorithm to sort an array of values 
+*     The routine uses the QUICKSORT algorithm to sort an array of values
 *     into ascending order. The "median of three" modification is included
 *     to reduce the likelihood of encountering the worst-case behaviour
 *     of QUICKSORT.
@@ -54,11 +54,11 @@
 *     6-AUG-1992 (RFWS):
 *        Rationalised the inner loop to improve performance.
 *     8-NOV-1995 (PDRAPER):
-*        Renamed to PDA_QSIA (Quick Sort Indexed Ascending) for 
+*        Renamed to PDA_QSIA (Quick Sort Indexed Ascending) for
 *        the PDA library. Now returns the index of the first 1..N
 *        elements of X.
 *     8-NOV-1995 (PDRAPER):
-*        Renamed to PDA_QSA (Quick Sort Ascending) and changed 
+*        Renamed to PDA_QSA (Quick Sort Ascending) and changed
 *        to sort elements rather than index.
 *     {enter_further_changes_here}
 
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
       INTEGER R                 ! Right pointer element in sub-file
       INTEGER RR( MXSTK )       ! Stack for right sub-file limits
       INTEGER STK               ! Recursion stack pointer
-      
+
 *.
 
 *  Initialise.
@@ -119,7 +119,7 @@
             L = LL( STK )
             R = RR( STK )
 
-*  Find a suitable partition value (the median of three possible 
+*  Find a suitable partition value (the median of three possible
 *  elements) by performing an elementary exchange sort.
             I1 = L
             I2 = ( L + R ) / 2
@@ -139,7 +139,7 @@
                I2 = I3
                I3 = ITMP
             END IF
-            
+
 *  Store the partition value.
             XPART = X( I2 )
 
@@ -156,13 +156,13 @@
             IF ( X( I ) .LT. XPART ) THEN
                I = I + 1
                GO TO 3
-            END IF           
+            END IF
 
  4          CONTINUE             ! Start of 'DO WHILE' loop
             IF ( X( J ) .GT. XPART ) THEN
                J = J - 1
                GO TO 4
-            END IF           
+            END IF
 
 *  Exchange pairs of values when necessary by interchanging their
 *  pointers.

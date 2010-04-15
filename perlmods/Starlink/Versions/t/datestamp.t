@@ -17,9 +17,9 @@ BEGIN {
 
 my $root = File::Spec->catdir(File::Spec->curdir, 'star');
 
-$ENV{THIS_PROG_DIR} = File::Spec->catdir( 
+$ENV{THIS_PROG_DIR} = File::Spec->catdir(
 					 $root,
-					 'bin', 
+					 'bin',
 					 'this_prog'
 					);
 
@@ -28,7 +28,7 @@ my $datedir = File::Spec->catdir(
 				 'dates',
 				);
 
-mkpath( [$ENV{THIS_PROG_DIR}, $datedir]) 
+mkpath( [$ENV{THIS_PROG_DIR}, $datedir])
   or die "Could not create skeleton Starlink tree";
 
 
@@ -40,7 +40,7 @@ END {
 # Now create a datestamp file
 # Use global filehandles for backwards compatibility with perl5.005
 my $outfile = File::Spec->catfile($datedir,"this_prog_datestamp");
-open DATESTAMP, "> $outfile" or 
+open DATESTAMP, "> $outfile" or
   die "Could not create test file: $!\n";
 
 print DATESTAMP "Package : THIS_PROG\n";

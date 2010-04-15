@@ -29,10 +29,10 @@ C DU_OPTION_SETUP  Set up option choices
 C DU_SDEF       Set up defaults
 C DU_ADDZ       Add/subtract a dustring from image
 C DU_ADDCZ      Cursor Add/subtract a dustring from image
-C DU_TBSTORE    Store rings table in a file 
+C DU_TBSTORE    Store rings table in a file
 C DU_TBAPPLY    Apply all rings from table
-C DU_TBLOAD     Load noted rings table from a file 
-C DU_TBLIST     List out the noted rings 
+C DU_TBLOAD     Load noted rings table from a file
+C DU_TBLIST     List out the noted rings
 C DU_TBUSE      Set use of ring in table
 C DU_GPROF      Get profile
 C DU_LEVEL      Type out local level
@@ -65,7 +65,7 @@ C--
       character*12 ktopt, ktoptc
 Cbegin
 
-     
+
       call du_sdef							!Set up start
       if ( ST_FAILED ) return
 
@@ -163,13 +163,13 @@ Cbegin
 
          if ( ktopt.eq.'cursor' ) call du_addcz ( %val(IPW) )		!Add/subtract ring with cursor posn
 
-         if ( ktopt.eq.'zoom' .or. ktopt.eq.'reset' .or. 
+         if ( ktopt.eq.'zoom' .or. ktopt.eq.'reset' .or.
      +        ktopt.eq.'cvalues' ) then
             if ( .not.DISPLAYED ) then
                call printo ( 'ERROR: No image displayed' )
             else
                if ( ktopt.eq.'zoom' ) call ds_zoom ( .true., 0, 0 )	!Pan
-                          
+
                if ( ktopt.eq.'reset' ) call ds_zoom ( .true., 1, 0 )	!Reset zoom
 
                if ( ktopt.eq.'cvalues' ) call ds_gtcur ( .true., kx, 	!Get cursor posn, image values
@@ -178,7 +178,7 @@ Cbegin
          endif
 
          if ( ktopt.eq.'clear' .and. OPDISP ) then        	        !Clear display
-                                        call ds_erase   
+                                        call ds_erase
                                         DISPLAYED = .false.
                                         endif
 
@@ -187,7 +187,7 @@ Cbegin
                                         OPDISP = .false.
                                         DISPLAYED = .false.
                                         endif
-    
+
          if ( ktopt.eq.'im_get' ) call du_newim ( ierr )		!Get new image
 
          if ( ktopt.eq.'open' ) call du_opdisp ( ierr )                 !Open display
@@ -200,7 +200,7 @@ Cbegin
 
          if ( ktopt.eq.'tb_load' ) call du_tbload			!Load table from file
 
-         if ( ktopt.eq.'tb_use' ) call du_tbuse				!Change use of ring in table 
+         if ( ktopt.eq.'tb_use' ) call du_tbuse				!Change use of ring in table
 
          if ( ktopt.eq.'im_reload' .and. GOTIMAGE ) call du_imload 	!Reload input image into working image
 
@@ -317,23 +317,23 @@ C--
      + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return. ' /
-       
+
       data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'add', 'Add a ring of standard profile at position set',
-     + ' ', 
+     + ' ',
      + 'This adds a ring of the standard profile at the given',
-     + 'position, using the background that has either been ', 
-     + 'already set, or one determined at this time.', 
-     + ' ', 
+     + 'position, using the background that has either been ',
+     + 'already set, or one determined at this time.',
+     + ' ',
      + 'The adding is done to the present working image' /
 
       data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'subtract', 'Subtract a ring of set profile at position set',
-     + ' ', 
+     + ' ',
      + 'This subtracts a ring of the standard profile at the given',
-     + 'position, using the background that has either been ', 
-     + 'already set, or one determined at this time.', 
-     + ' ', 
+     + 'position, using the background that has either been ',
+     + 'already set, or one determined at this time.',
+     + ' ',
      + 'The subtracting is done to the present working image' /
 
       data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
@@ -341,34 +341,34 @@ C--
      + 'This adds or subtracts a ring of the standard profile at ',
      + 'present position of the cursor. It uses the background ',
      + 'that has either been already set, or one determined at ',
-     + 'this time. Press a button to perform add or subtract.', 
-     + ' ', 
+     + 'this time. Press a button to perform add or subtract.',
+     + ' ',
      + 'Left button subtracts; middle button adds; right buttons ends'/
 
       data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'tb_apply', 'Add or subtract rings from the input table',
      + 'Using the table input buttons, a table of positions and ring ',
-     + 'profiles can be input. This option applies that table of rings', 
-     + 'to the image. You choose whether to add or subtract them. ', 
-     + 'The background is either taken from the table, or from the ', 
+     + 'profiles can be input. This option applies that table of rings',
+     + 'to the image. You choose whether to add or subtract them. ',
+     + 'The background is either taken from the table, or from the ',
      + 'local area, depending on the BK_AUTO button option. ',
      + 'The table has a use flag for each ring.' /
 
       data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'bk_auto', 'Toggle the method of calculating the local level',
-     + ' ', 
+     + ' ',
      + 'A ring profile is a fractional one, as a dust ring intercepts',
-     + 'a fraction of the incident light. Thus a local average level', 
-     + 'has to be determined. This can either be done  automatically', 
-     + 'from the local level at the centre of the ring, or the user ', 
+     + 'a fraction of the incident light. Thus a local average level',
+     + 'has to be determined. This can either be done  automatically',
+     + 'from the local level at the centre of the ring, or the user ',
      + 'can feed in a level.'/
 
       data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'bk_size', 'Set the size of the area used to find background',
      + 'As explained in the BOX_AUTO button help, a local background',
-     + 'has to be found. If this is done automatically, or by the user', 
+     + 'has to be found. If this is done automatically, or by the user',
      + 'finding a level, this is done by finding the mean in a square',
-     + 'box. The side of the box is set by this option through the ', 
+     + 'box. The side of the box is set by this option through the ',
      + 'SIDE parameter. The suggested size is 5/8 times the inner',
      + 'radius of the present ring profile.'/
 
@@ -376,57 +376,57 @@ C--
      + 'bk_ground', 'Input the level for the background ',
      + 'Use the input parameter BACK to set the level of the',
      + 'background.',
-     + ' ', 
+     + ' ',
      + 'A ring profile is a fractional one, as a dust ring intercepts',
-     + 'a fraction of the incident light. Thus a local level has to ', 
+     + 'a fraction of the incident light. Thus a local level has to ',
      + 'be determined. '/
 
       data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'bk_level', 'Measure local level - perhaps load into default',
-     + 'Take an area at the present position (input by keyboard or ', 
+     + 'Take an area at the present position (input by keyboard or ',
      + 'cursor) and of size given by BK_SIZE button, calculate mean',
      + 'level and optionally set default background level at this. ',
      + 'A ring profile is a fractional one, as a dust ring intercepts',
-     + 'a fraction of the incident light. Thus a local level has to ', 
+     + 'a fraction of the incident light. Thus a local level has to ',
      + 'be determined. '/
 
       data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'bk_load', 'Toggle between loading background measure and not',
-     + 'The background level can be measured with the BK_LEVEL button', 
-     + 'and if this switch is set, then this measure is loaded as the', 
-     + 'default background level. It starts off as being set. ', 
+     + 'The background level can be measured with the BK_LEVEL button',
+     + 'and if this switch is set, then this measure is loaded as the',
+     + 'default background level. It starts off as being set. ',
      + 'A ring profile is a fractional one, as a dust ring intercepts',
-     + 'a fraction of the incident light. Thus a local level has to ', 
+     + 'a fraction of the incident light. Thus a local level has to ',
      + 'be determined. '/
 
       data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'position', 'Set position via keyboard',
-     + ' ', 
+     + ' ',
      + 'The position of a ring is set up via POSN parameter. This is',
-     + 'used to apply the ring. It is also used for the measurement', 
-     + 'of the local background level with the BK_LEVEL button.', 
+     + 'used to apply the ring. It is also used for the measurement',
+     + 'of the local background level with the BK_LEVEL button.',
      + ' ', ' '/
 
       data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
      + 'profile', 'Set the parameters of the ring profile ',
-     + 'The ring profile has a number of factors. First the PERCENT ', 
+     + 'The ring profile has a number of factors. First the PERCENT ',
      + 'factor which gives the percentage (not fraction) of the depth',
-     + 'of the ring relative to the background. Then the inner and', 
-     + 'outer radii via RIN and ROUT. Then the length of the umbra of', 
-     + 'the inner and outer edges, the distances over which the shadow', 
+     + 'of the ring relative to the background. Then the inner and',
+     + 'outer radii via RIN and ROUT. Then the length of the umbra of',
+     + 'the inner and outer edges, the distances over which the shadow',
      + 'goes from full to zero, via SLOPEIN and SLOPEOUT.'/
 
       data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'show', 'Print out the ring paramaters and present controls ',
-     + ' ', 
+     + ' ',
      + 'Print out the ring paramaters and present controls ',
      + ' ', ' ', ' ', ' '/
 
       data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'tb_clear', 'Clear the table of set rings ',
-     + ' ', 
+     + ' ',
      + 'This clears the table of set rings.',
-     + ' ', 
+     + ' ',
      + 'The program has an internal table of ring positions and ',
      + 'parameters. These can be applied, changed, flagged for use,',
      + 'input and stored' /
@@ -434,33 +434,33 @@ C--
       data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'tb_get', 'Extract a ring from the table, ready for use ',
      + 'Extract a ring from the table, ready for use. This loads ',
-     + 'from the table a ring position, background and shape. This ', 
-     + 'can then be applied or changed', 
+     + 'from the table a ring position, background and shape. This ',
+     + 'can then be applied or changed',
      + 'The program has an internal table of ring positions and ',
      + 'parameters. These can be applied, changed, flagged for use,',
      + 'input and stored' /
 
       data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) /
      + 'tb_list', 'List the present contents of the set rings table',
-     + ' ', 
+     + ' ',
      + 'List the present contents of the set rings table',
-     + ' ', 
+     + ' ',
      + 'The program has an internal table of ring positions and ',
      + 'parameters. These can be applied, changed, flagged for use,',
      + 'input and stored' /
 
       data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) /
      + 'tb_load', 'Load a table of set rings from a file',
-     + 'Load the internal table from a file. The file has contents', 
-     + 'which are the position, background, profile, and use flag.', 
-     + 'This table is in the style of the table output via TB_STORE', 
+     + 'Load the internal table from a file. The file has contents',
+     + 'which are the position, background, profile, and use flag.',
+     + 'This table is in the style of the table output via TB_STORE',
      + 'The program has an internal table of ring positions and ',
      + 'parameters. These can be applied, changed, flagged for use,',
      + 'input and stored' /
 
       data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) /
      + 'tb_put', 'Put present ring parameters into table',
-     + ' ', 
+     + ' ',
      + 'Put present ring parameters into table',
      + ' ',
      + 'The program has an internal table of ring positions and ',
@@ -469,7 +469,7 @@ C--
 
       data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'tb_store', 'Store present table of rings into a disk file ',
-     + ' ', 
+     + ' ',
      + 'Store present table of rings into a disk file ',
      + ' ',
      + 'The program has an internal table of ring positions and ',
@@ -480,25 +480,25 @@ C--
      + 'tb_use', 'Set whether to use a particular ring in the table',
      + 'Set whether to use a particular ring in the table when using',
      + 'the TB_APPLY button',
-     + ' ', 
+     + ' ',
      + 'The program has an internal table of ring positions and ',
      + 'parameters. These can be applied, changed, flagged for use,',
      + 'input and stored' /
 
       data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) /
      + 'im_reload', 'Load original input image into present image ',
-     + ' ', 
-     + 'The original input image is loaded into this program and ', 
-     + 'changed by adding or subtracting rings. This option loads ', 
-     + 'the original image back in ', 
+     + ' ',
+     + 'The original input image is loaded into this program and ',
+     + 'changed by adding or subtracting rings. This option loads ',
+     + 'the original image back in ',
      + ' ', ' '/
 
       data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) /
      + 'im_store', 'Output present image into a disk file',
-     + ' ', 
-     + 'The original input image is loaded into this program and ', 
-     + 'changed by adding or subtracting rings. This option outputs', 
-     + 'the present image into an output file.', 
+     + ' ',
+     + 'The original input image is loaded into this program and ',
+     + 'changed by adding or subtracting rings. This option outputs',
+     + 'the present image into an output file.',
      + ' ', ' '/
 
       character*50 title, option
@@ -515,7 +515,7 @@ C--
       integer sect_num
       parameter ( sect_num=7 )
       character*10 sect_head(sect_num)
-      data sect_head / '  APPLY ', '   RING', 'BACKGROUND', 'TABLE', 
+      data sect_head / '  APPLY ', '   RING', 'BACKGROUND', 'TABLE',
      +                 'IMAGE', 'DISPLAY',  'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1)/ 'cursor:add:subtract:tb_apply' /
@@ -552,18 +552,18 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
-   
+
 
       end
-  
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DU_SDEF -- Set up defaults
@@ -664,12 +664,12 @@ Cbegin
                if ( kb.eq.1 ) then
                   kn = kn + 1
                   call pargi ( kn )
-                  call printd ( 
+                  call printd (
      +                   'Added defined ring: running total = %d' )
                else
                   kn = kn - 1
                   call pargi ( kn )
-                  call printd ( 
+                  call printd (
      +                   'Subtracted defined ring: running total = %d' )
                endif
             endif
@@ -699,7 +699,7 @@ C  alan penny                     RAL             1990-10-15
       integer	kopt		!i:   Flag for: 1=Add;2=subtract
       integer	istat 		!o:   Flag erro: 0=ok:1=not done
 C--
-      integer lx, ly, lxs, lxe, lys, lye, jx, jy, 
+      integer lx, ly, lxs, lxe, lys, lye, jx, jy,
      +        ix, iy, kxr(2), kyr(2), ierr
       real    corr, dx, dy, d, dc, am, std, rva, rvb
 Cbegin
@@ -745,7 +745,7 @@ Cbegin
       call pargr ( BACK )
       call pargi ( ISIDE )
       call pargi ( ISIDE )
-      call printd ( 
+      call printd (
      + 'Posn %f %f : Background %f in %d x %d box at centre of ring' )
 
       lx = 2*(ROUT+SLOPEOUT+2.0)
@@ -761,7 +761,7 @@ Cbegin
           istat = 1
           return
       endif
-      
+
       lxs = min(NX,max(1,lxs))
       lxe = min(NX,max(1,lxe))
       lys = min(NY,max(1,lys))
@@ -786,7 +786,7 @@ Cbegin
                endif
                if ( kopt.eq.2 ) then
                   im(jx,jy) = im(jx,jy) + dc/BS
-               else               
+               else
                   im(jx,jy) = im(jx,jy) - dc/BS
                endif
             endif
@@ -795,7 +795,7 @@ Cbegin
 
       if ( DISPLAYED ) then
          call ds_tiv ( lxs, lys, ix, iy )
-         call ds_acim ( im, NX, NY, 'REAL', lxs, lxe, lys, lye, ix, iy, 
+         call ds_acim ( im, NX, NY, 'REAL', lxs, lxe, lys, lye, ix, iy,
      +                  .false. )
       endif
 
@@ -804,7 +804,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DU_TBSTORE -- Store noted rings table in a file 
+C DU_TBSTORE -- Store noted rings table in a file
 C
 C a j penny             stsci                  1987-03-22
 
@@ -842,9 +842,9 @@ Cbegin
       if ( ST_FAILED ) return
       do j = 1, TBX
          call pthead ( 'OUTTAB', j, texth(j), ierr )
-      enddo         
+      enddo
 
-      call coprr ( RES, TBX, MAXRINGS, 1, TBX, 1, NRINGS, 
+      call coprr ( RES, TBX, MAXRINGS, 1, TBX, 1, NRINGS,
      +             %val(ipo), tbvx, NRINGS, 6, 1 )
 
       call ident ( %val(ipo), tbvx, NRINGS )
@@ -856,7 +856,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DU_TBLOAD -- Load noted rings table from a file 
+C DU_TBLOAD -- Load noted rings table from a file
 C
 C a j penny             stsci                  1987-03-22
 
@@ -892,7 +892,7 @@ Cbegin
          return
       endif
 
-      call coprr ( %val(iptb), tbvx, NRINGS, 6, tbvx, 1, NRINGS, 
+      call coprr ( %val(iptb), tbvx, NRINGS, 6, tbvx, 1, NRINGS,
      +             RES, TBX, MAXRINGS, 1, 1 )
 
       call canpar ( 'INTAB' )
@@ -902,7 +902,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C DU_TBLIST -- List out the noted rings 
+C DU_TBLIST -- List out the noted rings
 C
 C a j penny             stsci                  1987-03-22
 
@@ -973,7 +973,7 @@ C alan penny                   RAL                    1990-10-15
 C--
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       call get1r (  'PERCENT',  PERCENT,  PERCENT, -1.0e8, 1.0e8 )
@@ -981,14 +981,14 @@ Cbegin
       call get1r (     'ROUT',     ROUT,     ROUT,    RIN, 1.0e8 )
       call get1r (  'SLOPEIN',  SLOPEIN,  SLOPEIN,    0.0, 1.0e8 )
       call get1r ( 'SLOPEOUT', SLOPEOUT, SLOPEOUT,    0.0, 1.0e8 )
-      
+
 
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DU_LEVEL -- Get local level
-C  
+C
 C alan penny                  RAL                        1990-1015
 
       subroutine du_level ( im )
@@ -1011,7 +1011,7 @@ Cbegin
          call printo ( 'No image got' )
          return
       endif
-     
+
       kxr(1) = XP - ISIDE/2
       kxr(2) = kxr(1) + ISIDE - 1
       kyr(1) = YP - ISIDE/2
@@ -1020,7 +1020,7 @@ Cbegin
       call ranger ( im, NX, NY, kxr, kyr, RINVAL, am, std, ierr )
       am = BS*am + BZ
       std = BS*std
- 
+
       call printo ( ' ' )
       call pargr ( XP )
       call pargr ( YP )
@@ -1060,9 +1060,9 @@ Cbegin
 
       if ( NRINGS.eq.MAXRINGS ) then
          call pargi ( MAXRINGS )
-         call printd ( 
+         call printd (
      +        'Already stored the maximum number of rings - %d' )
-         call printo ( 
+         call printo (
      +     'You will have to store and clear these before adding more' )
          return
       endif
@@ -1275,7 +1275,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C DU_IMSTORE -- Store 'cleaned' image
-C  
+C
 C alan penny                      RAL                      1990-10-15
 
       subroutine du_imstore ( )
@@ -1338,7 +1338,7 @@ C--
       integer ierra
 Cbegin
 
-    
+
       if ( ST_FAILED ) return
 
       if ( GOTIMAGE ) call canpar ( 'IN' )
@@ -1436,7 +1436,7 @@ Cbegin
       call ds_gtype ( ierr )						!Get type of display
       if ( ierr.ne.0 ) return
 
-      call ds_init ( IMTITLE, 0, ierr )					!Open display 
+      call ds_init ( IMTITLE, 0, ierr )					!Open display
       if ( ierr.ne.0 ) return
       OPDISP = .true.
 

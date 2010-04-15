@@ -56,7 +56,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -97,7 +97,7 @@
       INTEGER WK_END                             ! Pointer to End of WK
       INTEGER WK_PTR                             ! Pointer to REAL scratch array
 
-      
+
 *   local data
 *.
 
@@ -112,7 +112,7 @@
 *     Allocate the scratch memory
 
       ITEMP = MAX(31, 27 + NCP)
-      CALL SCULIB_MALLOC(VAL__NBI * (ITEMP * NDP + N_PTS), IWK_PTR, 
+      CALL SCULIB_MALLOC(VAL__NBI * (ITEMP * NDP + N_PTS), IWK_PTR,
      :     IWK_END, STATUS)
       CALL SCULIB_MALLOC(VAL__NBR * 8 * NDP, WK_PTR, WK_END, STATUS)
 
@@ -129,7 +129,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL PDA_IDBVIP(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN,
-     :        NOP, X_IN(1), Y_IN(1), RTEMP, %VAL(CNF_PVAL(IWK_PTR)), 
+     :        NOP, X_IN(1), Y_IN(1), RTEMP, %VAL(CNF_PVAL(IWK_PTR)),
      :        %VAL(CNF_PVAL(WK_PTR)),
      :        ISTAT, STATUS)
 
@@ -140,20 +140,20 @@
          ELSE
 
 *     Now that the spline has been calculated retrieve all the data
-*     for the output grid using MODE 2. 
+*     for the output grid using MODE 2.
 
             MODE = 2
             NOP = N_PTS
 
             CALL PDA_IDBVIP(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NOP,
-     :           X_OUT, Y_OUT, DATA_OUT, %VAL(CNF_PVAL(IWK_PTR)), 
+     :           X_OUT, Y_OUT, DATA_OUT, %VAL(CNF_PVAL(IWK_PTR)),
      :           %VAL(CNF_PVAL(WK_PTR)),
      :           ISTAT, STATUS)
 
             IF (ISTAT .NE. 0 .OR. STATUS .NE. SAI__OK) THEN
                CALL MSG_SETI('ISTAT', ISTAT)
                CALL ERR_REP(' ','SPLINE_PDA_IDBVIP: Spline '//
-     :              'interpolation  failed with ISTAT = ^ISTAT' , 
+     :              'interpolation  failed with ISTAT = ^ISTAT' ,
      :              STATUS)
             END IF
          END IF
@@ -163,6 +163,6 @@
 
       CALL SCULIB_FREE ('SPLINE_IWK', IWK_PTR, IWK_END, STATUS)
       CALL SCULIB_FREE ('SPLINE_WK', WK_PTR, WK_END, STATUS)
-      
+
 
       END

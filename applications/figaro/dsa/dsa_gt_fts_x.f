@@ -58,7 +58,7 @@ C                          string passed by descriptor, all others
 C                          expect a logical or numeric quantity passed
 C                          by reference.
 C     (<) COMMENT          (Fixed string,descr) The comment that was
-C                          associated with the item.  
+C                          associated with the item.
 C     (!) STATUS           (Integer,ref) Status value.  If non-zero
 C                          status is passed to it, this routine will
 C                          return immediately.

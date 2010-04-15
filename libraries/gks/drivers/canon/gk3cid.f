@@ -17,7 +17,7 @@
 *
 *  ARGUMENTS
 *  ---------
-*     
+*
 *  COMMON BLOCK USAGE
 *  ------------------
       INCLUDE '../../include/gkio.par'
@@ -32,7 +32,7 @@
 *
 *  ALGORITHM
 *  ---------
-*     If (not Tex) then     
+*     If (not Tex) then
 *        Enter ISO mode (harmless in ISO mode)
 *        Reset
 *        Enter ISO mode (harmless in ISO mode)
@@ -57,7 +57,7 @@
 *        endif
 *     endif
 *
-*         
+*
 *
 *  LOCALS
 *  ------
@@ -111,4 +111,4 @@
          END IF
       END IF
       CALL GKFOCO(KIOPB,VDM//'"'//C1(:NC1)//C2(:NC2)//IS2,NLEFT)
-      END         
+      END

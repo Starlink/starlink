@@ -4,7 +4,7 @@
  *    ems_test
 
  *  Purpose:
- *    A simple test of the C EMS installation 
+ *    A simple test of the C EMS installation
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -16,12 +16,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -189,16 +189,16 @@ int main( void ){
    status = SAI__ERROR;
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be wrapped into two lines", &status );
-   (void) emsStune( "SZOUT", 20, &status ); 
+   (void) emsStune( "SZOUT", 20, &status );
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be wrapped into many lines", &status );
 
-   (void) emsStune( "SZOUT", 0, &status );    
+   (void) emsStune( "SZOUT", 0, &status );
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be just one line", &status );
    status = SAI__OK;
    (void) emsStune( "SZOUT", old_value, &status );
-    
+
    old_value = emsStune( "MSGDEF", 2, &status );
    value2 = emsGtune( "MSGDEF", &status );
    (void) emsStune( "MSGDEF", old_value, &status );
@@ -231,7 +231,7 @@ int main( void ){
    else if ( value4 != 1 ) {
        printf( "\nREVEAL test failed with BAD value\n" );
    }
-   
+
    if( value1 != 40 || value2 != 2 || value3 != 1 || value4 != 1 ) {
        printf( "Tuning subsystem has failed\n" );
    }
@@ -241,4 +241,4 @@ int main( void ){
 
 
    exit( 0 );
-}   
+}

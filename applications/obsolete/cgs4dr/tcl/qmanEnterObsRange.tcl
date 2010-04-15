@@ -77,7 +77,7 @@ proc qmanEnterObs2 {taskname index end step qpos} {
 # Enter observation range stage 3.
 #-
     global QmanAccess
-    
+
 # Construct the "other" record name.
     if {$qpos == "newest"} {
 	set tag REDUCE

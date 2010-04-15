@@ -10,15 +10,15 @@
 #     polarization of the selected vectors.
 
 #  Description:
-#     This class calculates the integrated polarization of the selected 
-#     vectors and displays them within a page of the main notebook. Each 
-#     time a new selection is made, the page is updated to hold the new 
-#     statistics. In fact, the calculation of new statistics is only 
-#     performed immediately if this page is currently visible, otherwise 
-#     the calculations are postponed until the page becomes visible. This 
-#     avoids spending unnecessary time calculating statistics which may 
+#     This class calculates the integrated polarization of the selected
+#     vectors and displays them within a page of the main notebook. Each
+#     time a new selection is made, the page is updated to hold the new
+#     statistics. In fact, the calculation of new statistics is only
+#     performed immediately if this page is currently visible, otherwise
+#     the calculations are postponed until the page becomes visible. This
+#     avoids spending unnecessary time calculating statistics which may
 #     never be seen.
-    
+
 #  Invocations:
 #
 #        GaiaPolUInteg object_name [configuration options]
@@ -85,7 +85,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -94,7 +94,7 @@ itcl::class gaia::GaiaPolUInteg {
       set created_ 0
 
 #  Set defaults
-      reset 
+      reset
    }
 
 #  Destructor:
@@ -102,7 +102,7 @@ itcl::class gaia::GaiaPolUInteg {
    destructor {
 
 #  Annul any reference to the displayed GaiaPolCat.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          set cat_ [$cat_ annull]
       }
 
@@ -134,7 +134,7 @@ itcl::class gaia::GaiaPolUInteg {
    public method clear {} {
 
 #  Annul any reference to the displayed GaiaPolCat.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          set cat_ [$cat_ annull]
       }
 
@@ -153,15 +153,15 @@ itcl::class gaia::GaiaPolUInteg {
       if { [info exists itk_component(table)] } {
          if { $cat_ != "" } {
 
-#  Remove any columns which are no longer available from the list of columns 
-#  to be displayed. 
+#  Remove any columns which are no longer available from the list of columns
+#  to be displayed.
             checkCols
 
 #  Get the column headings to use. If blank, use all columns.
             set cols $values_($this,cols)
             if { $cols == "" } {
                set cols $useheads_
-            } 
+            }
 
 #  Use null values if no data is available.
          } else {
@@ -180,9 +180,9 @@ itcl::class gaia::GaiaPolUInteg {
 #  ------------------------------------------------------
    public method newStats { cat } {
 
-#  Save a reference to the supplied GaiaPolCat, annulling any 
+#  Save a reference to the supplied GaiaPolCat, annulling any
 #  reference to a previous GaiaPolCat first.
-      if { $cat_ != "" } { 
+      if { $cat_ != "" } {
          $cat_ annull
       }
       set cat_ [$cat clone]
@@ -194,8 +194,8 @@ itcl::class gaia::GaiaPolUInteg {
       set done_ 0
 
 #  If this page of the notebook is currently visible, calculate the new
-#  statistics immediately and display them. Otherwise, statistics will 
-#  be calculated when the page is next displayed. 
+#  statistics immediately and display them. Otherwise, statistics will
+#  be calculated when the page is next displayed.
       if { [winfo viewable $w_] } {
          calc
       }
@@ -227,7 +227,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  if variances are present.
          if { [getMethod] != "mean" && $nsel > 100 && [$cat_ getColNam DI] != "" } {
             error_dialog "You have selected more than 100 vectors ($nsel). This number of vectors can only be integrated if there are no variances or if method \"Mean\" is used."
-         
+
 #  Otherwise (if there are some selected vectors) ...
          } elseif { $nsel > 0 } {
 
@@ -269,7 +269,7 @@ itcl::class gaia::GaiaPolUInteg {
 
             }
 
-#  Remove any columns which are no longer available from the list of columns 
+#  Remove any columns which are no longer available from the list of columns
 #  to be displayed.
             checkCols
 
@@ -277,7 +277,7 @@ itcl::class gaia::GaiaPolUInteg {
             set cols $values_($this,cols)
             if { $cols == "" } {
                set cols $useheads_
-            } 
+            }
 
 #  Form a list of the values of the required columns.
             set vals ""
@@ -292,7 +292,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Update the values shown in the table.
             $itk_component(table) config -info [list $vals]
-        
+
 #  Indicate that the required statistics have now been calculated.
             set done_ 1
 
@@ -354,7 +354,7 @@ itcl::class gaia::GaiaPolUInteg {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
       if { $values_($this,method) == "" } { set values_($this,method) "mean" }
       if { $values_($this,debias) == "" } { set values_($this,debias) 1 }
@@ -365,7 +365,7 @@ itcl::class gaia::GaiaPolUInteg {
 
    }
 
-#  Unselect any columns previously selected using the column selection 
+#  Unselect any columns previously selected using the column selection
 #  dialog but which are not now available in the currently displayed catalogue.
 #  ---------------------------------------------------------------------
    public method checkCols {} {
@@ -374,7 +374,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  If the cols list is not blank, we need to check that each element in
 #  the list is a heading which is available in the currently displayed
-#  catalogue. Get a list of the good column names, and a list of the 
+#  catalogue. Get a list of the good column names, and a list of the
 #  bad column names.
       if { $cols != "" } {
          set badcols ""
@@ -387,7 +387,7 @@ itcl::class gaia::GaiaPolUInteg {
             } else {
                lappend goodcols $col
             }
-         }            
+         }
 
 #  If any requested columns were not available in the current headings,
 #  update the common values_ array to hold only the available columns.
@@ -409,15 +409,15 @@ itcl::class gaia::GaiaPolUInteg {
          set xhead [lindex $headings_ [$cat_ getXCol]]
          set yhead [lindex $headings_ [$cat_ getYCol]]
          set idhead [lindex $headings_ [$cat_ getIDCol]]
-   
+
          if { [$cat_ gotWcs] } {
             set rahead [lindex $headings_ [$cat_ getRaCol]]
             set dechead [lindex $headings_ [$cat_ getDecCol]]
          } else {
-            set rahead "" 
-            set dechead "" 
+            set rahead ""
+            set dechead ""
          }
-   
+
          set useheads_ ""
          foreach head $headings_ {
             if { $head != $idhead && $head != $xhead && $head != $yhead && $head != $rahead && $head != $dechead } {
@@ -482,7 +482,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -513,7 +513,7 @@ itcl::class gaia::GaiaPolUInteg {
          set r -1
 
 #  Items to display header...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Items to display:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -535,10 +535,10 @@ itcl::class gaia::GaiaPolUInteg {
          add_short_help $itk_component(cols) {Click to select the catalogue columns for which statistics are required}
 
 #  Vertical space
-         grid [frame $w_.space1 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace1] -row [incr r]
 
 #  Vector parameters...
-         itk_component add header2 { 
+         itk_component add header2 {
 	    LabelRule $w_.header2 -text "Parameters for binning:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
@@ -551,7 +551,7 @@ itcl::class gaia::GaiaPolUInteg {
          itk_component add method {
             LabelMenu $w_.method -text "Method:" \
                                  -variable [scope values_($this,method)] \
-                                 -labelwidth $lwidth 
+                                 -labelwidth $lwidth
          }
          grid $itk_component(method) -row $r -columnspan $ncol -column 0 -sticky nw -padx $px
          add_short_help $itk_component(method) {Method used to combine Stokes parameters}
@@ -563,7 +563,7 @@ itcl::class gaia::GaiaPolUInteg {
                                     -command "[code $this activ method]"
 
 #  Vertical space.
-         grid [frame $w_.space2 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space2 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -576,13 +576,13 @@ itcl::class gaia::GaiaPolUInteg {
                                      -labelwidth $lwidth \
                                      -command [code $this activ debias] \
                                      -anchor nw \
-                                     -variable [scope values_($this,debias)] 
+                                     -variable [scope values_($this,debias)]
          }
          grid $itk_component(debias) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(debias) {Should the integrated polarization be debiassed if possible?}
 
 #  Vertical space.
-         grid [frame $w_.space3 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space3 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -601,13 +601,13 @@ itcl::class gaia::GaiaPolUInteg {
          add_short_help $itk_component(sigmas) {The number of standard deviations at which to clip when using method 'sigma-clipped mean'}
 
 #  Vertical space.
-         grid [frame $w_.space4 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space4 -height $vspace1] -row [incr r]
 
 #  Next row
          incr r
 
 #  Vector parameters...
-         itk_component add header3 { 
+         itk_component add header3 {
 	    LabelRule $w_.header3 -text "Integrated column values for currently selected vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
@@ -620,14 +620,14 @@ itcl::class gaia::GaiaPolUInteg {
          itk_component add table {
             ::util::TableList $w_.table -hscroll 1 -height 4 \
                                         -selectmode extended \
-                                        -exportselection 0 
+                                        -exportselection 0
          }
          grid $itk_component(table) -row $r -column 0 -columnspan $ncol -sticky nsew -padx $px
          add_short_help $itk_component(table) {Integrated values for the currently selected vectors}
          tabConfig
 
 #  Vertical space
-         grid [frame $w_.space5 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space5 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -639,7 +639,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
       }
    }
@@ -676,7 +676,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  string is blank.
       checkCols
       if { $values_($this,cols) != "" } {
-         $d setOptions $values_($this,cols) 
+         $d setOptions $values_($this,cols)
       } else {
          $d allOptions
       }
@@ -741,7 +741,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  Thw window containing the progress bar
    itk_option define -pbar pbar PBar {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -768,7 +768,7 @@ itcl::class gaia::GaiaPolUInteg {
        variable attr_
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
@@ -781,7 +781,7 @@ itcl::class gaia::GaiaPolUInteg {
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

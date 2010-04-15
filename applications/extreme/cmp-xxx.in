@@ -24,25 +24,25 @@
 #        - crepint -- Change int type to INT_BIG in C
 #        - frepint -- Change INTEGER to INTEGER * 8 in Fortran
 #
-#     If a file containing the filtered source code already exists, it 
+#     If a file containing the filtered source code already exists, it
 #     can be given as the second command-line argument, otherwise the
 #     file given as the first command-line argument will be run through
 #     the appropriate filter before the comparison is made.
 #
-#     The script uses its knowledge of the changes made by each of the 
+#     The script uses its knowledge of the changes made by each of the
 #     filters to identify changes which are unexpected.  The idea is to
-#     serve as a check that the the source code filter program itself 
-#     has not made a mistake.  The parsing done by this script is much 
-#     less careful than that done by the filters, so it may make 
+#     serve as a check that the the source code filter program itself
+#     has not made a mistake.  The parsing done by this script is much
+#     less careful than that done by the filters, so it may make
 #     mistakes - apparent discrepancies reported by this script should
 #     be investigated, but may well not indicate genuine problems.
 #
 #     If an apparent discrepancy is found, the script prints the
 #     first line from each file in which a discrepancy exists.
-#     The text printed is not the text as it appears in the files, but 
-#     a version mangled by this program for comparison - whitespace, 
-#     formatting, and other things may have been changed.  The printed 
-#     text should however make it easy enough to find the relevant point 
+#     The text printed is not the text as it appears in the files, but
+#     a version mangled by this program for comparison - whitespace,
+#     formatting, and other things may have been changed.  The printed
+#     text should however make it easy enough to find the relevant point
 #     in the input file.
 #
 #     If there is an apparent discrepancy the exit status of the program
@@ -81,7 +81,7 @@
       }
       else {
          my( $cmd ) = $ENV{ 'EXTREME_DIR' } . "/$filter $f1";
-         open( F2, "$cmd 2>/dev/null |" ) 
+         open( F2, "$cmd 2>/dev/null |" )
             or die( "Failed to pipe from '$cmd'\n" );
       }
 
@@ -111,16 +111,16 @@
 
 
 
-#  Normalisation routine.  Depending on the name of the filter which 
-#  has operated on the file, it basically removes syntactically 
+#  Normalisation routine.  Depending on the name of the filter which
+#  has operated on the file, it basically removes syntactically
 #  uninteresting text, and removes changes which the filter might
 #  have legitimately have inserted.  It is not very rigourous.
 
    sub normalise {
       my( $filter ) = shift;     # Name of filter
-      local( $_ ) = shift;       # Text of file 
+      local( $_ ) = shift;       # Text of file
 
-#  inscnf: Gets rid of continuation lines, spaces, and (most) CNF_PVAL 
+#  inscnf: Gets rid of continuation lines, spaces, and (most) CNF_PVAL
 #  invocations.
       if ( $filter =~ /inscnf/ ) {
          s/^\* *inscnf:.*\n//g;
@@ -131,7 +131,7 @@
       }
 
 #  frepint: Gets rid of continuation lines, spaces, and changes INTEGER*8
-#  to INTEGER.  Also removes INT__ local constant declarations and undoes 
+#  to INTEGER.  Also removes INT__ local constant declarations and undoes
 #  INT__ use.
       elsif ( $filter =~ /frepint/ ) {
          s/\n\* *Local constants for use as actual arguments:*\n(.*INT__.*\n)+//ig;
@@ -155,5 +155,5 @@
 #  Return normalised text.
       return( $_ );
    }
-      
+
 # $Id$

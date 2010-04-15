@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_PUTENT( INPUT, CNAMES, NUMCOLS, CHECK, CHARVALS, DOUBVALS, 
+     : CHI_PUTENT( INPUT, CNAMES, NUMCOLS, CHECK, CHARVALS, DOUBVALS,
      :             INTVALS, LOGVALS, REALVALS, COLTYPES, NULLFLAGS,
      :             STATUS )
 *+
@@ -13,58 +13,58 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHI_PUTENT( INPUT, CNAMES, NUMCOLS, CHECK, CHARVALS, DOUBVALS, 
+*     CALL CHI_PUTENT( INPUT, CNAMES, NUMCOLS, CHECK, CHARVALS, DOUBVALS,
 *     INTVALS, LOGVALS, REALVALS, COLTYPES, NULLFLAGS, STATUS )
 *
 *  Description:
 *     Add an entry to a catalogue. For each column name in CNAMES CHI_PUTENT
-*     checks in respective position in COLTYPES to find the type of data. 
-*     The data for this column in the entry will be taken from the respective 
+*     checks in respective position in COLTYPES to find the type of data.
+*     The data for this column in the entry will be taken from the respective
 *     element of the appropriate array unless the NULLFLAGS for this column is
-*     TRUE indicating that the column is null. So if COLTYPES(3) is 'I' and 
-*     NULLFLAGS(3) is FALSE then the data 
-*     for the column whose name is given in CNAMES(3) will be taken from 
+*     TRUE indicating that the column is null. So if COLTYPES(3) is 'I' and
+*     NULLFLAGS(3) is FALSE then the data
+*     for the column whose name is given in CNAMES(3) will be taken from
 *     INTVALS(3).
 *
 *     There are four levels of checking which are selected using the argument
 *     CHECK. Modes 1 and 2 are efficient and should be used whenever possible.
 *     You are advised not to change the level of checking when putting data
-*     into a catalogue unless you are moving to a mode where more checking is 
+*     into a catalogue unless you are moving to a mode where more checking is
 *     done
 *
-*     CHECK=1. The lowest level of checking. The routine processes the column 
-*     names given in CNAMES. Only if the column appears in the catalogue and 
+*     CHECK=1. The lowest level of checking. The routine processes the column
+*     names given in CNAMES. Only if the column appears in the catalogue and
 *     the type agrees with the that given in COLTYPES will data be put into
 *     the column for this entry. All other columns take their null values. The
 *     routine remembers where it found the data for each column (Eg. FLUX1 data
-*     in REALVALS(5)). On subsequent calls the routine assumes that the FLUX1 
-*     value will be in REALVALS(5). 
+*     in REALVALS(5)). On subsequent calls the routine assumes that the FLUX1
+*     value will be in REALVALS(5).
 *
 *     CHECK=2. The routine processes the column names given in CNAMES and only
 *     if the all the columns in the catalogue are given in CNAMES and the
 *     types are correct will the entry be put into the catalogue. If, during
-*     checking, an error is found the error is reported and the name of the 
+*     checking, an error is found the error is reported and the name of the
 *     offending column is returned in CNAMES(1). Again after
-*     the first call the routine remembers where it found the data for each 
+*     the first call the routine remembers where it found the data for each
 *     column and on subsequent calls the routine assumes that the data will be
-*     in the same place. This mode ensures that genuine data is put into the 
+*     in the same place. This mode ensures that genuine data is put into the
 *     catalogue. Columns cannot be overlooked.
 *
-*     CHECK=3. In this mode the routine processes the column names given in 
-*     CNAMES and their column types every time the routine is called. This 
-*     means that different columns can contribute to each entry. Only if 
-*     the column appears in the catalogue and 
+*     CHECK=3. In this mode the routine processes the column names given in
+*     CNAMES and their column types every time the routine is called. This
+*     means that different columns can contribute to each entry. Only if
+*     the column appears in the catalogue and
 *     the type agrees with that given in COLTYPES will data be put into
 *     the column for this entry. All other column take their null values.
 *
-*     CHECK=4. Again in this mode the routine processes the column names given 
+*     CHECK=4. Again in this mode the routine processes the column names given
 *     in CNAMES and their column types every time the routine is called.  Only
 *     if the all the columns in the catalogue are given in CNAMES and the
 *     types are correct will the entry be put into the catalogue.  If, during
-*     checking, an error is found the error is reported and the name of the 
+*     checking, an error is found the error is reported and the name of the
 *     offending column is returned in CNAMES(1). Subsequent
 *     calls to the routine may have the columns in CNAMES in a different order
-*     but they must all be their and the respective column types must be 
+*     but they must all be their and the respective column types must be
 *     correct.
 *
 
@@ -112,7 +112,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,37 +153,37 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Call PUTENT on the appropriate low level system
 *
       if (dbname .eq. 'HDS') then
           call chi_getcd(dbname, catname, .TRUE., cd, status)
           call chi_hputent(cd, cnames, numcols, check, charvals,
-     :  doubvals, 
+     :  doubvals,
      : intvals, logvals,  realvals, coltypes, nullflags, status)
 *
 *      elseif (dbname .eq. 'BIN') then
 *          call chi_getcd(dbname, catname, .TRUE., cd, status)
 *          call chi_bputent(cd, cnames, numcols, check, charvals,
-*     :  doubvals, 
+*     :  doubvals,
 *     : intvals, logvals,  realvals, coltypes, nullflags, status)
 *
 *      elseif (dbname .eq. 'CDF') then
 *          call chi_getcd(dbname, catname, .TRUE., cd, status)
 *          call chi_cputent(cd, cnames, numcols, check, charvals,
-*     :  doubvals, 
+*     :  doubvals,
 *     : intvals, logvals,  realvals, coltypes, nullflags, status)
 *
 *      elseif (dbname .eq. 'FIT') then
 *          call chi_getcd(dbname, catname, .TRUE., cd, status)
 *          call chi_fputent(cd, cnames, numcols, check, charvals,
-*     :  doubvals, 
+*     :  doubvals,
 *     : intvals, logvals,  realvals, coltypes, nullflags, status)
 *
 *      elseif (dbname .eq. 'REX') then
 *          call chi_getcd(dbname, catname, .TRUE., cd, status)
 *          call chi_rputent(cd, cnames, numcols, check, charvals,
-*     :  doubvals, 
+*     :  doubvals,
 *     : intvals, logvals,  realvals, coltypes, nullflags, status)
       endif
 *

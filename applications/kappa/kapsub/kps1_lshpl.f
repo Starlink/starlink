@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, KEYMAP, GEO, 
+      SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, KEYMAP, GEO,
      :                       IMARK, CLOSE, LABTYP, IGRP, IGRP2, JUST,
      :                       IDS, WORK, STATUS )
 *+
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, KEYMAP, GEO, IMARK, 
-*                      CLOSE, LABTYP, IGRP, IGRP2, JUST, IDS, WORK, 
+*     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, KEYMAP, GEO, IMARK,
+*                      CLOSE, LABTYP, IGRP, IGRP2, JUST, IDS, WORK,
 *                      STATUS )
 
 *  Description:
@@ -47,7 +47,7 @@
 *     IGRP2 = INTEGER (Given)
 *        A GRP group holding the strings to use if LABTYP=LABEL.
 *     JUST = CHARACTER * ( * ) (Given)
-*        A string specifying the justification to be used when displaying 
+*        A string specifying the justification to be used when displaying
 *        the text supplied in IGRP (ignored if PLOT is not "Text"). This
 *        should be a string of two characters; the first should be "B",
 *        "C" or "T", meaning bottom, centre or top. The second should be
@@ -91,7 +91,7 @@
 *     16-SEP-1998 (DSB):
 *        Original version.
 *     11-NOV-2005 (DSB):
-*        Allow up to 50 axes (this allows tables such as those produced by 
+*        Allow up to 50 axes (this allows tables such as those produced by
 *        CUPID:CLUMPS which have more than NDF__MXDIM columns to be
 *        displayed).
 *     21-NOV-2006 (DSB):
@@ -103,7 +103,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -114,7 +114,7 @@
 *  Global Variables:
       CHARACTER STCS*500         ! Used to pass info to kpg1_lshsc
       COMMON /KPG1_LSHPL/ STCS
-       
+
 *  Arguments Given:
       INTEGER IPLOT
       INTEGER NPOS
@@ -180,7 +180,7 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Simplify the Plot. This adds a new Current Frame into the Plot, so note 
+*  Simplify the Plot. This adds a new Current Frame into the Plot, so note
 *  the index of the original Current Frame so that it can be re-instated later.
 *  This can help to speed up the drawing, and also avoids the possibility
 *  of the Mapping going via a Frame in which the positions are undefined.
@@ -195,9 +195,9 @@
 
 *  Map the supplied positions into the GRAPHICS Frame.
          CALL AST_TRANN( IPLOT, NPOS, NAX, NPOS, POS, .FALSE., 2,
-     :                   NPOS, WORK, STATUS ) 
+     :                   NPOS, WORK, STATUS )
 
-*  Make the GRAPHICS (Base) Frame the Current Frame. 
+*  Make the GRAPHICS (Base) Frame the Current Frame.
          CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
      :                                              STATUS ),
      :                  STATUS )
@@ -229,20 +229,20 @@
          ST0 = AST_GETI( IPLOT, 'STYLE(STRINGS)', STATUS )
          FN0 = AST_GETI( IPLOT, 'FONT(STRINGS)', STATUS )
 
-         CALL AST_SETD( IPLOT, 'SIZE(STRINGS)', 
-     :                  AST_GETD( IPLOT, 'SIZE(NUMLAB)', STATUS ), 
+         CALL AST_SETD( IPLOT, 'SIZE(STRINGS)',
+     :                  AST_GETD( IPLOT, 'SIZE(NUMLAB)', STATUS ),
      :                  STATUS )
-         CALL AST_SETI( IPLOT, 'COLOUR(STRINGS)', 
-     :                  AST_GETI( IPLOT, 'COLOUR(NUMLAB)', STATUS ), 
+         CALL AST_SETI( IPLOT, 'COLOUR(STRINGS)',
+     :                  AST_GETI( IPLOT, 'COLOUR(NUMLAB)', STATUS ),
      :                  STATUS )
-         CALL AST_SETD( IPLOT, 'WIDTH(STRINGS)', 
-     :                  AST_GETD( IPLOT, 'WIDTH(NUMLAB)', STATUS ), 
+         CALL AST_SETD( IPLOT, 'WIDTH(STRINGS)',
+     :                  AST_GETD( IPLOT, 'WIDTH(NUMLAB)', STATUS ),
      :                  STATUS )
-         CALL AST_SETI( IPLOT, 'STYLE(STRINGS)', 
-     :                  AST_GETI( IPLOT, 'STYLE(NUMLAB)', STATUS ), 
+         CALL AST_SETI( IPLOT, 'STYLE(STRINGS)',
+     :                  AST_GETI( IPLOT, 'STYLE(NUMLAB)', STATUS ),
      :                  STATUS )
-         CALL AST_SETI( IPLOT, 'FONT(STRINGS)', 
-     :                  AST_GETI( IPLOT, 'FONT(NUMLAB)', STATUS ), 
+         CALL AST_SETI( IPLOT, 'FONT(STRINGS)',
+     :                  AST_GETI( IPLOT, 'FONT(NUMLAB)', STATUS ),
      :                  STATUS )
 
 *  Loop round each graphical co-ordinate position.
@@ -254,8 +254,8 @@
             END DO
 
 *  If the position is good...
-            IF( START( 1 ) .NE. AST__BAD .AND. 
-     :          START( 2 ) .NE. AST__BAD ) THEN         
+            IF( START( 1 ) .NE. AST__BAD .AND.
+     :          START( 2 ) .NE. AST__BAD ) THEN
 
 *  Format the position identifier or get the label text.
                IF( LABTYP .EQ. 'ID' ) THEN
@@ -272,8 +272,8 @@
                START( 2 ) = START( 2 ) - DY
 
 *  Draw the text.
-               CALL AST_TEXT( IPLOT, TEXT( : IAT ), START, UP, 'CC', 
-     :                        STATUS ) 
+               CALL AST_TEXT( IPLOT, TEXT( : IAT ), START, UP, 'CC',
+     :                        STATUS )
 
             END IF
 
@@ -286,7 +286,7 @@
          CALL AST_SETI( IPLOT, 'STYLE(STRINGS)', ST0, STATUS )
          CALL AST_SETI( IPLOT, 'FONT(STRINGS)', FN0, STATUS )
 
-*  Re-instate the Current Frame. 
+*  Re-instate the Current Frame.
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
@@ -305,10 +305,10 @@
 *  entries containing the STC-S descriptions.
       IF( KEYMAP .NE. AST__NULL ) THEN
          CHAN = AST_STCSCHAN( KPS1_LSHSC, AST_NULL, ' ', STATUS )
-         IF( .NOT. AST_MAPGETELEMC( KEYMAP, 'COLNAMES', 1, KEY, 
+         IF( .NOT. AST_MAPGETELEMC( KEYMAP, 'COLNAMES', 1, KEY,
      :                              STATUS ) ) KEY = 'SHAPE'
          IAT0 = CHR_LEN( KEY )
-         CALL CHR_APPND( '_', KEY, IAT0 ) 
+         CALL CHR_APPND( '_', KEY, IAT0 )
       ELSE
          CHAN = AST__NULL
       END IF
@@ -323,7 +323,7 @@
 
 *  If STC-S shapes are being plotted, get the STC-S description for this
 *  position form the supplied KeyMap and then convert it to an AST Region
-*  using the StcsChan created above. 
+*  using the StcsChan created above.
          IF( CHAN .NE. AST__NULL ) THEN
             IAT = IAT0
             CALL CHR_PUTI( I, KEY, IAT )
@@ -349,10 +349,10 @@
                IAT = 0
                CALL CHR_PUTI( I, TEXT, IAT )
             END IF
-         END IF                        
+         END IF
 
 *  Draw the position.
-         CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
+         CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO,
      :                    .FALSE., CLOSE, TEXT, JUST, REGION, STATUS )
 
 *  For efficiency, annul any Region pointer.
@@ -360,10 +360,10 @@
       END DO
 
 *  Complete any polygons.
-      CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
+      CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO,
      :                 .TRUE., CLOSE, TEXT, JUST, AST__NULL, STATUS )
 
-*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
+*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original
 *  Current Frame.
       CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
       CALL AST_SETI( IPLOT, 'CURRENT', ICURR0, STATUS )
@@ -381,7 +381,7 @@
       SUBROUTINE KPS1_LSHSC( status )
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -389,7 +389,7 @@
 *  Global Variables:
       CHARACTER STCS*500         ! Used to communicate with kpg1_lshpl
       COMMON /KPG1_LSHPL/ STCS
-       
+
 *  Status:
       INTEGER STATUS               ! Global status
 
@@ -410,7 +410,7 @@
       IF( L .EQ. 0 ) L = -1
 
 *  Send the text to the StcsChan.
-      CALL AST_PUTLINE( STCS, L, STATUS ) 
+      CALL AST_PUTLINE( STCS, L, STATUS )
 
 *  Set the text blank to indicate it has been read.
       STCS = ' '

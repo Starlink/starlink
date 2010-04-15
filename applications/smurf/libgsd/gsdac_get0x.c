@@ -24,15 +24,15 @@
 *        name[16]) and a null-terminated string.
 *     value = <type>* (Returned)
 *        The data value.  For gsdac_get0c the value should be declared with
-*        length 17 at least.  The returned string is null-terminated in 
+*        length 17 at least.  The returned string is null-terminated in
 *        value[16].
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *     These routines return the value stored in a scalar GSD header item
 *     given by name.  The different data types are:
-* 
+*
 *    <t> <type>     GSD
 *     b   char      byte
 *     c   char[17]  char
@@ -94,7 +94,7 @@ void gsdac_get0b ( const gsd *gsd,
                    const char *name, char *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be B) */
   char unit[11];               /* unit of the GSD header */
@@ -103,9 +103,9 @@ void gsdac_get0b ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0b", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -121,20 +121,20 @@ void gsdac_get0b ( const gsd *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0b", "Header type of ^NAME did not match requested type B (CHAR).", status );
     return;
-  } 
+  }
 
-  CALLGSD( gsdGet0b ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
+  CALLGSD( gsdGet0b ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0b", "gsdGet0b : Could not get ^NAME from GSD file", status ); );
 
 }
 
-void gsdac_get0c ( const gsd *gsd, 
+void gsdac_get0c ( const gsd *gsd,
                    const char *name, char *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be C) */
   char unit[11];               /* unit of the GSD header */
@@ -143,9 +143,9 @@ void gsdac_get0c ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0c", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -163,10 +163,10 @@ void gsdac_get0c ( const gsd *gsd,
     return;
   }
 
-  CALLGSD( gsdGet0c ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
-           msgSetc ( "NAME", name ); errRep ( "gsdac_get0c", "gsdGet0c : Could not get ^NAME from GSD file", status ); ); 
+  CALLGSD( gsdGet0c ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get0c", "gsdGet0c : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -174,7 +174,7 @@ void gsdac_get0d ( const gsd *gsd,
                    const char *name, double *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be D) */
   char unit[11];               /* unit of the GSD header */
@@ -183,9 +183,9 @@ void gsdac_get0d ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0d", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -201,20 +201,20 @@ void gsdac_get0d ( const gsd *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0d", "Header type of ^NAME did not match requested type D (DOUBLE).", status );
     return;
-  } 
+  }
 
-  CALLGSD( gsdGet0d ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
-           msgSetc ( "NAME", name ); errRep ( "gsdac_get0d", "gsdGet0d : Could not get ^NAME from GSD file", status ); ); 
+  CALLGSD( gsdGet0d ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get0d", "gsdGet0d : Could not get ^NAME from GSD file", status ); );
 
 }
 
-void gsdac_get0i ( const gsd *gsd, 
+void gsdac_get0i ( const gsd *gsd,
                    const char *name, int *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be I) */
   char unit[11];               /* unit of the GSD header */
@@ -223,9 +223,9 @@ void gsdac_get0i ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0i", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -241,20 +241,20 @@ void gsdac_get0i ( const gsd *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0i", "Header type of ^NAME did not match requested type I (INTEGER).", status );
      return;
-  } 
+  }
 
-  CALLGSD( gsdGet0i ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
-           msgSetc ( "NAME", name ); errRep ( "gsdac_get0i", "gsdGet0i : Could not get ^NAME from GSD file", status ); ); 
+  CALLGSD( gsdGet0i ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get0i", "gsdGet0i : Could not get ^NAME from GSD file", status ); );
 
 }
 
-void gsdac_get0l ( const gsd *gsd, 
+void gsdac_get0l ( const gsd *gsd,
                    const char *name, char *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be L) */
   char unit[11];               /* unit of the GSD header */
@@ -263,9 +263,9 @@ void gsdac_get0l ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0l", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -281,12 +281,12 @@ void gsdac_get0l ( const gsd *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0l", "Header type of ^NAME did not match requested type L (CHAR).", status );
     return;
-  } 
+  }
 
-  CALLGSD( gsdGet0l ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
-           msgSetc ( "NAME", name ); errRep ( "gsdac_get0l", "gsdGet0l : Could not get ^NAME from GSD file", status ); ); 
+  CALLGSD( gsdGet0l ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get0l", "gsdGet0l : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -294,7 +294,7 @@ void gsdac_get0r ( const gsd *gsd,
                    const char *name, float *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be R) */
   char unit[11];               /* unit of the GSD header */
@@ -303,9 +303,9 @@ void gsdac_get0r ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0r", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -321,20 +321,20 @@ void gsdac_get0r ( const gsd *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0r", "Header type of ^NAME did not match requested type R (FLOAT).", status );
     return;
-  } 
+  }
 
-  CALLGSD( gsdGet0r ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
-           msgSetc ( "NAME", name ); errRep ( "gsdac_get0r", "gsdGet0r : Could not get ^NAME from GSD file", status ); ); 
+  CALLGSD( gsdGet0r ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get0r", "gsdGet0r : Could not get ^NAME from GSD file", status ); );
 
 }
 
-void gsdac_get0w ( const gsd *gsd, 
+void gsdac_get0w ( const gsd *gsd,
                    const char *name, short *value, int *status ) {
 
   /* Local variables */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   int itemno;                  /* item number of the GSD header */
   char type;                   /* data type of the item (should always be W) */
   char unit[11];               /* unit of the GSD header */
@@ -343,9 +343,9 @@ void gsdac_get0w ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno,
+		     unit, &type, &array ),
+           status,
            msgSetc ( "NAME", name ); errRep ( "gsdac_get0w", "gsdFind : Could not find element ^NAME in file", status ); );
 
   if ( *status != SAI__OK ) return;
@@ -361,11 +361,11 @@ void gsdac_get0w ( const gsd *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0w", "Header type of ^NAME did not match requested type W (SHORT).", status );
     return;
-  } 
+  }
 
-  CALLGSD( gsdGet0w ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-		      itemno, value ), 
-           status, 
-           msgSetc ( "NAME", name ); errRep ( "gsdac_get0w", "gsdGet0w : Could not get ^NAME from GSD file", status ); ); 
+  CALLGSD( gsdGet0w ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+		      itemno, value ),
+           status,
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get0w", "gsdGet0w : Could not get ^NAME from GSD file", status ); );
 
 }

@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise all returned information to null.
-      DO I = 1, NITEM      
+      DO I = 1, NITEM
          WORK( I, II ) = ' '
       END DO
 
@@ -143,11 +143,11 @@
       END IF
 
 *  Obtain a locator to the FITS extension.
-      CALL NDF_XLOC( INDF, 'FITS', 'READ', FTSLOC, STATUS )      
+      CALL NDF_XLOC( INDF, 'FITS', 'READ', FTSLOC, STATUS )
 
 *  Map the FITS card images stored within the extension, and get the
 *  number of characters in each one.
-      CALL DAT_MAPV( FTSLOC, '_CHAR', 'READ', FTSPNT, NCARD, STATUS )  
+      CALL DAT_MAPV( FTSLOC, '_CHAR', 'READ', FTSPNT, NCARD, STATUS )
       CALL DAT_CLEN( FTSLOC, CLEN, STATUS )
 
 *  See what type of input image we are dealing with. This is derived
@@ -155,11 +155,11 @@
 *  because of the way that UNIX handles character arrays. There is no
 *  corresponding dummy argument in routine PREPA4. Character arrays
 *  passed using %VAL must always come earlier in the argument list than
-*  any other character strings. 
+*  any other character strings.
       CALL PREPA4( NCARD, %VAL( FTSPNT ), WORK( 2, II ),  STATUS,
      :             %VAL( CLEN ) )
 
-*  If this is a PO image, 
+*  If this is a PO image,
       IF( WORK( 2, II ) .EQ. IRI__DSCO ) THEN
 
 *  See what type of PO image it is.
@@ -186,8 +186,8 @@
      :             'PREPC3: Cannot find FITS keyword DSKYGRID in ^NDF.',
      :                   STATUS )
             GO TO 999
-         END IF      
-      
+         END IF
+
 *  Store the grid number.
          CALL CHR_ITOC( NINT( RSKGRD ), WORK( 3, II ), NCHAR )
 
@@ -206,7 +206,7 @@
      :             'PREPC3: Cannot find FITS keyword BUNIT in ^NDF.',
      :                   STATUS )
             GO TO 999
-         END IF      
+         END IF
 
 *  If this is a YORIC image...
       ELSE IF( WORK( 2, II ) .EQ. IRI__YORIC ) THEN
@@ -233,7 +233,7 @@
      :             'PREPC3: Cannot find FITS keyword OBJECT in ^NDF.',
      :                   STATUS )
             GO TO 999
-         END IF      
+         END IF
 
 *  Get the value of the FITS keyword DATE.
          CALL IRM_GKEYC( NCARD, %VAL( FTSPNT ), 1, 'DATE', THERE,
@@ -245,7 +245,7 @@
      :             'PREPC3: Cannot find FITS keyword DATE in ^NDF.',
      :                   STATUS )
             GO TO 999
-         END IF      
+         END IF
 
 *  Get the values of the FITS keyword ITERNO
          CALL IRM_GKEYR( NCARD, %VAL( FTSPNT ), 1, 'ITERNO', THERE,
@@ -257,7 +257,7 @@
      :             'PREPC3: Cannot find FITS keyword ITERNO in ^NDF.',
      :                   STATUS )
             GO TO 999
-         END IF      
+         END IF
 
 *  Store it.
          CALL CHR_ITOC( NINT( RITER ), WORK( 5, II ), NCHAR )
@@ -277,7 +277,7 @@
      :             'PREPC3: Cannot find FITS keyword BUNIT in ^NDF.',
      :                   STATUS )
             GO TO 999
-         END IF      
+         END IF
 
       END IF
 

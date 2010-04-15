@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -31,7 +31,7 @@ This guide shows you how to write programs for use as part of
 instrumentation systems under ADAM Version 2. If you are a programmer
 experienced with ADAM Version 1, then refer to Appendix \ref{old} which
 summarises some of the differences between the new ADAM tasking model
-and the old one. 
+and the old one.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ and the old one.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -245,12 +245,12 @@ and the old one.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -296,27 +296,27 @@ and the old one.
 \setcounter{page}{1}
 \section{Introduction\xlabel{introduction}}
 
-An ADAM instrumentation system typically consists of a number of 
-separate programs which are loaded into various computers and which 
-carry out their functions in response to receiving commands. A large part 
-of their functionality involves either sending commands to some 
-instrument and receiving data back from it, or sending commands to other 
-ADAM tasks. It follows that communication is a key feature of an ADAM 
-task, and one can expect that a task spends most of its time waiting for 
-a communication of one sort or another. Experience indicates that it is 
-very inconvenient if a task is only sensitive to the communication it is 
+An ADAM instrumentation system typically consists of a number of
+separate programs which are loaded into various computers and which
+carry out their functions in response to receiving commands. A large part
+of their functionality involves either sending commands to some
+instrument and receiving data back from it, or sending commands to other
+ADAM tasks. It follows that communication is a key feature of an ADAM
+task, and one can expect that a task spends most of its time waiting for
+a communication of one sort or another. Experience indicates that it is
+very inconvenient if a task is only sensitive to the communication it is
 expecting - for example, it becomes very difficult for the user to
 intervene because there has been a change of plan. An ADAM task written
 as part of an instrumentation system should, therefore, be organised
 such that if it is waiting for something it can also receive a command.
 This document describes the ADAM facilities provided to enable you to
-write tasks which match this idea. 
+write tasks which match this idea.
 
 \section{A simple picture of a task\xlabel{a_simple_picture_of_a_task}}
 
-A task is implemented by the application code plus an interface file. 
-The interface file is a text file containing declarations of the 
-parameters and actions ({\em i.e.} commands) which the task can carry out. The 
+A task is implemented by the application code plus an interface file.
+The interface file is a text file containing declarations of the
+parameters and actions ({\em i.e.} commands) which the task can carry out. The
 source code looks like this
 \small \begin{quote} \begin{verbatim}
       SUBROUTINE MYTASK ( STATUS )
@@ -328,12 +328,12 @@ source code looks like this
       END
 \end{verbatim} \end{quote} \normalsize
 
-That is, it appears as a subroutine which is linked into some ADAM code 
+That is, it appears as a subroutine which is linked into some ADAM code
 called the task {\em fixed-part}.
 It is conventional to test STATUS on entry and to exit without action if it
 is not equal to SAI\_\_OK. The value SAI\_\_OK is defined in the include file
 SAE\_PAR.
-When the task does things, it might have to wait for some other task or 
+When the task does things, it might have to wait for some other task or
 system to reply.
 
 The things a task might be waiting for include
@@ -352,28 +352,28 @@ CALL TASK_PUT_REQUEST(REQUEST,STATUS)
 \end{verbatim} \end{quote} \normalsize
 
 and then returning to the code which called it (the task's fixed-part).
-See Appendix \ref{request} for possible values of REQUEST. 
+See Appendix \ref{request} for possible values of REQUEST.
 
-The fixed-part waits for messages to arrive. If one arrives which your 
-application has warned it about, then it will call your application 
+The fixed-part waits for messages to arrive. If one arrives which your
+application has warned it about, then it will call your application
 after storing information about the message where you can collect it.
 
-The following sections describe how to wait for the various 
+The following sections describe how to wait for the various
 possibilities.
 
 \section{Waiting for a command\xlabel{waiting_for_a_command}}
 
-When you first load your task, the only thing it is waiting for is a 
-command. It can receive commands from other ADAM tasks telling it to SET 
-or GET the value of one of its program parameters. The fixed-part 
-handles this without your code being aware of it. It can also receive a 
-command telling it to CANCEL an earlier command, but as there hasn't yet 
+When you first load your task, the only thing it is waiting for is a
+command. It can receive commands from other ADAM tasks telling it to SET
+or GET the value of one of its program parameters. The fixed-part
+handles this without your code being aware of it. It can also receive a
+command telling it to CANCEL an earlier command, but as there hasn't yet
 been a command, the fixed-part will return an error to the other task.
 
-If the fixed-part receives an OBEY <action\_name> command, it checks 
-whether the given action\_name has been declared in the interface file. 
-If it has, then your code is called. You can find out why your code has 
-been called by using the TASK library, for example, 
+If the fixed-part receives an OBEY <action\_name> command, it checks
+whether the given action\_name has been declared in the interface file.
+If it has, then your code is called. You can find out why your code has
+been called by using the TASK library, for example,
 \small \begin{quote} \begin{verbatim}
 CALL TASK_GET_NAME(NAME,STATUS)
 \end{verbatim} \end{quote} \normalsize
@@ -381,7 +381,7 @@ returns the name of the action.
 
 \section{Carrying out a simple command\xlabel{carrying_out_a_simple_command}}
 
-Suppose your application is very simple, for example, SUMS.IFL contains 
+Suppose your application is very simple, for example, SUMS.IFL contains
 
 \small \begin{quote} \begin{verbatim}
 interface SUMS
@@ -412,25 +412,25 @@ and SUMS.FOR contains
       END
 \end{verbatim} \end{quote} \normalsize
 
-This can be built as a task called SUMS and loaded using ICL. When it is 
-loaded, the fixed-part reads the interface file and discovers that the 
-task has just one action, called SQUARE, and one parameter called VALUE. 
+This can be built as a task called SUMS and loaded using ICL. When it is
+loaded, the fixed-part reads the interface file and discovers that the
+task has just one action, called SQUARE, and one parameter called VALUE.
 If you send a command to it of the form
 
 \small \begin{quote} \begin{verbatim}
 ICL> send sums obey square
 \end{verbatim} \end{quote} \normalsize
 
-then the task will prompt you for VALUE. It will attempt to square your 
+then the task will prompt you for VALUE. It will attempt to square your
 reply and then return to the fixed-part. If you send the command again,
 you will not be prompted for VALUE. The task will remember the value of
 VALUE unless your application calls PAR\_CANCL, or you KILL the task
-from ICL. 
+from ICL.
 
 \section{A task with two actions\xlabel{a_task_with_two_actions}}
 
 Let us make the task SUMS able to accept two different commands.
-SUMS.IFL contains 
+SUMS.IFL contains
 
 \small \begin{quote} \begin{verbatim}
 interface SUMS
@@ -479,21 +479,21 @@ As above, you can issue the ICL command
 ICL> send sums obey square
 \end{verbatim} \end{quote} \normalsize
 
-and you will be prompted for VALUE. Thereafter, that same value of VALUE 
+and you will be prompted for VALUE. Thereafter, that same value of VALUE
 will be used, even if you
 
 \small \begin{quote} \begin{verbatim}
 ICL> send sums obey add
 \end{verbatim} \end{quote} \normalsize
 
-However, notice that the interface file has now been changed to specify that 
+However, notice that the interface file has now been changed to specify that
 VALUE is NEEDed by the actions. This means that you can
 
 \small \begin{quote} \begin{verbatim}
 ICL> send sums obey add 42
 \end{verbatim} \end{quote} \normalsize
 
-and the value 42 is put into the parameter by the fixed-part before your 
+and the value 42 is put into the parameter by the fixed-part before your
 application is called.
 
 \section{Completion of a timed interval\xlabel{completion_of_a_timed_interval}}
@@ -505,7 +505,7 @@ using TASK\_PUT\_REQUEST(ACT\_\_WAIT,STATUS) to tell the fixed-part a
 timer is required and using TASK\_PUT\_DELAY to tell the system how long
 a time is required. Note that your code has to find out whether it is
 being called for the first time or not by inquiring the sequence number
-SEQ. 
+SEQ.
 
 \small \begin{quote} \begin{verbatim}
 interface timer
@@ -536,10 +536,10 @@ endinterface
 \end{verbatim} \end{quote} \normalsize
 
 The time delay can also be used as a timeout facility in conjunction
-with waiting for input or message receipt. 
+with waiting for input or message receipt.
 
-It is possible to have several actions active at once, each waiting to 
-be called by the fixed-part. Here is a simple example of two actions, 
+It is possible to have several actions active at once, each waiting to
+be called by the fixed-part. Here is a simple example of two actions,
 each doing a timed reschedule.
 
 \small \begin{quote} \begin{verbatim}
@@ -576,37 +576,37 @@ each doing a timed reschedule.
       END
 \end{verbatim} \end{quote} \normalsize
 
-Obviously, this application never terminates, but will put out the WAIT 
+Obviously, this application never terminates, but will put out the WAIT
 message every 5 seconds and the WAIT1 message every 1 second.
 
 \section{Completion of data input\xlabel{completion_of_data_input}}
 
-Suppose that your task has to input data from some hardware connected to 
-an RS232 line. You can use the VAX/VMS SYS\$QIO system service with your 
-own AST handler to start the input operation, optionally call 
-TASK\_PUT\_DELAY to set a timeout on the operation, and return 
-to the task fixed-part after having put a request ACT\_\_ASTINT. 
+Suppose that your task has to input data from some hardware connected to
+an RS232 line. You can use the VAX/VMS SYS\$QIO system service with your
+own AST handler to start the input operation, optionally call
+TASK\_PUT\_DELAY to set a timeout on the operation, and return
+to the task fixed-part after having put a request ACT\_\_ASTINT.
 
 When the input completes, VMS hands control to your AST handler which
-can carry out whatever actions are necessary and then use 
-TASK\_ASTMSG(NAME,LENGTH,VALUE,STATUS) to tell the fixed part to call the 
+can carry out whatever actions are necessary and then use
+TASK\_ASTMSG(NAME,LENGTH,VALUE,STATUS) to tell the fixed part to call the
 application again. In this call:
 \begin{description}
 \item[NAME] is the name of the relevant task
 action
-\item[VALUE] is a character string containing any information you want 
+\item[VALUE] is a character string containing any information you want
 passed
 \item[LENGTH] is the number of significant bytes in VALUE
 \end{description}
 
-Provided NAME coincides with one of your actions which has requested to be 
+Provided NAME coincides with one of your actions which has requested to be
 called again, any associated timer is cancelled and your application is called.
 
 TASK\_GET\_REASON(REASON,STATUS) returns, in REASON, value
 MESSYS\_\_ASTINT if the message was received from the AST handler,
 or MESSYS\_\-\_\-RESCHED if the timer completed.
-In the former case, you could use 
-TASK\_GET\_VALUE(VALUE,STATUS) to get the information passed from the AST 
+In the former case, you could use
+TASK\_GET\_VALUE(VALUE,STATUS) to get the information passed from the AST
 handler.
 
 Let us consider an example task called DO\_IO with an action called READ.
@@ -633,7 +633,7 @@ Let us consider an example task called DO\_IO with an action called READ.
       CALL TASK_GET_SEQ( SEQ, STATUS )
       IF ( SEQ .EQ. 0 ) THEN
          CALL SYS$ASSIGN ( 'TTA5:', CHAN, ,)
-         CALL SYS$QIO ( , %VAL(CHAN), IO$_READ,, READAST, ASTPARM, 
+         CALL SYS$QIO ( , %VAL(CHAN), IO$_READ,, READAST, ASTPARM,
      :     %REF(INSTRING), %VAL(80),,,,)
          CALL TASK_PUT_DELAY ( 5000, STATUS )
          CALL TASK_PUT_REQUEST ( ACT__ASTINT, STATUS )
@@ -718,26 +718,26 @@ Suppose that your task is controlling other tasks. Say it sends an OBEY
 message to some other task. The other task will carry out its
 operations, maybe generating output intended for the user to see, and
 send your task a final message when it has completed the obey. You can
-use: 
+use:
 \small \begin{quote} \begin{verbatim}
 TASK_ADD_MESSINFO(PATH,MESSID,STATUS)
 \end{verbatim} \end{quote} \normalsize
-to tell the fixed-part you are 
-expecting messages on this PATH,MESSID combination, then return to the 
-fixed-part having set a request ACT\_\_MESSAGE. You could also have set a 
-timeout as above. You can use multiple calls to TASK\_ADD\_MESSINFO if you 
+to tell the fixed-part you are
+expecting messages on this PATH,MESSID combination, then return to the
+fixed-part having set a request ACT\_\_MESSAGE. You could also have set a
+timeout as above. You can use multiple calls to TASK\_ADD\_MESSINFO if you
 are controlling more than one operation in other tasks.
 
 When the fixed-part calls your application again, you can use:
 \small \begin{quote} \begin{verbatim}
-TASK_GET_MESSINFO(PATH,CONTEXT,NAME,VALUE,MESSID,EVENT,STATUS) 
+TASK_GET_MESSINFO(PATH,CONTEXT,NAME,VALUE,MESSID,EVENT,STATUS)
 \end{verbatim} \end{quote} \normalsize
-to obtain the information carried in the message. 
+to obtain the information carried in the message.
 
-Note that any output generated by the other task ({\em e.g.} using MSG\_OUT) 
-will have been handled automatically by the fixed-part of your task and will 
+Note that any output generated by the other task ({\em e.g.} using MSG\_OUT)
+will have been handled automatically by the fixed-part of your task and will
 not cause your application subroutine to be called.
-Messages from subsidiary tasks which do cause your subroutine to be called 
+Messages from subsidiary tasks which do cause your subroutine to be called
 will generally be completion messages, however, a special `TRIGGER' message is
 also available.
 
@@ -750,14 +750,14 @@ The message will be sent and the task can continue working.
 When your controlling task calls TASK\_GET\_MESSINFO, MESSYS\_\_TRIGGER will
 be returned in EVENT.
 
-Obviously, the example for all this is rather complex, involving three 
-separate tasks and multiple actions. The example, written by William 
-Lupton, involves a pair of tasks for making tea and coffee respectively 
+Obviously, the example for all this is rather complex, involving three
+separate tasks and multiple actions. The example, written by William
+Lupton, involves a pair of tasks for making tea and coffee respectively
 and a third task controlling them, and is relegated to Appendix \ref{make}.
 
 \section{Cancelling actions\xlabel{cancelling_actions}}
 
-It is possible to cancel an action which is in a wait state. Here is a 
+It is possible to cancel an action which is in a wait state. Here is a
 simple example.
 
 \small \begin{quote} \begin{verbatim}
@@ -803,7 +803,7 @@ ICL> send timer obey wait
 ICL> send timer cancel wait
 \end{verbatim} \end{quote} \normalsize
 
-It is possible to write the application such that CANCEL modifies the 
+It is possible to write the application such that CANCEL modifies the
 behaviour of the rescheduling action rather than terminating it.
 
 \small \begin{quote} \begin{verbatim}
@@ -867,30 +867,30 @@ ICL> send timer obey wait
 ICL> send timer cancel wait 10000
 \end{verbatim} \end{quote} \normalsize
 
-will cause the task to start rescheduling at 0.5sec intervals, but then 
-switch to rescheduling at 10sec intervals. In this particular example 
+will cause the task to start rescheduling at 0.5sec intervals, but then
+switch to rescheduling at 10sec intervals. In this particular example
 the action never terminates.
 
-An example of sending a CANCEL to a task which is controlling a 
+An example of sending a CANCEL to a task which is controlling a
 subsidiary task is given in Appendix \ref{cmotask}.
 
 \section{Behaviour of the parameter system
 \xlabel{behaviour_of_the_parameter_system}}
 
-As far as the ADAM parameter system is concerned, there are two aspects 
-of instrumentation tasks which cause them to behave differently from 
-standard data analysis tasks (A-tasks). The first is the way they are 
+As far as the ADAM parameter system is concerned, there are two aspects
+of instrumentation tasks which cause them to behave differently from
+standard data analysis tasks (A-tasks). The first is the way they are
 linked. The second is the form of the interface file declarations.
 
-Whenever an A-task executes, the parameter system is started-up, the 
-application is called, then the parameter system is closed-down. For an 
-instrumentation task this continuous opening-closing of the parameter 
-system does not happen. There are two obvious consequences of this. 
-Firstly, parameters remain ACTIVE once they have been given a value. 
+Whenever an A-task executes, the parameter system is started-up, the
+application is called, then the parameter system is closed-down. For an
+instrumentation task this continuous opening-closing of the parameter
+system does not happen. There are two obvious consequences of this.
+Firstly, parameters remain ACTIVE once they have been given a value.
 Secondly, global associations for WRITE never happen.
 
-All the parameters of an instrumentation task are available to all the 
-actions. In addition, a specific OBEY or CANCEL can specify that values 
+All the parameters of an instrumentation task are available to all the
+actions. In addition, a specific OBEY or CANCEL can specify that values
 of named parameters can be passed on the command line.
 
 \small \begin{quote} \begin{verbatim}
@@ -906,27 +906,27 @@ of named parameters can be passed on the command line.
    endaction
 \end{verbatim} \end{quote} \normalsize
 
-The order in which NEEDS declarations occur specifies the order in 
+The order in which NEEDS declarations occur specifies the order in
 which the values are expected on the command-line.
 
-An item of special interest to programmers of instrumentation systems is 
-the value-search-path (VPATH) declaration INTERNAL. An INTERNAL 
-parameter has the following properties which distinguish it from 
+An item of special interest to programmers of instrumentation systems is
+the value-search-path (VPATH) declaration INTERNAL. An INTERNAL
+parameter has the following properties which distinguish it from
 ordinary parameters.
 
-If it is a scalar, it is stored as a variable inside the parameter 
-system. All other parameter values are stored in HDS. This means that 
-access to INTERNAL scalar parameters is much faster than access to 
-ordinary parameters. This property may be of interest to instrumentation 
+If it is a scalar, it is stored as a variable inside the parameter
+system. All other parameter values are stored in HDS. This means that
+access to INTERNAL scalar parameters is much faster than access to
+ordinary parameters. This property may be of interest to instrumentation
 applications which make heavy use of the parameter system.
 
-An INTERNAL parameter is not prompted for. All other parameters have an 
-implicit PROMPT at the end of their VPATH declarations unless it is 
+An INTERNAL parameter is not prompted for. All other parameters have an
+implicit PROMPT at the end of their VPATH declarations unless it is
 explicitly overridden by NOPROMPT.
 
-The behaviour of PAR\_PUTxx is different for an INTERNAL parameter. 
-Putting an INTERNAL parameter simply puts the given value into the 
-parameter. For an ordinary parameter, the parameter system expects to be 
+The behaviour of PAR\_PUTxx is different for an INTERNAL parameter.
+Putting an INTERNAL parameter simply puts the given value into the
+parameter. For an ordinary parameter, the parameter system expects to be
 told an existing HDS component into which the value should be put.
 
 \section{Compiling and linking\xlabel{compiling_and_linking}}
@@ -1016,18 +1016,18 @@ endinterface
 
       IMPLICIT NONE
       INTEGER   STATUS          ! Modified STATUS
- 
+
       INCLUDE   'SAE_PAR'
       INCLUDE   'ADAMDEFNS'
       INCLUDE   'ACT_ERR'
- 
+
       INTEGER   SEQ             ! Action sequence number
       INTEGER   CONTEXT         ! Context (OBEY or CANCEL)
       INTEGER   PARAM           ! Arbitrary integer parameter
       INTEGER   DELAY           ! Delay between initial and final entries
       CHARACTER NAME*24         ! Action name
       CHARACTER VALUE*80        ! Value string
- 
+
       SAVE PARAM                ! Value must be saved
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -1039,7 +1039,7 @@ endinterface
       CALL TASK_GET_SEQ (SEQ,STATUS)
 
 *  Loop through possible OBEYs
- 
+
       IF (NAME(1:7) .EQ. 'LAPSANG') THEN
          IF (SEQ .EQ. 0) THEN
 *         Produce error - undefined parameter on LAPSANG2
@@ -1126,14 +1126,14 @@ endinterface
 
       IMPLICIT NONE
       INTEGER   STATUS          ! Modified STATUS
- 
+
       INCLUDE   'SAE_PAR'
       INCLUDE   'ACT_ERR'
- 
+
       INTEGER   SEQ             ! Action sequence number
       INTEGER   DELAY           ! Delay between initial and final entries
       CHARACTER NAME*24         ! Action name
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  Pick up required "ACT parameters"
@@ -1142,7 +1142,7 @@ endinterface
       CALL TASK_GET_SEQ (SEQ,STATUS)
 
 *  Loop through possible OBEYs
- 
+
       IF (NAME(1:5) .EQ. 'MOCHA') THEN
          IF (SEQ .EQ. 0) THEN
             CALL MSG_SETC ('NAME',NAME)
@@ -1194,13 +1194,13 @@ endinterface
 
       IMPLICIT NONE
       INTEGER   STATUS          ! Modified STATUS
- 
+
       INCLUDE   'ADAMDEFNS'
       INCLUDE   'SAE_PAR'
       INCLUDE   'MESSYS_ERR'
       INCLUDE   'ACT_ERR'
       INCLUDE   'DTASK_ERR'
- 
+
       INTEGER   I               ! Counter
       INTEGER   MAX             ! Number of TEA/COFFEE actions to start
       INTEGER   TIME            ! Timeout in seconds
@@ -1221,7 +1221,7 @@ endinterface
       INTEGER EVENT             ! Event which caused reschedule
 
       SAVE TEA_ACTIVE,COFFEE_ACTIVE,TIME ! Retain these values
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  Pick up required "ACT parameters"
@@ -1230,11 +1230,11 @@ endinterface
       CALL TASK_GET_SEQ (SEQ,STATUS)
 
 *  Loop through possible OBEYs
- 
+
       IF (NAME .EQ. 'BREW') THEN
- 
+
 *  First time through, initiate the actions ...
- 
+
          IF (SEQ .EQ. 0) THEN
 
 *  ... actions LAPSANG1 .. LAPSANG'MAX etc are initiated with a timeout
@@ -1290,20 +1290,20 @@ endinterface
                   CALL ERR_FLUSH ( STATUS )
                ENDIF
             ENDDO
- 
+
 *  ... and, if OK, set time-out period and set ACT__MESSAGE request.
- 
+
             IF (TEA_ACTIVE .GT. 0 .OR. COFFEE_ACTIVE .GT. 0) THEN
                IF (TIME .NE. -1) THEN
                   CALL TASK_PUT_DELAY ( 1000*TIME, STATUS )
                ENDIF
                CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
             ENDIF
- 
+
 *  On subsequent entries, get the details of the message that has
 *  caused this entry (it should either correspond to a subsidiary
 *  action completion, TRIGGER or a timeout).
- 
+
          ELSE
             CALL TASK_GET_MESSINFO (PATH,CONTEXT,NAME,VALUE,MESSID,
      :        EVENT,STATUS)
@@ -1332,7 +1332,7 @@ endinterface
 
 *  ... or determine which action has completed. Set ACT__MESSAGE request
 *  if more remain. Otherwise the BREW action is complete.
- 
+
             ELSE
                IF (NAME(1:7) .EQ. 'LAPSANG') THEN
                   TEA_ACTIVE = TEA_ACTIVE - 1
@@ -1350,7 +1350,7 @@ endinterface
                      CALL MSG_SETC( 'VALUE', VALUE )
                      CALL MSG_OUT (' ',
      :               'CONTROL: Value string: ^VALUE', STATUS)
-                  ENDIF                  
+                  ENDIF
 *  or failure ...
                ELSE
                   CALL ERR_REP (' ',
@@ -1360,8 +1360,8 @@ endinterface
                      CALL MSG_SETC( 'VALUE', VALUE )
                      CALL ERR_REP (' ',
      :               'CONTROL: Value string: ^VALUE', EVENT)
-                  ENDIF                  
-*  Flush 
+                  ENDIF
+*  Flush
                   CALL ERR_FLUSH ( EVENT )
                ENDIF
                IF (TEA_ACTIVE .GT. 0 .OR. COFFEE_ACTIVE .GT. 0) THEN
@@ -1382,12 +1382,12 @@ endinterface
 \section{Cancelling in multi-task subsystems
 \label{cmotask}\xlabel{cancelling_in_multitask_subsystems}}
 
-This example was provided by Ian Smith (ROE). When the controlling task 
-receives a CANCEL, it sends a CANCEL to the subsidiary task. The 
-controlling task then requests ACT\_\_MESSAGE to wait for the 
-final acknowledgement from the OBEY in the subsidiary task. The final 
-completion status from the subsidiary task is obtained by the 
-controlling task by the call to TASK\_GET\_REASON, irrespective of 
+This example was provided by Ian Smith (ROE). When the controlling task
+receives a CANCEL, it sends a CANCEL to the subsidiary task. The
+controlling task then requests ACT\_\_MESSAGE to wait for the
+final acknowledgement from the OBEY in the subsidiary task. The final
+completion status from the subsidiary task is obtained by the
+controlling task by the call to TASK\_GET\_REASON, irrespective of
 whether the final completion was due to a CANCEL.
 
 \subsection{Controlling task}
@@ -1419,7 +1419,7 @@ endinterface
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADAMDEFNS'
       INCLUDE 'MESSYS_ERR'
-      INCLUDE 'ACT_ERR'  
+      INCLUDE 'ACT_ERR'
       INCLUDE 'DTASK_ERR'
 
       INTEGER STATUS             ! modified status
@@ -1446,14 +1446,14 @@ endinterface
      :        MOTASK_PATH, MOTASK_MESSID, STATUS )
             IF ( STATUS .EQ. DTASK__ACTSTART ) THEN
                STATUS = SAI__OK
-               CALL TASK_ADD_MESSINFO ( MOTASK_PATH, MOTASK_MESSID, 
-     :           STATUS )          
+               CALL TASK_ADD_MESSINFO ( MOTASK_PATH, MOTASK_MESSID,
+     :           STATUS )
                CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
             ELSE
                CALL MSG_SETC ( 'MOTOR', MOTOR )
                CALL ERR_REP ( ' ', '^MOTOR FAILED', STATUS )
             END IF
-         ELSE 
+         ELSE
             CALL TASK_GET_REASON ( REASON, STATUS )
             IF ( REASON .EQ. DTASK__ACTCANCEL ) THEN
                CALL MSG_OUT ( ' ',
@@ -1472,7 +1472,7 @@ endinterface
             STATUS = SAI__OK
             CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
          ELSE
-            CALL ERR_REP ( ' ', 'CMOTASK: failure cancelling MOTASK', 
+            CALL ERR_REP ( ' ', 'CMOTASK: failure cancelling MOTASK',
      :        STATUS )
          ENDIF
       END IF
@@ -1520,8 +1520,8 @@ endinterface
 
       IMPLICIT NONE              ! No implicit typing
 
-      INCLUDE 'SAE_PAR'  
-      INCLUDE 'ACT_ERR'  
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
       INCLUDE 'ADAMDEFNS'
 
       INTEGER STATUS
@@ -1547,7 +1547,7 @@ endinterface
                CALL PAR_GET0I ( 'FILTER', FILTER, STATUS )
                PERIOD = FILTER * 1000
                CALL MSG_SETI ( 'FILTER', FILTER )
-               CALL MSG_OUT ( ' ', 'moving to filter ^FILTER...', 
+               CALL MSG_OUT ( ' ', 'moving to filter ^FILTER...',
      :           STATUS )
                CALL TASK_PUT_DELAY ( PERIOD, STATUS )
                CALL PAR_CANCL ( 'FILTER', STATUS )
@@ -1591,27 +1591,27 @@ endinterface
 \subsection{Introduction to the changes}
 
 C-tasks, CD-tasks and D-tasks are now ``unfashionable'', but are supported
-for the time being. That is, all existing ADAM tasks should continue to 
-behave as they did under ADAM V1, except for the following two features. 
+for the time being. That is, all existing ADAM tasks should continue to
+behave as they did under ADAM V1, except for the following two features.
 
-Firstly, an OBEY to a task will no longer be rejected on the grounds 
+Firstly, an OBEY to a task will no longer be rejected on the grounds
 that its NEEDS list is not satisfied. See section \ref{needs} for more details.
 
-Secondly, the VALUE string is only guaranteed to contain the parameter 
-string for the OBEY on first entry to ACT. If the action is 
-rescheduling, the VALUE string will not have retained the parameter 
+Secondly, the VALUE string is only guaranteed to contain the parameter
+string for the OBEY on first entry to ACT. If the action is
+rescheduling, the VALUE string will not have retained the parameter
 string for subsequent entries.
 
 Note that D-tasks are now free to use ERR and MSG and to send messages
 to other tasks whenever they feel like it (except inside AST routines!).
 
-The characteristics of the new-style ``instrumentation" tasks are as 
+The characteristics of the new-style ``instrumentation" tasks are as
 follows:
 \begin{itemize}
-\item The arguments previously passed in the call to CD-tasks and D-tasks, 
+\item The arguments previously passed in the call to CD-tasks and D-tasks,
 {\em ie.} CONTEXT, NAME, SEQ, VALUE and RETVAL are now accessed by calls to the
-TASK routines. 
-\item The DTASK library is being phased-out as far as applications are 
+TASK routines.
+\item The DTASK library is being phased-out as far as applications are
 concerned. The DTASK\_ calls are replaced by TASK\_ calls.
 \item The syntax of the interface file remains unchanged.
 \end{itemize}
@@ -1621,8 +1621,8 @@ The following sections list all the changes.
 
 Old-style D-tasks and CD-tasks may still be linked using DLINK and CDLINK.
 After re-linking they will use the new fixed-part and exhibit the new
-behaviour, particularly the improved error reporting. Furthermore, future 
-changes to the fixed-part will be incorporated automatically via a shareable 
+behaviour, particularly the improved error reporting. Furthermore, future
+changes to the fixed-part will be incorporated automatically via a shareable
 image.
 
 DLINK and CDLINK have the same parameters as ILINK. Procedures DNOSHR and
@@ -1631,64 +1631,64 @@ CDNOSHR are withdrawn.
 \subsection{NEEDS list checking}
 \label{needs}
 
-The fixed-part will no longer reject an OBEY or CANCEL on the grounds 
-that the parameters specified on the NEEDS list do not have suitable 
+The fixed-part will no longer reject an OBEY or CANCEL on the grounds
+that the parameters specified on the NEEDS list do not have suitable
 values.
 The only significance of NEEDS lists in ADAM V2 is to specify the order of any
 command-line parameters -- NEEDS constraints no longer have any effect.
 
 \subsection{DTASK\_RPON and DTASK\_RPOFF}
 
-These no longer do anything. The fixed-part automatically enables 
-reporting back to whatever process issued the GET/SET/OBEY/CANCEL 
+These no longer do anything. The fixed-part automatically enables
+reporting back to whatever process issued the GET/SET/OBEY/CANCEL
 currently under way.
 
 \subsection{DTASK\_ASTSIGNAL and DTASK\_TSTINTFLG}
 
-These routines are being phased-out. TASK\_ASTSIGNAL 
+These routines are being phased-out. TASK\_ASTSIGNAL
 and TASK\_TSTINTFLG, which have the same arguments and functionality, should
 be used instead.
 The DTASK\_ calls will continue to work for the time being.
 
 \subsection{TASK\_ASTMSG ( NAME, LENGTH, VALUE, STATUS )}
 
-This is a new routine, similar in function to TASK\_ASTSIGNAL, but 
-allowing a message of length LENGTH to be passed in the character string 
-VALUE. When the main-line code is rescheduled it can extract the message 
+This is a new routine, similar in function to TASK\_ASTSIGNAL, but
+allowing a message of length LENGTH to be passed in the character string
+VALUE. When the main-line code is rescheduled it can extract the message
 from VALUE.
 
 \subsection{Multiple calls to TASK\_ASTSIGNAL, TASK\_ASTMSG}
 
-It is now possible for an AST handler to make 
+It is now possible for an AST handler to make
 multiple calls to TASK\_ASTSIGNAL and TASK\_ASTMSG during a single execution.
-The information carried in the call is now sent as a message (rather than 
+The information carried in the call is now sent as a message (rather than
 entered in a COMMON block) and so the last call does not overwrite the earlier
 ones.
 
 \subsection{AST enabling and disabling}
 
-The DTASK fixed-part no longer re-enables ASTs, and the various AST 
-events (timed reschedules and AST reschedules) no longer disable ASTs. 
-This means that execution of outstanding AST handlers is no longer 
+The DTASK fixed-part no longer re-enables ASTs, and the various AST
+events (timed reschedules and AST reschedules) no longer disable ASTs.
+This means that execution of outstanding AST handlers is no longer
 delayed while the main-line code tidies-up from earlier events.
 
 \subsection{Message reschedules}
 
-The TASK library makes it possible for a task to send an OBEY to 
-another task, and then request the fixed-part to reschedule this action 
-on receipt of the final acknowledgement from the other task. The 
+The TASK library makes it possible for a task to send an OBEY to
+another task, and then request the fixed-part to reschedule this action
+on receipt of the final acknowledgement from the other task. The
 fixed-part automatically handles message forwarding from the other task.
 
 \subsection{Timeout on AST and message reschedules}
 
-If the application sets RETVAL and then returns with STATUS requesting 
-an AST or message reschedule, the fixed-part will also set a timed 
-reschedule for the time indicated in RETVAL. If the AST or message event 
-happens first, the timer is cancelled. Implications of this are that if 
-the application has been ``accidentally" setting RETVAL in the past, it 
+If the application sets RETVAL and then returns with STATUS requesting
+an AST or message reschedule, the fixed-part will also set a timed
+reschedule for the time indicated in RETVAL. If the AST or message event
+happens first, the timer is cancelled. Implications of this are that if
+the application has been ``accidentally" setting RETVAL in the past, it
 will now set up a timer, and alternatively, if a single action has been
 managing to set up multiple timers for itself, it will now only be able
-to have one outstanding at any one time. 
+to have one outstanding at any one time.
 
 \subsection{Closing down the Parameter system -- Global associations}
 
@@ -1697,17 +1697,17 @@ action completes. This means that parameters retain their values and
 remain ``active", rather than being returned to the ``ground" state.
 {\em It also means that instrumentation tasks never write global
 associations.}
-This behaviour is similar to the behaviour for D-tasks, but unlike the 
+This behaviour is similar to the behaviour for D-tasks, but unlike the
 behaviour for CD-tasks.
 
 \newpage
 
 \section{List of TASK routines\xlabel{list_of_task_routines}\label{tasks}}
 
-The ``action keyword'' is the name by which a task's action is known in 
-the world outside that task. The ``action name'' is the name by which the 
-action is known to the application code inside that task. These names 
-are defined in the interface file. The action keyword defaults to the 
+The ``action keyword'' is the name by which a task's action is known in
+the world outside that task. The ``action name'' is the name by which the
+action is known to the application code inside that task. These names
+are defined in the interface file. The action keyword defaults to the
 action name if it is not otherwise specified.
 
 There is a similar distinction between parameter keywords and parameter
@@ -1886,9 +1886,9 @@ Given and returned : STATUS
 Returned : RESULT
 \end{verbatim}
 
-The following generic string-handling routines are provided to help in 
-building or interpreting VALUE strings. Each TASK\_xxx$<$T$>$ routine 
-represents the set of calls TASK\_xxxC, TASK\_xxxD, TASK\_xxxI, TASK\_xxxL, 
+The following generic string-handling routines are provided to help in
+building or interpreting VALUE strings. Each TASK\_xxx$<$T$>$ routine
+represents the set of calls TASK\_xxxC, TASK\_xxxD, TASK\_xxxI, TASK\_xxxL,
 and TASK\_xxxR.
 
 \small
@@ -1946,8 +1946,8 @@ Given and returned : STATUS
 Returned : STRING
 \end{verbatim}
 
-The following three generic routines are provided for compatibility with 
-earlier ADAM releases. New applications should use the TASK\_ENC calls 
+The following three generic routines are provided for compatibility with
+earlier ADAM releases. New applications should use the TASK\_ENC calls
 instead.
 
 \begin{verbatim}
@@ -1961,7 +1961,7 @@ CALL TASK_VALN<T> ( NDIMS, DIMS, <T>VALS, STRING, STATUS )
 \section{REQUEST constants\xlabel{request_constants}\label{request}}
 
 The values your application can set using TASK\_PUT\_REQUEST to instruct
-the fixed-part are 
+the fixed-part are
 
 \begin{center}
 \begin{tabular}{ll}
@@ -1973,7 +1973,7 @@ ACT\_\_WAIT     &   requests a timed reschedule \\
 \end{tabular}
 \end{center}
 
-The following ACT\_\_ constants also exist for upwards compatibility 
+The following ACT\_\_ constants also exist for upwards compatibility
 with ADAM Version 1.
 \begin{center}
 \begin{tabular}{ll}
@@ -1984,17 +1984,17 @@ ACT\_\_UNIMP    &   the requested action is not implemented \\
 \end{tabular}
 \end{center}
 
-The fixed-part only acts on the REQUEST if your task returns a status of 
+The fixed-part only acts on the REQUEST if your task returns a status of
 SAI\_\_OK. Any other status returned, for example an error status of
 some sort, causes the action to be closed down. The error status is
 returned to the task which issued the original OBEY. Note that
-SS\$\_NORMAL is not recognised as an OK status, and will be reported as 
+SS\$\_NORMAL is not recognised as an OK status, and will be reported as
 an error.
 
 \section{Important STATUS values\xlabel{important_status_values}}
 
 The inquiry routines
-TASK\_GET\_REASON and TASK\_GET\_MESSINFO return a value in one of two groups. 
+TASK\_GET\_REASON and TASK\_GET\_MESSINFO return a value in one of two groups.
 The first group concerns reschedules caused by events in this task.
 
 \begin{center}
@@ -2014,12 +2014,12 @@ MESSYS\_\_TRIGGER    &  a trigger message has arrived, the subsidiary action \\
 DTASK\_\_ACTCOMPLETE &  the subsidiary action completed successfully \\
 DTASK\_\_ACTINFORM   &  the subsidiary action completed with an error \\
 DTASK\_\_ACTCANCEL   &  the subsidiary action was cancelled \\
-DTASK\_\_IVACTSTAT   &  the subsidiary action completed with an illegal 
+DTASK\_\_IVACTSTAT   &  the subsidiary action completed with an illegal
 REQUEST \\
 \end{tabular}
 \end{center}
 
-In addition, the value can be any error status returned by the action 
+In addition, the value can be any error status returned by the action
 in the subsidiary task.
 
 \section{Document changes\xlabel{document_changes}}

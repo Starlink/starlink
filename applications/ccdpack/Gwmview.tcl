@@ -16,15 +16,15 @@ class Gwmview {
 #     This class provides a mega-widget for holding a GWM canvas item
 #     on a canvas.  The GWM item can be destroyed and recreated at
 #     a different size on the same widget.  As well as the GWM display
-#     itself this widget contains buttons which are likely to be 
+#     itself this widget contains buttons which are likely to be
 #     useful in conjunction with it, in particular enough buttons for
 #     the user to be able to do the following:
 #        - Indicate that the widget is no longer needed
 #        - Specify what kind of colour table is wanted (not yet done)
 #        - Specify a zoom level
 #
-#     The value of the zoomlevel is significant to the widget in that 
-#     the 'view'-type coordinates with which one talks to this widget 
+#     The value of the zoomlevel is significant to the widget in that
+#     the 'view'-type coordinates with which one talks to this widget
 #     are mapped to pixel values using it.
 #
 #     This widget does any necessary worrying about scrolling the canvas,
@@ -34,12 +34,12 @@ class Gwmview {
 #
 #     Some methods supplied by this widget require or return coordinates
 #     on the GWM item.  In these cases 'view coordinates' are used;
-#     the origin and extent of the GWM window in view coordinates is set 
+#     the origin and extent of the GWM window in view coordinates is set
 #     when it is constructed with the makegwm method, so that it can
 #     effectively be addressed in any coordinate system of your choice.
-#     The methods canv2view and view2canv are supplied for converting 
-#     between this coordinate system and Tk canvas coordinates which 
-#     are needed if the canvas needs to be addressed directly, for 
+#     The methods canv2view and view2canv are supplied for converting
+#     between this coordinate system and Tk canvas coordinates which
+#     are needed if the canvas needs to be addressed directly, for
 #     instance to create canvas item bindings.
 
 #  Notes:
@@ -56,16 +56,16 @@ class Gwmview {
 
 #  Public Methods:
 #     activate
-#        Sets the status so that the widget is ready to be used.  This 
+#        Sets the status so that the widget is ready to be used.  This
 #        method should be called after sufficient configuration has been
 #        done that the widget can usefully be displayed and the user
 #        can begin to interact with it.  Before calling this method
-#        the widget is likely to be in a non-interacting state; many 
-#        of the other methods will not take any effect until the 
+#        the widget is likely to be in a non-interacting state; many
+#        of the other methods will not take any effect until the
 #        widget has been put into an active status.
 #
 #     canvas
-#        Returns the name of the canvas widget on which any GWM item 
+#        Returns the name of the canvas widget on which any GWM item
 #        will be drawn.  This name will not change during the lifetime
 #        of the Gwmview widget.
 #
@@ -81,25 +81,25 @@ class Gwmview {
 #
 #     deactivate
 #        Put the widget into the 'inactive' status.  After this call many
-#        of the other methods may not reflect their activity in the 
+#        of the other methods may not reflect their activity in the
 #        visible state of the widget.  Inquiring the state of the widget,
 #        for instance using the points method, should continue to work
 #        however.  This method can be called to prevent further user
-#        interaction with the widget and is called when the 'Done' 
-#        button is pushed.  This method can be overridded by children 
-#        of this class to do additional shutdown, for instance to 
+#        interaction with the widget and is called when the 'Done'
+#        button is pushed.  This method can be overridded by children
+#        of this class to do additional shutdown, for instance to
 #        remove bindings (see the unbindall method).
 #
 #     devname
-#        Returns the name of the graphics device associated with the GWM, 
+#        Returns the name of the graphics device associated with the GWM,
 #        as used for submitting to ADAM tasks.
 #
 #     display
 #        Updates the display with respect to the current state of the
-#        widget.  It is called, for instance, when the zoomfactor is 
+#        widget.  It is called, for instance, when the zoomfactor is
 #        updated.  This may not do much in this widget, but widgets
 #        which inherit from it can override this method to do whatever
-#        display updating they may require.  This method may be 
+#        display updating they may require.  This method may be
 #        called more often than is necessary, so if it is going to do
 #        anything slow then it ought to check whether a redisplay is
 #        really required before doing it.
@@ -126,7 +126,7 @@ class Gwmview {
 #
 #        Only one GWM display is allowed per Gwmview widget.  If one
 #        already exists, using this method will replace it with a new one.
-#        The name of the GWM and its corresponding device should be got 
+#        The name of the GWM and its corresponding device should be got
 #        using the gwmname or devname methods respectively.
 #
 #     maxcanvas
@@ -161,16 +161,16 @@ class Gwmview {
 #
 #     lutable = list
 #        This is a one or two element list giving the configuration of
-#        the colour lookup table.  The first element gives the name 
-#        of the table (COLTAB parameter of KAPPA's LUTABLE task) and 
-#        the second element, if present, gives the map type (MAPPING 
+#        the colour lookup table.  The first element gives the name
+#        of the table (COLTAB parameter of KAPPA's LUTABLE task) and
+#        the second element, if present, gives the map type (MAPPING
 #        parameter of LUTABLE) - if absent the value LINEAR is used.
 #
 #     pixelsize = real
-#        This variable is provided for convenience, to modify the way 
+#        This variable is provided for convenience, to modify the way
 #        the zoomfactor variable is accessed.  It should be set to
 #        the (approximate) linear size of a pixel (e.g. an NDF pixel)
-#        in view coordinates.  This variable controls the actual size 
+#        in view coordinates.  This variable controls the actual size
 #        in screen pixels of the GWM created by the makegwm method.
 #
 #     zoom = real
@@ -320,7 +320,7 @@ class Gwmview {
 #  are {0 0}.  Thus this method always puts the GWM item at the origin,
 #  but returns the distance away from its requested coordinates that it
 #  is.  The calling application can then do a $canvas move gwmitem to
-#  move it after it has performed whatever PGPLOT operations it needs to.  
+#  move it after it has performed whatever PGPLOT operations it needs to.
 #  If this bug gets fixed, then the 'set corigin $properorigin' line below
 #  could get uncommented.
 
@@ -364,13 +364,13 @@ class Gwmview {
 #  Unset all canvas bindings.  Because of the way that bind works
 #  (a binding is to a tag, not an item) we can't just use 'all' for the
 #  tabs to remove the bindings (though maybe there is some easier way?).
-         catch { unset taghash } 
+         catch { unset taghash }
          foreach item [ $canvas find all ] {
             foreach tag [ $canvas gettags $item ] {
                set taghash($tag) 1
             }
          }
-         foreach tag [ array names taghash ] { 
+         foreach tag [ array names taghash ] {
             foreach sequence [ $canvas bind $tag ] {
                $canvas bind $tag $sequence {}
             }

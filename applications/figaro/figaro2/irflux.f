@@ -15,7 +15,7 @@ C               image data.
 C
 C     TEMP      The temperature of the black body to be used.
 C
-C     CALTYPE   The type of calibration data. A single character as 
+C     CALTYPE   The type of calibration data. A single character as
 C               follows:
 C                  'J','H','K','L','M' - magnitude in a standard band
 C                  'F' - Flux at specified wavelength
@@ -54,7 +54,7 @@ C     21st Jul 1993  HME / UoE, Starlink.  Use DSA_*_LU.
 C     28th Jul 1993  HME / UoE, Starlink. Disuse STR$UPCASE.
 C     29th Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checks.
 C      5th Feb 1998  BLY / RAL, Starlink.  Added type definitions for
-C                    ICH_ENCODE and ICH_FOLD functions, a type 
+C                    ICH_ENCODE and ICH_FOLD functions, a type
 C                    definition for INVOKE to keep the Linux compiler
 C                    happy.
 C      5th Mar 1998  ACD / UoE, Starlink.  Fixed a bug in the call to
@@ -98,7 +98,7 @@ C
                                  ! errors
       INTEGER      OESLOT        ! Map slot number of output errors
       INTEGER      OPTR          ! Dynamic-memory pointer to data array
-      INTEGER      OQPTR         ! Dynamic-memory pointer to output 
+      INTEGER      OQPTR         ! Dynamic-memory pointer to output
                                  ! quality array
       INTEGER      OQSLOT        ! Map slot number of output quality
                                  ! array

@@ -189,7 +189,7 @@
    50    CONTINUE
 
   100    CONTINUE
-     
+
 *     If the "no clear open requested" flag has been set, then call GESC
 *     to set the state of the GKS device handler
          IF (NCLORQ) THEN
@@ -286,7 +286,7 @@
      :                                                            JSTAT)
          GO TO 9999
   140    CONTINUE
-      
+
 *     Copy the base zone
          XN=ZTV(2,J)
          YN=ZTV(4,J)

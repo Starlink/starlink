@@ -5,14 +5,14 @@
 *     KPS1_WIEOU
 
 *  Purpose:
-*     Copies the final Wiener-filtered image from the file 4 to 
+*     Copies the final Wiener-filtered image from the file 4 to
 *     an image.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WIEOU( NPIX, NLIN, FILE_4, XMARG, YMARG, NP, NL, OUT, 
+*     CALL KPS1_WIEOU( NPIX, NLIN, FILE_4, XMARG, YMARG, NP, NL, OUT,
 *                      BAD, STATUS )
 
 *  Description:
@@ -77,7 +77,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,9 +128,9 @@
             ELSE
                GOOD = .TRUE.
             END IF
-      
+
          END DO
-   
+
       END DO
 
 *  If there were no good pixels in the output, abort.

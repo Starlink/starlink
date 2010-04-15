@@ -15,17 +15,17 @@
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PWD: Peter W. Draper (JAC, Durham University)
 
@@ -46,7 +46,7 @@
 
 #define NDIM 2
 
-int main( int argc, char *argv[] ) 
+int main( int argc, char *argv[] )
 {
     Grp *grp;
     float c[NDIM+1*NDIM];
@@ -55,12 +55,12 @@ int main( int argc, char *argv[] )
     int el;
     int flag;
     int i;
-    int lbnd[NDIM]; 
-    int lbnde[NDIM]; 
-    int lbndi[NDIM]; 
+    int lbnd[NDIM];
+    int lbnde[NDIM];
+    int lbndi[NDIM];
     int status;
-    int ubnd[NDIM]; 
-    int ubnde[NDIM]; 
+    int ubnd[NDIM];
+    int ubnde[NDIM];
     int ubndi[NDIM];
 
     lbnd[0] = 1;
@@ -86,17 +86,17 @@ int main( int argc, char *argv[] )
     /*  Store the ARD description. */
     grp = NULL;
     ardGrpex( "CIR(0,0,20)OFF(10,0)CIR(0,0,20)", NULL, &grp, &flag, &status );
-    
+
     /*  Create the mask. */
     index = 2;
-    ardWork( grp, NDIM, lbnd, ubnd, c, 0, &index, maskPtr, 
+    ardWork( grp, NDIM, lbnd, ubnd, c, 0, &index, maskPtr,
              lbndi, ubndi, lbnde, ubnde, &status );
 
     /*  Check the returned index is correct. */
     if ( index != 4 ) {
         printf( " ARD installation test failed...\n" );
         printf( " Region index returned by ARD_WORK was %d\n", index );
-    } 
+    }
     /*  Check the retuned bounding boxes are correct. */
     else if ( lbndi[0] != 1 || ubndi[0] != 30 ||
               lbndi[1] != 1 || ubndi[1] != 20 ||
@@ -106,10 +106,10 @@ int main( int argc, char *argv[] )
         /*  If the test has failed, display the bounding boxes. */
         printf( " ARD installation test failed...\n" );
         printf( " Internal bounding box:\n" );
-   
+
         if ( lbndi[0] > ubndi[0] ) {
             printf( "... null\n" );
-        } 
+        }
         else {
             for ( i = 0; i < NDIM; i++ ) {
                 printf( "  %d; %d:%d\n", i+1, lbndi[i], ubndi[i] );
@@ -130,7 +130,7 @@ int main( int argc, char *argv[] )
     else {
         printf( " ARD installation test succeeded\n" );
     }
-      
+
     /*  Delete the GRP group. */
     grpDelet( &grp, &status );
 

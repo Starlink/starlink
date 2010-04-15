@@ -95,16 +95,16 @@ int emsGtune( const char *key, int *status )
     /*  Check that the given KEY is acceptable. */
     if ( strcasecmp( key, "SZOUT" ) == 0 ) {
         value = msgtab->msgwsz;
-    } 
+    }
     else if ( strcasecmp( key, "MSGDEF" ) == 0 ) {
         value = msgtab->msgdef;
-    } 
+    }
     else if ( strcasecmp( key, "STREAM" ) == 0 ) {
         value = msgtab->msgstm;
-    } 
+    }
     else if ( strcasecmp( key, "REVEAL" ) == 0 ) {
         value = msgtab->msgrvl;
-    } 
+    }
     else {
         /*  The given tuning parameter was not in the available set. */
         emsMark();

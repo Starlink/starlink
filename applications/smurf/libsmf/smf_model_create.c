@@ -621,10 +621,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                   gain_box = ival;
                }
                kmap = astAnnul( kmap );
-            }                 
-            if( isTordered ) { 
+            }
+            if( isTordered ) {
               ntslice = (idata->dims)[2];
-            } else { 
+            } else {
               ntslice = (idata->dims)[0];
             }
             nblock = ntslice/gain_box;
@@ -753,7 +753,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                 *status = SAI__ERROR;
                 errRep( FUNC_NAME, "Unable to re-size container file",
                         status );
-              } else if( (buf = mmap( 0, buflen, 
+              } else if( (buf = mmap( 0, buflen,
                                       PROT_READ | PROT_WRITE,
                                       MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
                 *status = SAI__ERROR;
@@ -885,8 +885,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               /* Initialize gain to 1, offset to 0, correlation to 0 */
               smf_get_dims( &(head.data), NULL, NULL, &nbolo, NULL, NULL,
                              &bstride, &tstride, status);
-  
-              for( k=0; k<nblock; k++ ) { 
+
+              for( k=0; k<nblock; k++ ) {
                 ibase = k*tstride;
                 for( l=0; l<nbolo; l++ ) {
                   ((double *)dataptr)[ibase] = 1.0;

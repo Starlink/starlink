@@ -433,89 +433,89 @@
       ELSE
 
 *  Set level to use for +/- sigma clip.
-         IF ( .NOT. USECON ) THEN 
+         IF ( .NOT. USECON ) THEN
             MEAN = UMEAN
          END IF
       END IF
 
 *  Call the appropriate version of DEBI
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_DEBIB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBIB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_DEBIUB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBIUB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                     IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_DEBIW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBIW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_DEBIUW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBIUW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                     IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_DEBII( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBII( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_DEBIR( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBIR( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_DEBID( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_DEBID( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                    IDIM1, IDIM2,
-     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
      :                    %VAL( CNF_PVAL( IPBIAS ) ),
      :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
      :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
-     :                    %VAL( CNF_PVAL( IPIDD ) ), 
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
      :                    %VAL( CNF_PVAL( IPWRK ) ),
-     :                    %VAL( CNF_PVAL( IPIDI ) ), 
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
 
       ELSE
@@ -553,31 +553,31 @@
 *  Not generating variances, but have an bias variance and an input
 *  variance - just add these.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL CCG1_ADDB( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDB( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                         %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL CCG1_ADDUB( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDUB( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                          %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-               CALL CCG1_ADDW( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDW( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                         %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-               CALL CCG1_ADDUW( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDUW( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                          %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL CCG1_ADDI( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDI( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                         %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL CCG1_ADDR( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDR( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                         %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL CCG1_ADDD( BAD, EL, %VAL( CNF_PVAL( IPOVAR )), 
+               CALL CCG1_ADDD( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                         %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
             END IF
@@ -600,31 +600,31 @@
 *  variances already present.
       IF ( GENVAR ) THEN
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL CCG1_GVARB( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARB( %VAL( CNF_PVAL( IPOUT ) ),
      :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL CCG1_GVARUB( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARUB( %VAL( CNF_PVAL( IPOUT ) ),
      :                        %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL CCG1_GVARW( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARW( %VAL( CNF_PVAL( IPOUT ) ),
      :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL CCG1_GVARUW( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARUW( %VAL( CNF_PVAL( IPOUT ) ),
      :                        %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL CCG1_GVARI( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARI( %VAL( CNF_PVAL( IPOUT ) ),
      :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL CCG1_GVARR( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARR( %VAL( CNF_PVAL( IPOUT ) ),
      :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL CCG1_GVARD( %VAL( CNF_PVAL( IPOUT ) ), 
+            CALL CCG1_GVARD( %VAL( CNF_PVAL( IPOUT ) ),
      :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          END IF

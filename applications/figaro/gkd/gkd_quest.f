@@ -21,7 +21,7 @@ C  Call:
 C     REPLY = GKD_QUEST (PROMPT,DEFAULT)
 C
 C  Parameters:      (">" input, "<" output)
-C     (>) PROMPT    (Fixed string, descr) The prompt string.  Should 
+C     (>) PROMPT    (Fixed string, descr) The prompt string.  Should
 C                   be 'clean' in the sense that it should not
 C                   include clever control characters, and should
 C                   not have the default value formatted in it.
@@ -29,7 +29,7 @@ C                   It looks best if it ends with a '?'
 C     (>) DEFAULT   (Logical, ref) The default value.  False => NO,
 C                   True => YES.
 C  Returns:
-C     (<) REPLY     (Logical, function value) Set to true if the reply 
+C     (<) REPLY     (Logical, function value) Set to true if the reply
 C                   was YES, to false if it was NO.
 C
 C  Author: Keith Shortridge, AAO
@@ -54,7 +54,7 @@ C
 C
 C     There isn't any need to be clever here.  PAR_QUEST should
 C     work perfectly well, so we use it.  (But there may arise a
-C     situation when it doesn't, and we'll be glad we have this 
+C     situation when it doesn't, and we'll be glad we have this
 C     wrap_up.)
 C
       GKD_QUEST = PAR_QUEST (PROMPT,DEFAULT)

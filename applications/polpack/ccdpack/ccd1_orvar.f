@@ -46,11 +46,11 @@
 *     need to sum all the variances and twice the covariances and use
 *     these to modify the actual variance of the (unordered) data.
 *
-*     - It is assumed that NSET cannot be any larger than CCD1__MXNDF.    
+*     - It is assumed that NSET cannot be any larger than CCD1__MXNDF.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -68,7 +68,7 @@
 *     24-FEB-1997 (PDRAPER):
 *        Removed unnecessary EXP1 and EXP2 estimates
 *     28-JAN-1998 (PDRAPER):
-*        Added check for normal scores with a population of 2. 
+*        Added check for normal scores with a population of 2.
 *        The second score isn't calculated as it is the negative
 *        of the first score.
 *     20-APR-1998 (DSB):
@@ -81,7 +81,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
-      
+
 *     Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'
@@ -152,7 +152,7 @@
 
 *  Get the covariance matrix for I*I.
             V11 = PDA_V11( I, IFAIL )
-            CALL PDA_COVMAT( MATRIX, I, CCD1__MXNDF, V11, PP( 1 ), 
+            CALL PDA_COVMAT( MATRIX, I, CCD1__MXNDF, V11, PP( 1 ),
      :                       PP( 2 ), SUMSQ, IFAIL)
 
 *  Now pack this into the output matrix in the form recognised by other

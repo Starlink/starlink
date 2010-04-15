@@ -41,8 +41,8 @@ C     20th Mar 1986  KS / AAO.  Re-written to use HDS routines.
 C     4th  Feb 1987  KS / AAO.  Now uses the new, recursive, version
 C                    of DAT_ERASE.  (This version will no longer
 C                    work with the original BLISS version of HDS).
-C     10th Jan 1992  KS / AAO.  Syntax of include statements changed to 
-C                    remove VMS logical names and to use lower case, to 
+C     10th Jan 1992  KS / AAO.  Syntax of include statements changed to
+C                    remove VMS logical names and to use lower case, to
 C                    enable compilation on a SUN.
 C     24th Jan 1992  KS / AAO. Calls to EMS added to control error reporting.
 C     14th Oct 1992  HME / UoE, Starlink.  Locating one level up is
@@ -83,7 +83,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert name to upper case and analyse it
 C

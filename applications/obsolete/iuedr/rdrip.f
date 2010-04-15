@@ -7,7 +7,7 @@
 *
 *   Description:
 *      The CMRIP contents are read.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     AT4 version
 *      Paul Rees          06-OCT-88     IUEDR Vn. 2.0
@@ -24,12 +24,12 @@
       INTEGER MAXLABEL            ! maximum label length
       INTEGER MAXPOLY             ! maximum polynomial size
       INTEGER OK                  ! OK status
-      PARAMETER (MAXNAME = 16, MAXLABEL = 40, MAXPOLY = 6, 
+      PARAMETER (MAXNAME = 16, MAXLABEL = 40, MAXPOLY = 6,
      :           OK = 0)
 
 *   Import:
       INTEGER FD                  ! file descriptor
- 
+
 *   Export:
       INTEGER STATUS              ! status return
 
@@ -44,7 +44,7 @@
       INTEGER NCHAR               ! character count
 
       NORIP = .TRUE.
- 
+
 *   TYPE, LABEL
       READ (FD, *, IOSTAT = STATUS) CTYPE, CID
       IF (STATUS.NE.OK) THEN
@@ -57,10 +57,10 @@
       CALL STR_RMBLK(RIPTP)
       CALL GEN_CTOS(CID, MAXLABEL, RIPID, NCHAR)
       CALL STR_RMBLK(RIPID)
- 
+
 *   NRIPM, RIPM, RIPALF, XRLIM
-      READ (FD, *, IOSTAT = STATUS) NRIPM, 
-     :                              (RIPM(I), I = 1, 
+      READ (FD, *, IOSTAT = STATUS) NRIPM,
+     :                              (RIPM(I), I = 1,
      :                              MIN(NRIPM, MAXPOLY)), RIPALF, XRLIM
 
       IF (STATUS.NE.OK) THEN

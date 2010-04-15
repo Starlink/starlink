@@ -68,7 +68,7 @@ proc GetRemoteQuery { } {
      wm transient .getremotequery  .
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 

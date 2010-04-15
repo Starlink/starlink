@@ -88,14 +88,14 @@
       INTEGER SIZE1              ! Size of group IGRP.
       INTEGER SIZE2              ! Size of group GRPS( TOPGRP ).
 
-*. 
+*.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If there is no top group, return .TRUE. if the IGRP group has any
 *  contents, and false otherwise.
-      IF( TOPGRP .LT. 1 .OR. GRPS( TOPGRP ) .EQ. GRP__NOID ) THEN 
+      IF( TOPGRP .LT. 1 .OR. GRPS( TOPGRP ) .EQ. GRP__NOID ) THEN
          CALL GRP_GRPSZ( IGRP, SIZE1, STATUS )
          CHANGE = ( SIZE1 .GT. 0 )
       ELSE

@@ -6,7 +6,7 @@
 *     COV_SORT
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -16,10 +16,10 @@
 *
 *  Description :
 *     Repacks the covariance matrix into convenient form
-*     
+*
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -56,7 +56,7 @@
 	INTEGER INDEX( M_PAR )
 	INTEGER TABLE_FREE( M_PAR )
 	COMMON / FREE_LIST / INDEX, TABLE_FREE
-	
+
 *     Zero all elemsnts below diagonal
 
 	DO J = 1, N_PAR - 1

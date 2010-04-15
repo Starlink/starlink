@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_CEN2( TYPE1, IPDAT1, NCOL1, NLINE1, LBND1,
-     :                      TYPE2, IPDAT2, NCOL2, NLINE2, LBND2, 
+     :                      TYPE2, IPDAT2, NCOL2, NLINE2, LBND2,
      :                      XIN1, YIN1, XIN2, YIN2, NIN,
      :                      ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                      XOUT1, YOUT1, XOUT2, YOUT2, NOUT, STATUS )
@@ -146,7 +146,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -175,7 +175,7 @@
       DOUBLE PRECISION MAXSHF
       INTEGER MAXIT
       DOUBLE PRECISION TOLER
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION XOUT1( * )
       DOUBLE PRECISION YOUT1( * )
@@ -191,8 +191,8 @@
       DOUBLE PRECISION XACC2     ! Centroid position
       DOUBLE PRECISION XPOS1     ! Initial position
       DOUBLE PRECISION XPOS2     ! Initial position
-      DOUBLE PRECISION YACC1     ! Centroid position 
-      DOUBLE PRECISION YACC2     ! Centroid position 
+      DOUBLE PRECISION YACC1     ! Centroid position
+      DOUBLE PRECISION YACC2     ! Centroid position
       DOUBLE PRECISION YPOS1     ! Initial position
       DOUBLE PRECISION YPOS2     ! Initial position
       INTEGER I                  ! Loop counter
@@ -209,7 +209,7 @@
      :     TYPE1 .NE. '_UWORD' .AND.
      :     TYPE1 .NE. '_INTEGER' .AND.
      :     TYPE1 .NE. '_REAL' .AND.
-     :     TYPE1 .NE. '_DOUBLE' ) THEN 
+     :     TYPE1 .NE. '_DOUBLE' ) THEN
          STATUS  = SAI__ERROR
          CALL MSG_SETC( 'TYPE', TYPE1 )
          CALL ERR_REP( 'CCD1_CENT_UNKN',
@@ -222,7 +222,7 @@
      :     TYPE2 .NE. '_UWORD' .AND.
      :     TYPE2 .NE. '_INTEGER' .AND.
      :     TYPE2 .NE. '_REAL' .AND.
-     :     TYPE2 .NE. '_DOUBLE' ) THEN 
+     :     TYPE2 .NE. '_DOUBLE' ) THEN
          STATUS  = SAI__ERROR
          CALL MSG_SETC( 'TYPE', TYPE2 )
          CALL ERR_REP( 'CCD1_CENT_UNKN',
@@ -235,8 +235,8 @@
       CALL ERR_MARK
 
 *  Try to determine the centroid for all positions, one pair at a time.
-      NOUT = 0 
-      DO 1 I = 1, NIN 
+      NOUT = 0
+      DO 1 I = 1, NIN
 
 *  Set the initial positions
          XPOS1 = XIN1( I )
@@ -249,32 +249,32 @@
             CALL CCG1_CENUB( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                       NCOL1, NLINE1, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC1, YACC1, STATUS )
-         ELSE IF ( TYPE1 .EQ. '_BYTE' ) THEN 
-            CALL CCG1_CENB( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+         ELSE IF ( TYPE1 .EQ. '_BYTE' ) THEN
+            CALL CCG1_CENB( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
-         ELSE IF ( TYPE1 .EQ. '_UWORD' ) THEN 
+         ELSE IF ( TYPE1 .EQ. '_UWORD' ) THEN
             CALL CCG1_CENUW( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                       NCOL1, NLINE1, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC1, YACC1, STATUS )
-         ELSE IF ( TYPE1 .EQ. '_WORD' ) THEN 
-            CALL CCG1_CENW( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+         ELSE IF ( TYPE1 .EQ. '_WORD' ) THEN
+            CALL CCG1_CENW( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
-         ELSE IF ( TYPE1 .EQ. '_INTEGER' ) THEN 
-            CALL CCG1_CENI( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+         ELSE IF ( TYPE1 .EQ. '_INTEGER' ) THEN
+            CALL CCG1_CENI( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
-         ELSE IF ( TYPE1 .EQ. '_REAL' ) THEN 
-            CALL CCG1_CENR( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+         ELSE IF ( TYPE1 .EQ. '_REAL' ) THEN
+            CALL CCG1_CENR( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
-         ELSE 
-            CALL CCG1_CEND( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+         ELSE
+            CALL CCG1_CEND( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
@@ -285,32 +285,32 @@
             CALL CCG1_CENUB( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                       NCOL2, NLINE2, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC2, YACC2, STATUS )
-         ELSE IF ( TYPE2 .EQ. '_BYTE' ) THEN 
-            CALL CCG1_CENB( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+         ELSE IF ( TYPE2 .EQ. '_BYTE' ) THEN
+            CALL CCG1_CENB( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
-         ELSE IF ( TYPE2 .EQ. '_UWORD' ) THEN 
+         ELSE IF ( TYPE2 .EQ. '_UWORD' ) THEN
             CALL CCG1_CENUW( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                       NCOL2, NLINE2, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC2, YACC2, STATUS )
-         ELSE IF ( TYPE2 .EQ. '_WORD' ) THEN 
-            CALL CCG1_CENW( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+         ELSE IF ( TYPE2 .EQ. '_WORD' ) THEN
+            CALL CCG1_CENW( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
-         ELSE IF ( TYPE2 .EQ. '_INTEGER' ) THEN 
-            CALL CCG1_CENI( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+         ELSE IF ( TYPE2 .EQ. '_INTEGER' ) THEN
+            CALL CCG1_CENI( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
-         ELSE IF ( TYPE2 .EQ. '_REAL' ) THEN 
-            CALL CCG1_CENR( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+         ELSE IF ( TYPE2 .EQ. '_REAL' ) THEN
+            CALL CCG1_CENR( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
-         ELSE 
-            CALL CCG1_CEND( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+         ELSE
+            CALL CCG1_CEND( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )

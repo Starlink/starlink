@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_PRFMK( MODE, NDIM, DIM, INDAT, VAR, INVAR, IWCS, 
-     :                       NCAX, ARRDIM, NPOS, POS, GEO, ID0, IDS, 
-     :                       PARAM,TITLE, NP, IPPDAT, IPPVAR, BADD, 
+      SUBROUTINE KPS1_PRFMK( MODE, NDIM, DIM, INDAT, VAR, INVAR, IWCS,
+     :                       NCAX, ARRDIM, NPOS, POS, GEO, ID0, IDS,
+     :                       PARAM,TITLE, NP, IPPDAT, IPPVAR, BADD,
      :                       BADV, STATUS )
 *+
 *  Name:
@@ -13,31 +13,31 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PRFMK( MODE, NDIM, DIM, INDAT, VAR, INVAR, IWCS, NCAX, ARRDIM, 
-*                      NPOS, POS, GEO, ID0, IDS, PARAM, TITLE, NP, IPPDAT, 
+*     CALL KPS1_PRFMK( MODE, NDIM, DIM, INDAT, VAR, INVAR, IWCS, NCAX, ARRDIM,
+*                      NPOS, POS, GEO, ID0, IDS, PARAM, TITLE, NP, IPPDAT,
 *                      IPPVAR, BADD, BADV, STATUS )
 
 *  Description:
 *     This routine produces a 1-D array of data and variances values by
-*     sampling the supplied data using nearest neighbour interplation. 
-*     The sample positions are determined using the method specified by 
+*     sampling the supplied data using nearest neighbour interplation.
+*     The sample positions are determined using the method specified by
 *     argument MODE:
 *
 *     POINTS - NPOS samples are produced placed at the NPOS positions
 *     supplied in array POS.
 *
-*     CURVE - Samples are placed at evenly spaced intervals along a 1-D 
-*     curve defined in the Current Frame of a supplied data array. The 
-*     curve is defined by the NPOS positions supplied in array POS. These 
-*     positions are joined in the fashion of a poly-curve, using either 
-*     geodesic line segments or Euclidean line segments. The total number 
-*     of samples along the entire profile can be specified by the caller, 
-*     or a default value equal to the appoximate length of the curve in 
+*     CURVE - Samples are placed at evenly spaced intervals along a 1-D
+*     curve defined in the Current Frame of a supplied data array. The
+*     curve is defined by the NPOS positions supplied in array POS. These
+*     positions are joined in the fashion of a poly-curve, using either
+*     geodesic line segments or Euclidean line segments. The total number
+*     of samples along the entire profile can be specified by the caller,
+*     or a default value equal to the appoximate length of the curve in
 *     pixels can be found and used.
 *
-*     The supplied FrameSet describing the supplied data arrays is modified 
-*     by remapping its Base Frame so that the Base Frame on exit is a 1-D 
-*     GRID Frame corresponding to the single GRID co-ordinate in the returned 
+*     The supplied FrameSet describing the supplied data arrays is modified
+*     by remapping its Base Frame so that the Base Frame on exit is a 1-D
+*     GRID Frame corresponding to the single GRID co-ordinate in the returned
 *     1-D data arrays.
 *
 *     An output positions list may be created holding the position at
@@ -78,8 +78,8 @@
 *        The co-ordinates at NPOS positions along the profile, in the
 *        Current Frame of IWCS.
 *     GEO = LOGICAL (Given)
-*        Should the supplied positions on the profile be connected using 
-*        geodesic curves in the Current Frame of IWCS? If not, the profile 
+*        Should the supplied positions on the profile be connected using
+*        geodesic curves in the Current Frame of IWCS? If not, the profile
 *        is made up of straight line segments in the Current Frame of IWCS.
 *        Not accessed if MODE is POINTS.
 *     ID0 = INTEGER (Given)
@@ -97,7 +97,7 @@
 *        The NDFs title.
 *     NP = INTEGER (Given and Returned)
 *        The number of values in the returned array. If this is zero on
-*        entry, then a default value is used equal to the approximate length 
+*        entry, then a default value is used equal to the approximate length
 *        of the profile in pixels. Otherwise, the supplied value is used.
 *        If MODE is POINTS then NP will always be returned equal to NPOS.
 *     IPPDAT = INTEGER (Returned)
@@ -147,12 +147,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -186,7 +186,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      DOUBLE PRECISION KPG1_ASDIS! Distance between 2 positions      
+      DOUBLE PRECISION KPG1_ASDIS! Distance between 2 positions
 
 *  Local Constants:
       INTEGER NN                 ! No. of positions to use when finding
@@ -252,7 +252,7 @@
 
                CALL ERR_REP( 'KPS1_PRFMK_ERR', 'Profile position #^I '//
      :                       'is invalid within the current '//
-     :                       'co-ordinate Frame of the supplied NDF.', 
+     :                       'co-ordinate Frame of the supplied NDF.',
      :                       STATUS )
                GO TO 999
             END IF
@@ -261,8 +261,8 @@
       END DO
 
 *  Get a simplified Mapping from Base to Current Frame.
-      SMAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE, 
-     :                                     AST__CURRENT, STATUS ), 
+      SMAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE,
+     :                                     AST__CURRENT, STATUS ),
      :                     STATUS )
 
 *  Store a pointer to the Current Frame of the supplied FrameSet.
@@ -272,7 +272,7 @@
       IF( MODE .EQ. 'POINTS' ) THEN
          NP = NPOS
 
-*  In CURVE mode, we need the total length of the lines joining the profile 
+*  In CURVE mode, we need the total length of the lines joining the profile
 *  positions in the Current Frame.
       ELSE
          CLEN = 0.0D0
@@ -285,7 +285,7 @@
 
 *  If the caller has not specified how many samples to place along the
 *  profile, find the default value equal to the (approximate) length of
-*  the profile in the GRID Frame (i.e. in pixels). 
+*  the profile in the GRID Frame (i.e. in pixels).
 *  ====================================================================
       IF( NP .LE. 0 ) THEN
 
@@ -306,7 +306,7 @@
 
 *  Transform these positions into the GRID Frame.
          CALL AST_TRANN( SMAP, NN, NCAX, NN, %VAL( CNF_PVAL( IPCPOS ) ),
-     :                   .FALSE., NDIM, NN, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                   .FALSE., NDIM, NN, %VAL( CNF_PVAL( IPGPOS ) ),
      :                   STATUS )
 
 *  Store a pointer to the Base Frame of the supplied FrameSet.
@@ -321,7 +321,7 @@
 
          DO I = 2, NN
 
-            INTVL = KPG1_ASDIS( BFRM, NN, NDIM, 
+            INTVL = KPG1_ASDIS( BFRM, NN, NDIM,
      :                          %VAL( CNF_PVAL( IPGPOS ) ),
      :                          I - 1, I, .FALSE., STATUS )
 
@@ -358,7 +358,7 @@
      :                   %VAL( CNF_PVAL( IPGPOS ) ), STATUS )
 
 *  In CURVE mode we need to find the sample positions.
-      ELSE      
+      ELSE
 
 *  Allocate memory to hold the Current Frame co-ordinates at NP positions
 *  evenly spaced (in the Current Frame) along the profile.
@@ -376,7 +376,7 @@
 
 *  Transform these positions into the GRID Frame.
          CALL AST_TRANN( SMAP, NP, NCAX, NP, %VAL( CNF_PVAL( IPCPOS ) ),
-     :                   .FALSE., NDIM, NP, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                   .FALSE., NDIM, NP, %VAL( CNF_PVAL( IPGPOS ) ),
      :                   STATUS )
       END IF
 
@@ -395,13 +395,13 @@
 
 *  Sample the input array using nearest-neighbour interpolation at each
 *  of the GRID positions.
-      CALL KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, 
+      CALL KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP,
      :                 %VAL( CNF_PVAL( IPGPOS ) ),
-     :                 %VAL( CNF_PVAL( IPPDAT ) ), 
+     :                 %VAL( CNF_PVAL( IPPDAT ) ),
      :                 %VAL( CNF_PVAL( IPPVAR ) ), BADD, BADV,
      :                 STATUS )
 
-*  Re-map the Base Frame of the supplied FrameSet so that it describes the 
+*  Re-map the Base Frame of the supplied FrameSet so that it describes the
 *  returned 1-D array.
 *  =======================================================================
 
@@ -409,7 +409,7 @@
 *  array into values on the first Base Frame axis. On return, the row
 *  within %VAL( IPGPOS ) holding the LUT values is replaced by an array
 *  of GRID co-ordinate values within the LUT (i.e. 1.0, 2.0, 3.0, etc).
-      CALL KPS1_PRFLT( 1, NP, NDIM, %VAL( CNF_PVAL( IPGPOS ) ), 
+      CALL KPS1_PRFLT( 1, NP, NDIM, %VAL( CNF_PVAL( IPGPOS ) ),
      :                 MAP, STATUS )
 
 *  Loop round all remaining Base Frame axes.
@@ -417,21 +417,21 @@
 
 *  Create a LutMap which transforms 1-D GRID position in the returned 1-D
 *  array into values on the current Base Frame axis.
-         CALL KPS1_PRFLT( I, NP, NDIM, %VAL( CNF_PVAL( IPGPOS ) ), 
+         CALL KPS1_PRFLT( I, NP, NDIM, %VAL( CNF_PVAL( IPGPOS ) ),
      :                    LUTMAP, STATUS )
 
-*  Combine the current total Mapping with this LutMaps in parallel, and then 
+*  Combine the current total Mapping with this LutMaps in parallel, and then
 *  annul the individual pointers.
          CMPMAP = AST_CMPMAP( MAP, LUTMAP, .FALSE., ' ', STATUS )
          CALL AST_ANNUL( MAP, STATUS )
          CALL AST_ANNUL( LUTMAP, STATUS )
-         MAP = CMPMAP          
+         MAP = CMPMAP
 
       END DO
 
 *  We now have a CmpMap with NDIM inputs all of which correspond to the
 *  same single Grid co-ordinate in the returned 1-D array. Create a PermMap
-*  with 1 input and NDIM outputs which will feed all the CmpMap inputs with 
+*  with 1 input and NDIM outputs which will feed all the CmpMap inputs with
 *  the same value.
       PMAP = AST_PERMMAP( 1, 1, NDIM, OUTPRM, 0.0D0, ' ', STATUS )
 
@@ -443,15 +443,15 @@
       MAP = CMPMAP
 
 *  Note the index of the Base and Current Frames in the supplied FrameSet.
-      IBASE = AST_GETI( IWCS, 'BASE', STATUS )      
-      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )      
+      IBASE = AST_GETI( IWCS, 'BASE', STATUS )
+      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Add a 1-D Frame with Domain GRID into the supplied FrameSet, using
 *  the inverse of the above Mapping to connect the original Base Frame to
 *  the new Frame. The new Frame becomes the Current Frame.
       CALL AST_INVERT( MAP, STATUS )
-      CALL AST_ADDFRAME( IWCS, IBASE, MAP, 
-     :                   AST_FRAME( 1, 'DOMAIN=GRID', STATUS ), STATUS ) 
+      CALL AST_ADDFRAME( IWCS, IBASE, MAP,
+     :                   AST_FRAME( 1, 'DOMAIN=GRID', STATUS ), STATUS )
 
 *  Make the new Frame the Base Frame within the FrameSet.
       CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', STATUS ),
@@ -480,7 +480,7 @@
 *  Create an output positions list holding the position at each sample.
 *  ====================================================================
 *  Create the title for the positions list.
-      TTL = 'Output from PROFILE' 
+      TTL = 'Output from PROFILE'
       IAT = 19
       IF( TITLE .NE. ' ' ) THEN
          CALL CHR_APPND( ' -', TTL, IAT )
@@ -489,7 +489,7 @@
       END IF
 
 *  Create the positions list itself.
-      CALL KPG1_WRLST( PARAM, NP, NP, 1, %VAL( CNF_PVAL( IPGPOS ) ), 
+      CALL KPG1_WRLST( PARAM, NP, NP, 1, %VAL( CNF_PVAL( IPGPOS ) ),
      :                 AST__BASE,
      :                 IWCS, TTL( : IAT ), 1, 0, .TRUE., STATUS )
 
@@ -497,7 +497,7 @@
 *  ========
  999  CONTINUE
 
-*  Free the memory holding the sub-sampled GRID and Current Frame profile 
+*  Free the memory holding the sub-sampled GRID and Current Frame profile
 *  positions.
       IF( IPGPOS .NE. 0 ) CALL PSX_FREE( IPGPOS, STATUS )
       IF( IPCPOS .NE. 0 ) CALL PSX_FREE( IPCPOS, STATUS )

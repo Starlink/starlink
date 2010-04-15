@@ -38,18 +38,18 @@ C     Modified:
 C
 C     30 Dec 1985  KS / AAO.  ICSUB added.
 C     10 Jul 1986  KS / AAO.  XCxxx routines added.
-C     24 Jul 1987  DJA/ AAO.  Revised DSA_ routines - some specs 
-C                  changed.  Modified dynamic memory handling - now uses 
+C     24 Jul 1987  DJA/ AAO.  Revised DSA_ routines - some specs
+C                  changed.  Modified dynamic memory handling - now uses
 C                  DYN_ package
 C     30 Oct 1987  KS / AAO.  Added calls to check match between input
 C                  and output arrays.
 C     20 Mar 1989  JM / RAL.  Error and quality handling added.
 C     13 Dec 1989  KS / AAO.  Reorganised to remove redundant mapping of
-C                  arrays copied by DSA_OUTPUT.  Quality and flagged 
+C                  arrays copied by DSA_OUTPUT.  Quality and flagged
 C                  value tests moved prior to map calls.
 C     02 May 1995  PND / JAC. Added support for YCxxx routines.
 C     20 Jul 1995  HME / UoE, Starlink.  INCLUDE changed.
-C     20 Jul 1995  KS / AAO.  Calls to DSA_MATCH_AXES and 
+C     20 Jul 1995  KS / AAO.  Calls to DSA_MATCH_AXES and
 C                  DSA_MATCH_SIZES were in the wrong places. Switched.
 C     15 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.

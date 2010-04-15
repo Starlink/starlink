@@ -49,7 +49,7 @@
 
 *  History:
 *     $Id$
-*     7-OCT-1993: Original version 
+*     7-OCT-1993: Original version
 *    endhistory
 
 *-

@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Find the first and last used height from the flags, since the
-*    heights are in ascending order.  
+*    heights are in ascending order.
 
 *    First height was used.
 
@@ -191,7 +191,7 @@
          IF ( NCH .GT. LIMCH .OR. J .EQ. LAST ) THEN
             CALL MSG_OUT( 'HEIGHT_LIST', BUFFER( :NCH ), STATUS )
 
-*          Start a new line (will be ignored if there are no more 
+*          Start a new line (will be ignored if there are no more
 *          heights to report).
 
             NCH = 0

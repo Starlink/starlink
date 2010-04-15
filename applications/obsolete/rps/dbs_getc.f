@@ -37,7 +37,7 @@
       INCLUDE 'com_dbs_bytes.inc'
       INCLUDE 'com_dbs_rec.inc'
 
- 
+
       COLD = ' '								! Wipe temporary storage.
       TYPE = FORMAT( FIELDNO, REF_NO )( :1 )					! Get type of variable.
 

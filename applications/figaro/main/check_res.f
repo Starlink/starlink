@@ -122,10 +122,10 @@ C      logical defined
 
 *             call dat_state(nloc,defined,status)
 *             if (defined) then
-*             call dat_get0c(nloc, parval, status)                     
+*             call dat_get0c(nloc, parval, status)
 
 *             else
-                
+
 *             endif
 
 *              parval=' '

@@ -17,14 +17,14 @@
 *     Create a new catalogue by joining two catalogues. The effect of the join
 *     is as follows. Consider a large catalogue that contains all the columns
 *     from the INPUT1 catalogue and all the columns from the INPUT2 catalogue.
-*     Into this catalogue put an entry for each combination of entries in 
-*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M 
+*     Into this catalogue put an entry for each combination of entries in
+*     catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M
 *     entries where N is the number of entries in the INPUT1 catalogue and
 *     M the number in the INPUT2 catalogue. Now search this catalogue for
 *     those entries that satisfy the given expression.
 *
 *     Another way of looking at join is to say. Take every entry in turn
-*     from catalogue INPUT1. Match this entry with every entry in 
+*     from catalogue INPUT1. Match this entry with every entry in
 *     catalogue INPUT2 and if the EXPRESSion in satisfied combine both entries
 *     to write to a new catalogue.
 *
@@ -42,10 +42,10 @@
 *        Global status.
 
 *  Notes:
-*     Both the input catalogues and the output catalogue are RESET to their 
+*     Both the input catalogues and the output catalogue are RESET to their
 *     first entries on exit from this routine.
 *
-*     If an invalid expression is given an invalid expression error will be 
+*     If an invalid expression is given an invalid expression error will be
 *     reported.
 *
 *     If the catalogue can not be created an insufficient privilege to create
@@ -69,7 +69,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,12 +92,12 @@
 
 *  External Variables:
       INTEGER CHR_LEN
-      
+
 *  Local Variables:
-      INTEGER LENINPUT 
-      INTEGER LENCNAME 
-      INTEGER LENTOT 
-      INTEGER LENDIFF 
+      INTEGER LENINPUT
+      INTEGER LENCNAME
+      INTEGER LENTOT
+      INTEGER LENDIFF
       INTEGER COUNT
       INTEGER COUNT1
       INTEGER COUNT2
@@ -125,48 +125,48 @@
 *
       count = cd3
        do count1 = 1, CHP__NUMCOLS
-        
+
           EPorig(count,count1) = 0
 *
           EPtype(count, count1) = ' '
 *
-          call chr_fill(' ',EPname(count,count1))        
-          call chr_fill(' ',EPformat(count,count1))        
-          call chr_fill(' ',EPunits(count,count1))        
-          call chr_fill(' ',EPcomment(count,count1))        
+          call chr_fill(' ',EPname(count,count1))
+          call chr_fill(' ',EPformat(count,count1))
+          call chr_fill(' ',EPunits(count,count1))
+          call chr_fill(' ',EPcomment(count,count1))
           EPmdataacc(count,count1) = .FALSE.
           EPdataacc(count,count1) = .FALSE.
-          EPdatelm(count,count1) = 0         
+          EPdatelm(count,count1) = 0
           EPvcflag(count,count1) = .FALSE.
-          call chr_fill(' ',EPvcexp(count,count1))        
+          call chr_fill(' ',EPvcexp(count,count1))
           do count2 = 1, CHP__NUMCOLS
-            call chr_fill(' ',EPvcdep(count,count1,count2))        
+            call chr_fill(' ',EPvcdep(count,count1,count2))
           enddo
           EPnvcdep(count,count1) = 0
           EPdelind(count,count1) = .FALSE.
           EPprefdis(count,count1) = .FALSE.
           EParrshp(count,count1) = 0
           do count2 = 1, CHP__MXDIM
-            EParrdim(count,count1,count2) = 0         
+            EParrdim(count,count1,count2) = 0
           enddo
           EPassert(count, count1) = .FALSE.
-          call chr_fill(' ',EPassexp(count,count1))        
+          call chr_fill(' ',EPassexp(count,count1))
           EPdomchk(count,count1) = .FALSE.
-          EPcoldes(count, count1) = 0 
+          EPcoldes(count, count1) = 0
           EPnsflag(count, count1 ) = 0
-          call chr_fill(' ',EPnsformat(count,count1))        
+          call chr_fill(' ',EPnsformat(count,count1))
           EPhidden(count,count1) = .FALSE.
         enddo
-        
+
         do count1 = 1, CHP__NUMPARS
 
           PPorig(count,count1) = 0
           PPtype(count, count1) = ' '
-          call chr_fill(' ',PPname(count,count1))        
-          call chr_fill(' ',PPunit(count,count1))        
-          call chr_fill(' ',PPformat(count,count1))        
-          call chr_fill(' ',PPcomment(count,count1))        
-          call chr_fill(' ',PPcharval(count,count1))        
+          call chr_fill(' ',PPname(count,count1))
+          call chr_fill(' ',PPunit(count,count1))
+          call chr_fill(' ',PPformat(count,count1))
+          call chr_fill(' ',PPcomment(count,count1))
+          call chr_fill(' ',PPcharval(count,count1))
           PPptrval(count,count1) = 0
           PPmdataacc(count,count1) = .FALSE.
           PPdataacc(count,count1) = .FALSE.
@@ -179,43 +179,43 @@
           enddo
           PPpardes(count, count1) = .FALSE.
           PPnsflag(count, count1) = .FALSE.
-          call chr_fill(' ',PPnsformat(count,count1))        
+          call chr_fill(' ',PPnsformat(count,count1))
         enddo
 
         CPnumext(count) = 0
         CPexttype(count) = .FALSE.
-        call chr_fill(' ',CPsorjexp(count))        
-        call chr_fill(' ',CPcatnotes(count))        
+        call chr_fill(' ',CPsorjexp(count))
+        call chr_fill(' ',CPcatnotes(count))
         do count1 = 1, CHP__MXJCATS
-          call chr_fill(' ',CPorignames(count,count1))        
+          call chr_fill(' ',CPorignames(count,count1))
         enddo
         CPnofndi(count) = 0
         do count1 = 1, CHP__NUMCOLS
           CPndorig(count,count1) = 0
           CPnddatelm(count,count1) = 0
           CPnumndcols(count,count1) = 0
-          call chr_fill(' ',CP1icol(count,count1))        
-          call chr_fill(' ',CP2icol(count,count1))        
-          call chr_fill(' ',CP3icol(count,count1))        
-          call chr_fill(' ',CP4icol(count,count1))        
-          call chr_fill(' ',CP5icol(count,count1))        
-          call chr_fill(' ',CP6icol(count,count1))        
-          call chr_fill(' ',CP7icol(count,count1))        
+          call chr_fill(' ',CP1icol(count,count1))
+          call chr_fill(' ',CP2icol(count,count1))
+          call chr_fill(' ',CP3icol(count,count1))
+          call chr_fill(' ',CP4icol(count,count1))
+          call chr_fill(' ',CP5icol(count,count1))
+          call chr_fill(' ',CP6icol(count,count1))
+          call chr_fill(' ',CP7icol(count,count1))
         enddo
         CPnofasorts(count) = 0
         do count1 = 1, CHP__NUMCOLS
           CPasorig(count,count1) = 0
           CPasdatelm(count,count1) = 0
           CPnumascols(count,count1) = 0
-          call chr_fill(' ',CPfascol(count,count1))        
-          call chr_fill(' ',CPsascol(count,count1))        
-          call chr_fill(' ',CPtascol(count,count1))        
+          call chr_fill(' ',CPfascol(count,count1))
+          call chr_fill(' ',CPsascol(count,count1))
+          call chr_fill(' ',CPtascol(count,count1))
           CPfasdir(count,count1) = 'T'
-          CPsasdir(count,count1) = 'T'   
-          CPtasdir(count,count1) = 'T'   
+          CPsasdir(count,count1) = 'T'
+          CPtasdir(count,count1) = 'T'
         enddo
 
-        call chr_fill(' ',CPname(count))        
+        call chr_fill(' ',CPname(count))
         CPdelind(count) = .FALSE.
         CPnuments(count) = 0
         CPnumcols(count) = 0
@@ -235,25 +235,25 @@
       CPdelind(cd3) = .TRUE.
 *      do ndcount = 1, CPnofndi(cd1)
 *        CPnumndcols(cd2,ndcount) = CPnumndcols(cd1,ndcount)
-*        CP1icol(cd2,ndcount) = CP1icol(cd1,ndcount) 
-*        CP2icol(cd2,ndcount) = CP2icol(cd1,ndcount) 
-*        CP3icol(cd2,ndcount) = CP3icol(cd1,ndcount) 
-*        CP4icol(cd2,ndcount) = CP4icol(cd1,ndcount) 
-*        CP5icol(cd2,ndcount) = CP5icol(cd1,ndcount) 
-*        CP6icol(cd2,ndcount) = CP6icol(cd1,ndcount) 
-*        CP7icol(cd2,ndcount) = CP7icol(cd1,ndcount) 
+*        CP1icol(cd2,ndcount) = CP1icol(cd1,ndcount)
+*        CP2icol(cd2,ndcount) = CP2icol(cd1,ndcount)
+*        CP3icol(cd2,ndcount) = CP3icol(cd1,ndcount)
+*        CP4icol(cd2,ndcount) = CP4icol(cd1,ndcount)
+*        CP5icol(cd2,ndcount) = CP5icol(cd1,ndcount)
+*        CP6icol(cd2,ndcount) = CP6icol(cd1,ndcount)
+*        CP7icol(cd2,ndcount) = CP7icol(cd1,ndcount)
 *        CPnddatelm(cd2,ndcount) = CPnddatelm(cd1,ndcount)
-*        CPndorig(cd2,ndcount) =  CPndorig(cd1,ndcount) 
+*        CPndorig(cd2,ndcount) =  CPndorig(cd1,ndcount)
 *      enddo
 
 *      do ascount = 1, CPnofasorts(cd1)
 *        CPnumascols(cd2,ascount) = CPnumascols(cd1,ascount)
-*        CPfascol(cd2,ascount) = CPfascol(cd1,ascount) 
-*        CPfasdir(cd2,ascount) = CPfasdir(cd1,ascount) 
-*        CPsascol(cd2,ascount) = CPsascol(cd1,ascount) 
-*        CPsasdir(cd2,ascount) = CPsasdir(cd1,ascount) 
-*        CPtascol(cd2,ascount) = CPtascol(cd1,ascount) 
-*        CPtasdir(cd2,ascount) = CPtasdir(cd1,ascount) 
+*        CPfascol(cd2,ascount) = CPfascol(cd1,ascount)
+*        CPfasdir(cd2,ascount) = CPfasdir(cd1,ascount)
+*        CPsascol(cd2,ascount) = CPsascol(cd1,ascount)
+*        CPsasdir(cd2,ascount) = CPsasdir(cd1,ascount)
+*        CPtascol(cd2,ascount) = CPtascol(cd1,ascount)
+*        CPtasdir(cd2,ascount) = CPtasdir(cd1,ascount)
 *        CPasdatelm(cd2,ascount) = CPasdatelm(cd1,ascount)
 *        CPasorig(cd2,ascount) = CPasorig(cd1,ascount)
 *      enddo
@@ -289,9 +289,9 @@
         EPcoldes(cd3,ed) = EPcoldes(cd1,ed)
         EPassert(cd3,ed) = EPassert(cd1,ed)
         EPdomchk(cd3,ed) = EPdomchk(cd1,ed)
-        EParrshp(cd3,ed) = EParrshp(cd1,ed) 
-        EPdatelm(cd3,ed) = EPdatelm(cd1,ed) 
-        EPnsflag(cd3,ed) = EPnsflag(cd1,ed) 
+        EParrshp(cd3,ed) = EParrshp(cd1,ed)
+        EPdatelm(cd3,ed) = EPdatelm(cd1,ed)
+        EPnsflag(cd3,ed) = EPnsflag(cd1,ed)
         EPnsformat(cd3,ed) = EPnsformat(cd1,ed)
         EPhidden(cd3,ed) = EPhidden(cd1,ed)
         EPorig(cd3,ed) = EPorig(cd1,ed)
@@ -374,8 +374,8 @@
         EPassert(cd3,ed) = EPassert(cd2,edcount)
         EPdomchk(cd3,ed) = EPdomchk(cd2,edcount)
         EParrshp(cd3,ed) = EParrshp(cd2,edcount)
-        EPdatelm(cd3,ed) = EPdatelm(cd2,edcount) 
-        EPnsflag(cd3,ed) = EPnsflag(cd2,edcount) 
+        EPdatelm(cd3,ed) = EPdatelm(cd2,edcount)
+        EPnsflag(cd3,ed) = EPnsflag(cd2,edcount)
         EPnsformat(cd3,ed) = EPnsformat(cd2,edcount)
         EPhidden(cd3,ed) = EPhidden(cd2,edcount)
         EPorig(cd3,ed) = EPorig(cd2,edcount)

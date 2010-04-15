@@ -73,17 +73,17 @@
 #.
 
 itcl::class gaia::GaiaEnterObject {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit cat::EnterObject
 
    #  Constructor:
    #  ------------
    constructor {args} {
       eval itk_initialize $args
-   }   
+   }
 
    #  Destructor:
    #  -----------
@@ -103,7 +103,7 @@ itcl::class gaia::GaiaEnterObject {
 
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  Protected variables: (available to instance)
    #  --------------------
 

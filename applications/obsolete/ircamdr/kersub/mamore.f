@@ -84,7 +84,7 @@
 *              for the extra output array dimensions and calculate the output
 *              array dimensions and slice limits according to the value of
 *              LINE.
-*           Else 
+*           Else
 *              Must have 1-D to 2-D case so set CASE to 9 and find out which
 *              axis of the output array the input array will form.
 *              Get window limits for input array dimension and get a value

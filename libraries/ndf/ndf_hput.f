@@ -44,7 +44,7 @@
 *        be suppressed. If a .FALSE. value is given, then default
 *        history information is not suppressed and will later be
 *        appended to the text supplied (unless suppressed by another
-*        call to NDF_HPUT). The supplied value is ignored, and a value 
+*        call to NDF_HPUT). The supplied value is ignored, and a value
 *        of .TRUE. assumed, if APPN is supplied equal to '<APPEND>'.
 *     NLINES = INTEGER (Given)
 *        Number of lines of history text supplied.
@@ -121,12 +121,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -151,8 +151,8 @@
 *        Removed calls to ERR_BEGIN and ERR_END so as to confine the
 *        effect of MSG_LOAD to the current message context only.
 *     16-OCT-2009 (DSB):
-*        IF APPN is supplied as "<APPEND>", append the text to the current 
-*        history record, even if the current history record was created by 
+*        IF APPN is supplied as "<APPEND>", append the text to the current
+*        history record, even if the current history record was created by
 *        a previous application.
 *     {enter_further_changes_here}
 
@@ -160,15 +160,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:

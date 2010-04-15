@@ -111,25 +111,25 @@
 *           Local status value.
 *        NPOSC = INTEGER (Read)
 *           No. of supplied sky positions.
-      
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
       DOUBLE PRECISION XC( N )
       INTEGER IFLAG
-      
+
 *  Arguments Returned:
-      DOUBLE PRECISION FVECC( M ) 
+      DOUBLE PRECISION FVECC( M )
 
 *.
-      
+
 *  Call a lower level routine to do the work, passing the work arrays
 *  using %VAL so that their contents can be accessed.
-      CALL KPS1_SKYF3( M, N, NPOSC, XC, %VAL( CNF_PVAL( IPWA ) ), 
+      CALL KPS1_SKYF3( M, N, NPOSC, XC, %VAL( CNF_PVAL( IPWA ) ),
      :                 %VAL( CNF_PVAL( IPWB ) ),
-     :                 %VAL( CNF_PVAL( IPWX ) ), 
-     :                 %VAL( CNF_PVAL( IPWY ) ),  
+     :                 %VAL( CNF_PVAL( IPWX ) ),
+     :                 %VAL( CNF_PVAL( IPWY ) ),
      :                 %VAL( CNF_PVAL( IPWXO ) ),
      :                 %VAL( CNF_PVAL( IPWYO ) ), FVECC, ISTAT )
 
-      END 
+      END

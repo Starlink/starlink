@@ -1,5 +1,5 @@
 *+  MEDREF - expands ARRIN into ARROUT by reflection about edges of ARRIN
-      SUBROUTINE MEDREF( STEP, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, 
+      SUBROUTINE MEDREF( STEP, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2,
      :                   ARROUT, STATUS )
 *    Description :
 *     The input array, ARRIN, is copied into the central section of the output
@@ -79,7 +79,7 @@
       INTEGER
      :  IDIMS1, IDIMS2, ! dimensions of input array
      :  ODIMS1, ODIMS2, !     "       "   "     "
-     :  STEP        ! 
+     :  STEP        !
       REAL
      :  ARRIN( IDIMS1, IDIMS2 ) ! input array
 *    Export :
@@ -125,7 +125,7 @@
                ARROUT( X, Y ) = ARRIN( XIN, YIN )
             ENDDO
          ENDDO
- 
+
 *       pad bottom STEP rows of output array by a reflection about the row
 *       corresponding to the first row of input array
          DO Y = 1, STEP

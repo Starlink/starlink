@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
 
 *  Arguments Returned:
       LOGICAL OK
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -96,7 +96,7 @@
 *  COMMAND component.
       CALL CMP_GET0C( CLOC, 'COMMAND', COMMND, STATUS )
 
-*  If the history record was not created by the right command, return 
+*  If the history record was not created by the right command, return
 *  with OK set false.
       IF( CSUBST .NE. ' ' .AND. INDEX( COMMND, CSUBST ) .EQ. 0 ) THEN
          OK = .FALSE.

@@ -9,8 +9,8 @@
 {\bf Appendix. Font Selection}
 
 Variations of font type can be achieved with the control
-sequences $\backslash$rm,$\backslash$it,$\backslash$sl,$\backslash$tt {\it etc$\ldotp$} 
-Similar commands can be defined using the $\backslash$font command to access 
+sequences $\backslash$rm,$\backslash$it,$\backslash$sl,$\backslash$tt {\it etc$\ldotp$}
+Similar commands can be defined using the $\backslash$font command to access
 any available fonts. For example  a command $\backslash$inch
 to select the `CMINCH' font (Computer Modern INCH high letters) can be defined thus:
 \smallskip
@@ -24,52 +24,52 @@ is identical to the use of $\backslash$rm, $\backslash$it {\it etc.}
 
 
 In addition to its normal size, each font is provided at a range of
-magnifications in a geometric progression. 
-Specifically, each font is available at magnifications of 1, 1.2, 
+magnifications in a geometric progression.
+Specifically, each font is available at magnifications of 1, 1.2,
 1.2$\times$1.2, {\it etc.} Altogether in the current Starlink version
-of {\TeX}, magnifications of 1, 1.2, 1.44, 1.728, 2.074, 2.488, 
+of {\TeX}, magnifications of 1, 1.2, 1.44, 1.728, 2.074, 2.488,
 2.986, 3.583 and 4.3 are available.
-(The first five of these numbers correspond to $\backslash$magstep0, 
+(The first five of these numbers correspond to $\backslash$magstep0,
 $\backslash$magstep1, $\backslash$magstep2, $\backslash$magstep3,
 $\backslash$magstep4 and $\backslash$magstep5 respectively.
-Additionally there is an intermediate size between 1 and 1.2, 
+Additionally there is an intermediate size between 1 and 1.2,
 $\sqrt{1.2}=1.095$ --- equivalent to $\backslash$magstephalf.)
 
-Magnified fonts can be selected using a `scaling factor' which is 
+Magnified fonts can be selected using a `scaling factor' which is
 1000$\times$the required magnification.
 For example, various sizes of the font `cmb10' can be accessed by
-defining the control sequences $\backslash$fzero, $\backslash$fhalf, 
-$\backslash$fone, $\backslash$ftwo as follows:	
+defining the control sequences $\backslash$fzero, $\backslash$fhalf,
+$\backslash$fone, $\backslash$ftwo as follows:
 \smallskip
 \tt
 \settabs\+\indent&slashfont=cmb10spacescaled 1000&                          \cr
 
-\+&$\backslash$font$\backslash$fzero=cmb10  
+\+&$\backslash$font$\backslash$fzero=cmb10
 &\%  unscaled cmb10\cr
-\+&$\backslash$font$\backslash$fhalf=cmb10 scaled 1095 &\% 1.095$\times$normal size 
+\+&$\backslash$font$\backslash$fhalf=cmb10 scaled 1095 &\% 1.095$\times$normal size
 (equivalent to $\backslash$magstephalf)\cr
-\+&$\backslash$font$\backslash$fone=cmb10 scaled 1200 &\% 1.2$\times$normal size 
+\+&$\backslash$font$\backslash$fone=cmb10 scaled 1200 &\% 1.2$\times$normal size
 (equivalent to $\backslash$magstep1)\cr
 \+&$\backslash$font$\backslash$ftwo=cmb10 scaled 1440 &\% 1.44$\times$normal size
 (equivalent to $\backslash$magstep2)\cr
 \rm
 %Thus you can produce a sentence like this
 
-\TeX\ has a large but limited capacity for fonts. For example, this appendix 
+\TeX\ has a large but limited capacity for fonts. For example, this appendix
 could not be generated in a single \TeX\ run.
 Additionally there is  a limit to the number of fonts the
-CANON laser printer can have on a page. 
+CANON laser printer can have on a page.
 However these restrictions will only inconvenience
 those who require more than about thirty fonts in a document.
 
 The fonts available in the current Starlink version of \TeX\ are shown below,
 and the maximum scaling factor (MSF) at which each is available is indicated.
-It can be assumed those sizes smaller than the maximum are present, thus 
+It can be assumed those sizes smaller than the maximum are present, thus
 an entry of 4300
-indicates that a font is available at scaling factors 1000, 1095, 
+indicates that a font is available at scaling factors 1000, 1095,
 1200, 1440, 1728, 2074, 2488, 2986, 3583 and 4300.
 Attempts to use a non-existent font-size will not cause errors during {\TeX}ing
-but will be reported at the stage when  device-dependent output is 
+but will be reported at the stage when  device-dependent output is
 being generated.
 \bigskip
 

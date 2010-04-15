@@ -28,14 +28,14 @@
 *        The file spec relative to the root directory. E.g. fred.dat,
 *        adam/display.sdf, etc.
 *     OUTSTR = CHARACTER * ( * ) (Returned)
-*        The full file path. E.g. /home/dsb/fred.dat (DISK$USER:[DSB]FRED.DAT 
+*        The full file path. E.g. /home/dsb/fred.dat (DISK$USER:[DSB]FRED.DAT
 *        on VMS), or /home/dsb/adam/display.sdf (DISK$USER:[DSB.ADAM]DISPLAY.SDF on VMS).
 *        Returned blank if an error occurs.
 *     NC = INTEGER (Returned)
 *        Number of characters used in OUTSTR. Returned equal to 0 if an
 *        error occurs.
 *     STATUS = INTEGER (Given and Returned)
-*        The global status.   
+*        The global status.
 
 *  Copyright:
 *     Copyright (C) 1998 CLRC
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,7 +123,7 @@
       ELSE IF( SYSNAM( : 3 ) .EQ. 'VMS' ) THEN
          CALL PSX_GETENV( 'PATH', OUTSTR, STATUS )
 
-      ELSE 
+      ELSE
          CALL PSX_GETENV( 'PWD', OUTSTR, STATUS )
 
       END IF
@@ -149,7 +149,7 @@
             OUTSTR( I : I ) = ']'
 
 *  Replace any remaining "/" with "."
-            CALL CHR_TRCHR( '/', '.', OUTSTR( : NC ), STATUS ) 
+            CALL CHR_TRCHR( '/', '.', OUTSTR( : NC ), STATUS )
 
 *  If the supplied file name does not include a directory part, just
 *  append it to the translation of $HOME.
@@ -168,7 +168,7 @@
       END IF
 
 *  Remove spaces.
-      CALL CHR_RMBLK( OUTSTR( : NC ) ) 
+      CALL CHR_RMBLK( OUTSTR( : NC ) )
 
 
  999  CONTINUE

@@ -127,27 +127,27 @@
       CALL PAR_GET0C( 'IN', INNAM, STATUS )
 
 *  CAT says a bit too much at times. Quiet it down (formatting warnings
-*  mostly). 
+*  mostly).
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  And attempt to open it.
       CI = CAT__NOID
       CALL CAT_TOPEN( INNAM, 'OLD', 'READ', CI, STATUS )
 
-*  Now access the tab table. If it already exists then quietly dispose of 
+*  Now access the tab table. If it already exists then quietly dispose of
 *  it.
       OUTOPN = .FALSE.
       CALL PAR_GET0C( 'OUT', OUTNAM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       INQUIRE( FILE = OUTNAM, EXIST = EXISTS )
-      IF ( EXISTS ) THEN 
+      IF ( EXISTS ) THEN
          CALL FIO_ERASE( OUTNAM, STATUS )
       END IF
-      CALL FIO_OPEN( OUTNAM, 'WRITE', 'LIST', 0, IFD, STATUS ) 
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      CALL FIO_OPEN( OUTNAM, 'WRITE', 'LIST', 0, IFD, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
          OUTOPN = .TRUE.
          CALL FIO_UNIT( IFD, FI, STATUS )
-      ELSE 
+      ELSE
          GO TO 99
       END IF
 
@@ -185,13 +185,13 @@
 
 *   Exit in error.
  99   CONTINUE
-      IF ( CI .NE. CAT__NOID ) THEN 
+      IF ( CI .NE. CAT__NOID ) THEN
          CALL CAT_TRLSE( CI, STATUS )
       END IF
-      IF ( OUTOPN ) THEN 
+      IF ( OUTOPN ) THEN
          CALL FIO_CLOSE( IFD, STATUS )
       END IF
-      
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'CAT2TAB',

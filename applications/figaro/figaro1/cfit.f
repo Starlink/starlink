@@ -3,18 +3,18 @@ C+
 C
 C     C F I T
 C
-C     Figaro function to generate a spectrum by interpolation 
+C     Figaro function to generate a spectrum by interpolation
 C     between points selected interactively using a display
 C     device cursor.  CFIT assumes that a spectrum has already
 C     been displayed by SPLOT, and will generate a new data
 C     structure based on the spectrum displayed, with only the
 C     data changed.
-C       
+C
 C     Command parameters -
 C
 C     OUTPUT      (Character) The name of the output file to
 C                 be created.  If this is the same as the displayed
-C                 spectrum, the data in the displayed spectrum will 
+C                 spectrum, the data in the displayed spectrum will
 C                 be modified.
 C
 C     Command keywords -
@@ -34,7 +34,7 @@ C     (>) SOFT    The device/type string defining the display device
 C
 C                                              KS / CIT 17th May 1983
 C     Modified:
-C        
+C
 C      5th Aug 1987  Rewritten to use the DSA_ and DYN_ routines.  DJA/AAO.
 C     13th Aug 1987  Test for identical X values added before fit.  KS / AAO.
 C     21st Mar 1988  Modified for GKS version of PGPLOT.  KS/AAO.
@@ -62,8 +62,8 @@ C
       INTEGER      DPTR         ! Dynamic-memory pointer to data array
       INTEGER      DSLOT        ! Map slot number of input data array
       REAL         HIGH         ! Highest pixel value
-      INTEGER      IGNORE       ! Used to pass an ignorable error 
-      REAL         LOW          ! Lowest pixel value 
+      INTEGER      IGNORE       ! Used to pass an ignorable error
+      REAL         LOW          ! Lowest pixel value
       INTEGER      NDIM         ! Number of dimensions in data
       INTEGER      NELM         ! Total number of elements in data
       INTEGER      NX           ! Size of 1st dimension
@@ -332,9 +332,9 @@ C
 C
 C           This step is required because the NAG spline evaluator will
 C           reject any point outside the X-range originally supplied.  So
-C           we need to generate two extra points at the extreme ends of 
+C           we need to generate two extra points at the extreme ends of
 C           the spectrum.  We do this by fitting a cubic to the end points
-C           that we have, including one at zero weight at the actual end 
+C           that we have, including one at zero weight at the actual end
 C           point.  We then evaluate the fitted polynomial at that point,
 C           doing this once for each end of the spectrum.
 C

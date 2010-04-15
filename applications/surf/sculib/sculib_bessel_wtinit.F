@@ -22,9 +22,9 @@
 *     The 1-D function 2.0*J1(x)/x is initialised in the declaration, and the
 *     weighting function lookup table is calculated from this. The
 *     tabulation is at intervals of pi/RES for the range 0.0 to RADIUS*pi,
-*     resulting in (RES*RADIUS)**2 values. The weight function is also 
+*     resulting in (RES*RADIUS)**2 values. The weight function is also
 *     multiplied by a cosine over the oute third to reduce edge effects.
-* 
+*
 *     The look up table is initialised such that one can access the
 *     weight directly given the square of the distance between the input
 *     and output pixel. We use a fixed resolution out to 10PI.
@@ -39,7 +39,7 @@
 *     RES = INTEGER (Given)
 *        Number of points per scale lenghth.
 *     STATUS = INTEGER (Given & Returned)
-*        Global status     
+*        Global status
 
 *  Authors:
 *     T. Jenness (timj@jach.hawaii.edu) - FORTRAN version
@@ -120,7 +120,7 @@
       WTFN(1) = 1.0
       WTFN(SIZE + 1) = 0.0
       DO I = 2, SIZE
-     
+
          BUFFBESS = SQRT(REAL(I)) * PI / REAL(RES)
 
          WTFN(I) = 2.0 * SCULIB_BESSJ1(BUFFBESS, STATUS) / BUFFBESS
@@ -128,7 +128,7 @@
       END DO
 
       ISTART = NINT(0.66 * 0.66 * REAL(SIZE))
-      ISTOP = PI * 0.5 / SQRT(REAL(SIZE - ISTART)) 
+      ISTOP = PI * 0.5 / SQRT(REAL(SIZE - ISTART))
 
 
 *    WTFN(ISTART) = WTFN(ISTART) since COS(0) = 1.0

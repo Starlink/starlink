@@ -62,7 +62,7 @@
       INCLUDE 'ASTRO_PAR'
 
 *  Local Constants:
-      INTEGER MAXDIM      
+      INTEGER MAXDIM
       PARAMETER (MAXDIM=10)
 
 *  Functions
@@ -100,7 +100,7 @@
       CHARACTER*32 X_INFO (2)    ! input x-axis info
       CHARACTER*32 Y_INFO (2)    !    "  y-axis   "
       CHARACTER*128 DTA_NAME     ! DTA item name
-      CHARACTER*128 TSDAT_DTA_NAME ! DTA name for TSDAT structure in JCMT 
+      CHARACTER*128 TSDAT_DTA_NAME ! DTA name for TSDAT structure in JCMT
                                   ! structure
       CHARACTER*128 TS_XUNITS    ! DTA name for TSDAT copy of x-axis units
       CHARACTER*128 TS_XLABEL    ! DTA name for TSDAT copy of x-axis label
@@ -181,7 +181,7 @@
 
 *  check the LST values are present and map them
 
-      CALL DTA_CRNAM ('INPUT', 'MORE.JCMT.LST.DATA_ARRAY', 0, 0, 
+      CALL DTA_CRNAM ('INPUT', 'MORE.JCMT.LST.DATA_ARRAY', 0, 0,
      :   DTA_NAME, DSTAT)
       NELM = DIMS(1)*DIMS(2)
       CALL DTA_MRVARD (DTA_NAME, NELM, ADDRESS, DSTAT)
@@ -202,14 +202,14 @@
       CALL DSA_OUTPUT ('OUTPUT', 'OUTPUT', 'INPUT', 1, 1, STATUS)
 
 *  create a TSDAT structure in the output JCMT structure to hold the original
-*  axis arrays and an array that will hold the index of the time 
+*  axis arrays and an array that will hold the index of the time
 *  sorted data in the original map.
 
-      CALL DTA_CRNAM ('OUTPUT', 'MORE.JCMT.TSDAT', 0, 0, TSDAT_DTA_NAME, 
+      CALL DTA_CRNAM ('OUTPUT', 'MORE.JCMT.TSDAT', 0, 0, TSDAT_DTA_NAME,
      :   DSTAT)
       CALL DTA_CRVAR (TSDAT_DTA_NAME, 'struc', DSTAT)
 
-*  create and map arrays in TSDAT to hold map axes, and time-spectrum -> map 
+*  create and map arrays in TSDAT to hold map axes, and time-spectrum -> map
 *  index use any old structure names as they will never be accessed by general
 *  applications (using old Figaro format names actually)
 
@@ -245,27 +245,27 @@
          CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.DATA', 1, DIMS(2), DTA_NAME,
      :      DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'FLOAT', DSTAT)
-         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.DATA', 0, 0, DTA_NAME, 
+         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.DATA', 0, 0, DTA_NAME,
      :      DSTAT)
          NELM = DIMS(2)
          CALL DTA_MUVARF (DTA_NAME, NELM, ADDRESS, DSTAT)
          TS_YAXPTR = DYN_ELEMENT (ADDRESS)
-         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.UNITS', 1, 32, DTA_NAME, 
+         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.UNITS', 1, 32, DTA_NAME,
      :      DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'CHAR', DSTAT)
-         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.UNITS', 0, 0, TS_YUNITS, 
+         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.UNITS', 0, 0, TS_YUNITS,
      :      DSTAT)
-         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.LABEL', 1, 32, DTA_NAME, 
+         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.LABEL', 1, 32, DTA_NAME,
      :      DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'CHAR', DSTAT)
-         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.LABEL', 0, 0, TS_YLABEL, 
+         CALL DTA_CRNAM (TSDAT_DTA_NAME, 'Y.LABEL', 0, 0, TS_YLABEL,
      :      DSTAT)
 
 *  write y-axis units and label
 
-         CALL DTA_WRVARC (TS_YUNITS, ICH_LEN(Y_INFO(1)), Y_INFO(1), 
+         CALL DTA_WRVARC (TS_YUNITS, ICH_LEN(Y_INFO(1)), Y_INFO(1),
      :      DSTAT)
-         CALL DTA_WRVARC (TS_YLABEL, ICH_LEN(Y_INFO(2)), Y_INFO(2), 
+         CALL DTA_WRVARC (TS_YLABEL, ICH_LEN(Y_INFO(2)), Y_INFO(2),
      :      DSTAT)
 
       END IF
@@ -302,17 +302,17 @@
       NELM = DIMS(1) * DIMS(2)
       CALL DSA_RESHAPE_DATA ('OUTPUT', 'INPUT', 1, NELM, STATUS)
       CALL DSA_RESHAPE_AXIS ('OUTPUT', 1, 'INPUT', 1, 1, NELM, STATUS)
-      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
      :   SLOT, STATUS)
       OUTDPTR = DYN_ELEMENT(ADDRESS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, 
+         CALL DSA_MAP_ERRORS ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
      :      SLOT, STATUS)
          OUTEPTR = DYN_ELEMENT(ADDRESS)
       ENDIF
-      CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'DOUBLE', 
+      CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'DOUBLE',
      :   ADDRESS, SLOT, STATUS)
-      OUTAPTR = DYN_ELEMENT(ADDRESS)         
+      OUTAPTR = DYN_ELEMENT(ADDRESS)
 
 *  set flagged value flag after creation of data arrays
 
@@ -327,7 +327,7 @@
 *  get size in bytes of various data types used
 
       FSIZE = DSA_TYPESIZE ('FLOAT', STATUS)
-      DSIZE = DSA_TYPESIZE ('DOUBLE', STATUS)       
+      DSIZE = DSA_TYPESIZE ('DOUBLE', STATUS)
 
 *  get some workspace for the GEN_?VSORT arrays
 
@@ -339,7 +339,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-*  create a sort vector using the LST array 
+*  create a sort vector using the LST array
 
          CALL JCMT_QDISORT (DYNAMIC_MEM(LSTPTR), NELM,
      :      DYNAMIC_MEM(IND_PTR))
@@ -348,7 +348,7 @@
 
          CALL GEN_MOVE (FSIZE*NELM, DYNAMIC_MEM(DATPTR),
      :      DYNAMIC_MEM(OUTDPTR))
-         CALL GEN_FVSORT (DYNAMIC_MEM(IND_PTR), NELM, 1, 
+         CALL GEN_FVSORT (DYNAMIC_MEM(IND_PTR), NELM, 1,
      :      DYNAMIC_MEM(FW_PTR), DYNAMIC_MEM(OUTDPTR))
 
 *  same for errors, and LST->axis

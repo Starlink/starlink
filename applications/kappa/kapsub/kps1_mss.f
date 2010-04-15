@@ -14,7 +14,7 @@
 
 *  Description:
 *     The user is asked for the co-ordinates of a point in the current
-*     co-ordinate systems of a group of NDFs.  For each NDF in a given 
+*     co-ordinate systems of a group of NDFs.  For each NDF in a given
 *     group which contains this point, the pixel value at that point
 *     is returned in an array.
 
@@ -25,7 +25,7 @@
 *        The number of NDFs in the group (size of IGRP).
 *     COMP = CHARACTER * ( * ) (Given)
 *        The component of the NDFs which is to be interrogated.  May
-*        be 'DATA', 'VARIANCE', 'ERROR' or 'QUALITY'. 
+*        be 'DATA', 'VARIANCE', 'ERROR' or 'QUALITY'.
 *     NGOOD = INTEGER (Returned)
 *        The number of good pixels found.
 *     PIXS( * ) = DOUBLE PRECISION (Returned)
@@ -36,12 +36,12 @@
 
 *  Notes:
 *     ILEVEL = INTEGER (Given)
-*        If 1 nothing is printed. If 2 print statistics. If 3, print 
+*        If 1 nothing is printed. If 2 print statistics. If 3, print
 *        statistics and pixel values.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils.  Copyright (C) 2009 Science & Technology Facilities 
+*     Councils.  Copyright (C) 2009 Science & Technology Facilities
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -191,7 +191,7 @@
       BUF( 50: ) = '-----------'
       CALL MSG_OUTIF( MSG__VERB, ' ', BUF, STATUS )
 
-*  Loop over each NDF getting the value for the selected position for 
+*  Loop over each NDF getting the value for the selected position for
 *  each one.
       NGOOD = 0
       DO I = 1, NNDF
@@ -214,15 +214,15 @@
 *  Get the dimensionality of the current Frame.
          NCDIM = AST_GETI( IWCS, 'NAXES', STATUS )
 
-*  Check that this is consistent with the dimensionality of the 
+*  Check that this is consistent with the dimensionality of the
 *  reference NDF.
          IF ( NCDIM .NE. NCDIM0 ) THEN
             CALL GRP_GET( IGRP, 1, 1, NAME, STATUS )
             CALL MSG_SETC( 'NDF1', NAME )
             CALL GRP_GET( IGRP, I, 1, NAME, STATUS )
             CALL MSG_SETC( 'NDF2', NAME )
-            STATUS = SAI__ERROR 
-            CALL ERR_REP( 'KPS1_MSS_ERR1:', 
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'KPS1_MSS_ERR1:',
      :                    'Current Frames of ^NDF1 and ^NDF2 have ' //
      :                    'different dimensionalities.', STATUS )
             GO TO 999
@@ -255,7 +255,7 @@
      :                    EL, STATUS )
 
 *  Extract the single pixel value.
-            CALL KPG1_RETRD( EL, 1, %VAL( CNF_PVAL( IPCOMP ) ), 
+            CALL KPG1_RETRD( EL, 1, %VAL( CNF_PVAL( IPCOMP ) ),
      :                       PIXS( NGOOD + 1 ), STATUS )
 
 *  Check if this pixel is good.
@@ -287,14 +287,14 @@
          BUF( 29: ) = ' ' // AST_GETC( IWCS, 'DOMAIN', STATUS )
          CALL MSG_LOAD( ' ', ' ^VALUE', BUF( 49: ), IAT, STATUS )
          CALL MSG_OUTIF( MSG__VERB, ' ', BUF, STATUS )
-        
+
       END DO
 
 *  Write summary information.
       CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
       CALL MSG_SETI( 'NGOOD', NGOOD )
-      CALL MSG_OUTIF( MSG__NORM, ' ', 
+      CALL MSG_OUTIF( MSG__NORM, ' ',
      :                ' Number of non-bad pixels:  ^NGOOD', STATUS )
       CALL MSG_BLANKIF( MSG__VERB, STATUS )
 

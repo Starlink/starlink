@@ -61,10 +61,10 @@
 *    Write a message to the log file
       CALL CHR_FILL( ' ', LOG_LINE )
       CPOS = 0
-      CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LOG_LINE, CPOS ) 
+      CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LOG_LINE, CPOS )
       CALL CHR_PUTC( DELIMITER, LOG_LINE, CPOS )
-      CALL CHR_PUTC( ' Contents of ', LOG_LINE, CPOS ) 
-      CALL CHR_PUTC( SRC_FILE(1:CHR_LEN(SRC_FILE))//' ', LOG_LINE, CPOS ) 
+      CALL CHR_PUTC( ' Contents of ', LOG_LINE, CPOS )
+      CALL CHR_PUTC( SRC_FILE(1:CHR_LEN(SRC_FILE))//' ', LOG_LINE, CPOS )
       CALL CHR_PUTC( DELIMITER, LOG_LINE, CPOS )
       CALL FIO_WRITE( LOG_UNIT, LOG_LINE(1:CPOS), STATUS )
 
@@ -75,20 +75,20 @@
 *       Prefix the SRC line with the time stamp
          CALL CHR_FILL( ' ', LOG_LINE )
          CPOS = 0
-         CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LOG_LINE, CPOS ) 
-         CALL CHR_PUTC( SRC_LINE(1:CLEN), LOG_LINE, CPOS ) 
+         CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LOG_LINE, CPOS )
+         CALL CHR_PUTC( SRC_LINE(1:CLEN), LOG_LINE, CPOS )
          CALL FIO_WRITE( LOG_UNIT, LOG_LINE(1:CPOS), STATUS )
       ENDDO
 
 *    Reset status if we hit end of file
       IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
- 
+
 *    Write a message to the log file delimiting the end of the SRC file
       CPOS = 0
-      CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LOG_LINE, CPOS ) 
+      CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LOG_LINE, CPOS )
       CALL CHR_PUTC( DELIMITER, LOG_LINE, CPOS )
-      CALL CHR_PUTC( ' End of ', LOG_LINE, CPOS ) 
-      CALL CHR_PUTC( SRC_FILE(1:CHR_LEN(SRC_FILE))//' ', LOG_LINE, CPOS ) 
+      CALL CHR_PUTC( ' End of ', LOG_LINE, CPOS )
+      CALL CHR_PUTC( SRC_FILE(1:CHR_LEN(SRC_FILE))//' ', LOG_LINE, CPOS )
       CALL CHR_PUTC( DELIMITER, LOG_LINE, CPOS )
       CALL FIO_WRITE( LOG_UNIT, LOG_LINE(1:CPOS), STATUS )
 

@@ -110,8 +110,8 @@
 	DATA TAME_FACTOR / 1.0 /
 
 	END
-	
 
-	
+
+
 
 

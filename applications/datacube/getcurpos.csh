@@ -10,16 +10,16 @@
 #     C-shell script.
 #
 #  Usage:
-#     source ${DATACUBE_DIR}/getcurpos.csh -a axes [-ci index] 
+#     source ${DATACUBE_DIR}/getcurpos.csh -a axes [-ci index]
 #            [-d device] [-f frame] [-g]
 #
 #  Description:
-#     This shell script activates the cursor upon a selected graphics 
+#     This shell script activates the cursor upon a selected graphics
 #     device, and returns the co-ordinate(s) of a single point.  There
-#     is a choice of co-ordinate axis or axes (see option -a) and 
+#     is a choice of co-ordinate axis or axes (see option -a) and
 #     co-ordinate Frame (see option -f).  The plot is also annotated to
 #     indicate the chosen position: a cross marks X-Y position, a
-#     vertical or horizontal line spanning the data area of the plot 
+#     vertical or horizontal line spanning the data area of the plot
 #     for an X or position respectively.
 #
 #  Parameters:
@@ -34,7 +34,7 @@
 #       The graphics device. [xwin]
 #     -f frame
 #       The co-ordinate Frame in which the co-ordinates are required.
-#       If not supplied, the Frame used to create the plot is used. 
+#       If not supplied, the Frame used to create the plot is used.
 #       Likely values are "PIXEL" and "SPECTRUM".  []
 #     -g
 #       If present, this indicates that the returned value(s) should be
@@ -53,7 +53,7 @@
 #  Notes:
 #      -  It is assumed that the co-ordinate Frame is stored in the AGI
 #      database.  Normally the current Frame is used.
-#      -  It uses /tmp/<user>/getcurpos.tmp to record the output from 
+#      -  It uses /tmp/<user>/getcurpos.tmp to record the output from
 #      KAPPA:CURSOR.
 #
 #  Implementation Status:
@@ -68,7 +68,7 @@
 #       Original version.
 #     2006 March 9 (MJC):
 #       Validate colour index.  Renamed "Returned Variables" to "Shell
-#       Variables" and reformatted to give access and data type. 
+#       Variables" and reformatted to give access and data type.
 #       Correct the Usage.  Use internal variable names (gcp_ prefix) to
 #       avoid potential classhes with variables from calling script.
 #     {enter_further_changes_here}
@@ -171,9 +171,9 @@ else
    endif
 endif
 
-# Wait for CURSOR output then get X-Y co-ordinates from 
+# Wait for CURSOR output then get X-Y co-ordinates from
 # the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${gcp_curfile} ) 
+while ( ! -e ${gcp_curfile} )
    sleep 1
 end
 

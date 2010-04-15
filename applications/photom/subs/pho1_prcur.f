@@ -88,7 +88,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'GNS_PAR'          ! Graphics name system constants 
+      INCLUDE 'GNS_PAR'          ! Graphics name system constants
 
 *  Arguments Given:
       INTEGER MNCHOI             ! Minimum number of choices

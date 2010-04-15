@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh
 #
 #  Prologue at end since the UNIX SST routines do not understand
 #  That hash is a comment character
@@ -55,7 +55,7 @@ unalias echo
 
 set out = "sdip"
 
-# Run skydip 
+# Run skydip
 
 if ($#argv == 0) then
    skydip  out=$out model_out=${out}_m
@@ -94,7 +94,7 @@ if (-e ${out}.sdf) then
     touch sdip_p1.eps
     touch sdip_p2.eps  # For linux
     \rm sdip_p1.eps* sdip_p2.eps*
-   
+
 
     # Now we can setup a postscript plot if needed
     if ($newkappa == 0) then
@@ -208,7 +208,7 @@ exit
 *    sdip [NDF]
 *
 *  Description:
-*    This script first runs the skydip task in order to fit the sky 
+*    This script first runs the skydip task in order to fit the sky
 *    parameters to the data. The sky data and model are written to files
 *    and are then displayed using Kappa's linplot. A hardcopy is also
 *    written to file sdip.eps

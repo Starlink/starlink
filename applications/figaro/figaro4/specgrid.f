@@ -27,16 +27,16 @@
 *     least three dimensions the first two non-spectroscopic axes can be
 *     used instead. The plot area is the current (AGI) picture of the
 *     graphics device.
-* 
+*
 *     The plot can be an overlay in coordinate space to a previous plot,
 *     or a new plot. A plot can be combined from spectra in different
 *     NDFs, or it can overlay spectra on an image of the same or a
 *     similar region in coordinate space.
-* 
+*
 *     The previous contents of the plot area can be erased or not.
 *     If the plot is not an overlay, then the space to be left for
 *     axis labels as well as the exact labelling can be specified.
-* 
+*
 *     The labelling (in coordinate space) consists of axes, axis ticks,
 *     numeric labels at the major ticks, and text labels. The axes are
 *     counted from bottom clockwise. Each axis can be drawn or not. Each
@@ -44,28 +44,28 @@
 *     labels or not. The left and right axes can have either horizontal
 *     (orthogonal) or vertical (parallel) numeric labels. Each axis can
 *     have a text label or not.
-* 
+*
 *     The kind of labelling is controlled by several 4-character
 *     strings. Each character is the switch for axis 1, 2, 3, 4
 *     respectively. "0" turns an option off for that axis, "+" turns
 *     it on. For the ticks and for numeric labels of axes 2 and 4, "-"
 *     is also allowed. It yields inward ticks and vertical numeric
 *     labels.
-* 
+*
 *     Labelling in spectroscopic space (e.g. wavelength-intensity space)
 *     is optional. It is in the form of an empty spectrum cell at a
 *     specified position in coordinate space. This legend cell is
 *     labelled with the ranges in spectroscopic space that is covered by
 *     each cell. It also has text labels to indicate what quantities are
 *     displayed.
-* 
+*
 *     The attributes of the plot can be selected. These are
 *     -  colour
 *     -  line thickness
 *     -  character height
 *     -  simple or roman font
 *     -  dash pattern
-* 
+*
 *     Most parameters default to the last used value.
 
 *  Usage:
@@ -358,7 +358,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

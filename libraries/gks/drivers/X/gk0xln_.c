@@ -55,40 +55,40 @@ f77_integer gk0xln_(npts, x, y)
      char OnOff[6];
      };
   static struct pattern
-    dashed = 			/* Broken line patterns,  similar to Sigmex */ 
+    dashed = 			/* Broken line patterns,  similar to Sigmex */
       {2, {4,4,0,0,0,0} },
-    dotted = 
+    dotted =
       {2, {1,3,0,0,0,0} },
     dash_dot =
       {4, {4,3,1,3,0,0} },
-    dash_dot_dot = 
-      {6, {4,3,1,3,1,3} }; 
+    dash_dot_dot =
+      {6, {4,3,1,3,1,3} };
 
   static struct pattern
     *patterns[] =		/* Array of references to the patterns above */
     {
       &dashed, &dotted, &dash_dot, &dash_dot_dot
     };
-      
+
   static struct pattern			/* Cached line pattern (see header comments)*/
     cached_pattern;
 
-  
+
   static unsigned int
     brush = 1;		/* Width cache */
 
   static Display *display;	/* Current default display to draw on */
   static GC LGC;		/* The GC to setup for drawing */
-  
+
   extern char
     *malloc();			/* For allocating pixrect coordinate array */
-  
+
   extern GC XDefaultGC();	/* for getting default GC */
-  
+
   XPoint *points;		/* Pointer to X coordinates */
 
   static int style = LineSolid;	/* X Line style */
-  
+
   f77_integer
     b_left,			/* Changed display area left bound */
     b_right,			/* Changed display area right bound */
@@ -134,7 +134,7 @@ f77_integer gk0xln_(npts, x, y)
 	/* Set style and multiply segment lengths by the line width */
 
 	style = LineOnOffDash;
-	
+
 	cached_pattern.NumOnOff = patterns[new_style - 2]->NumOnOff;
 	for(i = 0; patterns[new_style - 2]->NumOnOff != i; i++)
 	  cached_pattern.OnOff[i] = patterns[new_style - 2]->OnOff[i] * new_width;
@@ -143,7 +143,7 @@ f77_integer gk0xln_(npts, x, y)
       /* Update the cached_style */
 
       cached_style = new_style;
-      
+
       /* Now update the brush */
 
       if (new_width == 1) brush = 0;
@@ -190,12 +190,12 @@ f77_integer gk0xln_(npts, x, y)
     XSetLineAttributes(display,LGC,brush,style,CapButt,JoinMiter);
     XSetFillStyle(display, LGC, FillSolid);
     if(cached_style != 1) XSetDashes(display,LGC,1,cached_pattern.OnOff,cached_pattern.NumOnOff);
-    
+
     /* Render the polyine */
-    
+
     XDrawLines(display, (Drawable *)gk0xunportask(ddbm,ASKBMMEMORY), LGC,
                points, *npts, CoordModeOrigin);
-    
+
     /* Set up the update area in the workstation workspace */
 
     if(b_left < gkywkd_.kwkdat[wkix][ILEFT])

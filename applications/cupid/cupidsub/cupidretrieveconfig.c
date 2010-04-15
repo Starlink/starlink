@@ -23,7 +23,7 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status ){
 
 *  Description:
 *     This function reads the CONFIG component of the supplied CUPID
-*     extension and forms an AST KeyMap from it. It is the reverse of 
+*     extension and forms an AST KeyMap from it. It is the reverse of
 *     cupidStoreConfig.
 
 *  Parameters:
@@ -103,13 +103,13 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status ){
 
 /* Find how many there are and loop round them all. */
       datSize( aloc, (size_t *) &size, status );
-      for( i = 1; i <= size; i++ ) { 
+      for( i = 1; i <= size; i++ ) {
 
 /* Get a locator to the current cell of the array and read its value into
    character string "text". */
          datCell( aloc, 1, &i, &cloc, status );
          datGet0C( cloc, text, GRP__SZNAM, status );
-         datAnnul( &cloc, status ); 
+         datAnnul( &cloc, status );
 
 /* Store this string in the GRP group. */
          grpPut1( grp, text, 0, status );
@@ -121,7 +121,7 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status ){
 /* Delete the group */
       grpDelet( &grp, status );
 
-/* Return an empty KeyMap if the CUPID extension does not contain a CONFIG 
+/* Return an empty KeyMap if the CUPID extension does not contain a CONFIG
    component. */
    } else {
       ret = astKeyMap( " " );

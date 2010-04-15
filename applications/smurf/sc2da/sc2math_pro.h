@@ -1,7 +1,7 @@
 #ifndef HEADGEN____sc2math_pro_h
-#define HEADGEN____sc2math_pro_h 
- 
- 
+#define HEADGEN____sc2math_pro_h
+
+
 /*+ sc2math_calcmapwt - Make weight matrix for DREAM solution*/
 
 void sc2math_calcmapwt
@@ -47,8 +47,8 @@ int *status             /* global status (given and returned) */
 
 /*+ sc2math_choles - Factorize symmetric positive definite matrix */
 
-void sc2math_choles 
-( 
+void sc2math_choles
+(
 int n,         /* Dimension of the matrix (given) */
 double a[],    /* Square matrix of NxN values.
                   Only the lower-left triangle is given and returned.
@@ -65,7 +65,7 @@ int *ierr      /* Error code
 
 /*+ sc2math_cholesky - Invert matrix according to the Cholesky method */
 
-void sc2math_cholesky 
+void sc2math_cholesky
 (
 int nunkno,     /* The number of unknowns (given) */
 double lmat[],  /* The lower left triangle of the equation matrix.
@@ -93,7 +93,7 @@ int *status             /* global status (given and returned) */
 
 /*+ sc2math_conval - Calculate a value of the convolution function */
 
-double sc2math_conval 
+double sc2math_conval
 (
 int conv_shape,     /* Code for convolution function (given) */
 double conv_sig,    /* Convolution function parameter (given) */
@@ -117,8 +117,8 @@ int *status       /* global status (given and returned) */
 
 /*+ sc2math_cubfit - fit a set of values with a cubic */
 
-void sc2math_cubfit 
-( 
+void sc2math_cubfit
+(
 int npts,                 /* number of data points (given) */
 double *x,                /* observed values (given) */
 double *y,                /* observed values (given) */
@@ -129,7 +129,7 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_eq0  - Make equation matrix */
 
-void sc2math_eq0 
+void sc2math_eq0
 (
 int nunkno,        /* The number of unknowns (given) */
 double lcoef[],    /* The known values (given) */
@@ -191,7 +191,7 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_get_cycle - Return data for a single measurement cycle */
 
-void sc2math_get_cycle 
+void sc2math_get_cycle
 (
 int cur_cycle,    /* current cycle number (given) */
 int nsam_cycle,   /* number of samples per cycle (given) */
@@ -219,7 +219,7 @@ int *status          /* global status (given and returned) */
 
 /*+ sc2math_interpwt - Calculate the weight matrix for spatial interpolation */
 
-void sc2math_interpwt 
+void sc2math_interpwt
 (
 int npath,           /* Nr of rows (given) */
 int ngrid,           /* Nr of columns (given) */
@@ -235,7 +235,7 @@ int *status          /* (given and returned) */
 
 /*+ sc2math_invpdm - Invert positive definite matrix */
 
-void sc2math_invpdm 
+void sc2math_invpdm
 (
 int n,       /* Dimension of the matrix (given) */
 double a[]   /* Square Matrix with NxN points.
@@ -306,10 +306,10 @@ int *status        /* global status (given and returned) */
 
 /*+  sc2math_matinv - invert a symmetric matrix */
 
-void sc2math_matinv 
-( 
+void sc2math_matinv
+(
 int norder,            /* degree of matrix (given) */
-double array[10][10],  /* given matrix, its inverse is returned 
+double array[10][10],  /* given matrix, its inverse is returned
                          (given and returned) */
 double *det,           /* determinant of ARRAY (returned) */
 int *status            /* global status (given and returned) */
@@ -317,7 +317,7 @@ int *status            /* global status (given and returned) */
 
 /*+ sc2math_msv - Multiply matrix with column vector */
 
-void sc2math_msv 
+void sc2math_msv
 (
 int m,        /* Number of unknowns (given) */
 double s[],   /* Lower left triangle of a symmetric matrix of MxM (given) */
@@ -327,7 +327,7 @@ double x[]    /* Vector with dimension M with the result (returned) */
 
 /*+ sc2math_pathwts - Pixel weights for SMU path */
 
-void sc2math_pathwts 
+void sc2math_pathwts
 (
 int conv_shape,       /* Code for convolution function (given) */
 double conv_sig,      /* Convolution function parameter (given) */
@@ -341,34 +341,34 @@ int *status           /* global status (given and returned) */
 
 /*+ sc2math_recurfit - fit a set of values with outlier rejection */
 
-void sc2math_recurfit 
-( 
+void sc2math_recurfit
+(
 int despike,            /* flag for spike removal (given) */
 int npts,               /* number of data points (given) */
 int nterms,             /* number of combined waveforms (given) */
 double *standard_waves,   /* values of standard waveforms (given) */
-double *standard_weights, /* if volts[j] is not to be used, 
+double *standard_weights, /* if volts[j] is not to be used,
                             standard_weights[j] = 0.0, otherwise
                             standard_weights[j] = 1.0 (given) */
 double *volts,            /* observed values (given) */
-double *used_weights,     /* if volts[j] was not used, 
-                            used_weights[j] = 0.0, otherwise 
+double *used_weights,     /* if volts[j] was not used,
+                            used_weights[j] = 0.0, otherwise
                             used_weights[j] = 1.0 (returned) */
-double *fitted_volts,     /* combined waveform computed from the fit 
+double *fitted_volts,     /* combined waveform computed from the fit
                             (returned) */
 double *coeffs,           /* coefficients of fit (returned) */
 double *variances,        /* variances of fit (returned) */
 int *nbad,              /* number of points rejected as suspected
                             "spikes" (returned) */
-int *status             /* status must be 0 on entry. 
+int *status             /* status must be 0 on entry.
                             If no valid fit was found, SAI__ERROR is
                             returned (given and returned) */
 );
 
 /*+  sc2math_regres - multiple linear regression fit */
 
-void sc2math_regres 
-( 
+void sc2math_regres
+(
 int npts,      /* number of data points (given) */
 int nterms,    /* number of combined waveforms (given) */
 double *x,       /* values of standard waveforms (given) */
@@ -380,7 +380,7 @@ double *a,       /* coefficients of fit (returned) */
 double *sigma0,  /* standard deviation of A0 (returned) */
 double *sigmaa,  /* array of standard deviations for coefficients
                    (returned) */
-double *r,       /* array of linear correlation coefficients 
+double *r,       /* array of linear correlation coefficients
                    (returned) */
 double *rmul,    /* multiple linear correlation coefficient (returned) */
 double *chisqr,  /* reduced chi square for fit (returned) */
@@ -389,7 +389,7 @@ double *perr,    /* probable error in deviation of a single point from
                    the fit (returned) */
 int *status    /* status must be OK on entry
                    on exit, STATUS = OK => fit ok
-                   STATUS = DITS__APP_ERROR => exact fit (no noise) 
+                   STATUS = DITS__APP_ERROR => exact fit (no noise)
                    (given and returned) */
 );
 
@@ -397,11 +397,11 @@ int *status    /* status must be OK on entry
 
 void sc2math_remsine
 (
-int phase,        /* position in scan corresponding to zero phase 
+int phase,        /* position in scan corresponding to zero phase
                       of the superimposed sine (given) */
 double period,      /* period in samples of the sine wave (given) */
 int scanlen,      /* length of scan (given) */
-double *scan,       /* the time series of measurements (given and 
+double *scan,       /* the time series of measurements (given and
                       returned) */
 double *amplitude,  /* amplitude of the sine wave (returned) */
 int *status       /* global status (given and returned) */
@@ -421,7 +421,7 @@ double *r     /* Response value (returned) */
 /*+ sc2math_setcal - set flatfield calibration for a bolometer */
 
 void sc2math_setcal
-( 
+(
 int nboll,               /* total number of bolometers (given) */
 int bol,                 /* number of current bolometer (given) */
 int numsamples,          /* number of data samples (given) */
@@ -436,7 +436,7 @@ int *status              /* global status (given and returned) */
 /*+ sc2math_setcaldec - set decreasing flatfield calibration */
 
 void sc2math_setcaldec
-( 
+(
 int nboll,               /* total number of bolometers (given) */
 int bol,                 /* number of current bolometer (given) */
 const double dvalue,     /* representative data number (given) */
@@ -450,7 +450,7 @@ int *status              /* global status (given and returned) */
 /*+ sc2math_setcalinc - set increasing flatfield calibration */
 
 void sc2math_setcalinc
-( 
+(
 int nboll,               /* total number of bolometers (given) */
 int bol,                 /* number of current bolometer (given) */
 const double dvalue,     /* representative data number (given) */
@@ -465,8 +465,8 @@ int *status              /* global status (given and returned) */
 
 void sc2math_sigmaclip
 (
-int type,             /* 0 for double sided clip, 
-                        >0 positive clip, 
+int type,             /* 0 for double sided clip,
+                        >0 positive clip,
                         <0 negative clip (given) */
 size_t np,            /* number of points (given) */
 const double x[],     /* X data (given) */
@@ -479,8 +479,8 @@ int *status           /* global status (given and returned) */
 
 /*+  sc2math_sinedemod - sine wave demodulate a signal */
 
-void sc2math_sinedemod 
-( 
+void sc2math_sinedemod
+(
 int length,          /* length of the signal array (given) */
 double *sine,          /* sine wave (given) */
 double *cosine,        /* cosine wave (given) */
@@ -492,8 +492,8 @@ int *status          /* global status (given and returned) */
 
 /*+ sc2math_smooth - apply smoothing kernel */
 
-void sc2math_smooth 
-( 
+void sc2math_smooth
+(
 int nweights,      /* number of values in kernel (given) */
 double weights[],  /* smoothing kernel (given) */
 int numvals,       /* number of values in dataset (given) */
@@ -503,9 +503,9 @@ int *status        /* global status (given and returned) */
 
 /*+ sc2math_smupath - Calculate the path positions of the SMU */
 
-void sc2math_smupath 
+void sc2math_smupath
 (
-int nvert,           /* number of vertices in the jiggle pattern, 
+int nvert,           /* number of vertices in the jiggle pattern,
                         implemented are :
                         =1 : No visit of points.
                         At the moment a circle but that does not work !
@@ -550,7 +550,7 @@ int *status         /* global status (given and returned) */
 
 /*+ sc2math_sol - Solution of least square fit */
 
-void sc2math_sol 
+void sc2math_sol
 (
 int nunkno,      /* The number of unknowns (given) */
 int nequ,        /* The number of observed points (given) */
@@ -567,26 +567,26 @@ double lsol[]    /* solved parameters of the Least Square Solution
 /*+ sc2math_trace - provide a flag for debugging level */
 
 int sc2math_trace
-( 
+(
 int value       /* trace level (given) */
 );
 
 /*+ sc2math_vec - Make known vector */
 
-void sc2math_vec 
+void sc2math_vec
 (
 int nunkno,        /* The number of unknowns (given) */
 double lcoef[],    /* The known values (given) */
 double lknow,      /* The measured point, or observed value (given) */
-double lvec[],     /* array to contain the known vector 
-                      (given and returned) */ 
+double lvec[],     /* array to contain the known vector
+                      (given and returned) */
 double *lssum      /* sum of the square of known terms (returned) */
 );
 
 /*+  sc2math_wavegen - generate sine and cosine signals */
 
-void sc2math_wavegen 
-( 
+void sc2math_wavegen
+(
 double period,                 /* period in array elements (given) */
 int length,                  /* length of arrays (given) */
 double *sine,                  /* generated sine wave (returned) */
@@ -594,6 +594,6 @@ double *cosine,                /* generated cosine wave (returned) */
 int *status                  /* global status (given and returned) */
 );
 
- 
- 
+
+
 #endif

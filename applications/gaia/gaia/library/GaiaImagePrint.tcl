@@ -94,7 +94,7 @@ itcl::class gaia::GaiaImagePrint {
    #  Methods:
    #  --------
 
-   #  Override set_background to really set the background to the 
+   #  Override set_background to really set the background to the
    #  requested colour (rather than always white). Add a large
    #  surround to remove edge problems.
    method set_background {} {

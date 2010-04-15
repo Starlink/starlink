@@ -16,12 +16,12 @@
 *     The routine parses a list of NDF extension names, extracting each
 *     name from a comma separated list supplied and adding the name to an
 *     AST KeyMap. Each entry in the KeyMap has a key that is the
-*     extension name and a value which is zero if INCLUD is FALSE and one 
-*     if INCLUD is TRUE. The comma separated list may specify names for 
-*     EXCLUSION (i.e. extensions not to be copied) or INCLUSION (i.e. 
+*     extension name and a value which is zero if INCLUD is FALSE and one
+*     if INCLUD is TRUE. The comma separated list may specify names for
+*     EXCLUSION (i.e. extensions not to be copied) or INCLUSION (i.e.
 *     extensions to be copied, over-riding a previous inclusion).
 *
-*     If a name equal to "*" is encountered, all entries currently in 
+*     If a name equal to "*" is encountered, all entries currently in
 *     the KeyMap are set to 1 (if INCLUD is .TRUE.) or 0 (if INCLUD is
 *     .FALSE.).
 
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,17 +149,17 @@
                L = L + I1 - 1
 
 *  If the name is just an asterisk, assign 1 or 0 to all entries
-*  currently in the KeyMap. 
+*  currently in the KeyMap.
                IF( STR( F : L ) .EQ. '*' ) THEN
                   NKEY = AST_MAPSIZE( KEYMAP, STATUS )
                   DO IKEY = 1, NKEY
-                     CALL AST_MAPPUT0I( KEYMAP, AST_MAPKEY( KEYMAP, 
+                     CALL AST_MAPPUT0I( KEYMAP, AST_MAPKEY( KEYMAP,
      :                                                   IKEY, STATUS ),
      :                                  KEYVAL, ' ', STATUS )
                   END DO
 
 *  Otherwise, check the name for validity.
-               ELSE 
+               ELSE
                   CALL NDF1_CHXNM( STR( F : L ), STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -169,9 +169,9 @@
 
 *  Add an entry to the KeyMap. This will over-write any existing entry
 *  for this extension name.
-                     CALL AST_MAPPUT0I( KEYMAP, NAME, KEYVAL, ' ', 
+                     CALL AST_MAPPUT0I( KEYMAP, NAME, KEYVAL, ' ',
      :                                  STATUS )
-   
+
                   END IF
                END IF
             END IF
@@ -182,7 +182,7 @@
          I1 = I2 + 2
          GO TO 1
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PXLST', STATUS )
 

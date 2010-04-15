@@ -15,7 +15,7 @@
 *                      ARRAY3,STATUS)
 
 *  Description:
-*     Create an image from the Gaussians defined. 
+*     Create an image from the Gaussians defined.
 
 *  Arguments:
 *     NSOUR = Integer (Given)
@@ -100,7 +100,7 @@
 
 *   For each source.
       DO 10 I=1,NSOUR
-         
+
 *      Define a converted angle.
          PIC=PASS(I,7)*PI2360
 
@@ -117,22 +117,22 @@
 *         Determine angle and distance from origin.
             X1=REAL(X)-PASS(I,1)
             Y1=REAL(Y)-PASS(I,2)
-            IF (ABS(X1).GT.1E-10) THEN 
+            IF (ABS(X1).GT.1E-10) THEN
                ANGLE=ATAN(Y1/X1)-PIC
                RD=SQRT(X1**2+Y1**2)
             ELSE
                ANGLE=PIOV2-PIC
                RD=Y1
             END IF
-               
-*         Find value of X and Y relative to unrotated Gaussian.  
+
+*         Find value of X and Y relative to unrotated Gaussian.
             XV=(RD*COS(ANGLE)/PASS(I,5))**2
             YV=(RD*SIN(ANGLE)/PASS(I,6))**2
 
 *         Calculate pixel brightness and add it to the current value.
             ARRAY3(J)=ARRAY3(J)+V1*EXP(-(ABS(YV)+ABS(XV))/4.)
 
- 20      CONTINUE 
+ 20      CONTINUE
 
 
  10   CONTINUE

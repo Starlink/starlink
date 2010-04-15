@@ -7,9 +7,9 @@ C   ---------
 C
 C   Description
 C   -----------
-C   Inspects an image or an image subset and determines the total, maximum, 
-C   minimum, mean, and standard deviation. The coordinates of the maximum 
-C   and minimum pixels, the total number of pixels inspected, and (if 
+C   Inspects an image or an image subset and determines the total, maximum,
+C   minimum, mean, and standard deviation. The coordinates of the maximum
+C   and minimum pixels, the total number of pixels inspected, and (if
 C   applicable) the number of bad  pixels found are output. The bad
 C   pixel flag may be checked to ensure that it has the correct value.
 C
@@ -37,23 +37,23 @@ C
 C   START  Start coordinate in each dimension of the subset to be inspected.
 C          (real, array)(prompted for).
 C
-C   END    End coordinate in each dimension of the subset to be inspected. 
+C   END    End coordinate in each dimension of the subset to be inspected.
 C          (real, array)(prompted for).
 C
-C   The following parameters are all set by the program and written to the 
+C   The following parameters are all set by the program and written to the
 C   parameter file:
 C
-C   STAT_TOTAL   Sum of the pixel values 
+C   STAT_TOTAL   Sum of the pixel values
 C
-C   STAT_MIN     Minimum pixel value 
+C   STAT_MIN     Minimum pixel value
 C
 C   STAT_MAX     Maximum pixel value
 C
-C   STAT_MEAN    Mean pixel value 
+C   STAT_MEAN    Mean pixel value
 C
 C   STAT_SIGMA   Standard distribution of the pixel values
 C
-C   STAT_SIZE    Number of pixels inspected 
+C   STAT_SIZE    Number of pixels inspected
 C
 C   STAT_BADPIX  Number of bad pixels (magic or bad quality) found
 C
@@ -95,8 +95,8 @@ C   CHECK  Instructs the program to check whether the bad pixel flag is set
 C          correctly and, if necessary, correct it. (hidden keyword).
 C
 C   PASS2  Instructs the program to compute the standard deviation using
-C          two passes through the data. The one-pass algorithm normally 
-C          used is prone to rounding error when large numbers of pixels 
+C          two passes through the data. The one-pass algorithm normally
+C          used is prone to rounding error when large numbers of pixels
 C          are involved, but is rather faster. If fewer than 10000 pixels
 C          are involved, STATS always uses two passes, since other overheads
 C          outweigh the extra time taken.
@@ -109,7 +109,7 @@ C
 C
 C   Method
 C   ------
-C   - The IMAGE structure is tested for the bad pixel flag. If it is found 
+C   - The IMAGE structure is tested for the bad pixel flag. If it is found
 C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
 C   - The program can be instructed to check whether the bad pixel flag is
@@ -118,10 +118,10 @@ C     that magic values are present and then inspecting the whole image.
 C   - For images with less than 10000 pixels the two pass method is used
 C     automatically. For larger images the instruction to use the two pass
 C     method is prompted for.
-C   - A NDP_STATS_ subroutine appropriate to the required method, the data 
+C   - A NDP_STATS_ subroutine appropriate to the required method, the data
 C     type, the presence or absence of magic values, and the instruction
 C     to check the bad pixel flag is called to compute the statistics.
-C   - If the whole of IMAGE was inspected, the range structure is updated 
+C   - If the whole of IMAGE was inspected, the range structure is updated
 C     and marked as valid.
 C   - The bad data flag is corrected if necessary.
 C   - Several parameters are set to the values of the statistical quantities
@@ -169,7 +169,7 @@ C
 C   Library PAR:
 C      PAR_RDKEY
 C      PAR_ABORT
-C     
+C
 C   Library VAR:
 C      VAR_SETNUM
 C
@@ -190,7 +190,7 @@ C   Extensions to FORTRAN77
 C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
-C            
+C
 C   Possible future upgrades
 C   ------------------------
 C
@@ -266,7 +266,7 @@ C
       INCLUDE 'DYNAMIC_MEMORY'
       INCLUDE 'MAGIC_VALUES'
       INCLUDE 'NUMERIC_RANGES'
-C                      
+C
 C     Initialize.
 C
       STATUS=0
@@ -310,7 +310,7 @@ C
       END IF
 C
 C     Get IMAGE axis range.
-C                              
+C
       IF(.NOT.CHECK)THEN
         CALL NDP_AXIS_RANGE
      &    ('IMAGE',DIMS,NDIM,START,END,STAPIX,ENDPIX,STATUS)
@@ -325,7 +325,7 @@ C
           ENDPIX(I)=DIMS(I)
         END DO
       END IF
-C                               
+C
 C     Compute dimensions and number of elements in subset.
 C
       SUBNELM=1
@@ -343,16 +343,16 @@ C
       END IF
 C
 C     Map IMAGE data array (and error / quality array?)
-C      
+C
       IF(TYPE.EQ.'SHORT')THEN
         CALL DSA_MAP_DATA('IMAGE','READ','SHORT',ADDRESS,ISLOT,STATUS)
-        IMPTR=DYN_ELEMENT(ADDRESS)                 
+        IMPTR=DYN_ELEMENT(ADDRESS)
         IF (ERR) CALL DSA_MAP_ERRORS('IMAGE','READ','SHORT',ADDRESS,
      &                               ESLOT,STATUS)
         EPTR=DYN_ELEMENT(ADDRESS)
       ELSE
         CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,ISLOT,STATUS)
-        IMPTR=DYN_ELEMENT(ADDRESS)                 
+        IMPTR=DYN_ELEMENT(ADDRESS)
         IF (ERR) CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',ADDRESS,
      &                               ESLOT,STATUS)
         EPTR=DYN_ELEMENT(ADDRESS)
@@ -364,14 +364,14 @@ C
         IF (STATUS.NE.0) GO TO 500
         QPTR=DYN_ELEMENT(ADDRESS)
       END IF
-C           
+C
 C     See if two pass method is required.
 C
-      IF(SUBNELM.LE.10000)THEN 
+      IF(SUBNELM.LE.10000)THEN
         PASS2=.TRUE.
       ELSE
         CALL PAR_RDKEY('PASS2',.FALSE.,PASS2)
-      END IF   
+      END IF
 C
 C     At this point, the user may wish to abort
 C
@@ -388,7 +388,7 @@ C
      &                           BADPIX,MAGIC_SHORT,NELM,
      &                           EMEAN,EDEV,STATUS)
         END IF ! (ERR)
-        IF(PASS2)THEN                       
+        IF(PASS2)THEN
           IF(.NOT.BADPIX)THEN
             CALL NDP_STATS2_W(DYNAMIC_MEM(IMPTR),DIMS,NDIM,NELM,
      &                        STAPIX,ENDPIX,TOTAL,MAXVAL,MINVAL,
@@ -423,7 +423,7 @@ C
      &                           BADPIX,MAGIC_FLOAT,NELM,
      &                           EMEAN,EDEV,STATUS)
         END IF ! (ERR)
-        IF(PASS2)THEN                       
+        IF(PASS2)THEN
           IF(.NOT.BADPIX)THEN
             CALL NDP_STATS2_R(DYNAMIC_MEM(IMPTR),DIMS,NDIM,NELM,
      &                        STAPIX,ENDPIX,TOTAL,MAXVAL,MINVAL,
@@ -463,7 +463,7 @@ C
         IF(STATUS.NE.0)GO TO 500
       END IF
 C
-C     If the check option was requested, correct the bad pixel flag if 
+C     If the check option was requested, correct the bad pixel flag if
 C     necessary.
 C
       IF(CHECK)THEN
@@ -502,7 +502,7 @@ C
       STRING='  Max   = '
       DUMINT=ICH_ENCODE(STRING,MAXVAL,11,4,NEXT)
       NEXT=MAX(NEXT,17)
-      STRING(NEXT:)=' in pixel ('  
+      STRING(NEXT:)=' in pixel ('
       DUMINT=ICH_ENCODE(STRING,MAXPIX(1),NEXT+11,0,NEXT)
       STRING(NEXT:NEXT)=','
       DO I=2,NDIM
@@ -515,7 +515,7 @@ C
       STRING='  Min   = '
       DUMINT=ICH_ENCODE(STRING,MINVAL,11,4,NEXT)
       NEXT=MAX(NEXT,17)
-      STRING(NEXT:)=' in pixel ('  
+      STRING(NEXT:)=' in pixel ('
       DUMINT=ICH_ENCODE(STRING,MINPIX(1),NEXT+11,0,NEXT)
       STRING(NEXT:NEXT)=','
       DO I=2,NDIM
@@ -542,8 +542,8 @@ C
         DUMINT=ICH_ENCODE(STRING,EDEV,17,5,NEXT)
         CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
       END IF
-C                   
-      IF(BADPIX)THEN                   
+C
+      IF(BADPIX)THEN
         STRING='  No. of magic value pixels = '
         DUMINT=ICH_ENCODE(STRING,MAGICPIX,31,0,NEXT)
         CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')

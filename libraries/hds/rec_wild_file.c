@@ -674,7 +674,7 @@ from a shell process - ^MESSAGE",
             *fname = (*context)->list[ current ].name;
             *fname_len = (*context)->list[ current ].len;
          }
-      }      
+      }
 
 /* Exit the routine.                                                        */
       return;

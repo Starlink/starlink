@@ -13,7 +13,7 @@
 *    ADAM A-task
 
 * Usage:
-*    hwrite inp file [binary=] [fmt=] 
+*    hwrite inp file [binary=] [fmt=]
 
 * ADAM Parameters:
 *    INP = UNIV (Read)
@@ -29,17 +29,17 @@
 * Description :
 *      Writes values from an HDS primitive object into an ASCII (default)
 *      or binary file. One value is written per record.
-* 
+*
 *      For ASCII file output a default format is used unless explicitly
 *      overridden.
- 
+
 * Examples:
 *    % hwrite cfile.structure.data values.dat
 *       Write component DATA to ASCII file values.dat with default format
 *
 *    % hwrite cfile.structure.data values.dat fmt=F12.6
 *       As above but with specified format
-* 
+*
 *    % hwrite cfile.structure.data values.dat binary
 *       Write component DATA in binary form into sequential, unformatted
 *       file.
@@ -155,7 +155,7 @@
         IF (PRIM) THEN
           IF ( type .eq. '_LOGICAL' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'READ',PTR,NVAL,STATUS)
-	    CALL HWRITE_LPUT ( LUN, BINARY, FMT,%VAL(CNF_PVAL(PTR)), 
+	    CALL HWRITE_LPUT ( LUN, BINARY, FMT,%VAL(CNF_PVAL(PTR)),
      :                  NVAL,STATUS)
 	  ELSEIF (( type .eq. '_INTEGER' )  .OR.
      &         ( type .eq. '_UWORD'   )  .OR.

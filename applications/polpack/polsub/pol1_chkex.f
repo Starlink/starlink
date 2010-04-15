@@ -15,7 +15,7 @@
 
 *  Description:
 *     The routine does the following:
-*     1) Checks that the POLPACK extension contains one and only one of 
+*     1) Checks that the POLPACK extension contains one and only one of
 *     WPLATE, ANLANG or STOKES. An error is reported if not.
 *     2) If STOKES is found, no further checks are made.
 *     3) If WPLATE is found...
@@ -25,15 +25,15 @@
 *     basename of the NDF.
 *     5) Checks that the IMGID value is unique amongst the NDFs being
 *     processed. If not, a warning (not an error) is given.
-*     6) Appends the WPLATE or ANLANG value to the FILTER value. If there is 
+*     6) Appends the WPLATE or ANLANG value to the FILTER value. If there is
 *     no FILTER value then one is created equal to WPLATE or ANLANG.
 *     7) Copies the FILTER value into the CCDPACK extension (an extension
 *     is created if necessary).
 *     8) Adds a Frame into the NDF's WCS component representing a 2D
-*     cartesian coordinate system with origin at pixel coordinates (0,0), 
+*     cartesian coordinate system with origin at pixel coordinates (0,0),
 *     with its first axis parallel to the analyser for WPLATE = 0.0
 *     degrees.
-*     
+*
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        Identifier for the NDF.
@@ -81,7 +81,7 @@
 *     12-FEB-1999 (DSB):
 *        Added support for ANLANG as an alternative to WPLATE, and allow
 *        arbitrary values for WPLATE when using single-beam data. WPLATE
-*        changed from _CHAR to _REAL. 
+*        changed from _CHAR to _REAL.
 *     15-FEB-1999 (DSB):
 *        Use HDS component path and slice spec in IMGID (if they are not
 *        blank).
@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
       INTEGER CHR_LEN
 
 *  Local Variables:
-      CHARACTER CCDLOC*(DAT__SZLOC) 
+      CHARACTER CCDLOC*(DAT__SZLOC)
       CHARACTER FILTER*256
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
@@ -183,12 +183,12 @@
 *  =======================================================================
       IF( .NOT. STHERE ) THEN
 
-*  Get the value of the IMGID component, creating it with a blank value if  
+*  Get the value of the IMGID component, creating it with a blank value if
 *  it does not currently exist in the extension.
          CALL DAT_THERE( LOC, 'IMGID', THERE, STATUS )
          IF( .NOT. THERE ) THEN
-            CALL DAT_NEW0C( LOC, 'IMGID', 1, STATUS ) 
-            CALL CMP_PUT0C( LOC, 'IMGID', ' ', STATUS ) 
+            CALL DAT_NEW0C( LOC, 'IMGID', 1, STATUS )
+            CALL CMP_PUT0C( LOC, 'IMGID', ' ', STATUS )
             IMGID = ' '
          ELSE
             CALL CMP_GET0C( LOC, 'IMGID', IMGID, STATUS )
@@ -210,9 +210,9 @@
      :           STATUS )
 
 *  Create ther IMGID component and store the NDF basename as its value.
-            CALL DAT_NEW0C( LOC, 'IMGID', MAX( 1, CHR_LEN( IMGID ) ), 
-     :                      STATUS ) 
-            CALL CMP_PUT0C( LOC, 'IMGID', IMGID, STATUS ) 
+            CALL DAT_NEW0C( LOC, 'IMGID', MAX( 1, CHR_LEN( IMGID ) ),
+     :                      STATUS )
+            CALL CMP_PUT0C( LOC, 'IMGID', IMGID, STATUS )
 
          END IF
 
@@ -223,27 +223,27 @@
 
 *  See if the IMGID value has already been used. If so, issue a warning.
 *  If not, add it to the group of used IMGID values.
-         LC = CHR_LEN( IMGID ) 
+         LC = CHR_LEN( IMGID )
          IF( LC .GT. 0 ) THEN
             CALL GRP_INDEX( IMGID( : LC ), IGRP, 1, INDX, STATUS )
          ELSE
             CALL GRP_INDEX( ' ', IGRP, 1, INDX, STATUS )
          END IF
-   
+
          IF( INDX .GT. 0 ) THEN
             CALL MSG_SETC( 'IMGID', IMGID )
             CALL MSG_OUT( ' ', '     WARNING - The IMGID value  '
      :                   //'''^IMGID'' has already been used!', STATUS )
-         ELSE      
-            CALL GRP_PUT( IGRP, 1, IMGID, 0, STATUS ) 
+         ELSE
+            CALL GRP_PUT( IGRP, 1, IMGID, 0, STATUS )
          END IF
 
 *  If the extension does not currently contain a FILTER value,
 *  create a blank one. Otherwise, get the existing one.
          CALL DAT_THERE( LOC, 'FILTER', THERE, STATUS )
          IF( .NOT. THERE ) THEN
-            CALL DAT_NEW0C( LOC, 'FILTER', 1, STATUS ) 
-            CALL CMP_PUT0C( LOC, 'FILTER', ' ', STATUS ) 
+            CALL DAT_NEW0C( LOC, 'FILTER', 1, STATUS )
+            CALL CMP_PUT0C( LOC, 'FILTER', ' ', STATUS )
             FILTER = ' '
          ELSE
             CALL CMP_GET0C( LOC, 'FILTER', FILTER, STATUS )
@@ -255,8 +255,8 @@
          ELSE
             CALL CMP_GET0C( LOC, 'ANLANG', ANLID, STATUS )
          END IF
-         
-*  Append WPLATE or ANLANG to the FILTER value unless the FILTER value 
+
+*  Append WPLATE or ANLANG to the FILTER value unless the FILTER value
 *  already contains the WPLATE or ANLANG string.
          IAT = CHR_LEN( FILTER )
          IF( INDEX( FILTER, ANLID ) .EQ. 0 ) THEN
@@ -270,25 +270,25 @@
      :        STATUS )
 
          CALL DAT_ERASE( LOC, 'FILTER', STATUS )
-         CALL DAT_NEW0C( LOC, 'FILTER', MAX( 1, IAT ), STATUS ) 
-         CALL CMP_PUT0C( LOC, 'FILTER', FILTER( : IAT ), STATUS ) 
+         CALL DAT_NEW0C( LOC, 'FILTER', MAX( 1, IAT ), STATUS )
+         CALL CMP_PUT0C( LOC, 'FILTER', FILTER( : IAT ), STATUS )
 
 *  See if there is a CCDPACK extension. If not create one.
-         CALL NDF_XSTAT( INDF, 'CCDPACK', THERE, STATUS )       
+         CALL NDF_XSTAT( INDF, 'CCDPACK', THERE, STATUS )
          IF ( .NOT. THERE ) THEN
             CALL NDF_XNEW( INDF, 'CCDPACK', 'CCDPACK_EXT', 0, 0, CCDLOC,
-     :                     STATUS ) 
+     :                     STATUS )
 
 *  Erase any FILTER component in the existing CCDPACK extension.
          ELSE
             CALL NDF_XLOC( INDF, 'CCDPACK', 'UPDATE', CCDLOC, STATUS )
             CALL DAT_THERE( CCDLOC, 'FILTER', THERE, STATUS )
-            IF( THERE ) CALL DAT_ERASE( CCDLOC, 'FILTER', STATUS )     
+            IF( THERE ) CALL DAT_ERASE( CCDLOC, 'FILTER', STATUS )
          END IF
 
 *  Store the new FILTER value in the CCDPACK extension.
-         CALL DAT_NEW0C( CCDLOC, 'FILTER', MAX( 1, IAT ), STATUS ) 
-         CALL CMP_PUT0C( CCDLOC, 'FILTER', FILTER( : IAT ), STATUS ) 
+         CALL DAT_NEW0C( CCDLOC, 'FILTER', MAX( 1, IAT ), STATUS )
+         CALL CMP_PUT0C( CCDLOC, 'FILTER', FILTER( : IAT ), STATUS )
 
 *  Annul the locator to the CCDPACK extension.
          CALL DAT_ANNUL( CCDLOC, STATUS )
@@ -296,10 +296,10 @@
       END IF
 
 *  Add a Frame to the NDFs WCS component in which the first axis
-*  corresponds to the polarimeter reference direction. 
+*  corresponds to the polarimeter reference direction.
 *  ============================================================
 
-*  Get the anti-clockwise angle in degrees from the pixel X axis to 
+*  Get the anti-clockwise angle in degrees from the pixel X axis to
 *  the analyser X axis. If an ANGROT value is found in the POLPACK
 *  extension, erase it (the information ios stored in the POLANAL
 *  Frame only - as of POLPACK V2.0).

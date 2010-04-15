@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine merges two FrameSet by aligning them in a suitable
-*     common Frame. The Current Frame in the second FrameSet becomes the 
-*     Current Frame in the merged FrameSet. The domain search order for 
+*     common Frame. The Current Frame in the second FrameSet becomes the
+*     Current Frame in the merged FrameSet. The domain search order for
 *     finding a suitable Frame is:
 *
 *     1) The domain of the Current Frame in IWCS2, if not blank.
@@ -34,7 +34,7 @@
 *        all the Frames from IWCS2 into it. The Current Frame on exit is
 *        inherited from IWCS2.
 *     IWCS2 = INTEGER (Given)
-*        An AST pointer to the second FrameSet. The Current and Base Frames 
+*        An AST pointer to the second FrameSet. The Current and Base Frames
 *        are unchanged on exit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,14 +72,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants
 
 *  Arguments Given:
       INTEGER IWCS1
@@ -97,7 +97,7 @@
       INTEGER IBASE1             ! Index of original Base Frame in IWCS1
       INTEGER IBASE2             ! Index of original Base Frame in IWCS2
       INTEGER ICURR2             ! Index of Current Frame in IWCS2
-      INTEGER IMAT1              ! Index of alignment Frame in IWCS1 
+      INTEGER IMAT1              ! Index of alignment Frame in IWCS1
       INTEGER IMAT2              ! Index of alignment Frame in IWCS2
       INTEGER MAP                ! Simplified mapping between two Frames
       INTEGER NAX1               ! Number of current Frame axes in IWCS1
@@ -107,25 +107,25 @@
 
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Note the indices of the Base Frames in the two FrameSets so that they 
+*  Note the indices of the Base Frames in the two FrameSets so that they
 *  can be re-instated after AST_CONVERT has changed them.
       IBASE1 = AST_GETI( IWCS1, 'BASE', STATUS )
       IBASE2 = AST_GETI( IWCS2, 'BASE', STATUS )
 
-*  Note the index of the Current Frames in the IWCS2 so that it can be 
+*  Note the index of the Current Frames in the IWCS2 so that it can be
 *  re-instated later.
       ICURR2 = AST_GETI( IWCS2, 'CURRENT', STATUS )
 
 *  Note the number of Frames supplied in IWCS1.
       NFRM1 = AST_GETI( IWCS1, 'NFRAME', STATUS )
 
-*  Get the name of the Domain in which the Current Frame of the second 
+*  Get the name of the Domain in which the Current Frame of the second
 *  FrameSet lives.
       DOM = AST_GETC( IWCS2, 'DOMAIN', STATUS )
 
@@ -135,8 +135,8 @@
      :                 'DOMAIN', STATUS )
 
 *  Create a list of preferences for the Domain in which alignment should
-*  occur. First use the Domain of the Current Frame in IWCS2, then try 
-*  SKY, pdom, PIXEL, GRID and ARDAPP, then try any other Domain. 
+*  occur. First use the Domain of the Current Frame in IWCS2, then try
+*  SKY, pdom, PIXEL, GRID and ARDAPP, then try any other Domain.
       DOMLST = ' '
       IAT = 0
 
@@ -163,11 +163,11 @@
       CALL AST_SETI( IWCS1, 'MaxAxes', MAX( NAX1, NAX2 ), STATUS )
       CALL AST_SETI( IWCS2, 'MaxAxes', MAX( NAX1, NAX2 ), STATUS )
 
-*  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
-*  returned describing the relationship between the Current Frames in 
-*  IWCS2 and IWCS1, and the Base Frames are changed to indicate 
+*  Attempt to align the FrameSets. If succesfull, a new FrameSet is
+*  returned describing the relationship between the Current Frames in
+*  IWCS2 and IWCS1, and the Base Frames are changed to indicate
 *  the Frames in which alignment occurred.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS )
 
 *  Issue a fatal error if alignment was not possible in any Domain.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -193,7 +193,7 @@
       CALL AST_SETI( IWCS2, 'CURRENT', IMAT2, STATUS )
 
 *  Now call AST_CONVERT again.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS )
 
 *  Issue a fatal error if alignment was not possible. This shouldn't happen.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -207,10 +207,10 @@
 *  Get a simplified Mapping connecting the two Frames.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( TEMP, AST__BASE,
      :                                    AST__CURRENT, STATUS ),
-     :                    STATUS ) 
+     :                    STATUS )
 
-*  Merge the second FrameSet into the first FrameSet using the Mapping 
-*  returned by AST_CONVERT to join the two matching Frames. 
+*  Merge the second FrameSet into the first FrameSet using the Mapping
+*  returned by AST_CONVERT to join the two matching Frames.
       CALL AST_ADDFRAME( IWCS1, IMAT1, MAP, IWCS2, STATUS )
 
 *  Re-instate the two Base Frames which were modified by AST_CONVERT.

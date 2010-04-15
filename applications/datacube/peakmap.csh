@@ -10,36 +10,36 @@
 #     C-shell script.
 #
 #  Usage:
-#     peakmap [-a] [-c number] [-ci index] [-f] [-i filename] [-l logfile] 
+#     peakmap [-a] [-c number] [-ci index] [-f] [-i filename] [-l logfile]
 #             [-o filename] [-p] [-v] [-z/+z]
 #
 #  Description:
-#     This shell script reads a three-dimensional spectral-cube NDF and 
+#     This shell script reads a three-dimensional spectral-cube NDF and
 #     presents you with a white-light image of the cube.  You can then select
 #     an X-Y position using the cursor.  The script will extract and display
 #     this reference spectrum.  You will then be prompted to specify various
 #     fitting parameters, such as the peak position, using the cursor.  The
-#     script will then attempt to fit the emission line.  The fit will be 
+#     script will then attempt to fit the emission line.  The fit will be
 #     displayed and you are consulted regarding the goodness of fit.  If you
 #     consider the fit to be good enough, the script will attempt to perform
 #     similar fits to all spectra within the cube, building a two-dimensional
 #     NDF image of the strength of the line.  These will use the same initial
 #     parameters as the reference spectrum, unless option -a is selected.
-#     You may view this image drawn with a key (option -d), and overlay a 
+#     You may view this image drawn with a key (option -d), and overlay a
 #     contour plot (with a key) of the white-light image (option -c).
 #
 #     If you do not force the fit to be considered "good" by using the -f
 #     command-line option, the script will offer the opportunity to manually
 #     refit the spectral feature for individual pixels, such as those that
 #     were unsuccessfully fitted by the automatic procedure.  In this case,
-#     the line-strength map will be plotted and replotted after the new fit, 
+#     the line-strength map will be plotted and replotted after the new fit,
 #     regardless of the -p option.
 #
 #  Parameters:
 #     -a
-#       Requests that each fit may be inspected then approved or re-fit, not 
-#       just the initial reference fit.  A re-fit will change the initial 
-#       parameter guesses for subsequent fits, so it is recommended that you 
+#       Requests that each fit may be inspected then approved or re-fit, not
+#       just the initial reference fit.  A re-fit will change the initial
+#       parameter guesses for subsequent fits, so it is recommended that you
 #       note the co-ordinates of spectra to re-fit and tackle these
 #       individually in the final manual re-fit stage.  [FALSE]
 #     -c number
@@ -56,44 +56,44 @@
 #       Force the script to accept the first attempt to fit a Gaussian to
 #       the line.  This is a dangerous option; if the fit is poor, or
 #       unobtainable the script may terminate abruptly if it is forced to
-#       accept the fit.  This will additionally suppress manual re-fitting 
+#       accept the fit.  This will additionally suppress manual re-fitting
 #       of bad pixels at the end of the run of the script.  [FALSE]
 #     -i filename
 #       The script will use this as its input file, the specified file should
 #       be a three-dimensional NDF.  By default the script will prompt for the
 #       input file.
 #     -l filename
-#       The name of an text log file containing the fitted Gaussian 
+#       The name of an text log file containing the fitted Gaussian
 #       coefficients for each spatial pixel.  The file is written as a
-#       Starlink Small Text List (STL) described in SUN/190.  The STL file 
-#       comprises a schema to locate and describe the columns, and store 
-#       global properties; and a formatted table of the coefficients.  The 
-#       schema includes the units and a brief description of each column, and 
-#       the name of the input NDF used.  The table lists the Gaussian centre, 
+#       Starlink Small Text List (STL) described in SUN/190.  The STL file
+#       comprises a schema to locate and describe the columns, and store
+#       global properties; and a formatted table of the coefficients.  The
+#       schema includes the units and a brief description of each column, and
+#       the name of the input NDF used.  The table lists the Gaussian centre,
 #       peak height the FWHM, and integrated flux, each with its fitting error.
 #     -o filename
 #       The filename for the output NDF of the line-strength map.
 #     -p
-#       The script will plot the final image map to the current display 
+#       The script will plot the final image map to the current display
 #       as well as saving it to an NDF file.  It will additionally overplot
 #       the white-light image as a contour map for comparison.  [FALSE]
 #     -v
 #       The script will generate a variance array from the line fits and
 #       attach it to the peak-intensity-map NDF. [FALSE]
-#     -z 
+#     -z
 #       The script will automatically prompt to select a region to zoom
 #       before prompting for the region of interest.  [TRUE]
-#     +z 
+#     +z
 #       The script will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
 #
 #  Notes:
-#     -  The line-strength image map display scales between the 15 and 98 
-#     percentiles.  The map uses a false-colour lookup table. 
-#     -  CURSA:CATCOPY may be used to convert the STL log file (see the -l 
-#     option) to FITS format for analysis with the likes of TOPCAT, provided 
+#     -  The line-strength image map display scales between the 15 and 98
+#     percentiles.  The map uses a false-colour lookup table.
+#     -  CURSA:CATCOPY may be used to convert the STL log file (see the -l
+#     option) to FITS format for analysis with the likes of TOPCAT, provided
 #     the STL has the ".txt" file extension.  If you want just the tabulated
-#     data for your own favourite tool, the schema can be easily removed 
+#     data for your own favourite tool, the schema can be easily removed
 #     manually, or with sed excluding the lines up to and including the line
 #     beginning "BEGINTABLE".
 #
@@ -134,7 +134,7 @@
 #       Heavy modifications.
 #     13-SEP-2000 (AALLAN):
 #     NDF image of the velocity of the line.  You may view this image
-#     drawn with a key (option -d), and overlay a contour plot of the 
+#     drawn with a key (option -d), and overlay a contour plot of the
 #     white-light image (option -c).
 #       Rewritten on the train.
 #     18-SEP-2000 (AALLAN):
@@ -193,11 +193,11 @@
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
 #     2006 March 16 (MJC):
-#       Use any supplied spectral-axis section when ripping each spectrum for 
+#       Use any supplied spectral-axis section when ripping each spectrum for
 #       line fitting.  Reset KAPPA:DISPLAY parameters.
 #     2007 May 5 (MJC):
 #       Obtain and use spectral units.  Call the new getfitcon script to
@@ -206,8 +206,8 @@
 #       Added -l option.
 #     2008 June 19 (MJC):
 #       Intepret non-positive number of contours to mean no contour
-#       overlay required.  Added -ci option.  Provide case insensitive 
-#       prompting.  Remove overloading of the fitgood variable.  Fixed bug 
+#       overlay required.  Added -ci option.  Provide case insensitive
+#       prompting.  Remove overloading of the fitgood variable.  Fixed bug
 #       that stored the peak-height error as the variance in the output NDF.
 #       Remove duplicate token.  Added Licence.
 #     2008 June 25 (MJC):
@@ -252,7 +252,7 @@ set plotspec = "FALSE"
 # The SPECDRE extension is used to store the Gaussian fit.
 set component = 1
 
-# Specify the default number of contours used to display the white-light 
+# Specify the default number of contours used to display the white-light
 # image.
 set numcont = 15
 
@@ -268,7 +268,7 @@ while ( $#args > 0 )
    case -a:    # approve each fit?
       set approve = "TRUE"
       shift args
-      breaksw                             
+      breaksw
    case -c:    # Number of contours
       shift args
       set numcont = $args[1]
@@ -288,7 +288,7 @@ while ( $#args > 0 )
    case -f:    # force fit?
       set forcefit = "TRUE"
       shift args
-      breaksw                             
+      breaksw
    case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
@@ -315,15 +315,15 @@ while ( $#args > 0 )
    case -v:    # generate variances?
       set dovar = "TRUE"
       shift args
-     breaksw 
+     breaksw
    case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
-      breaksw 
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
@@ -360,13 +360,13 @@ set variance = `parget variance ndftrace`
 # Collapse the white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Display the collapsed image.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2] reset" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2] reset" >&/dev/null
 
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================
@@ -433,7 +433,7 @@ fitgauss \
     "in=${ripfile} mask1=${low_mask} mask2=${upp_mask} cont=${cont} " \
     "peak=${peak} fwhm=${fwhm} reguess=no remask=no ncomp=1 cf=0 " \
     "pf=0 wf=0 comp=${component} fitgood=${fitgood} dialog=f " \
-    "centre=${position} logfil=${fitfile} device=${plotdev}" >& /dev/null 
+    "centre=${position} logfil=${fitfile} device=${plotdev}" >& /dev/null
 
 # Check to see whether or not fitting was successful.
 if ( ! -e $fitfile ) then
@@ -446,7 +446,7 @@ if ( ! -e $fitfile ) then
 
    if ( ${refit} == "no" || ${refit} == "n" ) then
       rm -f ${fitfile} >& /dev/null
-      goto cleanup 
+      goto cleanup
 
 # Try again.
    else
@@ -540,7 +540,7 @@ if ( ${gotoutfile} == "FALSE" ) then
    echo " "
 endif
 
-date > ${tmpdir}/${user}/pmap_time.dat 
+date > ${tmpdir}/${user}/pmap_time.dat
 
 # Fit the cube in a similar fashion.
 echo "      Fitting:"
@@ -610,7 +610,7 @@ approvefit:
                goto cleanup
             endif
 
-# Plot the ripped spectrum with zooming, and obtain new fit estimated 
+# Plot the ripped spectrum with zooming, and obtain new fit estimated
 # parameters.
          else
             if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
@@ -636,7 +636,7 @@ approvefit:
          set peak_height = $array[4]
          set peak_err = $array[5]
          set fwhm_fit = $array[6]
-         set fwhm_err = $array[7] 
+         set fwhm_err = $array[7]
          set integral = $array[8]
          set integral_err = $array[9]
 
@@ -651,13 +651,13 @@ approvefit:
          set condition = `echo "if ($peak_height < 0) 1" | bc`
          if ( $condition == 1 ) then
             echo "        Spectrum at ($x,$y)"
-            set line = "${line} -9999.99"  
+            set line = "${line} -9999.99"
             if ( ${dovar} == "TRUE" ) then
-               set vars = "${vars} -9999.99"  
+               set vars = "${vars} -9999.99"
             endif
 
          else
-            echo "        Spectrum at ($x,$y): $peak_height +- $peak_err ${sunits}" 
+            echo "        Spectrum at ($x,$y): $peak_height +- $peak_err ${sunits}"
 
             set line = "${line} ${peak_height}"
             if ( ${dovar} == "TRUE" ) then
@@ -676,8 +676,8 @@ approvefit:
 
 # No fit file.  Set dummy values.
       else
-         echo "        Spectrum at ($x,$y)" 
-         set line = "${line} -9999.99" 
+         echo "        Spectrum at ($x,$y)"
+         set line = "${line} -9999.99"
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
          endif
@@ -712,7 +712,7 @@ date >> ${tmpdir}/${user}/pmap_time.dat
 
 echo " "
 echo "      Output NDF:"
-echo "        Converting: Creating NDF from data." 
+echo "        Converting: Creating NDF from data."
 
 ascii2ndf "in=${mapfile} out=${outfile}_tmp shape=[${dims[1]},${dims[2]}] "\
           "maxlen=2048 type='_real'" >& /dev/null
@@ -727,14 +727,14 @@ else
 endif
 
 # Set the NDF origin.
-echo "        Origin: Attaching origin (${lbnd[1]},${lbnd[2]})." 
+echo "        Origin: Attaching origin (${lbnd[1]},${lbnd[2]})."
 setorigin "ndf=${colfile} origin=[${lbnd[1]},${lbnd[2]}]" >& /dev/null
 setorigin "ndf=${outfile} origin=[${lbnd[1]},${lbnd[2]}]" >& /dev/null
 
 # Attach the VARIANCE array.  Note that ASCII2NDF does not allow
 # COMP=Error so work in variances rather than error.
 if ( ${dovar} == "TRUE" ) then
-   echo "        Converting: Attaching VARIANCE array." 
+   echo "        Converting: Attaching VARIANCE array."
    ascii2ndf in=${varfile} comp="Variance" out=${outfile} \
              shape="[${dims[1]},${dims[2]}]" \
              maxlen=2048 type='_real'
@@ -754,7 +754,7 @@ endif
 
 # Use the white-light image to clone the axis AXIS and WCS co-ordinates.
 # The WCS information will be copied incorrectly if the AXIS structure does
-# not exist before the WCS component is cloned.  If one an AXIS structure 
+# not exist before the WCS component is cloned.  If one an AXIS structure
 # does not exist, create an array of axis centres, derived from the current
 # WCS Frame, along each axis.
 if ( ${axis} == "FALSE" ) then
@@ -763,13 +763,13 @@ if ( ${axis} == "FALSE" ) then
    setaxis "ndf=${colfile} dim=2 mode=wcs comp=Centre" >& /dev/null
 endif
 
-echo "        Axes: Attaching AXIS structures." 
+echo "        Axes: Attaching AXIS structures."
 setaxis "ndf=${outfile} like=${colfile}" >& /dev/null
 
-echo "        WCS: Attaching WCS information." 
+echo "        WCS: Attaching WCS information."
 wcscopy "ndf=${outfile} like=${colfile}" >& /dev/null
 
-echo "        Title: Setting title." 
+echo "        Title: Setting title."
 settitle "ndf=${outfile} title='Line-strength Map'"
 echo " "
 
@@ -782,12 +782,12 @@ if ( ${plotspec} == "TRUE" ) then
 # Change to the coloured lookup table.
    lutcol device=${plotdev}
    echo "      Plotting:"
-   echo "        Display: Line-strength map using percentile scaling." 
+   echo "        Display: Line-strength map using percentile scaling."
    display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
            "axes=yes margin=!" reset >& /dev/null
 
    if ( $drawcontours == "TRUE" ) then
-      echo "        Contour: White-light image with equally spaced contours." 
+      echo "        Contour: White-light image with equally spaced contours."
       contour "ndf=${colfile} device=${plotdev} clear=no mode=equa "\
               "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
               "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
@@ -803,12 +803,12 @@ if ( ${forcefit} == "FALSE" ) then
    if ( ${plotspec} == "FALSE" ) then
       lutcol device=${plotdev}
       echo "      Plotting:"
-      echo "        Display: Line-strength map using percentile scaling." 
+      echo "        Display: Line-strength map using percentile scaling."
       display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
               "axes=yes margin=!" reset >& /dev/null
 
       if ( $drawcontours == "TRUE" ) then
-         echo "        Contour: White-light image with equally spaced contours." 
+         echo "        Contour: White-light image with equally spaced contours."
          contour "ndf=${colfile} device=${plotdev} clear=no mode=equa "\
                  "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
                  "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
@@ -868,7 +868,7 @@ if ( ${forcefit} == "FALSE" ) then
          set newfit = " "
 
 # Label for repeated fitting of the Gaussian.
-manual_refit: 
+manual_refit:
 
 # Plot the ripped spectrum with or without zooming, and obtain the fit
 # estimated parameters.
@@ -883,7 +883,7 @@ manual_refit:
            "peak=${peak} fwhm=${fwhm} reguess=no remask=no ncomp=1 "\
            "cf=0 pf=0 wf=0 comp=${component} fitgood=${fitgood} "\
            "centre=${position} logfil=${fitfile} device=${plotdev}"\
-           "dialog=f" >& /dev/null 
+           "dialog=f" >& /dev/null
 
 # Check to see whether or not fitting was successful.
          if ( ! -e $fitfile ) then
@@ -958,19 +958,19 @@ manual_refit:
 
          else if ( ${fitok} == "quit" || ${fitok} == "q" ) then
             rm -f ${fitfile} >& /dev/null
-            goto dropout 
+            goto dropout
 
-         else    
+         else
             rm -f ${fitfile} >& /dev/null
          endif
 
 # Report the peak_height and peak_err values.
          if ( ${dovar} == "TRUE" ) then
             echo "        (X,Y) Pixel: ${xgrid}:${ygrid}"
-            echo -n "        Peak Height: $peak_height " 
+            echo -n "        Peak Height: $peak_height "
          else
             echo "        (X,Y) Pixel: ${xgrid},${ygrid}"
-            echo "        Peak Height: $peak_height ${unit}" 
+            echo "        Peak Height: $peak_height ${unit}"
          endif
          echo " "
 
@@ -1010,7 +1010,7 @@ manual_refit:
             endif
 
 # Move the output file to a temporary place holder.
-            mv -f ${outfile}.sdf ${outfile}_tmp.sdf 
+            mv -f ${outfile}.sdf ${outfile}_tmp.sdf
 
 # Change the pixel variance.
             set pixel = "${xgrid}:${xgrid},${ygrid}:${ygrid}"
@@ -1042,11 +1042,11 @@ manual_refit:
          lutcol device=${plotdev}
          echo " "
          echo "      Plotting:"
-         echo "        Display: Line strength map using percentile scaling." 
+         echo "        Display: Line strength map using percentile scaling."
          display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
                  "axes=yes margin=!" reset >& /dev/null
          if ( $drawcontours == "TRUE" ) then
-            echo "        Contour: White-light image with equally spaced contours." 
+            echo "        Contour: White-light image with equally spaced contours."
             contour "ndf=${colfile} device=${plotdev} clear=no mode=equa"\
                     "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
                    "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
@@ -1074,7 +1074,7 @@ endif
 
 # Dropout point for an aborted fitting, try and salvage already existing
 # line-strength maps that may be lying around instead of throwing them away.
-dropout:     
+dropout:
 if ( -e ${outfile}_tmp.sdf ) then
    if ( -e ${outfile}.sdf ) then
       rm -f ${outfile}_tmp.sdf >& /dev/null

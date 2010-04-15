@@ -16,26 +16,26 @@ C        in the original data.
 C
 C     Parameters:
 C    (1) INPUT      (TSP, 2D)  The input time series dataset.
-C    (2) SHIFT      (Double)   Time shift to apply (days). 
+C    (2) SHIFT      (Double)   Time shift to apply (days).
 C    (3) OUTPUT     (TSP, 2D)  The output corrected dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         28/2/1988
 C
 C-
 C
 C  History:
-C    20/1/1988   Original Version.   JAB/AAO 
+C    20/1/1988   Original Version.   JAB/AAO
 C    28/2/1988   TSP Monolith version.  JAB/AAO
 C
 
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'                          
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'USER_ERR'  
+      INCLUDE 'USER_ERR'
       INTEGER STATUS
 
 *  HDS locators
@@ -45,10 +45,10 @@ C
       INTEGER SIZE
 
 *  Data pointer
-      INTEGER PTR   
+      INTEGER PTR
 
 *  Amount of shift
-      DOUBLE PRECISION SHIFT 
+      DOUBLE PRECISION SHIFT
 
 *  Array dimensions
       INTEGER DIMS(7),ACTDIM
@@ -61,7 +61,7 @@ C
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
 
 *  Copy input to output
-  
+
       CALL TSP_COPY(LOC,OLOC,STATUS)
 
 *  Get size of data
@@ -76,8 +76,8 @@ C
 
 *  Perform Shift
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_SHIFT(SIZE,%VAL(PTR),SHIFT,STATUS)         
-      ENDIF                    
+         CALL TSP_SHIFT(SIZE,%VAL(PTR),SHIFT,STATUS)
+      ENDIF
 
 *  Unmap data and annul locators
 
@@ -117,7 +117,7 @@ C
 
 *  Local variables
       INTEGER I
-            
+
 *  Loop over points adding shift value
       DO I=1,SIZE
           TIMES(I) = TIMES(I) + SHIFT

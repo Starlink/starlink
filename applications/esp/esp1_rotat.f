@@ -19,7 +19,7 @@
 *     CALL ELF1_ROTAT(XO,YO,THETA,COUNT,ANG,RAD,XCR,YCR,STATUS)
 
 *  Description:
-*     For each of the ellipse points in turn it determines the new angle of 
+*     For each of the ellipse points in turn it determines the new angle of
 *     the point relative to the origin. This and the distance
 *     from the origin, are employed to calculate the new position of the point
 *     when translated/rotated about the new origin.
@@ -69,7 +69,7 @@
 *  Arguments Given:
       INTEGER COUNT                   ! The number of points in the current
                                       ! 'fit' ellipse
-      REAL ANG(ELF__MXPOI)            ! Angle of the ellipse points  
+      REAL ANG(ELF__MXPOI)            ! Angle of the ellipse points
                                       ! before rotation
       REAL RAD(ELF__MXPOI)            ! Distance from the ellipse centre
       REAL THETA                      ! Position angle required for the
@@ -127,7 +127,7 @@
 *     CALL ELP1_ROTAT(X,Y,DIS,ANGL,POSANG,NUMPOI,XR,YR,STATUS)
 
 *  Description:
-*     For each of the ellipse points in turn it determines the new angle of 
+*     For each of the ellipse points in turn it determines the new angle of
 *     the point relative to the origin. This and the distance
 *     from the origin, are employed to calculate the new position of the point
 *     when translated/rotated about the new origin.
@@ -177,7 +177,7 @@
 *  Arguments Given:
       INTEGER NUMPOI                  ! The number of points in the current
                                       ! 'fit' ellipse
-      REAL ANGL(ELP__MXPOI)           ! Angle of the ellipse points  
+      REAL ANGL(ELP__MXPOI)           ! Angle of the ellipse points
                                       ! before rotation
       REAL DIS(ELP__MXPOI)            ! Distance from the ellipse centre
       REAL POSANG                     ! Position angle required for the

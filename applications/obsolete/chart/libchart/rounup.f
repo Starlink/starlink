@@ -20,9 +20,9 @@
 
       DOUBLE PRECISION X
       REAL Y
-      
+
       Z = Y
       IF (X.LT.0.0) Z = 0.0
       ROUNUP = AINT((X + Z)/Y) * Y
       END
- 
+

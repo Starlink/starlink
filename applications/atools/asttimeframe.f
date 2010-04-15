@@ -21,12 +21,12 @@
 
 *  Description:
 *     This application creates a new TimeFrame and optionally initialises
-*     its attributes. A TimeFrame is a specialised form of one-dimensional 
-*     Frame that represents various coordinate systems used to describe 
-*     moments in time. The particular coordinate system to be used is 
-*     specified by setting the TimeFrame's System attribute (the default 
-*     is MJD) qualified, as necessary, by other attributes such as zero 
-*     point, time scale, units, etc (see the description of the System 
+*     its attributes. A TimeFrame is a specialised form of one-dimensional
+*     Frame that represents various coordinate systems used to describe
+*     moments in time. The particular coordinate system to be used is
+*     specified by setting the TimeFrame's System attribute (the default
+*     is MJD) qualified, as necessary, by other attributes such as zero
+*     point, time scale, units, etc (see the description of the System
 *     attribute for details).
 
 *  Usage:
@@ -34,8 +34,8 @@
 
 *  ADAM Parameters:
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new TimeFrame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new TimeFrame.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new TimeFrame.
 
@@ -86,7 +86,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

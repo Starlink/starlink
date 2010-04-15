@@ -8,12 +8,12 @@ C  Function:
 C     Performs pre-processing for applications using flagged data.
 C
 C  Description:
-C     This routine must be called by any routine that is using flagged 
+C     This routine must be called by any routine that is using flagged
 C     data values to process data.  It should be called after the
-C     data array for the structure in question has been mapped, but 
-C     before any processing is done on it.  It handles any processing 
+C     data array for the structure in question has been mapped, but
+C     before any processing is done on it.  It handles any processing
 C     that may be required to deal with data arrays that are stored on
-C     disk with data quality arrays rather than directly with flagged 
+C     disk with data quality arrays rather than directly with flagged
 C     elements.
 C
 C  Language:
@@ -74,7 +74,7 @@ C     21st Aug 1992  Automatic portability modifications
 C                    ("INCLUDE" syntax etc) made. KS/AAO
 C     23rd Aug 1992  Remove unused variable declarations. KS/AAO
 C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
-C      3rd Feb 1995  Now supports files with both flagged values and 
+C      3rd Feb 1995  Now supports files with both flagged values and
 C                    quality arrays, and simulataneous use of both by
 C                    an application.
 C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
@@ -98,7 +98,7 @@ C
 C     Local variables
 C
       INTEGER   DATA_ADDR                   ! Virtual address of data array
-      CHARACTER DATA_TYPE*16                ! Type of mapped data array 
+      CHARACTER DATA_TYPE*16                ! Type of mapped data array
       INTEGER   I                           ! Index through dimensions
       INTEGER   IGNORE                      ! Dummy status value
       INTEGER   INVOKE                      ! Dummy function value
@@ -109,7 +109,7 @@ C
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       INTEGER   QUAL_ADDR                   ! Virtual address of quality array
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Full structure name from ref_name
       INTEGER   WORK_SLOT                   ! Workspace slot for data
 C
@@ -125,12 +125,12 @@ C     Return immediately if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need an upper case version of REF_NAME 
+C     We need an upper case version of REF_NAME
 C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -160,13 +160,13 @@ C     that since the data has been mapped, we can assume that QUAL_EXIST
 C     is now set one way or the other, so we can use it directly.
 C
 C     (It doesn't matter if the structure has flagged values in the data
-C     that aren't reflected in the quality array - these will be left 
+C     that aren't reflected in the quality array - these will be left
 C     in.)
 C
       IF ((QUAL_EXIST(REF_SLOT).GT.0).AND.
      :                 (.NOT.USE_QUALITY(REF_SLOT))) THEN
 C
-C        We have to flag the data.  First we have to hunt around 
+C        We have to flag the data.  First we have to hunt around
 C        the common tables to actually find the mapped array.
 C
          WORK_SLOT=MAP_CALL_WORK(DATA_SLOT(REF_SLOT))

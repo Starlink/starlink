@@ -42,16 +42,16 @@
 
 *     Get the password if there is one
         CALL CHR_FILL( ' ', PASSWORD )
-        CALL PAR_GET0C( 'PASSWORD', PASSWORD, STATUS ) 
+        CALL PAR_GET0C( 'PASSWORD', PASSWORD, STATUS )
         CALL PAR_CANCL( 'PASSWORD', STATUS )
 
         IF ( PASSWORD .EQ. ' ' ) THEN
           SECURE = .FALSE.
-          IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+          IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :      'A password has been NOT specified', STATUS )
         ELSE
           SECURE = .TRUE.
-          IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+          IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :      'A password has been specified', STATUS )
         END IF
 
@@ -59,11 +59,11 @@
         FRACTION  = 0
         CALL QMAN_INIT_POINTERS( STATUS )
 
-*     Do some PoSiX calls 
+*     Do some PoSiX calls
         CALL PSX_TIME( NTICKS, STATUS )
         CALL PSX_CTIME( NTICKS, BASETIME, STATUS )
         CALL PSX_CUSERID( USERNAME, STATUS )
-        CALL PSX_UNAME( SYSTEM, NODE, RELEASE, 
+        CALL PSX_UNAME( SYSTEM, NODE, RELEASE,
      :    VERSION, MACHINE, STATUS )
 
 *   Using these, create a new string
@@ -76,7 +76,7 @@
      :    / ' ' // MACHINE(1:CHR_LEN(MACHINE)) /
      ;    / ' on ' // BASETIME(1:CHR_LEN(BASETIME))
 
-*     Change the initialised settings 
+*     Change the initialised settings
         READREC_OK  = .FALSE.
         INITIALISED = .TRUE.
         INIT_STRING = TASK_INIT

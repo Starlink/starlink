@@ -126,7 +126,7 @@
 *.
 
 *  Check for diagnostic logging, if needed open log file.
-      DIAGNOSTICS_ACTIVE = USR_TUNE_DIAGNOSE      
+      DIAGNOSTICS_ACTIVE = USR_TUNE_DIAGNOSE
       IF ( DIAGNOSTICS_ACTIVE .AND. DIAGNOSTICS_LUN .EQ. 0 ) THEN
          CALL ECH_OPEN_FILE( 'echomop_diagnostics.log', 'TEXT',
      :        'NEW', .FALSE., DIAGNOSTICS_LUN, OPENED_NAME, STATUS )

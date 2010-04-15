@@ -5,7 +5,7 @@ C routine PGOLIN to allow the user to draw polygons on the screen.
 C As each polygon is completed, it is filled in using routine PGPOLY.
 C The user positions the cursor to define the vertices of the polygon.
 C He types 'A' to add a vertex at the current cursor position, 'D' to
-C delete the nearest vertex, or 'X' to signal that the polygon is 
+C delete the nearest vertex, or 'X' to signal that the polygon is
 C complete. Two 'X's in succession terminates the program.
 C-----------------------------------------------------------------------
       INTEGER PGBEG
@@ -65,7 +65,7 @@ C
       IF (NPT.GE.3) THEN
            CALL PGPOLY(NPT,X,Y)
            GOTO 20
-       END IF 
+       END IF
 C
 C Close the device and exit.
 C

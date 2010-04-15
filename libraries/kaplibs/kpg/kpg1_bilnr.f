@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_BILNR( X, Y, XLO, XHI, YLO, YHI, USEVAR, DATA, 
+      SUBROUTINE KPG1_BILNR( X, Y, XLO, XHI, YLO, YHI, USEVAR, DATA,
      :                       VAR, INTERP, INTERV, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_BILNR( X, Y, XLO, XHI, YLO, YHI, USEVAR, DATA, VAR, 
+*     CALL KPG1_BILNR( X, Y, XLO, XHI, YLO, YHI, USEVAR, DATA, VAR,
 *                      INTERP, INTERV, STATUS )
 
 *  Description:
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -193,7 +193,7 @@
      :             V3 .NE. VAL__BADR .AND. V4 .NE. VAL__BADR ) THEN
 
 *  Evaluate the weight variance value.
-                  INTERV = V1*(DX*DY)**2 + V2*(DX*EY)**2 + 
+                  INTERV = V1*(DX*DY)**2 + V2*(DX*EY)**2 +
      :                     V3*(EX*DY)**2 + V4*(EX*EY)**2
 
                END IF

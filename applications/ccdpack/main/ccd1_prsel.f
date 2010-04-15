@@ -33,7 +33,7 @@
 *        Number of entries in XIN, YIN and DISC.
 *     DISC( NIN ) = DOUBLE PRECISION (Given)
 *        The values which are to be used to discriminate the input
-*        data. 
+*        data.
 *     TOP = LOGICAL (Given)
 *        If true then the top NSEL values of DISC are used and the
 *        corresponding entries in XIN and YIN are selected. If false
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -150,7 +150,7 @@
          END IF
 
 *  Test for a failure somewhere.
-         IF ( IFAIL .NE. 0 ) THEN 
+         IF ( IFAIL .NE. 0 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'CCD1_PRSEL1',
      :      '  CCD1_PRSEL: Error sorting pre-selection discriminant'//

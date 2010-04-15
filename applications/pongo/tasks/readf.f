@@ -24,7 +24,7 @@
 *        - What the column delimiters are (more than one character is
 *        possible).
 *        - Symbolic names for each of the data columns.
-*        
+*
 *     The application is intended to be very robust: if a read error
 *     occurs within a line, READF will report an error and attempt to
 *     continue.
@@ -41,7 +41,7 @@
 *  ADAM Parameters:
 *     DATA = FILENAME (Read and Write)
 *        The name of the formatted data file.
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_DATA is used. If PONGO_DATA is
 *        not defined, the current value is used. If the current value
@@ -64,7 +64,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the X-axis data are read. The value "0"
 *        means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_XCOL is used. If PONGO_XCOL is
 *        not defined, the current value is used. The current value is
@@ -73,7 +73,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the Y-axis data are read. The value "0"
 *        means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_YCOL is used. If PONGO_YCOL is
 *        not defined, the current value is used. The current value is
@@ -82,7 +82,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the Z-axis data are read. The value "0"
 *        means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_ZCOL is used. If PONGO_ZCOL is
 *        not defined, the current value is used. The current value is
@@ -91,7 +91,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the X-axis error data are read. The value
 *        "0" means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_EXCOL isused. If PONGO_EXCOL
 *        is not defined, the current value is used. The current value
@@ -100,7 +100,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the Y-axis error data are read. The value
 *        "0" means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_EYCOL is used.  If PONGO_EYCOL
 *        is not defined, the current value is used. The current value
@@ -109,7 +109,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the symbolic name for each data point is
 *        read. The value "0" means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_LABCOL is used. If PONGO_LABCOL
 *        is not defined, the current value is used. The current value
@@ -118,7 +118,7 @@
 *        The column number (counting from 1), or the symbolic name of a
 *        column, from which the PGPLOT symbol code for each data point
 *        is read. The value "0" means "do not read these data".
-*        
+*
 *        If the value is not specified on the command line, the value
 *        of the global parameter PONGO_SYMCOL is used. If PONGO_SYMCOL
 *        is not defined, the current value is used. The current value
@@ -127,7 +127,7 @@
 *        The character string interpreted as a column delimitier when
 *        reading the data file. For example, this can be used to read
 *        LATEX format tables by setting DELIM="&".
-*        
+*
 *        If the value is not specified on the command line, the current
 *        value is used. The current value is initially set to " ".
 *     FROM = _INTEGER (Read and Write)
@@ -168,7 +168,7 @@
 *              value;
 *              o "A>" -- absolute value greater than;
 *              o "A<" -- absolute value less than.
-*              
+*
 *           - [VAL1{,VAL2, ...}] the value (or values) against which the
 *           selection is made.
 *
@@ -181,7 +181,7 @@
 *        tick marks. It consists of a series of letters, which are
 *        described fully in the documentation for the BOXFRAME
 *        application.
-*        
+*
 *        READF updates the value of the global parameters PONGO_XOPT.
 *        The application will automatically remove any "L" characters
 *        at the start of the options string, because it is assumed
@@ -190,7 +190,7 @@
 *        given in logarithmic form, the "L" character should be
 *        inserted into the options strings anywhere except at the
 *        start.
-*        
+*
 *        [The value of the global parameter PONGO_XOPT is used. If
 *        PONGO_XOPT is not defined, the default value "BCNST" is used.]
 *     YOPT = _CHAR (Read and Write)
@@ -198,7 +198,7 @@
 *        tick marks. It consists of a series of letters, which are
 *        described fully in the documentation for the BOXFRAME
 *        application.
-*        
+*
 *        READF updates the value of the global parameters PONGO_YOPT.
 *        The application will automatically remove any "L" characters
 *        at the start of the options string, because it is assumed
@@ -207,12 +207,12 @@
 *        given in logarithmic form, the "L" character should be
 *        inserted into the options strings anywhere except at the
 *        start.
-*        
+*
 *        [The value of the global parameter PONGO_YOPT is used. If
 *        PONGO_XOPT is not defined, the default value "BCNST" is used.]
 *     ERSCALE = _REAL (Read and Write)
 *        The scale factor to be applied to the EXCOL and EYCOL data.
-*        
+*
 *        [The value of the global parameter PONGO_ERSCALE is used. If
 *        PONGO_ERSCALE is not defined, the default value 1.0 is used.]
 *     ADD = _LOGICAL (Read)
@@ -231,7 +231,7 @@
 *        be used on files which exclusively contain numeric data. This
 *        parameter can over-ride the action of the LABCOL and SELCOND
 *        parameters.
-*        
+*
 *        If the value is not specified on the command line, the current
 *        value is used. The current value is initially set to FALSE.
 *     NDATA = _INTEGER (Write)
@@ -270,7 +270,7 @@
 *        ICL variables no longer need an @ or '' prepending or appending
 *        when referring to the file. INCOMPATIBLE with previous scripts.
 *     11-JUL-1997 (PDRAPER):
-*        Changed back so that it is possible to read data from 
+*        Changed back so that it is possible to read data from
 *        different files WITHOUT resetting the current contents.
 *     {enter_further_changes_here}
 
@@ -278,7 +278,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -359,7 +359,7 @@
      :'No data to be read (all columns 0)', STATUS )
             GO TO 999
          END IF
-         
+
 *     Get the delimiter(s) for the columns.
          CALL PAR_GET0C( 'DELIM', DELIM, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -370,7 +370,7 @@
 *     Get the select CRITERIA.
          CALL PON_GETSEL( COLLAB, SELCOL, ICOND, CHRSEL, SELVAL1,
      :                    SELVAL2, NLIST, CLIST, STATUS )
-      
+
 *     Get the first and last lines to be read ...
          CALL PAR_GET0I( 'FROM', ISTLN, STATUS )
          CALL PAR_GET0I( 'TO', IFINLN, STATUS )
@@ -394,14 +394,14 @@
          CLRBUFF = ( .NOT. CLRBUFF )
          CALL PAR_GET0R( 'ERSCALE', SIZESCALE, STATUS )
          CALL PAR_GET0C( 'SOFTCOM', SOFTCOM, STATUS )
-      
+
 *     Read the file.
          CALL PAR_GET0L( 'QUICK', QUICK, STATUS )
 
          IF ( QUICK ) THEN
 
-            IF ( ( ICOND .EQ. 5 ) .OR. ( ICOND .EQ. 6 ) 
-     :           .OR. ( ICOND .EQ. 8 ) .OR. ( ICOND .EQ. 9 ) 
+            IF ( ( ICOND .EQ. 5 ) .OR. ( ICOND .EQ. 6 )
+     :           .OR. ( ICOND .EQ. 8 ) .OR. ( ICOND .EQ. 9 )
      :           .OR. ( ICOND .EQ. 12 ) ) THEN
                ICOND = 0
                SELCOL = 0
@@ -410,18 +410,18 @@
                CALL MSG_OUT( ' ', '*** SELECT condition ignored. ***',
      :                       STATUS )
             ENDIF
-             
+
             IF ( LABCOL.NE.0 ) CALL MSG_OUT( ' ', 'No labels will ' //
      :                                       'be read in quick mode.',
      :                                       STATUS)
-  
-            CALL PON_QRDFIL( FD, 
-     :        SELCOL, ISTLN, IFINLN, ICOND, CHRSEL, 
+
+            CALL PON_QRDFIL( FD,
+     :        SELCOL, ISTLN, IFINLN, ICOND, CHRSEL,
      :        SELVAL1, SELVAL2, NLIST, CLIST(3), SIZESCALE, CLRBUFF,
      :        HARDCOM, SOFTCOM, STATUS )
          ELSE
-            CALL PON_RDFIL( FD, 
-     :        SELCOL, ISTLN, IFINLN, DELIM, ICOND, CHRSEL, 
+            CALL PON_RDFIL( FD,
+     :        SELCOL, ISTLN, IFINLN, DELIM, ICOND, CHRSEL,
      :        SELVAL1, SELVAL2, NLIST, CLIST(3), SIZESCALE, CLRBUFF,
      :        HARDCOM, SOFTCOM, STATUS )
          END IF

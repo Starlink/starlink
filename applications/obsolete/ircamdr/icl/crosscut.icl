@@ -13,8 +13,8 @@ proc crosscut clsc
   end if
   asknum (poffset) "Pixel offset from peak to plot over \15\ ? "
   cccom = name_image
-  print "Plotting image " (name_image) 
-  obeyw plt2d nsigma (name_image) 
+  print "Plotting image " (name_image)
+  obeyw plt2d nsigma (name_image)
   send plt2d set cursor_image (name_image)
   print "Select star with cursor"
   CURSOR

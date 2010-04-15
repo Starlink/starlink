@@ -6,7 +6,7 @@
 *     LIMIT_PAR
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -27,7 +27,7 @@
 *     HI = REAL (Given)
 *         Upper Boundary
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -79,22 +79,22 @@
         INTEGER STATUS
 
 	STATUS = SAI__OK
-      
+
 	IF( LO .GE. HI ) THEN
-	
+
 	  TEXT = 'ERROR > Upper limit is smaller than lower limit'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
  	  TEXT = '        This call to LIMIT_PAR is ignored'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
-	
+	  CALL MSG_OUT(' ', TEXT, STATUS)
+
 	  LIMIT_PAR = -1
 	ELSE IF( N .GE. 1 .AND. N .LE. M_PAR ) THEN
 	  IF( LIST_CYCLIC( N ) .NE. 0 ) THEN	! Cyclic
 	    IF( L_INDEX( N ) .NE. N ) THEN
 
 	      TEXT = 'ERROR > LIMIT_PAR says you can not do this!'
-	      CALL MSG_OUT(' ', TEXT, STATUS) 	    
-	 
+	      CALL MSG_OUT(' ', TEXT, STATUS)
+
 	      LIMIT_PAR = -1
 	      RETURN
 	    ELSE IF( LO .GE. TAB_BOTTOM( N )
@@ -146,9 +146,9 @@
 	  END IF
 	ELSE
 	  WRITE(TEXT, '(''ERROR > No such parameter #'', I2)') N
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
  	  TEXT = '        This call to LIMIT_PAR is ignored'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 
 	  LIMIT_PAR = -1
 	END IF
@@ -165,7 +165,7 @@
 *     NOLIMIT_PAR
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -174,13 +174,13 @@
 *     CALL NOLIMIT_PAR(N)
 *
 *  Description :
-*     {routine_description}...    
+*     {routine_description}...
 *
 *  Arguments :
 *     N = INTEGER (Given)
 *         Parameter of Interest
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -229,12 +229,12 @@
         INTEGER STATUS
 
 	STATUS = SAI__OK
-	
+
         IF( N .GE. 1 .AND. N .LE. M_PAR ) THEN
           IF( LIST_CYCLIC( N ) .EQ. 1 ) THEN
  	    WRITE(TEXT, '(''ERROR >  No limit has been set '
      1		 //   'for cyclic parameter'', I3)') N
-	    CALL MSG_OUT(' ', TEXT, STATUS) 
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 
 	    NOLIMIT_PAR = -1
 	  ELSE IF( LIST_CYCLIC( N ) .EQ. 0 ) THEN
@@ -263,9 +263,9 @@
 	    ELSE
  	      TEXT = 'ERROR >  Illegal attempt on a cyclic'//
      :               ' slave parameter'
-	      CALL MSG_OUT(' ', TEXT, STATUS) 
+	      CALL MSG_OUT(' ', TEXT, STATUS)
 
-     
+
 	      NOLIMIT_PAR = -1
 	      RETURN
 	    END IF
@@ -278,7 +278,7 @@
 	    IF( LIST_CYCLIC( K ) .EQ. 1 ) THEN
  	      WRITE(TEXT, '(''ERROR >  No limit has been set '//
      1		          'for cyclic parameter'', I3)') K
-	      CALL MSG_OUT(' ', TEXT, STATUS) 
+	      CALL MSG_OUT(' ', TEXT, STATUS)
 
 	      NOLIMIT_PAR = -1
 	    ELSE IF( LIST_CYCLIC( K ) .EQ. 0 ) THEN
@@ -307,9 +307,9 @@
 	  END DO
 	ELSE
  	  WRITE(TEXT, '(''ERROR > No such parameter # '', I3)') N
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
  	  TEXT = '        This call to NOLIMIT_PAR is ignored'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 
 	  NOLIMIT_PAR = -1
 	END IF

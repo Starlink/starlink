@@ -14,19 +14,19 @@
 
 *  Description:
 *     The supplied parameter is used to obtain the name of a text file
-*     from the environment. The contents of this text file are read and 
+*     from the environment. The contents of this text file are read and
 *     stored in a GRP group. The default GRP control characters are used
-*     to interpret the contents of the file. For instance, this means 
-*     that fields separated by commas are placed in adjacent elements 
-*     of the group, strings starting with # are ignored as comments, 
+*     to interpret the contents of the file. For instance, this means
+*     that fields separated by commas are placed in adjacent elements
+*     of the group, strings starting with # are ignored as comments,
 *     strings starting with ^ are treated as indirection elements, etc.
 *     If REJECT is supplied .TRUE., all blanks elements are removed from
-*     the group before it is returned. The group is set 
+*     the group before it is returned. The group is set
 *     case-insensitive.
 
 *  Arguments:
 *     PARAM = INTEGER (Given)
-*        The name of the parameter used to get the name of the text 
+*        The name of the parameter used to get the name of the text
 *        file.
 *     REJECT = LOGICAL (Given)
 *        If true, blanks are removed from the group.
@@ -50,15 +50,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
       INCLUDE 'GRP_ERR'          ! GRP_ error constants
-      
+
 *  Arguments Given:
       CHARACTER PARAM*(*)
       LOGICAL REJECT

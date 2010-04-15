@@ -1,8 +1,8 @@
 1 TSP - Time Series and Polarimetry package
                                                       Expires: ????.??.??
 
- TSP 2.3-2 is now available. 
- 
+ TSP 2.3-2 is now available.
+
  v2.3-2 has various internal fixes to correct problems that caused the
  Linux version to crash when accessing components of data files.  There
  is no change to functionality and no change to the documentation (SUN/66)

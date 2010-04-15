@@ -23,14 +23,14 @@
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *     ADDWCS operation creates a WCS for 3-D spectrum cube and stores it
 *     into a NDF file pointed by data (smfData*). The WCS includes a
 *     2-D Grid frameset for the first two dimensions from sc2ast_createwcs
 *     and 1-D WinMap frameset for the third dimension, which is the wavenumber.
-*     The scaling factor of the wavenumber is obtained from 
+*     The scaling factor of the wavenumber is obtained from
 *     MORE.FTS2DR.FTS_WN_FACTOR of the NDF file. The real wavenumber will be
 *     i  x  scaling factor (i is the index number of the third dimension,
 *     starting from 0).
@@ -45,8 +45,8 @@
 *     2008-03-31 (BZ):
 *        Try to finalize ADDWCS operation for FTS-2
 *     2008-04-01 (BZ):
-*        With the advice from Tim (TJ) and David (DB), 
-*        fix momery leak and do other minor modifications.    
+*        With the advice from Tim (TJ) and David (DB),
+*        fix momery leak and do other minor modifications.
 *     2008-04-02 (BZ):
 *        With the advice from Tim (TJ) and David (DB),
 *        set attributes of WCS.
@@ -98,7 +98,7 @@
 
 #define FUNC_NAME "sc2fts_addwcs"
 
-void sc2fts_addwcs 
+void sc2fts_addwcs
 (
 Grp *igrp,
 Grp* ogrp,
@@ -110,7 +110,7 @@ int   *status          /* global status (given and returned) */
   smfData *data;                /* Pointer to input SCUBA2 data struct */
   HDSLoc *fts2drloc = NULL;     /* HDSLoc to More.FTS2DR */
   HDSLoc *ftswnloc = NULL;      /* HDSLoc to More.FTS2DR.FTS_WN */
-  
+
   AstFrameSet *gridfset;        /* FrameSet by sc2ast_createwcs */
   AstMapping *gridmapping;      /* mapping from sc2ast_createwcs */
   AstZoomMap *specmapping;       /* mapping between index number and real wavenumber */
@@ -140,8 +140,8 @@ int   *status          /* global status (given and returned) */
   /* get the locator to More.FTS2DR.FTS_WN_FACTOR */
   datFind( fts2drloc, "FTS_WN_FACTOR", &ftswnloc, status );
 
-  /* get the scaling factor of spectrum of FTS. The scaling factor is 
-   * 1/L (L is the double-sided scan length with unit millimeter) 
+  /* get the scaling factor of spectrum of FTS. The scaling factor is
+   * 1/L (L is the double-sided scan length with unit millimeter)
   */
   datGet0D( ftswnloc, &ftswn_factor, status );
   /* Annual HDSLoc */
@@ -183,11 +183,11 @@ int   *status          /* global status (given and returned) */
   /* create ZoomMap for 1-D spectrum */
   specmapping = astZoomMap( 1, ftswn_factor, "" );
 
-  /* combine 2-D grid mapping and 1-D spectrum mapping to 
-   * create 3-D mapping for spectrum cube 
+  /* combine 2-D grid mapping and 1-D spectrum mapping to
+   * create 3-D mapping for spectrum cube
    */
   speccubemapping = astCmpMap( gridmapping, specmapping, 0, "" );
-   
+
   /* create Base Frame for 3-D spectrum cube */
   basefrm3d = astFrame( 3, "DOMAIN=GRID");
 

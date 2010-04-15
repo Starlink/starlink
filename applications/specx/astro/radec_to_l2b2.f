@@ -28,7 +28,7 @@
       PARAMETER ( PI = 3.141592654D0 )
       PARAMETER ( DZEROD = 27.4D0 )
       PARAMETER ( RZEROD = 192.25D0 )
-      
+
 *  Ok, go...
 
       DZERO    = DZEROD * PI/180.

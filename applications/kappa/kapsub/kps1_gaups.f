@@ -175,7 +175,7 @@
          CALL MSG_OUT( 'REPORT', '  Requested PSF has zero width',
      :                  STATUS )
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
-      
+
          DO LIN = 1, C1_NLN
             DO PIX = 1, C1_NPX
                OUT( PIX, LIN ) = 0.0

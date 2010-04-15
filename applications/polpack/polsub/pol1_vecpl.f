@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC, ANGROT, DSCALE, 
+*     CALL POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC, ANGROT, DSCALE,
 *                      AHSIZE, JUST, NEGATE, REFANG, STATUS )
 
 *  Description:
@@ -30,7 +30,7 @@
 *     VECORN( NVEC ) = REAL (Given)
 *        The data values defining the vector orientations.  Measured
 *        from the reference direction given by REFANG. They are
-*        anti-clockwise unless NEGATE is .TRUE. The units are defined 
+*        anti-clockwise unless NEGATE is .TRUE. The units are defined
 *        by argument ANGFAC.
 *     ANGFAC = REAL (Given)
 *        The factor which converts values from VECORN into units of
@@ -53,7 +53,7 @@
 *        corresponding pixel.  'END' causes vectors to be drawn ending
 *        at the corresponding pixel.
 *     NEGATE = LOGICAL (Given)
-*        If .TRUE., then the VECORN angles are negated before adding on any 
+*        If .TRUE., then the VECORN angles are negated before adding on any
 *        value specified by parameter ANGROT. [FALSE]
 *     REFANG = REAL (Given)
 *        The ACW angle from the X axis to the reference directions,
@@ -63,7 +63,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,24 +118,24 @@
       REAL VECANG                ! Vector position angle in radians
       REAL VECLEN                ! Vector length in pixels
       REAL D                     ! Change to axis extent
-      REAL X1                    ! X coordinate at bottom left corner      
-      REAL X2                    ! X coordinate at top right corner      
-      REAL Y1                    ! Y coordinate at bottom left corner      
-      REAL Y2                    ! Y coordinate at top right corner      
+      REAL X1                    ! X coordinate at bottom left corner
+      REAL X2                    ! X coordinate at top right corner
+      REAL Y1                    ! Y coordinate at bottom left corner
+      REAL Y2                    ! Y coordinate at top right corner
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First of all, reduce the extent of the PGPLOT viewport slightly so that
-*  vectors are not plotted right up to the border. Otherwise, vectors 
+*  vectors are not plotted right up to the border. Otherwise, vectors
 *  intersect the border.
 *  ========================================================================
 
 *  Get the bounds of the PGPLOT viewport in normalised device coordinates.
-      CALL PGQVP( 0, X1, X2, Y1, Y2 )      
+      CALL PGQVP( 0, X1, X2, Y1, Y2 )
 
-*  Change these bounds so that they cover the central 98% of the original 
+*  Change these bounds so that they cover the central 98% of the original
 *  viewport.
       D = 0.01*( X2 - X1 )
       X2 = X2 - D
@@ -174,7 +174,7 @@
       DO I = 1, NVEC
 
 *  Skip over bad data values.
-         IF ( VECMAG( I ) .NE. VAL__BADR .AND. 
+         IF ( VECMAG( I ) .NE. VAL__BADR .AND.
      :        VECORN( I ) .NE. VAL__BADR .AND.
      :        X( I ) .NE. VAL__BADD .AND.
      :        Y( I ) .NE. VAL__BADD ) THEN
@@ -184,7 +184,7 @@
 
 *  Calculate the vector orientation, in radians. Within POL1_VECT, the
 *  vector orientations are measured from the Y axis, but the supplied
-*  VECORN values are measured from the reference direction. So subtract 
+*  VECORN values are measured from the reference direction. So subtract
 *  90 degrees to make zero equivalent to the Y axis.
             IF( NEGATE ) THEN
                VECANG = -ANGFAC * VECORN( I ) + ANGROT + REFANG - PIBY2
@@ -192,8 +192,8 @@
                VECANG = ANGFAC * VECORN( I ) + ANGROT +REFANG - PIBY2
             END IF
 
-*  Plot the vector.      
-            CALL POL1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST, 
+*  Plot the vector.
+            CALL POL1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST,
      :                      VECLEN, VECANG, AHSIZE, STATUS )
 
 *  Abort if an error has occurred.
@@ -222,7 +222,7 @@
      :                   '  ^NP vectors plotted.', STATUS )
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
-      END IF      
+      END IF
 
 
 *  Arrive here if an error occurs.

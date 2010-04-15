@@ -21,10 +21,10 @@
 
 *  Description:
 *     Create a catalogue containing new fields for the Right Ascension,
-*     Declination, Parallax, Radial velocity and proper motions after a 
-*     conversion has been made from the FK5 system coordinates. The 
+*     Declination, Parallax, Radial velocity and proper motions after a
+*     conversion has been made from the FK5 system coordinates. The
 *     new fields are calculated using SLA_FK524. See SUN 67
-* 
+*
 *     Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
 *     is provided. Proper motion corrections can be made using PROPERM.
 *
@@ -69,25 +69,25 @@
 *        Name of the radial velocity field in FK4 system.
 
 *  Example:
-*     FK524 TEST TESTFK4 RA DEC RAPM DECPM PARALLAX RAD_VEL RAB DECB 
+*     FK524 TEST TESTFK4 RA DEC RAPM DECPM PARALLAX RAD_VEL RAB DECB
 *     RAPMB DECPMB PARALLAXB RADVELB
 
 *  Notes:
 *     This application creates a new catalogue that contains extra fields for
-*     Right Ascension, Declination, Parallax, Radial velocity and proper 
+*     Right Ascension, Declination, Parallax, Radial velocity and proper
 *     motions after a conversion to FK4 system.
 *     The naming of these new fields can lead to confusion. Traditionally
-*     the field names RA and DEC are used for the Right Ascension and 
+*     the field names RA and DEC are used for the Right Ascension and
 *     Declination fields in the catalogue. It is stongly suggested that the
 *     field names of Right Ascension and Declination in the new system (FK4)
-*     take the form RAB, DECB for RA Besselian and DEC Besselian. In the same 
-*     way PARLX would become PARLXB and RADVEL RADVELB etc. You may go on to 
-*     rename the field RA to RAJ and DEC to DECJ and RAB to RA and DECB to DEC 
+*     take the form RAB, DECB for RA Besselian and DEC Besselian. In the same
+*     way PARLX would become PARLXB and RADVEL RADVELB etc. You may go on to
+*     rename the field RA to RAJ and DEC to DECJ and RAB to RA and DECB to DEC
 *     using the UPFIELD application but you must also then update the Parallax,
 *     Radial velocity and proper motions and the catalogues Equinox parameter.
-*     
-*     Care should also be taken when renaming fields. Renaming RAB to RA 
-*     before renaming RA to RAJ, in the above example, would result in two 
+*
+*     Care should also be taken when renaming fields. Renaming RAB to RA
+*     before renaming RA to RAJ, in the above example, would result in two
 *     fields named RA in the same catalogue.
 
 *  Authors:
@@ -101,7 +101,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,13 +119,13 @@
       CHARACTER * ( CHP__SZCNAME ) RAFK4 ! Name of the RA field in FK4 system.
       CHARACTER * ( CHP__SZCNAME ) DECFK4 ! Name of the DEC field in FK4 system.
       CHARACTER * ( CHP__SZCNAME ) RAPMFK4 ! Name of the RA proper motion FK4.
-      CHARACTER * ( CHP__SZCNAME ) DECPMFK4 ! Name of the DEC proper motion FK4 
+      CHARACTER * ( CHP__SZCNAME ) DECPMFK4 ! Name of the DEC proper motion FK4
       CHARACTER * ( CHP__SZCNAME ) PARLXFK4 ! Name of the parallax field FK4.
       CHARACTER * ( CHP__SZCNAME ) RADVELFK4 ! Name of the radial velocity FK4.
       CHARACTER * ( CHP__SZCNAME ) RAFK5 ! Name of the RA field in FK4 system.
       CHARACTER * ( CHP__SZCNAME ) DECFK5 ! Name of the DEC field in FK5 system.
       CHARACTER * ( CHP__SZCNAME ) RAPMFK5 ! Name of the RA proper motion FK5.
-      CHARACTER * ( CHP__SZCNAME ) DECPMFK5 ! Name of the DEC proper motion FK5 
+      CHARACTER * ( CHP__SZCNAME ) DECPMFK5 ! Name of the DEC proper motion FK5
       CHARACTER * ( CHP__SZCNAME ) PARLXFK5 ! Name of the parallax field FK5.
       CHARACTER * ( CHP__SZCNAME ) RADVELFK5 ! Name of the radial velocity FK5.
 *.
@@ -155,7 +155,7 @@
 *
 *    Make the call.
 *
-       call chu_fk524(incat, outcat,  rafk5, decfk5, rapmfk5, decpmfk5, 
+       call chu_fk524(incat, outcat,  rafk5, decfk5, rapmfk5, decpmfk5,
      :   parlxfk5, radvelfk5, rafk4, decfk4, rapmfk4, decpmfk4,
      :   parlxfk4, radvelfk4, status)
 *

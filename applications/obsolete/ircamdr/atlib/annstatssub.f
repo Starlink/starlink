@@ -1,9 +1,9 @@
 	SUBROUTINE ANNSTATSSUB( NX, NY, INARR, NXO, NYO, OUTARR,
-     :	                        X, Y, ECC, ANG, WIDTH, PLATSCAL, 
+     :	                        X, Y, ECC, ANG, WIDTH, PLATSCAL,
      :	                        USEBAD, BADVAL, OUTFILE)
 
 *      No implicit variables
-	IMPLICIT NONE           
+	IMPLICIT NONE
 
 *     History
 *     13-JUL-1994  Changed STR$ to CHR_ and LIB$ to FIO_ (SKL@JACH)
@@ -11,7 +11,7 @@
 *                  Use FIO for open and close
 
 *      Include ADAM parameter defintions
-	INCLUDE 'SAE_PAR'       
+	INCLUDE 'SAE_PAR'
         INCLUDE 'CHR_ERR'
         INCLUDE 'FIO_PAR'
 
@@ -72,7 +72,7 @@
      :	  DATARR( MAXDATA),    ! data array for NAG sorting
      :    SUMSQ                ! sum of squares for std calculation
 
-	CHARACTER*( *) 
+	CHARACTER*( *)
      :	  OUTFILE              ! output ascii file name
 
 	LOGICAL
@@ -106,7 +106,7 @@
 	CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	CALL MSG_SETR( 'SZ', WIDTH)
 	CALL MSG_SETI( 'NU', NUMANN)
-	CALL MSG_OUT( 'MESS', 
+	CALL MSG_OUT( 'MESS',
      :	  'Number of (^SZ arcsec) annuli in your image is ^NU',
      :	  STATUS)
 
@@ -114,7 +114,7 @@
 	CALL FIO_OPEN( OUTFILE, 'WRITE','LIST',0, LUN, STATUS)
 
 *      write header line for output file
-	CALL FIO_WRITE(LUN, 
+	CALL FIO_WRITE(LUN,
      :	  '  No       Ri     Ro       N    BN         ' //
      :	  'Mea         Med         Mod         Sum         ' //
      :	  'Max         Min         Std', STATUS)
@@ -143,7 +143,7 @@
 	  DO K = 1, NY
 	    DO J = 1, NX
 
-*            calculate x and y of current pixel wrt rotated annulus 
+*            calculate x and y of current pixel wrt rotated annulus
 *            centre
 	      XR = ( J-X)*COS( ANGR ) - (K-Y)*SIN( ANGR )
 	      YR = ( J-X)*SIN( ANGR ) + (K-Y)*COS( ANGR )
@@ -154,8 +154,8 @@
 *            test if current pixel in current annulus
 	      IF( R .GE. R1 .AND. R .LT. R2) THEN
 
-*              test if current pixel is a good value 
-	        IF( USEBAD .AND. 
+*              test if current pixel is a good value
+	        IF( USEBAD .AND.
      :	            INARR( J, K) .NE. BADVAL) THEN
 
 *                increment number of good pixels in current annulus
@@ -173,7 +173,7 @@
 	          END IF
 
 *              here if current pixel is bad
-	        ELSE IF( USEBAD .AND. 
+	        ELSE IF( USEBAD .AND.
      :	                 INARR( J, K) .EQ. BADVAL) THEN
 
 *                increment number of bad pixels in current array
@@ -198,18 +198,18 @@
 
 *        tell user some important information on current annulus
 	  CALL MSG_SETI( 'N', I)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    ' Annulus number ^N',
      :	    STATUS)
 	  CALL MSG_SETI( 'NU', NPTS)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    ' Number of pixels in annulus       = ^NU',
      :	    STATUS)
 
 	  IF( USEBAD .AND. BNPTS .NE. 0) THEN
 	    CALL MSG_SETI( 'N', I)
 	    CALL MSG_SETI( 'NU', BNPTS)
-	    CALL MSG_OUT( 'MESS', 
+	    CALL MSG_OUT( 'MESS',
      :	      ' Number of BAD pixels in annulus   = ^NU',
      :	      STATUS)
 	  END IF
@@ -217,9 +217,9 @@
 *        Sort the pixel values in current annulus
 	  IF( NPTS .GT. 0) THEN
 	    CALL PDA_QSAD( NPTS, DATARR )
- 
+
 *          call subroutine to find median for the input DATARR
-	    CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN, 
+	    CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN,
      :	                          MEDIAN, MODE)
 
 *          Scan through pixels in annulus and calculate standard deviation
@@ -262,23 +262,23 @@
 *        tell user result of all this messing about...
 	  CALL MSG_SETR( 'RI', R1)
 	  CALL MSG_SETR( 'RO', R2)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    ' Inner/outer radius (arcsec)       = ^RI/^RO' ,
      :	    STATUS)
 	  CALL MSG_SETR( 'MEA', MEAN)
 	  CALL MSG_SETR( 'MED', MEDIAN)
 	  CALL MSG_SETR( 'MOD', MODE)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    ' Mean/Median/Mode                  = ^MEA/^MED/^MOD',
      :	    STATUS)
 	  CALL MSG_SETR( 'SUM', SUM)
 	  CALL MSG_SETR( 'MAX', VALMAX)
 	  CALL MSG_SETR( 'MIN', VALMIN)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    ' Sum/Maximum/Minimum               = ^SUM/^MAX/^MIN',
      :	    STATUS)
 	  CALL MSG_SETR( 'STD', STD)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	    ' Standard Deviation in annulus     = ^STD',
      :	    STATUS)
 

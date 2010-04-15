@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
+*     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd,
 *                              smfBox *boxes, int spread, const double params[],
 *                              AstFrameSet *wcsout, int tile_size[2],
 *                              int trim, int border, size_t *ntiles,
@@ -26,10 +26,10 @@
 *     size = int (Given)
 *        Number of elements in igrp
 *     lbnd = int * (Given)
-*        Pointer to an array holding the lower pixel index bounds of the 
+*        Pointer to an array holding the lower pixel index bounds of the
 *        full size output grid.
 *     ubnd = int * (Given)
-*        Pointer to an array holding the upper pixel index bounds of the 
+*        Pointer to an array holding the upper pixel index bounds of the
 *        full size output grid.
 *     boxes = smfBox * (Given)
 *        Pointer to an array of smfBox structures. The length of this
@@ -37,27 +37,27 @@
 *        the spatial bounding box of the corresponding input file, in the
 *        pixel index system of the full size output grid.
 *     spread = int (Given)
-*        Specifies the scheme to be used for dividing each input data value 
+*        Specifies the scheme to be used for dividing each input data value
 *        up amongst the corresponding output pixels. See docs for astRebinSeq
 *        (SUN/211) for the allowed values.
 *     params = const double[] (Given)
 *        An optional pointer to an array of double which should contain any
-*        additional parameter values required by the pixel spreading scheme. 
-*        See docs for astRebinSeq (SUN/211) for further information. If no 
+*        additional parameter values required by the pixel spreading scheme.
+*        See docs for astRebinSeq (SUN/211) for further information. If no
 *        additional parameters are required, this array is not used and a
-*        NULL pointer may be given. 
+*        NULL pointer may be given.
 *     wcsout = AstFrameSet * (Given)
 *        Pointer to the FrameSet describing the WCS of the output cube.
 *     tile_size = int[ 2 ] * (Given and Returned)
-*        An array holding the nominal spatial dimensions of each tile, in 
-*        pixels.  Edge tiles may be thinner if "trim" is non-zero. In order 
-*        to avoid creating very thin tiles around the edges, the actual tile 
-*        size used for the edge tiles may be up to 10 % larger than the 
-*        supplied value. This creation of "fat" edge tiles may be prevented 
+*        An array holding the nominal spatial dimensions of each tile, in
+*        pixels.  Edge tiles may be thinner if "trim" is non-zero. In order
+*        to avoid creating very thin tiles around the edges, the actual tile
+*        size used for the edge tiles may be up to 10 % larger than the
+*        supplied value. This creation of "fat" edge tiles may be prevented
 *        by supplying a negative value for the tile size, in which case edge
 *        tiles will never be wider than the supplied absolute value. If the
 *        first value is zero, then a single tile containing the entire output
-*        array is used, with no padding. The actual used tile sizes are 
+*        array is used, with no padding. The actual used tile sizes are
 *        returned.
 *     trim = int (Given)
 *        If true then the border tiles are trimmed to exclude pixels off
@@ -74,32 +74,32 @@
 
 *  Returned Value:
 *     Pointer to an array of smfTile structures. The length of this array
-*     will be returned in "*ntiles". This array of structures should be 
+*     will be returned in "*ntiles". This array of structures should be
 *     freed using smf_freetiles when no longer needed.
 
 *  Description:
-*     This function divides up the spatial coverage of the full size pixel 
-*     grid specified by "lbnd" and "ubnd" into a number of rectangular tiles, 
-*     each with spatial area given by "tile_size". It returns an array of 
-*     smfTile structures, each of which describes the extent and location of 
-*     a single tile. 
+*     This function divides up the spatial coverage of the full size pixel
+*     grid specified by "lbnd" and "ubnd" into a number of rectangular tiles,
+*     each with spatial area given by "tile_size". It returns an array of
+*     smfTile structures, each of which describes the extent and location of
+*     a single tile.
 *
-*     This function only produces spatial tiling. If the supplied grid has 
-*     a spectral axis, then each tile will cover the entire spectral range of 
+*     This function only produces spatial tiling. If the supplied grid has
+*     a spectral axis, then each tile will cover the entire spectral range of
 *     the full size grid.
 *
-*     The tiles are ordered in a raster like manner, starting at the lower 
-*     pixel bounds of the full size array. The full size grid is padded out 
+*     The tiles are ordered in a raster like manner, starting at the lower
+*     pixel bounds of the full size array. The full size grid is padded out
 *     so that it is an integer multiple of the supplied tile size. The
-*     padding is done by adding a border to each edge of the supplied full 
+*     padding is done by adding a border to each edge of the supplied full
 *     size grid.
 *
 *     Each smfTile structure includes the following:
 *        - The bounds of the tile specified as pixel indices within the
 *        full size grid. These bounds result in the tiles abutting with
 *        no gap or overlap.
-*        - The bounds of the tile including the requested border, specified 
-*        as pixel indices within the full size grid. 
+*        - The bounds of the tile including the requested border, specified
+*        as pixel indices within the full size grid.
 *        - The bounds of a tile that is further extended by the width of
 *        the spreading kernel (i.e. these bounds include both the
 *        requested biorder and the kernel width).
@@ -201,16 +201,16 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
-                          int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], AstFrameSet *wcsout, 
+smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
+                          int *ubnd, smfBox *boxes, int spread,
+                          const double params[], AstFrameSet *wcsout,
                           int tile_size[ 2 ], int trim, int border,
                           size_t *ntiles, int *status ){
 
 /* Local Variables */
    AstUnitMap *umap = NULL;
    char *pname = NULL;
-   char filename[ GRP__SZNAM + 1 ]; 
+   char filename[ GRP__SZNAM + 1 ];
    double refpix[ 3 ];
    double refwcs[ 3 ];
    double shift[ 3 ];
@@ -310,8 +310,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* If the tile size is non-zero, we split the output array into tiles... */
    } else {
 
-/* Ensure the tile sizes are positive, and set flags indicating if either 
-   supplied value was negative (indicating that we are free to expand the 
+/* Ensure the tile sizes are positive, and set flags indicating if either
+   supplied value was negative (indicating that we are free to expand the
    edge tiles by up to 10% to reduce the number of tiles). */
       for( i = 0; i < 2; i++ ){
          if( tile_size[ i ] < 0 ) {
@@ -353,7 +353,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       refpix[ 1 ] += tlbnd[ 1 ] - 1.5;
 
 /* We place the pixel containing the reference position at the centre
-   of a tile, and then pad the supplied full size grid bounds by adding a 
+   of a tile, and then pad the supplied full size grid bounds by adding a
    border to each edge so that each axis is spanned by an integer number
    of tiles. Do each spatial axis separately. */
       for( i = 0; i < 2; i++ ) {
@@ -381,7 +381,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          }
 
 /* If the ref pixel is outside the full sized output array, we may need
-   to exclude tiles that are off the edge. So increase the lower pixel 
+   to exclude tiles that are off the edge. So increase the lower pixel
    bounds by a tile size until the upper bound of the corresponding tile
    is inside the full sized output array. */
          while( plbnd[ i ] + tile_size[ i ] - 1 < tlbnd[ i ] + border ) {
@@ -389,10 +389,10 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             numtile[ i ]--;
          }
 
-/* If the edge tiles are being trimmed, and we have been told to avoid 
+/* If the edge tiles are being trimmed, and we have been told to avoid
    thin edge tiles on this axis, then see if the edge tile is thinner than
-   10% of the tile size. If so, reduce the number of tiles on this axis by 
-   one, and set a flag indicating that the edge tile on the lower bound of 
+   10% of the tile size. If so, reduce the number of tiles on this axis by
+   one, and set a flag indicating that the edge tile on the lower bound of
    this axis should be merged with the adjacent tile (i.e. fattened). */
          lfat[ i ] = 0;
          if( trim && adjust[ i ] ) {
@@ -431,15 +431,15 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       lbin = 0;
       ubin = 0;
       val = 1.0;
-   
+
       lbout = -1000;
       ubout = 1000;
       work = astMalloc( sizeof( float )*( ubout - lbout + 1 ) );
-      if( work ) {   
+      if( work ) {
          astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
-                    0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work, 
+                    0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work,
                     NULL );
-   
+
          w = work + 1001;
          while( *w != VAL__BADR && *w != 0.0 ) w++;
          extend = w  - ( work + 1001 );
@@ -447,15 +447,15 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          umap = astAnnul( umap );
          work = astFree( work );
       }
-   
+
 /* Return the total number of tiles, and create the returned array. */
       *ntiles = numtile[ 0 ]*numtile[ 1 ];
       result = astMalloc( sizeof( smfTile ) * (*ntiles ) );
-   
+
 /* Store a pointer to the next tile desription to create. */
-      tile = result;   
-   
-/* Initialise the y axis bounds (without border or extension) of the tiles in 
+      tile = result;
+
+/* Initialise the y axis bounds (without border or extension) of the tiles in
    the first row. */
       ylo = plbnd[ 1 ];
       if( numtile[ 1 ] == 1 ) {
@@ -467,8 +467,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Loop round each row of tiles. */
       for( iy = 0; iy < numtile[ 1 ] && *status == SAI__OK; iy++ ) {
-     
-/* Initialise the x axis bounds (without border or extension) of the tiles in 
+
+/* Initialise the x axis bounds (without border or extension) of the tiles in
    the first column. */
          xlo = plbnd[ 0 ];
          if( numtile[ 0 ] == 1 ) {
@@ -480,7 +480,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Loop round each tile in the current row. */
          for( ix = 0; ix < numtile[ 0 ]; ix++, tile++ ) {
-   
+
 /* Store the tile area (without border or extension). */
             tile->qlbnd[ 0 ] = xlo;
             tile->qubnd[ 0 ] = xhi;
@@ -496,7 +496,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
                if( tile->qubnd[ 0 ] > tubnd[ 0 ] ) tile->qubnd[ 0 ] = tubnd[ 0 ];
                if( tile->qubnd[ 1 ] > tubnd[ 1 ] ) tile->qubnd[ 1 ] = tubnd[ 1 ];
             }
-   
+
 /* Store the tile area including a spatial border of the requested width. */
             tile->lbnd[ 0 ] = tile->qlbnd[ 0 ] - border;
             tile->ubnd[ 0 ] = tile->qubnd[ 0 ] + border;
@@ -520,8 +520,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->elbnd[ 2 ] = tlbnd[ 2 ];
             tile->eubnd[ 2 ] = tubnd[ 2 ];
 
-/* Store the bounds of the basic (bordered but non-extended) tile in a grid 
-   coordinate system that has value (1.0,1.0) at the centre of the first pixel 
+/* Store the bounds of the basic (bordered but non-extended) tile in a grid
+   coordinate system that has value (1.0,1.0) at the centre of the first pixel
    in the extended tile. */
             tile->glbnd[ 0 ] = tile->lbnd[ 0 ] - tile->elbnd[ 0 ] + 1;
             tile->gubnd[ 0 ] = tile->ubnd[ 0 ] - tile->elbnd[ 0 ] + 1;
@@ -529,9 +529,9 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->gubnd[ 1 ] = tile->ubnd[ 1 ] - tile->elbnd[ 1 ] + 1;
             tile->glbnd[ 2 ] = tile->lbnd[ 2 ] - tile->elbnd[ 2 ] + 1;
             tile->gubnd[ 2 ] = tile->ubnd[ 2 ] - tile->elbnd[ 2 ] + 1;
-   
+
 /* A ShiftMap that describes the shift in the origin of 2D GRID coordinates
-   caused by extracting the extended tile from the full sized output array. 
+   caused by extracting the extended tile from the full sized output array.
    This is the Mapping from the full size GRID coordinate system to the
    tile GRID coordinate system. */
             shift[ 0 ] = tlbnd[ 0 ] - tile->elbnd[ 0 ];
@@ -544,21 +544,21 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    that falls within the bounds of the extended tile area. */
             tile->grp = grpNew( "", status );
             tile->jndf = astMalloc( sizeof( int )* size );
-            if( tile->jndf ) {   
+            if( tile->jndf ) {
 
 /* Find the input files that may overlap the current extended tile area. */
                box = boxes;
                tile->size = 0;
                for( i = 1; i <= size; i++, box++ ){
-   
+
 /* Does the bounding box for the i'th input file overlap the extended
-   tile area? If so, include the name of the input file in the group of 
+   tile area? If so, include the name of the input file in the group of
    file names that contribute to the current tile. */
                   if( box->lbnd[ 0 ] <= tile->eubnd[ 0 ] &&
                       box->ubnd[ 0 ] >= tile->elbnd[ 0 ] &&
                       box->lbnd[ 1 ] <= tile->eubnd[ 1 ] &&
                       box->ubnd[ 1 ] >= tile->elbnd[ 1 ] ) {
-      
+
                      pname = filename;
                      grpGet( igrp, i, 1, &pname, GRP__SZNAM, status );
                      grpPut1( tile->grp, filename, 0, status );
@@ -576,15 +576,15 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->qyu = 1;
             if( iy == 0 ) tile->qyl = ( plbnd[ 1 ] < tlbnd[ 1 ] );
             if( iy == numtile[ 1 ] - 1 ) tile->qyu = ( pubnd[ 1 ] > tubnd[ 1 ] );
-   
-/* Store the x axis bounds (without border or extension) of the tiles in 
+
+/* Store the x axis bounds (without border or extension) of the tiles in
    the next column. */
             xlo = xhi + 1;
             xhi = xlo + tile_size[ 0 ] - 1;
             if( ufat[ 0 ] && ix == numtile[ 0 ] - 2 ) xhi += tile_size[ 0 ];
          }
-   
-/* Store the y axis bounds (without border or extension) of the tiles in 
+
+/* Store the y axis bounds (without border or extension) of the tiles in
    the next row. */
          ylo = yhi + 1;
          yhi = ylo + tile_size[ 1 ] - 1;

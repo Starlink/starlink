@@ -78,14 +78,14 @@
       INTEGER ICURWK
 
       INTEGER NREC, I, NP
-      
+
 *   Buffer for record from file
       INTEGER IBUF(RECSIZ)
       REAL RBUF(RECSIZ)
       EQUIVALENCE (IBUF,RBUF)
 
       DATA ICURWK /-1/
-      
+
       IF (STATUS.EQ.0) THEN
 
 *   If the current workstation does not match the one requested
@@ -93,7 +93,7 @@
 
 *     Make sure that the database is open
             CALL GNS_1INITG(STATUS)
-            IF (STATUS.NE.0) GO TO 9999      
+            IF (STATUS.NE.0) GO TO 9999
 
 *     Hash the workstation type to get a record number and search the
 *     file from that point until we get an empty record or find the
@@ -114,8 +114,8 @@
                LDEFNA = 0
                IOPEN = 0
                AGITYG = 0
-            ELSE  
-      
+            ELSE
+
 *           If the type doesn't match then read another record
                IF (IBUF(1).NE.ITYPE) GO TO 10
 
@@ -163,7 +163,7 @@
                      NP = 2
                   END IF
                   DEFNAM(I:I) = CHAR(IBUF(NP))
-   30          CONTINUE                  
+   30          CONTINUE
 
 *           Repeat for the next item ( IOPEN )
                NP = NP + 1
@@ -189,7 +189,7 @@
          END IF
       END IF
       GO TO 9999
-      
+
   100 CONTINUE
       STATUS = GNS__DBRDE
       CALL EMS_REP( 'GNS_1RDWST_DBRE',
@@ -199,6 +199,6 @@
       STATUS = GNS__DBFME
       CALL EMS_REP( 'GNS_1RDWST_DBFE',
      :              'GNS database has invalid format', STATUS )
- 9999 CONTINUE            
+ 9999 CONTINUE
       END
-       
+

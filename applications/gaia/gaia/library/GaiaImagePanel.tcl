@@ -760,7 +760,7 @@ itcl::class gaia::GaiaImagePanel {
    }
 
    #  Go to a given RA. In fact since we cannot scroll outside the displayed
-   #  window just makes it visible, if possible. 
+   #  window just makes it visible, if possible.
    protected method goto_ra_ {ra} {
       set var $image_
       global ::$var
@@ -772,7 +772,7 @@ itcl::class gaia::GaiaImagePanel {
    }
 
    #  Go to a given Dec. In fact since we cannot scroll outside the displayed
-   #  window just makes it visible, if possible. 
+   #  window just makes it visible, if possible.
    protected method goto_dec_ {dec} {
       set var $image_
       global ::$var

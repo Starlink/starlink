@@ -9,7 +9,7 @@ C     Sets some of the information held in an axis structure.
 C
 C  Description:
 C     Sets a number of items in an axis structure.  If these items
-C     do not in fact exist, then they are created.  At present, only a 
+C     do not in fact exist, then they are created.  At present, only a
 C     very limited number of items are supported.
 C
 C  Language:
@@ -154,7 +154,7 @@ C
             GO TO 500          ! Error exit
          END IF
       END IF
-C     
+C
 C     Set the axis units
 C
       IF (CHAR_ITEMS.GE.1) THEN

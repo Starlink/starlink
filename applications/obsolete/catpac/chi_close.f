@@ -38,7 +38,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -66,9 +66,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-* 
+*
         do icount = 1, chi__mxass
-* 
+*
 *    Call CLOSECAT on the appropriate low level system
 *
           catname = opcatnames(icount)
@@ -92,7 +92,7 @@
 *              call chi_rclocat( cd, status)
             endif
           endif
-*    
+*
         enddo
         numopencats = 0
 *

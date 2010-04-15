@@ -4,14 +4,14 @@
 #     multistack.csh
 #
 #  Purpose:
-#     Averages groups of spectra extracted from a three-dimensional IFU NDF and 
+#     Averages groups of spectra extracted from a three-dimensional IFU NDF and
 #     then plots these averaged spectra in a stack.
 #
 #  Type of Module:
 #     C-shell script.
 #
 #  Usage:
-#     multistack [-g number] [-i filename] [-n number] [-o number] [-z/+z] 
+#     multistack [-g number] [-i filename] [-n number] [-o number] [-z/+z]
 #
 #  Description:
 #     This shell script reads a three-dimensional IFU NDF as input and
@@ -33,10 +33,10 @@
 #       The number of groups to extract.
 #     -o number
 #       Offset between the spectra in the stack.
-#     -z 
+#     -z
 #       The script will automatically prompt to select a region to zoom
 #       before prompting for the region of interest.  [TRUE]
-#     +z 
+#     +z
 #       The program will not prompt for a zoom before requesting the region
 #       of interest. [FALSE]
 #
@@ -71,13 +71,13 @@
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script
 #       that also checks for a degenerate third axis.
 #     2006 March 10 (MJC):
-#       Find upper limit of the plots' ordinate so as to include all 
-#       spectra fully regardless of the offsets.  Also allow a 2-percent 
-#       margin at the top and bottom of the plot to separate the spectra 
+#       Find upper limit of the plots' ordinate so as to include all
+#       spectra fully regardless of the offsets.  Also allow a 2-percent
+#       margin at the top and bottom of the plot to separate the spectra
 #       from the axes.
 #     {enter_further_changes_here}
 #
@@ -117,7 +117,7 @@ while ( $#args > 0 )
       set gotgrp = "TRUE"
       set numgrp = $args[1]
       shift args
-      breaksw      
+      breaksw
    case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
@@ -129,25 +129,25 @@ while ( $#args > 0 )
       set gotnum = "TRUE"
       set numspec = $args[1]
       shift args
-      breaksw    
+      breaksw
    case -o:    # offset for each spectra
       shift args
       set gotoff = "TRUE"
       set offset = $args[1]
       shift args
-      breaksw      
+      breaksw
    case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
-      breaksw                            
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw  
+   endsw
 end
 
 # Do the package setup.
@@ -169,7 +169,7 @@ if ( $status == 1 ) exit
 # Collapse white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Setup the plot device.
 set plotdev = "xwin"
@@ -178,7 +178,7 @@ set plotdev = "xwin"
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null
 
 # Form spectral stack of averaged spectra.
 # ========================================
@@ -242,15 +242,15 @@ while ( $grpcount <= $numgrp )
       else
          echo "        Adding: Group ${grpcount}"
          ndfcopy "in=${grpfile} out=${grpfile}_tmp"
-         add in1="${grpfile}_tmp" in2=${specfile} out=${grpfile} 
+         add in1="${grpfile}_tmp" in2=${specfile} out=${grpfile}
          rm -f ${grpfile}_tmp.sdf >& /dev/null
       endif
-      
+
       # increment counter
       @ counter = $counter + 1
 
    end
-   
+
 # Take the mean of the current group spectrum.
    ndfcopy "in=${grpfile} out=${grpfile}_tmp"
    cdiv in="${grpfile}_tmp" out=${grpfile} scalar=${numgrp}
@@ -288,8 +288,8 @@ set grpcount = 1
 set ytop = $ybot
 while ( $grpcount <= $numgrp )
 
-   set grpfile = "${tmpdir}/${user}/mstk_g${grpcount}" 
-   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off" 
+   set grpfile = "${tmpdir}/${user}/mstk_g${grpcount}"
+   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off"
 
 # Do the addition.
    set specoff = `calc exp="'${offset}*(${grpcount}-1)'" prec=_double`
@@ -302,7 +302,7 @@ while ( $grpcount <= $numgrp )
 # last spectrum even though it has the largest offset.
    stats "${outfile}" >& /dev/null
    set outmax = `parget maximum stats`
-   set ytop = `calc exp="'max(${outmax},${ytop})'"` 
+   set ytop = `calc exp="'max(${outmax},${ytop})'"`
 
 # Increment the group counter.
    @ grpcount = $grpcount + 1
@@ -310,8 +310,8 @@ end
 
 # Give a litte breathing room to separate the curves from the
 # axes.
-set ytop = `calc exp="'${ytop}+0.02*((${ytop})-(${ybot}))'"` 
-set ybot = `calc exp="'${ybot}-0.02*((${ytop})-(${ybot}))'"` 
+set ytop = `calc exp="'${ytop}+0.02*((${ytop})-(${ybot}))'"`
+set ybot = `calc exp="'${ybot}-0.02*((${ytop})-(${ybot}))'"`
 
 # Create the multi-spectrum plot.
 # ===============================
@@ -324,8 +324,8 @@ echo "      Plotting:"
 # Plot each group spectrum in turn in the same graphic.
 set grpcount = $numgrp
 while ( $grpcount > 0 )
-   
-   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off" 
+
+   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off"
 
    echo "        Group: ${grpcount} "
 
@@ -376,8 +376,8 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
    set grpcount = $numgrp
    while ( $grpcount > 0 )
-   
-      set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off" 
+
+      set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off"
 
       echo "        Group: ${grpcount} "
 
@@ -394,5 +394,5 @@ endif
 # =========
 cleanup:
 
-rm -f ${tmpdir}/${user}/mstk* >& /dev/null     
+rm -f ${tmpdir}/${user}/mstk* >& /dev/null
 rmdir ${tmpdir}/${user} >& /dev/null

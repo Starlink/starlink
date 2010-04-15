@@ -68,19 +68,19 @@
 #itk::usual <GaiaClass> {}
 
 itcl::class <scope>::<GaiaClass> {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    #  Nothing
 
    #  Constructor:
    #  ------------
    constructor {args} {
-      
+
       #  Evaluate any options [incr Tk].
       #  eval itk_initialize $args
-   }   
+   }
 
    #  Destructor:
    #  -----------
@@ -92,7 +92,7 @@ itcl::class <scope>::<GaiaClass> {
 
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  Protected variables: (available to instance)
    #  --------------------
 

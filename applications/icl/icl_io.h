@@ -12,7 +12,7 @@
 #define INPUTLINELENGTH 256
 #define IOPROCESSNAME "icl_io"
 
-struct iocommand 
+struct iocommand
   {
   int fcode;	/* Message function code */
   int iarg;	/* Message sequence number or integer argument */

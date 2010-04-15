@@ -1,5 +1,5 @@
 { PROCEDURE POL2 : Polarimetry on 4 image with concentric apertures
-proc pol2 
+proc pol2
   jxdisp = -1
   jydisp = 73
   hxdisp = -1

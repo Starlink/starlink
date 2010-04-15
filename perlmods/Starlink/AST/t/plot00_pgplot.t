@@ -11,8 +11,8 @@ BEGIN {
    exit;
  } else {
    plan tests => 15;
- }  
- 
+ }
+
 };
 
 require_ok("Starlink::AST");
@@ -34,7 +34,7 @@ is( Starlink::AST::PGPLOT::_GLine( \@x, \@y ), 1, "Calling _GLine()" );
 is( Starlink::AST::PGPLOT::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 
 # _GText( $text, $x, $y, $justification, $upx, $upy );
-is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 4, "CC", 0, 1), 
+is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 4, "CC", 0, 1),
     1, "Calling _GText()" );
 
 # _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
@@ -76,13 +76,13 @@ is( $status, 1, "Calling _GQch()" );
 
 # _GAttr
 my $old_value;
-( $status, $old_value ) = 
+( $status, $old_value ) =
   Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__COLOUR(), 3, undef );
 
 is( $status, 1, "Calling _GAttr()" );
 is( $old_value, 1, "Checking old GRF__COLOUR value" );
 
-( $status, $old_value ) = 
+( $status, $old_value ) =
   Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__WIDTH(), 5, undef );
 
 is( $status, 1, "Calling _GAttr()" );

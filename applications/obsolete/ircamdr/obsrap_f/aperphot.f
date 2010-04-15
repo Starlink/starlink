@@ -26,7 +26,7 @@
 *     FNAME = CHAR( READ )
 *            Name of file containing input data
 *     TERMOUT = CHAR( READ )
-*            Does use want terminal out of file input data 
+*            Does use want terminal out of file input data
 *     SKYANNUL = LOGICAL( READ )
 *            Whether user want to subtract sky from concentric annulus
 *     XCEN = REAL( READ )
@@ -58,10 +58,10 @@
 *
 *     Get input image from environment
 *     If no error so far then
-*        Map in DATA_ARRAY 
+*        Map in DATA_ARRAY
 *        Output image dimensions to user
 *        Get the source of the subsequent input
-*        If user has selected file input then 
+*        If user has selected file input then
 *          Get filename
 *          Does user want terminal output of data or just file
 *        Else if user has selected terminal input then
@@ -86,7 +86,7 @@
 *     Endif
 *     End
 *
-*    Deficiencies : 
+*    Deficiencies :
 
 *     Works on integer pixels only not partial pixels
 *
@@ -102,7 +102,7 @@
 *    History :
 *
 *     22-10-1985 : First implementation (REVA::MJM)
-*     17-01-1986 : More error checking and tidying (REVA::MJM) 
+*     17-01-1986 : More error checking and tidying (REVA::MJM)
 *     03-12-1987 : ask if want another input (UKTH::CAA)
 *     16-01-1988 : created aperphot from aperadd (UKTH::CAA)
 *     13-05-1990 : added option to change aperture size/position (JACH::CAA)
@@ -116,8 +116,8 @@
 
 *      Global constants :
 	INCLUDE  'SAE_PAR'          ! SSE global definitions
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
         INCLUDE 'FIO_PAR'
         INCLUDE 'CHR_ERR'
 
@@ -172,8 +172,8 @@
      :	   VALMIN2,            ! min       "      "   "      "
      :	   MODE1,              ! mode      "      "   "      "
      :	   MODE2,              ! mode      "      "   "      "
-     :     NOISE1,             ! std       "      "   "      "   
-     :     NOISE2,             ! std       "      "   "      "   
+     :     NOISE1,             ! std       "      "   "      "
+     :     NOISE2,             ! std       "      "   "      "
      :	   BADVAL,             ! bad pixel value
      :	   RAD1,               ! radius of inner edge of annulus
      :	   RAD2,               ! radius of outer edge of annulus
@@ -191,7 +191,7 @@
 	CHARACTER*132
      :	   LINE1               ! input line
 
-	LOGICAL 
+	LOGICAL
      :	   AGAIN,              ! another input option
      :	   MORE,               ! another read option
      :	   USEBAD,             ! option to use bad pixel value
@@ -224,7 +224,7 @@
 *        get source of data input F=file, T=terminal
 	  CALL PAR_GET0C( 'DATASOURCE', DATASOURCE, STATUS)
 	  CALL CHR_UCASE( DATASOURCE )
-	  IF( DATASOURCE( 1:1) .NE. 'F' .AND. 
+	  IF( DATASOURCE( 1:1) .NE. 'F' .AND.
      :	      DATASOURCE( 1:1) .NE. 'T') THEN
 	    DATASOURCE( 1:1) = 'T'
 	  END IF
@@ -236,7 +236,7 @@
 	    IF( DATASOURCE( 1:1) .EQ. 'F') THEN
 	      CALL PAR_GET0C( 'TERMOUT', TERMOUT, STATUS)
 	      CALL CHR_UCASE( TERMOUT )
-	      IF( TERMOUT( 1:1) .NE. 'T' .AND. 
+	      IF( TERMOUT( 1:1) .NE. 'T' .AND.
      :	          TERMOUT( 1:1) .NE. 'F' .AND.
      :	          TERMOUT( 1:1) .NE. 'B') THEN
 	        TERMOUT( 1:1) = 'B'
@@ -251,7 +251,7 @@
 
 *            get the aperture centre coordinates - the aperture centre
 *            cannot be off edge of the image
-	      IF( RUNSORT( 1:1) .EQ. 'P' .OR. RUNSORT( 1:1) .EQ. 'B') 
+	      IF( RUNSORT( 1:1) .EQ. 'P' .OR. RUNSORT( 1:1) .EQ. 'B')
      :        THEN
                 CALL AIF_GET0R( 'XCEN', REAL( IDIMS( 1 )/2.0 ), 0.0,
      :                          REAL( IDIMS( 1 ) ), XCEN, STATUS )
@@ -269,7 +269,7 @@
 *            get the aperture eccentricity and position angle
 	      IF( RUNSORT( 1:1) .EQ. 'B') THEN
                 CALL AIF_GET0R( 'ECC', 0.0, 0.0, 0.9999, ECC, STATUS )
-                CALL AIF_GET0R( 'POSANG', 0.0, 0.0, 180.0, POSANG, 
+                CALL AIF_GET0R( 'POSANG', 0.0, 0.0, 180.0, POSANG,
      :	                        STATUS )
 	        CALL PAR_CANCL( 'ECC', STATUS)
 	        CALL PAR_CANCL( 'POSANG', STATUS)
@@ -282,9 +282,9 @@
 	      END IF
 
 *            get the major axis of the aperture in arbitrary units
-	      IF( RUNSORT( 1:1) .EQ. 'M' .OR. RUNSORT( 1:1) .EQ. 'B') 
+	      IF( RUNSORT( 1:1) .EQ. 'M' .OR. RUNSORT( 1:1) .EQ. 'B')
      :        THEN
-	        CALL AIF_GET0R( 'MAJAX1', 10.0, 0.0001, 10000.0, 
+	        CALL AIF_GET0R( 'MAJAX1', 10.0, 0.0001, 10000.0,
      :                          MAJAX1, STATUS )
 !	print *, 'after aif'
 	        CALL PAR_CANCL( 'MAJAX1', STATUS)
@@ -292,12 +292,12 @@
 	        IF( SKYANNUL) THEN
 	          junk1 = majax1*2
 !	print *, 'in test', junk1, majax1
-                  CALL AIF_GET0R( 'MAJAX2', 10.0, MAJAX1, 10000.0, 
+                  CALL AIF_GET0R( 'MAJAX2', 10.0, MAJAX1, 10000.0,
      :                            MAJAX2, STATUS )
 !	print *, 'after aif 2'
 	          CALL PAR_CANCL( 'MAJAX2', STATUS)
 	          junk1 = majax1*3
-                  CALL AIF_GET0R( 'MAJAX3', 20.0, MAJAX2, 10000.0, 
+                  CALL AIF_GET0R( 'MAJAX3', 20.0, MAJAX2, 10000.0,
      :                            MAJAX3, STATUS )
 	          CALL PAR_CANCL( 'MAJAX3', STATUS)
 	        END IF
@@ -305,7 +305,7 @@
 
 *            get the size of a pixel in these arbitrary units
 	      IF( RUNSORT( 1:1) .EQ. 'B') THEN
-                CALL AIF_GET0R( 'SCALE', 1.0, 0.0001, 10000.0, 
+                CALL AIF_GET0R( 'SCALE', 1.0, 0.0001, 10000.0,
      :                          SCALE, STATUS )
 	        CALL PAR_CANCL( 'SCALE', STATUS)
 	      END IF
@@ -316,7 +316,7 @@
 
 *              just announce the error, clear up and abort
                 CALL ERR_REP( 'FUNNY_PARS',
-     :           'Something wrong with input parameters - aborting', 
+     :           'Something wrong with input parameters - aborting',
      :           STATUS )
                 CALL NDF_ANNUL( LOCI, STATUS )
                 RETURN
@@ -354,11 +354,11 @@
 	        RAD2 = MAJAX1/2.0
 
 *              call subroutine that does the actual work
-	        CALL APERPHOTSUB( 
-     :                 IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN, 
-     :	               IYCEN, ECC, POSANG, RAD1, RAD2, SCALE, 
-     :	               USEBAD, BADVAL, NUMPIX1, BNUMPIX1, TOTAL1, 
-     :	               MEAN1, MEDIAN1, MODE1, VALMAX1, VALMIN1, 
+	        CALL APERPHOTSUB(
+     :                 IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN,
+     :	               IYCEN, ECC, POSANG, RAD1, RAD2, SCALE,
+     :	               USEBAD, BADVAL, NUMPIX1, BNUMPIX1, TOTAL1,
+     :	               MEAN1, MEDIAN1, MODE1, VALMAX1, VALMIN1,
      :	               NOISE1)
 
 *              put all interesting parameters to interface
@@ -400,17 +400,17 @@
      :           'Standard deviation in aperture       = ^NOISE',
      :           STATUS )
 
-*              calculate the inner and outer radius of the sky annulus 
+*              calculate the inner and outer radius of the sky annulus
 	        RAD1 = MAJAX2/2.0
 	        RAD2 = MAJAX3/2.0
 
 *              call subroutine that does the actual work
 	        IF( SKYANNUL) THEN
-	          CALL APERPHOTSUB( 
-     :                   IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN, 
-     :	                 IYCEN, ECC, POSANG, RAD1, RAD2, SCALE, 
-     :	                 USEBAD, BADVAL, NUMPIX2, BNUMPIX2, TOTAL2, 
-     :	                 MEAN2, MEDIAN2, MODE2, VALMAX2, VALMIN2, 
+	          CALL APERPHOTSUB(
+     :                   IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN,
+     :	                 IYCEN, ECC, POSANG, RAD1, RAD2, SCALE,
+     :	                 USEBAD, BADVAL, NUMPIX2, BNUMPIX2, TOTAL2,
+     :	                 MEAN2, MEDIAN2, MODE2, VALMAX2, VALMIN2,
      :	                 NOISE2)
 
 *                put all interesting parameters to interface
@@ -456,19 +456,19 @@
 *                calculate total from median if median selected
 	          IF( USEWHAT( 1:3) .EQ. 'MED') THEN
 	            TOTAL2 = MEDIAN2*NUMPIX1
-	          ELSE 
+	          ELSE
 	            TOTAL2 = MEAN2*NUMPIX1
 	          END IF
 
 *                tell user about the sky level in the object aperture
 	          IF( USEWHAT( 1:3) .EQ. 'MED') THEN
 	            CALL MSG_SETR( 'TOTAL2', TOTAL2)
-	            CALL MSG_OUT( 'MESSAGE', 
+	            CALL MSG_OUT( 'MESSAGE',
      :               'Sky in object aperture (MEDIAN)      = ^TOTAL2',
      :                STATUS)
 	          ELSE
 	            CALL MSG_SETR( 'TOTAL2', TOTAL2)
-	            CALL MSG_OUT( 'MESSAGE', 
+	            CALL MSG_OUT( 'MESSAGE',
      :	             'Sky in object aperture (MEAN)        = ^TOTAL2',
      :	              STATUS)
 	          END IF
@@ -488,7 +488,7 @@
 *              tell user the marvellous news
 	        CALL PAR_PUT0R( 'OBJSKY', TOTAL3, STATUS)
 	        CALL MSG_SETR( 'TOTAL3', TOTAL3)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	          'Object-Sky value                     = ^TOTAL3',
      :	          STATUS)
 
@@ -504,7 +504,7 @@
 *              tell user the even more marvellous news
 	        CALL PAR_PUT0R( 'MAG', MAG3, STATUS)
 	        CALL MSG_SETR( 'MAG3', MAG3)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	          'Magnitude from absolute value        = ^MAG3',
      :	          STATUS)
 
@@ -519,14 +519,14 @@
               CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
 *            if user wants more runs then get sort of run
-	      IF( AGAIN) THEN 
+	      IF( AGAIN) THEN
 	        CALL PAR_GET0C( 'RUNSORT', RUNSORT, STATUS)
 	        CALL PAR_CANCL( 'RUNSORT', STATUS)
 	        CALL CHR_UCASE( RUNSORT )
 	        IF( RUNSORT( 1:1) .NE. 'M' .AND.
      :	            RUNSORT( 1:1) .NE. 'P') THEN
-	          CALL MSG_OUT( 'MESS', 
-     :                          'Changing aperture MAJOR AXIS ...', 
+	          CALL MSG_OUT( 'MESS',
+     :                          'Changing aperture MAJOR AXIS ...',
      :	                        STATUS)
 	          RUNSORT( 1:1) = 'M'
 	        END IF
@@ -546,7 +546,7 @@
 	    IF( DATASOURCE( 1:1) .EQ. 'F') THEN
 	      CALL PAR_GET0C( 'TERMOUT', TERMOUT, STATUS)
 	      CALL CHR_UCASE( TERMOUT )
-	      IF( TERMOUT( 1:1) .NE. 'T' .AND. 
+	      IF( TERMOUT( 1:1) .NE. 'T' .AND.
      :	          TERMOUT( 1:1) .NE. 'F' .AND.
      :	          TERMOUT( 1:1) .NE. 'B') THEN
 	        TERMOUT( 1:1) = 'B'
@@ -561,7 +561,7 @@
 
 *          check if user wants terminal, file or both output
 	    IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	        TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	        TERMOUT( 1:1) .EQ. 'B') THEN
 
 *            get lun for open of OUTPUT ascii file
 	      CALL FIO_GUNIT( LUN2, STATUS )
@@ -586,11 +586,11 @@
 	      OPEN( UNIT=LUN2, FILE=FNAME2, STATUS='UNKNOWN', ERR=998)
 
 *            write header line to output file
-	      LINE1 = 
+	      LINE1 =
      :	      '     X     Y     E    POS    D1    D2    D3    N1   '//
-     :        'BN1    N2   BN2          TOT1         '// 
-     :	      ' TOT2          TOT3        MAG' 
-              CALL CHR_CLEAN( LINE1 ) 
+     :        'BN1    N2   BN2          TOT1         '//
+     :	      ' TOT2          TOT3        MAG'
+              CALL CHR_CLEAN( LINE1 )
               L1 = 0
 	      CALL CHR_APPND( LINE1, LINE1, L1)
 	      WRITE( LUN2, '(A)') LINE1( 1:L1)
@@ -615,10 +615,10 @@
 	        READ( LINE1, *, ERR=997, END=996) XCEN, YCEN, ECC,
      :	                                          POSANG, ISKY,
      :	                                          MAJAX1, MAJAX2, MAJAX3,
-     :	                                          SCALE, IUSEWHAT, 
+     :	                                          SCALE, IUSEWHAT,
      :	                                          IUSEBAD, BADVAL
 
-*              setup skyannul, usewhat and usebad character variables 
+*              setup skyannul, usewhat and usebad character variables
 	        IF( ISKY .EQ. 0) THEN
 	          SKYANNUL = .FALSE.
 	        ELSE
@@ -644,16 +644,16 @@
 	        RAD2 = MAJAX1/2.0
 
 *              call subroutine that does the actual work
-	        CALL APERPHOTSUB( 
-     :                    IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN, 
-     :	                  IYCEN, ECC, POSANG, RAD1, RAD2, SCALE, 
-     :	                  USEBAD, BADVAL, NUMPIX1, BNUMPIX1, TOTAL1, 
-     :	                  MEAN1, MEDIAN1, MODE1, VALMAX1, VALMIN1, 
+	        CALL APERPHOTSUB(
+     :                    IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN,
+     :	                  IYCEN, ECC, POSANG, RAD1, RAD2, SCALE,
+     :	                  USEBAD, BADVAL, NUMPIX1, BNUMPIX1, TOTAL1,
+     :	                  MEAN1, MEDIAN1, MODE1, VALMAX1, VALMIN1,
      :	                  NOISE1)
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'T' .OR.
-     :	            TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	            TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                on return, output the relevant figures
                   CALL MSG_OUT( 'BLANK', ' ', STATUS )
@@ -694,23 +694,23 @@
 
 	        END IF
 
-*              calculate the inner and outer radius of the sky annulus 
+*              calculate the inner and outer radius of the sky annulus
 	        RAD1 = MAJAX2/2.0
 	        RAD2 = MAJAX3/2.0
 
 *              call subroutine that does the actual work
 	        IF( SKYANNUL) THEN
 !	print *, 'just before aperphotsub call 2'
-	          CALL APERPHOTSUB( 
-     :                IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN, 
-     :	              IYCEN, ECC, POSANG, RAD1, RAD2, SCALE, 
-     :	              USEBAD, BADVAL, NUMPIX2, BNUMPIX2, TOTAL2, 
-     :	              MEAN2, MEDIAN2, MODE2, VALMAX2, VALMIN2, 
+	          CALL APERPHOTSUB(
+     :                IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN,
+     :	              IYCEN, ECC, POSANG, RAD1, RAD2, SCALE,
+     :	              USEBAD, BADVAL, NUMPIX2, BNUMPIX2, TOTAL2,
+     :	              MEAN2, MEDIAN2, MODE2, VALMAX2, VALMIN2,
      :	              NOISE2)
 
 *                check if user wants terminal, file or both output
 	          IF( TERMOUT( 1:1) .EQ. 'T' .OR.
-     :	              TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	              TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                  on return, output the relevant figures
                     CALL MSG_OUT( 'BLANK', ' ', STATUS )
@@ -755,23 +755,23 @@
 *                calculate total from median if median selected
 	          IF( USEWHAT( 1:3) .EQ. 'MED') THEN
 	            TOTAL2 = MEDIAN2*NUMPIX1
-	          ELSE 
+	          ELSE
 	            TOTAL2 = MEAN2*NUMPIX1
 	          END IF
 
 *                check if user wants terminal, file or both output
 	          IF( TERMOUT( 1:1) .EQ. 'T' .OR.
-     :	              TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	              TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                  tell user about the sky level in the object aperture
 	            IF( USEWHAT( 1:3) .EQ. 'MED') THEN
 	              CALL MSG_SETR( 'TOTAL2', TOTAL2)
-	              CALL MSG_OUT( 'MESSAGE', 
+	              CALL MSG_OUT( 'MESSAGE',
      :               'Sky in object aperture (MEDIAN)      = ^TOTAL2',
      :                  STATUS)
 	            ELSE
 	              CALL MSG_SETR( 'TOTAL2', TOTAL2)
-	              CALL MSG_OUT( 'MESSAGE', 
+	              CALL MSG_OUT( 'MESSAGE',
      :	             'Sky in object aperture (MEAN)        = ^TOTAL2',
      :	                STATUS)
 	            END IF
@@ -792,12 +792,12 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'T' .OR.
-     :	            TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	            TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                tell user the marvellous news
 	          CALL PAR_PUT0R( 'OBJSKY', TOTAL3, STATUS)
 	          CALL MSG_SETR( 'TOTAL3', TOTAL3)
-	          CALL MSG_OUT( 'MESSAGE', 
+	          CALL MSG_OUT( 'MESSAGE',
      :	            'Object-Sky value                     = ^TOTAL3',
      :	            STATUS)
 
@@ -814,12 +814,12 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'T' .OR.
-     :	            TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	            TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                tell user the even more marvellous news
 	          CALL PAR_PUT0R( 'MAG', MAG3, STATUS)
 	          CALL MSG_SETR( 'MAG3', MAG3)
-	          CALL MSG_OUT( 'MESSAGE', 
+	          CALL MSG_OUT( 'MESSAGE',
      :	            'Magnitude from absolute value        = ^MAG3',
      :	            STATUS)
 
@@ -829,12 +829,12 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	            TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	            TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                write line to users output file
-	          WRITE( LUN2, 
-     :            '(2F6.1,2X,F4.2,2X,F5.1,3F6.1,4I6,3F14.2,F11.3)') 
-     :	            XCEN, YCEN, 
+	          WRITE( LUN2,
+     :            '(2F6.1,2X,F4.2,2X,F5.1,3F6.1,4I6,3F14.2,F11.3)')
+     :	            XCEN, YCEN,
      :	            ECC, POSANG,
      :	            MAJAX1, MAJAX2, MAJAX3,
      :	            NUMPIX1, BNUMPIX1,
@@ -848,7 +848,7 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	          TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	          TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                write comment line to users output file
                   CALL CHR_CLEAN( LINE1 )
@@ -868,7 +868,7 @@
 
 *          check if user wants terminal, file or both output
 	    IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	        TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	        TERMOUT( 1:1) .EQ. 'B') THEN
 
 *            close output files and free lun
 	      CLOSE( LUN2)
@@ -877,7 +877,7 @@
 *            tell user the name of the output file
 	      CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	      CALL MSG_SETC( 'FO', FNAME2)
-	      CALL MSG_OUT( 'MESS', 'Output file is called ^FO', 
+	      CALL MSG_OUT( 'MESS', 'Output file is called ^FO',
      :                      STATUS)
 	      CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
@@ -900,11 +900,11 @@
      :  STATUS )
 	GOTO 200
   997	CALL MSG_SETC( 'LINE', LINE1)
-        CALL ERR_REP( 'MESSAGE', 
+        CALL ERR_REP( 'MESSAGE',
      :                'Error, reading from input line ^LINE', STATUS )
 	GOTO 200
   996	CALL MSG_SETC( 'LINE', LINE1)
-        CALL ERR_REP( 'MESSAGE', 
+        CALL ERR_REP( 'MESSAGE',
      :                'Error, end of input line ^LINE', STATUS )
 *      here at end of program
   200	CONTINUE

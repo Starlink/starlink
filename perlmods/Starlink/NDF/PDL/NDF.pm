@@ -216,7 +216,7 @@ Writes a piddle to a NDF format file:
    $pdl->wndf($file);
    wndf($pdl,$file);
 
-wndf can be used for writing PDLs to NDF files. 
+wndf can be used for writing PDLs to NDF files.
 The '.sdf' suffix is optional. All the extensions
 created by rndf are supported by wndf.  This means that error, axis
 and quality arrays will be written if they exist. Extensions are also
@@ -398,7 +398,7 @@ sub PDL::propndfx {  # Write a PDL to a NDF format file
 
 =head1 NOTES
 
-The perl NDF module must be available. This is available from the 
+The perl NDF module must be available. This is available from the
 author or from Starlink (http://www.starlink.ac.uk).
 
 If an NDF is read which contains AST World Coordinate information
@@ -1018,10 +1018,10 @@ sub wdata {
 	    my $nelem = $axis->nelem;
             if ($el == $nelem) {
 	      print "Mapping axis " , $i+1 , "\n"  if $PDL::verbose;
-	    
+
               # Number of bytes per entry
               $nbytes = PDL::Core::howbig($axis->get_datatype) * $el;
-	    
+
               # Copy to disk
               string2mem( $ { $axis->get_dataref }, $nbytes, $axpntr)
                  if ($status == &NDF::SAI__OK);

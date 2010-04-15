@@ -88,7 +88,7 @@ not_there:
 }
 
 
-MODULE = Starlink::NBS		PACKAGE = Starlink::NBS		
+MODULE = Starlink::NBS		PACKAGE = Starlink::NBS
 
 
 double
@@ -103,7 +103,7 @@ nbs_tune(name, value, oldvalue, status)
   char * name
   int value
   int oldvalue = NO_INIT
-  int status 
+  int status
  CODE:
   nbc_tune(name, value, &oldvalue, &status);
  OUTPUT:
@@ -118,7 +118,7 @@ nbs_tune_noticeboard(id, name, value, oldvalue, status)
   char * name
   int value
   int oldvalue = NO_INIT
-  int status 
+  int status
  CODE:
   nbc_tune_noticeboard(id, name, value, &oldvalue, &status);
  OUTPUT:
@@ -238,7 +238,7 @@ nbs_get_name(id, name, status)
   int id
   char * name = NO_INIT
   int status
- CODE: 
+ CODE:
   name = str1; /* Get some space */
   nbc_get_name(id, name, &status);
  OUTPUT:
@@ -279,10 +279,10 @@ nbs_get_updated(id, updated, status)
   int status
  CODE:
   nbc_get_updated(id, &updated, &status);
- OUTPUT: 
+ OUTPUT:
   updated
   status
- 
+
 # Get the shape of the item
 # Might be a problem if actdims is greater than maxdims
 
@@ -427,7 +427,7 @@ nbs_put_value_c(id, string, status)
   {
     printf("Looping %d...\n",i);
     nbc_put_cvalue( id, i,&space, &status);
-  } 
+  }
   */
 
  OUTPUT:
@@ -435,7 +435,7 @@ nbs_put_value_c(id, string, status)
 
 
 # Put an array
-# I know it's a pain but that is just tough :-) ' 
+# I know it's a pain but that is just tough :-) '
 # Even more work for me if I want to support arrays and scalars
 
 # Integers
@@ -449,7 +449,7 @@ nbs_put_value_i(id, nvals, value, status)
   int items;
   int outbytes;
   int maxbytes;
-  int actbytes; 
+  int actbytes;
  CODE:
   /* Find how much space Ive got */
   nbc_get_size(id, &maxbytes, &actbytes, &status);
@@ -458,7 +458,7 @@ nbs_put_value_i(id, nvals, value, status)
     /* Use sizeof */
     items = maxbytes / sizeof(int);
 
-    /* Fix it so that number of items in noticeboard must be 
+    /* Fix it so that number of items in noticeboard must be
        equal to number of items in incoming array */
 
     if (items == nvals) {
@@ -484,7 +484,7 @@ nbs_put_value_f(id, nvals, value, status)
   int items;
   int outbytes;
   int maxbytes;
-  int actbytes; 
+  int actbytes;
  CODE:
   /* Find how much space Ive got */
   nbc_get_size(id, &maxbytes, &actbytes, &status);
@@ -493,7 +493,7 @@ nbs_put_value_f(id, nvals, value, status)
     /* Use sizeof */
     items = maxbytes / sizeof(float);
 
-    /* Fix it so that number of items in noticeboard must be 
+    /* Fix it so that number of items in noticeboard must be
        equal to number of items in incoming array */
 
     if (items == nvals) {
@@ -518,7 +518,7 @@ nbs_put_value_d(id, nvals, value, status)
   int items;
   int outbytes;
   int maxbytes;
-  int actbytes; 
+  int actbytes;
  CODE:
   /* Find how much space Ive got */
   nbc_get_size(id, &maxbytes, &actbytes, &status);
@@ -527,7 +527,7 @@ nbs_put_value_d(id, nvals, value, status)
     /* We still assume 8 bytes for doubles - very lazy */
     items = maxbytes / sizeof(double);
 
-    /* Fix it so that number of items in noticeboard must be 
+    /* Fix it so that number of items in noticeboard must be
        equal to number of items in incoming array */
 
     if (items == nvals) {
@@ -552,7 +552,7 @@ nbs_put_value_l(id, nvals, value, status)
   int items;
   int outbytes;
   int maxbytes;
-  int actbytes; 
+  int actbytes;
  CODE:
   /* Find how much space Ive got */
   nbc_get_size(id, &maxbytes, &actbytes, &status);
@@ -561,7 +561,7 @@ nbs_put_value_l(id, nvals, value, status)
     /* We still assume 4 bytes for ints - very lazy */
     items = maxbytes / sizeof(int);
 
-    /* Fix it so that number of items in noticeboard must be 
+    /* Fix it so that number of items in noticeboard must be
        equal to number of items in incoming array */
 
     if (items == nvals) {
@@ -588,7 +588,7 @@ nbs_put_value_l(id, nvals, value, status)
 # into the perl module (could do it with void* but that would involve
 # a somehat cleverer type map for arrays.c (I think)
 # One thing I can do in C is work out the size of the entry
-# Note that this mean that perl always returns NBS entries in 
+# Note that this mean that perl always returns NBS entries in
 # an array context.
 
 # Get Integers
@@ -618,9 +618,9 @@ nbs_get_value_i(id, values, status)
 
     /* Unpack into a perl array */
       if (items > 0)
-	unpack1D( (SV*)ST(1), (void *)values, PACKI32, items);  
+	unpack1D( (SV*)ST(1), (void *)values, PACKI32, items);
     }
-  }  
+  }
 
  OUTPUT:
   values
@@ -653,9 +653,9 @@ nbs_get_value_f(id, values, status)
 
     /* Unpack into a perl array */
       if (items > 0)
-	unpack1D( (SV*)ST(1), (void *)values, PACKF, items);  
+	unpack1D( (SV*)ST(1), (void *)values, PACKF, items);
     }
-  }  
+  }
 
  OUTPUT:
   values
@@ -688,9 +688,9 @@ nbs_get_value_d(id, values, status)
 
     /* Unpack into a perl array */
       if (items > 0)
-	unpack1D( (SV*)ST(1), (void *)values, PACKD, items);  
+	unpack1D( (SV*)ST(1), (void *)values, PACKD, items);
     }
-  }  
+  }
 
  OUTPUT:
   values
@@ -723,9 +723,9 @@ nbs_get_value_l(id, values, status)
 
     /* Unpack into a perl array */
       if (items > 0)
-	unpack1D( (SV*)ST(1), (void *)values, PACKI32, items);  
+	unpack1D( (SV*)ST(1), (void *)values, PACKI32, items);
     }
-  }  
+  }
 
  OUTPUT:
   values
@@ -775,55 +775,55 @@ nbs_get_value_c(id, cvalue, status)
 
 # Return size (in bytes) of ints and floats, shorts
 # by pack type (see Perl pack command)  [b, r and w are FORTRAN types]
- 
+
 int
 nbs_byte_size(packtype)
   char * packtype
  PROTOTYPE: $
  CODE:
   switch (*packtype) {
- 
+
   case 'a':
   case 'A':
     RETVAL = sizeof(char);
     break;
- 
+
   case 'b':
   case 'B':
   case 'c':
   case 'C':
     RETVAL = sizeof(char);
     break;
- 
+
   case 'd':
   case 'D':
     RETVAL = sizeof(double);
     break;
- 
+
   case 'i':
   case 'I':
     RETVAL = sizeof(int);
     break;
- 
+
   case 'f':
   case 'r':
   case 'R':
   case 'F':
     RETVAL = sizeof(float);
     break;
- 
+
   case 'l':
   case 'L':
     RETVAL = sizeof(long);
     break;
- 
+
   case 's':
   case 'S':
   case 'w':
   case 'W':
     RETVAL = sizeof(short);
     break;
- 
+
   default:
     RETVAL = 1;
   }

@@ -23,14 +23,14 @@
 	lf = mdh_endword(file)
 *	write(*,*) ' RPS_AUX: '//path(:lp)
 	call hlp_nametr(1, path(:lp), dum, istat)
-	if (istat .ne. 0) goto 99    
+	if (istat .ne. 0) goto 99
 	call hlp_nametr(2, '.shl', dum, istat)
 	if (istat .ne. 0) goto 99
 
 *	write(*,*) ' help lib ',file
 *	write(*,*) ' topic ',topic
 	istat = hlp_help(hlp_outsub, 132, topic, glun,
-     &		file(:lf), jflags, 
+     &		file(:lf), jflags,
      &		hlp_insub, hlp_nametr)
 
 99	continue

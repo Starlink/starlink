@@ -142,7 +142,7 @@
 
 *      tell user number of offsets read from offset file
         CALL MSG_SETI( 'N', NUMTELE)
-        CALL MSG_OUT( 'MESS', 
+        CALL MSG_OUT( 'MESS',
      :	'Number of telescope offset position read in = ^N', STATUS)
 
 *      tell user max and min in x and y in list
@@ -197,7 +197,7 @@
 
 *      tell user number of image names read in
         CALL MSG_SETI( 'I', NUMIMAG)
-        CALL MSG_OUT( 'MESS', 
+        CALL MSG_OUT( 'MESS',
      :	'Number of images read in = ^I', STATUS)
 
 	CALL MSG_OUT( 'BLANK' ,' ', STATUS)
@@ -207,11 +207,11 @@
           CALL MSG_OUT( 'MESS', 'Number of offsets/images are EQUAL',
      :	  STATUS)
 	ELSE
-          CALL MSG_OUT( 'MESS', 
+          CALL MSG_OUT( 'MESS',
      :    'Number of offsets/images are NOT EQUAL',
      :	  STATUS)
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
-          CALL MSG_OUT( 'MESS', 'Exiting program... fix and try again', 
+          CALL MSG_OUT( 'MESS', 'Exiting program... fix and try again',
      :	  STATUS)
            GOTO 100
 	END IF
@@ -245,7 +245,7 @@
   999 CLOSE( LUNT)
       CALL FIO_PUNIT( LUNT, STATUS )
       CALL MSG_SETC( 'T', TELEFILE)
-      CALL ERR_REP( 'MESS', 'Cannot open telescope offset file ^T', 
+      CALL ERR_REP( 'MESS', 'Cannot open telescope offset file ^T',
      :STATUS)
       GOTO 100
 
@@ -254,7 +254,7 @@
       CLOSE( LUNI)
       CALL FIO_PUNIT( LUNI, STATUS )
       CALL MSG_SETC( 'I', IMAGFILE)
-      CALL ERR_REP( 'MESS', 'Cannot open image list file ^I', 
+      CALL ERR_REP( 'MESS', 'Cannot open image list file ^I',
      :STATUS)
       GOTO 100
 
@@ -265,23 +265,23 @@
       CLOSE( LUNO)
       CALL FIO_PUNIT( LUNO, STATUS )
       CALL MSG_SETC( 'O', OUTFILE)
-      CALL ERR_REP( 'MESS', 'Cannot open output QUILT file ^O', 
+      CALL ERR_REP( 'MESS', 'Cannot open output QUILT file ^O',
      :STATUS)
       GOTO 100
 
   996 CLOSE( LUNT)
       CALL FIO_PUNIT( LUNT, STATUS )
       CALL MSG_SETC( 'T', TELEFILE)
-      CALL ERR_REP( 'MESS', 
-     :'Error reading offsets from telescope offset file ^T', 
+      CALL ERR_REP( 'MESS',
+     :'Error reading offsets from telescope offset file ^T',
      :STATUS)
       GOTO 100
 
   995 CLOSE( LUNI)
       CALL FIO_PUNIT( LUNI, STATUS )
       CALL MSG_SETC( 'I', IMAGFILE)
-      CALL ERR_REP( 'MESS', 
-     :'Error reading image list from image file ^I', 
+      CALL ERR_REP( 'MESS',
+     :'Error reading image list from image file ^I',
      :STATUS)
       GOTO 100
 

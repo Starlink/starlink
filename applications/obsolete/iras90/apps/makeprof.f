@@ -20,17 +20,17 @@
 *        The global status.
 
 *  Description:
-*     This routine creates an NDF holding typical in-scan detector 
-*     point source profiles. The data is taken from the IRAS Catalogs 
+*     This routine creates an NDF holding typical in-scan detector
+*     point source profiles. The data is taken from the IRAS Catalogs
 *     and Atlases Explanatory Supplement (second edition), page V-14.
 *
-*     The NDF contains four rows, each holding a typical point source 
+*     The NDF contains four rows, each holding a typical point source
 *     profile for one of the four survey wavebands. The NDF contains
 *     AXIS structures which identify the wavebands and the in-scan
 *     offset from the source centre.
 
 *  Usage:
-*     MAKEPROF OUT 
+*     MAKEPROF OUT
 
 *  ADAM Parameters:
 *     HISTORY = _LOGICAL (Read)
@@ -46,7 +46,7 @@
 *        detector responses.
 
 *  Allowed Formats for Profile NDFs:
-*     If users wish to create their own in-scan detector profiles for 
+*     If users wish to create their own in-scan detector profiles for
 *     use with TRACECRDD, etc, then they must ensure that the NDFs
 *     holding the profiles conform to the following requirements:
 *
@@ -55,20 +55,20 @@
 *     - Each profile should be normalised to a peak value of unity.
 *
 *     - The NDF must contain either 1 or 4 rows of data; no other
-*     values are allowed. If the NDF holds 4 rows, then rows 1 to 4 
-*     should contain the profiles for the 12, 25, 60 and 100 um bands 
+*     values are allowed. If the NDF holds 4 rows, then rows 1 to 4
+*     should contain the profiles for the 12, 25, 60 and 100 um bands
 *     respectively. If the NDF holds one row then the single profile
 *     will be used by TRACECRDD (etc) for all wave-bands.
 *
 *     - If an NDF contains 4 profiles, each one must be sampled at
-*     the same in-scan positions. Any gaps left at the ends of shorter 
+*     the same in-scan positions. Any gaps left at the ends of shorter
 *     profiles should be filled with zeros.
 *
-*     - The second dimension (i.e. the in-scan axis) should have an 
+*     - The second dimension (i.e. the in-scan axis) should have an
 *     associated AXIS structure containing a CENTRE array and a UNITS
-*     component. The UNITS component must start with the string 
+*     component. The UNITS component must start with the string
 *     "ARC-MIN" (case is ignored), and the CENTRE array must contain the
-*     in-scan offset from the detector centre to each point in the 
+*     in-scan offset from the detector centre to each point in the
 *     profile, in arc-minutes. These values should be in the same sense
 *     as the focal plane Y axis.
 
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -114,29 +114,29 @@
 
 *  Local Data:
       DATA RDATA/0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     :           0.14, 0.75, 1, 0.75, 0.2, 4.55E-02, 0, 0, 0, 0, 0, 0, 
+     :           0.14, 0.75, 1, 0.75, 0.2, 4.55E-02, 0, 0, 0, 0, 0, 0,
      :           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
      :           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     :           0.11, 0.68, 1, 0.8, 0.2, 4.55E-02, 0, 0, 0, 0, 0, 0, 
+     :           0.11, 0.68, 1, 0.8, 0.2, 4.55E-02, 0, 0, 0, 0, 0, 0,
      :           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
      :           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.27E-02,
      :           6.82E-02, 0.34, 0.73, 0.95, 1, 0.95, 0.77, 0.32, 0.16,
      :           6.82E-02, 4.55E-02, 2.27E-02, 0, 0, 0, 0, 0, 0, 0, 0,
-     :           0, 0, 0, 0, 0,                                       
+     :           0, 0, 0, 0, 0,
 
      :           0, 0, 0, 0, 0, 0, 0, 0, 2.27E-02, 3.18E-02, 4.55E-02,
      :           5.91E-02, 6.82E-02, 0.18, 0.34, 0.55, 0.7, 0.82, 0.93,
-     :           0.97, 1, 0.98, 0.95, 0.84, 0.73, 0.52, 0.32, 0.24, 
-     :           0.16, 0.14, 0.11, 9.09E-02, 6.82E-02, 6.25E-02, 
-     :           5.68E-02, 5.11E-02, 4.55E-02, 3.98E-02, 3.41E-02, 
+     :           0.97, 1, 0.98, 0.95, 0.84, 0.73, 0.52, 0.32, 0.24,
+     :           0.16, 0.14, 0.11, 9.09E-02, 6.82E-02, 6.25E-02,
+     :           5.68E-02, 5.11E-02, 4.55E-02, 3.98E-02, 3.41E-02,
      :           2.84E-02, 2.27E-02/
 
-      DATA AXIS1/-6, -5.7, -5.4, -5.1, -4.8, -4.5, -4.2, -3.9, -3.6, 
-     :           -3.3, -3, -2.7, -2.4, -2.1, -1.8, -1.5, -1.2, -0.9, 
+      DATA AXIS1/-6, -5.7, -5.4, -5.1, -4.8, -4.5, -4.2, -3.9, -3.6,
+     :           -3.3, -3, -2.7, -2.4, -2.1, -1.8, -1.5, -1.2, -0.9,
      :           -0.6, -0.3, 0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4,
-     :            2.7, 3, 3.3, 3.6, 3.9, 4.2, 4.5, 4.8, 5.1, 5.4, 5.7, 
+     :            2.7, 3, 3.3, 3.6, 3.9, 4.2, 4.5, 4.8, 5.1, 5.4, 5.7,
      :            6.0 /
 *.
 
@@ -157,15 +157,15 @@
       CALL NDF_MAP( INDF, 'DATA', '_REAL', 'WRITE', IPDATA, EL, STATUS )
 
 *  Map the CENTRE array of the first axis.
-      CALL NDF_AMAP( INDF, 'CEN', 1, '_REAL', 'WRITE', IPC1, EL, 
+      CALL NDF_AMAP( INDF, 'CEN', 1, '_REAL', 'WRITE', IPC1, EL,
      :               STATUS )
 
 *  Map the CENTRE array of the second axis.
-      CALL NDF_AMAP( INDF, 'CEN', 2, '_REAL', 'WRITE', IPC2, EL, 
+      CALL NDF_AMAP( INDF, 'CEN', 2, '_REAL', 'WRITE', IPC2, EL,
      :               STATUS )
 
 *  Call another routine to store the values.
-      CALL MPROA0( SIZE, I90__BANDS, RDATA, AXIS1, I90__WAVEL, 
+      CALL MPROA0( SIZE, I90__BANDS, RDATA, AXIS1, I90__WAVEL,
      :             %VAL( IPDATA ), %VAL( IPC1 ), %VAL( IPC2 ), STATUS )
 
 *  Set up first AXIS array scalar values.
@@ -177,12 +177,12 @@
       CALL NDF_ACPUT( 'microns', INDF, 'UNITS', 2, STATUS )
 
 *  Set up the NDF scalar values.
-      CALL NDF_CPUT( 'Typical in-scan point source profiles', INDF, 
+      CALL NDF_CPUT( 'Typical in-scan point source profiles', INDF,
      :               'TITLE', STATUS )
       CALL NDF_CPUT( 'Normalised amplitude', INDF, 'LABEL', STATUS )
 
 *  Add a history record.
-      CALL IRM_HIST( 'HISTORY', INDF, 'MAKEPROF', 1, 
+      CALL IRM_HIST( 'HISTORY', INDF, 'MAKEPROF', 1,
      :               'In-scan point source profiles', STATUS )
 
 *  If an error has occurred, delete the output NDF.

@@ -78,21 +78,21 @@
 #.
 
 itcl::class gaia::StarArdBox {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
-      #  Set the type of canvas object. 
+      #  Set the type of canvas object.
       configure -mode rectangle
       eval configure $args
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
@@ -121,10 +121,10 @@ itcl::class gaia::StarArdBox {
    #  Set the properties of the object to those of an ARD description
    #  of an object of this type.
    method setard {desc} {
-      if {$desc != "" } { 
+      if {$desc != "" } {
          set failed 1
-         if { [check_description box $desc] } { 
-            if { [llength $qualifiers_] == 4 } { 
+         if { [check_description box $desc] } {
+            if { [llength $qualifiers_] == 4 } {
                lassign $qualifiers_ xcen ycen xside yside
                set xside [expr $xside/2.0]
                set yside [expr $yside/2.0]
@@ -138,7 +138,7 @@ itcl::class gaia::StarArdBox {
                set failed 0
             }
          }
-         if { $failed } { 
+         if { $failed } {
             error "Failed to interpret \"$desc\" as an ARD box"
          }
       }

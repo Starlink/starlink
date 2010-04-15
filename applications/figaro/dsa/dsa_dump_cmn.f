@@ -18,14 +18,14 @@ C  Language:
 C     FORTRAN
 C
 C  Call:
-C     CALL DSA_DUMP_COMMON 
+C     CALL DSA_DUMP_COMMON
 C
 C  External variables used:
 C     Internal common variables used by DSA_ system routines.
 C
 C  External subroutines / functions used:  ICH_LEN
 C
-C  Prior requirements:  
+C  Prior requirements:
 C     DSA_OPEN should have been called to initialise the system.
 C
 C  Support: Keith Shortridge, AAO
@@ -43,7 +43,7 @@ C                    ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
 C      2nd Jul 1993  Added some missing MAP_CALL_xxx variables. KS/AAO.
 C
-C  Note: 
+C  Note:
 C     This routine is rather out of date - lots of new common items have
 C     appeared that it doesn't know about.
 C+
@@ -69,7 +69,7 @@ C
             PRINT *,'File slot ',I,',  Count = ',FILE_COUNT(I)
             PRINT *,FILE_NAMES(I)(:ICH_LEN(FILE_NAMES(I)))
             PRINT *,FILE_TOP_NAMES(I)(:ICH_LEN(FILE_TOP_NAMES(I)))
-         END IF         
+         END IF
       END DO
 C
 C     Map tables

@@ -26,7 +26,7 @@
 *     is searched for origin and bad-pixel information.  Should the
 *     origin be not at 0 for each dimension, and/or the bad-pixel flag
 *     be set to false, warning messages are made.
-*     
+*
 *     It will not handle other NDF variants save report an error.
 
 *  Arguments:
@@ -39,7 +39,7 @@
 *        On input when PARNAM is blank, there will be no association
 *        with a parameter; the locator is assumed to point at the
 *        top level of an NDF, and will be unchanged on exit.
-*        
+*
 *        If PARNAM is non blank, the input value of LOCAT is ignored.
 *        On exit LOCAT is the locator to the object associated with the
 *        given parameter name, unless status is bad, whereupon this
@@ -64,7 +64,7 @@
 *  Notes:
 *     -  This a stop-gap routine until the remainder of KAPPA
 *     IMAGE-format applications are converted to NDF.
-*     
+*
 *  Algorithm:
 *     -  Get a locator to the IMAGE-type data structure associated with
 *     parameter name given in PARNAM. Look for a DATA_ARRAY component.
@@ -95,12 +95,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -175,7 +175,7 @@
 *  Test which type of usage is required by testing for a blank parameter
 *  name.
       IF ( PARNAM .NE. ' ' ) THEN
-      
+
 *  Initialise the returned values.
          LOCAT = ' '
       END IF
@@ -302,7 +302,7 @@
                   ORIGIN( I ) = 1
                END DO
             END IF
-               
+
          END IF
 
 *  Perform checks for loss of bad-pixel flag.  Test whether it is

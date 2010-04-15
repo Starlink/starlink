@@ -3,7 +3,7 @@ C+
 C
 C     A R P A R M
 C
-C     Allows the user to modify the parameter array values used to 
+C     Allows the user to modify the parameter array values used to
 C     control the automatic line search.
 C
 C     Parameters -  ("!" modified)

@@ -18,6 +18,6 @@ C     ..
       XNEW = XX*COS(THETA) + YY*SIN(THETA)
       YNEW = -XX*SIN(THETA) + YY*COS(THETA)
       RADSQ = XNEW**2 + (YNEW/RATIO)**2
-      
+
       END
-      
+

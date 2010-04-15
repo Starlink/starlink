@@ -77,27 +77,27 @@
 *     {note_any_bugs_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) PREFIX
- 
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) EXPRES
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Length of string
- 
+
 *  Local Variables:
       CHARACTER* ( CCD1__SZTRN ) VALUE ! Value of token
       CHARACTER* ( CCD1__SZTRN ) TEMP ! Temporary buffer
@@ -106,42 +106,42 @@
       INTEGER I                  ! Loop variable
       INTEGER NSUBS              ! Number of tokens substituted
       LOGICAL AGAIN              ! Another token substituting pass required.
- 
+
 *  Local Data:
       DATA ALPHA / 'A','B','C','D','E','F','G','H','I','J', 'K','L',
      :             'M','N','O','P','Q','R','S','T','U','V','W','X',
      :             'Y','Z' /
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Loop looking for tokens in the expression until no more tokens are
 *  located. When a token is found get a value via the parameter system.
       AGAIN = .TRUE.
  1    CONTINUE                   ! Start of 'DO WHILE' loop
       IF ( AGAIN .AND. STATUS .EQ. SAI__OK ) THEN
          AGAIN = .FALSE.
- 
+
 *  Construct each of the possible tokens in turn. Look for it in the
 *  expression. When a token is located get a value.
          DO 2 I = 1, 26
             TOKEN = PREFIX//ALPHA( I )
- 
+
 *  Look for token.
             VALUE = EXPRES
             CALL TRN_STOK( TOKEN, 'ZZ', VALUE, NSUBS, STATUS )
- 
+
 *  Check the number of substitutions.
             IF ( NSUBS .GT. 0 ) THEN
- 
+
 *  Token present in expression get a value. Add extra () to protect
 *  from incorrect evaluation.
                CALL PAR_GET0C( TOKEN, VALUE( 2: ), STATUS )
                CALL CHR_UCASE( VALUE )
                TEMP = '(' // VALUE( 2 : CHR_LEN( VALUE ) ) // ')'
- 
+
 *  And substitute it. Only check again for new token-isations.
                AGAIN = .TRUE.
                CALL TRN_STOK( TOKEN, TEMP, EXPRES, NSUBS, STATUS )

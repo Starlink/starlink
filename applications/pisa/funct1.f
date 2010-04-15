@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,12 +94,12 @@
       REAL XDAT, XCOR
       DOUBLE PRECISION SD
       LOGICAL NOTWEI
-      COMMON /COMMUN/ SD( FITSIZ ), XDAT( FITSIZ ), XCOR( FITSIZ ), 
+      COMMON /COMMUN/ SD( FITSIZ ), XDAT( FITSIZ ), XCOR( FITSIZ ),
      :                NPOINT, NOTWEI
 
 *  Xdat contains the data to be fitted and xcor the radii associated
 *  with the data points, npoint is the number of points (less than equal
-*  to FITSIZ) which are to be used in the fit. SD contains the standard 
+*  to FITSIZ) which are to be used in the fit. SD contains the standard
 *  errors, NOTWEI controls whether weighting occurs or not
 
 *.
@@ -108,8 +108,8 @@
       CHANGE = LOG ( MAX( NOTZER, XC( 2 ) ) )
       XC1SQ = ( MAX( NOTZER, XC( 1 ) ) )**2
       COEF1 = -1.0D0 / XC1SQ
-      COEF2 = SQRT( MAX( ZERO, ( -4.0D0 * CHANGE / XC1SQ ) ) ) 
-      RADTHR = XC( 1 ) * SQRT( MAX( ZERO, -CHANGE )) 
+      COEF2 = SQRT( MAX( ZERO, ( -4.0D0 * CHANGE / XC1SQ ) ) )
+      RADTHR = XC( 1 ) * SQRT( MAX( ZERO, -CHANGE ))
       RMS = ZERO
       INVSUM = 0.0D0
 *
@@ -139,7 +139,7 @@
             IF ( SD( I ) .GT. 0.0D0 ) THEN
                INVSD = 1.0/ ( SD( I )* SD ( I ) )
                RMS = RMS + ( FIT - DDAT)**2 * INVSD
-               INVSUM = INVSUM + INVSD 
+               INVSUM = INVSUM + INVSD
             END IF
          END IF
   870 CONTINUE

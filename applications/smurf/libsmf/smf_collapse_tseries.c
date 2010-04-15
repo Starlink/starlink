@@ -42,7 +42,7 @@
 
 *  Description:
 *     This routine collapses the time series into a 2D image. It can
-*     use either a mean or clipped mean. If the dark is already 2D the 
+*     use either a mean or clipped mean. If the dark is already 2D the
 *     routine returns without action. The caller should check for this condition
 *     seeing if *outdata is non-NULL. This is done for efficiency.
 
@@ -113,7 +113,7 @@
 
 void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
-                           smfData **outdata, 
+                           smfData **outdata,
                            int *status ) {
 
   /* Per type pointers */

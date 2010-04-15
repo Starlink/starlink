@@ -208,12 +208,12 @@ C
          REPEAT=(CH.NE.'Q').AND.(CH.NE.'q')
       END DO
 C
-C     Close down PGPLOT 
+C     Close down PGPLOT
 C
       CALL GKD_CLOSE
       CALL PGEND
 C
-C     Close down 
+C     Close down
 C
   500 CONTINUE
 C

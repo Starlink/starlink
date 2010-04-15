@@ -48,7 +48,7 @@
       ENDIF
 
 *    Do the plot of the appropriate type
-      IF ( DISPLAY_TYPE( PORT ) .EQ. 'IMAGE' ) THEN 
+      IF ( DISPLAY_TYPE( PORT ) .EQ. 'IMAGE' ) THEN
         CALL P4_IMAGE( PORT, STATUS )
       ELSE IF ( DISPLAY_TYPE( PORT ) .EQ. 'GRAPH' ) THEN
         CALL P4_GRAPH( PORT, STATUS )

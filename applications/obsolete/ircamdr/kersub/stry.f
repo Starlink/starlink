@@ -1,5 +1,5 @@
 *+  STRY - stretches the input array into the output array in the Y-direction
-      SUBROUTINE STRY( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+      SUBROUTINE STRY( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :                 YPIX, YWT, STATUS )
 *    Description :
 *     The input array, ARRIN, is stretched in the Y ( second dimension )
@@ -43,7 +43,7 @@
 *    History :
 *     18/08/1983 : Original version                     (ROE::ASOC5)
 *     19/02/1984 : Documentation brought up to standard (ROE::ASOC5)
-*     12-Aug-1994  Changed DIM arguments so that routine will compile(SKL@JACH) 
+*     12-Aug-1994  Changed DIM arguments so that routine will compile(SKL@JACH)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :

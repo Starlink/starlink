@@ -33,7 +33,7 @@
 *     RESULT = LITERAL (Read)
 *        An text file to receive the Frame.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the FrameSet. If an NDF is supplied, 
+*        An NDF or text file holding the FrameSet. If an NDF is supplied,
 *        the WCS FrameSet will be used.
 
 *  Copyright:
@@ -88,14 +88,14 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get an AST Object.
-      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, IAST, 
+      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, IAST,
      :                 STATUS )
 
 *  Get the index of the required Frame.

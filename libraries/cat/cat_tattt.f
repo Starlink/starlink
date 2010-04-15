@@ -1,7 +1,7 @@
       SUBROUTINE CAT_TATTB (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTB 
+*     CAT_TATTB
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAT_TATTB (GI, ATTRIB, VALUEB; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -182,8 +182,8 @@
                   LVALB = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPEB, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -191,19 +191,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD
@@ -259,7 +259,7 @@
       SUBROUTINE CAT_TATTC (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTC 
+*     CAT_TATTC
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -267,7 +267,7 @@
 *  Invocation:
 *     CALL CAT_TATTC (GI, ATTRIB, VALUEC; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -424,8 +424,8 @@
                   LVALC = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPEC, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -433,19 +433,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD
@@ -501,7 +501,7 @@
       SUBROUTINE CAT_TATTD (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTD 
+*     CAT_TATTD
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -509,7 +509,7 @@
 *  Invocation:
 *     CALL CAT_TATTD (GI, ATTRIB, VALUED; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -666,8 +666,8 @@
                   LVALD = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPED, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -675,19 +675,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD
@@ -743,7 +743,7 @@
       SUBROUTINE CAT_TATTI (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTI 
+*     CAT_TATTI
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -751,7 +751,7 @@
 *  Invocation:
 *     CALL CAT_TATTI (GI, ATTRIB, VALUEI; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -908,8 +908,8 @@
                   LVALI = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPEI, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -917,19 +917,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD
@@ -985,7 +985,7 @@
       SUBROUTINE CAT_TATTL (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTL 
+*     CAT_TATTL
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -993,7 +993,7 @@
 *  Invocation:
 *     CALL CAT_TATTL (GI, ATTRIB, VALUEL; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1150,8 +1150,8 @@
                   LVALL = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPEL, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -1159,19 +1159,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD
@@ -1227,7 +1227,7 @@
       SUBROUTINE CAT_TATTR (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTR 
+*     CAT_TATTR
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -1235,7 +1235,7 @@
 *  Invocation:
 *     CALL CAT_TATTR (GI, ATTRIB, VALUER; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1392,8 +1392,8 @@
                   LVALR = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPER, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -1401,19 +1401,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD
@@ -1469,7 +1469,7 @@
       SUBROUTINE CAT_TATTW (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TATTW 
+*     CAT_TATTW
 *  Purpose:
 *     Set an attribute of a component to a given value.
 *  Language:
@@ -1477,7 +1477,7 @@
 *  Invocation:
 *     CALL CAT_TATTW (GI, ATTRIB, VALUEW; STATUS)
 *  Description:
-*     Set an attribute of a component to a given value.  Type 
+*     Set an attribute of a component to a given value.  Type
 *     conversions are performed if necessary.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1634,8 +1634,8 @@
                   LVALW = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPEW, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC, 
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD, 
+     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
      :              VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
@@ -1643,19 +1643,19 @@
                         ATTVV__CAT1(ATELM) = VALUB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEB) THEN
-                        ATTVB__CAT1(ATELM) = VALB 
+                        ATTVB__CAT1(ATELM) = VALB
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEUW) THEN
                         ATTVU__CAT1(ATELM) = VALUW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEW) THEN
-                        ATTVW__CAT1(ATELM) = VALW 
+                        ATTVW__CAT1(ATELM) = VALW
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
-                        ATTVR__CAT1(ATELM) = VALR 
+                        ATTVR__CAT1(ATELM) = VALR
 
                      ELSE IF (ATYPE .EQ. CAT__TYPED) THEN
                         ATTVD__CAT1(ATELM) = VALD

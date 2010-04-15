@@ -19,10 +19,10 @@
 *     The arrays, defined in F2NDF1_CMN, are:
 *     CHARACTER*(DAT__SZNAM) NDFNMS(MAXEXT)
 *        An array of names, one for each of the NDFs to be created within the
-*        specified container file. 
+*        specified container file.
 *        (See the definition of the NDFNAMES record below.)
 *     CHARACTER*(DAT__SZNAM*2) COMPS(MAXCMP)
-*        An array of NDF component names. 
+*        An array of NDF component names.
 *     CHARACTER*12 CODES( MAXCMP )
 *        An optional code number specifying a transformation to be applied
 *        to the FITS data to produce the NDF data.
@@ -30,7 +30,7 @@
 *         'NONE' - No transformation
 *     CHARACTER*32 EXTNS( MAXCMP, MAXEXT )
 *        An array of the extension specifiers given in the EXTABLE file.
-*        EXTNS(I,J) is the extension to be used for the component 
+*        EXTNS(I,J) is the extension to be used for the component
 *        COMPS(I) of the Jth NDF created in the specified container file.
 *        The set of extensions corresponding to the components of a single
 *        NDF is known as an extension set.
@@ -61,8 +61,8 @@
 *       Where:
 *        'component' (case-insensitive) specifies the NDF component and
 *           is DATA, VARIANCE, QUALITY or EXTNi.name. The EXTNi.name form
-*           specifies the name 'name' of an NDF extension to be created. 
-*           'name' may be omitted in which case 'FITS_EXT_n' is assumed 
+*           specifies the name 'name' of an NDF extension to be created.
+*           'name' may be omitted in which case 'FITS_EXT_n' is assumed
 *           where n is the FITS extension number. 'i' is any characters and
 *           may be omitted - it serves to differentiate component specifiers
 *           where the default name is to be used.
@@ -75,7 +75,7 @@
 *           1. An integer specifying the FITS Header and Data Unit (HDU)
 *              number. The primary HDU number is 0.
 *           2. keyword=value (case-insensitive), specifying a FITS HDU
-*              where the specified keyword has the specified value. E.g. 
+*              where the specified keyword has the specified value. E.g.
 *              EXTNAME=IM2.  The 'keyword=' may be omitted in which case
 *              EXTNAME is assumed.
 *              Multiple keyword=value pairs separated by commas and enclosed
@@ -113,7 +113,7 @@
 *
 *        There may be multiple NDFNAMES records, the names will be
 *        concatenated. A name may not span records and a comma as the last
-*        non-blank character indicates an omitted name. 
+*        non-blank character indicates an omitted name.
 *
 *        If there is only one extension set, the name_list may be '*', in
 *        which case the NDF will be created at the top level of the output
@@ -214,7 +214,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'         ! PAR Error codes
       INCLUDE 'FIO_ERR'         ! FIO Error codes
-      
+
 *  Arguments Given:
 *     None
 
@@ -246,7 +246,7 @@
 *           Number of extension sets in EXTABLE
 *        EXTNS(MAXCMP,MAXEXT) = CHARACTER*32
 *           Extension table from EXTABLE
-*        NDFNMS(MAXEXT) = CHARACTER*(DAT__SZNAM) 
+*        NDFNMS(MAXEXT) = CHARACTER*(DAT__SZNAM)
 *           NDF names from EXTABLE
 *        COMPS(MAXCMP) = CHARACTER*(DAT__SZNAM*2)
 *           Component names from EXTABLE
@@ -278,7 +278,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Initialise the EXTNS and NDFNMS arrays
       DO J = 1, MAXEXT
          DO I = 1, MAXCMP
@@ -327,7 +327,7 @@
 *  The line is a comment - ignore it
                      CONTINUE
 
-                  END IF 
+                  END IF
 
                ELSE IF ( BUFFER(1:NCH) .EQ. ' ' ) THEN
 
@@ -384,7 +384,7 @@
                               NDFNMS(I)(I2:I2) = CH
                               I2 = I2 + 1
                            END IF
-                        END IF                            
+                        END IF
                         I1 = I1 + 1
                      END DO
 
@@ -416,7 +416,7 @@
 *  There are some already used
                            DO ICMP = 1, MAXCMP
                               IF ( COMP .EQ. COMPS(ICMP) ) GOTO 100
-                           END DO                         
+                           END DO
 *  COMP not used yet
 *  count total number of component names
                            NCMP = NCMP + 1
@@ -437,7 +437,7 @@
                            NCMP = 1
                            ICMP = 1
                            COMPS( 1 ) = COMP
-                        END IF ! component names 
+                        END IF ! component names
 
 100                     CONTINUE
 
@@ -478,7 +478,7 @@
 
 *  I1,I2 index the first and last character of extension specifications
                         I1 = I1 + 1
-                        IF ( BUFFER(I2:I2) .EQ. ';' ) I2 = I2 -1 
+                        IF ( BUFFER(I2:I2) .EQ. ';' ) I2 = I2 -1
 *  J indexes the processed extension specifiers string
                         J = I1
                         BRACK = .FALSE.
@@ -505,13 +505,13 @@
                                  BUFFER(J:J) = CH
                                  J = J + 1
                               END IF
-                           END IF  !  space                           
+                           END IF  !  space
 
-                        END DO  ! removing spaces                     
+                        END DO  ! removing spaces
 
 * Get the number of extension sets so far for this component
                         IEXT = CMPNXT( ICMP )
-               
+
 *  Now split the extension specifiers (separated by ;)
 *  I1, J index the first and last characters of the processed string
 *  LAST flags the last specifier (i.e. no ; terminating it).
@@ -535,7 +535,7 @@
 *  If I is 1, we have an omitted specifier leave the blank EXTNS entry
                                  IF ( I .NE. 1 ) THEN
                                     IF ( I .EQ. 0 ) THEN
-*  There are no more ; separators 
+*  There are no more ; separators
                                        I = J - I1 + 2
                                        LAST = .TRUE.
 
@@ -552,7 +552,7 @@
 *  Update NEXTS in case the number of extns on a line differs between
 *  components.
                         NEXTS = MAX( NEXTS, IEXT )
- 
+
                      END IF  ! OK to set extension specifiers
 
 *  Done the component specifier record - update the number of extension
@@ -562,7 +562,7 @@
                   END IF  ! Component specifier record
 
                END IF  ! Component specifier or NDFNAMES record
-               
+
             ELSE IF ( STATUS .EQ. FIO__EOF ) THEN
 *  Ran off end of file
                CALL ERR_ANNUL( STATUS )

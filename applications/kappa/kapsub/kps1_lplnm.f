@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LPLNM( FRM, IAXIS, DIM, NDIM, POS, AXVAL, BAD, 
+      SUBROUTINE KPS1_LPLNM( FRM, IAXIS, DIM, NDIM, POS, AXVAL, BAD,
      :                       STATUS )
 *+
 *  Name:
@@ -69,12 +69,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER FRM
@@ -107,11 +107,11 @@
 
 *  Copy the position into a local work array.
          DO J = 1, NDIM
-            WORK( J ) = POS( I, J ) 
+            WORK( J ) = POS( I, J )
          END DO
 
 *  Normalise the position.
-         CALL AST_NORM( FRM, WORK, STATUS ) 
+         CALL AST_NORM( FRM, WORK, STATUS )
 
 *  Store the normalised value on the required axis, indicating if it is
 *  bad.

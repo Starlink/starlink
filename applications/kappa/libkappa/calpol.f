@@ -192,7 +192,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -303,7 +303,7 @@
 
 *  Replace the identifiers to the supplied NDFs with identifiers for
 *  sections of the supplied NDFs which have equal bounds.
-      CALL NDF_MBNDN( 'TRIM', 4, NDFIN, STATUS )      
+      CALL NDF_MBNDN( 'TRIM', 4, NDFIN, STATUS )
 
 *  Map the data arrays of each NDF section, and if all NDFs have
 *  VARIANCE components, also map the VARIANCE components.
@@ -321,7 +321,7 @@
 *  ===============================
 
 *  Attempt to get an output NDF to hold total intensity.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'I', NDFI, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'I', NDFI,
      :                STATUS )
 
 *  If successful, set a flag indicating that a total-intensity NDF is to
@@ -333,7 +333,7 @@
          CALL NDF_CPUT( 'Total Intensity', NDFI, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL KPG1_MAP( NDFI, 'DATA', '_REAL', 'WRITE', IPI, EL, 
+         CALL KPG1_MAP( NDFI, 'DATA', '_REAL', 'WRITE', IPI, EL,
      :                  STATUS )
          IF ( VAR ) CALL KPG1_MAP( NDFI, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIV, EL, STATUS )
@@ -353,7 +353,7 @@
 
 *  Attempt to get an output NDF to hold the normalised Q Stokes
 *  parameter.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ,
      :                STATUS )
 
 *  If successful, set a flag indicating that a
@@ -365,7 +365,7 @@
          CALL NDF_CPUT( 'Stokes Q', NDFQ, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL KPG1_MAP( NDFQ, 'DATA', '_REAL', 'WRITE', IPQ, EL, 
+         CALL KPG1_MAP( NDFQ, 'DATA', '_REAL', 'WRITE', IPQ, EL,
      :                  STATUS )
          IF ( VAR ) CALL KPG1_MAP( NDFQ, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPQV, EL, STATUS )
@@ -385,7 +385,7 @@
 
 *  Attempt to get an output NDF to hold the normalised U Stokes
 *  parameter.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU,
      :                STATUS )
 
 *  If successful, set a flag indicating that a U NDF is to be produced.
@@ -396,7 +396,7 @@
          CALL NDF_CPUT( 'Stokes U', NDFU, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL KPG1_MAP( NDFU, 'DATA', '_REAL', 'WRITE', IPU, EL, 
+         CALL KPG1_MAP( NDFU, 'DATA', '_REAL', 'WRITE', IPU, EL,
      :                  STATUS )
          IF ( VAR ) CALL KPG1_MAP( NDFU, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPUV, EL, STATUS )
@@ -415,7 +415,7 @@
 *  ===========================================
 
 *  Attempt to get an output NDF to hold percentage polarisation.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP,
      :                STATUS )
 
 *  If successful, set a flag indicating that a percent-polarisation NDF
@@ -431,7 +431,7 @@
          CALL NDF_CPUT( '%', NDFP, 'UNITS', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL KPG1_MAP( NDFP, 'DATA', '_REAL', 'WRITE', IPP, EL, 
+         CALL KPG1_MAP( NDFP, 'DATA', '_REAL', 'WRITE', IPP, EL,
      :                  STATUS )
          IF ( VAR ) CALL KPG1_MAP( NDFP, 'VARIANCE', '_REAL', 'WRITE',
      :                           IPPV, EL, STATUS )
@@ -451,7 +451,7 @@
 *  ======================================
 
 *  Attempt to get an output NDF to hold polarisation angle.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'THETA', NDFT, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'THETA', NDFT,
      :               STATUS )
 
 *  If successful, set a flag indicating that an angle NDF is to
@@ -466,7 +466,7 @@
          CALL NDF_CPUT( 'Degrees', NDFT, 'UNITS', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL KPG1_MAP( NDFT, 'DATA', '_REAL', 'WRITE', IPT, EL, 
+         CALL KPG1_MAP( NDFT, 'DATA', '_REAL', 'WRITE', IPT, EL,
      :                  STATUS )
          IF ( VAR ) CALL KPG1_MAP( NDFT, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPTV, EL, STATUS )
@@ -485,7 +485,7 @@
 *  =======================================
 
 *  Attempt to get an output NDF to hold polarised intensity.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IP', NDFIP, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IP', NDFIP,
      :               STATUS )
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
@@ -517,7 +517,7 @@
 
 *  Attempt to get an output NDF to hold total-intensity estimate based
 *  on the first and third input NDFs.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IA', NDFIA, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IA', NDFIA,
      :               STATUS )
 
 *  If successful, set a flag indicating that this total-intensity NDF is
@@ -549,7 +549,7 @@
 
 *  Attempt to get an output NDF to hold total-intensity estimate based
 *  on the second and fourth input NDFs.
-      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IB', NDFIB, 
+      CALL LPG_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IB', NDFIB,
      :               STATUS )
 
 *  If successful, set a flag indicating that this total intensity NDF is
@@ -586,7 +586,7 @@
          CALL ERR_REP( 'CALPOL_ERR1', 'No output NDFs requested',
      :                 STATUS )
          GO TO 999
-      END IF         
+      END IF
 
 *  Decide whether or not a bias correction is needed and possible.
 *  ===============================================================
@@ -609,29 +609,29 @@
 *  ============================
 
 *  Call the routine to do the work.
-      CALL KPS1_PLCLC( EL, %VAL( CNF_PVAL( IPDIN( 1 ) ) ), 
+      CALL KPS1_PLCLC( EL, %VAL( CNF_PVAL( IPDIN( 1 ) ) ),
      :                 %VAL( CNF_PVAL( IPDIN( 2 ) ) ),
-     :                 %VAL( CNF_PVAL( IPDIN( 3 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPDIN( 3 ) ) ),
      :                 %VAL( CNF_PVAL( IPDIN( 4 ) ) ),
-     :                 %VAL( CNF_PVAL( IPVIN( 1 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN( 1 ) ) ),
      :                 %VAL( CNF_PVAL( IPVIN( 2 ) ) ),
-     :                 %VAL( CNF_PVAL( IPVIN( 3 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN( 3 ) ) ),
      :                 %VAL( CNF_PVAL( IPVIN( 4 ) ) ), DEBIAS,
      :                 VAR, MAKEI, MAKEQ, MAKEU, MAKEP, MAKET, MAKEIP,
-     :                 MAKEIA, MAKEIB, %VAL( CNF_PVAL( IPI ) ), 
+     :                 MAKEIA, MAKEIB, %VAL( CNF_PVAL( IPI ) ),
      :                 %VAL( CNF_PVAL( IPQ ) ),
-     :                 %VAL( CNF_PVAL( IPU ) ), %VAL( CNF_PVAL( IPP ) ), 
+     :                 %VAL( CNF_PVAL( IPU ) ), %VAL( CNF_PVAL( IPP ) ),
      :                 %VAL( CNF_PVAL( IPT ) ),
      :                 %VAL( CNF_PVAL( IPIP ) ),
-     :                 %VAL( CNF_PVAL( IPIA ) ), 
+     :                 %VAL( CNF_PVAL( IPIA ) ),
      :                 %VAL( CNF_PVAL( IPIB ) ),
-     :                 %VAL( CNF_PVAL( IPIV ) ), 
-     :                 %VAL( CNF_PVAL( IPQV ) ), 
+     :                 %VAL( CNF_PVAL( IPIV ) ),
+     :                 %VAL( CNF_PVAL( IPQV ) ),
      :                 %VAL( CNF_PVAL( IPUV ) ),
-     :                 %VAL( CNF_PVAL( IPPV ) ), 
-     :                 %VAL( CNF_PVAL( IPTV ) ), 
+     :                 %VAL( CNF_PVAL( IPPV ) ),
+     :                 %VAL( CNF_PVAL( IPTV ) ),
      :                 %VAL( CNF_PVAL( IPIPV ) ),
-     :                 %VAL( CNF_PVAL( IPIAV ) ), 
+     :                 %VAL( CNF_PVAL( IPIAV ) ),
      :                 %VAL( CNF_PVAL( IPIBV ) ), STATUS )
 
 *  Closedown.
@@ -641,7 +641,7 @@
  999  CONTINUE
 
 *  If an error has occurred, delete the output NDFs.
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          IF ( MAKEI ) CALL NDF_DELET( NDFI, STATUS )
          IF ( MAKEQ ) CALL NDF_DELET( NDFQ, STATUS )
          IF ( MAKEU ) CALL NDF_DELET( NDFU, STATUS )

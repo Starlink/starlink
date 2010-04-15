@@ -13,18 +13,18 @@
 *     CALL ESP1_GTPSZ(INDF,PSIZE,STATUS)
 *
 *  Description:
-*     This routine gets a value for the PSIZE ADAM parameter, which 
+*     This routine gets a value for the PSIZE ADAM parameter, which
 *     represents pixel size in arcseconds.  If the parameter is in the
 *     ACTIVE state (presumably because it has been specified on the
 *     command line) then its current value will be used.  Otherwise,
-*     the routine will search for a frame in the SKY domain in the 
+*     the routine will search for a frame in the SKY domain in the
 *     WCS component of the NDF given by the INDF argument, and if
 *     one exists it will work out a value from this.  Failing either
 *     of these, the user will be prompted for a value.
 *
-*     The pixels are assumed to be square.  If the WCS component 
-*     indicates that they are in fact not square (have an aspect ratio 
-*     outside the range 0.95-1.05) then the user is warned of this, 
+*     The pixels are assumed to be square.  If the WCS component
+*     indicates that they are in fact not square (have an aspect ratio
+*     outside the range 0.95-1.05) then the user is warned of this,
 *     but no further action is taken.
 *
 *  Arguments:
@@ -101,7 +101,7 @@
       STATE=PAR__GROUND
       CALL PAR_STATE('PSIZE',STATE,STATUS)
 
-*   If it is in the ACTIVE state (presumably because it has been set on 
+*   If it is in the ACTIVE state (presumably because it has been set on
 *   the command line) then we use its set value.
       IF (STATE.EQ.PAR__ACTIVE) THEN
          CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
@@ -130,13 +130,13 @@
 
 *      If there is a sky frame, use it to work out pixel size.
          IF (SKYFRM.NE.AST__NULL .AND. JGRID.NE.AST__NOFRAME) THEN
-         
+
 *         Work out whether the SkyFrame has had its axes swapped over.
-*         Normally the first axis is longitude and the second is 
+*         Normally the first axis is longitude and the second is
 *         latitude.  However it may have had them swapped over.
-*         This code is pinched from KAPPA, where it is commented that 
-*         doing this is more complicated than it ought to be.  
-*         We compare it with a newly created SkyFrame to see if the 
+*         This code is pinched from KAPPA, where it is commented that
+*         doing this is more complicated than it ought to be.
+*         We compare it with a newly created SkyFrame to see if the
 *         axes have been swapped.
             FSET=AST_FINDFRAME(SKYFRM,AST_SKYFRAME(' ',STATUS),' ',
      :                         STATUS)
@@ -205,7 +205,7 @@
 
 *   The WCS component was not suitable for working out the pixel size.
 *   Ask the user to enter it instead.  We require it to be at least
-*   a micro-arcsecond; if this is altered the magic value of a 
+*   a micro-arcsecond; if this is altered the magic value of a
 *   1e-6 arcsec in gaufit must be modified also.
          ELSE
             INOKAY=.FALSE.

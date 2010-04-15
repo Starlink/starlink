@@ -1,8 +1,8 @@
 1 KAPRH_Version_2.0
 
    KAPRH is a package containing commands retired from the KAPPA
-   package (see SUN/95). These commands have been removed from KAPPA 
-   but are retained in KAPRH to satisfy any occasional need there may 
+   package (see SUN/95). These commands have been removed from KAPPA
+   but are retained in KAPRH to satisfy any occasional need there may
    be for them. KAPRH is documented in SUN/239.
 
    This release adds the following commands to KAPRH:

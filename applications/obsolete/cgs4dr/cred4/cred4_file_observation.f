@@ -9,7 +9,7 @@
 *     OBSERVATION  = CHARACTER*(*)( READ )
 *        Name of observation to file.
 *     ASK          = LOGICAL( READ )
-*        Logical flag indicating if the task should prompt for 
+*        Logical flag indicating if the task should prompt for
 *        confirmation before invoking the action.
 *     WAIT         = LOGICAL( READ )
 *        Logical flag indicating if the task should wait until
@@ -47,7 +47,7 @@
 *    Import :
       LOGICAL ASK                   ! T if should ask user before proceeding
       LOGICAL WAIT                  ! T if should wait for action to finish
-      CHARACTER*(*) OBSERVATION     ! The name of the observation 
+      CHARACTER*(*) OBSERVATION     ! The name of the observation
 *    Status :
       INTEGER STATUS
 *    Global variables :
@@ -68,7 +68,7 @@
       IF ( VERBOSE ) THEN
 
          CALL MSG_SETC( 'OBSERVATION', OBSERVATION )
-         CALL MSG_OUT (' ', 'Filing observation ^OBSERVATION', STATUS) 
+         CALL MSG_OUT (' ', 'Filing observation ^OBSERVATION', STATUS)
       END IF
 
 *    if necessary ask user if they wish to proceed
@@ -92,7 +92,7 @@
 
             CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL, STATUS)
 
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -131,7 +131,7 @@
 *       tell the RED4 A-task to file this observation
          INVAL = 'OBSERVATION="' // OBSERVATION /
      :      / '" TYPE="WHATEVER_IT_IS"'
-         CALL TASK_OBEY (RED4_ALIAS, 'FILE_OBS', INVAL, OUTVAL, 
+         CALL TASK_OBEY (RED4_ALIAS, 'FILE_OBS', INVAL, OUTVAL,
      :      RED4_PATH, RED4_MESSID, STATUS)
 
 *       check that the action started OK, if not report an error
@@ -152,9 +152,9 @@
 *          if necessary, wait for action to finish, check completion
             IF (WAIT) THEN
 
-               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL, 
+               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL,
      :            STATUS)
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN

@@ -19,7 +19,7 @@
  *  Notes:
  *     - Focal plane coordinates are read (in arcsec) from .MORE.ACSIS.FPLANEX
  *     and .MORE.ACSIS.FPLANEY.
- *     - Detector positions in tracking coordinates are read (in radians) from 
+ *     - Detector positions in tracking coordinates are read (in radians) from
  *     .MORE.ACSIS.RECEPPOS.
  *     - Detector names are read from .MORE.ACSIS.RECEPPOS.RECEPTORS
 
@@ -149,18 +149,18 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   /* Get the pixel index bounds of the NDF. */
   ndfBound( indf, 3, lbnd, ubnd, &ndim, status );
 
-  /* See which, if either, of axes 2 and 3 represent a section of the 
+  /* See which, if either, of axes 2 and 3 represent a section of the
      original NDF. The original NDF had lower bound of 1 on all axes.
-     The original upper bound on axis 2 (detector index) is assumed to be 
-     equal to the length of the "FPLANEX" array. The original upper bound 
-     on axis 3 (time slice index) is assumed to be equal to the length of 
-     the second axis of the "RECEPPOS" array. Get these original upper 
+     The original upper bound on axis 2 (detector index) is assumed to be
+     equal to the length of the "FPLANEX" array. The original upper bound
+     on axis 3 (time slice index) is assumed to be equal to the length of
+     the second axis of the "RECEPPOS" array. Get these original upper
      bounds. */
    datSize( fxloc, &origu1, status );
    datSize( rloc, &origu2, status );
    origu2 /= origu1*2;
 
-  /* Get slices of the extension arrays that match the pixel index 
+  /* Get slices of the extension arrays that match the pixel index
      bounds of the NDF. Only do this if the arrays do not already match
      the pixel index bounds. First do the 1D arrays. */
   if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != origu1 ) {
@@ -171,17 +171,17 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
      datSlice( fxloc, 1, lower, upper, &tmploc, status );
      datAnnul( &fxloc, status );
      fxloc = tmploc;
-      
+
      tmploc = NULL;
      datSlice( fyloc, 1, lower, upper, &tmploc, status );
      datAnnul( &fyloc, status );
      fyloc = tmploc;
-      
+
      tmploc = NULL;
      datSlice( nloc, 1, lower, upper, &tmploc, status );
      datAnnul( &nloc, status );
      nloc = tmploc;
-  } 
+  }
 
   /* Now do the 2D arrays. */
   if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != origu1 ||
@@ -243,7 +243,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     tsys = smf_malloc( sizet, sizeof(*tsys), 0, status );
     receptor = smf_malloc( sizen, clen + 1, 0, status );
 
-    /* need to convert fplane values from arcsec to radians since they are 
+    /* need to convert fplane values from arcsec to radians since they are
        stored in arcsec in the ACSIS data files. */
     if (fplanex && fplaney) {
       for (i = 0; i < sizex; i++) {
@@ -269,7 +269,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
       for( i = 0; i < sizen; i++ ) {
          for( j = 0; j < clen; j++ ) *(cout++) = *(cin++);
          *(cout++) = 0;
-      }         
+      }
     }
 
 
@@ -282,7 +282,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     hdr->detname = receptor;
 
     /* The receppos values may be either in tracking coords or in azel
-       coords. We determine which by seeing if the receppos values are 
+       coords. We determine which by seeing if the receppos values are
        closer to the TCS_AZ_AC1/2 values (azel) or the TCS_TR_AC1/2
        values (tracking). Loop round all time frames. */
     for( iframe = 0; iframe < hdr->nframes; iframe++ ) {
@@ -313,7 +313,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
                 trd = slaDsep( rx, ry, trac1, trac2 );
                 azd = slaDsep( rx, ry, azac1, azac2 );
 
-    /* If the receppos values are closer to the TRACKING values, then  
+    /* If the receppos values are closer to the TRACKING values, then
        set a flag indicating that the receppos values should be treated
        as TRACKING values. Otherwise, set the flag to indicate that the
        receppos values should be treated as AZEL values. */

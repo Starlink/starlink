@@ -15,7 +15,7 @@
 *  Description:
 *     ADAM tasks use this as their main subroutine when run directly at
 *     a terminal using the DCL RUN command. They can also be declared as
-*     DCL foreign commands, in which case the command-line parameters 
+*     DCL foreign commands, in which case the command-line parameters
 *     are picked-up.
 
 *  Arguments:
@@ -26,10 +26,10 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Initialize the parameter system, and inform it that the task is 
-*     running at the terminal. Get the command-line and pass it to the 
+*     Initialize the parameter system, and inform it that the task is
+*     running at the terminal. Get the command-line and pass it to the
 *     command-line parser. Finally, call the application code.
-*     The application routines are passed as EXTERNAL to allow the DTASK 
+*     The application routines are passed as EXTERNAL to allow the DTASK
 *     library to be in a shareable image.
 
 *  Copyright:
@@ -76,7 +76,7 @@
 *     25-APR-1991 (REVAD::BDK):
 *        Revise INCLUDE files
 *     30-APR-1991: revise INCLUDE files and improve error checking
-*                  (REVAD::BDK) 
+*                  (REVAD::BDK)
 *     23-MAY-1991 (REVAD::BDK):
 *        Ensure STATUS is bad before calling ERR
 *     27-MAY-1991 (REVAD::BDK):
@@ -124,9 +124,9 @@
 
 *  Local Variables:
       CHARACTER VALUE*(MESSYS__VAL_LEN)   ! command-line parameter string
-      CHARACTER*(SUBPAR__NAMELEN) NAME     ! action name. This is declared as 
-                                      ! a variable to allow the symbolic 
-                                      ! debugger to change the action 
+      CHARACTER*(SUBPAR__NAMELEN) NAME     ! action name. This is declared as
+                                      ! a variable to allow the symbolic
+                                      ! debugger to change the action
                                       ! name
 *.
 
@@ -150,7 +150,7 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 *
 *           NAME has been set by the call to SUBPAR_ACTDCL
-               CALL DTASK_OBEYDCL ( DTASK_APPLIC, NAME, VALUE, STATUS ) 
+               CALL DTASK_OBEYDCL ( DTASK_APPLIC, NAME, VALUE, STATUS )
 *
 *            Check for bad completion status.
 *

@@ -13,7 +13,7 @@
 *     CALL ARD1_COWCS( AWCS, C, UWCS, STATUS )
 
 *  Description:
-*     This routine creates a new user FrameSet (UWCS) from the 
+*     This routine creates a new user FrameSet (UWCS) from the
 *     supplied linear Mapping coefficients.
 
 *  Arguments:
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,15 +62,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_CONST'        ! ARD private constants 
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
+      INCLUDE 'ARD_CONST'        ! ARD private constants
+      INCLUDE 'ARD_ERR'          ! ARD error constants
 
 *  Arguments Given:
       INTEGER AWCS
@@ -104,7 +104,7 @@
 
       UWCS = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the Curent Frame in the application FrameSet has domain ARDAPP.
@@ -126,7 +126,7 @@
          M3 = AST_UNITMAP( NDIM, ' ', STATUS )
 
 *  Otherwise,
-      ELSE         
+      ELSE
 
 *  Create a MatrixMap representing the matrix part of the mapping (i.e.
 *  skipping over the elements of C which represent the constant offset
@@ -140,9 +140,9 @@
                K = K + 1
                L = L + 1
             END DO
-         END DO         
-   
-         M1 = AST_MATRIXMAP( NDIM, NDIM, 0, M, ' ', STATUS ) 
+         END DO
+
+         M1 = AST_MATRIXMAP( NDIM, NDIM, 0, M, ' ', STATUS )
 
 *  Now create a WinMap representing the vector offset elements.
          DO I = 1, NDIM
@@ -153,8 +153,8 @@
             OUTA( I ) = OFFV
             OUTB( I ) = STEP + OFFV
          END DO
-   
-         M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+
+         M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Combine the MatrixMap and the WinMap. This is the Mapping from
 *  user coords to application coords.
@@ -171,9 +171,9 @@
       END IF
 
 *  Now create a Frame to represent user coords. Base this on a
-*  copy of the ARDAPP Frame in the application FrameSet, in order 
+*  copy of the ARDAPP Frame in the application FrameSet, in order
 *  to inherit the correct class of Frame.
-      F1 = AST_COPY( AST_GETFRAME( AWCS, AST__CURRENT, STATUS ), 
+      F1 = AST_COPY( AST_GETFRAME( AWCS, AST__CURRENT, STATUS ),
      :               STATUS )
       CALL AST_SETC( F1, 'DOMAIN', 'ARDUSER', STATUS )
       CALL AST_SETC( F1, 'TITLE', 'ARD user coordinates', STATUS )
@@ -181,14 +181,14 @@
 *  Now create a Frame to represent application coords.
       F2 = AST_COPY( F1, STATUS )
       CALL AST_SETC( F2, 'DOMAIN', 'ARDAPP', STATUS )
-      CALL AST_SETC( F2, 'TITLE', 'ARD application coordinates', 
+      CALL AST_SETC( F2, 'TITLE', 'ARD application coordinates',
      :               STATUS )
 
 *  Construct the FrameSet, with user coords as Current Frame, and
 *  application coords as Base Frame.
-      UWCS = AST_FRAMESET( F2, ' ', STATUS ) 
-      CALL AST_ADDFRAME( UWCS, AST__BASE, M3, F1, STATUS ) 
-      
+      UWCS = AST_FRAMESET( F2, ' ', STATUS )
+      CALL AST_ADDFRAME( UWCS, AST__BASE, M3, F1, STATUS )
+
 *  Arrive here if an error occurs.
  999  CONTINUE
 

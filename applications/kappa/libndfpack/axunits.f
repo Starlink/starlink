@@ -29,7 +29,7 @@
 *     centres are pixel co-ordinates is created.
 
 *  Usage:
-*     axunits ndf units dim 
+*     axunits ndf units dim
 
 *  ADAM Parameters:
 *     DIM = _INTEGER (Read)
@@ -94,7 +94,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

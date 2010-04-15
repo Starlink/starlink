@@ -13,19 +13,19 @@
 *     C function
 
 *  Invocation:
-*     smf_detmask( type, void *in, int len, int ndim, int *dims_in, 
-*                  int axis, int *index, int maxis, int *mask, void *out, 
+*     smf_detmask( type, void *in, int len, int ndim, int *dims_in,
+*                  int axis, int *index, int maxis, int *mask, void *out,
 *                  int *status );
 
 *  Arguments:
 *     type = const char * (Given)
-*        The HDS data type. Note, this argument is only included in the 
+*        The HDS data type. Note, this argument is only included in the
 *        interface for the generic "smf_detmask" function.
 *     in = const <type> * (Given)
 *        Point to the vectorised input array. The elements are assumed to be
 *        stored in fortran order (i.e. the first axis varies fastest).
 *     len = int (Given)
-*        The length of each individual sub-string within the "in" and "out" 
+*        The length of each individual sub-string within the "in" and "out"
 *        arrays. Only used for smf_detmaskB. The supplied value is ignored
 *        otherwise, and a value of 1 is assumed.
 *     ndim = int (Given)
@@ -33,17 +33,17 @@
 *     dims_in = const int * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
-*        the "out" array should be the same as those of the "in" array, 
-*        except that the "maxis" axis should be shorter in the "out" array, 
+*        the "out" array should be the same as those of the "in" array,
+*        except that the "maxis" axis should be shorter in the "out" array,
 *        by the number of zero values in the mask.
 *     maxis = int (Given)
 *        The zero-based index of the dimension that is to be masked.
 *     mask = const int * (Given)
-*        An array with one element for each input pixel on the dimension that 
-*        is being masked (i.e. it should have "dims_in[maxis]" elements). This 
+*        An array with one element for each input pixel on the dimension that
+*        is being masked (i.e. it should have "dims_in[maxis]" elements). This
 *        array should contain non-zero values for those hyper-rows that
-*        are to be copied to "out". Other hyper-rows are not copied. The 
-*        number of non-zero values in "mask" should equal the length of the 
+*        are to be copied to "out". Other hyper-rows are not copied. The
+*        number of non-zero values in "mask" should equal the length of the
 *        "maxis" axis in "out".
 *     out = <type> * (Returned)
 *        Point to the vectorised output array. The elements are assumed to be
@@ -58,7 +58,7 @@
 *
 *     The hyper-planes removed are specified by an axis index and a 1D
 *     mask array. This array holds one element for each pixel along the
-*     specified axis of the input array. If an element is non-zero, the 
+*     specified axis of the input array. If an element is non-zero, the
 *     corresponding hyper-plane is included in the output array.
 *     Otherwise it is excluded.
 
@@ -118,7 +118,7 @@
 #include "mers.h"
 #include "smf.h"
 
-void smf_detmask( const char *type, const void *in, int len, int ndim, const int *dims_in, 
+void smf_detmask( const char *type, const void *in, int len, int ndim, const int *dims_in,
                   int maxis, const int *mask, void *out, int *status ){
 
 /* Check inherited status */
@@ -126,19 +126,19 @@ void smf_detmask( const char *type, const void *in, int len, int ndim, const int
 
 /* Call the correct function for the specified data type. */
    if( !strcmp( type, "_REAL" ) ) {
-      smf_detmaskF( (const float *) in, 1, ndim, dims_in, maxis, mask, 
+      smf_detmaskF( (const float *) in, 1, ndim, dims_in, maxis, mask,
                      (float *) out, status );
 
    } else if( !strcmp( type, "_DOUBLE" ) ) {
-      smf_detmaskD( (const double *) in, 1, ndim, dims_in, maxis, mask, 
+      smf_detmaskD( (const double *) in, 1, ndim, dims_in, maxis, mask,
                     (double *) out, status );
 
    } else if( !strcmp( type, "_INTEGER" ) ) {
-      smf_detmaskI( (const int *) in, 1, ndim, dims_in, maxis, mask, 
+      smf_detmaskI( (const int *) in, 1, ndim, dims_in, maxis, mask,
                     (int *) out, status );
 
    } else if( !strncmp( type, "_CHAR", 5 ) ) {
-      smf_detmaskB( (const char *) in, len, ndim, dims_in, maxis, mask, 
+      smf_detmaskB( (const char *) in, len, ndim, dims_in, maxis, mask,
                     (char *) out, status );
 
    } else if( *status == SAI__OK ) {

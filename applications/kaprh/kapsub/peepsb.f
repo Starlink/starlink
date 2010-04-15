@@ -39,8 +39,8 @@
 *     YSIZE  =  INTEGER( READ )
 *         The y size of the box to be output
 *     STATUS  =  INTEGER( READ, WRITE )
-*         Global status value 
-*           
+*         Global status value
+*
 *    Method :
 *
 *     Check for error on entry - return if not o.k.
@@ -206,7 +206,7 @@
 
       DO  J  =  1, YSIZE
 
-*       clear the output string 
+*       clear the output string
 
          OUTLIN  =  ' '
 
@@ -279,7 +279,7 @@
 *          with one additional space
 
             OUTLIN( POINT : POINT )  =  ' '
-            OUTLIN( POINT + 1 : POINT + STRLEN )  
+            OUTLIN( POINT + 1 : POINT + STRLEN )
      :                                      =  STRING ( 1 : STRLEN )
 
 *       end of loop round pixels in current line

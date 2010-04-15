@@ -40,7 +40,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -108,7 +108,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -188,12 +188,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -212,7 +212,7 @@
 %  ==================
 
 This note is the release note and installation instructions for the
-DEC Alpha AXP / Digital UNIX, Sun Sparc / Solaris v2.x, and Sun Sparc / 
+DEC Alpha AXP / Digital UNIX, Sun Sparc / Solaris v2.x, and Sun Sparc /
 SunOS 4.1.x versions of the Starlink Software Collection (USSC).
 
 You will be supplied with pre-built (and installed) versions on tape
@@ -227,7 +227,7 @@ no further updates are available.  The instructions for installing the
 main section of the USSC may continue to be used for installing Sun
 Sparc SunOS 4.1.x version.
 
- 
+
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
@@ -245,18 +245,18 @@ Sparc SunOS 4.1.x version.
 \renewcommand{\thepage}{\arabic{page}}
  \setcounter{page}{1}
 
-\section{General Introduction} 
+\section{General Introduction}
 \label{s:intro}
 
 \subsection{Organisation}
 \label{s:intro:organ}
 
-The Starlink Software is distributed in several parts to enable easy 
-installation.  The main part is the entire USSC proper, source included. 
+The Starlink Software is distributed in several parts to enable easy
+installation.  The main part is the entire USSC proper, source included.
 
-There are also two items of commercial software (NAG and MEMSYS), which 
+There are also two items of commercial software (NAG and MEMSYS), which
 will not be sent to sites not covered by the Starlink Licences for those
-products.  
+products.
 
 In addition, there is a Base Set of mostly Public Domain utilities
 which Starlink recommends that its sites install.  Some of these are
@@ -317,7 +317,7 @@ logged in as {\tt `star'} for the entirety of this installation, though
 {\tt `root'} access is required at times.
 
 This note assumes that you are familiar with some system management concepts,
-or that you have access to someone who does, and who can do the sections 
+or that you have access to someone who does, and who can do the sections
 requiring {\tt `root'} access.
 
 On some systems, you may need to skip over the EOF marks used to separate
@@ -399,7 +399,7 @@ If you are not a Starlink site, please proceed to the Base Set installation
 
 \begin{enumerate}
 
-\item Create a home for the NAG software. 
+\item Create a home for the NAG software.
 
 As provided, the USSC contains a top level soft link {\tt /star/nag} to the
 home of the NAG software as installed at RAL.  You should first remove
@@ -516,10 +516,10 @@ recognised by your system.
 \section{Local software}
 \label{s:ilocal}
 
-The USSC has provision for adding local software to the collection, in a 
-{\tt /star/local} directory.  
+The USSC has provision for adding local software to the collection, in a
+{\tt /star/local} directory.
 
-The USSC provided contains a top level soft link {\tt /star/local} 
+The USSC provided contains a top level soft link {\tt /star/local}
 to the home of the locxal software as installed at RAL.
 
 The {\tt /star/local} soft link should be removed, and either a new
@@ -553,12 +553,12 @@ provided at or above the version levels of the Starlink provided versions
 (see Tcl, Tk, Expect, Mosaic: Section \ref{s:ibase:tcl}).
 
 \begin{quote}
-NOTE for Sun SunOS 4: Emacs is included with the main USSC section and is 
-an old version. 
+NOTE for Sun SunOS 4: Emacs is included with the main USSC section and is
+an old version.
 \end{quote}
 
 If you intend to use the XADAM GUI, you must have Tcl, Tk, Expect and Mosaic
-installed.  
+installed.
 
 You will need a version of \TeX/\LaTeX\ to process the Starlink documentation,
 but it need not be the version provided by Starlink.
@@ -577,9 +577,9 @@ Create a home for the Base Set software and copy it from the tape:
 
 where \verb+/tape_device_name+ is defined as before.
 
-You will now have a directory {\tt /wherever/base} containing compressed tar 
-files for \TeX , Tcl, Tk, Expect, Mosaic, Pine, Jed, Emacs, Perl, Ispell, 
-and Ftnchek.  
+You will now have a directory {\tt /wherever/base} containing compressed tar
+files for \TeX , Tcl, Tk, Expect, Mosaic, Pine, Jed, Emacs, Perl, Ispell,
+and Ftnchek.
 
 \subsection{Installing \TeX}
 \label{s:ibase:tex}
@@ -657,8 +657,8 @@ Institution by an Officer of the Institution.
 If you have tape devices on your machine, and wish to use them for reading
 FITS tapes, you must ensure the USSC recognises them.
 
-As provided, the software will recognise the first 3 devices numerically 
-from zero, {\em e.g.}, on an Digital Unix machine: {\tt /dev/nrmt0h}, 
+As provided, the software will recognise the first 3 devices numerically
+from zero, {\em e.g.}, on an Digital Unix machine: {\tt /dev/nrmt0h},
 {\tt /dev/nrmt1h} and {\tt /dev/nrmt2h}.
 
 \begin{quote}
@@ -739,7 +739,7 @@ The complete documentation set in included in {\tt /star/docs}.  The
 documentation is in \LaTeX\ form, and may be processed by the Starlink
 provided version of \TeX/\LaTeX.
 
-In addition, an increasing number of Starlink documents have hypertext 
+In addition, an increasing number of Starlink documents have hypertext
 versions available.
 
 \subsection{Information files}
@@ -756,7 +756,7 @@ picked up by anonymous ftp from the Starlink FTP server at
 {\tt starlink-ftp.rl.ac.uk}.  If you would like to receive update
 notifications by email, please contact Starlink at the address below.
 
-If your local Netnews server carries the {\tt uk.*} heirarchy, you can 
+If your local Netnews server carries the {\tt uk.*} heirarchy, you can
 see the update notices posted on the newsgroup {\tt uk.org.starlink.announce}.
 This moderated group also carries astronomy related job adverts and
 general Starlink announcements and news items.

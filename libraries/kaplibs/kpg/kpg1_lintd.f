@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -155,7 +155,7 @@
      :        WY,
      :        XD0
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        YD0,
      :        X0,
      :        Y0,
@@ -171,7 +171,7 @@
      :        XXA,
      :        YYA
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        XXB,
      :        YYB,
      :        XBFIT,
@@ -190,17 +190,17 @@
      :                 'supplied (programming error)', STATUS )
          GO TO 999
       END IF
- 
+
 *  Find the total number of valid positions.
       SW = 0.0
       DO I = 1, N
 
-         IF( XA( I ) .NE. AST__BAD .AND. YA( I ) .NE. AST__BAD .AND. 
+         IF( XA( I ) .NE. AST__BAD .AND. YA( I ) .NE. AST__BAD .AND.
      :       XB( I ) .NE. AST__BAD .AND. YB( I ) .NE. AST__BAD ) THEN
             SW = SW + 1.0
          END IF
 
-      END DO 
+      END DO
 
 *  Report an error if all positions are invalid.
 *  Check validity of arguments
@@ -213,12 +213,12 @@
 
 *  Ok...set type of fit required between 1 and 4
       IFIT = MIN( MAX( 1, IFIT ), 4 )
- 
+
 *  Check that the fit does not have too many degrees of freedom for the
 *  number of data points available.
       IF( NINT( SW ) .LE. 2 ) IFIT = MIN( IFIT, 3 )
       IF( NINT( SW ) .LE. 1 ) IFIT = 1
- 
+
 *  Initiallise sums for normal equations
       SWX = 0.0
       SWY = 0.0
@@ -231,25 +231,25 @@
       SWYYD = 0.0
       SWXYD = 0.0
       SWYXD = 0.0
- 
+
 *  Form sums, setting weight to zero for invalid positions
       DO I = 1, N
- 
-         IF( XA( I ) .NE. AST__BAD .AND. YA( I ) .NE. AST__BAD .AND. 
+
+         IF( XA( I ) .NE. AST__BAD .AND. YA( I ) .NE. AST__BAD .AND.
      :       XB( I ) .NE. AST__BAD .AND. YB( I ) .NE. AST__BAD ) THEN
             W = 1.0
- 
+
          ELSE
             W = 0.0
          END IF
- 
+
          WX = W*XA( I )
          WY = W*YA( I )
          SWX = SWX + WX
          SWY = SWY + WY
          SWXD = SWXD + W*XB( I )
          SWYD = SWYD + W*YB( I )
- 
+
 
 *  If fit only requires a shift of origin, further sums are not
 *  required
@@ -262,8 +262,8 @@
             SWYXD = SWYXD + WY*XB( I )
             SWYYD = SWYYD + WY*YB( I )
          END IF
- 
-      END DO 
+
+      END DO
 
 *  Iterate up to 4 times, reducing IFIT by 1 each time
       IFIT = IFIT + 1
@@ -272,7 +272,7 @@
 
       DO WHILE( AGAIN )
          IFIT = IFIT - 1
- 
+
 *  Shift of origin only: equations simply solved
 *  ---------------------------------------------
          IF( IFIT .EQ. 1 ) THEN
@@ -283,11 +283,11 @@
             C( 5 ) = 0.0
             C( 6 ) = 1.0
             AGAIN = .FALSE.
- 
+
 *  Shift of origin and rotation
 *  ----------------------------
          ELSE IF( IFIT .EQ. 2 ) THEN
- 
+
 *  Calculate the centroids of each set of positions
             XD0 = SWXD/SW
             YD0 = SWYD/SW
@@ -299,12 +299,12 @@
             SWXYD0 = 0.0
             SWXXD0 = 0.0
             SWYYD0 = 0.0
- 
+
 *  Form new sums, using the deviations from the centroids
             DO I = 1, N
- 
+
                IF( XA( I ) .NE. AST__BAD .AND.
-     :             YA( I ) .NE. AST__BAD .AND. 
+     :             YA( I ) .NE. AST__BAD .AND.
      :             XB( I ) .NE. AST__BAD .AND.
      :             YB( I ) .NE. AST__BAD ) THEN
 
@@ -315,13 +315,13 @@
 
                END IF
 
-            END DO 
- 
+            END DO
+
 *  If the rotation angle is defined...
             TOP = SWYXD0 - SWXYD0
             BOT = SWYYD0 + SWXXD0
-            IF( TOP .NE. 0.0 .OR. BOT .NE. 0.0 ) THEN 
- 
+            IF( TOP .NE. 0.0 .OR. BOT .NE. 0.0 ) THEN
+
 *  ...calculate the rotation angle about the centroids and assign the
 *  results to the transform coefficients
                THETA = ATAN2( TOP, BOT )
@@ -359,11 +359,11 @@
             B( 2, 1 ) = SWXXD + SWYYD
             B( 3, 1 ) = SWYXD - SWXYD
             B( 4, 1 ) = SWYD
- 
+
 *  Solve the linear normal equations
-            CALL PDA_DGEFS( A, 4, 4, B( 1, 1 ), 1, IFAIL, WK1, WK2, 
+            CALL PDA_DGEFS( A, 4, 4, B( 1, 1 ), 1, IFAIL, WK1, WK2,
      :                      STATUS )
- 
+
 *  If successful, assign result to the transformation coefficients
             IF( STATUS .EQ. SAI__OK ) THEN
                C( 1 ) = B( 1, 1 )
@@ -396,13 +396,13 @@
             B( 1, 2 ) = SWYD
             B( 2, 2 ) = SWXYD
             B( 3, 2 ) = SWYYD
- 
+
 *  Solve linear normal equations
-            CALL PDA_DGEFS( A, 4, 3, B( 1, 1 ), 1, IFAIL, WK1, WK2, 
+            CALL PDA_DGEFS( A, 4, 3, B( 1, 1 ), 1, IFAIL, WK1, WK2,
      :                      STATUS )
-            CALL PDA_DGEFS( A, 4, 3, B( 1, 2 ), 2, IFAIL, WK1, WK2, 
+            CALL PDA_DGEFS( A, 4, 3, B( 1, 2 ), 2, IFAIL, WK1, WK2,
      :                      STATUS )
- 
+
 *  If successful,  assign results to transformation coefficients
             IF( STATUS .EQ. SAI__OK ) THEN
                C( 1 ) = B( 1, 1 )
@@ -427,14 +427,14 @@
 *  between the supplied and estimated (XB,YB) positions.
       MAXSQR = VAL__MINR
       SSQRES = 0.0
-      
+
       DO I = 1, N
          XXA = XA( I )
          YYA = YA( I )
          XXB = XB( I )
          YYB = YB( I )
-         
-         IF( XXA .NE. AST__BAD .AND. YYA .NE. AST__BAD .AND. 
+
+         IF( XXA .NE. AST__BAD .AND. YYA .NE. AST__BAD .AND.
      :       XXB .NE. AST__BAD .AND. YYB .NE. AST__BAD ) THEN
 
             XBFIT = C( 1 ) + C( 2 )*XXA + C( 3 )*YYA

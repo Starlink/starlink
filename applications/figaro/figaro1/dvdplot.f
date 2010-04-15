@@ -9,10 +9,10 @@ C     Plots the data in one data array against the data in another.
 C
 C  Description:
 C     DVDPLOT (Data Versus Data PLOT) plots the data in the main data
-C     array in one Figaro structure against the corresponding data 
+C     array in one Figaro structure against the corresponding data
 C     elements of the main data array in another structure.  This was
-C     originally written to help with linearity tests (where data in an 
-C     image taken at a low data rate could be plotted against one taken 
+C     originally written to help with linearity tests (where data in an
+C     image taken at a low data rate could be plotted against one taken
 C     at a higher data rate), but may have other applications.
 C
 C  Usage:
@@ -20,8 +20,8 @@ C     DVDPLOT IMage IMAGE2 XLow XHigh LOw HIgh AUtoscale
 C
 C  Parameters:
 C     IMAGE     (Character) The name of the first structure.  It is this
-C               structure whose data is plotted against the data in 
-C               IMAGE2, so its data values form the Y values of the 
+C               structure whose data is plotted against the data in
+C               IMAGE2, so its data values form the Y values of the
 C               plotted points.
 C     IMAGE2    (Character) The name of the second structure.  Its data
 C               values form the X values of the plotted points.
@@ -31,7 +31,7 @@ C     XHIGH     (Numeric) The high end of the data range plotted in X
 C               (i.e. the upper limit for the data in IMAGE2).
 C     LOW       (Numeric) The low end of the data range plotted in Y
 C               (i.e. the lower limit for the data in IMAGE).
-C     HIGH      (Numeric) The high end of the data range plotted in Y 
+C     HIGH      (Numeric) The high end of the data range plotted in Y
 C               (i.e. the upper limit for the data in IMAGE).
 C
 C  Keywords:
@@ -65,7 +65,7 @@ C                    problem.
 C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
 C+
-      SUBROUTINE DVDPLOT 
+      SUBROUTINE DVDPLOT
 C
       IMPLICIT NONE
 
@@ -81,7 +81,7 @@ C
       LOGICAL   AUTO              ! Value of AUTOSCALE keyword
       CHARACTER DEVICE*32         ! Plot device name (PGPLOT spec)
       INTEGER   DIMS(10)          ! Data dimensions (ignored)
-      LOGICAL   FAULT             ! Indicates a non-DSA error 
+      LOGICAL   FAULT             ! Indicates a non-DSA error
       REAL      FLAG              ! Flag value used for data
       LOGICAL   HARD              ! Valuer of HARDCOPY keyword
       REAL      HIGH              ! Higher data value to be plotted in Y
@@ -212,7 +212,7 @@ C     Now do the real work.
 C
       CALL DVDPLOT_PLOT (NELM,%VAL(CNF_PVAL(IPTR)),
      :                   %VAL(CNF_PVAL(IPTR2)),
-     :                   FLAG,XLOW,XHIGH,LOW,HIGH,DEVICE)      
+     :                   FLAG,XLOW,XHIGH,LOW,HIGH,DEVICE)
 C
 C     Close everything down.
 C
@@ -240,7 +240,7 @@ C     (>) NELM      (Integer) Number of array elements.
 C     (>) FLAG      (Real) The value used to flag 'bad' pixels.
 C     (<) VMAX      (Real) The higher limit of the values in ARRAY.
 C     (<) VMIN      (Real) The lower limit of the values in ARRAY.
-C     
+C
 C                                              KS / AAO 28th June 1990.
 C+
       IMPLICIT NONE
@@ -270,7 +270,7 @@ C     Get range of rest of array
 C
       IF (I1.EQ.0) THEN
          VMAX=0.0
-         VMIN=0.0  
+         VMIN=0.0
       ELSE
          VMAX=ARRAY(I1)
          VMIN=ARRAY(I1)
@@ -308,7 +308,7 @@ C     (>) XHIGH     (Real) The higher limit of the values in ARRAY2 to use.
 C     (>) XLOW      (Real) The lower limit of the values in ARRAY2 to use.
 C     (<) HIGH      (Real) The higher limit of the values in ARRAY.
 C     (<) LOW       (Real) The lower limit of the values in ARRAY.
-C     
+C
 C                                              KS / AAO 28th June 1990.
 C+
       IMPLICIT NONE
@@ -348,7 +348,7 @@ C
      :             (ARRAY2(I).GE.XLOW).AND.(ARRAY2(I).LE.XHIGH)) THEN
                IF (ARRAY(I).GT.HIGH) THEN
                   HIGH=ARRAY(I)
-               ELSE 
+               ELSE
                   IF (ARRAY(I).LT.LOW) LOW=ARRAY(I)
                END IF
             END IF
@@ -358,7 +358,7 @@ C
       END
 C+
       SUBROUTINE DVDPLOT_PLOT (NELM,ARRAY,ARRAY2,FLAG,
-     :                                 XLOW,XHIGH,LOW,HIGH,DEVICE)      
+     :                                 XLOW,XHIGH,LOW,HIGH,DEVICE)
 C
 C     D V D P L O T _ P L O T
 C
@@ -380,7 +380,7 @@ C     (>) HIGH      (Real) The higher limit of the values in ARRAY.
 C     (>) LOW       (Real) The lower limit of the values in ARRAY.
 C     (>) DEVICE    (Character string) The PGPLOT specification for
 C                   the device to be used.
-C     
+C
 C                                              KS / AAO 28th June 1990.
 C+
       IMPLICIT NONE

@@ -87,32 +87,32 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) STRING ! the given character string
- 
+
       INTEGER NMAXDIMS     ! the maximum number of dimensions that can be
                            ! returned
- 
+
       INTEGER MAXDIMS(NMAXDIMS) ! the maximum array indices in the various
                            ! dimensions that can be returned
- 
+
 *  Arguments Returned:
       INTEGER NDIMS        ! number of dimensions in the decoded array
- 
+
       INTEGER DIMS(1:*)    ! sizes of dimensions of the given array
- 
+
       REAL RVALS(1:*)  ! the decoded array, treated as a vector
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *    External references :
       INTEGER STRING_INANYL
       EXTERNAL STRING_INANYL
       INTEGER STRING_INANYR
       EXTERNAL STRING_INANYR
- 
+
 *  Local Variables:
       CHARACTER*(40) CARRAY(20)  ! store for original type conversions
       INTEGER CLENGTHS(20)       ! lengths of original converted strings
@@ -121,7 +121,7 @@
       INTEGER COUNT              ! number of items for conversion
       INTEGER J                  ! loop counter
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Only single-dimensioned arrays are supported
@@ -157,5 +157,5 @@
      :      STATUS )
          ENDDO
       ENDIF
- 
+
       END

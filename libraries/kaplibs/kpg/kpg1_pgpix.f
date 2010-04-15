@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_PGPIX( IPLOT, DOMAIN, LBND, UBND, NX, NY, COLI, 
+      SUBROUTINE KPG1_PGPIX( IPLOT, DOMAIN, LBND, UBND, NX, NY, COLI,
      :                       STATUS )
 *+
 *  Name:
@@ -16,8 +16,8 @@
 *  Description:
 *     This routine uses PGPIXL to display an array of colour indices
 *     as a rectangular image. The area occupied by the array of colour
-*     indices is specified within a nominated Domain. Two opposite 
-*     corners of this area are transformed into the Base Frame 
+*     indices is specified within a nominated Domain. Two opposite
+*     corners of this area are transformed into the Base Frame
 *     of the Plot (which should correspond to the current PGPLOT world
 *     co-ordinate sysytem), and the array of colour indices is drawn
 *     between these two transformed positions.
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,23 +72,23 @@
 *     19-AUG-1998 (DSB):
 *        Original version.
 *     2-JUN-2009 (DSB):
-*        Ensure the image does not quite fill the PGPLOT viewport. 
-*        If the image exactly fills the viewport, rounding errors in 
-*        PGPLOT can cause PGPLOT to use incorrect array bounds. 
+*        Ensure the image does not quite fill the PGPLOT viewport.
+*        If the image exactly fills the viewport, rounding errors in
+*        PGPLOT can cause PGPLOT to use incorrect array bounds.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'PRM_PAR'          ! VAL_ constants 
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -115,7 +115,7 @@
                                  ! viewport
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -126,7 +126,7 @@
       ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
 *  Find the first Frame in the Plot with the specified Domain.
-      IF( AST_FINDFRAME( IPLOT, AST_FRAME( 2, ' ', STATUS ), DOMAIN, 
+      IF( AST_FINDFRAME( IPLOT, AST_FRAME( 2, ' ', STATUS ), DOMAIN,
      :                   STATUS ) .NE. AST__NULL ) THEN
 
 *  Transform the bottom left and top right corners from the given Domain
@@ -135,8 +135,8 @@
          XIN( 2 ) = DBLE( UBND( 1 ) )
          YIN( 1 ) = DBLE( LBND( 2 ) )
          YIN( 2 ) = DBLE( UBND( 2 ) )
-         CALL AST_TRAN2( IPLOT, 2, XIN, YIN, .FALSE., XOUT, YOUT, 
-     :                   STATUS ) 
+         CALL AST_TRAN2( IPLOT, 2, XIN, YIN, .FALSE., XOUT, YOUT,
+     :                   STATUS )
 
 *  If succesful, draw the image.
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -161,13 +161,13 @@
 *  AST_FINDFRAME).
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
-*  Report an error if no Frame with the specified Domain was found in the 
+*  Report an error if no Frame with the specified Domain was found in the
 *  Plot.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'DOM', DOMAIN )
          CALL ERR_REP( 'KPG1_PGPIX_1', 'KPG1_PGPIX: No ^DOM Frame is '//
-     :                 'available (possible programming error).', 
+     :                 'available (possible programming error).',
      :                 STATUS )
       END IF
 

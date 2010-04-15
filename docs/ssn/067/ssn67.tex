@@ -14,9 +14,9 @@
 
 This document has been written to help Site Managers secure their
 Unix hosts from being compromised by hackers. I have given brief
-introductions to the security tools along with downloading, configuring 
-and running information. I have also included a section on my 
-recommendations for installing these security tools starting from an 
+introductions to the security tools along with downloading, configuring
+and running information. I have also included a section on my
+recommendations for installing these security tools starting from an
 absolute minimum security requirement.
 }
 
@@ -50,7 +50,7 @@ absolute minimum security requirement.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -123,7 +123,7 @@ absolute minimum security requirement.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -204,12 +204,12 @@ absolute minimum security requirement.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -251,7 +251,7 @@ absolute minimum security requirement.
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 
-\section{\label{introduction}\xlabel{introduction}Introduction} 
+\section{\label{introduction}\xlabel{introduction}Introduction}
 
 This document addresses the process of securing a Unix
 box using publicly available software. Most of the software described within
@@ -274,52 +274,52 @@ I have investigated. There are new tools coming out all the time, if
 you feel a particular security tool is worth including into this
 document then contact the author of this document.
 
-The aim of this paper is to describe what tools are available and what 
-they do without introducing too much technical detail. I have also 
-included information on which software tools I strongly recommend to be 
-installed, what tools are useful to have but not essential and tools for 
+The aim of this paper is to describe what tools are available and what
+they do without introducing too much technical detail. I have also
+included information on which software tools I strongly recommend to be
+installed, what tools are useful to have but not essential and tools for
 the paranoid system manager.
 
 The majority of software packages described are applicable for most
-versions of Unix which include Digital UNIX, Solaris 2.x and Linux. If a 
+versions of Unix which include Digital UNIX, Solaris 2.x and Linux. If a
 particular OS port is not available this will be indicated.
 
 %[Appendix B contains a lookup table which shows what security tools cater for
 %a particular type of security violation.
 
-This document is sectioned into systems security tools which deal mostly 
-with the filing system, miscellaneous tools which aid the use of some 
+This document is sectioned into systems security tools which deal mostly
+with the filing system, miscellaneous tools which aid the use of some
 of the described security tools and network security tools.
 
 %------------------------------------------------------------------------
 
-\section{\label{recommendations}\xlabel{Recommendations}Recommendations} 
+\section{\label{recommendations}\xlabel{Recommendations}Recommendations}
 For site managers who are unfamiliar with most of the security tools
 described in this document here are my recommendations:
 
 \begin{itemize}
-\item {\bf Minimum}: As an absolute minimum install the {\bf TCP Wrappers} 
-which will allow you to log and control access to your hosts. You can add 
+\item {\bf Minimum}: As an absolute minimum install the {\bf TCP Wrappers}
+which will allow you to log and control access to your hosts. You can add
 {\bf Swatch} to this which will help you to monitor the log files.
 \item After installing the minimum required security tools,
-I would recommend installing {\bf Crack} and checking user passwords. You can 
+I would recommend installing {\bf Crack} and checking user passwords. You can
 setup a cron job to do this.
 It is also worth running {\bf TIGER} occasionally to check on the state of the
-filesystem. The root areas of the filesystem will not change very 
+filesystem. The root areas of the filesystem will not change very
 regularly but the user areas will.  The frequency with which you add
-new users and do system upgrades will roughly determine how often you 
+new users and do system upgrades will roughly determine how often you
 use {\bf TIGER}.
 
-If you do install either {\bf Crack} and {\bf TIGER} then I would also 
-recommend installing {\bf MERLIN}. This will provide you with a HTML 
-front end with which you can execute either program and manage the 
+If you do install either {\bf Crack} and {\bf TIGER} then I would also
+recommend installing {\bf MERLIN}. This will provide you with a HTML
+front end with which you can execute either program and manage the
 output through hypertext links.
 
 \item Install some network security probing software such
-as {\bf ISS} or {\bf SATAN}. If you want to use encrypted passwords over 
-the network then it is worth looking at Secure Shell ({\bf SSH}). This 
-provides enhanced versions of rlogin, rsh and rcp that provide RSA 
-authentication and encryption of communications. This tool is not described 
+as {\bf ISS} or {\bf SATAN}. If you want to use encrypted passwords over
+the network then it is worth looking at Secure Shell ({\bf SSH}). This
+provides enhanced versions of rlogin, rsh and rcp that provide RSA
+authentication and encryption of communications. This tool is not described
 here but you can fetch it from the above URL in Starlink Forum.
 
 You may also want to consider installing the {\bf Logdaemon} package instead
@@ -334,10 +334,10 @@ in restricted vi editor and is not described here but is also available
 via Starlink Forum.
 
 \item You may also want to consider installing a firewall.
-This is a gateway machine with special security precautions on it, used 
+This is a gateway machine with special security precautions on it, used
 to service network requests. The idea is to protect a cluster of
 more loosely administered machines hidden behind it from hackers. This
-can make it more difficult for users to login from remote sites if you 
+can make it more difficult for users to login from remote sites if you
 restrict incoming connections to one machine.
 
 \end{itemize}
@@ -345,11 +345,11 @@ restrict incoming connections to one machine.
 %------------------------------------------------------------------------
 \section{\label{Systems_Security_Tools}\xlabel{Systems_Security_Tools}Systems Security Tools}
 
-This sections deals with controlling physical and logical access to 
+This sections deals with controlling physical and logical access to
 hosts on your network.
 
 \subsection{TIGER}
-TIGER is used to perform a security audit of Unix systems. 
+TIGER is used to perform a security audit of Unix systems.
 
 TIGER includes a set of signatures for various operating systems. These
 are secure checksums of system files based on the original release of
@@ -358,7 +358,7 @@ released then the patched system binaries will have different
 signatures. If you get a signature check error then check to see
 if you have applied any patches.
 
-TIGER has one primary goal, which is to report ways ``root'' can be 
+TIGER has one primary goal, which is to report ways ``root'' can be
 compromised. Paths into ``root'' (cron, inetd, setuid executables,
 PATH, etc) are all checked to see if anyone other than ``root''
 can alter that path. Paths into other accounts are also checked for
@@ -374,7 +374,7 @@ these vulnerabilities. The following checks are done:
 \item Specific file \& directory access permissions are checked
 \item File system scans locate unusual files
 \item Digital signatures are used to detect alterations to key
-binaries (signatures are generated from CD-ROM) and also to 
+binaries (signatures are generated from CD-ROM) and also to
 report binaries for which (updated) security patches exist.
 \item Pathnames embedded in any files reported by most of the other
 checks are checked.
@@ -382,8 +382,8 @@ checks are checked.
 
 \subsubsection{Installing TIGER}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -392,9 +392,9 @@ Use the following command to extract the files:
 
 \subsubsection{Configuring TIGER}
 
-In the {\it tiger-2.2.3} subdirectory you should create a 
-site-\$HOSTNAME file which sets up NIS, hostname aliases, 
-crack home directory, etc. There is a {\it site.sample} which 
+In the {\it tiger-2.2.3} subdirectory you should create a
+site-\$HOSTNAME file which sets up NIS, hostname aliases,
+crack home directory, etc. There is a {\it site.sample} which
 you should copy onto {\it site-`hostname'} and amend to suit your setup.
 If the host you are running the software on is called ``star'', then
 do the following:
@@ -404,7 +404,7 @@ do the following:
 \verb+% cp site-sample site-star+\\
 \verb+% vi site-star+
 \end{quote}
- 
+
 The following variables are required to be set in this {\it site-star} file:
 
 \begin{description}
@@ -419,7 +419,7 @@ maps for user directories.
 A sample {\it site-star} file is shown in Appendix B.
 
 \subsubsection{Running TIGER}
-You can execute the program by changing into the tiger directory 
+You can execute the program by changing into the tiger directory
 and running the tiger script as follows:
 
 \begin{quote}
@@ -466,8 +466,8 @@ of this document.
 
 
 \subsection{Crack}
-Crack helps the security administrator identify weak passwords by checking for various weaknesses and attempting to decrypt them.  
-System attacks can involve grabbing the password file and running this 
+Crack helps the security administrator identify weak passwords by checking for various weaknesses and attempting to decrypt them.
+System attacks can involve grabbing the password file and running this
 program on it.
 Systems employing shadowing password schemes are much harder to break into.
 
@@ -480,8 +480,8 @@ Each pass generates password guesses based upon a sequence of rules.
 
 \subsubsection{Installing Crack}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -493,10 +493,10 @@ Use the following command to extract the files:
 \end{description}
 
 \subsubsection{Configuring Crack}
-Enter the 
-{\it crack} subdirectory and edit the {\it Crack} script. Amend CRACK\_HOME 
-to the directory where you installed crack. If your system uses 
-shadow passwords then you need to create a {\it passwd } file. Do the 
+Enter the
+{\it crack} subdirectory and edit the {\it Crack} script. Amend CRACK\_HOME
+to the directory where you installed crack. If your system uses
+shadow passwords then you need to create a {\it passwd } file. Do the
 following as root if you are using Solaris 2.x:
 
 \begin{quote}
@@ -518,17 +518,17 @@ Do the following to run Crack:
 \begin{tabbing}
 This line is used to   set some \=tabs for formatting test \kill
 where {\verb+<password file>+} \> is {\it /etc/passwd} for Linux and Digital Unix \\
-\> is {\it passwd} for Solaris 2.x                      
+\> is {\it passwd} for Solaris 2.x
 \end{tabbing}
 
 \begin{description}
-\item {\bf -v } is to verbose crack information into the {\it out.*} files. 
-This tends to generate huge files, so I would leave it out unless 
+\item {\bf -v } is to verbose crack information into the {\it out.*} files.
+This tends to generate huge files, so I would leave it out unless
 you want to see what the program is doing.
 \end{description}
 
-All of the output from Crack is put into some {\it out.*} files in the 
-{\it crack} subdirectory. Under Digital Unix the output files are put into 
+All of the output from Crack is put into some {\it out.*} files in the
+{\it crack} subdirectory. Under Digital Unix the output files are put into
 the {\it crack/done} subdirectory.
 
 Once a password is cracked the {\it out.*} files will contain a line which looks
@@ -545,13 +545,13 @@ in square brackets and the encrypted version is at the end.
 
 The {\it Scripts} subdirectory contains some useful utilities:
 \begin{description}
-\item {\bf Scripts/nastygram} This is the shellscript that is invoked 
-by the password cracker  to send mail to users who have guessable 
+\item {\bf Scripts/nastygram} This is the shellscript that is invoked
+by the password cracker  to send mail to users who have guessable
 passwords. Use the -m option when running Crack to enable this option.
 Think carefully before choosing to use this option.
 
-\item {\bf Scripts/guess2fbk} This script takes your {\it out* } files  
-as  arguments  and reformats  the  `Guessed'  lines  into a slightly 
+\item {\bf Scripts/guess2fbk} This script takes your {\it out* } files
+as  arguments  and reformats  the  `Guessed'  lines  into a slightly
 messy feedback file, suitable for storing with the others.
 An occasion where this might be useful is when your Crack dies before
 writing out the guess to a feedback file.
@@ -571,43 +571,43 @@ a host it will try to connect to various ports. Initially it tries the
 telnet port, once connected it will log any information that the host
 displays.
 
-ISS also does remote procedure call (rpc) checks. It does a 
-{\it rpcinfo -p \verb+<hostname>+}. with the information obtained  it looks 
-for hosts that are running NIS, rexd, bootparam, whose on the host, 
-selection\_svc and NFS. 
+ISS also does remote procedure call (rpc) checks. It does a
+{\it rpcinfo -p \verb+<hostname>+}. with the information obtained  it looks
+for hosts that are running NIS, rexd, bootparam, whose on the host,
+selection\_svc and NFS.
 
 If a system shows {\it ypserv}, it is possible
 to provide the password file to any remote host asking for it. ISS will
 attempt to guess the domainname and that will provide information as
-to which machine is the NIS server. 
+to which machine is the NIS server.
 
-If a system shows {\it Select\_svr, selection\_svr} is running on 
-the machine and there are known holes that let anyone remotely 
-read any file on the system, even the password file. 
+If a system shows {\it Select\_svr, selection\_svr} is running on
+the machine and there are known holes that let anyone remotely
+read any file on the system, even the password file.
 {\it Selection\_svr} should be disabled.
 
-  When {\it rexd} is running on a remote system, anyone with a 
-small C program can emulate the `on' command spoofing any user 
-on the remote machine, thus gaining access to the password file 
+  When {\it rexd} is running on a remote system, anyone with a
+small C program can emulate the `on' command spoofing any user
+on the remote machine, thus gaining access to the password file
 and adding {\it .rhosts} files. {\it rexd } should be disabled.
 
-  If a machine is running {\it bootparam}, it is likely a server 
-to diskless clients.  One problem with {\it bootparam} is that 
-if it is running and someone can guess which machines the client 
+  If a machine is running {\it bootparam}, it is likely a server
+to diskless clients.  One problem with {\it bootparam} is that
+if it is running and someone can guess which machines the client
 and servers are, they are able to get the domainname from {\it bootparam},
 which goes back to the {\it ypserv} problem.
 
-It also checks for mail aliases, some obvious ones are decode and 
+It also checks for mail aliases, some obvious ones are decode and
 uudecode. With these aliases, you are able to send mail to
 decode@hostname with a file that has been uuencoded to overwrite a systems
 file, such as {\it .rhosts}. Some of the users it looks for are `bbs',
- `guest', `lp', which are known to have weak or no passwords at all. 
+ `guest', `lp', which are known to have weak or no passwords at all.
 The well known debug and wiz backdoors for sendmail are also checked.
 
 \subsubsection{Installing ISS}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -621,7 +621,7 @@ downloaded.
 
 \subsubsection{Running ISS}
 
-To carry out a network scan 
+To carry out a network scan
 from host 129.12.48.129 to 129.12.48.130 do the following:
 
 \begin{quote}
@@ -669,7 +669,7 @@ this file you will see something like:
 The above file shows various tests carried out on the hosts.
 The first test on kensun2 connects to port 25 of the
 host to check if sendmail is running. When the connection has been establised
-it then does test 550 which checks for various mail aliases. 
+it then does test 550 which checks for various mail aliases.
 
 The next test is for an anonymous ftp server. The connection is first
 established and it tries to change to ``/'', make a subdirectory and
@@ -684,9 +684,9 @@ was generated. The connection is then closed.
 
 Merlin is a tool for managing other tools. It currently supports
 COPS 1.04, Tiger 2.2.3, Crack 4.1, Tripwire 1.2, and SPI 3.2.2.
-It can take a powerful but cryptic command-line tool and provide 
-it with an easy-to-use graphical interface. It also provides the 
-ability to sort reports based on the type of tool used, the 
+It can take a powerful but cryptic command-line tool and provide
+it with an easy-to-use graphical interface. It also provides the
+ability to sort reports based on the type of tool used, the
 creation date, or the host where the report is produced.
 
 Merlin does not come with the above packages, you have to install
@@ -694,8 +694,8 @@ them yourself and tell Merlin where the home directory is.
 
 \subsubsection{Installing MERLIN}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -709,7 +709,7 @@ downloaded.
 
 \subsubsection{Running MERLIN}
 
-MERLIN uses perl5 patch m, which it assumes is installed in 
+MERLIN uses perl5 patch m, which it assumes is installed in
 {\it /usr/local/bin/perl}.
 Change into the {\it merlin-1.0} directory and type the following command
 to startup Merlin:
@@ -723,7 +723,7 @@ to startup Merlin:
 A Netscape browser will pop up with a Merlin start page. To configure,
 click on the {\it Configuration} icon. You will now be presented with
 boxes for entering package home directories. Type in the full pathnames
-to its top directory (without the ``/'' at the end). You don't need 
+to its top directory (without the ``/'' at the end). You don't need
 to fill them all in, just the tools you have installed or want to run.
 
 When you are done, click the {\it Make changes} box at the bottom of
@@ -752,7 +752,7 @@ software, but are generally not configured to do so.
 
 Also with a large network a system administrator must often monitor
 several log files. Swatch is a utility which will allow a system
-manager to log critical system and security related information to 
+manager to log critical system and security related information to
 a dependable, secure, central logging host system. Swatch monitors
 log files and acts to filter out unwanted data and take one or more
 user specified actions (ring bell, send mail, execute a script, etc.)
@@ -763,8 +763,8 @@ with tcpwrappers to provide extra logging info.
 
 \subsubsection{Installing Swatch}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -790,7 +790,7 @@ The format of each line is as follows:
 \item The patterns must be regular expressions which Perl will accept. Each
 string is compared in order with the expression in the configuration
 file and if a match is found the corresponding actions are taken.
-\item The time interval can be used to help eliminate redundant 
+\item The time interval can be used to help eliminate redundant
 messages.
 \item The time stamp location information is optional and can only be
 used when a time interval is specified. Swatch uses it to strip away
@@ -821,11 +821,11 @@ to send.
 of input and proceed to the next one.
 \item The {\bf write} and {\bf mail} actions can be used to send a copy
 of the line to a user list via the write and mail commands.
-\item The {\bf pipe} and {\bf exec} actions were added to provide some 
+\item The {\bf pipe} and {\bf exec} actions were added to provide some
 flexibility. The pipe action allows the user to use matched lines as
 input to a particular command on the system. The exec action allows
-the user to run a command on the system with the option of using 
-selected fields from the matched line as arguments for the command. 
+the user to run a command on the system with the option of using
+selected fields from the matched line as arguments for the command.
 \end{itemize}
 
 For more information about configuring Swatch, see the online manual
@@ -836,7 +836,7 @@ page with the following command:
 \end{quote}
 
 There are some sample configuration files in the {\it config\_files}
-subdirectory inside the main Swatch directory. Copy one of these 
+subdirectory inside the main Swatch directory. Copy one of these
 to your home directory as follows:
 
 \begin{quote}
@@ -851,7 +851,7 @@ You can amend it as appropriate for your system.
 
 \subsubsection{Running Swatch}
 
-The most useful way of using Swatch is to look at messages as they 
+The most useful way of using Swatch is to look at messages as they
 are being added to the syslog file. You can do this by the following
 command:
 
@@ -861,14 +861,14 @@ command:
 
 This is the default behaviour if swatch is invoked without any arguments.
 
-To process all information in a logfile from beginning to end, use the 
+To process all information in a logfile from beginning to end, use the
 following command:
 
 \begin{quote}
 \verb+% swatch -f /var/log/syslog+
 \end{quote}
 
-For more information about the command line options, consult the online 
+For more information about the command line options, consult the online
 manual page with the following command:
 
 \begin{quote}
@@ -884,14 +884,14 @@ at what is happening on the wire'' and are more monitoring in nature.
 
 \subsection{TCP Wrappers}
 The TCP wrapper provides monitoring and control of network services. We
-live in world where networking facilities are desirable, forcing you 
+live in world where networking facilities are desirable, forcing you
 to trust external hosts, but all the while having hackers living on
 those very same hosts. The tool described here allows you to protect
-each network service that is protectable, limit access as much as 
+each network service that is protectable, limit access as much as
 possible, and log all connections to make the job of detecting
 and resolving problems easier.
 
-Almost every application of the TCP/IP protocols is based on a 
+Almost every application of the TCP/IP protocols is based on a
 client-server model. For example, when a user invokes the telnet command to
 connect to one of your systems, a telnet server process is executed on
 the target host. The telnet server process connects the user to a login
@@ -923,11 +923,11 @@ finger & fingerd  & show users \\
 \end {table}
 
 When someone connects to a host, a single daemon (called inetd) waits
-for the connection to be establised. It then runs the appropriate 
+for the connection to be establised. It then runs the appropriate
 server program and then goes back to waiting for other connections.
 
 The wrapper programs are setup so that instead of running the server
-program, inetd is tricked into running a small wrapper program. The 
+program, inetd is tricked into running a small wrapper program. The
 wrapper logs the client hostname or address and performs some
 additional checks and then executes the appropriate server program.
 One of the additional checks include defining access control lists
@@ -944,8 +944,8 @@ server, the wrapper goes away and there is no overhead on either end.
 
 \subsubsection{Installing TCP Wrappers}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -957,9 +957,9 @@ Use the following command to extract the files:
 downloaded.
 \end{description}
 
-The {\it tcpd} executable in the {\it tcp\_wrappers\_7.2} subdirectory 
-will monitor telnet, finger, ftp, exec, rsh, rlogin, tftp, talk, 
-comsat and other udp or tcp services that have a one-to-one mapping 
+The {\it tcpd} executable in the {\it tcp\_wrappers\_7.2} subdirectory
+will monitor telnet, finger, ftp, exec, rsh, rlogin, tftp, talk,
+comsat and other udp or tcp services that have a one-to-one mapping
 onto executable files. As root user, install the files as follows:
 
 \begin{quote}
@@ -970,7 +970,7 @@ onto executable files. As root user, install the files as follows:
 
 \subsubsection{Configuring TCP Wrappers}
 
-There are a couple of ways that you can install the wrappers. I 
+There are a couple of ways that you can install the wrappers. I
 would recommend modifying the {\it /etc/inetd.conf} file. An example
 for monitoring ftp services is shown below:
 
@@ -1006,7 +1006,7 @@ The will cause the inetd daemon to re-read its configuration file
 
 \subsubsection{Logging information}
 
-By default, all logging information is sent to the {\it /var/log/syslog} 
+By default, all logging information is sent to the {\it /var/log/syslog}
 file. This is logged in the same place as where the sendmail daemon
 logs its information. If you want to change this you need to edit
 {\it /etc/syslog.conf} file and amend the following line:
@@ -1018,10 +1018,10 @@ logs its information. If you want to change this you need to edit
 \begin{description}
 \item {\bf loghost} is defined in the {\it /etc/hosts}. This is set to
 the name of the host you are on. If you would like logging to a central
-host then amend {\bf loghost} in the {\it /etc/syslog.conf} file to 
-{\bf logmaster}. Edit the {\it /etc/hosts} file or your NIS/NIS+ hosts 
-file to set the central host that you would like to have the 
-{\bf logmaster} alias. 
+host then amend {\bf loghost} in the {\it /etc/syslog.conf} file to
+{\bf logmaster}. Edit the {\it /etc/hosts} file or your NIS/NIS+ hosts
+file to set the central host that you would like to have the
+{\bf logmaster} alias.
 An example follows
 \end{description}
 
@@ -1051,9 +1051,9 @@ In the above {\it /etc/hosts} file the localhost is called ``star''
 and also has the alias name ``loghost''. The remote host ``kensun2''
 is used as the central logging machine and has the alias ``logmaster''.
 
-In order to make effective use of the logging information I would 
+In order to make effective use of the logging information I would
 recommend using a logfile watching utility such as Swatch,
-described in Section 3.2. This watches a specfied 
+described in Section 3.2. This watches a specfied
 log file and indicates visually when someone starts up a daemon process.
 
 \subsubsection{Access control}
@@ -1064,7 +1064,7 @@ to create two files for access control as follows:
 \begin{itemize}
 \item Access will be granted when a (daemon, remote client) pair matches an
 entry in the {\it /etc/hosts.allow} file.
-\item Access will be denied when a (daemon, remote client) pair matches an 
+\item Access will be denied when a (daemon, remote client) pair matches an
 entry in the {\it /etc/hosts.deny} file.
 \item If neither files exist then daemon access is granted to any host.
 \end{itemize}
@@ -1080,7 +1080,7 @@ where
 \item {\bf demon\_list} is a list of one or more daemon process names
 such as ftpd, tftpd, telnetd, ... etc or wildcards
 
-\item {\bf client\_list} is a list of one or more host names, host 
+\item {\bf client\_list} is a list of one or more host names, host
 addresses, patterns or wildcards.
 \end{description}
 
@@ -1092,7 +1092,7 @@ they are permitted access by entries in the allow file:
 \verb+ALL: ALL+
 \end{quote}
 
-In the above {\it /etc/hosts.deny} file ALL services to ALL hosts is 
+In the above {\it /etc/hosts.deny} file ALL services to ALL hosts is
 denied, unless they are permitted access by entries in the allow file:
 
 \begin{quote}
@@ -1103,7 +1103,7 @@ denied, unless they are permitted access by entries in the allow file:
 
 In the above {\it /etc/hosts.allow} the first rule allows access from
 hosts in the LOCAL domain and from members of the some\_netgroup
-netgroup. The second rule permits access from ALL hosts in the 
+netgroup. The second rule permits access from ALL hosts in the
 foobar.edu domain with the exception of terminalserver.foobar.edu.
 
 For further information about access control, consult the online manual
@@ -1115,31 +1115,31 @@ page in the tcp wrappers subdirectory through the following commands:
 \end{quote}
 
 \subsection{SATAN}
-SATAN is the Security Analysis Tool for Auditing Networks. 
+SATAN is the Security Analysis Tool for Auditing Networks.
 It gathers as much information about remote hosts and networks
 as possible by examining such network services as finger, NFS, NIS,
-ftp and tftp, rexed and other services. It can then either report 
+ftp and tftp, rexed and other services. It can then either report
 on this data or use a simple rule-based system to investigate any
 potential security problems. A great deal of general network
 information can be gained when using this tool e.g. network
-topology, network services running, types of hardware and 
+topology, network services running, types of hardware and
 software being used on the network, etc. It is driven entirely
 through a Web-based browser such as Netscape, Mosaic or Lynx and
 allows you to examine, query, and analyze the output through this
 interface.
 
 SATAN has a few modes of operation. One of the more informative
-is exploratory mode which will examine the avenues of trust and 
+is exploratory mode which will examine the avenues of trust and
 dependancy and iterate further data collection runs over secondary
-hosts. This allows the user to analyze their own network and also 
+hosts. This allows the user to analyze their own network and also
 to examine the real implications inherent in network trust and services
-which will help make decisions about the security level of the 
+which will help make decisions about the security level of the
 systems involved.
 
 \subsubsection{Installing SATAN}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -1154,9 +1154,9 @@ downloaded.
 
 \subsubsection{Configuring SATAN}
 
-After extracting the source code, change into the {\it satan-1.1.1} 
-subdirectory. There are a couple of ways to configure SATAN. 
-You can either do it via the HTML interface or by editing 
+After extracting the source code, change into the {\it satan-1.1.1}
+subdirectory. There are a couple of ways to configure SATAN.
+You can either do it via the HTML interface or by editing
 the {\it config/satan.cf} file.
 
 SATAN will support any Level 2 HTML browser such as Mosaic, Lynx or
@@ -1164,12 +1164,12 @@ Netscape versions 1 and 2. It will {\bf NOT} work properly with Netscape
 version 3.
 
 To explicitly set the type of browser, edit the {\it config/paths.pl}
-and set {\verb+$MOSAIC+} to the location of the executable. 
+and set {\verb+$MOSAIC+} to the location of the executable.
 
-I would recommend configuring via the HTML interface. See Section 3.2.3 
+I would recommend configuring via the HTML interface. See Section 3.2.3
 below for information on starting up the browser.
 
-Configuration options: 
+Configuration options:
 
 \begin{description}
 \item {\bf Attack Level} There are three levels of probes (light,
@@ -1177,13 +1177,13 @@ normal and heavy). Each has a set of programs that they use when
 probing a remote system.
 \item {\bf satan\_data} specify where the gathered information
 should be stored. Defaults to {\it satan-data}.
-\item {\bf timeouts} Some network probes will try to continue to 
+\item {\bf timeouts} Some network probes will try to continue to
 contact the remote host for a long time. {\it short\_timeout,
 med\_timeout and long\_timeout} timeout variables
 are available in order to prevent this from slowing down the
-overall scan. The default setting is the med\_timeout. 
+overall scan. The default setting is the med\_timeout.
 
-If a particular probe requires more time then this can be changed 
+If a particular probe requires more time then this can be changed
 via the {\it config/satan.cf} file. For example:
 
 \begin{quote}
@@ -1196,7 +1196,7 @@ via the {\it config/satan.cf} file. For example:
 \end{verbatim}
 \end{quote}
 
-\item {\bf Timeout Signals} When a timeout occurs, a kill signal is 
+\item {\bf Timeout Signals} When a timeout occurs, a kill signal is
 sent to the process running to stop it. This defaults to 9.
 
 \item {\bf Proximity variables} This variable controls how far out
@@ -1206,7 +1206,7 @@ recommend that you {\bf NOT} set it above 3. The default setting is
 0.
 
 \item {\bf Trusted or Untrusted} SATAN assumes that it is being
-run from a host that may appear in other hosts {\it rhosts, 
+run from a host that may appear in other hosts {\it rhosts,
 hosts.equiv or NFS export} files. The default setting is 0 which
 means no.
 
@@ -1239,7 +1239,7 @@ government networks you can say:
 Login as ``root'' user and make sure you are in the {\it satan-1.1.1}
 subdirectory. Type {\bf ./satan \& } and you will see a browser pop up.
 
-To configure it select SATAN Configuration Management. See the 
+To configure it select SATAN Configuration Management. See the
 Configuring section above for the meaning of the options.
 
 To start a scan, select SATAN Target selection from the start page.
@@ -1248,7 +1248,7 @@ You are presented with the following input boxes:
 \begin{description}
 \item {\bf Primary target selection} type in the host that you are
 running SATAN from if it isn't already in the box.
-\item you either {\bf Scan the target  host} or if you have the 
+\item you either {\bf Scan the target  host} or if you have the
 authorization and time you can scan {\bf Scan all hosts in the primary
 subnet}.
 \item select either a {\bf Light, Normal or Heavy } scan.
@@ -1268,11 +1268,11 @@ If you select {\it SATAN Reporting and Analysis} from the start page
 you are presented with a list of information.
 
 From here if you select {\it Vulnerabilities} followed by {\it By
-Approximate Danger Level} hyperlinks and look at the warning messages, 
+Approximate Danger Level} hyperlinks and look at the warning messages,
 this will tell you if SATAN found any problems. You can try scanning
 the targets at a higher level.
 
-There is a considerable amount of information in the table of 
+There is a considerable amount of information in the table of
 contents, too much to go through here in detail. I would
 recommend clicking on the hyperlinks to see what they reveal and
 going through the online documentation by clicking on {\it SATAN
@@ -1280,7 +1280,7 @@ Documentation} hyperlink from the start page.
 
 \subsection {NFSWatch}
 Although not strictly a security tool its main function is to allow
-you to monitor NFS packets by host, network or file system. This is 
+you to monitor NFS packets by host, network or file system. This is
 a useful tool when you want to see where NFS traffic is coming from/
 going to and which filesystem it is accessing.
 
@@ -1291,8 +1291,8 @@ Currently there is no {\bf Linux} version.
 
 \subsubsection{Installing NFSWatch}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -1303,17 +1303,17 @@ Use the following command to extract the files:
 \item where *** will be axp or sol depending on the file you have downloaded.
 \end{description}
 
-Change into the {\it nfswatch4.3} subdirectory and copy the 
+Change into the {\it nfswatch4.3} subdirectory and copy the
 {\it nfswatch} binary to a suitable location along with the man
 page {\it nfswatch.8l}.
 
 \subsubsection{Running NFSWatch}
 
-You must be ``root'' user to run nfswatch. 
-NFSwatch has many options, too many to describe here in detail but a 
+You must be ``root'' user to run nfswatch.
+NFSwatch has many options, too many to describe here in detail but a
 few examples will be described.
 
-To monitor NFS packets between hosts ``star'' and ``kenterm1'', type 
+To monitor NFS packets between hosts ``star'' and ``kenterm1'', type
 the following command:
 
 \begin{quote}
@@ -1362,11 +1362,11 @@ prompt. Press `h' at this prompt and you will receive brief help for
 the available commands.
 
 The first line displays the name of the host being monitored, the current
-date and time and the time elapsed since monitoring was started. The 
+date and time and the time elapsed since monitoring was started. The
 second line displays the total number of packets received during the
 most recent interval, and the third line displays the total number
 of packets received since monitoring started. These two lines display
-three numbers each: 
+three numbers each:
 \begin{itemize}
 \item the total number of packets on the network.
 \item the total number of packets received by the destination host.
@@ -1377,7 +1377,7 @@ The next part of the screen divides the received packets into 16
 categories. Each category is displayed with three numbers:
 \begin{itemize}
 \item the number of packets received this interval.
-\item the percentage  this  represents  of all packets received by 
+\item the percentage  this  represents  of all packets received by
 the host during this interval.
 \item the total number  of  packets received  since  monitoring  started.
 \end{itemize}
@@ -1417,7 +1417,7 @@ network traffic. The following programs are included:
 \end{description}
 
 
-where 
+where
 \begin{itemize}
 \item TCP refers to Transmission control protocol. Most daemons use
 this protocol for communication mainly because it adds support to
@@ -1426,7 +1426,7 @@ the data is completely received.
 \item UDP refers to User Datagram protocol. UDP neither guarantees delivery nor does it require a connection. As a result it is lightweight and efficient, but all error processing and retransmission must be taken care of by the application program.
 \end{itemize}
 
-If you type the following command on a Unix box and look under column 3 
+If you type the following command on a Unix box and look under column 3
 it will tell you what protocol a particular daemon uses:
 
 \begin{quote}
@@ -1494,8 +1494,8 @@ Note that some daemons such as nfsd use both protocols.
 
 \subsubsection{Installing Netlog}
 
-Download the distribution file via the Unix\_Security Topic (41) 
-in the Systems-management conference within Starlink Forum and unpack it. 
+Download the distribution file via the Unix\_Security Topic (41)
+in the Systems-management conference within Starlink Forum and unpack it.
 Use the following command to extract the files:
 
 \begin{quote}
@@ -1505,7 +1505,7 @@ Use the following command to extract the files:
 Currently this program only compiles under SunOS4 or Solaris 2.x.
 
 \subsubsection{Running Netlog}
-Login as ``root'' user and change into the {\it netlog-1.2/bin} 
+Login as ``root'' user and change into the {\it netlog-1.2/bin}
 subdirectory. To log tcp connections to an output file do the
 following:
 
@@ -1513,7 +1513,7 @@ following:
 \verb+# ./tcplogger -f /tmp/tcplog.out+
 \end{quote}
 
-Press CTRL-C to stop the data collection. The output file 
+Press CTRL-C to stop the data collection. The output file
 {\it /tmp/tcplog.out} will be in binary format. To convert this to
 ascii, type the following command:
 
@@ -1533,7 +1533,7 @@ ascii, type the following command:
 \end{quote}
 
 The first two columns are the date and time. The fourth column is the source
-hostname with the source port in the next column. The next column is the 
+hostname with the source port in the next column. The next column is the
 destination host and port number.
 
 %------------------------------------------------------------------------
@@ -1602,7 +1602,7 @@ etc
 #
 #
 # Sample site configuration file
-# 
+#
 # Rename this to either "site" or "site-`hostname`"
 #
 #------------------------------------------------------------------------

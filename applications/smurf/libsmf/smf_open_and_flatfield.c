@@ -57,7 +57,7 @@
 
 *  History:
 *     2006-01-23 (AGG):
-*        Initial version, stripped out code from old version of 
+*        Initial version, stripped out code from old version of
 *        smurf_flatfield.
 *     2006-01-24 (TIMJ):
 *        Fix i vs index and calling arguments
@@ -78,7 +78,7 @@
 *        Set SMF_NOCREATE_FILE & SMF__NOCREATE_DA flags for
 *        NULL ffdata when input data are flatfielded
 *     2006-12-20 (TIMJ):
-*        Open related files in UPDATE mode to prevent overwrite of propogated 
+*        Open related files in UPDATE mode to prevent overwrite of propogated
 *        components
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
@@ -192,7 +192,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
     /* We want QUALITY too if it's available */
-    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)", 
+    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
               ogrp, index, &outndf, status );
     ndfAnnul( &indf, status);
 
@@ -203,10 +203,10 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
 
     /* Close output file */
     ndfAnnul( &outndf, status);
-  } 
+  }
 
   /* Open the input without header information. This is required
-     because sc2store can not open two files at once 
+     because sc2store can not open two files at once
      22-Mar-2006: no longer true? hdr needed anyway */
   if (*status == SAI__OK) {
     smf_open_file( igrp, index, "READ", 0, &data, status);
@@ -223,7 +223,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     /* Returns without action if ogrp is not defined */
     smf_open_file( ogrp, index, "UPDATE", 0, ffdata, status);
     if ( *status == SAI__ERROR) {
-      errRep("", FUNC_NAME ": Unable to open output flatfielded file(s)", 
+      errRep("", FUNC_NAME ": Unable to open output flatfielded file(s)",
              status);
     }
 
@@ -269,7 +269,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
       }
     }
 
-    /* Handle darks - note that "data" read from a raw file 
+    /* Handle darks - note that "data" read from a raw file
      is actually a malloced data array and not a mmapped array. This means
      that it is not read-only despite the call to smf_open_file above. */
     smf_apply_dark( data, darks, status );
@@ -287,14 +287,14 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     errAnnul( status );
 
     /* What if ffdata is NULL? */
-    msgOutif(MSG__DEBUG," ", 
+    msgOutif(MSG__DEBUG," ",
              "Data already flatfielded. Copying to output file ", status);
     if ( *ffdata == NULL ) {
       /* Don't need the smfFile or smfDA components */
       flags |= SMF__NOCREATE_FILE;
       flags |= SMF__NOCREATE_DA;
       *ffdata = smf_deepcopy_smfData( data, 0, flags, status );
-    } else {    
+    } else {
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }
 

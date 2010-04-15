@@ -31,7 +31,7 @@
 *     MASK( MSKSIZ ) = INTEGER (Given)
 *        The supplied mask (in vector form). This should hold zero for
 *        all exterior points, and a positive value for all interior
-*        points. 
+*        points.
 *     DONE = LOGICAL (Given and Returned)
 *        If DONE is supplied .FALSE., then the bounding boxes of the
 *        mask are found and returned in the arrays LBEXTB, UBEXTB,
@@ -39,9 +39,9 @@
 *        of the above arrays are left unchanged. DONE is always returned
 *        .TRUE..
 *     B( MSKSIZ ) = INTEGER (Returned)
-*        The stack array (in vector form). This is used as the first 
+*        The stack array (in vector form). This is used as the first
 *        operand in the ARD expression. If INDEX is non-zero, it will
-*        be returned holding a copy of the supplied mask, and will be 
+*        be returned holding a copy of the supplied mask, and will be
 *        returned holding zeros otherwise.
 *     LBEXTB( NDIM ) = INTEGER (Returned)
 *        The lower pixel bounds of the smallest box which contains all
@@ -51,7 +51,7 @@
 *        is used to indicate a zero sized box.
 *     UBEXTB( NDIM ) = INTEGER (Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        exterior points in B. 
+*        exterior points in B.
 *     LBINTB( NDIM ) = INTEGER (Returned)
 *        The lower pixel bounds of the smallest box which contains all
 *        interior points in B. A value of VAL__MAXI for element 1 is
@@ -59,7 +59,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -73,12 +73,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,7 +152,7 @@
          DO I = 1, MSKSIZ
             B( I ) = MASK( I )
          END DO
-      
+
 
 *  If the bounding boxes have not yet been found, we will need to be a
 *  bit cleverer in order to retain information about the N-dimensional
@@ -173,7 +173,7 @@
          DO I = 1, NDIM
             EXT( I ) = .FALSE.
             INT( I ) = .FALSE.
-   
+
             LBEXTB( I ) = VAL__MAXI
             UBEXTB( I ) = VAL__MINI
             LBINTB( I ) = VAL__MAXI
@@ -188,7 +188,7 @@
          EHDIM = NDIM
          IHDIM = NDIM
 
-*  Loop round every element in the mask. 
+*  Loop round every element in the mask.
          DO EL = 1, MSKSIZ
 
 *  Copy the current pixel.
@@ -238,13 +238,13 @@
 
             END IF
 
-*  Increment the Cartesian index on the first axis. 
+*  Increment the Cartesian index on the first axis.
             MINDEX( 1 ) = IND + 1
 
 *  If the index is now larger than the corresponding upper bound of the
 *  mask...
             I = 1
-            DO WHILE( MINDEX( I ) .GT. UBND( I ) ) 
+            DO WHILE( MINDEX( I ) .GT. UBND( I ) )
 
 *  Reset the index to the corresponding lower bound.
                MINDEX( I ) = LBND( I )
@@ -263,7 +263,7 @@
 *  etc) contains any exterior values, update the bounds of the exterior
 *  bounding box on the current axis.
                   IF( EXT( I ) ) THEN
-                     
+
                      IF( IND .LT. LBEXTB( I ) ) LBEXTB( I ) = IND
                      IF( IND .GT. UBEXTB( I ) ) UBEXTB( I ) = IND
 
@@ -272,19 +272,19 @@
 
 *  Indicate that the next value on this axis is not known to contain any
 *  exterior values.
-                     EHDIM = I            
+                     EHDIM = I
 
                   END IF
 
 *  Do the same for interior values.
                   IF( INT( I ) ) THEN
-                     
+
                      IF( IND .LT. LBINTB( I ) ) LBINTB( I ) = IND
                      IF( IND .GT. UBINTB( I ) ) UBINTB( I ) = IND
 
                      INT( I ) = .FALSE.
 
-                     IHDIM = I            
+                     IHDIM = I
 
                   END IF
 
@@ -315,7 +315,7 @@
 
 *  Indicate that the bounding boxes have been found.
          DONE = .TRUE.
-      
+
       END IF
 
       END

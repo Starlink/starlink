@@ -12,7 +12,7 @@
 *  date expressed in VAX character format.
 
       IMPLICIT  NONE
- 
+
 *     Formal parameters
 
       CHARACTER         TIME*8        ! input time hh:mm:ss

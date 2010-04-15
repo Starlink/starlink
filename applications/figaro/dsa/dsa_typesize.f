@@ -33,11 +33,11 @@ C
 C  Returns:
 C     (<) BYTES       (Integer,function value) The number of bytes
 C                     corresponding to TYPE.  If TYPE is invalid, zero
-C                     is returned.  
+C                     is returned.
 C
 C  External variables used: None.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     ICH_FOLD
 C
 C  Prior requirements: None.

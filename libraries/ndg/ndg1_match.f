@@ -18,14 +18,14 @@
 
 *  Arguments:
 *     TEMPLT = CHARACTER*(*) (Given)
-*        The wild-card template. 
+*        The wild-card template.
 *     TEST = CHARACTER*(*) (Given)
 *        The test string to be compared to the template.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Returned Value:
-*     NDG1_MATCH = LOGICAL 
+*     NDG1_MATCH = LOGICAL
 *        .TRUE. if the test string matches the template.
 
 *  Copyright:
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,7 +90,7 @@
       CHARACTER TEXT*(GRP__SZFNM)  ! File type template
       CHARACTER TEXT2*(GRP__SZFNM) ! Temporary file type template
       INTEGER LTEST                ! Length of test string
-      INTEGER LTEXT                ! Length of template text 
+      INTEGER LTEXT                ! Length of template text
       INTEGER NSUB                 ! No. of substitutions made
 *.
 
@@ -99,21 +99,21 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
-*  We use CHR_WILD to compare the strings. CHR_WILD uses * for its 
-*  multi-character wild card, but % for its single character wild-card. If 
-*  these are not the same as those used by the native operating system, then 
-*  we need to put a CHR_WILD escape character "\" in front of any existing 
-*  CHR_WILD wild cards in the template, and translate the native wild-cards 
+
+*  We use CHR_WILD to compare the strings. CHR_WILD uses * for its
+*  multi-character wild card, but % for its single character wild-card. If
+*  these are not the same as those used by the native operating system, then
+*  we need to put a CHR_WILD escape character "\" in front of any existing
+*  CHR_WILD wild cards in the template, and translate the native wild-cards
 *  into CHR_WILD wild-cards.
       IF( NDG__WILD1 .NE. '%' ) THEN
-         CALL NDG1_SUBST( TEMPLT, '%', NDG__BKSLH//'%', .TRUE., TEXT, 
+         CALL NDG1_SUBST( TEMPLT, '%', NDG__BKSLH//'%', .TRUE., TEXT,
      :                    NSUB, STATUS )
          CALL CHR_TRCHR( NDG__WILD1, '%', TEXT, STATUS )
       END IF
 
       IF( NDG__WILD2 .NE. '*' ) THEN
-         CALL NDG1_SUBST( TEXT, '*', NDG__BKSLH//'*', .TRUE., TEXT2, 
+         CALL NDG1_SUBST( TEXT, '*', NDG__BKSLH//'*', .TRUE., TEXT2,
      :                    NSUB, STATUS )
          TEXT = TEXT2
          CALL CHR_TRCHR( NDG__WILD2, '*', TEXT, STATUS )

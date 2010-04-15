@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_WALA4( QUAL, VAR, METHOD, IXLO2, IXHI2, IYLO2, 
+      SUBROUTINE KPS1_WALA4( QUAL, VAR, METHOD, IXLO2, IXHI2, IYLO2,
      :                       IYHI2, IXLO1, IXHI1, IYLO1, IYHI1, DATIN,
-     :                       VARIN, QLIN, XMAP, YMAP, DATOUT, VAROUT, 
+     :                       VARIN, QLIN, XMAP, YMAP, DATOUT, VAROUT,
      :                       QLOUT, STATUS )
 *+
 *  Name:
@@ -22,8 +22,8 @@
 *     the positions specified by the coordinates supplied in arrays
 *     XMAP and YMAP. The sample value is calculated either by bi-linear
 *     interpolation, or by copying the data value at the nearest input
-*     pixel. The corresponding variance value is also returned. If nearest 
-*     neighbour interpolation is used, then QUALITY values can also be 
+*     pixel. The corresponding variance value is also returned. If nearest
+*     neighbour interpolation is used, then QUALITY values can also be
 *     assigned to the output NDF.
 
 *  Arguments:
@@ -104,7 +104,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -168,8 +168,8 @@
                   DATOUT( IOUT, JOUT ) = VAL__BADR
                   IF( QUAL ) QLOUT( IOUT, JOUT ) = 0
                   IF( VAR ) VAROUT( IOUT, JOUT ) = VAL__BADR
-  
-*  Otherwise, find the indices of the pixel in the input NDF which is 
+
+*  Otherwise, find the indices of the pixel in the input NDF which is
 *  closest to the centre of this output pixel.
                ELSE
                   IIN = NINT( X + 0.5 )
@@ -214,13 +214,13 @@
                IF( X .EQ. AST__BAD .OR. Y .EQ. AST__BAD ) THEN
                   DATOUT( IOUT, JOUT ) = VAL__BADR
                   IF( VAR ) VAROUT( IOUT, JOUT ) = VAL__BADR
-  
+
 *  Otherwise, interpolate the input data values at the image coordinates
 *  corresponding to the centre of the current output pixel. Store the
-*  interpolated value in the output DATA array, and the corresponding 
+*  interpolated value in the output DATA array, and the corresponding
 *  variance value in the output VARIANCE array.
                ELSE
-                  CALL KPG1_BILNR( REAL( X ), REAL( Y ), IXLO1, IXHI1, 
+                  CALL KPG1_BILNR( REAL( X ), REAL( Y ), IXLO1, IXHI1,
      :                             IYLO1, IYHI1, VAR, DATIN, VARIN,
      :                             DATOUT( IOUT, JOUT ), NVAR, STATUS )
                   IF( VAR ) VAROUT( IOUT, JOUT) = NVAR

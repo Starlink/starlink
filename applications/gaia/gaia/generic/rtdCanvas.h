@@ -23,7 +23,7 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
                             Tk_Item *itemPtr, const double *x,
                             const double *y, int numPoints );
 
-void RtdLineSetColour( Tk_Window tkwin, Display *display, Tk_Item *itemPtr, 
+void RtdLineSetColour( Tk_Window tkwin, Display *display, Tk_Item *itemPtr,
                        XColor *colour );
 
 void RtdLineSetWidth( Display *display, Tk_Item *itemPtr, int width );
@@ -48,11 +48,11 @@ void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
                           int numPoints );
 
 void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
-                               Tk_Item *itemPtr, int append, 
-                               const double *x, const double *y, 
+                               Tk_Item *itemPtr, int append,
+                               const double *x, const double *y,
                                int numPoints );
 
-void RtdSegmentSetColour( Tk_Window tkwin, Display *display, Tk_Item *itemPtr, 
+void RtdSegmentSetColour( Tk_Window tkwin, Display *display, Tk_Item *itemPtr,
                           XColor *colour );
 
 void RtdSegmentSetWidth( Display *display, Tk_Item *itemPtr, int width );

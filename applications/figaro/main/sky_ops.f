@@ -10,7 +10,7 @@
 *
 *
 * Description:
-*  Allows the use of SKY lines for a variety of operations 
+*  Allows the use of SKY lines for a variety of operations
 *  [1] SKY VIG
 *      Use the fluxes variations of a SKY line as a function of position
 *      to create a insitu VIG type correction.
@@ -18,7 +18,7 @@
 *      Results cube and Normalized to unity around some central point in
 *      the data.
 *      A Chebyschev Poly is fitted to the data.
-*      
+*
 *      the resulting 1D correction curve is applied to the data.
 *      Note that the data must then be refitted using the COPY option.
 *  [2] ZERO POINT CORRECTIONS.

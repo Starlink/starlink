@@ -4,16 +4,16 @@
       subroutine gau2_uinit (guess, guesserrs, calcerrs,
      :     x, xerrs, c, p, l, back, status)
 
-*+   
+*+
 *   Description:
 *     Put the current parameter set back into the array guess, inverting
 *     the mapping described in gau2_inita.
-*     
+*
 *   Arguments:
 *     guess = real(gau2maxfits,7) (returned)
-*       The returned estimates for the 10 gaussians.  
+*       The returned estimates for the 10 gaussians.
 *       Mapping is:
-*         guess(i,1): x-coord of gaussian 
+*         guess(i,1): x-coord of gaussian
 *         guess(i,2): y-coord
 *         guess(i,3): ?
 *         guess(i,4): peak height/pixels
@@ -62,7 +62,7 @@
       integer i, j, ngaussians
 
       if (status .ne. sai__ok) return
-      
+
       if (back .lt. 0.0) then   ! we fitted background
          ngaussians = l-1
          back = c(l)

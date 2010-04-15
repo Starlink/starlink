@@ -40,28 +40,28 @@
 *        There is no suggested default to allow more room for entering
 *        the value.
 *     DATE =  LITERAL (Read)
-*        The date and time to associated with the new history record. 
-*        Normally, a null (!) value should be supplied, in which case 
+*        The date and time to associated with the new history record.
+*        Normally, a null (!) value should be supplied, in which case
 *        the current UTC date and time will be used.  If a value is
 *        supplied, it should be in one of the following forms.
 *
-*           Gregorian Calendar Date --- With the month expressed 
-*           either as an integer or a 3-character abbreviation, and with 
+*           Gregorian Calendar Date --- With the month expressed
+*           either as an integer or a 3-character abbreviation, and with
 *           optional decimal places to represent a fraction of a day
-*           ("1996-10-2" or "1996-Oct-2.6" for example).  If no 
-*           fractional part of a day is given, the time refers to the 
+*           ("1996-10-2" or "1996-Oct-2.6" for example).  If no
+*           fractional part of a day is given, the time refers to the
 *           start of the day (zero hours).
-*           
-*           Gregorian Date and Time --- Any calendar date (as above) 
-*           but with a fraction of a day expressed as hours, minutes and 
+*
+*           Gregorian Date and Time --- Any calendar date (as above)
+*           but with a fraction of a day expressed as hours, minutes and
 *           seconds ("1996-Oct-2 12:13:56.985" for example).  The date
 *           and time can be separated by a space or by a "T" (as used by
 *           ISO 8601 format).
-*           
+*
 *           Modified Julian Date --- With or without decimal places
 *           ("MJD 54321.4" for example).
-*           
-*           Julian Date --- With or without decimal places 
+*
+*           Julian Date --- With or without decimal places
 *           ("JD 2454321.9" for example).
 *        [!]
 *     FILE =  FILENAME (Read)
@@ -85,8 +85,8 @@
 *        WRAP=TRUE requests that the paragraphs of comments are wrapped
 *        to make as much text fit on to each line of the history record
 *        as possible.  WRAP=FALSE means that the commentary text beyond
-*        the width of the history records (72 characters) is lost. If a 
-*        null (!) value is supplied, the value used is TRUE when 
+*        the width of the history records (72 characters) is lost. If a
+*        null (!) value is supplied, the value used is TRUE when
 *        MODE="Interface" and FALSE if MODE="File".  [!]
 
 *  Examples:
@@ -157,13 +157,13 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'MSG_PAR'          ! MSG_ public constants
       INCLUDE 'PAR_PAR'          ! PAR_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
@@ -187,7 +187,7 @@
                                  ! messy, so use hardwired buffer)
       INTEGER CONSTA             ! State of COMMENT parameter
       CHARACTER * ( 80 ) DATE    ! Date string
-      INTEGER FD                 ! File descriptor 
+      INTEGER FD                 ! File descriptor
       CHARACTER * ( NDF__SZHUM ) HUMODE ! History update mode
       INTEGER INDF               ! NDF identifier
       LOGICAL LOOP               ! Loop for another comment?
@@ -222,7 +222,7 @@
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Get the date to use, and tell the NDF library to attach this date 
+*  Get the date to use, and tell the NDF library to attach this date
 *  to the next history record written to the NDF.
          CALL PAR_GET0C( 'DATE', DATE, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -230,13 +230,13 @@
          ELSE
             CALL NDF_HSDAT( DATE, INDF, STATUS )
          END IF
-         
+
 *  Check whether or not there is a HISTORY component present.
          CALL NDF_STATE( INDF, 'History', THERE, STATUS )
 
 *  There can be no comment until the HISTORY component exists.
          IF ( .NOT. THERE ) CALL NDF_HCRE( INDF, STATUS )
-            
+
 *  Obtain the history update mode.
          CALL NDF_HINFO( INDF, 'MODE', 0, HUMODE, STATUS )
 

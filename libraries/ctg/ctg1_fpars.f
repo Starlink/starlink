@@ -13,7 +13,7 @@
 *     CALL CTG1_FPARS( SPEC, DIR, BN, SUF, EXT, STATUS )
 
 *  Description:
-*     This routine extracts and returned fields from the supplied 
+*     This routine extracts and returned fields from the supplied
 *     catalogue specification.
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *        The file base name. Ends with the character preceeding the first
 *        "." or "(" following the directory path.
 *     SUF = CHARACTER * ( * ) (Returned)
-*        Any string following the file base name, and preceeding any 
+*        Any string following the file base name, and preceeding any
 *        opening parenthesis. SUF will either be blank, or begin with a
 *        dot.
 *     EXT = CHARACTER * ( * ) (Returned)
@@ -129,7 +129,7 @@
 *  Find the first dot following the start of the basename.
       DOT = INDEX( SPEC( BNBEG : ), '.' )
 
-*  Find the first "{" following the start of the basename (a potential 
+*  Find the first "{" following the start of the basename (a potential
 *  FITS extension specification).
       PAR = INDEX( SPEC( BNBEG : ), '{' )
 
@@ -142,9 +142,9 @@
          BNEND = MIN( PAR, DOT ) - 1
       END IF
 
-*  If no end marker was found use the whole string. 
+*  If no end marker was found use the whole string.
       IF( BNEND .EQ. -1 ) THEN
-         BNEND = LSPEC 
+         BNEND = LSPEC
 
 *  Otherwise, correct for the start of the string.
       ELSE

@@ -2,14 +2,14 @@
       SUBROUTINE RED4_SEEK_ITEM( STRUCTURE, ITEM, FOUND, STATUS )
 *    Description :
 *     This routine searches the named data structure for a particular
-*     item and returns a flag indicating if the item exists. Any 
-*     internal errors will be take to indicate that the item does not 
+*     item and returns a flag indicating if the item exists. Any
+*     internal errors will be take to indicate that the item does not
 *     exist, and a bad status will not be returned.
 *
 *     The routine has been produced to simplify the high-level code by
 *     removing the frequently used low level DTA calls and checks.
 *    Invocation :
-*      CALL RED4_SEEK_ITEM( STRUCTURE, ITEM, FOUND, STATUS ) 
+*      CALL RED4_SEEK_ITEM( STRUCTURE, ITEM, FOUND, STATUS )
 *    Parameters :
 *     STRUCTURE     = CHARACTER*(*)( READ )
 *        The DTA address of the structure to be searched.

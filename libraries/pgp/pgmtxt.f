@@ -42,7 +42,7 @@ C--
 C 18-Apr-1983
 C 15-Aug-1987 - fix BBUF/EBUF error.
 C 27-Aug-1987 - fix justification error if XPERIN.ne.YPERIN.
-C 05-Sep-1989 - change so that DISP has some effect for 'RV' and 
+C 05-Sep-1989 - change so that DISP has some effect for 'RV' and
 C               'LV' options [nebk]
 C 16-Oct-1993 - erase background of opaque text.
 C-----------------------------------------------------------------------

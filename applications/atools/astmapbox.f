@@ -39,25 +39,25 @@
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Mapping. If an NDF is supplied, 
+*        An NDF or text file holding the Mapping. If an NDF is supplied,
 *        the Mapping from the base Frame of the WCS FrameSet to the
 *        current Frame will be used.
 *     LBNDIN() = _DOUBLE (Read)
-*        An array with one element for each Mapping input coordinate. This 
-*        should contain the lower bound of the input box in each input 
-*        dimension. If an NDF was supplied for THIS and FORWARD is true, then 
-*        a null (!) value can be supplied in which case a default will be used 
-*        corresponding to the GRID cordinates of the bottom left corner of the 
+*        An array with one element for each Mapping input coordinate. This
+*        should contain the lower bound of the input box in each input
+*        dimension. If an NDF was supplied for THIS and FORWARD is true, then
+*        a null (!) value can be supplied in which case a default will be used
+*        corresponding to the GRID cordinates of the bottom left corner of the
 *        bottom left pixel in the NDF (i.e. a value of 0.5 on every grid axis).
 *     UBNDIN() = _DOUBLE (Read)
-*        An array with one element for each Mapping input coordinate. This 
-*        should contain the upper bound of the input box in each input 
-*        dimension. Note that it is permissible for the upper bound to be 
+*        An array with one element for each Mapping input coordinate. This
+*        should contain the upper bound of the input box in each input
+*        dimension. Note that it is permissible for the upper bound to be
 *        less than the corresponding lower bound, as the values will simply
-*        be swapped before use. If an NDF was supplied for THIS and FORWARD is 
-*        true, then a null (!) value can be supplied in which case a default 
-*        will be used corresponding to the GRID cordinates of the top right 
-*        corner of the top right pixel in the NDF (i.e. a value of (DIM+0.5) 
+*        be swapped before use. If an NDF was supplied for THIS and FORWARD is
+*        true, then a null (!) value can be supplied in which case a default
+*        will be used corresponding to the GRID cordinates of the top right
+*        corner of the top right pixel in the NDF (i.e. a value of (DIM+0.5)
 *        on every grid axis, where DIM is the number of pixels along the axis).
 *     FORWARD = _LOGICAL (Read)
 *        If this value is TRUE, then the Mapping's forward
@@ -158,7 +158,7 @@
      :                 UBNDOUT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -168,14 +168,14 @@
       CALL KPG1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
      :                 STATUS )
 
-*  See if an NDF was used to specify the Mapping, by attempting to access the 
-*  parameter as an NDF. INDF will be returned set to NDF__NOID (without error) 
-*  if the Mapping was not supplied va an NDF. 
+*  See if an NDF was used to specify the Mapping, by attempting to access the
+*  parameter as an NDF. INDF will be returned set to NDF__NOID (without error)
+*  if the Mapping was not supplied va an NDF.
       CALL NDF_EXIST( 'THIS', 'READ', INDF, STATUS )
 
 *  Determine the Nin and Nout attributes of the Mapping
       NIN = AST_GETI( THIS, 'Nin', STATUS)
-      NOUT = AST_GETI( THIS, 'Nout', STATUS) 
+      NOUT = AST_GETI( THIS, 'Nout', STATUS)
 
       IF( ( NIN .GT. NDF__MXDIM .OR. NOUT .GT. NDF__MXDIM )
      :    .AND. STATUS .EQ. SAI__OK ) THEN
@@ -192,11 +192,11 @@
       CALL PAR_GET0L( 'FORWARD', FORWRD, STATUS )
 
 *  Store the number of axes in the input positions and the number in the
-*  output positions.         
+*  output positions.
       IF( FORWRD ) THEN
          NAXIN = NIN
          NAXOUT = NOUT
-      ELSE      
+      ELSE
          NAXIN = NOUT
          NAXOUT = NIN
       END IF
@@ -205,10 +205,10 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the lower input limits. Use a default of (0.5,0.5,...) if a null
-*  value is supplied and the forward transformation is being used and the 
-*  Mapping was specified via an NDF (d1,d2,...) are the pixel dimension. 
-      CALL PAR_EXACD( 'LBNDIN', NAXIN, LBNDIN, STATUS ) 
-      IF( STATUS .EQ. PAR__NULL .AND. FORWRD .AND. 
+*  value is supplied and the forward transformation is being used and the
+*  Mapping was specified via an NDF (d1,d2,...) are the pixel dimension.
+      CALL PAR_EXACD( 'LBNDIN', NAXIN, LBNDIN, STATUS )
+      IF( STATUS .EQ. PAR__NULL .AND. FORWRD .AND.
      :    INDF .NE. NDF__NOID ) THEN
          CALL ERR_ANNUL( STATUS )
 
@@ -219,10 +219,10 @@
       END IF
 
 *  Get the upper input limits. Use a default of (d1+0.5,d2+0.5,...) if a null
-*  value is supplied and the forward transformation is being used and the 
-*  Mapping was specified via an NDF (d1,d2,...) are the pixel dimension. 
-      CALL PAR_EXACD( 'UBNDIN', NAXIN, UBNDIN, STATUS ) 
-      IF( STATUS .EQ. PAR__NULL .AND. FORWRD .AND. 
+*  value is supplied and the forward transformation is being used and the
+*  Mapping was specified via an NDF (d1,d2,...) are the pixel dimension.
+      CALL PAR_EXACD( 'UBNDIN', NAXIN, UBNDIN, STATUS )
+      IF( STATUS .EQ. PAR__NULL .AND. FORWRD .AND.
      :    INDF .NE. NDF__NOID ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL NDF_DIM( INDF, NIN, DIMS, NDIM, STATUS )
@@ -232,18 +232,18 @@
       END IF
 
 *  Get the other parameters.
-      CALL PAR_GDR0I( 'COORDOUT', 1, 1, NAXOUT, .FALSE., COORDOUT, 
-     :                STATUS ) 
+      CALL PAR_GDR0I( 'COORDOUT', 1, 1, NAXOUT, .FALSE., COORDOUT,
+     :                STATUS )
 
 *  Find the bounding box.
       CALL AST_MAPBOX( THIS, LBNDIN, UBNDIN, FORWRD, COORDOUT, LBNDOUT,
-     :                 UBNDOUT, XL, XU, STATUS ) 
+     :                 UBNDOUT, XL, XU, STATUS )
 
 *  If an NDF was suplied get its current and base Frames. Swap them if the
-*  inverse Mapping was used. 
+*  inverse Mapping was used.
       IF( INDF .NE. NDF__NOID ) THEN
          CALL KPG1_GTWCS( INDF, IAST, STATUS )
-         IF( FORWRD ) THEN 
+         IF( FORWRD ) THEN
             INFRM = AST_GETFRAME( IAST, AST__BASE, STATUS )
             OUTFRM = AST_GETFRAME( IAST, AST__CURRENT, STATUS )
          ELSE
@@ -265,10 +265,10 @@
          CALL CHR_APPND( ')', ATTR, IAT )
 
          CALL MSG_SETC( 'LB', ' (' )
-         CALL MSG_SETC( 'LB', AST_GETC( OUTFRM, ATTR( : IAT ), 
+         CALL MSG_SETC( 'LB', AST_GETC( OUTFRM, ATTR( : IAT ),
      :                                  STATUS ) )
          CALL MSG_SETC( 'LB', ')' )
-      ELSE 
+      ELSE
          CALL MSG_SETC( 'LB', ' ' )
       END IF
 
@@ -276,10 +276,10 @@
       CALL MSG_SETD( 'L', LBNDOUT )
       CALL MSG_SETD( 'H', UBNDOUT )
       CALL MSG_OUT( ' ', 'Output axis ^O^LB varies between ^L and ^H'//
-     :              ' within the specified region of input space.', 
+     :              ' within the specified region of input space.',
      :              STATUS )
-      CALL PAR_PUT0D( 'LBNDOUT', LBNDOUT, STATUS ) 
-      CALL PAR_PUT0D( 'UBNDOUT', UBNDOUT, STATUS ) 
+      CALL PAR_PUT0D( 'LBNDOUT', LBNDOUT, STATUS )
+      CALL PAR_PUT0D( 'UBNDOUT', UBNDOUT, STATUS )
 
       CALL MSG_BLANK( STATUS )
       DO I = 1, NAXIN
@@ -292,13 +292,13 @@
          CALL MSG_OUT( ' ', 'The lowest output axis value was '//
      :              'attained at, for example, input ^D position '//
      :              '(^XL).', STATUS )
-      ELSE 
+      ELSE
          CALL MSG_OUT( ' ', 'The lowest output axis value was '//
      :              'attained at, for example, input position '//
      :              '(^XL).', STATUS )
       END IF
 
-      CALL PAR_PUT1D( 'XL', NAXOUT, XL, STATUS ) 
+      CALL PAR_PUT1D( 'XL', NAXOUT, XL, STATUS )
 
       CALL MSG_BLANK( STATUS )
       DO I = 1, NAXIN
@@ -311,13 +311,13 @@
          CALL MSG_OUT( ' ', 'The highest output axis value was '//
      :              'attained at, for example, input ^D position '//
      :              '(^XU).', STATUS )
-      ELSE 
+      ELSE
          CALL MSG_OUT( ' ', 'The highest output axis value was '//
      :              'attained at, for example, input position '//
      :              '(^XU).', STATUS )
       END IF
 
-      CALL PAR_PUT1D( 'XU', NAXOUT, XU, STATUS ) 
+      CALL PAR_PUT1D( 'XU', NAXOUT, XU, STATUS )
       CALL MSG_BLANK( STATUS )
 
 *  Tidy up.

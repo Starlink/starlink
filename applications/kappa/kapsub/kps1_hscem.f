@@ -14,8 +14,8 @@
 *     CALL KPS1_HSCEM( NUMBIN, HIST, MAXPOS, FRAC, MODEI, STATUS )
 
 *  Description:
-*     This subroutine estimates the bin index of the mode using an 
-*     optimally binned histogram.  It finds the weighted mean 
+*     This subroutine estimates the bin index of the mode using an
+*     optimally binned histogram.  It finds the weighted mean
 *     location of a the peak bin and its neighbours using moments.
 *     The extents of the neighbours is symmetric about the peak bin.
 
@@ -28,14 +28,14 @@
 *        The bin index of the peak bin within HIST.
 *     FRAC = REAL (Given)
 *        This sets the lower limit for contiguous bin populations to
-*        be regarded as a neighbour, and hence used to estimate the 
+*        be regarded as a neighbour, and hence used to estimate the
 *        mode by moments.
 
-*        If FRAC is positive, it is the fraction of the peak bin's 
-*        population.  Positive values should lie in the range 0.1 
+*        If FRAC is positive, it is the fraction of the peak bin's
+*        population.  Positive values should lie in the range 0.1
 *        to 0.9, otherwise a value of -2 is adopted.
 *
-*        If FRAC is negative, it is number of Poisson errors of 
+*        If FRAC is negative, it is number of Poisson errors of
 *        the peak's population.
 *     MODEI = DOUBLE PRECISION (Returned)
 *        The mode index estimated from the histogram peak.
@@ -94,7 +94,7 @@
 
 *  Local Constants:
       INTEGER MINBHW             ! Minimum neighbourhood width
-      PARAMETER( MINBHW = 1 ) 
+      PARAMETER( MINBHW = 1 )
 
 *  Local Variables:
       INTEGER HALF               ! Neighbourhood half width
@@ -117,13 +117,13 @@
 *  Determine the threshold level by first obtaining the fractional
 *  population.
       LFRAC = FRAC
-      IF ( ( FRAC .GE. 0.0 .AND. FRAC .LT. 0.1 ) .OR. 
+      IF ( ( FRAC .GE. 0.0 .AND. FRAC .LT. 0.1 ) .OR.
      :     FRAC .GT. 0.9 ) LFRAC = -2.0
-      
+
       IF ( LFRAC .LT. 0 ) THEN
          LFRAC = 1.0 + FRAC / SQRT( REAL( HIST( MAXPOS ) ) )
       END IF
-      THRESH = INT( REAL( HIST( MAXPOS ) ) * LFRAC ) 
+      THRESH = INT( REAL( HIST( MAXPOS ) ) * LFRAC )
 
 *   Look for a contiguous set of bins no lower than the threshold
 *   either side of the peak bin.
@@ -152,7 +152,7 @@
       HALF = HALF + MIN( 0, LBIN - 1 ) + MIN( 0, NUMBIN - UBIN )
 
 *  Find the weight bin number corresponding to the mode.  Yes there
-*  can be a bias, but it's likely to be small.  [Could do some 
+*  can be a bias, but it's likely to be small.  [Could do some
 *  experiments to determine sensible ranges of bins to incorporate.
 *  balancing the bias against skewness.]
       SUMW = 0.0D0

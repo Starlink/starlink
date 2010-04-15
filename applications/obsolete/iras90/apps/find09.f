@@ -46,7 +46,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-                                    
+
 *  Local Variables:
       INTEGER SCPOS              ! Scan do loop variable
       INTEGER SOPOS              ! Source do loop variable
@@ -84,7 +84,7 @@
             SCNPST( SCPOS ) = 0.0
             SCBLSZ( SCPOS ) = 0
             SCNSCP( SCPOS ) = 0
-      
+
  100     CONTINUE
 
 *  Zeroise the number of scans used in scan common
@@ -95,15 +95,15 @@
 
 *  For each scan associated with that source
             DO 200 SCPOS = 1, SONOSC( SOPOS )
-      
-*  Clear the pointer from the source to the scan 
+
+*  Clear the pointer from the source to the scan
                SOSCI( SOPOS, SCPOS ) = 0
 
  200        CONTINUE
 
 *  Clear the number of scans associated with the source
             SONOSC( SOPOS ) = 0
-      
+
  300     CONTINUE
       END IF
 

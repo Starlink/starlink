@@ -48,17 +48,17 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       LOGICAL ISERR
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER * ( 6 ) STATE    ! State of PGPLOT device
       INTEGER LEN                ! Length of state string
-      
+
 *.
 
 *  Default mode is not opened.

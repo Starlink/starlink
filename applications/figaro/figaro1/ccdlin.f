@@ -18,7 +18,7 @@ C     CBIAS   (Numeric) The value of the bias level to be applied when
 C             making the correction.  This is not a particularly critical
 C             parameter.
 C
-C     OUTPUT  (Character) The name of the result of the operation.  This 
+C     OUTPUT  (Character) The name of the result of the operation.  This
 C             can be the same as for IMAGE.  If not, a new structure
 C             is created, with everything but the data a direct
 C             copy of the input.
@@ -29,11 +29,11 @@ C
 C     27th Jun 1989  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C     24th Jan 1991  JMS / AAO. Modified to check if FITS structures 
+C     24th Jan 1991  JMS / AAO. Modified to check if FITS structures
 C                    exist before prompting user. Set Max and Min values
-C                    to +/- 3.0E18 respec. so as not to cause a floating 
+C                    to +/- 3.0E18 respec. so as not to cause a floating
 C                    point error in FIG_RCALIN.
-C     18th Feb 1991  JMS / AAO. Corrected an error - now uses ELEMENTS 
+C     18th Feb 1991  JMS / AAO. Corrected an error - now uses ELEMENTS
 C                    instead of NELM when calling DSA_SEEK_FITS.
 C     25th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
@@ -80,7 +80,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0

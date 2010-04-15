@@ -1,4 +1,4 @@
-      SUBROUTINE STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY, 
+      SUBROUTINE STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY,
      :     STATUS )
 *+
 *  Name:
@@ -14,13 +14,13 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY, 
+*     CALL STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY,
 *     :     STATUS )
 
 *  Description:
 *     Pack an array of strings into a smaller array of bigger strings.
-*     The NUMPACK elements of the output array each consist of SIZE 
-*     elements of the input array separated by commas and surrounded by 
+*     The NUMPACK elements of the output array each consist of SIZE
+*     elements of the input array separated by commas and surrounded by
 *     brackets.
 
 *  Arguments:
@@ -96,7 +96,7 @@
 *  Arguments Given:
       INTEGER NUMPACK            ! number of output strings
 
-      INTEGER SIZE               ! number of input strings per output 
+      INTEGER SIZE               ! number of input strings per output
                                  ! string
 
       CHARACTER*(*) INARRAY(*)   ! array of input strings
@@ -157,7 +157,7 @@
                OUTARRAY(J)(POS+1:) = INARRAY(K)(START:START+LENGTH-1)
 *           increment the output string pointer
                POS = POS + 1 + LENGTH
-*           and follow it with a comma 
+*           and follow it with a comma
 *           - this also copes with blank strings
                OUTARRAY(J)(POS:POS) = ','
 

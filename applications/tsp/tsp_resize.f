@@ -46,7 +46,7 @@ C-
 C  Subroutine / function details:
 C
 C  History:
-C     1/3/1988   Original version.  JAB / AAO.  
+C     1/3/1988   Original version.  JAB / AAO.
 C     11/8/1988  Modified to support arbitrary changes in size and
 C                dimensionality.  JAB / AAO.
 C     15/3/1991  NDF version     JAB/JAC
@@ -54,7 +54,7 @@ C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -98,7 +98,7 @@ C
           ELSE
               STATUS = SAI__OK
           ENDIF
-          CALL TSP_NDF_END(STATUS)          
+          CALL TSP_NDF_END(STATUS)
 
       END IF
 C

@@ -2,19 +2,19 @@
 *+
 *  Name:
 *     MAG1_CRTDS
- 
+
 *  Purpose:
 *     create MAG dataset.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG1_CRTDS(ELOC, DNAME, DEVICE, STATUS)
- 
+
 *  Description:
 *     This routine creates a new tape device data structure
- 
+
 *  Arguments:
 *     ELOC=CHARACTER*(*) (Given)
 *        Contains the locator to the current devices data structure
@@ -27,12 +27,12 @@
 *        SAI__OK on input, then the routine will return without action.  If
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
- 
+
 *  Algorithm:
 *     The contents of an MT dataset are created:-
 *       The DEVICE variable is written.
 *       The other components are left precisely undefined.
- 
+
 *  Copyright:
 *     Copyright (C) 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -56,7 +56,7 @@
 *  Authors:
 *     Jack Giddings  (UCL::JWG)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     Jack Giddings      01-MAY-81
 *     A.Chipperfield     03-JUN-86 ADAM version - use DAT_CCTYP
@@ -71,40 +71,40 @@
 *     4-FEB-1993 (PMA):
 *        Add INCLUDE 'DAT_PAR'
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     Formerly known as MAG_$CRTDS
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'MAG_SYS'         ! MAG Internal Constants
       INCLUDE 'MAG_ERR'         ! MAG Errors
- 
+
 *  Arguments Given:
       CHARACTER*(*) ELOC        ! locator to dataset env.
       CHARACTER*(*) DNAME       ! dataset name
       CHARACTER*(*) DEVICE      ! device name
- 
+
 *  Arguments Returned:
       INTEGER STATUS            ! status return
- 
+
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) LOC   ! locator to tape dataset
       CHARACTER*(DAT__SZLOC) TLOC  ! temporary locator
       CHARACTER*(DAT__SZTYP) TYPE
- 
+
 *.
- 
- 
+
+
 *    Is it already there ?
       CALL DAT_FIND(ELOC, DNAME, LOC, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -113,9 +113,9 @@
          CALL DAT_NEW0(ELOC, DNAME, 'tapedrive', STATUS)
          CALL DAT_FIND(ELOC, DNAME, LOC, STATUS)
       END IF
- 
+
 *    Create components :
- 
+
 *    DEVICE - device name string
       CALL DAT_FIND(LOC, 'DEVICE', TLOC, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -126,7 +126,7 @@
       END IF
       CALL DAT_PUT0C(TLOC, DEVICE, STATUS)
       CALL DAT_ANNUL(TLOC, STATUS)
- 
+
 *    FILE - current tape file number
       CALL DAT_FIND(LOC, 'FILE', TLOC, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -137,7 +137,7 @@
          CALL DAT_RESET(TLOC, STATUS)
       END IF
       CALL DAT_ANNUL(TLOC, STATUS)
- 
+
 *    START - if block number relative to start of file.
       CALL DAT_FIND(LOC, 'START', TLOC, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -148,7 +148,7 @@
          CALL DAT_RESET(TLOC, STATUS)
       END IF
       CALL DAT_ANNUL(TLOC, STATUS)
- 
+
 *    BLOCK - block number relative to position
       CALL DAT_FIND(LOC, 'BLOCK', TLOC, STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
@@ -159,13 +159,13 @@
          CALL DAT_RESET(TLOC, STATUS)
       END IF
       CALL DAT_ANNUL(TLOC, STATUS)
- 
+
       CALL DAT_ANNUL(LOC, STATUS)
- 
+
       IF ( STATUS.NE.SAI__OK ) THEN
          STATUS = MAG__CRERR
          CALL MAG1_ERNAM(DNAME, STATUS)
       END IF
- 
+
       RETURN
       END

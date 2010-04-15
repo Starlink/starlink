@@ -1,4 +1,4 @@
-      SUBROUTINE IRA1_LIMIT( PROJ, NP, P, ACEN, BCEN, XAXIS, SIGN, 
+      SUBROUTINE IRA1_LIMIT( PROJ, NP, P, ACEN, BCEN, XAXIS, SIGN,
      :                       DTARG, DTOL, ZZTOL, ZZ, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRA1_LIMIT( PROJ, NP, P, ACEN, BCEN, XAXIS, SIGN, DTARG, 
+*     CALL IRA1_LIMIT( PROJ, NP, P, ACEN, BCEN, XAXIS, SIGN, DTARG,
 *                      DTOL, ZZTOL, ZZ, STATUS )
 
 *  Description:
@@ -133,7 +133,7 @@
          STATUS = IRA__SING
          CALL ERR_REP( 'IRA1_LIMIT_ERR1',
      :  'IRA1_LIMIT: Astrometry information specifies zero pixel size.',
-     :                 STATUS )      
+     :                 STATUS )
          GO TO 999
       END IF
 
@@ -143,7 +143,7 @@
       SINB0 = SIN( BCEN )
 
 *  Find the image coordinates corresponding to the supplied point.
-      CALL IRA1_IPRJ( 1, ACEN, BCEN, .FALSE., PROJ, NP, P, X0, Y0, 
+      CALL IRA1_IPRJ( 1, ACEN, BCEN, .FALSE., PROJ, NP, P, X0, Y0,
      :                STATUS )
 
 *  Set initial guess assuming constant pixel size. ZZ is the distance

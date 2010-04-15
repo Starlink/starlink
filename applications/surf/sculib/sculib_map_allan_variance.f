@@ -1,12 +1,12 @@
-      SUBROUTINE SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES, 
-     :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL, 
+      SUBROUTINE SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES,
+     :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL,
      :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
 *+
 *  Name:
 *     SCULIB_MAP_ALLAN_VARIANCE
 
 *  Purpose:
-*     incorporate latest set of MAP demodulated data 
+*     incorporate latest set of MAP demodulated data
 *     into Allan variance
 
 *  Description:
@@ -21,12 +21,12 @@
 *                                (            2 * n
 *
 *     where n is the number of artificial samples available.
-*     
+*
 
 
 *  Invocation:
-*     CALL SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES, 
-*    :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL, 
+*     CALL SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES,
+*    :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL,
 *    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
 
 *  Arguments:
@@ -46,7 +46,7 @@
 *     KMAX                            = INTEGER (Given)
 *           the size of the Allan variance array
 *     SUM (KMAX)                      = REAL (Given and returned)
-*           the accumulator for current artificial sample of length K real 
+*           the accumulator for current artificial sample of length K real
 *           samples
 *     N_SUM (KMAX)                    = INTEGER (Given and returned)
 *           the number of samples currently in the artificial sample
@@ -54,7 +54,7 @@
 *     ARTIFICIAL (KMAX)               = REAL (Given and returned)
 *           the last artificial sample of length K samples that was
 *           calculated
-*     N_ARTIFICIAL (KMAX)             = INTEGER (Given and returned) 
+*     N_ARTIFICIAL (KMAX)             = INTEGER (Given and returned)
 *           the number of artificial samples of length K samples that
 *           have been calculated
 *     ALLAN_VARIANCE (KMAX)           = REAL (Given and returned)
@@ -92,7 +92,7 @@
 *              artificial sample at the simulated integration time of this
 *              variance
 *
-*              if all the data has been obtained for the latest artificial 
+*              if all the data has been obtained for the latest artificial
 *              sample -
 *
 *                 calculate the artificial sample
@@ -108,16 +108,16 @@
 *                              .--------------------------------
 *                                       2 * 2
 *
-*                 if there are more than 2 artificial samples 
+*                 if there are more than 2 artificial samples
 *
-*                    the sum of the squares of the differences between the 
+*                    the sum of the squares of the differences between the
 *                    previous samples is recovered from the current value of the
 *                    Allan variance
 *
 *                    the square of the difference between the current artificial
 *                    sample and the previous one is added to the sum
 *
-*                    the Allan variance is re-calculated 
+*                    the Allan variance is re-calculated
 *
 *                 end if
 *
@@ -191,7 +191,7 @@
       REAL    ALLAN_SUM
       INTEGER A_BOL
       INTEGER K
-      REAL    NEW_ARTIFICIAL 
+      REAL    NEW_ARTIFICIAL
       INTEGER SAMP
       REAL    SAMPLE
       INTEGER SAMPLE_N
@@ -268,11 +268,11 @@
 
                   ELSE IF (N_ARTIFICIAL(K) .EQ. 2) THEN
 
-*  2 artificial samples of this size have been contructed, so we can calculate 
+*  2 artificial samples of this size have been contructed, so we can calculate
 *  the Allan variance directly
 
-                     ALLAN_VARIANCE (K) = 
-     :                 (NEW_ARTIFICIAL - ARTIFICIAL(K)) **2 / 
+                     ALLAN_VARIANCE (K) =
+     :                 (NEW_ARTIFICIAL - ARTIFICIAL(K)) **2 /
      :                 (2.0 * REAL (N_ARTIFICIAL(K)))
                      ALLAN_QUALITY (K) = 0
 
@@ -284,11 +284,11 @@
 
                      ALLAN_SUM = 2.0 * REAL (N_ARTIFICIAL(K) - 1) *
      :                 ALLAN_VARIANCE (K)
-                     ALLAN_SUM = ALLAN_SUM + 
+                     ALLAN_SUM = ALLAN_SUM +
      :                 (NEW_ARTIFICIAL - ARTIFICIAL(K)) **2
                      ALLAN_VARIANCE (K) = ALLAN_SUM /
      :                 (2.0 * REAL (N_ARTIFICIAL(K)))
-             
+
                   END IF
 
 *  store the current artificial sample and rest variables

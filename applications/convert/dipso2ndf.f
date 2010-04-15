@@ -64,7 +64,7 @@
 
 *  Implementation Status:
 *     -  The output NDF has a primitive data array.
-*     -  The input wavelength and flux data are always of Fortran REAL 
+*     -  The input wavelength and flux data are always of Fortran REAL
 *     type, the output data arrays are of HDS type _REAL.
 *     -  The application assumes that the bad-pixel padding will not
 *     cause the number of elements in the data array to exceed twice
@@ -116,7 +116,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
 *  Local Constants:
       INTEGER MAXBRK
       PARAMETER (MAXBRK = 1000)  ! Max. no. of breaks allowed in
-                                 ! DIPSO data 
+                                 ! DIPSO data
 
 *  Local Variables:
       INTEGER BREAK(MAXBRK)      ! Break array
@@ -171,7 +171,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *   First, get name and logical unit number for DIPSO file.
       CALL FIO_ASSOC ('IN', 'READ', 'UNFORMATTED', 0, FD, STATUS)
       CALL FIO_UNIT (FD, UNIT, STATUS)
@@ -185,12 +185,12 @@
       READ (UNIT, IOSTAT = IOS) NBREAK, (BREAK(I),I = 1,NBREAK)
       IF (IOS.NE.0) GO TO 998
       NPTS = BREAK(NBREAK)
-      
-*   Begin an NDF context.    
-      CALL NDF_BEGIN                                          
+
+*   Begin an NDF context.
+      CALL NDF_BEGIN
 
 *   Create a scratch area in which to put the DIPSO wavelength array.
-      DIM(1) = NPTS 
+      DIM(1) = NPTS
       WAVDIP = ' '
       CALL AIF_TEMP('_REAL', 1, DIM, WAVDIP, STATUS)
       CALL DAT_MAP(WAVDIP, '_REAL', 'WRITE', 1, DIM, WDIP, STATUS)
@@ -225,28 +225,28 @@
       END IF
 
 *   Call a subroutine to read the data into the mapped data arrays.
-      CALL CON_DIPRD (UNIT, NPTS, NBREAK, BREAK, NMAX, 
+      CALL CON_DIPRD (UNIT, NPTS, NBREAK, BREAK, NMAX,
      :                %VAL(CNF_PVAL(WDIP)),
-     :                %VAL(CNF_PVAL(FDIP)), %VAL(CNF_PVAL(WCOR)), 
+     :                %VAL(CNF_PVAL(FDIP)), %VAL(CNF_PVAL(WCOR)),
      :                %VAL(CNF_PVAL(FCOR)), NCOR, STATUS)
 
 *  Check NCOR is greater than unity.
       IF (NCOR.LE.1) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI ('NCOR', NCOR)
-         CALL ERR_REP ('DIPSO2NDF_NTOOSMALL', 
+         CALL ERR_REP ('DIPSO2NDF_NTOOSMALL',
      :     'DIPSO2NDF: Too few data points (^NCOR).', STATUS)
 
-         GO TO 997              
+         GO TO 997
       END IF
 
-*  The lower pixel bound is set to unity, the upper bound to the 
+*  The lower pixel bound is set to unity, the upper bound to the
 *  number of elements. The number of dimensions is set to one.
       LBND(1) = 1
       UBND(1) = NCOR
       DIM(1) = NCOR
       NDIM = 1
-                                                              
+
 *   Create a new NDF file and associate an NDF identifier with it.
 *   A data array of the correct size is specified via NDIM
 *   and the LBND, UBND arrays.
@@ -264,22 +264,22 @@
       CALL NDF_MAP (NDF, 'DATA', '_REAL', 'WRITE', DATPTR, NCOR, STATUS)
 
 *   Map the NDF AXIS(1) array for WRITE.
-      CALL NDF_AMAP (NDF, 'CENTRE', 1, '_REAL', 'WRITE', WAVPTR, NCOR, 
+      CALL NDF_AMAP (NDF, 'CENTRE', 1, '_REAL', 'WRITE', WAVPTR, NCOR,
      :               STATUS)
 
-*   Move corrected wavelength and flux arrays into the NDF. 
+*   Move corrected wavelength and flux arrays into the NDF.
       NBYTES = VAL__NBR * NCOR
       IF ((NBYTES.GT.0) .AND. (STATUS.EQ.SAI__OK)) THEN
-         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(WCOR)), 
+         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(WCOR)),
      :                  %VAL(CNF_PVAL(WAVPTR)), STATUS)
-         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(FCOR)), 
+         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(FCOR)),
      :                  %VAL(CNF_PVAL(DATPTR)), STATUS)
       END IF
 
-*   If there were no breaks in the data, set the NDF bad-pixel flag 
+*   If there were no breaks in the data, set the NDF bad-pixel flag
 *   to .FALSE.
       IF (NBREAK.EQ.1) THEN
-         CALL NDF_SBAD (.FALSE., NDF, 'Data', STATUS)         
+         CALL NDF_SBAD (.FALSE., NDF, 'Data', STATUS)
       END IF
 
 997   CONTINUE
@@ -290,8 +290,8 @@
       CALL AIF_ANTMP(WAVCOR, STATUS)
       CALL AIF_ANTMP(FLXCOR, STATUS)
 
-*   End the NDF context.                                       
-      CALL NDF_END (STATUS)                                  
+*   End the NDF context.
+      CALL NDF_END (STATUS)
 
 998   CONTINUE
 
@@ -299,7 +299,7 @@
       IF (IOS.NE.0) THEN
          STATUS = SAI__ERROR
          CALL ERR_FIOER ('IERR', IOS)
-         CALL ERR_REP ('DIPSO2NDF_IOER', 
+         CALL ERR_REP ('DIPSO2NDF_IOER',
      :     'DIPSO2NDF: Error reading Dipso file. ^IERR', STATUS)
       END IF
 
@@ -308,4 +308,4 @@
 *   Shut down FIO.
       CALL FIO_CANCL ('IN', STATUS)
       CALL FIO_DEACT (STATUS)
-      END             
+      END

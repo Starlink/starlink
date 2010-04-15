@@ -43,10 +43,10 @@ C     8th  May 1986  KS / AAO  GNAME added to ensure group names
 C                    are always valid HDS names.
 C     29th May 1986  KS / AAO  DTA_FRALL now used to tidy up any
 C                    mapped objects in the file being closed.
-C     8th  Jan 1992  KS / AAO.  Syntax of include statements changed to 
-C                    remove VMS logical names and to use lower case, to 
+C     8th  Jan 1992  KS / AAO.  Syntax of include statements changed to
+C                    remove VMS logical names and to use lower case, to
 C                    enable compilation on a SUN.
-C     24th Jan 1992  KS / AAO. Calls to EMS added to control error reporting. 
+C     24th Jan 1992  KS / AAO. Calls to EMS added to control error reporting.
 C     14th Oct 1992  HME / UoE, Starlink.  Append 'G' to top level name
 C                    to construct HDS group name.
 C     12th Mar 1993 HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
@@ -73,7 +73,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert ENAME to upper case, check its structure, check
 C     it looks like a top level name

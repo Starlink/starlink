@@ -13,8 +13,8 @@
 *     CALL NDG_BEGPV( STATUS )
 
 *  Description:
-*     This routine should be called to mark the start of an NDF 
-*     provenance block. The block should be ended by a matching 
+*     This routine should be called to mark the start of an NDF
+*     provenance block. The block should be ended by a matching
 *     call to NDG_ENDPV. See NDG_ENDPV for more details.
 *
 *     Note - provenance blocks must not be nested.
@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,7 +88,7 @@
 
 *  Indicate that NDF event handlers needed to record the NDFs in which
 *  provenance should be stored have not yet been established, and then
-*  establish them. 
+*  establish them.
       STATE_COM1 = .FALSE.
       CALL NDG_HLTPV( .TRUE., OLD, STATUS )
 
@@ -96,13 +96,13 @@
 *  default when NDF_PROP or NDF_SCOPY is called.
       CALL NDF_TUNE( 0, 'PXTPROVENANCE', STATUS )
 
-*  Create a AST KeyMap to hold the paths to the NDFs that are read during 
+*  Create a AST KeyMap to hold the paths to the NDFs that are read during
 *  the provenance block. Each KeyMap entry has a key that is an NDF name
-*  (the entry value is of no significance and will be set arbitrarily to 
+*  (the entry value is of no significance and will be set arbitrarily to
 *  zero).
       RDKMP_COM1 = AST_KEYMAP( ' ', STATUS )
 
-*  Create a AST KeyMap to hold the paths to the NDFs that are written during 
+*  Create a AST KeyMap to hold the paths to the NDFs that are written during
 *  the provenance block.
       WRKMP_COM1 = AST_KEYMAP( ' ', STATUS )
 

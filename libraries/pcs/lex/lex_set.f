@@ -52,7 +52,7 @@
 *     CH = CHARACTER*1 (given)
 *           The character to be written to the token string if
 *           WRITE is specified
-*     STATUS = INTEGER 
+*     STATUS = INTEGER
 
 *  Algorithm:
 *     The specified entry is written into the state table for

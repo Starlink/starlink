@@ -1,27 +1,27 @@
 //  This file is part of moggy.
-//  
+//
 //  Copyright 2001, Council for the Central Laboratory of the Research Councils
-//  
+//
 //  This program is part of the Starlink Software Distribution: see
-//  http://www.starlink.ac.uk 
-//  
+//  http://www.starlink.ac.uk
+//
 //  moggy is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  moggy is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with moggy; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//  
+//
 //  The General Public License is distributed along with this
 //  program in the file LICENCE.
-//  
+//
 //  Author: Norman Gray <norman@astro.gla.ac.uk>
 //  $Id$
 
@@ -73,10 +73,10 @@ CatalogueHandler::~CatalogueHandler ()
 }
 
 // Do the search.  Returns negative if not all required
-// information was present.  If all the information is present, it 
+// information was present.  If all the information is present, it
 // does the query and returns the number of rows obtained.
 // Should I distinguish a successful search which returns zero
-// rows from a search which has some other problem? 
+// rows from a search which has some other problem?
 int CatalogueHandler::doSearch ()
     throw (MoggyException)
 {
@@ -236,13 +236,13 @@ CatalogueHandler::const_iterator&
     // as tested in operator==.
     if (idx_ >= parent_->queryResult_.numRows())
 	idx_ = -1;
-    
+
 
     return *this;
 }
 
 // Helper function to check the status of the query, and throw a
-// MoggyException if they've been violated somehow.  Doesn't check the 
+// MoggyException if they've been violated somehow.  Doesn't check the
 // iterator's precise status (because it's not a member of the
 // iterator class).
 //
@@ -259,7 +259,7 @@ void CatalogueHandler::checkQueryStatus_()
     if (! isValid_(RESULT))
 	throw MoggyException ("iterator called before query result");
 
-    // Note that having zero columns is an error, but having zero rows 
+    // Note that having zero columns is an error, but having zero rows
     // isn't (from our point of view).
     if (queryResult_.numCols() <= 0 || queryResult_.numRows() < 0)
     {
@@ -591,7 +591,7 @@ ostream& CatalogueHandler::CatalogueRow::put (ostream& o)
         }
 
         // RA and Dec maybe in sexagesimal format, if so convert to
-        // decimal. 
+        // decimal.
         if ( i == ra_col ) {
             o << str2ra( value );
         } else if ( i == dec_col ) {

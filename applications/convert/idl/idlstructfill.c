@@ -146,13 +146,13 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 /* If it's a true structure array, get the first tag corresponding to */
 /* an array element; otherwise just use the given structure           */
          if( ndims ) {
-            if ((toffset = 
+            if ((toffset =
                IDL_StructTagInfoByIndex( sdef, k, IDL_MSG_RET, &datav ))
                   == -1 ) {
                *status = SAI__ERROR;
                emsRep(" ", "Failed to get tag info", status );
             } else {
-               sdefc = datav->value.s.sdef;   
+               sdefc = datav->value.s.sdef;
                sdatac = sdata + toffset;
             }
          } else {
@@ -166,7 +166,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 /* Get locator to the corresponding HDS structure array cell */
          datCell( vloc, 1, &k, &aloc, status );
          if ( *status != SAI__OK ) {
-            emsRep( " ", 
+            emsRep( " ",
             "Failed to get locator to structure array element", status );
          } else {
             datNcomp( aloc, &ncomp, status );
@@ -190,7 +190,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
                   IDL_StrStore( (IDL_STRING *)tdata, type );
                }
                for ( i=1; (*status==SAI__OK) && (i<=ncomp); i++ ) {
-                  if ((toffset = 
+                  if ((toffset =
                      IDL_StructTagInfoByIndex( sdefc, i, IDL_MSG_RET, &datav ))
                        == -1 ) {
                      *status = SAI__ERROR;
@@ -203,7 +203,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 
 /* Get locator to i'th component of the HDS structure */
                      datIndex( aloc, i, &cloc, status );
-                     if( *status != SAI__OK ) {         
+                     if( *status != SAI__OK ) {
                         emsRep(" ", "Failed locator to next index", status );
                      } else {
 /* check type compatibility */
@@ -219,7 +219,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 
                         } else {
 /* It's primitive data */
-                           idlprimfill( cloc, datav, tdata, status );                           
+                           idlprimfill( cloc, datav, tdata, status );
                         }
                      } /* end index  got OK */
                      datAnnul( &cloc, status );

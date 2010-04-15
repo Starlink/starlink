@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command READ.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -34,7 +34,7 @@
 *     -  If the X units are km/s, WORV is the rest wavelength (in
 *     Angstroms) to which the velocities are referenced, divided by
 *     he speed of light (in km/s). If the X units are not km/s, then
-*     WORV will be set to 1.0. 
+*     WORV will be set to 1.0.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -45,7 +45,7 @@
 *        Original version.
 *     13-DEC-1995 (DSB):
 *        Remove LOC argument from GETNDF call. This argument returned a
-*        primary locator to keep the file open, but the NDF library now 
+*        primary locator to keep the file open, but the NDF library now
 *        looks after it all.
 *     {enter_changes_here}
 
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Get an identifier for the NDF. 
+*  Get an identifier for the NDF.
       CALL GETNDF( PARAMS, 1, .FALSE., COMM, 'The NDF to be read',
      :             ' ', 'READ', ' ', INDF, STATUS )
 

@@ -38,14 +38,14 @@ proc qmanCancelEndRange {taskname} {
 # Clear the global abort flag.
     global QmanAbort
     set QmanAbort 0
- 
+
 # Start the obey sequence.
     global QmanAccess
     $taskname obey lock $QmanAccess  -inform "cgs4drInform $taskname %V" -endmsg "qmanCancelEnd1 $taskname $index $end $step $qpos"
 }
 
 proc qmanCancelEnd1 {taskname index end step qpos} {
-    
+
 # Check for loop termination (index equal to end or the interrupt flag set).
     global QmanAbort
     if {$index != $end && $QmanAbort==0} {
@@ -70,7 +70,7 @@ proc qmanCancelEnd1 {taskname index end step qpos} {
 }
 
 proc qmanCancelEnd2 {taskname index end step qpos} {
-    
+
 # Check for loop termination (index equal to end or the interrupt flag set).
     global QmanAbort
     if {$index != $end && $QmanAbort==0} {

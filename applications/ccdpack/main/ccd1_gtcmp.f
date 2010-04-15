@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,8 +132,8 @@
                NOV( I ) = NOV( I ) + 1
                NOV( J ) = NOV( J ) + 1
             END IF
- 2       CONTINUE        
- 3    CONTINUE        
+ 2       CONTINUE
+ 3    CONTINUE
 
 *  Check that each NDF overlaps with at least one other and report an
 *  error if it does not.

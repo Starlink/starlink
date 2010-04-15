@@ -1,5 +1,5 @@
-      SUBROUTINE CDCRA8( FID, GID, NCRDD, NDFID, IRCID, SCNDIR, SOP, 
-     :                   OBS, BAND, NCROS, CRSFLX, CRSDTX, CRSDIS, 
+      SUBROUTINE CDCRA8( FID, GID, NCRDD, NDFID, IRCID, SCNDIR, SOP,
+     :                   OBS, BAND, NCROS, CRSFLX, CRSDTX, CRSDIS,
      :                   CRSSMP, CRSFLG, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CDCRA8( FID, GID, NCRDD, NDFID, IRCID, SCNDIR, SOP, 
-*                  OBS, BAND, NCROS, CRSFLX, CRSDTX, CRSDIS, 
+*     CALL CDCRA8( FID, GID, NCRDD, NDFID, IRCID, SCNDIR, SOP,
+*                  OBS, BAND, NCROS, CRSFLX, CRSDTX, CRSDIS,
 *                  CRSSMP, CRSFLG, STATUS )
 
 *  Description:
@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
       INTEGER CRSFLX( NCROS ), CRSDTX( NCROS )
       REAL CRSDIS( NCROS ), CRSSMP( NCROS )
       INTEGER CRSFLG( NCROS )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -146,7 +146,7 @@
      :                  STATUS )
          GOTO 999
       END IF
-      
+
 *  Write total amount of crossings.
       CALL CHR_ITOC( NCROS, NCROST, NCHAR )
       CALL FIO_WRITE( FID, '   There are total '//NCROST( : NCHAR )/
@@ -160,7 +160,7 @@
 *  Get the file name and detector number of this crossing.
          CALL NDF_MSG( 'NDF', NDFID( CRSFLX( I ) ) )
          CALL MSG_LOAD( ' ', '^NDF', FULNAM, NAMELN, STATUS )
-         CALL IRM_FILNM( FULNAM( : NAMELN ), NAME, STATUS ) 
+         CALL IRM_FILNM( FULNAM( : NAMELN ), NAME, STATUS )
          NAMELN = CHR_LEN( NAME )
          DET = IRC_DETNO( IRCID( CRSFLX( I ) ), CRSDTX( I ), STATUS )
          CALL CHR_ITOC( DET, DTST, NCHAR )
@@ -171,13 +171,13 @@
          ELSE
             DRST = 'From South to North'
          END IF
-      
+
 *  Write an item for this crossing.
          CALL CHR_ITOC( I, ICST, NCHAR )
          CALL CHR_ITOC( SOP( CRSFLX( I ) ), SPST, NCHAR )
          CALL CHR_ITOC( OBS( CRSFLX( I ) ), OBST, NCHAR )
          CALL CHR_RTOC( CRSDIS( I ), XDST, XDSTLN )
-         CALL CHR_RTOC( CRSSMP( I ), SMST, NCHAR )         
+         CALL CHR_RTOC( CRSSMP( I ), SMST, NCHAR )
          CALL FIO_WRITE( FID, '      Crossing '//ICST//':',
      :                   STATUS )
          CALL FIO_WRITE( FID, '         CRDD NDF name     : '/
@@ -203,7 +203,7 @@
      :                    /'of its samples are bad, this crossing is '/
      :                    /'discarded while coadding', STATUS )
             CALL FIO_WRITE( FID, ' ', STATUS )
-         END IF      
+         END IF
       END DO
 
  999  CONTINUE

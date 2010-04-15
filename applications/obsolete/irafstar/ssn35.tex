@@ -18,22 +18,22 @@
 \newcommand{\stardocmanual}    {}
 \newcommand{\stardocabstract}  {
 IRAFSTAR contains the infrastructure which enables applications written for
-the 
-\xref{Starlink Software Environment (ADAM)}{sg4}{} to be run in the 
+the
+\xref{Starlink Software Environment (ADAM)}{sg4}{} to be run in the
 \htmladdnormallink{IRAF}{\IRAFURL} software environment.
 IRAFSTAR does not include any applications itself.
 \par
 Communications between the application and IRAF are handled by an `adaptor'
-process and conversion between Starlink NDF and IRAF image or FITS files may 
-be done transparently, making it easy to intermix IRAF and Starlink 
+process and conversion between Starlink NDF and IRAF image or FITS files may
+be done transparently, making it easy to intermix IRAF and Starlink
 applications.
 \par
 This document is intended for software developers and describes the system
 and the additional files required by Starlink applications to be used with it.
 Some knowledge of both ADAM and IRAF is assumed.
 \par
-Users who just want to run to run Starlink applications 
-in IRAF should read 
+Users who just want to run to run Starlink applications
+in IRAF should read
 \xref{SUN/217}{sun217}{}
 rather than this document.}
 % ? End of document identification
@@ -67,7 +67,7 @@ rather than this document.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -135,7 +135,7 @@ rather than this document.}
 \newcommand{\setunderscore}{\renewcommand{\_}{\texttt{\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -226,12 +226,12 @@ rather than this document.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -271,26 +271,26 @@ be run from from the
 \htmladdnormallink{IRAF}{\IRAFURL} user-interface, \cl.
 Where these applications use the Starlink
 \xref{NDF}{sun33}{}
-library, conversion between Starlink NDF and IRAF \texttt{.imh} or FITS format 
-data files can be done automatically, making the intermixing of IRAF and 
+library, conversion between Starlink NDF and IRAF \texttt{.imh} or FITS format
+data files can be done automatically, making the intermixing of IRAF and
 Starlink applications easy.
 
 The main component of IRAFSTAR is an `adaptor' process which sits between
-the 
-\htmladdnormallink{IRAF}{\IRAFURL} \cl\ and the Starlink task intercepting 
-communications in both directions and handling them appropriately. 
-In some cases this will be a simple format conversion and in others a more 
+the
+\htmladdnormallink{IRAF}{\IRAFURL} \cl\ and the Starlink task intercepting
+communications in both directions and handling them appropriately.
+In some cases this will be a simple format conversion and in others a more
 complex task.
 
 Also in IRAFSTAR are IRAF scripts defining some environment variables required
-to run Starlink applications and tasks which can be used to set the format 
+to run Starlink applications and tasks which can be used to set the format
 (NDF or IRAF or FITS) of images output by applications which use the Starlink
 NDF library.
 
-IRAFSTAR does not include any applications itself. 
+IRAFSTAR does not include any applications itself.
 Section \latexonly{\ref{installing}}
 \htmlref{`Installing Starlink Applications for IRAF'}{installing}
-describes for programmers how to adapt Starlink applications so that they can 
+describes for programmers how to adapt Starlink applications so that they can
 be run with the system.
 \xref{SUN/217}{sun217}{} describes how to use Starlink applications
 in IRAF and includes a section on obtaining and installing the software at
@@ -298,38 +298,38 @@ non-Starlink sites.
 
 \section{\xlabel{the_adaptor_process}The Adaptor Process}
 Starlink applications are defined for the \cl\ so that when they are invoked,
-\cl\ actually starts the adaptor process which in turn runs a script which 
+\cl\ actually starts the adaptor process which in turn runs a script which
 loads and controls the required Starlink executable (which will usually be the
 normal Starlink version using the normal Starlink interface module).
 The script is written in
 \xref{Tcl with Starlink extensions}{sun186}{}\latexonly{ (see SUN/186)}
 and uses the ADAM message system interface to control the application.
-Having `loaded' the Starlink application, the script `sets' the value of 
+Having `loaded' the Starlink application, the script `sets' the value of
 any parameters which were specified on the command line as received from IRAF.
-There will be specifications for any parameters entered by the user and any 
-IRAF `hidden' parameters (except strings with no default value). 
+There will be specifications for any parameters entered by the user and any
+IRAF `hidden' parameters (except strings with no default value).
 
-The ADAM task is then `obeyed' with just the special keyword `PROMPT' on the 
+The ADAM task is then `obeyed' with just the special keyword `PROMPT' on the
 command line.
-This forces the ADAM interface file VPATH to be ignored and ADAM parameter 
+This forces the ADAM interface file VPATH to be ignored and ADAM parameter
 request messages to be issued for any parameters not already specified.
 The parameter request message is intercepted by the adaptor which requests
-a value from IRAF or, if the parameter is classed as 
+a value from IRAF or, if the parameter is classed as
 \htmlref{`dynamic'}{dynamic_parameters},
-uses the ADAM 
+uses the ADAM
 suggested value. \latexonly{More information on `dynamic' parameters is given
 in Section \ref{dynamic_parameters}.}
 If a value is requested from IRAF, a prompt may or may not be issued depending
 upon the effective mode of the parameter and whether or not it has a default
 value.
 
-Any informational messages from the ADAM task are passed on to the IRAF 
+Any informational messages from the ADAM task are passed on to the IRAF
 \cl\ for display to the user.
 
 \section{\xlabel{required_environment_variables}Required Environment Variables}
 In order to run any Starlink (ADAM) application from the IRAF \cl, certain
 environment variables must be set. These will be set to standard values by
-obeying the IRAFSTAR script \texttt{zzsetenv.def}, normally in the 
+obeying the IRAFSTAR script \texttt{zzsetenv.def}, normally in the
 \htmlref{package definition file}
 {pkg_def_files}\latexonly{ (see Section \ref{pkg_def_files})}.
 The \texttt{zzsetenv.def} script sets the following variables:
@@ -337,7 +337,7 @@ The \texttt{zzsetenv.def} script sets the following variables:
 \item[ADAM\_USER] This is set to the user's \texttt{uparm} directory.
 \item[NDF Conversion Variables] The environment variables associated with the
 \xref{NDF Format Conversion Facilities}{ssn20}{}
-are set so that given a filename without a recognised extension, applications 
+are set so that given a filename without a recognised extension, applications
 using the NDF library will:
 \begin{itemize}
 \item Input an IRAF image file \itfile{filename}{.imh},
@@ -345,21 +345,21 @@ or failing that a FITS file \itfile{filename}{.fit},
 (or \itfile{filename}{.fits}),
 and automatically convert it if an NDF,
 \itfile{filename}{.sdf} is not found.
-\item Output IRAF image file \itfile{filename}{.imh} instead of NDF 
+\item Output IRAF image file \itfile{filename}{.imh} instead of NDF
 \itfile{filename}{.sdf}.
 \end{itemize}
 \end{description}
 In addition, the IRAF tasks, \texttt{use\_ndf}, \texttt{use\_imh} and
 \texttt{use\_fits} are defined.
-These can be used to switch the conversion behaviour so that Starlink NDF or 
+These can be used to switch the conversion behaviour so that Starlink NDF or
 IRAF image or FITS files respectively are output by default.
 
 IRAF Image and FITS files can be input or output regardless of the default by
 including a recognised extension on the filename.
 
 \section{\xlabel{installing_starlink_applications_for_iraf}\label{installing}Installing Starlink Applications for IRAF}
-This section describes how to set up a Starlink (ADAM) package for use from 
-IRAF. 
+This section describes how to set up a Starlink (ADAM) package for use from
+IRAF.
 It assumes that the Starlink IRAF inter-operability infrastructure (IRAFSTAR)
 and the Interface Definition File system (IFD) have already been installed.
 \begin{quote}
@@ -367,30 +367,30 @@ and the Interface Definition File system (IFD) have already been installed.
 and Communications Subsystem (PCS) version 3.2-1\footnote{3.2-3 on Linux}
 (released as part of USSC update 181, 17/12/96) or later.}
 \end{quote}
-The files associated with running Starlink packages from IRAF are normally 
+The files associated with running Starlink packages from IRAF are normally
 installed beneath directory \texttt{/star/iraf} and an IRAF environment
-variable \texttt{starlink} is set to point to this top-level directory. 
-The files associated with a particular package will be installed in 
-\texttt{/star/iraf/\textit{package}}. 
+variable \texttt{starlink} is set to point to this top-level directory.
+The files associated with a particular package will be installed in
+\texttt{/star/iraf/\textit{package}}.
 IRAF environment variables \texttt{\textit{package}}
 will be set to point to the individual package directories.
 
 References to \texttt{/star} here may be taken to mean the top-level
 installation directory for the software item in question. For development
-systems, or at non-Starlink sites, it may be something other than 
+systems, or at non-Starlink sites, it may be something other than
 \texttt{/star}.
-References to \texttt{\textit{package}} mean the package name in lower case, 
+References to \texttt{\textit{package}} mean the package name in lower case,
 \textit{e.g.}\ \texttt{figaro}, \texttt{kappa}, \textit{etc.}
 
 \subsection{\xlabel{overview}Overview}
-The makefile for a Starlink package to be used with IRAF will typically 
+The makefile for a Starlink package to be used with IRAF will typically
 install the following files in \texttt{/star/iraf/\textit{package}}:
 \begin{itemize}
 \item The Starlink executable image files \dash\ usually these will just be
 soft links to the executables in the Starlink software.
-\item The Starlink interface ({\texttt{.ifc}}) files. 
-These will also usually be soft links to the Starlink software versions but 
-may be real files if it turns out to be necessary to have different interface 
+\item The Starlink interface ({\texttt{.ifc}}) files.
+These will also usually be soft links to the Starlink software versions but
+may be real files if it turns out to be necessary to have different interface
 files for running under IRAF.
 \item The IRAF tasks. These have the same names as the Starlink executables but
 with \texttt{.e} appended to the name and are soft links to the Starlink/IRAF
@@ -398,7 +398,7 @@ adaptor, {\texttt{aitclsh}}.
 \item An IRAF package definition file (\itfile{package}{.cl}).
 \item An IRAF package parameter file (\itfile{package}{.par}).
 \item An IRAF parameter (\texttt{.par}) file for each command in the package.
-\item An Output Parameters File for each executable to list the task 
+\item An Output Parameters File for each executable to list the task
 parameters which are:
 \begin{enumerate}
 \item `output' and should therefore have their values set in the
@@ -406,36 +406,36 @@ IRAF parameter file when a command completes.
 \item `dynamic' and should therefore take the value suggested by the ADAM task.
 \end{enumerate}
 \item IRAF help files (\itfile{\_package}{.hd},
-\itfile{package}{.hd}, 
-\itfile{package}{.men}, \texttt{helpdb.mip} and \texttt{root.hd}) and the 
-subdirectory (\texttt{doc}) containing the individual help topic 
+\itfile{package}{.hd},
+\itfile{package}{.men}, \texttt{helpdb.mip} and \texttt{root.hd}) and the
+subdirectory (\texttt{doc}) containing the individual help topic
 (\texttt{.hlp}) files.
 \end{itemize}
 
 \subsection{\xlabel{the_interface_definition_file}The Interface Definition File}
 The required files will initially be produced in two stages. First, an
-{\bfseries Interface Definition File} (\texttt{.ifd}) is produced for the 
+{\bfseries Interface Definition File} (\texttt{.ifd}) is produced for the
 package.
 Interface Definition Files and the scripts to produce and handle them are fully
 described in
 \xref{SSN/68}{ssn68}{}.
 
-If there is an existing Starlink Interface File source (\texttt{.ifl}) for 
-the package, the Tcl script 
-\xref{\texttt{ifl2ifd}}{ssn68}{creating_ifds_from_interface_files} 
-may be used to read it and create a basic 
-Interface Definition File. 
-After modification, this file may be used as the source for the package 
+If there is an existing Starlink Interface File source (\texttt{.ifl}) for
+the package, the Tcl script
+\xref{\texttt{ifl2ifd}}{ssn68}{creating_ifds_from_interface_files}
+may be used to read it and create a basic
+Interface Definition File.
+After modification, this file may be used as the source for the package
 definition files required by both IRAF and ADAM.
-The script assumes a single monolith for the package \dash\ if there is more 
+The script assumes a single monolith for the package \dash\ if there is more
 than one, the resulting \texttt{.ifd}'s have to be combined by hand.
 
-Secondly, the Tcl script 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
-will read the Interface Definition File 
+Secondly, the Tcl script
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
+will read the Interface Definition File
 and produce a package definition file and an IRAF parameter file for
 the package and for each command defined. It also creates an Output Parameters
-File for each executable, listing the `output' and 
+File for each executable, listing the `output' and
 `dynamic' parameters for each action in the executable.
 
 The files resulting from this automatic process will probably not describe
@@ -446,7 +446,7 @@ altering and reprocessing the Interface Definition File.
 Sometimes a special version of the ADAM interface file will be required for
 use with IRAF. In this case conditional statements are added to the
 Interface Definition File, and it is processed by the Tcl script
-\xref{\texttt{ifd2irafifl}}{ssn68}{ifd2irafifl} to produce the required 
+\xref{\texttt{ifd2irafifl}}{ssn68}{ifd2irafifl} to produce the required
 interface file.
 
 \subsection{\xlabel{package_definition_files}Package Definition Files\label{pkg_def_files}}
@@ -473,47 +473,47 @@ print "--------------------------------------------------"
 print ""
 
 clbye()
-\end{verbatim} \end{quote} 
+\end{verbatim} \end{quote}
 If the list of tasks generated from the initial \texttt{.ifd} contains
-task statements for commands that don't make any sense when running as part 
+task statements for commands that don't make any sense when running as part
 of IRAF (\textit{e.g.}\ the package `help' command), the \texttt{.ifd} can be
 altered to use
 \xref{conditional sections}{ssn68}{conditional_sections}\latexonly{ (see
-SSN/68)} 
+SSN/68)}
 so that they are omitted when processing for IRAF.
 
 \subsection{\xlabel{package_parameter_files}Package Parameter Files}
-These will normally contain just the definition of the parameter 
+These will normally contain just the definition of the parameter
 \texttt{version} as follows:
 \begin{quote} \begin{verbatim}
 # Package parameters for the PKG package
 version,s,h,"V1.3 - 25/4/97"
 \end{verbatim} \end{quote}
-The 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
+The
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
 script will set the parameter value to the argument of
-the 
+the
 \xref{\texttt{version}}{ssn68}{version}
 keyword in the Interface Definition File (or to `PKG\_VERS' in default) plus
-the current date. This text may be edited to your taste, possibly by the 
+the current date. This text may be edited to your taste, possibly by the
 \texttt{install} target of the package makefile replacing `PKG\_VERS' with
 \$(PKG\_VERS).
 
 \subsection{\xlabel{task_parameter_files}\label{parfiles}Task Parameter Files}
-The task parameter (\texttt{.par}) files created by 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
+The task parameter (\texttt{.par}) files created by
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
 need to be
-inspected before they are ready for use because parameters that might 
+inspected before they are ready for use because parameters that might
 potentially be set to an array rather than a single value must be given
 an IRAF type of `struct' and there is no way of determining whether this
 is the case or not from the Starlink interface file unless the parameter has
 a default value that is an array.
 
-For example, the parameter file for the kappa command \texttt{ffclean} as 
-generated by 
-\xref{\texttt{ifl2ifd}}{ssn68}{creating_ifds_from_interface_files} 
-followed by 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
+For example, the parameter file for the kappa command \texttt{ffclean} as
+generated by
+\xref{\texttt{ifl2ifd}}{ssn68}{creating_ifds_from_interface_files}
+followed by
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
 is:
 \begin{quote} \begin{verbatim}
 box,struct,a,,,,Smoothing box size
@@ -528,7 +528,7 @@ title,s,h,KAPPA - Cleaner,,,Title for output NDF
 thresh,r,h,INDEF,,,Data-value limits
 wlim,r,h,INDEF,,,Weight limit for good output pixels
 \end{verbatim} \end{quote}
-but the parameter `thresh' is an array so the definition of `thresh' 
+but the parameter `thresh' is an array so the definition of `thresh'
 must be changed to:
 \begin{quote} \begin{verbatim}
 thresh,struct,h,,,,Data-value limits
@@ -536,13 +536,13 @@ INDEF
 \end{verbatim} \end{quote}
 \textit{i.e.}\ the data type (the second field) is changed to `struct' and the
 default value (the fourth field) moved onto a line following the definition.
-If there is no default, then the line following should be blank. 
+If there is no default, then the line following should be blank.
 This situation should be corrected permanently by inserting a
-\xref{\texttt{size}}{ssn68}{size} directive into the parameter description in 
+\xref{\texttt{size}}{ssn68}{size} directive into the parameter description in
 the \texttt{.ifd} file.
 
-Further modifications to the parameter files will probably be seen to be 
-necessary when the package is tested. 
+Further modifications to the parameter files will probably be seen to be
+necessary when the package is tested.
 
 \subsection{\xlabel{the_output_parameters_file}The Output Parameters File}
 \subsubsection{\xlabel{output_parameters}Output Parameters}
@@ -554,24 +554,24 @@ files as the default access mode (`UPDATE') is often used for parameters which
 are actually read-only.
 Furthermore, parameters whose values are the names of files or devices to be
 written to need to have access `WRITE' or `UPDATE' specified whereas the
-parameter value (the filename or device name) is usually read-only and 
-therefore does not require the IRAF parameter to be updated when the 
+parameter value (the filename or device name) is usually read-only and
+therefore does not require the IRAF parameter to be updated when the
 application has finished.
-The 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
+The
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
 script assumes that a parameter is an output parameter
 if the \texttt{.ifd} contains an
 \xref{\texttt{outputpar}}{ssn68}{outputpar}
-keyword for it or if it is a primitive type with an 
+keyword for it or if it is a primitive type with an
 \xref{\texttt{access}}{ssn68}{access}
 keyword specifying WRITE or UPDATE.
 
-\subsubsection{\xlabel{dynamic_parameters}\label{dynamic_parameters}Dynamic 
+\subsubsection{\xlabel{dynamic_parameters}\label{dynamic_parameters}Dynamic
 Parameters}
 The ADAM environment permits parameter values to be taken from GLOBAL
-parameters (usually set up by another task) or from values calculated by the 
-current task itself. Where this is the case and there is no obvious default 
-value and the user cannot reasonably be expected to provide the value, the 
+parameters (usually set up by another task) or from values calculated by the
+current task itself. Where this is the case and there is no obvious default
+value and the user cannot reasonably be expected to provide the value, the
 parameter is classed as `dynamic' by the IRAF/Starlink inter-operability
 system. If the ADAM task prompts for a dynamic parameter value, the prompt
 is intercepted by the adaptor process which replies with the ADAM suggested
@@ -585,29 +585,29 @@ suggested value.
 that the PPATH starts with GLOBAL or DYNAMIC.
 \item The adaptor process must know that the parameter is `dynamic'.
 \end{enumerate}
-The 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
+The
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
 script assumes that a parameter is dynamic if there is a
 \xref{`\texttt{dynamic yes}'}{ssn68}{dynamic}
 keyword for it or if it has a
 \xref{\texttt{vpath}}{ssn68}{vpath}
 starting with GLOBAL.
 
-\emph{Parameters with \texttt{vpath DYNAMIC} are not assumed to be dynamic by 
+\emph{Parameters with \texttt{vpath DYNAMIC} are not assumed to be dynamic by
 default because they are often using a fixed value which is hardwired in the
-code. Such parameters are usually better handled by specifying that fixed 
+code. Such parameters are usually better handled by specifying that fixed
 value as the static default value with a
 \xref{\texttt{default}}{ssn68}{default}
 keyword.
-If it really is a dynamic parameter, the \texttt{.ifd} should contain a 
+If it really is a dynamic parameter, the \texttt{.ifd} should contain a
 \xref{`\texttt{dynamic yes}'}{ssn68}{dynamic}
 keyword for it.}
 
 \subsubsection{\xlabel{creating_the_output_parameters_file}Creating the Output Parameters File}
 There should be a separate Output Parameters File for each executable image in
 the package.
-This file is read by the adaptor process and should contain Tcl statements that 
-set the elements of arrays OutputParList and DynParList, indexed by command 
+This file is read by the adaptor process and should contain Tcl statements that
+set the elements of arrays OutputParList and DynParList, indexed by command
 name, to a list of the output and dynamic parameters respectively.
 
 For example:
@@ -619,14 +619,14 @@ set DynParList(centroid) {cosys device mode}
 \end{verbatim} \end{quote}
 
 If a command doesn't have any output or dynamic parameters the relevant entry
-can be omitted entirely \dash\ you don't have to set the appropriate array 
+can be omitted entirely \dash\ you don't have to set the appropriate array
 element to an empty list.
 
-An attempt is made by the 
-\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd} 
+An attempt is made by the
+\xref{\texttt{ifd2iraf}}{ssn68}{producing_iraf_files_from_an_ifd}
 script to list the output and dynamic parameters in file \itfile{adamexe}{.tcl}
-(where \texttt{\textit{adamexe}} is the name of the executable image) but 
-this file is likely to need editing until the \texttt{.ifd} has the correct 
+(where \texttt{\textit{adamexe}} is the name of the executable image) but
+this file is likely to need editing until the \texttt{.ifd} has the correct
 entries.
 
 \subsection{\xlabel{help_files}Help Files}
@@ -641,11 +641,11 @@ as the description. A typical menu file looks like:
        add - Adds two NDF data structures.
    aperadd - Derives statistics of pixels within a specified circled.
      tweak - Interactively adjusts a colour table.
-using_help - 
+using_help -
     zaplin - Replaces regions by bad values or by linear interpolation.
-\end{verbatim} \end{quote} 
-This file will almost certainly need to be edited to remove irrelevant 
-topics (such as `using\_help' in the above example) and to tidy up the 
+\end{verbatim} \end{quote}
+This file will almost certainly need to be edited to remove irrelevant
+topics (such as `using\_help' in the above example) and to tidy up the
 descriptions.
 
 The package \texttt{.hd} file (\textit{e.g.}\ \texttt{kappa.hd}) looks like:
@@ -658,7 +658,7 @@ add        hlp = doc$add.hlp, src = add.f
 aperadd        hlp = doc$aperadd.hlp, src = aperadd.f
 using_help        hlp = doc$using_help.hlp, src = using_help.f
 zaplin        hlp = doc$zaplin.hlp, src = zaplin.f
-\end{verbatim} \end{quote} 
+\end{verbatim} \end{quote}
 will also need to have irrelevant topics removed and possibly directory
 specifications altered.
 
@@ -678,9 +678,9 @@ way beneath directory \texttt{/star}. If this is not the case, suitable
 modifications must be made to the following instructions.
 
 \begin{enumerate}
-\item The \texttt{/star/iraf/\textit{package}} directory should contain the 
-package definition (\texttt{.cl}) file, the package and task parameter 
-(\texttt{.par}) files, the Output Parameter File(s) and the IRAF Help Files. 
+\item The \texttt{/star/iraf/\textit{package}} directory should contain the
+package definition (\texttt{.cl}) file, the package and task parameter
+(\texttt{.par}) files, the Output Parameter File(s) and the IRAF Help Files.
 The following links must then be set up in the same directory:
 \begin{itemize}
 \item The Starlink executable and interface-file soft links:
@@ -699,12 +699,12 @@ IRAF, the actual files should be installed here.
 
 \item Make your package known to IRAF.
 The preferred way of adding new external packages for IRAF is for the site
-manager to add entries in the \texttt{hlib\$extern.pkg} file, starting with the 
+manager to add entries in the \texttt{hlib\$extern.pkg} file, starting with the
 definition of the top-level \texttt{starlink} directory:
 \begin{quote} \begin{verbatim}
 reset   starlink          = /star/iraf/
 \end{verbatim} \end{quote}
-and add `\texttt{,starlink\$irafstar/helpdb.mip}' to the \texttt{helpdb} 
+and add `\texttt{,starlink\$irafstar/helpdb.mip}' to the \texttt{helpdb}
 definition.
 
 Then, for example:
@@ -714,11 +714,11 @@ task    figaro.pkg        = figaro$figaro.cl
 \end{verbatim} \end{quote}
 and add `\texttt{,figaro\$helpdb.mip}' to the \texttt{helpdb} definition.
 Similar definitions should be added for all the Starlink applications packages
-in use. 
+in use.
 
-If you do not have access to the \texttt{hlib\$extern.pkg} file, or whilst 
-testing, the above commands can be added to your \texttt{login.cl} file, just 
-before the \texttt{user} package definition. 
+If you do not have access to the \texttt{hlib\$extern.pkg} file, or whilst
+testing, the above commands can be added to your \texttt{login.cl} file, just
+before the \texttt{user} package definition.
 In that case, the \texttt{helpdb} definition can be extended by a command like:
 \begin{quote} \begin{verbatim}
 reset helpdb = (envget("helpdb") // ",figaro$helpdb.mip")
@@ -733,7 +733,7 @@ and the following questions addressed:
 
 \begin{enumerate}
 
-\item \label{pardefs}Are the parameter defaults appropriate 
+\item \label{pardefs}Are the parameter defaults appropriate
 (view them with \texttt{lparam}
 after resetting the parameters to their initial state with \texttt{unlearn})?
 
@@ -741,21 +741,21 @@ after resetting the parameters to their initial state with \texttt{unlearn})?
 \htmlref{`dynamic' parameters}{dynamic_parameters}
 used where required and only where required?
 
-\item \label{repeated} Are parameters which will be reprompted for set to 
+\item \label{repeated} Are parameters which will be reprompted for set to
 `query' mode to force an IRAF prompt?
 
 \item \label{prompt}Is the prompt text sensible in the context of IRAF?
 
-\item \label{images}Will the application read IRAF image files 
+\item \label{images}Will the application read IRAF image files
 (where appropriate)? If not,
 either the application does not use the NDF library or does some some
-peculiar manipulation of HDS files that defeats the NDF data conversion 
+peculiar manipulation of HDS files that defeats the NDF data conversion
 mechanism.
 
 \item \label{error}Do error messages look sensible?
 
-\item \label{promptdefs}Are the default values in prompts what 
-an IRAF user would expect? 
+\item \label{promptdefs}Are the default values in prompts what
+an IRAF user would expect?
 For example, if you run an IRAF application a second time the defaults are
 usually simply the values used last time; the `global association' mechanism
 used by some Starlink applications to set the default for an input image to be
@@ -769,7 +769,7 @@ file to produce the required \texttt{.par} files but in some cases, particularly
 with `dynamic' parameters, a special ADAM interface file may be required for
 use with IRAF \dash\ to produce the required suggested value, for example.
 
-Problems 5 and 6 may require modification of the application 
+Problems 5 and 6 may require modification of the application
 source code, but this should be done in a way that is compatible with running
 the application in the normal way so that only one version of the source
 code and executable is needed.  Remember that the ADAM message system does

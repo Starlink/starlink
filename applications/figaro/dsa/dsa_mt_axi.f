@@ -10,11 +10,11 @@ C
 C  Description:
 C     This routine checks that the axis information for a specific axis
 C     in one structure matches that for a specific axis in another
-C     structure.  It checks a) that the units, if any are given, are 
-C     the same for each axis, b) that the axis data, if it exists, is 
-C     the same for each axis.  If there are any discrepancies, an error 
-C     message is output, and bad status is returned.  This routine is 
-C     intended for use where no further processing is to be performed 
+C     structure.  It checks a) that the units, if any are given, are
+C     the same for each axis, b) that the axis data, if it exists, is
+C     the same for each axis.  If there are any discrepancies, an error
+C     message is output, and bad status is returned.  This routine is
+C     intended for use where no further processing is to be performed
 C     on the axis data, but where the user should be warned of any possible
 C     incompatibility.  If all axes in a structure are to be compared with
 C     the corresponding axes in another, then DSA_MATCH_AXES should
@@ -206,7 +206,7 @@ C
          STATUS=DSA__UNIDIF
       END IF
 C
-C     See if the axis data arrays exist. 
+C     See if the axis data arrays exist.
 C
       CALL DSA_SEEK_AXIS (REF_NAME,AXIS,EXIST,STATUS)
       CALL DSA_SEEK_AXIS (REF_NAME2,AXIS2,EXIST2,STATUS)
@@ -216,7 +216,7 @@ C     If neither exist, we can quit now. If both exist, we need to
 C     compare their data.  If only one exists,  we could just check it
 C     against the numbers 1..N, but in the interests of keeping this
 C     routine simple (!) we map both anyway, knowing that DSA_MAP_AXIS_DATA
-C     will give us the numbers 1..N, and trying not to care about the 
+C     will give us the numbers 1..N, and trying not to care about the
 C     overheads.
 C
       IF ((.NOT.EXIST).AND.(.NOT.EXIST2)) GO TO 500    ! Break out to exit.
@@ -228,7 +228,7 @@ C
      :                                                          STATUS)
       IF (STATUS.NE.0) GO TO 500       ! Error exit
 C
-C     Compare them.  First, the number of dimensions.  
+C     Compare them.  First, the number of dimensions.
 C
       IF (NDIM2.NE.NDIM) THEN
          CALL DSA_WRUSER ('The ')

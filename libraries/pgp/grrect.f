@@ -11,7 +11,7 @@
 *      X2      r     X     "      "    "    2
 *      Y2      r     Y     "      "    "    2
 *
-*   D L Terrett  20-MAY-1988 
+*   D L Terrett  20-MAY-1988
 *++
       IMPLICIT NONE
       REAL X1,X2,Y1,Y2

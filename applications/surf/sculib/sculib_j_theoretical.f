@@ -11,13 +11,13 @@
 *     This routine calculates the theoretical sky brightness temperature
 *     according to Bill Duncan's model:-
 *
-*       Jth = (1 - eta_tel) * Jtel + eta_tel * Jatm * 
+*       Jth = (1 - eta_tel) * Jtel + eta_tel * Jatm *
 *             (1 - b * exp (-tauz * airmass))
 *
 *     where Jatm is the effective brightness temperature of the sky, related
 *     to the ambient air temperature at ground level by:-
 *
-*       Jatm = Jamb * Xg 
+*       Jatm = Jamb * Xg
 *
 *       Xg   = 1 + hscale * Tlapse * exp (-tauz * airmass / Xgconst)
 *                 .---------------
@@ -30,8 +30,8 @@
 *     If tauz * airmass exceeds 15 the following approximation will be
 *     used:-
 *
-*       Jth = (1 - eta_tel) * Jtel + eta_tel * Jatm 
-*   
+*       Jth = (1 - eta_tel) * Jtel + eta_tel * Jatm
+*
 *     The routine will return immediately if entered with bad status.
 *     Errors will be reported and bad status returned if:-
 *       - TAUZ is less than 0
@@ -191,7 +191,7 @@
          IF (ABS(TAUZ * AIRMASS) .LT. 15.0) THEN
             X_G = 1.0 - 2.0 * 6.5 * EXP (-TAUZ * AIRMASS / 3.669383) /
      :        T_AMB
-            J_ATM = J_AMB * X_G 
+            J_ATM = J_AMB * X_G
             J_THEORETICAL = (1.0 - ETA_TEL) * J_TEL + ETA_TEL * J_ATM *
      :        (1.0 - B * EXP (-TAUZ * AIRMASS))
          ELSE

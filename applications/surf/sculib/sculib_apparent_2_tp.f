@@ -9,7 +9,7 @@
 *     RA, Decs
 
 *  Description:
-*     This routine converts a list of apparent RA,Decs to tangent plane 
+*     This routine converts a list of apparent RA,Decs to tangent plane
 *     offsets from a tangent point whose position is also given in apparent
 *     RA,Dec. In addition, a rotation is applied to the tangent plane so that
 *     it can be aligned with a coordinate system other than apparent RA,Dec,

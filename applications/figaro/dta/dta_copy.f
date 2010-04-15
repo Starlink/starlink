@@ -8,7 +8,7 @@ C  Function:
 C     General copy of data from one array to another.
 C
 C  Description:
-C     General purpose mover of bytes from one area of core to another.  
+C     General purpose mover of bytes from one area of core to another.
 C
 C  Language:
 C     Fortran.
@@ -44,7 +44,7 @@ C+
       SUBROUTINE DTA_COPY (BYTES,FROM,TO)
 C
       IMPLICIT NONE
-C 
+C
 C     Parameters
 C
       INTEGER BYTES

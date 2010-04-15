@@ -79,14 +79,14 @@
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
 *     2004 September 10 (TIMJ):
-*        Fix valgrind warning by initialising strings before sending 
+*        Fix valgrind warning by initialising strings before sending
 *        them to FITSIO,
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,7 +158,7 @@
 
 *  Start a new NDF context.
       CALL NDF_BEGIN
-      
+
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
 
@@ -217,7 +217,7 @@
      :                         DELT, COMENT, STATUS )
             END IF
          END IF
-      
+
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Decide the data type of the axis centres.
@@ -265,7 +265,7 @@
                IF ( ABS( OFFSET ) .LT. VAL__EPSD ) THEN
                   ITYPE = '_REAL'
                ELSE
-                  
+
                   IF ( ABS( DELT / OFFSET ) .GT. DBLE( VAL__EPSR ) *
      :                 PRECF ) THEN
                      ITYPE = '_REAL'
@@ -278,15 +278,15 @@
             IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Map the centre array in the axis structure.
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR, 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR,
      :                        EL, STATUS )
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL KPG1_SSAZR( EL, DELT, OFFSET, 
+                  CALL KPG1_SSAZR( EL, DELT, OFFSET,
      :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
-               
+
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
                END IF
@@ -303,7 +303,7 @@
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL KPG1_SSAZD( EL, DELT, OFFSET, 
+                  CALL KPG1_SSAZD( EL, DELT, OFFSET,
      :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                             STATUS )
 
@@ -358,5 +358,5 @@
 
 *  Close the new NDF context.
       CALL NDF_END( STATUS )
-      
+
       END

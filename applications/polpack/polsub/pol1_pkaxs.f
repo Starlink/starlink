@@ -15,9 +15,9 @@
 *  Description:
 *     This routine modifies the supplied FrameSet to select the axes
 *     which are to span the display. Other axes are assigned constant
-*     values as specified in CONST. If the Base Frame has no Domain, it 
-*     is given a Domain equal to "<COLX>-<COLY>..." where <COLX>, <COLY>, 
-*     ... are the names of the catalogue columns included in the Frame. 
+*     values as specified in CONST. If the Base Frame has no Domain, it
+*     is given a Domain equal to "<COLX>-<COLY>..." where <COLX>, <COLY>,
+*     ... are the names of the catalogue columns included in the Frame.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -27,21 +27,21 @@
 *        Ignored if NDIM is zero. The Base Frame of the returned FrameSet
 *        is spanned by these two columns.
 *     CONST( NDIM ) = DOUBLE PRECISION (Given)
-*        Selects the base Frame axes in the returned FrameSet. Each value 
-*        corresponds to one of the NDIM columns given in GI, and is either 
-*        AST__BAD or a constant value. Axes for which AST__BAD is supplied 
-*        will be included in the base Frame of the returned FrameSet. Axes 
+*        Selects the base Frame axes in the returned FrameSet. Each value
+*        corresponds to one of the NDIM columns given in GI, and is either
+*        AST__BAD or a constant value. Axes for which AST__BAD is supplied
+*        will be included in the base Frame of the returned FrameSet. Axes
 *        for which a constant value is supplied wil not be included, but
 *        will be set to the specified constant value.
 *     IWCS = INTEGER (Returned)
-*        An AST pointer to the returned FrameSet. AST__NULL is returned if 
-*        an error occurs. 
+*        An AST pointer to the returned FrameSet. AST__NULL is returned if
+*        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -55,15 +55,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'CAT_PAR'          ! CAT constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER NDIM
@@ -97,7 +97,7 @@
       INTEGER PMAP               ! Pointer to PermMap
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -125,18 +125,18 @@
 
 *  If it would not be a unit mapping, create the PermMap.
       IF( NCON .GT. 0 ) THEN
-         PMAP = AST_PERMMAP( NDIM, INPRM, NREQ, OUTPRM, CON, ' ', 
+         PMAP = AST_PERMMAP( NDIM, INPRM, NREQ, OUTPRM, CON, ' ',
      :                       STATUS )
 
-*  Create a new Base Frame by picking the required axes from the 
+*  Create a new Base Frame by picking the required axes from the
 *  original Base Frame.
-         NFRM = AST_PICKAXES( BFRM, NREQ, OUTPRM, MAP, STATUS ) 
+         NFRM = AST_PICKAXES( BFRM, NREQ, OUTPRM, MAP, STATUS )
 
 *  Add this new Frame into the FrameSet, remembering the index of the
 *  Current and Base Frames.
          ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
          IBASE = AST_GETI( IWCS, 'BASE', STATUS )
-         CALL AST_ADDFRAME( IWCS, AST__BASE, PMAP, NFRM, STATUS ) 
+         CALL AST_ADDFRAME( IWCS, AST__BASE, PMAP, NFRM, STATUS )
 
 *  Get the index of the newly added Frame.
          INEW = AST_GETI( IWCS, 'CURRENT', STATUS )
@@ -155,7 +155,7 @@
 *  If the Base Frame has no Domain value, give it a default Domain based
 *  on the names of the catalogue columns.
       BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-      IF( .NOT. AST_TEST( BFRM, 'DOMAIN', STATUS ) ) THEN 
+      IF( .NOT. AST_TEST( BFRM, 'DOMAIN', STATUS ) ) THEN
          DOM = ' '
          IAT = 0
 
@@ -172,16 +172,16 @@
 
 *  Now modify the Current Frame so that it also has 2 axes.
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-      IF( AST_GETI( CFRM, 'NAXES', STATUS ) .EQ. NDIM ) THEN 
+      IF( AST_GETI( CFRM, 'NAXES', STATUS ) .EQ. NDIM ) THEN
 
 *  Transform a point from the 2D Base Frame to the nD Current Frame.
          TEST( 1, 1 ) = 0.0D0
          TEST( 1, 2 ) = 0.0D0
-         CALL AST_TRANN( IWCS, 1, 2, 1, TEST, .TRUE., NDIM, 1, TEST, 
-     :                   STATUS ) 
+         CALL AST_TRANN( IWCS, 1, 2, 1, TEST, .TRUE., NDIM, 1, TEST,
+     :                   STATUS )
 
 *  Set up the information required to create a PermMap which goes from
-*  the NDIM-dimensional current Frame found above, to a new Frame 
+*  the NDIM-dimensional current Frame found above, to a new Frame
 *  containing only the axes with indices equal to the indices of the chosen
 *  base Frame axes.
          NREQ = 0
@@ -199,18 +199,18 @@
          END DO
 
 *  Create the PermMap.
-         PMAP = AST_PERMMAP( NDIM, INPRM, NREQ, OUTPRM, CON, ' ', 
+         PMAP = AST_PERMMAP( NDIM, INPRM, NREQ, OUTPRM, CON, ' ',
      :                       STATUS )
 
-*  Create a new Current Frame by picking the required axes from the 
+*  Create a new Current Frame by picking the required axes from the
 *  original Current Frame.
-         NFRM = AST_PICKAXES( CFRM, NREQ, OUTPRM, MAP, STATUS ) 
+         NFRM = AST_PICKAXES( CFRM, NREQ, OUTPRM, MAP, STATUS )
 
 *  Set the domain of the original Base Frame to POLNDCURRENT.
          CALL AST_SETC( CFRM, 'DOMAIN', 'POLNDCURRENT', STATUS )
 
 *  Add this new Frame into the FrameSet.
-         CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NFRM, STATUS ) 
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NFRM, STATUS )
 
       END IF
 

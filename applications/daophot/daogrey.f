@@ -58,7 +58,7 @@
 *     21 Jan 1991  Changed to NDF and new version of AGI
 *      6 Jan 1992  Use 'PRM_PAR' instead of 'BAD_PAR'
 *     11 Mar 1992  Unix version, GKS 7.4
-*     13 Feb 1995  Mended the plot error when image has non-zero origin (GJP) 
+*     13 Feb 1995  Mended the plot error when image has non-zero origin (GJP)
 *      8 Jun 2000  Fixed to work with other apps for non-zero origins (MBT)
 *    endhistory
 *
@@ -153,7 +153,7 @@
 
 * Find the maximum and minimum data values in the subarray
 * Use the KAPGEN routine MAXMIN
-      call MAXMIN( idims( 1 ), idims( 2 ), %val( cnf_pval( datpin ) ), 
+      call MAXMIN( idims( 1 ), idims( 2 ), %val( cnf_pval( datpin ) ),
      :             xstart,
      :             ystart, xend, yend, npix, ninval, vmax, vmin,
      :             maxpos, minpos, status )
@@ -191,7 +191,7 @@
 
 * Scale the data array into the workspace array
       call MSG_OUT( ' ', 'Scaling image', status )
-      call GREY( idims( 1 ), idims( 2 ), %val( cnf_pval( datpin ) ), 
+      call GREY( idims( 1 ), idims( 2 ), %val( cnf_pval( datpin ) ),
      :           xstart, xend,
      :           ystart, yend, dx, dy, %val( cnf_pval( worpin ) ),
      :           npens, vmax, vmin )
@@ -208,7 +208,7 @@
 
 * Plot out the image
       call MSG_OUT( ' ', 'Plotting image', status )
-      call GCA( x1, y2, x2, y1, dx, dy, 1, 1, dx, dy, 
+      call GCA( x1, y2, x2, y1, dx, dy, 1, 1, dx, dy,
      :          %val( cnf_pval( worpin ) ) )
 
 * Make a database entry
@@ -324,7 +324,7 @@
 *    History :
 *
 *     14-04-1986 : First implementation (REVA::MJM)
-*     1986 Aug 12: Completed prologue and nearly conformed to 
+*     1986 Aug 12: Completed prologue and nearly conformed to
 *                  Starlink standards (RAL::CUR).
 *     1986 Sep  2: Renamed parameters -> arguments section in prologue,
 *                  added bad-pixel handling and tidied (RAL::CUR).
@@ -386,7 +386,7 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*    check the sub-array co-ordinates for validity 
+*    check the sub-array co-ordinates for validity
 
       IF ( XSTART .LT. 1 .OR. XSTART .GT. DIM1 .OR.
      :     YSTART .LT. 1 .OR. YSTART .GT. DIM2 .OR.
@@ -435,7 +435,7 @@
       NUMPIX  =  ( XFINSH - XSTART + 1 ) * ( YFINSH - YSTART + 1 )
 
 *    initialise max and min variables to be equal to the value of
-*    the lower left corner of the specified subarray, and the 
+*    the lower left corner of the specified subarray, and the
 *    positions of each to be there
 
       MINMUM      =  ABS( VAL__BADR )

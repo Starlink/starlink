@@ -71,9 +71,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER*(*) LOC      
+      CHARACTER*(*) LOC
       INTEGER       MAX_JIGGLE
       INTEGER       N_FITS
       CHARACTER*(*) FITS(N_FITS)
@@ -99,7 +99,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local constants:
- 
+
 *  Local Variables:
       INTEGER ITEMP              ! Dummy variable
 *.

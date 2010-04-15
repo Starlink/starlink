@@ -13,19 +13,19 @@
 *     CALL CHR_ITOB( IVALUE, STRING, STATUS )
 
 *  Description:
-*     Encode an INTEGER value into a binary string. The result is 
-*     right-justified in the returned string. In the event of an error, 
+*     Encode an INTEGER value into a binary string. The result is
+*     right-justified in the returned string. In the event of an error,
 *     '*'s are written to the string.
- 
+
 *  Arguments:
 *     IVALUE = INTEGER (Given)
 *        Value to be encoded.
 *     STRING = CHARACTER * ( * ) (Returned)
 *        Binary string encoded from the given value.
 
-*  Note: 
-*     This subroutine assumes a 32-bit, twos-complement representation 
-*     of an INTEGER. 
+*  Note:
+*     This subroutine assumes a 32-bit, twos-complement representation
+*     of an INTEGER.
 
 *  Algorithm:
 *     Portable Version:
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -158,7 +158,7 @@
          IVAL = IVALUE
       END IF
 
-*  Encode the integer into a right-justified binary string: first 
+*  Encode the integer into a right-justified binary string: first
 *  initialise ITEST.
       ITEST = BINDEC
 

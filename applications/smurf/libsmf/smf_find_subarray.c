@@ -32,7 +32,7 @@
 *  Description:
 *     This function reads the FITS header to determine the subarray name
 *     and then converts it to a number.
-*     
+*
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}

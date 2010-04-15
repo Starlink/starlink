@@ -10,7 +10,7 @@
 *    CALL PSX_PUTENV( NAME, VALUE, STATUS )
 
 *  Description:
-*    The routine sets the specified environment variable to the 
+*    The routine sets the specified environment variable to the
 *    supplied value. If it fails it sets STATUS to SAI__ERROR.
 
 *  Arguments:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -77,7 +77,7 @@
 *    is not available defaults to using the putenv() function.
 *    Use of putenv() will result in memory leaks since the putenv
 *    string is not freed by the system and can not be freed
-*    by the call to PSX_PUTENV. 
+*    by the call to PSX_PUTENV.
 
 *  CPP Flags:
 *    Recognizes the HAVE_SETENV CPP definition.
@@ -116,7 +116,7 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
 #if !HAVE_SETENV
    char *envstr;
 #endif
-   char errmsg[100];    /* Adequate space for constructed error message */ 
+   char errmsg[100];    /* Adequate space for constructed error message */
    int putstat;
 
   /* Check inherited global status. */
@@ -130,7 +130,7 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
 # if HAVE_SETENV
       putstat = setenv(temp_name, temp_value, 1);
 
-# else 
+# else
   /* If we have to use putenv we must worry about memory
      leaks. Currently ignore it. */
 
@@ -143,7 +143,7 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
   /* Include space for equals sign and trailing null */
   /* Assumes a character is one byte */
       envstr = starMalloc( strlen(temp_name) + strlen(temp_value) + 2);
- 
+
   /* Copy in the string */
       strcpy( envstr, temp_name );
       strcat( envstr, "=");
@@ -181,6 +181,6 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
       strcpy( errmsg, "Error setting environment variable " );
       strcat( errmsg, name );
       psx1_rep_c( "PSX_PUTENV_NOENV", errmsg, status );
-   }     
+   }
 
 }

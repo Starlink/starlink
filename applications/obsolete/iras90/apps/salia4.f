@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -151,8 +151,8 @@
                   DATOUT( IOUT, JOUT ) = VAL__BADR
                   IF( QUAL ) QLOUT( IOUT, JOUT ) = 0
                   IF( VAR ) VAROUT( IOUT, JOUT ) = VAL__BADR
-  
-*  Otherwise, find the indices of the pixel in the input NDF which is 
+
+*  Otherwise, find the indices of the pixel in the input NDF which is
 *  closest to the centre of this output pixel.
                ELSE
                   IIN = NINT( X + 0.5 )
@@ -196,12 +196,12 @@
 
                IF( X .EQ. VAL__BADR .OR. Y .EQ. VAL__BADR ) THEN
                   DATOUT( IOUT, JOUT ) = VAL__BADR
-  
+
 *  Otherwise, interpolate the input data values at the image coordinates
 *  corresponding to the centre of the current output pixel. Store the
 *  interpolated value in the output DATA array.
                ELSE
-                  CALL IRM_BILN1( X, Y, IXLO1, IXHI1, IYLO1, IYHI1, 
+                  CALL IRM_BILN1( X, Y, IXLO1, IXHI1, IYLO1, IYHI1,
      :                            DATIN, DATOUT( IOUT, JOUT ), STATUS )
                END IF
 

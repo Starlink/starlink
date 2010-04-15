@@ -288,13 +288,13 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
     *status = SAI__ERROR;
     msgSetc( "I", temp );
     errRep( " ", "Bad value (^I) for simpar 'Interp'.", status );
-  } 
-  
+  }
+
   if ( !astMapGet0D ( keymap, "PARAM1", sinx->params ) )
     sinx->params[0] = 2.0;
 
   if ( !astMapGet0D ( keymap, "PARAM2", sinx->params + 1 ) )
     sinx->params[1] = 2.0;
-  
+
 }
 

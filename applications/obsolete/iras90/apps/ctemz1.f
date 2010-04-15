@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,9 +86,9 @@
                                  ! values, in microns
      :      INTGND( MXSIZ ),     ! Response data in increasing order.
      :      LK( MXSIZ + 4 ),     ! Knot positions of cubic spline.
-     :      NRESP( MXSIZ, I90__BANDS ),! Response normalised to a 
-                                 ! peak in each band of unity. Taken 
-                                 ! from Exp. Supp. Table II.C.5 
+     :      NRESP( MXSIZ, I90__BANDS ),! Response normalised to a
+                                 ! peak in each band of unity. Taken
+                                 ! from Exp. Supp. Table II.C.5
                                  ! "Relative system resp." (padded with
                                  ! extra zeros).
      :      NU( MXSIZ ),         ! Frequency in units of 1.0E12 Hz.
@@ -105,26 +105,26 @@
       DATA DWAVEL / 0.5, 0.5, 3.0, 5.0 /
 
       DATA NRESP   / 0.000, 0.000, 0.000, 0.008, 0.535, 0.689, 0.735,
-     : 0.815, 0.900, 0.904, 0.834, 0.816, 0.793, 0.854, 0.938, 0.991, 
+     : 0.815, 0.900, 0.904, 0.834, 0.816, 0.793, 0.854, 0.938, 0.991,
      : 1.000, 0.934, 0.388, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
      : 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
      : 0.000, 0.000,
 
-     :               0.000, 0.000, 0.007, 0.101, 0.288, 0.388, 0.452, 
-     : 0.521, 0.562, 0.626, 0.683, 0.729, 0.778, 0.832, 0.912, 0.914, 
-     : 0.938, 0.933, 0.875, 0.910, 1.000, 0.911, 0.840, 0.763, 0.749, 
-     : 0.829, 0.914, 0.790, 0.877, 0.558, 0.274, 0.069, 0.012, 0.000, 
+     :               0.000, 0.000, 0.007, 0.101, 0.288, 0.388, 0.452,
+     : 0.521, 0.562, 0.626, 0.683, 0.729, 0.778, 0.832, 0.912, 0.914,
+     : 0.938, 0.933, 0.875, 0.910, 1.000, 0.911, 0.840, 0.763, 0.749,
+     : 0.829, 0.914, 0.790, 0.877, 0.558, 0.274, 0.069, 0.012, 0.000,
      : 0.000, 0.000,
 
-     :               0.000, 0.000, 0.000, 0.010, 0.036, 0.068, 0.174, 
-     : 0.315, 0.483, 0.585, 0.658, 0.716, 0.824, 0.915, 0.987, 0.990, 
-     : 1.000, 0.946, 0.713, 0.531, 0.174, 0.047, 0.000, 0.000, 0.000, 
-     : 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 
+     :               0.000, 0.000, 0.000, 0.010, 0.036, 0.068, 0.174,
+     : 0.315, 0.483, 0.585, 0.658, 0.716, 0.824, 0.915, 0.987, 0.990,
+     : 1.000, 0.946, 0.713, 0.531, 0.174, 0.047, 0.000, 0.000, 0.000,
+     : 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
      : 0.000, 0.000,
 
-     :               0.000, 0.000, 0.000, 0.010, 0.113, 0.306, 0.505, 
-     : 0.695, 0.824, 0.947, 0.939, 1.000, 0.631, 0.319, 0.195, 0.106, 
-     : 0.053, 0.010, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 
+     :               0.000, 0.000, 0.000, 0.010, 0.113, 0.306, 0.505,
+     : 0.695, 0.824, 0.947, 0.939, 1.000, 0.631, 0.319, 0.195, 0.106,
+     : 0.053, 0.010, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
      : 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
      : 0.000, 0.000 /
 
@@ -151,7 +151,7 @@
 *  Find a cubic spline which interpolates the integrand values.
       IFAIL = -1
 *      CALL E01BAF( SIZE( BAND ), NU, INTGND, LK, CK, MXSIZ + 4, WORK,
-*     :             6*MXSIZ + 16, IFAIL ) 
+*     :             6*MXSIZ + 16, IFAIL )
 
       STATUS = IRC__NAGER
       CALL ERR_REP('CTEMZ1_ERR0',
@@ -163,7 +163,7 @@
       IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'L', I90__WAVEL( BAND ) )
-         CALL MSG_SETR( 'T', REAL( T ) ) 
+         CALL MSG_SETR( 'T', REAL( T ) )
          CALL ERR_REP( 'CTEMZ1_ERR1',
      :      'CTEMZ1: NAG error while fitting cubic spline to flux '//
      :      'density observed from a ^T K source (^L um band)', STATUS )
@@ -184,7 +184,7 @@
       IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'L', I90__WAVEL( BAND ) )
-         CALL MSG_SETR( 'T', REAL( T ) ) 
+         CALL MSG_SETR( 'T', REAL( T ) )
          CALL ERR_REP( 'CTEMZ1_ERR2',
      :      'CTEMZ1: NAG error while integrating the flux '//
      :      'density observed from a ^T K source (^L um band)', STATUS )

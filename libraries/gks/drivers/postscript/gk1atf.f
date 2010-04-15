@@ -89,19 +89,19 @@
 *
 *---------------------------------------------------------------------
 *
- 
+
       IF(NT .LE. 0) RETURN
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
- 
+
+
 *     Take a graphics memory snapshot, so as not to clutter it
 *     with temporaries.
       CALL GKFOCO(KIOPB,'gsave',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Select the format of the coordinates to be sent
       CALL GK1ASF (6*NT,TZA,LCOORD,LCF,FCOORD)
@@ -123,17 +123,17 @@
          CALL GKFOCO(KIOPB,' fasoldo', IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
       ELSE
- 
+
 *
 *     Deal with pattern here.
 *
         CALL GK1APA
       ENDIF
- 
+
 *
 *     End Fill Area - restore graphics state
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'grestore',IREM)
- 
+
       END

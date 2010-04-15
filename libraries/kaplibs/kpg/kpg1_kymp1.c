@@ -22,11 +22,11 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status )
 
 *  Description:
-*     This function checks each non-comment, non-blank line in the supplied 
+*     This function checks each non-comment, non-blank line in the supplied
 *     GRP group. An error is reported if any such lines do not have the
 *     form "keyword = value", where the keyword name can be a hierarchical
 *     list of component names separated by dots. The returned KeyMap has
-*     an entry for each component name found at the start of any keyword 
+*     an entry for each component name found at the start of any keyword
 *     name. The value associated with the entry will either be a
 *     primitive value (if the keyword name contained no other components)
 *     or another KeyMap (if the keyword name contained other components).
@@ -43,10 +43,10 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     "clumpfind" and "method". The value associated with the "gaussclumps"
 *     entry will be another KeyMap containing keys "epsilon" (a primitive
 *     vector entry containing the values 0.001 and 0.002) and "contrast"
-*     (a primitive scalar entry with value "2.3"). The value associated with 
-*     the "clumpfind" entry will be another KeyMap containing keys "naxis" 
-*     and "deltat", which will have primitive scalar values "2" and "2.0". 
-*     The value associated with the "method" entry will be the primitive 
+*     (a primitive scalar entry with value "2.3"). The value associated with
+*     the "clumpfind" entry will be another KeyMap containing keys "naxis"
+*     and "deltat", which will have primitive scalar values "2" and "2.0".
+*     The value associated with the "method" entry will be the primitive
 *     scalar value "gaussclumps".
 *
 *     Assigning the value "<def>" (case insensitive) to a keyword has the
@@ -64,9 +64,9 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     igrp
 *        A GRP identifier for the group of text strings to be analysed.
 *     keymap
-*        A location at which to return a pointer to the new KeyMap, or 
-*        NULL if an error occurs. A valid pointer to an empty KeyMap will be 
-*        returned if the supplied group contains nothing but comments and 
+*        A location at which to return a pointer to the new KeyMap, or
+*        NULL if an error occurs. A valid pointer to an empty KeyMap will be
+*        returned if the supplied group contains nothing but comments and
 *        blank lines.
 *     status
 *        Pointer to the global status variable.
@@ -78,7 +78,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     - This function provides a private implementation for the public
 *     KPG1_KYMAP Fortran routine and kpg1Kymap C function.
 *     - Component names must contain only alphanumerical characters,
-*     underscores, plus and minus signs [a-zA-Z0-9_+\-], 
+*     underscores, plus and minus signs [a-zA-Z0-9_+\-],
 *     - Any lower case characters contained in a component name will be
 *     translated to the upper case equivalent.
 *     - If the last non-blank character in a value is a backslash ("\"),
@@ -95,12 +95,12 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -126,7 +126,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *+
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    char *accumulation;          /* Sum of concatenated strings */
    char *pname;                 /* Pointer to pass to grpGet */
    char name[ GRP__SZNAM + 1 ]; /* A single string from the group */
@@ -170,7 +170,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 /* Skip blank lines */
       if( thislen > 0 ) {
 
-/* Eliminate any trailing white space by terminating the new string after 
+/* Eliminate any trailing white space by terminating the new string after
    its last non-white character. */
          name[ thislen ] = 0;
 

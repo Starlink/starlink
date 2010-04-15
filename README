@@ -143,7 +143,7 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
       % ./bootstrap
 
    This step takes a long while. Note that, although an important part of the
-   ./bootstrap script is running autoreconf in the top-level directory, 
+   ./bootstrap script is running autoreconf in the top-level directory,
    you should not run autoreconf yourself in this directory.
 
  - Build the configure dependencies.
@@ -275,7 +275,7 @@ Platform specific build notes
 
  After the release of GCC 4 the Fortran compiler "g77" has been replaced with a
  completely new "gfortran" (that now implements Fortran 90, 95 and some 2003
- features), which has not been compatible with Starlink Fortran until the 
+ features), which has not been compatible with Starlink Fortran until the
  release of version 4.3. Happily this turned out to be not a major problem
  (thanks to Andy Vaught) as the other free Fortran compiler "g95", is
  compatible. So to build the collection with a GCC 4+ compiler you'll either
@@ -306,7 +306,7 @@ Platform specific build notes
   The build situation under OS X follows much like that of GNU/Linux,
   but you'll need to install your own Fortran compiler. In 10.3
   the "g77" compiler from "Fink" or "MacPorts" has been used successfully,
-  in 10.4 you'll need a copy of "g95". For 10.5 or later you can use 
+  in 10.4 you'll need a copy of "g95". For 10.5 or later you can use
   g95, or gfortran. The latter is available from hpc.sourceforge.net
   as well as MacPorts.
 
@@ -341,7 +341,7 @@ The source is in the repository at docs/sun/248.
 
 You should consult the project web pages at <http://www.starlink.ac.uk>,
 <http://starlink.jach.hawaii.edu> and consider subscribing to the Starlink
-development and user mailing lists: see 
+development and user mailing lists: see
 <http://www.jiscmail.ac.uk/archives/starlink.html> and
 <http://www.jiscmail.ac.uk/archives/stardev.html>.
 
@@ -368,7 +368,7 @@ at the JAC Hawaii. This is described by a wiki at:
 
    http://starlink.jach.hawaii.edu/
 
-The build procedures described above are still correct, but much of the 
+The build procedures described above are still correct, but much of the
 associated documentation, SSN/78 etc. are becoming rapidly out-of-date.
 Consult the wiki for download instructions and how to access things like
 specific releases.

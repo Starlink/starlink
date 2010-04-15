@@ -10,7 +10,7 @@ C     Function:
 C        Subtract two Polarization spectra.
 C
 C     Description:
-C        Two Polarization spectra covering the same wavelength range 
+C        Two Polarization spectra covering the same wavelength range
 C        are subtracted to form a new spectrum giving the difference of
 C        the intensity and Stokes parameters.
 C
@@ -18,23 +18,23 @@ C        Any number of Stokes parameters may be present in the
 C        spectra, but only Stokes parameters present in both spectra
 C        will appear in the output spectrum.
 C
-C        
-C                 
+C
+C
 C     Parameters:
 C    (1) INPUT1     (TSP, 1D)  The first input Stokes spectrum.
 C    (2) INPUT2     (TSP, 1D)  The second input Stokes spectrum.
 C    (3) OUTPUT     (TSP, 1D)  The output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         4/12/1988
 C
 C-
 C
 C  History:
-C    27/4/1988   Original Version (COMBINE).   JAB/AAO  
+C    27/4/1988   Original Version (COMBINE).   JAB/AAO
 C    15/8/1988   Allow more than one stokes parameter in
 C                the input spectra.   JAB/AAO
 C    19/8/1988   Correct bug in above change.   JAB/AAO
@@ -54,7 +54,7 @@ C
 
 *  HDS locators
       CHARACTER*(DAT__SZLOC) LOC1,LOC2,OLOC,DLOC1,DLOC2
-      CHARACTER*(DAT__SZLOC) SDLOC1,SDLOC2,VDLOC1,VDLOC2  
+      CHARACTER*(DAT__SZLOC) SDLOC1,SDLOC2,VDLOC1,VDLOC2
       CHARACTER*(DAT__SZLOC) QLOC1,QLOC2,ULOC1,ULOC2,VLOC1,VLOC2
 
 *  Array dimensions
@@ -77,7 +77,7 @@ C
 *  Create the output file
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
- 
+
 *  Copy input to output
       CALL TSP_COPY(LOC1,OLOC,STATUS)
 
@@ -108,14 +108,14 @@ C
          CALL MSG_OUT('MSG','Input 1 and 2 Dimensions are different',
      :          STATUS)
          STATUS = USER__001
-      ENDIF         
+      ENDIF
 
 *  Map the intensity data from both datasets
       CALL TSP_MAP_DATA(OLOC,'UPDATE',PTR1,DLOC1,STATUS)
       CALL TSP_MAP_DATA(LOC2,'READ',PTR2,DLOC2,STATUS)
 
 *  Get the Stokes data from output dataset
-                                  
+
       CALL TSP_STOKES(OLOC,NUM,QZ1,UZ1,VZ1,STATUS)
 
 *  Q Stokes parameter
@@ -152,7 +152,7 @@ C
       ENDIF
 
 *  Subtract the Stokes arrays and sum the variances
-      
+
       IF (QZ1) THEN
 
 *  Map the Q stokes data from the first dataset
@@ -172,18 +172,18 @@ C
               CALL TSP_SUBTRACT(SIZE,%VAL(SPTR1),%VAL(SPTR2))
 
 *  Add the Q stokes variance
-              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))  
+              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
 
 *  Unmap the arrays
               CALL TSP_UNMAP(SDLOC2,STATUS)
               CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(QLOC2,STATUS)
           ELSE
-              CALL MSG_OUT(' ','Q present in only one dataset',STATUS)        
+              CALL MSG_OUT(' ','Q present in only one dataset',STATUS)
               CALL TSP_DELETE_STOKES(LOC1,'Q',STATUS)
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
-          CALL TSP_UNMAP(VDLOC1,STATUS)   
+          CALL TSP_UNMAP(VDLOC1,STATUS)
           CALL DAT_ANNUL(QLOC1,STATUS)
       ENDIF
 
@@ -206,21 +206,21 @@ C
               CALL TSP_SUBTRACT(SIZE,%VAL(SPTR1),%VAL(SPTR2))
 
 *  Add the U Stokes variance
-              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))  
+              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
 
 *  Unmap the arrays
               CALL TSP_UNMAP(SDLOC2,STATUS)
-              CALL TSP_UNMAP(VDLOC2,STATUS) 
+              CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(ULOC2,STATUS)
           ELSE
-              CALL MSG_OUT(' ','U present in only one dataset',STATUS)        
+              CALL MSG_OUT(' ','U present in only one dataset',STATUS)
               CALL TSP_DELETE_STOKES(LOC1,'U',STATUS)
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
-          CALL TSP_UNMAP(VDLOC1,STATUS)   
+          CALL TSP_UNMAP(VDLOC1,STATUS)
           CALL DAT_ANNUL(ULOC1,STATUS)
       ENDIF
-                                 
+
       IF (VZ1) THEN
 
 *  Map the V stokes data from the first dataset
@@ -240,14 +240,14 @@ C
               CALL TSP_SUBTRACT(SIZE,%VAL(SPTR1),%VAL(SPTR2))
 
 *  Add the V stokes variance arrays
-              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))  
+              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
 
 *  Unmap the arrays
               CALL TSP_UNMAP(SDLOC2,STATUS)
               CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(VLOC2,STATUS)
           ELSE
-              CALL MSG_OUT(' ','V present in only one dataset',STATUS)        
+              CALL MSG_OUT(' ','V present in only one dataset',STATUS)
               CALL TSP_DELETE_STOKES(LOC1,'V',STATUS)
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
@@ -255,13 +255,13 @@ C
           CALL DAT_ANNUL(VLOC1,STATUS)
       ENDIF
 
-*  subtract the intensities 
+*  subtract the intensities
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL TSP_SUBTRACT(SIZE,%VAL(PTR1),%VAL(PTR2))
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(DLOC1,STATUS)
       CALL TSP_UNMAP(DLOC2,STATUS)
@@ -286,7 +286,7 @@ C
 *   (>)   SIZE    (Integer)          Size of the data arrays
 *   (!)   I1      (Real array(SIZE)) First input array (and output)
 *   (>)   I2      (Real array(SIZE)) Second input array
-*       
+*
 *   Jeremy Bailey   4/12/1988
 *
 *   Modified:
@@ -307,7 +307,7 @@ C
       INTEGER I
 
 *  Loop over points adding the data when both are good
-      DO I=1,SIZE 
+      DO I=1,SIZE
         IF (I1(I) .NE. VAL__BADR .AND. I2(I) .NE. VAL__BADR) THEN
           I1(I)=I1(I)+I2(I)
         ELSE
@@ -332,7 +332,7 @@ C
 *   (>)   SIZE    (Integer)          Size of the data arrays
 *   (!)   I1      (Real array(SIZE)) First input array (and output)
 *   (>)   I2      (Real array(SIZE)) Second input array
-*       
+*
 *   Jeremy Bailey   4/12/1988
 *
 *   Modified:
@@ -353,7 +353,7 @@ C
       INTEGER I
 
 *  Loop over points adding the data when both are good
-      DO I=1,SIZE 
+      DO I=1,SIZE
         IF (I1(I) .NE. VAL__BADR .AND. I2(I) .NE. VAL__BADR) THEN
           I1(I)=I1(I)-I2(I)
         ELSE

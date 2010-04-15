@@ -29,7 +29,7 @@ C***FIRST EXECUTABLE STATEMENT  DCSEVL
      1 SAI__ERROR)
        IF(N.GT.1000)CALL ERR_REP(' ','DCSEVL  NUMBER OF TERMS GT 1000',
      1 SAI__ERROR)
-       IF ((X.LT.-1.D0) .OR. (X.GT.1.D0)) CALL ERR_REP(' ', 'DCSEVL  
+       IF ((X.LT.-1.D0) .OR. (X.GT.1.D0)) CALL ERR_REP(' ', 'DCSEVL
      1 X OUTSIDE (-1,+1)', SAI__ERROR)
 C
        TWOX = 2.0D0*X
@@ -37,7 +37,7 @@ C
        B0=0.D0
        DO 10 I=1,N
          B2=B1
-         B1=B0      
+         B1=B0
          NI = N - I + 1
          B0 = TWOX*B1 - B2 + A(NI)
  10    CONTINUE

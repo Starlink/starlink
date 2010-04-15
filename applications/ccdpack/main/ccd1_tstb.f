@@ -91,25 +91,25 @@
 *  Call the appropriate subroutine for the given type to perform the
 *  test.
       IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_TBUB( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBUB( %VAL( CNF_PVAL( IPDATA ) ),
      :                   NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_TBB( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBB( %VAL( CNF_PVAL( IPDATA ) ),
      :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_TBUW( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBUW( %VAL( CNF_PVAL( IPDATA ) ),
      :                   NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_TBW( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBW( %VAL( CNF_PVAL( IPDATA ) ),
      :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_TBI( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBI( %VAL( CNF_PVAL( IPDATA ) ),
      :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_TBR( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBR( %VAL( CNF_PVAL( IPDATA ) ),
      :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_TBD( %VAL( CNF_PVAL( IPDATA ) ), 
+         CALL CCG1_TBD( %VAL( CNF_PVAL( IPDATA ) ),
      :                  NEL, ALLBAD, STATUS )
       ELSE
 

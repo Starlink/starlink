@@ -15,7 +15,7 @@
 *     S.M.Beard (REVAD::SMB)
 *     P.N.Daly (JACH::PND)
 *    History :
-*     15-Jan-1990 : Original version, copied from 
+*     15-Jan-1990 : Original version, copied from
 *                   CRED4_REDUCE_INTEGRATION.             (JFL, SMB)
 *      2-Feb-1990: PROCEED_FF flag included.                   (SMB)
 *      8-Feb-1990: PROCEED_FF flag moved to RED4. PROMPT_FF
@@ -54,7 +54,7 @@
 *                  CALIB_MODE, STANDARD_MODE, SPECIFIED_BIAS,
 *                  SPECIFIED_DARK, SPECIFIED_FLAT,
 *                  SPECIFIED_CALIB and SPECIFIED_STD
-*                  parameters, for DRIMP/5.1 and DRIMP/5.2.  
+*                  parameters, for DRIMP/5.1 and DRIMP/5.2.
 *                  MSG_VAL_LEN added.                          (SMB)
 *     17-Jul-1992: Add SUBTRACT_BIAS option                    (PND)
 *     12-Feb-1993: Conform to error strategy                   (PND)
@@ -124,10 +124,10 @@
 
             IF (RED4_ACTIVE) THEN
 
-               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, 
+               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :           OUTVAL, STATUS)
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -243,12 +243,12 @@
 
             IF ( VERBOSE ) THEN
               CALL MSG_SETC( 'RED4_ALIAS', RED4_ALIAS )
-              CALL MSG_OUT( ' ', 'Sent to ^RED4_ALIAS: ', STATUS ) 
+              CALL MSG_OUT( ' ', 'Sent to ^RED4_ALIAS: ', STATUS )
               CALL MSG_SETC( 'INVAL', INVAL )
-              CALL MSG_OUT( ' ', '^INVAL', STATUS ) 
+              CALL MSG_OUT( ' ', '^INVAL', STATUS )
             ENDIF
 
-            CALL TASK_OBEY (RED4_ALIAS, 'RED_OBS', INVAL(1:CPOS), 
+            CALL TASK_OBEY (RED4_ALIAS, 'RED_OBS', INVAL(1:CPOS),
      :        OUTVAL, RED4_PATH, RED4_MESSID, STATUS)
 
 *          check that the action started OK, if not set the REDUCTION_OK flag
@@ -275,10 +275,10 @@
                IF (WAIT) THEN
 
                   IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Waiting for RED4 action to complete', STATUS )
-                  CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, 
+                  CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :              OUTVAL, STATUS)
 
-                  RED4_ACTIVE = .FALSE. 
+                  RED4_ACTIVE = .FALSE.
 
                   IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
 
@@ -307,7 +307,7 @@
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'ES', ERR_STATUS )
                         CALL ERR_REP( ' ', 'CRED4_REDUCE_OBSERVATION '/
-     :                     /'Failed to reduce observation '/ 
+     :                     /'Failed to reduce observation '/
      :                     /'(Status = ^ES)', STATUS )
                      ENDIF
                   ELSE

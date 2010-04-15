@@ -48,7 +48,7 @@
 *        Useful if displaying different classes of objects successively.
 *        This flag acts as a switch retaining its last value. [FALSE]
 *     DEFAXES = _LOGICAL (Read)
-*        If set true then prompting for the axis bounds will occur, 
+*        If set true then prompting for the axis bounds will occur,
 *        otherwise the program generated defaults will be used. [FALSE]
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device on which to plot the map
@@ -125,7 +125,7 @@
 *        [Dynamic]
 
 *  Examples:
-*     PISAPLOT OVERLAY 
+*     PISAPLOT OVERLAY
 *        Using the overlay parameter allows ellipses to be plotted over
 *        a previously displayed image.
 *     PISAPLOT OVERLAY CLEAR
@@ -156,9 +156,9 @@
 *     1990 July 31 (MJC):
 *        Original version.
 *     1990 October 22 (PDRAPER):
-*        Changed to read in pixel area not index (bug). 
-*        Used MCA (ignored previously) parameter to allow room for 
-*        annotations. Changed 0.75 to 2.0; character aspect ratio 
+*        Changed to read in pixel area not index (bug).
+*        Used MCA (ignored previously) parameter to allow room for
+*        annotations. Changed 0.75 to 2.0; character aspect ratio
 *        plus a bit. Found the maximum index number in file, external
 *        manipulations (SCAR) of pisafind file could cause reordering.
 *     1990 October 30 (PDRAPER):
@@ -185,7 +185,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -230,7 +230,7 @@
      :  CATPOS,                  ! The data file is open
      :  DEVCAN,                  ! Image-display parameter is to be
                                  ! cancelled
-     :  OUTTIC,                  ! Axis tick marks are to be placed 
+     :  OUTTIC,                  ! Axis tick marks are to be placed
                                  ! outside the box instead of inside
      :  OVRLAY,                  ! The plot is an overlay on an image
      :  NEWAX,                   ! The user wants to change the plot
@@ -294,7 +294,7 @@
      :  FD,                      ! File description of parameterised data
      :  THICK,                   ! The line thickness (standard is 1.0)
      :  IDNO,                    ! Identification number of an image
-     :  MCA,                     ! Maximum number of characters in 
+     :  MCA,                     ! Maximum number of characters in
                                  ! annotation
      :  N,                       ! Number of lines read from the data
                                  ! file
@@ -394,7 +394,7 @@
          IF ( MAJTIC( 1 ) .LT. 0.0 ) MAJTIC( 1 ) = 0.0
          IF ( MAJTIC( 2 ) .LT. 0.0 ) MAJTIC( 2 ) = 0.0
 
-*       Are the tick marks on the outside of the axes?  Default is 
+*       Are the tick marks on the outside of the axes?  Default is
 *       outside so that they do not hide any of the image.
         OUTTIC = .TRUE.
         CALL PAR_GET0L( 'OUTTIC', OUTTIC, STATUS )
@@ -430,7 +430,7 @@
       CALL AGP_ACTIV( STATUS )
 
 *  Clear the current picture - PGQCOL bug requires this.
-      IF ( OVRLAY .AND. CLEAR .OR. .NOT. OVRLAY ) THEN 
+      IF ( OVRLAY .AND. CLEAR .OR. .NOT. OVRLAY ) THEN
 
 *  Use false activation of PGPLOT window to clear whole of area.
          CALL AGP_NVIEW( .FALSE., STATUS )
@@ -471,7 +471,7 @@
 *    Course of action depends on whether or not the ellipse plot is
 *    to be drawn over a display of the image.  If it is then look
 *    for that picture in the database and map the ellipse plot directly
-*    on to it; there can be no axes. The alternative has no such 
+*    on to it; there can be no axes. The alternative has no such
 *    constraints, so the plot, with or without axes, is fitted into the
 *    current picture giving square pixels.
       IF ( OVRLAY ) THEN
@@ -627,8 +627,8 @@
          CALL PAR_GET0L( 'DEFAXES', NEWAX, STATUS )
          IF ( NEWAX ) THEN
 
-*        Offer these values to the user for modification. May well 
-*        require to compare the same frame with different classes of 
+*        Offer these values to the user for modification. May well
+*        require to compare the same frame with different classes of
 *        objects.
 345         CONTINUE
             RVAL( 1 ) = LBND( 1 )
@@ -646,7 +646,7 @@
 
 *        Check for zero extent axes
             IF( STATUS .EQ. SAI__OK ) THEN
-               IF ( LBND( 1 ) .EQ. UBND( 1 ) .OR. 
+               IF ( LBND( 1 ) .EQ. UBND( 1 ) .OR.
      :              LBND( 2 ) .EQ. UBND( 2 ) ) THEN
                   CALL MSG_OUT( 'ZERO_AXES',
      :                          'Cannot have zero extent axes', STATUS )
@@ -655,8 +655,8 @@
                   GO TO 345
                END IF
             END IF
-         END IF  
-*       
+         END IF
+*
 *       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *        Create a zone of the specified size.
          CALL PGWINDOW( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ) )
@@ -684,11 +684,11 @@
             IF ( MAJTIC( 1 ) .GT. 0 ) THEN
                MAJTIC( 1 ) = ( UBND( 1 ) - LBND( 1 ) ) /
      :                       ( MAJTIC( 1 ) + 1.0 )
-            END IF 
+            END IF
             IF ( MAJTIC( 2 ) .GT. 0 ) THEN
                MAJTIC( 2 ) = ( UBND( 2 ) - LBND( 2 ) )/
      :                       ( MAJTIC( 2 ) + 1.0 )
-            END IF 
+            END IF
 
 *       Draw axes.
             CALL PGBOX( FORSTR, MAJTIC( 1 ), MINTIC( 1 ),
@@ -763,12 +763,12 @@
                XA = XP + ABS( EA * COS( RPA ) * COS( OA ) -
      :              EB * SIN( RPA ) * SIN( OA ) ) + 0.003 * WDIM
                YA = YP + ABS( EA * SIN( RPA ) * COS( OA ) +
-     :              EB * COS( RPA ) * SIN( OA ) ) + 0.003 * WDIM 
+     :              EB * COS( RPA ) * SIN( OA ) ) + 0.003 * WDIM
                CALL CHR_ITOC( IDNO, NUM, N )
 
 *  Clip so that XA and YA lie within frame.
                IF ( XA .GE. LBND( 1 ) .AND. XA .LE. UBND( 1 ) .AND.
-     :              YA .GE. LBND( 2 ) .AND. YA .LE. UBND( 2 ) ) THEN 
+     :              YA .GE. LBND( 2 ) .AND. YA .LE. UBND( 2 ) ) THEN
                   CALL PGTEXT( XA, YA, NUM( :N ) )
                END IF
             END IF
@@ -819,7 +819,7 @@
  960  CONTINUE
       IF ( STATUS .NE. SAI__OK ) THEN
          TSTAT = STATUS
-         STATUS = SAI__OK 
+         STATUS = SAI__OK
 
 *       Reset the current picture.
          CALL AGI_SELP( PICID, STATUS )
@@ -831,7 +831,7 @@
 *    Close down PGPLOT and AGI.
       CALL AGP_DEACT( STATUS )
       CALL AGI_END( -1 , STATUS )
-      
+
       IF ( DEVCAN ) THEN
          CALL AGI_CANCL( 'DEVICE', STATUS )
       ELSE

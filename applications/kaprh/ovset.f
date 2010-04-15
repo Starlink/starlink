@@ -30,7 +30,7 @@
 *  ADAM Parameters:
 *     DEVICE = DEVICE (Read)
 *        The image-display overlay to become the current image-display
-*        overlay device. 
+*        overlay device.
 
 *  Examples:
 *     ovset xov

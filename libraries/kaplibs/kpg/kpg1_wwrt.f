@@ -17,7 +17,7 @@
 *     a supplied HDS object. The new component has type WCS and contains
 *     a single component named DATA, of type _CHAR. DATA is a 1-D array
 *     holding lines of text which can be interpreted by a simple AST
-*     Channel. 
+*     Channel.
 
 *  Arguments:
 *     IAST = INTEGER (Given)
@@ -25,7 +25,7 @@
 *     NAME = CHARACTER * ( * ) (Given)
 *        The name of the WCS component to add into the supplied HDS object.
 *     LOC = CHARACTER * ( * ) (Given)
-*        A locator for an HDS structure object. This object is modified by 
+*        A locator for an HDS structure object. This object is modified by
 *        adding a component of type WCS, with name given by NAME.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'AST_PAR'          ! AST_ public interface
       INCLUDE 'KPG_PAR'          ! KPG constants
-      
+
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common block
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Write)
@@ -92,7 +92,7 @@
 
 *  External References:
       EXTERNAL KPG1_WRAST        ! Write AST_ data to an HDS object
-      
+
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) WCSLOC ! Locator to WCS component
       INTEGER CHAN               ! Pointer to AST_ Channel
@@ -119,7 +119,7 @@
       CALL DAT_FIND( LOC, NAME, WCSLOC, STATUS )
       CALL DAT_NEW1C( WCSLOC, 'DATA', KPG__SZAST, KPG__INAST, STATUS )
 
-*  Obtain a locator to the DATA component, and annul the WCS structure 
+*  Obtain a locator to the DATA component, and annul the WCS structure
 *  locator.
       ASTLC = DAT__NOLOC
       CALL DAT_FIND( WCSLOC, 'DATA', ASTLC, STATUS )

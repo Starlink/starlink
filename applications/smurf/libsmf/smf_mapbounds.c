@@ -16,7 +16,7 @@
 *  Invocation:
 *     smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 *                   const AstFrameSet *refwcs,
-*                   int alignsys, int *lbnd_out, int *ubnd_out, 
+*                   int alignsys, int *lbnd_out, int *ubnd_out,
 *                   AstFrameSet **outframeset, int *moving, smfBox ** boxes,
 *                   int *status );
 
@@ -35,23 +35,23 @@
 *        Frameset corresponding to a reference WCS that should be
 *        used to define the output pixel grid. Can be NULL.
 *     alignsys = int (Given)
-*        If non-zero, then the input data will be aligned in the coordinate 
+*        If non-zero, then the input data will be aligned in the coordinate
 *        system specified by "system" rather than in the default system
 *        (ICRS).
 *     lbnd_out = double* (Returned)
-*        2-element array pixel coord. for the lower bounds of the output map 
+*        2-element array pixel coord. for the lower bounds of the output map
 *     ubnd_out = double* (Returned)
-*        2-element array pixel coord. for the upper bounds of the output map 
+*        2-element array pixel coord. for the upper bounds of the output map
 *     outframeset = AstFrameSet** (Returned)
 *        Frameset containing the sky->output map mapping
 *     moving = int* (Returned)
 *        Flag to denote whether the source is moving
 *     boxes = smfBox ** (Returned)
-*        Location at which to returned a pointer to an array of smfBox 
-*        structures. The length of this array is equal to the number of input 
-*        files in group "igrp". Each element of the array holds the bounds 
-*        of the spatial coverage of the corresponding input file, given as 
-*        pixel indices within the output cube. The array should be freed 
+*        Location at which to returned a pointer to an array of smfBox
+*        structures. The length of this array is equal to the number of input
+*        files in group "igrp". Each element of the array holds the bounds
+*        of the spatial coverage of the corresponding input file, given as
+*        pixel indices within the output cube. The array should be freed
 *        using astFree when no longer needed.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -59,14 +59,14 @@
 *  Description:
 *     This function steps over a list of input files and calculates the
 *     bolometer->output map pixel transformation for the corner bolometers
-*     of the subarray in order to automatically determine the extent 
+*     of the subarray in order to automatically determine the extent
 *     of the map.
 
 *  Authors:
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
-*     David Berry 
+*     David Berry
 *     {enter_new_authors_here}
 
 *  History:
@@ -200,7 +200,7 @@
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     const AstFrameSet *spacerefwcs,
-                    int alignsys, int *lbnd_out, int *ubnd_out, 
+                    int alignsys, int *lbnd_out, int *ubnd_out,
                     AstFrameSet **outframeset, int *moving,
                     smfBox ** boxes, int *status ) {
 
@@ -223,7 +223,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   dim_t j;                     /* Loop counter */
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
-  double map_pa=0;             /* Map PA in output coord system (rads) */ 
+  double map_pa=0;             /* Map PA in output coord system (rads) */
   dim_t maxloop;               /* Number of times to go round the time slice loop */
   dim_t nbadt  = 0;            /* Number of bad time slices */
   dim_t ngoodt = 0;            /* Number of good time slices */
@@ -238,10 +238,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
-  double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
-  double x_map[4];             /* Projected X-coordinates of corner bolos */ 
-  double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
-  double y_map[4];             /* Projected X-coordinates of corner bolos */ 
+  double x_array_corners[4];   /* X-Indices for corner bolos in array */
+  double x_map[4];             /* Projected X-coordinates of corner bolos */
+  double y_array_corners[4];   /* Y-Indices for corner pixels in array */
+  double y_map[4];             /* Projected X-coordinates of corner bolos */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -278,7 +278,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     box->ubnd[ 0 ] = VAL__MIND;
     box->ubnd[ 1 ] = VAL__MIND;
 
-    /* Read data from the ith input file in the group */      
+    /* Read data from the ith input file in the group */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
 
     if (*status != SAI__OK) {
@@ -289,23 +289,23 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
       if( *status == SAI__OK ) {
         if( data->file == NULL ) {
           *status = SAI__ERROR;
-          errRep( FUNC_NAME, "No smfFile associated with smfData.", 
+          errRep( FUNC_NAME, "No smfFile associated with smfData.",
                   status );
           break;
 
         } else if( data->hdr == NULL ) {
           *status = SAI__ERROR;
-          errRep( FUNC_NAME, "No smfHead associated with smfData.", 
+          errRep( FUNC_NAME, "No smfHead associated with smfData.",
                   status );
           break;
 
         } else if( data->hdr->fitshdr == NULL ) {
           *status = SAI__ERROR;
-          errRep( FUNC_NAME, "No FITS header associated with smfHead.", 
+          errRep( FUNC_NAME, "No FITS header associated with smfHead.",
                   status );
           break;
 
-        } 
+        }
       }
     }
 
@@ -318,7 +318,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     msgSetc("FILE", pname);
     msgSeti("I", i);
     msgSeti("N", size);
-    msgOutif(MSG__VERB, " ", 
+    msgOutif(MSG__VERB, " ",
              "SMF_MAPBOUNDS: Processing ^I/^N ^FILE",
              status);
 
@@ -327,7 +327,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
       msgSetc( "FILE", pname );
       msgSeti( "NDIMS", data->ndims );
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.", 
+      errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",
               status );
       break;
     }
@@ -339,7 +339,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
          checking bounds, depending on the instrument in use. */
 
       switch( hdr->instrument ) {
-	  
+
       case INST__SCUBA2:
         drcntrl_mask = DRCNTRL__POSITION;
         /* 4 corner bolometers of the subarray */
@@ -347,34 +347,34 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         x_array_corners[1] = 1;
         x_array_corners[2] = (data->dims)[0];
         x_array_corners[3] = (data->dims)[0];
-	  
+
         y_array_corners[0] = 1;
         y_array_corners[1] = (data->dims)[1];
         y_array_corners[2] = 1;
         y_array_corners[3] = (data->dims)[1];
         break;
-	  
+
       case INST__AZTEC:
         /* Rough guess for extreme bolometers around the edge */
         x_array_corners[0] = 22;
         x_array_corners[1] = 65;
         x_array_corners[2] = 73;
         x_array_corners[3] = 98;
-	  
+
         y_array_corners[0] = 1; /* Always 1 for AzTEC */
         y_array_corners[1] = 1;
         y_array_corners[2] = 1;
         y_array_corners[3] = 1;
         break;
-	  
+
       case INST__ACSIS:
-        smf_find_acsis_corners( data, x_array_corners, y_array_corners, 
+        smf_find_acsis_corners( data, x_array_corners, y_array_corners,
                                 status);
         break;
-	  
+
       default:
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Don't know how to calculate mapbounds for data created with this instrument", status);	  
+        errRep(FUNC_NAME, "Don't know how to calculate mapbounds for data created with this instrument", status);
       }
     }
 
@@ -391,7 +391,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         /* Retrieve input SkyFrame */
         skyin = astGetFrame( hdr->wcs, AST__CURRENT );
 
-        smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref, 
+        smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
                            moving, status );
 
         /* Get the orientation of the map vertical within the output celestial
@@ -426,10 +426,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
              to get the correct handedness. */
           fitschan = astFitsChan ( NULL, NULL, " " );
           smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
-                            &(par[2]), &(par[4]), par[6], fitschan, status ); 
+                            &(par[2]), &(par[4]), par[6], fitschan, status );
           astClear( fitschan, "Card" );
           fs = astRead( fitschan );
-            
+
           /* Extract the output PIXEL->SKY Mapping. */
           oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
           /* Tidy up */
@@ -543,7 +543,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
       for( j=0; j<maxloop; j++ ) {
         dim_t ts;  /* Actual time slice to use */
 
-        /* if we are doing the fast loop, we need to read the time slice 
+        /* if we are doing the fast loop, we need to read the time slice
            index from textreme. Else we just use the index */
         if (fast) {
           /* get the index but make sure it is good */
@@ -553,7 +553,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           ts = j;
         }
         /* Calculate the bolo to map-pixel transformation for this tslice */
-        bolo2map = smf_rebin_totmap( data, ts, abskyframe, oskymap, 
+        bolo2map = smf_rebin_totmap( data, ts, abskyframe, oskymap,
                                      *moving, status );
 
         if ( *status == SAI__OK ) {
@@ -646,25 +646,25 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   lbnd0[ 0 ] = lbnd_out[ 0 ];
   lbnd0[ 1 ] = lbnd_out[ 1 ];
   parDef1i( "LBND", 2, lbnd0, status );
-  
+
   ubnd0[ 0 ] = ubnd_out[ 0 ];
   ubnd0[ 1 ] = ubnd_out[ 1 ];
   parDef1i( "UBND", 2, ubnd0, status );
 
   parGet1i( "LBND", 2, lbnd_out, &actval, status );
   if( actval == 1 ) lbnd_out[ 1 ] = lbnd_out[ 0 ];
-    
+
   parGet1i( "UBND", 2, ubnd_out, &actval, status );
   if( actval == 1 ) ubnd_out[ 1 ] = ubnd_out[ 0 ];
-    
+
   /* Ensure the bounds are the right way round. */
-  if( lbnd_out[ 0 ] > ubnd_out[ 0 ] ) { 
+  if( lbnd_out[ 0 ] > ubnd_out[ 0 ] ) {
     int itmp = lbnd_out[ 0 ];
     lbnd_out[ 0 ] = ubnd_out[ 0 ];
     ubnd_out[ 0 ] = itmp;
-  }      
-    
-  if( lbnd_out[ 1 ] > ubnd_out[ 1 ] ) { 
+  }
+
+  if( lbnd_out[ 1 ] > ubnd_out[ 1 ] ) {
     int itmp = lbnd_out[ 1 ];
     lbnd_out[ 1 ] = ubnd_out[ 1 ];
     ubnd_out[ 1 ] = itmp;
@@ -688,7 +688,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
               status );
   }
 
-  /* If no error has occurred, export the returned FrameSet pointer from the 
+  /* If no error has occurred, export the returned FrameSet pointer from the
      current AST context so that it will not be annulled when the AST
      context is ended. Otherwise, ensure a null pointer is returned. */
   if( *status == SAI__OK ) {
@@ -697,7 +697,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     *outframeset = astAnnul( *outframeset );
   }
 
-  /* Clean Up */ 
+  /* Clean Up */
  CLEANUP:
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);

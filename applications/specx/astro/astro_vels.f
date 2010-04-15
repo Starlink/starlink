@@ -101,7 +101,7 @@ C *** Precess apex to present
       VZSUN = VSUN*(VX*PREMAT(3,1) + VY*PREMAT(3,2) + VZ*PREMAT(3,3))
 
 C *** Calculate position of earth
- 
+
    30 COSDEL = COS(APDEC)
       CALL A13 (DATJUL, A1, A2, A3)
       SUNLON = A1+ ECE (ECCENT,A3)

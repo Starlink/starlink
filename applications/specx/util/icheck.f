@@ -28,7 +28,7 @@ C   Returns a value 1 if OK, 0 otherwise
 
 C     Also check that the scan number is not negative (LSCAN).
 C     (I have forgotten why this is included, but it must be
-C     so that a stack rolled when XCLEAR is 0 does not give 
+C     so that a stack rolled when XCLEAR is 0 does not give
 C     a spurious indication of enough spectra).
 
       DO J = 1,NSTACK
@@ -37,6 +37,6 @@ C     a spurious indication of enough spectra).
           IERR   = 8
         ENDIF
       END DO
-      
+
       RETURN
       END

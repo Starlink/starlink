@@ -71,26 +71,26 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) STRING  ! the character string to be decoded
- 
+
 *  Arguments Returned:
       LOGICAL LVAL         ! the returned value
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
- 
+
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   Use appropriate CHR routine
       CALL CHR_CTOL( STRING, LVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -99,5 +99,5 @@
      :   'TASK_DEC0L: Failed to convert ^STR to LOGICAL',
      :    STATUS )
       ENDIF
- 
+
       END

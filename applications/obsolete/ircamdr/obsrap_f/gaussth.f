@@ -75,8 +75,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -96,11 +96,11 @@
      :  ROLL( 2 ),            ! dimensions of 2-D workspace
      :  BOXSIZE,              ! side-length in pixels of smoothing box
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
-     :  PLACE1,               ! place holder for temporary NDF 
-     :  PLACE2,               ! place holder for temporary NDF 
-     :  PLACE3,               ! place holder for temporary NDF 
-     :  PLACE4,               ! place holder for temporary NDF 
+     :  PNTRI,                !    "     " input      "
+     :  PLACE1,               ! place holder for temporary NDF
+     :  PLACE2,               ! place holder for temporary NDF
+     :  PLACE3,               ! place holder for temporary NDF
+     :  PLACE4,               ! place holder for temporary NDF
      :  WPNTR1,               !    "     " workspace for RAPGAU
      :  WPNTR2,               !    "     "     "      "    "
      :  WPNTR3,               !    "     "     "      "    "
@@ -149,7 +149,7 @@
          CALL AIF_GODDN( 'BOXSIZE', BOXSIZE, 1, 31, BOXSIZE, STATUS )
 
 *       value of THRESH, suggest default of 0.0
-         CALL AIF_GET0R( 'THRESH', 0.0, -1.0E20, 1.0E20, THRESH, 
+         CALL AIF_GET0R( 'THRESH', 0.0, -1.0E20, 1.0E20, THRESH,
      :                    STATUS )
 
 *       create the output image and get a title for it
@@ -169,25 +169,25 @@
 *          create and map temporary workspace
 
             CALL NDF_TEMP( PLACE1, STATUS )
-            CALL NDF_NEW( '_REAL', NDIMS, LBND, ROLL, PLACE1, WLOC1, 
+            CALL NDF_NEW( '_REAL', NDIMS, LBND, ROLL, PLACE1, WLOC1,
      :                    STATUS )
             CALL NDF_MAP( WLOC1, 'DATA', '_REAL', 'WRITE', WPNTR1,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE2, STATUS )
-            CALL NDF_NEW( '_REAL', 1, 1, BOXSIZE, PLACE2, WLOC2, 
+            CALL NDF_NEW( '_REAL', 1, 1, BOXSIZE, PLACE2, WLOC2,
      :                    STATUS )
             CALL NDF_MAP( WLOC2, 'DATA', '_REAL', 'WRITE', WPNTR2,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE3, STATUS )
-            CALL NDF_NEW( '_REAL', 1, 1, BOXSIZE, PLACE3, WLOC3, 
+            CALL NDF_NEW( '_REAL', 1, 1, BOXSIZE, PLACE3, WLOC3,
      :                    STATUS )
             CALL NDF_MAP( WLOC3, 'DATA', '_REAL', 'WRITE', WPNTR3,
      :                    NELEMENTS, STATUS )
 
             CALL NDF_TEMP( PLACE4, STATUS )
-            CALL NDF_NEW( '_REAL', 1, 1, DIMS(1), PLACE4, WLOC4, 
+            CALL NDF_NEW( '_REAL', 1, 1, DIMS(1), PLACE4, WLOC4,
      :                    STATUS )
             CALL NDF_MAP( WLOC4, 'DATA', '_REAL', 'WRITE', WPNTR4,
      :                    NELEMENTS, STATUS )
@@ -196,13 +196,13 @@
             IF( STATUS .EQ. SAI__OK ) THEN
 
 *             copy the input DATA_ARRAY into the output DATA_ARRAY
-               CALL COPY2D( DIMS(1), DIMS(2), %VAL( PNTRI ), 
+               CALL COPY2D( DIMS(1), DIMS(2), %VAL( PNTRI ),
      :                      %VAL( PNTRO ), STATUS )
 
 *             pass everything to the rapid gaussian smoothing routine
-               CALL RAPGAUTH( 
-     :                  SIGMA, BOXSIZE, THRESH, DIMS( 1), DIMS( 2), 
-     :	                %VAL( PNTRO ), %VAL( WPNTR1 ), %VAL( WPNTR2 ), 
+               CALL RAPGAUTH(
+     :                  SIGMA, BOXSIZE, THRESH, DIMS( 1), DIMS( 2),
+     :	                %VAL( PNTRO ), %VAL( WPNTR1 ), %VAL( WPNTR2 ),
      :	                %VAL( WPNTR3 ), %VAL( WPNTR4 ), STATUS )
 
             ENDIF

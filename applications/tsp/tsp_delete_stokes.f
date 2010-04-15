@@ -39,12 +39,12 @@ C-
 C  Subroutine / function details:
 C
 C  History:
-C     11/8/1988   Original version.  JAB / AAO.  
+C     11/8/1988   Original version.  JAB / AAO.
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -53,7 +53,7 @@ C
 C
 C     Local variables
 C
-      CHARACTER*(DAT__SZLOC) MLOC,PLOC           
+      CHARACTER*(DAT__SZLOC) MLOC,PLOC
       CHARACTER*80 TSTRING
 C
       IF (STATUS .EQ. SAI__OK) THEN

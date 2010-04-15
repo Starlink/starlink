@@ -19,12 +19,12 @@
  *       int first, int last, char *gsdval );
 
  * Description:
- *    Function to get values from the GSD data in memory. The routine 
+ *    Function to get values from the GSD data in memory. The routine
  *    finds a GSDITEM and returns all the associated data as a byte-string.
  *    This routine is not meant to deal with multiple-scan GSD files.
- *   
+ *
  *    There are several different modes of operation:
- *   
+ *
  *       (GSD item numbers start at 1).
  *
  *       mode 0: search for item by name and return the item number and the
@@ -32,7 +32,7 @@
  *       mode 1: search for item by name and return the item number only.
  *       mode 2: search for item by number and return name and data.
  *       mode 3: search for item by number and return name only.
- *   
+ *
  *    Unless pfirst or plast are 0 (in which case the whole array is
  *    returned), the first array item returned will be pfirst, the
  *    last plast. Array item indices START with 1.
@@ -89,12 +89,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -123,9 +123,9 @@
  *       use const
 
  * Copyright:
- *    Copyright (C) 2008 Science and Technology Facilities Council. 
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
- *    All Rights Reserved. 
+ *    All Rights Reserved.
 
  *-
  */
@@ -141,7 +141,7 @@ int gsd1_getval( const struct file_descriptor *file_dsc,
    const struct item_descriptor *item_dsc, const char *data_ptr,
    int mode, short data_type, char *name, int *itemno,
    int first, int last, char *gsdval )
-{ 
+{
    const int gsd_byte[GSD_NTYPES] =  /* Size for each type. */
    {  GSD_SZBYTE, GSD_SZLOGICAL, GSD_SZWORD, GSD_SZINTEGER,
       GSD_SZREAL, GSD_SZDOUBLE,  GSD_SZCHAR

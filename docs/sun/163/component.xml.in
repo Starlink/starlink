@@ -11,8 +11,8 @@
      the reduction and analysis of {\small IRAS} Survey and Pointed
      Observation (PO) data (also known as ``Additional Observation'',
      or ``AO'' data). It does not provide facilities for handling Low
-     Resolution Spectrometer (LRS) data, or catalogue data. 
-  </p></abstract>  
+     Resolution Spectrometer (LRS) data, or catalogue data.
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

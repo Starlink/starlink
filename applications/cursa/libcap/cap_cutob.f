@@ -29,7 +29,7 @@
 *        CHARACTER string, as follows: 'HHMM'.
 *     LONG  =  DOUBLE PRECISION (Given)
 *        Geographical longitude of the observatory where the plate
-*        the plate was exposed, expressed in radians with the 
+*        the plate was exposed, expressed in radians with the
 *        (conventional astronomical) convention that east is positive.
 *     UTMJD  =  DOUBLE PRECISION (Returned)
 *        UT of the observation, expressed as an MJD.

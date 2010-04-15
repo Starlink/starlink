@@ -65,7 +65,7 @@ C     Set up the weights array (to save working out lots of exponentials later
           WEIGHT(I,J) = EXP (-((I**2/XRAD**2)+(J**2/YRAD**2)))
         END DO
       END DO
-      
+
       IF (IXMAX.LT.10 .AND. IYMAX.LT.10) THEN
         PRINT *
         PRINT *, 'Weights array:'

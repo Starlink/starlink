@@ -1,7 +1,7 @@
 /*
  *				wvmCal.h
  *	This include file is used for both wvmCal.c and wvmOpt.c
- * 
+ *
  */
 
 

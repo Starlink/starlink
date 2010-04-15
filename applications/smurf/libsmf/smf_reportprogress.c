@@ -17,13 +17,13 @@
 
 *  Arguments:
 *     max = int (Given)
-*        Should be supplied non-zero only on the first call to this 
+*        Should be supplied non-zero only on the first call to this
 *        function. It gives the number of calls to this function that
 *        corresponds to 100% of the job done. On subsequent calls it
-*        should be supplied as zero. Supplying a non-zero value causes 
+*        should be supplied as zero. Supplying a non-zero value causes
 *        the internal counter to be reset to zero.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
 *     This function counts the number of times it has been invoked since
@@ -98,7 +98,7 @@ void smf_reportprogress( int max, int *status ){
       count = 0.0;
       msgOutif( MSG__VERB, "", " ", status );
       perc_last = -1;
-   }   
+   }
 
 /* Do nothing if we have already displayed "100 %" */
    if( perc_last < 100 ) {
@@ -108,10 +108,10 @@ void smf_reportprogress( int max, int *status ){
       perc = (int) ( 100.0*( ((float) count++)/((float) maxcount ) ) + 0.5 );
       if( perc > 100 ) perc = 100;
 
-/* If the percentage has changed, display the current progress, including 
-   vt100 escape sequences that result in  each displayed percentage 
+/* If the percentage has changed, display the current progress, including
+   vt100 escape sequences that result in  each displayed percentage
    over-printing the previous displayed percentage. Set the MSG "STREAM"
-   tuning parameter non-zero so that the escape characters are left in place. */ 
+   tuning parameter non-zero so that the escape characters are left in place. */
       if( perc != perc_last ) {
          if( perc < 100 ) {
             msgTune( "STREAM", 1, status );
@@ -123,7 +123,7 @@ void smf_reportprogress( int max, int *status ){
             msgOutiff( MSG__VERB, "", "%3d %% done", status, perc );
             msgBlankif( MSG__VERB, status );
          }
-      } 
+      }
 
 /* Record the previous percentage for next time. */
       perc_last = perc;

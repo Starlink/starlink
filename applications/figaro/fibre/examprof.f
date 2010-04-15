@@ -166,7 +166,7 @@ C     CNF_PVAL     : Full pointer to dynamically allocated memory
           trial = fit.and.(.not.masked)
           if(par_quest('Store fit results',trial)) then
 *
-*  This is the original test.  
+*  This is the original test.
 *  Restore when Digital Fortran Compiler v4.1 is fixed.
 *
 *         if(par_quest('Store fit results',(fit.and.(.not.masked))))

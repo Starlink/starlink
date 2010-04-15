@@ -1,14 +1,14 @@
-      SUBROUTINE CAT_TDETL (CI, COLFLG, NUMROW, NUMCOL, NUMIND, NUMPAR, 
+      SUBROUTINE CAT_TDETL (CI, COLFLG, NUMROW, NUMCOL, NUMIND, NUMPAR,
      :   DATE, STATUS)
 *+
 *  Name:
-*     CAT_TDETL 
+*     CAT_TDETL
 *  Purpose:
 *     Get the details of a catalogue.
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT_TDETL (CI, COLFLG; NUMROW, NUMCOL, NUMIND, NUMPAR, DATE; 
+*     CALL CAT_TDETL (CI, COLFLG; NUMROW, NUMCOL, NUMIND, NUMPAR, DATE;
 *       STATUS)
 *  Description:
 *     Get some summary details of a catalogue.  This routine will work
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -111,7 +111,7 @@
       IF (STATUS .EQ. CAT__OK) THEN
 
 *
-*       Determine the type of the identifier and proceed if it 
+*       Determine the type of the identifier and proceed if it
 *       corresponds to a catalogue.
 
          CALL CAT_TIDTP (CI, IDTYP, STATUS)
@@ -119,7 +119,7 @@
          IF (IDTYP .EQ. CAT__CITYP) THEN
 
 *
-*          Attempt to find the array element corresponding to the 
+*          Attempt to find the array element corresponding to the
 *          catalogue and proceed if ok.
 
             CALL CAT1_CIELM (CI, CIELM, STATUS)

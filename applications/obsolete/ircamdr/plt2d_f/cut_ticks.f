@@ -1,5 +1,5 @@
 	SUBROUTINE CUT_TICKS( X_LO, X_HI, Y_LO, Y_HI, XST, XEN, YST, YEN,
-     :	                      CUT_MAGNIF, XTICK_START, XTICK_INTERVAL, 
+     :	                      CUT_MAGNIF, XTICK_START, XTICK_INTERVAL,
      :	                      CUT_NUMYTIC, CUT_NUMXTIC, STATUS)
 
 * Description : Subroutine to plot tick marks along the axis of a CUT/SLICE
@@ -22,13 +22,13 @@
 
 * define local variables
 
-	INTEGER 
+	INTEGER
      :	  CUT_NUMXTIC,
      :	  CUT_NUMYTIC,
      :	  J,
      :	  STATUS
 
-	REAL 
+	REAL
      :    CUT_MAGNIF,
      :	  DXTICK_INTERVAL,
      :	  DXTICK_START,

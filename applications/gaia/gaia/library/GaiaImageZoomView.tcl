@@ -76,7 +76,7 @@
 itk::usual GaiaImageZoomView {}
 
 itcl::class gaia::GaiaImageZoomView {
-   
+
    #  Inheritances:
    #  -------------
    inherit rtd::RtdImageZoomView
@@ -86,7 +86,7 @@ itcl::class gaia::GaiaImageZoomView {
    constructor {args} {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
-   }   
+   }
 
    #  Destructor:
    #  -----------
@@ -104,7 +104,7 @@ itcl::class gaia::GaiaImageZoomView {
       rtd::RtdImageZoomView::scale
       set itk_option(-factor) $old_factor
    }
-   
+
    #  Called when the zoom checkbutton is pressed and when image is entered.
    #  Override to use the adaptive scale factor.
    public method zoom {{clear 0}} {
@@ -115,7 +115,7 @@ itcl::class gaia::GaiaImageZoomView {
    }
 
    #  This method is called when the mouse ptr enters an RtdImage. Sets the
-   #  target scale factor from the given rtdimage. 
+   #  target scale factor from the given rtdimage.
    #  Override so that an adjusted scale factor is determined when the zoomed
    #  image doesn't fill the zoomed window. This is needed as the central
    #  pixel of the zoomed window has to show the image.
@@ -157,7 +157,7 @@ itcl::class gaia::GaiaImageZoomView {
 
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  Protected variables: (available to instance)
    #  --------------------
 

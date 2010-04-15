@@ -44,7 +44,7 @@
 
 /* Linked list of signal numbers and the RTL handler routine addresses */
 
-struct siglist { 
+struct siglist {
                  int signo;
                  struct sigaction act;
                  struct siglist *next;
@@ -73,8 +73,8 @@ static unsigned int sigisset=0;
 
 
 
-void ant_accept 
-( 
+void ant_accept
+(
 int *status    /* global status (given and returned) */
 )
 
@@ -84,7 +84,7 @@ int *status    /* global status (given and returned) */
 *     ANT_ACCEPT
 
 *  Purpose:
-*     Accept a network connection request 
+*     Accept a network connection request
 
 *  Language:
 *     Starlink C
@@ -92,7 +92,7 @@ int *status    /* global status (given and returned) */
 *  Algorithm:
 *     A connection request has been received.
 *     Store the new channel and unit numbers in COMMON arrays indexed by
-*     MACHNUM. 
+*     MACHNUM.
 *     Start the read on the new channel.
 
 *  Authors:
@@ -152,8 +152,8 @@ int *status    /* global status (given and returned) */
 /*   Get the name of the other machine */
 
       if ( *status == SAI__OK )
-      ant_verify ( n_mach[machnum].local_channel, 
-        n_mach[machnum].machine_names, status ); 
+      ant_verify ( n_mach[machnum].local_channel,
+        n_mach[machnum].machine_names, status );
 
 /*      strcpy ( n_mach[machnum].machine_names, "other" ); */
       if ( *status == SAI__OK )
@@ -171,7 +171,7 @@ int *status    /* global status (given and returned) */
          }
          else
          {
-            istat = fcntl ( n_mach[machnum].local_channel, F_SETFL, 
+            istat = fcntl ( n_mach[machnum].local_channel, F_SETFL,
               fileflags | FASYNC );
             if ( istat == -1 )
             {
@@ -190,8 +190,8 @@ int *status    /* global status (given and returned) */
 
 
 
-void ant_accept_netack 
-( 
+void ant_accept_netack
+(
 int *status                         /* global status (give and returned) */
 )
 
@@ -201,16 +201,16 @@ int *status                         /* global status (give and returned) */
 *     ANT_ACCEPT_NETACK
 
 *  Purpose:
-*     Accept a netack message 
+*     Accept a netack message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Complete the relevant N_PATH entry from information in the 
+*     Complete the relevant N_PATH entry from information in the
 *     received message.
 *     Forward an acknowledgement message to the local task.
-*     On error, return a DEINIT message across the network and annul the 
+*     On error, return a DEINIT message across the network and annul the
 *     N_PATH entry.
 
 *  Authors:
@@ -249,10 +249,10 @@ int *status                         /* global status (give and returned) */
    memcpy ( &npath, k_rpath, 4 );
    path = ntohl ( npath );
 
-   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) ) 
+   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) )
    {
 
-      if ( n_paths[path].path_state == ANT__THIS_P ) 
+      if ( n_paths[path].path_state == ANT__THIS_P )
       {
          found = 1;
          memcpy ( &npath, k_spath, 4 );
@@ -262,15 +262,15 @@ int *status                         /* global status (give and returned) */
 /*   Build a structure and send it to the target task */
 
          outbuf.mess_in_type = C_REM_ACK_IN;
-         outbuf.u.rem_ack_in.local_task_t_path_num = 
+         outbuf.u.rem_ack_in.local_task_t_path_num =
            n_paths[path].local_task_t_path_num;
          outbuf.u.rem_ack_in.local_nettask_n_path_num = path;
-         msp_send_message ( (char *)&outbuf, C_REM_ACK_IN_LEN, 
+         msp_send_message ( (char *)&outbuf, C_REM_ACK_IN_LEN,
            n_paths[path].local_task_reminit_ack_q, command_q, status );
 
       }
 
-      if ( ( found == 0 ) || ( *status != SAI__OK ) ) 
+      if ( ( found == 0 ) || ( *status != SAI__OK ) )
       {
 
 /*  Send a rejection across the network */
@@ -281,13 +281,13 @@ int *status                         /* global status (give and returned) */
          memcpy ( netbuffer, &ntype, 4 );
          memcpy ( &npath, k_spath, 4 );
          memcpy ( d_rpath, &npath, 4 );
-         sock_write ( n_mach[machnum].local_channel, 
+         sock_write ( n_mach[machnum].local_channel,
            C_NET_MAXMSG_LEN, netbuffer, status );
 
-/*   Bad status ignored. Hope that a network EVENT is in the 
+/*   Bad status ignored. Hope that a network EVENT is in the
      process of occurring and things will be tidied elsewhere. */
 
-         if ( found == 1 ) 
+         if ( found == 1 )
          {
 
 /*   Remove the PATH entry */
@@ -311,8 +311,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_accept_netdeinit 
-( 
+void ant_accept_netdeinit
+(
 int *status                            /* global status (give and returned) */
 )
 
@@ -322,17 +322,17 @@ int *status                            /* global status (give and returned) */
 *     ANT_ACCEPT_NETDEINIT
 
 *  Purpose:
-*     Accept a netdeinit message 
+*     Accept a netdeinit message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Find the relevant N_PATH entry from information in the 
+*     Find the relevant N_PATH entry from information in the
 *     received message.
 *     Forward a deinit message to the local task.
-*     Search for any transactions associated with the N_PATH entry. Send 
-*     deinit messages to their associated queues and annul the 
+*     Search for any transactions associated with the N_PATH entry. Send
+*     deinit messages to their associated queues and annul the
 *     transaction entries.
 *     Annul the N_PATH entry.
 
@@ -381,17 +381,17 @@ int *status                            /* global status (give and returned) */
       return;
    }
 
-   if ( n_paths[path].path_state == ANT__THIS_P ) 
+   if ( n_paths[path].path_state == ANT__THIS_P )
    {
 
-/*   The local task is waiting for the reply to an INIT. 
+/*   The local task is waiting for the reply to an INIT.
      Send the DEINIT to the queue expecting the acknowledgement. */
 
       outbuf.mess_in_type = C_REM_DEINIT_IN;
-      outbuf.u.rem_deinit_in.local_task_t_path_num = 
+      outbuf.u.rem_deinit_in.local_task_t_path_num =
         n_paths[path].local_task_t_path_num;
       istat = SAI__OK;
-      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN, 
+      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN,
         n_paths[path].local_task_reminit_ack_q, command_q, &istat );
 
 /*   Remove the PATH entry */
@@ -404,23 +404,23 @@ int *status                            /* global status (give and returned) */
       n_paths[path].path_state = ANT__NULL_P;
 
    }
-   else if ( n_paths[path].path_state == ANT__FULL_P ) 
+   else if ( n_paths[path].path_state == ANT__FULL_P )
    {
 
 /*   Build a structure and send it to the target task's command queue */
 
       outbuf.mess_in_type = C_REM_DEINIT_IN;
-      outbuf.u.rem_deinit_in.local_task_t_path_num = 
+      outbuf.u.rem_deinit_in.local_task_t_path_num =
         n_paths[path].local_task_t_path_num;
       istat = SAI__OK;
-      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN, 
+      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN,
         n_paths[path].local_task_q, command_q, &istat );
 
 /*   Search for active transactions and close them */
 
       for ( trans_num=0; trans_num<MESSYS__MXTRANS; trans_num++ )
       {
-         if ( path == n_trans[trans_num].local_nettask_n_path_num ) 
+         if ( path == n_trans[trans_num].local_nettask_n_path_num )
          {
             n_trans[trans_num].local_nettask_n_path_num = MESSYS__NULL_P;
             n_trans[trans_num].local_task_t_num = MESSYS__NULL_T;
@@ -439,7 +439,7 @@ int *status                            /* global status (give and returned) */
       n_paths[path].path_state = ANT__NULL_P;
 
    }
-   else if ( n_paths[path].path_state == ANT__OTHER_P ) 
+   else if ( n_paths[path].path_state == ANT__OTHER_P )
    {
 
 /*   Remove the PATH entry */
@@ -462,8 +462,8 @@ int *status                            /* global status (give and returned) */
 
 
 
-void ant_accept_netinit 
-( 
+void ant_accept_netinit
+(
 int machnum,                         /* index to other machine details
                                         (given) */
 int *status                          /* global status (give and returned) */
@@ -475,7 +475,7 @@ int *status                          /* global status (give and returned) */
 *     ANT_ACCEPT_NETINIT
 
 *  Purpose:
-*     Accept a netinit message 
+*     Accept a netinit message
 
 *  Language:
 *     Starlink C
@@ -484,7 +484,7 @@ int *status                          /* global status (give and returned) */
 *     Search the common blocks for an unused N_PATH entry.
 *     Put partial information into it from the received message.
 *     Open communications with the target task on this machine.
-*     On error, return a DEINIT message across the network and annul the 
+*     On error, return a DEINIT message across the network and annul the
 *     new N_PATH entry.
 
 *  Authors:
@@ -526,7 +526,7 @@ int *status                          /* global status (give and returned) */
    found = 0;
    for ( path=0; path<MESSYS__MXPATH; path++)
    {
-      if ( n_paths[path].path_state == ANT__NULL_P ) 
+      if ( n_paths[path].path_state == ANT__NULL_P )
       {
          found = 1;
          break;
@@ -546,10 +546,10 @@ int *status                          /* global status (give and returned) */
 
       strcpy ( mspname, n_paths[path].local_taskname );
 
-      msp_get_task_queue ( mspname, 
+      msp_get_task_queue ( mspname,
         &(n_paths[path].local_task_q), status );
 
-      if ( *status == SAI__OK ) 
+      if ( *status == SAI__OK )
       {
 
 /*   Build a structure and send it to the target task */
@@ -559,16 +559,16 @@ int *status                          /* global status (give and returned) */
            n_paths[path].remote_taskname );
          strcpy ( outbuf.u.rem_init_in.local_taskname,
            n_paths[path].local_taskname );
-         strcpy ( outbuf.u.rem_init_in.remote_machine_name, 
+         strcpy ( outbuf.u.rem_init_in.remote_machine_name,
            n_mach[machnum].machine_names );
          outbuf.u.rem_init_in.local_nettask_n_path_num = path;
-         msp_send_message ( (char *)&outbuf, C_REM_INIT_IN_LEN, 
+         msp_send_message ( (char *)&outbuf, C_REM_INIT_IN_LEN,
            n_paths[path].local_task_q, command_q, status );
       }
-                           
+
    }
 
-   if ( ( found == 0 ) || ( *status != SAI__OK ) ) 
+   if ( ( found == 0 ) || ( *status != SAI__OK ) )
    {
 
 /*   Send a rejection across the network */
@@ -577,7 +577,7 @@ int *status                          /* global status (give and returned) */
       ntype = htonl ( C_NET_DEINIT_OUT );
       memcpy ( netbuffer, &ntype, 4 );
       memcpy ( d_rpath, i_spath, 4 );
-      sock_write ( n_mach[machnum].local_channel, 
+      sock_write ( n_mach[machnum].local_channel,
         C_NET_MAXMSG_LEN, netbuffer, status );
 
 /*   Bad status ignored. There is nothing useful can be done. */
@@ -598,8 +598,8 @@ int *status                          /* global status (give and returned) */
 
 
 
-void ant_call_out 
-( 
+void ant_call_out
+(
 struct a_rem_call_out rem_call_out, /* the received message (given) */
 sendq_type reply_q,                 /* task reply queue (given) */
 int *status                         /* global status (give and returned) */
@@ -611,15 +611,15 @@ int *status                         /* global status (give and returned) */
 *     ANT_CALL_OUT
 
 *  Purpose:
-*     Handle request to make network call 
+*     Handle request to make network call
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Get the name of the target machine from the given message. Check 
-*     the ANT common blocks to see if a link to it exists. If not, open 
-*     a network connection to it. Return an acknowledgement to the 
+*     Get the name of the target machine from the given message. Check
+*     the ANT common blocks to see if a link to it exists. If not, open
+*     a network connection to it. Return an acknowledgement to the
 *     requesting task.
 
 *  Authors:
@@ -655,21 +655,21 @@ int *status                         /* global status (give and returned) */
    for ( machnum=0; machnum<MESSYS__MXMACH; machnum++ )
    {
       if ( strcmp ( n_mach[machnum].machine_names,
-        rem_call_out.remote_machine_name ) == 0 ) 
+        rem_call_out.remote_machine_name ) == 0 )
       {
          found = 1;
          break;
       }
    }
 
-   if ( found == 0 ) 
+   if ( found == 0 )
    {
 
 /*   Need to open a network link. */
 
-      ant_opennet ( rem_call_out.remote_machine_name, 
+      ant_opennet ( rem_call_out.remote_machine_name,
         reply_q, status );
-      if ( *status != SAI__OK ) 
+      if ( *status != SAI__OK )
       {
 
 /*   Return an informational message */
@@ -677,33 +677,33 @@ int *status                         /* global status (give and returned) */
          reply.mess_in_type = C_REM_ACCEPT_IN;
          reply.u.rem_accept_in.accept_status = *status;
          *status = SAI__OK;
-         msp_send_message ( (char *)&reply, C_REM_ACCEPT_IN_LEN, 
+         msp_send_message ( (char *)&reply, C_REM_ACCEPT_IN_LEN,
            reply_q, command_q, status );
       }
 
    }
-   else if ( n_mach[machnum].mach_state == ANT__THIS_START ) 
+   else if ( n_mach[machnum].mach_state == ANT__THIS_START )
    {
 
-/*   Connection to other machine has been already been requested by 
-     an ADAM task on this machine but is not yet complete. 
+/*   Connection to other machine has been already been requested by
+     an ADAM task on this machine but is not yet complete.
      Return an informational message. */
 
       reply.mess_in_type = C_REM_ACCEPT_IN;
       reply.u.rem_accept_in.accept_status = ANT__CONTEND;
-      msp_send_message ( (char *)&reply, C_REM_ACCEPT_IN_LEN, 
+      msp_send_message ( (char *)&reply, C_REM_ACCEPT_IN_LEN,
         reply_q, command_q, status );
 
    }
    else
    {
 
-/*  Connection to other machine is already complete. Return an 
+/*  Connection to other machine is already complete. Return an
     ACCEPT message. */
 
       reply.mess_in_type = C_REM_ACCEPT_IN;
       reply.u.rem_accept_in.accept_status = SAI__OK;
-      msp_send_message ( (char *)&reply, C_REM_ACCEPT_IN_LEN, 
+      msp_send_message ( (char *)&reply, C_REM_ACCEPT_IN_LEN,
         reply_q, command_q, status );
 
    }
@@ -712,8 +712,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_commq 
-( 
+void ant_commq
+(
 struct a_mess_out rxbuf,   /* the received message (given) */
 sendq_type reply_q,        /* reply queue for the message (given) */
 int *status                /* global status (given and returned) */
@@ -725,14 +725,14 @@ int *status                /* global status (given and returned) */
 *     ANT_COMMQ
 
 *  Purpose:
-*     Handle messages received on the command queue 
+*     Handle messages received on the command queue
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     The given message will have been sent by an ADAM task on this 
-*     machine. The message will be one of the MESSYS REM_ data structures. 
+*     The given message will have been sent by an ADAM task on this
+*     machine. The message will be one of the MESSYS REM_ data structures.
 *     Inspect its TYPE flag to see what action is requested.
 
 *  Authors:
@@ -758,35 +758,35 @@ int *status                /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   if ( rxbuf.mess_out_type == C_REM_CALL_OUT ) 
+   if ( rxbuf.mess_out_type == C_REM_CALL_OUT )
    {
       ant_call_out ( rxbuf.u.rem_call_out, reply_q, status );
    }
-   else if ( rxbuf.mess_out_type == C_REM_ACK_OUT ) 
+   else if ( rxbuf.mess_out_type == C_REM_ACK_OUT )
    {
       ant_send_netack ( rxbuf.u.rem_ack_out, reply_q, status );
    }
-   else if ( rxbuf.mess_out_type == C_REM_DEINIT_OUT ) 
+   else if ( rxbuf.mess_out_type == C_REM_DEINIT_OUT )
    {
       ant_send_netdeinit ( rxbuf.u.rem_deinit_out, status );
    }
-   else if ( rxbuf.mess_out_type == C_REM_INIT_OUT ) 
+   else if ( rxbuf.mess_out_type == C_REM_INIT_OUT )
    {
       ant_send_netinit ( rxbuf.u.rem_init_out, reply_q, status );
    }
-   else if ( rxbuf.mess_out_type == C_REM_GSOC_START_OUT ) 
+   else if ( rxbuf.mess_out_type == C_REM_GSOC_START_OUT )
    {
       ant_send_start_out ( rxbuf.u.rem_gsoc_start_out, reply_q, status );
    }
-   else if ( rxbuf.mess_out_type == C_REM_MSG_OUT ) 
+   else if ( rxbuf.mess_out_type == C_REM_MSG_OUT )
    {
       ant_send_ack_out ( rxbuf.u.rem_msg_out, reply_q, status );
    }
-   else if ( rxbuf.mess_out_type == C_REM_GSOC_END_OUT ) 
+   else if ( rxbuf.mess_out_type == C_REM_GSOC_END_OUT )
    {
       ant_send_end_out ( rxbuf.u.rem_msg_out, status );
    }
-   else if ( rxbuf.mess_out_type == C_LOC_GSOC_START_OUT ) 
+   else if ( rxbuf.mess_out_type == C_LOC_GSOC_START_OUT )
    {
 
 /*      Request for diagnostics */
@@ -802,8 +802,8 @@ int *status                /* global status (given and returned) */
 
 
 
-void ant_connect 
-( 
+void ant_connect
+(
 char *rmach,               /* name of remote machine (given) */
 int *channel,              /* i/o channel for communications,
                               bound to a socket (returned) */
@@ -816,7 +816,7 @@ int *status                /* global status (give and returned) */
 *     ANT_CONNECT
 
 *  Purpose:
-*     Connect to an adamnet on another machine 
+*     Connect to an adamnet on another machine
 
 *  Language:
 *     Starlink C
@@ -827,7 +827,7 @@ int *status                /* global status (give and returned) */
 *     socket.
 
 *  Authors:
-*     B.D.Kelly (REVAD::BDK) 
+*     B.D.Kelly (REVAD::BDK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -874,8 +874,8 @@ int *status                /* global status (give and returned) */
 
 
 
-void ant_discon 
-( 
+void ant_discon
+(
 int machnum,       /* machine number associated with the call to
                       be disconnected (given) */
 int *status        /* global status (give and returned) */
@@ -887,7 +887,7 @@ int *status        /* global status (give and returned) */
 *     ANT_DISCON
 
 *  Purpose:
-*     Disconnect a network call 
+*     Disconnect a network call
 
 *  Language:
 *     Starlink C
@@ -948,11 +948,11 @@ int *status        /* global status (give and returned) */
 
    for ( path=0; path<MESSYS__MXPATH; path++ )
    {
-      if ( machnum == n_paths[path].local_machine_num ) 
+      if ( machnum == n_paths[path].local_machine_num )
       {
          for ( trans_num=0; trans_num<MESSYS__MXTRANS; trans_num++)
          {
-            if ( path == n_trans[trans_num].local_nettask_n_path_num ) 
+            if ( path == n_trans[trans_num].local_nettask_n_path_num )
             {
                if ( ( n_trans[trans_num].trans_state == ANT__FULL_T ) ||
                  ( n_trans[trans_num].trans_state == ANT__THIS_T ) )
@@ -961,14 +961,14 @@ int *status        /* global status (give and returned) */
 /*   Construct the message and send it to the task */
 
                   t_close.mess_in_type = C_REM_GSOC_END_IN;
-                  t_close.u.rem_msg_in.local_task_t_trans_num = 
+                  t_close.u.rem_msg_in.local_task_t_trans_num =
                     n_trans[trans_num].local_task_t_num;
                   t_close.u.rem_msg_in.local_nettask_n_trans_num = trans_num;
                   t_close.u.rem_msg_in.gsoc_flag = OBEY;
                   strcpy ( t_close.u.rem_msg_in.gsoc_name, "NETDISCON" );
                   t_close.u.rem_msg_in.gsoc_len = 26;
                   t_close.u.rem_msg_in.gsoc_status = ANT__NETSHUT;
-                  strcpy ( t_close.u.rem_msg_in.gsoc_value, 
+                  strcpy ( t_close.u.rem_msg_in.gsoc_value,
                     "network call disconnected" );
 
                   istat = SAI__OK;
@@ -981,7 +981,7 @@ int *status        /* global status (give and returned) */
                n_trans[trans_num].local_nettask_n_path_num =
                  MESSYS__NULL_P;
                n_trans[trans_num].local_task_t_num = MESSYS__NULL_T;
-               n_trans[trans_num].remote_nettask_n_trans_num = 
+               n_trans[trans_num].remote_nettask_n_trans_num =
                  MESSYS__NULL_T;
                n_trans[trans_num].trans_state = ANT__NULL_T;
             }
@@ -990,19 +990,19 @@ int *status        /* global status (give and returned) */
 /*   Close the path */
 
          p_close.mess_in_type = C_REM_DEINIT_IN;
-         p_close.u.rem_deinit_in.local_task_t_path_num = 
+         p_close.u.rem_deinit_in.local_task_t_path_num =
            n_paths[path].local_task_t_path_num;
 
          istat = SAI__OK;
-         if ( n_paths[path].path_state == ANT__THIS_P ) 
+         if ( n_paths[path].path_state == ANT__THIS_P )
          {
-            msp_send_message ( (char *)&p_close, C_REM_DEINIT_IN_LEN, 
+            msp_send_message ( (char *)&p_close, C_REM_DEINIT_IN_LEN,
               n_paths[path].local_task_reminit_ack_q, command_q, &istat );
          }
-         else if ( n_paths[path].path_state == ANT__FULL_P ) 
+         else if ( n_paths[path].path_state == ANT__FULL_P )
 
          {
-            msp_send_message ( (char *)&p_close, C_REM_DEINIT_IN_LEN, 
+            msp_send_message ( (char *)&p_close, C_REM_DEINIT_IN_LEN,
               n_paths[path].local_task_q, command_q, &istat );
          }
 
@@ -1019,8 +1019,8 @@ int *status        /* global status (give and returned) */
 
 
 
-void ant_exit 
-( 
+void ant_exit
+(
 /* int *status  */                       /* global status (give and returned) */
 void
 )
@@ -1031,15 +1031,15 @@ void
 *     ANT_EXIT
 
 *  Purpose:
-*     The ADAMNET exit handler 
+*     The ADAMNET exit handler
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Search the lists of PATHs and TRANSACTIONs and send deinit 
-*     messages to all the relevant queues. It is not necessary to send 
-*     messages to the remote machine because the network itself should 
+*     Search the lists of PATHs and TRANSACTIONs and send deinit
+*     messages to all the relevant queues. It is not necessary to send
+*     messages to the remote machine because the network itself should
 *     report the exit of this process to ADAMNET on the other machine.
 *     Close the listen socket.
 
@@ -1078,10 +1078,10 @@ void
         ( n_paths[path].path_state == ANT__THIS_P ) )
       {
          outbuf.mess_in_type = C_REM_DEINIT_IN;
-         outbuf.u.rem_deinit_in.local_task_t_path_num = 
+         outbuf.u.rem_deinit_in.local_task_t_path_num =
            n_paths[path].local_task_t_path_num;
          istat = SAI__OK;
-         msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN, 
+         msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN,
            n_paths[path].local_task_q, command_q, &istat );
       }
    }
@@ -1092,8 +1092,8 @@ void
 
 
 
-void ant_forward_ack_in 
-( 
+void ant_forward_ack_in
+(
 int *status                      /* global status (given and returned) */
 )
 
@@ -1103,14 +1103,14 @@ int *status                      /* global status (given and returned) */
 *     ANT_FORWARD_ACK_IN
 
 *  Purpose:
-*     Forward a network message to the target task 
+*     Forward a network message to the target task
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a NET_MSG_IN, forward it to the target task and make 
-*     the necessary entries in the common blocks. In the event of 
+*     Given a NET_MSG_IN, forward it to the target task and make
+*     the necessary entries in the common blocks. In the event of
 *     failure, do what tidying is possible.
 *     Check the indicated path and transaction number are valid.
 *     Complete the N_TRANS entry if necessary.
@@ -1154,7 +1154,7 @@ int *status                      /* global status (given and returned) */
    memcpy ( &ntrans, m_rtrans, 4);
    trans_num = ntohl ( ntrans );
 
-   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) ) 
+   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) )
    {
       path = n_trans[trans_num].local_nettask_n_path_num;
    }
@@ -1167,7 +1167,7 @@ int *status                      /* global status (given and returned) */
    }
 
    if ( ( path != MESSYS__NULL_P ) &&
-     ( n_paths[path].path_state == ANT__FULL_P ) ) 
+     ( n_paths[path].path_state == ANT__FULL_P ) )
    {
       if ( n_trans[trans_num].trans_state != ANT__FULL_T )
       {
@@ -1175,7 +1175,7 @@ int *status                      /* global status (given and returned) */
 /*   Complete the transaction details. */
 
          memcpy ( &ntrans, m_strans, 4 );
-         n_trans[trans_num].remote_nettask_n_trans_num = 
+         n_trans[trans_num].remote_nettask_n_trans_num =
            ntohl ( ntrans );
          n_trans[trans_num].trans_state = ANT__FULL_T;
       }
@@ -1183,7 +1183,7 @@ int *status                      /* global status (given and returned) */
 /*   Construct the message and send it to the task */
 
       outbuf.mess_in_type = C_REM_MSG_IN;
-      outbuf.u.rem_msg_in.local_task_t_trans_num = 
+      outbuf.u.rem_msg_in.local_task_t_trans_num =
         n_trans[trans_num].local_task_t_num;
       outbuf.u.rem_msg_in.local_nettask_n_trans_num = trans_num;
       memcpy ( &nflag, m_flag, 4 );
@@ -1196,29 +1196,29 @@ int *status                      /* global status (given and returned) */
       outbuf.u.rem_msg_in.gsoc_status = ntohl ( nstatus );
       memcpy ( outbuf.u.rem_msg_in.gsoc_value, m_value,
         outbuf.u.rem_msg_in.gsoc_len  );
-      length = C_REM_MSG_IN_LEN - MSG_VAL_LEN + 
+      length = C_REM_MSG_IN_LEN - MSG_VAL_LEN +
         outbuf.u.rem_msg_in.gsoc_len;
 
       msp_send_message ( (char *)&outbuf, length,
         n_trans[trans_num].local_task_ack_q, command_q, status );
 
    }
-   else if ( path == MESSYS__NULL_P ) 
+   else if ( path == MESSYS__NULL_P )
    {
 
-/*   The path is nonexistent. This means that the communication route 
+/*   The path is nonexistent. This means that the communication route
      back to the other machine is also unknown.
-     Trust that this has happened because the incoming message has 
+     Trust that this has happened because the incoming message has
      crossed with an outgoing DEINIT. So do nothing. */
    }
    else
    {
 
-/*  The path is partly installed. Something has got out of step. 
-    This should be impossible unless it has arisen by the PATH 
-    number being reused. In which case, the incoming message has 
-    crossed with an outgoing DEINIT message. The entry in the 
-    N_PATH structure doesn't have anything to do with the incoming 
+/*  The path is partly installed. Something has got out of step.
+    This should be impossible unless it has arisen by the PATH
+    number being reused. In which case, the incoming message has
+    crossed with an outgoing DEINIT message. The entry in the
+    N_PATH structure doesn't have anything to do with the incoming
     message, so DO NOTHING. */
 
 
@@ -1228,8 +1228,8 @@ int *status                      /* global status (given and returned) */
 
 
 
-void ant_forward_end_in 
-( 
+void ant_forward_end_in
+(
 int *status                       /* global status (give and returned) */
 )
 
@@ -1239,14 +1239,14 @@ int *status                       /* global status (give and returned) */
 *     ANT_FORWARD_END_IN
 
 *  Purpose:
-*     Forward a net END_IN message 
+*     Forward a net END_IN message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a NET_GSOC_END_IN, forward it to the target task and make 
-*     the necessary entries in the common blocks. 
+*     Given a NET_GSOC_END_IN, forward it to the target task and make
+*     the necessary entries in the common blocks.
 *     Check the indicated path and transaction number are valid.
 *     Send the GSOC_END to the target task on this machine.
 *     Remove the transaction.
@@ -1288,7 +1288,7 @@ int *status                       /* global status (give and returned) */
 
    memcpy ( &ntrans, m_rtrans, 4 );
    trans_num = ntohl ( ntrans );
-   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) ) 
+   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) )
    {
       path = n_trans[trans_num].local_nettask_n_path_num;
    }
@@ -1301,7 +1301,7 @@ int *status                       /* global status (give and returned) */
    }
 
    if ( ( path != MESSYS__NULL_P ) &&
-     ( n_paths[path].path_state == ANT__FULL_P ) ) 
+     ( n_paths[path].path_state == ANT__FULL_P ) )
    {
       if ( ( n_trans[trans_num].trans_state == ANT__FULL_T ) ||
         ( n_trans[trans_num].trans_state == ANT__THIS_T ) )
@@ -1310,12 +1310,12 @@ int *status                       /* global status (give and returned) */
 /*   Construct the message and send it to the task */
 
          outbuf.mess_in_type = C_REM_GSOC_END_IN;
-         outbuf.u.rem_msg_in.local_task_t_trans_num = 
+         outbuf.u.rem_msg_in.local_task_t_trans_num =
            n_trans[trans_num].local_task_t_num;
          outbuf.u.rem_msg_in.local_nettask_n_trans_num = trans_num;
          memcpy ( &nflag, m_flag, 4 );
          outbuf.u.rem_msg_in.gsoc_flag = ntohl ( nflag );
-         strcpy ( outbuf.u.rem_msg_in.gsoc_name, m_name ); 
+         strcpy ( outbuf.u.rem_msg_in.gsoc_name, m_name );
          memcpy ( &nlen, m_len, 4 );
          outbuf.u.rem_msg_in.gsoc_len = ntohl ( nlen );
       ANT_CHECKLEN(outbuf.u.rem_msg_in.gsoc_len);
@@ -1323,7 +1323,7 @@ int *status                       /* global status (give and returned) */
          outbuf.u.rem_msg_in.gsoc_status = ntohl ( nstatus );
          memcpy ( outbuf.u.rem_msg_in.gsoc_value, m_value,
            outbuf.u.rem_msg_in.gsoc_len );
-         length = C_REM_MSG_IN_LEN - MSG_VAL_LEN + 
+         length = C_REM_MSG_IN_LEN - MSG_VAL_LEN +
            outbuf.u.rem_msg_in.gsoc_len;
 
          msp_send_message ( (char *)&outbuf, length,
@@ -1338,23 +1338,23 @@ int *status                       /* global status (give and returned) */
       n_trans[trans_num].trans_state = ANT__NULL_T;
 
    }
-   else if ( path == MESSYS__NULL_P ) 
+   else if ( path == MESSYS__NULL_P )
    {
 
-/*   The path is nonexistent. This means that the communication route 
+/*   The path is nonexistent. This means that the communication route
      back to the other machine is also unknown.
-     Trust that this has happened because the incoming message has 
+     Trust that this has happened because the incoming message has
      crossed with an outgoing DEINIT. So do nothing. */
 
    }
    else
    {
 
-/*   The path is partly installed. Something has got out of step. 
-     This should be impossible unless it has arisen by the PATH 
-     number being reused. In which case, the incoming message has 
-     crossed with an outgoing DEINIT message. The entry in the 
-     N_PATH structure doesn't have anything to do with the incoming 
+/*   The path is partly installed. Something has got out of step.
+     This should be impossible unless it has arisen by the PATH
+     number being reused. In which case, the incoming message has
+     crossed with an outgoing DEINIT message. The entry in the
+     N_PATH structure doesn't have anything to do with the incoming
      message, so DO NOTHING. */
 
    }
@@ -1363,8 +1363,8 @@ int *status                       /* global status (give and returned) */
 
 
 
-void ant_forward_start_in 
-( 
+void ant_forward_start_in
+(
 int *status                         /* global status (give and returned) */
 )
 
@@ -1374,20 +1374,20 @@ int *status                         /* global status (give and returned) */
 *     ANT_FORWARD_START_IN
 
 *  Purpose:
-*     Forward a net GSOC start message 
+*     Forward a net GSOC start message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a NET_GSOC_START, forward it to the target task and make the 
-*     necessary entries in the common blocks. In the event of failure, 
+*     Given a NET_GSOC_START, forward it to the target task and make the
+*     necessary entries in the common blocks. In the event of failure,
 *     return a GSOC_END message across the network.
 *     Check the indicated path is valid
 *     Search the common blocks for an unused N_TRANS entry.
 *     Put partial information into it from the received message.
 *     Send the GSOC_START to the target task on this machine.
-*     On error, return a GSOC_END message across the network if 
+*     On error, return a GSOC_END message across the network if
 *     relevant.
 
 *  Authors:
@@ -1448,10 +1448,10 @@ int *status                         /* global status (give and returned) */
    memcpy ( &npath, g_rpath, 4 );
    path = ntohl ( npath );
 
-   if ( ( path >=0 ) && ( path < MESSYS__MXPATH ) ) 
+   if ( ( path >=0 ) && ( path < MESSYS__MXPATH ) )
    {
 
-      if ( n_paths[path].path_state == ANT__FULL_P ) 
+      if ( n_paths[path].path_state == ANT__FULL_P )
       {
 
 /*   Look for a free transaction slot. */
@@ -1460,27 +1460,27 @@ int *status                         /* global status (give and returned) */
 
          for ( trans_num=0; trans_num<MESSYS__MXTRANS; trans_num++ )
          {
-            if ( n_trans[trans_num].trans_state == ANT__NULL_T ) 
+            if ( n_trans[trans_num].trans_state == ANT__NULL_T )
             {
                found = 1;
                break;
             }
          }
 
-         if ( found == 1 ) 
+         if ( found == 1 )
          {
             n_trans[trans_num].trans_state = ANT__OTHER_T;
             n_trans[trans_num].local_nettask_n_path_num = path;
             memcpy ( &ntrans, g_strans, 4 );
-            n_trans[trans_num].remote_nettask_n_trans_num = 
+            n_trans[trans_num].remote_nettask_n_trans_num =
               ntohl ( ntrans );
 
 /*   Construct the message and send it to the task */
 
             outbuf.mess_in_type = C_REM_GSOC_START_IN;
-            outbuf.u.rem_gsoc_start_in.local_task_t_path_num = 
+            outbuf.u.rem_gsoc_start_in.local_task_t_path_num =
               n_paths[path].local_task_t_path_num;
-            outbuf.u.rem_gsoc_start_in.local_nettask_n_trans_num = 
+            outbuf.u.rem_gsoc_start_in.local_nettask_n_trans_num =
               trans_num;
             memcpy ( &nflag, g_flag, 4 );
             outbuf.u.rem_gsoc_start_in.gsoc_flag = ntohl ( nflag );
@@ -1488,7 +1488,7 @@ int *status                         /* global status (give and returned) */
             memcpy ( &nlen, g_len, 4 );
             outbuf.u.rem_gsoc_start_in.gsoc_len = ntohl ( nlen );
             ANT_CHECKLEN(outbuf.u.rem_gsoc_start_in.gsoc_len);
-            memcpy ( outbuf.u.rem_gsoc_start_in.gsoc_value, g_value, 
+            memcpy ( outbuf.u.rem_gsoc_start_in.gsoc_value, g_value,
               outbuf.u.rem_gsoc_start_in.gsoc_len );
             length = C_REM_GSOC_START_IN_LEN - MSG_VAL_LEN +
               outbuf.u.rem_gsoc_start_in.gsoc_len;
@@ -1526,15 +1526,15 @@ int *status                         /* global status (give and returned) */
             memcpy ( m_value, in_value, MSG_VAL_LEN );
             machnum = n_paths[path].local_machine_num;
 
-            sock_write ( n_mach[machnum].local_channel, 
+            sock_write ( n_mach[machnum].local_channel,
               C_NET_MAXMSG_LEN, netbuffer, status );
          }
-                           
+
       }
       else
       {
 
-/*   Shouldn't happen. The message must have crossed with a DEINIT 
+/*   Shouldn't happen. The message must have crossed with a DEINIT
      and the path number in it is no longer relevant to this NETTASK.
      DO NOTHING. */
 
@@ -1544,7 +1544,7 @@ int *status                         /* global status (give and returned) */
    else
    {
 
-/*   Shouldn't happen. Can't do anything in the way of sending 
+/*   Shouldn't happen. Can't do anything in the way of sending
      messages. */
 
       *status = ANT__IVPATH;
@@ -1555,8 +1555,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_init 
-( 
+void ant_init
+(
 int *status                         /* global status (give and returned) */
 )
 
@@ -1566,7 +1566,7 @@ int *status                         /* global status (give and returned) */
 *     ANT_INIT
 
 *  Purpose:
-*     Initialise the ANT library 
+*     Initialise the ANT library
 
 *  Language:
 *     Starlink C
@@ -1712,7 +1712,7 @@ int *status                         /* global status (give and returned) */
 
    msp_enter_task ( this_machine, &command_q, status );
 
-/*   Create a queue for receiving messages forwarded from the 
+/*   Create a queue for receiving messages forwarded from the
      signal-handling routine. */
 
    msp_create_localq ( &networks_q, &networkr_q, status );
@@ -1730,8 +1730,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_listen 
-( 
+void ant_listen
+(
 int *status                         /* global status (give and returned) */
 )
 
@@ -1741,7 +1741,7 @@ int *status                         /* global status (give and returned) */
 *     ANT_LISTEN
 
 *  Purpose:
-*     Start an asynchronous connection acceptance 
+*     Start an asynchronous connection acceptance
 
 *  Language:
 *     Starlink C
@@ -1783,14 +1783,14 @@ int *status                         /* global status (give and returned) */
    found = 0;
    for ( machnum=0; machnum<MESSYS__MXMACH; machnum++ )
    {
-      if ( n_mach[machnum].mach_state == ANT__NULL_MACH ) 
+      if ( n_mach[machnum].mach_state == ANT__NULL_MACH )
       {
          found = 1;
          break;
       }
    }
 
-   if ( found == 0 ) 
+   if ( found == 0 )
    {
       *status = ANT__TOOMANY;
    }
@@ -1806,7 +1806,7 @@ int *status                         /* global status (give and returned) */
       }
 
       optval = 1;
-      istat = setsockopt ( listen_channel, SOL_SOCKET, SO_REUSEADDR, 
+      istat = setsockopt ( listen_channel, SOL_SOCKET, SO_REUSEADDR,
         (char *)&optval, sizeof(optval) );
       if ( istat != 0 )
       {
@@ -1862,8 +1862,8 @@ int *status                         /* global status (give and returned) */
 }
 
 
-void ant_netmsg 
-( 
+void ant_netmsg
+(
 int machnum,         /* index to the received message (given) */
 int *status          /* global status (give and returned) */
 )
@@ -1874,14 +1874,14 @@ int *status          /* global status (give and returned) */
 *     ANT_NETMSG
 
 *  Purpose:
-*     Handle messages received across the network 
+*     Handle messages received across the network
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
 *     Read the message.
-*     Identify message type and pass the relevant structure component to 
+*     Identify message type and pass the relevant structure component to
 *     the corresponding routine.
 
 *  Authors:
@@ -1910,12 +1910,12 @@ int *status          /* global status (give and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   sock_read ( n_mach[machnum].local_channel, C_NET_MAXMSG_LEN, 
+   sock_read ( n_mach[machnum].local_channel, C_NET_MAXMSG_LEN,
      netbuffer, status );
 
 /*   Extract the message type field and convert from network format */
 
-   if ( *status == SAI__OK ) 
+   if ( *status == SAI__OK )
    {
 
       memcpy ( (char *)&intype, netbuffer, 4 );
@@ -1929,11 +1929,11 @@ int *status          /* global status (give and returned) */
       {
          ant_accept_netack ( status );
       }
-      else if ( messtype == C_NET_DEINIT_IN ) 
+      else if ( messtype == C_NET_DEINIT_IN )
       {
          ant_accept_netdeinit ( status );
       }
-      else if ( messtype == C_NET_GSOC_START_IN ) 
+      else if ( messtype == C_NET_GSOC_START_IN )
       {
          ant_forward_start_in ( status );
       }
@@ -1941,7 +1941,7 @@ int *status          /* global status (give and returned) */
       {
          ant_forward_ack_in ( status );
       }
-      else if ( messtype == C_NET_GSOC_END_IN ) 
+      else if ( messtype == C_NET_GSOC_END_IN )
       {
          ant_forward_end_in ( status );
       }
@@ -1965,7 +1965,7 @@ int *status          /* global status (give and returned) */
 
 
 void ant_network
-( 
+(
 int *status          /* global status (give and returned) */
 )
 
@@ -1975,7 +1975,7 @@ int *status          /* global status (give and returned) */
 *     ANT_NETWORK
 
 *  Purpose:
-*     Handle messages received across the network 
+*     Handle messages received across the network
 
 *  Language:
 *     Starlink C
@@ -2027,7 +2027,7 @@ int *status          /* global status (give and returned) */
 
       wait.tv_sec = 0;
       wait.tv_usec = 0;
-      nready = select ( FD_SETSIZE, &read_mask, (fd_set *)0, (fd_set *)0, 
+      nready = select ( FD_SETSIZE, &read_mask, (fd_set *)0, (fd_set *)0,
         &wait );
 
       if ( nready > 0 )
@@ -2067,9 +2067,9 @@ int *status          /* global status (give and returned) */
 
 
 
-void ant_obey 
-( 
-struct a_loc_gsoc_start_out loc_gsoc_start_out, /* the incoming message 
+void ant_obey
+(
+struct a_loc_gsoc_start_out loc_gsoc_start_out, /* the incoming message
                                                  (given) */
 int *status                         /* global status (give and returned) */
 )
@@ -2080,13 +2080,13 @@ int *status                         /* global status (give and returned) */
 *     ANT_OBEY
 
 *  Purpose:
-*     Obey a command to dump diagnostics 
+*     Obey a command to dump diagnostics
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     A message has been received requesting ADAMNET to output 
+*     A message has been received requesting ADAMNET to output
 *     diagnostics.
 *     Write the contents of the ADAMNET common blocks to a text file.
 
@@ -2131,7 +2131,7 @@ int *status                         /* global status (give and returned) */
    found = 0;
    for ( machnum=0; machnum<MESSYS__MXMACH; machnum++ )
    {
-      if ( n_mach[machnum].mach_state != ANT__NULL_MACH ) 
+      if ( n_mach[machnum].mach_state != ANT__NULL_MACH )
       {
          found = 1;
          fprintf ( fd, "%s  %d  %d  %d\n",
@@ -2141,7 +2141,7 @@ int *status                         /* global status (give and returned) */
            n_mach[machnum].mach_state );
       }
    }
-   if ( found == 0 ) 
+   if ( found == 0 )
    {
       fprintf ( fd, "No machines known\n" );
    }
@@ -2153,7 +2153,7 @@ int *status                         /* global status (give and returned) */
    found = 0;
    for ( path=0; path<MESSYS__MXPATH; path++ )
    {
-      if ( n_paths[path].path_state != ANT__NULL_P ) 
+      if ( n_paths[path].path_state != ANT__NULL_P )
       {
          found = 1;
          fprintf ( fd, "%s  %s %d\n",
@@ -2162,7 +2162,7 @@ int *status                         /* global status (give and returned) */
            n_paths[path].path_state );
       }
    }
-   if ( found == 0 ) 
+   if ( found == 0 )
    {
       fprintf ( fd, "No paths known\n" );
    }
@@ -2175,10 +2175,10 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_opennet 
-( 
+void ant_opennet
+(
 char *remote_machine_name,  /* name of other machine (given) */
-sendq_type accept_q,        /* queue for sending acknowledgement to task 
+sendq_type accept_q,        /* queue for sending acknowledgement to task
                                on this machine (given) */
 int *status                 /* global status (give and returned) */
 )
@@ -2189,21 +2189,21 @@ int *status                 /* global status (give and returned) */
 *     ANT_OPENNET
 
 *  Purpose:
-*     Initiate communication with a task across a network 
+*     Initiate communication with a task across a network
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
 *     Initiate the call.
-*     If the connection request was successful return an 
-*     ACK_INIT message to the ADAM task on this machine which requested 
+*     If the connection request was successful return an
+*     ACK_INIT message to the ADAM task on this machine which requested
 *     the path. Start a read on the newly-opened network channel.
-*     If the connection request was rejected, return a rejection message 
+*     If the connection request was rejected, return a rejection message
 *     to the task which requested the path.
 
 *  Authors:
-*     B.D.Kelly (REVAD::BDK) 
+*     B.D.Kelly (REVAD::BDK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -2246,15 +2246,15 @@ int *status                 /* global status (give and returned) */
    found = 0;
    for ( machnum=0; machnum<MESSYS__MXMACH; machnum++ )
    {
-      if ( n_mach[machnum].mach_state == ANT__NULL_MACH ) 
+      if ( n_mach[machnum].mach_state == ANT__NULL_MACH )
       {
          found = 1;
          break;
       }
    }
 
-   if ( found == 0 ) 
-   { 
+   if ( found == 0 )
+   {
       *status = ANT__TOOMANY;
    }
    else
@@ -2271,11 +2271,11 @@ int *status                 /* global status (give and returned) */
 
       ant_connect ( rmach, &(n_mach[machnum].local_channel), status );
 
-      if ( *status == SAI__OK ) 
+      if ( *status == SAI__OK )
       {
          strcpy ( n_mach[machnum].machine_names, remote_machine_name );
 
-/*   Mark the entry in COMMON as complete 
+/*   Mark the entry in COMMON as complete
      Build an acceptance message */
 
          n_mach[machnum].mach_state = ANT__THIS_INIT;
@@ -2299,7 +2299,7 @@ int *status                 /* global status (give and returned) */
 
 /*   Send the acknowledgement to the local task */
 
-      msp_send_message ( (char *)&mess_in, C_REM_ACCEPT_IN_LEN, 
+      msp_send_message ( (char *)&mess_in, C_REM_ACCEPT_IN_LEN,
         accept_q, command_q, status );
 
    }
@@ -2321,7 +2321,7 @@ struct sigaction oact    /* action structure with flag initialised
 *     ANT_RETARGET
 
 *  Purpose:
-*     Retarget a signal to the ant handling routine 
+*     Retarget a signal to the ant handling routine
 
 *  Language:
 *     Starlink C
@@ -2355,19 +2355,19 @@ struct sigaction oact    /* action structure with flag initialised
    if ( ( sigisset >> signo ) & 1 )
    {
 
- /* Signal handler already processed */ 
+ /* Signal handler already processed */
 
      return;
    }
 
-   if ( oact.sa_handler != SIG_DFL ) 
+   if ( oact.sa_handler != SIG_DFL )
    {
 
 /* Create an entry to add to the list */
 
       new_entry = (struct siglist *) malloc ( sizeof(struct siglist) );
 
-      if ( new_entry == NULL ) 
+      if ( new_entry == NULL )
       {
          perror ( "ant_retarget - malloc error" );
          exit(1);
@@ -2379,12 +2379,12 @@ struct sigaction oact    /* action structure with flag initialised
 
 /* Find the end of our linked list */
 
-      if ( stack_top != NULL ) 
+      if ( stack_top != NULL )
       {
          for ( entry = stack_top; entry->next != NULL; entry=entry->next )
            /* Null statement */;
          entry->next = new_entry;
-      } 
+      }
       else
       {
          stack_top = new_entry;
@@ -2400,13 +2400,13 @@ struct sigaction oact    /* action structure with flag initialised
 /* Mark signal handler set in bitmask */
 
    sigisset |= (1<<signo);
- 
-} 
+
+}
 
 
 
-void ant_send_ack_out 
-( 
+void ant_send_ack_out
+(
 struct a_rem_msg_out rem_msg_out, /* the received message (given) */
 sendq_type reply_q,               /* task reply queue (given) */
 int *status                       /* global status (give and returned) */
@@ -2418,14 +2418,14 @@ int *status                       /* global status (give and returned) */
 *     ANT_SEND_ACK_OUT
 
 *  Purpose:
-*     Send a net ACK_OUT message 
+*     Send a net ACK_OUT message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a REM_MSG_OUT, send it to the other machine and make 
-*     the necessary entries in the global structures. In the event of 
+*     Given a REM_MSG_OUT, send it to the other machine and make
+*     the necessary entries in the global structures. In the event of
 *     failure, do what tidying is possible.
 *     Check the indicated path and transaction number are valid.
 *     Complete the N_TRANS entry if necessary.
@@ -2471,7 +2471,7 @@ int *status                       /* global status (give and returned) */
 /*   Check the entries in the tables */
 
    trans_num = rem_msg_out.local_nettask_n_trans_num;
-   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) ) 
+   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) )
    {
       path = n_trans[trans_num].local_nettask_n_path_num;
    }
@@ -2480,8 +2480,8 @@ int *status                       /* global status (give and returned) */
       path = MESSYS__NULL_P;
    }
 
-   if ( ( path != MESSYS__NULL_P ) && 
-     ( n_paths[path].path_state == ANT__FULL_P ) ) 
+   if ( ( path != MESSYS__NULL_P ) &&
+     ( n_paths[path].path_state == ANT__FULL_P ) )
    {
       if ( n_trans[trans_num].trans_state == ANT__OTHER_T )
       {
@@ -2489,7 +2489,7 @@ int *status                       /* global status (give and returned) */
 /*   Complete the transaction details. */
 
          n_trans[trans_num].local_task_ack_q = reply_q;
-         n_trans[trans_num].local_task_t_num = 
+         n_trans[trans_num].local_task_t_num =
            rem_msg_out.local_task_t_trans_num;
          n_trans[trans_num].trans_state = ANT__FULL_T;
       }
@@ -2513,7 +2513,7 @@ int *status                       /* global status (give and returned) */
       memcpy ( m_value, rem_msg_out.gsoc_value, rem_msg_out.gsoc_len );
       machnum = n_paths[path].local_machine_num;
 
-      sock_write ( n_mach[machnum].local_channel, 
+      sock_write ( n_mach[machnum].local_channel,
         C_NET_MAXMSG_LEN, netbuffer, status );
 
    }
@@ -2521,15 +2521,15 @@ int *status                       /* global status (give and returned) */
    {
 
 /*   Return a GSOC_END to the task's acknowledgement queue.
-     Presumably the path is in the process of closing down and the 
-     task's command_q will have already received a message, but the 
-     acknowledgement queue for this transaction may have been unknown 
+     Presumably the path is in the process of closing down and the
+     task's command_q will have already received a message, but the
+     acknowledgement queue for this transaction may have been unknown
      at the time the DEINIT was issued. */
 
       outbuf.mess_in_type = C_REM_GSOC_END_IN;
-      outbuf.u.rem_msg_in.local_task_t_trans_num = 
+      outbuf.u.rem_msg_in.local_task_t_trans_num =
         rem_msg_out.local_task_t_trans_num;
-      outbuf.u.rem_msg_in.local_nettask_n_trans_num = 
+      outbuf.u.rem_msg_in.local_nettask_n_trans_num =
         rem_msg_out.local_nettask_n_trans_num;
       outbuf.u.rem_msg_in.gsoc_flag = rem_msg_out.gsoc_flag;
       strcpy ( outbuf.u.rem_msg_in.gsoc_name, rem_msg_out.gsoc_name );
@@ -2540,14 +2540,14 @@ int *status                       /* global status (give and returned) */
         outbuf.u.rem_msg_in.gsoc_len );
       length = C_REM_MSG_IN_LEN - MSG_VAL_LEN + rem_msg_out.gsoc_len;
 
-      msp_send_message ( (char *)&outbuf, length, reply_q, command_q, 
+      msp_send_message ( (char *)&outbuf, length, reply_q, command_q,
         status );
 
    }
 
 /*   If the TRANS_NUM was invalid, return a bad status. */
 
-   if ( ( trans_num < 0 ) || ( trans_num >= MESSYS__MXTRANS ) ) 
+   if ( ( trans_num < 0 ) || ( trans_num >= MESSYS__MXTRANS ) )
    {
       *status = ANT__IVMSG;
    }
@@ -2555,8 +2555,8 @@ int *status                       /* global status (give and returned) */
 
 
 
-void ant_send_end_out 
-( 
+void ant_send_end_out
+(
 struct a_rem_msg_out rem_msg_out,  /* the received message, this is a MSG
                                       of type END (given) */
 int *status                         /* global status (give and returned) */
@@ -2568,14 +2568,14 @@ int *status                         /* global status (give and returned) */
 *     ANT_SEND_END_OUT
 
 *  Purpose:
-*     Send a net END_OUT message 
+*     Send a net END_OUT message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a REM_GSOC_END_OUT, send it to the other machine and make 
-*     the necessary entries in the common blocks. In the event of 
+*     Given a REM_GSOC_END_OUT, send it to the other machine and make
+*     the necessary entries in the common blocks. In the event of
 *     failure, do what tidying is possible.
 *     Check the indicated path and transaction number are valid.
 *     Send the GSOC_END to the other machine.
@@ -2619,7 +2619,7 @@ int *status                         /* global status (give and returned) */
 /*   Check the entries in the tables */
 
    trans_num = rem_msg_out.local_nettask_n_trans_num;
-   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) ) 
+   if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) )
    {
       path = n_trans[trans_num].local_nettask_n_path_num;
    }
@@ -2628,8 +2628,8 @@ int *status                         /* global status (give and returned) */
       path = MESSYS__NULL_P;
    }
 
-   if ( ( path != MESSYS__NULL_P ) && 
-     ( n_paths[path].path_state == ANT__FULL_P ) ) 
+   if ( ( path != MESSYS__NULL_P ) &&
+     ( n_paths[path].path_state == ANT__FULL_P ) )
    {
 
 /*      Construct the message and send it to the other machine */
@@ -2653,7 +2653,7 @@ int *status                         /* global status (give and returned) */
 
       machnum = n_paths[path].local_machine_num;
 
-      sock_write ( n_mach[machnum].local_channel, 
+      sock_write ( n_mach[machnum].local_channel,
         C_NET_MAXMSG_LEN, netbuffer, status );
 
 /*   Remove the transaction details. */
@@ -2667,7 +2667,7 @@ int *status                         /* global status (give and returned) */
    else
    {
 
-      if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) ) 
+      if ( ( trans_num >= 0 ) && ( trans_num < MESSYS__MXTRANS ) )
       {
 
 /*   Presumably the path is in the process of closing down.
@@ -2685,8 +2685,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_send_netack 
-( 
+void ant_send_netack
+(
 struct a_rem_ack_out rem_ack_out,  /* the received message (given) */
 sendq_type reply_q,                 /* task reply queue (given) */
 int *status                        /* global status (give and returned) */
@@ -2698,16 +2698,16 @@ int *status                        /* global status (give and returned) */
 *     ANT_SEND_NETACK
 
 *  Purpose:
-*     Send a netack message 
+*     Send a netack message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a REM_ACK, send a NETACK it to the other machine and 
-*     make the necessary entries in the common blocks. In the event of 
+*     Given a REM_ACK, send a NETACK it to the other machine and
+*     make the necessary entries in the common blocks. In the event of
 *     failure, return a DEINIT to the local task.
-*     Complete the relevant N_PATH entry from information in the 
+*     Complete the relevant N_PATH entry from information in the
 *     received message.
 *     Forward an acknowledgement message to the other machine.
 *     On error, return a DEINIT message to the local task.
@@ -2746,12 +2746,12 @@ int *status                        /* global status (give and returned) */
 
    path = rem_ack_out.local_nettask_n_path_num;
 
-   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) ) 
+   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) )
    {
 
-      if ( n_paths[path].path_state == ANT__OTHER_P ) 
+      if ( n_paths[path].path_state == ANT__OTHER_P )
       {
-         n_paths[path].local_task_t_path_num = 
+         n_paths[path].local_task_t_path_num =
            rem_ack_out.local_task_t_path_num;
          n_paths[path].path_state = ANT__FULL_P;
 
@@ -2765,10 +2765,10 @@ int *status                        /* global status (give and returned) */
          npath = htonl ( path );
          memcpy ( k_spath, &npath, 4 );
 
-         sock_write ( n_mach[machnum].local_channel, 
+         sock_write ( n_mach[machnum].local_channel,
            C_NET_MAXMSG_LEN, netbuffer, status );
 
-/*   Bad status ignored. Assume a network EVENT is in the process 
+/*   Bad status ignored. Assume a network EVENT is in the process
      of happening. */
 
       }
@@ -2778,11 +2778,11 @@ int *status                        /* global status (give and returned) */
 /*   Return a deinit to the task */
 
          outbuf.mess_in_type = C_REM_DEINIT_IN;
-         outbuf.u.rem_deinit_in.local_task_t_path_num = 
+         outbuf.u.rem_deinit_in.local_task_t_path_num =
            rem_ack_out.local_task_t_path_num;
-         msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN, 
+         msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN,
            reply_q, command_q, status );
-                           
+
       }
 
    }
@@ -2792,19 +2792,19 @@ int *status                        /* global status (give and returned) */
 /*   Return a deinit to the task */
 
       outbuf.mess_in_type = C_REM_DEINIT_IN;
-      outbuf.u.rem_deinit_in.local_task_t_path_num = 
+      outbuf.u.rem_deinit_in.local_task_t_path_num =
         rem_ack_out.local_task_t_path_num;
-      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN, 
+      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN,
         reply_q, command_q, status );
-                           
+
    }
 
 }
 
 
 
-void ant_send_netdeinit 
-( 
+void ant_send_netdeinit
+(
 struct a_rem_deinit_out rem_deinit_out,  /* the received message (given) */
 int *status                         /* global status (give and returned) */
 )
@@ -2815,15 +2815,15 @@ int *status                         /* global status (give and returned) */
 *     ANT_SEND_NETDEINIT
 
 *  Purpose:
-*     Send a NETDEINIT message 
+*     Send a NETDEINIT message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a REM_DEINIT, send a NETDEINIT to the other machine and 
-*     annul the necessary entries in the common blocks. 
-*     Look-up the relevant N_PATH entry from information in the 
+*     Given a REM_DEINIT, send a NETDEINIT to the other machine and
+*     annul the necessary entries in the common blocks.
+*     Look-up the relevant N_PATH entry from information in the
 *     received message.
 *     Send a deinit message to the other machine.
 *     Close msp communications with the local task.
@@ -2863,10 +2863,10 @@ int *status                         /* global status (give and returned) */
 
    path = rem_deinit_out.local_nettask_n_path_num;
 
-   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) ) 
+   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) )
    {
 
-      if ( n_paths[path].path_state != ANT__NULL_P ) 
+      if ( n_paths[path].path_state != ANT__NULL_P )
       {
 
 /*   Build a structure and send it across the network */
@@ -2876,19 +2876,19 @@ int *status                         /* global status (give and returned) */
          npath = htonl ( n_paths[path].remote_nettask_n_path_num );
          memcpy ( d_rpath, &npath, 4 );
          machnum = n_paths[path].local_machine_num;
-         sock_write ( n_mach[machnum].local_channel, 
+         sock_write ( n_mach[machnum].local_channel,
            C_NET_MAXMSG_LEN, netbuffer, status );
 
 /*   Remove any transaction entries dependent on this PATH. */
 
          for ( trans_num=0; trans_num<MESSYS__MXTRANS; trans_num++ )
          {
-            if ( path == n_trans[trans_num].local_nettask_n_path_num ) 
+            if ( path == n_trans[trans_num].local_nettask_n_path_num )
             {
                n_trans[trans_num].local_nettask_n_path_num =
                  MESSYS__NULL_P;
                n_trans[trans_num].local_task_t_num = MESSYS__NULL_T;
-               n_trans[trans_num].remote_nettask_n_trans_num = 
+               n_trans[trans_num].remote_nettask_n_trans_num =
                  MESSYS__NULL_T;
                n_trans[trans_num].trans_state = ANT__NULL_T;
             }
@@ -2909,7 +2909,7 @@ int *status                         /* global status (give and returned) */
       {
 
 /*   Path already gone. Do nothing. */
-                           
+
       }
 
    }
@@ -2926,8 +2926,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_send_netinit 
-( 
+void ant_send_netinit
+(
 struct a_rem_init_out rem_init_out,  /* the received message (given) */
 sendq_type reply_q,                 /* task reply queue (given) */
 int *status                         /* global status (give and returned) */
@@ -2939,19 +2939,19 @@ int *status                         /* global status (give and returned) */
 *     ANT_SEND_NETINIT
 
 *  Purpose:
-*     Send a netinit message 
+*     Send a netinit message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a NETINIT, send it to the target machine and make the 
-*     necessary entries in the common blocks. In the event of failure, 
+*     Given a NETINIT, send it to the target machine and make the
+*     necessary entries in the common blocks. In the event of failure,
 *     return a DEINIT message to the local task.
 *     Search the common blocks for an unused N_PATH entry.
 *     Put partial information into it from the received message.
 *     Send the init message across the network.
-*     On error, return a DEINIT to the local task and annul the 
+*     On error, return a DEINIT to the local task and annul the
 *     new N_PATH entry.
 
 *  Authors:
@@ -2992,14 +2992,14 @@ int *status                         /* global status (give and returned) */
    found = 0;
    for ( path=0; path<MESSYS__MXPATH; path++ )
    {
-      if ( n_paths[path].path_state == ANT__NULL_P ) 
+      if ( n_paths[path].path_state == ANT__NULL_P )
       {
          found = 1;
          break;
       }
    }
 
-   if ( found == 1 ) 
+   if ( found == 1 )
    {
 
 /*   Search for the right machine */
@@ -3008,9 +3008,9 @@ int *status                         /* global status (give and returned) */
       for ( machnum=0; machnum<MESSYS__MXMACH; machnum++ )
       {
          if ( ( n_mach[machnum].mach_state == ANT__THIS_INIT ) ||
-           ( n_mach[machnum].mach_state == ANT__OTHER_INIT ) ) 
+           ( n_mach[machnum].mach_state == ANT__OTHER_INIT ) )
          {
-            if ( strcmp ( n_mach[machnum].machine_names, 
+            if ( strcmp ( n_mach[machnum].machine_names,
               rem_init_out.remote_machine_name ) == 0 )
             {
                found = 1;
@@ -3021,7 +3021,7 @@ int *status                         /* global status (give and returned) */
 
       }
 
-      if ( found == 1 ) 
+      if ( found == 1 )
       {
 
 /*   Make a partial entry in the tables */
@@ -3031,7 +3031,7 @@ int *status                         /* global status (give and returned) */
          strcpy ( n_paths[path].remote_taskname,
            rem_init_out.remote_taskname );
          msp_mkcomq ( reply_q, &n_paths[path].local_task_q, status );
-         n_paths[path].local_task_t_path_num = 
+         n_paths[path].local_task_t_path_num =
            rem_init_out.local_task_t_path_num;
          n_paths[path].local_machine_num = machnum;
          n_paths[path].local_task_reminit_ack_q = reply_q;
@@ -3051,7 +3051,7 @@ int *status                         /* global status (give and returned) */
          memcpy ( i_smach, &nmach, 4 );
          npath = htonl ( path );
          memcpy ( i_spath, &npath, 4 );
-         sock_write ( n_mach[machnum].local_channel, 
+         sock_write ( n_mach[machnum].local_channel,
            C_NET_MAXMSG_LEN, netbuffer, status );
 
          if ( *status != SAI__OK )
@@ -3069,25 +3069,25 @@ int *status                         /* global status (give and returned) */
 
    }
 
-   if ( found == 0 ) 
+   if ( found == 0 )
    {
 
 /*   Return a DEINIT to the local task */
 
       outbuf.mess_in_type = C_REM_DEINIT_IN;
-      outbuf.u.rem_deinit_in.local_task_t_path_num = 
+      outbuf.u.rem_deinit_in.local_task_t_path_num =
         rem_init_out.local_task_t_path_num;
-      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN, 
+      msp_send_message ( (char *)&outbuf, C_REM_DEINIT_IN_LEN,
         reply_q, command_q, status );
-                           
+
    }
 
 }
 
 
 
-void ant_send_start_out 
-( 
+void ant_send_start_out
+(
 struct a_rem_gsoc_start_out rem_gsoc_start_out, /* the received message
                                                    (given) */
 sendq_type reply_q,                 /* task reply queue (given) */
@@ -3100,14 +3100,14 @@ int *status                         /* global status (give and returned) */
 *     ANT_SEND_START_OUT
 
 *  Purpose:
-*     Send a net GSOC start message 
+*     Send a net GSOC start message
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
-*     Given a REM_GSOC_START, record the new transaction and send it to 
-*     the target machine. In the event of failure, return a GSOC_END to 
+*     Given a REM_GSOC_START, record the new transaction and send it to
+*     the target machine. In the event of failure, return a GSOC_END to
 *     the local task.
 
 *  Authors:
@@ -3157,29 +3157,29 @@ int *status                         /* global status (give and returned) */
    found = 0;
    path = rem_gsoc_start_out.local_nettask_n_path_num;
 
-   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) ) 
+   if ( ( path >= 0 ) && ( path < MESSYS__MXPATH ) )
    {
 
-      if ( n_paths[path].path_state == ANT__FULL_P ) 
+      if ( n_paths[path].path_state == ANT__FULL_P )
       {
 
 /*   Find a free transaction slot */
 
          for ( trans_num=0; trans_num<MESSYS__MXTRANS; trans_num++ )
          {
-            if ( n_trans[trans_num].trans_state == ANT__NULL_T ) 
+            if ( n_trans[trans_num].trans_state == ANT__NULL_T )
             {
                found = 1;
                break;
             }
          }
 
-         if ( found == 1 ) 
+         if ( found == 1 )
          {
             n_trans[trans_num].trans_state = ANT__THIS_T;
             n_trans[trans_num].local_nettask_n_path_num = path;
             n_trans[trans_num].local_task_ack_q = reply_q;
-            n_trans[trans_num].local_task_t_num = 
+            n_trans[trans_num].local_task_t_num =
               rem_gsoc_start_out.local_task_t_trans_num;
 
 /*   Construct the message and send it to the other machine */
@@ -3201,34 +3201,34 @@ int *status                         /* global status (give and returned) */
 
             machnum = n_paths[path].local_machine_num;
 
-            sock_write ( n_mach[machnum].local_channel, 
+            sock_write ( n_mach[machnum].local_channel,
               C_NET_MAXMSG_LEN, netbuffer, status );
          }
 
       }
 
-      if ( found == 0 ) 
+      if ( found == 0 )
       {
 
 /*  Return a GSOC_END to the local task */
 
          outbuf.mess_in_type = C_REM_GSOC_END_IN;
-         outbuf.u.rem_msg_in.local_task_t_trans_num = 
+         outbuf.u.rem_msg_in.local_task_t_trans_num =
            rem_gsoc_start_out.local_task_t_trans_num;
          outbuf.u.rem_msg_in.local_nettask_n_trans_num = MESSYS__NULL_T;
          outbuf.u.rem_msg_in.gsoc_flag = rem_gsoc_start_out.gsoc_flag;
-         strcpy ( outbuf.u.rem_msg_in.gsoc_name, 
+         strcpy ( outbuf.u.rem_msg_in.gsoc_name,
            rem_gsoc_start_out.gsoc_name );
          ANT_CHECKLEN(rem_gsoc_start_out.gsoc_len);
          outbuf.u.rem_msg_in.gsoc_len = rem_gsoc_start_out.gsoc_len;
          outbuf.u.rem_msg_in.gsoc_status = ANT__NOPATH;
-         memcpy ( outbuf.u.rem_msg_in.gsoc_value, 
+         memcpy ( outbuf.u.rem_msg_in.gsoc_value,
            rem_gsoc_start_out.gsoc_value,
            outbuf.u.rem_msg_in.gsoc_len );
          length = C_REM_MSG_IN_LEN - MSG_VAL_LEN +
            rem_gsoc_start_out.gsoc_len;
 
-         msp_send_message ( (char *)&outbuf, length, 
+         msp_send_message ( (char *)&outbuf, length,
            reply_q, command_q, status );
 
       }
@@ -3248,8 +3248,8 @@ int *status                         /* global status (give and returned) */
 
 
 
-void ant_serve 
-( 
+void ant_serve
+(
 int *status          /* global status (given and returned) */
 )
 
@@ -3259,7 +3259,7 @@ int *status          /* global status (given and returned) */
 *     ANT_SERVE
 
 *  Purpose:
-*     Forward network messages 
+*     Forward network messages
 
 *  Language:
 *     Starlink C
@@ -3303,7 +3303,7 @@ int *status          /* global status (given and returned) */
 
 /*      printf("Waiting...\n"); */
 
-      msp_receive_message ( lqueues, numq, 1, sizeof(rxbuf), 
+      msp_receive_message ( lqueues, numq, 1, sizeof(rxbuf),
         (char *)&rxbuf, &actual_length, &queue_id, &reply_q, status );
 
 /*	printf ( "serve: received %d, qid = %d\n", actual_length, queue_id);*/
@@ -3319,7 +3319,7 @@ int *status          /* global status (given and returned) */
       {
          printf ( "adamnet: queues bad after receive\n" );
       }
-      if ( queue_id == networkr_q ) 
+      if ( queue_id == networkr_q )
       {
          ant_network ( status );
       if ( lqueues[0] !=0 )
@@ -3327,7 +3327,7 @@ int *status          /* global status (given and returned) */
          printf ( "adamnet: queues bad after ant_network\n" );
       }
       }
-      else if ( queue_id == command_q ) 
+      else if ( queue_id == command_q )
       {
          ant_commq ( rxbuf, reply_q, status );
       if ( lqueues[0] !=0 )
@@ -3336,12 +3336,12 @@ int *status          /* global status (given and returned) */
       }
       }
 
-      if ( *status == ANT__NETSHUT ) 
+      if ( *status == ANT__NETSHUT )
       {
          printf ( "adamnet: NETSHUT requested\n" );
          break;
       }
-      else if ( *status != SAI__OK ) 
+      else if ( *status != SAI__OK )
       {
 /*         *status = SAI__OK; */
          break;
@@ -3354,8 +3354,8 @@ int *status          /* global status (given and returned) */
 
 
 static void ant_setsig
-( 
-void 
+(
+void
 )
 
 /*
@@ -3364,7 +3364,7 @@ void
 *     ANT_SETSIG
 
 *  Purpose:
-*     Set up signal handlers 
+*     Set up signal handlers
 
 *  Language:
 *     Starlink C
@@ -3376,7 +3376,7 @@ void
 *     any library "exit handlers" declared via atexit() to be called.
 *     The routine ant_exhdlr is called by Unix when a signal occurs
 *     Uses standard Unix C system service routines
-*     Note: all signal handlers can be overridden by the user elsewhere in 
+*     Note: all signal handlers can be overridden by the user elsewhere in
 *     the process and we should document any side effects of doing this.
 
 *  Authors:
@@ -3413,14 +3413,14 @@ void
 
 /*   The defaults for three terminal related signals */
 
-   sigaction ( SIGINT,  &ignact, NULL ); 
-   sigaction ( SIGQUIT, &ignact, NULL ); 
+   sigaction ( SIGINT,  &ignact, NULL );
+   sigaction ( SIGQUIT, &ignact, NULL );
 
 /*   socket events from msp */
 
    sigaction ( SIGPIPE, &ignact, NULL );
 
-/* Hangup and Default kill signals  - we use these to make an ADAM task exit 
+/* Hangup and Default kill signals  - we use these to make an ADAM task exit
    quietly after running all exit handlers */
 
    sigaction ( SIGHUP, NULL, &oact );
@@ -3528,7 +3528,7 @@ void
 
 void ant_exhdlr
 (
-int isig, 
+int isig,
 siginfo_t *info,
 void *dummy
 )
@@ -3546,7 +3546,7 @@ void *dummy
 /*   printf ("In exhdlr\n"); */
    for ( entry=stack_top; entry != NULL; entry=entry->next )
    {
-      if ( entry->signo == isig ) 
+      if ( entry->signo == isig )
       {
          cur_entry = entry;
          break;
@@ -3555,7 +3555,7 @@ void *dummy
 
 /* Reset all signal handlers to the system default */
 
-   for ( i=0; i<sizeof(int)*8; i++ ) 
+   for ( i=0; i<sizeof(int)*8; i++ )
    {
       if ( ( sigisset >> i ) & 1 )
       {
@@ -3570,7 +3570,7 @@ void *dummy
 /*      printf("HUP/TERM exit\n"); */
       exit(0);
    }
-   else 
+   else
    {
 /*   We fork a duplicate process - the parent calls the RTL handler for the
      current signal while the child process merely exits. This allows exit
@@ -3580,15 +3580,15 @@ void *dummy
       {
          perror ( "ant_exhdlr - fork error" );
       }
-      else if ( pid == 0 ) 
-      { 
+      else if ( pid == 0 )
+      {
 
 /* Child */
 
          exit(isig);
-      } 
-      else 
-      { 
+      }
+      else
+      {
 
 /* Parent */
 
@@ -3596,7 +3596,7 @@ void *dummy
          {
             perror("ant_exhdlr - waitpid error");
          }
-         if ( cur_entry != NULL ) 
+         if ( cur_entry != NULL )
          {
              cur_entry->act.sa_sigaction(isig, info, dummy);
 
@@ -3604,7 +3604,7 @@ void *dummy
      it does we exit as fast as possible! */
 /*     printf("Going quickly...\n"); */
             _exit(isig);
-         } 
+         }
          else
          {
 
@@ -3620,7 +3620,7 @@ void *dummy
 
 
 void ant_sighdlr
-( 
+(
 int astparam,              /* the signal parameter (given) */
 siginfo_t *infop,          /* info pointer (given) */
 void *ucp                  /* context pointer (given) */
@@ -3632,7 +3632,7 @@ void *ucp                  /* context pointer (given) */
 *     ANT_EXHDLR
 
 *  Purpose:
-*     ADAM task signal handler for all process signals 
+*     ADAM task signal handler for all process signals
 
 *  Language:
 *     Starlink C
@@ -3669,7 +3669,7 @@ void *ucp                  /* context pointer (given) */
 *     ANT_SIGHDLR
 
 *  Purpose:
-*     Signal handler network messages 
+*     Signal handler network messages
 
 *  Language:
 *     Starlink C
@@ -3705,9 +3705,9 @@ void *ucp                  /* context pointer (given) */
 
 
 
-void ant_verify 
-( 
-int channel,         /* i/o channel for communications, bound to a socket 
+void ant_verify
+(
+int channel,         /* i/o channel for communications, bound to a socket
                        (given) */
 char *machine_name,  /* name of other machine (returned) */
 int *status          /* global status (give and returned) */
@@ -3719,7 +3719,7 @@ int *status          /* global status (give and returned) */
 *     ANT_VERIFY
 
 *  Purpose:
-*     Verify an incoming connection 
+*     Verify an incoming connection
 
 *  Language:
 *     Starlink C
@@ -3728,7 +3728,7 @@ int *status          /* global status (give and returned) */
 *     Inquire the details of the peer machine
 
 *  Authors:
-*     B.D.Kelly (REVAD::BDK) 
+*     B.D.Kelly (REVAD::BDK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -3771,6 +3771,6 @@ int *status          /* global status (give and returned) */
    {
       perror ( "sock_gpn failed" );
       machine_name[0] = '\0';
-   }   
+   }
 
 }

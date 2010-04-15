@@ -4,7 +4,7 @@
 *     KPG1_ASSIG
 
 *  Purpose:
-*     Ensure that the Current Frame from an NDF WCS FrameSet has no 
+*     Ensure that the Current Frame from an NDF WCS FrameSet has no
 *     insignificant axes.
 
 *  Language:
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
       DOUBLE PRECISION GUBND( NDF__MXDIM )! Upper GRID bounds
       DOUBLE PRECISION XL( NDF__MXDIM )! GRID coords at CLBND
       DOUBLE PRECISION XU( NDF__MXDIM )! GRID coords at CUBND
-      INTEGER DUMMY              ! Unused PermMap 
+      INTEGER DUMMY              ! Unused PermMap
       INTEGER IAT                ! Used length of ATT
       INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
       INTEGER J                  ! Axis index
@@ -138,11 +138,11 @@
 *  on an insignificant pixel axis (i.e. an axis spanning only a single
 *  pixel).
       DO J = 1, NDIM
-         GLBND( J ) = 1.0      
+         GLBND( J ) = 1.0
          GUBND( J ) = DBLE( UBND( J ) - LBND( J ) + 1 )
       END DO
 
-*  Get the the Mapping from GRID (Base) Frame to the NDFs Current Frame, 
+*  Get the the Mapping from GRID (Base) Frame to the NDFs Current Frame,
 *  and simplify it.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
      :                                    STATUS ), STATUS )
@@ -164,8 +164,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Now try to find the bounding box.
-         CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, CLBND, CUBND, 
-     :                    XL, XU, STATUS ) 
+         CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, CLBND, CUBND,
+     :                    XL, XU, STATUS )
 
 *  Report a more informative error if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN
@@ -176,7 +176,7 @@
             CALL CHR_PUTI( J, ATT, IAT )
             CALL CHR_APPND( ')', ATT, IAT )
 
-            CALL MSG_SETC( 'AX', 
+            CALL MSG_SETC( 'AX',
      :                     AST_GETC( IWCS, ATT( : IAT ), STATUS ) )
 
             STATUS = SAI__ERROR
@@ -188,13 +188,13 @@
          END IF
 
 *  If this axis covers a zero range (i.e. if it is insignificant)...
-         IF( ABS( CUBND - CLBND ) .LE. 
-     :       EPS*MAX( ABS( CUBND ), ABS( CLBND ) ) ) THEN 
+         IF( ABS( CUBND - CLBND ) .LE.
+     :       EPS*MAX( ABS( CUBND ), ABS( CLBND ) ) ) THEN
 
 *  Increment the number of insignificant axes found so far.
             NINSIG = NINSIG + 1
 
-*  Indicate that the PermMap input axis which connects to axis J of 
+*  Indicate that the PermMap input axis which connects to axis J of
 *  the NDFs Current Frame should be fed a constant value when the PermMap
 *  is used in the inverse direction. Store the (negative) index of the
 *  constant, and store the constant itself in AXVAL.
@@ -215,22 +215,22 @@
             NSIG = NSIG + 1
             INPRM( J ) = NSIG
             OUTPRM( NSIG ) = J
-         END IF            
+         END IF
 
       END DO
 
 *  Report an error if no significant axes were found.
-      IF( NSIG .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF( NSIG .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_ASSIG_ERR2', 'No significant axes found '//
      :                 'in the current coordinate Frame.', STATUS )
-      
+
 *  If any insignificant axes were found...
       ELSE IF( NINSIG .GT. 0 ) THEN
 
 *  Create a PermMap which connects the full Current Frame (with NAXC axes)
 *  to the cut-down Frame (with NSIG axes).
-         PMAP = AST_PERMMAP( NAXC, INPRM, NSIG, OUTPRM, AXVAL, ' ', 
+         PMAP = AST_PERMMAP( NAXC, INPRM, NSIG, OUTPRM, AXVAL, ' ',
      :                       STATUS )
 
 *  Create a new Frame by picking the significant axes from the original

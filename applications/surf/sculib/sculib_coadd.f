@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
-     :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
+     :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER,
      :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
      :   BADBIT, VARIANCE, STATUS)
 *+
@@ -12,7 +12,7 @@
 *  Description:
 *     This routine coadds the current exposure to the input coadd arrays
 *     and puts the result in the output coadd arrays. The input and output
-*     arrays can be the same. The coadd result is the average of exposures 
+*     arrays can be the same. The coadd result is the average of exposures
 *     that have been input. The coadd variance is calculated from
 *     the spread of the input exposures about the mean if more than
 *     one exposure has been added in. If only one exposure is
@@ -22,7 +22,7 @@
 
 *  Invocation:
 *     CALL SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
-*    :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
+*    :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER,
 *    :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
 *    :   BADBIT, VARIANCE, STATUS)
 
@@ -36,7 +36,7 @@
 *     IN_QUALITY (N)          = BYTE (Given)
 *           quality on input data
 *     INCOADD_DATA (N)        = REAL (Given)
-*           Input coadd. 
+*           Input coadd.
 *     INCOADD_VAR (N)         = REAL (Given)
 *           Input coadd variance.
 *     INCOADD_QUAL (N)       = BYTE (returned)
@@ -44,7 +44,7 @@
 *     INCOADD_NUMBER (N)      = INTEGER (Given)
 *           Number of exposures coadded in input coadd.
 *     OUTCOADD_DATA (N)       = REAL (Returned)
-*           Output coadd. 
+*           Output coadd.
 *     OUTCOADD_VAR (N)        = REAL (Returned)
 *           Output coadd variance.
 *     OUTCOADD_QUAL (N)       = BYTE (returned)
@@ -134,7 +134,7 @@
 
 *  Local variables:
       INTEGER I                   ! DO loop
-      REAL    SUM                 ! sum of data coadded 
+      REAL    SUM                 ! sum of data coadded
       REAL    SUMSQ               ! sum of data squared coadded
 
 *  Internal References:
@@ -153,7 +153,7 @@
          IF (NDF_QMASK(IN_QUALITY(I), BADBIT).AND.
      :        NDF_QMASK(INCOADD_QUAL(I), BADBIT)) THEN
 
-*  good quality input point, 
+*  good quality input point,
 *  ..recover the sum of the data points and the sum of them squared
 
             IF (INCOADD_NUMBER(I) .EQ. 1) THEN
@@ -161,8 +161,8 @@
                SUMSQ = INCOADD_DATA(I)**2
             ELSE IF (INCOADD_NUMBER(I) .GT. 1) THEN
                SUM = INCOADD_DATA (I) * INCOADD_NUMBER (I)
-               SUMSQ = INCOADD_NUMBER (I) * INCOADD_DATA(I)**2 + 
-     :            INCOADD_NUMBER(I) * (INCOADD_NUMBER(I)-1) * 
+               SUMSQ = INCOADD_NUMBER (I) * INCOADD_DATA(I)**2 +
+     :            INCOADD_NUMBER(I) * (INCOADD_NUMBER(I)-1) *
      :            INCOADD_VAR (I)
             ELSE
                SUM = 0.0
@@ -182,10 +182,10 @@
 
             OUTCOADD_DATA (I) = SUM / OUTCOADD_NUMBER (I)
             IF (OUTCOADD_NUMBER(I) .GT. 1) THEN
-               OUTCOADD_VAR (I) = 
+               OUTCOADD_VAR (I) =
      :            (SUMSQ - OUTCOADD_NUMBER(I) * OUTCOADD_DATA(I)**2) /
      :            (OUTCOADD_NUMBER(I) * (OUTCOADD_NUMBER(I)-1))
-            ELSE 
+            ELSE
                IF (VARIANCE) THEN
                   OUTCOADD_VAR (I) = IN_VARIANCE (I)
                ELSE

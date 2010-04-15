@@ -41,7 +41,7 @@ PUBLIC fontinfo *gk0xftload(file) char *file;{
 
 	if(file!=NULLPTR(char)){
 /*
- * on sun XLoadFont returns ok even if cannot find font. 
+ * on sun XLoadFont returns ok even if cannot find font.
  * XQueryFont then bombs out
  */
 #ifdef DOESNTWORK
@@ -125,7 +125,7 @@ PRIVATE int gk0xwwchkfont(fp)fontinfo *fp;{
 			if(offset++)prop = TRUE;
 			if(xcs.descent>jfp->jf_offset)jfp->jf_offset = xcs.descent;
 		}
-		
+
 	}
 	if(fp->f_height<=0 || fp->f_width<=0){
 		sprintf(errmsg,"improper font height %d or width %d",fp->f_height,fp->f_width);

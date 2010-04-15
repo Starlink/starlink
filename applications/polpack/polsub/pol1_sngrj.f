@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGRJ( NSIGMA, EL, DIN, VIN, DOUT, NREJ, NGOOD, 
+      SUBROUTINE POL1_SNGRJ( NSIGMA, EL, DIN, VIN, DOUT, NREJ, NGOOD,
      :                       STATUS )
 *+
 *  Name:
@@ -14,10 +14,10 @@
 *     CALL POL1_SNGRJ( NSIGMA, EL, DIN, VIN, DOUT, NREJ, NGOOD, STATUS )
 
 *  Description:
-*     This routine copies the image supplied in DIN, returning the copy 
-*     in DOUT. 
+*     This routine copies the image supplied in DIN, returning the copy
+*     in DOUT.
 *
-*     Values are returned bad in DOUT if the supplied value of DOUT 
+*     Values are returned bad in DOUT if the supplied value of DOUT
 *     is greater than (NSIGMA**2)*VIN
 
 *  Arguments:
@@ -46,7 +46,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,7 +101,7 @@
 *  Store the variance factor.
       VARFAC = NSIGMA**2
 
-*  Check each pixel. 
+*  Check each pixel.
       DO I = 1, EL
 
 *  Check the supplied data value is valid.
@@ -123,12 +123,12 @@
 
 *  If the variance or residual is not valid, store a bad output value.
             ELSE
-               DOUT( I ) = VAL__BADR 
+               DOUT( I ) = VAL__BADR
                NREJ = NREJ + 1
-            END IF         
-   
+            END IF
+
          END IF
-   
+
       END DO
 
       END

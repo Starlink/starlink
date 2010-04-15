@@ -10,17 +10,17 @@
 #include "tcltalk.h"
 #include "ccdaux.h"
 
-   F77_SUBROUTINE(ccd1_tcurs)( CHARACTER_ARRAY(ndfnms), INTEGER(nndf), 
-                               CHARACTER(sname), CHARACTER(domain), 
-                               INTEGER_ARRAY(idi), DOUBLE_ARRAY(xipos), 
-                               DOUBLE_ARRAY(yipos), INTEGER(nipos), 
+   F77_SUBROUTINE(ccd1_tcurs)( CHARACTER_ARRAY(ndfnms), INTEGER(nndf),
+                               CHARACTER(sname), CHARACTER(domain),
+                               INTEGER_ARRAY(idi), DOUBLE_ARRAY(xipos),
+                               DOUBLE_ARRAY(yipos), INTEGER(nipos),
                                LOGICAL(verbos),
-                               DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
+                               DOUBLE_ARRAY(percnt), DOUBLE(zoom),
                                INTEGER(maxcanv), INTEGER(windim),
-                               CHARACTER(mstyle), LOGICAL(centrd), 
+                               CHARACTER(mstyle), LOGICAL(centrd),
                                POINTER(ipio), POINTER(ipxo), POINTER(ipyo),
                                INTEGER(nopos), INTEGER(status)
-                               TRAIL(ndfnms) TRAIL(sname) TRAIL(domain) 
+                               TRAIL(ndfnms) TRAIL(sname) TRAIL(domain)
                                TRAIL(mstyle) ) {
 /*
 *+
@@ -44,7 +44,7 @@
 *     using an intuitive graphical interface.  It returns a list of
 *     the selected points to the calling routine.  If the list of
 *     selected points is not empty on entry (if NIPOS is not zero)
-*     then the list passed in to the routine will be used as a 
+*     then the list passed in to the routine will be used as a
 *     starting point.
 
 *  Arguments:
@@ -57,30 +57,30 @@
 *        The name of the NDF Set.  If blank, a sensible name will
 *        be used instead.
 *     DOMAIN = CHARACTER * ( * ) (Given)
-*        The AST domain in which the coordinates XPOS and YPOS are 
+*        The AST domain in which the coordinates XPOS and YPOS are
 *        given.
 *     IDI( * ) = INTEGER (Given)
 *        The index identifiers for the initial list of positions.
 *     XIPOS( * ) = DOUBLE PRECISION (Given)
-*        X coordinates of the initial list of positions, in DOMAIN 
+*        X coordinates of the initial list of positions, in DOMAIN
 *        coordinates.
 *     YIPOS( * ) = DOUBLE PRECISION (Given)
 *        Y coordinates of the initial list of positions, in DOMAIN
 *        coordinates.
 *     NIPOS = INTEGER (Given)
-*        Number of positions in the initial list (size of IDI, XIPOS, 
+*        Number of positions in the initial list (size of IDI, XIPOS,
 *        YIPOS).
 *     VERBOS = LOGICAL (Given)
-*        If true, then all the postions will be written to the user 
+*        If true, then all the postions will be written to the user
 *        at the end.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
 *     ZOOM = DOUBLE PRECISION (Given and Returned)
-*        The zoom factor for the initial display (may be limited by 
+*        The zoom factor for the initial display (may be limited by
 *        MAXCANV).
 *     MAXCANV = INTEGER (Given and Returned)
-*        The maximum X or Y dimension of canvas on which an initial NDF 
+*        The maximum X or Y dimension of canvas on which an initial NDF
 *        is to be displayed (if zero there is no limit).
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
@@ -91,20 +91,20 @@
 *     IPIO = INTEGER (Returned)
 *        Pointer to the index idenfiers for the positions selected.
 *     IPXO = DOUBLE PRECISION (Returned)
-*        Pointer to the X coordinates of the positions selected, in 
+*        Pointer to the X coordinates of the positions selected, in
 *        DOMAIN coordinates.
 *     IPYO = DOUBLE PRECISION (Returned)
-*        Pointer to the Y coordinates of the positions selected, in 
+*        Pointer to the Y coordinates of the positions selected, in
 *        DOMAIN coordinates.
 *     NOPOS = INTEGER (Returned)
-*        The number of X,Y positions selected (size of the arrays 
+*        The number of X,Y positions selected (size of the arrays
 *        pointed to by IPIO, IPXO, IPYO).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     The pointers in the arrays IPIO, IPXO and IPYO are allocated
-*     using CCD1_MALL by this routine, and should be freed by the 
+*     using CCD1_MALL by this routine, and should be freed by the
 *     caller using CCD1_MFREE.
 
 *  Copyright:
@@ -276,7 +276,7 @@
          ccdTclGetI( cinterp, "set WINY", windim + 1, status );
          ccdTclGetI( cinterp, "set CENTROID", centrd, status );
          *centrd = F77_ISTRUE(*centrd);
-         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ), 
+         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ),
                    mstyle, mstyle_length );
       }
 

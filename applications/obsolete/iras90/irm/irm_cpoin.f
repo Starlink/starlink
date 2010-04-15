@@ -17,8 +17,8 @@
 *     This routine performs the opposite function to IRM_CDESC, i.e.
 *     it converts a pointer to a character array descriptor into a
 *     pointer to the memory used to store the characters. The dynamic
-*     memory used to hold the character string descriptor (if any) is 
-*     released, but the memory used to store the actual characters is 
+*     memory used to hold the character string descriptor (if any) is
+*     released, but the memory used to store the actual characters is
 *     not released.
 
 *  Arguments:
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

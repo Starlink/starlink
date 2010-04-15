@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GTCHV( NOPT, OPTS, PARAM, NVAL, IDEF, VALS, 
+      SUBROUTINE KPG1_GTCHV( NOPT, OPTS, PARAM, NVAL, IDEF, VALS,
      :                       STATUS )
 *+
 *  Name:
@@ -32,14 +32,14 @@
 *        Leading and trailing white space is ignored. Blank options are
 *        not allowed.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter to use. 
+*        The name of the parameter to use.
 *     NVAL = INTEGER (Given)
 *        The number of choices required. The user must supply exactly
 *        this number of choices.
 *     IDEF( NVAL ) = INTEGER (Given)
-*        The indices within OPTS of the default strings to use if a null (!) 
+*        The indices within OPTS of the default strings to use if a null (!)
 *        value is supplied for the parameter. If the first value is zero,
-*        a null parameter value results in a PAR__NULL status being returned. 
+*        a null parameter value results in a PAR__NULL status being returned.
 *     VALS( NVAL ) = INTEGER (Returned)
 *        The indices within OPTS of the selected options.
 *     STATUS = INTEGER (Given and Returned)
@@ -48,7 +48,7 @@
 *  Notes:
 *     -  Case is insignificant when comparing supplied strings with
 *     available options.
-*     -  A dynamic default is set for the parameter before accessing it if 
+*     -  A dynamic default is set for the parameter before accessing it if
 *     IDEF supplied suitable defaults. The default consists of a
 *     comma-separated list of the default options.
 
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
       LOGICAL PROMPT             ! Should a new group of strings be obtained?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the supplied values are OK.
@@ -156,7 +156,7 @@
                CALL ERR_REP( 'KPG1_GTCHV_3', 'KPG1_GTCHV: The ^ITH '//
      :                       'default value (^D) is fewer than 1 or '//
      :                       'greater than the number of available '//
-     :                       'options (^N) (programming error).', 
+     :                       'options (^N) (programming error).',
      :                       STATUS )
                GO TO 999
 
@@ -173,7 +173,7 @@
      :                       'available option is blank (programming '//
      :                       'error).', STATUS )
                GO TO 999
-            END IF         
+            END IF
          END DO
       END IF
 
@@ -201,7 +201,7 @@
 
 *  Loop until NVAL valid choices are obtained, or an error occurs.
       PROMPT = .TRUE.
-      DO WHILE( PROMPT .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( PROMPT .AND. STATUS .EQ. SAI__OK )
 
 *  Get a group of strings from the user. A new group is created if
 *  necessary, or any existing group is emptied.
@@ -212,7 +212,7 @@
          IF( STATUS .EQ. PAR__NULL .AND. IDEF( 1 ) .GT. 0 ) THEN
             CALL ERR_ANNUL( STATUS )
 
-            DO I = 1, NVAL            
+            DO I = 1, NVAL
                VALS( I ) = IDEF( I )
             END DO
 
@@ -315,9 +315,9 @@
 
          END IF
 
-*  If all the supplied values were OK, report an error if the number of 
+*  If all the supplied values were OK, report an error if the number of
 *  values supplied is not correct.
-         IF( .NOT. PROMPT .AND. NGOT .NE. NVAL .AND. 
+         IF( .NOT. PROMPT .AND. NGOT .NE. NVAL .AND.
      :       STATUS .EQ. SAI__OK ) THEN
             PROMPT = .TRUE.
             STATUS = SAI__ERROR
@@ -355,7 +355,7 @@
             IF( NVAL .EQ. 1 ) THEN
                CALL ERR_REP( 'KPG1_GTCHV_9', 'Please supply a new '//
      :                       'value for parameter %^PAR.', STATUS )
-            ELSE 
+            ELSE
                CALL ERR_REP( 'KPG1_GTCHV_10', 'Please supply new '//
      :                       'values for parameter %^PAR.', STATUS )
             END IF

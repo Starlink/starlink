@@ -5,25 +5,25 @@
 *     ELF1_HILOW
 
 *  Purpose:
-*     Find the highest and lowest pixel counts in a given 
+*     Find the highest and lowest pixel counts in a given
 *     circular chunk of the image.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELF1_HILOW(ELEMS,ARRAY,PRANGE,XO,YO,SEARCH,VMIN,VMAX,STATUS)    
+*     CALL ELF1_HILOW(ELEMS,ARRAY,PRANGE,XO,YO,SEARCH,VMIN,VMAX,STATUS)
 
 *  Description:
 *     Scans through all of the pixels within the image bounds defined
-*     by the input variables. Each is checked to see that it is within 
+*     by the input variables. Each is checked to see that it is within
 *     the bounds of the image and also that it is not bad.
 
-*  Arguments:                     
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        Number of pixels in the image.
 *     ARRAY(ELEMS) = REAL (Given)
-*        Image pixel array.           
+*        Image pixel array.
 *     PRANGE(2) = INTEGER (Given)
 *        Size of the image x and y directions. Units pixels.
 *     XO = REAL (Given)
@@ -53,29 +53,29 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-*  Arguments Given:        
-      INTEGER ELEMS                   ! Number of pixels in the image                      
+*  Arguments Given:
+      INTEGER ELEMS                   ! Number of pixels in the image
       INTEGER PRANGE(2)               ! Image size in each dimension
       REAL ARRAY(ELEMS)               ! Image pixel array
       REAL SEARCH                     ! Radius surrounding galaxy centre
       REAL XO                         ! X co-ordinate of galaxy centre
       REAL YO                         ! Y co-ordinate of galaxy centre
 
-*  Arguments Returned:           
+*  Arguments Returned:
       REAL VMIN                       ! Count of the faintest pixel
       REAL VMAX                       ! Count of brightest pixel
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      INTEGER ADD                     ! Array element containing the 
+      INTEGER ADD                     ! Array element containing the
                                       ! count value for a given pixel
       INTEGER LOX                     ! Lower x co-ord. limit
       INTEGER LOY                     ! Lower y co-ord. limit
@@ -87,7 +87,7 @@
       REAL RSQLIM                     ! Square of max permitted origin
                                       ! to pixel distance
       REAL V                          ! Pixel count value
- 
+
 *.
 
 *   Check the inherited global status.

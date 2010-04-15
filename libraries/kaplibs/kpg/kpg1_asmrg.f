@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine merges two FrameSet by aligning them in a suitable
-*     common Frame. The Current Frame in the second FrameSet becomes the 
-*     Current Frame in the merged FrameSet. The domain search order for 
+*     common Frame. The Current Frame in the second FrameSet becomes the
+*     Current Frame in the merged FrameSet. The domain search order for
 *     finding a suitable Frame is:
 *
 *     1) The domain of the Current Frame in IWCS2, if not blank.
@@ -27,8 +27,8 @@
 *        is blank, "AGI_WORLD" is used.
 *     7) Any other suitable Frame.
 *
-*     For each of these Domains, the current Frame is checked first. An error 
-*     is reported if alignment is not possible, and a message identifying the 
+*     For each of these Domains, the current Frame is checked first. An error
+*     is reported if alignment is not possible, and a message identifying the
 *     alignment Frame is displayed if alignment is possible.
 *
 *     If either FrameSet contains a second Frame with the same Domain as
@@ -48,11 +48,11 @@
 *        all the Frames from IWCS2 into it. The Current Frame on exit is
 *        inherited from IWCS2.
 *     IWCS2 = INTEGER (Given)
-*        An AST pointer to the second FrameSet. The Current and Base Frames 
+*        An AST pointer to the second FrameSet. The Current and Base Frames
 *        are unchanged on exit.
 *     DOMAIN = CHARACTER * ( * ) (Given)
-*        A comma separated list of domains in which alignment of the FrameSets 
-*        should be attempted if alignment is not possible in the Current Frame 
+*        A comma separated list of domains in which alignment of the FrameSets
+*        should be attempted if alignment is not possible in the Current Frame
 *        of the second FrameSet, or SKY, SPECTRUM, PIXEL or GRID.
 *     QUIET = LOGICAL (Given)
 *        Suppress the message identifying the alignment Frame?
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -110,7 +110,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,7 +138,7 @@
       INTEGER IBASE2             ! Index of original Base Frame in IWCS2
       INTEGER ICURR1             ! Index of Current Frame in IWCS1
       INTEGER ICURR2             ! Index of Current Frame in IWCS2
-      INTEGER IMAT1              ! Index of alignment Frame in IWCS1 
+      INTEGER IMAT1              ! Index of alignment Frame in IWCS1
       INTEGER IMAT2              ! Index of alignment Frame in IWCS2
       INTEGER MAP                ! Simplified mapping between two Frames
       INTEGER NAXC1              ! Number of axies in current Frame of IWCS1
@@ -148,7 +148,7 @@
       LOGICAL WARNED             ! Warning of duplicate Frames issued?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -158,7 +158,7 @@
       NAXC1 = AST_GETI( IWCS1, 'NAXES', status )
       NAXC2 = AST_GETI( IWCS2, 'NAXES', status )
 
-*  Note the indices of the Base and Currrent Frames in the two FrameSets so 
+*  Note the indices of the Base and Currrent Frames in the two FrameSets so
 *  that they can be re-instated after AST_CONVERT has changed them.
       IBASE1 = AST_GETI( IWCS1, 'BASE', STATUS )
       IBASE2 = AST_GETI( IWCS2, 'BASE', STATUS )
@@ -169,14 +169,14 @@
 *  Note the number of Frames supplied in IWCS1.
       NFRM1 = AST_GETI( IWCS1, 'NFRAME', STATUS )
 
-*  Get the name of the Domain in which the Current Frame of the second 
+*  Get the name of the Domain in which the Current Frame of the second
 *  FrameSet lives.
       DOM = AST_GETC( IWCS2, 'DOMAIN', STATUS )
 
 *  Create a list of preferences for the Domain in which alignment should
-*  occur. First use the Domain of the Current Frame in IWCS2, then try 
-*  SKY, SPECTRUM, PIXEL and GRID, then try the supplied Domain (if any), 
-*  then try any other Domain. 
+*  occur. First use the Domain of the Current Frame in IWCS2, then try
+*  SKY, SPECTRUM, PIXEL and GRID, then try the supplied Domain (if any),
+*  then try any other Domain.
       DOMLST = ' '
       IAT = 0
 
@@ -201,20 +201,20 @@
       CALL AST_SETI( IWCS1, 'BASE', ICURR1, STATUS )
       CALL AST_SETI( IWCS2, 'BASE', ICURR2, STATUS )
 
-*  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
-*  returned describing the relationship between the Current Frames in 
-*  IWCS2 and IWCS1, and the Base Frames are changed to indicate 
+*  Attempt to align the FrameSets. If succesfull, a new FrameSet is
+*  returned describing the relationship between the Current Frames in
+*  IWCS2 and IWCS1, and the Base Frames are changed to indicate
 *  the Frames in which alignment occurred.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS )
 
 *  Issue a fatal error if alignment was not possible in any Domain.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
-         IF( AST_ISAPLOT( IWCS1, STATUS ) ) THEN          
+         IF( AST_ISAPLOT( IWCS1, STATUS ) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPG1_ASMRG_2', 'Could not align data '//
      :                    'with displayed picture.', STATUS )
 
-         ELSE 
+         ELSE
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPG1_ASMRG_2', 'Could not align supplied '//
      :                    'positions.', STATUS )
@@ -247,16 +247,16 @@
       CALL AST_SETI( IWCS2, 'CURRENT', IMAT2, STATUS )
 
 *  Now call AST_CONVERT again.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS )
 
 *  Issue a fatal error if alignment was not possible. This shouldn't happen.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
-         IF( AST_ISAPLOT( IWCS1, STATUS ) ) THEN          
+         IF( AST_ISAPLOT( IWCS1, STATUS ) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPG1_ASMRG_2', 'Could not align data '//
      :                    'with displayed picture.', STATUS )
 
-         ELSE 
+         ELSE
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPG1_ASMRG_2', 'Could not align supplied '//
      :                    'positions.', STATUS )
@@ -269,7 +269,7 @@
 *  If succesful, tell the user what Domain alignment was performed in.
       IF( .NOT. QUIET ) THEN
          DOM = AST_GETC( AST_GETFRAME( IWCS2, AST__BASE, STATUS ),
-     :                   'Domain', STATUS ) 
+     :                   'Domain', STATUS )
 
          TEXT = ' '
          IAT = IND
@@ -297,7 +297,7 @@
                   END IF
                END IF
             END DO
-	    
+
             DO I = 1, AST_GETI( IWCS2, 'NFRAME', STATUS )
                IF( I .NE. IMAT2 .AND. .NOT. WARNED ) THEN
                   IF( AST_GETC( AST_GETFRAME( IWCS2, I, STATUS ),
@@ -316,10 +316,10 @@
 *  Get a simplified Mapping connecting the two Frames.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( TEMP, AST__BASE,
      :                                    AST__CURRENT, STATUS ),
-     :                    STATUS ) 
+     :                    STATUS )
 
-*  Merge the second FrameSet into the first FrameSet using the Mapping 
-*  returned by AST_CONVERT to join the two matching Frames. 
+*  Merge the second FrameSet into the first FrameSet using the Mapping
+*  returned by AST_CONVERT to join the two matching Frames.
       CALL AST_ADDFRAME( IWCS1, IMAT1, MAP, IWCS2, STATUS )
 
 *  Re-instate the two Base Frames which were modified by AST_CONVERT.

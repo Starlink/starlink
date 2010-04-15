@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -116,7 +116,7 @@
 *  Local Variables:
       INTEGER
      :        ZONE1              ! Current zone with uniform coords
-                               
+
       REAL
      :        DX1, DX2, DY1, DY2,! Extent of DATA zone
      :        DXM, DYM,          ! Extent of DATA zone in metres
@@ -174,7 +174,7 @@
 *  zone covering the fractional extent of the graph window zone given
 *  by constants ANCLP1 to ANCLP4.
       FACT = ( DX2U - DX1U )/( ANCLP2 - ANCLP1 )
-      GX1 = DX1U - ANCLP1*FACT 
+      GX1 = DX1U - ANCLP1*FACT
       GX2 = DX2U + ( 1.0 - ANCLP2)*FACT
 
       FACT = ( DY2U - DY1U )/( ANCLP4 - ANCLP3 )
@@ -198,7 +198,7 @@
 *  original uniform zone.
       ELSE
          GOK = .TRUE.
-         CALL SGS_ZONE( GX1, GX2, GY1, GY2, ZONEG, STATUS )      
+         CALL SGS_ZONE( GX1, GX2, GY1, GY2, ZONEG, STATUS )
          CALL SGS_SELZ( ZONE1, STATUS )
       END IF
 
@@ -224,11 +224,11 @@
 *  Set up the Y coordinate of the bottom of the KEY zone.
       KY1 = KY2 - KH
 
-*  If the bottom edge of the KEY zone would be below the current 
+*  If the bottom edge of the KEY zone would be below the current
 *  zone, limit the KEY zone height and find the corresponding width.
       IF( KY1 .LT. Y1 ) THEN
          KY1 = Y1
-         KH = KY2 - KY1 
+         KH = KY2 - KY1
          KW = ASPKEY*KH
       END IF
 
@@ -251,7 +251,7 @@
 *  uniform zone.
       ELSE
          KOK = .TRUE.
-         CALL SGS_ZONE( KX1, KX2, KY1, KY2, ZONEK, STATUS )      
+         CALL SGS_ZONE( KX1, KX2, KY1, KY2, ZONEK, STATUS )
          CALL SGS_SELZ( ZONE1, STATUS )
       END IF
 
@@ -268,11 +268,11 @@
          FY2 = MAX( FY2, KY2 )
       END IF
 
-      CALL SGS_ZONE( FX1, FX2, FY1, FY2, ZONEF, STATUS )      
+      CALL SGS_ZONE( FX1, FX2, FY1, FY2, ZONEF, STATUS )
 
 *  Release the uniform zone.
       CALL SGS_RELZ( ZONE1 )
 
  999  CONTINUE
-      
+
       END

@@ -2,7 +2,7 @@
 C+
 C     R E D 3 _ C G S 3 _ D E T
 C
-C     Reduces a UKIRT CGS3 wavelength calibration data file created by the 
+C     Reduces a UKIRT CGS3 wavelength calibration data file created by the
 C     CALCGS3 mode out of its original file to create a detector calibration
 C     spectrum from it.
 C
@@ -53,12 +53,12 @@ C     Initialization of DSA routines
 C
       CALL DSA_OPEN(STATUS)
 C
-C     Get the name of the input file 
+C     Get the name of the input file
 C
       CALL PAR_GET0C ('INPUT',INPUT,STATUS)
       CALL DSA_NAMED_INPUT ('INPUT',INPUT,STATUS)
 C
-C     Determine dimensions of input. 
+C     Determine dimensions of input.
 C
       CALL DSA_DATA_SIZE ('INPUT',4,NDIM,DIMS,ELEMENTS,STATUS)
       IF ((NDIM .NE. 4) .OR. (DIMS(1) .GT. 1))
@@ -116,7 +116,7 @@ C
 C     Map the input file
 C
       CALL DSA_MAP_DATA ('INPUT','READ','FLOAT',IPTR,SLOT,STATUS)
-      CALL DSA_MAP_AXIS_DATA ('INPUT',3,'READ','FLOAT',AIPTR,SLOT, 
+      CALL DSA_MAP_AXIS_DATA ('INPUT',3,'READ','FLOAT',AIPTR,SLOT,
      :   STATUS)
 C
 C     Create and Map the output file
@@ -151,7 +151,7 @@ C
      :   SUM, SUMSQ)
 C
 C     Extracts a single detector scan from the array, summing over
-C     the requested cycles. 
+C     the requested cycles.
 C
 C     Author:
 C      Alan Bridger (JAC)
@@ -196,7 +196,7 @@ C
       NCYCLES = ENDCYC - STARTCYC + 1
       DO I = 1, NSPEC
          OUT_DATA(I) = SUM(I) / NCYCLES
-         IF (NCYCLES .GT. 1) OUT_VARIANCE (I) = 
+         IF (NCYCLES .GT. 1) OUT_VARIANCE (I) =
      :    (SUMSQ(I) - (SUM(I)**2)/NCYCLES)/(NCYCLES * (NCYCLES-1))
          IF (OUT_VARIANCE(I) .LT. 0.0) THEN
             OUT_VARIANCE (I) = 0.0

@@ -47,7 +47,7 @@ C     ICH_LEN, DSA_WRUSER, DSA_FREE_WORKSPACE, DSA_WRNAME, DTA_FRVAR,
 C     DTA_ERROR
 C
 C  Prior requirements:
-C     DSA_OPEN must have been called to initialise the system.  
+C     DSA_OPEN must have been called to initialise the system.
 C
 C  Support: Keith Shortridge, AAO
 C
@@ -94,11 +94,11 @@ C
       INTEGER ICH_LEN
 C
 C     DSA_ system error codes
-C   
+C
       INCLUDE 'DSA_ERRORS'
 C
 C     DSA_ system common definition
-C   
+C
       INCLUDE 'DSA_COMMON'
 C
 C     Local variables
@@ -166,7 +166,7 @@ C
             END IF
          END IF
       END DO
-C     
+C
 C     Exit
 C
   500 CONTINUE

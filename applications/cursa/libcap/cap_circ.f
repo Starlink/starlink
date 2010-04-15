@@ -207,7 +207,7 @@
             DCMAX = MIN(DCMAX, CAP__PI / 2.0D0)
 
 *
-*          The Right Ascension must lie in the range 0 to 2*Pi 
+*          The Right Ascension must lie in the range 0 to 2*Pi
 
             IF ( RAMIN .LT. 0.0D0 ) THEN
                RAMIN = RAMIN + 2.0D0 * CAP__PI
@@ -219,7 +219,7 @@
 C           print3000, radius, ramin, ramax, dcmin, dcmax
 C3000       format(1x, 'Coordinates of the bounding box:' /
 C     :        3x, 'radius: ', 1pd20.8 /
-C     :        3x, 'ramin: ', 1pd20.8 / 
+C     :        3x, 'ramin: ', 1pd20.8 /
 C     :        3x, 'ramax: ',  1pd20.8 /
 C     :        3x, 'dcmin: ',  1pd20.8 /
 C     :        3x, 'dcmax: ', 1pd20.8 )
@@ -454,7 +454,7 @@ C    :           expr(36 : 70), expr(71 : 105), lexpr
                IF (REJCAT  .AND.  SI .NE. CAT__NOID  .AND.
      :             STATUS .EQ. SAI__OK) THEN
                   CALL CAT_TIQAI (SI, 'PTR', SELPTR, STATUS)
-                  CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(SELPTR)), 
+                  CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(SELPTR)),
      :              CRIT, .TRUE., CI, DRJI, SIR, NUMREJ, STATUS)
                ELSE
                   SIR = CAT__NOID

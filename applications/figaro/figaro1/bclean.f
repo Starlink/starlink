@@ -62,9 +62,9 @@ C               an automatic bad line search will be preformed,
 C               unless overidden by the setting of the AUTOROW
 C               keyword.
 C     DIRECTION (Numeric) Indicates along which direction on the CCD
-C               the cosmic rays will be interpolated across. 1 means 
-C               columns, -1 means rows, and 0 means let the computer 
-C               decide which gives smaller residuals. 
+C               the cosmic rays will be interpolated across. 1 means
+C               columns, -1 means rows, and 0 means let the computer
+C               decide which gives smaller residuals.
 C
 C     Command keywords -
 C
@@ -93,8 +93,8 @@ C                    is found.
 C     26th Aug 1988  MCBA / AAO. Added CRSHARPNESS, SHARPNESS, and TEXTFILE.
 C     5th  Nov 1990  KS / AAO.  Increased maximum number of cosmic rays.
 C     5th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed.
-C     13th Jul 1993  SJM/MSSSO Copied the Caltech DIRECTION code to give the 
-C                    user the option of deciding what the best interpolation 
+C     13th Jul 1993  SJM/MSSSO Copied the Caltech DIRECTION code to give the
+C                    user the option of deciding what the best interpolation
 C                    direction is for patching up cosmic rays.
 C     15th Apr 1997  JJL / Soton, Starlink. Maps the variance array so
 C                    that is is written to the output file.
@@ -166,7 +166,7 @@ C
       INTEGER      VSLOT        ! Map slot number for output data array
       INTEGER      WPTR         ! Dynamic-memory pointer to workspace
       INTEGER      WSLOT        ! Map slot number of workspace
-      INTEGER      DIRECTION    ! direction for CR interpolation 
+      INTEGER      DIRECTION    ! direction for CR interpolation
 C
 C     Initialisation of DSA_ routines
 C
@@ -273,7 +273,7 @@ C
 C     Do a test for a variance array. VEXIST = .TRUE. if there is.
 C
       VEXIST = .FALSE.
-      CALL DSA_SEEK_VARIANCE('OUTPUT',VEXIST,STATUS)      
+      CALL DSA_SEEK_VARIANCE('OUTPUT',VEXIST,STATUS)
       IF (VEXIST) THEN
          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VPTR,
      :                          VSLOT,STATUS)

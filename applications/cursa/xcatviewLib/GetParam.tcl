@@ -35,7 +35,7 @@ proc GetParam {twidth prompt helptext} {
     pack  .getparam.label  .getparam.name
 
 #
-# Bind the return key to set global variable button to "ok".  That is, 
+# Bind the return key to set global variable button to "ok".  That is,
 # hitting return will have the same effect as clicking on the "ok"
 # button.
 
@@ -57,7 +57,7 @@ proc GetParam {twidth prompt helptext} {
 
     pack .getparam.can  -side left -expand 1 -padx 3m -pady 2m -ipadx 1m
     pack .getparam.help -side left -expand 1 -padx 3m -pady 2m -ipadx 1m
- 
+
 
 # Withdraw the window, then update all the geometry information
 # so we know how big it wants to be, then center the window in

@@ -1,7 +1,7 @@
       SUBROUTINE TBL_GETCVL( IN, START, LEN, SZARR, OUT, COLOUT)
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'

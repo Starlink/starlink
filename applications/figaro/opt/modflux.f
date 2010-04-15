@@ -24,9 +24,9 @@
 *               - 5 Skew Gaussian with base
 *               - 6 Cauchy function with base
 *    AREA = REAL (Returned)
-*       
+*
 *    AREA_ERROR = REAL (Returned)
-*       
+*
 * History:
 *   IMAP made argument, TNW 24/1/89
 *   N removed, TNW 27/1/89

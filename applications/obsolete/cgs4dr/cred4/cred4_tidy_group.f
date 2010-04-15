@@ -27,9 +27,9 @@
 
 *    Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Get the full group name
-      CLEN = INDEX( GROUP, SEPARATOR ) 
+      CLEN = INDEX( GROUP, SEPARATOR )
       TMP_GROUP = RGDIR(1:CHR_LEN(RGDIR)) // GROUP(CLEN+1:CHR_LEN(GROUP))
 
 *    Delete _pf files

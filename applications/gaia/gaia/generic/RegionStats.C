@@ -37,7 +37,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     32-JUL-2001 (PWD):
  *        Original version.
@@ -127,10 +127,10 @@ void RegionStats::calc()
     switch ( type ) {
         case BYTE_IMAGE:
             if ( swap_ ) {
-                calcSwap( (unsigned char *) image, nx, ny, bscale, bzero, 
+                calcSwap( (unsigned char *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (unsigned char *) image, nx, ny, bscale, bzero, 
+                calcNative( (unsigned char *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;
@@ -145,25 +145,25 @@ void RegionStats::calc()
             break;
         case USHORT_IMAGE:
             if ( swap_ ) {
-                calcSwap( (ushort *) image, nx, ny, bscale, bzero, 
+                calcSwap( (ushort *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (ushort *) image, nx, ny, bscale, bzero, 
+                calcNative( (ushort *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;
         case SHORT_IMAGE:
             if ( swap_ ) {
-                calcSwap( (short *) image, nx, ny, bscale, bzero, 
+                calcSwap( (short *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (short *) image, nx, ny, bscale, bzero, 
+                calcNative( (short *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;
         case LONG_IMAGE:
             if ( swap_ ) {
-                calcSwap( (FITS_LONG *) image, nx, ny, bscale, bzero, 
+                calcSwap( (FITS_LONG *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
                 calcNative( (FITS_LONG *) image, nx, ny, bscale, bzero,
@@ -175,16 +175,16 @@ void RegionStats::calc()
                 calcSwap( (float *) image, nx, ny, bscale, bzero, x0, y0,
                           x1, y1 );
             } else {
-                calcNative( (float *) image, nx, ny, bscale, bzero, 
+                calcNative( (float *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;
         case DOUBLE_IMAGE:
             if ( swap_ ) {
-                calcSwap( (double *) image, nx, ny, bscale, bzero, 
+                calcSwap( (double *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (double *) image, nx, ny, bscale, bzero, 
+                calcNative( (double *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;

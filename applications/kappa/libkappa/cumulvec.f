@@ -17,10 +17,10 @@
 *        The global status.
 
 *  Description:
-*     This application forms the cumulative sum of the values of a 
+*     This application forms the cumulative sum of the values of a
 *     one-dimensional NDF starting from the first to the last element.
 *     thus the first output pixel will be unchanged but the second will
-*     be the sum of the first two input pixels, third output pixel is the 
+*     be the sum of the first two input pixels, third output pixel is the
 *     sum of the first three input pixels and so on.  Anomalous values
 *     may be excluded from the summation by setting a threshold.
 
@@ -35,7 +35,7 @@
 *     THRESH = _DOUBLE (Read)
 *        The maximum difference between adjacent elements for the
 *        summation to ocur.  For increments outside the allowed
-*        range, the increment becomes zero.  If null, !, is given, then 
+*        range, the increment becomes zero.  If null, !, is given, then
 *        there is no limit.  [!]
 *     TITLE = LITERAL (Read)
 *        The title of the output NDF.  A null (!) value means using the
@@ -47,24 +47,24 @@
 *       form NDF profile.
 *     cumulvec in=gradient out=profile thresh=20
 *       As above but only adjacent values separated by less than 20
-*       are included in the summation. 
+*       are included in the summation.
 
 *  Related Applications:
 *     KAPPA: HISTOGRAM.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
+*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an
 *     NDF data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
-*     supported.  Bad pixels are propagated and excluded from the 
-*     summation.  
+*     supported.  Bad pixels are propagated and excluded from the
+*     summation.
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single- or double-precision floating point as
 *     appropriate.
 
 *  Copyright:
-*     Copyright (C) 2006 Central Laboratory of the Research Councils. 
+*     Copyright (C) 2006 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -95,7 +95,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -183,7 +183,7 @@
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,History,Quality', 'OUT', 
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,History,Quality', 'OUT',
      :               NDFO, STATUS )
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
@@ -232,18 +232,18 @@
 *  ======================
 
 *  Form cumulative sum.  Reject increments when adjacent pixels deviate
-*  from by more than the threshold, calling the routine of the 
+*  from by more than the threshold, calling the routine of the
 *  appropriate data type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_CPWDR( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTIN( 2 ) ) ),
-     :                    THRESH, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                    THRESH, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_CPWDD( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTIN( 2 ) ) ),
-     :                    DTHRES, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                    DTHRES, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ), STATUS )
 
       END IF

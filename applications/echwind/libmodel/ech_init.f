@@ -60,7 +60,7 @@
 *     08 Dec 1989  : Added configuration handling (AAOEPP::WFL)
 *     23 Sep 1994  : Added blaze0, thetacam, collxe, prface, prapex, gamafac.
 *                    (MPF/RGO)
-*     05 Feb 1997  : Modified calls to str$upcase to str_upcase for 
+*     05 Feb 1997  : Modified calls to str$upcase to str_upcase for
 *                    Linux port (BLY,RAL).
 *
 *   Type definitions :

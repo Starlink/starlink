@@ -3,8 +3,8 @@
 *
 *     R E D 4 _ I R F L A T
 *
-*     Figaro function that produces a "flatfield" ripple 
-*     spectrum from a infrared  spectrum, by averaging the data from 
+*     Figaro function that produces a "flatfield" ripple
+*     spectrum from a infrared  spectrum, by averaging the data from
 *     regions of the spectrum uncontaminated with spectral features
 *     (i.e. assumed flat) to determine the relative response of each
 *     detector or scan. The output spectrum can be divided into the original
@@ -12,7 +12,7 @@
 *
 *     The program is used to remove two kinds of ripple from spectra.
 *     In instruments which interleave a number of scan positions to give
-*     a fully sampled spectrum (such as CGS3 and CGS4), the program removes 
+*     a fully sampled spectrum (such as CGS3 and CGS4), the program removes
 *     ripple which results from seeing or transparency fluctuations between
 *     scan positions. In an instrument such as CGS2 it can remove the ripple
 *     which results from the fact that the flatfield (i.e. relative detector
@@ -122,13 +122,13 @@
       IF ( NDIM .GT. 1 ) GOTO 500
 
 *   Open named output stream
-      CALL DSA_NAMED_OUTPUT( 'OUTPUT', OUTPUT, 'SPECTRUM', 
+      CALL DSA_NAMED_OUTPUT( 'OUTPUT', OUTPUT, 'SPECTRUM',
      :     0, 1, DSA_STATUS )
       IF ( STATUS .NE. DSA__OK ) GOTO 500
       CALL DSA_USE_QUALITY( 'OUTPUT', DSA_STATUS )
 
 *   Find value of period
-      CALL DSA_GET_FITS_F( 'SPECTRUM', 'DETINCR', 0, DETINCR, 
+      CALL DSA_GET_FITS_F( 'SPECTRUM', 'DETINCR', 0, DETINCR,
      :     STRING, DSA_STATUS )
 
       ND = NINT( 1.0 / DETINCR )
@@ -146,14 +146,14 @@
       CALL FIG_IRFLAT_FILL( NX, ND, NS, %val(SPTR), %val(DPTR) )
 
 *   Force creation of error array by mapping it, then zero it
-      CALL DSA_MAP_ERRORS( 'OUTPUT', 'UPDATE', 'FLOAT', 
+      CALL DSA_MAP_ERRORS( 'OUTPUT', 'UPDATE', 'FLOAT',
      :     EPTR, ESLT, DSA_STATUS)
-      CALL GEN_FILL( NX*DSA_TYPESIZE('FLOAT',STATUS), 0, %val(EPTR) ) 
+      CALL GEN_FILL( NX*DSA_TYPESIZE('FLOAT',STATUS), 0, %val(EPTR) )
 
 *   Map data  and quality array
-      CALL DSA_MAP_DATA( 'OUTPUT', 'UPDATE', 'FLOAT', 
+      CALL DSA_MAP_DATA( 'OUTPUT', 'UPDATE', 'FLOAT',
      :     OPTR, OSLT, DSA_STATUS )
-      CALL DSA_MAP_QUALITY( 'OUTPUT', 'UPDATE', 'BYTE', 
+      CALL DSA_MAP_QUALITY( 'OUTPUT', 'UPDATE', 'BYTE',
      :     QPTR, QSLT, DSA_STATUS )
       IF ( DSA_STATUS .NE. DSA__OK ) GOTO 500
 
@@ -171,8 +171,8 @@
       CALL GEN_FILL( ND*DSA_TYPESIZE('INT',STATUS), 0, %val(NPTR) )
 
 *   Operate on data
-      CALL FIG_IRFLAT_FOLD( %val(OPTR), %val(QPTR), NX, IXST, IXEN, 
-     :     %val(DPTR), %val(SPTR), %val(UPTR), NS, ND, 
+      CALL FIG_IRFLAT_FOLD( %val(OPTR), %val(QPTR), NX, IXST, IXEN,
+     :     %val(DPTR), %val(SPTR), %val(UPTR), NS, ND,
      :     %val(SUMPTR), %val(NPTR) )
 
 *   Repeat for more ranges if necessary
@@ -185,14 +185,14 @@
               CALL PAR_CNPAR( 'XEND' )
               CALL DSA_AXIS_RANGE( 'SPECTRUM', 1, ' ', .FALSE., XS, XE,
      :             IXST, IXEN, DSA_STATUS )
-              CALL FIG_IRFLAT_FOLD( %val(OPTR), %val(QPTR), NX, IXST, 
-     :             IXEN, %val(DPTR), %val(SPTR), %val(UPTR), NS, ND, 
+              CALL FIG_IRFLAT_FOLD( %val(OPTR), %val(QPTR), NX, IXST,
+     :             IXEN, %val(DPTR), %val(SPTR), %val(UPTR), NS, ND,
      :             %val(SUMPTR), %val(NPTR) )
           ENDIF
       ENDDO
 
 *   Make the flat field spectrum
-      CALL FIG_IRFLAT_WORK( ND, %val(SUMPTR), %val(NPTR), 
+      CALL FIG_IRFLAT_WORK( ND, %val(SUMPTR), %val(NPTR),
      :     NX, %val(DPTR), %val(OPTR) )
 
 *   Tidy up

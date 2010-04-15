@@ -75,10 +75,10 @@
 #
 #         -modified boolean
 #
-#     This option is set to 1 (true) after a keypress in any of the 
-#     entries occurs (these keypresses are not any of the recognised 
-#     ones for moving the selection etc.). This doesn't actually 
-#     guarantee that an entry has changed, but indicates it might 
+#     This option is set to 1 (true) after a keypress in any of the
+#     entries occurs (these keypresses are not any of the recognised
+#     ones for moving the selection etc.). This doesn't actually
+#     guarantee that an entry has changed, but indicates it might
 #     have.
 
 #  Inheritance:
@@ -188,7 +188,7 @@
 #        Returns a list of the indices of the currently selected
 #        values.
 #     sethelp docname label
-#        Sets the document and label for the help associated with 
+#        Sets the document and label for the help associated with
 #        this widget as a whole.
 #
 #     Internal methods (should not be used outside of this class defintion).
@@ -660,8 +660,8 @@
 
 
 #  Set the context help for this widget (as a whole).
-      method sethelp { docname label } { 
-         if $exists { 
+      method sethelp { docname label } {
+         if $exists {
             Ccd::base::sethelp $Oldthis $docname $label
          }
       }
@@ -916,7 +916,7 @@
 
 #  And adjust the positions of the text. Need update to make sure we
 #  get the real end not some intermediary position.
-            if { $flushright } { 
+            if { $flushright } {
                update
                for { set j 0 } { $j < $columns } { incr j } {
                   for { set i 0 } { $i < $rows } { incr i } {
@@ -1134,7 +1134,7 @@
          set pvalue $padvalue
       }
 
-#  Whether any text is flushed right (so that the end of the insertion can 
+#  Whether any text is flushed right (so that the end of the insertion can
 #  be viewed or not).
       public variable flushright 1 {}
 

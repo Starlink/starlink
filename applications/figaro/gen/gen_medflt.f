@@ -5,7 +5,7 @@ C     G E N _ M E D F L T
 C
 C     Median filters a 2D real array, using a box of a given size.
 C     That is, each pixel of the result array is set to the median
-C     value of a box of pixels centered on the corresponding pixel 
+C     value of a box of pixels centered on the corresponding pixel
 C     in the input array.
 C
 C     Parameters -  (">" input, "<" output, "W" workspace)

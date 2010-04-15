@@ -19,7 +19,7 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The FitsChan class provides facilities for reading and writing AST 
+*     The FitsChan class provides facilities for reading and writing AST
 *     Objects in the form of FITS header cards.
 
 *  Inheritance:
@@ -32,19 +32,19 @@
 *           Integer dentifier for an illegal FITS data type.
 *        AST__COMMENT
 *           Integer dentifier for a FITS comment keyword.
-*        AST__INT    
+*        AST__INT
 *           Integer dentifier for the integer FITS data type.
-*        AST__FLOAT  
+*        AST__FLOAT
 *           Integer dentifier for the floating point FITS data type.
-*        AST__STRING 
+*        AST__STRING
 *           Integer dentifier for the string FITS data type.
-*        AST__CONTINUE 
+*        AST__CONTINUE
 *           Integer dentifier for the continuation string FITS data type.
 *        AST__COMPLEXF
 *           Integer dentifier for the complex floating point FITS data type.
 *        AST__COMPLEXI
 *           Integer dentifier for the complex integer FITS data type.
-*        AST__LOGICAL 
+*        AST__LOGICAL
 *           Integer dentifier for the logical FITS data type.
 *        AST__UNDEF
 *           Integer dentifier for undefined FITS data type.
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -138,7 +138,7 @@
 #define AST__NOTYPE       -1
 #define AST__COMMENT       0
 #define AST__INT           1
-#define AST__FLOAT         2  
+#define AST__FLOAT         2
 #define AST__STRING        3
 #define AST__COMPLEXF      4
 #define AST__COMPLEXI      5
@@ -148,7 +148,7 @@
 
 /* Define constants used to size global arrays in this module. */
 #define AST__FITSCHAN_FITSCARDLEN        80
-#define AST__FITSCHAN_GETATTRIB_BUFF_LEN 50    
+#define AST__FITSCHAN_GETATTRIB_BUFF_LEN 50
 
 #endif
 
@@ -272,7 +272,7 @@ typedef struct AstFitsChanVtab {
 
 } AstFitsChanVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -280,9 +280,9 @@ typedef struct AstFitsChanGlobals {
    AstFitsChanVtab Class_Vtab;
    int Class_Init;
    char GetAttrib_Buff[ AST__FITSCHAN_GETATTRIB_BUFF_LEN + 1 ];
-   char CnvType_Text[ AST__FITSCHAN_FITSCARDLEN + 1 ]; 
-   char CnvType_Text0[ AST__FITSCHAN_FITSCARDLEN + 1 ]; 
-   char CnvType_Text1[ AST__FITSCHAN_FITSCARDLEN + 1 ]; 
+   char CnvType_Text[ AST__FITSCHAN_FITSCARDLEN + 1 ];
+   char CnvType_Text0[ AST__FITSCHAN_FITSCARDLEN + 1 ];
+   char CnvType_Text1[ AST__FITSCHAN_FITSCARDLEN + 1 ];
    int Items_Written;
    int Write_Nest;
    int Current_Indent;
@@ -331,8 +331,8 @@ AstFitsChan *astFitsChanForId_( const char *(*)( void ),
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstFitsChan *astInitFitsChan_( void *, size_t, int, AstFitsChanVtab *, 
-                               const char *, 
+AstFitsChan *astInitFitsChan_( void *, size_t, int, AstFitsChanVtab *,
+                               const char *,
                                const char *(*)( void ),
                                char *(*)( const char *(*)( void ), int * ),
                                void (*)( const char * ),
@@ -348,7 +348,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
                                const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitFitsChanGlobals_( AstFitsChanGlobals * );
 #endif
 

@@ -184,7 +184,7 @@
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  ROWS,       ! No. of rows in the input catalogue.
@@ -198,7 +198,7 @@
       LOGICAL
      :  QUIET,      ! Flag; operate in quiet or verbose (normal) mode?
      :  ADDPAR      ! Flag; add new parameters?
-     
+
 *.
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -297,7 +297,7 @@
          CALL CAP_CPTAB (CIIN, CIOUT, NUMCOL, FIIN, FIOUT, STATUS)
 
 *
-*       If required, copy any header text from the input catalogue to the 
+*       If required, copy any header text from the input catalogue to the
 *       output catalogue.
 
          IF (TEXT(1 : 1) .NE. 'N') THEN

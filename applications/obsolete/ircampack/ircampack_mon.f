@@ -59,7 +59,7 @@
                                   ! any trailing blanks
 
 *  Local Variables:
-      CHARACTER NAME*( PAR__SZNAM ) ! Action name 
+      CHARACTER NAME*( PAR__SZNAM ) ! Action name
 
 *.
 
@@ -67,7 +67,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the action name.
-      CALL TASK_GET_NAME( NAME, STATUS )      
+      CALL TASK_GET_NAME( NAME, STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task

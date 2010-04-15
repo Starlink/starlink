@@ -13,9 +13,9 @@
 *     RESULT = LPG_AGAIN( STATUS )
 
 *  Description:
-*     This routine is used to allow multiple invocations of an application 
+*     This routine is used to allow multiple invocations of an application
 *     within an Starlink monolith to process a group of data files. The
-*     initialization routine LPG_START should be called prior to this 
+*     initialization routine LPG_START should be called prior to this
 *     routine. This routine returns a logical flag indicating if the
 *     application should be invoked again. A typical way to use this
 *     routine within a monolith is as follows:
@@ -33,20 +33,20 @@
 
 *     The application corresponding to the required action will always be
 *     invoked once. The applications should use the routines LPG_ASSOC,
-*     LPG_PROP, LPG_CREAT and LPG_CREP to get identifier for NDFs, in 
-*     place of the corresponding routines from the NDF library. 
+*     LPG_PROP, LPG_CREAT and LPG_CREP to get identifier for NDFs, in
+*     place of the corresponding routines from the NDF library.
 *
 *     For catalogues, routines LPG_CATASSOC and LPG_CATCREAT should be
 *     used in place of CAT_ASSOC and CAT_CREAT.
 *
 *     LPG_AGAIN returns a .TRUE. value until a group of data files is
-*     exhausted, where-upon it deletes all its groups and returns a 
+*     exhausted, where-upon it deletes all its groups and returns a
 *     .FALSE. value.
 *
-*     On the first invocation of the application, groups of data files are 
-*     obtained whenever one of the above LPG routines is used to get an NDF 
-*     or CAT identifier, and an identifier corresponding to the first name in 
-*     each group is returned to the application. On subsequent invocations, 
+*     On the first invocation of the application, groups of data files are
+*     obtained whenever one of the above LPG routines is used to get an NDF
+*     or CAT identifier, and an identifier corresponding to the first name in
+*     each group is returned to the application. On subsequent invocations,
 *     the names in the groups obtained during the first invocation are used
 *     without obtaining new parameter values from the environment. The
 *     index of the returned data file within each group is increment by 1
@@ -71,20 +71,20 @@
 *     In this case, you do not want to have VPATH=DEFAULT,DEFAULT=! because
 *     this would require the application to abort in the cases where there
 *     is no dynamic default available. It is probably better in these
-*     cases to have VPATH=PROMPT,PPATH=DYNAMIC and accept the fact that 
+*     cases to have VPATH=PROMPT,PPATH=DYNAMIC and accept the fact that
 *     the user will be prompted for a parameter that was previously
 *     defaulted.
 *
 *     Some applications test to see if a parameter was specified on the
 *     command line, and vary their behaviour accordingly. This is done
-*     by checking the state of the parameter before accessing it, a 
-*     state of PAR__ACTIVE (or SUBPAR__ACTIVE) indicating that the 
+*     by checking the state of the parameter before accessing it, a
+*     state of PAR__ACTIVE (or SUBPAR__ACTIVE) indicating that the
 *     parameter already has a value. This is correct on the first
-*     invocation, but not on subsequent invocations because the first 
+*     invocation, but not on subsequent invocations because the first
 *     invocation may have set a parameter value, resulting in subsequent
-*     invocations thinking that the parameter was given on the command 
-*     line. To avoid this, applications should use LPG_STATE in place of 
-*     PAR_STATE. LPG_STATE remembers the state of the parameter on the 
+*     invocations thinking that the parameter was given on the command
+*     line. To avoid this, applications should use LPG_STATE in place of
+*     PAR_STATE. LPG_STATE remembers the state of the parameter on the
 *     first invocation, and returns that state, rather than the current
 *     parameter state, on subsequent invocations.
 
@@ -93,7 +93,7 @@
 *        The global status.
 
 *  Returned Value:
-*     LPG_AGAIN = LOGICAL 
+*     LPG_AGAIN = LOGICAL
 *        .TRUE. if the application should be executed again.
 
 *  Copyright:
@@ -105,12 +105,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -147,7 +147,7 @@
 *        PNAME( LPG__MXPAR ) = CHARACTER * ( DAT__SZNAM ) (Read and Write)
 *           The names of the daat file parameters used by the application.
 *        IGRP( LPG__MXPAR ) = INTEGER (Read and Write)
-*           The identifier for the GRP groups holding the daat file names 
+*           The identifier for the GRP groups holding the daat file names
 *           supplied for each daat file parameter.
 *        SIZE( LPG__MXPAR ) = INTEGER (Read and Write)
 *           The number of data files supplied for each parameter.
@@ -157,15 +157,15 @@
 *           The number of times the application has been invoked so far.
 *        OLD( LPG__MXPAR ) = LOGICAL (Read and Write)
 *           A flag for each data file parameter indicating if the parameter
-*           is used to access existing (i.e. old) daat files. If not, the 
-*           parameter is used to access new data files to be created by the 
+*           is used to access existing (i.e. old) daat files. If not, the
+*           parameter is used to access new data files to be created by the
 *           application.
 *        REP( LPG__MXPAR ) = LOGICAL (Write)
-*           A flag for each data file parameter indicating if the parameter 
+*           A flag for each data file parameter indicating if the parameter
 *           value has been reported yet by the current invocation of the
 *           application.
 *        VERB = LOGICAL (Read)
-*           A flag indicating if the values used for each multi-valued 
+*           A flag indicating if the values used for each multi-valued
 *           parameter should be displayed each time the parameter is accessed.
 *        DELAY = REAL (Read)
 *           The inter-invocation delay, in seconds.
@@ -179,12 +179,12 @@
 *           be open by the NDF system. In this case the temporary NDF
 *           is copied to the requested position once the application has
 *           finished.  The TMPLST group holds adjacent pairs of file
-*           specs; the first one in each pair is the spec of the temporary 
+*           specs; the first one in each pair is the spec of the temporary
 *           output NDF, the second is the spec of the requested output NDF.
 *        OPNLST = INTEGER (Read and Write)
 *           A GRP identifier for a group holding the full specification
 *           for any existing NDFs which have been opened for read-only
-*           input by this invocation of the application. 
+*           input by this invocation of the application.
 *        REPLACE = LOGICAL (Read)
 *           Should the user be allowed to use the same input as both
 *           input and output? If so, a temporary NDF will be used to
@@ -203,7 +203,7 @@
       INTEGER IAT                ! Used length of PARS string
       INTEGER ISTAT              ! Saved status on entry
       INTEGER N                  ! No. of over-supplied parameters
-      INTEGER SURP               ! No. of surplus data files 
+      INTEGER SURP               ! No. of surplus data files
       LOGICAL ALLONE             ! All parameters have only a single data file?
       LOGICAL FLUSH              ! Flush an error in the previous invocation?
 *.
@@ -225,7 +225,7 @@
       NRUN = NRUN + 1
 
 *  If this is the first invocation of the application, return .TRUE. so
-*  that the application is executed at least once. 
+*  that the application is executed at least once.
       IF( NRUN .EQ. 1 ) THEN
          LPG_AGAIN = .TRUE.
 
@@ -244,7 +244,7 @@
 *  the application again.
          LPG_AGAIN = .TRUE.
 
-*  Assume for now that all data file parameters are associated with only a 
+*  Assume for now that all data file parameters are associated with only a
 *  single data file.
          ALLONE = .TRUE.
 
@@ -266,7 +266,7 @@
          END DO
  10      CONTINUE
 
-*  If no multi-valued data file parameters were found, do not re-run the 
+*  If no multi-valued data file parameters were found, do not re-run the
 *  application.
          IF( ALLONE ) LPG_AGAIN = .FALSE.
 
@@ -287,7 +287,7 @@
 
 *  If any un-exhausted groups were found, warn the user that some data files
 *  were not used.
-            IF( N .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
+            IF( N .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'P', PARS( : IAT ) )
 
@@ -307,14 +307,14 @@
                   CALL MSG_SETI( 'N', N )
                   CALL ERR_REP( 'LPG_AGAIN_ERR3', 'Surplus data files'//
      :                          ' supplied for the following ^N '//
-     :                          'parameter have been ignored: ^P.', 
+     :                          'parameter have been ignored: ^P.',
      :                          STATUS )
                END IF
 
 *  Since this error is not fatal, flush it.
                CALL ERR_FLUSH( STATUS )
 
-            END IF               
+            END IF
 
          END IF
 
@@ -324,10 +324,10 @@
 *  Delay for the required interval.
             IF( DELAY .GT. 0.0 ) CALL LPG1_SLEEP( DELAY, STATUS )
 
-*  Print out a divider on the screen to separate the screen output from 
-*  the two invokations, if required, and indicate that the parameter values 
+*  Print out a divider on the screen to separate the screen output from
+*  the two invokations, if required, and indicate that the parameter values
 *  used in the next invocation of the application have not yet been reported.
-            IF( VERB ) THEN 
+            IF( VERB ) THEN
                CALL MSG_BLANK( STATUS )
 
                DO I = 1, NPAR
@@ -343,22 +343,22 @@
 *  we should flush it so that the application can continue to process any
 *  remaining data files. Since we are currently in a new error reporting
 *  environment, we cannot flush the error now, so we set a flag indicating
-*  if the error should be flushed once we have returned to the original error 
+*  if the error should be flushed once we have returned to the original error
 *  reporting environment. We flush if:
 *
 *     1) There is no error status in the current reporting context. Such
 *        an error would indicate a failure in the looping infrastructure which
 *        we cannot recover from.
 *     2) There was an error on entry (recorded in ISTAT).
-*     3) The error on entry was not PAR__ABORT. This means the user can enter 
+*     3) The error on entry was not PAR__ABORT. This means the user can enter
 *        !! to abort the whole loop.
 *     4) We are about to invoke the application again (i.e. errors in the
 *        final invocation are not flushed).
-*     5) We have already performed at least one invocation (i.e. the error 
+*     5) We have already performed at least one invocation (i.e. the error
 *        did not occur in the ADAM fixed part, or the calling monolith
 *        routine).
       FLUSH = ( STATUS .EQ. SAI__OK .AND. ISTAT .NE. SAI__OK .AND.
-     :          ISTAT .NE. PAR__ABORT .AND. LPG_AGAIN .AND. 
+     :          ISTAT .NE. PAR__ABORT .AND. LPG_AGAIN .AND.
      :          NRUN .GT. 1 )
 
 *  Re-instate the original error reporting environment. First, annul any

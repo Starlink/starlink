@@ -77,7 +77,7 @@
 *  If we get here then the string is all blanks.
       L = 0
       GO TO 40
-      
+
    20 CONTINUE
       OUT = IN(I:)
 
@@ -87,4 +87,4 @@
    30 CONTINUE
 
    40 CONTINUE
-      END       
+      END

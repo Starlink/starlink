@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -292,7 +292,7 @@ unsigned long *pixels, *pix;
 
 strcpy( wind0, "WI " );
 if (virgin == 1)
-   { 
+   {
    if (!(display_id = XOpenDisplay(NULL)))
       {
       *status = VD_XCONNERR;
@@ -301,7 +301,7 @@ if (virgin == 1)
    virgin++;
    }
 else
-   {       
+   {
    virgin++;
    newwin = 0 ;
    wind0[2]= '0';
@@ -310,13 +310,13 @@ else
 
 /* Get window information from memory file */
       nit = 1;
-      kwm_xtr (filwnd , wind0 , &nit , arg); 
+      kwm_xtr (filwnd , wind0 , &nit , arg);
       if (nit == 0)
          {
          *status = VD_FILKWERR;
          return;
          }
-      if (arg[0] != 0) 
+      if (arg[0] != 0)
          {
          display_id =  (Display*) arg[0] ;
          wind0[2]++;
@@ -325,7 +325,7 @@ else
 	 newwin = 1;
       }
 
-   } 
+   }
 
 /* Window creation */
 /* Look for an existing window with this name */
@@ -440,13 +440,13 @@ while (wfree == 0 )
 
 /* Get window information from memory file */
    nit = 1;
-   kwm_xtr (filwnd , wind0 , &nit , arg); 
+   kwm_xtr (filwnd , wind0 , &nit , arg);
    if (nit == 0)
       {
       *status = VD_FILKWERR;
       return;
       }
-   if (arg[0] != 0) 
+   if (arg[0] != 0)
       wind0[2]++;
    else
       {
@@ -700,7 +700,7 @@ else
       return;
       }
 
-   }   
+   }
 
 return;
 }
@@ -775,7 +775,7 @@ unsigned int   xdim, ydim;
 
 /* Get window information from memory file */
 nit = 2;
-kwm_xtr (filwnd , wind , &nit , arg); 
+kwm_xtr (filwnd , wind , &nit , arg);
 
 /* - - - - - - - - - - - - - - - - -  */
 /* System dependent modification      */
@@ -817,7 +817,7 @@ else
 /* - - - - - - - - - - - - - - -   */
 /* Update window file              */
 /* - - - - - - - - - - - - - - -   */
-   
+
 arg[2] += 0;
 arg[3] += 0;
 arg[4] += dxdim;

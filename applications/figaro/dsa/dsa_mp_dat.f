@@ -9,7 +9,7 @@ C     Maps the main data array in a structure.
 C
 C  Description:
 C     This routine maps the main data array in a structure, returning
-C     the address of the dynamic memory array that may be used to 
+C     the address of the dynamic memory array that may be used to
 C     access it.   The whole array is mapped.
 C
 C  Language:
@@ -21,16 +21,16 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
 C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT', 'USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT', 'USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
-C     (<) ADDRESS      (Integer,ref) The memory address of the start of 
+C     (<) ADDRESS      (Integer,ref) The memory address of the start of
 C                      the mapped data array.
 C     (<) SLOT         (Integer,ref) A handle value that identifies the
 C                      mapping, and can be used, for example, in a
@@ -39,13 +39,13 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
 C     ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_WRUSER, DSA_GET_ACTUAL_NAME,
 C     DSA_MAIN_SIZE, ICH_FOLD, DTA_STRUC, DTA_TYVAR, DSA_SEEK_FLAGGED_VALUES,
-C     DSA_SEEK_QUALITY, DSA_PRE_PROCESS_FLAGGED_VALUES, 
+C     DSA_SEEK_QUALITY, DSA_PRE_PROCESS_FLAGGED_VALUES,
 C     DSA_PRE_PROCESS_QUALITY, DSA__SET_FLAGGED, DSA__ARRAY, DSA__DATA_NAME
 C
 C  Prior requirements:
@@ -60,7 +60,7 @@ C  Common variable details:
 C     (>) MAX_AXES     (Integer parameter) Maximum number of axes in data.
 C     (>) USE_FLAGS    (Logical array) Indicates application can handle flagged
 C                      data values.
-C     (<) DATA_UPDATE  (Logical array) Indicates that the data array has 
+C     (<) DATA_UPDATE  (Logical array) Indicates that the data array has
 C                      been updated (or at least, mapped for update).
 C     (>) USE_QUALITY  (Logical array) Indicates application will use a data
 C                      quality array.
@@ -142,7 +142,7 @@ C
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       LOGICAL   QUALITY_EXIST               ! Quality info present
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE_NAME*128          ! Full structure name from ref_name
       CHARACTER TYPE_UC*8                   ! Upper case version of TYPE
       LOGICAL   UNFLAG                      ! Flagged values to be processed out
@@ -162,7 +162,7 @@ C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -194,8 +194,8 @@ C     quality array but flagged data will be used (and so the flags need
 C     inserting).  The reason for insisting on a copy in these circumstances
 C     is that if a program crashes after fiddling with a data array that is
 C     mapped directly to disk and before resetting these fiddles, the disk
-C     data will end up in the fiddled state.  Data needs unflagging at 
-C     this stage only if it contains flags but neither quality nor flags 
+C     data will end up in the fiddled state.  Data needs unflagging at
+C     this stage only if it contains flags but neither quality nor flags
 C     are going to be used by the application.  Important: Note that
 C     the DSA_PRE_PROCESS_xxx routines assume that this routine has called
 C     both of DSA_SEEK_FLAGGED_VALUES and DSA_SEEK_QUALITY (to set the
@@ -249,7 +249,7 @@ C     mapping, if the application is using flagged values and the structure
 C     does not have data quality information, make sure the `data flagged'
 C     flag for the structure is set. Also set the data slot to give a
 C     handle to the data mapping.
-C 
+C
       IF ((MODE(1:1).NE.'R').AND.(MODE(1:1).NE.'r')) THEN
          DATA_UPDATE(REF_SLOT)=.TRUE.
          RANGE_UPDATE(REF_SLOT)=.FALSE.
@@ -261,7 +261,7 @@ C
       DATA_SLOT(REF_SLOT)=SLOT
 C
 C     Finally, see if we need to call either of the pre-process routines.
-C     If the application is going to use flagged data, we can call 
+C     If the application is going to use flagged data, we can call
 C     DSA_PRE_PROCESS_FLAGGED_VALUES now.  If it is going to use quality
 C     data, then we call DSA_PRE_PROCESS_QUALITY from whichever of this
 C     and DSA_MAP_QUALITY is called second (because both need to have

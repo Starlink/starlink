@@ -1,15 +1,15 @@
       PROGRAM PGDEM4
 C-----------------------------------------------------------------------
-C Test program for PGPLOT: test of imaging routine PGGRAY (with 
+C Test program for PGPLOT: test of imaging routine PGGRAY (with
 C PGCONT). This program serves to both demonstrate and test PGGRAY.
 C It computes an (arbitrary) function on a 2D array, and uses both
-C PGGRAY and PGCONT to display it. An irregular transformation (TR 
+C PGGRAY and PGCONT to display it. An irregular transformation (TR
 C matrix) is used, to test (a) that the routine works when the array
 C pixels are not aligned with the device pixels, and (b) that the
 C image is clipped correctly at the edge of the viewport. The program
 C also draws the bounding quadrilateral of the contour map. The contours
-C should end on this quadrilateral, but note that the grayscale image 
-C extends one half pixel beyond this quadrilateral (if the subarray to 
+C should end on this quadrilateral, but note that the grayscale image
+C extends one half pixel beyond this quadrilateral (if the subarray to
 C be displayed contains N pixels in one dimension, the width of the
 C image is N units, while the width of the contour map is N-1 pixels).
 C-----------------------------------------------------------------------
@@ -60,7 +60,7 @@ C
       CALL PGWNAD(-40., 40.,-40., 40.)
       CALL PGSCI(1)
 C
-C Draw the map with PGGRAY.  
+C Draw the map with PGGRAY.
 C
       CALL PGGRAY(F,MXI,MXJ,1,MXI,1,MXJ,FMAX,FMIN,TR)
 C
@@ -111,7 +111,7 @@ C Set up the color map.
 C
       CALL PALETT(2)
 C
-C Draw the map with PGIMAG.  
+C Draw the map with PGIMAG.
 C
       CALL PGIMAG(F,MXI,MXJ,1,MXI,1,MXJ,FMIN,FMAX,TR)
 C

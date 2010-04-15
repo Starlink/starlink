@@ -105,7 +105,7 @@
 
       ELSE IF (SORN(1:1).EQ.'N'.OR.SORN(1:1).EQ.'n') THEN
 
-*     Changing from SGS to NCAR: 
+*     Changing from SGS to NCAR:
 
 *     Changing from NCAR to SGS: check toggle state
          IF (STATE.NE.'S') GO TO 9000

@@ -28,7 +28,7 @@
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
   </developers>
-  <documentation>@STAR_DOCUMENTATION@</documentation> 
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

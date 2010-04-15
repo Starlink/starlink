@@ -15,16 +15,16 @@
 
 *  Description:
 *     The routine returns the anti-clockwise angle from the first axis of
-*     the Base Frame of the supplied FrameSet to the POLPACK reference 
+*     the Base Frame of the supplied FrameSet to the POLPACK reference
 *     direction, in degrees.
 *
 *     If the NDF or catalogue contains a ANGROT value (either in the
 *     POLPACK extension of an NDF or as a catalogue parameter), then
-*     the ANGROT value is returned. 
+*     the ANGROT value is returned.
 *
-*     Otherwise, it the supplied FrameSet contains a Frame with Domain 
-*     POLANAL, the angle between the first axis of the POLANAL Frame 
-*     and the first axis of the Base Frame is returned as ANGROT. 
+*     Otherwise, it the supplied FrameSet contains a Frame with Domain
+*     POLANAL, the angle between the first axis of the POLANAL Frame
+*     and the first axis of the Base Frame is returned as ANGROT.
 *
 *     ANGROT items were written by versions of POLPACK prior to V2.0.
 *     The POLANAL Frame written before V2.0 did not take account of the
@@ -46,7 +46,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,22 +96,22 @@
       INTEGER ICURR
       INTEGER NDIM
       INTEGER NPOL
-      REAL LANG 
+      REAL LANG
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise a local copy of ANGROT to indicate no value has yet been 
+*  Initialise a local copy of ANGROT to indicate no value has yet been
 *  obtained.
       LANG = VAL__BADR
 
 *  If an NDF has been supplied, attempt to get the ANGROT value from the
 *  POLPACK extension.
       IF( INDF .NE. NDF__NOID ) THEN
-         CALL NDF_XGT0R( INDF, 'POLPACK', 'ANGROT', LANG, STATUS ) 
+         CALL NDF_XGT0R( INDF, 'POLPACK', 'ANGROT', LANG, STATUS )
 
-*  Otherwise, attempt to get a CAT identifier for the ANGROT catalogue 
+*  Otherwise, attempt to get a CAT identifier for the ANGROT catalogue
 *  parameter.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          CALL CAT_TIDNT( CI, 'ANGROT', GANG, STATUS )
@@ -146,8 +146,8 @@
 
 *  Find the POLANAL Frame. It becomes the Current Frame in the FrameSet.
          FS = AST_FINDFRAME( IWCS, AST_FRAME( NDIM, 'MINAXES=1, '//
-     :                       'MAXAXES=20', STATUS ), 'POLANAL', 
-     :                       STATUS ) 
+     :                       'MAXAXES=20', STATUS ), 'POLANAL',
+     :                       STATUS )
 
 *  Report an error if no POLANAL Frame was found.
          IF( FS .EQ. AST__NULL ) THEN
@@ -156,24 +156,24 @@
      :                    ' in the input data is undefined since the '//
      :                    'WCS information does not contain a POLANAL'//
      :                    ' Frame.', STATUS )
-        
+
 *  If a POLANAL Frame was found
          ELSE
 
 *  Get the number of axes in it.
-            NPOL = AST_GETI( FS, 'NAXES', STATUS )  
+            NPOL = AST_GETI( FS, 'NAXES', STATUS )
 
-*  Transform 2 points along the first axis of the reference Frame into 
-*  the Base Frame. The first point is the origin, the second point is a 
+*  Transform 2 points along the first axis of the reference Frame into
+*  the Base Frame. The first point is the origin, the second point is a
 *  unit distance along the first axis.
             DO I = 1, NPOL
                IN( 1, I ) = 0.0D0
                IN( 2, I ) = 0.0D0
             END DO
             IN( 2, 1 ) = 1.0D0
-   
+
             CALL AST_TRANN( FS, 2, NPOL, 2, IN, .FALSE., NDIM, 2,
-     :                      OUT, STATUS ) 
+     :                      OUT, STATUS )
 
 *  Find the anti-clockwise angle from the first axis of the Base Frame to
 *  the line from point 1 to point 2. Convert from radians to degrees.

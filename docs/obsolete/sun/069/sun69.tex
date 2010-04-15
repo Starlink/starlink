@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -50,9 +50,9 @@ The compact disc is an increasingly popular medium for the distribution
 of astronomical data, especially for large files such as source
 catalogues and images. CDs can be pressed cheaply in quantity and hold
 around 600 megabytes each.  ISO 9660 specifies a standard physical
-layout and file structure which is almost universally used (although DEC 
+layout and file structure which is almost universally used (although DEC
 is a notable exception). The advent of recordable CD-ROM may provide us
-with an inexpensive and convenient archiving medium. 
+with an inexpensive and convenient archiving medium.
 
 Although CD-ROM readers such as DEC's RRD40 are physically capable of
 reading these discs, VMS cannot (at present) cope with the ISO 9660 file
@@ -63,17 +63,17 @@ unsupported. There are rumours that the next major release of VMS will
 include proper support for ISO standard CD-ROMs. Until then, the {\tt
 CDCOPY} program described here is probably the best alternative for
 VAX/VMS users. It can copy files from ISO 9660 discs to other devices
-and provides several options for format conversion on the fly. 
+and provides several options for format conversion on the fly.
 
 Version 3.6 of {\tt CDCOPY} fixes several minor bugs and in particular
 supports the IRAS survey CD-ROMs which have image arrays with unity as
 the first dimension. Unfortunately {\tt KAPPA} still cannot handle axes
-described by spaced arrays (the natural translation for FITS axis 
+described by spaced arrays (the natural translation for FITS axis
 information) -- but {\tt ASTERIX} will work on these (advt).
 I am grateful to James Albinson for helping to test some of the latest
-modifications. 
+modifications.
 
-\section{Running CDCOPY} 
+\section{Running CDCOPY}
 
 If the software has been installed correctly and you have executed the
 Starlink {\tt LOGIN.COM} file then the name {\tt CDCOPY} will be set as
@@ -82,15 +82,15 @@ name of a CD reader on your system. If your system has more than one CD
 reader then this default may not be suitable and you may need to use the
 physical device name in these commands, or redefine the logical {\tt
 CD\_DEV} to point to the required unit.  It is not necessary to use
-explicit {\tt ALLOCATE} or {\tt MOUNT} commands before using the 
+explicit {\tt ALLOCATE} or {\tt MOUNT} commands before using the
 program, but use of {\tt ALLOCATE} and {\tt DEALLOCATE} may be desirable
-to avoid clashes with other users attempting concurrent access to the 
+to avoid clashes with other users attempting concurrent access to the
 same drive.
 
 {\tt CDCOPY} {\em must} be used as a VMS foreign command with a switch
 after the command-name to select the operation required; the input and
 output file specifications follow on the same line and both have
-defaults.  For example: 
+defaults.  For example:
 \begin{verbatim}
 $ CDCOPY/DIR
 $ CDCOPY/TEXT  [LISTS.VMS]SRCS.LIS  TEMP.TXT
@@ -108,7 +108,7 @@ include {\tt *} as a wild-card, but the notation {\tt [...]} is only
 supported at the top level (to allow a search of the entire disc). The
 filename part may include wild-card characters {\tt *} and {\tt \%} to
 allow a number of files (of the same type) to be copied in one
-operation. 
+operation.
 
 If the output specification is omitted then {\tt /VOL, /PATH} and {\tt
 /DIR} options send their output to \verb+SYS$OUTPUT:+ (normally your
@@ -117,22 +117,22 @@ directory; by default the file has the same name as on the CD-ROM. A
 logical name or directory specification may be used to select another
 destination; an alternative output file-name may be given if you are
 only copying one file. Note that wild-card characters are {\em not}
-allowed in the output specification. 
+allowed in the output specification.
 
-\section{Listing the Volume Header and Path Table} 
+\section{Listing the Volume Header and Path Table}
 
 There are two options to help you find your way around a disc:
-{\tt CDCOPY/VOL} lists the volume header information and {\tt CDCOPY/PATH} 
+{\tt CDCOPY/VOL} lists the volume header information and {\tt CDCOPY/PATH}
 lists the path table (every subdirectory path on the disc). For example:
 \goodbreak
 \begin{verbatim}
-$ CDCOPY/VOL 
+$ CDCOPY/VOL
 CDCOPY version 3.6
  Descriptor type               1
  Standard identifier    CD001
  Descriptor version            1
- System identifier                                      
- Volume identifier      USA_AURA_STSI_GSC1_0002         
+ System identifier
+ Volume identifier      USA_AURA_STSI_GSC1_0002
  Volume space size       1208610
  Volume set size               1
  Volume sequence No.           1
@@ -142,10 +142,10 @@ CDCOPY version 3.6
  Volume set              USA_AURA_STSI_GSC1_0002
  Publisher               SPACE TELESCOPE SCIENCE INSTITUTE
  Data prep.              SPACE TELESCOPE SCIENCE INSTITUTE
- Application              
- Copywrite file                                              
- Abstract file                                               
- Bibliog. file                                               
+ Application
+ Copywrite file
+ Abstract file
+ Bibliog. file
  Creation date/time     1989060100000000
 \end{verbatim}
 
@@ -155,7 +155,7 @@ $ CDCOPY/PATH
 CDCOPY version 3.6
 Volume path table
   #  address    path
-   1      80   
+   1      80
    2      88  GSC
    3      96  TABLES
    4     104  GSC.S0730
@@ -174,26 +174,26 @@ The example shown above comes from volume 2 of the first issue of the
 NASA Guide Star Catalog; many path tables are much longer than this.
 Note that the first path is the (un-named) root.  The {\tt address} is
 the initial sector number of the file which is only provided
-for diagnosic purposes. 
+for diagnosic purposes.
 
 \section{Listing Directories}
 
 Often the next step will be to use {\tt CDCOPY/DIR} to list one or more
 sub-directories.  The default input specification is {\tt CD\_DEV:[ ]*}
 which lists all files in the root directory.  The output will be sent to
-your terminal unless you name an output file. 
+your terminal unless you name an output file.
 
 Examples of use:
 \begin{verbatim}
-$ CDCOPY/DIR  
+$ CDCOPY/DIR
 $ CDCOPY/DIR  DKB0:[GSC.S1500]1%%%.*
 $ CDCOPY/DIR  [GSC.*]*.TXT     ALL.TEXT
 \end{verbatim}
-The following example shows a directory on the ADC catalog disc, volume 
+The following example shows a directory on the ADC catalog disc, volume
 1 number 2.
 \goodbreak
 \begin{verbatim}
-$CDCOPY/DIR [NONSTELL.GALAXIES.IRASGAL] 
+$CDCOPY/DIR [NONSTELL.GALAXIES.IRASGAL]
 CDCOPY version 3.6
 Directory of CD_DEV:[NONSTELL.GALAXIES.IRASGAL]*
     #  ----filename----             ---date/time----   length  rtyp cc reclen
@@ -205,26 +205,26 @@ Directory of CD_DEV:[NONSTELL.GALAXIES.IRASGAL]*
 The sequential numbering starts at 3 because files 1 and 2 are the
 directory itself and its parent.  The letters ``{\tt dir}'' at the end
 of the file-name identifies a file which is a sub-directory, such as {\tt
-SUPPL} in the example above.  
+SUPPL} in the example above.
 
 {\tt length} is the file size in bytes (divide by 512 to get VMS
-blocks). 
+blocks).
 
 {\tt rtyp} is the record type: 0 means no information; 1 means
 fixed-length of {\tt reclen} bytes; other values indicate
-variable-length records. 
+variable-length records.
 
 {\tt cc} shows the carriage-control type for text files: 0 means no
 information or fixed length, 1 means Fortran-style, 2 means embedded
 carriage-control characters.  {\tt CDCOPY} should handle all these cases
-and others. 
+and others.
 
 \section{Copying Files}
 A switch must be used to specify the transfer format.  If you forget
 which switches are available then the command {\tt CDCOPY} alone gives a
 brief summary.  A switch may be abbreviated to the first letter but it must
 appear directly after the command word and not after the input or output
-specifications as is permitted in internal VMS commands. 
+specifications as is permitted in internal VMS commands.
 
 Wild-card characters {\tt *} and {\tt \%} are permitted in the input
 file specification to allow a number of files (of the same type) to be
@@ -235,12 +235,12 @@ copied to your terminal by using {\tt TT:} as the output device.
 \begin{description}
 \item {\tt CDCOPY/BINARY} produces an unformatted direct-access file
 with a record length of 512 bytes. It may be used on all types of file
-but you may need to write your own software to process the results. 
+but you may need to write your own software to process the results.
 
 \item {\tt CDCOPY/FITS} copies FITS files to disc, producing unformatted
 direct-access files with records of 2880 bytes.  No byte swapping is
 performed, this is the responsibility of any software that reads the
-disc files.  
+disc files.
 
 \item {\tt CDCOPY/GSC} is designed to transfer the FITS tables in the
 NASA Guide Star Catalog to text files, but should work on any FITS ASCII
@@ -249,11 +249,11 @@ includes the all the fits header lines as well as the tabular data. If
 used on a FITS file which is not an ASCII table it will just copy the
 header lines.  If the file contains more than one ASCII table in
 sequence than all will be copied to the same output file, each preceded
-by its own extension header. 
+by its own extension header.
 
 \item {\tt CDCOPY/HDS} is designed to copy the image files on the SAO
 Einstein Observatory discs to HDS files, but should work with any FITS
-image files with 8-bit or 16-bit image arrays {\em (but note that it does 
+image files with 8-bit or 16-bit image arrays {\em (but note that it does
 not work on FITS tables, only images)}. If FITS parameter {\tt BSCALE}
 is unity and {\tt BZERO} is zero then 8 or 16-bit data will produce a
 {\tt DATA\_ARRAY} of {\tt \_UBYTE} or {\tt \_WORD} type respectively in
@@ -264,7 +264,7 @@ standard NDF {\tt AXIS} arrays are also created to allow use with {\tt
 ASTERIX} or {\tt KAPPA}.  The celestial coordinates of images from the
 Einstein discs (or others with similar FITS components) will also be
 copied to the {\tt MORE.ASTERIX.HEADER} structure (and will be precessed
-to equinox 2000 if necessary). 
+to equinox 2000 if necessary).
 
 \item {\tt CDCOPY/TEXT} transfers text to formatted sequential files.
 The program is designed to handle fixed record lengths (if
@@ -275,7 +275,7 @@ VMS file will have {\it list} style carriage-control (unless {\it
 Fortran} style is specified in the CD-ROM extended attribute block.
 
 \end{description}
-A few examples are shown here: 
+A few examples are shown here:
 \begin{verbatim}
 $ CDCOPY/TEXT  README.TXT  TT
 $ CDCOPY/TEXT  [LISTS.VMS]SRCS.LIS
@@ -285,7 +285,7 @@ $ CDCOPY/GSC   $2$DKB0:[GSC.*]526%.*  SYS$SCRATCH
 $ CDCOPY/HDS   [DATA.07H]I0700S05.XIA  .SDF
 \end{verbatim}
 Note that the first example copies a text file to the terminal (device
-{\tt TT}), while the last one produces an HDS file called {\tt I0700S05.SDF} 
+{\tt TT}), while the last one produces an HDS file called {\tt I0700S05.SDF}
 to conform to the Starlink convention for file extensions.
 
 \section{Limitations}
@@ -295,20 +295,20 @@ will dismount the disc automatically (but without unloading it since
 this causes trouble in some drives).  If, however, you abort CDCOPY
 (or it fails in some way) it may be necessary to use an explicit VMS
 {\tt DISMOUNT} command to dismount the disc afterwards.  You should not
-try to swap discs while VMS still has a disc mounted. 
+try to swap discs while VMS still has a disc mounted.
 
 The {\tt /BINARY, /TEXT} and {\tt /FITS} options will copy files of any
 length, but the {\tt /HDS} and {\tt /GSC} options rely on reading the
 whole file into virtual memory before format conversion, so they are
-currently restricted to files no more than 5 megabytes in size.  This 
-limit could be increased by altering a parameter in the source-code and 
+currently restricted to files no more than 5 megabytes in size.  This
+limit could be increased by altering a parameter in the source-code and
 re-compiling, but the program might then use excessive amounts of
-virtual memory. 
+virtual memory.
 
 Most CD-ROM drives are rather slow, being based on those in domestic
 hi-fi systems.  Typical copying speeds are 1.5 to 2 megabytes/minute, but
 your mileage may vary. Elaborate error-correction is employed (each byte
-of information is represented by at least 17 bits on the disc) so 
+of information is represented by at least 17 bits on the disc) so
 reading errors are rare if not entirely unknown.
 
-\end{document} 
+\end{document}

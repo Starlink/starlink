@@ -51,7 +51,7 @@ PUBLIC int gk0xcosize(bm,colours)bitmap *bm;int colours;{
 		}
 		jwp->jw_flags &= ~JWDEFAULTCOLOUR;
 		jwp->jw_colmapsize = newsize;
-		XSetWindowColormap(WXD,jwp->jw_xwindow,jwp->jw_cmap);	
+		XSetWindowColormap(WXD,jwp->jw_xwindow,jwp->jw_cmap);
 	}
 	return(jwp->jw_colmapsize);
 }

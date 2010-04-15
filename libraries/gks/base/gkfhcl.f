@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1989
 *
- 
+
 *----------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -65,7 +65,7 @@ C# IL>=a, OL>=0
       INCLUDE '../include/gkstk.cmn'
       INCLUDE '../include/gkerr.cmn'
       INCLUDE '../include/gkwkd.cmn'
- 
+
 *  LOCALS
 *  ------
 *     CROSS   True, if line crosses clipping rectangle
@@ -90,8 +90,8 @@ C# IL>=a, OL>=0
       INTEGER ICLPSA, ICLPSB, ICLD, ICLS, NPOLCR, NSECT
       INTEGER NSMIN, NSWANT, ILOOP
       LOGICAL CROSS, INSIDE
- 
- 
+
+
 *  STACK USAGE
 *  -----------
 *     Integer stack for
@@ -155,8 +155,8 @@ C# IL>=a, OL>=0
       NSMIN = 1
       NCROSS = 0
       IPOLY(1) = 1
- 
- 
+
+
 ***** Is clipping necessary? *****
       DO 100 IP = 1,NP
         IF(WSX(IP) .LT. RECT(1))GOTO 110
@@ -164,7 +164,7 @@ C# IL>=a, OL>=0
         IF(WSY(IP) .LT. RECT(3))GOTO 110
         IF(WSY(IP) .GT. RECT(4))GOTO 110
   100 CONTINUE
- 
+
 *     Here - no clipping required - output polygon
       IPOLY(2) = 1 + NP
       GOTO 999
@@ -189,10 +189,10 @@ C# IL>=a, OL>=0
       ELSEIF(WSY(1) .GT. RECT(4))THEN
          ICLPSA = ICLPSA + 10
       ENDIF
- 
+
 *     Is there enough workspace?
       IF(NW .LT. NEED)GOTO 999
- 
+
 *     Close polygon in workspace
       WSX(1+NP) = WSX(1)
       WSY(1+NP) = WSY(1)
@@ -242,7 +242,7 @@ C# IL>=a, OL>=0
         ICLPSA = ICLPSB
   200 CONTINUE
 *     Counting of crossings complete
- 
+
 *
 ***** If no crossings *****
 *
@@ -266,11 +266,11 @@ C# IL>=a, OL>=0
          NPOLY = 0
          GOTO 999
       ENDIF
- 
+
 *     Is there enough workspace
       NEED = NP + NCROSS + 4
       IF(NW .LT. NEED)GOTO 999
- 
+
 *****  Get stack space *****
       ILOOP = 0
   250 CONTINUE
@@ -283,7 +283,7 @@ C# IL>=a, OL>=0
          CALL GKLUMP (KINTGS,2,NSWANT,NSMIN,4,MSECT,ISL)
       ENDIF
       IF(KERROR .NE. 0)GOTO 999
- 
+
 ***** Get Unspliced Clipped Polygon and Section list *****
       KSTACK(ISL) = 1
       KSTACK(ISL+1) = NP+1
@@ -294,7 +294,7 @@ C# IL>=a, OL>=0
       NEED = IWR - 1
 *     Is there enough provision for polygons
       IF(NPOLY .GT. MPOLY)GOTO 989
- 
+
 *
 *     If not hollow and several polygons, need to take care of
 *     case were some of the polygons overlap.
@@ -317,7 +317,7 @@ C# IL>=a, OL>=0
               IF(ILOOP .LE. 1)GOTO 250
               GOTO 999
            ENDIF
- 
+
 *          Process section list to join up polygons at intersections
            MPO = NPOLY
            CALL GKPSJI(NW,WSX,WSY,IWR,MSECT+4*NPOLCR,KSTACK(ISL),
@@ -327,11 +327,11 @@ C# IL>=a, OL>=0
            NEED = IWR - 1
          ENDIF
       ENDIF
- 
+
 ***** Splice polygons together on the workspace *****
       CALL GKPSFH (NPOLY,IPOLY,NEED,WSX,WSY,MSECT,KSTACK(ISL))
       IF(KERROR .NE. 0)GOTO 900
- 
+
 ***** Set IPOLY to point to workspace instead of KSTACK(ISL)
       DO 300 JP = NPOLY+1,2,-1
         IPOLY(JP) = KSTACK(ISL + 2*IPOLY(JP-1) - 1)
@@ -340,7 +340,7 @@ C# IL>=a, OL>=0
           GOTO 989
         ENDIF
   300 CONTINUE
- 
+
 ***** Re-adjust number of polygons
       DO 350 JP=NPOLY,1,-1
              IF(IPOLY(JP+1)-IPOLY(JP) .GE. 2)GOTO 351
@@ -351,6 +351,6 @@ C# IL>=a, OL>=0
 ***** Release Stack
   900 CONTINUE
   989 CALL GKSTDA (KINTGS,ISL)
- 
+
   999 CONTINUE
       END

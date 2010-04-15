@@ -228,7 +228,7 @@ HDS structure.",
    *status = hds_gl_status;
    return *status;
 }
- 
+
 /* F77_INTEGER_FUNCTION(dat_index)(struct STR *locator1_str,
  *                                 F77_INTEGER_TYPE *index,
  *                                 struct STR *locator2_str,
@@ -317,7 +317,7 @@ datIndex(const HDSLoc *locator1,
 
 /* Locate the required element of the Component Record Vector, save the      */
 /* object name and extract the ID of the object record.                      */
-    szcrv = SZCRV;          
+    szcrv = SZCRV;
    _call( rec_locate_data( &han, szcrv, ( index - 1 ) * szcrv,
           'R', &crv ) )
    dat1_locate_name( crv, 0, &name1 );

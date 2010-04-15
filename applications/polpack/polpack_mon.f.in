@@ -64,7 +64,7 @@
 *     8-JUN-1999 (DSB):
 *        Added POLSTACK.
 *     20-SEP-2000 (DSB):
-*        Set CAT tuning parameter QUIET to YES to suppress warnings about 
+*        Set CAT tuning parameter QUIET to YES to suppress warnings about
 *        blank format strings.
 *     23-NOV-2000 (DSB):
 *        Added POLWRTCL.
@@ -96,7 +96,7 @@
 
 *  Local Variables:
       CHARACTER FILTER*( 60 )     ! HDS_INFOI filter string
-      CHARACTER NAME*( PAR__SZNAM ) ! Action name 
+      CHARACTER NAME*( PAR__SZNAM ) ! Action name
       INTEGER IPOSN               ! Position in string
       INTEGER LSTAT               ! Local status
       INTEGER NGRP0               ! Number of active GRP groups on entry
@@ -121,7 +121,7 @@
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  Obtain the action name.
-      CALL TASK_GET_NAME( NAME, STATUS )      
+      CALL TASK_GET_NAME( NAME, STATUS )
 
 *  Need to construct a string to filter out parameter locators
 *  from the list of active locators. Need monolith and taskname
@@ -136,7 +136,7 @@
      :     NLOC0, STATUS )
 
 *  Define the current application name for history. The package version
-*  number gets substituted in here when the POLPACK release source tar file 
+*  number gets substituted in here when the POLPACK release source tar file
 *  is contructed.
       CALL NDF_HAPPN( NAME // ' (@PACKAGE_VERSION@)', STATUS )
 
@@ -145,8 +145,8 @@
 
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
-*  time an NDF is opened. This handler routine keeps a record of all NDFs 
-*  that are opened for input or output, until the block is closed by 
+*  time an NDF is opened. This handler routine keeps a record of all NDFs
+*  that are opened for input or output, until the block is closed by
 *  calling NDG_ENDPV.
       CALL NDG_BEGPV( STATUS )
 

@@ -43,7 +43,7 @@
 *     SHAPE( ) = _INTEGER (Read)
 *        The shape of the output NDF.  For example, [50,30,20] would
 *        create 50 columns by 30 lines by 20 bands.  It is only
-*        accessed when VECTORIZE = FALSE. 
+*        accessed when VECTORIZE = FALSE.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the base NDF to the output NDF. [!]
@@ -70,7 +70,7 @@
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, QUALITY,
 *     VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
-*     data structure and propagates all extensions.  WCS and AXIS information 
+*     data structure and propagates all extensions.  WCS and AXIS information
 *     is lost.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
@@ -112,7 +112,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -156,7 +156,7 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
-      
+
 *  Get the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
@@ -232,37 +232,37 @@
 *  appropriate routine for the data type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL VEC_RTOR( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL VEC_BTOB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL VEC_DTOD( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL VEC_ITOI( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL VEC_UWTOUW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL VEC_WTOW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
       END IF
 
@@ -289,37 +289,37 @@
 *  appropriate routine for the data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL VEC_RTOR( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL VEC_BTOB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL VEC_DTOD( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ITOI( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL VEC_UWTOUW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL VEC_WTOW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )
          END IF
 
@@ -340,7 +340,7 @@
      :                 ELOUT, STATUS )
 
          CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    IERR, NERR, STATUS )
 
 *  Unmap the quality arrays.

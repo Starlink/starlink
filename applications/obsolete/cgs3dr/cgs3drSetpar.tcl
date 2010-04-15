@@ -76,7 +76,7 @@ proc cgs3drSetpar {} {
   set rf5 [frame $right.l5 -relief flat]
   set rf6 [frame $right.l6 -relief flat]
   pack $rf1 $rf2 $rf3 $rf4 $rf5 $rf6 -in $right -side top -fill both -expand yes
- 
+
   set rl1 [label $rf1.l1 -text "Cycle Start"]
   set re1 [entry $rf1.e1 -width 12 -relief sunken -bd 2 -textvariable Cgs3drWidgets(PAR_CYCBEG)]
   pack $rl1 -in $rf1 -side left
@@ -127,14 +127,14 @@ proc cgs3drSetpar {} {
 
 # OK pressed
   if {$bv==0} {
-    set cbeg [string trim [$re1 get]] 
-    set cend [string trim [$re2 get]] 
-    set nsig [string trim [$re5 get]] 
-    set strd [string trim [$re6 get]] 
-    set ibeg [string trim [$re3 get]] 
-    set iend [string trim [$re4 get]] 
-    set gdev [string trim [$Cgs3drWidgets(be1) get]] 
-   
+    set cbeg [string trim [$re1 get]]
+    set cend [string trim [$re2 get]]
+    set nsig [string trim [$re5 get]]
+    set strd [string trim [$re6 get]]
+    set ibeg [string trim [$re3 get]]
+    set iend [string trim [$re4 get]]
+    set gdev [string trim [$Cgs3drWidgets(be1) get]]
+
     if {$Cgs3drWidgets(PAR_PLOTTING)==1} {
       set message "PLOTTING=T"
     } else {

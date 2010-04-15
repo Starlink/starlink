@@ -154,7 +154,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive \
 all: all-recursive
 
 # Note to track the build we create a world-stamp file with the current date
-# and a starlink.version file with the current branch name  (usually master, 
+# and a starlink.version file with the current branch name  (usually master,
 # but other names for release branches are possible), the sha1 of the
 # last commit which reflects the current state of the checkout and the
 # date and time in of that commit in ISO8601 format.

@@ -1,4 +1,4 @@
-*+  ABCOM - creates an image from two image with channels A and B data 
+*+  ABCOM - creates an image from two image with channels A and B data
 
 	SUBROUTINE ABCOM ( STATUS )
 
@@ -31,8 +31,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE  'NDF_PAR'	    
-        INCLUDE  'NDF_ERR'	    
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 * Status :
 
@@ -45,7 +45,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  LOCIA,             ! locator for input data structure
      :  LOCIB,             ! locator for input data structure
      :  LOCO,              ! locator for output channel B data structure
@@ -174,8 +174,8 @@
 *
 * put channel A and channel B data into the output array
 *
-	CALL COPYAB_COMB( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRIA), 
-     :                    %VAL( PNTRIB), ODIMS(1), ODIMS(2), 
+	CALL COPYAB_COMB( IDIMS_1(1), IDIMS_1(2), %VAL( PNTRIA),
+     :                    %VAL( PNTRIB), ODIMS(1), ODIMS(2),
      :	                  %VAL( PNTRO), STATUS)
 *
 * tidy up the input/output structures

@@ -15,7 +15,7 @@
 #            [-z zoom]
 #
 #  Description:
-#     This shell script activates the cursor upon a selected graphics 
+#     This shell script activates the cursor upon a selected graphics
 #     device, and returns the constraints: centre, peak level, FWHM, and
 #     background to be used in the Gaussian fitting.
 #
@@ -27,9 +27,9 @@
 #       file has a one-dimensional data array.  The calling script
 #       should do this with the checkndf script.
 #     -r
-#       If present, it requests that just refitting is required, i.e. the 
+#       If present, it requests that just refitting is required, i.e. the
 #       zooming enquiries are omitted.
-#     -z 
+#     -z
 #       The zoom status: allowed values are:
 #          "ASK" --- prompt the user whether to zoom or not;
 #          "TRUE" --- zooming required; and
@@ -60,13 +60,13 @@
 #        The units of the data values.  This must be defined even if the
 #        string is null.
 #     $zoomit = CHARACTER (Returned)
-#        Whether or not zooming was selected.  Value "yes" indicates 
+#        Whether or not zooming was selected.  Value "yes" indicates
 #        zooming is required.
 
 #  Notes:
 #      -  It is assumed that the co-ordinate Frame is stored in the AGI
 #      database.  Normally the current Frame is used.
-#      -  It uses /tmp/<user>/getcurpos.tmp to record the output from 
+#      -  It uses /tmp/<user>/getcurpos.tmp to record the output from
 #      KAPPA:CURSOR.
 #
 #  Implementation Status:
@@ -80,7 +80,7 @@
 #     2007 May 5 (MJC):
 #       Original version derived from a peakmap.csh extract.
 #     2008 June 29 (MJC):
-#       Fixed bug with -z option that ignored its value, insisting on 
+#       Fixed bug with -z option that ignored its value, insisting on
 #       zooming.
 #
 #  Copyright:
@@ -122,12 +122,12 @@ while ( $#args > 0 )
    case -r:    # only obtain fit initial guesses?
       set gfc_refit = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case -z:    # zoom mode
       shift args
       set gfc_gotzoom = $args[1]
       shift args
-      breaksw 
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
@@ -174,7 +174,7 @@ if ( ${gfc_refit} != "TRUE" ) then
       echo "      Zooming:"
       echo "        Lower Boundary: ${low_z}"
       echo "        Upper Boundary: ${upp_z}"
- 
+
 # Replot the spectrum.
 # --------------------
       linplot ${gfc_infile} xleft=${low_z} xright=${upp_z} \
@@ -200,7 +200,7 @@ echo "  Left click on the upper limit of the fitting region."
 source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
 set upp_mask = $xpos
 
-echo " " 
+echo " "
 echo "      Fit Mask:"
 echo "        Lower Mask Boundary: ${low_mask}"
 echo "        Upper Mask Boundary: ${upp_mask}"
@@ -230,7 +230,7 @@ echo "        Average Value: ${cont}"
 # Get the line-peak position.
 # ---------------------------
 
-echo " " 
+echo " "
 echo "  Left click on the line peak."
 source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
 set position = $xpos
@@ -244,7 +244,7 @@ echo "        Peak Height: ${peak} ${unit}"
 # Get the fwhm left side.
 # -----------------------
 
-echo " " 
+echo " "
 echo "  Left click on the left hand edge of the FWHM."
 source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
 set fwhm_low = $xpos

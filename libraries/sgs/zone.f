@@ -132,10 +132,10 @@
       X2VN = X1V + ((X2N-X1CUR) / (X2CUR-X1CUR)) * (X2V-X1V)
       Y1VN = Y1V + ((Y1N-Y1CUR) / (Y2CUR-Y1CUR)) * (Y2V-Y1V)
       Y2VN = Y1V + ((Y2N-Y1CUR) / (Y2CUR-Y1CUR)) * (Y2V-Y1V)
-      
+
 *  Set up zone with appropriate viewport
       CALL sgs_1NEWZ(IZONID,X1VN,X2VN,Y1VN,Y2VN)
-      
+
 *  Exit
       GO TO 9999
  8888 CONTINUE

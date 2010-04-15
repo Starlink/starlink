@@ -13,7 +13,7 @@
 *     C include file
 
 *  Description:
-*     See the description in "cgeneric.h". This is the file 
+*     See the description in "cgeneric.h". This is the file
 *     "cgenerics_defs.h". This include file defines the macros:
 *
 *        CGEN_TYPE

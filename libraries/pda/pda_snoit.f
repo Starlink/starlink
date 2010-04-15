@@ -135,7 +135,7 @@ c
  60   g1 = iv(g)
       alpha = g1 - n
       w = alpha - 6
-      call pda_sgrad2(v(alpha), d, v(eta0), fx, v(g1), iv(sgirc), n, 
+      call pda_sgrad2(v(alpha), d, v(eta0), fx, v(g1), iv(sgirc), n,
      1                v(w),x)
       if (iv(sgirc) .eq. 0) go to 10
          iv(ngcall) = iv(ngcall) + 1

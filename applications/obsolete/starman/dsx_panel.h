@@ -1,7 +1,7 @@
 /* DSX_GEN.H */
 
 extern Display        *VD_ID; 		/* Display identifier */
-extern char           BY_PC_ID[256]; 	/* Byte equivalents of PC_ID */ 
+extern char           BY_PC_ID[256]; 	/* Byte equivalents of PC_ID */
 extern Colormap       CM_ID;		/* Panel Default Colour map identifier */
 extern unsigned long  PC_ID[256];	/* Panel Colour index identifiers */
 extern XColor         COLOUR[256];	 /*Panel Colour index */

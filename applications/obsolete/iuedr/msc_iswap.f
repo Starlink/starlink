@@ -3,7 +3,7 @@
 *  Name:
 *     SUBROUTINE MSC_ISWAP
 *
-*  Description: 
+*  Description:
 *     Swap two integer variables.
 *
 *  History:
@@ -18,7 +18,7 @@
 *  Import-Export:
       INTEGER V1     ! first variable
       INTEGER V2     ! second variable
- 
+
 *  Local variables:
       INTEGER V      ! temporary copy
 

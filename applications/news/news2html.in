@@ -13,9 +13,9 @@
 #     Bourne Shell (sh)
 #
 #  Description:
-#     Generates an HTML formatted file ($NEWS_HTML) containing the 
-#     subject headings from all news item files in $NEWSDIR which point 
-#     to the relevant text file in the `news' subdirectory of the HTTP 
+#     Generates an HTML formatted file ($NEWS_HTML) containing the
+#     subject headings from all news item files in $NEWSDIR which point
+#     to the relevant text file in the `news' subdirectory of the HTTP
 #     default directory.
 #
 #  Syntax:

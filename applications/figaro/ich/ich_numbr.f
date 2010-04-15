@@ -19,7 +19,7 @@ C                     indicate hex, octal or binary respectively.
 C
 C     (>) IST         (Integer) The position of the first character
 C                     in STRING (starting from 1) at which the
-C                     decoding is to start.  
+C                     decoding is to start.
 C
 C     (>) DELIMS      (Character) A string giving the set of
 C                     possible delimiters for the number.  The
@@ -41,7 +41,7 @@ C
 C     Returns -  (if called as a function)
 C
 C     (<) ICH_NUMBR   (Integer) Indicates the status of the
-C                     evaluation.  
+C                     evaluation.
 C                     0  => OK. Number was given, and was valid
 C                     -1 => Null.  There was a null string.
 C                     1  => Error.  The string was not null, but it
@@ -55,7 +55,7 @@ C     Some examples of accepted formats -
 C
 C     27.3  -345E-8  -'345'O  +'1010.101'B  'ABCXD'X  '101E101'B
 C
-C     -%O345   %B1010.101  12345.6789  %xabcxd      
+C     -%O345   %B1010.101  12345.6789  %xabcxd
 C
 C     Original version:                  KS / UCL  25th June 1982
 C
@@ -64,7 +64,7 @@ C
 C     14th Feb 1984  KS / CIT  Extended to allow different bases.
 C     29th Dec 1987  KS / AAO  Now accepts 'D' as well as 'E' for
 C                    decimal exponents.
-C                                        
+C
 C+
       IMPLICIT NONE
 C

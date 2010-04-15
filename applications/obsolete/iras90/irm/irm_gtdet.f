@@ -45,7 +45,7 @@
 *
 *      - The string "NONE". This specifies that no detectors should be
 *      selected, and may not be mixed with other options. A null
-*      parameter value is equivalent to "NONE". 
+*      parameter value is equivalent to "NONE".
 *
 *      - The string "LIST". This causes a list of available detectors
 *      to be displayed, but no detectors are selected. The user is
@@ -76,7 +76,7 @@
 *     detectors consists of all 12um detectors together with all small
 *     detectors from all 4 bands, not just the small detectors from the
 *     12um band.
-      
+
 *  Authors:
 *     WG: Wei Gong (IPMAF)
 *     DSB: David Berry (STARLINK)
@@ -123,7 +123,7 @@
       INTEGER CHR_LEN            ! Find used length of a string
 
 *  Local Constants:
-      INTEGER NOTAV              ! A detector is not available 
+      INTEGER NOTAV              ! A detector is not available
                                  ! if DTSTAT = NOTAV.
       PARAMETER ( NOTAV = 0 )
 
@@ -213,7 +213,7 @@
 *  supplied.
          DO I = 1, MIN( I90__DETS, NDET )
             NUM = ADET( I )
-   
+
             IF( NUM .GT. 0 .AND. NUM .LE. I90__DETS ) THEN
                DTSTAT( NUM ) = AVAIL
 
@@ -257,7 +257,7 @@
 *  Create a group from which any blank elements have been removed.
 *  Delete the intermediate group.
          CALL GRP_REMOV( IGRP2, ' ', IGRP3, STATUS )
-         CALL GRP_DELET( IGRP2, STATUS )      
+         CALL GRP_DELET( IGRP2, STATUS )
 
 *  Get the size of the new group.
          CALL GRP_GRPSZ( IGRP3, NSPEC, STATUS )
@@ -291,8 +291,8 @@
                   CALL ERR_REP( 'IRM_GTDET_ERR2',
      :             'IRM_GTDET: "LIST" can only be specified by itself.',
      :                          STATUS )
-                  GO TO 20 
-               
+                  GO TO 20
+
                END IF
 
 *  Store the available detectors, and the focal plane Z coordinate
@@ -413,7 +413,7 @@
                      CALL MSG_SETC( 'S', SPEC( : COLON - 1) )
                      CALL ERR_REP( 'IRM_GTDET_ERR6',
      :                    'IRM_GTDET: Bad numeric value "^S" supplied.',
-     :                             STATUS )      
+     :                             STATUS )
                      GO TO 20
                   END IF
 
@@ -428,7 +428,7 @@
                         OK = .TRUE.
 
 *  If the detector is not available, report an error.
-                     ELSE                        
+                     ELSE
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'D', LODET )
                         CALL ERR_REP( 'IRM_GTDET_ERR7',
@@ -445,7 +445,7 @@
      :                        'IRM_GTDET: Detector #^D does not exist.',
      :                              STATUS )
                      GO TO 20
-                  END IF      
+                  END IF
 
                END IF
 
@@ -465,7 +465,7 @@
                      CALL MSG_SETC( 'S', SPEC( COLON + 1 : ) )
                      CALL ERR_REP( 'IRM_GTDET_ERR9',
      :                    'IRM_GTDET: Bad numeric value "^S" supplied.',
-     :                             STATUS )      
+     :                             STATUS )
                      GO TO 20
                   END IF
 
@@ -480,7 +480,7 @@
                         OK = .TRUE.
 
 *  If the detector is not available, report an error.
-                     ELSE                        
+                     ELSE
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'D', HIDET )
                         CALL ERR_REP( 'IRM_GTDET_ERR10',
@@ -497,7 +497,7 @@
      :                        'IRM_GTDET: Detector #^D does not exist.',
      :                             STATUS )
                      GO TO 20
-                  END IF      
+                  END IF
 
                END IF
 
@@ -544,14 +544,14 @@
                   CALL MSG_SETC( 'S', SPEC( : LNSPEC - 2 ) )
                   CALL ERR_REP( 'IRM_GTDET_ERR13',
      :                    'IRM_GTDET: Bad numeric value "^S" supplied.',
-     :                          STATUS )      
+     :                          STATUS )
                   GO TO 20
                END IF
 
 *  Find the waveband index.
                BAND = 0
                DO I = 1, I90__BANDS
-                  IF( I90__WAVEL( I ) .EQ. WAVEL ) BAND = I 
+                  IF( I90__WAVEL( I ) .EQ. WAVEL ) BAND = I
                END DO
 
 *  Report an error if the wave band does not exist.
@@ -567,14 +567,14 @@
 *  Loop through each available detector.
                OK = .FALSE.
                DO I = 1, NDET
-                  NUM = ADET( I ) 
+                  NUM = ADET( I )
 
 *  If this detector belongs to the requested waveband, select it.
                   IF( I90__DBAND( NUM ) .EQ. BAND ) THEN
                      DTSTAT( NUM ) = SELECT
                      OK = .TRUE.
                   END IF
-      
+
                END DO
 
 *  Report an error if no detectors are available in this band.
@@ -590,7 +590,7 @@
 *  If none of LIST, ALL, SMALL, NONE, RANGE and BAND is specified, this
 *  section must be a detector number. Attempt to convert it to numeric
 *  form.
-            ELSE 
+            ELSE
                CALL CHR_CTOI( SPEC( : LNSPEC), NUM, STATUS )
 
 *  Add a report if an error occurred (CHR_CTOI doesn't make a report
@@ -599,7 +599,7 @@
                      CALL MSG_SETC( 'S', SPEC( : LNSPEC ) )
                      CALL ERR_REP( 'IRM_GTDET_ERR16',
      :                    'IRM_GTDET: Bad numeric value "^S" supplied.',
-     :                             STATUS )      
+     :                             STATUS )
                      GO TO 20
                   END IF
 
@@ -608,9 +608,9 @@
 
                   IF( DTSTAT( NUM ) .NE. NOTAV ) THEN
                      DTSTAT( NUM ) = SELECT
-                     
+
 *  If the detector is not available, report an error.
-                  ELSE                        
+                  ELSE
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'D', NUM )
                      CALL ERR_REP( 'IRM_GTDET_ERR17',
@@ -620,14 +620,14 @@
                   END IF
 
 *  If a bad detector number was given, report an error.
-               ELSE 
+               ELSE
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'D', NUM )
                   CALL ERR_REP( 'IRM_GTDET_ERR18',
      :                        'IRM_GTDET: Detector #^D does not exist.',
      :                          STATUS )
                   GO TO 20
-               END IF      
+               END IF
 
             END IF
 
@@ -639,7 +639,7 @@
          END DO
 
 *  Delete the group holding the detector specifications.
-         CALL GRP_DELET( IGRP3, STATUS )      
+         CALL GRP_DELET( IGRP3, STATUS )
 
 *  If an error occurred while processing the supplied group of detector
 *  specifications (other than parameter abort)...
@@ -671,7 +671,7 @@
 *  Indicate that another prompt is required, so long as the max. number
 *  of re-prompts has not been reached.
             IF( NBAD .LE. 4 ) PROMPT = .TRUE.
-      
+
          END IF
 
       END DO

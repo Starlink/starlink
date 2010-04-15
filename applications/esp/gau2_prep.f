@@ -3,13 +3,13 @@
 
 * See gau2_pro for discussion
 
-      subroutine gau2_prep (sourceimg, mask, elems, n, 
-     :     bkgd, niter, calcerrs, modtyp, 
+      subroutine gau2_prep (sourceimg, mask, elems, n,
+     :     bkgd, niter, calcerrs, modtyp,
      :     guess, workimg, inc, iv, v, x, xinit, c,
-     :     l, p, liv, lv, gau2par, 
+     :     l, p, liv, lv, gau2par,
      :     status)
 
-*+      
+*+
 *   Description:
 *     This routine allocates and initialises the working arrays for the
 *     NSG routines, based on the arrays passed to it from its
@@ -103,11 +103,11 @@
 *   m=number of 1s in INC
       integer m,i
       integer incc
-      
+
 
       if (status .ne. sai__ok) return
 
-      
+
 *   Zero all the elements of gau2par
       do 20, i=1,gau2len
          gau2par(i) = 0
@@ -124,7 +124,7 @@
       endif
 *      write (*, '("gau2_prep: bkgd=",f10.5," gau2bg=",i1)')
 *     :     bkgd,gau2par(gau2bg)
-      
+
 *   there will be p ones in INC (so m=p, in NSG documentation)
       m = p
       incc = l+1
@@ -142,12 +142,12 @@
       call psx_calloc (p,         '_DOUBLE',  xinit,   status)
       call psx_calloc (l,         '_DOUBLE',  c,       status)
       call psx_calloc (2*p,       '_INTEGER', inc,     status)
- 
+
       if (status .eq. sai__ok) then
 *      call a subroutine to initialise workimg and inc
-         call gau2_inita (n, p, l, bkgd, sourceimg, mask, elems, 
-     :        guess, %val(cnf_pval(xinit)), 
-     :        %val(cnf_pval(workimg)), 
+         call gau2_inita (n, p, l, bkgd, sourceimg, mask, elems,
+     :        guess, %val(cnf_pval(xinit)),
+     :        %val(cnf_pval(workimg)),
      :        %val(cnf_pval(inc)))
       endif
 
@@ -156,17 +156,17 @@
 *      write (*,'("gau2_prep: p=",i5," l=",i5," n=",i5,
 *     :     " incc=",i5," lv=",i10," liv=",i5)')
 *     :     p, l, n, incc, lv, liv
-      
+
 *   We've allocated the v and iv arrays, now initialise them
       call gau2_initv (liv, lv, niter, calcerrs,
-     :     modtyp, %val(cnf_pval(iv)), %val(cnf_pval(v)), 
+     :     modtyp, %val(cnf_pval(iv)), %val(cnf_pval(v)),
      :     gau2par, status)
 
       end
 
 ***** gau2_uprep
 
-      subroutine gau2_uprep (img, in, iv, v, x, xinit, c, 
+      subroutine gau2_uprep (img, in, iv, v, x, xinit, c,
      :     gau2par, status)
 
 *+
@@ -184,9 +184,9 @@
 *   arguments
       integer img, in, iv, v, x, xinit, c, status
       integer gau2par(gau2len)
-      
+
       if (status .ne. sai__ok) return
-      
+
       call psx_free (img,   status)
       call psx_free (in,    status)
       call psx_free (iv,    status)
@@ -194,11 +194,11 @@
       call psx_free (x,     status)
       call psx_free (xinit, status)
       call psx_free (c,     status)
-      
+
       if (status .ne. sai__ok) then
          gau2par(gau2status) = gau2memory
          status = sai__error
          call err_rep (' ','gaufit: error freeing memory',status)
       endif
-      
+
       end

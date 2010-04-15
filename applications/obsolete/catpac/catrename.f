@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     
+*
 *     Rename a catalogue to a new name.
 
 *  Usage:
@@ -33,7 +33,7 @@
 *        New name of the catalogue.
 
 *  Example:
-*     CATRENAME TEST NEWTEST 
+*     CATRENAME TEST NEWTEST
 
 *  Authors:
 *     ARW: Alan Wood (STARLINK)
@@ -46,7 +46,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

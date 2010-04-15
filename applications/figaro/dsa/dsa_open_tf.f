@@ -11,13 +11,13 @@ C  Description:
 C     This routine will open either a new or existing text file.
 C     It returns both the full name of the opened file and a Fortran
 C     logical unit number that can be used to access it.  If the
-C     file is new, or if the name includes a directory specification 
+C     file is new, or if the name includes a directory specification
 C     or a logical name then the file name supplied will be used unchanged.
 C     If the file is supposed to exist, and no directory name is specified,
-C     then it will be searched for in the standard Figaro sequence, that 
-C     is, 1) default directory, 2) FIGARO_PROG_U, 3) the .EXE directory 
+C     then it will be searched for in the standard Figaro sequence, that
+C     is, 1) default directory, 2) FIGARO_PROG_U, 3) the .EXE directory
 C     (that is, the directory from which the current .EXE image comes,
-C     if the system supports this concept) 4) FIGARO_PROG_L, 5) 
+C     if the system supports this concept) 4) FIGARO_PROG_L, 5)
 C     FIGARO_PROG_N, 6) FIGARO_PROG_S.  Read-only files are opened shared.
 C
 C  Language:
@@ -30,8 +30,8 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) FILE     (Character,descr) The name of the file to be opened.
 C     (>) DEFAULT  (Character,descr) A string specifying the default
-C                  name for the file.  This is to be used for supplying 
-C                  a default extension, and should be just that default 
+C                  name for the file.  This is to be used for supplying
+C                  a default extension, and should be just that default
 C                  extension, including the leading dot.
 C     (>) EXIST    (Character,descr) A string specifying whether the
 C                  file is supposed to exist or not.  This string should
@@ -62,7 +62,7 @@ C  Note:
 C     The original VAX version of this routine allowed DEFAULT to specify
 C     a general default file specification. For the portable version of
 C     DSA this has been restricted and only a default extension is supported.
-C     (In practice, the VAX implementation will still work as it used to, 
+C     (In practice, the VAX implementation will still work as it used to,
 C     but using more than an extension is not supported on all platforms.)
 C-
 C  Common variable details:
@@ -176,7 +176,7 @@ C
 C
       IF (MAY_EXIST) THEN
 C
-C        If the file may exist, we have to look for it.  We try the 
+C        If the file may exist, we have to look for it.  We try the
 C        various directories one by one.  If we actually fail to
 C        open an existing file, we exit the loop.
 C
@@ -246,11 +246,11 @@ C
          END IF
       END IF
 C
-C     If we have got here, then there has been no error so far. Either 
-C     we have opened an existing file, or the file didn't exist and 
+C     If we have got here, then there has been no error so far. Either
+C     we have opened an existing file, or the file didn't exist and
 C     DEFAULT was either 'NEW' or 'UNKNOWN' so we can try to create a
 C     new one. A new file is always opened just by name as it stands.
-C     Note that we don't even bother to test the value of WRITE - we 
+C     Note that we don't even bother to test the value of WRITE - we
 C     assume a new file is not to be opened readonly.
 C
       IF (.NOT.OPENED) THEN
@@ -282,8 +282,8 @@ C
 C     If we got here, we have an open file.  Get it's full name.
 C
       CALL DSAZ_INQ_NAME (' ',LU,NAME,IGNORE)
-C     
-C     Exit.  If we got a logical unit number but failed to open the 
+C
+C     Exit.  If we got a logical unit number but failed to open the
 C     file, release it.
 C
   500 CONTINUE

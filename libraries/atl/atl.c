@@ -56,21 +56,21 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h"                 
+#include "f77.h"
 #include "ast.h"
 #include "atl.h"
 
 /* Wrapper function implementations. */
 /* ================================= */
 
-F77_SUBROUTINE(atl_axtrm)( INTEGER(IWCS), 
+F77_SUBROUTINE(atl_axtrm)( INTEGER(IWCS),
                            INTEGER_ARRAY(AXES),
                            INTEGER_ARRAY(LBND),
                            INTEGER_ARRAY(UBND),
                            DOUBLE_ARRAY(WORK),
                            INTEGER(STATUS) );
 
-void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd, 
+void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd,
                double *work, int *status ){
    DECLARE_INTEGER(IWCS);
    DECLARE_INTEGER_ARRAY_DYN(AXES);
@@ -107,7 +107,7 @@ void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd,
    return;
 }
 
-F77_SUBROUTINE(atl_plroi)( INTEGER(IPLOT), 
+F77_SUBROUTINE(atl_plroi)( INTEGER(IPLOT),
                            INTEGER(RPLOTS),
                            INTEGER(STATUS) );
 
@@ -135,7 +135,7 @@ void atlPlroi( AstPlot *iplot, AstKeyMap **rplots, int *status ){
 
 
 
-F77_SUBROUTINE(atl_mklut)( INTEGER(IX), 
+F77_SUBROUTINE(atl_mklut)( INTEGER(IX),
                            INTEGER(IY),
                            INTEGER(NPNT),
                            INTEGER(NVAR),
@@ -144,7 +144,7 @@ F77_SUBROUTINE(atl_mklut)( INTEGER(IX),
                            INTEGER(MAP),
                            INTEGER(STATUS) );
 
-void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm, 
+void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm,
                double *table, AstMapping **map, int *status ){
    DECLARE_INTEGER(IX);
    DECLARE_INTEGER(IY);
@@ -178,7 +178,7 @@ void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm,
       *map = astI2P( iobj );
    } else {
       *map = AST__NULL;
-   }      
+   }
 
    F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -187,12 +187,12 @@ void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm,
 
 
 F77_SUBROUTINE(atl_mgfts)( INTEGER(METHOD),
-                           INTEGER(FC1), 
-                           INTEGER(FC2), 
+                           INTEGER(FC1),
+                           INTEGER(FC2),
                            INTEGER(FC3),
                            INTEGER(STATUS) );
 
-void atlMgfts( int method, AstFitsChan *fc1, AstFitsChan *fc2, 
+void atlMgfts( int method, AstFitsChan *fc1, AstFitsChan *fc2,
                AstFitsChan **fc3, int *status ){
    DECLARE_INTEGER(METHOD);
    DECLARE_INTEGER(FC1);
@@ -225,16 +225,16 @@ F77_SUBROUTINE(atl_ptfti)( INTEGER(THIS),
                            CHARACTER(NAME),
                            INTEGER(VALUE),
                            CHARACTER(COMMNT),
-                           INTEGER(STATUS) 
+                           INTEGER(STATUS)
                            TRAIL(NAME)
                            TRAIL(COMMNT) );
 
-void atlPtfti( AstFitsChan *this, const char *name, int value, 
+void atlPtfti( AstFitsChan *this, const char *name, int value,
                const char *comment, int *status ){
    DECLARE_INTEGER(THIS);
-   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_CHARACTER_DYN(NAME);
    DECLARE_INTEGER(VALUE);
-   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_CHARACTER_DYN(COMMNT);
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( astP2I( this ), THIS );
@@ -270,16 +270,16 @@ F77_SUBROUTINE(atl_ptftl)( INTEGER(THIS),
                            CHARACTER(NAME),
                            LOGICAL(VALUE),
                            CHARACTER(COMMNT),
-                           INTEGER(STATUS) 
+                           INTEGER(STATUS)
                            TRAIL(NAME)
                            TRAIL(COMMNT) );
 
-void atlPtftl( AstFitsChan *this, const char *name, int value, 
+void atlPtftl( AstFitsChan *this, const char *name, int value,
                const char *comment, int *status ){
    DECLARE_INTEGER(THIS);
-   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_CHARACTER_DYN(NAME);
    DECLARE_LOGICAL(VALUE);
-   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_CHARACTER_DYN(COMMNT);
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( astP2I( this ), THIS );
@@ -316,16 +316,16 @@ F77_SUBROUTINE(atl_ptftr)( INTEGER(THIS),
                            CHARACTER(NAME),
                            REAL(VALUE),
                            CHARACTER(COMMNT),
-                           INTEGER(STATUS) 
+                           INTEGER(STATUS)
                            TRAIL(NAME)
                            TRAIL(COMMNT) );
 
-void atlPtftr( AstFitsChan *this, const char *name, float value, 
+void atlPtftr( AstFitsChan *this, const char *name, float value,
                const char *comment, int *status ){
    DECLARE_INTEGER(THIS);
-   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_CHARACTER_DYN(NAME);
    DECLARE_REAL(VALUE);
-   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_CHARACTER_DYN(COMMNT);
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( astP2I( this ), THIS );
@@ -362,7 +362,7 @@ F77_SUBROUTINE(atl_ptfts)( INTEGER(THIS),
                            CHARACTER(NAME),
                            CHARACTER(VALUE),
                            CHARACTER(COMMNT),
-                           INTEGER(STATUS) 
+                           INTEGER(STATUS)
                            TRAIL(NAME)
                            TRAIL(VALUE)
                            TRAIL(COMMNT) );
@@ -370,9 +370,9 @@ F77_SUBROUTINE(atl_ptfts)( INTEGER(THIS),
 void atlPtfts( AstFitsChan *this, const char *name,
                const char *value, const char *comment, int *status ){
    DECLARE_INTEGER(THIS);
-   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_CHARACTER_DYN(NAME);
    DECLARE_CHARACTER_DYN(VALUE);
-   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_CHARACTER_DYN(COMMNT);
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( astP2I( this ), THIS );
@@ -422,7 +422,7 @@ void atlRmblft(  AstFitsChan * this, int *status ) {
 }
 
 
-F77_SUBROUTINE(atl_tolut)( INTEGER(INMAP), 
+F77_SUBROUTINE(atl_tolut)( INTEGER(INMAP),
                            DOUBLE(XLO),
                            DOUBLE(XHI),
                            DOUBLE(DX),
@@ -470,13 +470,13 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
       *outmap = astI2P( ioutmap );
    } else {
       *outmap = AST__NULL;
-   }      
+   }
 
    return;
 }
 
-F77_SUBROUTINE(atl_wcspx)( INTEGER(KM1), 
-                           INTEGER(KM2), 
+F77_SUBROUTINE(atl_wcspx)( INTEGER(KM1),
+                           INTEGER(KM2),
                            DOUBLE_ARRAY(CRPIX),
                            DOUBLE(OBSLON),
                            DOUBLE(OBSLAT),
@@ -519,14 +519,14 @@ void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, double crpix[3], double obslon,
       *iwcs = astI2P( iiwcs );
    } else {
       *iwcs = AST__NULL;
-   }      
+   }
 
    return;
 }
 
-F77_SUBROUTINE(atl_kychk)( INTEGER(KEYMAP), 
-                           CHARACTER(KEY), 
-                           CHARACTER(ERRMSG), 
+F77_SUBROUTINE(atl_kychk)( INTEGER(KEYMAP),
+                           CHARACTER(KEY),
+                           CHARACTER(ERRMSG),
                            INTEGER(STATUS)
                            TRAIL(KEY)
                            TRAIL(ERRMSG) );
@@ -534,8 +534,8 @@ F77_SUBROUTINE(atl_kychk)( INTEGER(KEYMAP),
 void atlKychk( AstKeyMap *keymap, const char *key, const char *errmsg,
                int *status ){
    DECLARE_INTEGER(KEYMAP);
-   DECLARE_CHARACTER_DYN(KEY);  
-   DECLARE_CHARACTER_DYN(ERRMSG);  
+   DECLARE_CHARACTER_DYN(KEY);
+   DECLARE_CHARACTER_DYN(ERRMSG);
    DECLARE_INTEGER(STATUS);
 
    if( !astOK ) return;

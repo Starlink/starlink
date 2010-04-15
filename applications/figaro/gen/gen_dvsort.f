@@ -17,7 +17,7 @@ C                 array, and DATA(PTRS(N),i) are to be last.
 C     (>) N       (Integer) The first dimension of DATA.
 C     (>) M       (Integer) The second dimension of DATA.
 C     (W) WORK    (Double precision array WORK(N)) Workspace.
-C     (!) DATA    (Double precision array DATA(N,M)) Data to be 
+C     (!) DATA    (Double precision array DATA(N,M)) Data to be
 C                 reordered. Returned in the order specified by PTRS.
 C
 C     Common variables used - None.

@@ -1,8 +1,8 @@
 ************************************************************************
 
-      SUBROUTINE PHO1_RAGGED ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, 
-     :                         MASK, USEMSK, NXL, NXH, NYL, NYH, 
-     :                         XCEN, YCEN, A2, A3, E, THETA, VALUES, 
+      SUBROUTINE PHO1_RAGGED ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR,
+     :                         MASK, USEMSK, NXL, NXH, NYL, NYH,
+     :                         XCEN, YCEN, A2, A3, E, THETA, VALUES,
      :                         NV, SKY, SIGMA, VSKY )
 
 *+
@@ -111,7 +111,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 

@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_FITLM( X, Y, ID, OK, NXY, NIM, NALN, IFIT,
-     :                       RELTOL, TR, XOUT, YOUT, IDOUT, XW, YW, 
+     :                       RELTOL, TR, XOUT, YOUT, IDOUT, XW, YW,
      :                       IDW, NOUT, RMS, STATUS )
 *+
 *  Name:
@@ -175,7 +175,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -423,7 +423,7 @@
             CALL NUM_GETERR()
             CALL ERR_REP( 'CCD1_FITLM_NERR',
      :      'CCD1_FITLM: Numeric error during fit.', STATUS )
-            STOP = .TRUE. 
+            STOP = .TRUE.
          END IF
          GO TO 4
       ENDIF
@@ -437,7 +437,7 @@
             IF ( I .GE. 2 ) IP = IP + NXY( I - 3 ) + NXY( I - 2 )
             IF ( .NOT. OK( IP ) ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETI( 'LISTID', I ) 
+               CALL MSG_SETI( 'LISTID', I )
                CALL ERR_REP( 'CCD1_FITLM_FAIL', '  Could not '//
      :         'align list ^LISTID)', STATUS )
                GO TO 15
@@ -459,5 +459,5 @@
 
 *  Cancel the condition handler.
       CALL NUM_REVRT
-      END            
+      END
 * $Id$

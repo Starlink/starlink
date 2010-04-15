@@ -13,8 +13,8 @@
 *     CALL NDG_BEGGH( STATUS )
 
 *  Description:
-*     This routine should be called to mark the start of a GRP NDF 
-*     history block. The block should be ended by a matching 
+*     This routine should be called to mark the start of a GRP NDF
+*     history block. The block should be ended by a matching
 *     call to NDG_ENDGH. See NDG_ENDGH for more details.
 *
 *     Note - GRP NDF history blocks must not be nested.
@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
 
 *  Indicate that NDF event handlers needed to record the NDFs in which
 *  GRP history should be stored have not yet been established, and then
-*  establish them. 
+*  establish them.
       STATE_COM2 = .FALSE.
       CALL NDG_HLTGH( .TRUE., OLD, STATUS )
 

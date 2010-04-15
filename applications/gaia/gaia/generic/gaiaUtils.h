@@ -18,7 +18,7 @@ extern "C" {
     char *gaiaUtilsErrMessage();
 
     /* Extract a FrameSet for an axis */
-    int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset, 
+    int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
                             AstFrameSet **iwcs, char **error_mess );
 
     /* Extract a FrameSet for an image */
@@ -30,7 +30,7 @@ extern "C" {
     /* Query the coordinate of a base pixel along the equivalent world
      * coordinate axis */
     int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
-                             int trailed, int readable, int formatted, 
+                             int trailed, int readable, int formatted,
                              int ncoords, char **coord, char **error_mess );
 
     /* Get Plots for each ROI in a Plot */
@@ -42,15 +42,15 @@ extern "C" {
                            int ubnd[], double work[], char **error_mess );
 
     /* Read FITS headers (char array) into a FITS channel */
-    int gaiaUtilsGtFitsChan( char header[], int ncards, 
+    int gaiaUtilsGtFitsChan( char header[], int ncards,
                              AstFitsChan **fitschan );
 
     /* Read FITS headers and return a FrameSet */
-    int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding, 
+    int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding,
                             AstFrameSet **iwcs );
 
     /* Convert ARD description into a mask */
-    int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], 
+    int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[],
                                 int lbnd[], int ubnd[], char **error_mess );
 
 #ifdef __cplusplus

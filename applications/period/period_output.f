@@ -1,7 +1,7 @@
- 
-      SUBROUTINE PERIOD_OUTPUT(YPTR, MXCOL, MXSLOT, NPTSARRAY, 
+
+      SUBROUTINE PERIOD_OUTPUT(YPTR, MXCOL, MXSLOT, NPTSARRAY,
      :                         YERRORARRAY)
- 
+
 C===========================================================================
 C Output data to a disk file.
 C
@@ -15,24 +15,24 @@ C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'
 
       INCLUDE 'SAE_PAR'
- 
+
 C-----------------------------------------------------------------------------
 C PLT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER MXCOL, MXSLOT
       INTEGER YPTR(MXSLOT), NPTSARRAY(MXSLOT)
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_OUTPUT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER FIRSTSLOT, LASTSLOT, SLOT, IUNIT
       INTEGER NDATA, YSLOT1, STATUS
       LOGICAL YERRORARRAY(MXSLOT)
@@ -44,14 +44,14 @@ C-----------------------------------------------------------------------------
 
       STATUS = SAI__OK
       CALL FIO_GUNIT( IUNIT, STATUS )
- 
+
 C-----------------------------------------------------------------------------
 C Select slots to output.
 C-----------------------------------------------------------------------------
- 
+
       WRITE (*, *) ' '
  100  CONTINUE
-      WRITE (*, '(X,A,$)') 'Enter first and last slots for output' // 
+      WRITE (*, '(X,A,$)') 'Enter first and last slots for output' //
      :                     ' (0,0 to quit) : '
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.NE.0 .AND. LASTSLOT.NE.0 ) THEN
@@ -78,7 +78,7 @@ C-----------------------------------------------------------------------------
 
             YSLOT1 = YPTR(SLOT)
 
-            CALL PERIOD_PERFORMOUTPUT(%VAL(CNF_PVAL(YSLOT1)), 
+            CALL PERIOD_PERFORMOUTPUT(%VAL(CNF_PVAL(YSLOT1)),
      :                                NDATA, MXCOL,
      :                                YERRORARRAY(SLOT), IUNIT)
 
@@ -90,7 +90,7 @@ C-----------------------------------------------------------------------------
  150     CONTINUE
 
       END IF
- 
+
  200  CONTINUE
       CALL FIO_PUNIT( IUNIT, STATUS )
       RETURN

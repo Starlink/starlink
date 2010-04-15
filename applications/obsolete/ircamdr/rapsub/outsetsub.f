@@ -1,7 +1,7 @@
 
 *+  OUTSETSUB - replaces all pixels outside circle with specified value
 
-      SUBROUTINE OUTSETSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, XCENTRE, 
+      SUBROUTINE OUTSETSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, XCENTRE,
      :                       YCENTRE, DIAMETER, NEWVAL, STATUS )
 
 *    Description :
@@ -12,7 +12,7 @@
 *
 *    Invocation :
 *
-*     CALL OUTSETSUB( INARRAY, OUTARRAY, DIMS, XCENTRE, YCENTRE, 
+*     CALL OUTSETSUB( INARRAY, OUTARRAY, DIMS, XCENTRE, YCENTRE,
 *                     DIAMETER, NEWVAL, STATUS )
 *
 *    Method :
@@ -100,7 +100,7 @@
 *          see where current pixel is in relation to centre of circle
             DISTANCE  =  SQRT(REAL((I-XCENTRE)**2+(J-YCENTRE)**2))
 
-*          check this against given radius value 
+*          check this against given radius value
             IF( DISTANCE .GT. RADIUS ) THEN
 
 *             pixel lies outside circle - output array pixel value is

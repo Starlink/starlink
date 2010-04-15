@@ -6,7 +6,7 @@ The extensible N-dimensional data format (NDF) is a format for storing
 bulk data in the form of N-dimensional arrays of numbers. It is
 typically used for storing spectra, images and similar datasets with
 higher dimensionality. The NDF format is based on the Hierarchical
-Data System (HDS) and is extensible; not only does it provide a 
+Data System (HDS) and is extensible; not only does it provide a
 comprehensive set of standard ancillary items to describe the data,
 it can also be extended indefinitely to handle additional user-defined
 information of any type.

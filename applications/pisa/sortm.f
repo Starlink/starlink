@@ -3,7 +3,7 @@
       integer*2 ib(n),iu
       real*4 it
       int=2
-   10 int=2*int 
+   10 int=2*int
       if(int.lt.n)goto 10
       int=min0(n,(3*int)/4-1)
    20 int=int/2

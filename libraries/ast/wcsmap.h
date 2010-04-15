@@ -20,9 +20,9 @@
 *     etc.  needed to use this class.
 *
 *     The WcsMap class implements Mappings that transform a pair of
-*     longitude/latitude values into a pair of projected Cartesian 
+*     longitude/latitude values into a pair of projected Cartesian
 *     coordinates. All the projections included in FITS WCS are included.
-*     For more information about these projections, see the appropriate 
+*     For more information about these projections, see the appropriate
 *     FITS document.
 
 *  Inheritance:
@@ -33,42 +33,42 @@
 
 *  New Attributes Defined:
 *     NatLat (double)
-*        This attribute gives the latitude of the reference point of 
-*        a FITS WCS projection, in the native coordinate system. The value 
-*        returned is in radians. A value of AST__BAD is returned if 
-*        no value is defined. This attribute is read only, and may change 
+*        This attribute gives the latitude of the reference point of
+*        a FITS WCS projection, in the native coordinate system. The value
+*        returned is in radians. A value of AST__BAD is returned if
+*        no value is defined. This attribute is read only, and may change
 *        if new values are assigned to the projection parameters.
 *     NatLon (double)
-*        This attribute gives the longitude of the reference point of 
-*        a FITS WCS projection, in the native coordinate system. The value 
-*        returned is in radians. A value of AST__BAD is returned if 
-*        no value is defined. This attribute is read only, and may change 
+*        This attribute gives the longitude of the reference point of
+*        a FITS WCS projection, in the native coordinate system. The value
+*        returned is in radians. A value of AST__BAD is returned if
+*        no value is defined. This attribute is read only, and may change
 *        if new values are assigned to the projection parameters.
 *     ProjP(i) (double)
-*        This attribute provides aliases for the PV attributes, which 
-*        specifies the projection parameter values to be used by a WcsMap 
-*        when implementing a FITS-WCS sky projection. ProjP is retained for 
-*        compatibility with previous versions of FITS-WCS and AST. New 
+*        This attribute provides aliases for the PV attributes, which
+*        specifies the projection parameter values to be used by a WcsMap
+*        when implementing a FITS-WCS sky projection. ProjP is retained for
+*        compatibility with previous versions of FITS-WCS and AST. New
 *        applications should use the PV attibute instead.
 *     PVj_m (double)
-*        This attribute gives the parameter values used by a FITS WCS 
-*        projection. The index j is the axis index in the range 1 to 99, and 
-*        the index m is the parameter index in the range 0 to 99. They will 
-*        have the value AST__BAD if undefined. By default, no projection 
-*        parameters are defined. These should be assigned appropriate values 
+*        This attribute gives the parameter values used by a FITS WCS
+*        projection. The index j is the axis index in the range 1 to 99, and
+*        the index m is the parameter index in the range 0 to 99. They will
+*        have the value AST__BAD if undefined. By default, no projection
+*        parameters are defined. These should be assigned appropriate values
 *        before using a WcsMap to transform points.
 *     WcsAxis(lonlat) (int)
 *        This attribute gives the indices of the longitude and latitude axes
 *        of a FITS WCS projection within the coordinate system used by a
-*        WcsMap. If "lonlat" is 1 then the index of the longitude axis is 
-*        returned. If it is 2 the index of the latitude axis is returned. 
-*        The first axis in the coordinate system is axis 1. This is a 
+*        WcsMap. If "lonlat" is 1 then the index of the longitude axis is
+*        returned. If it is 2 the index of the latitude axis is returned.
+*        The first axis in the coordinate system is axis 1. This is a
 *        read-only attribute.
 *     WcsType (int)
 *        This attribute gives the FITS WCS projection type implemented by a
-*        WcsMap. Macros giving the integer value associated with supported 
-*        projections are defined. They have the general form "AST__xxx" where 
-*        "xxx" is the 3-character code used to represent the projection in the 
+*        WcsMap. Macros giving the integer value associated with supported
+*        projections are defined. They have the general form "AST__xxx" where
+*        "xxx" is the 3-character code used to represent the projection in the
 *        FITS CTYPE keyword.
 
 *  Methods Over-Ridden:
@@ -146,63 +146,63 @@
 *           Factor for converting degrees to radians.
 *        AST__DR2D
 *           Factor for converting radians to degrees.
-*        AST__AZP     
+*        AST__AZP
 *           An integer identifier for the FITS AZP projection.
-*        AST__TAN     
-*           An integer identifier for the FITS TAN projection. 
-*        AST__SIN     
-*           An integer identifier for the FITS SIN projection. 
-*        AST__STG     
-*           An integer identifier for the FITS STG projection. 
-*        AST__ARC     
-*           An integer identifier for the FITS ARC projection. 
-*        AST__ZPN     
-*           An integer identifier for the FITS ZPN projection. 
-*        AST__ZEA     
-*           An integer identifier for the FITS ZEA projection. 
-*        AST__AIR     
-*           An integer identifier for the FITS AIR projection. 
-*        AST__CYP     
-*           An integer identifier for the FITS CYP projection. 
-*        AST__CAR     
-*           An integer identifier for the FITS CAR projection. 
-*        AST__MER     
-*           An integer identifier for the FITS MER projection. 
-*        AST__CEA     
-*           An integer identifier for the FITS CEA projection. 
-*        AST__COP     
-*           An integer identifier for the FITS COP projection. 
-*        AST__COD     
-*           An integer identifier for the FITS COD projection. 
-*        AST__COE     
-*           An integer identifier for the FITS COE projection. 
-*        AST__COO     
-*           An integer identifier for the FITS COO projection. 
-*        AST__BON     
-*           An integer identifier for the FITS BON projection. 
-*        AST__PCO     
-*           An integer identifier for the FITS PCO projection. 
-*        AST__GLS     
-*           A depracated integer identifier for the FITS SFL projection. 
-*        AST__SFL     
-*           An integer identifier for the FITS SFL projection. 
-*        AST__PAR     
-*           An integer identifier for the FITS PAR projection. 
-*        AST__AIT     
-*           An integer identifier for the FITS AIT projection. 
-*        AST__MOL     
-*           An integer identifier for the FITS MOL projection. 
-*        AST__CSC     
-*           An integer identifier for the FITS CSC projection. 
-*        AST__QSC     
-*           An integer identifier for the FITS QSC projection. 
-*        AST__TSC     
+*        AST__TAN
+*           An integer identifier for the FITS TAN projection.
+*        AST__SIN
+*           An integer identifier for the FITS SIN projection.
+*        AST__STG
+*           An integer identifier for the FITS STG projection.
+*        AST__ARC
+*           An integer identifier for the FITS ARC projection.
+*        AST__ZPN
+*           An integer identifier for the FITS ZPN projection.
+*        AST__ZEA
+*           An integer identifier for the FITS ZEA projection.
+*        AST__AIR
+*           An integer identifier for the FITS AIR projection.
+*        AST__CYP
+*           An integer identifier for the FITS CYP projection.
+*        AST__CAR
+*           An integer identifier for the FITS CAR projection.
+*        AST__MER
+*           An integer identifier for the FITS MER projection.
+*        AST__CEA
+*           An integer identifier for the FITS CEA projection.
+*        AST__COP
+*           An integer identifier for the FITS COP projection.
+*        AST__COD
+*           An integer identifier for the FITS COD projection.
+*        AST__COE
+*           An integer identifier for the FITS COE projection.
+*        AST__COO
+*           An integer identifier for the FITS COO projection.
+*        AST__BON
+*           An integer identifier for the FITS BON projection.
+*        AST__PCO
+*           An integer identifier for the FITS PCO projection.
+*        AST__GLS
+*           A depracated integer identifier for the FITS SFL projection.
+*        AST__SFL
+*           An integer identifier for the FITS SFL projection.
+*        AST__PAR
+*           An integer identifier for the FITS PAR projection.
+*        AST__AIT
+*           An integer identifier for the FITS AIT projection.
+*        AST__MOL
+*           An integer identifier for the FITS MOL projection.
+*        AST__CSC
+*           An integer identifier for the FITS CSC projection.
+*        AST__QSC
+*           An integer identifier for the FITS QSC projection.
+*        AST__TSC
 *           An integer identifier for the FITS TSC projection
-*        AST__HPX     
-*           An integer identifier for the FITS HPX projection. 
+*        AST__HPX
+*           An integer identifier for the FITS HPX projection.
 *        AST__TPN
-*           An integer identifier for a "TAN with correction terms" projection. 
-*        AST__WCSBAD  
+*           An integer identifier for a "TAN with correction terms" projection.
+*        AST__WCSBAD
 *           An integer identifier for a "null" projection.
 *
 *     Protected:
@@ -234,12 +234,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -271,7 +271,7 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
-#include "proj.h"                /* Mark Calabretta's WCSLIB library header 
+#include "proj.h"                /* Mark Calabretta's WCSLIB library header
                                     file */
 
 #if defined(astCLASS)            /* Protected */
@@ -294,7 +294,7 @@
 #else
 #define STATUS_PTR astGetStatusPtr
 #endif
-#define AST__WCSMX 10   
+#define AST__WCSMX 10
 
 /* pi:  180 degrees in radians - from SLALIB file slamac.h. */
 #define AST__DPI 3.1415926535897932384626433832795028841971693993751
@@ -395,7 +395,7 @@ typedef struct AstWcsMapVtab {
 
 } AstWcsMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -436,7 +436,7 @@ AstWcsMap *astLoadWcsMap_( void *, size_t, AstWcsMapVtab *,
                            const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitWcsMapGlobals_( AstWcsMapGlobals * );
 #endif
 

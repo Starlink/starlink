@@ -13,8 +13,8 @@
 *     CALL ATL1_GTFRM( PARAM, IAST, IFRAME, STATUS )
 
 *  Description:
-*     The supplied environment parameter is used to get either an integer 
-*     Frame index or a Domain name (which is converted to an intger index) 
+*     The supplied environment parameter is used to get either an integer
+*     Frame index or a Domain name (which is converted to an intger index)
 *     from the user. Any Frame within the supplied FrameSet can be
 *     selected. The strings "AST__BASE" or "AST__CURRENT" may also be
 *     supplied.
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,8 +125,8 @@
       DEFAUL = AST_GETC( IAST, 'CURRENT', STATUS )
 
 *  Get a string representing the Frame to use.
-      CALL PAR_MIX0I( PARAM, DEFAUL, 1, NFRM, DLIST, .TRUE., CFRM, 
-     :                STATUS ) 
+      CALL PAR_MIX0I( PARAM, DEFAUL, 1, NFRM, DLIST, .TRUE., CFRM,
+     :                STATUS )
 
 *  Attempt to convert the returned string to integer.
       IF( STATUS .EQ. SAI__OK ) THEN

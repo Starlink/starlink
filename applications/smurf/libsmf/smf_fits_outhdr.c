@@ -27,9 +27,9 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function is used to build up an output FITS header (as a 
+*     This function is used to build up an output FITS header (as a
 *     FitsChan) by merging content from all the input FITS headers.
-*     Values in the FITS headers that differ are removed. It should be 
+*     Values in the FITS headers that differ are removed. It should be
 *     called once for each input FITS header.
 
 *     Keywords that relate to state from the beginning and end of the
@@ -228,8 +228,8 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
       *outhdr = temphdr;
    }
 
-/* Remove any ASTWARN cards from the output header, but retain them 
-   within the input header. Any such warnings in the input header will 
+/* Remove any ASTWARN cards from the output header, but retain them
+   within the input header. Any such warnings in the input header will
    be displayed when the input NDF is closed using smf_close_file. This
    helps to track down bugs caused by keywords unintentionally having
    undefined values in an input NDF. */

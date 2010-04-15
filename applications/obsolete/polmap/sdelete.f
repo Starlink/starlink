@@ -4,26 +4,26 @@
      &             STK_NPTS,TOP_STK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   S D E L E T E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<),
 C STK_TITLE (><), STK_LAMBDA (><), STK_STOKES_I (><), STK_STOKES_Q (><),
 C STK_STOKES_QV (><), STK_STOKES_U (><), STK_STOKES_UV (><),
 C STK_NPTS (><), TOP_STK (><), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This routine deletes the specified polarization spectra from the stack.
@@ -52,7 +52,7 @@ C The command parameters
 C
       INTEGER NPARAMS
       REAL PARAMS(*)
-C 
+C
 C Misc.
 C
       LOGICAL OK

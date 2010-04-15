@@ -27,7 +27,7 @@
 *  Notes:
 *     Both the input and output catalogues are RESET to their first entries
 *     on exit from this routine.
-* 
+*
 *     If the catalogue can not be created an insufficient privilege to create
 *     error will be reported.
 *
@@ -49,7 +49,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,30 +97,30 @@
       CPnumcols(cd2) = CPnumcols(cd1)
       CPnumpars(cd2) = CPnumpars(cd1)
       CPcatnotes(cd2) = CPcatnotes(cd1)
-      CPdelind(cd2) = CPdelind(cd1) 
+      CPdelind(cd2) = CPdelind(cd1)
       CPnofndi(cd2) = CPnofndi(cd1)
       do ndcount = 1, CPnofndi(cd1)
         CPnumndcols(cd2,ndcount) = CPnumndcols(cd1,ndcount)
-        CP1icol(cd2,ndcount) = CP1icol(cd1,ndcount) 
-        CP2icol(cd2,ndcount) = CP2icol(cd1,ndcount) 
-        CP3icol(cd2,ndcount) = CP3icol(cd1,ndcount) 
-        CP4icol(cd2,ndcount) = CP4icol(cd1,ndcount) 
-        CP5icol(cd2,ndcount) = CP5icol(cd1,ndcount) 
-        CP6icol(cd2,ndcount) = CP6icol(cd1,ndcount) 
-        CP7icol(cd2,ndcount) = CP7icol(cd1,ndcount) 
+        CP1icol(cd2,ndcount) = CP1icol(cd1,ndcount)
+        CP2icol(cd2,ndcount) = CP2icol(cd1,ndcount)
+        CP3icol(cd2,ndcount) = CP3icol(cd1,ndcount)
+        CP4icol(cd2,ndcount) = CP4icol(cd1,ndcount)
+        CP5icol(cd2,ndcount) = CP5icol(cd1,ndcount)
+        CP6icol(cd2,ndcount) = CP6icol(cd1,ndcount)
+        CP7icol(cd2,ndcount) = CP7icol(cd1,ndcount)
         CPnddatelm(cd2,ndcount) = CPnddatelm(cd1,ndcount)
-        CPndorig(cd2,ndcount) =  CPndorig(cd1,ndcount) 
+        CPndorig(cd2,ndcount) =  CPndorig(cd1,ndcount)
       enddo
 
       CPnofasorts(cd2) = CPnofasorts(cd1)
       do ascount = 1, CPnofasorts(cd1)
         CPnumascols(cd2,ascount) = CPnumascols(cd1,ascount)
-        CPfascol(cd2,ascount) = CPfascol(cd1,ascount) 
-        CPfasdir(cd2,ascount) = CPfasdir(cd1,ascount) 
-        CPsascol(cd2,ascount) = CPsascol(cd1,ascount) 
-        CPsasdir(cd2,ascount) = CPsasdir(cd1,ascount) 
-        CPtascol(cd2,ascount) = CPtascol(cd1,ascount) 
-        CPtasdir(cd2,ascount) = CPtasdir(cd1,ascount) 
+        CPfascol(cd2,ascount) = CPfascol(cd1,ascount)
+        CPfasdir(cd2,ascount) = CPfasdir(cd1,ascount)
+        CPsascol(cd2,ascount) = CPsascol(cd1,ascount)
+        CPsasdir(cd2,ascount) = CPsasdir(cd1,ascount)
+        CPtascol(cd2,ascount) = CPtascol(cd1,ascount)
+        CPtasdir(cd2,ascount) = CPtasdir(cd1,ascount)
         CPasdatelm(cd2,ascount) = CPasdatelm(cd1,ascount)
         CPasorig(cd2,ascount) = CPasorig(cd1,ascount)
       enddo
@@ -138,9 +138,9 @@
         EPcoldes(cd2,ed) = EPcoldes(cd1,ed)
         EPassert(cd2,ed) = EPassert(cd1,ed)
         EPdomchk(cd2,ed) = EPdomchk(cd1,ed)
-        EParrshp(cd2,ed) = EParrshp(cd1,ed) 
-        EPdatelm(cd2,ed) = EPdatelm(cd1,ed) 
-        EPnsflag(cd2,ed) = EPnsflag(cd1,ed) 
+        EParrshp(cd2,ed) = EParrshp(cd1,ed)
+        EPdatelm(cd2,ed) = EPdatelm(cd1,ed)
+        EPnsflag(cd2,ed) = EPnsflag(cd1,ed)
         EPnsformat(cd2,ed) = EPnsformat(cd1,ed)
         EPhidden(cd2,ed) = EPhidden(cd1,ed)
         EPorig(cd2,ed) = EPorig(cd1,ed)

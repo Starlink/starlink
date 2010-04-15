@@ -3,7 +3,7 @@ C+
 C
 C     S C R U N C H
 C
-C     Figaro routine to scrunch a spectrum or set of spectra.  Can 
+C     Figaro routine to scrunch a spectrum or set of spectra.  Can
 C     scrunch either into a linear wavelength scale, where the
 C     wavelength increment from bin to bin is constant across the
 C     spectrum, or into a logarithmic scale, where the increment of the
@@ -12,7 +12,7 @@ C     is performed by the routine FIG_REBIN.
 C
 C     If the input file is 2D data, then it is treated as a set of
 C     1D spectra and each is scrunched individually.   If the wavelength
-C     array is 1D, then this single array will be used for all 
+C     array is 1D, then this single array will be used for all
 C     the spectra.  If it is 2D, then each spectrum will be scrunched
 C     according to the corresponding cross-section of the wavelength
 C     array.
@@ -32,7 +32,7 @@ C     Command parameters -
 C
 C     SPECTRUM     (Character) The name of the spectrum to be scrunched.
 C     WSTART       (Numeric) The wavelength of the CENTER of the first
-C                  bin of the resulting scrunched spectrum.  
+C                  bin of the resulting scrunched spectrum.
 C     WEND         (Numeric) The wavelength of the CENTER of the final
 C                  bin of the resulting scrunched spectrum.  If WEND is
 C                  less than WSTART, then SCRUNCH assumes that it is the
@@ -40,8 +40,8 @@ C                  increment rather than the final value that is being
 C                  specified.  If the scrunch is logarithmic and WSTART
 C                  is greater than WEND, SCRUNCH assumes that the WEND
 C                  value represents a velocity in km/sec.  These
-C                  assumptions can be controlled directly by the 
-C                  keywords INCREMENT and FINAL, if they will not give 
+C                  assumptions can be controlled directly by the
+C                  keywords INCREMENT and FINAL, if they will not give
 C                  the desired effect.
 C     BINS         (Numeric) The number of bins for the resulting
 C                  spectrum.
@@ -60,7 +60,7 @@ C     INCREMENT    WEND is an increment value, even though it is >
 C                  WSTART.
 C     FINAL        WEND is a final value, even though it is < WSTART.
 C
-C     User variables - 
+C     User variables -
 C
 C     SCRUNCH_INC  Is set to the wavelength increment if linear
 C                  rebinning is used, and to the velocity increment if
@@ -75,19 +75,19 @@ C
 C     28th Mar 1985  KS / AAO.  AXIS(1) log flag now written into the
 C                    output file rather than the input!
 C     29th Apr 1985  KS / AAO.  SCRUNCH_INC now set.
-C     12th Sep 1985  KS / AAO.  Now works on a double precision 
+C     12th Sep 1985  KS / AAO.  Now works on a double precision
 C                    wavelength array, to handle high dispersion data.
 C     30th Dec 1985  KS / AAO.  Ends of spectra are now zeroed properly
 C                    when they represent wavelength values outside the
 C                    range of the input spectrum.
-C     2nd  Jan 1986  KS / AAO.  Use of WEND as an increment value 
+C     2nd  Jan 1986  KS / AAO.  Use of WEND as an increment value
 C                    introduced, along with INCREMENT and FINAL keywords
 C                    and setting of SCRUNCH_INC in the log case and setting
 C                    of SCRUNCH_END. Now operates on a 2D set of spectra
 C                    as well as on a single spectrum.  Error arrays now
 C                    no longer copied over.
 C     4th  May 1986  KS / AAO.  Initial values for flags now set
-C                    explicitly instead of being assumed to default to 
+C                    explicitly instead of being assumed to default to
 C                    .FALSE.
 C     17th Oct 1988  KS / AAO.  GEN_ELEMD values properly cast to float
 C                    before being passed to ICH_ENCODE.
@@ -95,7 +95,7 @@ C     3rd  Nov 1988  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
 C     2nd  Mar 1990  KS / AAO. DSA_GET/SET_AXIS_INFO now support the log
-C                    flag, so that is now used.  DYN_INCREMENT used 
+C                    flag, so that is now used.  DYN_INCREMENT used
 C                    instead of assuming DYNAMIC_MEM elements are bytes.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
 C                    ICH_ENCODE with float, not double.
@@ -120,7 +120,7 @@ C
       DOUBLE PRECISION GEN_ELEMD
       INTEGER  ICH_ENCODE
       INTEGER  ICH_FOLD
-      INTEGER  ICH_LEN 
+      INTEGER  ICH_LEN
       LOGICAL  PAR_GIVEN
 C
 C     Local variables
@@ -139,14 +139,14 @@ C
       LOGICAL   FINAL            ! True if  WEND is a final value
       LOGICAL   FLUX             ! Conserve flux?
       INTEGER   IDIM             ! Loop variable
-      INTEGER   IMODE            ! Selects mode of transfer for input 
-                                 ! bins 
+      INTEGER   IMODE            ! Selects mode of transfer for input
+                                 ! bins
       LOGICAL   INCREM           ! True if WEND is an increment value
       INTEGER   INVOKE           ! Used to format character strings
       LOGICAL   ISNEW            ! Is address new to CNF?
       LOGICAL   ISNEWX           ! Is XPTR address new to CNF?
       LOGICAL   ISNRZ            ! Is address RZPTR new to CNF?
-      INTEGER   IQUAD            ! Equals 0 for lin. interp. non-zero 
+      INTEGER   IQUAD            ! Equals 0 for lin. interp. non-zero
                                  ! for quadratic
       INTEGER   ISPECT           ! Loop variable
       LOGICAL   LINEAR           ! If true, linear interpolation used
@@ -155,7 +155,7 @@ C
       LOGICAL   MEAN             ! Conserve mean data level, not flux?
       INTEGER   NADD             ! No. of input bins added to form one
                                  ! output bin
-      INTEGER   NBINR            ! Number of elements (bins) in 
+      INTEGER   NBINR            ! Number of elements (bins) in
                                  ! rebinned data
       INTEGER   NCITEMS          ! Number of axis character items
                                  ! retrieved
@@ -165,7 +165,7 @@ C
       DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
       INTEGER   NNITEMS          ! Number of axis numeric items
                                  ! retrieved
-      INTEGER   NSPECT           ! No. of spectra in SPECT 
+      INTEGER   NSPECT           ! No. of spectra in SPECT
       INTEGER   NX               ! Number of elements (bins) in input
                                  ! data
       INTEGER   NXSPECT          ! No. of spectra in axis structure
@@ -176,23 +176,23 @@ C
       INTEGER   PSTAT            ! Status for PAR_ routines
       LOGICAL   QUAD             ! Quadratic interpolation used?
       REAL      RESET            ! Reset value for real parameter
-      INTEGER   RXPTR            ! Pointer to output wavelength array 
+      INTEGER   RXPTR            ! Pointer to output wavelength array
                                  ! (Mode 1 only)
       INTEGER   RZPTR            ! Pointer to output array containing
                                  ! rebinned data
       INTEGER   SLOT             ! Slot number
       REAL      SSKEW            ! No. of bins the input array is to
-                                 ! be shifted 
+                                 ! be shifted
       INTEGER   STATUS           ! Running status for DSA_ routines
       CHARACTER STRING*72        ! Used to format strings
       INTEGER   TPTR             ! Temporary pointer
       REAL      VALUE            ! Value of some real parameters
       REAL      WEND             ! End wavelength
       REAL      WSTART           ! Start wavelength
-      INTEGER   XPTR             ! Pointer to input wavelength array 
+      INTEGER   XPTR             ! Pointer to input wavelength array
                                  ! (Mode 1 only)
       CHARACTER XUNITS*72        ! Axis data units
-      INTEGER   ZPTR             ! Pointer to input data      
+      INTEGER   ZPTR             ! Pointer to input data
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
@@ -318,7 +318,7 @@ C
       END IF
 C
 C     If it is an incremental value, calculate the final wavelength
-C    
+C
       IF (INCREM) THEN
          DELTA=DWEND
          IF (.NOT.LOGWR) THEN
@@ -385,14 +385,14 @@ C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','SPECT',NO_DATA,NEW_FILE,STATUS)
 C
 C     Create output axis and data arrays of appropriate size.
-C     Note that NDIM and DIMS still contain the values 
+C     Note that NDIM and DIMS still contain the values
 C     obtained for the input data array.
 C
       DIMS(1)=NBINR
       CALL DSA_RESHAPE_DATA('OUTPUT','SPECT',NDIM,DIMS,STATUS)
       CALL DSA_RESHAPE_AXIS('OUTPUT',1,'SPECT',1,1,NBINR,STATUS)
 C
-C     Set LOG flag in output data 
+C     Set LOG flag in output data
 C
       IF (LOGWR) THEN
          NITEMS(1)=1.0
@@ -479,7 +479,7 @@ C
          CALL PAR_WRUSER(' ',PSTAT)
       END IF
 C
-C     And something about the output data and set the SCRUNCH_INC and 
+C     And something about the output data and set the SCRUNCH_INC and
 C     SCRUNCH_END variables.
 C
       STRING='Data rebinned into '
@@ -514,7 +514,7 @@ C
 
 C     Now tidy up
 
-      CALL DSA_CLOSE(STATUS)       
+      CALL DSA_CLOSE(STATUS)
 
       END
 

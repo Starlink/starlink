@@ -67,7 +67,7 @@
 
 
 
-   
+
       SUBROUTINE TSP_CCDPOL(N,E,O,OFFSET,S,I,V,VV,STATUS)
 *+
 *   T S P _ C C D P O L
@@ -146,16 +146,16 @@
       ELSE
           SQI = 0D0
       ENDIF
-      SUMS = SUMS/N                                        
-      SUMI = SUMI/N                                                      
+      SUMS = SUMS/N
+      SUMI = SUMI/N
 
 *  Output final results
-      CALL MSG_FMTD('SUMI','F12.2',SUMI)                                  
-      CALL MSG_FMTD('SQI','F9.2',SQI)                                    
-      CALL MSG_OUT(' ',' Intensity     ^SUMI +/- ^SQI',STATUS)           
-      CALL MSG_FMTD('SUMS','F12.2',SUMS*100D0/SUMI)                       
-      CALL MSG_FMTD('SQS','F9.2',SQS*100D0/SUMI)                         
-      CALL MSG_OUT(' ',' Polarization  ^SUMS +/- ^SQS',STATUS)           
+      CALL MSG_FMTD('SUMI','F12.2',SUMI)
+      CALL MSG_FMTD('SQI','F9.2',SQI)
+      CALL MSG_OUT(' ',' Intensity     ^SUMI +/- ^SQI',STATUS)
+      CALL MSG_FMTD('SUMS','F12.2',SUMS*100D0/SUMI)
+      CALL MSG_FMTD('SQS','F9.2',SQS*100D0/SUMI)
+      CALL MSG_OUT(' ',' Polarization  ^SUMS +/- ^SQS',STATUS)
       END
 
 
@@ -232,7 +232,7 @@
 *   (>)  IN      (Double array (N))  Input array
 *   (<)  OUT     (Double array (N))  Output array
 *
-*  Jeremy Bailey   26/10/1989    
+*  Jeremy Bailey   26/10/1989
 *+
 
       IMPLICIT NONE

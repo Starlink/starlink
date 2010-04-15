@@ -4,7 +4,7 @@ C
 C     I S T R E T C H
 C
 C     Shifts an image in both X and Y, by, in each direction,
-C     a constant amount expressed in pixels and stretches it 
+C     a constant amount expressed in pixels and stretches it
 C     by a given factor - this is a linear stretch, combined
 C     with a shift.  Note that this is functionally a superset
 C     of ISHIFT, but ISHIFT should be used for cases where the
@@ -28,12 +28,12 @@ C              shifted in Y.  Sense is as for XSHIFT.
 C
 C     XSPLIT   (Numeric) The number of sub-divisions to be made in
 C              each of the original pixels in X.
-C   
+C
 C     YSPLIT   (Numeric) The number of sub-divisions to be made in
 C              each of the original pixels in Y.
 C
 C              Note that if XSPLIT or YSPLIT are greater than 1,
-C              the data will be interpolated using a fit to a 2D 
+C              the data will be interpolated using a fit to a 2D
 C              parabola.  This increases the accuracy (sometimes)
 C              of the rebinning, but results in increased CPU usage.
 C
@@ -76,7 +76,7 @@ C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       INTEGER      DPTR          ! Dynamic-memory pointer to data array
       INTEGER      DSLOT         ! Map slot number of input data array
-      REAL         EXTRA         ! 
+      REAL         EXTRA         !
       INTEGER      MODE          !
       INTEGER      NCXX          !
       INTEGER      NCXY          !
@@ -96,22 +96,22 @@ C
       INTEGER      PY            ! Workspace pointer
       INTEGER      PYSLOT        ! Map slot number for workspace
       INTEGER      STATUS        ! Running status for DSA_ routines
-      REAL         VALS(20,20)   ! 
+      REAL         VALS(20,20)   !
       REAL         VALUE         ! Temporary real number
       INTEGER      WPTR          ! Dynamic-memory pointer to workspace
       INTEGER      WSLOT         ! Map slot number of workspace
       DOUBLE PRECISION XCOEFF(1,2) !
-      LOGICAL      XLOG          ! 
-      REAL         XRESMIN       ! 
-      REAL         XRESMAX       ! 
-      REAL         XSHIFT        !  
-      REAL         XSTRCH        ! 
+      LOGICAL      XLOG          !
+      REAL         XRESMIN       !
+      REAL         XRESMAX       !
+      REAL         XSHIFT        !
+      REAL         XSTRCH        !
       DOUBLE PRECISION YCOEFF(2,1) !
-      LOGICAL      YLOG          ! 
-      REAL         YRESMIN       ! 
-      REAL         YRESMAX       ! 
-      REAL         YSHIFT        ! 
-      REAL         YSTRCH        ! 
+      LOGICAL      YLOG          !
+      REAL         YRESMIN       !
+      REAL         YRESMAX       !
+      REAL         YSHIFT        !
+      REAL         YSTRCH        !
 C
 C     Parameter values for FIG_REBIN2D
 C
@@ -173,7 +173,7 @@ C
       IF (DPTR.EQ.OPTR) THEN
 C
 C        Single operand (result replaces original data). Get
-C        workspace to rebin into.  
+C        workspace to rebin into.
 C
          BYTES=NPIX*NLINE*DSA_TYPESIZE('FLOAT',STATUS)
          CALL DSA_GET_WORKSPACE(BYTES,WPTR,WSLOT,STATUS)
